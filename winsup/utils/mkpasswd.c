@@ -560,11 +560,11 @@ main (int argc, char **argv)
       if (passed_home_path[0] == '\0')
 	strcpy (passed_home_path, "/home/");
 
-      printf ("%s::%ld:%ld::%s%s:/bin/bash\n", name,
-					     DOMAIN_USER_RID_ADMIN,
-					     DOMAIN_ALIAS_RID_ADMINS,
-					     passed_home_path,
-					     name);
+      printf ("%s:*:%ld:%ld::%s%s:/bin/bash\n", name,
+					        DOMAIN_USER_RID_ADMIN,
+					        DOMAIN_ALIAS_RID_ADMINS,
+					        passed_home_path,
+					        name);
 
       return 0;
     }
