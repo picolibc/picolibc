@@ -1,5 +1,13 @@
 2003-07-03  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* mingwex/math/trunc.c (trunc): Provide lvalue for memory input constraint. 
+	* mingwex/math/truncf.c (truncf): Likewise.
+	* mingwex/math/truncl.c (truncl): Likewise.
+	* mingwex/math/modff.c (modff): Likewise.
+	* mingwex/math/modfl.c (modfl): Likewise.
+
+2003-07-03  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/search.h: New file.
 	* include/stdlib.h: Add comment about qsort, bsearch in
 	search.h.
