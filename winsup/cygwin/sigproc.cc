@@ -127,9 +127,9 @@ static bool NO_COPY pending_signals = false;	// true if signals pending
 
 /* Functions
  */
-static int __stdcall checkstate (waitq *);
+static int __stdcall checkstate (waitq *) __attribute__ ((regparm (1)));
 static __inline__ BOOL get_proc_lock (DWORD, DWORD);
-static HANDLE __stdcall getsem (_pinfo *, const char *, int, int);
+static HANDLE __stdcall getevent (_pinfo *, const char *) __attribute__ ((regparm (2)));
 static void __stdcall remove_zombie (int);
 static DWORD WINAPI wait_sig (VOID *arg);
 static int __stdcall stopped_or_terminated (waitq *, _pinfo *);
@@ -679,18 +679,21 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
   sigproc_printf ("pid %d, signal %d, its_me %d", p->pid, sig, its_me);
 
   LONG *todo;
+  bool issem;
   if (its_me)
     {
       if (!wait_for_completion)
 	{
 	  thiscatch = sigcatch_nosync;
 	  todo = myself->getsigtodo (sig);
+	  issem = false;
 	}
       else if (tid != mainthread.id)
 	{
 	  thiscatch = sigcatch_nonmain;
 	  thiscomplete = sigcomplete_nonmain;
 	  todo = getlocal_sigtodo (sig);
+	  issem = true;
 	}
       else
 	{
@@ -698,12 +701,16 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
 	  thiscomplete = sigcomplete_main;
 	  thisframe.set (mainthread, ebp, exception);
 	  todo = getlocal_sigtodo (sig);
+	  issem = true;
 	}
     }
-  else if ((thiscatch = getsem (p, "sigcatch", 0, 0)))
-    todo = p->getsigtodo (sig);
+  else if ((thiscatch = getevent (p, "sigcatch")))
+    {
+      todo = p->getsigtodo (sig);
+      issem = false;
+    }
   else
-    goto out;		  // Couldn't get the semaphore.  getsem issued
+    goto out;		  // Couldn't get the semaphore.  getevent issued
 			  //  an error, if appropriate.
 
 #if WHEN_MULTI_THREAD_SIGNALS_WORK
@@ -719,15 +726,7 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
 
   /* Notify the process that a signal has arrived.
    */
-  SetLastError (0);
-
-#if 0
-  int prio;
-  prio = GetThreadPriority (GetCurrentThread ());
-  (void) SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
-#endif
-
-  if (!ReleaseSemaphore (thiscatch, 1, NULL) && (int) GetLastError () > 0)
+  if (issem ? !ReleaseSemaphore (thiscatch, 1, NULL) : !SetEvent (thiscatch))
     {
       /* Couldn't signal the semaphore.  This probably means that the
        * process is exiting.
@@ -764,23 +763,8 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
   else
     {
       sigproc_printf ("Waiting for thiscomplete %p", thiscomplete);
-
-      SetLastError (0);
       rc = WaitForSingleObject (thiscomplete, WSSC);
-#if 0 // STILL NEEDED?
-      /* Check for strangeness due to this thread being redirected by the
-	 signal handler.  Sometimes a WAIT_TIMEOUT will occur when the
-	 thread hasn't really timed out.  So, check again.
-	 FIXME: This isn't foolproof. */
-      if (rc != WAIT_OBJECT_0 &&
-	  WaitForSingleObject (thiscomplete, 0) == WAIT_OBJECT_0)
-	rc = WAIT_OBJECT_0;
-#endif
     }
-
-#if 0
-  SetThreadPriority (GetCurrentThread (), prio);
-#endif
 
   if (rc == WAIT_OBJECT_0)
     rc = 0;		// Successful exit
@@ -892,7 +876,7 @@ out:
 /* Get or create a process specific semaphore used in message passing.
  */
 static HANDLE __stdcall
-getsem (_pinfo *p, const char *str, int init, int max)
+getevent (_pinfo *p, const char *str)
 {
   HANDLE h;
   char sem_name[MAX_PATH];
@@ -912,14 +896,18 @@ getsem (_pinfo *p, const char *str, int init, int max)
 	low_priority_sleep (1);
     }
 
-  SetLastError (0);
   if (p == NULL)
     {
       char sa_buf[1024];
 
       DWORD winpid = GetCurrentProcessId ();
+#if 0
       h = CreateSemaphore (sec_user_nih (sa_buf), init, max,
 			   str = shared_name (sem_name, str, winpid));
+#else
+      h = CreateEvent (sec_user_nih (sa_buf), FALSE, FALSE,
+		       str = shared_name (sem_name, str, winpid));
+#endif
       p = myself;
       if (!h)
 	{
@@ -929,8 +917,13 @@ getsem (_pinfo *p, const char *str, int init, int max)
     }
   else
     {
+#if 0
       h = OpenSemaphore (SEMAPHORE_ALL_ACCESS, FALSE,
 			 shared_name (sem_name, str, p->dwProcessId));
+#else
+      h = OpenEvent (EVENT_ALL_ACCESS, FALSE,
+		     shared_name (sem_name, str, p->dwProcessId));
+#endif
 
       if (!h)
 	{
@@ -1075,7 +1068,7 @@ wait_sig (VOID *self)
    * sigcomplete_nonmain   - semaphore signaled for non-main thread on signal
    *			     completion
    */
-  sigcatch_nosync = getsem (NULL, "sigcatch", 0, MAXLONG);
+  sigcatch_nosync = getevent (NULL, "sigcatch");
   sigcatch_nonmain = CreateSemaphore (&sec_none_nih, 0, MAXLONG, NULL);
   sigcatch_main = CreateSemaphore (&sec_none_nih, 0, MAXLONG, NULL);
   sigcomplete_nonmain = CreateSemaphore (&sec_none_nih, 0, MAXLONG, NULL);
@@ -1198,7 +1191,7 @@ wait_sig (VOID *self)
 			  if (rc == RC_MAIN)
 			    {
 			      flush = true;
-			      ReleaseSemaphore (sigcatch_nosync, 1, NULL);
+			      SetEvent (sigcatch_nosync);
 			      goto out1;
 			    }
 			  break;
@@ -1257,7 +1250,7 @@ wait_sig (VOID *self)
     out1:
       if (saw_failed_interrupt)
 	{
-	  ReleaseSemaphore (sigcatch_nosync, 1, NULL);
+	  SetEvent (sigcatch_nosync);
 	  low_priority_sleep (0);	/* Hopefully, other thread will be waking up soon. */
 	}
       sigproc_printf ("looping");

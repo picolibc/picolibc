@@ -101,12 +101,12 @@ BOOL __stdcall my_parent_is_alive ();
 extern "C" int __stdcall sig_dispatch_pending ();
 extern "C" void __stdcall set_process_mask (sigset_t newmask);
 extern "C" void __stdcall reset_signal_arrived ();
-int __stdcall sig_handle (int);
-void __stdcall sig_clear (int);
-void __stdcall sig_set_pending (int);
+int __stdcall sig_handle (int) __attribute__ ((regparm (1)));
+void __stdcall sig_clear (int) __attribute__ ((regparm (1)));
+void __stdcall sig_set_pending (int) __attribute__ ((regparm (1)));
 int __stdcall handle_sigsuspend (sigset_t);
 
-int __stdcall proc_subproc (DWORD, DWORD);
+int __stdcall proc_subproc (DWORD, DWORD) __attribute__ ((regparm (2)));
 
 class _pinfo;
 void __stdcall proc_terminate ();
