@@ -150,12 +150,13 @@ details. */
        50: Export fnmatch.
        51: Export recvmsg, sendmsg.
        52: Export strptime
+       53: Export strlcat, strlcpy.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 52
+#define CYGWIN_VERSION_API_MINOR 53
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

@@ -967,6 +967,10 @@ pclose
 _pclose = pclose
 strftime
 _strftime = strftime
+strlcat
+_strlcat = strlcat
+strlcpy
+_strlcpy = strlcpy
 strptime
 _strptime = strptime
 setgrent

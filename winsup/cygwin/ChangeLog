@@ -1,3 +1,8 @@
+2002-05-13  Mark Bradshaw  <bradshaw@staff.crosswalk.com>
+
+	* cygwin.din: Add strlcat and strlcpy.
+	* include/cygwin/version.h: Increment API minor version number.
+
 2002-05-09  Pierre Humblet <pierre.humblet@ieee.org>  
 
 	* shared.cc (__sec_user): Split into sec_acl() and call orig_sid().
