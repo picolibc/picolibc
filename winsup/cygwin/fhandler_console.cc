@@ -107,9 +107,12 @@ get_tty_stuff (int flags = 0)
 						 sizeof (*shared_console_info),
 						 NULL);
   ProtectHandle (cygheap->console_h);
-  shared_console_info->setntty (TTY_CONSOLE);
-  shared_console_info->setsid (myself->sid);
-  shared_console_info->set_ctty (TTY_CONSOLE, flags);
+  if (!shared_console_info->ntty)
+    {
+      shared_console_info->setntty (TTY_CONSOLE);
+      shared_console_info->setsid (myself->sid);
+      shared_console_info->set_ctty (TTY_CONSOLE, flags);
+    }
   return shared_console_info;
 }
 

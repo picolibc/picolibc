@@ -1,3 +1,11 @@
+Tue Aug  7 01:13:58 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler_console.cc (get_tty_stuff): Don't initialize shared memory
+	console area if it is already initialized.
+
+	* fhandler_termios.cc (fhandler_termios::tcsetpgrp): Augment debugging
+	info.
+
 Mon Aug  6 19:58:43 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* cygheap.cc (cygheap_root::set): Avoid treating '/' specially.

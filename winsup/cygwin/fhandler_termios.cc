@@ -65,7 +65,7 @@ fhandler_termios::tcinit (tty_min *this_tc, int force)
 int
 fhandler_termios::tcsetpgrp (const pid_t pgid)
 {
-  termios_printf ("pgid %d, sid %d, tsid %d", pgid,
+  termios_printf ("tty %d pgid %d, sid %d, tsid %d", tc->ntty, pgid,
 		    myself->sid, tc->getsid ());
   if (myself->sid != tc->getsid ())
     {
