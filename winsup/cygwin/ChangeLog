@@ -1,3 +1,15 @@
+2005-01-16  Christopher Faylor  <cgf@timesys.com>
+
+	* pinfo.h (maybe_set_exit_code_from_windows): Renamed from
+	set_exit_state.
+	* pinfo.cc (pinfo::exit): Use renamed function.
+	(proc_waiter): Ditto.  Make a copy of input argument to avoid problems
+	when procs array is shuffled.  Flag when copy is made so that
+	remove_proc knows when it is safe to reshuffle.
+	* sigproc.cc (proc_terminate): Don't flag process_state as PID_EXITED.
+	(remove_proc): Wait for waiter to finish copying pinfo element before
+	moving it (an actual wait should be an extremely rare event).
+
 2005-01-15  Christopher Faylor  <cgf@timesys.com>
 
 	* init.cc (dll_entry): Remove unused extern.

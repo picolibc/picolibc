@@ -140,6 +140,7 @@ public:
   HANDLE rd_proc_pipe;
   HANDLE hProcess;
   CRITICAL_SECTION _lock;
+  bool waiter_ready;
   /* Handle associated with initial Windows pid which started it all. */
   class cygthread *wait_thread;
   void init (pid_t, DWORD, HANDLE = NULL) __attribute__ ((regparm(3)));
@@ -155,7 +156,7 @@ public:
       release ();
   }
   void exit (DWORD n) __attribute__ ((noreturn, regparm(2)));
-  void set_exit_state () __attribute__ ((regparm(2)));
+  void maybe_set_exit_code_from_windows () __attribute__ ((regparm(1)));
   void initialize_lock () {InitializeCriticalSection (&_lock);}
   void lock () {EnterCriticalSection (&_lock);}
   void unlock () {LeaveCriticalSection (&_lock);}

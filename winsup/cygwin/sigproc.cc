@@ -65,8 +65,9 @@ Static HANDLE wait_sig_inited;		// Control synchronization of
 					//  message queue startup
 
 Static int nprocs;			// Number of deceased children
-Static char cprocs[(NPROCS + 1) * sizeof (pinfo)];		// All my deceased children info
-#define procs ((pinfo *) cprocs)
+Static char cprocs[(NPROCS + 1) * sizeof (pinfo)];// All my children info
+#define procs ((pinfo *) cprocs)	// All this just to avoid expensive
+					// constructor operation  at DLL startup
 Static waitq waitq_head = {0, 0, 0, 0, 0, 0, 0};// Start of queue for wait'ing threads
 
 muto NO_COPY *sync_proc_subproc = NULL;	// Control access to subproc stuff
@@ -406,8 +407,6 @@ proc_terminate (void)
       for (i = 0; i < nprocs; i++)
 	{
 	  procs[i]->ppid = 1;
-	  if (!proc_exists (procs[i]))
-	    procs[i]->process_state = PID_EXITED;	/* CGF FIXME - still needed? */
 	  if (procs[i].wait_thread)
 	    {
 	      // CloseHandle (procs[i].rd_proc_pipe);
@@ -860,7 +859,15 @@ remove_proc (int ci)
 	ForceCloseHandle1 (procs[ci].hProcess, childhProc);
     }
   if (ci < --nprocs)
-    procs[ci] = procs[nprocs];
+    {
+      /* Wait for proc_waiter thread to make a copy of this element before
+	 moving it or it may become confused.  The chances are very high that
+	 the proc_waiter thread has already done this by the time we
+	 get here.  */
+      while (!procs[nprocs].waiter_ready)
+	low_priority_sleep (0);
+      procs[ci] = procs[nprocs];
+    }
   return 0;
 }
 

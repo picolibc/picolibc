@@ -105,7 +105,7 @@ pinfo_init (char **envp, int envc)
 
 # define self (*this)
 void
-pinfo::set_exit_state ()
+pinfo::maybe_set_exit_code_from_windows ()
 {
   DWORD x = 0xdeadbeef;
   DWORD oexitcode = self->exitcode;
@@ -135,7 +135,7 @@ pinfo::exit (DWORD n)
   fill_rusage (&r, hMainProc);
   add_rusage (&self->rusage_self, &r);
 
-  set_exit_state ();
+  maybe_set_exit_code_from_windows ();
   if (n != EXITCODE_NOSET)
     self->alert_parent (0);
   int exitcode = self->exitcode;
@@ -675,7 +675,8 @@ _pinfo::cmdline (size_t& n)
 static DWORD WINAPI
 proc_waiter (void *arg)
 {
-  pinfo& vchild = *(pinfo *) arg;
+  pinfo vchild = *(pinfo *) arg;
+  ((pinfo *) arg)->waiter_ready = true;
 
   siginfo_t si;
   si.si_signo = SIGCHLD;
@@ -714,8 +715,7 @@ proc_waiter (void *arg)
 	  /* Child exited.  Do some cleanup and signal myself.  */
 	  CloseHandle (vchild.rd_proc_pipe);
 	  vchild.rd_proc_pipe = NULL;
-	  vchild.set_exit_state ();
-	  vchild->process_state = PID_EXITED;
+	  vchild.maybe_set_exit_code_from_windows ();
 	  if (WIFEXITED (vchild->exitcode))
 	    si.si_sigval.sival_int = CLD_EXITED;
 	  else if (WCOREDUMP (vchild->exitcode))
@@ -723,6 +723,8 @@ proc_waiter (void *arg)
 	  else
 	    si.si_sigval.sival_int = CLD_KILLED;
 	  si.si_status = vchild->exitcode;
+	  vchild->process_state = PID_EXITED;
+	  /* This should always be last.  Do not use vchild-> beyond this point */
 	  break;
 	case SIGTTIN:
 	case SIGTTOU:
@@ -812,6 +814,7 @@ pinfo::wait ()
 
   preserve ();		/* Preserve the shared memory associated with the pinfo */
 
+  waiter_ready = false;
   /* Fire up a new thread to track the subprocess */
   cygthread *h = new cygthread (proc_waiter, this, "proc_waiter");
   if (!h)
@@ -854,6 +857,7 @@ _pinfo::alert_parent (char sig)
 	debug_printf ("sending %d notification to parent failed, %E", sig);
       else
 	{
+	  ppid = 1;
 	  HANDLE closeit = wr_proc_pipe;
 	  wr_proc_pipe = INVALID_HANDLE_VALUE;
 	  CloseHandle (closeit);
