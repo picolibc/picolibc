@@ -2394,23 +2394,28 @@ check_sysfile (const char *path, DWORD fileattr, HANDLE h,
   return res;
 }
 
-#define SCAN_BEG	0
-#define SCAN_LNK	1
-#define SCAN_TERM1	2
-#define SCAN_JUSTCHECK	3
+enum
+{
+  SCAN_BEG,
+  SCAN_LNK,
+  SCAN_HASLNK,
+  SCAN_JUSTCHECK,
+  SCAN_DONE,
+  SCAN_CHECKEDLNK,
+  SCAN_APPENDLNK,
+};
 
 class suffix_scan
 {
   char *ext_here;
   const suffix_info *suffixes;
-  int state;
-  int lnk_state;
+  int nextstate;
   int nullterm;
 public:
   const char *path;
   char *has (const char *, const suffix_info *, char **);
   int next ();
-  int lnk_match () {return lnk_state;}
+  int lnk_match () {return nextstate >= SCAN_CHECKEDLNK;}
 };
 
 char *
@@ -2419,8 +2424,7 @@ suffix_scan::has (const char *in_path, const suffix_info *in_suffixes, char **ex
   path = in_path;
   suffixes = in_suffixes;
   nullterm = 0;
-  state = SCAN_BEG;
-  lnk_state = 0;
+  nextstate = SCAN_BEG;
   ext_here = *ext_where = strrchr (in_path, '.');
   if (ext_here)
     {
@@ -2430,15 +2434,15 @@ suffix_scan::has (const char *in_path, const suffix_info *in_suffixes, char **ex
 	  for (const suffix_info *ex = in_suffixes; ex->name != NULL; ex++)
 	    if (strcasematch (ext_here, ex->name))
 	      {
-		state = SCAN_JUSTCHECK;
-	        suffixes = NULL; /* Has an extension so don't scan for one. */
+		nextstate = SCAN_JUSTCHECK;
+		suffixes = NULL;	/* Has an extension so don't scan for one. */
 		return ext_here;
 	      }
 	}
       /* Didn't match.  Use last resort -- .lnk. */
       if (strcasematch (ext_here, ".lnk"))
 	{
-	  lnk_state = 1;
+	  nextstate = SCAN_HASLNK;
 	  suffixes = NULL;
 	}
     }
@@ -2464,17 +2468,23 @@ suffix_scan::next ()
 	    return 1;
 	  }
       suffixes = NULL;
-      state++;
     }
 
-  switch (state++)
+  switch (nextstate)
     {
-    case SCAN_LNK:
-      lnk_state = 1;
-      strcpy (ext_here, ".lnk");
-      /* fall through */
     case SCAN_BEG:
+      nextstate = SCAN_LNK;
+      return 1;
+    case SCAN_HASLNK:
+      nextstate = SCAN_APPENDLNK;	/* Skip SCAN_BEG */
+      return 1;
+    case SCAN_LNK:
+    case SCAN_APPENDLNK:
+      strcpy (ext_here, ".lnk");
+      nextstate = SCAN_CHECKEDLNK;
+      return 1;
     case SCAN_JUSTCHECK:
+      nextstate = SCAN_DONE;
       return 1;
     default:
       if (nullterm && ext_here)
@@ -2559,7 +2569,7 @@ symlink_info::check (const char *path, const suffix_info *suffixes)
 	  if (suffix.lnk_match ())
 	    {
 	      fileattr = (DWORD)-1;
-	      continue;
+	      continue;		/* in case we're going to tack *another* .lnk on this filename. */
 	    }
 	  goto file_not_symlink;
 	}

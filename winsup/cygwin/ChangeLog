@@ -1,3 +1,14 @@
+Fri Mar 16 20:25:40 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc: Translate scan states from defines to enums.
+	(suffix_scan): Rename state to nextstate for clarity.
+	(lnk_match): Change to allow multiple states to indicate that a .lnk
+	has been matched.
+	(suffix_scan::has): Eliminate a goto.  Handle .lnk as a special case,
+	since a .lnk may also need to be tacked on the end of a .lnk.
+	(suffix_scan::next): Don't increment next state.  Set it specifically.
+	Recognize new .lnk states.
+
 aturday Mar 17 01:19 2001 Robert Collins rbtcollins@hotmail.com
    
 	* cygwin.din: Export the new functions.
