@@ -327,6 +327,10 @@ esac
 case "${host}" in
   *-*-cygwin*)
 	newlib_cflags="${newlib_cflags} -DHAVE_OPENDIR -DHAVE_RENAME -DSIGNAL_PROVIDED -DWANT_IO_LONG_DBL -DWANT_PRINTF_LONG_LONG -D_COMPILING_NEWLIB -DHAVE_FCNTL"
+# CYGWIN provides its own malloc if --enable-malloc-debugging is set
+	if [ "x${malloc_debugging}" = "xyes" ] ; then
+	  newlib_cflags="${newlib_cflags} -DMALLOC_PROVIDED"
+	fi
 	syscall_dir=syscalls
 	;;
 # RTEMS supplies its own versions of some routines:

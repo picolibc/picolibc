@@ -26,6 +26,15 @@ AC_ARG_ENABLE(target-optspace,
   *)   AC_MSG_ERROR(bad value ${enableval} for target-optspace option) ;;
  esac], [target_optspace=])dnl
 
+dnl Support --enable-malloc-debugging - currently only supported for Cygwin
+AC_ARG_ENABLE(malloc-debugging,
+[  --enable-malloc-debugging indicate malloc debugging requested],
+[case "${enableval}" in
+  yes) malloc_debugging=yes ;;
+  no)  malloc_debugging=no ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for malloc-debugging option) ;;
+ esac], [malloc_debugging=])dnl
+
 dnl Support --enable-newlib-mb
 AC_ARG_ENABLE(newlib-mb,
 [  --enable-newlib-mb        enable multibyte support],

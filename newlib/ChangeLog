@@ -1,4 +1,18 @@
 2001-04-20  Jeff Johnston  <jjohnstn@redhat.com>
+	
+	* acinclude.m4: Added --enable-malloc-debugging configure flag.
+	* configure.host: For Cygwin specify -DMALLOC_PROVIDED if
+	--enable-malloc-debugging selected.
+	* aclocal.m4 configure: Regenerated.
+	  libm/aclocal.m4 libm/configure: Ditto.
+	* libc/aclocal.m4 libc/configure: Ditto.
+	* libc/machine/aclocal.m4 libc/machine/configure: Ditto.
+	* libc/machine/*/aclocal.m4 libc/machine/*/configure: Ditto.
+	* libc/sys/aclocal.m4 libc/sys/configure: Ditto.
+	* libc/sys/*/aclocal.m4 libc/sys/*/configure: Ditto.
+	* doc/aclocal.m4 doc/configure: Ditto.
+
+2001-04-20  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/stdio.h[!_REENT_ONLY]: Moved various functions together
 	into one list.
