@@ -71,6 +71,8 @@ CRT0 = @CRT0@
 DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
 LDFLAGS = @LDFLAGS@
+LIBC_EXTRA_DEF = @LIBC_EXTRA_DEF@
+LIBC_EXTRA_LIB = @LIBC_EXTRA_LIB@
 LIBC_MACHINE_LIB = @LIBC_MACHINE_LIB@
 LIBC_POSIX_LIB = @LIBC_POSIX_LIB@
 LIBC_SIGNAL_DEF = @LIBC_SIGNAL_DEF@
@@ -88,6 +90,7 @@ PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
 aext = @aext@
+extra_dir = @extra_dir@
 libm_machine_dir = @libm_machine_dir@
 machine_dir = @machine_dir@
 newlib_basedir = @newlib_basedir@
@@ -107,7 +110,7 @@ AUTOMAKE_OPTIONS = cygnus
 # The order of SUBDIRS is important for the integrated documentation.
 # Do not change the order without considering the doc impact.
 SUBDIRS = stdlib ctype stdio string $(SIGNAL_SUBDIR) time locale sys reent \
-	errno misc machine $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) .
+	$(extra_dir) errno misc machine $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) .
 
 
 noinst_DATA = $(CRT0)
@@ -123,6 +126,7 @@ noinst_DATA = $(CRT0)
 @USE_LIBTOOL_TRUE@	locale/liblocale.$(aext) \
 @USE_LIBTOOL_TRUE@	$(LIBC_SYS_LIB) \
 @USE_LIBTOOL_TRUE@	reent/libreent.$(aext) \
+@USE_LIBTOOL_TRUE@	$(LIBC_EXTRA_LIB) \
 @USE_LIBTOOL_TRUE@	errno/liberrno.$(aext) \
 @USE_LIBTOOL_TRUE@	misc/libmisc.$(aext) \
 @USE_LIBTOOL_TRUE@	$(LIBC_MACHINE_LIB) \
@@ -139,6 +143,7 @@ noinst_DATA = $(CRT0)
 @USE_LIBTOOL_FALSE@	locale/lib.$(aext) \
 @USE_LIBTOOL_FALSE@	$(LIBC_SYS_LIB) \
 @USE_LIBTOOL_FALSE@	reent/lib.$(aext) \
+@USE_LIBTOOL_FALSE@	$(LIBC_EXTRA_LIB) \
 @USE_LIBTOOL_FALSE@	errno/lib.$(aext) \
 @USE_LIBTOOL_FALSE@	misc/lib.$(aext) \
 @USE_LIBTOOL_FALSE@	$(LIBC_MACHINE_LIB) \
@@ -167,6 +172,7 @@ SUBDEFS = \
 	time/stmp-def \
 	locale/stmp-def \
 	reent/stmp-def \
+	$(LIBC_EXTRA_DEF) \
 	misc/stmp-def
 
 
@@ -216,7 +222,7 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 TAR = gtar
 GZIP_ENV = --best
 DIST_SUBDIRS =  stdlib ctype stdio string signal time locale sys reent \
-errno misc machine unix posix syscalls .
+@extra_dir@ errno misc machine unix posix syscalls .
 SOURCES = libc.a.c $(libc_la_SOURCES)
 OBJECTS = libc.a.o $(libc_la_OBJECTS)
 

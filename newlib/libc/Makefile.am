@@ -21,7 +21,7 @@ endif
 # The order of SUBDIRS is important for the integrated documentation.
 # Do not change the order without considering the doc impact.
 SUBDIRS = stdlib ctype stdio string $(SIGNAL_SUBDIR) time locale sys reent \
-	errno misc machine $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) .
+	$(extra_dir) errno misc machine $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) .
 
 noinst_DATA = $(CRT0)
 
@@ -37,6 +37,7 @@ SUBLIBS = \
 	locale/liblocale.$(aext) \
 	$(LIBC_SYS_LIB) \
 	reent/libreent.$(aext) \
+	$(LIBC_EXTRA_LIB) \
 	errno/liberrno.$(aext) \
 	misc/libmisc.$(aext) \
 	$(LIBC_MACHINE_LIB) \
@@ -55,6 +56,7 @@ SUBLIBS = \
 	locale/lib.$(aext) \
 	$(LIBC_SYS_LIB) \
 	reent/lib.$(aext) \
+	$(LIBC_EXTRA_LIB) \
 	errno/lib.$(aext) \
 	misc/lib.$(aext) \
 	$(LIBC_MACHINE_LIB) \
@@ -105,6 +107,7 @@ SUBDEFS = \
 	time/stmp-def \
 	locale/stmp-def \
 	reent/stmp-def \
+	$(LIBC_EXTRA_DEF) \
 	misc/stmp-def
 
 libc.info: sigset.texi targetdep.tex $(SUBDEFS)

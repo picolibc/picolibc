@@ -77,6 +77,14 @@ fi
 AC_SUBST(LIBC_UNIX_LIB)
 AM_CONDITIONAL(HAVE_UNIX_DIR, test x${unix_dir} != x)
 
+LIBC_EXTRA_LIB=
+LIBC_EXTRA_DEF=
+extra_dir=
+
+AC_SUBST(LIBC_EXTRA_LIB)
+AC_SUBST(LIBC_EXTRA_DEF)
+AC_SUBST(extra_dir)
+
 dnl We always recur into sys and machine, and let them decide what to
 dnl do.  However, we do need to know whether they will produce a library.
 
