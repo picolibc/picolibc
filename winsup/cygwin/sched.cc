@@ -81,6 +81,18 @@ sched_get_priority_min (int policy)
   return 15;
 }
 
+/* Check a scheduler parameter struct for valid settings */
+int
+valid_sched_parameters(const struct sched_param *param)
+{
+  if (param->sched_priority < -14 || param->sched_priority > 15)
+    {
+      return 0;
+    }
+  return -1;
+
+}
+
 /* get sched params for process
 
    Note, I'm never returning EPERM, 
@@ -273,7 +285,7 @@ sched_setparam (pid_t pid, const struct sched_param *param)
       return -1;
     }
 
-  if (param->sched_priority < -14 || param->sched_priority > 15)
+  if (!valid_sched_parameters(param))
     {
       set_errno (EINVAL);
       return -1;
@@ -381,6 +393,36 @@ sched_setparam (pid_t pid, const struct sched_param *param)
     }
   CloseHandle (process);
 
+  return 0;
+}
+
+/* we map -14 to 15, and 15 to 1 via (16- ((n+16) >> 1)). This lines up with the allowed
+ * valueswe return elsewhere in the sched* functions. We then map in groups of three to
+ * allowed thread priority's. The reason for dropping accuracy while still returning
+ * a wide range of values is to allow more flexible code in the future.
+ */
+int
+sched_set_thread_priority(HANDLE thread, int priority)
+{
+  int real_pri;
+  real_pri = 16 - ((priority + 16) >> 1);
+  if (real_pri <1 || real_pri > 15)
+    return EINVAL;
+  
+  if (real_pri < 4) 
+    real_pri = THREAD_PRIORITY_LOWEST;
+  else if (real_pri < 7)
+    real_pri = THREAD_PRIORITY_BELOW_NORMAL;
+  else if (real_pri < 10)
+    real_pri = THREAD_PRIORITY_NORMAL;
+  else if (real_pri < 13)
+    real_pri = THREAD_PRIORITY_ABOVE_NORMAL;
+  else
+    real_pri = THREAD_PRIORITY_HIGHEST;
+
+  if (!SetThreadPriority(thread, real_pri))
+    /* invalid handle, no access are the only expected errors. */
+    return EPERM;
   return 0;
 }
 

@@ -10,6 +10,21 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+/* Implementation overview and caveats:
+
+  Win32 puts some contraints on what can and cannot be implemented. Where possible
+  we work around those contrainsts. Where we cannot work around the constraints we
+  either pretend to be conformant, or return an error code. 
+
+  Some caveats: PROCESS_SHARED objects while they pretend to be process shared,
+  may not actually work. Some test cases are needed to determine win32's behaviour.
+  My suspicion is that the win32 handle needs to be opened with different flags for
+  proper operation.
+
+  R.Collins, April 2001.
+
+  */
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -31,9 +46,93 @@ details. */
 
 extern int threadsafe;
 
-#define MT_INTERFACE user_data->threadinterface
+/* pthread_key_destructor_list class: to-be threadsafe single linked list 
+ * FIXME: Put me in a dedicated file, or a least a tools area !
+ */
 
-#define NOT_IMP(n)  system_printf ("not implemented %s\n", n); return 0;
+pthread_key_destructor *
+pthread_key_destructor::InsertAfter (pthread_key_destructor * node)
+{
+  pthread_key_destructor *temp = next;
+  next = node;
+  return temp;
+}
+
+pthread_key_destructor *
+pthread_key_destructor::UnlinkNext ()
+{
+  pthread_key_destructor *temp = next;
+  if (next)
+    next = next->Next ();
+  return temp;
+}
+
+pthread_key_destructor *
+pthread_key_destructor::Next ()
+{
+  return next;
+}
+
+void
+pthread_key_destructor_list::Insert (pthread_key_destructor * node)
+{
+  if (!node)
+    return;
+  head = node->InsertAfter (head);
+  if (!head)
+    head = node;		/* first node special case */
+}
+
+  /* remove a given dataitem, wherever in the list it is */
+pthread_key_destructor *
+pthread_key_destructor_list::Remove (pthread_key * key)
+{
+  if (!key)
+    return NULL;
+  if (!head)
+    return NULL;
+  if (key == head->key)
+    return Pop ();
+  pthread_key_destructor *temp = head;
+  while (temp && temp->Next () && !(key == temp->Next ()->key))
+    {
+      temp = temp->Next ();
+    }
+  if (temp)
+    return temp->UnlinkNext ();
+  return NULL;
+}
+
+  /* get the first item and remove at the same time */
+pthread_key_destructor *
+pthread_key_destructor_list::Pop ()
+{
+  pthread_key_destructor *temp = head;
+  head = head->Next ();
+  return temp;
+}
+
+pthread_key_destructor::
+pthread_key_destructor (void (*thedestructor) (void *), pthread_key * key)
+{
+  destructor = thedestructor;
+  next = NULL;
+  this->key = key;
+}
+
+void
+pthread_key_destructor_list::IterateNull ()
+{
+  pthread_key_destructor *temp = head;
+  while (temp)
+    {
+      temp->destructor ((temp->key)->get ());
+      temp = temp->Next ();
+    }
+}
+
+
+#define MT_INTERFACE user_data->threadinterface
 
 struct _reent *
 _reent_clib ()
@@ -191,6 +290,8 @@ MTinterface::Init (int forked)
 	  ("local storage for thread couldn't be set\nThis means that we are not thread safe!\n");
     }
 
+  concurrency = 0;
+
   if (forked)
     return;
 
@@ -208,7 +309,8 @@ MTinterface::Init (int forked)
 #endif
 }
 
-pthread::pthread ():verifyable_object (PTHREAD_MAGIC), win32_obj_id (0)
+pthread::pthread ():verifyable_object (PTHREAD_MAGIC), win32_obj_id (0),
+cancelstate (0), canceltype (0)
 {
 }
 
@@ -230,6 +332,8 @@ pthread::create (void *(*func) (void *), pthread_attr * newattr,
   if (newattr)
     {
       attr.joinable = newattr->joinable;
+      attr.contentionscope = newattr->contentionscope;
+      attr.inheritsched = newattr->inheritsched;
       attr.stacksize = newattr->stacksize;
     }
   function = func;
@@ -242,20 +346,30 @@ pthread::create (void *(*func) (void *), pthread_attr * newattr,
   if (!win32_obj_id)
     magic = 0;
   else
-    ResumeThread (win32_obj_id);
+    {
+      /* FIXME: set the priority appropriately for system contention scope */
+      if (attr.inheritsched == PTHREAD_EXPLICIT_SCHED)
+	{
+	  /* FIXME: set the scheduling settings for the new thread */
+	  /* sched_thread_setparam(win32_obj_id, attr.schedparam); */
+	}
+      ResumeThread (win32_obj_id);
+    }
 }
 
 pthread_attr::pthread_attr ():verifyable_object (PTHREAD_ATTR_MAGIC),
-joinable (PTHREAD_CREATE_JOINABLE), stacksize (0)
+joinable (PTHREAD_CREATE_JOINABLE), contentionscope (PTHREAD_SCOPE_PROCESS),
+inheritsched (PTHREAD_INHERIT_SCHED), stacksize (0)
 {
+  schedparam.sched_priority = 0;
 }
 
 pthread_attr::~pthread_attr ()
 {
 }
 
-pthread_condattr::pthread_condattr ():verifyable_object 
-(PTHREAD_CONDATTR_MAGIC), shared (PTHREAD_PROCESS_PRIVATE)
+pthread_condattr::pthread_condattr ():verifyable_object
+  (PTHREAD_CONDATTR_MAGIC), shared (PTHREAD_PROCESS_PRIVATE)
 {
 }
 
@@ -269,10 +383,9 @@ pthread_cond::pthread_cond (pthread_condattr * attr):verifyable_object (PTHREAD_
   this->mutex = NULL;
   this->waiting = 0;
 
-  this->win32_obj_id =::CreateEvent (&sec_none_nih, 
-	false,	/* auto signal reset - which I think is pthreads like ? */
-	false,	/* start non signaled */
-	NULL /* no name */ );
+  this->win32_obj_id =::CreateEvent (&sec_none_nih, false,	/* auto signal reset - which I think is pthreads like ? */
+				     false,	/* start non signaled */
+				     NULL /* no name */ );
 
   if (!this->win32_obj_id)
     magic = 0;
@@ -312,21 +425,26 @@ pthread_cond::TimedWait (DWORD dwMilliseconds)
   switch (rv)
     {
     case WAIT_FAILED:
-      return 0;		/* POSIX doesn't allow errors after we modify the mutex state */
+      return 0;			/* POSIX doesn't allow errors after we modify the mutex state */
     case WAIT_ABANDONED:
       return ETIMEDOUT;
     case WAIT_OBJECT_0:
-      return 0;		/* we have been signaled */
+      return 0;			/* we have been signaled */
     default:
       return 0;
     }
 }
 
-pthread_key::pthread_key ():verifyable_object (PTHREAD_KEY_MAGIC)
+pthread_key::pthread_key (void (*destructor) (void *)):verifyable_object (PTHREAD_KEY_MAGIC)
 {
   dwTlsIndex = TlsAlloc ();
   if (dwTlsIndex == TLS_OUT_OF_INDEXES)
     magic = 0;
+  else if (destructor)
+    {
+      MT_INTERFACE->destructors.
+	Insert (new pthread_key_destructor (destructor, this));
+    }
 }
 
 pthread_key::~pthread_key ()
@@ -336,6 +454,8 @@ pthread_key::~pthread_key ()
  * if (destructor && TlsGetValue(dwTlsIndex))
  *   destructor (TlsGetValue(dwTlsIndex));
  */
+  if (pthread_key_destructor * dest = MT_INTERFACE->destructors.Remove (this))
+    delete dest;
   TlsFree (dwTlsIndex);
 };
 
@@ -360,7 +480,7 @@ pthread_mutex::pthread_mutex (pthread_mutexattr * attr):verifyable_object (PTHRE
   if (!this->win32_obj_id)
     magic = 0;
   condwaits = 0;
-};
+}
 
 pthread_mutex::~pthread_mutex ()
 {
@@ -385,6 +505,15 @@ pthread_mutex::UnLock ()
 {
   return ReleaseMutex (win32_obj_id);
 }
+
+pthread_mutexattr::pthread_mutexattr ():verifyable_object (PTHREAD_MUTEXATTR_MAGIC),
+pshared (PTHREAD_PROCESS_PRIVATE), mutextype (PTHREAD_MUTEX_DEFAULT)
+{
+}
+
+pthread_mutexattr::~pthread_mutexattr ()
+{
+};
 
 semaphore::semaphore (int pshared, unsigned int value):verifyable_object (SEM_MAGIC)
 {
@@ -540,6 +669,273 @@ __pthread_create (pthread_t * thread, const pthread_attr_t * attr,
 }
 
 int
+__pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
+{
+  pthread_mutex_lock (&once_control->mutex);
+  /* Here we must set a cancellation handler to unlock the mutex if needed */
+  /* but a cancellation handler is not the right thing. We need this in the thread
+   * cleanup routine. Assumption: a thread can only be in one pthread_once routine
+   * at a time. Stote a mutex_t * in the pthread_structure. if that's non null unlock 
+   * on pthread_exit();
+   */
+  if (once_control->state == 0)
+    {
+      init_routine ();
+      once_control->state = 1;
+    }
+  /* Here we must remove our cancellation handler */
+  pthread_mutex_unlock (&once_control->mutex);
+  return 0;
+}
+
+/* Cancelability states */
+
+
+/* Perform the actual cancel */
+void
+__pthread_cleanup (pthread_t thread)
+{
+}
+
+
+int
+__pthread_cancel (pthread_t thread)
+{
+  if (!verifyable_object_isvalid (thread, PTHREAD_MAGIC))
+    return ESRCH;
+  if (thread->cancelstate == PTHREAD_CANCEL_ENABLE)
+    {
+#if 0
+      /* once all the functions call testcancel(), we will do this */
+      if (thread->canceltype == PTHREAD_CANCEL_DEFERRED)
+	{
+	}
+      else
+	{
+	  /* possible FIXME: this function is meant to return asynchronously
+	   * from the cancellation routine actually firing. So we may need some sort
+	   * of signal to be sent that is immediately recieved and acted on.
+	   */
+	  __pthread_cleanup (thread);
+	}
+#endif
+    }
+/*  return 0; 
+*/
+
+  return ESRCH;
+/*
+  we return ESRCH until all the required functions call testcancel();
+  this will give applications predictable behaviour.
+
+  the required function list is:
+aio_suspend()
+close()
+creat()
+fcntl()
+fsync()
+getmsg()
+getpmsg()
+lockf()
+mq_receive()
+mq_send()
+msgrcv()
+msgsnd()
+msync()
+nanosleep()
+open()
+pause()
+poll()
+pread()
+pthread_cond_timedwait()
+pthread_cond_wait()
+pthread_join()
+pthread_testcancel()
+putmsg()
+putpmsg()
+pwrite()
+read()
+readv()
+select()
+sem_wait()
+sigpause()
+sigsuspend()
+sigtimedwait()
+sigwait()
+sigwaitinfo()
+sleep()
+system()
+tcdrain()
+usleep()
+wait()
+wait3()
+waitid()
+waitpid()
+write()
+writev()
+
+the optional list is:
+catclose()
+catgets()
+catopen()
+closedir()
+closelog()
+ctermid()
+dbm_close()
+dbm_delete()
+dbm_fetch()
+dbm_nextkey()
+dbm_open()
+dbm_store()
+dlclose()
+dlopen()
+endgrent()
+endpwent()
+endutxent()
+fclose()
+fcntl()
+fflush()
+fgetc()
+fgetpos()
+fgets()
+fgetwc()
+fgetws()
+fopen()
+fprintf()
+fputc()
+fputs()
+fputwc()
+fputws()
+fread()
+freopen()
+fscanf()
+fseek()
+fseeko()
+fsetpos()
+ftell()
+ftello()
+ftw()
+fwprintf()
+fwrite()
+fwscanf()
+getc()
+getc_unlocked()
+getchar()
+getchar_unlocked()
+getcwd()
+getdate()
+getgrent()
+getgrgid()
+getgrgid_r()
+getgrnam()
+getgrnam_r()
+getlogin()
+getlogin_r()
+getpwent()
+getpwnam()
+getpwnam_r()
+getpwuid()
+getpwuid_r()
+gets()
+getutxent()
+getutxid()
+getutxline()
+getw()
+getwc()
+getwchar()
+getwd()
+glob()
+iconv_close()
+iconv_open()
+ioctl()
+lseek()
+mkstemp()
+nftw()
+opendir()
+openlog()
+pclose()
+perror()
+popen()
+printf()
+putc()
+putc_unlocked()
+putchar()
+putchar_unlocked()
+puts()
+pututxline()
+putw()
+putwc()
+putwchar()
+readdir()
+readdir_r()
+remove()
+rename()
+rewind()
+rewinddir()
+scanf()
+seekdir()
+semop()
+setgrent()
+setpwent()
+setutxent()
+strerror()
+syslog()
+tmpfile()
+tmpnam()
+ttyname()
+ttyname_r()
+ungetc()
+ungetwc()
+unlink()
+vfprintf()
+vfwprintf()
+vprintf()
+vwprintf()
+wprintf()
+wscanf()
+
+Note, that for fcntl(), for any value of the cmd argument. 
+
+And we must not introduce cancellation points anywhere else that's part of the posix or
+opengroup specs.
+ */
+}
+
+/* no races in these three functions: they are all current-thread-only */
+int
+__pthread_setcancelstate (int state, int *oldstate)
+{
+  class pthread *thread = __pthread_self ();
+  if (state != PTHREAD_CANCEL_ENABLE && state != PTHREAD_CANCEL_DISABLE)
+    return EINVAL;
+  *oldstate = thread->cancelstate;
+  thread->cancelstate = state;
+  return 0;
+}
+
+int
+__pthread_setcanceltype (int type, int *oldtype)
+{
+  class pthread *thread = __pthread_self ();
+  if (type != PTHREAD_CANCEL_DEFERRED && type != PTHREAD_CANCEL_ASYNCHRONOUS)
+    return EINVAL;
+  *oldtype = thread->canceltype;
+  thread->canceltype = type;
+  return 0;
+}
+
+/* deferred cancellation request handler */
+void
+__pthread_testcancel (void)
+{
+  class pthread *thread = __pthread_self ();
+  if (thread->cancelstate == PTHREAD_CANCEL_DISABLE)
+    return;
+  /* check the cancellation event object here - not neededuntil pthread_cancel actually
+   * does something*/
+}
+
+int
 __pthread_attr_init (pthread_attr_t * attr)
 {
   *attr = new pthread_attr;
@@ -549,6 +945,49 @@ __pthread_attr_init (pthread_attr_t * attr)
       *attr = NULL;
       return EAGAIN;
     }
+  return 0;
+}
+
+int
+__pthread_attr_getinheritsched (const pthread_attr_t * attr,
+				int *inheritsched)
+{
+  if (!verifyable_object_isvalid (*attr, PTHREAD_ATTR_MAGIC))
+    return EINVAL;
+  *inheritsched = (*attr)->inheritsched;
+  return 0;
+}
+
+int
+__pthread_attr_getschedparam (const pthread_attr_t * attr,
+			      struct sched_param *param)
+{
+  if (!verifyable_object_isvalid (*attr, PTHREAD_ATTR_MAGIC))
+    return EINVAL;
+  *param = (*attr)->schedparam;
+  return 0;
+}
+
+/* From a pure code point of view, this should call a helper in sched.cc,
+ * to allow for someone adding scheduler policy changes to win32 in the future.
+ * However that's extremely unlikely, so short and sweet will do us 
+ */
+int
+__pthread_attr_getschedpolicy (const pthread_attr_t * attr, int *policy)
+{
+  if (!verifyable_object_isvalid (*attr, PTHREAD_ATTR_MAGIC))
+    return EINVAL;
+  *policy = SCHED_FIFO;
+  return 0;
+}
+
+
+int
+__pthread_attr_getscope (const pthread_attr_t * attr, int *contentionscope)
+{
+  if (!verifyable_object_isvalid (*attr, PTHREAD_ATTR_MAGIC))
+    return EINVAL;
+  *contentionscope = (*attr)->contentionscope;
   return 0;
 }
 
@@ -573,6 +1012,57 @@ __pthread_attr_getdetachstate (const pthread_attr_t * attr, int *detachstate)
 }
 
 int
+__pthread_attr_setinheritsched (pthread_attr_t * attr, int inheritsched)
+{
+  if (!verifyable_object_isvalid (*attr, PTHREAD_ATTR_MAGIC))
+    return EINVAL;
+  if (inheritsched != PTHREAD_INHERIT_SCHED
+      && inheritsched != PTHREAD_EXPLICIT_SCHED)
+    return ENOTSUP;
+  (*attr)->inheritsched = inheritsched;
+  return 0;
+}
+
+int
+__pthread_attr_setschedparam (pthread_attr_t * attr,
+			      const struct sched_param *param)
+{
+  if (!verifyable_object_isvalid (*attr, PTHREAD_ATTR_MAGIC))
+    return EINVAL;
+  if (!valid_sched_parameters (param))
+    return ENOTSUP;
+  (*attr)->schedparam = *param;
+  return 0;
+}
+
+/* See __pthread_attr_getschedpolicy for some notes */
+int
+__pthread_attr_setschedpolicy (pthread_attr_t * attr, int policy)
+{
+  if (!verifyable_object_isvalid (*attr, PTHREAD_ATTR_MAGIC))
+    return EINVAL;
+  if (policy != SCHED_FIFO)
+    return ENOTSUP;
+  return 0;
+}
+
+int
+__pthread_attr_setscope (pthread_attr_t * attr, int contentionscope)
+{
+  if (!verifyable_object_isvalid (*attr, PTHREAD_ATTR_MAGIC))
+    return EINVAL;
+  if (contentionscope != PTHREAD_SCOPE_SYSTEM
+      && contentionscope != PTHREAD_SCOPE_PROCESS)
+    return EINVAL;
+  /* In future, we may be able to support system scope by escalating the thread 
+   * priority to exceed the priority class. For now we only support PROCESS scope. */
+  if (contentionscope != PTHREAD_SCOPE_PROCESS)
+    return ENOTSUP;
+  (*attr)->contentionscope = contentionscope;
+  return 0;
+}
+
+int
 __pthread_attr_setstacksize (pthread_attr_t * attr, size_t size)
 {
   if (!verifyable_object_isvalid (*attr, PTHREAD_ATTR_MAGIC))
@@ -582,7 +1072,7 @@ __pthread_attr_setstacksize (pthread_attr_t * attr, size_t size)
 }
 
 int
-__pthread_attr_getstacksize (pthread_attr_t * attr, size_t * size)
+__pthread_attr_getstacksize (const pthread_attr_t * attr, size_t * size)
 {
   if (!verifyable_object_isvalid (*attr, PTHREAD_ATTR_MAGIC))
     return EINVAL;
@@ -605,6 +1095,7 @@ __pthread_exit (void *value_ptr)
 {
   class pthread *thread = __pthread_self ();
 
+  MT_INTERFACE->destructors.IterateNull ();
 // FIXME: run the destructors of thread_key items here
 
   thread->return_ptr = value_ptr;
@@ -617,7 +1108,7 @@ __pthread_join (pthread_t * thread, void **return_val)
   if (!verifyable_object_isvalid (*thread, PTHREAD_MAGIC))
     return ESRCH;
 
-  if ((*thread)->joinable == PTHREAD_CREATE_DETACHED)
+  if ((*thread)->attr.joinable == PTHREAD_CREATE_DETACHED)
     {
       if (return_val)
 	*return_val = NULL;
@@ -625,7 +1116,7 @@ __pthread_join (pthread_t * thread, void **return_val)
     }
   else
     {
-      (*thread)->joinable = PTHREAD_CREATE_DETACHED;
+      (*thread)->attr.joinable = PTHREAD_CREATE_DETACHED;
       WaitForSingleObject ((*thread)->win32_obj_id, INFINITE);
       if (return_val)
 	*return_val = (*thread)->return_ptr;
@@ -640,13 +1131,13 @@ __pthread_detach (pthread_t * thread)
   if (!verifyable_object_isvalid (*thread, PTHREAD_MAGIC))
     return ESRCH;
 
-  if ((*thread)->joinable == PTHREAD_CREATE_DETACHED)
+  if ((*thread)->attr.joinable == PTHREAD_CREATE_DETACHED)
     {
       (*thread)->return_ptr = NULL;
       return EINVAL;
     }
 
-  (*thread)->joinable = PTHREAD_CREATE_DETACHED;
+  (*thread)->attr.joinable = PTHREAD_CREATE_DETACHED;
   return 0;
 }
 
@@ -679,6 +1170,30 @@ __pthread_continue (pthread_t * thread)
   return 0;
 }
 
+/* provided for source level compatability.
+ * See http://www.opengroup.org/onlinepubs/007908799/xsh/pthread_getconcurrency.html
+ */
+int
+__pthread_getconcurrency (void)
+{
+  return MT_INTERFACE->concurrency;
+}
+
+/* keep this in sync with sched.cc */
+int
+__pthread_getschedparam (pthread_t thread, int *policy,
+			 struct sched_param *param)
+{
+  if (!verifyable_object_isvalid (thread, PTHREAD_MAGIC))
+    return ESRCH;
+  *policy = SCHED_FIFO;
+  /* we don't return the current effective priority, we return the current requested
+   * priority */
+  *param = thread->attr.schedparam;
+  return 0;
+}
+
+
 unsigned long
 __pthread_getsequence_np (pthread_t * thread)
 {
@@ -697,7 +1212,7 @@ __pthread_key_create (pthread_key_t * key, void (*destructor) (void *))
   if (verifyable_object_isvalid (*key, PTHREAD_KEY_MAGIC))
     return EBUSY;
 
-  *key = new pthread_key ();
+  *key = new pthread_key (destructor);
 
   if (!verifyable_object_isvalid (*key, PTHREAD_KEY_MAGIC))
     {
@@ -709,13 +1224,43 @@ __pthread_key_create (pthread_key_t * key, void (*destructor) (void *))
 }
 
 int
-__pthread_key_delete (pthread_key_t * key)
+__pthread_key_delete (pthread_key_t key)
 {
-  if (!verifyable_object_isvalid (*key, PTHREAD_KEY_MAGIC))
+  if (!verifyable_object_isvalid (key, PTHREAD_KEY_MAGIC))
     return EINVAL;
 
-  delete (*key);
+  delete (key);
   return 0;
+}
+
+/* provided for source level compatability. 
+ * See http://www.opengroup.org/onlinepubs/007908799/xsh/pthread_getconcurrency.html
+ */
+int
+__pthread_setconcurrency (int new_level)
+{
+  if (new_level < 0)
+    return EINVAL;
+  MT_INTERFACE->concurrency = new_level;
+  return 0;
+}
+
+/* keep syncronised with sched.cc */
+int
+__pthread_setschedparam (pthread_t thread, int policy,
+			 const struct sched_param *param)
+{
+  if (!verifyable_object_isvalid (thread, PTHREAD_MAGIC))
+    return ESRCH;
+  if (policy != SCHED_FIFO)
+    return ENOTSUP;
+  if (!param)
+    return EINVAL;
+  int rv =
+    sched_set_thread_priority (thread->win32_obj_id, param->sched_priority);
+  if (!rv)
+    thread->attr.schedparam.sched_priority = param->sched_priority;
+  return rv;
 }
 
 
@@ -806,6 +1351,8 @@ __pthread_cond_timedwait (pthread_cond_t * cond, pthread_mutex_t * mutex,
   int rv;
   if (!abstime)
     return EINVAL;
+  if (*mutex == PTHREAD_MUTEX_INITIALIZER)
+    __pthread_mutex_init (mutex, NULL);
   if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
     return EINVAL;
   if (!verifyable_object_isvalid (*cond, PTHREAD_COND_MAGIC))
@@ -831,6 +1378,8 @@ int
 __pthread_cond_wait (pthread_cond_t * cond, pthread_mutex_t * mutex)
 {
   int rv;
+  if (*mutex == PTHREAD_MUTEX_INITIALIZER)
+    __pthread_mutex_init (mutex, NULL);
   if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
     return EINVAL;
   if (!verifyable_object_isvalid (*cond, PTHREAD_COND_MAGIC))
@@ -897,16 +1446,16 @@ __pthread_condattr_destroy (pthread_condattr_t * condattr)
 
 /* Thread signal */
 int
-__pthread_kill (pthread_t * thread, int sig)
+__pthread_kill (pthread_t thread, int sig)
 {
 // lock myself, for the use of thread2signal
   // two differ kills might clash: FIXME
 
-  if (!verifyable_object_isvalid (*thread, PTHREAD_MAGIC))
+  if (!verifyable_object_isvalid (thread, PTHREAD_MAGIC))
     return EINVAL;
 
-  if ((*thread)->sigs)
-    myself->setthread2signal (*thread);
+  if (thread->sigs)
+    myself->setthread2signal (thread);
 
   int rval = _kill (myself->pid, sig);
 
@@ -933,7 +1482,8 @@ __pthread_sigmask (int operation, const sigset_t * set, sigset_t * old_set)
 }
 
 /*  ID */
-pthread_t __pthread_self ()
+pthread_t
+__pthread_self ()
 {
   return (pthread *) TlsGetValue (MT_INTERFACE->thread_self_dwTlsIndex);
 }
@@ -945,6 +1495,15 @@ __pthread_equal (pthread_t * t1, pthread_t * t2)
 }
 
 /* Mutexes  */
+
+/* FIXME: there's a potential race with PTHREAD_MUTEX_INITALIZER:
+ * the mutex is not actually inited until the first use.
+ * So two threads trying to lock/trylock may collide.
+ * Solution: we need a global mutex on mutex creation, or possibly simply
+ * on all constructors that allow INITIALIZER macros.
+ * the lock should be very small: only around the init routine, not
+ * every test, or all mutex access will be synchronised.
+ */
 
 int
 __pthread_mutex_init (pthread_mutex_t * mutex,
@@ -967,8 +1526,29 @@ __pthread_mutex_init (pthread_mutex_t * mutex,
 }
 
 int
+__pthread_mutex_getprioceiling (const pthread_mutex_t * mutex,
+				int *prioceiling)
+{
+  if (*mutex == PTHREAD_MUTEX_INITIALIZER)
+    __pthread_mutex_init ((pthread_mutex_t *) mutex, NULL);
+  if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
+    return EINVAL;
+  /* We don't define _POSIX_THREAD_PRIO_PROTECT because we do't currently support
+   * mutex priorities.
+   *
+   * We can support mutex priorities in the future though:
+   * Store a priority with each mutex. 
+   * When the mutex is optained, set the thread priority as appropriate
+   * When the mutex is released, reset the thre priority.
+   */
+  return ENOSYS;
+}
+
+int
 __pthread_mutex_lock (pthread_mutex_t * mutex)
 {
+  if (*mutex == PTHREAD_MUTEX_INITIALIZER)
+    __pthread_mutex_init (mutex, NULL);
   if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
     return EINVAL;
   (*mutex)->Lock ();
@@ -978,6 +1558,8 @@ __pthread_mutex_lock (pthread_mutex_t * mutex)
 int
 __pthread_mutex_trylock (pthread_mutex_t * mutex)
 {
+  if (*mutex == PTHREAD_MUTEX_INITIALIZER)
+    __pthread_mutex_init (mutex, NULL);
   if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
     return EINVAL;
   if ((*mutex)->TryLock () == WAIT_TIMEOUT)
@@ -988,6 +1570,8 @@ __pthread_mutex_trylock (pthread_mutex_t * mutex)
 int
 __pthread_mutex_unlock (pthread_mutex_t * mutex)
 {
+  if (*mutex == PTHREAD_MUTEX_INITIALIZER)
+    __pthread_mutex_init (mutex, NULL);
   if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
     return EINVAL;
   (*mutex)->UnLock ();
@@ -997,6 +1581,8 @@ __pthread_mutex_unlock (pthread_mutex_t * mutex)
 int
 __pthread_mutex_destroy (pthread_mutex_t * mutex)
 {
+  if (*mutex == PTHREAD_MUTEX_INITIALIZER)
+    return 0;
   if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
     return EINVAL;
 
@@ -1006,6 +1592,137 @@ __pthread_mutex_destroy (pthread_mutex_t * mutex)
 
   delete (*mutex);
   *mutex = NULL;
+  return 0;
+}
+
+int
+__pthread_mutex_setprioceiling (pthread_mutex_t * mutex, int prioceiling,
+				int *old_ceiling)
+{
+  if (*mutex == PTHREAD_MUTEX_INITIALIZER)
+    __pthread_mutex_init (mutex, NULL);
+  if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
+    return EINVAL;
+  return ENOSYS;
+}
+
+/* Win32 doesn't support mutex priorities - see __pthread_mutex_getprioceiling 
+ * for more detail */
+int
+__pthread_mutexattr_getprotocol (const pthread_mutexattr_t * attr,
+				 int *protocol)
+{
+  if (!verifyable_object_isvalid (*attr, PTHREAD_MUTEX_MAGIC))
+    return EINVAL;
+  return ENOSYS;
+}
+
+int
+__pthread_mutexattr_getpshared (const pthread_mutexattr_t * attr,
+				int *pshared)
+{
+  if (!verifyable_object_isvalid (*attr, PTHREAD_MUTEX_MAGIC))
+    return EINVAL;
+  *pshared = (*attr)->pshared;
+  return 0;
+}
+
+/* Win32 mutex's are equivalent to posix RECURSIVE mutexs. 
+ * We need to put glue in place to support other types of mutex's. We map 
+ * PTHREAD_MUTEX_DEFAULT to PTHREAD_MUTEX_RECURSIVE and return EINVAL for other types.
+ */
+int
+__pthread_mutexattr_gettype (const pthread_mutexattr_t * attr, int *type)
+{
+  if (!verifyable_object_isvalid (*attr, PTHREAD_MUTEX_MAGIC))
+    return EINVAL;
+  *type = (*attr)->mutextype;
+  return 0;
+}
+
+/* Currently pthread_mutex_init ignores the attr variable, this is because
+ * none of the variables have any impact on it's behaviour.
+ *
+ * FIXME: write and test process shared mutex's.
+ */
+int
+__pthread_mutexattr_init (pthread_mutexattr_t * attr)
+{
+  if (verifyable_object_isvalid (*attr, PTHREAD_MUTEXATTR_MAGIC))
+    return EBUSY;
+
+  *attr = new pthread_mutexattr ();
+  if (!verifyable_object_isvalid (*attr, PTHREAD_MUTEXATTR_MAGIC))
+    {
+      delete (*attr);
+      *attr = NULL;
+      return ENOMEM;
+    }
+  return 0;
+}
+
+int
+__pthread_mutexattr_destroy (pthread_mutexattr_t * attr)
+{
+  if (!verifyable_object_isvalid (*attr, PTHREAD_MUTEXATTR_MAGIC))
+    return EINVAL;
+  delete (*attr);
+  *attr = NULL;
+  return 0;
+}
+
+
+/* Win32 doesn't support mutex priorities */
+int
+__pthread_mutexattr_setprotocol (pthread_mutexattr_t * attr, int protocol)
+{
+  if (!verifyable_object_isvalid (*attr, PTHREAD_MUTEXATTR_MAGIC))
+    return EINVAL;
+  return ENOSYS;
+}
+
+/* Win32 doesn't support mutex priorities */
+int
+__pthread_mutexattr_setprioceiling (pthread_mutexattr_t * attr,
+				    int prioceiling)
+{
+  if (!verifyable_object_isvalid (*attr, PTHREAD_MUTEXATTR_MAGIC))
+    return EINVAL;
+  return ENOSYS;
+}
+
+int
+__pthread_mutexattr_getprioceiling (const pthread_mutexattr_t * attr,
+				    int *prioceiling)
+{
+  if (!verifyable_object_isvalid (*attr, PTHREAD_MUTEXATTR_MAGIC))
+    return EINVAL;
+  return ENOSYS;
+}
+
+int
+__pthread_mutexattr_setpshared (pthread_mutexattr_t * attr, int pshared)
+{
+  if (!verifyable_object_isvalid (*attr, PTHREAD_MUTEXATTR_MAGIC))
+    return EINVAL;
+  /* we don't use pshared for anything as yet. We need to test PROCESS_SHARED 
+   * functionality 
+   */
+  if (pshared != PTHREAD_PROCESS_PRIVATE)
+    return EINVAL;
+  (*attr)->pshared = pshared;
+  return 0;
+}
+
+/* see __pthread_mutex_gettype */
+int
+__pthread_mutexattr_settype (pthread_mutexattr_t * attr, int type)
+{
+  if (!verifyable_object_isvalid (*attr, PTHREAD_MUTEXATTR_MAGIC))
+    return EINVAL;
+  if (type != PTHREAD_MUTEX_RECURSIVE)
+    return EINVAL;
+  (*attr)->mutextype = type;
   return 0;
 }
 
@@ -1073,179 +1790,4 @@ __sem_post (sem_t * sem)
   return 0;
 }
 
-
-#else
-
-// empty functions needed when makeing the dll without mt_safe support
-extern "C"
-{
-int __pthread_create (pthread_t *, const pthread_attr_t *,
-		      TFD (start_routine), void *arg)
-{
-  return -1;
-}
-int __pthread_attr_init (pthread_attr_t * attr)
-{
-  return -1;
-}
-int __pthread_attr_destroy (pthread_attr_t * attr)
-{
-  return -1;
-}
-int __pthread_attr_setdetachstate (pthread_attr_t * attr, int detachstate)
-{
-  return -1;
-}
-int
-  __pthread_attr_getdetachstate (const pthread_attr_t * attr,
-				 int *detachstate)
-{
-  return -1;
-}
-int __pthread_attr_setstacksize (pthread_attr_t * attr, size_t size)
-{
-  return -1;
-}
-int __pthread_attr_getstacksize (pthread_attr_t * attr, size_t * size)
-{
-  return -1;
-}
-/* these cannot be supported on win32 - the os allocates it's own stack space..
- __pthread_attr_setstackaddr (...){ return -1; };
- __pthread_attr_getstackaddr (...){ return -1; };
-*/
-int __pthread_exit (void *value_ptr)
-{
-  return -1;
-}
-
-int __pthread_join (pthread_t thread_id, void **return_val)
-{
-  return -1;
-}
-
-unsigned long __pthread_getsequence_np (pthread_t * thread)
-{
-  return 0;
-}
-int __pthread_key_create (pthread_key_t * key)
-{
-  return -1;
-}
-int __pthread_key_delete (pthread_key_t * key)
-{
-  return -1;
-}
-int __pthread_setspecific (pthread_key_t * key, const void *value)
-{
-  return -1;
-}
-void *__pthread_getspecific (pthread_key_t * key)
-{
-  return NULL;
-}
-int __pthread_kill (pthread_t * thread, int sig)
-{
-  return -1;
-}
-int __pthread_sigmask (int operation, const sigset_t * set,
-		       sigset_t * old_set)
-{
-  return -1;
-}
-pthread_t __pthread_self ()
-{
-  return -1;
-}
-int __pthread_equal (pthread_t * t1, pthread_t * t2)
-{
-  return -1;
-}
-int __pthread_mutex_init (pthread_mutex_t *, const pthread_mutexattr_t *)
-{
-  return -1;
-}
-int __pthread_mutex_lock (pthread_mutex_t *)
-{
-  return -1;
-}
-int __pthread_mutex_trylock (pthread_mutex_t *)
-{
-  return -1;
-}
-int __pthread_mutex_unlock (pthread_mutex_t *)
-{
-  return -1;
-}
-int __pthread_mutex_destroy (pthread_mutex_t *)
-{
-  return -1;
-}
-int __pthread_cond_destroy (pthread_cond_t *)
-{
-  return -1;
-}
-int __pthread_cond_init (pthread_cond_t *, const pthread_condattr_t *)
-{
-  return -1;
-}
-int __pthread_cond_signal (pthread_cond_t *)
-{
-  return -1;
-}
-int __pthread_cond_broadcast (pthread_cond_t *)
-{
-  return -1;
-}
-int __pthread_cond_timedwait (pthread_cond_t *, pthread_mutex_t *,
-			      const struct timespec *)
-{
-  return -1;
-}
-int __pthread_cond_wait (pthread_cond_t *, pthread_mutex_t *)
-{
-  return -1;
-}
-int __pthread_condattr_init (pthread_condattr_t *)
-{
-  return -1;
-}
-int __pthread_condattr_destroy (pthread_condattr_t *)
-{
-  return -1;
-}
-int __pthread_condattr_getpshared (pthread_condattr_t *, int *)
-{
-  return -1;
-}
-int __pthread_condattr_setpshared (pthread_condattr_t *, int)
-{
-  return -1;
-}
-int __sem_init (sem_t * sem, int pshared, unsigned int value)
-{
-  return -1;
-}
-int __sem_destroy (sem_t * sem)
-{
-  return -1;
-}
-int __sem_wait (sem_t * sem)
-{
-  return -1;
-}
-int __sem_trywait (sem_t * sem)
-{
-  return -1;
-}
-int __sem_post (sem_t * sem)
-{
-  return -1;
-}
-struct _reent *_reent_clib ()
-{
-  return NULL;
-  }
-}
-
-#endif				// MT_SAFE
+#endif // MT_SAFE
