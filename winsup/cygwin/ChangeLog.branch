@@ -1,3 +1,7 @@
+2003-01-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* devices.gperf: Remove obsolete win32 device names.
+
 2003-01-25  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in (DLL_OFILES): Add fhandler_nodevice.o.
