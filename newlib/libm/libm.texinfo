@@ -28,7 +28,7 @@ END-INFO-DIR-ENTRY
 @ifinfo
 This file documents an ANSI-C conforming mathematical subroutine library.
 
-Copyright (C) 1992, 1993, 1995, 1996-2002 Red Hat, Inc. 
+Copyright (C) 1992, 1993, 1995, 1996-2004 Red Hat, Inc. 
 
 @file{libm} includes software developed at SunPro, a Sun Microsystems,
 Inc. business.  Permission to use, copy, modify, and distribute this
@@ -74,13 +74,13 @@ into another language, under the above conditions for modified versions.
 \hfill Red Hat Support\par
 \hfill sac@@cygnus.com\par
 \hfill pesch@@cygnus.com\par
-\hfill jjohnstn@redhat.com\par
+\hfill jjohnstn@@redhat.com\par
 }
 \global\parindent=0pt % Steve likes it this way
 @end tex
 
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1992, 1993, 1994-2002 Red Hat, Inc. 
+Copyright @copyright{} 1992, 1993, 1994-2004 Red Hat, Inc. 
 
 @file{libm} includes software developed at SunPro, a Sun Microsystems,
 Inc. business.  Permission to use, copy, modify, and distribute this

@@ -28,7 +28,7 @@ END-INFO-DIR-ENTRY
 @ifinfo
 This file documents the ANSI C library.
 
-Copyright (C) 1992, 1993, 1994-2002 Red Hat, Inc.
+Copyright (C) 1992, 1993, 1994-2004 Red Hat, Inc.
 
 @file{libc} includes software developed by the
 University of California, Berkeley and its contributors.
@@ -94,8 +94,8 @@ into another language, under the above conditions for modified versions.
 
 @tex
 {\parskip=0pt
-sac@@cygnus.com, pesch@@cygnus.com, jjohnstn@redhat.com\hfill {\it The Red Hat newlib C Library}\par
-Copyright \copyright{} 1992, 1993, 1994-2002 Red Hat Inc. 
+sac@@cygnus.com, pesch@@cygnus.com, jjohnstn@@redhat.com\hfill {\it The Red Hat newlib C Library}\par
+Copyright \copyright{} 1992, 1993, 1994-2004 Red Hat Inc. 
 }
 \global\parindent=0pt % Steve likes it this way
 @end tex
