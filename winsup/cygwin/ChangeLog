@@ -1,3 +1,7 @@
+2003-05-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/types.h: Add key_t typedef.
+
 2003-05-10  Christopher Faylor  <cgf@redhat.com>
 
 	* dir.cc (readdir): Fill out new old_d_ino field.
