@@ -1,3 +1,8 @@
+2005-03-16  Christopher Faylor  <cgf@timesys.com>
+
+	* winclude/winnt.h (SYSTEM_LUID): Fix definitition invalidated by below
+	change.
+
 2005-03-16  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winnt.h (_LUID): Add structure. Correct LUID typedef. 

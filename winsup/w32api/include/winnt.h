@@ -1349,7 +1349,7 @@ typedef struct _GUID {
 	unsigned short Data3;
 	unsigned char  Data4[8];
 } GUID, *REFGUID, *LPGUID;
-#define SYSTEM_LUID { QuadPart:999 }
+#define SYSTEM_LUID { 0x3e7, 0x0 }
 #endif /* GUID_DEFINED */
 typedef struct _GENERIC_MAPPING {
 	ACCESS_MASK GenericRead;
