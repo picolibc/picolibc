@@ -698,7 +698,7 @@ struct _reent
 #define _REENT_MP_RESULT_K(ptr)	((ptr)->_result_k)
 #define _REENT_MP_P5S(ptr)	((ptr)->_p5s)
 #define _REENT_MP_FREELIST(ptr)	((ptr)->_freelist)
-#define _REENT_ASCTIME_BUF(ptr)	(&(ptr)->_new._reent._asctime_buf)
+#define _REENT_ASCTIME_BUF(ptr)	((ptr)->_new._reent._asctime_buf)
 #define _REENT_TM(ptr)		(&(ptr)->_new._reent._localtime_buf)
 #define _REENT_EMERGENCY(ptr)	((ptr)->_emergency)
 #define _REENT_STRTOK_LAST(ptr)	((ptr)->_new._reent._strtok_last)

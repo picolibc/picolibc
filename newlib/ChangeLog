@@ -1,5 +1,10 @@
 2004-01-08  Joel Sherrill  <joel@oarcorp.com>
 
+        * libc/ctype/iswctype.c, include/sys/reent.h, libc/stdlib/a64l.c:
+        Remove warnings.
+
+2004-01-08  Joel Sherrill  <joel@oarcorp.com>
+
         * libc/sys/rtems/sys/queue.h: New file.
         * libc/include/sys/signal.h: Reflect renumbering of signals to
         fit into 32-bit mask.

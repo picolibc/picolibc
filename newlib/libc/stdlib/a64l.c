@@ -62,7 +62,7 @@ long
 _DEFUN (a64l, (input),
 	const char *input)
 {
-  char *ptr;
+  const char *ptr;
   char ch;
   int i, digit;
   unsigned long result = 0;

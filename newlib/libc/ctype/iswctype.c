@@ -62,6 +62,7 @@ _DEFUN(iswctype,(c, desc), wint_t c _AND wctype_t desc)
     case WC_XDIGIT:
       return iswxdigit (c);
     default:
+      return 0; /* eliminate warning */
     }
 
   /* otherwise unknown */
