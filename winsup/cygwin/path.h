@@ -67,9 +67,9 @@ struct fs_info
   DWORD drive_type;
   bool update (const char *);
 };
+
 class path_conv
 {
-  char path[MAX_PATH];
   DWORD fileattr;
   fs_info fs;
   void add_ext_from_sym (symlink_info&);
@@ -81,7 +81,6 @@ class path_conv
   DWORD devn;
   int unit;
   BOOL case_clash;
-  char *normalized_path;
 
   int isdisk () const { return path_flags & PATH_ISDISK;}
   int isremote () const {return fs.is_remote_drive;}
@@ -160,6 +159,9 @@ class path_conv
   DWORD volser () { return fs.serial; }
   const char *volname () {return fs.name; }
   void fillin (HANDLE h);
+  char *normalized_path;
+ private:
+  char path[MAX_PATH];
 };
 
 /* Symlink marker */

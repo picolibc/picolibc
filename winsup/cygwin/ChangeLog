@@ -1,5 +1,9 @@
 2003-02-12  Christopher Faylor  <cgf@redhat.com>
 
+	* path.h (path_conv): Reorganize slightly.
+
+2003-02-12  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler_tty.cc (process_input): Add sanity check to ensure that
 	console typeahead is cleared on signal.
 
