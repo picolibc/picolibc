@@ -1,3 +1,16 @@
+Wed Mar 14 10:11:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* path.cc (lnk_suffixes): Remove.
+	(class suffix_scan): Add `lnk_state' flag.
+	(suffix_scan::lnk_match): Return state of `lnk_state' now.
+	(suffix_scan::has): Changed behaviour if file has `.lnk' suffix.
+	(suffix_scan::next): Set `lnk_state' where appropriate.
+	(symlink_info::check): Fix a wrong `break'.
+	* syscalls.cc (chown_worker): Change debug statement to reflect
+	lchown fix.
+	(lchown): Call chown_worker with `PC_SYM_NOFOLLOW' instead of
+	`PC_SYM_IGNORE'.
+
 Tue Mar 13 13:52:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_disk_file::fstat): Add correct modes to

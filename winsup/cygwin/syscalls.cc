@@ -762,7 +762,7 @@ chown_worker (const char *name, unsigned fmode, uid_t uid, gid_t gid)
 
 done:
   syscall_printf ("%d = %schown (%s,...)",
-		  res, (fmode & PC_SYM_IGNORE) ? "l" : "", name);
+		  res, (fmode & PC_SYM_NOFOLLOW) ? "l" : "", name);
   return res;
 }
 
@@ -777,7 +777,7 @@ extern "C" int
 lchown (const char * name, uid_t uid, gid_t gid)
 {
   sigframe thisframe (mainthread);
-  return chown_worker (name, PC_SYM_IGNORE, uid, gid);
+  return chown_worker (name, PC_SYM_NOFOLLOW, uid, gid);
 }
 
 extern "C" int
@@ -1279,9 +1279,7 @@ _rename (const char *oldpath, const char *newpath)
   if (real_old.issymlink () && !real_new.error)
     {
       int len_old = strlen (real_old.get_win32 ());
-      int len_new = strlen (real_new.get_win32 ());
-      if (!strcasecmp (real_old.get_win32 () + len_old - 4, ".lnk") &&
-	  strcasecmp (real_new.get_win32 () + len_new - 4, ".lnk"))
+      if (!strcasecmp (real_old.get_win32 () + len_old - 4, ".lnk"))
 	{
 	  strcpy (new_lnk_buf, newpath);
 	  strcat (new_lnk_buf, ".lnk");

@@ -96,13 +96,6 @@ struct symlink_info
   int check (const char *path, const suffix_info *suffixes);
 };
 
-/* These suffixes are the only ones allowed in inner path components. */
-suffix_info lnk_suffixes[] =
-{
-  suffix_info (".lnk", 1),
-  suffix_info (NULL)
-};
-
 cwdstuff cygcwd;	/* The current working directory. */
 
 #define path_prefix_p(p1, p2, l1) \
@@ -2411,12 +2404,13 @@ class suffix_scan
   char *ext_here;
   const suffix_info *suffixes;
   int state;
+  int lnk_state;
   int nullterm;
 public:
   const char *path;
   char *has (const char *, const suffix_info *, char **);
   int next ();
-  int lnk_match () {return state == SCAN_LNK + 1;}
+  int lnk_match () {return lnk_state;}
 };
 
 char *
@@ -2426,6 +2420,7 @@ suffix_scan::has (const char *in_path, const suffix_info *in_suffixes, char **ex
   suffixes = in_suffixes;
   nullterm = 0;
   state = SCAN_BEG;
+  lnk_state = 0;
   ext_here = *ext_where = strrchr (in_path, '.');
   if (ext_here)
     {
@@ -2436,14 +2431,15 @@ suffix_scan::has (const char *in_path, const suffix_info *in_suffixes, char **ex
 	    if (strcasematch (ext_here, ex->name))
 	      {
 		state = SCAN_JUSTCHECK;
-		goto known_suffix;
+	        suffixes = NULL; /* Has an extension so don't scan for one. */
+		return ext_here;
 	      }
 	}
       /* Didn't match.  Use last resort -- .lnk. */
       if (strcasematch (ext_here, ".lnk"))
 	{
-	  state = SCAN_LNK;
-	  goto known_suffix;
+	  lnk_state = 1;
+	  suffixes = NULL;
 	}
     }
 
@@ -2451,10 +2447,6 @@ suffix_scan::has (const char *in_path, const suffix_info *in_suffixes, char **ex
   ext_here = *ext_where = strchr (path, '\0');
   nullterm = 1;
   return NULL;
-
- known_suffix:
-  suffixes = NULL;		/* Has an extension so don't scan for one. */
-  return ext_here;
 }
 
 int
@@ -2478,6 +2470,7 @@ suffix_scan::next ()
   switch (state++)
     {
     case SCAN_LNK:
+      lnk_state = 1;
       strcpy (ext_here, ".lnk");
       /* fall through */
     case SCAN_BEG:
@@ -2566,7 +2559,7 @@ symlink_info::check (const char *path, const suffix_info *suffixes)
 	  if (suffix.lnk_match ())
 	    {
 	      fileattr = (DWORD)-1;
-	      break;
+	      continue;
 	    }
 	  goto file_not_symlink;
 	}
