@@ -76,7 +76,7 @@ fill_rusage (struct rusage *r, HANDLE h)
   PROCESS_MEMORY_COUNTERS pmc;
 
   memset (&pmc, 0, sizeof (pmc));
-  if (GetProcessMemoryInfo( h, &pmc, sizeof (pmc)))
+  if (GetProcessMemoryInfo (h, &pmc, sizeof (pmc)))
     {
       r->ru_maxrss += (long) (pmc.WorkingSetSize /1024);
       r->ru_majflt += pmc.PageFaultCount;
@@ -165,7 +165,7 @@ setrlimit (int resource, const struct rlimit *rlp)
   // Check if the request is to actually change the resource settings.
   // If it does not result in a change, take no action and do not
   // fail.
-  if (getrlimit(resource, &oldlimits) < 0)
+  if (getrlimit (resource, &oldlimits) < 0)
     return -1;
 
   if (oldlimits.rlim_cur == rlp->rlim_cur &&

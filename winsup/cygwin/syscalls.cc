@@ -783,7 +783,7 @@ chown_worker (const char *name, unsigned fmode, __uid32_t uid, __gid32_t gid)
 	    uid = old_uid;
 	  if (gid == ILLEGAL_GID)
 	    gid = old_gid;
-	  if (win32_path.isdir())
+	  if (win32_path.isdir ())
 	    attrib |= S_IFDIR;
 	  res = set_file_attribute (win32_path.has_acls (), win32_path, uid,
 				    gid, attrib);
@@ -1969,7 +1969,7 @@ seteuid32 (__uid32_t uid)
   sav_token = cygheap->user.token;
   sav_impersonated = cygheap->user.impersonated;
 
-  RevertToSelf();
+  RevertToSelf ();
   if (!OpenProcessToken (hMainProc, TOKEN_QUERY | TOKEN_ADJUST_DEFAULT, &ptok))
     {
       __seterrno ();
@@ -1979,7 +1979,7 @@ seteuid32 (__uid32_t uid)
      Currently we do not try to differentiate between
 	 internal tokens and others */
   process_ok = verify_token (ptok, usersid, groups);
-  debug_printf("Process token %sverified", process_ok ? "" : "not ");
+  debug_printf ("Process token %sverified", process_ok ? "" : "not ");
   if (process_ok)
     {
       if (cygheap->user.issetuid ())
@@ -1996,7 +1996,7 @@ seteuid32 (__uid32_t uid)
       /* Verify if the current tokem is suitable */
       BOOL token_ok = verify_token (cygheap->user.token, usersid, groups,
 				    &sav_token_is_internal_token);
-      debug_printf("Thread token %d %sverified",
+      debug_printf ("Thread token %d %sverified",
 		   cygheap->user.token, token_ok?"":"not ");
       if (!token_ok)
 	cygheap->user.token = INVALID_HANDLE_VALUE;
@@ -2014,8 +2014,8 @@ seteuid32 (__uid32_t uid)
     }
 
   /* Set process def dacl to allow access to impersonated token */
-  char dacl_buf[MAX_DACL_LEN(5)];
-  if (usersid != (origpsid =  cygheap->user.orig_sid())) psid2 = usersid;
+  char dacl_buf[MAX_DACL_LEN (5)];
+  if (usersid != (origpsid =  cygheap->user.orig_sid ())) psid2 = usersid;
   if (sec_acl ((PACL) dacl_buf, FALSE, origpsid, psid2))
     {
       TOKEN_DEFAULT_DACL tdacl;
@@ -2030,7 +2030,7 @@ seteuid32 (__uid32_t uid)
   if (!process_ok && cygheap->user.token == INVALID_HANDLE_VALUE)
     {
       /* If no impersonation token is available, try to
-	 authenticate using NtCreateToken() or subauthentication. */
+	 authenticate using NtCreateToken () or subauthentication. */
       cygheap->user.token = create_token (usersid, groups, pw_new);
       if (cygheap->user.token != INVALID_HANDLE_VALUE)
 	explicitly_created_token = TRUE;
@@ -2059,7 +2059,7 @@ seteuid32 (__uid32_t uid)
 	  /* Try setting primary group in token to current group */
 	  if (!SetTokenInformation (cygheap->user.token,
 				    TokenPrimaryGroup,
-				    &groups.pgsid, sizeof(cygsid)))
+				    &groups.pgsid, sizeof (cygsid)))
 	    debug_printf ("SetTokenInformation(user.token, "
 			  "TokenPrimaryGroup): %E");
 	}

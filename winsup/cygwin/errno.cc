@@ -673,7 +673,7 @@ strerror (int errnum)
       break;
     default:
 #ifdef _MT_SAFE
-      char *buf= _reent_winsup()->_strerror_buf;
+      char *buf= _reent_winsup ()->_strerror_buf;
 #else
       static NO_COPY char buf[20];
 #endif

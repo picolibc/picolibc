@@ -541,8 +541,8 @@ fhandler_console::open (path_conv *, int flags, mode_t)
 
   tcinit (get_tty_stuff (flags));
 
-  set_io_handle (INVALID_HANDLE_VALUE);
-  set_output_handle (INVALID_HANDLE_VALUE);
+  set_io_handle (NULL);
+  set_output_handle (NULL);
 
   set_flags ((flags & ~O_TEXT) | O_BINARY);
 
@@ -595,8 +595,8 @@ fhandler_console::close (void)
 {
   CloseHandle (get_io_handle ());
   CloseHandle (get_output_handle ());
-  set_io_handle (INVALID_HANDLE_VALUE);
-  set_output_handle (INVALID_HANDLE_VALUE);
+  set_io_handle (NULL);
+  set_output_handle (NULL);
   return 0;
 }
 

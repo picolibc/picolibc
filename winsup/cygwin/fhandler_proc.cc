@@ -50,7 +50,7 @@ static const char *proc_listing[] = {
   NULL
 };
 
-static const int PROC_LINK_COUNT = (sizeof(proc_listing) / sizeof(const char *)) - 1;
+static const int PROC_LINK_COUNT = (sizeof (proc_listing) / sizeof (const char *)) - 1;
 
 /* FH_PROC in the table below means the file/directory is handles by
  * fhandler_proc.
@@ -412,7 +412,7 @@ format_proc_uptime (char *destbuf, size_t maxsize)
   NTSTATUS ret = NtQuerySystemInformation (SystemProcessorTimes, (PVOID) &spt,
 					   sizeof spt, NULL);
   if (!ret && GetLastError () == ERROR_PROC_NOT_FOUND)
-    uptime = GetTickCount() / 10;
+    uptime = GetTickCount () / 10;
   else if (ret != STATUS_SUCCESS)
     {
       __seterrno_from_win_error (RtlNtStatusToDosError (ret));

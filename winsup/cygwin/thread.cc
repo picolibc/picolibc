@@ -308,7 +308,7 @@ pthread::precreate (pthread_attr *newattr)
       attr.stacksize = newattr->stacksize;
     }
 
-  if (!pthread_mutex::isGoodObject(&verifyable_mutex_obj))
+  if (!pthread_mutex::isGoodObject (&verifyable_mutex_obj))
     {
       thread_printf ("New thread object access mutex is not valid. this %p",
 		     this);
@@ -1013,7 +1013,7 @@ pthread_key::set (const void *value)
 void *
 pthread_key::get () const
 {
-  int savedError = ::GetLastError();
+  int savedError = ::GetLastError ();
   void *result = TlsGetValue (dwTlsIndex);
   ::SetLastError (savedError);
   return result;
@@ -1038,7 +1038,7 @@ void
 pthread_key::run_destructor () const
 {
   if (destructor)
-    destructor (get());
+    destructor (get ());
 }
 
 /*pshared mutexs:

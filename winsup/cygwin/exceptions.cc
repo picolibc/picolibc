@@ -736,9 +736,9 @@ signal_fixup_after_exec (bool isspawn)
   /* Set up child's signal handlers */
   for (int i = 0; i < NSIG; i++)
     {
-      myself->getsig(i).sa_mask = 0;
-      if (myself->getsig(i).sa_handler != SIG_IGN || isspawn)
-	myself->getsig(i).sa_handler = SIG_DFL;
+      myself->getsig (i).sa_mask = 0;
+      if (myself->getsig (i).sa_handler != SIG_IGN || isspawn)
+	myself->getsig (i).sa_handler = SIG_DFL;
     }
 }
 

@@ -56,7 +56,7 @@ static BOOL read_file (HANDLE fh, void *buf, DWORD to_read,
   BOOL ret;
 
   *err = 0;
-  if (!(ret = ReadFile(fh, buf, to_read, read, 0)))
+  if (!(ret = ReadFile (fh, buf, to_read, read, 0)))
     {
       if ((*err = GetLastError ()) == ERROR_MEDIA_CHANGED
 	  || *err == ERROR_BUS_RESET)
@@ -136,7 +136,7 @@ fhandler_dev_raw::open (path_conv *real_path, int flags, mode_t)
   if (!wincap.has_raw_devices ())
     {
       set_errno (ENOENT);
-      debug_printf("%s is accessible under NT/W2K only",real_path->get_win32());
+      debug_printf ("%s is accessible under NT/W2K only",real_path->get_win32());
       return 0;
     }
 

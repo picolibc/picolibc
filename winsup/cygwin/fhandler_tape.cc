@@ -347,8 +347,8 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 		    }
 		  if (devbufsiz > 1L && size > 1L)
 		    {
-		      memcpy(buf, devbuf + devbufstart,
-			     devbufend - devbufstart);
+		      memcpy (buf, devbuf + devbufstart,
+			      devbufend - devbufstart);
 		      devbufend -= devbufstart;
 		    }
 		  else

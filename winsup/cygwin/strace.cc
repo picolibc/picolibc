@@ -21,14 +21,14 @@ details. */
 #include "cygthread.h"
 
 #define PROTECT(x) x[sizeof(x)-1] = 0
-#define CHECK(x) if (x[sizeof(x)-1] != 0) { small_printf("array bound exceeded %d\n", __LINE__); ExitProcess(1); }
+#define CHECK(x) if (x[sizeof(x)-1] != 0) { small_printf ("array bound exceeded %d\n", __LINE__); ExitProcess (1); }
 
 class strace NO_COPY strace;
 
 #ifndef NOSTRACE
 
 void
-strace::hello()
+strace::hello ()
 {
   char buf[30];
 
@@ -196,11 +196,11 @@ strace::vprntf (unsigned category, const char *func, const char *fmt, va_list ap
   int count;
   char buf[10000];
 
-  PROTECT(buf);
+  PROTECT (buf);
   SetLastError (err);
 
   count = this->vsprntf (buf, func, fmt, ap);
-  CHECK(buf);
+  CHECK (buf);
   if (category & _STRACE_SYSTEM)
     {
       DWORD done;

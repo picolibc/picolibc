@@ -103,7 +103,7 @@ fhandler_base::set_readahead_valid (int val, int ch)
   if (!val)
     ralen = raixget = raixput = 0;
   if (ch != -1)
-    put_readahead(ch);
+    put_readahead (ch);
 }
 
 int
@@ -160,7 +160,7 @@ fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit
   else
     {
       const char *fmt = get_native_name ();
-      char *w =  (char *) cmalloc (HEAP_STR, strlen(fmt) + 16);
+      char *w =  (char *) cmalloc (HEAP_STR, strlen (fmt) + 16);
       __small_sprintf (w, fmt, unit);
       win32_path_name = w;
     }
@@ -254,7 +254,7 @@ fhandler_base::raw_read (void *ptr, size_t ulen)
 {
   DWORD bytes_read;
 
-  if (!ReadFile (get_handle(), ptr, ulen, &bytes_read, 0))
+  if (!ReadFile (get_handle (), ptr, ulen, &bytes_read, 0))
     {
       int errcode;
 
@@ -299,7 +299,7 @@ fhandler_base::raw_write (const void *ptr, size_t len)
 {
   DWORD bytes_written;
 
-  if (!WriteFile (get_handle(), ptr, len, &bytes_written, 0))
+  if (!WriteFile (get_handle (), ptr, len, &bytes_written, 0))
     {
       if (GetLastError () == ERROR_DISK_FULL && bytes_written > 0)
 	return bytes_written;
@@ -394,7 +394,7 @@ fhandler_base::open (path_conv *pc, int flags, mode_t mode)
     creation_distribution = CREATE_NEW;
 
   if (flags & O_APPEND)
-    set_append_p();
+    set_append_p ();
 
   /* These flags are host dependent. */
   shared = wincap.shared ();
@@ -601,7 +601,7 @@ fhandler_base::write (const void *ptr, size_t len)
   int res;
 
   if (get_append_p ())
-    SetFilePointer (get_handle(), 0, 0, FILE_END);
+    SetFilePointer (get_handle (), 0, 0, FILE_END);
   else if (wincap.has_lseek_bug () && get_check_win95_lseek_bug ())
     {
       /* Note: this bug doesn't happen on NT4, even though the documentation
@@ -855,7 +855,7 @@ fhandler_base::lseek (__off64_t offset, int whence)
     }
 
   debug_printf ("setting file pointer to %u (high), %u (low)", off_high, off_low);
-  res = SetFilePointer (get_handle(), off_low, poff_high, win32_whence);
+  res = SetFilePointer (get_handle (), off_low, poff_high, win32_whence);
   if (res == INVALID_SET_FILE_POINTER && GetLastError ())
     {
       __seterrno ();
@@ -881,12 +881,12 @@ fhandler_base::close ()
 {
   int res = -1;
 
-  syscall_printf ("closing '%s' handle %p", get_name (), get_handle());
-  if (get_nohandle () || CloseHandle (get_handle()))
+  syscall_printf ("closing '%s' handle %p", get_name (), get_handle ());
+  if (get_nohandle () || CloseHandle (get_handle ()))
     res = 0;
   else
     {
-      paranoid_printf ("CloseHandle (%d <%s>) failed", get_handle(),
+      paranoid_printf ("CloseHandle (%d <%s>) failed", get_handle (),
 		       get_name ());
 
       __seterrno ();
@@ -914,7 +914,7 @@ fhandler_base::lock (int, struct flock *)
 }
 
 extern "C" char * __stdcall
-rootdir(char *full_path)
+rootdir (char *full_path)
 {
   /* Possible choices:
    * d:... -> d:/
@@ -1006,18 +1006,19 @@ fhandler_base::dup (fhandler_base *child)
   debug_printf ("in fhandler_base dup");
 
   HANDLE nh;
-  if (get_nohandle ())
-    nh = INVALID_HANDLE_VALUE;
-  else if (!DuplicateHandle (hMainProc, get_handle(), hMainProc, &nh, 0, TRUE,
-			DUPLICATE_SAME_ACCESS))
+  if (!get_nohandle ())
     {
-      system_printf ("dup(%s) failed, handle %x, %E",
-		     get_name (), get_handle());
-      __seterrno ();
-      return -1;
-    }
+      if (!DuplicateHandle (hMainProc, get_handle (), hMainProc, &nh, 0, TRUE,
+			    DUPLICATE_SAME_ACCESS))
+	{
+	  system_printf ("dup(%s) failed, handle %x, %E",
+			 get_name (), get_handle ());
+	  __seterrno ();
+	  return -1;
+	}
 
-  child->set_io_handle (nh);
+      child->set_io_handle (nh);
+    }
   return 0;
 }
 

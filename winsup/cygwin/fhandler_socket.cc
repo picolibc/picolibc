@@ -502,7 +502,7 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
   if (len && ((unsigned) *len < sizeof (struct sockaddr_in)))
     *len = sizeof (struct sockaddr_in);
 
-  if (!is_nonblocking())
+  if (!is_nonblocking ())
     {
       ev[0] = WSACreateEvent ();
 

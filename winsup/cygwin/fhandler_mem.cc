@@ -93,9 +93,9 @@ fhandler_dev_mem::open (path_conv *, int flags, mode_t)
   RtlInitUnicodeString (&memstr, L"\\device\\physicalmemory");
 
   OBJECT_ATTRIBUTES attr;
-  InitializeObjectAttributes(&attr, &memstr,
-			     OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
-			     NULL, NULL);
+  InitializeObjectAttributes (&attr, &memstr,
+			      OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
+			      NULL, NULL);
 
   ACCESS_MASK section_access;
   if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDONLY)
@@ -279,9 +279,9 @@ fhandler_dev_mem::mmap (caddr_t *addr, size_t len, DWORD access,
   RtlInitUnicodeString (&memstr, L"\\device\\physicalmemory");
 
   OBJECT_ATTRIBUTES attr;
-  InitializeObjectAttributes(&attr, &memstr,
-			     OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
-			     NULL, NULL);
+  InitializeObjectAttributes (&attr, &memstr,
+			      OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
+			      NULL, NULL);
 
   ACCESS_MASK section_access;
   ULONG protect;
@@ -432,5 +432,5 @@ fhandler_dev_mem::dup (fhandler_base *child)
 void
 fhandler_dev_mem::dump ()
 {
-  paranoid_printf("here, fhandler_dev_mem");
+  paranoid_printf ("here, fhandler_dev_mem");
 }

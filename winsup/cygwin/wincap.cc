@@ -477,14 +477,14 @@ wincapc::init ()
 	  {
 	    case 0:
 	      os = "95";
-	      if (strchr(version.szCSDVersion, 'C'))
+	      if (strchr (version.szCSDVersion, 'C'))
 		caps = &wincap_95osr2;
 	      else
 		caps = &wincap_95;
 	      break;
 	    case 10:
 	      os = "98";
-	      if (strchr(version.szCSDVersion, 'A'))
+	      if (strchr (version.szCSDVersion, 'A'))
 		caps = &wincap_98se;
 	      else
 		caps = &wincap_98;

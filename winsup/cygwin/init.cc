@@ -27,21 +27,23 @@ WINAPI dll_entry (HANDLE h, DWORD reason, void *static_load)
     case DLL_THREAD_ATTACH:
       if (user_data->threadinterface)
 	{
-	  if (!TlsSetValue(user_data->threadinterface->reent_index,
-		    &user_data->threadinterface->reents))
-	    api_fatal("Sig proc MT init failed\n");
+	  if (!TlsSetValue (user_data->threadinterface->reent_index,
+			    &user_data->threadinterface->reents))
+	    api_fatal ("Sig proc MT init failed\n");
 	}
       break;
     case DLL_PROCESS_DETACH:
       break;
     case DLL_THREAD_DETACH:
-      pthread *thisthread = (pthread *) TlsGetValue (
-			user_data->threadinterface->thread_self_dwTlsIndex);
+#if 0
+      pthread *thisthread = (pthread *)
+	TlsGetValue (user_data->threadinterface->thread_self_dwTlsIndex);
       if (thisthread) {
 	  /* Some non-pthread call created this thread,
 	   * but we need to clean it up */
-	  thisthread->exit(0);
+	  thisthread->exit (0);
       }
+#endif
       break;
     }
   return 1;

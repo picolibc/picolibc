@@ -35,7 +35,7 @@ static int max_lines;
 
 /* Position in the group cache */
 #ifdef _MT_SAFE
-#define grp_pos _reent_winsup()->_grp_pos
+#define grp_pos _reent_winsup ()->_grp_pos
 #else
 static int grp_pos = 0;
 #endif
@@ -45,7 +45,7 @@ static pwdgrp_check group_state;
 static int
 parse_grp (struct __group32 &grp, char *line)
 {
-  int len = strlen(line);
+  int len = strlen (line);
   if (line[--len] == '\r')
     line[len] = '\0';
 
@@ -157,7 +157,7 @@ read_etc_group ()
 	    if (strlen (line))
 	      add_grp_line (line);
 
-	  group_state.set_last_modified (gr.get_fhandle(), gr.get_fname ());
+	  group_state.set_last_modified (gr.get_fhandle (), gr.get_fname ());
 	  group_state = loaded;
 	  gr.close ();
 	  debug_printf ("Read /etc/group, %d lines", curr_lines);
@@ -189,8 +189,8 @@ read_etc_group ()
 		      snprintf (linebuf, sizeof (linebuf), "%s:%s:%lu:",
 				group_name,
 				tg.string (strbuf),
-				*GetSidSubAuthority(tg,
-					     *GetSidSubAuthorityCount(tg) - 1));
+				*GetSidSubAuthority (tg,
+					     *GetSidSubAuthorityCount (tg) - 1));
 		      debug_printf ("Emulating /etc/group: %s", linebuf);
 		      add_grp_line (linebuf);
 		      group_state = emulated;
@@ -243,7 +243,7 @@ getgrgid32 (__gid32_t gid)
 {
   struct __group32 * default_grp = NULL;
   if (group_state  <= initializing)
-    read_etc_group();
+    read_etc_group ();
 
   for (int i = 0; i < curr_lines; i++)
     {
@@ -270,7 +270,7 @@ struct __group32 *
 getgrnam32 (const char *name)
 {
   if (group_state  <= initializing)
-    read_etc_group();
+    read_etc_group ();
 
   for (int i = 0; i < curr_lines; i++)
     if (strcasematch (group_buf[i].gr_name, name))
@@ -291,17 +291,17 @@ getgrnam (const char *name)
 
 extern "C"
 void
-endgrent()
+endgrent ()
 {
   grp_pos = 0;
 }
 
 extern "C"
 struct __group32 *
-getgrent32()
+getgrent32 ()
 {
   if (group_state  <= initializing)
-    read_etc_group();
+    read_etc_group ();
 
   if (grp_pos < curr_lines)
     return group_buf + grp_pos++;
@@ -311,7 +311,7 @@ getgrent32()
 
 extern "C"
 struct __group16 *
-getgrent()
+getgrent ()
 {
   static struct __group16 g16;
 
@@ -330,7 +330,7 @@ struct __group32 *
 internal_getgrent (int pos)
 {
   if (group_state  <= initializing)
-    read_etc_group();
+    read_etc_group ();
 
   if (pos < curr_lines)
     return group_buf + pos;
@@ -347,7 +347,7 @@ getgroups32 (int gidsetsize, __gid32_t *grouplist, __gid32_t gid,
   struct __group32 *gr;
 
   if (group_state  <= initializing)
-    read_etc_group();
+    read_etc_group ();
 
   if (allow_ntsec &&
       OpenProcessToken (hMainProc, TOKEN_QUERY, &hToken))

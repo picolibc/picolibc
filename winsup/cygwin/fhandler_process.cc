@@ -68,10 +68,10 @@ static off_t format_process_stat (_pinfo *p, char *destbuf, size_t maxsize);
 static off_t format_process_status (_pinfo *p, char *destbuf, size_t maxsize);
 static off_t format_process_statm (_pinfo *p, char *destbuf, size_t maxsize);
 static int get_process_state (DWORD dwProcessId);
-static bool get_mem_values(DWORD dwProcessId, unsigned long *vmsize,
-			   unsigned long *vmrss, unsigned long *vmtext,
-			   unsigned long *vmdata, unsigned long *vmlib,
-			   unsigned long *vmshare);
+static bool get_mem_values (DWORD dwProcessId, unsigned long *vmsize,
+			    unsigned long *vmrss, unsigned long *vmtext,
+			    unsigned long *vmdata, unsigned long *vmlib,
+			    unsigned long *vmshare);
 
 /* Returns 0 if path doesn't exist, >0 if path is a directory,
  * <0 if path is a file.
@@ -126,7 +126,7 @@ fhandler_process::fstat (struct __stat64 *buf, path_conv *pc)
     case 2:
       buf->st_ctime = buf->st_mtime = p->start_time;
       buf->st_ctim.tv_nsec = buf->st_mtim.tv_nsec = 0;
-      time_as_timestruc_t(&buf->st_atim);
+      time_as_timestruc_t (&buf->st_atim);
       buf->st_uid = p->uid;
       buf->st_gid = p->gid;
       buf->st_mode |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
@@ -373,7 +373,7 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
     strcpy (cmd, "<defunct>");
   else
     {
-      strcpy(cmd, p->progname);
+      strcpy (cmd, p->progname);
       char *last_slash = strrchr (cmd, '\\');
       if (last_slash != NULL)
 	strcpy (cmd, last_slash + 1);
@@ -434,7 +434,7 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
 	{
 	  DWORD error = GetLastError ();
 	  __seterrno_from_win_error (error);
-	  debug_printf("OpenProcess: ret = %d",
+	  debug_printf ("OpenProcess: ret = %d",
 			error);
 	  return 0;
 	}
@@ -449,7 +449,7 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
       if (ret != STATUS_SUCCESS)
 	{
 	  __seterrno_from_win_error (RtlNtStatusToDosError (ret));
-	  debug_printf("NtQueryInformationProcess: ret = %d, "
+	  debug_printf ("NtQueryInformationProcess: ret = %d, "
 		       "Dos(ret) = %d",
 		       ret, RtlNtStatusToDosError (ret));
 	  return 0;
@@ -468,7 +468,7 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
 	  */
 	 start_time = (spt.KernelTime.QuadPart + spt.UserTime.QuadPart) * HZ / 10000000ULL;
        priority = pbi.BasePriority;
-       unsigned page_size = getpagesize();
+       unsigned page_size = getpagesize ();
        vmsize = vmc.VirtualSize;
        vmrss = vmc.WorkingSetSize / page_size;
        vmmaxrss = ql.MaximumWorkingSetSize / page_size;
@@ -507,7 +507,7 @@ format_process_status (_pinfo *p, char *destbuf, size_t maxsize)
     strcpy (cmd, "<defunct>");
   else
     {
-      strcpy(cmd, p->progname);
+      strcpy (cmd, p->progname);
       char *last_slash = strrchr (cmd, '\\');
       if (last_slash != NULL)
 	strcpy (cmd, last_slash + 1);
@@ -552,7 +552,7 @@ format_process_status (_pinfo *p, char *destbuf, size_t maxsize)
     {
       if (!get_mem_values (p->dwProcessId, &vmsize, &vmrss, &vmtext, &vmdata, &vmlib, &vmshare))
 	return 0;
-      unsigned page_size = getpagesize();
+      unsigned page_size = getpagesize ();
       vmsize *= page_size; vmrss *= page_size; vmdata *= page_size;
       vmtext *= page_size; vmlib *= page_size;
     }
@@ -623,7 +623,7 @@ get_process_state (DWORD dwProcessId)
     delete [] p, p = new ULONG[n *= 2];
   if (ret != STATUS_SUCCESS)
     {
-      debug_printf("NtQuerySystemInformation: ret = %d, "
+      debug_printf ("NtQuerySystemInformation: ret = %d, "
 		   "Dos(ret) = %d",
 		   ret, RtlNtStatusToDosError (ret));
       goto out;
@@ -672,8 +672,9 @@ out:
 
 static
 bool
-get_mem_values(DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss, unsigned long *vmtext,
-	       unsigned long *vmdata, unsigned long *vmlib, unsigned long *vmshare)
+get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
+		unsigned long *vmtext, unsigned long *vmdata,
+		unsigned long *vmlib, unsigned long *vmshare)
 {
   bool res = true;
   NTSTATUS ret;
@@ -682,14 +683,14 @@ get_mem_values(DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss, u
   MEMORY_WORKING_SET_LIST *mwsl;
   ULONG n = 0x1000, length;
   PULONG p = new ULONG[n];
-  unsigned page_size = getpagesize();
+  unsigned page_size = getpagesize ();
   hProcess = OpenProcess (PROCESS_QUERY_INFORMATION,
 			  FALSE, dwProcessId);
   if (hProcess == NULL)
     {
-      DWORD error = GetLastError();
+      DWORD error = GetLastError ();
       __seterrno_from_win_error (error);
-      debug_printf("OpenProcess: ret = %d",
+      debug_printf ("OpenProcess: ret = %d",
 		    error);
       return false;
     }
@@ -702,7 +703,7 @@ get_mem_values(DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss, u
     delete [] p, p = new ULONG[n *= 2];
   if (ret != STATUS_SUCCESS)
     {
-      debug_printf("NtQueryVirtualMemory: ret = %d, "
+      debug_printf ("NtQueryVirtualMemory: ret = %d, "
 		   "Dos(ret) = %d",
 		   ret, RtlNtStatusToDosError (ret));
       res = false;
@@ -728,9 +729,9 @@ get_mem_values(DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss, u
 				   sizeof vmc, NULL);
   if (ret != STATUS_SUCCESS)
     {
-      debug_printf("NtQueryInformationProcess: ret = %d, "
-		   "Dos(ret) = %d",
-		   ret, RtlNtStatusToDosError (ret));
+      debug_printf ("NtQueryInformationProcess: ret = %d, "
+		    "Dos(ret) = %d",
+		    ret, RtlNtStatusToDosError (ret));
       res = false;
       goto out;
     }

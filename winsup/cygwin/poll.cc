@@ -35,7 +35,7 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
     if (fds[i].fd > max_fd)
       max_fd = fds[i].fd;
 
-  size_t fds_size = howmany(max_fd + 1, NFDBITS) * sizeof (fd_mask);
+  size_t fds_size = howmany (max_fd + 1, NFDBITS) * sizeof (fd_mask);
 
   read_fds = (fd_set *) alloca (fds_size);
   write_fds = (fd_set *) alloca (fds_size);
@@ -55,7 +55,7 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
   for (unsigned int i = 0; i < nfds; ++i)
     {
       fds[i].revents = 0;
-      if (!cygheap->fdtab.not_open(fds[i].fd))
+      if (!cygheap->fdtab.not_open (fds[i].fd))
 	{
 	  if (fds[i].events & POLLIN)
 	    FD_SET(fds[i].fd, read_fds);
@@ -81,7 +81,7 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
       {
 	if (fds[i].fd >= 0)
 	  {
-	    if (cygheap->fdtab.not_open(fds[i].fd))
+	    if (cygheap->fdtab.not_open (fds[i].fd))
 	      fds[i].revents = POLLHUP;
 	    else
 	      {
@@ -93,7 +93,7 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
 		    if (!sock)
 		      fds[i].revents |= POLLIN;
 		    else
-		      switch (sock->recvfrom (peek, sizeof(peek), MSG_PEEK,
+		      switch (sock->recvfrom (peek, sizeof (peek), MSG_PEEK,
 					      NULL, NULL))
 			{
 			  case -1: /* Something weird happened */

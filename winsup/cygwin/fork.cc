@@ -194,7 +194,7 @@ resume_child (PROCESS_INFORMATION &pi, HANDLE forker_finished)
    Note that this has to be a macro since the parent may be messing with
    our stack. */
 static void __stdcall
-sync_with_parent(const char *s, bool hang_self)
+sync_with_parent (const char *s, bool hang_self)
 {
   debug_printf ("signalling parent: %s", s);
   /* Tell our parent we're waiting. */
@@ -258,7 +258,7 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   if (GetEnvironmentVariable ("CYGWIN_FORK_SLEEP", buf, sizeof (buf)))
     {
       small_printf ("Sleeping %d after fork, pid %u\n", atoi (buf), GetCurrentProcessId ());
-      Sleep (atoi(buf));
+      Sleep (atoi (buf));
     }
 #endif
 
@@ -426,7 +426,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 
   si.cb = sizeof (STARTUPINFO);
   si.lpReserved2 = (LPBYTE)&ch;
-  si.cbReserved2 = sizeof(ch);
+  si.cbReserved2 = sizeof (ch);
 
   /* Remove impersonation */
   if (cygheap->user.issetuid ())
@@ -475,8 +475,8 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
     {
       __seterrno ();
       syscall_printf ("CreateProcessA failed, %E");
-      ForceCloseHandle(subproc_ready);
-      ForceCloseHandle(forker_finished);
+      ForceCloseHandle (subproc_ready);
+      ForceCloseHandle (forker_finished);
       /* Restore impersonation */
       if (cygheap->user.issetuid ())
 	ImpersonateLoggedOnUser (cygheap->user.token);
@@ -503,7 +503,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 
   /* Initialize things that are done later in dll_crt0_1 that aren't done
      for the forkee.  */
-  strcpy(forked->progname, myself->progname);
+  strcpy (forked->progname, myself->progname);
 
   /* Restore impersonation */
   if (cygheap->user.issetuid ())
@@ -517,7 +517,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   /* Fill in fields in the child's process table entry.  */
   forked->hProcess = pi.hProcess;
   forked->dwProcessId = pi.dwProcessId;
-  forked->copysigs(myself);
+  forked->copysigs (myself);
 
   /* Hopefully, this will succeed.  The alternative to doing things this
      way is to reserve space prior to calling CreateProcess and then fill

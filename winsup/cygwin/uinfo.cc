@@ -118,7 +118,7 @@ uinfo_init ()
   /* Real and effective uid/gid are identical on process start up. */
   cygheap->user.orig_uid = cygheap->user.real_uid = myself->uid;
   cygheap->user.orig_gid = cygheap->user.real_gid = myself->gid;
-  cygheap->user.set_orig_sid();      /* Update the original sid */
+  cygheap->user.set_orig_sid ();	/* Update the original sid */
 
   cygheap->user.token = INVALID_HANDLE_VALUE; /* No token present */
 }
@@ -259,7 +259,7 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	    {
 	      WCHAR wlogsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];
 	      sys_mbstowcs (wlogsrv, logsrv (),
-			    sizeof (wlogsrv) / sizeof(*wlogsrv));
+			    sizeof (wlogsrv) / sizeof (*wlogsrv));
 	     sys_mbstowcs (wuser, winname (), sizeof (wuser) / sizeof (*wuser));
 	      if (!(ret = NetUserGetInfo (wlogsrv, wuser, 3,(LPBYTE *)&ui)))
 		{

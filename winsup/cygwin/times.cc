@@ -96,7 +96,7 @@ settimeofday (const struct timeval *tv, const struct timezone *tz)
 
   tz = tz;			/* silence warning about unused variable */
 
-  ptm = gmtime(&tv->tv_sec);
+  ptm = gmtime (&tv->tv_sec);
   st.wYear	   = ptm->tm_year + 1900;
   st.wMonth	   = ptm->tm_mon + 1;
   st.wDayOfWeek    = ptm->tm_wday;
@@ -106,7 +106,7 @@ settimeofday (const struct timeval *tv, const struct timezone *tz)
   st.wSecond       = ptm->tm_sec;
   st.wMilliseconds = tv->tv_usec / 1000;
 
-  res = !SetSystemTime(&st);
+  res = !SetSystemTime (&st);
 
   syscall_printf ("%d = settimeofday (%x, %x)", res, tv, tz);
 
@@ -118,13 +118,13 @@ extern "C" char *
 timezone ()
 {
 #ifdef _MT_SAFE
-  char *b=_reent_winsup()->timezone_buf;
+  char *b=_reent_winsup ()->timezone_buf;
 #else
   static NO_COPY char b[20] = {0};
 #endif
 
-  tzset();
-  __small_sprintf (b,"GMT%+d:%02d", (int) (-_timezone / 3600), (int) (abs(_timezone / 60) % 60));
+  tzset ();
+  __small_sprintf (b,"GMT%+d:%02d", (int) (-_timezone / 3600), (int) (abs (_timezone / 60) % 60));
   return b;
 }
 
@@ -158,7 +158,7 @@ gettimeofday (struct timeval *tv, struct timezone *tz)
     {
       if (!tzflag)
 	{
-	  tzset();
+	  tzset ();
 	  tzflag = true;
 	}
       tz->tz_minuteswest = _timezone / 60;
