@@ -1,3 +1,8 @@
+Wed Jun 28 14:08:00 2000  Keith Walker  <keith.walker@arm.com>
+
+	* libc/sys/arm/crt0.S (.LC30): Added missing length parameter
+	to argument list for AngelSWI_Reason_GetCmdLine.
+
 Tue Jun 27 15:49:00 2000  Marek Michalkiewicz  <marekm@linux.org.pl>
 
 	* configure.host: Add support for AVR target.

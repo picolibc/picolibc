@@ -226,6 +226,7 @@ change_back:
 
 #ifdef ARM_RDI_MONITOR
 .LC30:	.word	CommandLine
+	.word	255
 
 /*  Workspace for Angel calls. */
 	.data
