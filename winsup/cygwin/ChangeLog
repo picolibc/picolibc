@@ -1,3 +1,8 @@
+2003-06-05  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::terminate_thread): Change system_printf to
+	debug_printf.
+
 2003-06-04  Christopher Faylor  <cgf@redhat.com>
 
 	* shared.cc (shared_info::heap_chunk_size): Be really defensive about

@@ -255,7 +255,7 @@ cygthread::terminate_thread ()
   if (!m.RegionSize)
     system_printf ("m.RegionSize 0?  stack_ptr %p", stack_ptr);
   else if (!VirtualFree (m.AllocationBase, 0, MEM_RELEASE))
-    system_printf ("VirtualFree of allocation base %p<%p> failed, %E",
+    debug_printf ("VirtualFree of allocation base %p<%p> failed, %E",
 		   stack_ptr, m.AllocationBase);
 
   if (is_freerange)
