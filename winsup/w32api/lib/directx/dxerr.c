@@ -13,12 +13,10 @@
 */
 
 #include <windows.h>
-#include <stdio.h>
-#include <tchar.h>
 
 #ifndef DXERROR
-#define DXERROR(v,n,d) {v, _T(n), _T(d)},
-#define DXERRORLAST(v,n,d) {v, _T(n), _T(d)}
+#define DXERROR(v,n,d) {v, TEXT(n), TEXT(d)},
+#define DXERRORLAST(v,n,d) {v, TEXT(n), TEXT(d)}
 #endif
 #ifndef DXERROR8
 #define DXERROR8(v,n,d)
@@ -726,7 +724,7 @@ HRESULT __stdcall DXTrace(char *strFile, DWORD dwLine, HRESULT hr,
 	DebugMessage = (TCHAR *)malloc((strlen(strFile) + (strMsg ? _tcslen(strMsg) : 0) + _tcslen(ErrorName) + 48) * sizeof(TCHAR));
 	if (DebugMessage == 0)
 		return hr;
-	_stprintf(DebugMessage, _T("%hs(%Lu): %s (hr=%s(0x%Lx))"), strFile, dwLine, (strMsg ? strMsg : _T("")) ErrorName, hr);
+	wsprintf(DebugMessage, TEXT("%hs(%Lu): %s (hr=%s(0x%Lx))"), strFile, dwLine, (strMsg ? strMsg : TEXT("")) ErrorName, hr);
 	OutputDebugString(DebugMessage);
 	free(DebugMessage);
 
@@ -737,11 +735,11 @@ HRESULT __stdcall DXTrace(char *strFile, DWORD dwLine, HRESULT hr,
 		DebugMessage = (TCHAR *)malloc((strlen(strFile) + (strMsg ? _tcslen(strMsg) : 0) + _tcslen(ErrorName) + 60) * sizeof(TCHAR));
 		if (DebugMessage == 0)
 			return DXERROR_NOT_ENOUGH_MEMORY;
-		_stprintf(DebugMessage, 
-		   _T("File: %hs\nLine: %Lu\nError Code: %s(0x%Lx)\nCalling: %s\n"
+		wsprintf(DebugMessage, 
+		   TEXT("File: %hs\nLine: %Lu\nError Code: %s(0x%Lx)\nCalling: %s\n"
 		   "Do you want to debug the application?"), strFile, dwLine,
-		   ErrorName, hr, (strMsg ? strMsg : _T("")));		
-		Result = MessageBox(0, DebugMessage, _T("Unexpected error encountred"), MB_YESNO | MB_ICONDXERROR);
+		   ErrorName, hr, (strMsg ? strMsg : TEXT("")));		
+		Result = MessageBox(0, DebugMessage, TEXT("Unexpected error encountred"), MB_YESNO | MB_ICONDXERROR);
 		if (Result == 0)
 			return hr;
 		if (Result == IDYES)
@@ -756,16 +754,16 @@ HRESULT __stdcall DXTrace(char *strFile, DWORD dwLine, HRESULT hr,
 	const TCHAR *ErrorName = DXGetErrorString(hr);
 	TCHAR DebugMessage[4096];
    
-	_stprintf(DebugMessage, _T("%hs(%Lu): %s (hr=%s(0x%Lx))"), strFile, dwLine, (strMsg ? strMsg : _T("")), ErrorName, hr);
+	wsprintf(DebugMessage, TEXT("%hs(%Lu): %s (hr=%s(0x%Lx))"), strFile, dwLine, (strMsg ? strMsg : TEXT("")), ErrorName, hr);
 	OutputDebugString(DebugMessage);
 	if (bPopMsgBox)
 	{
 	    int Result;
-		_stprintf(DebugMessage, 
-		   _T("File: %hs\nLine: %Lu\nError Code: %s(0x%Lx)\nCalling: %s\n"
+		wsprintf(DebugMessage, 
+		   TEXT("File: %hs\nLine: %Lu\nError Code: %s(0x%Lx)\nCalling: %s\n"
 		   "Do you want to debug the application?"), strFile, dwLine,
-		   ErrorName, hr, (strMsg ? strMsg : _T("")));		
-		Result = MessageBox(0, DebugMessage, _T("Unexpected error encountred"), MB_YESNO | MB_ICONERROR);
+		   ErrorName, hr, (strMsg ? strMsg : TEXT("")));		
+		Result = MessageBox(0, DebugMessage, TEXT("Unexpected error encountred"), MB_YESNO | MB_ICONERROR);
 		if (Result == IDYES)
 			DebugBreak();
 	}

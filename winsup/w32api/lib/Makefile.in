@@ -142,7 +142,7 @@ directx:
 
 TEST_OPTIONS = $(ALL_CFLAGS) -DWINVER=0x0666  \
 	-Wall -pedantic -Wsystem-headers -c $(srcdir)/test.c -o test.o
-.PHONY: test ddk
+.PHONY: test ddk directx
 test:
 	@echo "Testing w32api..."
 	@for lang in c c++ objective-c ; do \
