@@ -1,3 +1,8 @@
+Sun Sep 30 17:37:43 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* environ.cc (winenv): Allocate exact amount of space needed for forced
+	windows environment variable rather than just using MAX_PATH.
+
 Sun Sep 30 17:10:18 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Depend on stamp to ensure rebuilding.  Remove stamp file
