@@ -75,7 +75,7 @@ extract_nt_dom_user (const struct passwd *pw, char *domain, char *user)
       else if (u - d <= INTERNET_MAX_HOST_NAME_LENGTH + 2)
 	strlcpy(domain, d + 2, u - d - 1);
       if (c == NULL)
-        c = u + UNLEN + 1;
+	c = u + UNLEN + 1;
       if (c - u <= UNLEN + 1)
 	strlcpy(user, u + 1, c - u);
     }

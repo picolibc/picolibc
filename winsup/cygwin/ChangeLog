@@ -23,7 +23,7 @@
 	argument.
 	(fhandler_process::fill_filebuf): Use p pointer rather than argument.
 
-2002-06-29  Pierre Humblet <pierre.humblet@ieee.org>   
+2002-06-29  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* security.cc (extract_nt_dom_user): Check for all buffer overflows.
 	Call LookupAccountSid after trying to get domain & user from passwd.
