@@ -1,3 +1,8 @@
+Fri Jun  8 11:14:02 2001  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* Makefile.in (VER): When present, extract the version number from
+ 	the file version.in.
+
 2001-06-08  Alexandre Oliva  <aoliva@redhat.com>, Jeff Sturm  <jsturm@one-point.com>
 
 	* Makefile.in (AS_FOR_TARGET, LD_FOR_TARGET, NM_FOR_TARGET): If
