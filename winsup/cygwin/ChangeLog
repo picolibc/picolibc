@@ -1,3 +1,19 @@
+2002-08-07  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* fhandler_socket.cc (fhandler_socket::accept): Fix FIONBIO call.
+
+2002-08-06  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.cc (_csbrk): Avoid !cygheap considerations.
+	(cygheap_init): Deal with unintialized cygheap issues here.
+	(cheap_init): Move cygheap_max setting here.
+
+2002-08-06  Christopher Faylor  <cgf@redhat.com>
+	    Conrad Scott  <conrad.scott@dsl.pipex.com
+
+	* cygheap.cc (_csbrk): Allocate some slop initially.  Don't erroneously
+	add sbrk amount to returned value in initial case.
+
 2002-08-06  Christopher Faylor  <cgf@redhat.com>
 
 	* spawn.cc (spawn_guts): Don't set mount_h here.

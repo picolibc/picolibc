@@ -523,8 +523,9 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 
           /* Unset events for listening socket and
              switch back to blocking mode */
-          WSAEventSelect (get_socket (), ev[0], 0 );
-          ioctlsocket (get_socket (), FIONBIO, 0);
+          WSAEventSelect (get_socket (), ev[0], 0);
+	  unsigned long nonblocking = 0;
+          ioctlsocket (get_socket (), FIONBIO, &nonblocking);
 
           switch (wait_result)
             {
