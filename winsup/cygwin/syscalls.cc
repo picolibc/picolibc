@@ -536,7 +536,7 @@ open (const char *unix_path, int flags, ...)
 	  if (!(fh = cygheap->fdtab.build_fhandler_from_name (fd, unix_path,
 							      NULL, pc)))
 	    res = -1;		// errno already set
-	  else if (fh->is_fs_device () && fh->device_access_denied (flags))
+	  else if (fh->is_fs_special () && fh->device_access_denied (flags))
 	    {
 	      fd.release ();
 	      res = -1;
@@ -934,7 +934,7 @@ chmod (const char *path, mode_t mode)
       res = 0;
       goto done;
     }
-  if (win32_path.is_fs_device ())
+  if (win32_path.is_fs_special ())
     {
       res = chmod_device (win32_path, mode);
       goto done;
@@ -1972,11 +1972,17 @@ mknod (const char *path, mode_t mode, dev_t dev)
     }
 
   mode_t type = mode & S_IFMT;
+  _major_t major = dev >> 8 /* SIGH.  _major (dev) */;
+  _minor_t minor = dev & 0xff /* SIGH _minor (dev) */;
   switch (type)
     {
     case S_IFCHR:
     case S_IFBLK:
+      break;
+
     case S_IFIFO:
+      major = _major (FH_FIFO);
+      minor = _minor (FH_FIFO) & 0xff; /* SIGH again */
       break;
 
     case 0:
@@ -1994,8 +2000,6 @@ mknod (const char *path, mode_t mode, dev_t dev)
       return -1;
     }
 
-  _major_t major = dev >> 8 /* SIGH.  _major (dev) */;
-  _minor_t minor = dev & 0xff /* SIGH _minor (dev) */;
   return mknod_worker (w32path, type, mode, major, minor);
 }
 
