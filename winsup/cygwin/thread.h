@@ -238,7 +238,7 @@ public:
   SemaphoreItem *GetSemaphore (sem_t * t);
 
   // Condition functions
-  CondItem *CreateCond (pthread_cond_t *, const pthread_condattr_t *); 
+  CondItem *CreateCond (pthread_cond_t *, const pthread_condattr_t *);
   CondItem *GetCond (pthread_cond_t *);
 
 private:

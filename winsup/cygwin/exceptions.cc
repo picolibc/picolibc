@@ -640,10 +640,8 @@ interruptible (DWORD pc, int testvalid = 0)
   else
     res = !strncasematch (windows_system_directory, checkdir,
 			  windows_system_directory_length);
-  minimal_printf ("h %p", h);
 # undef h
-
-  minimal_printf ("interruptible %d", res);
+  sigproc_printf ("h %p, interruptible %d", res);
   return res;
 }
 
@@ -856,11 +854,13 @@ setup_handler (int sig, void *handler, struct sigaction& siga)
 	break;
     }
 
-set_pending:
+ set_pending:
   if (!interrupted)
     {
       pending_signals = 1;	/* FIXME: Probably need to be more tricky here */
       sig_set_pending (sig);
+      sig_dispatch_pending (1);
+      Sleep (0);		/* Hopefully, other process will be waking up soon. */
       sigproc_printf ("couldn't send signal %d", sig);
     }
   else
