@@ -1,3 +1,9 @@
+2003-07-25  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* v850.h (SHF_V850_GPREL): New.
+	(SHF_V850_EPREL): Likewise.
+	(SHF_V850_R0REL): Likewise.
+
 2003-07-09  Alexandre Oliva  <aoliva@redhat.com>
 
 	2001-05-16  Alexandre Oliva  <aoliva@redhat.com>

@@ -104,4 +104,15 @@ END_RELOC_NUMBERS (R_V850_max)
 /* Section contains the .scommon data.  */
 #define SHT_V850_ZCOMMON	0x70000002
 
+/* Processor specific section flags.  */
+
+/* This section must be in the small data area (pointed to by GP).  */
+#define SHF_V850_GPREL		0x10000000
+
+/* This section must be in the tiny data area (pointed to by EP).  */
+#define SHF_V850_EPREL		0x20000000
+
+/* This section must be in the zero data area (pointed to by R0).  */
+#define SHF_V850_R0REL		0x40000000
+
 #endif /* _ELF_V850_H */
