@@ -1,3 +1,7 @@
+Fri Sep  1 10:15:37 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: More normalization.
+
 Thu Aug 31 16:37:31 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Normalize 'pwd' based on location of winsup.
