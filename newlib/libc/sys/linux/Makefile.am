@@ -8,7 +8,7 @@ SUBDIRS = machine .
 SUBLIBS = $(LINUX_MACH_LIB)
 
 LIB_SOURCES = \
-	brk.c getoptlong.c ids.c inode.c io.c linux.c mmap.c \
+	brk.c getoptlong.c ids.c inode.c io.c io64.c linux.c mmap.c \
 	process.c realpath.c sched.c \
 	select.c signal.c siglongjmp.c socket.c sleep.c stack.c \
 	sysconf.c systat.c termios.c time.c \

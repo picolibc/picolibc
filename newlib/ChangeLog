@@ -1,5 +1,13 @@
 2002-04-26  Jeff Johnston  <jjohnstn@redhat.com>
 
+	*  libc/sys/linux/Makefile.am: Add io64.c.
+	*  libc/sys/linux/Makefile.in: Regenerated.
+	*  libc/sys/linux/io.c(mkfifo, fsync, fdatasync): Added syscalls.
+	*  libc/sys/linux/signal.c (sigwaitinfo, sigtimedwait): Ditto. 
+	*  libc/sys/linux/io64.c: New file.
+
+2002-04-26  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* configure.in (CC_FOR_NEWLIB): New variable that
 	bases on $(CC) and adds targ-include and libc/include as
 	-isystem directives if they are not already part of $(CC).

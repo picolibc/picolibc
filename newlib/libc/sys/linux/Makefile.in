@@ -97,7 +97,7 @@ SUBDIRS = machine .
 SUBLIBS = $(LINUX_MACH_LIB)
 
 LIB_SOURCES = \
-	brk.c getoptlong.c ids.c inode.c io.c linux.c mmap.c \
+	brk.c getoptlong.c ids.c inode.c io.c io64.c linux.c mmap.c \
 	process.c realpath.c sched.c \
 	select.c signal.c siglongjmp.c socket.c sleep.c stack.c \
 	sysconf.c systat.c termios.c time.c \
@@ -132,15 +132,15 @@ DEFS = @DEFS@ -I. -I$(srcdir)
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@lib_a_OBJECTS =  brk.o getoptlong.o ids.o inode.o \
-@USE_LIBTOOL_FALSE@io.o linux.o mmap.o process.o realpath.o sched.o \
-@USE_LIBTOOL_FALSE@select.o signal.o siglongjmp.o socket.o sleep.o \
-@USE_LIBTOOL_FALSE@stack.o sysconf.o systat.o termios.o time.o usleep.o \
-@USE_LIBTOOL_FALSE@wait.o
+@USE_LIBTOOL_FALSE@io.o io64.o linux.o mmap.o process.o realpath.o \
+@USE_LIBTOOL_FALSE@sched.o select.o signal.o siglongjmp.o socket.o \
+@USE_LIBTOOL_FALSE@sleep.o stack.o sysconf.o systat.o termios.o time.o \
+@USE_LIBTOOL_FALSE@usleep.o wait.o
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 @USE_LIBTOOL_TRUE@liblinux_la_DEPENDENCIES = 
 @USE_LIBTOOL_TRUE@liblinux_la_OBJECTS =  brk.lo getoptlong.lo ids.lo \
-@USE_LIBTOOL_TRUE@inode.lo io.lo linux.lo mmap.lo process.lo \
+@USE_LIBTOOL_TRUE@inode.lo io.lo io64.lo linux.lo mmap.lo process.lo \
 @USE_LIBTOOL_TRUE@realpath.lo sched.lo select.lo signal.lo \
 @USE_LIBTOOL_TRUE@siglongjmp.lo socket.lo sleep.lo stack.lo sysconf.lo \
 @USE_LIBTOOL_TRUE@systat.lo termios.lo time.lo usleep.lo wait.lo
