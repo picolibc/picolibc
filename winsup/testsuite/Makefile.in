@@ -87,7 +87,7 @@ ifdef VERBOSE
     RUNTESTFLAGS = -v
 endif
 
-RUNTIME=$(cygwin_build)/new-cygwin1.dll $(cygwin_build)/new-libcygwin.a $(cygwin_build)/cygrun.exe
+RUNTIME=$(cygwin_build)/new-cygwin1.dll $(cygwin_build)/new-libcygwin.a cygrun.exe
 
 TESTSUP_LIB_NAME:=libltp.a
 TESTSUP_OFILES:=${sort ${addsuffix .o,${basename ${notdir ${wildcard $(libltp_srcdir)/lib/*.c}}}}}
@@ -180,3 +180,10 @@ check: $(TESTSUP_LIB_NAME) $(RUNTIME) testsuite/site.exp
 	    export TCL_LIBRARY ; fi ; \
 	PATH=$(bupdir)/cygwin:$${PATH} ;\
 	$(RUNTEST) --tool winsup $(RUNTESTFLAGS)
+
+cygrun.o: cygrun.c
+	$(CC) $(MINGW_CFLAGS) -o $@ -c $<
+
+cygrun.exe : cygrun.o
+	$(CC) ${MINGW_LDFLAGS} -mno-cygwin -o $@ $<
+
