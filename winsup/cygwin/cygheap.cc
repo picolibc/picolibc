@@ -162,7 +162,8 @@ cygheap_fixup_in_child (bool execed)
 	  if (!VirtualQuery ((LPCVOID) cygheap, &m, sizeof m))
 	    system_printf ("couldn't get memory info, %E");
 
-	  system_printf ("Couldn't reserve space for cygwin's heap (%p <%p>) in child, %E", cygheap, newaddr);
+	  system_printf ("Couldn't reserve %d bytes of space for cygwin's heap (%p <%p>) in child, %E",
+			 alloc_sz, cygheap, newaddr);
 	  api_fatal ("m.AllocationBase %p, m.BaseAddress %p, m.RegionSize %p, m.State %p\n",
 		     m.AllocationBase, m.BaseAddress, m.RegionSize, m.State);
 	}
