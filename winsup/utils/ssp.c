@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2000, Red Hat, Inc.
+ * Copyright (c) 2000, 2001, 2002 Red Hat, Inc.
  *
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -22,47 +22,47 @@
 #include <windows.h>
 
 #ifdef __GNUC__
-const char *help_text = "
-Usage: ssp [options] low_pc high_pc command...
-
-The SSP is a `single-step profiler' - it uses the debug API to
-single-step your program, noting *everything* your program runs, not
-just random places hit by random timer interrupts.  You must specify
-the range of EIP values to profile.  For example, you could profile
-just a function, or just a line of code, or the whole thing.
-Use \"objdump -h\" to find the start of .text and the section following
-it; this is what you want.
-
-There are many options to ssp.  Since step-profiling makes your
-program run about 1,000 times slower than normal, it's best to
-understand all the options so that you can narrow down the parts
-of your program you need to single-step.
-
--v = verbose messages about debug events.
-
--d, -e = disable/enable single-stepping by default.  Use
-OutputDebugString (\"ssp on\") to enable stepping, or \"ssp off\" to
-disable it.  Thus, you can profile a single function call or block.
-
--t = trace every EIP value to a file TRACE.SSP.  This gets big *fast*.
-Use \"addr2line -C -f -s -e foo.exe < trace.ssp > lines.ssp\" and then
-\"perl cvttrace\" to convert to symbolic traces.
-
--tc = trace every EIP value to the console.  *Lots* slower.
-
--s = trace sub-threads too.  Dangerous if you have race conditions.
-
--dll = enable dll profiling.  A chart of relative DLL usage is
-produced after the run.
-
-Examples:
-  ssp 0x401000 0x403000 hello.exe
-  ssp -v -d -dll 0x401000 0x440000 foo.exe
-
-The output is a file \"gmon.out\" that can be read with gprof:
-  gprof -b foo.exe
-
-See ssp.txt in the cygwin sources for more information.
+const char *help_text = "\
+Usage: ssp [options] low_pc high_pc command...\n\
+\n\
+The SSP is a `single-step profiler' - it uses the debug API to\n\
+single-step your program, noting *everything* your program runs, not\n\
+just random places hit by random timer interrupts.  You must specify\n\
+the range of EIP values to profile.  For example, you could profile\n\
+just a function, or just a line of code, or the whole thing.\n\
+Use \"objdump -h\" to find the start of .text and the section following\n\
+it; this is what you want.\n\
+\n\
+There are many options to ssp.  Since step-profiling makes your\n\
+program run about 1,000 times slower than normal, it's best to\n\
+understand all the options so that you can narrow down the parts\n\
+of your program you need to single-step.\n\
+\n\
+-v = verbose messages about debug events.\n\
+\n\
+-d, -e = disable/enable single-stepping by default.  Use\n\
+OutputDebugString (\"ssp on\") to enable stepping, or \"ssp off\" to\n\
+disable it.  Thus, you can profile a single function call or block.\n\
+\n\
+-t = trace every EIP value to a file TRACE.SSP.  This gets big *fast*.\n\
+Use \"addr2line -C -f -s -e foo.exe < trace.ssp > lines.ssp\" and then\n\
+\"perl cvttrace\" to convert to symbolic traces.\n\
+\n\
+-tc = trace every EIP value to the console.  *Lots* slower.\n\
+\n\
+-s = trace sub-threads too.  Dangerous if you have race conditions.\n\
+\n\
+-dll = enable dll profiling.  A chart of relative DLL usage is\n\
+produced after the run.\n\
+\n\
+Examples:\n\
+  ssp 0x401000 0x403000 hello.exe\n\
+  ssp -v -d -dll 0x401000 0x440000 foo.exe\n\
+\n\
+The output is a file \"gmon.out\" that can be read with gprof:\n\
+  gprof -b foo.exe\n\
+\n\
+See ssp.txt in the cygwin sources for more information.\n\
 ";
 #else
 char *help_text = "Usage: get cygwin!\n";

@@ -1,6 +1,6 @@
 /* cygcheck.cc
 
-   Copyright 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -33,7 +33,9 @@ typedef __int64 longlong;
 
 void dump_setup (int, char **, bool);
 
-const char *known_env_vars[] = {
+static const char version[] = "$Revision$";
+
+static const char *known_env_vars[] = {
   "c_include_path",
   "compiler_path",
   "cxx_include_path",
@@ -63,7 +65,7 @@ struct
   const char *name;
   int missing_is_good;
 }
-common_apps[] =
+static common_apps[] =
 {
   {"bash", 0},
   {"cat", 0},
@@ -78,20 +80,20 @@ common_apps[] =
   {0, 0}
 };
 
-int num_paths = 0, max_paths = 0;
-char **paths = 0;
+static int num_paths = 0, max_paths = 0;
+static char **paths = 0;
 
 /*
  * keyeprint() is used to report failure modes
  */
-int
+static int
 keyeprint (const char *name)
 {
   fprintf (stderr, "cygcheck: %s failed: %lu\n", name, GetLastError ());
   return 1;
 }
 
-void
+static void
 add_path (char *s, int maxlen)
 {
   if (num_paths >= max_paths)
@@ -119,7 +121,7 @@ add_path (char *s, int maxlen)
   num_paths++;
 }
 
-void
+static void
 init_paths ()
 {
   char tmp[4000], *sl;
@@ -156,7 +158,7 @@ init_paths ()
     printf ("WARNING: PATH is not set at all!\n");
 }
 
-char *
+static char *
 find_on_path (char *file, char *default_extension,
 	      int showall = 0, int search_sysdirs = 0)
 {
@@ -215,9 +217,9 @@ struct Did
   char *file;
   int state;
 };
-Did *did = 0;
+static Did *did = 0;
 
-Did *
+static Did *
 already_did (char *file)
 {
   Did *d;
@@ -232,7 +234,7 @@ already_did (char *file)
   return d;
 }
 
-int
+static int
 get_word (HANDLE fh, int offset)
 {
   short rv;
@@ -248,7 +250,7 @@ get_word (HANDLE fh, int offset)
   return rv;
 }
 
-int
+static int
 get_dword (HANDLE fh, int offset)
 {
   int rv;
@@ -273,7 +275,7 @@ struct Section
   int pointer_to_raw_data;
 };
 
-int
+static int
 rva_to_offset (int rva, char *sections, int nsections, int *sz)
 {
   int i;
@@ -322,7 +324,7 @@ struct ImpDirectory
 };
 
 
-void track_down (char *file, char *suffix, int lvl);
+static void track_down (char *file, char *suffix, int lvl);
 
 #define CYGPREFIX (sizeof ("%%% Cygwin ") - 1)
 static void
@@ -400,7 +402,7 @@ cygwin_info (HANDLE h)
   return;
 }
 
-void
+static void
 dll_info (const char *path, HANDLE fh, int lvl, int recurse)
 {
   DWORD junk;
@@ -511,7 +513,7 @@ dll_info (const char *path, HANDLE fh, int lvl, int recurse)
     cygwin_info (fh);
 }
 
-void
+static void
 track_down (char *file, char *suffix, int lvl)
 {
   if (file == NULL)
@@ -588,7 +590,7 @@ track_down (char *file, char *suffix, int lvl)
     keyeprint ("track_down: CloseHandle()");
 }
 
-void
+static void
 ls (char *f)
 {
   HANDLE h = CreateFile (f, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
@@ -610,7 +612,7 @@ ls (char *f)
     keyeprint ("ls: CloseHandle()");
 }
 
-void
+static void
 cygcheck (char *app)
 {
   char *papp = find_on_path (app, (char *) ".exe", 1, 0);
@@ -645,7 +647,7 @@ struct RegInfo
   HKEY key;
 };
 
-void
+static void
 show_reg (RegInfo * ri, int nest)
 {
   if (!ri)
@@ -657,7 +659,7 @@ show_reg (RegInfo * ri, int nest)
     printf ("%s\n", ri->name);
 }
 
-void
+static void
 scan_registry (RegInfo * prev, HKEY hKey, char *name, int cygnus)
 {
   RegInfo ri;
@@ -750,7 +752,7 @@ scan_registry (RegInfo * prev, HKEY hKey, char *name, int cygnus)
   free (subkey_name);
 }
 
-void
+static void
 dump_sysinfo ()
 {
   int i, j;
@@ -1131,7 +1133,7 @@ dump_sysinfo ()
     }
 }
 
-int
+static int
 check_keys ()
 {
   HANDLE h = CreateFileA ("CONIN$", GENERIC_READ | GENERIC_WRITE,
@@ -1215,18 +1217,20 @@ check_keys ()
   return 0;
 }
 
-void
-usage ()
+static void
+usage (FILE *stream, int status)
 {
-  fprintf (stderr, "Usage: cygcheck [OPTIONS] [program ...]\n");
-  fprintf (stderr, "  -c, --check-setup = check packages installed via setup.exe\n");
-  fprintf (stderr, "  -s, --sysinfo     = system information (not with -k)\n");
-  fprintf (stderr, "  -v, --verbose     = verbose output (indented) (for -s or programs)\n");
-  fprintf (stderr, "  -r, --registry    = registry search (requires -s)\n");
-  fprintf (stderr, "  -k, --keycheck    = perform a keyboard check session (not with -s)\n");
-  fprintf (stderr, "  -h, --help        = give help about the info (not with -c)\n");
-  fprintf (stderr, "You must at least give either -s or -k or a program name\n");
-  exit (1);
+  fprintf (stream, "\
+Usage: cygcheck [OPTIONS] [program ...]\n\
+ -c, --check-setup  check packages installed via setup.exe\n\
+ -s, --sysinfo      system information (not with -k)\n\
+ -v, --verbose      verbose output (indented) (for -s or programs)\n\
+ -r, --registry     registry search (requires -s)\n\
+ -k, --keycheck     perform a keyboard check session (not with -s)\n\
+ -h, --help         give help about the info (not with -c)\n\
+ -V, --version      output version information and exit\n\
+You must at least give either -s or -k or a program name\n");
+  exit (status);
 }
 
 struct option longopts[] = {
@@ -1236,10 +1240,33 @@ struct option longopts[] = {
   {"verbose", no_argument, NULL, 'v'},
   {"keycheck", no_argument, NULL, 'k'},
   {"help", no_argument, NULL, 'h'},
+  {"version", no_argument, 0, 'z'},
   {0, no_argument, NULL, 0}
 };
 
-char opts[] = "srvkhc";
+static char opts[] = "chkrsvV";
+
+static void
+print_version ()
+{
+  const char *v = strchr (version, ':');
+  int len;
+  if (!v)
+    {
+      v = "?";
+      len = 1;
+    }
+  else
+    {
+      v += 2;
+      len = strchr (v, ' ') - v;
+    }
+  printf ("\
+cygcheck version %.*s\n\
+System Checker for Cygwin\n\
+Copyright 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.\n\
+Compiled on %s", len, v, __DATE__);
+}
 
 int
 main (int argc, char **argv)
@@ -1267,17 +1294,24 @@ main (int argc, char **argv)
       case 'h':
 	givehelp = 1;
 	break;
+      case 'V':
+	print_version ();
+        exit (0);
       default:
-	usage ();
+	usage (stderr, 1);
        /*NOTREACHED*/}
   argc -= optind;
   argv += optind;
 
-  if (argc == 0 && !sysinfo && !keycheck && !check_setup)
-    usage ();
+  if (argc == 0 && !sysinfo && !keycheck && !check_setup) {
+     if (givehelp)
+	usage (stdout, 0);
+     else
+	usage (stderr, 1);
+     }
 
   if ((check_setup || sysinfo) && keycheck)
-    usage ();
+    usage (stderr, 1);
 
   if (keycheck)
     return check_keys ();
