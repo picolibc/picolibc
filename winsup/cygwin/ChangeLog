@@ -1,3 +1,8 @@
+Thu Sep 13 17:14:59 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* cygheap.cc (ccalloc): Pass correct length to creturn so that
+	cygheap_max is correctly calculated.
+
 Wed Sep 12 21:06:38 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* sync.cc (muto::acquire): Fix while/if typo.
