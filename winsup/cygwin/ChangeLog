@@ -1,5 +1,9 @@
 2002-10-30  Christopher Faylor  <cgf@redhat.com>
 
+	* include/cygwin/version.h: Bump DLL minor number.
+
+2002-10-30  Christopher Faylor  <cgf@redhat.com>
+
 	* external.cc (cygwin_internal): Implement CW_CMDLINE.
 	* pinfo.h (SIGCOMMUNE): New signal type.
 	(commune_result): New structure for commune functions.
