@@ -1318,13 +1318,13 @@ slash_unc_prefix_p (const char *path)
 /* conv_path_list: Convert a list of path names to/from Win32/POSIX. */
 
 static void
-conv_path_list (const char *src, char *dst, int to_posix_p)
+conv_path_list (const char *src, char *dst, int to_posix)
 {
   char *s;
   char *d = dst;
-  char src_delim = to_posix_p ? ';' : ':';
-  char dst_delim = to_posix_p ? ':' : ';';
-  int (*conv_fn) (const char *, char *) = (to_posix_p
+  char src_delim = to_posix ? ';' : ':';
+  char dst_delim = to_posix ? ':' : ';';
+  int (*conv_fn) (const char *, char *) = (to_posix
 					   ? cygwin_conv_to_posix_path
 					   : cygwin_conv_to_win32_path);
 
@@ -3487,23 +3487,29 @@ cygwin_posix_path_list_p (const char *path)
    allows the caller to use alloca if it wants.  */
 
 static int
-conv_path_list_buf_size (const char *path_list, int to_posix_p)
+conv_path_list_buf_size (const char *path_list, bool to_posix)
 {
   int i, num_elms, max_mount_path_len, size;
   const char *p;
 
+  path_conv pc(".", PC_FULL | PC_POSIX);
   /* The theory is that an upper bound is
      current_size + (num_elms * max_mount_path_len)  */
 
-  char delim = to_posix_p ? ';' : ':';
-  p = path_list;
-  for (num_elms = 1; (p = strchr (p, delim)) != NULL; ++num_elms)
-    ++p;
+  unsigned nrel;
+  char delim = to_posix ? ';' : ':';
+  for (p = path_list, num_elms = nrel = 0; p; num_elms++)
+    {
+      if (!isabspath (p))
+	nrel++;
+      p = strchr (++p, delim);
+    }
 
   /* 7: strlen ("//c") + slop, a conservative initial value */
-  for (max_mount_path_len = 7, i = 0; i < mount_table->nmounts; ++i)
+  for (max_mount_path_len = sizeof ("/cygdrive/X"), i = 0;
+       i < mount_table->nmounts; i++)
     {
-      int mount_len = (to_posix_p
+      int mount_len = (to_posix
 		       ? mount_table->mount[i].posix_pathlen
 		       : mount_table->mount[i].native_pathlen);
       if (max_mount_path_len < mount_len)
@@ -3511,20 +3517,23 @@ conv_path_list_buf_size (const char *path_list, int to_posix_p)
     }
 
   /* 100: slop */
-  size = strlen (path_list) + (num_elms * max_mount_path_len) + 100;
+  size = strlen (path_list)
+    + (num_elms * max_mount_path_len)
+    + (nrel * strlen (to_posix ? pc.get_win32 () : pc.normalized_path))
+    + 100;
   return size;
 }
 
 extern "C" int
 cygwin_win32_to_posix_path_list_buf_size (const char *path_list)
 {
-  return conv_path_list_buf_size (path_list, 1);
+  return conv_path_list_buf_size (path_list, true);
 }
 
 extern "C" int
 cygwin_posix_to_win32_path_list_buf_size (const char *path_list)
 {
-  return conv_path_list_buf_size (path_list, 0);
+  return conv_path_list_buf_size (path_list, false);
 }
 
 extern "C" int

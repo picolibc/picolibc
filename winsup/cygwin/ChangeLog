@@ -1,5 +1,10 @@
 2003-02-05  Christopher Faylor  <cgf@redhat.com>
 
+	* path.cc: Change 'to_posix_p' to 'to_posix' throughout.
+	(conv_path_list_buf_size): Accommodate relative paths.
+
+2003-02-05  Christopher Faylor  <cgf@redhat.com>
+
 	* path.cc (etc::dir_changed): Fix debug printf.
 
 2003-02-05  Corinna Vinschen  <corinna@vinschen.de>
@@ -99,7 +104,7 @@
 	* pwdgrp.h: Change arguments of internal_getpwsid,
 	internal_getgrsid and internal_getgroups to cygpsid.
 	* passwd.cc (internal_getpwsid): Change argument from cygsid to cygpsid.
-	* grp.cc (internal_getgrsid): Ditto. 
+	* grp.cc (internal_getgrsid): Ditto.
 	(internal_getgroups): Ditto.
 
 2003-02-03  Christopher Faylor  <cgf@redhat.com>
