@@ -1,3 +1,7 @@
+2005-03-28  Eric Blake  <ebb9@byu.net>
+
+	* errno.cc (FILENAME_EXCED_RANGE): Map to ENAMETOOLONG.
+
 2005-03-27  Christopher Faylor  <cgf@timesys.com>
 
 	* signal.cc (nanosleep): Revert tv_sec < 0 check as it is fixed
