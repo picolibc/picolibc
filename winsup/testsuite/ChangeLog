@@ -1,3 +1,97 @@
+2001-09-13  Egor Duda  <deo@logos-m.ru>
+
+	* libltp/lib/tst_sig.c: Pass SIGSEGV to application to consider
+	whether it's expected or not.
+	* winsup.api/known_bugs.tcl: lseek10 is known to fail because mknod
+	is not implemented.
+	* winsup.api/ltp/rename02.c: Fix formatting.
+	* libltp/lib/libtestsuite.c: New file.
+	* winsup.api/signal-into-win32-api.c: New test.
+	* winsup.api/ltp/access04.c: Ditto.
+	* winsup.api/ltp/access05.c: Ditto.
+	* winsup.api/ltp/alarm07.c: Ditto.
+	* winsup.api/ltp/chdir04.c: Ditto.
+	* winsup.api/ltp/chmod01.c: Ditto.
+	* winsup.api/ltp/close01.c: Ditto.
+	* winsup.api/ltp/close02.c: Ditto.
+	* winsup.api/ltp/creat01.c: Ditto.
+	* winsup.api/ltp/creat03.c: Ditto.
+	* winsup.api/ltp/exit01.c: Ditto.
+	* winsup.api/ltp/exit02.c: Ditto.
+	* winsup.api/ltp/fchdir01.c: Ditto.
+	* winsup.api/ltp/fchdir02.c: Ditto.
+	* winsup.api/ltp/fork02.c: Ditto.
+	* winsup.api/ltp/fork03.c: Ditto.
+	* winsup.api/ltp/fork06.c: Ditto.
+	* winsup.api/ltp/fork07.c: Ditto.
+	* winsup.api/ltp/fork09.c: Ditto.
+	* winsup.api/ltp/fork10.c: Ditto.
+	* winsup.api/ltp/fork11.c: Ditto.
+	* winsup.api/ltp/fstat02.c: Ditto.
+	* winsup.api/ltp/fstat03.c: Ditto.
+	* winsup.api/ltp/fstat04.c: Ditto.
+	* winsup.api/ltp/ftruncate01.c: Ditto.
+	* winsup.api/ltp/ftruncate02.c: Ditto.
+	* winsup.api/ltp/ftruncate03.c: Ditto.
+	* winsup.api/ltp/getgid02.c: Ditto.
+	* winsup.api/ltp/getgid03.c: Ditto.
+	* winsup.api/ltp/getpgid01.c: Ditto.
+	* winsup.api/ltp/getpgid02.c: Ditto.
+	* winsup.api/ltp/getpid02.c: Ditto.
+	* winsup.api/ltp/getppid02.c: Ditto.
+	* winsup.api/ltp/getuid02.c: Ditto.
+	* winsup.api/ltp/getuid03.c: Ditto.
+	* winsup.api/ltp/kill01.c: Ditto.
+	* winsup.api/ltp/kill02.c: Ditto.
+	* winsup.api/ltp/kill03.c: Ditto.
+	* winsup.api/ltp/kill04.c: Ditto.
+	* winsup.api/ltp/lseek06.c: Ditto.
+	* winsup.api/ltp/lseek07.c: Ditto.
+	* winsup.api/ltp/lseek08.c: Ditto.
+	* winsup.api/ltp/lseek09.c: Ditto.
+	* winsup.api/ltp/lseek10.c: Ditto.
+	* winsup.api/ltp/mmap02.c: Ditto.
+	* winsup.api/ltp/mmap03.c: Ditto.
+	* winsup.api/ltp/mmap04.c: Ditto.
+	* winsup.api/ltp/mmap05.c: Ditto.
+	* winsup.api/ltp/mmap06.c: Ditto.
+	* winsup.api/ltp/mmap07.c: Ditto.
+	* winsup.api/ltp/mmap08.c: Ditto.
+	* winsup.api/ltp/munmap01.c: Ditto.
+	* winsup.api/ltp/munmap02.c: Ditto.
+	* winsup.api/ltp/open02.c: Ditto.
+	* winsup.api/ltp/pipe01.c: Ditto.
+	* winsup.api/ltp/pipe08.c: Ditto.
+	* winsup.api/ltp/pipe09.c: Ditto.
+	* winsup.api/ltp/pipe10.c: Ditto.
+	* winsup.api/ltp/pipe11.c: Ditto.
+	* winsup.api/ltp/poll01.c: Ditto.
+	* winsup.api/ltp/read04.c: Ditto.
+	* winsup.api/ltp/readlink01.c: Ditto.
+	* winsup.api/ltp/readlink03.c: Ditto.
+	* winsup.api/ltp/rename01.c: Ditto.
+	* winsup.api/ltp/rename08.c: Ditto.
+	* winsup.api/ltp/rename10.c: Ditto.
+	* winsup.api/ltp/rmdir01.c: Ditto.
+	* winsup.api/ltp/stat01.c: Ditto.
+	* winsup.api/ltp/stat02.c: Ditto.
+	* winsup.api/ltp/stat03.c: Ditto.
+	* winsup.api/ltp/symlink03.c: Ditto.
+	* winsup.api/ltp/symlink04.c: Ditto.
+	* winsup.api/ltp/symlink05.c: Ditto.
+	* winsup.api/ltp/sync02.c: Ditto.
+	* winsup.api/ltp/time02.c: Ditto.
+	* winsup.api/ltp/times02.c: Ditto.
+	* winsup.api/ltp/times03.c: Ditto.
+	* winsup.api/ltp/truncate01.c: Ditto.
+	* winsup.api/ltp/truncate02.c: Ditto.
+	* winsup.api/ltp/umask02.c: Ditto.
+	* winsup.api/ltp/umask03.c: Ditto.
+	* winsup.api/ltp/wait401.c: Ditto.
+	* winsup.api/ltp/wait402.c: Ditto.
+	* winsup.api/ltp/write02.c: Ditto.
+	* winsup.api/ltp/write03.c: Ditto.
+
 2001-09-09  Egor Duda  <deo@logos-m.ru>
 
 	* winsup.api/ltp/dup03.c: New test.
