@@ -298,6 +298,7 @@ int	_EXFUN(_sscanf_r, (struct _reent *, const char *, const char *, ...));
 char *	_EXFUN(_tempnam_r, (struct _reent *, const char *, const char *));
 FILE *	_EXFUN(_tmpfile_r, (struct _reent *));
 char *	_EXFUN(_tmpnam_r, (struct _reent *, char *));
+int	_EXFUN(_ungetc_r, (struct _reent *, int, FILE *));
 int	_EXFUN(_vasprintf_r, (struct _reent *, char **, const char *, __VALIST));
 int	_EXFUN(_vfprintf_r, (struct _reent *, FILE *, const char *, __VALIST));
 int	_EXFUN(_vprintf_r, (struct _reent *, const char *, __VALIST));

@@ -1,3 +1,10 @@
+2004-05-03  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
+
+	* libc/include/stdio.h (_ungetc_r): New prototype.
+	* libc/stdio/ungetc.c (_ungetc_r): New reentrant function.
+	(__submore): Add reentrant struct pointer argument.
+	(ungetc): Change to call _ungetc_r.
+
 2004-04-28  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
 
 	* libc/stdio/local.h (_fwalk_reent): Specify prototype of

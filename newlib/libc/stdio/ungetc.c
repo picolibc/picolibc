@@ -20,6 +20,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
 #include <_ansi.h>
+#include <reent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -34,7 +35,8 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 
 /*static*/
 int
-_DEFUN(__submore, (fp),
+_DEFUN(__submore, (rptr, fp),
+       struct _reent *rptr _AND
        register FILE *fp)
 {
   register int i;
@@ -45,7 +47,7 @@ _DEFUN(__submore, (fp),
       /*
        * Get a new buffer (rather than expanding the old one).
        */
-      if ((p = (unsigned char *) _malloc_r (_REENT, (size_t) BUFSIZ)) == NULL)
+      if ((p = (unsigned char *) _malloc_r (rptr, (size_t) BUFSIZ)) == NULL)
 	return EOF;
       fp->_ub._base = p;
       fp->_ub._size = BUFSIZ;
@@ -56,7 +58,7 @@ _DEFUN(__submore, (fp),
       return 0;
     }
   i = fp->_ub._size;
-  p = (unsigned char *) _realloc_r (_REENT, (_PTR) (fp->_ub._base), i << 1);
+  p = (unsigned char *) _realloc_r (rptr, (_PTR) (fp->_ub._base), i << 1);
   if (p == NULL)
     return EOF;
   _CAST_VOID memcpy ((_PTR) (p + i), (_PTR) p, (size_t) i);
@@ -67,8 +69,9 @@ _DEFUN(__submore, (fp),
 }
 
 int
-_DEFUN(ungetc, (c, fp),
-       int c _AND
+_DEFUN(_ungetc_r, (rptr, c, fp),
+       struct _reent *rptr _AND
+       int c               _AND
        register FILE *fp)
 {
   if (c == EOF)
@@ -118,7 +121,7 @@ _DEFUN(ungetc, (c, fp),
 
   if (HASUB (fp))
     {
-      if (fp->_r >= fp->_ub._size && __submore (fp))
+      if (fp->_r >= fp->_ub._size && __submore (rptr, fp))
         {
           _funlockfile (fp);
           return EOF;
@@ -158,3 +161,14 @@ _DEFUN(ungetc, (c, fp),
   _funlockfile (fp);
   return c;
 }
+
+#ifndef _REENT_ONLY
+int
+_DEFUN(ungetc, (c, fp),
+       int c               _AND
+       register FILE *fp)
+{
+  return _ungetc_r (_REENT, c, fp);
+}
+#endif /* !_REENT_ONLY */
+
