@@ -1,3 +1,7 @@
+2003-01-27  Alexandre Oliva  <aoliva@redhat.com>
+
+	* mips.h (EF_MIPS_XGOT): Define.
+
 2003-01-24  Martin Schwidefsky  <schwidefsky@de.ibm.com>
 
 	* s390.h: Add s390 TLS relocations.
