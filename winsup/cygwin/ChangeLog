@@ -1,3 +1,8 @@
+2002-07-23  Nicholas Wourms  <nwourms@netscape.net>
+
+	* cygwin.din (fcloseall): Add symbol for export.
+	(fcloseall_r): Ditto.
+
 2002-07-24  Christopher Faylor  <cgf@redhat.com>
 
 	* path.cc (path_conv::check): Always set fileattr when component == 0.
