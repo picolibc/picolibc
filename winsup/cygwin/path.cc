@@ -620,7 +620,7 @@ normalize_posix_path (const char *cwd, const char *src, char *dst)
 	}
     }
   if (dst > (dst_start + 1) && dst[-1] == '.' && SLASH_P (dst[-2]))
-    dst -= 2;
+    dst -= dst[2] ? 2 : 1;
   *dst = 0;
   debug_printf ("%s = normalize_posix_path (%s)", dst_start, src_start);
   return 0;

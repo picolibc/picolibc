@@ -1,6 +1,11 @@
+Thu Apr 20 16:39:18 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (normalize_posix_path): Previous change failed to take root
+	access into account.
+
 Thu Apr 20 11:26:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * syscalls.cc (_link): Check new link path for trailing dot.
+	* syscalls.cc (_link): Check new link path for trailing dot.
 
 Thu Apr 20 00:32:03 2000  Christopher Faylor <cgf@cygnus.com>
 
