@@ -377,6 +377,8 @@ pthread::exit (void *value_ptr)
       mutex.unlock ();
     }
 
+  (_reclaim_reent) (_REENT);
+
   if (InterlockedDecrement (&MT_INTERFACE->threadcount) == 0)
     ::exit (0);
   else
@@ -1879,6 +1881,7 @@ __reent_t::init_clib (struct _reent& var)
   var._stdout = _GLOBAL_REENT->_stdout;
   var._stderr = _GLOBAL_REENT->_stderr;
   var.__sdidinit = _GLOBAL_REENT->__sdidinit;
+  var.__cleanup = _GLOBAL_REENT->__cleanup;
   _clib = &var;
 };
 

@@ -1,3 +1,10 @@
+2003-11-11  Christopher Faylor  <cgf@redhat.com>
+	    Thomas Pfaff <tpfaff@gmx.net>
+
+	* thread.cc (pthread::exit): Cleanup on thread exit.
+	(__reent_t::init_clib): Set thread local clib __cleanup var
+	appropriately.
+
 2003-11-10  Christopher Faylor  <cgf@redhat.com>
 
 	* miscfuncs.cc (low_priority_sleep): Make a "C" function.
