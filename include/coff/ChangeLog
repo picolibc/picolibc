@@ -1,3 +1,7 @@
+2000-03-15  Kazu Hirata  <kazu@hxi.com>
+
+	* internal.h: Fix a typo in the comment for R_MOVL2.
+
 2000-02-28  Nick Clifton  <nickc@cygnus.com>
 
 	* mipspe.h (MIPS_PE_MAGIC): Define.

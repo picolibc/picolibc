@@ -671,7 +671,7 @@ struct internal_reloc
 #define R_MOVL1    	0x4c
 
 /* This reloc identifies mov.[wl] insns which formerlly had
-   a 32/24bit absolute address and how have a 16bit absolute address.  */
+   a 32/24bit absolute address and now have a 16bit absolute address.  */
 #define R_MOVL2 	0x4d
 
 /* This reloc identifies a bCC:8 which will have it's condition
