@@ -536,7 +536,7 @@ WINLDAPAPI LDAP ldap_conn_from_msg(LDAP*,LDAPMessage*);
 WINLDAPAPI INT LdapUnicodeToUTF8(LPCWSTR,int,LPSTR,int);
 WINLDAPAPI INT LdapUTF8ToUnicode(LPCSTR,int,LPWSTR,int);
 
-#if UNICODE
+#ifdef UNICODE
 #define LDAPControl LDAPControlW
 #define PLDAPControl PLDAPControlW
 #define LDAPMod LDAPModW
