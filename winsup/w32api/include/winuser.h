@@ -2127,6 +2127,8 @@ extern "C" {
 #endif
 #if (_WIN32_WINNT >= 0x0501)
 #define PW_CLIENTONLY 0x00000001
+#define RIM_INPUT     0x00000000
+#define RIM_INPUTSINK 0x00000001
 #define RIM_TYPEMOUSE    0x00000000
 #define RIM_TYPEKEYBOARD 0x00000001
 #define RIM_TYPEHID      0x00000002
@@ -2163,6 +2165,14 @@ extern "C" {
 #define RIDI_PREPARSEDDATA 0x20000005
 #define RIDI_DEVICENAME    0x20000007
 #define RIDI_DEVICEINFO    0x2000000b
+#define RIDEV_REMOVE       0x00000001
+#define RIDEV_EXCLUDE      0x00000010
+#define RIDEV_PAGEONLY     0x00000020
+#define RIDEV_NOLEGACY     0x00000030
+#define RIDEV_INPUTSINK    0x00000100
+#define RIDEV_CAPTUREMOUSE 0x00000200
+#define RIDEV_NOHOTKEYS    0x00000200
+#define RIDEV_APPKEYS      0x00000400
 #endif
 
 #ifndef RC_INVOKED
@@ -3316,7 +3326,8 @@ HANDLE WINAPI GetPropW(HWND,LPCWSTR);
 #if (_WIN32_WINNT >= 0x0501)
 UINT WINAPI GetRawInputBuffer(PRAWINPUT,PUINT,UINT);
 UINT WINAPI GetRawInputData(HRAWINPUT,UINT,LPVOID,PUINT,UINT);
-UINT WINAPI GetRawInputDeviceInfo(HANDLE,UINT,LPVOID,PUINT);
+UINT WINAPI GetRawInputDeviceInfoA(HANDLE,UINT,LPVOID,PUINT);
+UINT WINAPI GetRawInputDeviceInfoW(HANDLE,UINT,LPVOID,PUINT);
 UINT WINAPI GetRawInputDeviceList(PRAWINPUTDEVICELIST,PUINT,UINT);
 UINT WINAPI GetRegisteredRawInputDevices(PRAWINPUTDEVICE,PUINT,UINT);
 #endif
@@ -3777,6 +3788,7 @@ typedef MONITORINFOEXW MONITORINFOEX, *LPMONITORINFOEX;
 #define GetMessage GetMessageW
 #define GetMonitorInfo GetMonitorInfoW
 #define GetProp GetPropW
+#define GetRawInputDeviceInfo GetRawInputDeviceInfoW
 #define GetTabbedTextExtent GetTabbedTextExtentW
 #define GetUserObjectInformation GetUserObjectInformationW
 #define GetWindowLong GetWindowLongW
@@ -3940,6 +3952,7 @@ typedef MONITORINFOEXA MONITORINFOEX, *LPMONITORINFOEX;
 #define GetMessage GetMessageA
 #define GetMonitorInfo GetMonitorInfoA
 #define GetProp GetPropA
+#define GetRawInputDeviceInfo GetRawInputDeviceInfoA
 #define GetTabbedTextExtent GetTabbedTextExtentA
 #define GetUserObjectInformation GetUserObjectInformationA
 #define GetWindowLong GetWindowLongA

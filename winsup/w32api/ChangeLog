@@ -1,3 +1,20 @@
+2003-09-30  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/winuser.h [_WIN32_WINNT >= 0x0501] (RIM_INPUT,
+	RIM_INPUTSINK): Add constants, for use by WM_INPUT notification.
+
+	* include/winuser.h [_WIN32_WINNT >= 0x0501] (RIDEV_REMOVE,
+	RIDEV_EXCLUDE, RIDEV_PAGEONLY, RIDEV_NOLEGACY, RIDEV_INPUTSINK,
+	RIDEV_CAPTUREMOUSE, RIDEV_NOHOTKEYS, RIDEV_APPKEYS): Add constants,
+	for use in RAWINPUTDEVICE.
+
+	* include/winuser.h [_WIN32_WINNT >= 0x0501]
+	(GetRawInputDeviceInfo[AW]): Ooops... there are
+	ANSI/Unicode versions of this function.
+
+	* lib/user32.def (GetRawInputDeviceInfo[AW]): Ooops... there
+	are ANSI/Unicode versions of this function.
+
 2003-09-29  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/winuser.h [_WIN32_WINNT >= 0x0501] (RIM_TYPEMOUSE,

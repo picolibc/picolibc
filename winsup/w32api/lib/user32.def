@@ -311,7 +311,8 @@ GetPropA@8
 GetPropW@8
 GetRawInputBuffer@12
 GetRawInputData@20
-GetRawInputDeviceInfo@16
+GetRawInputDeviceInfoA@16
+GetRawInputDeviceInfoW@16
 GetRawInputDeviceList@12
 GetRegisteredRawInputDevices@12
 GetQueueStatus@4
