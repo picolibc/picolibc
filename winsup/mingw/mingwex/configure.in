@@ -47,7 +47,7 @@ esac
 
 AC_SUBST(MNO_CYGWIN)
 
-W32API_INCLUDE='-I $(subdir)/../w32api/include'
+W32API_INCLUDE='-I $(srcdir)/../../w32api/include'
 AC_SUBST(W32API_INCLUDE)
 
 AC_PROG_INSTALL

@@ -657,7 +657,7 @@ esac
 
 
 
-W32API_INCLUDE='-I $(subdir)/../w32api/include'
+W32API_INCLUDE='-I $(srcdir)/../../w32api/include'
 
 
 # Find a good install program.  We prefer a C program (faster),
