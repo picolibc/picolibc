@@ -95,10 +95,6 @@ AM_MAKEFLAGS = \
 	"CFLAGS=$(CFLAGS)" \
 	"CFLAGS_FOR_BUILD=$(CFLAGS_FOR_BUILD)" \
 	"CFLAGS_FOR_TARGET=$(CFLAGS_FOR_TARGET)" \
-	"INSTALL=$(INSTALL)" \
-	"INSTALL_DATA=$(INSTALL_DATA)" \
-	"INSTALL_PROGRAM=$(INSTALL_PROGRAM)" \
-	"INSTALL_SCRIPT=$(INSTALL_SCRIPT)" \
 	"LDFLAGS=$(LDFLAGS)" \
 	"LIBCFLAGS=$(LIBCFLAGS)" \
 	"LIBCFLAGS_FOR_TARGET=$(LIBCFLAGS_FOR_TARGET)" \
@@ -126,8 +122,9 @@ AM_MAKEFLAGS = \
 	"DESTDIR=$(DESTDIR)"
 
 
-@HAVE_DOC_TRUE@DOCDIR = \
-@HAVE_DOC_TRUE@doc
+FLAGS_TO_PASS = $(AM_MAKEFLAGS)
+
+@HAVE_DOC_TRUE@DOCDIR = @HAVE_DOC_TRUE@doc
 
 SUBDIRS = libc libm $(DOCDIR) .
 
@@ -409,7 +406,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \

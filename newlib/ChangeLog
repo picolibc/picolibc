@@ -1,3 +1,12 @@
+2000-12-08  Ralf Corsepius <corsepiu@faw.uni-ulm.de>
+
+        * Makefile.am: $(INSTALL), $(INSTALL_DATA), and $(INSTALL_PROGRAM)  
+        can be a relative path to $(top_srcdir)/install.sh so ensure the
+        autoconf detected settings are properly passed recursively.
+        Similarly, add AM_MAKEFLAGS to FLAGS_TO_PASS so they also get passed
+        properly to subdirectories.
+	* Makefile.in: Regenerated.
+
 2000-12-07  Jay Kulpinski <jskulpin@eng01.gdds.com>
 
         * libc/stdio/vfprintf.c: Minor modification to avoid requiring
