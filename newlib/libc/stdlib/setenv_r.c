@@ -29,6 +29,13 @@
 #include <string.h>
 #include "envlock.h"
 
+extern char **environ;
+
+/* Only deal with a pointer to environ, to work around subtle bugs with shared
+   libraries and/or small data systems where the user declares his own
+   'environ'.  */
+static char ***p_environ = &environ;
+
 /* _findenv_r is defined in getenv_r.c.  */
 extern char *_findenv_r _PARAMS ((struct _reent *, const char *, int *));
 
@@ -45,7 +52,6 @@ _DEFUN (_setenv_r, (reent_ptr, name, value, rewrite),
 	_CONST char *value _AND
 	int rewrite)
 {
-  extern char **environ;
   static int alloced;		/* if allocated space before */
   register char *C;
   int l_value, offset;
@@ -74,12 +80,12 @@ _DEFUN (_setenv_r, (reent_ptr, name, value, rewrite),
       register int cnt;
       register char **P;
 
-      for (P = environ, cnt = 0; *P; ++P, ++cnt);
+      for (P = *p_environ, cnt = 0; *P; ++P, ++cnt);
       if (alloced)
 	{			/* just increase size */
-	  environ = (char **) _realloc_r (reent_ptr, (char *) environ,
-				       (size_t) (sizeof (char *) * (cnt + 2)));
-	  if (!environ)
+	  *p_environ = (char **) _realloc_r (reent_ptr, (char *) environ,
+					     (size_t) (sizeof (char *) * (cnt + 2)));
+	  if (!*p_environ)
             {
               ENV_UNLOCK;
 	      return -1;
@@ -94,20 +100,20 @@ _DEFUN (_setenv_r, (reent_ptr, name, value, rewrite),
               ENV_UNLOCK;
 	      return (-1);
             }
-	  bcopy ((char *) environ, (char *) P, cnt * sizeof (char *));
-	  environ = P;
+	  bcopy ((char *) *p_environ, (char *) P, cnt * sizeof (char *));
+	  *p_environ = P;
 	}
-      environ[cnt + 1] = NULL;
+      (*p_environ)[cnt + 1] = NULL;
       offset = cnt;
     }
   for (C = (char *) name; *C && *C != '='; ++C);	/* no `=' in name */
-  if (!(environ[offset] =	/* name + `=' + value */
+  if (!((*p_environ)[offset] =	/* name + `=' + value */
 	_malloc_r (reent_ptr, (size_t) ((int) (C - name) + l_value + 2))))
     {
       ENV_UNLOCK;
       return -1;
     }
-  for (C = environ[offset]; (*C = *name++) && *C != '='; ++C);
+  for (C = (*p_environ)[offset]; (*C = *name++) && *C != '='; ++C);
   for (*C++ = '='; (*C++ = *value++) != 0;);
 
   ENV_UNLOCK;
@@ -124,14 +130,13 @@ _DEFUN (_unsetenv_r, (reent_ptr, name),
         struct _reent *reent_ptr _AND
         _CONST char *name)
 {
-  extern char **environ;
   register char **P;
   int offset;
 
   ENV_LOCK;
 
   while (_findenv_r (reent_ptr, name, &offset))	/* if set multiple times */
-    for (P = &environ[offset];; ++P)
+    for (P = &(*p_environ)[offset];; ++P)
       if (!(*P = *(P + 1)))
 	break;
 

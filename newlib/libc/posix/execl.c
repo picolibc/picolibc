@@ -6,6 +6,11 @@
 #include <_ansi.h>
 #include <unistd.h>
 
+/* Only deal with a pointer to environ, to work around subtle bugs with shared
+   libraries and/or small data systems where the user declares his own
+   'environ'.  */
+static char ***p_environ = &environ;
+
 #ifdef _HAVE_STDC
 
 #include <stdarg.h>
@@ -38,5 +43,5 @@ execl (path, arg0, va_alist)
   while (argv[i++] != NULL);
   va_end (args);
 
-  return _execve (path, (char * _CONST  *) argv, environ);
+  return _execve (path, (char * _CONST  *) argv, *p_environ);
 }

@@ -1,3 +1,21 @@
+2000-11-22  Michael Meissner  <meissner@redhat.com>
+
+	* libc/posix/execl.c (execl): Don't reference environ directly,
+	reference it only via a static pointer to avoid problems with some
+	shared library systems and with different uses of small data where
+	the user specifies his own version of environ.
+	* libc/posix/execv.c (execv): Ditto.
+	* libc/stdlib/getenv_r.c (_findenv_r): Ditto.
+	* libc/stdlib/setenv_r.c (_setenv_r,_unsetenv_r): Ditto.
+	* libc/stdlib/system.c (system, !cygwin32 case): Ditto.
+
+	* libc/stdlib/getenv.c (environ): Delete unused reference to
+	environ.
+
+	* libc/stdlib/getenv_r.c: Make initial comment friendlier to emacs
+	colorization.
+	* libc/stdlib/system.c: Ditto.
+
 Tue Nov 21 20:32:21 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* libc/sys/cygwin/sys/dirent.h: Change definition to avoid necessity of

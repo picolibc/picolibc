@@ -19,7 +19,7 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
 <<_getenv_r>> searches the list of environment variable names and values
-(using the global pointer `<<char **environ>>') for a variable whose
+(using the global pointer ``<<char **environ>>'') for a variable whose
 name matches the string at <[name]>.  If a variable name matches,
 <<_getenv_r>> returns a pointer to the associated value.
 
@@ -65,6 +65,11 @@ variables vary from one system to another.
 
 extern char **environ;
 
+/* Only deal with a pointer to environ, to work around subtle bugs with shared
+   libraries and/or small data systems where the user declares his own
+   'environ'.  */
+static char ***p_environ = &environ;
+
 /*
  * _findenv --
  *	Returns pointer to value associated with name, if any, else NULL.
@@ -89,7 +94,7 @@ _DEFUN (_findenv_r, (reent_ptr, name, offset),
 
   /* In some embedded systems, this does not get set.  This protects
      newlib from dereferencing a bad pointer.  */
-  if (!environ)
+  if (!*p_environ)
     return NULL;
 
   c = name;
@@ -100,11 +105,11 @@ _DEFUN (_findenv_r, (reent_ptr, name, offset),
       len++;
     }
 
-  for (p = environ; *p; ++p)
+  for (p = *p_environ; *p; ++p)
     if (!strncmp (*p, name, len))
       if (*(c = *p + len) == '=')
 	{
-	  *offset = p - environ;
+	  *offset = p - *p_environ;
           ENV_UNLOCK;
 	  return (char *) (++c);
 	}

@@ -27,7 +27,7 @@ DESCRIPTION
 Use <<system>> to pass a command string <<*<[s]>>> to <</bin/sh>> on
 your system, and wait for it to finish executing.
 
-Use `<<system(NULL)>>' to test whether your system has <</bin/sh>>
+Use ``<<system(NULL)>>'' to test whether your system has <</bin/sh>>
 available.
 
 The alternate function <<_system_r>> is a reentrant version.  The
@@ -107,6 +107,13 @@ system (s)
 #endif
 
 #if defined (unix) && !defined (__CYGWIN__)
+extern char **environ;
+
+/* Only deal with a pointer to environ, to work around subtle bugs with shared
+   libraries and/or small data systems where the user declares his own
+   'environ'.  */
+static char ***p_environ = &environ;
+
 static int
 do_system (ptr, s)
      struct _reent *ptr;
@@ -114,7 +121,6 @@ do_system (ptr, s)
 {
   char *argv[4];
   int pid, status;
-  extern char **environ;
 
   argv[0] = "sh";
   argv[1] = "-c";
@@ -123,7 +129,7 @@ do_system (ptr, s)
 
   if ((pid = _fork_r (ptr)) == 0)
     {
-      _execve ("/bin/sh", argv, environ);
+      _execve ("/bin/sh", argv, *p_environ);
       exit (100);
     }
   else if (pid == -1)
