@@ -1629,16 +1629,18 @@ fhandler_base::set_inheritance (HANDLE &h, int not_inheriting)
 void
 fhandler_base::fork_fixup (HANDLE parent, HANDLE &h, const char *name)
 {
-  if (!get_close_on_exec ())
+  HANDLE oh = h;
+  if (/* !is_socket () && */ !get_close_on_exec ())
     debug_printf ("handle %p already opened", h);
-  else if (!DuplicateHandle (parent, h, hMainProc, &h, 0, 0,
+  else if (!DuplicateHandle (parent, h, hMainProc, &h, 0, !get_close_on_exec (),
 			     DUPLICATE_SAME_ACCESS))
     system_printf ("%s - %E, handle %s<%p>", get_name (), name, h);
-#ifdef DEBUG
+#ifdef DEBUGGING
   else
     {
+      debug_printf ("%s success - oldh %p, h %p", get_name (), oh, h);
       ProtectHandle1 (h, name);
-      setclexec_pid (h, 0);
+      setclexec_pid (h, !get_close_on_exec ());
     }
 #endif
 }

@@ -1205,6 +1205,7 @@ peek_socket (select_record *me, int)
   if (r == -1)
     {
       select_printf ("error %d", WSAGetLastError ());
+      set_winsock_errno ();
       return 0;
     }
 

@@ -55,7 +55,8 @@ set_std_handle (int fd)
 void
 dtable::dec_console_fds ()
 {
-  if (console_fds > 0 && !--console_fds && myself->ctty != TTY_CONSOLE)
+  if (console_fds > 0 && !--console_fds &&
+      myself->ctty != TTY_CONSOLE && !check_pty_fds())
     FreeConsole ();
 }
 

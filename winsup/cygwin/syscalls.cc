@@ -65,19 +65,20 @@ close_all_files (void)
   cygwin_shared->delqueue.process_queue ();
 }
 
-static BOOL __stdcall
-check_ttys_fds (void)
+BOOL __stdcall
+check_pty_fds (void)
 {
   int res = FALSE;
-  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "close_all_files");
+  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK, "check_pty_fds");
   fhandler_base *fh;
   for (int i = 0; i < (int) cygheap->fdtab.size; i++)
-    if ((fh = cygheap->fdtab[i]) != NULL && fh->get_device() == FH_TTYS)
+    if ((fh = cygheap->fdtab[i]) != NULL &&
+	(fh->get_device() == FH_TTYS || fh->get_device() == FH_PTYM))
       {
 	res = TRUE;
 	break;
       }
-  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "close_all_files");
+  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK, "check_pty_fds");
   return res;
 }
 
@@ -270,7 +271,7 @@ setsid (void)
     {
       if (myself->ctty == TTY_CONSOLE &&
 	  !cygheap->fdtab.has_console_fds () &&
-	  !check_ttys_fds ())
+	  !check_pty_fds ())
 	FreeConsole ();
       myself->ctty = -1;
       myself->sid = _getpid ();

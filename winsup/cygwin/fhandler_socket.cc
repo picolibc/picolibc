@@ -179,6 +179,7 @@ fhandler_socket::fixup_before_fork_exec (DWORD win_proc_id)
     }
 }
 
+extern "C" void __stdcall load_wsock32 ();
 void
 fhandler_socket::fixup_after_fork (HANDLE parent)
 {
@@ -197,6 +198,7 @@ fhandler_socket::fixup_after_fork (HANDLE parent)
     }
   else if (!new_sock && !winsock2_active)
     {
+      load_wsock32 ();
       fhandler_base::fixup_after_fork (parent);
       debug_printf ("Without Winsock 2.0");
     }

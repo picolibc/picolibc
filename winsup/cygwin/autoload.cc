@@ -416,6 +416,7 @@ LoadDLLfunc (SetClipboardData, 8, user32)
 LoadDLLfunc (SetTimer, 16, user32)
 LoadDLLfunc (SetUserObjectSecurity, 12, user32)
 
+LoadDLLfuncEx (load_wsock32, 0, wsock32, 1) // non-existent function forces wsock32 load
 LoadDLLfunc (WSAAsyncSelect, 16, wsock32)
 LoadDLLfunc (WSACleanup, 0, wsock32)
 LoadDLLfunc (WSAGetLastError, 0, wsock32)

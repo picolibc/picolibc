@@ -121,20 +121,12 @@ WSADATA wsadata;
 static SOCKET __stdcall
 set_socket_inheritance (SOCKET sock)
 {
-  if (wincap.has_set_handle_information ())
-    (void) SetHandleInformation ((HANDLE) sock, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
+  SOCKET osock = sock;
+  if (!DuplicateHandle (hMainProc, (HANDLE) sock, hMainProc, (HANDLE *) &sock,
+			0, TRUE, DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
+    system_printf ("DuplicateHandle failed %E");
   else
-    {
-      SOCKET newsock;
-      if (!DuplicateHandle (hMainProc, (HANDLE) sock, hMainProc, (HANDLE *) &newsock,
-			    0, TRUE, DUPLICATE_SAME_ACCESS))
-	small_printf ("DuplicateHandle failed %E");
-      else
-	{
-	  closesocket (sock);
-	  sock = newsock;
-	}
-    }
+    debug_printf ("DuplicateHandle succeeded osock %p, sock %p", osock, sock);
   return sock;
 }
 
@@ -506,15 +498,16 @@ cygwin_getprotobynumber (int number)
 fhandler_socket *
 fdsock (int fd, const char *name, SOCKET soc)
 {
-  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "fdsock");
-  if (wsadata.wVersion < 512) /* < Winsock 2.0 */
+  if (!winsock2_active)
     soc = set_socket_inheritance (soc);
+  else
+    debug_printf ("not setting socket inheritance since winsock2_active %d", winsock2_active);
   fhandler_socket *fh = (fhandler_socket *) cygheap->fdtab.build_fhandler (fd, FH_SOCKET, name);
   fh->set_io_handle ((HANDLE) soc);
   fh->set_flags (O_RDWR);
   cygheap->fdtab.inc_need_fixup_before ();
   fh->set_name (name, name);
-  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "fdsock");
+  debug_printf ("fd %d, name '%s', soc %p", fd, name, soc);
   return fh;
 }
 
@@ -523,9 +516,9 @@ extern "C" int
 cygwin_socket (int af, int type, int protocol)
 {
   int res = -1;
-  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK|READ_LOCK, "socket");
+  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "socket");
 
-  SOCKET soc;
+  SOCKET soc = 0;
 
   int fd = cygheap->fdtab.find_unused_handle ();
 
@@ -555,7 +548,7 @@ cygwin_socket (int af, int type, int protocol)
 
 done:
   syscall_printf ("%d = socket (%d, %d, %d)", res, af, type, protocol);
-  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK|READ_LOCK, "socket");
+  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "socket");
   return res;
 }
 
@@ -1217,12 +1210,9 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
 
       int res_fd = cygheap->fdtab.find_unused_handle ();
       if (res_fd == -1)
-	{
-	  /* FIXME: what is correct errno? */
-	  set_errno (EMFILE);
-	  goto lock_done;
-	}
-      if ((SOCKET) res == (SOCKET) INVALID_SOCKET)
+	/* FIXME: what is correct errno? */
+	set_errno (EMFILE);
+      else if ((SOCKET) res == (SOCKET) INVALID_SOCKET)
 	set_winsock_errno ();
       else
 	{
@@ -1230,10 +1220,9 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
 	  res_fh->set_addr_family (sock->get_addr_family ());
 	  res = res_fd;
 	}
+      ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK|READ_LOCK, "accept");
     }
-lock_done:
-  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK|READ_LOCK, "accept");
-done:
+ done:
   syscall_printf ("%d = accept (%d, %x, %x)", res, fd, peer, len);
   return res;
 }
@@ -2127,6 +2116,7 @@ cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
 
   if (fd2p)
     {
+      SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "cygwin_rcmd");
       *fd2p = cygheap->fdtab.find_unused_handle (res_fd + 1);
       if (*fd2p == -1)
 	goto done;
@@ -2141,10 +2131,10 @@ cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
       res = res_fd;
     }
   if (fd2p)
-    {
-      fdsock (*fd2p, "/dev/tcp", fd2s);
-    }
+    fdsock (*fd2p, "/dev/tcp", fd2s);
 done:
+  if (fd2p)
+    ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK|READ_LOCK, "cygwin_rcmd");
   syscall_printf ("%d = rcmd (...)", res);
   return res;
 }
@@ -2156,6 +2146,7 @@ cygwin_rresvport (int *port)
   int res = -1;
   sigframe thisframe (mainthread);
 
+  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "cygwin_rresvport");
   int res_fd = cygheap->fdtab.find_unused_handle ();
   if (res_fd == -1)
     goto done;
@@ -2169,6 +2160,7 @@ cygwin_rresvport (int *port)
       res = res_fd;
     }
 done:
+  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "cygwin_rresvport");
   syscall_printf ("%d = rresvport (%d)", res, port ? *port : 0);
   return res;
 }
@@ -2182,6 +2174,7 @@ cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
   SOCKET fd2s;
   sigframe thisframe (mainthread);
 
+  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "cygwin_rexec");
   int res_fd = cygheap->fdtab.find_unused_handle ();
   if (res_fd == -1)
     goto done;
@@ -2203,6 +2196,7 @@ cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
     fdsock (*fd2p, "/dev/tcp", fd2s);
 
 done:
+  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "cygwin_rexec");
   syscall_printf ("%d = rexec (...)", res);
   return res;
 }

@@ -1,3 +1,32 @@
+2001-10-13  Christopher Faylor  <cgf@redhat.com>
+
+	* autoload.cc (load_wsock32): Declare dummy function to force loading
+	of winsock.
+	* fhandler.cc (fhandler_base::set_inheritance): Make debugging output
+	more verbose.
+	* fhandler_socket.cc (fhandler_socket::fixup_after_fork): Force loading
+	of winsock32 if winsock2 not available.
+	* net.cc (set_socket_inheritance): Use DuplicateHandle in all cases to
+	set inheritance correctly.
+	(fdsock): Use winsock2_active macro to determine when to set socket
+	inheritance.  Remove fdtab resource locking since this function should
+	already be protected.
+	(cygwin_accept): Simplify logic.  Ensure that fdtab unlock is not
+	called inappropriately.
+	(cygwin_rcmd): Use fdtab locking.
+	(cygwin_rresvport): Ditto.
+	(cygwin_rexec): Ditto.
+	* select.cc (peek_socket): Set errno appropriately if winsock select
+	fails.
+
+2001-10-13  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
+
+	* winsup.h: Declare check_pty_fds.
+	* syscalls.cc (check_pty_fds): Rename from check_ttys_fds.  Also check
+	pty master.
+	(setsid): Use check_pty_fds.
+	* dtable.cc (dtable::dec_console_fds): Add check on pty fds.
+
 2001-10-13  Ralf Habacker  <Ralf.Habacker@freenet.de>
 
 	* fhandler_dsp.cc (fhandler_dsp::ioctl): Return 0 for successful
