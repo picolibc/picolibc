@@ -1,3 +1,11 @@
+2001-12-07  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/setupi.h (SetupDiCreateDeviceInterfaceRegKey[AW],
+	SetupDiCreateDevRegKey[AW],SetupDiDeleteDeviceInterfaceRegKey,
+	SetupDiDeleteDevRegKey,SetupDiOpenClassRegKey,
+	SetupDiOpenClassRegKeyEx[AW],SetupDiOpenDeviceInterfaceRegKey,
+	SetupDiOpenDevRegKey): Correct function names.
+
 2001-12-04  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/winuser.h (IDC_STATIC): Don't define.
