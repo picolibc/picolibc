@@ -34,22 +34,13 @@
 /* 0 = untested, 1 = running, 2 = dead */
 int cygserver_running=CYGSERVER_UNKNOWN;
 
-client_request_get_version::client_request_get_version () : client_request (CYGSERVER_REQUEST_GET_VERSION)
+client_request_get_version::client_request_get_version () : client_request (CYGSERVER_REQUEST_GET_VERSION, sizeof (version))
 {
-  header.cb = sizeof (version);
   buffer = (char *)&version;
 }
 
-#ifdef __INSIDE_CYGWIN__
-void
-client_request_get_version::serve (transport_layer_base *conn, class process_cache *cache)
+client_request_attach_tty::client_request_attach_tty () : client_request (CYGSERVER_REQUEST_ATTACH_TTY, sizeof (req))
 {
-}
-#endif
-
-client_request_attach_tty::client_request_attach_tty () : client_request (CYGSERVER_REQUEST_ATTACH_TTY)
-{
-  header.cb = sizeof (req);
   buffer = (char *)&req;
   req.pid = 0;
   req.master_pid = 0;
@@ -57,9 +48,8 @@ client_request_attach_tty::client_request_attach_tty () : client_request (CYGSER
   req.to_master = NULL;
 }
 
-client_request_attach_tty::client_request_attach_tty (DWORD npid, DWORD nmaster_pid, HANDLE nfrom_master, HANDLE nto_master) : client_request (CYGSERVER_REQUEST_ATTACH_TTY)
+client_request_attach_tty::client_request_attach_tty (DWORD npid, DWORD nmaster_pid, HANDLE nfrom_master, HANDLE nto_master) : client_request (CYGSERVER_REQUEST_ATTACH_TTY, sizeof (req))
 {
-  header.cb = sizeof (req);
   buffer = (char *)&req;
   req.pid = npid;
   req.master_pid = nmaster_pid;
@@ -67,30 +57,13 @@ client_request_attach_tty::client_request_attach_tty (DWORD npid, DWORD nmaster_
   req.to_master = nto_master;
 }
 
-#ifdef __INSIDE_CYGWIN__
-void
-client_request_attach_tty::serve (transport_layer_base *conn, class process_cache *cache)
+client_request_shutdown::client_request_shutdown () : client_request (CYGSERVER_REQUEST_SHUTDOWN, 0)
 {
-}
-#endif
-
-client_request_shutdown::client_request_shutdown () : client_request (CYGSERVER_REQUEST_SHUTDOWN)
-{
-  header.cb = 0;
   buffer = NULL;
 }
 
-#ifdef __INSIDE_CYGWIN__
-void
-client_request_shutdown::serve (transport_layer_base *conn, class process_cache *cache)
+client_request::client_request (cygserver_request_code id, ssize_t buffer_size) : header (id, buffer_size)
 {
-}
-#endif
-
-client_request::client_request (cygserver_request_code id)
-{
-  header.req_id = id;
-  header.error_code = 0;
 }
 
 client_request::~client_request ()

@@ -68,38 +68,10 @@ getsystemallocgranularity ()
   return buffer_offset;
 }
 
-client_request_shm_get::client_request_shm_get ():client_request (CYGSERVER_REQUEST_SHM_GET)
-{
-  header.cb = sizeof (parameters);
-  buffer = (char *) &parameters;
-  header.error_code = 0;
-}
 
-client_request_shm_get::client_request_shm_get (int nshm_id, pid_t npid):
-client_request (CYGSERVER_REQUEST_SHM_GET)
+client_request_shm_get::client_request_shm_get ():client_request (CYGSERVER_REQUEST_SHM_GET, sizeof (parameters))
 {
-  header.cb = sizeof (parameters);
   buffer = (char *) &parameters;
-  header.error_code = 0;
-  parameters.in.shm_id = nshm_id;
-  parameters.in.type = SHM_REATTACH;
-  parameters.in.pid = npid;
-}
-
-client_request_shm_get::client_request_shm_get (key_t nkey, size_t nsize,
-						int nshmflg,
-						char psdbuf[4096],
-						pid_t npid):
-client_request (CYGSERVER_REQUEST_SHM_GET)
-{
-  header.cb = sizeof (parameters);
-  buffer = (char *) &parameters;
-  parameters.in.key = nkey;
-  parameters.in.size = nsize;
-  parameters.in.shmflg = nshmflg;
-  parameters.in.type = SHM_CREATE;
-  parameters.in.pid = npid;
-  memcpy (parameters.in.sd_buf, psdbuf, 4096);
 }
 
 /* FIXME: If building on a 64-bit compiler, the address->int typecast will fail.
@@ -162,15 +134,6 @@ shmat (int shmid, const void *shmaddr, int parameters.in.shmflg)
 
 /* FIXME: on NT we should check everything against the SD. On 95 we just emulate.
  */
-
-/* for dll size */
-#ifdef __INSIDE_CYGWIN__
-void
-client_request_shm_get::serve (transport_layer_base * conn,
-			       process_cache * cache)
-{
-}
-#else
 
 extern GENERIC_MAPPING access_mapping;
 
@@ -559,4 +522,3 @@ client_request_shm_get::serve (transport_layer_base * conn,
   CloseHandle (token_handle);
   return;
 }
-#endif

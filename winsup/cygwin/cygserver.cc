@@ -372,7 +372,7 @@ server_request::process ()
     case CYGSERVER_REQUEST_SHM_GET:
      req = new client_request_shm_get (); break;
     default:
-      req = new client_request (CYGSERVER_REQUEST_INVALID);
+      req = new client_request (CYGSERVER_REQUEST_INVALID, 0);
       req->header.error_code = ENOSYS;
       debug_printf ("Bad client request - returning ENOSYS\n");
     }

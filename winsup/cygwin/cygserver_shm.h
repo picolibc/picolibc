@@ -20,7 +20,9 @@ details. */
 class client_request_shm_get : public client_request
 {
   public:
+#ifndef __INSIDE_CYGWIN__
   virtual void serve (transport_layer_base *conn, process_cache *cache);
+#endif
   client_request_shm_get::client_request_shm_get(key_t, size_t, int, char psdbuf[4096], pid_t);
   client_request_shm_get::client_request_shm_get();
   client_request_shm_get::client_request_shm_get(int,pid_t);

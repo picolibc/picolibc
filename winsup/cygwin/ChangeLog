@@ -1,3 +1,30 @@
+Tue Oct  2 16:06:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* Makefile.in: Remove cygserver_shm.o from cygwin1.dll. 
+	Rename cygserver_shm_outside.o to cygserver_shm.o.
+	* cygserver.cc (server_request::process): Use the new client_request
+	constructor.
+	* cygserver_client.cc: Remove the #ifdef's stubs for the server method
+	within cygwin.
+	(client_request_attach_tty::client_request_attach_tty): Use the new
+	client_request constructor.
+	(client_request_shutdown::client_request_shutdown): Ditto.
+	(client_request::client_request): Ditto.
+	* cygserver_shm.cc (client_request_shm_get::serve): Remove the 
+	#ifdef'd stub for in-cygwin builds.
+	(client_request_shm_get::client_request_shm_get): Use the new
+	client_request constructor, and remove the in-cygwin variants.
+	* cygserver_shm.h (class client_request_shm_get): #ifndef test the
+	serve method - it's only used in cygserver.
+	* shm.cc (client_request_shm_get::client_request_shm_get): New function.
+	* include/cygwin/cygserver.h (request_header): New constructor.
+	(class client_request): Use it. 
+	New constructor accepting the header size.
+	#ifndef test the server method - it's only used within cygserver.
+	(client_request_get_version): #ifdef test the server method.
+	(client_request_shutdown): Ditto.
+	(client_request_attach_tty): Ditto.
+
 Tue Oct  2  9:57:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
 	* Makefile.in: add threaded_queue.o to cygserver.exe.

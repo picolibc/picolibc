@@ -42,6 +42,7 @@ class request_header
     ssize_t cb;
     cygserver_request_code req_id;
     ssize_t error_code;
+    request_header (cygserver_request_code id, ssize_t ncb) : cb (ncb), req_id (id), error_code (0) {} ;
 }
 #ifdef __GNUC__
   __attribute__ ((packed))
@@ -85,9 +86,11 @@ struct request_attach_tty
 class client_request
 {
   public:
-  client_request (cygserver_request_code id);
+  client_request (cygserver_request_code id, ssize_t data_size);
   virtual void send (transport_layer_base *conn);
+#ifndef __INSIDE_CYGWIN__
   virtual void serve (transport_layer_base *conn, class process_cache *cache);
+#endif
   virtual operator struct request_header ();
   cygserver_request_code req_id () {return header.req_id;};
   virtual ~client_request();
@@ -98,7 +101,9 @@ class client_request
 class client_request_get_version : public client_request
 {
   public:
+#ifndef __INSIDE_CYGWIN__
   virtual void serve (transport_layer_base *conn, class process_cache *cache);
+#endif
   client_request_get_version::client_request_get_version();
   struct request_get_version version;
 };
@@ -106,14 +111,18 @@ class client_request_get_version : public client_request
 class client_request_shutdown : public client_request
 {
   public:
+#ifndef __INSIDE_CYGWIN__
   virtual void serve (transport_layer_base *conn, class process_cache *cache);
+#endif
   client_request_shutdown ();
 };
 
 class client_request_attach_tty : public client_request
 {
   public:
+#ifndef __INSIDE_CYGWIN__
   virtual void serve (transport_layer_base *conn, class process_cache *cache);
+#endif
   client_request_attach_tty ();
   client_request_attach_tty (DWORD npid, DWORD nmaster_pid, HANDLE nfrom_master, HANDLE nto_master);
   HANDLE from_master () {return req.from_master;};

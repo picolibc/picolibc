@@ -44,6 +44,30 @@ getsystemallocgranularity ()
   return buffer_offset;
 }
 
+client_request_shm_get::client_request_shm_get (int nshm_id, pid_t npid):
+client_request (CYGSERVER_REQUEST_SHM_GET, sizeof (parameters))
+{
+  buffer = (char *) &parameters;
+  parameters.in.shm_id = nshm_id;
+  parameters.in.type = SHM_REATTACH;
+  parameters.in.pid = npid;
+}
+
+client_request_shm_get::client_request_shm_get (key_t nkey, size_t nsize,
+                                                int nshmflg,
+                                                char psdbuf[4096],
+                                                pid_t npid):
+client_request (CYGSERVER_REQUEST_SHM_GET, sizeof (parameters))
+{
+  buffer = (char *) &parameters;
+  parameters.in.key = nkey;
+  parameters.in.size = nsize;
+  parameters.in.shmflg = nshmflg;
+  parameters.in.type = SHM_CREATE;
+  parameters.in.pid = npid;
+  memcpy (parameters.in.sd_buf, psdbuf, 4096);
+}
+
 static shmnode *shm_head = NULL;
 
 static shmnode *

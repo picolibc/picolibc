@@ -116,7 +116,7 @@ MALLOC_OFILES=@MALLOC_OFILES@
 
 DLL_IMPORTS:=$(w32api_lib)/libkernel32.a
 
-DLL_OFILES:=assert.o autoload.o cygheap.o cygserver_client.o cygserver_shm.o \
+DLL_OFILES:=assert.o autoload.o cygheap.o cygserver_client.o \
 	cygserver_transport.o cygserver_transport_pipes.o cygserver_transport_sockets.o \
 	dcrt0.o debug.o \
 	delqueue.o dir.o \
@@ -236,10 +236,10 @@ cygserver_transport_sockets_outside.o: cygserver_transport_sockets.cc
 cygserver_client_outside.o: cygserver_client.cc
 	 $(COMPILE_CXX) -D__OUTSIDE_CYGWIN__ -o $@ $<
 
-cygserver_shm_outside.o: cygserver_shm.cc
+cygserver_shm.o: cygserver_shm.cc
 	$(COMPILE_CXX) -D__OUTSIDE_CYGWIN__ -o $@ $<
 
-cygserver.exe: cygserver.o cygserver_shm_outside.o cygserver_transport_outside.o cygserver_transport_pipes_outside.o cygserver_transport_sockets_outside.o cygserver_client_outside.o cygserver_process.o threaded_queue.o wincap.o version.o smallprint.o 
+cygserver.exe: cygserver.o cygserver_shm.o cygserver_transport_outside.o cygserver_transport_pipes_outside.o cygserver_transport_sockets_outside.o cygserver_client_outside.o cygserver_process.o threaded_queue.o wincap.o version.o smallprint.o 
 	$(CXX) -o $@ $^
 #ifdef VERBOSE
 #	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,3,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
