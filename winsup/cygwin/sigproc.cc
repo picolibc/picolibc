@@ -559,9 +559,6 @@ sig_dispatch_pending ()
 #endif
     }
 
-  if (was_pending)
-    thisframe.call_signal_handler ();
-
   return was_pending;
 }
 

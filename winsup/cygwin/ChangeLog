@@ -1,5 +1,10 @@
 2003-08-30  Christopher Faylor  <cgf@redhat.com>
 
+	* sigproc.cc (sig_dispatch_pending): Remove explicit call to
+	thisframe.call_signal_handler.
+
+2003-08-30  Christopher Faylor  <cgf@redhat.com>
+
 	Remove some cygserver files.
 
 2003-08-28  Christopher Faylor  <cgf@redhat.com>
