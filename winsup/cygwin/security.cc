@@ -1398,7 +1398,23 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
   group_deny &= ~(STANDARD_RIGHTS_READ | FILE_READ_ATTRIBUTES | FILE_READ_EA);
 
   /* Construct appropriate inherit attribute. */
+  /* TODO */
+#if 0
+  /* Inheriting of attributes result in some strange behaviour if
+     a user creates files in directories which are owned by another
+     user. Even if the creator has all permissions, the default
+     permissions of created files are set according to the dirs
+     permission bits which may result in the inability to chmod
+     the own file.
+     Even if not inheriting permissions seems to be the correct
+     behaviour from the POSIX point of view, I'll keep that
+     stuff in the sources if it turns out that native Windows
+     processes are failing due to this change.
+  */
   DWORD inherit = (attribute & S_IFDIR) ? INHERIT_ALL : DONT_INHERIT;
+#else
+  DWORD inherit = DONT_INHERIT;
+#endif
 
   /* Set deny ACE for owner. */
   if (owner_deny
