@@ -16,7 +16,7 @@ details. */
 #include "fhandler.h"
 
 fhandler_dev_zero::fhandler_dev_zero ()
-  : fhandler_base (FH_ZERO)
+  : fhandler_base ()
 {
 }
 
