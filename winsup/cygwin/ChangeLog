@@ -1,3 +1,7 @@
+2001-12-11  Christopher Faylor  <cgf@redhat.com>
+
+	* include/getopt.h: Add HAVE_DECL_GETOPT to save pain elsewhere.
+
 2001-12-10  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler.h (fhandler_serial::ev): New class member.

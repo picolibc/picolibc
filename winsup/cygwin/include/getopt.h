@@ -54,6 +54,7 @@ extern char *optarg;      /* argument associated with option */
 int getopt (int, char * const *, const char *);
 
 int getopt_long (int, char *const *, const char *, const struct option *, int *);
+#define HAVE_DECL_GETOPT 1
 
 #define no_argument             0
 #define required_argument       1
