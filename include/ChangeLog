@@ -1,3 +1,9 @@
+2000-12-19  Hans-Peter Nilsson  <hp@bitrange.com>
+
+	* dis-asm.h (struct disassemble_info): New member "section".
+	(INIT_DISASSEMBLE_INFO_NO_ARCH): Initialize private_data member.
+	Initialize section member.
+
 2000-12-16  Herman A.J. ten Brugge  <Haj.Ten.Brugge@net.HCC.nl>
 
 	* safe-ctype.h: Make code work on all targets and not just on

@@ -56,6 +56,11 @@ typedef struct disassemble_info {
   /* Endianness (for bi-endian cpus).  Mono-endian cpus can ignore this.  */
   enum bfd_endian endian;
 
+  /* Some targets need information about the current section to accurately
+     display insns.  If this is NULL, the target disassembler function
+     will have to make its best guess.  */
+  asection *section;
+
   /* An array of pointers to symbols either at the location being disassembled
      or at the start of the function being disassembled.  The array is sorted
      so that the first symbol is intended to be the one used.  The others are
@@ -256,8 +261,10 @@ extern int generic_symbol_at_address
 #define INIT_DISASSEMBLE_INFO_NO_ARCH(INFO, STREAM, FPRINTF_FUNC) \
   (INFO).fprintf_func = (fprintf_ftype)(FPRINTF_FUNC), \
   (INFO).stream = (PTR)(STREAM), \
+  (INFO).section = NULL, \
   (INFO).symbols = NULL, \
   (INFO).num_symbols = 0, \
+  (INFO).private_data = NULL, \
   (INFO).buffer = NULL, \
   (INFO).buffer_vma = 0, \
   (INFO).buffer_length = 0, \
