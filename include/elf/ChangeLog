@@ -1,3 +1,8 @@
+2005-01-12  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc.h (R_PPC_RELAX32_PLT, R_PPC_RELAX32PC_PLT): Define.
+	(R_PPC_RELAX32, R_PPC_RELAX32PC): Adjust value.
+
 2004-12-22  Klaus Rudolph  <lts-rudolph@gmx.de>
 	
 	* include/elf/avr.h (R_AVR_LDI, R_AVR_6, R_AVR_6_ADIW): New
