@@ -444,6 +444,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    OS specific values.  This is a deliberate special case and we
    maintain it for backwards compatability.  */
 #define DT_VALRNGLO	0x6ffffd00
+#define DT_CHECKSUM	0x6ffffdf8
 #define DT_PLTPADSZ	0x6ffffdf9
 #define DT_MOVEENT	0x6ffffdfa
 #define DT_MOVESZ	0x6ffffdfb
@@ -483,23 +484,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define DT_USED		0x7ffffffe
 #define DT_FILTER	0x7fffffff
 
-/* FIXME: From
-
-   http://docs.sun.com:80/ab2/coll.45.13/LLM/@Ab2PageView/21165?Ab2Lang=C&Ab2Enc=iso-8859-1
-
-   DT_CHECKSUM is mentioned. But it is not in the table. Someone should
-   check <sys/link.h> on Solaris 8. */
-#define DT_CHECKSUM	0
-
 
 /* Values used in DT_FEATURE .dynamic entry.  */
 #define DTF_1_PARINIT	0x00000001
-/* FIXME: From
+/* From
 
    http://docs.sun.com:80/ab2/coll.45.13/LLM/@Ab2PageView/21165?Ab2Lang=C&Ab2Enc=iso-8859-1
 
-   DTF_1_CONFEXP is the same as DTF_1_PARINIT. I think it is a typo.
-   Someone should check <sys/link.h> on Solaris 8. */
+   DTF_1_CONFEXP is the same as DTF_1_PARINIT. It is a typo. The value
+   defined here is the same as the one in <sys/link.h> on Solaris 8. */
 #define DTF_1_CONFEXP	0x00000002
 
 /* Flag values used in the DT_POSFLAG_1 .dynamic entry.  */
