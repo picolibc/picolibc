@@ -9,7 +9,6 @@
 @setfilename faq.txt
 
 @include what.texinfo
-@include sites.texinfo
 @include install.texinfo
 @include calls.texinfo
 @include how.texinfo

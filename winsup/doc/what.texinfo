@@ -16,6 +16,20 @@ interest in the many standard Unix utilities provided with the package.
 They can be used both from the bash shell (provided) or from the
 standard Windows command shell.
 
+@section Where can I get it?
+
+The main WWW page for the Cygwin project is
+@file{http://sources.redhat.com/cygwin/}.  There you should find
+everything you need for Cygwin, including links for download and setup,
+a User's Guide, an API Reference, mailing lists and archives, and
+additional ported software.
+
+You can find documentation for the individual GNU tools at
+@file{http://www.fsf.org/manual/}.  (You should read GNU manuals from a
+local mirror.  Check @file{http://www.fsf.org/server/list-mirrors.html}
+for a list of them.)
+
+
 @section Is it free software?
 
 Yes.  Parts are GNU software (gcc, gas, ld, etc...), parts are covered
