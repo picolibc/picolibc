@@ -1956,6 +1956,7 @@ mount_info::read_cygdrive_info_from_registry ()
 	cygdrive_flags |= MOUNT_SYSTEM;
       slashify (cygdrive, cygdrive, 1);
       cygdrive_len = strlen (cygdrive);
+      break;
     }
 }
 
