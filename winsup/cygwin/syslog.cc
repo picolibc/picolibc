@@ -361,7 +361,7 @@ syslog (int priority, const char *message, ...)
 	   interleaved, we must lock the first byte of the file
 	   This works on Win32 even if we created the file above.
 	*/
-	HANDLE fHandle = fdtab[fileno (fp)]->get_handle ();
+	HANDLE fHandle = dtable[fileno (fp)]->get_handle ();
 	if (LockFile (fHandle, 0, 0, 1, 0) == FALSE)
 	  {
 	    debug_printf ("failed to lock file %s", get_win95_event_log_path());
