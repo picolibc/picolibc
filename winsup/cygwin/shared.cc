@@ -245,7 +245,7 @@ shared_info::heap_chunk_size ()
 	reg_key r1 (HKEY_LOCAL_MACHINE, KEY_READ, "SOFTWARE",
 		    CYGWIN_INFO_CYGNUS_REGISTRY_NAME,
 		    CYGWIN_INFO_CYGWIN_REGISTRY_NAME, NULL);
-        heap_chunk = reg.get_int ("heap_chunk_in_mb", 384);
+	heap_chunk = reg.get_int ("heap_chunk_in_mb", 384);
       }
 
       if (heap_chunk < 4)

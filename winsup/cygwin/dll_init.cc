@@ -263,7 +263,7 @@ release_upto (const char *name, DWORD here)
 	if (!(mb.State == MEM_RESERVE && mb.AllocationProtect == PAGE_NOACCESS &&
 	    (((void *) start < cygheap->user_heap.base
 	      || (void *) start > cygheap->user_heap.top) &&
-	     ((void *) start < (void *) cygheap 
+	     ((void *) start < (void *) cygheap
 	      | (void *) start > (void *) ((char *) cygheap + CYGHEAPSIZE)))))
 	  continue;
 	if (!VirtualFree ((void *) start, 0, MEM_RELEASE))
