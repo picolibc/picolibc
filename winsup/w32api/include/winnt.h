@@ -1710,7 +1710,7 @@ typedef SID_AND_ATTRIBUTES_ARRAY *PSID_AND_ATTRIBUTES_ARRAY;
 typedef struct _TOKEN_SOURCE {
 	CHAR SourceName[8];
 	LUID SourceIdentifier;
-} TOKEN_SOURCE;
+} TOKEN_SOURCE,*PTOKEN_SOURCE,*LPTOKEN_SOURCE;
 typedef struct _TOKEN_CONTROL {
 	LUID TokenId;
 	LUID AuthenticationId;
