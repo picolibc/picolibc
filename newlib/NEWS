@@ -1,3 +1,12 @@
+*** Major changes in newlib version 1.12.0:
+
+* general iconv support added
+* major cleanup with linux header files regarding warnings
+* thread-safety and reentrancy fixes
+* additional wide character C99 functions
+* addition of %lc, %ls, %S, and %C printf format specifiers
+* doc cleanup
+
 *** Major changes in newlib version 1.11.0:
 
 * enhanced EL/IX support for i[3456]86-pc-linux 
