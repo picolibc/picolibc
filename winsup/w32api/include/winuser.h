@@ -918,6 +918,7 @@ extern "C" {
 #else
 #define SM_CMETRICS 83
 #endif
+#define SM_REMOTESESSION 0X1000
 #define ARW_BOTTOMLEFT 0
 #define ARW_BOTTOMRIGHT 1
 #define ARW_HIDE 8

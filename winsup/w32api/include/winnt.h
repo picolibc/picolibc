@@ -470,6 +470,7 @@ typedef DWORD FLONG;
 #define SE_SYSTEM_ENVIRONMENT_NAME	TEXT("SeSystemEnvironmentPrivilege")
 #define SE_CHANGE_NOTIFY_NAME	TEXT("SeChangeNotifyPrivilege")
 #define SE_REMOTE_SHUTDOWN_NAME	TEXT("SeRemoteShutdownPrivilege")
+#define SE_CREATE_GLOBAL_NAME TEXT("SeCreateGlobalPrivilege")
 #define SE_GROUP_MANDATORY 1
 #define SE_GROUP_ENABLED_BY_DEFAULT 2
 #define SE_GROUP_ENABLED 4

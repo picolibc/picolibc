@@ -1,3 +1,8 @@
+2003-10-13  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* include/winnt.h (SM_REMOTESESSION): Add define.
+	* include/winuser.h (SE_CREATE_GLOBAL_NAME): Ditto.
+
 2003-10-13  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wincrypt (KP_IV, KP_SALT, KP_PADDING, KP_MODE,
