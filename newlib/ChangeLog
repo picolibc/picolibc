@@ -1,5 +1,11 @@
 2003-01-31  Michael Snyder  <msnyder@redhat.com>
 
+	* libc/sys/h8300hms/_exit.c (_exit, __exit):  Slip a magic cookie
+	into registers r1 and r2, so that the simulator can distinguish
+	this trap from a breakpoint trap.  Copied from libgloss.
+
+2003-01-31  Michael Snyder  <msnyder@redhat.com>
+
 	* libc/sys/h8300hms/crt0.S (_start): Change local label
 	from .loop to .Loop, so that ld and gdb will ignore it.
 
