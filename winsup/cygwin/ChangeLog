@@ -1,5 +1,13 @@
 2002-06-30  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* cygserver_shm.cc (server_shmmgr::_instance): New static field.
+	(server_shmmgr::_instance_once): Ditto.
+	(server_shmmgr::initialise_instance): New static method.
+	(server_shmmgr::instance): Use a pthread_once_t rather than
+	relying on a local static variable.
+
+2002-06-30  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* woutsup.h: Remove all uses of the C++ new and delete operators
 	throughout cygserver until they are fully thread-safe.
 	(safe_new0): New macro to replace the C++ new operator.

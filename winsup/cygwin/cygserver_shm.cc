@@ -112,6 +112,11 @@ public:
   int shmget (key_t, size_t, int shmflg, pid_t, uid_t, gid_t);
 
 private:
+  static server_shmmgr *_instance;
+  static pthread_once_t _instance_once;
+
+  static void initialise_instance ();
+
   CRITICAL_SECTION _segments_lock;
   segment_t *_segments_head;	// A list sorted by shmid.
 
@@ -134,16 +139,21 @@ private:
   void delete_segment (segment_t *);
 };
 
+/* static */ server_shmmgr *server_shmmgr::_instance = NULL;
+/* static */ pthread_once_t server_shmmgr::_instance_once = PTHREAD_ONCE_INIT;
+
 /*---------------------------------------------------------------------------*
  * server_shmmgr::instance ()
  *---------------------------------------------------------------------------*/
 
-server_shmmgr &
+/* static */ server_shmmgr &
 server_shmmgr::instance ()
 {
-  static server_shmmgr instance;
+  pthread_once (&_instance_once, &initialise_instance);
 
-  return instance;
+  assert (_instance);
+
+  return *_instance;
 }
 
 /*---------------------------------------------------------------------------*
@@ -331,6 +341,18 @@ server_shmmgr::shmget (const key_t key, const size_t size, const int shmflg,
 
   LeaveCriticalSection (&_segments_lock);
   return result;
+}
+
+/*---------------------------------------------------------------------------*
+ * server_shmmgr::initialise_instance ()
+ *---------------------------------------------------------------------------*/
+
+/* static */ void
+server_shmmgr::initialise_instance ()
+{
+  assert (!_instance);
+
+  _instance = safe_new0 (server_shmmgr);
 }
 
 /*---------------------------------------------------------------------------*
