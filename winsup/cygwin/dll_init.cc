@@ -132,13 +132,22 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
 
   /* Need to do the shared memory thing since W95 can't allocate in
      the shared memory region otherwise. */
-  HANDLE h1 = CreateFileMapping (INVALID_HANDLE_VALUE, &sec_none_nih,
-				 PAGE_READWRITE, 0, sizeof (dll), NULL);
-
   DWORD n = (DWORD) m.BaseAddress;
-  n = ((n - (n % s1.dwAllocationGranularity)) + s1.dwAllocationGranularity);
-  d = (dll *) MapViewOfFileEx (h1, FILE_MAP_WRITE, 0, 0, 0, (void *) n);
-  CloseHandle (h1);
+  DWORD r = n % s1.dwAllocationGranularity;
+
+  if (r)
+    n = ((n - r) + s1.dwAllocationGranularity);
+  if (VirtualAlloc ((void *) n, sizeof (dll), MEM_RESERVE, PAGE_READWRITE))
+    d = (dll *) VirtualAlloc ((void *) n, sizeof (dll), MEM_COMMIT, PAGE_READWRITE);
+
+  if (d == NULL)
+    {
+#ifdef DEBUGGING
+      system_printf ("VirtualAlloc failed for %p, %E", n);
+#endif
+      __seterrno ();
+      return NULL;
+    }
 
   /* Now we've allocated a block of information.  Fill it in with the supplied
      info about this DLL. */
@@ -176,7 +185,7 @@ dll_list::detach (dll *d)
 	loaded_dlls--;
       if (end == d)
 	end = d->prev;
-      UnmapViewOfFile (d);
+      VirtualFree (d, 0, MEM_RELEASE);
     }
 }
 

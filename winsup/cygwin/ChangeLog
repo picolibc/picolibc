@@ -1,3 +1,10 @@
+Sat Jul 15 00:32:41 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dll_init.cc (dll_list::alloc): Round correctly.  Use VirtualAlloc
+	since shared file mapping is unnecessary.
+	(dll_list::detach): Release memory via VirtualFree since there we no
+	longer use shared file mapping.
+
 Fri Jul 14 22:40:22 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* hinfo.cc (hinfo::linearize_fd_array): Make max_used_fd an int so that
