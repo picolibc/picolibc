@@ -1,7 +1,6 @@
 /* ia64.h -- Header file for ia64 opcode table
-   Copyright (C) 1998, 1999, 2002 David Mosberger-Tang <davidm@hpl.hp.com>
-
-   See the file HP-COPYRIGHT for additional information.  */
+   Copyright (C) 1998, 1999, 2002 Free Software Foundation, Inc.
+	Contributed by David Mosberger-Tang <davidm@hpl.hp.com> */
 
 #ifndef opcode_ia64_h
 #define opcode_ia64_h
@@ -39,13 +38,14 @@ enum ia64_unit
   };
 
 /* Changes to this enumeration must be propagated to the operand table in
-   bfd/cpu-ia64-opc.c 
- */ 
+   bfd/cpu-ia64-opc.c
+ */
 enum ia64_opnd
   {
     IA64_OPND_NIL,	/* no operand---MUST BE FIRST!*/
 
     /* constants */
+    IA64_OPND_AR_CSD,	/* application register csd (ar.csd) */
     IA64_OPND_AR_CCV,	/* application register ccv (ar.ccv) */
     IA64_OPND_AR_PFS,	/* application register pfs (ar.pfs) */
     IA64_OPND_C1,	/* the constant 1 */
@@ -288,7 +288,7 @@ struct ia64_opcode
     /* Used by ia64_find_next_opcode (). */
     short ent_index;
 
-    /* Opcode dependencies. */ 
+    /* Opcode dependencies. */
     const struct ia64_opcode_dependency *dependencies;
   };
 

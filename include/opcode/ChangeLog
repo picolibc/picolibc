@@ -1,3 +1,8 @@
+2002-12-04  David Mosberger  <davidm@hpl.hp.com>
+
+	* ia64.h: Fix copyright message.
+	(IA64_OPND_AR_CSD): New operand kind.
+
 2002-12-03  Richard Henderson  <rth@redhat.com>
 
 	* ia64.h (enum ia64_opnd): Add IA64_OPND_LDXMOV.
