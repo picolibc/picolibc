@@ -276,6 +276,12 @@ check_package_files (int verbose, char *package)
   while (fgets (buf, MAX_PATH, fp))
     {
       char *filename = strtok(buf, "\n");
+
+      if (*filename == '/')
+	++filename;
+      else if (!strncmp (filename, "./", 2))
+	filename += 2;
+
       if (filename[strlen (filename) - 1] == '/')
         {
           if (!directory_exists (verbose, filename, package))

@@ -1,3 +1,8 @@
+2003-08-17  David Rothenberger  <daveroth@acm.org>
+
+	* dump_setup.cc (check_package_files): Strip leading / and ./ from
+	package file names.
+
 2003-08-16  David Rothenberger  <daveroth@acm.org>
 
 	* dump_setup.cc (package_find): Don't stop searching on missing
