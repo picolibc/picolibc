@@ -1,3 +1,13 @@
+2001-11-10  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (cygcheck.exe): Compile as -mno-cygwin executable.
+	* path.cc: New file.
+	* cygcheck.cc (init_paths): Use MS-DOS path syntax.
+	(cygwin_info): Properly display cygwin version numbers.  Prettify some
+	output.
+	(dump_sysinfo): Calculate max names of posix and ms-dos paths for
+	prettier output.
+
 2001-11-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc (dump_sysinfo): Print more detailed OS information string.

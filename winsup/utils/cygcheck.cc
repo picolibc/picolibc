@@ -8,6 +8,8 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
+typedef unsigned short uid_t;
+typedef unsigned short gid_t;
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,6 +18,7 @@
 #include <mntent.h>
 #include <time.h>
 #include <getopt.h>
+#include <ctype.h>
 
 int verbose = 0;
 int registry = 0;
@@ -134,18 +137,14 @@ init_paths ()
   GetWindowsDirectory (tmp, 4000);
   add_path (tmp, strlen (tmp));
 
-  char *path = getenv ("PATH");
-  if (path)
+  char *wpath = getenv ("PATH");
+  if (wpath)
     {
-      char wpath[4000];
-      cygwin_posix_to_win32_path_list (path, wpath);
-      char *b, *e, sep = ':';
-      if (strchr (wpath, ';'))
-	sep = ';';
+      char *b, *e;
       b = wpath;
       while (1)
 	{
-	  for (e = b; *e && *e != sep; e++);
+	  for (e = b; *e && *e != ';'; e++);
 	  add_path (b, e - b);
 	  if (!*e)
 	    break;
@@ -350,6 +349,7 @@ cygwin_info (HANDLE h)
       return;
     }
 
+  char *dll_major;
   bufend = buf + size;
   while (buf < bufend)
     if ((buf = (char *) memchr (buf, '%', bufend - buf)) == NULL)
@@ -361,9 +361,33 @@ cygwin_info (HANDLE h)
 	char *p = strchr (buf += CYGPREFIX, '\n');
 	if (!p)
 	  break;
-	fputs (hello, stdout);
-	fputs ("        ", stdout);
-	fwrite (buf, 1 + p - buf, 1, stdout);
+	if (strncasecmp (buf, "dll major:", 10) == 0)
+	  {
+	    dll_major = buf + 11;
+	    continue;
+	  }
+	char *s, pbuf[80];
+	int len;
+	len = 1 + p - buf;
+	if (strncasecmp (buf, "dll minor:", 10) != 0)
+	  s = buf;
+	else
+	  {
+	    char c = dll_major[1];
+	    dll_major[1] = '\0';
+	    int maj = atoi (dll_major);
+	    dll_major[1] = c;
+	    int min = atoi (dll_major + 1);
+	    sprintf (pbuf, "DLL version: %d.%d.%.*s", maj, min, len - 11, buf + 11);
+	    len = strlen (s = pbuf);
+	  }
+	if (strncmp (s, "dll", 3) == 0)
+	  memcpy (s, "DLL", 3);
+	else if (strncmp (s, "api", 3) == 0)
+	  memcpy (s, "API", 3);
+	else if (islower (*s))
+	  *s = toupper (*s);
+	fprintf (stdout, "%s        %.*s", hello, len, s);
 	hello = "";
       }
 
@@ -987,6 +1011,18 @@ dump_sysinfo ()
 
   unsigned int ml_fsname = 4, ml_dir = 7, ml_type = 6;
 
+  struct mntent *mnt;
+  setmntent (0, 0);
+  while ((mnt = getmntent (0)))
+    {
+      int n = (int) strlen (mnt->mnt_fsname);
+      if (ml_fsname < n)
+	ml_fsname = n;
+      n = (int) strlen (mnt->mnt_dir);
+      if (ml_dir < n)
+	ml_dir = n;
+    }
+
   if (givehelp)
     {
       printf
@@ -995,9 +1031,7 @@ dump_sysinfo ()
 	      ml_type, "-Type-", "-Flags-");
     }
 
-  struct mntent *mnt;
   setmntent (0, 0);
-
   while ((mnt = getmntent (0)))
     {
       printf ("%-*s  %-*s  %-*s  %s\n",
