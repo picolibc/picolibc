@@ -1,3 +1,11 @@
+2000-11-20  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/unistd.h: Removed definition of MAXNAMLEN.
+	* libc/include/dirent.h: Added definition of MAXNAMLEN if
+	not defined by sys/dirent.h.
+	* libc/posix/execvp.c: Added include of dirent.h to get
+	MAXNAMLEN value which used to be in unistd.h.
+
 Mon Nov  6 12:56:00 2000  Corinna Vinschen <vinschen@cygnus.com>
 
 	* libc/include/sys/types.h: Change type of i to `size_t' in

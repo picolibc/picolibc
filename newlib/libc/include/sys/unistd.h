@@ -176,10 +176,6 @@ long _EXFUN(sysconf, (int __name));
 # define	_PC_PRIO_IO            10
 # define	_PC_SYNC_IO            11
 
-# ifndef	_POSIX_SOURCE
-#  define	MAXNAMLEN	1024
-# endif		/* _POSIX_SOURCE */
-
 /* FIXME: This is temporary until winsup gets sorted out.  */
 #ifdef __CYGWIN__
 #define MAXPATHLEN (260 - 1 /* NUL */)

@@ -6,6 +6,7 @@
 #include <_ansi.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <dirent.h>
 #include <string.h>
 #include <errno.h>
 #include <ctype.h>
