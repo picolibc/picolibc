@@ -1,3 +1,8 @@
+2003-08-28  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (sigreturn): Fix problem where old return address was
+	not properly restored for a nested signal.
+
 2003-08-27  Christopher Faylor  <cgf@redhat.com>
 
 	* autoload.cc (SwitchToThread): Declare as autoload function.

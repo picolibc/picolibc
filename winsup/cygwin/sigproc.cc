@@ -1157,7 +1157,7 @@ wait_sig (VOID *self)
       sigproc_printf ("awake, rc %d", rc);
       LONG *todo;
       if (rc != RC_NOSYNC)
-	todo = *todos;
+	todo = todos[0];
       else
 	todo = todos[1];
 
