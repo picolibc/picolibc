@@ -1,3 +1,10 @@
+2003-03-27  Vladimir Michl  <michlv@users.sourceforge.net>
+
+	* include/ddk/ndis.h (NdisAllocateSpinLock,NdisFreeSpinLock,
+	NdisAcquireSpinLock,NdisReleaseSpinLock,NdisDprAcquireSpinLock,
+	NdisDprReleaseSpinLock): Change macro argument from SpinLock to
+	_SpinLock.
+
 2003-03-26  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/w32api.h: Increment version to 2.4.

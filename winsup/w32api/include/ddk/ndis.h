@@ -2524,41 +2524,41 @@ NdisUnicodeStringToAnsiString(
  * NdisAllocateSpinLock(
  *   IN PNDIS_SPIN_LOCK  SpinLock);
  */
-#define NdisAllocateSpinLock(SpinLock) \
-  KeInitializeSpinLock(&(SpinLock)->SpinLock)
+#define NdisAllocateSpinLock(_SpinLock)
+  KeInitializeSpinLock(&(_SpinLock)->SpinLock)
 
 /*
  * VOID
  * NdisFreeSpinLock(
  *   IN PNDIS_SPIN_LOCK  SpinLock);
  */
-#define NdisFreeSpinLock(SpinLock)
+#define NdisFreeSpinLock(_SpinLock)
 
 /*
  * VOID
  * NdisAcquireSpinLock(
  *   IN PNDIS_SPIN_LOCK  SpinLock);
  */
-#define NdisAcquireSpinLock(SpinLock) \
-  KeAcquireSpinLock(&(SpinLock)->SpinLock, &(SpinLock)->OldIrql)
+#define NdisAcquireSpinLock(_SpinLock) \
+  KeAcquireSpinLock(&(_SpinLock)->SpinLock, &(_SpinLock)->OldIrql)
 
 /*
  * VOID
  * NdisReleaseSpinLock(
  *   IN PNDIS_SPIN_LOCK  SpinLock);
  */
-#define NdisReleaseSpinLock(SpinLock) \
-  KeReleaseSpinLock(&(SpinLock)->SpinLock,(SpinLock)->OldIrql)
+#define NdisReleaseSpinLock(_SpinLock) \
+  KeReleaseSpinLock(&(_SpinLock)->SpinLock, (_SpinLock)->OldIrql)
 
 /*
  * VOID
  * NdisDprAcquireSpinLock(
  *   IN PNDIS_SPIN_LOCK  SpinLock);
  */
-#define NdisDprAcquireSpinLock(SpinLock)                \
+#define NdisDprAcquireSpinLock(_SpinLock)                \
 {                                                       \
-    KeAcquireSpinLockAtDpcLevel(&(SpinLock)->SpinLock); \
-    (SpinLock)->OldIrql = DISPATCH_LEVEL;               \
+    KeAcquireSpinLockAtDpcLevel(&(_SpinLock)->SpinLock); \
+    (_SpinLock)->OldIrql = DISPATCH_LEVEL;               \
 }
 
 /*
@@ -2566,8 +2566,8 @@ NdisUnicodeStringToAnsiString(
  * NdisDprReleaseSpinLock(
  *   IN PNDIS_SPIN_LOCK  SpinLock);
  */
-#define NdisDprReleaseSpinLock(SpinLock) \
-  KeReleaseSpinLockFromDpcLevel(&(SpinLock)->SpinLock)
+#define NdisDprReleaseSpinLock(_SpinLock) \
+  KeReleaseSpinLockFromDpcLevel(&(_SpinLock)->SpinLock)
 
 
 
