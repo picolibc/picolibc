@@ -1964,14 +1964,15 @@ pthread::atfork (void (*prepare)(void), void (*parent)(void), void (*child)(void
 extern "C" int
 pthread_attr_init (pthread_attr_t *attr)
 {
-  if (check_valid_pointer (attr))
-    return EINVAL;
+  if (pthread_attr::is_good_object (attr))
+    return 0;
+
   *attr = new pthread_attr;
   if (!pthread_attr::is_good_object (attr))
     {
       delete (*attr);
       *attr = NULL;
-      return EAGAIN;
+      return ENOMEM;
     }
   return 0;
 }
@@ -2488,14 +2489,15 @@ pthread_cond_wait (pthread_cond_t *cond, pthread_mutex_t *mutex)
 extern "C" int
 pthread_condattr_init (pthread_condattr_t *condattr)
 {
-  if (check_valid_pointer (condattr))
-    return EINVAL;
+  if (pthread_condattr::is_good_object (condattr))
+    return 0;
+
   *condattr = new pthread_condattr;
   if (!pthread_condattr::is_good_object (condattr))
     {
       delete (*condattr);
       *condattr = NULL;
-      return EAGAIN;
+      return ENOMEM;
     }
   return 0;
 }
@@ -2673,14 +2675,15 @@ pthread_rwlock_unlock (pthread_rwlock_t *rwlock)
 extern "C" int
 pthread_rwlockattr_init (pthread_rwlockattr_t *rwlockattr)
 {
-  if (check_valid_pointer (rwlockattr))
-    return EINVAL;
+  if (pthread_rwlockattr::is_good_object (rwlockattr))
+    return 0;
+
   *rwlockattr = new pthread_rwlockattr;
   if (!pthread_rwlockattr::is_good_object (rwlockattr))
     {
       delete (*rwlockattr);
       *rwlockattr = NULL;
-      return EAGAIN;
+      return ENOMEM;
     }
   return 0;
 }
@@ -2933,7 +2936,7 @@ extern "C" int
 pthread_mutexattr_init (pthread_mutexattr_t *attr)
 {
   if (pthread_mutexattr::is_good_object (attr))
-    return EBUSY;
+    return 0;
 
   *attr = new pthread_mutexattr ();
   if (!pthread_mutexattr::is_good_object (attr))

@@ -1,3 +1,13 @@
+2003-06-11  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.cc (pthread_attr_init): Return 0 if attribute is already
+	initialized.
+	Fix return code if out of memory.
+	(pthread_condattr_init): Ditto.
+	(pthread_rwlockattr_init): Ditto.
+	(pthread_mutexattr_init): Return 0 if attribute is already
+	initialized.
+
 2003-06-09  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* spawn.cc (spawn_guts): Call CreateProcess while impersonated,
