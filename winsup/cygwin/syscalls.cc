@@ -130,35 +130,47 @@ unlink (const char *ourname)
   if (!writable_directory (win32_name))
     {
       syscall_printf ("non-writable directory");
+      set_errno (EPERM);
       goto done;
     }
 
+  /* Allow us to delete even if read-only */
   SetFileAttributes (win32_name, (DWORD) win32_name & ~(FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM));
   /* Attempt to use "delete on close" semantics to handle removing
      a file which may be open. */
   HANDLE h;
-  h = CreateFile (win32_name, GENERIC_READ, FILE_SHARE_DELETE, &sec_none_nih,
+  h = CreateFile (win32_name, 0, FILE_SHARE_READ, &sec_none_nih,
 		  OPEN_EXISTING, FILE_FLAG_DELETE_ON_CLOSE, 0);
-
-  (void) SetFileAttributes (win32_name, (DWORD) win32_name);
-  (void) DeleteFile (win32_name);
-  DWORD lasterr;
-  lasterr = GetLastError ();
   if (h != INVALID_HANDLE_VALUE)
-    CloseHandle (h);
-
-  if (GetFileAttributes (win32_name) == INVALID_FILE_ATTRIBUTES
-      || (!win32_name.isremote () && wincap.has_delete_on_close ()))
     {
-      syscall_printf ("DeleteFile succeeded");
-      goto ok;
+      (void) SetFileAttributes (win32_name, (DWORD) win32_name);
+      BOOL res = CloseHandle (h);
+      syscall_printf ("%d = CloseHandle (%p)", res, h);
+      if (GetFileAttributes (win32_name) == INVALID_FILE_ATTRIBUTES
+	  || (!win32_name.isremote () && wincap.has_delete_on_close ()))
+	{
+	  syscall_printf ("CreateFile (FILE_FLAG_DELETE_ON_CLOSE) succeeded");
+	  goto ok;
+	}
+      else
+	{
+	  syscall_printf ("CreateFile (FILE_FLAG_DELETE_ON_CLOSE) failed");
+	  SetFileAttributes (win32_name, (DWORD) win32_name & ~(FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM));
+	}
     }
 
+
+  /* Try a delete with attributes reset */
   if (DeleteFile (win32_name))
     {
       syscall_printf ("DeleteFile after CreateFile/ClosHandle succeeded");
       goto ok;
     }
+
+  DWORD lasterr;
+  lasterr = GetLastError ();
+
+  (void) SetFileAttributes (win32_name, (DWORD) win32_name);
 
   /* Windows 9x seems to report ERROR_ACCESS_DENIED rather than sharing
      violation.  So, set lasterr to ERROR_SHARING_VIOLATION in this case
