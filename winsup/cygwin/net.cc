@@ -1923,7 +1923,7 @@ cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
 	  cygheap_fdnew newfd (res_fd, false);
 	  cygheap_fdget fd (*fd2p);
 
-	  if (newfd >= 0 && fdsock (fd, tcp_dev, fd2s))
+	  if (newfd >= 0 && fdsock (newfd, tcp_dev, fd2s))
 	    *fd2p = newfd;
 	  else
 	    {
@@ -1999,7 +1999,7 @@ cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
 	  cygheap_fdnew newfd (res_fd, false);
 	  cygheap_fdget fd (*fd2p);
 
-	  if (newfd >= 0 && fdsock (fd, tcp_dev, fd2s))
+	  if (newfd >= 0 && fdsock (newfd, tcp_dev, fd2s))
 	    *fd2p = newfd;
 	  else
 	    {

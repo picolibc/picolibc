@@ -73,8 +73,8 @@ _fcloseall_r
 fcloseall_r = _fcloseall_r
 _fscanf_r
 fscanf_r = _fscanf_r
-_fstat
-fstat = _fstat
+fstat
+_fstat = fstat
 _pipe
 _pthread_cleanup_pop
 _pthread_cleanup_push
@@ -82,9 +82,10 @@ _scanf_r
 scanf_r = _scanf_r
 _sscanf_r
 sscanf_r = _sscanf_r
-_stat
-stat = _stat
+stat
+_stat = stat
 _strtold
+trunc
 _vasprintf_r
 vasprintf_r = _vasprintf_r
 _vfscanf_r
@@ -181,6 +182,7 @@ bcopy
 _bcopy = bcopy
 bsearch
 _bsearch = bsearch
+btowc
 bzero
 _bzero = bzero
 cabs
@@ -951,6 +953,17 @@ pthread_mutexattr_setprotocol
 pthread_mutexattr_setpshared
 pthread_mutexattr_settype
 pthread_once
+pthread_rwlock_destroy
+pthread_rwlock_init
+pthread_rwlock_rdlock
+pthread_rwlock_tryrdlock
+pthread_rwlock_wrlock
+pthread_rwlock_trywrlock
+pthread_rwlock_unlock
+pthread_rwlockattr_init
+pthread_rwlockattr_getpshared
+pthread_rwlockattr_setpshared
+pthread_rwlockattr_destroy
 pthread_self
 pthread_setcancelstate
 pthread_setcanceltype

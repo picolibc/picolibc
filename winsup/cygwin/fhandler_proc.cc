@@ -626,6 +626,7 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 	    debug_printf ("processor does not support CPUID instruction");
 	}
 
+
       if (!has_cpuid)
 	{
 	  bufptr += __small_sprintf (bufptr, "processor       : %d\n", cpu_number);
@@ -633,37 +634,44 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 	  bufptr += __small_sprintf (bufptr, "vendor id       : %s\n", szBuffer);
 	  read_value ("Identifier", REG_SZ);
 	  bufptr += __small_sprintf (bufptr, "identifier      : %s\n", szBuffer);
-	  read_value ("~Mhz", REG_DWORD);
-	  bufptr += __small_sprintf (bufptr, "cpu MHz         : %u\n", *(DWORD *) szBuffer);
+          if (wincap.is_winnt ())
+            {
+	      read_value ("~Mhz", REG_DWORD);
+	      bufptr += __small_sprintf (bufptr, "cpu MHz         : %u\n", *(DWORD *) szBuffer);
 
-	  print ("flags           :");
-	  if (IsProcessorFeaturePresent (PF_3DNOW_INSTRUCTIONS_AVAILABLE))
-	    print (" 3dnow");
-	  if (IsProcessorFeaturePresent (PF_COMPARE_EXCHANGE_DOUBLE))
-	    print (" cx8");
-	  if (!IsProcessorFeaturePresent (PF_FLOATING_POINT_EMULATED))
-	    print (" fpu");
-	  if (IsProcessorFeaturePresent (PF_MMX_INSTRUCTIONS_AVAILABLE))
-	    print (" mmx");
-	  if (IsProcessorFeaturePresent (PF_PAE_ENABLED))
-	    print (" pae");
-	  if (IsProcessorFeaturePresent (PF_RDTSC_INSTRUCTION_AVAILABLE))
-	    print (" tsc");
-	  if (IsProcessorFeaturePresent (PF_XMMI_INSTRUCTIONS_AVAILABLE))
-	    print (" sse");
-	  if (IsProcessorFeaturePresent (PF_XMMI64_INSTRUCTIONS_AVAILABLE))
-	    print (" sse2");
-	}
+	      print ("flags           :");
+	      if (IsProcessorFeaturePresent (PF_3DNOW_INSTRUCTIONS_AVAILABLE))
+	        print (" 3dnow");
+	      if (IsProcessorFeaturePresent (PF_COMPARE_EXCHANGE_DOUBLE))
+	        print (" cx8");
+	      if (!IsProcessorFeaturePresent (PF_FLOATING_POINT_EMULATED))
+	        print (" fpu");
+	      if (IsProcessorFeaturePresent (PF_MMX_INSTRUCTIONS_AVAILABLE))
+	        print (" mmx");
+	      if (IsProcessorFeaturePresent (PF_PAE_ENABLED))
+	        print (" pae");
+	      if (IsProcessorFeaturePresent (PF_RDTSC_INSTRUCTION_AVAILABLE))
+	        print (" tsc");
+	      if (IsProcessorFeaturePresent (PF_XMMI_INSTRUCTIONS_AVAILABLE))
+	        print (" sse");
+	      if (IsProcessorFeaturePresent (PF_XMMI64_INSTRUCTIONS_AVAILABLE))
+	        print (" sse2");
+	    }
+        }
       else
 	{
 	  bufptr += __small_sprintf (bufptr, "processor       : %d\n", cpu_number);
 	  unsigned maxf, vendor_id[4], unused;
-	  cpuid (&maxf, &vendor_id[0], &vendor_id[1], &vendor_id[2], 0);
+	  cpuid (&maxf, &vendor_id[0], &vendor_id[2], &vendor_id[1], 0);
 	  maxf &= 0xffff;
 	  vendor_id[3] = 0;
 	  bufptr += __small_sprintf (bufptr, "vendor id       : %s\n", (char *)vendor_id);
-	  read_value ("~Mhz", REG_DWORD);
-	  unsigned cpu_mhz = *(DWORD *)szBuffer;
+          unsigned cpu_mhz  = 0;
+          if (wincap.is_winnt ())
+            {
+	      read_value ("~Mhz", REG_DWORD);
+	      cpu_mhz = *(DWORD *)szBuffer;
+            }
 	  if (maxf >= 1)
 	    {
 	      unsigned features2, features1, extra_info, cpuid_sig;
@@ -709,26 +717,50 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 		  // could implement a lookup table here if someone needs it
 		  strcpy (szBuffer, "unknown");
 		}
-	      bufptr += __small_sprintf (bufptr, "type            : %s\n"
-						 "cpu family      : %d\n"
-						 "model           : %d\n"
-						 "model name      : %s\n"
-						 "stepping        : %d\n"
-						 "brand id        : %d\n"
-						 "cpu count       : %d\n"
-						 "apic id         : %d\n"
-						 "cpu MHz         : %d\n"
-						 "fpu             : %s\n",
-					 type_str,
-					 family,
-					 model,
-					 szBuffer,
-					 stepping,
-					 brand_id,
-					 cpu_count,
-					 apic_id,
-					 cpu_mhz,
-					 IsProcessorFeaturePresent (PF_FLOATING_POINT_EMULATED) ? "no" : "yes");
+              if (wincap.is_winnt ())
+                {
+	          bufptr += __small_sprintf (bufptr, "type            : %s\n"
+	        				     "cpu family      : %d\n"
+						     "model           : %d\n"
+						     "model name      : %s\n"
+						     "stepping        : %d\n"
+						     "brand id        : %d\n"
+						     "cpu count       : %d\n"
+						     "apic id         : %d\n"
+						     "cpu MHz         : %d\n"
+						     "fpu             : %s\n",
+					     type_str,
+					     family,
+					     model,
+					     szBuffer,
+					     stepping,
+					     brand_id,
+					     cpu_count,
+					     apic_id,
+					     cpu_mhz,
+					     (features1 & (1 << 0)) ? "yes" : "no");
+                }
+              else
+                {
+                  bufptr += __small_sprintf (bufptr, "type            : %s\n"
+                                                     "cpu family      : %d\n"
+                                                     "model           : %d\n"
+                                                     "model name      : %s\n"
+                                                     "stepping        : %d\n"
+                                                     "brand id        : %d\n"
+                                                     "cpu count       : %d\n"
+                                                     "apic id         : %d\n"
+                                                     "fpu             : %s\n",
+                                             type_str,
+                                             family,
+                                             model,
+                                             szBuffer,
+                                             stepping,
+                                             brand_id,
+                                             cpu_count,
+                                             apic_id,
+                                             (features1 & (1 << 0)) ? "yes" : "no");
+                }
 	      print ("flags           :");
 	      if (features1 & (1 << 0))
 		print (" fpu");
@@ -801,7 +833,7 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 	      if (features2 & (1 << 10))
 		print (" cid");
 	    }
-	  else
+	  else if (wincap.is_winnt ())
 	    {
 	      bufptr += __small_sprintf (bufptr, "cpu MHz         : %d\n"
 						 "fpu             : %s\n",

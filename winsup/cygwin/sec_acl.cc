@@ -119,19 +119,13 @@ setacl (const char *file, int nentries, __aclent32_t *aclbufp)
       DWORD allow;
       /* Owner has more standard rights set. */
       if ((aclbufp[i].a_type & ~ACL_DEFAULT) == USER_OBJ)
-	allow = (STANDARD_RIGHTS_ALL & ~DELETE)
-		| FILE_WRITE_ATTRIBUTES | FILE_WRITE_EA;
+	allow = STANDARD_RIGHTS_ALL | FILE_WRITE_ATTRIBUTES | FILE_WRITE_EA;
       else
 	allow = STANDARD_RIGHTS_READ | FILE_READ_ATTRIBUTES | FILE_READ_EA;
       if (aclbufp[i].a_perm & S_IROTH)
 	allow |= FILE_GENERIC_READ;
       if (aclbufp[i].a_perm & S_IWOTH)
-	{
-	  allow |= STANDARD_RIGHTS_WRITE | FILE_GENERIC_WRITE;
-	  /* Owner gets DELETE right, too. */
-	  if ((aclbufp[i].a_type & ~ACL_DEFAULT) == USER_OBJ)
-	    allow |= DELETE;
-	}
+	allow |= STANDARD_RIGHTS_WRITE | FILE_GENERIC_WRITE;
       if (aclbufp[i].a_perm & S_IXOTH)
 	allow |= FILE_GENERIC_EXECUTE;
       if ((aclbufp[i].a_perm & (S_IWOTH | S_IXOTH)) == (S_IWOTH | S_IXOTH))

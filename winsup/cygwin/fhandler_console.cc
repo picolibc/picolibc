@@ -648,8 +648,12 @@ fhandler_console::close (void)
   set_io_handle (NULL);
   set_output_handle (NULL);
   if (!cygheap->fdtab.in_vfork_cleanup () && --open_fhs <= 0
-      && myself->ctty != FH_CONSOLE)
-    FreeConsole ();
+      && myself->ctty != TTY_CONSOLE)
+    {
+      syscall_printf ("open_fhs %d, freeing console %p",
+		      fhandler_console::open_fhs, myself->ctty);
+      FreeConsole ();
+    }
   debug_printf ("decremented open_fhs, now %d", open_fhs);
   return 0;
 }

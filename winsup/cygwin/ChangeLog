@@ -1,3 +1,412 @@
+2003-03-18  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* pthread.cc (pthread_attr_init): Remove
+	(pthread_attr_destroy): Ditto.
+	(pthread_attr_setdetachstate): Ditto.
+	(pthread_attr_getdetachstate): Ditto.
+	(pthread_attr_setstacksize): Ditto.
+	(pthread_attr_getstacksize): Ditto.
+	(pthread_attr_setinheritsched): Ditto.
+	(pthread_attr_getinheritsched): Ditto.
+	(pthread_attr_setschedparam): Ditto.
+	(pthread_attr_getschedparam): Ditto.
+	(pthread_attr_setschedpolicy): Ditto.
+	(pthread_attr_getschedpolicy): Ditto.
+	(pthread_attr_setscope): Ditto.
+	(pthread_attr_getscope): Ditto.
+	(pthread_attr_setstackaddr): Ditto.
+	(pthread_attr_getstackaddr): Ditto.
+	(pthread_key_create): Ditto.
+	(pthread_key_delete): Ditto.
+	(pthread_setspecific): Ditto.
+	(pthread_getspecific): Ditto.
+	(pthread_kill): Ditto.
+	(pthread_sigmask): Ditto.
+	(pthread_equal): Ditto.
+	(pthread_mutex_lock): Ditto.
+	(pthread_mutex_trylock): Ditto.
+	(pthread_mutex_unlock): Ditto.
+	(pthread_mutex_destroy): Ditto.
+	(pthread_mutex_setprioceiling): Ditto.
+	(pthread_mutex_getprioceiling): Ditto.
+	(pthread_mutexattr_destroy): Ditto.
+	(pthread_mutexattr_getprioceiling): Ditto.
+	(pthread_mutexattr_getprotocol): Ditto.
+	(pthread_mutexattr_getpshared): Ditto.
+	(pthread_mutexattr_gettype): Ditto.
+	(pthread_mutexattr_init): Ditto.
+	(pthread_mutexattr_setprioceiling): Ditto.
+	(pthread_mutexattr_setprotocol): Ditto.
+	(pthread_mutexattr_setpshared): Ditto.
+	(pthread_mutexattr_settype): Ditto.
+	(pthread_cond_destroy): Ditto.
+	(pthread_cond_signal): Ditto.
+	(pthread_cond_broadcast): Ditto.
+	(pthread_condattr_init): Ditto.
+	(pthread_condattr_destroy): Ditto.
+	(pthread_condattr_getpshared): Ditto.
+	(pthread_condattr_setpshared): Ditto.
+	(pthread_rwlock_destroy): Ditto.
+	(pthread_rwlock_rdlock): Ditto.
+	(pthread_rwlock_tryrdlock): Ditto.
+	(pthread_rwlock_wrlock): Ditto.
+	(pthread_rwlock_trywrlock): Ditto.
+	(pthread_rwlock_unlock): Ditto.
+	(pthread_rwlockattr_init): Ditto.
+	(pthread_rwlockattr_getpshared): Ditto.
+	(pthread_rwlockattr_setpshared): Ditto.
+	(pthread_rwlockattr_destroy): Ditto.
+	(pthread_getconcurrency): Ditto.
+	(pthread_setconcurrency): Ditto.
+	(pthread_getschedparam): Ditto.
+	(pthread_setschedparam): Ditto.
+
+	* thread.h (__pthread_attr_init): Remove prototype.
+	(__pthread_attr_destroy): Ditto.
+	(__pthread_attr_setdetachstate): Ditto.
+	(__pthread_attr_getdetachstate): Ditto.
+	(__pthread_attr_setstacksize): Ditto.
+	(__pthread_attr_getstacksize): Ditto.
+	(__pthread_attr_setinheritsched): Ditto.
+	(__pthread_attr_getinheritsched): Ditto.
+	(__pthread_attr_setschedparam): Ditto.
+	(__pthread_attr_getschedparam): Ditto.
+	(__pthread_attr_setschedpolicy): Ditto.
+	(__pthread_attr_getschedpolicy): Ditto.
+	(__pthread_attr_setscope): Ditto.
+	(__pthread_attr_getscope): Ditto.
+	(__pthread_attr_setstackaddr): Ditto.
+	(__pthread_attr_getstackaddr): Ditto.
+	(__pthread_key_create): Ditto.
+	(__pthread_key_delete): Ditto.
+	(__pthread_setspecific): Ditto.
+	(__pthread_getspecific): Ditto.
+	(__pthread_kill): Ditto.
+	(__pthread_sigmask): Ditto.
+	(__pthread_equal): Ditto.
+	(__pthread_mutex_lock): Ditto.
+	(__pthread_mutex_trylock): Ditto.
+	(__pthread_mutex_unlock): Ditto.
+	(__pthread_mutex_destroy): Ditto.
+	(__pthread_mutex_setprioceiling): Ditto.
+	(__pthread_mutex_getprioceiling): Ditto.
+	(__pthread_mutexattr_destroy): Ditto.
+	(__pthread_mutexattr_getprioceiling): Ditto.
+	(__pthread_mutexattr_getprotocol): Ditto.
+	(__pthread_mutexattr_getpshared): Ditto.
+	(__pthread_mutexattr_gettype): Ditto.
+	(__pthread_mutexattr_init): Ditto.
+	(__pthread_mutexattr_setprioceiling): Ditto.
+	(__pthread_mutexattr_setprotocol): Ditto.
+	(__pthread_mutexattr_setpshared): Ditto.
+	(__pthread_mutexattr_settype): Ditto.
+	(__pthread_cond_destroy): Ditto.
+	(__pthread_cond_signal): Ditto.
+	(__pthread_cond_broadcast): Ditto.
+	(__pthread_condattr_init): Ditto.
+	(__pthread_condattr_destroy): Ditto.
+	(__pthread_condattr_getpshared): Ditto.
+	(__pthread_condattr_setpshared): Ditto.
+	(__pthread_rwlock_destroy): Ditto.
+	(__pthread_rwlock_rdlock): Ditto.
+	(__pthread_rwlock_tryrdlock): Ditto.
+	(__pthread_rwlock_wrlock): Ditto.
+	(__pthread_rwlock_trywrlock): Ditto.
+	(__pthread_rwlock_unlock): Ditto.
+	(__pthread_rwlockattr_init): Ditto.
+	(__pthread_rwlockattr_getpshared): Ditto.
+	(__pthread_rwlockattr_setpshared): Ditto.
+	(__pthread_rwlockattr_destroy): Ditto.
+	(__pthread_getconcurrency): Ditto.
+	(__pthread_setconcurrency): Ditto.
+	(__pthread_getschedparam): Ditto.
+	(__pthread_setschedparam): Ditto.
+
+	* thread.cc: Rename __pthread_equal to pthread_equal throughout.
+	Change pthread_self parameter appropriate.
+	(__pthread_attr_init): Remove __ prefix. Change to extern "C".
+	(__pthread_attr_destroy): Ditto.
+	(__pthread_attr_setdetachstate): Ditto.
+	(__pthread_attr_getdetachstate): Ditto.
+	(__pthread_attr_setstacksize): Ditto.
+	(__pthread_attr_getstacksize): Ditto.
+	(__pthread_attr_setinheritsched): Ditto.
+	(__pthread_attr_getinheritsched): Ditto.
+	(__pthread_attr_setschedparam): Ditto.
+	(__pthread_attr_getschedparam): Ditto.
+	(__pthread_attr_setschedpolicy): Ditto.
+	(__pthread_attr_getschedpolicy): Ditto.
+	(__pthread_attr_setscope): Ditto.
+	(__pthread_attr_getscope): Ditto.
+	(__pthread_attr_setstackaddr): Ditto.
+	(__pthread_attr_getstackaddr): Ditto.
+	(__pthread_key_create): Ditto.
+	(__pthread_key_delete): Ditto.
+	(__pthread_setspecific): Ditto.
+	(__pthread_getspecific): Ditto.
+	(__pthread_kill): Ditto.
+	(__pthread_sigmask): Ditto.
+	(__pthread_equal): Ditto.
+	(__pthread_mutex_lock): Ditto.
+	(__pthread_mutex_trylock): Ditto.
+	(__pthread_mutex_unlock): Ditto.
+	(__pthread_mutex_destroy): Ditto.
+	(__pthread_mutex_setprioceiling): Ditto.
+	(__pthread_mutex_getprioceiling): Ditto.
+	(__pthread_mutexattr_destroy): Ditto.
+	(__pthread_mutexattr_getprioceiling): Ditto.
+	(__pthread_mutexattr_getprotocol): Ditto.
+	(__pthread_mutexattr_getpshared): Ditto.
+	(__pthread_mutexattr_gettype): Ditto.
+	(__pthread_mutexattr_init): Ditto.
+	(__pthread_mutexattr_setprioceiling): Ditto.
+	(__pthread_mutexattr_setprotocol): Ditto.
+	(__pthread_mutexattr_setpshared): Ditto.
+	(__pthread_mutexattr_settype): Ditto.
+	(__pthread_cond_destroy): Ditto.
+	(__pthread_cond_signal): Ditto.
+	(__pthread_cond_broadcast): Ditto.
+	(__pthread_condattr_init): Ditto.
+	(__pthread_condattr_destroy): Ditto.
+	(__pthread_condattr_getpshared): Ditto.
+	(__pthread_condattr_setpshared): Ditto.
+	(__pthread_rwlock_destroy): Ditto.
+	(__pthread_rwlock_rdlock): Ditto.
+	(__pthread_rwlock_tryrdlock): Ditto.
+	(__pthread_rwlock_wrlock): Ditto.
+	(__pthread_rwlock_trywrlock): Ditto.
+	(__pthread_rwlock_unlock): Ditto.
+	(__pthread_rwlockattr_init): Ditto.
+	(__pthread_rwlockattr_getpshared): Ditto.
+	(__pthread_rwlockattr_setpshared): Ditto.
+	(__pthread_rwlockattr_destroy): Ditto.
+	(__pthread_getconcurrency): Ditto.
+	(__pthread_setconcurrency): Ditto.
+	(__pthread_getschedparam): Ditto.
+	(__pthread_setschedparam): Ditto.
+
+2003-03-18  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* cygwin.din: Add pthread_rwlock_destroy, pthread_rwlock_init,
+	pthread_rwlock_rdlock, pthread_rwlock_tryrdlock,
+	pthread_rwlock_wrlock, pthread_rwlock_trywrlock,
+	pthread_rwlock_unlock, pthread_rwlockattr_init,
+	pthread_rwlockattr_getpshared, pthread_rwlockattr_setpshared,
+	and pthread_rwlockattr_destroy.
+	* include/cygwin/version.h: Bump API minor number.
+	* include/pthread.h (PTHREAD_RWLOCK_INITIALIZER): Define a
+	reasonable value.
+	Add prototypes for pthread_rwlock_destroy, pthread_rwlock_init,
+	pthread_rwlock_rdlock, pthread_rwlock_tryrdlock,
+	pthread_rwlock_wrlock, pthread_rwlock_trywrlock,
+	pthread_rwlock_unlock, pthread_rwlockattr_init,
+	pthread_rwlockattr_getpshared, pthread_rwlockattr_setpshared,
+	and pthread_rwlockattr_destroy.
+	* thread.h (PTHREAD_ONCE_MAGIC): Remove superflous semicolon.
+	(PTHREAD_RWLOCK_MAGIC): New define.
+	(PTHREAD_RWLOCKATTR_MAGIC): Ditto.
+	(pthread_rwlockattr): New class.
+	(pthread_rwlock): Ditto.
+	(MTinterface::rwlocks): New member.
+	(MTinterface::MTinterface): Initialize rwlocks.
+	Add prototypes for __pthread_rwlock_destroy,
+	__pthread_rwlock_wrlock, __pthread_rwlock_trywrlock,
+	__pthread_rwlock_unlock, __pthread_rwlockattr_init,
+	__pthread_rwlockattr_getpshared, __pthread_rwlockattr_setpshared,
+	and __pthread_rwlockattr_destroy.
+	* thread.cc (MTinterface::Init): Initialize rwlock internal mutex.
+	(MTinterface::fixup_after_fork): Fixup rwlocks after fork.
+	(pthread_rwlockattr::isGoodObject): Implement.
+	(pthread_rwlockattr::pthread_rwlockattr): Ditto.
+	(pthread_rwlockattr::~pthread_rwlockattr): Ditto.
+	(pthread_rwlock::initMutex): Ditto.
+	(pthread_rwlock::pthread_rwlock): Ditto.
+	(pthread_rwlock::~pthread_rwlock): Ditto.
+	(pthread_rwlock::RdLock): Ditto.
+	(pthread_rwlock::TryRdLock): Ditto.
+	(pthread_rwlock::WrLock): Ditto.
+	(pthread_rwlock::TryWrLock): Ditto.
+	(pthread_rwlock::UnLock): Ditto.
+	(pthread_rwlock::addReader): Ditto.
+	(pthread_rwlock::removeReader): Ditto.
+	(pthread_rwlock::lookupReader): Ditto.
+	(pthread_rwlock::RdLockCleanup): Ditto.
+	(pthread_rwlock::WrLockCleanup): Ditto.
+	(pthread_rwlock::fixup_after_fork): Ditto.
+	(pthread_rwlock::isGoodObject): Ditto.
+	(pthread_rwlock::isGoodInitializer): Ditto.
+	(pthread_rwlock::isGoodInitializerOrObject): Ditto.
+	(pthread_rwlock::isGoodInitializerOrBadObject): Ditto.
+	(__pthread_rwlock_destroy): Ditto.
+	(pthread_rwlock::init): Ditto.
+	(__pthread_rwlock_rdlock): Ditto.
+	(__pthread_rwlock_tryrdlock): Ditto.
+	(__pthread_rwlock_wrlock): Ditto.
+	(__pthread_rwlock_trywrlock): Ditto.
+
+2003-03-18  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.h (pthread_cond::ExitingWait): Remove.
+	(pthread_cond::mutex): Ditto.
+	(pthread_cond::cond_access): Ditto.
+	(pthread_cond::win32_obj_id): Ditto.
+	(pthread_cond::TimedWait): Ditto.
+	(pthread_cond::BroadCast): Ditto.
+	(pthread_cond::Signal): Ditto.
+	(pthread_cond::waiting): Change type to unsigned long.
+	(pthread_cond::pending): New member.
+	(pthread_cond::semWait): Ditto.
+	(pthread_cond::mtxIn): Ditto.
+	(pthread_cond::mtxOut): Ditto.
+	(pthread_cond::mtxCond): Ditto.
+	(pthread_cond::UnBlock): New method.
+	(pthread_cond::Wait): Ditto.
+	* thread.cc: Update list of cancellation points.
+	(pthread_cond::pthread_cond): Rewrite.
+	(pthread_cond::~pthread_cond): Ditto.
+	(pthread_cond::TimedWait): Remove.
+	(pthread_cond::BroadCast): Ditto.
+	(pthread_cond::Signal): Ditto.
+	(pthread_cond::UnBlock): Implement.
+	(pthread_cond::Wait): Ditto.
+	(pthread_cond::fixup_after_fork): Rewrite.
+	(pthread_mutex::fixup_after_fork): Remove DETECT_BAD_APP
+	conditional.
+	(__pthread_cond_broadcast): Just return 0 if the condition is
+	not initialized. Call pthread_cond::UnBlock to release blocked
+	threads.
+	(__pthread_cond_signal): Ditto.
+	(__pthread_cond__dowait): Rewrite.
+	(pthread_cond_timedwait): Add pthread_testcancel call. Fix
+	waitlength calculation.
+	(pthread_cond_wait): Add pthread_testcancel call.
+
+2003-03-18  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* include/pthread.h (PTHREAD_MUTEX_NORMAL): New define.
+	* thread.cc: Remove errno.h include.
+	(pthread::precreate): Change internal mutex type to normal.
+	(pthread_mutex::canBeUnlocked): Implement.
+	(pthread_mutex::pthread_mutex): Initialize lock_counter with 0.
+	(pthread_mutex::Lock): Rename to _Lock. Add self parameter.
+	Change lock_counter logic. Update SetOwner call.
+	(pthread_mutex::TryLock): Rename to _TryLock. Add self parameter.
+	Change lock_counter logic. Update SetOwner call.
+	(pthread_mutex::UnLock): Rename to _UnLock. Add self parameter.
+	Change lock_counter logic.
+	(pthread_mutex::Destroy): Rename to _Destroy. Update TryLock call.
+	(pthread_mutex::SetOwner): Move to thread.h as inline.
+	(pthread_mutex::LockRecursive): Ditto.
+	(pthread_mutex::fixup_after_fork): Change lock_counter logic.
+	(__pthread_mutexattr_settype): Add PTHREAD_MUTEX_NORMAL to valid
+	types check.
+	* thread.h: Include errno.h and limits.h.
+	(MUTEX_LOCK_COUNTER_INITIAL): Remove.
+	(MUTEX_OWNER_ANONYMOUS): New define.
+	(pthread_mutex::canBeUnlocked): New static method.
+	(pthread_mutex::lock_counter): Change type to unsigned long.
+	(pthread_mutex::GetPthreadSelf): New method.
+	(pthread_mutex::Lock): Call _Lock with pthread_self pointer.
+	(pthread_mutex::TryLock): Call _TryLock with pthread_self pointer.
+	(pthread_mutex::UnLock): Call _UnLock with pthread_self pointer.
+	(pthread_mutex::Destroy): Call _Destroy with pthread_self pointer.
+	(pthread_mutex::SetOwner): Moved from thread.cc as inline.
+	(pthread_mutex::LockRecursive): Ditto.
+	(pthread_mutex::_Lock): New method.
+	(pthread_mutex::_TryLock): New method.
+	(pthread_mutex::_UnLock): New method.
+	(pthread_mutex::_Destroy): New method.
+
+2003-03-18  Christopher January  <chris@atomice.net>
+
+	* fhandler_proc.cc (format_proc_cpuinfo): Use IsProcessorFeaturePresent
+	only on Windows NT. Read CPU Mhz value only on NT. Revert previous
+	change so cpuid instruction is called even on non-NT systems.
+
+2003-03-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* glob.c (g_lstat): Change API minor test to match API minor number 
+	change in previous patch.
+	(g_stat): Ditto.
+
+2003-03-17  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Reorganize last two api versions so that
+	btowc and trunc exports show up before previous bump since there has
+	been no exported version of the DLL with the 64 bit changes yet but
+	1.3.22 will have the btowc and trunc.
+
+2003-03-17  Christopher Faylor  <cgf@redhat.com>
+
+	* cygwin.din: Export btowc, trunc.
+	* include/cygwin/version.h: Reflect new exports.
+	* syscalls.cc (_stat): Rename to stat to avoid newlib wrapper.
+	* syscalls.cc (_fstat): Ditto.
+
+2003-03-16  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_console.cc (fhandler_console::close): Correct check for
+	current tty.  Add debugging output when console is freed.
+	(set_console_state_for_spawn): Add debugging output.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Don't decrement console
+	open flag when vforking.
+	* sigproc.cc (sigproc_terminate): Fix debugging output.
+	* spawn.cc (handle): Eliminate second argument.
+	(spawn_guts): Reflect elimination of argument change to handle.
+	* syscalls.cc (setsid): Add debugging output when console is freed.
+
+2003-03-14  Christopher Faylor  <cgf@redhat.com>
+
+	* syscalls.cc (rename): Revert assumption that DELETE_ON_CLOSE works on
+	Win9x.
+
+2003-03-13  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number to 23.
+
+2003-03-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (IsProcessorFeaturePresent): Add.
+	* fhandler_proc.cc (format_proc_cpuinfo): Add case for 9x systems.
+
+2003-03-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_proc.cc (format_proc_cpuinfo): Fix vendor id in cpuid case.
+
+2003-03-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_rcmd): Use correct file descriptor in call to fdsock.
+	(cygwin_rexec): Ditto.
+
+2003-03-13  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_tty.cc (fhandler_tty_slave::close): Fix typo in debug
+	output.
+
+	* syscalls.cc (rename): Assume that DELETE_ON_CLOSE works on Win9x.
+
+2003-03-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::dup): Don't call
+	fhandler_base::dup() but call DuplicateHandle directly instead to have
+	control over socket inheritence.
+
+2003-03-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::dup): On NT systems avoid
+	using WinSock2 socket duplication methods.  Add comment.
+
+2003-03-11  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* fhandler_socket.cc (fhandler_socket::fixup_after_fork):
+	Set io_handle to INVALID_SOCKET in case of failure.
+	(fhandler_socket::dup): Return 0 if the io_handle is valid.
+
+2003-03-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_acl.cc (setacl): Don't handle DELETE flag specially.
+	* security.cc (alloc_sd): Ditto.
+
 2003-03-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* winver.rc: Change Copyright hint to include 2003.

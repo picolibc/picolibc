@@ -39,6 +39,8 @@ extern "C"
 #else
 
 #include <pthread.h>
+#include <limits.h>
+#include <errno.h>
 #include <signal.h>
 #include <pwd.h>
 #include <grp.h>
@@ -160,9 +162,11 @@ private:
 #define PTHREAD_COND_MAGIC PTHREAD_MAGIC+5
 #define PTHREAD_CONDATTR_MAGIC PTHREAD_MAGIC+6
 #define SEM_MAGIC PTHREAD_MAGIC+7
-#define PTHREAD_ONCE_MAGIC PTHREAD_MAGIC+8;
+#define PTHREAD_ONCE_MAGIC PTHREAD_MAGIC+8
+#define PTHREAD_RWLOCK_MAGIC PTHREAD_MAGIC+9
+#define PTHREAD_RWLOCKATTR_MAGIC PTHREAD_MAGIC+10
 
-#define MUTEX_LOCK_COUNTER_INITIAL   (-1)
+#define MUTEX_OWNER_ANONYMOUS        ((pthread_t) -1)
 
 /* verifyable_object should not be defined here - it's a general purpose class */
 
@@ -304,10 +308,11 @@ public:
   static bool isGoodInitializer (pthread_mutex_t const *);
   static bool isGoodInitializerOrObject (pthread_mutex_t const *);
   static bool isGoodInitializerOrBadObject (pthread_mutex_t const *mutex);
+  static bool canBeUnlocked (pthread_mutex_t const *mutex);
   static void initMutex ();
   static int init (pthread_mutex_t *, const pthread_mutexattr_t *);
 
-  LONG lock_counter;
+  unsigned long lock_counter;
   HANDLE win32_obj_id;
   unsigned int recursion_counter;
   LONG condwaits;
@@ -316,12 +321,43 @@ public:
   int pshared;
   class pthread_mutex * next;
 
-  int Lock ();
-  int TryLock ();
-  int UnLock ();
-  int Destroy ();
-  void SetOwner ();
-  int LockRecursive ();
+  pthread_t GetPthreadSelf () const
+  {
+    return PTHREAD_MUTEX_NORMAL == type ? MUTEX_OWNER_ANONYMOUS :
+      ::pthread_self ();
+  }
+
+  int Lock ()
+  {
+    return _Lock (GetPthreadSelf ());
+  }
+  int TryLock ()
+  {
+    return _TryLock (GetPthreadSelf ());
+  }
+  int UnLock ()
+  {
+    return _UnLock (GetPthreadSelf ());
+  }
+  int Destroy ()
+  {
+    return _Destroy (GetPthreadSelf ());
+  }
+
+  void SetOwner (pthread_t self)
+  {
+    recursion_counter = 1;
+    owner = self;
+  }
+
+  int LockRecursive ()
+  {
+    if (UINT_MAX == recursion_counter)
+      return EAGAIN;
+    ++recursion_counter;
+    return 0;
+  }
+
   void fixup_after_fork ();
 
   pthread_mutex (pthread_mutexattr * = NULL);
@@ -329,6 +365,11 @@ public:
   ~pthread_mutex ();
 
 private:
+  int _Lock (pthread_t self);
+  int _TryLock (pthread_t self);
+  int _UnLock (pthread_t self);
+  int _Destroy (pthread_t self);
+
   static nativeMutex mutexInitializationLock;
 };
 
@@ -455,16 +496,20 @@ public:
   static int init (pthread_cond_t *, const pthread_condattr_t *);
 
   int shared;
-  LONG waiting;
-  LONG ExitingWait;
-  pthread_mutex *mutex;
-  /* to allow atomic behaviour for cond_broadcast */
-  pthread_mutex_t cond_access;
-  HANDLE win32_obj_id;
+
+  unsigned long waiting;
+  unsigned long pending;
+  HANDLE semWait;
+
+  pthread_mutex mtxIn;
+  pthread_mutex mtxOut;
+
+  pthread_mutex_t mtxCond;
+
   class pthread_cond * next;
-  int TimedWait (DWORD dwMilliseconds);
-  void BroadCast ();
-  void Signal ();
+
+  void UnBlock (const bool all);
+  int Wait (pthread_mutex_t mutex, DWORD dwMilliseconds = INFINITE);
   void fixup_after_fork ();
 
   pthread_cond (pthread_condattr *);
@@ -472,6 +517,67 @@ public:
 
 private:
   static nativeMutex condInitializationLock;
+};
+
+class pthread_rwlockattr:public verifyable_object
+{
+public:
+  static bool isGoodObject(pthread_rwlockattr_t const *);
+  int shared;
+
+  pthread_rwlockattr ();
+  ~pthread_rwlockattr ();
+};
+
+class pthread_rwlock:public verifyable_object
+{
+public:
+  static bool isGoodObject (pthread_rwlock_t const *);
+  static bool isGoodInitializer (pthread_rwlock_t const *);
+  static bool isGoodInitializerOrObject (pthread_rwlock_t const *);
+  static bool isGoodInitializerOrBadObject (pthread_rwlock_t const *);
+  static void initMutex ();
+  static int init (pthread_rwlock_t *, const pthread_rwlockattr_t *);
+
+  int shared;
+
+  unsigned long waitingReaders;
+  unsigned long waitingWriters;
+  pthread_t writer;
+  struct RWLOCK_READER
+  {
+    struct RWLOCK_READER *next;
+    pthread_t thread;
+  } *readers;
+
+  int RdLock ();
+  int TryRdLock ();
+
+  int WrLock ();
+  int TryWrLock ();
+
+  int UnLock ();
+
+  pthread_mutex mtx;
+  pthread_cond condReaders;
+  pthread_cond condWriters;
+
+  class pthread_rwlock * next;
+
+  void fixup_after_fork ();
+
+  pthread_rwlock (pthread_rwlockattr *);
+  ~pthread_rwlock ();
+
+private:
+  void addReader (struct RWLOCK_READER *rd);
+  void removeReader (struct RWLOCK_READER *rd);
+  struct RWLOCK_READER *lookupReader (pthread_t thread);
+
+  static void RdLockCleanup (void *arg);
+  static void WrLockCleanup (void *arg);
+
+  static nativeMutex rwlockInitializationLock;
 };
 
 class pthread_once
@@ -531,6 +637,7 @@ public:
   // lists of pthread objects. USE THREADSAFE INSERTS AND DELETES.
   class pthread_mutex * mutexs;
   class pthread_cond  * conds;
+  class pthread_rwlock * rwlocks;
   class semaphore     * semaphores;
 
   pthread_key reent_key;
@@ -543,7 +650,7 @@ public:
   MTinterface () :
     concurrency (0), threadcount (1),
     pthread_prepare (NULL), pthread_child (NULL), pthread_parent (NULL),
-    mutexs (NULL), conds (NULL), semaphores (NULL),
+    mutexs (NULL), conds (NULL), rwlocks (NULL), semaphores (NULL),
     reent_key (NULL), thread_self_key (NULL)
   {
   }
@@ -551,84 +658,6 @@ public:
 
 #define MT_INTERFACE user_data->threadinterface
 
-extern "C"
-{
-int __pthread_attr_init (pthread_attr_t * attr);
-int __pthread_attr_destroy (pthread_attr_t * attr);
-int __pthread_attr_setdetachstate (pthread_attr_t *, int);
-int __pthread_attr_getdetachstate (const pthread_attr_t *, int *);
-int __pthread_attr_setstacksize (pthread_attr_t * attr, size_t size);
-int __pthread_attr_getstacksize (const pthread_attr_t * attr, size_t * size);
-
-int __pthread_attr_getinheritsched (const pthread_attr_t *, int *);
-int __pthread_attr_getschedparam (const pthread_attr_t *,
-				  struct sched_param *);
-int __pthread_attr_getschedpolicy (const pthread_attr_t *, int *);
-int __pthread_attr_getscope (const pthread_attr_t *, int *);
-int __pthread_attr_getstackaddr (const pthread_attr_t *, void **);
-int __pthread_attr_setinheritsched (pthread_attr_t *, int);
-int __pthread_attr_setschedparam (pthread_attr_t *,
-				  const struct sched_param *);
-int __pthread_attr_setschedpolicy (pthread_attr_t *, int);
-int __pthread_attr_setscope (pthread_attr_t *, int);
-int __pthread_attr_setstackaddr (pthread_attr_t *, void *);
-
-/* Thread SpecificData */
-int __pthread_key_create (pthread_key_t * key, void (*destructor) (void *));
-int __pthread_key_delete (pthread_key_t key);
-int __pthread_setspecific (pthread_key_t key, const void *value);
-void *__pthread_getspecific (pthread_key_t key);
-
-/* Thead synchroniation */
-int __pthread_cond_destroy (pthread_cond_t * cond);
-int __pthread_cond_signal (pthread_cond_t * cond);
-int __pthread_cond_broadcast (pthread_cond_t * cond);
-int __pthread_condattr_init (pthread_condattr_t * condattr);
-int __pthread_condattr_destroy (pthread_condattr_t * condattr);
-int __pthread_condattr_getpshared (const pthread_condattr_t * attr,
-				   int *pshared);
-int __pthread_condattr_setpshared (pthread_condattr_t * attr, int pshared);
-
-/* Thread signal */
-int __pthread_kill (pthread_t thread, int sig);
-int __pthread_sigmask (int operation, const sigset_t * set,
-		       sigset_t * old_set);
-
-/*  ID */
-int __pthread_equal (pthread_t * t1, pthread_t * t2);
-
-/* Mutexes  */
-int __pthread_mutex_lock (pthread_mutex_t *);
-int __pthread_mutex_trylock (pthread_mutex_t *);
-int __pthread_mutex_unlock (pthread_mutex_t *);
-int __pthread_mutex_destroy (pthread_mutex_t *);
-int __pthread_mutex_setprioceiling (pthread_mutex_t * mutex,
-				    int prioceiling, int *old_ceiling);
-int __pthread_mutex_getprioceiling (const pthread_mutex_t * mutex,
-				    int *prioceiling);
-
-
-int __pthread_mutexattr_destroy (pthread_mutexattr_t *);
-int __pthread_mutexattr_getprioceiling (const pthread_mutexattr_t *, int *);
-int __pthread_mutexattr_getprotocol (const pthread_mutexattr_t *, int *);
-int __pthread_mutexattr_getpshared (const pthread_mutexattr_t *, int *);
-int __pthread_mutexattr_gettype (const pthread_mutexattr_t *, int *);
-int __pthread_mutexattr_init (pthread_mutexattr_t *);
-int __pthread_mutexattr_setprioceiling (pthread_mutexattr_t *, int);
-int __pthread_mutexattr_setprotocol (pthread_mutexattr_t *, int);
-int __pthread_mutexattr_setpshared (pthread_mutexattr_t *, int);
-int __pthread_mutexattr_settype (pthread_mutexattr_t *, int);
-
-
-/* Scheduling */
-int __pthread_getconcurrency (void);
-int __pthread_setconcurrency (int new_level);
-int __pthread_getschedparam (pthread_t thread, int *policy,
-			     struct sched_param *param);
-int __pthread_setschedparam (pthread_t thread, int policy,
-			     const struct sched_param *param);
-
-};
 #endif // MT_SAFE
 
 #endif // _CYGNUS_THREADS_
