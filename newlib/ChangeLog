@@ -1,3 +1,9 @@
+2000-08-09  Nick Clifton  <nickc@cygnus.com>
+
+	* libc/sys/arm/setjmp.S: Recode to clean up function prologues and
+	epilogue and to allow the functions to be used in a Thumb based
+	toolchain.
+
 2000-08-08  Jeff Johnston <jjohnstn@redhat.com>
 
 	* libc/stdio/snprintf.c (snprintf, _snprintf_r): Fixed code
