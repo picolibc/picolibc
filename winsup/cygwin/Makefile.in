@@ -136,7 +136,7 @@ LIBCOS:=${sort ${addsuffix .o,${basename ${notdir ${wildcard $(srcdir)/lib/*.c}}
 
 EXTRA_DLL_OFILES:=${addsuffix .o,${basename ${notdir ${wildcard $(CONFIG_DIR)/*.c}}}}
 
-EXTRA_OFILES=$(bupdir1)/libiberty/random.o $(bupdir1)/libiberty/strsignal.o
+EXTRA_OFILES=$(bupdir1)/libiberty/random.o $(bupdir1)/libiberty/strsignal.o alloca.o
 
 MALLOC_OFILES=@MALLOC_OFILES@
 

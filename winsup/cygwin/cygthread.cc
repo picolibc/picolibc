@@ -141,6 +141,8 @@ new (size_t)
 #ifdef DEBUGGING
 	if (info->__name)
 	  api_fatal ("name not NULL? id %p, i %d", id, info - threads);
+	if (!info->h)
+	  api_fatal ("h not set? id %p, i %d", id, info - threads);
 #endif
 	goto out;
       }

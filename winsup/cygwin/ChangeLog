@@ -1,5 +1,18 @@
+2003-04-02  Jason Tishler <jason@tishler.net>
+	    Christopher Faylor  <cgf@redhat.com>
+
+	* external.cc (check_ntsec): New function.
+	(cygwin_internal): Add CW_CHECK_NTSEC handling to call check_ntsec()
+	from applications.
+	* include/cygwin/version.h: Bump API minor number.
+	* include/sys/cygwin.h (cygwin_getinfo_types): Add CW_CHECK_NTSEC.
+
+2003-04-02  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::new): Add more defensive debugging.
+
 2003-04-01  Pierre Humblet  <pierre.humblet@ieee.org>
-	
+
 	* fhandler.cc (fhandler_base::fstat): Set the uid and gid fields
 	from the current effective ids.
 	* fhandler_socket.cc (fhandler_socket::fstat): Keep the uid and gid set
