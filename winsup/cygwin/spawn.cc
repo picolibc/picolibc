@@ -709,21 +709,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 		       &pi);
     }
 
-  /* FIXME: There is a small race here */
-
-  DWORD res;
-  pthread_cleanup cleanup;
-  pthread_cleanup_push (do_cleanup, (void *) &cleanup);
-  if (mode == _P_SYSTEM)
-    {
-      sigset_t child_block;
-      cleanup.oldint = signal (SIGINT, SIG_IGN);
-      cleanup.oldquit = signal (SIGQUIT, SIG_IGN);
-      sigemptyset (&child_block);
-      sigaddset (&child_block, SIGCHLD);
-      (void) sigprocmask (SIG_BLOCK, &child_block, &cleanup.oldmask);
-    }
-
   /* Restore impersonation. In case of _P_OVERLAY this isn't
      allowed since it would overwrite child data. */
   if (mode != _P_OVERLAY)
@@ -745,6 +730,21 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	ForceCloseHandle (subproc_ready);
       cygheap_setup_for_child_cleanup (newheap, &ciresrv, 0);
       return -1;
+    }
+
+  /* FIXME: There is a small race here */
+
+  DWORD res;
+  pthread_cleanup cleanup;
+  pthread_cleanup_push (do_cleanup, (void *) &cleanup);
+  if (mode == _P_SYSTEM)
+    {
+      sigset_t child_block;
+      cleanup.oldint = signal (SIGINT, SIG_IGN);
+      cleanup.oldquit = signal (SIGQUIT, SIG_IGN);
+      sigemptyset (&child_block);
+      sigaddset (&child_block, SIGCHLD);
+      (void) sigprocmask (SIG_BLOCK, &child_block, &cleanup.oldmask);
     }
 
   /* Fixup the parent datastructure if needed and resume the child's
