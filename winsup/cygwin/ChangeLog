@@ -1,3 +1,24 @@
+2002-10-22  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::exiting): New variable.
+	(cygthread::initialized): Delete.
+	(cygthread::stub): Use exiting variable to determine when to exit.
+	(cygthread::runner): Delete.
+	(cygthread_protect): New variable.
+	(cygthread::init): Don't start runner thread.  Initialize muto for list
+	protection.
+	(cygthread::freerange): Return pointer to cygthread.
+	(cygthread::operator new): Change logic to start threads on an
+	as-needed basis.
+	(cygthread::detach): Don't zero id.
+	(cygthread::terminate): Don't kill any executing threads.  Just set
+	exiting flag.
+	* cygthread.h (cygthread): Reflect above changes.
+	* dcrt0.cc (dll_crt0_1): Move cygthread initialization later.
+
+	* fork.cc (fork_child): Do fdtab fixup after dll fixup or (apparently)
+	winsock may allocate memory in dll load address.
+
 2002-10-22  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* sec_helper.cc (cygsid::get_id): If the sid matches a sid stored in

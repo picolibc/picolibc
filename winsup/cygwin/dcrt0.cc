@@ -573,10 +573,7 @@ dll_crt0_1 ()
   char **envp = NULL;
 
   if (!child_proc_info)
-    {
-      cygthread::init ();
-      memory_init ();
-    }
+    memory_init ();
   else
     {
       bool close_ppid_handle = false;
@@ -587,7 +584,6 @@ dll_crt0_1 ()
 	    alloc_stack (fork_info);
 	    cygheap_fixup_in_child (0);
 	    memory_init ();
-	    cygthread::init ();
 	    set_myself (mypid);
 	    close_ppid_handle = !!child_proc_info->pppid_handle;
 	    break;
@@ -600,7 +596,6 @@ dll_crt0_1 ()
 	    hexec_proc = spawn_info->hexec_proc;
 	  around:
 	    HANDLE h;
-	    cygthread::init ();
 	    cygheap_fixup_in_child (1);
 	    memory_init ();
 	    if (!spawn_info->moreinfo->myself_pinfo ||
@@ -621,7 +616,6 @@ dll_crt0_1 ()
 		old_title = strcpy (title_buf, spawn_info->moreinfo->old_title);
 		cfree (spawn_info->moreinfo->old_title);
 	      }
-	    // cygthread::init ();
 	    break;
 	}
       if (close_hexec_proc)
@@ -632,6 +626,7 @@ dll_crt0_1 ()
 
   ProtectHandle (hMainProc);
   ProtectHandle (hMainThread);
+  cygthread::init ();
 
   /* Initialize debug muto, if DLL is built with --enable-debugging.
      Need to do this before any helper threads start. */

@@ -18,9 +18,7 @@ class cygthread
   VOID *arg;
   bool is_freerange;
   static DWORD main_thread_id;
-  static int initialized;
-  static DWORD WINAPI runner (VOID *);
-  static DWORD WINAPI free_runner (VOID *);
+  static bool exiting;
   static DWORD WINAPI stub (VOID *);
   static DWORD WINAPI simplestub (VOID *);
  public:
@@ -32,7 +30,7 @@ class cygthread
   operator HANDLE ();
   static bool is ();
   void * operator new (size_t);
-  static void * freerange ();
+  static cygthread *freerange ();
   void exit_thread ();
   static void terminate ();
   bool SetThreadPriority (int nPriority) {return ::SetThreadPriority (h, nPriority);}

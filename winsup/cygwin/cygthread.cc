@@ -12,6 +12,7 @@ details. */
 #include "exceptions.h"
 #include "security.h"
 #include "cygthread.h"
+#include "sync.h"
 
 #undef CloseHandle
 
@@ -19,7 +20,7 @@ static cygthread NO_COPY threads[9];
 #define NTHREADS (sizeof (threads) / sizeof (threads[0]))
 
 DWORD NO_COPY cygthread::main_thread_id;
-int NO_COPY cygthread::initialized;
+bool NO_COPY cygthread::exiting;
 
 /* Initial stub called by cygthread constructor. Performs initial
    per-thread initialization and loops waiting for new thread functions
@@ -48,7 +49,7 @@ cygthread::stub (VOID *arg)
 	system_printf ("erroneous thread activation");
       else
 	{
-	  if (!info->func || initialized < 0)
+	  if (!info->func || exiting)
 	    ExitThread (0);
 
 	  /* Cygwin threads should not call ExitThread directly */
@@ -89,33 +90,12 @@ cygthread::simplestub (VOID *arg)
   ExitThread (0);
 }
 
-/* This function runs in a secondary thread and starts up a bunch of
-   other suspended threads for use in the cygthread pool. */
-DWORD WINAPI
-cygthread::runner (VOID *arg)
-{
-  for (unsigned i = 0; i < NTHREADS; i++)
-    if (!initialized)
-      threads[i].h = CreateThread (&sec_none_nih, 0, cygthread::stub,
-				   &threads[i], CREATE_SUSPENDED,
-				   &threads[i].avail);
-    else
-      ExitThread (0);
-
-  initialized ^= 1;
-  ExitThread (0);
-}
-
-HANDLE NO_COPY runner_handle;
-DWORD NO_COPY runner_tid;
+static NO_COPY muto *cygthread_protect;
 /* Start things going.  Called from dll_crt0_1. */
 void
 cygthread::init ()
 {
-  runner_handle = CreateThread (&sec_none_nih, 0, cygthread::runner, NULL, 0,
-				&runner_tid);
-  if (!runner_handle)
-    api_fatal ("can't start thread_runner, %E");
+  new_muto (cygthread_protect);
   main_thread_id = GetCurrentThreadId ();
 }
 
@@ -131,7 +111,7 @@ cygthread::is ()
   return 0;
 }
 
-void *
+cygthread *
 cygthread::freerange ()
 {
   cygthread *self = (cygthread *) calloc (1, sizeof (*self));
@@ -148,39 +128,36 @@ new (size_t)
   DWORD id;
   cygthread *info;
 
-  for (;;)
-    {
-      int was_initialized = initialized;
-      if (was_initialized < 0)
-	ExitThread (0);
+  cygthread_protect->acquire ();
 
-      /* Search the threads array for an empty slot to use */
-      for (info = threads + NTHREADS - 1; info >= threads; info--)
-	if ((id = (DWORD) InterlockedExchange ((LPLONG) &info->avail, 0)))
-	  {
-	    info->id = id;
+  /* Search the threads array for an empty slot to use */
+  for (info = threads; info < threads + NTHREADS; info++)
+    if ((id = (DWORD) InterlockedExchange ((LPLONG) &info->avail, 0)))
+      {
 #ifdef DEBUGGING
-	    if (info->__name)
-	      api_fatal ("name not NULL? id %p, i %d", id, info - threads);
+	if (info->__name)
+	  api_fatal ("name not NULL? id %p, i %d", id, info - threads);
 #endif
-	    return info;
-	  }
+	goto out;
+      }
+    else if (!info->id)
+      {
+	info->h = CreateThread (&sec_none_nih, 0, cygthread::stub, info,
+				CREATE_SUSPENDED, &info->id);
+	goto out;
+      }
 
-      if (was_initialized < 0)
-	ExitThread (0);
-
-      if (!was_initialized)
-	Sleep (0); /* thread_runner is not finished yet. */
-      else
-	{
 #ifdef DEBUGGING
-	  char buf[1024];
-	  if (!GetEnvironmentVariable ("CYGWIN_NOFREERANGE_NOCHECK", buf, sizeof (buf)))
-	    api_fatal ("Overflowed cygwin thread pool");
+  char buf[1024];
+  if (!GetEnvironmentVariable ("CYGWIN_NOFREERANGE_NOCHECK", buf, sizeof (buf)))
+    api_fatal ("Overflowed cygwin thread pool");
 #endif
-	  return freerange ();
-	}
-    }
+
+  info = freerange ();	/* exhausted thread pool */
+
+out:
+  cygthread_protect->release ();
+  return info;
 }
 
 cygthread::cygthread (LPTHREAD_START_ROUTINE start, LPVOID param,
@@ -200,9 +177,7 @@ cygthread::cygthread (LPTHREAD_START_ROUTINE start, LPVOID param,
       Sleep (0);
     }
 #endif
-  __name = name;	/* Need to set after thread has woken up to
-			   ensure that it won't be cleared by exiting
-			   thread. */
+  __name = name;
   if (!thread_sync)
     ResumeThread (h);
   else
@@ -278,7 +253,6 @@ cygthread::detach ()
 	}
       else
 	{
-	  id = 0;
 	  ResetEvent (*this);
 	  /* Mark the thread as available by setting avail to non-zero */
 	  (void) InterlockedExchange ((LPLONG) &this->avail, avail);
@@ -289,37 +263,5 @@ cygthread::detach ()
 void
 cygthread::terminate ()
 {
-  /* Wow.  All of this seems to be necessary or (on Windows 9x at least) the
-     process will sometimes deadlock if there are suspended threads.  I assume
-     that something funky is happening like a suspended thread being created
-     while the process is exiting or something.  In particular, it seems like
-     the WaitForSingleObjects are necessary since it appears that the
-     TerminateThread call may happen asynchronously, i.e., when TerminateThread
-     returns, the thread may not yet have terminated. */
-  if (runner_handle && initialized >= 0)
-    {
-      /* Don't care about detaching (or attaching) threads now */
-      if (cygwin_hmodule && !DisableThreadLibraryCalls (cygwin_hmodule))
-	system_printf ("DisableThreadLibraryCalls (%p) failed, %E",
-		       cygwin_hmodule);
-      initialized = -1;
-      (void) TerminateThread (runner_handle, 0);
-      (void) WaitForSingleObject (runner_handle, INFINITE);
-      (void) CloseHandle (runner_handle);
-      HANDLE hthreads[NTHREADS];
-      int n = 0;
-      for (unsigned i = 0; i < NTHREADS; i++)
-	if (threads[i].h)
-	  {
-	    hthreads[n] = threads[i].h;
-	    threads[i].h = NULL;
-	    TerminateThread (hthreads[n++], 0);
-	  }
-      if (n)
-	{
-	  (void) WaitForMultipleObjects (n, hthreads, TRUE, INFINITE);
-	  while (--n >= 0)
-	    CloseHandle (hthreads[n]);
-	}
-    }
+  exiting = 1;
 }

@@ -281,8 +281,6 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   if (fixup_mmaps_after_fork (hParent))
     api_fatal ("recreate_mmaps_after_fork_failed");
 
-  cygheap->fdtab.fixup_after_fork (hParent);
-  ProtectHandleINH (hParent);
 
   MALLOC_CHECK;
 
@@ -291,10 +289,16 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
       that we're done, and wait for the parent to fill in the.
       loaded dlls' data/bss. */
   if (!load_dlls)
-    sync_with_parent ("performed fork fixup.", FALSE);
+    {
+      cygheap->fdtab.fixup_after_fork (hParent);
+      ProtectHandleINH (hParent);
+      sync_with_parent ("performed fork fixup.", FALSE);
+    }
   else
     {
       dlls.load_after_fork (hParent, first_dll);
+      cygheap->fdtab.fixup_after_fork (hParent);
+      ProtectHandleINH (hParent);
       sync_with_parent ("loaded dlls", TRUE);
     }
 
