@@ -1141,7 +1141,5 @@ fhandler_socket::set_close_on_exec (int val)
 void
 fhandler_socket::set_sun_path (const char *path)
 {
-  if (sun_path)
-    cfree (sun_path);
-  sun_path = cstrdup (path);
+  sun_path = path ? cstrdup (path) : NULL;
 }
