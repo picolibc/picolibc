@@ -11,7 +11,6 @@ details. */
 /* FIXME: Access permissions are ignored at the moment.  */
 
 #include "winsup.h"
-#include <sys/fcntl.h>
 #include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -481,8 +480,8 @@ fhandler_registry::open (path_conv *pc, int flags, mode_t mode)
 
 success:
   res = 1;
+  set_flags (flags & ~O_TEXT, O_BINARY);
   set_open_status ();
-  set_flags (flags);
 out:
   if (hKey != (HKEY) INVALID_HANDLE_VALUE)
     RegCloseKey (hKey);

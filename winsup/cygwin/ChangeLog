@@ -1,3 +1,52 @@
+2002-06-04  Christopher Faylor  <cgf@redhat.com>
+
+	Remove fcntl.h includes throughout.
+	* fhandler.h: Move fcntl.h include here.
+	(fhandler_base::set_flags): Accept supplied_bin argument.  Make
+	non-inlined.
+	* dtable.cc (dtable::init_std_file_from_handle): Just use binmode from
+	pc.
+	(reset_to_open_binmode): Use set_flags.
+	* cygwin.din (open): Avoid newlib wrapper.
+	(read): Ditto.
+	(unlink): Ditto.
+	(write): Ditto.
+	* fhandler.cc (fhandler_base::set_flags): Accept supplied_bin argument.
+	Make binmode decisions here.
+	(fhandler_base::open): Avoid using pc if it is NULL.  Eliminate binmode
+	logic.  Just call set_flags with binmode argument.
+	(fhandler_base::init): Call set_flags with binmode argument.
+	* fhandler_clipboard.cc (fhandler_dev_clipboard::open): Ditto.
+	* fhandler_console.cc (fhandler_console::open): Ditto.
+	(fhandler_console::init): Force binary on open.
+	* fhandler_disk_file.cc (fhandler_disk_file::open): Don't set binmode
+	here.  Let it happen in base class.
+	* fhandler_dsp.cc (fhandler_dev_dsp::open): Force binmode open.  Set
+	return value appropriately if unable to open.
+	* fhandler_proc.cc (fhandler_proc::open): Make sure flags are set
+	before open_status.
+	* fhandler_process.cc (fhandler_process::open): Ditto.
+	* fhandler_registry.cc (fhandler_registry::open): Ditto.
+	* fhandler_random.cc (fhandler_dev_random::fhandler_dev_random): Ditto.
+	* fhandler_raw.cc (fhandler_dev_raw::open): Force O_BINARY by default.
+	* fhandler_serial.cc (fhandler_serial::init): Ditto.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Ditto.
+	(fhandler_pty_master::open): Ditto.
+	* fhandler_virtual.cc (fhandler_virtual::open): Ditto.
+	* fhandler_windows.cc (fhandler_windows::open): Ditto.
+	* fhandler_zero.cc (fhandler_dev_zero::open): Ditto.
+	* net.cc (fdsock): Ditto.
+	* path.cc (path_conv::check): Avoid checking for executable extension
+	when directory. (Suggested by Pavel Tsekov)
+	(set_flags): Set PATH_TEXT explicitly, when appropriate.
+	(mount_info::conv_to_win32_path): Use set_flags() to set path flags.
+	* path.h (PATH_TEXT): New enum.
+	(path_conv::binmode): Return appropriate constant based on binmode.
+	* pipe.cc (make_pipe): Set binmode to O_TEXT xor O_BINARY.
+	* syscalls.cc (setmode_helper): Make debugging message a little
+	clearer.
+	(setmode): Set binmode via set_flags.
+
 2002-06-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (class fhandler_socket): Add private method
@@ -69,14 +118,14 @@
 	(create_token): Delete logonserver and call to get_logon_server.
 	Adjust arguments of get_group_sidlist, see above.
 	* security.h: Delete declaration of get_logon_server_and_user_domain
-	and add declaration of get_logon_server. 
+	and add declaration of get_logon_server.
 	* uinfo.cc (internal_get_login): Call get_logon_server instead of
 	get_logon_server_and_user_domain.
 
 2002-06-02  Christopher Faylor  <cgf@redhat.com>
 
-        * dtable.cc (handle_to_fn): Use largest match for device.  Correctly
-        (?) deal with remote drive weirdness.
+	* dtable.cc (handle_to_fn): Use largest match for device.  Correctly
+	(?) deal with remote drive weirdness.
 
 2002-06-02  Christopher Faylor  <cgf@redhat.com>
 

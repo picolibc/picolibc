@@ -12,7 +12,6 @@ details. */
 #include <sys/termios.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
 #include <wingdi.h>
@@ -547,9 +546,7 @@ fhandler_console::open (path_conv *, int flags, mode_t)
   set_io_handle (INVALID_HANDLE_VALUE);
   set_output_handle (INVALID_HANDLE_VALUE);
 
-  set_flags (flags);
-  set_w_binary (1);
-  set_r_binary (1);
+  set_flags (flags & ~O_TEXT, O_BINARY);
 
   /* Open the input handle as handle_ */
   h = CreateFileA ("CONIN$", GENERIC_READ|GENERIC_WRITE,
@@ -1700,19 +1697,18 @@ get_nonascii_key (INPUT_RECORD& input_rec, char *tmp)
 void
 fhandler_console::init (HANDLE f, DWORD a, mode_t bin)
 {
-  this->fhandler_termios::init (f, a, bin);
-
+  // this->fhandler_termios::init (f, mode, bin);
   /* Ensure both input and output console handles are open */
-  int mode = 0;
+  int flags = 0;
 
   a &= GENERIC_READ | GENERIC_WRITE;
   if (a == GENERIC_READ)
-    mode = O_RDONLY;
+    flags = O_RDONLY;
   if (a == GENERIC_WRITE)
-    mode = O_WRONLY;
+    flags = O_WRONLY;
   if (a == (GENERIC_READ | GENERIC_WRITE))
-    mode = O_RDWR;
-  open ((path_conv *) NULL, mode);
+    flags = O_RDWR;
+  open ((path_conv *) NULL, flags | O_BINARY);
   if (f != INVALID_HANDLE_VALUE)
     CloseHandle (f);	/* Reopened by open */
 

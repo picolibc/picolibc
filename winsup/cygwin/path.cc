@@ -52,7 +52,6 @@ details. */
 #include <stdlib.h>
 #include <sys/mount.h>
 #include <mntent.h>
-#include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
 #include <ctype.h>
@@ -803,7 +802,7 @@ out:
   if (saw_symlinks)
     set_has_symlinks ();
 
-  if (!error && !(path_flags & PATH_ALL_EXEC))
+  if (!error && !isdir () && !(path_flags & PATH_ALL_EXEC))
     {
       const char *p = strchr (path, '\0') - 4;
       if (p >= path &&
@@ -1342,6 +1341,14 @@ mount_info::init ()
   from_registry ();
 }
 
+static void
+set_flags (unsigned *flags, unsigned val)
+{
+  *flags = val;
+  if (!(*flags & PATH_BINARY))
+    *flags = PATH_TEXT;
+}
+
 /* conv_to_win32_path: Ensure src_path is a pure Win32 path and store
    the result in win32_path.
 
@@ -1404,7 +1411,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
 	  return rc;
 	}
 
-      *flags = set_flags_from_win32_path (dst);
+      set_flags (flags, (unsigned) set_flags_from_win32_path (dst));
       goto out;
     }
 
@@ -1433,7 +1440,6 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
       if (rc)
 	{
 	  debug_printf ("%d = conv_to_win32_path (%s)", rc, src_path);
-	  *flags = 0;
 	  return rc;
 	}
     }
@@ -1468,7 +1474,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
 	}
       else if (cygdrive_win32_path (pathbuf, dst, unit))
 	{
-	  *flags = cygdrive_flags;
+	  set_flags (flags, (unsigned) cygdrive_flags);
 	  goto out;
 	}
       else if (mount_table->cygdrive_len > 1)
@@ -1506,10 +1512,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
     }
 
   if (i >= nmounts)
-    {
-      backslashify (pathbuf, dst, 0);	/* just convert */
-      *flags = PATH_BINARY;		/* Default to binmode */
-    }
+    backslashify (pathbuf, dst, 0);	/* just convert */
   else
     {
       int n;
@@ -1538,7 +1541,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
 	dst[n++] = '\\';
       strcpy (dst + n, p);
       backslashify (dst, dst, 0);
-      *flags = mi->flags;
+      set_flags (flags, (unsigned) mi->flags);
     }
 
   if (!isvirtual_dev (devn))

@@ -9,7 +9,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -201,8 +200,7 @@ fhandler_serial::dump (void)
 void
 fhandler_serial::init (HANDLE f, DWORD flags, mode_t bin)
 {
-  fhandler_base::init (f, flags, bin);
-  (void) open (NULL, flags, bin ? O_BINARY : 0);
+  (void) open (NULL, flags, bin & (O_BINARY | O_TEXT));
 }
 
 int

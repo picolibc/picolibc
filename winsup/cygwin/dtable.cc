@@ -16,7 +16,6 @@ details. */
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <fcntl.h>
 #include <sys/cygwin.h>
 #include <assert.h>
 #include <ntdef.h>
@@ -216,7 +215,6 @@ cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
 void
 dtable::init_std_file_from_handle (int fd, HANDLE handle, DWORD myaccess)
 {
-  int bin = -1;
   const char *name;
   CONSOLE_SCREEN_BUFFER_INFO buf;
   struct sockaddr sa;
@@ -234,20 +232,13 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle, DWORD myaccess)
     name = NULL;
   else
     {
-      if (__fmode)
-	bin = __fmode;
-      else
-	bin = (int) binmode ?: -1;
-
-      /* See if we can consoleify it  - if it is a console,
-       don't open it in binary.  That will screw up our crlfs*/
+      /* See if we can consoleify it */
       if (GetConsoleScreenBufferInfo (handle, &buf))
 	{
 	  if (ISSTATE (myself, PID_USETTY))
 	    name = "/dev/tty";
 	  else
 	    name = "/dev/conout";
-	  bin = 0;
 	}
       else if (GetNumberOfConsoleInputEvents (handle, (DWORD *) &buf))
 	{
@@ -255,7 +246,6 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle, DWORD myaccess)
 	    name = "/dev/tty";
 	  else
 	    name = "/dev/conin";
-	  bin = 0;
 	}
       else if (ft == FILE_TYPE_PIPE)
 	{
@@ -263,8 +253,6 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle, DWORD myaccess)
 	    name = "/dev/piper";
 	  else
 	    name = "/dev/pipew";
-	  if (bin == 0)
-	    bin = O_BINARY;
 	}
       else if (wsock_started && getpeername ((SOCKET) handle, &sa, &sal) == 0)
 	name = "/dev/socket";
@@ -280,7 +268,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle, DWORD myaccess)
     {
       path_conv pc;
       build_fhandler_from_name (fd, name, handle, pc)->init (handle, myaccess,
-							     bin < 0 ? pc.isbinary () : bin);
+							     pc.binmode ());
       set_std_handle (fd);
       paranoid_printf ("fd %d, handle %p", fd, handle);
     }

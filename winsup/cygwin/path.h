@@ -47,6 +47,7 @@ enum path_types
   PATH_NOTEXEC = MOUNT_NOTEXEC,
   PATH_CYGWIN_EXEC = MOUNT_CYGWIN_EXEC,
   PATH_ALL_EXEC = (PATH_CYGWIN_EXEC | PATH_EXEC),
+  PATH_TEXT =	      0x02000000,
   PATH_ISDISK =	      0x04000000,
   PATH_HAS_SYMLINKS = 0x10000000,
   PATH_HASBUGGYOPEN = 0x20000000,
@@ -88,7 +89,14 @@ class path_conv
   int has_symlinks () const {return path_flags & PATH_HAS_SYMLINKS;}
   int hasgood_inode () const {return path_flags & PATH_HASACLS;}  // Not strictly correct
   int has_buggy_open () const {return path_flags & PATH_HASBUGGYOPEN;}
-  int isbinary () const {return path_flags & PATH_BINARY;}
+  int binmode () const
+  {
+    if (path_flags & PATH_BINARY)
+      return O_BINARY;
+    if (path_flags & PATH_TEXT)
+      return O_TEXT;
+    return 0;
+  }
   int issymlink () const {return path_flags & PATH_SYMLINK;}
   int issocket () const {return path_flags & PATH_SOCKET;}
   int iscygexec () const {return path_flags & PATH_CYGWIN_EXEC;}

@@ -9,7 +9,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <sys/fcntl.h>
 #include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -301,8 +300,8 @@ fhandler_proc::open (path_conv *pc, int flags, mode_t mode)
 
 success:
   res = 1;
+  set_flags (flags & ~O_TEXT, O_BINARY);
   set_open_status ();
-  set_flags (flags);
 out:
   syscall_printf ("%d = fhandler_proc::open (%p, %d)", res, flags, mode);
   return res;

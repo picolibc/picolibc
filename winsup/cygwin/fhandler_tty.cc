@@ -10,7 +10,6 @@ details. */
 
 #include "winsup.h"
 #include <stdio.h>
-#include <fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -455,7 +454,7 @@ fhandler_tty_slave::open (path_conv *, int flags, mode_t)
   attach_tty (ttynum);
   tc->set_ctty (ttynum, flags);
 
-  set_flags (flags);
+  set_flags (flags & ~O_TEXT, O_BINARY);
   /* Create synchronisation events */
   char buf[40];
 
@@ -1007,7 +1006,7 @@ fhandler_pty_master::open (path_conv *, int flags, mode_t)
 
   cygwin_shared->tty[ttynum]->common_init (this);
   inuse = get_ttyp ()->create_inuse (TTY_MASTER_ALIVE);
-  set_flags (flags);
+  set_flags (flags & ~O_TEXT, O_BINARY);
   set_open_status ();
 
   termios_printf ("opened pty master tty%d<%p>", ttynum, this);

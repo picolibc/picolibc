@@ -23,7 +23,7 @@ fhandler_dev_zero::fhandler_dev_zero ()
 int
 fhandler_dev_zero::open (path_conv *, int flags, mode_t)
 {
-  set_flags (flags);
+  set_flags (flags & ~O_TEXT, O_BINARY);
   set_open_status ();
   return 1;
 }

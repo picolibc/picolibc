@@ -9,7 +9,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <sys/fcntl.h>
 #include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -56,6 +55,33 @@ fhandler_base::puts_readahead (const char *s, size_t len)
 	 && (success = put_readahead (*s++) > 0))
     continue;
   return success;
+}
+
+void
+fhandler_base::set_flags (int flags, int supplied_bin)
+{
+  int bin;
+  int fmode;
+  debug_printf ("flags %p, supplied_bin %p", flags, supplied_bin);
+  if ((bin = flags & (O_BINARY | O_TEXT)))
+    debug_printf ("O_TEXT/O_BINARY set in flags %p", bin);
+  else if (get_r_binset () && get_w_binset ())
+    bin = get_r_binary () ? O_BINARY : O_TEXT;	// FIXME: Not quite right
+  else if (supplied_bin)
+    bin = supplied_bin;
+  else if ((fmode = get_default_fmode (flags)) & O_BINARY)
+    bin = O_BINARY;
+  else if (fmode & O_TEXT)
+    bin = O_TEXT;
+  else
+    bin = get_w_binary () || get_r_binary () || (binmode != O_TEXT) ?
+      	  O_BINARY : O_TEXT;
+
+  openflags = flags | bin;
+
+  set_r_binary (bin & O_BINARY);
+  set_w_binary (bin & O_BINARY);
+  syscall_printf ("filemode set to %s", bin ? "binary" : "text");
 }
 
 int
@@ -381,10 +407,8 @@ fhandler_base::open (path_conv *pc, int flags, mode_t mode)
   /* CreateFile() with dwDesiredAccess == 0 when called on remote
      share returns some handle, even if file doesn't exist. This code
      works around this bug. */
-  if (get_query_open () &&
-      isremote () &&
-      creation_distribution == OPEN_EXISTING &&
-      !pc->exists ())
+  if (get_query_open () && isremote () &&
+      creation_distribution == OPEN_EXISTING && pc && !pc->exists ())
     {
       set_errno (ENOENT);
       goto done;
@@ -424,30 +448,7 @@ fhandler_base::open (path_conv *pc, int flags, mode_t mode)
     set_file_attribute (has_acls (), get_win32_name (), mode);
 
   set_io_handle (x);
-  if (get_w_binset () && get_r_binset ())
-    syscall_printf ("filemode already set to %d/%d", get_r_binary (), get_w_binary ());
-  else
-    {
-      int bin;
-      int fmode;
-      if ((bin = flags & (O_BINARY | O_TEXT)))
-	/* nothing to do */;
-      else if ((fmode = get_default_fmode (flags)) & O_BINARY)
-	bin = O_BINARY;
-      else if (fmode & O_TEXT)
-	bin = O_TEXT;
-      else
-	bin = get_w_binary () || get_r_binary () || (binmode != O_TEXT);
-
-      if (bin & O_TEXT)
-	bin = 0;
-
-      set_flags (flags | (bin ? O_BINARY : O_TEXT));
-
-      set_r_binary (bin);
-      set_w_binary (bin);
-      syscall_printf ("filemode set to %s", bin ? "binary" : "text");
-    }
+  set_flags (flags, pc ? pc->binmode () : 0);
 
   res = 1;
   set_open_status ();
@@ -849,18 +850,16 @@ void
 fhandler_base::init (HANDLE f, DWORD a, mode_t bin)
 {
   set_io_handle (f);
-  set_r_binary (bin);
-  set_w_binary (bin);
   access = a;
   a &= GENERIC_READ | GENERIC_WRITE;
-  int oflags = 0;
+  int flags = 0;
   if (a == GENERIC_READ)
-    oflags = O_RDONLY;
+    flags = O_RDONLY;
   else if (a == GENERIC_WRITE)
-    oflags = O_WRONLY;
+    flags = O_WRONLY;
   else if (a == (GENERIC_READ | GENERIC_WRITE))
-    oflags = O_RDWR;
-  set_flags (oflags | (bin ? O_BINARY : O_TEXT));
+    flags = O_RDWR;
+  set_flags (flags, bin);
   set_open_status ();
   debug_printf ("created new fhandler_base for handle %p, bin %d", f, get_r_binary ());
 }

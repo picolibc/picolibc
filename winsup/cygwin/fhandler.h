@@ -12,6 +12,7 @@ details. */
 #define _FHANDLER_H_
 
 #include <sys/ioctl.h>
+#include <fcntl.h>
 
 enum
 {
@@ -174,7 +175,7 @@ class fhandler_base
   void set_async (int x) { FHCONDSETF (x, ASYNC); }
 
   int get_flags () { return openflags; }
-  void set_flags (int x) { openflags = x; }
+  void set_flags (int x, int supplied_bin = 0);
 
   bool is_nonblocking ();
   void set_nonblocking (int yes);
@@ -197,9 +198,9 @@ class fhandler_base
   DWORD get_open_status () {return open_status;}
   void reset_to_open_binmode ()
   {
-    status = status & ~(FH_WBINARY | FH_WBINSET | FH_RBINARY | FH_RBINSET);
-    status = status | ((FH_WBINARY | FH_WBINSET | FH_RBINARY | FH_RBINSET)
-		       & open_status);
+    set_flags ((get_flags () & ~(O_TEXT | O_BINARY))
+	       | ((open_status & (FH_WBINARY | FH_RBINARY)
+		   ? O_BINARY : O_TEXT)));
   }
 
   int get_default_fmode (int flags);

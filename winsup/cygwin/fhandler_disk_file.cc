@@ -9,7 +9,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <sys/fcntl.h>
 #include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -338,9 +337,6 @@ fhandler_disk_file::open (path_conv *real_path, int flags, mode_t mode)
       set_errno (ECASECLASH);
       return 0;
     }
-
-  set_r_binary (real_path->isbinary ());
-  set_w_binary (real_path->isbinary ());
 
   set_has_acls (real_path->has_acls ());
   set_isremote (real_path->isremote ());

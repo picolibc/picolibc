@@ -575,8 +575,8 @@ nextafter
 _nextafter = nextafter
 nextafterf
 _nextafterf = nextafterf
-open
-_open = open
+_open
+open = _open
 opendir
 _opendir = opendir
 pathconf
@@ -610,8 +610,8 @@ _rand = rand
 random
 initstate
 setstate
-read
-_read = read
+_read
+read = read
 readdir
 _readdir = readdir
 readlink
@@ -896,8 +896,8 @@ uname
 _uname = uname
 ungetc
 _ungetc = ungetc
-unlink
-_unlink = unlink
+_unlink
+unlink = _unlink
 usleep
 _usleep = usleep
 utime
@@ -940,8 +940,8 @@ wcstombs
 _wcstombs = wcstombs
 wctomb
 _wctomb = wctomb
-write
-_write = write
+_write
+write = _write
 barfly = write
 writev
 _writev = writev

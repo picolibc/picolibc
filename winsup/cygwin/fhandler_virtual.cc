@@ -9,7 +9,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <sys/fcntl.h>
 #include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -208,7 +207,7 @@ fhandler_virtual::open (path_conv *, int flags, mode_t mode)
   set_execable_p (not_executable);
   set_socket_p (false);
 
-  set_flags (flags);
+  set_flags (flags & ~O_TEXT, O_BINARY);
 
   set_nohandle (true);
 

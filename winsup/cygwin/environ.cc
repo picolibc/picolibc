@@ -12,7 +12,6 @@ details. */
 #include <stdlib.h>
 #include <stddef.h>
 #include <ctype.h>
-#include <fcntl.h>
 #include <sys/cygwin.h>
 #include <cygwin/version.h>
 #include "pinfo.h"

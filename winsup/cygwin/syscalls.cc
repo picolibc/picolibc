@@ -11,7 +11,6 @@ details. */
 #include "winsup.h"
 #include <sys/stat.h>
 #include <sys/vfs.h> /* needed for statfs */
-#include <fcntl.h>
 #include <pwd.h>
 #include <grp.h>
 #include <stdlib.h>
@@ -1624,8 +1623,8 @@ setmode_helper (FILE *f)
   if (fileno (f) != setmode_file)
     return 0;
   syscall_printf ("setmode: file was %s now %s\n",
-		 f->_flags & __SCLE ? "cle" : "raw",
-		 setmode_mode & O_TEXT ? "cle" : "raw");
+		 f->_flags & __SCLE ? "text" : "raw",
+		 setmode_mode & O_TEXT ? "text" : "raw");
   if (setmode_mode & O_TEXT)
     f->_flags |= __SCLE;
   else
@@ -1673,16 +1672,8 @@ setmode (int fd, int mode)
 
   if (!mode)
     cfd->reset_to_open_binmode ();
-  else if (mode & O_BINARY)
-    {
-      cfd->set_w_binary (1);
-      cfd->set_r_binary (1);
-    }
   else
-    {
-      cfd->set_w_binary (0);
-      cfd->set_r_binary (0);
-    }
+    cfd->set_flags ((cfd->get_flags () & ~(O_TEXT | O_BINARY)) | mode);
 
   if (_cygwin_istext_for_stdio (fd))
     setmode_mode = O_TEXT;
@@ -1691,9 +1682,8 @@ setmode (int fd, int mode)
   setmode_file = fd;
   _fwalk (_REENT, setmode_helper);
 
-  syscall_printf ("setmode (%d<%s>, %s) returns %s\n", fd, cfd->get_name (),
-		  mode & O_TEXT ? "text" : "binary",
-		  res & O_TEXT ? "text" : "binary");
+  syscall_printf ("setmode (%d<%s>, %p) returns %s\n", fd, cfd->get_name (),
+		  mode, res & O_TEXT ? "text" : "binary");
   return res;
 }
 

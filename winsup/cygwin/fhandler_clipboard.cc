@@ -65,7 +65,7 @@ fhandler_dev_clipboard::dup (fhandler_base * child)
 int
 fhandler_dev_clipboard::open (path_conv *, int flags, mode_t)
 {
-  set_flags (flags);
+  set_flags (flags, O_TEXT);
   eof = false;
   pos = 0;
   if (membuffer)

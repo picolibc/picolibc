@@ -11,7 +11,6 @@ details. */
 
 #include "winsup.h"
 #include <sys/termios.h>
-#include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
 #include <winioctl.h>

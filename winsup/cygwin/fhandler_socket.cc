@@ -19,7 +19,6 @@
 
 #include <stdlib.h>
 #include <unistd.h>
-#include <fcntl.h>
 #define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>
 #include "cygerrno.h"
