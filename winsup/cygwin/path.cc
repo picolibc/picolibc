@@ -100,7 +100,7 @@ struct symlink_info
   int is_symlink;
   bool ext_tacked_on;
   int error;
-  BOOL case_clash;
+  bool case_clash;
   int check (char *path, const suffix_info *suffixes, unsigned opt);
   BOOL case_check (char *path);
 };
@@ -401,7 +401,7 @@ path_conv::check (const char *src, unsigned opt,
   path_flags = 0;
   known_suffix = NULL;
   fileattr = (DWORD) -1;
-  case_clash = FALSE;
+  case_clash = false;
   devn = unit = 0;
   root_dir[0] = '\0';
   fs_name[0] = '\0';
@@ -479,21 +479,23 @@ path_conv::check (const char *src, unsigned opt,
 	  if (error)
 	    return;
 
-	  /* devn should not be a device.  If it is, then stop parsing now. */
-	  if (devn != FH_BAD)
+	  if (devn == FH_CYGDRIVE)
 	    {
-	      if (devn != FH_CYGDRIVE)
+	      if (component)
+		devn = FH_BAD;
+	      fileattr = !unit ? FILE_ATTRIBUTE_DIRECTORY
+			       : GetFileAttributes (full_path);
+	      goto out;
+	    }
+	  /* devn should not be a device.  If it is, then stop parsing now. */
+	  else if (devn != FH_BAD)
+	    {
+	      fileattr = 0;
+	      if (component)
 		{
-		  fileattr = 0;
-		  if (component)
-		    {
-		      error = ENOTDIR;
-		      return;
-		    }
+		  error = ENOTDIR;
+		  return;
 		}
-	      else if (!component)
-		fileattr = !unit ? FILE_ATTRIBUTE_DIRECTORY
-				 : GetFileAttributes (full_path);
 	      goto out;		/* Found a device.  Stop parsing. */
 	    }
 
@@ -502,9 +504,10 @@ path_conv::check (const char *src, unsigned opt,
 	  /* Eat trailing slashes */
 	  char *dostail = strchr (full_path, '\0');
 
-	  /* If path is only a drivename, Windows interprets it as the current working
-	     directory on this drive instead of the root dir which is what we want. So
-	     we need the trailing backslash in this case. */
+	  /* If path is only a drivename, Windows interprets it as the
+	     current working directory on this drive instead of the root
+	     dir which is what we want. So we need the trailing backslash
+	     in this case. */
 	  while (dostail > full_path + 3 && (*--dostail == '\\'))
 	    *tail = '\0';
 
@@ -537,7 +540,6 @@ path_conv::check (const char *src, unsigned opt,
 	      if (!component)
 		case_clash = TRUE;
 	    }
-
 	  if (!(opt & PC_SYM_IGNORE))
 	    {
 	      if (!component)
@@ -692,8 +694,8 @@ out:
       update_fs_info (path);
       if (!fs_name[0])
 	{
-	  set_has_acls (FALSE);
-	  set_has_buggy_open (FALSE);
+	  set_has_acls (false);
+	  set_has_buggy_open (false);
 	}
       else
 	{
@@ -701,7 +703,7 @@ out:
 	  debug_printf ("root_dir(%s), this->path(%s), set_has_acls(%d)",
 			root_dir, this->path, fs_flags & FS_PERSISTENT_ACLS);
 	  if (!allow_smbntsec && is_remote_drive)
-	    set_has_acls (FALSE);
+	    set_has_acls (false);
 	  else
 	    set_has_acls (fs_flags & FS_PERSISTENT_ACLS);
 	  /* Known file systems with buggy open calls. Further explanation
@@ -1022,10 +1024,10 @@ win32_device_name (const char *src_path, char *win32_path,
   devn = get_device_number (src_path, win32_path, unit);
 
   if (devn == FH_BAD)
-    return FALSE;
+    return false;
 
   if ((devfmt = windows_device_names[FHDEVN (devn)]) == NULL)
-    return FALSE;
+    return false;
   switch (devn)
     {
       case FH_RANDOM:
@@ -1724,7 +1726,7 @@ mount_info::read_mounts (reg_key& r)
       mount_flags = subkey.get_int ("flags", 0);
 
       /* Add mount_item corresponding to registry mount point. */
-      res = mount_table->add_item (native_path, posix_path, mount_flags, FALSE);
+      res = mount_table->add_item (native_path, posix_path, mount_flags, false);
       if (res && get_errno () == EMFILE)
 	break; /* The number of entries exceeds MAX_MOUNTS */
     }
@@ -2187,7 +2189,7 @@ int
 mount_info::del_item (const char *path, unsigned flags, int reg_p)
 {
   char pathtmp[MAX_PATH];
-  int posix_path_p = FALSE;
+  int posix_path_p = false;
 
   /* Something's wrong if path is NULL or empty. */
   if (path == NULL || *path == 0 || !isabspath (path))
@@ -2533,14 +2535,14 @@ set_symlink_ea (const char* frompath, const char* topath)
   if (!NTWriteEA (frompath, SYMLINK_EA_NAME, topath, strlen (topath) + 1))
     {
       debug_printf ("Cannot save symlink in EA");
-      return FALSE;
+      return false;
     }
   return TRUE;
 }
 
 /* Create a symlink from FROMPATH to TOPATH. */
 
-/* If TRUE create symlinks as Windows shortcuts, if FALSE create symlinks
+/* If TRUE create symlinks as Windows shortcuts, if false create symlinks
    as normal files with magic number and system bit set. */
 int allow_winsymlinks = TRUE;
 
@@ -2900,7 +2902,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 
   pflags &= ~PATH_SYMLINK;
 
-  case_clash = FALSE;
+  case_clash = false;
 
   while (suffix.next ())
     {
@@ -2984,7 +2986,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
       break;
 
     file_not_symlink:
-      is_symlink = FALSE;
+      is_symlink = false;
       syscall_printf ("not a symlink");
       res = 0;
       break;
@@ -2997,7 +2999,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 
 /* Check the correct case of the last path component (given in DOS style).
    Adjust the case in this->path if pcheck_case == PCHECK_ADJUST or return
-   FALSE if pcheck_case == PCHECK_STRICT.
+   false if pcheck_case == PCHECK_STRICT.
    Dont't call if pcheck_case == PCHECK_RELAXED.
 */
 
@@ -3027,7 +3029,7 @@ symlink_info::case_check (char *path)
 	  /* If check is set to STRICT, a wrong case results
 	     in returning a ENOENT. */
 	  if (pcheck_case == PCHECK_STRICT)
-	    return FALSE;
+	    return false;
 
 	  /* PCHECK_ADJUST adjusts the case in the incoming
 	     path which points to the path in *this. */
@@ -3541,7 +3543,7 @@ cwdstuff::get_hash ()
 void
 cwdstuff::init ()
 {
-  lock = new_muto (FALSE, "cwd");
+  lock = new_muto (false, "cwd");
 }
 
 /* Get initial cwd.  Should only be called once in a
