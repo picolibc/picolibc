@@ -1,3 +1,8 @@
+2005-01-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_serial.cc (fhandler_serial::dup): Call overlapped_setup
+	for child, not for parent.
+
 2005-01-13  Christopher Faylor  <cgf@timesys.com>
 
 	* init.cc (dll_entry): Nuke attempt to set exit code since parent will
