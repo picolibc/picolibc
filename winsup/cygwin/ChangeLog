@@ -1,3 +1,12 @@
+Sun May  6 17:05:00 2001  Robert Collins <rbtcollins@hotmail.com>
+	* thread.h (pthread_cond): New element cond_access to allow atomic broadcasts.
+	* thread.cc (pthread_cond::pthread_cond): Initialise cond_access.
+	(pthread_cond::~pthread_cond): Destroy cond_access.
+	(pthread_cond::Broadcast): Use cond_access.
+	(pthread_cond::Signal): Use cond_access.
+	(pthread_cond_wait): Use cond_access.
+	(pthread_cond_timedwait): Use cond_access.
+
 Sun May  6 11:55:40 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* string.h (cygwin_strchr): Make 'static inline' so that things will

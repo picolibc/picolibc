@@ -290,6 +290,8 @@ public:
   int shared;
   LONG waiting;
   pthread_mutex *mutex;
+  /* to allow atomic behaviour for cond_broadcast */
+  pthread_mutex_t cond_access;
   HANDLE win32_obj_id;
   int TimedWait (DWORD dwMilliseconds);
   void BroadCast ();

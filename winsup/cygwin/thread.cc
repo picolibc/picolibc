@@ -386,6 +386,7 @@ pthread_condattr::~pthread_condattr ()
 
 pthread_cond::pthread_cond (pthread_condattr * attr):verifyable_object (PTHREAD_COND_MAGIC)
 {
+  int temperr;
   this->shared = attr ? attr->shared : PTHREAD_PROCESS_PRIVATE;
   this->mutex = NULL;
   this->waiting = 0;
@@ -393,6 +394,14 @@ pthread_cond::pthread_cond (pthread_condattr * attr):verifyable_object (PTHREAD_
   this->win32_obj_id =::CreateEvent (&sec_none_nih, false,	/* auto signal reset - which I think is pthreads like ? */
 				     false,	/* start non signaled */
 				     NULL /* no name */);
+  /* TODO: make a shared mem mutex if out attributes request shared mem cond */
+  cond_access=NULL;
+  if ((temperr = pthread_mutex_init (&this->cond_access, NULL))) 
+    {
+      system_printf ("couldn't init mutex, this %0p errno=%d\n", this, temperr);
+      /* we need the mutex for correct behaviour */
+      magic = 0;	
+    }
 
   if (!this->win32_obj_id)
     magic = 0;
@@ -402,27 +411,38 @@ pthread_cond::~pthread_cond ()
 {
   if (win32_obj_id)
     CloseHandle (win32_obj_id);
+  pthread_mutex_destroy (&cond_access);
 }
 
 void
 pthread_cond::BroadCast ()
 {
-  // This potentially has an unfairness bug. We should
-  // consider preventing the wakeups from resuming until we finish signalling.
-  if (!verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC))
-    return;
-  PulseEvent (win32_obj_id);
-  while (InterlockedDecrement (&waiting) != 0)
+  if (pthread_mutex_lock (&cond_access))
+    system_printf ("Failed to lock condition variable access mutex, this %0p\n", this);
+  int count = waiting;
+  if (!verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC)) 
+    {
+      if (pthread_mutex_unlock (&cond_access))
+        system_printf ("Failed to unlock condition variable access mutex, this %0p\n", this);
+      system_printf ("Broadcast called with invalid mutex\n");
+      return;
+    }
+  while (count--)
     PulseEvent (win32_obj_id);
-  mutex = NULL;
+  if (pthread_mutex_unlock (&cond_access))
+    system_printf ("Failed to unlock condition variable access mutex, this %0p\n", this);
 }
 
 void
 pthread_cond::Signal ()
 {
+  if (pthread_mutex_lock (&cond_access))
+    system_printf ("Failed to lock condition variable access mutex, this %0p\n", this);
   if (!verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC))
     return;
   PulseEvent (win32_obj_id);
+  if (pthread_mutex_unlock (&cond_access))
+    system_printf ("Failed to unlock condition variable access mutex, this %0p\n", this);
 }
 
 int
@@ -1608,6 +1628,8 @@ int
 __pthread_cond_timedwait (pthread_cond_t * cond, pthread_mutex_t * mutex,
 			  const struct timespec *abstime)
 {
+// and yes cond_access here is still open to a race. (we increment, context swap, 
+// broadcast occurs -  we miss the broadcast. the functions aren't split properly.
   int rv;
   if (!abstime)
     return EINVAL;
@@ -1623,18 +1645,31 @@ __pthread_cond_timedwait (pthread_cond_t * cond, pthread_mutex_t * mutex,
   if (!verifyable_object_isvalid (*cond, PTHREAD_COND_MAGIC))
     return EINVAL;
 
+  if (pthread_mutex_lock (&(*cond)->cond_access))
+    system_printf ("Failed to lock condition variable access mutex, this %0p\n", *cond);
+
   if ((*cond)->waiting)
     if ((*cond)->mutex && ((*cond)->mutex != (*themutex)))
-      return EINVAL;
+      {
+        if (pthread_mutex_unlock (&(*cond)->cond_access))
+          system_printf ("Failed to unlock condition variable access mutex, this %0p\n", *cond);
+        return EINVAL;
+      }
   InterlockedIncrement (&((*cond)->waiting));
 
   (*cond)->mutex = (*themutex);
   InterlockedIncrement (&((*themutex)->condwaits));
+  if (pthread_mutex_unlock (&(*cond)->cond_access))
+    system_printf ("Failed to unlock condition variable access mutex, this %0p\n", *cond);
   rv = (*cond)->TimedWait (abstime->tv_sec * 1000);
+  if (pthread_mutex_lock (&(*cond)->cond_access))
+    system_printf ("Failed to lock condition variable access mutex, this %0p\n", *cond);
   (*cond)->mutex->Lock ();
   if (InterlockedDecrement (&((*cond)->waiting)) == 0)
     (*cond)->mutex = NULL;
   InterlockedDecrement (&((*themutex)->condwaits));
+  if (pthread_mutex_unlock (&(*cond)->cond_access))
+    system_printf ("Failed to unlock condition variable access mutex, this %0p\n", *cond);
 
   return rv;
 }
@@ -1642,6 +1677,7 @@ __pthread_cond_timedwait (pthread_cond_t * cond, pthread_mutex_t * mutex,
 int
 __pthread_cond_wait (pthread_cond_t * cond, pthread_mutex_t * mutex)
 {
+// see cond_timedwait for notes
   int rv;
   pthread_mutex_t *themutex = mutex;
   if (*mutex == PTHREAD_MUTEX_INITIALIZER)
@@ -1654,19 +1690,31 @@ __pthread_cond_wait (pthread_cond_t * cond, pthread_mutex_t * mutex)
   if (!verifyable_object_isvalid (*cond, PTHREAD_COND_MAGIC))
     return EINVAL;
 
+  if (pthread_mutex_lock (&(*cond)->cond_access))
+    system_printf ("Failed to lock condition variable access mutex, this %0p\n", *cond);
+
   if ((*cond)->waiting)
     if ((*cond)->mutex && ((*cond)->mutex != (*themutex)))
-      return EINVAL;
+      {
+        if (pthread_mutex_unlock (&(*cond)->cond_access))
+          system_printf ("Failed to unlock condition variable access mutex, this %0p\n", *cond);
+        return EINVAL;
+      }
   InterlockedIncrement (&((*cond)->waiting));
 
   (*cond)->mutex = (*themutex);
   InterlockedIncrement (&((*themutex)->condwaits));
+  if (pthread_mutex_unlock (&(*cond)->cond_access))
+    system_printf ("Failed to unlock condition variable access mutex, this %0p\n", *cond);
   rv = (*cond)->TimedWait (INFINITE);
+  if (pthread_mutex_lock (&(*cond)->cond_access))
+    system_printf ("Failed to lock condition variable access mutex, this %0p\n", *cond);
   (*cond)->mutex->Lock ();
   if (InterlockedDecrement (&((*cond)->waiting)) == 0)
     (*cond)->mutex = NULL;
   InterlockedDecrement (&((*themutex)->condwaits));
-
+  if (pthread_mutex_unlock (&(*cond)->cond_access))
+    system_printf ("Failed to unlock condition variable access mutex, this %0p\n", *cond);
   return rv;
 }
 
