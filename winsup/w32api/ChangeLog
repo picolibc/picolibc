@@ -1,3 +1,21 @@
+2003-08-26  Danny Smith <dannysmith@users.sourceforge.net>
+
+	* lib/test.c: Add snmp.h, winsnmp.h amd mgmtapi.h to
+	includes.
+
+2003-08-26  Filip Navara  <xnavara@volny.cz>
+
+	* include/snmp.h: New file.
+	* include/winsnmp.h: New file.
+	* include/mgmtapi.h: New file.
+	* lib/snmpapi.def: New file.
+	* lib/wsnmp32.def: New file.
+	* lib/igmpagnt.def: New file.
+	* lib/mgmtapi.def (SnmpMgrCtl) Add stub.
+	(SnmpMgrGetTrapEx): Ditto.
+	(SnmpMgrMIB2Disk): Remove.
+	(dbginit): Remove.
+
 2003-08-25  Steven Edwards  <Steven_Ed4153@yahoo.com>
 
 	* include/ddk/ntifs.h: Change all C++ style comments to C.
