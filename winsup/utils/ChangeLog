@@ -1,3 +1,11 @@
+2002-06-09  Christopher Faylor  <cgf@redhat.com>
+
+	* mount.cc (main): Use default system/user flag for cygdrive stuff,
+	too.
+	(change_cygdrive_prefix): Change MOUNT_AUTO to MOUNT_CYGDRIVE.
+	* umount.cc (remove_cygdrive_prefix): Ditto.
+	(main): Use default system/user flag for cygdrive stuff, too.
+
 2002-06-08  Christopher Faylor  <cgf@redhat.com>
 
 	* mount.cc (opts): Remove '-i' option.

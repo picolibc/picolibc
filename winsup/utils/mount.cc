@@ -275,7 +275,7 @@ main (int argc, char **argv)
     case saw_change_cygdrive_prefix:
       if (optind != argc)
 	usage ();
-      change_cygdrive_prefix (argv[optind], flags);
+      change_cygdrive_prefix (argv[optind], flags | default_flag);
       break;
     case saw_show_cygdrive_prefix:
       if (optind <= argc)
@@ -436,7 +436,7 @@ mount_already_exists (const char *posix_path, int flags)
 static void
 change_cygdrive_prefix (const char *new_prefix, int flags)
 {
-  flags |= MOUNT_AUTO;
+  flags |= MOUNT_CYGDRIVE;
 
   if (mount (NULL, new_prefix, flags))
     error (new_prefix);

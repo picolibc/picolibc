@@ -160,7 +160,7 @@ main (int argc, char **argv)
     case saw_remove_cygdrive_prefix:
       if (optind != argc)
 	usage ();
-      remove_cygdrive_prefix (flags);
+      remove_cygdrive_prefix (flags | default_flag);
       break;
     case saw_remove_all_system_mounts:
       if (optind != argc)
@@ -244,7 +244,7 @@ remove_all_system_mounts ()
 static void
 remove_cygdrive_prefix (int flags)
 {
-  int res = cygwin_umount (NULL, flags | MOUNT_AUTO);
+  int res = cygwin_umount (NULL, flags | MOUNT_CYGDRIVE);
   if (res)
     error ("remove_cygdrive_prefix");
   exit (0);
