@@ -15,7 +15,7 @@ Defaults to set (binary mode). This option must be set
 before starting a Cygwin shell to have an effect on redirection.
 </para>
 <warning><title>Warning!</title><para>If set in 12/98 b20.1, all files 
-always open in binary mode.</para> </warning>
+always open in binary mode.</para></warning>
 </listitem>
 <listitem>
 <para><FirstTerm>(no)envcache</FirstTerm> - If set, environment variable
@@ -29,10 +29,10 @@ contents. Defaults to set.</para>
 settings are re-exported to the environment as $CYGWIN again.</para>
 </listitem>
 <listitem>
-<para><FirstTerm>error_start:filepath</FirstTerm> - if set, runs <filename>filepath</filepath>
+<para><FirstTerm>error_start:filepath</FirstTerm> - if set, runs <filename>filepath</filename>
 when cygwin encounters a fatal error.  This is useful for debugging.
 <filename>filepath</filename> is usually set to the path to the <filename>gdb</filename>
-program.
+program.</para>
 <para><FirstTerm>(no)glob[:ignorecase]</FirstTerm> - if set, command line arguments
 containing UNIX-style file wildcard characters (brackets, question mark,
 asterisk, escaped with \) are expanded into lists of files that match 

@@ -1,3 +1,7 @@
+Thu Dec 21 15:03:29 2000  Edward M. Lee <tailbert@yahoo.com>
+
+	* cygwinenv.sgml: Fix typo in <filename>. Add missing </para>.
+
 Tue Dec 19 21:06:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* cygwinenv.sgml: Add text for `smbntsec' option.
