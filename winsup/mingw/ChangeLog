@@ -1,3 +1,13 @@
+2004-08-24  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/malloc.h (__mingw_aligned_offset_malloc,
+	__mingw_aligned_offset_realloc, __mingw_aligned_malloc,
+	__mingw_aligned_realloc, __mingw_aligned_free): Add
+	prototypes.
+	* mingwex/Makefile.in (DISTFILES): Add mingw-aligned-malloc.c,
+	tst-aligned-malloc.c.
+	(REPLACE_OBJS): Add mingw-aligned-malloc.o.
+
 2004-08-24  Steven G. Johnson  <stevenj@alum.mit.edu>
 
 	* mingwex/mingw-aligned-malloc.c: New file.

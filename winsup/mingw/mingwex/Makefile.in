@@ -30,10 +30,11 @@ DISTFILES = Makefile.in configure configure.in \
 	fegetexceptflag.c fegetround.c feholdexcept.c feraiseexcept.c \
 	fesetenv.c fesetexceptflag.c fesetround.c fetestexcept.c \
 	feupdateenv.c ftruncate.c fwide.c  getopt.c imaxabs.c imaxdiv.c \
-	ldtoa.c lltoa.c lltow.c mbsinit.c mingw-fseek.c sitest.c strtof.c \
-	strtoimax.c strtold.c strtoumax.c testwmem.c ulltoa.c ulltow.c \
-	wcstof.c wcstoimax.c wcstold.c wcstoumax.c wdirent.c wmemchr.c \
-	wmemcmp.c wmemcpy.c wmemmove.c wmemset.c wtoll.c
+	ldtoa.c lltoa.c lltow.c mbsinit.c mingw-aligned-malloc.o \
+	mingw-fseek.c sitest.c strtof.c strtoimax.c strtold.c strtoumax.c \
+	testwmem.c tst-aligned-malloc.c ulltoa.c ulltow.c wcstof.c \
+	wcstoimax.c wcstold.c wcstoumax.c wdirent.c wmemchr.c wmemcmp.c \
+	wmemcpy.c wmemmove.c wmemset.c wtoll.c
 	
 MATH_DISTFILES = \
 	acosf.c acosl.c asinf.c asinl.c atan2f.c atan2l.c \
@@ -149,7 +150,7 @@ FENV_OBJS = fesetround.o  fegetround.o \
 POSIX_OBJS = \
 	dirent.o wdirent.o getopt.o ftruncate.o
 REPLACE_OBJS = \
-	mingw-fseek.o
+	mingw-aligned-malloc.o mingw-fseek.o
 COMPLEX_OBJS = \
 	cabs.o cacos.o cacosh.o carg.o casin.o casinh.o catan.o catanh.o \
 	ccos.o ccosh.o cexp.o cimag.o clog.o cpow.o cproj.o creal.o \

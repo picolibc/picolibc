@@ -68,10 +68,18 @@ _CRTIMP void* __cdecl _expand (void*, size_t);
 _CRTIMP void * __cdecl _aligned_offset_malloc(size_t, size_t, size_t);
 _CRTIMP void * __cdecl _aligned_offset_realloc(void*, size_t, size_t, size_t);
 
-_CRTIMP void* __cdecl _aligned_malloc (size_t, size_t);
-_CRTIMP void* __cdecl _aligned_realloc (void*, size_t, size_t);
+_CRTIMP void * __cdecl _aligned_malloc (size_t, size_t);
+_CRTIMP void * __cdecl _aligned_realloc (void*, size_t, size_t);
 _CRTIMP void __cdecl _aligned_free (void*);
 #endif /* __MSVCRT_VERSION__ >= 0x0700 */
+
+/* These require libmingwex.a. */ 
+void * __cdecl __mingw_aligned_offset_malloc (size_t, size_t, size_t);
+void * __cdecl __mingw_aligned_offset_realloc (void*, size_t, size_t, size_t);
+
+void * __cdecl __mingw_aligned_malloc (size_t, size_t);
+void * __cdecl __mingw_aligned_realloc (void*, size_t, size_t);
+void __cdecl __mingw_aligned_free (void*);
 
 #ifdef __cplusplus
 }
