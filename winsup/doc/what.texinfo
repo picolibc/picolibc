@@ -21,8 +21,8 @@ standard Windows command shell.
 The main WWW page for the Cygwin project is
 @file{http://sources.redhat.com/cygwin/}.  There you should find
 everything you need for Cygwin, including links for download and setup,
-a User's Guide, an API Reference, mailing lists and archives, and
-additional ported software.
+a current list of ftp mirror sites, a User's Guide, an API Reference,
+mailing lists and archives, and additional ported software.
 
 You can find documentation for the individual GNU tools at
 @file{http://www.fsf.org/manual/}.  (You should read GNU manuals from a
