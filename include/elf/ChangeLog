@@ -1,3 +1,15 @@
+2002-07-15  Denis Chertykov  <denisc@overta.ru>
+	    Frank Ch. Eigler  <fche@redhat.com>
+	    Ben Elliston  <bje@redhat.com>
+	    Alan Lehotsky  <alehotsky@cygnus.com>
+	    John Healy  <jhealy@redhat.com>
+	    Graham Stott  <grahams@redhat.com>
+	    Jeff Johnston  <jjohnstn@redhat.com>
+
+        * common.h (EM_IP2K): New macro.
+	(EM_IP2K_OLD): New macro.
+        * ip2k.h: New file.
+
 2002-07-01  Matt Thomas  <matt@3am-software.com>
 
 	* vax.h: Rename EF_* to EF_VAX_*.
