@@ -1,3 +1,7 @@
+2002-05-30  Christopher Faylor  <cgf@redhat.com>
+
+	* mkpasswd.cc (main): Don't reset to binmode if stdout is a terminal.
+
 2002-05-29  Christopher Faylor  <cgf@redhat.com>
 
 	* mount.cc (main): Make -b the default.

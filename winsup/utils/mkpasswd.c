@@ -476,7 +476,8 @@ main (int argc, char **argv)
   DWORD len;
 
   passed_home_path[0] = '\0';
-  setmode (1, O_BINARY);
+  if (!isatty (1))
+    setmode (1, O_BINARY);
 
   if (GetVersion () < 0x80000000)
     {
