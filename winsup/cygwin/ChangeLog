@@ -1,3 +1,7 @@
+2004-06-03  Christopher Faylor  <cgf@alum.bu.edu>
+
+	* winbase.h: Fix all ilock defs as per cygwin 1.5.10 release.
+
 2004-06-02  Christopher Faylor  <cgf@alum.bu.edu>
 
 	* cygheap.cc (cmalloc): Add debugging hook.
