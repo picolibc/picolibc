@@ -22,12 +22,8 @@ mailing list.
 
 @section Installation using ``Cygwin Setup''
 
-The Cygwin Setup program is the only recommended way to install Cygwin,
-but it is still a work in progress.  Expect features and functionality
-to change.  For this reason, it is a good idea to note the version and
-build time reported by Cygwin Setup when you run it.  This will help
-diagnose problems, should you have any.  Check the cygwin mailing list
-for the latest news about Cygwin Setup.
+The Cygwin Setup program is the @emph{only} recommended way to install
+Cygwin.
 
 @subsection Why not install in C:\?
 
@@ -151,19 +147,20 @@ something you really @emph{don't} want.
 @subsection How much disk space does Cygwin require?
 
 That depends, obviously, on what you've chosen to download and
-install.  A full installation is probably close to 500MB installed,
-not including the package archives themselves or the source code.
+install.  A full installation today is probably larger than 800MB
+installed, not including the package archives themselves nor the source
+code.
 
-After installation, the package archives remain in your ``Local Package
-Directory'', by default the location of @code{setup.exe}.  You may
-conserve disk space by deleting the @code{contrib} and @code{latest}
-subdirectories there.
+After installation, the package archives remain in your ``Local
+Package Directory'', by default the location of @code{setup.exe}.  You
+may conserve disk space by deleting the subdirectories there.  These
+directories will have very wierd looking names, being encoded with
+their URLs.
 
 @subsection What if setup fails?
 
 First, make sure that you are using the latest version of Cygwin
-Setup.  It is a work in progress, with improvements and bugfixes being
-made often.  The latest version is always available from the 'Install
+Setup.  The latest version is always available from the 'Install
 Cygwin now' link on the Cygwin Home Page at @file{http://cygwin.com/}.
 
 If you are downloading from the internet, setup will fail if it cannot
