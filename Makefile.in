@@ -203,8 +203,7 @@ USUAL_MAKEINFO = `if [ -f $$r/texinfo/makeinfo/makeinfo ] ; \
 # This just becomes part of the MAKEINFO definition passed down to
 # sub-makes.  It lets flags be given on the command line while still
 # using the makeinfo from the object tree.
-# (Default to avoid splitting info files by setting the threshold high.)
-MAKEINFOFLAGS = --split-size=5000000
+MAKEINFOFLAGS =
 
 EXPECT = `if [ -f $$r/expect/expect ] ; \
 	then echo $$r/expect/expect ; \
@@ -7265,9 +7264,8 @@ all-gcc: configure-gcc
 # In theory, on an SMP all those dependencies can be resolved
 # in parallel.
 #
-GCC_STRAP_TARGETS = bootstrap bootstrap-lean bootstrap2 bootstrap2-lean bootstrap3 bootstrap3-lean bootstrap4 bootstrap4-lean bubblestrap quickstrap cleanstrap restrap
-.PHONY: $(GCC_STRAP_TARGETS)
-$(GCC_STRAP_TARGETS): all-bootstrap configure-gcc
+.PHONY: bootstrap bootstrap-lean bootstrap2 bootstrap2-lean bootstrap3 bootstrap3-lean bootstrap4 bootstrap4-lean bubblestrap quickstrap cleanstrap restrap
+bootstrap bootstrap-lean bootstrap2 bootstrap2-lean bootstrap3 bootstrap3-lean bootstrap4 bootstrap4-lean bubblestrap quickstrap cleanstrap restrap: all-bootstrap configure-gcc
 	@r=`${PWD}`; export r; \
 	s=`cd $(srcdir); ${PWD}`; export s; \
 	$(SET_LIB_PATH) \
