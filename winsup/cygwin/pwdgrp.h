@@ -27,106 +27,54 @@ enum pwdgrp_state {
   loaded
 };
 
-#define MAX_ETC_FILES 2
-class etc
-{
-  static int curr_ix;
-  static bool sawchange[MAX_ETC_FILES];
-  static const char *fn[MAX_ETC_FILES];
-  static FILETIME last_modified[MAX_ETC_FILES];
-  static bool dir_changed (int);
-  static int init (int, const char *);
-  static bool file_changed (int);
-  static void set_last_modified (int, FILETIME&);
-  friend class pwdgrp;
-};
-
 class pwdgrp
 {
   pwdgrp_state state;
   int pwd_ix;
   path_conv pc;
   char *buf;
-  char *lptr, *eptr;
-
-  char *gets ()
+  int max_lines;
+  union
   {
-    if (!buf)
-      lptr = NULL;
-    else if (!eptr)
-      lptr = NULL;
-    else
-      {
-	lptr = eptr;
-	eptr = strchr (lptr, '\n');
-	if (eptr)
-	  {
-	    if (eptr > lptr && *(eptr - 1) == '\r')
-	      *(eptr - 1) = 0;
-	    *eptr++ = '\0';
-	  }
-      }
-    return lptr;
-  }
+    passwd **passwd_buf;
+    __group32 **group_buf;
+    void **pwdgrp_buf;
+  };
+  unsigned pwdgrp_buf_elem_size;
+  bool (pwdgrp::*parse) (char *);
+
+  char *gets (char*&);
+  bool parse_pwd (char *);
+  bool parse_grp (char *);
 
 public:
+  int curr_lines;
+
+  void add_line (char *);
   bool isinitializing ()
-    {
-      if (state <= initializing)
-	state = initializing;
-      else if (etc::file_changed (pwd_ix - 1))
-	state = initializing;
-      return state == initializing;
-    }
+  {
+    if (state <= initializing)
+      state = initializing;
+    else if (etc::file_changed (pwd_ix))
+      state = initializing;
+    return state == initializing;
+  }
   void operator = (pwdgrp_state nstate) { state = nstate; }
   bool isuninitialized () const { return state == uninitialized; }
 
-  bool load (const char *posix_fname, void (* add_line) (char *))
+  bool load (const char *);
+  bool load (const char *posix_fname, passwd *&buf)
   {
-    if (buf)
-      free (buf);
-    buf = lptr = eptr = NULL;
-
-    pc.check (posix_fname);
-    pwd_ix = etc::init (pwd_ix - 1, pc) + 1;
-
-    paranoid_printf ("%s", posix_fname);
-
-    bool res;
-    if (pc.error || !pc.exists () || !pc.isdisk () || pc.isdir ())
-      res = false;
-    else
-      {
-	HANDLE fh = CreateFile (pc, GENERIC_READ, wincap.shared (), NULL,
-				OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-	if (fh == INVALID_HANDLE_VALUE)
-	  res = false;
-	else
-	  {
-	    DWORD size = GetFileSize (fh, NULL), read_bytes;
-	    buf = (char *) malloc (size + 1);
-	    if (!ReadFile (fh, buf, size, &read_bytes, NULL))
-	      {
-		if (buf)
-		  free (buf);
-		buf = NULL;
-		fh = NULL;
-		return false;
-	      }
-	    buf[read_bytes] = '\0';
-	    eptr = buf;
-	    CloseHandle (fh);
-	    FILETIME ft;
-	    if (GetFileTime (fh, NULL, NULL, &ft))
-	      etc::set_last_modified (pwd_ix - 1, ft);
-	    char *line;
-	    while ((line = gets()) != NULL)
-	      add_line (line);
-	    res = true;
-	  }
-      }
-
-    state = loaded;
-    return res;
+    passwd_buf = &buf;
+    pwdgrp_buf_elem_size = sizeof (*buf);
+    parse = &pwdgrp::parse_pwd;
+    return load (posix_fname);
+  }
+  bool load (const char *posix_fname, __group32 *&buf)
+  {
+    group_buf = &buf;
+    pwdgrp_buf_elem_size = sizeof (*buf);
+    parse = &pwdgrp::parse_grp;
+    return load (posix_fname);
   }
 };

@@ -26,11 +26,8 @@ details. */
 /* Read /etc/passwd only once for better performance.  This is done
    on the first call that needs information from it. */
 
-static struct passwd NO_COPY *passwd_buf;	/* passwd contents in memory */
-static int NO_COPY curr_lines;
-static int NO_COPY max_lines;
-
-static NO_COPY pwdgrp pr;
+static pwdgrp pr;
+passwd *passwd_buf;
 
 /* Position in the passwd cache */
 #define pw_pos  _reent_winsup ()->_pw_pos
@@ -65,9 +62,10 @@ grab_int (char **p)
 }
 
 /* Parse /etc/passwd line into passwd structure. */
-static int
-parse_pwd (struct passwd &res, char *buf)
+bool
+pwdgrp::parse_pwd (char *buf)
 {
+# define res (*passwd_buf)[curr_lines]
   /* Allocate enough room for the passwd struct and all the strings
      in it in one go */
   res.pw_name = grab_string (&buf);
@@ -75,25 +73,14 @@ parse_pwd (struct passwd &res, char *buf)
   res.pw_uid = grab_int (&buf);
   res.pw_gid = grab_int (&buf);
   if (!*buf)
-    return 0;
+    return false;
   res.pw_comment = 0;
   res.pw_gecos = grab_string (&buf);
   res.pw_dir =  grab_string (&buf);
   res.pw_shell = grab_string (&buf);
-  return 1;
-}
-
-/* Add one line from /etc/passwd into the password cache */
-static void
-add_pwd_line (char *line)
-{
-    if (curr_lines >= max_lines)
-      {
-	max_lines += 10;
-	passwd_buf = (struct passwd *) realloc (passwd_buf, max_lines * sizeof (struct passwd));
-      }
-    if (parse_pwd (passwd_buf[curr_lines], line))
-      curr_lines++;
+  curr_lines++;
+  return true;
+# undef res
 }
 
 class passwd_lock
@@ -131,8 +118,7 @@ read_etc_passwd ()
   /* if we got blocked by the mutex, then etc_passwd may have been processed */
   if (pr.isinitializing ())
     {
-      curr_lines = 0;
-      if (!pr.load ("/etc/passwd", add_pwd_line))
+      if (!pr.load ("/etc/passwd", passwd_buf))
 	debug_printf ("pr.load failed");
 
       char strbuf[128] = "";
@@ -141,8 +127,8 @@ read_etc_passwd ()
 
       if (wincap.has_security ())
 	{
-	  static char pretty_ls[] = "????????:*:-1:-1:";
-	  add_pwd_line (pretty_ls);
+	  static char NO_COPY pretty_ls[] = "????????:*:-1:-1:";
+	  pr.add_line (pretty_ls);
 	  cygsid tu = cygheap->user.sid ();
 	  tu.string (strbuf);
 	  if (myself->uid == ILLEGAL_UID)
@@ -164,7 +150,7 @@ read_etc_passwd ()
 		    myself->gid,
 		    strbuf, getenv ("HOME") ?: "");
 	  debug_printf ("Completing /etc/passwd: %s", linebuf);
-	  add_pwd_line (linebuf);
+	  pr.add_line (linebuf);
 	}
     }
   return;
@@ -183,7 +169,7 @@ internal_getpwsid (cygsid &sid)
   if (sid.string (sid_string + 2))
     {
       endptr = strchr (sid_string + 2, 0) - 1;
-      for (int i = 0; i < curr_lines; i++)
+      for (int i = 0; i < pr.curr_lines; i++)
 	if ((pw = passwd_buf + i)->pw_dir > pw->pw_gecos + 8)
 	  for (ptr1 = endptr, ptr2 = pw->pw_dir - 2;
 	       *ptr1 == *ptr2; ptr2--)
@@ -199,7 +185,7 @@ internal_getpwuid (__uid32_t uid, bool check)
   if (pr.isuninitialized () || (check && pr.isinitializing ()))
     read_etc_passwd ();
 
-  for (int i = 0; i < curr_lines; i++)
+  for (int i = 0; i < pr.curr_lines; i++)
     if (uid == (__uid32_t) passwd_buf[i].pw_uid)
       return passwd_buf + i;
   return NULL;
@@ -211,7 +197,7 @@ internal_getpwnam (const char *name, bool check)
   if (pr.isuninitialized () || (check && pr.isinitializing ()))
     read_etc_passwd ();
 
-  for (int i = 0; i < curr_lines; i++)
+  for (int i = 0; i < pr.curr_lines; i++)
     /* on Windows NT user names are case-insensitive */
     if (strcasematch (name, passwd_buf[i].pw_name))
       return passwd_buf + i;
@@ -333,7 +319,7 @@ getpwent (void)
   if (pr.isinitializing ())
     read_etc_passwd ();
 
-  if (pw_pos < curr_lines)
+  if (pw_pos < pr.curr_lines)
     return passwd_buf + pw_pos++;
 
   return NULL;

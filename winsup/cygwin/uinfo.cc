@@ -390,89 +390,87 @@ cygheap_user::env_name (const char *name, size_t namelen)
   return pwinname;
 }
 
-int NO_COPY etc::curr_ix = -1;
-bool NO_COPY etc::sawchange[MAX_ETC_FILES];
-const NO_COPY char *etc::fn[MAX_ETC_FILES];
-FILETIME NO_COPY etc::last_modified[MAX_ETC_FILES];
-
-int
-etc::init (int n, const char *etc_fn)
+char *
+pwdgrp::gets (char*& eptr)
 {
-  if (n >= 0)
-    /* ok */;
-  else if (++curr_ix < MAX_ETC_FILES)
-    n = curr_ix;
+  char *lptr;
+  if (!eptr)
+    lptr = NULL;
   else
-    api_fatal ("internal error");
-
-  fn[n] = etc_fn;
-  sawchange[n] = false;
-  paranoid_printf ("curr_ix %d, n %d", curr_ix, n);
-  return curr_ix;
-}
-
-bool
-etc::dir_changed (int n)
-{
-  bool res = sawchange[n];
-
-  if (!res)
     {
-      static HANDLE NO_COPY changed_h;
-      if (!changed_h)
+      lptr = eptr;
+      eptr = strchr (lptr, '\n');
+      if (eptr)
 	{
-	  path_conv pwd ("/etc");
-	  changed_h = FindFirstChangeNotification (pwd, FALSE,
-						  FILE_NOTIFY_CHANGE_LAST_WRITE);
-#ifdef DEBUGGING
-	  if (changed_h == INVALID_HANDLE_VALUE)
-	    system_printf ("Can't open /etc for checking, %E", (char *) pwd,
-			   changed_h);
-#endif
-	}
-
-      if (changed_h == INVALID_HANDLE_VALUE)
-	res = true;
-      else if (WaitForSingleObject (changed_h, 0) == WAIT_OBJECT_0)
-	{
-	  (void) FindNextChangeNotification (changed_h);
-	  memset (sawchange, true, sizeof sawchange);
-	  res = true;
+	  if (eptr > lptr && *(eptr - 1) == '\r')
+	    *(eptr - 1) = 0;
+	  *eptr++ = '\0';
 	}
     }
-
-  paranoid_printf ("%s res %d", fn[n], res);
-  return res;
-}
-
-bool
-etc::file_changed (int n)
-{
-  bool res = false;
-  if (!fn[n])
-    res = true;
-  else if (dir_changed (n))
-    {
-      HANDLE h;
-      WIN32_FIND_DATA data;
-
-      if ((h = FindFirstFile (fn[n], &data)) == INVALID_HANDLE_VALUE)
-	res = true;
-      else
-	{
-	  FindClose (h);
-	  if (CompareFileTime (&data.ftLastWriteTime, last_modified + n) > 0)
-	    res = true;
-	}
-    }
-  sawchange[n] = false;
-  paranoid_printf ("%s res %d", fn[n], res);
-  return res;
+  return lptr;
 }
 
 void
-etc::set_last_modified (int n, FILETIME& ft)
+pwdgrp::add_line (char *line)
 {
-  last_modified[n] = ft;
-  sawchange[n] = false;
+  if (curr_lines >= max_lines)
+    {
+      max_lines += 10;
+      *pwdgrp_buf = realloc (*pwdgrp_buf, max_lines * pwdgrp_buf_elem_size);
+    }
+  (void) (this->*parse) (line);
+}
+
+bool
+pwdgrp::load (const char *posix_fname)
+{
+  if (buf)
+    free (buf);
+  buf = NULL;
+
+  pc.check (posix_fname);
+  pwd_ix = etc::init (pwd_ix, pc);
+
+  paranoid_printf ("%s", posix_fname);
+
+  bool res;
+  if (pc.error || !pc.exists () || !pc.isdisk () || pc.isdir ())
+    res = false;
+  else
+    {
+      HANDLE fh = CreateFile (pc, GENERIC_READ, wincap.shared (), NULL,
+			      OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+      if (fh == INVALID_HANDLE_VALUE)
+	res = false;
+      else
+	{
+	  DWORD size = GetFileSize (fh, NULL), read_bytes;
+	  buf = (char *) malloc (size + 1);
+	  if (!ReadFile (fh, buf, size, &read_bytes, NULL))
+	    {
+	      CloseHandle (fh);
+	      if (buf)
+		free (buf);
+	      buf = NULL;
+	      fh = NULL;
+	      res = false;
+	    }
+	  else
+	    {
+	      CloseHandle (fh);
+	      buf[read_bytes] = '\0';
+	      char *eptr = buf;
+	      eptr = buf;
+	      char *line;
+	      curr_lines = 0;
+	      while ((line = gets (eptr)) != NULL)
+		add_line (line);
+	      debug_printf ("%s curr_lines %d", posix_fname, curr_lines);
+	      res = true;
+	    }
+	}
+    }
+
+  state = loaded;
+  return res;
 }

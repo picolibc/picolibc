@@ -206,3 +206,20 @@ int pathmatch (const char *path1, const char *path2) __attribute__ ((regparm (2)
 int pathnmatch (const char *path1, const char *path2, int len) __attribute__ ((regparm (2)));
 
 int path_prefix_p (const char *path1, const char *path2, int len1) __attribute__ ((regparm (3)));
+
+/* FIXME: Move to own include file eventually */
+
+#define MAX_ETC_FILES 2
+class etc
+{
+  static int curr_ix;
+  static signed char change_possible[MAX_ETC_FILES + 1];
+  static const char *fn[MAX_ETC_FILES + 1];
+  static FILETIME last_modified[MAX_ETC_FILES + 1];
+  static bool dir_changed (int);
+  static int init (int, const char *);
+  static bool file_changed (int);
+  static void set_last_modified (int, FILETIME&);
+  static bool test_file_change (int);
+  friend class pwdgrp;
+};

@@ -1,3 +1,54 @@
+2003-01-19  Christopher Faylor  <cgf@redhat.com>
+
+	* pwdgrp.h (etc): Move to path.h.
+	(pwdgrp::max_lines): New field.
+	(pwdgrp::curr_lines): New field.
+	(pwdgrp::pwdgrp_buf): Ditto.
+	(pwdgrp_buf_elem_size): Ditto.
+	(pwdgrp_parse): Ditto.
+	(pwdgrp::gets): Just declare here.
+	(pwdgrp::load): Ditto.  Just take one argument.
+	(pwdgrp::load): Define overloaded function accepting passwd buf.
+	(pwdgrp::load): Define overloaded function accepting group buf.
+	* grp.cc: Use pwdgrp elements rather than standalone static variables
+	throughout.
+	(curr_lines): Eliminate.
+	(max_lines): Ditto.
+	(add_grp_line): Ditto.
+	(parse_grp): Define as returning boolean.  Accept void * arg and line
+	count.  Coerce first argument into __group32 buf reference.  Increment
+	curr_line as appropriate.
+	(read_etc_group): Pass pwdgrp buffer to gr.load.
+	* passwd.cc: Use pwdgrp elements rather than standalone static variables
+	throughout.
+	(curr_lines): Eliminate.
+	(max_lines): Ditto.
+	(add_grp_line): Ditto.
+	(parse_passwd): Define as returning boolean.  Accept void * arg and line
+	count.  Coerce first argument into passwd buf reference.  Increment
+	curr_line as appropriate.
+	(read_etc_group): Pass pwdgrp buffer to pr.load.
+	* path.cc (etc::fn): Extend buffer size to allow index by 1 rather than
+	zero.
+	(etc::last_modified): Ditto.
+	(etc::change_possible): Ditto.  Renamed from sawchange.  Change to
+	signed char since elements are now tri-state.
+	(etc::init): Assume "handle" is 1 based rather than 0.
+	(etc::test_file_change): New function.  Sets change_possible based on
+	file date comparison.
+	(etc::dir_changed): Check file states immediately after changed_h is
+	initialized to avoid a race.
+	(etc::file_changed): Use test_file_change to detect if file needs to be
+	updated.
+	* path.h (etc): Move class here from pwdgrp.h.
+
+	* uinfo.cc: Move etc:: functions to path.cc.  Move pwdgrp functions
+	here.
+	(pwdgrp::gets): Eliminate buf checks.  Just check eptr and set lptr.
+	(pwdgrp::add_line): New function.
+	(pwdgrp::load): Call generic add_line function which will call correct
+	parser.
+
 2003-01-17  Christopher Faylor  <cgf@redhat.com>
 
 	* cygheap.cc: Change most 'int's to 'unsigned's.

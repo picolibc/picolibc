@@ -3753,3 +3753,104 @@ out:
   MALLOC_CHECK;
   return buf;
 }
+
+int etc::curr_ix = 0;
+/* Note that the first elements of the below arrays are unused */
+signed char etc::change_possible[MAX_ETC_FILES + 1];
+const char *etc::fn[MAX_ETC_FILES + 1];
+FILETIME etc::last_modified[MAX_ETC_FILES + 1];
+
+int
+etc::init (int n, const char *etc_fn)
+{
+  if (n > 0)
+    /* ok */;
+  else if (++curr_ix <= MAX_ETC_FILES)
+    n = curr_ix;
+  else
+    api_fatal ("internal error");
+
+  fn[n] = etc_fn;
+  change_possible[n] = false;
+  (void) test_file_change (n);
+  paranoid_printf ("fn[%d] %s, curr_ix %d", n, fn[n], curr_ix);
+  return n;
+}
+
+bool
+etc::test_file_change (int n)
+{
+  HANDLE h;
+  WIN32_FIND_DATA data;
+  bool res;
+
+  if (change_possible[n] < 0)
+    {
+      res = true;
+      paranoid_printf ("fn[%d] %s, already marked changed", n, fn[n]);
+    }
+  else if ((h = FindFirstFile (fn[n], &data)) == INVALID_HANDLE_VALUE)
+    {
+      res = true;
+      memset (last_modified + n, 0, sizeof (last_modified[n]));
+      debug_printf ("FindFirstFile failed, %E");
+    }
+  else
+    {
+      FindClose (h);
+      res = CompareFileTime (&data.ftLastWriteTime, last_modified + n) > 0;
+      last_modified[n] = data.ftLastWriteTime;
+      change_possible[n] = -res;
+      debug_printf ("FindFirstFile succeeded");
+    }
+
+  paranoid_printf ("fn[%d] %s res %d", n, fn[n], res);
+  return res;
+}
+
+bool
+etc::dir_changed (int n)
+{
+  if (!change_possible[n])
+    {
+      static HANDLE changed_h NO_COPY;
+
+      if (!changed_h)
+	{
+	  path_conv pwd ("/etc");
+	  changed_h = FindFirstChangeNotification (pwd, FALSE,
+						  FILE_NOTIFY_CHANGE_LAST_WRITE);
+#ifdef DEBUGGING
+	  if (changed_h == INVALID_HANDLE_VALUE)
+	    system_printf ("Can't open /etc for checking, %E", (char *) pwd,
+			   changed_h);
+#endif
+	  for (int i = 1; i <= curr_ix; i++)
+	    (void) test_file_change (i);
+	}
+
+      if (changed_h == INVALID_HANDLE_VALUE)
+	(void) test_file_change (n);	/* semi-brute-force way */
+      else if (WaitForSingleObject (changed_h, 0) == WAIT_OBJECT_0)
+	{
+	  (void) FindNextChangeNotification (changed_h);
+	  memset (change_possible, 1, sizeof change_possible);
+	}
+    }
+
+  paranoid_printf ("fn[%d] %s change_possible %d", n, fn[n], change_possible[n]);
+  return change_possible[n];
+}
+
+bool
+etc::file_changed (int n)
+{
+  bool res = false;
+  if (!fn[n])
+    res = true;
+  else if (dir_changed (n) && test_file_change (n))
+    res = true;
+  change_possible[n] = 0;
+  paranoid_printf ("fn[%d] %s res %d", n, fn[n], res);
+  return res;
+}

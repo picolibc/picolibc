@@ -26,27 +26,22 @@ details. */
 #include "cygheap.h"
 #include "pwdgrp.h"
 
-/* Read /etc/group only once for better performance.  This is done
-   on the first call that needs information from it. */
-
-static struct __group32 NO_COPY *group_buf;		/* group contents in memory */
-static int NO_COPY curr_lines;
-static int NO_COPY max_lines;
-
 /* Position in the group cache */
 #define grp_pos _reent_winsup ()->_grp_pos
 
-static pwdgrp NO_COPY gr;
+static pwdgrp gr;
+static __group32 *group_buf;
 static char * NO_COPY null_ptr;
 
-static int
-parse_grp (struct __group32 &grp, char *line)
+bool
+pwdgrp::parse_grp (char *line)
 {
   char *dp = strchr (line, ':');
 
   if (!dp)
-    return 0;
+    return false;
 
+# define grp (* group_buf)[curr_lines]
   *dp++ = '\0';
   grp.gr_name = line;
 
@@ -80,23 +75,12 @@ parse_grp (struct __group32 &grp, char *line)
 		  grp.gr_mem = namearray;
 		}
 	    }
-	  return 1;
+	  curr_lines++;
+	  return true;
 	}
     }
-  return 0;
-}
-
-/* Read one line from /etc/group into the group cache */
-static void
-add_grp_line (char *line)
-{
-    if (curr_lines == max_lines)
-      {
-	max_lines += 10;
-	group_buf = (struct __group32 *) realloc (group_buf, max_lines * sizeof (struct __group32));
-      }
-    if (parse_grp (group_buf[curr_lines], line))
-      curr_lines++;
+  return false;
+# undef grp
 }
 
 class group_lock
@@ -130,12 +114,11 @@ read_etc_group ()
   /* if we got blocked by the mutex, then etc_group may have been processed */
   if (gr.isinitializing ())
     {
-      for (int i = 0; i < curr_lines; i++)
+      for (int i = 0; i < gr.curr_lines; i++)
 	if ((group_buf + i)->gr_mem != &null_ptr)
 	  free ((group_buf + i)->gr_mem);
 
-      curr_lines = 0;
-      if (!gr.load ("/etc/group", add_grp_line))
+      if (!gr.load ("/etc/group", group_buf))
 	debug_printf ("gr.load failed");
 
       /* Complete /etc/group in memory if needed */
@@ -156,11 +139,11 @@ read_etc_group ()
 	  snprintf (linebuf, sizeof (linebuf), "%s:%s:%lu:%s",
 		    group_name, strbuf, myself->gid, cygheap->user.name ());
 	  debug_printf ("Completing /etc/group: %s", linebuf);
-	  add_grp_line (linebuf);
+	  gr.add_line (linebuf);
 	}
       static char NO_COPY pretty_ls[] = "????????::-1:";
       if (wincap.has_security ())
-	add_grp_line (pretty_ls);
+	gr.add_line (pretty_ls);
     }
   return;
 }
@@ -174,7 +157,7 @@ internal_getgrsid (cygsid &sid)
     read_etc_group ();
 
   if (sid.string (sid_string))
-    for (int i = 0; i < curr_lines; i++)
+    for (int i = 0; i < gr.curr_lines; i++)
       if (!strcmp (sid_string, group_buf[i].gr_passwd))
         return group_buf + i;
   return NULL;
@@ -186,7 +169,7 @@ internal_getgrgid (__gid32_t gid, bool check)
   if (gr.isuninitialized () || (check && gr.isinitializing ()))
     read_etc_group ();
 
-  for (int i = 0; i < curr_lines; i++)
+  for (int i = 0; i < gr.curr_lines; i++)
     if (group_buf[i].gr_gid == gid)
       return group_buf + i;
   return NULL;
@@ -198,7 +181,7 @@ internal_getgrnam (const char *name, bool check)
   if (gr.isuninitialized () || (check && gr.isinitializing ()))
     read_etc_group ();
 
-  for (int i = 0; i < curr_lines; i++)
+  for (int i = 0; i < gr.curr_lines; i++)
     if (strcasematch (group_buf[i].gr_name, name))
       return group_buf + i;
 
@@ -206,8 +189,7 @@ internal_getgrnam (const char *name, bool check)
   return NULL;
 }
 
-static
-struct __group16 *
+static struct __group16 *
 grp32togrp16 (struct __group16 *gp16, struct __group32 *gp32)
 {
   if (!gp16 || !gp32)
@@ -263,7 +245,7 @@ getgrent32 ()
   if (gr.isinitializing ())
     read_etc_group ();
 
-  if (grp_pos < curr_lines)
+  if (grp_pos < gr.curr_lines)
     return group_buf + grp_pos++;
 
   return NULL;
@@ -290,7 +272,7 @@ internal_getgrent (int pos)
   if (gr.isuninitialized ())
     read_etc_group ();
 
-  if (pos < curr_lines)
+  if (pos < gr.curr_lines)
     return group_buf + pos;
   return NULL;
 }
