@@ -119,7 +119,7 @@ _CRTIMP wint_t __cdecl	ungetwc (wchar_t, FILE*);
 
 #ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
 int __cdecl snwprintf (wchar_t* s, size_t n, const wchar_t*  format, ...);
-extern __inline__ int __cdecl
+__CRT_INLINE int __cdecl
 vsnwprintf (wchar_t* s, size_t n, const wchar_t* format, __VALIST arg)
   { return _vsnwprintf ( s, n, format, arg);}
 int __cdecl vwscanf (const wchar_t * __restrict__, __VALIST);
@@ -253,7 +253,7 @@ _CRTIMP long __cdecl 		wcstol (const wchar_t*, wchar_t**, int);
 _CRTIMP unsigned long __cdecl	wcstoul (const wchar_t*, wchar_t**, int);
 _CRTIMP double __cdecl		wcstod (const wchar_t*, wchar_t**);
 #if !defined __NO_ISOCEXT /* extern stub in static libmingwex.a */
-extern __inline__ float __cdecl wcstof( const wchar_t *nptr, wchar_t **endptr)
+__CRT_INLINE float __cdecl wcstof( const wchar_t *nptr, wchar_t **endptr)
 {  return (wcstod(nptr, endptr)); }
 long double __cdecl wcstold (const wchar_t * __restrict__, wchar_t ** __restrict__);
 #endif /* __NO_ISOCEXT */
@@ -298,8 +298,8 @@ size_t __cdecl wcsrtombs(char *, const wchar_t **, size_t, mbstate_t *);
 int __cdecl wctob(wint_t);
 
 #ifndef __NO_ISOCEXT /* these need static lib libmingwex.a */
-extern __inline__ int __cdecl fwide(FILE* stream, int mode) {return -1;} /* limited to byte orientation */ 
-extern __inline__ int __cdecl mbsinit(const mbstate_t* ps) {return 1;}
+__CRT_INLINE int __cdecl fwide(FILE* stream, int mode) {return -1;} /* limited to byte orientation */ 
+__CRT_INLINE int __cdecl mbsinit(const mbstate_t* ps) {return 1;}
 wchar_t* __cdecl wmemset(wchar_t* s, wchar_t c, size_t n);
 wchar_t* __cdecl wmemchr(const wchar_t* s, wchar_t c, size_t n);
 int wmemcmp(const wchar_t* s1, const wchar_t * s2, size_t n);

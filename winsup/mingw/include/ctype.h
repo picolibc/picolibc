@@ -156,21 +156,21 @@ extern unsigned short** _imp___ctype;
       || defined (__STRICT_ANSI__ ))
 /* use  simple lookup if SB locale, else  _isctype()  */
 #define __ISCTYPE(c, mask)  (MB_CUR_MAX == 1 ? (_pctype[c] & mask) : _isctype(c, mask))
-extern __inline__ int __cdecl isalnum(int c) {return __ISCTYPE(c, (_ALPHA|_DIGIT));}
-extern __inline__ int __cdecl isalpha(int c) {return __ISCTYPE(c, _ALPHA);}
-extern __inline__ int __cdecl iscntrl(int c) {return __ISCTYPE(c, _CONTROL);}
-extern __inline__ int __cdecl isdigit(int c) {return __ISCTYPE(c, _DIGIT);}
-extern __inline__ int __cdecl isgraph(int c) {return __ISCTYPE(c, (_PUNCT|_ALPHA|_DIGIT));}
-extern __inline__ int __cdecl islower(int c) {return __ISCTYPE(c, _LOWER);}
-extern __inline__ int __cdecl isprint(int c) {return __ISCTYPE(c, (_BLANK|_PUNCT|_ALPHA|_DIGIT));}
-extern __inline__ int __cdecl ispunct(int c) {return __ISCTYPE(c, _PUNCT);}
-extern __inline__ int __cdecl isspace(int c) {return __ISCTYPE(c, _SPACE);}
-extern __inline__ int __cdecl isupper(int c) {return __ISCTYPE(c, _UPPER);}
-extern __inline__ int __cdecl isxdigit(int c) {return __ISCTYPE(c, _HEX);}
+__CRT_INLINE int __cdecl isalnum(int c) {return __ISCTYPE(c, (_ALPHA|_DIGIT));}
+__CRT_INLINE int __cdecl isalpha(int c) {return __ISCTYPE(c, _ALPHA);}
+__CRT_INLINE int __cdecl iscntrl(int c) {return __ISCTYPE(c, _CONTROL);}
+__CRT_INLINE int __cdecl isdigit(int c) {return __ISCTYPE(c, _DIGIT);}
+__CRT_INLINE int __cdecl isgraph(int c) {return __ISCTYPE(c, (_PUNCT|_ALPHA|_DIGIT));}
+__CRT_INLINE int __cdecl islower(int c) {return __ISCTYPE(c, _LOWER);}
+__CRT_INLINE int __cdecl isprint(int c) {return __ISCTYPE(c, (_BLANK|_PUNCT|_ALPHA|_DIGIT));}
+__CRT_INLINE int __cdecl ispunct(int c) {return __ISCTYPE(c, _PUNCT);}
+__CRT_INLINE int __cdecl isspace(int c) {return __ISCTYPE(c, _SPACE);}
+__CRT_INLINE int __cdecl isupper(int c) {return __ISCTYPE(c, _UPPER);}
+__CRT_INLINE int __cdecl isxdigit(int c) {return __ISCTYPE(c, _HEX);}
 
 /* these reproduce behaviour of lib underscored versions  */
-extern __inline__ int __cdecl _tolower(int c) {return ( c -'A'+'a');}
-extern __inline__ int __cdecl _toupper(int c) {return ( c -'a'+'A');}
+__CRT_INLINE int __cdecl _tolower(int c) {return ( c -'A'+'a');}
+__CRT_INLINE int __cdecl _toupper(int c) {return ( c -'a'+'A');}
 
 /* TODO? Is it worth inlining ANSI tolower, toupper? Probably only
    if we only want C-locale. */
@@ -212,19 +212,19 @@ _CRTIMP int __cdecl isleadbyte (int);
 #if ! (defined (__NO_INLINE__) || defined(__NO_CTYPE_INLINES) \
        || defined(__WCTYPE_INLINES_DEFINED))
 #define __WCTYPE_INLINES_DEFINED
-extern __inline__ int __cdecl iswalnum(wint_t wc) {return (iswctype(wc,_ALPHA|_DIGIT));}
-extern __inline__ int __cdecl iswalpha(wint_t wc) {return (iswctype(wc,_ALPHA));}
-extern __inline__ int __cdecl iswascii(wint_t wc) {return ((wc & ~0x7F) ==0);}
-extern __inline__ int __cdecl iswcntrl(wint_t wc) {return (iswctype(wc,_CONTROL));}
-extern __inline__ int __cdecl iswdigit(wint_t wc) {return (iswctype(wc,_DIGIT));}
-extern __inline__ int __cdecl iswgraph(wint_t wc) {return (iswctype(wc,_PUNCT|_ALPHA|_DIGIT));}
-extern __inline__ int __cdecl iswlower(wint_t wc) {return (iswctype(wc,_LOWER));}
-extern __inline__ int __cdecl iswprint(wint_t wc) {return (iswctype(wc,_BLANK|_PUNCT|_ALPHA|_DIGIT));}
-extern __inline__ int __cdecl iswpunct(wint_t wc) {return (iswctype(wc,_PUNCT));}
-extern __inline__ int __cdecl iswspace(wint_t wc) {return (iswctype(wc,_SPACE));}
-extern __inline__ int __cdecl iswupper(wint_t wc) {return (iswctype(wc,_UPPER));}
-extern __inline__ int __cdecl iswxdigit(wint_t wc) {return (iswctype(wc,_HEX));}
-extern __inline__ int __cdecl isleadbyte(int c) {return (_pctype[(unsigned char)(c)] & _LEADBYTE);}
+__CRT_INLINE int __cdecl iswalnum(wint_t wc) {return (iswctype(wc,_ALPHA|_DIGIT));}
+__CRT_INLINE int __cdecl iswalpha(wint_t wc) {return (iswctype(wc,_ALPHA));}
+__CRT_INLINE int __cdecl iswascii(wint_t wc) {return ((wc & ~0x7F) ==0);}
+__CRT_INLINE int __cdecl iswcntrl(wint_t wc) {return (iswctype(wc,_CONTROL));}
+__CRT_INLINE int __cdecl iswdigit(wint_t wc) {return (iswctype(wc,_DIGIT));}
+__CRT_INLINE int __cdecl iswgraph(wint_t wc) {return (iswctype(wc,_PUNCT|_ALPHA|_DIGIT));}
+__CRT_INLINE int __cdecl iswlower(wint_t wc) {return (iswctype(wc,_LOWER));}
+__CRT_INLINE int __cdecl iswprint(wint_t wc) {return (iswctype(wc,_BLANK|_PUNCT|_ALPHA|_DIGIT));}
+__CRT_INLINE int __cdecl iswpunct(wint_t wc) {return (iswctype(wc,_PUNCT));}
+__CRT_INLINE int __cdecl iswspace(wint_t wc) {return (iswctype(wc,_SPACE));}
+__CRT_INLINE int __cdecl iswupper(wint_t wc) {return (iswctype(wc,_UPPER));}
+__CRT_INLINE int __cdecl iswxdigit(wint_t wc) {return (iswctype(wc,_HEX));}
+__CRT_INLINE int __cdecl isleadbyte(int c) {return (_pctype[(unsigned char)(c)] & _LEADBYTE);}
 #endif /* !(defined(__NO_CTYPE_INLINES) || defined(__WCTYPE_INLINES_DEFINED)) */
 
 #ifndef	__STRICT_ANSI__
@@ -234,10 +234,10 @@ int __cdecl __iscsymf (int);		/* Valid first character in C symbol */
 int __cdecl __iscsym (int);		/* Valid character in C symbol (after first) */
 
 #if !(defined (__NO_INLINE__) || defined (__NO_CTYPE_INLINES))
-extern __inline__ int __cdecl __isascii(int c) {return ((c & ~0x7F) == 0);} 
-extern __inline__ int __cdecl __toascii(int c) {return (c & 0x7F);}
-extern __inline__ int __cdecl __iscsymf(int c) {return (isalpha(c) || (c == '_'));}
-extern __inline__ int __cdecl __iscsym(int c)  {return  (isalnum(c) || (c == '_'));}
+__CRT_INLINE int __cdecl __isascii(int c) {return ((c & ~0x7F) == 0);} 
+__CRT_INLINE int __cdecl __toascii(int c) {return (c & 0x7F);}
+__CRT_INLINE int __cdecl __iscsymf(int c) {return (isalpha(c) || (c == '_'));}
+__CRT_INLINE int __cdecl __iscsym(int c)  {return  (isalnum(c) || (c == '_'));}
 #endif /* __NO_CTYPE_INLINES */
 
 #ifndef	_NO_OLDNAMES

@@ -222,7 +222,7 @@ _CRTIMP int __cdecl	_vsnprintf (char*, size_t, const char*, __VALIST);
 
 #ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
 int __cdecl snprintf(char* s, size_t n, const char*  format, ...);
-extern __inline__ int __cdecl
+__CRT_INLINE int __cdecl
 vsnprintf (char* s, size_t n, const char* format, __VALIST arg)
   { return _vsnprintf ( s, n, format, arg); }
 int __cdecl vscanf (const char * __restrict__, __VALIST);
@@ -387,7 +387,7 @@ _CRTIMP FILE* __cdecl	_wpopen (const wchar_t*, const wchar_t*);
 
 #ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
 int __cdecl snwprintf (wchar_t* s, size_t n, const wchar_t*  format, ...);
-extern __inline__ int __cdecl
+__CRT_INLINE int __cdecl
 vsnwprintf (wchar_t* s, size_t n, const wchar_t* format, __VALIST arg)
   { return _vsnwprintf ( s, n, format, arg);}
 int __cdecl vwscanf (const wchar_t * __restrict__, __VALIST);

@@ -161,13 +161,13 @@ _CRTIMP int __cdecl	memicmp (const void*, const void*, size_t);
 _CRTIMP char* __cdecl	strdup (const char*);
 _CRTIMP int __cdecl	strcmpi (const char*, const char*);
 _CRTIMP int __cdecl	stricmp (const char*, const char*);
-extern __inline__ int __cdecl
+__CRT_INLINE int __cdecl
 strcasecmp (const char * __sz1, const char * __sz2)
   {return _stricmp (__sz1, __sz2);}
 _CRTIMP int __cdecl	stricoll (const char*, const char*);
 _CRTIMP char* __cdecl	strlwr (char*);
 _CRTIMP int __cdecl	strnicmp (const char*, const char*, size_t);
-extern __inline__ int __cdecl
+__CRT_INLINE int __cdecl
 strncasecmp (const char * __sz1, const char * __sz2, size_t __sizeMaxCompare)
   {return _strnicmp (__sz1, __sz2, __sizeMaxCompare);}
 _CRTIMP char* __cdecl	strnset (char*, int, size_t);
@@ -179,7 +179,7 @@ _CRTIMP void __cdecl	swab (const char*, char*, size_t);
 #endif /* _UWIN */
 
 /* NOTE: There is no _wcscmpi, but this is for compatibility. */
-extern __inline__ int __cdecl
+__CRT_INLINE int __cdecl
 wcscmpi (const wchar_t * __ws1, const wchar_t * __ws2)
   {return _wcsicmp (__ws1, __ws2);}
 _CRTIMP wchar_t* __cdecl wcsdup (wchar_t*);

@@ -329,7 +329,7 @@ _CRTIMP long __cdecl _wtol (const wchar_t *);
 
 _CRTIMP double __cdecl	strtod	(const char*, char**);
 #if !defined __NO_ISOCEXT  /* extern stub in static libmingwex.a */
-extern __inline__ float __cdecl strtof (const char *nptr, char **endptr)
+__CRT_INLINE float __cdecl strtof (const char *nptr, char **endptr)
   { return (strtod (nptr, endptr));}
 long double __cdecl strtold (const char * __restrict__, char ** __restrict__);
 #endif /* __NO_ISOCEXT */
@@ -341,7 +341,7 @@ _CRTIMP unsigned long __cdecl	strtoul	(const char*, char**, int);
 /*  also declared in wchar.h */
 _CRTIMP double __cdecl	wcstod	(const wchar_t*, wchar_t**);
 #if !defined __NO_ISOCEXT /* extern stub in static libmingwex.a */
-extern __inline__ float __cdecl wcstof( const wchar_t *nptr, wchar_t **endptr)
+__CRT_INLINE float __cdecl wcstof( const wchar_t *nptr, wchar_t **endptr)
 {  return (wcstod(nptr, endptr)); }
 long double __cdecl wcstold (const wchar_t * __restrict__, wchar_t ** __restrict__);
 #endif /* __NO_ISOCEXT */
@@ -479,7 +479,7 @@ _CRTIMP char* __cdecl	gcvt (double, int, char*);
 /* C99 name for _exit */
 void __cdecl _Exit(int) _ATTRIB_NORETURN;
 #ifndef __STRICT_ANSI__   /* inline using non-ansi functions */
-extern __inline__ void __cdecl _Exit(int status)
+__CRT_INLINE void __cdecl _Exit(int status)
 	{  _exit(status); }
 #endif 
 
@@ -487,7 +487,7 @@ typedef struct { long long quot, rem; } lldiv_t;
 
 lldiv_t	__cdecl lldiv (long long, long long);
 
-extern __inline__ long long __cdecl llabs(long long _j)
+__CRT_INLINE long long __cdecl llabs(long long _j)
   {return (_j >= 0 ? _j : -_j);}
 
 long long  __cdecl strtoll (const char* __restrict__, char** __restrict, int);
@@ -504,17 +504,17 @@ wchar_t* __cdecl lltow (long long, wchar_t *, int);
 wchar_t* __cdecl ulltow (unsigned long long, wchar_t *, int);
 
   /* inline using non-ansi functions */
-extern __inline__ long long  __cdecl atoll (const char * _c)
+__CRT_INLINE long long  __cdecl atoll (const char * _c)
 	{ return _atoi64 (_c); }
-extern __inline__ char*  __cdecl lltoa (long long _n, char * _c, int _i)
+__CRT_INLINE char*  __cdecl lltoa (long long _n, char * _c, int _i)
 	{ return _i64toa (_n, _c, _i); }
-extern __inline__ char*  __cdecl ulltoa (unsigned long long _n, char * _c, int _i)
+__CRT_INLINE char*  __cdecl ulltoa (unsigned long long _n, char * _c, int _i)
 	{ return _ui64toa (_n, _c, _i); }
-extern __inline__ long long  __cdecl wtoll (const wchar_t * _w)
+__CRT_INLINE long long  __cdecl wtoll (const wchar_t * _w)
  	{ return _wtoi64 (_w); }
-extern __inline__ wchar_t*  __cdecl lltow (long long _n, wchar_t * _w, int _i)
+__CRT_INLINE wchar_t*  __cdecl lltow (long long _n, wchar_t * _w, int _i)
 	{ return _i64tow (_n, _w, _i); } 
-extern __inline__ wchar_t*  __cdecl ulltow (unsigned long long _n, wchar_t * _w, int _i)
+__CRT_INLINE wchar_t*  __cdecl ulltow (unsigned long long _n, wchar_t * _w, int _i)
 	{ return _ui64tow (_n, _w, _i); } 
 #endif /* (__STRICT_ANSI__)  */
 

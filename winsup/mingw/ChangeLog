@@ -1,3 +1,16 @@
+2003-07-24  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/_mingw.h (__CRT_INLINE): Define.
+	* include/ctype.h: Replace 'extern inline' with __CRT_INLINE,
+	throughout
+	* include/inttypes.h: Likewise.
+	* include/math.h: Likewise.
+	* include/stdio.h: Likewise.
+	* include/stdlib.h: Likewise.
+	* include/string.h: Likewise.
+	* include/wchar.h: Likewise.
+	* include/wctype.h: Likewise.
+
 2003-09-22  Roland Schwingel  <rolandschwingel@users.sourceforge.net>
 
 	* mingwex/dirent.c (_topendir): Allocate enough memory for

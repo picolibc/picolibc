@@ -111,19 +111,19 @@ extern unsigned short** _imp___ctype;
 #if !(defined (__NO_INLINE__) || defined(__NO_CTYPE_INLINES) \
       || defined(__WCTYPE_INLINES_DEFINED))
 #define __WCTYPE_INLINES_DEFINED
-extern __inline__ int __cdecl iswalnum(wint_t wc) {return (iswctype(wc,_ALPHA|_DIGIT));}
-extern __inline__ int __cdecl iswalpha(wint_t wc) {return (iswctype(wc,_ALPHA));}
-extern __inline__ int __cdecl iswascii(wint_t wc) {return ((wc & ~0x7F) ==0);}
-extern __inline__ int __cdecl iswcntrl(wint_t wc) {return (iswctype(wc,_CONTROL));}
-extern __inline__ int __cdecl iswdigit(wint_t wc) {return (iswctype(wc,_DIGIT));}
-extern __inline__ int __cdecl iswgraph(wint_t wc) {return (iswctype(wc,_PUNCT|_ALPHA|_DIGIT));}
-extern __inline__ int __cdecl iswlower(wint_t wc) {return (iswctype(wc,_LOWER));}
-extern __inline__ int __cdecl iswprint(wint_t wc) {return (iswctype(wc,_BLANK|_PUNCT|_ALPHA|_DIGIT));}
-extern __inline__ int __cdecl iswpunct(wint_t wc) {return (iswctype(wc,_PUNCT));}
-extern __inline__ int __cdecl iswspace(wint_t wc) {return (iswctype(wc,_SPACE));}
-extern __inline__ int __cdecl iswupper(wint_t wc) {return (iswctype(wc,_UPPER));}
-extern __inline__ int __cdecl iswxdigit(wint_t wc) {return (iswctype(wc,_HEX));}
-extern __inline__ int __cdecl isleadbyte(int c) {return (_pctype[(unsigned char)(c)] & _LEADBYTE);}
+__CRT_INLINE int __cdecl iswalnum(wint_t wc) {return (iswctype(wc,_ALPHA|_DIGIT));}
+__CRT_INLINE int __cdecl iswalpha(wint_t wc) {return (iswctype(wc,_ALPHA));}
+__CRT_INLINE int __cdecl iswascii(wint_t wc) {return ((wc & ~0x7F) ==0);}
+__CRT_INLINE int __cdecl iswcntrl(wint_t wc) {return (iswctype(wc,_CONTROL));}
+__CRT_INLINE int __cdecl iswdigit(wint_t wc) {return (iswctype(wc,_DIGIT));}
+__CRT_INLINE int __cdecl iswgraph(wint_t wc) {return (iswctype(wc,_PUNCT|_ALPHA|_DIGIT));}
+__CRT_INLINE int __cdecl iswlower(wint_t wc) {return (iswctype(wc,_LOWER));}
+__CRT_INLINE int __cdecl iswprint(wint_t wc) {return (iswctype(wc,_BLANK|_PUNCT|_ALPHA|_DIGIT));}
+__CRT_INLINE int __cdecl iswpunct(wint_t wc) {return (iswctype(wc,_PUNCT));}
+__CRT_INLINE int __cdecl iswspace(wint_t wc) {return (iswctype(wc,_SPACE));}
+__CRT_INLINE int __cdecl iswupper(wint_t wc) {return (iswctype(wc,_UPPER));}
+__CRT_INLINE int __cdecl iswxdigit(wint_t wc) {return (iswctype(wc,_HEX));}
+__CRT_INLINE int __cdecl isleadbyte(int c) {return (_pctype[(unsigned char)(c)] & _LEADBYTE);}
 #endif /* !(defined(__NO_CTYPE_INLINES) || defined(__WCTYPE_INLINES_DEFINED)) */
 
 
