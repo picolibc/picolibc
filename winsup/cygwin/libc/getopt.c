@@ -36,6 +36,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "winsup.h"
 #include <assert.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -52,11 +53,11 @@
 #ifdef __weak_alias
 __weak_alias(getopt,_getopt)
 #endif
-int	opterr = 1;		/* if error message should be printed */
-int	optind = 1;		/* index into parent argv vector */
-int	optopt = '?';		/* character checked for validity */
-int	optreset;		/* reset getopt */
-char    *optarg;		/* argument associated with option */
+int __declspec(dllexport) opterr;	/* if error message should be printed */
+int __declspec(dllexport) optind;	/* index into parent argv vector */
+int __declspec(dllexport) optopt;	/* character checked for validity */
+int __declspec(dllexport) optreset;	/* reset getopt */
+char __declspec(dllexport) *optarg;	/* argument associated with option */
 #endif
 
 #ifdef __weak_alias
@@ -66,7 +67,7 @@ __weak_alias(getopt_long,_getopt_long)
 #ifndef __CYGWIN__
 #define __progname __argv[0]
 #else
-extern char __declspec(dllimport) *__progname;
+extern char *__progname;
 #endif
 
 #define IGNORE_FIRST	(*options == '-' || *options == '+')

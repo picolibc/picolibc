@@ -2919,7 +2919,7 @@ long gethostid(void)
 
 #define ETC_SHELLS "/etc/shells"
 static int shell_index;
-static FILE *shell_fp;
+static struct __sFILE64 *shell_fp;
 
 extern "C" char *
 getusershell ()
@@ -2938,7 +2938,7 @@ getusershell ()
   static char buf[MAX_PATH];
   int ch, buf_idx;
 
-  if (!shell_fp && !(shell_fp = fopen (ETC_SHELLS, "rt")))
+  if (!shell_fp && !(shell_fp = fopen64 (ETC_SHELLS, "rt")))
     {
       if (def_shells[shell_index])
         return strcpy (buf, def_shells[shell_index++]);

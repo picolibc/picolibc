@@ -37,14 +37,20 @@ details. */
 #include <sys/types.h>
 #include <sys/strace.h>
 
+/* Declarations for functions used in C and C++ code. */
 #ifdef __cplusplus
 extern "C" {
 #endif
 extern __uid32_t getuid32 (void);
 extern __uid32_t geteuid32 (void);
+extern int seteuid32 (__uid32_t);
 extern __gid32_t getegid32 (void);
 extern struct passwd *getpwuid32 (__uid32_t);
-struct passwd *getpwnam (const char *);
+extern struct passwd *getpwnam (const char *);
+extern struct __sFILE64 *fopen64 (const char *, const char *);
+extern struct hostent *cygwin_gethostbyname (const char *name);
+extern unsigned long cygwin_inet_addr (const char *cp);
+
 #ifdef __cplusplus
 }
 #endif

@@ -1,3 +1,20 @@
+2003-09-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_OFILES): Add getopt.o and iruserok.o.
+	* cygwin.din: Export __check_rhosts_file, __rcmd_errstr, optarg,
+	opterr, optind, optopt, optreset, getopt, getopt_long, iruserok
+	and ruserok.
+	* getopt.c: Moved from lib to here.  Define opt* variables as
+	dllexport.
+	* iruserok.c: Moved from lib to here.  Rearrange function order.
+	Prefer using 64/32 bit functions.
+	* syscalls.cc (shell_fp): Define as struct __sFILE64.
+	(getusershell): Use fopen64 instead of fopen.
+	* winsup.h: Add declarations for seteuid32, fopen64,
+	cygwin_gethostbyname and cygwin_inet_addr.
+	* include/getopt.h: Declare opt* variables dllimport.
+	* include/cygwin/version.h: Bump API minor number.
+
 2003-09-10  Christopher Faylor  <cgf@redhat.com>
 
 	* exceptions.cc (sig_handle_tty_stop): Check parent PID_NOCLDSTOP
