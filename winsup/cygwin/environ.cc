@@ -760,6 +760,8 @@ struct spenv
     __attribute__ ((regparm (3)));
 };
 
+char env_dontadd[] = "";
+
 /* Keep this list in upper case and sorted */
 static NO_COPY spenv spenvs[] =
 {
@@ -781,18 +783,21 @@ spenv::retrieve (bool no_envblock, const char *const envname)
   if (from_cygheap)
     {
       const char *p;
-      if (!envname)
-	return NULL;			/* No need to force these into the
+      if (!cygheap->user.issetuid ())
+	{
+	  if (!envname)
+	    return NULL;		/* No need to force these into the
 					   environment */
 
-      if (no_envblock)
-	return cstrdup1 (envname);	/* Don't really care what it's set to
+	  if (no_envblock)
+	    return cstrdup1 (envname);	/* Don't really care what it's set to
 					   if we're calling a cygwin program */
+	}
 
-      /* Make a FOO=BAR entry from the value returned by the cygheap_user
-         method. */
-      if (!(p = (cygheap->user.*from_cygheap) ()))
-        return NULL;
+      /* Calculate (potentially) value for given environment variable.  */
+      p = (cygheap->user.*from_cygheap) ();
+      if (!p || (no_envblock && !envname))
+        return env_dontadd;
       char *s = (char *) cmalloc (HEAP_1_STR, namelen + strlen (p) + 1);
       strcpy (s, name);
       (void) strcpy (s + namelen, p);
@@ -846,23 +851,28 @@ build_env (const char * const *envp, char *&envblock, int &envc,
   int tl = 0;
   /* Iterate over input list, generating a new environment list and refreshing
      "special" entries, if necessary. */
-  for (srcp = envp, dstp = newenv; *srcp; srcp++, dstp++)
+  for (srcp = envp, dstp = newenv; *srcp; srcp++)
     {
       /* Look for entries that require special attention */
       for (unsigned i = 0; i < SPENVS_SIZE; i++)
 	if (!saw_spenv[i] && (*dstp = spenvs[i].retrieve (no_envblock, *srcp)))
 	  {
 	    saw_spenv[i] = 1;
-	    goto next;
+	    if (*dstp == env_dontadd)
+	      goto next1;
+	    goto  next0;
 	  }
 
       /* Add entry to new environment */
       *dstp = cstrdup1 (*srcp);
 
-    next:
+    next0:
       /* If necessary, calculate rough running total for envblock size */
       if (!no_envblock)
 	tl += strlen (*dstp) + 1;
+      dstp++;
+    next1:
+      continue;
     }
 
   /* Fill in any required-but-missing environment variables. */
@@ -870,7 +880,7 @@ build_env (const char * const *envp, char *&envblock, int &envc,
     if (!saw_spenv[i])
       {
 	*dstp = spenvs[i].retrieve (no_envblock);
-	if (*dstp)
+	if (*dstp && *dstp != env_dontadd)
 	  {
 	    if (!no_envblock)
 	      tl += strlen (*dstp) + 1;

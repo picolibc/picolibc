@@ -1,5 +1,20 @@
 2002-06-16  Christopher Faylor  <cgf@redhat.com>
 
+	* cygheap.h (cygheap_user::issetuid): New method.
+	* dtable.cc (dtable::vfork_child_dup): Use new method to determine if
+	we are in "setuid mode."
+	* fork.cc (fork_parent): Ditto.
+	* spawn.cc (spawn_guts): Ditto.
+	* syscalls.cc (seteuid32): Ditto.
+	(setegid32): Ditto.
+	* environ.cc (spenv::retrieve): (Suggested by Pierre Humblet) Do
+	potential recalculation of cygheap_user stuff when in setuid mode.
+	Return special value when environment variable exists but should not be
+	added.
+	(build_env): Don't add retrieved value to dstp if it is 'dont_add'.
+
+2002-06-16  Christopher Faylor  <cgf@redhat.com>
+
 	Changes suggested by Pierre Humblet.
 	* environ.cc (NL): New macro.
 	(conv_envvars): Use NL macro to fill in name and namelen.

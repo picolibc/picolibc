@@ -144,6 +144,10 @@ public:
   PSID sid () const { return psid; }
   PSID orig_sid () const { return orig_psid; }
   const char *ontherange (homebodies what, struct passwd * = NULL);
+  bool issetuid () const
+  {
+    return impersonated && token != INVALID_HANDLE_VALUE;
+  }
 };
 
 /* cwd cache stuff.  */

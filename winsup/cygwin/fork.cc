@@ -441,7 +441,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   si.cbReserved2 = sizeof(ch);
 
   /* Remove impersonation */
-  if (cygheap->user.impersonated && cygheap->user.token != INVALID_HANDLE_VALUE)
+  if (cygheap->user.issetuid ())
     RevertToSelf ();
 
   ch.parent = hParent;
@@ -490,8 +490,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
       ForceCloseHandle(subproc_ready);
       ForceCloseHandle(forker_finished);
       /* Restore impersonation */
-      if (cygheap->user.impersonated
-	  && cygheap->user.token != INVALID_HANDLE_VALUE)
+      if (cygheap->user.issetuid ())
 	ImpersonateLoggedOnUser (cygheap->user.token);
       cygheap_setup_for_child_cleanup (newheap, &ch, 0);
       return -1;
@@ -519,7 +518,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   strcpy(forked->progname, myself->progname);
 
   /* Restore impersonation */
-  if (cygheap->user.impersonated && cygheap->user.token != INVALID_HANDLE_VALUE)
+  if (cygheap->user.issetuid ())
     ImpersonateLoggedOnUser (cygheap->user.token);
 
   ProtectHandle (pi.hThread);
