@@ -1,5 +1,9 @@
 2002-08-19  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/sys/linux/include/pthread.h: New file.
+
+2002-08-19  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/include/sys/types.h: Support __need_inttypes macro
 	that only sets the __intxx and __uintxx types.  
 	* libc/machine/powerpc/Makefile.am: Add stdlib to include directories
