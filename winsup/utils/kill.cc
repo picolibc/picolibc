@@ -37,7 +37,7 @@ main (int argc, char **argv)
       break;
     else if (strcmp(*argv + 1, "0") != 0)
       {
-	sig = getsig (*argv++ + 1);
+	sig = getsig (*argv + 1);
 	gotsig = 1;
       }
     else

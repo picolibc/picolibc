@@ -72,10 +72,12 @@ PROGS:=mount$(EXEEXT) umount$(EXEEXT) ps$(EXEEXT) kill$(EXEEXT) \
        passwd$(EXEEXT) getfacl$(EXEEXT) setfacl$(EXEEXT) strace$(EXEEXT) \
        regtool$(EXEEXT)
 
+CLEAN_PROGS:=$(PROGS)
 ifdef build_dumper
 PROGS+=dumper$(EXEEXT)
 else
 PROGS:=warn_dumper $(PROGS)
+CLEAN_PROGS+=dumper.exe
 endif
 
 .SUFFIXES:
@@ -106,7 +108,7 @@ mingw_getopt.o: $(cygwin_source)/lib/getopt.c
 	$(CC) -c -o $@ $(MINGW_CFLAGS) $^
 
 clean:
-	rm -f *.o $(PROGS)
+	rm -f *.o $(CLEAN_PROGS)
 
 realclean: clean
 	rm -f  Makefile config.cache

@@ -1,3 +1,9 @@
+Mon Aug 28 21:55:56 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* kill.c (main): Avoid skipping next argument when a signal number is
+	specified.
+	* Makefile.in: Always clean dumper.exe.
+
 Fri Aug 25 12:41:53 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Only build dumper.exe when all of its library and
