@@ -70,7 +70,8 @@ enum
   FH_NOEINTR	= 0x01000000,	/* Set if I/O should be uninterruptible. */
   FH_FFIXUP	= 0x02000000,	/* Set if need to fixup after fork. */
   FH_LOCAL	= 0x04000000,	/* File is unix domain socket */
-  FH_FIFO	= 0x08000000,	/* File is FIFO */
+  FH_SHUTRD	= 0x08000000,	/* Socket saw a SHUT_RD */
+  FH_SHUTWR	= 0x10000000,	/* Socket saw a SHUT_WR */
   FH_ISREMOTE	= 0x10000000,	/* File is on a remote drive */
   FH_DCEXEC	= 0x20000000,	/* Don't care if this is executable */
   FH_HASACLS	= 0x40000000,	/* True if fs of file has ACLS */
@@ -157,7 +158,7 @@ enum executable_states
 
 class fhandler_base
 {
-private:
+protected:
   DWORD status;
 public:
   int cb;
@@ -398,6 +399,13 @@ public:
   ~fhandler_socket ();
   int get_socket () { return (int) get_handle(); }
   fhandler_socket * is_socket () { return this; }
+
+  int saw_shutdown_read () const {return FHISSETF (SHUTRD);}
+  int saw_shutdown_write () const {return FHISSETF (SHUTWR);}
+
+  void set_shutdown_read () {FHSETF (SHUTRD);}
+  void set_shutdown_write () {FHSETF (SHUTWR);}
+
   int write (const void *ptr, size_t len);
   int read (void *ptr, size_t len);
   int ioctl (unsigned int cmd, void *);
@@ -1066,6 +1074,7 @@ public:
 		     fd_set *exceptfds);
   int poll (fd_set *readfds, fd_set *writefds, fd_set *exceptfds);
   int wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds, DWORD ms);
+  void cleanup ();
 };
 
 int __stdcall set_console_state_for_spawn ();

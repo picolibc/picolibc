@@ -65,6 +65,7 @@ LD:=@LD@
 DLLTOOL:=@DLLTOOL@
 WINDRES:=@WINDRES@
 AS:=@AS@
+LDSCRIPT=cygwin.sc
 
 #
 # Include common definitions for winsup directory
@@ -194,9 +195,11 @@ new-$(LIB_NAME): $(LIB_NAME)
 
 # Rule to build cygwin.dll
 
-new-$(DLL_NAME): $(DLL_OFILES) $(DEF_FILE) $(DLL_IMPORTS) $(LIBC) $(LIBM) Makefile winver_stamp
-	$(CXX) $(CXXFLAGS) -nostdlib -Wl,-shared -o $@ -e $(DLL_ENTRY) $(DEF_FILE) $(DLL_OFILES) version.o \
-	winver.o $(DLL_IMPORTS) $(MALLOC_OBJ) $(LIBM) $(LIBC) -lstdc++ -lgcc -lshell32 -luuid
+new-$(DLL_NAME): $(LDSCRIPT) $(DLL_OFILES) $(DEF_FILE) $(DLL_IMPORTS) $(LIBC) $(LIBM) Makefile winver_stamp
+	$(CXX) $(CXXFLAGS) -nostdlib -Wl,-T$(firstword $^) -shared -o $@ \
+	-e $(DLL_ENTRY) $(DEF_FILE) $(DLL_OFILES) version.o winver.o \
+	$(DLL_IMPORTS) $(MALLOC_OBJ) $(LIBM) $(LIBC) \
+	-lstdc++ -lgcc -lshell32 -luuid
 
 dll_ofiles: $(DLL_OFILES)
 

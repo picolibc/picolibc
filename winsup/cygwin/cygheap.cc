@@ -36,7 +36,7 @@ struct cygheap_entry
   };
 
 #define NBUCKETS 32
-char *buckets[NBUCKETS] = {0};
+static char *buckets[NBUCKETS] = {0};
 
 #define N0 ((_cmalloc_entry *) NULL)
 #define to_cmalloc(s) ((_cmalloc_entry *) (((char *) (s)) - (int) (N0->data)))
@@ -46,28 +46,21 @@ char *buckets[NBUCKETS] = {0};
 
 extern "C" {
 static void __stdcall _cfree (void *ptr) __attribute__((regparm(1)));
+extern void *_cygheap_start;
 }
 
 inline static void
 init_cheap ()
 {
-  if (!iswinnt)
+  cygheap = (init_cygheap *) VirtualAlloc ((void *) &_cygheap_start, CYGHEAPSIZE, MEM_RESERVE, PAGE_NOACCESS);
+  if (!cygheap)
     {
-      cygheap = (init_cygheap *) VirtualAlloc (NULL, CYGHEAPSIZE, MEM_RESERVE, PAGE_NOACCESS);
-      if (!cygheap)
-	    api_fatal ("Couldn't reserve space for cygwin's heap, %E");
-    }
-  else
-    {
-      HANDLE h;
-      h = CreateFileMapping (INVALID_HANDLE_VALUE, &sec_none, PAGE_READWRITE,
-      			     0, CYGHEAPSIZE, NULL);
-      if (!h)
-        api_fatal ("CreateFileMapping failed, %E");
-      cygheap = (init_cygheap *) MapViewOfFile (h, FILE_MAP_WRITE, 0, 0, 0);
-      if (!cygheap)
-        api_fatal ("Couldn't allocate shared memory for cygwin heap, %E");
-      CloseHandle (h);
+      MEMORY_BASIC_INFORMATION m;
+      if (!VirtualQuery ((LPCVOID) &_cygheap_start, &m, sizeof m))
+	system_printf ("couldn't get memory info, %E");
+      small_printf ("AllocationBase %p, BaseAddress %p, RegionSize %p, State %p\n",
+		    m.AllocationBase, m.BaseAddress, m.RegionSize, m.State);
+      api_fatal ("Couldn't reserve space for cygwin's heap, %E");
     }
   cygheap_max = cygheap + 1;
 }
@@ -106,18 +99,30 @@ cygheap_fixup_in_child (child_info *ci, bool execed)
   cygheap_max = ci->cygheap_max;
   void *addr = iswinnt ? cygheap : NULL;
   void *newaddr;
+
   newaddr = MapViewOfFileEx (ci->cygheap_h, MVMAP_OPTIONS, 0, 0, 0, addr);
-  if (!iswinnt || newaddr != addr)
+  if (newaddr != cygheap)
     {
+      if (!newaddr)
+	newaddr = MapViewOfFileEx (ci->cygheap_h, MVMAP_OPTIONS, 0, 0, 0, NULL);
       DWORD n = (DWORD) cygheap_max - (DWORD) cygheap;
       /* Reserve cygwin heap in same spot as parent */
       if (!VirtualAlloc (cygheap, CYGHEAPSIZE, MEM_RESERVE, PAGE_NOACCESS))
-	    api_fatal ("Couldn't reserve space for cygwin's heap (%p <%p>) in child, %E", cygheap, newaddr);
+      {
+	MEMORY_BASIC_INFORMATION m;
+	memset (&m, 0, sizeof m);
+	if (!VirtualQuery ((LPCVOID) cygheap, &m, sizeof m))
+	  system_printf ("couldn't get memory info, %E");
+
+	small_printf ("m.AllocationBase %p, m.BaseAddress %p, m.RegionSize %p, m.State %p\n",
+		      m.AllocationBase, m.BaseAddress, m.RegionSize, m.State);
+	api_fatal ("Couldn't reserve space for cygwin's heap (%p <%p>) in child, %E", cygheap, newaddr);
+      }
 
       /* Allocate same amount of memory as parent */
       if (!VirtualAlloc (cygheap, n, MEM_COMMIT, PAGE_READWRITE))
-	    api_fatal ("Couldn't allocate space for child's heap %p, size %d, %E",
-			       cygheap, n);
+	api_fatal ("Couldn't allocate space for child's heap %p, size %d, %E",
+		   cygheap, n);
       memcpy (cygheap, newaddr, n);
       UnmapViewOfFile (newaddr);
     }

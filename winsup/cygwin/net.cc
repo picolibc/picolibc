@@ -1349,6 +1349,20 @@ cygwin_shutdown (int fd, int how)
       res = shutdown (sock->get_socket (), how);
       if (res)
 	set_winsock_errno ();
+      else
+	switch (how)
+	  {
+	  case SHUT_RD:
+	    sock->set_shutdown_read ();
+	    break;
+	  case SHUT_WR:
+	    sock->set_shutdown_write ();
+	    break;
+	  case SHUT_RDWR:
+	    sock->set_shutdown_read ();
+	    sock->set_shutdown_write ();
+	    break;
+	  }
     }
   syscall_printf ("%d = shutdown (%d, %d)", res, fd, how);
   return res;

@@ -1,3 +1,34 @@
+Fri Aug 31 00:56:26 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* cygwin.sc: New file -- linker script for building cygwin DLL.
+	* Makefile.in: Use linker script to control location of cygheap.
+	* cygheap.cc (buckets): Make static.
+	(init_cheap): Remove special iswinnt handling.  Allocate cygheap at a
+	fixed location.  Display more info when allocation fails.
+	(cygheap_fixup_in_child): Try harder to move cygheap to correct
+	location.  Display more info when allocation fails.
+	* fhandler.h (fhandler_socket): Add macros for tracking socket shutdown
+	state.
+	* net.cc (cygwin_shutdown): Set appropriate shutdown value for future
+	use.
+	* select.cc (select_stuff::cleanup): New method.
+	(cygwin_select): Call cleanup explicitly to avoid a race.
+	(select_stuff:~select_stuff): Call cleanup chain via cleanup method.
+	(fhandler_socket::select_read): Set *_ready when shutdown has been
+	called on the socket.
+	(fhandler_socket::select_write): Ditto.
+	(fhandler_socket::select_except): Ditto.
+
+	* winsup.h: Move NO_COPY to "COMMON" section.
+	* autoload.cc (wsock_started): Avoid initializing NO_COPY value.
+	* sigproc.cc: Remove initialization from NO_COPY variables.
+	(sigproc_init): Initialize sig_loop_wait here, rather than via
+	initialization.
+	(subproc_init): Initialize proc_loop_wait here, rather than via
+	initialization.
+
+
+
 Thu Aug 30 10:19:00 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* select.cc (select_read): Add setting read_ready flag.
