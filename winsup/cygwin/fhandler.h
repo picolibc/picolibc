@@ -1107,7 +1107,6 @@ class fhandler_proc: public fhandler_virtual
   void fill_filebuf ();
 };
 
-class pinfo;
 class fhandler_registry: public fhandler_proc
 {
  public:
@@ -1125,16 +1124,18 @@ class fhandler_registry: public fhandler_proc
   void fill_filebuf ();
 };
 
-struct _pinfo;
+class pinfo;
 class fhandler_process: public fhandler_proc
 {
+  pid_t pid;
+  pinfo *p;
  public:
   fhandler_process ();
   int exists();
   struct dirent *readdir (DIR *);
   int open (path_conv *real_path, int flags, mode_t mode = 0);
   int __stdcall fstat (struct __stat64 *buf, path_conv *) __attribute__ ((regparm (3)));
-  void fill_filebuf (pinfo& p);
+  void fill_filebuf ();
 };
 
 typedef union

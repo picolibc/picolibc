@@ -76,7 +76,39 @@
 	(transport_layer_sockets::accept): Rename local variable
 	`accept_fd' to avoid shadowing the `fd' field.
 
-2002-06-29  Pierre Humblet <pierre.humblet@ieee.org>   
+2002-06-30  Christopher Faylor  <cgf@redhat.com>
+
+	* uinfo.cc (cygheap_user::ontherange): Potentially set HOME from
+	existing homepath and homedrive cygheap_user fields (not currently used
+	yet).  Set HOME to / if no other alternative.
+	(cygheap_user::test_uid): Simplify.
+
+2002-06-30  Christopher Faylor  <cgf@redhat.com>
+
+	* environ.cc (parse_options): Use setenv to potentially replace CYGWIN
+	value on export.  Fixes broken behavior since November 2000 changes.
+	(regopt): Return indication of whether or not something has been parsed
+	from the registry.
+	(environ_init): Only attempt to export CYGWIN variable when values were
+	set from the registry.  It is exported automatically otherwise.
+
+2002-06-30  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.h (fhandler_process::pid): New field.
+	(fhandler_process::fstat): Remove unneeded array.  Set pid element.
+	(fhandler_process::open): Ditto.
+	(fhandler_process::fill_filebuf): Handle case where 'p' field is NULL.
+
+2002-06-30  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.h (fhandler_process::p): New field.
+	(fhandler_process:fill_filebuf): Revert to same definition as virtual
+	in parent class.
+	(fhandler_process::open): Fill out p field rather than passing as an
+	argument.
+	(fhandler_process::fill_filebuf): Use p pointer rather than argument.
+
+2002-06-29  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* security.cc (extract_nt_dom_user): Check for all buffer overflows.
 	Call LookupAccountSid after trying to get domain & user from passwd.
