@@ -1523,7 +1523,7 @@ typedef struct tagNMCUSTOMDRAWINFO {
     RECT     rc;
     DWORD    dwItemSpec;
     UINT     uItemState;
-    LPARAM   lItemParam;
+    LPARAM   lItemlParam;
 } NMCUSTOMDRAW, *LPNMCUSTOMDRAW;
 typedef struct tagNMLVCUSTOMDRAW {
     NMCUSTOMDRAW nmcd;
