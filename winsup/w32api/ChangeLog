@@ -1,5 +1,23 @@
 2003-09-25  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/winuser.h (GetClipboardSequenceNumber): Add functions
+	and constants.
+
+	* include/winuser.h (GetGuiResources, GR_GDIOBJECTS,
+	GR_USEROBJECTS): Add functions and constants.
+
+	* include/winuser.h (GetMouseMovePointsEx, GMMP_USE_DISPLAY_POINTS,
+	GMMP_USE_HIGH_RESOLUTION_POINTS): Add functions and constants.
+
+	* include/winuser.h (InSendMessageEx, ISMEX_NOSEND, ISMEX_CALLBACK,
+	ISMEX_NOTIFY, ISMEX_REPLIED, ISMEX_SEND): Add functions and
+	constants.
+
+	* lib/user32.def (GetClipboardSequenceNumber, GetGuiResources,
+	GetMouseMovePointsEx, InSendMessageEx): Add functions.
+
+2003-09-25  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winuser.h (BroadcastSystemMessage, BroadcastSystemMessageA,
 	BroadcastSystemMessageW, BroadcastSystemMessageEx,
 	BroadcastSystemMessageExA, BroadcastSystemMessageExW,

@@ -2097,9 +2097,20 @@ extern "C" {
 #define MONITOR_DEFAULTTOPRIMARY 1 
 #define MONITOR_DEFAULTTONEAREST 2 
 #define MONITORINFOF_PRIMARY 1 
-#endif
-#if (_WIN32_WINNT >= 0x0500 || _WIN32_WINDOWS >= 0x0410)
 #define EDS_RAWMODE 0x00000002
+#define ISMEX_NOSEND 0x00000000
+#define ISMEX_CALLBACK 0x00000004
+#define ISMEX_NOTIFY 0x00000002
+#define ISMEX_REPLIED 0x00000008
+#define ISMEX_SEND 0x00000001
+#endif
+#if (_WIN32_WINNT >= 0x0500)
+#define GR_GDIOBJECTS 0
+#define GR_USEROBJECTS 1
+#endif
+#if (_WIN32_WINNT >= 0x0500 || _WIN32_WINDOWS >= 0x0490)
+#define GMMP_USE_DISPLAY_POINTS 1
+#define GMMP_USE_HIGH_RESOLUTION_POINTS 2
 #endif
 
 #ifndef RC_INVOKED
@@ -2824,12 +2835,14 @@ typedef struct {
   DWORD dwTimeout;
 } FLASHWINFO, *PFLASHWINFO;
 #endif /* (WINVER >= 0x0500) */
+#if (_WIN32_WINNT >= 0x0500 || _WIN32_WINDOWS >= 0x0490)
 typedef struct tagMOUSEMOVEPOINT {
   int x;
   int y;
   DWORD time;
   ULONG_PTR dwExtraInfo;
-} MOUSEMOVEPOINT, *PMOUSEMOVEPOINT;
+} MOUSEMOVEPOINT, *PMOUSEMOVEPOINT, *LPMOUSEMOVEPOINT;
+#endif
 typedef struct tagMOUSEINPUT {
   LONG dx;
   LONG dy;
@@ -3126,6 +3139,9 @@ HANDLE WINAPI GetClipboardData(UINT);
 int WINAPI GetClipboardFormatNameA(UINT,LPSTR,int);
 int WINAPI GetClipboardFormatNameW(UINT,LPWSTR,int);
 HWND WINAPI GetClipboardOwner(void);
+#if (_WIN32_WINNT >= 0x0500 || _WIN32_WINDOWS >= 0x0410)
+DWORD WINAPI GetClipboardSequenceNumber(void);
+#endif
 HWND WINAPI GetClipboardViewer(void);
 BOOL WINAPI GetClipCursor(LPRECT);
 BOOL WINAPI GetCursorPos(LPPOINT);
@@ -3141,6 +3157,9 @@ UINT WINAPI GetDlgItemTextW(HWND,int,LPWSTR,int);
 UINT WINAPI GetDoubleClickTime(void);
 HWND WINAPI GetFocus(void);
 HWND WINAPI GetForegroundWindow(void);
+#if (_WIN32_WINNT >= 0x0500)
+DWORD WINAPI GetGuiResources(HANDLE,DWORD);
+#endif
 BOOL WINAPI GetIconInfo(HICON,PICONINFO);
 BOOL WINAPI GetInputState(void);
 UINT WINAPI GetKBCodePage(void);
@@ -3172,6 +3191,9 @@ BOOL WINAPI GetMessageW(LPMSG,HWND,UINT,UINT);
 LONG WINAPI GetMessageExtraInfo(void);
 DWORD WINAPI GetMessagePos(void);
 LONG WINAPI GetMessageTime(void);
+#if (_WIN32_WINNT >= 0x0500 || _WIN32_WINDOWS >= 0x0490)
+int WINAPI GetMouseMovePointsEx(UINT,LPMOUSEMOVEPOINT,LPMOUSEMOVEPOINT,int,DWORD);
+#endif
 HWND WINAPI GetNextDlgGroupItem(HWND,HWND,BOOL);
 HWND WINAPI GetNextDlgTabItem(HWND,HWND,BOOL);
 #define GetNextWindow(h,c) GetWindow(h,c)
@@ -3251,6 +3273,9 @@ BOOL WINAPI HideCaret(HWND);
 BOOL WINAPI HiliteMenuItem(HWND,HMENU,UINT,UINT);
 BOOL WINAPI InflateRect(LPRECT,int,int);
 BOOL WINAPI InSendMessage(VOID);
+#if (_WIN32_WINNT >= 0x0500 || _WIN32_WINDOWS >= 0x0410)
+DWORD WINAPI InSendMessageEx(LPVOID);
+#endif
 BOOL WINAPI InsertMenuA(HMENU,UINT,UINT,UINT,LPCSTR);
 BOOL WINAPI InsertMenuW(HMENU,UINT,UINT,UINT,LPCWSTR);
 BOOL WINAPI InsertMenuItemA(HMENU,UINT,BOOL,LPCMENUITEMINFOA);

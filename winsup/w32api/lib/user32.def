@@ -239,6 +239,7 @@ GetClipboardData@4
 GetClipboardFormatNameA@12
 GetClipboardFormatNameW@12
 GetClipboardOwner@0
+GetClipboardSequenceNumber@0
 GetClipboardViewer@0
 GetComboBoxInfo@8
 GetCursor@0
@@ -257,6 +258,7 @@ GetDoubleClickTime@0
 GetFocus@0
 GetForegroundWindow@0
 GetGUIThreadInfo@8
+GetGuiResources@8
 GetIconInfo@8
 GetInputDesktop@0
 GetInputState@0
@@ -295,6 +297,7 @@ GetMessageTime@0
 GetMessageW@16
 GetMonitorInfoA@8
 GetMonitorInfoW@8
+GetMouseMovePointsEx@20
 GetNextDlgGroupItem@12
 GetNextDlgTabItem@12
 GetOpenClipboardWindow@0
@@ -350,6 +353,7 @@ HideCaret@4
 HiliteMenuItem@16
 ImpersonateDdeClientWindow@8
 InSendMessage@0
+InSendMessageEx@4
 InflateRect@12
 InsertMenuA@20
 InsertMenuItemA@16
