@@ -1,5 +1,9 @@
 2004-02-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* getopt.c: Avoid useless compiler warnings.
+
+2004-02-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* getopt.c: Replace with latest vanilla(!) OpenBSD version 1.16.
 
 2004-02-18  Christopher Faylor  <cgf@redhat.com>

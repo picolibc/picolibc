@@ -87,7 +87,11 @@ char    *optarg;		/* argument associated with option */
 #define	BADARG		((*options == ':') ? (int)':' : (int)'?')
 #define	INORDER 	(int)1
 
+#ifdef __CYGWIN__
+static char EMSG[] = "";
+#else
 #define	EMSG		""
+#endif
 
 static int getopt_internal(int, char * const *, const char *,
 			   const struct option *, int *, int);
@@ -421,7 +425,7 @@ start:
 	}
 
 	if ((optchar = (int)*place++) == (int)':' ||
-	    optchar == (int)'-' && *place != '\0' ||
+	    (optchar == (int)'-' && *place != '\0') ||
 	    (oli = strchr(options, optchar)) == NULL) {
 		/*
 		 * If the user specified "-" and  '-' isn't listed in
