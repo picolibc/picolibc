@@ -431,14 +431,7 @@ dtable::build_fhandler (int fd, const device& dev, char *unix_name,
     }
 
   if (!fh)
-    {
-      set_errno (ENODEV);
-#ifdef DEBUGGING
-      system_printf ("unknown device - %p, '%s', upper %d",
-	       (int) dev, dev.name, dev.upper);
-      return NULL;
-#endif
-    }
+    fh = cnew (fhandler_nodevice) ();
 
   char w32buf[MAX_PATH + 1];
   if (!unix_name || !*unix_name)

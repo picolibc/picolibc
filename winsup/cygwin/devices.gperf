@@ -107,6 +107,7 @@ struct device;
 "//./x:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
 "//./y:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
 "//./z:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
+":bad:", FH_BAD, ":bad:", 0, 0, 0, 0
 %%
 void
 device::parse (const char *s)
@@ -179,6 +180,8 @@ device::parse (_major_t major, _minor_t minor)
       }
   
 out:
+  if (!*this)
+    devn = FHDEV (major, minor);
   return;
 }
 

@@ -1168,6 +1168,13 @@ class fhandler_process: public fhandler_proc
   bool fill_filebuf ();
 };
 
+struct fhandler_nodevice: public fhandler_base
+{
+  fhandler_nodevice ();
+  int open (path_conv *real_path, int flags, mode_t mode = 0);
+  // int __stdcall fstat (struct __stat64 *buf, path_conv *);
+};
+
 typedef union
 {
   char __base[sizeof (fhandler_base)];
@@ -1196,6 +1203,7 @@ typedef union
   char __tty_slave[sizeof (fhandler_tty_slave)];
   char __virtual[sizeof (fhandler_virtual)];
   char __windows[sizeof (fhandler_windows)];
+  char __nodevice[sizeof (fhandler_nodevice)];
 } fhandler_union;
 
 struct select_record

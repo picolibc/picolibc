@@ -615,14 +615,9 @@ path_conv::check (const char *src, unsigned opt,
 	  if (sym.minor || sym.major)
 	    {
 	      dev.parse (sym.major, sym.minor);
-	      if (!dev)
-		error = ENODEV;
-	      else
-		{
-		  dev.setfs (1);
-		  dev.mode = sym.mode;
-		  fileattr = sym.fileattr;
-		}
+	      dev.setfs (1);
+	      dev.mode = sym.mode;
+	      fileattr = sym.fileattr;
 	      goto out;
 	    }
 
