@@ -1,3 +1,8 @@
+2004-07-13  Earnie Boyd  <earnie@users.sourcefourge.net>
+
+	* include/_mingw.h: Increment minor version for 3.4 release.
+	* Makefile.in: Ditto.
+
 2004-07-12  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/math/cephes_emath.h (__etens): Remove declaration.
