@@ -28,7 +28,7 @@ details. */
 
 static NO_COPY const int CHUNK_SIZE = 1024; /* Used for crlf conversions */
 
-static char fhandler_disk_dummy_name[] = "some disk file";
+static NO_COPY char fhandler_disk_dummy_name[] = "some disk file";
 
 struct __cygwin_perfile *perfile_table;
 

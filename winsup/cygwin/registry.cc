@@ -14,7 +14,7 @@ details. */
 #include "security.h"
 #include <cygwin/version.h>
 
-char cygnus_class[] = "cygnus";
+static char NO_COPY cygnus_class[] = "cygnus";
 
 reg_key::reg_key (HKEY top, REGSAM access, ...)
 {

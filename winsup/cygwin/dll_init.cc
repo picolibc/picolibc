@@ -18,7 +18,7 @@ extern void __stdcall check_sanity_and_sync (per_process *);
 
 dll_list NO_COPY dlls;
 
-static NO_COPY int in_forkee;
+static NO_COPY int in_forkee = 0;
 static int dll_global_dtors_recorded;
 
 /* Run destructors for all DLLs on exit. */

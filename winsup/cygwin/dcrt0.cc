@@ -67,7 +67,7 @@ int cygwin_finished_initializing;
    bit for masking.  So, we'll temporarily detect this and set it to zero
    for programs that are linked using older cygwins.  This is just a stopgap
    measure to allow an orderly transfer to the new, correct sigmask method. */
-unsigned int signal_shift_subtract = 1;
+unsigned NO_COPY int signal_shift_subtract = 1;
 
 ResourceLocks _reslock NO_COPY;
 MTinterface _mtinterf NO_COPY;

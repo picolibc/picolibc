@@ -53,7 +53,7 @@ static char **lastenviron;
    CreateProcess.  HOME is here because most shells use it and would be
    confused by Windows style path names.  */
 static int return_MAX_PATH (const char *) {return MAX_PATH;}
-static win_env conv_envvars[] =
+static NO_COPY win_env conv_envvars[] =
   {
     {"PATH=", 5, NULL, NULL, cygwin_win32_to_posix_path_list,
      cygwin_posix_to_win32_path_list,
@@ -110,7 +110,7 @@ getwinenv (const char *env, const char *in_posix)
   for (int i = 0; conv_envvars[i].name != NULL; i++)
     if (strncmp (env, conv_envvars[i].name, conv_envvars[i].namelen) == 0)
       {
-	win_env *we = conv_envvars + i;
+	win_env * const we = conv_envvars + i;
 	const char *val;
 	if (!cur_environ () || !(val = in_posix ?: getenv(we->name)))
 	  debug_printf ("can't set native for %s since no environ yet",
@@ -477,7 +477,7 @@ subauth_id_init (const char *buf)
 /* The structure below is used to set up an array which is used to
    parse the CYGWIN environment variable or, if enabled, options from
    the registry.  */
-struct parse_thing
+static struct parse_thing
   {
     const char *name;
     union parse_setting
@@ -495,7 +495,7 @@ struct parse_thing
 	DWORD i;
 	const char *s;
       } values[2];
-  } known[] =
+  } known[] NO_COPY =
 {
   {"binmode", {x: &binmode}, justset, NULL, {{O_TEXT}, {O_BINARY}}},
   {"check_case", {func: &check_case_init}, isfunc, NULL, {{0}, {0}}},
@@ -639,7 +639,7 @@ environ_init (char **envp, int envc)
   char *newp;
   int sawTERM = 0;
   bool envp_passed_in;
-  static char cygterm[] = "TERM=cygwin";
+  static char NO_COPY cygterm[] = "TERM=cygwin";
 
   static int initted;
   if (!initted)
@@ -743,7 +743,7 @@ env_sort (const void *a, const void *b)
 }
 
 /* Keep this list in upper case and sorted */
-const char* forced_winenv_vars [] =
+static const NO_COPY char* forced_winenv_vars [] =
   {
     "SYSTEMDRIVE",
     "SYSTEMROOT",

@@ -499,9 +499,9 @@ struct tzhead {
 #define WILDABBR	"   "
 #endif /* !defined WILDABBR */
 
-static char		wildabbr[] = WILDABBR;
+static char wildabbr[] NO_COPY = WILDABBR;
 
-static const char	gmt[] = "GMT";
+static const char gmt[] NO_COPY = "GMT";
 
 struct ttinfo {				/* time type information */
 	long		tt_gmtoff;	/* UTC offset in seconds */

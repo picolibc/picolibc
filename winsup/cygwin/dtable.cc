@@ -32,7 +32,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 
-static DWORD std_consts[] = {STD_INPUT_HANDLE, STD_OUTPUT_HANDLE,
+static const NO_COPY DWORD std_consts[] = {STD_INPUT_HANDLE, STD_OUTPUT_HANDLE,
 			     STD_ERROR_HANDLE};
 
 /* Set aside space for the table of fds */

@@ -35,9 +35,9 @@ details. */
 #include <sys/types.h>
 #include <sys/strace.h>
 
-extern char case_folded_lower[];
+extern const char case_folded_lower[];
 #define cyg_tolower(c) (case_folded_lower[(unsigned char)(c)])
-extern char case_folded_upper[];
+extern const char case_folded_upper[];
 #define cyg_toupper(c) (case_folded_upper[(unsigned char)(c)])
 
 #ifndef MALLOC_DEBUG

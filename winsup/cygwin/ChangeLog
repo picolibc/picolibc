@@ -1,3 +1,7 @@
+Thu Sep  6 01:16:44 2001  Christopher Faylor <cgf@cygnus.com>
+
+	Move appropriate variables to NO_COPY segment, throughout.
+
 Thu Sep  6 00:40:35 2001  Christopher Faylor <cgf@cygnus.com>
 
 	Remove initialization of static or global values to zero, throughout.

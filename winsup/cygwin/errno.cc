@@ -21,7 +21,7 @@ details. */
 
 #define X(w, e) {ERROR_##w, #w, e}
 
-static const struct
+static const NO_COPY struct
   {
     DWORD w;		 /* windows version of error */
     const char *s;	 /* text of windows version */
@@ -145,7 +145,7 @@ seterrno (const char *file, int line)
 
 extern char *_user_strerror _PARAMS ((int));
 
-extern const char __declspec(dllexport) * const _sys_errlist[]=
+extern const NO_COPY char __declspec(dllexport) * const _sys_errlist[]=
 {
 /*      NOERROR 0       */ "No error",
 /*	EPERM 1		*/ "Not super-user",
@@ -287,7 +287,7 @@ extern const char __declspec(dllexport) * const _sys_errlist[]=
 /* ECASECLASH 137 */ "Filename exists with different case"
 };
 
-int __declspec(dllexport) _sys_nerr =
+int NO_COPY __declspec(dllexport) _sys_nerr =
   sizeof (_sys_errlist) / sizeof (_sys_errlist[0]);
 
 /* FIXME: Why is strerror() a long switch and not just:

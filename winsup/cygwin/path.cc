@@ -740,7 +740,7 @@ digits (const char *name)
   return p > name && !*p ? n : -1;
 }
 
-const char *windows_device_names[] =
+const char *windows_device_names[] NO_COPY =
 {
   NULL,
   "\\dev\\console",
