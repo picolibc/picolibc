@@ -23,7 +23,7 @@ if { [info exists env(CYGWIN_TESTSUITE_TESTS)] } {
 proc ws_spawn {cmd args} {
     global rv
     verbose "running $cmd\n"
-    catch [eval "exec $cmd"] rv
+    catch "exec $cmd" rv
     verbose send "catchCode = $rv\n"
 }
 

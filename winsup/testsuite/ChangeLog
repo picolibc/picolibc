@@ -1,3 +1,8 @@
+2003-02-08  Christopher Faylor  <cgf@redhat.com>
+
+	* winsup.api/winsup.exp (ws_spawn): Tweak slightly to work with tcl
+	8.4.1.
+
 2003-02-07  Christopher Faylor  <cgf@redhat.com>
 
 	* libltp/lib/parse_opts.c: Deal with C warnings.
