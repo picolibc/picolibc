@@ -1,6 +1,6 @@
 /* pwdgrp.h
 
-   Copyright 2001 Red Hat inc.
+   Copyright 2001, 2002, 2003 Red Hat inc.
 
    Stuff common to pwd and grp handling.
 
@@ -13,125 +13,67 @@ details. */
 /* These functions are needed to allow searching and walking through
    the passwd and group lists */
 extern struct passwd *internal_getpwsid (cygsid &);
-extern struct passwd *internal_getpwnam (const char *, BOOL = FALSE);
-extern struct passwd *internal_getpwuid (__uid32_t, BOOL = FALSE);
+extern struct passwd *internal_getpwnam (const char *, bool = FALSE);
+extern struct passwd *internal_getpwuid (__uid32_t, bool = FALSE);
 extern struct __group32 *internal_getgrsid (cygsid &);
-extern struct __group32 *internal_getgrgid (__gid32_t gid, BOOL = FALSE);
-extern struct __group32 *internal_getgrnam (const char *, BOOL = FALSE);
+extern struct __group32 *internal_getgrgid (__gid32_t gid, bool = FALSE);
+extern struct __group32 *internal_getgrnam (const char *, bool = FALSE);
 extern struct __group32 *internal_getgrent (int);
-int internal_getgroups (int, __gid32_t *);
+int internal_getgroups (int, __gid32_t *, cygsid * = NULL);
 
-enum pwdgrp_state {
-  uninitialized = 0,
-  initializing,
-  loaded
-};
-
-class pwdgrp_check {
-  pwdgrp_state	state;
-  FILETIME	last_modified;
-  char		file_w32[MAX_PATH];
-
-public:
-  pwdgrp_check () : state (uninitialized) {}
-  BOOL isinitializing ()
-    {
-      if (state <= initializing)
-	state = initializing;
-      else if (cygheap->etc_changed ())
-        {
-	  if (!file_w32[0])
-	    state = initializing;
-	  else
-	    {
-	      HANDLE h;
-	      WIN32_FIND_DATA data;
-
-	      if ((h = FindFirstFile (file_w32, &data)) != INVALID_HANDLE_VALUE)
-	        {
-		  if (CompareFileTime (&data.ftLastWriteTime, &last_modified) > 0)
-		    state = initializing;
-		  FindClose (h);
-		}
-	    }
-	}
-      return state == initializing;
-    }
-  void operator = (pwdgrp_state nstate)
-    {
-      state = nstate;
-    }
-  BOOL isuninitialized () const { return state == uninitialized; }
-  void set_last_modified (HANDLE fh, const char *name)
-    {
-      if (!file_w32[0])
-	strcpy (file_w32, name);
-      GetFileTime (fh, NULL, NULL, &last_modified);
-    }
-};
-
-class pwdgrp_read {
+#include "sync.h"
+class pwdgrp
+{
+  unsigned pwdgrp_buf_elem_size;
+  union
+  {
+    passwd **passwd_buf;
+    __group32 **group_buf;
+    void **pwdgrp_buf;
+  };
+  void (pwdgrp::*read) ();
+  bool (pwdgrp::*parse) ();
+  int etc_ix;
   path_conv pc;
-  HANDLE fh;
-  char *buf;
-  char *lptr, *eptr;
+  char *buf, *lptr;
+  int max_lines;
+  bool initialized;
+  muto *pglock;
+
+  bool parse_passwd ();
+  bool parse_group ();
+  void read_passwd ();
+  void read_group ();
+  char *add_line (char *);
+  char *pwdgrp::next_str (char = 0);
+  int pwdgrp::next_int (char = 0);
 
 public:
-  bool open (const char *posix_fname)
-  {
-    if (buf)
-      free (buf);
-    buf = lptr = eptr = NULL;
+  int curr_lines;
 
-    pc.check (posix_fname);
-    if (pc.error || !pc.exists () || !pc.isdisk () || pc.isdir ())
-      return false;
+  bool load (const char *);
+  void refresh (bool check = true)
+  {
+    if (!check && initialized)
+      return;
+    pglock->acquire ();
+    if (!initialized || (check && etc::file_changed (etc_ix)))
+      (this->*read) ();
+    pglock->release ();
+  }
 
-    fh = CreateFile (pc, GENERIC_READ, wincap.shared (), NULL, OPEN_EXISTING,
-		     FILE_ATTRIBUTE_NORMAL, 0);
-    if (fh != INVALID_HANDLE_VALUE)
-      {
-	DWORD size = GetFileSize (fh, NULL), read_bytes;
-	buf = (char *) malloc (size + 1);
-	if (!ReadFile (fh, buf, size, &read_bytes, NULL))
-	  {
-	    if (buf)
-	      free (buf);
-	    buf = NULL;
-	    CloseHandle (fh);
-	    fh = NULL;
-	    return false;
-	  }
-	buf[read_bytes] = '\0';
-	return true;
-      }
-    return false;
-  }
-  char *gets ()
-  {
-    if (!buf)
-      return NULL;
-    if (!lptr)
-      lptr = buf;
-    else if (!eptr)
-      return lptr = NULL;
-    else
-      lptr = eptr;
-    eptr = strchr (lptr, '\n');
-    if (eptr)
-      {
-	if (eptr > lptr && *(eptr - 1) == '\r')
-          *(eptr - 1) = 0;
-	*eptr++ = '\0';
-      }
-    return lptr;
-  }
-  inline HANDLE get_fhandle () { return fh; }
-  inline const char *get_fname () { return pc; }
-  void close ()
-  {
-    if (fh)
-      CloseHandle (fh);
-    fh = NULL;
-  }
+  pwdgrp (passwd *&pbuf) :
+    pwdgrp_buf_elem_size (sizeof (*pbuf)), passwd_buf (&pbuf)
+    {
+      read = &pwdgrp::read_passwd;
+      parse = &pwdgrp::parse_passwd;
+      new_muto (pglock);
+    }
+  pwdgrp (__group32 *&gbuf) :
+    pwdgrp_buf_elem_size (sizeof (*gbuf)), group_buf (&gbuf)
+    {
+      read = &pwdgrp::read_group;
+      parse = &pwdgrp::parse_group;
+      new_muto (pglock);
+    }
 };

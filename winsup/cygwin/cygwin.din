@@ -597,6 +597,8 @@ nan
 _nan = nan
 nanf
 _nanf = nanf
+nanosleep
+_nanosleep = nanosleep
 nextafter
 _nextafter = nextafter
 nextafterf
@@ -826,6 +828,8 @@ strdup
 _strdup = strdup
 strerror
 _strerror = strerror
+strerror_r
+_strerror_r = strerror_r
 strlen
 _strlen = strlen
 strlwr

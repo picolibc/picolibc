@@ -26,161 +26,82 @@ details. */
 /* Read /etc/passwd only once for better performance.  This is done
    on the first call that needs information from it. */
 
-static struct passwd *passwd_buf;	/* passwd contents in memory */
-static int curr_lines;
-static int max_lines;
-
-static pwdgrp_check passwd_state;
-
+passwd *passwd_buf;
+/* FIXME: This really should use a constructor, but they are slow */
+static pwdgrp pr (passwd_buf);
 
 /* Position in the passwd cache */
-#ifdef _MT_SAFE
 #define pw_pos  _reent_winsup ()->_pw_pos
-#else
-static int pw_pos = 0;
-#endif
-
-/* Remove a : teminated string from the buffer, and increment the pointer */
-static char *
-grab_string (char **p)
-{
-  char *src = *p;
-  char *res = src;
-
-  while (*src && *src != ':')
-    src++;
-
-  if (*src == ':')
-    {
-      *src = 0;
-      src++;
-    }
-  *p = src;
-  return res;
-}
-
-/* same, for ints */
-static unsigned int
-grab_int (char **p)
-{
-  char *src = *p;
-  unsigned int val = strtoul (src, p, 10);
-  *p = (*p == src || **p != ':') ? almost_null : *p + 1;
-  return val;
-}
 
 /* Parse /etc/passwd line into passwd structure. */
-static int
-parse_pwd (struct passwd &res, char *buf)
+bool
+pwdgrp::parse_passwd ()
 {
+  int n;
+# define res (*passwd_buf)[curr_lines]
   /* Allocate enough room for the passwd struct and all the strings
      in it in one go */
-  res.pw_name = grab_string (&buf);
-  res.pw_passwd = grab_string (&buf);
-  res.pw_uid = grab_int (&buf);
-  res.pw_gid = grab_int (&buf);
-  if (!*buf)
-    return 0;
+  memset (&res, 0, sizeof (res));
+  res.pw_name = next_str ();
+  res.pw_passwd = next_str ();
+
+  n = next_int ();
+  if (n < 0)
+    return false;
+  res.pw_uid = n;
+
+  n = next_int ();
+  if (n < 0)
+    return false;
+  res.pw_gid = n;
   res.pw_comment = 0;
-  res.pw_gecos = grab_string (&buf);
-  res.pw_dir =  grab_string (&buf);
-  res.pw_shell = grab_string (&buf);
-  return 1;
+  res.pw_gecos = next_str ();
+  res.pw_dir =  next_str ();
+  res.pw_shell = next_str ();
+  curr_lines++;
+  return true;
+# undef res
 }
-
-/* Add one line from /etc/passwd into the password cache */
-static void
-add_pwd_line (char *line)
-{
-    if (curr_lines >= max_lines)
-      {
-	max_lines += 10;
-	passwd_buf = (struct passwd *) realloc (passwd_buf, max_lines * sizeof (struct passwd));
-      }
-    if (parse_pwd (passwd_buf[curr_lines], line))
-      curr_lines++;
-}
-
-class passwd_lock
-{
-  bool armed;
-  static NO_COPY pthread_mutex_t mutex;
- public:
-  passwd_lock (bool doit)
-  {
-    if (doit)
-      pthread_mutex_lock (&mutex);
-    armed = doit;
-  }
-  ~passwd_lock ()
-  {
-    if (armed)
-      pthread_mutex_unlock (&mutex);
-  }
-};
-
-pthread_mutex_t NO_COPY passwd_lock::mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
 
 /* Read in /etc/passwd and save contents in the password cache.
-   This sets passwd_state to loaded or emulated so functions in this file can
+   This sets pr to loaded or emulated so functions in this file can
    tell that /etc/passwd has been read in or will be emulated. */
-static void
-read_etc_passwd ()
+void
+pwdgrp::read_passwd ()
 {
-  static pwdgrp_read pr;
+  if (!load ("/etc/passwd"))
+    debug_printf ("load failed");
 
-  /* A mutex is ok for speed here - pthreads will use critical sections not
-   * mutexes for non-shared mutexes in the future. Also, this function will
-   * at most be called once from each thread, after that the passwd_state
-   * test will succeed */
-  passwd_lock here (cygwin_finished_initializing);
+  char strbuf[128] = "";
+  bool searchentry = true;
+  struct passwd *pw;
 
-  /* if we got blocked by the mutex, then etc_passwd may have been processed */
-  if (passwd_state.isinitializing ())
+  if (wincap.has_security ())
     {
-      curr_lines = 0;
-      if (pr.open ("/etc/passwd"))
-	{
-	  char *line;
-	  while ((line = pr.gets ()) != NULL)
-	    add_pwd_line (line);
-
-	  passwd_state.set_last_modified (pr.get_fhandle (), pr.get_fname ());
-	  pr.close ();
-	  debug_printf ("Read /etc/passwd, %d lines", curr_lines);
-	}
-      passwd_state = loaded;
-
-      static char linebuf[1024];
-      char strbuf[128] = "";
-      BOOL searchentry = TRUE;
-      __uid32_t default_uid = DEFAULT_UID;
-      struct passwd *pw;
-
-      if (wincap.has_security ())
-	{
-	  cygsid tu = cygheap->user.sid ();
-	  tu.string (strbuf);
-	  if (myself->uid == ILLEGAL_UID
-	      && (searchentry = !internal_getpwsid (tu)))
-	    default_uid = DEFAULT_UID_NT;
-	}
-      else if (myself->uid == ILLEGAL_UID)
-        searchentry = !internal_getpwuid (DEFAULT_UID);
-      if (searchentry &&
-	  (!(pw = internal_getpwnam (cygheap->user.name ())) ||
-	   (myself->uid != ILLEGAL_UID &&
-	    myself->uid != (__uid32_t) pw->pw_uid  &&
-	    !internal_getpwuid (myself->uid))))
-	{
-	  snprintf (linebuf, sizeof (linebuf), "%s:*:%lu:%lu:,%s:%s:/bin/sh",
-		    cygheap->user.name (),
-		    myself->uid == ILLEGAL_UID ? default_uid : myself->uid,
-		    myself->gid,
-		    strbuf, getenv ("HOME") ?: "/");
-	  debug_printf ("Completing /etc/passwd: %s", linebuf);
-	  add_pwd_line (linebuf);
-	}
+      static char NO_COPY pretty_ls[] = "????????:*:-1:-1:";
+      pr.add_line (pretty_ls);
+      cygsid tu = cygheap->user.sid ();
+      tu.string (strbuf);
+      if (myself->uid == ILLEGAL_UID)
+	searchentry = !internal_getpwsid (tu);
+    }
+  else if (myself->uid == ILLEGAL_UID)
+    searchentry = !internal_getpwuid (DEFAULT_UID);
+  if (searchentry &&
+      (!(pw = internal_getpwnam (cygheap->user.name ())) ||
+       (myself->uid != ILLEGAL_UID &&
+	myself->uid != (__uid32_t) pw->pw_uid  &&
+	!internal_getpwuid (myself->uid))))
+    {
+      char linebuf[1024];
+      (void) cygheap->user.ontherange (CH_HOME, NULL);
+      snprintf (linebuf, sizeof (linebuf), "%s:*:%lu:%lu:,%s:%s:/bin/sh",
+		cygheap->user.name (),
+		myself->uid == ILLEGAL_UID ? DEFAULT_UID_NT : myself->uid,
+		myself->gid,
+		strbuf, getenv ("HOME") ?: "");
+      debug_printf ("Completing /etc/passwd: %s", linebuf);
+      pr.add_line (linebuf);
     }
   return;
 }
@@ -192,13 +113,12 @@ internal_getpwsid (cygsid &sid)
   char *ptr1, *ptr2, *endptr;
   char sid_string[128] = {0,','};
 
-  if (passwd_state.isuninitialized ())
-    read_etc_passwd ();
+  pr.refresh ();
 
   if (sid.string (sid_string + 2))
     {
       endptr = strchr (sid_string + 2, 0) - 1;
-      for (int i = 0; i < curr_lines; i++)
+      for (int i = 0; i < pr.curr_lines; i++)
 	if ((pw = passwd_buf + i)->pw_dir > pw->pw_gecos + 8)
 	  for (ptr1 = endptr, ptr2 = pw->pw_dir - 2;
 	       *ptr1 == *ptr2; ptr2--)
@@ -209,26 +129,22 @@ internal_getpwsid (cygsid &sid)
 }
 
 struct passwd *
-internal_getpwuid (__uid32_t uid, BOOL check)
+internal_getpwuid (__uid32_t uid, bool check)
 {
-  if (passwd_state.isuninitialized ()
-      || (check && passwd_state.isinitializing ()))
-    read_etc_passwd ();
+  pr.refresh (check);
 
-  for (int i = 0; i < curr_lines; i++)
+  for (int i = 0; i < pr.curr_lines; i++)
     if (uid == (__uid32_t) passwd_buf[i].pw_uid)
       return passwd_buf + i;
   return NULL;
 }
 
 struct passwd *
-internal_getpwnam (const char *name, BOOL check)
+internal_getpwnam (const char *name, bool check)
 {
-  if (passwd_state.isuninitialized ()
-      || (check && passwd_state.isinitializing ()))
-    read_etc_passwd ();
+  pr.refresh (check);
 
-  for (int i = 0; i < curr_lines; i++)
+  for (int i = 0; i < pr.curr_lines; i++)
     /* on Windows NT user names are case-insensitive */
     if (strcasematch (name, passwd_buf[i].pw_name))
       return passwd_buf + i;
@@ -347,10 +263,9 @@ getpwnam_r (const char *nam, struct passwd *pwd, char *buffer, size_t bufsize, s
 extern "C" struct passwd *
 getpwent (void)
 {
-  if (passwd_state.isinitializing ())
-    read_etc_passwd ();
+  pr.refresh ();
 
-  if (pw_pos < curr_lines)
+  if (pw_pos < pr.curr_lines)
     return passwd_buf + pw_pos++;
 
   return NULL;
@@ -383,15 +298,10 @@ setpassent ()
 extern "C" char *
 getpass (const char * prompt)
 {
-#ifdef _MT_SAFE
   char *pass=_reent_winsup ()->_pass;
-#else
-  static char pass[_PASSWORD_LEN];
-#endif
   struct termios ti, newti;
 
-  if (passwd_state.isinitializing ())
-    read_etc_passwd ();
+  pr.refresh ();
 
   cygheap_fdget fhstdin (0);
 

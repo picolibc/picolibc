@@ -329,7 +329,7 @@ fhandler_termios::line_edit (const char *rptr, int nread, termios& ti)
       if (!iscanon || input_done)
 	{
 	  int status = accept_input ();
-	  if (status != 1) 
+	  if (status != 1)
 	    {
 	      ret = status ? line_edit_error : line_edit_pipe_full;
 	      eat_readahead (1);

@@ -42,7 +42,7 @@ details. */
 	 changes to the DLL and is mainly informative in nature. */
 
 #define CYGWIN_VERSION_DLL_MAJOR 1003
-#define CYGWIN_VERSION_DLL_MINOR 19
+#define CYGWIN_VERSION_DLL_MINOR 20
 
       /* Major numbers before CYGWIN_VERSION_DLL_EPOCH are
 	 incompatible. */
@@ -168,12 +168,14 @@ details. */
        68: Export netdb stuff
        69: Export strtof
        70: Export asprintf, _asprintf_r, vasprintf, _vasprintf_r
+       71: Export strerror_r
+       72: Export nanosleep
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 70
+#define CYGWIN_VERSION_API_MINOR 72
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

@@ -1,6 +1,6 @@
 /* uinfo.cc: user info (uid, gid, etc...)
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -388,4 +388,110 @@ cygheap_user::env_name (const char *name, size_t namelen)
   if (!test_uid (pwinname, name, namelen))
     (void) domain ();
   return pwinname;
+}
+
+char *
+pwdgrp::next_str (char c)
+{
+  if (!lptr)
+    return NULL;
+  char search[] = ":\n\0\0";
+  search[2] = c;
+  char *res = lptr;
+  char *p = strpbrk (lptr, search);
+  if (!p)
+    lptr = NULL;
+  else
+    {
+      lptr = (*p == '\n') ? NULL : p + 1;
+      *p = '\0';
+    }
+  return res;
+}
+
+int
+pwdgrp::next_int (char c)
+{
+  char *p = next_str (c);
+  if (!p)
+    return -1;
+  char *cp;
+  unsigned n = strtoul (p, &cp, 10);
+  if (p == cp)
+    return -1;
+  return n;
+}
+
+char *
+pwdgrp::add_line (char *eptr)
+{
+  if (eptr)
+    {
+      lptr = eptr;
+      eptr = strchr (lptr, '\n');
+      if (eptr)
+	{
+	  if (eptr > lptr && eptr[-1] == '\r')
+	    eptr[-1] = '\n';
+	  eptr++;
+	}
+      if (curr_lines >= max_lines)
+	{
+	  max_lines += 10;
+	  *pwdgrp_buf = realloc (*pwdgrp_buf, max_lines * pwdgrp_buf_elem_size);
+	}
+      (void) (this->*parse) ();
+    }
+  return eptr;
+}
+
+bool
+pwdgrp::load (const char *posix_fname)
+{
+  if (buf)
+    free (buf);
+  buf = NULL;
+
+  pc.check (posix_fname);
+  etc_ix = etc::init (etc_ix, pc);
+
+  paranoid_printf ("%s", posix_fname);
+
+  bool res;
+  if (pc.error || !pc.exists () || !pc.isdisk () || pc.isdir ())
+    res = false;
+  else
+    {
+      HANDLE fh = CreateFile (pc, GENERIC_READ, wincap.shared (), NULL,
+			      OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+      if (fh == INVALID_HANDLE_VALUE)
+	res = false;
+      else
+	{
+	  DWORD size = GetFileSize (fh, NULL), read_bytes;
+	  buf = (char *) malloc (size + 1);
+	  if (!ReadFile (fh, buf, size, &read_bytes, NULL))
+	    {
+	      CloseHandle (fh);
+	      if (buf)
+		free (buf);
+	      buf = NULL;
+	      res = false;
+	    }
+	  else
+	    {
+	      CloseHandle (fh);
+	      buf[read_bytes] = '\0';
+	      char *eptr = buf;
+	      curr_lines = 0;
+	      while ((eptr = add_line (eptr)))
+		continue;
+	      debug_printf ("%s curr_lines %d", posix_fname, curr_lines);
+	      res = true;
+	    }
+	}
+    }
+
+  initialized = true;
+  return res;
 }

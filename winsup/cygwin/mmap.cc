@@ -986,9 +986,11 @@ fixup_mmaps_after_fork (HANDLE parent)
 					       getpagesize (), NULL))
 		      {
 			DWORD old_prot;
+			DWORD last_error = GetLastError ();
 
-			if (GetLastError () != ERROR_PARTIAL_COPY ||
-			    !wincap.virtual_protect_works_on_shared_pages ())
+			if (last_error != ERROR_PARTIAL_COPY
+			    && last_error != ERROR_NOACCESS
+			    || !wincap.virtual_protect_works_on_shared_pages ())
 			  {
 			    system_printf ("ReadProcessMemory failed for "
 			    		   "MAP_PRIVATE address %p, %E",

@@ -1,3 +1,216 @@
+2003-01-23  Christopher Faylor  <cgf@redhat.com>
+
+	* pwdrp.h (pwdgrp::refresh): Lock entire test prior to reading.
+
+2003-01-23  Christopher Faylor  <cgf@redhat.com>
+
+	* grp.cc (pwdgrp::parse_group): Eliminate arg and use class member
+	instead.  Use next_str and next_int to parse arguments.
+	* passwd.cc (pwdgrp::parse_passwd): Ditto.
+	(grab_string): Eliminate.
+	(grab_int): Ditto.
+	* pwdgrp.h (pwdgrp::parse): Eliminate input arg.
+	(pwdgrp::parse_passwd): Reflect above change.
+	(pwdgrp::parse_group): Reflect above change.
+	(pwdgrp::next_str): New function.
+	(pwdgrp::next_int): Ditto.
+	(pwdgrp::gets): Eliminate.
+	* uinfo.cc (pwdgrp::next_str): New function.
+	(pwdgrp::next_int): Ditto.
+	(pwdgrp::add_line): Subsume gets.
+	(pwdgrp::gets): Eliminate.
+	(pwdgrp::load): Just call add_line to parse input buffer.
+
+2003-01-22  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* include/pthread.h (PTHREAD_MUTEX_RECURSIVE): Revert changes from
+	2003-01-09 mutex patch.
+	(PTHREAD_MUTEX_ERRORCHECK): Ditto.
+
+2003-01-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygrun.c: Move from here to ../testsuite.
+	* Makefile.in: Remove cygrun.exe dependencies.
+
+2003-01-21  Jason Tishler  <jason@tishler.net>
+
+	* cygwin.din: Export nanosleep().
+	* signal.cc (nanosleep): New function.
+	(sleep): Move old functionality to nanosleep().  Call nanosleep().
+	(usleep): Remove old functionality.  Call nanosleep().
+	* include/cygwin/version.h: Bump API minor number.
+
+2003-01-21  Christopher Faylor  <cgf@redhat.com>
+
+	* grp.cc: Call gr.refresh() rather than doing isunitialized tests
+	throughout.
+	(gr): Use constructor (sigh).
+	(pwdgrp::parse_group): Rename from parse_grp.
+	(pwdgrp::read_group): Rename from read_etc_group.  Just call gr.load
+	with a single argument.
+	* passwd.cc: Call pr.refresh() rather than doing isunitialized tests
+	throughout.
+	(pr): Use constructor (sigh).
+	(pwdgrp::parse_passwd): Rename from "parse_pwd".
+	(pwdgrp::read_passwd): Rename from read_etc_passwd.  Just call pr.load
+	with a single argument.
+	* pwdgrp.h (pwdgrp_state): Eliminate.
+	(pwdgrp): Reflect above renamings.
+	(pwdgrp::etc_ix): Rename from pwd_ix.
+	(pwdgrp::read): New element.
+	(pwdgrp::lock): New element.
+	(pwdgrp::refresh): New function.
+	(pwdgrp::load): Eliminate variations which take buffer arguments.
+	(pwdgrp::pwdgrp): New constructors.  Initialize mutex here.
+	* uinfo.cc (pwdgrp::load): Accommodate pwd_ix -> etc_ix renaming.
+	(pwdgrp::load): Set initialized state to true rather than setting state
+	to loaded.
+
+2003-01-21  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number.
+
+2003-01-21  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* path.h (etc::change_possible): Revert the type to bool.
+	(etc::set_last_modified): Remove obsolete function.
+	* path.cc (etc::change_possible): Revert type to bool.
+	(etc::test_file_change): Do not test for negative values of
+	change_possible and do not set it to -res.
+	(etc::dir_changed): When the handle is NULL, call memset instead of
+	test_file_changed.  When the handle is invalid, return true.  Detect
+	filename change in /etc.
+	(etc::file_changed): Remove unneeded check for !fn[n].
+	* uinfo.cc (pwdgrp::load): Eliminate spurious setting of fh to NULL.
+	* pwdgrp.h (pwdgrp::operator =): Eliminate.
+
+2003-01-19  Christopher Faylor  <cgf@redhat.com>
+
+	* pwdgrp.h (etc): Move to path.h.
+	(pwdgrp::max_lines): New field.
+	(pwdgrp::curr_lines): New field.
+	(pwdgrp::pwdgrp_buf): Ditto.
+	(pwdgrp_buf_elem_size): Ditto.
+	(pwdgrp_parse): Ditto.
+	(pwdgrp::gets): Just declare here.
+	(pwdgrp::load): Ditto.  Just take one argument.
+	(pwdgrp::load): Define overloaded function accepting passwd buf.
+	(pwdgrp::load): Define overloaded function accepting group buf.
+	* grp.cc: Use pwdgrp elements rather than standalone static variables
+	throughout.
+	(curr_lines): Eliminate.
+	(max_lines): Ditto.
+	(add_grp_line): Ditto.
+	(parse_grp): Define as returning boolean.  Accept void * arg and line
+	count.  Coerce first argument into __group32 buf reference.  Increment
+	curr_line as appropriate.
+	(read_etc_group): Pass pwdgrp buffer to gr.load.
+	* passwd.cc: Use pwdgrp elements rather than standalone static variables
+	throughout.
+	(curr_lines): Eliminate.
+	(max_lines): Ditto.
+	(add_grp_line): Ditto.
+	(parse_passwd): Define as returning boolean.  Accept void * arg and line
+	count.  Coerce first argument into passwd buf reference.  Increment
+	curr_line as appropriate.
+	(read_etc_group): Pass pwdgrp buffer to pr.load.
+	* path.cc (etc::fn): Extend buffer size to allow index by 1 rather than
+	zero.
+	(etc::last_modified): Ditto.
+	(etc::change_possible): Ditto.  Renamed from sawchange.  Change to
+	signed char since elements are now tri-state.
+	(etc::init): Assume "handle" is 1 based rather than 0.
+	(etc::test_file_change): New function.  Sets change_possible based on
+	file date comparison.
+	(etc::dir_changed): Check file states immediately after changed_h is
+	initialized to avoid a race.
+	(etc::file_changed): Use test_file_change to detect if file needs to be
+	updated.
+	* path.h (etc): Move class here from pwdgrp.h.
+	* uinfo.cc: Move etc:: functions to path.cc.  Move pwdgrp functions
+	here.
+	(pwdgrp::gets): Eliminate buf checks.  Just check eptr and set lptr.
+	(pwdgrp::add_line): New function.
+	(pwdgrp::load): Call generic add_line function which will call correct
+	parser.
+
+2003-01-17  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.cc: Change most 'int's to 'unsigned's.
+	(_cmalloc): Only check for size of malloced region when calculating
+	bucket.  Add overhead when performing the sbrk.  Previous change broke
+	_crealloc.
+
+2003-01-17  Christopher Faylor  <cgf@redhat.com>
+
+	* dcrt0.cc (initialize_env): Use colon for CYGWIN_DEBUG separator.
+	* grp.cc: Change most statics to NO_COPY throughout.
+	* passwd.cc: Ditto.
+
+2003-01-17  Christopher Faylor  <cgf@redhat.com>
+
+	* pwdgrp.h: Change some BOOLs to bools.
+	(pwdgrp::pwdgrp): Remove unneeded constructor.
+	* passwd.cc: Change BOOL to bool throughout.
+
+2003-01-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din: Add strerror_r.
+	* include/cygwin/version.h: Bump API minor number.
+
+2003-01-17  Christopher Faylor  <cgf@redhat.com>
+
+	* uinfo.cc (etc::dir_changed): Don't print a warning if can't open
+	/etc, unless debugging.
+
+2003-01-17  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* grp.cc (read_etc_group): On NT, add a line for gid = -1.  Change name
+	"unknown" to "mkgroup".
+	(internal_getgrgid): Do not return default in nontsec case.
+	(internal_getgroups): Add argument srchsid and look for it in groups if
+	not NULL.
+	* passwd.cc (read_etc_passwd): On NT, add a line for uid = -1.  Use
+	same default uid for Win95 and NT.  Call cygheap_user::ontherange to
+	initialize HOME.
+
+2003-01-16  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.cc (init_cygheap::etc_changed): Move to uinfo.cc.
+	* cygheap.h (init_cygheap::etc_changed_h): Remove.
+	(init_cygheap::etc_changed): Ditto.
+	* grp.cc (group_state): Remove.  Use gr instead throughout.
+	(gr): Define as class pwdgrp.
+	(read_etc_group): Remove gr definition.  Remove calls to
+	set_last_modified and close.  Pass add_grp to gr.load to load file.
+	* passwd.cc (passwd_state): Remove.  Use pr instead, throughout.
+	(pr): Define as class pwdgrp.
+	(read_etc_passwd): Remove pr definition.  Remove calls to
+	set_last_modified and close.  Pass add_pwd_line to pr.load to load
+	file.
+	* pwdgrp.h (etc): New helper class for pwdgrp.
+	(pwdgrp): Combine pwdgrp_check and pwdgrp_read into one class.  Remove
+	file_w32 and last_modified fields.
+	(pwdgrp::set_last_modified): Remove.
+	(pwdgrp::isinitializing): Remove FindFirstFile stuff.  Move to
+	etc::file_changed.
+	(pwdgrp::load): Rename from 'open'.  Call etc::init to initialize etc
+	scanning.  Close file handle after reading buffer into memory.  Parse
+	buffer by calling second argument.
+	(pwdgrp::gets): Reorganize slightly to rely on eptr starting at
+	beginning of buffer.
+	(pwdgrp::close): Remove.
+	* uinfo.cc (etc::dir_changed): New function.
+	(etc::init): Ditto.
+	(etc::file_changed): Ditto.
+	(etc::set_last_modified): Ditto.
+
+2003-01-16  Jason Tishler  <jason@tishler.net>
+
+	* mmap.cc (fixup_mmaps_after_fork): Add ERROR_NOACCESS to the list of
+	ReadProcessMemory() error codes that trigger a retry with temporary
+	PAGE_READONLY access.  Note that this can occur on NT 4.0.
+
 2003-01-15  Christopher Faylor  <cgf@redhat.com>
 
 	* path.cc (normalize_posix_path): Convert win32 path separators to
