@@ -47,8 +47,8 @@ extern "C" pid_t
 wait4 (int intpid, int *status, int options, struct rusage *r)
 {
   int res;
-  waitq *w;
   HANDLE waitfor;
+  waitq *w;
 
   pthread_testcancel ();
 
@@ -65,8 +65,7 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
       if (r)
 	memset (r, 0, sizeof (*r));
 
-      if ((w = (waitq *) waitq_storage.get ()) == NULL)
-	w = (waitq *) waitq_storage.create ();
+      w = &_my_tls.wq;
 
       w->pid = intpid;
       w->options = options;

@@ -1,5 +1,33 @@
 2004-03-11  Christopher Faylor  <cgf@redhat.com>
 
+	* cygtls.h (waitq): Declare structure here.
+	(_cygtls::wq): Declare.
+	* cygtls.cc (_cygtls::fixup_after_fork): Clear wq.thread_ev to avoid
+	using an invalid event handle in forked process.
+	* dcrt0.cc (waitq_storage): Delete.
+	(threadstuff): Remove waitq_storage.
+	* perthread.h (per_thread_waitq): Delete.
+	(waitq_storage): Delete declaration.
+	* sigproc.cc (sigproc_init): Remove perthread waitq consideration.
+	* sigproc.h (waitq): Delete declaration.
+	* wait.cc (wait4): Use _my_tls waitq structure rather than per_thread.
+
+2004-02-11  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* cygtls.h (_cygtls::newmask): Delete member.
+	(_cygtls::deltamask): New member.
+	* gendef (_sigdelayed): Replace the call to set_process_mask by a call
+	to set_process_mask_delta.
+	* exceptions.cc (handle_sigsuspend): Do not filter tempmask.  Or
+	SIG_NONMASKABLE in deltamask as a flag.
+	(_cygtls::interrupt_setup): Set deltamask only.
+	(set_process_mask_delta): New function.
+	(_cygtls::call_signal_handler): Replace the first call to
+	set_process_mask by a call to set_process_mask_delta.
+	* tlsoffsets.h: Regenerate.
+
+2004-03-11  Christopher Faylor  <cgf@redhat.com>
+
 	* cygtls.cc (_cygtls::fixup_after_fork): Remove unneeded setting of
 	oldmask.
 	* exceptions.cc: Remove some __I386__ conditionals.

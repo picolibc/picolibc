@@ -34,15 +34,6 @@ public:
   }
 };
 
-class per_thread_waitq : public per_thread
-{
-public:
-  per_thread_waitq () : per_thread (0) {}
-  void *get () {return (waitq *) per_thread::get ();}
-  void *create () {return (waitq *) per_thread::create ();}
-  size_t size () {return sizeof (waitq);}
-};
-
 #ifdef NEED_VFORK
 #include "cygtls.h"
 #endif
@@ -91,7 +82,5 @@ extern vfork_save *main_vfork;
 #define VFORKPID main_vfork->pid
 #endif
 #endif /*NEWVFORK*/
-
-extern per_thread_waitq waitq_storage;
 
 extern per_thread *threadstuff[];

@@ -109,7 +109,6 @@ Static char czombies[(NZOMBIES + 1) * sizeof (pinfo)];		// All my deceased child
 #define zombies ((pinfo *) czombies)
 
 Static waitq waitq_head = {0, 0, 0, 0, 0, 0, 0};// Start of queue for wait'ing threads
-Static waitq waitq_main;		// Storage for main thread
 
 muto NO_COPY *sync_proc_subproc = NULL;	// Control access to subproc stuff
 
@@ -603,18 +602,6 @@ sigproc_init ()
 
   hwait_sig = new cygthread (wait_sig, cygself, "sig");
   hwait_sig->zap_h ();
-
-  /* Initialize waitq structure for main thread.  A waitq structure is
-   * allocated for each thread that executes a wait to allow multiple threads
-   * to perform waits.  Pre-allocate a waitq structure for the main thread.
-   */
-  waitq *w;
-  if ((w = (waitq *)waitq_storage.get ()) == NULL)
-    {
-      w = &waitq_main;
-      waitq_storage.set (w);
-    }
-  memset (w, 0, sizeof *w);	// Just to be safe
 
   global_sigs[SIGSTOP].sa_flags = SA_RESTART | SA_NODEFER;
   sigproc_printf ("process/signal handling enabled(%x)", myself->process_state);

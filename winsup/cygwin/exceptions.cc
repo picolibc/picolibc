@@ -570,8 +570,7 @@ handle_sigsuspend (sigset_t tempmask)
 {
   sigset_t oldmask = myself->getsigmask ();	// Remember for restoration
 
-  // Let signals we're interested in through.
-  set_signal_mask (tempmask &= ~SIG_NONMASKABLE, oldmask);
+  set_signal_mask (tempmask, oldmask);
   sigproc_printf ("oldmask %p, newmask %p", oldmask, tempmask);
 
   pthread_testcancel ();
@@ -581,8 +580,9 @@ handle_sigsuspend (sigset_t tempmask)
 
   /* A signal dispatch function will have been added to our stack and will
      be hit eventually.  Set the old mask to be restored when the signal
-     handler returns. */
+     handler returns and indicate its presence by modifying deltamask. */
 
+  _my_tls.deltamask |= SIG_NONMASKABLE;
   _my_tls.oldmask = oldmask;	// Will be restored by signal handler
   return -1;
 }
@@ -671,8 +671,7 @@ void __stdcall
 _cygtls::interrupt_setup (int sig, void *handler, struct sigaction& siga)
 {
   push ((__stack_t) sigdelayed, false);
-  oldmask = myself->getsigmask ();
-  newmask = oldmask | siga.sa_mask | SIGTOMASK (sig);
+  deltamask = (siga.sa_mask | SIGTOMASK (sig)) & ~SIG_NONMASKABLE;
   sa_flags = siga.sa_flags;
   func = (void (*) (int)) handler;
   saved_errno = -1;		// Flag: no errno to save
@@ -898,6 +897,27 @@ sighold (int sig)
   set_signal_mask (mask);
   mask_sync->release ();
   return 0;
+}
+
+/* Update the signal mask for this process
+   and return the old mask.
+   Called from sigdelayed */
+extern "C" sigset_t
+set_process_mask_delta ()
+{
+  mask_sync->acquire (INFINITE);
+  sigset_t newmask, oldmask;
+
+  if (_my_tls.deltamask & SIG_NONMASKABLE)
+    oldmask = _my_tls.oldmask; /* from handle_sigsuspend */
+  else
+    oldmask = myself->getsigmask ();
+  newmask = (oldmask | _my_tls.deltamask) & ~SIG_NONMASKABLE;
+  sigproc_printf ("oldmask %p, newmask %p, deltamask %p", oldmask, newmask,
+		  _my_tls.deltamask);
+  myself->setsigmask (newmask);
+  mask_sync->release ();
+  return oldmask;
 }
 
 /* Set the signal mask for this process.
@@ -1152,14 +1172,13 @@ _cygtls::call_signal_handler ()
 
       (void) pop ();
       reset_signal_arrived ();
-      sigset_t this_oldmask = oldmask;
+      sigset_t this_oldmask = set_process_mask_delta ();
       int this_errno = saved_errno;
-      set_process_mask (newmask);
       incyg--;
       sig = 0;
       sigfunc (thissig);
       incyg++;
-      set_process_mask (this_oldmask);
+      set_signal_mask (this_oldmask);
       if (this_errno >= 0)
 	set_errno (this_errno);
     }

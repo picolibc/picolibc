@@ -39,17 +39,6 @@ enum procstuff
   PROC_NOTHING		= 5	// nothing, really
 };
 
-typedef struct struct_waitq
-{
-  int pid;
-  int options;
-  int status;
-  HANDLE ev;
-  void *rusage;			/* pointer to potential rusage */
-  struct struct_waitq *next;
-  HANDLE thread_ev;
-} waitq;
-
 struct sigpacket
 {
   siginfo_t si;

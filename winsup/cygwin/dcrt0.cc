@@ -44,12 +44,11 @@ details. */
 HANDLE NO_COPY hMainProc = (HANDLE) -1;
 HANDLE NO_COPY hMainThread;
 
-per_thread_waitq NO_COPY waitq_storage;
 #ifdef NEWVFORK
 per_thread_vfork NO_COPY vfork_storage;
 #endif
 
-per_thread NO_COPY *threadstuff[] = {&waitq_storage,
+per_thread NO_COPY *threadstuff[] = {
 #ifdef NEWVFORK
 				     &vfork_storage,
 #endif

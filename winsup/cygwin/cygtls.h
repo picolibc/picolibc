@@ -85,9 +85,20 @@ struct _local_storage
   char signamebuf[sizeof ("Unknown signal 4294967295   ")];
 };
 
-/* Please keep this file simple.  Changes to the below structure may require
-   acompanying changes to the very simple parser in the perl script
-   'gentls_offsets' (<<-- start parsing here).  */
+typedef struct struct_waitq
+{
+  int pid;
+  int options;
+  int status;
+  HANDLE ev;
+  void *rusage;			/* pointer to potential rusage */
+  struct struct_waitq *next;
+  HANDLE thread_ev;
+} waitq;
+
+/* Changes to the below structure may require acompanying changes to the very
+   simple parser in the perl script 'gentls_offsets' (<<-- start parsing here).
+*/
 
 typedef __uint32_t __stack_t;
 struct _cygtls
@@ -96,7 +107,7 @@ struct _cygtls
   int saved_errno;
   int sa_flags;
   sigset_t oldmask;
-  sigset_t newmask;
+  sigset_t deltamask;
   HANDLE event;
   int *errno_addr;
   unsigned initialized;
@@ -108,6 +119,7 @@ struct _cygtls
   struct pthread *tid;
   struct _reent local_clib;
   struct _local_storage locals;
+  waitq wq;
   struct _cygtls *prev, *next;
   __stack_t *stackptr;
   int sig;
