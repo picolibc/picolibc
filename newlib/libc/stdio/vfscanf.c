@@ -945,7 +945,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 #else  /* !_NO_LONG_DBL */
 	      long double res;
 #endif /* !_NO_LONG_DBL */
-	      long new_exp;
+	      long new_exp = 0;
 
 	      *p = 0;
 	      if ((flags & (DPTOK | EXPOK)) == EXPOK)

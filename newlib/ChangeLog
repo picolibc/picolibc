@@ -1,5 +1,9 @@
 2001-04-27  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/stdio/vfscanf.c (__svfscanf_r): Initialize new_exp local var.
+
+2001-04-27  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/include/stdlib.h: Add prototype for _strtod_r.
 
 2001-04-24  Charles Wilson  <cwilson@ece.gatech.edu
