@@ -1,3 +1,11 @@
+2002-03-29  David Robinow  <drobinow@yahoo.com>
+
+	* include/wingdi.h (SetPixelFormat): Correct prototype.
+
+2002-03-29  Phil Krylov  <likewolf@users.sourceforge.net>
+
+	* include/richedit.h (EM_SHOWSCROLLBAR): Add define.
+
 2002-03-26  Phil Krylov  <likewolf@users.sourceforge.net>
 
 	* include/richedit.h (EM_GETSCROLLPOS, EM_SETSCROLLPSPOS):
