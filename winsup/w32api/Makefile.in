@@ -61,7 +61,7 @@ PACKAGE = w32api
 VERSION = 0.3
 
 DIST_FILES = Makefile.in configure.in configure config.guess config.sub \
-install-sh README ChangeLog TODO
+install-sh README ChangeLog TODO CONTRIBUTIONS
 
 all: lib
 

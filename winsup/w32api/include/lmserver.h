@@ -4,43 +4,43 @@
 extern "C" {
 #endif
 #include <winsvc.h>
-
+#include <lmcons.h>
 typedef struct _SERVER_INFO_100 {
 DWORD	sv100_platform_id;
-LPTSTR	sv100_name;
+LPWSTR	sv100_name;
 } SERVER_INFO_100,*PSERVER_INFO_100,*LPSERVER_INFO_100;
 typedef struct _SERVER_INFO_101 {
 DWORD	sv101_platform_id;
-LPTSTR	sv101_name;
+LPWSTR	sv101_name;
 DWORD	sv101_version_major;
 DWORD	sv101_version_minor;
 DWORD	sv101_type;
-LPTSTR	sv101_comment;
+LPWSTR	sv101_comment;
 } SERVER_INFO_101,*PSERVER_INFO_101,*LPSERVER_INFO_101;
 typedef struct _SERVER_INFO_102 {
 DWORD	sv102_platform_id;
-LPTSTR	sv102_name;
+LPWSTR	sv102_name;
 DWORD	sv102_version_major;
 DWORD	sv102_version_minor;
 DWORD	sv102_type;
-LPTSTR	sv102_comment;
+LPWSTR	sv102_comment;
 DWORD	sv102_users;
 LONG	sv102_disc;
 BOOL	sv102_hidden;
 DWORD	sv102_announce;
 DWORD	sv102_anndelta;
 DWORD	sv102_licenses;
-LPTSTR	sv102_userpath;
+LPWSTR	sv102_userpath;
 } SERVER_INFO_102,*PSERVER_INFO_102,*LPSERVER_INFO_102;
 typedef struct _SERVER_INFO_402 {
 DWORD	sv402_ulist_mtime;
 DWORD	sv402_glist_mtime;
 DWORD	sv402_alist_mtime;
-LPTSTR	sv402_alerts;
+LPWSTR	sv402_alerts;
 DWORD	sv402_security;
 DWORD	sv402_numadmin;
 DWORD	sv402_lanmask;
-LPTSTR	sv402_guestacct;
+LPWSTR	sv402_guestacct;
 DWORD	sv402_chdevs;
 DWORD	sv402_chdevq;
 DWORD	sv402_chdevjobs;
@@ -63,17 +63,17 @@ DWORD	sv402_accessalert;
 DWORD	sv402_diskalert;
 DWORD	sv402_netioalert;
 DWORD	sv402_maxauditsz;
-LPTSTR	sv402_srvheuristics;
+LPWSTR	sv402_srvheuristics;
 } SERVER_INFO_402,*PSERVER_INFO_402,*LPSERVER_INFO_402;
 typedef struct _SERVER_INFO_403 {
 DWORD	sv403_ulist_mtime;
 DWORD	sv403_glist_mtime;
 DWORD	sv403_alist_mtime;
-LPTSTR	sv403_alerts;
+LPWSTR	sv403_alerts;
 DWORD	sv403_security;
 DWORD	sv403_numadmin;
 DWORD	sv403_lanmask;
-LPTSTR	sv403_guestacct;
+LPWSTR	sv403_guestacct;
 DWORD	sv403_chdevs;
 DWORD	sv403_chdevq;
 DWORD	sv403_chdevjobs;
@@ -96,10 +96,10 @@ DWORD	sv403_accessalert;
 DWORD	sv403_diskalert;
 DWORD	sv403_netioalert;
 DWORD	sv403_maxauditsz;
-LPTSTR	sv403_srvheuristics;
+LPWSTR	sv403_srvheuristics;
 DWORD	sv403_auditedevents;
 DWORD	sv403_autoprofile;
-LPTSTR	sv403_autopath;
+LPWSTR	sv403_autopath;
 } SERVER_INFO_403,*PSERVER_INFO_403,*LPSERVER_INFO_403;
 typedef struct _SERVER_INFO_502 {
 DWORD	sv502_sessopens;
@@ -140,7 +140,7 @@ BOOL	sv503_enableforcedlogoff;
 BOOL	sv503_timesource;
 BOOL	sv503_acceptdownlevelapis;
 BOOL	sv503_lmannounce;
-LPTSTR	sv503_domain;
+LPWSTR	sv503_domain;
 DWORD	sv503_maxcopyreadlen;
 DWORD	sv503_maxcopywritelen;
 DWORD	sv503_minkeepsearch;
@@ -184,7 +184,7 @@ BOOL	sv599_enableforcedlogoff;
 BOOL	sv599_timesource;
 BOOL	sv599_acceptdownlevelapis;
 BOOL	sv599_lmannounce;
-LPTSTR	sv599_domain;
+LPWSTR	sv599_domain;
 DWORD	sv599_maxcopyreadlen;
 DWORD	sv599_maxcopywritelen;
 DWORD	sv599_minkeepsearch;
@@ -251,7 +251,7 @@ DWORD	sv598_minpagedpoolchunksize;
 DWORD	sv598_maxpagedpoolchunksize;
 BOOL	sv598_sendsfrompreferredprocessor;
 } SERVER_INFO_598,*PSERVER_INFO_598,*LPSERVER_INFO_598;
-typedef struct _SERVER_INFO_1005 {LPTSTR sv1005_comment; } SERVER_INFO_1005,*PSERVER_INFO_1005,*LPSERVER_INFO_1005;
+typedef struct _SERVER_INFO_1005 {LPWSTR sv1005_comment; } SERVER_INFO_1005,*PSERVER_INFO_1005,*LPSERVER_INFO_1005;
 typedef struct _SERVER_INFO_1107 { DWORD sv1107_users; } SERVER_INFO_1107,*PSERVER_INFO_1107,*LPSERVER_INFO_1107;
 typedef struct _SERVER_INFO_1010 { LONG sv1010_disc; } SERVER_INFO_1010,*PSERVER_INFO_1010,*LPSERVER_INFO_1010;
 typedef struct _SERVER_INFO_1016 { BOOL sv1016_hidden; } SERVER_INFO_1016,*PSERVER_INFO_1016,*LPSERVER_INFO_1016;
@@ -332,24 +332,24 @@ typedef struct _SERVER_INFO_1585 { BOOL sv1585_sendsfrompreferredprocessor; } SE
 typedef struct _SERVER_INFO_1586 { BOOL sv1586_maxthreadsperqueue; } SERVER_INFO_1586,*PSERVER_INFO_1586,*LPSERVER_INFO_1586;
 typedef struct _SERVER_TRANSPORT_INFO_0 {
 DWORD svti0_numberofvcs;
-LPTSTR	svti0_transportname;
+LPWSTR	svti0_transportname;
 PBYTE	svti0_transportaddress;
 DWORD	svti0_transportaddresslength;
-LPTSTR	svti0_networkaddress;
+LPWSTR	svti0_networkaddress;
 } SERVER_TRANSPORT_INFO_0,*PSERVER_TRANSPORT_INFO_0,*LPSERVER_TRANSPORT_INFO_0;
 
 NET_API_STATUS WINAPI NetServerEnum(LPCWSTR,DWORD,PBYTE*,DWORD,PDWORD,PDWORD,DWORD,LPCWSTR,PDWORD);
 NET_API_STATUS WINAPI NetServerEnumEx(LPCWSTR,DWORD,PBYTE*,DWORD,PDWORD,PDWORD,DWORD,LPCWSTR,LPCWSTR);
-NET_API_STATUS WINAPI NetServerGetInfo(LPTSTR,DWORD,PBYTE*);
-NET_API_STATUS WINAPI NetServerSetInfo(LPTSTR,DWORD,PBYTE,PDWORD);
-NET_API_STATUS NetServerSetInfoCommandLine(WORD,LPTSTR*);
-NET_API_STATUS WINAPI NetServerDiskEnum(LPTSTR,DWORD,PBYTE*,DWORD,PDWORD,PDWORD,PDWORD);
+NET_API_STATUS WINAPI NetServerGetInfo(LPWSTR,DWORD,PBYTE*);
+NET_API_STATUS WINAPI NetServerSetInfo(LPWSTR,DWORD,PBYTE,PDWORD);
+NET_API_STATUS NetServerSetInfoCommandLine(WORD,LPWSTR*);
+NET_API_STATUS WINAPI NetServerDiskEnum(LPWSTR,DWORD,PBYTE*,DWORD,PDWORD,PDWORD,PDWORD);
 NET_API_STATUS WINAPI NetServerComputerNameAdd(LPWSTR,LPWSTR,LPWSTR);
 NET_API_STATUS WINAPI NetServerComputerNameDel(LPWSTR,LPWSTR);
-NET_API_STATUS WINAPI NetServerTransportAdd(LPTSTR,DWORD,PBYTE);
-NET_API_STATUS WINAPI NetServerTransportAddEx(LPTSTR,DWORD,PBYTE);
-NET_API_STATUS WINAPI NetServerTransportDel(LPTSTR,DWORD,PBYTE);
-NET_API_STATUS WINAPI NetServerTransportEnum(LPTSTR,DWORD,PBYTE*,DWORD,PDWORD,PDWORD,PDWORD);
+NET_API_STATUS WINAPI NetServerTransportAdd(LPWSTR,DWORD,PBYTE);
+NET_API_STATUS WINAPI NetServerTransportAddEx(LPWSTR,DWORD,PBYTE);
+NET_API_STATUS WINAPI NetServerTransportDel(LPWSTR,DWORD,PBYTE);
+NET_API_STATUS WINAPI NetServerTransportEnum(LPWSTR,DWORD,PBYTE*,DWORD,PDWORD,PDWORD,PDWORD);
 BOOL SetServiceBits(SERVICE_STATUS_HANDLE,DWORD,BOOL,BOOL);
 
 #define SVI1_NUM_ELEMENTS	5

@@ -17,12 +17,14 @@
 extern "C" {
 #endif
 
-#ifndef _SYS_TYPES_H
+#if !defined ( _BSDTYPES_DEFINED ) && !defined ( _SYS_TYPES_H  )
+/* also defined in gmon.h and in cygwin's sys/types */
 typedef unsigned char	u_char;
 typedef unsigned short	u_short;
 typedef unsigned int	u_int;
 typedef unsigned long	u_long;
-#endif /* ndef _SYS_TYPES_H */
+#define _BSDTYPES_DEFINED
+#endif /* ndef _BSDTYPES_  _SYS_TYPES_H */
 typedef u_int	SOCKET;
 #ifndef FD_SETSIZE
 #define FD_SETSIZE	64

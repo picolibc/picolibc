@@ -1,5 +1,8 @@
 #ifndef __RPCNDR_H__
 #define __RPCNDR_H__
+#ifndef __RPCNDR_H_VERSION__
+#define __RPCNDR_H_VERSION__        ( 450 )
+#endif /* __RPCNDR_H_VERSION__ */
 #include <rpcnsip.h>
 #ifdef __cplusplus
 extern "C" {

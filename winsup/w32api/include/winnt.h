@@ -125,18 +125,9 @@ typedef LONGLONG USN;
 #define UNICODE_NULL L'\0'
 typedef BYTE BOOLEAN,*PBOOLEAN;
 #endif
-#ifndef GUID_DEFINED
-#define GUID_DEFINED
-typedef struct _GUID
-{
-    unsigned long Data1;
-    unsigned short Data2;
-    unsigned short Data3;
-    unsigned char Data4[8];
-} GUID,*REFGUID,*LPGUID;
-#endif /* GUID_DEFINED */
 
 #define NTAPI __stdcall
+#include <basetsd.h>
 #define APPLICATION_ERROR_MASK       0x20000000
 #define ERROR_SEVERITY_SUCCESS       0x00000000
 #define ERROR_SEVERITY_INFORMATIONAL 0x40000000
@@ -1053,6 +1044,15 @@ typedef struct _GUID
 #define IO_REPARSE_TAG_MOUNT_POINT 0xA0000003
 #ifndef RC_INVOKED
 typedef DWORD ACCESS_MASK;
+#ifndef _GUID_DEFINED /* also defined in basetyps.h */
+#define _GUID_DEFINED
+typedef struct _GUID {
+	unsigned long  Data1;
+	unsigned short Data2;
+	unsigned short Data3;
+	unsigned char  Data4[8];
+} GUID, *REFGUID, *LPGUID;
+#endif /* _GUID_DEFINED */
 typedef struct _GENERIC_MAPPING {
 	ACCESS_MASK GenericRead;
 	ACCESS_MASK GenericWrite;
@@ -1074,6 +1074,49 @@ typedef struct _ACCESS_DENIED_ACE {
 	ACCESS_MASK Mask;
 	DWORD SidStart;
 } ACCESS_DENIED_ACE;
+typedef struct _SYSTEM_AUDIT_ACE {
+	ACE_HEADER Header;
+	ACCESS_MASK Mask;
+	DWORD SidStart;
+} SYSTEM_AUDIT_ACE;
+typedef SYSTEM_AUDIT_ACE *PSYSTEM_AUDIT_ACE;
+typedef struct _SYSTEM_ALARM_ACE {
+	ACE_HEADER Header;
+	ACCESS_MASK Mask;
+	DWORD SidStart;
+} SYSTEM_ALARM_ACE,*PSYSTEM_ALARM_ACE;
+typedef struct _ACCESS_ALLOWED_OBJECT_ACE {
+	ACE_HEADER Header;
+	ACCESS_MASK Mask;
+	DWORD Flags;
+	GUID ObjectType;
+	GUID InheritedObjectType;
+	DWORD SidStart;
+} ACCESS_ALLOWED_OBJECT_ACE,*PACCESS_ALLOWED_OBJECT_ACE;
+typedef struct _ACCESS_DENIED_OBJECT_ACE {
+	ACE_HEADER Header;
+	ACCESS_MASK Mask;
+	DWORD Flags;
+	GUID ObjectType;
+	GUID InheritedObjectType;
+	DWORD SidStart;
+} ACCESS_DENIED_OBJECT_ACE,*PACCESS_DENIED_OBJECT_ACE;
+typedef struct _SYSTEM_AUDIT_OBJECT_ACE {
+	ACE_HEADER Header;
+	ACCESS_MASK Mask;
+	DWORD Flags;
+	GUID ObjectType;
+	GUID InheritedObjectType;
+	DWORD SidStart;
+} SYSTEM_AUDIT_OBJECT_ACE,*PSYSTEM_AUDIT_OBJECT_ACE;
+typedef struct _SYSTEM_ALARM_OBJECT_ACE {
+	ACE_HEADER Header;
+	ACCESS_MASK Mask;
+	DWORD Flags;
+	GUID ObjectType;
+	GUID InheritedObjectType;
+	DWORD SidStart;
+} SYSTEM_ALARM_OBJECT_ACE,*PSYSTEM_ALARM_OBJECT_ACE;
 typedef struct _ACL {
 	BYTE AclRevision;
 	BYTE Sbz1;
@@ -1085,9 +1128,9 @@ typedef struct _ACL_REVISION_INFORMATION {
 	DWORD AclRevision;
 } ACL_REVISION_INFORMATION;
 typedef struct _ACL_SIZE_INFORMATION {
-    DWORD   AceCount;
-    DWORD   AclBytesInUse;
-    DWORD   AclBytesFree;
+	DWORD   AceCount;
+	DWORD   AclBytesInUse;
+	DWORD   AclBytesFree;
 } ACL_SIZE_INFORMATION;
 
 /* FIXME: add more machines */
@@ -1309,18 +1352,18 @@ typedef struct _CONTEXT {
 
 /* These are the debug or break registers on the SH3 */
 typedef struct _DEBUG_REGISTERS {
-    ULONG  BarA;
-    UCHAR  BasrA;
-    UCHAR  BamrA;
-    USHORT BbrA;
-    ULONG  BarB;
-    UCHAR  BasrB;
-    UCHAR  BamrB;
-    USHORT BbrB;
-    ULONG  BdrB;
-    ULONG  BdmrB;
-    USHORT Brcr;
-    USHORT Align;
+	ULONG  BarA;
+	UCHAR  BasrA;
+	UCHAR  BamrA;
+	USHORT BbrA;
+	ULONG  BarB;
+	UCHAR  BasrB;
+	UCHAR  BamrB;
+	USHORT BbrB;
+	ULONG  BdrB;
+	ULONG  BdmrB;
+	USHORT Brcr;
+	USHORT Align;
 } DEBUG_REGISTERS, *PDEBUG_REGISTERS;
 
 /* The following flags control the contents of the CONTEXT structure. */
@@ -1347,31 +1390,31 @@ typedef struct _DEBUG_REGISTERS {
 /* Thread structure for CPUs which have no floating point support. */
 
 typedef struct _CONTEXT {
-    /* The flags values within this flag control the contents of */
-    /* a CONTEXT record. */
+	/* The flags values within this flag control the contents of */
+	/* a CONTEXT record. */
 
-    /* If the context record is used as an input parameter, then */
-    /* for each portion of the context record controlled by a flag */
-    /* whose value is set, it is assumed that that portion of the */
-    /* context record contains valid context. If the context record */
-    /* is being used to modify a thread's context, then only that */
-    /* portion of the threads context will be modified. */
+	/* If the context record is used as an input parameter, then */
+	/* for each portion of the context record controlled by a flag */
+	/* whose value is set, it is assumed that that portion of the */
+	/* context record contains valid context. If the context record */
+	/* is being used to modify a thread's context, then only that */
+	/* portion of the threads context will be modified. */
 
-    /* If the context record is used as an IN OUT parameter to capture */
-    /* the context of a thread, then only those portions of the thread's */
-    /* context corresponding to set flags will be returned. */
+	/* If the context record is used as an IN OUT parameter to capture */
+	/* the context of a thread, then only those portions of the thread's */
+	/* context corresponding to set flags will be returned. */
 
-    /* The context record is never used as an OUT only parameter. */
+	/* The context record is never used as an OUT only parameter. */
 
 
-    ULONG ContextFlags;
+	ULONG ContextFlags;
 
-    /* This section is specified/returned if the ContextFlags word contains */
-    /* the flag CONTEXT_INTEGER. */
+	/* This section is specified/returned if the ContextFlags word contains */
+	/* the flag CONTEXT_INTEGER. */
 
-    /* N.B. The registers RA and R15 are defined in this section, but are */
-    /*  considered part of the control context rather than part of the integer */
-    /*  context. */
+	/* N.B. The registers RA and R15 are defined in this section, but are */
+	/*  considered part of the control context rather than part of the integer */
+	/*  context. */
 
 	ULONG PR;
 	ULONG MACH;
@@ -1394,19 +1437,19 @@ typedef struct _CONTEXT {
 	ULONG R14;
 	ULONG R15;
 
-    /* This section is specified/returned if the ContextFlags word contains */
-    /* the flag CONTEXT_CONTROL. */
+	/* This section is specified/returned if the ContextFlags word contains */
+	/* the flag CONTEXT_CONTROL. */
 
-    /* N.B. The registers r15 and ra are defined in the integer section, */
-    /*   but are considered part of the control context rather than part of */
-    /*   the integer context. */
+	/* N.B. The registers r15 and ra are defined in the integer section, */
+	/*   but are considered part of the control context rather than part of */
+	/*   the integer context. */
 
-    ULONG Fir;
-    ULONG Psr;
+	ULONG Fir;
+	ULONG Psr;
 
 #if !defined(SH3e) && !defined(SH4)
 	ULONG	OldStuff[2];
-    DEBUG_REGISTERS DebugRegisters;
+	DEBUG_REGISTERS DebugRegisters;
 #else
 	ULONG	Fpscr;
 	ULONG	Fpul;
@@ -1444,125 +1487,125 @@ typedef struct _CONTEXT {
 
 typedef struct _CONTEXT {
 
-    /* This section is always present and is used as an argument build */
-    /* area. */
+	/* This section is always present and is used as an argument build */
+	/* area. */
 
-    DWORD Argument[4];
+	DWORD Argument[4];
 
-    /* This section is specified/returned if the ContextFlags word contains */
-    /* the flag CONTEXT_FLOATING_POINT. */
+	/* This section is specified/returned if the ContextFlags word contains */
+	/* the flag CONTEXT_FLOATING_POINT. */
 
-    DWORD FltF0;
-    DWORD FltF1;
-    DWORD FltF2;
-    DWORD FltF3;
-    DWORD FltF4;
-    DWORD FltF5;
-    DWORD FltF6;
-    DWORD FltF7;
-    DWORD FltF8;
-    DWORD FltF9;
-    DWORD FltF10;
-    DWORD FltF11;
-    DWORD FltF12;
-    DWORD FltF13;
-    DWORD FltF14;
-    DWORD FltF15;
-    DWORD FltF16;
-    DWORD FltF17;
-    DWORD FltF18;
-    DWORD FltF19;
-    DWORD FltF20;
-    DWORD FltF21;
-    DWORD FltF22;
-    DWORD FltF23;
-    DWORD FltF24;
-    DWORD FltF25;
-    DWORD FltF26;
-    DWORD FltF27;
-    DWORD FltF28;
-    DWORD FltF29;
-    DWORD FltF30;
-    DWORD FltF31;
+	DWORD FltF0;
+	DWORD FltF1;
+	DWORD FltF2;
+	DWORD FltF3;
+	DWORD FltF4;
+	DWORD FltF5;
+	DWORD FltF6;
+	DWORD FltF7;
+	DWORD FltF8;
+	DWORD FltF9;
+	DWORD FltF10;
+	DWORD FltF11;
+	DWORD FltF12;
+	DWORD FltF13;
+	DWORD FltF14;
+	DWORD FltF15;
+	DWORD FltF16;
+	DWORD FltF17;
+	DWORD FltF18;
+	DWORD FltF19;
+	DWORD FltF20;
+	DWORD FltF21;
+	DWORD FltF22;
+	DWORD FltF23;
+	DWORD FltF24;
+	DWORD FltF25;
+	DWORD FltF26;
+	DWORD FltF27;
+	DWORD FltF28;
+	DWORD FltF29;
+	DWORD FltF30;
+	DWORD FltF31;
 
-    /* This section is specified/returned if the ContextFlags word contains */
-    /* the flag CONTEXT_INTEGER. */
+	/* This section is specified/returned if the ContextFlags word contains */
+	/* the flag CONTEXT_INTEGER. */
 
-    /* N.B. The registers gp, sp, and ra are defined in this section, but are */
-    /*  considered part of the control context rather than part of the integer */
-    /*  context. */
+	/* N.B. The registers gp, sp, and ra are defined in this section, but are */
+	/*  considered part of the control context rather than part of the integer */
+	/*  context. */
 
-    /* N.B. Register zero is not stored in the frame. */
+	/* N.B. Register zero is not stored in the frame. */
 
-    DWORD IntZero;
-    DWORD IntAt;
-    DWORD IntV0;
-    DWORD IntV1;
-    DWORD IntA0;
-    DWORD IntA1;
-    DWORD IntA2;
-    DWORD IntA3;
-    DWORD IntT0;
-    DWORD IntT1;
-    DWORD IntT2;
-    DWORD IntT3;
-    DWORD IntT4;
-    DWORD IntT5;
-    DWORD IntT6;
-    DWORD IntT7;
-    DWORD IntS0;
-    DWORD IntS1;
-    DWORD IntS2;
-    DWORD IntS3;
-    DWORD IntS4;
-    DWORD IntS5;
-    DWORD IntS6;
-    DWORD IntS7;
-    DWORD IntT8;
-    DWORD IntT9;
-    DWORD IntK0;
-    DWORD IntK1;
-    DWORD IntGp;
-    DWORD IntSp;
-    DWORD IntS8;
-    DWORD IntRa;
-    DWORD IntLo;
-    DWORD IntHi;
+	DWORD IntZero;
+	DWORD IntAt;
+	DWORD IntV0;
+	DWORD IntV1;
+	DWORD IntA0;
+	DWORD IntA1;
+	DWORD IntA2;
+	DWORD IntA3;
+	DWORD IntT0;
+	DWORD IntT1;
+	DWORD IntT2;
+	DWORD IntT3;
+	DWORD IntT4;
+	DWORD IntT5;
+	DWORD IntT6;
+	DWORD IntT7;
+	DWORD IntS0;
+	DWORD IntS1;
+	DWORD IntS2;
+	DWORD IntS3;
+	DWORD IntS4;
+	DWORD IntS5;
+	DWORD IntS6;
+	DWORD IntS7;
+	DWORD IntT8;
+	DWORD IntT9;
+	DWORD IntK0;
+	DWORD IntK1;
+	DWORD IntGp;
+	DWORD IntSp;
+	DWORD IntS8;
+	DWORD IntRa;
+	DWORD IntLo;
+	DWORD IntHi;
 
-    /* This section is specified/returned if the ContextFlags word contains */
-    /* the flag CONTEXT_FLOATING_POINT. */
+	/* This section is specified/returned if the ContextFlags word contains */
+	/* the flag CONTEXT_FLOATING_POINT. */
 
-    DWORD Fsr;
+	DWORD Fsr;
 
-    /* This section is specified/returned if the ContextFlags word contains */
-    /* the flag CONTEXT_CONTROL. */
+	/* This section is specified/returned if the ContextFlags word contains */
+	/* the flag CONTEXT_CONTROL. */
 
-    /* N.B. The registers gp, sp, and ra are defined in the integer section, */
-    /*   but are considered part of the control context rather than part of */
-    /*   the integer context. */
+	/* N.B. The registers gp, sp, and ra are defined in the integer section, */
+	/*   but are considered part of the control context rather than part of */
+	/*   the integer context. */
 
-    DWORD Fir;
-    DWORD Psr;
+	DWORD Fir;
+	DWORD Psr;
 
-    /* The flags values within this flag control the contents of */
-    /* a CONTEXT record. */
+	/* The flags values within this flag control the contents of */
+	/* a CONTEXT record. */
 
-    /* If the context record is used as an input parameter, then */
-    /* for each portion of the context record controlled by a flag */
-    /* whose value is set, it is assumed that that portion of the */
-    /* context record contains valid context. If the context record */
-    /* is being used to modify a thread's context, then only that */
-    /* portion of the threads context will be modified. */
+	/* If the context record is used as an input parameter, then */
+	/* for each portion of the context record controlled by a flag */
+	/* whose value is set, it is assumed that that portion of the */
+	/* context record contains valid context. If the context record */
+	/* is being used to modify a thread's context, then only that */
+	/* portion of the threads context will be modified. */
 
-    /* If the context record is used as an IN OUT parameter to capture */
-    /* the context of a thread, then only those portions of the thread's */
-    /* context corresponding to set flags will be returned. */
+	/* If the context record is used as an IN OUT parameter to capture */
+	/* the context of a thread, then only those portions of the thread's */
+	/* context corresponding to set flags will be returned. */
 
-    /* The context record is never used as an OUT only parameter. */
+	/* The context record is never used as an OUT only parameter. */
 
-    DWORD ContextFlags;
+	DWORD ContextFlags;
 
-    DWORD Fill[2];
+	DWORD Fill[2];
 
 } CONTEXT;
 #elif defined(ARM)
@@ -1577,44 +1620,44 @@ typedef struct _CONTEXT {
 #define CONTEXT_FULL (CONTEXT_CONTROL | CONTEXT_INTEGER)
 
 typedef struct _CONTEXT {
-    /* The flags values within this flag control the contents of
-       a CONTEXT record.
-      
-       If the context record is used as an input parameter, then
-       for each portion of the context record controlled by a flag
-       whose value is set, it is assumed that that portion of the
-       context record contains valid context. If the context record
-       is being used to modify a thread's context, then only that
-       portion of the threads context will be modified.
-      
-       If the context record is used as an IN OUT parameter to capture
-       the context of a thread, then only those portions of the thread's
-       context corresponding to set flags will be returned.
-      
-       The context record is never used as an OUT only parameter. */
+	/* The flags values within this flag control the contents of
+	   a CONTEXT record.
+	  
+	   If the context record is used as an input parameter, then
+	   for each portion of the context record controlled by a flag
+	   whose value is set, it is assumed that that portion of the
+	   context record contains valid context. If the context record
+	   is being used to modify a thread's context, then only that
+	   portion of the threads context will be modified.
+	  
+	   If the context record is used as an IN OUT parameter to capture
+	   the context of a thread, then only those portions of the thread's
+	   context corresponding to set flags will be returned.
+	  
+	   The context record is never used as an OUT only parameter. */
 
-    ULONG ContextFlags;
+	ULONG ContextFlags;
 
-    /* This section is specified/returned if the ContextFlags word contains
-       the flag CONTEXT_INTEGER. */
-    ULONG R0;
-    ULONG R1;
-    ULONG R2;
-    ULONG R3;
-    ULONG R4;
-    ULONG R5;
-    ULONG R6;
-    ULONG R7;
-    ULONG R8;
-    ULONG R9;
-    ULONG R10;
-    ULONG R11;
-    ULONG R12;
+	/* This section is specified/returned if the ContextFlags word contains
+	   the flag CONTEXT_INTEGER. */
+	ULONG R0;
+	ULONG R1;
+	ULONG R2;
+	ULONG R3;
+	ULONG R4;
+	ULONG R5;
+	ULONG R6;
+	ULONG R7;
+	ULONG R8;
+	ULONG R9;
+	ULONG R10;
+	ULONG R11;
+	ULONG R12;
 
-    ULONG Sp;
-    ULONG Lr;
-    ULONG Pc;
-    ULONG Psr;
+	ULONG Sp;
+	ULONG Lr;
+	ULONG Pc;
+	ULONG Psr;
 } CONTEXT;
 
 #else
@@ -1692,7 +1735,6 @@ typedef struct _SE_IMPERSONATION_STATE {
 typedef struct _SID_IDENTIFIER_AUTHORITY {
 	BYTE Value[6];
 } SID_IDENTIFIER_AUTHORITY,*PSID_IDENTIFIER_AUTHORITY,*LPSID_IDENTIFIER_AUTHORITY;
-
 typedef PVOID PSID;
 typedef struct _SID {
    BYTE  Revision;
@@ -1700,7 +1742,6 @@ typedef struct _SID {
    SID_IDENTIFIER_AUTHORITY IdentifierAuthority;
    DWORD SubAuthority[ANYSIZE_ARRAY];
 } SID, *PISID;
-
 typedef struct _SID_AND_ATTRIBUTES {
 	PSID Sid;
 	DWORD Attributes;
@@ -1708,15 +1749,15 @@ typedef struct _SID_AND_ATTRIBUTES {
 typedef SID_AND_ATTRIBUTES SID_AND_ATTRIBUTES_ARRAY[ANYSIZE_ARRAY];
 typedef SID_AND_ATTRIBUTES_ARRAY *PSID_AND_ATTRIBUTES_ARRAY;
 typedef struct _TOKEN_SOURCE {
-	CHAR SourceName[8];
+	CHAR SourceName[TOKEN_SOURCE_LENGTH];
 	LUID SourceIdentifier;
-} TOKEN_SOURCE,*PTOKEN_SOURCE,*LPTOKEN_SOURCE;
+} TOKEN_SOURCE,*PTOKEN_SOURCE;
 typedef struct _TOKEN_CONTROL {
 	LUID TokenId;
 	LUID AuthenticationId;
 	LUID ModifiedId;
 	TOKEN_SOURCE TokenSource;
-} TOKEN_CONTROL;
+} TOKEN_CONTROL,*PTOKEN_CONTROL;
 typedef struct _TOKEN_DEFAULT_DACL {
 	PACL DefaultDacl;
 } TOKEN_DEFAULT_DACL;
@@ -1765,21 +1806,28 @@ typedef enum _TOKEN_INFORMATION_CLASS {
 	TokenUser=1,TokenGroups,TokenPrivileges,TokenOwner,
 	TokenPrimaryGroup,TokenDefaultDacl,TokenSource,TokenType,
 	TokenImpersonationLevel,TokenStatistics,TokenRestrictedSids,
-        TokenSessionId
+	TokenSessionId
 } TOKEN_INFORMATION_CLASS;
 typedef enum _SID_NAME_USE {
 	SidTypeUser=1,SidTypeGroup,SidTypeDomain,SidTypeAlias,SidTypeWellKnownGroup,
 	SidTypeDeletedAccount,SidTypeInvalid,SidTypeUnknown
 } SID_NAME_USE,*PSID_NAME_USE;
 typedef struct _QUOTA_LIMITS {
-	size_t PagedPoolLimit;
-	size_t NonPagedPoolLimit;
-	DWORD MinimumWorkingSetSize;
-	DWORD MaximumWorkingSetSize;
-	size_t PagefileLimit;
+	SIZE_T PagedPoolLimit;
+	SIZE_T NonPagedPoolLimit;
+	SIZE_T MinimumWorkingSetSize;
+	SIZE_T MaximumWorkingSetSize;
+	SIZE_T PagefileLimit;
 	LARGE_INTEGER TimeLimit;
-} QUOTA_LIMITS;
-typedef QUOTA_LIMITS *PQUOTA_LIMITS;
+} QUOTA_LIMITS,*PQUOTA_LIMITS;
+typedef struct _IO_COUNTERS {
+	ULONGLONG  ReadOperationCount;
+	ULONGLONG  WriteOperationCount;
+	ULONGLONG  OtherOperationCount;
+	ULONGLONG ReadTransferCount;
+	ULONGLONG WriteTransferCount;
+	ULONGLONG OtherTransferCount;
+} IO_COUNTERS, *PIO_COUNTERS;
 typedef struct _FILE_NOTIFY_INFORMATION {
 	DWORD NextEntryOffset;
 	DWORD Action;

@@ -8,6 +8,7 @@
 #include <lmaudit.h>
 #include <lmchdev.h>
 #include <lmconfig.h>
+#include <lmerr.h>
 #include <lmmsg.h>
 #include <lmshare.h>
 #include <lmapibuf.h>
@@ -17,6 +18,7 @@
 #include <lmerrlog.h>
 #include <lmsvc.h>
 #include <lmwksta.h>
+#include <lmserver.h>
 #include <lmstats.h>
 
 #endif

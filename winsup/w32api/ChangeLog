@@ -1,3 +1,34 @@
+2000-10-31  Earnie Boyd  <earnie_boyd@yahoo.com>
+
+	* Merge in accepted changes from 
+	2000-10-23  Danny Smith  <danny_r_smith_2001@yahoo.co.nz>
+	* include/basetyps.h: add comment for GUID_DEFINED 
+	* include/lm.h: add includes for lmerr.h and lmserver.h
+	* include/lmcons.h: add W2K typedefs LMSTR, LMCSTR
+	* include/lmerr.h:  add error codes
+	* include/lmserver.h: replace LPTSTR with LPWSTR,
+	LPTCSTR with LPWCSTR in structures and prototypes
+	* include/lmshare.h: ditto
+	* include/lmuse.h: ditto
+	* include/lmstats.h: ditto
+	* include/oleauto.h: add function prototype SystemTimeToVariantTime
+	* include/winbase.h: change first argument of CommConfigDialog to const
+	* include/windowsx.h: add macros  defining FAR versions of
+	mem and string functions for porting from Win16 code
+	* include/winioctl.h:  added IOCTL_STORAGE defines
+	* include/winnetwk.h:  added WNNC_NET flags
+	* include/winnt.h: add include of <basetsd.h>;
+	add structs; add pointer typedefs  for TOKEN structs
+	* include/winsock.h: add guard around BSD-ish typedefs
+	* include/wtypes.h: new VARENUM enums, new WIN32/WIN64 compat. macros
+	* include/basetsd.h: new file
+	* include/raserror.h: ditto
+	* include/rassapi.h: ditto
+	* include/ras.h: ditto
+	comment from Earnie: replaced original ras.h contribution with Danny's
+	contribution as it is more complete.
+	* include/rpcndr.h: add default definition for __RPCNDR_H_VERSION__
+
 Mon Oct 19 13:55:00 2000  Earnie Boyd <earnie_boyd@yahoo.com>
 
         * Makefile.in: increment VERSION.  Change tar file name for dist and

@@ -57,4 +57,13 @@
 #define PLATFORM_ID_NT 500
 #define PLATFORM_ID_OSF 600
 #define PLATFORM_ID_VMS 700
+/* new typedef in W2K */
+#if defined( _WIN32_WINNT ) || defined( WINNT ) || defined( FORCE_UNICODE )
+#define LMSTR   LPWSTR
+#define LMCSTR  LPCWSTR
+#else
+#define LMSTR   LPSTR
+#define LMCSTR  LPCSTR
+#endif
+
 #endif

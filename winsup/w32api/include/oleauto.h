@@ -113,6 +113,7 @@ WINOLEAUTAPI_(BSTR) SysAllocStringByteLen(const char*,unsigned int);
 WINOLEAUTAPI_(int) DosDateTimeToVariantTime(unsigned short,unsigned short,double*);
 WINOLEAUTAPI_(int) VariantTimeToDosDateTime(double,unsigned short*,unsigned short*);
 WINOLEAUTAPI_(int) VariantTimeToSystemTime(double,LPSYSTEMTIME);
+WINOLEAUTAPI_(int) SystemTimeToVariantTime(LPSYSTEMTIME, double*);
 WINOLEAUTAPI SafeArrayAllocDescriptor(unsigned int,SAFEARRAY**);
 WINOLEAUTAPI SafeArrayAllocData(SAFEARRAY*);
 WINOLEAUTAPI_(SAFEARRAY*) SafeArrayCreate(VARTYPE,unsigned int,SAFEARRAYBOUND*);
