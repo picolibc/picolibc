@@ -334,7 +334,7 @@ low_priority_sleep (DWORD secs)
 	SetThreadPriority (thisthread, new_prio);
       Sleep (secs);
 
-      if (!staylow || curr_prio == new_prio)
+      if (!staylow && curr_prio != new_prio)
 	SetThreadPriority (thisthread, curr_prio);
     }
 

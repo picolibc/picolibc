@@ -545,6 +545,7 @@ private:
   void precreate (pthread_attr *);
   void postcreate ();
   void set_tls_self_pointer ();
+  bool create_cancel_event ();
   static pthread *get_tls_self_pointer ();
   void cancel_self ();
   DWORD get_thread_id ();

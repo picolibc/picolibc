@@ -1,3 +1,14 @@
+2003-12-11  Christopher Faylor  <cgf@redhat.com>
+
+	* miscfuncs.cc (low_priority_sleep): Correct thinko which caused
+	SetPriority to be called unnecessarily.
+	* thread.cc (pthread::init_main_thread): Call new create_cancel_event
+	function.
+	(pthread::precreate): Ditto.
+	(pthread::postcreate): Remove cancel_event creation.
+	(pthread::create_cancel_event): Define new function.
+	* thread.h (pthread::create_cancel_event): Declare new function.
+
 2003-12-11  Brian Ford  <ford@vss.fsi.com>
 
 	* fhandler_serial.cc (fhandler_serial::tcflush): Simplify.  Remove
@@ -194,7 +205,7 @@
 2003-12-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::lock): Use UINT32_MAX
-	instead of 0xffffffff.  Accomodate Win 9x bug in evaluating length
+	instead of 0xffffffff.  Accommodate Win 9x bug in evaluating length
 	of area to lock when given length is 0.
 
 2003-12-03  Pierre Humblet <pierre.humblet@ieee.org>
@@ -276,7 +287,7 @@
 	struct __flock64 *.
 	* fhandler_disk_file.cc (fhandler_disk_file::lock): Ditto.  Rework
 	to be 64 bit aware.
-	* fhandler.h: Accomodate above method argument changes.
+	* fhandler.h: Accommodate above method argument changes.
 	* include/cygwin/types.h: Add struct __flock32 and __flock64.
 	Define struct flock according to setting of __CYGWIN_USE_BIG_TYPES__.
 	* include/cygwin/version.h: Bump API minor number.
@@ -876,7 +887,7 @@
 	Use appropriate security attribute for process shared semaphores.
 	(semaphore::semaphore): New constructor for named semaphores.
 	(semaphore::~semaphore): Care for semaphore name.
-	(semaphore::_post): Accomodate failing ReleaseSemaphore. Use value
+	(semaphore::_post): Accommodate failing ReleaseSemaphore. Use value
 	returned by ReleaseSemaphore vor currentvalue.
 	(semaphore::_getvalue): New method.
 	(semaphore::_timedwait): Ditto.
@@ -1612,7 +1623,7 @@
 	orig_gid to saved_psid, saved_uid and saved_gid respectively.
 	Rename methods orig_sid and set_orig_sid to saved_sid and set_saved_sid
 	respectively.
-	* sec_helper.cc (sec_acl): Accomodate above changes.
+	* sec_helper.cc (sec_acl): Accommodate above changes.
 	* spawn.cc (spawn_guts): Ditto.
 	* uinfo.cc (uinfo_init): Ditto.
 
@@ -1972,7 +1983,7 @@
 	* mmap.cc: Restructure. Add, remove and rewrite comments throughout
 	for better readability.  Change function names for better
 	understanding.
-	(MAP_SET): Accomodate name change from map_map_ to page_map_.
+	(MAP_SET): Accommodate name change from map_map_ to page_map_.
 	(MAP_CLR): Ditto.
 	(MAP_ISSET): Ditto.
 	(mmap_record::page_map_): Rename from page_map_.
