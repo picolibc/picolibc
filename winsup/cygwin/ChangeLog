@@ -1,3 +1,11 @@
+2003-09-10  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_disk_file.cc (num_entries): Take .  and ..  into account if
+	they do not exist since cygwin simulates them.
+	(fhandler_cygdrive::fstat): Ditto.
+	(fhandler_cygdrive::readdir): Don't do any specific tests on
+	__d_position when seeing if a drive exists.
+
 2003-09-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (DLL_OFILES): Add getopt.o and iruserok.o.
