@@ -211,6 +211,9 @@ extern "C" void __api_fatal (const char *, ...) __attribute__ ((noreturn));
 extern "C" int __small_sprintf (char *dst, const char *fmt, ...) /*__attribute__ ((regparm (2)))*/;
 extern "C" int __small_vsprintf (char *dst, const char *fmt, va_list ap) /*__attribute__ ((regparm (3)))*/;
 
+extern "C" void __malloc_lock (struct _reent *);
+extern "C" void __malloc_unlock (struct _reent *);
+
 /**************************** Exports ******************************/
 
 extern "C" {

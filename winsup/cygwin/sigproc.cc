@@ -46,7 +46,7 @@ details. */
 
 #define no_signals_available() (!hwait_sig || !sig_loop_wait)
 
-#define ZOMBIEMAX	4096
+#define NZOMBIES	4096
 
 /*
  * Global variables
@@ -99,12 +99,12 @@ Static HANDLE wait_sig_inited = NULL;	// Control synchronization of
 
 /* Used by WaitForMultipleObjects.  These are handles to child processes.
  */
-Static HANDLE events[PSIZE + 1] = {0};	// All my children's handles++
+Static HANDLE events[PSIZE + 1] = {0};  // All my children's handles++
 #define hchildren (events + 1)		// Where the children handles begin
 Static pinfo pchildren[PSIZE];		// All my children info
 Static int nchildren = 0;		// Number of active children
-static pinfo *zombies;			// All my deceased children info
-static int nzombies;			// Number of deceased children
+Static pinfo zombies[NZOMBIES];		// All my deceased children info
+Static int nzombies = 0;		// Number of deceased children
 
 Static waitq waitq_head = {0, 0, 0, 0, 0, 0, 0};// Start of queue for wait'ing threads
 Static waitq waitq_main;		// Storage for main thread
@@ -318,7 +318,7 @@ proc_subproc (DWORD what, DWORD val)
 	 filled up our table or if we're ignoring SIGCHLD, then we immediately
 	 remove the process and move on. Otherwise, this process becomes a zombie
 	 which must be reaped by a wait() call. */
-      if (nzombies >= ZOMBIEMAX
+      if (nzombies >= NZOMBIES
 	  || myself->getsig (SIGCHLD).sa_handler == (void *) SIG_IGN)
 	{
 	  sigproc_printf ("automatically removing zombie %d", thiszombie);
@@ -543,11 +543,6 @@ sig_dispatch_pending (int justwake)
 void __stdcall
 sigproc_init ()
 {
-  if (!zombies)
-    zombies = (pinfo *) malloc (sizeof (pinfo) * ZOMBIEMAX);
-  else
-    nzombies = 0;
-
   wait_sig_inited = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
   ProtectHandle (wait_sig_inited);
 

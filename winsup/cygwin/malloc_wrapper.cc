@@ -154,8 +154,7 @@ _strdup_r (struct _reent *, const char *s)
 /* These routines are used by the application if it
    doesn't provide its own malloc. */
 
-extern "C"
-void
+extern "C" void
 export_free (void *p)
 {
   malloc_printf ("(%p), called by %x", p, ((int *)&p)[-1]);
@@ -165,8 +164,7 @@ export_free (void *p)
     user_data->free (p);
 }
 
-extern "C"
-void *
+extern "C" void *
 export_malloc (int size)
 {
   void *res;
@@ -179,8 +177,7 @@ export_malloc (int size)
   return res;
 }
 
-extern "C"
-void *
+extern "C" void *
 export_realloc (void *p, int size)
 {
   void *res;
@@ -192,8 +189,7 @@ export_realloc (void *p, int size)
   return res;
 }
 
-extern "C"
-void *
+extern "C" void *
 export_calloc (size_t nmemb, size_t size)
 {
   void *res;
@@ -234,15 +230,13 @@ malloc_init ()
     }
 }
 
-extern "C"
-void
+extern "C" void
 __malloc_lock (struct _reent *)
 {
   mprotect->acquire ();
 }
 
-extern "C"
-void
+extern "C" void
 __malloc_unlock (struct _reent *)
 {
   mprotect->release ();

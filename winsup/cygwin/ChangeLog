@@ -1,3 +1,12 @@
+Sat Sep  8 23:32:18 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* fork.cc (fork_parent): Stop malloc activity while fork is in control
+	of the heap.
+	* sigproc.cc (NZOMBIES): Rename from ZOMBIEMAX for clarity.
+	(zombies): Revert to original behavior.  Allocating zombie array
+	resulted in performance hit.
+	* winsup.h: Declare malloc lock routines.
+
 Fri Sep  7 21:35:35 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* cygwin.din: Add gamm*_r function exports.

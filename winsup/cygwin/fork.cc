@@ -462,6 +462,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   char sa_buf[1024];
   syscall_printf ("CreateProcess (%s, %s, 0, 0, 1, %x, 0, 0, %p, %p)",
 		  myself->progname, myself->progname, c_flags, &si, &pi);
+  __malloc_lock (_reent_clib ());
   cygheap_setup_for_child (&ch);
   rc = CreateProcess (myself->progname, /* image to run */
 		      myself->progname, /* what we send in arg0 */
@@ -557,6 +558,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 		  dll_data_start, dll_data_end,
 		  dll_bss_start, dll_bss_end, NULL);
 
+  __malloc_unlock (_reent_clib ());
   MALLOC_CHECK;
   if (!rc)
     goto cleanup;
