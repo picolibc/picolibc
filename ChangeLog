@@ -1,3 +1,7 @@
+2001-07-26  DJ Delorie  <dj@redhat.com>
+
+	* MAINTAINERS: Clarify libiberty merge rules and procedures.
+
 2001-06-19  Alan Modra  <amodra@bigpond.net.au>
 
 	* Makefile.in: Revert 2001-06-17.
