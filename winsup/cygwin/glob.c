@@ -97,11 +97,7 @@ __weak_alias(__globfree13,___globfree13);
 #ifdef __LIBC12_SOURCE__
 #define	STAT	stat12
 #else
-#if defined (__INSIDE_CYGWIN__)
 #define STAT	__stat64
-#else
-#define	STAT	stat
-#endif
 #endif
 
 #define	DOLLAR		'$'
@@ -847,11 +843,7 @@ g_lstat(fn, sb, pglob)
 			stat32_to_STAT (&lsb, sb);
 		return ret;
 	}
-#ifdef __INSIDE_CYGWIN__
 	return(lstat64(buf, sb));
-#else
-	return(lstat(buf, sb));
-#endif
 }
 
 static int
@@ -873,11 +865,7 @@ g_stat(fn, sb, pglob)
 			stat32_to_STAT (&lsb, sb);
 		return ret;
 	}
-#ifdef __INSIDE_CYGWIN__
 	return(stat64(buf, sb));
-#else
-	return(stat(buf, sb));
-#endif
 }
 
 static Char *

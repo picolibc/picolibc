@@ -1,5 +1,10 @@
 2003-03-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* glob.c: Eliminate __INSIDE_CYGWIN__ preprocessor conditionals
+	throughout.
+
+2003-03-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::fstat_helper): Fix
 	wrong usage of S_IFDIR.
 	* security.cc (get_attribute_from_acl): Ditto.
