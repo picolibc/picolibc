@@ -1,3 +1,9 @@
+2002-08-05  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::stub): Change event creation to manual
+	reset.  Set __name after calling SetEvent to prevent races.
+	(cygthread::detach): Always reset event here to prevent races.
+
 2002-08-03  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* debug.h (WaitForMultipleObjects): Correct typo.

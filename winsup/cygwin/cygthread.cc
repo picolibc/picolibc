@@ -7,10 +7,10 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include <windows.h>
 #include "exceptions.h"
 #include "security.h"
 #include "cygthread.h"
-#include <windows.h>
 
 #undef CloseHandle
 
@@ -21,8 +21,9 @@ static HANDLE NO_COPY hthreads[NTHREADS];
 
 DWORD NO_COPY cygthread::main_thread_id;
 
-/* Initial stub called by makethread. Performs initial per-thread
-   initialization.  */
+/* Initial stub called by cygthread constructor. Performs initial
+   per-thread initialization and loops waiting for new thread functions
+   to execute.  */
 DWORD WINAPI
 cygthread::stub (VOID *arg)
 {
@@ -34,7 +35,7 @@ cygthread::stub (VOID *arg)
   init_exceptions (&except_entry);
 
   cygthread *info = (cygthread *) arg;
-  info->ev = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+  info->ev = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
   while (1)
     {
       if (!info->func)
@@ -43,12 +44,15 @@ cygthread::stub (VOID *arg)
       /* Cygwin threads should not call ExitThread */
       info->func (info->arg);
 
-      info->__name = NULL;
+      debug_printf ("returned from function %p", info->func);
       SetEvent (info->ev);
+      info->__name = NULL;
       SuspendThread (info->h);
     }
 }
 
+/* This function runs in a secondary thread and starts up a bunch of
+   other suspended threads for use in the cygthread pool. */
 DWORD WINAPI
 cygthread::runner (VOID *arg)
 {
@@ -59,6 +63,7 @@ cygthread::runner (VOID *arg)
   return 0;
 }
 
+/* Start things going.  Called from dll_crt0_1. */
 void
 cygthread::init ()
 {
@@ -86,7 +91,7 @@ void * cygthread::operator
 new (size_t)
 {
   DWORD id;
-  cygthread *info; /* Various information needed by the newly created thread */
+  cygthread *info;
 
   for (;;)
     {
@@ -147,6 +152,8 @@ HANDLE ()
   return ev;
 }
 
+/* Should only be called when the process is exiting since it
+   leaves an open thread slot. */
 void
 cygthread::exit_thread ()
 {
@@ -154,18 +161,28 @@ cygthread::exit_thread ()
   ExitThread (0);
 }
 
+/* Detach the cygthread from the current thread.  Note that the
+   theory is that cygthread's are only associated with one thread.
+   So, there should be no problems with multiple threads doing waits
+   on the one cygthread. */
 void
 cygthread::detach ()
 {
   if (!avail)
     {
       DWORD avail = id;
-      if (__name)
+      /* Checking for __name here is just a minor optimization to avoid
+	 an OS call. */
+      if (!__name)
+	debug_printf ("thread routine returned.  No need to wait.");
+      else
 	{
 	  DWORD res = WaitForSingleObject (*this, INFINITE);
 	  debug_printf ("WFSO returns %d", res);
 	}
+      ResetEvent (*this);
       id = 0;
+      /* Mark the thread as available by setting avail to non-zero */
       (void) InterlockedExchange ((LPLONG) &this->avail, avail);
     }
 }
