@@ -53,10 +53,10 @@ fhandler_dev_tape::is_eof (int win_error)
   return ret;
 }
 
-fhandler_dev_tape::fhandler_dev_tape (int unit)
-  : fhandler_dev_raw (FH_TAPE, unit)
+fhandler_dev_tape::fhandler_dev_tape ()
+  : fhandler_dev_raw (FH_TAPE)
 {
-  debug_printf ("unit: %d", unit);
+  debug_printf ("unit: %d", dev.minor);
 }
 
 int
@@ -89,7 +89,7 @@ fhandler_dev_tape::open (path_conv *real_path, int flags, mode_t)
        * returns ERROR_NO_DATA_DETECTED. After media change, all subsequent
        * ReadFile calls return ERROR_NO_DATA_DETECTED, too.
        * The call to tape_set_pos seems to reset some internal flags. */
-      if ((! ioctl (MTIOCPOS, &pos)) && (! pos.mt_blkno))
+      if ((!ioctl (MTIOCPOS, &pos)) && (!pos.mt_blkno))
 	{
 	  op.mt_op = MTREW;
 	  ioctl (MTIOCTOP, &op);
