@@ -1,3 +1,7 @@
+2000-07-26  Dave Brolley  <brolley@redhat.com>
+
+	* cgen.h (cgen_hw_lookup_by_num): Second parameter is unsigned.
+
 2000-07-20  Hans-Peter Nilsson  <hp@axis.com>
 
 	cris.h: New file.

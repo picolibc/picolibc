@@ -452,7 +452,7 @@ typedef struct {
 extern const CGEN_HW_ENTRY * cgen_hw_lookup_by_name
      PARAMS ((CGEN_CPU_DESC, const char *));
 extern const CGEN_HW_ENTRY * cgen_hw_lookup_by_num
-     PARAMS ((CGEN_CPU_DESC, int));
+     PARAMS ((CGEN_CPU_DESC, unsigned int));
 
 /* This struct is used to describe things like register names, etc.  */
 
