@@ -273,6 +273,7 @@ static const struct pa_opcode pa_opcodes[] =
 { "addibf",	0xac000000, 0xfc000000, "!n5,b,w", pa10},
 { "bb",		0xc4004000, 0xfc004000, "~nx,Q,w", pa10}, 
 { "bvb",	0xc0004000, 0xffe04000, "~nx,w", pa10},
+{ "clrbts",	0xe8004005, 0xffffffff, "", pa20},
 
 /* Computation Instructions */
 

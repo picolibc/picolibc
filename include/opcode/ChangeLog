@@ -1,7 +1,9 @@
 Fri Jun 25 04:22:04 1999  Jerry Quinn <jquinn@nortelnetworks.com>
 			  Jeff Law <law@cygnus.com>
 
-	* hppa.h (pa_opcodes):  Add entries for mfia and mtsarcm instructions.
+	* hppa.h (pa_opcodes): Add pa2.0 clrbts instruction.
+
+	* hppa.h (pa_opcodes): Add entries for mfia and mtsarcm instructions.
 
 1999-06-23  Alan Modra  <alan@spri.levels.unisa.edu.au>
 
