@@ -1,3 +1,8 @@
+2002-09-02  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
+
+	* cygwin.din: Revert exporting new wchar functions.
+	* include/cygwin/version.h: Change comment for API minor 62.
+
 2002-09-02  Christopher Faylor  <cgf@redhat.com>
 
 	* dcrt0.cc (dll_crt0_1): Remove getpagesize() call.

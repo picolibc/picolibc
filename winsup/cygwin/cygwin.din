@@ -1031,58 +1031,6 @@ wcscmp
 _wcscmp = wcscmp
 wcslen
 _wcslen = wcslen
-wcscat
-_wcscat = wcscat
-wcschr
-_wcschr = wcschr
-wcscpy
-_wcscpy = wcscpy
-wcscspn
-_wcscspn = wcscspn
-wcslcat
-_wcslcat = wcslcat
-wcslcpy
-_wcslcpy = wcslcpy
-wcsncat
-_wcsncat = wcsncat
-wcsncmp
-_wcsncmp = wcsncmp
-wcsncpy
-_wcsncpy = wcsncpy
-wcspbrk
-_wcspbrk = wcspbrk
-wcsrchr
-_wcsrchr = wcsrchr
-wcsspn
-_wcsspn = wcsspn
-wcsstr
-_wcsstr = wcsstr
-wmemchr
-_wmemchr = wmemchr
-wmemcmp
-_wmemcmp = wmemcmp
-wmemcpy
-_wmemcpy = wmemcpy
-wmemmove
-_wmemmove = wmemmove
-wmemset
-_wmemset = wmemset
-btowc
-_btowc = btowc
-wctob
-_wctob = wctob
-mbsinit
-_mbsinit = mbsinit
-mbrlen
-_mbrlen = mbrlen
-mbrtowc
-_mbrtowc = mbrtowc
-mbsrtowcs
-_mbsrtowcs = mbsrtowcs
-wcrtomb
-_wcrtomb = wcrtomb
-wcsrtombs
-_wcsrtombs = wcsrtombs
 wprintf
 _wprintf = wprintf
 memccpy
