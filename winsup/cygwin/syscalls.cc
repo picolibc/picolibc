@@ -2102,6 +2102,7 @@ setegid (gid_t gid)
 	      return -1;
 	    }
 	  myself->gid = gid;
+#if 0	  // Setting the primary group in token here isn't foolproof enough.
 	  if (allow_ntsec)
 	    {
 	      cygsid gsid;
@@ -2123,6 +2124,7 @@ setegid (gid_t gid)
 		    }
 		}
 	    }
+#endif
 	}
     }
   else

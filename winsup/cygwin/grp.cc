@@ -223,7 +223,7 @@ getgrgid (gid_t gid)
 	return group_buf + i;
     }
 
-  return default_grp;
+  return allow_ntsec ? NULL : default_grp;
 }
 
 extern "C"
