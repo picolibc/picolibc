@@ -1,3 +1,7 @@
+2004-09-13  Aaron W. LaFramboise  <aaronavay62@aaronwl.com>
+
+	* libiberty.h (basename): Prototype for __MINGW32__.
+
 2004-09-13  Paul Brook  <paul@codesourcery.com>
 
 	* elf/arm.h: Rename RELABS to TARGET1.
