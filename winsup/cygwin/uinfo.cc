@@ -18,12 +18,12 @@ details. */
 #include <stdlib.h>
 #include <lm.h>
 #include <sys/cygwin.h>
+#include "cygerrno.h"
 #include "pinfo.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
-#include "cygerrno.h"
 #include "cygheap.h"
 #include "registry.h"
 #include "child_info.h"

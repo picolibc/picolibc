@@ -1,5 +1,20 @@
 2005-01-12  Christopher Faylor  <cgf@timesys.com>
 
+	Reorganize header file inclusion throughout so that cygerrno.h comes
+	first.
+	* fhandler.h (select_record::thread_errno): Save any encountered errno
+	here.
+	(select_record::set_select_errno): New function.
+	(select_record::saw_error): New function.
+	(select_record::select_record): Initialize thread_errno to zero.
+	* select.cc (set_handle_or_return_if_not_open): Set thread_errno on
+	failure.
+	(select_stuff::wait): Record errno for later resurrection in calling
+	thread.
+	(peek_serial): Ditto.
+
+2005-01-12  Christopher Faylor  <cgf@timesys.com>
+
 	* syscalls.cc (system): Use "/bin/sh" as per linux and (sorta) SUSv3.
 
 2005-01-12  Christopher Faylor  <cgf@timesys.com>

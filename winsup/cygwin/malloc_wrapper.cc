@@ -14,11 +14,11 @@ details. */
 #include "winsup.h"
 #include <stdlib.h>
 #include <assert.h>
+#include "cygerrno.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
-#include "cygerrno.h"
 #include "cygheap.h"
 #include "heap.h"
 #include "sync.h"

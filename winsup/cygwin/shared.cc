@@ -14,12 +14,12 @@ details. */
 #include <stdlib.h>
 #include <grp.h>
 #include <pwd.h>
+#include "cygerrno.h"
 #include "pinfo.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
-#include "cygerrno.h"
 #include "cygheap.h"
 #include "heap.h"
 #include "shared_info_magic.h"

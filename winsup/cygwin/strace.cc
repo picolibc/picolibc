@@ -14,6 +14,7 @@ details. */
 #include <wingdi.h>
 #include <winuser.h>
 #include <ctype.h>
+#include "cygerrno.h"
 #include "pinfo.h"
 #include "perprocess.h"
 #include "cygwin_version.h"
@@ -23,7 +24,6 @@ details. */
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
-#include "cygerrno.h"
 #include "cygheap.h"
 
 #define PROTECT(x) x[sizeof (x)-1] = 0

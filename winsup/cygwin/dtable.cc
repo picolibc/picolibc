@@ -584,7 +584,7 @@ dtable::select_read (int fd, select_record *s)
   s = fh->select_read (s);
   s->fd = fd;
   s->fh = fh;
-  s->saw_error = 0;
+  s->thread_errno = 0;
   debug_printf ("%s fd %d", fh->get_name (), fd);
   return s;
 }
@@ -601,7 +601,7 @@ dtable::select_write (int fd, select_record *s)
   s = fh->select_write (s);
   s->fd = fd;
   s->fh = fh;
-  s->saw_error = 0;
+  s->thread_errno = 0;
   debug_printf ("%s fd %d", fh->get_name (), fd);
   return s;
 }
@@ -618,7 +618,7 @@ dtable::select_except (int fd, select_record *s)
   s = fh->select_except (s);
   s->fd = fd;
   s->fh = fh;
-  s->saw_error = 0;
+  s->thread_errno = 0;
   debug_printf ("%s fd %d", fh->get_name (), fd);
   return s;
 }

@@ -12,11 +12,11 @@
 #include <string.h>
 #include <assert.h>
 #include <stdlib.h>
+#include "cygerrno.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
-#include "cygerrno.h"
 #include "cygheap.h"
 #include "child_info.h"
 #include "heap.h"

@@ -1216,7 +1216,7 @@ struct select_record
   int fd;
   HANDLE h;
   fhandler_base *fh;
-  bool saw_error;
+  int thread_errno;
   bool windows_handle;
   bool read_ready, write_ready, except_ready;
   bool read_selected, write_selected, except_selected;
@@ -1227,9 +1227,11 @@ struct select_record
 		 fd_set *exceptfds);
   void (*cleanup) (select_record *me, class select_stuff *stuff);
   struct select_record *next;
+  void set_select_errno () {__seterrno (); thread_errno = errno;}
+  int saw_error () {return thread_errno;}
 
   select_record (fhandler_base *in_fh = NULL) : fd (0), h (NULL),
-		 fh (in_fh), saw_error (false), windows_handle (false),
+		 fh (in_fh), thread_errno (0), windows_handle (false),
 		 read_ready (false), write_ready (false), except_ready (false),
 		 read_selected (false), write_selected (false),
 		 except_selected (false), except_on_write (false),

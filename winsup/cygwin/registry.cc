@@ -13,10 +13,10 @@ details. */
 #include "registry.h"
 #include "security.h"
 #include <cygwin/version.h>
+#include "cygerrno.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
-#include "cygerrno.h"
 #include "cygheap.h"
 static const char cygnus_class[] = "cygnus";
 

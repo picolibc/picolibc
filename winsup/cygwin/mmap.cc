@@ -13,11 +13,11 @@ details. */
 #include <stdlib.h>
 #include <stddef.h>
 #include <sys/mman.h>
+#include "cygerrno.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
-#include "cygerrno.h"
 #include "cygheap.h"
 #include "pinfo.h"
 #include "sys/cygwin.h"

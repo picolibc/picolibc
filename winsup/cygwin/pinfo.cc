@@ -14,11 +14,11 @@ details. */
 #include <time.h>
 #include <limits.h>
 #include <stdarg.h>
+#include "cygerrno.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
-#include "cygerrno.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "cygwin_version.h"

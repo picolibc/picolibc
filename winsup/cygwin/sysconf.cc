@@ -13,11 +13,11 @@ details. */
 #include <time.h>
 #include <limits.h>
 #include <ntdef.h>
+#include "cygerrno.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
-#include "cygerrno.h"
 #include "cygheap.h"
 #include "ntdll.h"
 

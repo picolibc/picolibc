@@ -16,12 +16,12 @@ details. */
 #include <wininet.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "cygerrno.h"
 #include "pinfo.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
-#include "cygerrno.h"
 #include "cygheap.h"
 #include "pwdgrp.h"
 #include "cygtls.h"

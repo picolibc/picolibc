@@ -11,11 +11,11 @@ details. */
 #include "winsup.h"
 #include <stdarg.h>
 #include <unistd.h>
+#include "cygerrno.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
-#include "cygerrno.h"
 #include "cygheap.h"
 #include "thread.h"
 

@@ -13,13 +13,13 @@ details. */
 #include <unistd.h>
 #include <stdlib.h>
 #include <process.h>
+#include "cygerrno.h"
 #include "perprocess.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "pinfo.h"
 #include "environ.h"
-#include "cygerrno.h"
 #undef _execve
 
 /* This is called _execve and not execve because the real execve is defined

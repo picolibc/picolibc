@@ -14,6 +14,7 @@ details. */
 #include <stdlib.h>
 #include <unistd.h>
 #include <ctype.h>
+#include "cygerrno.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
@@ -21,7 +22,6 @@ details. */
 #include "thread.h"
 #include "dlfcn.h"
 #include "dll_init.h"
-#include "cygerrno.h"
 #include "cygtls.h"
 
 static void __stdcall

@@ -28,8 +28,8 @@ details. */
 #include <limits.h>
 #define USE_SYS_TYPES_FD_SET
 #include <winsock.h>
-#include "select.h"
 #include "cygerrno.h"
+#include "select.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
@@ -85,8 +85,7 @@ typedef long fd_mask;
   h = (s)->fh->get_handle (); \
   if (cygheap->fdtab.not_open ((s)->fd)) \
     { \
-      (s)->saw_error = true; \
-      set_sig_errno (EBADF); \
+      (s)->thread_errno =  EBADF; \
       return -1; \
     } \
 
@@ -238,7 +237,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	}
       if (!s->startup (s, this))
 	{
-	  __seterrno ();
+	  s->set_select_errno ();
 	  return -1;
 	}
       if (s->h == NULL)
@@ -269,7 +268,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	  return -1;
 	case WAIT_FAILED:
 	  select_printf ("WaitForMultipleObjects failed");
-	  __seterrno ();
+	  s->set_select_errno ();
 	  return -1;
 	case WAIT_TIMEOUT:
 	  select_printf ("timed out");
@@ -285,8 +284,11 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	 If it returns false, then this wakeup was a false alarm and we should go
 	 back to waiting. */
       while ((s = s->next))
-	if (s->saw_error)
-	  return -1;		/* Somebody detected an error */
+	if (s->saw_error ())
+	  {
+	    set_errno (s->saw_error ());
+	    return -1;		/* Somebody detected an error */
+	  }
 	else if ((((wait_ret >= m && s->windows_handle) || s->h == w4[wait_ret])) &&
 	    s->verify (s, readfds, writefds, exceptfds))
 	  gotone = true;
@@ -1005,8 +1007,7 @@ err:
       return ready;
     }
 
-  __seterrno ();
-  s->saw_error = true;
+  s->set_select_errno ();
   select_printf ("error %E");
   return -1;
 }

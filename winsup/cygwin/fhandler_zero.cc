@@ -13,6 +13,7 @@ details. */
 #include "winsup.h"
 #include <errno.h>
 #include "security.h"
+#include "cygerrno.h"
 #include "path.h"
 #include "fhandler.h"
 

@@ -16,10 +16,10 @@ details. */
 #include <asm/socket.h>
 #include <cygwin/hdreg.h>
 #include <cygwin/fs.h>
+#include "cygerrno.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
-#include "cygerrno.h"
 
 /**********************************************************************/
 /* fhandler_dev_floppy */

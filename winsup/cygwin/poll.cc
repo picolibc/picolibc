@@ -18,11 +18,11 @@
 #include <stdlib.h>
 #define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>
+#include "cygerrno.h"
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
-#include "cygerrno.h"
 #include "cygheap.h"
 #include "sigproc.h"
 
