@@ -126,7 +126,7 @@ class path_conv
     check (src, opt | PC_NULLEMPTY, suffixes);
   }
 
-  path_conv (): path_flags (0), known_suffix (NULL), error (0), devn (0), unit (0), fileattr (INVALID_FILE_ATTRIBUTES) {path[0] = '\0';}
+  path_conv (): path_flags (0), known_suffix (NULL), error (0), devn (0), unit (0), fileattr (INVALID_FILE_ATTRIBUTES), normalized_path (NULL) {path[0] = '\0';}
 
   ~path_conv ();
   inline char *get_win32 () { return path; }
