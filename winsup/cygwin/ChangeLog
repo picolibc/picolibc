@@ -1,11 +1,18 @@
+2004-04-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din: Export rand_r and ttyname_r.
+	* syscalls.cc (ttyname_r): New function.
+	(ttyname): Move functionality to ttyname_r.  Call it from here.
+	* include/cygwin/version.h: Bump API minor number.
+
 2004-04-14  Pierre Humblet <pierre.humblet@ieee.org>
 
-        * path.h (path_conv::set_symlink): Add argument.
-        (path_conv::get_symlink_length): New method. 
-        (path_conv::symlink_length): New member.
-        * path.cc (path_conv::check): Pass symlen to set_symlink.
-        * fhandler_disk_file.cc (fhandler_base::fstat_helper): For symlinks
-        set st_size from get_symlink_length.    
+	* path.h (path_conv::set_symlink): Add argument.
+	(path_conv::get_symlink_length): New method. 
+	(path_conv::symlink_length): New member.
+	* path.cc (path_conv::check): Pass symlen to set_symlink.
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): For symlinks
+	set st_size from get_symlink_length.    
 
 2004-04-13  Corinna Vinschen  <corinna@vinschen.de>
 

@@ -1067,6 +1067,7 @@ raise SIGFE
 _raise = raise SIGFE
 rand NOSIGFE
 _rand = rand NOSIGFE
+rand_r NOSIGFE
 random NOSIGFE
 read SIGFE
 _read = read SIGFE
@@ -1438,6 +1439,7 @@ truncf NOSIGFE
 tsearch SIGFE
 ttyname SIGFE
 _ttyname = ttyname SIGFE
+ttyname_r SIGFE
 ttyslot NOSIGFE
 twalk NOSIGFE
 tzset SIGFE

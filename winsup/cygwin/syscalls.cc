@@ -1511,15 +1511,38 @@ pathconf (const char *file, int v)
     }
 }
 
+extern "C" int
+ttyname_r (int fd, char *buf, size_t buflen)
+{
+  int ret = 0;
+  if (__check_null_invalid_struct (buf, buflen))
+    ret = EINVAL;
+  else
+    {
+      cygheap_fdget cfd (fd, true);
+      if (cfd < 0)
+	ret = EBADF;
+      else if (!cfd->is_tty ())
+	ret = ENOTTY;
+      else if (buflen < strlen (cfd->ttyname ()) + 1)
+	ret = ERANGE;
+      else
+        strcpy (buf, cfd->ttyname ());
+    }
+  debug_printf ("returning %d tty: %s", ret, ret ? "NULL" : buf);
+  return ret;
+}
+
 extern "C" char *
 ttyname (int fd)
 {
-  char *name;
-  cygheap_fdget cfd (fd);
-  if (cfd < 0 || !cfd->is_tty ())
-    return 0;
-  name = (char *) (cfd->ttyname ());
-  debug_printf ("returning %s", name);
+  static char name[CYG_MAX_PATH];
+  int ret = ttyname_r (fd, name, CYG_MAX_PATH);
+  if (ret)
+    {
+      set_errno (ret);
+      return NULL;
+    }
   return name;
 }
 
