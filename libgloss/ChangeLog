@@ -1,5 +1,10 @@
 2002-04-15  Hans-Peter Nilsson  <hp@bitrange.com>
 
+        * d30v/syscalls.c: #include <time.h>.  Don't use multi-line
+        strings.
+
+2002-04-15  Hans-Peter Nilsson  <hp@bitrange.com>
+
         * m32r/trapmon0.c (__trap0): Don't use multi-line strings.
 
 2002-02-05  Mark Salter  <msalter@redhat.com>

@@ -17,18 +17,19 @@
  */
 
 #include <stdlib.h>
+#include <time.h>
 #include "syscall.h"
 
 extern int *__errno(), errno;
 
 __asm__ (
-"	.globl	__syscall
-	.type	__syscall,@function
-__syscall:
-	trap	31		|| nop
-	cmpge	f0,r2,0		-> jmp/tx	link
-	bra	__set_errno
-	.size	__syscall,.-__syscall
+"	.globl	__syscall					\n\
+	.type	__syscall,@function				\n\
+__syscall:							\n\
+	trap	31		|| nop				\n\
+	cmpge	f0,r2,0		-> jmp/tx	link		\n\
+	bra	__set_errno					\n\
+	.size	__syscall,.-__syscall				\n\
 ");
 
 int
