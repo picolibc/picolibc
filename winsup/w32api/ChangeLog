@@ -1,3 +1,8 @@
+2002-08-20  Casper S. Hornstrup  <chorns@users.sourceforge.net>
+
+	* include/ws2spi.h: New file.
+	* lib/test.c: Include ws2spi.h.
+
 2002-08-20  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winsock2.h (WSAIsBlocking,WSAUnhookBlockingHook,
