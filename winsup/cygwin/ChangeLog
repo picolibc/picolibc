@@ -1,4 +1,4 @@
-Thu Aug 24 14:33:46 2000  Christopher Faylor <cgf@cygnus.com>
+2000-08-24  Egor Duda  <deo@logos-m.ru>
 
 	* include/cygwin/core_dump.h: New file, contains structures used in
 	cygwin core core files.

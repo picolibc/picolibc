@@ -1,4 +1,4 @@
-Thu Aug 24 15:00:31 2000  Christopher Faylor <cgf@cygnus.com>
+2000-08-24  Egor Duda  <deo@logos-m.ru>
 
 	* Makefile.in: Add dumper.exe target and associated mechanisms for building it.
 	* dumper.cc: New file.
