@@ -95,6 +95,12 @@ __change_mode:
 #endif
 	/*  Parse string at r1 */
 	mov	r0, #0		/*  count of arguments so far */
+	/* Push a NULL argument onto the end of the list.  */
+#ifdef __thumb__
+	push	{r0}
+#else
+	stmfd	sp!, {r0}
+#endif
 .LC10:
 /*  Skip leading blanks */
 #ifdef __thumb__
@@ -179,14 +185,6 @@ __change_mode:
 	strhi	r5, [r2, #-4]!
 	strhi	r4, [r3], #4
 	bhi	.LC13
-#endif
-
-	/* Push a NULL argument onto the end of the list.  */
-	mov	r2, #0
-#ifdef __thumb__
-	push	{r2}
-#else
-	stmfd	sp!, {r1}
 #endif
 #endif
 
