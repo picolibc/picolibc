@@ -1,3 +1,8 @@
+2004-12-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* errno.cc (errmap): Map ERROR_INVALID_ADDRESS to EINVAL instead of
+	EOVERFLOW.
+
 2004-12-10  Christopher Faylor  <cgf@timesys.com>
 
 	* include/sys/strace.h: Don't output paranoid_printf by default.
