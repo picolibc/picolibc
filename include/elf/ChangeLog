@@ -1,4 +1,10 @@
-Tue Aug 28 23:32:34 2001  J"orn Rennecke <amylaar@redhat.com>
+2001-08-29  Jeff Law <law@redhat.com>
+
+	* h8.h (EF_H8_MACH): New mask for encoded machine type.
+	(E_H8_MACH_H8300, E_H8_MACH_H8300H, E_H8_MACH_H8300S): New
+	machine types.
+
+Tue Aug 26 23:32:34 2001  J"orn Rennecke <amylaar@redhat.com>
 
 	* h8.h: New file.
 

@@ -83,4 +83,14 @@ START_RELOC_NUMBERS (elf_h8_reloc_type)
   RELOC_NUMBER (R_H8_OPscttop, 141)
 END_RELOC_NUMBERS (R_H8_max)
 
+/* Machine variant if we know it.  This field was invented at Cygnus,
+   but it is hoped that other vendors will adopt it.  If some standard
+   is developed, this code should be changed to follow it. */
+
+#define EF_H8_MACH		0x00FF0000
+
+#define E_H8_MACH_H8300		0x00800000
+#define E_H8_MACH_H8300H	0x00810000
+#define E_H8_MACH_H8300S	0x00820000
+
 #endif
