@@ -1,3 +1,7 @@
+2001-07-18  Andreas Jaeger  <aj@suse.de>
+
+	* xregex2.h: Place under LGPL version 2.1.
+
 2001-07-12  Jeff Johnston  <jjohnstn@redhat.com>
 
         * opcode/cgen.h (CGEN_INSN): Add regex support.
