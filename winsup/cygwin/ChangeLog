@@ -1,3 +1,7 @@
+Mon May 15 00:35:35 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* include/cygwin/version.h: Bump DLL minor version number to 2.
+
 Sun May 14 23:41:24 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* shared.h: Bump PROC_MAGIC.
@@ -535,10 +539,6 @@ Sat Mar 11 22:47:43 2000  Christopher Faylor <cgf@cygnus.com>
 	* fhandler_tty.cc (fhandler_pty_master::process_slave_output):
 	Streamline, simplify code.
 	* sigproc.cc (sig_send): Remove debugging statement.
-
-Sat Mar 11 22:46:55 2000  Christopher Faylor <cgf@cygnus.com>
-
-	* fhandler_console.cc (fhandler_console::read)
 
 Fri Mar 10 13:20:50 2000  Christopher Faylor <cgf@cygnus.com>
 
