@@ -271,6 +271,7 @@ extern "C" {
 #endif
 
 #include <stdio.h>    /* needed for malloc_stats */
+#include <limits.h>   /* needed for overflow checks */
 
 
 /*
@@ -1399,8 +1400,8 @@ nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 /* pad request bytes into a usable size */
 
 #define request2size(req) \
- (((long)((req) + (SIZE_SZ + MALLOC_ALIGN_MASK)) < \
-  (long)(MINSIZE + MALLOC_ALIGN_MASK)) ? ((MINSIZE + MALLOC_ALIGN_MASK) & ~(MALLOC_ALIGN_MASK)) : \
+ (((unsigned long)((req) + (SIZE_SZ + MALLOC_ALIGN_MASK)) < \
+  (unsigned long)(MINSIZE + MALLOC_ALIGN_MASK)) ? ((MINSIZE + MALLOC_ALIGN_MASK) & ~(MALLOC_ALIGN_MASK)) : \
    (((req) + (SIZE_SZ + MALLOC_ALIGN_MASK)) & ~(MALLOC_ALIGN_MASK)))
 
 /* Check if m has acceptable alignment */
@@ -2333,6 +2334,10 @@ Void_t* mALLOc(RARG bytes) RDECL size_t bytes;
 
   INTERNAL_SIZE_T nb  = request2size(bytes);  /* padded request size; */
 
+  /* Check for overflow and just fail, if so. */
+  if (nb > INT_MAX)
+    return 0;
+
   MALLOC_LOCK;
 
   /* Check for exact match in a bin */
@@ -2791,6 +2796,10 @@ Void_t* rEALLOc(RARG oldmem, bytes) RDECL Void_t* oldmem; size_t bytes;
 
 
   nb = request2size(bytes);
+
+  /* Check for overflow and just fail, if so. */
+  if (nb > INT_MAX)
+    return 0;
 
 #if HAVE_MMAP
   if (chunk_is_mmapped(oldp)) 
