@@ -207,7 +207,7 @@ uinfo_init ()
      Setting `impersonated' to TRUE seems to be wrong but it
      isn't. Impersonated is thought as "Current User and `token'
      are coincident". See seteuid() for the mechanism behind that. */
-  cygwin_set_impersonation_token (INVALID_HANDLE_VALUE);
+  cygheap->user.token = INVALID_HANDLE_VALUE;
   cygheap->user.impersonated = TRUE;
 
   /* If uid is USHRT_MAX, the process is started from a non cygwin
