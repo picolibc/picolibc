@@ -1,5 +1,41 @@
 2003-10-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/winbase.h [_WIN32_WINNT >= 0x0500] (GetComputerNameEx[AW],
+	GetProcessIoCounters): Add functions.
+
+	* include/winbase.h [_WIN32_WINNT >= 0x0500] (COMPUTER_NAME_FORMAT):
+	Move around, needed by GetComputerNameEx.
+
+	* include/winbase.h [_WIN32_WINNT >= 0x0501] (FindActCtxSectionGuid,
+	FindActCtxSectionString[AW], GetCurrentActCtx, GetNativeSystemInfo):
+	Add functions.
+
+	* include/winbase.h [_WIN32_WINNT >= 0x0501]
+	(ACTCTX_SECTION_KEYED_DATA): Add structure.
+
+	* include/winbase.h [_WIN32_WINNT >= 0x0502] (GetDllDirectory[AW],
+	GetFirmwareEnvironmentVariable[AW], GetProcessHandleCount,
+	GetProcessId, GetSystemRegistryQuota): Add functions, available on
+	Windows XP SP1 and better.
+
+	* include/winnt.h [_WIN32_WINNT >= 0x0501]
+	(ACTIVATION_CONTEXT_SECTION_ASSEMBLY_INFORMATION,
+	ACTIVATION_CONTEXT_SECTION_DLL_REDIRECTION,
+	ACTIVATION_CONTEXT_SECTION_WINDOW_CLASS_REDIRECTION,
+	ACTIVATION_CONTEXT_SECTION_COM_SERVER_REDIRECTION,
+	ACTIVATION_CONTEXT_SECTION_COM_INTERFACE_REDIRECTION,
+	ACTIVATION_CONTEXT_SECTION_COM_TYPE_LIBRARY_REDIRECTION,
+	ACTIVATION_CONTEXT_SECTION_COM_PROGID_REDIRECTION,
+	ACTIVATION_CONTEXT_SECTION_CLR_SURROGATES): Add constants.
+
+	* lib/user32.def (FindActCtxSectionGuid, FindActCtxSectionString[AW],
+	GetComputerNameEx[AW], GetCurrentActCtx, GetDllDirectory[AW],
+	GetFirmwareEnvironmentVariable[AW], GetModuleHandleEx[AW],
+	GetNativeSystemInfo, GetProcessHandleCount, GetProcessIoCounters):
+	Add functions.
+
+2003-10-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winbase.h [_WIN32_WINNT >= 0x0501]
 	(CheckRemoteDebuggerPresent, DebugActiveProcessStop, DebugBreakProcess,
 	DebugSetProcessKillOnExit): Add functions.

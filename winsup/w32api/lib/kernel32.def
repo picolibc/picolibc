@@ -168,6 +168,9 @@ FileTimeToSystemTime@8
 FillConsoleOutputAttribute@20
 FillConsoleOutputCharacterA@20
 FillConsoleOutputCharacterW@20
+FindActCtxSectionGuid@20
+FindActCtxSectionStringA@20
+FindActCtxSectionStringW@20
 FindAtomA@4
 FindAtomW@4
 FindClose@4
@@ -235,6 +238,8 @@ GetCompressedFileSizeA@8
 GetCompressedFileSizeW@8
 GetComputerNameA@8
 GetComputerNameW@8
+GetComputerNameExA@12
+GetComputerNameExW@12
 GetConsoleAliasA@16
 GetConsoleAliasExesA@8
 GetConsoleAliasExesLengthA@0
@@ -268,6 +273,7 @@ GetConsoleTitleW@8
 GetConsoleWindow@0
 GetCurrencyFormatA@24
 GetCurrencyFormatW@24
+GetCurrentActCtx@4
 GetCurrentConsoleFont@12
 GetCurrentDirectoryA@8
 GetCurrentDirectoryW@8
@@ -284,6 +290,8 @@ GetDiskFreeSpaceA@20
 GetDiskFreeSpaceW@20
 GetDiskFreeSpaceExA@16
 GetDiskFreeSpaceExW@16
+GetDllDirectoryA@8
+GetDllDirectoryW@8
 GetDriveTypeA@4
 GetDriveTypeW@4
 GetErrorMode@0
@@ -303,6 +311,8 @@ GetFileSize@8
 GetFileSizeEx@8
 GetFileTime@16
 GetFileType@4
+GetFirmwareEnvironmentVariableA@16
+GetFirmwareEnvironmentVariableW@16
 GetFullPathNameA@16
 GetFullPathNameW@16
 GetGeoInfoA@20
@@ -323,9 +333,12 @@ GetModuleFileNameA@12
 GetModuleFileNameW@12
 GetModuleHandleA@4
 GetModuleHandleW@4
+GetModuleHandleExA@12
+GetModuleHandleExW@12
 GetNamedPipeHandleStateA@28
 GetNamedPipeHandleStateW@28
 GetNamedPipeInfo@20
+GetNativeSystemInfo@4
 GetNextVDMCommand@4
 GetNumberFormatA@24
 GetNumberFormatW@24
@@ -347,8 +360,11 @@ GetPrivateProfileStructA@20
 GetPrivateProfileStructW@20
 GetProcAddress@8
 GetProcessAffinityMask@12
+GetProcessHandleCount@8
 GetProcessHeap@0
 GetProcessHeaps@8
+GetProcessId@4
+GetProcessIoCounters@8
 GetProcessPriorityBoost@8
 GetProcessShutdownParameters@8
 GetProcessTimes@20
@@ -378,6 +394,7 @@ GetSystemDirectoryA@8
 GetSystemDirectoryW@8
 GetSystemInfo@4
 GetSystemPowerStatus@4
+GetSystemRegistryQuota@8
 GetSystemTime@4
 GetSystemTimes@12
 GetSystemTimeAdjustment@12

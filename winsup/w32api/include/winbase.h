@@ -523,6 +523,7 @@ extern "C" {
 #define ACTCTX_FLAG_APPLICATION_NAME_VALID 0x00000020
 #define ACTCTX_FLAG_HMODULE_VALID 0x00000080
 #define DEACTIVATE_ACTCTX_FLAG_FORCE_EARLY_DEACTIVATION 0x00000001
+#define FIND_ACTCTX_SECTION_KEY_RETURN_HACTCTX 0x00000001
 #endif
 
 #ifndef RC_INVOKED
@@ -972,11 +973,37 @@ typedef struct tagACTCTXW {
 	HMODULE hModule;
 } ACTCTXW,*PACTCTXW;
 typedef const ACTCTXW *PCACTCTXW;
+typedef struct tagACTCTX_SECTION_KEYED_DATA {
+	ULONG cbSize;
+	ULONG ulDataFormatVersion;
+	PVOID lpData;
+	ULONG ulLength;
+	PVOID lpSectionGlobalData;
+	ULONG ulSectionGlobalDataLength;
+	PVOID lpSectionBase;
+	ULONG ulSectionTotalLength;
+	HANDLE hActCtx;
+	HANDLE ulAssemblyRosterIndex;
+} ACTCTX_SECTION_KEYED_DATA,*PACTCTX_SECTION_KEYED_DATA;
+typedef const ACTCTX_SECTION_KEYED_DATA *PCACTCTX_SECTION_KEYED_DATA;
 typedef enum {
 	LowMemoryResourceNotification ,
 	HighMemoryResourceNotification
 } MEMORY_RESOURCE_NOTIFICATION_TYPE;
-#endif
+#endif / (_WIN32_WINNT >= 0x0501) */
+#if (_WIN32_WINNT >= 0x0500)
+typedef enum _COMPUTER_NAME_FORMAT {
+	ComputerNameNetBIOS, 
+	ComputerNameDnsHostname, 
+	ComputerNameDnsDomain, 
+	ComputerNameDnsFullyQualified, 
+	ComputerNamePhysicalNetBIOS, 
+	ComputerNamePhysicalDnsHostname, 
+	ComputerNamePhysicalDnsDomain, 
+	ComputerNamePhysicalDnsFullyQualified, 
+	ComputerNameMax
+} COMPUTER_NAME_FORMAT;
+#endif / (_WIN32_WINNT >= 0x0500) */
 
 typedef DWORD(WINAPI *LPPROGRESS_ROUTINE)(LARGE_INTEGER,LARGE_INTEGER,LARGE_INTEGER,LARGE_INTEGER,DWORD,DWORD,HANDLE,HANDLE,LPVOID);
 typedef void(WINAPI *LPFIBER_START_ROUTINE)(PVOID);
@@ -1200,6 +1227,11 @@ BOOL WINAPI FileEncryptionStatusW(LPCWSTR,LPDWORD);
 BOOL WINAPI FileTimeToDosDateTime(CONST FILETIME *,LPWORD,LPWORD);
 BOOL WINAPI FileTimeToLocalFileTime(CONST FILETIME *,LPFILETIME);
 BOOL WINAPI FileTimeToSystemTime(CONST FILETIME *,LPSYSTEMTIME);
+#if (_WIN32_WINNT >= 0x0501)
+BOOL WINAPI FindActCtxSectionGuid(DWORD,const GUID*,ULONG,const GUID*,PACTCTX_SECTION_KEYED_DATA);
+BOOL WINAPI FindActCtxSectionStringA(DWORD,const GUID*,ULONG,LPCSTR,PACTCTX_SECTION_KEYED_DATA);
+BOOL WINAPI FindActCtxSectionStringW(DWORD,const GUID*,ULONG,LPCWSTR,PACTCTX_SECTION_KEYED_DATA);
+#endif
 ATOM WINAPI FindAtomA(LPCSTR);
 ATOM WINAPI FindAtomW(LPCWSTR);
 BOOL WINAPI FindClose(HANDLE);
@@ -1232,6 +1264,10 @@ HRSRC WINAPI FindResourceA(HMODULE,LPCSTR,LPCSTR);
 HRSRC WINAPI FindResourceW(HINSTANCE,LPCWSTR,LPCWSTR);
 HRSRC WINAPI FindResourceExA(HINSTANCE,LPCSTR,LPCSTR,WORD);
 HRSRC WINAPI FindResourceExW(HINSTANCE,LPCWSTR,LPCWSTR,WORD);
+#if (_WIN32_WINNT >= 0x0502)
+DWORD WINAPI GetFirmwareEnvironmentVariableA(LPCSTR,LPCSTR,PVOID,DWORD);
+DWORD WINAPI GetFirmwareEnvironmentVariableW(LPCWSTR,LPCWSTR,PVOID,DWORD);
+#endif
 BOOL WINAPI FlushFileBuffers(HANDLE);
 BOOL WINAPI FlushInstructionCache(HANDLE,PCVOID,DWORD);
 BOOL WINAPI FlushViewOfFile(PCVOID,DWORD);
@@ -1265,6 +1301,13 @@ DWORD WINAPI GetCompressedFileSizeA(LPCSTR,PDWORD);
 DWORD WINAPI GetCompressedFileSizeW(LPCWSTR,PDWORD);
 BOOL WINAPI GetComputerNameA(LPSTR,PDWORD);
 BOOL WINAPI GetComputerNameW(LPWSTR,PDWORD);
+#if (_WIN32_WINNT >= 0x0500)
+BOOL WINAPI GetComputerNameExA(COMPUTER_NAME_FORMAT,LPSTR,LPDWORD);
+BOOL WINAPI GetComputerNameExW(COMPUTER_NAME_FORMAT,LPWSTR,LPDWORD);
+#endif
+#if (_WIN32_WINNT >= 0x0501)
+BOOL WINAPI GetCurrentActCtx(HANDLE*);
+#endif
 DWORD WINAPI GetCurrentDirectoryA(DWORD,LPSTR);
 DWORD WINAPI GetCurrentDirectoryW(DWORD,LPWSTR);
 BOOL WINAPI GetCurrentHwProfileA(LPHW_PROFILE_INFOA);
@@ -1280,6 +1323,10 @@ BOOL WINAPI GetDiskFreeSpaceA(LPCSTR,PDWORD,PDWORD,PDWORD,PDWORD);
 BOOL WINAPI GetDiskFreeSpaceW(LPCWSTR,PDWORD,PDWORD,PDWORD,PDWORD);
 BOOL WINAPI GetDiskFreeSpaceExA(LPCSTR,PULARGE_INTEGER,PULARGE_INTEGER,PULARGE_INTEGER);
 BOOL WINAPI GetDiskFreeSpaceExW(LPCWSTR,PULARGE_INTEGER,PULARGE_INTEGER,PULARGE_INTEGER);
+#if (_WIN32_WINNT >= 0x0502)
+DWORD WINAPI GetDllDirectoryA(DWORD,LPSTR);
+DWORD WINAPI GetDllDirectoryW(DWORD,LPWSTR);
+#endif
 UINT WINAPI GetDriveTypeA(LPCSTR);
 UINT WINAPI GetDriveTypeW(LPCWSTR);
 LPSTR WINAPI GetEnvironmentStrings(void);
@@ -1320,12 +1367,15 @@ DWORD WINAPI GetModuleFileNameW(HINSTANCE,LPWSTR,DWORD);
 HMODULE WINAPI GetModuleHandleA(LPCSTR);
 HMODULE WINAPI GetModuleHandleW(LPCWSTR);
 #if (_WIN32_WINNT >= 0x0500)
-BOOL WINAPI GetModuleHandleExA(DWORD, LPCSTR, HMODULE*);
-BOOL WINAPI GetModuleHandleExW(DWORD, LPCWSTR, HMODULE*);
+BOOL WINAPI GetModuleHandleExA(DWORD,LPCSTR,HMODULE*);
+BOOL WINAPI GetModuleHandleExW(DWORD,LPCWSTR,HMODULE*);
 #endif
 BOOL WINAPI GetNamedPipeHandleStateA(HANDLE,PDWORD,PDWORD,PDWORD,PDWORD,LPSTR,DWORD);
 BOOL WINAPI GetNamedPipeHandleStateW(HANDLE,PDWORD,PDWORD,PDWORD,PDWORD,LPWSTR,DWORD);
 BOOL WINAPI GetNamedPipeInfo(HANDLE,PDWORD,PDWORD,PDWORD,PDWORD);
+#if (_WIN32_WINNT >= 0x0501)
+VOID WINAPI GetNativeSystemInfo(LPSYSTEM_INFO);
+#endif
 BOOL WINAPI GetNumberOfEventLogRecords(HANDLE,PDWORD);
 BOOL WINAPI GetOldestEventLogRecord(HANDLE,PDWORD);
 BOOL WINAPI GetOverlappedResult(HANDLE,LPOVERLAPPED,PDWORD,BOOL);
@@ -1343,8 +1393,17 @@ BOOL WINAPI GetPrivateProfileStructA(LPCSTR,LPCSTR,LPVOID,UINT,LPCSTR);
 BOOL WINAPI GetPrivateProfileStructW(LPCWSTR,LPCWSTR,LPVOID,UINT,LPCWSTR);
 FARPROC WINAPI GetProcAddress(HINSTANCE,LPCSTR);
 BOOL WINAPI GetProcessAffinityMask(HANDLE,PDWORD,PDWORD);
+#if (_WIN32_WINNT >= 0x0502)
+BOOL WINAPI GetProcessHandleCount(HANDLE,PDWORD);
+#endif
 HANDLE WINAPI GetProcessHeap(VOID);
 DWORD WINAPI GetProcessHeaps(DWORD,PHANDLE);
+#if (_WIN32_WINNT >= 0x0502)
+DWORD WINAPI GetProcessId(HANDLE);
+#endif
+#if (_WIN32_WINNT >= 0x0500)
+BOOL WINAPI GetProcessIoCounters(HANDLE,PIO_COUNTERS);
+#endif
 BOOL WINAPI GetProcessPriorityBoost(HANDLE,PBOOL);
 BOOL WINAPI GetProcessShutdownParameters(PDWORD,PDWORD);
 BOOL WINAPI GetProcessTimes(HANDLE,LPFILETIME,LPFILETIME,LPFILETIME,LPFILETIME);
@@ -1377,6 +1436,9 @@ UINT WINAPI GetSystemDirectoryA(LPSTR,UINT);
 UINT WINAPI GetSystemDirectoryW(LPWSTR,UINT);
 VOID WINAPI GetSystemInfo(LPSYSTEM_INFO);
 BOOL WINAPI GetSystemPowerStatus(LPSYSTEM_POWER_STATUS);
+#if (_WIN32_WINNT >= 0x0502)
+BOOL WINAPI GetSystemRegistryQuota(PDWORD,PDWORD);
+#endif
 VOID WINAPI GetSystemTime(LPSYSTEMTIME);
 #if (_WIN32_WINNT >= 0x0501)
 BOOL WINAPI GetSystemTimes(LPFILETIME,LPFILETIME,LPFILETIME);
@@ -1754,18 +1816,6 @@ BOOL WINAPI AllocateUserPhysicalPages(HANDLE,PULONG_PTR,PULONG_PTR);
 BOOL WINAPI FreeUserPhysicalPages(HANDLE,PULONG_PTR,PULONG_PTR);
 BOOL WINAPI MapUserPhysicalPages(PVOID,ULONG_PTR,PULONG_PTR);
 BOOL WINAPI MapUserPhysicalPagesScatter(PVOID*,ULONG_PTR,PULONG_PTR);
-typedef enum _COMPUTER_NAME_FORMAT
-{
-  ComputerNameNetBIOS, 
-  ComputerNameDnsHostname, 
-  ComputerNameDnsDomain, 
-  ComputerNameDnsFullyQualified, 
-  ComputerNamePhysicalNetBIOS, 
-  ComputerNamePhysicalDnsHostname, 
-  ComputerNamePhysicalDnsDomain, 
-  ComputerNamePhysicalDnsFullyQualified, 
-  ComputerNameMax
-} COMPUTER_NAME_FORMAT;
 #endif
 
 #ifdef UNICODE
@@ -1820,6 +1870,9 @@ typedef PCACTCTXW PCACTCTX;
 #define ExpandEnvironmentStrings ExpandEnvironmentStringsW
 #define FatalAppExit FatalAppExitW
 #define FileEncryptionStatus FileEncryptionStatusW
+#if (_WIN32_WINNT >= 0x0501)
+#define FindActCtxSectionString FindActCtxSectionStringW
+#endif
 #define FindAtom FindAtomW
 #define FindFirstChangeNotification FindFirstChangeNotificationW
 #define FindFirstFile FindFirstFileW
@@ -1846,6 +1899,9 @@ typedef PCACTCTXW PCACTCTX;
 #define GetDefaultCommConfig GetDefaultCommConfigW
 #define GetDiskFreeSpace GetDiskFreeSpaceW
 #define GetDiskFreeSpaceEx GetDiskFreeSpaceExW
+#if (_WIN32_WINNT >= 0x0502)
+#define GetDllDirectory GetDllDirectoryW
+#endif
 #define GetDriveType GetDriveTypeW
 #define GetEnvironmentStrings GetEnvironmentStringsW
 #define GetEnvironmentVariable GetEnvironmentVariableW
@@ -1989,6 +2045,9 @@ typedef PCACTCTXA PCACTCTX;
 #define ExpandEnvironmentStrings ExpandEnvironmentStringsA
 #define FatalAppExit FatalAppExitA
 #define FileEncryptionStatus FileEncryptionStatusA
+#if (_WIN32_WINNT >= 0x0501)
+#define FindActCtxSectionString FindActCtxSectionStringA
+#endif
 #define FindAtom FindAtomA
 #define FindFirstChangeNotification FindFirstChangeNotificationA
 #define FindFirstFile FindFirstFileA
@@ -2015,6 +2074,9 @@ typedef PCACTCTXA PCACTCTX;
 #define GetDefaultCommConfig GetDefaultCommConfigA
 #define GetDiskFreeSpace GetDiskFreeSpaceA
 #define GetDiskFreeSpaceEx GetDiskFreeSpaceExA
+#if (_WIN32_WINNT >= 0x0502)
+#define GetDllDirectory GetDllDirectoryA
+#endif
 #define GetDriveType GetDriveTypeA
 #define GetEnvironmentVariable GetEnvironmentVariableA
 #define GetFileAttributes GetFileAttributesA
