@@ -59,16 +59,6 @@ class pwdgrp_read {
   char *lptr, *eptr;
 
 public:
-  pwdgrp_read ()
-  : fh (INVALID_HANDLE_VALUE), buf (NULL), lptr (NULL), eptr (NULL) {}
-  virtual ~pwdgrp_read ()
-  {
-    if (fh != INVALID_HANDLE_VALUE)
-      CloseHandle (fh);
-    if (buf)
-      free (buf);
-  }
-
   bool open (const char *posix_fname)
   {
     if (buf)
@@ -91,7 +81,7 @@ public:
 	      free (buf);
 	    buf = NULL;
 	    CloseHandle (fh);
-	    fh = INVALID_HANDLE_VALUE;
+	    fh = NULL;
 	    return false;
 	  }
         buf[read_bytes] = '\0';
@@ -118,8 +108,8 @@ public:
   inline const char *get_fname () { return pc; }
   void close ()
   {
-    if (fh != INVALID_HANDLE_VALUE)
+    if (fh)
       CloseHandle (fh);
-    fh = INVALID_HANDLE_VALUE;
+    fh = NULL;
   }
 };
