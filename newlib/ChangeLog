@@ -1,3 +1,19 @@
+Tue May 30 13:13:01 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* libc/include/ctype.h: __CYGWIN32__ -> __CYGWIN__
+	* libc/include/malloc.h: Ditto.
+	* libc/include/process.h: Ditto.
+	* libc/include/stdio.h: Ditto.
+	* libc/include/stdlib.h: Ditto.
+	* libc/include/time.h: Ditto.
+	* libc/include/machine/setjmp.h: Ditto.
+	* libc/include/sys/errno.h: Ditto.
+	* libc/include/sys/signal.h: Ditto.
+	* libc/include/sys/stat.h: Ditto.
+	* libc/include/sys/time.h: Ditto.
+	* libc/include/sys/unistd.h: Ditto.
+	* libc/include/string.h: Ditto.  strsignal should return a const char *.
+
 2000-05-26  Marek Michalkiewicz  <marekm@linux.org.pl>
 
 	* libm/common/s_expm1.c (expm1): Add curly braces, avoid warnings.

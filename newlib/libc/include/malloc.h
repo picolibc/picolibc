@@ -79,7 +79,7 @@ extern void cfree _PARAMS ((_PTR));
 extern _VOID mstats _PARAMS ((char *));
 extern _VOID _mstats_r _PARAMS ((struct _reent *, char *));
 
-#ifdef __CYGWIN32__
+#ifdef __CYGWIN__
 
 /* Cygwin32 needs to be able to copy all the malloc information from
    the parent to the child.  However, cygwin32 does not normally copy
@@ -88,7 +88,7 @@ extern _VOID _mstats_r _PARAMS ((struct _reent *, char *));
 
 extern int __malloc_copy _PARAMS ((int (*) (void *, void *, void *, int),
 				   void *, int));
-#endif /* __CYGWIN32 */
+#endif /* __CYGWIN */
 
 #ifdef __cplusplus
 }

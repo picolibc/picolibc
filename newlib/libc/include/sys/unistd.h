@@ -83,7 +83,7 @@ void *  _EXFUN(_sbrk,  (size_t __incr));
 int     _EXFUN(_unlink, (const char *__path ));
 int     _EXFUN(_write, (int __fildes, const void *__buf, size_t __nbyte ));
 
-#if defined(__CYGWIN32__) || defined(__rtems__)
+#if defined(__CYGWIN__) || defined(__rtems__)
 unsigned _EXFUN(usleep, (unsigned int __useconds));
 int     _EXFUN(ftruncate, (int __fd, off_t __length));
 int     _EXFUN(truncate, (const char *, off_t __length));
@@ -125,7 +125,7 @@ int     _EXFUN(symlink, (const char *__name1, const char *__name2));
 #endif
 #endif
 
-#ifdef __CYGWIN32__
+#ifdef __CYGWIN__
 # define _POSIX_JOB_CONTROL	1
 # define _POSIX_SAVED_IDS	0
 # define _POSIX_VERSION		199009L
@@ -166,7 +166,7 @@ long _EXFUN(sysconf, (int __name));
 # endif		/* _POSIX_SOURCE */
 
 /* FIXME: This is temporary until winsup gets sorted out.  */
-#ifdef __CYGWIN32__
+#ifdef __CYGWIN__
 #define MAXPATHLEN (260 - 1 /* NUL */)
 #else
 # define	MAXPATHLEN	1024

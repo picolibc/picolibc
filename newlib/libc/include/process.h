@@ -27,7 +27,7 @@ int spawnve(int mode, const char *path, char * const *argv, const char * const *
 int spawnvp(int mode, const char *path, const char * const *argv);
 int spawnvpe(int mode, const char *path, const char * const *argv, const char * const *envp);
 
-#ifdef __CYGWIN32__
+#ifdef __CYGWIN__
 /* Secure exec() functions family */
 /* The first arg should really be a HANDLE which is a void *.  But we
    can't include windows.h here so... */

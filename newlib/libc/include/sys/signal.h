@@ -31,7 +31,7 @@ struct sigaction
 int sigprocmask (int __how, const sigset_t *__a, sigset_t *__b);
 
 /* protos for functions found in winsup sources */
-#if defined(__CYGWIN32__)
+#if defined(__CYGWIN__)
 #undef sigaddset
 #undef sigemptyset
 /* The first argument to kill should be pid_t.  Right now
@@ -86,7 +86,7 @@ int _EXFUN(sigpause, (int));
 #define SIGUSR1	18
 #define SIGUSR2	19
 #define NSIG    20
-#elif defined(__CYGWIN32__)	/* BSD signals symantics */
+#elif defined(__CYGWIN__)	/* BSD signals symantics */
 #define	SIGHUP	1	/* hangup */
 #define	SIGINT	2	/* interrupt */
 #define	SIGQUIT	3	/* quit */

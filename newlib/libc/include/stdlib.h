@@ -39,7 +39,7 @@ typedef struct
 
 #define RAND_MAX 0x7fffffff
 
-#if (defined(__CYGWIN__) || defined(__CYGWIN32__)) && ! defined(_COMPILING_NEWLIB)
+#if (defined(__CYGWIN__) || defined(__CYGWIN__)) && ! defined(_COMPILING_NEWLIB)
 extern __declspec(dllimport) int __mb_cur_max;
 #else
 extern int __mb_cur_max;
@@ -113,7 +113,7 @@ char *	_EXFUN(ecvtf,(float,int,int *,int *));
 char *	_EXFUN(dtoa,(double, int, int, int *, int*, char**));
 int	_EXFUN(rand_r,(unsigned *__seed));
 
-#ifdef __CYGWIN32__
+#ifdef __CYGWIN__
 char *	_EXFUN(realpath,(const char *, char *));
 void	_EXFUN(unsetenv,(const char *__string));
 void	_EXFUN(_unsetenv_r,(struct _reent *, const char *__string));

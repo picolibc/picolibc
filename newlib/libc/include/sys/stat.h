@@ -134,7 +134,7 @@ int	_EXFUN(lstat,( const char *__path, struct stat *__buf ));
 int	_EXFUN(_fstat,( int __fd, struct stat *__sbuf ));
 int	_EXFUN(_stat,( const char *__path, struct stat *__sbuf ));
 
-#ifdef __CYGWIN32__
+#ifdef __CYGWIN__
 int	_EXFUN(lstat,( const char *__path, struct stat *__buf ));
 #endif
 

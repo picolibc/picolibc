@@ -23,9 +23,9 @@ struct timezone {
   int tz_dsttime;
 };
 
-#ifdef __CYGWIN32__
+#ifdef __CYGWIN__
 #include <sys/select.h>
-#endif /* __CYGWIN32__ */
+#endif /* __CYGWIN__ */
 
 #endif /* _WINSOCK_H */
 

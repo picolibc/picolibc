@@ -15,7 +15,7 @@ extern "C" {
 extern int *__errno _PARAMS ((void));
 #endif
 
-#if !defined(__CYGWIN32__) || defined(__INSIDE_CYGWIN__)
+#if !defined(__CYGWIN__) || defined(__INSIDE_CYGWIN__)
 extern _CONST char * _CONST _sys_errlist[];
 extern int _sys_nerr;
 #else

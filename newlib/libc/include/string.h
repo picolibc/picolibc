@@ -66,8 +66,8 @@ int	 _EXFUN(strncasecmp,(const char *, const char *, size_t));
 char 	*_EXFUN(strsep,(char **, const char *));
 char	*_EXFUN(strlwr,(char *));
 char	*_EXFUN(strupr,(char *));
-#ifdef __CYGWIN32__
-char    *_EXFUN(strsignal, (int __signo));
+#ifdef __CYGWIN__
+const char  *_EXFUN(strsignal, (int __signo));
 int     _EXFUN(strtosigno, (const char *__name));
 #endif
 void	 _EXFUN(swab,(const void *, void *, ssize_t));

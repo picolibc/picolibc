@@ -36,7 +36,7 @@ int _EXFUN(_toupper, (int __c));
 #define _X	0100
 #define	_B	0200
 
-#if !defined(__CYGWIN32__) || defined(__INSIDE_CYGWIN__) || defined(_COMPILING_NEWLIB)
+#if !defined(__CYGWIN__) || defined(__INSIDE_CYGWIN__) || defined(_COMPILING_NEWLIB)
 extern	_CONST char	_ctype_[];
 #else
 extern	_CONST char	_ctype_[] __declspec(dllimport);
