@@ -50,6 +50,9 @@ else
 fi
 AM_CONDITIONAL(HAVE_DOC, test x$have_doc = xyes)
 
+EXTRA_DIRS=
+AC_SUBST(EXTRA_DIRS)
+
 # These get added in the top-level configure.in, except in the case where
 # newlib is being built natively.
 if test -z `echo ${CC} | grep \/libc\/include`; then

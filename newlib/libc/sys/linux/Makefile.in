@@ -72,6 +72,8 @@ CXX = @CXX@
 CXXCPP = @CXXCPP@
 DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
+EXTRA_SUBDIRS = @EXTRA_SUBDIRS@
+EXTRA_SUBLIBS = @EXTRA_SUBLIBS@
 GCJ = @GCJ@
 GCJFLAGS = @GCJFLAGS@
 LDFLAGS = @LDFLAGS@
@@ -105,11 +107,13 @@ INCLUDES = -I$(srcdir)/include $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 SUBDIRS = machine \
 	$(argp_dir) \
 	cmath \
+	$(EXTRA_SUBDIRS)\
 	.
 
 SUBLIBS = \
 	$(ARGP_LIB) \
 	cmath/libcmath.la \
+	$(EXTRA_SUBLIBS) \
 	$(LINUX_MACH_LIB)
 
 
@@ -349,7 +353,7 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-DIST_SUBDIRS =  machine argp cmath .
+DIST_SUBDIRS =  machine argp cmath @EXTRA_SUBDIRS@ .
 SOURCES = $(lib_a_SOURCES) $(liblinux_la_SOURCES)
 OBJECTS = $(lib_a_OBJECTS) $(liblinux_la_OBJECTS)
 

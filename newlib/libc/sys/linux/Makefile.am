@@ -15,10 +15,12 @@ endif
 SUBDIRS = machine \
 	$(argp_dir) \
 	cmath \
+	$(EXTRA_SUBDIRS)\
 	.
 SUBLIBS = \
 	$(ARGP_LIB) \
 	cmath/libcmath.la \
+	$(EXTRA_SUBLIBS) \
 	$(LINUX_MACH_LIB)
 
 GENERAL_SOURCES = \

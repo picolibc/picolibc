@@ -29,7 +29,11 @@ if test -n "${machine_dir}"; then
 fi
 AC_SUBST(LINUX_MACH_LIB)
 
+EXTRA_SUBDIRS=
+EXTRA_SUBLIBS=
+AC_SUBST(EXTRA_SUBDIRS)
+AC_SUBST(EXTRA_SUBLIBS)
 
-AC_CONFIG_SUBDIRS(machine $EXTRA_DIRS)
+AC_CONFIG_SUBDIRS(machine $EXTRA_CONFIG_DIRS)
 
 AC_OUTPUT(Makefile cmath/Makefile argp/Makefile)

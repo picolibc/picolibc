@@ -1,3 +1,16 @@
+2002-10-07  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* Makefile.am: Add EXTRA_DIRS to allow future dependencies on
+	the build library.
+	* configure.in: Ditto.
+	* Makefile.in: Regenerated.
+	* configure: Ditto.
+	* libc/sys/linux/Makefile.am: Add EXTRA_SUBDIRS and EXTRA_SUBLIBS
+	for specifying configured libraries/directories.
+	* libc/sys/linux/configure.in: Ditto.
+	* libc/sys/linux/Makefile.in: Regenerated.
+	* libc/sys/linux/configure: Ditto.
+
 2002-10-03  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/reent.h: Update documentation at start of file.

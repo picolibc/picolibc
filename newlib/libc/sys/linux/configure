@@ -3017,8 +3017,12 @@ if test -n "${machine_dir}"; then
 fi
 
 
+EXTRA_SUBDIRS=
+EXTRA_SUBLIBS=
 
-subdirs="machine $EXTRA_DIRS"
+
+
+subdirs="machine $EXTRA_CONFIG_DIRS"
 
 
 trap '' 1 2 15
@@ -3227,6 +3231,8 @@ s%@OBJDUMP@%$OBJDUMP%g
 s%@LIBTOOL@%$LIBTOOL%g
 s%@AWK@%$AWK%g
 s%@LINUX_MACH_LIB@%$LINUX_MACH_LIB%g
+s%@EXTRA_SUBDIRS@%$EXTRA_SUBDIRS%g
+s%@EXTRA_SUBLIBS@%$EXTRA_SUBLIBS%g
 s%@subdirs@%$subdirs%g
 
 CEOF
@@ -3365,7 +3371,7 @@ if test "$no_recursion" != yes; then
     esac
   done
 
-  for ac_config_dir in machine $EXTRA_DIRS; do
+  for ac_config_dir in machine $EXTRA_CONFIG_DIRS; do
 
     # Do not complain, so a configure script can configure whichever
     # parts of a large source tree are present.

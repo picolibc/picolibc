@@ -78,6 +78,7 @@ CXX = @CXX@
 CXXCPP = @CXXCPP@
 DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
+EXTRA_DIRS = @EXTRA_DIRS@
 GCJ = @GCJ@
 GCJFLAGS = @GCJFLAGS@
 LDFLAGS = @LDFLAGS@
@@ -164,7 +165,7 @@ FLAGS_TO_PASS = $(AM_MAKEFLAGS)
 @HAVE_DOC_FALSE@DOCDIR = 
 
 SUBDIRS = libc libm \
-	$(DOCDIR) .
+	$(DOCDIR) . $(EXTRA_DIRS)
 
 
 tooldir = $(exec_prefix)/$(host_alias)
@@ -281,7 +282,7 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-DIST_SUBDIRS =  libc libm doc .
+DIST_SUBDIRS =  libc libm doc . @EXTRA_DIRS@
 EXPECT = `if test -f $(top_builddir)/../expect/expect; then echo $(top_builddir)/../expect/expect; else echo expect; fi`
 RUNTEST = `if test -f $(top_srcdir)/../dejagnu/runtest; then echo $(top_srcdir)/../dejagnu/runtest; else echo runtest; fi`
 SOURCES = libm.a.c libc.a.c $(libm_la_SOURCES) $(libc_la_SOURCES)

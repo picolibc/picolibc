@@ -63,7 +63,7 @@ DOCDIR =
 endif
 
 SUBDIRS = libc libm \
-	$(DOCDIR) .
+	$(DOCDIR) . $(EXTRA_DIRS)
 
 tooldir = $(exec_prefix)/$(host_alias)
 toollibdir = $(tooldir)/lib$(MULTISUBDIR)
