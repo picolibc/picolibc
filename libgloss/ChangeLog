@@ -1,3 +1,14 @@
+2003-07-10  Alexandre Oliva  <aoliva@redhat.com>
+
+	2001-10-30  Jeff Johnston  <jjohnstn@redhat.com>
+	* mn10300/asb2305.ld: Added ASB2305 support.
+	* mn10300/configure: Ditto.
+	* mn10300/configure.in: Ditto.
+	2001-09-12  Stan Cox  <scox@redhat.com>
+	* mn10300/asb2303.ld: New file.  Linker script for the ASB2303
+	AM33/2.00 board.
+	* mn10300/configure.in: Add support for asb2303 board script.
+
 2003-07-08  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* configure.in: Reapply Kazuhiro Inaoko's multilib patch from

@@ -908,6 +908,11 @@ fi
 
 
 case "${target}" in
+  mn10300-*elf)
+        part_specific_obj=vr4300.o
+        script_list="eval sim asb2303 asb2305"
+        bsp_list="libeval.a libcygmon.a"
+        ;;
   *)
         part_specific_obj=vr4300.o
         script_list="eval sim"
