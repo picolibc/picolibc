@@ -1,3 +1,8 @@
+2004-12-21  Christopher Faylor  <cgf@timesys.com>
+
+	* spawn.cc (spawn_guts): Force parent to forget about P_DETACH'ed
+	process.
+
 2004-12-20  Christopher Faylor  <cgf@timesys.com>
 
 	* path.cc (normalize_win32_path): Remove unneeded check for dots.

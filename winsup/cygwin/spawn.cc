@@ -839,6 +839,8 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	 However, we should try to find another way to do this eventually. */
       (void) DuplicateHandle (hMainProc, child.shared_handle (), pi.hProcess,
 			      NULL, 0, 0, DUPLICATE_SAME_ACCESS);
+      if (mode == _P_DETACH)
+	myself.alert_parent (0);
       child->start_time = time (NULL); /* Register child's starting time. */
     }
 
