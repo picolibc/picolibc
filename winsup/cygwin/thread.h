@@ -162,6 +162,8 @@ private:
 #define SEM_MAGIC PTHREAD_MAGIC+7
 #define PTHREAD_ONCE_MAGIC PTHREAD_MAGIC+8;
 
+#define MUTEX_LOCK_COUNTER_INITIAL   (-1)
+
 /* verifyable_object should not be defined here - it's a general purpose class */
 
 class verifyable_object
@@ -305,15 +307,21 @@ public:
   static void initMutex ();
   static int init (pthread_mutex_t *, const pthread_mutexattr_t *);
 
-  CRITICAL_SECTION criticalsection;
+  LONG lock_counter;
   HANDLE win32_obj_id;
+  unsigned int recursion_counter;
   LONG condwaits;
+  pthread_t owner;
+  int type;
   int pshared;
   class pthread_mutex * next;
 
   int Lock ();
   int TryLock ();
   int UnLock ();
+  int Destroy ();
+  void SetOwner ();
+  int LockRecursive ();
   void fixup_after_fork ();
 
   pthread_mutex (pthread_mutexattr * = NULL);

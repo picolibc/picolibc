@@ -913,27 +913,20 @@ int
 pthread_cond::TimedWait (DWORD dwMilliseconds)
 {
   DWORD rv;
-  if (!wincap.has_signal_object_and_wait ())
-    {
-      // FIXME: race condition (potentially drop events
-      // Possible solution (single process only) - place this in a critical section.
-      ReleaseMutex (mutex->win32_obj_id);
-      rv = WaitForSingleObject (win32_obj_id, dwMilliseconds);
-    }
-  else
-    {
-      LeaveCriticalSection (&mutex->criticalsection);
-      rv = WaitForSingleObject (win32_obj_id, dwMilliseconds);
-#if 0
-    /* we need to use native win32 mutex's here, because the cygwin ones now use
-     * critical sections, which are faster, but introduce a race _here_. Until then
-     * The NT variant of the code is redundant.
-     */
 
-    rv = SignalObjectAndWait (mutex->win32_obj_id, win32_obj_id, dwMilliseconds,
-			 false);
+  // FIXME: race condition (potentially drop events
+  // Possible solution (single process only) - place this in a critical section.
+  mutex->UnLock ();
+  rv = WaitForSingleObject (win32_obj_id, dwMilliseconds);
+#if 0
+  /* we need to use native win32 mutex's here, because the cygwin ones now use
+   * critical sections, which are faster, but introduce a race _here_. Until then
+   * The NT variant of the code is redundant.
+   */
+
+  rv = SignalObjectAndWait (mutex->win32_obj_id, win32_obj_id, dwMilliseconds,
+                            false);
 #endif
-    }
   switch (rv)
     {
     case WAIT_FAILED:
@@ -1154,39 +1147,41 @@ pthread_mutex::initMutex ()
     api_fatal ("Could not create win32 Mutex for pthread mutex static initializer support.");
 }
 
-pthread_mutex::pthread_mutex (pthread_mutexattr *attr):verifyable_object (PTHREAD_MUTEX_MAGIC)
+pthread_mutex::pthread_mutex (pthread_mutexattr *attr) :
+  verifyable_object (PTHREAD_MUTEX_MAGIC),
+  lock_counter (MUTEX_LOCK_COUNTER_INITIAL),
+  win32_obj_id (NULL), recursion_counter (0),
+  condwaits (0), owner (NULL), type (PTHREAD_MUTEX_DEFAULT),
+  pshared(PTHREAD_PROCESS_PRIVATE)
 {
-  /* attr checked in the C call */
-  if (attr && attr->pshared == PTHREAD_PROCESS_SHARED)
+  win32_obj_id = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
+  if (!win32_obj_id)
     {
-      // fail
       magic = 0;
       return;
     }
-  if (wincap.has_try_enter_critical_section ())
-    InitializeCriticalSection (&criticalsection);
-  else
+  /*attr checked in the C call */
+  if (attr)
     {
-      this->win32_obj_id = ::CreateMutex (&sec_none_nih, false, NULL);
-      if (!win32_obj_id)
-	magic = 0;
+      if (attr->pshared == PTHREAD_PROCESS_SHARED)
+        {
+          // fail
+          magic = 0;
+          return;
+        }
+      
+      type = attr->mutextype;
     }
-  condwaits = 0;
-  pshared = PTHREAD_PROCESS_PRIVATE;
+
   /* threadsafe addition is easy */
   next = (pthread_mutex *) InterlockedExchangePointer (&MT_INTERFACE->mutexs, this);
 }
 
 pthread_mutex::~pthread_mutex ()
 {
-  if (wincap.has_try_enter_critical_section ())
-    DeleteCriticalSection (&criticalsection);
-  else
-    {
-      if (win32_obj_id)
-	CloseHandle (win32_obj_id);
-      win32_obj_id = NULL;
-    }
+  if (win32_obj_id)
+    CloseHandle (win32_obj_id);
+
   /* I'm not 100% sure the next bit is threadsafe. I think it is... */
   if (MT_INTERFACE->mutexs == this)
     /* TODO: printf an error if the return value != this */
@@ -1195,7 +1190,7 @@ pthread_mutex::~pthread_mutex ()
     {
       pthread_mutex *tempmutex = MT_INTERFACE->mutexs;
       while (tempmutex->next && tempmutex->next != this)
-	tempmutex = tempmutex->next;
+        tempmutex = tempmutex->next;
       /* but there may be a race between the loop above and this statement */
       /* TODO: printf an error if the return value != this */
       InterlockedExchangePointer (&tempmutex->next, this->next);
@@ -1205,33 +1200,96 @@ pthread_mutex::~pthread_mutex ()
 int
 pthread_mutex::Lock ()
 {
-  if (wincap.has_try_enter_critical_section ())
+  int result = 0;
+  pthread_t self = pthread::self ();
+ 
+  if (0 == InterlockedIncrement (&lock_counter))
+    SetOwner ();
+  else if (__pthread_equal (&owner, &self))
     {
-      EnterCriticalSection (&criticalsection);
-      return 0;
+      InterlockedDecrement (&lock_counter);
+      if (PTHREAD_MUTEX_RECURSIVE == type)
+        result = LockRecursive ();
+      else
+        result = EDEADLK;
     }
-  /* FIXME: Return 0 on success */
-  return WaitForSingleObject (win32_obj_id, INFINITE);
+  else
+    {
+      WaitForSingleObject (win32_obj_id, INFINITE);
+      SetOwner ();
+    }
+ 
+  return result;
 }
 
 /* returns non-zero on failure */
 int
 pthread_mutex::TryLock ()
 {
-  if (wincap.has_try_enter_critical_section ())
-    return (!TryEnterCriticalSection (&criticalsection));
-  return (WaitForSingleObject (win32_obj_id, 0) == WAIT_TIMEOUT);
+  int result = 0;
+  pthread_t self = pthread::self ();
+ 
+  if (MUTEX_LOCK_COUNTER_INITIAL ==
+      InterlockedCompareExchange (&lock_counter, 0, MUTEX_LOCK_COUNTER_INITIAL ))
+    SetOwner ();
+  else if (__pthread_equal (&owner, &self) && PTHREAD_MUTEX_RECURSIVE == type)
+    result = LockRecursive ();
+  else
+    result = EBUSY;
+ 
+  return result;
 }
 
 int
 pthread_mutex::UnLock ()
 {
-  if (wincap.has_try_enter_critical_section ())
+  pthread_t self = pthread::self ();
+ 
+  if (!__pthread_equal (&owner, &self))
+    return EPERM;
+ 
+  if (0 == --recursion_counter)
     {
-      LeaveCriticalSection (&criticalsection);
-      return 0;
+      owner = NULL;
+      if (MUTEX_LOCK_COUNTER_INITIAL != InterlockedDecrement (&lock_counter))
+        // Another thread is waiting
+        ::ReleaseSemaphore (win32_obj_id, 1, NULL);
     }
-  return (!ReleaseMutex (win32_obj_id));
+ 
+  return 0;
+}
+
+int
+pthread_mutex::Destroy ()
+{
+  if (condwaits || TryLock ())
+    // Do not destroy a condwaited or locked mutex
+    return EBUSY;
+  else if (recursion_counter != 1)
+    {
+      // Do not destroy a recursive locked mutex
+      --recursion_counter;
+      return EBUSY;
+    }
+ 
+  delete this;
+  return 0;
+}
+ 
+void
+pthread_mutex::SetOwner ()
+{
+  recursion_counter = 1;
+  owner = pthread::self ();
+}
+
+int
+pthread_mutex::LockRecursive ()
+{
+  if (UINT_MAX == recursion_counter)
+    return EAGAIN;
+  ++recursion_counter;
+  return 0;
 }
 
 void
@@ -1240,15 +1298,18 @@ pthread_mutex::fixup_after_fork ()
   debug_printf ("mutex %x in fixup_after_fork", this);
   if (pshared != PTHREAD_PROCESS_PRIVATE)
     api_fatal ("pthread_mutex::fixup_after_fork () doesn'tunderstand PROCESS_SHARED mutex's");
-  /* FIXME: duplicate code here and in the constructor. */
-  if (wincap.has_try_enter_critical_section ())
-    InitializeCriticalSection (&criticalsection);
-  else
-    {
-      win32_obj_id = ::CreateMutex (&sec_none_nih, false, NULL);
-      if (!win32_obj_id)
-	api_fatal ("pthread_mutex::fixup_after_fork () failed to create new win32 mutex");
-    }
+
+  if (NULL == owner)
+    /* mutex has no owner, reset to initial */
+    lock_counter = MUTEX_LOCK_COUNTER_INITIAL;
+  else if (lock_counter != MUTEX_LOCK_COUNTER_INITIAL)
+    /* All waiting threads are gone after a fork */
+    lock_counter = 0;
+
+  win32_obj_id = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
+  if (!win32_obj_id)
+    api_fatal ("pthread_mutex::fixup_after_fork () failed to recreate win32 semaphore for mutex");
+
 #if DETECT_BAD_APPS
   if (condwaits)
     api_fatal ("Forked () while a mutex has condition variables waiting on it.\nReport to cygwin@cygwin.com");
@@ -2346,8 +2407,7 @@ __pthread_mutex_lock (pthread_mutex_t *mutex)
     case VALID_OBJECT:
       break;
     }
-  (*themutex)->Lock ();
-  return 0;
+  return (*themutex)->Lock ();
 }
 
 int
@@ -2358,9 +2418,7 @@ __pthread_mutex_trylock (pthread_mutex_t *mutex)
     pthread_mutex::init (mutex, NULL);
   if (!pthread_mutex::isGoodObject (themutex))
     return EINVAL;
-  if ((*themutex)->TryLock ())
-    return EBUSY;
-  return 0;
+  return (*themutex)->TryLock ();
 }
 
 int
@@ -2370,23 +2428,23 @@ __pthread_mutex_unlock (pthread_mutex_t *mutex)
     pthread_mutex::init (mutex, NULL);
   if (!pthread_mutex::isGoodObject (mutex))
     return EINVAL;
-  (*mutex)->UnLock ();
-  return 0;
+  return (*mutex)->UnLock ();
 }
 
 int
 __pthread_mutex_destroy (pthread_mutex_t *mutex)
 {
+  int rv;
+
   if (pthread_mutex::isGoodInitializer (mutex))
     return 0;
   if (!pthread_mutex::isGoodObject (mutex))
     return EINVAL;
 
-  /* reading a word is atomic */
-  if ((*mutex)->condwaits)
-    return EBUSY;
+  rv = (*mutex)->Destroy ();
+  if (rv)
+    return rv;
 
-  delete (*mutex);
   *mutex = NULL;
   return 0;
 }
@@ -2424,10 +2482,6 @@ __pthread_mutexattr_getpshared (const pthread_mutexattr_t *attr,
   return 0;
 }
 
-/* Win32 mutex's are equivalent to posix RECURSIVE mutexs.
-   We need to put glue in place to support other types of mutex's. We map
-   PTHREAD_MUTEX_DEFAULT to PTHREAD_MUTEX_RECURSIVE and return EINVAL for
-   other types.  */
 int
 __pthread_mutexattr_gettype (const pthread_mutexattr_t *attr, int *type)
 {
@@ -2437,10 +2491,7 @@ __pthread_mutexattr_gettype (const pthread_mutexattr_t *attr, int *type)
   return 0;
 }
 
-/* Currently pthread_mutex_init ignores the attr variable, this is because
-   none of the variables have any impact on it's behaviour.
-
-   FIXME: write and test process shared mutex's.  */
+/* FIXME: write and test process shared mutex's.  */
 int
 __pthread_mutexattr_init (pthread_mutexattr_t *attr)
 {
@@ -2516,9 +2567,17 @@ __pthread_mutexattr_settype (pthread_mutexattr_t *attr, int type)
 {
   if (!pthread_mutexattr::isGoodObject (attr))
     return EINVAL;
-  if (type != PTHREAD_MUTEX_RECURSIVE)
-    return EINVAL;
-  (*attr)->mutextype = type;
+ 
+  switch (type)
+    {
+    case PTHREAD_MUTEX_ERRORCHECK:
+    case PTHREAD_MUTEX_RECURSIVE:
+      (*attr)->mutextype = type;
+      break;
+    default:
+      return EINVAL;
+    }
+
   return 0;
 }
 

@@ -1,5 +1,40 @@
 2003-01-09  Thomas Pfaff  <tpfaff@gmx.net>
 
+	* include/pthread.h: Add define for errorchecking mutexes.
+	Change default mutex type.
+	* thread.cc (pthread_cond::TimedWait): Update mutex unlock
+	calls.
+	(pthread_mutex::pthread_mutex): New implement.
+	(pthread_mutex::~pthread_mutex): Ditto.
+	(pthread_mutex::Lock): Ditto.
+	(pthread_mutex::TryLock): Ditto.
+	(pthread_mutex::UnLock): Ditto.
+	(pthread_mutex::Destroy): Implement new method.
+	(pthread_mutex::SetOwner): Ditto.
+	(pthread_mutex::LockRecursive): Ditto.
+	(pthread_mutex::fixup_after_fork): Restore locking state after
+	fork.
+	(__pthread_mutex_lock): Return pthread_mutex::Lock errorcode.
+	(__pthread_mutex_trylock): Return pthread_mutex::TryLock
+	errorcode.
+	(__pthread_mutex_unlock): Return pthread_mutex::UnLock
+	errorcode.
+	(__pthread_mutex_destroy): Call pthread_mutex::Destroy to
+	destroy	mutex.
+	(__pthread_mutexattr_settype): Allow errorchecking and recursive
+	types.
+	* thread.h (MUTEX_LOCK_COUNTER_INITIAL): New define.
+	(pthread_mutex::criticalsection): Remove.
+	(pthread_mutex::lock_counter): New member.
+	(pthread_mutex::recursion_counter): Ditto.
+	(pthread_mutex::owner): Ditto.
+	(pthread_mutex::type): Ditto.
+	(pthread_mutex::Destroy): New method.
+	(pthread_mutex::SetOwner): Ditto.
+	(pthread_mutex::LockRecursive): Ditto.
+
+2003-01-09  Thomas Pfaff  <tpfaff@gmx.net>
+
 	* pthread.cc (pthread_cond_init): Use new pthread_cond::init.
 	* thread.cc: Some white spaces cleanups.
 	Change __pthread_cond_init to pthread_cond::init throughout.
