@@ -32,6 +32,11 @@ NET_API_STATUS WINAPI (*netlocalgroupgetmembers)(LPWSTR,LPWSTR,DWORD,PBYTE*,DWOR
 NET_API_STATUS WINAPI (*netgetdcname)(LPWSTR,LPWSTR,PBYTE*);
 NET_API_STATUS WINAPI (*netgroupgetusers)(LPWSTR,LPWSTR,DWORD,PBYTE*,DWORD,PDWORD,PDWORD,PDWORD);
 
+NTSTATUS NTAPI (*lsaclose)(LSA_HANDLE);
+NTSTATUS NTAPI (*lsaopenpolicy)(PLSA_UNICODE_STRING,PLSA_OBJECT_ATTRIBUTES,ACCESS_MASK,PLSA_HANDLE);
+NTSTATUS NTAPI (*lsaqueryinformationpolicy)(LSA_HANDLE,POLICY_INFORMATION_CLASS,PVOID*);
+NTSTATUS NTAPI (*lsafreememory)(PVOID);
+
 #ifndef min
 #define min(a,b) (((a)<(b))?(a):(b))
 #endif
@@ -55,6 +60,18 @@ load_netapi ()
   if (!(netlocalgroupgetmembers = (void *) GetProcAddress (h, "NetLocalGroupGetMembers")))
     return FALSE;
   if (!(netgetdcname = (void *) GetProcAddress (h, "NetGetDCName")))
+    return FALSE;
+
+  if (!(h = LoadLibrary ("advapi32.dll")))
+    return FALSE;
+
+  if (!(lsaclose = (void *) GetProcAddress (h, "LsaClose")))
+    return FALSE;
+  if (!(lsaopenpolicy = (void *) GetProcAddress (h, "LsaOpenPolicy")))
+    return FALSE;
+  if (!(lsaqueryinformationpolicy = (void *) GetProcAddress (h, "LsaQueryInformationPolicy")))
+    return FALSE;
+  if (!(lsafreememory = (void *) GetProcAddress (h, "LsaFreeMemory")))
     return FALSE;
 
   return TRUE;
@@ -573,10 +590,10 @@ main (int argc, char **argv)
 	psid = (PSID) buf;
       else
         {
-	  ret = LsaOpenPolicy(NULL, &oa, POLICY_VIEW_LOCAL_INFORMATION, &lsa);
+	  ret = lsaopenpolicy (NULL, &oa, POLICY_VIEW_LOCAL_INFORMATION, &lsa);
 	  if (ret == STATUS_SUCCESS && lsa != INVALID_HANDLE_VALUE)
 	    {
-	      ret = LsaQueryInformationPolicy (lsa,
+	      ret = lsaqueryinformationpolicy (lsa,
 					       PolicyPrimaryDomainInformation,
 					       (PVOID *) &pdi);
 	      if (ret == STATUS_SUCCESS)
@@ -586,9 +603,9 @@ main (int argc, char **argv)
 		      CopySid (1024, (PSID) buf, pdi->Sid);
 		      psid = (PSID) buf;
 		    }
-		  LsaFreeMemory (pdi);
+		  lsafreememory (pdi);
 		}
-	      LsaClose (lsa);
+	      lsaclose (lsa);
 	    }
 	}
       if (!psid)
