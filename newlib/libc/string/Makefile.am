@@ -48,6 +48,7 @@ GENERAL_SOURCES = \
 	wcscat.c \
 	wcschr.c \
 	wcscmp.c \
+	wcscoll.c \
 	wcscpy.c \
 	wcscspn.c \
 	wcslcat.c \
@@ -104,7 +105,8 @@ memchr.def	strcat.def	strerror.def	strerror_r.def strrchr.def \
 memcmp.def	strchr.def	strlen.def	strnlen.def strspn.def \
 strcasecmp.def	strncasecmp.def strlwr.def	strupr.def  memccpy.def \
 mempcpy.def \
-wcscat.def	wcschr.def	wcscmp.def	wcscpy.def wcscspn.def \
+wcscat.def	wcschr.def	wcscmp.def	wcscoll.def \
+wcscpy.def wcscspn.def \
 wcslcat.def	wcslcpy.def	wcslen.def	wcsncat.def wcsncmp.def \
 wcsncpy.def	wcspbrk.def	wcsrchr.def	wcsspn.def wcsstr.def \
 wmemchr.def	wmemcmp.def	wmemcpy.def	wmemmove.def wmemset.def

@@ -1,3 +1,11 @@
+2001-04-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/wchar.h: Add definition for wcscoll.
+	* libc/string/Makefile.am: Add wcscoll.c.
+	* libc/string/Makefile.in: Regenerated.
+	* libc/string/wcscoll.c: New file.
+	* libc/string/wcstrings.tex: Add wcscoll.   
+
 2003-04-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdio/sscanf.c: Update flags description.
