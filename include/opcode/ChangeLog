@@ -1,3 +1,8 @@
+2003-08-19  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc.h (PPC_OPCODE_440): Define.  Formatting.  Use hex for other
+	PPC_OPCODE_* defines.
+
 2003-08-16  Jason Eckhardt  <jle@rice.edu>
 
 	* i860.h (fmov.ds): Expand as famov.ds.
