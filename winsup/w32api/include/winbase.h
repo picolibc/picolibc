@@ -1238,6 +1238,10 @@ DWORD WINAPI GetModuleFileNameA(HINSTANCE,LPSTR,DWORD);
 DWORD WINAPI GetModuleFileNameW(HINSTANCE,LPWSTR,DWORD);
 HMODULE WINAPI GetModuleHandleA(LPCSTR);
 HMODULE WINAPI GetModuleHandleW(LPCWSTR);
+#if (_WIN32_WINNT >= _NT5)
+BOOL WINAPI GetModuleHandleExA(DWORD, LPCSTR, HMODULE*);
+BOOL WINAPI GetModuleHandleExW(DWORD, LPCWSTR, HMODULE*);
+#endif
 BOOL WINAPI GetNamedPipeHandleStateA(HANDLE,PDWORD,PDWORD,PDWORD,PDWORD,LPSTR,DWORD);
 BOOL WINAPI GetNamedPipeHandleStateW(HANDLE,PDWORD,PDWORD,PDWORD,PDWORD,LPWSTR,DWORD);
 BOOL WINAPI GetNamedPipeInfo(HANDLE,PDWORD,PDWORD,PDWORD,PDWORD);
@@ -1764,6 +1768,9 @@ typedef HW_PROFILE_INFOW HW_PROFILE_INFO,*LPHW_PROFILE_INFO;
 #endif
 #define GetModuleFileName GetModuleFileNameW
 #define GetModuleHandle GetModuleHandleW
+#if (_WIN32_WINNT >= _NT5)
+#define GetModuleHandleEx GetModuleHandleExW
+#endif
 #define GetNamedPipeHandleState GetNamedPipeHandleStateW
 #define GetPrivateProfileInt GetPrivateProfileIntW
 #define GetPrivateProfileSection GetPrivateProfileSectionW
@@ -1921,6 +1928,9 @@ typedef HW_PROFILE_INFOA HW_PROFILE_INFO,*LPHW_PROFILE_INFO;
 #endif
 #define GetNamedPipeHandleState GetNamedPipeHandleStateA
 #define GetModuleHandle GetModuleHandleA
+#if (_WIN32_WINNT >= _NT5)
+#define GetModuleHandleEx GetModuleHandleExA
+#endif
 #define GetModuleFileName GetModuleFileNameA
 #define GetPrivateProfileInt GetPrivateProfileIntA
 #define GetPrivateProfileSection GetPrivateProfileSectionA

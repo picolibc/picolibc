@@ -1,5 +1,9 @@
 2003-07-22  Danny Smith <dannysmith@users.sourceforge.net>
 
+	* include/winbase.h (GetModuleHandleEx[AW]): Add prototypes.
+
+2003-07-22  Danny Smith <dannysmith@users.sourceforge.net>
+
 	* include/winbase.h (DUPLICATE_CLOSE_SOURCE,
 	DUPLICATE_SAME_ACCESS): Remove defines.
 	(HANDLE_FLAG_INHERIT, HANDLE_FLAG_PROTECT_FROM_CLOSE): Sync with
