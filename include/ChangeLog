@@ -96,7 +96,7 @@ Mon Dec 14 09:53:31 1998  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 	* demangle.h: Don't check IN_GCC anymore.
 	* splay-tree.h: Likewise.
 
-Tue Dec  8 00:30:31 1998  Elena Zannoni  <ezannoni@kwikemart.cygnus.com> 
+Tue Dec  8 00:30:31 1998  Elena Zannoni  <ezannoni@kwikemart.cygnus.com>
 
 	The following changes were made by Elena Zannoni
  	<ezannoni@kwikemart.cygnus.com> and Edith Epstein

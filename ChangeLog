@@ -9,7 +9,7 @@
 
 1999-08-31  Nick Clifton  <nickc@cygnus.com>
 
-	* config.sub (maybe_os): Add support for configuring for fr30. 
+	* config.sub (maybe_os): Add support for configuring for fr30.
 
 1999-08-27  Nick Clifton  <nickc@cygnus.com>
 
@@ -219,7 +219,7 @@ Wed Feb 17 01:38:59 1999  H.J. Lu  (hjl@gnu.org)
 
 	Patch from: Scott Bambrough <scottb@corelcomputer.com>
 	
-	* config.guess: Modified to recognize uname's armv* syntax. 
+	* config.guess: Modified to recognize uname's armv* syntax.
 
 	* config.sub: Modified to recognize uname's armv* syntax.
 
