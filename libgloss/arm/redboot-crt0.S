@@ -49,18 +49,33 @@ __change_mode:
 	sub	r0, r0, #32
 	mov	sp, r0
 
+#ifdef __USES_INITFINI__
+	/* Some arm/elf targets use the .init and .fini sections
+	   to create constructors and destructors, and for these
+	   targets we need to call the _init function and arrange
+	   for _fini to be called at program exit.  */
+	ldr	r0, .Lfini
+	bl	SYM_NAME (atexit)
+	bl	SYM_NAME (_init)
+#endif	
+
 	mov 	a1, #0
 	ldr	a2, .LC3
 	mov	a3, a2
 	bl	SYM_NAME(main)
     1:	bl	SYM_NAME(exit)
 	b	1b
+	.align	2
 .LC1:
 	.word	__bss_start__
 .LC2:
 	.word	__bss_end__
 .LC3:
 	.word	0
+#ifdef __USES_INITFINI__
+.Lfini:
+	.word	SYM_NAME(_fini)
+#endif
 	
 #if 0
 #ifdef __thumb__
