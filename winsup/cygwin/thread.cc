@@ -338,8 +338,8 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
   arg = threadarg;
 
   win32_obj_id = ::CreateThread (&sec_none_nih, attr.stacksize,
-				(LPTHREAD_START_ROUTINE) thread_init_wrapper,
-				this, CREATE_SUSPENDED, &thread_id);
+				thread_init_wrapper, this, CREATE_SUSPENDED,
+				&thread_id);
 
   if (!win32_obj_id)
     {
@@ -1887,8 +1887,8 @@ __reent_t::init_clib (struct _reent& var)
   _clib = &var;
 };
 
-void
-pthread::thread_init_wrapper2 (void *arg, void *)
+DWORD WINAPI
+pthread::thread_init_wrapper (void *arg)
 {
   pthread *thread = (pthread *) arg;
   _my_tls.tid = thread;
@@ -1928,14 +1928,8 @@ pthread::thread_init_wrapper2 (void *arg, void *)
   void *ret = thread->function (thread->arg);
 
   thread->exit (ret);
-}
 
-/* Pthreads */
-void
-pthread::thread_init_wrapper (void *arg)
-{
-  // calls thread_init_wrapper2.  Never returns.
-  _threadinfo::call (thread_init_wrapper2, arg);
+  return 0;	// just for show.  Never returns.
 }
 
 bool

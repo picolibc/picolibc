@@ -520,11 +520,7 @@ alloc_stack (child_info_fork *ci)
   if (sm.AllocationBase == ci->stacktop)
     ci->stacksize = 0;
   else
-    {
-      alloc_stack_hard_way (ci, b + sizeof (b) - 1);
-      _main_tls = &_my_tls;
-      _main_tls->init_thread (NULL);
-    }
+    alloc_stack_hard_way (ci, b + sizeof (b) - 1);
 
   return;
 }
@@ -665,8 +661,8 @@ dll_crt0_1 ()
 	 this step. */
       if (fork_info->stacksize)
 	{
-	  asm ("movl %0,%%fs:4" : : "r" (fork_info->stackbottom));
-	  asm ("movl %0,%%fs:8" : : "r" (fork_info->stacktop));
+	  _tlsbase = (char *) fork_info->stackbottom;
+	  _tlstop = (char *) fork_info->stacktop;
 	}
 
       longjmp (fork_info->jmp, fork_info->cygpid);

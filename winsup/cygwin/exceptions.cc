@@ -38,7 +38,6 @@ extern void sigdelayed ();
 
 _threadinfo NO_COPY dummy_thread;
 _threadinfo NO_COPY *_last_thread = &dummy_thread;
-extern _threadinfo *_main_tls;
 
 CRITICAL_SECTION NO_COPY _threadinfo::protect_linked_list;
 
@@ -150,17 +149,17 @@ _threadinfo::reset_exception ()
 }
 
 void
-_threadinfo::call (void (*func) (void *, void *), void *arg)
+_threadinfo::call (DWORD (*func) (void *, void *), void *arg)
 {
   char buf[CYGTLS_PADSIZE];
   _my_tls.call2 (func, arg, buf);
 }
 
 void
-_threadinfo::call2 (void (*func) (void *, void *), void *arg, void *buf)
+_threadinfo::call2 (DWORD (*func) (void *, void *), void *arg, void *buf)
 {
   init_thread (buf);
-  func (arg, buf);
+  ExitThread (func (arg, buf));
 }
 
 void
@@ -170,10 +169,13 @@ _threadinfo::init ()
 }
 
 void
-_threadinfo::init_thread (void *)
+_threadinfo::init_thread (void *x)
 {
-  memset (this, 0, sizeof (*this));
-  stackptr = stack;
+  if (x)
+    {
+      memset (this, 0, sizeof (*this));
+      stackptr = stack;
+    }
 
   EnterCriticalSection (&protect_linked_list);
   prev = _last_thread;

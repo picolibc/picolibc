@@ -262,8 +262,8 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
      Exit with a status code of 0. */
   if (fork_info->stacksize)
     {
-      ((DWORD *)fork_info->stackbottom)[-17] = (DWORD)do_exit;
-      ((DWORD *)fork_info->stackbottom)[-15] = (DWORD)0;
+      _main_tls = &_my_tls;
+      _my_tls.init_thread (NULL);
     }
 
   set_file_api_mode (current_codepage);

@@ -32,13 +32,6 @@ bool NO_COPY cygthread::exiting;
 DWORD WINAPI
 cygthread::stub (VOID *arg)
 {
-  _threadinfo::call (stub2, arg);
-  return 0;
-}
-
-void
-cygthread::stub2 (void *arg, void *)
-{
   exception_list except_entry;
   /* Initialize this thread's ability to respond to things like
      SIGSEGV or SIGFPE. */
@@ -71,7 +64,7 @@ cygthread::stub2 (void *arg, void *)
       else
 	{
 	  if (!info->func || exiting)
-	    ExitThread (0);
+	    return 0;
 
 	  /* Cygwin threads should not call ExitThread directly */
 	  info->func (info->arg == cygself ? info : info->arg);
@@ -99,13 +92,6 @@ cygthread::stub2 (void *arg, void *)
 DWORD WINAPI
 cygthread::simplestub (VOID *arg)
 {
-  _threadinfo::call (simplestub2, arg);
-  return 0;
-}
-
-void
-cygthread::simplestub2 (void *arg, void *)
-{
   exception_list except_entry;
   /* Initialize this thread's ability to respond to things like
      SIGSEGV or SIGFPE. */
@@ -116,7 +102,7 @@ cygthread::simplestub2 (void *arg, void *)
   info->stack_ptr = &arg;
   info->ev = info->h;
   info->func (info->arg == cygself ? info : info->arg);
-  ExitThread (0);
+  return 0;
 }
 
 /* Start things going.  Called from dll_crt0_1. */

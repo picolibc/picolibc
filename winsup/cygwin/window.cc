@@ -120,7 +120,7 @@ Winmain (VOID *)
   while (GetMessage (&msg, ourhwnd, 0, 0) == TRUE)
     DispatchMessage (&msg);
 
-  ExitThread (0);
+  return 0;
 }
 
 HWND __stdcall

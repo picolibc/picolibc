@@ -44,8 +44,8 @@ struct _threadinfo
   static CRITICAL_SECTION protect_linked_list;
   static void init ();
   void init_thread (void *);
-  static void call (void (*) (void *, void *), void *);
-  void call2 (void (*) (void *, void *), void *, void *);
+  static void call (DWORD (*) (void *, void *), void *);
+  void call2 (DWORD (*) (void *, void *), void *, void *);
   static struct _threadinfo *find_tls (int sig);
   void remove ();
   void push (__stack_t, bool = false);
@@ -62,8 +62,10 @@ struct _threadinfo
 };
 #pragma pack(pop)
 
-extern _threadinfo *_tlsbase __asm__ ("%fs:4");
-#define _my_tls (_tlsbase[-1])
+extern char *_tlsbase __asm__ ("%fs:4");
+extern char *_tlstop __asm__ ("%fs:8");
+#define _my_tls (((_threadinfo *) _tlsbase)[-1])
+extern _threadinfo *_main_tls;
 
 #define CYGTLS_PADSIZE (sizeof (_threadinfo) + 64)
 #endif /*_CYGTLS_H*/

@@ -1,3 +1,49 @@
+2003-12-14  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::stub): Revert previous change and again
+	subsume cygthread::stub2.  Just return from function now since
+	ExitThread is guaranteed by automatic _threadinfo wrapper.  Define as
+	per ThreadProc convention.
+	(cygthread::stub2): Remove.
+	(cygthread::simplestub): Perform similar operations to cygthread::stub.
+	(cygthread::simplestub2): Remove.
+	* cygthread.h (cygthread::stub): Declare as per ThreadProc convention.
+	(cygthread::stub2): Remove declaration.
+	(cygthread::simplestub): Declare as per ThreadProc convention.
+	(cygthread::simplestub2): Remove declaration.
+	* cygtls.h (_threadinfo::call): Define first argument as per ThreadProc
+	convention.
+	(_threadinfo::call2): Ditto.
+	(_tlsbase): Define as char * pointer.
+	(_tlstop): New definition.
+	(_main_tls): Define here.
+	* dcrt0.cc (alloc_stack): Revert previous change which called
+	init_thread since information would be overwritten by fork later
+	anyway.
+	(dll_crt0_1): Use _tlsbase and _tlstop for setting stack bottom, top.
+	* exceptions.cc: Move _main_tls declaration to cygtls.h.
+	(_threadinfo::call): Define first argument as per ThreadProc
+	convention.
+	(_threadinfo::call2): Call ExitThread with thread function return
+	value.
+	(_threadinfo::init_thread): Don't initialize cygtls to zero if input
+	arg is NULL.
+	* fork.cc (fork_child): Reset _main_tls here.  Reinitialize parts of
+	_my_tls after copying data from parent.
+	* init.cc (threadfunc_fe): New function.  Front-end for all threads
+	created in cygwin processes.
+	(munge_threadfunc): New function.
+	(dll_entry): Call munge_threadfunc to force the call of a thread
+	wrapper.
+	* thread.cc (pthread::thread_init_wrapper): Perform similar operations
+	to cygthread::stub.
+	(pthread::thread_init_wrapper2): Remove.
+	* thread.h (pthread::thread_init_wrapper): Declare as per ThreadProc
+	convention.
+	(pthread::thread_init_wrapper2): Remove declaration.
+	* window.cc (Winmain): Just return from function now since ExitThread
+	is guaranteed by automatic _threadinfo wrapper.
+
 2003-12-12  Christopher Faylor  <cgf@redhat.com>
 
 	* dtable.cc (dtable::delete_archetype): Add debugging.
