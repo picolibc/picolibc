@@ -88,6 +88,7 @@
 #include <rpcproxy.h>
 #include <exdisp.h>
 #include <mshtml.h>
+#include <servprov.h>
 
 #else
 #undef BOOL

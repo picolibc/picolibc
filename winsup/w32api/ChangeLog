@@ -1,3 +1,11 @@
+2003-05-12  Mattia Barbon  <mbarbon@dsi.unive.it>
+
+	* include/oleauto.h (VarR8FromDec, VarDecFromR8): Add prototypes.
+	* include/winbase.h (TerminateJobObject,
+	AssignProcessToJobObject): Likewise.
+	* include/servprov.h: New header.
+	* lib/test.c: Include servprov.h.
+
 2003-05-10  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/shlguid.h (CGID_ShellServiceObject): Declare.
@@ -145,7 +153,7 @@
 
 	* lib/uuid.c (IID_IHTML*): Add new GUID definitions.
 	* include/mshtml.h (IHTMLElementCollection, IHTMLLinkElement,
-	IHTMLImgElement): Add intetface definitions.
+	IHTMLImgElement): Add interface definitions.
 
 2003-03-29  Danny Smith  <dannysmith@users.sourceforge.net>
 
