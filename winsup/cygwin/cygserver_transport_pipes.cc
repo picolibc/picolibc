@@ -174,7 +174,7 @@ transport_layer_pipes::accept (bool *const recoverable)
 #endif /* !__INSIDE_CYGWIN__ */
 
 void
-transport_layer_pipes::close()
+transport_layer_pipes::close ()
 {
   // verbose: debug_printf ("closing pipe %p", pipe);
 
@@ -182,9 +182,10 @@ transport_layer_pipes::close()
     {
       assert (pipe != INVALID_HANDLE_VALUE);
 
+#ifndef __INSIDE_CYGWIN__
+
       if (is_accepted_endpoint)
 	{
-#ifndef __INSIDE_CYGWIN__
 	  (void) FlushFileBuffers (pipe); // Blocks until client reads.
 	  (void) DisconnectNamedPipe (pipe);
 	  EnterCriticalSection (&pipe_instance_lock);
@@ -192,12 +193,16 @@ transport_layer_pipes::close()
 	  assert (pipe_instance > 0);
 	  InterlockedDecrement (&pipe_instance);
 	  LeaveCriticalSection (&pipe_instance_lock);
-#else /* __INSIDE_CYGWIN__ */
-	  assert (false);
-#endif /* __INSIDE_CYGWIN__ */
 	}
       else
 	(void) CloseHandle (pipe);
+
+#else /* __INSIDE_CYGWIN__ */
+
+      assert (!is_accepted_endpoint);
+      (void) ForceCloseHandle (pipe);
+
+#endif /* __INSIDE_CYGWIN__ */
 
       pipe = NULL;
     }
@@ -289,6 +294,9 @@ transport_layer_pipes::connect ()
       if (pipe != INVALID_HANDLE_VALUE)
 	{
 	  assert (pipe);
+#ifdef __INSIDE_CYGWIN__
+	  ProtectHandle (pipe);
+#endif
 	  assume_cygserver = true;
 	  return true;
 	}
