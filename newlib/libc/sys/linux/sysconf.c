@@ -201,7 +201,7 @@ sysconf (int name)
   
     case _SC_ASYNCHRONOUS_IO:
 #ifdef _POSIX_ASYNCHRONOUS_IO
-      return 1;TZNAME_MAX;
+      return 1;
 #else
       return -1;
 #endif

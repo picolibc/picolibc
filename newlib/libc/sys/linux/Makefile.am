@@ -12,6 +12,9 @@ SUBLIBS = \
 LIB_SOURCES = \
 	brk.c \
 	cfspeed.c \
+	clock_getres.c \
+	clock_gettime.c \
+	clock_settime.c \
 	flockfile.c \
 	ftok.c \
 	funlockfile.c \

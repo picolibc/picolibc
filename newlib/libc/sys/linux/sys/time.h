@@ -42,7 +42,7 @@
 #define _SYS_TIME_H
 
 #include <sys/types.h>
-#include <linux/time.h>
+#include <sys/linux_time.h>
 
 /* Macros for converting between `struct timeval' and `struct timespec'.  */
 # define TIMEVAL_TO_TIMESPEC(tv, ts) {                                   \

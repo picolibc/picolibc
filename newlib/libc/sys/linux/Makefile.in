@@ -109,6 +109,9 @@ SUBLIBS = \
 LIB_SOURCES = \
 	brk.c \
 	cfspeed.c \
+	clock_getres.c \
+	clock_gettime.c \
+	clock_settime.c \
 	flockfile.c \
 	ftok.c \
 	funlockfile.c \
@@ -206,13 +209,14 @@ DEFS = @DEFS@ -I. -I$(srcdir)
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@lib_a_OBJECTS =  brk.$(OBJEXT) cfspeed.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@flockfile.$(OBJEXT) ftok.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@funlockfile.$(OBJEXT) getdate.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@getdate_err.$(OBJEXT) gethostname.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@getoptlong.$(OBJEXT) getreent.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@ids.$(OBJEXT) inode.$(OBJEXT) io.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@io64.$(OBJEXT) ipc.$(OBJEXT) linux.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@mmap.$(OBJEXT) mq_close.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@clock_getres.$(OBJEXT) clock_gettime.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@clock_settime.$(OBJEXT) flockfile.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@ftok.$(OBJEXT) funlockfile.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@getdate.$(OBJEXT) getdate_err.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@gethostname.$(OBJEXT) getoptlong.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@getreent.$(OBJEXT) ids.$(OBJEXT) inode.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@io.$(OBJEXT) io64.$(OBJEXT) ipc.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@linux.$(OBJEXT) mmap.$(OBJEXT) mq_close.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@mq_getattr.$(OBJEXT) mq_notify.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@mq_open.$(OBJEXT) mq_receive.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@mq_send.$(OBJEXT) mq_setattr.$(OBJEXT) \
@@ -234,15 +238,17 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@usleep.$(OBJEXT) wait.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
-@USE_LIBTOOL_TRUE@liblinux_la_OBJECTS =  brk.lo cfspeed.lo flockfile.lo \
-@USE_LIBTOOL_TRUE@ftok.lo funlockfile.lo getdate.lo getdate_err.lo \
-@USE_LIBTOOL_TRUE@gethostname.lo getoptlong.lo getreent.lo ids.lo \
-@USE_LIBTOOL_TRUE@inode.lo io.lo io64.lo ipc.lo linux.lo mmap.lo \
-@USE_LIBTOOL_TRUE@mq_close.lo mq_getattr.lo mq_notify.lo mq_open.lo \
-@USE_LIBTOOL_TRUE@mq_receive.lo mq_send.lo mq_setattr.lo mq_unlink.lo \
-@USE_LIBTOOL_TRUE@ntp_gettime.lo pread.lo pread64.lo process.lo \
-@USE_LIBTOOL_TRUE@psignal.lo pwrite.lo pwrite64.lo raise.lo realpath.lo \
-@USE_LIBTOOL_TRUE@rename.lo resource.lo sched.lo select.lo seteuid.lo \
+@USE_LIBTOOL_TRUE@liblinux_la_OBJECTS =  brk.lo cfspeed.lo \
+@USE_LIBTOOL_TRUE@clock_getres.lo clock_gettime.lo clock_settime.lo \
+@USE_LIBTOOL_TRUE@flockfile.lo ftok.lo funlockfile.lo getdate.lo \
+@USE_LIBTOOL_TRUE@getdate_err.lo gethostname.lo getoptlong.lo \
+@USE_LIBTOOL_TRUE@getreent.lo ids.lo inode.lo io.lo io64.lo ipc.lo \
+@USE_LIBTOOL_TRUE@linux.lo mmap.lo mq_close.lo mq_getattr.lo \
+@USE_LIBTOOL_TRUE@mq_notify.lo mq_open.lo mq_receive.lo mq_send.lo \
+@USE_LIBTOOL_TRUE@mq_setattr.lo mq_unlink.lo ntp_gettime.lo pread.lo \
+@USE_LIBTOOL_TRUE@pread64.lo process.lo psignal.lo pwrite.lo \
+@USE_LIBTOOL_TRUE@pwrite64.lo raise.lo realpath.lo rename.lo \
+@USE_LIBTOOL_TRUE@resource.lo sched.lo select.lo seteuid.lo \
 @USE_LIBTOOL_TRUE@sethostname.lo shm_open.lo shm_unlink.lo sig.lo \
 @USE_LIBTOOL_TRUE@sigaction.lo sigqueue.lo signal.lo siglongjmp.lo \
 @USE_LIBTOOL_TRUE@sigset.lo sigwait.lo socket.lo sleep.lo stack.lo \

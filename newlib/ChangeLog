@@ -1,3 +1,24 @@
+2002-06-27  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/sys/linux/Makefile.am: Add new clock routines.
+        * libc/sys/linux/Makefile.in: Regenerated.
+        * libc/sys/linux/clock_getres.c: New file.
+        * libc/sys/linux/clock_gettime.c: Ditto.
+        * libc/sys/linux/clock_settime.c: Ditto.
+        * libc/sys/linux/hp-timing.h: Ditto.
+        * libc/sys/linux/libc-internal.h: Ditto.
+        * libc/sys/linux/sysconf.c: Fix typo.
+        * libc/sys/linux/include/time.h: Add include of <sys/linux_time.h>.
+        * libc/sys/linux/machine/hp-timing.h: New file.
+        * libc/sys/linux/machine/i386/Makefile.am: Add new files.
+        * libc/sys/linux/machine/i386/Makefile.in: Regenerated.
+        * libc/sys/linux/machine/i386/get_clockfreq.c: New file.
+        * libc/sys/linux/machine/i386/hp-timing.c: Ditto.
+        * libc/sys/linux/machine/i386/hp-timing.h: Ditto.
+        * libc/sys/linux/sys/linux_time.h: New file.
+        * libc/sys/linux/sys/time.h: Remove include of <linux/time.h> and
+        replace with <sys/linux_time.h>.
+
 Wed Jun 26 16:33:25 2002  J"orn Rennecke <joern.rennecke@superh.com>
 
 	* libc/sys/sh/crt0.S: Remove vestigial .section directive.

@@ -98,7 +98,7 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = setjmp.S sigaction.c
+LIB_SOURCES = get_clockfreq.c hp-timing.c setjmp.S sigaction.c
 
 liblinuxi386_la_LDFLAGS = -Xcompiler -nostdlib
 
@@ -122,11 +122,14 @@ DEFS = @DEFS@ -I. -I$(srcdir)
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 lib_a_LIBADD = 
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  setjmp.$(OBJEXT) sigaction.$(OBJEXT)
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  get_clockfreq.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@hp-timing.$(OBJEXT) setjmp.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sigaction.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 liblinuxi386_la_LIBADD = 
-@USE_LIBTOOL_TRUE@liblinuxi386_la_OBJECTS =  setjmp.lo sigaction.lo
+@USE_LIBTOOL_TRUE@liblinuxi386_la_OBJECTS =  get_clockfreq.lo \
+@USE_LIBTOOL_TRUE@hp-timing.lo setjmp.lo sigaction.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
