@@ -16,8 +16,8 @@ extern char **environ;
 
 extern int main(int argc,char **argv,char **envp);
 
-extern void *_end;
-extern void *__bss_start;
+extern char _end;
+extern char __bss_start;
 
 void _start(int args)
 {
@@ -34,7 +34,7 @@ void _start(int args)
     environ = argv+argc+1;
 
     /* clear bss */
-    memset(__bss_start,0,((char *)_end - (char *)__bss_start));
+    memset(&__bss_start,0,(&_end - &__bss_start));
 
     tzset(); /* initialize timezone info */
     exit(main(argc,argv,environ));
