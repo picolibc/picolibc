@@ -1,5 +1,5 @@
 /* ELF support for BFD.
-   Copyright 1991, 1992, 1993, 1994, 1995, 1997, 1998, 2000
+   Copyright 1991, 1992, 1993, 1994, 1995, 1997, 1998, 2000, 2001
    Free Software Foundation, Inc.
 
    Written by Fred Fish @ Cygnus Support, from information published
@@ -153,7 +153,7 @@ typedef struct elf_internal_rel {
 typedef struct elf_internal_rela {
   bfd_vma	r_offset;	/* Location at which to apply the action */
   bfd_vma	r_info;		/* Index and Type of relocation */
-  bfd_signed_vma r_addend;	/* Constant addend used to compute value */
+  bfd_vma	r_addend;	/* Constant addend used to compute value */
 } Elf_Internal_Rela;
 
 #define elf32_internal_rela elf_internal_rela
