@@ -1,5 +1,9 @@
 2001-11-23  Christopher Faylor  <cgf@redhat.com>
 
+	* path.cc (chdir): Allow 'cd /cygdrive'.
+
+2001-11-23  Christopher Faylor  <cgf@redhat.com>
+
 	* dtable.cc (dtable::vfork_parent_restore): Add debugging statement.
 
 	* exceptions.cc (try_to_debug): Spin only as long as we don't have a

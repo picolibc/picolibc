@@ -3223,7 +3223,7 @@ chdir (const char *in_dir)
       return -1;
     }
 
-  char *native_dir = path.get_win32 ();
+  const char *native_dir = path.get_win32 ();
 
   /* Check to see if path translates to something like C:.
      If it does, append a \ to the native directory specification to
@@ -3231,10 +3231,17 @@ chdir (const char *in_dir)
      the last directory visited on the given drive. */
   if (isdrive (native_dir) && !native_dir[2])
     {
-      native_dir[2] = '\\';
-      native_dir[3] = '\0';
+      path.get_win32 ()[2] = '\\';
+      path.get_win32 ()[3] = '\0';
     }
-  int res = SetCurrentDirectoryA (native_dir) ? 0 : -1;
+  int res;
+  if (path.get_devn () != FH_CYGDRIVE)
+    res = SetCurrentDirectory (native_dir) ? 0 : -1;
+  else
+    {
+      native_dir = "c:\\";
+      res = 0;
+    }
 
   /* If res < 0, we didn't change to a new directory.
      Otherwise, set the current windows and posix directory cache from input.
@@ -3250,9 +3257,9 @@ chdir (const char *in_dir)
     __seterrno ();
   else if (!path.has_symlinks () && strpbrk (dir, ":\\") == NULL
 	   && pcheck_case == PCHECK_RELAXED)
-    cygheap->cwd.set (path, dir);
+    cygheap->cwd.set (native_dir, dir);
   else
-    cygheap->cwd.set (path, NULL);
+    cygheap->cwd.set (native_dir, NULL);
 
   /* Note that we're accessing cwd.posix without a lock here.  I didn't think
      it was worth locking just for strace. */
