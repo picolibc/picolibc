@@ -1,3 +1,7 @@
+2004-07-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_mutex.cc (win_priority): Actually calculate p from priority.
+
 2004-06-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* shm.cc (shmget): Explicitely set td_retval[0] to -1 on error.

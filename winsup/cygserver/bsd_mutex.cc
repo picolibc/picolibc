@@ -109,7 +109,7 @@ msleep_event_name (void *ident, char *name)
 static int
 win_priority (int priority)
 {
-  int p = (int)((p) & PRIO_MASK) - PZERO;
+  int p = (int)((priority) & PRIO_MASK) - PZERO;
   /* Generating a valid priority value is a bit tricky.  The only valid
      values on 9x and NT4 are -15, -2, -1, 0, 1, 2, 15. */
   switch (p)
