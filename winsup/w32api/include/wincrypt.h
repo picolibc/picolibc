@@ -344,6 +344,7 @@ extern "C" {
 #define KP_RB               0x00000011
 #define KP_INFO             0x00000012
 #define KP_EFFECTIVE_KEYLEN 0x00000013
+#define KP_SCHANNEL_ALG     0x00000014
 #define KP_PUB_PARAMS       0x00000027
 #define CRYPT_FLAG_PCT1    0x0001
 #define CRYPT_FLAG_SSL2    0x0002

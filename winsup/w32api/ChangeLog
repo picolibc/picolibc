@@ -1,7 +1,8 @@
 2003-10-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/wincrypt.h (SCHANNEL_MAC_KEY, SCHANNEL_ENC_KEY,
-	INTERNATIONAL_USAGE): Add constants. Specifying the Algorithms
+	INTERNATIONAL_USAGE, KP_SCHANNEL_ALG): Add constants. Specifying
+	the algorithms.
 
 2003-10-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
