@@ -17,9 +17,42 @@ details. */
 #include <windows.h>
 #include <sys/cygwin.h>
 
-static void usage (void);
-static int __stdcall getsig (char *);
-static void __stdcall forcekill (int, int, int);
+static void
+usage (void)
+{
+  fprintf (stderr, "Usage: kill [-sigN] pid1 [pid2 ...]\n");
+  exit (1);
+}
+
+static int
+getsig (char *in_sig)
+{
+  char *sig;
+  char buf[80];
+
+  if (strncmp (in_sig, "SIG", 3) == 0)
+    sig = in_sig;
+  else
+    {
+      sprintf (buf, "SIG%s", in_sig);
+      sig = buf;
+    }
+  return (strtosigno (sig) ?: atoi (in_sig));
+}
+
+static void __stdcall
+forcekill (int pid, int sig, int wait)
+{
+  external_pinfo *p = (external_pinfo *) cygwin_internal (CW_GETPINFO_FULL, pid);
+  if (!p)
+    return;
+  HANDLE h = OpenProcess (PROCESS_TERMINATE, FALSE, (DWORD) p->dwProcessId);
+  if (!h)
+    return;
+  if (!wait || WaitForSingleObject (h, 200) != WAIT_OBJECT_0)
+    TerminateProcess (h, sig << 8);
+  CloseHandle (h);
+}
 
 int
 main (int argc, char **argv)
@@ -82,41 +115,4 @@ sig0:
       argv++;
     }
   return ret;
-}
-
-static void
-usage (void)
-{
-  fprintf (stderr, "Usage: kill [-sigN] pid1 [pid2 ...]\n");
-  exit (1);
-}
-
-static int
-getsig (char *in_sig)
-{
-  char *sig;
-  char buf[80];
-
-  if (strncmp (in_sig, "SIG", 3) == 0)
-    sig = in_sig;
-  else
-    {
-      sprintf (buf, "SIG%s", in_sig);
-      sig = buf;
-    }
-  return (strtosigno (sig) ?: atoi (in_sig));
-}
-
-static void __stdcall
-forcekill (int pid, int sig, int wait)
-{
-  external_pinfo *p = (external_pinfo *) cygwin_internal (CW_GETPINFO_FULL, pid);
-  if (!p)
-    return;
-  HANDLE h = OpenProcess (PROCESS_TERMINATE, FALSE, (DWORD) p->dwProcessId);
-  if (!h)
-    return;
-  if (!wait || WaitForSingleObject (h, 200) != WAIT_OBJECT_0)
-    TerminateProcess (h, sig << 8);
-  CloseHandle (h);
 }

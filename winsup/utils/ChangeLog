@@ -1,3 +1,9 @@
+2001-03-11 Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
+
+	* kill.cc (usage): Move to top of file.
+	(getsig): Ditto.
+	(forcekill): Ditto.
+
 2002-03-06  Christopher Faylor  <cgf@redhat.com>
 
 	* cygcheck.cc: Reformat.
