@@ -568,8 +568,6 @@ dll_crt0_1 ()
   user_data->resourcelocks->Init ();
   user_data->threadinterface->Init (user_data->forkee);
 
-  (void) getpagesize ();	/* initialize page size constant */
-
   mainthread.init ("mainthread"); // For use in determining if signals
 				  //  should be blocked.
 
