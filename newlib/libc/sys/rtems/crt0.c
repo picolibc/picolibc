@@ -18,7 +18,18 @@ void *realloc() { return 0; }
 void free() { ; }
 void abort() { ; }
 int raise() { return -1; }
- 
+
+/* gcc 2.8.1 implicitly can generate references to these for at
+ * least sparc-elf */
+#if (__GNUC__ == 2) && (__GNUC_MINOR__ == 8)
+strcmp() {}
+strcpy() {}
+strlen() {}
+memcmp() {}
+memcpy() {}
+memset() {}
+#endif
+
 /* The PowerPC expects certain symbols to be defined in the linker script. */
 
 #if defined(__PPC__)
@@ -46,3 +57,18 @@ int raise() { return -1; }
   int atexit(void (*function)(void)) { return 0; }
 #endif
 
+
+/*
+ *  The AMD a29k generates code expecting the following.
+ */
+
+#if defined(_AM29000) || defined(_AM29K)
+asm (".global V_SPILL, V_FILL" );
+asm (".global V_EPI_OS, V_BSD_OS" );
+
+asm (".equ    V_SPILL, 64" );
+asm (".equ    V_FILL, 65" );
+
+asm (".equ    V_BSD_OS, 66" );
+asm (".equ    V_EPI_OS, 69" );
+#endif
