@@ -2575,7 +2575,7 @@ symlink (const char *topath, const char *frompath)
     }
 
   win32_path.check (frompath, PC_SYM_NOFOLLOW);
-  if (allow_winsymlinks && !win32_path.error)
+  if (allow_winsymlinks && !win32_path.exists ())
     {
       strcpy (from, frompath);
       strcat (from, ".lnk");

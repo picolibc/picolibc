@@ -1,3 +1,7 @@
+2002-01-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink): Fix check for already existing file.
+
 2002-01-21  Christopher Faylor  <cgf@redhat.com>
 
 	* cygmagic: Suppress error output when figuring out if sum takes an
