@@ -1,3 +1,27 @@
+Tue May  8 11:09:59 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* cygheap.cc (_cfree): Add regparm attribute.
+	(_crealloc): Ditto.
+
+	* dcrt0.cc (dll_crt0_1): Default to always checking for executable for now.
+
+	* dtable.cc (dtable::not_open): Move method.
+	* dtable.h (dtable): Here.
+
+	* exceptions.cc (ctrl_c_handler): Don't expect process group leader to
+	handle a signal if it doesn't exist.
+
+	* fhandler.h (fhandler_base): Make openflags protected.
+
+	* localtime.c (tzsetwall): Check for __CYGWIN__ as well as __WIN32__.
+
+	* path.cc (path_conv::check): Add some comments. Change strcat to assignment.
+
+	* lib/_cygwin_S_IEXEC.cc (_cygwin_bob__): Eliminate.
+
+	* fhandler_tty.cc (fhandler_console::dup): Set controlling terminal if necessary.
+	* fhandler_tty.cc (fhandler_tty_slave::dup): Ditto.
+
 Mon May  7 21:33:17 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* include/sys/file.h: Revert special X_OK usage.  Just make it a

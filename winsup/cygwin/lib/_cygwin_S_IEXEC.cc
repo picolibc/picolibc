@@ -19,9 +19,3 @@ unsigned _cygwin_S_IXGRP = S_IXGRP;
 unsigned _cygwin_S_IXOTH = S_IXOTH;
 unsigned _cygwin_X_OK = X_OK;
 };
-
-extern int __declspec (dllimport) _check_for_executable;
-struct _cygwin_bob__
-{
-  _cygwin_bob__ () {_check_for_executable = 1;}
-} _cygwin_dummy_bob__;

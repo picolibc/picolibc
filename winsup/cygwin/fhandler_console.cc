@@ -595,7 +595,7 @@ fhandler_console::dup (fhandler_base *child)
 {
   fhandler_console *fhc = (fhandler_console *) child;
 
-  if (!fhc->open (get_name (), get_flags (), 0))
+  if (!fhc->open (get_name (), get_flags () & ~O_NOCTTY, 0))
     system_printf ("error opening console, %E");
 
   fhc->default_color = default_color;

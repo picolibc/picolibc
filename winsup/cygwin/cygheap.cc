@@ -115,6 +115,7 @@ _cmalloc (int size)
   return rvc->data;
 }
 
+static void __stdcall _cfree (void *ptr) __attribute__((regparm(1)));
 static void __stdcall
 _cfree (void *ptr)
 {
@@ -126,6 +127,7 @@ _cfree (void *ptr)
   cygheap_protect->release ();
 }
 
+static void *__stdcall _crealloc (void *ptr, int size) __attribute__((regparm(2)));
 static void *__stdcall
 _crealloc (void *ptr, int size)
 {

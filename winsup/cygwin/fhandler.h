@@ -150,11 +150,11 @@ private:
 
   unsigned long namehash;	/* hashed filename, used as inode num */
 
+protected:
   /* Full unix path name of this file */
   /* File open flags from open () and fcntl () calls */
   int openflags;
 
-protected:
   char *rabuf;		/* used for crlf conversion in text files */
   size_t ralen;
   size_t raixget;

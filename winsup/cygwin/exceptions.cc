@@ -904,8 +904,9 @@ ctrl_c_handler (DWORD type)
   tty_min *t = cygwin_shared->tty.get_tty (myself->ctty);
   /* Ignore this if we're not the process group lead since it should be handled
      *by* the process group leader. */
-  if (t->getpgid () && (t->getpgid () != myself->pid ||
-      (GetTickCount () - t->last_ctrl_c) < MIN_CTRL_C_SLOP))
+  if (t->getpgid () && pid_exists (t->getpgid ()) &&
+      (t->getpgid () != myself->pid ||
+       (GetTickCount () - t->last_ctrl_c) < MIN_CTRL_C_SLOP))
     return TRUE;
   else
     /* Otherwise we just send a SIGINT to the process group and return TRUE (to indicate

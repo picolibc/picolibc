@@ -11,6 +11,8 @@ details. */
 /* Initial and increment values for cygwin's fd table */
 #define NOFILE_INCR    32
 
+#include "thread.h"
+
 class dtable
 {
   fhandler_base **fds;
@@ -41,7 +43,15 @@ public:
   fhandler_base *build_fhandler (int fd, DWORD dev, const char *name,
 				 int unit = -1);
   fhandler_base *build_fhandler (int fd, const char *name, HANDLE h);
-  int not_open (int n) __attribute__ ((regparm(1)));
+  int not_open (int fd)
+  {
+    SetResourceLock (LOCK_FD_LIST, READ_LOCK, "not_open");
+
+    int res = fd < 0 || fd >= (int) size || fds[fd] == NULL;
+
+    ReleaseResourceLock (LOCK_FD_LIST, READ_LOCK, "not open");
+    return res;
+  }
   int find_unused_handle (int start);
   int find_unused_handle () { return find_unused_handle (first_fd_for_open);}
   void release (int fd);

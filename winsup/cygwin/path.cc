@@ -386,6 +386,9 @@ path_conv::check (const char *src, unsigned opt,
       MALLOC_CHECK;
       assert (src);
       char *p = strrchr (src, '/');
+      /* Detect if the user was looking for a directory.  We have to strip the
+	 trailing slash initially and add it back on at the end due to Windows
+	 brain damage. */
       if (p)
 	{
 	  if (p[1] == '\0' || strcmp (p, "/.") == 0)
@@ -434,9 +437,11 @@ path_conv::check (const char *src, unsigned opt,
 	      full_path = this->path;
 	    }
 
+	  /* Convert to native path spec sans symbolic link info. */
 	  error = mount_table->conv_to_win32_path (path_copy, full_path, devn,
 						   unit, &sym.pflags);
 
+	  /* devn should not be a device.  If it is, then stop parsing now. */
 	  if (devn != FH_BAD)
 	    {
 	      fileattr = 0;
@@ -453,7 +458,10 @@ path_conv::check (const char *src, unsigned opt,
 	    *tail = '\0';
 
 	  if (full_path[0] && full_path[1] == ':' && full_path[2] == '\0')
-	    strcat (full_path, "\\");
+	    {
+	      full_path[2] = '\\';
+	      full_path[3] = '\0';
+	    }
 
 	  if ((opt & PC_SYM_IGNORE) && pcheck_case == PCHECK_RELAXED)
 	    {
@@ -529,13 +537,16 @@ path_conv::check (const char *src, unsigned opt,
 		    break;
 		}
 	      /* No existing file found. */
-
 	    }
 
+	  /* Find the "tail" of the path, e.g. in '/for/bar/baz',
+	     /baz is the tail. */
 	  char *newtail = strrchr (path_copy, '/');
 	  if (tail != path_end)
 	    *tail = '/';
 
+	  /* Exit loop if there is no tail or we are at the
+	     beginning of a UNC path */
 	  if (!newtail || newtail == path_copy || (newtail == path_copy + 1 && newtail[-1] == '/'))
 	    goto out;	// all done
 
@@ -556,6 +567,9 @@ path_conv::check (const char *src, unsigned opt,
 
       MALLOC_CHECK;
 
+      /* The tail is pointing at a null pointer.  Increment it and get the length.
+	 If the tail was empty then this increment will end up pointing to the extra
+	 \0 added to path_copy above. */
       int taillen = strlen (++tail);
       int buflen = strlen (sym.contents);
       if (buflen + taillen > MAX_PATH)
@@ -565,24 +579,32 @@ path_conv::check (const char *src, unsigned opt,
 	    return;
 	  }
 
+      /* Strip off current directory component since this is the part that refers
+	 to the symbolic link. */
       if ((p = strrchr (path_copy, '/')) == NULL)
 	p = path_copy;
       *p = '\0';
 
       char *headptr;
       if (isabspath (sym.contents))
-	headptr = tmp_buf;
+	headptr = tmp_buf;	/* absolute path */
       else
 	{
+	  /* Copy the first part of the path and point to the end. */
 	  strcpy (tmp_buf, path_copy);
 	  headptr = strchr (tmp_buf, '\0');
 	}
 
+      /* See if we need to separate first part + symlink contents with a / */
       if (headptr > tmp_buf && headptr[-1] != '/')
 	*headptr++ = '/';
       
+      /* Copy the symlink contents to the end of tmp_buf.
+	 Convert slashes.  FIXME? */
       for (p = sym.contents; *p; p++)
 	*headptr++ = *p == '\\' ? '/' : *p;
+
+      /* Copy any tail component */
       if (tail >= path_end)
 	*headptr = '\0';
       else
@@ -591,6 +613,7 @@ path_conv::check (const char *src, unsigned opt,
 	  strcpy (headptr, tail);
 	}
 
+      /* Now evaluate everything all over again. */
       src = tmp_buf;
     }
 

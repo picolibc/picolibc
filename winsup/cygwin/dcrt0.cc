@@ -109,7 +109,7 @@ extern "C"
    /* impure_ptr */ &reent_data,
   };
   bool ignore_case_with_glob = FALSE;
-  int __declspec (dllexport) _check_for_executable = FALSE;
+  int __declspec (dllexport) _check_for_executable = TRUE;
 #ifdef DEBUGGING
   int pinger = 0;
 #endif
@@ -752,9 +752,6 @@ dll_crt0_1 ()
 
       longjmp (fork_info->jmp, fork_info->cygpid);
     }
-
-  if (!CYGWIN_VERSION_CHECK_FOR_S_IEXEC)
-    _check_for_executable = TRUE;
 
 #ifdef DEBUGGING
   {

@@ -783,6 +783,7 @@ fhandler_tty_common::dup (fhandler_base *child)
   fts->tcinit (get_ttyp ());
 
   attach_tty (ttynum);
+  tc->set_ctty (ttynum, openflags & ~O_NOCTTY);
 
   HANDLE nh;
 

@@ -126,17 +126,6 @@ stdio_init (void)
 }
 
 int
-dtable::not_open (int fd)
-{
-  SetResourceLock(LOCK_FD_LIST, READ_LOCK, "not_open");
-
-  int res = fd < 0 || fd >= (int)size || fds[fd] == NULL;
-
-  ReleaseResourceLock(LOCK_FD_LIST, READ_LOCK, "not open");
-  return res;
-}
-
-int
 dtable::find_unused_handle (int start)
 {
   AssertResourceOwner(LOCK_FD_LIST, READ_LOCK);
