@@ -343,8 +343,19 @@ MTinterface::fixup_after_fork (void)
     }
 }
 
+/* pthread calls */
+
+/* static methods */
+
+pthread *
+pthread::self ()
+{
+  return (pthread *) TlsGetValue (MT_INTERFACE->thread_self_dwTlsIndex);
+}
+
+/* member methods */
 pthread::pthread ():verifyable_object (PTHREAD_MAGIC), win32_obj_id (0),
-cancelstate (0), canceltype (0), joiner(NULL)
+cancelstate (0), canceltype (0), joiner (NULL), cleanup_handlers(NULL) 
 {
 }
 
@@ -390,6 +401,41 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
 	}
       ResumeThread (win32_obj_id);
     }
+}
+
+void
+pthread::push_cleanup_handler (__pthread_cleanup_handler *handler)
+{
+  if (this != self ())
+    // TODO: do it?
+    api_fatal ("Attempt to push a cleanup handler across threads"); 
+  handler->next = cleanup_handlers;
+  cleanup_handlers = handler;
+}
+
+void
+pthread::pop_cleanup_handler (int const execute)
+{
+  if (this != self ())
+    // TODO: send a signal or something to the thread ?
+    api_fatal ("Attempt to execute a cleanup handler across threads");
+  
+  if (cleanup_handlers != NULL )
+    {
+      __pthread_cleanup_handler *handler = cleanup_handlers;
+
+      if (execute)
+	 (*handler->function) (handler->arg);
+
+      cleanup_handlers = handler->next;
+    }
+}
+
+void
+pthread::pop_all_cleanup_handlers ()
+{
+  while (cleanup_handlers != NULL)
+    pop_cleanup_handler (1);
 }
 
 pthread_attr::pthread_attr ():verifyable_object (PTHREAD_ATTR_MAGIC),
@@ -910,8 +956,8 @@ thread_init_wrapper (void *_arg)
   TlsSetValue (MT_INTERFACE->thread_self_dwTlsIndex, thread);
 
   // if thread is detached force cleanup on exit
-  if (thread->attr.joinable == PTHREAD_CREATE_DETACHED)
-    thread->joiner = __pthread_self();
+  if (thread->attr.joinable == PTHREAD_CREATE_DETACHED && thread->joiner == NULL)
+    thread->joiner = pthread::self ();
 
 #ifdef _CYG_THREAD_FAILSAFE
   if (_REENT == _impure_ptr)
@@ -1191,7 +1237,7 @@ opengroup specs.
 int
 __pthread_setcancelstate (int state, int *oldstate)
 {
-  class pthread *thread = __pthread_self ();
+  class pthread *thread = pthread::self ();
   if (state != PTHREAD_CANCEL_ENABLE && state != PTHREAD_CANCEL_DISABLE)
     return EINVAL;
   *oldstate = thread->cancelstate;
@@ -1202,7 +1248,7 @@ __pthread_setcancelstate (int state, int *oldstate)
 int
 __pthread_setcanceltype (int type, int *oldtype)
 {
-  class pthread *thread = __pthread_self ();
+  class pthread *thread = pthread::self ();
   if (type != PTHREAD_CANCEL_DEFERRED && type != PTHREAD_CANCEL_ASYNCHRONOUS)
     return EINVAL;
   *oldtype = thread->canceltype;
@@ -1214,7 +1260,7 @@ __pthread_setcanceltype (int type, int *oldtype)
 void
 __pthread_testcancel (void)
 {
-  class pthread *thread = __pthread_self ();
+  class pthread *thread = pthread::self ();
   if (thread->cancelstate == PTHREAD_CANCEL_DISABLE)
     return;
   /*check the cancellation event object here - not neededuntil pthread_cancel actually
@@ -1495,7 +1541,10 @@ __pthread_attr_destroy (pthread_attr_t *attr)
 void
 __pthread_exit (void *value_ptr)
 {
-  pthread_t thread = __pthread_self ();
+  pthread * thread = pthread::self ();
+
+  // run cleanup handlers
+  thread->pop_all_cleanup_handlers();
 
   MT_INTERFACE->destructors.IterateNull ();
 
@@ -1514,7 +1563,7 @@ __pthread_exit (void *value_ptr)
 int
 __pthread_join (pthread_t *thread, void **return_val)
 {
-   pthread_t joiner = __pthread_self();
+   pthread_t joiner = pthread::self ();
 
   /*FIXME: wait on the thread cancellation event as well - we are a cancellation point*/
   if (verifyable_object_isvalid (thread, PTHREAD_MAGIC) != VALID_OBJECT)
@@ -1536,8 +1585,8 @@ __pthread_join (pthread_t *thread, void **return_val)
 
   else
     {
-      (*thread)->attr.joinable = PTHREAD_CREATE_DETACHED;
       (*thread)->joiner = joiner;
+      (*thread)->attr.joinable = PTHREAD_CREATE_DETACHED;
       WaitForSingleObject ((*thread)->win32_obj_id, INFINITE);
       if (return_val)
          *return_val = (*thread)->return_ptr;
@@ -1561,9 +1610,9 @@ __pthread_detach (pthread_t *thread)
       return EINVAL;
     }
 
-  (*thread)->attr.joinable = PTHREAD_CREATE_DETACHED;
   // force cleanup on exit
   (*thread)->joiner = *thread;
+  (*thread)->attr.joinable = PTHREAD_CREATE_DETACHED;
 
   return 0;
 }
@@ -1925,7 +1974,7 @@ __pthread_kill (pthread_t thread, int sig)
 int
 __pthread_sigmask (int operation, const sigset_t *set, sigset_t *old_set)
 {
-  pthread *thread = __pthread_self ();
+  pthread *thread = pthread::self ();
 
   // lock this myself, for the use of thread2signal
   // two differt kills might clash: FIXME
@@ -1941,11 +1990,6 @@ __pthread_sigmask (int operation, const sigset_t *set, sigset_t *old_set)
 }
 
 /* ID */
-pthread_t
-__pthread_self ()
-{
-  return (pthread *) TlsGetValue (MT_INTERFACE->thread_self_dwTlsIndex);
-}
 
 int
 __pthread_equal (pthread_t *t1, pthread_t *t2)

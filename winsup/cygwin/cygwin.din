@@ -1186,6 +1186,8 @@ pthread_attr_setschedpolicy
 pthread_attr_setscope
 pthread_attr_setstacksize
 pthread_cancel
+_pthread_cleanup_push
+_pthread_cleanup_pop
 pthread_cond_broadcast
 pthread_cond_destroy
 pthread_cond_init

@@ -218,7 +218,7 @@ pthread_sigmask (int operation, const sigset_t * set, sigset_t * old_set)
 
 pthread_t pthread_self ()
 {
-  return __pthread_self ();
+  return pthread::self();
 }
 
 int
@@ -425,8 +425,6 @@ pthread_cancel (pthread_t thread)
   return __pthread_cancel (thread);
 }
 
-
-
 int
 pthread_setcancelstate (int state, int *oldstate)
 {
@@ -443,6 +441,18 @@ void
 pthread_testcancel (void)
 {
   __pthread_testcancel ();
+}
+
+void
+_pthread_cleanup_push (__pthread_cleanup_handler *handler)
+{
+  pthread::self()->push_cleanup_handler(handler);
+}
+
+void
+_pthread_cleanup_pop (int execute)
+{
+  pthread::self()->pop_cleanup_handler (execute);
 }
 
 /* Semaphores */

@@ -260,8 +260,17 @@ public:
     pthread ();
    ~pthread ();
 
+   void push_cleanup_handler (__pthread_cleanup_handler *handler);
+   void pop_cleanup_handler (int const execute);
+
+   static pthread* self ();
+
 private:
     DWORD thread_id;
+    __pthread_cleanup_handler *cleanup_handlers;
+
+    friend void __pthread_exit (void *value_ptr);
+    void pop_all_cleanup_handlers (void);
 };
 
 class pthread_mutexattr:public verifyable_object
@@ -394,6 +403,11 @@ void __pthread_atforkprepare(void);
 void __pthread_atforkparent(void);
 void __pthread_atforkchild(void);
 
+/* Thread Exit */
+void __pthread_exit (void *value_ptr);
+int __pthread_join (pthread_t * thread, void **return_val);
+int __pthread_detach (pthread_t * thread);
+
 extern "C"
 {
 void *thread_init_wrapper (void *);
@@ -424,15 +438,7 @@ int __pthread_attr_setschedpolicy (pthread_attr_t *, int);
 int __pthread_attr_setscope (pthread_attr_t *, int);
 int __pthread_attr_setstackaddr (pthread_attr_t *, void *);
 
-
-
-/* Thread Exit */
-void __pthread_exit (void *value_ptr);
-int __pthread_join (pthread_t * thread, void **return_val);
-int __pthread_detach (pthread_t * thread);
-
 /* Thread suspend */
-
 int __pthread_suspend (pthread_t * thread);
 int __pthread_continue (pthread_t * thread);
 
@@ -462,9 +468,7 @@ int __pthread_sigmask (int operation, const sigset_t * set,
 		       sigset_t * old_set);
 
 /*  ID */
-pthread_t __pthread_self ();
 int __pthread_equal (pthread_t * t1, pthread_t * t2);
-
 
 /* Mutexes  */
 int __pthread_mutex_init (pthread_mutex_t *, const pthread_mutexattr_t *);
@@ -503,7 +507,6 @@ int __pthread_cancel (pthread_t thread);
 int __pthread_setcancelstate (int state, int *oldstate);
 int __pthread_setcanceltype (int type, int *oldtype);
 void __pthread_testcancel (void);
-
 
 /* Semaphores */
 int __sem_init (sem_t * sem, int pshared, unsigned int value);

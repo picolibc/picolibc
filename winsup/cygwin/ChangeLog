@@ -1,5 +1,44 @@
 2002-06-10  Robert Collins  <rbtcollins@hotmail.com>
 
+	* cygwin.din: Add _pthread_cleanup_push and _pthread_cleanup_pop.
+	* pthread.cc: Change __pthread_self to pthread::self() thruoghout.
+	(_pthread_cleanup_push): New function.
+	(_pthread_cleanup_pop): Ditto.
+	* thread.cc: Thanks to Thomas Pfaff for the pthread cleanup_push,_pop
+	patch, this work is derived from that.
+	Change __pthread_self to pthread::self() thruoghout.
+	(__pthread_self): Rename to pthread::self.
+	(pthread::self): New method.
+	(pthread::pthread): Initialize new member.
+	(pthread::push_cleanup_handler): New method.
+	(pthread::pop_cleanup_handler): New method.
+	(pthread::pop_all_cleanup_handlers): New method.
+	(__pthread_exit): Pop all cleanup handlers.
+	* thread.h (pthread::push_cleanup_handler): Declare.
+	(pthread::pop_cleanup_handler): Ditto.
+	(pthread::pop_all_cleanup_handlers): Ditto.
+	(pthread::self): New static method.
+	(__pthread_exit): Give C++ linkage.
+	(__pthread_join): Ditto.
+	(__pthread_detach): Ditto.
+	(__pthread_self): Remove.
+
+2002-04-24  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* include/pthread.h (__pthread_cleanup_handler): New structure
+	(pthread_cleanup_push): Rewritten .
+	(pthread_cleanup_pop): Ditto.
+	(_pthread_cleanup_push): New prototype.
+	(_pthread_cleanup_pop) Ditto.
+
+2002-04-24  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.cc (thread_init_wrapper): Check if thread is already joined.
+	(__pthread_join): Set joiner first.
+	(__pthread_detach): Ditto.
+
+2002-06-10  Robert Collins  <rbtcollins@hotmail.com>
+
 	* cygserver_transport.cc (create_server_transport): Finish the split
 	out of sockets code from transport_layer_base. Thanks to Nicholas
 	Wourms and Conrad Scott for catching this.

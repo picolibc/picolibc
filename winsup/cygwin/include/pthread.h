@@ -103,10 +103,20 @@ void pthread_cleanup_push (void (*routine)(void*), void *arg);
 void pthread_cleanup_pop (int execute);
 */
 typedef void (*__cleanup_routine_type) (void *);
+typedef struct _pthread_cleanup_handler 
+{
+  __cleanup_routine_type function;
+  void *arg;
+  struct _pthread_cleanup_handler *next;
+} __pthread_cleanup_handler;
 
-#define pthread_cleanup_push(fn, arg) { __cleanup_routine_type __cleanup_routine=fn; \
-void *__cleanup_param=arg;
-#define pthread_cleanup_pop(execute) if (execute) __cleanup_routine(__cleanup_param); }
+void _pthread_cleanup_push (__pthread_cleanup_handler *handler);
+void _pthread_cleanup_pop (int execute);
+
+#define pthread_cleanup_push(_fn, _arg) { __pthread_cleanup_handler __cleanup_handler = \
+                                         { _fn, _arg, NULL }; \
+                                         _pthread_cleanup_push( &__cleanup_handler );
+#define pthread_cleanup_pop(_execute) _pthread_cleanup_pop( _execute ); }
 
 /* Condition variables */
 int pthread_cond_broadcast (pthread_cond_t *);
