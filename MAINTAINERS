@@ -21,13 +21,14 @@ cgen/; cgen parts of opcodes/, sim/ & include/
 	May need separate opcodes/ or sim/ approval for
 		commits of regenerated files there.
 
-config.guess; config.sub; dejagnu/config.guess;
+config.guess; config.sub; dejagnu/config.guess; dejagnu/config.sub;
 readline/support/config.sub; readline/support/config.guess
 	config: http://savannah.gnu.org/projects/config
 	Patches to config-patches@gnu.org.
 	Changes need to be done in tandem with the official CONFIG
 	sources or submitted to the master file maintainer and brought
-	in via a merge.
+	in via a merge.  When updating any of these files, please be
+	sure to update all of them.
 	Please notify the following of any committed patches:
 		binutils@sources.redhat.com
 		gdb-patches@sources.redhat.com

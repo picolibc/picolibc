@@ -1,3 +1,8 @@
+2002-07-19  Chris Demetriou  <cgd@broadcom.com>
+
+	* MAINTAINERS: Clarify on config.guess and config.sub, and add
+	one instance of them which was missed to the list to update.
+
 2002-07-16  Chris Demetriou  <cgd@broadcom.com>
 
 	* config.guess: Update to 2002-07-09 version.
