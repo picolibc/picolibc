@@ -1,3 +1,15 @@
+2004-05-07  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/param.h: Remove endian info and include
+	<machine/endian.h> instead.
+	* libc/include/machine/endian.h: New file.
+	* libc/include/machine/param.h: Ditto.
+	* libc/machine/arm/machine/endian.h: Ditto.
+	* libc/machine/arm/machine/param.h: Ditto.
+	* libc/sys/arm/sys/param.h: Removed.
+	* libc/sys/sysvi386/sys/param.h: Ditto.
+	* libc/sys/rtems/sys/param.h: Modified to include <machine/endian.h>.
+
 2004-05-03  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
 
 	* libc/stdio/vfprintf.c (_VFPRINTF_R): Set error flag when
