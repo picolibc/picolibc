@@ -87,7 +87,7 @@ EOF
 	$res = <<EOF . longjmp () . $res;
 	.text
 
-	.stabs	"_sigfe:F(0,1)",36,0,0,__sigbe
+	.stabs	"_sigfe:F(0,1)",36,0,0,__sigfe
 __sigfe:
 	pushl	%ebx
 	pushl	%edx
@@ -134,6 +134,72 @@ __sigbe:
 	popl	%eax
 	popl	%edx
 	ret
+
+	.global	_sigreturn
+	.stabs	"sigreturn:F(0,1)",36,0,0,_sigreturn
+_sigreturn:
+	addl	\$4,%esp				# Remove argument
+	call	_set_process_mask\@4
+
+1:	movl	%fs:4,%edx
+	movl	\$1,%eax				# potential lock value
+	lock	xchgl %eax,$tls::stacklock(%edx)	# see if we can grab it
+	movl	%eax,$tls::spinning(%edx)		# flag if we are waiting for lock
+	orl	%eax,%eax				# it will be zero
+	jz	2f					#  if so
+	xorl	%eax,%eax				# nope.  not zero
+	call	_low_priority_sleep			# sleep
+	jmp	1b					#  and loop
+2:	popl	%ebx					# saved errno
+	testl	%ebx,%ebx				# Is it < 0
+	jl	3f					# yup.  ignore it
+	movl	$tls::errno_addr(%edx),%eax
+	movl	%ebx,(%eax)
+3:	movl	\$-4,%eax				# now decrement aux stack
+	xadd	%eax,$tls::stackptr(%edx)		#  and get pointer
+	xorl	%ebp,%ebp
+	xchgl	%ebp,-4(%eax)				# get return address from signal stack
+	xchgl	%ebp,28(%esp)				# store real return address
+	decl	$tls::stacklock(%edx)			# unlock
+
+	popl	%eax
+	popl	%ebx
+	popl	%ecx
+	popl	%edx
+	popl	%edi
+	popl	%esi
+	popf
+	ret
+
+	.global	_sigdelayed
+	.stabs	"sigdelayed:F(0,1)",36,0,0,_sigdelayed
+_sigdelayed:
+	pushl	%ebp
+	movl	%esp,%ebp
+	pushf
+	pushl	%esi
+	pushl	%edi
+	pushl	%edx
+	pushl	%ecx
+	pushl	%ebx
+	pushl	%eax
+	movl	%fs:4,%ebx
+	pushl	$tls::saved_errno(%ebx)	# saved errno
+3:	pushl	$tls::oldmask(%ebx)	# oldmask
+	pushl	$tls::sig(%ebx)		# signal argument
+	pushl	\$_sigreturn
+
+	call	_reset_signal_arrived\@0
+	pushl	$tls::func(%ebx)	# signal func
+	pushl	$tls::newmask(%ebx)	# newmask - eaten by set_process_mask
+
+	call	_set_process_mask\@4
+	cmpl	\$0,$tls::threadkill(%ebx)#pthread_kill signal?
+	jnz	4f			#yes.  Callee clears signal number
+	movl	\$0,$tls::sig(%ebx)	# zero the signal number as a
+					# flag to the signal handler thread
+					# that it is ok to set up sigsave
+4:	ret
 
 	.global	__ZN7_cygtls3popEv
 __ZN7_cygtls3popEv:
@@ -191,61 +257,6 @@ stabilize_sig_stack:
 	call	__ZN7_cygtls19call_signal_handlerEv
 	jmp	1b
 3:	ret
-
-	.global	_sigreturn
-	.stabs	"sigreturn:F(0,1)",36,0,0,_sigreturn
-_sigreturn:
-	addl	\$4,%esp				# Remove argument
-	call	_set_process_mask\@4
-
-	call	stabilize_sig_stack
-
-1:	popl	%ebx					# saved errno
-	testl	%ebx,%ebx				# Is it < 0
-	jl	2f					# yup.  ignore it
-	movl	$tls::errno_addr(%edx),%eax
-	movl	%ebx,(%eax)
-2:	popl	%eax
-	popl	%ebx
-	popl	%ecx
-	popl	%edi
-	popl	%esi
-	popf
-	decl	$tls::stacklock(%edx)			# relinquish lock
-	popl	%edx
-	popl	%ebp
-	jmp	__sigbe
-
-	.global	_sigdelayed
-	.stabs	"sigdelayed:F(0,1)",36,0,0,_sigdelayed
-_sigdelayed:
-	pushl	%ebp
-	movl	%esp,%ebp
-	pushl	%edx
-	pushf
-	pushl	%esi
-	pushl	%edi
-	pushl	%ecx
-	pushl	%ebx
-	pushl	%eax
-	movl	%fs:4,%ebx
-	pushl	$tls::saved_errno(%ebx)	# saved errno
-3:	pushl	$tls::oldmask(%ebx)	# oldmask
-	pushl	$tls::sig(%ebx)		# signal argument
-	pushl	\$_sigreturn
-
-	call	_reset_signal_arrived\@0
-	pushl	$tls::func(%ebx)	# signal func
-	pushl	$tls::newmask(%ebx)	# newmask - eaten by set_process_mask
-
-	call	_set_process_mask\@4
-	cmpl	\$0,$tls::threadkill(%ebx)#pthread_kill signal?
-	jnz	4f			#yes.  Callee clears signal number
-	movl	\$0,$tls::sig(%ebx)	# zero the signal number as a
-					# flag to the signal handler thread
-					# that it is ok to set up sigsave
-4:	ret
-
 EOF
     }
     return $res;

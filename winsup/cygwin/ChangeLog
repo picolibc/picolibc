@@ -1,41 +1,41 @@
+2004-03-05  Christopher Faylor  <cgf@redhat.com>
+
+	* gendef (sigdelayed): Handle return here rather than going through
+	sigbe to ensure that flags are properly restored.
+
 2004-03-04  Thomas Pfaff  <tpfaff@gmx.net>
 
-	* include/pthread.h (PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP):
-	New define.
+	* include/pthread.h (PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP): New
+	define.
 	(PTHREAD_NORMAL_MUTEX_INITIALIZER_NP): Ditto.
 	(PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP): Ditto.
-	* thread.cc (pthread_mutex::is_good_initializer):
-	Check for all posssible initializers
+	* thread.cc (pthread_mutex::is_good_initializer): Check for all
+	posssible initializers
 	(pthread_mutex::is_good_initializer_or_object): Ditto.
 	(pthread_mutex::is_good_initializer_or_bad_object): Ditto.
-	(verifyable_object_isvalid): Support up to three static
-	initializers.
+	(verifyable_object_isvalid): Support up to three static initializers.
 	(verifyable_object_isvalid (void const *,long)): Remove.
-	(pthread_cond::is_good_initializer_or_bad_object): Remove
-	unneeded objectState var.
-	(pthread_cond::init): Condition remains unchanged when creation
-	has failed.
-	(pthread_rwlock::is_good_initializer_or_bad_object): Remove
-	unneeded objectState var.
-	(pthread_rwlock::init): Rwlock remains unchanged when creation
-	has failed.
-	(pthread_mutex::init): Remove obsolete comment.
-	Mutex remains unchanged when creation has failed. Add support
-	for new initializers.
-	(pthread_mutex_getprioceiling): Do not create mutex,
-	just return ENOSYS.
+	(pthread_cond::is_good_initializer_or_bad_object): Remove unneeded
+	objectState var.
+	(pthread_cond::init): Condition remains unchanged when creation has
+	failed.
+	(pthread_rwlock::is_good_initializer_or_bad_object): Remove unneeded
+	objectState var.
+	(pthread_rwlock::init): Rwlock remains unchanged when creation has
+	failed.
+	(pthread_mutex::init): Remove obsolete comment.  Mutex remains
+	unchanged when creation has failed.  Add support for new initializers.
+	(pthread_mutex_getprioceiling): Do not create mutex, just return
+	ENOSYS.
 	(pthread_mutex_lock): Simplify.
 	(pthread_mutex_trylock): Remove unneeded local themutex.
-	(pthread_mutex_unlock): Just return EPERM if mutex is not
-	initialized.
-	(pthread_mutex_setprioceiling): Do not create mutex,
-	just return ENOSYS.
-	* thread.h (verifyable_object_isvalid): Support up to three
-	static initializers.
-	(verifyable_object_isvalid (void const *,long)): Remove
-	prototype.
-	(pthread_mutex::init): Add optional initializer to parameter
-	list.
+	(pthread_mutex_unlock): Just return EPERM if mutex is not initialized.
+	(pthread_mutex_setprioceiling): Do not create mutex, just return
+	ENOSYS.
+	* thread.h (verifyable_object_isvalid): Support up to three static
+	initializers.
+	(verifyable_object_isvalid (void const *,long)): Remove prototype.
+	(pthread_mutex::init): Add optional initializer to parameter list.
 
 2004-03-03  Christopher Faylor  <cgf@redhat.com>
 
