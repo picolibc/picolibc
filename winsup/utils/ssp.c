@@ -39,7 +39,7 @@ static struct option longopts[] =
   {NULL, 0, NULL, 0}
 };
 
-static char opts[] = "cdehlstvV";
+static char opts[] = "+cdehlstvV";
 
 #define KERNEL_ADDR 0x77000000
 
