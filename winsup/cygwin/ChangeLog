@@ -1,4 +1,4 @@
-2004-04-11  Pierre Humblet  <pierre.humblet@ieee.org>
+2004-05-04  Christopher Faylor  <cgf@alum.bu.edu>
 
 	* path.cc (normalize_win32_path): Detect components with only dots.
 	Remove a final .  if it follows '\\'.
@@ -6,7 +6,7 @@
 	mount is found.
 	(chdir): Do not look for components with only dots.
 
-2004-04-20  Pierre Humblet <pierre.humblet@ieee.org>
+2004-05-04  Pierre Humblet <pierre.humblet@ieee.org>
 	    Christopher Faylor  <cgf@alum.bu.edu>
 
 	* path.cc (is_unc_share): Remove redundant tests.
