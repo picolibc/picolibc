@@ -1,3 +1,17 @@
+2000-11-22  Nick Clifton  <nickc@redhat.com>
+
+	* common.h (EM_JAVELIN): New machine number.
+	(EM_FIREPATH): New machine number.
+	(EM_ZSP): New machine number.
+	(EM_MMIX): New machine number.
+	(EM_HUANY): New machine number.
+	(EM_PRISM): New machine number.
+	(SHT_GROUP): New section type.
+	(SHT_SYMTAB_SHNDX): New section type.
+	(SHF_GROUP): New section flag.
+	(SHN_XINDEX): New section index.
+	(GRP_COMDAT): New section group flag.
+
 2000-11-20  H.J. Lu  <hjl@gnu.org>
 
 	* common.h (ELFOSABI_MONTEREY): Renamed to ...
