@@ -241,7 +241,7 @@ _CRTIMP int __cdecl fpclass (double);
 
 #ifndef __NO_ISOCEXT
 #if (defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) \
-	|| !defined __STRICT_ANSI__ || defined __GLIBCPP__
+	|| !defined __STRICT_ANSI__ || defined __cplusplus
 
 #define NAN (0.0F/0.0F)
 #define HUGE_VALF (1.0F/0.0F)
