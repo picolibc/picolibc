@@ -1,3 +1,19 @@
+2004-03-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_socket): Add has_been_closed member.
+	* fhandler_socket.cc (fhandler_socket::fhandler_socket): Initialize
+	has_been_closed to 0.
+	(fhandler_socket::recvfrom): Use new asynchronous I/O driven
+	wsock_event methods.
+	(fhandler_socket::recvmsg): Ditto.
+	(fhandler_socket::sendto): Ditto.
+	(fhandler_socket::sendmsg): Ditto.
+	* net.cc (wsock_event::prepare): Reimplement using asynchronous I/O.
+	(wsock_event::wait): Ditto.
+	(wsock_event::release): New method.
+	* wsock_event.h (class wsock_event): Remove ovr member.  Accomodate
+	new implementation of prepare and wait methods.  Add release method.
+
 2004-03-29  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* thread.cc (pthread::atforkprepare): Call

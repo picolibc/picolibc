@@ -14,7 +14,6 @@ details. */
 class wsock_event
 {
   WSAEVENT		event;
-  WSAOVERLAPPED		ovr;
 public:
   wsock_event () : event (NULL) {};
   ~wsock_event ()
@@ -25,8 +24,9 @@ public:
     };
 
   /* The methods are implemented in net.cc */
-  LPWSAOVERLAPPED prepare ();
-  int wait (int socket, LPDWORD flags);
+  bool prepare (int sock, long event_mask);
+  int wait (int sock, int &closed);
+  void release (int sock);
 };
 
 #endif /* __WSOCK_EVENT_H__ */
