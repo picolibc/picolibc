@@ -1,5 +1,21 @@
 2003-09-07  Christopher Faylor  <cgf@redhat.com>
 
+	Throughout, remove __d_u.__d_data fields from DIR structure.
+	* include/sys/dirent.h (dirent): Remvoe old_d_ino.
+	(DIR): Make __d_dirhash a 64 bit value.  Remove __d_data and __d_u.
+	Add __flags.
+	* dir.cc (opendir_states): New enum.
+	(opendir): Clear new DIR __flags field.
+	(readdir): Fill in '.' and '..' entries if we hit EOF and we haven't
+	seen them already.  Nuke setting of old_d_ino.
+	(rewinddir): Reset DIR __flags field.
+	(seekdir64): Ditto.
+	* fhandler_disk_file.cc (fhandler_cygdrive::fhandler_cygdrive): Remove
+	special handling of "." and ".." since they are now handled
+	automatically.
+
+2003-09-07  Christopher Faylor  <cgf@redhat.com>
+
 	* include/cygwin/in.h: Don't define ipv6 stuff unless we call for it
 	specifically since it isn't really implemented yet.
 

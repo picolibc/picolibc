@@ -71,6 +71,14 @@ dirfd (DIR *dir)
   return dir->__d_dirent->d_fd;
 }
 
+enum opendir_states
+{
+  opendir_ok = 0,
+  opendir_saw_dot = 1,
+  opendir_saw_dot_dot = 2,
+  opendir_saw_eof = 4
+};
+
 /* opendir: POSIX 5.1.2.1 */
 extern "C" DIR *
 opendir (const char *name)
@@ -91,7 +99,9 @@ opendir (const char *name)
       res = NULL;
     }
 
-  if (!res && fh)
+  if (res)
+    res->__flags = 0;
+  else if (fh)
     delete fh;
   return res;
 }
@@ -110,7 +120,23 @@ readdir (DIR *dir)
       return NULL;
     }
 
-  dirent *res = ((fhandler_base *) dir->__d_u.__d_data.__fh)->readdir (dir);
+  dirent *res = ((fhandler_base *) dir->__fh)->readdir (dir);
+
+  if (!res)
+    {
+      if (!(dir->__flags & opendir_saw_dot))
+	{
+	  res = dir->__d_dirent;
+	  strcpy (res->d_name, ".");
+	  dir->__flags |= opendir_saw_dot;
+	}
+      else if (!(dir->__flags & opendir_saw_dot_dot))
+	{
+	  res = dir->__d_dirent;
+	  strcpy (res->d_name, "..");
+	  dir->__flags |= opendir_saw_dot_dot;
+	}
+    }
 
   if (res)
     {
@@ -119,11 +145,15 @@ readdir (DIR *dir)
       if (res->d_name[0] == '.')
 	{
 	  if (res->d_name[1] == '\0')
-	    dir->__d_dirent->d_ino = dir->__d_dirhash;
+	    {
+	      dir->__d_dirent->d_ino = dir->__d_dirhash;
+	      dir->__flags |= opendir_saw_dot;
+	    }
 	  else if (res->d_name[1] != '.' || res->d_name[2] != '\0')
 	    goto hashit;
 	  else
 	    {
+	      dir->__flags |= opendir_saw_dot_dot;
 	      char *p, up[strlen (dir->__d_dirname) + 1];
 	      strcpy (up, dir->__d_dirname);
 	      if (!(p = strrchr (up, '\\')))
@@ -145,7 +175,6 @@ readdir (DIR *dir)
 	  dir->__d_dirent->d_ino = hash_path_name (dino, res->d_name);
 	}
     }
-  dir->__d_dirent->old_d_ino = dir->__d_dirent->d_ino;	// just truncate
   return res;
 }
 
@@ -157,7 +186,7 @@ telldir64 (DIR *dir)
 
   if (dir->__d_cookie != __DIRENT_COOKIE)
     return 0;
-  return ((fhandler_base *) dir->__d_u.__d_data.__fh)->telldir (dir);
+  return ((fhandler_base *) dir->__fh)->telldir (dir);
 }
 
 /* telldir */
@@ -175,7 +204,8 @@ seekdir64 (DIR *dir, _off64_t loc)
 
   if (dir->__d_cookie != __DIRENT_COOKIE)
     return;
-  return ((fhandler_base *) dir->__d_u.__d_data.__fh)->seekdir (dir, loc);
+  dir->__flags = 0;
+  return ((fhandler_base *) dir->__fh)->seekdir (dir, loc);
 }
 
 /* seekdir */
@@ -194,7 +224,8 @@ rewinddir (DIR *dir)
 
   if (dir->__d_cookie != __DIRENT_COOKIE)
     return;
-  return ((fhandler_base *) dir->__d_u.__d_data.__fh)->rewinddir (dir);
+  dir->__flags = 0;
+  return ((fhandler_base *) dir->__fh)->rewinddir (dir);
 }
 
 /* closedir: POSIX 5.1.2.1 */
@@ -214,7 +245,7 @@ closedir (DIR *dir)
   /* Reset the marker in case the caller tries to use `dir' again.  */
   dir->__d_cookie = 0;
 
-  int res = ((fhandler_base *) dir->__d_u.__d_data.__fh)->closedir (dir);
+  int res = ((fhandler_base *) dir->__fh)->closedir (dir);
 
   cygheap->fdtab.release (dir->__d_dirent->d_fd);
 

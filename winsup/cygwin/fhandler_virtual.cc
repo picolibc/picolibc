@@ -77,9 +77,9 @@ fhandler_virtual::opendir (path_conv& pc)
 	  fd = this;
 	  fd->set_nohandle (true);
 	  dir->__d_dirent->d_fd = fd;
-	  dir->__d_u.__d_data.__fh = this;
+	  dir->__fh = this;
 	  dir->__d_cookie = __DIRENT_COOKIE;
-	  dir->__d_u.__d_data.__handle = INVALID_HANDLE_VALUE;
+	  dir->__handle = INVALID_HANDLE_VALUE;
 	  dir->__d_position = 0;
 	  dir->__d_dirhash = get_namehash ();
 
