@@ -1,5 +1,21 @@
 2003-01-23  Christopher Faylor  <cgf@redhat.com>
 
+	* Makefile.in: Don't filter out -g.  Actually pass correct CFLAGS to
+	site.exp.
+	* winsup.api/winsup.exp: Use -g flag from CFLAGS.
+
+2003-01-23  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Turn off all optimizations.
+	* libltp/lib/parse_opts.c (TEST_VALID_ENO): Move define outside of
+	conditional.
+	(TEST_ERRNO): Ditto.
+	(btime): Ditto.
+	(etime): Ditto.
+	(tmptime): Ditto.
+
+2003-01-23  Christopher Faylor  <cgf@redhat.com>
+
 	* libltp/include/usctest.h: Add externs to some variables that need it.
 	* winsup.api/ltp/mmap05.c (main): Make file_content volatile to avoid
 	optimization glitch.
@@ -42,7 +58,7 @@
 
 2003-01-23  Christopher Faylor  <cgf@redhat.com>
 
-	* Makeifle.in: Use ALL_CFLAGS to build test programs so that correct
+	* Makefile.in: Use ALL_CFLAGS to build test programs so that correct
 	libraries and other options are used.
 
 2003-01-22  Corinna Vinschen  <corinna@vinschen.de>
