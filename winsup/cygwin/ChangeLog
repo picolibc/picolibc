@@ -1,3 +1,12 @@
+2005-03-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* errno.cc (NO_SYSTEM_RESOURCES): Map to EAGAIN.
+	(NONPAGED_SYSTEM_RESOURCES): Ditto.
+	(PAGED_SYSTEM_RESOURCES): Ditto.
+	(WORKING_SET_QUOTA): Ditto.
+	(PAGEFILE_QUOTA): Ditto.
+	(COMMITMENT_LIMIT): Ditto.
+
 2005-03-30  Christopher Faylor  <cgf@timesys.com>
 
 	* environ.cc (spenvs): Re-force SYSTEMROOT to always be included in
