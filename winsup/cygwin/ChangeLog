@@ -1,3 +1,8 @@
+2003-10-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_proc.cc (format_proc_partitions): Use new device code
+	to get major and minor device numbers.  Fix size evaluation.
+
 2003-10-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* external.cc (cygwin_internal): Add CW_GET_ERRNO_FROM_WINERROR

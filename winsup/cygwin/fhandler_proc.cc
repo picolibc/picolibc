@@ -898,12 +898,16 @@ format_proc_partitions (char *destbuf, size_t maxsize)
 		debug_printf ("DeviceIoControl %E");
 	      else
 		{
-		  bufptr += __small_sprintf (bufptr, "%5d %5d %9U sd%c\n",
-					     FH_FLOPPY,
-					     drive_number * 16 + 32,
+		  char devname[16];
+		  __small_sprintf (devname, "/dev/sd%c", drive_number + 'a');
+		  device dev;
+		  dev.parse (devname);
+		  bufptr += __small_sprintf (bufptr, "%5d %5d %9U %s\n",
+					     dev.major,
+					     dev.minor,
 					     (long long)((dg.Cylinders.QuadPart * dg.TracksPerCylinder *
-					      dg.SectorsPerTrack * dg.BytesPerSector) >> 6),
-					     drive_number + 'a');
+					      dg.SectorsPerTrack * dg.BytesPerSector) >> 10),
+					     devname + 5);
 		}
 	      while (dwRetCode = DeviceIoControl (hDevice,
 						  IOCTL_DISK_GET_DRIVE_LAYOUT,
@@ -924,12 +928,16 @@ format_proc_partitions (char *destbuf, size_t maxsize)
 		    {
 		      if (dli->PartitionEntry[partition].PartitionLength.QuadPart == 0)
 			continue;
-		      bufptr += __small_sprintf (bufptr, "%5d %5d %9U sd%c%d\n",
-						 FH_FLOPPY,
-						 drive_number * 16 + partition + 33,
-						 (long long)(dli->PartitionEntry[partition].PartitionLength.QuadPart >> 6),
-						 drive_number + 'a',
-						 partition + 1);
+		      char devname[16];
+		      __small_sprintf (devname, "/dev/sd%c%d",
+		      				drive_number + 'a',
+						partition + 1);
+		      device dev;
+		      dev.parse (devname);
+		      bufptr += __small_sprintf (bufptr, "%5d %5d %9U %s\n",
+						 dev.major, dev.minor,
+						 (long long)(dli->PartitionEntry[partition].PartitionLength.QuadPart >> 10),
+						 devname + 5);
 		    }
 		}
 
