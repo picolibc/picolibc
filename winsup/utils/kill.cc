@@ -1,6 +1,6 @@
 /* kill.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -18,25 +18,58 @@ details. */
 #include <sys/cygwin.h>
 #include <getopt.h>
 
+static const char version[] = "$Revision$";
+static char *prog_name;
+
 static struct option longopts[] =
 {
   {"help", no_argument, NULL, 'h' },
   {"list", optional_argument, NULL, 'l'},
   {"force", no_argument, NULL, 'f'},
   {"signal", required_argument, NULL, 's'},
+  {"version", no_argument, NULL, 'v'},
   {NULL, 0, NULL, 0}
 };
 
-static char opts[] = "hl::fs:";
+static char opts[] = "hl::fs:v";
 
 extern "C" const char *strsigno (int);
 
 static void
 usage (FILE *where = stderr)
 {
-  fputs ("usage: kill [-signal] [-s signal] pid1 [pid2 ...]\n"
-	 "       kill -l [signal]\n", where);
+  fprintf (where , ""
+	"Usage: %s [-f] [-signal] [-s signal] pid1 [pid2 ...]\n"
+	"       %s -l [signal]\n"
+	" -f, --force     force, using win32 interface if necessary\n"
+	" -l, --list      print a list of signal names\n"
+	" -s, --signal    send signal (use %s --list for a list)\n"
+	" -h, --help      output usage information and exit\n"
+	" -v, --version   output version information and exit\n"
+	"", prog_name, prog_name, prog_name);
   exit (where == stderr ? 1 : 0);
+}
+
+static void
+print_version ()
+{
+  const char *v = strchr (version, ':');
+  int len;
+  if (!v)
+    {
+      v = "?";
+      len = 1;
+    }
+  else
+    {
+      v += 2;
+      len = strchr (v, ' ') - v;
+    }
+  printf ("\
+%s (cygwin) %.*s\n\
+Process Signaller\n\
+Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.\n\
+Compiled on %s", prog_name, len, v, __DATE__);
 }
 
 static int
@@ -65,7 +98,7 @@ test_for_unknown_sig (int sig, const char *sigstr)
 {
   if (sig < 0 || sig > NSIG)
     {
-      fprintf (stderr, "kill: unknown signal: %s\n", sigstr);
+      fprintf (stderr, "%s: unknown signal: %s\n", prog_name, sigstr);
       usage ();
       exit (1);
     }
@@ -111,6 +144,14 @@ main (int argc, char **argv)
   char *gotsig = NULL;
   int ret = 0;
 
+  prog_name = strrchr (argv[0], '/');
+  if (prog_name == NULL)
+    prog_name = strrchr (argv[0], '\\');
+  if (prog_name == NULL)
+    prog_name = argv[0];
+  else
+    prog_name++;
+
   if (argc == 1)
     usage ();
 
@@ -147,6 +188,9 @@ main (int argc, char **argv)
 	case 'h':
 	  usage (stdout);
 	  break;
+	case 'v':
+	  print_version ();
+	  break;
 	case '?':
 	  if (gotsig)
 	    usage ();
@@ -170,7 +214,7 @@ main (int argc, char **argv)
       int pid = strtol (*argv, &p, 10);
       if (*p != '\0')
 	{
-	  fprintf (stderr, "kill: illegal pid: %s\n", *argv);
+	  fprintf (stderr, "%s: illegal pid: %s\n", prog_name, *argv);
 	  ret = 1;
 	}
       else if (kill (pid, sig) == 0)
@@ -183,7 +227,7 @@ main (int argc, char **argv)
       else
 	{
 	  char buf[1000];
-	  sprintf (buf, "kill %d", pid);
+	  sprintf (buf, "%s %d", prog_name, pid);
 	  perror (buf);
 	  ret = 1;
 	}
