@@ -92,7 +92,6 @@ unsigned long _EXFUN(_strtoul_r,(struct _reent *,const char *_n_PTR, char **_end
 int	_EXFUN(system,(const char *__string));
 
 #ifndef __STRICT_ANSI__
-_VOID	_EXFUN(cfree,(_PTR));
 int	_EXFUN(putenv,(const char *__string));
 int	_EXFUN(_putenv_r,(struct _reent *, const char *__string));
 int	_EXFUN(setenv,(const char *__string, const char *__value, int __overwrite));
@@ -109,7 +108,9 @@ char *	_EXFUN(ecvtf,(float,int,int *,int *));
 char *	_EXFUN(dtoa,(double, int, int, int *, int*, char**));
 int	_EXFUN(rand_r,(unsigned *__seed));
 
-#ifdef __CYGWIN__
+#ifndef __CYGWIN__
+_VOID	_EXFUN(cfree,(_PTR));
+#else
 char *	_EXFUN(realpath,(const char *, char *));
 void	_EXFUN(unsetenv,(const char *__string));
 void	_EXFUN(_unsetenv_r,(struct _reent *, const char *__string));
