@@ -57,14 +57,6 @@ set_std_handle (int fd)
     SetStdHandle (std_consts[fd], cygheap->fdtab[fd]->get_output_handle ());
 }
 
-void
-dtable::dec_console_fds ()
-{
-  if (console_fds > 0 && !--console_fds &&
-      myself->ctty != TTY_CONSOLE && !check_pty_fds())
-    FreeConsole ();
-}
-
 int
 dtable::extend (int howmuch)
 {
@@ -189,9 +181,6 @@ dtable::release (int fd)
 	{
 	case FH_SOCKET:
 	  dec_need_fixup_before ();
-	  break;
-	case FH_CONSOLE:
-	  dec_console_fds ();
 	  break;
 	}
       delete fds[fd];
@@ -369,8 +358,7 @@ build_fh_pc (path_conv& pc)
       case FH_CONSOLE:
       case FH_CONIN:
       case FH_CONOUT:
-	if ((fh = cnew (fhandler_console) ()))
-	  cygheap->fdtab.inc_console_fds ();
+	fh = cnew (fhandler_console) ();
 	break;
       case FH_CYGDRIVE:
 	fh = cnew (fhandler_cygdrive) ();
@@ -435,8 +423,7 @@ build_fh_pc (path_conv& pc)
 	  switch (newdev)
 	    {
 	    case FH_CONSOLE:
-	      if ((fh = cnew (fhandler_console) ()))
-		cygheap->fdtab.inc_console_fds ();
+	      fh = cnew (fhandler_console) ();
 	      break;
 	    case FH_TTYS:
 	      fh = cnew (fhandler_tty_slave) ();

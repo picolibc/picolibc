@@ -1,3 +1,26 @@
+2003-03-02  Christopher Faylor  <cgf@redhat.com>
+
+	* dll_init.cc (dll_list::load_after_fork): Don't revert to LoadLibrary
+	if LoadLibraryEx fails.
+	* dtable.cc (dtable::dec_console_fds): Eliminate.
+	(dtable::release): Don't treat console specially.
+	(dtable::build_fhandler): Ditto.
+	* dtable.h (console_fds): Eliminate.
+	(dtable::dec_console_fds): Eliminate.
+	(dtable::inc_console_fds): Eliminate.
+	* fhandler.h (fhandler_console::open_fhs): New static element.
+	* fhandler_console.cc (fhandler_console::open): Increment open_fs.
+	(fhandler_console::close): Call FreeConsole if no more open consoles
+	and ctty is not associated with the console.
+	* syscalls.cc (setsid): Simplify check for when to call FreeConsole.
+	(check_pty_fds): Eliminate definition.
+	* winsup.h (check_pty_fds): Eliminate declaration.
+
+2003-03-02  Christopher Faylor  <cgf@redhat.com>
+
+	* dll_init.cc (dll_list::load_after_fork): Fix typo where result of
+	LoadLibrary was ignored.
+
 2003-03-01  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::bind): Open and write socket
@@ -166,7 +189,7 @@
 
 2003-02-16  Christopher Faylor  <cgf@redhat.com>
 
-	* cygwin.din: Export all appropriate newlibc libm functions.  Sort.
+	* cygwin.din: Export all appropriate newlib libm functions.  Sort.
 	* include/cygwin/version.h: Bump API minor number.
 
 2003-02-15  Christopher Faylor  <cgf@redhat.com>

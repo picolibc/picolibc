@@ -804,6 +804,7 @@ class fhandler_console: public fhandler_termios
   void set_cursor_maybe ();
 
  public:
+  static int open_fhs;
 
   fhandler_console ();
 
