@@ -30,7 +30,7 @@ details. */
 
 static const NO_COPY char *CYGWIN_NATIVE = "CYGWIN_NATIVE_CLIPBOARD";
 /* this is MT safe because windows format id's are atomic */
-static UINT cygnativeformat;
+static int cygnativeformat;
 
 fhandler_dev_clipboard::fhandler_dev_clipboard ()
   : fhandler_base (), pos (0), membuffer (NULL), msize (0),
@@ -190,7 +190,7 @@ fhandler_dev_clipboard::read (void *ptr, size_t& len)
   HGLOBAL hglb;
   size_t ret;
   UINT formatlist[2];
-  UINT format;
+  int format;
   if (eof)
     len = 0;
   else

@@ -1,3 +1,9 @@
+2005-03-04  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler_clipboard.cc: Use int for cygnativeformat rather than UINT
+	as that is what is returned by GetPriorityClipboardFormat.
+	(fhandler_dev_clipboard::read): Ditto for the format variable.
+
 2005-03-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::open_9x): Satisfy query_open values.
