@@ -36,6 +36,7 @@
  * regular-expression syntax might require a total rethink.
  */
 
+#include "winsup.h"
 #include "regexp.h"
 #include <stdio.h>
 #include <ctype.h>

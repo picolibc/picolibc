@@ -1,3 +1,4 @@
+#include "winsup.h"
 #include "regexp.h"
 #include <stdio.h>
 
