@@ -813,6 +813,12 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _cygtls *tls)
 out:
   if (locked)
     tls->unlock ();
+  if (interrupted && tls->event)
+    {
+      HANDLE h = tls->event;
+      tls->event = NULL;
+      SetEvent (h);
+    }
   sigproc_printf ("signal %d %sdelivered", sig, interrupted ? "" : "not ");
   return interrupted;
 }
@@ -904,6 +910,24 @@ extern "C" void __stdcall
 set_process_mask (sigset_t newmask)
 {
   set_signal_mask (newmask);
+}
+
+extern "C" int
+sighold (int sig)
+{
+  /* check that sig is in right range */
+  if (sig < 0 || sig >= NSIG)
+    {
+      set_errno (EINVAL);
+      syscall_printf ("signal %d out of range", sig);
+      return -1;
+    }
+  mask_sync->acquire (INFINITE);
+  sigset_t mask = myself->getsigmask ();
+  sigaddset (&mask, sig);
+  set_signal_mask (mask);
+  mask_sync->release ();
+  return 0;
 }
 
 /* Set the signal mask for this process.

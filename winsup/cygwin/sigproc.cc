@@ -66,7 +66,7 @@ public:
   friend void __stdcall sig_dispatch_pending (bool);
 };
 
-static pending_signals sigqueue;
+static pending_signals sigq;
 
 struct sigaction *global_sigs;
 
@@ -537,15 +537,15 @@ sig_clear (int target_sig)
   else
     {
       sigpacket *q;
-      sigpacket *save = sigqueue.save ();
-      sigqueue.reset ();
-      while ((q = sigqueue.next ()))
+      sigpacket *save = sigq.save ();
+      sigq.reset ();
+      while ((q = sigq.next ()))
 	if (q->si.si_signo == target_sig)
 	  {
 	    q->si.si_signo = __SIGDELETE;
 	    break;
 	  }
-      sigqueue.restore (save);
+      sigq.restore (save);
     }
   return;
 }
@@ -564,11 +564,11 @@ sigpending (sigset_t *mask)
 void __stdcall
 sig_dispatch_pending (bool fast)
 {
-  if (exit_state || GetCurrentThreadId () == sigtid || !sigqueue.start.next)
+  if (exit_state || GetCurrentThreadId () == sigtid || !sigq.start.next)
     {
 #ifdef DEBUGGING
-      sigproc_printf ("exit_state %d, cur thread id %p, sigtid %p, sigqueue.start.next %p",
-		      exit_state, GetCurrentThreadId (), sigtid, sigqueue.start.next);
+      sigproc_printf ("exit_state %d, cur thread id %p, sigtid %p, sigq.start.next %p",
+		      exit_state, GetCurrentThreadId (), sigtid, sigq.start.next);
 #endif
       return;
     }
@@ -1156,17 +1156,17 @@ wait_sig (VOID *self)
 	case __SIGPENDING:
 	  *pack.mask = 0;
 	  unsigned bit;
-	  sigqueue.reset ();
-	  while ((q = sigqueue.next ()))
+	  sigq.reset ();
+	  while ((q = sigq.next ()))
 	    if (myself->getsigmask () & (bit = SIGTOMASK (q->si.si_signo)))
 	      *pack.mask |= bit;
 	  break;
 	case __SIGFLUSH:
 	case __SIGFLUSHFAST:
-	  sigqueue.reset ();
-	  while ((q = sigqueue.next ()))
+	  sigq.reset ();
+	  while ((q = sigq.next ()))
 	    if (q->si.si_signo == __SIGDELETE || q->process () > 0)
-	      sigqueue.del ();
+	      sigq.del ();
 	  break;
 	default:
 	  if (pack.si.si_signo < 0)
@@ -1181,7 +1181,7 @@ wait_sig (VOID *self)
 		  if (!sigres)
 		    system_printf ("Failed to arm signal %d from pid %d", pack.sig, pack.pid);
 #endif
-		  sigqueue.add (pack);	// FIXME: Shouldn't add this in !sh condition
+		  sigq.add (pack);	// FIXME: Shouldn't add this in !sh condition
 		}
 	      if (sig == SIGCHLD)
 		proc_subproc (PROC_CLEARWAIT, 0);

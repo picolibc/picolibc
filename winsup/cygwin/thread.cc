@@ -2181,24 +2181,31 @@ pthread::join (pthread_t *thread, void **return_val)
       (*thread)->attr.joinable = PTHREAD_CREATE_DETACHED;
       (*thread)->mutex.unlock ();
 
-      switch (cancelable_wait ((*thread)->win32_obj_id, INFINITE, false, false))
-	{
-	case WAIT_OBJECT_0:
-	  if (return_val)
-	    *return_val = (*thread)->return_ptr;
-	  delete (*thread);
-	  break;
-	case WAIT_CANCELED:
-	  // set joined thread back to joinable since we got canceled
-	  (*thread)->joiner = NULL;
-	  (*thread)->attr.joinable = PTHREAD_CREATE_JOINABLE;
-	  joiner->cancel_self ();
-	  // never reached
-	  break;
-	default:
-	  // should never happen
-	  return EINVAL;
-	}
+      bool loop = false;
+      do
+	switch (cancelable_wait ((*thread)->win32_obj_id, INFINITE, false, true))
+	  {
+	  case WAIT_OBJECT_0:
+	    if (return_val)
+	      *return_val = (*thread)->return_ptr;
+	    delete (*thread);
+	    break;
+	  case WAIT_SIGNALED:
+	    _my_tls.call_signal_handler ();
+	    loop = true;
+	    break;
+	  case WAIT_CANCELED:
+	    // set joined thread back to joinable since we got canceled
+	    (*thread)->joiner = NULL;
+	    (*thread)->attr.joinable = PTHREAD_CREATE_JOINABLE;
+	    joiner->cancel_self ();
+	    // never reached
+	    break;
+	  default:
+	    // should never happen
+	    return EINVAL;
+	  }
+      while (loop);
     }
 
   return 0;

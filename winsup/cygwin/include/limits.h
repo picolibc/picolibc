@@ -147,6 +147,10 @@ details. */
 #undef PIPE_BUF
 #define PIPE_BUF 4096
 
+/* Maximum number of timer expiration overruns. */
+#undef TIMER_MAX
+#define TIMER_MAX 32
+
 /* POSIX values */
 /* These should never vary from one system type to another */
 /* They represent the minimum values that POSIX systems must support.
@@ -165,6 +169,7 @@ details. */
 #define _POSIX_STREAM_MAX	8
 #define _POSIX_TZNAME_MAX       3
 #define _POSIX_RTSIG_MAX	8
+#define _POSIX_TIMER_MAX	32
 
 #define RTSIG_MAX		_POSIX_RTSIG_MAX
 

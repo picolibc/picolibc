@@ -141,8 +141,8 @@ handle_sigprocmask (int sig, const sigset_t *set, sigset_t *oldset, sigset_t& op
   /* check that sig is in right range */
   if (sig < 0 || sig >= NSIG)
     {
-      set_errno (ESRCH);
-      syscall_printf ("SIG_ERR = sigprocmask signal %d out of range", sig);
+      set_errno (EINVAL);
+      syscall_printf ("signal %d out of range", sig);
       return -1;
     }
 
@@ -493,30 +493,54 @@ sigwaitinfo (const sigset_t *set, siginfo_t *info)
   pthread_testcancel ();
   HANDLE h;
   h = _my_tls.event = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
-  if (!_my_tls.event)
+  if (!h)
     {
       __seterrno ();
       return -1;
     }
 
   _my_tls.sigwait_mask = *set;
+  sig_dispatch_pending (true);
 
   int res;
-  switch (WaitForSingleObject (_my_tls.event, INFINITE))
+  switch (WaitForSingleObject (h, INFINITE))
     {
     case WAIT_OBJECT_0:
-      res = _my_tls.infodata.si_signo;
-      sigproc_printf ("returning sig %d", res);
-      if (info)
-	*info = _my_tls.infodata;
+      if (!sigismember (set, _my_tls.infodata.si_signo))
+	{
+	  set_errno (EINTR);
+	  res = -1;
+	}
+      else
+	{
+	  if (info)
+	    *info = _my_tls.infodata;
+	  res = _my_tls.infodata.si_signo;
+	  InterlockedExchange ((LONG *) &_my_tls.sig, (LONG) 0);
+	}
       break;
     default:
       __seterrno ();
       res = -1;
     }
-  _my_tls.event = NULL;
-  InterlockedExchange ((LONG *) &_my_tls.sig, (LONG) 0);
   CloseHandle (h);
-  sig_dispatch_pending ();
+  sigproc_printf ("returning sig %d", res);
   return res;
+}
+
+extern "C" int
+sigqueue (pid_t pid, int sig, const union sigval value)
+{
+  siginfo_t si;
+  pinfo dest (pid);
+  if (!dest)
+    {
+      set_errno (ESRCH);
+      return -1;
+    }
+  si.si_signo = sig;
+  si.si_code = SI_USER;
+  si.si_pid = si.si_uid = si.si_errno = 0;
+  si.si_value = value;
+  return sig_send (dest, si);
 }

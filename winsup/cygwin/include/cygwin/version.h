@@ -236,12 +236,13 @@ details. */
       109: Oh well.  Someone uses reent_data.
       110: Export clock_gettime, sigwaitinfo, timer_create, timer_delete,
            timer_settime
+      111: Export sigqueue, sighold.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 110
+#define CYGWIN_VERSION_API_MINOR 111
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

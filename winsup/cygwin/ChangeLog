@@ -1,3 +1,31 @@
+2004-02-25  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (setup_handler): Signal event for any sigwaitinfo if it
+	exists to force signal to be handled.  Zero event here to prevent
+	races.
+	* signal.cc (sigwaitinfo): Use local handle value for everything since
+	signal thread could zero event element at any time.  Detect when
+	awaking due to thread not in mask and set return value and errno
+	accordingly.  Don't set signal number to zero unless we've recognized
+	the signal.
+	* sigproc.cc (sigq): Rename from sigqueue throughout.
+
+	* thread.cc (pthread::join): Handle signals received while waiting for
+	thread to terminate.
+
+2004-02-25  Christopher Faylor  <cgf@redhat.com>
+
+	* cygwin.din: Export sighold, sigqueue.
+	* exceptions.cc (sighold): Define new function.
+	* signal.cc (handle_sigprocmask): Set correct errno for invalid signal.
+	Simplify debugging output.
+	(sigqueue): Define new function.
+	* include/cygwin/signal.h (sighold): Declare new function.
+	(sigqueue): Ditto.
+	* include/cygwin/version.h: Bump API minor version number.
+	* include/limits.h (TIMER_MAX): Define.
+	(_POSIX_TIMER_MAX): Ditto.
+
 2004-02-25  Brian Ford <ford@vss.fsi.com>,
 	    Corinna Vinschen  <corinna@vinschen.de>
 

@@ -1225,6 +1225,8 @@ sigaddset SIGFE
 sigdelset SIGFE
 sigemptyset NOSIGFE
 sigfillset NOSIGFE
+sighold SIGFE
+sigqueue SIGFE
 siginterrupt SIGFE
 sigismember SIGFE
 signal SIGFE
