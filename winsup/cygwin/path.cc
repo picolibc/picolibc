@@ -170,6 +170,17 @@ path_conv::check (const char *src, unsigned opt,
   symlink_info sym;
   bool need_directory = 0;
 
+#if 0
+  static path_conv last_path_conv;
+  static char last_src[MAX_PATH + 1];
+
+  if (*last_src && strcmp (last_src, src) == 0)
+    {
+      *this = last_path_conv;
+      return;
+    }
+#endif
+
   char *rel_path, *full_path;
 
   if (!(opt & PC_NULLEMPTY))
@@ -392,6 +403,14 @@ out:
 		    tmp_buf, full_path, volflags & FS_PERSISTENT_ACLS);
       set_has_acls (volflags & FS_PERSISTENT_ACLS);
     }
+
+#if 0
+  if (!error)
+    {
+      last_path_conv = *this;
+      strcpy (last_src, src);
+    }
+#endif
 }
 
 #define deveq(s) (strcasematch (name, (s)))

@@ -1,3 +1,11 @@
+Sun Oct 22 23:33:00 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* fork.cc (fork): Set sigframe here, since it can pause for a
+	considerable amount of time.
+	* environ.cc (_addenv): Add debugging.
+	* fhandler.cc: Eliminate unneeded include.
+	* smallprint.c: Ditto.
+
 Sun Oct 22 12:07:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* pinfo.cc (pinfo_init): Eliminate call to `set_process_privileges'.

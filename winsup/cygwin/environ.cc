@@ -234,7 +234,12 @@ _addenv (const char *name, const char *value, int overwrite)
 					     __cygwin_environ, sz);
 
       if (!__cygwin_environ)
-	return -1;		/* Oops.  No more memory. */
+	{
+#ifdef DEBUGING
+	  try_to_debug ();
+	  return -1;		/* Oops.  No more memory. */
+#endif
+	}
 
       __cygwin_environ[offset + 1] = NULL;	/* NULL terminate. */
       update_envptrs ();	/* Update any local copies of 'environ'. */

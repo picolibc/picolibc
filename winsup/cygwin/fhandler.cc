@@ -14,7 +14,6 @@ details. */
 #include <unistd.h>
 #include <stdlib.h>
 #include "cygheap.h"
-#include <string.h>
 #include <sys/cygwin.h>
 #include <signal.h>
 #include "cygerrno.h"

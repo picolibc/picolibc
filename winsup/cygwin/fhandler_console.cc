@@ -1152,7 +1152,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	{
 	case normal:
 	  src = write_normal (src, end);
-	  if (src == 0) /* write_normal fail */
+	  if (!src) /* write_normal failed */
 	    return -1;
 	  break;
 	case gotesc:

@@ -580,6 +580,7 @@ fork ()
   } grouped;
 
   MALLOC_CHECK;
+  sigframe thisframe (mainthread);
 
   debug_printf ("entering");
   grouped.hParent = grouped.first_dll = NULL;
