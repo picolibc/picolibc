@@ -188,7 +188,6 @@ pathmatch (const char *path1, const char *path2)
 #define isslash(c) ((c) == '/')
 
 /* Normalize a POSIX path.
-   \'s are converted to /'s in the process.
    All duplicate /'s, except for 2 leading /'s, are deleted.
    The result is 0 for success, or an errno error value.  */
 
@@ -200,14 +199,11 @@ normalize_posix_path (const char *src, char *dst)
 
   syscall_printf ("src %s", src);
 
+  const char *in_src = src;
+  char *in_dst = dst;
+
   if (isdrive (src) || slash_unc_prefix_p (src))
-    {
-      int err = normalize_win32_path (src, dst);
-      if (!err)
-	for (char *p = dst; (p = strchr (p, '\\')); p++)
-	  *p = '/';
-      return err;
-    }
+    goto win32_path;
 
   if (!isslash (src[0]))
     {
@@ -247,6 +243,8 @@ normalize_posix_path (const char *src, char *dst)
 
   while (*src)
     {
+      if (*src == '\\')
+	goto win32_path;
       /* Strip runs of /'s.  */
       if (!isslash (*src))
 	*dst++ = *src++;
@@ -309,6 +307,13 @@ done:
 
   debug_printf ("%s = normalize_posix_path (%s)", dst_start, src_start);
   return 0;
+
+win32_path:
+  int err = normalize_win32_path (in_src, in_dst);
+  if (!err)
+    for (char *p = in_dst; (p = strchr (p, '\\')); p++)
+      *p = '/';
+  return err;
 }
 
 inline void

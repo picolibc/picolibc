@@ -48,31 +48,11 @@ details. */
 
 #define NZOMBIES	256
 
-class pending_signals
-{
-  sigpacket sigs[NSIG + 1];
-  sigpacket start;
-  sigpacket *end;
-  sigpacket *prev;
-  sigpacket *curr;
-  int empty;
-public:
-  void reset () {curr = &start; prev = &start;}
-  void add (sigpacket&);
-  void del ();
-  sigpacket *next ();
-  sigpacket *save () const {return curr;}
-  void restore (sigpacket *saved) {curr = saved;}
-  friend void __stdcall sig_dispatch_pending (bool);
-};
-
-static pending_signals sigq;
-
-struct sigaction *global_sigs;
-
 /*
  * Global variables
  */
+struct sigaction *global_sigs;
+
 const char *__sp_fn ;
 int __sp_ln;
 
@@ -114,15 +94,37 @@ muto NO_COPY *sync_proc_subproc = NULL;	// Control access to subproc stuff
 
 DWORD NO_COPY sigtid = 0;		// ID of the signal thread
 
-/* Functions
- */
+/* Function declarations */
 static int __stdcall checkstate (waitq *) __attribute__ ((regparm (1)));
 static __inline__ bool get_proc_lock (DWORD, DWORD);
 static void __stdcall remove_zombie (int);
-static DWORD WINAPI wait_sig (VOID *arg);
 static int __stdcall stopped_or_terminated (waitq *, _pinfo *);
 static DWORD WINAPI wait_subproc (VOID *);
+static DWORD WINAPI wait_sig (VOID *arg);
 
+/* wait_sig bookkeeping */
+
+class pending_signals
+{
+  sigpacket sigs[NSIG + 1];
+  sigpacket start;
+  sigpacket *end;
+  sigpacket *prev;
+  sigpacket *curr;
+public:
+  void reset () {curr = &start; prev = &start;}
+  void add (sigpacket&);
+  void del ();
+  sigpacket *next ();
+  sigpacket *save () const {return curr;}
+  void restore (sigpacket *saved) {curr = saved;}
+  friend void __stdcall sig_dispatch_pending (bool);
+  friend DWORD WINAPI wait_sig (VOID *arg);
+};
+
+static pending_signals sigq;
+
+/* Functions */
 void __stdcall
 sigalloc ()
 {
@@ -1012,25 +1014,13 @@ talktome ()
 	pids[i]->commune_recv ();
 }
 
-/* Process signals by waiting for a semaphore to become signaled.
-   Then scan an in-memory array representing queued signals.
-   Executes in a separate thread.
-
-   Signals sent from this process are sent a completion signal so
-   that returns from kill/raise do not occur until the signal has
-   has been handled, as per POSIX.  */
-
 void
 pending_signals::add (sigpacket& pack)
 {
   sigpacket *se;
-  for (se = start.next; se; se = se->next)
-    if (se->si.si_signo == pack.si.si_signo)
-      return;
-  while (sigs[empty].si.si_signo)
-    if (++empty == NSIG)
-      empty = 0;
-  se = sigs + empty;
+  if (sigs[pack.si.si_signo].si.si_signo)
+    return;
+  se = sigs + pack.si.si_signo;
   *se = pack;
   se->mask = &myself->getsigmask ();
   se->next = NULL;
@@ -1039,7 +1029,6 @@ pending_signals::add (sigpacket& pack)
   end = se;
   if (!start.next)
     start.next = se;
-  empty++;
 }
 
 void
@@ -1053,7 +1042,6 @@ pending_signals::del ()
 #endif
   if (end == curr)
     end = prev;
-  empty = curr - sigs;
   curr = next;
 }
 
@@ -1174,7 +1162,7 @@ wait_sig (VOID *self)
 	default:
 	  if (pack.si.si_signo < 0)
 	    sig_clear (-pack.si.si_signo);
-	  else
+	  else if (!sigq.sigs[pack.si.si_signo].si.si_signo)
 	    {
 	      int sig = pack.si.si_signo;
 	      int sigres = pack.process ();

@@ -349,16 +349,21 @@ extern "C" int
 sigaction (int sig, const struct sigaction *newact, struct sigaction *oldact)
 {
   sig_dispatch_pending ();
-  sigproc_printf ("signal %d, newact %p, oldact %p", sig, newact, oldact);
   /* check that sig is in right range */
   if (sig < 0 || sig >= NSIG)
     {
       set_errno (EINVAL);
+      sigproc_printf ("signal %d, newact %p, oldact %p", sig, newact, oldact);
       syscall_printf ("SIG_ERR = sigaction signal %d out of range", sig);
       return -1;
     }
 
   struct sigaction oa = global_sigs[sig];
+
+  if (newact)
+    sigproc_printf ("signal %d, newact %p (handler %p), oa %p", sig, newact, newact->sa_handler, oa, oa.sa_handler);
+  else
+    sigproc_printf ("signal %d, newact %p, oa %p", sig, newact, oa, oa.sa_handler);
 
   if (newact)
     {

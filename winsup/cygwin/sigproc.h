@@ -66,7 +66,6 @@ int __stdcall handle_sigprocmask (int sig, const sigset_t *set,
   __attribute__ ((regparm (3)));
 
 extern "C" void __stdcall reset_signal_arrived ();
-extern "C" int __stdcall call_signal_handler_now ();
 void __stdcall sig_clear (int) __attribute__ ((regparm (1)));
 void __stdcall sig_set_pending (int) __attribute__ ((regparm (1)));
 int __stdcall handle_sigsuspend (sigset_t);

@@ -1,3 +1,16 @@
+2004-03-25  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (normalize_posix_path): Reorganize to short circuit to DOS
+	path handling whenever a '\' is detected.
+
+	* signal.cc (sigaction): Make strace output more informative.
+	* sigproc.cc (pending_signals::add): Just index directly into signal
+	array rather than treating the array as a heap.
+	(pending_signals::del): Ditto.
+	(wait_sig): Don't send signal if we already have a similar signal
+	queued.
+	* sigproc.h (call_signal_handler_now): Remove obsolete declaration.
+
 2004-03-23  Gerd Spalink  <Gerd.Spalink@t-online.de>
 
 	* fhandler_dsp.cc (fhandler_dev_dsp::write): Remove type
