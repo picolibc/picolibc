@@ -1,3 +1,7 @@
+2001-09-05  Tom Rix <trix@redhat.com>
+
+	* xcoff.h : Add XCOFF_SYSCALL32 and XCOFF_SYSCALL64 hash table flags.
+	
 2001-08-27  Andreas Jaeger  <aj@suse.de>
 
 	* xcoff.h (struct __rtinit): Make proper prototype for rtl.
