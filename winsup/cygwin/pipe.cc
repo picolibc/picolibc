@@ -19,7 +19,6 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "thread.h"
-#include "sigproc.h"
 #include "pinfo.h"
 
 static unsigned pipecount;

@@ -18,7 +18,6 @@ details. */
 #include "cygerrno.h"
 #include "security.h"
 #include "fhandler.h"
-#include "sigproc.h"
 #include "pinfo.h"
 #include "path.h"
 #include "shared_info.h"
@@ -157,7 +156,6 @@ fhandler_process::open (path_conv *pc, int flags, mode_t mode)
 {
   int process_file_no = -1, pid;
   winpids pids;
-  _pinfo *p;
 
   int res = fhandler_virtual::open (pc, flags, mode);
   if (!res)
@@ -218,29 +216,23 @@ fhandler_process::open (path_conv *pc, int flags, mode_t mode)
       res = 0;
       goto out;
     }
-  for (unsigned i = 0; i < pids.npids; i++)
+
+  {
+  pinfo p (pid);
+  if (!p)
     {
-      p = pids[i];
-
-      if (!proc_exists (p))
-	continue;
-
-      if (p->pid == pid)
-	goto found;
+      set_errno (ENOENT);
+      res = 0;
+      goto out;
     }
-  set_errno (ENOENT);
-  res = 0;
-  goto out;
-found:
-  fileid = process_file_no;
-  saved_pid = pid;
-  saved_p = p;
-  fill_filebuf ();
+
+  fill_filebuf (p);
 
   if (flags & O_APPEND)
     position = filesize;
   else
     position = 0;
+  }
 
 success:
   res = 1;
@@ -252,15 +244,8 @@ out:
 }
 
 void
-fhandler_process::fill_filebuf ()
+fhandler_process::fill_filebuf (pinfo& p)
 {
-  // has this process gone away?
-  if (!proc_exists (saved_p) || saved_p->pid != saved_pid)
-    {
-      if (filebuf)
-	cfree(filebuf);
-      filesize = 0; bufalloc = (size_t) -1;
-    }
   switch (fileid)
     {
     case PROCESS_UID:
@@ -276,22 +261,22 @@ fhandler_process::fill_filebuf ()
 	switch (fileid)
 	  {
 	  case PROCESS_PPID:
-	    num = saved_p->ppid;
+	    num = p->ppid;
 	    break;
 	  case PROCESS_UID:
-	    num = saved_p->uid;
+	    num = p->uid;
 	    break;
 	  case PROCESS_PGID:
-	    num = saved_p->pgid;
+	    num = p->pgid;
 	    break;
 	  case PROCESS_SID:
-	    num = saved_p->sid;
+	    num = p->sid;
 	    break;
 	  case PROCESS_GID:
-	    num = saved_p->gid;
+	    num = p->gid;
 	    break;
 	  case PROCESS_CTTY:
-	    num = saved_p->ctty;
+	    num = p->ctty;
 	    break;
 	  default: // what's this here for?
 	    num = 0;
@@ -305,11 +290,11 @@ fhandler_process::fill_filebuf ()
       {
 	if (!filebuf)
 	filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = MAX_PATH);
-	if (saved_p->process_state & (PID_ZOMBIE | PID_EXITED))
+	if (p->process_state & (PID_ZOMBIE | PID_EXITED))
 	  strcpy (filebuf, "<defunct>");
 	else
 	  {
-	    mount_table->conv_to_posix_path (saved_p->progname, filebuf, 1);
+	    mount_table->conv_to_posix_path (p->progname, filebuf, 1);
 	    int len = strlen (filebuf);
 	    if (len > 4)
 	      {
@@ -325,16 +310,16 @@ fhandler_process::fill_filebuf ()
       {
 	if (!filebuf)
 	filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 40);
-	__small_sprintf (filebuf, "%d\n", saved_p->dwProcessId);
+	__small_sprintf (filebuf, "%d\n", p->dwProcessId);
 	filesize = strlen (filebuf);
 	break;
       }
     case PROCESS_WINEXENAME:
       {
-	int len = strlen (saved_p->progname);
+	int len = strlen (p->progname);
 	if (!filebuf)
 	filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = (len + 2));
-	strcpy (filebuf, saved_p->progname);
+	strcpy (filebuf, p->progname);
 	filebuf[len] = '\n';
 	filesize = len + 1;
 	break;
@@ -343,23 +328,23 @@ fhandler_process::fill_filebuf ()
       {
 	if (!filebuf)
 	  filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 2048);
-	filesize = format_process_status (saved_p, filebuf, bufalloc);
+	filesize = format_process_status (p, filebuf, bufalloc);
 	break;
       }
     case PROCESS_STAT:
       {
 	if (!filebuf)
 	  filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 2048);
-	filesize = format_process_stat (saved_p, filebuf, bufalloc);
+	filesize = format_process_stat (p, filebuf, bufalloc);
 	break;
       }
     case PROCESS_STATM:
       {
 	if (!filebuf)
 	  filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 2048);
-	filesize = format_process_statm (saved_p, filebuf, bufalloc);
+	filesize = format_process_statm (p, filebuf, bufalloc);
 	break;
-    }
+      }
     }
 }
 

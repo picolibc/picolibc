@@ -37,7 +37,6 @@ details. */
 #include <assert.h>
 #include <stdlib.h>
 #include <syslog.h>
-#include "sigproc.h"
 #include "pinfo.h"
 #include "perprocess.h"
 #include "security.h"

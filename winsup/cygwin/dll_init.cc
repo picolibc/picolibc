@@ -18,6 +18,7 @@ details. */
 #include "path.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "pinfo.h"
 
 extern void __stdcall check_sanity_and_sync (per_process *);
 
@@ -183,6 +184,9 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
 void
 dll_list::detach (dll *d)
 {
+  if (!myself || myself->process_state == PID_EXITED)
+    return;
+
   if (d->count <= 0)
     system_printf ("WARNING: try to detach an already detached dll ...\n");
   else if (--d->count == 0)

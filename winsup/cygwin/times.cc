@@ -20,7 +20,6 @@ details. */
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"
-#include "sigproc.h"
 #include "pinfo.h"
 #include "hires.h"
 

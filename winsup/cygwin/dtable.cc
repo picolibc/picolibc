@@ -24,7 +24,6 @@ details. */
 
 #define USE_SYS_TYPES_FD_SET
 #include <winsock.h>
-#include "sigproc.h"
 #include "pinfo.h"
 #include "cygerrno.h"
 #include "perprocess.h"

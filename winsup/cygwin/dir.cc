@@ -18,7 +18,6 @@ details. */
 #define _COMPILING_NEWLIB
 #include <dirent.h>
 
-#include "sigproc.h"
 #include "pinfo.h"
 #include "cygerrno.h"
 #include "security.h"

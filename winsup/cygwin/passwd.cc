@@ -18,7 +18,6 @@ details. */
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
-#include "sigproc.h"
 #include "pinfo.h"
 #include "cygheap.h"
 #include <sys/termios.h>

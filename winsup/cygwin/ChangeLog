@@ -1,3 +1,22 @@
+2002-06-02  Christopher Faylor  <cgf@redhat.com>
+
+	Remove unneeded sigproc.h includes throughout.
+	* fhandler.h (fhandler_proc::fill_filebuf): Take a pinfo argument.
+	* fhandler_proc.cc (fhandler_proc::get_proc_fhandler): Simplify search
+	for given pid.
+	(fhandler_proc::readdir): Assume that pid exists if it shows up in the
+	winpid list.
+	* fhandler_process.cc (fhandler_process::open): Simplify search for
+	given pid.  Call fill_filebuf with pinfo argument.
+	(fhandler_process::fill_filebuf): Pass pinfo here and assume that it
+	exists.
+	* pinfo.h (pinfo::remember): Define differently if sigproc.h is not
+	included.
+
+2002-06-02  Christopher Faylor  <cgf@redhat.com>
+
+	* dll_init.cc (dll_list::detach): Don't run destructor on exit.
+
 2002-06-01  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler.cc (fhandler_base::fstat): Move dev and ino calculation into

@@ -8,6 +8,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#ifndef _PINFO_H
+#define _PINFO_H
 /* Signal constants (have to define them here, unfortunately) */
 
 enum
@@ -152,7 +154,11 @@ public:
   _pinfo *operator * () const {return procinfo;}
   operator _pinfo * () const {return procinfo;}
   // operator bool () const {return (int) h;}
+#ifdef _SIGPROC_H
   int remember () {destroy = 0; return proc_subproc (PROC_ADDCHILD, (DWORD) this);}
+#else
+  int remember () {system_printf ("remember is not here"); return 0;}
+#endif
   HANDLE shared_handle () {return h;}
 };
 
@@ -206,3 +212,4 @@ int __stdcall fixup_shms_after_fork ();
 
 void __stdcall fill_rusage (struct rusage *, HANDLE);
 void __stdcall add_rusage (struct rusage *, struct rusage *);
+#endif /*_PINFO_H*/

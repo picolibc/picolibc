@@ -19,7 +19,6 @@ details. */
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"
-#include "sigproc.h"
 #include "pinfo.h"
 #include "dtable.h"
 #include "cygheap.h"
@@ -101,34 +100,24 @@ fhandler_proc::get_proc_fhandler (const char *path)
 	return proc_fhandlers[i];
     }
 
-  int pid = atoi (path);
-  winpids pids;
-  for (unsigned i = 0; i < pids.npids; i++)
-    {
-      _pinfo *p = pids[i];
+  if (pinfo (atoi (path)))
+    return FH_PROCESS;
 
-      if (!proc_exists (p))
-	continue;
+  bool has_subdir = false;
+  while (*path)
+    if (SLASH_P (*path++))
+      {
+	has_subdir = true;
+	break;
+      }
 
-      if (p->pid == pid)
-	return FH_PROCESS;
-    }
-
-    bool has_subdir = false;
-    while (*path)
-      if (SLASH_P (*path++))
-	{
-	  has_subdir = true;
-	  break;
-	}
-
-    if (has_subdir)
-      /* The user is trying to access a non-existent subdirectory of /proc. */
-      return FH_BAD;
-    else
-      /* Return FH_PROC so that we can return EROFS if the user is trying to create
-	 a file. */
-      return FH_PROC;
+  if (has_subdir)
+    /* The user is trying to access a non-existent subdirectory of /proc. */
+    return FH_BAD;
+  else
+    /* Return FH_PROC so that we can return EROFS if the user is trying to create
+       a file. */
+    return FH_PROC;
 }
 
 /* Returns 0 if path doesn't exist, >0 if path is a directory,
@@ -203,20 +192,12 @@ fhandler_proc::readdir (DIR * dir)
       winpids pids;
       int found = 0;
       for (unsigned i = 0; i < pids.npids; i++)
-	{
-	  _pinfo *p = pids[i];
-
-	  if (!proc_exists (p))
-	    continue;
-
-	  if (found == dir->__d_position - PROC_LINK_COUNT)
-	    {
-	      __small_sprintf (dir->__d_dirent->d_name, "%d", p->pid);
-	      dir->__d_position++;
-	      return dir->__d_dirent;
-	    }
-	  found++;
-	}
+	if (found++ == dir->__d_position - PROC_LINK_COUNT)
+	  {
+	    __small_sprintf (dir->__d_dirent->d_name, "%d", pids[i]->pid);
+	    dir->__d_position++;
+	    return dir->__d_dirent;
+	  }
       set_errno (ENMFILE);
       return NULL;
     }

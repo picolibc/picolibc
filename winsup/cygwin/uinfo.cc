@@ -19,7 +19,6 @@ details. */
 #include <lm.h>
 #include <errno.h>
 #include <sys/cygwin.h>
-#include "sigproc.h"
 #include "pinfo.h"
 #include "security.h"
 #include "fhandler.h"

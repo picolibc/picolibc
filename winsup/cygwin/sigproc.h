@@ -8,6 +8,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#ifndef _SIGPROC_H
+#define _SIGPROC_H
 #include <signal.h>
 
 #define EXIT_SIGNAL	 0x010000
@@ -124,3 +126,4 @@ extern char myself_nowait_nonmain_dummy[];
 
 #define myself_nowait ((_pinfo *)myself_nowait_dummy)
 #define myself_nowait_nonmain ((_pinfo *)myself_nowait_nonmain_dummy)
+#endif /*_SIGPROC_H*/
