@@ -61,8 +61,8 @@ IDLE_PRIORITY_CLASS has it stay at that priority.  Note that in the
 Win32 API, there are 32 priorities.  So currently we only give access
 to four of these through <function>nice</function>.
 
-<para> <function>seteuid</function>, <function>setegid</function>, and
-<function>settimeofday</function> always return 0 and sets errno to
+<para> <function>seteuid</function> and <function>setegid</function>
+always return 0 and set errno to
 ENOSYS.</para>
 
 <para><function>vfork</function> just calls
