@@ -56,7 +56,7 @@ _fcntl (int fd, int cmd,...)
 {
   void *arg = NULL;
   va_list args;
-  struct __flock32 *src;
+  struct __flock32 *src = NULL;
   struct __flock64 dst;
 
   va_start (args, cmd);
@@ -64,7 +64,7 @@ _fcntl (int fd, int cmd,...)
   va_end (args);
   if (cmd == F_GETLK || cmd == F_SETLK || cmd == F_SETLKW)
     {
-      src = (struct __flock32 *)arg;
+      src = (struct __flock32 *) arg;
       dst.l_type = src->l_type;
       dst.l_whence = src->l_whence;
       dst.l_start = src->l_start;
@@ -79,7 +79,7 @@ _fcntl (int fd, int cmd,...)
       src->l_whence = dst.l_whence;
       src->l_start = dst.l_start;
       src->l_len = dst.l_len;
-      src->l_pid = (short)dst.l_pid;
+      src->l_pid = (short) dst.l_pid;
     }
   return res;
 }

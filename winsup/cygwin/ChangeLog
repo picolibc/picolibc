@@ -1,3 +1,7 @@
+2003-12-02  Christopher Faylor  <cgf@redhat.com>
+
+	* fcntl.cc (_fcntl): Silence a compiler warning.
+
 2003-12-02  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* pinfo.cc (pinfo::init): Use shared_name to construct the mapname.
