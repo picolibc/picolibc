@@ -369,6 +369,8 @@ static const struct pa_opcode pa_opcodes[] =
 { "blr",	0xe8004000, 0xfc00e001, "nx,b", pa10},
 { "bv",		0xe800c000, 0xfc00fffd, "nx(b)", pa10},
 { "bv",		0xe800c000, 0xfc00fffd, "n(b)", pa10},
+{ "be",		0xe4000000, 0xfc000000, "lnz(S,b)", pa10, FLAG_STRICT},
+{ "be",		0xe0000000, 0xfc000000, "nz(S,b)", pa10, FLAG_STRICT},
 { "be",		0xe0000000, 0xfc000000, "nz(S,b)", pa10},
 { "ble",	0xe4000000, 0xfc000000, "nz(S,b)", pa10},
 { "movb",	0xc8000000, 0xfc000000, "?ynx,b,w", pa10},
