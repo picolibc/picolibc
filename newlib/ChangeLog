@@ -1,5 +1,14 @@
 2004-04-23  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/machine/powerpc/vfscanf.c (NNZDIGITS): New define.
+	(__svfscanf_r): In integer conversions, leave out leading zeroes
+	which are not part of a base prefix.
+	Keep track of width truncation to fit into buf, not counting left-out
+	zeroes against width till the truncation has been compensated for.
+	This is based on Joern's patch of 04/21 for libc/stdio/vfscanf.c.
+
+2004-04-23  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/include/stdio.h: (_ftell_r, _fseek_r): New prototypes.
 
 2004-04-23  Artem B. Bityuckiy  <abitytsky@softminecorp.com>

@@ -153,9 +153,9 @@ extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
 #define	LONG		0x01	/* l: long or double */
 #define	LONGDBL		0x02	/* L: long double or long long */
 #define	SHORT		0x04	/* h: short */
-#define	SUPPRESS	0x08	/* suppress assignment */
-#define	POINTER		0x10	/* weird %p pointer (`fake hex') */
-#define	NOSKIP		0x20	/* do not skip blanks */
+#define	SUPPRESS	0x10	/* suppress assignment */
+#define	POINTER		0x20	/* weird %p pointer (`fake hex') */
+#define	NOSKIP		0x40	/* do not skip blanks */
 
 /*
  * The following are used in numeric conversions only:
@@ -163,18 +163,19 @@ extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
  * SIGNOK, NDIGITS, PFXOK, and NZDIGITS are for integral.
  */
 
-#define	SIGNOK		0x40	/* +/- is (still) legal */
-#define	NDIGITS		0x80	/* no digits detected */
+#define	SIGNOK		0x80	/* +/- is (still) legal */
+#define	NDIGITS		0x100	/* no digits detected */
 
-#define	DPTOK		0x100	/* (float) decimal point is still legal */
-#define	EXPOK		0x200	/* (float) exponent (e+3, etc) still legal */
+#define	DPTOK		0x200	/* (float) decimal point is still legal */
+#define	EXPOK		0x400	/* (float) exponent (e+3, etc) still legal */
 
-#define	PFXOK		0x100	/* 0x prefix is (still) legal */
-#define	NZDIGITS	0x200	/* no zero digits detected */
+#define	PFXOK		0x200	/* 0x prefix is (still) legal */
+#define	NZDIGITS	0x400	/* no zero digits detected */
+#define	NNZDIGITS	0x800	/* no non-zero digits detected */
 
-#define	VECTOR		0x400	/* v: vector */
-#define	FIXEDPOINT	0x800	/* r/R: fixed-point */
-#define	SIGNED  	0x1000	/* r: signed fixed-point */
+#define	VECTOR		0x2000	/* v: vector */
+#define	FIXEDPOINT	0x4000	/* r/R: fixed-point */
+#define	SIGNED  	0x8000	/* r: signed fixed-point */
 
 /*
  * Conversion types.
@@ -798,18 +799,19 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	  continue;
 
 	case CT_INT:
-	  /* scan an integer as if by strtol/strtoul */
+	  unsigned int_width_left = 0;
 	  int_width = width;
 #ifdef hardway
 	  if (int_width == 0 || int_width > sizeof (buf) - 1)
-	    int_width = sizeof (buf) - 1;
 #else
 	  /* size_t is unsigned, hence this optimisation */
-	  if (--int_width > sizeof (buf) - 2)
-	    int_width = sizeof (buf) - 2;
-	  int_width++;
+	  if (int_width - 1 > sizeof (buf) - 2)
 #endif
-	  flags |= SIGNOK | NDIGITS | NZDIGITS;
+	    {
+	      int_width_left = width - (sizeof (buf) - 1);
+	      int_width = sizeof (buf) - 1;
+	    }
+	  flags |= SIGNOK | NDIGITS | NZDIGITS | NNZDIGITS;
 	  for (p = buf; int_width; int_width--)
 	    {
 	      c = *fp->_p;
@@ -829,16 +831,25 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 		   * will turn it off if we have scanned any nonzero digits).
 		   */
 		case '0':
+		  if (! (flags & NNZDIGITS))
+		    goto ok;
 		  if (base == 0)
 		    {
 		      base = 8;
 		      flags |= PFXOK;
 		    }
 		  if (flags & NZDIGITS)
-		    flags &= ~(SIGNOK | NZDIGITS | NDIGITS);
-		  else
-		    flags &= ~(SIGNOK | PFXOK | NDIGITS);
-		  goto ok;
+		    {
+		      flags &= ~(SIGNOK | NZDIGITS | NDIGITS);
+		      goto ok;
+		    }
+		  flags &= ~(SIGNOK | PFXOK | NDIGITS);
+		  if (int_width_left)
+		    {
+		      int_width_left--;
+		      int_width++;
+		    }
+		  goto skip;
 
 		  /* 1 through 7 always legal */
 		case '1':
@@ -849,7 +860,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 		case '6':
 		case '7':
 		  base = basefix[base];
-		  flags &= ~(SIGNOK | PFXOK | NDIGITS);
+		  flags &= ~(SIGNOK | PFXOK | NDIGITS | NNZDIGITS);
 		  goto ok;
 
 		  /* digits 8 and 9 ok iff decimal or hex */
@@ -858,7 +869,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 		  base = basefix[base];
 		  if (base <= 8)
 		    break;	/* not legal here */
-		  flags &= ~(SIGNOK | PFXOK | NDIGITS);
+		  flags &= ~(SIGNOK | PFXOK | NDIGITS | NNZDIGITS);
 		  goto ok;
 
 		  /* letters ok iff hex */
@@ -877,7 +888,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 		  /* no need to fix base here */
 		  if (base <= 10)
 		    break;	/* not legal here */
-		  flags &= ~(SIGNOK | PFXOK | NDIGITS);
+		  flags &= ~(SIGNOK | PFXOK | NDIGITS | NNZDIGITS);
 		  goto ok;
 
 		  /* sign ok only as first character */
@@ -912,6 +923,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	       * c is legal: store it and look at the next.
 	       */
 	      *p++ = c;
+	    skip:
 	      if (--fp->_r > 0)
 		fp->_p++;
 	      else
@@ -1004,16 +1016,18 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	  long leading_zeroes = 0;
 	  long zeroes, exp_adjust;
 	  char *exp_start = NULL;
-	  int fl_width = width;
+	  unsigned fl_width = width;
+	  unsigned width_left = 0;
 #ifdef hardway
 	  if (fl_width == 0 || fl_width > sizeof (buf) - 1)
-	    fl_width = sizeof (buf) - 1;
 #else
 	  /* size_t is unsigned, hence this optimisation */
-	  if (--fl_width > sizeof (buf) - 2)
-	    fl_width = sizeof (buf) - 2;
-	  fl_width++;
+	  if (fl_width - 1 > sizeof (buf) - 2)
 #endif
+	    {
+	      width_left = fl_width - (sizeof (buf) - 1);
+	      fl_width = sizeof (buf) - 1;
+	    }
 	  flags |= SIGNOK | NDIGITS | DPTOK | EXPOK;
 	  zeroes = 0;
 	  exp_adjust = 0;
@@ -1032,6 +1046,11 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 		    {
 		      flags &= ~SIGNOK;
 		      zeroes++;
+		      if (width_left)
+			{
+			  width_left--;
+			  fl_width++;
+			}
 		      goto fskip;
 		    }
 		  /* Fall through.  */
