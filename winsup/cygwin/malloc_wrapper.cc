@@ -255,15 +255,20 @@ malloc_init ()
   new_muto (mallock);
 
 #ifndef MALLOC_DEBUG
-  /* Check if mallock is provided by application. If so, redirect all
+  /* Check if malloc is provided by application. If so, redirect all
      calls to malloc/free/realloc to application provided. This may
      happen if some other dll calls cygwin's malloc, but main code provides
      its own malloc */
   if (!user_data->forkee)
     {
       user_data->free (user_data->malloc (16));
-      if (!export_malloc_called)
-	use_internal_malloc = 0;
+      if (export_malloc_called)
+	malloc_printf ("using internal malloc");
+      else
+	{
+	  use_internal_malloc = 0;
+	  malloc_printf ("using external malloc");
+	}
     }
 #endif
 }

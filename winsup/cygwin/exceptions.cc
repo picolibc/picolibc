@@ -1200,4 +1200,5 @@ reset_signal_arrived ()
 {
   (void) ResetEvent (signal_arrived);
   sigproc_printf ("reset signal_arrived");
+if (_my_tls.stackptr > _my_tls.stack) debug_printf ("stackptr[-1] %p", _my_tls.stackptr[-1]);
 }

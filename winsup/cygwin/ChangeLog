@@ -1,3 +1,11 @@
+2004-03-03  Christopher Faylor  <cgf@redhat.com>
+
+	* gendef (sigreturn): Call stabilize_sig_stack to ensure that there are
+	no pending signals.  Restore edx later.
+	(sigdelayed): Save edx earlier.
+
+	* malloc_wrapper.cc (malloc_init): Add some more debugging output.
+
 2004-03-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_raw.cc (fhandler_dev_raw::raw_read): When reading with

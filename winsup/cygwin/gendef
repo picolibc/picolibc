@@ -128,8 +128,8 @@ __sigbe:
 2:	movl	\$-4,%eax				# now decrement aux stack
 	xadd	%eax,$tls::stackptr(%edx)		#  and get pointer
 	xorl	%ebx,%ebx
-	xchgl	%ebx,-4(%eax)				# 
-	xchgl	%ebx,8(%esp)
+	xchgl	%ebx,-4(%eax)				# get return address from signal stack
+	xchgl	%ebx,8(%esp)				# restore ebx/real return address
 	decl	$tls::stacklock(%edx)			# release lock
 	popl	%eax
 	popl	%edx
@@ -172,29 +172,47 @@ __ZN7_cygtls6lockedEv:
 	movl	$tls::pstacklock(%eax),%eax
 	ret
 
+	.extern	__ZN7_cygtls19call_signal_handlerEv
+stabilize_sig_stack:
+1:	movl	%fs:4,%edx
+	movl	\$1,%eax
+	lock	xchgl %eax,$tls::stacklock(%edx)
+	movl	%eax,$tls::spinning(%edx)		# flag if we are waiting for lock
+	orl	%eax,%eax
+	jz	2f
+	xorl	%eax,%eax
+	call	_low_priority_sleep
+	jmp	1b
+2:	cmpl	\$0,$tls::sig(%edx)
+	jz	3f
+	decl	$tls::stacklock(%edx)			# unlock
+	movl	\$-$tls::sizeof__cygtls,%eax		# point to beginning
+	addl	%edx,%eax				#  of tls block
+	call	__ZN7_cygtls19call_signal_handlerEv
+	jmp	1b
+3:	ret
+
 	.global	_sigreturn
 	.stabs	"sigreturn:F(0,1)",36,0,0,_sigreturn
 _sigreturn:
-	addl	\$4,%esp		# Remove argument
+	addl	\$4,%esp				# Remove argument
 	call	_set_process_mask\@4
 
-	movl	%fs:4,%ebx
+	call	stabilize_sig_stack
 
-#	cmpl	\$0,$tls::sig(%ebx)	# Did a signal come in?
-#	jnz	3f			# Yes, if non-zero
-
-1:	popl	%edx			# saved errno
-	testl	%edx,%edx		# Is it < 0
-	jl	2f			# yup.  ignore it
-	movl	$tls::errno_addr(%ebx),%eax
-	movl	%edx,(%eax)
+1:	popl	%ebx					# saved errno
+	testl	%ebx,%ebx				# Is it < 0
+	jl	2f					# yup.  ignore it
+	movl	$tls::errno_addr(%edx),%eax
+	movl	%ebx,(%eax)
 2:	popl	%eax
 	popl	%ebx
 	popl	%ecx
-	popl	%edx
 	popl	%edi
 	popl	%esi
 	popf
+	decl	$tls::stacklock(%edx)			# relinquish lock
+	popl	%edx
 	popl	%ebp
 	jmp	__sigbe
 
@@ -203,10 +221,10 @@ _sigreturn:
 _sigdelayed:
 	pushl	%ebp
 	movl	%esp,%ebp
+	pushl	%edx
 	pushf
 	pushl	%esi
 	pushl	%edi
-	pushl	%edx
 	pushl	%ecx
 	pushl	%ebx
 	pushl	%eax
@@ -235,26 +253,6 @@ EOF
 
 sub longjmp {
     return <<EOF;
-
-	.extern	__ZN7_cygtls19call_signal_handlerEv
-stabilize_sig_stack:
-1:	movl	%fs:4,%edx
-	movl	\$1,%eax
-	lock	xchgl %eax,$tls::stacklock(%edx)
-	movl	%eax,$tls::spinning(%edx)		# flag if we are waiting for lock
-	orl	%eax,%eax
-	jz	2f
-	xorl	%eax,%eax
-	call	_low_priority_sleep
-	jmp	1b
-2:	cmpl	\$0,$tls::sig(%edx)
-	jz	3f
-	decl	$tls::stacklock(%edx)			# unlock
-	movl	\$-$tls::sizeof__cygtls,%eax		# point to beginning
-	addl	%edx,%eax				#  of tls block
-	call	__ZN7_cygtls19call_signal_handlerEv
-	jmp	1b
-3:	ret
 
 	.globl	_setjmp
 _setjmp:
