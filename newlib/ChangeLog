@@ -1,5 +1,24 @@
 2002-07-23  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/include/string.h: Add mempcpy, strndup, and _strndup_r
+	prototypes.
+	* libc/stdlib/Makefile.am: Remove strdup.c and strdup_r.c.
+	* libc/stdlib/Makefile.in: Regenerated.
+	* libc/stdlib/strdup.c: Removed.
+	* libc/stdlib/strdup_r.c: Removed.
+	* libc/string/Makefile.am: Add strdup.c, strdup_r.c, memccpy.c,
+	mempcpy.c, strndup.c, and strndup_r.c.
+	* libc/string/Makefile.in: Regenerated.
+	* libc/string/memccpy.c: New file.
+	* libc/string/mempcpy.c: Ditto.
+	* libc/string/strndup.c: Ditto.
+	* libc/string/strndup_r.c: Ditto.
+	* libc/string/strdup.c: New file moved from stdlib.
+	* libc/string/strdup_r.c: Ditto.
+	* libc/string/strings.tex: Add memccpy and mempcpy documentation.
+
+2002-07-23  Jeff Johnston  <jjohnstn@redhat.com>
+
         * libc/include/stdio.h: Move fcloseall prototype within
         #ifndef _REENT_ONLY section.
         * libc/sys/linux/Makefile.am: Add new files.

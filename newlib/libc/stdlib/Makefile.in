@@ -173,8 +173,6 @@ LIB_SOURCES = \
 	setenv.c	\
 	setenv_r.c	\
 	srand48.c	\
-	strdup.c	\
-	strdup_r.c	\
 	strtod.c	\
 	strtol.c	\
 	strtoll.c	\
@@ -290,8 +288,7 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@putenv_r.$(OBJEXT) rand.$(OBJEXT) rand48.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@rand_r.$(OBJEXT) realloc.$(OBJEXT) seed48.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@setenv.$(OBJEXT) setenv_r.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@srand48.$(OBJEXT) strdup.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@strdup_r.$(OBJEXT) strtod.$(OBJEXT) strtol.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@srand48.$(OBJEXT) strtod.$(OBJEXT) strtol.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@strtoll.$(OBJEXT) strtoll_r.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@strtoul.$(OBJEXT) strtoull.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@strtoull_r.$(OBJEXT) system.$(OBJEXT) \
@@ -318,10 +315,10 @@ LTLIBRARIES =  $(noinst_LTLIBRARIES)
 @USE_LIBTOOL_TRUE@msize.lo mstats.lo mtrim.lo nrand48.lo on_exit.lo \
 @USE_LIBTOOL_TRUE@putenv.lo putenv_r.lo rand.lo rand48.lo rand_r.lo \
 @USE_LIBTOOL_TRUE@realloc.lo seed48.lo setenv.lo setenv_r.lo srand48.lo \
-@USE_LIBTOOL_TRUE@strdup.lo strdup_r.lo strtod.lo strtol.lo strtoll.lo \
-@USE_LIBTOOL_TRUE@strtoll_r.lo strtoul.lo strtoull.lo strtoull_r.lo \
-@USE_LIBTOOL_TRUE@system.lo valloc.lo wcstombs.lo wcstombs_r.lo \
-@USE_LIBTOOL_TRUE@wctomb.lo wctomb_r.lo
+@USE_LIBTOOL_TRUE@strtod.lo strtol.lo strtoll.lo strtoll_r.lo \
+@USE_LIBTOOL_TRUE@strtoul.lo strtoull.lo strtoull_r.lo system.lo \
+@USE_LIBTOOL_TRUE@valloc.lo wcstombs.lo wcstombs_r.lo wctomb.lo \
+@USE_LIBTOOL_TRUE@wctomb_r.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

@@ -67,8 +67,6 @@ LIB_SOURCES = \
 	setenv.c	\
 	setenv_r.c	\
 	srand48.c	\
-	strdup.c	\
-	strdup_r.c	\
 	strtod.c	\
 	strtol.c	\
 	strtoll.c	\
