@@ -1,3 +1,7 @@
+2000-05-04  Timothy Wall  <twall@cygnus.com>
+
+	* tic54x.h: New.
+
 2000-05-03  J.T. Conklin  <jtc@redback.com>
 
 	* ppc.h (PPC_OPCODE_ALTIVEC): New opcode flag for vector unit.
