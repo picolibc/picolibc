@@ -1,3 +1,7 @@
+2003-02-20  Daniel Jacobowitz  <drow@mvista.com>
+
+	* libiberty.h (lrealpath): Add declaration.
+
 2003-01-31  Grant Grundler  <grundler@dsl2.external.hp.com>
 
         * hppa.h (ldwa, ldda): Add ordered opcodes.
