@@ -2826,7 +2826,7 @@ typedef struct tagKBDLLHOOKSTRUCT {
 	DWORD time;
 	DWORD dwExtraInfo;
 } KBDLLHOOKSTRUCT, FAR *LPKBDLLHOOKSTRUCT, *PKBDLLHOOKSTRUCT;
-#if (WINVER >= 0x0500)
+#if (_WIN32_WINNT >= 0x0500 || _WIN32_WINDOWS >= 0x0410)
 typedef struct {
   UINT  cbSize;
   HWND  hwnd;

@@ -1,3 +1,7 @@
+2003-09-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/winuser.h (FLASHWINFO, PFLASHWINFO): Define for 98/Me, too.
+
 2003-09-25  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/version.def (LIBRARY): Quote name.
