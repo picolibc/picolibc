@@ -1,3 +1,8 @@
+2001-11-06  Christopher Faylor  <cgf@redhat.com>
+
+	* select.cc (fhandler_tty_slave::ready_for_read): Correct inverted
+	not_open test.
+
 2001-11-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (mmap_record::find_empty): Add input parameter check.
