@@ -750,10 +750,19 @@ dump_sysinfo ()
       switch (osversion.dwMinorVersion)
 	{
 	case 0:
-	  osname = (char *) "Win95";
+	  if (strchr(osversion.szCSDVersion, 'C'))
+	    osname = (char *) "Win95OSR2";
+	  else
+	    osname = (char *) "Win95";
 	  break;
-	case 1:
-	  osname = (char *) "Win98";
+	case 10:
+	  if (strchr(osversion.szCSDVersion, 'A'))
+	    osname = (char *) "Win98SE";
+	  else
+	    osname = (char *) "Win98";
+	  break;
+	case 90:
+	  osname = (char *) "WinME";
 	  break;
 	default:
 	  osname = (char *) "Win9X";
@@ -761,7 +770,15 @@ dump_sysinfo ()
 	}
       break;
     case VER_PLATFORM_WIN32_NT:
-      osname = (char *) "WinNT";
+      if (osversion.dwMajorVersion == 5)
+	{
+	  if (osversion.dwMinorVersion == 0)
+	    osname = (char *) "Win2000";
+	  else
+	    osname = (char *) "WinXP";
+        }
+      else
+	osname = (char *) "WinNT";
       break;
     default:
       osname = (char *) "uknown-os";
