@@ -1,5 +1,11 @@
 2002-12-26  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/commcat.h: Don't include windows.h or ole2.h ifdef
+	COM_NO_WINDOWS_H.
+	* include/unknwn.h: Ditto.
+	
+2002-12-26  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/imm.h (ImmGetCompositionFont[AW],
 	ImmSetCompositionFont[AW]): Add NOGDI guard.
 
