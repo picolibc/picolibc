@@ -1,3 +1,8 @@
+Thu May  3 10:44:16 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (handle_exceptions): Break out of "loop" if the
+	debugger doesn't seem to be attaching to our process.
+
 Wed May  2 20:18:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* autoload.cc: Use new definition of LoadDLLinitfunc throughout.

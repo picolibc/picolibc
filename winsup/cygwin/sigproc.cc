@@ -1144,7 +1144,7 @@ wait_sig (VOID *)
 
 	      if (sig > 0 && sig != SIGKILL && sig != SIGSTOP &&
 		  (sigismember (&myself->getsigmask (), sig) ||
-		  (sig != SIGCONT && ISSTATE (myself, PID_STOPPED))))
+		   (sig != SIGCONT && ISSTATE (myself, PID_STOPPED))))
 		{
 		  sigproc_printf ("signal %d blocked", sig);
 		  break;
@@ -1172,7 +1172,7 @@ wait_sig (VOID *)
 		  /* Need to decrement again to offset increment below since
 		     we really do want to decrement in this case. */
 		  InterlockedDecrement (myself->getsigtodo (sig));
-		  goto nextsig;
+		  goto nextsig;		/* FIXME: shouldn't this allow the loop to continue? */
 		}
 	    }
 

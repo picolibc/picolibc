@@ -1334,6 +1334,7 @@ socket_cleanup (select_record *, select_stuff *stuff)
       /* Set LINGER with 0 timeout for hard close */
       struct linger tmp = {1, 0}; /* On, 0 delay */
       (void) setsockopt (s, SOL_SOCKET, SO_LINGER, (char *)&tmp, sizeof(tmp));
+      (void) setsockopt (si->exitsock, SOL_SOCKET, SO_LINGER, (char *)&tmp, sizeof(tmp));
 
       /* Connecting to si->exitsock will cause any executing select to wake
 	 up.  When this happens then the exitsock condition will cause the
