@@ -1,5 +1,9 @@
 2004-06-03  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygserver.h (CYGWIN_SERVER_VERSION_API): Bump.
+
+2004-06-03  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/ipc.h (IPC_KEY_IS_SHMID): Redefine to a more sensible
 	value.
 
