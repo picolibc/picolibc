@@ -126,7 +126,7 @@
 #define EM_RCE		 39	/* Old name for MCore */
 #define EM_ARM		 40	/* ARM */
 #define EM_OLD_ALPHA	 41	/* Digital Alpha */
-#define EM_SH		 42	/* Renesas (formerly Hitachi) SH */
+#define EM_SH		 42	/* Renesas (formerly Hitachi) / SuperH SH */
 #define EM_SPARCV9	 43	/* SPARC v9 64-bit */
 #define EM_TRICORE	 44	/* Siemens Tricore embedded processor */
 #define EM_ARC		 45	/* ARC Cores */

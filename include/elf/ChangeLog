@@ -1,3 +1,7 @@
+2003-04-23  J"orn Rennecke <joern.rennecke@superh.com>
+
+	* common.h (EM_SH): Amend comment to refer to SuperH.
+
 2003-04-22  Kazuhiro Inaoka  <inaoka.kazuhiro@renesas.com>
 
 	* common.h: Replace references to Mitsubishi M32R with
