@@ -1,3 +1,8 @@
+2004-03-20  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* bfdlink.h (bfd_link_info): Correct comments for the
+	unresolved_syms_in_objects field.
+
 2004-03-12  Jakub Jelinek  <jakub@redhat.com>
 
 	* opcode/i386.h (i386_optab): Remove CpuNo64 from sysenter and
