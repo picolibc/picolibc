@@ -70,8 +70,8 @@ typedef unsigned long long uintmax_t;
 
 #define INT8_MIN (-128)
 #define INT16_MIN (-32768)
-#define INT32_MIN (-2147483647-1)
-#define INT64_MIN (-9223372036854775808LL)
+#define INT32_MIN (-2147483647 - 1)
+#define INT64_MIN (-9223372036854775807LL - 1LL)
 
 #define INT8_MAX (127)
 #define INT16_MAX (32767)
@@ -87,8 +87,8 @@ typedef unsigned long long uintmax_t;
 
 #define INT_LEAST8_MIN (-128)
 #define INT_LEAST16_MIN (-32768)
-#define INT_LEAST32_MIN (-2147483648)
-#define INT_LEAST64_MIN (-9223372036854775808LL)
+#define INT_LEAST32_MIN (-2147483647 - 1)
+#define INT_LEAST64_MIN (-9223372036854775807LL - 1LL)
 
 #define INT_LEAST8_MAX (127)
 #define INT_LEAST16_MAX (32767)
@@ -103,9 +103,9 @@ typedef unsigned long long uintmax_t;
 /* Limits of fastest minimum-width integer types */
 
 #define INT_FAST8_MIN (-128)
-#define INT_FAST16_MIN (-2147483648)
-#define INT_FAST32_MIN (-2147483648)
-#define INT_FAST64_MIN (-9223372036854775808LL)
+#define INT_FAST16_MIN (-2147483647 - 1)
+#define INT_FAST32_MIN (-2147483647 - 1)
+#define INT_FAST64_MIN (-9223372036854775807LL - 1LL)
 
 #define INT_FAST8_MAX (127)
 #define INT_FAST16_MAX (2147483647)
@@ -119,25 +119,25 @@ typedef unsigned long long uintmax_t;
 
 /* Limits of integer types capable of holding object pointers */
 
-#define INTPTR_MIN (-2147483648)
+#define INTPTR_MIN (-2147483647 - 1)
 #define INTPTR_MAX (2147483647)
 #define UINTPTR_MAX (4294967295UL)
 
 /* Limits of greatest-width integer types */
 
-#define INTMAX_MIN (-9223372036854775808)
-#define INTMAX_MAX (9223372036854775807)
+#define INTMAX_MIN (-9223372036854775807LL - 1LL)
+#define INTMAX_MAX (9223372036854775807LL)
 #define UINTMAX_MAX (18446744073709551615ULL)
 
 /* Limits of other integer types */
 
 #ifndef PTRDIFF_MIN
-#define PTRDIFF_MIN (-2147483648)
+#define PTRDIFF_MIN (-2147483647 - 1)
 #define PTRDIFF_MAX (2147483647)
 #endif
 
 #ifndef SIG_ATOMIC_MIN
-#define SIG_ATOMIC_MIN (-2147483648)
+#define SIG_ATOMIC_MIN (-2147483647 - 1)
 #endif
 #ifndef SIG_ATOMIC_MAX
 #define SIG_ATOMIC_MAX (2147483647)
@@ -158,7 +158,7 @@ typedef unsigned long long uintmax_t;
 #endif
 
 #ifndef WINT_MIN
-#define WINT_MIN (-2147483648)
+#define WINT_MIN (-2147483647 - 1)
 #define WINT_MAX (2147483647)
 #endif
 
