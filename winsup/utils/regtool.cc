@@ -155,7 +155,7 @@ translate (char *key)
 	    break;
 	  case 'x':
 	    if (!isxdigit (s[1]))
-	      c = 0;
+	      c = '0';
 	    else
 	      {
 		c = tohex (*++s);
@@ -401,8 +401,10 @@ cmd_set ()
 			  n + 1);
       break;
     case KT_AUTO:
-    default:
       rv = ERROR_SUCCESS;
+      break;
+    default:
+      rv = ERROR_INVALID_CATEGORY;
       break;
     }
 
