@@ -2,7 +2,7 @@
 
 @title The Cygwin FAQ
 
-@subtitle (Only partially updated for the latest net release.)
+@subtitle (Not completely updated for the latest net release, but still useful!)
 
 @author You can always find the latest version of this FAQ at @file{http://sources.redhat.com/cygwin/faq/}.
 

@@ -4,9 +4,12 @@
 
 @emph{(Please note: The mirrors listed in this section are not monitored
 automatically.  If you notice an error here, such as a broken link, a
-site that's down, or an ommission, please notify the FAQ maintainer.
-You can always find an up-to-date list of mirrors at
-@file{http://sources.redhat.com/cygwin/mirrors.html}.)}
+site that's down, or an ommission, please notify the FAQ maintainer at
+@file{mailto:starksb@@ebi.ac.uk}.  You can always find an up-to-date list of
+mirrors at @file{http://sources.redhat.com/cygwin/mirrors.html}.)}
+
+@strong{You must read the file @code{latest/README} before downloading
+and installing Cygwin.  It contains important setup instructions.}
 
 @c Just commenting out unreachable sites now, though problem could have
 @c been transient or a simple typo.  It would be nice to automate this,
@@ -99,5 +102,5 @@ great many links to additional resources and related sites.
 
 You can find documentation for the individual GNU tools at
 @file{http://www.fsf.org/manual/}.  (You should read GNU manuals from a
-local mirror, check @file{http://www.fsf.org/server/list-mirrors.html}
+local mirror.  Check @file{http://www.fsf.org/server/list-mirrors.html}
 for a list of them.)
