@@ -204,30 +204,30 @@ fhandler_console::read (void *pv, size_t buflen)
 #define control_key_state (input_rec.Event.KeyEvent.dwControlKeyState)
 
 #ifdef DEBUGGING
-          /* allow manual switching to/from raw mode via ctrl-alt-scrolllock */
-          if (input_rec.Event.KeyEvent.bKeyDown &&
-              virtual_key_code == VK_SCROLL &&
-              control_key_state & (LEFT_ALT_PRESSED | LEFT_CTRL_PRESSED) == LEFT_ALT_PRESSED | LEFT_CTRL_PRESSED
-             )
-            {   
-              set_raw_win32_keyboard_mode ( !raw_win32_keyboard_mode );
-              continue;
-            }
+	  /* allow manual switching to/from raw mode via ctrl-alt-scrolllock */
+	  if (input_rec.Event.KeyEvent.bKeyDown &&
+	      virtual_key_code == VK_SCROLL &&
+	      control_key_state & (LEFT_ALT_PRESSED | LEFT_CTRL_PRESSED) == LEFT_ALT_PRESSED | LEFT_CTRL_PRESSED
+	    )
+	    {
+	      set_raw_win32_keyboard_mode (!raw_win32_keyboard_mode);
+	      continue;
+	    }
 #endif
 
-          if (raw_win32_keyboard_mode)
-            {
-              __small_sprintf(tmp, "\033{%u;%u;%u;%u;%u;%luK",
-                                   input_rec.Event.KeyEvent.bKeyDown,
-                                   input_rec.Event.KeyEvent.wRepeatCount,
-                                   input_rec.Event.KeyEvent.wVirtualKeyCode,
-                                   input_rec.Event.KeyEvent.wVirtualScanCode,
-                                   input_rec.Event.KeyEvent.uChar.UnicodeChar,
-                                   input_rec.Event.KeyEvent.dwControlKeyState );
-              toadd = tmp;
-              nread = strlen (toadd);
-              break;
-            }
+	  if (raw_win32_keyboard_mode)
+	    {
+	      __small_sprintf(tmp, "\033{%u;%u;%u;%u;%u;%luK",
+				   input_rec.Event.KeyEvent.bKeyDown,
+				   input_rec.Event.KeyEvent.wRepeatCount,
+				   input_rec.Event.KeyEvent.wVirtualKeyCode,
+				   input_rec.Event.KeyEvent.wVirtualScanCode,
+				   input_rec.Event.KeyEvent.uChar.UnicodeChar,
+				   input_rec.Event.KeyEvent.dwControlKeyState);
+	      toadd = tmp;
+	      nread = strlen (toadd);
+	      break;
+	    }
 
 	  if (!input_rec.Event.KeyEvent.bKeyDown)
 	    continue;
@@ -244,8 +244,8 @@ fhandler_console::read (void *pv, size_t buflen)
 		continue;
 	      nread = strlen (toadd);
 	    }
-          else
-            {
+	  else
+	    {
 	      tmp[1] = ich;
 	      /* Need this check since US code page seems to have a bug when
 		 converting a CTRL-U. */
@@ -260,7 +260,7 @@ fhandler_console::read (void *pv, size_t buflen)
 		  toadd = tmp;
 		  nread++;
 		}
-            }
+	    }
 #undef ich
 #undef wch
 	  break;
@@ -280,7 +280,7 @@ fhandler_console::read (void *pv, size_t buflen)
 	      /* Did something other than a click occur? */
 	      if (mouse_event.dwEventFlags)
 		continue;
-	      
+
 	      /* If the mouse event occurred out of the area we can handle,
 		 ignore it. */
 	      int x = mouse_event.dwMousePosition.X;
@@ -290,10 +290,10 @@ fhandler_console::read (void *pv, size_t buflen)
 		  syscall_printf("mouse: position out of range");
 		  continue;
 		}
-	      
+
 	      /* Ignore unimportant mouse buttons */
 	      mouse_event.dwButtonState &= 0x7;
-	      
+
 	      /* This code assumes Windows never reports multiple button
 		 events at the same time. */
 	      int b = 0;
@@ -323,10 +323,10 @@ fhandler_console::read (void *pv, size_t buflen)
 		  b = 2;
 		  strcpy(sz, "btn3 down");
 		}
-	      
+
 	      /* Remember the current button state */
 	      dwLastButtonState = mouse_event.dwButtonState;
-	      
+
 	      /* If a button was pressed, remember the modifiers */
 	      if (b != 3)
 		{
@@ -338,9 +338,9 @@ fhandler_console::read (void *pv, size_t buflen)
 		  if (mouse_event.dwControlKeyState & (RIGHT_CTRL_PRESSED|LEFT_CTRL_PRESSED))
 		    nModifiers |= 0x10;
 		}
-	      
+
 	      b |= nModifiers;
-	      
+
 	      /* We can now create the code. */
 	      sprintf(tmp, "\033[M%c%c%c", b + ' ', x + ' ' + 1, y + ' ' + 1);
 	      syscall_printf("mouse: %s at (%d,%d)", sz, x, y);
@@ -537,15 +537,15 @@ fhandler_console::dup (fhandler_base *child)
   fhc->dim_color = dim_color;
   fhc->state_ = state_;
   fhc->nargs_ = nargs_;
-  for ( int i = 0; i < MAXARGS; i++ ) 
+  for (int i = 0; i < MAXARGS; i++)
     fhc->args_[i] = args_[i];
   fhc->rarg = rarg;
   fhc->saw_question_mark = saw_question_mark;
 
-  strncpy ( fhc->my_title_buf, my_title_buf, TITLESIZE + 1) ;
+  strncpy (fhc->my_title_buf, my_title_buf, TITLESIZE + 1) ;
 
   fhc->current_win32_attr = current_win32_attr;
-  fhc->intensity = intensity; 
+  fhc->intensity = intensity;
   fhc->underline = underline;
   fhc->blink = blink;
   fhc->reverse = reverse;
@@ -772,7 +772,7 @@ fhandler_console::fhandler_console (const char *name) :
   underline_color = FOREGROUND_GREEN | FOREGROUND_BLUE;
   state_ = normal;
   nargs_ = 0;
-  for ( int i = 0; i < MAXARGS; i++ ) args_ [i] = 0;
+  for (int i = 0; i < MAXARGS; i++) args_ [i] = 0;
   savex = savey = 0;
   scroll_region.Top = 0;
   scroll_region.Bottom = -1;
@@ -785,9 +785,9 @@ fhandler_console::fhandler_console (const char *name) :
 }
 
 #define FOREGROUND_ATTR_MASK (FOREGROUND_RED | FOREGROUND_GREEN | \
-                              FOREGROUND_BLUE | FOREGROUND_INTENSITY)
+			      FOREGROUND_BLUE | FOREGROUND_INTENSITY)
 #define BACKGROUND_ATTR_MASK (BACKGROUND_RED | BACKGROUND_GREEN | \
-                              BACKGROUND_BLUE | BACKGROUND_INTENSITY)
+			      BACKGROUND_BLUE | BACKGROUND_INTENSITY)
 void
 fhandler_console::set_default_attr ()
 {
@@ -802,26 +802,26 @@ fhandler_console::get_win32_attr ()
 {
   WORD win_fg = fg;
   WORD win_bg = bg;
-  if ( reverse )
-    { 
+  if (reverse)
+    {
       WORD save_fg = win_fg;
-      win_fg = ( win_bg & BACKGROUND_RED   ? FOREGROUND_RED   : 0 ) |
-               ( win_bg & BACKGROUND_GREEN ? FOREGROUND_GREEN : 0 ) |
-               ( win_bg & BACKGROUND_BLUE  ? FOREGROUND_BLUE  : 0 ) |
-               ( win_fg & FOREGROUND_INTENSITY );
-      win_bg = ( save_fg & FOREGROUND_RED   ? BACKGROUND_RED   : 0 ) |
-               ( save_fg & FOREGROUND_GREEN ? BACKGROUND_GREEN : 0 ) |
-               ( save_fg & FOREGROUND_BLUE  ? BACKGROUND_BLUE  : 0 ) |
-               ( win_bg & BACKGROUND_INTENSITY );
+      win_fg = (win_bg & BACKGROUND_RED   ? FOREGROUND_RED   : 0) |
+	       (win_bg & BACKGROUND_GREEN ? FOREGROUND_GREEN : 0) |
+	       (win_bg & BACKGROUND_BLUE  ? FOREGROUND_BLUE  : 0) |
+	       (win_fg & FOREGROUND_INTENSITY);
+      win_bg = (save_fg & FOREGROUND_RED   ? BACKGROUND_RED   : 0) |
+	       (save_fg & FOREGROUND_GREEN ? BACKGROUND_GREEN : 0) |
+	       (save_fg & FOREGROUND_BLUE  ? BACKGROUND_BLUE  : 0) |
+	       (win_bg & BACKGROUND_INTENSITY);
     }
-  if ( underline ) win_fg = underline_color;
+  if (underline) win_fg = underline_color;
   /* emulate blink with bright background */
-  if ( blink ) win_bg |= BACKGROUND_INTENSITY;
-  if ( intensity == INTENSITY_INVISIBLE )
+  if (blink) win_bg |= BACKGROUND_INTENSITY;
+  if (intensity == INTENSITY_INVISIBLE)
     win_fg = win_bg;
-  else if ( intensity == INTENSITY_BOLD )
+  else if (intensity == INTENSITY_BOLD)
     win_fg |= FOREGROUND_INTENSITY;
-  return ( win_fg | win_bg );
+  return (win_fg | win_bg);
 }
 
 /*
@@ -931,7 +931,7 @@ static const char base_chars[256] =
 /*10 11 12 13 14 15 16 17 */ NOR, NOR, ERR, ERR, ERR, ERR, ERR, ERR,
 /*18 19 1A 1B 1C 1D 1E 1F */ NOR, NOR, ERR, ESC, ERR, ERR, ERR, ERR,
 /*   !  "  #  $  %  &  '  */ NOR, NOR, NOR, NOR, NOR, NOR, NOR, NOR,
-/*(  )  *  +  ,  -  .  /  */ NOR, NOR, NOR, NOR, NOR, NOR, NOR, NOR,
+/*()  *  +  ,  -  .  /  */ NOR, NOR, NOR, NOR, NOR, NOR, NOR, NOR,
 /*0  1  2  3  4  5  6  7  */ NOR, NOR, NOR, NOR, NOR, NOR, NOR, NOR,
 /*8  9  :  ;  <  =  >  ?  */ NOR, NOR, NOR, NOR, NOR, NOR, NOR, NOR,
 /*@  A  B  C  D  E  F  G  */ NOR, NOR, NOR, NOR, NOR, NOR, NOR, NOR,
@@ -974,32 +974,32 @@ fhandler_console::char_command (char c)
 	 switch (args_[i])
 	   {
 	     case 0:    /* normal color */
-               set_default_attr ();
+	       set_default_attr ();
 	       break;
 	     case 1:    /* bold */
-               intensity = INTENSITY_BOLD;
+	       intensity = INTENSITY_BOLD;
 	       break;
-	     case 4:    
+	     case 4:
 	       underline = 1;
 	       break;
 	     case 5:    /* blink mode */
-               blink = TRUE;
+	       blink = TRUE;
 	       break;
 	     case 7:    /* reverse */
-               reverse = TRUE;
+	       reverse = TRUE;
 	       break;
 	     case 8:    /* invisible */
-               intensity = INTENSITY_INVISIBLE;
+	       intensity = INTENSITY_INVISIBLE;
 	       break;
 	     case 9:    /* dim */
-               intensity = INTENSITY_DIM;
+	       intensity = INTENSITY_DIM;
 	       break;
-             case 24:
-               underline = FALSE;
-               break;
-             case 27: 
-               reverse = FALSE;
-               break;
+	     case 24:
+	       underline = FALSE;
+	       break;
+	     case 27:
+	       reverse = FALSE;
+	       break;
 	     case 30:		/* BLACK foreground */
 	       fg = 0;
 	       break;
@@ -1024,9 +1024,9 @@ fhandler_console::char_command (char c)
 	     case 37:		/* WHITE foreg */
 	       fg = FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED;
 	       break;
-             case 39:
-               fg = default_color & FOREGROUND_ATTR_MASK;
-               break;
+	     case 39:
+	       fg = default_color & FOREGROUND_ATTR_MASK;
+	       break;
 	     case 40:		/* BLACK background */
 	       bg = 0;
 	       break;
@@ -1051,12 +1051,12 @@ fhandler_console::char_command (char c)
 	     case 47:    /* WHITE background */
 	       bg = BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED;
 	       break;
-             case 49:
-               bg = default_color & BACKGROUND_ATTR_MASK;
-               break;
+	     case 49:
+	       bg = default_color & BACKGROUND_ATTR_MASK;
+	       break;
 	   }
-         current_win32_attr = get_win32_attr ();
-  	 SetConsoleTextAttribute (get_output_handle (), current_win32_attr);
+	 current_win32_attr = get_win32_attr ();
+	 SetConsoleTextAttribute (get_output_handle (), current_win32_attr);
       break;
     case 'h':
     case 'l':
@@ -1069,10 +1069,10 @@ fhandler_console::char_command (char c)
 	  syscall_printf("mouse support %sabled", use_mouse ? "en" : "dis");
 	  break;
 
-        case 2000: /* Raw keyboard mode */
-         set_raw_win32_keyboard_mode ( (c == 'h') ? TRUE : FALSE );
-         break;
-          
+	case 2000: /* Raw keyboard mode */
+	  set_raw_win32_keyboard_mode ((c == 'h') ? TRUE : FALSE);
+	  break;
+
 	default: /* Ignore */
 	  syscall_printf("unknown h/l command: %d", args_[0]);
 	  break;
@@ -1251,7 +1251,7 @@ fhandler_console::write_normal (const unsigned char *src,
 	  CharToOemBuff ((LPCSTR)src, buf, l2);
 	else
 	  strncpy (buf, (LPCSTR)src, l2);
-	if (! WriteFile (get_output_handle (), buf, l2, &done, 0))
+	if (!WriteFile (get_output_handle (), buf, l2, &done, 0))
 	{
 	  debug_printf ("write failed, handle %p", get_output_handle ());
 	  __seterrno ();
@@ -1335,7 +1335,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	  if (*src == '[')
 	    {
 	      state_ = gotsquare;
-              saw_question_mark = FALSE;
+	      saw_question_mark = FALSE;
 	      for (nargs_ = 0; nargs_ < MAXARGS; nargs_++)
 		args_[nargs_] = 0;
 	      nargs_ = 0;
@@ -1354,7 +1354,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	    }
 	  else if (*src == 'c')		/* Reset Linux terminal */
 	    {
-              set_default_attr ();
+	      set_default_attr ();
 	      clear_screen (0, 0, -1, -1);
 	      cursor_set (TRUE, 0, 0);
 	      state_ = normal;

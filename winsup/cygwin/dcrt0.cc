@@ -38,7 +38,7 @@ details. */
 
 #define MAX_AT_FILE_LEVEL 10
 
-#define PREMAIN_LEN (sizeof(user_data->premain) / sizeof (user_data->premain[0]))
+#define PREMAIN_LEN (sizeof (user_data->premain) / sizeof (user_data->premain[0]))
 
 HANDLE NO_COPY hMainProc = NULL;
 HANDLE NO_COPY hMainThread = NULL;
@@ -356,7 +356,7 @@ globify (char *word, char **&argv, int &argc, int &argvlen)
   int n = 0;
   char *p, *s;
   int dos_spec = isdrive (word);
-  if (!dos_spec && isquote(*word) && word[1] && word[2])
+  if (!dos_spec && isquote (*word) && word[1] && word[2])
     dos_spec = isdrive (word + 1);
 
   /* We'll need more space if there are quoting characters in
@@ -601,7 +601,7 @@ alloc_stack (child_info_fork *ci)
 	api_fatal ("fork: couldn't get stack info, %E");
 
       if (sm.AllocationBase != ci->stacktop)
-	alloc_stack_hard_way (ci, b + sizeof(b) - 1);
+	alloc_stack_hard_way (ci, b + sizeof (b) - 1);
       else
 	ci->stacksize = 0;
     }
@@ -872,7 +872,7 @@ _dll_crt0 ()
   if (GetEnvironmentVariable ("CYGWIN_SLEEP", buf, sizeof (buf)))
     {
       small_printf ("Sleeping %d, pid %u\n", atoi (buf), GetCurrentProcessId ());
-      Sleep (atoi(buf));
+      Sleep (atoi (buf));
     }
 #endif
 

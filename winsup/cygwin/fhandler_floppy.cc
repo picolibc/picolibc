@@ -96,27 +96,27 @@ fhandler_dev_floppy::lseek (off_t offset, int whence)
       PARTITION_INFORMATION pi;
       DWORD bytes_read;
 
-      if ( !DeviceIoControl ( get_handle(),
+      if (!DeviceIoControl (get_handle(),
                               IOCTL_DISK_GET_DRIVE_GEOMETRY,
                               NULL, 0,
                               &di, sizeof (di),
-                              &bytes_read, NULL) )
+                              &bytes_read, NULL))
         {
           __seterrno ();
           return -1;
         }
-      debug_printf ( "disk geometry: (%ld cyl)*(%ld trk)*(%ld sec)*(%ld bps)",
+      debug_printf ("disk geometry: (%ld cyl)*(%ld trk)*(%ld sec)*(%ld bps)",
                      di.Cylinders.LowPart,
                      di.TracksPerCylinder,
                      di.SectorsPerTrack,
-                     di.BytesPerSector );
-      if ( DeviceIoControl ( get_handle (),
+                     di.BytesPerSector);
+      if (DeviceIoControl (get_handle (),
                              IOCTL_DISK_GET_PARTITION_INFO,
                              NULL, 0,
                              &pi, sizeof (pi),
-                             &bytes_read, NULL ))
+                             &bytes_read, NULL))
         {
-          debug_printf ( "partition info: %ld (%ld)",
+          debug_printf ("partition info: %ld (%ld)",
                           pi.StartingOffset.LowPart,
                           pi.PartitionLength.LowPart);
           drive_size = (long long) pi.PartitionLength.QuadPart;
@@ -126,13 +126,13 @@ fhandler_dev_floppy::lseek (off_t offset, int whence)
           drive_size = (long long) di.Cylinders.QuadPart * di.TracksPerCylinder *
                        di.SectorsPerTrack * di.BytesPerSector;
         }
-      debug_printf ( "drive size: %ld", drive_size );
+      debug_printf ("drive size: %ld", drive_size);
     }
 
   if (whence == SEEK_END && drive_size > 0)
     {
       lloffset = offset + drive_size;
-      whence = SEEK_SET; 
+      whence = SEEK_SET;
     }
 
   if (whence == SEEK_CUR)
@@ -161,7 +161,7 @@ fhandler_dev_floppy::lseek (off_t offset, int whence)
     }
   high = lloffset >> 32;
   low = lloffset & 0xffffffff;
-  if ( high || (off_t) low < 0 )
+  if (high || (off_t) low < 0)
     {
       set_errno (EFBIG);
       return -1;

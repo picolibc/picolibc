@@ -48,17 +48,17 @@ SYSTEM_INFO system_info;
 void __stdcall
 close_all_files (void)
 {
-  SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," close");
+  SetResourceLock (LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," close");
 
   fhandler_base *fh;
   for (int i = 0; i < (int) fdtab.size; i++)
-    if ((fh = fdtab[i]) != NULL)
+    if ( (fh = fdtab[i]) != NULL)
       {
 	fh->close ();
 	fdtab.release (i);
       }
 
-  ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," close");
+  ReleaseResourceLock (LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," close");
   cygwin_shared->delqueue.process_queue ();
 }
 
@@ -100,7 +100,7 @@ _unlink (const char *ourname)
       int len = strlen (win32_name.get_win32 ());
       if (len > 4 && !strcasecmp (win32_name.get_win32 () + len - 4, ".lnk"))
 	SetFileAttributes (win32_name.get_win32 (),
-	              win32_name.file_attributes () & ~FILE_ATTRIBUTE_READONLY);
+		      win32_name.file_attributes () & ~FILE_ATTRIBUTE_READONLY);
     }
 
   for (int i = 0; i < 2; i++)
@@ -421,9 +421,9 @@ _open (const char *unix_path, int flags, ...)
   sigframe thisframe (mainthread);
 
   syscall_printf ("open (%s, %p)", unix_path, flags);
-  if (!check_null_empty_path_errno(unix_path))
+  if (!check_null_empty_path_errno (unix_path))
     {
-      SetResourceLock(LOCK_FD_LIST, WRITE_LOCK|READ_LOCK, " open ");
+      SetResourceLock (LOCK_FD_LIST, WRITE_LOCK|READ_LOCK, " open ");
 
       /* check for optional mode argument */
       va_start (ap, flags);
@@ -434,16 +434,16 @@ _open (const char *unix_path, int flags, ...)
 
       if (fd < 0)
 	set_errno (ENMFILE);
-      else if ((fh = fdtab.build_fhandler (fd, unix_path, NULL)) == NULL)
+      else if ( (fh = fdtab.build_fhandler (fd, unix_path, NULL)) == NULL)
 	res = -1;		// errno already set
       else if (!fh->open (unix_path, flags, (mode & 0777) & ~cygheap->umask))
 	{
 	  fdtab.release (fd);
 	  res = -1;
 	}
-      else if ((res = fd) <= 2)
+      else if ( (res = fd) <= 2)
 	set_std_handle (res);
-      ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," open");
+      ReleaseResourceLock (LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," open");
     }
 
   syscall_printf ("%d = open (%s, %p)", res, unix_path, flags);
@@ -456,9 +456,9 @@ _lseek (int fd, off_t pos, int dir)
   off_t res;
   sigframe thisframe (mainthread);
 
-  if ( dir != SEEK_SET && dir != SEEK_CUR && dir != SEEK_END )
+  if (dir != SEEK_SET && dir != SEEK_CUR && dir != SEEK_END)
     {
-      set_errno ( EINVAL );
+      set_errno (EINVAL);
       res = -1;
     }
   else if (fdtab.not_open (fd))
@@ -492,10 +492,10 @@ _close (int fd)
     }
   else
     {
-      SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," close");
+      SetResourceLock (LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," close");
       res = fdtab[fd]->close ();
       fdtab.release (fd);
-      ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," close");
+      ReleaseResourceLock (LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," close");
     }
 
   syscall_printf ("%d = close (%d)", res, fd);
@@ -604,7 +604,7 @@ _link (const char *a, const char *b)
       /* Write the WIN32_STREAM_ID */
       bSuccess = BackupWrite (
 	hFileSource,
-	(LPBYTE) &StreamId,	// buffer to write
+	 (LPBYTE) &StreamId,	// buffer to write
 	StreamSize,		// number of bytes to write
 	&dwBytesWritten,
 	FALSE,			// don't abort yet
@@ -618,7 +618,7 @@ _link (const char *a, const char *b)
 	     Need to handle. */
 	  bSuccess = BackupWrite (
 		hFileSource,
-		(LPBYTE) wbuf,	// buffer to write
+		 (LPBYTE) wbuf,	// buffer to write
 		cbPathLen,	// number of bytes to write
 		&dwBytesWritten,
 		FALSE,		// don't abort yet
@@ -668,7 +668,7 @@ rel2abssd (PSECURITY_DESCRIPTOR psd_rel, PSECURITY_DESCRIPTOR psd_abs,
 		DWORD abslen)
 {
 #ifdef _MT_SAFE
-  struct _winsup_t *r=_reent_winsup();
+  struct _winsup_t *r=_reent_winsup ();
   char *dacl_buf=r->_dacl_buf;
   char *sacl_buf=r->_sacl_buf;
   char *ownr_buf=r->_ownr_buf;
@@ -696,7 +696,7 @@ rel2abssd (PSECURITY_DESCRIPTOR psd_rel, PSECURITY_DESCRIPTOR psd_abs,
 
 /* chown: POSIX 5.6.5.1 */
 /*
- * chown() is only implemented for Windows NT.  Under other operating
+ * chown () is only implemented for Windows NT.  Under other operating
  * systems, it is only a stub that always returns zero.
  */
 static int
@@ -706,7 +706,7 @@ chown_worker (const char *name, unsigned fmode, uid_t uid, gid_t gid)
   uid_t old_uid;
   gid_t old_gid;
 
-  if (check_null_empty_path_errno(name))
+  if (check_null_empty_path_errno (name))
     return -1;
 
   if (os_being_run != winNT)    // real chown only works on NT
@@ -736,7 +736,7 @@ chown_worker (const char *name, unsigned fmode, uid_t uid, gid_t gid)
 	attrib |= S_IFDIR;
       res = get_file_attribute (win32_path.has_acls (),
 				win32_path.get_win32 (),
-				(int *) &attrib,
+				 (int *) &attrib,
 				&old_uid,
 				&old_gid);
       if (!res)
@@ -940,7 +940,7 @@ num_entries (const char *win32_name)
   count ++;
   while (FindNextFileA (handle, &buf))
     {
-      if ((buf.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+      if ( (buf.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 	count ++;
     }
   FindClose (handle);
@@ -1076,7 +1076,7 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
   strcpy (root, real_path.get_win32 ());
   dtype = GetDriveType (rootdir (root));
 
-  if ((atts == -1 || !(atts & FILE_ATTRIBUTE_DIRECTORY) ||
+  if ( (atts == -1 || ! (atts & FILE_ATTRIBUTE_DIRECTORY) ||
        (os_being_run == winNT
 	&& dtype != DRIVE_NO_ROOT_DIR
 	&& dtype != DRIVE_UNKNOWN)))
@@ -1089,7 +1089,7 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 	 in a failing open call in the same process. Check that
 	 case. */
       if (!oret && allow_ntsec && get_errno () == EACCES
-          && !get_file_attribute (TRUE, real_path, &attribute, &uid, &gid)
+	  && !get_file_attribute (TRUE, real_path, &attribute, &uid, &gid)
 	  && !attribute && uid == myself->uid && gid == myself->gid)
 	{
 	  set_file_attribute (TRUE, real_path, 0400);
@@ -1098,7 +1098,7 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 	  set_file_attribute (TRUE, real_path.get_win32 (), 0);
 	}
       if (oret)
-        {
+	{
 	  res = fh.fstat (buf);
 	  fh.close ();
 	  /* The number of links to a directory includes the
@@ -1106,14 +1106,14 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 	     those subdirectories point to it.
 	     This is too slow on remote drives, so we do without it and
 	     set the number of links to 2. */
-	  /* Unfortunately the count of 2 confuses `find(1)' command. So
+	  /* Unfortunately the count of 2 confuses `find (1)' command. So
 	     let's try it with `1' as link count. */
 	  if (atts != -1 && (atts & FILE_ATTRIBUTE_DIRECTORY))
 	    buf->st_nlink = (dtype == DRIVE_REMOTE
-	                     ? 1
+			     ? 1
 			     : num_entries (real_path.get_win32 ()));
 	  goto done;
-        }
+	}
     }
   if (atts != -1 || (!oret && get_errno () != ENOENT
 			   && get_errno () != ENOSHARE))
@@ -1127,7 +1127,7 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 	  && (atts & FILE_ATTRIBUTE_DIRECTORY)
 	  && dtype != DRIVE_REMOTE)
 	buf->st_nlink = num_entries (real_path.get_win32 ());
-      buf->st_dev = FHDEVN(FH_DISK) << 8;
+      buf->st_dev = FHDEVN (FH_DISK) << 8;
       buf->st_ino = hash_path_name (0, real_path.get_win32 ());
       if (atts != -1 && (atts & FILE_ATTRIBUTE_DIRECTORY))
 	buf->st_mode = S_IFDIR;
@@ -1142,14 +1142,14 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 				 &buf->st_mode, &buf->st_uid, &buf->st_gid))
 	{
 	  buf->st_mode |= STD_RBITS | STD_XBITS;
-	  if ((atts & FILE_ATTRIBUTE_READONLY) == 0)
+	  if ( (atts & FILE_ATTRIBUTE_READONLY) == 0)
 	    buf->st_mode |= STD_WBITS;
 	  if (real_path.issymlink ())
 	    buf->st_mode |= S_IRWXU | S_IRWXG | S_IRWXO;
 	  get_file_attribute (FALSE, real_path.get_win32 (),
 			      NULL, &buf->st_uid, &buf->st_gid);
 	}
-      if ((handle = FindFirstFile (real_path.get_win32(), &wfd))
+      if ( (handle = FindFirstFile (real_path.get_win32 (), &wfd))
 	  != INVALID_HANDLE_VALUE)
 	{
 	  buf->st_atime   = to_time_t (&wfd.ftLastAccessTime);
@@ -1157,7 +1157,7 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 	  buf->st_ctime   = to_time_t (&wfd.ftCreationTime);
 	  buf->st_size    = wfd.nFileSizeLow;
 	  buf->st_blksize = S_BLKSIZE;
-	  buf->st_blocks  = ((unsigned long) buf->st_size +
+	  buf->st_blocks  = ( (unsigned long) buf->st_size +
 			    S_BLKSIZE-1) / S_BLKSIZE;
 	  FindClose (handle);
 	}
@@ -1192,7 +1192,7 @@ access (const char *fn, int flags)
 {
   sigframe thisframe (mainthread);
   // flags were incorrectly specified
-  if (flags & ~(F_OK|R_OK|W_OK|X_OK))
+  if (flags & ~ (F_OK|R_OK|W_OK|X_OK))
     {
       set_errno (EINVAL);
       return -1;
@@ -1210,45 +1210,45 @@ access (const char *fn, int flags)
     {
       if (st.st_uid == myself->uid)
 	{
-	  if (!(st.st_mode & S_IRUSR))
+	  if (! (st.st_mode & S_IRUSR))
 	    goto done;
 	}
       else if (st.st_gid == myself->gid)
 	{
-	  if (!(st.st_mode & S_IRGRP))
+	  if (! (st.st_mode & S_IRGRP))
 	    goto done;
 	}
-      else if (!(st.st_mode & S_IROTH))
+      else if (! (st.st_mode & S_IROTH))
 	goto done;
     }
   if (flags & W_OK)
     {
       if (st.st_uid == myself->uid)
 	{
-	  if (!(st.st_mode & S_IWUSR))
+	  if (! (st.st_mode & S_IWUSR))
 	    goto done;
 	}
       else if (st.st_gid == myself->gid)
 	{
-	  if (!(st.st_mode & S_IWGRP))
+	  if (! (st.st_mode & S_IWGRP))
 	    goto done;
 	}
-      else if (!(st.st_mode & S_IWOTH))
+      else if (! (st.st_mode & S_IWOTH))
 	goto done;
     }
   if (flags & X_OK)
     {
       if (st.st_uid == myself->uid)
 	{
-	  if (!(st.st_mode & S_IXUSR))
+	  if (! (st.st_mode & S_IXUSR))
 	    goto done;
 	}
       else if (st.st_gid == myself->gid)
 	{
-	  if (!(st.st_mode & S_IXGRP))
+	  if (! (st.st_mode & S_IXGRP))
 	    goto done;
 	}
-      else if (!(st.st_mode & S_IXOTH))
+      else if (! (st.st_mode & S_IXOTH))
 	goto done;
     }
   r = 0;
@@ -1394,7 +1394,7 @@ system (const char *cmdstring)
   command[2] = cmdstring;
   command[3] = (const char *) NULL;
 
-  if ((res = spawnvp (_P_WAIT, "sh", command)) == -1)
+  if ( (res = spawnvp (_P_WAIT, "sh", command)) == -1)
     {
       // when exec fails, return value should be as if shell
       // executed exit (127)
@@ -1426,7 +1426,7 @@ extern "C" size_t
 getpagesize ()
 {
   if (!system_info.dwPageSize)
-    GetSystemInfo(&system_info);
+    GetSystemInfo (&system_info);
   return (int) system_info.dwPageSize;
 }
 
@@ -1503,7 +1503,7 @@ ttyname (int fd)
     {
       return 0;
     }
-  return (char *)(fdtab[fd]->ttyname ());
+  return (char *) (fdtab[fd]->ttyname ());
 }
 
 extern "C" char *
@@ -1523,39 +1523,39 @@ ctermid (char *str)
 extern "C" int
 _cygwin_istext_for_stdio (int fd)
 {
-  syscall_printf("_cygwin_istext_for_stdio (%d)\n", fd);
+  syscall_printf ("_cygwin_istext_for_stdio (%d)\n", fd);
   if (CYGWIN_VERSION_OLD_STDIO_CRLF_HANDLING)
     {
-      syscall_printf(" _cifs: old API\n");
+      syscall_printf (" _cifs: old API\n");
       return 0; /* we do it for old apps, due to getc/putc macros */
     }
 
   if (fdtab.not_open (fd))
     {
-      syscall_printf(" _cifs: fd not open\n");
+      syscall_printf (" _cifs: fd not open\n");
       return 0;
     }
 
   fhandler_base *p = fdtab[fd];
 
-  if (p->get_device() != FH_DISK)
+  if (p->get_device () != FH_DISK)
     {
-      syscall_printf(" _cifs: fd not disk file\n");
+      syscall_printf (" _cifs: fd not disk file\n");
       return 0;
     }
 
   if (p->get_w_binary () || p->get_r_binary ())
     {
-      syscall_printf(" _cifs: get_*_binary\n");
+      syscall_printf (" _cifs: get_*_binary\n");
       return 0;
     }
 
-  syscall_printf("_cygwin_istext_for_stdio says yes\n");
+  syscall_printf ("_cygwin_istext_for_stdio says yes\n");
   return 1;
 }
 
 /* internal newlib function */
-extern "C" int _fwalk (struct _reent *ptr, int (*function)(FILE *));
+extern "C" int _fwalk (struct _reent *ptr, int (*function) (FILE *));
 
 static int setmode_mode;
 static int setmode_file;
@@ -1563,9 +1563,9 @@ static int setmode_file;
 static int
 setmode_helper (FILE *f)
 {
-  if (fileno(f) != setmode_file)
+  if (fileno (f) != setmode_file)
     return 0;
-  syscall_printf("setmode: file was %s now %s\n",
+  syscall_printf ("setmode: file was %s now %s\n",
 		 f->_flags & __SCLE ? "cle" : "raw",
 		 setmode_mode & O_TEXT ? "cle" : "raw");
   if (setmode_mode & O_TEXT)
@@ -1633,7 +1633,7 @@ setmode (int fd, int mode)
   else
     setmode_mode = O_BINARY;
   setmode_file = fd;
-  _fwalk(_REENT, setmode_helper);
+  _fwalk (_REENT, setmode_helper);
 
   syscall_printf ("setmode (%d, %s) returns %s\n", fd,
 		  mode&O_TEXT ? "text" : "binary",
@@ -1718,7 +1718,7 @@ get_osfhandle (int fd)
     {
       res = (long) fdtab[fd]->get_handle ();
     }
-  syscall_printf ("%d = get_osfhandle(%d)", res, fd);
+  syscall_printf ("%d = get_osfhandle (%d)", res, fd);
 
   return res;
 }
@@ -1733,7 +1733,7 @@ statfs (const char *fname, struct statfs *sfs)
       return -1;
     }
 
-  path_conv full_path(fname, PC_SYM_FOLLOW | PC_FULL);
+  path_conv full_path (fname, PC_SYM_FOLLOW | PC_FULL);
   char *root = rootdir (full_path);
 
   syscall_printf ("statfs %s", root);
@@ -1859,7 +1859,7 @@ ptsname (int fd)
       set_errno (EBADF);
       return 0;
     }
-  return (char *)(fdtab[fd]->ptsname ());
+  return (char *) (fdtab[fd]->ptsname ());
 }
 
 /* FIXME: what is this? */
@@ -1924,30 +1924,30 @@ seteuid (uid_t uid)
 	  if (uid != myself->uid)
 	    if (uid == cygheap->user.orig_uid)
 	      {
-		debug_printf ("RevertToSelf() (uid == orig_uid, token=%d)",
+		debug_printf ("RevertToSelf () (uid == orig_uid, token=%d)",
 			      cygheap->user.token);
-		RevertToSelf();
+		RevertToSelf ();
 		if (cygheap->user.token != INVALID_HANDLE_VALUE)
 		  cygheap->user.impersonated = FALSE;
 	      }
 	    else if (!cygheap->user.impersonated)
 	      {
-		debug_printf ("Impersonate(uid == %d)", uid);
-		RevertToSelf();
+		debug_printf ("Impersonate (uid == %d)", uid);
+		RevertToSelf ();
 		if (cygheap->user.token != INVALID_HANDLE_VALUE)
 		  if (!ImpersonateLoggedOnUser (cygheap->user.token))
-		    system_printf ("Impersonate(%d) in set(e)uid failed: %E",
+		    system_printf ("Impersonate (%d) in set (e)uid failed: %E",
 				   cygheap->user.token);
 		  else
 		    cygheap->user.impersonated = TRUE;
 	      }
 
 	  cygheap_user user;
-	  /* user.token is used in internal_getlogin() to determine if
+	  /* user.token is used in internal_getlogin () to determine if
 	     impersonation is active. If so, the token is used for
 	     retrieving user's SID. */
 	  user.token = cygheap->user.impersonated ? cygheap->user.token
-					          : INVALID_HANDLE_VALUE;
+						  : INVALID_HANDLE_VALUE;
 	  struct passwd *pw_cur = getpwnam (internal_getlogin (user));
 	  if (pw_cur != pw_new)
 	    {
@@ -1996,7 +1996,7 @@ chroot (const char *newroot)
 {
   sigframe thisframe (mainthread);
   int ret = -1;
-  path_conv path(newroot, PC_SYM_FOLLOW | PC_FULL);
+  path_conv path (newroot, PC_SYM_FOLLOW | PC_FULL);
 
   if (path.error)
     goto done;
@@ -2005,7 +2005,7 @@ chroot (const char *newroot)
       set_errno (ENOENT);
       goto done;
     }
-  if (!(path.file_attributes () & FILE_ATTRIBUTE_DIRECTORY))
+  if (! (path.file_attributes () & FILE_ATTRIBUTE_DIRECTORY))
     {
       set_errno (ENOTDIR);
       goto done;
@@ -2068,7 +2068,7 @@ wcscmp (const wchar_t *s1, const wchar_t *s2)
       s2++;
     }
 
-  return (*(unsigned short *) s1) - (*(unsigned short *) s2);
+  return (* (unsigned short *) s1) - (* (unsigned short *) s2);
 }
 
 extern "C" size_t
@@ -2203,7 +2203,7 @@ login (struct utmp *ut)
       (void) write (fd, (char *) ut, sizeof (struct utmp));
       (void) close (fd);
     }
-  if ((fd = open (_PATH_WTMP, O_WRONLY | O_APPEND | O_BINARY, 0)) >= 0)
+  if ( (fd = open (_PATH_WTMP, O_WRONLY | O_APPEND | O_BINARY, 0)) >= 0)
     {
       (void) write (fd, (char *) ut, sizeof (struct utmp));
       (void) close (fd);
@@ -2211,7 +2211,7 @@ login (struct utmp *ut)
 }
 
 /* It isn't possible to use unix-style I/O function in logout code because
-cygwin's I/O subsystem may be inaccessible at logout() call time.
+cygwin's I/O subsystem may be inaccessible at logout () call time.
 FIXME (cgf): huh?
 */
 extern "C" int
@@ -2243,7 +2243,7 @@ logout (char *line)
       while (!res && ReadFile (ut_fd, ut_buf, sizeof ut_buf, &rd, NULL)
 	     && rd != 0)
 	{
-	  struct utmp *ut_end = (struct utmp *) ((char *) ut_buf + rd);
+	  struct utmp *ut_end = (struct utmp *) ( (char *) ut_buf + rd);
 
 	  for (ut = ut_buf; ut < ut_end; ut++, pos += sizeof (*ut))
 	    if (ut->ut_name[0]
@@ -2257,7 +2257,7 @@ logout (char *line)
 
 		/* Now seek back to the position in utmp at which UT occured,
 		   and write the new version of UT there.  */
-		if ((SetFilePointer (ut_fd, pos, 0, FILE_BEGIN) != 0xFFFFFFFF)
+		if ( (SetFilePointer (ut_fd, pos, 0, FILE_BEGIN) != 0xFFFFFFFF)
 		    && (WriteFile (ut_fd, (char *) ut, sizeof (*ut),
 				   &rd, NULL)))
 		  {

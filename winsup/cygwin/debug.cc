@@ -1,6 +1,6 @@
 /* debug.cc
 
-   Copyright 1998, 1999, 2000 Cygnus Solutions.
+   Copyright 1998, 1999, 2000, 2001 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -31,7 +31,7 @@ typedef struct
   } thread_info;
 
 static NO_COPY thread_info threads[32] = {{0, NULL}};	// increase as necessary
-#define NTHREADS (sizeof(threads) / sizeof(threads[0]))
+#define NTHREADS (sizeof (threads) / sizeof (threads[0]))
 
 void
 threadname_init ()
@@ -55,7 +55,7 @@ regthread (const char *name, DWORD tid)
 }
 
 int __stdcall
-iscygthread()
+iscygthread ()
 {
   DWORD tid = GetCurrentThreadId ();
   if (tid != mainthread.id)
@@ -256,7 +256,7 @@ add_handle (const char *func, int ln, HANDLE h, const char *name)
       goto out;		/* Already did this once */
     }
 
-  if ((hl = newh()) == NULL)
+  if ((hl = newh ()) == NULL)
     {
       unlock_debug ();
       system_printf ("couldn't allocate memory for %s(%d): %s(%p)",
