@@ -1,3 +1,17 @@
+2004-01-06  Alexandre Oliva  <aoliva@redhat.com>
+
+	2003-09-18  Alexandre Oliva  <aoliva@redhat.com>
+	* frv.h (EF_FRV_FDPIC): New macro.
+	(EF_FRV_PIC_FLAGS): Adjust.
+	2003-08-08  Alexandre Oliva  <aoliva@redhat.com>
+	* frv.h (R_FRV_FUNCDESC_VALUE, R_FRV_FUNCDESC_GOTOFF12,
+	R_FRV_FUNCDESC_GOTOFFLO, R_FRV_FUNCDESC_GOTOFFHI, R_FRV_GOTOFF12,
+	R_FRV_GOTOFFLO, R_FRV_GOTOFFHI): New.
+	2003-08-04  Alexandre Oliva  <aoliva@redhat.com>
+	* frv.h (R_FRV_GOT12, R_FRV_GOTHI, R_FRV_GOTLO, R_FRV_FUNCDESC,
+	R_FRV_FUNCDESC_GOT12, R_FRV_FUNCDESC_GOTHI, R_FRV_FUNCDESC_GOTLO):
+	New.
+
 
 For older changes see ChangeLog-9103
 
