@@ -23,7 +23,9 @@
 #include <ldsodefs.h>
 #include "dynamic-link.h"
 
+#ifndef __attribute_used__
 #define __attribute_used__
+#endif
 
 #if !defined ELF_MACHINE_NO_RELA || ELF_MACHINE_NO_REL
 # define PLTREL  ElfW(Rela)
@@ -44,7 +46,7 @@
    function.  */
 
 #ifndef ELF_MACHINE_NO_PLT
-static ElfW(Addr) __attribute_used__
+static ElfW(Addr) __attribute__ ((regparm (2), unused))
 fixup (
 # ifdef ELF_MACHINE_RUNTIME_FIXUP_ARGS
         ELF_MACHINE_RUNTIME_FIXUP_ARGS,
@@ -128,7 +130,7 @@ fixup (
 
 #if !defined PROF && !defined ELF_MACHINE_NO_PLT && !__BOUNDED_POINTERS__
 
-static ElfW(Addr) __attribute_used__
+static ElfW(Addr) __attribute__ ((regparm (3), unused))
 profile_fixup (
 #ifdef ELF_MACHINE_RUNTIME_FIXUP_ARGS
        ELF_MACHINE_RUNTIME_FIXUP_ARGS,

@@ -1,3 +1,10 @@
+2004-08-12  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/linux/sys/types.h (u64): New typedef to allow building
+	on linux systems with glibc 2.3.3 installed.
+	* libc/sys/linux/dl/dl-runtime.c: Fix prototypes for fixup and
+	profile_fixup so newlib can build on fc3 system.
+ 
 2004-07-30  Alexandre Oliva  <aoliva@redhat.com>
 
 	Introduce SH2a support.

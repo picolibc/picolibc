@@ -190,6 +190,8 @@ typedef __uint64_t              uint64_t;
 #define _UINT64_T_DECLARED
 #endif
 
+typedef __uint64_t		u64;
+
 #if !defined(_ANSI_SOURCE) && !defined(_POSIX_SOURCE)
 typedef	struct _physadr {
 	int	r[1];
