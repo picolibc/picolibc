@@ -1,3 +1,8 @@
+2005-03-06  Christopher Faylor  <cgf@timesys.com>
+
+	* path.cc (special_name): Reorganize to always detect the use of
+	special names first, before detecting special characters.
+
 2005-03-04  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_clipboard.cc: Use int for cygnativeformat rather than UINT

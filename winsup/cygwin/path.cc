@@ -1255,29 +1255,26 @@ special_name (const char *s, int inc = 1)
     return false;
 
   s += inc;
-  if (strpbrk (s, special_chars))
-    return !strncasematch (s, "%2f", 3);
 
-  if (strcasematch (s, ".") || strcasematch (s, ".."))
+  if (strcmp (s, ".") == 0 || strcmp (s, "..") == 0)
     return false;
-  if (s[strlen (s)-1] == '.')
-    return true;
 
-  const char *p;
-  if (strcasematch (s, "conin$") || strcasematch (s, "conout$"))
-    return -1;
-
-  if (strncasematch (s, "nul", 3)
+  int n;
+  const char *p = NULL;
+  if (strncasematch (s, "conin$", n = 5)
+      || strncasematch (s, "conout$", n = 7)
+      || strncasematch (s, "nul", n = 3)
       || strncasematch (s, "aux", 3)
       || strncasematch (s, "prn", 3)
       || strncasematch (s, "con", 3))
-    p = s + 3;
+    p = s + n;
   else if (strncasematch (s, "com", 3) || strncasematch (s, "lpt", 3))
     (void) strtoul (s + 3, (char **) &p, 10);
-  else
-    return false;
+  if (p && (*p == '\0' || *p == '.'))
+    return -1;
 
-  return (*p == '\0' || *p == '.') ? -1 : false;
+  return (strchr (s, '\0')[-1] == '.')
+	 || (strpbrk (s, special_chars) && !strncasematch (s, "%2f", 3));
 }
 
 bool
