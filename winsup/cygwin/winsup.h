@@ -214,6 +214,9 @@ void uinfo_init (void);
 #define uid16touid32(u16)  ((u16)==ILLEGAL_UID16?ILLEGAL_UID:(__uid32_t)(u16))
 #define gid16togid32(g16)  ((g16)==ILLEGAL_GID16?ILLEGAL_GID:(__gid32_t)(g16))
 
+/* Convert LARGE_INTEGER into long long */
+#define get_ll(pl)  (((long long) (pl).HighPart << 32) | (pl).LowPart)
+
 /* various events */
 void events_init (void);
 void events_terminate (void);

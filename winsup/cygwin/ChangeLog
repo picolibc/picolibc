@@ -1,5 +1,14 @@
 2005-03-16  Christopher Faylor  <cgf@timesys.com>
 
+	* fhandler_tape.cc (get_ll): This is a generally useful function so
+	move it
+	* winsup.h (get_ll): to here
+	* security.cc (get_token_group_sidlist): Use get_ll to figure out the
+	long long version of the luid since QuadPart is not part of the
+	standard Windows API.
+
+2005-03-16  Christopher Faylor  <cgf@timesys.com>
+
 	* dir.cc: Rename opendir_* to dirent_* throughout.
 	(opendir_states): Move and rename.
 	* fhandler.h (dirent_states): to here.

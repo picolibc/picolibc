@@ -534,7 +534,7 @@ get_token_group_sidlist (cygsidlist &grp_list, PTOKEN_GROUPS my_grps,
       grp_list += well_known_local_sid;
       grp_list += well_known_interactive_sid;
     }
-  if (auth_luid.QuadPart != 999) /* != SYSTEM_LUID */
+  if (get_ll (auth_luid) != 999LL) /* != SYSTEM_LUID */
     {
       char buf[64];
       __small_sprintf (buf, "S-1-5-5-%u-%u", auth_luid.HighPart,

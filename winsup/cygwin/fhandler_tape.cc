@@ -36,9 +36,6 @@ details. */
 			    part (partition)->initialize (0); \
 			  }
 
-/* Convert LARGE_INTEGER into long long */
-#define get_ll(pl)  (((long long) (pl).HighPart << 32) | (pl).LowPart)
-
 #define IS_BOT(err) ((err) == ERROR_BEGINNING_OF_MEDIA)
 
 #define IS_EOF(err) ((err) == ERROR_FILEMARK_DETECTED \
