@@ -17,7 +17,7 @@ extern "C"
 #ifndef _SYS_SHM_H
 #define _SYS_SHM_H
 
-#include "cygwin_ipc.h"
+#include <cygwin/ipc.h>
 
 #define SHM_RDONLY 1
 /* 64 Kb was hardcoded for x86. MS states this may change, but we need it in the header

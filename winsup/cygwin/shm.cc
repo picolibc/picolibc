@@ -22,7 +22,7 @@ details. */
 #include "cygheap.h"
 #include <stdio.h>
 #include "thread.h"
-#include "cygwin_shm.h"
+#include <cygwin/shm.h>
 #include "cygserver_shm.h"
 
 // FIXME IS THIS CORRECT

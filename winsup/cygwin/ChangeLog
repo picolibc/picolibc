@@ -1,3 +1,13 @@
+2002-09-21  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygwin_ipc.h: Move to "include/cygwin/ipc.h".
+	* cygwin_shm.h: Move to "include/cygwin/shm.h".
+	* include/cygwin/ipc.h: New file.
+	* include/cygwin/shm.h: New file.
+	* ipc.c:c Update <cygwin/ipc.h> include.
+	* cygserver_shm.cc: Update <cygwin/shm.h> include.
+	* shm.cc: Ditto.
+
 2002-09-21  Robert Collins <rbtcollins@hotmail.com>
 
 	* pthread.cc: Use class::call for converted pthread and semaphore
