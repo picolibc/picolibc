@@ -120,7 +120,6 @@ LIB_SOURCES = \
 	hash_page.c \
 	hcreate.c \
 	hcreate_r.c \
-	ndbm.c \
 	page.h \
 	qsort.c \
 	tdelete.c \
@@ -151,7 +150,7 @@ lib_a_LIBADD =
 @USE_LIBTOOL_FALSE@hash_bigkey.$(OBJEXT) hash_buf.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@hash_func.$(OBJEXT) hash_log2.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@hash_page.$(OBJEXT) hcreate.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@hcreate_r.$(OBJEXT) ndbm.$(OBJEXT) qsort.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@hcreate_r.$(OBJEXT) qsort.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@tdelete.$(OBJEXT) tdestroy.$(OBJEXT) tfind.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@tsearch.$(OBJEXT) twalk.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
@@ -159,7 +158,7 @@ LTLIBRARIES =  $(noinst_LTLIBRARIES)
 libsearch_la_LIBADD = 
 @USE_LIBTOOL_TRUE@libsearch_la_OBJECTS =  bsearch.lo hash.lo \
 @USE_LIBTOOL_TRUE@hash_bigkey.lo hash_buf.lo hash_func.lo hash_log2.lo \
-@USE_LIBTOOL_TRUE@hash_page.lo hcreate.lo hcreate_r.lo ndbm.lo qsort.lo \
+@USE_LIBTOOL_TRUE@hash_page.lo hcreate.lo hcreate_r.lo qsort.lo \
 @USE_LIBTOOL_TRUE@tdelete.lo tdestroy.lo tfind.lo tsearch.lo twalk.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

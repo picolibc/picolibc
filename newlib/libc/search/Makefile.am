@@ -16,7 +16,6 @@ LIB_SOURCES = \
 	hash_page.c \
 	hcreate.c \
 	hcreate_r.c \
-	ndbm.c \
 	page.h \
 	qsort.c \
 	tdelete.c \

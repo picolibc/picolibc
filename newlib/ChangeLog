@@ -1,3 +1,8 @@
+2002-06-24  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* libc/include/ndbm.h: Remove.
+	* libc/search/ndbm.c: Remove.
+
 2002-06-24  WATANABE Hirofumi <eban@os.rim.or.jp>
 
 	* libc/stdio/fseek.c (fseek): Fix braces.
