@@ -1,3 +1,7 @@
+2001-10-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (getcwd): Allow len == 0 when buf == NULL.
+
 2001-10-18  Christopher Faylor  <cgf@redhat.com>
 
 	* syscalls.cc (_read): Validate input pointer.
