@@ -197,7 +197,10 @@ public:
   void set_need_fork_fixup () { FHSETF (FFIXUP); }
 
   virtual void set_close_on_exec (int val);
-  virtual void fixup_after_fork (HANDLE parent);
+
+  virtual void fixup_before_fork_exec (DWORD) {}
+  virtual void fixup_after_fork (HANDLE);
+  virtual void fixup_after_exec (HANDLE) {}
 
   int get_symlink_p () { return FHISSETF (SYMLINK); }
   void set_symlink_p (int val) { FHCONDSETF (val, SYMLINK); }
@@ -291,8 +294,6 @@ public:
   virtual int raw_read (void *ptr, size_t ulen);
   virtual int raw_write (const void *ptr, size_t ulen);
 
-  virtual void fixup_after_exec (HANDLE) {}
-
   /* Virtual accessor functions to hide the fact
      that some fd's have two handles. */
   virtual HANDLE get_handle () const { return io_handle; }
@@ -320,9 +321,11 @@ class fhandler_socket: public fhandler_base
 {
 private:
   int addr_family;
+  struct _WSAPROTOCOL_INFOA *prot_info_ptr;
+
 public:
   fhandler_socket (const char *name = 0);
-  fhandler_socket (unsigned int, const char *name = 0);
+  ~fhandler_socket ();
   int get_socket () const { return (int) get_handle(); }
   fhandler_socket * is_socket () { return this; }
   int write (const void *ptr, size_t len);
@@ -332,6 +335,11 @@ public:
   off_t lseek (off_t, int) { return 0; }
   int close ();
   void hclose (HANDLE) {close ();}
+  int dup (fhandler_base *child);
+
+  virtual void fixup_before_fork_exec (DWORD);
+  void fixup_after_fork (HANDLE);
+  void fixup_after_exec (HANDLE parent) { fixup_after_fork (parent); }
 
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);

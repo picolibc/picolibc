@@ -1,3 +1,44 @@
+Thu Oct 26 11:51:59 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* dtable.cc (dtable::release): Check for socket. Change
+	cnt_need_fixup_before accordingly.
+	(dtable::dup2): Ditto.
+	(dtable::fixup_before_fork): New method.
+	(dtable::fixup_before_exec): Ditto.
+	* dtable.h (class dtable): Add member `cnt_need_fixup_before'. Add
+	definition for methods `dec_need_fixup_before', `inc_need_fixup_before',
+	`need_fixup_before', `fixup_before_exec' and `fixup_before_fork'.
+	* fhandler.h (class fhandler_base): Slight rearrangements. Add
+	definitions for methods `fixup_before_fork_exec'.
+	(class fhandler_socket): Eliminate superfluous constructor.
+	Add member `prot_info_ptr'. Add destructor. Add definitions for
+	methods `dup', `fixup_before_fork_exec', `fixup_after_fork' and
+	`fixup_after_exec'.
+	* fork.cc (fork_parent): Care for file types which need a fixup
+	before fork. Start child in suspended state then.
+	* net.cc: New global variable `ws2_32_handle' and `wsadata'.
+	(fdsock): Check for Winsock version. Call `set_socket_inheritance'
+	only if Winsock version < 2.0. Care for `need_fixup' count in fdtab.
+	(cygwin_socket): Eliminate call to `set_socket_inheritance'.
+	(cygwin_accept): Ditto.
+	(cygwin_rcmd): Ditto.
+	(cygwin_rresvport): Ditto.
+	(cygwin_rexec): Ditto.
+	(socketpair): Ditto.
+	(fhandler_socket::fhandler_socket): Set `need_fork_fixup'. Allocate
+	space for the WSAPROTOCOL_INFOA struct used in fixup.
+	(fhandler_socket::~fhandler_socket): New destructor.
+	(fhandler_socket::fixup_before_fork_exec): New method.
+	(fhandler_socket::fixup_after_fork): Ditto.
+	(fhandler_socket::dup): Ditto.
+	(wsock_init): New static function.
+	(LoadDLLinitfunc (wsock32)): Rearranged.
+	(LoadDLLinitfunc (ws2_32)): New function.
+	(dummy_autoload): Add autoload statemants for `WSADuplicateSocketA'
+	and `WSASocketA'.
+	* spawn.cc (spawn_guts): Care for file types which need a fixup
+	before exec. Start child in suspended state then.
+
 Wed Oct 25 20:49:59 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* signal.cc (kill_pgrp): Don't limit sending of signals to stopped

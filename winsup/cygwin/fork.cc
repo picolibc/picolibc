@@ -341,6 +341,13 @@ fork_parent (void *stack_here, HANDLE& hParent, dll *&first_dll, bool& load_dlls
   else
     c_flags |= DETACHED_PROCESS;
 
+  /* Some file types (currently only sockets) need extra effort in the
+     parent after CreateProcess and before copying the datastructures
+     to the child. So we have to start the child in suspend state,
+     unfortunately, to avoid a race condition. */
+  if (fdtab.need_fixup_before ())
+    c_flags |= CREATE_SUSPENDED;
+
   hParent = NULL;
   if (!DuplicateHandle (hMainProc, hMainProc, hMainProc, &hParent, 0, 1,
 			DUPLICATE_SAME_ACCESS))
@@ -427,6 +434,14 @@ fork_parent (void *stack_here, HANDLE& hParent, dll *&first_dll, bool& load_dlls
       if (myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
 	seteuid (uid);
       return -1;
+    }
+
+  /* Fixup the parent datastructure if needed and resume the child's
+     main thread. */
+  if (fdtab.need_fixup_before ())
+    {
+      fdtab.fixup_before_fork (pi.dwProcessId);
+      ResumeThread (pi.hThread);
     }
 
   pinfo forked (cygwin_pid (pi.dwProcessId), 1);

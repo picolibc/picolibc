@@ -22,7 +22,8 @@ details. */
 #include <netdb.h>
 #include <fcntl.h>
 #include "autoload.h"
-#include <winsock.h>
+#include <winsock2.h>
+#include "cygheap.h"
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "path.h"
@@ -42,6 +43,9 @@ int __stdcall rexec (char **ahost, unsigned short inport, char *locuser,
 int __stdcall rresvport (int *);
 int sscanf (const char *, const char *, ...);
 } /* End of "C" section */
+
+extern HANDLE ws2_32_handle;
+WSADATA wsadata;
 
 /* Cygwin internal */
 static SOCKET __stdcall
@@ -308,9 +312,12 @@ cygwin_getprotobynumber (int number)
 fhandler_socket *
 fdsock (int fd, const char *name, SOCKET soc)
 {
+  if (wsadata.wVersion < 512) /* < Winsock 2.0 */
+    soc = set_socket_inheritance (soc);
   fhandler_socket *fh = (fhandler_socket *) fdtab.build_fhandler (fd, FH_SOCKET, name);
   fh->set_io_handle ((HANDLE) soc);
   fh->set_flags (O_RDWR);
+  fdtab.inc_need_fixup_before ();
   return fh;
 }
 
@@ -338,8 +345,6 @@ cygwin_socket (int af, int type, int protocol)
 	  set_winsock_errno ();
 	  goto done;
 	}
-
-      soc = set_socket_inheritance (soc);
 
       const char *name;
       if (af == AF_INET)
@@ -720,8 +725,6 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
 	set_winsock_errno ();
       else
 	{
-	  res = set_socket_inheritance (res);
-
 	  fdsock (res_fd, sock->get_name (), res);
 	  res = res_fd;
 	}
@@ -1593,15 +1596,11 @@ cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
     goto done;
   else
     {
-      res = set_socket_inheritance (res);
-
       fdsock (res_fd, "/dev/tcp", res);
       res = res_fd;
     }
   if (fd2p)
     {
-      fd2s = set_socket_inheritance (fd2s);
-
       fdsock (*fd2p, "/dev/tcp", fd2s);
     }
 done:
@@ -1625,8 +1624,6 @@ cygwin_rresvport (int *port)
     goto done;
   else
     {
-      res = set_socket_inheritance (res);
-
       fdsock (res_fd, "/dev/tcp", res);
       res = res_fd;
     }
@@ -1658,8 +1655,6 @@ cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
     goto done;
   else
     {
-      res = set_socket_inheritance (res);
-
       fdsock (res_fd, "/dev/tcp", res);
       res = res_fd;
     }
@@ -1766,26 +1761,14 @@ socketpair (int, int type, int, int *sb)
   closesocket (newsock);
   res = 0;
 
-  insock = set_socket_inheritance (insock);
-
   fdsock (sb[0], "/dev/tcp", insock);
 
-  outsock = set_socket_inheritance (outsock);
   fdsock (sb[1], "/dev/tcp", outsock);
 
 done:
   syscall_printf ("%d = socketpair (...)", res);
   ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK|READ_LOCK, "socketpair");
   return res;
-}
-
-/**********************************************************************/
-/* fhandler_socket */
-
-fhandler_socket::fhandler_socket (const char *name) :
-	fhandler_base (FH_SOCKET, name)
-{
-  set_cb (sizeof *this);
 }
 
 /* sethostent: standards? */
@@ -1798,6 +1781,89 @@ sethostent (int)
 extern "C" void
 endhostent (void)
 {
+}
+
+/**********************************************************************/
+/* fhandler_socket */
+
+fhandler_socket::fhandler_socket (const char *name) :
+	fhandler_base (FH_SOCKET, name)
+{
+  set_cb (sizeof *this);
+  set_need_fork_fixup ();
+  prot_info_ptr = (LPWSAPROTOCOL_INFOA) cmalloc (HEAP_BUF,
+  					         sizeof (WSAPROTOCOL_INFOA));
+}
+
+fhandler_socket::~fhandler_socket ()
+{
+  if (prot_info_ptr)
+    cfree (prot_info_ptr);
+}
+
+void
+fhandler_socket::fixup_before_fork_exec (DWORD win_proc_id)
+{
+  int ret = 1;
+
+  if (prot_info_ptr &&
+      (ret = WSADuplicateSocketA (get_socket (), win_proc_id, prot_info_ptr)))
+    {
+      debug_printf ("WSADuplicateSocket error");
+      set_winsock_errno ();
+    }
+  if (!ret && ws2_32_handle)
+    {
+      debug_printf ("WSADuplicateSocket went fine, dwServiceFlags1=%d",
+		    prot_info_ptr->dwServiceFlags1);
+    }
+  else
+    {
+      fhandler_base::fixup_before_fork_exec (win_proc_id);
+      debug_printf ("Without Winsock 2.0");
+    }
+}
+
+void
+fhandler_socket::fixup_after_fork (HANDLE parent)
+{
+  SOCKET new_sock = INVALID_SOCKET;
+
+  debug_printf ("WSASocket begin, dwServiceFlags1=%d",
+		prot_info_ptr->dwServiceFlags1);
+  if (prot_info_ptr &&
+      (new_sock = WSASocketA (FROM_PROTOCOL_INFO,
+                              FROM_PROTOCOL_INFO,
+                              FROM_PROTOCOL_INFO,
+                              prot_info_ptr, 0, 0)) == INVALID_SOCKET)
+    {
+      debug_printf ("WSASocket error");
+      set_winsock_errno ();
+    }
+  if (new_sock != INVALID_SOCKET && ws2_32_handle)
+    {
+      debug_printf ("WSASocket went fine");
+      set_io_handle ((HANDLE) new_sock);
+    }
+  else
+    {
+      fhandler_base::fixup_after_fork (parent);
+      debug_printf ("Without Winsock 2.0");
+    }
+}
+
+int
+fhandler_socket::dup (fhandler_base *child)
+{
+  fhandler_socket *fhs = (fhandler_socket *) child;
+  fhs->set_io_handle (get_io_handle ());
+  fhs->fixup_before_fork_exec (GetCurrentProcessId ());
+  if (ws2_32_handle)
+    {
+      fhs->fixup_after_fork (hMainProc);
+      return 0;
+    }
+  return fhandler_base::dup (child);
 }
 
 int
@@ -2011,12 +2077,28 @@ fhandler_socket::fcntl (int cmd, void *arg)
   return res;
 }
 
+static void
+wsock_init ()
+{
+  int res = WSAStartup ((2<<8) | 2, &wsadata);
+
+  debug_printf ("res %d", res);
+  debug_printf ("wVersion %d", wsadata.wVersion);
+  debug_printf ("wHighVersion %d", wsadata.wHighVersion);
+  debug_printf ("szDescription %s", wsadata.szDescription);
+  debug_printf ("szSystemStatus %s", wsadata.szSystemStatus);
+  debug_printf ("iMaxSockets %d", wsadata.iMaxSockets);
+  debug_printf ("iMaxUdpDg %d", wsadata.iMaxUdpDg);
+  debug_printf ("lpVendorInfo %d", wsadata.lpVendorInfo);
+
+  if (FIONBIO  != REAL_FIONBIO)
+    debug_printf ("****************  FIONBIO  != REAL_FIONBIO");
+}
+
 extern "C" {
 /* Initialize WinSock */
 LoadDLLinitfunc (wsock32)
 {
-  WSADATA p;
-  int res;
   HANDLE h;
 
   if ((h = LoadLibrary ("wsock32.dll")) != NULL)
@@ -2026,29 +2108,32 @@ LoadDLLinitfunc (wsock32)
   else
     return 0;		/* Already done by another thread? */
 
-  res = WSAStartup ((2<<8) | 2, &p);
-
-  debug_printf ("res %d", res);
-  debug_printf ("wVersion %d", p.wVersion);
-  debug_printf ("wHighVersion %d", p.wHighVersion);
-  debug_printf ("szDescription %s", p.szDescription);
-  debug_printf ("szSystemStatus %s", p.szSystemStatus);
-  debug_printf ("iMaxSockets %d", p.iMaxSockets);
-  debug_printf ("iMaxUdpDg %d", p.iMaxUdpDg);
-  debug_printf ("lpVendorInfo %d", p.lpVendorInfo);
-
-  if (FIONBIO  != REAL_FIONBIO)
-    debug_printf ("****************  FIONBIO  != REAL_FIONBIO");
+  if (!ws2_32_handle)
+    wsock_init ();
 
   return 0;
 }
 
-LoadDLLinit (wsock32)
+/* Initialize WinSock2.0 */
+LoadDLLinitfunc (ws2_32)
+{
+  HANDLE h;
+
+  if ((h = LoadLibrary ("ws2_32.dll")) == NULL)
+    return 0;          /* Already done or not available. */
+  ws2_32_handle = h;
+
+  if (!wsock32_handle)
+    wsock_init ();
+
+  return 0;
+}
 
 static void dummy_autoload (void) __attribute__ ((unused));
 static void
 dummy_autoload (void)
 {
+LoadDLLinit (wsock32)
 LoadDLLfunc (WSAAsyncSelect, 16, wsock32)
 LoadDLLfunc (WSACleanup, 0, wsock32)
 LoadDLLfunc (WSAGetLastError, 0, wsock32)
@@ -2084,5 +2169,9 @@ LoadDLLfunc (sendto, 24, wsock32)
 LoadDLLfunc (setsockopt, 20, wsock32)
 LoadDLLfunc (shutdown, 8, wsock32)
 LoadDLLfunc (socket, 12, wsock32)
+
+LoadDLLinit (ws2_32)
+LoadDLLfuncEx (WSADuplicateSocketA, 12, ws2_32, 1)
+LoadDLLfuncEx (WSASocketA, 24, ws2_32, 1)
 }
 }

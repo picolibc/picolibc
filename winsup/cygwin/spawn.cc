@@ -540,6 +540,14 @@ skip_arg_parsing:
   if (mode != _P_OVERLAY)
     flags |= CREATE_SUSPENDED;
 
+  /* Some file types (currently only sockets) need extra effort in the
+     parent after CreateProcess and before copying the datastructures
+     to the child. So we have to start the child in suspend state,
+     unfortunately, to avoid a race condition. */
+  if (fdtab.need_fixup_before ())
+    flags |= CREATE_SUSPENDED;
+
+
   /* Build windows style environment list */
   char *envblock;
   if (real_path.iscygexec ())
@@ -654,6 +662,15 @@ skip_arg_parsing:
       if (spr)
 	ForceCloseHandle (spr);
       return -1;
+    }
+
+  /* Fixup the parent datastructure if needed and resume the child's
+     main thread. */
+  if (fdtab.need_fixup_before ())
+    {
+      fdtab.fixup_before_exec (pi.dwProcessId);
+      if (mode == _P_OVERLAY)
+        ResumeThread (pi.hThread);
     }
 
   if (mode == _P_OVERLAY)

@@ -16,13 +16,26 @@ class dtable
   fhandler_base **fds;
   fhandler_base **fds_on_hold;
   int first_fd_for_open;
+  int cnt_need_fixup_before;
 public:
   size_t size;
-  dtable () {first_fd_for_open = 3;}
+
+  dtable ()
+    : first_fd_for_open(3), cnt_need_fixup_before(0) {}
+
+  void dec_need_fixup_before ()
+    { if (cnt_need_fixup_before > 0) --cnt_need_fixup_before; }
+  void inc_need_fixup_before ()
+    { ++cnt_need_fixup_before; }
+  BOOL need_fixup_before ()
+    { return cnt_need_fixup_before > 0; }
+
   int vfork_child_dup ();
   void vfork_parent_restore ();
   fhandler_base *dup_worker (fhandler_base *oldfh);
   int extend (int howmuch);
+  void fixup_before_exec (DWORD win_proc_id);
+  void fixup_before_fork (DWORD win_proc_id);
   void fixup_after_fork (HANDLE);
   fhandler_base *build_fhandler (int fd, DWORD dev, const char *name,
 				 int unit = -1);
