@@ -1,3 +1,8 @@
+2001-05-04  Alan Modra  <amodra@one.net.au>
+
+	* i386.h (i386_optab): Move InvMem to first operand of pmovmskb
+	and pextrw to swap reg/rm assignments.
+
 2001-03-24  Alan Modra  <alan@linuxcare.com.au>
 
 	* i386.h (i386_optab): Correct entry for "movntdq".  Add "punpcklqdq".
