@@ -1,3 +1,7 @@
+2001-01-09  Nick Clifton  <nickc@redhat.com>
+
+	* configure.host (v859): Remove unsupported compiler options.
+
 Fri Jan  5 19:57:00 EST 2001  Aaron J. Grier  <aaron@frye.com>
 
 	* src/newlib/configure.host (*-*-rtems*): add printf long long

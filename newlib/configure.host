@@ -164,15 +164,15 @@ case "${host_cpu}" in
 	;;
   v850)
 	machine_dir=v850
-	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -mv850 -mno-app-regs -msmall-sld"
+	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -mv850 "
 	;;
   v850e)
 	machine_dir=v850
-	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -mv850 -mno-app-regs -msmall-sld"
+	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -mv850 "
 	;;
   v850ea)
 	machine_dir=v850
-	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -mv850 -mno-app-regs -msmall-sld"
+	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -mv850 "
 	;;
   w65*)
 	machine_dir=w65
