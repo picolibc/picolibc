@@ -1,3 +1,15 @@
+2003-03-30  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* lib/uuid.c (IID_IHTML*): Move definitions to...
+	* lib/mshtml-uuid.c: New file.
+	* lib/Makefile.in: Add mshtml-uuid.o to libuuid.a
+
+2003-03-30  Michael Sazonov  <traip@comset.net>
+
+	* lib/uuid.c (IID_IHTML*): Add new GUID definitions.
+	* include/mshtml.h (IHTMLElementCollection, IHTMLLinkElement,
+	IHTMLImgElement): Add intetface definitions.
+
 2003-03-29  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/commctrl.h (ANIMATE_CLASS,HOTKEY_CLASS,PROGRESS_CLASS,
