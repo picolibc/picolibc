@@ -923,7 +923,7 @@ ctrl_c_handler (DWORD type)
 
   /* We're only the process group leader when we have a valid pinfo structure.
      If we don't have one, then the parent "stub" will handle the signal. */
-  if (!pinfo (GetCurrentProcessId ()))
+  if (!pinfo (cygwin_pid (GetCurrentProcessId ())))
     return TRUE;
 
   tty_min *t = cygwin_shared->tty.get_tty (myself->ctty);

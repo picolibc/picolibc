@@ -1,3 +1,8 @@
+2002-01-20  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (ctrl_c_handler): Convert windows pid to cygwin pid
+	when detecting if we should actually handle CTRL-C.
+
 2002-01-19  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in (new-cygwin1.dll): Revert previous change.  libsupc++.a
