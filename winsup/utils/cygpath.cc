@@ -27,7 +27,8 @@ static char *prog_name;
 static char *file_arg;
 static char *close_arg;
 static int path_flag, unix_flag, windows_flag, absolute_flag;
-static int shortname_flag, ignore_flag, allusers_flag, output_flag;
+static int shortname_flag, longname_flag;
+static int ignore_flag, allusers_flag, output_flag;
 
 static struct option long_options[] = {
   {(char *) "help", no_argument, NULL, 'h'},
@@ -40,6 +41,7 @@ static struct option long_options[] = {
   {(char *) "version", no_argument, NULL, 'v'},
   {(char *) "windows", no_argument, NULL, 'w'},
   {(char *) "short-name", no_argument, NULL, 's'},
+  {(char *) "long-name", no_argument, NULL, 'l'},
   {(char *) "windir", no_argument, NULL, 'W'},
   {(char *) "sysdir", no_argument, NULL, 'S'},
   {(char *) "ignore", no_argument, NULL, 'i'},
@@ -55,22 +57,26 @@ usage (FILE * stream, int status)
 {
   if (!ignore_flag || !status)
     fprintf (stream, "\
-Usage: %s [-p|--path] (-u|--unix)|(-w|--windows [-s|--short-name]) filename\n\
+Usage: %s (-u|--unix)|(-w|--windows) [options] filename\n\n\
+  -u|--unix		print Unix form of filename\n\
+  -w|--windows		print Windows form of filename\n\n\
+Other options:\n\
   -a|--absolute		output absolute path\n\
   -c|--close handle	close handle (for use in captured process)\n\
   -f|--file file	read file for input path information\n\
   -i|--ignore		ignore missing argument\n\
+  -l|--long-name	print Windows long form of filename (with -w only)\n\
   -p|--path		filename argument is a path\n\
-  -s|--short-name	print Windows short form of filename\n\
-  -u|--unix		print Unix form of filename\n\
-  -v|--version		output version information and exit\n\
-  -w|--windows		print Windows form of filename\n\
+  -s|--short-name	print Windows short form of filename (with -w only)\n\
   -A|--allusers		use `All Users' instead of current user for -D, -P\n\
   -D|--desktop		output `Desktop' directory and exit\n\
   -H|--homeroot		output `Profiles' directory (home root) and exit\n\
   -P|--smprograms	output Start Menu `Programs' directory and exit\n\
   -S|--sysdir		output system directory and exit\n\
-  -W|--windir		output `Windows' directory and exit\n", prog_name);
+  -W|--windir		output `Windows' directory and exit\n\n\
+Informative output:\n\
+  -h|--help             print this help, then exit\n\
+  -v|--version		output version information and exit\n", prog_name);
   exit (ignore_flag ? 0 : status);
 }
 
@@ -123,6 +129,7 @@ get_short_paths (char *path)
 	break;
       *sptr = ';';
       ++ptr, ++sptr;
+      acc -= len + 1;
     }
   return sbuf;
 }
@@ -130,8 +137,8 @@ get_short_paths (char *path)
 static char *
 get_short_name (const char *filename)
 {
-  char *sbuf;
-  DWORD len = GetShortPathName (filename, NULL, 0);
+  char *sbuf, buf[MAX_PATH];
+  DWORD len = GetShortPathName (filename, buf, MAX_PATH);
   if (len == 0 && GetLastError () == ERROR_INVALID_PARAMETER)
     {
       fprintf (stderr, "%s: cannot create short name of %s\n", prog_name,
@@ -144,14 +151,225 @@ get_short_name (const char *filename)
       fprintf (stderr, "%s: out of memory\n", prog_name);
       exit (1);
     }
-  len = GetShortPathName (filename, sbuf, len);
+  return strcpy (sbuf, buf);
+}
+
+static DWORD
+get_long_path_name_w32impl (LPCSTR src, LPSTR sbuf, DWORD)
+{
+  char buf1[MAX_PATH], buf2[MAX_PATH], *ptr;
+  const char *pelem, *next;
+  WIN32_FIND_DATA w32_fd;
+  int len;
+  
+  strcpy (buf1, src);
+  *buf2 = 0;
+  pelem = src;
+  ptr = buf2;
+  while (pelem)
+    {
+      next = pelem;
+      if (*next == '\\')
+	{
+	  strcat (ptr++, "\\");
+	  pelem++;
+	  if (!*pelem)
+	    break;
+	  continue;
+	}
+      pelem = strchr (next, '\\');
+      len = pelem ? (pelem++ - next) : strlen (next);
+      strncpy (ptr, next, len);
+      ptr[len] = 0;
+      if (next[1] != ':' && strcmp(next, ".") && strcmp(next, ".."))
+	{
+	  if (FindFirstFile (buf2, &w32_fd) != INVALID_HANDLE_VALUE)
+	    strcpy (ptr, w32_fd.cFileName);
+	}
+      ptr += strlen (ptr);
+      if (pelem)
+	{
+	  *ptr++ = '\\';
+	  *ptr = 0;
+	}
+    }
+  if (sbuf)
+    strcpy (sbuf, buf2);
+  SetLastError (0);
+  return strlen (buf2) + (sbuf ? 0 : 1);
+}
+
+static char *
+get_long_paths (char *path)
+{
+  char *sbuf;
+  char *sptr;
+  char *next;
+  char *ptr = path;
+  char *end = strrchr (path, 0);
+  DWORD acc = 0;
+  DWORD len;
+
+  HINSTANCE hinst;
+  DWORD (*GetLongPathNameAPtr) (LPCSTR, LPSTR, DWORD) = 0;
+  hinst = LoadLibrary ("kernel32");
+  if (hinst)
+    GetLongPathNameAPtr = (DWORD (*) (LPCSTR, LPSTR, DWORD))
+      GetProcAddress (hinst, "GetLongPathNameA");
+  /* subsequent calls of kernel function with NULL cause SegFault in W2K!! */
+  if (1 || !GetLongPathNameAPtr)
+    GetLongPathNameAPtr = get_long_path_name_w32impl;
+
+  while (ptr != NULL)
+    {
+      next = ptr;
+      ptr = strchr (ptr, ';');
+      if (ptr)
+	*ptr++ = 0;
+      len = (*GetLongPathNameAPtr) (next, NULL, 0);
+      if (len == 0 && GetLastError () == ERROR_INVALID_PARAMETER)
+	{
+	  fprintf (stderr, "%s: cannot create long name of %s\n", prog_name,
+		   next);
+	  exit (2);
+	}
+      acc += len + 1;
+    }
+  sptr = sbuf = (char *) malloc (acc + 1);
+  if (sbuf == NULL)
+    {
+      fprintf (stderr, "%s: out of memory\n", prog_name);
+      exit (1);
+    }
+  ptr = path;
+  for (;;)
+    {
+      len = (*GetLongPathNameAPtr) (ptr, sptr, acc);
+      if (len == 0 && GetLastError () == ERROR_INVALID_PARAMETER)
+	{
+	  fprintf (stderr, "%s: cannot create long name of %s\n", prog_name,
+		   ptr);
+	  exit (2);
+	}
+
+      ptr = strrchr (ptr, 0);
+      sptr = strrchr (sptr, 0);
+      if (ptr == end)
+	break;
+      *ptr = *sptr = ';';
+      ++ptr, ++sptr;
+      acc -= len + 1;
+    }
+  return sbuf;
+}
+
+static char *
+get_long_name (const char *filename)
+{
+  char *sbuf, buf[MAX_PATH];
+  DWORD len;
+  HINSTANCE hinst;
+  DWORD (*GetLongPathNameAPtr) (LPCSTR, LPSTR, DWORD) = 0;
+  hinst = LoadLibrary ("kernel32");
+  if (hinst)
+    GetLongPathNameAPtr = (DWORD (*) (LPCSTR, LPSTR, DWORD))
+      GetProcAddress (hinst, "GetLongPathNameA");
+  if (!GetLongPathNameAPtr)
+    GetLongPathNameAPtr = get_long_path_name_w32impl;
+  
+  len = (*GetLongPathNameAPtr) (filename, buf, MAX_PATH);
   if (len == 0 && GetLastError () == ERROR_INVALID_PARAMETER)
     {
-      fprintf (stderr, "%s: cannot create short name of %s\n", prog_name,
+      fprintf (stderr, "%s: cannot create long name of %s\n", prog_name,
 	       filename);
       exit (2);
     }
-  return sbuf;
+  sbuf = (char *) malloc (++len);
+  if (sbuf == NULL)
+    {
+      fprintf (stderr, "%s: out of memory\n", prog_name);
+      exit (1);
+    }
+  return strcpy (sbuf, buf);
+}
+
+static void
+dowin (char option)
+{
+  char *buf, buf1[MAX_PATH], buf2[MAX_PATH];
+  DWORD len = MAX_PATH;
+  WIN32_FIND_DATA w32_fd;
+  LPITEMIDLIST id;
+  HINSTANCE hinst;
+  BOOL (*GetProfilesDirectoryAPtr) (LPSTR, LPDWORD) = 0;
+      
+  buf = buf1;
+  switch (option)
+    {
+    case 'D':
+      SHGetSpecialFolderLocation (NULL, allusers_flag ? 
+	CSIDL_COMMON_DESKTOPDIRECTORY : CSIDL_DESKTOPDIRECTORY, &id);
+      SHGetPathFromIDList (id, buf);
+      /* This if clause is a Fix for Win95 without any "All Users" */
+      if (strlen (buf) == 0)
+	{
+	  SHGetSpecialFolderLocation (NULL, CSIDL_DESKTOPDIRECTORY, &id);
+	  SHGetPathFromIDList (id, buf);
+	}
+      break;
+
+    case 'P':
+      SHGetSpecialFolderLocation (NULL, allusers_flag ? 
+	CSIDL_COMMON_PROGRAMS : CSIDL_PROGRAMS, &id);
+      SHGetPathFromIDList (id, buf);
+      /* This if clause is a Fix for Win95 without any "All Users" */
+      if (strlen (buf) == 0)
+	{
+	  SHGetSpecialFolderLocation (NULL, CSIDL_PROGRAMS, &id);
+	  SHGetPathFromIDList (id, buf);
+	}
+      break;
+
+    case 'H':
+      hinst = LoadLibrary ("userenv");
+      if (hinst)
+	GetProfilesDirectoryAPtr = (BOOL (*) (LPSTR, LPDWORD))
+	  GetProcAddress (hinst, "GetProfilesDirectoryA");
+      if (GetProfilesDirectoryAPtr)
+        (*GetProfilesDirectoryAPtr) (buf, &len);
+      else
+	{
+	  GetWindowsDirectory (buf, MAX_PATH);
+	  strcat (buf, "\\Profiles");
+	}
+      break;
+
+    case 'S':
+      GetSystemDirectory (buf, MAX_PATH);
+      FindFirstFile (buf, &w32_fd);
+      strcpy (strrchr (buf, '\\') + 1, w32_fd.cFileName);
+      break;
+
+    case 'W':
+      GetWindowsDirectory (buf, MAX_PATH);
+      break;
+
+    default:
+      usage (stderr, 1);
+    }
+
+  if (!windows_flag)
+    {
+      cygwin_conv_to_posix_path (buf, buf2);
+      buf = buf2;
+    }
+  else
+    {
+      if (shortname_flag)
+        buf = get_short_name (buf);
+    }
+  printf ("%s\n", buf);
+  exit (0);
 }
 
 static void
@@ -213,6 +431,8 @@ doit (char *filename)
 	  cygwin_posix_to_win32_path_list (filename, buf);
 	  if (shortname_flag)
 	    buf = get_short_paths (buf);
+	  if (longname_flag)
+	    buf = get_long_paths (buf);
 	}
     }
   else
@@ -230,8 +450,13 @@ doit (char *filename)
 		   prog_name, filename);
 	  exit (1);
 	}
-      if (!unix_flag && shortname_flag)
-	buf = get_short_name (buf);
+      if (!unix_flag)
+	{
+	if (shortname_flag)
+	  buf = get_short_name (buf);
+	if (longname_flag)
+	  buf = get_long_name (buf);
+	}
     }
 
   puts (buf);
@@ -278,12 +503,13 @@ main (int argc, char **argv)
   unix_flag = 0;
   windows_flag = 0;
   shortname_flag = 0;
+  longname_flag = 0;
   ignore_flag = 0;
   options_from_file_flag = 0;
   allusers_flag = 0;
   output_flag = 0;
   while ((c =
-	  getopt_long (argc, argv, (char *) "hac:f:opsSuvwWiDPAH",
+	  getopt_long (argc, argv, (char *) "hac:f:opslSuvwWiDPAH",
 		       long_options, (int *) NULL)) != EOF)
     {
       switch (c)
@@ -320,8 +546,14 @@ main (int argc, char **argv)
 	  windows_flag = 1;
 	  break;
 
+	case 'l':
+	  if (unix_flag || shortname_flag)
+	    usage (stderr, 1);
+	  longname_flag = 1;
+	  break;
+
 	case 's':
-	  if (unix_flag)
+	  if (unix_flag || longname_flag)
 	    usage (stderr, 1);
 	  shortname_flag = 1;
 	  break;
@@ -360,97 +592,17 @@ main (int argc, char **argv)
 
     }
 
-  if (output_flag)
-    {
-      char *buf, buf1[MAX_PATH], buf2[MAX_PATH];
-      DWORD len = MAX_PATH;
-      WIN32_FIND_DATA w32_fd;
-      LPITEMIDLIST id;
-      HINSTANCE hinst;
-      BOOL (*GetProfilesDirectoryAPtr) (LPSTR, LPDWORD) = 0;
-      
-      buf = buf1;
-      switch (o)
-	{
-	case 'D':
-	  if (!allusers_flag)
-	    SHGetSpecialFolderLocation (NULL, CSIDL_DESKTOPDIRECTORY, &id);
-	  else
-	    SHGetSpecialFolderLocation (NULL, CSIDL_COMMON_DESKTOPDIRECTORY,
-					&id);
-	  SHGetPathFromIDList (id, buf);
-	  /* This if clause is a Fix for Win95 without any "All Users" */
-	  if (strlen (buf) == 0)
-	    {
-	      SHGetSpecialFolderLocation (NULL, CSIDL_DESKTOPDIRECTORY, &id);
-	      SHGetPathFromIDList (id, buf);
-	    }
-	  break;
-
-	case 'P':
-	  if (!allusers_flag)
-	    SHGetSpecialFolderLocation (NULL, CSIDL_PROGRAMS, &id);
-	  else
-	    SHGetSpecialFolderLocation (NULL, CSIDL_COMMON_PROGRAMS, &id);
-	  SHGetPathFromIDList (id, buf);
-	  /* This if clause is a Fix for Win95 without any "All Users" */
-	  if (strlen (buf) == 0)
-	    {
-	      SHGetSpecialFolderLocation (NULL, CSIDL_PROGRAMS, &id);
-	      SHGetPathFromIDList (id, buf);
-	    }
-	  break;
-
-	case 'H':
-	  hinst = LoadLibrary ("userenv");
-	  if (hinst)
-	    GetProfilesDirectoryAPtr = (BOOL (*) (LPSTR, LPDWORD))
-	      GetProcAddress (hinst, "GetProfilesDirectoryA");
-	  if (GetProfilesDirectoryAPtr)
-	    (*GetProfilesDirectoryAPtr) (buf, &len);
-	  else
-	    {
-	      GetWindowsDirectory (buf, MAX_PATH);
-	      strcat (buf, "\\Profiles");
-	    }
-	  break;
-
-	case 'S':
-	  GetSystemDirectory (buf, MAX_PATH);
-	  FindFirstFile (buf, &w32_fd);
-	  strcpy (strrchr (buf, '\\') + 1, w32_fd.cFileName);
-	  break;
-
-	case 'W':
-	  GetWindowsDirectory (buf, MAX_PATH);
-	  break;
-
-	default:
-    	  usage (stderr, 1);
-	}
-
-	if (!windows_flag)
-	  {
-	    cygwin_conv_to_posix_path (buf, buf2);
-	    buf = buf2;
-	  }
-	else
-	  {
-	    if (shortname_flag)
-	      buf = get_short_name (buf);
-	  }
-	printf ("%s\n", buf);
-	exit (0);
-    }
-
   if (options_from_file_flag && !file_arg)
     usage (stderr, 1);
 
-  if (!unix_flag && !windows_flag && !options_from_file_flag)
+  if (!output_flag && !unix_flag && !windows_flag && !options_from_file_flag)
     usage (stderr, 1);
 
   if (!file_arg)
     {
+      if (output_flag)
+	dowin (o);
+
       if (optind != argc - 1)
 	usage (stderr, 1);
 
@@ -499,6 +651,11 @@ main (int argc, char **argv)
 		    break;
 		  case 's':
 		    shortname_flag = 1;
+		    longname_flag = 0;
+		    break;
+		  case 'l':
+		    shortname_flag = 0;
+		    longname_flag = 1;
 		    break;
 		  case 'w':
 		    unix_flag = 0;
@@ -510,14 +667,25 @@ main (int argc, char **argv)
 		    break;
 		  case 'p':
 		    path_flag = 1;
+		    break;
+		  case 'D':
+		  case 'H':
+		  case 'P':
+		  case 'S':
+		  case 'W':
+	  	    output_flag = 1;
+		    o = c;
+	  	    break;
 		  }
 	      if (*s)
 		do
 		  s++;
 		while (*s && isspace (*s));
 	    }
-	  if (*s)
+	  if (*s && !output_flag)
 	    doit (s);
+	  if (!*s && output_flag)
+	    dowin (o);
 	}
     }
 

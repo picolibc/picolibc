@@ -71,18 +71,22 @@ or if you know what everything is already, just leave this out.</para>
 <sect2 id="cygpath"><title>cygpath</title>
 
 <screen>
-Usage: cygpath.exe [-p|--path] (-u|--unix)|(-w|--windows [-s|--short-name]) filename
+Usage: cygpath [-p|--path] (-w|--windows) ([-s|--short-name]|[-l|--long-name]) filename
+Usage: cygpath [-p|--path] (-u|--unix) filename
+Usage: cygpath (-H|--homeroot)|(-S|--sysdir)|(-W|--windir) [-s|--short-name]
+Usage: cygpath [-A|--allusers] (-D|--desktop)|(-P|--smprograms) [-s|--short-name]
   -a|--absolute         output absolute path
   -c|--close handle     close handle (for use in captured process)
   -f|--file file        read file for input path information
   -i|--ignore           ignore missing argument
+  -l|--long-name        print Windows long form of filename
   -p|--path             filename argument is a path
   -s|--short-name       print Windows short form of filename
   -u|--unix             print Unix form of filename
   -v|--version          output version information and exit
   -w|--windows          print Windows form of filename
   -A|--allusers         use `All Users' instead of current user for -D, -P
-  -H|--homeroot		output `Profiles' directory (home root) and exit\n\
+  -H|--homeroot		output `Profiles' directory (home root) and exit
   -D|--desktop          output `Desktop' directory and exit
   -P|--smprograms       output Start Menu `Programs' directory and exit
   -S|--sysdir           output system directory and exit
@@ -102,8 +106,14 @@ indicate whether you want a conversion from Windows to UNIX (POSIX)
 format (<literal>-u</literal>) or a conversion from UNIX (POSIX) to
 Windows format (<literal>-w</literal>).  You must give exactly
 one of these.  To give neither or both is an error.  Use the
-<literal>-s</literal> option in combination with the <literal>-w
-</literal> option to convert to Windows short form.</para>
+<literal>-l</literal> or <literal>-s</literal> option in combination 
+with the <literal>-w</literal> option to convert to Windows long or 
+short form.</para>
+
+<para>Caveat: The <literal>-l</literal> option does not work if the
+<em>check_case</em> parameter of <em>CYGWIN</em> is set to <em>strict</em>,
+since Cygwin is not able to match any Windows short path in this mode.
+</para>
 
 <para>The <literal>-p</literal> option means that you want to convert
 a path-style string rather than a single filename.  For example, the

@@ -1,3 +1,23 @@
+2002-05-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygpath.cc (usage): Change usage output slightly.
+
+2002-05-20  Joerg Schaible <joerg.schaible@gmx.de>
+
+	* cygpath.cc (main): Add option l to support conversion to   
+	Windows long file names.  Refactured code for capital options.
+	Support of options from file for capital options.
+	(dowin): New function.  Refactured from main.
+	(doit): Call long path conversion.
+	(get_long_name): New function.
+	(get_long_paths): New function.
+	(get_long_path_name_w32impl): New function.  Reimplementation
+	of Windows API function GetLongPathName (only 98/Me/2000/XP or  
+	higher).
+	(get_short_name): Call GetShortPathName only once.
+	(get_short_paths): Fix calculating buffer size.
+	* utils.sgml: Update cygpath section for l option.
+
 2002-05-18  Christopher Faylor  <cgf@redhat.com>
 
 	* strace.cc (add_child): Use calloc since new requires working
