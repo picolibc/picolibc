@@ -433,10 +433,8 @@ static const struct i860_opcode i860_opcodes[] =
 { "pfsub.ss",	0x48000431, 0xb40001ce, "e,f,g", 0 },	/* pfsub.p fsrc1,fsrc2,fdest */
 { "pfsub.sd",	0x480004b1, 0xb400014e, "e,f,g", 0 },	/* pfsub.p fsrc1,fsrc2,fdest */
 { "pfsub.dd",	0x480005b1, 0xb400004e, "e,f,g", 0 },	/* pfsub.p fsrc1,fsrc2,fdest */
-{ "fix.ss",	0x48000032, 0xb40005cd, "e,g", 0 },	/* fix.p fsrc1,fdest */
 { "fix.sd",	0x480000b2, 0xb400054d, "e,g", 0 },	/* fix.p fsrc1,fdest */
 { "fix.dd",	0x480001b2, 0xb400044d, "e,g", 0 },	/* fix.p fsrc1,fdest */
-{ "pfix.ss",	0x48000432, 0xb40001cd, "e,g", 0 },	/* pfix.p fsrc1,fdest */
 { "pfix.sd",	0x480004b2, 0xb400014d, "e,g", 0 },	/* pfix.p fsrc1,fdest */
 { "pfix.dd",	0x480005b2, 0xb400004d, "e,g", 0 },	/* pfix.p fsrc1,fdest */
 { "famov.ss",	0x48000033, 0xb40005cc, "e,g", 0 },	/* famov.p fsrc1,fdest */
@@ -455,10 +453,8 @@ static const struct i860_opcode i860_opcodes[] =
 { "pfle.dd",	0x480005b4, 0xb400004b, "e,f,g", 0 },	/* pfle.p fsrc1,fsrc2,fdest */
 { "pfeq.ss",	0x48000435, 0xb40001ca, "e,f,g", 0 },	/* pfeq.p fsrc1,fsrc2,fdest */
 { "pfeq.dd",	0x48000535, 0xb40000ca, "e,f,g", 0 },	/* pfeq.p fsrc1,fsrc2,fdest */
-{ "ftrunc.ss",	0x4800003a, 0xb40005c5, "e,g", 0 },	/* ftrunc.p fsrc1,fdest */
 { "ftrunc.sd",	0x480000ba, 0xb4000545, "e,g", 0 },	/* ftrunc.p fsrc1,fdest */
 { "ftrunc.dd",	0x480001ba, 0xb4000445, "e,g", 0 },	/* ftrunc.p fsrc1,fdest */
-{ "pftrunc.ss",	0x4800043a, 0xb40001c5, "e,g", 0 },	/* pftrunc.p fsrc1,fdest */
 { "pftrunc.sd",	0x480004ba, 0xb4000145, "e,g", 0 },	/* pftrunc.p fsrc1,fdest */
 { "pftrunc.dd",	0x480005ba, 0xb4000045, "e,g", 0 },	/* pftrunc.p fsrc1,fdest */
 { "fxfr",	0x48000040, 0xb40005bf, "e,d", 0 },	/* fxfr fsrc1,idest */
@@ -472,14 +468,14 @@ static const struct i860_opcode i860_opcodes[] =
 { "pfisub.dd",	0x480005cd, 0xb4000032, "e,f,g", 0 },	/* pfisub.w fsrc1,fsrc2,fdest */
 { "fzchkl",	0x480001d7, 0xb4000428, "e,f,g", 0 },	/* fzchkl fsrc1,fsrc2,fdest */
 { "pfzchkl",	0x480005d7, 0xb4000028, "e,f,g", 0 },	/* pfzchkl fsrc1,fsrc2,fdest */
-{ "fzchks",	0x4800015f, 0xb4000420, "e,f,g", 0 },	/* fzchks fsrc1,fsrc2,fdest */
-{ "pfzchks",	0x4800055f, 0xb4000020, "e,f,g", 0 },	/* pfzchks fsrc1,fsrc2,fdest */
-{ "faddp",	0x48000050, 0xb40005af, "e,f,g", 0 },	/* faddp fsrc1,fsrc2,fdest */
-{ "pfaddp",	0x48000450, 0xb40001af, "e,f,g", 0 },	/* pfaddp fsrc1,fsrc2,fdest */
+{ "fzchks",	0x480001df, 0xb4000420, "e,f,g", 0 },	/* fzchks fsrc1,fsrc2,fdest */
+{ "pfzchks",	0x480005df, 0xb4000020, "e,f,g", 0 },	/* pfzchks fsrc1,fsrc2,fdest */
+{ "faddp",	0x480001d0, 0xb400042f, "e,f,g", 0 },	/* faddp fsrc1,fsrc2,fdest */
+{ "pfaddp",	0x480005d0, 0xb400002f, "e,f,g", 0 },	/* pfaddp fsrc1,fsrc2,fdest */
 { "faddz",	0x480001d1, 0xb400042e, "e,f,g", 0 },	/* faddz fsrc1,fsrc2,fdest */
 { "pfaddz",	0x480005d1, 0xb400002e, "e,f,g", 0 },	/* pfaddz fsrc1,fsrc2,fdest */
-{ "form.dd",	0x480001da, 0xb4000425, "e,g", 0 },	/* form fsrc1,fdest */
-{ "pform.dd",	0x480005da, 0xb4000025, "e,g", 0 },	/* pform fsrc1,fdest */
+{ "form",	0x480001da, 0xb4000425, "e,g", 0 },	/* form fsrc1,fdest */
+{ "pform",	0x480005da, 0xb4000025, "e,g", 0 },	/* pform fsrc1,fdest */
 
 /* Floating point pseudo-instructions.  */
 { "fmov.ss",	0x48000049, 0xb7e005b6, "e,g", 0 },	/* fiadd.ss fsrc1,f0,fdest */

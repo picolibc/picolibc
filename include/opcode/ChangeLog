@@ -1,3 +1,14 @@
+2003-05-20  Jason Eckhardt  <jle@rice.edu>
+
+	opcode/i860.h (fzchks): Both S and R bits must be set.
+	(pfzchks): Likewise.
+	(faddp): Likewise.
+	(pfaddp): Likewise.
+	(fix.ss): Remove (invalid instruction).
+	(pfix.ss): Likewise.
+	(ftrunc.ss): Likewise.
+	(pftrunc.ss): Likewise.
+
 2003-05-18  Jason Eckhardt  <jle@rice.edu>
 
 	* i860.h (form, pform): Add missing .dd suffix.
