@@ -1,5 +1,8 @@
 Thu Sep 23 07:08:38 1999  Jerry Quinn <jquinn@nortelnetworks.com>
 
+	* hppa.h (pa_opcodes): Add "call" and "ret".  Clean up "b", "bve"
+	and "be" using completer prefixes.
+
 	* hppa.h (pa_opcodes): Add initializers to silence compiler.
 
 	* hppa.h: Update comments about character usage.

@@ -71,8 +71,8 @@ struct pa_opcode
    In the args field, the following characters are unused:
 
 	'  "   &     -  /   34 6789:;< > @'
-	'  C                     Y [\]  '
-	'    e                   y   } '
+	' BC         M             [\]  '
+	'    e g    l            y   } '
 
    Here are all the characters:
 
@@ -145,11 +145,7 @@ Also these:
 	the bb instruction. It's the same as r above, except the
         value is in a different location)
    Z    %r1 -- implicit target of addil instruction.
-   g    ,gate completer for new syntax branch
-   l	,l completer for new syntax branch
-   M    ,push completer for new syntax branch
    L    ,%r2 completer for new syntax branch
-   B    ,pop completer for new syntax branch
    {    Source format completer for fcnv
    _    Destination format completer for fcnv
    h    cbit for fcmp
@@ -158,6 +154,7 @@ Also these:
    #    14bit offset for double precision FP load long/store.
    J    Yet another 14bit offset with an unusual encoding.
    K    Yet another 14bit offset with an unusual encoding.
+   Y    %sr0,%r31 -- implicit target of be,l instruction.
 
 Completer operands all have 'c' as the prefix:
 
@@ -168,6 +165,11 @@ Completer operands all have 'c' as the prefix:
    cs   store bytes short completer.
    cc   Another load/store completer with a different encoding than the
 	others
+
+   cp	branch link and push completer
+   cP	branch pop completer
+   cl	branch link completer
+   cg	branch gate completer
 
    cw	read/write completer for PROBE
    cW	wide completer for MFCTL
@@ -262,13 +264,14 @@ static const char *const completer_chars = ",CcY<>?!@+&U~FfGHINnOoZMadu|/=0123%e
 static const struct pa_opcode pa_opcodes[] =
 {
 
+/* pseudo-instructions */
 
-{ "b",		0xe8002000, 0xfc00e000, "gnW,b", pa10, FLAG_STRICT},
-{ "b",		0xe8008000, 0xfc00e000, "lMnXL", pa20, FLAG_STRICT},
-{ "b",		0xe800a000, 0xfc00e000, "lnXL", pa20, FLAG_STRICT},
-{ "b",		0xe8000000, 0xfc00e000, "lnW,b", pa10, FLAG_STRICT},
-{ "b",		0xe8000000, 0xffe0e000, "nW", pa10, 0}, /* bl foo,r0 */
 { "ldi",	0x34000000, 0xffe0c000, "j,x", pa10, 0},/* ldo val(r0),r */
+
+{ "call",	0xe800f000, 0xfc1ffffd, "n(b)", pa20, FLAG_STRICT},
+{ "call",	0xe800a000, 0xffe0e000, "nW", pa10, FLAG_STRICT},
+{ "ret",	0xe840d000, 0xfffffffd, "n", pa20, FLAG_STRICT},
+
 { "comib", 	0x84000000, 0xfc000000, "?nn5,b,w", pa10, 0}, /* comib{tf}*/
 /* This entry is for the disassembler only.  It will never be used by
    assembler.  */
@@ -397,18 +400,24 @@ static const struct pa_opcode pa_opcodes[] =
 { "addil",	0x28000000, 0xfc000000, "k,b", pa10, 0},
 
 /* Branching instructions. */
+{ "b",		0xe8008000, 0xfc00e000, "cpnXL", pa20, FLAG_STRICT},
+{ "b",		0xe800a000, 0xfc00e000, "clnXL", pa20, FLAG_STRICT},
+{ "b",		0xe8000000, 0xfc00e000, "clnW,b", pa10, FLAG_STRICT},
+{ "b",		0xe8002000, 0xfc00e000, "cgnW,b", pa10, FLAG_STRICT},
+{ "b",		0xe8000000, 0xffe0e000, "nW", pa10},  /* b,l foo,r0 */
 { "bl",		0xe8000000, 0xfc00e000, "nW,b", pa10, 0},
 { "gate",	0xe8002000, 0xfc00e000, "nW,b", pa10, 0},
 { "blr",	0xe8004000, 0xfc00e001, "nx,b", pa10, 0},
 { "bv",		0xe800c000, 0xfc00fffd, "nx(b)", pa10, 0},
 { "bv",		0xe800c000, 0xfc00fffd, "n(b)", pa10, 0},
-{ "bve",	0xe800f001, 0xfc00ffff, "lMn(b)L", pa20, FLAG_STRICT},
-{ "bve",	0xe800f000, 0xfc00ffff, "ln(b)L", pa20, FLAG_STRICT},
-{ "bve",	0xe800d001, 0xfc00ffff, "Bn(b)", pa20, FLAG_STRICT},
-{ "bve",	0xe800d000, 0xfc00ffff, "n(b)", pa20, FLAG_STRICT},
-{ "be",		0xe4000000, 0xfc000000, "lnz(S,b)", pa10, FLAG_STRICT},
-{ "be",		0xe0000000, 0xfc000000, "nz(S,b)", pa10, FLAG_STRICT},
+{ "bve",	0xe800f001, 0xfc1ffffd, "cpn(b)L", pa20, FLAG_STRICT},
+{ "bve",	0xe800f000, 0xfc1ffffd, "cln(b)L", pa20, FLAG_STRICT},
+{ "bve",	0xe800d001, 0xfc1ffffd, "cPn(b)", pa20, FLAG_STRICT},
+{ "bve",	0xe800d000, 0xfc1ffffd, "n(b)", pa20, FLAG_STRICT},
+{ "be",		0xe4000000, 0xfc000000, "clnz(S,b),Y", pa10, FLAG_STRICT},
+{ "be",		0xe4000000, 0xfc000000, "clnz(b),Y", pa10, FLAG_STRICT},
 { "be",		0xe0000000, 0xfc000000, "nz(S,b)", pa10, 0},
+{ "be",		0xe0000000, 0xfc000000, "nz(b)", pa10, 0},
 { "ble",	0xe4000000, 0xfc000000, "nz(S,b)", pa10, 0},
 { "movb",	0xc8000000, 0xfc000000, "?ynx,b,w", pa10, 0},
 { "movib",	0xcc000000, 0xfc000000, "?yn5,b,w", pa10, 0},
