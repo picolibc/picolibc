@@ -758,6 +758,7 @@ fhandler_base::read (void *in_ptr, size_t& len)
 	  __small_sprintf (p, c >= 33 && c <= 127 ? " %c" : " %p", c);
 	  p += strlen (p);
 	}
+      *p = '\0';
       debug_printf ("read %d bytes (%s%s)", copied_chars, buf,
 		    copied_chars > 16 ? " ..." : "");
     }

@@ -1,3 +1,8 @@
+2004-12-05  Bas van Gompel  <cygwin-patch@bavag.tmfweb.nl>
+
+	* fhandler.cc (fhandler_base::read): Don't debug_printf garbage when
+	copied_chars is zero.
+
 2004-12-03  Christopher Faylor  <cgf@timesys.com>
 
 	* environ.cc (environ_init): Alloc space for TERM if it is not set,
