@@ -1,3 +1,21 @@
+2003-03-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc: Slightly cleanup all utmp functions.
+	(login): Use mutex to secure against concurrent access to wtmp file.
+	(logout): Rewrite using POSIX calls.
+	(utmp_fd): Initialized to -1 now.  Any value < 0 is treated as closed
+	in subsequent functions.
+	(utmp_readonly): New variable, indicating utmp file open for reading
+	only.
+	(internal_setutent): New function implementing setutent().
+	(setutent): Call internal_setutent now.
+	(endutent): Reset utmp_readonly.
+	(getutent): Return immediately if utmp file can't be opened.
+	(getutid): Ditto.
+	(getutline): Ditto.
+	(pututline): Ditto. Use mutex to secure against concurrent access to
+	utmp file.
+
 2003-03-28  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in: Remove EXE_LDFLAGS.  Fix fhandler_CFLAGS typo.  Recognize .s suffix.
