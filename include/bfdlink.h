@@ -495,6 +495,9 @@ struct bfd_link_callbacks
      ld.  */
   bfd_boolean (*error_handler)
     PARAMS ((int id, const char * fmt, ...));
+
+/* Identifiers of linker error messages used by error_handler.  */
+#define LD_DEFINITION_IN_DISCARDED_SECTION	1
 };
 
 /* The linker builds link_order structures which tell the code how to
