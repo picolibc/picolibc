@@ -1,3 +1,8 @@
+2002-09-03  René Møller Fonseca  <fonseca@users.sourceforge.net>
+
+	* include/winuser.h (IDTRYAGAIN,IDCONTINUE): Add defines.
+	Add WINVER guards for dialog box command id defines.
+
 2002-09-03  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/wincon.h (GetConsoleWindow): Add _WIN32_WINNT >= 0x0500 guard.

@@ -693,15 +693,23 @@ extern "C" {
 #define MB_NOFOCUS 0x00008000
 #define MB_TYPEMASK 15
 #define MB_TOPMOST 0x40000
-#define IDABORT 3
-#define IDCANCEL 2
-#define IDCLOSE 8
-#define IDHELP 9
-#define IDIGNORE 5
-#define IDNO 7
+
 #define IDOK 1
+#define IDCANCEL 2
+#define IDABORT 3
 #define IDRETRY 4
+#define IDIGNORE 5
 #define IDYES 6
+#define IDNO 7
+#if (WINVER >= 0x0400)
+#  define IDCLOSE 8
+#  define IDHELP 9
+#endif
+#if (WINVER >= 0x0500)
+#  define IDTRYAGAIN 10
+#  define IDCONTINUE 11
+#endif
+
 #define GWL_EXSTYLE (-20)
 #define GWL_STYLE (-16)
 #define GWL_WNDPROC (-4)
