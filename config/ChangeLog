@@ -1,3 +1,14 @@
+2003-07-07  Zack Weinberg  <zack@codesourcery.com>
+
+	* gettext.m4: Delete all former contents.
+	(ZW_GNU_GETTEXT_SISTER_DIR): New macro.
+	* progtest.m4: New file.
+
+2003-07-04  Zack Weinberg  <zack@codesourcery.com>
+
+	* gettext.m4: New file - copy of gettext.m4 from binutils
+	CVS, with added AC_ISC_POSIX macro from gcc/aclocal.m4.
+
 2003-05-14  Kelley Cook  <kelleycook@wideopenwest.com>
 
 	* acinclude.m4: Accept i[3456789]86 for machine type.
