@@ -1,5 +1,8 @@
 2002-04-30  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
+	* testsuite/lib/newlib.exp (newlib_target_compile): Change
+	method of finding libgloss_target_dir.
+
 	* Makefile.am (site.exp): Change host_alias, host_triplet,
 	target_alias, target_triplet to refer to gcc's host and target
 	variables (newlib's build and host variables).

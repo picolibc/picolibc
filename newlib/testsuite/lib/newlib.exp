@@ -67,7 +67,7 @@ proc newlib_target_compile { source dest type options } {
 	    [info exists gluefile] } {
 	lappend options "libs=$gluefile"
 	# This method of finding libgloss_target_dir may not work for some targets
-	set libgloss_target_dir [lindex [split $host_triplet "-"] 0]
+	set libgloss_target_dir [lindex [split $target_triplet "-"] 0]
 	lappend options "ldflags=$wrap_flags -B$objdir/../libgloss/$libgloss_target_dir \
                                              -L$objdir/../libgloss/$libgloss_target_dir \
                                              -L$srcdir/../../libgloss/$libgloss_target_dir \
