@@ -1,3 +1,7 @@
+2001-12-11  Christopher Faylor  <cgf@redhat.com>
+
+	* what.texinfo: Clarify XP.
+
 2001-12-03  Christopher Faylor  <cgf@redhat.com>
 
 	Cleanup copyrights and Cygnus'isms throughout.

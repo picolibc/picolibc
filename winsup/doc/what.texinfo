@@ -23,9 +23,8 @@ it, such as through a support contract with Red Hat.  For information
 about getting a Red Hat support contract, see
 @file{http://www.redhat.com/products/support/cygwin/}.
 
-That said, Cygwin can be expected to run on all modern versions of
-Windows, except Windows CE.  This includes Windows 95/98/ME/NT/2000,
-and, once it is officially released by Microsoft, Windows XP.
+That said, Cygwin can be expected to run on all modern 32 bit versions of
+Windows, except Windows CE.  This includes Windows 95/98/ME/NT/2000/XP.
 
 Keep in mind that Cygwin can only do as much as the underlying OS
 supports.  Because of this, Cygwin will behave differently, and
