@@ -1,5 +1,9 @@
 2004-05-04  Corinna Vinschen  <corinna@vinschen.de>
 
+	* crt0.o (mainCRTStartup): 16 byte align stack for main function.
+
+2004-05-04  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (check_sysfile): Don't scan string twice.
 
 2004-05-03  Corinna Vinschen  <corinna@vinschen.de>

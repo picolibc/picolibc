@@ -36,6 +36,8 @@ void
 mainCRTStartup ()
 {
 #ifdef __i386__
+  (void)__builtin_return_address(1);
+  asm volatile ("andl $-16,%%esp" ::: "%esp");
   if (__cygwin_crt0_bp)
     asm volatile ("int3");
 
