@@ -254,13 +254,24 @@ fhandler_base::raw_read (void *ptr, size_t& ulen)
 {
 #define bytes_read ((ssize_t) ulen)
 
+  HANDLE h = NULL;	/* grumble */
+  int prio = 0;		/* ditto */
   DWORD len = ulen;
+
   (ssize_t) ulen = -1;
   if (read_state)
-    SetEvent (read_state);
+    {
+      h = GetCurrentThread ();
+      prio = GetThreadPriority (h);
+      (void) SetThreadPriority (h, THREAD_PRIORITY_TIME_CRITICAL);
+      SetEvent (read_state);
+    }
   BOOL res = ReadFile (get_handle (), ptr, len, (DWORD *) &ulen, 0);
   if (read_state)
-    SetEvent (read_state);
+    {
+      SetEvent (read_state);
+      (void) SetThreadPriority (h, prio);
+    }
   if (!res)
     {
       /* Some errors are not really errors.  Detect such cases here.  */
@@ -497,7 +508,6 @@ done:
 void
 fhandler_base::read (void *in_ptr, size_t& len)
 {
-  size_t in_len = len;
   char *ptr = (char *) in_ptr;
   ssize_t copied_chars = 0;
   int c;
@@ -514,53 +524,31 @@ fhandler_base::read (void *in_ptr, size_t& len)
   if (copied_chars && is_slow ())
     {
       len = (size_t) copied_chars;
-      return;
+      goto out;
     }
 
-  if (len)
-    {
-      raw_read (ptr + copied_chars, len);
-      if (!copied_chars)
-	/* nothing */;
-      else if ((ssize_t) len > 0)
-	len += copied_chars;
-      else
-	len = copied_chars;
-    }
-  else if (copied_chars <= 0)
+  if (!len)
     {
       len = (size_t) copied_chars;
-      return;
+      goto out;
     }
 
-  if (get_r_binary ())
-    {
-      debug_printf ("returning %d chars, binary mode", len);
-      return;
-    }
+  raw_read (ptr + copied_chars, len);
+  if (!copied_chars)
+    /* nothing */;
+  else if ((ssize_t) len > 0)
+    len += copied_chars;
+  else
+    len = copied_chars;
 
-#if 0
-  char *ctrlzpos;
-  /* Scan buffer for a control-z and shorten the buffer to that length */
-
-  ctrlzpos = (char *) memchr ((char *) ptr, 0x1a, copied_chars);
-  if (ctrlzpos)
-    {
-      lseek ((ctrlzpos - ((char *) ptr + copied_chars)), SEEK_CUR);
-      copied_chars = ctrlzpos - (char *) ptr;
-    }
-
-  if (copied_chars == 0)
-    {
-      debug_printf ("returning 0 chars, text mode, CTRL-Z found");
-      return 0;
-    }
-#endif
+  if (get_r_binary () || len <= 0)
+    goto out;
 
   /* Scan buffer and turn \r\n into \n */
-  char *src = (char *) ptr;
-  char *dst = (char *) ptr;
-  char *end = src + len - 1;
+  char *src, *dst, *end;
+  src = (char *) ptr;
+  dst = (char *) ptr;
+  end = src + len - 1;
 
   /* Read up to the last but one char - the last char needs special handling */
   while (src < end)
@@ -570,25 +558,29 @@ fhandler_base::read (void *in_ptr, size_t& len)
       *dst++ = *src++;
     }
 
-  len = dst - (char *) ptr;
-
-  /* if last char is a '\r' then read one more to see if we should
-     translate this one too */
-  if (len < in_len && *src == '\r')
+  /* If not beyond end and last char is a '\r' then read one more
+     to see if we should translate this one too */
+  if (src > end)
+    /* nothing */;
+  else if (*src != '\r')
+    *dst++ = *src;
+  else
     {
-      size_t clen = 1;
-      raw_read (&c, clen);
-      if (clen <= 0)
+      char c1;
+      size_t c1len = 1;
+      raw_read (&c1, c1len);
+      if (c1len <= 0)
 	/* nothing */;
-      else if (c != '\n')
-	set_readahead_valid (1, c);
+      else if (c1 == '\n')
+	*dst++ = '\n';
       else
 	{
-	  *dst++ = '\n';
-	  len++;
+	  set_readahead_valid (1, c1);
+	  *dst++ = *src;
 	}
     }
 
+  len = dst - (char *) ptr;
 
 #ifndef NOSTRACE
   if (strace.active)
@@ -608,7 +600,9 @@ fhandler_base::read (void *in_ptr, size_t& len)
     }
 #endif
 
-  debug_printf ("returning %d chars, text mode", len);
+out:
+  debug_printf ("returning %d, %s mode", len,
+		get_r_binary () ? "binary" : "text");
   return;
 }
 
