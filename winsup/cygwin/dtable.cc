@@ -190,7 +190,6 @@ cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
 {
   if (fd == -1)
     fd = cygheap->fdtab.find_unused_handle ();
-  path_conv pc;
   fhandler_base *fh = build_fh_name (name);
   cygheap->fdtab[fd] = fh;
   fh->init (handle, myaccess, bin ?: fh->pc_binmode ());
