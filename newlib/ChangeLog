@@ -1,4 +1,4 @@
-2003-09-05  Ben Elliston  <bje@namadgi>
+2003-09-05  Ben Elliston  <bje@wasabisystems.com>
 
 	* libc/machine/xscale/memcmp.c (memcmp): Strip trailing whitespace
 	after continuation characters that induces a warning from modern
