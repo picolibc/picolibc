@@ -601,7 +601,7 @@ interruptible (DWORD pc, int testvalid = 0)
       /* Apparently Windows 95 can sometimes return bogus addresses from
 	 GetThreadContext.  These resolve to an allocation base == 0.
 	 These should *never* be treated as interruptible. */
-      if (!h)
+      if (!h || m.State != MEM_COMMIT)
 	res = 0;
       else if (testvalid)
 	res = 1;	/* All we wanted to know was if this was a valid module. */

@@ -1,3 +1,8 @@
+Sun Sep 17 22:18:39 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (interruptible): Return 0 if given an address in
+	uncommitted memory.
+
 2000-09-16  Egor Duda  <deo@logos-m.ru>
 
 	* signal.cc (sleep): If interrupted by signal, return the
