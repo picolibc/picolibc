@@ -31,6 +31,8 @@
 #define _BSS	".bss"
 #define _PAD	".pad"
 #define _LOADER	".loader"
+#define _EXCEPT ".except"
+#define _TYPCHK ".typchk"
 
 /* XCOFF uses a special .loader section with type STYP_LOADER.  */
 #define STYP_LOADER 0x1000
@@ -591,7 +593,9 @@ struct xcoff_ar_hdr_big
    Make it a bit cleaner.  We can use `xcoff_ardata' here because the
    `hdr' member has the same size and position in both formats.  */
 #define xcoff_big_format_p(abfd) \
-  (xcoff_ardata (abfd)->magic[1] == 'b')
+  ((NULL != bfd_ardata(abfd)) && \
+   (NULL != xcoff_ardata(abfd)) && \
+   (xcoff_ardata (abfd)->magic[1] == 'b'))
 
 /* We store a copy of the xcoff_ar_file_hdr in the tdata field of the
    artdata structure.  Similar for the big archive.  */
