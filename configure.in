@@ -351,12 +351,24 @@ esac
 
 # Allow --disable-libmudflap to exclude target-libmudflap
 case $enable_libmudflap in
-yes | "")
-    # By default it's enabled
+yes)
     ;;
 no)
     noconfigdirs="$noconfigdirs target-libmudflap"
     ;;
+"")
+    case "${target}" in
+    *-*-linux*)
+        # Enable libmudflap by default in GNU/Linux.
+	;;
+    *-*-freebsd*)
+        # Enable libmudflap by default in FreeBSD.
+	;;
+    *)
+        # Disable it by default everywhere else.
+	noconfigdirs="$noconfigdirs target-libmudflap"
+	;;
+    esac
 esac
 
 
@@ -502,6 +514,9 @@ case "${target}" in
     ;;
   cris-*-*)
     noconfigdirs="$noconfigdirs ${libgcj} target-newlib target-libgloss"
+    ;;
+  crx-*-*)
+    noconfigdirs="$noconfigdirs target-libgloss target-libstdc++-v3 target-mudflap ${libgcj}"
     ;;
   d10v-*-*)
     noconfigdirs="$noconfigdirs target-libstdc++-v3 target-libgloss ${libgcj}"
@@ -2039,10 +2054,13 @@ CXX_FOR_TARGET_FOR_RECURSIVE_MAKE="\$(STAGE_CC_WRAPPER) ${qqCXX_FOR_TARGET}"
 RAW_CXX_FOR_TARGET_FOR_RECURSIVE_MAKE="\$(STAGE_CC_WRAPPER) ${qqRAW_CXX_FOR_TARGET}"
 
 # Makefile fragments.
-host_makefile_frag=${srcdir}/${host_makefile_frag}
-target_makefile_frag=${srcdir}/${target_makefile_frag}
-alphaieee_frag=${srcdir}/${alphaieee_frag}
-ospace_frag=${srcdir}/${ospace_frag}
+for frag in host_makefile_frag target_makefile_frag alphaieee_frag ospace_frag;
+do
+  eval fragval=\$$frag
+  if test $fragval != /dev/null; then
+    eval $frag=${srcdir}/$fragval
+  fi
+done
 AC_SUBST_FILE(host_makefile_frag)
 AC_SUBST_FILE(target_makefile_frag)
 AC_SUBST_FILE(alphaieee_frag)

@@ -1,3 +1,36 @@
+2004-07-12  Paolo Bonzini  <bonzini@gnu.org>
+
+	* configure.in: Add noconfigdirs for crx-*-*.
+	* configure: Regenerate.
+
+2004-07-12  Paolo Bonzini  <bonzini@gnu.org>
+
+	Synced from gcc:
+
+	2004-07-09  Loren J. Rittle <ljrittle@acm.org>
+
+	* configure.in: Build libmudflap by default on FreeBSD.
+	* configure: Regenerated.
+
+	2004-07-09  Mark Mitchell  <mark@codesourcery.com>
+
+	* configure.in: Do not build libmudflap by default on non-GNU/Linux
+	systems.
+	* configure: Regenerated.
+
+	2004-07-08 John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
+
+	PR target/16344
+	* Makefile.tpl (profiledbootstrap): Build runtime libraries with
+	feedback based compiler.
+	* Makefile.in: Rebuilt.
+
+	2004-07-05  Phil Edwards  <phil@codesourcery.com>
+
+	* configure.in:  Do not prepend $srcdir to /dev/null in
+	makefile fragments.
+	* configure:  Regenerate.
+
 2004-07-08  Alexandre Oliva  <aoliva@redhat.com>
 
 	* Makefile.def (host_modules): Set bootstrap=true for flex.
