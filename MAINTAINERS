@@ -21,7 +21,7 @@ cgen/, cgen parts of opcodes/, sim/, include/
 	May need separate opcodes/ or sim/ approval for
 		commits of regenerated files there.
 
-sid/, sid parts of cgen/, dejagnu/
+sid/; SID's part of cgen/ and dejagnu/
 	sid: http://sources.redhat.com/sid/
 	Patches to sid@sources.redhat.com
 
@@ -31,6 +31,11 @@ config.guess, config.sub
 	Changes need to be done in tandem with the official CONFIG
 	sources or submitted to the master file maintainer and brought
 	in via a merge.
+
+dejagnu/,
+	Notify http://dejagnu.sourceforge.net/ of changes.
+	Patches to gdb-patches@sources.redhat.com,
+	sid@sources.redhat.com.
 
 libiberty/ & libiberty's part of include/ 
 	gcc: http://gcc.gnu.org
@@ -55,7 +60,7 @@ newlib/, libgloss/
 	http://sources.redhat.com/newlib/
 	Patches to newlib@sources.redhat.com.
 
-gdb/, mmalloc/, readline/, sim/ & GDB's part of include/
+gdb/; mmalloc/; readline/; sim/; GDB's part of include/, dejagnu/
 	gdb: http://sources.redhat.com/gdb/
 	Patches to gdb-patches@sources.redhat.com.
 	See also gdb/MAINTAINERS, sim/MAINTAINERS, mmalloc/MAINTAINERS.
@@ -76,10 +81,10 @@ texinfo/texinfo.tex
 	imported at any (reasonable) time.
 	Please not use GCC's texinfo.  Please do not import texinfo.
 
-expect/, dejagnu/, config-ml.in, mpw-README, mpw-build.in,
-mpw-config.in, mpw-configure, mpw-install, setup.com, missing,
-makefile.vms, utils/, config/, config.if, makefile.vms, missing,
-ylwrap, mkdep, etc/, install-sh, intl/
+ expect/, config-ml.in, mpw-README, mpw-build.in, mpw-config.in,
+mpw-configure, mpw-install, setup.com, missing, makefile.vms, utils/,
+config/, config.if, makefile.vms, missing, ylwrap, mkdep, etc/,
+install-sh, intl/
 	?
 
 modules file
