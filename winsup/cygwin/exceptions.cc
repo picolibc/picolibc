@@ -836,6 +836,7 @@ setup_handler (int sig, void *handler, struct sigaction& siga)
 	  /* Just set pending if thread is already suspended */
 	  if (res)
 	    {
+	      mainthread.release_winapi_lock ();
 	      (void) ResumeThread (hth);
 	      break;
 	    }

@@ -1,3 +1,8 @@
+2003-03-31  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (setup_handler): Make sure winapi lock is released when
+	exiting loop.
+
 2003-03-30  Christopher Faylor  <cgf@redhat.com>
 
 	* include/cygwin/fs.h: Remove unneeded include.
