@@ -1116,9 +1116,20 @@ wait_sig (VOID *self)
 
   HANDLE catchem[] = {sigcatch_main, sigcatch_nonmain, sigcatch_nosync};
   sigproc_printf ("Ready.  dwProcessid %d", myself->dwProcessId);
+  DWORD rc = RC_NOSYNC;
+  bool flush = false;
   for (;;)
     {
-      DWORD rc = WaitForMultipleObjects (3, catchem, FALSE, sig_loop_wait);
+      DWORD i;
+      if (rc == RC_MAIN || rc == RC_NONMAIN)
+	i = RC_NOSYNC;
+      else
+	i = RC_MAIN;
+      rc = WaitForSingleObject (catchem[i], 0);
+      if (rc != WAIT_OBJECT_0)
+	rc = WaitForMultipleObjects (3, catchem, FALSE, sig_loop_wait);
+      else
+	rc = i + WAIT_OBJECT_0;
       (void) SetThreadPriority (GetCurrentThread (), WAIT_SIG_PRIORITY);
 
       /* sigproc_terminate sets sig_loop_wait to zero to indicate that
@@ -1159,7 +1170,7 @@ wait_sig (VOID *self)
       /* A sigcatch semaphore has been signaled.  Scan the sigtodo
        * array looking for any unprocessed signals.
        */
-      pending_signals = false;
+      pending_signals = 0;
       bool saw_failed_interrupt = false;
       for (LONG **todo = todos; todo <= end_todo; todo++)
 	for (int sig = -__SIGOFFSET; sig < NSIG; sig++)
@@ -1178,8 +1189,8 @@ wait_sig (VOID *self)
 		     (sig != SIGCONT && ISSTATE (myself, PID_STOPPED))))
 		  {
 		    sigproc_printf ("signal %d blocked", sig);
-		    InterlockedIncrement (*todo + sig);
 		    pending_signals = true;	// FIXME: This will cause unnecessary sig_dispatch_pending spins
+		    InterlockedIncrement (myself->getsigtodo (sig));
 		  }
 		else
 		  {
@@ -1188,7 +1199,12 @@ wait_sig (VOID *self)
 		    switch (sig)
 		      {
 		      case __SIGFLUSH:
-			/* just forcing the loop */
+			if (rc == RC_MAIN)
+			  {
+			    flush = true;
+			    ReleaseSemaphore (sigcatch_nosync, 1, NULL);
+			    goto out1;
+			  }
 			break;
 
 		      /* Internal signal to turn on stracing. */
@@ -1206,8 +1222,9 @@ wait_sig (VOID *self)
 			if (!sig_handle (sig))
 			  {
 			    sigproc_printf ("couldn't send signal %d", sig);
-			    pending_signals = saw_failed_interrupt = true;
 			    ReleaseSemaphore (sigcatch_nosync, 1, NULL);
+			    saw_failed_interrupt = true;
+			    pending_signals = true;
 			    InterlockedIncrement (myself->getsigtodo (sig));
 			  }
 		      }
@@ -1222,19 +1239,15 @@ wait_sig (VOID *self)
     out:
       /* Signal completion of signal handling depending on which semaphore
 	 woke up the WaitForMultipleObjects above.  */
-      switch (rc)
+      if (rc == RC_NONMAIN)	// FIXME: This is broken
+	ReleaseSemaphore (sigcomplete_nonmain, 1, NULL);
+      else if (rc == RC_MAIN || flush)
 	{
-	case RC_MAIN:
 	  SetEvent (sigcomplete_main);
 	  sigproc_printf ("set main thread completion event");
-	  break;
-	case RC_NONMAIN:
-	  ReleaseSemaphore (sigcomplete_nonmain, 1, NULL);
-	  break;
-	default:
-	  /* Signal from another process.  No need to synchronize. */
-	  break;
+	  flush = false;
 	}
+    out1:
       if (saw_failed_interrupt)
 	low_priority_sleep (SLEEP_0_STAY_LOW);	/* Hopefully, other thread will be waking up soon. */
       sigproc_printf ("looping");

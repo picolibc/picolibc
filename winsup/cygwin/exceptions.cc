@@ -1220,13 +1220,14 @@ __asm__ volatile ("\n\
 	.text								\n\
 _sigreturn:								\n\
 	addl	$4,%%esp	# Remove argument			\n\
-	movl	%%esp,%%ebp						\n\
-	addl	$36,%%ebp						\n\
 	call	_set_process_mask@4					\n\
 									\n\
 	cmpl	$0,%4		# Did a signal come in?			\n\
 	jz	1f		# No, if zero				\n\
-	call	_call_signal_handler_now@0 # yes handle the signal	\n\
+	movl	%2,%%eax						\n\
+	movl	%%esp,%%ebp						\n\
+	movl	%%eax,36(%%ebp)	# Restore return address		\n\
+	jmp	3f							\n\
 									\n\
 1:	popl	%%eax		# saved errno				\n\
 	testl	%%eax,%%eax	# Is it < 0				\n\
@@ -1257,7 +1258,7 @@ _sigdelayed0:								\n\
 	pushl	%%ebx							\n\
 	pushl	%%eax							\n\
 	pushl	%6			# saved errno			\n\
-	pushl	%3			# oldmask			\n\
+3:	pushl	%3			# oldmask			\n\
 	pushl	%4			# signal argument		\n\
 	pushl	$_sigreturn						\n\
 									\n\
