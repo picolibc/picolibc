@@ -1,6 +1,6 @@
 2002-07-01  Matt Thomas  <matt@3am-software.com>
 
-	* Rename EF_* to EF_VAX_*.
+	* vax.h: Rename EF_* to EF_VAX_*.
 
 2002-06-18  Dave Brolley  <brolley@redhat.com>
 
@@ -45,8 +45,8 @@
 	* common.h (NT_GNU_ABI_TAG): Define.
 	(GNU_ABI_TAG_LINUX): Define.
 	(GNU_ABI_TAG_HURD): Define.
-	(GNU_ABI_TAG_SOLARIS): Define. 
-	(NT_NETBSD_IDENT): Define.  
+	(GNU_ABI_TAG_SOLARIS): Define.
+	(NT_NETBSD_IDENT): Define.
 	(NT_FREEBSD_ABI_TAG): Define.
 
 2002-04-24  Elena Zannoni  <ezannoni@redhat.com>
@@ -145,7 +145,7 @@
 
 	* common.h: Update copyright years.
 	(NT_NETBSDCORE_PROCINFO): Define.
-	(NT_NETBSDCORE_FIRSTMACH): Define. 
+	(NT_NETBSDCORE_FIRSTMACH): Define.
 
 2002-01-06  Steve Ellcey  <sje@cup.hp.com>
 
@@ -339,18 +339,18 @@
 
 2000-10-16  Chris Demetriou  <cgd@sibyte.com>
 
-        * mips.h (E_MIPS_ARCH_32): New constant.
-        (E_MIPS_MACH_MIPS32, E_MIPS_MACH_MIPS32_4K): Replace the
-        former with the latter.
+	* mips.h (E_MIPS_ARCH_32): New constant.
+	(E_MIPS_MACH_MIPS32, E_MIPS_MACH_MIPS32_4K): Replace the
+	former with the latter.
 
-        * mips.h (E_MIPS_ARCH_5, E_MIPS_ARCH_64): New definitions.
+	* mips.h (E_MIPS_ARCH_5, E_MIPS_ARCH_64): New definitions.
 
-        * mips.h (E_MIPS_MACH_SB1): New constant.
+	* mips.h (E_MIPS_MACH_SB1): New constant.
 
 2000-11-30  Jan Hubicka  <jh@suse.cz>
 
-        * common.h (EM_X86_64): New macro.
-        * x86-64.h: New file.
+	* common.h (EM_X86_64): New macro.
+	* x86-64.h: New file.
 
 2000-11-27  Hans-Peter Nilsson  <hp@axis.com>
 
