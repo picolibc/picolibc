@@ -445,7 +445,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
   DWORD gran_off = off & ~(granularity - 1);
   DWORD gran_len = howmany (len, granularity) * granularity;
 
-  fhandler_base *fh = NULL;
+  fhandler_base *fh;
   caddr_t base = addr;
   HANDLE h;
 
@@ -459,14 +459,15 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
 	  ReleaseResourceLock(LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
 	  return MAP_FAILED;
 	}
-      if (cfd->get_device () == FH_DISK)
+      fh = cfd;
+      if (fh->get_device () == FH_DISK)
 	{
 	  DWORD fsiz = GetFileSize (fh->get_handle (), NULL);
 	  fsiz -= gran_off;
 	  if (gran_len > fsiz)
 	    gran_len = fsiz;
 	}
-      else if (cfd->get_device () == FH_ZERO)
+      else if (fh->get_device () == FH_ZERO)
 	/* mmap /dev/zero is like MAP_ANONYMOUS. */
 	fd = -1;
     }
