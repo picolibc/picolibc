@@ -1,3 +1,8 @@
+2004-12-08  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/sqlext.h (SQL_INTERVAL_*): Correct macros.
+	Reported by Eric Sharkey <sharkey at netrics dot com>
+
 2004-12-07  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winnt.h (TOKEN_INFORMATION_CLASS): Add
