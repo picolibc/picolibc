@@ -1,3 +1,7 @@
+Mon Oct  9 11:32:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* include/ntsecapi.h: Fix PLSA_UNICODE_STRING define.
+
 Sun Oct  8 18:26:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* include/ntsecapi.h: New file.
