@@ -419,7 +419,11 @@ semundo_adjust(struct thread *td, struct sem_undo **supptr, int semid,
 	suptr = *supptr;
 	if (suptr == NULL) {
 		SLIST_FOREACH(suptr, &semu_list, un_next) {
+#ifdef __CYGWIN__
+			if (suptr->un_proc->cygpid == p->cygpid) {
+#else
 			if (suptr->un_proc == p) {
+#endif
 				*supptr = suptr;
 				break;
 			}
@@ -1244,7 +1248,11 @@ semexit_myhook(void *arg, struct proc *p)
 	 */
 	SEMUNDO_HOOKLOCK();
 	SLIST_FOREACH_PREVPTR(suptr, supptr, &semu_list, un_next) {
+#ifdef __CYGWIN__
+		if (suptr->un_proc->cygpid == p->cygpid)
+#else
 		if (suptr->un_proc == p)
+#endif
 			break;
 	}
 	SEMUNDO_UNLOCK();
@@ -1252,8 +1260,13 @@ semexit_myhook(void *arg, struct proc *p)
 	if (suptr == NULL)
 		return;
 
+#ifdef __CYGWIN__
+	DPRINTF(("proc @%u(%u) has undo structure with %d entries\n",
+	    p->cygpid, p->winpid, suptr->un_cnt));
+#else
 	DPRINTF(("proc @%08x has undo structure with %d entries\n", p,
 	    suptr->un_cnt));
+#endif
 
 	/*
 	 * If there are any active undo elements then process them.
@@ -1282,8 +1295,14 @@ semexit_myhook(void *arg, struct proc *p)
 				panic("semexit - semnum out of range");
 
 			DPRINTF((
+#ifdef __CYGWIN__
+			    "semexit:  %u(%u) id=%d num=%d(adj=%d) ; sem=%d\n",
+			    suptr->un_proc->cygpid, suptr->un_proc->winpid,
+			    suptr->un_ent[ix].un_id,
+#else
 			    "semexit:  %08x id=%d num=%d(adj=%d) ; sem=%d\n",
 			    suptr->un_proc, suptr->un_ent[ix].un_id,
+#endif
 			    suptr->un_ent[ix].un_num,
 			    suptr->un_ent[ix].un_adjval,
 			    semaptr->sem_base[semnum].semval));

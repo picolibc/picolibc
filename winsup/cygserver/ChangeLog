@@ -1,3 +1,10 @@
+2004-03-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysv_sem.cc (semundo_adjust): Check for process id instead of
+	process struct pointer, which isn't fixed under Cygwin.
+	(semexit_myhook): Ditto.  Adjust debug print statements to print
+	Cygwin and Windows PIDs instead of process pointer under Cygwin.
+
 2004-02-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* bsd_mutex.cc (win_priority): Move to msleep helper function section.
