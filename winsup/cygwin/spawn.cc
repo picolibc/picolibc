@@ -796,16 +796,28 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       sigproc_printf ("new process name %s", myself->progname);
       close_all_files ();
       /* If wr_proc_pipe doesn't exist then this process was not started by a cygwin
-	process.  So, we need to wait around until the process we've just "execed"
-	dies.  Use our own wait facility to wait for our own pid to exit (there
-	is some minor special case code in proc_waiter and friends to accommodeate
-	this). */
+	 process.  So, we need to wait around until the process we've just "execed"
+	 dies.  Use our own wait facility to wait for our own pid to exit (there
+	 is some minor special case code in proc_waiter and friends to accommodate
+	 this).
+
+	 If wr_proc_pipe exists, then it should be duplicated to the child.
+	 If the child has exited already, that's ok.  The parent will pick up
+	 on this fact when we exit.  dup_proc_pipe also closes our end of the pipe.
+	 Note that wr_proc_pipe may also be == INVALID_HANDLE_VALUE.  That will make
+	 dup_proc_pipe essentially a no-op.  */
       if (!myself->wr_proc_pipe)
-       {
-	 myself.remember (true);
-	 wait_for_myself = true;
-	 myself->wr_proc_pipe = INVALID_HANDLE_VALUE;
-       }
+	{
+	  myself.remember (false);
+	  wait_for_myself = true;
+	}
+      else
+	{
+	  /* Make sure that we own wr_proc_pipe just in case we've been
+	     previously execed. */
+	  myself->sync_proc_pipe ();
+	  (void) myself->dup_proc_pipe (pi.hProcess);
+	}
     }
   else
     {
@@ -849,14 +861,13 @@ ForceCloseHandle (pi.hThread);
 
 sigproc_printf ("spawned windows pid %d", pi.dwProcessId);
 
-if (wait_for_myself)
-  waitpid (myself->pid, &res, 0);
-else
-  ciresrv.sync (myself, INFINITE);
+ciresrv.sync (myself, INFINITE);
 
 switch (mode)
   {
   case _P_OVERLAY:
+    if (wait_for_myself)
+      waitpid (myself->pid, &res, 0);
     myself->exit (res, 1);
     break;
   case _P_WAIT:

@@ -1,3 +1,31 @@
+2004-12-24  Christopher Faylor  <cgf@timesys.com>
+
+	* child_info.h (CURR_CHILD_INFO_MAGIC): Update.
+	(child_info::parent_wr_proc_pipe): Eliminate.
+	* pinfo.h (_pinfo::alert_parent): Move here from pinfo class.
+	(_pinfo::dup_proc_pipe): New method.
+	(_pinfo::sync_proc_pipe): Ditto.
+	* exceptions.cc (sig_handle_tty_stop): Reflect move of alert_parent.
+	* init.cc (dll_entry): Exit with status one if main process called
+	ExitProcess.
+	* pinfo.cc (set_myself): Remove handling of parent_wr_proc_pipe.
+	(_pinfo::exit): Reflect move of alert_parent.  Set procinfo to NULL to
+	flag that we are exiting normally.  Always use exitcode when exiting
+	(although this could be a little racy).
+	(pinfo::init): Set default exit to SIGTERM.  This will be the exit code
+	reported if process is terminated.
+	(_pinfo::dup_proc_pipe): New function.
+	(pinfo::wait): Duplicate wr_proc_pipe to the right place.  Use
+	dup_proc_pipe to move the pipe to the child.
+	(_pinfo::sync_proc_pipe): New function.
+	(_pinfo::alert_parent): Move to _pinfo.  Make sure that wr_proc_pipe is
+	ours before using it.
+	* sigproc.cc (child_info::child_info): Remove handling of
+	parent_wr_proc_pipe.
+	* spawn.cc (spawn_guts): Pass our wr_proc_pipe to the child when
+	execing.  Ensure that exit code of cygwin process started from windows
+	is correctly set.
+
 2004-12-23  Pierre Humblet <pierre.humblet@ieee.org>
 	    Christopher Faylor  <cgf@timesys.com>
 

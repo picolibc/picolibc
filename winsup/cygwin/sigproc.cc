@@ -735,8 +735,6 @@ child_info::child_info (unsigned in_cb, child_info_types chtype)
   if (chtype != PROC_SPAWN)
     subproc_ready = CreateEvent (&sec_all, FALSE, FALSE, NULL);
   sigproc_printf ("subproc_ready %p", subproc_ready);
-  if (chtype != PROC_EXEC && myself->wr_proc_pipe != INVALID_HANDLE_VALUE)
-    parent_wr_proc_pipe = myself->wr_proc_pipe;
 }
 
 child_info::~child_info ()

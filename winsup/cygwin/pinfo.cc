@@ -44,8 +44,6 @@ pinfo NO_COPY myself ((_pinfo *)&pinfo_dummy);	// Avoid myself != NULL checks
 void __stdcall
 set_myself (HANDLE h)
 {
-  extern child_info *child_proc_info;
-
   if (!h)
     cygheap->pid = cygwin_pid (GetCurrentProcessId ());
   myself.init (cygheap->pid, PID_IN_USE | PID_MYSELF, h);
@@ -68,19 +66,11 @@ set_myself (HANDLE h)
     }
   else if (!myself->wr_proc_pipe)
     myself->start_time = time (NULL); /* Register our starting time. */
-  else
+  else if (cygheap->pid_handle)
     {
-      /* We've inherited the parent's wr_proc_pipe.  We don't need it,
-	 so close it. */
-      if (child_proc_info->parent_wr_proc_pipe)
-	CloseHandle (child_proc_info->parent_wr_proc_pipe);
-      if (cygheap->pid_handle)
-	{
-	  ForceCloseHandle (cygheap->pid_handle);
-	  cygheap->pid_handle = NULL;
-	}
+      ForceCloseHandle (cygheap->pid_handle);
+      cygheap->pid_handle = NULL;
     }
-# undef child_proc_info
   return;
 }
 
@@ -117,9 +107,9 @@ _pinfo::exit (UINT n, bool norecord)
   exit_state = ES_FINAL;
   cygthread::terminate ();
   if (norecord)
-    sigproc_terminate ();	/* Just terminate signal and process stuff */
+    sigproc_terminate ();		/* Just terminate signal and process stuff */
   else
-    exitcode = n;		/* We're really exiting.  Record the UNIX exit code. */
+    exitcode = n;			/* We're really exiting.  Record the UNIX exit code. */
 
   if (this)
     {
@@ -135,7 +125,7 @@ _pinfo::exit (UINT n, bool norecord)
 	  /* We could just let this happen automatically when the process
 	     exits but this should gain us a microsecond or so by notifying
 	     the parent early.  */
-	  myself.alert_parent (0);
+	  myself->alert_parent (0);
 	    
 	}
     }
@@ -143,7 +133,8 @@ _pinfo::exit (UINT n, bool norecord)
   sigproc_printf ("Calling ExitProcess %d", n);
   _my_tls.stacklock = 0;
   _my_tls.stackptr = _my_tls.stack;
-  ExitProcess (n);
+  myself.procinfo = NULL;	// This breaks the abstraction a little doesn't it?
+  ExitProcess (exitcode);
 }
 
 void
@@ -273,7 +264,10 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
       if (!created)
 	/* nothing */;
       else if (!(flag & PID_EXECED))
-	procinfo->pid = n;
+	{
+	  procinfo->pid = n;
+	  procinfo->exitcode = SIGTERM;
+	}
       else
 	{
 	  procinfo->process_state |= PID_IN_USE | PID_EXECED;
@@ -664,15 +658,10 @@ _pinfo::cmdline (size_t& n)
 }
 
 /* This is the workhorse which waits for the write end of the pipe
-   created during new process creation.  If the pipe is closed, it is
-   assumed that the cygwin pid has exited.  Otherwise, various "signals"
-   can be sent to the parent to inform the parent to perform a certain
-   action.
-
-   This code was originally written to eliminate the need for "reparenting"
-   but, unfortunately, reparenting is still needed in order to get the
-   exit code of an execed windows process.  Otherwise, the exit code of
-   a cygwin process comes from the exitcode field in _pinfo. */
+   created during new process creation.  If the pipe is closed or a zero
+   is received on the pipe, it is assumed that the cygwin pid has exited.
+   Otherwise, various "signals" can be sent to the parent to inform the
+   parent to perform a certain action. */
 static DWORD WINAPI
 proc_waiter (void *arg)
 {
@@ -768,29 +757,41 @@ proc_waiter (void *arg)
   return 0;
 }
 
+bool
+_pinfo::dup_proc_pipe (HANDLE hProcess)
+{
+  bool res = DuplicateHandle (hMainProc, wr_proc_pipe, hProcess, &wr_proc_pipe,
+			      0, FALSE,
+			      DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE);
+  if (!res)
+    sigproc_printf ("DuplicateHandle failed, pid %d, hProcess %p, %E", pid, hProcess);
+  else
+    {
+      wr_proc_pipe_owner = dwProcessId;
+      sigproc_printf ("closed wr_proc_pipe %p for pid %d(%u)", wr_proc_pipe,
+		      pid, dwProcessId);
+    }
+  return res;
+}
+
 /* function to set up the process pipe and kick off proc_waiter */
 int
 pinfo::wait ()
 {
-  HANDLE out;
   /* FIXME: execed processes should be able to wait for pids that were started
      by the process which execed them. */
-  if (!CreatePipe (&rd_proc_pipe, &out, &sec_none_nih, 16))
+  if (!CreatePipe (&rd_proc_pipe, &((*this)->wr_proc_pipe), &sec_none_nih, 16))
     {
       system_printf ("Couldn't create pipe tracker for pid %d, %E",
 		     (*this)->pid);
       return 0;
     }
-  /* Duplicate the write end of the pipe into the subprocess.  Make it inheritable
-     so that all of the execed children get it.  */
-  if (!DuplicateHandle (hMainProc, out, hProcess, &((*this)->wr_proc_pipe), 0,
-			TRUE, DUPLICATE_SAME_ACCESS))
+
+  if (!(*this)->dup_proc_pipe (hProcess))
     {
-      system_printf ("Couldn't duplicate pipe topid %d(%p), %E", (*this)->pid,
-		     hProcess);
+      system_printf ("Couldn't duplicate pipe topid %d(%p), %E", (*this)->pid, hProcess);
       return 0;
     }
-  CloseHandle (out);	/* Don't need this end in this proces */
 
   preserve ();		/* Preserve the shared memory associated with the pinfo */
 
@@ -808,26 +809,38 @@ pinfo::wait ()
   return 1;
 }
 
+void
+_pinfo::sync_proc_pipe ()
+{
+  if (wr_proc_pipe && wr_proc_pipe != INVALID_HANDLE_VALUE)
+    while (wr_proc_pipe_owner != GetCurrentProcessId ())
+      low_priority_sleep (0);
+}
+
 /* function to send a "signal" to the parent when something interesting happens
    in the child. */
 bool
-pinfo::alert_parent (char sig)
+_pinfo::alert_parent (char sig)
 {
   DWORD nb = 0;
   /* Send something to our parent.  If the parent has gone away,
      close the pipe. */
-  if (myself->wr_proc_pipe == INVALID_HANDLE_VALUE
+  if (wr_proc_pipe == INVALID_HANDLE_VALUE
       || !myself->wr_proc_pipe)
     /* no parent */;
-  else if (WriteFile (myself->wr_proc_pipe, &sig, 1, &nb, NULL))
-    /* all is well */;
-  else if (GetLastError () != ERROR_BROKEN_PIPE)
-    debug_printf ("sending %d notification to parent failed, %E", sig);
   else
     {
-      HANDLE closeit = myself->wr_proc_pipe;
-      myself->wr_proc_pipe = INVALID_HANDLE_VALUE;
-      CloseHandle (closeit);
+      sync_proc_pipe ();
+      if (WriteFile (wr_proc_pipe, &sig, 1, &nb, NULL))
+	/* all is well */;
+      else if (GetLastError () != ERROR_BROKEN_PIPE)
+	debug_printf ("sending %d notification to parent failed, %E", sig);
+      else
+	{
+	  HANDLE closeit = wr_proc_pipe;
+	  wr_proc_pipe = INVALID_HANDLE_VALUE;
+	  CloseHandle (closeit);
+	}
     }
   return (bool) nb;
 }

@@ -106,6 +106,9 @@ public:
   bool alive ();
   char *cmdline (size_t &);
   void set_ctty (class tty_min *, int, class fhandler_tty_slave *);
+  bool dup_proc_pipe (HANDLE) __attribute__ ((regparm(2)));
+  void sync_proc_pipe ();
+  bool alert_parent (char);
 
   friend void __stdcall set_myself (HANDLE);
 
@@ -117,6 +120,7 @@ private:
   sigset_t sig_mask;
 public:
   HANDLE wr_proc_pipe;
+  DWORD wr_proc_pipe_owner;
   friend class pinfo;
 };
 
@@ -163,8 +167,6 @@ public:
   operator _pinfo * () const {return procinfo;}
   // operator bool () const {return (int) h;}
   void preserve () { destroy = false; }
-  bool alert_parent (char);
-  bool parent_alive () { return alert_parent (__ALERT_ALIVE); }
 #ifndef _SIGPROC_H
   int remember () {system_printf ("remember is not here"); return 0;}
 #else
@@ -178,6 +180,7 @@ public:
 #endif
   HANDLE shared_handle () {return h;}
   void set_acl();
+  friend class _pinfo;
 };
 
 #define ISSTATE(p, f)	(!!((p)->process_state & f))

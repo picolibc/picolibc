@@ -600,7 +600,7 @@ sig_handle_tty_stop (int sig)
     }
 
   myself->stopsig = sig;
-  myself.alert_parent (sig);
+  myself->alert_parent (sig);
   sigproc_printf ("process %d stopped by signal %d", myself->pid, sig);
   HANDLE w4[2];
   w4[0] = sigCONT;
@@ -610,7 +610,7 @@ sig_handle_tty_stop (int sig)
     case WAIT_OBJECT_0:
     case WAIT_OBJECT_0 + 1:
       reset_signal_arrived ();
-      myself.alert_parent (SIGCONT);
+      myself->alert_parent (SIGCONT);
       break;
     default:
       api_fatal ("WaitSingleObject failed, %E");
