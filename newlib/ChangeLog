@@ -1,3 +1,9 @@
+2002-03-06  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/machine/i386/Makefile.am: Add $(oext) for setjmp
+        object so it works for shared library or statici library.
+        * libc/machine/i386/Makefile.in: Regenerated.
+
 Wed Mar  6 10:24:26 2002  J"orn Rennecke <joern.rennecke@superh.com>
 
 	* Makefile.am (lib_a_SOURCES, SH64 case): Add memcpy.S, memset.S

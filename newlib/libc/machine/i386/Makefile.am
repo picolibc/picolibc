@@ -5,7 +5,7 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = -I $(newlib_basedir)/libm/common $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 if MACH_ADD_SETJMP
-mach_add_obj=setjmp.o
+mach_add_obj=setjmp.$(oext)
 else
 mach_add_obj=
 endif
