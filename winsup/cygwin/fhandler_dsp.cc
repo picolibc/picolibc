@@ -113,7 +113,7 @@ class fhandler_dev_dsp::Audio_out: public Audio
 
   bool query (int rate, int bits, int channels);
   bool start (int rate, int bits, int channels);
-  void stop ();
+  void stop (bool immediately = false);
   bool write (const char *pSampleData, int nBytes);
   void buf_info (audio_buf_info *p, int rate, int bits, int channels);
   void callback_sampledone (WAVEHDR *pHdr);
@@ -152,6 +152,7 @@ public:
   bool start (int rate, int bits, int channels);
   void stop ();
   bool read (char *pSampleData, int &nBytes);
+  void buf_info (audio_buf_info *p, int rate, int bits, int channels);
   void callback_blockfull (WAVEHDR *pHdr);
 
 private:
@@ -418,7 +419,7 @@ fhandler_dev_dsp::Audio_out::start (int rate, int bits, int channels)
 }
 
 void
-fhandler_dev_dsp::Audio_out::stop ()
+fhandler_dev_dsp::Audio_out::stop (bool immediately)
 {
   MMRESULT rc;
   WAVEHDR *pHdr;
@@ -428,8 +429,11 @@ fhandler_dev_dsp::Audio_out::stop ()
 		GetCurrentProcessId (), getOwner ());
   if (getOwner () && !denyAccess ())
     {
-      sendcurrent ();		// force out last block whatever size..
-      waitforallsent ();        // block till finished..
+      if (!immediately)
+	{
+	  sendcurrent ();           // force out last block whatever size..
+	  waitforallsent ();        // block till finished..
+	}
 
       rc = waveOutReset (dev_);
       debug_printf ("waveOutReset rc=%d", rc);
@@ -507,7 +511,7 @@ fhandler_dev_dsp::Audio_out::write (const char *pSampleData, int nBytes)
   return true;
 }
 
-// return number of (partially) empty blocks back.
+// return number of (completely) empty blocks back.
 int
 fhandler_dev_dsp::Audio_out::emptyblocks ()
 {
@@ -516,8 +520,6 @@ fhandler_dev_dsp::Audio_out::emptyblocks ()
   n = Qisr2app_->query ();
   unlock ();
   n += Qapp2app_->query ();
-  if (pHdr_ != NULL)
-    n++;
   return n;
 }
 
@@ -531,8 +533,8 @@ fhandler_dev_dsp::Audio_out::buf_info (audio_buf_info *p,
     {
       p->fragments = emptyblocks ();
       if (pHdr_ != NULL)
-	p->bytes = p->fragsize - bufferIndex_ +
-	  p->fragsize * (p->fragments - 1);
+	p->bytes = (int)pHdr_->dwUser - bufferIndex_
+	  + p->fragsize * p->fragments;
       else
 	p->bytes = p->fragsize * p->fragments;
     }
@@ -685,7 +687,9 @@ fhandler_dev_dsp::Audio_out::parsewav (const char * &pData, int &nBytes,
   const char *end = pData + nBytes;
   const char *pDat;
   int skip = 0;
-  
+  // Check alignment first: A lot of the code below depends on it
+  if (((int)pData & 0x3) != 0)
+    return false;
   if (!(pData[0] == 'R' && pData[1] == 'I'
 	&& pData[2] == 'F' && pData[3] == 'F'))
     return false;
@@ -971,6 +975,31 @@ fhandler_dev_dsp::Audio_in::waitfordata ()
   bufferIndex_ = 0; 
 }
 
+void
+fhandler_dev_dsp::Audio_in::buf_info (audio_buf_info *p,
+				      int rate, int bits, int channels)
+{
+  p->fragstotal = MAX_BLOCKS;
+  p->fragsize = blockSize (rate, bits, channels);
+  if (getOwner ())
+    {
+      lock ();
+      p->fragments = Qisr2app_->query ();
+      unlock ();
+      p->fragments += Qapp2app_->query ();
+      if (pHdr_ != NULL)
+	p->bytes = pHdr_->dwBytesRecorded - bufferIndex_
+	  + p->fragsize * p->fragments;
+      else
+	p->bytes = p->fragsize * p->fragments;
+    }
+  else
+    {
+      p->fragments = 0;
+      p->bytes = 0;
+    }
+}
+
 // This is called on an interrupt so use locking..
 void
 fhandler_dev_dsp::Audio_in::callback_blockfull (WAVEHDR *pHdr)
@@ -1214,22 +1243,12 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
 	if (audio_out_)
 	  {
 	    RETURN_ERROR_WHEN_BUSY (audio_out_);
-	    audioformat_ = AFMT_U8;
-	    audiofreq_ = 8000;
-	    audiobits_ = 8;
-	    audiochannels_ = 1;
-	    audio_out_->stop ();
-	    audio_out_->setformat (audioformat_);
+	    audio_out_->stop (true);
 	  }
 	if (audio_in_)
 	  {
 	    RETURN_ERROR_WHEN_BUSY (audio_in_);
-	    audioformat_ = AFMT_U8;
-	    audiofreq_ = 8000;
-	    audiobits_ = 8;
-	    audiochannels_ = 1;
 	    audio_in_->stop ();
-	    audio_in_->setformat (audioformat_);
 	  }
 	return 0;
 	break;
@@ -1409,6 +1428,20 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
 	  {
 	    RETURN_ERROR_WHEN_BUSY (audio_out_);
 	    audio_out_->buf_info (p, audiofreq_, audiobits_, audiochannels_);
+	    debug_printf ("ptr=%p frags=%d fragsize=%d bytes=%d",
+			  ptr, p->fragments, p->fragsize, p->bytes);
+	  }
+	return 0;
+      }
+      break;
+
+      CASE (SNDCTL_DSP_GETISPACE)
+      {
+	audio_buf_info *p = (audio_buf_info *) ptr;
+	if (audio_in_)
+	  {
+	    RETURN_ERROR_WHEN_BUSY (audio_in_);
+	    audio_in_->buf_info (p, audiofreq_, audiobits_, audiochannels_);
 	    debug_printf ("ptr=%p frags=%d fragsize=%d bytes=%d",
 			  ptr, p->fragments, p->fragsize, p->bytes);
 	  }

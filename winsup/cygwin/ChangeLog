@@ -1,3 +1,20 @@
+2004-04-13  Gerd Spalink  <Gerd.Spalink@t-online.de>
+
+	* fhandler_dsp.cc (fhandler_dev_dsp::Audio_out::stop): Add optional
+	boolean argument so that playing can be stopped without playing
+	pending buffers.
+	(fhandler_dev_dsp::ioctl): Stop playback immediately for
+	SNDCTL_DSP_RESET.  Do not reset audio parameters in this case.
+	Add support for ioctl SNDCTL_DSP_GETISPACE.
+	(fhandler_dev_dsp::Audio_out::emptyblocks): Now returns the number of
+	completely empty blocks.
+	(fhandler_dev_dsp::Audio_out::buf_info): p->fragments is now the number
+	of completely empty blocks. This conforms with the OSS specification.
+	(fhandler_dev_dsp::Audio_out::parsewav): Ignore wave headers that are
+	not aligned on four byte boundary.
+	(fhandler_dev_dsp::Audio_in::buf_info): New, needed for
+	SNDCTL_DSP_GETISPACE.
+
 2004-04-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* winsup.h (IMPLEMENT_STATUS_FLAG): New macro to define status flag
