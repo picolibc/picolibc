@@ -55,7 +55,7 @@
 #ifndef _TCHAR_DEFINED
 #ifndef RC_INVOKED
 typedef	wchar_t	TCHAR;
-typedef wchar_t _TCHAR
+typedef wchar_t _TCHAR;
 #endif	/* Not RC_INVOKED */
 #define _TCHAR_DEFINED
 #endif
