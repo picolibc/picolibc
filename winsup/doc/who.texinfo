@@ -61,7 +61,7 @@ and exception handling, and has made countless contributions throughout
 the library.  He also provided binaries of the development snapshots to
 the Net after the beta 19 release.
 
-Mumit Khan (has been most helpful on the EGCS end of things, providing
+Mumit Khan has been most helpful on the EGCS end of things, providing
 quite a large number of stabilizing patches to the compiler tools for
 the B20 release.
 
