@@ -92,7 +92,7 @@ PSID
 convert_string_sid_to_sid (PSID psid, const char *sid_str)
 {
   char sid_buf[256];
-  char *t;
+  char *t, *lasts;
   DWORD cnt = 0;
   DWORD s = 0;
   DWORD i, r[8];
@@ -102,7 +102,9 @@ convert_string_sid_to_sid (PSID psid, const char *sid_str)
 
   strcpy (sid_buf, sid_str);
 
-  for (t = sid_buf + 4, i = 0; cnt < 8 && (t = strtok (t, "-")); t = NULL, ++i)
+  for (t = sid_buf + 4, i = 0;
+       cnt < 8 && (t = strtok_r (t, "-", &lasts));
+       t = NULL, ++i)
     if (i == 0)
       s = strtoul (t, NULL, 10);
     else
@@ -2110,7 +2112,11 @@ aclfromtext (char *acltextp, int *)
   aclent_t lacl[MAX_ACL_ENTRIES];
   memset (lacl, 0, sizeof lacl);
   int pos = 0;
-  for (char *c = strtok (buf, ","); c; c = strtok (NULL, ","))
+  strcpy (buf, acltextp);
+  char *lasts;
+  for (char *c = strtok_r (buf, ",", &lasts);
+       c;
+       c = strtok_r (NULL, ",", &lasts))
     {
       if (!strncmp (c, "default", 7))
 	{

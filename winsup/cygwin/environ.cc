@@ -465,7 +465,7 @@ static void __stdcall
 parse_options (char *buf)
 {
   int istrue;
-  char *p;
+  char *p, *lasts;
   parse_thing *k;
 
   if (buf == NULL)
@@ -487,7 +487,9 @@ parse_options (char *buf)
     }
 
   buf = strcpy ((char *) alloca (strlen (buf) + 1), buf);
-  for (p = strtok (buf, " \t"); p != NULL; p = strtok (NULL, " \t"))
+  for (p = strtok_r (buf, " \t", &lasts);
+       p != NULL;
+       p = strtok_r (NULL, " \t", &lasts))
     {
       if (!(istrue = !strncasematch (p, "no", 2)))
 	p += 2;

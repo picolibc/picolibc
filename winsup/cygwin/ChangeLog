@@ -1,3 +1,9 @@
+Wed Mar 14 16:30:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* environ.cc (parse_options): Use strtok_r instead of strtok.
+	* security.cc (convert_string_sid_to_sid): Ditto.
+	(aclfromtext): Ditto. Fix buffer usage.
+
 Wed Mar 14 10:11:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* path.cc (lnk_suffixes): Remove.
