@@ -83,7 +83,7 @@ else
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)
 lib_a_LIBADD = $(LIBADD_OBJS)
-LIB_COMPILE = $(CC)
+LIB_COMPILE = $(COMPILE)
 noinst_DATA =
 endif # USE_LIBTOOL
 
@@ -93,10 +93,10 @@ include $(srcdir)/../../Makefile.shared
 # libtool moves vfprintf.o and subsequently can't find it.
 
 vfprintf.$(oext): vfprintf.c
-	$(LIB_COMPILE) $(INCLUDES) -c $(srcdir)/vfprintf.c
+	$(LIB_COMPILE) -c $(srcdir)/vfprintf.c
 
 vfiprintf.$(oext): vfprintf.c
-	$(LIB_COMPILE) $(INCLUDES) -DINTEGER_ONLY -c $(srcdir)/vfprintf.c -o $@
+	$(LIB_COMPILE) -DINTEGER_ONLY -c $(srcdir)/vfprintf.c -o $@
 
 CHEWOUT_FILES = \
 	clearerr.def		\

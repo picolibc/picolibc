@@ -169,7 +169,7 @@ libstdio_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@libstdio_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_SOURCES)
 @USE_LIBTOOL_TRUE@libstdio_la_LIBADD = @USE_LIBTOOL_TRUE@$(LIBADD_OBJS)
 @USE_LIBTOOL_TRUE@LIB_COMPILE = @USE_LIBTOOL_TRUE@$(LTCOMPILE)
-@USE_LIBTOOL_FALSE@LIB_COMPILE = @USE_LIBTOOL_FALSE@$(CC)
+@USE_LIBTOOL_FALSE@LIB_COMPILE = @USE_LIBTOOL_FALSE@$(COMPILE)
 @USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
@@ -497,10 +497,10 @@ objectlist.awk.in: $(noinst_LTLIBRARIES)
 # libtool moves vfprintf.o and subsequently can't find it.
 
 vfprintf.$(oext): vfprintf.c
-	$(LIB_COMPILE) $(INCLUDES) -c $(srcdir)/vfprintf.c
+	$(LIB_COMPILE) -c $(srcdir)/vfprintf.c
 
 vfiprintf.$(oext): vfprintf.c
-	$(LIB_COMPILE) $(INCLUDES) -DINTEGER_ONLY -c $(srcdir)/vfprintf.c -o $@
+	$(LIB_COMPILE) -DINTEGER_ONLY -c $(srcdir)/vfprintf.c -o $@
 
 .c.def:
 	$(CHEW) < $< > $*.def 2> $*.ref
