@@ -37,6 +37,75 @@ extern int cygwin32_attach_handle_to_fd (char *, int, HANDLE, int, int);
 extern int cygwin_attach_handle_to_fd (char *, int, HANDLE, mode_t, unsigned);
 #endif
 
+#include <sys/resource.h>
+
+/* External interface stuff */
+
+typedef enum
+  {
+    CW_LOCK_PINFO,
+    CW_UNLOCK_PINFO,
+    CW_GETTHREADNAME,
+    CW_GETPINFO,
+    CW_SETPINFO,
+    CW_SETTHREADNAME,
+    CW_GETVERSIONINFO,
+    CW_READ_V1_MOUNT_TABLES
+  } cygwin_getinfo_types;
+
+struct external_pinfo
+  {
+  pid_t pid;
+  pid_t ppid;
+  HANDLE hProcess;
+  DWORD dwProcessId, dwSpawnedProcessId;
+  uid_t uid;
+  gid_t gid;
+  pid_t pgid;
+  pid_t sid;
+  int ctty;
+  mode_t umask;
+
+  long start_time;
+  struct rusage rusage_self;
+  struct rusage rusage_children;
+
+  char progname[MAX_PATH];
+
+  DWORD strace_mask;
+  HANDLE strace_file;
+
+  DWORD process_state;
+};
+
+DWORD cygwin_internal (cygwin_getinfo_types, ...);
+
+#define CW_NEXTPID 0x80000000	// or with pid to get next one
+
+/* Flags associated with process_state */
+enum
+{
+  PID_NOT_IN_USE       = 0x0000, // Free entry.
+  PID_IN_USE	       = 0x0001, // Entry in use.
+  PID_ZOMBIE	       = 0x0002, // Child exited: no parent wait.
+  PID_STOPPED	       = 0x0004, // Waiting for SIGCONT.
+  PID_TTYIN	       = 0x0008, // Waiting for terminal input.
+  PID_TTYOU	       = 0x0010, // Waiting for terminal output.
+  PID_ORPHANED	       = 0x0020, // Member of an orphaned process group.
+  PID_ACTIVE	       = 0x0040, // Pid accepts signals.
+  PID_CYGPARENT	       = 0x0080, // Set if parent was a cygwin app.
+  PID_SPLIT_HEAP       = 0x0100, // Set if the heap has been split,
+				 //  which means we can't fork again.
+  PID_CLEAR	       = 0x0200, // Flag that pid should be cleared from parent's
+				 //  wait list
+  PID_SOCKETS_USED     = 0x0400, // Set if process uses Winsock.
+  PID_INITIALIZING     = 0x0800, // Set until ready to receive signals.
+  PID_USETTY	       = 0x1000, // Setting this enables or disables cygwin's
+				 //  tty support.  This is inherited by
+				 //  all execed or forked processes.
+  PID_REPARENT	       = 0x2000  // child has execed
+};
+
 #ifdef __cplusplus
 };
 #endif

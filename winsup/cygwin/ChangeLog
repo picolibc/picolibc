@@ -1,3 +1,14 @@
+Thu May 18 01:28:02 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* select.cc (thread_pipe): Add paranoid check to ensure thread
+	termination.
+	* external.cc: Eliminate obsolete include.
+	* getopt.c (getopt_long): Fix compiler warning.
+	* shared.h: Moved PID_ definitions to include/sys/cygwin so that they
+	can be used by external programs.
+	* include/sys/cygwin.h: Move external definitions here.  Include
+	sys/resource.h to avoid having to do this everywhere.
+
 Thu May 18 01:04:02 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* sigproc.h (sigframe): Don't set frame info unless tid matches this

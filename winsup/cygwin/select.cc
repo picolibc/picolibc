@@ -505,6 +505,12 @@ thread_pipe (void *arg)
 		goto out;
 	      }
 	  }
+      /* Paranoid check */
+      if (pi->stop_thread_pipe)
+	{
+	  select_printf ("stopping from outer loop");
+	  break;
+	}
       if (gotone)
 	break;
       Sleep (10);

@@ -154,7 +154,8 @@ getopt_long(nargc, nargv, options, long_options, index)
 
 	if ((retval = getopt_internal(nargc, nargv, options)) == -2) {
 		char *current_argv = nargv[optind++] + 2, *has_equal;
-		int i, current_argv_len, match = -1;
+		int i, match = -1;
+		size_t current_argv_len;
 
 		if (*current_argv == '\0') {
 			return(-1);
