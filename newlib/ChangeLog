@@ -1,3 +1,12 @@
+2002-06-24  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/math.h: Remove <sys/types.h>.
+	(__dmath): Use __ULong instead of _uint32_t.
+	* libc/include/sys/reent.h: If long or int is not 32-bits,
+	include <sys/types.h> to get definitions for _int32_t and _uint32_t.
+	* libc/stdlib/mprec.h: Include <sys/types.h> to get integer defs.
+	* libm/common/fdlibm.h: Ditto.
+
 2002-06-24  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* libc/include/ndbm.h: Remove.

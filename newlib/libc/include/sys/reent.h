@@ -24,6 +24,7 @@ typedef unsigned __Long __ULong;
 #endif
 
 #ifndef __Long
+#include <sys/types.h>
 #define __Long __int32_t
 typedef __uint32_t __ULong;
 #endif

@@ -7,7 +7,6 @@ extern "C" {
 #define  _MATH_H_
 
 #include <sys/reent.h>
-#include <sys/types.h>
 #include <machine/ieeefp.h>
 #include "_ansi.h"
 
@@ -18,7 +17,7 @@ extern "C" {
 
 union __dmath
 {
-  __uint32_t i[2];
+  __ULong i[2];
   double d;
 };
 

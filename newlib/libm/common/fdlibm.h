@@ -13,6 +13,7 @@
 
 /* REDHAT LOCAL: Include files.  */
 #include <math.h>
+#include <sys/types.h>
 #include <machine/ieeefp.h>
 
 /* REDHAT LOCAL: Default to XOPEN_MODE.  */
