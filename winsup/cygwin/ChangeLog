@@ -1,3 +1,12 @@
+2002-12-16  Steve Osborn  <bub@io.com>
+	    Christopher Faylor <cgf@redhat.com>
+
+	* fhandler_termios.cc (fhandler_termios::line_edit): Return
+	line_edit_error and remove last char from readahead buffer if
+	accept_input() fails.
+	* fhandler_tty.cc (fhandler_pty_master::accept_input): Return 0 and
+	restore readahead buffer when tty slave pipe is full.
+
 2002-12-16  Christopher Faylor  <cgf@redhat.com>
 
 	* pinfo.cc (_pinfo::cmdline): Allocate sufficient space for myself

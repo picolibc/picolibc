@@ -145,51 +145,48 @@ fhandler_pty_master::doecho (const void *str, DWORD len)
 int
 fhandler_pty_master::accept_input ()
 {
-  DWORD bytes_left, written;
-  DWORD n;
-  DWORD rc;
-  char* p;
+  DWORD bytes_left;
+  int ret = 1;
 
-  rc = WaitForSingleObject (input_mutex, INFINITE);
+  (void) WaitForSingleObject (input_mutex, INFINITE);
 
-  bytes_left = n = eat_readahead (-1);
-  p = rabuf;
+  bytes_left = eat_readahead (-1);
 
-  if (n != 0)
+  if (!bytes_left)
     {
-      while (bytes_left > 0)
-	{
-	  termios_printf ("about to write %d chars to slave", bytes_left);
-	  rc = WriteFile (get_output_handle (), p, bytes_left, &written, NULL);
-	  if (!rc)
-	    {
-	      debug_printf ("error writing to pipe %E");
-	      get_ttyp ()->read_retval = -1;
-	      break;
-	    }
-	  else
-	    get_ttyp ()->read_retval = 1;
+      termios_printf ("sending EOF to slave");
+      get_ttyp ()->read_retval = 0;
+    }
+  else
+    {
+      char *p = rabuf;
+      DWORD rc;
+      DWORD written = 0;
 
+      termios_printf ("about to write %d chars to slave", bytes_left);
+      rc = WriteFile (get_output_handle (), p, bytes_left, &written, NULL);
+      if (!rc)
+	{
+	  debug_printf ("error writing to pipe %E");
+	  get_ttyp ()->read_retval = -1;
+	}
+      else
+	{
+	  get_ttyp ()->read_retval = 1;
 	  p += written;
 	  bytes_left -= written;
 	  if (bytes_left > 0)
 	    {
 	      debug_printf ("to_slave pipe is full");
-	      SetEvent (input_available_event);
-	      ReleaseMutex (input_mutex);
-	      Sleep (10);
-	      rc = WaitForSingleObject (input_mutex, INFINITE);
+	      puts_readahead (p, bytes_left);
+	      ret = 0;
 	    }
 	}
     }
-  else
-    {
-      termios_printf ("sending EOF to slave");
-      get_ttyp ()->read_retval = 0;
-    }
+
   SetEvent (input_available_event);
   ReleaseMutex (input_mutex);
-  return 1;
+  return ret;
 }
 
 static DWORD WINAPI
