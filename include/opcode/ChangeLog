@@ -1,3 +1,7 @@
+2001-03-19  Alan Modra  <alan@linuxcare.com.au>
+
+	* i386.h (REGNAM_AL, REGNAM_AX, REGNAM_EAX): Define.
+
 Mon Feb 12 17:39:31 CET 2001  Jan Hubicka  <jh@suse.cz>
 
 	* i386.h (i386_optab): SSE integer converison instructions have
