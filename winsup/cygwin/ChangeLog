@@ -1,3 +1,7 @@
+2004-06-02  Christopher Faylor  <cgf@alum.bu.edu>
+
+	* cygheap.cc (cmalloc): Add debugging hook.
+
 2004-06-02  Christophe Jaillet  <christophe.jaillet@wanadoo.fr>
 
 	* spawn.cc (find_exec): Use has_slash to determine if path has a slash
