@@ -1,3 +1,68 @@
+2005-03-28  Mark Mitchell  <mark@codesourcery.com>
+
+	Backport from mainline.
+	2005-03-22  Mark Mitchell  <mark@codesourcery.com>
+	* Makefile.in (SFILES): Add ser-base.c.
+	(ser_base_h): New variable.
+	(ser-base.o): New target.
+	(ser-pipe.o): Depend on $(ser_base_h).
+	(ser-tcp.o): Likewise.
+	(ser-unix.o): Likewise.  Do not depend on $(event_loop_h).
+	* configure.ac (SER_HARDWIRE): Include ser-base.o where
+	appropriate.
+	* ser-base.c: New file.
+	(push_event): Move from ser-unix.c.
+	(fd_event): Likewise.
+	(reschedule): Likewise.
+	(ser_unix_write): Likewise.
+	(ser_unix_nop_flush_output): Likewise.
+	(ser_unix_flush_input): Likewise.
+	(ser_unix_nop_send_break): Likewise.
+	(ser_unix_nop_drain_output): Likewise.
+	(ser_unix_nop_raw): Likewise.
+	(ser_unix_nop_get_tty_state): Likewise.
+	(ser_unix_nop_set_tty_state): Likewise.
+	(ser_unix_nop_noflush_set_tty_state): Likewise.
+	(ser_unix_nop_print_tty_state): Likewise.
+	(ser_unix_nop_setbaudrate): Likewise.
+	(ser_unix_nop_setstopbits): Likewise.
+	(ser_unix_async): Likewise.
+	* ser-base.h: New file.
+	* ser-pipe.c (ser-base.h): Include it.
+	* ser-tcp.c (ser-base.h): Likewise.
+	* ser-unix.h (ser_unix_nop_flush_output): Remove.
+	(ser_unix_flush_input): Likewise.
+	(ser_unix_nop_send_break): Likewise.
+	(ser_unix_nop_raw): Likewise.
+	(ser_unix_nop_get_tty_state): Likewise.
+	(ser_unix_nop_set_tty_state): Likewise.
+	(ser_unix_nop_print_tty_state): Likewise.
+	(ser_unix_nop_noflush_set_tty_state): Likewise.
+	(ser_unix_nop_setbaudrate): Likewise.
+	(ser_unix_nop_setstopbits): Likewise.
+	(ser_unix_nop_drain_output): Likewise.
+	(ser_unix_wait_for): Likewise.
+	(ser_unix_write): Likewise.
+	(ser_unix_async): Likewise.
+	* ser-unix.c (event-loop.h): Do not include it.
+	(push_event): Move to ser-base.c.
+	(fd_event): Likewise.
+	(reschedule): Likewise.
+	(ser_unix_write): Likewise.
+	(ser_unix_nop_flush_output): Likewise.
+	(ser_unix_flush_input): Likewise.
+	(ser_unix_nop_send_break): Likewise.
+	(ser_unix_nop_drain_output): Likewise.
+	(ser_unix_nop_raw): Likewise.
+	(ser_unix_nop_get_tty_state): Likewise.
+	(ser_unix_nop_set_tty_state): Likewise.
+	(ser_unix_nop_noflush_set_tty_state): Likewise.
+	(ser_unix_nop_print_tty_state): Likewise.
+	(ser_unix_nop_setbaudrate): Likewise.
+	(ser_unix_nop_setstopbits): Likewise.
+	(ser_unix_async): Likewise.
+	(ser_unix_wait_for): Make it static.
+
 2005-03-25  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* gdb/Makefile.in (arm-linux-nat.o): Update dependencies.
