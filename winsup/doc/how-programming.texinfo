@@ -208,23 +208,27 @@ If your @samp{.lib} file is a normal static or import library with
 C-callable entry points, you can list @samp{foo.lib} as an object file for
 gcc/g++, just like any @samp{*.o} file. Otherwise, here are some steps:
 
-1. Build a C file with a function table.  Put all functions you intend
+@enumerate
+@item Build a C file with a function table.  Put all functions you intend
 to use in that table.  This forces the linker to include all the object
 files from the .lib.  Maybe there is an option to force LINK.EXE to
 include an object file.
-2. Build a dummy 'LibMain'.
-3. Build a .def with all the exports you need.
-4. Link with your .lib using link.exe.
+@item Build a dummy 'LibMain'.
+@item Build a .def with all the exports you need.
+@item Link with your .lib using link.exe.
+@end enumerate
 
 or
 
-1. Extract all the object files from the .lib using LIB.EXE.
-2. Build a dummy C file referencing all the functions you need, either
-with a direct call or through an initialized function pointer.
-3. Build a dummy LibMain.
-4. Link all the objects with this file+LibMain.
-5. Write a .def.
-6. Link.
+@enumerate
+@item Extract all the object files from the .lib using LIB.EXE.
+@item Build a dummy C file referencing all the functions you need, either
+      withth a direct call or through an initialized function pointer.
+@item Build a dummy LibMain.
+@item Link all the objects with this file+LibMain.
+@item Write a .def.
+@item Link.
+@end enumerate
 
 You can use these methods to use MSVC (and many other runtime libs)
 with Cygwin development tools.

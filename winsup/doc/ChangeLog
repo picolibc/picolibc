@@ -1,5 +1,9 @@
 2004-03-28  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
+	* how-programming.texinfo: Make list in .lib FAQ enumerative. 
+
+2004-03-28  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
 	* how-programming.texinfo: Add note about gcc .lib linking.
 	* pathnames.sgml: Mention create_devices.sh for /dev/ creation.
 
