@@ -1,3 +1,7 @@
+2000-07-12  Alan Modra  <alan@linuxcare.com.au>
+
+	* internal.h (struct elf_internal_sym): Update comment for st_other.
+
 2000-07-10  Alan Modra  <alan@linuxcare.com.au>
 
 	* hppa.h: Add comments to all the relocs. 
