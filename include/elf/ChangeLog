@@ -1,3 +1,18 @@
+2002-09-30  Gavin Romig-Koch  <gavin@redhat.com>
+            Ken Raeburn  <raeburn@cygnus.com>
+            Aldy Hernandez  <aldyh@redhat.com>
+            Eric Christopher  <echristo@redhat.com>
+            Richard Sandiford  <rsandifo@redhat.com>
+
+	* mips.h (E_MIPS_MACH_4120, E_MIPS_MACH_5400, E_MIPS_MACH_5500): New.
+
+2002-09-12  Roland McGrath  <roland@redhat.com>
+
+	* dwarf2.h: Updates from GCC version of thie file:
+	(enum dwarf_location_atom): DW_OP_calli -> DW_OP_call_ref.
+	Add DW_OP_GNU_push_tls_address.
+	(DW_OP_lo_user): Change to 0xe0.
+
 2002-08-28  Catherine Moore  <clm@redhat.com>
 
 	* elf/v850.h (R_V850_LONGCALL, R_V850_ALIGN,

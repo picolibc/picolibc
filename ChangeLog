@@ -1,3 +1,95 @@
+2002-09-30  Nick Clifton  <nickc@redhat.com>
+
+	* cpu: New top level directory.  Intended to hold input files for
+	CGEN which have FSF copyright assignment.
+	* Makefile.in (BINUTILS_SUPPORT_DIRS): Add cpu directory.
+
+2002-09-29  Andrew Cagney  <ac131313@redhat.com>
+
+	Revert below (note that src does not contain Makefile.tpl):
+	* Makefile.tpl: Make subsituted variables more autoconfy.
+	* Makefile.in: Regenerate.
+
+2002-09-29  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure: Revert accidentally applied changes.
+
+	* Makefile.tpl: Make more autoconf-friendly.
+	* Makefile.in: Regenerate.
+	* configure: Make substitution more autoconf-like.
+
+2002-09-28  Richard Earnshaw  <rearnsha@arm.com>
+
+	* configure.in (arm-*-coff, strongarm-*-coff, xscale-*-coff): Use a
+	single entry to handle all these.
+	(arm-*-elf, strongarm-*-elf, xscale-*-elf): Likewise.  Also enable
+	libjava on arm-*-elf.
+
+2002-09-27  Geoffrey Keating  <geoffk@apple.com>
+
+	* configure.in (powerpc-*-darwin*): Don't configure BFD, TK, or the
+	things that depend on them.
+
+2002-09-25  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.tpl: Make subsituted variables more autoconfy.
+	* Makefile.in: Regenerate.
+	* configure: Make seds more autoconfy.
+
+2002-09-25  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.tpl: Rewrite substituted lines to look autoconfy.
+	* Makefile.in: Regenerate.
+	* configure.in: Rewrite sed statements to look autoconfy.
+
+	* Makefile.tpl: Autogenerate *-target-* lists, dependencies of
+	all-target-foo on configure-target-foo.
+	* Makefile.def: Ditto.
+	* Makefile.in: Rebuild.
+
+2002-09-22  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.def: New file.
+	* Makefile.tpl: New file.
+	* Makefile.in: Generate from Makefile.tpl with 'autogen Makefile.def'.
+
+	* configure.in: Minor rearrangement.  Simplify tests.
+
+2002-09-23  Jason Thorpe  <thorpej@wasabisystems.com>
+
+	* configure.in (with_headers): Skip copy if value is "yes".
+	(with_libs): Likewise.
+
+2002-09-20  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure.in (*-*-netbsd*): Use noconfigdirs, not skipdirs.
+	* configure.in (sh*-*-pe*): Ditto.
+	* configure.in (mips*-*-pe*): Ditto.
+	* configure.in (*arm-wince-pe): Ditto.
+
+	* configure.in: Rearrange.
+
+2002-09-12  Nick Clifton  <nickc@redhat.com>
+
+	* Import these changes from the config master repository:
+
+	2002-09-05  Svein E. Seldal  <Svein.Seldal@solidas.com>
+
+		* config.sub: Add tic4x target.
+
+	2002-09-03  Ben Elliston  <bje@redhat.com>
+
+		* config.guess: Detect NSR-D machines for nsr-tandem-nsk.
+		Reported by <Duncan_Stodart@insession.com>.
+
+2002-09-10  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* COPYING.NEWLIB: More updates.
+
+2002-09-09  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* COPYING.NEWLIB: Update.
+
 2002-08-23  Andrew Cagney  <ac131313@redhat.com>
 
 	* texinfo/texinfo.tex: Import version 2002-06-04.06.

@@ -1,3 +1,30 @@
+2002-09-26  Jakub Jelinek  <jakub@redhat.com>
+
+	* elf/x86-64.h: Add TLS relocs.
+
+2002-09-26  Andrew Cagney  <ac131313@redhat.com>
+
+	* regs/: Delete directory.
+
+2002-09-19  Alexandre Oliva  <aoliva@redhat.com>
+
+	* libiberty.h (asprintf, vasprintf): Don't declare them if the
+	corresponding HAVE_DECL_ macro is 1.
+
+2002-09-19  Jakub Jelinek  <jakub@redhat.com>
+
+	* elf/i386.h (R_386_TLS_TPOFF, R_386_TLS_IE, R_386_TLS_GOTIE):
+	Define.
+
+2002-09-19  Nathan Tallent  <eraxxon@alumni.rice.edu>
+
+	* dis-asm.h: Remove (errant) trailing semicolon (;) from the
+	extern "C" { } declaration.
+
+2002-09-04  Nick Clifton  <nickc@redhat.com>
+
+	* dis-asm.h (print_ppc_disassembler_options): Prototype.
+
 2002-08-28  Michael Hayes <m.hayes@elec.canterbury.ac.nz>
 
 	* coff/internal.h: Add new relocation types.

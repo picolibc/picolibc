@@ -1,3 +1,5 @@
+
+# Makefile.in is generated from Makefile.tpl by 'autogen Makefile.def'.
 #
 # Makefile for directory with subdirs to build.
 #   Copyright (C) 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
@@ -41,7 +43,7 @@ includedir=${prefix}/include
 oldincludedir=/usr/include
 infodir=${prefix}/info
 mandir=${prefix}/man
-gxx_include_dir=${includedir}/g++
+gxx_include_dir=@gxx_include_dir@
 
 tooldir = $(exec_prefix)/$(target_alias)
 build_tooldir = $(exec_prefix)/$(target_alias)
@@ -181,27 +183,26 @@ RUNTEST = `if [ -f $$s/dejagnu/runtest ] ; \
 CC_FOR_BUILD = $(CC)
 CXX_FOR_BUILD = $(CXX)
 
-SUBDIRS = "this is set via configure, don't edit this"
-OTHERS = 
+SUBDIRS = @configdirs@
 
 # This is set by the configure script to the list of directories which
 # should be built using the target tools.
-TARGET_CONFIGDIRS = libiberty libgloss $(SPECIAL_LIBS) newlib winsup opcodes libf2c libobjc
+TARGET_CONFIGDIRS = @target_configdirs@
 
 # Target libraries are put under this directory:
 # Changed by configure to $(target_alias) if cross.
-TARGET_SUBDIR = .
+TARGET_SUBDIR = @target_subdir@
 
 BUILD_CONFIGDIRS = libiberty
-BUILD_SUBDIR = .
+BUILD_SUBDIR = @build_subdir@
 
 # This is set by the configure script to the arguments to use when configuring
 # directories built for the target.
-TARGET_CONFIGARGS = 
+TARGET_CONFIGARGS = @target_configargs@
 
 # This is set by the configure script to the arguments to use when configuring
 # directories built for the build system.
-BUILD_CONFIGARGS =
+BUILD_CONFIGARGS = @build_configargs@
 
 # This is set by configure to REALLY_SET_LIB_PATH if --enable-shared
 # was used.
@@ -241,11 +242,11 @@ INSTALL_TARGET_CROSS = installdirs \
 	$(INSTALL_DOSREL)
 
 # Should be substed by configure.in
-FLAGS_FOR_TARGET =
-CC_FOR_TARGET =
-CXX_FOR_TARGET =
-CXX_FOR_TARGET_FOR_RECURSIVE_MAKE =
-GCJ_FOR_TARGET =
+FLAGS_FOR_TARGET = @FLAGS_FOR_TARGET@
+CC_FOR_TARGET = @CC_FOR_TARGET@
+CXX_FOR_TARGET = @CXX_FOR_TARGET@
+CXX_FOR_TARGET_FOR_RECURSIVE_MAKE = @CXX_FOR_TARGET_FOR_RECURSIVE_MAKE@
+GCJ_FOR_TARGET = @GCJ_FOR_TARGET@
 
 # If GCC_FOR_TARGET is not overriden on the command line, then this
 # variable is passed down to the gcc Makefile, where it is used to
@@ -529,6 +530,7 @@ ALL_MODULES = \
 	all-automake \
 	all-bash \
 	all-bfd \
+	all-opcodes \
 	all-binutils \
 	all-bison \
 	all-byacc \
@@ -553,6 +555,7 @@ ALL_MODULES = \
 	all-hello \
 	all-indent \
 	all-intl \
+	all-tcl \
 	all-itcl \
 	all-ld \
 	all-libgui \
@@ -561,7 +564,6 @@ ALL_MODULES = \
 	all-m4 \
 	all-make \
 	all-mmalloc \
-	all-opcodes \
 	all-patch \
 	all-perl \
 	all-prms \
@@ -576,7 +578,6 @@ ALL_MODULES = \
 	all-sim \
 	all-snavigator \
 	all-tar \
-	all-tcl \
 	all-texinfo \
 	all-textutils \
 	all-time \
@@ -605,6 +606,7 @@ CROSS_CHECK_MODULES = \
 	check-automake \
 	check-bash \
 	check-bfd \
+	check-opcodes \
 	check-binutils \
 	check-bzip2 \
 	check-db \
@@ -624,6 +626,7 @@ CROSS_CHECK_MODULES = \
 	check-hello \
 	check-indent \
 	check-intl \
+	check-tcl \
 	check-itcl \
 	check-ld \
 	check-libgui \
@@ -631,8 +634,6 @@ CROSS_CHECK_MODULES = \
 	check-libtool \
 	check-m4 \
 	check-make \
-	check-mmcheckoc \
-	check-opcodes \
 	check-patch \
 	check-perl \
 	check-prms \
@@ -642,11 +643,10 @@ CROSS_CHECK_MODULES = \
 	check-sed \
 	check-send-pr \
 	check-shellutils \
-	check-snavigator \
 	check-sid \
 	check-sim \
+	check-snavigator \
 	check-tar \
-	check-tcl \
 	check-texinfo \
 	check-textutils \
 	check-time \
@@ -669,11 +669,11 @@ INSTALL_MODULES = \
 	install-automake \
 	install-bash \
 	install-bfd \
-	install-bzip2 \
 	install-opcodes \
 	install-binutils \
 	install-bison \
 	install-byacc \
+	install-bzip2 \
 	install-db \
 	install-dejagnu \
 	install-diff \
@@ -770,7 +770,7 @@ ALL_TARGET_MODULES = \
 	all-target-libjava \
 	all-target-zlib \
 	all-target-boehm-gc \
-	all-target-qthreads
+	all-target-qthreads 
 
 # This is a list of the configure targets for all of the modules which
 # are compiled using the target tools.
@@ -789,7 +789,7 @@ CONFIGURE_TARGET_MODULES = \
 	configure-target-libjava \
 	configure-target-zlib \
 	configure-target-boehm-gc \
-	configure-target-qthreads
+	configure-target-qthreads 
 
 # This is a list of the check targets for all of the modules which are
 # compiled using $(TARGET_FLAGS_TO_PASS).
@@ -800,12 +800,12 @@ CHECK_TARGET_MODULES = \
 	check-target-libobjc \
 	check-target-winsup \
 	check-target-libiberty \
+	check-target-gperf \
 	check-target-libffi \
 	check-target-libjava \
 	check-target-zlib \
 	check-target-boehm-gc \
-	check-target-qthreads \
-	check-target-gperf
+	check-target-qthreads 
 
 # This is a list of the install targets for all of the modules which are
 # compiled using $(TARGET_FLAGS_TO_PASS).
@@ -818,11 +818,11 @@ INSTALL_TARGET_MODULES = \
 	install-target-winsup \
 	install-target-libgloss \
 	install-target-libiberty \
+	install-target-gperf \
 	install-target-libjava \
 	install-target-zlib \
 	install-target-boehm-gc \
-	install-target-qthreads \
-	install-target-gperf
+	install-target-qthreads 
 
 # This is a list of the targets for which we can do a clean-{target}.
 CLEAN_MODULES = \
@@ -831,6 +831,7 @@ CLEAN_MODULES = \
 	clean-automake \
 	clean-bash \
 	clean-bfd \
+	clean-opcodes \
 	clean-binutils \
 	clean-bison \
 	clean-byacc \
@@ -855,6 +856,7 @@ CLEAN_MODULES = \
 	clean-hello \
 	clean-indent \
 	clean-intl \
+	clean-tcl \
 	clean-itcl \
 	clean-ld \
 	clean-libgui \
@@ -863,7 +865,6 @@ CLEAN_MODULES = \
 	clean-m4 \
 	clean-make \
 	clean-mmalloc \
-	clean-opcodes \
 	clean-patch \
 	clean-perl \
 	clean-prms \
@@ -878,14 +879,13 @@ CLEAN_MODULES = \
 	clean-sim \
 	clean-snavigator \
 	clean-tar \
-	clean-tcl \
 	clean-texinfo \
 	clean-textutils \
 	clean-time \
 	clean-uudecode \
 	clean-wdiff \
 	clean-zip \
-	clean-zlib
+	clean-zlib 
 
 # All of the target modules that can be cleaned
 CLEAN_TARGET_MODULES = \
@@ -902,7 +902,7 @@ CLEAN_TARGET_MODULES = \
 	clean-target-libjava \
 	clean-target-zlib \
 	clean-target-boehm-gc \
-	clean-target-qthreads
+	clean-target-qthreads 
 
 # All of the x11 modules that can be cleaned
 CLEAN_X11_MODULES = \
@@ -1658,7 +1658,6 @@ all-bfd: all-libiberty all-intl
 all-binutils: all-libiberty all-opcodes all-bfd all-flex all-bison all-byacc all-intl
 all-bison: all-texinfo
 configure-target-boehm-gc: $(ALL_GCC_C) configure-target-qthreads
-all-target-boehm-gc: configure-target-boehm-gc
 all-byacc:
 all-bzip2:
 all-db:
@@ -1666,7 +1665,6 @@ all-dejagnu: all-tcl all-expect all-tk
 all-diff: all-libiberty
 all-etc:
 configure-target-examples: $(ALL_GCC_C)
-all-target-examples: configure-target-examples
 all-expect: all-tcl all-tk
 all-fileutils: all-libiberty
 all-findutils:
@@ -1681,7 +1679,7 @@ all-gdb: all-libiberty all-opcodes all-bfd all-mmalloc all-readline all-bison al
 all-gettext:
 all-gnuserv:
 configure-target-gperf: $(ALL_GCC_CXX)
-all-target-gperf: configure-target-gperf all-target-libiberty all-target-libstdc++-v3
+all-target-gperf: all-target-libiberty all-target-libstdc++-v3
 all-gprof: all-libiberty all-bfd all-opcodes all-intl
 all-grep: all-libiberty
 all-gui: all-gdb all-libproc
@@ -1693,36 +1691,32 @@ all-intl:
 all-itcl: all-tcl all-tk
 all-ld: all-libiberty all-bfd all-opcodes all-bison all-byacc all-flex all-intl
 configure-target-libgloss: $(ALL_GCC)
-all-target-libgloss: configure-target-libgloss configure-target-newlib
+all-target-libgloss: configure-target-newlib
 all-libgui: all-tcl all-tk all-itcl
 all-libiberty:
 
 all-build-libiberty: configure-build-libiberty
 
 configure-target-libffi: $(ALL_GCC_C) 
-all-target-libffi: configure-target-libffi
 configure-target-libjava: $(ALL_GCC_C) configure-target-zlib configure-target-boehm-gc configure-target-qthreads configure-target-libffi
-all-target-libjava: configure-target-libjava all-fastjar all-target-zlib all-target-boehm-gc all-target-qthreads all-target-libffi
+all-target-libjava: all-fastjar all-target-zlib all-target-boehm-gc all-target-qthreads all-target-libffi
 configure-target-libstdc++-v3: $(ALL_GCC_C)
-all-target-libstdc++-v3: configure-target-libstdc++-v3 all-target-libiberty
+all-target-libstdc++-v3: all-target-libiberty
 all-libtool:
 configure-target-libf2c: $(ALL_GCC_C)
-all-target-libf2c: configure-target-libf2c all-target-libiberty
+all-target-libf2c: all-target-libiberty
 configure-target-libobjc: $(ALL_GCC_C)
-all-target-libobjc: configure-target-libobjc all-target-libiberty
+all-target-libobjc: all-target-libiberty
 all-m4: all-libiberty all-texinfo
 all-make: all-libiberty
 all-mmalloc:
 configure-target-newlib: $(ALL_GCC)
-all-target-newlib: configure-target-newlib
 configure-target-libtermcap: $(ALL_GCC_C)
-all-target-libtermcap: configure-target-libtermcap
 all-opcodes: all-bfd all-libiberty
 all-patch: all-libiberty
 all-perl:
 all-prms: all-libiberty
 configure-target-qthreads: $(ALL_GCC_C)
-all-target-qthreads: configure-target-qthreads
 all-rcs:
 all-readline:
 all-recode: all-libiberty
@@ -1742,21 +1736,38 @@ all-time:
 all-tix: all-tcl all-tk
 all-wdiff:
 configure-target-winsup: $(ALL_GCC_C)
-all-target-winsup: all-target-libiberty all-target-libtermcap configure-target-winsup
+all-target-winsup: all-target-libiberty all-target-libtermcap
 all-uudecode: all-libiberty
 all-zip:
 all-zlib:
 configure-target-zlib: $(ALL_GCC_C)
-all-target-zlib: configure-target-zlib
 all-fastjar: all-zlib all-libiberty
 configure-target-fastjar: configure-target-zlib
 all-target-fastjar: configure-target-fastjar all-target-zlib all-target-libiberty
 configure-target-libiberty: $(ALL_GCC_C)
-all-target-libiberty: configure-target-libiberty
 all-target: $(ALL_TARGET_MODULES)
 install-target: $(INSTALL_TARGET_MODULES)
 install-gdb: install-tcl install-tk install-itcl install-tix install-libgui
 install-sid: install-tcl install-tk
+
+# Dependencies of all-target-foo on configure-target-foo.
+all-target-libstdc++-v3: configure-target-libstdc++-v3
+all-target-newlib: configure-target-newlib
+all-target-libf2c: configure-target-libf2c
+all-target-libobjc: configure-target-libobjc
+all-target-libtermcap: configure-target-libtermcap
+all-target-winsup: configure-target-winsup
+all-target-libgloss: configure-target-libgloss
+all-target-libiberty: configure-target-libiberty
+all-target-gperf: configure-target-gperf
+all-target-examples: configure-target-examples
+all-target-libffi: configure-target-libffi
+all-target-libjava: configure-target-libjava
+all-target-zlib: configure-target-zlib
+all-target-boehm-gc: configure-target-boehm-gc
+all-target-qthreads: configure-target-qthreads
+
+
 ### other supporting targets
 
 MAKEDIRS= \
@@ -1786,6 +1797,10 @@ etags tags: TAGS
 # the user could load to tell emacs19 where all the TAGS files we just
 # built are.
 TAGS: do-TAGS
+
+# Rebuilding Makefile.in, using autogen.
+$(srcdir)/Makefile.in: # $(srcdir)/Makefile.tpl $(srcdir)/Makefile.def
+	cd $(srcdir) && autogen Makefile.def
 
 # with the gnu make, this is done automatically.
 
@@ -1985,7 +2000,7 @@ gas.tar.bz2: $(DIST_SUPPORT) $(GAS_SUPPORT_DIRS) gas
 
 # The FSF "binutils" release includes gprof and ld.
 .PHONY: binutils.tar.bz2
-BINUTILS_SUPPORT_DIRS= bfd gas include libiberty opcodes ld gprof intl setup.com makefile.vms mkdep
+BINUTILS_SUPPORT_DIRS= bfd gas include libiberty opcodes ld gprof intl setup.com makefile.vms mkdep cpu
 binutils.tar.bz2: $(DIST_SUPPORT) $(BINUTILS_SUPPORT_DIRS) binutils
 	$(MAKE) -f Makefile.in taz TOOL=binutils \
 		MD5PROG="$(MD5PROG)" \
