@@ -1965,7 +1965,7 @@ extern "C" int
 pthread_attr_init (pthread_attr_t *attr)
 {
   if (pthread_attr::is_good_object (attr))
-    return 0;
+    return EBUSY;
 
   *attr = new pthread_attr;
   if (!pthread_attr::is_good_object (attr))
@@ -2490,7 +2490,7 @@ extern "C" int
 pthread_condattr_init (pthread_condattr_t *condattr)
 {
   if (pthread_condattr::is_good_object (condattr))
-    return 0;
+    return EBUSY;
 
   *condattr = new pthread_condattr;
   if (!pthread_condattr::is_good_object (condattr))
@@ -2676,7 +2676,7 @@ extern "C" int
 pthread_rwlockattr_init (pthread_rwlockattr_t *rwlockattr)
 {
   if (pthread_rwlockattr::is_good_object (rwlockattr))
-    return 0;
+    return EBUSY;
 
   *rwlockattr = new pthread_rwlockattr;
   if (!pthread_rwlockattr::is_good_object (rwlockattr))
@@ -2936,7 +2936,7 @@ extern "C" int
 pthread_mutexattr_init (pthread_mutexattr_t *attr)
 {
   if (pthread_mutexattr::is_good_object (attr))
-    return 0;
+    return EBUSY;
 
   *attr = new pthread_mutexattr ();
   if (!pthread_mutexattr::is_good_object (attr))

@@ -1,3 +1,11 @@
+2003-06-12  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.cc (pthread_attr_init): Revert change from 2003-06-11
+	to return 0 if attribute is already initialized back to EBUSY.
+	(pthread_condattr_init): Ditto.
+	(pthread_rwlockattr_init): Ditto.
+	(pthread_mutexattr_init): Ditto.
+
 2003-06-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* exceptions.cc (ctrl_c_handler): Don't send a signal on
