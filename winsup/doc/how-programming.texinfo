@@ -243,8 +243,8 @@ gcc as:
 
 @samp{objdump -p} provides this information, but is rather verbose.
 
-@samp{cygcheck} will do this much more concisely, provided the command
-is in your path.
+@samp{cygcheck} will do this much more concisely, and operates
+recursively, provided the command is in your path.
 
 Note there is currently a bug in cygcheck in that it will not report
 on a program in a Windows system dir (e.g., C:\Windows or C:\WINNT) even
