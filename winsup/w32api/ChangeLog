@@ -1,3 +1,8 @@
+2003-07-31  Danny Smith <dannysmith@users.sourceforge.net>
+
+	* include/shellapi.h: Include all structs within pshpack2.h/
+	poppack.h block.
+
 2003-07-26  Danny Smith <dannysmith@users.sourceforge.net>
 
 	* include/winuser.h (ASFW_ANY, LSFW_LOCK, LSFW_UNLOCK,
