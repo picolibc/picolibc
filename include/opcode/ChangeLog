@@ -1,3 +1,9 @@
+2004-08-13  Nick Clifton  <nickc@redhat.com>
+
+	PR/301
+	* h8300.h (O_JSR): Do not allow VECIND addressing for non-SX
+	processors.
+
 2004-08-30  Michal Ludvig  <mludvig@suse.cz>
 
 	* i386.h (i386_optab): Added montmul/xsha1/xsha256 insns.
