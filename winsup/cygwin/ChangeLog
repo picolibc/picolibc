@@ -1,3 +1,9 @@
+2003-03-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* glob.c (g_lstat): Change API minor test to match API minor number 
+	change in previous patch.
+	(g_stat): Ditto.
+
 2003-03-17  Christopher Faylor  <cgf@redhat.com>
 
 	* include/cygwin/version.h: Reorganize last two api versions so that

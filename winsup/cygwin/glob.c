@@ -840,7 +840,7 @@ g_lstat(fn, sb, pglob)
 		struct __stat32 lsb;
 		int ret;
 
-		if (user_data->api_major > 0 || user_data->api_minor > 77)
+		if (user_data->api_major > 0 || user_data->api_minor > 78)
 		  ret = (*pglob->gl_lstat)(buf, &sb);
 		else if (!(ret = (*pglob->gl_lstat)(buf, &lsb)))
 			stat32_to_STAT (&lsb, sb);
@@ -866,7 +866,7 @@ g_stat(fn, sb, pglob)
 		struct __stat32 lsb;
 		int ret;
 
-		if (user_data->api_major > 0 || user_data->api_minor > 77)
+		if (user_data->api_major > 0 || user_data->api_minor > 78)
 		  ret = (*pglob->gl_stat)(buf, &sb);
 		if (!(ret = (*pglob->gl_stat)(buf, &lsb)))
 			stat32_to_STAT (&lsb, sb);
