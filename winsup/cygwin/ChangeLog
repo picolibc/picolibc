@@ -1,3 +1,7 @@
+2003-07-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (fhandler_disk_file::mmap): Fix address test.
+
 2003-07-03  Christopher Faylor  <cgf@redhat.com>
 
 	* path.cc (fillout_mntent): Change "posix" to "managed".

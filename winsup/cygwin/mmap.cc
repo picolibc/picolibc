@@ -820,7 +820,7 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
   void *base = NULL;
   /* If a non-zero address is given, try mapping using the given address first.
      If it fails and flags is not MAP_FIXED, try again with NULL address. */
-  if (addr)
+  if (*addr)
     base = MapViewOfFileEx (h, access, high, low, len, *addr);
   if (!base && !(flags & MAP_FIXED))
     base = MapViewOfFileEx (h, access, high, low, len, NULL);
