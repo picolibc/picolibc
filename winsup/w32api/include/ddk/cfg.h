@@ -99,6 +99,26 @@ extern "C" {
 #define LCPRI_DISABLED                    0x0000FFFF
 #define MAX_LCPRI                         0x0000FFFF
 
+#define DN_ROOT_ENUMERATED	0x00000001	/* Was enumerated by ROOT */
+#define DN_DRIVER_LOADED	0x00000002	/* Has Register_Device_Driver */
+#define DN_ENUM_LOADED		0x00000004	/* Has Register_Enumerator */
+#define DN_STARTED		0x00000008	/* Is currently configured */
+#define DN_MANUAL		0x00000010	/* Manually installed */
+#define DN_NEED_TO_ENUM		0x00000020	/* May need reenumeration */
+#define DN_NOT_FIRST_TIME	0x00000040	/* Has received a config */
+#define DN_HARDWARE_ENUM	0x00000080	/* Enum generates hardware ID */
+#define DN_LIAR			0x00000100	/* Lied about can reconfig once */
+#define DN_HAS_MARK		0x00000200	/* Not CM_Create_DevNode lately */
+#define DN_HAS_PROBLEM		0x00000400	/* Need device installer */
+#define DN_FILTERED		0x00000800	/* Is filtered */
+#define DN_MOVED		0x00001000	/* Has been moved */
+#define DN_DISABLEABLE		0x00002000	/* Can be rebalanced */
+#define DN_REMOVABLE		0x00004000	/* Can be removed */
+#define DN_PRIVATE_PROBLEM	0x00008000	/* Has a private problem */
+#define DN_MF_PARENT		0x00010000	/* Multi function parent */
+#define DN_MF_CHILD		0x00020000	/* Multi function child */
+#define DN_WILL_BE_REMOVED	0x00040000	/* Devnode is being removed */
+
 typedef enum _PNP_VETO_TYPE {
   PNP_VetoTypeUnknown,
   PNP_VetoLegacyDevice,

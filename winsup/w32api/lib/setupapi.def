@@ -5,6 +5,10 @@ AddMiniIconToList@8
 AddTagToGroupOrderListEntry@12
 AppendStringToMultiSz@24
 AssertFail@12
+CM_Request_Device_EjectA@20
+CM_Request_Device_EjectW@20
+CM_Request_Device_Eject_ExA@24
+CM_Request_Device_Eject_ExW@24
 CaptureAndConvertAnsiArg@8
 CaptureStringArg@8
 CenterWindowRelativeToParent@4

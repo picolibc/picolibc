@@ -1,3 +1,9 @@
+2004-01-01  Igor Pechtchanski  <pechtcha@cs.nyu.edu>
+
+	* lib/setupapi.def (CM_Request_Device_Eject[AW]): Add export.
+	(CM_Request_Device_Eject_Ex[AW]): Likwise.
+	* include/ddk/cfg.h (DN_*): Add defines.
+
 2004-01-01  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/ddk/cfgmgr32.def: Remove duplicate symbol names.
