@@ -33,6 +33,7 @@ LIB_SOURCES = \
 	getenv.c  	\
 	getenv_r.c	\
 	getopt.c	\
+	getsubopt.c	\
 	jrand48.c	\
 	l64a.c		\
 	labs.c 		\

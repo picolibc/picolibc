@@ -1,3 +1,17 @@
+2002-07-19  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* libc/argz/argz_replace.c: Include buf_findstr.h.
+	* libc/argz/buf_findstr.c: Likewise.
+	* libc/argz/envz_entry.c: Include buf_findstr.h.  Cast return
+	value to (char *).
+	* libc/argz/envz_get.c: Likewise.
+	* libc/include/sys/unistd.h: Add getopt and getsubopt declarations.
+	* libc/stdlib/Makefile.am (LIB_SOURCES): Add getsubopt.c.
+	* libc/stdlib/getsubopt.3: New file.
+	* libc/stdlib/getsubopt.c: New file.
+	* libc/sys/linux/machine/i386/socketcall.h (__sockcall_base):
+	Change esp to ebp.
+
 2002-07-17  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* configure.host(stdio64_dir): New setting that is used to

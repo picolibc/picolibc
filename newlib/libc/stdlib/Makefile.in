@@ -82,6 +82,8 @@ LIBC_MACHINE_LIB = @LIBC_MACHINE_LIB@
 LIBC_POSIX_LIB = @LIBC_POSIX_LIB@
 LIBC_SIGNAL_DEF = @LIBC_SIGNAL_DEF@
 LIBC_SIGNAL_LIB = @LIBC_SIGNAL_LIB@
+LIBC_STDIO64_DEF = @LIBC_STDIO64_DEF@
+LIBC_STDIO64_LIB = @LIBC_STDIO64_LIB@
 LIBC_SYSCALL_LIB = @LIBC_SYSCALL_LIB@
 LIBC_SYS_LIB = @LIBC_SYS_LIB@
 LIBC_UNIX_LIB = @LIBC_UNIX_LIB@
@@ -137,6 +139,7 @@ LIB_SOURCES = \
 	getenv.c  	\
 	getenv_r.c	\
 	getopt.c	\
+	getsubopt.c	\
 	jrand48.c	\
 	l64a.c		\
 	labs.c 		\
@@ -275,17 +278,18 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@efgcvt.$(OBJEXT) environ.$(OBJEXT) envlock.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@eprintf.$(OBJEXT) erand48.$(OBJEXT) exit.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@getenv.$(OBJEXT) getenv_r.$(OBJEXT) getopt.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@jrand48.$(OBJEXT) l64a.$(OBJEXT) labs.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@lcong48.$(OBJEXT) ldiv.$(OBJEXT) ldtoa.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@lrand48.$(OBJEXT) malign.$(OBJEXT) malloc.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@mblen.$(OBJEXT) mblen_r.$(OBJEXT) mbstowcs.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@mbstowcs_r.$(OBJEXT) mbtowc.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@mbtowc_r.$(OBJEXT) mlock.$(OBJEXT) mprec.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@mrand48.$(OBJEXT) msize.$(OBJEXT) mstats.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@mtrim.$(OBJEXT) nrand48.$(OBJEXT) on_exit.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@putenv.$(OBJEXT) putenv_r.$(OBJEXT) rand.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@rand48.$(OBJEXT) rand_r.$(OBJEXT) realloc.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@seed48.$(OBJEXT) setenv.$(OBJEXT) setenv_r.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@getsubopt.$(OBJEXT) jrand48.$(OBJEXT) l64a.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@labs.$(OBJEXT) lcong48.$(OBJEXT) ldiv.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@ldtoa.$(OBJEXT) lrand48.$(OBJEXT) malign.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@malloc.$(OBJEXT) mblen.$(OBJEXT) mblen_r.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@mbstowcs.$(OBJEXT) mbstowcs_r.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@mbtowc.$(OBJEXT) mbtowc_r.$(OBJEXT) mlock.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@mprec.$(OBJEXT) mrand48.$(OBJEXT) msize.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@mstats.$(OBJEXT) mtrim.$(OBJEXT) nrand48.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@on_exit.$(OBJEXT) putenv.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@putenv_r.$(OBJEXT) rand.$(OBJEXT) rand48.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@rand_r.$(OBJEXT) realloc.$(OBJEXT) seed48.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@setenv.$(OBJEXT) setenv_r.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@srand48.$(OBJEXT) strdup.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@strdup_r.$(OBJEXT) strtod.$(OBJEXT) strtol.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@strtoll.$(OBJEXT) strtoll_r.$(OBJEXT) \
@@ -307,14 +311,14 @@ LTLIBRARIES =  $(noinst_LTLIBRARIES)
 @USE_LIBTOOL_TRUE@calloc.lo div.lo drand48.lo dtoa.lo dtoastub.lo \
 @USE_LIBTOOL_TRUE@ecvtbuf.lo efgcvt.lo environ.lo envlock.lo eprintf.lo \
 @USE_LIBTOOL_TRUE@erand48.lo exit.lo getenv.lo getenv_r.lo getopt.lo \
-@USE_LIBTOOL_TRUE@jrand48.lo l64a.lo labs.lo lcong48.lo ldiv.lo \
-@USE_LIBTOOL_TRUE@ldtoa.lo lrand48.lo malign.lo malloc.lo mblen.lo \
-@USE_LIBTOOL_TRUE@mblen_r.lo mbstowcs.lo mbstowcs_r.lo mbtowc.lo \
-@USE_LIBTOOL_TRUE@mbtowc_r.lo mlock.lo mprec.lo mrand48.lo msize.lo \
-@USE_LIBTOOL_TRUE@mstats.lo mtrim.lo nrand48.lo on_exit.lo putenv.lo \
-@USE_LIBTOOL_TRUE@putenv_r.lo rand.lo rand48.lo rand_r.lo realloc.lo \
-@USE_LIBTOOL_TRUE@seed48.lo setenv.lo setenv_r.lo srand48.lo strdup.lo \
-@USE_LIBTOOL_TRUE@strdup_r.lo strtod.lo strtol.lo strtoll.lo \
+@USE_LIBTOOL_TRUE@getsubopt.lo jrand48.lo l64a.lo labs.lo lcong48.lo \
+@USE_LIBTOOL_TRUE@ldiv.lo ldtoa.lo lrand48.lo malign.lo malloc.lo \
+@USE_LIBTOOL_TRUE@mblen.lo mblen_r.lo mbstowcs.lo mbstowcs_r.lo \
+@USE_LIBTOOL_TRUE@mbtowc.lo mbtowc_r.lo mlock.lo mprec.lo mrand48.lo \
+@USE_LIBTOOL_TRUE@msize.lo mstats.lo mtrim.lo nrand48.lo on_exit.lo \
+@USE_LIBTOOL_TRUE@putenv.lo putenv_r.lo rand.lo rand48.lo rand_r.lo \
+@USE_LIBTOOL_TRUE@realloc.lo seed48.lo setenv.lo setenv_r.lo srand48.lo \
+@USE_LIBTOOL_TRUE@strdup.lo strdup_r.lo strtod.lo strtol.lo strtoll.lo \
 @USE_LIBTOOL_TRUE@strtoll_r.lo strtoul.lo strtoull.lo strtoull_r.lo \
 @USE_LIBTOOL_TRUE@system.lo valloc.lo wcstombs.lo wcstombs_r.lo \
 @USE_LIBTOOL_TRUE@wctomb.lo wctomb_r.lo

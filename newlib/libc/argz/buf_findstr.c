@@ -9,10 +9,12 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "buf_findstr.h"
+
 /* Find string str in buffer buf of length buf_len.  Point buf to character after string,
    or set it to NULL if end of buffer is reached.  Return 1 if found, 0 if not. */
 int
-buf_findstr(const char *str, const char **buf, size_t *buf_len)
+_buf_findstr(const char *str, char **buf, size_t *buf_len)
 {
   int i = 0;
   int j = 0;

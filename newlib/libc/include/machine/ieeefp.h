@@ -50,7 +50,7 @@
 	
 */
 
-#if defined(__arm__) || defined(__thumb__)
+#if (defined(__arm__) || defined(__thumb__))
 /* ARM always has big-endian words.  Within those words the byte ordering
    will be big or little endian depending upon the target.  */
 #define __IEEE_BIG_ENDIAN

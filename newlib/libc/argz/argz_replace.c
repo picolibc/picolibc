@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <argz.h>
 
-extern int buf_findstr(const char *str, char **buf, size_t *buf_len);
+#include "buf_findstr.h"
 
 error_t
 argz_replace (char **argz, size_t *argz_len, const char *str, const char *with, unsigned *replace_count)
@@ -31,7 +31,7 @@ argz_replace (char **argz, size_t *argz_len, const char *str, const char *with, 
 
   while(buf_len)
     {
-      if(buf_findstr(str, &buf_iter, &buf_len))
+      if(_buf_findstr(str, &buf_iter, &buf_len))
         {
           *replace_count += 1;
           new_argz_len += len_diff;
@@ -49,7 +49,7 @@ argz_replace (char **argz, size_t *argz_len, const char *str, const char *with, 
       
       while(buf_len)
         {
-          if (buf_findstr(str, &buf_iter, &buf_len))
+          if (_buf_findstr(str, &buf_iter, &buf_len))
             {
               /* copy everything up to, but not including str, from old argz to
                  new argz. */

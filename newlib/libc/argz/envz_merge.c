@@ -20,7 +20,7 @@ envz_merge (char **envz, size_t *envz_len, const char *envz2, size_t envz2_len, 
   char *name_iter = NULL;
   int retval = 0;
 
-  while((entry = argz_next(envz2, envz2_len, entry)) && !retval)
+  while((entry = argz_next((char *)envz2, envz2_len, entry)) && !retval)
     {
       if (!override)
         {

@@ -10,17 +10,17 @@
 #include <stdlib.h>
 #include <envz.h>
 
-extern int buf_findstr(const char *str, char **buf, size_t *buf_len);
+#include "buf_findstr.h"
 
 char *
 envz_entry (const char *envz, size_t envz_len, const char *name)
 {
-  const char *buf_ptr = envz;
+  char *buf_ptr = (char *)envz;
   size_t buf_len = envz_len;
 
   while(buf_len)
     {
-      if (buf_findstr(name, &buf_ptr, &buf_len))
+      if (_buf_findstr(name, &buf_ptr, &buf_len))
         {
           if (buf_ptr)
             {
@@ -34,7 +34,7 @@ envz_entry (const char *envz, size_t envz_len, const char *name)
                   if(*buf_ptr == '\0')
                     buf_ptr++;
 
-                  return buf_ptr;
+                  return (char *)buf_ptr;
                 }
             }
         }

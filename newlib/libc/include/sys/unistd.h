@@ -118,8 +118,16 @@ int     _EXFUN(unlink, (const char *__path ));
 int     _EXFUN(vhangup, (void ));
 _READ_WRITE_RETURN_TYPE _EXFUN(write, (int __fd, const void *__buf, size_t __nbyte ));
 
+extern char *optarg;			/* getopt(3) external variables */
+extern int optind, opterr, optopt;
+int	 getopt(int, char * const [], const char *);
+extern int optreset;			/* getopt(3) external variable */
+
 #ifndef        _POSIX_SOURCE
 pid_t   _EXFUN(vfork, (void ));
+
+extern char *suboptarg;			/* getsubopt(3) external variable */
+int	 getsubopt(char **, char * const *, char **);
 #endif /* _POSIX_SOURCE */
 
 /* Provide prototypes for most of the _<systemcall> names that are

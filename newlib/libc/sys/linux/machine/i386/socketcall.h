@@ -18,7 +18,7 @@
 #define __sockcall_base(type, name) \
 { \
 long __res; \
-__asm__ volatile ("push %%ebx; movl %2,%%ebx; lea 8(%%esp),%%ecx; int $0x80; pop %%ebx" \
+__asm__ volatile ("push %%ebx; movl %2,%%ebx; lea 8(%%ebp),%%ecx; int $0x80; pop %%ebx" \
 	: "=a" (__res) \
 	: "0" (__NR_socketcall),"r" (SOCK_##name)); \
 __syscall_return(type,__res); \

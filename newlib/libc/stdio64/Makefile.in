@@ -82,6 +82,8 @@ LIBC_MACHINE_LIB = @LIBC_MACHINE_LIB@
 LIBC_POSIX_LIB = @LIBC_POSIX_LIB@
 LIBC_SIGNAL_DEF = @LIBC_SIGNAL_DEF@
 LIBC_SIGNAL_LIB = @LIBC_SIGNAL_LIB@
+LIBC_STDIO64_DEF = @LIBC_STDIO64_DEF@
+LIBC_STDIO64_LIB = @LIBC_STDIO64_LIB@
 LIBC_SYSCALL_LIB = @LIBC_SYSCALL_LIB@
 LIBC_SYS_LIB = @LIBC_SYS_LIB@
 LIBC_UNIX_LIB = @LIBC_UNIX_LIB@
@@ -114,7 +116,10 @@ LIB_SOURCES = \
 	freopen64.c 			\
 	fseeko64.c 			\
 	fsetpos64.c 			\
+	fstat64r.c			\
 	ftello64.c			\
+	lseek64r.c			\
+	open64r.c			\
 	stdio64.c			\
 	tmpfile64.c
 
@@ -138,7 +143,10 @@ CHEWOUT_FILES = \
 	freopen64.def		\
 	fseeko64.def		\
 	fsetpos64.def		\
+	fstat64r.def		\
 	ftello64.def		\
+	lseek64r.def		\
+	open64r.def		\
 	tmpfile64.def
 
 
@@ -161,14 +169,16 @@ lib_a_LIBADD =
 @USE_LIBTOOL_FALSE@lib_a_OBJECTS =  fgetpos64.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@fopen64.$(OBJEXT) freopen64.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@fseeko64.$(OBJEXT) fsetpos64.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@ftello64.$(OBJEXT) stdio64.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@tmpfile64.$(OBJEXT)
+@USE_LIBTOOL_FALSE@fstat64r.$(OBJEXT) ftello64.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@lseek64r.$(OBJEXT) open64r.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@stdio64.$(OBJEXT) tmpfile64.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 libstdio64_la_LIBADD = 
 @USE_LIBTOOL_TRUE@libstdio64_la_OBJECTS =  fgetpos64.lo fopen64.lo \
-@USE_LIBTOOL_TRUE@freopen64.lo fseeko64.lo fsetpos64.lo ftello64.lo \
-@USE_LIBTOOL_TRUE@stdio64.lo tmpfile64.lo
+@USE_LIBTOOL_TRUE@freopen64.lo fseeko64.lo fsetpos64.lo fstat64r.lo \
+@USE_LIBTOOL_TRUE@ftello64.lo lseek64r.lo open64r.lo stdio64.lo \
+@USE_LIBTOOL_TRUE@tmpfile64.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
