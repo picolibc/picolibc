@@ -1,4 +1,10 @@
 
+2001-03-01  Earnie Boyd  <earnie@users.sourceforge.net
+
+	* Makefile.in: (snapshot): Add target.
+	* lib/Makefile.in: (install-headers): Use installdir variable.
+	(installdir): Set value based on target-alias.
+
 2001-02-21  Earnie Boyd  <earnie@users.sourceforge.net
 
 	* include/w32api.h: (_W32API_VERSION): Remove.

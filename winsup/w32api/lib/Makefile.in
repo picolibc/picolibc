@@ -35,7 +35,11 @@ tooldir:=$(exec_prefix)/$(target_alias)
 endif
 datadir = @datadir@
 infodir = @infodir@
+ifneq (,$(findstring cygwin,$(target_alias)))
+includedir = $(tooldir)/include/w32api
+else
 includedir = @includedir@
+endif
 
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -144,9 +148,9 @@ install-libraries: all
 	done
 
 install-headers:
-	$(mkinstalldirs) $(tooldir)/include/w32api
+	$(mkinstalldirs) $(includedir)
 	for i in $(HEADERS); do \
-		$(INSTALL_DATA) $(srcdir)/../include/$$i $(tooldir)/include/w32api/$$i ; \
+		$(INSTALL_DATA) $(srcdir)/../include/$$i $(includedir)/$$i ; \
 	done
 
 # uninstall headers and libraries from a target specified directory
