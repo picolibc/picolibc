@@ -1,3 +1,9 @@
+2005-03-30  Christopher Faylor  <cgf@timesys.com>
+
+	* environ.cc (spenv::retrieve): Revert most of previous change.
+	(build_env): Ditto.  Rework to track environment variables which need
+	to always be in the windows environment in a separate array.
+
 2005-03-30  Igor Pechtchanski  <pechtcha@cs.nyu.edu>
 
 	* path.cc (symlink_info::case_check): Ignore trailing characters

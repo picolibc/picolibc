@@ -899,12 +899,12 @@ spenv::retrieve (bool no_envblock, const char *const env)
 	{
 	  debug_printf ("duping existing value for '%s'", name);
 	  /* Don't really care what it's set to if we're calling a cygwin program */
-	  return (no_envblock && !force) ? env_dontadd : cstrdup1 (env);
+	  return cstrdup1 (env);
 	}
 
       /* Calculate (potentially) value for given environment variable.  */
       p = (cygheap->user.*from_cygheap) (name, namelen);
-      if (!p || (p == env_dontadd) || (!force && (no_envblock && !env)))
+      if (!p || (no_envblock && !env) || (p == env_dontadd))
 	return env_dontadd;
       char *s = (char *) cmalloc (HEAP_1_STR, namelen + strlen (p) + 1);
       strcpy (s, name);
@@ -913,8 +913,6 @@ spenv::retrieve (bool no_envblock, const char *const env)
       return s;
     }
 
-  if (!force && no_envblock)
-    return env_dontadd;
   if (env)
     return cstrdup1 (env);
 
@@ -944,32 +942,37 @@ build_env (const char * const *envp, char *&envblock, int &envc,
 
   /* Allocate a new "argv-style" environ list with room for extra stuff. */
   char **newenv = (char **) cmalloc (HEAP_1_ARGV, sizeof (char *) *
-						  (n + SPENVS_SIZE + 1));
+				     (n + SPENVS_SIZE + 1));
 
   int tl = 0;
+  char **pass_dstp;
+  char **pass_env = (char **) alloca (sizeof (char *) * (n + SPENVS_SIZE + 1));
   /* Iterate over input list, generating a new environment list and refreshing
      "special" entries, if necessary. */
-  for (srcp = envp, dstp = newenv; *srcp; srcp++)
+  for (srcp = envp, dstp = newenv, pass_dstp = pass_env; *srcp; srcp++)
     {
+      bool calc_tl = !no_envblock;
       /* Look for entries that require special attention */
       for (unsigned i = 0; i < SPENVS_SIZE; i++)
 	if (!saw_spenv[i] && (*dstp = spenvs[i].retrieve (no_envblock, *srcp)))
 	  {
 	    saw_spenv[i] = 1;
-	    if (*dstp != env_dontadd)
-	      goto next0;
-	    goto  next1;
+	    if (*dstp == env_dontadd)
+	      goto next1;
+	    if (spenvs[i].force)
+	      calc_tl = true;
+	    goto  next0;
 	  }
 
-      if (no_envblock)
-	goto next1;
       /* Add entry to new environment */
       *dstp = cstrdup1 (*srcp);
 
     next0:
-      /* If necessary, calculate rough running total for envblock size */
-      if (!no_envblock)
-	tl += strlen (*dstp) + 1;
+      if (calc_tl)
+	{
+	  *pass_dstp++ = *dstp;
+	  tl += strlen (*dstp) + 1;
+	}
       dstp++;
     next1:
       continue;
@@ -992,22 +995,24 @@ build_env (const char * const *envp, char *&envblock, int &envc,
   assert ((size_t) envc <= (n + SPENVS_SIZE));
   *dstp = NULL;			/* Terminate */
 
-  if (!envc)
+  size_t pass_envc = pass_dstp - pass_env;
+  if (!pass_envc)
     envblock = NULL;
   else
     {
-      debug_printf ("env count %d, bytes %d", envc, tl);
+      *pass_dstp = NULL;
+      debug_printf ("env count %d, bytes %d", pass_envc, tl);
       win_env temp;
       temp.reset ();
 
       /* Windows programs expect the environment block to be sorted.  */
-      qsort (newenv, envc, sizeof (char *), env_sort);
+      qsort (pass_env, pass_envc, sizeof (char *), env_sort);
 
       /* Create an environment block suitable for passing to CreateProcess.  */
       char *s;
       envblock = (char *) malloc (2 + tl);
       int new_tl = 0;
-      for (srcp = newenv, s = envblock; *srcp; srcp++)
+      for (srcp = pass_env, s = envblock; *srcp; srcp++)
 	{
 	  const char *p;
 	  win_env *conv;
