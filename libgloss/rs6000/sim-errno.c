@@ -14,13 +14,8 @@
  * they apply.
  */
 
-int errno;
-
-int *
-__errno ()
-{
-  return &errno;
-}
+#include <errno.h>
+#include <reent.h>
 
 /* syscall handler branches here in case of error. */
 
@@ -28,6 +23,6 @@ int
 _cerror (e)
      int e;
 {
-  errno = e;
+  _REENT->_errno = e;
   return -1;
 }
