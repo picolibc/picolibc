@@ -1,5 +1,10 @@
 2001-11-03  Christopher Faylor  <cgf@redhat.com>
 
+	* Makefile.in: Add directory dependencies to ensure ordering when using
+	'make -jN'.
+
+2001-11-03  Christopher Faylor  <cgf@redhat.com>
+
 	* Makefile.common: Remove preferred-stack-boundary setting since gcc
 	2.95.3 doesn't work well with it.
 

@@ -100,3 +100,19 @@ check: cygwin
 	    sh ./config.status; \
 	fi; \
 	$(MAKE) check
+
+utils: cygwin mingw
+
+mingw: w32api
+
+cygwin: w32api
+
+cinstall: mingw
+
+install_utils: cygwin mingw
+
+install_mingw: w32api
+
+install_cygwin: w32api
+
+install_cinstall: mingw
