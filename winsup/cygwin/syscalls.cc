@@ -797,7 +797,7 @@ chown_worker (const char *name, unsigned fmode, __uid32_t uid, __gid32_t gid)
 
       /* FIXME: This makes chown on a device succeed always.  Someday we'll want
 	 to actually allow chown to work properly on devices. */
-      if (win32_path.is_device ())
+      if (win32_path.is_auto_device ())
 	{
 	  res = 0;
 	  goto done;
@@ -915,7 +915,7 @@ chmod (const char *path, mode_t mode)
 
   /* FIXME: This makes chmod on a device succeed always.  Someday we'll want
      to actually allow chmod to work properly on devices. */
-  if (win32_path.is_device ())
+  if (win32_path.is_auto_device ())
     {
       res = 0;
       goto done;
@@ -1547,7 +1547,7 @@ pathconf (const char *file, int v)
 	    set_errno (full_path.error);
 	    return -1;
 	  }
-	if (full_path.is_device ())
+	if (full_path.is_auto_device ())
 	  {
 	    set_errno (EINVAL);
 	    return -1;
@@ -1927,16 +1927,73 @@ regfree ()
    fileutils) assume its existence so we must provide a stub that always
    fails. */
 extern "C" int
-mknod (const char *_path, mode_t mode, dev_t dev)
+mknod (const char *path, mode_t mode, dev_t dev)
 {
-  set_errno (ENOSYS);
-  return -1;
+  if (check_null_empty_str_errno (path))
+    return -1;
+
+  if (strlen (path) >= MAX_PATH)
+    return -1;
+
+  path_conv w32path (path, PC_SYM_NOFOLLOW | PC_FULL);
+  if (w32path.exists ())
+    {
+      set_errno (EEXIST);
+      return -1;
+    }
+
+  mode_t prot = mode & (S_IRWXU | S_IRWXG | S_IRWXO);
+  mode &= S_IFMT;
+  if (!mode || mode == S_IFREG)
+    {
+      int fd = open (path, O_CREAT, prot);
+      if (fd < 0)
+	return -1;
+      close (fd);
+      return 0;
+    }
+
+  char buf[sizeof (":00000000:00000000:X") + MAX_PATH];
+
+  _devtype_t ch;
+  if (mode == S_IFCHR)
+    ch = 'c';
+  else if (mode == S_IFBLK)
+    ch = 'b';
+  else if (mode == S_IFIFO)
+    {
+      dev = FH_FIFO;
+      ch = 's';
+    }
+  else
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+
+  _major_t major = dev >> 8 /* SIGH.  _major (dev) */;
+  _minor_t minor = dev & 0xff /* SIGH _minor (dev) */;
+
+  sprintf (buf, ":%x:%x:%c", major, minor, ch);
+  if (symlink_worker (buf, w32path, true, true))
+    return -1;
+
+  strcat (w32path, ".lnk");
+  if (chmod (w32path, prot))
+    return -1;
+
+  if (!SetFileAttributes (w32path, FILE_ATTRIBUTE_READONLY))
+    {
+      __seterrno ();
+      return -1;
+    }
+
+  return 0;
 }
 
 extern "C" int
 mkfifo (const char *_path, mode_t mode)
 {
-  set_errno (ENOSYS);
   return -1;
 }
 
@@ -1944,7 +2001,6 @@ mkfifo (const char *_path, mode_t mode)
 extern "C" int
 seteuid32 (__uid32_t uid)
 {
-
   debug_printf ("uid: %d myself->gid: %d", uid, myself->gid);
 
   if (!wincap.has_security ()
