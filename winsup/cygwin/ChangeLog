@@ -1,3 +1,10 @@
+Thu Aug 16 09:38:59 2001  Jason Tishler <jason@tishler.net>
+
+	* fhandler_socket.cc (fhandler_socket::create_secret_event): Relax
+	security of secret_event so AF_UNIX socket clients can connect to
+	servers even if running under a different user account.
+	(fhandler_socket::check_peer_secret_event): Ditto.
+
 Thu Aug 16 16:26:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* resource.cc (getrlimit): Return getdtablesize () as current limit
