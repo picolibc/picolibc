@@ -121,5 +121,6 @@ TARGETDOC = ../tmp.texi
 
 doc: $(CHEWOUT_FILES)
 	cat $(srcdir)/strings.tex >> $(TARGETDOC)
+	cat $(srcdir)/wcstrings.tex >> $(TARGETDOC)
 
 CLEANFILES = $(CHEWOUT_FILES) *.ref

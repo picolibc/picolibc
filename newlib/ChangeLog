@@ -1,3 +1,12 @@
+2002-08-29  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/libc.texinfo: Add node reference to wide-character strings.
+        * libc/string/wcstrings.tex: New file.
+	* libc/string/strtok_r.c: Remove outdated advertising clause.
+        * libc/string/Makefile.am (doc): Add wide-character string
+        chapter to documentation.
+        * libc/string/Makefile.in: Regenerated.
+
 2002-08-29  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
         * libc/include/wchar.h: Define NULL. Define WEOF more general

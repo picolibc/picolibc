@@ -165,6 +165,7 @@ into another language, under the above conditions for modified versions.
 @end ifset
 
 * Strings::
+* Wchar strings::
 @ifset SIGNALS
 * Signals::
 @end ifset
