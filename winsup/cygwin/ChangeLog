@@ -1,3 +1,8 @@
+Fri Mar 16 21:13:23 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler_termios.cc (fhandler_termios::line_edit): Don't accept input
+	when a signal is sent or we'll end up in an EOF/signal race.
+
 Fri Mar 16 20:25:40 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc: Translate scan states from defines to enums.

@@ -299,11 +299,8 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
     set_input_done (ralen > 0);
 
   if (sawsig)
-    {
-      // tc->write_error = EINTR;
-      input_done = -1;
-    }
-  if (input_done)
+    input_done = -1;
+  else if (input_done)
     (void) accept_input ();
 
   return input_done;
