@@ -838,48 +838,6 @@ typedef struct _TIME_ZONE_INFORMATION {
 	SYSTEMTIME DaylightDate;
 	LONG DaylightBias;
 } TIME_ZONE_INFORMATION,*LPTIME_ZONE_INFORMATION;
-typedef struct _OSVERSIONINFOA {
-	DWORD dwOSVersionInfoSize;
-	DWORD dwMajorVersion;
-	DWORD dwMinorVersion;
-	DWORD dwBuildNumber;
-	DWORD dwPlatformId;
-	CHAR szCSDVersion[128];
-} OSVERSIONINFOA,*POSVERSIONINFOA,*LPOSVERSIONINFOA;
-typedef struct _OSVERSIONINFOW {
-	DWORD dwOSVersionInfoSize;
-	DWORD dwMajorVersion;
-	DWORD dwMinorVersion;
-	DWORD dwBuildNumber;
-	DWORD dwPlatformId;
-	WCHAR szCSDVersion[128];
-} OSVERSIONINFOW,*POSVERSIONINFOW,*LPOSVERSIONINFOW;
-typedef struct _OSVERSIONINFOEXA {
-	DWORD dwOSVersionInfoSize;
-	DWORD dwMajorVersion;
-	DWORD dwMinorVersion;
-	DWORD dwBuildNumber;
-	DWORD dwPlatformId;
-	CHAR szCSDVersion[128];
-	WORD wServicePackMajor;
-	WORD wServicePackMinor;
-	WORD wSuiteMask;
-	BYTE wProductType;
-	BYTE wReserved;
-} OSVERSIONINFOEXA,*POSVERSIONINFOEXA,*LPOSVERSIONINFOEXA;
-typedef struct _OSVERSIONINFOEXW {
-	DWORD dwOSVersionInfoSize;
-	DWORD dwMajorVersion;
-	DWORD dwMinorVersion;
-	DWORD dwBuildNumber;
-	DWORD dwPlatformId;
-	WCHAR szCSDVersion[128];
-	WORD wServicePackMajor;
-	WORD wServicePackMinor;
-	WORD wSuiteMask;
-	BYTE wProductType;
-	BYTE wReserved;
-} OSVERSIONINFOEXW,*POSVERSIONINFOEXW,*LPOSVERSIONINFOEXW;
 typedef struct _MEMORYSTATUS {
 	DWORD dwLength;
 	DWORD dwMemoryLoad;

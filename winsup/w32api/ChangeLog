@@ -1,3 +1,11 @@
+2001-12-04  Danny Smith  <dannysmith@users.sourceforge.net>
+
+        Cleanup merge between SourceForge and winsup CVS.
+        * include/winbase.h (OSVERSIONINFO[AW], OSVERSIONINFOEX[AW]: Remove 
+	definitions.
+        * include/winnt.h (VER_NT*): Remove duplicate defines.
+        (VER_SUITE*): Group with VER_PLATFORM*, VER_NT* defines.
+
 2001-12-03  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/accctrl.h: Change \r\n to \n.
