@@ -1,3 +1,11 @@
+Wed Aug 29 14:17:38 2001  J"orn Rennecke <amylaar@redhat.com>
+
+	* configure.host (h8300-*-elf*, h8500-*-elf*): New cases.
+	* libc/sys/h8300hms/crt1.c (__main): Don't reference __ctors /
+	__ctors_end.
+	* libc/sys/h8300hms/syscalls.c: Include errno.h.
+	(_unlink): New stub function.
+
 Sat Aug 25 22:22:25 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* libc/include/sys/errno.h: Add a cautionary comment.

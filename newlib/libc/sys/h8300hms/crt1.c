@@ -1,5 +1,6 @@
 void __main ()
 {
+#ifndef __ELF__
   static int initialized;
   if (! initialized)
     {
@@ -13,4 +14,5 @@ void __main ()
 	(*--p) ();
 
     }
+#endif
 }

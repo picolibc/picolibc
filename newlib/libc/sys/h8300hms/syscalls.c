@@ -3,6 +3,7 @@
 #include <_ansi.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <errno.h>
 
 int _DEFUN(_read,(file, ptr, len),
 	   int file _AND
@@ -47,4 +48,12 @@ _open (path, flags)
      int flags;
 {
   return 0;
+}
+
+int
+_unlink (path)
+     const char *path;
+{
+  errno = EIO;
+  return -1;
 }

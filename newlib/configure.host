@@ -230,10 +230,16 @@ case "${host}" in
   h8300-*-hms*)
 	sys_dir=h8300hms
 	;;
+  h8300-*-elf*)
+	sys_dir=h8300hms
+	;;
   h8300-*-xray*)
 	sys_dir=h8300xray
 	;;
   h8500-*-hms*)
+	sys_dir=h8500hms
+	;;
+  h8500-*-elf*)
 	sys_dir=h8500hms
 	;;
   i[3456]86-*-go32)
