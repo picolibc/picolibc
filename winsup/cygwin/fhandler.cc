@@ -186,6 +186,26 @@ fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit
     }
 }
 
+/* Detect if we are sitting at EOF for conditions where Windows
+   returns an error but UNIX doesn't.  */
+static int __stdcall
+is_at_eof (HANDLE h, DWORD err)
+{
+  DWORD size, upper1, curr;
+
+  size = GetFileSize (h, &upper1);
+  if (upper1 != 0xffffffff || GetLastError () == NO_ERROR)
+    {
+      LONG upper2 = 0;
+      curr = SetFilePointer (h, 0, &upper2, FILE_CURRENT);
+      if (curr == size && upper1 == (DWORD) upper2)
+	return 1;
+    }
+
+  SetLastError (err);
+  return 0;
+}
+
 /* Normal file i/o handlers.  */
 
 /* Cover function to ReadFile to achieve (as much as possible) Posix style
@@ -211,6 +231,9 @@ fhandler_base::raw_read (void *ptr, size_t ulen)
 	case ERROR_MORE_DATA:
 	  /* `bytes_read' is supposedly valid.  */
 	  break;
+	case ERROR_NOACCESS:
+	  if (is_at_eof (get_handle (), errcode))
+	    return 0;
 	default:
 	  syscall_printf ("ReadFile %s failed, %E", unix_path_name_);
 	  __seterrno_from_win_error (errcode);

@@ -1,3 +1,10 @@
+Sun Nov 26 16:26:14 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler.cc (is_at_eof): New function.
+	(fhandler_base::raw_read): Detect special case where last error ==
+	ERROR_NOACCESS but the file is at EOF.  Most UNIXes do not consider
+	this to be an error.
+
 Sun Nov 26 14:37:29 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* include/cygwin/version.h: Bump DLL minor version number to 7.
