@@ -170,7 +170,13 @@ proc_can_be_signalled (_pinfo *p)
   if (p->sendsig != INVALID_HANDLE_VALUE)
     {
       if (p == myself_nowait || p == myself)
-	return hwait_sig;
+	if (hwait_sig)
+	  return true;
+	else
+	  {
+	    set_errno (EAGAIN);
+	    return hwait_sig;
+	  }
 
       if (ISSTATE (p, PID_INITIALIZING) ||
 	  (((p)->process_state & (PID_ACTIVE | PID_IN_USE)) ==
@@ -544,9 +550,6 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
   sigpacket pack;
 
   pack.wakeup = NULL;
-  if (!myself->sendsig)	// FIXME: This catches the exec case but what if the exec is going to fail?
-    goto out;
-
   bool wait_for_completion;
   if (!(its_me = (p == NULL || p == myself || p == myself_nowait)))
     wait_for_completion = false;
@@ -556,6 +559,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 	{
 	  sigproc_printf ("hwait_sig %p, myself->sendsig %p, exit_state %d",
 			  hwait_sig, myself->sendsig, exit_state);
+	  set_errno (EAGAIN);
 	  goto out;		// Either exiting or not yet initializing
 	}
       if (wait_sig_inited)
@@ -601,8 +605,8 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
       HANDLE hp = OpenProcess (PROCESS_DUP_HANDLE, false, dwProcessId);
       if (!hp)
 	{
-	  sigproc_printf ("OpenProcess failed, %E");
 	  __seterrno ();
+	  sigproc_printf ("OpenProcess failed, %E");
 	  goto out;
 	}
       VerifyHandle (hp);
@@ -651,8 +655,8 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 	 process is exiting.  */
       if (!its_me)
 	{
-	  sigproc_printf ("WriteFile for pipe %p failed, %E", sendsig);
 	  __seterrno ();
+	  sigproc_printf ("WriteFile for pipe %p failed, %E", sendsig);
 	  ForceCloseHandle (sendsig);
 	}
       else
@@ -662,6 +666,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
 	  else if (!hExeced)
 	    system_printf ("error sending signal %d to pid %d, pipe handle %p, %E",
 			  si.si_signo, p->pid, sendsig);
+	  set_errno (EACCES);
 	}
       goto out;
     }
@@ -796,15 +801,9 @@ child_info::sync (pinfo& vchild, DWORD howlong)
       res = true;
       break;
     case WAIT_OBJECT_0 + 1:
+      sigproc_printf ("process exited before subproc_ready");
       if (WaitForSingleObject (subproc_ready, 0) == WAIT_OBJECT_0)
 	sigproc_printf ("should never happen.  noticed subproc_ready after process exit");
-      else
-	{
-	  DWORD exitcode = 0;
-	  (void) GetExitCodeProcess (vchild.hProcess, &exitcode);
-	  vchild->exitcode = (exitcode & 0xff) << 8;
-	  sigproc_printf ("non-cygwin exit value is %p", exitcode);
-	}
       res = false;
       break;
     default:

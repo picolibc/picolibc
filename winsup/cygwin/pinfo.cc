@@ -39,6 +39,8 @@ static char NO_COPY pinfo_dummy[sizeof (_pinfo)] = {0};
 
 pinfo NO_COPY myself ((_pinfo *)&pinfo_dummy);	// Avoid myself != NULL checks
 
+bool is_toplevel_proc;
+
 /* Initialize the process table.
    This is done once when the dll is first loaded.  */
 
@@ -101,40 +103,55 @@ pinfo_init (char **envp, int envc)
   debug_printf ("pid %d, pgid %d", myself->pid, myself->pgid);
 }
 
+# define self (*this)
 void
-_pinfo::exit (UINT n, bool norecord)
+pinfo::set_exit_state (DWORD pidstate)
+{
+  DWORD x = 0xdeadbeef;
+  DWORD oexitcode = self->exitcode;
+  if (hProcess && self->exitcode == EXITCODE_UNSET)
+    {
+      GetExitCodeProcess (hProcess, &x);
+      self->exitcode = (x & 0xff) << 8;
+    }
+  sigproc_printf ("exit value - old %p, windows %p, cygwin %p", oexitcode, x,
+		  self->exitcode);
+  if (self->exitcode != EXITCODE_NOSET)
+    self->process_state = pidstate;
+}
+
+void
+pinfo::exit (DWORD n)
 {
   exit_state = ES_FINAL;
   cygthread::terminate ();
-  if (norecord)
-    sigproc_terminate ();		/* Just terminate signal and process stuff */
-  else
-    exitcode = n;			/* We're really exiting.  Record the UNIX exit code. */
-
-  if (this)
+  if (n != EXITCODE_EXEC)
     {
-      /* FIXME:  There is a potential race between an execed process and its
-	 parent here.  I hated to add a mutex just for this, though.  */
-      struct rusage r;
-      fill_rusage (&r, hMainProc);
-      add_rusage (&rusage_self, &r);
-
-      if (!norecord)
-	{
-	  process_state = PID_EXITED;
-	  /* Ensure that the parent knows that this logical process has
-	     terminated. */
-	  myself->alert_parent (0);
-	    
-	}
+      sigproc_terminate ();	/* Just terminate signal and process stuff */
+      self->exitcode = n;	/* We're really exiting.  Record the UNIX exit code. */
     }
+  sigproc_printf ("1 hProcess %p, n %p, exitcode %p", hProcess, n, self->exitcode);
 
-  sigproc_printf ("Calling ExitProcess norecord %d, n %p, exitcode %p",
-		  norecord, n, exitcode);
+  /* FIXME:  There is a potential race between an execed process and its
+     parent here.  I hated to add a mutex just for this, though.  */
+  struct rusage r;
+  fill_rusage (&r, hMainProc);
+  add_rusage (&self->rusage_self, &r);
+
+  set_exit_state (PID_EXITED);
+  sigproc_printf ("2 hProcess %p, n %p, exitcode %p, EXITCODE_EXEC %p", hProcess, n, self->exitcode, EXITCODE_EXEC);
+  if (n != EXITCODE_EXEC)
+{sigproc_printf ("3 hProcess %p, n %p, exitcode %p, EXITCODE_EXE %pC", hProcess, n, self->exitcode, EXITCODE_EXEC);
+    myself->alert_parent (0);
+}
+  
   _my_tls.stacklock = 0;
   _my_tls.stackptr = _my_tls.stack;
-  ExitProcess (exitcode);
+  sigproc_printf ("Calling ExitProcess hProcess %p, n %p, exitcode %p",
+		  hProcess, n, self->exitcode);
+  ExitProcess (self->exitcode);
 }
+# undef self
 
 void
 pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
@@ -664,7 +681,6 @@ _pinfo::cmdline (size_t& n)
 static DWORD WINAPI
 proc_waiter (void *arg)
 {
-  extern HANDLE hExeced;
   pinfo& vchild = *(pinfo *) arg;
 
   siginfo_t si;
@@ -685,6 +701,8 @@ proc_waiter (void *arg)
     {
       DWORD nb;
       char buf = '\0';
+      extern HANDLE hExeced;
+
       if (!ReadFile (vchild.rd_proc_pipe, &buf, 1, &nb, NULL)
 	  && GetLastError () != ERROR_BROKEN_PIPE)
 	{
@@ -702,12 +720,7 @@ proc_waiter (void *arg)
 	  /* Child exited.  Do some cleanup and signal myself.  */
 	  CloseHandle (vchild.rd_proc_pipe);
 	  vchild.rd_proc_pipe = NULL;
-	  if (vchild->exitcode == EXITCODE_UNSET)
-	    {
-	      DWORD x;
-	      GetExitCodeProcess (vchild.hProcess, &x);
-	      vchild->exitcode = (x & 0xff) << 8;
-	    }
+	  vchild.set_exit_state (PID_ZOMBIE);
 	  if (WIFEXITED (vchild->exitcode))
 	    si.si_sigval.sival_int = CLD_EXITED;
 	  else if (WCOREDUMP (vchild->exitcode))
@@ -715,7 +728,6 @@ proc_waiter (void *arg)
 	  else
 	    si.si_sigval.sival_int = CLD_KILLED;
 	  si.si_status = vchild->exitcode;
-	  vchild->process_state = PID_ZOMBIE;
 	  break;
 	case SIGTTIN:
 	case SIGTTOU:
@@ -769,7 +781,7 @@ _pinfo::dup_proc_pipe (HANDLE hProcess)
   /* Grr.  Can't set DUPLICATE_CLOSE_SOURCE for exec case because we could be
      execing a non-cygwin process and we need to set the exit value before the
      parent sees it.  */
-  if (this != myself)
+  if (this != myself || is_toplevel_proc)
     flags |= DUPLICATE_CLOSE_SOURCE;
   bool res = DuplicateHandle (hMainProc, wr_proc_pipe, hProcess, &wr_proc_pipe,
 			      0, FALSE, flags);

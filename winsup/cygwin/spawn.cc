@@ -645,7 +645,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
      after CreateProcess and before copying the datastructures to the child.
      So we have to start the child in suspend state, unfortunately, to avoid
      a race condition. */
-  if (wincap.start_proc_suspended() || mode != _P_OVERLAY
+  if (wincap.start_proc_suspended () || mode != _P_OVERLAY
       || cygheap->fdtab.need_fixup_before ())
     flags |= CREATE_SUSPENDED;
 
@@ -787,7 +787,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   /* Name the handle similarly to proc_subproc. */
   ProtectHandle1 (pi.hProcess, childhProc);
 
-  bool wait_for_myself = false;
+  bool synced;
   if (mode == _P_OVERLAY)
     {
       myself->dwProcessId = dwExeced = pi.dwProcessId;
@@ -807,12 +807,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	 on this fact when we exit.  dup_proc_pipe also closes our end of the pipe.
 	 Note that wr_proc_pipe may also be == INVALID_HANDLE_VALUE.  That will make
 	 dup_proc_pipe essentially a no-op.  */
-      if (!myself->wr_proc_pipe)
-	{
-	  myself.remember (false);
-	  wait_for_myself = true;
-	}
-      else
+      if (myself->wr_proc_pipe)
 	{
 	  /* Make sure that we own wr_proc_pipe just in case we've been
 	     previously execed. */
@@ -855,42 +850,51 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	}
     }
 
-/* Start the child running */
-if (flags & CREATE_SUSPENDED)
-  ResumeThread (pi.hThread);
-ForceCloseHandle (pi.hThread);
+  /* Start the child running */
+  if (flags & CREATE_SUSPENDED)
+    ResumeThread (pi.hThread);
+  ForceCloseHandle (pi.hThread);
 
-sigproc_printf ("spawned windows pid %d", pi.dwProcessId);
+  sigproc_printf ("spawned windows pid %d", pi.dwProcessId);
 
-ciresrv.sync (myself, INFINITE);
+  synced = ciresrv.sync (myself, INFINITE);
 
-switch (mode)
-  {
-  case _P_OVERLAY:
-    if (wait_for_myself)
-      waitpid (myself->pid, &res, 0);
-    myself->exit (res, 1);
-    break;
-  case _P_WAIT:
-  case _P_SYSTEM:
-    if (waitpid (cygpid, (int *) &res, 0) != cygpid)
-      res = -1;
-    break;
-  case _P_DETACH:
-    res = 0;	/* Lost all memory of this child. */
-    break;
-  case _P_NOWAIT:
-  case _P_NOWAITO:
-  case _P_VFORK:
-    res = cygpid;
-    break;
-  default:
-    break;
-  }
+  switch (mode)
+    {
+    case _P_OVERLAY:
+      if (!synced)
+	/* let myself.exit handle this */;
+      else if (myself->wr_proc_pipe)
+	myself.hProcess = NULL;
+      else
+	{
+	  extern bool is_toplevel_proc;
+	  is_toplevel_proc = true;
+	  myself.remember (false);
+	  waitpid (myself->pid, &res, 0);
+	}
+      myself.exit (EXITCODE_EXEC);
+      break;
+    case _P_WAIT:
+    case _P_SYSTEM:
+      if (waitpid (cygpid, &res, 0) != cygpid)
+	res = -1;
+      break;
+    case _P_DETACH:
+      res = 0;	/* Lost all memory of this child. */
+      break;
+    case _P_NOWAIT:
+    case _P_NOWAITO:
+    case _P_VFORK:
+      res = cygpid;
+      break;
+    default:
+      break;
+    }
 
 out:
-pthread_cleanup_pop (1);
-return (int) res;
+  pthread_cleanup_pop (1);
+  return (int) res;
 }
 
 extern "C" int

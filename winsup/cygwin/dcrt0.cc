@@ -625,12 +625,8 @@ dll_crt0_0 ()
 	    else if (sizeof (fhandler_union) != child_proc_info->fhandler_union_cb)
 	      multiple_cygwin_problem ("fhandler size", child_proc_info->fhandler_union_cb, sizeof (fhandler_union));
 	    else
-	      {
-		if (child_proc_info->type != _PROC_FORK)
-		  child_proc_info->ready (true);
-		cygwin_user_h = child_proc_info->user_h;
-		break;
-	      }
+	      cygwin_user_h = child_proc_info->user_h;
+	    break;
 	  default:
 	    system_printf ("unknown exec type %d", child_proc_info->type);
 	    /* intentionally fall through */
@@ -667,6 +663,8 @@ dll_crt0_0 ()
 				  DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
 	      h = NULL;
 	    set_myself (h);
+	    if (child_proc_info->type != _PROC_FORK)
+	      child_proc_info->ready (true);
 	    __argc = spawn_info->moreinfo->argc;
 	    __argv = spawn_info->moreinfo->argv;
 	    envp = spawn_info->moreinfo->envp;
@@ -1060,7 +1058,7 @@ do_exit (int status)
     }
 
   minimal_printf ("winpid %d, exit %d", GetCurrentProcessId (), n);
-  myself->exit (n);
+  myself.exit (n);
 }
 
 static muto *atexit_lock;
@@ -1123,7 +1121,7 @@ __api_fatal (const char *fmt, ...)
 #ifdef DEBUGGING
   (void) try_to_debug ();
 #endif
-  myself->exit (1);
+  myself.exit (1);
 }
 
 void

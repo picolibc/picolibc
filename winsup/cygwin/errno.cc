@@ -121,6 +121,7 @@ static NO_COPY struct
   X (DEVICE_DOOR_OPEN,		EIO),
   X (IO_PENDING,		EAGAIN),
   X (TOO_MANY_LINKS,		EMLINK),
+  X (PROC_NOT_FOUND,		ESRCH),
   { 0, NULL, 0}
 };
 

@@ -125,7 +125,7 @@ strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
   int microsec = microseconds ();
   lmicrosec = microsec;
 
-  __small_sprintf (fmt, "%7d [%s] %s ", microsec, tn, "%s %d%s");
+  __small_sprintf (fmt, "%7d [%s] %s ", microsec, tn, "%s %d/%d%s");
 
   SetLastError (err);
 
@@ -147,7 +147,7 @@ strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
 	*p = '\000';
       p = progname;
       count = __small_sprintf (buf, fmt, p && *p ? p : "?",
-			       myself->pid ?: GetCurrentProcessId (),
+			       myself->pid ?: GetCurrentProcessId (), GetCurrentProcessId (),
 			       execing ? "!" : "");
       if (func)
 	count += getfunc (buf + count, func);

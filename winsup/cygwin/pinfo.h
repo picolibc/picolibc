@@ -27,6 +27,8 @@ enum picom
 };
 
 #define EXITCODE_UNSET 0x80000000
+#define EXITCODE_NOSET EXITCODE_UNSET
+#define EXITCODE_EXEC EXITCODE_UNSET
 
 class _pinfo
 {
@@ -82,8 +84,6 @@ public:
   pid_t hello_pid;
   HANDLE tothem;
   HANDLE fromthem;
-
-  void exit (UINT n, bool norecord = 0) __attribute__ ((noreturn, regparm(2)));
 
   inline void set_has_pgid_children ()
   {
@@ -155,6 +155,8 @@ public:
     if (destroy && procinfo)
       release ();
   }
+  void exit (DWORD n) __attribute__ ((noreturn, regparm(2)));
+  void set_exit_state (DWORD) __attribute__ ((regparm(2)));
   void initialize_lock () {InitializeCriticalSection (&_lock);}
   void lock () {EnterCriticalSection (&_lock);}
   void unlock () {LeaveCriticalSection (&_lock);}

@@ -1080,7 +1080,7 @@ signal_exit (int rc)
 {
   EnterCriticalSection (&exit_lock);
   if (exit_already++)
-    myself->exit (rc);
+    myself.exit (rc);
 
   /* We'd like to stop the main thread from executing but when we do that it
      causes random, inexplicable hangs.  So, instead, we set up the priority

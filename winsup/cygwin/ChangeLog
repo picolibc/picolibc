@@ -1,3 +1,31 @@
+2005-01-11  Christopher Faylor  <cgf@timesys.com>
+
+	* pinfo.h (_pinfo::set_exit_state): Declare new function.
+	(pinfo::exit): Move here from _pinfo::exit.
+	* sigproc.cc (child_info::sync): Use new function to set exitcode and
+	process_state.
+	* pinfo.cc (_pinfo::exit): Ditto.
+	(proc_waiter): Ditto.
+	(_pinfo::set_exit_state): Define new function.
+	(_pinfo::dup_proc_pipe): Close handle when there is no parent process
+	around to care about the exit value.
+	* dcrt0.cc (dll_crt0_0): Move subproc_ready synchronization later to
+	make sure that myself is still mapped in parent.
+	(do_exit): Reflect movement to pinfo::exit.
+	(__api_fatal): Ditto.
+	* exceptions.cc (signal_exit): Ditto.
+	* errno.cc (errmap): Map PROC_NOT_FOUND.
+	* init.cc (dll_entry): Release myself before exiting.
+	* sigproc.cc (proc_can_be_signalled): Set errno appropriately.
+	(sig_send): Ditto.  Also remove ill-advised test for !myself->sendsig
+	since this is an indication of a process which is still initializating
+	-- it is not an error.
+	(child_info::sync): Don't set exitcode here.  Assume that will happen
+	in proc_waiter, if necessary.
+	* spawn.cc (spawn_guts): Delay "wait_for_myself" logic until later.
+	Don't wait at all if the process has already exited.  Reflect movement
+	to pinfo::exit.
+
 2005-01-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* environ.cc (build_env): Disallow empty strings and strings starting
