@@ -138,12 +138,7 @@ fhandler_proc::exists ()
 }
 
 fhandler_proc::fhandler_proc ():
-  fhandler_virtual (FH_PROC)
-{
-}
-
-fhandler_proc::fhandler_proc (DWORD devtype):
-  fhandler_virtual (devtype)
+  fhandler_virtual ()
 {
 }
 
