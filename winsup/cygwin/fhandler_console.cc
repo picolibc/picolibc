@@ -647,7 +647,8 @@ fhandler_console::close (void)
   CloseHandle (get_output_handle ());
   set_io_handle (NULL);
   set_output_handle (NULL);
-  if (--open_fhs <= 0 && myself->ctty != FH_CONSOLE)
+  if (!cygheap->fdtab.in_vfork_cleanup () && --open_fhs <= 0
+      && myself->ctty != FH_CONSOLE)
     FreeConsole ();
   debug_printf ("decremented open_fhs, now %d", open_fhs);
   return 0;
