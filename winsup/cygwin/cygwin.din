@@ -280,6 +280,8 @@ frexpf
 _frexpf = frexpf
 fscanf
 _fscanf = fscanf
+_fscanf_r
+fscanf_r = _fscanf_r
 fseek
 _fseek = fseek
 fsetpos
@@ -612,6 +614,8 @@ scandir
 _scandir = scandir
 scanf
 _scanf = scanf
+_scanf_r
+scanf_r = _scanf_r
 seekdir
 _seekdir = seekdir
 setbuf
@@ -707,6 +711,8 @@ _srand = srand
 srandom
 sscanf
 _sscanf = sscanf
+_sscanf_r
+sscanf_r = _sscanf_r
 stat
 _stat = stat
 statfs
@@ -842,12 +848,24 @@ vfork
 _vfork = vfork
 vfprintf
 _vfprintf = vfprintf
+vfscanf
+_vfscanf = vfscanf
+_vfscanf_r
+vfscanf_r = _vfscanf_r
 vprintf
 _vprintf = vprintf
+vscanf
+_vscanf = vscanf
+_vscanf_r
+vscanf_r = _vscanf_r
 vsprintf
 _vsprintf = vsprintf
 vsnprintf
 _vsnprintf = vsnprintf
+vsscanf
+_vsscanf = vsscanf
+_vsscanf_r
+vsscanf_r = _vsscanf_r
 wait
 _wait = wait
 waitpid

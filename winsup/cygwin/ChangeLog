@@ -1,3 +1,7 @@
+Fri Apr 20 19:38:29 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* cygwin.din: Add *scanf and *scan_r functions.
+
 Fri Apr 20 22:25:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* security.cc (set_process_privileges): Swap out.
