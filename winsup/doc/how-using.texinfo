@@ -117,12 +117,18 @@ Install this too.
 @samp{ntea} works on NTFS @emph{and} FAT but it creates a huge,
 @strong{undeletable} file on FAT filesystems.
 
+(The @samp{ntsec} and @samp{ntea} settings are values for the
+@samp{CYGWIN} environment variable.  See the Cygwin User's Guide at
+@file{http://cygwin.com/cygwin-ug-net/cygwin-ug-net.html} for more
+information on this variable and its settings.)
+
 There is no solution at all for Windows 9x.
 
-These are settings for the @samp{CYGWIN} environment variable.  See the
-Cygwin User's Guide at
-@file{http://cygwin.com/cygwin-ug-net/cygwin-ug-net.html}
-for more information on this variable and its settings.
+If you have an application that requires a certain permission mode on a
+file, you may be able to work around this requirement by modifying the
+application's source code.  For a hint, based on work done by Corinna
+Vinschen for OpenSSH, see this message from the cygwin mailing list:
+@file{http://cygwin.com/ml/cygwin/2000-11/msg01176.html}.
 
 @subsection Why doesn't @samp{mkdir -p} work on a network share?
 
