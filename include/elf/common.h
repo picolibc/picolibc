@@ -339,9 +339,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define NT_WIN32PSTATUS	18		/* Has a struct win32_pstatus */
 
 /* Values of note segment descriptor types for object files.  */
-/* (Only for hppa right now.  Should this be moved elsewhere?)  */
 
 #define NT_VERSION	1		/* Contains a version string.  */
+#define NT_ARCH		2		/* Contains an architecture string.  */
 
 /* These three macros disassemble and assemble a symbol table st_info field,
    which contains the symbol binding and symbol type.  The STB_ and STT_
