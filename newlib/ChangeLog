@@ -1,3 +1,7 @@
+002-11-06  Sergey Okhapkin  <sos@prospect.com.ru>
+
+	* include/utmp.h: Define WTMP_FILE.  Define and use UT_IDLEN.
+
 2002-11-06  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
         * libc/include/wchar.h: Use _{BEGIN,END}_STD_C instead of extern "C".

@@ -14,6 +14,7 @@
 #include <paths.h>
 
 #define UTMP_FILE _PATH_UTMP
+#define WTMP_FILE _PATH_WTMP
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,6 +23,7 @@ extern "C" {
 #define UT_LINESIZE	16
 #define UT_NAMESIZE	16
 #define UT_HOSTSIZE	256
+#define UT_IDLEN	2
 #define ut_name ut_user
 
 struct utmp 
@@ -29,7 +31,7 @@ struct utmp
  short	ut_type;	
  pid_t	ut_pid;		
  char	ut_line[UT_LINESIZE];
- char	ut_id[2];
+ char  ut_id[UT_IDLEN];
  time_t ut_time;	
  char	ut_user[UT_NAMESIZE];	
  char	ut_host[UT_HOSTSIZE];	
