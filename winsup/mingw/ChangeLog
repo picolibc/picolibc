@@ -1,3 +1,10 @@
+2004-03-19  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* msvcrt.def.in: Add stubs for msvcrt.dll (version 6.10),
+	msvcr70.dll, and msvcr71.dll.
+	* Makefile.in (msvcr*.def): Define preprocessor  __msvcr*__ constant
+	using basename of output def file.
+
 2004-03-13  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/malloc.h: Remove __STRICT_ANSI__ guard.

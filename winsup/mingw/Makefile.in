@@ -246,7 +246,7 @@ msvcr70.def msvcr70d.def \
 msvcr71.def msvcr71d.def \
 : msvcrt.def.in
 	$(CC) -DRUNTIME=$(basename $(notdir $@)) \
-		-D__FILENAME__=$@ \
+		-D__$(basename $(notdir $@))__=1 \
 		-D__MSVCRT__ -C -E -P \
 		-xc-header $? > $@
 

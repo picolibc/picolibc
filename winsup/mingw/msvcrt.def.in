@@ -2,11 +2,7 @@
 ; __FILENAME__ 
 ;    created from msvcrt.def.in
 ;
-; Exports from msvcrt.dll. Msvcrt.dll appears to be distributed with
-; Internet Explorer 4.0, and may be more common in the future, but
-; right now it seems like a risky choice. There are differences, although
-; they seem to be minor overall, between the exports from msvcrt and msvcrt20.
-; However, for most purposes the two sets are interchangable.
+; Exports from msvcrt.dll, msvcr70.dll and msvcr71.dll
 ;
 ; NOTE: All exports, except for what appeared to be C++ mangled names,
 ;       are included. Not all functions have prototypes in the headers
@@ -14,6 +10,7 @@
 ;
 ; Contributors:
 ;  Created by Colin Peters <colin@bird.fu.is.saga-u.ac.jp>
+;  MSVCRT 6,10, 7.00, 7.10 additions by Danny Smith <dannysmith@users.sourceforge.net>
 ;
 ;  THIS SOFTWARE IS NOT COPYRIGHTED
 ;
@@ -735,4 +732,93 @@ wcsxfrm
 wctomb
 wprintf
 wscanf
+; msvcrt.dll(version 6.10) and later
+__lc_collate_cp	DATA
+__p__mbcasemap
+__unDNameEx
+_chkesp
+_ctime64
+_findfirst64
+_findnext64
+_fstat64
+_ftime64
+_futime64
+_gmtime64
+_localtime64
+_mbcasemap
+_mktime64
+_osplatform	DATA
+_stat64
+_time64
+_utime64
+_wctime64
+_wfindfirst64
+_wfindnext64
+_wstat64
+_wutime64
+#if ( __msvcr70__ || __msvcr70d__ ||  __msvcr71__ || __msvcr71d__)
+; msvcr70.dll amd later
+__buffer_overrun
+__CxxDetectRethrow
+__CxxExceptionFilter
+__CxxQueryExceptionSize
+__CxxRegisterExceptionObject
+__CxxUnregisterExceptionObject
+__DestructExceptionObject
+__lc_clike
+__security_error_handler
+__set_buffer_overrun_handler
+__uncaught_exception
+__wcserror
+_aligned_free
+_aligned_malloc
+_aligned_offset_malloc
+_aligned_offset_realloc
+_aligned_realloc
+_cgetws
+_cputws
+_CRT_RTC_INIT
+_cwprintf
+_cwscanf
+_getwch
+_getwche
+_putwch
+_resetstkoflw
+_scprintf
+_scwprintf
+_set_security_error_handler
+_snscanf
+_snwscanf
+_strtoi64
+_strtoui64
+_ungetwch
+_vscprintf
+_vscwprintf
+_wcserror
+_wcstoi64
+_wcstoui64
+_wctype
+_wtof
+#endif  /* 7.0 */
+#if  (__msvcr71__ || __msvcr71d__)
+; msvcr71.dll
+___lc_codepage_func
+___lc_collate_cp_func
+___lc_handle_func
+___mb_cur_max_func
+___setlc_active_func
+___unguarded_readlc_active_add_func
+__CppXcptFilter
+__crtCompareStringW
+__crtGetStringTypeW
+__crtLCMapStringW
+__CxxCallUnwindDtor
+__CxxCallUnwindVecDtor
+__iob_func
+__pctype_func
+__pwctype_func
+_get_heap_handle
+_set_purecall_handler
+_set_SSE2_enable
+#endif /* 7.1  */
 
