@@ -15,16 +15,10 @@ Win9x does not support the API used by the Cygwin fhandler_dev_tape
 class.  Details at
 @file{http://sources.redhat.com/ml/cygwin/2000-12/msg00331.html}.
 
-@subsection Hang or core-dump during make
-
-There is a rare core-dump that seems to be triggered by a recursive
-make.  There is also a hang condition that happens more frequently
-during parallel makes (@code{make -j 3}).  The solution is not known,
-so please help debug this.  ``Me too'' reports are not useful, unless
-accompanied by exhaustive, useful data (stack traces, reproducible
-test cases, patches).
+@subsection On Win9x, scp leaves ssh processes running.
 
 @section Fixed in the Next Release
 
-@subsection On Win9x, scp and cvs/ssh leave ssh processes running, and cvs/ssh hangs at completion
+(Nothing to report.)
+
 
