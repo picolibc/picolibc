@@ -1,3 +1,51 @@
+2002-12-23  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h (struct bfd_link_info): Add "strip_discarded".
+
+2002-12-20  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h (struct bfd_link_info): Replace bfd_boolean fields with
+	bit-fields.  Rearrange to put all like types together.
+
+2002-11-30  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h: Replace boolean with bfd_boolean.  Formatting.
+
+2002-11-23  Simon Burge  <simonb@wasabisystems.com>
+
+	* libiberty.h (basename): Add NetBSD to the list.
+
+2002-11-22  Daniel Jacobowitz  <drow@mvista.com>
+
+	* libiberty.h (make_relative_prefix): Add prototype.
+
+2002-11-16  Klee Dienes  <kdienes@apple.com>
+
+	* opcode/m88k.h (INSTAB): Remove 'next' field.
+	(instruction): Remove definition; replace with extern declaration
+	and mark as const.
+
+2002-11-14  Egor Duda  <deo@logos-m.ru>
+
+	* bfdlink.h (struct bfd_link_info): Add new boolean
+	field pei386_runtime_pseudo_reloc.
+
+2002-10-26  Roger Sayle  <roger@eyesopen.com>
+
+	* partition.h:  Close the extern "C" scope when compiling with C++.
+
+2002-10-26  Roger Sayle  <roger@eyesopen.com>
+	    DJ Delorie <dj@redhat.com>
+
+	PR bootstrap/8351
+	* getopt.h: Avoid prototyping getopt with no arguments in C++.
+
+2002-10-24  Nathan Tallent  <eraxxon@alumni.rice.edu>
+
+	* ansidecl.h (__STDC__): Add (__alpha && __cplusplus) to the
+	list of	platform compilers that may look, smell and act
+	like __STDC__ but that may not define it.
+
 2002-10-11  David O'Brien  <obrien@FreeBSD.org>
 
 	* getopt.h: getopt is in unistd.h (based on SUSv2).

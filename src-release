@@ -136,7 +136,7 @@ do-proto-toplev: $(DEVO_SUPPORT) $(SUPPORT_FILES) texinfo/texinfo.tex
 	mv -f tmp Makefile.in
 	#
 	./configure sun4
-	$(MAKE) configure-target \
+	$(MAKE) configure-host configure-target \
 	    ALL_GCC="" ALL_GCC_C="" ALL_GCC_CXX="" \
 	    CC_FOR_TARGET="$(CC)" CXX_FOR_TARGET="$(CXX)"
 	# Make links, and run "make diststuff" or "make info" when needed.

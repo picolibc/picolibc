@@ -1,5 +1,5 @@
 /* MMIX support for BFD.
-   Copyright (C) 2001, 2002 Free Software Foundation, Inc.
+   Copyright 2001, 2002 Free Software Foundation, Inc.
 
 This file is part of BFD, the Binary File Descriptor library.
 
@@ -157,11 +157,11 @@ END_RELOC_NUMBERS (R_MMIX_max)
 #define MMO_SEC_DEBUGGING 0x10000
 
 #ifdef BFD_ARCH_SIZE
-extern boolean _bfd_mmix_prepare_linker_allocated_gregs
+extern bfd_boolean _bfd_mmix_prepare_linker_allocated_gregs
  PARAMS ((bfd *, struct bfd_link_info *));
-extern boolean _bfd_mmix_finalize_linker_allocated_gregs
+extern bfd_boolean _bfd_mmix_finalize_linker_allocated_gregs
  PARAMS ((bfd *, struct bfd_link_info *));
-extern boolean _bfd_mmix_check_all_relocs
+extern bfd_boolean _bfd_mmix_check_all_relocs
  PARAMS ((bfd *, struct bfd_link_info *));
 #endif
 
