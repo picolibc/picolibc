@@ -1,3 +1,8 @@
+2003-06-25  Richard Sandiford  <rsandifo@redhat.com>
+
+	* include/opcode/h8300.h (h8_opcodes): Fix the mov.l @(dd:32,ERs),ERd
+	and mov.l ERs,@(dd:32,ERd) entries.
+
 2003-06-23  H.J. Lu <hongjiu.lu@intel.com>
 
 	* i386.h (i386_optab): Support Intel Precott New Instructions.
