@@ -20,6 +20,7 @@ extern "C" {
  */
 extern long get_osfhandle(int);
 extern int setmode (int __fd, int __mode);
+int access(const char *__path, int __amode);
 
 #ifdef __cplusplus
 };
