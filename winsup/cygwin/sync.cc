@@ -4,7 +4,7 @@
    which is intended to operate similarly to a mutex but attempts to
    avoid making expensive calls to the kernel.
 
-   Copyright 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
 
    Written by Christopher Faylor <cgf@cygnus.com>
 

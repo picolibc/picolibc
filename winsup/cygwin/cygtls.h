@@ -1,6 +1,6 @@
 /* cygtls.h
 
-   Copyright 2003 Red Hat, Inc.
+   Copyright 2003, 2004 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -130,14 +130,15 @@ struct _threadinfo
   void reset_exception ();
   bool interrupt_now (CONTEXT *, int, void *, struct sigaction&)
     __attribute__((regparm(3)));
-  void __stdcall interrupt_setup (int sig, void *handler, struct sigaction& siga, __stack_t retaddr)
+  void __stdcall interrupt_setup (int sig, void *handler,
+				  struct sigaction& siga)
     __attribute__((regparm(3)));
   void init_threadlist_exceptions (struct _exception_list *);
   operator HANDLE () const {return tid->win32_obj_id;}
   void set_siginfo (struct sigpacket *) __attribute__ ((regparm (3)));
   void set_threadkill () {threadkill = true;}
   void reset_threadkill () {threadkill = false;}
-  int lock (int wait) __attribute__ ((regparm (2)));
+  int lock () __attribute__ ((regparm (1)));
   void unlock () __attribute__ ((regparm (1)));
   /*gentls_offsets*/
 };

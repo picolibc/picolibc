@@ -125,10 +125,10 @@ Static HANDLE wait_sig_inited;		// Control synchronization of
  */
 Static HANDLE events[PSIZE + 1];	  // All my children's handles++
 #define hchildren (events + 1)		// Where the children handles begin
-Static char cpchildren[PSIZE * sizeof (pinfo)];		// All my children info
 Static int nchildren;			// Number of active children
-Static char czombies[(NZOMBIES + 1) * sizeof (pinfo)];		// All my deceased children info
+Static char cpchildren[PSIZE * sizeof (pinfo)];		// All my children info
 Static int nzombies;			// Number of deceased children
+Static char czombies[(NZOMBIES + 1) * sizeof (pinfo)];		// All my deceased children info
 
 #define pchildren ((pinfo *) cpchildren)
 #define zombies ((pinfo *) czombies)
@@ -378,7 +378,7 @@ proc_subproc (DWORD what, DWORD val)
 	 way to deal with this and could lead to process hangs.  */
       if (nzombies >= NZOMBIES)
 	{
-	  sigproc_printf ("zombie table overflow %d", thiszombie);
+	  system_printf ("zombie table overflow %d", thiszombie);
 	  remove_zombie (thiszombie);
 	}
 

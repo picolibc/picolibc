@@ -1,6 +1,6 @@
 /* sec_acl.cc: Sun compatible ACL functions.
 
-   Copyright 2000, 2001, 2002, 2003 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna@vinschen.de>
 

@@ -1,6 +1,6 @@
 /* fhandler_registry.cc: fhandler for /proc/registry virtual filesystem
 
-   Copyright 2002, 2003 Red Hat, Inc.
+   Copyright 2002, 2003, 2003, 2004 Red Hat, Inc.
 
 This file is part of Cygwin.
 

@@ -1,6 +1,6 @@
 /* window.cc: hidden windows for signals/itimer support
 
-   Copyright 1997, 1998, 2000, 2001, 2002, 2003 Red Hat, Inc.
+   Copyright 1997, 1998, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
 
    Written by Sergey Okhapkin <sos@prospect.com.ru>
 

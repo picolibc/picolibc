@@ -1,6 +1,6 @@
 /* debug.h
 
-   Copyright 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -38,6 +38,7 @@ details. */
 # define setclexec(h, nh, b) do {} while (0)
 # define debug_fixup_after_fork_exec() do {} while (0)
 # define VerifyHandle(h) do {} while (0)
+# define console_printf small_printf
 
 #else
 

@@ -156,7 +156,7 @@ void
 _threadinfo::push (__stack_t addr, bool exception)
 {
   if (exception)
-    lock (true);
+    lock ();
   *stackptr++ = (__stack_t) addr;
   if (exception)
     unlock ();

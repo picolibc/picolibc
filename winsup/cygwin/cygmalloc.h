@@ -1,6 +1,6 @@
 /* cygmalloc.h: cygwin DLL malloc stuff
 
-   Copyright 2002 Red Hat, Inc.
+   Copyright 2002, 2003, 2004 Red Hat, Inc.
 
 This file is part of Cygwin.
 

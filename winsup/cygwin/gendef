@@ -94,8 +94,9 @@ __sigfe:
 	pushl	%edx
 	movl	%fs:4,%edx
 1:	movl	\$1,%eax
-	lock	cmpxchg %eax,$tls::stacklock(%edx)
-	jne	2f
+	lock	xchgl %eax,$tls::stacklock(%edx)
+	cmpl	%eax,%eax
+	jz	2f
 	xorl	%eax,%eax
 	call	_low_priority_sleep
 	jmp	1b
@@ -103,7 +104,7 @@ __sigfe:
 	xadd	%eax,$tls::stackptr(%edx)
 	decl	$tls::stacklock(%edx)
 	leal	__sigbe,%edx
-	xchg	%edx,8(%esp)
+	xchgl	%edx,8(%esp)
 	movl	%edx,(%eax)
 	popl	%edx
 	ret
@@ -115,15 +116,17 @@ __sigbe:
 	pushl	%eax
 	movl	%fs:4,%edx
 1:	movl	\$1,%eax
-	lock	cmpxchg %eax,$tls::stacklock(%edx)
-	jne	2f
+	lock	xchgl %eax,$tls::stacklock(%edx)
+	cmpl	%eax,%eax
+	jz	2f
 	xorl	%eax,%eax
 	call	_low_priority_sleep
 	jmp	1b
 2:	movl	\$-4,%eax
 	xadd	%eax,$tls::stackptr(%edx)
-	xchg	%edx,-4(%eax)
-	xchg	%edx,4(%esp)
+	decl	$tls::stacklock(%edx)
+	xchgl	%edx,-4(%eax)
+	xchgl	%edx,4(%esp)
 	popl	%eax
 	ret
 
@@ -134,19 +137,17 @@ __ZN11_threadinfo3popEv:
 	movl	\$-4,%ebx
 	xadd	%ebx,$tls::pstackptr(%edx)
 	xorl	%eax,%eax
-	xchg	%eax,-4(%ebx)
-	decl	$tls::pstacklock(%edx)
+	xchgl	%eax,-4(%ebx)
 	popl	%ebx
 	ret
 
-	.global	__ZN11_threadinfo4lockEi
-__ZN11_threadinfo4lockEi:
+	.global	__ZN11_threadinfo4lockEv
+__ZN11_threadinfo4lockEv:
 	pushl	%ebx
 	movl	%eax,%ebx
 1:	movl	\$1,%eax
-	lock	cmpxchg %eax,$tls::pstacklock(%ebx)
-	jne	2f
-	cmpl	%edx,%edx
+	lock	xchgl %eax,$tls::pstacklock(%ebx)
+	cmpl	%eax,%eax
 	jz	2f
 	xorl	%eax,%eax
 	call	_low_priority_sleep

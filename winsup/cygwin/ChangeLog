@@ -1,5 +1,23 @@
 2004-02-08  Christopher Faylor  <cgf@redhat.com>
 
+	* debug.h (console_printf): Define for non-debugging condition.
+
+	* cygtls.h (_threadinfo::lock): Remove wait argument.
+	(_threadinfo::interrupt_setup): Remove retaddr argument.
+	* exceptions.cc (_threadinfo::interrupt_setup): Ditto.
+	(_threadinfo::interrupt_now): Accommodate change to interrupt_setup
+	argument.
+	(setup_handler): Ditto.  Always lock sig stack prior to determining
+	interrupt method.
+	* gendef (_sigfe): Correct thinko regarding cmpxchg.
+	(_sigbe): Ditto.
+	(_threadinfo::lock): Ditto.
+	(_threadinfo::pop): Eliminate left-over stack unlock.
+	* sigproc.cc (proc_subproc): Chnage debugging output to printed
+	warning.
+
+2004-02-08  Christopher Faylor  <cgf@redhat.com>
+
 	* localtime.cc (localtime_r): Call tzset.
 
 	* Makefile.in: Make version.h/cygwin.din version check a warning since

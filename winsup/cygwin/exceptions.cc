@@ -693,9 +693,8 @@ interruptible (DWORD pc)
 }
 void __stdcall
 _threadinfo::interrupt_setup (int sig, void *handler,
-			      struct sigaction& siga, __stack_t retaddr)
+			      struct sigaction& siga)
 {
-  __stack_t *retaddr_in_tls = stackptr - 1;
   push ((__stack_t) sigdelayed);
   oldmask = myself->getsigmask ();
   newmask = oldmask | siga.sa_mask | SIGTOMASK (sig);
@@ -707,8 +706,9 @@ _threadinfo::interrupt_setup (int sig, void *handler,
       myself->stopsig = 0;
       myself->process_state |= PID_STOPPED;
     }
-  this->sig = sig;			// Should ALWAYS be second to last setting set to avoid a race
-  *retaddr_in_tls = retaddr;
+
+  this->sig = sig;			// Should ALWAYS be last setting set to avoid a race
+
   /* Clear any waiting threads prior to dispatching to handler function */
   int res = SetEvent (signal_arrived);	// For an EINTR case
   proc_subproc (PROC_CLEARWAIT, 1);
@@ -720,8 +720,8 @@ bool
 _threadinfo::interrupt_now (CONTEXT *ctx, int sig, void *handler,
 			    struct sigaction& siga)
 {
-  push (0);
-  interrupt_setup (sig, handler, siga, (__stack_t) ctx->Eip);
+  push ((__stack_t) ctx->Eip);
+  interrupt_setup (sig, handler, siga);
   ctx->Eip = pop ();
   SetThreadContext (*this, ctx); /* Restart the thread in a new location */
   return 1;
@@ -762,20 +762,16 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _threadinfo *tls)
       goto out;
     }
 
+  int locked;
   for (int i = 0; i < CALL_HANDLER_RETRY; i++)
     {
+      locked = tls->lock ();
       __stack_t *retaddr_on_stack = tls->stackptr - 1;
       if (retaddr_on_stack >= tls->stack)
 	{
-	  if (!tls->lock (false))
-	    continue;
-	  __stack_t retaddr = InterlockedExchange ((LONG *) retaddr_on_stack, 0);
-	  if (!retaddr)
-	    continue;
 	  tls->reset_exception ();
-	  tls->interrupt_setup (sig, handler, siga, retaddr);
+	  tls->interrupt_setup (sig, handler, siga);
 	  sigproc_printf ("interrupted known cygwin routine");
-	  tls->unlock ();
 	  interrupted = true;
 	  break;
 	}
@@ -826,11 +822,15 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _threadinfo *tls)
       if (interrupted)
 	break;
 
+      tls->unlock ();
+      locked = false;
       sigproc_printf ("couldn't interrupt.  trying again.");
       low_priority_sleep (0);
     }
 
 out:
+  if (locked)
+    tls->unlock ();
   sigproc_printf ("signal %d %sdelivered", sig, interrupted ? "" : "not ");
   return interrupted;
 }
