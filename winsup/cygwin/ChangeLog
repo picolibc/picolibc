@@ -1,3 +1,9 @@
+2003-02-22  Christopher Faylor  <cgf@redhat.com>
+
+	* cygmalloc.h: Remove MORECORE_CANNOT_TRIM.  It's not true.
+	# cygwin.din: Export mallinfo.
+	# malloc_wrapper.cc (mallinfo): New function.
+
 2003-02-22  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* syslog.cc (syslog): Do not print the Windows pid.  Print the Cygwin
