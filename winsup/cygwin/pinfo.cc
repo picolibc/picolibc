@@ -11,7 +11,6 @@ details. */
 #include "winsup.h"
 #include <stdlib.h>
 #include <time.h>
-#include <errno.h>
 #include <limits.h>
 #include <stdarg.h>
 #include "security.h"
@@ -361,7 +360,7 @@ _pinfo::commune_send (DWORD code, ...)
   res.s = NULL;
   res.n = 0;
 
-  if (!pid || !this)
+  if (!pid || !this || (dwProcessId != (DWORD) pid && !pinfo (myself->dwProcessId)))
     {
       set_errno (ESRCH);
       goto err;

@@ -13,7 +13,6 @@
 #define  __INSIDE_CYGWIN_NET__
 
 #include "winsup.h"
-#include <errno.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <sys/uio.h>
@@ -328,6 +327,7 @@ fhandler_socket::dup (fhandler_base *child)
   if (get_addr_family () == AF_LOCAL)
     fhs->set_sun_path (get_sun_path ());
   fhs->set_socket_type (get_socket_type ());
+  fhs->set_connect_state (get_connect_state ());
 
   if (winsock2_active)
     {
@@ -338,12 +338,10 @@ fhandler_socket::dup (fhandler_base *child)
 	 If WSADuplicateSocket() still fails for some reason, we fall back
 	 to DuplicateHandle(). */
       WSASetLastError (0);
-      if (cygheap->user.issetuid ())
-	RevertToSelf ();
+      cygheap->user.deimpersonate ();
       fhs->set_io_handle (get_io_handle ());
       fhs->fixup_before_fork_exec (GetCurrentProcessId ());
-      if (cygheap->user.issetuid ())
-	ImpersonateLoggedOnUser (cygheap->user.token);
+      cygheap->user.reimpersonate ();
       if (!WSAGetLastError ())
 	{
 	  fhs->fixup_after_fork (hMainProc);
@@ -492,6 +490,7 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
   BOOL in_progress = FALSE;
   sockaddr_in sin;
   int secret [4];
+  DWORD err;
 
   if (!get_inet_addr (name, namelen, &sin, &namelen, secret))
     return -1;
@@ -504,12 +503,12 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 	 when called on a non-blocking socket. */
       if (is_nonblocking () || is_connect_pending ())
 	{
-	  DWORD err = WSAGetLastError ();
+	  err = WSAGetLastError ();
 	  if (err == WSAEWOULDBLOCK || err == WSAEALREADY)
-	    {
-	      WSASetLastError (WSAEINPROGRESS);
-	      in_progress = TRUE;
-	    }
+	    in_progress = TRUE;
+
+	  if (err == WSAEWOULDBLOCK)
+	    WSASetLastError (WSAEINPROGRESS);
 	  else if (err == WSAEINVAL)
 	    WSASetLastError (WSAEISCONN);
 	}
@@ -546,7 +545,8 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 	}
     }
 
-  if (WSAGetLastError () == WSAEINPROGRESS)
+  err = WSAGetLastError ();
+  if (err == WSAEINPROGRESS || err == WSAEALREADY)
     set_connect_state (CONNECT_PENDING);
   else
     set_connect_state (CONNECTED);

@@ -10,11 +10,11 @@
 
 #define  __INSIDE_CYGWIN_NET__
 
+#define FD_SETSIZE 16384		// lots of fds
 #include "winsup.h"
 #include <sys/time.h>
 #include <sys/poll.h>
 #include <sys/socket.h>
-#include <errno.h>
 #include <stdlib.h>
 #define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>

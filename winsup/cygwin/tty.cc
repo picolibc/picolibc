@@ -9,7 +9,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <errno.h>
 #include <unistd.h>
 #include <utmp.h>
 #include <wingdi.h>
@@ -409,11 +408,16 @@ tty::common_init (fhandler_pty_master *ptym)
    */
   if (wincap.has_security ())
     {
+#ifdef USE_CYGSERVER
       if (cygserver_running == CYGSERVER_UNKNOWN)
 	cygserver_init ();
+#endif
 
-      if (cygserver_running != CYGSERVER_OK
-	  && !SetKernelObjectSecurity (hMainProc,
+      if (
+#ifdef USE_CYGSERVER
+	  cygserver_running != CYGSERVER_OK &&
+#endif
+	  !SetKernelObjectSecurity (hMainProc,
 				       DACL_SECURITY_INFORMATION,
 				       get_null_sd ()))
 	system_printf ("Can't set process security, %E");

@@ -14,7 +14,6 @@ details. */
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <ctype.h>
 #include <limits.h>
 #include "cygerrno.h"
@@ -508,9 +507,11 @@ fhandler_tty_slave::open (int flags, mode_t)
 
   HANDLE from_master_local, to_master_local;
 
-  if (!wincap.has_security () ||
-      cygserver_running == CYGSERVER_UNAVAIL ||
-      !cygserver_attach_tty (&from_master_local, &to_master_local))
+#ifdef USE_CYGSERVER
+  if (!wincap.has_security ()
+      || cygserver_running == CYGSERVER_UNAVAIL
+      || !cygserver_attach_tty (&from_master_local, &to_master_local))
+#endif
     {
       termios_printf ("cannot dup handles via server. using old method.");
 
@@ -583,7 +584,8 @@ fhandler_tty_slave::close ()
 {
   if (!output_done_event)
     {
-      fhandler_console::open_fhs--;
+      if (!--fhandler_console::open_fhs && myself->ctty == -1)
+	FreeConsole ();
       termios_printf ("decremented open_fhs %d", fhandler_console::open_fhs);
     }
   return fhandler_tty_common::close ();
@@ -593,6 +595,9 @@ int
 fhandler_tty_slave::cygserver_attach_tty (LPHANDLE from_master_ptr,
 					  LPHANDLE to_master_ptr)
 {
+#ifndef USE_CYGSERVER
+  return 0;
+#else
   if (!from_master_ptr || !to_master_ptr)
     return 0;
 
@@ -605,7 +610,9 @@ fhandler_tty_slave::cygserver_attach_tty (LPHANDLE from_master_ptr,
 
   *from_master_ptr = req.from_master ();
   *to_master_ptr = req.to_master ();
+
   return 1;
+#endif
 }
 
 void

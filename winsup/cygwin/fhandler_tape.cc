@@ -11,7 +11,6 @@ details. */
 
 #include "winsup.h"
 #include <sys/termios.h>
-#include <errno.h>
 #include <unistd.h>
 #include <sys/mtio.h>
 #include "cygerrno.h"

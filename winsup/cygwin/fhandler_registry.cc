@@ -11,7 +11,6 @@ details. */
 /* FIXME: Access permissions are ignored at the moment.  */
 
 #include "winsup.h"
-#include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/cygwin.h>

@@ -12,7 +12,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <errno.h>
 #include <signal.h>
 #include <stdlib.h>
 #include "cygerrno.h"

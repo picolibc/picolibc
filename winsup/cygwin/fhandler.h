@@ -20,8 +20,7 @@ enum
   FH_WBINSET	= 0x00010000,	/* binary write mode has been explicitly set */
   FH_APPEND	= 0x00020000,	/* always append */
   FH_ASYNC	= 0x00040000,	/* async I/O */
-  FH_SIGCLOSE	= 0x00080000,	/* signal handler should close fd on interrupt */
-
+  FH_ENC	= 0x00080000,	/* native path is encoded */
   FH_SYMLINK	= 0x00100000,	/* is a symlink */
   FH_EXECABL	= 0x00200000,	/* file looked like it would run:
 				 * ends in .exe or .bat or begins with #! */
@@ -199,6 +198,9 @@ class fhandler_base
 
   bool get_need_fork_fixup () { return FHISSETF (FFIXUP); }
   void set_need_fork_fixup () { FHSETF (FFIXUP); }
+
+  bool get_encoded () { return FHISSETF (ENC);}
+  void set_encoded () { FHSETF (ENC);}
 
   virtual void set_close_on_exec (int val);
 
@@ -387,6 +389,7 @@ class fhandler_socket: public fhandler_base
   bool is_connect_pending () const {return had_connect_or_listen == CONNECT_PENDING;}
   bool is_connected () const {return had_connect_or_listen == CONNECTED;}
   void set_connect_state (int newstate) { had_connect_or_listen = newstate; }
+  int get_connect_state () const { return had_connect_or_listen; }
 
   int bind (const struct sockaddr *name, int namelen);
   int connect (const struct sockaddr *name, int namelen);

@@ -26,6 +26,7 @@ __eprintf
 __errno
 __fpclassifyd
 __fpclassifyf
+__getreent
 __infinity
 __main
 __signbitd
@@ -1299,6 +1300,7 @@ sysconf
 _sysconf = sysconf
 syslog
 _syslog = syslog
+vsyslog
 system
 _system = system
 tan

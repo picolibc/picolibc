@@ -10,7 +10,6 @@
 
 #include "winsup.h"
 #include <string.h>
-#include <errno.h>
 #include <assert.h>
 #include <stdlib.h>
 #include "security.h"

@@ -12,6 +12,8 @@ details. */
 #define	_SYS_LOG_H
 
 #include <sys/cdefs.h>
+#include <stdarg.h>
+
 #define	LOG_EMERG	0
 #define	LOG_ALERT	1
 #define	LOG_CRIT	2
@@ -76,6 +78,7 @@ void	closelog (void);
 void	openlog (const char *, int, int);
 int	setlogmask (int);
 void	syslog (int, const char *, ...);
+void	vsyslog (int, const char *, va_list ap);
 
 __END_DECLS
 

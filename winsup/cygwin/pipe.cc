@@ -12,7 +12,6 @@ details. */
 
 #include "winsup.h"
 #include <unistd.h>
-#include <errno.h>
 #include <sys/socket.h>
 #include "cygerrno.h"
 #include "security.h"

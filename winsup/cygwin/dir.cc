@@ -12,7 +12,6 @@ details. */
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/stat.h>
-#include <errno.h>
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>

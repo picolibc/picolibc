@@ -16,7 +16,6 @@ details. */
 
 #include <assert.h>
 #include <ctype.h>
-#include <errno.h>
 #include <getopt.h>
 #include <signal.h>
 #include <stdio.h>

@@ -17,7 +17,6 @@ details. */
 #include <limits.h>
 #include <wingdi.h>
 #include <winuser.h>
-#include <errno.h>
 #include "sigproc.h"
 #include "pinfo.h"
 #include "cygerrno.h"
@@ -54,9 +53,9 @@ per_thread NO_COPY *threadstuff[] = {&waitq_storage,
 				     &signal_dispatch_storage,
 				     NULL};
 
-BOOL display_title;
-BOOL strip_title_path;
-BOOL allow_glob = TRUE;
+bool display_title;
+bool strip_title_path;
+bool allow_glob = TRUE;
 codepage_type current_codepage = ansi_cp;
 
 int cygwin_finished_initializing;

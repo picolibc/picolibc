@@ -13,7 +13,6 @@ details. */
 #include <stdlib.h>
 #include <stddef.h>
 #include <sys/mman.h>
-#include <errno.h>
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
@@ -272,7 +271,8 @@ public:
   void erase (int i);
   void erase ();
   mmap_record *match (_off64_t off, DWORD len);
-  long match (caddr_t addr, DWORD len, long start);
+  long match (caddr_t addr, DWORD len, caddr_t &m_addr, DWORD &m_len,
+	      long start);
 };
 
 list::list ()
@@ -325,13 +325,24 @@ list::match (_off64_t off, DWORD len)
 
 /* Used in munmap() */
 long
-list::match (caddr_t addr, DWORD len, _off_t start)
+list::match (caddr_t addr, DWORD len, caddr_t &m_addr, DWORD &m_len,
+	     _off_t start)
 {
+  caddr_t low, high;
+
   for (int i = start + 1; i < nrecs; ++i)
-    if (addr >= recs[i].get_address ()
-	&& addr + len <= recs[i].get_address ()
-			 + (PAGE_CNT (recs[i].get_size ()) * getpagesize ()))
-      return i;
+    {
+      low = (addr >= recs[i].get_address ()) ? addr : recs[i].get_address ();
+      high = recs[i].get_address () 
+	     + (PAGE_CNT (recs[i].get_size ()) * getpagesize ());
+      high = (addr + len < high) ? addr + len : high;
+      if (low < high)
+	{
+	  m_addr = low;
+	  m_len = high - low;
+	  return i;
+	}
+    }
   return -1;
 }
 
@@ -440,7 +451,7 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, _off64_t off)
   if (off % getpagesize ()
       || (!(flags & MAP_SHARED) && !(flags & MAP_PRIVATE))
       || ((flags & MAP_SHARED) && (flags & MAP_PRIVATE))
-      || ((flags & MAP_FIXED) && ((DWORD)addr % granularity))
+      || ((flags & MAP_FIXED) && ((DWORD)addr % getpagesize ()))
       || !len)
     {
       set_errno (EINVAL);
@@ -471,8 +482,6 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, _off64_t off)
   DWORD gran_len = howmany (off + len, granularity) * granularity - gran_off;
 
   fhandler_base *fh;
-  caddr_t base = addr;
-  HANDLE h;
 
   if (fd != -1)
     {
@@ -490,6 +499,16 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, _off64_t off)
 	  DWORD high;
 	  DWORD low = GetFileSize (fh->get_handle (), &high);
 	  _off64_t fsiz = ((_off64_t)high << 32) + low;
+	  /* Don't allow mappings beginning beyond EOF since Windows can't
+	     handle that POSIX like.  FIXME: Still looking for a good idea
+	     to allow that nevertheless. */
+	  if (gran_off >= fsiz)
+	    {
+	      set_errno (ENXIO);
+	      ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK,
+				   "mmap");
+	      return MAP_FAILED;
+	    }
 	  fsiz -= gran_off;
 	  if (gran_len > fsiz)
 	    gran_len = fsiz;
@@ -542,7 +561,13 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, _off64_t off)
       && (wincap.has_working_copy_on_write () || fd != -1))
     access = FILE_MAP_COPY;
 
-  h = fh->mmap (&base, gran_len, access, flags, gran_off);
+  caddr_t base = addr;
+  /* This shifts the base address to the next lower 64K boundary.
+     The offset is re-added when evaluating the return value. */
+  if (base)
+    base -= off - gran_off;
+  
+  HANDLE h = fh->mmap (&base, gran_len, access, flags, gran_off);
 
   if (h == INVALID_HANDLE_VALUE)
     {
@@ -589,16 +614,16 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, _off_t off)
   return mmap64 (addr, len, prot, flags, fd, (_off64_t)off);
 }
 
-/* munmap () removes an mmapped area.  It insists that base area
-   requested is the same as that mmapped, error if not. */
+/* munmap () removes all mmapped pages between addr and addr+len. */
 
 extern "C" int
 munmap (caddr_t addr, size_t len)
 {
   syscall_printf ("munmap (addr %x, len %d)", addr, len);
 
-  /* Error conditions according to SUSv2 */
-  if (((DWORD)addr % getpagesize ()) || !len)
+  /* Error conditions according to SUSv3 */
+  if (!addr || ((DWORD)addr % getpagesize ()) || !len
+      || IsBadReadPtr (addr, len))
     {
       set_errno (EINVAL);
       syscall_printf ("-1 = munmap(): Invalid parameters");
@@ -606,17 +631,15 @@ munmap (caddr_t addr, size_t len)
     }
 
   SetResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "munmap");
-  /* Check if a mmap'ed area was ever created */
   if (mmapped_areas == NULL)
     {
       syscall_printf ("-1 = munmap(): mmapped_areas == NULL");
-      set_errno (EINVAL);
       ReleaseResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "munmap");
-      return -1;
+      return 0;
     }
 
-  /* Iterate through the map, looking for the mmapped area.
-     Error if not found. */
+  /* Iterate through the map, unmap pages between addr and addr+len
+     in all maps. */
 
   for (int it = 0; it < mmapped_areas->nlists; ++it)
     {
@@ -624,10 +647,13 @@ munmap (caddr_t addr, size_t len)
       if (map_list)
 	{
 	  long li = -1;
-	  if ((li = map_list->match(addr, len, li)) >= 0)
+	  caddr_t u_addr;
+	  DWORD u_len;
+
+	  while ((li = map_list->match(addr, len, u_addr, u_len, li)) >= 0)
 	    {
 	      mmap_record *rec = map_list->recs + li;
-	      if (rec->unmap_map (addr, len))
+	      if (rec->unmap_map (u_addr, u_len))
 		{
 		  fhandler_base *fh = rec->alloc_fh ();
 		  fh->munmap (rec->get_handle (), addr, len);
@@ -636,18 +662,13 @@ munmap (caddr_t addr, size_t len)
 		  /* Delete the entry. */
 		  map_list->erase (li);
 		}
-	      syscall_printf ("0 = munmap(): %x", addr);
-	      ReleaseResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "munmap");
-	      return 0;
 	    }
 	}
     }
 
-  set_errno (EINVAL);
-  syscall_printf ("-1 = munmap(): EINVAL");
-
   ReleaseResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "munmap");
-  return -1;
+  syscall_printf ("0 = munmap(): %x", addr);
+  return 0;
 }
 
 /* Sync file with memory. Ignore flags for now. */
@@ -815,9 +836,15 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
     }
 
   DWORD high = off >> 32, low = off & 0xffffffff;
-  void *base = MapViewOfFileEx (h, access, high, low, len,
-			       (flags & MAP_FIXED) ? *addr : NULL);
-  debug_printf ("%x = MapViewOfFileEx (h:%x, access:%x, 0, off:%D, len:%d, addr:%x)", base, h, access, off, len, (flags & MAP_FIXED) ? *addr : NULL);
+  void *base = NULL;
+  /* If a non-zero address is given, try mapping using the given address first.
+     If it fails and flags is not MAP_FIXED, try again with NULL address. */
+  if (*addr)
+    base = MapViewOfFileEx (h, access, high, low, len, *addr);
+  if (!base && !(flags & MAP_FIXED))
+    base = MapViewOfFileEx (h, access, high, low, len, NULL);
+  debug_printf ("%x = MapViewOfFileEx (h:%x, access:%x, 0, off:%D, "
+  		"len:%d, addr:%x)", base, h, access, off, len, *addr);
   if (!base || ((flags & MAP_FIXED) && base != *addr))
     {
       if (!base)

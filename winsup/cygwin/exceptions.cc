@@ -10,7 +10,6 @@ details. */
 
 #include "winsup.h"
 #include <imagehlp.h>
-#include <errno.h>
 #include <stdlib.h>
 
 #include "exceptions.h"
@@ -154,7 +153,7 @@ error_start_init (const char *buf)
   for (char *p = strchr (pgm, '\\'); p; p = strchr (p, '\\'))
     *p = '/';
 
-  __small_sprintf (debugger_command, "%s %s", buf, pgm);
+  __small_sprintf (debugger_command, "%s \"%s\"", buf, pgm);
 }
 
 static void
@@ -932,7 +931,13 @@ ctrl_c_handler (DWORD type)
      is shut down or console window is closed. */
   if (type == CTRL_SHUTDOWN_EVENT)
     {
+#if 0
+      /* Don't send a signal.  Only NT service applications and their child
+         processes will receive this event and the services typically already
+	 handle the shutdown action when getting the SERVICE_CONTROL_SHUTDOWN
+	 control message. */
       sig_send (NULL, SIGTERM);
+#endif
       return FALSE;
     }
   if (type == CTRL_CLOSE_EVENT)

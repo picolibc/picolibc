@@ -12,7 +12,6 @@ details. */
 #include "winsup.h"
 #include <unistd.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <process.h>
 #include "perprocess.h"
 #include "security.h"

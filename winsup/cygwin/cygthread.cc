@@ -9,7 +9,6 @@ details. */
 #include "winsup.h"
 #include <windows.h>
 #include <stdlib.h>
-#include <errno.h>
 #include "exceptions.h"
 #include "security.h"
 #include "cygthread.h"

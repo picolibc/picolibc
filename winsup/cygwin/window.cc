@@ -13,7 +13,6 @@ details. */
 #include "winsup.h"
 #include <sys/time.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <signal.h>
 #include <limits.h>
 #include <wingdi.h>

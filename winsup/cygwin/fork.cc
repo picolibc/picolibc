@@ -13,7 +13,6 @@ details. */
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include <errno.h>
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
@@ -237,14 +236,7 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
 
   /* Restore the inheritance state as in parent
      Don't call setuid here! The flags are already set. */
-  if (cygheap->user.impersonated)
-    {
-      debug_printf ("Impersonation of child, token: %d", cygheap->user.token);
-      if (cygheap->user.token == INVALID_HANDLE_VALUE)
-	RevertToSelf (); // probably not needed
-      else if (!ImpersonateLoggedOnUser (cygheap->user.token))
-	system_printf ("Impersonate for forked child failed: %E");
-    }
+  cygheap->user.reimpersonate ();
 
   sync_with_parent ("after longjmp.", TRUE);
   sigproc_printf ("hParent %p, child 1 first_dll %p, load_dlls %d", hParent,
@@ -306,8 +298,10 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   (void) ForceCloseHandle1 (fork_info->subproc_ready, subproc_ready);
   (void) ForceCloseHandle1 (fork_info->forker_finished, forker_finished);
 
+#ifdef USE_CYGSERVER
   if (fixup_shms_after_fork ())
     api_fatal ("recreate_shm areas after fork failed");
+#endif
 
   pinfo_fixup_after_fork ();
   signal_fixup_after_fork ();
@@ -437,8 +431,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   si.cbReserved2 = sizeof (ch);
 
   /* Remove impersonation */
-  if (cygheap->user.issetuid ())
-    RevertToSelf ();
+  cygheap->user.deimpersonate ();
 
   ch.parent = hParent;
 #ifdef DEBUGGING
@@ -486,8 +479,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
       ForceCloseHandle (subproc_ready);
       ForceCloseHandle (forker_finished);
       /* Restore impersonation */
-      if (cygheap->user.issetuid ())
-	ImpersonateLoggedOnUser (cygheap->user.token);
+      cygheap->user.reimpersonate ();
       cygheap_setup_for_child_cleanup (newheap, &ch, 0);
       return -1;
     }
@@ -514,8 +506,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   strcpy (forked->progname, myself->progname);
 
   /* Restore impersonation */
-  if (cygheap->user.issetuid ())
-    ImpersonateLoggedOnUser (cygheap->user.token);
+  cygheap->user.reimpersonate ();
 
   ProtectHandle (pi.hThread);
   /* Protect the handle but name it similarly to the way it will

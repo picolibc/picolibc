@@ -9,7 +9,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/cygwin.h>
@@ -627,6 +626,8 @@ fhandler_disk_file::opendir ()
 
 	  res = dir;
 	}
+      if (real_name.isencoded ())
+	set_encoded ();
     }
 
   syscall_printf ("%p = opendir (%s)", res, get_name ());
@@ -653,9 +654,7 @@ fhandler_disk_file::readdir (DIR *dir)
 	}
     }
   else if (dir->__d_u.__d_data.__handle == INVALID_HANDLE_VALUE)
-    {
-      return res;
-    }
+    return res;
   else if (!FindNextFileA (dir->__d_u.__d_data.__handle, &buf))
     {
       DWORD lasterr = GetLastError ();
@@ -670,7 +669,10 @@ fhandler_disk_file::readdir (DIR *dir)
     }
 
   /* We get here if `buf' contains valid data.  */
-  strcpy (dir->__d_dirent->d_name, buf.cFileName);
+  if (get_encoded ())
+    (void) fnunmunge (dir->__d_dirent->d_name, buf.cFileName);
+  else
+    strcpy (dir->__d_dirent->d_name, buf.cFileName);
 
   /* Check for Windows shortcut. If it's a Cygwin or U/WIN
      symlink, drop the .lnk suffix. */

@@ -10,7 +10,6 @@
 
 #include "winsup.h"
 #include <sys/termios.h>
-#include <errno.h>
 #include <unistd.h>
 
 #include <cygwin/rdevio.h>

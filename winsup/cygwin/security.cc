@@ -16,7 +16,6 @@ details. */
 #include <pwd.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <errno.h>
 #include <limits.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -41,12 +40,11 @@ details. */
 #include "lm.h"
 #include "pwdgrp.h"
 
-extern BOOL allow_ntea;
-BOOL allow_ntsec;
+bool allow_ntsec;
 /* allow_smbntsec is handled exclusively in path.cc (path_conv::check).
    It's defined here because of it's strong relationship to allow_ntsec.
    The default is TRUE to reflect the old behaviour. */
-BOOL allow_smbntsec;
+bool allow_smbntsec;
 
 cygsid *
 cygsidlist::alloc_sids (int n)
@@ -71,10 +69,16 @@ extern "C" void
 cygwin_set_impersonation_token (const HANDLE hToken)
 {
   debug_printf ("set_impersonation_token (%d)", hToken);
-  if (cygheap->user.token != hToken)
+  if (cygheap->user.impersonation_state == IMP_EXTERNAL
+      && cygheap->user.external_token != hToken)
     {
-      cygheap->user.token = hToken;
-      cygheap->user.impersonated = FALSE;
+      set_errno (EPERM);
+      return;
+    }
+  else
+    {
+      cygheap->user.external_token = hToken;
+      return;
     }
 }
 
@@ -718,7 +722,7 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, BOOL *pintern)
   if (pintern)
     {
       TOKEN_SOURCE ts;
-      if (!GetTokenInformation (cygheap->user.token, TokenSource,
+      if (!GetTokenInformation (token, TokenSource,
 				&ts, sizeof ts, &size))
 	debug_printf ("GetTokenInformation(): %E");
       else
@@ -1907,7 +1911,7 @@ check_file_access (const char *fn, int flags)
     goto done;
 
   if (cygheap->user.issetuid ())
-    hToken = cygheap->user.token;
+    hToken = cygheap->user.token ();
   else if (!OpenProcessToken (hMainProc, TOKEN_DUPLICATE, &hToken))
     {
       __seterrno ();
@@ -1915,7 +1919,7 @@ check_file_access (const char *fn, int flags)
     }
   if (!(status = DuplicateToken (hToken, SecurityIdentification, &hIToken)))
     __seterrno ();
-  if (hToken != cygheap->user.token)
+  if (!cygheap->user.issetuid ())
     CloseHandle (hToken);
   if (!status)
     goto done;

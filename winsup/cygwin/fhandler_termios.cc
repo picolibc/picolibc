@@ -12,7 +12,6 @@ details. */
 #include <sys/termios.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <errno.h>
 #include <ctype.h>
 #include "cygerrno.h"
 #include "security.h"

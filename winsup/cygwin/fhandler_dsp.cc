@@ -12,7 +12,6 @@ details. */
 
 #include "winsup.h"
 #include <stdio.h>
-#include <errno.h>
 #include <windows.h>
 #include <sys/soundcard.h>
 #include <mmsystem.h>

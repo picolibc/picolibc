@@ -29,7 +29,6 @@ details. */
 # include "config.h"
 #endif
 
-#ifdef _MT_SAFE
 #include "winsup.h"
 #include <limits.h>
 #include "cygerrno.h"
@@ -45,16 +44,21 @@ details. */
 
 extern int threadsafe;
 
-struct _reent *
-_reent_clib ()
+extern "C" struct _reent *
+__getreent ()
 {
   struct __reent_t *_r =
     (struct __reent_t *) MT_INTERFACE->reent_key.get ();
 
-#ifdef _CYG_THREAD_FAILSAFE
   if (_r == 0)
-    system_printf ("local thread storage not inited");
+    {
+#ifdef _CYG_THREAD_FAILSAFE
+      system_printf ("local thread storage not inited");
 #endif
+      /* Return _impure_ptr as long as MTinterface is not initialized */
+      return _impure_ptr;
+    }
+
   return _r->_clib;
 }
 
@@ -64,10 +68,14 @@ _reent_winsup ()
   struct __reent_t *_r =
     (struct __reent_t *) MT_INTERFACE->reent_key.get ();
 
-#ifdef _CYG_THREAD_FAILSAFE
   if (_r == 0)
-    system_printf ("local thread storage not inited");
+    {
+#ifdef _CYG_THREAD_FAILSAFE
+      system_printf ("local thread storage not inited");
 #endif
+      return NULL;
+    }
+
   return _r->_winsup;
 }
 
@@ -212,9 +220,24 @@ MTinterface::fixup_after_fork (void)
 {
   pthread_key::fixup_after_fork ();
 
+#ifndef __SIGNALS_ARE_MULTITHREADED__
+  /* As long as the signal handling not multithreaded
+     switch reents storage back to _impure_ptr for the mainthread
+     to support fork from threads other than the mainthread */
+  struct _reent *reent_old = __getreent ();
+
+  if (reent_old && _impure_ptr != reent_old)
+    *_impure_ptr = *reent_old;
+  reents._clib = _impure_ptr;
+  reents._winsup = &winsup_reent;
+  winsup_reent._process_logmask = LOG_UPTO (LOG_DEBUG);
+  reent_key.set (&reents);
+#endif
+
   threadcount = 1;
   pthread::init_mainthread ();
 
+  pthread::fixup_after_fork ();
   pthread_mutex::fixup_after_fork ();
   pthread_cond::fixup_after_fork ();
   pthread_rwlock::fixup_after_fork ();
@@ -261,11 +284,16 @@ pthread::get_tls_self_pointer ()
 
 
 
+List<pthread> pthread::threads;
+
 /* member methods */
 pthread::pthread ():verifyable_object (PTHREAD_MAGIC), win32_obj_id (0),
+		    running (false), suspended (false), 
 		    cancelstate (0), canceltype (0), cancel_event (0),
-		    joiner (NULL), cleanup_stack (NULL)
+		    joiner (NULL), next (NULL), cleanup_stack (NULL)
 {
+  if (this != pthread_null::get_null_pthread ())
+    threads.insert (this);
 }
 
 pthread::~pthread ()
@@ -274,6 +302,9 @@ pthread::~pthread ()
     CloseHandle (win32_obj_id);
   if (cancel_event)
     CloseHandle (cancel_event);
+
+  if (this != pthread_null::get_null_pthread ())
+    threads.remove (this);
 }
 
 void
@@ -347,13 +378,15 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
 void
 pthread::postcreate ()
 {
-    InterlockedIncrement (&MT_INTERFACE->threadcount);
-    /* FIXME: set the priority appropriately for system contention scope */
-    if (attr.inheritsched == PTHREAD_EXPLICIT_SCHED)
-      {
-	/* FIXME: set the scheduling settings for the new thread */
-	/* sched_thread_setparam (win32_obj_id, attr.schedparam); */
-      }
+  running = true;
+
+  InterlockedIncrement (&MT_INTERFACE->threadcount);
+  /* FIXME: set the priority appropriately for system contention scope */
+  if (attr.inheritsched == PTHREAD_EXPLICIT_SCHED)
+    {
+      /* FIXME: set the scheduling settings for the new thread */
+      /* sched_thread_setparam (win32_obj_id, attr.schedparam); */
+    }
 }
 
 void
@@ -372,6 +405,7 @@ pthread::exit (void *value_ptr)
     delete this;
   else
     {
+      running = false;
       return_ptr = value_ptr;
       mutex.unlock ();
     }
@@ -389,6 +423,12 @@ pthread::cancel (void)
   class pthread *self = pthread::self ();
 
   mutex.lock ();
+
+  if (!running)
+    {
+      mutex.unlock ();
+      return 0;
+    }
 
   if (canceltype == PTHREAD_CANCEL_DEFERRED ||
       cancelstate == PTHREAD_CANCEL_DISABLE)
@@ -737,6 +777,19 @@ pthread::init_current_thread ()
     win32_obj_id = NULL;
   set_thread_id_to_current ();
   set_tls_self_pointer (this);
+}
+
+void
+pthread::_fixup_after_fork ()
+{
+  /* set thread to not running if it is not the forking thread */
+  if (this != pthread::self ())
+    {
+      magic = 0;
+      running = false;
+      win32_obj_id = NULL;
+      cancel_event = NULL;
+    }
 }
 
 /* static members */
@@ -1964,14 +2017,15 @@ pthread::atfork (void (*prepare)(void), void (*parent)(void), void (*child)(void
 extern "C" int
 pthread_attr_init (pthread_attr_t *attr)
 {
-  if (check_valid_pointer (attr))
-    return EINVAL;
+  if (pthread_attr::is_good_object (attr))
+    return EBUSY;
+
   *attr = new pthread_attr;
   if (!pthread_attr::is_good_object (attr))
     {
       delete (*attr);
       *attr = NULL;
-      return EAGAIN;
+      return ENOMEM;
     }
   return 0;
 }
@@ -2187,7 +2241,7 @@ pthread::detach (pthread_t *thread)
     }
 
   // check if thread is still alive
-  if (WaitForSingleObject ((*thread)->win32_obj_id, 0) == WAIT_TIMEOUT)
+  if ((*thread)->running && WaitForSingleObject ((*thread)->win32_obj_id, 0) == WAIT_TIMEOUT)
     {
       // force cleanup on exit
       (*thread)->joiner = *thread;
@@ -2488,14 +2542,15 @@ pthread_cond_wait (pthread_cond_t *cond, pthread_mutex_t *mutex)
 extern "C" int
 pthread_condattr_init (pthread_condattr_t *condattr)
 {
-  if (check_valid_pointer (condattr))
-    return EINVAL;
+  if (pthread_condattr::is_good_object (condattr))
+    return EBUSY;
+
   *condattr = new pthread_condattr;
   if (!pthread_condattr::is_good_object (condattr))
     {
       delete (*condattr);
       *condattr = NULL;
-      return EAGAIN;
+      return ENOMEM;
     }
   return 0;
 }
@@ -2673,14 +2728,15 @@ pthread_rwlock_unlock (pthread_rwlock_t *rwlock)
 extern "C" int
 pthread_rwlockattr_init (pthread_rwlockattr_t *rwlockattr)
 {
-  if (check_valid_pointer (rwlockattr))
-    return EINVAL;
+  if (pthread_rwlockattr::is_good_object (rwlockattr))
+    return EBUSY;
+
   *rwlockattr = new pthread_rwlockattr;
   if (!pthread_rwlockattr::is_good_object (rwlockattr))
     {
       delete (*rwlockattr);
       *rwlockattr = NULL;
-      return EAGAIN;
+      return ENOMEM;
     }
   return 0;
 }
@@ -3172,5 +3228,3 @@ pthread_null::getsequence_np ()
 }
 
 pthread_null pthread_null::_instance;
-
-#endif // MT_SAFE

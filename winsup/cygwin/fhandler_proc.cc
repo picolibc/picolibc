@@ -11,7 +11,6 @@ details. */
 #define _WIN32_WINNT 0x0501
 
 #include "winsup.h"
-#include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/cygwin.h>
