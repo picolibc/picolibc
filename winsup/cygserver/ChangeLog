@@ -1,3 +1,11 @@
+2003-12-26  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (CFLAGS, CXXFLAGS): Remove unneeded include.
+	(CYGWIN_LIB): Delete.
+	(cygserver.exe target): Add -L$(cygwin_build) to the link line to force
+	linker to use build tree version of the library.  Remove specific
+	inclusion of libcygwin.a from the link line.
+
 2003-12-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* bsd_helper.cc (tunable_params): Add entries for kern.ipc.msgmnb and

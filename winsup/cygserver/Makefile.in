@@ -31,8 +31,8 @@ AR:=@AR@
 
 include $(srcdir)/../Makefile.common
 
-CFLAGS:=@CFLAGS@ -I$(cygwin_source)
-CXXFLAGS:=@CXXFLAGS@ -I$(cygwin_source)
+CFLAGS:=@CFLAGS@
+CXXFLAGS:=@CXXFLAGS@
 override CXXFLAGS+=-MMD -DHAVE_DECL_GETOPT=0 -D__OUTSIDE_CYGWIN__ -DSYSCONFDIR="\"$(sysconfdir)\""
 
 .SUFFIXES: .c .cc .a .o .d
@@ -68,8 +68,8 @@ libclean:
 
 fullclean: clean libclean
 
-cygserver.exe: $(OBJS) $(CYGWIN_OBJS) $(CYGWIN_LIB)
-	$(CXX) -o $@ $^
+cygserver.exe: $(CYGWIN_LIB) $(OBJS) $(CYGWIN_OBJS)
+	$(CXX) -o $@ ${wordlist 2,999,$^} -L$(cygwin_build)
 
 $(cygwin_build)/%.o: $(cygwin_source)/%.cc
 	@$(MAKE) -C $(@D) $(@F)
