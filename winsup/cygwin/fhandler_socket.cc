@@ -251,27 +251,35 @@ fhandler_socket::fstat (struct stat *buf, path_conv *pc)
   return fh.fstat (buf, pc);
 }
 
+extern "C" int cygwin_recv (int, void *, int, unsigned int);
+
 int __stdcall
 fhandler_socket::read (void *ptr, size_t len)
 {
   sigframe thisframe (mainthread);
-  int res = recv (get_socket (), (char *) ptr, len, 0);
+  int res = cygwin_recv (get_fd (), (char *) ptr, len, 0);
+#if 0
   if (res == SOCKET_ERROR)
     set_winsock_errno ();
+#endif
   return res;
 }
+
+extern "C" int cygwin_send (int, const void *, int, unsigned int);
 
 int
 fhandler_socket::write (const void *ptr, size_t len)
 {
   sigframe thisframe (mainthread);
-  int res = send (get_socket (), (const char *) ptr, len, 0);
+  int res = cygwin_send (get_fd (), (const char *) ptr, len, 0);
+#if 0
   if (res == SOCKET_ERROR)
     {
       set_winsock_errno ();
       if (get_errno () == ECONNABORTED || get_errno () == ECONNRESET)
 	_raise (SIGPIPE);
     }
+#endif
   return res;
 }
 

@@ -1,3 +1,16 @@
+2002-02-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (dtable::dup2): Store fd for fhandler_socket.
+	* fhandler.h (fhandler_base::set_fd): New virtual method.
+	(fhandler_base::get_fd): Ditto.
+	(fhandler_socket::set_fd): Ditto.
+	(fhandler_socket::get_fd): Ditto.
+	* fhandler_socket.cc (fhandler_socket::read): Call cygwin_recv instead
+	of native Winsock recv.
+	(fhandler_socket::write): Call cygwin_send instead of native Winsock
+	send.
+	* net.cc (fdsock): Store fd in fhandler_socket.
+
 2002-02-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (cygwin_getsockname): Fix handling of NULL sun_path.
