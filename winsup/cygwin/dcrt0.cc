@@ -600,13 +600,13 @@ dll_crt0_0 ()
   else
     {
       if ((child_proc_info->intro & OPROC_MAGIC_MASK) == OPROC_MAGIC_GENERIC)
-	multiple_cygwin_problem ("proc", child_proc_info->intro, 0);
+	multiple_cygwin_problem ("proc intro", child_proc_info->intro, 0);
       else if (child_proc_info->intro == PROC_MAGIC_GENERIC
 	       && child_proc_info->magic != CHILD_INFO_MAGIC)
-	multiple_cygwin_problem ("proc", child_proc_info->magic,
+	multiple_cygwin_problem ("proc magic", child_proc_info->magic,
 				 CHILD_INFO_MAGIC);
       else if (child_proc_info->cygheap != (void *) &_cygheap_start)
-	multiple_cygwin_problem ("cygheap", (DWORD) child_proc_info->cygheap,
+	multiple_cygwin_problem ("cygheap base", (DWORD) child_proc_info->cygheap,
 				 (DWORD) &_cygheap_start);
       unsigned should_be_cb = 0;
       switch (child_proc_info->type)
@@ -1141,12 +1141,14 @@ multiple_cygwin_problem (const char *what, unsigned magic_version, unsigned vers
   if (CYGWIN_VERSION_MAGIC_VERSION (magic_version) == version)
     system_printf ("%s magic number mismatch detected - %p/%p", what, magic_version, version);
   else
-    api_fatal ("%s version mismatch detected - %p/%p.\n\
-You have multiple copies of cygwin1.dll on your system.\n\
+    api_fatal ("%s mismatch detected - %p/%p.\n\
+This problem is probably due to using incompatible versions of the cygwin DLL.\n\
 Search for cygwin1.dll using the Windows Start->Find/Search facility\n\
 and delete all but the most recent version.  The most recent version *should*\n\
 reside in x:\\cygwin\\bin, where 'x' is the drive on which you have\n\
-installed the cygwin distribution.", what, magic_version, version);
+installed the cygwin distribution.  Rebooting is also suggested if you\n\
+are unable to find another cygwin DLL.",
+	       what, magic_version, version);
 }
 
 #ifdef DEBUGGING

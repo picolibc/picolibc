@@ -1,3 +1,12 @@
+2005-01-05  Christopher Faylor  <cgf@timesys.com>
+
+	* dcrt0.cc (multiple_cygwin_problem): Reorganize error message to not
+	always talk about a "version" when it's not a version.
+	(dll_crt0_0): Change info passed to multiple_cygwin_problem to be a
+	little more precise.
+	* shared.cc (user_shared_initialize): Ditto.
+	(shared_info::initialize): Ditto.
+
 2005-01-03  Christopher Faylor  <cgf@timesys.com>
 
 	* pinfo.cc (_pinfo::dup_proc_pipe): Can't close proc pipe when execing

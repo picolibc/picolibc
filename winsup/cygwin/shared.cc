@@ -185,9 +185,9 @@ user_shared_initialize (bool reinit)
       user_shared->delqueue.init ();
     }
   else if (user_shared->version != USER_VERSION_MAGIC)
-    multiple_cygwin_problem ("user", user_shared->version, USER_VERSION_MAGIC);
+    multiple_cygwin_problem ("user shared memory version", user_shared->version, USER_VERSION_MAGIC);
   else if (user_shared->cb != sizeof (*user_shared))
-    multiple_cygwin_problem ("user shared size", user_shared->cb, sizeof (*user_shared));
+    multiple_cygwin_problem ("user shared memory size", user_shared->cb, sizeof (*user_shared));
 }
 
 void
@@ -203,7 +203,7 @@ shared_info::initialize ()
     {
       if (version != SHARED_VERSION_MAGIC)
 	{
-	  multiple_cygwin_problem ("shared", version, SHARED_VERSION_MAGIC);
+	  multiple_cygwin_problem ("system shared memory version", version, SHARED_VERSION_MAGIC);
 	  InterlockedExchange ((LONG *) &version, sversion);
 	}
       while (!cb)
