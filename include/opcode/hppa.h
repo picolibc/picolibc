@@ -71,7 +71,7 @@ struct pa_opcode
    In the args field, the following characters are unused:
 
 	'  "   &     -  /   34 6789:;< > @'
-	' BC         M             [\]  '
+	'  C         M             [\]  '
 	'    e g    l            y   } '
 
    Here are all the characters:
@@ -144,6 +144,9 @@ Also these:
    Q	5 bit immediate value at 10 (a bit position specified in
 	the bb instruction. It's the same as r above, except the
         value is in a different location)
+   B	5 bit immediate value at 10 (a bit position specified in
+	the bb instruction. Similar to Q, but 64bit handling is
+	different.
    Z    %r1 -- implicit target of addil instruction.
    L    ,%r2 completer for new syntax branch
    {    Source format completer for fcnv
@@ -459,7 +462,7 @@ static const struct pa_opcode pa_opcodes[] =
 { "addibt",	0xa4000000, 0xfc000000, "?dn5,b,w", pa10, 0},
 { "addibf",	0xac000000, 0xfc000000, "?dn5,b,w", pa10, 0},
 { "bb",		0xc0006000, 0xffe06000, "?Bnx,!,w", pa20, FLAG_STRICT}, 
-{ "bb",		0xc4006000, 0xfc006000, "?Bnx,Q,w", pa20, FLAG_STRICT}, 
+{ "bb",		0xc4004000, 0xfc004000, "?Bnx,B,w", pa20, FLAG_STRICT}, 
 { "bb",		0xc0004000, 0xffe06000, "?bnx,!,w", pa10, FLAG_STRICT}, 
 { "bb",		0xc4004000, 0xfc004000, "?bnx,Q,w", pa10, 0}, 
 { "bvb",	0xc0004000, 0xffe04000, "?bnx,w", pa10, 0},
