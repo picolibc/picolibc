@@ -1,3 +1,7 @@
+2004-03-16  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc.h (PPC_OPERAND_GPR_0): Define.  Bump other operand defines.
+
 2004-03-12  Michal Ludvig  <mludvig@suse.cz>
 
 	* i386.h (i386_optab): Added xstore as an alias for xstorerng.
@@ -11,7 +15,7 @@
 	* h8300.h (32bit ldc/stc): Add relaxing support.
 
 2004-01-12  Anil Paranjpe  <anilp1@KPITCummins.com>
-	
+
 	* h8300.h (BITOP): Pass MEMRELAX flag.
 
 2004-01-09  Anil Paranjpe  <anilp1@KPITCummins.com>
