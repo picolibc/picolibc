@@ -2897,7 +2897,7 @@ chdir (const char *dir)
      whitespace to SetCurrentDirectory.  This doesn't work too well
      with other parts of the API, though, apparently.  So nuke trailing
      white space. */
-  for (s = strchr (dir, '\0'); --s >= dir && isspace ((unsigned int) *s); )
+  for (s = strchr (dir, '\0'); --s >= dir && isspace ((unsigned int) (*s & 0xff)); )
     *s = '\0';
 
   if (path.error)

@@ -1,3 +1,8 @@
+Fri Jun  1 10:57:19 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (chdir): Really make sure that isspace gets only an unsigned
+	char.
+
 Fri Jun  1 13:45:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* syscalls.cc (_rename): Handle the case that `foo' is renamed to
