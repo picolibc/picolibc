@@ -1,3 +1,7 @@
+2002-05-10  Elena Zannoni  <ezannoni@redhat.com>
+
+        * sim-sh.h: New file, for sh gdb<->sim interface.
+
 2002-05-09  Daniel Jacobowitz  <drow@mvista.com>
 
 	* signals.h: Update comments.
