@@ -734,15 +734,19 @@ handle_to_fn (HANDLE h, char *posix_fn)
 
   DWORD res = NtQueryObject (h, ObjectNameInformation, ntfn, sizeof (fnbuf), NULL);
 
-  // NT seems to do this on an unopened file
-  if (!ntfn->Name.Buffer)
-    return NULL;
-
   if (res)
     {
       strcpy (posix_fn, "some disk file");
       return posix_fn;
     }
+
+  // NT seems to do this on an unopened file
+  if (!ntfn->Name.Buffer)
+    {
+      debug_printf ("nt->Name.Buffer == NULL");
+      return NULL;
+    }
+
   ntfn->Name.Buffer[ntfn->Name.Length / sizeof (WCHAR)] = 0;
 
   char win32_fn[MAX_PATH + 100];

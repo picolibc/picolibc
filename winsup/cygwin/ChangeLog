@@ -1,3 +1,11 @@
+2002-06-05  Christopher Faylor  <cgf@redhat.com>
+
+	* dtable.cc (handle_to_fn): Check error return value from NtQueryObject
+	first before seeing if name buffer is NULL.
+
+	* grp.cc (read_etc_group): Fix gcc warning regarding snprintf format.
+	* passwd.cc (read_etc_passwd): Ditto.
+
 2002-04-18  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* thread.h (pthread::joiner): New member.

@@ -186,7 +186,7 @@ read_etc_group ()
 				            &domain_name_len, &acType))
 		    {
 		      char strbuf[100];
-		      snprintf (linebuf, sizeof (linebuf), "%s:%s:%u:",
+		      snprintf (linebuf, sizeof (linebuf), "%s:%s:%lu:",
 		      		group_name, 
 				tg.string (strbuf),
 				*GetSidSubAuthority(tg,

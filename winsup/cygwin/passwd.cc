@@ -177,7 +177,7 @@ read_etc_passwd ()
 		    {
 		      char strbuf[100];
 		      snprintf (linebuf, sizeof (linebuf),
-				"%s::%u:%u:%s:%s:/bin/sh",
+				"%s::%lu:%lu:%s:%s:/bin/sh",
 				cygheap->user.name (),
 				*GetSidSubAuthority(tu,
 				             *GetSidSubAuthorityCount(tu) - 1),
