@@ -1,3 +1,7 @@
+Sun Dec 10 17:19:04 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* include/sysexits: New file.
+
 2000-12-09  Egor Duda <deo@logos-m.ru>
 
 	* autoload.cc: Autoload CharToOemA.
