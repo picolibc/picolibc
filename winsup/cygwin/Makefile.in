@@ -254,6 +254,8 @@ regexec_CFLAGS=-fomit-frame-pointer
 regfree_CFLAGS=-fomit-frame-pointer
 shared_CFLAGS:=-fomit-frame-pointer
 smallprint_CFLAGS:=-fomit-frame-pointer
+sysconf_CFLAGS:=-fomit-frame-pointer
+uinfo_CFLAGS:=-fomit-frame-pointer
 endif
 
 .PHONY: all force dll_ofiles install all_target install_target all_host install_host \

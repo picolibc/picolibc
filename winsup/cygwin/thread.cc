@@ -297,7 +297,7 @@ pthread::exit (void *value_ptr)
     ::exit (0);
   else
     {
-      _my_tls.remove ();
+      _my_tls.remove (INFINITE);
       ExitThread (0);
     }
 }
@@ -1782,9 +1782,6 @@ pthread::thread_init_wrapper (void *arg)
 {
   pthread *thread = (pthread *) arg;
   _my_tls.tid = thread;
-
-  exception_list cygwin_except_entry;
-  init_exceptions (&cygwin_except_entry); /* Initialize SIGSEGV handling, etc. */
 
   thread->mutex.lock ();
 

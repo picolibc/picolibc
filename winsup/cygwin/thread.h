@@ -14,10 +14,7 @@ details. */
 #ifndef _CYGNUS_THREADS_
 #define _CYGNUS_THREADS_
 
-#define LOCK_FD_LIST     1
-#define LOCK_MEMORY_LIST 2
-#define LOCK_MMAP_LIST   3
-#define LOCK_DLL_LIST    4
+#define LOCK_MMAP_LIST   1
 
 #define WRITE_LOCK 1
 #define READ_LOCK  2

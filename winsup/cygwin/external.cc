@@ -135,16 +135,6 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 {
   va_list arg;
   va_start (arg, t);
-  if (t != CW_USER_DATA)
-    {
-      wincap.init ();
-      if (!myself)
-	{
-	  memory_init ();
-	  malloc_init ();
-	  set_myself (1);
-	}
-    }
 
   switch (t)
     {

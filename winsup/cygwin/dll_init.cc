@@ -195,7 +195,7 @@ dll_list::detach (void *retaddr)
     if (d->handle != h)
       continue;
     else if (d->count <= 0)
-      system_printf ("WARNING: try to detach an already detached dll ...");
+      system_printf ("WARNING: trying to detach an already detached dll ...");
     else if (--d->count == 0)
       {
 	d->p.run_dtors ();

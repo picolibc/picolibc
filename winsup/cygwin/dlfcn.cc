@@ -83,8 +83,6 @@ get_full_path_of_dll (const char* str, char *name)
 void *
 dlopen (const char *name, int)
 {
-  SetResourceLock (LOCK_DLL_LIST, READ_LOCK | WRITE_LOCK, "dlopen");
-
   void *ret;
 
   if (name == NULL)
@@ -108,7 +106,6 @@ dlopen (const char *name, int)
     set_dl_error ("dlopen");
   debug_printf ("ret %p", ret);
 
-  ReleaseResourceLock (LOCK_DLL_LIST, READ_LOCK | WRITE_LOCK, "dlopen");
   return ret;
 }
 
@@ -125,8 +122,6 @@ dlsym (void *handle, const char *name)
 int
 dlclose (void *handle)
 {
-  SetResourceLock (LOCK_DLL_LIST, READ_LOCK | WRITE_LOCK, "dlclose");
-
   int ret = -1;
   void *temphandle = (void *) GetModuleHandle (NULL);
   if (temphandle == handle || FreeLibrary ((HMODULE) handle))
@@ -134,8 +129,6 @@ dlclose (void *handle)
   if (ret)
     set_dl_error ("dlclose");
   CloseHandle ((HMODULE) temphandle);
-
-  ReleaseResourceLock (LOCK_DLL_LIST, READ_LOCK | WRITE_LOCK, "dlclose");
   return ret;
 }
 

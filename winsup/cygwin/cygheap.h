@@ -19,6 +19,7 @@ enum cygheap_types
   HEAP_MOUNT,
   HEAP_SIGS,
   HEAP_ARCHETYPES,
+  HEAP_TLS,
   HEAP_1_START,
   HEAP_1_STR,
   HEAP_1_ARGV,
@@ -263,7 +264,10 @@ struct init_cygheap
 
   fhandler_tty_slave *ctty;	/* Current tty */
   fhandler_tty_slave *ctty_on_hold;
+  struct _threadinfo **threadlist;
+  size_t sthreads;
   int open_fhs;
+  void close_ctty ();
 };
 
 #define CYGHEAPSIZE (sizeof (init_cygheap) + (20000 * sizeof (fhandler_union)) + (5 * 65536))
@@ -282,7 +286,7 @@ class cygheap_fdmanip
   virtual ~cygheap_fdmanip ()
   {
     if (locked)
-      ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "cygheap_fdmanip");
+      cygheap->fdtab.unlock ();
   }
   void release ()
   {
@@ -308,7 +312,7 @@ class cygheap_fdnew : public cygheap_fdmanip
   cygheap_fdnew (int seed_fd = -1, bool lockit = true)
   {
     if (lockit)
-      SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "cygheap_fdnew");
+      cygheap->fdtab.lock ();
     if (seed_fd < 0)
       fd = cygheap->fdtab.find_unused_handle ();
     else
@@ -322,7 +326,7 @@ class cygheap_fdnew : public cygheap_fdmanip
       {
 	set_errno (EMFILE);
 	if (lockit)
-	  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "cygheap_fdnew");
+	  cygheap->fdtab.unlock ();
 	locked = false;
       }
   }
@@ -335,7 +339,7 @@ class cygheap_fdget : public cygheap_fdmanip
   cygheap_fdget (int fd, bool lockit = false, bool do_set_errno = true)
   {
     if (lockit)
-      SetResourceLock (LOCK_FD_LIST, READ_LOCK, "cygheap_fdget");
+      cygheap->fdtab.lock ();
     if (fd >= 0 && fd < (int) cygheap->fdtab.size
 	&& *(fh = cygheap->fdtab + fd) != NULL)
       {
@@ -348,7 +352,7 @@ class cygheap_fdget : public cygheap_fdmanip
 	if (do_set_errno)
 	  set_errno (EBADF);
 	if (lockit)
-	  ReleaseResourceLock (LOCK_FD_LIST, READ_LOCK, "cygheap_fdget");
+	  cygheap->fdtab.unlock ();
 	locked = false;
       }
   }

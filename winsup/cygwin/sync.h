@@ -37,6 +37,7 @@ public:
   DWORD owner () {return tid;}
   int unstable () {return !tid && (sync || waiters >= 0);}
   void reset () __attribute__ ((regparm (1)));
+  bool acquired ();
 };
 
 extern muto muto_start;
@@ -46,4 +47,11 @@ extern muto muto_start;
 ({ \
   static muto __name##_storage __attribute__((nocommon)) __attribute__((section(".data_cygwin_nocopy"))); \
   __name = __name##_storage.init (#__name); \
+})
+
+/* Use a statically allocated buffer as the storage for a muto */
+#define new_muto1(__name, __storage) \
+({ \
+  static muto __storage __attribute__((nocommon)) __attribute__((section(".data_cygwin_nocopy"))); \
+  __name = __storage.init (#__name); \
 })

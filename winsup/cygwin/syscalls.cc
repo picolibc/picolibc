@@ -87,7 +87,7 @@ static int __stdcall stat_worker (const char *name, struct __stat64 *buf,
 void __stdcall
 close_all_files (void)
 {
-  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "close_all_files");
+  cygheap->fdtab.lock ();
 
   fhandler_base *fh;
   for (int i = 0; i < (int) cygheap->fdtab.size; i++)
@@ -101,13 +101,9 @@ close_all_files (void)
       }
 
   if (cygheap->ctty)
-    {
-      debug_printf ("closing ctty");
-      cygheap->ctty->close ();
-      cygheap->ctty = NULL;
-    }
+    cygheap->close_ctty ();
 
-  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "close_all_files");
+  cygheap->fdtab.unlock ();
   user_shared->delqueue.process_queue ();
 }
 
@@ -332,10 +328,7 @@ setsid (void)
       syscall_printf ("sid %d, pgid %d, ctty %d, open_fhs %d", myself->sid,
 		      myself->pgid, myself->ctty, cygheap->open_fhs);
       if (cygheap->ctty)
-	{
-	  cygheap->ctty->close ();
-	  cygheap->ctty = NULL;
-	}
+	cygheap->close_ctty ();
       return myself->sid;
     }
 

@@ -112,6 +112,9 @@ add_handle (const char *func, int ln, HANDLE h, const char *name, bool inh)
   handle_list *hl;
   lock_debug here;
 
+  if (!cygheap)
+    return;
+
   if ((hl = find_handle (h)))
     {
       hl = hl->next;
@@ -171,6 +174,9 @@ mark_closed (const char *func, int ln, HANDLE h, const char *name, bool force)
 {
   handle_list *hl;
   lock_debug here;
+
+  if (!cygheap)
+    return true;
 
   if ((hl = find_handle (h)) && !force)
     {

@@ -135,6 +135,12 @@ muto::release ()
   return 1;	/* success. */
 }
 
+bool
+muto::acquired ()
+{
+  return tid == GetCurrentThreadId ();
+}
+
 /* Call only when we're exiting.  This is not thread safe. */
 void
 muto::reset ()
