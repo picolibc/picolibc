@@ -15,7 +15,6 @@ details. */
 #include <ctype.h>
 #include <sys/types.h>
 #include <sys/mount.h>
-#include <sys/strace.h>
 #include <errno.h>
 #include "shortcut.h"
 

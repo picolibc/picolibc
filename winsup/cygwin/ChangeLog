@@ -1,3 +1,7 @@
+Mon Feb 26  0:10:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* shortcut.c: Remove #include <sys/strace.h>.
+
 Sun Feb 25 10:32:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* path.cc (symlink): Add a ".lnk" suffix regardless. Add a comment.
