@@ -4,20 +4,30 @@ FUNCTION
 
 INDEX
 	fclose
+INDEX
+	_fclose_r
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	int fclose(FILE *<[fp]>);
+	int _fclose_r(void *<[reent]>, FILE *<[fp]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
 	int fclose(<[fp]>)
+	FILE *<[fp]>;
+        
+	int fclose(<[fp]>)
+        void *<[reent]>
 	FILE *<[fp]>;
 
 DESCRIPTION
 If the file or stream identified by <[fp]> is open, <<fclose>> closes
 it, after first ensuring that any pending data is written (by calling
 <<fflush(<[fp]>)>>).
+
+The alternate function <<_fclose_r>> is a reentrant version.
+The extra argument <[reent]> is a pointer to a reentrancy structure.
 
 RETURNS
 <<fclose>> returns <<0>> if successful (including when <[fp]> is
@@ -47,6 +57,7 @@ Required OS subroutines: <<close>>, <<fstat>>, <<isatty>>, <<lseek>>,
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#include <reent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "local.h"
@@ -57,8 +68,9 @@ Required OS subroutines: <<close>>, <<fstat>>, <<isatty>>, <<lseek>>,
  */
 
 int
-_DEFUN (fclose, (fp),
-	register FILE * fp)
+_DEFUN (_fclose_r, (rptr, fp),
+       struct _reent *rptr _AND
+       register FILE * fp)
 {
   int r;
 
@@ -81,7 +93,7 @@ _DEFUN (fclose, (fp),
   if (fp->_close != NULL && (*fp->_close) (fp->_cookie) < 0)
     r = EOF;
   if (fp->_flags & __SMBF)
-    _free_r (_REENT, (char *) fp->_bf._base);
+    _free_r (rptr, (char *) fp->_bf._base);
   if (HASUB (fp))
     FREEUB (fp);
   if (HASLB (fp))
@@ -96,3 +108,15 @@ _DEFUN (fclose, (fp),
 
   return (r);
 }
+
+#ifndef _REENT_ONLY
+
+int
+_DEFUN (fclose, (fp),
+	register FILE * fp)
+{
+  return _fclose_r(_REENT, fp);
+}
+
+#endif
+

@@ -66,7 +66,7 @@ int
 _fcloseall_r (ptr)
      struct _reent *ptr;
 {
-  return _fwalk (ptr, fclose);
+  return _fwalk_reent (ptr, _fclose_r);
 }
 
 #ifndef _REENT_ONLY

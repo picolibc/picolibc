@@ -1,3 +1,17 @@
+2004-04-08  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
+
+	* libc/stdio/fclose.c (_fclose_r): New function.
+	* libc/stdio/freopen.c (_freopen_r): Call _fclose_r.
+	* libc/stdio/fcloseall.c (_fcloseall_r): Call _fwalk_reent.
+	* libc/stdio64/freopen64.c (_freopen64_r): Use _fclose_r.
+	* libc/include/stdio.h (_fclose_r): New prototype.
+	* libc/stdio/fopen.c: Fix typo in comment.
+
+2004-04-08  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdio/fwalk.c (_fwalk_reent): New version of _fwalk
+	to handle _r reentrant functions.
+
 2004-04-08  Eric Christopher  <echristo@redhat.com>
 
 	* libc/include/machine/setjmp.h: Fix endif locations.

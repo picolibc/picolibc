@@ -98,7 +98,7 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
   if ((flags = __sflags (ptr, mode, &oflags)) == 0)
     {
       _funlockfile(fp);
-      (void) fclose (fp);
+      (void) _fclose_r (ptr, fp);
       __sfp_lock_release ();
       return NULL;
     }

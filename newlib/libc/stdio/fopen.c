@@ -38,7 +38,7 @@ TRAD_SYNOPSIS
 	char *<[mode]>;
 
 	FILE *_fopen_r(<[reent]>, <[file]>, <[mode]>)
-	char *<[reent]>;
+	void *<[reent]>;
 	char *<[file]>;
 	char *<[mode]>;
 

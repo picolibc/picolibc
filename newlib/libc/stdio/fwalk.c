@@ -48,6 +48,30 @@ __fwalk (ptr, function)
   return ret;
 }
 
+/* Special version of __fwalk where the function pointer is a reentrant
+   I/O function (e.g. _fclose_r).  */
+static int
+__fwalk_reent (ptr, reent_function)
+     struct _reent *ptr;
+     register int (*reent_function) ();
+{
+  register FILE *fp;
+  register int n, ret = 0;
+  register struct _glue *g;
+
+  for (g = &ptr->__sglue; g != NULL; g = g->_next)
+    for (fp = g->_iobs, n = g->_niobs; --n >= 0; fp++)
+      if (fp->_flags != 0)
+        {
+          _flockfile (fp);
+          if (fp->_flags != 0 && fp->_file != -1)
+            ret |= (*reent_function) (ptr, fp);
+          _funlockfile (fp);
+        }
+
+  return ret;
+}
+
 int
 _fwalk (ptr, function)
      struct _reent *ptr;
@@ -63,6 +87,29 @@ _fwalk (ptr, function)
 
   /* Must traverse global list for all other streams.  */
   ret |= __fwalk (_GLOBAL_REENT, function);
+
+  __sfp_lock_release ();
+
+  return ret;
+}
+
+/* Special version of _fwalk which handles a function pointer to a
+   reentrant I/O function (e.g. _fclose_r).  */
+int
+_fwalk_reent (ptr, reent_function)
+     struct _reent *ptr;
+     register int (*reent_function) ();
+{
+  register int ret = 0;
+
+  __sfp_lock_acquire ();
+
+  /* Must traverse given list for std streams.  */
+  if (ptr != _GLOBAL_REENT)
+    ret |= __fwalk_reent (ptr, reent_function);
+
+  /* Must traverse global list for all other streams.  */
+  ret |= __fwalk_reent (_GLOBAL_REENT, reent_function);
 
   __sfp_lock_release ();
 

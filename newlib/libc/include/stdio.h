@@ -275,6 +275,7 @@ int	_EXFUN(_asprintf_r, (struct _reent *, char **, const char *, ...));
 int	_EXFUN(_fcloseall_r, (struct _reent *));
 FILE *	_EXFUN(_fdopen_r, (struct _reent *, int, const char *));
 FILE *	_EXFUN(_fopen_r, (struct _reent *, const char *, const char *));
+int	_EXFUN(_fclose_r, (struct _reent *, FILE *));
 int	_EXFUN(_fscanf_r, (struct _reent *, FILE *, const char *, ...));
 int	_EXFUN(_getchar_r, (struct _reent *));
 char *	_EXFUN(_gets_r, (struct _reent *, char *));
