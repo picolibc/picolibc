@@ -23,7 +23,9 @@ details. */
 #define IOCTL_REQUEST_EVENT	"cygtty%d.ioctl.request"
 #define IOCTL_DONE_EVENT	"cygtty%d.ioctl.done"
 #define RESTART_OUTPUT_EVENT	"cygtty%d.output.restart"
+#define INPUT_AVAILABLE_EVENT	"cygtty%d.input.avail"
 #define OUTPUT_MUTEX		"cygtty%d.output.mutex"
+#define INPUT_MUTEX		"cygtty%d.input.mutex"
 #define TTY_SLAVE_ALIVE		"cygtty%x.slave_alive"
 #define TTY_MASTER_ALIVE	"cygtty%x.master_alive"
 
@@ -109,6 +111,12 @@ public:
   {
     char buf[80];
     __small_sprintf (buf, OUTPUT_MUTEX, ntty);
+    return OpenMutex (MUTEX_ALL_ACCESS, inherit, buf);
+  }
+  HANDLE open_input_mutex (BOOL inherit = FALSE)
+  {
+    char buf[80];
+    __small_sprintf (buf, INPUT_MUTEX, ntty);
     return OpenMutex (MUTEX_ALL_ACCESS, inherit, buf);
   }
   BOOL exists ()

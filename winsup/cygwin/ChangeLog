@@ -1,3 +1,22 @@
+2001-03-04  Egor Duda  <deo@logos-m.ru>
+
+	* fhandler.h (class fhandler_tty_common): New mutex and event to
+	syncronize input on master tty with slave tty.
+	* fhandler_tty.cc (fhandler_pty_master::accept_input): Use them to
+	syncronize with slave.
+	* fhandler_tty.cc (fhandler_tty_slave::read): Use input mutex and
+	event to syncronize with master. Do not limit amount of data read
+	from master to vmin value. Interrupt on signal and return already
+	read data, if any.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Handle input mutex and
+	event.
+	* fhandler_tty.cc (fhandler_tty_common::close): Ditto.
+	* fhandler_tty.cc (fhandler_tty_common::set_close_on_exec): Ditto.
+	* fhandler_tty.cc (fhandler_tty_common::fixup_after_fork): Ditto.
+	* fhandler_tty.cc (fhandler_tty_common::dup): Ditto.
+	* tty.h (tty::open_input_mutex): New function.
+	* tty.cc (tty::common_init): Create input mutex and event.
+
 Fri Mar  2 13:32:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* dir.cc (readdir): Fix creating path in symlink check.

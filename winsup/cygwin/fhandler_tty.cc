@@ -167,22 +167,21 @@ fhandler_pty_master::accept_input ()
 {
   DWORD written;
   DWORD n;
-  const char dummy[1] = {'X'};
-  const char *buf;
+  DWORD rc;
+
+  rc = WaitForSingleObject (input_mutex, INFINITE);
 
   n = get_ttyp ()->read_retval = eat_readahead (-1);
 
-  if (n != 0)
-    buf = rabuf;
-  else
+  if ( n != 0 )
     {
-      n = 1;
-      buf = dummy;
-      termios_printf ("sending EOF to slave");
+      termios_printf ("about to write %d chars to slave", n);
+      rc = WriteFile (get_output_handle (), rabuf, n, &written, NULL);
     }
-  termios_printf ("about to write %d chars to slave", n);
-  if (!WriteFile (get_output_handle (), buf, n, &written, NULL))
-      return -1;
+  else
+    termios_printf ("sending EOF to slave");
+  SetEvent (input_available_event);
+  ReleaseMutex (input_mutex);
   return get_ttyp ()->read_retval;
 }
 
@@ -459,6 +458,19 @@ fhandler_tty_slave::open (const char *, int flags, mode_t)
       __seterrno ();
       return 0;
     }
+  if (!(input_mutex = get_ttyp()->open_input_mutex (TRUE)))
+    {
+      termios_printf ("open input mutex failed, %E");
+      __seterrno ();
+      return 0;
+    }
+  __small_sprintf (buf, INPUT_AVAILABLE_EVENT, ttynum);
+  if (!(input_available_event = OpenEvent (EVENT_ALL_ACCESS, TRUE, buf)))
+    {
+      termios_printf ("open input event failed, %E");
+      __seterrno ();
+      return 0;
+    }
 
   /* The ioctl events may or may not exist.  See output_done_event,
      above.  */
@@ -599,29 +611,90 @@ fhandler_tty_slave::read (void *ptr, size_t len)
   int totalread = 0;
   int vmin = INT_MAX;
   int vtime = 0;	/* Initialized to prevent -Wuninitialized warning */
+  size_t readlen;
+  DWORD bytes_in_pipe;
   char buf[INP_BUFFER_SIZE];
+  DWORD time_to_wait;
+  DWORD rc;
+  HANDLE w4[2];
 
-  termios_printf("read(%x, %d) handle %d", ptr, len, get_handle ());
+  termios_printf ("read(%x, %d) handle %d", ptr, len, get_handle ());
 
   if (!(get_ttyp ()->ti.c_lflag & ICANON))
     {
-      vmin = get_ttyp ()->ti.c_cc[VMIN];
+      vmin = min (INP_BUFFER_SIZE, get_ttyp ()->ti.c_cc[VMIN]);
       vtime = get_ttyp ()->ti.c_cc[VTIME];
+      if (vmin < 0) vmin = 0;
+      if (vtime < 0) vtime = 0;
+      if (vmin == 0)
+        time_to_wait = INFINITE;
+      else
+        time_to_wait = (vtime == 0 ? INFINITE : 10 * vtime);
     }
+  else
+    time_to_wait = INFINITE;
+
+  w4[0] = signal_arrived;
+  w4[1] = input_available_event;
 
   while (len)
     {
-      size_t readlen = min ((unsigned) vmin, min (len, sizeof (buf)));
-      termios_printf ("reading %d bytes (vtime %d)",
-		      min ((unsigned) vmin, min (len, sizeof (buf))), vtime);
-
-      n = get_readahead_into_buffer (buf, readlen);
-
-      if (!n && ReadFile (get_handle (), buf, readlen, &n, NULL) == FALSE)
+      rc = WaitForMultipleObjects (2, w4, FALSE, time_to_wait);
+      if (rc == WAIT_OBJECT_0)
+        {
+          /* if we've recieved signal after successfully reading some data,
+             just return all data successfully read */
+          if (totalread > 0)
+            break;
+          set_sig_errno (EINTR);
+          return -1;
+        }
+      else if (rc == WAIT_FAILED)
+        {
+          termios_printf ("wait for input event failed, %E");
+          break;
+        }
+      else if (rc == WAIT_TIMEOUT)
+        break;
+      rc = WaitForSingleObject (input_mutex, 1000);
+      if (rc == WAIT_FAILED)
+        {
+          termios_printf ("wait for input mutex failed, %E");
+          break;
+        }
+      else if (rc == WAIT_TIMEOUT)
+        {
+          termios_printf ("failed to acquire input mutex after input event arrived");
+          break;
+        }
+      if (!PeekNamedPipe (get_handle (), NULL, 0, NULL, &bytes_in_pipe, NULL))
 	{
-	  termios_printf ("read failed, %E");
-	  _raise (SIGHUP);
+	  termios_printf ("PeekNamedPipe failed, %E");
+          _raise (SIGHUP);
+          bytes_in_pipe = 0;
 	}
+      readlen = min (bytes_in_pipe, min (len, sizeof (buf)));
+      if ( readlen )
+        {
+          termios_printf ("reading %d bytes (vtime %d)", readlen, vtime);
+          if (ReadFile (get_handle (), buf, readlen, &n, NULL) == FALSE)
+ 	    {
+	      termios_printf ("read failed, %E");
+	      _raise (SIGHUP);
+	    }
+          if (n)
+            {
+              len -= n;
+              totalread += n;
+              memcpy (ptr, buf, n);
+              ptr = (char *) ptr + n;
+            }
+        }
+
+      if (readlen != bytes_in_pipe)
+        SetEvent (input_available_event);
+
+      ReleaseMutex (input_mutex);
 
       if (get_ttyp ()->read_retval < 0)	// read error
 	{
@@ -634,48 +707,28 @@ fhandler_tty_slave::read (void *ptr, size_t len)
 	  termios_printf ("saw EOF");
 	  break;
 	}
-      len -= n;
-      totalread += n;
-      memcpy (ptr, buf, n);
-      ptr = (char *) ptr + n;
-      if (get_ttyp ()->ti.c_lflag & ICANON)
+      if ( get_ttyp ()->ti.c_lflag & ICANON ||
+           get_flags () & (O_NONBLOCK | O_NDELAY))
 	break;
-      else if (totalread >= vmin)
-	break;
+      if (totalread >= vmin && (vmin > 0 || totalread > 0))
+        break;
 
-      if (!PeekNamedPipe (get_handle (), NULL, 0, NULL, &n, NULL))
-	{
-	  termios_printf("PeekNamedPipe failed, %E");
-	  break;
-	}
-      if (n == 0)
-	{
-	  if (get_flags () & (O_NONBLOCK | O_NDELAY))
-	    break;
+      /* vmin == 0 && vtime == 0: 
+       *   we've already read all input, if any, so return immediately
+       * vmin == 0 && vtime > 0:
+       *   we've waited for input 10*vtime ms in WFSO(input_available_event),
+       *   no matter whether any input arrived, we shouldn't wait any longer,
+       *   so return immediately 
+       * vmin > 0 && vtime == 0:
+       *   here, totalread < vmin, so continue waiting until more data
+       *   arrive
+       * vmin > 0 && vtime > 0:
+       *   similar to the previous here, totalread < vmin, and timer
+       *   hadn't expired -- WFSO(input_available_event) != WAIT_TIMEOUT,
+       *   so "restart timer" and wait until more data arrive
+       */
 
-	  /* We can't enter the blocking Readfile as signals will be lost.
-	   * So, poll the pipe for data.
-	   * FIXME: try to avoid polling...
-	   * FIXME: Current EINTR scheme does not take vmin/vtime into account.
-	   */
-	  if (!(get_ttyp ()->ti.c_lflag & ICANON))
-	    {
-	      termios_printf("vmin %d vtime %d", vmin, vtime);
-	      if (vmin == 0 && vtime == 0)
-		return 0;		// min = 0, time = 0
-	      if (vtime == 0)
-		continue;		// min > 0, time = 0
-	      while (vtime--)
-		{
-		  PeekNamedPipe (get_handle (), NULL, 0, NULL, &n, NULL);
-		  if (n)
-		    break;
-		  Sleep(10);
-		}
-	      if (vtime == 0)
-		return totalread;
-	    }
-	}
+      if (vmin == 0) break;
     }
   termios_printf ("%d=read(%x, %d)", totalread, ptr, len);
   return totalread;
@@ -721,18 +774,32 @@ fhandler_tty_common::dup (fhandler_base *child)
       errind = 3;
       goto err;
     }
+  if (!DuplicateHandle (hMainProc, input_available_event, hMainProc,
+			&fts->input_available_event, 0, 1,
+			DUPLICATE_SAME_ACCESS))
+    {
+      errind = 4;
+      goto err;
+    }
   if (!DuplicateHandle (hMainProc, output_mutex, hMainProc,
 			&fts->output_mutex, 0, 1,
 			DUPLICATE_SAME_ACCESS))
     {
-      errind = 4;
+      errind = 5;
+      goto err;
+    }
+  if (!DuplicateHandle (hMainProc, input_mutex, hMainProc,
+			&fts->input_mutex, 0, 1,
+			DUPLICATE_SAME_ACCESS))
+    {
+      errind = 6;
       goto err;
     }
   if (!DuplicateHandle (hMainProc, get_handle (), hMainProc,
 			&nh, 0, 1,
 			DUPLICATE_SAME_ACCESS))
     {
-      errind = 5;
+      errind = 7;
       goto err;
     }
   fts->set_io_handle (nh);
@@ -741,7 +808,7 @@ fhandler_tty_common::dup (fhandler_base *child)
 			&nh, 0, 1,
 			DUPLICATE_SAME_ACCESS))
     {
-      errind = 6;
+      errind = 8;
       goto err;
     }
   fts->set_output_handle (nh);
@@ -752,7 +819,7 @@ fhandler_tty_common::dup (fhandler_base *child)
 			     &fts->inuse, 0, 1,
 			     DUPLICATE_SAME_ACCESS))
     {
-      errind = 7;
+      errind = 9;
       goto err;
     }
   return 0;
@@ -888,6 +955,10 @@ fhandler_tty_common::close ()
     termios_printf ("CloseHandle (inuse), %E");
   if (!ForceCloseHandle (output_mutex))
     termios_printf ("CloseHandle (output_mutex<%p>), %E", output_mutex);
+  if (!ForceCloseHandle (input_mutex))
+    termios_printf ("CloseHandle (input_mutex<%p>), %E", input_mutex);
+  if (!ForceCloseHandle (input_available_event))
+    termios_printf ("CloseHandle (input_available_event<%p>), %E", input_available_event);
   if (!ForceCloseHandle1 (get_handle (), from_pty))
     termios_printf ("CloseHandle (get_handle ()<%p>), %E", get_handle ());
   if (!ForceCloseHandle1 (get_output_handle (), to_pty))
@@ -1009,6 +1080,8 @@ fhandler_tty_common::set_close_on_exec (int val)
   if (inuse)
     set_inheritance (inuse, val);
   set_inheritance (output_mutex, val, "output_mutex");
+  set_inheritance (input_mutex, val, "input_mutex");
+  set_inheritance (input_available_event, val);
   set_inheritance (output_handle, val);
 }
 
@@ -1027,6 +1100,13 @@ fhandler_tty_common::fixup_after_fork (HANDLE parent)
       fork_fixup (parent, output_mutex, "output_mutex");
       ProtectHandle (output_mutex);
     }
+  if (input_mutex)
+    {
+      fork_fixup (parent, input_mutex, "input_mutex");
+      ProtectHandle (input_mutex);
+    }
+  if (input_available_event)
+    fork_fixup (parent, input_available_event, "input_available_event");
   fork_fixup (parent, output_handle, "output_handle");
   fork_fixup (parent, inuse, "inuse");
 }

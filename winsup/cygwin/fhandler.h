@@ -707,7 +707,8 @@ public:
 				// Ioctl() request in tty::cmd/arg.
   HANDLE ioctl_done_event;	// Raised by master on ioctl() completion.
 				// Ioctl() status in tty::ioctl_retval.
-  HANDLE output_mutex;
+  HANDLE output_mutex, input_mutex;
+  HANDLE input_available_event;
   HANDLE inuse;			// used to indicate that a tty is in use
 
 

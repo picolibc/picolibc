@@ -408,6 +408,9 @@ tty::common_init (fhandler_pty_master *ptym)
 	return FALSE;
     }
 
+  if (!(ptym->input_available_event = get_event (INPUT_AVAILABLE_EVENT, FALSE)))
+    return FALSE;
+
   char buf[40];
   __small_sprintf (buf, OUTPUT_MUTEX, ntty);
   if (!(ptym->output_mutex = CreateMutex (&sec_all, FALSE, buf)))
@@ -417,7 +420,16 @@ tty::common_init (fhandler_pty_master *ptym)
       return FALSE;
     }
 
+  __small_sprintf (buf, INPUT_MUTEX, ntty);
+  if (!(ptym->input_mutex = CreateMutex (&sec_all, FALSE, buf)))
+    {
+      termios_printf ("can't create %s", buf);
+      set_errno (ENOENT);
+      return FALSE;
+    }
+
   ProtectHandle1 (ptym->output_mutex, output_mutex);
+  ProtectHandle1 (ptym->input_mutex, input_mutex);
   winsize.ws_col = 80;
   winsize.ws_row = 25;
 
