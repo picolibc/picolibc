@@ -145,6 +145,22 @@ additional Cygwin applications that are not part of the core net
 release.  (That is, anything not found in an ftp mirror of @code{latest}
 and installed by @code{setup.exe}.)
 
+@subsection How do I convert between Windows and UNIX paths?
+
+Use the 'cygpath' utility.  Type '@code{cygpath}' with no arguments to
+get usage information.  For example (on my installation):
+@example
+	bash$ cygpath --windows ~/.bashrc
+        D:\starksb\.bashrc
+        bash$ cygpath --unix C:/cygwin/bin/cygwin.bat
+        /usr/bin/cygwin.bat
+        bash$ cygpath --unix C:\\cygwin\\bin\\cygwin.bat
+        /usr/bin/cygwin.bat
+@end example
+Note that bash interprets the backslash '\' as an escape character, so
+you must type it twice in the bash shell if you want it to be recognised
+as such.
+
 @subsection How do I set /etc up?
 
 @strong{(Please note: This section has not yet been updated for the latest
@@ -180,13 +196,10 @@ used by Cygwin tools.
 In particular, bash interprets space as a word separator.  You would have
 to quote a filename containing spaces, or escape the space character.
 For example:
-
 @example
 	bash-2.03$ cd '/cygdrive/c/Program Files'
 @end example
-
 or
-
 @example
 	bash-2.03$ cd /cygdrive/c/Program\ Files
 @end example
@@ -269,21 +282,17 @@ In some applications (notably bash), you can use the familiar windows
 backward-slashes ('\').  (But see the warning below!)  This maps in the
 obvious way to the Windows path, but will be converted internally to use
 the Cygwin path, following mounts (default or explicit).  For example:
-
 @example
 	bash-2.03$ cd C:/Windows
 	bash-2.03$ pwd
         /cygdrive/c/Windows
 @end example
-
 and
-
 @example
 	bash-2.03$ cd C:/cygwin
 	bash-2.03$ pwd
         /
 @end example
-
 for a default setup.  (You could also use backward-slashes in the
 Windows path, but these would have to be escaped from the shell.)
 
@@ -296,13 +305,11 @@ get there.
 
 You can avoid the ambiguity of Windows paths, and avoid typing
 "/cygdrive", by explicitly mounting drives to posix paths.  For example:
-
 @example
 	bash$ mkdir /c
 	bash$ mount c:/ /c
 	bash$ ls /c
 @end example
-
 Note that you only need to mount drives once.  The mapping is kept
 in the registry so mounts stay valid pretty much indefinitely.
 You can only get rid of them with umount (or the registry editor).
@@ -469,7 +476,6 @@ read those info files.  This is how you do it:
 	bash$ cd /usr/info
 	bash$ for f in *.info ; do install-info $f dir ; done
 @end example
-
 This may generate warnings:
 @example
 	install-info: warning: no info dir entry in `gzip.info'
@@ -838,6 +844,14 @@ Did you explicitly call tzset() before checking the value of _timezone?
 If not, you must do so.
 
 @section Programming Questions
+
+@subsection Why are compiled executables so huge?!?
+
+By default, gcc compiles in all symbols.  You'll also find that gcc
+creates large executables on UNIX.
+
+If that bothers you, just use the 'strip' program, part of the binutils
+package.
 
 @subsection Why is gcc failing?
 
