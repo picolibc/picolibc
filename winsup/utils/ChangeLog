@@ -1,3 +1,8 @@
+Sat Mar 17 21:46:06 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* kill.cc (forcekill): Use dwProcessId when opening a process, not the
+	Cygwin pid.
+
 Mon Mar  5 18:50:00 2001  Corinna Vinschen <vinschen@redhat.com>
 
         * getfacl.c: Add copyright hint.

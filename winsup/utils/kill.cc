@@ -120,7 +120,7 @@ forcekill (int pid, int sig, int wait)
   external_pinfo *p = (external_pinfo *) cygwin_internal (CW_GETPINFO_FULL, pid);
   if (!p)
     return;
-  HANDLE h = OpenProcess (PROCESS_TERMINATE, FALSE, (DWORD) p->pid);
+  HANDLE h = OpenProcess (PROCESS_TERMINATE, FALSE, (DWORD) p->dwProcessId);
   if (!h)
     return;
   if (!wait || WaitForSingleObject (h, 200) != WAIT_OBJECT_0)
