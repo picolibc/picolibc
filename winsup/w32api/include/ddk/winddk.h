@@ -5328,11 +5328,20 @@ ExInterlockedAddLargeStatistic(
 
 NTOSAPI
 ULONG
-DDKFASTAPI
+DDKAPI
 ExInterlockedAddUlong(
   IN PULONG  Addend,
   IN ULONG  Increment,
   PKSPIN_LOCK  Lock);
+
+NTOSAPI
+ULONG
+DDKFASTAPI
+ExfInterlockedAddUlong(
+  IN PULONG  Addend,
+  IN ULONG  Increment,
+  PKSPIN_LOCK  Lock);
+
 
 NTOSAPI
 LONGLONG
@@ -5351,7 +5360,7 @@ ExInterlockedFlushSList(
 
 NTOSAPI
 PLIST_ENTRY
-DDKFASTAPI
+DDKAPI
 ExInterlockedInsertHeadList(
   IN PLIST_ENTRY  ListHead,
   IN PLIST_ENTRY  ListEntry,
@@ -5360,15 +5369,38 @@ ExInterlockedInsertHeadList(
 NTOSAPI
 PLIST_ENTRY
 DDKFASTAPI
+ExfInterlockedInsertHeadList(
+  IN PLIST_ENTRY  ListHead,
+  IN PLIST_ENTRY  ListEntry,
+  IN PKSPIN_LOCK  Lock);
+
+NTOSAPI
+PLIST_ENTRY
+DDKAPI
 ExInterlockedInsertTailList(
   IN PLIST_ENTRY  ListHead,
   IN PLIST_ENTRY  ListEntry,
   IN PKSPIN_LOCK  Lock);
 
 NTOSAPI
+PLIST_ENTRY
+DDKFASTAPI
+ExfInterlockedInsertTailList(
+  IN PLIST_ENTRY  ListHead,
+  IN PLIST_ENTRY  ListEntry,
+  IN PKSPIN_LOCK  Lock);
+
+NTOSAPI
+PSINGLE_LIST_ENTRY
+DDKAPI
+ExInterlockedPopEntryList(
+  IN PSINGLE_LIST_ENTRY  ListHead,
+  IN PKSPIN_LOCK  Lock);
+
+NTOSAPI
 PSINGLE_LIST_ENTRY
 DDKFASTAPI
-ExInterlockedPopEntryList(
+ExfInterlockedPopEntryList(
   IN PSINGLE_LIST_ENTRY  ListHead,
   IN PKSPIN_LOCK  Lock);
 
@@ -5384,8 +5416,16 @@ ExInterlockedPopEntryList(
 
 NTOSAPI
 PSINGLE_LIST_ENTRY
-DDKFASTAPI
+DDKAPI
 ExInterlockedPushEntryList(
+  IN PSINGLE_LIST_ENTRY  ListHead,
+  IN PSINGLE_LIST_ENTRY  ListEntry,
+  IN PKSPIN_LOCK  Lock);
+
+NTOSAPI
+PSINGLE_LIST_ENTRY
+DDKFASTAPI
+ExfInterlockedPushEntryList(
   IN PSINGLE_LIST_ENTRY  ListHead,
   IN PSINGLE_LIST_ENTRY  ListEntry,
   IN PKSPIN_LOCK  Lock);
@@ -5404,10 +5444,18 @@ ExInterlockedPushEntryList(
 
 NTOSAPI
 PLIST_ENTRY
-DDKFASTAPI
+DDKAPI
 ExInterlockedRemoveHeadList(
   IN PLIST_ENTRY  ListHead,
   IN PKSPIN_LOCK  Lock);
+
+NTOSAPI
+PLIST_ENTRY
+DDKFASTAPI
+ExfInterlockedRemoveHeadList(
+  IN PLIST_ENTRY  ListHead,
+  IN PKSPIN_LOCK  Lock);
+
 
 NTOSAPI
 BOOLEAN

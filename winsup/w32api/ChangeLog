@@ -1,3 +1,29 @@
+2004-10-10  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/ddk/winnt4.h (Exi386InterlockedDecrementLong,
+	Exi386InterlockedExchangeUlong, Exi386InterlockedIncrementLong);
+	Add prototypes.
+	* include/winddk.h (ExInterlockedAddUlong,
+	ExInterlockedInsertHeadList, ExInterlockedInsertTailList,
+	ExInterlockedRemoveHeadList, ExInterlockedPopEntryList,
+	ExInterlockedPushEntryList): Change calling convention to 
+	DDKAPI.
+	(ExfInterlockedAddUlong,ExInterlockedInsertHeadList,
+	ExInterlockedInsertTailList, ExInterlockedRemoveHeadList,
+	ExInterlockedPopEntryList, ExInterlockedPushEntryList): 
+	Add prototypes for DDKFASTAPI versions.
+	Thanks to Vadim Yegor0v <zg at bmg dot lv> for report. 
+	* lib/ntoskrnl.def (ExInterlockedAddUlong,
+	ExInterlockedInsertHeadList, ExInterlockedInsertTailList,
+	ExInterlockedRemoveHeadList, ExInterlockedPopEntryList,
+	ExInterlockedPushEntryList): Remove lead '@' from stubs.
+	(ExfInterlockedAddUlong,ExfInterlockedInsertHeadList,
+	ExfInterlockedInsertTailList, ExfInterlockedRemoveHeadList,
+	ExfInterlockedPopEntryList, ExfInterlockedPushEntryList): 
+	Add fastcall stubs.
+	(Exi386InterlockedDecrementLong, Exi386InterlockedExchangeUlong,
+	Exi386InterlockedIncrementLong); Add stdcall stubs.
+
 2004-09-30  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winbase.h (WINBASEAPI): Define as DECLSPEC_IMPORT only

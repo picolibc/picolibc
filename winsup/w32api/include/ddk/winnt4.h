@@ -567,10 +567,16 @@ RtlLargeIntegerSubtract(
 
 
 /*
-** Architecture specific structures
+** Architecture specific functions
 */
 
 #ifdef _X86_
+
+NTOSAPI
+INTERLOCKED_RESULT
+DDKAPI
+Exi386InterlockedIncrementLong(
+  IN PLONG  Addend);
 
 NTOSAPI
 INTERLOCKED_RESULT
@@ -580,9 +586,22 @@ Exfi386InterlockedIncrementLong(
 
 NTOSAPI
 INTERLOCKED_RESULT
+DDKAPI
+Exi386InterlockedDecrementLong(
+  IN PLONG  Addend);
+
+NTOSAPI
+INTERLOCKED_RESULT
 DDKFASTAPI
 Exfi386InterlockedDecrementLong(
   IN PLONG  Addend);
+
+NTOSAPI
+ULONG
+DDKAPI
+Exi386InterlockedExchangeUlong(
+  IN PULONG  Target,
+  IN ULONG  Value);
 
 NTOSAPI
 ULONG
