@@ -12,6 +12,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include "cygerrno.h"
 #ifdef USE_SERVER
 #include <sys/types.h>
 
@@ -19,7 +20,6 @@ details. */
 #include <stdio.h>
 #include <unistd.h>
 
-#include "cygerrno.h"
 #include "safe_memory.h"
 #include "sigproc.h"
 
@@ -552,50 +552,6 @@ client_shmmgr::new_segment (const int shmid,
 }
 
 /*---------------------------------------------------------------------------*
- * shmat ()
- *---------------------------------------------------------------------------*/
-
-extern "C" void *
-shmat (const int shmid, const void *const shmaddr, const int shmflg)
-{
-  sigframe thisframe (mainthread);
-  return shmmgr.shmat (shmid, shmaddr, shmflg);
-}
-
-/*---------------------------------------------------------------------------*
- * shmctl ()
- *---------------------------------------------------------------------------*/
-
-extern "C" int
-shmctl (const int shmid, const int cmd, struct shmid_ds *const buf)
-{
-  sigframe thisframe (mainthread);
-  return shmmgr.shmctl (shmid, cmd, buf);
-}
-
-/*---------------------------------------------------------------------------*
- * shmdt ()
- *---------------------------------------------------------------------------*/
-
-extern "C" int
-shmdt (const void *const shmaddr)
-{
-  sigframe thisframe (mainthread);
-  return shmmgr.shmdt (shmaddr);
-}
-
-/*---------------------------------------------------------------------------*
- * shmget ()
- *---------------------------------------------------------------------------*/
-
-extern "C" int
-shmget (const key_t key, const size_t size, const int shmflg)
-{
-  sigframe thisframe (mainthread);
-  return shmmgr.shmget (key, size, shmflg);
-}
-
-/*---------------------------------------------------------------------------*
  * fixup_shms_after_fork ()
  *---------------------------------------------------------------------------*/
 
@@ -691,3 +647,67 @@ client_request_shm::client_request_shm (const key_t key,
   msglen (sizeof (_parameters.in));
 }
 #endif /* USE_SERVER */
+
+/*---------------------------------------------------------------------------*
+ * shmat ()
+ *---------------------------------------------------------------------------*/
+
+extern "C" void *
+shmat (const int shmid, const void *const shmaddr, const int shmflg)
+{
+#ifdef USE_SERVER
+  sigframe thisframe (mainthread);
+  return shmmgr.shmat (shmid, shmaddr, shmflg);
+#else
+  set_errno (ENOSYS);
+  return (void *) -1;
+#endif
+}
+
+/*---------------------------------------------------------------------------*
+ * shmctl ()
+ *---------------------------------------------------------------------------*/
+
+extern "C" int
+shmctl (const int shmid, const int cmd, struct shmid_ds *const buf)
+{
+#ifdef USE_SERVER
+  sigframe thisframe (mainthread);
+  return shmmgr.shmctl (shmid, cmd, buf);
+#else
+  set_errno (ENOSYS);
+  return -1;
+#endif
+}
+
+/*---------------------------------------------------------------------------*
+ * shmdt ()
+ *---------------------------------------------------------------------------*/
+
+extern "C" int
+shmdt (const void *const shmaddr)
+{
+#ifdef USE_SERVER
+  sigframe thisframe (mainthread);
+  return shmmgr.shmdt (shmaddr);
+#else
+  set_errno (ENOSYS);
+  return -1;
+#endif
+}
+
+/*---------------------------------------------------------------------------*
+ * shmget ()
+ *---------------------------------------------------------------------------*/
+
+extern "C" int
+shmget (const key_t key, const size_t size, const int shmflg)
+{
+#ifdef USE_SERVER
+  sigframe thisframe (mainthread);
+  return shmmgr.shmget (key, size, shmflg);
+#else
+  set_errno (ENOSYS);
+  return -1;
+#endif
+}

@@ -1,3 +1,25 @@
+2003-10-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in: Add $(LIBSERVER) rule.
+	* cygserver.h: Moved from include/cygwin to here.
+	* cygserver_ipc.h: Moved from ../cygserver to here.
+	* cygserver_shm.h: Ditto.
+	* cygwin.din: Add shmat, shmctl, shmdt and shmget.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Don't warn about handle
+	dup'ing if not build with USE_SERVER.
+	* shm.cc: Include cygerrno.h unconditionally.
+	(shmat): Set errno to ENOSYS and return -1 if not build with
+	USE_SERVER.
+	(shmctl): Ditto.
+	(shmdt): Ditto.
+	(shmget): Ditto.
+	* woutsup.h: Remove.
+	* include/cygwin/cygserver_process.h: Moved to ../cygserver directory.
+	* include/cygwin/cygserver_transport.h: Ditto.
+	* include/cygwin/cygserver_transport_pipes.h: Ditto.
+	* include/cygwin/cygserver_transport_sockets.h: Ditto.
+	* include/cygwin/version.h: Bump API minor number.
+
 2003-10-16  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* syscalls.cc (seteuid32): Always construct a default DACL including

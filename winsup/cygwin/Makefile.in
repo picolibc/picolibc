@@ -365,6 +365,9 @@ $(LIB_NAME): rmsym newsym $(TEST_DLL_NAME) $(LIBCOS)
 $(TEST_LIB_NAME): $(LIB_NAME)
 	perl -p -e 'BEGIN{binmode(STDIN); binmode(STDOUT);}; s/cygwin1/cygwin0/g' < $? > $@
 
+$(LIBSERVER): $(bupdir)/cygserver/Makefile
+	$(MAKE) -C $(bupdir)/cygserver libcygserver.a
+
 dll_ofiles: $(DLL_OFILES)
 
 $(LIBGMON_A): $(GMON_OFILES) $(GMON_START)

@@ -25,7 +25,7 @@ details. */
 #include "pinfo.h"
 #include "cygheap.h"
 #include "shared_info.h"
-#include "cygwin/cygserver.h"
+#include "cygserver.h"
 #include "cygthread.h"
 
 /* Tty master stuff */
@@ -516,8 +516,9 @@ fhandler_tty_slave::open (int flags, mode_t)
       || !cygserver_attach_tty (&from_master_local, &to_master_local))
 #endif
     {
+#ifdef USE_SERVER
       termios_printf ("cannot dup handles via server. using old method.");
-
+#endif
       HANDLE tty_owner = OpenProcess (PROCESS_DUP_HANDLE, FALSE,
 				      get_ttyp ()->master_pid);
       termios_printf ("tty own handle %p",tty_owner);

@@ -21,7 +21,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "pinfo.h"
-#include "cygwin/cygserver.h"
+#include "cygserver.h"
 #include "shared_info.h"
 #include "cygthread.h"
 

@@ -1198,6 +1198,10 @@ sexecp = sexecve_is_bad
 sexecv = sexecve_is_bad
 sexecve = sexecve_is_bad
 sexecvpe = sexecve_is_bad
+shmat
+shmctl
+shmdt
+shmget
 sigaction
 _sigaction = sigaction
 sigaddset
