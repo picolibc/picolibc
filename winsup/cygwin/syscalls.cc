@@ -259,8 +259,7 @@ beg:
     }
 
 out:
-  if (res < 0 && WaitForSingleObject (signal_arrived, 0) == WAIT_OBJECT_0 &&
-      call_signal_handler ())
+  if (res < 0 && get_errno () == EINTR && call_signal_handler ())
     goto beg;
   syscall_printf ("%d = read (%d<%s>, %p, %d), bin %d, errno %d", res, fd, fh->get_name (),
 		  ptr, len, fh->get_r_binary (), get_errno ());

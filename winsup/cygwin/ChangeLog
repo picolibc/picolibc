@@ -1,3 +1,8 @@
+Sun Jan 14 14:07:50 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* syscalls.cc (_read): Use more lightweight method for determining if
+	read has been interrupted by a signal.
+
 Fri Jan 12 00:35:15 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* debug.h: Add regparm attributes to some functions.
