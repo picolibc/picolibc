@@ -1,3 +1,7 @@
+2002-10-14  Alan Modra  <amodra@bigpond.net.au>
+
+	* cgen.h: Test __BFD_H_SEEN__ rather than BFD_VERSION_DATE.
+
 2002-09-30  Gavin Romig-Koch  <gavin@redhat.com>
             Ken Raeburn  <raeburn@cygnus.com>
             Aldy Hernandez  <aldyh@redhat.com>
