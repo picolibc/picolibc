@@ -1,5 +1,11 @@
 2003-11-29  Christopher Faylor  <cgf@redhat.com>
 
+	* pinfo.h: Remove global_sigs declaration.
+	* siginfo.h: Move global_sigs declaration here.
+	* Makefile.in: Remove duplicate compiler flag.
+
+2003-11-29  Christopher Faylor  <cgf@redhat.com>
+
 	* exceptions.cc (_threadinfo::pop): Zero *contents* of popped stack
 	location rather than the actual stack pointer.
 
