@@ -1,3 +1,7 @@
+2002-01-24  Christopher Faylor  <cgf@redhat.com>
+
+	* speclib: Ensure that temporary def file is removed.
+
 2002-01-23  Christopher Faylor  <cgf@redhat.com>
 
 	* speclib: Use rm -f to remove temp file just to quiet any potential
