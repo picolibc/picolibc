@@ -790,6 +790,7 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval, int *optlen)
 	{
 	  int *e = (int *) optval;
 
+	  debug_printf ("WinSock SO_ERROR = %d", *e);
 	  *e = find_winsock_errno (*e);
 	}
 
@@ -2162,7 +2163,7 @@ socketpair (int family, int type, int protocol, int *sb)
 	((fhandler_socket *) sb0)->set_socket_type (type);
 	((fhandler_socket *) sb0)->connect_state (connected);
 	if (family == AF_LOCAL && type == SOCK_STREAM)
-	  ((fhandler_socket *) sb0)->set_socketpair_eids ();
+	  ((fhandler_socket *) sb0)->af_local_set_sockpair_cred ();
 
 	cygheap_fdnew sb1 (sb0, false);
 
@@ -2173,7 +2174,7 @@ socketpair (int family, int type, int protocol, int *sb)
 	    ((fhandler_socket *) sb1)->set_socket_type (type);
 	    ((fhandler_socket *) sb1)->connect_state (connected);
 	    if (family == AF_LOCAL && type == SOCK_STREAM)
-	      ((fhandler_socket *) sb1)->set_socketpair_eids ();
+	      ((fhandler_socket *) sb1)->af_local_set_sockpair_cred ();
 
 	    sb[0] = sb0;
 	    sb[1] = sb1;

@@ -45,16 +45,6 @@ int sscanf (const char *, const char *, ...);
 
 fhandler_dev_random* entropy_source;
 
-static void
-secret_event_name (char *buf, short port, int *secret_ptr)
-{
-  __small_sprintf (buf, "%scygwin.local_socket.secret.%d.%08x-%08x-%08x-%08x",
-		   wincap.has_terminal_services () ? "Global\\" : "",
-		   port,
-		   secret_ptr [0], secret_ptr [1],
-		   secret_ptr [2], secret_ptr [3]);
-}
-
 /* cygwin internal: map sockaddr into internet domain address */
 static int
 get_inet_addr (const struct sockaddr *in, int inlen,
@@ -150,8 +140,22 @@ fhandler_socket::~fhandler_socket ()
     cfree (sun_path);
 }
 
+char *
+fhandler_socket::get_proc_fd_name (char *buf)
+{
+  __small_sprintf (buf, "socket:[%d]", get_socket ());
+  return buf;
+}
+
+int
+fhandler_socket::open (int flags, mode_t mode)
+{
+  set_errno (ENXIO);
+  return 0;
+}
+
 void
-fhandler_socket::set_socketpair_eids (void)
+fhandler_socket::af_local_set_sockpair_cred (void)
 {
   sec_pid = sec_peer_pid = getpid ();
   sec_uid = sec_peer_uid = geteuid32 ();
@@ -159,7 +163,7 @@ fhandler_socket::set_socketpair_eids (void)
 }
 
 void
-fhandler_socket::eid_setblocking (bool &async, bool &nonblocking)
+fhandler_socket::af_local_setblocking (bool &async, bool &nonblocking)
 {
   async = async_io ();
   nonblocking = is_nonblocking ();
@@ -172,7 +176,7 @@ fhandler_socket::eid_setblocking (bool &async, bool &nonblocking)
 }
 
 void
-fhandler_socket::eid_unsetblocking (bool async, bool nonblocking)
+fhandler_socket::af_local_unsetblocking (bool async, bool nonblocking)
 {
   if (nonblocking)
     {
@@ -188,7 +192,55 @@ fhandler_socket::eid_unsetblocking (bool async, bool nonblocking)
 }
 
 bool
-fhandler_socket::eid_recv (void)
+fhandler_socket::af_local_recv_secret (void)
+{
+  int out[4] = { 0, 0, 0, 0 };
+  int rest = sizeof out;
+  char *ptr = (char *) out;
+  while (rest > 0)
+    {
+      int ret = recvfrom (ptr, rest, 0, NULL, NULL);
+      if (ret <= 0)
+	break;
+      rest -= ret;
+      ptr += ret;
+    }
+  if (rest == 0)
+    {
+      debug_printf ("Received af_local secret: %08x-%08x-%08x-%08x",
+		    out[0], out[1], out[2], out[3]);
+      if (out[0] != connect_secret[0] || out[1] != connect_secret[1]
+          || out[2] != connect_secret[2] || out[3] != connect_secret[3])
+	{
+	  debug_printf ("Receiving af_local secret mismatch");
+	  return false;
+	}
+    }
+  else
+    debug_printf ("Receiving af_local secret failed");
+  return rest == 0;
+}
+
+bool
+fhandler_socket::af_local_send_secret (void)
+{
+  int rest = sizeof connect_secret;
+  char *ptr = (char *) connect_secret;
+  while (rest > 0)
+    {
+      int ret = sendto (ptr, rest, 0, NULL, 0);
+      if (ret <= 0)
+	break;
+      rest -= ret;
+      ptr += ret;
+    }
+  debug_printf ("Sending af_local secret %s", rest == 0 ? "succeeded"
+							: "failed");
+  return rest == 0;
+}
+
+bool
+fhandler_socket::af_local_recv_cred (void)
 {
   struct ucred out = { (pid_t) 0, (__uid32_t) -1, (__gid32_t) -1 };
   int rest = sizeof out;
@@ -215,7 +267,7 @@ fhandler_socket::eid_recv (void)
 }
 
 bool
-fhandler_socket::eid_send (void)
+fhandler_socket::af_local_send_cred (void)
 {
   struct ucred in = { sec_pid, sec_uid, sec_gid };
   int rest = sizeof in;
@@ -235,42 +287,75 @@ fhandler_socket::eid_send (void)
   return rest == 0;
 }
 
-void
-fhandler_socket::eid_connect (void)
+int
+fhandler_socket::af_local_connect (void)
 {
-  debug_printf ("eid_connect called");
-  bool orig_async_io, orig_is_nonblocking;
-  eid_setblocking (orig_async_io, orig_is_nonblocking);
-  eid_send () && eid_recv ();
-  eid_unsetblocking (orig_async_io, orig_is_nonblocking);
-}
+  /* This keeps the test out of select. */
+  if (get_addr_family () != AF_LOCAL || get_socket_type () != SOCK_STREAM)
+    return 0;
 
-void
-fhandler_socket::eid_accept (void)
-{
-  debug_printf ("eid_accept called");
+  debug_printf ("af_local_connect called");
   bool orig_async_io, orig_is_nonblocking;
-  eid_setblocking (orig_async_io, orig_is_nonblocking);
-  eid_recv () && eid_send ();
-  eid_unsetblocking (orig_async_io, orig_is_nonblocking);
-}
-
-char *
-fhandler_socket::get_proc_fd_name (char *buf)
-{
-  __small_sprintf (buf, "socket:[%d]", get_socket ());
-  return buf;
+  af_local_setblocking (orig_async_io, orig_is_nonblocking);
+  if (!af_local_send_secret () || !af_local_recv_secret ()
+      || !af_local_send_cred () || !af_local_recv_cred ())
+    {
+      debug_printf ("accept from unauthorized server");
+      ::shutdown (get_socket (), SD_BOTH);
+      WSASetLastError (WSAECONNREFUSED);
+      return -1;
+    }
+  af_local_unsetblocking (orig_async_io, orig_is_nonblocking);
+  return 0;
 }
 
 int
-fhandler_socket::open (int flags, mode_t mode)
+fhandler_socket::af_local_accept (void)
 {
-  set_errno (ENXIO);
+  debug_printf ("af_local_accept called");
+  bool orig_async_io, orig_is_nonblocking;
+  af_local_setblocking (orig_async_io, orig_is_nonblocking);
+  if (!af_local_recv_secret () || !af_local_send_secret ()
+      || !af_local_recv_cred () || !af_local_send_cred ())
+    {
+      debug_printf ("connect from unauthorized client");
+      ::shutdown (get_socket (), SD_BOTH);
+      ::closesocket (get_socket ());
+      WSASetLastError (WSAECONNABORTED);
+      return -1;
+    }
+  af_local_unsetblocking (orig_async_io, orig_is_nonblocking);
   return 0;
 }
 
 void
-fhandler_socket::set_connect_secret ()
+fhandler_socket::af_local_set_cred (void)
+{
+  sec_pid = getpid ();
+  sec_uid = geteuid32 ();
+  sec_gid = getegid32 ();
+  sec_peer_pid = (pid_t) 0;
+  sec_peer_uid = (__uid32_t) -1;
+  sec_peer_gid = (__gid32_t) -1;
+}
+
+void
+fhandler_socket::af_local_copy (fhandler_socket *sock)
+{
+  sock->connect_secret[0] = connect_secret[0];
+  sock->connect_secret[1] = connect_secret[1];
+  sock->connect_secret[2] = connect_secret[2];
+  sock->connect_secret[3] = connect_secret[3];
+  sock->sec_pid = sec_pid;
+  sock->sec_uid = sec_uid;
+  sock->sec_gid = sec_gid;
+  sock->sec_peer_pid = sec_peer_pid;
+  sock->sec_peer_uid = sec_peer_uid;
+  sock->sec_peer_gid = sec_peer_gid;
+}
+
+void
+fhandler_socket::af_local_set_secret (char *buf)
 {
   if (!entropy_source)
     {
@@ -291,158 +376,9 @@ fhandler_socket::set_connect_secret ()
       if (len != sizeof (connect_secret))
 	bzero ((char*) connect_secret, sizeof (connect_secret));
     }
-}
-
-void
-fhandler_socket::get_connect_secret (char* buf)
-{
   __small_sprintf (buf, "%08x-%08x-%08x-%08x",
 		   connect_secret [0], connect_secret [1],
 		   connect_secret [2], connect_secret [3]);
-}
-
-HANDLE
-fhandler_socket::create_secret_event ()
-{
-  struct sockaddr_in sin;
-  int sin_len = sizeof (sin);
-
-  if (secret_event)
-    return secret_event;
-
-  if (::getsockname (get_socket (), (struct sockaddr*) &sin, &sin_len))
-    {
-      debug_printf ("error getting local socket name (%d)", WSAGetLastError ());
-      return NULL;
-    }
-
-  char event_name[CYG_MAX_PATH];
-  secret_event_name (event_name, sin.sin_port, connect_secret);
-  secret_event = CreateEvent (&sec_all, FALSE, FALSE, event_name);
-
-  if (!secret_event)
-    debug_printf("create event %E");
-  else if (close_on_exec ())
-    /* Event allows inheritance, but handle will not be inherited */
-    set_no_inheritance (secret_event, 1);
-
-  return secret_event;
-}
-
-void
-fhandler_socket::signal_secret_event ()
-{
-  if (!secret_event)
-    debug_printf ("no secret event?");
-  else
-    {
-      SetEvent (secret_event);
-      debug_printf ("signaled secret_event");
-    }
-}
-
-void
-fhandler_socket::close_secret_event ()
-{
-  if (secret_event)
-    CloseHandle (secret_event);
-  secret_event = NULL;
-}
-
-int
-fhandler_socket::check_peer_secret_event (struct sockaddr_in *peer)
-{
-
-  char event_name[CYG_MAX_PATH];
-
-  secret_event_name (event_name, peer->sin_port, connect_secret);
-  HANDLE ev = CreateEvent (&sec_all_nih, FALSE, FALSE, event_name);
-  if (!ev)
-    debug_printf("create event %E");
-
-  signal_secret_event ();
-
-  if (ev)
-    {
-      DWORD rc = WaitForSingleObject (ev, 10000);
-      debug_printf ("WFSO rc=%d", rc);
-      CloseHandle (ev);
-      return (rc == WAIT_OBJECT_0 ? 1 : 0);
-    }
-  else
-    return 0;
-}
-
-int
-fhandler_socket::sec_event_connect (struct sockaddr_in *peer)
-{
-  bool secret_check_failed = false;
-  struct sockaddr_in sin;
-  int siz = sizeof sin;
-
-  debug_printf ("sec_event_connect called");
-  if (!peer)
-    {
-      if (::getpeername (get_socket (), (struct sockaddr *) &sin, &siz))
-        goto err;
-      peer = &sin;
-    }
-  if (!create_secret_event ())
-    secret_check_failed = true;
-  if (!secret_check_failed && !check_peer_secret_event (peer))
-    {
-      debug_printf ("accept from unauthorized server");
-      secret_check_failed = true;
-    }
-  if (!secret_check_failed)
-    return 0;
-
-err:
-  close_secret_event ();
-  closesocket (get_socket ());
-  WSASetLastError (WSAECONNREFUSED);
-  set_winsock_errno ();
-  return -1;
-}
-
-/* Called from select().  It combines the secret event handshake and
-   the eid credential transaction into one call.  This keeps implementation
-   details from select. */
-int
-fhandler_socket::af_local_connect (void)
-{
-  if (get_addr_family () != AF_LOCAL || get_socket_type () != SOCK_STREAM)
-    return 0;
-  int ret = sec_event_connect (NULL);
-  if (!ret)
-    eid_connect ();
-  return ret;
-}
-
-int
-fhandler_socket::sec_event_accept (int sock, struct sockaddr_in *peer)
-{
-  bool secret_check_failed = false;
-
-  debug_printf ("sec_event_accept called");
-
-  if (!create_secret_event ())
-    secret_check_failed = true;
-
-  if (!secret_check_failed
-      && !check_peer_secret_event (peer))
-    {
-      debug_printf ("connect from unauthorized client");
-      secret_check_failed = true;
-    }
-  if (secret_check_failed)
-    {
-      close_secret_event ();
-      closesocket (sock);
-      set_errno (ECONNABORTED);
-      return -1;
-    }
-  return sock;
 }
 
 void
@@ -493,9 +429,6 @@ fhandler_socket::fixup_after_fork (HANDLE parent)
       debug_printf ("WSASocket went fine new_sock %p, old_sock %p", new_sock, get_io_handle ());
       set_io_handle ((HANDLE) new_sock);
     }
-
-  if (secret_event)
-    fork_fixup (parent, secret_event, "secret_event");
 }
 
 void
@@ -722,11 +655,9 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
 	    __seterrno ();
 	}
 
-      set_connect_secret ();
-
       char buf[sizeof (SOCKET_COOKIE) + 80];
       __small_sprintf (buf, "%s%u ", SOCKET_COOKIE, sin.sin_port);
-      get_connect_secret (strchr (buf, '\0'));
+      af_local_set_secret (strchr (buf, '\0'));
       DWORD blen = strlen (buf) + 1;
       if (!WriteFile (fh, buf, blen, &blen, 0))
 	{
@@ -789,23 +720,13 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 
   if (get_addr_family () == AF_LOCAL && get_socket_type () == SOCK_STREAM)
     {
-      /* Prepare eid credential transaction. */
-      sec_pid = getpid ();
-      sec_uid = geteuid32 ();
-      sec_gid = getegid32 ();
-      sec_peer_pid = (pid_t) 0;
-      sec_peer_uid = (__uid32_t) -1;
-      sec_peer_gid = (__gid32_t) -1;
-
-      if (!res)
-	res = sec_event_connect (&sin);
-
-      if (!res)
-        {
-	  /* eid credential transaction.  If connect is in progress,
-	    we're deferring the eid transaction to the successful select,
-	    see select.cc, function set_bits(). */
-	  eid_connect ();
+      af_local_set_cred (); /* Don't move into af_local_connect since
+			       af_local_connect is called from select,
+			       possibly running under another identity. */
+      if (!res && af_local_connect ())
+	{
+	  set_winsock_errno ();
+	  return -1;
 	}
     }
 
@@ -826,15 +747,7 @@ fhandler_socket::listen (int backlog)
   else
     {
       if (get_addr_family () == AF_LOCAL && get_socket_type () == SOCK_STREAM)
-        {
-	  /* Prepare eid credential transaction. */
-	  sec_pid = getpid ();
-	  sec_uid = geteuid32 ();
-	  sec_gid = getegid32 ();
-	  sec_peer_pid = (pid_t) 0;
-	  sec_peer_uid = (__uid32_t) -1;
-	  sec_peer_gid = (__gid32_t) -1;
-	}
+	af_local_set_cred ();
       connect_state (connected);
     }
   return res;
@@ -865,11 +778,7 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 
   res = ::accept (get_socket (), peer, len);
 
-  if ((SOCKET) res != INVALID_SOCKET && get_addr_family () == AF_LOCAL
-      && get_socket_type () == SOCK_STREAM)
-    res = sec_event_accept (res, (struct sockaddr_in *) peer);
-
-  if ((SOCKET) res == INVALID_SOCKET)
+  if (res == (int) INVALID_SOCKET)
     set_winsock_errno ();
   else
     {
@@ -889,13 +798,14 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 		  /* Don't forget to copy credentials from accepting
 		     socket to accepted socket and start transaction
 		     on accepted socket! */
-		  sock->sec_pid = sec_pid;
-		  sock->sec_uid = sec_uid;
-		  sock->sec_gid = sec_gid;
-		  sock->sec_peer_pid = sec_peer_pid;
-		  sock->sec_peer_uid = sec_peer_uid;
-		  sock->sec_peer_gid = sec_peer_gid;
-		  sock->eid_accept ();
+		  af_local_copy (sock);
+		  res = sock->af_local_accept ();
+		  if (res == -1)
+		    {
+		      res_fd.release ();
+		      set_winsock_errno ();
+		      goto out;
+		    }
 	        }
 	    }
 	  sock->connect_state (connected);
@@ -908,6 +818,7 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 	}
     }
 
+out:
   debug_printf ("res %d", res);
   return res;
 }
@@ -1524,8 +1435,6 @@ fhandler_socket::close ()
       WSASetLastError (0);
     }
 
-  close_secret_event ();
-
   debug_printf ("%d = fhandler_socket::close()", res);
   return res;
 }
@@ -1709,8 +1618,6 @@ fhandler_socket::fcntl (int cmd, void *arg)
 void
 fhandler_socket::set_close_on_exec (bool val)
 {
-  if (secret_event)
-    set_no_inheritance (secret_event, val);
   if (!winsock2_active) /* < Winsock 2.0 */
     set_no_inheritance (get_handle (), val);
   close_on_exec (val);

@@ -362,8 +362,7 @@ class fhandler_socket: public fhandler_base
  private:
   int addr_family;
   int type;
-  int connect_secret [4];
-  HANDLE secret_event;
+  int connect_secret[4];
 
   pid_t     sec_pid;
   __uid32_t sec_uid;
@@ -371,14 +370,19 @@ class fhandler_socket: public fhandler_base
   pid_t     sec_peer_pid;
   __uid32_t sec_peer_uid;
   __gid32_t sec_peer_gid;
-  void eid_setblocking (bool &, bool &);
-  void eid_unsetblocking (bool, bool);
-  bool eid_recv (void);
-  bool eid_send (void);
-  void eid_accept (void);
-  void eid_connect (void);
+  void af_local_set_secret (char *);
+  void af_local_setblocking (bool &, bool &);
+  void af_local_unsetblocking (bool, bool);
+  void af_local_set_cred (void);
+  void af_local_copy (fhandler_socket *);
+  bool af_local_recv_secret (void);
+  bool af_local_send_secret (void);
+  bool af_local_recv_cred (void);
+  bool af_local_send_cred (void);
+  int af_local_accept (void);
  public:
-  void set_socketpair_eids (void);
+  int af_local_connect (void);
+  void af_local_set_sockpair_cred (void);
 
  private:
   struct _WSAPROTOCOL_INFOA *prot_info_ptr;
@@ -458,18 +462,6 @@ class fhandler_socket: public fhandler_base
   int get_socket_type () {return type;}
   void set_sun_path (const char *path);
   char *get_sun_path () {return sun_path;}
-
- private:
-  void set_connect_secret ();
-  void get_connect_secret (char*);
-  HANDLE create_secret_event ();
-  int check_peer_secret_event (struct sockaddr_in *peer);
-  void signal_secret_event ();
-  void close_secret_event ();
-  int sec_event_accept (int, struct sockaddr_in *);
-  int sec_event_connect (struct sockaddr_in *peer);
- public:
-  int af_local_connect (void);
 
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));

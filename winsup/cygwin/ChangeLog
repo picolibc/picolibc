@@ -1,3 +1,75 @@
+2005-03-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_socket::secret_event): Remove.
+	(fhandler_socket::af_local_set_secret): New function combining former
+	set_connect_secret and get_connect_secret into one function.
+	(fhandler_socket::af_local_setblocking): Rename from eid_setblocking.
+	(fhandler_socket::af_local_unsetblocking): Rename from
+	eid_unsetblocking.
+	(fhandler_socket::af_local_set_cred): New method.
+	(fhandler_socket::af_local_copy): New method.
+	(fhandler_socket::af_local_recv_secret): New method.
+	(fhandler_socket::af_local_send_secret): New method.
+	(fhandler_socket::af_local_recv_cred): Rename from eid_recv.
+	(fhandler_socket::af_local_send_cred): Rename from eid_send.
+	(fhandler_socket::af_local_accept): New method.
+	(fhandler_socket::af_local_set_sockpair_cred): Rename from
+	set_socketpair_eids.
+	(fhandler_socket::eid_accept): Remove.
+	(fhandler_socket::eid_connect): Remove.
+	(fhandler_socket::set_connect_secret): Remove.
+	(fhandler_socket::get_connect_secret): Remove.
+	(fhandler_socket::create_secret_event): Remove.
+	(fhandler_socket::check_peer_secret_event): Remove.
+	(fhandler_socket::signal_secret_event): Remove.
+	(fhandler_socket::close_secret_event): Remove.
+	(fhandler_socket::sec_event_accept): Remove.
+	(fhandler_socket::sec_event_connect): Remove.
+	* fhandler_socket.cc (secret_event_name): Remove.
+	(fhandler_socket::af_local_set_sockpair_cred): Rename from
+	set_socketpair_eids.
+	(fhandler_socket::af_local_setblocking): Rename from eid_setblocking.
+	(fhandler_socket::af_local_unsetblocking): Rename from
+	eid_unsetblocking.
+	(fhandler_socket::af_local_recv_secret): New function to receive
+	AF_LOCAL connect secret over socket itself.
+	(fhandler_socket::af_local_send_secret): New function to send AF_LOCAL
+	connect secret over socket itself.
+	(fhandler_socket::af_local_recv_cred): Rename from eid_recv.
+	(fhandler_socket::af_local_send_cred): Rename from eid_send.
+	(fhandler_socket::eid_connect): Remove.
+	(fhandler_socket::af_local_connect): Take over connect side handling
+	of AF_LOCAL secret and credential handshake.
+	(fhandler_socket::eid_accept): Remove.
+	(fhandler_socket::af_local_accept): New method, take over accept side
+	handling of AF_LOCAL secret and credential handshake.
+	(fhandler_socket::af_local_set_cred): New method, set eid credentials
+	to start values.
+	(fhandler_socket::af_local_copy): New method, copy secret and
+	credentials to another socket.
+	(fhandler_socket::af_local_set_secret): New function combining former
+	set_connect_secret and get_connect_secret into one function.
+	(fhandler_socket::create_secret_event): Remove.
+	(fhandler_socket::signal_secret_event): Remove.
+	(fhandler_socket::close_secret_event): Remove.
+	(fhandler_socket::check_peer_secret_event): Remove.
+	(fhandler_socket::sec_event_connect): Remove.
+	(fhandler_socket::sec_event_accept): Remove.
+	(fhandler_socket::fixup_after_fork): Drop secret_event handling.
+	(fhandler_socket::bind): Call af_local_set_secret.
+	(fhandler_socket::connect): Call af_local_set_cred and af_local_connect.
+	(fhandler_socket::listen): Call af_local_set_cred.
+	(fhandler_socket::accept): Call af_local_copy and af_local_accept on
+	accepted socket.
+	(fhandler_socket::close): Don't call close_secret_event.
+	(fhandler_socket::set_close_on_exec): Don't set secret_event
+	inheritance.
+	* net.cc (cygwin_getsockopt): Add debug output.
+	(socketpair): Call af_local_set_sockpair_cred instead of
+	set_socketpair_eids.
+	* select.cc (set_bits): Drop AF_LOCAL special handling in case
+	of except bit set.
+
 2005-03-23  Christopher Faylor  <cgf@timesys.com>
 
 	* include/ctype.h: Always define macros when inside cygwin.

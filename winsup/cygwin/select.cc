@@ -352,13 +352,7 @@ set_bits (select_record *me, fd_set *readfds, fd_set *writefds,
 	{
 	  UNIX_FD_SET (me->fd, writefds);
 	  if ((sock = me->fh->is_socket ()))
-	    {
-	      /* Special AF_LOCAL handling. */
-	      if (!me->read_ready && sock->connect_state () == connect_pending
-		  && sock->af_local_connect () && me->read_selected)
-		UNIX_FD_SET (me->fd, readfds);
-	      sock->connect_state (connected);
-	    }
+	    sock->connect_state (connected);
 	}
       if (me->except_selected)
 	UNIX_FD_SET (me->fd, exceptfds);
