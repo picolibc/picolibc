@@ -48,16 +48,6 @@ typedef struct _VM_COUNTERS
   ULONG PeakPagefileUsage;
 } VM_COUNTERS, *PVM_COUNTERS;
 
-typedef struct _IO_COUNTERS
-{
-  LARGE_INTEGER ReadOperationCount;
-  LARGE_INTEGER WriteOperationCount;
-  LARGE_INTEGER OtherOperationCount;
-  LARGE_INTEGER ReadTransferCount;
-  LARGE_INTEGER WriteTransferCount;
-  LARGE_INTEGER OtherTransferCount;
-} IO_COUNTERS, *PIO_COUNTERS;
-
 typedef struct _CLIENT_ID
 {
   HANDLE UniqueProcess;

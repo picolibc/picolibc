@@ -1,3 +1,7 @@
+Thu Nov  2 01:58:03 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* ntdll.h: Remove IO_COUNTERS definition since it is now in winnt.h.
+
 Thu Nov  2 00:10:23 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* pinfo.cc (EnumProcessesNT): New function.  Eliminates dependence on
