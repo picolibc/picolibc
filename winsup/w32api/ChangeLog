@@ -1,4 +1,8 @@
-2003-04-07 Marcel Telka <telka@users.sourceforge.net>
+2003-04-11  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/sspi.h: Add comment for FreeCredentialsHandle.
+
+2003-04-07  Marcel Telka <telka@users.sourceforge.net>
 
 	* include/ddk/winddk.h (KIRQL): Typedef as UCHAR. not ULONG.
 
