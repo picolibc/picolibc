@@ -1,3 +1,8 @@
+2002-10-24  Hans-Peter Nilsson  <hp@bitrange.com>
+
+	* configure.in (i[3456]86-*-linux*): Add check to disable
+	${libgcj} for glibc1.
+
 2002-10-07  Svein E. Seldal  <Svein.Seldal@solidas.com>
 
 	* configure.in: Add tic4x target.
