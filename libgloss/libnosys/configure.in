@@ -137,53 +137,63 @@ case "${target}" in
 
         AC_CACHE_CHECK(for .previous assembler directive,
                          libc_cv_asm_previous_directive, [dnl
+        libc_cv_asm_previous_directive=no
         cat > conftest.s <<EOF
 .section foo_section
 .previous
 EOF
         if AC_TRY_COMMAND(${CC-cc} -c $CFLAGS conftest.s 1>&AC_FD_CC); then
+          libc_cv_asm_previous_directive=yes
           AC_DEFINE(HAVE_ASM_PREVIOUS_DIRECTIVE)
         fi
         rm -f conftest*])
 
         AC_CACHE_CHECK(for .popsection assembler directive,
                          libc_cv_asm_popsection_directive, [dnl
+        libc_cv_asm_popsection_directive=no
         cat > conftest.s <<EOF
 .pushsection foo_section
 .popsection
 EOF
         if AC_TRY_COMMAND(${CC-cc} -c $CFLAGS conftest.s 1>&AC_FD_CC); then
+          libc_cv_asm_popsection_directive=yes
           AC_DEFINE(HAVE_ASM_POPSECTION_DIRECTIVE)
         fi
         rm -f conftest*])
 
         AC_CACHE_CHECK(for section attributes,
                          libc_cv_section_attributes, [dnl
+        libc_cv_section_attributes=no
         cat > conftest.c <<EOF
 int secttest __attribute__ ((section (".gnu.warning.secttest"))) = 10;
 int main() {}
 EOF
         if AC_TRY_COMMAND(${CC-cc} -c $CFLAGS conftest.c 1>&AC_FD_CC); then
+          libc_cv_section_attributes=yes
           AC_DEFINE(HAVE_SECTION_ATTRIBUTES)
         fi
         rm -f conftest*])
         ;;
 esac
 
-AC_CACHE_CHECK(for function prefix, libc_dollar_prefix, [dnl
+AC_CACHE_CHECK(for symbol prefix, libc_symbol_prefix, [dnl
 cat > conftest.c <<\EOF
 foo () { }
 EOF
 dnl
+libc_symbol_prefix=none
 if AC_TRY_COMMAND([${CC-cc} -S conftest.c -o - | fgrep "\$foo" > /dev/null]);
 then
-  libc_dollar_prefix=yes
+  libc_symbol_prefix='$'
 else
-  libc_dollar_prefix=no
+  if AC_TRY_COMMAND([${CC-cc} -S conftest.c -o - | fgrep "_foo" > /dev/null]);
+  then
+    libc_symbol_prefix=_
+  fi
 fi
 rm -f conftest* ])
-if test $libc_dollar_prefix = yes ; then
-  AC_DEFINE(__SYMBOL_PREFIX, "$")
+if test $libc_symbol_prefix != none; then
+  AC_DEFINE_UNQUOTED(__SYMBOL_PREFIX, "$libc_symbol_prefix")
 else
   AC_DEFINE(__SYMBOL_PREFIX, "")
 fi

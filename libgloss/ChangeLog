@@ -1,5 +1,15 @@
 2005-01-18  Hans-Peter Nilsson  <hp@axis.com>
 
+	* libnosys/configure.in (libc_cv_asm_previous_directive): Set
+	cache-id variable.
+	(libc_cv_asm_popsection_directive): Ditto.
+	(libc_cv_section_attributes): Ditto.
+	(libc_symbol_prefix): Rename from libc_dollar_prefix.  Check for
+	"_" as well, and set __SYMBOL_PREFIX accordingly.
+	* libnosys/configure: Regenerate.
+
+2005-01-18  Hans-Peter Nilsson  <hp@axis.com>
+
 	* libnosys/Makefile.in (LD, AS): Correct obsoleted suffix: Say
 	as-new and ld-new, not as.new and ld.new.
 
