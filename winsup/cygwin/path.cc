@@ -3182,7 +3182,7 @@ hash_path_name (unsigned long hash, const char *name)
 	  hash = cygheap->cwd.get_hash ();
 	  if (name[0] == '.' && name[1] == '\0')
 	    return hash;
-	  hash += hash_path_name (hash, "\\");
+	  hash = (hash << 5) - hash + '\\';
 	}
     }
 
@@ -3192,8 +3192,7 @@ hashit:
   do
     {
       int ch = cyg_tolower(*name);
-      hash += ch + (ch << 17);
-      hash ^= hash >> 2;
+      hash = (hash << 5) - hash + ch;
     }
   while (*++name != '\0' &&
 	 !(*name == '\\' && (!name[1] || (name[1] == '.' && !name[2]))));

@@ -1,3 +1,7 @@
+2002-04-30  Eric Blake  <ebb9@email.byu.edu>
+
+	* path.cc (hash_path_name): Improve hash function strength.
+
 2002-05-02  Robert Collins <rbtcollins@hotmail.com>
 
 	* thread.cc (__pthread_cond_dowait): Fix a race on signalling from a
