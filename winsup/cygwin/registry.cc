@@ -211,14 +211,15 @@ get_registry_hive_path (const PSID psid, char *path)
       char buf[256];
       DWORD type, siz;
 
-      key[0] = '\0';
+      path[0] = '\0';
       if (!RegQueryValueExA (hkey, "ProfileImagePath", 0, &type,
-			     (BYTE *)buf, (siz = 256, &siz)))
-	ExpandEnvironmentStringsA (buf, key, 256);
+			     (BYTE *)buf, (siz = sizeof (buf), &siz)))
+	ExpandEnvironmentStringsA (buf, path, CYG_MAX_PATH + 1);
       RegCloseKey (hkey);
-      if (key[0])
-	return strcpy (path, key);
+      if (path[0])
+	return path;
     }
+  debug_printf ("HKLM\\%s not found", key);
   return NULL;
 }
 
@@ -241,7 +242,8 @@ load_registry_hive (PSID psid)
       RegCloseKey (hkey);
       return;
     }
-  enable_restore_privilege ();
+  /* This is only called while deimpersonated */
+  set_process_privilege (SE_RESTORE_NAME);
   if (get_registry_hive_path (psid, path))
     {
       strcat (path, "\\NTUSER.DAT");
