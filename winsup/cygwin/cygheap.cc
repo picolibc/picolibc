@@ -112,7 +112,7 @@ cygheap_fixup_in_child (child_info *ci, bool execed)
       DWORD n = (DWORD) cygheap_max - (DWORD) cygheap;
       /* Reserve cygwin heap in same spot as parent */
       if (!VirtualAlloc (cygheap, CYGHEAPSIZE, MEM_RESERVE, PAGE_NOACCESS))
-	    api_fatal ("Couldn't reserve space for cygwin's heap (%p) in child, cygheap, %E", cygheap);
+	    api_fatal ("Couldn't reserve space for cygwin's heap (%p <%p>) in child, cygheap, %E", cygheap, newaddr);
 
       /* Allocate same amount of memory as parent */
       if (!VirtualAlloc (cygheap, n, MEM_COMMIT, PAGE_READWRITE))
