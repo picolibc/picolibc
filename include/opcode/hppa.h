@@ -107,7 +107,10 @@ Also these:
         31-p
    ~    6 bit shift count at 20,22:26 encoded as 63-~.
    P    5 bit bit position at 26
+   q    6 bit bit position at 20,22:26
    T    5 bit field length at 31 (encoded as 32-T)
+   %	6 bit field length at 23,27:31 (variable extract/deposit)
+   |	6 bit field length at 19,27:31 (fixed extract/deposit)
    A    13 bit immediate at 18 (to support the BREAK instruction)
    ^	like b, but describes a control register
    !    sar (cr11) register
@@ -222,7 +225,7 @@ Condition operands all have '?' as the prefix:
    ?U   64 bit unit conditions
 
 Floating point registers all have 'f' as a prefix:
-  
+
    ft	target register at 31
    fT	target register with L/R halves at 31
    fa	operand 1 register at 10
