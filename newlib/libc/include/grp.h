@@ -63,6 +63,7 @@ struct group {
 extern "C" {
 #endif
 
+#ifndef __INSIDE_CYGWIN__
 struct group	*getgrgid (gid_t);
 struct group	*getgrnam (const char *);
 int		 getgrnam_r (const char *, struct group *,
@@ -80,6 +81,7 @@ int		 setgroupent (int);
 int		 initgroups (const char *, gid_t);
 #endif /* !_XOPEN_SOURCE */
 #endif /* !_POSIX_SOURCE */
+#endif /* !__INSIDE_CYGWIN__ */
 
 #ifdef __cplusplus
 }
