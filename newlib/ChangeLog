@@ -1,3 +1,17 @@
+2001-01-18  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/arc/Makefile.am: New file.
+	* libc/sys/arc/Makefile.in: Ditto.
+	* libc/sys/arc/aclocal.m4: Ditto.
+	* libc/sys/arc/configure: Ditto.
+	* libc/sys/arc/configure.in: Ditto.
+	* libc/sys/arc/crt0.S: Ditto.
+	* libc/sys/arc/isatty.c: Ditto.
+	* libc/sys/arc/mem-layout.c: Ditto.
+	* libc/sys/arc/sbrk.c: Ditto.
+	* libc/sys/arc/syscalls.c: Ditto.
+	* libc/sys/arc/sys/syscall.h: Ditto.
+
 Wed Jan 17 23:20:56 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* libc/include/sys/unistd.h: Use correct declaration for setdtablesize.
