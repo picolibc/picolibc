@@ -81,9 +81,9 @@ AC_DEFUN([CY_WITH_NLS],
 	dnl In the standard gettext, we would now check for catgets.
         dnl However, we never want to use catgets for our releases.
 
-        if test "$CATOBJEXT" = "NONE"; then
-	  dnl Neither gettext nor catgets in included in the C library.
-	  dnl Fall back on GNU gettext library.
+        if test "$CATOBJEXT" = "NONE" && test -d $srcdir/../intl; then
+	  # Neither gettext nor catgets in included in the C library.
+	  # Fall back on GNU gettext library (assuming it is present).
 	  nls_cv_use_gnu_gettext=yes
         fi
       fi
