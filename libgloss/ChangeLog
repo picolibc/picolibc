@@ -1,3 +1,8 @@
+2003-06-23  Kazuhiro Inaoka  <inaoka.kazuhiro@renesas.com>
+
+	* m32r/crt0.S (_start): Allow _stack to be placed anywhere 
+	in memory.
+
 2003-06-06  Stan Cox  <scox@redhat.com>
             Jeff Johnston  <jjohnstn@redhat.com>
             Anthony Green  <green@redhat.com>

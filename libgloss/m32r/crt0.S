@@ -3,7 +3,8 @@
 	.global	_start
 _start:
 
-	ld24	sp, _stack
+	seth	sp, #shigh(_stack)
+	add3	sp, sp, #low(_stack)
 	ldi	fp, #0
 
 # Clear the BSS.  Do it in two parts for efficiency: longwords first
