@@ -1,15 +1,83 @@
-1999-04-11  Richard Henderson  <rth@cygnus.com>
+Sat Jan  1 19:06:52 2000  Hans-Peter Nilsson  <hp@bitrange.com>
 
-	* bfdlink.h (bfd_elf_version_expr): Rename `match' to `pattern'.
-	Add `match' callback function.
+	* symcat.h (STRINGX) [!__STDC__ || ALMOST_STDC]: Change "?" to "s"
+	to stringify argument s.
 
-1999-04-10  Richard Henderson  <rth@cygnus.com>
+1999-12-05  Mark Mitchell  <mark@codesourcery.com>
 
-	* bfdlink.h (bfd_link_info): Add no_undefined.
+	* splay-tree.h (struct splay_tree_node): Rename to ...
+	(struct splay_tree_node_s): ... this.
+	(struct splay_tree): Rename to ...
+	(struct splay_tree_s): ... this.
 
-1999-04-08  Nick Clifton  <nickc@cygnus.com>
+1999-11-30  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
-	* dis-asm.h: Add prototype for print_insn_mcore.
+	* ansidecl.h (ATTRIBUTE_MALLOC): New macro.
+
+	* libiberty.h (buildargv, dupargv, concat, choose_temp_base,
+	make_temp_file, xmalloc, xcalloc, xstrdup, xmemdup): Add
+	ATTRIBUTE_MALLOC.
+	(xatexit): Remove __GNUC__ check, add ATTRIBUTE_NORETURN.
+
+1999-11-28  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+
+	* libiberty.h: Include stdarg.h when ANSI_PROTOTYPES is defined.
+	(asprintf, vasprintf): Provide declarations.
+
+Wed Nov 10 12:43:21 1999  Philippe De Muyter  <phdm@macqel.be>
+                          Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+
+	* ansidecl.h: Define and test `GCC_VERSION', not `HAVE_GCC_VERSION'.
+	
+1999-10-23 08:51 -0700  Zack Weinberg  <zack@bitmover.com>
+
+	* hashtab.h: Give hash_table_t a struct tag.  Add prototypes
+	for clear_hash_table_slot and traverse_hash_table.  Correct
+	prototype of all_hash_table_collisions.
+
+Fri Oct 15 01:47:51 1999  Vladimir Makarov  <vmakarov@loony.cygnus.com>
+
+	* hashtab.h: New file.
+
+1999-10-10  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+
+	* ansidecl.h (HAVE_GCC_VERSION): New macro.  Use it instead of
+	explicitly testing __GNUC__ and __GNUC_MINOR__.
+	
+	(ATTRIBUTE_PRINTF): Use `__format__', not `format'.
+
+1999-09-25  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+
+	* libiberty.h (make_temp_file):  Add a prototype.
+
+Tue Sep 14 00:35:02 1999  Marc Espie <espie@cvs.openbsd.org>
+
+	* libiberty.h (basename):  OpenBSD has a correct prototype.
+	(xrealloc):  Remove outdated comment.
+
+1999-09-07  Jeff Garzik  <jgarzik@pobox.com>
+
+	* libiberty.h (xmemdup): Add prototype for new function.
+
+1999-09-01  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+
+	* obstack.h (obstack_grow, obstack_grow0): Move (char*) casts
+	in calls to `_obstack_memcpy' from here ...
+
+	(_obstack_memcpy): ... to here, except in the __STDC__ case which
+	doesn't need it.
+
+1999-08-30  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+
+	* libiberty.h (getpwd): Prototype.
+
+1999-08-01  Mark Mitchell  <mark@codesourcery.com>
+
+	* splay-tree.h (splay_tree_insert): Return the new node.
+
+1999-07-11  Ian Lance Taylor  <ian@zembu.com>
+
+	* ansidecl.h: Copy attribute support macros from egcs.
 
 1999-04-02  Mark Mitchell  <mark@codesourcery.com>
 
@@ -23,39 +91,12 @@ Wed Mar 24 12:46:29 1999  Andrew Cagney  <cagney@amy.cygnus.com>
 
 	* libiberty.h (basename): Cygwin{,32} should have the prototype.
 
-1999-02-22  Jim Lemke  <jlemke@cygnus.com>
-
-	* bfdlink.h (bfd_link_info): add field "mpc860c0".
-
-Mon Feb  1 21:05:46 1999  Catherine Moore  <clm@cygnus.com>
-
-       * dis-asm.h (print_insn_i386_att):  Declare.
-       (print_insn_i386_intel):  Declare.
-
-998-12-30  Michael Meissner  <meissner@cygnus.com>
-
-	* dis-asm.h (INIT_DISASSEMBLE_INFO_NO_ARCH): Cast STREAM and
-	FPRINTF_FUNC to avoid compiler warnings.
-
-Wed Dec 30 16:07:14 1998  David Taylor  <taylor@texas.cygnus.com>
-
-	* dis-asm.h: change void * to PTR (two places).
-
 Mon Dec 14 09:53:31 1998  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
 	* demangle.h: Don't check IN_GCC anymore.
 	* splay-tree.h: Likewise.
 
 Tue Dec  8 00:30:31 1998  Elena Zannoni  <ezannoni@kwikemart.cygnus.com> 
-
-	The following changes were made by Elena Zannoni
- 	<ezannoni@kwikemart.cygnus.com> and Edith Epstein
- 	<eepstein@sophia.cygnus.com> as part of a project to merge in
- 	changes made by HP; HP did not create ChangeLog entries.
-
-	* dis-asm.h (struct disassemble_info): change the type of stream
-	from FILE* to void*, for use with gdb's new type GDB_FILE.
-	(fprintf_ftype): change FILE* parameter type to void*.
 
         * demangle.h: (DMGL_EDG): new macro for Kuck and Associates
         (DMGL_STYLE_MASK): modify to include Kuck and Assoc style
@@ -69,17 +110,6 @@ Tue Dec  8 00:30:31 1998  Elena Zannoni  <ezannoni@kwikemart.cygnus.com>
         (HP_DEMANGLING_STYLE_STRING): new macro.
         (ARM_DEMANGLING): coerce to int.
         (HP_DEMANGLING): new macro.
-
-	* hp-symtab.h: rewritten, from HP.
-	(quick_procedure): change type of language field to unsigned int
-	(quick_module): change type of language field to unsigned int
-	(struct dntt_type_svar): add field thread_specific.
-	(hp_language): add languages modcal and dmpascal.
-
-Mon Nov 30 15:25:58 1998  J"orn Rennecke <amylaar@cygnus.co.uk>
-
-	* elf/sh.h (elf_sh_reloc_type): Add R_SH_FIRST_INVALID_RELOC,
-	R_SH_LAST_INVALID_RELOC, R_SH_SWITCH8 and R_SH_max.
 
 Fri Nov 20 13:14:00 1998  Andrew Cagney  <cagney@b1.cygnus.com>
 
@@ -96,18 +126,10 @@ Sun Nov  8 17:42:25 1998  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 	* demangle.h: Never define PARAMS().
 	* splay-tree.h: Likewise.
 
-Sat Nov  7 18:30:20 1998  Peter Schauer  <peter.schauer@regent.e-technik.tu-muenchen.de>
-
-	* dis-asm.h (print_insn_vax): Declare.
-
 Sat Nov  7 16:04:03 1998  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
 	* demangle.h: Don't include gansidecl.h.
 	* splay-tree.h: Likewise.
-
-1998-10-26 16:03  Ulrich Drepper  <drepper@cygnus.com>
-
-	* bfdlink.h (struct bfd_link_info): Add new field optimize.
 
 Thu Oct 22 19:58:00 1998  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
@@ -134,10 +156,6 @@ Sat Sep  5 12:16:33 1998  Jeffrey A Law  (law@cygnus.com)
 Mon Jun  1 13:48:32 1998  Jason Molenda  (crash@bugshack.cygnus.com)
 
 	* obstack.h: Update to latest FSF version.
-
-Tue May 26 20:57:43 1998  Stan Cox  <scox@equinox.cygnus.com>
-
-	* elf/sparc.h (EF_SPARC_LEDATA, R_SPARC_32LE): Added.
 
 Tue Feb 24 13:05:02 1998  Doug Evans  <devans@canuck.cygnus.com>
 
@@ -410,10 +428,6 @@ Thu Feb  6 14:20:01 1997  Martin M. Hunt  <hunt@pizza.cygnus.com>
 	* dis-asm.h: (disassemble_info):  Add new fields
 	bytes_per_chunk and display_endian to control the
 	display of raw instructions.
-
-Fri Dec 27 22:17:37 1996  Fred Fish  <fnf@cygnus.com>
-
-	* dis-asm.h (print_insn_tic80): Declare.
 
 Sun Dec  8 17:11:12 1996  Doug Evans  <dje@canuck.cygnus.com>
 
