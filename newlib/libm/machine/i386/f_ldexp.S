@@ -8,6 +8,8 @@
  * ====================================================
  */
 
+#if !defined(_SOFT_FLOAT)
+
 /*
 Fast version of ldexp using Intel float instructions.
 
@@ -32,3 +34,5 @@ SYM (_f_ldexp):
 
 	leave
 	ret
+
+#endif

@@ -8,6 +8,8 @@
  * ==================================================== 
  */             
 
+#if !defined(_SOFT_FLOAT)
+
 /*
 Fast version of tan using Intel float instructions.
 
@@ -31,3 +33,5 @@ SYM (_f_tan):
 
 	leave
 	ret
+
+#endif

@@ -8,6 +8,8 @@
  * ==================================================== 
  */
 
+#if !defined(_SOFT_FLOAT)
+
 /*
 Fast version of logf using Intel float instructions.
 
@@ -34,3 +36,5 @@ SYM (_f_log10f):
 
 	leave
 	ret
+
+#endif

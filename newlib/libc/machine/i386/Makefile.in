@@ -91,10 +91,7 @@ INCLUDES = -I $(newlib_basedir)/libm/common $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(T
 
 LIB_SOURCES = \
 	memchr.S memcmp.S memcpy.S memset.S strchr.S \
-	memmove.S strlen.S f_atan2.S f_atan2f.S f_exp.c f_expf.c \
-	f_frexp.S f_frexpf.S f_log.S f_logf.S f_log10.S f_log10f.S \
-	f_ldexp.S f_ldexpf.S f_pow.c f_powf.c f_tan.S f_tanf.S \
-	$(mach_add_src)
+	memmove.S strlen.S $(mach_add_src) i386mach.h
 
 
 libi386_la_LDFLAGS = -Xcompiler -nostdlib
@@ -119,18 +116,12 @@ CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 lib_a_LIBADD = 
 @USE_LIBTOOL_FALSE@lib_a_OBJECTS =  memchr.o memcmp.o memcpy.o memset.o \
-@USE_LIBTOOL_FALSE@strchr.o memmove.o strlen.o f_atan2.o f_atan2f.o \
-@USE_LIBTOOL_FALSE@f_exp.o f_expf.o f_frexp.o f_frexpf.o f_log.o \
-@USE_LIBTOOL_FALSE@f_logf.o f_log10.o f_log10f.o f_ldexp.o f_ldexpf.o \
-@USE_LIBTOOL_FALSE@f_pow.o f_powf.o f_tan.o f_tanf.o
+@USE_LIBTOOL_FALSE@strchr.o memmove.o strlen.o
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 libi386_la_LIBADD = 
 @USE_LIBTOOL_TRUE@libi386_la_OBJECTS =  memchr.lo memcmp.lo memcpy.lo \
-@USE_LIBTOOL_TRUE@memset.lo strchr.lo memmove.lo strlen.lo f_atan2.lo \
-@USE_LIBTOOL_TRUE@f_atan2f.lo f_exp.lo f_expf.lo f_frexp.lo f_frexpf.lo \
-@USE_LIBTOOL_TRUE@f_log.lo f_logf.lo f_log10.lo f_log10f.lo f_ldexp.lo \
-@USE_LIBTOOL_TRUE@f_ldexpf.lo f_pow.lo f_powf.lo f_tan.lo f_tanf.lo
+@USE_LIBTOOL_TRUE@memset.lo strchr.lo memmove.lo strlen.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

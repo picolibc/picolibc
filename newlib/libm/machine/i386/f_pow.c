@@ -8,6 +8,8 @@
  * ====================================================
  */
 
+#if !defined(_SOFT_FLOAT)
+
 /*
 Fast version of pow using Intel float instructions.
 
@@ -42,3 +44,4 @@ double _f_pow (double x, double y)
     return pow (x,y);
 }
 
+#endif

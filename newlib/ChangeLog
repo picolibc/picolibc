@@ -3,6 +3,19 @@
 	* Makefile.am (DOCDIR): Force to empty string when doc
 	directory is not present.
 
+2001-12-18  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* libc/machine/i386/f_*: Move to libm/machine/i386.
+
+2001-12-18      Joel Sherrill <joel@OARcorp.com>
+
+	* libm/machine/Makefile.am: Add dummy doc stub so
+	"make info" works.
+
+2001-12-17	Joel Sherrill <joel@OARcorp.com>
+
+	* libc/include/sys/types.h (ino_t): RTEMS uses long also.
+
 2001-12-17  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* libc/stdlib/Makefile.am (LIB_COMPILE): Change to equal

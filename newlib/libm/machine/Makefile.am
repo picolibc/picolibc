@@ -13,3 +13,5 @@ endif # USE_LIBTOOL
 
 ACLOCAL_AMFLAGS = -I ../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
+
+doc:  

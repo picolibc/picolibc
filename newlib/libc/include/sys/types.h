@@ -87,7 +87,7 @@ struct itimerspec {
 typedef	long	daddr_t;
 typedef	char *	caddr_t;
 
-#ifdef __MS_types__
+#if defined(__MS_types__) || defined(__rtems__)
 typedef	unsigned long	ino_t;
 #else
 #ifdef __sparc__
@@ -218,7 +218,7 @@ typedef _TIMER_T_ timer_t;
 #define __timer_t_defined
 #endif
 
-#ifdef __CYGWIN__
+#if defined(__CYGWIN__) || defined(__rtems__)
 typedef long useconds_t;
 #endif
 

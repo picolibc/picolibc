@@ -1,6 +1,7 @@
 *** Major changes in newlib version 1.10.0:
 
 * libtool support for i[3456]86-pc-linux native builds
+* addition of libm/machine/i386 directory, for i386 fast math routines
 
 *** Major changes in newlib version 1.9.0:
 
