@@ -1,4 +1,3 @@
-
 	
     .file   "crt0.S"
 	
@@ -12,30 +11,44 @@
 #endif
 
     .text
-     /*
-      * Setup the assembly entry point.
-      */
+     /* Setup the assembly entry point.  */
     .code 32
     .globl SYM_NAME(start)
     .globl SYM_NAME(_start)
 SYM_NAME(start):
 SYM_NAME(_start):
-	mov	fp, #0	/* Null frame pointer */
-	mov	r7, #0	/* Null frame pointer for Thumb */
+	mov	fp, #0	/* Null frame pointer.  */
+	mov	r7, #0	/* Null frame pointer for Thumb.  */
 
-	/* enable interrupts for gdb debugging */
+	/* Enable interrupts for gdb debugging.  */
 	mrs    r0, cpsr
 	bic    r0, r0, #0xC0
 	msr    cpsr, r0
 	
-	mov 	a2, #0			/* Second arg: fill value */
-	ldr	a1, .LC1		/* First arg: start of memory block */
+	mov 	a2, #0			/* Second arg: fill value.  */
+	ldr	a1, .LC1		/* First arg: start of memory block.  */
 	ldr	a3, .LC2	
-	sub	a3, a3, a1		/* Third arg: length of block */
+	sub	a3, a3, a1		/* Third arg: length of block.  */
 
-#ifdef __thumb__		/* Enter Thumb mode.... */
-	add	a4, pc, #1	/* Get the address of the Thumb block */
-	bx	a4		/* Go there and start Thumb decoding  */
+#ifdef	GCRT0
+	/* Zero out the bss without using memset. 
+	   Using memset is bad because it may be instrumented for
+	   profiling, but at this point, the profiling data structures
+	   have not been set up. 
+	   FIXME: This loop could be a lot more efficient.  */
+	subs	a3, a3, #0
+	beq	2f
+1:	strb	a2, [a1]
+	subs	a3, a3, #1
+	add	a1, a1, #1
+	bne	1b
+2:	
+	/* Nothing to left to clear.  */
+#endif
+
+#ifdef __thumb__		/* Enter Thumb mode. */
+	add	a4, pc, #1	/* Get the address of the Thumb block.  */
+	bx	a4		/* Go there and start Thumb decoding.   */
 
 	.code 16
 	.global __change_mode
@@ -43,8 +56,9 @@ SYM_NAME(_start):
 __change_mode:	
 #endif
 
+#ifndef	GCRT0
 	bl	SYM_NAME(memset)
-	
+#endif
 	bl	SYM_NAME(__get_memtop)
 	sub	r0, r0, #32
 	mov	sp, r0
@@ -76,7 +90,6 @@ __change_mode:
 .Lfini:
 	.word	SYM_NAME(_fini)
 #endif
-	
 #if 0
 #ifdef __thumb__
 	.code 16

@@ -47,14 +47,18 @@ OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
 	then echo ${objroot}/../binutils/objcopy ; \
 	else t='$(program_transform_name)'; echo objcopy | sed -e $$t ; fi`
 
-REDBOOT_OBJS	= redboot-crt0.o redboot-syscalls.o
+REDBOOT_OBJS	= redboot-crt0.o  redboot-syscalls.o
 REDBOOT_SCRIPTS	= redboot.ld redboot.specs
 REDBOOT_INSTALL	= install-redboot
 CFLAGS		= -g
 
-# Here is specific eval board stuff
+# Here is all of the eval board stuff
+PID_SCRIPTS	= pid.specs
+PID_INSTALL	= install-pid
+
 IQ80310_SCRIPTS	= iq80310.specs
 IQ80310_INSTALL	= install-iq80310
+
 
 # Host specific makefile fragment comes in here.
 @host_makefile_frag@
@@ -82,12 +86,15 @@ distclean maintainer-clean realclean: clean
 	rm -f Makefile config.status *~
 
 .PHONY: install info install-info clean-info
-install: ${REDBOOT_INSTALL} ${IQ80310_INSTALL}
+install: ${REDBOOT_INSTALL} ${IQ80310_INSTALL}  ${PID_INSTALL}
 
 
 install-redboot:
 	set -e; for x in ${REDBOOT_OBJS}; do ${INSTALL_DATA} $$x ${tooldir}/lib${MULTISUBDIR}/$$x; done
 	set -e; for x in ${REDBOOT_SCRIPTS}; do ${INSTALL_DATA} ${srcdir}/${objtype}$$x ${tooldir}/lib${MULTISUBDIR}/$$x; done
+
+install-pid:
+	set -e; for x in ${PID_SCRIPTS}; do ${INSTALL_DATA} ${srcdir}/${objtype}$$x ${tooldir}/lib${MULTISUBDIR}/$$x; done
 
 install-iq80310:
 	set -e; for x in ${IQ80310_SCRIPTS}; do ${INSTALL_DATA} ${srcdir}/${objtype}$$x ${tooldir}/lib${MULTISUBDIR}/$$x; done

@@ -9,7 +9,7 @@ SECTIONS
      present): */
   .text  0x8000 : {
     *(.init)
-    *(.text)
+    *(.text*)
     *(.glue_7t)
     *(.glue_7)
     *(.rdata)
@@ -23,7 +23,12 @@ SECTIONS
   }
   .data 0x40000 + (. & 0xfffc0fff) : {
       __data_start__ = . ;
-    *(.data)
+    *(.data*)
+    *(.gcc_exc*)
+    ___EH_FRAME_BEGIN__ = . ;
+    *(.eh_fram*)
+    ___EH_FRAME_END__ = . ;
+    LONG(0);
      __data_end__ = . ;
      edata  =  .;
      _edata  =  .;

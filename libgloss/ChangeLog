@@ -1,4 +1,16 @@
 2002-11-08 Jeff Johnston  <jjohnstn@redhat.com> 
+
+	* arm/Makefile.in: Add support for new pid specs.
+	* arm/coff-iq80310.specs: Change to allow future support.
+	* arm/elf-iq80310.specs: Ditto.
+	* arm/elf-redboot.specs: Ditto.
+	* arm/coff-redboot.ld: Add EH frame support.
+	* arm/redboot-crt0.S: Add optional code to clear bss without
+	memset.
+	* arm/coff-pid.specs: New file.
+	* arm/elf-pid.specs: New file.
+
+2002-11-08 Jeff Johnston  <jjohnstn@redhat.com> 
 	   Catherine Moore  <clm@redhat.com>
 
         * m32r/configure.in:  Do not require gcc to be able to link an

@@ -4,5 +4,5 @@
 -T redboot.ld%s -Ttext 0xA0020000 %(old_link)
 
 *startfile:
-crti%O%s crtbegin%O%s redboot-crt0%O%s redboot-syscalls%O%s
+crti%O%s crtbegin%O%s %{!pg:redboot-crt0%O%s} %{pg:redboot-crt0%O%s} redboot-syscalls%O%s
 
