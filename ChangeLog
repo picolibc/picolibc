@@ -1,3 +1,13 @@
+2003-05-29  Robert Millan  <rmh@debian.org>
+
+	* ltconfig: Import this patch and modify for use with current
+	version of ltconfig:
+
+	2003-05-21  Bruno Haible  <bruno@clisp.org>
+
+	* libtool.m4 (AC_LIBTOOL_SYS_DYNAMIC_LINKER): Add support for
+	GNU/FreeBSD.
+
 2003-05-28  DJ Delorie  <dj@redhat.com>
 
 	* Makefile.tpl: Make maybe-check-gcc .PHONY.
