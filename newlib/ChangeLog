@@ -36,7 +36,7 @@
 	* libc/stdio64/Makefile.am: Add EL/IX level checking.
 	* libc/stdio64/Makefile.in: Regenerated.
 	* libc/stdio64/dummy.c: New file.
-	* libc/stdio64/fgetpos64.c: Fix so _LARGEFILE_64 macro is checked
+	* libc/stdio64/fgetpos64.c: Fix so _LARGE64_FILES macro is checked
 	after first include.
 	* libc/stdio64/fopen64.c: Ditto.
 	* libc/stdio64/freopen64.c: Ditto.
