@@ -1,5 +1,9 @@
 2000-04-14  H.J. Lu  <hjl@gnu.org>
 
+	* common.h (ELFOSABI_TRUE64): Renamed to ELFOSABI_TRU64.
+
+2000-04-14  H.J. Lu  <hjl@gnu.org>
+
 	* common.h (ELFOSABI_NETBSD): Defined.
 	(ELFOSABI_HURD): Likewise.
 	(ELFOSABI_SOLARIS): Likewise.
