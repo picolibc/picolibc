@@ -36,7 +36,7 @@ CFLAGS          := @CFLAGS@ -nostdinc
 include $(srcdir)/../Makefile.common
 
 WIN32_COMMON	:= -mno-cygwin
-WIN32_INCLUDES  := -I. -I$(srcdir) -I$(w32api_include)
+WIN32_INCLUDES  := -I. -I$(srcdir) $(w32api_include)
 WIN32_CFLAGS    := $(CFLAGS) $(WIN32_COMMON) $(WIN32_INCLUDES)
 WIN32_LDFLAGS	:= $(CFLAGS) $(WIN32_COMMON) -L$(mingw_build) -nostdlib -Wl,-shared
 

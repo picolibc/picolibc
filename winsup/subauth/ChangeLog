@@ -1,3 +1,7 @@
+2001-10-12  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Accomodate changes to w32api_include macro.
+
 Sun May 20 00:24:36 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Use 'rm -f' when cleaning.
