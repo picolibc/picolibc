@@ -39,7 +39,7 @@ has_exec_chars (const char *buf, int len)
 }
 
 char shortcut_header[SHORTCUT_HDR_SIZE];
-BOOL shortcut_initalized = FALSE;
+BOOL shortcut_initalized;
 
 void
 create_shortcut_header (void)

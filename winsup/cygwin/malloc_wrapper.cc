@@ -28,7 +28,7 @@ details. */
    problems if malloced on our heap and free'd on theirs.
 */
 
-static int export_malloc_called = 0;
+static int export_malloc_called;
 static int use_internal_malloc = 1;
 
 #undef in

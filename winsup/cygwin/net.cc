@@ -1072,8 +1072,8 @@ cygwin_gethostbyname (const char *name)
 {
   static unsigned char tmp_addr[4];
   static struct hostent tmp;
-  static char *tmp_aliases[1] = {0};
-  static char *tmp_addr_list[2] = {0, 0};
+  static char *tmp_aliases[1];
+  static char *tmp_addr_list[2];
   static int a, b, c, d;
 
   if (sscanf (name, "%d.%d.%d.%d", &a, &b, &c, &d) == 4)

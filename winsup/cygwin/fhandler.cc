@@ -30,9 +30,9 @@ static NO_COPY const int CHUNK_SIZE = 1024; /* Used for crlf conversions */
 
 static char fhandler_disk_dummy_name[] = "some disk file";
 
-struct __cygwin_perfile *perfile_table = NULL;
+struct __cygwin_perfile *perfile_table;
 
-DWORD binmode = 0;
+DWORD binmode;
 
 inline fhandler_base&
 fhandler_base::operator =(fhandler_base &x)

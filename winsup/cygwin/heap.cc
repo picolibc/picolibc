@@ -19,7 +19,7 @@ details. */
 
 #define assert(x)
 
-static unsigned page_const = 0;
+static unsigned page_const;
 
 extern "C" size_t getpagesize ();
 

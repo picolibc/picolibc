@@ -31,7 +31,7 @@ static char NO_COPY pinfo_dummy[sizeof(pinfo)] = {0};
 
 pinfo NO_COPY myself ((_pinfo *)&pinfo_dummy);	// Avoid myself != NULL checks
 
-HANDLE hexec_proc = NULL;
+HANDLE hexec_proc;
 
 void __stdcall
 pinfo_fixup_after_fork ()
@@ -319,7 +319,7 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
 DWORD
 winpids::enumNT (bool winpid)
 {
-  static DWORD szprocs = 0;
+  static DWORD szprocs;
   static SYSTEM_PROCESSES *procs;
 
   DWORD nelem = 0;

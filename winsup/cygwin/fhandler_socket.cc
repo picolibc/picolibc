@@ -35,7 +35,7 @@
 #define ENTROPY_SOURCE_NAME "/dev/urandom"
 #define ENTROPY_SOURCE_DEV_UNIT 9
 
-fhandler_dev_random* entropy_source = NULL;
+fhandler_dev_random* entropy_source;
 
 /**********************************************************************/
 /* fhandler_socket */

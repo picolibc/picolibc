@@ -1,3 +1,10 @@
+Thu Sep  6 00:40:35 2001  Christopher Faylor <cgf@cygnus.com>
+
+	Remove initialization of static or global values to zero, throughout.
+	This just needlessly grows the size of the DLL.
+	* tty.cc (tty::alive): Make inuse handle non-inheriting on open, just
+	for thread safety.
+
 Wed Sep  5 23:36:03 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* cygheap.h (init_cygheap): Move bucket array here from cygheap.cc.

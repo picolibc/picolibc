@@ -30,9 +30,9 @@ details. */
 #include "dll_init.h"
 
 #ifdef DEBUGGING
-static int npid = 0;
-static int npid_max = 0;
-static pid_t fork_pids[100] = {0};
+static int npid;
+static int npid_max;
+static pid_t fork_pids[100];
 #endif
 
 DWORD NO_COPY chunksize = 0;

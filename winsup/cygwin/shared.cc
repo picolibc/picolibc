@@ -31,7 +31,7 @@ details. */
 
 shared_info NO_COPY *cygwin_shared = NULL;
 mount_info NO_COPY *mount_table = NULL;
-HANDLE cygwin_mount_h = NULL;
+HANDLE cygwin_mount_h;
 
 /* General purpose security attribute objects for global use. */
 SECURITY_ATTRIBUTES NO_COPY sec_none;

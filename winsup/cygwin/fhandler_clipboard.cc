@@ -30,7 +30,7 @@ details. */
 
 static const char *CYGWIN_NATIVE = "CYGWIN_NATIVE_CLIPBOARD";
 /* this is MT safe because windows format id's are atomic */
-static UINT cygnativeformat = 0;
+static UINT cygnativeformat;
 
 fhandler_dev_clipboard::fhandler_dev_clipboard (const char *name):
 fhandler_base (FH_CLIPBOARD, name)

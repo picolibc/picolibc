@@ -40,7 +40,7 @@ extern int subauth_id;
 BOOL reset_com = TRUE;
 static BOOL envcache = TRUE;
 
-static char **lastenviron = NULL;
+static char **lastenviron;
 
 #define ENVMALLOC \
   (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) \
@@ -641,7 +641,7 @@ environ_init (char **envp, int envc)
   bool envp_passed_in;
   static char cygterm[] = "TERM=cygwin";
 
-  static int initted = 0;
+  static int initted;
   if (!initted)
     {
       for (int i = 0; conv_envvars[i].name != NULL; i++)

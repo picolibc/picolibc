@@ -109,7 +109,7 @@ public:
   const char *tname;
 } ostack[100];
 
-static int osi = 0;
+static int osi;
 #endif /*DEBUGGING*/
 
 DWORD

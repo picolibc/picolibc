@@ -54,12 +54,12 @@ per_thread NO_COPY *threadstuff[] = {&waitq_storage,
 				     &signal_dispatch_storage,
 				     NULL};
 
-BOOL display_title = FALSE;
-BOOL strip_title_path = FALSE;
+BOOL display_title;
+BOOL strip_title_path;
 BOOL allow_glob = TRUE;
 codepage_type current_codepage = ansi_cp;
 
-int cygwin_finished_initializing = 0;
+int cygwin_finished_initializing;
 
 /* Used in SIGTOMASK for generating a bit for insertion into a sigset_t.
    This is subtracted from the signal number prior to shifting the bit.
@@ -86,7 +86,7 @@ extern "C"
   char **__cygwin_environ;
   char ***main_environ;
   /* __progname used in getopt error message */
-  char *__progname = NULL;
+  char *__progname;
   struct _reent reent_data = _REENT_INIT(reent_data);
   struct per_process __cygwin_user_data =
   {/* initial_sp */ 0, /* magic_biscuit */ 0,
@@ -110,14 +110,14 @@ extern "C"
    /* resourcelocks */ &_reslock, /* threadinterface */ &_mtinterf,
    /* impure_ptr */ &reent_data,
   };
-  bool ignore_case_with_glob = FALSE;
+  bool ignore_case_with_glob;
   int __declspec (dllexport) _check_for_executable = TRUE;
 #ifdef DEBUGGING
-  int pinger = 0;
+  int pinger;
 #endif
 };
 
-char *old_title = NULL;
+char *old_title;
 char title_buf[TITLESIZE + 1];
 
 static void
@@ -621,8 +621,8 @@ alloc_stack (child_info_fork *ci)
 }
 
 static NO_COPY int mypid = 0;
-int _declspec(dllexport) __argc = 0;
-char _declspec(dllexport) **__argv = NULL;
+int _declspec(dllexport) __argc;
+char _declspec(dllexport) **__argv;
 
 void
 sigthread::init (const char *s)

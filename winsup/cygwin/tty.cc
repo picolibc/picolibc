@@ -295,7 +295,7 @@ tty::alive (const char *fmt)
   char buf[sizeof (TTY_MASTER_ALIVE) + 16];
 
   __small_sprintf (buf, fmt, ntty);
-  if ((ev = OpenEvent (EVENT_ALL_ACCESS, TRUE, buf)))
+  if ((ev = OpenEvent (EVENT_ALL_ACCESS, FALSE, buf)))
     CloseHandle (ev);
   return ev != NULL;
 }

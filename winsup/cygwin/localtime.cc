@@ -640,12 +640,12 @@ static struct tm	tm;
 #undef _daylight
 
 #ifdef USG_COMPAT
-time_t			timezone = 0;
-int			daylight = 0;
+time_t			timezone;
+int			daylight;
 #endif /* defined USG_COMPAT */
 
 #ifdef ALTZONE
-time_t			altzone = 0;
+time_t			altzone;
 #endif /* defined ALTZONE */
 
 static long

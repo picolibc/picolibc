@@ -31,9 +31,9 @@ details. */
    on the first call that needs information from it. */
 
 static NO_COPY const char *etc_group = "/etc/group";
-static struct group *group_buf = NULL;		/* group contents in memory */
-static int curr_lines = 0;
-static int max_lines = 0;
+static struct group *group_buf;		/* group contents in memory */
+static int curr_lines;
+static int max_lines;
 
 /* Position in the group cache */
 #ifdef _MT_SAFE
