@@ -1,3 +1,10 @@
+2001-01-15  Ben Elliston  <bje@redhat.com>
+
+	* configure.in (host_tools): Add sid.
+	Always configure cgen.
+	* Makefile.in (all-sid): New target.
+	(check-sid, clean-sid, install-sid): Likewise.
+
 2001-01-07  Andreas Jaeger  <aj@suse.de>
 
         * config.sub, config.guess: Update from subversions.
