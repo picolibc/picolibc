@@ -1,5 +1,9 @@
 2002-08-16  Christopher Faylor  <cgf@redhat.com>
 
+	* winsup.h: Remove malloc_*lock functions.
+
+2002-08-16  Christopher Faylor  <cgf@redhat.com>
+
 	* Makefile.in: Add support for new malloc.o and renamed
 	malloc_wrapper.o.  Use -fomit-frame-pointer for malloc.o compilation.
 	* malloc_wrapper.cc: New file.  Rename from malloc.cc.  Add support for

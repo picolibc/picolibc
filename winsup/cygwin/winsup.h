@@ -232,9 +232,6 @@ extern "C" int __small_sprintf (char *dst, const char *fmt, ...) /*__attribute__
 extern "C" int __small_vsprintf (char *dst, const char *fmt, va_list ap) /*__attribute__ ((regparm (3)))*/;
 extern void multiple_cygwin_problem (const char *, unsigned, unsigned);
 
-extern "C" void __malloc_lock ();
-extern "C" void __malloc_unlock ();
-
 class path_conv;
 int __stdcall stat_worker (const char *name, struct __stat64 *buf, int nofollow,
 			   path_conv *pc = NULL) __attribute__ ((regparm (3)));
