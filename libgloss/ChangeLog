@@ -7,6 +7,12 @@
 	* mips/ddb.ld: KEEP .init and .fini.
 	* mips/ddb-kseg0.ld: Likewise.
 
+2002-10-04  Michael Snyder  <msnyder@redhat.com>
+
+        * m32r/m32r-lib.c (exceptionHandler): Fix computation of
+        exception vector address, as suggested by Mitsubishi.
+        (getExceptionVector): Ditto.
+
 2002-08-01  Chris Demetriou  <cgd@broadcom.com>
 
 	* mips/cfe.ld (STARTUP): New definition.
