@@ -1,3 +1,7 @@
+Fri Mar 10 13:20:50 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* sigproc.cc: Set wait_sig priority to normal.
+
 Fri Mar 10 13:03:06 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* sigproc.cc (wait_sig): Add addtional debugging output.

@@ -28,7 +28,7 @@ extern BOOL allow_ntsec;
 #define WSPX		   20000 // Wait for wait_sig to terminate
 #define WWSP		   20000 // Wait for wait_subproc to terminate
 
-#define WAIT_SIG_PRIORITY		THREAD_PRIORITY_HIGHEST
+#define WAIT_SIG_PRIORITY		THREAD_PRIORITY_NORMAL
 
 #define TOTSIGS	(NSIG + __SIGOFFSET)
 
