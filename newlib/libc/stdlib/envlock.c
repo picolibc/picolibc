@@ -20,7 +20,7 @@ TRAD_SYNOPSIS
 	char *<[reent]>;
 
 DESCRIPTION
-The <<stenv>> family of routines call these functions when they need
+The <<setenv>> family of routines call these functions when they need
 to modify the environ variable.  The version of these routines supplied
 in the library does not do anything.  If multiple threads of execution
 can call <<setenv>>, or if <<setenv>> can be called reentrantly, then

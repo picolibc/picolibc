@@ -1,3 +1,7 @@
+Tue Mar 21 19:08:00 2000  Jeff Johnston <jjohnstn@cygnus.com>
+
+	* libc/stdlib/envlock.c: Fixed comment typo.
+
 Fri Mar 17 15:37:00 2000  Jeff Johnston <jjohnstn@cygnus.com>
 
 	* libc/stdio/vfscanf.c (__svfscanf): Fixed floating point
