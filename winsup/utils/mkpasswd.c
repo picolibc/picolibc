@@ -92,11 +92,10 @@ psx_dir (char *in, char *out)
 }
 
 void
-uni2ansi (LPWSTR wcs, char *mbs)
+uni2ansi (LPWSTR wcs, char *mbs, int size)
 {
   if (wcs)
-    wcstombs (mbs, wcs, (wcslen (wcs) + 1) * sizeof (WCHAR));
-
+    WideCharToMultiByte (CP_ACP, 0, wcs, -1, mbs, size, NULL, NULL);
   else
     *mbs = '\0';
 }
@@ -113,7 +112,7 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
   char ansi_srvname[256];
 
   if (servername)
-    uni2ansi (servername, ansi_srvname);
+    uni2ansi (servername, ansi_srvname, sizeof (ansi_srvname));
 
   do
     {
@@ -152,10 +151,10 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
 
 	  int uid = buffer[i].usri3_user_id;
 	  int gid = buffer[i].usri3_primary_group_id;
-	  uni2ansi (buffer[i].usri3_name, username);
-	  uni2ansi (buffer[i].usri3_full_name, fullname);
+	  uni2ansi (buffer[i].usri3_name, username, sizeof (username));
+	  uni2ansi (buffer[i].usri3_full_name, fullname, sizeof (fullname));
 	  homedir_w32[0] = homedir_psx[0] = '\0';
-	  uni2ansi (buffer[i].usri3_home_dir, homedir_w32);
+	  uni2ansi (buffer[i].usri3_home_dir, homedir_w32, sizeof (homedir_w32));
 	  if (print_cygpath)
 	    cygwin_conv_to_posix_path (homedir_w32, homedir_psx);
 	  else
@@ -264,7 +263,7 @@ enum_local_groups (int print_sids)
 	  DWORD sid_length = 1024;
 	  DWORD gid;
 	  SID_NAME_USE acc_type;
-	  uni2ansi (buffer[i].lgrpi0_name, localgroup_name);
+	  uni2ansi (buffer[i].lgrpi0_name, localgroup_name, sizeof (localgroup_name));
 
 	  if (!LookupAccountName (NULL, localgroup_name, psid,
 				  &sid_length, domain_name, &domname_len,

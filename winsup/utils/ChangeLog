@@ -1,3 +1,13 @@
+2001-04-11  Egor Duda  <deo@logos-m.ru>
+
+	* mkgroup.c (uni2ansi): Use native method to convert from Unicode
+	to multi-byte strings.
+	* mkpasswd.c (uni2ansi): Ditto.
+	(enum_users): Pass buffer size when converting string.
+	(enum_local_groups): Ditto.
+	* mkgroup.c (enum_groups): Ditto.
+	(enum_local_groups): Ditto.
+
 Mon Apr  2 22:41:33 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* mount.cc (main): Use getopt_long for parsing arguments.

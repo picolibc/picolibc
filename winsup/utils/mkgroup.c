@@ -92,11 +92,10 @@ psx_dir (char *in, char *out)
 }
 
 void
-uni2ansi (LPWSTR wcs, char *mbs)
+uni2ansi (LPWSTR wcs, char *mbs, int size)
 {
   if (wcs)
-    wcstombs (mbs, wcs, (wcslen (wcs) + 1) * sizeof (WCHAR));
-
+    WideCharToMultiByte (CP_ACP, 0, wcs, -1, mbs, size, NULL, NULL);
   else
     *mbs = '\0';
 }
@@ -141,7 +140,7 @@ enum_local_groups (int print_sids)
 	  DWORD sid_length = 1024;
 	  DWORD gid;
 	  SID_NAME_USE acc_type;
-	  uni2ansi (buffer[i].lgrpi0_name, localgroup_name);
+	  uni2ansi (buffer[i].lgrpi0_name, localgroup_name, sizeof (localgroup_name));
 
 	  if (!LookupAccountName (NULL, localgroup_name, psid,
 				  &sid_length, domain_name, &domname_len,
@@ -198,7 +197,7 @@ enum_groups (LPWSTR servername, int print_sids)
   char ansi_srvname[256];
 
   if (servername)
-    uni2ansi (servername, ansi_srvname);
+    uni2ansi (servername, ansi_srvname, sizeof (ansi_srvname));
 
   do
     {
@@ -232,7 +231,7 @@ enum_groups (LPWSTR servername, int print_sids)
 	  SID_NAME_USE acc_type;
 
 	  int gid = buffer[i].grpi2_group_id;
-	  uni2ansi (buffer[i].grpi2_name, groupname);
+	  uni2ansi (buffer[i].grpi2_name, groupname, sizeof (groupname));
           if (print_sids)
             {
               if (!LookupAccountName (servername ? ansi_srvname : NULL,
