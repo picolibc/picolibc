@@ -505,10 +505,10 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
     }
 
   /*
-   * We set the SE_DACL_PROTECTED flag here to prevent the DACL from being modified
-   * by inheritable ACEs.
-   * This flag as well as the SetSecurityDescriptorControl call are available only
-   * since Win2K.
+   * We set the SE_DACL_PROTECTED flag here to prevent the DACL from being
+   * modified by inheritable ACEs.
+   * This flag as well as the SetSecurityDescriptorControl call are available
+   * only since Win2K.
    */
   static int win2KorHigher = -1;
   if (win2KorHigher == -1)

@@ -228,10 +228,6 @@ get_null_sd ()
   return null_sdp;
 }
 
-extern PSID get_admin_sid ();
-extern PSID get_system_sid ();
-extern PSID get_creator_owner_sid ();
-
 PSECURITY_ATTRIBUTES __stdcall
 sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
 {

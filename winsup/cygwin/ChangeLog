@@ -1,3 +1,8 @@
+Mon Apr 23  0:10:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* security.cc (alloc_sd): Reformat comment.
+	* shared.cc: Drop function declarations already in security.h.
+
 Sun Apr 22 12:17:57 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* shortcut.c (check_shortcut): Close input file handle before
