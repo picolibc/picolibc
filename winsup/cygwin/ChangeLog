@@ -1,3 +1,11 @@
+Fri Aug  4 00:00:46 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* hinfo.cc (hinfo::find_unused_handle): Just check for table entry ==
+	NULL since we are already bounds checked by default.
+	* thread.cc (ResourceLocks::Lock): Streamline this function since it is
+	called a lot.
+	(ReleaseResourceLock): Ditto.
+
 Thu Aug  3 20:44:39 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* select.cc (fhandler_console::select_read): Call set_cursor_maybe

@@ -26,38 +26,41 @@ extern int threadsafe;
 
 #define MT_INTERFACE user_data->threadinterface
 
-#define NOT_IMP(n)  system_printf("not implemented %s\n",n); return 0;
+#define NOT_IMP(n)  system_printf ("not implemented %s\n", n); return 0;
 
-#define CHECKHANDLE(rval,release) \
-  if ( ! item->HandleOke() ) { \
-    if ( release ) item->used=false; \
-    return rval; };
+#define CHECKHANDLE(rval, release) \
+  if (!item->HandleOke ()) \
+    { \
+      if (release) \
+	item->used=false; \
+      return rval; \
+    }
 
 #define GETTHREAD(n) \
-  if ( ! thread ) system_printf("thread is NULL");\
-  SetResourceLock(LOCK_THREAD_LIST,READ_LOCK,n);\
-  ThreadItem *item=user_data->threadinterface->GetThread(thread); \
-  ReleaseResourceLock(LOCK_THREAD_LIST,READ_LOCK,n); \
-  if ( ! item ) return EINVAL; \
-  CHECKHANDLE(EINVAL,0);
+  if (!thread) system_printf ("thread is NULL");\
+  SetResourceLock (LOCK_THREAD_LIST, READ_LOCK, n);\
+  ThreadItem *item=user_data->threadinterface->GetThread (thread); \
+  ReleaseResourceLock (LOCK_THREAD_LIST, READ_LOCK, n); \
+  if (!item) return EINVAL; \
+  CHECKHANDLE (EINVAL, 0);
 
 #define GETMUTEX(n) \
-  SetResourceLock(LOCK_MUTEX_LIST,READ_LOCK,n); \
-  MutexItem* item=user_data->threadinterface->GetMutex(mutex); \
-  ReleaseResourceLock(LOCK_MUTEX_LIST,READ_LOCK,n); \
-  if ( ! item ) return EINVAL;  \
-  CHECKHANDLE(EINVAL,0);
+  SetResourceLock (LOCK_MUTEX_LIST, READ_LOCK, n); \
+  MutexItem* item=user_data->threadinterface->GetMutex (mutex); \
+  ReleaseResourceLock (LOCK_MUTEX_LIST, READ_LOCK, n); \
+  if (!item) return EINVAL;  \
+  CHECKHANDLE (EINVAL, 0);
 
 #define GETSEMA(n) \
-  SetResourceLock(LOCK_SEM_LIST,READ_LOCK,n); \
-  SemaphoreItem* item=user_data->threadinterface->GetSemaphore(sem); \
-  ReleaseResourceLock(LOCK_SEM_LIST,READ_LOCK,n); \
-  if ( ! item ) return EINVAL; \
-  CHECKHANDLE(EINVAL,0);
+  SetResourceLock (LOCK_SEM_LIST, READ_LOCK, n); \
+  SemaphoreItem* item=user_data->threadinterface->GetSemaphore (sem); \
+  ReleaseResourceLock (LOCK_SEM_LIST, READ_LOCK, n); \
+  if (!item) return EINVAL; \
+  CHECKHANDLE (EINVAL, 0);
 
-#define CHECKITEM(rn,rm,fn) \
-  if ( ! item ) { \
-    ReleaseResourceLock(rn,rm,fn); \
+#define CHECKITEM(rn, rm, fn) \
+  if (!item) { \
+    ReleaseResourceLock (rn, rm, fn); \
     return EINVAL;  }; \
 
 struct _reent *
@@ -68,9 +71,7 @@ _reent_clib ()
 
 #ifdef _CYG_THREAD_FAILSAFE
   if (_r == 0)
-    {
-      system_printf ("local thread storage not inited");
-    }
+    system_printf ("local thread storage not inited");
 #endif
 
   SetLastError (tmp);
@@ -85,22 +86,32 @@ _reent_winsup ()
   _r = (struct __reent_t *) TlsGetValue (MT_INTERFACE->reent_index);
 #ifdef _CYG_THREAD_FAILSAFE
   if (_r == 0)
-    {
-      system_printf ("local thread storage not inited");
-    }
+    system_printf ("local thread storage not inited");
 #endif
   SetLastError (tmp);
   return _r->_winsup;
 };
 
+inline LPCRITICAL_SECTION
+ResourceLocks::Lock (int _resid)
+{
+#ifdef _CYG_THREAD_FAILSAFE
+  if (!inited)
+    system_printf ("lock called before initialization");
+
+  thread_printf ("Get Resource lock %d ==> %p for %p , real : %d , threadid %d ",
+		 _resid, &lock, user_data, myself->pid, GetCurrentThreadId ());
+#endif
+  return &lock;
+};
+
 void
 SetResourceLock (int _res_id, int _mode, const char *_function)
 {
-#if 0
-  if (!threadsafe)
-    return;
+#ifdef _CYG_THREAD_FAILSAFE
+  thread_printf ("Set resource lock %d mode %d for %s start",
+		 _res_id, _mode, _function);
 #endif
-  thread_printf ("Set resource lock %d mode %d for %s start", _res_id, _mode, _function);
   EnterCriticalSection (user_data->resourcelocks->Lock (_res_id));
 
 #ifdef _CYG_THREAD_FAILSAFE
@@ -112,13 +123,9 @@ SetResourceLock (int _res_id, int _mode, const char *_function)
 void
 ReleaseResourceLock (int _res_id, int _mode, const char *_function)
 {
-#if 0
-  if (!threadsafe)
-    return;
-#endif
+#ifdef _CYG_THREAD_FAILSAFE
   thread_printf ("Release resource lock %d mode %d for %s done", _res_id, _mode, _function);
 
-#ifdef _CYG_THREAD_FAILSAFE
   AssertResourceOwner (_res_id, _mode);
   user_data->resourcelocks->count--;
   if (user_data->resourcelocks->count == 0)
@@ -133,26 +140,14 @@ void
 AssertResourceOwner (int _res_id, int _mode)
 {
 
-  thread_printf ("Assert Resource lock %d ==> for %p , real : %d , threadid %d count %d owner %d", _res_id, user_data, (myself ? myself->pid : -1), GetCurrentThreadId (), user_data->resourcelocks->count, user_data->resourcelocks->owner);
+  thread_printf ("Assert Resource lock %d ==> for %p , real : %d , threadid %d count %d owner %d",
+		 _res_id, user_data, myself->pid, GetCurrentThreadId (),
+		 user_data->resourcelocks->count, user_data->resourcelocks->owner);
   if (user_data && (user_data->resourcelocks->owner != GetCurrentThreadId ()))
-    {
-      system_printf ("assertion failed, not the resource owner");
-    };
+    system_printf ("assertion failed, not the resource owner");
 }
 
 #endif
-
-LPCRITICAL_SECTION
-ResourceLocks::Lock (int _resid)
-{
-  if (!inited)
-    {
-      system_printf ("lock called before initialization");
-    };
-
-  thread_printf ("Get Resource lock %d ==> %p for %p , real : %d , threadid %d ", _resid, &lock, user_data, (myself ? myself->pid : -1), GetCurrentThreadId ());
-  return &lock;
-};
 
 void
 ResourceLocks::Init ()
@@ -167,7 +162,7 @@ ResourceLocks::Init ()
   count = 0;
 #endif
 
-  thread_printf ("Resource lock %p inited by %p , %d", &lock, user_data, (myself ? myself->pid : -1));
+  thread_printf ("Resource lock %p inited by %p , %d", &lock, user_data, myself->pid);
 };
 
 void
@@ -178,7 +173,7 @@ ResourceLocks::Delete ()
       thread_printf ("Close Resource Locks %p ", &lock);
       DeleteCriticalSection (&lock);
       inited = false;
-    };
+    }
 };
 
 
@@ -200,7 +195,7 @@ MTinterface::Find (void *_value, int (*comp) (void *, void *), register int &_in
       if (current->used && comp (current, _value))
         break;
       current = NULL;
-    };
+    }
   return current;
 };
 
@@ -214,7 +209,7 @@ MTinterface::Find (MTitem & _item, MTList * _list)
       current = _list->items[_index];
       if (current->used && current == &_item)
         break;
-    };
+    }
   return (_index == _list->index ? -1 : _index);
 };
 
@@ -243,13 +238,13 @@ MTinterface::SetItem (int _index, MTitem * _item, MTList * _list)
 int
 CmpPthreadObj (void *_i, void *_value)
 {
-  return ((MTitem *) _i)->Id () == *(int *) _value;
+  return ( (MTitem *) _i)->Id () == * (int *) _value;
 };
 
 int
 CmpThreadId (void *_i, void *_id)
 {
-  return ((ThreadItem *) _i)->thread_id == *(DWORD *) _id;
+  return ( (ThreadItem *) _i)->thread_id == * (DWORD *) _id;
 };
 
 void
@@ -260,7 +255,7 @@ MTinterface::Init0 ()
       threadlist.items[i] = NULL;
       mutexlist.items[i] = NULL;
       semalist.items[i] = NULL;
-    };
+    }
 
   threadlist.index = 0;
   mutexlist.index = 0;
@@ -541,9 +536,7 @@ __pthread_create (pthread_t * thread, const pthread_attr_t * attr, TFD (start_ro
     {
       __pthread_attr_init (&a);
       item = MT_INTERFACE->CreateThread (thread, start_routine, arg, a);
-    };
-
-
+    }
 
   CHECKITEM (LOCK_THREAD_LIST, WRITE_LOCK | READ_LOCK, "__pthread_create")
 
@@ -581,16 +574,16 @@ __pthread_attr_destroy (pthread_attr_t * /*attr*/)
 int
 __pthread_exit (void *value_ptr)
 {
-  ThreadItem *item = MT_INTERFACE->GetCallingThread();
+  ThreadItem *item = MT_INTERFACE->GetCallingThread ();
   item->return_ptr = value_ptr;
-  ExitThread(0);
+  ExitThread (0);
   return 0;
 }
 
 int
-__pthread_join(pthread_t * thread, void **return_val)
+__pthread_join (pthread_t * thread, void **return_val)
 {
-  ThreadItem *item=user_data->threadinterface->GetThread(thread);
+  ThreadItem *item=user_data->threadinterface->GetThread (thread);
 
 
   if (!item)
@@ -605,7 +598,7 @@ __pthread_join(pthread_t * thread, void **return_val)
   else
   {
      item->joinable = 'N';
-     WaitForSingleObject((HANDLE)*thread, INFINITE);
+     WaitForSingleObject ((HANDLE)*thread, INFINITE);
      if (return_val)
         *return_val = item->return_ptr;
   }/* End if*/
@@ -614,9 +607,9 @@ __pthread_join(pthread_t * thread, void **return_val)
 };
 
 int
-__pthread_detach(pthread_t * thread)
+__pthread_detach (pthread_t * thread)
 {
-  ThreadItem *item=user_data->threadinterface->GetThread(thread);
+  ThreadItem *item=user_data->threadinterface->GetThread (thread);
   if (!item)
      return ESRCH;
 
@@ -631,16 +624,16 @@ __pthread_detach(pthread_t * thread)
 }
 
 int
-__pthread_suspend(pthread_t * thread)
+__pthread_suspend (pthread_t * thread)
 {
-  ThreadItem *item=user_data->threadinterface->GetThread(thread);
+  ThreadItem *item=user_data->threadinterface->GetThread (thread);
   if (!item)
      return ESRCH;
 
   if (item->suspended == false)
   {
      item->suspended = true;
-     SuspendThread( (HANDLE)*thread);
+     SuspendThread ((HANDLE)*thread);
   }
 
   return 0;
@@ -648,14 +641,14 @@ __pthread_suspend(pthread_t * thread)
 
 
 int
-__pthread_continue(pthread_t * thread)
+__pthread_continue (pthread_t * thread)
 {
-  ThreadItem *item=user_data->threadinterface->GetThread(thread);
+  ThreadItem *item=user_data->threadinterface->GetThread (thread);
   if (!item)
      return ESRCH;
 
   if (item->suspended == true)
-        ResumeThread( (HANDLE)*thread);
+        ResumeThread ((HANDLE)*thread);
   item->suspended = false;
 
   return 0;
@@ -885,33 +878,33 @@ extern "C"
   int __pthread_create (pthread_t *, const pthread_attr_t *, TFD (start_routine), void *arg)
   {
     return -1;
-  };
+  }
   int __pthread_attr_init (pthread_attr_t * attr)
   {
     return -1;
-  };
+  }
   int __pthread_attr_destroy (pthread_attr_t * attr)
   {
     return -1;
-  };
+  }
   int __pthread_attr_setstacksize (pthread_attr_t * attr, size_t size)
   {
     return -1;
-  };
+  }
   int __pthread_attr_getstacksize (pthread_attr_t * attr, size_t * size)
   {
     return -1;
-  };
+  }
 /*
-   __pthread_attr_setstackaddr(...){ return -1; };
-   __pthread_attr_getstackaddr(...){ return -1; };
+   __pthread_attr_setstackaddr (...){ return -1; };
+   __pthread_attr_getstackaddr (...){ return -1; };
  */
   int __pthread_exit (void *value_ptr)
   {
     return -1;
-  };
+  }
 
-  int __pthread_join(pthread_t thread_id, void **return_val)
+  int __pthread_join (pthread_t thread_id, void **return_val)
   {
      return -1;
   }
@@ -919,83 +912,83 @@ extern "C"
   unsigned long __pthread_getsequence_np (pthread_t * thread)
   {
     return 0;
-  };
+  }
   int __pthread_key_create (pthread_key_t * key)
   {
     return -1;
-  };
+  }
   int __pthread_key_delete (pthread_key_t * key)
   {
     return -1;
-  };
+  }
   int __pthread_setspecific (pthread_key_t * key, const void *value)
   {
     return -1;
-  };
+  }
   void *__pthread_getspecific (pthread_key_t * key)
   {
     return NULL;
-  };
+  }
   int __pthread_kill (pthread_t * thread, int sig)
   {
     return -1;
-  };
+  }
   int __pthread_sigmask (int operation, const sigset_t * set, sigset_t * old_set)
   {
     return -1;
-  };
+  }
   pthread_t __pthread_self ()
   {
     return -1;
-  };
+  }
   int __pthread_equal (pthread_t * t1, pthread_t * t2)
   {
     return -1;
-  };
+  }
   int __pthread_mutex_init (pthread_mutex_t *, const pthread_mutexattr_t *)
   {
     return -1;
-  };
+  }
   int __pthread_mutex_lock (pthread_mutex_t *)
   {
     return -1;
-  };
+  }
   int __pthread_mutex_trylock (pthread_mutex_t *)
   {
     return -1;
-  };
+  }
   int __pthread_mutex_unlock (pthread_mutex_t *)
   {
     return -1;
-  };
+  }
   int __pthread_mutex_destroy (pthread_mutex_t *)
   {
     return -1;
-  };
+  }
   int __sem_init (sem_t * sem, int pshared, unsigned int value)
   {
     return -1;
-  };
+  }
   int __sem_destroy (sem_t * sem)
   {
     return -1;
-  };
+  }
   int __sem_wait (sem_t * sem)
   {
     return -1;
-  };
+  }
   int __sem_trywait (sem_t * sem)
   {
     return -1;
-  };
+  }
   int __sem_post (sem_t * sem)
   {
     return -1;
-  };
+  }
   struct _reent *_reent_clib ()
   {
     return NULL;
-  };
+  }
 }
 
 #endif                          // MT_SAFE

@@ -125,12 +125,13 @@ hinfo::not_open (int fd)
 int
 hinfo::find_unused_handle (int start)
 {
-  AssertResourceOwner(LOCK_FD_LIST,READ_LOCK);
+  AssertResourceOwner(LOCK_FD_LIST, READ_LOCK);
 
   do
     {
       for (int i = start; i < (int) size; i++)
-	if (not_open (i))
+	/* See if open -- no need for overhead of not_open */
+	if (fds[i] == NULL)
 	  return i;
     }
   while (extend (NOFILE_INCR));

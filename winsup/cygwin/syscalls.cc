@@ -391,7 +391,7 @@ _open (const char *unix_path, int flags, ...)
   syscall_printf ("open (%s, %p)", unix_path, flags);
   if (!check_null_empty_path_errno(unix_path))
     {
-      SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," open ");
+      SetResourceLock(LOCK_FD_LIST, WRITE_LOCK|READ_LOCK, " open ");
 
       /* check for optional mode argument */
       va_start (ap, flags);
