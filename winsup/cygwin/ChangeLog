@@ -1,3 +1,32 @@
+2003-06-30  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* cygheap.h (enum impersonation): New enum.
+	(cygheap_user::token): Delete.
+	(cygheap_user::impersonated): Delete.
+	(cygheap_user::external_token): New member.
+	(cygheap_user::internal_token): New member.
+	(cygheap_user::impersonation_state): New member.
+	(cygheap_user::issetuid): Modify.
+	(cygheap_user::token): New method.   
+	(cygheap_user::deimpersonate): New method.
+	(cygheap_user::reimpersonate): New method.
+	(cygheap_user::has_impersonation_tokens): New method.
+	(cygheap_user::close_impersonation_tokens): New method.
+	* dtable.cc (dtable::vfork_child_dup): Use new cygheap_user methods.
+	* fhandler_socket.cc (fhandler_socket::dup): Ditto.
+	* fork.cc (fork_child): Ditto.
+	(fork_parent): Ditto.
+	* grp.cc (internal_getgroups): Ditto.
+	* security.cc (verify_token): Ditto.
+	(check_file_access): Ditto.
+	(cygwin_set_impersonation_token): Detect conflicts. Set
+	user.external_token.
+	* spawn.cc (spawn_guts): Use new cygheap_user methods.
+	* syscalls.cc (seteuid32): Rearrange to use the two tokens
+	in cygheap_user.
+	(setegid32): Use new cygheap_user methods.
+	* uinfo.cc: (internal_getlogin): Ditto.
+
 2003-06-25  Doru Carastan  <doru.carastan@mvista.com>
 
 	* Makefile.in: Use INSTALL_PROGRAM to install the cygwin DLL.

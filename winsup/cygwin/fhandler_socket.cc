@@ -330,12 +330,10 @@ fhandler_socket::dup (fhandler_base *child)
 	 If WSADuplicateSocket() still fails for some reason, we fall back
 	 to DuplicateHandle(). */
       WSASetLastError (0);
-      if (cygheap->user.issetuid ())
-	RevertToSelf ();
+      cygheap->user.deimpersonate ();
       fhs->set_io_handle (get_io_handle ());
       fhs->fixup_before_fork_exec (GetCurrentProcessId ());
-      if (cygheap->user.issetuid ())
-	ImpersonateLoggedOnUser (cygheap->user.token);
+      cygheap->user.reimpersonate ();
       if (!WSAGetLastError ())
 	{
 	  fhs->fixup_after_fork (hMainProc);

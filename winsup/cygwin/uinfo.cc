@@ -102,7 +102,7 @@ internal_getlogin (cygheap_user &user)
 void
 uinfo_init ()
 {
-  if (child_proc_info && cygheap->user.token == INVALID_HANDLE_VALUE)
+  if (child_proc_info && !cygheap->user.has_impersonation_tokens ())
     return;
 
   if (!child_proc_info)
@@ -114,17 +114,16 @@ uinfo_init ()
 	   && cygheap->user.orig_gid == cygheap->user.real_gid
 	   && !cygheap->user.groups.issetgroups ())
     {
-      if (!ImpersonateLoggedOnUser (cygheap->user.token))
-	system_printf ("ImpersonateLoggedOnUser: %E");
+      cygheap->user.reimpersonate ();
       return;
     }
   else
-    CloseHandle (cygheap->user.token);
+    cygheap->user.close_impersonation_tokens ();
 
   cygheap->user.orig_uid = cygheap->user.real_uid = myself->uid;
   cygheap->user.orig_gid = cygheap->user.real_gid = myself->gid;
+  cygheap->user.impersonation_state = IMP_NONE;
   cygheap->user.set_orig_sid ();	/* Update the original sid */
-  cygheap->user.token = INVALID_HANDLE_VALUE; /* No token present */
 }
 
 extern "C" char *

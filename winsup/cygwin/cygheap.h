@@ -92,7 +92,13 @@ enum homebodies
   CH_HOME
 };
 
-struct passwd;
+enum impersonation
+{
+  IMP_BAD = -1,
+  IMP_NONE = 0,
+  IMP_EXTERNAL,
+  IMP_INTERNAL
+};
 
 class cygheap_user
 {
@@ -117,8 +123,9 @@ public:
 
   /* token is needed if set(e)uid should be called. It can be set by a call
      to `set_impersonation_token()'. */
-  HANDLE token;
-  BOOL   impersonated;
+  HANDLE external_token;
+  HANDLE internal_token;
+  enum impersonation impersonation_state;
 
   /* CGF 2002-06-27.  I removed the initializaton from this constructor
      since this class is always allocated statically.  That means that everything
@@ -165,7 +172,40 @@ public:
   const char *ontherange (homebodies what, struct passwd * = NULL);
   bool issetuid () const
   {
-    return impersonated && token != INVALID_HANDLE_VALUE;
+    return impersonation_state > IMP_NONE;
+  }
+  HANDLE token ()
+  {
+    if (impersonation_state == IMP_EXTERNAL)
+      return external_token;
+    if (impersonation_state == IMP_INTERNAL)
+      return internal_token;
+    return INVALID_HANDLE_VALUE;
+  }
+  void deimpersonate ()
+  {
+    if (impersonation_state > IMP_NONE)
+      RevertToSelf ();
+  }
+  void reimpersonate ()
+  {
+    if (impersonation_state > IMP_NONE
+	&& !ImpersonateLoggedOnUser (token ()))
+      system_printf ("ImpersonateLoggedOnUser: %E");
+  }
+  bool has_impersonation_tokens () { return external_token || internal_token; }
+  void close_impersonation_tokens ()
+  {
+    if (external_token)
+      {
+	CloseHandle (external_token);
+	external_token = 0;
+      }
+    if (internal_token)
+      {
+	CloseHandle (internal_token);
+	internal_token = 0;
+      }
   }
   const char *cygheap_user::test_uid (char *&, const char *, size_t)
     __attribute__ ((regparm (3)));

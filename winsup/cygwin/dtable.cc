@@ -634,8 +634,7 @@ dtable::vfork_child_dup ()
   int res = 1;
 
   /* Remove impersonation */
-  if (cygheap->user.issetuid ())
-    RevertToSelf ();
+  cygheap->user.deimpersonate ();
 
   for (size_t i = 0; i < size; i++)
     if (not_open (i))
@@ -654,8 +653,7 @@ dtable::vfork_child_dup ()
 
 out:
   /* Restore impersonation */
-  if (cygheap->user.issetuid ())
-    ImpersonateLoggedOnUser (cygheap->user.token);
+  cygheap->user.reimpersonate ();
 
   ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
   return 1;
