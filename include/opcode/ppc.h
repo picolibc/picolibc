@@ -1,5 +1,5 @@
 /* ppc.h -- Header file for PowerPC opcode table
-   Copyright 1994, 1995, 1999, 2000 Free Software Foundation, Inc.
+   Copyright 1994, 1995, 1999, 2000, 2001 Free Software Foundation, Inc.
    Written by Ian Lance Taylor, Cygnus Support
 
 This file is part of GDB, GAS, and the GNU binutils.
@@ -229,6 +229,8 @@ extern const struct powerpc_operand powerpc_operands[];
    prints these with a leading 'v'.  */
 #define PPC_OPERAND_VR (010000)
 
+/* This operand is for the DS field in a DS form instruction.  */
+#define PPC_OPERAND_DS (020000)
 
 /* The POWER and PowerPC assemblers use a few macros.  We keep them
    with the operands table for simplicity.  The macro table is an

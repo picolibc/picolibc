@@ -1,3 +1,7 @@
+2001-08-27  Torbjorn Granlund  <tege@swox.com>
+
+	* ppc.h (PPC_OPERAND_DS): Define.
+
 2001-08-25  Andreas Jaeger  <aj@suse.de>
 
 	* d30v.h: Fix declaration of reg_name_cnt.
