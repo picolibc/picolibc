@@ -70,6 +70,9 @@
 #include <security.h>
 #include <secext.h>
 #include <schnlsp.h>
+#include <ntldap.h>
+#include <winber.h>
+#include <winldap.h>
 #include <shlwapi.h>
 
 #ifndef __OBJC__  /* problems with BOOL */

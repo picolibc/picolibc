@@ -1,12 +1,22 @@
 2003-08-01  Danny Smith <dannysmith@users.sourceforge.net>
 
+	* lib/test.c: Include winldap.h, ntldap.h, winber.h.
+
+2003-08-01  Filip Navara  <xnavara@volny.cz>
+
+	* include/winldap.h: New file.
+	* include/ntldap.h: New file.
+	* include/winber.h: New file.
+	* lib/winldap32.def: New file.
+
+2003-08-01  Danny Smith <dannysmith@users.sourceforge.net>
+
 	* include/ddk/atm.h: Remove stray '.';
 
 2003-08-01  Gisle Vanem  <gvanem@broadpark.no>
 
 	* include/ddk/winddk.h; Remove trailing ';' from macros,
 	throughout. Add () around defines with cast returns, throughout.
-
 
 2003-07-31  Martin Fuchs  <Martin-Fuchs@gmx.net>
 
