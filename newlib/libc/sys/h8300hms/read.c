@@ -14,7 +14,7 @@ int _read(file, ptr, len)
 	asm("mov.b %0, r0l"::  "i" (SYS_read)) ; /* Syscall Number */
 	asm("mov.w %0, r1" :: "r"((short)file) :"r1", "r2", "r3") ;
 	asm("mov.w %0, r3" :: "r"((short)len) :"r1", "r2", "r3") ;
-#ifdef __H8300__
+#if defined(__H8300__) || defined(__NORMAL_MODE__)
 	asm("mov.w %0, r2" :: "r"(ptr) :"r1", "r2", "r3") ;
 #else
 	asm("mov.l %0, er2" :: "r"(ptr) :"r1", "er2", "r3") ;

@@ -1,3 +1,8 @@
+2002-11-22  Vijay L. Khuspe  <vijayk1@kpit.com>
+
+	* libc/sys/h8300hms/read.c: Add support for normal mode
+	architecture.
+
 2002-11-20  Ryo Tsuruta  <ryo@kitanet.ne.jp>
 
 	* libc/machine/h8300/setjmp.S (setjmp, longjmp): Combine common
