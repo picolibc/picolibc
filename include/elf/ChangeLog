@@ -1,3 +1,12 @@
+2002-05-08  Jason Thorpe  <thorpej@wasabisystems.com>
+
+	* common.h (NT_GNU_ABI_TAG): Define.
+	(GNU_ABI_TAG_LINUX): Define.
+	(GNU_ABI_TAG_HURD): Define.
+	(GNU_ABI_TAG_SOLARIS): Define. 
+	(NT_NETBSD_IDENT): Define.  
+	(NT_FREEBSD_ABI_TAG): Define.
+
 2002-04-24  Elena Zannoni  <ezannoni@redhat.com>
 
 	* dwarf2.h: Add DW_AT_GNU_vector.

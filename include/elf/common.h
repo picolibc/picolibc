@@ -358,6 +358,21 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define NT_VERSION	1		/* Contains a version string.  */
 #define NT_ARCH		2		/* Contains an architecture string.  */
 
+/* Values for GNU .note.ABI-tag notes.  Note name is "GNU".  */
+
+#define NT_GNU_ABI_TAG		1
+#define GNU_ABI_TAG_LINUX	0
+#define GNU_ABI_TAG_HURD	1
+#define GNU_ABI_TAG_SOLARIS	2
+
+/* Values for NetBSD .note.netbsd.ident notes.  Note name is "NetBSD".  */
+
+#define NT_NETBSD_IDENT		1
+
+/* Values for FreeBSD .note.ABI-tag notes.  Note name is "FreeBSD".  */
+
+#define NT_FREEBSD_ABI_TAG	1
+
 /* These three macros disassemble and assemble a symbol table st_info field,
    which contains the symbol binding and symbol type.  The STB_ and STT_
    defines identify the binding and type.  */
