@@ -1,3 +1,8 @@
+2002-03-19  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* configure.in (noconfigdirs): Do not add target-newlib if
+	target == i[3456]86-*-linux*, and host == target.
+
 2002-04-29  Mark Mitchell  <mark@codesourcery.com>
 
 	* config.guess: Updated to 2002-04-26's version.
