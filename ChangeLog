@@ -1,3 +1,13 @@
+2004-02-19  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	PR bootstrap/11932
+	* mkinstalldirs, install-sh: Import from automake CVS HEAD.
+
+2004-02-19  Andrew Cagney  <cagney@redhat.com>
+
+	* config.guess: Update from version 2003-06-12 to 2004-02-16.
+	* config.sub: Update from version 2003-06-13 to 2004-02-16.
+
 2004-02-11  David Edelsohn  <edelsohn@gnu.org>
 
 	* configure.in (powerpc-*-aix*): Add target-libada to noconfigdirs.
