@@ -1055,7 +1055,7 @@ freeset(p, cs)
 register struct parse *p;
 register cset *cs;
 {
-	register int i;
+	register size_t i;
 	register cset *top = &p->g->sets[p->g->ncsets];
 	register size_t css = (size_t)p->g->csetsize;
 
@@ -1081,7 +1081,7 @@ register struct parse *p;
 register cset *cs;
 {
 	register uch h = cs->hash;
-	register int i;
+	register size_t i;
 	register cset *top = &p->g->sets[p->g->ncsets];
 	register cset *cs2;
 	register size_t css = (size_t)p->g->csetsize;
@@ -1114,7 +1114,7 @@ firstch(p, cs)
 register struct parse *p;
 register cset *cs;
 {
-	register int i;
+	register size_t i;
 	register size_t css = (size_t)p->g->csetsize;
 
 	for (i = 0; i < css; i++)
@@ -1133,7 +1133,7 @@ nch(p, cs)
 register struct parse *p;
 register cset *cs;
 {
-	register int i;
+	register size_t i;
 	register size_t css = (size_t)p->g->csetsize;
 	register int n = 0;
 

@@ -254,7 +254,7 @@ template <class ListNode> void
 List<ListNode>::forEach (void (*callback)(ListNode *))
 {
   ListNode *aNode = head;
-  while (aNode) 
+  while (aNode)
   {
     callback (aNode);
     aNode = aNode->next;
@@ -293,7 +293,7 @@ public:
   static bool isGoodInitializerOrObject(pthread_mutex_t const *);
   static void initMutex ();
   static int init (pthread_mutex_t *, const pthread_mutexattr_t *);
-  
+
   CRITICAL_SECTION criticalsection;
   HANDLE win32_obj_id;
   LONG condwaits;
@@ -355,7 +355,7 @@ public:
   virtual void exit (void *value_ptr);
 
   virtual int cancel ();
-  
+
   virtual void testcancel ();
   static void static_cancel_self ();
 
@@ -459,7 +459,7 @@ public:
   static int wait (sem_t * sem);
   static int trywait (sem_t * sem);
   static int post (sem_t * sem);
-  
+
   HANDLE win32_obj_id;
   class semaphore * next;
   int shared;

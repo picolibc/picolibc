@@ -665,8 +665,8 @@ environ_init (char **envp, int envc)
     {
       for (int i = 0; conv_envvars[i].name != NULL; i++)
 	{
-	  conv_start_chars[cyg_tolower (conv_envvars[i].name[0])] = 1;
-	  conv_start_chars[cyg_toupper (conv_envvars[i].name[0])] = 1;
+	  conv_start_chars[(int) cyg_tolower (conv_envvars[i].name[0])] = 1;
+	  conv_start_chars[(int) cyg_toupper (conv_envvars[i].name[0])] = 1;
 	}
       initted = 1;
     }

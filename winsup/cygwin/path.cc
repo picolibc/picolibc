@@ -805,7 +805,7 @@ out:
 	mkrelpath (this->path);
       if (need_directory)
 	{
-	  char n = strlen (this->path);
+	  size_t n = strlen (this->path);
 	  /* Do not add trailing \ to UNC device names like \\.\a: */
 	  if (this->path[n - 1] != '\\' &&
 	      (strncmp (this->path, "\\\\.\\", 4) != 0 ||
