@@ -191,6 +191,7 @@ class path_conv
     {path[0] = '\0';}
 
   ~path_conv ();
+  void set_name (const char *win32, const char *posix);
   inline char *get_win32 () { return path; }
   PUNICODE_STRING get_nt_native_path (UNICODE_STRING &upath);
   operator char *() {return path;}

@@ -951,6 +951,7 @@ class fhandler_dev_null: public fhandler_base
 {
  public:
   fhandler_dev_null ();
+  int open (int, mode_t);
 
   void dump ();
   select_record *select_read (select_record *s);

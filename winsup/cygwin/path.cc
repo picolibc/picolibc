@@ -942,6 +942,15 @@ out:
 #endif
 }
 
+void
+path_conv::set_name (const char *win32, const char *posix)
+{
+  if (!normalized_path_size && normalized_path)
+    cfree (normalized_path);
+  strcpy (path, win32);
+  set_normalized_path (posix, false);
+}
+
 path_conv::~path_conv ()
 {
   if (!normalized_path_size && normalized_path)

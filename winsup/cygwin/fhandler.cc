@@ -1421,6 +1421,15 @@ fhandler_dev_null::dump (void)
   paranoid_printf ("here");
 }
 
+int
+fhandler_dev_null::open (int flags, mode_t mode)
+{
+  char posix[strlen (get_name ()) + 1];
+  strcpy (posix, get_name ());
+  pc.set_name ("NUL", posix);
+  return fhandler_base::open_9x (flags, mode);
+}
+
 void
 fhandler_base::set_no_inheritance (HANDLE &h, int not_inheriting)
 {
