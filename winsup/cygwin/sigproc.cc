@@ -1,8 +1,8 @@
 /* sigproc.cc: inter/intra signal and sub process handler
 
-   Copyright 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
 
-   Written by Christopher Faylor <cgf@cygnus.com>
+   Written by Christopher Faylor
 
 This file is part of Cygwin.
 
@@ -44,7 +44,7 @@ details. */
 
 #define wake_wait_subproc() SetEvent (events[0])
 
-#define no_signals_available() (!hwait_sig || !sig_loop_wait)
+#define no_signals_available() (!hwait_sig || !sig_loop_wait && !exit_state)
 
 #define NZOMBIES	256
 
@@ -267,7 +267,7 @@ pid_exists (pid_t pid)
 BOOL __stdcall
 proc_exists (_pinfo *p)
 {
-  return p && !(p->process_state & PID_EXITED);
+  return p && !(p->process_state & (PID_EXITED | PID_ZOMBIE));
 }
 
 /* Return 1 if this is one of our children, zero otherwise.
@@ -428,9 +428,8 @@ proc_subproc (DWORD what, DWORD val)
       goto scan_wait;
 
     /* Clear all waiting threads.  Called from exceptions.cc prior to
-     * the main thread's dispatch to a signal handler function.
-     * (called from wait_sig thread)
-     */
+       the main thread's dispatch to a signal handler function.
+       (called from wait_sig thread) */
     case PROC_CLEARWAIT:
       /* Clear all "wait"ing threads. */
       if (val)
@@ -707,15 +706,20 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
       HANDLE hp = OpenProcess (PROCESS_DUP_HANDLE, false, p->dwProcessId);
       if (!hp)
 	{
+	  sigproc_printf ("OpenProcess failed, %E");
 	  __seterrno ();
 	  goto out;
 	}
+      for (int i = 0; !p->sendsig && i < 10000; i++)
+	low_priority_sleep (0);
       if (!DuplicateHandle (hp, p->sendsig, hMainProc, &sendsig, false, 0,
 			    DUPLICATE_SAME_ACCESS) || !sendsig)
 	{
+	  sigproc_printf ("DuplicateHandle failed, %E");
 	  __seterrno ();
 	  goto out;
 	}
+      CloseHandle (hp);
       pack.wakeup = NULL;
     }
 
@@ -738,6 +742,7 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
          process is exiting.  */
       if (!its_me)
 	{
+	  sigproc_printf ("WriteFile for pipe %p failed, %E", sendsig);
 	  __seterrno ();
 	  ForceCloseHandle (sendsig);
 	}
@@ -783,6 +788,9 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
       set_errno (ENOSYS);
       rc = -1;
     }
+
+  if (wait_for_completion)
+    call_signal_handler_now ();
 
 out:
   if (sig != __SIGPENDING)
