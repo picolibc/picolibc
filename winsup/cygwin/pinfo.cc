@@ -328,6 +328,10 @@ _pinfo::commune_send (DWORD code)
   HANDLE fromme = NULL, tothem = NULL;
   DWORD nr;
   commune_result res;
+
+  res.s = NULL;
+  res.n = 0;
+
   if (!pid || !this)
     {
       set_errno (ESRCH);
