@@ -36,6 +36,7 @@ enum path_types
   PATH_BINARY = MOUNT_BINARY,
   PATH_EXEC = MOUNT_EXEC,
   PATH_CYGWIN_EXEC = MOUNT_CYGWIN_EXEC,
+  PATH_ALL_EXEC = PATH_CYGWIN_EXEC | PATH_EXEC,
   PATH_SOCKET =  0x40000000,
   PATH_HASACLS = 0x80000000
 };
@@ -52,7 +53,7 @@ class path_conv
   int isbinary () {return path_flags & PATH_BINARY;}
   int issymlink () {return path_flags & PATH_SYMLINK;}
   int issocket () {return path_flags & PATH_SOCKET;}
-  int isexec () {return path_flags & PATH_EXEC;}
+  int isexec () {return path_flags & PATH_ALL_EXEC;}
   int iscygexec () {return path_flags & PATH_CYGWIN_EXEC;}
 
   void set_binary () {path_flags |= PATH_BINARY;}

@@ -258,6 +258,7 @@ pinfo::init (pid_t n, DWORD create, HANDLE in_h)
 
   destroy = 1;
 }
+
 void
 pinfo::release ()
 {

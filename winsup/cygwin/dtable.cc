@@ -33,6 +33,9 @@ details. */
 
 dtable fdtab;
 
+static DWORD std_consts[] = {STD_INPUT_HANDLE, STD_OUTPUT_HANDLE,
+			   STD_ERROR_HANDLE};
+
 /* Set aside space for the table of fds */
 void
 dtable_init (void)
@@ -45,11 +48,9 @@ void __stdcall
 set_std_handle (int fd)
 {
   if (fd == 0)
-    SetStdHandle (STD_INPUT_HANDLE, fdtab[fd]->get_handle ());
-  else if (fd == 1)
-    SetStdHandle (STD_OUTPUT_HANDLE, fdtab[fd]->get_output_handle ());
-  else if (fd == 2)
-    SetStdHandle (STD_ERROR_HANDLE, fdtab[fd]->get_output_handle ());
+    SetStdHandle (std_consts[fd], fdtab[fd]->get_handle ());
+  else if (fd <= 2)
+    SetStdHandle (std_consts[fd], fdtab[fd]->get_output_handle ());
 }
 
 int
@@ -453,7 +454,13 @@ dtable::fixup_after_exec (HANDLE parent, size_t sz, fhandler_base **f)
 	if (fds[i]->get_close_on_exec ())
 	  release (i);
 	else
-	  fds[i]->fixup_after_exec (parent);
+	  {
+	    fds[i]->fixup_after_exec (parent);
+	    if (i == 0)
+	      SetStdHandle (std_consts[i], fds[i]->get_io_handle ());
+	    else if (i <= 2)
+	      SetStdHandle (std_consts[i], fds[i]->get_output_handle ());
+	  }
       }
 }
 

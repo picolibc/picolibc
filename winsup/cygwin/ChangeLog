@@ -1,3 +1,27 @@
+Sun Oct  8 22:38:40 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dtable.cc (set_std_handle): Use std_consts array to control
+	SetStdHandle settings.
+	(dtable::fixup_after_fork): Ditto.
+	* exceptions.cc (set_sig_errno): Remove some debugging output.
+	* path.cc (path_conv::check): Don't OR need_directory with flags sent
+	to symlink_info::check.
+	(symlink_info::check): Use PATH_ALL_EXEC to determine when a file is
+	executable.
+	* path.h (path_types): Add PATH_ALL_EXEC.
+	(isexec): Use PATH_ALL_EXEC so that cygexec types will be considered
+	executable.
+	* pinfo.h (_pinfo): Add a process handle that is kept open throughout
+	the life of a cygwin pid.
+	* sigproc.cc (proc_exists): Remove hopefully obsolete stuff.
+	(proc_subproc): Set up process handle that is kept open throughout the
+	life of a cygwin pid.  Reorganize PROC_WAIT stuff to use common code.
+	(proc_terminate): Close pid lifetime process handle.
+	(checkstate): Cleanup.
+	(stopped_or_terminated): Move zombie cleanup.
+	(remove_zombie): To here.
+	* spawn.cc (spawn_guts): Reorganize reparenting code for 1247th time.
+
 Sat Oct  7 13:59:15 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler.h (fhandler_base): Remove obsolete _rpos and _rsize

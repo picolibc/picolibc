@@ -257,7 +257,7 @@ path_conv::check (const char *src, unsigned opt,
 	  else
 	    {
 	      suff = suffixes;
-	      sym.pflags = path_flags | need_directory;
+	      sym.pflags = path_flags;
 	    }
 
 	  int len = sym.check (path_copy, suff);
@@ -2294,7 +2294,7 @@ symlink_info::check (const char *in_path, const suffix_info *suffixes)
 	  else
 	    {
 	      /* Not a symlink, see if executable.  */
-	      if (!(pflags & (PATH_EXEC | PATH_CYGWIN_EXEC)) && got >= 2 &&
+	      if (!(pflags & PATH_ALL_EXEC) && got >= 2 &&
 		  ((cookie_buf[0] == '#' && cookie_buf[1] == '!') ||
 		   (cookie_buf[0] == ':' && cookie_buf[1] == '\n') ||
 		   (cookie_buf[0] == 'M' && cookie_buf[1] == 'Z')))

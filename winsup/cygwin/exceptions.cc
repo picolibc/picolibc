@@ -688,7 +688,7 @@ set_sig_errno (int e)
 {
   set_errno (e);
   sigsave.saved_errno = e;
-  debug_printf ("errno %d", e);
+  // sigproc_printf ("errno %d", e);
 }
 
 #define SUSPEND_TRIES 10000

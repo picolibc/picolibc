@@ -687,14 +687,11 @@ skip_arg_parsing:
 
   /* We print the original program name here so the user can see that too.  */
   syscall_printf ("%d = spawn_guts (%s, %.132s)",
-		  rc ? cygpid : (unsigned int) -1,
-		  prog_arg, one_line.buf);
+		  rc ? cygpid : (unsigned int) -1, prog_arg, one_line.buf);
 
-  MALLOC_CHECK;
   /* Name the handle similarly to proc_subproc. */
   ProtectHandle1 (pi.hProcess, childhProc);
   ProtectHandle (pi.hThread);
-  MALLOC_CHECK;
 
   if (mode == _P_OVERLAY)
     {
@@ -785,20 +782,16 @@ skip_arg_parsing:
 	    {
 	    case WAIT_OBJECT_0:
 	      sigproc_printf ("subprocess exited");
-	      if (!GetExitCodeProcess (pi.hProcess, &res))
-		res = 1;
+	      DWORD exitcode;
+	      if (!GetExitCodeProcess (pi.hProcess, &exitcode))
+		exitcode = 1;
+	      res |= exitcode;
 	      exited = TRUE;
 
-	      if (nwait <= 2 || mode != _P_OVERLAY)
+	      if (nwait <= 2 || (res & EXIT_REPARENTING) || (mode != _P_OVERLAY && mode != _P_VFORK))
 		/* nothing to do */;
 	      else if (WaitForSingleObject (spr, 1) == WAIT_OBJECT_0)
 		goto reparent;
-	      else if (!(res & EXIT_REPARENTING))
-		{
-		  MALLOC_CHECK;
-		  close_all_files ();
-		  MALLOC_CHECK;
-		}
 	      break;
 	    case WAIT_OBJECT_0 + 1:
 	      sigproc_printf ("signal arrived");
@@ -809,7 +802,6 @@ skip_arg_parsing:
 		{
 	      reparent:
 		  res |= EXIT_REPARENTING;
-		  close_all_files ();
 		  if (!parent_alive)
 		    {
 		      nwait = 1;
@@ -848,33 +840,37 @@ skip_arg_parsing:
 	    /* nothing */;
 	  else
 	    {
-	      int rc;
-	      HANDLE hP = OpenProcess (PROCESS_ALL_ACCESS, FALSE,
-				       parent->dwProcessId);
-	      sigproc_printf ("parent handle %p, pid %d", hP, parent->dwProcessId);
-	      if (hP == NULL && GetLastError () == ERROR_INVALID_PARAMETER)
+	      int rc = 0;
+	      HANDLE oldh = myself->hProcess;
+	      HANDLE h = OpenProcess (PROCESS_ALL_ACCESS, FALSE,
+				      parent->dwProcessId);
+	      sigproc_printf ("parent handle %p, pid %d", h, parent->dwProcessId);
+	      if (h == NULL && GetLastError () == ERROR_INVALID_PARAMETER)
 		rc = 1;
-	      else if (hP)
+	      else if (h)
 		{
-		  ProtectHandle (hP);
-		  rc = DuplicateHandle (hMainProc, pi.hProcess, hP,
-					&myself->hProcess, 0, FALSE,
+		  ProtectHandle (h);
+		  rc = DuplicateHandle (hMainProc, pi.hProcess,
+					h, &myself->hProcess, 0, FALSE,
 					DUPLICATE_SAME_ACCESS);
-		  sigproc_printf ("Dup hP %d", rc);
-		  ForceCloseHandle (hP);
+		  sigproc_printf ("%d = DuplicateHandle, oldh %p, newh %p",
+				  rc, oldh, myself->hProcess);
+		  ForceCloseHandle (h);
 		}
-	      if (!res)
+	      if (!rc)
 		{
-		  system_printf ("Reparent failed, parent handle %p, %E", hP);
+		  system_printf ("Reparent failed, parent handle %p, %E", h);
 		  system_printf ("my dwProcessId %d, myself->dwProcessId %d",
 				 GetCurrentProcessId(), myself->dwProcessId);
-		  system_printf ("myself->process_state %x",
-				 myself->process_state);
-		  system_printf ("myself->hProcess %x", myself->hProcess);
+		  system_printf ("old hProcess %p, hProcess %p", oldh, myself->hProcess);
 		}
 	    }
-	  ForceCloseHandle1 (hExeced, childhProc);
-	  hExeced = INVALID_HANDLE_VALUE;
+	  if (hExeced)
+	    {
+	      ForceCloseHandle1 (hExeced, childhProc);
+	      hExeced = INVALID_HANDLE_VALUE;
+	      close_all_files ();
+	    }
 	}
       else if (exited)
 	{

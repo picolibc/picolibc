@@ -236,6 +236,7 @@ proc_exists (_pinfo *p)
     }
 
   sigproc_printf ("it doesn't exist");
+#if 0
   /* If the parent pid does not exist, clean this process out of the pinfo
    * table.  It must have died abnormally.
    */
@@ -244,6 +245,7 @@ proc_exists (_pinfo *p)
       p->hProcess = NULL;
       p->process_state = PID_NOT_IN_USE;
     }
+#endif
   return FALSE;
 }
 
@@ -303,11 +305,15 @@ proc_subproc (DWORD what, DWORD val)
       pchildren[nchildren] = vchild;
       hchildren[nchildren] = vchild->hProcess;
       ProtectHandle1 (vchild->hProcess, childhProc);
+      nchildren++;
+      if (!DuplicateHandle (hMainProc, vchild->hProcess, hMainProc, &vchild->pid_handle,
+		     0, 0, DUPLICATE_SAME_ACCESS))
+	system_printf ("Couldn't duplicate child handle for pid %d, %E", vchild->pid);
+      ProtectHandle1 (vchild->pid_handle, pid_handle);
       sigproc_printf ("added pid %d to wait list, slot %d, winpid %p, handle %p",
 		  vchild->pid, nchildren, vchild->dwProcessId,
 		  vchild->hProcess);
 
-      nchildren++;
       wake_wait_subproc ();
       break;
 
@@ -351,6 +357,38 @@ proc_subproc (DWORD what, DWORD val)
       clearing = 0;
       goto scan_wait;
 
+    /* Handle a wait4() operation.  Allocates an event for the calling
+     * thread which is signaled when the appropriate pid exits or stops.
+     * (usually called from the main thread)
+     */
+    case PROC_WAIT:
+      wval->ev = NULL;		// Don't know event flag yet
+
+      if (wval->pid <= 0)
+	child = NULL;		// Not looking for a specific pid
+      else if (!mychild (wval->pid))
+	goto out;		// invalid pid.  flag no such child
+
+      wval->status = 0;		// Don't know status yet
+      sigproc_printf ("wval->pid %d, wval->options %d", wval->pid, wval->options);
+
+      /* If the first time for this thread, create a new event, otherwise
+       * reset the event.
+       */
+      if ((wval->ev = wval->thread_ev) == NULL)
+	{
+	  wval->ev = wval->thread_ev = CreateEvent (&sec_none_nih, TRUE,
+						    FALSE, NULL);
+	  ProtectHandle (wval->ev);
+	}
+
+      ResetEvent (wval->ev);
+      w = waitq_head.next;
+      waitq_head.next = wval;	/* Add at the beginning. */
+      wval->next = w;		/* Link in rest of the list. */
+      clearing = 0;
+      goto scan_wait;
+
     /* Clear all waiting threads.  Called from exceptions.cc prior to
      * the main thread's dispatch to a signal handler function.
      * (called from wait_sig thread)
@@ -371,12 +409,13 @@ proc_subproc (DWORD what, DWORD val)
 	{
 	  if ((potential_match = checkstate (w)) > 0)
 	    sigproc_printf ("released waiting thread");
-	  else if (!clearing && potential_match < 0)
+	  else if (!clearing && !(w->next->options & WNOHANG) && potential_match < 0)
 	    sigproc_printf ("only found non-terminated children");
 	  else if (potential_match <= 0)		// nothing matched
 	    {
 	      sigproc_printf ("waiting thread found no children");
 	      HANDLE oldw = w->next->ev;
+	      w->next->pid = 0;
 	      if (clearing)
 		w->next->status = -1;		/* flag that a signal was received */
 	      else
@@ -396,75 +435,6 @@ proc_subproc (DWORD what, DWORD val)
 	  waitq_head.next = NULL;
 	  sigproc_printf ("finished clearing");
 	}
-      break;
-
-    /* Handle a wait4() operation.  Allocates an event for the calling
-     * thread which is signaled when the appropriate pid exits or stops.
-     * (usually called from the main thread)
-     */
-    case PROC_WAIT:
-      wval->ev = NULL;		// Don't know event flag yet
-
-      if (wval->pid <= 0)
-	child = NULL;		// Not looking for a specific pid
-      else if (!mychild (wval->pid))
-	goto out;		// invalid pid.  flag no such child
-
-      wval->status = 0;		// Don't know status yet
-
-      /* Put waitq structure at the end of a linked list. */
-      for (w = &waitq_head; w->next != NULL; w = w->next)
-	if (w->next == wval && (w->next = w->next->next) == NULL)
-	  break;
-
-      wval->next = NULL;	/* This will be last in the list */
-      sigproc_printf ("wval->pid %d, wval->options %d", wval->pid, wval->options);
-
-      /* If the first time for this thread, create a new event, otherwise
-       * reset the event.
-       */
-      if ((wval->ev = wval->thread_ev) == NULL)
-	{
-	  wval->ev = wval->thread_ev = CreateEvent (&sec_none_nih, TRUE,
-						    FALSE, NULL);
-	  ProtectHandle (wval->ev);
-	}
-      ResetEvent (wval->ev);
-
-      /* Scan list of children to see if any have died.
-       * If so, the event flag is set so that the wait* ()
-       * process will return immediately.
-       *
-       * If no children were found and the wait option was WNOHANG,
-       * then set the pid to 0 and remove the waitq value from
-       * consideration.
-       */
-      w->next = wval;		/* set at end of wait queue */
-      if ((potential_match = checkstate (w)) <= 0)
-	{
-	  if (!potential_match)
-	    {
-	      w->next = NULL;		// don't want to keep looking
-	      wval->ev = NULL;		// flag that there are no children
-	      sigproc_printf ("no appropriate children, %p, %p",
-			  wval->thread_ev, wval->ev);
-	    }
-	  else if (wval->options & WNOHANG)
-	    {
-	      w->next = NULL;		// don't want to keep looking
-	      wval->pid = 0;		// didn't find a pid
-	      if (!SetEvent (wval->ev))	// wake up wait4 () immediately
-		system_printf ("Couldn't wake up wait event, %E");
-	      sigproc_printf ("WNOHANG and no terminated children, %p, %p",
-			  wval->thread_ev, wval->ev);
-	    }
-	}
-      if (w->next != NULL)
-	sigproc_printf ("wait activated %p, %p", wval->thread_ev, wval->ev);
-      else if (wval->ev != NULL)
-	sigproc_printf ("wait activated %p.  Reaped zombie.", wval->ev);
-      else
-	sigproc_printf ("wait not activated %p, %p", wval->thread_ev, wval->ev);
       break;
   }
 
@@ -513,7 +483,7 @@ proc_terminate (void)
 	  if (zombies[i]->hProcess)
 	    {
 	      ForceCloseHandle1 (zombies[i]->hProcess, childhProc);
-	      zombies[i]->hProcess = NULL;
+	      ForceCloseHandle1 (zombies[i]->pid_handle, pid_handle);
 	    }
 	  zombies[i]->process_state = PID_NOT_IN_USE;	/* CGF FIXME - still needed? */
 	  zombies[i].release();		// FIXME: this breaks older gccs for some reason
@@ -530,7 +500,6 @@ proc_terminate (void)
 	  else
 	    {
 	      ForceCloseHandle1 (pchildren[i]->hProcess, childhProc);
-	      pchildren[i]->hProcess = NULL;
 	      if (!proc_exists (pchildren[i]))
 		{
 		  sigproc_printf ("%d(%d) doesn't exist", pchildren[i]->pid,
@@ -937,21 +906,22 @@ init_child_info (DWORD chtype, child_info *ch, pid_t pid, HANDLE subproc_ready)
  * terminated.
  */
 static int __stdcall
-checkstate (waitq *w)
+checkstate (waitq *parent_w)
 {
-  int i, x, potential_match = 0;
-  _pinfo *child;
+  int potential_match = 0;
 
   sigproc_printf ("nchildren %d, nzombies %d", nchildren, nzombies);
 
   /* Check already dead processes first to see if they match the criteria
    * given in w->next.
    */
-  for (i = 0; i < nzombies; i++)
-    if ((x = stopped_or_terminated (w, child = zombies[i])) < 0)
-      potential_match = -1;
-    else if (x > 0)
+  for (int i = 0; i < nzombies; i++)
+    switch (stopped_or_terminated (parent_w, zombies[i]))
       {
+      case -1:
+	potential_match = -1;
+	break;
+      case 1:
 	remove_zombie (i);
 	potential_match = 1;
 	goto out;
@@ -960,13 +930,15 @@ checkstate (waitq *w)
   sigproc_printf ("checking alive children");
 
   /* No dead terminated children matched.  Check for stopped children. */
-  for (i = 0; i < nchildren; i++)
-    if ((x = stopped_or_terminated (w, pchildren[i])) < 0)
-      potential_match = -1;
-    else if (x > 0)
+  for (int i = 0; i < nchildren; i++)
+    switch (stopped_or_terminated (parent_w, pchildren[i]))
       {
-	potential_match = 1;
+      case -1:
+	potential_match = -1;
 	break;
+      case 1:
+	potential_match = 1;
+	goto out;
       }
 
 out:
@@ -1074,10 +1046,15 @@ static void __stdcall
 remove_zombie (int ci)
 {
   sigproc_printf ("removing %d, pid %d, nzombies %d", ci, zombies[ci]->pid,
-	      nzombies);
+		  nzombies);
 
   if (zombies[ci])
-    zombies[ci].release ();
+    {
+      ForceCloseHandle1 (zombies[ci]->hProcess, childhProc);
+      ForceCloseHandle1 (zombies[ci]->pid_handle, pid_handle);
+      zombies[ci]->process_state = PID_NOT_IN_USE;	/* a reaped child */
+      zombies[ci].release ();
+    }
 
   if (ci < --nzombies)
     zombies[ci] = zombies[nzombies];
@@ -1146,9 +1123,6 @@ stopped_or_terminated (waitq *parent_w, _pinfo *child)
 	      add_rusage ((struct rusage *) w->rusage, &child->rusage_children);
 	      add_rusage ((struct rusage *) w->rusage, &child->rusage_self);
 	    }
-	  ForceCloseHandle1 (child->hProcess, childhProc);
-	  child->hProcess = NULL;
-	  child->process_state = PID_NOT_IN_USE;	/* a reaped child */
 	}
 
       if (!SetEvent (w->ev))	/* wake up wait4 () immediately */
