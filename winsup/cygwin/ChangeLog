@@ -1,3 +1,11 @@
+2003-09-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din: Export endusershell, getusershell and setusershell.
+	* syscalls.cc (getusershell): New function.
+	(setusershell): Ditto.
+	(endusershell): Ditto.
+	* include/cygwin/version.h: Bump API minor number.
+
 2003-09-08  Nicholas Wourms  <nwourms@netscape.net>
 
 	* cygwin.din: Export argz_add argz_add_sep argz_append argz_count

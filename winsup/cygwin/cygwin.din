@@ -289,6 +289,7 @@ cygwin32_detach_dll = cygwin_detach_dll
 cygwin_dll_init
 endprotoent = cygwin_endprotoent
 endservent = cygwin_endservent
+endusershell
 gethostbyaddr = cygwin_gethostbyaddr
 gethostbyname = cygwin_gethostbyname
 _gethostname = cygwin_gethostname
@@ -302,6 +303,7 @@ getservbyport = cygwin_getservbyport
 getservent = cygwin_getservent
 getsockname = cygwin_getsockname
 getsockopt = cygwin_getsockopt
+getusershell
 herror = cygwin_herror
 hstrerror = cygwin_hstrerror
 inet_addr = cygwin_inet_addr
@@ -335,6 +337,7 @@ cygwin_set_impersonation_token
 setprotoent = cygwin_setprotoent
 setservent = cygwin_setservent
 setsockopt = cygwin_setsockopt
+setusershell
 shutdown = cygwin_shutdown
 socket = cygwin_socket
 cygwin_split_path

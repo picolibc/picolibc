@@ -30,6 +30,8 @@ details. */
 #include <process.h>
 #include <utmp.h>
 #include <sys/uio.h>
+#include <errno.h>
+#include <ctype.h>
 #include <limits.h>
 #include <unistd.h>
 #include <setjmp.h>
@@ -2896,4 +2898,68 @@ long gethostid(void)
   debug_printf ("hostid: %08x", hostid);
 
   return hostid;
+}
+
+#define ETC_SHELLS "/etc/shells"
+static int shell_index;
+static FILE *shell_fp;
+
+extern "C" char *
+getusershell ()
+{
+  /* List of default shells if no /etc/shells exists, defined as on Linux.
+     FIXME: SunOS has a far longer list, containing all shells which
+     might be shipped with the OS.  Should we do the same for the Cygwin
+     distro, adding bash, tcsh, ksh, pdksh and zsh?  */
+  static NO_COPY const char *def_shells[] = {
+    "/bin/sh",
+    "/bin/csh",
+    "/usr/bin/sh",
+    "/usr/bin/csh",
+    NULL
+  };
+  static char buf[MAX_PATH];
+  int ch, buf_idx;
+
+  if (!shell_fp && !(shell_fp = fopen (ETC_SHELLS, "rt")))
+    {
+      if (def_shells[shell_index])
+        return strcpy (buf, def_shells[shell_index++]);
+      return NULL;
+    }
+  /* Skip white space characters. */
+  while ((ch = getc (shell_fp)) != EOF && isspace (ch))
+    ;
+  /* Get each non-whitespace character as part of the shell path as long as
+     it fits in buf. */
+  for (buf_idx = 0;
+       ch != EOF && !isspace (ch) && buf_idx < MAX_PATH;
+       buf_idx++, ch = getc (shell_fp))
+    buf[buf_idx] = ch;
+  /* Skip any trailing non-whitespace character not fitting in buf.  If the
+     path is longer than MAX_PATH, it's invalid anyway. */
+  while (ch != EOF && !isspace (ch))
+    ch = getc (shell_fp);
+  if (buf_idx)
+    {
+      buf[buf_idx] = '\0';
+      return buf;
+    }
+  return NULL;
+}
+
+extern "C" void
+setusershell ()
+{
+  if (shell_fp)
+    fseek (shell_fp, 0L, SEEK_SET);
+  shell_index = 0;
+}
+
+extern "C" void
+endusershell ()
+{
+  if (shell_fp)
+    fclose (shell_fp);
+  shell_index = 0;
 }
