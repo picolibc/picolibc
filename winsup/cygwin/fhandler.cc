@@ -909,13 +909,22 @@ fhandler_base::close ()
 int
 fhandler_base::ioctl (unsigned int cmd, void *buf)
 {
-  if (cmd == FIONBIO)
-    syscall_printf ("ioctl (FIONBIO, %p)", buf);
-  else
-    syscall_printf ("ioctl (%x, %p)", cmd, buf);
+  int res;
 
-  set_errno (EINVAL);
-  return -1;
+  switch (cmd)
+    {
+    case FIONBIO:
+      set_nonblocking (*(int *) buf);
+      res = 0;
+      break;
+    default:
+      set_errno (EINVAL);
+      res = -1;
+      break;
+    }
+
+  syscall_printf ("%d = ioctl (%x, %p)", res, cmd, buf);
+  return res;
 }
 
 int

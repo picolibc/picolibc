@@ -1,3 +1,7 @@
+2003-10-25  Brian Ford  <ford@vss.fsi.com>
+
+	* fhandler.cc (fhandler_base::ioctl): Handle FIONBIO.
+
 2003-10-24  Thomas Pfaff  <tpfaff@gmx.net>
 
 	Rename native_mutex to fast_mutex throughout.
