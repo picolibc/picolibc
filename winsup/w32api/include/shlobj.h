@@ -233,7 +233,7 @@ typedef struct _ITEMIDLIST {
 } ITEMIDLIST,*LPITEMIDLIST;
 typedef const ITEMIDLIST *LPCITEMIDLIST;
 typedef int (CALLBACK* BFFCALLBACK)(HWND,UINT,LPARAM,LPARAM);
-typedef struct _browseinfo {
+typedef struct _browseinfoA {
 	HWND	hwndOwner;
 	LPCITEMIDLIST	pidlRoot;
 	LPSTR	pszDisplayName;
@@ -242,7 +242,17 @@ typedef struct _browseinfo {
 	BFFCALLBACK	lpfn;
 	LPARAM	lParam;
 	int	iImage;
-} BROWSEINFO,*PBROWSEINFO,*LPBROWSEINFO;
+} BROWSEINFOA,*PBROWSEINFOA,*LPBROWSEINFOA;
+typedef struct _browseinfoW {
+	HWND	hwndOwner;
+	LPCITEMIDLIST	pidlRoot;
+	LPWSTR	pszDisplayName;
+	LPCWSTR	lpszTitle;
+	UINT	ulFlags;
+	BFFCALLBACK	lpfn;
+	LPARAM	lParam;
+	int	iImage;
+} BROWSEINFOW,*PBROWSEINFOW,*LPBROWSEINFOW;
 typedef struct _CMInvokeCommandInfo {
 	DWORD cbSize;
 	DWORD fMask;
@@ -676,14 +686,16 @@ DECLARE_INTERFACE_(IShellIcon,IUnknown)
 typedef IShellIcon *LPSHELLICON;
 
 void WINAPI SHAddToRecentDocs(UINT,PCVOID);
-LPITEMIDLIST WINAPI SHBrowseForFolder(PBROWSEINFO);
+LPITEMIDLIST WINAPI SHBrowseForFolderA(PBROWSEINFOA);
+LPITEMIDLIST WINAPI SHBrowseForFolderW(PBROWSEINFOW);
 void WINAPI SHChangeNotify(LONG,UINT,PCVOID,PCVOID);
 HRESULT WINAPI SHGetDataFromIDListA(LPSHELLFOLDER,LPCITEMIDLIST,int,PVOID,int);
 HRESULT WINAPI SHGetDataFromIDListW(LPSHELLFOLDER,LPCITEMIDLIST,int,PVOID,int);
 HRESULT WINAPI SHGetDesktopFolder(LPSHELLFOLDER*);
 HRESULT WINAPI SHGetInstanceExplorer(LPUNKNOWN);
 HRESULT WINAPI SHGetMalloc(LPMALLOC*);
-BOOL WINAPI SHGetPathFromIDList(LPCITEMIDLIST,LPSTR);
+BOOL WINAPI SHGetPathFromIDListA(LPCITEMIDLIST,LPSTR);
+BOOL WINAPI SHGetPathFromIDListW(LPCITEMIDLIST,LPWSTR);
 HRESULT WINAPI SHGetSpecialFolderLocation(HWND,int,LPITEMIDLIST*);
 HRESULT WINAPI SHLoadInProc(REFCLSID);
 /* FIXME/TODO: Only valid for _WIN32_IE >= 400? */
@@ -693,13 +705,19 @@ BOOL WINAPI SHGetSpecialFolderPathW(HWND,LPSTR,int,BOOL);
 #ifdef UNICODE
 typedef IShellExecuteHookW IShellExecuteHook;
 typedef IShellLinkW IShellLink;
+typedef BROWSEINFOW BROWSEINFO,*PBROWSEINFO,*LPBROWSEINFO;
+#define SHBrowseForFolder SHBrowseForFolderW
 #define SHGetDataFromIDList SHGetDataFromIDListW
+#define SHGetPathFromIDList SHGetPathFromIDListW
 /* FIXME/TODO: Only valid for _WIN32_IE >= 400? */
 #define SHGetSpecialFolderPath SHGetSpecialFolderPathW
 #else
 typedef IShellExecuteHookA IShellExecuteHook;
 typedef IShellLinkA IShellLink;
+typedef BROWSEINFOA BROWSEINFO,*PBROWSEINFO,*LPBROWSEINFO;
+#define SHBrowseForFolder SHBrowseForFolderA
 #define SHGetDataFromIDList SHGetDataFromIDListA
+#define SHGetPathFromIDList SHGetPathFromIDListA
 /* FIXME/TODO: Only valid for _WIN32_IE >= 400? */
 #define SHGetSpecialFolderPath SHGetSpecialFolderPathA
 #endif
