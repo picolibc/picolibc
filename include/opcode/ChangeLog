@@ -1,3 +1,8 @@
+2003-10-21  Peter Barada  <pbarada@mail.wm.sps.mot.com>
+            Bernardo Innocenti  <bernie@develer.com>
+
+	* m68k.h: Add MCFv4/MCF5528x support.
+
 2003-10-19  Hans-Peter Nilsson  <hp@bitrange.com>
 
 	* mmix.h (JMP_INSN_BYTE): Define.
