@@ -1,3 +1,7 @@
+2002-01-07  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* COPYING.NEWLIB: Update generic copyright date.
+
 2002-01-07  Mark Salter  <msalter@redhat.com>
 
 	* configure.in: Remove target-bsp and target-cygmon from arm builds.
