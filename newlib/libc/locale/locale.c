@@ -136,6 +136,7 @@ _DEFUN(_setlocale_r, (p, category, locale),
 
   if (locale)
     {
+      char *locale_name = (char *)locale;
       if (category != LC_CTYPE && category != LC_MESSAGES) 
         { 
           if (strcmp (locale, "C") && strcmp (locale, ""))
@@ -143,17 +144,15 @@ _DEFUN(_setlocale_r, (p, category, locale),
           if (category == LC_ALL)
             {
               strcpy (last_lc_ctype, lc_ctype);
-              strcpy (lc_ctype, locale);
+              strcpy (lc_ctype, "C");
               strcpy (last_lc_messages, lc_messages);
-              strcpy (lc_messages, locale);
+              strcpy (lc_messages, "C");
               __mb_cur_max = 1;
             }
         }
       else
         {
-          if (locale[0] != 'C')
-            return 0; 
-          if (locale[1] == '-')
+          if (locale[0] == 'C' && locale[1] == '-')
             {
               switch (locale[2])
                 {
@@ -180,12 +179,18 @@ _DEFUN(_setlocale_r, (p, category, locale),
                 default:
                   return 0;
                 }
-            }   
+            }
+          else 
+            {
+              if (strcmp (locale, "C") && strcmp (locale, ""))
+                return 0;
+              locale_name = "C"; /* C is always the default locale */
+            }
 
           if (category == LC_CTYPE)
             {
               strcpy (last_lc_ctype, lc_ctype);
-              strcpy (lc_ctype, locale);
+              strcpy (lc_ctype, locale_name);
 
               __mb_cur_max = 1;
               if (locale[1] == '-')
@@ -213,7 +218,7 @@ _DEFUN(_setlocale_r, (p, category, locale),
           else
             {
               strcpy (last_lc_messages, lc_messages);
-              strcpy (lc_messages, locale);
+              strcpy (lc_messages, locale_name);
 
               charset = "ISO-8859-1";
               if (locale[1] == '-')

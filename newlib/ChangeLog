@@ -1,3 +1,9 @@
+2002-08-29  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/locale/locale.c (_setlocale_r)[MB_CAPABLE]: Fix so
+        default locale "" is accepted for LC_CTYPE or LC_MESSAGES
+        and is treated as if "C" was specified.
+
 2002-08-28  Jeff Johnston  <jjohnstn@redhat.com>
 
         * Makefile.am (install-data-local): Move install of build
