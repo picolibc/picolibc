@@ -1,5 +1,10 @@
 2003-12-14  Christopher Faylor  <cgf@redhat.com>
 
+	* exceptions.cc (ctrl_c_handler): Remove this thread from the signal
+	handler chain.
+
+2003-12-14  Christopher Faylor  <cgf@redhat.com>
+
 	* cygthread.cc (cygthread::stub): Revert previous change and again
 	subsume cygthread::stub2.  Just return from function now since
 	ExitThread is guaranteed by automatic _threadinfo wrapper.  Define as

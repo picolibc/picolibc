@@ -899,6 +899,7 @@ static BOOL WINAPI
 ctrl_c_handler (DWORD type)
 {
   static bool saw_close;
+  _my_tls.remove ();
 
   /* Return FALSE to prevent an "End task" dialog box from appearing
      for each Cygwin process window that's open when the computer
