@@ -17,6 +17,7 @@ details. */
 #define SHM_REATTACH 1
 #define SHM_ATTACH 2
 #define SHM_DETACH 3
+#define SHM_DEL    4
 
 
 class client_request_shm : public client_request

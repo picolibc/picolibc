@@ -134,6 +134,34 @@ build_inprocess_shmds (HANDLE hfilemap, HANDLE hattachmap, key_t key,
   return tempnode;
 }
 
+static void
+delete_inprocess_shmds (shmnode **nodeptr)
+{
+  shmnode *node = *nodeptr;
+
+  // remove from the list
+  if (node == shm_head)
+    shm_head = shm_head->next;
+  else
+    {
+      shmnode *tempnode = shm_head;
+      while (tempnode && tempnode->next != node)
+        tempnode = tempnode->next;
+      if (tempnode)
+	tempnode->next = node->next;
+      // else log the unexpected !
+    }
+  
+  // release the shared data view
+  UnmapViewOfFile (node->shmds);
+  CloseHandle (node->filemap);
+  CloseHandle (node->attachmap);
+
+  // free the memory
+  delete node;
+  nodeptr = NULL;
+}
+
 int __stdcall
 fixup_shms_after_fork ()
 {
@@ -352,8 +380,7 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
 	   * and each process, as they touch this area detaches. eventually only the 
 	   * daemon has an attach. The daemon gets asked to detach immediately.
 	 */
-#if 0
-//waiting for the daemon to handle terminating process's
+	//waiting for the daemon to handle terminating process's
 	client_request_shm *req =
 	  new client_request_shm (SHM_DEL, shmid, GetCurrentProcessId ());
 	int rc;
@@ -373,9 +400,10 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
 
 	/* the daemon has deleted it's references */
 	/* now for us */
-	
-#endif	
 
+	// FIXME: create a destructor
+	delete_inprocess_shmds (&tempnode);
+	
       }
       break;
     case IPC_SET:

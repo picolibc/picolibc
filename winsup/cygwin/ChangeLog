@@ -1,5 +1,15 @@
 2002-03-04  Robert Collins  <rbtcollins@hotmail.com>
 
+	* cygserver_shm.cc: Run indent.
+	(deleted_head): New global for storing shm id's pending deletion.
+	(client_request_shm::serve): Return ENOSYS for invalid request types.
+	Implement SHM_DEL - delete a shm id.
+	* cygserver_shm.h (SHM_DEL): New type value.
+	* shm.cc (delete_inprocess_shmds): New function, does what it's name implies.
+	(shmctl): Implement shm_rmid control type.
+
+2002-03-04  Robert Collins  <rbtcollins@hotmail.com>
+
 	* Makefile.in (install): Remove install-bin to allow make install to work.
 
 2002-03-03  Robert Collins  <rbtcollins@hotmail.com>

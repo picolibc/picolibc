@@ -70,7 +70,8 @@ getsystemallocgranularity ()
 }
 
 
-client_request_shm::client_request_shm ():client_request (CYGSERVER_REQUEST_SHM_GET, sizeof (parameters))
+client_request_shm::client_request_shm ():client_request (CYGSERVER_REQUEST_SHM_GET,
+		sizeof (parameters))
 {
   buffer = (char *) &parameters;
 }
@@ -80,10 +81,13 @@ client_request_shm::client_request_shm ():client_request (CYGSERVER_REQUEST_SHM_
  */
 
 #if 0
-extern "C" void *
+extern
+"C" void *
 shmat (int shmid, const void *shmaddr, int parameters.in.shmflg)
 {
-  class shmid_ds *shm = (class shmid_ds *) shmid;	//FIXME: verifyable object test
+  class shmid_ds *
+    shm = (class shmid_ds *)
+    shmid;			//FIXME: verifyable object test
 
   if (shmaddr)
     {
@@ -92,12 +96,14 @@ shmat (int shmid, const void *shmaddr, int parameters.in.shmflg)
       return (void *) -1;
     }
 
-  void *rv = MapViewOfFile (shm->attachmap,
+  void *
+    rv =
+    MapViewOfFile (shm->attachmap,
 
 
-			    (parameters.in.shmflg & SHM_RDONLY) ?
-			    FILE_MAP_READ : FILE_MAP_WRITE, 0,
-			    0, 0);
+		   (parameters.in.shmflg & SHM_RDONLY) ?
+		   FILE_MAP_READ : FILE_MAP_WRITE, 0,
+		   0, 0);
 
   if (!rv)
     {
@@ -111,7 +117,10 @@ shmat (int shmid, const void *shmaddr, int parameters.in.shmflg)
  */
 
   InterlockedIncrement (&shm->shm_nattch);
-  _shmattach *attachnode = new _shmattach;
+  _shmattach *
+    attachnode =
+    new
+    _shmattach;
 
   attachnode->data = rv;
   attachnode->next =
@@ -136,7 +145,8 @@ shmat (int shmid, const void *shmaddr, int parameters.in.shmflg)
 /* FIXME: on NT we should check everything against the SD. On 95 we just emulate.
  */
 
-extern GENERIC_MAPPING access_mapping;
+extern GENERIC_MAPPING
+  access_mapping;
 
 extern int
 check_and_dup_handle (HANDLE from_process, HANDLE to_process,
@@ -146,14 +156,22 @@ check_and_dup_handle (HANDLE from_process, HANDLE to_process,
 		      HANDLE * to_handle_ptr, BOOL bInheritHandle);
 
 //FIXME: where should this live
-static shmnode *shm_head = NULL;
+static shmnode *
+  shm_head =
+  NULL;
+//FIXME: ditto.
+static shmnode *
+  deleted_head = NULL;
 /* must be long for InterlockedIncrement */
-static long new_id = 0;
-static long new_private_key = 0;
+static long
+  new_id =
+  0;
+static long
+  new_private_key =
+  0;
 
 void
-client_request_shm::serve (transport_layer_base * conn,
-			       process_cache * cache)
+client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 {
 //  DWORD sd_size = 4096;
 //  char sd_buf[4096];
@@ -257,296 +275,335 @@ client_request_shm::serve (transport_layer_base * conn,
     {
       shmnode *tempnode = shm_head;
       while (tempnode)
-        {
-          if (tempnode->shm_id == parameters.in.shm_id)
-            {
+	{
+	  if (tempnode->shm_id == parameters.in.shm_id)
+	    {
 	      InterlockedIncrement (&tempnode->shmds->shm_nattch);
 	      header.error_code = 0;
-              CloseHandle (token_handle);
-              return;
-            }
-          tempnode = tempnode->next;
-        }
+	      CloseHandle (token_handle);
+	      return;
+	    }
+	  tempnode = tempnode->next;
+	}
       header.error_code = EINVAL;
       CloseHandle (token_handle);
       return;
     }
 
-  /* it's a original request from the users */
-
-  /* FIXME: enter the checking for existing keys mutex. This mutex _must_ be system wide
-   * to prevent races on shmget.
-   */
-
-  if (parameters.in.key == IPC_PRIVATE)
+  /* Someone wants the ID removed. */
+  if (parameters.in.type == SHM_DEL)
     {
-      /* create the mapping name (CYGWINSHMKPRIVATE_0x01234567 */
-      /* The K refers to Key, the actual mapped area has D */
-      long private_key = (int) InterlockedIncrement (&new_private_key);
-      snprintf (stringbuf, 29, "CYGWINSHMKPRIVATE_0x%0x", private_key);
-      shmname = stringbuf;
-      snprintf (stringbuf1, 29, "CYGWINSHMDPRIVATE_0x%0x", private_key);
-      shmaname = stringbuf1;
+      shmnode **tempnode = &shm_head;
+      while (*tempnode)
+	  {
+	    if ((*tempnode)->shm_id == parameters.in.shm_id)
+	      {
+		// unlink from the accessible node list
+		shmnode *temp2 = *tempnode;
+		*tempnode = temp2->next;
+		// link into the deleted list
+		temp2->next = deleted_head;
+		deleted_head = temp2;
+
+		// FIXME: when/where do we delete the handles?
+		
+	        header.error_code = 0;
+	        CloseHandle (token_handle);
+	        return;
+	      }
+	    tempnode = &(*tempnode)->next;
+	  }
+      header.error_code = EINVAL;
+      CloseHandle (token_handle);
+      return;
     }
-  else
+
+
+  if (parameters.in.type == SHM_CREATE)
     {
-      /* create the mapping name (CYGWINSHMK0x0123456789abcdef */
-      /* The K refers to Key, the actual mapped area has D */
+      /* FIXME: enter the checking for existing keys mutex. This mutex _must_ be system wide
+       * to prevent races on shmget.
+       */
 
-      snprintf (stringbuf, 29, "CYGWINSHMK0x%0qx", parameters.in.key);
-      shmname = stringbuf;
-      snprintf (stringbuf1, 29, "CYGWINSHMD0x%0qx", parameters.in.key);
-      shmaname = stringbuf1;
-      debug_printf ("system id strings are \n%s\n%s\n", shmname, shmaname);
-      debug_printf ("key input value is 0x%0qx\n", parameters.in.key);
-    }
-
-  /* attempt to open the key */
-
-  /* get an existing key */
-  /* On unix the same shmid identifier is returned on multiple calls to shm_get 
-   * with the same key and size. Different modes is a ?.
-   */
-
-
-
-  /* walk the list of known keys and return the id if found. remember, we are
-   * authoritative...
-   */
-
-  shmnode *tempnode = shm_head;
-  while (tempnode)
-    {
-      if (tempnode->key == parameters.in.key
-	  && parameters.in.key != IPC_PRIVATE)
+      if (parameters.in.key == IPC_PRIVATE)
 	{
-	  // FIXME: free the mutex
-	  if (parameters.in.size
-	      && tempnode->shmds->shm_segsz < parameters.in.size)
+	  /* create the mapping name (CYGWINSHMKPRIVATE_0x01234567 */
+	  /* The K refers to Key, the actual mapped area has D */
+	  long private_key = (int) InterlockedIncrement (&new_private_key);
+	  snprintf (stringbuf, 29, "CYGWINSHMKPRIVATE_0x%0x", private_key);
+	  shmname = stringbuf;
+	  snprintf (stringbuf1, 29, "CYGWINSHMDPRIVATE_0x%0x", private_key);
+	  shmaname = stringbuf1;
+	}
+      else
+	{
+	  /* create the mapping name (CYGWINSHMK0x0123456789abcdef */
+	  /* The K refers to Key, the actual mapped area has D */
+
+	  snprintf (stringbuf, 29, "CYGWINSHMK0x%0qx", parameters.in.key);
+	  shmname = stringbuf;
+	  snprintf (stringbuf1, 29, "CYGWINSHMD0x%0qx", parameters.in.key);
+	  shmaname = stringbuf1;
+	  debug_printf ("system id strings are \n%s\n%s\n", shmname,
+			shmaname);
+	  debug_printf ("key input value is 0x%0qx\n", parameters.in.key);
+	}
+
+      /* attempt to open the key */
+
+      /* get an existing key */
+      /* On unix the same shmid identifier is returned on multiple calls to shm_get 
+       * with the same key and size. Different modes is a ?.
+       */
+
+
+
+      /* walk the list of known keys and return the id if found. remember, we are
+       * authoritative...
+       */
+
+      shmnode *tempnode = shm_head;
+      while (tempnode)
+	{
+	  if (tempnode->key == parameters.in.key
+	      && parameters.in.key != IPC_PRIVATE)
 	    {
-	      header.error_code = EINVAL;
+	      // FIXME: free the mutex
+	      if (parameters.in.size
+		  && tempnode->shmds->shm_segsz < parameters.in.size)
+		{
+		  header.error_code = EINVAL;
+		  CloseHandle (token_handle);
+		  return;
+		}
+	      /* FIXME: can the same process call this twice without error ? test 
+	       * on unix
+	       */
+	      if ((parameters.in.shmflg & IPC_CREAT)
+		  && (parameters.in.shmflg & IPC_EXCL))
+		{
+		  header.error_code = EEXIST;
+		  debug_printf
+		    ("attempt to exclusively create already created shm_area with key 0x%0qx\n",
+		     parameters.in.key);
+		  // FIXME: free the mutex
+		  CloseHandle (token_handle);
+		  return;
+		}
+	      // FIXME: do we need to other tests of the requested mode with the 
+	      // tempnode->shm_id mode ? testcase on unix needed.
+	      // FIXME how do we do the security test? or
+	      // do we wait for shmat to bother with that?
+	      /* One possibly solution: impersonate the client, and then test we can
+	       * reopen the area. In fact we'll probably have to do that to get 
+	       * handles back to them, alternatively just tell them the id, and then
+	       * let them attempt the open.
+	       */
+	      parameters.out.shm_id = tempnode->shm_id;
+	      if (check_and_dup_handle
+		  (GetCurrentProcess (), from_process_handle, token_handle,
+		   DUPLICATE_SAME_ACCESS, tempnode->filemap,
+		   &parameters.out.filemap, TRUE) != 0)
+		{
+		  printf ("error duplicating filemap handle (%lu)\n",
+			  GetLastError ());
+		  header.error_code = EACCES;
+/*mutex*/
+		  CloseHandle (token_handle);
+		  return;
+		}
+	      if (check_and_dup_handle
+		  (GetCurrentProcess (), from_process_handle, token_handle,
+		   DUPLICATE_SAME_ACCESS, tempnode->attachmap,
+		   &parameters.out.attachmap, TRUE) != 0)
+		{
+		  printf ("error duplicating attachmap handle (%lu)\n",
+			  GetLastError ());
+		  header.error_code = EACCES;
+/*mutex*/
+		  CloseHandle (token_handle);
+		  return;
+		}
+
 	      CloseHandle (token_handle);
 	      return;
 	    }
-	  /* FIXME: can the same process call this twice without error ? test 
-	   * on unix
-	   */
+	  tempnode = tempnode->next;
+	}
+      /* couldn't find a currently open shm area. */
+
+      /* create one */
+      /* do this as the client */
+      conn->impersonate_client ();
+      /* This may need sh_none... it's only a control structure */
+      HANDLE filemap = CreateFileMapping (INVALID_HANDLE_VALUE,	// system pagefile.
+					  &sa,
+					  PAGE_READWRITE,	// protection  
+					  0x00000000,
+					  getsystemallocgranularity (),
+					  shmname	// object name
+	);
+      int lasterr = GetLastError ();
+      conn->revert_to_self ();
+
+      if (filemap == NULL)
+	{
+	  /* We failed to open the filemapping ? */
+	  system_printf ("failed to open file mapping: %lu\n",
+			 GetLastError ());
+	  // free the mutex
+	  // we can assume that it exists, and that it was an access problem.
+	  header.error_code = EACCES;
+	  CloseHandle (token_handle);
+	  return;
+	}
+
+      /* successfully opened the control region mapping */
+      /* did we create it ? */
+      int oldmapping = lasterr == ERROR_ALREADY_EXISTS;
+      if (oldmapping)
+	{
+	  /* should never happen - we are the global daemon! */
+#if 0
 	  if ((parameters.in.shmflg & IPC_CREAT)
 	      && (parameters.in.shmflg & IPC_EXCL))
-	    {
-	      header.error_code = EEXIST;
-	      debug_printf
-		("attempt to exclusively create already created shm_area with key 0x%0qx\n",
-		 parameters.in.key);
-	      // FIXME: free the mutex
-	      CloseHandle (token_handle);
-	      return;
-	    }
-	  // FIXME: do we need to other tests of the requested mode with the 
-	  // tempnode->shm_id mode ? testcase on unix needed.
-	  // FIXME how do we do the security test? or
-	  // do we wait for shmat to bother with that?
-	  /* One possibly solution: impersonate the client, and then test we can
-	   * reopen the area. In fact we'll probably have to do that to get 
-	   * handles back to them, alternatively just tell them the id, and then
-	   * let them attempt the open.
-	   */
-	  parameters.out.shm_id = tempnode->shm_id;
-	  if (check_and_dup_handle (GetCurrentProcess (), from_process_handle,
-				    token_handle,
-				    DUPLICATE_SAME_ACCESS,
-				    tempnode->filemap,
-				    &parameters.out.filemap, TRUE) != 0)
-	    {
-	      printf ("error duplicating filemap handle (%lu)\n",
-		      GetLastError ());
-	      header.error_code = EACCES;
-/*mutex*/
-	      CloseHandle (token_handle);
-	      return;
-	    }
-	  if (check_and_dup_handle (GetCurrentProcess (), from_process_handle,
-				    token_handle,
-				    DUPLICATE_SAME_ACCESS,
-				    tempnode->attachmap,
-				    &parameters.out.attachmap, TRUE) != 0)
-	    {
-	      printf ("error duplicating attachmap handle (%lu)\n",
-		      GetLastError ());
-	      header.error_code = EACCES;
-/*mutex*/
-	      CloseHandle (token_handle);
-	      return;
-	    }
-
-	  CloseHandle (token_handle);
-	  return;
-	}
-      tempnode = tempnode->next;
-    }
-  /* couldn't find a currently open shm area. */
-
-  /* create one */
-  /* do this as the client */
-  conn->impersonate_client ();
-  /* This may need sh_none... it's only a control structure */
-  HANDLE filemap = CreateFileMapping (INVALID_HANDLE_VALUE,	// system pagefile.
-				      &sa,
-				      PAGE_READWRITE,	// protection  
-				      0x00000000,
-				      getsystemallocgranularity (),
-				      shmname	// object name
-    );
-  int lasterr = GetLastError ();
-  conn->revert_to_self ();
-
-  if (filemap == NULL)
-    {
-      /* We failed to open the filemapping ? */
-      system_printf ("failed to open file mapping: %lu\n", GetLastError ());
-      // free the mutex
-      // we can assume that it exists, and that it was an access problem.
-      header.error_code = EACCES;
-      CloseHandle (token_handle);
-      return;
-    }
-
-  /* successfully opened the control region mapping */
-  /* did we create it ? */
-  int oldmapping = lasterr == ERROR_ALREADY_EXISTS;
-  if (oldmapping)
-    {
-      /* should never happen - we are the global daemon! */
-#if 0
-      if ((parameters.in.shmflg & IPC_CREAT)
-	  && (parameters.in.shmflg & IPC_EXCL))
 #endif
+	    {
+	      /* FIXME free mutex */
+	      CloseHandle (filemap);
+	      header.error_code = EEXIST;
+	      CloseHandle (token_handle);
+	      return;
+	    }
+	}
+
+      /* we created a new mapping */
+      if (parameters.in.key != IPC_PRIVATE &&
+	  (parameters.in.shmflg & IPC_CREAT) == 0)
 	{
-	  /* FIXME free mutex */
 	  CloseHandle (filemap);
-	  header.error_code = EEXIST;
+	  /* FIXME free mutex */
+	  header.error_code = ENOENT;
 	  CloseHandle (token_handle);
 	  return;
 	}
-    }
 
-  /* we created a new mapping */
-  if (parameters.in.key != IPC_PRIVATE &&
-      (parameters.in.shmflg & IPC_CREAT) == 0)
-    {
-      CloseHandle (filemap);
-      /* FIXME free mutex */
-      header.error_code = ENOENT;
-      CloseHandle (token_handle);
-      return;
-    }
+      conn->impersonate_client ();
+      void *mapptr = MapViewOfFile (filemap, FILE_MAP_WRITE, 0, 0, 0);
+      conn->revert_to_self ();
 
-  conn->impersonate_client ();
-  void *mapptr = MapViewOfFile (filemap, FILE_MAP_WRITE, 0, 0, 0);
-  conn->revert_to_self ();
+      if (!mapptr)
+	{
+	  CloseHandle (filemap);
+	  //FIXME: close filemap and free the mutex
+	  /* we couldn't access the mapped area with the requested permissions */
+	  header.error_code = EACCES;
+	  CloseHandle (token_handle);
+	  return;
+	}
 
-  if (!mapptr)
-    {
-      CloseHandle (filemap);
-      //FIXME: close filemap and free the mutex
-      /* we couldn't access the mapped area with the requested permissions */
-      header.error_code = EACCES;
-      CloseHandle (token_handle);
-      return;
-    }
+      conn->impersonate_client ();
+      /* Now get the user data */
+      HANDLE attachmap = CreateFileMapping (INVALID_HANDLE_VALUE,	// system pagefile
+					    &sa,
+					    PAGE_READWRITE,	// protection (FIXME)
+					    0x00000000,
+					    parameters.in.size +
+					    parameters.in.size %
+					    getsystemallocgranularity (),
+					    shmaname	// object name
+	);
+      conn->revert_to_self ();
 
-  conn->impersonate_client ();
-  /* Now get the user data */
-  HANDLE attachmap = CreateFileMapping (INVALID_HANDLE_VALUE,	// system pagefile
-					&sa,
-					PAGE_READWRITE,	// protection (FIXME)
-					0x00000000,
-					parameters.in.size +
-					parameters.in.size %
-					getsystemallocgranularity (),
-					shmaname	// object name
-    );
-  conn->revert_to_self ();
+      if (attachmap == NULL)
+	{
+	  system_printf ("failed to get shm attachmap\n");
+	  header.error_code = ENOMEM;
+	  UnmapViewOfFile (mapptr);
+	  CloseHandle (filemap);
+	  /* FIXME exit the mutex */
+	  CloseHandle (token_handle);
+	  return;
+	}
 
-  if (attachmap == NULL)
-    {
-      system_printf ("failed to get shm attachmap\n");
-      header.error_code = ENOMEM;
-      UnmapViewOfFile (mapptr);
-      CloseHandle (filemap);
-      /* FIXME exit the mutex */
-      CloseHandle (token_handle);
-      return;
-    }
+      shmid_ds *shmtemp = new shmid_ds;
+      if (!shmtemp)
+	{
+	  system_printf ("failed to malloc shm node\n");
+	  header.error_code = ENOMEM;
+	  UnmapViewOfFile (mapptr);
+	  CloseHandle (filemap);
+	  CloseHandle (attachmap);
+	  /* FIXME exit mutex */
+	  CloseHandle (token_handle);
+	  return;
+	}
 
-  shmid_ds *shmtemp = new shmid_ds;
-  if (!shmtemp)
-    {
-      system_printf ("failed to malloc shm node\n");
-      header.error_code = ENOMEM;
-      UnmapViewOfFile (mapptr);
-      CloseHandle (filemap);
-      CloseHandle (attachmap);
-      /* FIXME exit mutex */
-      CloseHandle (token_handle);
-      return;
-    }
+      /* fill out the node data */
+      shmtemp->shm_perm.cuid = getuid ();
+      shmtemp->shm_perm.uid = shmtemp->shm_perm.cuid;
+      shmtemp->shm_perm.cgid = getgid ();
+      shmtemp->shm_perm.gid = shmtemp->shm_perm.cgid;
+      shmtemp->shm_perm.mode = parameters.in.shmflg & 0x01ff;
+      shmtemp->shm_lpid = 0;
+      shmtemp->shm_nattch = 0;
+      shmtemp->shm_atime = 0;
+      shmtemp->shm_dtime = 0;
+      shmtemp->shm_ctime = time (NULL);
+      shmtemp->shm_segsz = parameters.in.size;
+      *(shmid_ds *) mapptr = *shmtemp;
+      shmtemp->mapptr = mapptr;
 
-  /* fill out the node data */
-  shmtemp->shm_perm.cuid = getuid ();
-  shmtemp->shm_perm.uid = shmtemp->shm_perm.cuid;
-  shmtemp->shm_perm.cgid = getgid ();
-  shmtemp->shm_perm.gid = shmtemp->shm_perm.cgid;
-  shmtemp->shm_perm.mode = parameters.in.shmflg & 0x01ff;
-  shmtemp->shm_lpid = 0;
-  shmtemp->shm_nattch = 0;
-  shmtemp->shm_atime = 0;
-  shmtemp->shm_dtime = 0;
-  shmtemp->shm_ctime = time (NULL);
-  shmtemp->shm_segsz = parameters.in.size;
-  *(shmid_ds *) mapptr = *shmtemp;
-  shmtemp->mapptr = mapptr;
+      /* no need for InterlockedExchange here, we're serialised by the global mutex */
+      tempnode = new shmnode;
+      tempnode->shmds = shmtemp;
+      tempnode->shm_id = (int) InterlockedIncrement (&new_id);
+      tempnode->key = parameters.in.key;
+      tempnode->filemap = filemap;
+      tempnode->attachmap = attachmap;
+      tempnode->next = shm_head;
+      shm_head = tempnode;
 
-  /* no need for InterlockedExchange here, we're serialised by the global mutex */
-  tempnode = new shmnode;
-  tempnode->shmds = shmtemp;
-  tempnode->shm_id = (int) InterlockedIncrement (&new_id);
-  tempnode->key = parameters.in.key;
-  tempnode->filemap = filemap;
-  tempnode->attachmap = attachmap;
-  tempnode->next = shm_head;
-  shm_head = tempnode;
+      /* we now have the area in the daemon list, opened. 
 
-  /* we now have the area in the daemon list, opened. 
+         FIXME: leave the system wide shm mutex */
 
-     FIXME: leave the system wide shm mutex */
-
-  parameters.out.shm_id = tempnode->shm_id;
-  if (check_and_dup_handle (GetCurrentProcess (), from_process_handle,
-			    token_handle,
-			    DUPLICATE_SAME_ACCESS,
-			    tempnode->filemap, &parameters.out.filemap,
-			    TRUE) != 0)
-    {
-      printf ("error duplicating filemap handle (%lu)\n", GetLastError ());
-      header.error_code = EACCES;
-      CloseHandle (token_handle);
+      parameters.out.shm_id = tempnode->shm_id;
+      if (check_and_dup_handle (GetCurrentProcess (), from_process_handle,
+				token_handle,
+				DUPLICATE_SAME_ACCESS,
+				tempnode->filemap, &parameters.out.filemap,
+				TRUE) != 0)
+	{
+	  printf ("error duplicating filemap handle (%lu)\n",
+		  GetLastError ());
+	  header.error_code = EACCES;
+	  CloseHandle (token_handle);
 /* mutex et al */
-      return;
-    }
-  if (check_and_dup_handle (GetCurrentProcess (), from_process_handle,
-			    token_handle,
-			    DUPLICATE_SAME_ACCESS,
-			    tempnode->attachmap, &parameters.out.attachmap,
-			    TRUE) != 0)
-    {
-      printf ("error duplicating attachmap handle (%lu)\n", GetLastError ());
-      header.error_code = EACCES;
-      CloseHandle (from_process_handle);
-      CloseHandle (token_handle);
+	  return;
+	}
+      if (check_and_dup_handle (GetCurrentProcess (), from_process_handle,
+				token_handle,
+				DUPLICATE_SAME_ACCESS,
+				tempnode->attachmap,
+				&parameters.out.attachmap, TRUE) != 0)
+	{
+	  printf ("error duplicating attachmap handle (%lu)\n",
+		  GetLastError ());
+	  header.error_code = EACCES;
+	  CloseHandle (from_process_handle);
+	  CloseHandle (token_handle);
 /* more cleanup... yay! */
+	  return;
+	}
+      CloseHandle (token_handle);
+
       return;
     }
+
+  header.error_code = ENOSYS;
   CloseHandle (token_handle);
+
+
   return;
 }
