@@ -1,5 +1,26 @@
 2004-04-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (class fhandler_dev_raw): Move status bits into protected
+	bitfield struct type status_flags.  Drop unused has_written bit.
+	Add accessor methods.
+	(fhandler_dev_raw::clear): Remove.
+	(fhandler_dev_raw::reset_devbuf): Remove.
+	* fhandler_floppy.cc (fhandler_dev_floppy::lseek): Use accessor method
+	for is_writing.
+	* fhandler_raw.cc: Use status accessor methods throughout.
+	(fhandler_dev_raw::clear): Remove.
+	(fhandler_dev_raw::fhandler_dev_raw): Drop clear call.
+	(fhandler_dev_raw::~fhandler_dev_raw): Ditto.
+	* fhandler_tape.cc: Use mtinfo::status accessor methods throughout.
+	(mtinfo_drive::close): Fix conditional to enable BSD semantics
+	correctly.
+	(mtinfo_drive::get_status): Rename from mtinfo_drive::status.
+	* mtinfo.h (class mtinfo_drive): Move status bits into private bitfield
+	struct type status_flags.  Add accessor methods.
+	Rename status method to get_status.
+
+2004-04-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (fsinfo): Global storage for file system information.
 	(fs_info::update): Store file system information also in fsinfo and
 	short circuit GetVolumeInformation by using alredy stored file system

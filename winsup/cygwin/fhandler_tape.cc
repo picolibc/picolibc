@@ -80,12 +80,12 @@ mtinfo_drive::initialize (int num, bool first_time)
   lock = unlocked;
   if (first_time)
     {
-      buffer_writes = true;
-      two_fm = false;
-      fast_eom = false;
-      auto_lock = false;
-      sysv = false;
-      nowait = false;
+      buffer_writes (true);
+      two_fm (false);
+      fast_eom (false);
+      auto_lock (false);
+      sysv (false);
+      nowait (false);
     }
   for (int i = 0; i < MAX_PARTITION_NUM; ++i)
     part (i)->initialize ();
@@ -139,17 +139,17 @@ mtinfo_drive::close (HANDLE mt, bool rewind)
     {
       /* if last operation was writing, write a filemark */
       debug_printf ("writing filemark");
-      write_marks (mt, TAPE_FILEMARKS, two_fm ? 2 : 1);
-      if (two_fm && !lasterr && !rewind) /* Backspace over the 2nd filemark. */
+      write_marks (mt, TAPE_FILEMARKS, two_fm () ? 2 : 1);
+      if (two_fm () && !lasterr && !rewind) /* Backspace over 2nd filemark. */
         {
 	  set_pos (mt, TAPE_SPACE_FILEMARKS, -1, false);
 	  if (!lasterr)
 	    part (partition)->fblock = 0; /* That's obvious, isn't it? */
 	}
     }
-  else if (dirty == has_read && sysv && !rewind)
+  else if (dirty == has_read && !rewind)
     {
-      if (sysv)
+      if (sysv ())
         {
 	  /* Under SYSV semantics, the tape is moved past the next file mark
 	     after read. */
@@ -172,7 +172,7 @@ mtinfo_drive::close (HANDLE mt, bool rewind)
       debug_printf ("rewinding");
       set_pos (mt, TAPE_REWIND, 0, false);
     }
-  if (auto_lock && lock == auto_locked)
+  if (auto_lock () && lock == auto_locked)
     prepare (mt, TAPE_UNLOCK);
   dirty = clean;
   return error ("close");
@@ -223,7 +223,7 @@ mtinfo_drive::read (HANDLE mt, void *ptr, size_t &ulen)
       goto out;
     }
   part (partition)->smark = false;
-  if (auto_lock && lock < auto_locked)
+  if (auto_lock () && lock < auto_locked)
     prepare (mt, TAPE_LOCK, true);
   ret = ReadFile (mt, ptr, ulen, &bytes_read, 0);
   lasterr = ret ? 0 : GetLastError ();
@@ -287,7 +287,7 @@ mtinfo_drive::write (HANDLE mt, const void *ptr, size_t &len)
     }
   dirty = clean;
   part (partition)->smark = false;
-  if (auto_lock && lock < auto_locked)
+  if (auto_lock () && lock < auto_locked)
     prepare (mt, TAPE_LOCK, true);
   ret = WriteFile (mt, ptr, len, &bytes_written, 0);
   lasterr = ret ? 0: GetLastError ();
@@ -372,7 +372,7 @@ mtinfo_drive::set_pos (HANDLE mt, int mode, long count,
       case TAPE_ABSOLUTE_BLOCK:
       case TAPE_LOGICAL_BLOCK:
       case TAPE_REWIND:
-        dont_wait = nowait ? TRUE : FALSE;
+        dont_wait = nowait () ? TRUE : FALSE;
 	break;
     }
   if (mode == TAPE_SPACE_FILEMARKS)
@@ -629,7 +629,7 @@ mtinfo_drive::erase (HANDLE mt, int mode)
 	  mode = TAPE_ERASE_SHORT;
 	break;
     }
-  TAPE_FUNC (EraseTape (mt, mode, nowait ? TRUE : FALSE));
+  TAPE_FUNC (EraseTape (mt, mode, nowait () ? TRUE : FALSE));
   part (partition)->initialize (0);
   return error ("erase");
 }
@@ -641,7 +641,7 @@ mtinfo_drive::prepare (HANDLE mt, int action, bool is_auto)
 
   dirty = clean;
   if (action == TAPE_UNLOAD || action == TAPE_LOAD || action == TAPE_TENSION)
-    dont_wait = nowait ? TRUE : FALSE;
+    dont_wait = nowait () ? TRUE : FALSE;
   TAPE_FUNC (PrepareTape (mt, action, dont_wait));
   /* Reset buffer after all successful preparations but lock and unlock. */
   switch (action)
@@ -696,7 +696,7 @@ mtinfo_drive::set_blocksize (HANDLE mt, long count)
 }
 
 int
-mtinfo_drive::status (HANDLE mt, struct mtget *get)
+mtinfo_drive::get_status (HANDLE mt, struct mtget *get)
 {
   int notape = 0;
   DWORD tstat;
@@ -778,7 +778,7 @@ mtinfo_drive::status (HANDLE mt, struct mtget *get)
   if (notape)
     get->mt_gstat |= GMT_DR_OPEN (-1);
 
-  if (buffer_writes)
+  if (buffer_writes ())
     get->mt_gstat |= GMT_IM_REP_EN (-1);	/* TODO: Async writes */
 
   else if (tstat == ERROR_DEVICE_REQUIRES_CLEANING)
@@ -793,15 +793,15 @@ mtinfo_drive::status (HANDLE mt, struct mtget *get)
     get->mt_gstat |= GMT_HW_ECC (-1);
   if (dp ()->Compression)
     get->mt_gstat |= GMT_HW_COMP (-1);
-  if (two_fm)
+  if (two_fm ())
     get->mt_gstat |= GMT_TWO_FM (-1);
-  if (fast_eom)
+  if (fast_eom ())
     get->mt_gstat |= GMT_FAST_MTEOM (-1);
-  if (auto_lock)
+  if (auto_lock ())
     get->mt_gstat |= GMT_AUTO_LOCK (-1);
-  if (sysv)
+  if (sysv ())
     get->mt_gstat |= GMT_SYSV (-1);
-  if (nowait)
+  if (nowait ())
     get->mt_gstat |= GMT_NOWAIT (-1);
 
   get->mt_erreg = 0;				/* FIXME: No softerr counting */
@@ -837,16 +837,16 @@ mtinfo_drive::set_options (HANDLE mt, long options)
       case 0:
 	if (options == 0 || options == 1)
 	  {
-	    buffer_writes = (options == 1);
+	    buffer_writes ((options == 1));
 	  }
         break;
       case MT_ST_BOOLEANS:
-	buffer_writes = !!(options & MT_ST_BUFFER_WRITES);
-	two_fm = !!(options & MT_ST_TWO_FM);
-	fast_eom = !!(options & MT_ST_FAST_MTEOM);
-	auto_lock = !!(options & MT_ST_AUTO_LOCK);
-	sysv = !!(options & MT_ST_SYSV);
-	nowait = !!(options & MT_ST_NOWAIT);
+	buffer_writes (!!(options & MT_ST_BUFFER_WRITES));
+	two_fm (!!(options & MT_ST_TWO_FM));
+	fast_eom (!!(options & MT_ST_FAST_MTEOM));
+	auto_lock (!!(options & MT_ST_AUTO_LOCK));
+	sysv (!!(options & MT_ST_SYSV));
+	nowait (!!(options & MT_ST_NOWAIT));
 	if (get_feature (TAPE_DRIVE_SET_ECC))
 	  sdp.ECC = !!(options & MT_ST_ECC);
 	if (get_feature (TAPE_DRIVE_SET_PADDING))
@@ -861,17 +861,17 @@ mtinfo_drive::set_options (HANDLE mt, long options)
       case MT_ST_CLEARBOOLEANS:
         set = (what == MT_ST_SETBOOLEANS);
 	if (options & MT_ST_BUFFER_WRITES)
-	  buffer_writes = set;
+	  buffer_writes (set);
 	if (options & MT_ST_TWO_FM)
-	  two_fm = set;
+	  two_fm (set);
 	if (options & MT_ST_FAST_MTEOM)
-	  fast_eom = set;
+	  fast_eom (set);
 	if (options & MT_ST_AUTO_LOCK)
-	  auto_lock = set;
+	  auto_lock (set);
 	if (options & MT_ST_SYSV)
-	  sysv = set;
+	  sysv (set);
 	if (options & MT_ST_NOWAIT)
-	  nowait = set;
+	  nowait (set);
 	if (options & MT_ST_ECC)
 	  sdp.ECC = set;
 	if (options & MT_ST_PADDING)
@@ -974,7 +974,7 @@ mtinfo_drive::ioctl (HANDLE mt, unsigned int cmd, void *buf)
 	    set_pos (mt, TAPE_SPACE_FILEMARKS, op->mt_count, true);
 	    break;
 	  case MTEOM:
-	    if (fast_eom && get_feature (TAPE_DRIVE_END_OF_DATA))
+	    if (fast_eom () && get_feature (TAPE_DRIVE_END_OF_DATA))
 	      set_pos (mt, TAPE_SPACE_END_OF_DATA, 0, false);
 	    else
 	      set_pos (mt, TAPE_SPACE_FILEMARKS, 32767, false);
@@ -1062,7 +1062,7 @@ mtinfo_drive::ioctl (HANDLE mt, unsigned int cmd, void *buf)
     {
       if (__check_null_invalid_struct (buf, sizeof (struct mtget)))
         return ERROR_NOACCESS;
-      status (mt, (struct mtget *) buf);
+      get_status (mt, (struct mtget *) buf);
     }
   else if (cmd == MTIOCPOS)
     {
@@ -1169,7 +1169,7 @@ fhandler_dev_tape::open (int flags, mode_t)
   /* The O_TEXT flag is used to indicate write-through (non buffered writes)
      to the underlying fhandler_dev_raw::open call. */
   flags &= ~O_TEXT;
-  if (!mt->drive (driveno ())->buffered_writes ())
+  if (!mt->drive (driveno ())->buffer_writes ())
     flags |= O_TEXT;
   ret = fhandler_dev_raw::open (flags);
   if (ret)
@@ -1213,9 +1213,9 @@ fhandler_dev_tape::raw_read (void *ptr, size_t &ulen)
   size_t bytes_read = 0;
   int ret = 0;
 
-  if (lastblk_to_read)
+  if (lastblk_to_read ())
     {
-      lastblk_to_read = 0;
+      lastblk_to_read (false);
       ulen = 0;
       return;
     }
@@ -1265,7 +1265,7 @@ fhandler_dev_tape::raw_read (void *ptr, size_t &ulen)
 	  else {
 	    len = 0;
 	    if (bytes_read)
-	      lastblk_to_read = 1;
+	      lastblk_to_read (true);
 	  }
 	}
       if (!ret && len > 0)
@@ -1283,7 +1283,7 @@ fhandler_dev_tape::raw_read (void *ptr, size_t &ulen)
 	      memcpy (buf, devbuf, len);
 	    }
 	  else if (bytes_read)
-	    lastblk_to_read = 1;
+	    lastblk_to_read (true);
 	}
     }
   if (ret)

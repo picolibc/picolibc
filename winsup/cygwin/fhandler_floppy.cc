@@ -144,7 +144,7 @@ fhandler_dev_floppy::lseek (_off64_t offset, int whence)
 	  return -1;
 	}
       current_position = low + ((_off64_t) high << 32);
-      if (is_writing)
+      if (is_writing ())
 	current_position += devbufend - devbufstart;
       else
 	current_position -= devbufend - devbufstart;

@@ -497,13 +497,27 @@ class fhandler_dev_raw: public fhandler_base
   size_t devbufsiz;
   size_t devbufstart;
   size_t devbufend;
-  int eom_detected    : 1;
-  int eof_detected    : 1;
-  int lastblk_to_read : 1;
-  int is_writing      : 1;
-  int has_written     : 1;
+  struct status_flags
+  {
+    unsigned eom_detected    : 1;
+    unsigned eof_detected    : 1;
+    unsigned lastblk_to_read : 1;
+    unsigned is_writing      : 1;
+   public:
+    status_flags () :
+      eom_detected (0), eof_detected (0), lastblk_to_read (0), is_writing (0)
+      {}
+  } status;
+ 
+  void eom_detected (bool b) { status.eom_detected = b; }
+  bool eom_detected () { return status.eom_detected; }
+  void eof_detected (bool b) { status.eof_detected = b; }
+  bool eof_detected () { return status.eof_detected; }
+  void lastblk_to_read (bool b) { status.lastblk_to_read = b; }
+  bool lastblk_to_read () { return status.lastblk_to_read; }
+  void is_writing (bool b) { status.is_writing = b; }
+  bool is_writing () { return status.is_writing; }
 
-  virtual void clear (void);
   virtual BOOL write_file (const void *buf, DWORD to_write,
 			   DWORD *written, int *err);
   virtual BOOL read_file (void *buf, DWORD to_read, DWORD *read, int *err);
@@ -515,13 +529,6 @@ class fhandler_dev_raw: public fhandler_base
   virtual int is_eof(int win_error);
 
   fhandler_dev_raw ();
-
-  inline void reset_devbuf (void)
-    {
-      devbufstart = devbufend = 0;
-      eom_detected = eof_detected = 0;
-      lastblk_to_read = is_writing = has_written = 0;
-    }
 
  public:
   ~fhandler_dev_raw (void);

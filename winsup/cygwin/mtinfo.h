@@ -67,12 +67,15 @@ class mtinfo_drive
   lock_state lock;
   TAPE_GET_DRIVE_PARAMETERS _dp;
   TAPE_GET_MEDIA_PARAMETERS _mp;
-  bool buffer_writes;
-  bool two_fm;
-  bool fast_eom;
-  bool auto_lock;
-  bool sysv;
-  bool nowait;
+  struct status_flags
+  {
+    unsigned buffer_writes : 1;
+    unsigned two_fm        : 1;
+    unsigned fast_eom      : 1;
+    unsigned auto_lock     : 1;
+    unsigned sysv          : 1;
+    unsigned nowait        : 1;
+  } status;
   mtinfo_part _part[MAX_PARTITION_NUM];
 
   inline int error (const char *str)
@@ -96,7 +99,7 @@ class mtinfo_drive
   int prepare (HANDLE mt, int action, bool is_auto = false);
   int set_compression (HANDLE mt, long count);
   int set_blocksize (HANDLE mt, long count);
-  int status (HANDLE mt, struct mtget *get);
+  int get_status (HANDLE mt, struct mtget *get);
   int set_options (HANDLE mt, long options);
 
 public:
@@ -110,7 +113,18 @@ public:
   int ioctl (HANDLE mt, unsigned int cmd, void *buf);
   int set_pos (HANDLE mt, int mode, long count, bool sfm_func);
 
-  inline bool buffered_writes (void) { return buffer_writes; }
+  void buffer_writes (bool b) { status.buffer_writes = b; }
+  bool buffer_writes () { return status.buffer_writes; }
+  void two_fm (bool b) { status.two_fm = b; }
+  bool two_fm () { return status.two_fm; }
+  void fast_eom (bool b) { status.fast_eom = b; }
+  bool fast_eom () { return status.fast_eom; }
+  void auto_lock (bool b) { status.auto_lock = b; }
+  bool auto_lock () { return status.auto_lock; }
+  void sysv (bool b) { status.sysv = b; }
+  bool sysv () { return status.sysv; }
+  void nowait (bool b) { status.nowait = b; }
+  bool nowait () { return status.nowait; }
   PTAPE_GET_DRIVE_PARAMETERS dp (void) { return &_dp; }
   PTAPE_GET_MEDIA_PARAMETERS mp (void) { return &_mp; }
   mtinfo_part *part (int num) { return &_part[num]; }

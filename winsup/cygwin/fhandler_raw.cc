@@ -27,18 +27,6 @@
 /**********************************************************************/
 /* fhandler_dev_raw */
 
-void
-fhandler_dev_raw::clear (void)
-{
-  devbuf = NULL;
-  devbufsiz = 0;
-  devbufstart = 0;
-  devbufend = 0;
-  eom_detected = 0;
-  eof_detected = 0;
-  lastblk_to_read = 0;
-}
-
 int
 fhandler_dev_raw::is_eom (int win_error)
 {
@@ -88,7 +76,7 @@ fhandler_dev_raw::writebuf (void)
   DWORD written;
   int ret = 0;
 
-  if (is_writing && devbuf && devbufend)
+  if (is_writing () && devbuf && devbufend)
     {
       DWORD to_write;
       int ret = 0;
@@ -97,19 +85,16 @@ fhandler_dev_raw::writebuf (void)
       to_write = ((devbufend - 1) / 512 + 1) * 512;
       if (!write_file (devbuf, to_write, &written, &ret)
 	  && is_eom (ret))
-	eom_detected = 1;
-      if (written)
-	has_written = 1;
+	eom_detected (true);
       devbufstart = devbufend = 0;
     }
-  is_writing = 0;
+  is_writing (false);
   return ret;
 }
 
 fhandler_dev_raw::fhandler_dev_raw ()
-  : fhandler_base ()
+  : fhandler_base (), status ()
 {
-  clear ();
   set_need_fork_fixup ();
 }
 
@@ -117,7 +102,6 @@ fhandler_dev_raw::~fhandler_dev_raw (void)
 {
   if (devbufsiz > 1L)
     delete [] devbuf;
-  clear ();
 }
 
 int __stdcall
@@ -226,15 +210,15 @@ fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
     }
 
   /* Checking a previous end of file */
-  if (eof_detected && !lastblk_to_read)
+  if (eof_detected () && !lastblk_to_read ())
     {
-      eof_detected = 0;
+      eof_detected (false);
       ulen = 0;
       return;
     }
 
   /* Checking a previous end of media */
-  if (eom_detected && !lastblk_to_read)
+  if (eom_detected () && !lastblk_to_read ())
     {
       set_errno (ENOSPC);
       goto err;
@@ -256,9 +240,9 @@ fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
 	      bytes_read += bytes_to_read;
 	      devbufstart += bytes_to_read;
 
-	      if (lastblk_to_read)
+	      if (lastblk_to_read ())
 		{
-		  lastblk_to_read = 0;
+		  lastblk_to_read (false);
 		  break;
 		}
 	    }
@@ -286,9 +270,9 @@ fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
 		    }
 
 		  if (is_eof (ret))
-		    eof_detected = 1;
+		    eof_detected (true);
 		  else
-		    eom_detected = 1;
+		    eom_detected (true);
 
 		  if (!read2)
 		    {
@@ -300,7 +284,7 @@ fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
 			}
 		      break;
 		    }
-		  lastblk_to_read = 1;
+		  lastblk_to_read (true);
 		}
 	      if (!read2)
 	       break;
@@ -328,9 +312,9 @@ fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
       if (bytes_read)
 	{
 	  if (is_eof (ret))
-	    eof_detected = 1;
+	    eof_detected (true);
 	  else
-	    eom_detected = 1;
+	    eom_detected (true);
 	}
       else if (is_eom (ret))
 	{
@@ -359,15 +343,15 @@ fhandler_dev_raw::raw_write (const void *ptr, size_t len)
   int ret;
 
   /* Checking a previous end of media on tape */
-  if (eom_detected)
+  if (eom_detected ())
     {
       set_errno (ENOSPC);
       return -1;
     }
 
-  if (!is_writing)
+  if (!is_writing ())
     devbufstart = devbufend = 0;
-  is_writing = 1;
+  is_writing (true);
 
   if (devbuf)
     {
@@ -397,8 +381,6 @@ fhandler_dev_raw::raw_write (const void *ptr, size_t len)
 
 	      ret = 0;
 	      write_file (tgt, bytes_to_write, &written, &ret);
-	      if (written)
-		has_written = 1;
 
 	      if (ret)
 		{
@@ -408,7 +390,7 @@ fhandler_dev_raw::raw_write (const void *ptr, size_t len)
 		      return -1;
 		    }
 
-		  eom_detected = 1;
+		  eom_detected (true);
 
 		  if (!written && !bytes_written)
 		    {
@@ -441,21 +423,18 @@ fhandler_dev_raw::raw_write (const void *ptr, size_t len)
     {
       if (!write_file (p, len, &bytes_written, &ret))
 	{
-	  if (bytes_written)
-	    has_written = 1;
 	  if (!is_eom (ret))
 	    {
 	      __seterrno ();
 	      return -1;
 	    }
-	  eom_detected = 1;
+	  eom_detected (true);
 	  if (!bytes_written)
 	    {
 	      set_errno (ENOSPC);
 	      return -1;
 	    }
 	}
-      has_written = 1;
     }
   return bytes_written;
 }
@@ -474,9 +453,9 @@ fhandler_dev_raw::dup (fhandler_base *child)
 	fhc->devbuf = new char [devbufsiz];
       fhc->devbufstart = 0;
       fhc->devbufend = 0;
-      fhc->eom_detected = eom_detected;
-      fhc->eof_detected = eof_detected;
-      fhc->lastblk_to_read = 0;
+      fhc->eom_detected (eom_detected ());
+      fhc->eof_detected (eof_detected ());
+      fhc->lastblk_to_read (false);
     }
   return ret;
 }
@@ -486,7 +465,7 @@ fhandler_dev_raw::fixup_after_fork (HANDLE)
 {
   devbufstart = 0;
   devbufend = 0;
-  lastblk_to_read = 0;
+  lastblk_to_read (false);
 }
 
 void
@@ -496,7 +475,7 @@ fhandler_dev_raw::fixup_after_exec ()
     devbuf = new char [devbufsiz];
   devbufstart = 0;
   devbufend = 0;
-  lastblk_to_read = 0;
+  lastblk_to_read (false);
 }
 
 int
