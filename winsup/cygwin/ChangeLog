@@ -1,3 +1,10 @@
+2003-03-17  Christopher Faylor  <cgf@redhat.com>
+
+	* cygwin.din: Export btowc, trunc.
+	* include/cygwin/version.h: Reflect new exports.
+	* syscalls.cc (_stat): Rename to stat to avoid newlib wrapper.
+	* syscalls.cc (_fstat): Ditto.
+
 2003-03-16  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_console.cc (fhandler_console::close): Correct check for
