@@ -244,10 +244,10 @@ main (int argc, char **argv)
 		printf ("group:%s:", groupname (acls[i].a_id));
 	      break;
 	    case CLASS_OBJ:
-	      printf ("mask::");
+	      printf ("mask:");
 	      break;
 	    case OTHER_OBJ:
-	      printf ("other::");
+	      printf ("other:");
 	      break;
 	    }
 	  printf ("%s\n", permstr (acls[i].a_perm));

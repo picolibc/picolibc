@@ -1,3 +1,9 @@
+2002-12-14  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* setfacl.c (main): Place a single : after other and mask.
+	* getfacl.c (getaclentry): Allow both : and :: for other and mask.
+	(main): Remove extraneous break.
+
 2002-11-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mkpasswd.c (main): Set pw_passwd field to '*' on 9x/Me.

@@ -165,8 +165,9 @@ getaclentry (action_t action, char *c, aclent_t *ace)
       if (c2)
         c = c2 + 1;
     }
-  else if (*c++ != ':')
-    return FALSE;
+  /* FIXME: currently allow both :: and : */
+  else if (*c == ':')
+    c++;
   if (action == Delete)
     {
       if ((ace->a_type & (CLASS_OBJ | OTHER_OBJ))
@@ -509,7 +510,6 @@ main (int argc, char **argv)
             usage (stderr);
             return 1;
 	  }
-        break;
         if (! getaclentries (Set, optarg, acls, &aclidx))
           {
             fprintf (stderr, "%s: illegal acl entries\n", prog_name);
