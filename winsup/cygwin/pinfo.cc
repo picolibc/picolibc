@@ -179,7 +179,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 
   void *mapaddr;
   bool createit = !!(flag & (PID_IN_USE | PID_EXECED));
-  bool created;
+  bool created = false;
   DWORD access = FILE_MAP_READ
 		 | (flag & (PID_IN_USE | PID_EXECED | PID_MAP_RW)
 		    ? FILE_MAP_WRITE : 0);
@@ -189,7 +189,6 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
     {
       /* Try to enforce that myself is always created in the same place */
       mapaddr = open_shared (NULL, 0, h0, 0, SH_MYSELF);
-      created = false;
       if (h0 == INVALID_HANDLE_VALUE)
 	h0 = NULL;
     }
