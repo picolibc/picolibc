@@ -115,11 +115,7 @@ int		_EXFUN(getdate_r, (const char *, struct tm *));
 #endif /* HAVE_GETDATE */
 
 /* defines for the opengroup specifications Derived from Issue 1 of the SVID.  */
-#ifdef __CYGWIN__
-extern __IMPORT time_t _timezone;
-#else
 extern __IMPORT long _timezone;
-#endif
 extern __IMPORT int _daylight;
 extern __IMPORT char *_tzname[2];
 
@@ -135,7 +131,7 @@ extern __IMPORT char *_tzname[2];
 #endif
 #ifdef timezonevar
 #ifndef timezone
-#define timezone ((long int) _timezone)
+#define timezone _timezone
 #endif
 #else
 char *_EXFUN(timezone, (void));
