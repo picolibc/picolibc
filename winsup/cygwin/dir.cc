@@ -146,6 +146,7 @@ readdir (DIR *dir)
 	  dir->__d_dirent->d_ino = hash_path_name (dino, res->d_name);
 	}
     }
+  dir->__d_dirent->old_d_ino = dir->__d_dirent->d_ino;	// just truncate
   return res;
 }
 

@@ -1,3 +1,20 @@
+2003-05-10  Christopher Faylor  <cgf@redhat.com>
+
+	* dir.cc (readdir): Fill out new old_d_ino field.
+	* fhandler.h (fhandler_base::namehash): Define as ino_t.
+	(fhandler_base::get_namehash): Ditto.
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat_helper): Accommodate
+	new 64 bit st_ino.
+	* fhandler_socket.cc (fhandler_socket::fstat): Ditto.
+	* path.cc (hash_path_name): Return ino_t.
+	* syscalls.cc (stat64_to_stat32): Convert 64 bit inode to 32 bit.
+	* winsup.h (hash_path_name): Declare as returning ino_t.
+	* include/cygwin/stat.h (__stat32): Use 32 bit st_ino.
+	(__stat64): Use 64 bit st_ino.
+	* include/cygwin/types.h (__ino64_t): Define.
+	(__ino32_t): Ditto.
+	(ino_t): Define appropriately.
+
 2003-05-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (NEW_FUNCTIONS): All 32/64 from 0.79 API get

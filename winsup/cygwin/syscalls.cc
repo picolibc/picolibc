@@ -990,7 +990,7 @@ static void
 stat64_to_stat32 (struct __stat64 *src, struct __stat32 *dst)
 {
   dst->st_dev = ((src->st_dev >> 8) & 0xff00) | (src->st_dev & 0xff);
-  dst->st_ino = src->st_ino;
+  dst->st_ino = ((unsigned) (src->st_ino >> 32)) | (unsigned) src->st_ino;
   dst->st_mode = src->st_mode;
   dst->st_nlink = src->st_nlink;
   dst->st_uid = src->st_uid;

@@ -442,14 +442,14 @@ fhandler_socket::fstat (struct __stat64 *buf, path_conv *pc)
       if (get_socket_type ()) /* fstat */
 	{
 	  buf->st_dev = 0;
-	  buf->st_ino = (ino_t) get_handle ();
+	  buf->st_ino = (ino_t) ((DWORD) get_handle ());
 	  buf->st_mode = S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO;
 	}
       else
 	{
 	  path_conv spc ("/dev", PC_SYM_NOFOLLOW | PC_NULLEMPTY, NULL);
 	  buf->st_dev = spc.volser ();
-	  buf->st_ino = (ino_t) get_namehash ();
+	  buf->st_ino = get_namehash ();
 	  buf->st_mode &= ~S_IRWXO;
 	  buf->st_rdev = (get_device () << 16) | get_unit ();
 	}

@@ -24,6 +24,7 @@ details. */
 #endif
 
 #define NO_COPY __attribute__((nocommon)) __attribute__((section(".data_cygwin_nocopy")))
+#define NO_COPY_INIT __attribute__((section(".data_cygwin_nocopy")))
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ >= 199900L
 #define NEW_MACRO_VARARGS
@@ -198,7 +199,7 @@ int __stdcall writable_directory (const char *file);
 int __stdcall stat_dev (DWORD, int, unsigned long, struct __stat64 *);
 extern BOOL allow_ntsec;
 
-unsigned long __stdcall hash_path_name (ino_t hash, const char *name) __attribute__ ((regparm(2)));
+ino_t __stdcall hash_path_name (ino_t hash, const char *name) __attribute__ ((regparm(2)));
 void __stdcall nofinalslash (const char *src, char *dst) __attribute__ ((regparm(2)));
 extern "C" char *__stdcall rootdir (char *full_path) __attribute__ ((regparm(1)));
 

@@ -10,6 +10,7 @@ details. */
 
 #define _sys_nerr FOO_sys_nerr
 #define sys_nerr FOOsys_nerr
+#define _sys_errlist FOO_sys_errlist
 #include "winsup.h"
 #define _REENT_ONLY
 #include <stdio.h>
@@ -18,6 +19,7 @@ details. */
 #include "thread.h"
 #undef _sys_nerr
 #undef sys_nerr
+#undef _sys_errlist
 
 /* Table to map Windows error codes to Errno values.  */
 /* FIXME: Doing things this way is a little slow.  It's trivial to change
@@ -25,13 +27,12 @@ details. */
 
 #define X(w, e) {ERROR_##w, #w, e}
 
-static const NO_COPY struct
-  {
-    DWORD w;		 /* windows version of error */
-    const char *s;	 /* text of windows version */
-    int e;		 /* errno version of error */
-  }
-errmap[] =
+static NO_COPY struct
+{
+  DWORD w;		 /* windows version of error */
+  const char *s;	 /* text of windows version */
+  int e;		 /* errno version of error */
+} errmap[] =
 {
   /* FIXME: Some of these choices are arbitrary! */
   X (INVALID_FUNCTION,		EBADRQC),
@@ -116,42 +117,8 @@ errmap[] =
   { 0, NULL, 0}
 };
 
-int __stdcall
-geterrno_from_win_error (DWORD code, int deferrno)
-{
-  for (int i = 0; errmap[i].w != 0; ++i)
-    if (code == errmap[i].w)
-      {
-	syscall_printf ("windows error %u == errno %d", code, errmap[i].e);
-	return errmap[i].e;
-      }
-
-  syscall_printf ("unknown windows error %u, setting errno to %d", code,
-		  deferrno);
-  return deferrno;	/* FIXME: what's so special about EACCESS? */
-}
-
-/* seterrno_from_win_error: Given a Windows error code, set errno
-   as appropriate. */
-void __stdcall
-seterrno_from_win_error (const char *file, int line, DWORD code)
-{
-  syscall_printf ("%s:%d windows error %d", file, line, code);
-  set_errno (geterrno_from_win_error (code, EACCES));
-  return;
-}
-
-/* seterrno: Set `errno' based on GetLastError (). */
-void __stdcall
-seterrno (const char *file, int line)
-{
-  seterrno_from_win_error (file, line, GetLastError ());
-}
-
-extern char *_user_strerror _PARAMS ((int));
-
 extern "C" {
-const NO_COPY char __declspec(dllexport) * const _sys_errlist[]=
+const char __declspec(dllexport) * _sys_errlist[] NO_COPY_INIT =
 {
 /*      NOERROR 0       */ "No error",
 /*	EPERM 1		*/ "Operation not permitted",
@@ -295,8 +262,42 @@ const NO_COPY char __declspec(dllexport) * const _sys_errlist[]=
 /* EOVERFLOW 139 */ "Value too large for defined data type"
 };
 
-extern const int NO_COPY __declspec(dllexport) _sys_nerr = sizeof (_sys_errlist) / sizeof (_sys_errlist[0]);
+int NO_COPY_INIT _sys_nerr = sizeof (_sys_errlist) / sizeof (_sys_errlist[0]);
 };
+
+int __stdcall
+geterrno_from_win_error (DWORD code, int deferrno)
+{
+  for (int i = 0; errmap[i].w != 0; ++i)
+    if (code == errmap[i].w)
+      {
+	syscall_printf ("windows error %u == errno %d", code, errmap[i].e);
+	return errmap[i].e;
+      }
+
+  syscall_printf ("unknown windows error %u, setting errno to %d", code,
+		  deferrno);
+  return deferrno;	/* FIXME: what's so special about EACCESS? */
+}
+
+/* seterrno_from_win_error: Given a Windows error code, set errno
+   as appropriate. */
+void __stdcall
+seterrno_from_win_error (const char *file, int line, DWORD code)
+{
+  syscall_printf ("%s:%d windows error %d", file, line, code);
+  set_errno (geterrno_from_win_error (code, EACCES));
+  return;
+}
+
+/* seterrno: Set `errno' based on GetLastError (). */
+void __stdcall
+seterrno (const char *file, int line)
+{
+  seterrno_from_win_error (file, line, GetLastError ());
+}
+
+extern char *_user_strerror _PARAMS ((int));
 
 /* FIXME: Why is strerror() a long switch and not just:
 	return sys_errlist[errnum];

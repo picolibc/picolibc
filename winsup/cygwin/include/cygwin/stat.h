@@ -19,9 +19,9 @@ extern "C" {
 #ifdef __INSIDE_CYGWIN__
 struct __stat32
 {
-  __dev16_t     st_dev;
-  ino_t         st_ino;
-  mode_t        st_mode;
+  __dev16_t	st_dev;
+  __ino32_t	st_ino;
+  mode_t	st_mode;
   nlink_t       st_nlink;
   __uid16_t     st_uid;
   __gid16_t     st_gid;
@@ -38,7 +38,7 @@ struct __stat32
 struct __stat64
 {
   __dev32_t     st_dev;
-  ino_t         st_ino;
+  __ino64_t     st_ino;
   mode_t        st_mode;
   nlink_t       st_nlink;
   __uid32_t     st_uid;

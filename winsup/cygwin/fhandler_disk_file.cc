@@ -250,7 +250,7 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
     case DRIVE_RAMDISK:
       /* Although the documentation indicates otherwise, it seems like
 	 "inodes" on these devices are persistent, at least across reboots. */
-      buf->st_ino = nFileIndexHigh | nFileIndexLow;
+      buf->st_ino = (((ino_t) nFileIndexHigh) << 32) | (ino_t) nFileIndexLow;
       break;
     default:
       /* Either the nFileIndex* fields are unreliable or unavailable.  Use the
