@@ -72,7 +72,7 @@ struct pa_opcode
 
 	'  "#  &     -  /   34 6789:;< > @'
 	' BC      JKLM          XY [\]  '
-	'   de  h   lm           y { } '
+	'   de  h    m           y { } '
 
    Here are all the characters:
 
@@ -142,6 +142,7 @@ Also these:
         value is in a different location)
    Z    %r1 -- implicit target of addil instruction.
    g    ,gate completer for new syntax branch
+   l	,l completer for new syntax branch
 
 Completer operands all have 'c' as the prefix:
 
@@ -243,6 +244,7 @@ static const struct pa_opcode pa_opcodes[] =
 
 
 { "b",		0xe8002000, 0xfc00e000, "gnW,b", pa10, FLAG_STRICT},
+{ "b",		0xe8000000, 0xfc00e000, "lnW,b", pa10, FLAG_STRICT},
 { "b",		0xe8000000, 0xffe0e000, "nW", pa10}, /* bl foo,r0 */
 { "ldi",	0x34000000, 0xffe0c000, "j,x", pa10},	/* ldo val(r0),r */
 { "comib", 	0x84000000, 0xfc000000, "?nn5,b,w", pa10}, /* comib{tf}*/
