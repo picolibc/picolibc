@@ -83,7 +83,7 @@ fhandler_virtual::opendir ()
 	  dir->__handle = INVALID_HANDLE_VALUE;
 	  dir->__d_position = 0;
 	  dir->__d_dirhash = get_namehash ();
-
+	  dir->__flags = dirent_saw_dot | dirent_saw_dot_dot;
 	  res = dir;
 	}
     }
@@ -100,6 +100,7 @@ _off64_t fhandler_virtual::telldir (DIR * dir)
 void
 fhandler_virtual::seekdir (DIR * dir, _off64_t loc)
 {
+  dir->__flags |= dirent_saw_dot | dirent_saw_dot_dot;
   dir->__d_position = loc;
   return;
 }
@@ -108,6 +109,7 @@ void
 fhandler_virtual::rewinddir (DIR * dir)
 {
   dir->__d_position = 0;
+  dir->__flags |= dirent_saw_dot | dirent_saw_dot_dot;
   return;
 }
 

@@ -38,14 +38,6 @@ dirfd (DIR *dir)
   return dir->__d_dirent->d_fd;
 }
 
-enum opendir_states
-{
-  opendir_ok = 0,
-  opendir_saw_dot = 1,
-  opendir_saw_dot_dot = 2,
-  opendir_saw_eof = 4
-};
-
 /* opendir: POSIX 5.1.2.1 */
 extern "C" DIR *
 opendir (const char *name)
@@ -89,18 +81,18 @@ readdir (DIR *dir)
 
   if (!res)
     {
-      if (!(dir->__flags & opendir_saw_dot))
+      if (!(dir->__flags & dirent_saw_dot))
 	{
 	  res = dir->__d_dirent;
 	  strcpy (res->d_name, ".");
-	  dir->__flags |= opendir_saw_dot;
+	  dir->__flags |= dirent_saw_dot;
 	  dir->__d_position++;
 	}
-      else if (!(dir->__flags & opendir_saw_dot_dot))
+      else if (!(dir->__flags & dirent_saw_dot_dot))
 	{
 	  res = dir->__d_dirent;
 	  strcpy (res->d_name, "..");
-	  dir->__flags |= opendir_saw_dot_dot;
+	  dir->__flags |= dirent_saw_dot_dot;
 	  dir->__d_position++;
 	}
     }
@@ -114,13 +106,13 @@ readdir (DIR *dir)
 	  if (res->d_name[1] == '\0')
 	    {
 	      dir->__d_dirent->d_ino = dir->__d_dirhash;
-	      dir->__flags |= opendir_saw_dot;
+	      dir->__flags |= dirent_saw_dot;
 	    }
 	  else if (res->d_name[1] != '.' || res->d_name[2] != '\0')
 	    goto hashit;
 	  else
 	    {
-	      dir->__flags |= opendir_saw_dot_dot;
+	      dir->__flags |= dirent_saw_dot_dot;
 	      char *p, up[strlen (dir->__d_dirname) + 1];
 	      strcpy (up, dir->__d_dirname);
 	      if (!(p = strrchr (up, '\\')))

@@ -1,5 +1,21 @@
 2005-03-16  Christopher Faylor  <cgf@timesys.com>
 
+	* dir.cc: Rename opendir_* to dirent_* throughout.
+	(opendir_states): Move and rename.
+	* fhandler.h (dirent_states): to here.
+	* fhandler_disk_file.cc (fhandler_disk_file::readdir): Use raw readdir
+	when skipping through entries since it is keeping track of "." and
+	"..".
+	(fhandler_cygdrive::seekdir): Use fhandler_disk_file::readdir to do
+	everything.
+	* fhandler_virtual.cc (fhandler_virtual::opendir): Set flag indicating
+	that we provide .  and ..
+	(fhandler_virtual::seekdir): Ditto.
+	(fhandler_virtual::rewinddir): Ditto.
+	* fhandler_registry.cc (fhandler_registry::rewinddir): Ditto.
+
+2005-03-16  Christopher Faylor  <cgf@timesys.com>
+
 	* cygtls.cc (free_local): New macro.
 	(_cygtls::remove): Use free_local to free known-malloced local
 	variables.

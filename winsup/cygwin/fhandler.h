@@ -38,6 +38,14 @@ struct dirent;
 struct iovec;
 struct __acl32;
 
+enum dirent_states
+{
+  dirent_ok = 0,
+  dirent_saw_dot = 1,
+  dirent_saw_dot_dot = 2,
+  dirent_saw_eof = 4
+};
+
 enum conn_state
 {
   unconnected = 0,
