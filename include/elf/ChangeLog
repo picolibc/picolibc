@@ -1,3 +1,9 @@
+2003-01-16  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc.h: Split out ppc64 definitions to..
+	* pcc64.h: ..here.  New file.
+	(R_PPC64_REL30): Rename from R_PPC64_ADDR30.
+
 2003-01-13 Dmitry Diky <diwil@mail.ru>
 
 	* elf/common.h (EM_MSP430): Change e_machine value to officially
