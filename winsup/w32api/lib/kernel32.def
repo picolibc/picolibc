@@ -121,6 +121,7 @@ EnumResourceTypesA@12
 EnumResourceTypesW@12
 EnumSystemCodePagesA@8
 EnumSystemCodePagesW@8
+EnumSystemGeoID@12
 EnumSystemLanguageGroupsA@12
 EnumSystemLanguageGroupsW@12
 EnumSystemLocalesA@8
@@ -285,6 +286,8 @@ GetFileTime@16
 GetFileType@4
 GetFullPathNameA@16
 GetFullPathNameW@16
+GetGeoInfoA@20
+GetGeoInfoW@20
 GetHandleInformation@8
 GetLargestConsoleWindowSize@4
 GetLastError@0
@@ -380,6 +383,7 @@ GetTimeZoneInformation@4
 GetUserDefaultLCID@0
 GetUserDefaultLangID@0
 GetUserDefaultUILanguage@0
+GetUserGeoID@12
 GetVDMCurrentDirectories@8
 GetVersion@0
 GetVersionExA@4
@@ -661,6 +665,7 @@ SetThreadPriorityBoost@8
 SetTimeZoneInformation@4
 SetTimerQueueTimer@24
 SetUnhandledExceptionFilter@4
+SetUserGeoID@4
 SetVDMCurrentDirectories@8
 SetVolumeLabelA@8
 SetVolumeLabelW@8

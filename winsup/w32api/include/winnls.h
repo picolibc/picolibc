@@ -258,6 +258,7 @@ extern "C" {
 #define CTRY_KAZAKSTAN 7
 #define CTRY_KENYA 254
 #define CTRY_KUWAIT 965
+#define CTRY_KYRGYZSTAN 996
 #define CTRY_LATVIA 371
 #define CTRY_LEBANON 961
 #define CTRY_LIBYA 218
@@ -267,8 +268,10 @@ extern "C" {
 #define CTRY_MACAU 853
 #define CTRY_MACEDONIA 389
 #define CTRY_MALAYSIA 60
+#define CTRY_MALDIVES 960
 #define CTRY_MEXICO 52
 #define CTRY_MONACO 33
+#define CTRY_MONGOLIA 976
 #define CTRY_MOROCCO 212
 #define CTRY_NETHERLANDS 31
 #define CTRY_NEW_ZEALAND 64
@@ -395,7 +398,7 @@ extern "C" {
 #define LGRPID_GEORGIAN 16
 #define LGRPID_ARMENIAN 17
 
-#if(WINVER >= 0x0500)
+#if (WINVER >= 0x0500)
 #define LOCALE_SYEARMONTH 0x1006
 #define LOCALE_SENGCURRNAME 0x1007
 #define LOCALE_SNATIVECURRNAME 0x1008
@@ -413,7 +416,7 @@ extern "C" {
 #define CAL_NOUSEROVERRIDE LOCALE_NOUSEROVERRIDE
 #define CAL_RETURN_NUMBER LOCALE_RETURN_NUMBER
 #define CAL_USE_CP_ACP LOCALE_USE_CP_ACP
-#endif /* WINVER >= 0x0500 */
+#endif /* (WINVER >= 0x0500) */
 #ifndef  _BASETSD_H
 typedef long LONG_PTR;
 #endif 
@@ -423,26 +426,52 @@ typedef DWORD LCTYPE;
 typedef DWORD CALTYPE;
 typedef DWORD CALID;
 typedef DWORD LGRPID;
+typedef DWORD GEOID;
+typedef DWORD GEOTYPE;
+typedef DWORD GEOCLASS;
 typedef BOOL (CALLBACK *CALINFO_ENUMPROCA)(LPSTR);
 typedef BOOL (CALLBACK *CALINFO_ENUMPROCW)(LPWSTR);
-typedef BOOL (CALLBACK* CALINFO_ENUMPROCEXA)(LPSTR, CALID);
-typedef BOOL (CALLBACK* CALINFO_ENUMPROCEXW)(LPWSTR, CALID);
-typedef BOOL (CALLBACK* LANGUAGEGROUP_ENUMPROCA)(LGRPID, LPSTR, LPSTR, DWORD, LONG_PTR);
-typedef BOOL (CALLBACK* LANGUAGEGROUP_ENUMPROCW)(LGRPID, LPWSTR, LPWSTR, DWORD, LONG_PTR);
-typedef BOOL (CALLBACK* LANGGROUPLOCALE_ENUMPROCA)(LGRPID, LCID, LPSTR, LONG_PTR);
-typedef BOOL (CALLBACK* LANGGROUPLOCALE_ENUMPROCW)(LGRPID, LCID, LPWSTR, LONG_PTR);
-typedef BOOL (CALLBACK* UILANGUAGE_ENUMPROCW)(LPWSTR, LONG_PTR);
-typedef BOOL (CALLBACK* UILANGUAGE_ENUMPROCA)(LPSTR, LONG_PTR);
+typedef BOOL (CALLBACK *CALINFO_ENUMPROCEXA)(LPSTR, CALID);
+typedef BOOL (CALLBACK *CALINFO_ENUMPROCEXW)(LPWSTR, CALID);
+typedef BOOL (CALLBACK *LANGUAGEGROUP_ENUMPROCA)(LGRPID, LPSTR, LPSTR, DWORD, LONG_PTR);
+typedef BOOL (CALLBACK *LANGUAGEGROUP_ENUMPROCW)(LGRPID, LPWSTR, LPWSTR, DWORD, LONG_PTR);
+typedef BOOL (CALLBACK *LANGGROUPLOCALE_ENUMPROCA)(LGRPID, LCID, LPSTR, LONG_PTR);
+typedef BOOL (CALLBACK *LANGGROUPLOCALE_ENUMPROCW)(LGRPID, LCID, LPWSTR, LONG_PTR);
+typedef BOOL (CALLBACK *UILANGUAGE_ENUMPROCW)(LPWSTR, LONG_PTR);
+typedef BOOL (CALLBACK *UILANGUAGE_ENUMPROCA)(LPSTR, LONG_PTR);
 typedef BOOL (CALLBACK *LOCALE_ENUMPROCA)(LPSTR);
 typedef BOOL (CALLBACK *LOCALE_ENUMPROCW)(LPWSTR);
 typedef BOOL (CALLBACK *CODEPAGE_ENUMPROCA)(LPSTR);
 typedef BOOL (CALLBACK *CODEPAGE_ENUMPROCW)(LPWSTR);
 typedef BOOL (CALLBACK *DATEFMT_ENUMPROCA)(LPSTR);
 typedef BOOL (CALLBACK *DATEFMT_ENUMPROCW)(LPWSTR);
-typedef BOOL (CALLBACK* DATEFMT_ENUMPROCEXA)(LPSTR, CALID);
-typedef BOOL (CALLBACK* DATEFMT_ENUMPROCEXW)(LPWSTR, CALID);
+typedef BOOL (CALLBACK *DATEFMT_ENUMPROCEXA)(LPSTR, CALID);
+typedef BOOL (CALLBACK *DATEFMT_ENUMPROCEXW)(LPWSTR, CALID);
 typedef BOOL (CALLBACK *TIMEFMT_ENUMPROCA)(LPSTR);
 typedef BOOL (CALLBACK *TIMEFMT_ENUMPROCW)(LPWSTR);
+typedef BOOL (CALLBACK *GEO_ENUMPROC)(GEOID);
+
+enum NLS_FUNCTION {
+	COMPARE_STRING = 0x0001
+};
+typedef enum NLS_FUNCTION NLS_FUNCTION;
+enum SYSGEOCLASS {
+	GEOCLASS_NATION = 16,
+	GEOCLASS_REGION = 14
+};
+enum SYSGEOTYPE {
+	GEO_NATION            = 0x0001,
+	GEO_LATITUDE          = 0x0002,
+	GEO_LONGITUDE         = 0x0003,
+	GEO_ISO2              = 0x0004,
+	GEO_ISO3              = 0x0005,
+	GEO_RFC1766           = 0x0006,
+	GEO_LCID              = 0x0007,
+	GEO_FRIENDLYNAME      = 0x0008,
+	GEO_OFFICIALNAME      = 0x0009,
+	GEO_TIMEZONES         = 0x000a,
+	GEO_OFFICIALLANGUAGES = 0x000a
+};
 
 typedef struct _cpinfo {
 	UINT MaxCharSize;
@@ -450,21 +479,21 @@ typedef struct _cpinfo {
 	BYTE LeadByte[MAX_LEADBYTES];
 } CPINFO,*LPCPINFO;
 typedef struct _cpinfoexA {
-    UINT MaxCharSize;
-    BYTE DefaultChar[MAX_DEFAULTCHAR];
-    BYTE LeadByte[MAX_LEADBYTES];
-    WCHAR UnicodeDefaultChar;
-    UINT CodePage;
-    CHAR CodePageName[MAX_PATH];
-} CPINFOEXA, *LPCPINFOEXA;
+	UINT MaxCharSize;
+	BYTE DefaultChar[MAX_DEFAULTCHAR];
+	BYTE LeadByte[MAX_LEADBYTES];
+	WCHAR UnicodeDefaultChar;
+	UINT CodePage;
+	CHAR CodePageName[MAX_PATH];
+} CPINFOEXA,*LPCPINFOEXA;
 typedef struct _cpinfoexW {
-    UINT MaxCharSize;
-    BYTE DefaultChar[MAX_DEFAULTCHAR];
-    BYTE LeadByte[MAX_LEADBYTES];
-    WCHAR UnicodeDefaultChar;
-    UINT CodePage;
-    WCHAR CodePageName[MAX_PATH];
-} CPINFOEXW, *LPCPINFOEXW;
+	UINT MaxCharSize;
+	BYTE DefaultChar[MAX_DEFAULTCHAR];
+	BYTE LeadByte[MAX_LEADBYTES];
+	WCHAR UnicodeDefaultChar;
+	UINT CodePage;
+	WCHAR CodePageName[MAX_PATH];
+} CPINFOEXW,*LPCPINFOEXW;
 typedef struct _currencyfmtA {
 	UINT NumDigits;
 	UINT LeadingZero;
@@ -474,7 +503,7 @@ typedef struct _currencyfmtA {
 	UINT NegativeOrder;
 	UINT PositiveOrder;
 	LPSTR lpCurrencySymbol;
-} CURRENCYFMTA, *LPCURRENCYFMTA;
+} CURRENCYFMTA,*LPCURRENCYFMTA;
 typedef struct _currencyfmtW {
 	UINT NumDigits;
 	UINT LeadingZero;
@@ -484,7 +513,12 @@ typedef struct _currencyfmtW {
 	UINT NegativeOrder;
 	UINT PositiveOrder;
 	LPWSTR lpCurrencySymbol;
-} CURRENCYFMTW, *LPCURRENCYFMTW;
+} CURRENCYFMTW,*LPCURRENCYFMTW;
+typedef struct nlsversioninfo { 
+	DWORD dwNLSVersionInfoSize; 
+	DWORD dwNLSVersion; 
+	DWORD dwDefinedVersion; 
+} NLSVERSIONINFO,*LPNLSVERSIONINFO; 
 typedef struct _numberfmtA {
 	UINT NumDigits;
 	UINT LeadingZero;
@@ -492,7 +526,7 @@ typedef struct _numberfmtA {
 	LPSTR lpDecimalSep;
 	LPSTR lpThousandSep;
 	UINT NegativeOrder;
-} NUMBERFMTA, *LPNUMBERFMTA;
+} NUMBERFMTA,*LPNUMBERFMTA;
 typedef struct _numberfmtW {
 	UINT NumDigits;
 	UINT LeadingZero;
@@ -500,7 +534,7 @@ typedef struct _numberfmtW {
 	LPWSTR lpDecimalSep;
 	LPWSTR lpThousandSep;
 	UINT NegativeOrder;
-} NUMBERFMTW, *LPNUMBERFMTW;
+} NUMBERFMTW,*LPNUMBERFMTW;
 
 int WINAPI CompareStringA(LCID,DWORD,LPCSTR,int,LPCSTR,int);
 int WINAPI CompareStringW(LCID,DWORD,LPCWSTR,int,LPCWSTR,int);
@@ -511,6 +545,7 @@ BOOL WINAPI EnumDateFormatsA(DATEFMT_ENUMPROCA,LCID,DWORD);
 BOOL WINAPI EnumDateFormatsW(DATEFMT_ENUMPROCW,LCID,DWORD);
 BOOL WINAPI EnumSystemCodePagesA(CODEPAGE_ENUMPROCA,DWORD);
 BOOL WINAPI EnumSystemCodePagesW(CODEPAGE_ENUMPROCW,DWORD);
+BOOL WINAPI EnumSystemGeoID(GEOCLASS,GEOID,GEO_ENUMPROC);
 BOOL WINAPI EnumSystemLocalesA(LOCALE_ENUMPROCA,DWORD);
 BOOL WINAPI EnumSystemLocalesW(LOCALE_ENUMPROCW,DWORD);
 BOOL WINAPI EnumTimeFormatsA(TIMEFMT_ENUMPROCA,LCID,DWORD);
@@ -518,6 +553,8 @@ BOOL WINAPI EnumTimeFormatsW(TIMEFMT_ENUMPROCW,LCID,DWORD);
 int WINAPI FoldStringA(DWORD,LPCSTR,int,LPSTR,int);
 int WINAPI FoldStringW(DWORD,LPCWSTR,int,LPWSTR,int);
 UINT WINAPI GetACP(void);
+int WINAPI GetCalendarInfoA(LCID,CALID,CALTYPE,LPSTR,int,LPDWORD);
+int WINAPI GetCalendarInfoW(LCID,CALID,CALTYPE,LPWSTR,int,LPDWORD);
 BOOL WINAPI GetCPInfo(UINT,LPCPINFO);
 BOOL WINAPI GetCPInfoExA(UINT,DWORD,LPCPINFOEXA);
 BOOL WINAPI GetCPInfoExW(UINT,DWORD,LPCPINFOEXW);
@@ -525,8 +562,11 @@ int WINAPI GetCurrencyFormatA(LCID,DWORD,LPCSTR,const CURRENCYFMTA*,LPSTR,int);
 int WINAPI GetCurrencyFormatW(LCID,DWORD,LPCWSTR,const CURRENCYFMTW*,LPWSTR,int);
 int WINAPI GetDateFormatA(LCID,DWORD,const SYSTEMTIME*,LPCSTR,LPSTR,int);
 int WINAPI GetDateFormatW(LCID,DWORD,const SYSTEMTIME*,LPCWSTR,LPWSTR,int);
+int WINAPI GetGeoInfoA(GEOID,GEOTYPE,LPSTR,int,LANGID);
+int WINAPI GetGeoInfoW(GEOID,GEOTYPE,LPWSTR,int,LANGID);
 int WINAPI GetLocaleInfoA(LCID,LCTYPE,LPSTR,int);
 int WINAPI GetLocaleInfoW(LCID,LCTYPE,LPWSTR,int);
+BOOL WINAPI GetNLSVersion(NLS_FUNCTION,LCID,LPNLSVERSIONINFO);
 int WINAPI GetNumberFormatA(LCID,DWORD,LPCSTR,const NUMBERFMTA*,LPSTR,int);
 int WINAPI GetNumberFormatW(LCID,DWORD,LPCWSTR,const NUMBERFMTW*,LPWSTR,int);
 UINT WINAPI GetOEMCP(void);
@@ -541,16 +581,21 @@ int WINAPI GetTimeFormatA(LCID,DWORD,const SYSTEMTIME*,LPCSTR,LPSTR,int);
 int WINAPI GetTimeFormatW(LCID,DWORD,const SYSTEMTIME*,LPCWSTR,LPWSTR,int);
 LANGID WINAPI GetUserDefaultLangID(void);
 LCID WINAPI GetUserDefaultLCID(void);
+GEOID WINAPI GetUserGeoID(GEOCLASS);
 BOOL WINAPI IsDBCSLeadByte(BYTE);
 BOOL WINAPI IsDBCSLeadByteEx(UINT,BYTE);
+BOOL WINAPI IsNLSDefinedString(NLS_FUNCTION,DWORD,LPNLSVERSIONINFO,LPCWSTR,int);
 BOOL WINAPI IsValidCodePage(UINT);
 BOOL WINAPI IsValidLocale(LCID,DWORD);
 int WINAPI LCMapStringA(LCID,DWORD,LPCSTR,int,LPSTR,int);
 int WINAPI LCMapStringW(LCID,DWORD,LPCWSTR,int,LPWSTR,int);
 int WINAPI MultiByteToWideChar(UINT,DWORD,LPCSTR,int,LPWSTR,int);
+int WINAPI SetCalendarInfoA(LCID,CALID,CALTYPE,LPCSTR);
+int WINAPI SetCalendarInfoW(LCID,CALID,CALTYPE,LPCWSTR);
 BOOL WINAPI SetLocaleInfoA(LCID,LCTYPE,LPCSTR);
 BOOL WINAPI SetLocaleInfoW(LCID,LCTYPE,LPCWSTR);
 BOOL WINAPI SetThreadLocale(LCID);
+BOOL WINAPI SetUserGeoID(GEOID);
 int WINAPI WideCharToMultiByte(UINT,DWORD,LPCWSTR,int,LPSTR,int,LPCSTR,LPBOOL);
 #if (WINVER >= 0x0500)
 BOOL WINAPI EnumCalendarInfoExA(CALINFO_ENUMPROCEXA,LCID,CALID,CALTYPE);
@@ -591,14 +636,17 @@ typedef LPNUMBERFMTW LPNUMBERFMT;
 #define EnumSystemLocales EnumSystemLocalesW
 #define EnumTimeFormats EnumTimeFormatsW
 #define FoldString FoldStringW
+#define GetCalendarInfo GetCalendarInfoW
 #define GetCPInfoEx GetCPInfoExW
 #define GetCurrencyFormat GetCurrencyFormatW
 #define GetDateFormat GetDateFormatW
+#define GetGeoInfo GetGeoInfoW
 #define GetLocaleInfo GetLocaleInfoW
 #define GetNumberFormat GetNumberFormatW
 #define GetStringTypeEx GetStringTypeExW
 #define GetTimeFormat GetTimeFormatW
 #define LCMapString LCMapStringW
+#define SetCalendarInfo  SetCalendarInfoW
 #define SetLocaleInfo SetLocaleInfoW
 #if (WINVER >= 0x0500)
 #define EnumCalendarInfoEx EnumCalendarInfoExW;
@@ -630,14 +678,17 @@ typedef LPNUMBERFMTA LPNUMBERFMT;
 #define EnumSystemLocales EnumSystemLocalesA
 #define EnumTimeFormats EnumTimeFormatsA
 #define FoldString FoldStringA
+#define GetCalendarInfo GetCalendarInfoA
 #define GetCPInfoEx GetCPInfoExA
 #define GetCurrencyFormat GetCurrencyFormatA
 #define GetDateFormat GetDateFormatA
+#define GetGeoInfo GetGeoInfoA
 #define GetLocaleInfo GetLocaleInfoA
 #define GetNumberFormat GetNumberFormatA
 #define GetStringTypeEx GetStringTypeExA
 #define GetTimeFormat GetTimeFormatA
 #define LCMapString LCMapStringA
+#define SetCalendarInfo SetCalendarInfoA
 #define SetLocaleInfo SetLocaleInfoA
 #if (WINVER >= 0x0500)
 #define EnumCalendarInfoEx EnumCalendarInfoExA;

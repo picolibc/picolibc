@@ -1,7 +1,33 @@
 2003-10-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/winnls.h (CTRY_KYRGYZSTAN, CTRY_MALDIVES, CTRY_MONGOLIA):
+	Add constants.
+
+	* include/winnls.h (NLS_FUNCTION, SYSGEOCLASS, SYSGEOTYPE): Add
+	constants for National Language Support.
+
+	* include/winnls.h (NLSVERSIONINFO): Add structure for National
+	Language Support.
+
+	* include/winnls.h (GEO_ENUMPROC): Add callback for National
+	Language Support.
+
+	* include/winnls.h (EnumSystemGeoID, GetCalendarInfo[AW],
+	GetGeoInfo[AW], GetUserGeoID, SetCalendarInfo[AW], SetUserGeoID):
+	Add functions.
+
+	* include/winnls.h (IsNLSDefinedString, GetNLSVersion): Add
+	functions. Strange... I am unable to find which library contains
+	these functions. Can't find anything with pexports. Any clue?
+
+	* lib/user32.def (EnumSystemGeoID, GetGeoInfo[AW], GetUserGeoID,
+	SetUserGeoID): Add functions.
+
+2003-10-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winnt.h (LANG_KYRGYZ, LANG_MONGOLIAN, LANG_GALICIAN,
 	LANG_SYRIAC, LANG_INVARIANT, SUBLANG_KASHMIRI_SASIA): Add constants.
+
 	* include/winnt.h (SUBLANG_AZERI_LATIN, SUBLANG_AZERI_CYRILLIC,
 	SUBLANG_ENGLISH_ZIMBABWE, SUBLANG_ENGLISH_PHILIPPINES): Fix wrong
 	value for constants.
