@@ -1,3 +1,7 @@
+2005-03-23  Ben Elliston  <bje@au.ibm.com>
+
+	* dwarf.h: Merge with GCC's dwarf.h.
+
 2005-03-18  C Jaipraash  <cjaiprakash@noida.hcltech.com>
 
 	* m68k.h (EF_CFV4E): Define.
