@@ -1852,11 +1852,14 @@ typedef struct tagTVINSERTSTRUCTW {
 #define _TV_INSERTSTRUCTW tagTVINSERTSTRUCTW
 #define TV_INSERTSTRUCTW TVINSERTSTRUCTW
 #define LPTV_INSERTSTRUCTW LPTVINSERTSTRUCTW
-typedef struct _TV_HITTESTINFO {
-	POINT pt;
-	UINT flags;
-	HTREEITEM hItem;
-} TV_HITTESTINFO,*LPTV_HITTESTINFO;
+typedef struct tagTVHITTESTINFO {
+    POINT  pt;
+    UINT  flags;
+    HTREEITEM  hItem;
+} TVHITTESTINFO, *LPTVHITTESTINFO;
+#define _TV_HITTESTINFO tagTVHITTESTINFO
+#define TV_HITTESTINFO TVHITTESTINFO
+#define LPTV_HITTESTINFO LPTVHITTESTINFO
 typedef int(CALLBACK *PFNTVCOMPARE)(LPARAM,LPARAM,LPARAM);
 typedef struct _TV_SORTCB {
 	HTREEITEM hParent;
@@ -2364,6 +2367,7 @@ WINBOOL WINAPI ImageList_DrawIndirect(IMAGELISTDRAWPARAMS*);
 #define TreeView_SetToolTips(w,wt) (HWND)SNDMSG((w),TVM_SETTOOLTIPS,(WPARAM)(wt),0)
 #endif
 #if (_WIN32_IE >= 0x0400)
+#define ListView_SetExtendedListViewStyleEx(w,m,s) (DWORD)SNDMSG((w),LVM_SETEXTENDEDLISTVIEWSTYLE,(m),(s))
 #define TabCtrl_HighlightItem(hwnd, i, fHighlight) SNDMSG((hwnd), TCM_HIGHLIGHTITEM, (WPARAM)i, (LPARAM)MAKELONG (fHighlight, 0))
 #define TabCtrl_SetExtendedStyle(hwnd, dw) SNDMSG((hwnd), TCM_SETEXTENDEDSTYLE, 0, dw)
 #define TabCtrl_GetExtendedStyle(hwnd) SNDMSG((hwnd), TCM_GETEXTENDEDSTYLE, 0, 0)
