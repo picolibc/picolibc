@@ -1,3 +1,8 @@
+2003-05-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/sys/config.h: Remove all Cygwin specific configuration.
+	Include cygwin/config.h instead.
+
 2003-04-16  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* newlib/libc/machine/powerpc (ato*fix*.c,strto*fix*.c): Shield

@@ -147,17 +147,8 @@
 #define __RAND_MAX 0x7fffffff
 #endif
 
-
 #if defined(__CYGWIN32__) || defined(__CYGWIN__)
-#define __FILENAME_MAX__ (260 - 1 /* NUL */)
-#define _READ_WRITE_RETURN_TYPE _ssize_t
-#define __LARGE64_FILES 1
-#define __CYGWIN_USE_BIG_TYPES__ 1
-#if defined(__INSIDE_CYGWIN__) || defined(_COMPILING_NEWLIB)
-#define __IMPORT
-#else
-#define __IMPORT __declspec(dllimport)
-#endif
+#include <cygwin/config.h>
 #endif
 
 #if defined(__rtems__)
@@ -177,8 +168,7 @@
 #endif
 
 #ifndef __WCHAR_MAX__
-#if __INT_MAX__ == 32767 || defined(__CYGWIN__) || \
-    defined (_WIN32)
+#if __INT_MAX__ == 32767 || defined (_WIN32)
 #define __WCHAR_MAX__ 0xffffu
 #endif
 #endif
