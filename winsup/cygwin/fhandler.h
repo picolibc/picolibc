@@ -767,7 +767,11 @@ public:
 class fhandler_dev_mem: public fhandler_base
 {
 protected:
+  unsigned long mem_size;
   unsigned long pos;
+  bool init_phase;
+
+  void init (void);
 
 public:
   fhandler_dev_mem (const char *name, int unit);

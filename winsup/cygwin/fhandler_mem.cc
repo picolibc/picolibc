@@ -36,12 +36,36 @@ ULONG NTAPI RtlNtStatusToDosError(NTSTATUS);
 
 fhandler_dev_mem::fhandler_dev_mem (const char *name, int)
 : fhandler_base (FH_MEM, name),
-  pos(0UL)
+  init_phase(false)
 {
 }
 
 fhandler_dev_mem::~fhandler_dev_mem (void)
 {
+}
+
+void
+fhandler_dev_mem::init ()
+{
+  long page_size = getpagesize ();
+  char buf[1];
+
+  init_phase = true;
+  mem_size = pos = 1 << 30;
+  for (off_t afct = 1 << 29; afct >= page_size; afct >>= 1)
+    {
+      if (read (buf, 1) > 0)
+        pos += afct;
+      else
+        {
+          if (pos < mem_size)
+            mem_size = pos;
+          pos -= afct;
+        }
+    }
+  pos = 0;
+  debug_printf ("MemSize: %d MB", mem_size >>= 20);
+  init_phase = false;
 }
 
 int
@@ -54,21 +78,38 @@ fhandler_dev_mem::open (const char *, int flags, mode_t)
       return 0;
     }
 
+  /* Check for illegal flags. */
+  if (flags & (O_APPEND | O_TRUNC | O_EXCL))
+    {
+      set_errno (EINVAL);
+      return 0;
+    }
+
   UNICODE_STRING memstr;
   RtlInitUnicodeString (&memstr, L"\\device\\physicalmemory");
 
   OBJECT_ATTRIBUTES attr;
   InitializeObjectAttributes(&attr, &memstr, OBJ_CASE_INSENSITIVE, NULL, NULL);
 
+  ACCESS_MASK section_access;
   if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDONLY)
-    set_access (SECTION_MAP_READ);
+    {
+      set_access (GENERIC_READ);
+      section_access = SECTION_MAP_READ;
+    }
   else if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_WRONLY)
-    set_access (SECTION_MAP_WRITE);
+    {
+      set_access (GENERIC_WRITE);
+      section_access = SECTION_MAP_READ | SECTION_MAP_WRITE;
+    }
   else
-    set_access (SECTION_MAP_READ | SECTION_MAP_WRITE);
+    {
+      set_access (GENERIC_READ | GENERIC_WRITE);
+      section_access = SECTION_MAP_READ | SECTION_MAP_WRITE;
+    }
 
   HANDLE mem;
-  NTSTATUS ret = NtOpenSection (&mem, get_access (), &attr);
+  NTSTATUS ret = NtOpenSection (&mem, section_access, &attr);
   if (!NT_SUCCESS(ret))
     {
       __seterrno_from_win_error (RtlNtStatusToDosError (ret));
@@ -77,26 +118,29 @@ fhandler_dev_mem::open (const char *, int flags, mode_t)
     }
 
   set_io_handle (mem);
+  init ();
   return 1;
 }
 
 int
-fhandler_dev_mem::write (const void *ptr, size_t len)
+fhandler_dev_mem::write (const void *ptr, size_t ulen)
 {
-  set_errno (ENOSYS);
-  return -1;
-}
-
-int
-fhandler_dev_mem::read (void *ptr, size_t ulen)
-{
-  if (!ulen)
+  if (!ulen || pos >= mem_size)
     return 0;
+
+  if (!(get_access () & GENERIC_WRITE))
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+
+  if (pos + ulen > mem_size)
+    ulen = mem_size - pos;
 
   PHYSICAL_ADDRESS phys;
   NTSTATUS ret;
   void *viewmem = NULL;
-  DWORD len = ulen + 4095;
+  DWORD len = ulen + getpagesize () - 1;
 
   phys.QuadPart = (ULONGLONG) pos;
   if ((ret = NtMapViewOfSection (get_handle (),
@@ -111,6 +155,56 @@ fhandler_dev_mem::read (void *ptr, size_t ulen)
                                  PAGE_READONLY)) != STATUS_SUCCESS)
     {
       __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+      return -1;
+    }
+
+  memcpy ((char *) viewmem + (pos - phys.QuadPart), ptr, ulen);
+
+  if (!NT_SUCCESS(ret = NtUnmapViewOfSection (INVALID_HANDLE_VALUE, viewmem)))
+    {
+      __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+      return -1;
+    }
+
+  pos += ulen;
+
+  return ulen;
+}
+
+int
+fhandler_dev_mem::read (void *ptr, size_t ulen)
+{
+  if (!ulen || pos >= mem_size)
+    return 0;
+
+  if (!(get_access () & GENERIC_READ))
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+
+  if (pos + ulen > mem_size)
+    ulen = mem_size - pos;
+
+  PHYSICAL_ADDRESS phys;
+  NTSTATUS ret;
+  void *viewmem = NULL;
+  DWORD len = ulen + getpagesize () - 1;
+
+  phys.QuadPart = (ULONGLONG) pos;
+  if ((ret = NtMapViewOfSection (get_handle (),
+                                 INVALID_HANDLE_VALUE,
+                                 &viewmem,
+                                 0L,
+                                 len,
+                                 &phys,
+                                 &len,
+                                 ViewShare,
+                                 0,
+                                 PAGE_READONLY)) != STATUS_SUCCESS)
+    {
+      if (!init_phase) /* Don't want to flood debug output with init crap. */
+        __seterrno_from_win_error (RtlNtStatusToDosError (ret));
       return -1;
     }
 
@@ -147,11 +241,17 @@ fhandler_dev_mem::lseek (off_t offset, int whence)
       break;
 
     case SEEK_END:
-      pos = 0;
-      pos -= offset;
+      pos = mem_size;
+      pos += offset;
       break;
     
     default:
+      set_errno (EINVAL);
+      return (off_t) -1;
+    }
+
+  if (pos > mem_size)
+    {
       set_errno (EINVAL);
       return (off_t) -1;
     }
@@ -175,7 +275,7 @@ fhandler_dev_mem::fstat (struct stat *buf)
 		    S_IRGRP | S_IWGRP |
 		    S_IROTH | S_IWOTH;
   buf->st_nlink = 1;
-  buf->st_blksize = 4096;
+  buf->st_blksize = getpagesize ();
   buf->st_dev = buf->st_rdev = get_device () << 8;
 
   return 0;
@@ -184,8 +284,16 @@ fhandler_dev_mem::fstat (struct stat *buf)
 int
 fhandler_dev_mem::dup (fhandler_base *child)
 {
-  set_errno (ENOSYS);
-  return -1;
+  int ret = fhandler_base::dup (child);
+
+  if (! ret)
+    {
+      fhandler_dev_mem *fhc = (fhandler_dev_mem *) child;
+
+      fhc->mem_size = mem_size;
+      fhc->pos = pos;
+    }
+  return ret;
 }
 
 void
