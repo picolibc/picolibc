@@ -47,7 +47,7 @@ muto::~muto ()
     release ();
 
   HANDLE h = bruteforce;
-  h = NULL;
+  bruteforce = NULL;
   /* Just need to close the event handle */
   if (h)
     CloseHandle (h);

@@ -1,3 +1,13 @@
+Sun Sep 16 23:04:31 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* dtable.h (not_open): Assure inline.
+	* fhandler.h (operator []): Make const.
+
+Sun Sep 16 23:02:57 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* sync.cc (muto::~muto): Fix typo which stopped muto event handle from
+	ever being closed.
+
 2001-09-16  Egor Duda  <deo@logos-m.ru>
 
 	* path.cc (symlink): Check arguments for validity.

@@ -50,7 +50,7 @@ public:
   fhandler_base *build_fhandler (int fd, DWORD dev, const char *name,
 				 int unit = -1);
   fhandler_base *build_fhandler (int fd, const char *name, HANDLE h);
-  int not_open (int fd)
+  inline int not_open (int fd)
   {
     SetResourceLock (LOCK_FD_LIST, READ_LOCK, "not_open");
 
@@ -65,7 +65,7 @@ public:
   void init_std_file_from_handle (int fd, HANDLE handle, DWORD access, const char *name);
   int dup2 (int oldfd, int newfd);
   void fixup_after_exec (HANDLE);
-  inline fhandler_base *operator [](int fd) { return fds[fd]; }
+  inline fhandler_base *operator [](int fd) const { return fds[fd]; }
   select_record *select_read (int fd, select_record *s);
   select_record *select_write (int fd, select_record *s);
   select_record *select_except (int fd, select_record *s);
