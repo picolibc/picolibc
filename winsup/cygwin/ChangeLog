@@ -1,3 +1,13 @@
+Sun Apr 29 21:41:25 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (symlink_info::check): Remove extra arguments, move
+	functionality back to path_conv::check.  Clear symlink bit from pflags
+	argument before detecting if this is a symlink.
+	(path_conv::check): Convert posix path here instead of
+	symlink_info::check.  Only grab volflags when using ntsec.
+	(symlink_info::check_case): Just replace appropriate part of input
+	path.
+
 Sat Apr 28 19:36:13 2001  Christopher Faylor <cgf@cygnus.com>
 
 	Throughout, change 'tty_attached' to 'real_tty_attached', for clarity.

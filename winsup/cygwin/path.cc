@@ -102,10 +102,8 @@ struct symlink_info
   bool ext_tacked_on;
   int error;
   BOOL case_clash;
-  int check (const char *path, const suffix_info *suffixes,
-  	     char *orig_path, unsigned opt,
-	     DWORD& devn, int& unit, unsigned& path_flags);
-  BOOL case_check (const char *path, char *orig_path);
+  int check (char *path, const suffix_info *suffixes, unsigned opt);
+  BOOL case_check (char *path);
 };
 
 int pcheck_case = PCHECK_RELAXED; /* Determines the case check behaviour. */
@@ -407,8 +405,34 @@ path_conv::check (const char *src, unsigned opt,
 	      full_path = this->path;
 	    }
 
-	  int len = sym.check (path_copy, suff, full_path, opt,
-	     		       devn, unit, path_flags);
+	  error = mount_table->conv_to_win32_path (path_copy, NULL, full_path, devn,
+						   unit, &path_flags);
+
+	  if (devn != FH_BAD)
+	    {
+	      fileattr = 0;
+	      goto out;		/* Found a device.  Stop parsing. */
+	    }
+
+	  /* Eat trailing slashes */
+	  char *dostail = strchr (full_path, '\0');
+
+	  /* If path is only a drivename, Windows interprets it as the current working
+	     directory on this drive instead of the root dir which is what we want. So
+	     we need the trailing backslash in this case. */
+	  while (dostail > full_path + 3 && (*--dostail == '\\'))
+	    *tail = '\0';
+
+	  if (full_path[0] && full_path[1] == ':' && full_path[2] == '\0')
+	    strcat (full_path, "\\");
+
+	  if ((opt & PC_SYM_IGNORE) && pcheck_case == PCHECK_RELAXED)
+	    {
+	      fileattr = GetFileAttributesA (full_path);
+	      goto out;
+	    }
+
+	  int len = sym.check (full_path, suff, opt);
 
 	  if (sym.case_clash)
 	    {
@@ -563,9 +587,9 @@ out:
   char fs_name[16];
 
   strcpy (tmp_buf, this->path);
-  if (!rootdir (tmp_buf) ||
+  if (allow_ntsec && (!rootdir (tmp_buf) ||
       !GetVolumeInformation (tmp_buf, NULL, 0, &serial, NULL,
-      			     &volflags, fs_name, 16))
+      			     &volflags, fs_name, 16)))
     {
       debug_printf ("GetVolumeInformation(%s) = ERR, this->path(%s), set_has_acls(FALSE)",
 		    tmp_buf, this->path, GetLastError ());
@@ -2620,46 +2644,18 @@ suffix_scan::next ()
    stored into BUF if PATH is a symlink.  */
 
 int
-symlink_info::check (const char *path, const suffix_info *suffixes,
-		     char *full_path, unsigned opt,
-		     DWORD& devn, int& unit, unsigned& path_flags)
+symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 {
   HANDLE h;
   int res = 0;
   suffix_scan suffix;
   contents[0] = '\0';
-  char *tail;
-
-  error = mount_table->conv_to_win32_path (path, NULL, full_path, devn,
-					   unit, &path_flags);
-
-  if (devn != FH_BAD)
-    {
-      fileattr = 0;
-      goto out;		/* Found a device.  Stop parsing. */
-    }
-
-  /* Eat trailing slashes */
-  tail = strchr (full_path, '\0');
-
-  /* If path is only a drivename, Windows interprets it as the current working
-     directory on this drive instead of the root dir which is what we want. So
-     we need the trailing backslash in this case. */
-  while (tail > full_path + 3 && (*--tail == '\\'))
-    *tail = '\0';
-
-  if (full_path[0] && full_path[1] == ':' && full_path[2] == '\0')
-    strcat (full_path, "\\");
-
-  if ((opt & PC_SYM_IGNORE) && pcheck_case == PCHECK_RELAXED)
-    {
-      fileattr = GetFileAttributesA (path);
-      goto out;
-    }
 
   is_symlink = TRUE;
-  ext_here = suffix.has (full_path, suffixes);
-  extn = ext_here - full_path;
+  ext_here = suffix.has (path, suffixes);
+  extn = ext_here - path;
+
+  pflags &= ~PATH_SYMLINK;
 
   ext_tacked_on = !*ext_here;
 
@@ -2679,7 +2675,7 @@ symlink_info::check (const char *path, const suffix_info *suffixes,
 	  continue;
 	}
 
-      if (pcheck_case != PCHECK_RELAXED && !case_check (path, full_path)
+      if (pcheck_case != PCHECK_RELAXED && !case_check (path)
           || (opt & PC_SYM_IGNORE))
         goto file_not_symlink;
 
@@ -2753,11 +2749,11 @@ out:
 */
 
 BOOL
-symlink_info::case_check (const char *path, char *orig_path)
+symlink_info::case_check (char *path)
 {
   WIN32_FIND_DATA data;
   HANDLE h;
-  const char *c;
+  char *c;
 
   /* Set a pointer to the beginning of the last component. */
   if (!(c = strrchr (path, '\\')))
@@ -2782,8 +2778,7 @@ symlink_info::case_check (const char *path, char *orig_path)
 
 	  /* PCHECK_ADJUST adjusts the case in the incoming
 	     path which points to the path in *this. */
-	  strncpy (orig_path + (c - path), data.cFileName,
-		   strlen (data.cFileName));
+	  strcpy (c, data.cFileName);
 	}
     }
   return TRUE;
