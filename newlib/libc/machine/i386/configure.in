@@ -1,0 +1,14 @@
+dnl This is the newlib/libc/machine/i386 configure.in file.
+dnl Process this file with autoconf to produce a configure script.
+
+AC_PREREQ(2.5)
+AC_INIT(setjmp.S)
+
+dnl Can't be done in NEWLIB_CONFIGURE because that confuses automake. 
+AC_CONFIG_AUX_DIR(../../../..)
+
+NEWLIB_CONFIGURE(../../..)
+
+AM_CONDITIONAL(MACH_ADD_SETJMP, test "x$mach_add_setjmp" = 'xtrue')
+
+AC_OUTPUT(Makefile)

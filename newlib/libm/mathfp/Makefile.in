@@ -1,0 +1,410 @@
+# Makefile.in generated automatically by automake 1.3b from Makefile.am
+
+# Copyright (C) 1994, 1995, 1996, 1997, 1998 Free Software Foundation, Inc.
+# This Makefile.in is free software; the Free Software Foundation
+# gives unlimited permission to copy and/or distribute it,
+# with or without modifications, as long as this notice is preserved.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY, to the extent permitted by law; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+# PARTICULAR PURPOSE.
+
+
+SHELL = @SHELL@
+
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+bindir = @bindir@
+sbindir = @sbindir@
+libexecdir = @libexecdir@
+datadir = @datadir@
+sysconfdir = @sysconfdir@
+sharedstatedir = @sharedstatedir@
+localstatedir = @localstatedir@
+libdir = @libdir@
+infodir = @infodir@
+mandir = @mandir@
+includedir = @includedir@
+oldincludedir = /usr/include
+
+DESTDIR =
+
+pkgdatadir = $(datadir)/@PACKAGE@
+pkglibdir = $(libdir)/@PACKAGE@
+pkgincludedir = $(includedir)/@PACKAGE@
+
+top_builddir = ..
+
+ACLOCAL = @ACLOCAL@
+AUTOCONF = @AUTOCONF@
+AUTOMAKE = @AUTOMAKE@
+AUTOHEADER = @AUTOHEADER@
+
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+transform = @program_transform_name@
+
+NORMAL_INSTALL = :
+PRE_INSTALL = :
+POST_INSTALL = :
+NORMAL_UNINSTALL = :
+PRE_UNINSTALL = :
+POST_UNINSTALL = :
+host_alias = @host_alias@
+host_triplet = @host@
+AR = @AR@
+AS = @AS@
+CC = @CC@
+CPP = @CPP@
+EXEEXT = @EXEEXT@
+MAINT = @MAINT@
+MAKEINFO = @MAKEINFO@
+NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
+PACKAGE = @PACKAGE@
+RANLIB = @RANLIB@
+VERSION = @VERSION@
+mach_add_objs = @mach_add_objs@
+machine_dir = @machine_dir@
+newlib_basedir = @newlib_basedir@
+sys_dir = @sys_dir@
+
+AUTOMAKE_OPTIONS = cygnus
+
+INCLUDES = -I$(srcdir)/../common $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+
+noinst_LIBRARIES = lib.a
+src =	s_acos.c s_frexp.c s_mathcnst.c \
+	s_cos.c s_sinh.c \
+	s_asin.c\
+	s_asine.c s_cosh.c s_ispos.c s_numtest.c s_sqrt.c \
+	s_exp.c s_ldexp.c s_pow.c s_tan.c \
+	s_atan.c \
+	s_atan2.c s_fabs.c s_log.c s_tanh.c \
+	s_log10.c s_sin.c \
+	s_floor.c s_sine.c \
+	s_atangent.c s_logarithm.c \
+	s_sineh.c \
+	s_ceil.c s_isnan.c s_isinf.c \
+	e_acosh.c e_atanh.c e_remainder.c \
+	er_gamma.c er_lgamma.c \
+	s_erf.c e_j0.c e_j1.c w_jn.c e_hypot.c \
+	w_cabs.c w_drem.c s_asinh.c s_fmod.c \
+	e_scalb.c s_infconst.c s_signif.c
+
+fsrc =	sf_ceil.c \
+	sf_acos.c sf_frexp.c \
+	sf_cos.c sf_sinh.c \
+	sf_asine.c sf_cosh.c sf_ispos.c sf_numtest.c sf_sqrt.c \
+	sf_asin.c \
+	sf_exp.c sf_ldexp.c sf_pow.c sf_tan.c \
+	sf_atan2.c sf_fabs.c sf_tanh.c \
+	sf_atan.c sf_log10.c sf_sin.c\
+	sf_floor.c sf_sine.c \
+	sf_atangent.c sf_logarithm.c sf_sineh.c \
+	sf_log.c sf_sineh.c \
+	sf_isnan.c sf_isinf.c \
+	ef_acosh.c ef_atanh.c ef_remainder.c \
+	erf_gamma.c erf_lgamma.c \
+	sf_erf.c ef_j0.c ef_j1.c wf_jn.c ef_hypot.c \
+	wf_cabs.c wf_drem.c sf_asinh.c sf_fmod.c \
+	ef_scalb.c sf_signif.c
+
+lib_a_SOURCES = $(src) $(fsrc)
+
+chobj = eacosh.def 	eatanh.def 	ehypot.def 	eremainder.def 	erlgamma.def 	sacos.def 	sasine.def 	sasinh.def 	satan.def 	satan2.def 	satangent.def 	scosh.def	serf.def 	sexp.def 	sfabs.def 	sfloor.def 	sfmod.def 	sfrexp.def 	sisnan.def 	sldexp.def 	slog10.def 	slogarithm.def 	spow.def 	ssine.def 	ssineh.def 	ssqrt.def 	stan.def 	stanh.def 	wjn.def
+
+SUFFIXES = .def
+
+CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
+
+TARGETDOC = ../tmp.texi
+
+CLEANFILES = $(chobj) *.ref
+mkinstalldirs = $(SHELL) $(top_srcdir)/../../mkinstalldirs
+CONFIG_CLEAN_FILES = 
+LIBRARIES =  $(noinst_LIBRARIES)
+
+
+DEFS = @DEFS@ -I. -I$(srcdir) 
+CPPFLAGS = @CPPFLAGS@
+LDFLAGS = @LDFLAGS@
+LIBS = @LIBS@
+lib_a_LIBADD = 
+lib_a_OBJECTS =  s_acos.o s_frexp.o s_mathcnst.o s_cos.o s_sinh.o \
+s_asin.o s_asine.o s_cosh.o s_ispos.o s_numtest.o s_sqrt.o s_exp.o \
+s_ldexp.o s_pow.o s_tan.o s_atan.o s_atan2.o s_fabs.o s_log.o s_tanh.o \
+s_log10.o s_sin.o s_floor.o s_sine.o s_atangent.o s_logarithm.o \
+s_sineh.o s_ceil.o s_isnan.o s_isinf.o e_acosh.o e_atanh.o \
+e_remainder.o er_gamma.o er_lgamma.o s_erf.o e_j0.o e_j1.o w_jn.o \
+e_hypot.o w_cabs.o w_drem.o s_asinh.o s_fmod.o e_scalb.o s_infconst.o \
+s_signif.o sf_ceil.o sf_acos.o sf_frexp.o sf_cos.o sf_sinh.o sf_asine.o \
+sf_cosh.o sf_ispos.o sf_numtest.o sf_sqrt.o sf_asin.o sf_exp.o \
+sf_ldexp.o sf_pow.o sf_tan.o sf_atan2.o sf_fabs.o sf_tanh.o sf_atan.o \
+sf_log10.o sf_sin.o sf_floor.o sf_sine.o sf_atangent.o sf_logarithm.o \
+sf_sineh.o sf_log.o sf_sineh.o sf_isnan.o sf_isinf.o ef_acosh.o \
+ef_atanh.o ef_remainder.o erf_gamma.o erf_lgamma.o sf_erf.o ef_j0.o \
+ef_j1.o wf_jn.o ef_hypot.o wf_cabs.o wf_drem.o sf_asinh.o sf_fmod.o \
+ef_scalb.o sf_signif.o
+CFLAGS = @CFLAGS@
+COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LINK = $(CC) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
+DIST_COMMON =  Makefile.am Makefile.in
+
+
+DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
+
+TAR = tar
+GZIP = --best
+SOURCES = $(lib_a_SOURCES)
+OBJECTS = $(lib_a_OBJECTS)
+
+all: Makefile $(LIBRARIES)
+
+.SUFFIXES:
+.SUFFIXES: .S .c .def .o .s
+$(srcdir)/Makefile.in: @MAINT@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4)
+	cd $(top_srcdir) && $(AUTOMAKE) --cygnus mathfp/Makefile
+
+Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
+	cd $(top_builddir) \
+	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
+
+
+mostlyclean-noinstLIBRARIES:
+
+clean-noinstLIBRARIES:
+	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
+
+distclean-noinstLIBRARIES:
+
+maintainer-clean-noinstLIBRARIES:
+
+.c.o:
+	$(COMPILE) -c $<
+
+.s.o:
+	$(COMPILE) -c $<
+
+.S.o:
+	$(COMPILE) -c $<
+
+mostlyclean-compile:
+	-rm -f *.o core *.core
+
+clean-compile:
+
+distclean-compile:
+	-rm -f *.tab.c
+
+maintainer-clean-compile:
+
+lib.a: $(lib_a_OBJECTS) $(lib_a_DEPENDENCIES)
+	-rm -f lib.a
+	$(AR) cru lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
+	$(RANLIB) lib.a
+
+tags: TAGS
+
+ID: $(HEADERS) $(SOURCES) $(LISP)
+	here=`pwd` && cd $(srcdir) \
+	  && mkid -f$$here/ID $(SOURCES) $(HEADERS) $(LISP)
+
+TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) $(LISP)
+	tags=; \
+	here=`pwd`; \
+	list='$(SOURCES) $(HEADERS)'; \
+	unique=`for i in $$list; do echo $$i; done | \
+	  awk '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
+	test -z "$(ETAGS_ARGS)$$unique$(LISP)$$tags" \
+	  || (cd $(srcdir) && etags $(ETAGS_ARGS) $$tags  $$unique $(LISP) -o $$here/TAGS)
+
+mostlyclean-tags:
+
+clean-tags:
+
+distclean-tags:
+	-rm -f TAGS ID
+
+maintainer-clean-tags:
+
+distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
+
+subdir = mathfp
+
+distdir: $(DISTFILES)
+	@for file in $(DISTFILES); do \
+	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
+	  test -f $(distdir)/$$file \
+	  || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
+	  || cp -p $$d/$$file $(distdir)/$$file; \
+	done
+info:
+dvi:
+check:
+installcheck:
+install-info:
+install-exec: 
+	@$(NORMAL_INSTALL)
+
+install-data: 
+	@$(NORMAL_INSTALL)
+
+install: install-exec install-data all
+	@:
+
+uninstall: 
+
+install-strip:
+	$(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM='$(INSTALL_PROGRAM) -s' INSTALL_SCRIPT='$(INSTALL_PROGRAM)' install
+installdirs:
+
+
+mostlyclean-generic:
+
+clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
+
+distclean-generic:
+	-rm -f Makefile $(CONFIG_CLEAN_FILES)
+	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
+
+maintainer-clean-generic:
+mostlyclean:  mostlyclean-noinstLIBRARIES mostlyclean-compile \
+		mostlyclean-tags mostlyclean-generic
+
+clean:  clean-noinstLIBRARIES clean-compile clean-tags clean-generic \
+		mostlyclean
+
+distclean:  distclean-noinstLIBRARIES distclean-compile distclean-tags \
+		distclean-generic clean
+	-rm -f config.status
+
+maintainer-clean:  maintainer-clean-noinstLIBRARIES \
+		maintainer-clean-compile maintainer-clean-tags \
+		maintainer-clean-generic distclean
+	@echo "This command is intended for maintainers to use;"
+	@echo "it deletes files that may require special tools to rebuild."
+
+.PHONY: mostlyclean-noinstLIBRARIES distclean-noinstLIBRARIES \
+clean-noinstLIBRARIES maintainer-clean-noinstLIBRARIES \
+mostlyclean-compile distclean-compile clean-compile \
+maintainer-clean-compile tags mostlyclean-tags distclean-tags \
+clean-tags maintainer-clean-tags distdir info dvi installcheck \
+install-info install-exec install-data install uninstall all \
+installdirs mostlyclean-generic distclean-generic clean-generic \
+maintainer-clean-generic clean mostlyclean distclean maintainer-clean
+
+
+.c.def:
+	$(CHEW) < $< > $*.def 2> $*.ref
+	touch stmp-def
+
+doc: $(chobj)
+	cat $(srcdir)/mathfp.tex >> $(TARGETDOC)
+
+# Texinfo does not appear to support underscores in file names, so we
+# name the .def files without underscores.
+
+eacosh.def: e_acosh.c
+	$(CHEW) < $(srcdir)/e_acosh.c >$@ 2>/dev/null
+	touch stmp-def
+eatanh.def: e_atanh.c
+	$(CHEW) < $(srcdir)/e_atanh.c >$@ 2>/dev/null
+	touch stmp-def
+ehypot.def: e_hypot.c
+	$(CHEW) < $(srcdir)/e_hypot.c >$@ 2>/dev/null
+	touch stmp-def
+eremainder.def: e_remainder.c
+	$(CHEW) < $(srcdir)/e_remainder.c >$@ 2>/dev/null
+	touch stmp-def
+erlgamma.def: er_lgamma.c
+	$(CHEW) < $(srcdir)/er_lgamma.c >$@ 2>/dev/null
+	touch stmp-def
+sacos.def: s_acos.c
+	$(CHEW) < $(srcdir)/s_acos.c >$@ 2>/dev/null
+	touch stmp-def
+sasine.def: s_asine.c
+	$(CHEW) < $(srcdir)/s_asine.c >$@ 2>/dev/null
+	touch stmp-def
+sasinh.def: s_asinh.c
+	$(CHEW) < $(srcdir)/s_asinh.c >$@ 2>/dev/null
+	touch stmp-def
+satan.def: s_atan.c
+	$(CHEW) < $(srcdir)/s_atan.c >$@ 2>/dev/null
+	touch stmp-def
+satan2.def: s_atan2.c
+	$(CHEW) < $(srcdir)/s_atan2.c >$@ 2>/dev/null
+	touch stmp-def
+satangent.def: s_atangent.c
+	$(CHEW) < $(srcdir)/s_atangent.c >$@ 2>/dev/null
+	touch stmp-def
+scosh.def: s_cosh.c
+	$(CHEW) < $(srcdir)/s_cosh.c >$@ 2>/dev/null
+	touch stmp-def
+serf.def: s_erf.c
+	$(CHEW) < $(srcdir)/s_erf.c >$@ 2>/dev/null
+	touch stmp-def
+sexp.def: s_exp.c
+	$(CHEW) < $(srcdir)/s_exp.c >$@ 2>/dev/null
+	touch stmp-def
+sfabs.def: s_fabs.c
+	$(CHEW) < $(srcdir)/s_fabs.c >$@ 2>/dev/null
+	touch stmp-def
+sfloor.def: s_floor.c
+	$(CHEW) < $(srcdir)/s_floor.c >$@ 2>/dev/null
+	touch stmp-def
+sfmod.def: s_fmod.c
+	$(CHEW) < $(srcdir)/s_fmod.c >$@ 2>/dev/null
+	touch stmp-def
+sfrexp.def: s_frexp.c
+	$(CHEW) < $(srcdir)/s_frexp.c >$@ 2>/dev/null
+	touch stmp-def
+sisnan.def: s_isnan.c
+	$(CHEW) < $(srcdir)/s_isnan.c >$@ 2>/dev/null
+	touch stmp-def
+sldexp.def: s_ldexp.c
+	$(CHEW) < $(srcdir)/s_ldexp.c >$@ 2>/dev/null
+	touch stmp-def
+slog10.def: s_log10.c
+	$(CHEW) < $(srcdir)/s_log10.c >$@ 2>/dev/null
+	touch stmp-def
+slogarithm.def: s_logarithm.c
+	$(CHEW) < $(srcdir)/s_logarithm.c >$@ 2>/dev/null
+	touch stmp-def
+spow.def: s_pow.c
+	$(CHEW) < $(srcdir)/s_pow.c >$@ 2>/dev/null
+	touch stmp-def
+ssine.def: s_sine.c
+	$(CHEW) < $(srcdir)/s_sine.c >$@ 2>/dev/null
+	touch stmp-def
+ssineh.def: s_sineh.c
+	$(CHEW) < $(srcdir)/s_sineh.c >$@ 2>/dev/null
+	touch stmp-def
+ssqrt.def: s_sqrt.c
+	$(CHEW) < $(srcdir)/s_sqrt.c >$@ 2>/dev/null
+	touch stmp-def
+stan.def: s_tan.c
+	$(CHEW) < $(srcdir)/s_tan.c >$@ 2>/dev/null
+	touch stmp-def
+stanh.def: s_tanh.c
+	$(CHEW) < $(srcdir)/s_tanh.c >$@ 2>/dev/null
+	touch stmp-def
+wjn.def: w_jn.c
+	$(CHEW) < $(srcdir)/w_jn.c >$@ 2>/dev/null
+	touch stmp-def
+
+# A partial dependency list.
+
+$(lib_a_OBJECTS): $(srcdir)/../../libc/include/math.h $(srcdir)/../common/fdlibm.h
+
+# Tell versions [3.59,3.63) of GNU make to not export all variables.
+# Otherwise a system limit (for SysV at least) may be exceeded.
+.NOEXPORT:

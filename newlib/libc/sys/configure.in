@@ -1,0 +1,24 @@
+dnl This is the newlib/libc/sys configure.in file.
+dnl Process this file with autoconf to produce a configure script.
+
+AC_PREREQ(2.5)
+AC_INIT(a29khif)
+
+dnl Can't be done in NEWLIB_CONFIGURE because that confuses automake. 
+AC_CONFIG_AUX_DIR(../../..)
+
+NEWLIB_CONFIGURE(../..)
+
+if test -n "${sys_dir}"; then
+  AC_CONFIG_SUBDIRS(${sys_dir})
+fi
+
+CRT0=
+if test -n "${sys_dir}"; then
+  CRT0=crt0.o
+fi
+AC_SUBST(CRT0)
+
+AM_CONDITIONAL(HAVE_SYS_DIR, test x${sys_dir} != x)
+
+AC_OUTPUT(Makefile)

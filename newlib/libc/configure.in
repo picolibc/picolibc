@@ -1,0 +1,70 @@
+dnl This is the newlib/libc configure.in file.
+dnl Process this file with autoconf to produce a configure script.
+
+AC_PREREQ(2.5)
+AC_INIT(sys.tex)
+
+dnl Can't be done in NEWLIB_CONFIGURE because that confuses automake. 
+AC_CONFIG_AUX_DIR(../..)
+
+NEWLIB_CONFIGURE(..)
+
+AC_CONFIG_SUBDIRS(machine sys)
+
+CRT0=
+if test -n "${sys_dir}"; then
+  CRT0=crt0.o
+fi
+AC_SUBST(CRT0)
+
+dnl For each directory which we may or may not want, we define a name
+dnl for the library and an automake conditional for whether we should
+dnl build the library.
+
+LIBC_POSIX_LIB=
+if test -n "${posix_dir}"; then
+  LIBC_POSIX_LIB=${posix_dir}/lib.a
+fi
+AC_SUBST(LIBC_POSIX_LIB)
+AM_CONDITIONAL(HAVE_POSIX_DIR, test x${posix_dir} != x)
+
+LIBC_SIGNAL_LIB=
+LIBC_SIGNAL_DEF=
+if test -n "${signal_dir}"; then
+  LIBC_SIGNAL_LIB=${signal_dir}/lib.a
+  LIBC_SIGNAL_DEF=${signal_dir}/stmp-def
+fi
+AC_SUBST(LIBC_SIGNAL_LIB)
+AC_SUBST(LIBC_SIGNAL_DEF)
+AM_CONDITIONAL(HAVE_SIGNAL_DIR, test x${signal_dir} != x)
+
+LIBC_SYSCALL_LIB=
+if test -n "${syscall_dir}"; then
+  LIBC_SYSCALL_LIB=${syscall_dir}/lib.a
+fi
+AC_SUBST(LIBC_SYSCALL_LIB)
+AM_CONDITIONAL(HAVE_SYSCALL_DIR, test x${syscall_dir} != x)
+
+LIBC_UNIX_LIB=
+if test -n "${unix_dir}"; then
+  LIBC_UNIX_LIB=${unix_dir}/lib.a
+fi
+AC_SUBST(LIBC_UNIX_LIB)
+AM_CONDITIONAL(HAVE_UNIX_DIR, test x${unix_dir} != x)
+
+dnl We always recur into sys and machine, and let them decide what to
+dnl do.  However, we do need to know whether they will produce a library.
+
+LIBC_SYS_LIB=
+if test -n "${sys_dir}"; then
+  LIBC_SYS_LIB=sys/lib.a
+fi
+AC_SUBST(LIBC_SYS_LIB)
+
+LIBC_MACHINE_LIB=
+if test -n "${machine_dir}"; then
+  LIBC_MACHINE_LIB=machine/lib.a
+fi
+AC_SUBST(LIBC_MACHINE_LIB)
+
+AC_OUTPUT(Makefile ctype/Makefile errno/Makefile locale/Makefile misc/Makefile reent/Makefile stdio/Makefile stdlib/Makefile string/Makefile time/Makefile posix/Makefile signal/Makefile syscalls/Makefile unix/Makefile)
