@@ -8,6 +8,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#define fstat __FOOfstat__
+#define stat __FOOstat__
 #define _close __FOO_close__
 #define _lseek __FOO_lseek__
 #define _open __FOO_open__
@@ -29,9 +31,15 @@ details. */
 #include <sys/uio.h>
 #include <errno.h>
 #include <limits.h>
+#include <unistd.h>
+#include <setjmp.h>
 #include <winnls.h>
 #include <wininet.h>
 #include <lmcons.h> /* for UNLEN */
+
+#undef fstat
+#undef stat
+
 #include <cygwin/version.h>
 #include <sys/cygwin.h>
 #include "cygerrno.h"
@@ -42,11 +50,9 @@ details. */
 #include "dtable.h"
 #include "sigproc.h"
 #include "pinfo.h"
-#include <unistd.h>
 #include "shared_info.h"
 #include "cygheap.h"
 #define NEED_VFORK
-#include <setjmp.h>
 #include "perthread.h"
 #include "pwdgrp.h"
 
@@ -153,7 +159,8 @@ unlink (const char *ourname)
       BOOL res = CloseHandle (h);
       syscall_printf ("%d = CloseHandle (%p)", res, h);
       if (!win32_name.isremote ()
-	  || GetFileAttributes (win32_name) == INVALID_FILE_ATTRIBUTES)
+	  || (GetFileAttributes (win32_name) == INVALID_FILE_ATTRIBUTES
+	      || wincap.has_delete_on_close ()))
 	{
 	  syscall_printf ("CreateFile (FILE_FLAG_DELETE_ON_CLOSE) succeeded");
 	  goto ok;
@@ -1017,7 +1024,7 @@ extern "C" int _fstat64 (int fd, __off64_t pos, int dir)
   __attribute__ ((alias ("fstat64")));
 
 extern "C" int
-_fstat (int fd, struct __stat32 *buf)
+fstat (int fd, struct __stat32 *buf)
 {
   struct __stat64 buf64;
   int ret = fstat64 (fd, &buf64);
@@ -1025,6 +1032,9 @@ _fstat (int fd, struct __stat32 *buf)
     stat64_to_stat32 (&buf64, buf);
   return ret;
 }
+
+extern "C" int _fstat (int fd, __off64_t pos, int dir)
+  __attribute__ ((alias ("fstat")));
 
 /* fsync: P96 6.6.1.1 */
 extern "C" int
@@ -1110,6 +1120,9 @@ stat_worker (const char *name, struct __stat64 *buf, int nofollow,
   return res;
 }
 
+extern "C" int _stat (int fd, __off64_t pos, int dir)
+  __attribute__ ((alias ("stat")));
+
 extern "C" int
 stat64 (const char *name, struct __stat64 *buf)
 {
@@ -1119,7 +1132,7 @@ stat64 (const char *name, struct __stat64 *buf)
 }
 
 extern "C" int
-_stat (const char *name, struct __stat32 *buf)
+stat (const char *name, struct __stat32 *buf)
 {
   struct __stat64 buf64;
   int ret = stat64 (name, &buf64);

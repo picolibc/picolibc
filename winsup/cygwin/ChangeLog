@@ -1,3 +1,27 @@
+2003-03-17  Christopher Faylor  <cgf@redhat.com>
+
+	* cygwin.din: Export btowc, trunc.
+	* include/cygwin/version.h: Reflect new exports.
+	* syscalls.cc (_stat): Rename to stat to avoid newlib wrapper.
+	* syscalls.cc (_fstat): Ditto.
+
+2003-03-16  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_console.cc (fhandler_console::close): Correct check for
+	current tty.  Add debugging output when console is freed.
+	(set_console_state_for_spawn): Add debugging output.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Don't decrement console
+	open flag when vforking.
+	* sigproc.cc (sigproc_terminate): Fix debugging output.
+	* spawn.cc (handle): Eliminate second argument.
+	(spawn_guts): Reflect elimination of argument change to handle.
+	* syscalls.cc (setsid): Add debugging output when console is freed.
+
+2003-03-14  Christopher Faylor  <cgf@redhat.com>
+
+	* syscalls.cc (rename): Revert assumption that DELETE_ON_CLOSE works on
+	Win9x.
+
 2003-03-13  Christopher Faylor  <cgf@redhat.com>
 
 	* include/cygwin/version.h: Bump DLL minor number to 23.
