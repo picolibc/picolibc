@@ -1,3 +1,8 @@
+2004-11-19  Alan Modra  <amodra@bigpond.net.au>
+
+	* msp430.h (struct rcodes_s, MSP430_RLC, msp430_rcodes,
+	struct hcodes_s, msp430_hcodes): Move to gas/config/tc-msp430.c.
+
 2004-11-08  Inderpreet Singh   <inderpreetb@nioda.hcltech.com>
 	    Vineet Sharma      <vineets@noida.hcltech.com>
 
