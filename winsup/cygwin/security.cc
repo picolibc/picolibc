@@ -1341,7 +1341,7 @@ get_nt_attribute (const char *file, mode_t *attribute,
   get_info_from_sd (sd, attribute, uidret, gidret);
 }
 
-static int
+int
 get_nt_object_security (HANDLE handle, SE_OBJECT_TYPE object_type,
 			security_descriptor &sd_ret)
 {

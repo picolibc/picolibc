@@ -12,6 +12,7 @@ details. */
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/cygwin.h>
+#include <sys/acl.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -237,6 +238,14 @@ fhandler_virtual::fchmod (mode_t mode)
 
 int
 fhandler_virtual::fchown (__uid32_t uid, __gid32_t gid)
+{
+  /* Same as on Linux. */
+  set_errno (EPERM);
+  return -1;
+}
+
+int
+fhandler_virtual::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 {
   /* Same as on Linux. */
   set_errno (EPERM);

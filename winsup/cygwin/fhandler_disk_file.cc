@@ -12,6 +12,7 @@ details. */
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/cygwin.h>
+#include <sys/acl.h>
 #include <signal.h>
 #include "cygerrno.h"
 #include "perprocess.h"
@@ -437,6 +438,83 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
       /* fake - if not supported, pretend we're like win95
          where it just works */
       res = 0;
+    }
+
+  if (oret)
+    close_fs ();
+
+  return res;
+}
+
+int _stdcall
+fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
+{
+  int res = -1;
+  int oret = 0;
+
+  if (!get_io_handle ())
+    {
+      query_open (query_write_control);
+      if (!(oret = open_fs (O_BINARY, 0)))
+        return -1;
+    }
+
+  if (!pc.has_acls () || !allow_ntsec)
+    {
+      switch (cmd)
+        {
+	  struct __stat64 st;
+
+	  case SETACL:
+	    set_errno (ENOSYS);
+	    break;
+	  case GETACL:
+	    if (!aclbufp)
+	      set_errno(EFAULT);
+	    else if (nentries < MIN_ACL_ENTRIES)
+	      set_errno (ENOSPC);
+	    else if (!fstat_by_handle (&st))
+	      {
+		aclbufp[0].a_type = USER_OBJ;
+		aclbufp[0].a_id = st.st_uid;
+		aclbufp[0].a_perm = (st.st_mode & S_IRWXU) >> 6;
+		aclbufp[1].a_type = GROUP_OBJ;
+		aclbufp[1].a_id = st.st_gid;
+		aclbufp[1].a_perm = (st.st_mode & S_IRWXG) >> 3;
+		aclbufp[2].a_type = OTHER_OBJ;
+		aclbufp[2].a_id = ILLEGAL_GID;
+		aclbufp[2].a_perm = st.st_mode & S_IRWXO;
+		aclbufp[3].a_type = CLASS_OBJ; 
+		aclbufp[3].a_id = ILLEGAL_GID;
+		aclbufp[3].a_perm = S_IRWXU | S_IRWXG | S_IRWXO;
+		res = MIN_ACL_ENTRIES;
+	      }
+	    break;
+	  case GETACLCNT:
+	    res = MIN_ACL_ENTRIES;
+	    break;
+	}
+    }
+  else
+    {
+      switch (cmd)
+	{
+	  case SETACL:
+	    if (!aclsort32 (nentries, 0, aclbufp))
+	      res = setacl (get_io_handle (), pc, nentries, aclbufp);
+	    break;
+	  case GETACL:
+	    if (!aclbufp)
+	      set_errno(EFAULT);
+	    else
+	      res = getacl (get_io_handle (), pc, pc, nentries, aclbufp);
+	    break;
+	  case GETACLCNT:
+	    res = getacl (get_io_handle (), pc, pc, 0, NULL);
+	  default:
+	    set_errno (EINVAL);
+	    break;
+	}
     }
 
   if (oret)

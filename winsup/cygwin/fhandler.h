@@ -35,6 +35,7 @@ class fhandler_disk_file;
 typedef struct __DIR DIR;
 struct dirent;
 struct iovec;
+struct __acl32;
 
 enum conn_state
 {
@@ -245,6 +246,7 @@ class fhandler_base
   int __stdcall fstat_by_name (struct __stat64 *buf) __attribute__ ((regparm (2)));
   virtual int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
   virtual int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
+  virtual int __stdcall facl (int, int, __acl32 *) __attribute__ ((regparm (3)));
   virtual int ioctl (unsigned int cmd, void *);
   virtual int fcntl (int cmd, void *);
   virtual char const *ttyname () { return get_name (); }
@@ -571,6 +573,7 @@ class fhandler_disk_file: public fhandler_base
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
   int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
+  int __stdcall facl (int, int, __acl32 *) __attribute__ ((regparm (3)));
 
   HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, _off64_t off);
   int munmap (HANDLE h, caddr_t addr, size_t len);
@@ -1105,6 +1108,7 @@ class fhandler_virtual : public fhandler_base
   int __stdcall fstat (struct stat *buf) __attribute__ ((regparm (2)));
   int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
   int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
+  int __stdcall facl (int, int, __acl32 *) __attribute__ ((regparm (3)));
   virtual bool fill_filebuf ();
   void fixup_after_exec ();
 };

@@ -823,50 +823,20 @@ done:
 static int
 chown_worker (const char *name, unsigned fmode, __uid32_t uid, __gid32_t gid)
 {
-  int res;
-
-  if (check_null_empty_str_errno (name))
-    return -1;
-
   if (!wincap.has_security ())  // real chown only works on NT
-    res = 0;			// return zero (and do nothing) under Windows 9x
-  else
+    return 0;			// return zero (and do nothing) under Windows 9x
+
+  int res = -1;
+  fhandler_base *fh = build_fh_name (name, NULL, fmode | PC_FULL,
+				     stat_suffixes);
+  if (fh->error ())
     {
-      /* we need Win32 path names because of usage of Win32 API functions */
-      path_conv win32_path (PC_NONULLEMPTY, name, fmode);
-
-      if (win32_path.error)
-	{
-	  set_errno (win32_path.error);
-	  res = -1;
-	  goto done;
-	}
-
-      /* FIXME: This makes chown on a device succeed always.  Someday we'll want
-	 to actually allow chown to work properly on devices. */
-      if (win32_path.is_auto_device () && !win32_path.issocket ())
-	{
-	  res = 0;
-	  goto done;
-	}
-
-      mode_t attrib = 0;
-      if (win32_path.isdir ())
-	attrib |= S_IFDIR;
-      res = get_file_attribute (win32_path.has_acls (), NULL,
-				win32_path.get_win32 (), &attrib);
-      if (!res)
-	 res = set_file_attribute (win32_path.has_acls (), NULL, win32_path,
-				   uid, gid, attrib);
-      if (res != 0 && (!win32_path.has_acls () || !allow_ntsec))
-	{
-	  /* fake - if not supported, pretend we're like win95
-	     where it just works */
-	  res = 0;
-	}
+      debug_printf ("got %d error from build_fh_name", fh->error ());
+      set_errno (fh->error ());
     }
+  else
+    res = fh->fchown (uid, gid);
 
-done:
   syscall_printf ("%d = %schown (%s,...)",
 		  res, (fmode & PC_SYM_NOFOLLOW) ? "l" : "", name);
   return res;
@@ -908,18 +878,10 @@ fchown32 (int fd, __uid32_t uid, __gid32_t gid)
       return -1;
     }
 
-  const char *path = cfd->get_name ();
+  int res = cfd->fchown (uid, gid);
 
-  if (path == NULL)
-    {
-      syscall_printf ("-1 = fchown (%d,...) (no name)", fd);
-      set_errno (ENOSYS);
-      return -1;
-    }
-
-  syscall_printf ("fchown (%d,...): calling chown_worker (%s,FOLLOW,...)",
-		  fd, path);
-  return chown_worker (path, PC_SYM_FOLLOW, uid, gid);
+  syscall_printf ("%d = fchown (%s,...)", res, cfd->get_name ());
+  return res;
 }
 
 extern "C" int

@@ -13,6 +13,7 @@ details. */
 #include <stdlib.h>
 #include <sys/cygwin.h>
 #include <sys/uio.h>
+#include <sys/acl.h>
 #include <signal.h>
 #include "cygerrno.h"
 #include "perprocess.h"
@@ -442,27 +443,28 @@ fhandler_base::open (int flags, mode_t mode)
       goto done;
     }
 
-  if (query_open ())
-    switch (query_open ())
-      {
-	case query_null_access:
-	  access = 0;
-	  break;
-	case query_read_control:
-	  access = READ_CONTROL;
-	  break;
-	case query_write_control:
-	  access = READ_CONTROL | WRITE_OWNER | WRITE_DAC;
-	  break;
-      }
-  else if (get_major () == DEV_TAPE_MAJOR)
-    access = GENERIC_READ | GENERIC_WRITE;
-  else if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDONLY)
-    access = GENERIC_READ;
-  else if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_WRONLY)
-    access = GENERIC_WRITE;
-  else
-    access = GENERIC_READ | GENERIC_WRITE;
+  switch (query_open ())
+    {
+      case query_null_access:
+	access = 0;
+	break;
+      case query_read_control:
+	access = READ_CONTROL;
+	break;
+      case query_write_control:
+	access = READ_CONTROL | WRITE_OWNER | WRITE_DAC;
+	break;
+      default:
+	if (get_major () == DEV_TAPE_MAJOR)
+	  access = GENERIC_READ | GENERIC_WRITE;
+	else if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDONLY)
+	  access = GENERIC_READ;
+	else if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_WRONLY)
+	  access = GENERIC_WRITE;
+	else
+	  access = GENERIC_READ | GENERIC_WRITE;
+        break;
+    }
 
   /* Allow reliable lseek on disk devices. */
   if (get_major () == DEV_FLOPPY_MAJOR)
@@ -1425,6 +1427,13 @@ fhandler_base::fchmod (mode_t mode)
 
 int
 fhandler_base::fchown (__uid32_t uid, __gid32_t gid)
+{
+  /* By default, just succeeds. */
+  return 0;
+}
+
+int
+fhandler_base::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 {
   /* By default, just succeeds. */
   return 0;

@@ -1,5 +1,23 @@
 2004-04-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::open): Simplify access evaluation
+	expression.
+	(fhandler_base::facl): New method.
+	* fhandler.h: Declare facl method in fhandler_base,
+	fhandler_disk_file and fhandler_virtual.
+	* fhandler_disk_file.cc (fhandler_disk_file::facl): New method.
+	* fhandler_virtual.cc (fhandler_virtual::facl): New method.
+	* sec_acl.cc: Remove forward declaration for aclsort32 and acl32.
+	(setacl): Remove static.  Add and use handle parameter.
+	(getacl): Ditto.
+	(acl_worker): Reorganize to call fhandler's facl method eventually.
+	(facl32): Ditto.
+	* security.cc (get_nt_object_security): Remove static.
+	* security.h: Add extern declarations for get_nt_object_security,
+	aclsort32, acl32, getacl and setacl.
+
+2004-04-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.cc (fhandler_base::open): Accomodate query_write_control
 	query_state.
 	(fhandler_base::fchown): New method.
@@ -17,6 +35,9 @@
 	NtSetSecurityObject failed or handle is NULL.
 	(set_nt_attribute): Call write_sd with additional handle attribute.
 	* security.h (write_sd): Declare with additional handle argument.
+	* syscalls.cc (chown_worker): Reorganize to call fhandler's fchown
+	method eventually.
+	(fchown): Ditto.
 
 2004-04-14  Corinna Vinschen  <corinna@vinschen.de>
 

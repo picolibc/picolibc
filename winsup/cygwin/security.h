@@ -253,6 +253,8 @@ int __stdcall get_file_attribute (int, HANDLE, const char *, mode_t *,
 				  __uid32_t * = NULL, __gid32_t * = NULL);
 int __stdcall set_file_attribute (bool, HANDLE, const char *, int);
 int __stdcall set_file_attribute (bool, HANDLE, const char *, __uid32_t, __gid32_t, int);
+int __stdcall get_nt_object_security (HANDLE, SE_OBJECT_TYPE,
+				      security_descriptor &);
 int __stdcall get_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type, mode_t *,
 				  __uid32_t * = NULL, __gid32_t * = NULL);
 LONG __stdcall read_sd (const char *file, security_descriptor &sd);
@@ -265,6 +267,13 @@ void set_security_attribute (int attribute, PSECURITY_ATTRIBUTES psa,
 			     security_descriptor &sd_buf);
 
 bool get_sids_info (cygpsid, cygpsid, __uid32_t * , __gid32_t *);
+
+/* sec_acl.cc */
+struct __acl32;
+extern "C" int aclsort32 (int, int, __acl32 *);
+extern "C" int acl32 (const char *, int, int, __acl32 *);
+int getacl (HANDLE, const char *, DWORD, int, __acl32 *);
+int setacl (HANDLE, const char *, int, __acl32 *);
 
 /* Try a subauthentication. */
 HANDLE subauth (struct passwd *pw);

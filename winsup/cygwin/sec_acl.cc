@@ -31,9 +31,6 @@ details. */
 #include "cygheap.h"
 #include "pwdgrp.h"
 
-extern "C" int aclsort32 (int nentries, int, __aclent32_t *aclbufp);
-extern "C" int acl32 (const char *path, int cmd, int nentries, __aclent32_t *aclbufp);
-
 static int
 searchace (__aclent32_t *aclp, int nentries, int type, __uid32_t id = ILLEGAL_UID)
 {
@@ -46,12 +43,13 @@ searchace (__aclent32_t *aclp, int nentries, int type, __uid32_t id = ILLEGAL_UI
   return -1;
 }
 
-static int
-setacl (const char *file, int nentries, __aclent32_t *aclbufp)
+int
+setacl (HANDLE handle, const char *file, int nentries, __aclent32_t *aclbufp)
 {
   security_descriptor sd_ret;
 
-  if (read_sd (file, sd_ret) <= 0)
+  if ((!handle || get_nt_object_security (handle, SE_FILE_OBJECT, sd_ret))
+      && read_sd (file, sd_ret) <= 0)
     {
       debug_printf ("read_sd %E");
       return -1;
@@ -223,7 +221,7 @@ setacl (const char *file, int nentries, __aclent32_t *aclbufp)
       return -1;
     }
   debug_printf ("Created SD-Size: %d", sd_ret.size ());
-  return write_sd (NULL, file, sd_ret);
+  return write_sd (handle, file, sd_ret);
 }
 
 /* Temporary access denied bits */
@@ -257,13 +255,15 @@ getace (__aclent32_t &acl, int type, int id, DWORD win_ace_mask,
       acl.a_perm |= DENY_X;
 }
 
-static int
-getacl (const char *file, DWORD attr, int nentries, __aclent32_t *aclbufp)
+int
+getacl (HANDLE handle, const char *file, DWORD attr, int nentries,
+	__aclent32_t *aclbufp)
 {
   security_descriptor sd;
 
   int ret;
-  if ((ret = read_sd (file, sd)) <= 0)
+  if (!handle || get_nt_object_security (handle, SE_FILE_OBJECT, sd)
+      && (ret = read_sd (file, sd)) <= 0)
     {
       debug_printf ("read_sd %E");
       return ret;
@@ -409,93 +409,33 @@ getacl (const char *file, DWORD attr, int nentries, __aclent32_t *aclbufp)
 
 static int
 acl_worker (const char *path, int cmd, int nentries, __aclent32_t *aclbufp,
-	    int nofollow)
+	    unsigned fmode)
 {
   extern suffix_info stat_suffixes[];
-  path_conv real_path (path, (nofollow ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW) | PC_FULL, stat_suffixes);
-  if (real_path.error)
+  int res = -1;
+  fhandler_base *fh = build_fh_name (path, NULL, fmode | PC_FULL,
+				     stat_suffixes);
+  if (fh->error ())
     {
-      set_errno (real_path.error);
-      syscall_printf ("-1 = acl (%s)", path);
-      return -1;
+      debug_printf ("got %d error from build_fh_name", fh->error ());
+      set_errno (fh->error ());
     }
-  if (!real_path.has_acls () || !allow_ntsec)
-    {
-      struct __stat64 st;
-      int ret = -1;
-
-      switch (cmd)
-	{
-	case SETACL:
-	  set_errno (ENOSYS);
-	  break;
-	case GETACL:
-	  if (!aclbufp)
-	    set_errno(EFAULT);
-	  else if (nentries < MIN_ACL_ENTRIES)
-	    set_errno (ENOSPC);
-	  else if ((nofollow && !lstat64 (path, &st))
-		   || (!nofollow && !stat64 (path, &st)))
-	    {
-	      aclbufp[0].a_type = USER_OBJ;
-	      aclbufp[0].a_id = st.st_uid;
-	      aclbufp[0].a_perm = (st.st_mode & S_IRWXU) >> 6;
-	      aclbufp[1].a_type = GROUP_OBJ;
-	      aclbufp[1].a_id = st.st_gid;
-	      aclbufp[1].a_perm = (st.st_mode & S_IRWXG) >> 3;
-	      aclbufp[2].a_type = OTHER_OBJ;
-	      aclbufp[2].a_id = ILLEGAL_GID;
-	      aclbufp[2].a_perm = st.st_mode & S_IRWXO;
-	      aclbufp[3].a_type = CLASS_OBJ;
-	      aclbufp[3].a_id = ILLEGAL_GID;
-	      aclbufp[3].a_perm = S_IRWXU | S_IRWXG | S_IRWXO;
-	      ret = MIN_ACL_ENTRIES;
-	    }
-	  break;
-	case GETACLCNT:
-	  ret = MIN_ACL_ENTRIES;
-	  break;
-	}
-      syscall_printf ("%d = acl (%s)", ret, path);
-      return ret;
-    }
-  switch (cmd)
-    {
-      case SETACL:
-	if (!aclsort32 (nentries, 0, aclbufp))
-	  return setacl (real_path.get_win32 (),
-			 nentries, aclbufp);
-	break;
-      case GETACL:
-	if (!aclbufp)
-	  set_errno(EFAULT);
-	else
-	  return getacl (real_path.get_win32 (),
-			 real_path.file_attributes (),
-			 nentries, aclbufp);
-	break;
-      case GETACLCNT:
-	return getacl (real_path.get_win32 (),
-		       real_path.file_attributes (),
-		       0, NULL);
-      default:
-	set_errno (EINVAL);
-	break;
-    }
-  syscall_printf ("-1 = acl (%s)", path);
-  return -1;
+  else
+    res = fh->facl (cmd, nentries, aclbufp);
+  syscall_printf ("%d = acl (%s)", res, path);
+  return res;
 }
 
 extern "C" int
 acl32 (const char *path, int cmd, int nentries, __aclent32_t *aclbufp)
 {
-  return acl_worker (path, cmd, nentries, aclbufp, 0);
+  return acl_worker (path, cmd, nentries, aclbufp, PC_SYM_FOLLOW);
 }
 
 extern "C" int
 lacl32 (const char *path, int cmd, int nentries, __aclent32_t *aclbufp)
 {
-  return acl_worker (path, cmd, nentries, aclbufp, 1);
+  return acl_worker (path, cmd, nentries, aclbufp, PC_SYM_NOFOLLOW);
 }
 
 extern "C" int
@@ -507,15 +447,9 @@ facl32 (int fd, int cmd, int nentries, __aclent32_t *aclbufp)
       syscall_printf ("-1 = facl (%d)", fd);
       return -1;
     }
-  const char *path = cfd->get_name ();
-  if (path == NULL)
-    {
-      syscall_printf ("-1 = facl (%d) (no name)", fd);
-      set_errno (ENOSYS);
-      return -1;
-    }
-  syscall_printf ("facl (%d): calling acl (%s)", fd, path);
-  return acl_worker (path, cmd, nentries, aclbufp, 0);
+  int res = cfd->facl (cmd, nentries, aclbufp);
+  syscall_printf ("%d = facl (%s) )", res, cfd->get_name ());
+  return res;
 }
 
 extern "C" int
