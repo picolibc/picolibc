@@ -1,3 +1,12 @@
+2005-01-19  Fred Fish  <fnf@specifixinc.com>
+
+	* mips.h (struct mips_opcode): Add new pinfo2 member.
+	(INSN_ALIAS): New define for opcode table entries that are
+	specific instances of another entry, such as 'move' for an 'or'
+	with a zero operand.
+	(INSN_READ_MDMX_ACC): Redefine from 0 to 0x2.
+	(INSN_WRITE_MDMX_ACC): Redefine from 0 to 0x4.
+
 2004-12-09  Ian Lance Taylor  <ian@wasabisystems.com>
 
 	* mips.h (CPU_RM9000): Define.

@@ -192,6 +192,8 @@ struct mips_opcode
      of bits describing the instruction, notably any relevant hazard
      information.  */
   unsigned long pinfo;
+  /* A collection of additional bits describing the instruction. */
+  unsigned long pinfo2;
   /* A collection of bits describing the instruction sets of which this
      instruction or macro is a member. */
   unsigned long membership;
@@ -376,10 +378,16 @@ struct mips_opcode
 #define INSN_MULT                   0x40000000
 /* Instruction synchronize shared memory.  */
 #define INSN_SYNC		    0x80000000
-/* Instruction reads MDMX accumulator.  XXX FIXME: No bits left!  */
-#define INSN_READ_MDMX_ACC	    0
-/* Instruction writes MDMX accumulator.  XXX FIXME: No bits left!  */
-#define INSN_WRITE_MDMX_ACC	    0
+
+/* These are the bits which may be set in the pinfo2 field of an
+   instruction. */
+
+/* Instruction is a simple alias (I.E. "move" for daddu/addu/or) */
+#define	INSN_ALIAS		    0x00000001
+/* Instruction reads MDMX accumulator. */
+#define INSN_READ_MDMX_ACC	    0x00000002
+/* Instruction writes MDMX accumulator. */
+#define INSN_WRITE_MDMX_ACC	    0x00000004
 
 /* Instruction is actually a macro.  It should be ignored by the
    disassembler, and requires special treatment by the assembler.  */
