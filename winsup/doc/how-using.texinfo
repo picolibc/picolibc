@@ -104,6 +104,20 @@ Make sure you are using the find that came with Cygwin and that you
 aren't picking up the Win32 find command instead.  You can verify that
 you are getting the right one by doing a "type find" in bash.
 
+@subsection Why doesn't chmod work?
+
+@samp{ntsec} will allow UNIX permissions in Windows NT on NTFS file systems.
+
+@samp{ntea} works on NTFS @emph{and} FAT but it creates a huge,
+@strong{undeletable} file on FAT filesystems.
+
+There is no solution at all for Windows 9x.
+
+These are settings for the @samp{CYGWIN} environment variable.  See the
+Cygwin User's Guide at
+@file{http://sources.redhat.com/cygwin/cygwin-ug-net/cygwin-ug-net.html}
+for more information on this variable and its settings.
+
 @subsection Why don't cursor keys work under Win95/Win98?
 
 @strong{(Please note: This section has not yet been updated for the latest
