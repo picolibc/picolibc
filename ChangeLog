@@ -1,3 +1,7 @@
+2003-02-19  Andrew Cagney <ac131313@redhat.com>
+
+	* configure: Regenerate using autoconf 2.13.
+
 2003-02-19  Alan Modra  <amodra@bigpond.net.au>
 
 	* config.guess: Import latest version.
