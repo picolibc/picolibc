@@ -1,3 +1,12 @@
+2003-03-27  Brian Ford  <ford@vss.fsi.com>
+
+	* winsup.api/pthread/condvar7.c (mythread): Cast
+	pthread_mutex_unlock argument of pthread_cleanup_push
+	to void *, preventing a	compiler warning / testsuite failure.
+	* winsup.api/pthread/condvar9.c (mythread): Likewise.
+	* winsup.api/pthread/rwlock7.c (main): Use ftime instead of
+	_ftime.
+
 2003-03-18  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* winsup.api/pthread/rwlock1.c: New test.

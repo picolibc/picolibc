@@ -97,7 +97,7 @@ mythread(void * arg)
 #ifdef _MSC_VER
 #pragma inline_depth(0)
 #endif
-  pthread_cleanup_push(pthread_mutex_unlock, (void *) &cvthing.lock);
+  pthread_cleanup_push((void *) pthread_mutex_unlock, (void *) &cvthing.lock);
 
   while (! (cvthing.shared > 0))
     assert(pthread_cond_timedwait(&cvthing.notbusy, &cvthing.lock, &abstime) == 0);
