@@ -1,3 +1,8 @@
+2002-06-27  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.cc (pthread::create): Added trace printf to get CreateThread
+	LastError.
+
 2002-06-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (list::match): Check using pagesize aligned size.
