@@ -198,8 +198,9 @@ process_input (void *)
   while (1)
     {
       size_t nraw = INP_BUFFER_SIZE;
+      termios ti = tty_master->get_ttyp ()->ti;
       tty_master->console->read ((void *) rawbuf, nraw);
-      (void) tty_master->line_edit (rawbuf, nraw);
+      (void) tty_master->line_edit (rawbuf, nraw, ti);
     }
 }
 
@@ -1080,9 +1081,11 @@ fhandler_pty_master::write (const void *ptr, size_t len)
 {
   int i;
   char *p = (char *) ptr;
-  for (i=0; i < (int) len; i++)
+  termios ti = tc->ti;
+
+  for (i = 0; i < (int) len; i++)
     {
-      line_edit_status status = line_edit (p++, 1);
+      line_edit_status status = line_edit (p++, 1, ti);
       if (status > line_edit_signalled)
 	{
 	  if (status != line_edit_pipe_full)

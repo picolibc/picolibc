@@ -1,3 +1,17 @@
+2002-12-26  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.h (fhandler_termios::line_edit): Replace third argument with
+	passed-in termios struct.
+	* fhandler_console.cc (fhandler_console::read): Prior to loop, make a
+	copy of current termios for passing to line_edit prior so that all
+	characters are processed consistently.
+	* fhandler_tty.cc (fhandler_pty_master::write): Ditto.
+	(process_input): Make a copy of curent termios prior to read for use in
+	subsequent line_edit.
+	* fhandler_termios.cc (fhandler_termios::line_edit): Replace third
+	parameter with passed-in termios struct and use it throughout rather
+	than the data from the current fhandler_termios class.
+
 2002-12-25  Christopher Faylor  <cgf@redhat.com>
 
 	* include/cygwin/version.h: Bump DLL minor number.

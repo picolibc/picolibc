@@ -247,6 +247,7 @@ fhandler_console::read (void *pv, size_t& buflen)
       nwait = 2;
     }
 
+  termios ti = tc->ti;
   for (;;)
     {
       int bgres;
@@ -461,7 +462,7 @@ fhandler_console::read (void *pv, size_t& buflen)
 
       if (toadd)
 	{
-	  line_edit_status res = line_edit (toadd, nread);
+	  line_edit_status res = line_edit (toadd, nread, ti);
 	  if (res == line_edit_signalled)
 	    goto sig_exit;
 	  else if (res == line_edit_input_done)

@@ -705,7 +705,7 @@ class fhandler_termios: public fhandler_base
     set_need_fork_fixup ();
   }
   HANDLE& get_output_handle () { return output_handle; }
-  line_edit_status line_edit (const char *rptr, int nread, int always_accept = 0);
+  line_edit_status line_edit (const char *rptr, int nread, termios&);
   void set_output_handle (HANDLE h) { output_handle = h; }
   void tcinit (tty_min *this_tc, int force = FALSE);
   virtual int is_tty () { return 1; }
