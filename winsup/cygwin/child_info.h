@@ -29,7 +29,7 @@ enum
 class child_info
 {
 public:
-  DWORD zero[1];	// must be zeroed
+  DWORD zero[4];	// must be zeroed
   DWORD cb;		// size of this record
   DWORD type;		// type of record
   int cygpid;		// cygwin pid of child process

@@ -1,3 +1,11 @@
+Thu Sep 20 16:48:44 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler.cc (fhandler_base::set_inheritance): Just use
+	DUPLICATE_CLOSE_SOURCE to change inheritance.  Eliminate all other
+	logic dealing with closed handles.
+	* fhandler.h (fhandler_base::set_inheritance): Reflect above change.
+	* fhandler_tty.cc (fhandler_tty_common::set_close_on_exec): Ditto.
+
 Thu Sep 20 13:34:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::fixup_after_exec): Close

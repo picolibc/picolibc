@@ -1119,7 +1119,7 @@ fhandler_tty_common::set_close_on_exec (int val)
   /* FIXME: This is a duplication from fhandler_base::set_close_on_exec.
      It is here because we need to specify the "from_pty" stuff here or
      we'll get warnings from ForceCloseHandle when debugging. */
-  set_inheritance (get_io_handle (), val, "from_pty");
+  set_inheritance (get_io_handle (), val);
   set_close_on_exec_flag (val);
 #endif
   if (output_done_event)
@@ -1130,10 +1130,10 @@ fhandler_tty_common::set_close_on_exec (int val)
     set_inheritance (ioctl_done_event, val);
   if (inuse)
     set_inheritance (inuse, val);
-  set_inheritance (output_mutex, val, "output_mutex");
-  set_inheritance (input_mutex, val, "input_mutex");
+  set_inheritance (output_mutex, val);
+  set_inheritance (input_mutex, val);
   set_inheritance (input_available_event, val);
-  set_inheritance (output_handle, val, "to_pty");
+  set_inheritance (output_handle, val);
 }
 
 void

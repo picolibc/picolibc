@@ -1510,44 +1510,18 @@ fhandler_pipe::lseek (off_t offset, int whence)
   return -1;
 }
 
-#ifdef DEBUGGING
-#define nameparm name
-#else
-#define nameparm
-#endif
-
 void
-fhandler_base::set_inheritance (HANDLE &h, int not_inheriting, const char *nameparm)
-#undef nameparm
+fhandler_base::set_inheritance (HANDLE &h, int not_inheriting)
 {
-  HANDLE newh;
-
-  if (wincap.has_set_handle_information () && (!is_console () ||
-      wincap.has_set_handle_information_on_console_handles ()))
-    (void) SetHandleInformation (h, HANDLE_FLAG_INHERIT,
-    				 not_inheriting ? 0 : HANDLE_FLAG_INHERIT);
-  else if (!DuplicateHandle (hMainProc, h, hMainProc, &newh, 0, !not_inheriting,
-			     DUPLICATE_SAME_ACCESS))
-    debug_printf ("DuplicateHandle %E");
-#ifndef DEBUGGING
-  else
-    {
-      hclose (h);
-      h = newh;
-    }
-#else
-  else if (!name)
-    {
-      hclose (h);
-      h = newh;
-    }
-  else
-  /* FIXME: This won't work with sockets */
-    {
-      ForceCloseHandle2 (h, name);
-      h = newh;
-      ProtectHandle2 (h, name);
-    }
+  /* Note that we could use SetHandleInformation here but it is not available
+     on all platforms.  Test cases seem to indicate that using DuplicateHandle
+     in this fashion does not actually close the original handle, which is
+     what we want.  If this changes in the future, we may be forced to use
+     SetHandleInformation on newer OS's */
+  if (!DuplicateHandle (hMainProc, h, hMainProc, &h, 0, !not_inheriting,
+			     DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
+    debug_printf ("DuplicateHandle failed, %E");
+#ifdef DEBUGGING
   setclexec_pid (h, not_inheriting);
 #endif
 }
