@@ -113,7 +113,7 @@ strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
   static NO_COPY int nonewline = FALSE;
   DWORD err = GetLastError ();
   const char *tn = cygthread::name ();
-  char *pn = __progname ?: myself->progname;
+  char *pn = __progname ?: (myself ? myself->progname : NULL);
 
   int microsec = microseconds ();
   lmicrosec = microsec;

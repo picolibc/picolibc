@@ -224,7 +224,7 @@ fhandler_process::open (path_conv *pc, int flags, mode_t mode)
 
   fileid = process_file_no;
   if (!fill_filebuf ())
-  	{
+	{
 	  res = 0;
 	  goto out;
 	}
@@ -458,8 +458,8 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
        utime = put.UserTime.QuadPart * HZ / 10000000ULL;
        stime = put.KernelTime.QuadPart * HZ / 10000000ULL;
        if (stodi.CurrentTime.QuadPart > put.CreateTime.QuadPart)
-         start_time = (spt.KernelTime.QuadPart + spt.UserTime.QuadPart -
-                       stodi.CurrentTime.QuadPart + put.CreateTime.QuadPart) * HZ / 10000000ULL;
+	 start_time = (spt.KernelTime.QuadPart + spt.UserTime.QuadPart -
+		       stodi.CurrentTime.QuadPart + put.CreateTime.QuadPart) * HZ / 10000000ULL;
        else
 	 /*
 	  * sometimes stodi.CurrentTime is a bit behind
@@ -590,7 +590,7 @@ off_t
 format_process_statm (_pinfo *p, char *destbuf, size_t maxsize)
 {
   unsigned long vmsize = 0UL, vmrss = 0UL, vmtext = 0UL, vmdata = 0UL,
-  		vmlib = 0UL, vmshare = 0UL;
+		vmlib = 0UL, vmshare = 0UL;
   if (wincap.is_winnt ())
     {
       if (!get_mem_values (p->dwProcessId, &vmsize, &vmrss, &vmtext, &vmdata,

@@ -730,7 +730,7 @@ handle_to_fn (HANDLE h, char *posix_fn)
   if (!strncasematch (win32_fn, DEVICE_PREFIX, DEVICE_PREFIX_LEN)
       || !QueryDosDevice (NULL, fnbuf, sizeof (fnbuf)))
     return strcpy (posix_fn, win32_fn);
-  
+
   char *p = strchr (win32_fn + DEVICE_PREFIX_LEN, '\\');
   if (!p)
     p = strchr (win32_fn + DEVICE_PREFIX_LEN, '\0');

@@ -1,3 +1,31 @@
+2002-09-18  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::initialized): Avoid copying on fork or some
+	threads may not end up in the pool.
+	(cygthread::new): Avoid race when checking for initialized.  Add
+	debugging code.
+
+2002-09-18  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* fhandler.cc (fhandler_base::raw_read): Add case for
+	ERROR_INVALID_HANDLE due to Win95 directories.
+	(fhandler_base::open): Handle errors due to Win95 directories.
+	(fhandler_base::close): Add get_nohandle () test.
+	(fhandler_base::set_close_on_exec): Ditto.
+	(fhandler_base::fork_fixup): Ditto.
+	(fhandler_base::lock): Change error code to Posix EINVAL.
+	(fhandler_base::dup): If get_nohandle (), set new value to
+	INVALID_HANDLE_VALUE instead of NULL.
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat): Call fstat_by_name
+	if get_nohandle ().  Remove extraneous element from strpbrk.
+	(fhandler_disk_file::open): Remove test for Win95 directory.
+
+	* fhandler_random.cc (fhandler_dev_random::open): Add set_nohandle ().
+	* fhandler_clipboard.cc (fhandler_dev_clipboard::open): Ditto.
+	* fhandler_zero.cc (fhandler_dev_zero::open): Ditto.
+	(fhandler_dev_zero::close): Delete.
+	* fhandler.h (class fhandler_dev_zero): Ditto.
+
 2002-09-17  Robert Collins <rbtcollins@hotmail.com>
 
 	* thread.cc (pthread_key::set): Preserve GetLastError(). Reported

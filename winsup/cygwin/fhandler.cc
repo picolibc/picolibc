@@ -234,8 +234,8 @@ fhandler_base::set_flags (int flags, int supplied_bin)
   else if (supplied_bin)
     bin = supplied_bin;
   else
-    bin = get_w_binary () || get_r_binary () || (binmode != O_TEXT) ?
-      	  O_BINARY : O_TEXT;
+    bin = get_w_binary () || get_r_binary () || (binmode != O_TEXT)
+	  ? O_BINARY : O_TEXT;
 
   openflags = flags | bin;
 
@@ -275,6 +275,7 @@ fhandler_base::raw_read (void *ptr, size_t ulen)
 	    return 0;
 	case ERROR_INVALID_FUNCTION:
 	case ERROR_INVALID_PARAMETER:
+	case ERROR_INVALID_HANDLE:
 	  if (openflags & O_DIROPEN)
 	    {
 	      set_errno (EISDIR);
@@ -441,11 +442,21 @@ fhandler_base::open (path_conv *pc, int flags, mode_t mode)
 
   if (x == INVALID_HANDLE_VALUE)
     {
-      if (GetLastError () == ERROR_INVALID_HANDLE)
+      if (pc->isdir () && !wincap.can_open_directories ())
+	{
+	  if (mode & (O_CREAT | O_EXCL) == (O_CREAT | O_EXCL))
+	    set_errno (EEXIST);
+	  else if (mode & (O_WRONLY | O_RDWR))
+	    set_errno (EISDIR);
+	  else
+	    set_nohandle (true);
+	}
+      else if (GetLastError () == ERROR_INVALID_HANDLE)
 	set_errno (ENOENT);
       else
 	__seterrno ();
-      goto done;
+      if (!get_nohandle ())
+	goto done;
     }
 
   /* Attributes may be set only if a file is _really_ created.
@@ -712,7 +723,7 @@ fhandler_base::readv (const struct iovec *const iov, const int iovcnt,
     {
       tot = 0;
       const struct iovec *iovptr = iov + iovcnt;
-      do 
+      do
 	{
 	  iovptr -= 1;
 	  tot += iovptr->iov_len;
@@ -764,7 +775,7 @@ fhandler_base::writev (const struct iovec *const iov, const int iovcnt,
     {
       tot = 0;
       const struct iovec *iovptr = iov + iovcnt;
-      do 
+      do
 	{
 	  iovptr -= 1;
 	  tot += iovptr->iov_len;
@@ -871,7 +882,7 @@ fhandler_base::close ()
   int res = -1;
 
   syscall_printf ("closing '%s' handle %p", get_name (), get_handle());
-  if (CloseHandle (get_handle()))
+  if (get_nohandle () || CloseHandle (get_handle()))
     res = 0;
   else
     {
@@ -898,7 +909,7 @@ fhandler_base::ioctl (unsigned int cmd, void *buf)
 int
 fhandler_base::lock (int, struct flock *)
 {
-  set_errno (ENOSYS);
+  set_errno (EINVAL);
   return -1;
 }
 
@@ -996,7 +1007,7 @@ fhandler_base::dup (fhandler_base *child)
 
   HANDLE nh;
   if (get_nohandle ())
-    nh = NULL;
+    nh = INVALID_HANDLE_VALUE;
   else if (!DuplicateHandle (hMainProc, get_handle(), hMainProc, &nh, 0, TRUE,
 			DUPLICATE_SAME_ACCESS))
     {
@@ -1207,7 +1218,8 @@ fhandler_base::fork_fixup (HANDLE parent, HANDLE &h, const char *name)
 void
 fhandler_base::set_close_on_exec (int val)
 {
-  set_inheritance (io_handle, val);
+  if (!get_nohandle ())
+    set_inheritance (io_handle, val);
   set_close_on_exec_flag (val);
   debug_printf ("set close_on_exec for %s to %d", get_name (), val);
 }
@@ -1216,7 +1228,8 @@ void
 fhandler_base::fixup_after_fork (HANDLE parent)
 {
   debug_printf ("inheriting '%s' from parent", get_name ());
-  fork_fixup (parent, io_handle, "io_handle");
+  if (!get_nohandle ())
+    fork_fixup (parent, io_handle, "io_handle");
 }
 
 bool

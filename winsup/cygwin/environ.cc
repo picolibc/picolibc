@@ -960,10 +960,10 @@ build_env (const char * const *envp, char *&envblock, int &envc,
 	    {
 	      tl = new_tl + 100;
 	      char *new_envblock =
-	      		(char *) realloc (envblock, 2 + tl);
+			(char *) realloc (envblock, 2 + tl);
 	      /* If realloc moves the block, move `s' with it. */
 	      if (new_envblock != envblock)
-	        {
+		{
 		  s += new_envblock - envblock;
 		  envblock = new_envblock;
 		}

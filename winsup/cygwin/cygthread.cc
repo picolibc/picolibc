@@ -19,7 +19,7 @@ static cygthread NO_COPY threads[6];
 #define NTHREADS (sizeof (threads) / sizeof (threads[0]))
 
 DWORD NO_COPY cygthread::main_thread_id;
-bool cygthread::initialized;
+bool NO_COPY cygthread::initialized;
 
 /* Initial stub called by cygthread constructor. Performs initial
    per-thread initialization and loops waiting for new thread functions
@@ -127,8 +127,9 @@ new (size_t)
 
   for (;;)
     {
+      bool was_initialized = initialized;
       /* Search the threads array for an empty slot to use */
-      for (info = threads; info < threads + NTHREADS; info++)
+      for (info = threads + NTHREADS - 1; info >= threads; info--)
 	if ((id = (DWORD) InterlockedExchange ((LPLONG) &info->avail, 0)))
 	  {
 	    info->id = id;
@@ -139,10 +140,17 @@ new (size_t)
 	    return info;
 	  }
 
-      if (!initialized)
-	Sleep (0); /* thread_runner is not be finished yet. */
+      if (!was_initialized)
+	Sleep (0); /* thread_runner is not finished yet. */
       else
-	return freerange ();
+	{
+#ifdef DEBUGGING
+	  char buf[1024];
+	  if (GetEnvironmentVariable ("CYGWIN_NOFREERANGE", buf, sizeof (buf)))
+	    api_fatal ("Overflowed cygwin thread pool");
+#endif
+	  return freerange ();
+	}
     }
 }
 
