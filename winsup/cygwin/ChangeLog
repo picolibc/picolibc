@@ -1,3 +1,8 @@
+Wed Apr 26 16:20:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * syscalls.cc (stat_worker): Previous patch could succeed
+        in stating a non-existant file.
+
 Wed Apr 26 01:07:16 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (interruptible): Allocate slightly more space for

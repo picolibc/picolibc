@@ -978,6 +978,7 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 	      int nofollow)
 {
   int res = -1;
+  int oret = 1;
   int atts;
   char root[MAX_PATH];
   UINT dtype;
@@ -1013,8 +1014,8 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
        (os_being_run == winNT
         && dtype != DRIVE_NO_ROOT_DIR
         && dtype != DRIVE_UNKNOWN))
-      && fh.open (real_path, O_RDONLY | O_BINARY | O_DIROPEN |
-			     (nofollow ? O_NOSYMLINK : 0), 0))
+      && (oret = fh.open (real_path, O_RDONLY | O_BINARY | O_DIROPEN |
+			  (nofollow ? O_NOSYMLINK : 0), 0)))
     {
       res = fh.fstat (buf);
       fh.close ();
@@ -1029,10 +1030,10 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
         buf->st_nlink =
             (dtype == DRIVE_REMOTE ? 1 : num_entries (real_path.get_win32 ()));
     }
-  else if (atts != -1 || GetLastError () != ERROR_FILE_NOT_FOUND)
+  else if (atts != -1 || (!oret && get_errno () != ENOENT))
     {
-      /* Unfortunately, the above open may fail. So we have
-         to care for this case here, too. */
+      /* Unfortunately, the above open may fail if the file exists, though.
+         So we have to care for this case here, too. */
       WIN32_FIND_DATA wfd;
       HANDLE handle;
       buf->st_nlink = 1;
