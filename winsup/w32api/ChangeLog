@@ -1,9 +1,14 @@
+2004-03-24  Filip Navara  <xnavara@volny.cz>
+
+	* include/ddk/srb.h (_PORT_CONFIGURATION_INFORMATION):	Rename
+	TaggedQueueing to TaggedQueuing.
+	(_HW_INITIALIZATION_DATA): Likewise.
+
 2004-03-16  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/docobj.h (IOleDocumentView::GetDocument): Correct
 	prototype.	
 	Thanks to Buster Copley  <consequent@users.sourceforge.net>
-
 
 2004-03-16  Danny Smith  <dannysmith@users.sourceforge.net>
 
