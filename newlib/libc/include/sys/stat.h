@@ -106,18 +106,6 @@ struct	stat
 #define		S_IWOTH	0000002	/* write permission, other */
 #define		S_IXOTH 0000001/* execute/search permission, other */
 
-#if defined (__CYGWIN__) && !defined (__INSIDE_CYGWIN__)
-extern unsigned const _cygwin_S_IEXEC, _cygwin_S_IXUSR, _cygwin_S_IXGRP, _cygwin_S_IXOTH;
-#undef S_IEXEC
-#undef S_IXUSR
-#undef S_IXGRP
-#undef S_IXOTH
-#define S_IEXEC		_cygwin_S_IEXEC
-#define S_IXUSR		_cygwin_S_IXUSR
-#define S_IXGRP		_cygwin_S_IXGRP
-#define S_IXOTH		_cygwin_S_IXOTH
-#endif
-
 #define	S_ISBLK(m)	(((m)&_IFMT) == _IFBLK)
 #define	S_ISCHR(m)	(((m)&_IFMT) == _IFCHR)
 #define	S_ISDIR(m)	(((m)&_IFMT) == _IFDIR)
