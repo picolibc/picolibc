@@ -1,3 +1,8 @@
+2002-03-13  Alexandre Oliva  <aoliva@redhat.com>
+
+	* libc/machine/mips/strlen.c (strlen) [__mips16]: Fix off-by-two
+	error.
+
 2002-03-12  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/sys/go32/access.c: Change license to relaxed license

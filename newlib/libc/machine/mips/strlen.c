@@ -2,7 +2,7 @@
  * strlen.c -- strlen function.  On at least some MIPS chips, a simple
  * strlen is faster than the 'optimized' C version.
  *
- * Copyright (c) 2001 Red Hat, Inc.
+ * Copyright (c) 2001, 2002 Red Hat, Inc.
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -29,7 +29,7 @@ strlen (const char *str)
   while (*str++ != '\0')
     ;
 
-  return str - start + 1;
+  return str - start - 1;
 }
 #elif defined(__mips64)
 __asm__(""			/* 64-bit MIPS targets */
