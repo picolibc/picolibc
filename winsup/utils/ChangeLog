@@ -1,3 +1,8 @@
+2002-09-18  Christopher Faylor  <cgf@redhat.com>
+
+	* cygcheck.cc: Include sys/time.h rather than time.h to avoid a
+	compiler error.
+
 2002-09-17  Christopher Faylor  <cgf@redhat.com>
 
 	* cygcheck.cc: Reorder includes to avoid compiler error.
