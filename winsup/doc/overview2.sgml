@@ -29,6 +29,8 @@ category. However, be advised that this will download and install
 several hundreds of megabytes of software to your computer. The best
 plan is probably to click on individual categories and install either
 entire categories or packages from the categories themselves.
+After installation, you can find Cygwin-specific documentation in
+the <literal>/usr/share/doc/Cygwin/</literal> directory.
 </para>
 <para>
 Developers coming from a Windows background will find a set of tools capable of
@@ -66,6 +68,8 @@ category. However, be advised that this will download and install
 several hundreds of megabytes of software to your computer. The best
 plan is probably to click on individual categories and install either
 entire categories or packages from the categories themselves.
+After installation, you can find Cygwin-specific documentation in
+the <literal>/usr/share/doc/Cygwin/</literal> directory.
 </para>
 <para>
 Developers coming from a UNIX background will find a set of utilities

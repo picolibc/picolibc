@@ -9,7 +9,13 @@ providing substantial <ulink
 url="http://www.pasc.org/#POSIX">POSIX</ulink> (Portable Operating
 System Interface) system call functionality, and a collection of tools,
 which provide a Linux look and feel. The Cygwin DLL works with all x86
-versions of Windows since Windows 95.
+versions of Windows since Windows 95. The API follows the <ulink
+url="http://www.opengroup.org/onlinepubs/009695399/nfindex.html">Single
+Unix Specification</ulink> as much as possible, and then Linux practice.
+Two other major differences between Cygwin and Linux are the C library
+(<literal>newlib</literal> instead of <literal>glibc</literal>) and
+default <command>/bin/sh</command>, which is <command>ash</command> on
+Cygwin but <command>bash</command> on most Linux distributions.
 </para>
 <para>
 With Cygwin installed, users have access to many standard UNIX

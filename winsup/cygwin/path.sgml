@@ -16,6 +16,7 @@ buffer.</para>
 <example>
 <title>Example use of cygwin_posix_to_win32_path_list</title>
 <programlisting>
+<![CDATA[
 char *_epath;
 char *_win32epath;
 _epath = _win32epath = getenv (NAME);
@@ -27,6 +28,7 @@ if (_epath != NULL && *_epath != 0
       (cygwin_posix_to_win32_path_list_buf_size (_epath));
     cygwin_posix_to_win32_path_list (_epath, _win32epath);
     }
+]]>
 </programlisting>
 </example>
 

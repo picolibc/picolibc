@@ -1,3 +1,9 @@
+2004-12-30  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* path.sgml: Encode programming example with CDATA.
+	* overview.sgml: Add notes about SUS, newlib, and ash.
+	* overview2.sgml: Add notes about /usr/share/doc/Cygwin.
+
 2004-12-27  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* Makefile.in: Update to use xmlto. 
