@@ -1,3 +1,9 @@
+2003-07-03  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/process.h (_execv, _execvp, _spawnv, _spawnvp, _execve,
+	_execvpe, _spawnve, _spawnvpe, execv, execvp, spawnv, spawnvp,
+	execve, execvpe, spawnve, spawnvpe): Const-ify all the char params.
+
 2003-07-01  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/_mingw.h (small, hyper): Change to __small and __hyper to
