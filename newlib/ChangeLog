@@ -1,3 +1,14 @@
+2004-12-17  Christian Groessler  <chris@groessler.org>
+
+	* libc/machine/z8k/memcmp.S: New file.
+	* libc/machine/z8k/memcpy.S: Ditto.
+	* libc/machine/z8k/memmove.S: Ditto.
+	* libc/machine/z8k/memset.S: Ditto.
+	* libc/machine/z8k/Makefile.am: Add new files.
+	* libc/machine/z8k/Makefile.in: Regenerated.
+	* libc/machine/z8k/setjmp.S: Fix indirect register usage in Z8002
+	part.  Implement Z8002 stdcall version.
+
 2004-12-13  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/fread.c (fread): For unbuffered I/O, attempt
