@@ -510,6 +510,7 @@ fhandler_base::read (void *in_ptr, size_t& len)
 {
   char *ptr = (char *) in_ptr;
   ssize_t copied_chars = 0;
+  bool need_signal = !!read_state;
   int c;
 
   while (len)
@@ -534,6 +535,7 @@ fhandler_base::read (void *in_ptr, size_t& len)
     }
 
   raw_read (ptr + copied_chars, len);
+  need_signal = false;
   if (!copied_chars)
     /* nothing */;
   else if ((ssize_t) len > 0)
@@ -601,6 +603,9 @@ fhandler_base::read (void *in_ptr, size_t& len)
 #endif
 
 out:
+  if (need_signal)
+    SetEvent (read_state);
+
   debug_printf ("returning %d, %s mode", len,
 		get_r_binary () ? "binary" : "text");
   return;

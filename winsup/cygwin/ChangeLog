@@ -1,5 +1,10 @@
 2002-12-14  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler.cc (fhandler_base::read): Signal event, if necessary, and
+	raw_read hasn't done so.
+
+2002-12-14  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler.cc (fhandler_base::raw_read): Reset priorities to minimize
 	window where thread termination may cause data loss.
 	(fhandler_base::read): Always return at end of function.  Just set len
