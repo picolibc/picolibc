@@ -62,24 +62,24 @@ typedef wchar_t wctype_t;
 #endif
 
 /* Wide character equivalents - also in ctype.h */
-int	iswalnum(wint_t);
-int	iswalpha(wint_t);
-int	iswascii(wint_t);
-int	iswcntrl(wint_t);
-int	iswctype(wint_t, wctype_t);
-int	iswdigit(wint_t);
-int	iswgraph(wint_t);
-int	iswlower(wint_t);
-int	iswprint(wint_t);
-int	iswpunct(wint_t);
-int	iswspace(wint_t);
-int	iswupper(wint_t);
-int	iswxdigit(wint_t);
+_CRTIMP int __cdecl iswalnum(wint_t);
+_CRTIMP int __cdecl iswalpha(wint_t);
+_CRTIMP int __cdecl iswascii(wint_t);
+_CRTIMP int __cdecl iswcntrl(wint_t);
+_CRTIMP int __cdecl iswctype(wint_t, wctype_t);
+_CRTIMP int __cdecl iswdigit(wint_t);
+_CRTIMP int __cdecl iswgraph(wint_t);
+_CRTIMP int __cdecl iswlower(wint_t);
+_CRTIMP int __cdecl iswprint(wint_t);
+_CRTIMP int __cdecl iswpunct(wint_t);
+_CRTIMP int __cdecl iswspace(wint_t);
+_CRTIMP int __cdecl iswupper(wint_t);
+_CRTIMP int __cdecl iswxdigit(wint_t);
 
-wchar_t	towlower(wchar_t);
-wchar_t	towupper(wchar_t);
+_CRTIMP wchar_t __cdecl towlower(wchar_t);
+_CRTIMP wchar_t	__cdecl towupper(wchar_t);
 
-int	isleadbyte (int);
+_CRTIMP int __cdecl isleadbyte (int);
 
 /* Also in ctype.h */
 
@@ -104,34 +104,35 @@ extern unsigned short** _imp___ctype;
 # endif	/* CRTDLL */
 #endif		/*  __DECLSPEC_SUPPORTED */
 
-#if !(defined(__NO_CTYPE_INLINES) || defined(__WCTYPE_INLINES_DEFINED))
+#if !(defined (__NO_INLINE__) || defined(__NO_CTYPE_INLINES) \
+      || defined(__WCTYPE_INLINES_DEFINED))
 #define __WCTYPE_INLINES_DEFINED
-extern __inline__ int iswalnum(wint_t __wc) {return (iswctype(__wc,_ALPHA|_DIGIT));}
-extern __inline__ int iswalpha(wint_t __wc) {return (iswctype(__wc,_ALPHA));}
-extern __inline__ int iswascii(wint_t __wc) {return ((__wc & ~0x7F) == 0);}
-extern __inline__ int iswcntrl(wint_t __wc) {return (iswctype(__wc,_CONTROL));}
-extern __inline__ int iswdigit(wint_t __wc) {return (iswctype(__wc,_DIGIT));}
-extern __inline__ int iswgraph(wint_t __wc) {return (iswctype(__wc,_PUNCT|_ALPHA|_DIGIT));}
-extern __inline__ int iswlower(wint_t __wc) {return (iswctype(__wc,_LOWER));}
-extern __inline__ int iswprint(wint_t __wc) {return (iswctype(__wc,_BLANK|_PUNCT|_ALPHA|_DIGIT));}
-extern __inline__ int iswpunct(wint_t __wc) {return (iswctype(__wc,_PUNCT));}
-extern __inline__ int iswspace(wint_t __wc) {return (iswctype(__wc,_SPACE));}
-extern __inline__ int iswupper(wint_t __wc) {return (iswctype(__wc,_UPPER));}
-extern __inline__ int iswxdigit(wint_t __wc) {return (iswctype(__wc,_HEX));}
-extern __inline__ int isleadbyte(int __c)
+extern __inline__ int __cdecl iswalnum(wint_t __wc) {return (iswctype(__wc,_ALPHA|_DIGIT));}
+extern __inline__ int __cdecl iswalpha(wint_t __wc) {return (iswctype(__wc,_ALPHA));}
+extern __inline__ int __cdecl iswascii(wint_t __wc) {return ((__wc & ~0x7F) == 0);}
+extern __inline__ int __cdecl iswcntrl(wint_t __wc) {return (iswctype(__wc,_CONTROL));}
+extern __inline__ int __cdecl iswdigit(wint_t __wc) {return (iswctype(__wc,_DIGIT));}
+extern __inline__ int __cdecl iswgraph(wint_t __wc) {return (iswctype(__wc,_PUNCT|_ALPHA|_DIGIT));}
+extern __inline__ int __cdecl iswlower(wint_t __wc) {return (iswctype(__wc,_LOWER));}
+extern __inline__ int __cdecl iswprint(wint_t __wc) {return (iswctype(__wc,_BLANK|_PUNCT|_ALPHA|_DIGIT));}
+extern __inline__ int __cdecl iswpunct(wint_t __wc) {return (iswctype(__wc,_PUNCT));}
+extern __inline__ int __cdecl iswspace(wint_t __wc) {return (iswctype(__wc,_SPACE));}
+extern __inline__ int __cdecl iswupper(wint_t __wc) {return (iswctype(__wc,_UPPER));}
+extern __inline__ int __cdecl iswxdigit(wint_t __wc) {return (iswctype(__wc,_HEX));}
+extern __inline__ int __cdecl isleadbyte(int __c)
   {return (_pctype[(unsigned char)(__c)] & _LEADBYTE);}
 #endif /* !(defined(__NO_CTYPE_INLINES) || defined(__WCTYPE_INLINES_DEFINED)) */
 
 typedef wchar_t wctrans_t;
-wint_t 		towctrans(wint_t, wctrans_t);
-wctrans_t	wctrans(const char*);
-wctype_t	wctype(const char*);
+_CRTIMP wint_t __cdecl towctrans(wint_t, wctrans_t);
+_CRTIMP wctrans_t __cdecl wctrans(const char*);
+_CRTIMP wctype_t __cdecl wctype(const char*);
 
 __END_CSTD_NAMESPACE
 
 #ifndef __STRICT_ANSI__
 __BEGIN_CGLOBAL_NAMESPACE
-int	is_wctype(__CSTD wint_t, __CSTD wctype_t);	/* Obsolete! */
+_CRTIMP int __cdecl is_wctype(__CSTD wint_t, __CSTD wctype_t);	/* Obsolete! */
 __END_CGLOBAL_NAMESPACE
 #endif /* __STRICT_ANSI__ */
 

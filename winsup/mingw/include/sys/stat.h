@@ -154,16 +154,16 @@ struct _stati64 {
 extern "C" {
 #endif
 
-int	_fstat (int, struct _stat*);
-int	_chmod (const char*, int);
-int	_stat (const char*, struct _stat*);
+_CRTIMP int __cdecl	_fstat (int, struct _stat*);
+_CRTIMP int __cdecl	_chmod (const char*, int);
+_CRTIMP int __cdecl	_stat (const char*, struct _stat*);
 
 #if defined (__MSVCRT__)
-int  _fstati64(int, struct _stati64 *);
-int  _stati64(const char *, struct _stati64 *);
+_CRTIMP int __cdecl  _fstati64(int, struct _stati64 *);
+_CRTIMP int __cdecl  _stati64(const char *, struct _stati64 *);
 #if !defined ( _WSTAT_DEFINED) /* also declared in wchar.h */
-int	_wstat(const wchar_t*, struct _stat*);
-int	_wstati64 (const wchar_t*, struct _stati64*);
+_CRTIMP int __cdecl	_wstat(const wchar_t*, struct _stat*);
+_CRTIMP int __cdecl	_wstati64 (const wchar_t*, struct _stati64*);
 #define _WSTAT_DEFINED
 #endif /* _WSTAT_DEFIND */
 #endif /* __MSVCRT__ */
@@ -171,9 +171,9 @@ int	_wstati64 (const wchar_t*, struct _stati64*);
 #ifndef	_NO_OLDNAMES
 
 /* These functions live in liboldnames.a. */
-int	fstat (int, struct stat*);
-int	chmod (const char*, int);
-int	stat (const char*, struct stat*);
+_CRTIMP int __cdecl	fstat (int, struct stat*);
+_CRTIMP int __cdecl	chmod (const char*, int);
+_CRTIMP int __cdecl	stat (const char*, struct stat*);
 
 #endif	/* Not _NO_OLDNAMES */
 

@@ -1,4 +1,5 @@
 #include <fenv.h>
+#include <float.h>
 
 /* 7.6.4.3
    The fesetenv function establishes the floating-point environment

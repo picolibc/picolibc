@@ -82,7 +82,7 @@ strtoimax(nptr, endptr, base)
 	accum = n;
 
 	for ( toobig = 0; n = ToNumber(*nptr), valid(n, base); ++nptr )
-		if ( accum > INTMAX_MAX / base + 2 )	/* major wrap-around */
+		if ( accum > (uintmax_t)(INTMAX_MAX / base + 2) ) /* major wrap-around */
 			toobig = 1;	/* but keep scanning */
 		else
 			accum = base * accum + n;

@@ -77,12 +77,12 @@ typedef struct
 	char			dd_name[1];
 } DIR;
 
-DIR*		opendir (const char*);
-struct dirent*	readdir (DIR*);
-int		closedir (DIR*);
-void		rewinddir (DIR*);
-long		telldir (DIR*);
-void		seekdir (DIR*, long);
+DIR* __cdecl opendir (const char*);
+struct dirent* __cdecl readdir (DIR*);
+int __cdecl closedir (DIR*);
+void __cdecl rewinddir (DIR*);
+long __cdecl telldir (DIR*);
+void __cdecl seekdir (DIR*, long);
 
 
 /* wide char versions */
@@ -127,12 +127,12 @@ typedef struct
 
 
 
-_WDIR*		_wopendir (const wchar_t*);
-struct _wdirent* _wreaddir (_WDIR*);
-int		_wclosedir (_WDIR*);
-void		_wrewinddir (_WDIR*);
-long		_wtelldir (_WDIR*);
-void		_wseekdir (_WDIR*, long);
+_WDIR* __cdecl _wopendir (const wchar_t*);
+struct _wdirent*  __cdecl _wreaddir (_WDIR*);
+int __cdecl _wclosedir (_WDIR*);
+void __cdecl _wrewinddir (_WDIR*);
+long __cdecl _wtelldir (_WDIR*);
+void __cdecl _wseekdir (_WDIR*, long);
 
 
 #ifdef	__cplusplus

@@ -115,12 +115,12 @@ extern "C" {
 /* Set the FPU control word as cw = (cw & ~unMask) | (unNew & unMask),
  * i.e. change the bits in unMask to have the values they have in unNew,
  * leaving other bits unchanged. */
-unsigned int	_controlfp (unsigned int unNew, unsigned int unMask);
-unsigned int	_control87 (unsigned int unNew, unsigned int unMask);
+_CRTIMP unsigned int __cdecl _controlfp (unsigned int unNew, unsigned int unMask);
+_CRTIMP unsigned int __cdecl _control87 (unsigned int unNew, unsigned int unMask);
 
 
-unsigned int	_clearfp (void);	/* Clear the FPU status word */
-unsigned int	_statusfp (void);	/* Report the FPU status word */
+_CRTIMP unsigned int __cdecl _clearfp (void);	/* Clear the FPU status word */
+_CRTIMP unsigned int __cdecl _statusfp (void);	/* Report the FPU status word */
 #define		_clear87	_clearfp
 #define		_status87	_statusfp
 
@@ -134,11 +134,11 @@ unsigned int	_statusfp (void);	/* Report the FPU status word */
    per fninit. To use the MSVCRT.dll _fpreset, include CRT_fp8.o when
    building your application.	 
 */
-void		_fpreset (void);
-void		fpreset (void);
+void __cdecl _fpreset (void);
+void __cdecl fpreset (void);
 
 /* Global 'variable' for the current floating point error code. */
-int *	__fpecode(void);
+_CRTIMP int * __cdecl __fpecode(void);
 #define	_fpecode	(*(__fpecode()))
 
 /*
@@ -146,15 +146,15 @@ int *	__fpecode(void);
  * but they really belong in math.h.
  */
 
-double	_chgsign	(double);
-double	_copysign	(double, double);
-double	_logb		(double);
-double	_nextafter	(double, double);
-double	_scalb		(double, long);
+_CRTIMP double __cdecl _chgsign	(double);
+_CRTIMP double __cdecl _copysign (double, double);
+_CRTIMP double __cdecl _logb (double);
+_CRTIMP double __cdecl _nextafter (double, double);
+_CRTIMP double __cdecl _scalb (double, long);
 
-int	_finite		(double);
-int	_fpclass	(double);
-int	_isnan		(double);
+_CRTIMP int __cdecl _finite (double);
+_CRTIMP int __cdecl _fpclass (double);
+_CRTIMP int __cdecl _isnan (double);
 
 #ifdef	__cplusplus
 }

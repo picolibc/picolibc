@@ -89,6 +89,13 @@ gcrt1.o: gcrt0.c
 gcrt2.o: gcrt0.c
 	$(CC) -D__MSVCRT__ -c -o $@ $(CPPFLAGS) $(CFLAGS) $?
 
+#
+# Dependancies
+#
+gmon.o: gmon.c gmon.h profile.h profil.h
+mcount.o: mcount.c gmon.h profile.h
+profil.o: profil.c profil.h
+
 Makefile: Makefile.in config.status configure
 	$(SHELL) config.status
 
@@ -132,3 +139,4 @@ dist:
 	@for i in $(DISTFILES); do\
 		cp -p $(srcdir)/$$i $(distdir)/profile/$$i ; \
 	done
+

@@ -1,3 +1,4 @@
+LIBRARY dll
 EXPORTS
 Add
 Sub@16

@@ -50,7 +50,7 @@ typedef  _JBTYPE jmp_buf[_JBLEN];
  * Return to the last setjmp call and act as if setjmp had returned
  * nVal (which had better be non-zero!).
  */
-void	longjmp (jmp_buf, int);
+_CRTIMP void __cdecl longjmp (jmp_buf, int);
 __END_CSTD_NAMESPACE
 
 __BEGIN_CGLOBAL_NAMESPACE
@@ -58,7 +58,7 @@ __BEGIN_CGLOBAL_NAMESPACE
  * The function provided by CRTDLL which appears to do the actual work
  * of setjmp.
  */
-int	_setjmp (__CSTD jmp_buf);
+_CRTIMP int __cdecl _setjmp (__CSTD jmp_buf);
 
 #define	setjmp(x)	_setjmp(x)
 __END_CGLOBAL_NAMESPACE

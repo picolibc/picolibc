@@ -46,29 +46,29 @@ __BEGIN_CSTD_NAMESPACE
 /*
  * Prototypes of the ANSI Standard C library string functions.
  */
-void*	memchr (const void*, int, size_t);
-int 	memcmp (const void*, const void*, size_t);
-void* 	memcpy (void*, const void*, size_t);
-void*	memmove (void*, const void*, size_t);
-void*	memset (void*, int, size_t);
-char*	strcat (char*, const char*);
-char*	strchr (const char*, int);
-int	strcmp (const char*, const char*);
-int	strcoll (const char*, const char*);	/* Compare using locale */
-char*	strcpy (char*, const char*);
-size_t	strcspn (const char*, const char*);
-char*	strerror (int); /* NOTE: NOT an old name wrapper. */
+_CRTIMP void* __cdecl	memchr (const void*, int, size_t);
+_CRTIMP int __cdecl 	memcmp (const void*, const void*, size_t);
+_CRTIMP void* __cdecl 	memcpy (void*, const void*, size_t);
+_CRTIMP void* __cdecl	memmove (void*, const void*, size_t);
+_CRTIMP void* __cdecl	memset (void*, int, size_t);
+_CRTIMP char* __cdecl	strcat (char*, const char*);
+_CRTIMP char* __cdecl	strchr (const char*, int);
+_CRTIMP int __cdecl	strcmp (const char*, const char*);
+_CRTIMP int __cdecl	strcoll (const char*, const char*);	/* Compare using locale */
+_CRTIMP char* __cdecl	strcpy (char*, const char*);
+_CRTIMP size_t __cdecl	strcspn (const char*, const char*);
+_CRTIMP char* __cdecl	strerror (int); /* NOTE: NOT an old name wrapper. */
 
-size_t	strlen (const char*);
-char*	strncat (char*, const char*, size_t);
-int	strncmp (const char*, const char*, size_t);
-char*	strncpy (char*, const char*, size_t);
-char*	strpbrk (const char*, const char*);
-char*	strrchr (const char*, int);
-size_t	strspn (const char*, const char*);
-char*	strstr (const char*, const char*);
-char*	strtok (char*, const char*);
-size_t	strxfrm (char*, const char*, size_t);
+_CRTIMP size_t __cdecl	strlen (const char*);
+_CRTIMP char* __cdecl	strncat (char*, const char*, size_t);
+_CRTIMP int __cdecl	strncmp (const char*, const char*, size_t);
+_CRTIMP char* __cdecl	strncpy (char*, const char*, size_t);
+_CRTIMP char* __cdecl	strpbrk (const char*, const char*);
+_CRTIMP char* __cdecl	strrchr (const char*, int);
+_CRTIMP size_t __cdecl	strspn (const char*, const char*);
+_CRTIMP char* __cdecl	strstr (const char*, const char*);
+_CRTIMP char* __cdecl	strtok (char*, const char*);
+_CRTIMP size_t __cdecl	strxfrm (char*, const char*, size_t);
 __END_CSTD_NAMESPACE
 
 #ifndef __STRICT_ANSI__
@@ -76,24 +76,24 @@ __BEGIN_CGLOBAL_NAMESPACE
 /*
  * Extra non-ANSI functions provided by the CRTDLL library
  */
-char*	_strerror (const char *);
-void*	_memccpy (void*, const void*, int, __CSTD size_t);
-int 	_memicmp (const void*, const void*, __CSTD size_t);
-char* 	_strdup (const char*);
-int	_strcmpi (const char*, const char*);
-int	_stricmp (const char*, const char*);
-int	_stricoll (const char*, const char*);
-char*	_strlwr (char*);
-int	_strnicmp (const char*, const char*, __CSTD size_t);
-char*	_strnset (char*, int, __CSTD size_t);
-char*	_strrev (char*);
-char*	_strset (char*, int);
-char*	_strupr (char*);
-void	_swab (const char*, char*, __CSTD size_t);
+_CRTIMP char* __cdecl	_strerror (const char *);
+_CRTIMP void* __cdecl	_memccpy (void*, const void*, int, __CSTD size_t);
+_CRTIMP int __cdecl 	_memicmp (const void*, const void*, __CSTD size_t);
+_CRTIMP char* __cdecl 	_strdup (const char*);
+_CRTIMP int __cdecl	_strcmpi (const char*, const char*);
+_CRTIMP int __cdecl	_stricmp (const char*, const char*);
+_CRTIMP int __cdecl	_stricoll (const char*, const char*);
+_CRTIMP char* __cdecl	_strlwr (char*);
+_CRTIMP int __cdecl	_strnicmp (const char*, const char*, __CSTD size_t);
+_CRTIMP char* __cdecl	_strnset (char*, int, __CSTD size_t);
+_CRTIMP char* __cdecl	_strrev (char*);
+_CRTIMP char* __cdecl	_strset (char*, int);
+_CRTIMP char* __cdecl	_strupr (char*);
+_CRTIMP void __cdecl	_swab (const char*, char*, __CSTD size_t);
 
 #ifdef __MSVCRT__
-int  _strncoll(const char*, const char*, __CSTD size_t);
-int  _strnicoll(const char*, const char*, __CSTD size_t);
+_CRTIMP int __cdecl  _strncoll(const char*, const char*, __CSTD size_t);
+_CRTIMP int __cdecl  _strnicoll(const char*, const char*, __CSTD size_t);
 #endif
 
 #ifndef	_NO_OLDNAMES
@@ -104,28 +104,28 @@ int  _strnicoll(const char*, const char*, __CSTD size_t);
  * strcasecmp.
  */
 
-void*	memccpy (void*, const void*, int, __CSTD size_t);
-int	memicmp (const void*, const void*, __CSTD size_t);
-char*	strdup (const char*);
-int	strcmpi (const char*, const char*);
-int	stricmp (const char*, const char*);
-extern __inline__ int
+_CRTIMP void* __cdecl memccpy (void*, const void*, int, __CSTD size_t);
+_CRTIMP int __cdecl	memicmp (const void*, const void*, __CSTD size_t);
+_CRTIMP char* __cdecl	strdup (const char*);
+_CRTIMP int __cdecl	strcmpi (const char*, const char*);
+_CRTIMP int __cdecl	stricmp (const char*, const char*);
+extern __inline__ int  __cdecl
 strcasecmp (const char * __sz1, const char * __sz2)
   {return _stricmp (__sz1, __sz2);}
-int	stricoll (const char*, const char*);
-char*	strlwr (char*);
-int	strnicmp (const char*, const char*, __CSTD size_t);
-extern __inline__ int
+_CRTIMP int __cdecl	stricoll (const char*, const char*);
+_CRTIMP char* __cdecl	strlwr (char*);
+_CRTIMP int __cdecl	strnicmp (const char*, const char*, __CSTD size_t);
+extern __inline__ int __cdecl
 strncasecmp (const char*, const char*, __CSTD size_t);
-extern __inline__ int
+extern __inline__ int  __cdecl
 strncasecmp (const char * __sz1, const char * __sz2, __CSTD size_t __sizeMaxCompare)
   {return _strnicmp (__sz1, __sz2, __sizeMaxCompare);}
-char*	strnset (char*, int, __CSTD size_t);
-char*	strrev (char*);
-char*	strset (char*, int);
-char*	strupr (char*);
+_CRTIMP char* __cdecl	strnset (char*, int, __CSTD size_t);
+_CRTIMP char* __cdecl	strrev (char*);
+_CRTIMP char* __cdecl	strset (char*, int);
+_CRTIMP char* __cdecl	strupr (char*);
 #ifndef _UWIN
-void	swab (const char*, char*, __CSTD size_t);
+_CRTIMP void __cdecl swab (const char*, char*, __CSTD size_t);
 #endif /* _UWIN */
 
 #endif	/* Not _NO_OLDNAMES */
@@ -141,23 +141,23 @@ __END_CGLOBAL_NAMESPACE
  * Also in wchar.h, where they really belong.
  */
 __BEGIN_CSTD_NAMESPACE
-wchar_t* wcscat (wchar_t*, const wchar_t*);
-wchar_t* wcschr (const wchar_t*, wchar_t);
-int	wcscmp (const wchar_t*, const wchar_t*);
-int	wcscoll (const wchar_t*, const wchar_t*);
-wchar_t* wcscpy (wchar_t*, const wchar_t*);
-size_t	wcscspn (const wchar_t*, const wchar_t*);
+_CRTIMP wchar_t* __cdecl wcscat (wchar_t*, const wchar_t*);
+_CRTIMP wchar_t* __cdecl wcschr (const wchar_t*, wchar_t);
+_CRTIMP int __cdecl	wcscmp (const wchar_t*, const wchar_t*);
+_CRTIMP int __cdecl	wcscoll (const wchar_t*, const wchar_t*);
+_CRTIMP wchar_t* __cdecl wcscpy (wchar_t*, const wchar_t*);
+_CRTIMP size_t __cdecl	wcscspn (const wchar_t*, const wchar_t*);
 /* Note: No wcserror in CRTDLL. */
-size_t	wcslen (const wchar_t*);
-wchar_t* wcsncat (wchar_t*, const wchar_t*, size_t);
-int	wcsncmp(const wchar_t*, const wchar_t*, size_t);
-wchar_t* wcsncpy(wchar_t*, const wchar_t*, size_t);
-wchar_t* wcspbrk(const wchar_t*, const wchar_t*);
-wchar_t* wcsrchr(const wchar_t*, wchar_t);
-size_t	wcsspn(const wchar_t*, const wchar_t*);
-wchar_t* wcsstr(const wchar_t*, const wchar_t*);
-wchar_t* wcstok(wchar_t*, const wchar_t*);
-size_t	wcsxfrm(wchar_t*, const wchar_t*, size_t);
+_CRTIMP size_t __cdecl	wcslen (const wchar_t*);
+_CRTIMP wchar_t* __cdecl wcsncat (wchar_t*, const wchar_t*, size_t);
+_CRTIMP int __cdecl	wcsncmp(const wchar_t*, const wchar_t*, size_t);
+_CRTIMP wchar_t* __cdecl wcsncpy(wchar_t*, const wchar_t*, size_t);
+_CRTIMP wchar_t* __cdecl wcspbrk(const wchar_t*, const wchar_t*);
+_CRTIMP wchar_t* __cdecl wcsrchr(const wchar_t*, wchar_t);
+_CRTIMP size_t __cdecl	wcsspn(const wchar_t*, const wchar_t*);
+_CRTIMP wchar_t* __cdecl wcsstr(const wchar_t*, const wchar_t*);
+_CRTIMP wchar_t* __cdecl wcstok(wchar_t*, const wchar_t*);
+_CRTIMP size_t __cdecl	wcsxfrm(wchar_t*, const wchar_t*, size_t);
 __END_CSTD_NAMESPACE
 
 #ifndef __STRICT_ANSI__
@@ -169,35 +169,35 @@ __BEGIN_CGLOBAL_NAMESPACE
 /* NOTE: _wcscmpi not provided by CRTDLL, this define is for portability */
 #define		_wcscmpi	_wcsicmp
 
-wchar_t* _wcsdup (const wchar_t*);
-int	_wcsicmp (const wchar_t*, const wchar_t*);
-int	_wcsicoll (const wchar_t*, const wchar_t*);
-wchar_t* _wcslwr (wchar_t*);
-extern __inline__ int
+_CRTIMP wchar_t* __cdecl _wcsdup (const wchar_t*);
+_CRTIMP int __cdecl	_wcsicmp (const wchar_t*, const wchar_t*);
+_CRTIMP int __cdecl	_wcsicoll (const wchar_t*, const wchar_t*);
+_CRTIMP wchar_t* __cdecl _wcslwr (wchar_t*);
+extern __inline__ int __cdecl
 wcscmpi (const wchar_t * __ws1, const wchar_t * __ws2)
   {return _wcsicmp (__ws1, __ws2);}
-wchar_t* _wcsnset (wchar_t*, wchar_t, __CSTD size_t);
-wchar_t* _wcsrev (wchar_t*);
-wchar_t* _wcsset (wchar_t*, wchar_t);
-wchar_t* _wcsupr (wchar_t*);
+_CRTIMP wchar_t* __cdecl _wcsnset (wchar_t*, wchar_t, __CSTD size_t);
+_CRTIMP wchar_t* __cdecl _wcsrev (wchar_t*);
+_CRTIMP wchar_t* __cdecl _wcsset (wchar_t*, wchar_t);
+_CRTIMP wchar_t* __cdecl _wcsupr (wchar_t*);
 
 #ifdef __MSVCRT__
-int  _wcsncoll(const wchar_t*, const wchar_t*, __CSTD size_t);
-int  _wcsnicoll(const wchar_t*, const wchar_t*, __CSTD size_t);
+_CRTIMP int __cdecl  _wcsncoll(const wchar_t*, const wchar_t*, __CSTD size_t);
+_CRTIMP int __cdecl  _wcsnicoll(const wchar_t*, const wchar_t*, __CSTD size_t);
 #endif
 
 #ifndef __NO_OLDNAMES
 /* NOTE: There is no _wcscmpi, but this is for compatibility. */
-int	wcscmpi	(const wchar_t*, const wchar_t*);
-wchar_t* wcsdup (wchar_t*);
-int	wcsicmp (const wchar_t*, const wchar_t*);
-int	wcsicoll (const wchar_t*, const wchar_t*);
-wchar_t* wcslwr (wchar_t*);
-int	wcsnicmp (const wchar_t*, const wchar_t*, __CSTD size_t);
-wchar_t* wcsnset (wchar_t*, wchar_t, __CSTD size_t);
-wchar_t* wcsrev (wchar_t*);
-wchar_t* wcsset (wchar_t*, wchar_t);
-wchar_t* wcsupr (wchar_t*);
+_CRTIMP int __cdecl	wcscmpi	(const wchar_t*, const wchar_t*);
+_CRTIMP wchar_t* __cdecl wcsdup (wchar_t*);
+_CRTIMP int __cdecl	wcsicmp (const wchar_t*, const wchar_t*);
+_CRTIMP int __cdecl	wcsicoll (const wchar_t*, const wchar_t*);
+_CRTIMP wchar_t* __cdecl wcslwr (wchar_t*);
+_CRTIMP int __cdecl	wcsnicmp (const wchar_t*, const wchar_t*, __CSTD size_t);
+_CRTIMP wchar_t* __cdecl wcsnset (wchar_t*, wchar_t, __CSTD size_t);
+_CRTIMP wchar_t* __cdecl wcsrev (wchar_t*);
+_CRTIMP wchar_t* __cdecl wcsset (wchar_t*, wchar_t);
+_CRTIMP wchar_t* __cdecl wcsupr (wchar_t*);
 #endif	/* Not _NO_OLDNAMES */
 
 __END_CGLOBAL_NAMESPACE

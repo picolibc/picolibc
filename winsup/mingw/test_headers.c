@@ -36,7 +36,6 @@
 #include <time.h>
 #include <unistd.h>
 #include <values.h>
-#include <wchar.h>
 #include <wctype.h>
 #include <sys/fcntl.h>
 #include <sys/file.h>
@@ -48,6 +47,7 @@
 #include <sys/types.h>
 #include <sys/unistd.h>
 #include <sys/utime.h>
+#include <wchar.h>
 
 int main()
 {return 0;}

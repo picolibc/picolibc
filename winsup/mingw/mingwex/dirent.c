@@ -58,7 +58,7 @@ _topendir (const _TCHAR *szPath)
 
   /* Attempt to determine if the given path really is a directory. */
   rc = GetFileAttributes (szPath);
-  if (rc == -1)
+  if (rc == (unsigned int)-1)
     {
       /* call GetLastError for more error info */
       errno = ENOENT;

@@ -93,12 +93,12 @@ typedef int sig_atomic_t;
  * previous handler, or SIG_ERR if an error occurs. Initially
  * unhandled signals defined above will return SIG_DFL.
  */
-__p_sig_fn_t	signal(int, __p_sig_fn_t);
+_CRTIMP __p_sig_fn_t __cdecl	signal(int, __p_sig_fn_t);
 
 /*
  * Raise the signal indicated by sig. Returns non-zero on success.
  */
-int	raise (int);
+_CRTIMP int __cdecl	raise (int);
 
 __END_CSTD_NAMESPACE
 

@@ -2,6 +2,7 @@
 //  Public domain: all copyrights disclaimed, absolutely no warranties.
 
 #include <stdarg.h>
+#include <stdio.h>
 #include <wchar.h>
 
 int vwscanf(const wchar_t * __restrict__ format, va_list arg) {

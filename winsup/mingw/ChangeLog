@@ -1,3 +1,177 @@
+2003-04-01  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	Merge from mingw trunk (changes since 2003-01-27).
+
+	2003-04-01  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/_mingw.h (_CRTIMP): Make conditional on __USE_CRTIMP.
+
+	2003-03-16  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/dirent.c (_topendir): Eliminate signed/unsigned warning.
+	* mingwex/strtoimax.c (strtoimax): Likewise.
+	* mingwex/wcstoimax.c (wcstoimax): Likewise.
+	* mingwex/wtoll.c (wtoll): Remove unnecessary ';'
+	* mingwex/fesentenv.c: Include float.h.
+	* mingwex/math/powl.c: Eliminate type punning/strict aliasing 
+	warning.
+	* mingwex/math/tanhl.c: Eliminate signed/unsigned warning in
+	constants.
+	* mingwex/math/tgammal.c: Likewise.
+
+	2003-03-16  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/utime.h: New file, forwarding to sys/utime.h.
+
+	2003-03-16  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/sys/param.h (MAXPATHLEN): Define.
+
+	2003-03-16  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/tchar.h: Ansi-fy a comment.
+
+	2003-03-16  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* profile/profile.h (mcount): Use __builtin_return_address
+	rather than inline __asm statements.
+	* profile/Makefile.in: Specify dependencies for mcount.o
+	profil.o gmon.o.
+
+	2003-03-10  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/stdlib.h (qsort): Remove const from first parm.
+	Thanks to: Tien-Ren Chen  <trchen@sourceforge.users.net>
+
+	2003-03-03  Christopher Faylor  <cgf@redhat.com>
+
+	* mingwex/getopt.c: Refresh from NetBSD sources.
+
+	2003-03-03  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/getopt.c: New file, copied from cygwin srcs.
+	* include/getopt.h: New file, copied from cygwin srcs.
+	* include/unistd.h: Include getopt.h.
+	* mingwex/Makefile.in (DISTFILES): Add getopt.c.
+	(POSIX_OBJS): Add getopt.o.
+
+	2003-03-02  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/stdio.h (vscanf): Add prototype.
+	(vfscanf): Ditto.
+	(vsscanf): Ditto.
+	(vwscanf): Ditto.
+	(vfwscanf): Ditto.
+	(vswscanf): Ditto.
+	* include/wchar.h (vwscanf): Add prototype.
+	(vfwscanf): Ditto.
+	(vswscanf): Ditto.
+	* mingwex/snprintf.c: Move to mingwex/stdio.
+ 	* mingwex/vsnprintf.c: Ditto.
+	* mingwex/snwprintf.c: Ditto.
+	* mingwex/vsnwprintf.c: Ditto.
+	* mingwex/Makefile.in (VPATH): Add $(srcdir)/stdio
+	(STDIO_DISTFILES): Add.
+	(DISTFILES): Adjust.
+	(STDIO_STUB_OBJS): Rename to STDIO_OBJS and add v*scanf objects.
+	(LIB_OBJS): Adjust.
+	(dist): Adjust.
+
+	2003-03-02  Aaron W  LaFramboise   <AWLaFramboise@aol.com>
+
+	* mingwex/stdio: New directory
+	* mingwex/stdio/vfscanf.c: New file.
+	* mingwex/stdio/vfwscanf.c:  New file.
+	* mingwex/stdio/vscanf.c:  New file.
+	* mingwex/stdio/vsscanf.c:  New file.
+	* mingwex/stdio/vswscanf.c:  New file.
+	* mingwex/stdio/vwscanf.c:  New file.
+
+	2003-02-25  Earnie Boyd  <earnie@users.sf.net>
+
+	* Makefile.in (libmsvcrt20.a): Remove target and dependencies.
+	(libmsvcrt40.a): Ditto.
+
+	2003-02-21  Earnie Boyd  <earnie@users.sf.net>
+
+	Thanks to David Frasier <davidf@sjsoft.com> who inspired portions of
+	this patch.
+	* Makefile.in (libmsvcrtd.a): Add target library.
+	(libmoldnamed.a): Ditto.
+	(msvcrt.def, msvcrtd.def, msvcrt20.def, msvcrt40.def): Use msvcrt.def.in
+	template to create.
+	($(srcdir)): Remove explicit reference for depencies of object targets.
+	* moldname.def, moldname-msvcrt.def, moldname-crtdll.def, msvcrt.def,
+	msvcrt20.def, msvcrt40.def: Remove.
+	* msvcrt.def.in: New file (Copy of previous msvcrt.def).
+
+	2003-02-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in: Make sure libmingwex.a from current build tree is used.
+
+	2003-02-10  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/math.h: Remove _CRTIMP from pow() prototype,
+	unless __NO_ISOCEXT.
+
+	2003-02-10  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/math/cephes_emath.h: Don't redefine INFINITY.
+
+	2003-02-10  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/_mingw.h (_CRTIMP): Define for __GNUC__ if
+	__declspec(dllimport)  supported.
+	(__cdecl): Define if not already defined.
+	(__stdcall): Likewise.
+	* include/dirent.h: Qualify fuctions with __cdecl.
+	* include/fenv.h: Likewise.
+	* include/inttypes.h: Likewise.
+	* include/assert.h: Qualify fuctions with __cdecl. Qualify
+	CRT dll imports with _CRTIMP.
+	* include/conio.h: Likewise.
+	* include/ctype.h: Likewise.
+	* include/direct.h: Likewise.
+	* include/dos.h: Likewise.
+	* include/errno.h: Likewise.
+	* include/float.h: Likewise.
+	* include/io.h: Likewise.
+	* include/locale.h: Likewise.
+	* include/malloc.h: Likewise.
+	* include/math.h: Likewise.
+	* include/mbctype.h: Likewise.
+	* include/mbstring.h: Likewise.
+	* include/process.h: Likewise.
+	* include/setjmp.h: Likewise.
+	* include/signal.h: Likewise.
+	* include/stdio.h: Likewise.
+	* include/stdlib.h: Likewise.
+	* include/string.h: Likewise.
+	* include/time.h: Likewise.
+	* include/wchar.h: Likewise.
+	* include/wctype.h: Likewise.
+	* include/sys/stat.h: Likewise.
+	* include/sys/timeb.h: Likewise.
+	* include/sys/utime.h: Likewise.
+
+	* include/ctype.h: Guard ctype inlines with __NO_INLINE__.
+	* include/wctype.h: Guard wctype inlines with __NO_INLINE__.
+
+	* include/stdio.h (__VALIST): Guard against prior definition.
+
+	2003-02-08  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/_mingw.h: Change version to 3.0
+	* Makefile.in: Ditto.
+
+	2003-02-08  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/stdlib.h: Make words after #endif a comment.
+
+	2003-02-07  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/locale.h: Include stddef.h for definition of NULL.
+
 2003-01-27  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/setjmp.h (_setjmp): Move from std to global
@@ -128,7 +302,7 @@
 
 	2002-10-30  Guido Serassio  <serassio@libero.it>
 
-         * include/stdio.h (_getmaxstdio): Add prototype.
+        * include/stdio.h (_getmaxstdio): Add prototype.
          (_setmaxstdio): Likewise.
 
 	2002-10-19  Kang Li  <rubylith@users.sourceforge.net>

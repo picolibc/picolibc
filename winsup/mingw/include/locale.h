@@ -51,7 +51,16 @@
 
 #ifndef RC_INVOKED
 
+/* According to C89 std, NULL is defined in locale.h too */
+#define __need_NULL
+#include <stddef.h>
+
 __BEGIN_CSTD_NAMESPACE
+
+/* According to C89 std, NULL is defined in locale.h too.  */
+#define __need_NULL
+#include <stddef.h>
+
 /*
  * The structure returned by 'localeconv'.
  */
@@ -77,8 +86,8 @@ struct lconv
 	char	n_sign_posn;
 };
 
-char*		setlocale (int, const char*);
-struct lconv*	localeconv (void);
+_CRTIMP  char* __cdecl setlocale (int, const char*);
+_CRTIMP struct lconv* __cdecl localeconv (void);
 
 __END_CSTD_NAMESPACE
 
@@ -86,7 +95,7 @@ __END_CSTD_NAMESPACE
 # define __need_wchar_t
 # include <stddef.h>
 __BEGIN_CGLOBAL_NAMESPACE
-  wchar_t* 	_wsetlocale(int, const wchar_t*);
+_CRTIMP  wchar_t*  __cdecl _wsetlocale(int, const wchar_t*);
 __END_CGLOBAL_NAMESPACE
 # define _WLOCALE_DEFINED
 #endif /* ndef _WLOCALE_DEFINED */
