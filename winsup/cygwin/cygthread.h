@@ -8,7 +8,7 @@ details. */
 
 class cygthread
 {
-  DWORD avail;
+  LONG avail;	/* 1: available, 0: ininitialized, -1: not available */
   DWORD id;
   HANDLE h;
   HANDLE ev;

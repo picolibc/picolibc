@@ -1,6 +1,18 @@
 2003-04-04  Christopher Faylor  <cgf@redhat.com>
 
-	* cygthread.cc (operator new): Be more defensive when messing with
+	* cygthread.h (cygthread::avail): Make LONG for easier use with
+	Interlocked* functions.
+	* cygthread.cc (cygthread::init): Eliminate unneeded muto.
+	(cygthread::operator new): Don't lock.  Instead change use of avail
+	variable into tri-state: available (1), not available (-1),
+	uninitialized (0).
+	(cygthread::terminate_thread): Set avail to uninitialized.
+	(cygthread::detach): Eliminate local 'avail'.  Always set avail to 1
+	unless signalled.
+
+2003-04-04  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::operator new): Be more defensive when messing with
 	threads that are marked "unavailable".
 
 2003-04-03  Christopher Faylor  <cgf@redhat.com>
