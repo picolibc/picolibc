@@ -137,18 +137,18 @@ endif
 
 path.o: path.cc
 ifdef VERBOSE
-	${filter-out -I$(newlib_source)/%,$(COMPILE_CC)} $c -o $(@D)/$(basename $@)$o $(MINGW_CFLAGS) $<
+	${filter-out -I$(newlib_source)/%,$(COMPILE_CXX)} $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) $<
 else
-	@echo $(CC) $c -o $(@D)/$(basename $@)$o $(MINGW_CFLAGS) ... $^;\
-	${filter-out -I$(newlib_source)/%,$(COMPILE_CC)} $c -o $(@D)/$(basename $@)$o $(MINGW_CFLAGS) $<
+	@echo $(CXX) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) ... $^;\
+	${filter-out -I$(newlib_source)/%,$(COMPILE_CXX)} $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) $<
 endif
 
 dump_setup.o: dump_setup.cc
 ifdef VERBOSE
-	${filter-out -I$(newlib_source)/%,$(COMPILE_CC)} $c -o $(@D)/$(basename $@)$o $(MINGW_CFLAGS) $<
+	${filter-out -I$(newlib_source)/%,$(COMPILE_CXX)} $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) $<
 else
-	@echo $(CC) $c -o $(@D)/$(basename $@)$o $(MINGW_CFLAGS) ... $^;\
-	${filter-out -I$(newlib_source)/%,$(COMPILE_CC)} $c -o $(@D)/$(basename $@)$o $(MINGW_CFLAGS) $<
+	@echo $(CXX) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) ... $^;\
+	${filter-out -I$(newlib_source)/%,$(COMPILE_CXX)} $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) $<
 endif
 
 clean:
