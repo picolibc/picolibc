@@ -679,19 +679,23 @@ for( i=M; i<NI-1; i++ )
 
 static __inline__ void __enan_64(unsigned short* nan)
 {
-  static const unsigned short nan64[6]
-    = {0, 0, 0, 0xc000, 0xffff, 0};
-  nan = (unsigned short*) nan64;
+
+  int i;
+  for( i=0; i<3; i++ )
+    *nan++ = 0;
+  *nan++ = 0xc000;
+  *nan++ = 0x7fff;
+  *nan = 0;
   return;
 }
 
 static __inline__ void __enan_NBITS(unsigned short* nan)
 {
- int i; 
- for( i=0; i<NE-2; i++ )
+  int i; 
+  for( i=0; i<NE-2; i++ )
     *nan++ = 0;
   *nan++ = 0xc000;
-  *nan++ = 0x7fff;
+  *nan = 0x7fff;
   return;
 }
 
@@ -699,14 +703,13 @@ static __inline__ void __enan_NI16(unsigned short* nan)
 {
   int i; 
   *nan++ = 0;
-  *nan = 0x7fff;
-  *nan = 0;
-  *nan = 0xc000;
+  *nan++ = 0x7fff;
+  *nan++ = 0;
+  *nan++ = 0xc000;
   for( i=4; i<NI; i++ )
     *nan++ = 0;
   return;
 }
-
 
 #endif /* _CEPHES_EMATH_H */
 

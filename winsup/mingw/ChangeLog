@@ -1,3 +1,9 @@
+2004-01-31  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/math/cephes_emath.h (__enan_64): Fix thinko.
+	(__enan_NI16): Fix another one.
+	(__enan_NBITS): Tidy.
+
 2004-01-16  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/stdint.h  Fix __STDC_CONSTANT_MACROS for 8 and 16 bit
