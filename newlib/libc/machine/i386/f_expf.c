@@ -8,6 +8,8 @@
  * ====================================================
  */
 
+#if !defined(_SOFT_FLOAT)
+
 /*
 Fast version of exp using Intel float instructions.
 
@@ -42,4 +44,4 @@ float _f_expf (float x)
    return x;
 }
 
-
+#endif

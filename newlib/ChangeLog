@@ -1,3 +1,20 @@
+2001-08-29  Joel Sherrill <joel@OARcorp.com>
+
+	* libc/include/sys/unistd.h: Prototype chroot() for RTEMS.
+
+2001-08-29  Ralf Corsepius <corsepiu@faw.uni-ulm.de>
+
+	* libc/machine/i386/f_atan2.S, libc/machine/i386/f_atan2f.S,
+	  libc/machine/i386/f_exp.c, libc/machine/i386/f_expf.c,
+	  libc/machine/i386/f_frexp.S, libc/machine/i386/f_frexpf.S,
+	  libc/machine/i386/f_ldexp.S, libc/machine/i386/f_ldexpf.S,
+	  libc/machine/i386/f_log.S, libc/machine/i386/f_log10.S,
+	  libc/machine/i386/f_log10f.S, libc/machine/i386/f_logf.S,
+	  libc/machine/i386/f_pow.c, libc/machine/i386/f_powf.c,
+	  libc/machine/i386/f_tan.S, libc/machine/i386/f_tanf.S:
+	Add conditional compilation to avoid HW FPU instructions
+	when compiled for soft-float.
+
 2001-08-29  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* Makefile.am: Add check for ln failing when creating libg.a

@@ -8,6 +8,8 @@
  * ====================================================
  */
 
+#if !defined(_SOFT_FLOAT)
+
 /* 
 Fast version of atan2 using Intel float instructions.
 
@@ -31,3 +33,5 @@ SYM (_f_atan2):
 
 	leave
 	ret
+
+#endif

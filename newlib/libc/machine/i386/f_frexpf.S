@@ -8,6 +8,8 @@
  * ====================================================
  */
 
+#if !defined(_SOFT_FLOAT)
+
 /*
 Fast version of frexpf using Intel float instructions.
 
@@ -42,3 +44,5 @@ SYM (_f_frexpf):
 
 	leave
 	ret
+
+#endif

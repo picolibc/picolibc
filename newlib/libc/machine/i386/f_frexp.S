@@ -8,6 +8,8 @@
  * ====================================================
  */
 
+#if !defined(_SOFT_FLOAT)
+
 /*
 Fast version of frexp using Intel float instructions.
 
@@ -42,3 +44,5 @@ SYM (_f_frexp):
 
 	leave
 	ret
+
+#endif
