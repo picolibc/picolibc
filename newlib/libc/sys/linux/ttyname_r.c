@@ -34,8 +34,6 @@ static int getttyname_r (char *buf, size_t buflen,
 
 extern struct dirent64 *__readdir64 (DIR *);
 
-#define __set_errno(x) (errno = (x))
-
 static int
 getttyname_r (char *buf, size_t buflen, dev_t mydev, ino64_t myino,
 	      int save, int *dostat)

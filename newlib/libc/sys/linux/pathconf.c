@@ -30,8 +30,6 @@
 #include <machine/weakalias.h>
 #include "linux_fsinfo.h"
 
-#define __set_errno(x) errno=(x)
-
 /* The Linux kernel header mentioned this as a kind of generic value.  */
 #define LINUX_LINK_MAX	127
 

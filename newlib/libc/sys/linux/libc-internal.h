@@ -6,9 +6,6 @@
 
 #include <hp-timing.h>
 
-/* macro to set errno */
-#define __set_errno(x) (errno = (x))
-
 /* Initialize the `__libc_enable_secure' flag.  */
 extern void __libc_init_secure (void);
 

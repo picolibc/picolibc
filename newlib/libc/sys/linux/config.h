@@ -13,6 +13,4 @@
 
 #define UINT32_C(c)    c ## U
 
-#define __set_errno(x) (errno = (x))
-
 #include <machine/sysdep.h>

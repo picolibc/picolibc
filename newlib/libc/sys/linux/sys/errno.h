@@ -23,6 +23,8 @@ extern __IMPORT int _sys_nerr;
 /* --- end of slight redundancy (the use of struct _reent->_errno is
        hard-coded in perror.c so why pretend anything else could work too ? */
 
+#define __set_errno(x) (errno = (x))
+
 #include <asm/errno.h>
 
 #define ENOTSUP EOPNOTSUPP
