@@ -625,7 +625,7 @@ cygwin_sendto (int fd,
     {
       debug_printf ("Fallback to winsock 1 sendto call");
       if ((res = sendto (h->get_socket (), (const char *) buf, len, flags,
-			 to, tolen)) == SOCKET_ERROR)
+			 (sockaddr *) &sin, tolen)) == SOCKET_ERROR)
 	{
 	  set_winsock_errno ();
 	  res = -1;
@@ -636,7 +636,7 @@ cygwin_sendto (int fd,
       WSABUF wsabuf = { len, (char *) buf };
       DWORD ret = 0;
       if (WSASendTo (h->get_socket (), &wsabuf, 1, &ret, (DWORD)flags,
-		     to, tolen, ovr, NULL) != SOCKET_ERROR)
+		     (sockaddr *) &sin, tolen, ovr, NULL) != SOCKET_ERROR)
 	res = ret;
       else if ((res = WSAGetLastError ()) != WSA_IO_PENDING)
 	{

@@ -1,3 +1,8 @@
+2001-10-11  Egor Duda  <deo@logos-m.ru>
+
+	* net.cc (cygwin_sendto): Use correct socket address when sending
+	data to AF_UNIX socket.
+
 Wed Oct 10 16:10:41 2001  Alexander Gottwald <ago@informatik.tu-chemnitz.de>    
 
 	* net.cc (get_95_ifconf): Using other registry values pointing to
