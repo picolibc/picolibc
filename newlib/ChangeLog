@@ -1,3 +1,9 @@
+2003-10-23  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configure.in: Use absolute newlib basedir when forming
+	CC_FOR_NEWLIB include options.
+	* configure: Regenerated.
+
 2003-10-23  Artem B. Bityuckiy  <mail_lists@mail.ru>
 
 	* libc/string/wcsnlen.c: New file.
