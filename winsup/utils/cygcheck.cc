@@ -1240,7 +1240,7 @@ struct option longopts[] = {
   {"verbose", no_argument, NULL, 'v'},
   {"keycheck", no_argument, NULL, 'k'},
   {"help", no_argument, NULL, 'h'},
-  {"version", no_argument, 0, 'z'},
+  {"version", no_argument, 0, 'V'},
   {0, no_argument, NULL, 0}
 };
 
