@@ -3,9 +3,11 @@
 <title>cygwin_detach_dll</title>
 
 <funcsynopsis>
+<funcprototype>
 <funcdef>extern "C" void
 <function>cygwin_detach_dll</function></funcdef>
 <paramdef>int <parameter>dll_index</parameter></paramdef>
+</funcprototype>
 </funcsynopsis>
 
 </sect1>
