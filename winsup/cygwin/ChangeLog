@@ -1,3 +1,12 @@
+Fri Dec 15 18:54:42 2000 Bradley A. Town <townba@pobox.com>
+
+	* fhandler_console.cc (read): Add support for xterm-style mouse event
+	reporting.
+	(fhandler_console::char_command): Honor mouse events.
+	(fhandler_console::open): Enable mouse input events.
+	(fhandler_console::input_tcsetattr): Ditto.
+	* select.cc (peek_console): Add check for mouse events.
+
 Fri Dec 15 17:23:17 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (normalize_posix_path): Calculate path name length overruns

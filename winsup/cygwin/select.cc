@@ -635,6 +635,10 @@ peek_console (select_record *me, int ignra)
       {
 	if (irec.EventType == WINDOW_BUFFER_SIZE_EVENT)
 	  kill_pgrp (fh->tc->getpgid (), SIGWINCH);
+	else if (irec.EventType == MOUSE_EVENT &&
+		 (irec.Event.MouseEvent.dwEventFlags == 0 ||
+		  irec.Event.MouseEvent.dwEventFlags == DOUBLE_CLICK))
+	  return me->read_ready = 1;
 	else if (irec.EventType == KEY_EVENT && irec.Event.KeyEvent.bKeyDown == TRUE &&
 		 (irec.Event.KeyEvent.uChar.AsciiChar || get_nonascii_key (irec, tmpbuf)))
 	  return me->read_ready = 1;

@@ -47,6 +47,8 @@ static struct
 
 const char * get_nonascii_key (INPUT_RECORD&, char *);
 
+static BOOL use_mouse = FALSE;
+
 HANDLE console_shared_h;
 
 static tty_min NO_COPY *shared_console_info = NULL;
@@ -184,7 +186,7 @@ fhandler_console::read (void *pv, size_t buflen)
 
       DWORD nread;
       INPUT_RECORD input_rec;
-      const char *toadd;
+      const char *toadd = NULL;
 
       if (!ReadConsoleInput (h, &input_rec, 1, &nread))
 	{
@@ -193,48 +195,142 @@ fhandler_console::read (void *pv, size_t buflen)
 	  return -1;		/* seems to be failure */
 	}
 
+      /* check the event that occurred */
+      switch (input_rec.EventType)
+	{
+	case KEY_EVENT:
+	  if (!input_rec.Event.KeyEvent.bKeyDown)
+	    continue;
+
 #define ich (input_rec.Event.KeyEvent.uChar.AsciiChar)
 #define wch (input_rec.Event.KeyEvent.uChar.UnicodeChar)
 
-      /* check if we're just disposing of this one */
+	  if (wch == 0 ||
+	      /* arrow/function keys */
+	      (input_rec.Event.KeyEvent.dwControlKeyState & ENHANCED_KEY))
+	    {
+	      toadd = get_nonascii_key (input_rec, tmp);
+	      if (!toadd)
+		continue;
+	      nread = strlen (toadd);
+	    }
+          else
+            {
+	      tmp[1] = ich;
+	      /* Need this check since US code page seems to have a bug when
+		 converting a CTRL-U. */
+	      if ((unsigned char)ich > 0x7f)
+		OemToCharBuff (tmp + 1, tmp + 1, 1);
+	      if (!(input_rec.Event.KeyEvent.dwControlKeyState & LEFT_ALT_PRESSED))
+		toadd = tmp + 1;
+	      else
+		{
+		  tmp[0] = '\033';
+		  tmp[1] = cyg_tolower (tmp[1]);
+		  toadd = tmp;
+		  nread++;
+		}
+            }
+#undef ich
+#undef wch
+	  break;
 
-      if (input_rec.EventType == WINDOW_BUFFER_SIZE_EVENT)
-	{
+	case MOUSE_EVENT:
+	  if (use_mouse)
+	    {
+	      MOUSE_EVENT_RECORD & mouse_event = input_rec.Event.MouseEvent;
+
+	      /* Treat the double-click event like a regular button press */
+	      if (mouse_event.dwEventFlags == DOUBLE_CLICK)
+		{
+		  syscall_printf("mouse: double-click -> click");
+		  mouse_event.dwEventFlags = 0;
+		}
+
+	      /* Did something other than a click occur? */
+	      if (mouse_event.dwEventFlags)
+		continue;
+	      
+	      /* If the mouse event occurred out of the area we can handle,
+		 ignore it. */
+	      int x = mouse_event.dwMousePosition.X;
+	      int y = mouse_event.dwMousePosition.Y;
+	      if ((x + ' ' + 1 > 0xFF) || (y + ' ' + 1 > 0xFF))
+		{
+		  syscall_printf("mouse: position out of range");
+		  continue;
+		}
+	      
+	      /* Ignore unimportant mouse buttons */
+	      mouse_event.dwButtonState &= 0x7;
+	      
+	      /* This code assumes Windows never reports multiple button
+		 events at the same time. */
+	      static DWORD dwLastButtonState = 0;
+	      int b = 0;
+	      char sz[32];
+	      if (mouse_event.dwButtonState == dwLastButtonState)
+		{
+		  syscall_printf("mouse: button state unchanged");
+		  continue;
+		}
+	      else if (mouse_event.dwButtonState < dwLastButtonState)
+		{
+		  b = 3;
+		  strcpy(sz, "btn up");
+		}
+	      else if ((mouse_event.dwButtonState & 1) != (dwLastButtonState & 1))
+		{
+		  b = 0;
+		  strcpy(sz, "btn1 down");
+		}
+	      else if ((mouse_event.dwButtonState & 2) != (dwLastButtonState & 2))
+		{
+		  b = 1;
+		  strcpy(sz, "btn2 down");
+		}
+	      else if ((mouse_event.dwButtonState & 4) != (dwLastButtonState & 4))
+		{
+		  b = 2;
+		  strcpy(sz, "btn3 down");
+		}
+	      
+	      /* Remember the current button state */
+	      dwLastButtonState = mouse_event.dwButtonState;
+	      
+	      static int nModifiers = 0;
+	      /* If a button was pressed, remember the modifiers */
+	      if (b != 3)
+		{
+		  nModifiers = 0;
+		  if (mouse_event.dwControlKeyState & SHIFT_PRESSED)
+		    nModifiers |= 0x4;
+		  if (mouse_event.dwControlKeyState & (RIGHT_ALT_PRESSED|LEFT_ALT_PRESSED))
+		    nModifiers |= 0x8;
+		  if (mouse_event.dwControlKeyState & (RIGHT_CTRL_PRESSED|LEFT_CTRL_PRESSED))
+		    nModifiers |= 0x10;
+		}
+	      
+	      b |= nModifiers;
+	      
+	      /* We can now create the code. */
+	      sprintf(tmp, "\033[M%c%c%c", b + ' ', x + ' ' + 1, y + ' ' + 1);
+	      syscall_printf("mouse: %s at (%d,%d)", sz, x, y);
+
+	      toadd = tmp;
+	      nread = 6;
+	    }
+	  break;
+
+	case WINDOW_BUFFER_SIZE_EVENT:
 	  kill_pgrp (tc->getpgid (), SIGWINCH);
 	  continue;
-	}
-      if (input_rec.EventType != KEY_EVENT ||
-	  !input_rec.Event.KeyEvent.bKeyDown)
-	continue;
 
-      if (wch == 0 ||
-	  /* arrow/function keys */
-	  (input_rec.Event.KeyEvent.dwControlKeyState & ENHANCED_KEY))
-	{
-	  toadd = get_nonascii_key (input_rec, tmp);
-	  if (!toadd)
-	    continue;
-	  nread = strlen (toadd);
-	}
-      else
-	{
-	  tmp[1] = ich;
-	  /* Need this check since US code page seems to have a bug when
-	     converting a CTRL-U. */
-	  if ((unsigned char)ich > 0x7f && current_codepage == ansi_cp)
-	    OemToCharBuff (tmp + 1, tmp + 1, 1);
-	  if (!(input_rec.Event.KeyEvent.dwControlKeyState & LEFT_ALT_PRESSED))
-	    toadd = tmp + 1;
-	  else
-	    {
-	      tmp[0] = '\033';
-	      tmp[1] = cyg_tolower (tmp[1]);
-	      toadd = tmp;
-	      nread++;
-	    }
+	default:
+	  continue;
 	}
 
-      if (line_edit (toadd, nread))
+      if (toadd && line_edit (toadd, nread))
 	break;
 #undef ich
     }
@@ -365,7 +461,7 @@ fhandler_console::open (const char *, int flags, mode_t)
   set_r_no_interrupt (1);	// Handled explicitly in read code
 
   h = CreateFileA ("CONOUT$", GENERIC_READ|GENERIC_WRITE,
-		   FILE_SHARE_WRITE | FILE_SHARE_WRITE, &sec_none,
+		   FILE_SHARE_READ | FILE_SHARE_WRITE, &sec_none,
 		   OPEN_EXISTING, 0, 0);
 
   if (h == INVALID_HANDLE_VALUE)
@@ -382,7 +478,7 @@ fhandler_console::open (const char *, int flags, mode_t)
   if (GetConsoleMode (get_io_handle (), &cflags))
     {
       cflags |= ENABLE_PROCESSED_INPUT;
-      SetConsoleMode (get_io_handle (), ENABLE_WINDOW_INPUT | cflags);
+      SetConsoleMode (get_io_handle (), ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | cflags);
     }
 
   TTYCLEARF (RSTCONS);
@@ -545,7 +641,7 @@ fhandler_console::input_tcsetattr (int, struct termios const *t)
       tc->ti.c_lflag = 0;
     }
 
-  flags |= ENABLE_WINDOW_INPUT;
+  flags |= ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT;
 
   int res;
   if (flags == oflags)
@@ -903,7 +999,19 @@ fhandler_console::char_command (char c, bool saw_question_mark)
       break;
     case 'h':
     case 'l':
-      /* Ignore */
+      if (!saw_question_mark)
+	break;
+      switch (args_[0])
+	{
+	case 1000: /* Mouse support */
+	  use_mouse = (c == 'h') ? TRUE : FALSE;
+	  syscall_printf("mouse support %sabled", use_mouse ? "en" : "dis");
+	  break;
+
+	default: /* Ignore */
+	  syscall_printf("unknown h/l command: %d", args_[0]);
+	  break;
+	}
       break;
     case 'J':
       switch (args_[0])
