@@ -1,3 +1,7 @@
+2002-12-24    Dmitry Diky <diwil@mail.ru>
+
+	* dis-asm.h: Add msp430 disassembler prototype.
+
 2002-12-27  Chris Demetriou  <cgd@broadcom.com>
 
 	* dis-asm.h (print_mips_disassembler_options): Prototype.

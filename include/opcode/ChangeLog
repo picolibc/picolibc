@@ -1,3 +1,7 @@
+2002-12-24    Dmitry Diky <diwil@mail.ru>
+
+	* msp430.h: New file.  Defines msp430 opcodes.
+
 2002-12-30 D.Venkatasubramanian <dvenkat@noida.hcltech.com>
 
 	* h8300.h: Added some more pseudo opcodes for system call

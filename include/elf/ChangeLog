@@ -1,3 +1,8 @@
+2002-12-24    Dmitry Diky <diwil@mail.ru>
+
+	* common.h: Define msp430 machine numbers.
+	* msp430.h: New file.  Define msp430 relocs.
+
 2002-12-20  DJ Delorie  <dj@redhat.com>
 
 	* xstormy16.h: Add XSTORMY16_12.

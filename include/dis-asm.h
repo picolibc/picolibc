@@ -217,6 +217,7 @@ extern int print_insn_mcore		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_mmix		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_mn10200		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_mn10300		PARAMS ((bfd_vma, disassemble_info*));
+extern int print_insn_msp430		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_ns32k		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_openrisc		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_big_or32          PARAMS ((bfd_vma, disassemble_info*));

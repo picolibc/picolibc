@@ -251,6 +251,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* Ubicom IP2xxx; no ABI */
 #define EM_IP2K_OLD 	        0x8217	
 
+/* MSP430 magic number
+      Written in the absense everything.  */
+#define EM_MSP430_OLD		0x1059
+
+/* TI msp430 micro controller.  */
+#define EM_MSP430      		0x430
+
 /* See the above comment before you add a new EM_* value here.  */
 
 /* Values for e_version.  */
