@@ -189,7 +189,7 @@ __sizemem ()
   volatile unsigned int *probe;
   unsigned int baseorig;
   unsigned int sr;
-  extern void end[];
+  extern char end[];
   char *endptr = (char *)&end;
   int extra;
 
