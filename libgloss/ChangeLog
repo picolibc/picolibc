@@ -1,4 +1,9 @@
-2002-04-17	Joel Sherrill <joel@OARcorp.com>
+2002-04-17  Joel Sherrill <joel@OARcorp.com>
+
+	* debug.h: Change mem_err to volatile to match definition in 
+	debug.c.
+
+2002-04-17  Joel Sherrill <joel@OARcorp.com>
 
 	* sparc/cygmon-salib.c, sparc/erc32-stub.c: Don't use multi-line
 	strings.

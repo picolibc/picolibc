@@ -77,7 +77,7 @@ extern char *gdb_set(char *);			/* Q - set value */
  * indicate to caller of mem2hex or hex2mem that there has been an error. 
  * 0 means ok, 1 means error
  */
-extern int mem_err;
+extern volatile int mem_err;
 
 /*
  * indicate whether the debug vectors have been initialized
