@@ -52,18 +52,22 @@ should be able to change it to fit their needs, learn from it, share
 it with their friends, etc.  The Cygwin license allows you those
 freedoms, so it is free software.
 
-The Cygwin 1.0 product is a "commercial" distribution of cygwin.  As
-such, it includes such non-software things as printed manuals, support,
-and aggregation of useful utilities.  There is nothing (software-wise)
-in there that you can't already get off the net already, if you take the
-time to find and download everything (and usually, build it yourself),
-although the @emph{versions} available for download may be different
-than those distributed with the commercial product.  We test it all to
-make sure it works together, and package it in a convenient form.  We
-consider such testing and packaging to be a valuable service and thus
-charge a fee for it.  Plus, it provides income for the cygwin project so
-we can continue working on it.  For further details about the commercial
-product, see @file{http://www.cygnus.com/cygwin/}.
+The Cygwin 1.0 product was a "commercial" distribution of cygwin.  As
+such, it included such non-software things as printed manuals, support,
+and aggregation of useful utilities.  There was nothing (software-wise)
+in there that you couldn't get off the net already, if you took the time
+to find and download everything (and usually, build it yourself),
+although the @emph{versions} available for download may have beeen
+different than those distributed with the commercial product.  We tested
+it all to make sure it worked together, and packaged it in a convenient
+form.  We considered such testing and packaging to be a valuable service
+and thus charged a fee for it.  Plus, it provided income for the cygwin
+project so we could continue working on it.  However, Red Hat is no
+longer offering Cygwin 1.0 on CD.  There are tentative plans to offer a
+new Cygwin CD sometime in early 2001.  So far, however, there are no
+definite plans.  The latest news about this can be found at
+@file{http://sources.redhat.com/cygwin/cygwin-cd.html}.
+
 
 @section Recent history of the project: What version @emph{is} this, anyway?
 
