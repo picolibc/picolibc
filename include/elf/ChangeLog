@@ -1,3 +1,9 @@
+2000-05-02  H.J. Lu  <hjl@gnu.org>
+
+	* common.h (ELFOSABI_NONE): Renamed from ELFOSABI_SYSV.
+	(ELFOSABI_MODESTO): Defined.
+	(ELFOSABI_OPENBSD): Likewise.
+
 Fri Apr 21 13:20:53 2000  Richard Henderson  <rth@cygnus.com>
 			  David Mosberger  <davidm@hpl.hp.com>
 
