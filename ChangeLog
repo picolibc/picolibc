@@ -98,9 +98,6 @@
 	* configure: Likewise.
 	* configure.in: Likewise.
 
-	config:
-	* acinclude.m4: Allow for PWDCMD to override hardcoded pwd.
-
 2002-05-13  Nathanael Nerode  <neroden@twcny.rr.com>
 
 	* configure.in: Simplify makefile fragment collection.
