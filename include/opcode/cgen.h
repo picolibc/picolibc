@@ -513,6 +513,11 @@ typedef struct cgen_keyword
   
   /* Pointer to null keyword "" entry if present.  */
   const CGEN_KEYWORD_ENTRY *null_entry;
+
+  /* String containing non-alphanumeric characters used
+     in keywords.  
+     At present, the highest number of entries used is 1.  */
+  char nonalpha_chars[8];
 } CGEN_KEYWORD;
 
 /* Structure used for searching.  */

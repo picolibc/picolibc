@@ -1,3 +1,7 @@
+2001-06-14  Geoffrey Keating  <geoffk@redhat.com>
+
+	* cgen.h (cgen_keyword): Add nonalpha_chars field.
+
 2001-05-23  Thiemo Seufer <seufer@csv.ica.uni-stuttgart.de>
 
 	* mips.h (CPU_R12000): Define.
