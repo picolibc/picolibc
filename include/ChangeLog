@@ -32,8 +32,13 @@ Tue Feb  8 17:01:13 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* dis-asm.h: Add prototype for disassembler_usage().
 	Add prototype for arm_disassembler_options().
-	Remvoe prototype for arm_toggle_regnames().
+	Remove prototype for arm_toggle_regnames().
 	Add prototype for parse_arm_disassembler_option().
+
+Sat Jan  1 19:06:52 2000  Hans-Peter Nilsson  <hp@bitrange.com>
+
+	* symcat.h (STRINGX) [!__STDC__ || ALMOST_STDC]: Change "?" to "s"
+	to stringify argument s.
 
 Wed Dec 15 11:22:56 1999  Jeffrey A Law  (law@cygnus.com)
 
@@ -43,6 +48,32 @@ Wed Dec 15 11:22:56 1999  Jeffrey A Law  (law@cygnus.com)
 1999-12-15  Doug Evans  <dje@transmeta.com>
 
 	* dis-asm.h: Enclose in extern "C" ifdef __cplusplus.
+
+1999-12-05  Mark Mitchell  <mark@codesourcery.com>
+
+	* splay-tree.h (struct splay_tree_node): Rename to ...
+	(struct splay_tree_node_s): ... this.
+	(struct splay_tree): Rename to ...
+	(struct splay_tree_s): ... this.
+
+1999-11-30  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+
+	* ansidecl.h (ATTRIBUTE_MALLOC): New macro.
+
+	* libiberty.h (buildargv, dupargv, concat, choose_temp_base,
+	make_temp_file, xmalloc, xcalloc, xstrdup, xmemdup): Add
+	ATTRIBUTE_MALLOC.
+	(xatexit): Remove __GNUC__ check, add ATTRIBUTE_NORETURN.
+
+1999-11-28  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+
+	* libiberty.h: Include stdarg.h when ANSI_PROTOTYPES is defined.
+	(asprintf, vasprintf): Provide declarations.
+
+Wed Nov 10 12:43:21 1999  Philippe De Muyter  <phdm@macqel.be>
+                          Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+
+	* ansidecl.h: Define and test `GCC_VERSION', not `HAVE_GCC_VERSION'.
 
 1999-11-04      Jimmy Guo       <guo@cup.hp.com>
 
@@ -54,13 +85,59 @@ Sun Oct 24 19:11:32 1999  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* sim-d10v.h (SIM_D10V_TS2_DMAP_REGNUM): Define.
 
+1999-10-23 08:51 -0700  Zack Weinberg  <zack@bitmover.com>
+
+	* hashtab.h: Give hash_table_t a struct tag.  Add prototypes
+	for clear_hash_table_slot and traverse_hash_table.  Correct
+	prototype of all_hash_table_collisions.
+
 Sat Oct 23 19:00:13 1999  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* sim-d10v.h: New file.
 
+Fri Oct 15 01:47:51 1999  Vladimir Makarov  <vmakarov@loony.cygnus.com>
+
+	* hashtab.h: New file.
+
+1999-10-10  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+
+	* ansidecl.h (HAVE_GCC_VERSION): New macro.  Use it instead of
+	explicitly testing __GNUC__ and __GNUC_MINOR__.
+	
+	(ATTRIBUTE_PRINTF): Use `__format__', not `format'.
+
+1999-09-25  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+
+	* libiberty.h (make_temp_file):  Add a prototype.
+
+Tue Sep 14 00:35:02 1999  Marc Espie <espie@cvs.openbsd.org>
+
+	* libiberty.h (basename):  OpenBSD has a correct prototype.
+	(xrealloc):  Remove outdated comment.
+
+1999-09-07  Jeff Garzik  <jgarzik@pobox.com>
+
+	* libiberty.h (xmemdup): Add prototype for new function.
+
 1999-09-04  Steve Chamberlain  <sac@pobox.com>
 
 	* dis-asm.h (print_insn_pj): Declare.
+
+1999-09-01  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+
+	* obstack.h (obstack_grow, obstack_grow0): Move (char*) casts
+	in calls to `_obstack_memcpy' from here ...
+
+	(_obstack_memcpy): ... to here, except in the __STDC__ case which
+	doesn't need it.
+
+1999-08-30  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+
+	* libiberty.h (getpwd): Prototype.
+
+1999-08-01  Mark Mitchell  <mark@codesourcery.com>
+
+	* splay-tree.h (splay_tree_insert): Return the new node.
 
 1999-07-11  Ian Lance Taylor  <ian@zembu.com>
 
