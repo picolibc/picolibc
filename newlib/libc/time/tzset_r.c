@@ -190,7 +190,7 @@ _DEFUN (_tzset_r, (reent_ptr),
       n = 0;
       
       if (*tzenv == '/')
-	sscanf (tzenv, "%hu%n:%hu%n:%hu%n", &hh, &n, &mm, &n, &ss, &n);
+	sscanf (tzenv, "/%hu%n:%hu%n:%hu%n", &hh, &n, &mm, &n, &ss, &n);
 
       __tzrule[i].s = ss + SECSPERMIN * mm + SECSPERHOUR  * hh;
       
