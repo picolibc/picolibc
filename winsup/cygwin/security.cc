@@ -106,7 +106,7 @@ convert_string_sid_to_sid (PSID psid, const char *sid_str)
 BOOL
 get_pw_sid (PSID sid, struct passwd *pw)
 {
-  char *sp = strrchr (pw->pw_gecos, ',');
+  char *sp = pw->pw_gecos ? strrchr (pw->pw_gecos, ',') : NULL;
 
   if (!sp)
     return FALSE;

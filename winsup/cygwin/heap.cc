@@ -75,6 +75,7 @@ heap_init ()
 		   brkchunk);
     }
 
+  debug_printf ("heap base %p, heap top %p", brkbase, brktop);
   page_const--;
   malloc_init ();
 }

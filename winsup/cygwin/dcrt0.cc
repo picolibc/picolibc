@@ -662,10 +662,13 @@ dll_crt0_1 ()
 
   if (child_proc_info)
     {
+      cygheap = child_proc_info->cygheap;
+      cygheap_max = child_proc_info->cygheap_max;
       switch (child_proc_info->type)
 	{
 	  case PROC_FORK:
 	  case PROC_FORK1:
+	    cygheap_fixup_in_child (child_proc_info->parent, 0);
 	    alloc_stack (fork_info);
 	    set_myself (mypid);
 	    user_data->forkee = child_proc_info->cygpid;
@@ -677,8 +680,6 @@ dll_crt0_1 ()
 	  case PROC_EXEC:
 	  case PROC_SPAWN:
 	    HANDLE h;
-	    cygheap = spawn_info->cygheap;
-	    cygheap_max = spawn_info->cygheap_max;
 	    cygheap_fixup_in_child (spawn_info->parent, 1);
 	    if (!spawn_info->moreinfo->myself_pinfo ||
 		!DuplicateHandle (hMainProc, spawn_info->moreinfo->myself_pinfo,

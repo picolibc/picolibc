@@ -70,6 +70,7 @@ details. */
 #include "shared_info.h"
 #include "registry.h"
 #include "security.h"
+#include <assert.h>
 
 static int normalize_win32_path (const char *src, char *dst);
 static void slashify (const char *src, char *dst, int trailing_slash_p);
@@ -190,6 +191,7 @@ path_conv::check (const char *src, unsigned opt,
   for (;;)
     {
       MALLOC_CHECK;
+      assert (src);
       char *p = strrchr (src, '/');
       if (p)
 	{
@@ -2163,6 +2165,7 @@ done:
 static __inline char *
 has_suffix (const char *path, const suffix_info *suffixes)
 {
+  assert (path);
   char *ext = strrchr (path, '.');
   if (ext)
     for (const suffix_info *ex = suffixes; ex->name != NULL; ex++)

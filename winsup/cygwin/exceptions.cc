@@ -385,7 +385,7 @@ try_to_debug ()
 static void
 stackdump (EXCEPTION_RECORD *e, CONTEXT *in)
 {
-  char *p;
+  const char *p;
   if (myself->progname[0])
     {
       /* write to progname.stackdump if possible */

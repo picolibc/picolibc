@@ -1,3 +1,26 @@
+Thu Oct 12 17:58:03 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* child_info: Bump child_info "version".
+	(child_info): Move some fields from child_info_spawn to here.
+	* cygheap.cc: Make cygheap pointers NOCOPY.
+	* dcrt0.cc (dll_crt0_1): Copy cygwin heap here regardless of whether
+	we've been forked or execed.
+	* dtable.cc (dtable::fixup_after_fork): Just release close-on-exec fds.
+	* exceptions.cc (stackdump): Respond to C warning.
+	* fork.cc: Reorganize to minimize stack copying.
+	(fork_child): New function.
+	(fork_parent): Ditto.
+	(sync_with_child): Don't suspend the forkee.
+	(sync_with_parent): Ditto.  Make into a function.
+	* heap.cc (heap_init): Add some debugging output.
+	* path.cc (path_conv::check): Add an assertion.
+	(has_suffix): Ditto.
+	* security.cc (get_pw_sid): Defend against NULL.
+	* sigproc.cc (proc_subproc): Fix debugging output.
+	(wait_sig): Ditto.
+	* strace.cc: Make statics NO_COPY throughout.
+	(strace::vsprntf): Defend against NULL.
+
 Thu Oct 12 00:25:29 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* errno.cc (seterrno_from_win_error): Fix debugging output.

@@ -21,7 +21,7 @@ details. */
 #define PROTECT(x) x[sizeof(x)-1] = 0
 #define CHECK(x) if (x[sizeof(x)-1] != 0) { small_printf("array bound exceeded %d\n", __LINE__); ExitProcess(1); }
 
-class strace NO_COPY strace;
+class NO_COPY strace strace;
 
 /* 'twould be nice to declare this in winsup.h but winsup.h doesn't require
    stdarg.h, so we declare it here instead. */
@@ -31,9 +31,9 @@ class strace NO_COPY strace;
 int
 strace::microseconds()
 {
-  static int first_microsec = 0;
-  static long long hires_frequency = 0;
-  static int hires_initted = 0;
+  static NO_COPY int first_microsec = 0;
+  static NO_COPY long long hires_frequency = 0;
+  static NO_COPY int hires_initted = 0;
 
   int microsec;
 
@@ -104,7 +104,7 @@ strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
 {
   int count;
   char fmt[80];
-  static int nonewline = FALSE;
+  static NO_COPY int nonewline = FALSE;
   DWORD err = GetLastError ();
   const char *tn = threadname (0);
   char *pn = __progname ?: myself->progname;
@@ -121,7 +121,9 @@ strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
   else
     {
       char *p, progname[MAX_PATH + 1];
-      if ((p = strrchr (pn, '\\')) != NULL)
+      if (!pn)
+	p = (char *) "*** unknown ***";
+      else if ((p = strrchr (pn, '\\')) != NULL)
 	p++;
       else if ((p = strrchr (pn, '/')) != NULL)
 	p++;
@@ -206,7 +208,7 @@ strace::prntf (unsigned category, const char *func, const char *fmt, ...)
   SetLastError (err);
 }
 
-static const struct tab
+static NO_COPY const struct tab
 {
   int v;
   const char *n;

@@ -305,7 +305,6 @@ proc_subproc (DWORD what, DWORD val)
       pchildren[nchildren] = vchild;
       hchildren[nchildren] = vchild->hProcess;
       ProtectHandle1 (vchild->hProcess, childhProc);
-      nchildren++;
       if (!DuplicateHandle (hMainProc, vchild->hProcess, hMainProc, &vchild->pid_handle,
 		     0, 0, DUPLICATE_SAME_ACCESS))
 	system_printf ("Couldn't duplicate child handle for pid %d, %E", vchild->pid);
@@ -313,6 +312,7 @@ proc_subproc (DWORD what, DWORD val)
       sigproc_printf ("added pid %d to wait list, slot %d, winpid %p, handle %p",
 		  vchild->pid, nchildren, vchild->dwProcessId,
 		  vchild->hProcess);
+      nchildren++;
 
       wake_wait_subproc ();
       break;
@@ -1163,7 +1163,7 @@ wait_sig (VOID *)
   sigcatch_main = CreateSemaphore (&sec_none_nih, 0, MAXLONG, NULL);
   sigcomplete_nonmain = CreateSemaphore (&sec_none_nih, 0, MAXLONG, NULL);
   sigcomplete_main = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
-  sigproc_printf ("sigcatch_nonmain %p", sigcatch_nonmain);
+  sigproc_printf ("sigcatch_nonmain %p, sigcatch_main %p", sigcatch_nonmain, sigcatch_main);
 
   /* Setting dwProcessId flags that this process is now capable of receiving
    * signals.  Prior to this, dwProcessId was set to the windows pid of

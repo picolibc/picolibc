@@ -472,7 +472,9 @@ dtable::fixup_after_fork (HANDLE parent)
   for (size_t i = 0; i < size; i++)
     if ((fh = fds[i]) != NULL)
       {
-	if (fh->get_close_on_exec () || fh->get_need_fork_fixup ())
+	if (fds[i]->get_close_on_exec ())
+	  release (i);
+	else if (fh->get_need_fork_fixup ())
 	  {
 	    debug_printf ("fd %d(%s)", i, fh->get_name ());
 	    fh->fixup_after_fork (parent);

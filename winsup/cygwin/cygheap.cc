@@ -18,8 +18,8 @@
 #include "cygerrno.h"
 #include "sync.h"
 
-void *cygheap = NULL;
-void *cygheap_max = NULL;
+void NO_COPY *cygheap = NULL;
+void NO_COPY *cygheap_max = NULL;
 
 static NO_COPY muto *cygheap_protect = NULL;
 

@@ -12,7 +12,7 @@ details. */
 
 enum
 {
-  PROC_MAGIC = 0xaf08f000,
+  PROC_MAGIC = 0xaf09f000,
   PROC_FORK = PROC_MAGIC + 1,
   PROC_EXEC = PROC_MAGIC + 2,
   PROC_SPAWN = PROC_MAGIC + 3,
@@ -37,6 +37,9 @@ public:
   HANDLE shared_h;
   HANDLE console_h;
   HANDLE parent_alive;	// handle of thread used to track children
+  HANDLE parent;
+  void *cygheap;
+  void *cygheap_max;
 };
 
 class child_info_fork: public child_info
@@ -72,13 +75,9 @@ public:
 class child_info_spawn: public child_info
 {
 public:
-  HANDLE parent;
-  void *cygheap;
-  void *cygheap_max;
   cygheap_exec_info *moreinfo;
 
-  child_info_spawn (): parent (NULL), cygheap (NULL),
-    cygheap_max (NULL), moreinfo (NULL) {}
+  child_info_spawn (): moreinfo (NULL) {}
   ~child_info_spawn ()
   {
     if (parent)
