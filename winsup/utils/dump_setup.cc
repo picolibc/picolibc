@@ -204,7 +204,6 @@ dump_setup (int verbose, char **argv, bool /*check_files*/)
   pkgver *packages;
 
   packages = (pkgver *) calloc (nlines, sizeof(packages[0]));
-  printf ("%-*s%-*s\n", package_len, "Package", version_len, "Version");
   int n;
   for (n = 0; fgets (buf, 4096, fp) && n < nlines;)
     {
@@ -225,7 +224,13 @@ dump_setup (int verbose, char **argv, bool /*check_files*/)
 	  strcpy (packages[n].name , package);
 	  if (f.what[0])
 	    strcat (strcat (packages[n].name, "-"), f.what);
+	  int pkg_len = strlen(packages[n].name);
+	  if (package_len < pkg_len+1)
+	    package_len = pkg_len+1;
 	  packages[n].ver = strdup (f.ver);
+	  int ver_len = strlen(packages[n].ver);
+	  if (version_len < ver_len+1)
+	    version_len = ver_len+1;
 	  n++;
 	  if (strtok (NULL, " ") == NULL)
 	    break;
@@ -234,6 +239,7 @@ dump_setup (int verbose, char **argv, bool /*check_files*/)
 
   qsort (packages, n, sizeof (packages[0]), compar);
 
+  printf ("%-*s%-*s\n", package_len, "Package", version_len, "Version");
   for (int i = 0; i < n; i++)
     printf ("%-*s%-*s\n", package_len, packages[i].name,
 			  version_len, packages[i].ver);
