@@ -1,3 +1,7 @@
+2001-12-04  Alexandre Oliva  <aoliva@redhat.com>
+
+	* d10v.h (OPERAND_NOSP): New macro.
+
 2001-11-29  Alexandre Oliva  <aoliva@redhat.com>
 
 	* d10v.h (OPERAND_SP): New macro.

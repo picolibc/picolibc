@@ -184,6 +184,11 @@ extern const struct d10v_operand d10v_operands[];
 /* Pre-decrement is only supported for SP.  */
 #define OPERAND_SP      (0x100000)
 
+/* Post-decrement is not supported for SP.  Like OPERAND_EVEN, and
+   unlike OPERAND_SP, this flag doesn't prevent the instruction from
+   matching, it only fails validation later on.  */
+#define OPERAND_NOSP    (0x200000)
+
 /* Structure to hold information about predefined registers.  */
 struct pd_reg
 {
