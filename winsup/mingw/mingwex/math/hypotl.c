@@ -1,58 +1,73 @@
 #include <math.h>
+#include <float.h>
+#include <errno.h>
 
-typedef union
-{
-  long double value;
-  struct
-  {
-    unsigned mantissa[2];
-    unsigned sign_exponent : 16;
-    unsigned empty : 16;
-  } parts;
-} ieee_long_double_shape_type;
+/*
+This implementation is based largely on Cephes library
+function cabsl (cmplxl.c), which bears the following notice:
 
+Cephes Math Library Release 2.1:  January, 1989
+Copyright 1984, 1987, 1989 by Stephen L. Moshier
+Direct inquiries to 30 Frost Street, Cambridge, MA 02140
+*/
 
+/*
+   Modified for use in libmingwex.a
+   02 Sept 2002  Danny Smith  <dannysmith@users.sourceforege.net>
+   Calls to ldexpl replaced by logbl and calls to frexpl replaced
+   by scalbnl to avoid duplicated range checks.
+*/
 
-/* Get int from the exponent of a long double.  */
-static __inline__ void
-get_ld_exp (unsigned exp,long double d)
-{
-  ieee_long_double_shape_type u;
-  u.value = d;
-  exp = u.parts.sign_exponent;
-}
-
-/* Set exponent of a long double from an int.  */
-static __inline__ void
-set_ld_exp (long double d,unsigned exp)
-{
-  ieee_long_double_shape_type u;
-  u.value = d;
-  u.parts.sign_exponent = exp;
-  d = u.value;
-}
+extern long double __INFL;
+#define PRECL 32
 
 long double
 hypotl (long double x, long double y)
 {
-  unsigned exx = 0U;
-  unsigned eyy = 0U;
-  unsigned  scale;
+  int exx;
+  int eyy;
+  int  scale;
   long double xx =fabsl(x);
   long double yy =fabsl(y);
   if (!isfinite(xx) || !isfinite(yy))
     return  xx + yy; /* Return INF or NAN. */
 
-  /* Scale to avoid overflow.*/
-  get_ld_exp (exx, xx);
-  get_ld_exp (eyy, yy);	
-  scale = (exx > eyy ? exx : eyy);
-  if (scale == 0)
-    return 0.0L;		
-  set_ld_exp (xx, exx - scale);
-  set_ld_exp (yy, eyy - scale);	
-  xx = sqrtl(xx * xx  + yy * yy);
-  get_ld_exp (exx,xx);
-  set_ld_exp (xx, exx + scale);
-  return xx;
+  if (xx == 0.0L)
+     return yy;
+  if (yy == 0.0L)
+     return xx;
+
+  /* Get exponents */
+  exx =  logbl (xx);
+  eyy =  logbl (yy);
+
+  /* Check if large differences in scale */
+  scale = exx - eyy;
+  if ( scale > PRECL)
+     return xx;
+  if ( scale < -PRECL)
+     return yy;
+
+  /* Exponent of approximate geometric mean (x 2) */
+  scale = (exx + eyy) >> 1;
+
+  /*  Rescale: Geometric mean is now about 2 */  
+  x = scalbnl(xx, -scale);
+  y = scalbnl(yy, -scale);
+
+  xx = sqrtl(x * x  + y * y);
+
+  /* Check for overflow and underflow */
+  exx = logbl(xx);   
+  exx += scale;
+    if (exx > LDBL_MAX_EXP)
+    {
+      errno = ERANGE; 
+      return __INFL;
+    }
+  if (exx < LDBL_MIN_EXP)
+    return 0.0L;
+
+  /* Undo scaling */
+  return (scalbnl (xx, scale));
 }
