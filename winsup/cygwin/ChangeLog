@@ -1,3 +1,8 @@
+2004-02-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygerrno.h (set_errno): Replace semicolon with comma in non-DEBUGGING
+	version to avoid compile time error.
+
 2004-02-01  Christopher Faylor  <cgf@redhat.com>
 
 	* cygerrno.h (set_errno): Set global errno whenever setting thread

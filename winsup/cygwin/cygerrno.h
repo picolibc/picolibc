@@ -18,7 +18,7 @@ int __stdcall geterrno_from_win_error (DWORD code, int deferrno) __attribute__ (
 #define __seterrno_from_win_error(val) seterrno_from_win_error (__FILE__, __LINE__, val)
 
 #ifndef DEBUGGING
-#define set_errno(val) (errno = (val); _impure_ptr->_errno = (val))
+#define set_errno(val) (errno = (val), _impure_ptr->_errno = (val))
 #else
 int __stdcall __set_errno (const char *ln, int ln, int val) __attribute ((regparm(3)));
 #define set_errno(val) __set_errno (__PRETTY_FUNCTION__, __LINE__, (val))
