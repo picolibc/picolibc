@@ -1,3 +1,11 @@
+2003-03-19  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	*lib/ndis.def (NdisAllocateMemory): Correct stdcall suffix.
+	Thanks to: Vladimir Michl <michlv@users.sourceforge.net>
+	(NdisUpdateSharedMemory): Likewise.
+	(NdisMFreeSharedMemory: Likewise. 
+	(NdisMMapIoSpace: Likewise.
+
 2003-03-18  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/lmaccess.h (UF_LOCKOUT): Correct name from UF_LOCK.

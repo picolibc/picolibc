@@ -13,7 +13,7 @@ NdisAdjustBufferLength@8
 NdisAllocateBuffer@20
 NdisAllocateBufferPool@12
 ;NdisAllocateFromBlockPool
-NdisAllocateMemory@16
+NdisAllocateMemory@20
 NdisAllocateMemoryWithTag@12
 NdisAllocatePacket@12
 NdisAllocatePacketPool@16
@@ -173,14 +173,14 @@ NdisMDeregisterInterrupt@4
 NdisMDeregisterIoPortRange@16
 NdisMFlushLog@4
 NdisMFreeMapRegisters@4
-NdisMFreeSharedMemory@20
+NdisMFreeSharedMemory@24
 NdisMGetDeviceProperty@24
 ;NdisMGetDmaAlignment
 ;NdisMIndicateStatus
 ;NdisMIndicateStatusComplete
 NdisMInitializeScatterGatherDma@12
 ;NdisMInitializeTimer
-NdisMMapIoSpace@16
+NdisMMapIoSpace@20
 ;NdisMPciAssignResources
 NdisMPromoteMiniport@4
 NdisMQueryAdapterInstanceName@8
@@ -266,7 +266,7 @@ NdisUnchainBufferAtFront@8
 NdisUnicodeStringToAnsiString@8
 ;NdisUnmapFile
 NdisUpcaseUnicodeString@8
-NdisUpdateSharedMemory@16
+NdisUpdateSharedMemory@20
 ;NdisWaitEvent
 NdisWriteConfiguration@16
 NdisWriteErrorLogEntry
