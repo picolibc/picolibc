@@ -70,7 +70,9 @@ uname (struct utsname *name)
 	      break;
 	    case winNT:
 	      /* wProcessorLevel only valid in Windows NT */
-	      __small_sprintf (name->machine, "i%d86", sysinfo.wProcessorLevel);
+	      __small_sprintf (name->machine, "i%d86",
+			       sysinfo.dwProcessorType > 6 ?
+				6 : sysinfo.dwProcessorType);
 	      break;
 	    default:
 	      strcpy (name->machine, "i386");

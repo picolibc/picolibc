@@ -1,3 +1,7 @@
+Sun Apr 15 16:36:27 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* uname.c (uname): Default n in in86 to 6 if Windows returns > 6.
+
 Sun Apr 15 15:56:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* path.cc (add_ext_from_sym): Redefine to call `add_ext_from_sym_'.
