@@ -1,3 +1,18 @@
+2003-05-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h: Rename FH_W95LSBUG flag to FH_LSEEKED.
+	(fhandler_base::set_did_lseek): Rename from set_check_win95_lseek_bug.
+	(fhandler_base::get_did_lseek): Rename from get_check_win95_lseek_bug.
+	(fhandler_base::set_fs_flags): New method.
+	(fhandler_base::get_fs_flags): Ditto.
+	* fhandler.cc (fhandler_base::write): Make 64 bit clean.  Convert file
+	to a "sparse" file when writing after a long lseek (>64K) beyond EOF.
+	(fhandler_base::lseek): Call set_did_lseek() instead of
+	set_check_win95_lseek_bug().
+	(fhandler_base::fhandler_base): Initialize fs_flags to 0.
+	* fhandler_disk_file.cc (fhandler_disk_file::open): Don't create files  
+	as "sparse" unconditionally.  Set fs_flags member.
+
 2003-05-25  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* autoload.cc (GetDiskFreeSpaceEx): Add.
