@@ -1,5 +1,9 @@
 2004-03-12  Michal Ludvig  <mludvig@suse.cz>
 
+	* i386.h (i386_optab): Added xstore as an alias for xstorerng.
+
+2004-03-12  Michal Ludvig  <mludvig@suse.cz>
+
 	* i386.h (i386_optab): Added xstore/xcrypt insns.
 
 2004-02-09  Anil Paranjpe  <anilp1@KPITCummins.com>
