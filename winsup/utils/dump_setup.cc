@@ -18,7 +18,6 @@ details. */
 #include "path.h"
 
 static int package_len = 20;
-static int version_len = 20;
 
 
 typedef struct
@@ -159,7 +158,7 @@ compar (const void *a, const void *b)
 {
   const pkgver *pa = (const pkgver *) a;
   const pkgver *pb = (const pkgver *) b;
-  return strcmp (pa->name, pb->name);
+  return strcasecmp (pa->name, pb->name);
 }
 }
 
@@ -220,17 +219,13 @@ dump_setup (int verbose, char **argv, bool /*check_files*/)
 	  int len = strlen (package);
 	  if (f.what[0])
 	    len += strlen (f.what) + 1;
+	  if (len > package_len)
+	    package_len = len;
 	  packages[n].name = (char *) malloc (len + 1);
 	  strcpy (packages[n].name , package);
 	  if (f.what[0])
 	    strcat (strcat (packages[n].name, "-"), f.what);
-	  int pkg_len = strlen(packages[n].name);
-	  if (package_len < pkg_len+1)
-	    package_len = pkg_len+1;
 	  packages[n].ver = strdup (f.ver);
-	  int ver_len = strlen(packages[n].ver);
-	  if (version_len < ver_len+1)
-	    version_len = ver_len+1;
 	  n++;
 	  if (strtok (NULL, " ") == NULL)
 	    break;
@@ -239,10 +234,9 @@ dump_setup (int verbose, char **argv, bool /*check_files*/)
 
   qsort (packages, n, sizeof (packages[0]), compar);
 
-  printf ("%-*s%-*s\n", package_len, "Package", version_len, "Version");
+  printf ("%-*s %s\n", package_len, "Package", "Version");
   for (int i = 0; i < n; i++)
-    printf ("%-*s%-*s\n", package_len, packages[i].name,
-			  version_len, packages[i].ver);
+    printf ("%-*s %s\n", package_len, packages[i].name, packages[i].ver);
   fclose (fp);
 
   return;

@@ -1,3 +1,9 @@
+2003-02-07  Christopher Faylor  <cgf@redhat.com>
+
+	* dump_setup.cc (compar): Use case insensitive comparisons.
+	(dump_setup): Calculate package_len based on already used "len".  Don't
+	bother with version_len.
+
 2003-02-07  Igor Pechtchanski <pechtcha@cs.nyu.edu>
 
 	* dump_setup.cc (dump_setup): Compute the longest package name
