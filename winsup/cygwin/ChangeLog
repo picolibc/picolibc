@@ -1,3 +1,51 @@
+2003-09-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc: Restructure. Add, remove and rewrite comments throughout
+	for better readability.  Change function names for better
+	understanding.
+	(MAP_SET): Accomodate name change from map_map_ to page_map_.
+	(MAP_CLR): Ditto.
+	(MAP_ISSET): Ditto.
+	(mmap_record::page_map_): Rename from page_map_.
+	(mmap_record::get_map): Remove.
+	(mmap_record::alloc_page_map): Rename from alloc_map. Return bool
+	indicating success of cygheap memory allocation.
+	(mmap_record::free_page_map): Rename from free_map.
+	(mmap_record::fixup_page_map): Rename from fixup_map.
+	(mmap_record::find_unused_pages): Rename from find_empty.
+	(mmap_record::map_pages): Rename from map_map.
+	(mmap_record::unmap_pages): Rename from unmap_map.
+	(class list): Make all class members private.
+	(list::list): Remove.
+	(list::~list): Remove.
+	(list::get_fd): New attribute reader.
+	(list::get_hash): Ditto.
+	(list::get_record): Ditto.
+	(list::add_record): Manage all allocation for mmap_records.  Check
+	for failed memory allocation and return NULL if so.
+	(list::set): New function.
+	(list::del_record): Rename from erase. Return true if last mmap_record
+	has been deleted, false otherwise. Check for legal incoming index
+	value.
+	(list::erase): Remove erase/0.
+	(list::search_record): Rename from match.
+	(map::map): Remove.
+	(map::~map): Remove.
+	(map::add_list): Manage all allocation for lists.  Check for failed
+	memory allocation and return NULL if so.
+	(map::get_list): New method.
+	(map::del_list): Rename from erase. Check for legal incoming index
+	value.
+	(mmap64): Check for failed mmap_record memory allocation.  Return
+	with MAP_FAILED and errno set to ENOMEM if so.
+	(munmap): Rearrange loop using new list and mmap_record accessor
+	functions.  Rename loop index variables for better understanding.
+	Check if list can be deleted after last mmap_record in it has been
+	deleted.
+	(msync): Rearrange loop using new list and mmap_record accessor
+	functions.  Rename loop index variables for better understanding.
+	(fixup_mmaps_after_fork): Ditto.
+
 2003-09-03  Christopher Faylor  <cgf@redhat.com>
 
 	* cxx.cc (new): Fix formatting.  Just return result of ccalloc rather
