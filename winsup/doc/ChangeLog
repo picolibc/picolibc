@@ -1,3 +1,11 @@
+Fri Mar  2 12:42:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* cygwinenv.sgml: Add text for `winsymlinks' option.
+	* how-api.texinfo: Add text to explain new symlinks==shortcuts
+	and the CYGWIN setting `(no)winsymlinks'.
+	* how-using.texinfo: Add text that Cygwin now treats shortcuts
+	as symlinks.
+
 2001-02-07  Eric M. Monsler  <emonsler@beamreachnetworks.com>
 
 	* setup2.sgml: Add docs about domain accounts.

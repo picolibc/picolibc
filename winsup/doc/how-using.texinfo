@@ -98,6 +98,8 @@ or
 
 @subsection Why can't I cd into a shortcut to a directory?
 
+This is only valid up to but not including version 1.3.0:
+
 Cygwin does not follow MS Windows Explorer Shortcuts (*.lnk files).  It
 sees a shortcut as a regular file and this you cannot "cd" into it.
 
@@ -105,6 +107,8 @@ Some people have suggested replacing the current symbolic link scheme
 with shortcuts.  The major problem with this is that .LNK files would
 then be used to symlink Cygwin paths that may or may not be valid
 under native Win32 non-Cygwin applications such as Explorer.
+
+Since version 1.3.0, Cygwin treats shortcuts as symlinks.
 
 @subsection I'm having basic problems with find.  Why?
 

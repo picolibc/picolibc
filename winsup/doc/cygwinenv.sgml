@@ -93,5 +93,11 @@ expected instead of ^Z, and is settable via stty.
 This option must be specified before starting a Cygwin shell 
 and it cannot be changed in the shell.</para>
 </listitem>
+<listitem>
+<para><FirstTerm>(no)winsymlinks</FirstTerm> - if set, Cygwin creates
+symlinks as Windows shortcuts with a special header and the R/O attribute
+set. If not set, Cygwin creates symlinks as plain files with a magic number,
+a path and the system attribute set. Defaults to set.</para>
+</listitem>
 </itemizedlist>
 </sect1>

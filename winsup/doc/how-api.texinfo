@@ -141,15 +141,36 @@ Beware: globbing uses @code{malloc}.  If your application defines
 
 @subsection How do symbolic links work?
 
-Cygwin generates link files with a magic header.  When
-you open a file or directory that is a link to somewhere else, it
-opens the file or directory listed in the magic header.  Because we
-don't want to have to open every referenced file to check symlink
-status, Cygwin marks symlinks with the system attribute.  Files
-without the system attribute are not checked.  Because remote samba
-filesystems do not enable the system attribute by default, symlinks do
-not work on network drives unless you explicitly enable this
-attribute.
+Cygwin knows of two ways to create symlinks.
+
+The old method is the only valid one up to but not including version 1.3.0.
+If it's enabled (from 1.3.0 on by setting `nowinsymlinks' in the environment
+variable CYGWIN) Cygwin generates link files with a magic header.  When you
+open a file or directory that is a link to somewhere else, it opens the file
+or directory listed in the magic header.  Because we don't want to have to
+open every referenced file to check symlink status, Cygwin marks symlinks
+with the system attribute.  Files without the system attribute are not
+checked.  Because remote samba filesystems do not enable the system
+attribute by default, symlinks do not work on network drives unless you
+explicitly enable this attribute.
+
+The new method which is introduced with Cygwin version 1.3.0 is enabled
+by default or if `winsymlinks' is set in the environment variable CYGWIN.
+Using this method, Cygwin generates symlinks by creating Windows shortcuts.
+Cygwin created shortcuts have a special header (which is in that way never
+created by Explorer) and the R/O attribute set.  A DOS path is stored in
+the shortcut as usual and the description entry is used to store the POSIX
+path.  While the POSIX path is stored as is, the DOS path has perhaps to be
+rearranged to result in a valid path.  This may result in a divergence
+between the DOS and the POSIX path when symlinks are moved crossing mount
+points.  When a user changes the shortcut, this will be detected by Cygwin
+and it will only use the DOS path then.  While Cygwin shortcuts are shown
+without the ".lnk" suffix in `ls' output, non-Cygwin shortcuts are shown
+with the suffix.  However, both are treated as symlinks.
+
+Both, the old and the new symlinks can live peacefully together since Cygwin
+treats both as symlinks regardless of the setting of `(no)winsymlinks' in
+the environment variable CYGWIN.
 
 @subsection Why do some files, which are not executables have the 'x' type.
 
