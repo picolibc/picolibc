@@ -1,3 +1,10 @@
+Fri Aug 11 14:47:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* poll.cc: Add bounds checking for file descriptors. Return POLLNVAL
+	if fd is invalid. Return POLLERR for each valid fd if cygwin_select
+	returned with error.
+	include/sys/poll.h: Change POLLERR comment according to above change.
+
 Thu Aug 10 21:54:29 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* syslog.cc (syslog): Use a less malloc-intensive method for allocating
