@@ -1,5 +1,9 @@
 2004-08-07  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/wchar.h: Reorganize, avoid including other headers.
+
+2004-08-07  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/string.h (memchr, memcmp, strchr, strcmp, strcspn)
 	(strlen, strncmp, strpbrk, strrchr, strspn, strstr): Add pure
         attribute.

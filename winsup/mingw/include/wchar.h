@@ -17,23 +17,45 @@
 /* All the headers include this file. */
 #include <_mingw.h>
 
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <sys/types.h>
-#include <stdint.h>
+#ifndef RC_INVOKED
 
 #define __need_size_t
 #define __need_wint_t
 #define __need_wchar_t
-#ifndef RC_INVOKED
+#define __need_NULL
 #include <stddef.h>
+
+#ifndef __VALIST
+#if defined __GNUC__ && __GNUC__ >= 3
+#define __need___va_list
+#include <stdarg.h>
+#define __VALIST __builtin_va_list
+#else
+#define __VALIST char*
+#endif
+#endif
+
 #endif /* Not RC_INVOKED */
+
+/*
+ * MSDN says that isw* char classifications are in wchar.h and wctype.h.
+ * Although the wctype names are ANSI, their exposure in this header is
+ * not.
+ */
+#include <wctype.h>
+
+#ifndef	__STRICT_ANSI__
+/* This is necessary to support the the non-ANSI wchar declarations
+   here. */
+#include <sys/types.h>
+#endif /* __STRICT_ANSI__ */
 
 #define WCHAR_MIN	0
 #define WCHAR_MAX	((wchar_t)-1)
+
+#ifndef WEOF
+#define	WEOF	(wchar_t)(0xFFFF)
+#endif
 
 #ifndef RC_INVOKED
 
@@ -41,81 +63,80 @@
 extern "C" {
 #endif
 
-#ifndef	__STRICT_ANSI__
+#ifndef _FILE_DEFINED  /* Also in stdio.h */
+#define	_FILE_DEFINED
+typedef struct _iobuf
+{
+	char*	_ptr;
+	int	_cnt;
+	char*	_base;
+	int	_flag;
+	int	_file;
+	int	_charbuf;
+	int	_bufsiz;
+	char*	_tmpfname;
+} FILE;
+#endif	/* Not _FILE_DEFINED */
 
-#ifndef	_FSIZE_T_DEFINED
-typedef	unsigned long	_fsize_t;
-#define _FSIZE_T_DEFINED
+#ifndef _TIME_T_DEFINED  /* Also in time.h */
+typedef long time_t;
+#define _TIME_T_DEFINED
 #endif
 
-#ifndef _WFINDDATA_T_DEFINED
-struct _wfinddata_t {
-	unsigned	attrib;
-	time_t		time_create;	/* -1 for FAT file systems */
-	time_t		time_access;	/* -1 for FAT file systems */
-	time_t		time_write;
-	_fsize_t	size;
-	wchar_t		name[FILENAME_MAX];	/* may include spaces. */
-};
-struct _wfinddatai64_t {
-	unsigned    attrib;
-	time_t      time_create;
-	time_t      time_access;
-	time_t      time_write;
-	__int64     size;
-	wchar_t     name[FILENAME_MAX];
-};
-struct __wfinddata64_t {
-        unsigned    attrib;
-        __time64_t  time_create;    
-        __time64_t  time_access;
-        __time64_t  time_write;
-        _fsize_t    size;
-        wchar_t     name[FILENAME_MAX];
-};
-#define _WFINDDATA_T_DEFINED
+#ifndef _TM_DEFINED /* Also in time.h */
+struct tm {
+        int tm_sec;     /* seconds after the minute - [0,59] */
+        int tm_min;     /* minutes after the hour - [0,59] */
+        int tm_hour;    /* hours since midnight - [0,23] */
+        int tm_mday;    /* day of the month - [1,31] */
+        int tm_mon;     /* months since January - [0,11] */
+        int tm_year;    /* years since 1900 */
+        int tm_wday;    /* days since Sunday - [0,6] */
+        int tm_yday;    /* days since January 1 - [0,365] */
+        int tm_isdst;   /* daylight savings time flag */
+        };
+#define _TM_DEFINED
 #endif
-
-/* Wide character versions. Also defined in io.h. */
-/* CHECK: I believe these only exist in MSVCRT, and not in CRTDLL. Also
-   applies to other wide character versions? */
-#if !defined (_WIO_DEFINED)
-#if defined (__MSVCRT__)
-_CRTIMP int __cdecl	 _waccess (const wchar_t*, int);
-_CRTIMP int __cdecl	_wchmod (const wchar_t*, int);
-_CRTIMP int __cdecl	_wcreat (const wchar_t*, int);
-_CRTIMP long __cdecl	_wfindfirst (const wchar_t*, struct _wfinddata_t *);
-_CRTIMP int __cdecl	_wfindnext (long, struct _wfinddata_t *);
-_CRTIMP int __cdecl	_wunlink (const wchar_t*);
-_CRTIMP int __cdecl	_wopen (const wchar_t*, int, ...);
-_CRTIMP int __cdecl	_wsopen (const wchar_t*, int, int, ...);
-_CRTIMP wchar_t* __cdecl _wmktemp (wchar_t*);
-_CRTIMP long __cdecl	_wfindfirsti64 (const wchar_t*, struct _wfinddatai64_t*);
-_CRTIMP int __cdecl 	_wfindnexti64 (long, struct _wfinddatai64_t*);
-#if __MSVCRT_VERSION__ >= 0x0601
-_CRTIMP intptr_t __cdecl _wfindfirst64(const wchar_t*, struct __wfinddata64_t*); 
-_CRTIMP intptr_t __cdecl _wfindnext64(intptr_t, struct __wfinddata64_t*);
-#endif
-#endif /* defined (__MSVCRT__) */
-#define _WIO_DEFINED
-#endif /* _WIO_DEFINED */
 
 #ifndef _WSTDIO_DEFINED
-/* also in stdio.h - keep in sync */
+/*  Also in stdio.h - keep in sync */
 _CRTIMP int __cdecl	fwprintf (FILE*, const wchar_t*, ...);
 _CRTIMP int __cdecl	wprintf (const wchar_t*, ...);
 _CRTIMP int __cdecl	swprintf (wchar_t*, const wchar_t*, ...);
 _CRTIMP int __cdecl	_snwprintf (wchar_t*, size_t, const wchar_t*, ...);
-_CRTIMP int __cdecl	vfwprintf (FILE*, const wchar_t*, __VA_LIST);
-_CRTIMP int __cdecl	vwprintf (const wchar_t*, __VA_LIST);
-_CRTIMP int __cdecl	vswprintf (wchar_t*, const wchar_t*, __VA_LIST);
-_CRTIMP int __cdecl	_vsnwprintf (wchar_t*, size_t, const wchar_t*, __VA_LIST);
+_CRTIMP int __cdecl	vfwprintf (FILE*, const wchar_t*, __VALIST);
+_CRTIMP int __cdecl	vwprintf (const wchar_t*, __VALIST);
+_CRTIMP int __cdecl	vswprintf (wchar_t*, const wchar_t*, __VALIST);
+_CRTIMP int __cdecl	_vsnwprintf (wchar_t*, size_t, const wchar_t*, __VALIST);
 _CRTIMP int __cdecl	fwscanf (FILE*, const wchar_t*, ...);
 _CRTIMP int __cdecl	wscanf (const wchar_t*, ...);
 _CRTIMP int __cdecl	swscanf (const wchar_t*, const wchar_t*, ...);
 _CRTIMP wint_t __cdecl	fgetwc (FILE*);
 _CRTIMP wint_t __cdecl	fputwc (wchar_t, FILE*);
 _CRTIMP wint_t __cdecl	ungetwc (wchar_t, FILE*);
+
+#ifdef __MSVCRT__ 
+_CRTIMP wchar_t* __cdecl fgetws (wchar_t*, int, FILE*);
+_CRTIMP int __cdecl	fputws (const wchar_t*, FILE*);
+_CRTIMP wint_t __cdecl	getwc (FILE*);
+_CRTIMP wint_t __cdecl	getwchar (void);
+_CRTIMP wint_t __cdecl	putwc (wint_t, FILE*);
+_CRTIMP wint_t __cdecl	putwchar (wint_t);
+#ifndef __STRICT_ANSI__
+_CRTIMP wchar_t* __cdecl _getws (wchar_t*);
+_CRTIMP int __cdecl	_putws (const wchar_t*);
+_CRTIMP FILE* __cdecl	_wfdopen(int, wchar_t *);
+_CRTIMP FILE* __cdecl	_wfopen (const wchar_t*, const wchar_t*);
+_CRTIMP FILE* __cdecl	_wfreopen (const wchar_t*, const wchar_t*, FILE*);
+_CRTIMP FILE* __cdecl	_wfsopen (const wchar_t*, const wchar_t*, int);
+_CRTIMP wchar_t* __cdecl _wtmpnam (wchar_t*);
+_CRTIMP wchar_t* __cdecl _wtempnam (const wchar_t*, const wchar_t*);
+_CRTIMP int __cdecl	_wrename (const wchar_t*, const wchar_t*);
+_CRTIMP int __cdecl	_wremove (const wchar_t*);
+_CRTIMP void __cdecl	_wperror (const wchar_t*);
+_CRTIMP FILE* __cdecl	_wpopen (const wchar_t*, const wchar_t*);
+#endif  /* __STRICT_ANSI__ */
+#endif	/* __MSVCRT__ */
 
 #ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
 int __cdecl snwprintf (wchar_t* s, size_t n, const wchar_t*  format, ...);
@@ -129,29 +150,205 @@ int __cdecl vswscanf (const wchar_t * __restrict__,
 		       const wchar_t * __restrict__, __VALIST);
 #endif
 
-#ifdef __MSVCRT__ 
-_CRTIMP wchar_t* __cdecl fgetws (wchar_t*, int, FILE*);
-_CRTIMP int __cdecl	fputws (const wchar_t*, FILE*);
-_CRTIMP wint_t __cdecl	getwc (FILE*);
-_CRTIMP wint_t __cdecl  getwchar (void);
-_CRTIMP wchar_t* __cdecl _getws (wchar_t*);
-_CRTIMP wint_t __cdecl	putwc (wint_t, FILE*);
-_CRTIMP int __cdecl	_putws (const wchar_t*);
-_CRTIMP wint_t __cdecl	putwchar (wint_t);
-_CRTIMP FILE* __cdecl	_wfdopen(int, wchar_t *);
-_CRTIMP FILE* __cdecl	_wfopen (const wchar_t*, const wchar_t*);
-_CRTIMP FILE* __cdecl	_wfreopen (const wchar_t*, const wchar_t*, FILE*);
-_CRTIMP FILE* __cdecl   _wfsopen (const wchar_t*, const wchar_t*, int);
-_CRTIMP wchar_t* __cdecl _wtmpnam (wchar_t*);
-_CRTIMP wchar_t* __cdecl _wtempnam (const wchar_t*, const wchar_t*);
-_CRTIMP int __cdecl	_wrename (const wchar_t*, const wchar_t*);
-_CRTIMP int __cdecl	_wremove (const wchar_t*)
-
-_CRTIMP FILE* __cdecl	_wpopen (const wchar_t*, const wchar_t*)
-_CRTIMP void __cdecl	_wperror (const wchar_t*);
-#endif	/* __MSVCRT__ */
 #define _WSTDIO_DEFINED
 #endif /* _WSTDIO_DEFINED */
+
+#ifndef _WSTDLIB_DEFINED /* also declared in stdlib.h */
+_CRTIMP long __cdecl 		wcstol (const wchar_t*, wchar_t**, int);
+_CRTIMP unsigned long __cdecl	wcstoul (const wchar_t*, wchar_t**, int);
+_CRTIMP double __cdecl		wcstod (const wchar_t*, wchar_t**);
+#if !defined __NO_ISOCEXT /* extern stub in static libmingwex.a */
+__CRT_INLINE float __cdecl wcstof( const wchar_t *nptr, wchar_t **endptr)
+{  return (wcstod(nptr, endptr)); }
+long double __cdecl wcstold (const wchar_t * __restrict__, wchar_t ** __restrict__);
+#endif /* __NO_ISOCEXT */
+#define  _WSTDLIB_DEFINED
+#endif /* _WSTDLIB_DEFINED */
+
+#ifndef _WTIME_DEFINED
+#ifndef __STRICT_ANSI__
+#ifdef __MSVCRT__
+/* wide function prototypes, also declared in time.h */
+_CRTIMP wchar_t* __cdecl	_wasctime (const struct tm*);
+_CRTIMP wchar_t* __cdecl	_wctime (const time_t*);
+_CRTIMP wchar_t* __cdecl	_wstrdate (wchar_t*);
+_CRTIMP wchar_t* __cdecl	_wstrtime (wchar_t*);
+#if __MSVCRT_VERSION__ >= 0x601
+_CRTIMP wchar_t* __cdecl	_wctime64 (const __time64_t*);
+#endif
+#endif /* __MSVCRT__ */
+#endif /* __STRICT_ANSI__ */
+_CRTIMP size_t __cdecl	wcsftime (wchar_t*, size_t, const wchar_t*, const struct tm*);
+#define _WTIME_DEFINED
+#endif /* _WTIME_DEFINED */ 
+
+
+#ifndef _WSTRING_DEFINED
+/*
+ * Unicode versions of the standard string calls.
+ * Also in string.h.
+ */
+_CRTIMP wchar_t* __cdecl wcscat (wchar_t*, const wchar_t*);
+_CRTIMP wchar_t* __cdecl wcschr (const wchar_t*, wchar_t);
+_CRTIMP int __cdecl	wcscmp (const wchar_t*, const wchar_t*);
+_CRTIMP int __cdecl	wcscoll (const wchar_t*, const wchar_t*);
+_CRTIMP wchar_t* __cdecl wcscpy (wchar_t*, const wchar_t*);
+_CRTIMP size_t __cdecl	wcscspn (const wchar_t*, const wchar_t*);
+/* Note:  _wcserror requires __MSVCRT_VERSION__ >= 0x0700.  */
+_CRTIMP size_t __cdecl	wcslen (const wchar_t*);
+_CRTIMP wchar_t* __cdecl wcsncat (wchar_t*, const wchar_t*, size_t);
+_CRTIMP int __cdecl	wcsncmp(const wchar_t*, const wchar_t*, size_t);
+_CRTIMP wchar_t* __cdecl wcsncpy(wchar_t*, const wchar_t*, size_t);
+_CRTIMP wchar_t* __cdecl wcspbrk(const wchar_t*, const wchar_t*);
+_CRTIMP wchar_t* __cdecl wcsrchr(const wchar_t*, wchar_t);
+_CRTIMP size_t __cdecl	wcsspn(const wchar_t*, const wchar_t*);
+_CRTIMP wchar_t* __cdecl wcsstr(const wchar_t*, const wchar_t*);
+_CRTIMP wchar_t* __cdecl wcstok(wchar_t*, const wchar_t*);
+_CRTIMP size_t __cdecl	wcsxfrm(wchar_t*, const wchar_t*, size_t);
+
+#ifndef	__STRICT_ANSI__
+/*
+ * Unicode versions of non-ANSI functions provided by CRTDLL.
+ */
+
+/* NOTE: _wcscmpi not provided by CRTDLL, this define is for portability */
+#define		_wcscmpi	_wcsicmp
+
+_CRTIMP wchar_t* __cdecl _wcsdup (const wchar_t*);
+_CRTIMP int __cdecl	_wcsicmp (const wchar_t*, const wchar_t*);
+_CRTIMP int __cdecl	_wcsicoll (const wchar_t*, const wchar_t*);
+_CRTIMP wchar_t* __cdecl _wcslwr (wchar_t*);
+_CRTIMP int __cdecl	_wcsnicmp (const wchar_t*, const wchar_t*, size_t);
+_CRTIMP wchar_t* __cdecl _wcsnset (wchar_t*, wchar_t, size_t);
+_CRTIMP wchar_t* __cdecl _wcsrev (wchar_t*);
+_CRTIMP wchar_t* __cdecl _wcsset (wchar_t*, wchar_t);
+_CRTIMP wchar_t* __cdecl _wcsupr (wchar_t*);
+
+#ifdef __MSVCRT__
+_CRTIMP int __cdecl  _wcsncoll(const wchar_t*, const wchar_t*, size_t);
+_CRTIMP int   __cdecl _wcsnicoll(const wchar_t*, const wchar_t*, size_t);
+#if __MSVCRT_VERSION__ >= 0x0700
+_CRTIMP  wchar_t* __cdecl _wcserror(int);
+_CRTIMP  wchar_t* __cdecl __wcserror(const wchar_t*);
+#endif
+#endif
+
+#ifndef	_NO_OLDNAMES
+/* NOTE: There is no _wcscmpi, but this is for compatibility. */
+__CRT_INLINE int __cdecl
+wcscmpi (const wchar_t * __ws1, const wchar_t * __ws2)
+  {return _wcsicmp (__ws1, __ws2);}
+_CRTIMP wchar_t* __cdecl wcsdup (wchar_t*);
+_CRTIMP int __cdecl	wcsicmp (const wchar_t*, const wchar_t*);
+_CRTIMP int __cdecl	wcsicoll (const wchar_t*, const wchar_t*);
+_CRTIMP wchar_t* __cdecl wcslwr (wchar_t*);
+_CRTIMP int __cdecl	wcsnicmp (const wchar_t*, const wchar_t*, size_t);
+_CRTIMP wchar_t* __cdecl wcsnset (wchar_t*, wchar_t, size_t);
+_CRTIMP wchar_t* __cdecl wcsrev (wchar_t*);
+_CRTIMP wchar_t* __cdecl wcsset (wchar_t*, wchar_t);
+_CRTIMP wchar_t* __cdecl wcsupr (wchar_t*);
+#endif	/* Not _NO_OLDNAMES */
+
+#endif	/* Not strict ANSI */
+
+#define _WSTRING_DEFINED
+#endif  /* _WSTRING_DEFINED */
+
+/* These are resolved by -lmsvcp60 */
+/* If you don't have msvcp60.dll in your windows system directory, you can
+   easily obtain it with a search from your favorite search engine. */
+#ifndef __STRICT_ANSI__
+typedef wchar_t _Wint_t;
+#endif
+
+typedef int mbstate_t;
+
+wint_t __cdecl btowc(int);
+size_t __cdecl mbrlen(const char *, size_t, mbstate_t *);
+size_t __cdecl mbrtowc(wchar_t *, const char *, size_t, mbstate_t *);
+size_t __cdecl mbsrtowcs(wchar_t *, const char **, size_t, mbstate_t *);
+
+size_t __cdecl wcrtomb(char *, wchar_t, mbstate_t *);
+size_t __cdecl wcsrtombs(char *, const wchar_t **, size_t, mbstate_t *);
+int __cdecl wctob(wint_t);
+
+#ifndef __NO_ISOCEXT /* these need static lib libmingwex.a */
+__CRT_INLINE int __cdecl fwide(FILE* __UNUSED_PARAM(stream), int __UNUSED_PARAM(mode))
+  {return -1;} /* limited to byte orientation */ 
+__CRT_INLINE int __cdecl mbsinit(const mbstate_t* __UNUSED_PARAM(ps))
+  {return 1;}
+wchar_t* __cdecl wmemset(wchar_t* s, wchar_t c, size_t n);
+wchar_t* __cdecl wmemchr(const wchar_t* s, wchar_t c, size_t n);
+int wmemcmp(const wchar_t* s1, const wchar_t * s2, size_t n);
+wchar_t* __cdecl wmemcpy(wchar_t* __restrict__ s1, const wchar_t* __restrict__ s2,
+		 size_t n);
+wchar_t* __cdecl wmemmove(wchar_t* s1, const wchar_t* s2, size_t n);
+long long __cdecl wcstoll(const wchar_t* __restrict__ nptr,
+		  wchar_t** __restrict__ endptr, int base);
+unsigned long long __cdecl wcstoull(const wchar_t* __restrict__ nptr,
+			    wchar_t ** __restrict__ endptr, int base);
+#endif /* __NO_ISOCEXT */
+
+#ifndef	__STRICT_ANSI__
+/* non-ANSI wide char functions from io.h, direct.h, sys/stat.h and locale.h.  */
+
+#ifndef	_FSIZE_T_DEFINED
+typedef	unsigned long	_fsize_t;
+#define _FSIZE_T_DEFINED
+#endif
+
+#ifndef _WFINDDATA_T_DEFINED
+struct _wfinddata_t {
+	unsigned	attrib;
+	time_t		time_create;	/* -1 for FAT file systems */
+	time_t		time_access;	/* -1 for FAT file systems */
+	time_t		time_write;
+	_fsize_t	size;
+	wchar_t		name[260];	/* may include spaces. */
+};
+struct _wfinddatai64_t {
+	unsigned    attrib;
+	time_t      time_create;
+	time_t      time_access;
+	time_t      time_write;
+	__int64     size;
+	wchar_t     name[260];
+};
+struct __wfinddata64_t {
+        unsigned    attrib;
+        __time64_t  time_create;    
+        __time64_t  time_access;
+        __time64_t  time_write;
+        _fsize_t    size;
+        wchar_t     name[260];
+};
+#define _WFINDDATA_T_DEFINED
+#endif
+
+/* Wide character versions. Also defined in io.h. */
+/* CHECK: I believe these only exist in MSVCRT, and not in CRTDLL. Also
+   applies to other wide character versions? */
+#if !defined (_WIO_DEFINED)
+#if defined (__MSVCRT__)
+#include <stdint.h>  /* For intptr_t.  */
+_CRTIMP int __cdecl	_waccess (const wchar_t*, int);
+_CRTIMP int __cdecl	_wchmod (const wchar_t*, int);
+_CRTIMP int __cdecl	_wcreat (const wchar_t*, int);
+_CRTIMP long __cdecl	_wfindfirst (const wchar_t*, struct _wfinddata_t *);
+_CRTIMP int __cdecl	_wfindnext (long, struct _wfinddata_t *);
+_CRTIMP int __cdecl	_wunlink (const wchar_t*);
+_CRTIMP int __cdecl	_wopen (const wchar_t*, int, ...);
+_CRTIMP int __cdecl	_wsopen (const wchar_t*, int, int, ...);
+_CRTIMP wchar_t* __cdecl _wmktemp (wchar_t*);
+_CRTIMP long __cdecl	_wfindfirsti64 (const wchar_t*, struct _wfinddatai64_t*);
+_CRTIMP int __cdecl 	_wfindnexti64 (long, struct _wfinddatai64_t*);
+#if __MSVCRT_VERSION__ >= 0x0601
+_CRTIMP intptr_t __cdecl _wfindfirst64(const wchar_t*, struct __wfinddata64_t*); 
+_CRTIMP intptr_t __cdecl _wfindnext64(intptr_t, struct __wfinddata64_t*);
+#endif /* __MSVCRT_VERSION__ >= 0x0601 */
+#endif /* defined (__MSVCRT__) */
+#define _WIO_DEFINED
+#endif /* _WIO_DEFINED */
 
 #ifndef _WDIRECT_DEFINED
 /* Also in direct.h */
@@ -204,6 +401,7 @@ struct stat
 	time_t	st_mtime;	/* Modified time */
 	time_t	st_ctime;	/* Creation time */
 };
+
 #if defined (__MSVCRT__)
 struct _stati64 {
     _dev_t st_dev;
@@ -249,91 +447,12 @@ _CRTIMP int __cdecl _wstat64 (const wchar_t*, struct __stat64*);
 #define _WSTAT_DEFINED
 #endif /* ! _WSTAT_DEFIND  */
 
-#ifndef _WTIME_DEFINED
-#ifdef __MSVCRT__
-/* wide function prototypes, also declared in time.h */
-_CRTIMP wchar_t* __cdecl	_wasctime (const struct tm*);
-_CRTIMP wchar_t* __cdecl	_wctime (const time_t*);
-_CRTIMP wchar_t* __cdecl	_wstrdate (wchar_t*);
-_CRTIMP wchar_t* __cdecl	_wstrtime (wchar_t*);
-#if __MSVCRT_VERSION__ >= 0x601
-_CRTIMP wchar_t* __cdecl	_wctime64 (const __time64_t*);
-#endif
-#endif /* __MSVCRT__ */
-_CRTIMP size_t __cdecl		wcsftime (wchar_t*, size_t, const wchar_t*, const struct tm*);
-#define _WTIME_DEFINED
-#endif /* _WTIME_DEFINED */ 
-
 #ifndef _WLOCALE_DEFINED  /* also declared in locale.h */
 _CRTIMP wchar_t* __cdecl _wsetlocale (int, const wchar_t*);
 #define _WLOCALE_DEFINED
 #endif
 
-#ifndef _WSTDLIB_DEFINED /* also declared in stdlib.h */
-_CRTIMP long __cdecl 		wcstol (const wchar_t*, wchar_t**, int);
-_CRTIMP unsigned long __cdecl	wcstoul (const wchar_t*, wchar_t**, int);
-_CRTIMP double __cdecl		wcstod (const wchar_t*, wchar_t**);
-#if !defined __NO_ISOCEXT /* extern stub in static libmingwex.a */
-__CRT_INLINE float __cdecl wcstof( const wchar_t *nptr, wchar_t **endptr)
-{  return (wcstod(nptr, endptr)); }
-long double __cdecl wcstold (const wchar_t * __restrict__, wchar_t ** __restrict__);
-#endif /* __NO_ISOCEXT */
-#define  _WSTDLIB_DEFINED
-#endif
-
-
-#ifndef	_NO_OLDNAMES
-
-/* Wide character versions. Also declared in io.h. */
-/* CHECK: Are these in the oldnames???  NO! */
-#if (0)
-int 		waccess (const wchar_t *, int);
-int 		wchmod (const wchar_t *, int);
-int 		wcreat (const wchar_t *, int);
-long 		wfindfirst (wchar_t *, struct _wfinddata_t *);
-int 		wfindnext (long, struct _wfinddata_t *);
-int 		wunlink (const wchar_t *);
-int 		wrename (const wchar_t *, const wchar_t *);
-int 		wremove (const wchar_t *);
-int 		wopen (const wchar_t *, int, ...);
-int 		wsopen (const wchar_t *, int, int, ...);
-wchar_t* 	wmktemp (wchar_t *);
-#endif
-#endif /* _NO_OLDNAMES */
-
 #endif /* not __STRICT_ANSI__ */
-
-/* These are resolved by -lmsvcp60 */
-/* If you don't have msvcp60.dll in your windows system directory, you can
-   easily obtain it with a search from your favorite search engine. */
-typedef int mbstate_t;
-typedef wchar_t _Wint_t;
-
-wint_t __cdecl btowc(int);
-size_t __cdecl mbrlen(const char *, size_t, mbstate_t *);
-size_t __cdecl mbrtowc(wchar_t *, const char *, size_t, mbstate_t *);
-size_t __cdecl mbsrtowcs(wchar_t *, const char **, size_t, mbstate_t *);
-
-size_t __cdecl wcrtomb(char *, wchar_t, mbstate_t *);
-size_t __cdecl wcsrtombs(char *, const wchar_t **, size_t, mbstate_t *);
-int __cdecl wctob(wint_t);
-
-#ifndef __NO_ISOCEXT /* these need static lib libmingwex.a */
-__CRT_INLINE int __cdecl fwide(FILE* __UNUSED_PARAM(stream), int __UNUSED_PARAM(mode))
-  {return -1;} /* limited to byte orientation */ 
-__CRT_INLINE int __cdecl mbsinit(const mbstate_t* __UNUSED_PARAM(ps))
-  {return 1;}
-wchar_t* __cdecl wmemset(wchar_t* s, wchar_t c, size_t n);
-wchar_t* __cdecl wmemchr(const wchar_t* s, wchar_t c, size_t n);
-int wmemcmp(const wchar_t* s1, const wchar_t * s2, size_t n);
-wchar_t* __cdecl wmemcpy(wchar_t* __restrict__ s1, const wchar_t* __restrict__ s2,
-		 size_t n);
-wchar_t* __cdecl wmemmove(wchar_t* s1, const wchar_t* s2, size_t n);
-long long __cdecl wcstoll(const wchar_t* __restrict__ nptr,
-		  wchar_t** __restrict__ endptr, int base);
-unsigned long long __cdecl wcstoull(const wchar_t* __restrict__ nptr,
-			    wchar_t ** __restrict__ endptr, int base);
-#endif /* __NO_ISOCEXT */
 
 #ifdef __cplusplus
 }	/* end of extern "C" */
