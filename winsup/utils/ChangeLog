@@ -1,3 +1,14 @@
+2001-08-30  Egor Duda  <deo@logos-m.ru>
+
+	* dumper.h: Update copyright notice.
+	* dumper.cc: Ditto.
+	* dumper.cc: (dumper::print_core_section_list): New function.
+	* dumper.h: (dumper::print_core_section_list): Declare it.
+	* dumper.cc (print_section_name): New function.
+	(dumper::collect_process_information): Augment debugging output.
+	Stop debugee processing if it posts double exception.
+	(usage): Fix typo in option name.
+
 Tue Aug 28 14:45:02 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* mount.cc (main): Issue correct warning for 'not enough arguments'.

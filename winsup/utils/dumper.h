@@ -1,6 +1,6 @@
 /* dumper.h
 
-   Copyright 1999 Cygnus Solutions.
+   Copyright 1999,2001 Red Hat Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -111,6 +111,7 @@ public:
   int sane ();
 
   int collect_process_information ();
+  void print_core_section_list ();
 
   dumper ( DWORD pid, DWORD tid, const char* name );
   ~dumper ();

@@ -1,6 +1,6 @@
 /* dumper.cc
 
-   Copyright 1999 Cygnus Solutions.
+   Copyright 1999,2001 Red Hat Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -112,6 +112,20 @@ dumper::sane ()
   if (hProcess == NULL || core_bfd == NULL || excl_list == NULL)
     return 0;
   return 1;
+}
+
+void
+print_section_name (bfd* abfd, asection* sect, PTR obj)
+{
+  deb_printf ( " %s", bfd_get_section_name (abfd, sect));
+}
+
+void
+dumper::print_core_section_list ()
+{
+  deb_printf ("current sections:");
+  bfd_map_over_sections (core_bfd, &print_section_name, NULL);
+  deb_printf ("\n");
 }
 
 process_entity *
@@ -476,6 +490,8 @@ out:
 int
 dumper::collect_process_information ()
 {
+  int exception_level = 0;
+
   if (!sane ())
     return 0;
 
@@ -495,6 +511,8 @@ dumper::collect_process_information ()
     {
       if (!WaitForDebugEvent (&current_event, 20000))
 	return 0;
+
+      deb_printf ("got debug event %d\n", current_event.dwDebugEventCode);
 
       switch (current_event.dwDebugEventCode)
 	{
@@ -534,6 +552,12 @@ dumper::collect_process_information ()
 	  break;
 
 	case EXCEPTION_DEBUG_EVENT:
+
+	  exception_level++;
+	  if (exception_level == 2)
+	    break;
+	  else if (exception_level > 2)
+	    return 0;
 
 	  collect_memory_sections ();
 
@@ -670,14 +694,22 @@ dumper::prepare_core_dump ()
       deb_printf ("creating section (type%u) %s(%u), flags=%08x\n",
 		  p->type, sect_name, sect_size, sect_flags);
 
+      bfd_set_error (bfd_error_no_error);
       char *buf = strdup (sect_name);
       new_section = bfd_make_section (core_bfd, buf);
+      if (new_section == NULL)
+	{
+	  if (bfd_get_error () == bfd_error_no_error)
+	    fprintf (stderr, "error creating new section (%s), section already exists.\n", buf);
+	  else
+	    bfd_perror ("creating section");
+	  goto failed;
+	}
 
-      if (new_section == NULL ||
-	  !bfd_set_section_flags (core_bfd, new_section, sect_flags) ||
+      if (!bfd_set_section_flags (core_bfd, new_section, sect_flags) ||
 	  !bfd_set_section_size (core_bfd, new_section, sect_size))
 	{
-	  bfd_perror ("creating section");
+	  bfd_perror ("setting section attributes");
 	  goto failed;
 	};
 
@@ -736,7 +768,7 @@ dumper::write_core_dump ()
 static void
 usage ()
 {
-  fprintf (stderr, "Usage: dumper [-v] [-c filename] pid\n");
+  fprintf (stderr, "Usage: dumper [-d] [-c filename] pid\n");
   fprintf (stderr, "-c filename -- dump core to filename.core\n");
   fprintf (stderr, "-d          -- print some debugging info while dumping\n");
   fprintf (stderr, "pid         -- win32-pid of process to dump\n");
