@@ -1,3 +1,8 @@
+2001-02-14  Egor Duda  <deo@logos-m.ru>
+  
+	* fhandler_console.cc (fhandler_console::char_command): Ignore unknown
+	rendition codes in \033[xx;yym control sequences
+
 Fri Feb  9 23:19:01 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* fork.cc (fork_parent): Return EAGAIN when can't record pid.

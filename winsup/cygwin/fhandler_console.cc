@@ -986,13 +986,6 @@ fhandler_console::char_command (char c, bool saw_question_mark)
 	     case 47:    /* WHITE background */
 	       bg = BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED;
 	       break;
-	     default:
-	       fg = default_color & (FOREGROUND_BLUE | FOREGROUND_GREEN |
-				     FOREGROUND_RED);
-	       bg = default_color & (BACKGROUND_BLUE | BACKGROUND_GREEN |
-				     BACKGROUND_RED | BACKGROUND_INTENSITY);
-	       bold = default_color & FOREGROUND_INTENSITY;
-	       break;
 	   }
 	 SetConsoleTextAttribute (get_output_handle (), fg | bg | bold);
       break;
