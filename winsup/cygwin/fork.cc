@@ -443,14 +443,17 @@ fork_parent (void *stack_here, HANDLE& hParent, dll *&first_dll, bool& load_dlls
   /* Protect the handle but name it similarly to the way it will
      be called in subproc handling. */
   ProtectHandle1 (pi.hProcess, childhProc);
-  if (os_being_run != winNT)
-    {
-      if (last_fork_proc)
-	CloseHandle (last_fork_proc);
-      if (!DuplicateHandle (hMainProc, pi.hProcess, hMainProc, &last_fork_proc,
-			    0, FALSE, DUPLICATE_SAME_ACCESS))
-	system_printf ("couldn't create last_fork_proc, %E");
-    }
+
+  /* Keep a handle to the current forked process sitting around to prevent
+     Windows from reusing the same pid twice in a row.  Having the same pid
+     twice in a row confuses bash.  So, after every CreateProcess, we can safely
+     remove the old pid and save a handle to the newly created process.  Keeping
+     a handle open will stop windows from reusing the same pid.  */
+  if (last_fork_proc)
+    CloseHandle (last_fork_proc);
+  if (!DuplicateHandle (hMainProc, pi.hProcess, hMainProc, &last_fork_proc,
+			0, FALSE, DUPLICATE_SAME_ACCESS))
+    system_printf ("couldn't create last_fork_proc, %E");
 
   /* Fill in fields in the child's process table entry.  */
   forked->ppid = myself->pid;

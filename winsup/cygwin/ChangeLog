@@ -1,3 +1,18 @@
+Sat Oct 21 00:46:36 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler.h (fhandler_console): Remove tcsetpgrp.
+	* fhandler_console.cc (fhandler_console::tcsetpgrp): Eliminate.
+	* fork.cc (fork_parent): Avoid returning same pid twice in a row
+	regardless of OS.
+	* pinfo.cc (pinfo::init): Rename create argument to flags and treat it
+	as such.
+	* signal.cc (set_sigcatchers): New function.
+	(signal): Use set_sigcatchers to increment or decrement sigcatcher
+	tracker.
+	(sigaction): Ditto.  Add debugging output.
+	* spawn.cc (spawn_guts): Always quote first argv[0] argument when it's
+	a COMSPEC shell.
+
 2000-10-20  DJ Delorie  <dj@redhat.com>
 
 	* times.cc (to_time_t): pass zero time as epoch

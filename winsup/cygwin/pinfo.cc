@@ -134,7 +134,7 @@ _pinfo::exit (UINT n, bool norecord)
 }
 
 void
-pinfo::init (pid_t n, DWORD create, HANDLE in_h)
+pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
 {
   if (n == myself->pid)
     {
@@ -144,6 +144,7 @@ pinfo::init (pid_t n, DWORD create, HANDLE in_h)
       return;
     }
 
+  int createit = flag & PID_IN_USE;
   for (int i = 0; i < 10; i++)
     {
       int created;
@@ -151,7 +152,7 @@ pinfo::init (pid_t n, DWORD create, HANDLE in_h)
       __small_sprintf (mapname, "cygpid.%x", n);
 
       int mapsize;
-      if (create & PID_EXECED)
+      if (flag & PID_EXECED)
 	mapsize = PINFO_REDIR_SIZE;
       else
 	mapsize = sizeof (_pinfo);
@@ -161,7 +162,7 @@ pinfo::init (pid_t n, DWORD create, HANDLE in_h)
 	  h = in_h;
 	  created = 0;
 	}
-      else if (!create)
+      else if (!createit)
 	{
 	  h = OpenFileMappingA (FILE_MAP_READ | FILE_MAP_WRITE, FALSE, mapname);
 	  created = 0;
@@ -175,7 +176,7 @@ pinfo::init (pid_t n, DWORD create, HANDLE in_h)
 
       if (!h)
 	{
-	  if (create)
+	  if (createit)
 	    __seterrno ();
 	  procinfo = NULL;
 	  return;
@@ -184,7 +185,7 @@ pinfo::init (pid_t n, DWORD create, HANDLE in_h)
       procinfo = (_pinfo *) MapViewOfFile (h, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
       ProtectHandle1 (h, pinfo_shared_handle);
 
-      if ((procinfo->process_state & PID_INITIALIZING) && (create & PID_NOREDIR))
+      if ((procinfo->process_state & PID_INITIALIZING) && (flag & PID_NOREDIR))
 	{
 	  release ();
 	  set_errno (ENOENT);
@@ -208,7 +209,7 @@ pinfo::init (pid_t n, DWORD create, HANDLE in_h)
 	   should only be a brief occurrence, so rather than introduce some kind
 	   of locking mechanism, just loop.  FIXME: I'm sure I'll regret doing it
 	   this way at some point.  */
-      if (i < 9 && !created && create && (procinfo->process_state & PID_EXITED))
+      if (i < 9 && !created && createit && (procinfo->process_state & PID_EXITED))
 	{
 	  Sleep (5);
 	  release ();
@@ -217,7 +218,7 @@ pinfo::init (pid_t n, DWORD create, HANDLE in_h)
 
       if (!created)
 	/* nothing */;
-      else if (!(create & PID_EXECED))
+      else if (!(flag & PID_EXECED))
 	procinfo->pid = n;
       else
 	{

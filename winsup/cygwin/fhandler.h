@@ -607,8 +607,6 @@ public:
   int tcsetattr (int a, const struct termios *t);
   int tcgetattr (struct termios *t);
 
-  int tcsetpgrp (const pid_t pid);
-
   /* Special dup as we must dup two handles */
   int dup (fhandler_base *child);
 

@@ -188,8 +188,8 @@ fhandler_console::read (void *pv, size_t buflen)
 
       if (!ReadConsoleInput (h, &input_rec, 1, &nread))
 	{
-	  syscall_printf ("ReadConsoleInput failed, %E");
 	  __seterrno ();
+	  syscall_printf ("ReadConsoleInput failed, %E");
 	  return -1;		/* seems to be failure */
 	}
 
@@ -250,13 +250,6 @@ fhandler_console::read (void *pv, size_t buflen)
 #undef buf
 
   return copied_chars;
-}
-
-int
-fhandler_console::tcsetpgrp (pid_t pid)
-{
-  tc->pgid = pid;
-  return 0;
 }
 
 void

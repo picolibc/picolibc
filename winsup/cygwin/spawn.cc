@@ -352,10 +352,12 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
       (iscmd (argv[0], "command.com") || iscmd (argv[0], "cmd.exe")))
     {
       real_path.check (prog_arg);
+      one_line.add ("\"");
       if (!real_path.error)
 	one_line.add (real_path);
       else
 	one_line.add (argv[0]);
+      one_line.add ("\"");
       one_line.add (" ");
       one_line.add (argv[1]);
       one_line.add (" ");

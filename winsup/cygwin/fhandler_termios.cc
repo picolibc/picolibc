@@ -293,9 +293,6 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
   if (!iscanon || always_accept)
     set_input_done (ralen > 0);
 
-  /* FIXME:  It's not clear that this code will ever do anything.
-     Currently, it doesn't look like accept_input will ever return
-     a negative number. */
   if (input_done)
     (void) accept_input ();
 

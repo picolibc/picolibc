@@ -23,6 +23,23 @@ int sigcatchers;	/* FIXME: Not thread safe. */
 
 #define sigtrapped(func) ((func) != SIG_IGN && (func) != SIG_DFL)
 
+static inline void
+set_sigcatchers (void (*oldsig) (int), void (*cursig) (int))
+{
+#ifdef DEBUGGING
+  int last_sigcatchers = sigcatchers;
+#endif
+  if (!sigtrapped (oldsig) && sigtrapped (cursig))
+    sigcatchers++;
+  else if (sigtrapped (oldsig) && !sigtrapped (cursig))
+    sigcatchers--;
+#ifdef DEBUGGING
+  if (last_sigcatchers != sigcatchers)
+    sigproc_printf ("last %d, old %d, cur %p, cur %p", last_sigcatchers,
+		    sigcatchers, oldsig, cursig);
+#endif
+}
+
 extern "C" _sig_func_ptr
 signal (int sig, _sig_func_ptr func)
 {
@@ -39,10 +56,7 @@ signal (int sig, _sig_func_ptr func)
   prev = myself->getsig (sig).sa_handler;
   myself->getsig (sig).sa_handler = func;
   myself->getsig (sig).sa_mask = 0;
-  if (!sigtrapped (prev) && sigtrapped (func))
-    sigcatchers++;
-  else if (sigtrapped (prev) && !sigtrapped (func))
-    sigcatchers--;
+  set_sigcatchers (prev, func);
   
   syscall_printf ("%p = signal (%d, %p)", prev, sig, func);
   return prev;
@@ -235,6 +249,7 @@ killpg (int pgrp, int sig)
 extern "C" int
 sigaction (int sig, const struct sigaction *newact, struct sigaction *oldact)
 {
+  sigproc_printf ("sig %d, newact %p, oldact %p", sig, newact, oldact);
   /* check that sig is in right range */
   if (sig < 0 || sig >= NSIG)
     {
@@ -257,10 +272,7 @@ sigaction (int sig, const struct sigaction *newact, struct sigaction *oldact)
 	sig_clear (sig);
       if (newact->sa_handler == SIG_DFL && sig == SIGCHLD)
 	sig_clear (sig);
-      if (!sigtrapped (oa.sa_handler) && sigtrapped (newact->sa_handler))
-	sigcatchers++;
-      else if (sigtrapped (oa.sa_handler) && !sigtrapped (newact->sa_handler))
-	sigcatchers--;
+      set_sigcatchers (oa.sa_handler, newact->sa_handler);
     }
 
   if (oldact)
