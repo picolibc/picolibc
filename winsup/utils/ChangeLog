@@ -1,3 +1,9 @@
+2000-10-18  DJ Delorie  <dj@redhat.com>
+
+	* ssp.c: new
+	* ssp.txt: new
+	* Makefile.in: build ssp.exe
+
 Wed Oct 18 18:57:46 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* ps.cc (main): Add some extra space to Windows pid output for

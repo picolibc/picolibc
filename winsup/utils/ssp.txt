@@ -1,0 +1,125 @@
+
+SSP - The Single Step Profiler
+
+Original Author:  DJ Delorie <dj@redhat.com>
+
+The SSP is a program that uses the Win32 debug API to run a program
+one ASM instruction at a time.  It records the location of each
+instruction used, how many times that instruction is used, and all
+function calls.  The results are saved in a format that is usable by
+the profiling program "gprof", although gprof will claim the values
+are seconds, they really are instruction counts.  More on that later.
+
+Because the SSP was originally designed to profile the cygwin DLL, it
+does not automatically select a block of code to report statistics on.
+You must specify the range of memory addresses to keep track of
+manually, but it's not hard to figure out what to specify.  Use the
+"objdump" program to determine the bounds of the target's ".text"
+section.  Let's say we're profiling cygwin1.dll.  Make sure you've
+built it with debug symbols (else gprof won't run) and run objdump
+like this:
+
+	objdump -h cygwin1.dll 
+
+It will print a report like this:
+
+cygwin1.dll:     file format pei-i386
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         0007ea00  61001000  61001000  00000400  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE, DATA
+  1 .data         00008000  61080000  61080000  0007ee00  2**2
+                  CONTENTS, ALLOC, LOAD, DATA
+  . . .
+
+The only information we're concerned with are the VMA of the .text
+section and the VMA of the section after it (sections are usually
+contiguous; you can also add the Size to the VMA to get the end
+address).  In this case, the VMA is 0x61001000 and the ending address
+is either 0x61080000 (start of .data method) or 0x0x6107fa00 (VMA+Size
+method).
+
+There are two basic ways to use SSP - either profiling a whole
+program, or selectively profiling parts of the program.
+
+To profile a whole program, just run ssp without options.  By default,
+it will step the whole program.  Here's a simple example, using the
+numbers above:
+
+	ssp 0x61001000 0x61080000 hello.exe
+
+This will step the whole program.  It will take at least 8 minutes on
+a PII/300 (yes, really).  When it's done, it will create a file called
+"gmon.out".  You can turn this data file into a readable report with
+gprof:
+
+	gprof -b cygwin1.dll
+
+The "-b" means "skip the help pages".  You can omit this until you're
+familiar with the report layout.  The gprof documentation explains
+a lot about this report, but ssp changes a few things.  For example,
+the first part of the report reports the amount of time spent in each
+function, like this:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls  ms/call  ms/call  name    
+ 10.02    231.22    72.43       46  1574.57  1574.57  strcspn
+  7.95    288.70    57.48      130   442.15   442.15  strncasematch
+
+The "seconds" columns are really CPU opcodes, 1/100 second per opcode.
+So, "231.22" above means 23,122 opcodes.  The ms/call values are 10x
+too big; 1574.57 means 157.457 opcodes per call.  Similar adjustments
+need to be made for the "self" and "children" columns in the second
+part of the report.
+
+OK, so now we've got a huge report that took a long time to generate,
+and we've identified a spot we want to work on optimizing.  Let's say
+it's the time() function.  We can use SSP to selectively profile this
+function by using OutputDebugString() to control SSP from within the
+program.  Here's a sample program:
+
+	#include <windows.h>
+	main()
+	{
+	  time_t t;
+	  OutputDebugString("ssp on");
+	  time(&t);
+	  OutputDebugString("ssp off");
+	}
+
+Then, add the "-d" option to ssp to default to *disabling* profiling.
+The program will run at full speed until the first OutputDebugString,
+then step until the second.
+
+	ssp -d 0x61001000 0x61080000 hello.exe
+
+You can then use gprof (as usual) to see the performance profile for
+just that portion of the program's execution.
+
+OK, now for the other ssp options, and when to use them:
+
+"-v" - verbose.  This prints messages about threads starting and
+stopping, OutputDebugString calls, DLLs loading, etc.
+
+"-t" and "-tc" - tracing.  With -t, *every* step's address is written
+to the file "trace.ssp".  This can be used to help debug functions,
+since it can trace multiple threads.  Clever use of scripts can match
+addresses with disassembled opcodes if needed.  Warning: creates
+*huge* files, very quickly.  "-tc" prints each address to the console,
+useful for debugging key chunks of assembler.
+
+"-s" - subthreads.  Usually, you only need to trace the main thread,
+but sometimes you need to trace all threads, so this enables that.
+It's also needed when you want to profile a function that only a
+subthread calls.  However, using OutputDebugString automatically
+enables profiling on the thread that called it, not the main thread.
+
+"-dll" - dll profiling.  Generates a pretty table of how much time was
+spent in each dll the program used.  No sense optimizing a function in
+your program if most of the time is spent in the DLL.
+
+I usually use the -v, -s, and -dll options:
+
+	ssp -v -s -dll -d 0x61001000 0x61080000 hello.exe
