@@ -7,32 +7,32 @@
    in "UNIX System V Release 4, Programmers Guide: ANSI C and
    Programming Support Tools".
 
-This file is part of BFD, the Binary File Descriptor library.
+   This file is part of BFD, the Binary File Descriptor library.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 
 /* This file is part of ELF support for BFD, and contains the portions
    that are common to both the internal and external representations.
    For example, ELFMAG0 is the byte 0x7F in both the internal (in-memory)
-   and external (in-file) representations. */
+   and external (in-file) representations.  */
 
 #ifndef _ELF_COMMON_H
 #define _ELF_COMMON_H
 
-/* Fields in e_ident[] */
+/* Fields in e_ident[].  */
 
 #define EI_MAG0		0	/* File identification byte 0 index */
 #define ELFMAG0		   0x7F	/* Magic number byte 0 */
@@ -126,14 +126,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define EM_RCE		 39	/* Old name for MCore */
 #define EM_ARM		 40	/* ARM */
 #define EM_OLD_ALPHA	 41	/* Digital Alpha */
-#define EM_SH		 42	/* Hitachi SH */
+#define EM_SH		 42	/* Renesas (formerly Hitachi) SH */
 #define EM_SPARCV9	 43	/* SPARC v9 64-bit */
 #define EM_TRICORE	 44	/* Siemens Tricore embedded processor */
 #define EM_ARC		 45	/* ARC Cores */
-#define EM_H8_300	 46	/* Hitachi H8/300 */
-#define EM_H8_300H	 47	/* Hitachi H8/300H */
-#define EM_H8S		 48	/* Hitachi H8S */
-#define EM_H8_500	 49	/* Hitachi H8/500 */
+#define EM_H8_300	 46	/* Renesas (formerly Hitachi) H8/300 */
+#define EM_H8_300H	 47	/* Renesas (formerly Hitachi) H8/300H */
+#define EM_H8S		 48	/* Renesas (formerly Hitachi) H8S */
+#define EM_H8_500	 49	/* Renesas (formerly Hitachi) H8/500 */
 #define EM_IA_64	 50	/* Intel IA-64 Processor */
 #define EM_MIPS_X	 51	/* Stanford MIPS-X */
 #define EM_COLDFIRE	 52	/* Motorola Coldfire */
