@@ -1,3 +1,12 @@
+2003-07-25  Christopher Faylor  <cgf@redhat.com>
+
+	* cygwin.din: Export _fdopen64
+	* Makefile.in (NEW_FUNCTIONS): Add _fdopen64 -> fdopen translation.
+	* include/cygwin/version.h: Bump api minor number.
+
+	* ntdll.h: Remove (now) duplicate FILE_SYNCHRONOUS_IO_NONALERT
+	definition.
+
 2003-07-24  Christopher Faylor  <cgf@redhat.com>
 
 	* environ.cc (check_case_init): Use strncasematch.

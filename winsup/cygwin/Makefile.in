@@ -194,6 +194,7 @@ NEW_FUNCTIONS:=regcomp posix_regcomp \
 	       chown _chown32 \
 	       facl _facl32 \
 	       fchown _fchown32 \
+	       fdopen _fdopen64 \
 	       fgetpos _fgetpos64 \
 	       fopen _fopen64 \
 	       freopen _freopen64 \
