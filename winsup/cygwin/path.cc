@@ -230,7 +230,7 @@ normalize_posix_path (const char *src, char *dst, char *&tail)
 	*tail++ = '/';
     }
   /* Two leading /'s?  If so, preserve them.  */
-  else if (isslash (src[1]) && !isslash (src[2]))
+  else if (isslash (src[1]) && src[2] && !isslash (src[2]))
     {
       *tail++ = '/';
       *tail++ = '/';
@@ -1023,7 +1023,7 @@ normalize_win32_path (const char *src, char *dst, char *&tail)
   bool beg_src_slash = isdirsep (src[0]);
 
   tail = dst;
-  if (beg_src_slash && isdirsep (src[1]))
+  if (beg_src_slash && isdirsep (src[1]) && src[2])
     {
       *tail++ = '\\';
       src++;

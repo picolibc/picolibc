@@ -195,14 +195,6 @@ pid_exists (pid_t pid)
   return pinfo (pid)->exists ();
 }
 
-/* Test to determine if a process really exists and is processing signals.
- */
-bool __stdcall
-_pinfo::exists ()
-{
-  return this && !(process_state & PID_EXITED);
-}
-
 /* Return true if this is one of our children, false otherwise.  */
 static inline bool __stdcall
 mychild (int pid)

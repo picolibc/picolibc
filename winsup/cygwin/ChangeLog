@@ -1,5 +1,18 @@
 2005-02-26  Christopher Faylor  <cgf@timesys.com>
 
+	* sigproc.cc (_pinfo::set_ctty): Move function
+	* pinfo.cc (_pinfo::set_ctty): to here.
+
+	* fhandler_mem.cc (fhandler_dev_mem::fstat): Don't fill out structure
+	if this is an on-disk device rather than an "auto" device.
+	* fhandler_raw.cc (fhandler_dev_raw::fstat): Ditto.
+
+	* path.cc (normalize_posix_path): Don't treat a standalone '//' as
+	introducing a UNC path.
+	(normalize_win32_path): Ditto.
+
+2005-02-26  Christopher Faylor  <cgf@timesys.com>
+
 	* debug.cc (delete_handle): Report on handle value in debugging output.
 
 	* pinfo.h (_pinfo::exists): Declare "new" function.

@@ -373,6 +373,14 @@ _pinfo::set_ctty (tty_min *tc, int flags, fhandler_tty_slave *arch)
     }
 }
 
+/* Test to determine if a process really exists and is processing signals.
+ */
+bool __stdcall
+_pinfo::exists ()
+{
+  return this && !(process_state & PID_EXITED);
+}
+
 bool
 _pinfo::alive ()
 {

@@ -402,12 +402,15 @@ int
 fhandler_dev_mem::fstat (struct __stat64 *buf)
 {
   fhandler_base::fstat (buf);
-  buf->st_mode = S_IFCHR;
-  if (wincap.has_physical_mem_access ())
-    buf->st_mode |= S_IRUSR | S_IWUSR |
-		    S_IRGRP | S_IWGRP |
-		    S_IROTH | S_IWOTH;
   buf->st_blksize = getpagesize ();
+  if (is_auto_device ())
+    {
+      buf->st_mode = S_IFCHR;
+      if (wincap.has_physical_mem_access ())
+	buf->st_mode |= S_IRUSR | S_IWUSR |
+			S_IRGRP | S_IWGRP |
+			S_IROTH | S_IWOTH;
+    }
 
   return 0;
 }
