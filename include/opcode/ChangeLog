@@ -1,5 +1,7 @@
 Sat Sep 18 11:41:16 1999  Jeffrey A Law  (law@cygnus.com)
 
+	* hppa.h (pa_opcodes): Fix mask for probe and probei.
+
 	* hppa.h (pa_opcodes): Fix mask for depwi.
 
 Tue Sep  7 13:44:25 1999  Jeffrey A Law  (law@cygnus.com)
