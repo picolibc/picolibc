@@ -56,7 +56,7 @@ times (struct tms * buf)
   /* Ticks is in milliseconds, convert to our ticks. Use long long to prevent
      overflow. */
   clock_t tc = (clock_t) ((long long) ticks * CLOCKS_PER_SEC / 1000);
-  if (os_being_run == winNT)
+  if (iswinnt)
     {
       GetProcessTimes (hMainProc, &creation_time, &exit_time,
 		       &kernel_time, &user_time);

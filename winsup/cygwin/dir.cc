@@ -375,7 +375,7 @@ rmdir (const char *dir)
         {
 	  /* On 9X ERROR_ACCESS_DENIED is returned if you try to remove
 	     a non-empty directory. */
-	  if (os_being_run != winNT)
+	  if (!iswinnt)
 	    set_errno (ENOTEMPTY);
 	  else
 	    __seterrno ();

@@ -134,7 +134,7 @@ _unlink (const char *ourname)
   /* Windows 9x seems to report ERROR_ACCESS_DENIED rather than sharing
      violation.  So, set lasterr to ERROR_SHARING_VIOLATION in this case
      to simplify tests. */
-  if (os_being_run != winNT && lasterr == ERROR_ACCESS_DENIED
+  if (!iswinnt && lasterr == ERROR_ACCESS_DENIED
       && !win32_name.isremote ())
     lasterr = ERROR_SHARING_VIOLATION;
 
@@ -152,7 +152,7 @@ _unlink (const char *ourname)
 
   bool delete_on_close_ok;
 
-  delete_on_close_ok  = !win32_name.isremote () && os_being_run == winNT;
+  delete_on_close_ok  = !win32_name.isremote () && iswinnt;
 
   /* Attempt to use "delete on close" semantics to handle removing
      a file which may be open. */
@@ -590,7 +590,7 @@ _link (const char *a, const char *b)
     }
 
   /* Try to make hard link first on Windows NT */
-  if (os_being_run == winNT)
+  if (iswinnt)
     {
       HANDLE hFileSource;
 
@@ -707,7 +707,7 @@ chown_worker (const char *name, unsigned fmode, uid_t uid, gid_t gid)
   if (check_null_empty_str_errno (name))
     return -1;
 
-  if (os_being_run != winNT)    // real chown only works on NT
+  if (!iswinnt)    // real chown only works on NT
     res = 0;			// return zero (and do nothing) under Windows 9x
   else
     {
@@ -1074,7 +1074,7 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
   dtype = real_path.get_drive_type ();
 
   if ((atts == -1 || ! (atts & FILE_ATTRIBUTE_DIRECTORY) ||
-       (os_being_run == winNT
+       (iswinnt
 	&& dtype != DRIVE_NO_ROOT_DIR
 	&& dtype != DRIVE_UNKNOWN)))
     {
@@ -1338,7 +1338,7 @@ _rename (const char *oldpath, const char *newpath)
 		   && GetLastError () != ERROR_FILE_EXISTS))
     goto done;
 
-  if (os_being_run == winNT)
+  if (iswinnt)
     {
       if (MoveFileEx (real_old.get_win32 (), real_new.get_win32 (),
 		      MOVEFILE_REPLACE_EXISTING))
@@ -1462,7 +1462,7 @@ check_posix_perm (const char *fname, int v)
   extern int allow_ntea, allow_ntsec, allow_smbntsec;
 
   /* Windows 95/98/ME don't support file system security at all. */
-  if (os_being_run != winNT)
+  if (!iswinnt)
     return 0;
 
   /* ntea is ok for supporting permission bits but it doesn't support
@@ -2008,7 +2008,7 @@ extern "C" int
 seteuid (uid_t uid)
 {
   sigframe thisframe (mainthread);
-  if (os_being_run == winNT)
+  if (iswinnt)
     {
       char orig_username[UNLEN + 1];
       char orig_domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
@@ -2223,7 +2223,7 @@ extern "C" int
 setegid (gid_t gid)
 {
   sigframe thisframe (mainthread);
-  if (os_being_run == winNT)
+  if (iswinnt)
     {
       if (gid != (gid_t) -1)
 	{

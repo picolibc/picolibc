@@ -116,7 +116,7 @@ fork_copy (PROCESS_INFORMATION &pi, const char *what, ...)
   debug_printf ("done");
   return 1;
 
-err:
+ err:
   TerminateProcess (pi.hProcess, 1);
   set_errno (EAGAIN);
   return 0;
@@ -458,7 +458,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 	  npid = 0;
 	}
     }
-out:
+ out:
 #endif
 
   char sa_buf[1024];
@@ -477,7 +477,7 @@ out:
 		      &pi);
 
   CloseHandle (hParent);
-  ForceCloseHandle1 (ch.cygheap_h, passed_cygheap_h);
+  cygheap_setup_for_child_cleanup (&ch);
 
   if (!rc)
     {
@@ -607,7 +607,7 @@ out:
   return forked->pid;
 
 /* Common cleanup code for failure cases */
-cleanup:
+ cleanup:
   /* Remember to de-allocate the fd table. */
   if (pi.hProcess)
     ForceCloseHandle1 (pi.hProcess, childhProc);

@@ -40,7 +40,7 @@ internal_getlogin (cygheap_user &user)
     user.set_name (username);
   debug_printf ("GetUserName() = %s", user.name ());
 
-  if (os_being_run == winNT)
+  if (iswinnt)
     {
       LPWKSTA_USER_INFO_1 wui;
       NET_API_STATUS ret;

@@ -658,7 +658,7 @@ environ_init (char **envp, int envc)
 
 #ifdef NTSEC_ON_BY_DEFAULT
   /* Set ntsec explicit as default, if NT is running */
-  if (os_being_run == winNT)
+  if (iswinnt)
     allow_ntsec = TRUE;
 #endif
 

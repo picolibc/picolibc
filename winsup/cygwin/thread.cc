@@ -457,7 +457,7 @@ int
 pthread_cond::TimedWait (DWORD dwMilliseconds)
 {
   DWORD rv;
-  if (os_being_run != winNT)
+  if (!iswinnt)
     {
       // FIXME: race condition (potentially drop events
       // Possible solution (single process only) - place this in a critical section.

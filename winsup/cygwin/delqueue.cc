@@ -87,7 +87,7 @@ delqueue_list::process_queue ()
 	    int res = GetLastError ();
 	    empty = 0;
 	    if (res == ERROR_SHARING_VIOLATION ||
-		(os_being_run != winNT && res == ERROR_ACCESS_DENIED))
+		(!iswinnt && res == ERROR_ACCESS_DENIED))
 	      {
 		/* File still inuse, that's ok */
 		syscall_printf ("Still using %s", name[i]);

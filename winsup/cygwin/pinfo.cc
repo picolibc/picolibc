@@ -393,7 +393,7 @@ winpids::init (bool winpid)
 DWORD
 winpids::enum_init (bool winpid)
 {
-  if (os_being_run == winNT)
+  if (iswinnt)
     enum_processes = &winpids::enumNT;
   else
     enum_processes = &winpids::enum9x;

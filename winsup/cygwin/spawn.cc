@@ -675,7 +675,7 @@ skip_arg_parsing:
   MALLOC_CHECK;
   if (envblock)
     free (envblock);
-  ForceCloseHandle1 (ciresrv.cygheap_h, passed_cygheap_h);
+  cygheap_setup_for_child_cleanup (&ciresrv);
   MALLOC_CHECK;
 
   /* Set errno now so that debugging messages from it appear before our
@@ -718,6 +718,7 @@ skip_arg_parsing:
       strace.execing = 1;
       hExeced = pi.hProcess;
       strcpy (myself->progname, real_path);
+      close_all_files ();
     }
   else
     {

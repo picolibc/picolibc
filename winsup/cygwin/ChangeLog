@@ -1,3 +1,20 @@
+Sat Aug  4 16:52:03 2001  Christopher Faylor <cgf@cygnus.com>
+
+	Throughout, change check for running under Windows NT to 'iswinnt'.
+	* dcrt0.cc (set_os_type): Set 'iswinnt' appropriately.
+	* cygheap.cc (init_cheap): Revert to using VirtualAlloc for allocating
+	cygheap.
+	(cygheap_setup_for_child_cleanup): New function.  Standard function to
+	call after calling CreateProcess to cleanup cygheap info passed to
+	child.
+	(cygheap_fixup_in_child): Copy cygheap from shared memory into
+	allocated space under Windows 9x or if can't relocate shared space
+	under NT.
+	* cygheap.h: Declare new function.
+	* spawn.cc (spawn_guts): Use cygheap_fixup_in_child.
+	* fork.cc (fork_parent): Ditto.
+	* winsup.h: Declare iswinnt.
+
 2001-08-04  Egor Duda  <deo@logos-m.ru>
 
 	* dtable.cc (dtable::release): Avoid messing with console when

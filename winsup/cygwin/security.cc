@@ -108,7 +108,7 @@ extern "C"
 HANDLE
 cygwin_logon_user (const struct passwd *pw, const char *password)
 {
-  if (os_being_run != winNT)
+  if (!iswinnt)
     {
       set_errno (ENOSYS);
       return INVALID_HANDLE_VALUE;
@@ -1063,7 +1063,7 @@ static int
 get_nt_attribute (const char *file, int *attribute,
 		  uid_t *uidret, gid_t *gidret)
 {
-  if (os_being_run != winNT)
+  if (!iswinnt)
     return 0;
 
   syscall_printf ("file: %s", file);
@@ -1286,7 +1286,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
 {
   BOOL dummy;
 
-  if (os_being_run != winNT)
+  if (!iswinnt)
     return NULL;
 
   if (!sd_ret || !sd_size_ret)
@@ -1557,7 +1557,7 @@ static int
 set_nt_attribute (const char *file, uid_t uid, gid_t gid,
 		  const char *logsrv, int attribute)
 {
-  if (os_being_run != winNT)
+  if (!iswinnt)
     return 0;
 
   DWORD sd_size = 4096;

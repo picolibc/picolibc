@@ -122,7 +122,7 @@ WSADATA wsadata;
 static SOCKET __stdcall
 set_socket_inheritance (SOCKET sock)
 {
-  if (os_being_run == winNT)
+  if (iswinnt)
     (void) SetHandleInformation ((HANDLE) sock, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
   else
     {
@@ -1292,9 +1292,9 @@ getdomainname (char *domain, int len)
    * Punt for now and assume MS-TCP on Win95.
    */
   reg_key r (HKEY_LOCAL_MACHINE, KEY_READ,
-	     (os_being_run != winNT) ? "System" : "SYSTEM",
+	     (!iswinnt) ? "System" : "SYSTEM",
 	     "CurrentControlSet", "Services",
-	     (os_being_run != winNT) ? "MSTCP" : "Tcpip",
+	     (!iswinnt) ? "MSTCP" : "Tcpip",
 	     NULL);
 
   /* FIXME: Are registry keys case sensitive? */

@@ -156,6 +156,7 @@ do_global_ctors (void (**in_pfunc)(), int force)
 /* remember the type of Win32 OS being run for future use. */
 os_type NO_COPY os_being_run;
 char NO_COPY osname[40];
+bool iswinnt;
 
 /* set_os_type: Set global variable os_being_run with type of Win32
    operating system being run.  This information is used internally
@@ -171,11 +172,13 @@ set_os_type ()
   os_version_info.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
   GetVersionEx (&os_version_info);
 
+  iswinnt = 0;
   switch (os_version_info.dwPlatformId)
     {
       case VER_PLATFORM_WIN32_NT:
 	os_being_run = winNT;
 	os = "NT";
+	iswinnt = 1;
 	break;
       case VER_PLATFORM_WIN32_WINDOWS:
 	if (os_version_info.dwMinorVersion == 0)
@@ -539,7 +542,7 @@ static NO_COPY STARTUPINFO si;
 child_info_fork NO_COPY *child_proc_info = NULL;
 static MEMORY_BASIC_INFORMATION sm;
 
-#define CYGWIN_GUARD ((os_being_run == winNT) ? PAGE_GUARD : PAGE_NOACCESS)
+#define CYGWIN_GUARD ((iswinnt) ? PAGE_GUARD : PAGE_NOACCESS)
 
 // __inline__ void
 extern void

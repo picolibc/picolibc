@@ -59,7 +59,7 @@ sysconf (int in)
 #endif
       case _SC_NPROCESSORS_CONF:
       case _SC_NPROCESSORS_ONLN:
-	if (os_being_run != winNT)
+	if (!iswinnt)
 	  return 1;
 	/*FALLTHRU*/
       case _SC_PHYS_PAGES:

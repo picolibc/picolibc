@@ -91,7 +91,7 @@ fhandler_dev_floppy::lseek (off_t offset, int whence)
   DWORD low;
   LONG high = 0;
 
-  if (os_being_run == winNT)
+  if (iswinnt)
     {
       DISK_GEOMETRY di;
       PARTITION_INFORMATION pi;

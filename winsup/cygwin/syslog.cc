@@ -300,7 +300,7 @@ syslog (int priority, const char *message, ...)
 	      return;
 	  }
 
-	if (os_being_run != winNT)
+	if (!iswinnt)
 	  {
 	    /* Add a priority string - not needed for NT
 	       as NT has its own priority codes. */
@@ -336,7 +336,7 @@ syslog (int priority, const char *message, ...)
 
     msg_strings[0] = total_msg;
 
-    if (os_being_run == winNT)
+    if (iswinnt)
       {
 	/* For NT, open the event log and send the message */
 	HANDLE hEventSrc = RegisterEventSourceA (NULL, (process_ident != NULL) ?

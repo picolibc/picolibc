@@ -568,7 +568,7 @@ fhandler_base::write (const void *ptr, size_t len)
 
   if (get_append_p ())
     SetFilePointer (get_handle(), 0, 0, FILE_END);
-  else if (os_being_run != winNT && get_check_win95_lseek_bug ())
+  else if (!iswinnt && get_check_win95_lseek_bug ())
     {
       /* Note: this bug doesn't happen on NT4, even though the documentation
 	 for WriteFile() says that it *may* happen on any OS. */
@@ -1417,7 +1417,7 @@ fhandler_disk_file::lock (int cmd, struct flock *fl)
 
   BOOL res;
 
-  if (os_being_run == winNT)
+  if (iswinnt)
     {
       DWORD lock_flags = (cmd == F_SETLK) ? LOCKFILE_FAIL_IMMEDIATELY : 0;
       lock_flags |= (fl->l_type == F_WRLCK) ? LOCKFILE_EXCLUSIVE_LOCK : 0;

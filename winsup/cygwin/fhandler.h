@@ -418,7 +418,7 @@ public:
   /* This strange test is due to the fact that we can't rely on
      Windows shells to "do the right thing" with pipes.  Apparently
      the can keep one end of the pipe open when it shouldn't be. */
-  BOOL is_slow () {return os_being_run == winNT;}
+  BOOL is_slow () {return iswinnt;}
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
