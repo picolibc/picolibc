@@ -1,3 +1,8 @@
+2003-10-20  Phil Edwards  <phil@codesourcery.com>
+
+	* configure.in (*-*-vxworks):  Add target-libiberty to noconfdirs.
+	* configure:  Regenerate.
+
 2003-10-13  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	* Makefile.tpl: Make GCC_FLAGS_TO_PASS a superset of
