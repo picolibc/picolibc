@@ -14,7 +14,7 @@ details. */
 
 class mount_item
 {
-public:
+ public:
   /* FIXME: Nasty static allocation.  Need to have a heap in the shared
      area [with the user being able to configure at runtime the max size].  */
 
@@ -45,7 +45,7 @@ public:
 class reg_key;
 class mount_info
 {
-public:
+ public:
   DWORD version;
   DWORD sys_mount_table_counter;
   int nmounts;
@@ -57,11 +57,11 @@ public:
   char cygdrive[MAX_PATH];
   size_t cygdrive_len;
   unsigned cygdrive_flags;
-private:
+ private:
   int posix_sorted[MAX_MOUNTS];
   int native_sorted[MAX_MOUNTS];
 
-public:
+ public:
   /* Increment when setting up a reg_key if mounts area had to be
      created so we know when we need to import old mount tables. */
   int had_to_create_mount_areas;
@@ -89,7 +89,7 @@ public:
 
   void import_v1_mounts ();
 
-private:
+ private:
 
   void sort ();
   void read_mounts (reg_key& r);
@@ -99,7 +99,6 @@ private:
 
   int cygdrive_win32_path (const char *src, char *dst, int trailing_slash_p);
   void cygdrive_posix_path (const char *src, char *dst, int trailing_slash_p);
-  void slash_drive_to_win32_path (const char *path, char *buf, int trailing_slash_p);
   void read_cygdrive_info_from_registry ();
 };
 
@@ -132,7 +131,7 @@ public:
 class shared_info
 {
   DWORD inited;
-public:
+ public:
   int heap_chunk_in_mb;
   DWORD sys_mount_table_counter;
 

@@ -1038,18 +1038,6 @@ nofinalslash (const char *src, char *dst)
     dst[len] = '\0';
 }
 
-/* slash_drive_prefix_p: Return non-zero if PATH begins with
-   //<letter>.  */
-
-static int
-slash_drive_prefix_p (const char *path)
-{
-  return (isdirsep(path[0])
-	  && isdirsep(path[1])
-	  && isalpha (path[2])
-	  && (path[3] == 0 || path[3] == '/'));
-}
-
 /* slash_unc_prefix_p: Return non-zero if PATH begins with //UNC/SHARE */
 
 int __stdcall
@@ -1254,10 +1242,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
 
   if (i >= nmounts)
     {
-      if (slash_drive_prefix_p (pathbuf))
-	slash_drive_to_win32_path (pathbuf, dst, 0);
-      else
-	backslashify (pathbuf, dst, 0);	/* just convert */
+      backslashify (pathbuf, dst, 0);	/* just convert */
       *flags = 0;
     }
   else
@@ -1278,20 +1263,6 @@ out:
   MALLOC_CHECK;
   debug_printf ("src_path %s, dst %s, flags %p", src_path, dst, *flags);
   return 0;
-}
-
-/* Convert PATH (for which slash_drive_prefix_p returns 1) to WIN32 form.  */
-
-void
-mount_info::slash_drive_to_win32_path (const char *path, char *buf,
-				       int trailing_slash_p)
-{
-  buf[0] = path[2];
-  buf[1] = ':';
-  if (path[3] == '0')
-    strcpy (buf + 2, "\\");
-  else
-    backslashify (path + 3, buf + 2, trailing_slash_p);
 }
 
 /* cygdrive_posix_path: Build POSIX path used as the
@@ -1920,10 +1891,7 @@ mount_info::add_item (const char *native, const char *posix, unsigned mountflags
   char nativetmp[MAX_PATH];
   char posixtmp[MAX_PATH];
 
-  if (slash_drive_prefix_p (native))
-    slash_drive_to_win32_path (native, nativetmp, 0);
-  else
-    backslashify (native, nativetmp, 0);
+  backslashify (native, nativetmp, 0);
   nofinalslash (nativetmp, nativetmp);
 
   slashify (posix, posixtmp, 0);
@@ -1990,10 +1958,8 @@ mount_info::del_item (const char *path, unsigned flags, int reg_p)
       return -1;
     }
 
-  if (slash_drive_prefix_p (path))
-      slash_drive_to_win32_path (path, pathtmp, 0);
-  else if (slash_unc_prefix_p (path) || strpbrk (path, ":\\"))
-      backslashify (path, pathtmp, 0);
+  if (slash_unc_prefix_p (path) || strpbrk (path, ":\\"))
+    backslashify (path, pathtmp, 0);
   else
     {
       slashify (path, pathtmp, 0);
