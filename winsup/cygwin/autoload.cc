@@ -24,45 +24,45 @@ struct DLLinfo
 };
 
 /* FIXME: This is not thread-safe! */
-__asm__ ("
-msg1:
-  .ascii \"couldn't dynamically determine load address for '%s' (handle %p), %E\\0\"
-
-  .align 32
-noload:
-  popl %edx		# Get the address of the information block
-  movl 8(%edx),%eax	# Should we 'ignore' the lack
-  test $1,%eax		#  of this function?
-  jz 1f			# Nope.
-  decl %eax		# Yes.  This is the # of bytes + 1
-  popl %edx		# Caller's caller
-  addl %eax,%esp	# Pop off bytes
-  xor %eax,%eax		# Zero functional return
-  jmp *%edx		# Return
-1:
-  movl 4(%edx),%eax	# Handle value
-  pushl (%eax)
-  leal 12(%edx),%eax	# Location of name of function
-  push %eax
-  push $msg1		# The message
-  call ___api_fatal	# Print message. Never returns
-
-  .globl cygwin_dll_func_load
-cygwin_dll_func_load:
-  movl (%esp),%eax	# 'Return address' contains load info
-  addl $12,%eax		# Address of name of function to load
-  pushl %eax		# Second argument
-  movl -8(%eax),%eax	# Address of Handle to DLL
-  pushl (%eax)		# Handle to DLL
-  call _GetProcAddress@8# Load it
-  test %eax,%eax	# Success?
-  jne gotit		# Yes
-  jmp noload		# Issue an error or return
-gotit:
-  popl %ecx		# Pointer to 'return address'
-  movb $0xe0,-1(%ecx)	# Turn preceding call to a jmp *%eax
-  movl %eax,(%ecx)	# Point dispatch to address loaded above
-  jmp *%eax
+__asm__ ("\n\
+msg1:\n\
+  .ascii \"couldn't dynamically determine load address for '%s' (handle %p), %E\\0\"\n\
+\n\
+  .align 32\n\
+noload:\n\
+  popl %edx		# Get the address of the information block\n\
+  movl 8(%edx),%eax	# Should we 'ignore' the lack\n\
+  test $1,%eax		#  of this function?\n\
+  jz 1f			# Nope.\n\
+  decl %eax		# Yes.  This is the # of bytes + 1\n\
+  popl %edx		# Caller's caller\n\
+  addl %eax,%esp	# Pop off bytes\n\
+  xor %eax,%eax		# Zero functional return\n\
+  jmp *%edx		# Return\n\
+1:\n\
+  movl 4(%edx),%eax	# Handle value\n\
+  pushl (%eax)\n\
+  leal 12(%edx),%eax	# Location of name of function\n\
+  push %eax\n\
+  push $msg1		# The message\n\
+  call ___api_fatal	# Print message. Never returns\n\
+\n\
+  .globl cygwin_dll_func_load\n\
+cygwin_dll_func_load:\n\
+  movl (%esp),%eax	# 'Return address' contains load info\n\
+  addl $12,%eax		# Address of name of function to load\n\
+  pushl %eax		# Second argument\n\
+  movl -8(%eax),%eax	# Address of Handle to DLL\n\
+  pushl (%eax)		# Handle to DLL\n\
+  call _GetProcAddress@8# Load it\n\
+  test %eax,%eax	# Success?\n\
+  jne gotit		# Yes\n\
+  jmp noload		# Issue an error or return\n\
+gotit:\n\
+  popl %ecx		# Pointer to 'return address'\n\
+  movb $0xe0,-1(%ecx)	# Turn preceding call to a jmp *%eax\n\
+  movl %eax,(%ecx)	# Point dispatch to address loaded above\n\
+  jmp *%eax\n\
 ");
 
 LoadDLLinitfunc (advapi32)

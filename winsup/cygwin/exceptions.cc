@@ -1144,69 +1144,69 @@ void unused_sig_wrapper ()
    prototype signal handlers as __stdcall), calls _set_process_mask
    to restore any mask, restores any potentially clobbered registers
    and returns to original caller. */
-__asm__ volatile ("
-	.text
-
-_sigreturn:
-	addl	$4,%%esp	# Remove argument
-	movl	%%esp,%%ebp
-	addl	$36,%%ebp
-
-	cmpl	$0,%4		# Did a signal come in?
-	jz	1f		# No, if zero
-	call	_call_signal_handler@0 # yes handle the signal
-
-# FIXME: There is a race here.  The signal handler could set up
-# the sigsave structure between _call_signal_handler and the
-# end of _set_process_mask.  This would make cygwin detect an
-# incorrect signal mask.
-
-1:	call	_set_process_mask@4
-	popl	%%eax		# saved errno
-	testl	%%eax,%%eax	# Is it < 0
-	jl	2f		# yup.  ignore it
-	movl	%1,%%ebx
-	movl	%%eax,(%%ebx)
-2:	popl	%%eax
-	popl	%%ebx
-	popl	%%ecx
-	popl	%%edx
-	popl	%%edi
-	popl	%%esi
-	popf
-	popl	%%ebp
-	ret
-
-__no_sig_start:
-_sigdelayed:
-	pushl	%2			# original return address
-_sigdelayed0:
-	pushl	%%ebp
-	movl	%%esp,%%ebp
-	pushf
-	pushl	%%esi
-	pushl	%%edi
-	pushl	%%edx
-	pushl	%%ecx
-	pushl	%%ebx
-	pushl	%%eax
-	pushl	%7			# saved errno
-	pushl	%3			# oldmask
-	pushl	%4			# signal argument
-	pushl	$_sigreturn
-
-	call	_reset_signal_arrived@0
-	pushl	%5			# signal number
-	movl	$0,%0			# zero the signal number as a
-					# flag to the signal handler thread
-					# that it is ok to set up sigsave
-
-	pushl	%8
-	call	_set_process_mask@4
-	popl	%%eax
-	jmp	*%%eax
-__no_sig_end:
-
+__asm__ volatile ("\n\
+	.text\n\
+\n\
+_sigreturn:\n\
+	addl	$4,%%esp	# Remove argument\n\
+	movl	%%esp,%%ebp\n\
+	addl	$36,%%ebp\n\
+\n\
+	cmpl	$0,%4		# Did a signal come in?\n\
+	jz	1f		# No, if zero\n\
+	call	_call_signal_handler@0 # yes handle the signal\n\
+\n\
+# FIXME: There is a race here.  The signal handler could set up\n\
+# the sigsave structure between _call_signal_handler and the\n\
+# end of _set_process_mask.  This would make cygwin detect an\n\
+# incorrect signal mask.\n\
+\n\
+1:	call	_set_process_mask@4\n\
+	popl	%%eax		# saved errno\n\
+	testl	%%eax,%%eax	# Is it < 0\n\
+	jl	2f		# yup.  ignore it\n\
+	movl	%1,%%ebx\n\
+	movl	%%eax,(%%ebx)\n\
+2:	popl	%%eax\n\
+	popl	%%ebx\n\
+	popl	%%ecx\n\
+	popl	%%edx\n\
+	popl	%%edi\n\
+	popl	%%esi\n\
+	popf\n\
+	popl	%%ebp\n\
+	ret\n\
+\n\
+__no_sig_start:\n\
+_sigdelayed:\n\
+	pushl	%2			# original return address\n\
+_sigdelayed0:\n\
+	pushl	%%ebp\n\
+	movl	%%esp,%%ebp\n\
+	pushf\n\
+	pushl	%%esi\n\
+	pushl	%%edi\n\
+	pushl	%%edx\n\
+	pushl	%%ecx\n\
+	pushl	%%ebx\n\
+	pushl	%%eax\n\
+	pushl	%7			# saved errno\n\
+	pushl	%3			# oldmask\n\
+	pushl	%4			# signal argument\n\
+	pushl	$_sigreturn\n\
+\n\
+	call	_reset_signal_arrived@0\n\
+	pushl	%5			# signal number\n\
+	movl	$0,%0			# zero the signal number as a\n\
+					# flag to the signal handler thread\n\
+					# that it is ok to set up sigsave\n\
+\n\
+	pushl	%8\n\
+	call	_set_process_mask@4\n\
+	popl	%%eax\n\
+	jmp	*%%eax\n\
+__no_sig_end:\n\
+\n\
 " : "=m" (sigsave.sig) : "m" (&_impure_ptr->_errno),
   "g" (sigsave.retaddr), "g" (sigsave.oldmask), "g" (sigsave.sig),
     "g" (sigsave.func), "o" (pid_offset), "g" (sigsave.saved_errno), "g" (sigsave.newmask)

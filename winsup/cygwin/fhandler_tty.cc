@@ -1,6 +1,6 @@
 /* fhandler_tty.cc
 
-   Copyright 1997, 1998, 2000 Cygnus Solutions.
+   Copyright 1997, 1998, 2000, 2001 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -144,7 +144,7 @@ fhandler_tty_common::__release_output_mutex (const char *fn, int ln)
       if (osi > 0)
 	osi--;
       termios_printf ("released at %s:%d, osi %d", fn, ln, osi);
-      termios_printf("  for %s:%d (%s)", ostack[osi].fn, ostack[osi].ln, ostack[osi].tname);
+      termios_printf ("  for %s:%d (%s)", ostack[osi].fn, ostack[osi].ln, ostack[osi].tname);
       ostack[osi].ln = -ln;
 #endif
     }
@@ -173,7 +173,7 @@ fhandler_pty_master::accept_input ()
 
   n = get_ttyp ()->read_retval = eat_readahead (-1);
 
-  if ( n != 0 )
+  if (n != 0)
     {
       termios_printf ("about to write %d chars to slave", n);
       rc = WriteFile (get_output_handle (), rabuf, n, &written, NULL);
@@ -411,21 +411,21 @@ process_ioctl (void *)
 /**********************************************************************/
 /* Tty slave stuff */
 
-fhandler_tty_slave::fhandler_tty_slave(int num, const char *name) :
+fhandler_tty_slave::fhandler_tty_slave (int num, const char *name) :
 	fhandler_tty_common (FH_TTYS, name, num)
 {
   set_cb (sizeof *this);
   ttynum = num;
   /* FIXME: This is wasteful.  We should rewrite the set_name path to eliminate the
      need for double allocates. */
-  unix_path_name_ = (char *) crealloc (unix_path_name_, strlen(win32_path_name_) + 1);
+  unix_path_name_ = (char *) crealloc (unix_path_name_, strlen (win32_path_name_) + 1);
   strcpy (unix_path_name_, win32_path_name_);
   unix_path_name_[0] = unix_path_name_[4] = '/';
   debug_printf ("unix '%s', win32 '%s'", unix_path_name_, win32_path_name_);
   inuse = NULL;
 }
 
-fhandler_tty_slave::fhandler_tty_slave(const char *name) :
+fhandler_tty_slave::fhandler_tty_slave (const char *name) :
 	fhandler_tty_common (FH_TTYS, name, 0)
 {
   set_cb (sizeof *this);
@@ -452,13 +452,13 @@ fhandler_tty_slave::open (const char *, int flags, mode_t)
   __small_sprintf (buf, OUTPUT_DONE_EVENT, ttynum);
   output_done_event = OpenEvent (EVENT_ALL_ACCESS, TRUE, buf);
 
-  if (!(output_mutex = get_ttyp()->open_output_mutex (TRUE)))
+  if (!(output_mutex = get_ttyp ()->open_output_mutex (TRUE)))
     {
       termios_printf ("open output mutex failed, %E");
       __seterrno ();
       return 0;
     }
-  if (!(input_mutex = get_ttyp()->open_input_mutex (TRUE)))
+  if (!(input_mutex = get_ttyp ()->open_input_mutex (TRUE)))
     {
       termios_printf ("open input mutex failed, %E");
       __seterrno ();
@@ -500,7 +500,7 @@ fhandler_tty_slave::open (const char *, int flags, mode_t)
 				     get_ttyp ()->master_pid);
   if (tty_owner == NULL)
     {
-      termios_printf ("can't open tty(%d) handle process %d",
+      termios_printf ("can't open tty (%d) handle process %d",
 		      ttynum, get_ttyp ()->master_pid);
       __seterrno ();
       return 0;
@@ -529,7 +529,7 @@ fhandler_tty_slave::open (const char *, int flags, mode_t)
   ProtectHandle1 (nh, to_pty);
   CloseHandle (tty_owner);
 
-  termios_printf("tty%d opened", ttynum);
+  termios_printf ("tty%d opened", ttynum);
 
   return 1;
 }
@@ -555,7 +555,7 @@ fhandler_tty_slave::write (const void *ptr, size_t len)
 {
   DWORD n, towrite = len;
 
-  termios_printf("tty%d, write(%x, %d)", ttynum, ptr, len);
+  termios_printf ("tty%d, write(%x, %d)", ttynum, ptr, len);
 
   acquire_output_mutex (INFINITE);
 
@@ -597,7 +597,7 @@ fhandler_tty_slave::write (const void *ptr, size_t len)
 	  DWORD rc;
 	  DWORD x = n * 1000;
 	  rc = WaitForSingleObject (output_done_event, x);
-	  termios_printf("waited %d ms for output_done_event, WFSO %d", x, rc);
+	  termios_printf ("waited %d ms for output_done_event, WFSO %d", x, rc);
 	}
     }
   release_output_mutex ();
@@ -627,9 +627,9 @@ fhandler_tty_slave::read (void *ptr, size_t len)
       if (vmin < 0) vmin = 0;
       if (vtime < 0) vtime = 0;
       if (vmin == 0)
-        time_to_wait = INFINITE;
+	time_to_wait = INFINITE;
       else
-        time_to_wait = (vtime == 0 ? INFINITE : 10 * vtime);
+	time_to_wait = (vtime == 0 ? INFINITE : 10 * vtime);
     }
   else
     time_to_wait = INFINITE;
@@ -641,58 +641,58 @@ fhandler_tty_slave::read (void *ptr, size_t len)
     {
       rc = WaitForMultipleObjects (2, w4, FALSE, time_to_wait);
       if (rc == WAIT_OBJECT_0)
-        {
-          /* if we've recieved signal after successfully reading some data,
-             just return all data successfully read */
-          if (totalread > 0)
-            break;
-          set_sig_errno (EINTR);
-          return -1;
-        }
+	{
+	  /* if we've recieved signal after successfully reading some data,
+	     just return all data successfully read */
+	  if (totalread > 0)
+	    break;
+	  set_sig_errno (EINTR);
+	  return -1;
+	}
       else if (rc == WAIT_FAILED)
-        {
-          termios_printf ("wait for input event failed, %E");
-          break;
-        }
+	{
+	  termios_printf ("wait for input event failed, %E");
+	  break;
+	}
       else if (rc == WAIT_TIMEOUT)
-        break;
+	break;
       rc = WaitForSingleObject (input_mutex, 1000);
       if (rc == WAIT_FAILED)
-        {
-          termios_printf ("wait for input mutex failed, %E");
-          break;
-        }
+	{
+	  termios_printf ("wait for input mutex failed, %E");
+	  break;
+	}
       else if (rc == WAIT_TIMEOUT)
-        {
-          termios_printf ("failed to acquire input mutex after input event arrived");
-          break;
-        }
+	{
+	  termios_printf ("failed to acquire input mutex after input event arrived");
+	  break;
+	}
       if (!PeekNamedPipe (get_handle (), NULL, 0, NULL, &bytes_in_pipe, NULL))
 	{
 	  termios_printf ("PeekNamedPipe failed, %E");
-          _raise (SIGHUP);
-          bytes_in_pipe = 0;
+	  _raise (SIGHUP);
+	  bytes_in_pipe = 0;
 	}
       readlen = min (bytes_in_pipe, min (len, sizeof (buf)));
-      if ( readlen )
-        {
-          termios_printf ("reading %d bytes (vtime %d)", readlen, vtime);
-          if (ReadFile (get_handle (), buf, readlen, &n, NULL) == FALSE)
- 	    {
+      if (readlen)
+	{
+	  termios_printf ("reading %d bytes (vtime %d)", readlen, vtime);
+	  if (ReadFile (get_handle (), buf, readlen, &n, NULL) == FALSE)
+	    {
 	      termios_printf ("read failed, %E");
 	      _raise (SIGHUP);
 	    }
-          if (n)
-            {
-              len -= n;
-              totalread += n;
-              memcpy (ptr, buf, n);
-              ptr = (char *) ptr + n;
-            }
-        }
+	  if (n)
+	    {
+	      len -= n;
+	      totalread += n;
+	      memcpy (ptr, buf, n);
+	      ptr = (char *) ptr + n;
+	    }
+	}
 
       if (readlen != bytes_in_pipe)
-        SetEvent (input_available_event);
+	SetEvent (input_available_event);
 
       ReleaseMutex (input_mutex);
 
@@ -707,18 +707,18 @@ fhandler_tty_slave::read (void *ptr, size_t len)
 	  termios_printf ("saw EOF");
 	  break;
 	}
-      if ( get_ttyp ()->ti.c_lflag & ICANON ||
-           get_flags () & (O_NONBLOCK | O_NDELAY))
+      if (get_ttyp ()->ti.c_lflag & ICANON ||
+	  get_flags () & (O_NONBLOCK | O_NDELAY))
 	break;
       if (totalread >= vmin && (vmin > 0 || totalread > 0))
-        break;
+	break;
 
-      /* vmin == 0 && vtime == 0: 
+      /* vmin == 0 && vtime == 0:
        *   we've already read all input, if any, so return immediately
        * vmin == 0 && vtime > 0:
        *   we've waited for input 10*vtime ms in WFSO(input_available_event),
        *   no matter whether any input arrived, we shouldn't wait any longer,
-       *   so return immediately 
+       *   so return immediately
        * vmin > 0 && vtime == 0:
        *   here, totalread < vmin, so continue waiting until more data
        *   arrive
@@ -728,7 +728,8 @@ fhandler_tty_slave::read (void *ptr, size_t len)
        *   so "restart timer" and wait until more data arrive
        */
 
-      if (vmin == 0) break;
+      if (vmin == 0)
+	break;
     }
   termios_printf ("%d=read(%x, %d)", totalread, ptr, len);
   return totalread;
@@ -861,8 +862,8 @@ fhandler_tty_slave::ioctl (unsigned int cmd, void *arg)
 	 myself->ctty == ttynum && (get_ttyp ()->ti.c_lflag & TOSTOP))
     {
       /* background process */
-      termios_printf("bg ioctl pgid %d, tpgid %d, ctty %d",
-		     myself->pgid, get_ttyp ()->getpgid (), myself->ctty);
+      termios_printf ("bg ioctl pgid %d, tpgid %d, ctty %d",
+		      myself->pgid, get_ttyp ()->getpgid (), myself->ctty);
       _raise (SIGTTOU);
     }
 
@@ -1070,7 +1071,15 @@ fhandler_pty_master::ptsname (void)
 void
 fhandler_tty_common::set_close_on_exec (int val)
 {
+#ifndef DEBUGGING
   this->fhandler_base::set_close_on_exec (val);
+#else
+  /* FIXME: This is a duplication from fhandler_base::set_close_on_exec.
+     It is here because we need to specify the "from_pty" stuff here or
+     we'll get warnings from ForceCloseHandle when debugging. */
+  set_inheritance (get_io_handle (), val, "from_pty");
+  set_close_on_exec_flag (val);
+#endif
   if (output_done_event)
     set_inheritance (output_done_event, val);
   if (ioctl_request_event)
@@ -1082,7 +1091,7 @@ fhandler_tty_common::set_close_on_exec (int val)
   set_inheritance (output_mutex, val, "output_mutex");
   set_inheritance (input_mutex, val, "input_mutex");
   set_inheritance (input_available_event, val);
-  set_inheritance (output_handle, val);
+  set_inheritance (output_handle, val, "to_pty");
 }
 
 void

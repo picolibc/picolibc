@@ -1,3 +1,13 @@
+Sat Mar 10 20:54:47 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* autoload.cc (noload): Use proper method for multiline strings or
+	newer gcc's complain.
+	* exceptions.cc (unused_sig_wrapper): Ditto.
+	* fhandler.h (fhandler_base): Make get_io_handle and friends return
+	self.
+	* fhandler_tty.cc (fhandler_pty_common::close_on_exec): Accomodate
+	DEBUGGING flag to avoid spurious warnings when inheritance is set.
+
 Sat Mar 10 16:52:12 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* shortcut.c (PATH_ALL_EXEC): Add parentheses to avoid a compiler

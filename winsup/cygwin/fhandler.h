@@ -317,9 +317,9 @@ public:
 
   /* Virtual accessor functions to hide the fact
      that some fd's have two handles. */
-  virtual HANDLE get_handle () const { return io_handle; }
-  virtual HANDLE get_io_handle () const { return io_handle; }
-  virtual HANDLE get_output_handle () const { return io_handle; }
+  virtual HANDLE& get_handle () { return io_handle; }
+  virtual HANDLE& get_io_handle () { return io_handle; }
+  virtual HANDLE& get_output_handle () { return io_handle; }
   virtual BOOL hit_eof () {return FALSE;}
   virtual select_record *select_read (select_record *s);
   virtual select_record *select_write (select_record *s);
@@ -347,7 +347,7 @@ private:
 public:
   fhandler_socket (const char *name = 0);
   ~fhandler_socket ();
-  int get_socket () const { return (int) get_handle(); }
+  int get_socket () { return (int) get_handle(); }
   fhandler_socket * is_socket () { return this; }
   int write (const void *ptr, size_t len);
   int read (void *ptr, size_t len);
@@ -570,7 +570,7 @@ public:
   {
     // nothing to do
   }
-  HANDLE get_output_handle () const { return output_handle; }
+  HANDLE& get_output_handle () { return output_handle; }
   int line_edit (const char *rptr, int nread, int always_accept = 0);
   void set_output_handle (HANDLE h) { output_handle = h; }
   void tcinit (tty_min *this_tc, int force = FALSE);
