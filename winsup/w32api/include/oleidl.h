@@ -285,33 +285,6 @@ DECLARE_INTERFACE_(IViewObject2,IUnknown)
 	STDMETHOD(GetExtent)(THIS_ DWORD,DWORD,DVTARGETDEVICE*,LPSIZEL) PURE;
 };
 
-EXTERN_C const IID IID_ISupportErrorInfo;
-#undef INTERFACE
-#define INTERFACE ISupportErrorInfo
-DECLARE_INTERFACE_(ISupportErrorInfo, IUnknown)
-{
-	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
-	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
-	STDMETHOD_(ULONG,Release)(THIS) PURE;
-	STDMETHOD(InterfaceSupportsErrorInfo)(THIS_ REFIID) PURE;
-
-};
-
-EXTERN_C const IID IID_IErrorInfo;
-#undef INTERFACE
-#define INTERFACE IErrorInfo
-DECLARE_INTERFACE_(IErrorInfo, IUnknown)
-{
-	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
-	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
-	STDMETHOD_(ULONG,Release)(THIS) PURE;
-
-	STDMETHOD(GetGUID)(THIS_ REFIID) PURE;
-	STDMETHOD(GetSource)(THIS_ BSTR*) PURE;
-	STDMETHOD(GetDescription)(THIS_ BSTR*) PURE;
-	STDMETHOD(GetHelpContext)(THIS_ DWORD*) PURE;
-
- };
 
 #ifdef __cplusplus
 }

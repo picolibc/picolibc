@@ -60,6 +60,7 @@ typedef interface IErrorInfo *LPERRORINFO;
 typedef interface IDispatch *LPDISPATCH;
 typedef interface IEnumVARIANT *LPENUMVARIANT;
 typedef interface ICreateErrorInfo *LPCREATEERRORINFO;
+typedef interface ISupportErrorInfo *LPSUPPORTERRORINFO;
 
 extern const IID IID_ITypeLib;
 extern const IID IID_ICreateTypeInfo;
@@ -71,7 +72,7 @@ extern const IID IID_IErrorInfo;
 extern const IID IID_IDispatch;
 extern const IID IID_IEnumVARIANT;
 extern const IID IID_ICreateErrorInfo;
-extern const GUID IID_ISupportErrorInfo;
+extern const IID IID_ISupportErrorInfo;
 
 typedef enum tagSYSKIND {
 	SYS_WIN16,SYS_WIN32,SYS_MAC
@@ -505,6 +506,47 @@ DECLARE_INTERFACE_(ITypeLib,IUnknown)
 	STDMETHOD(IsName)(THIS_ LPOLESTR,ULONG,BOOL*) PURE;
 	STDMETHOD(FindName)(THIS_ LPOLESTR,ULONG,ITypeInfo**,MEMBERID*,USHORT*) PURE;
 	STDMETHOD_(void,ReleaseTLibAttr)(THIS_ TLIBATTR*) PURE;
+};
+
+EXTERN_C const IID IID_IErrorInfo;
+#undef INTERFACE
+#define INTERFACE IErrorInfo
+DECLARE_INTERFACE_(IErrorInfo, IUnknown)
+{
+	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG,Release)(THIS) PURE;
+	STDMETHOD(GetGUID)(THIS_ GUID*) PURE;
+	STDMETHOD(GetSource)(THIS_ BSTR*) PURE;
+	STDMETHOD(GetDescription)(THIS_ BSTR*) PURE;
+	STDMETHOD(GetHelpFile)(THIS_ BSTR*) PURE;
+	STDMETHOD(GetHelpContext)(THIS_ DWORD*) PURE;
+};
+
+EXTERN_C const IID IID_ICreateErrorInfo;
+#undef INTERFACE
+#define INTERFACE ICreateErrorInfo
+DECLARE_INTERFACE_(ICreateErrorInfo, IUnknown)
+{
+	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*)PURE;
+	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG,Release)(THIS) PURE;
+	STDMETHOD(SetGUID)(THIS_ REFGUID) PURE;
+	STDMETHOD(SetSource)(THIS_ LPOLESTR) PURE;
+	STDMETHOD(SetDescription)(THIS_ LPOLESTR) PURE;
+	STDMETHOD(SetHelpFile)(THIS_ LPOLESTR) PURE;
+	STDMETHOD(SetHelpContext)(THIS_ DWORD) PURE;
+};
+
+EXTERN_C const IID IID_ISupportErrorInfo;
+#undef INTERFACE
+#define INTERFACE ISupportErrorInfo
+DECLARE_INTERFACE_(ISupportErrorInfo, IUnknown)
+{
+	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG,Release)(THIS) PURE;
+	STDMETHOD(InterfaceSupportsErrorInfo)(THIS_ REFIID) PURE;
 };
 
 #ifdef __cplusplus

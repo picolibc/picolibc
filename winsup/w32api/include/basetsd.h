@@ -1,6 +1,12 @@
 #ifndef _BASETSD_H
 #define _BASETSD_H
 
+#ifdef __GNUC__
+#ifndef __int64
+#define __int64 long long
+#endif
+#endif
+
 #if defined(_WIN64)
 #define __int3264   __int64
 #define ADDRESS_TAG_BIT 0x40000000000UI64

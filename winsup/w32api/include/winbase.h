@@ -1310,9 +1310,15 @@ BOOL WINAPI InitializeAcl(PACL,DWORD,DWORD);
 VOID WINAPI InitializeCriticalSection(LPCRITICAL_SECTION);
 BOOL WINAPI InitializeSecurityDescriptor(PSECURITY_DESCRIPTOR,DWORD);
 BOOL WINAPI InitializeSid (PSID,PSID_IDENTIFIER_AUTHORITY,BYTE);
-PVOID WINAPI InterlockedCompareExchange(PVOID*,PVOID,PVOID);
+LONG WINAPI InterlockedCompareExchange(LPLONG,LONG,LONG);
+/* PVOID WINAPI InterlockedCompareExchangePointer(PVOID*,PVOID,PVOID); */
+#define InterlockedCompareExchangePointer(d,e,c) \
+    (PVOID)InterlockedCompareExchange((LPLONG)(d),(LONG)(e),(LONG)(c))
 LONG WINAPI InterlockedDecrement(LPLONG);
-LONG WINAPI InterlockedExchange(PLONG,LONG);
+LONG WINAPI InterlockedExchange(LPLONG,LONG);
+/* PVOID WINAPI InterlockedExchangePointer(PVOID*,PVOID); */
+#define InterlockedExchangePointer(t,v) \
+    (PVOID)InterlockedExchange((LPLONG)(t),(LONG)(v)
 LONG WINAPI InterlockedExchangeAdd(PLONG,LONG);
 LONG WINAPI InterlockedIncrement(LPLONG);
 BOOL WINAPI IsBadCodePtr(FARPROC);

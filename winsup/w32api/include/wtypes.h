@@ -10,7 +10,7 @@ extern "C" {
 #define CLSID_NULL GUID_NULL
 #define CBPCLIPDATA(d) ((d).cbSize-sizeof((d).ulClipFmt))
 #define DECIMAL_NEG ((BYTE)0x80)
-#define DECIMAL_SETZERO(d) {(dec).Lo64=(dec).Hi32=(dec).signscale=0;}
+#define DECIMAL_SETZERO(d) {(d).Lo64=(d).Hi32=(d).signscale=0;}
 typedef struct _BLOB {
 	ULONG	cbSize;
 	BYTE	*pBlobData;

@@ -220,7 +220,6 @@ extern "C" {
 #define TBSTYLE_CHECKGROUP	(TBSTYLE_GROUP|TBSTYLE_CHECK)
 #define TBSTYLE_TOOLTIPS	256
 #define TBSTYLE_WRAPABLE	512
-#define TBSTYPE_FLAT	0x0800
 #define TBSTYLE_ALTDRAG	1024
 #if (_WIN32_IE >= 0x0300)
 #define TBSTYLE_FLAT 2048
@@ -302,6 +301,9 @@ extern "C" {
 #define TB_REPLACEBITMAP	(WM_USER+46)
 #define TBBF_LARGE 1
 #define TB_GETBITMAPFLAGS	(WM_USER+41)
+#if _WIN32_IE >= 0x400
+#define TB_SETBUTTONINFO    (WM_USER+66)
+#endif
 #define TBN_GETBUTTONINFOA	(TBN_FIRST-0)
 #define TBN_GETBUTTONINFOW	(TBN_FIRST-20)
 #define TBN_BEGINDRAG	(TBN_FIRST-1)
@@ -418,6 +420,16 @@ extern "C" {
 #define TBS_ENABLESELRANGE	32
 #define TBS_FIXEDLENGTH	64
 #define TBS_NOTHUMB	128
+#if _WIN32_IE >= 0x400
+#define TBIF_BYINDEX -2147483648
+#define TBIF_COMMAND 32
+#define TBIF_IMAGE 1
+#define TBIF_LPARAM 16
+#define TBIF_SIZE 64
+#define TBIF_STATE 4
+#define TBIF_STYLE 8
+#define TBIF_TEXT 2
+#endif
 #define TBM_GETPOS	(WM_USER)
 #define TBM_GETRANGEMIN	(WM_USER+1)
 #define TBM_GETRANGEMAX	(WM_USER+2)
@@ -504,6 +516,31 @@ extern "C" {
 #define LVS_NOCOLUMNHEADER	0x4000
 #define LVS_NOSORTHEADER	0x8000
 #if (_WIN32_IE >= 0x0300)
+/* FIXME: missing CDIS_INDETERMINATE,CDIS_MARKED,
+ CDDS_SUBITEM, CDRF_NOTIFYSUBITEMDRAW */
+#define CDIS_CHECKED 8
+#define CDIS_DEFAULT 32
+#define CDIS_DISABLED 4
+#define CDIS_FOCUS 16
+#define CDIS_GRAYED 2
+#define CDIS_HOT 64
+#define CDIS_SELECTED 1
+#define CDDS_POSTERASE 4
+#define CDDS_POSTPAINT 2
+#define CDDS_PREERASE 3
+#define CDDS_PREPAINT 1
+#define CDDS_ITEM 65536
+#define CDDS_ITEMPOSTERASE 65540
+#define CDDS_ITEMPOSTPAINT 65538
+#define CDDS_ITEMPREERASE 65539
+#define CDDS_ITEMPREPAINT 65537
+#define CDRF_DODEFAULT 0
+#define CDRF_NOTIFYITEMDRAW 32
+#define CDRF_NOTIFYITEMERASE 128
+#define CDRF_NOTIFYPOSTERASE 64
+#define CDRF_NOTIFYPOSTPAINT 16
+#define CDRF_NEWFONT 2
+#define CDRF_SKIPDEFAULT 4
 #define LVS_OWNERDATA 4096
 #define LVS_EX_CHECKBOXES 4
 #define LVS_EX_FULLROWSELECT 32
@@ -1114,6 +1151,32 @@ typedef struct _TBBUTTON {
 	int iString;
 } TBBUTTON,*PTBBUTTON,*LPTBBUTTON;
 typedef const TBBUTTON *LPCTBBUTTON;
+#if _WIN32_IE >= 0x400
+typedef struct {
+	UINT cbSize;
+	DWORD dwMask;
+	int idCommand;
+	int iImage;
+	BYTE fsState;
+	BYTE fsStyle;
+	WORD cx;
+	DWORD lParam;
+	LPSTR pszText;
+	int cchText;
+} TBBUTTONINFOA, *LPTBBUTTONINFOA;
+typedef struct {
+	UINT cbSize;
+	DWORD dwMask;
+	int idCommand;
+	int iImage;
+	BYTE fsState;
+	BYTE fsStyle;
+	WORD cx;
+	DWORD lParam;
+	LPWSTR pszText;
+	int cchText;
+} TBBUTTONINFOW, *LPTBBUTTONINFOW;
+#endif
 typedef struct {
 	NMHDR hdr;
 	int iItem;
@@ -1213,6 +1276,31 @@ typedef struct _NMHEADERW {
 #define LPNMHEADER LPNMHEADERA
 #endif
 /* End FIXME. */
+typedef struct tagNMCUSTOMDRAWINFO {
+    NMHDR    hdr;
+    DWORD    dwDrawStage;
+    HDC      hdc;
+    RECT     rc;
+    DWORD    dwItemSpec;
+    UINT     uItemState;
+    LPARAM   lItemParam;
+} NMCUSTOMDRAW, *LPNMCUSTOMDRAW;
+typedef struct tagNMLVCUSTOMDRAW {
+    NMCUSTOMDRAW nmcd;
+    COLORREF     clrText;
+    COLORREF     clrTextBk;
+#if _WIN32_IE >= 0x0400
+    int          iSubItem;
+#endif
+} NMLVCUSTOMDRAW, *LPNMLVCUSTOMDRAW;
+typedef struct tagNMTVCUSTOMDRAW {
+    NMCUSTOMDRAW nmcd;
+    COLORREF     clrText;
+    COLORREF     clrTextBk;
+#if _WIN32_IE >= 0x0400
+    int          iLevel;
+#endif
+} NMTVCUSTOMDRAW, *LPNMTVCUSTOMDRAW;
 typedef struct tagTBADDBITMAP {
 	HINSTANCE hInst;
 	UINT nID;
@@ -1412,6 +1500,12 @@ typedef struct _LV_KEYDOWN {
 	WORD wVKey;
 	UINT flags;
 } LV_KEYDOWN;
+typedef struct tagNMLVCACHEHINT {
+	NMHDR hdr;
+	int iFrom;
+	int iTo;
+} NMLVCACHEHINT, *PNMLVCACHEHINT;
+#define NM_CACHEHINT NMLVCACHEHINT
 DECLARE_HANDLE(HTREEITEM);
 typedef struct tagTVITEMA {
 	UINT mask;
@@ -1912,7 +2006,7 @@ BOOL WINAPI _TrackMouseEvent(LPTRACKMOUSEEVENT);
 #define TreeView_GetItemRect(w,i,p,c) (*(HTREEITEM*)p=(i),(BOOL)SendMessage((w),TVM_GETITEMRECT,c,(LPARAM)(LPRECT)(p)))
 #define TreeView_GetCount(w) (UINT)SendMessage((w),TVM_GETCOUNT,0,0)
 #define TreeView_GetIndent(w) (UINT)SendMessage((w),TVM_GETINDENT,0,0)
-#define TreeView_SetIndent(w,i) (BOOL)SendMessage((w),TVM_SETINDENT,indent,0)
+#define TreeView_SetIndent(w,i) (BOOL)SendMessage((w),TVM_SETINDENT,i,0)
 #define TreeView_GetImageList(w,i) (HIMAGELIST)SendMessage((w),TVM_GETIMAGELIST,i,0)
 #define TreeView_SetImageList(w,h,i) (HIMAGELIST)SendMessage((w),TVM_SETIMAGELIST,i,(LPARAM)(HIMAGELIST)(h))
 #define TreeView_GetNextItem(w,i,c) (HTREEITEM)SendMessage((w),TVM_GETNEXTITEM,c,(LPARAM)(HTREEITEM)(i))
@@ -2027,6 +2121,10 @@ typedef NMTREEVIEWW NMTREEVIEW,*LPNMTREEVIEW;
 #define TB_SAVERESTORE TB_SAVERESTOREW
 #define TB_ADDSTRING TB_ADDSTRINGW
 #define TBN_GETBUTTONINFO TBN_GETBUTTONINFOW
+#if _WIN32_IE >= 0x400
+#define TBBUTTONINFO TBBUTTONINFOW
+#define LPTBBUTTONINFO LPTBBUTTONINFOW
+#endif
 #define TBNOTIFY TBNOTIFYW
 #define LPTBNOTIFY LPTBNOTIFYW
 #define TOOLTIPS_CLASS TOOLTIPS_CLASSW
@@ -2158,6 +2256,10 @@ typedef NMTREEVIEWA NMTREEVIEW,*LPNMTREEVIEW;
 #define TB_SAVERESTORE TB_SAVERESTOREA
 #define TB_ADDSTRING TB_ADDSTRINGA
 #define TBN_GETBUTTONINFO TBN_GETBUTTONINFOA
+#if _WIN32_IE >= 0x400
+#define TBBUTTONINFO TBBUTTONINFOA
+#define LPTBBUTTONINFO LPTBBUTTONINFOA
+#endif
 #define TBNOTIFY TBNOTIFYA
 #define LPTBNOTIFY LPTBNOTIFYA
 #define TTM_ADDTOOL	TTM_ADDTOOLA

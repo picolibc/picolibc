@@ -1,3 +1,72 @@
+2001-08-04  Danny Smith <dannysmith@users.sourceforge.net>
+
+	* include/wtypes.h: (DECIMAL_SETZERO): Correct typo.
+
+2001-08-02  Danny Smith <dannysmith@users.sourceforge.net>
+
+	Apply Dmitry Bely <dbely@mail.ru> patch 437834 (with additions).
+ 	* include/oleidl.h (ISupportErrorInfo, ICreateInfo): Move from here
+	* include/oaidl.h: ... to here.
+	* include/oaidl.h ICreateErrorInfo): Add interface definition.
+	(IErrorInfo::GetGUID): Change arg to GUID.
+	(LPSUPPORTERRORINFO): Add typedef.
+	(IID_ISupportErrorInfo): Change forward decl. of type to IID.
+
+2001-08-02  Danny Smith <dannysmith@users.sourceforge.net>
+
+	* include/winsock2.h (WSAGET* and WSAMAKE*): Remove duplicate
+	defines.
+
+2001-07-30  Danny Smith <dannysmith@users.sourceforge.net>
+
+	* include/commctrl.h (TreeView_SetIndent): Correct typo.
+
+2001-07-30  Danny Smith <dannysmith@users.sourceforge.net>
+ 
+	* include/commctrl.h (TBSTYPE_FLAT): Remove define.
+	Thanks to: Jason Craig  <jacraig@softhome.net>
+
+2001-07-30  Mattia Barbon  <mbarbon@dsi.unive.it>
+
+	* include/commctrl.h (TBBUTTONINFO[AW]): Add struct definitions,
+	and UNICODE mappings, if _WIN32_IE >= 0x400.
+	(TBIF_* and TB_SETBUTTONINFO): Add defines, if _WIN32_IE >= 0x400.
+	(CDIS_*,CDDS_*,CDRF_*) : Add defines.
+	(tagNMCUSTOMDRAWINFO): Add struct definition and typedefs.
+	(tagNMLVCUSTOMDRAW): Likewise.
+	(tagNMTVCUSTOMDRAW): Likewise.
+	(tagNMLVCACHEHINT): Likewise.
+	
+2001-07-06 Danny Smith <dannysmith@users.sourceforge.net>
+ 
+	* include/basetsd.h (#include <_mingw.h>): Remove.
+	(__int64): Define.
+
+2001-06-28 Danny Smith <dannysmith@users.sourceforge.net>
+
+	* include/wingdi.h (AC_SRC_OVER): Add define.
+	(struct _BLENDFUNCTION): Add.
+
+2001-06-28 Danny Smith <dannysmith@users.sourceforge.net>
+
+	* include/shlobj.h:  Add BIF_* defines.
+
+2001-06-27 Danny Smith <dannysmith@users.sourceforge.net>
+
+	* include/winerror.h (E_PENDING): Add error code define.
+
+2001-06-27 Danny Smith <dannysmith@users.sourceforge.net>
+
+	* include/basetsd.h (#include <_mingw.h>): Add directive.
+
+2001-06-25 Danny Smith <dannysmith@users.sourceforge.net>
+
+	* include/winbase.h(InterlockedCompareExchange): Change args
+	and return value from PVOID to LONG.
+	(InterlockedExchange): Change first arg to LPLONG.
+	(InterlockedCompareExchangePointer): New macro.
+	(InterlockedExchangePointer): New macro.
+
 2001-06-19 Danny Smith <dannysmith@users.sourceforge.net>
 
 	* lib/kernel32.def: Add LanguageGroup and UILanguage symbols.
