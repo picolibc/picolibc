@@ -1,4 +1,4 @@
-/* WSIPX.H - initially taken from the Wine project
+/* WSIPX.H - contributed by the WINE project
  */
 
 #ifndef _WSIPX_H

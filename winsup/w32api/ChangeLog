@@ -1,3 +1,8 @@
+2004-04-17  Luke Dunstan  <infidel@users.sourceforge.net>
+
+	* README.w32api: List separate copyright conditions for some headers.
+	* include/(winsock2.h, wsipx.h): Minor change to copyright header.
+
 2004-04-15  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wingdi.h (RGB): Correct macro.
