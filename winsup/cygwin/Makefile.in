@@ -386,10 +386,10 @@ dcrt0.o sigproc.o: child_info_magic.h
 
 shared.o: shared_info_magic.h
 
-$(srcdir)/devices.cc: cygwin-gperf devices.gperf devices.h
+$(srcdir)/qevices.cc: cygwin-gperf devices.gperf devices.h
 	$^ > $@
 
-$(srcdir)/qevices.cc: cygwin-shilka devices.shilka devices.h
+$(srcdir)/devices.cc: cygwin-shilka devices.shilka devices.h
 	${wordlist 1,2,$^} $@
 
 $(PWD)/libpthread.a: speclib $(LIB_NAME) pthread.o thread.o

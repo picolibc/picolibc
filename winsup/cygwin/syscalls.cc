@@ -1654,10 +1654,13 @@ pathconf (const char *file, int v)
 extern "C" char *
 ttyname (int fd)
 {
+  char *name;
   cygheap_fdget cfd (fd);
   if (cfd < 0 || !cfd->is_tty ())
     return 0;
-  return (char *) (cfd->ttyname ());
+  name = (char *) (cfd->ttyname ());
+  debug_printf ("returning %s", name);
+  return name;
 }
 
 extern "C" char *

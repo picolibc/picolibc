@@ -287,7 +287,7 @@ class fhandler_base
   int __stdcall fstat_by_name (struct __stat64 *buf) __attribute__ ((regparm (2)));
   virtual int ioctl (unsigned int cmd, void *);
   virtual int fcntl (int cmd, void *);
-  virtual char const *ttyname () { return get_name(); }
+  virtual char const *ttyname () { return get_name (); }
   virtual void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   virtual int write (const void *ptr, size_t len);
   virtual ssize_t readv (const struct iovec *, int iovcnt, ssize_t tot = -1);

@@ -1,3 +1,10 @@
+2003-09-27  Christopher Faylor  <cgf@redhat.com>
+
+	* cygwin-shilka: Remove '#line directives' or suffer debugging oddities.
+	Use -length option so that device prefixes are used.
+	* devices.cc: Regenerate.
+	* syscalls.cc (ttyname): Add debugging output.
+
 2003-09-26  Vaclav Haisman  <V.Haisman@sh.cvut.cz>
 
 	* Makefile.in: Add libusr32.a to DLL_IMPORTS.
