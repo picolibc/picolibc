@@ -314,7 +314,7 @@ static const template i386_optab[] = {
 {"call",   1,	0xe8, X, wl_Suf|JumpDword,	{ Disp16|Disp32, 0, 0} },
 {"call",   1,	0xff, 2, wl_Suf|Modrm,		{ WordReg|WordMem|JumpAbsolute, 0, 0} },
 /* Intel Syntax */
-{"call",   2, 0x9a, X, wl_Suf|JumpInterSegment, { Imm16, Imm16|Imm32, 0} },
+{"call",   2,	0x9a, X, wl_Suf|JumpInterSegment, { Imm16, Imm16|Imm32, 0} },
 {"lcall",  2,	0x9a, X, wl_Suf|JumpInterSegment, { Imm16, Imm16|Imm32, 0} },
 {"lcall",  1,	0xff, 3, wl_Suf|Modrm,		{ WordMem, 0, 0} },
 
@@ -322,8 +322,8 @@ static const template i386_optab[] = {
 {"jmp",	   1,	0xeb, X, NoSuf|Jump,		{ Disp, 0, 0} },
 {"jmp",	   1,	0xff, 4, wl_Suf|Modrm,		{ WordReg|WordMem|JumpAbsolute, 0, 0} },
 /* Intel Syntax */
-{"jmp",   2,	0xea, X, wl_Suf|JumpInterSegment, { Imm16, Imm16|Imm32, 0} },
-{"jmp",   1,	0xff, 5, wl_Suf|Modrm,		{ WordMem, 0, 0} },
+{"jmp",    2,	0xea, X, wl_Suf|JumpInterSegment, { Imm16, Imm16|Imm32, 0} },
+{"jmp",    1,	0xff, 5, wl_Suf|Modrm,		{ WordMem, 0, 0} },
 {"ljmp",   2,	0xea, X, wl_Suf|JumpInterSegment, { Imm16, Imm16|Imm32, 0} },
 {"ljmp",   1,	0xff, 5, wl_Suf|Modrm,		{ WordMem, 0, 0} },
 
@@ -477,23 +477,23 @@ static const template i386_optab[] = {
 {"nop",	   0,	0x90, X, NoSuf,			{ 0, 0, 0} },
 
 /* protection control */
-{"arpl",   2,	0x63, X, NoSuf|Modrm|IgnoreSize,{ Reg16, Reg16|ShortMem, 0} },
+{"arpl",   2,	0x63, X, w_Suf|Modrm|IgnoreSize,{ Reg16, Reg16|ShortMem, 0} },
 {"lar",	   2, 0x0f02, X, wl_Suf|Modrm,		{ WordReg|WordMem, WordReg, 0} },
 {"lgdt",   1, 0x0f01, 2, wl_Suf|Modrm,		{ WordMem, 0, 0} },
 {"lidt",   1, 0x0f01, 3, wl_Suf|Modrm,		{ WordMem, 0, 0} },
-{"lldt",   1, 0x0f00, 2, NoSuf|Modrm|IgnoreSize,{ Reg16|ShortMem, 0, 0} },
-{"lmsw",   1, 0x0f01, 6, NoSuf|Modrm|IgnoreSize,{ Reg16|ShortMem, 0, 0} },
+{"lldt",   1, 0x0f00, 2, w_Suf|Modrm|IgnoreSize,{ Reg16|ShortMem, 0, 0} },
+{"lmsw",   1, 0x0f01, 6, w_Suf|Modrm|IgnoreSize,{ Reg16|ShortMem, 0, 0} },
 {"lsl",	   2, 0x0f03, X, wl_Suf|Modrm,		{ WordReg|WordMem, WordReg, 0} },
-{"ltr",	   1, 0x0f00, 3, NoSuf|Modrm|IgnoreSize,{ Reg16|ShortMem, 0, 0} },
+{"ltr",	   1, 0x0f00, 3, w_Suf|Modrm|IgnoreSize,{ Reg16|ShortMem, 0, 0} },
 
 {"sgdt",   1, 0x0f01, 0, wl_Suf|Modrm,		{ WordMem, 0, 0} },
 {"sidt",   1, 0x0f01, 1, wl_Suf|Modrm,		{ WordMem, 0, 0} },
 {"sldt",   1, 0x0f00, 0, wl_Suf|Modrm,		{ WordReg|WordMem, 0, 0} },
 {"smsw",   1, 0x0f01, 4, wl_Suf|Modrm,		{ WordReg|WordMem, 0, 0} },
-{"str",	   1, 0x0f00, 1, NoSuf|Modrm|IgnoreSize,{ Reg16|ShortMem, 0, 0} },
+{"str",	   1, 0x0f00, 1, w_Suf|Modrm|IgnoreSize,{ Reg16|ShortMem, 0, 0} },
 
-{"verr",   1, 0x0f00, 4, NoSuf|Modrm|IgnoreSize,{ Reg16|ShortMem, 0, 0} },
-{"verw",   1, 0x0f00, 5, NoSuf|Modrm|IgnoreSize,{ Reg16|ShortMem, 0, 0} },
+{"verr",   1, 0x0f00, 4, w_Suf|Modrm|IgnoreSize,{ Reg16|ShortMem, 0, 0} },
+{"verw",   1, 0x0f00, 5, w_Suf|Modrm|IgnoreSize,{ Reg16|ShortMem, 0, 0} },
 
 /* floating point instructions */
 
@@ -766,7 +766,7 @@ static const template i386_optab[] = {
 
 /* 486 extensions */
 
-{"bswap",   1, 0x0fc8, X, NoSuf|ShortForm,	{ Reg32,0,0 } },
+{"bswap",   1, 0x0fc8, X, l_Suf|ShortForm,	{ Reg32,0,0 } },
 {"xadd",    2, 0x0fc0, X, bwl_Suf|W|Modrm,	{ Reg, Reg|AnyMem, 0 } },
 {"cmpxchg", 2, 0x0fb0, X, bwl_Suf|W|Modrm,	{ Reg, Reg|AnyMem, 0 } },
 {"invd",    0, 0x0f08, X, NoSuf,		{ 0, 0, 0} },
@@ -781,10 +781,10 @@ static const template i386_optab[] = {
 {"rdtsc",   0, 0x0f31, X, NoSuf,		{ 0, 0, 0} },
 {"rdmsr",   0, 0x0f32, X, NoSuf,		{ 0, 0, 0} },
 {"cmpxchg8b",1,0x0fc7, 1, NoSuf|Modrm,		{ LLongMem, 0, 0} },
-{"sysenter", 0, 0x0f34, X, NoSuf,		{ 0, 0, 0} },
-{"sysexit",  0, 0x0f35, X, NoSuf,		{ 0, 0, 0} },
-{"fxsave",   1,	0x0fae, 0, FP|Modrm,		{ LLongMem, 0, 0} },
-{"fxrstor",  1,	0x0fae, 1, FP|Modrm,		{ LLongMem, 0, 0} },
+{"sysenter",0, 0x0f34, X, NoSuf,		{ 0, 0, 0} },
+{"sysexit", 0, 0x0f35, X, NoSuf,		{ 0, 0, 0} },
+{"fxsave",  1, 0x0fae, 0, FP|Modrm,		{ LLongMem, 0, 0} },
+{"fxrstor", 1, 0x0fae, 1, FP|Modrm,		{ LLongMem, 0, 0} },
 
 /* Pentium Pro extensions */
 {"rdpmc",   0, 0x0f33, X, NoSuf,		{ 0, 0, 0} },
@@ -822,33 +822,33 @@ static const template i386_optab[] = {
 {"cmovg",   2, 0x0f4f, X, wl_Suf|Modrm,		{ WordReg|WordMem, WordReg, 0} },
 {"cmovnle", 2, 0x0f4f, X, wl_Suf|Modrm,		{ WordReg|WordMem, WordReg, 0} },
 
-{"fcmovb",  2, 0xdac0, X, NoSuf|ShortForm,	{ FloatReg, FloatAcc, 0} },
-{"fcmovnae",2, 0xdac0, X, NoSuf|ShortForm,	{ FloatReg, FloatAcc, 0} },
-{"fcmove",  2, 0xdac8, X, NoSuf|ShortForm,	{ FloatReg, FloatAcc, 0} },
-{"fcmovbe", 2, 0xdad0, X, NoSuf|ShortForm,	{ FloatReg, FloatAcc, 0} },
-{"fcmovna", 2, 0xdad0, X, NoSuf|ShortForm,	{ FloatReg, FloatAcc, 0} },
-{"fcmovu",  2, 0xdad8, X, NoSuf|ShortForm,	{ FloatReg, FloatAcc, 0} },
-{"fcmovae", 2, 0xdbc0, X, NoSuf|ShortForm,	{ FloatReg, FloatAcc, 0} },
-{"fcmovnb", 2, 0xdbc0, X, NoSuf|ShortForm,	{ FloatReg, FloatAcc, 0} },
-{"fcmovne", 2, 0xdbc8, X, NoSuf|ShortForm,	{ FloatReg, FloatAcc, 0} },
-{"fcmova",  2, 0xdbd0, X, NoSuf|ShortForm,	{ FloatReg, FloatAcc, 0} },
-{"fcmovnbe",2, 0xdbd0, X, NoSuf|ShortForm,	{ FloatReg, FloatAcc, 0} },
-{"fcmovnu", 2, 0xdbd8, X, NoSuf|ShortForm,	{ FloatReg, FloatAcc, 0} },
+{"fcmovb",  2, 0xdac0, X, FP|ShortForm,		{ FloatReg, FloatAcc, 0} },
+{"fcmovnae",2, 0xdac0, X, FP|ShortForm,		{ FloatReg, FloatAcc, 0} },
+{"fcmove",  2, 0xdac8, X, FP|ShortForm,		{ FloatReg, FloatAcc, 0} },
+{"fcmovbe", 2, 0xdad0, X, FP|ShortForm,		{ FloatReg, FloatAcc, 0} },
+{"fcmovna", 2, 0xdad0, X, FP|ShortForm,		{ FloatReg, FloatAcc, 0} },
+{"fcmovu",  2, 0xdad8, X, FP|ShortForm,		{ FloatReg, FloatAcc, 0} },
+{"fcmovae", 2, 0xdbc0, X, FP|ShortForm,		{ FloatReg, FloatAcc, 0} },
+{"fcmovnb", 2, 0xdbc0, X, FP|ShortForm,		{ FloatReg, FloatAcc, 0} },
+{"fcmovne", 2, 0xdbc8, X, FP|ShortForm,		{ FloatReg, FloatAcc, 0} },
+{"fcmova",  2, 0xdbd0, X, FP|ShortForm,		{ FloatReg, FloatAcc, 0} },
+{"fcmovnbe",2, 0xdbd0, X, FP|ShortForm,		{ FloatReg, FloatAcc, 0} },
+{"fcmovnu", 2, 0xdbd8, X, FP|ShortForm,		{ FloatReg, FloatAcc, 0} },
 
-{"fcomi",   2, 0xdbf0, X, NoSuf|ShortForm,	{ FloatReg, FloatAcc, 0} },
-{"fcomi",   0, 0xdbf1, X, NoSuf|ShortForm,	{ 0, 0, 0} },
-{"fcomi",   1, 0xdbf0, X, NoSuf|ShortForm,	{ FloatReg, 0, 0} },
-{"fucomi",  2, 0xdbe8, X, NoSuf|ShortForm,	{ FloatReg, FloatAcc, 0} },
-{"fucomi",  0, 0xdbe9, X, NoSuf|ShortForm,	{ 0, 0, 0} },
-{"fucomi",  1, 0xdbe8, X, NoSuf|ShortForm,	{ FloatReg, 0, 0} },
-{"fcomip",  2, 0xdff0, X, NoSuf|ShortForm,	{ FloatReg, FloatAcc, 0} },
-{"fcompi",  2, 0xdff0, X, NoSuf|ShortForm,	{ FloatReg, FloatAcc, 0} },
-{"fcompi",  0, 0xdff1, X, NoSuf|ShortForm,	{ 0, 0, 0} },
-{"fcompi",  1, 0xdff0, X, NoSuf|ShortForm,	{ FloatReg, 0, 0} },
-{"fucomip", 2, 0xdfe8, X, NoSuf|ShortForm,	{ FloatReg, FloatAcc, 0} },
-{"fucompi", 2, 0xdfe8, X, NoSuf|ShortForm,	{ FloatReg, FloatAcc, 0} },
-{"fucompi", 0, 0xdfe9, X, NoSuf|ShortForm,	{ 0, 0, 0} },
-{"fucompi", 1, 0xdfe8, X, NoSuf|ShortForm,	{ FloatReg, 0, 0} },
+{"fcomi",   2, 0xdbf0, X, FP|ShortForm,		{ FloatReg, FloatAcc, 0} },
+{"fcomi",   0, 0xdbf1, X, FP|ShortForm,		{ 0, 0, 0} },
+{"fcomi",   1, 0xdbf0, X, FP|ShortForm,		{ FloatReg, 0, 0} },
+{"fucomi",  2, 0xdbe8, X, FP|ShortForm,		{ FloatReg, FloatAcc, 0} },
+{"fucomi",  0, 0xdbe9, X, FP|ShortForm,		{ 0, 0, 0} },
+{"fucomi",  1, 0xdbe8, X, FP|ShortForm,		{ FloatReg, 0, 0} },
+{"fcomip",  2, 0xdff0, X, FP|ShortForm,		{ FloatReg, FloatAcc, 0} },
+{"fcompi",  2, 0xdff0, X, FP|ShortForm,		{ FloatReg, FloatAcc, 0} },
+{"fcompi",  0, 0xdff1, X, FP|ShortForm,		{ 0, 0, 0} },
+{"fcompi",  1, 0xdff0, X, FP|ShortForm,		{ FloatReg, 0, 0} },
+{"fucomip", 2, 0xdfe8, X, FP|ShortForm,		{ FloatReg, FloatAcc, 0} },
+{"fucompi", 2, 0xdfe8, X, FP|ShortForm,		{ FloatReg, FloatAcc, 0} },
+{"fucompi", 0, 0xdfe9, X, FP|ShortForm,		{ 0, 0, 0} },
+{"fucompi", 1, 0xdfe8, X, FP|ShortForm,		{ FloatReg, 0, 0} },
 
 /* MMX instructions.  */
 
