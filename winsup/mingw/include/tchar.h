@@ -100,6 +100,7 @@ typedef wchar_t _TCHAR;
 #define	_gettc		getwc
 #define	_getts		_getws
 #define	_puttc		putwc
+#define _puttchar       putwchar
 #define	_putts		_putws
 #define	_ungettc	ungetwc
 #define	_tcstod		wcstod
@@ -282,6 +283,7 @@ typedef char	_TCHAR;
 #define	_gettc		getc
 #define	_getts		gets
 #define	_puttc		putc
+#define _puttchar       putchar
 #define	_putts		puts
 #define	_ungettc	ungetc
 #define	_tcstod		strtod

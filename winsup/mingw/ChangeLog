@@ -1,3 +1,7 @@
+2004-01-14  Greg Chicares  <chicares@users.sourceforge.net>
+
+	* include/tchar.h (_puttchar): Define.
+
 2003-12-13  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/stdio.h:(_fileno): Define macro version after both
