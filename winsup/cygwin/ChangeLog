@@ -1,5 +1,11 @@
 2005-03-02  Christopher Faylor  <cgf@timesys.com>
 
+	* autoload.cc (std_dll_init): Save and restore fpu control register
+	around LoadAddress to prevent loaded dlls (like msvcrt.dll) from
+	setting unwanted stuff.
+
+2005-03-02  Christopher Faylor  <cgf@timesys.com>
+
 	* cygtls.cc (_cygtls::init_thread): Move exitsock setting later.  It
 
 2005-03-02  Christopher Faylor  <cgf@timesys.com>

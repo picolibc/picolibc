@@ -208,8 +208,13 @@ std_dll_init ()
     while (InterlockedIncrement (&dll->here));
   else if (!dll->handle)
     {
+      unsigned fpu_control = 0;
+      __asm__ __volatile__ ("fnstcw %0": "=m" (fpu_control));
       if ((h = LoadLibrary (dll->name)) != NULL)
-	dll->handle = h;
+	{
+	  __asm__ __volatile__ ("fldcw %0": : "m" (fpu_control));
+	  dll->handle = h;
+	}
       else if (!(func->decoration & 1))
 	api_fatal ("could not load %s, %E", dll->name);
       else
@@ -256,7 +261,6 @@ wsock_init ()
 
   if (!wsock_started)
     {
-      /* Don't use autoload to load WSAStartup to eliminate recursion. */
       int (*wsastartup) (int, WSADATA *);
 
       wsastartup = (int (*)(int, WSADATA *))
