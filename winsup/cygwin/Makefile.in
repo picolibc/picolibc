@@ -52,7 +52,7 @@ malloc_CFLAGS:=-fomit-frame-pointer
 shared_CFLAGS:=-fomit-frame-pointer
 cygthread_CFLAGS:=-fomit-frame-pointer
 miscfuncs_CFLAGS:=-fomit-frame-pointer
-fhandler_CFLAGS:=-fomit-frame_pointer
+fhandler_CFLAGS:=-fomit-frame-pointer
 fhandler_clipboard_CFLAGS:=-fomit-frame-pointer
 fhandler_console_CFLAGS:=-fomit-frame-pointer
 fhandler_disk_file_CFLAGS:=-fomit-frame-pointer
@@ -78,11 +78,8 @@ CC:=@CC@
 CC_FOR_TARGET:=$(CC)
 CFLAGS=@CFLAGS@
 override CFLAGS+=-MMD ${$(*F)_CFLAGS}
-CXX:=@CXX@
+CXX=@CXX@
 CXXFLAGS=@CXXFLAGS@
-
-# For linking mount, etc. crt0.o isn't accessable in a fresh build.
-EXE_LDFLAGS:=@EXE_LDFLAGS@
 
 AR:=@AR@
 AR_FLAGS:=qv
@@ -245,7 +242,7 @@ TARGET_LIBS:=$(LIB_NAME) $(SUBLIBS) $(GMON_START) $(LIBGMON_A) $(SUBLIBS) $(INST
 	install install-libs install-headers -lgcc
 
 .SUFFIXES:
-.SUFFIXES: .c .cc .def .a .o .d
+.SUFFIXES: .c .cc .def .a .o .d .s
 
 all_host=@all_host@
 install_host=@install_host@

@@ -1,5 +1,11 @@
 2003-03-28  Christopher Faylor  <cgf@redhat.com>
 
+	* Makefile.in: Remove EXE_LDFLAGS.  Fix fhandler_CFLAGS typo.  Recognize .s suffix.
+	* configure.in: Remove EXE_LDFLAGS.
+	* configure: Regenerate.
+
+2003-03-28  Christopher Faylor  <cgf@redhat.com>
+
 	* include/sys/cygwin.h: Declare cygwin_internal as unsigned long.
 	* external.cc (cygwin_internal): Define as unsigned long.
 

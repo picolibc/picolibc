@@ -204,38 +204,6 @@ dnl     program_transform_name="$program_transform_name -e s,^,$target_alias-,"
 dnl   fi
 dnl fi
 
-dnl
-dnl If newlib is part of build tree, always set EXE_LDFLAGS to point to
-dnl it; this is important in cases where the installed newlib is perhaps
-dnl not compatible. Check and warn for installed newlib only if it's not
-dnl part of the build tree.
-dnl
-
-AC_MSG_CHECKING([if newlib is part of the build tree])
-
-EXE_LDFLAGS=
-if test -d ../newlib
-then
-  AC_MSG_RESULT(yes)
-  EXE_LDFLAGS="-B../../newlib/ -B../"
-else
-  AC_MSG_RESULT(no)
-fi
- AC_SUBST(EXE_LDFLAGS)
-
-if test x"$EXE_LDFLAGS" = x
-then
-  AC_MSG_CHECKING([if installed newlib needed])
-  AC_TRY_LINK(,
-    [/* main already defined */]
-    ,
-    AC_MSG_RESULT(no)
-    ,
-    AC_MSG_RESULT(yes)
-    AC_MSG_WARN(newlib not found - utility .exe's may not link))
-fi
-AC_SUBST(EXE_LDFLAGS)
-
 case "$target_cpu" in
    i386|i486|i586|i686) DLL_ENTRY="_dll_entry@12"
 		DEF_DLL_ENTRY="dll_entry@12"
