@@ -1,3 +1,9 @@
+
+2001-05-22  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* include/w32api.h: Update version.
+	* Makefile.in: Ditto.
+
 Thu May 17 23:12:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* include/winnt.h: Define SE_GROUP_LOGON_ID as unsigned to avoid
