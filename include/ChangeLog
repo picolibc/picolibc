@@ -1,3 +1,7 @@
+2005-02-03  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h (struct bfd_link_hash_entry): Add u.undef.weak.
+
 2005-02-01  Alan Modra  <amodra@bigpond.net.au>
 
 	* bfdlink.h (bfd_link_repair_undef_list): Declare.
