@@ -1,3 +1,8 @@
+2001-10-26  Christian Groessler  <cpg@aladdin.de>
+
+	* external.h (GET_LINENO_LNNO): Fix usage of H_GET_32/16.
+	(PUT_LINENO_LNNO): Likewise with H_PUT_32/16.
+
 2001-09-21  Nick Clifton  <nickc@cambridge.redhat.com>
 
 	* ti.h (GET_SCNHDR_PAGE): Fix compile time warning.
