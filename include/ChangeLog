@@ -1,3 +1,8 @@
+2001-05-11  Jakub Jelinek  <jakub@redhat.com>
+
+	* elf/ia64.h (ELF_STRING_ia64_unwind_once): Define.
+	(ELF_STRING_ia64_unwind_info_once): Define.
+
 2001-05-07  Zack Weinberg  <zackw@stanford.edu>
 
 	* demangle.h: Use PARAMS for all prototypes.
