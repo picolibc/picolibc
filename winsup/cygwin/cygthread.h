@@ -18,6 +18,10 @@ class cygthread
   HANDLE thread_sync;
   void *stack_ptr;
   const char *__name;
+#ifdef DEBUGGING
+  const char *__oldname;
+  bool terminated;
+#endif
   LPTHREAD_START_ROUTINE func;
   VOID *arg;
   bool is_freerange;
@@ -28,7 +32,7 @@ class cygthread
   static DWORD WINAPI simplestub (VOID *);
   static DWORD main_thread_id;
   static const char * name (DWORD = 0);
-  void release ();
+  void release (bool);
   cygthread (LPTHREAD_START_ROUTINE, LPVOID, const char *);
   cygthread () {};
   static void init ();

@@ -111,6 +111,8 @@ cygheap_setup_for_child (child_info *ci, bool dup_later)
   if (!ci->cygheap_h)
     api_fatal ("Couldn't create heap for child, size %d, %E", size);
   newcygheap = MapViewOfFileEx (ci->cygheap_h, MVMAP_OPTIONS, 0, 0, 0, NULL);
+  if (!newcygheap)
+    api_fatal ("couldn't map space for new cygheap, %E");
   ProtectHandle1INH (ci->cygheap_h, passed_cygheap_h);
   if (!dup_later)
     dup_now (newcygheap, ci, n);

@@ -1,5 +1,20 @@
 2004-12-22  Christopher Faylor  <cgf@timesys.com>
 
+	* cygheap.cc (cygheap_setup_for_child): Add api_fatal to catch failing
+	MapViewOfFileEx.
+	* cygthread.cc (cygthread::stub): Previous change to make diagnostic
+	output more informative was really a bust.  Try again.  Capture previous
+	name in a new field in cygthread for diagnostic purposes.
+	(cygthread::cygthread): Ditto.
+	(cygthread::release): Add an argument to control whether h should be cleared
+	or not.
+	(cygthread::terminate_thread): Use 'inuse' for tests rather than 'h'.
+	(cygthread): Add some diagnostic fields.
+	(cygthread::release): Add an argument.
+	* pinfo.cc (proc_waiter): Accommodate change to cygthread::release.
+
+2004-12-22  Christopher Faylor  <cgf@timesys.com>
+
 	* cygthread.cc (cygthread::stub): Make diagnostic output more informative.
 
 2004-12-22  Christopher Faylor  <cgf@timesys.com>

@@ -54,9 +54,12 @@ cygthread::stub (VOID *arg)
 
   while (1)
     {
-      const char *name = info->__name;
-      if (!name)
-	system_printf ("erroneous thread activation, name is non-NULL '%s'", name);
+      if (!info->__name)
+#ifdef DEBUGGING
+	system_printf ("erroneous thread activation, name is NULL prev thread name = '%s'", info->__oldname);
+#else
+	system_printf ("erroneous thread activation, name is NULL");
+#endif
       else
 	{
 	  if (!info->func || exiting)
@@ -68,6 +71,7 @@ cygthread::stub (VOID *arg)
 
 #ifdef DEBUGGING
 	  info->func = NULL;	// catch erroneous activation
+	  info->__oldname = info->__name;
 #endif
 	  info->__name = NULL;
 	  if (info->inuse)
@@ -159,11 +163,16 @@ cygthread::cygthread (LPTHREAD_START_ROUTINE start, LPVOID param,
   else
     {
       stack_ptr = NULL;
+#ifdef DEBUGGING
+      if (__oldname)
+	system_printf ("__oldname %s, terminated %d", __oldname, terminated);
+#endif
       h = CreateThread (&sec_none_nih, 0, is_freerange ? simplestub : stub,
 			this, 0, &id);
       if (!h)
 	api_fatal ("thread handle not set - %p<%p>, %E", h, id);
       thread_printf ("created thread %p", h);
+      terminated = false;
     }
 }
 
@@ -215,9 +224,11 @@ cygthread::exit_thread ()
 }
 
 void
-cygthread::release ()
+cygthread::release (bool nuke_h)
 {
-  h = NULL;
+  if (nuke_h)
+    h = NULL;
+  __oldname = __name;
   __name = NULL;
   stack_ptr = NULL;
   (void) InterlockedExchange (&inuse, 0); /* No longer in use */
@@ -227,7 +238,7 @@ cygthread::release ()
 void
 cygthread::terminate_thread ()
 {
-  /* FIXME: The if (!h) stuff below should be handled better.  The
+  /* FIXME: The if (!inuse) stuff below should be handled better.  The
      problem is that terminate_thread could be called while a thread
      is terminating and either the thread could be handling its own
      release or, if this is being called during exit, some other
@@ -239,19 +250,19 @@ cygthread::terminate_thread ()
       ResetEvent (*this);
       ResetEvent (thread_sync);
     }
-  if (!h)
+  if (!inuse)
     return;
   (void) TerminateThread (h, 0);
   (void) WaitForSingleObject (h, INFINITE);
-  if (!h)
+  if (!inuse)
     return;
 
   CloseHandle (h);
 
-  while (h && !stack_ptr)
+  while (inuse && !stack_ptr)
     low_priority_sleep (0);
 
-  if (!h)
+  if (!inuse)
     return;
 
   MEMORY_BASIC_INFORMATION m;
@@ -264,10 +275,17 @@ cygthread::terminate_thread ()
     debug_printf ("VirtualFree of allocation base %p<%p> failed, %E",
 		   stack_ptr, m.AllocationBase);
 
+  if (!inuse)
+    /* nothing */;
   if (is_freerange)
     free (this);
   else
-    release ();
+    {
+#ifdef DEBUGGING
+      terminated = true;
+#endif
+      release (true);
+    }
 }
 
 /* Detach the cygthread from the current thread.  Note that the

@@ -764,7 +764,7 @@ proc_waiter (void *arg)
 
   sigproc_printf ("exiting wait thread for pid %d", pid);
   vchild.wait_thread = NULL;
-  _my_tls._ctinfo->release ();	/* return the cygthread to the cygthread pool */
+  _my_tls._ctinfo->release (false);	/* return the cygthread to the cygthread pool */
   return 0;
 }
 
