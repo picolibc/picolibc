@@ -13,12 +13,6 @@ details. */
 #include "dlmalloc.h"
 #define MALLOC_CHECK ({\
   debug_printf ("checking malloc pool");\
-  free (malloc (20));\
-  free (malloc (128));\
-  free (malloc (4096));\
-  free (malloc (16384));\
-  free (malloc (32768));\
-  free (malloc (65536));\
   (void)mallinfo ();\
 })
 #endif

@@ -315,7 +315,6 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   /* Initialize signal/process handling */
   sigproc_init ();
   __pthread_atforkchild ();
-  MALLOC_CHECK;
   cygbench ("fork-child");
   return 0;
 }
