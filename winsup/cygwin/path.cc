@@ -534,6 +534,8 @@ get_device_number (const char *name, int &unit, BOOL from_conv)
         }
       else if (deveqn ("com", 3) && (unit = digits (name + 3)) >= 0)
 	devn = FH_SERIAL;
+      else if (deveqn ("ttyS", 4) && (unit = digits (name + 4)) >= 0)
+	devn = FH_SERIAL;
       else if (deveq ("pipe") || deveq ("piper") || deveq ("pipew"))
 	devn = FH_PIPE;
       else if (deveq ("tcp") || deveq ("udp") || deveq ("streamsocket")
@@ -546,6 +548,8 @@ get_device_number (const char *name, int &unit, BOOL from_conv)
 				      unit);
     }
   else if (deveqn ("com", 3) && (unit = digits (name + 3)) >= 0)
+    devn = FH_SERIAL;
+  else if (deveqn ("ttyS", 4) && (unit = digits (name + 4)) >= 0)
     devn = FH_SERIAL;
 
   return devn;

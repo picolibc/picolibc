@@ -16,7 +16,7 @@ extern int _fmode;
 void
 cygwin_premain0 (int argc, char **argv)
 {
-  static struct __cygwin_perfile pf[] = 
+  static struct __cygwin_perfile pf[] =
   {
     {"", O_RDONLY | O_TEXT},
     {"", O_WRONLY | O_BINARY},

@@ -1,3 +1,8 @@
+Sun Nov 12 23:01:35 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (get_device_number): Allow /dev/ttySn to designate a com
+	port.
+
 Sat Nov 11 23:55:19 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* path.h: Add __attribute__ ((regparm(x))) to commonly used functions.
