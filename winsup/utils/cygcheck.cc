@@ -61,38 +61,17 @@ struct
 }
 common_apps[] =
 {
-  {
-  "bash", 0}
-  ,
-  {
-  "cat", 0}
-  ,
-  {
-  "cpp", 1}
-  ,
-  {
-  "find", 0}
-  ,
-  {
-  "gcc", 0}
-  ,
-  {
-  "gdb", 0}
-  ,
-  {
-  "ld", 0}
-  ,
-  {
-  "ls", 0}
-  ,
-  {
-  "make", 0}
-  ,
-  {
-  "sh", 0}
-  ,
-  {
-  0, 0}
+  {"bash", 0},
+  {"cat", 0},
+  {"cpp", 1},
+  {"find", 0},
+  {"gcc", 0},
+  {"gdb", 0},
+  {"ld", 0},
+  {"ls", 0},
+  {"make", 0},
+  {"sh", 0},
+  {0, 0}
 };
 
 int num_paths = 0, max_paths = 0;
@@ -1038,7 +1017,8 @@ struct option longopts[] = {
   {"help", no_argument, NULL, 'h'},
   {0, no_argument, NULL, 0}
 };
-char *opts = "srvkh";
+
+char opts[] = "srvkh";
 
 int
 main (int argc, char **argv)

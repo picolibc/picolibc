@@ -1,3 +1,12 @@
+Sat Oct 28 01:37:55 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Accomodate newer gcc's which require linking of c++
+	programs with g++.  Fixup output for some compilations.
+	* cygcheck.cc: Respond to compiler warnings.
+	* dumper.cc (main): Ditto.
+	* parse_pe.cc (exclusion::sort_and_check): Ditto.
+	* setfacl.cc (getaclentry): Ditto.
+
 Fri Oct 27 20:20:29 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* strace.cc (main): Add a '-b' option.

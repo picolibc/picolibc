@@ -112,7 +112,7 @@ getaclentry (action_t action, char *c, aclent_t *ace)
     return FALSE;
   if (ace->a_type & (USER_OBJ | GROUP_OBJ))
     {
-      if (c2 = strchr (c, ':'))
+      if ((c2 = strchr (c, ':')))
         {
           if (action == Delete)
             return FALSE;

@@ -79,7 +79,7 @@ dumper::dumper (DWORD pid, DWORD tid, const char *file_name)
     dumper_abort ();
 }
 
-dumper: :~dumper ()
+dumper::~dumper ()
 {
   close ();
   free (file_name);
@@ -740,7 +740,7 @@ int
 main (int argc, char **argv)
 {
   int opt;
-  char *p = "";
+  const char *p = "";
   DWORD pid;
 
   while ((opt = getopt (argc, argv, "dc:")) != EOF)

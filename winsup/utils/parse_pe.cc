@@ -49,7 +49,7 @@ exclusion::sort_and_check ()
       process_mem_region *q = p + 1;
       if (p->base + size > q->base)
 	{
-	  fprintf (stderr, "region error @ %08x", p->base);
+	  fprintf (stderr, "region error @ %08x", (unsigned) p->base);
 	  return 0;
 	}
     }
