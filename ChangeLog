@@ -1,3 +1,8 @@
+2002-01-11  Steve Ellcey  <sje@cup.hp.com>
+
+	* configure.in (ia64*-*-hpux*): New target for IA64 HP-UX,
+	ld and gdb are not supported.
+
 2002-01-07  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* Change reference to Cygnus Solutions to be Red Hat.
