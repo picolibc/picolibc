@@ -121,6 +121,13 @@ get_cygdrive_prefixes (char *user, char *system)
   return res;
 }
 
+static DWORD
+check_ntsec (const char *filename)
+{
+  path_conv pc (filename);
+  return allow_ntsec && pc.has_acls ();
+}
+
 extern "C" unsigned long
 cygwin_internal (cygwin_getinfo_types t, ...)
 {
@@ -246,6 +253,11 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  pid_t pid = va_arg (arg, pid_t);
 	  pinfo p (pid);
 	  return (DWORD) p->cmdline (n);
+	}
+      case CW_CHECK_NTSEC:
+	{
+	  char *filename = va_arg (arg, char *);
+	  return check_ntsec (filename);
 	}
       default:
 	return (DWORD) -1;

@@ -197,12 +197,13 @@ details. */
 		  fgetpos64 fopen64 freopen64 fseeko64 fsetpos64 ftello64
 		  _open64 _lseek64 _fstat64 _stat64 mknod32
        80: Export pthread_rwlock stuff
+       81: CW_CHECK_NTSEC addition to external.cc
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 80
+#define CYGWIN_VERSION_API_MINOR 81
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
