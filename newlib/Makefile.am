@@ -81,7 +81,7 @@ libc.a: libc/libc.a libm.a
 	 $(AR) x ../libc/libc.a ; \
 	 $(AR) $(AR_FLAGS) ../$@ *.o
 	$(RANLIB) libc.a
-	ln libc.a libg.a
+	ln libc.a libg.a >/dev/null 2>/dev/null || cp libc.a libg.a
 	rm -rf tmp
 
 libc/libc.a: ; @true
@@ -128,7 +128,7 @@ CLEANFILES = targ-include stmp-targ-include
 
 install-data-local:	install-toollibLIBRARIES
 	rm -f $(DESTDIR)$(toollibdir)/libg.a
-	ln $(DESTDIR)$(toollibdir)/libc.a $(DESTDIR)$(toollibdir)/libg.a
+	ln $(DESTDIR)$(toollibdir)/libc.a $(DESTDIR)$(toollibdir)/libg.a >/dev/null 2>/dev/null || cp $(DESTDIR)$(toollibdir)/libc.a $(DESTDIR)$(toollibdir)/libg.a
 	$(MULTIDO) $(AM_MAKEFLAGS) DO=install multi-do
 	-if [ -z "$(MULTISUBDIR)" ]; then \
 	  $(mkinstalldirs) $(DESTDIR)$(tooldir)/include; \

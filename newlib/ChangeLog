@@ -1,5 +1,11 @@
 2001-08-29  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* Makefile.am: Add check for ln failing when creating libg.a
+	so that cp gets used as a backup.
+	* Makefile.in: Regenerated.
+
+2001-08-29  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/include/sys/reent.h: Add include of <sys/_types.h>.
 	No longer include time.h.  Add struct __tm to use for
 	_localtime_buf in the reentrant structure.  Add a
