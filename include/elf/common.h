@@ -239,6 +239,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define NT_PRSTATUS	1		/* Contains copy of prstatus struct */
 #define NT_FPREGSET	2		/* Contains copy of fpregset struct */
 #define NT_PRPSINFO	3		/* Contains copy of prpsinfo struct */
+#define NT_TASKSTRUCT	4		/* Contains copy of task struct */
 
 /* Note segments for core files on dir-style procfs systems. */
 

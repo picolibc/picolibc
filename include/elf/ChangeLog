@@ -1,3 +1,7 @@
+1999-08-31  Nick Clifton  <nickc@cygnus.com>
+
+	* common.h (NT_TASKSTRUCT): Define.
+
 1999-07-16  Jakub Jelinek  <jj@ultra.linux.cz>
 
 	* sparc.h (EF_SPARC_SUN_US3): Define in Cheetah extensions
