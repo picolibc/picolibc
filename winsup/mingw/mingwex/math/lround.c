@@ -1,24 +1,19 @@
-#include <fenv.h>
 #include <math.h>
+#include <limits.h>
+#include <errno.h>
 
 long
-lround (double x) {
-  long retval;
-  unsigned short saved_cw, _cw;
-  __asm__ (
-	"fnstcw %0;" : "=m" (saved_cw)
-	); /* save  control word  */
-  _cw = ~(FE_TONEAREST | FE_DOWNWARD | FE_UPWARD | FE_TOWARDZERO)
-     	  | (x > 0.0 ? FE_UPWARD : FE_DOWNWARD); /* round away from zero */
-  __asm__ (
-	"fldcw %0;" : : "m" (_cw)
-	);  /* load the rounding control */
-  __asm__ __volatile__ (
-	"fistpl %0"  : "=m" (retval) : "t" (x) : "st"
-	);
-  __asm__ (
-	"fldcw %0;" : : "m" (saved_cw)
-	); /* restore control word */
-  return retval;
+lround (double x)
+{
+  /* Add +/- 0.5 then then round towards zero.  */
+  double tmp = trunc (x + (x >= 0.0 ?  0.5 : -0.5));
+  if (!isfinite (tmp) 
+      || tmp > (double)LONG_MAX
+      || tmp < (double)LONG_MIN)
+    { 
+      errno = ERANGE;
+      /* Undefined behaviour, so we could return anything.  */
+      /* return tmp > 0.0 ? LONG_MAX : LONG_MIN;  */
+    }
+  return (long)tmp;
 }
-

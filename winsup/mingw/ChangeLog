@@ -1,3 +1,12 @@
+2004-04-22  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/math/lround.c: Rewrite.
+	* mingwex/math/lroundf.c: Rewrite.
+	* mingwex/math/lroundl.c: Rewrite.
+	* mingwex/math/llround.c: Rewrite.
+	* mingwex/math/llroundf.c: Rewrite.
+	* mingwex/math/llroundl.c: Rewrite.
+
 2004-04-20  Earnie Boyd  <earnie@users.sf.net>
 
 	* CONTRIBUTORS: New file.
