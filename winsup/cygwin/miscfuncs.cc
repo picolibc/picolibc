@@ -158,7 +158,7 @@ int __stdcall
 __check_invalid_read_ptr_errno (const void *s, unsigned sz)
 {
   if (!s || IsBadReadPtr ((void *) s, sz))
-    set_errno (EFAULT);
+    return set_errno (EFAULT);
 
   return 0;
 }
