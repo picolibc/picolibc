@@ -613,11 +613,11 @@ static int get_inet_addr (const struct sockaddr *in, int inlen,
 /* exported as sendto: standards? */
 extern "C" int
 cygwin_sendto (int fd,
-		 const void *buf,
-		 int len,
-		 unsigned int flags,
-		 const struct sockaddr *to,
-		 int tolen)
+	       const void *buf,
+	       int len,
+	       unsigned int flags,
+	       const struct sockaddr *to,
+	       int tolen)
 {
   int res;
   wsock_event wsock_evt;
@@ -684,7 +684,7 @@ cygwin_recvfrom (int fd,
 
   if (__check_null_invalid_struct_errno (buf, (unsigned) len)
       || check_null_invalid_struct_errno (fromlen)
-      || __check_null_invalid_struct_errno (from, (unsigned) *fromlen)
+      || (from && __check_null_invalid_struct_errno (from, (unsigned) *fromlen))
       || !h)
     res = -1;
   else
@@ -735,7 +735,7 @@ cygwin_setsockopt (int fd,
   int res = -1;
   const char *name = "error";
 
-  if (!__check_invalid_read_ptr_errno (optval, optlen) && h)
+  if ((!optval || !__check_invalid_read_ptr_errno (optval, optlen)) && h)
     {
       /* For the following debug_printf */
       switch (optname)
@@ -799,7 +799,7 @@ cygwin_getsockopt (int fd,
   int res = -1;
   const char *name = "error";
   if (!check_null_invalid_struct_errno (optlen)
-      && !__check_null_invalid_struct_errno (optval, (unsigned) optlen)
+      && (!optval || !__check_null_invalid_struct_errno (optval, (unsigned) optlen))
       && h)
     {
       /* For the following debug_printf */
