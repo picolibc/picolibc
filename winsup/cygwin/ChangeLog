@@ -1,6 +1,7 @@
 2004-12-01  Christopher Faylor  <cgf@timesys.com>
 
 	* syscalls.cc (truncate64): Don't second-guess errno if open fails.
+	* devices.in: Don't allow /dev/com0.
 
 2004-11-25  Christopher Faylor  <cgf@timesys.com>
 
