@@ -1627,6 +1627,11 @@ fhandler_base::utimes (const struct timeval *tvp)
 int
 fhandler_base::fsync ()
 {
+  if (!get_handle () || nohandle ())
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
   if (pc.isdir ()) /* Just succeed. */
     return 0;
   if (FlushFileBuffers (get_handle ()))

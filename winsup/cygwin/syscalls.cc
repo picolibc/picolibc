@@ -918,6 +918,8 @@ fsync (int fd)
   return cfd->fsync ();
 }
 
+EXPORT_ALIAS (fsync, fdatasync)
+
 static void 
 sync_worker (const char *vol)
 {

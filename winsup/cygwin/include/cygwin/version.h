@@ -246,12 +246,13 @@ details. */
       116: Export atoll.
       117: Export utmpx functions, Return utmp * from pututent.
       118: Export getpriority, setpriority.
+      118: Export fdatasync.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 118
+#define CYGWIN_VERSION_API_MINOR 119
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

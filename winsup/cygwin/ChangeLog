@@ -1,3 +1,11 @@
+2005-02-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din (fdatasync): Export.
+	* fhandler.cc (fhandler_base::fsync): Return with EINVAL if no
+	handle is available.
+	* syscalls.cc (fdatasync): Create export alias to fsync.
+	* include/cygwin/version.h: Bump API minor version.
+
 2005-02-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_base::fstat_helper): Declare with additional

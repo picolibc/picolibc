@@ -562,6 +562,7 @@ _fsetpos64 = fsetpos64 SIGFE
 _fstat64 = fstat64 SIGFE
 fstatfs SIGFE
 _fstatfs = fstatfs SIGFE
+fdatasync SIGFE
 fsync SIGFE
 _fsync = fsync SIGFE
 ftell SIGFE
