@@ -1,3 +1,9 @@
+2003-10-16  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* syscalls.cc (seteuid32): Always construct a default DACL including
+	the new sid, Admins and SYSTEM and copy it to the new thread token.
+	* security.cc (create_token): Use a NULL default DACL in NtCreateToken.
+
 2003-10-14  Micha Nelissen  <M.Nelissen@student.tue.nl>
 
 	* dcrt0.cc: Remove local variable alternate_charset_active.
