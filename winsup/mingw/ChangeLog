@@ -1,3 +1,22 @@
+2002-04-23  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	Make wide char versions of opendir and friends.
+	* include/dirent.h (_wdirent, _WDIR): Define wide versions of
+	struct dirent, DIR.
+	(_wopendir,_wreaddir,_wclosedir,_wrewinddir,_wtelldir,
+	_wseekdir): Add prototypes for wide versions of corresponding
+	standard functions.
+	* include/tchar.h; Add _UNICODE mappings for dirent.h
+	structures and functions.
+	* mingwex/dirent.c: Make _UNICODE neutral.
+	* mingwex/wdirent.c: New file to define _UNICODE before
+	including dirent.c.  
+	* mingwex/Makefile.in (DISTFILES): Add wdirent.c/
+	(POSIX_OBJS): Add wdirent.o.
+	(wdirent.o): Specify dependency on dirent.c as well as
+	wdirent.c.
+	* samples/dirent/wtest.c: New file, wide version of test.c.
+
 2002-04-20  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/mbstring.h: New file.

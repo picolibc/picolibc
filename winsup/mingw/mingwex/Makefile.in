@@ -75,6 +75,7 @@ DISTFILES = Makefile.in configure configure.in \
 	wcstof.c \
 	wcstoimax.c \
 	wcstoumax.c \
+	wdirent.c \
 	wmemchr.c \
 	wmemcmp.c \
 	wmemcpy.c \
@@ -140,7 +141,7 @@ FENV_OBJS = fesetround.o  fegetround.o \
 	feclearexcept.o feholdexcept.o fegetexceptflag.o \
 	feraiseexcept.o fetestexcept.o fesetexceptflag.o
 POSIX_OBJS = \
-	dirent.o
+	dirent.o wdirent.o
 REPLACE_OBJS = \
 	mingw-fseek.o
 
@@ -189,6 +190,12 @@ distclean:
 	$(CC) -c  $< -o $@
 .s.o:
 	$(CC) -c  $< -o $@
+
+
+#
+# Dependancies
+#
+wdirent.o: $(srcdir)/dirent.c $(srcdir)/wdirent.c
 
 
 dist:
