@@ -1039,7 +1039,6 @@ gotit:
   movl %eax,(%ecx)	# Point dispatch to address loaded above
   jmp *%eax
 ");
-}
 
 LoadDLLinitfunc (user32)
 {
@@ -1053,6 +1052,22 @@ LoadDLLinitfunc (user32)
   return 0;		/* Already done by another thread? */
 }
 
+LoadDLLinitfunc (advapi32)
+{
+  HANDLE h;
+
+  if ((h = LoadLibrary ("advapi32.dll")) != NULL)
+    advapi32_handle = h;
+  else if (!advapi32_handle)
+    api_fatal ("could not load advapi32.dll, %E");
+
+  return 0;		/* Already done by another thread? */
+}
+
+static void dummy_autoload (void) __attribute__ ((unused));
+static void
+dummy_autoload (void)
+{
 LoadDLLinit (user32)
 LoadDLLfunc (CharToOemA, 8, user32)
 LoadDLLfunc (CreateWindowExA, 48, user32)
@@ -1075,18 +1090,6 @@ LoadDLLfunc (RegisterClassA, 4, user32)
 LoadDLLfunc (SendMessageA, 16, user32)
 LoadDLLfunc (SetTimer, 16, user32)
 LoadDLLfunc (SetUserObjectSecurity, 12, user32)
-
-LoadDLLinitfunc (advapi32)
-{
-  HANDLE h;
-
-  if ((h = LoadLibrary ("advapi32.dll")) != NULL)
-    advapi32_handle = h;
-  else if (!advapi32_handle)
-    api_fatal ("could not load advapi32.dll, %E");
-
-  return 0;		/* Already done by another thread? */
-}
 
 LoadDLLinit (advapi32)
 LoadDLLfunc (AddAccessAllowedAce, 16, advapi32)
@@ -1132,3 +1135,5 @@ LoadDLLfunc (SetKernelObjectSecurity, 12, advapi32)
 LoadDLLfunc (SetSecurityDescriptorDacl, 16, advapi32)
 LoadDLLfunc (SetSecurityDescriptorGroup, 12, advapi32)
 LoadDLLfunc (SetSecurityDescriptorOwner, 12, advapi32)
+}
+}

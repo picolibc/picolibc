@@ -1782,6 +1782,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
   return res;
 }
 
+extern "C" {
 /* Initialize WinSock */
 LoadDLLinitfunc (wsock32)
 {
@@ -1815,6 +1816,10 @@ LoadDLLinitfunc (wsock32)
 
 LoadDLLinit (wsock32)
 
+static void dummy_autoload (void) __attribute__ ((unused));
+static void
+dummy_autoload (void)
+{
 LoadDLLfunc (WSAAsyncSelect, 16, wsock32)
 LoadDLLfunc (WSACleanup, 0, wsock32)
 LoadDLLfunc (WSAGetLastError, 0, wsock32)
@@ -1850,3 +1855,5 @@ LoadDLLfunc (sendto, 24, wsock32)
 LoadDLLfunc (setsockopt, 20, wsock32)
 LoadDLLfunc (shutdown, 8, wsock32)
 LoadDLLfunc (socket, 12, wsock32)
+}
+}

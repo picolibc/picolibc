@@ -14,10 +14,7 @@ details. */
 #define Win32_Winsock
 #include "winsup.h"
 #include "exceptions.h"
-#undef DECLSPEC_IMPORT
-#define DECLSPEC_IMPORT
 #include <imagehlp.h>
-#include "autoload.h"
 
 char debugger_command[2 * MAX_PATH + 20];
 

@@ -281,7 +281,7 @@ dll_init.o: $(WINSUP_H) include/exceptions.h dll_init.h
 dll_main.o:
 environ.o: $(WINSUP_H)
 errno.o: $(WINSUP_H)
-exceptions.o: $(WINSUP_H) include/exceptions.h sync.h autoload.h
+exceptions.o: $(WINSUP_H) include/exceptions.h sync.h
 exec.o: $(WINSUP_H)
 external.o: $(WINSUP_H)
 fcntl.o: $(WINSUP_H)
@@ -338,7 +338,7 @@ termios.o: $(WINSUP_H)
 test.o: $(WINSUP_H)
 times.o: $(WINSUP_H)
 tty.o: $(WINSUP_H)
-uinfo.o: $(WINSUP_H)
+uinfo.o: $(WINSUP_H) autoload.h
 uname.o: $(WINSUP_H)
 wait.o: $(WINSUP_H)
 window.o: $(WINSUP_H)

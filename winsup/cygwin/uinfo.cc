@@ -179,6 +179,7 @@ cuserid (char *src)
     }
 }
 
+extern "C" {
 LoadDLLinitfunc (netapi32)
 {
   HANDLE h;
@@ -189,8 +190,14 @@ LoadDLLinitfunc (netapi32)
     api_fatal ("could not load netapi32.dll. %d", GetLastError ());
   return 0;
 }
+
+static void dummy_autoload (void) __attribute__ ((unused));
+static void
+dummy_autoload (void)
+{
 LoadDLLinit (netapi32)
 LoadDLLfunc (NetWkstaUserGetInfo, 12, netapi32)
 LoadDLLfunc (NetGetDCName, 12, netapi32)
 LoadDLLfunc (NetApiBufferFree, 4, netapi32)
-
+}
+}
