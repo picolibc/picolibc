@@ -164,7 +164,15 @@ public:
    ~verifyable_object ();
 };
 
-int verifyable_object_isvalid (void const *, long);
+typedef enum 
+{
+  VALID_OBJECT,
+  INVALID_OBJECT,
+  VALID_STATIC_OBJECT
+} verifyable_object_state;
+
+verifyable_object_state verifyable_object_isvalid (void const *, long);
+verifyable_object_state verifyable_object_isvalid (void const *, long, void *);
 
 class pthread_key:public verifyable_object
 {
@@ -440,10 +448,6 @@ int __pthread_cond_init (pthread_cond_t * cond,
 			 const pthread_condattr_t * attr);
 int __pthread_cond_signal (pthread_cond_t * cond);
 int __pthread_cond_broadcast (pthread_cond_t * cond);
-int __pthread_cond_timedwait (pthread_cond_t * cond,
-			      pthread_mutex_t * mutex,
-			      const struct timespec *abstime);
-int __pthread_cond_wait (pthread_cond_t * cond, pthread_mutex_t * mutex);
 int __pthread_condattr_init (pthread_condattr_t * condattr);
 int __pthread_condattr_destroy (pthread_condattr_t * condattr);
 int __pthread_condattr_getpshared (const pthread_condattr_t * attr,

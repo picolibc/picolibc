@@ -459,10 +459,11 @@ pthread_cond::~pthread_cond ()
 void
 pthread_cond::BroadCast ()
 {
+  /* TODO: implement the same race fix as Signal has */
   if (pthread_mutex_lock (&cond_access))
     system_printf ("Failed to lock condition variable access mutex, this %0p\n", this);
   int count = waiting;
-  if (!verifyable_object_isvalid (&mutex, PTHREAD_MUTEX_MAGIC))
+  if (verifyable_object_isvalid (&mutex, PTHREAD_MUTEX_MAGIC) != VALID_OBJECT)
     {
       if (pthread_mutex_unlock (&cond_access))
 	system_printf ("Failed to unlock condition variable access mutex, this %0p\n", this);
@@ -483,14 +484,39 @@ pthread_cond::Signal ()
 {
   if (pthread_mutex_lock (&cond_access))
     system_printf ("Failed to lock condition variable access mutex, this %0p\n", this);
-  if (!verifyable_object_isvalid (&mutex, PTHREAD_MUTEX_MAGIC))
+  if (verifyable_object_isvalid (&mutex, PTHREAD_MUTEX_MAGIC) != VALID_OBJECT)
     {
       if (pthread_mutex_unlock (&cond_access))
 	system_printf ("Failed to unlock condition variable access mutex, this %0p\n",
 		       this);
       return;
     }
+  int temp = waiting;
+  if (!temp)
+    /* nothing to signal */
+    {
+      if (pthread_mutex_unlock (&cond_access))
+	system_printf ("Failed to unlock condition variable access mutex, this %0p\n", this);
+      return;
+    }
   PulseEvent (win32_obj_id);
+  /* No one can start waiting until we release the condition access mutex */
+  /* The released thread will decrement waiting when it gets a time slice...
+     without waiting for the access mutex
+   */
+  int spins = 10;
+  while (InterlockedIncrement (&waiting) != (temp - 1) && spins)
+    {
+      InterlockedDecrement (&waiting);
+      /* give up the cpu to force a context switch. */
+      Sleep (0);
+      if (spins == 5)
+	/* we've had 5 timeslices, and the woekn thread still hasn't done it's
+	 * thing - maybe we raced it with the event? */
+	PulseEvent (win32_obj_id);
+      spins--;
+    }
+  InterlockedDecrement (&waiting);
   if (pthread_mutex_unlock (&cond_access))
     system_printf ("Failed to unlock condition variable access mutex, this %0p\n", this);
 }
@@ -804,26 +830,34 @@ verifyable_object::~verifyable_object ()
 
 /*Generic memory acccess routine - where should it live ? */
 int __stdcall
-check_valid_pointer (void *pointer)
+check_valid_pointer (void const *pointer)
 {
-  if (!pointer || IsBadWritePtr (pointer, sizeof (verifyable_object)))
+  if (!pointer || IsBadWritePtr ((void *) pointer, sizeof (verifyable_object)))
     return EFAULT;
   return 0;
 }
 
-int
-verifyable_object_isvalid (void const * objectptr, long magic)
+verifyable_object_state
+verifyable_object_isvalid (void const * objectptr, long magic, void *static_ptr)
 {
   verifyable_object **object = (verifyable_object **)objectptr;
   if (check_valid_pointer (object))
-    return 0;
-  if (!*object || *object == PTHREAD_MUTEX_INITIALIZER)
-    return 0;
+    return INVALID_OBJECT;
+  if (!*object)
+    return INVALID_OBJECT;
+  if (static_ptr && *object == static_ptr)
+    return VALID_STATIC_OBJECT;
   if (check_valid_pointer (*object))
-    return 0;
+    return INVALID_OBJECT;
   if ((*object)->magic != magic)
-    return 0;
-  return -1;
+    return INVALID_OBJECT;
+  return VALID_OBJECT;
+}
+
+verifyable_object_state
+verifyable_object_isvalid (void const * objectptr, long magic)
+{
+  return verifyable_object_isvalid (objectptr, magic, NULL);
 }
 
 /* Pthreads */
@@ -885,12 +919,12 @@ int
 __pthread_create (pthread_t *thread, const pthread_attr_t *attr,
 		  void *(*start_routine) (void *), void *arg)
 {
-  if (attr && !verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC))
+  if (attr && verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
 
   *thread = new pthread ();
   (*thread)->create (start_routine, attr ? *attr : NULL, arg);
-  if (!verifyable_object_isvalid (thread, PTHREAD_MAGIC))
+  if (verifyable_object_isvalid (thread, PTHREAD_MAGIC) != VALID_OBJECT)
     {
       delete (*thread);
       *thread = NULL;
@@ -934,7 +968,7 @@ __pthread_cleanup (pthread_t thread)
 int
 __pthread_cancel (pthread_t thread)
 {
-  if (!verifyable_object_isvalid (&thread, PTHREAD_MAGIC))
+  if (verifyable_object_isvalid (&thread, PTHREAD_MAGIC) != VALID_OBJECT)
     return ESRCH;
   if (thread->cancelstate == PTHREAD_CANCEL_ENABLE)
     {
@@ -1285,8 +1319,10 @@ __pthread_atfork (void (*prepare)(void), void (*parent)(void), void (*child)(voi
 int
 __pthread_attr_init (pthread_attr_t *attr)
 {
+  if (check_valid_pointer (attr))
+    return EINVAL;
   *attr = new pthread_attr;
-  if (!verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC) != VALID_OBJECT)
     {
       delete (*attr);
       *attr = NULL;
@@ -1299,7 +1335,7 @@ int
 __pthread_attr_getinheritsched (const pthread_attr_t *attr,
 				int *inheritsched)
 {
-  if (!verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
   *inheritsched = (*attr)->inheritsched;
   return 0;
@@ -1309,7 +1345,7 @@ int
 __pthread_attr_getschedparam (const pthread_attr_t *attr,
 			      struct sched_param *param)
 {
-  if (!verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
   *param = (*attr)->schedparam;
   return 0;
@@ -1322,7 +1358,7 @@ __pthread_attr_getschedparam (const pthread_attr_t *attr,
 int
 __pthread_attr_getschedpolicy (const pthread_attr_t *attr, int *policy)
 {
-  if (!verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
   *policy = SCHED_FIFO;
   return 0;
@@ -1332,7 +1368,7 @@ __pthread_attr_getschedpolicy (const pthread_attr_t *attr, int *policy)
 int
 __pthread_attr_getscope (const pthread_attr_t *attr, int *contentionscope)
 {
-  if (!verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
   *contentionscope = (*attr)->contentionscope;
   return 0;
@@ -1341,7 +1377,7 @@ __pthread_attr_getscope (const pthread_attr_t *attr, int *contentionscope)
 int
 __pthread_attr_setdetachstate (pthread_attr_t *attr, int detachstate)
 {
-  if (!verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
   if (detachstate < 0 || detachstate > 1)
     return EINVAL;
@@ -1352,7 +1388,7 @@ __pthread_attr_setdetachstate (pthread_attr_t *attr, int detachstate)
 int
 __pthread_attr_getdetachstate (const pthread_attr_t *attr, int *detachstate)
 {
-  if (!verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
   *detachstate = (*attr)->joinable;
   return 0;
@@ -1361,7 +1397,7 @@ __pthread_attr_getdetachstate (const pthread_attr_t *attr, int *detachstate)
 int
 __pthread_attr_setinheritsched (pthread_attr_t *attr, int inheritsched)
 {
-  if (!verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
   if (inheritsched != PTHREAD_INHERIT_SCHED
       && inheritsched != PTHREAD_EXPLICIT_SCHED)
@@ -1374,7 +1410,7 @@ int
 __pthread_attr_setschedparam (pthread_attr_t *attr,
 			      const struct sched_param *param)
 {
-  if (!verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
   if (!valid_sched_parameters (param))
     return ENOTSUP;
@@ -1386,7 +1422,7 @@ __pthread_attr_setschedparam (pthread_attr_t *attr,
 int
 __pthread_attr_setschedpolicy (pthread_attr_t *attr, int policy)
 {
-  if (!verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
   if (policy != SCHED_FIFO)
     return ENOTSUP;
@@ -1396,7 +1432,7 @@ __pthread_attr_setschedpolicy (pthread_attr_t *attr, int policy)
 int
 __pthread_attr_setscope (pthread_attr_t *attr, int contentionscope)
 {
-  if (!verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
   if (contentionscope != PTHREAD_SCOPE_SYSTEM
       && contentionscope != PTHREAD_SCOPE_PROCESS)
@@ -1412,7 +1448,7 @@ __pthread_attr_setscope (pthread_attr_t *attr, int contentionscope)
 int
 __pthread_attr_setstacksize (pthread_attr_t *attr, size_t size)
 {
-  if (!verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
   (*attr)->stacksize = size;
   return 0;
@@ -1421,7 +1457,7 @@ __pthread_attr_setstacksize (pthread_attr_t *attr, size_t size)
 int
 __pthread_attr_getstacksize (const pthread_attr_t *attr, size_t *size)
 {
-  if (!verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
   *size = (*attr)->stacksize;
   return 0;
@@ -1430,7 +1466,7 @@ __pthread_attr_getstacksize (const pthread_attr_t *attr, size_t *size)
 int
 __pthread_attr_destroy (pthread_attr_t *attr)
 {
-  if (!verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_ATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
   delete (*attr);
   *attr = NULL;
@@ -1455,7 +1491,7 @@ int
 __pthread_join (pthread_t *thread, void **return_val)
 {
   /*FIXME: wait on the thread cancellation event as well - we are a cancellation point*/
-  if (!verifyable_object_isvalid (thread, PTHREAD_MAGIC))
+  if (verifyable_object_isvalid (thread, PTHREAD_MAGIC) != VALID_OBJECT)
     return ESRCH;
 
   if ((*thread)->attr.joinable == PTHREAD_CREATE_DETACHED)
@@ -1480,7 +1516,7 @@ __pthread_join (pthread_t *thread, void **return_val)
 int
 __pthread_detach (pthread_t *thread)
 {
-  if (!verifyable_object_isvalid (thread, PTHREAD_MAGIC))
+  if (verifyable_object_isvalid (thread, PTHREAD_MAGIC) != VALID_OBJECT)
     return ESRCH;
 
   if ((*thread)->attr.joinable == PTHREAD_CREATE_DETACHED)
@@ -1496,7 +1532,7 @@ __pthread_detach (pthread_t *thread)
 int
 __pthread_suspend (pthread_t *thread)
 {
-  if (!verifyable_object_isvalid (thread, PTHREAD_MAGIC))
+  if (verifyable_object_isvalid (thread, PTHREAD_MAGIC) != VALID_OBJECT)
     return ESRCH;
 
   if ((*thread)->suspended == false)
@@ -1512,7 +1548,7 @@ __pthread_suspend (pthread_t *thread)
 int
 __pthread_continue (pthread_t *thread)
 {
-  if (!verifyable_object_isvalid (thread, PTHREAD_MAGIC))
+  if (verifyable_object_isvalid (thread, PTHREAD_MAGIC) != VALID_OBJECT)
     return ESRCH;
 
   if ((*thread)->suspended == true)
@@ -1536,7 +1572,7 @@ int
 __pthread_getschedparam (pthread_t thread, int *policy,
 			 struct sched_param *param)
 {
-  if (!verifyable_object_isvalid (&thread, PTHREAD_MAGIC))
+  if (verifyable_object_isvalid (&thread, PTHREAD_MAGIC) != VALID_OBJECT)
     return ESRCH;
   *policy = SCHED_FIFO;
   /*we don't return the current effective priority, we return the current requested
@@ -1549,7 +1585,7 @@ __pthread_getschedparam (pthread_t thread, int *policy,
 unsigned long
 __pthread_getsequence_np (pthread_t *thread)
 {
-  if (!verifyable_object_isvalid (thread, PTHREAD_MAGIC))
+  if (verifyable_object_isvalid (thread, PTHREAD_MAGIC) != VALID_OBJECT)
     return EINVAL;
   return (*thread)->GetThreadId ();
 }
@@ -1561,12 +1597,12 @@ __pthread_key_create (pthread_key_t *key, void (*destructor) (void *))
   /*The opengroup docs don't define if we should check this or not,
    *but creation is relatively rare..
    */
-  if (verifyable_object_isvalid (key, PTHREAD_KEY_MAGIC))
+  if (verifyable_object_isvalid (key, PTHREAD_KEY_MAGIC) == VALID_OBJECT)
     return EBUSY;
 
   *key = new pthread_key (destructor);
 
-  if (!verifyable_object_isvalid (key, PTHREAD_KEY_MAGIC))
+  if (verifyable_object_isvalid (key, PTHREAD_KEY_MAGIC) != VALID_OBJECT)
     {
       delete (*key);
       *key = NULL;
@@ -1578,7 +1614,7 @@ __pthread_key_create (pthread_key_t *key, void (*destructor) (void *))
 int
 __pthread_key_delete (pthread_key_t key)
 {
-  if (!verifyable_object_isvalid (&key, PTHREAD_KEY_MAGIC))
+  if (verifyable_object_isvalid (&key, PTHREAD_KEY_MAGIC) != VALID_OBJECT)
     return EINVAL;
 
   delete (key);
@@ -1602,7 +1638,7 @@ int
 __pthread_setschedparam (pthread_t thread, int policy,
 			 const struct sched_param *param)
 {
-  if (!verifyable_object_isvalid (&thread, PTHREAD_MAGIC))
+  if (verifyable_object_isvalid (&thread, PTHREAD_MAGIC) != VALID_OBJECT)
     return ESRCH;
   if (policy != SCHED_FIFO)
     return ENOTSUP;
@@ -1619,7 +1655,7 @@ __pthread_setschedparam (pthread_t thread, int policy,
 int
 __pthread_setspecific (pthread_key_t key, const void *value)
 {
-  if (!verifyable_object_isvalid (&key, PTHREAD_KEY_MAGIC))
+  if (verifyable_object_isvalid (&key, PTHREAD_KEY_MAGIC) != VALID_OBJECT)
     return EINVAL;
   (key)->set (value);
   return 0;
@@ -1628,7 +1664,7 @@ __pthread_setspecific (pthread_key_t key, const void *value)
 void *
 __pthread_getspecific (pthread_key_t key)
 {
-  if (!verifyable_object_isvalid (&key, PTHREAD_KEY_MAGIC))
+  if (verifyable_object_isvalid (&key, PTHREAD_KEY_MAGIC) != VALID_OBJECT)
     return NULL;
 
   return (key)->get ();
@@ -1640,7 +1676,7 @@ __pthread_getspecific (pthread_key_t key)
 int
 __pthread_cond_destroy (pthread_cond_t *cond)
 {
-  if (!verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC))
+  if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC) != VALID_OBJECT)
     return EINVAL;
 
   /*reads are atomic */
@@ -1656,15 +1692,15 @@ __pthread_cond_destroy (pthread_cond_t *cond)
 int
 __pthread_cond_init (pthread_cond_t *cond, const pthread_condattr_t *attr)
 {
-  if (attr && !verifyable_object_isvalid (attr, PTHREAD_CONDATTR_MAGIC))
+  if (attr && verifyable_object_isvalid (attr, PTHREAD_CONDATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
 
-  if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC))
+  if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC) != INVALID_OBJECT)
     return EBUSY;
 
   *cond = new pthread_cond (attr ? (*attr) : NULL);
 
-  if (!verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC))
+  if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC) != VALID_OBJECT)
     {
       delete (*cond);
       *cond = NULL;
@@ -1677,7 +1713,7 @@ __pthread_cond_init (pthread_cond_t *cond, const pthread_condattr_t *attr)
 int
 __pthread_cond_broadcast (pthread_cond_t *cond)
 {
-  if (!verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC))
+  if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC) != VALID_OBJECT)
     return EINVAL;
 
   (*cond)->BroadCast ();
@@ -1688,7 +1724,7 @@ __pthread_cond_broadcast (pthread_cond_t *cond)
 int
 __pthread_cond_signal (pthread_cond_t *cond)
 {
-  if (!verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC))
+  if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC) != VALID_OBJECT)
     return EINVAL;
 
   (*cond)->Signal ();
@@ -1697,29 +1733,21 @@ __pthread_cond_signal (pthread_cond_t *cond)
 }
 
 int
-__pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
-			  const struct timespec *abstime)
+__pthread_cond_dowait (pthread_cond_t *cond, pthread_mutex_t *mutex,
+		       long waitlength)
 {
 // and yes cond_access here is still open to a race. (we increment, context swap,
 // broadcast occurs -  we miss the broadcast. the functions aren't split properly.
   int rv;
-  if (!abstime)
-    return EINVAL;
   pthread_mutex **themutex = NULL;
   if (*mutex == PTHREAD_MUTEX_INITIALIZER)
     __pthread_mutex_init (mutex, NULL);
   themutex = mutex;
 
-  if (!verifyable_object_isvalid (themutex, PTHREAD_MUTEX_MAGIC))
+  if (verifyable_object_isvalid (themutex, PTHREAD_MUTEX_MAGIC) != VALID_OBJECT)
     return EINVAL;
-  if (!verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC))
+  if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC) != VALID_OBJECT)
     return EINVAL;
-  struct timeb currSysTime;
-  long waitlength;
-  ftime(&currSysTime);
-  waitlength = (abstime->tv_sec - currSysTime.time) *1000;
-  if (waitlength < 0)
-    return ETIMEDOUT;
 
   /*if the cond variable is blocked, then the above timer test maybe wrong. *shrug**/
   if (pthread_mutex_lock (&(*cond)->cond_access))
@@ -1739,11 +1767,17 @@ __pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
   if (pthread_mutex_unlock (&(*cond)->cond_access))
     system_printf ("Failed to unlock condition variable access mutex, this %0p\n", *cond);
   rv = (*cond)->TimedWait (waitlength);
+  /* this may allow a race on the mutex acquisition and waits.. 
+   * But doing this within the cond access mutex creates a different race
+   */
+  bool last = false;
+  if (InterlockedDecrement (&((*cond)->waiting)) == 0)
+    last = true;
   (*cond)->mutex->Lock ();
+  if (last)
+    (*cond)->mutex = NULL;
   if (pthread_mutex_lock (&(*cond)->cond_access))
     system_printf ("Failed to lock condition variable access mutex, this %0p\n", *cond);
-  if (InterlockedDecrement (&((*cond)->waiting)) == 0)
-    (*cond)->mutex = NULL;
   InterlockedDecrement (&((*themutex)->condwaits));
   if (pthread_mutex_unlock (&(*cond)->cond_access))
     system_printf ("Failed to unlock condition variable access mutex, this %0p\n", *cond);
@@ -1751,53 +1785,32 @@ __pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
   return rv;
 }
 
-int
-__pthread_cond_wait (pthread_cond_t *cond, pthread_mutex_t *mutex)
+extern "C" int
+pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
+			const struct timespec *abstime)
 {
-// see cond_timedwait for notes
-  int rv;
-  pthread_mutex_t *themutex = mutex;
-  if (*mutex == PTHREAD_MUTEX_INITIALIZER)
-    __pthread_mutex_init (mutex, NULL);
-  themutex = mutex;
-  if (!verifyable_object_isvalid (themutex, PTHREAD_MUTEX_MAGIC))
+  if (check_valid_pointer(abstime))
     return EINVAL;
-  if (!verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC))
-    return EINVAL;
+  struct timeb currSysTime;
+  long waitlength;
+  ftime(&currSysTime);
+  waitlength = (abstime->tv_sec - currSysTime.time) *1000;
+  if (waitlength < 0)
+    return ETIMEDOUT;
+  return __pthread_cond_dowait (cond, mutex, waitlength);
+}
 
-  if (pthread_mutex_lock (&(*cond)->cond_access))
-    system_printf ("Failed to lock condition variable access mutex, this %0p\n", *cond);
-
-  if ((*cond)->waiting)
-    if ((*cond)->mutex && ((*cond)->mutex != (*themutex)))
-      {
-	if (pthread_mutex_unlock (&(*cond)->cond_access))
-	  system_printf ("Failed to unlock condition variable access mutex, this %0p\n", *cond);
-	return EINVAL;
-      }
-  InterlockedIncrement (&((*cond)->waiting));
-
-  (*cond)->mutex = (*themutex);
-  InterlockedIncrement (&((*themutex)->condwaits));
-  if (pthread_mutex_unlock (&(*cond)->cond_access))
-    system_printf ("Failed to unlock condition variable access mutex, this %0p\n", *cond);
-  rv = (*cond)->TimedWait (INFINITE);
-  (*cond)->mutex->Lock ();
-  if (pthread_mutex_lock (&(*cond)->cond_access))
-    system_printf ("Failed to lock condition variable access mutex, this %0p\n", *cond);
-  if (InterlockedDecrement (&((*cond)->waiting)) == 0)
-    (*cond)->mutex = NULL;
-  InterlockedDecrement (&((*themutex)->condwaits));
-  if (pthread_mutex_unlock (&(*cond)->cond_access))
-    system_printf ("Failed to unlock condition variable access mutex, this %0p\n", *cond);
-  return rv;
+extern "C" int
+pthread_cond_wait (pthread_cond_t *cond, pthread_mutex_t *mutex)
+{
+  return __pthread_cond_dowait (cond, mutex, INFINITE);
 }
 
 int
 __pthread_condattr_init (pthread_condattr_t *condattr)
 {
   *condattr = new pthread_condattr;
-  if (!verifyable_object_isvalid (condattr, PTHREAD_CONDATTR_MAGIC))
+  if (verifyable_object_isvalid (condattr, PTHREAD_CONDATTR_MAGIC) != VALID_OBJECT)
     {
       delete (*condattr);
       *condattr = NULL;
@@ -1809,7 +1822,7 @@ __pthread_condattr_init (pthread_condattr_t *condattr)
 int
 __pthread_condattr_getpshared (const pthread_condattr_t *attr, int *pshared)
 {
-  if (!verifyable_object_isvalid (attr, PTHREAD_CONDATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_CONDATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
   *pshared = (*attr)->shared;
   return 0;
@@ -1818,7 +1831,7 @@ __pthread_condattr_getpshared (const pthread_condattr_t *attr, int *pshared)
 int
 __pthread_condattr_setpshared (pthread_condattr_t *attr, int pshared)
 {
-  if (!verifyable_object_isvalid (attr, PTHREAD_CONDATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_CONDATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
   if ((pshared < 0) || (pshared > 1))
     return EINVAL;
@@ -1832,7 +1845,7 @@ __pthread_condattr_setpshared (pthread_condattr_t *attr, int pshared)
 int
 __pthread_condattr_destroy (pthread_condattr_t *condattr)
 {
-  if (!verifyable_object_isvalid (condattr, PTHREAD_CONDATTR_MAGIC))
+  if (verifyable_object_isvalid (condattr, PTHREAD_CONDATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
   delete (*condattr);
   *condattr = NULL;
@@ -1846,7 +1859,7 @@ __pthread_kill (pthread_t thread, int sig)
 // lock myself, for the use of thread2signal
   // two different kills might clash: FIXME
 
-  if (!verifyable_object_isvalid (&thread, PTHREAD_MAGIC))
+  if (verifyable_object_isvalid (&thread, PTHREAD_MAGIC) != VALID_OBJECT)
     return EINVAL;
 
   if (thread->sigs)
@@ -1904,14 +1917,14 @@ int
 __pthread_mutex_init (pthread_mutex_t *mutex,
 		      const pthread_mutexattr_t *attr)
 {
-  if (attr && !verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC))
+  if (attr && verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC) != VALID_OBJECT || check_valid_pointer (mutex))
     return EINVAL;
 
-  if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC))
+  if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC, PTHREAD_MUTEX_INITIALIZER) != INVALID_OBJECT)
     return EBUSY;
 
   *mutex = new pthread_mutex (attr ? (*attr) : NULL);
-  if (!verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC))
+  if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC) != VALID_OBJECT)
     {
       delete (*mutex);
       *mutex = NULL;
@@ -1927,7 +1940,7 @@ __pthread_mutex_getprioceiling (const pthread_mutex_t *mutex,
   pthread_mutex_t *themutex=(pthread_mutex_t *) mutex;
   if (*mutex == PTHREAD_MUTEX_INITIALIZER)
     __pthread_mutex_init ((pthread_mutex_t *) mutex, NULL);
-  if (!verifyable_object_isvalid (themutex, PTHREAD_MUTEX_MAGIC))
+  if (verifyable_object_isvalid (themutex, PTHREAD_MUTEX_MAGIC) != VALID_OBJECT)
     return EINVAL;
   /*We don't define _POSIX_THREAD_PRIO_PROTECT because we do't currently support
    *mutex priorities.
@@ -1944,13 +1957,21 @@ int
 __pthread_mutex_lock (pthread_mutex_t *mutex)
 {
   pthread_mutex_t *themutex = mutex;
-  if (!verifyable_object_isvalid (themutex, PTHREAD_MUTEX_MAGIC))
-    return EINVAL;
-  if (*mutex == PTHREAD_MUTEX_INITIALIZER)
+  switch (verifyable_object_isvalid (themutex, PTHREAD_MUTEX_MAGIC, PTHREAD_MUTEX_INITIALIZER))
     {
-      int rv = __pthread_mutex_init (mutex, NULL);
-      if (rv)
-	return rv;
+    case INVALID_OBJECT:
+      return EINVAL;
+      break;
+    case VALID_STATIC_OBJECT:
+      if (*mutex == PTHREAD_MUTEX_INITIALIZER)
+        {
+          int rv = __pthread_mutex_init (mutex, NULL);
+          if (rv)
+	    return rv;
+        }
+      break;
+    case VALID_OBJECT:
+      break;
     }
   (*themutex)->Lock ();
   return 0;
@@ -1962,7 +1983,7 @@ __pthread_mutex_trylock (pthread_mutex_t *mutex)
   pthread_mutex_t *themutex = mutex;
   if (*mutex == PTHREAD_MUTEX_INITIALIZER)
     __pthread_mutex_init (mutex, NULL);
-  if (!verifyable_object_isvalid (themutex, PTHREAD_MUTEX_MAGIC))
+  if (verifyable_object_isvalid (themutex, PTHREAD_MUTEX_MAGIC) != VALID_OBJECT)
     return EINVAL;
   if ((*themutex)->TryLock ())
     return EBUSY;
@@ -1974,7 +1995,7 @@ __pthread_mutex_unlock (pthread_mutex_t *mutex)
 {
   if (*mutex == PTHREAD_MUTEX_INITIALIZER)
     __pthread_mutex_init (mutex, NULL);
-  if (!verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC))
+  if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC) != VALID_OBJECT)
     return EINVAL;
   (*mutex)->UnLock ();
   return 0;
@@ -1985,7 +2006,7 @@ __pthread_mutex_destroy (pthread_mutex_t *mutex)
 {
   if (check_valid_pointer (mutex) && (*mutex == PTHREAD_MUTEX_INITIALIZER))
     return 0;
-  if (!verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC))
+  if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC) != VALID_OBJECT)
     return EINVAL;
 
   /*reading a word is atomic */
@@ -2004,7 +2025,7 @@ __pthread_mutex_setprioceiling (pthread_mutex_t *mutex, int prioceiling,
   pthread_mutex_t *themutex = mutex;
   if (*mutex == PTHREAD_MUTEX_INITIALIZER)
     __pthread_mutex_init (mutex, NULL);
-  if (!verifyable_object_isvalid (themutex, PTHREAD_MUTEX_MAGIC))
+  if (verifyable_object_isvalid (themutex, PTHREAD_MUTEX_MAGIC) != VALID_OBJECT)
     return EINVAL;
   return ENOSYS;
 }
@@ -2015,7 +2036,7 @@ int
 __pthread_mutexattr_getprotocol (const pthread_mutexattr_t *attr,
 				 int *protocol)
 {
-  if (!verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
   return ENOSYS;
 }
@@ -2024,7 +2045,7 @@ int
 __pthread_mutexattr_getpshared (const pthread_mutexattr_t *attr,
 				int *pshared)
 {
-  if (!verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
   *pshared = (*attr)->pshared;
   return 0;
@@ -2037,7 +2058,7 @@ __pthread_mutexattr_getpshared (const pthread_mutexattr_t *attr,
 int
 __pthread_mutexattr_gettype (const pthread_mutexattr_t *attr, int *type)
 {
-  if (!verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
   *type = (*attr)->mutextype;
   return 0;
@@ -2051,11 +2072,11 @@ __pthread_mutexattr_gettype (const pthread_mutexattr_t *attr, int *type)
 int
 __pthread_mutexattr_init (pthread_mutexattr_t *attr)
 {
-  if (verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC) != INVALID_OBJECT)
     return EBUSY;
 
   *attr = new pthread_mutexattr ();
-  if (!verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC) != VALID_OBJECT)
     {
       delete (*attr);
       *attr = NULL;
@@ -2067,7 +2088,7 @@ __pthread_mutexattr_init (pthread_mutexattr_t *attr)
 int
 __pthread_mutexattr_destroy (pthread_mutexattr_t *attr)
 {
-  if (!verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
   delete (*attr);
   *attr = NULL;
@@ -2079,7 +2100,7 @@ __pthread_mutexattr_destroy (pthread_mutexattr_t *attr)
 int
 __pthread_mutexattr_setprotocol (pthread_mutexattr_t *attr, int protocol)
 {
-  if (!verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
   return ENOSYS;
 }
@@ -2089,7 +2110,7 @@ int
 __pthread_mutexattr_setprioceiling (pthread_mutexattr_t *attr,
 				    int prioceiling)
 {
-  if (!verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
   return ENOSYS;
 }
@@ -2098,7 +2119,7 @@ int
 __pthread_mutexattr_getprioceiling (const pthread_mutexattr_t *attr,
 				    int *prioceiling)
 {
-  if (!verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
   return ENOSYS;
 }
@@ -2106,7 +2127,7 @@ __pthread_mutexattr_getprioceiling (const pthread_mutexattr_t *attr,
 int
 __pthread_mutexattr_setpshared (pthread_mutexattr_t *attr, int pshared)
 {
-  if (!verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
   /*we don't use pshared for anything as yet. We need to test PROCESS_SHARED
    *functionality
@@ -2121,7 +2142,7 @@ __pthread_mutexattr_setpshared (pthread_mutexattr_t *attr, int pshared)
 int
 __pthread_mutexattr_settype (pthread_mutexattr_t *attr, int type)
 {
-  if (!verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC))
+  if (verifyable_object_isvalid (attr, PTHREAD_MUTEXATTR_MAGIC) != VALID_OBJECT)
     return EINVAL;
   if (type != PTHREAD_MUTEX_RECURSIVE)
     return EINVAL;
@@ -2134,7 +2155,7 @@ int
 __sem_init (sem_t *sem, int pshared, unsigned int value)
 {
   /*opengroup calls this undefined */
-  if (verifyable_object_isvalid (sem, SEM_MAGIC))
+  if (verifyable_object_isvalid (sem, SEM_MAGIC) != INVALID_OBJECT)
     return EBUSY;
 
   if (value > SEM_VALUE_MAX)
@@ -2142,7 +2163,7 @@ __sem_init (sem_t *sem, int pshared, unsigned int value)
 
   *sem = new semaphore (pshared, value);
 
-  if (!verifyable_object_isvalid (sem, SEM_MAGIC))
+  if (verifyable_object_isvalid (sem, SEM_MAGIC) != VALID_OBJECT)
     {
       delete (*sem);
       *sem = NULL;
@@ -2154,7 +2175,7 @@ __sem_init (sem_t *sem, int pshared, unsigned int value)
 int
 __sem_destroy (sem_t *sem)
 {
-  if (!verifyable_object_isvalid (sem, SEM_MAGIC))
+  if (verifyable_object_isvalid (sem, SEM_MAGIC) != VALID_OBJECT)
     return EINVAL;
 
   /*FIXME - new feature - test for busy against threads... */
@@ -2167,7 +2188,7 @@ __sem_destroy (sem_t *sem)
 int
 __sem_wait (sem_t *sem)
 {
-  if (!verifyable_object_isvalid (sem, SEM_MAGIC))
+  if (verifyable_object_isvalid (sem, SEM_MAGIC) != VALID_OBJECT)
     return EINVAL;
 
   (*sem)->Wait ();
@@ -2177,7 +2198,7 @@ __sem_wait (sem_t *sem)
 int
 __sem_trywait (sem_t *sem)
 {
-  if (!verifyable_object_isvalid (sem, SEM_MAGIC))
+  if (verifyable_object_isvalid (sem, SEM_MAGIC) != VALID_OBJECT)
     return EINVAL;
 
   return (*sem)->TryWait ();
@@ -2186,7 +2207,7 @@ __sem_trywait (sem_t *sem)
 int
 __sem_post (sem_t *sem)
 {
-  if (!verifyable_object_isvalid (sem, SEM_MAGIC))
+  if (verifyable_object_isvalid (sem, SEM_MAGIC) != VALID_OBJECT)
     return EINVAL;
 
   (*sem)->Post ();
