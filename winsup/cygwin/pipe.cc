@@ -28,7 +28,7 @@ static unsigned pipecount;
 static const NO_COPY char pipeid_fmt[] = "stupid_pipe.%u.%u";
 
 fhandler_pipe::fhandler_pipe ()
-  : fhandler_base (0), guard (NULL), broken_pipe (false), writepipe_exists(0),
+  : fhandler_base (), guard (NULL), broken_pipe (false), writepipe_exists(0),
     orig_pid (0), id (0)
 {
 }
