@@ -1,3 +1,8 @@
+Mon Aug  7 00:11:35 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* include/cygwin/cygwin_dll.h: Remove extraneous (and incorrect)
+	declarations.
+
 Fri Aug  4 00:00:46 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* hinfo.cc (hinfo::find_unused_handle): Just check for table entry ==
