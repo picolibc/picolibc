@@ -1646,15 +1646,13 @@ extern "C"
 int
 statfs (const char *fname, struct statfs *sfs)
 {
-  char full_path[MAX_PATH];
-
   if (!sfs)
     {
       set_errno (EFAULT);
       return -1;
     }
-  cygwin_conv_to_full_win32_path (fname, full_path);
 
+  path_conv full_path(fname, PC_SYM_FOLLOW | PC_FULL);
   char *root = rootdir (full_path);
 
   syscall_printf ("statfs %s", root);

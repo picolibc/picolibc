@@ -1,3 +1,7 @@
+Tue Jul 25 21:50:42 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* syscalls.cc (statfs): Use path_conv method to convert input path.
+
 Tue Jul 25 21:40:51 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* syscalls.cc (_link): Avoid extraneous call to
