@@ -151,6 +151,9 @@ tty_list::terminate (void)
 	  low_priority_sleep (200);
 	}
 
+      if (WaitForSingleObject (tty_mutex, INFINITE) == WAIT_FAILED)
+	termios_printf ("WFSO for tty_mutex %p failed, %E", tty_mutex);
+
       termios_printf ("tty %d master about to finish", ttynum);
       ForceCloseHandle1 (t->to_slave, to_pty);
       ForceCloseHandle1 (t->from_slave, from_pty);
@@ -160,6 +163,8 @@ tty_list::terminate (void)
       char buf[20];
       __small_sprintf (buf, "tty%d", ttynum);
       logout (buf);
+
+      ReleaseMutex (tty_mutex);
     }
 }
 
@@ -369,6 +374,7 @@ tty::init (void)
   to_slave = NULL;
   from_slave = NULL;
   was_opened = 0;
+  master_pid = 0;
 }
 
 HANDLE

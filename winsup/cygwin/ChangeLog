@@ -1,3 +1,8 @@
+2004-12-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* tty.cc (tty_list::terminate): Guard releasing the tty with tty_mutex.
+	(tty::init): Set master_pid to 0.
+
 2004-12-14  Thomas Wolff  <towo@computer.org>
 
 	* fhandler_console.cc (read): Consider offset within scrolling
