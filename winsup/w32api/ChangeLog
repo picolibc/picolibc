@@ -1,3 +1,8 @@
+2001-12-20  Christopher Faylor  <cgf@redhat.com>
+
+	* lib/Makefile.in: Revert inst_installdir definitions to working
+	versions.
+
 2001-12-17  Guido Serassio <serassio@libero.it>
 
 	* include/winsvc.h: Add ChangeServiceConfig2() &

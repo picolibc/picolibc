@@ -19,7 +19,6 @@ host_alias = @host_alias@
 build_alias = @build_alias@
 target_alias = @target_alias@
 prefix = @prefix@
-config_prefix = @prefix@
 includedir:=@includedir@
 
 program_transform_name = @program_transform_name@
@@ -37,22 +36,9 @@ tooldir:=$(exec_prefix)/$(target_alias)
 endif
 datadir = @datadir@
 infodir = @infodir@
-#FIXME.  The inst_includedir and inst_libdir need to be modified to use
-#$(tooldir)/usr/include/w32api and $(tooldir)/usr/lib/w32api for the dist 
-#targets.
 ifneq (,$(findstring cygwin,$(target_alias)))
-ifeq ($(build_alias),$(host_alias))
-ifeq ($(prefix),$(config_prefix))
 inst_includedir:=$(tooldir)/include/w32api
 inst_libdir:=$(tooldir)/lib/w32api
-else
-inst_includedir:=$(tooldir)/include/w32api
-inst_libdir:=$(tooldir)/lib/w32api
-endif
-else
-inst_includedir:=$(includedir)
-inst_libdir:=$(libdir)
-endif
 else
 inst_includedir:=$(includedir)
 inst_libdir:=$(libdir)
