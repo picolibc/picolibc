@@ -1,3 +1,21 @@
+Tue Oct  2  9:57:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* Makefile.in: add threaded_queue.o to cygserver.exe.
+	* cygserver.cc: Include threaded_queue.h
+	(class server_request): Inherit from queue_request.
+	(class server_process_param): Inherit from queue_process_param.
+	(class server_request_queue): Inherit from threaded_queue.
+	(request_loop): Adjust for new types.
+	(server_request_queue::process_requests): Remove guts to 
+	threaded_queue::process_requests.
+	(server_request::server_request): Adjust for new types.
+	(worker_function): Delete.
+	(server_request_queue::create_workers): Delete.
+	(server_request_queue::cleanup): Delete.
+	(server_request_queue::add): Move guts to threaded_queue::add.
+	* threaded_queue.cc: New file.
+	* threaded_queue.h: New file.
+
 Mon Oct  1 12:38:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
 	* cygserver.cc (client_request::serve): New function.

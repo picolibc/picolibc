@@ -30,6 +30,8 @@
 #include "cygwin/cygserver.h"
 #include "cygserver_shm.h"
 
+#include "threaded_queue.h"
+
 /* for quieter operation, set to 0 */
 #define DEBUG 0
 #define debug_printf if (DEBUG) printf
@@ -272,52 +274,37 @@ client_request_get_version::serve(transport_layer_base *conn, class process_cach
   version.patch = CYGWIN_SERVER_VERSION_PATCH;
 }
 
-class server_request
+class server_request : public queue_request
 {
   public:
-  class server_request *next;
   server_request (transport_layer_base *newconn, class process_cache *newcache);
-  void process ();
+  virtual void process ();
   private:
     char request_buffer [MAX_REQUEST_SIZE];
     transport_layer_base *conn;
     class process_cache *cache;
 };
 
-class queue_process_param
+class server_process_param : public queue_process_param
 {
   public:
-  class queue_process_param * next;
-  class server_request_queue *queue;
-  transport_layer_base *transport;
-  HANDLE hThread;
-  DWORD tid;
+    transport_layer_base *transport;
 };
 
-class server_request_queue
+class server_request_queue : public threaded_queue
 {
   public:
-  CRITICAL_SECTION queuelock;
-  HANDLE event;
-  server_request * request;
-  bool active;
-  unsigned int initial_workers;
-  unsigned int running;
-  class process_cache *cache;
-  void create_workers ();
-  void cleanup ();
-  void process_requests (transport_layer_base *transport);
-  void add (transport_layer_base *conn);
-  private:
-    class queue_process_param * process_head;
+    class process_cache *cache;
+    void process_requests (transport_layer_base *transport);
+    virtual void add (transport_layer_base *conn);
 };
 class server_request_queue request_queue;
 
 DWORD WINAPI
 request_loop (LPVOID LpParam)
 {
-  class queue_process_param *params = (queue_process_param *) LpParam;
-  class server_request_queue *queue = params->queue;
+  class server_process_param *params = (server_process_param *) LpParam;
+  class server_request_queue *queue = (server_request_queue *) params->queue;
   class transport_layer_base * transport = params->transport;
   while (queue->active)
   {
@@ -337,18 +324,9 @@ request_loop (LPVOID LpParam)
 void
 server_request_queue::process_requests (transport_layer_base *transport)
 {
-  class queue_process_param *params;
-  params = new queue_process_param;
+  class server_process_param *params = new server_process_param;
   params->transport = transport;
-  params->queue = this;
-  params->hThread = CreateThread (NULL, 0, request_loop, params, 0, &params->tid);
-  if (params->hThread == NULL)
-    {
-      printf ("Failed to create thread (%lu), terminating\n", GetLastError ());
-      delete params;
-      exit (1);
-    }
-  params->next = (queue_process_param *) InterlockedExchangePointer (&process_head, params);
+  threaded_queue::process_requests (params, request_loop);
 }
 
 void
@@ -365,7 +343,6 @@ server_request::server_request (transport_layer_base *newconn, class process_cac
 {
   conn = newconn;
   cache = newcache;
-  next = NULL;
 }
 
 void
@@ -440,135 +417,20 @@ out:
     delete (req);
 }
 
-DWORD WINAPI
-worker_function( LPVOID LpParam )
-{
-  class server_request_queue *queue = (class server_request_queue *) LpParam;
-  class server_request *request;
-  /* FIXME use a threadsafe pop instead for speed? */
-  while (queue->active)
-    {
-      EnterCriticalSection (&queue->queuelock);
-      while (!queue->request && queue->active)
-        {
-	  LeaveCriticalSection (&queue->queuelock);
-          DWORD rc = WaitForSingleObject (queue->event,INFINITE);
-          if (rc == WAIT_FAILED)
-	    {
-	      printf("Wait for event failed\n");
-	      queue->running--;
-	      ExitThread (0);
-	    }
-	  EnterCriticalSection (&queue->queuelock);
-        }
-      if (!queue->active)
-	{
-	  queue->running--;
-	  LeaveCriticalSection (&queue->queuelock);
-	  ExitThread (0);
-	}
-      /* not needed, but it is efficient */
-      request = (class server_request *)InterlockedExchangePointer (&queue->request, queue->request->next);
-      LeaveCriticalSection (&queue->queuelock);
-      request->process ();
-      delete request;
-    }
-  queue->running--;
-  ExitThread (0);
-}
-
-void
-server_request_queue::create_workers()
-{
-  InitializeCriticalSection (&queuelock);
-  if ((event = CreateEvent (NULL, FALSE, FALSE, NULL)) == NULL)
-    {
-      printf ("Failed to create event queue (%lu), terminating\n", GetLastError ());
-      exit (1);
-    }
-  active = true;
-  
-  /* FIXME: Use a stack pair and create threads on the fly whenever
-   * we have to to service a request.
-   */
-  for (unsigned int i=0; i<initial_workers; i++)
-    {
-      HANDLE hThread;
-      DWORD tid;
-      hThread = CreateThread (NULL, 0, worker_function, this, 0, &tid);
-      if (hThread == NULL)
-        {
-	  printf ("Failed to create thread (%lu), terminating\n", GetLastError ());
-	  exit (1);
-	}
-      CloseHandle (hThread);
-      running++;
-    }
-}
-
-void
-server_request_queue::cleanup ()
-{
-  /* harvest the threads */
-  active = false;
-  /* kill the request processing loops */
-  queue_process_param * reqloop;
-  /* make sure we don't race with a incoming request creation */
-  EnterCriticalSection (&queuelock);
-  reqloop = (queue_process_param *) InterlockedExchangePointer (&process_head, NULL);
-  while (reqloop)
-    {
-      printf ("killing request loop thread %ld\n", reqloop->tid);
-      int rc;
-      if (!(rc = TerminateThread (reqloop->hThread, 0)))
-	{
-	  printf ("error shutting down request loop worker thread\n");
-	}
-      CloseHandle (reqloop->hThread);
-      queue_process_param *t = reqloop;
-      reqloop = reqloop->next;
-      delete t;
-    }
-  LeaveCriticalSection (&queuelock);
-  if (!running)
-    return;
-  printf ("Waiting for current connections to terminate\n");
-  for (int n=running; n; n--)
-    PulseEvent (event);
-  while (running)
-    sleep (1);
-  DeleteCriticalSection (&queuelock);
-  CloseHandle (event);
-}
-
 void
 server_request_queue::add (transport_layer_base *conn)
 {
   /* safe to not "Try" because workers don't hog this, they wait on the event
    */
+  /* every derived ::add must enter the section! */
   EnterCriticalSection (&queuelock);
   if (!running)
     {
-      printf ("No worker threads to handle request!\n");
       conn->close ();
       delete conn;
     }
-  server_request * listrequest;
-  if (!request)
-    {
-      request = new server_request (conn, cache);
-      listrequest = request;
-    }
-  else
-    {
-      /* add to the queue end. */
-      listrequest = request;
-      while (listrequest->next)
-	listrequest = listrequest->next;
-      listrequest->next = new server_request (conn, cache);
-      listrequest = listrequest->next;
-    }
-  PulseEvent (event);
+  queue_request * listrequest = new server_request (conn, cache);
+  threaded_queue::add (listrequest);
   LeaveCriticalSection (&queuelock);
 }
 
