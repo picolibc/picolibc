@@ -9,7 +9,7 @@
 int
 __fpclassifyf (float x)
 {
-  unsigned int w;
+  __uint32_t w;
 
   GET_FLOAT_WORD(w,x);
   
@@ -30,7 +30,7 @@ __fpclassifyf (float x)
 int
 __fpclassifyd (double x)
 {
-  unsigned int msw, lsw;
+  __uint32_t msw, lsw;
 
   EXTRACT_WORDS(msw,lsw,x);
 

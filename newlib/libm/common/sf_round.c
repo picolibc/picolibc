@@ -19,7 +19,7 @@
 #endif
 {
   int signbit;
-  int w;
+  __uint32_t w;
   /* Most significant word, least significant word. */
   int exponent_less_127;
 

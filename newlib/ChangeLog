@@ -1,5 +1,11 @@
 2005-02-24  Ralf Corsepious  <ralf.corsepius@rtems.org>
 
+	* libm/common/s_fpclassify.c: Use __uint32_t instead of int to
+	manipulate float values in integer form.
+	* libm/common/sf_round.c: Ditto.
+
+2005-02-24  Ralf Corsepious  <ralf.corsepius@rtems.org>
+
 	* libc/include/sys/types.h [__rtems__]: Include new
 	header file machine/_types.h.
 	* libc/include/machine/types.h: Ditto.
