@@ -47,12 +47,12 @@ THREAD_DLL = @THREAD_DLL@
 THREAD_DLL_VERSION = 10
 THREAD_DLL_NAME = $(THREAD_DLL)$(THREAD_DLL_VERSION).dll
 
+W32API_INCLUDE = @W32API_INCLUDE@
 INCLUDES = -I$(srcdir) -I$(srcdir)/../include \
-  -I$(srcdir)/../../w32api/include \
   -nostdinc -nostdinc++ \
   -iwithprefixbefore include
-ALL_CFLAGS = $(CFLAGS) $(INCLUDES) $(MNO_CYGWIN)
-ALL_CXXFLAGS = $(CXXFLAGS) $(INCLUDES) $(MNO_CYGWIN)
+ALL_CFLAGS = $(CFLAGS) $(W32API_INCLUDE) $(INCLUDES) $(MNO_CYGWIN)
+ALL_CXXFLAGS = $(CXXFLAGS) $(W32API_INCLUDE) $(INCLUDES) $(MNO_CYGWIN)
 
 AS = @AS@
 AR = @AR@
@@ -81,13 +81,13 @@ $(LIBGMON_A): $(LIBGMON_OBJS) $(CRT0S)
 # FIXME: These are really the same, but gcc specs want different names.
 # The only CRT dependency is atexit.
 gcrt0.o: gcrt0.c
-	$(CC)  -c -o $@ $(CPPFLAGS) $(CFLAGS) $?
+	$(CC)  -c -o $@ $(CPPFLAGS) $(ALL_CFLAGS) $?
 
 gcrt1.o: gcrt0.c
-	$(CC) -U__MSVCRT__ -c -o $@ $(CPPFLAGS) $(CFLAGS) $?
+	$(CC) -U__MSVCRT__ -c -o $@ $(CPPFLAGS) $(ALL_CFLAGS) $?
 
 gcrt2.o: gcrt0.c
-	$(CC) -D__MSVCRT__ -c -o $@ $(CPPFLAGS) $(CFLAGS) $?
+	$(CC) -D__MSVCRT__ -c -o $@ $(CPPFLAGS) $(ALL_CFLAGS) $?
 
 #
 # Dependancies

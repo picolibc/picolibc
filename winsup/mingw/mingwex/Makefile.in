@@ -76,13 +76,12 @@ OPTFLAGS= -fomit-frame-pointer
 # compiling with Cygwin?
 MNO_CYGWIN = @MNO_CYGWIN@
 
-
+W32API_INCLUDE = @W32API_INCLUDE@
 INCLUDES = -I$(srcdir) -I$(srcdir)/../include \
-  -I$(srcdir)/../../w32api/include \
   -nostdinc -nostdinc++ \
   -iwithprefixbefore include
-ALL_CFLAGS = $(CFLAGS) $(OPTFLAGS) $(INCLUDES) $(MNO_CYGWIN)
-ALL_CXXFLAGS = $(CXXFLAGS) $(OPTFLAGS) $(INCLUDES) $(MNO_CYGWIN)
+ALL_CFLAGS = $(CFLAGS) $(OPTFLAGS) $(W32API_INCLUDE) $(INCLUDES) $(MNO_CYGWIN)
+ALL_CXXFLAGS = $(CXXFLAGS) $(OPTFLAGS) $(W32API_INCLUDE) $(INCLUDES) $(MNO_CYGWIN)
 
 AS = @AS@
 AR = @AR@

@@ -1,7 +1,26 @@
+2003-05-06  Earnie Boyd  <earnie@users.sf.net>
+
+	* configure.in (CFLAGS): Remove -D__USE_CRTIMP=1 due to possibilites
+	of multiply defined symbols if the symbols is defined locally.  E.G.:
+	A local definition of malloc causes this problem.
+	* configure: Regenerate.
+	* profile/Makefile.in (W32API_INCLUDE): New variable.
+	(ALL_CFLAGS): Use W32API_INCLUDE value.
+	(ALL_CXXFLAGS): Ditto.
+	(gcrt0.o gcrt1.o gcrt2.o): Use ALL_CFLAGS instead of CFLAGS.
+	Thanks to Jeff Bonggren <jbon@users.sf.net>.
+	* profile/configure.in (W32API_INCLUDE): Set default value.
+	* profile/configure: Regenerate.
+	* mingwex/Makefile.in (W32API_INCLUDE): New variable.
+	(ALL_CFLAGS): Use W32API-INCLUDE value.
+	(ALL_CXXFLAGS): Ditto.
+	* mingwex/configure.in (W32API_INCLUDE): Set default value.
+	* mingwex/configure: Regenerate.
+
 2003-05-05  Earnie Boyd  <earnie@users.sf.net>
 
 	* Makefile.in (W32API_INCLUDE): New variable.
-	(ALL_CFLAGS): Include W32API_INCLUDE value.
+	(ALL_CFLAGS): Use W32API_INCLUDE value.
 	(ALL_CXXFLAGS): Ditto.
 	* configure.in (CFLAGS): Add -D__USE_CRTIMP=1 to default values.
 	(W32API_INCLUDE): Set default value.
