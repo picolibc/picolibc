@@ -1,5 +1,15 @@
 2003-03-18  Thomas Pfaff  <tpfaff@gmx.net>
 
+	* winsup.api/pthread/rwlock1.c: New test.
+	* winsup.api/pthread/rwlock2.c: Ditto.
+	* winsup.api/pthread/rwlock3.c: Ditto.
+	* winsup.api/pthread/rwlock4.c: Ditto.
+	* winsup.api/pthread/rwlock5.c: Ditto.
+	* winsup.api/pthread/rwlock6.c: Ditto.
+	* winsup.api/pthread/rwlock7.c: Ditto.
+
+2003-03-18  Thomas Pfaff  <tpfaff@gmx.net>
+
 	* winsup.api/pthread/condvar7.c: New test.
 	* winsup.api/pthread/condvar9.c: Ditto.
 
