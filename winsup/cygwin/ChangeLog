@@ -1,3 +1,9 @@
+2002-09-08  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_tty.cc (fhandler_tty_slave::open): Don't protect
+	input/output handles since they are not properly manipulated later.
+	* tty.cc (tty::make_pipes): Ditto.
+
 2002-09-06  Christopher Faylor  <cgf@redhat.com>
 
 	* winsup.h (_WIN32_WINNT): Protect.
