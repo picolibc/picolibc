@@ -1,3 +1,8 @@
+2002-09-30  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_transport_pipes.cc (transport_layer_pipes::accept):
+	Remove trailing \n from debug_printf.
+
 2002-09-30  Christopher Faylor  <cgf@redhat.com>
 
 	* thread.cc (pthread_mutex::initMutex): Remove \n from api_fatal.

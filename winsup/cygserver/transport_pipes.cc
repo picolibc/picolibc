@@ -170,7 +170,7 @@ transport_layer_pipes::accept (bool *const recoverable)
   if (!ConnectNamedPipe (accept_pipe, NULL)
       && GetLastError () != ERROR_PIPE_CONNECTED)
     {
-      debug_printf ("error connecting to pipe (%lu)\n.", GetLastError ());
+      debug_printf ("error connecting to pipe (%lu)", GetLastError ());
       (void) CloseHandle (accept_pipe);
       *recoverable = true;	// FIXME: case analysis?
       return NULL;
