@@ -1,3 +1,7 @@
+2001-11-24  Christopher Faylor  <cgf@redhat.com>
+
+	* net.cc (inet_makeaddr): Revert previous change.
+
 2001-11-23  Christopher Faylor  <cgf@redhat.com>
 
 	* path.cc (chdir): Allow 'cd /cygdrive'.

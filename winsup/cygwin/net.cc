@@ -268,7 +268,7 @@ extern "C" struct in_addr
 inet_makeaddr (int net, int lna)
 {
   unsigned long i;
-  static struct in_addr in;	/* Note -- not thread safe! */
+  struct in_addr in;
 
   if (net < IN_CLASSA_MAX)
     i = (net << IN_CLASSA_NSHIFT) | (lna & IN_CLASSA_HOST);
