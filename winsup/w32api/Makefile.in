@@ -100,6 +100,12 @@ else
    endif
 endif
 
+ifneq (,$(findstring mingw, $(target_alias)))
+    dist_prefix=
+else
+    dist_prefix=/$(conf_prefix)
+endif
+
 ifneq (,$(findstring cygwin, $(target_alias)))
   TARFLAGS = j
   TARFILEEXT = .tar.bz2
@@ -124,7 +130,7 @@ bindist:
 	rm -rf $(distdir)
 	mkdir $(distdir)
 	chmod 755 $(distdir)
-	$(MAKE) install prefix=../$(distdir)/$(conf_prefix) exec_prefix=../$(distdir)/$(conf_prefix)
+	$(MAKE) install prefix=../$(distdir)$(dist_prefix) exec_prefix=../$(distdir)$(dist_prefix)
 	rm -f $(distdir)$(TARFILEEXT)
 	cd $(distdir); $(TAR) $(TARFLAGS)cf ../$(distdir)$(TARFILEEXT) *
 

@@ -1,6 +1,7 @@
 2002-06-14  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/wingdi.h (GetEnhMetaFileBits): Correct typo.
+	* Makefile.in (bindist): Correct the MinGW distribution.
 
 2002-06-13  Earnie Boyd  <earnie@users.sf.net>
 
