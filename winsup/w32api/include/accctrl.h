@@ -170,7 +170,7 @@ typedef struct _ACTRL_ACCESS_ENTRYA {
 	ACCESS_RIGHTS   Access;
 	ACCESS_RIGHTS   ProvSpecificAccess;
 	INHERIT_FLAGS   Inheritance;
-	LPSTR           lpInheritProperty;
+	LPCSTR          lpInheritProperty;
 } ACTRL_ACCESS_ENTRYA, *PACTRL_ACCESS_ENTRYA;
 typedef struct _ACTRL_ACCESS_ENTRYW {
 	TRUSTEE_W       Trustee;
@@ -178,7 +178,7 @@ typedef struct _ACTRL_ACCESS_ENTRYW {
 	ACCESS_RIGHTS   Access;
 	ACCESS_RIGHTS   ProvSpecificAccess;
 	INHERIT_FLAGS   Inheritance;
-	LPWSTR          lpInheritProperty;
+	LPCWSTR         lpInheritProperty;
 } ACTRL_ACCESS_ENTRYW, *PACTRL_ACCESS_ENTRYW;
 typedef struct _ACTRL_ACCESS_ENTRY_LISTA {
 	ULONG                  cEntries;
@@ -189,12 +189,12 @@ typedef struct _ACTRL_ACCESS_ENTRY_LISTW {
 	ACTRL_ACCESS_ENTRYW    *pAccessList;
 } ACTRL_ACCESS_ENTRY_LISTW, *PACTRL_ACCESS_ENTRY_LISTW;
 typedef struct _ACTRL_PROPERTY_ENTRYA {
-	LPSTR                       lpProperty;
+	LPCSTR                      lpProperty;
 	PACTRL_ACCESS_ENTRY_LISTA   pAccessEntryList;
 	ULONG                       fListFlags;
 } ACTRL_PROPERTY_ENTRYA, *PACTRL_PROPERTY_ENTRYA;
 typedef struct _ACTRL_PROPERTY_ENTRYW {
-	LPWSTR                      lpProperty;
+	LPCWSTR                     lpProperty;
 	PACTRL_ACCESS_ENTRY_LISTW   pAccessEntryList;
 	ULONG                       fListFlags;
 } ACTRL_PROPERTY_ENTRYW, *PACTRL_PROPERTY_ENTRYW;

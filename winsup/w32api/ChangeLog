@@ -1,3 +1,10 @@
+2002-12-26  Dimitri Papadopoulos  <dimitri_at@sourceforge.users.net>
+
+	* include/accctrl.h (ACTRL_ACCESS_ENTRY[AW]): Make
+	lpInheritProperty member const.
+	(ACTRL_PROPERTY_ENTRY[AW]): Make lpProperty member
+	const.
+
 2002-12-26  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/commcat.h: Don't include windows.h or ole2.h ifdef
