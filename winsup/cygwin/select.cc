@@ -352,7 +352,7 @@ out:
 
 static int
 set_bits (select_record *me, fd_set *readfds, fd_set *writefds,
-	   fd_set *exceptfds)
+	  fd_set *exceptfds)
 {
   int ready = 0;
   select_printf ("me %p, testing fd %d (%s)", me, me->fd, me->fh->get_name ());

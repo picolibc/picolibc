@@ -1,3 +1,13 @@
+2001-10-29  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.h (fhandler_serial::fhandler_serial): Change to only accept
+	unit argument.
+	* fhandler_serial.cc (fhandler_serial::fhandler_serial): Ditto.
+	(fhandler_serial::open): Avoid else when previous clause is a return().
+	* path.cc (get_devn): Alias /dev/ttyS0 -> /dev/com1, etc.
+	(get_device_number): Reallow standalone "com1" as a valid name for
+	/dev/com1.
+
 2001-10-26  Christopher Faylor  <cgf@redhat.com>
 
 	* select.cc (MAKEready): Check for read_ready in loop since select_read

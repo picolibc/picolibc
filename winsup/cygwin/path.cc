@@ -846,7 +846,10 @@ get_devn (const char *name, int &unit)
   else if (deveqn ("com", 3) && (unit = digits (name + 3)) >= 0)
     devn = FH_SERIAL;
   else if (deveqn ("ttyS", 4) && (unit = digits (name + 4)) >= 0)
-    devn = FH_SERIAL;
+    {
+      devn = FH_SERIAL;
+      unit++;
+    }
   else if (deveq ("pipe") || deveq ("piper") || deveq ("pipew"))
     devn = FH_PIPE;
   else if (deveq ("tcp") || deveq ("udp") || deveq ("streamsocket")
@@ -979,14 +982,21 @@ get_device_number (const char *unix_path, const char *w32_path, int &unit)
       devn = get_devn (unix_path, unit);
       if (devn == FH_BAD && *w32_path == '\\' && wdeveqn ("\\dev\\", 5))
 	devn = get_devn (w32_path, unit);
-      if (devn == FH_BAD && udeveqn ("com", 3)
-	  && (unit = digits (unix_path + 3)) >= 0)
-	devn = FH_SERIAL;
       if (devn == FH_BAD && wdeveqn ("\\\\.\\", 4))
 	devn = get_raw_device_number (unix_path + 5, w32_path + 4, unit);
       if (devn == FH_BAD)
 	devn = get_raw_device_number (unix_path + 5, NULL, unit);
     }
+  else
+    {
+      char *p = strrchr (unix_path, '/');
+      if (p)
+	unix_path = p + 1;
+      if (udeveqn ("com", 3)
+	 && (unit = digits (unix_path + 3)) >= 0)
+	devn = FH_SERIAL;
+    }
+
   return devn;
 }
 

@@ -35,8 +35,8 @@ static DWORD WINAPI process_input (void *);		// Input queue thread
 static DWORD WINAPI process_output (void *);		// Output queue thread
 static DWORD WINAPI process_ioctl (void *);		// Ioctl requests thread
 
-fhandler_tty_master::fhandler_tty_master (int unit) :
-	fhandler_pty_master (FH_TTYM, unit), console (NULL), hThread (NULL)
+fhandler_tty_master::fhandler_tty_master (int unit)
+  : fhandler_pty_master (FH_TTYM, unit), console (NULL), hThread (NULL)
 {
 }
 

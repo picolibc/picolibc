@@ -159,7 +159,6 @@ class fhandler_base
 {
 protected:
   DWORD status;
-public:
 private:
   int access;
   HANDLE io_handle;
@@ -579,7 +578,7 @@ public:
   OVERLAPPED io_status;
 
   /* Constructor */
-  fhandler_serial (DWORD devtype = FH_SERIAL, int unit = 0);
+  fhandler_serial (int unit);
 
   int open (path_conv *, int flags, mode_t mode);
   int close ();

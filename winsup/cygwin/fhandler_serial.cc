@@ -24,8 +24,8 @@ details. */
 /**********************************************************************/
 /* fhandler_serial */
 
-fhandler_serial::fhandler_serial (DWORD devtype, int unit)
-  : fhandler_base (devtype, unit), vmin_ (0), vtime_ (0), pgrp_ (myself->pgid)
+fhandler_serial::fhandler_serial (int unit)
+  : fhandler_base (FH_SERIAL, unit), vmin_ (0), vtime_ (0), pgrp_ (myself->pgid)
 {
   set_need_fork_fixup ();
 }
@@ -219,8 +219,8 @@ fhandler_serial::open (path_conv *, int flags, mode_t mode)
 
   if (!(res = this->fhandler_base::open (NULL, flags, mode)))
     return 0;
-  else
-    res = 1;
+
+  res = 1;
 
   (void) SetCommMask (get_handle (), EV_RXCHAR);
 

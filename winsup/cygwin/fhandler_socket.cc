@@ -41,8 +41,8 @@ fhandler_dev_random* entropy_source;
 /**********************************************************************/
 /* fhandler_socket */
 
-fhandler_socket::fhandler_socket () :
-	fhandler_base (FH_SOCKET)
+fhandler_socket::fhandler_socket ()
+  : fhandler_base (FH_SOCKET)
 {
   set_need_fork_fixup ();
   prot_info_ptr = (LPWSAPROTOCOL_INFOA) cmalloc (HEAP_BUF, 
