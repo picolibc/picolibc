@@ -1,3 +1,8 @@
+2001-12-14  Nick Clifton  <nickc@cambridge.redhat.com>
+
+	* dis-asm.h (INIT_DISASSEMBLE_INFO_NO_ARCH): Initialise the
+	disassembler_options field (to NULL).
+
 2001-12-13  Jakub Jelinek  <jakub@redhat.com>
 
 	* elf/common.h (PT_GNU_EH_FRAME): Define.

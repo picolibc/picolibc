@@ -300,6 +300,7 @@ extern int generic_symbol_at_address
   (INFO).bytes_per_line = 0, \
   (INFO).bytes_per_chunk = 0, \
   (INFO).display_endian = BFD_ENDIAN_UNKNOWN, \
+  (INFO).disassembler_options = NULL, \
   (INFO).insn_info_valid = 0
 
 #ifdef __cplusplus
