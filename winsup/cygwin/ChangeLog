@@ -1,5 +1,9 @@
 2003-10-28  Christopher Faylor  <cgf@redhat.com>
 
+	* include/stdint.h: Duplicate below effort for rest of *64_*.
+
+2003-10-28  Christopher Faylor  <cgf@redhat.com>
+
 	* include/stdint.h: Correctly define INT64_MAX.
 
 2003-10-27  Thomas Pfaff  <tpfaff@gmx.net>
