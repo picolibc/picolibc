@@ -28,12 +28,13 @@ endif
 endif
 
 pwd:=${shell pwd}
-ifneq (,${filter-out /%,$(pwd)})
+dummy_pwd:=${word 1,${subst winsup/,winsup ,$(pwd)}}/foo
+ifneq (,${filter-out /%,$(dummy_pwd)})
     bupdir:=..
     bupdir1:=../..
     bupdir2:=../../..
 else
-    bupdir:=${patsubst %:::,%,${patsubst %/:::,%,$(dir $(pwd)):::}}
+    bupdir:=${patsubst %:::,%,${patsubst %/:::,%,$(dir $(dummy_pwd)):::}}
 ifneq (,${findstring /,$(bupdir)})
     bupdir1:=${patsubst %:::,%,${patsubst %/:::,%,$(dir $(bupdir)):::}}
 else
