@@ -1,3 +1,8 @@
+Sat May 19 21:16:07 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* fork.cc (fork_parent): Move atforkprepare call here.
+	(fork): From here.
+
 Sat May 19 18:35:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* autoload.cc: Add missing load statement for `CancelIo'.

@@ -307,7 +307,7 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
 
   /* Initialize signal/process handling */
   sigproc_init ();
-  __pthread_atforkchild();
+  __pthread_atforkchild ();
   cygbench ("fork-child");
   return 0;
 }
@@ -344,6 +344,9 @@ fork_parent (void *stack_here, HANDLE& hParent, dll *&first_dll,
   HANDLE subproc_ready, forker_finished;
   DWORD rc;
   PROCESS_INFORMATION pi = {0, NULL, 0, 0};
+
+  /* call the pthread_atfork prepare functions */
+  __pthread_atforkprepare ();
 
   subproc_init ();
 
@@ -596,7 +599,7 @@ out:
   ForceCloseHandle (forker_finished);
   forker_finished = NULL;
   pi.hThread = NULL;
-  __pthread_atforkparent();
+  __pthread_atforkparent ();
 
   return forked->pid;
 
@@ -639,9 +642,6 @@ fork ()
       syscall_printf ("-1 = fork (), split heap");
       return -1;
     }
-
-  /* call the pthread_atfork prepare functions */
-  __pthread_atforkprepare();
 
   void *esp;
   __asm ("movl %%esp,%0": "=r" (esp));
