@@ -71,11 +71,12 @@ struct external_filehdr {
 #define COFF2_BADMAG(x) ((x).f_magic != TICOFF2MAGIC || (x).f_target_id != TI_TARGET_ID)
 
 /* we need to read/write an extra field in the coff file header */
+/* FIXME load page */
 #ifndef COFF_ADJUST_FILEHDR_IN_POST
 #define COFF_ADJUST_FILEHDR_IN_POST(abfd,src,dst) \
 do { ((struct internal_filehdr *)(dst))->f_target_id = \
 bfd_h_get_16(abfd, (bfd_byte *)(((FILHDR *)(src))->f_target_id)); \
-((struct internal_filehdr *)(dst))->f_flags |= F_LDPAGE; \
+/*((struct internal_filehdr *)(dst))->f_flags |= F_LDPAGE;*/ \
 } while(0)
 #endif
 
@@ -211,15 +212,18 @@ bfd_h_put_8 (ABFD,VAL,(PTR)-7), bfd_h_put_8 (ABFD, 0, (PTR)-8))
 #define PUT_SCNHDR_SIZE(ABFD,SZ,SZP) \
 bfd_h_put_32(ABFD,(SZ)/bfd_octets_per_byte(ABFD),SZP)
 
+/* FIXME load page
 #define COFF_ADJUST_SCNHDR_IN_POST(ABFD,EXT,INT) \
 do { ((struct internal_scnhdr *)(INT))->s_page = \
 GET_SCNHDR_PAGE(ABFD,(bfd_byte *)((SCNHDR *)(EXT))->s_page); \
 } while(0)
+*/
 
 /* The line number and reloc overflow checking in coff_swap_scnhdr_out in
    coffswap.h doesn't use PUT_X for s_nlnno and s_nreloc.
    Due to different sized v0/v1/v2 section headers, we have to re-write these
    fields.
+   FIXME load page
  */
 #define COFF_ADJUST_SCNHDR_OUT_POST(ABFD,INT,EXT) \
 do { \
@@ -229,8 +233,8 @@ PUT_SCNHDR_NRELOC(ABFD,((struct internal_scnhdr *)(INT))->s_nreloc,\
                 (bfd_byte *)((SCNHDR *)(EXT))->s_nreloc); \
 PUT_SCNHDR_FLAGS(ABFD,((struct internal_scnhdr *)(INT))->s_flags, \
                 (bfd_byte *)((SCNHDR *)(EXT))->s_flags); \
-PUT_SCNHDR_PAGE(ABFD,((struct internal_scnhdr *)(INT))->s_page, \
-                (bfd_byte *)((SCNHDR *)(EXT))->s_page); \
+/*PUT_SCNHDR_PAGE(ABFD,((struct internal_scnhdr *)(INT))->s_page, \
+  (bfd_byte *)((SCNHDR *)(EXT))->s_page);*/ \
 } while(0)
 
 /* page macros
