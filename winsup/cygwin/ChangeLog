@@ -1,7 +1,7 @@
 2002-03-13  Boris Schaeling  <boriss@web.de>
 
-	* poll.cc: Remove variable open_fds, rearrange and add code
-	to fix settings of revents.
+	* poll.cc (poll): Remove variable open_fds.  Rearrange and add code to
+	fix settings of revents.
 
 2002-03-13  Corinna Vinschen  <corina@vinschen.de>
 
