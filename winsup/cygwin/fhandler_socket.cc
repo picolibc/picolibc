@@ -247,7 +247,7 @@ fhandler_socket::check_peer_secret_event (struct sockaddr_in* peer, int* secret)
       DWORD rc = WaitForSingleObject (ev, 10000);
       debug_printf ("WFSO rc=%d", rc);
       CloseHandle (ev);
-      return (rc == WAIT_OBJECT_0 ? 1 : 0 );
+      return (rc == WAIT_OBJECT_0 ? 1 : 0);
     }
   else
     return 0;
@@ -530,7 +530,7 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 	{
 	  if (!check_peer_secret_event (&sin, secret))
 	    {
-	      debug_printf ( "accept from unauthorized server" );
+	      debug_printf ("accept from unauthorized server");
 	      secret_check_failed = TRUE;
 	    }
        }

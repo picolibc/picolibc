@@ -1,5 +1,9 @@
 2003-09-24  Christopher Faylor  <cgf@redhat.com>
 
+	* include/tzfile.h: Add some missing entries.
+
+2003-09-24  Christopher Faylor  <cgf@redhat.com>
+
 	* include/paths.h: Add some missing entries.
 
 2003-09-24  Christopher Faylor  <cgf@redhat.com>

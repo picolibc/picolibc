@@ -1574,7 +1574,7 @@ pthread_mutex::_trylock (pthread_t self)
 {
   int result = 0;
 
-  if (InterlockedCompareExchange ((long *)&lock_counter, 1, 0 ) == 0)
+  if (InterlockedCompareExchange ((long *) &lock_counter, 1, 0) == 0)
     set_owner (self);
   else if (type == PTHREAD_MUTEX_RECURSIVE && pthread::equal (owner, self))
     result = lock_recursive ();

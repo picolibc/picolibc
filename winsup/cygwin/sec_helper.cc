@@ -163,7 +163,7 @@ cygsid::getfromstr (const char *nsidstr)
   if (nsidstr && !strncmp (nsidstr, "S-1-", 4))
     {
       s = strtoul (nsidstr + 4, &lasts, 10);
-      while ( cnt < 8 && *lasts == '-')
+      while (cnt < 8 && *lasts == '-')
 	r[cnt++] = strtoul (lasts + 1, &lasts, 10);
       if (!*lasts)
 	return get_sid (s, cnt, r);

@@ -1125,7 +1125,7 @@ fhandler_tty_common::close ()
   /* Send EOF to slaves if master side is closed */
   if (!get_ttyp ()->master_alive ())
     {
-      termios_printf ("no more masters left. sending EOF" );
+      termios_printf ("no more masters left. sending EOF");
       SetEvent (input_available_event);
     }
 

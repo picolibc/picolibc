@@ -1745,7 +1745,7 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
 	}
 
   /* Construct appropriate inherit attribute for new directories */
-  if (S_ISDIR (attribute) && !acl_exists )
+  if (S_ISDIR (attribute) && !acl_exists)
     {
       const DWORD inherit = SUB_CONTAINERS_AND_OBJECTS_INHERIT | INHERIT_ONLY;
 

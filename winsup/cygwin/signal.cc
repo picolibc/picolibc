@@ -82,7 +82,7 @@ nanosleep (const struct timespec *rqtp, struct timespec *rmtp)
     }
   DWORD resolution = gtod.resolution ();
   DWORD req = ((rqtp->tv_sec * 1000 + (rqtp->tv_nsec + 999999) / 1000000
-		+ resolution - 1) / resolution ) * resolution;
+		+ resolution - 1) / resolution) * resolution;
   DWORD end_time = gtod.dmsecs () + req;
   syscall_printf ("nanosleep (%ld)", req);
 
