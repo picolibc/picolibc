@@ -1,3 +1,7 @@
+2004-03-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (sigpacket::process): Simplify code slightly.
+
 2004-03-11  Christopher Faylor  <cgf@redhat.com>
 
 	* cygtls.h (waitq): Declare structure here.

@@ -1041,6 +1041,7 @@ sigpacket::process ()
   if (handler == (void *) SIG_ERR)
     goto exit_sig;
 
+  tls->set_siginfo (this);
   goto dosig;
 
 stop:
@@ -1049,11 +1050,8 @@ stop:
     goto done;
   handler = (void *) sig_handle_tty_stop;
   thissig = global_sigs[SIGSTOP];
-  goto dosig1;
 
 dosig:
-  tls->set_siginfo (this);
-dosig1:
   /* Dispatch to the appropriate function. */
   sigproc_printf ("signal %d, about to call %p", si.si_signo, handler);
   rc = setup_handler (si.si_signo, handler, thissig, tls);
