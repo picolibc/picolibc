@@ -1009,6 +1009,7 @@ case "${target}" in
     # Skip some stuff that's unsupported on some NetBSD configurations.
     case "${target}" in
       i*86-*-netbsdelf*) ;;
+      arm*-*-netbsdelf*) ;;
       *)
 	noconfigdirs="$noconfigdirs ${libgcj}"
 	;;
@@ -1265,11 +1266,6 @@ case "${target}" in
     ;;
   powerpc-*-eabi)
     noconfigdirs="$noconfigdirs ${libgcj}"
-    ;;
-  powerpc64*-*-linux*)
-    noconfigdirs="$noconfigdirs target-newlib target-libgloss"
-    # not yet ported.
-    noconfigdirs="$noconfigdirs target-libffi"
     ;;
   rs6000-*-lynxos*)
     noconfigdirs="$noconfigdirs target-newlib gprof ${libgcj}"
