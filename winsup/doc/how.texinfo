@@ -649,32 +649,28 @@ is not supported in Win 9x.
 
 @subsection How is fork() implemented?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
 Cygwin fork() essentially works like a non-copy on write version
 of fork() (like old Unix versions used to do).  Because of this it
 can be a little slow.  In most cases, you are better off using the
 spawn family of calls if possible.
 
-Here's how fork works as of beta 18:
+Here's how it works:
 
-Parent initializes a space in the Cygwin process
-table for child.  Parent creates child suspended using Win32 CreateProcess
-call, giving the same path it was invoked with itself.  Parent
-calls setjmp to save its own context and then sets a pointer to this
-in the Cygwin shared memory area (shared among all Cygwin tasks).
-Parent fills in the childs .data and .bss subsections by copying from
-its own address space into the suspended child's address space.
-Parent then starts the child.  Parent waits on mutex for child to get
-to safe point.  Child starts and discovers if has been forked and
-then longjumps using the saved jump buffer.  Child sets mutex parent
-is waiting on and then blocks on another mutex waiting for parent to
-fill in its stack and heap.  Parent notices child is in safe area,
-copies stack and heap from itself into child, releases the mutex
-the child is waiting on and returns from the fork call.  Child wakes
-from blocking on mutex, recreates any mmapped areas passed to it via
-shared area and then returns from fork itself.
+Parent initializes a space in the Cygwin process table for child.
+Parent creates child suspended using Win32 CreateProcess call, giving
+the same path it was invoked with itself.  Parent calls setjmp to save
+its own context and then sets a pointer to this in the Cygwin shared
+memory area (shared among all Cygwin tasks).  Parent fills in the childs
+.data and .bss subsections by copying from its own address space into
+the suspended child's address space.  Parent then starts the child.
+Parent waits on mutex for child to get to safe point.  Child starts and
+discovers if has been forked and then longjumps using the saved jump
+buffer.  Child sets mutex parent is waiting on and then blocks on
+another mutex waiting for parent to fill in its stack and heap.  Parent
+notices child is in safe area, copies stack and heap from itself into
+child, releases the mutex the child is waiting on and returns from the
+fork call.  Child wakes from blocking on mutex, recreates any mmapped
+areas passed to it via shared area and then returns from fork itself.
 
 @subsection How does wildcarding (globbing) work?
 
@@ -697,10 +693,7 @@ Beware: globbing uses @code{malloc}.  If your application defines
 
 @subsection How do symbolic links work?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
-CYGWIN.DLL generates link files with a magic header.  When
+Cygwin generates link files with a magic header.  When
 you open a file or directory that is a link to somewhere else, it
 opens the file or directory listed in the magic header.  Because we
 don't want to have to open every referenced file to check symlink
@@ -842,35 +835,11 @@ creates large executables on UNIX.
 If that bothers you, just use the 'strip' program, part of the binutils
 package.
 
-@subsection Why is gcc failing?
-
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
-If the error is "gcc: installation problem, cannot exec `cpp':
-No such file or directory", the GCC_EXEC_PREFIX environment variable
-hasn't been set correctly.  The current release does not need
-GCC_EXEC_PREFIX set -- it should be able to find cpp regardless of the
-install location.  But if you have it set incorrectly, you may still
-see this message.
-
 @subsection Where is glibc?
 
 Cygwin does not provide glibc.  It uses newlib instead, which provides
 much (but not all) of the same functionality.  Porting glibc to Cygwin
 would be difficult.
-
-@subsection Why can't bison find bison.simple or bison.hairy?
-
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
-If you are getting a warning to this effect, you need to set
-the BISONLIB environment variable.  The value should be the directory
-in which bison.simple and bison.hairy are installed.  This will be
-the path leading up to and including the @code{share} directory of
-the top-level of the binary distributions.  For example, on some
-systems, you would want to set it to @code{C:/cygnus/cygwin-b20/share}.
 
 @subsection Why is make behaving badly?
 
@@ -960,17 +929,15 @@ the file that makes the reference.
 
 @subsection How do I compile a Win32 executable that doesn't use Cygwin?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
 The -mno-cygwin flag to gcc makes gcc link against standard Microsoft
 DLLs instead of Cygwin.  This is desirable for native Windows programs
 that don't need a UNIX emulation layer.
 
-@subsection How do I make the console window go away?
+This is not to be confused with 'MinGW' (Minimalist GNU for Windows),
+which is a completely separate effort.  That project's home page is
+@file{http://www.mingw.org/index.shtml}.
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
+@subsection How do I make the console window go away?
 
 The default during compilation is to produce a console application.
 It you are writing a GUI program, you should either compile with
@@ -979,24 +946,18 @@ It you are writing a GUI program, you should either compile with
 
 @subsection Why does make complain about a "missing separator"?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
 This problem usually occurs as a result of someone editing a Makefile
 with a text editor that replaces tab characters with spaces.  Command
-lines must start with tabs.
+lines must start with tabs.  This is not specific to Cygwin.
 
 @subsection Why can't we redistribute Microsoft's Win32 headers?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
-Subsection 2.d.f of the `Microsoft Open Tools License agreement' looks like
-it says that can not "permit further redistribution of the
+Subsection 2.d.f of the `Microsoft Open Tools License agreement' looks
+like it says that one may not "permit further redistribution of the
 Redistributables to their end users".  We take this to mean that we can
 give them to you, but you can't give them to anyone else, which is
-something that Cygnus can't agree to.  Fortunately, we have our own
-Win32 headers which are pretty complete.
+something that Cygnus (err... Red Hat) can't agree to.  Fortunately, we
+have our own Win32 headers which are pretty complete.
 
 @subsection How do I link against .lib files?
 
@@ -1223,9 +1184,6 @@ like -ltcl80 in your linker command.
 
 @subsection How can I debug what's going on?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
 You can debug your application using @code{gdb}.  Make sure you
 compile it with the -g flag!  If your application calls functions in
 MS dlls, gdb will complain about not being able to load debug information
@@ -1235,25 +1193,20 @@ info would not be compatible with gdb).
 
 @subsection Can I use a system trace mechanism instead?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
+Yes.  You can use the @code{strace.exe} utility to run other cygwin
+programs with various debug and trace messages enabled.  For information
+on using @code{strace}, see the Cygwin User's Guide or the file
+@code{winsup/utils/utils.sgml}.
 
-Yes.  If you have a newer cygwin with the @code{strace.exe} program,
-@code{strace} can run other cygwin programs with various debug and
-trace messages enabled.  For information on using the @code{strace}
-program, see the Cygwin User's Guide or the file
-@code{winsup/utils/utils/sgml}.
-
-If you have an older cygwin, you can set the <CODE>STRACE</CODE>
-environment variable to <CODE>1</CODE>, and get a whole load of debug
-information on your screen whenever a Cygwin app runs.  This is an
-especially useful tool to use when tracking bugs down inside the
-Cygwin library.  <CODE>STRACE</CODE> can be set to different values to
-achieve different amounts of granularity.  You can set it to
-<CODE>0x10</CODE> for information about syscalls or <CODE>0x800</CODE>
-for signal/process handling-related info, to name two.  The strace
-mechanism is well documented in the Cygwin library sources in the file
-<CODE>winsup/include/sys/strace.h</CODE>.
+Alternatively, you can set the @code{STRACE} environment variable to
+@code{1}, and get a whole load of debug information on your screen
+whenever a Cygwin app runs.  This is an especially useful tool to use
+when tracking bugs down inside the Cygwin library.  @code{STRACE} can be
+set to different values to achieve different amounts of granularity.
+You can set it to @code{0x10} for information about syscalls or
+@code{0x800} for signal/process handling-related info, to name two.  The
+strace mechanism is well documented in the Cygwin library sources in the
+file @code{winsup/cygwin/include/sys/strace.h}.
 
 @subsection Why doesn't gdb handle signals?
 
@@ -1325,9 +1278,6 @@ combining C++ objects.
 
 @subsection Can I use the gdb debugger to debug programs built by VC++?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
 No, not for full (high level source language) debugging.
 The Microsoft compilers generate a different type of debugging
 symbol information, which gdb does not understand.
@@ -1339,9 +1289,6 @@ global symbols; you just won't have any information about
 data types, line numbers, local variables etc.
 
 @subsection Where can I find info on x86 assembly?
-
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
 
 CPU reference manuals for Intel's current chips are available in
 downloadable PDF form on Intel's web site:
@@ -1398,9 +1345,6 @@ may still want to use Cygwin if your program contains a lot of shared
 advantages inherent in using Cygwin.
 
 @subsection Why not use DJGPP ?
-
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
 
 DJGPP is a similar idea, but for DOS instead of Win32.  DJGPP uses a
 "DOS extender" to provide a more reasonable operating interface for its
