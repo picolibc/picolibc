@@ -18,8 +18,8 @@ nm=$1; shift
 ar=$1; shift
 libdll=$1; shift
 cp /dev/null /tmp/$$.objs
-trap "/bin/rm -rf /tmp/$$.dir /tmp/$$.syms /tmp/$$.objs /tmp/$$.raw" 0 1 2 15
-$nm --extern-only --defined-only $* | sed -e '/^[ 	]*$/d' -e '/:$/d' -e 's%^.* _\(.*\)%/ __imp__\1$/p%' | grep -v ' __imp___imp__' > /tmp/$$.syms
+# trap "/bin/rm -rf /tmp/$$.dir /tmp/$$.syms /tmp/$$.objs /tmp/$$.raw" 0 1 2 15
+$nm --extern-only --defined-only $* | sed -n -e 's%^.* [TD] \(.*\)$%/ \1\$/p%p' > /tmp/$$.syms
 v || $nm -Ap --extern-only --defined-only $libdll | egrep ' I __head| I _.*_iname' |  awk -F: '{print $2}' > /tmp/$$.objs
 $nm -Ap --extern-only --defined-only $libdll | sed -n -f /tmp/$$.syms | awk -F: '{print $2}' >> /tmp/$$.objs
 sort -o /tmp/$$.objs -u /tmp/$$.objs

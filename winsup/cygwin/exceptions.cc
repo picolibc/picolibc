@@ -569,7 +569,7 @@ stack (void)
 int __stdcall
 handle_sigsuspend (sigset_t tempmask)
 {
-  sig_dispatch_pending (0);
+  sig_dispatch_pending ();
   sigframe thisframe (mainthread);
   sigset_t oldmask = myself->getsigmask ();	// Remember for restoration
 
@@ -901,14 +901,6 @@ setup_handler (int sig, void *handler, struct sigaction& siga)
 	SetThreadPriority (GetCurrentThread (), WAIT_SIG_PRIORITY);
       sigproc_printf ("signal successfully delivered");
     }
-  else
-    {
-      pending_signals = 1;	/* FIXME: Probably need to be more tricky here */
-      sig_set_pending (sig);
-      sig_dispatch_pending (1);
-      low_priority_sleep (SLEEP_0_STAY_LOW);	/* Hopefully, other process will be waking up soon. */
-      sigproc_printf ("couldn't send signal %d", sig);
-    }
 
   sigproc_printf ("returning %d", interrupted);
   return interrupted;
@@ -990,7 +982,7 @@ set_process_mask (sigset_t newmask)
   sigproc_printf ("old mask = %x, new mask = %x", myself->getsigmask (), newmask);
   myself->setsigmask (newmask);	// Set a new mask
   mask_sync->release ();
-  if (oldmask != newmask && GetCurrentThreadId () != sigtid)
+  if (oldmask != newmask)
     sig_dispatch_pending ();
   else
     sigproc_printf ("not calling sig_dispatch_pending.  sigtid %p current %p",
@@ -999,7 +991,7 @@ set_process_mask (sigset_t newmask)
 }
 
 int __stdcall
-sig_handle (int sig, bool thisproc)
+sig_handle (int sig)
 {
   int rc = 0;
 
@@ -1034,7 +1026,9 @@ sig_handle (int sig, bool thisproc)
       if (stopped)
 	SetEvent (sigCONT);
       /* process pending signals */
-      sig_dispatch_pending (1);
+#if 0 // FIXME?
+      sig_dispatch_pending ();
+#endif
     }
 
 #if 0
@@ -1046,7 +1040,7 @@ sig_handle (int sig, bool thisproc)
   if (handler == (void *) SIG_DFL)
     {
       if (sig == SIGCHLD || sig == SIGIO || sig == SIGCONT || sig == SIGWINCH
-	  || sig == SIGURG || (thisproc && hExeced && sig == SIGINT))
+	  || sig == SIGURG || (hExeced && sig == SIGINT))
 	{
 	  sigproc_printf ("default signal %d ignored", sig);
 	  goto done;

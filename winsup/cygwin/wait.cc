@@ -54,7 +54,7 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
 
   while (1)
     {
-      sig_dispatch_pending (0);
+      sig_dispatch_pending ();
       sigframe thisframe (mainthread);
       sawsig = 0;
       if (options & ~(WNOHANG | WUNTRACED))

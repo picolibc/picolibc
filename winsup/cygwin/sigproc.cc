@@ -514,22 +514,19 @@ sig_clear (int sig)
 /* Force the wait_sig thread to wake up and scan the sigtodo array.
  */
 extern "C" int __stdcall
-sig_dispatch_pending (int justwake)
+sig_dispatch_pending ()
 {
-  if (!hwait_sig)
+  if (!hwait_sig || GetCurrentThreadId () == sigtid)
     return 0;
-  DWORD tid = GetCurrentThreadId ();
 
   sigframe thisframe (mainthread);
-
-  if (tid == sigtid && !justwake)
-    justwake = 1;
 
   int was_pending = pending_signals;
 #ifdef DEBUGGING
   sigproc_printf ("pending_signals %d", was_pending);
 #endif
-  if (!was_pending && !justwake)
+
+  if (!was_pending)
 #ifdef DEBUGGING
     sigproc_printf ("no need to wake anything up");
 #else
@@ -537,21 +534,13 @@ sig_dispatch_pending (int justwake)
 #endif
   else
     {
-      if (!justwake)
-	(void) sig_send (myself, __SIGFLUSH);
-      else if (ReleaseSemaphore (sigcatch_nosync, 1, NULL))
+      (void) sig_send (myself, __SIGFLUSH);
 #ifdef DEBUGGING
-	sigproc_printf ("woke up wait_sig");
-#else
-	;
+      sigproc_printf ("woke up wait_sig");
 #endif
-      else if (no_signals_available ())
-	/*sigproc_printf ("I'm going away now")*/;
-      else
-	system_printf ("%E releasing sigcatch_nosync(%p)", sigcatch_nosync);
-
     }
-  if (was_pending && !justwake)
+
+  if (was_pending)
     thisframe.call_signal_handler ();
 
   return was_pending;
@@ -614,11 +603,6 @@ sigproc_terminate (void)
       sigproc_printf ("entering");
       sig_loop_wait = 0;	// Tell wait_sig to exit when it is
 				//  finished with anything it is doing
-      sig_dispatch_pending (1);
-    }
-
-  if (GetCurrentThreadId () == sigtid)
-    {
       ForceCloseHandle (sigcomplete_main);
       for (int i = 0; i < 20; i++)
 	(void) ReleaseSemaphore (sigcomplete_nonmain, 1, NULL);
@@ -1132,14 +1116,20 @@ wait_sig (VOID *self)
        * array looking for any unprocessed signals.
        */
       pending_signals = -1;
-      int saw_pending_signals = 0;
-      int saw_sigchld = 0;
+      bool saw_pending_signals = false;
+      bool saw_sigchld = false;
       for (int sig = -__SIGOFFSET; sig < NSIG; sig++)
 	{
-	  while (InterlockedDecrement (myself->getsigtodo (sig)) >= 0)
+	  LONG x = InterlockedDecrement (myself->getsigtodo (sig));
+	  if (x < 0)
+	    InterlockedIncrement (myself->getsigtodo (sig));
+	  else if (x >= 0)
 	    {
+	      if (x > 0)
+		pending_signals = 1;
+
 	      if (sig == SIGCHLD)
-		saw_sigchld = 1;
+		saw_sigchld = true;
 
 	      if (sig > 0 && sig != SIGKILL && sig != SIGSTOP &&
 		  (sigismember (&myself->getsigmask (), sig) ||
@@ -1147,44 +1137,47 @@ wait_sig (VOID *self)
 		   (sig != SIGCONT && ISSTATE (myself, PID_STOPPED))))
 		{
 		  sigproc_printf ("signal %d blocked", sig);
-		  break;
+		  InterlockedIncrement (myself->getsigtodo (sig));
 		}
-
-	      /* Found a signal to process */
-	      sigproc_printf ("processing signal %d", sig);
-	      switch (sig)
+	      else
 		{
-		case __SIGFLUSH:
-		  /* just forcing the loop */
-		  break;
+		  /* Found a signal to process */
+		  sigproc_printf ("processing signal %d", sig);
+		  switch (sig)
+		    {
+		    case __SIGFLUSH:
+		      /* just forcing the loop */
+		      break;
 
-		/* Internal signal to turn on stracing. */
-		case __SIGSTRACE:
-		  strace.hello ();
-		  break;
+		    /* Internal signal to turn on stracing. */
+		    case __SIGSTRACE:
+		      strace.hello ();
+		      break;
 
-		case __SIGCOMMUNE:
-		  talktome ();
-		  break;
+		    case __SIGCOMMUNE:
+		      talktome ();
+		      break;
 
-		/* A normal UNIX signal */
-		default:
-		  sigproc_printf ("Got signal %d", sig);
-		  sig_handle (sig, rc != 2);
-		  /* Need to decrement again to offset increment below since
-		     we really do want to decrement in this case. */
-		  InterlockedDecrement (myself->getsigtodo (sig));
-		  goto nextsig;		/* FIXME: shouldn't this allow the loop to continue? */
+		    /* A normal UNIX signal */
+		    default:
+		      sigproc_printf ("Got signal %d", sig);
+		      if (!sig_handle (sig))
+			{
+			  sigproc_printf ("couldn't send signal %d", sig);
+			  low_priority_sleep (SLEEP_0_STAY_LOW);	/* Hopefully, other process will be waking up soon. */
+			  saw_pending_signals = true;
+			  ReleaseSemaphore (sigcatch_nosync, 1, NULL);
+			  InterlockedIncrement (myself->getsigtodo (sig));
+			}
+		      break;
+		    }
 		}
 	    }
-
-	nextsig:
-	  /* Decremented too far. */
-	  if (InterlockedIncrement (myself->getsigtodo (sig)) > 0)
-	    saw_pending_signals = 1;
 	}
 
-      if (pending_signals < 0 && !saw_pending_signals)
+      if (saw_pending_signals)
+	pending_signals = 1;
+      else if (pending_signals < 0)
 	pending_signals = 0;
 
       if (saw_sigchld)

@@ -369,7 +369,7 @@ readv (int fd, const struct iovec *const iov, const int iovcnt)
 
   while (1)
     {
-      sig_dispatch_pending (0);
+      sig_dispatch_pending ();
       sigframe thisframe (mainthread);
 
       cygheap_fdget cfd (fd);
@@ -441,7 +441,7 @@ extern "C" ssize_t
 writev (const int fd, const struct iovec *const iov, const int iovcnt)
 {
   int res = -1;
-  sig_dispatch_pending (0);
+  sig_dispatch_pending ();
   const ssize_t tot = check_iovec_for_write (iov, iovcnt);
 
   sigframe thisframe (mainthread);
@@ -497,7 +497,7 @@ open (const char *unix_path, int flags, ...)
   int res = -1;
   va_list ap;
   mode_t mode = 0;
-  sig_dispatch_pending (0);
+  sig_dispatch_pending ();
   sigframe thisframe (mainthread);
 
   syscall_printf ("open (%s, %p)", unix_path, flags);

@@ -1,7 +1,26 @@
+2003-08-19  Christopher Faylor  <cgf@redhat.com>
+
+	Throughout, eliminate argument to sig_dispatch_pending.
+	* exceptions.cc (setup_handler): Move non-interruptible condition
+	handling (back) to wait_sig (as suggested by Pierre Humblet).
+	(set_process_mask): Don't worry about calling sig_dispatch_pending from
+	sigthread since it is detected in the function anyway.
+	(sig_handle): Eliminate thisproc arg.  Don't call sig_dispatch_pending
+	on SIGCONT since that should happen automatically.
+	* sigproc.cc (sig_dispatch_pending): Eliminate justwake argument.  Just
+	return when called from sigthread.
+	(wait_sig): Change some variables to bool.  Change inner while to an
+	if.  Move uninterruptible signal handling here.
+	(sigproc_terminate): Don't call sig_dispatch_pending.  Just increment
+	semaphore on exit.
+
+	* speclib: Use slightly different (but still flawed) method for
+	determining symbols to extract from libraries.
+
 2003-08-18  Christopher Faylor  <cgf@redhat.com>
 
 	* exceptions.cc (sigdelayed): Fix race where signal handler could get
-	the wrong mask.
+	the wrong mask (as suggested by Pierre Humblet).
 
 2003-08-18  Christopher Faylor  <cgf@redhat.com>
 
