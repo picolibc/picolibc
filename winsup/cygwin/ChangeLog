@@ -1,5 +1,19 @@
 2004-12-27  Christopher Faylor  <cgf@timesys.com>
 
+	* cygthread.cc (cygthread::stub): Add better debug output.
+	(cygthread::cygthread): Ditto.
+	(cygthread::terminate_thread): Ditto.  Move inuse test earlier or
+	suffer infinite loop.
+	* pinfo.cc (_pinfo::dup_proc_pipe): Close handle if DuplicateHandle
+	fails and process no longer exists.
+	* spawn.cc (spawn_guts): Create process in suspended state if OS
+	demands it.
+	* wincap.cc: Add "start_proc_suspended" throughout.
+	* wincap.h (wincaps): Ditto.
+	(wincapc): Ditto.
+
+2004-12-27  Christopher Faylor  <cgf@timesys.com>
+
 	* pinfo.cc (_pinfo::exit): Beef up debugging output.
 	* sigproc.cc (proc_subproc): Detached children apparently need a ppid
 	of 1.

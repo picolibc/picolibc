@@ -45,6 +45,7 @@ cygthread::stub (VOID *arg)
   else
     {
       info->stack_ptr = &arg;
+      debug_printf ("thread '%s', id %p, stack_ptr %p", info->name (), info->id, info->stack_ptr);
       if (!info->ev)
 	{
 	  info->ev = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
@@ -166,7 +167,7 @@ cygthread::cygthread (LPTHREAD_START_ROUTINE start, LPVOID param,
       while (!thread_sync)
 	low_priority_sleep (0);
       SetEvent (thread_sync);
-      thread_printf ("activated thread_sync %p", thread_sync);
+      thread_printf ("activated name '%s', thread_sync %p for thread %p", thread_sync, id);
     }
   else
     {
@@ -179,7 +180,7 @@ cygthread::cygthread (LPTHREAD_START_ROUTINE start, LPVOID param,
 			this, 0, &id);
       if (!h)
 	api_fatal ("thread handle not set - %p<%p>, %E", h, id);
-      thread_printf ("created thread %p", h);
+      thread_printf ("created name '%s', thread %p, id %p", __name, h, id);
 #ifdef DEBUGGING
       terminated = false;
 #endif
@@ -268,17 +269,20 @@ cygthread::terminate_thread ()
       ResetEvent (*this);
       ResetEvent (thread_sync);
     }
+
+  debug_printf ("thread '%s', id %p, inuse %d, stack_ptr %p", name (), id, inuse, stack_ptr);
+  while (inuse && !stack_ptr)
+    low_priority_sleep (0);
+
   if (!inuse)
     return;
+
   (void) TerminateThread (h, 0);
   (void) WaitForSingleObject (h, INFINITE);
-  if (!inuse)
+  if (!inuse || exiting)
     return;
 
   CloseHandle (h);
-
-  while (inuse && !stack_ptr)
-    low_priority_sleep (0);
 
   if (!inuse)
     return;

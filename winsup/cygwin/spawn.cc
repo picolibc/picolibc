@@ -645,7 +645,8 @@ spawn_guts (const char * prog_arg, const char *const *argv,
      after CreateProcess and before copying the datastructures to the child.
      So we have to start the child in suspend state, unfortunately, to avoid
      a race condition. */
-  if (mode != _P_OVERLAY || cygheap->fdtab.need_fixup_before ())
+  if (wincap.start_proc_suspended() || mode != _P_OVERLAY
+      || cygheap->fdtab.need_fixup_before ())
     flags |= CREATE_SUSPENDED;
 
   const char *runpath = null_app_name ? NULL : (const char *) real_path;

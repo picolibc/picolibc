@@ -128,7 +128,7 @@ _pinfo::exit (UINT n, bool norecord)
 	}
     }
 
-  sigproc_printf ("Calling ExitProcess norecord %d, n %d, exitcode %d",
+  sigproc_printf ("Calling ExitProcess norecord %d, n %p, exitcode %p",
 		  norecord, n, exitcode);
   _my_tls.stacklock = 0;
   _my_tls.stackptr = _my_tls.stack;
@@ -768,7 +768,11 @@ _pinfo::dup_proc_pipe (HANDLE hProcess)
 			      0, FALSE,
 			      DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE);
   if (!res)
-    sigproc_printf ("DuplicateHandle failed, pid %d, hProcess %p, %E", pid, hProcess);
+    {
+      if (WaitForSingleObject (hProcess, 0) == WAIT_OBJECT_0)
+	CloseHandle (wr_proc_pipe);
+      sigproc_printf ("DuplicateHandle failed, pid %d, hProcess %p, %E", pid, hProcess);
+    }
   else
     {
       wr_proc_pipe_owner = dwProcessId;

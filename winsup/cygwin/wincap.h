@@ -55,6 +55,7 @@ struct wincaps
   unsigned has_switch_to_thread				: 1;
   unsigned cant_debug_dll_entry				: 1;
   unsigned has_ioctl_storage_get_media_types_ex		: 1;
+  unsigned start_proc_suspended				: 1;
 };
 
 class wincapc
@@ -114,6 +115,7 @@ public:
   bool  IMPLEMENT (has_switch_to_thread)
   bool	IMPLEMENT (cant_debug_dll_entry)
   bool	IMPLEMENT (has_ioctl_storage_get_media_types_ex)
+  bool	IMPLEMENT (start_proc_suspended)
 
 #undef IMPLEMENT
 };
