@@ -1,3 +1,8 @@
+2001-03-22  Egor Duda  <deo@logos-m.ru>
+  
+	* fhandler_console.cc (fhandler_console::set_default_attr): Update
+	console color attributes on tty reset.
+
 Wed Mar 21 22:12:36 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* autoload.cc (kernel32_init): New function for kernel32 autoload

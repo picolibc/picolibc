@@ -817,6 +817,8 @@ fhandler_console::set_default_attr ()
   intensity = INTENSITY_NORMAL;
   fg = default_color & FOREGROUND_ATTR_MASK;
   bg = default_color & BACKGROUND_ATTR_MASK;
+  current_win32_attr = get_win32_attr ();
+  SetConsoleTextAttribute (get_output_handle (), current_win32_attr);
 }
 
 WORD
