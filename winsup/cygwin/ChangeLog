@@ -1,3 +1,8 @@
+Fri Aug 18 11:11:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* dtable.cc (dtable::dup2): Extend fdtab if newfd is out of current
+	allocated bounds.
+
 Sat Aug 12 01:47:28 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* mkvers.sh: Properly trap exit removal of temp file.  Remove debugging

@@ -345,6 +345,12 @@ dtable::dup2 (int oldfd, int newfd)
     }
 
   SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
+  if ((size_t) newfd >= fdtab.size)
+    {
+      int inc_size = NOFILE_INCR * ((newfd + NOFILE_INCR - 1) / NOFILE_INCR) -
+                     fdtab.size;
+      fdtab.extend (inc_size);
+    }
   if ((size_t) newfd >= fdtab.size || newfd < 0)
     {
       syscall_printf ("new fd out of bounds: %d", newfd);
