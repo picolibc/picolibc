@@ -46,9 +46,22 @@
  */
 
 #ifndef	__STRICT_ANSI__
+#ifndef	_NO_OLDNAMES
+
+#define	DOMAIN		_DOMAIN
+#define	SING		_SING
+#define	OVERFLOW	_OVERFLOW
+#define	UNDERFLOW	_UNDERFLOW
+#define	TLOSS		_TLOSS
+#define	PLOSS		_PLOSS
+
+#endif	/* Not _NO_OLDNAMES */
+#endif	/* Not __STRICT_ANSI__ */
+
 
 /* These are also defined in Mingw float.h; needed here as well to work 
    around GCC build issues.  */
+#ifndef	__STRICT_ANSI__
 #ifndef __MINGW_FPCLASS_DEFINED
 #define __MINGW_FPCLASS_DEFINED 1
 #define	_FPCLASS_SNAN	0x0001	/* Signaling "Not a Number" */
@@ -62,19 +75,7 @@
 #define	_FPCLASS_PN	0x0100	/* Positive Normal */
 #define	_FPCLASS_PINF	0x0200	/* Positive Infinity */
 #endif /* __MINGW_FPCLASS_DEFINED */
-
-#ifndef	_NO_OLDNAMES
-
-#define	DOMAIN		_DOMAIN
-#define	SING		_SING
-#define	OVERFLOW	_OVERFLOW
-#define	UNDERFLOW	_UNDERFLOW
-#define	TLOSS		_TLOSS
-#define	PLOSS		_PLOSS
-
-#endif	/* Not _NO_OLDNAMES */
 #endif	/* Not __STRICT_ANSI__ */
-
 
 #ifndef RC_INVOKED
 
