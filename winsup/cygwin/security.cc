@@ -1525,7 +1525,8 @@ set_file_attribute (int use_ntsec, const char *file,
 
   if (!use_ntsec || !allow_ntsec)
     {
-      if (!NTWriteEA (file, ".UNIXATTR", (char *) &attribute, sizeof (attribute)))
+      if (!NTWriteEA (file, ".UNIXATTR", (char *) &attribute,
+		      sizeof (attribute)))
 	{
 	  __seterrno ();
 	  return -1;
