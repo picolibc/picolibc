@@ -15,6 +15,8 @@
  * PIC uses %ebx, so we need to save it during system calls
  */
 
+#ifdef __syscall_return
+
 #define __sockcall_base(type, name) \
 { \
 long __res; \
@@ -23,6 +25,30 @@ __asm__ volatile ("push %%ebx; movl %2,%%ebx; lea 8(%%ebp),%%ecx; int $0x80; pop
 	: "0" (__NR_socketcall),"r" (SOCK_##name)); \
 __syscall_return(type,__res); \
 }
+
+#else /* !defined(__syscall_return) */
+
+/* FIXME: we need to rewrite this for a vsyscall system.  */
+
+#define __syscall_return(type, res) \
+do { \ 
+  if ((unsigned long)(res) >= (unsigned long)(-125)) { \
+    errno = -(res); \
+    res = -1; \
+  } \
+  return (type) (res); \
+} while (0)
+
+#define __sockcall_base(type, name) \
+{ \
+long __res; \
+__asm__ volatile ("push %%ebx; movl %2,%%ebx; lea 8(%%ebp),%%ecx; int $0x80; pop %%ebx" \
+	: "=a" (__res) \
+	: "0" (__NR_socketcall),"r" (SOCK_##name)); \
+__syscall_return(type,__res); \
+}
+
+#endif /* !defined(__syscall_return) */
 
 #undef _sockcall1
 #define _sockcall1(type,name,type1,arg1) \

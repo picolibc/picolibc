@@ -1,3 +1,14 @@
+2004-06-09  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/linux/Makefile.am: Change siglist.inc to be generated
+	from /usr/include/asm/signal.h instead of kernel sources.  Also
+	default max to 32 if not found in header file.
+	* libc/sys/linux/Makefile.in: Regenerated.
+	* libc/sys/linux/machine/i386/socketcall.h: Fix for Fedora Core 2
+	systems where __syscall_return is not defined.
+	* libc/sys/linux/machine/i386/syscall.h: Change for Fedora Core 2
+	systems to use syscall() function instead of assembler interrupt.
+
 2004-06-09  Toralf Lund  <toralf@procaptura.com>
 
 	* libc/sys/arm/setjmp.S, libc/sys/arm/access.c: Move

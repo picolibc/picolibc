@@ -8,6 +8,7 @@
 #include <machine/weakalias.h>
 #include <sys/errno.h>
 #include <asm/unistd.h>
+#include <unistd.h>
 
 
 /*
@@ -22,6 +23,8 @@
 /*
  * PIC uses %ebx, so we need to save it during system calls
  */
+
+#ifdef __syscall_return
 
 #undef __inline_syscall0
 #define __inline_syscall0(name,ret) \
@@ -77,11 +80,6 @@ __inline_syscall0(name,__res) \
 __syscall_return(type,__res); \
 }
 
-#undef _syscall0
-#define _syscall0(type,name) \
-_syscall0_base(type,name) \
-weak_alias(__libc_##name,name);
-
 #undef _syscall1_base
 #define _syscall1_base(type,name,type1,arg1) \
 type __libc_##name (type1 arg1) \
@@ -90,11 +88,6 @@ long __res; \
 __inline_syscall1(name,__res,arg1) \
 __syscall_return(type,__res); \
 }
-
-#undef _syscall1
-#define _syscall1(type,name,type1,arg1) \
-_syscall1_base(type,name,type1,arg1) \
-weak_alias(__libc_##name,name);
 
 #undef _syscall2_base
 #define _syscall2_base(type,name,type1,arg1,type2,arg2) \
@@ -105,11 +98,6 @@ __inline_syscall2(name,__res,arg1,arg2) \
 __syscall_return(type,__res); \
 }
 
-#undef _syscall2
-#define _syscall2(type,name,type1,arg1,type2,arg2) \
-_syscall2_base(type,name,type1,arg1,type2,arg2) \
-weak_alias(__libc_##name,name);
-
 #undef _syscall3_base
 #define _syscall3_base(type,name,type1,arg1,type2,arg2,type3,arg3) \
 type __libc_##name (type1 arg1,type2 arg2,type3 arg3) \
@@ -119,11 +107,6 @@ __inline_syscall3(name,__res,arg1,arg2,arg3) \
 __syscall_return(type,__res); \
 }
 
-#undef _syscall3
-#define _syscall3(type,name,type1,arg1,type2,arg2,type3,arg3) \
-_syscall3_base(type,name,type1,arg1,type2,arg2,type3,arg3) \
-weak_alias(__libc_##name,name);
-
 #undef _syscall4_base
 #define _syscall4_base(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4) \
 type __libc_##name (type1 arg1, type2 arg2, type3 arg3, type4 arg4) \
@@ -132,11 +115,6 @@ long __res; \
 __inline_syscall4(name,__res,arg1,arg2,arg3,arg4) \
 __syscall_return(type,__res); \
 }
-
-#undef _syscall4
-#define _syscall4(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4) \
-_syscall4_base(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4) \
-weak_alias(__libc_##name,name);
 
 #undef _syscall5_base
 #define _syscall5_base(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4, \
@@ -148,12 +126,6 @@ __inline_syscall5(name,__res,arg1,arg2,arg3,arg4,arg5) \
 __syscall_return(type,__res); \
 } \
 
-#undef _syscall5
-#define _syscall5(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4, \
-          type5,arg5) \
-_syscall5_base(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4,type5,arg5) \
-weak_alias(__libc_##name,name);
-
 #undef _syscall6_base
 #define _syscall6_base(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4, \
           type5,arg5,type6,arg6) \
@@ -163,6 +135,90 @@ long __res; \
 __inline_syscall6(name,__res,arg1,arg2,arg3,arg4,arg5,arg6) \
 __syscall_return(type,__res); \
 }
+
+#else /* !__syscall_return */
+
+#undef _syscall0_base
+#define _syscall0_base(type,name) \
+type __libc_##name (void) \
+{ \
+  return (type)syscall (__NR_##name); \
+}
+
+#undef _syscall1_base
+#define _syscall1_base(type,name,type1,arg1) \
+type __libc_##name (type1 arg1) \
+{ \
+  return (type)syscall (__NR_##name, arg1); \
+}
+
+#undef _syscall2_base
+#define _syscall2_base(type,name,type1,arg1,type2,arg2) \
+type __libc_##name (type1 arg1, type2 arg2) \
+{ \
+  return (type)syscall (__NR_##name, arg1, arg2); \
+}
+
+#undef _syscall3_base
+#define _syscall3_base(type,name,type1,arg1,type2,arg2,type3,arg3) \
+type __libc_##name (type1 arg1, type2 arg2, type3 arg3) \
+{ \
+  return (type)syscall (__NR_##name, arg1, arg2, arg3); \
+}
+
+#undef _syscall4_base
+#define _syscall4_base(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4) \
+type __libc_##name (type1 arg1, type2 arg2, type3 arg3, type4 arg4) \
+{ \
+  return (type)syscall (__NR_##name, arg1, arg2, arg3, arg4); \
+}
+
+#undef _syscall5_base
+#define _syscall5_base(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4,type5,arg5) \
+type __libc_##name (type1 arg1,type2 arg2,type3 arg3,type4 arg4,type5 arg5) \
+{ \
+  return (type)syscall (__NR_##name, arg1, arg2, arg3, arg4, arg5); \
+}
+
+#undef _syscall6_base
+#define _syscall6_base(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4,type5,arg5,type6,arg6) \
+type __libc_##name (type1 arg1,type2 arg2,type3 arg3,type4 arg4,type5 arg5,type6 arg6) \
+{ \
+  return (type)syscall (__NR_##name, arg1, arg2, arg3, arg4, arg5, arg6); \
+}
+
+#endif /* !__syscall_return */
+
+#undef _syscall0
+#define _syscall0(type,name) \
+_syscall0_base(type,name) \
+weak_alias(__libc_##name,name);
+
+#undef _syscall1
+#define _syscall1(type,name,type1,arg1) \
+_syscall1_base(type,name,type1,arg1) \
+weak_alias(__libc_##name,name);
+
+#undef _syscall2
+#define _syscall2(type,name,type1,arg1,type2,arg2) \
+_syscall2_base(type,name,type1,arg1,type2,arg2) \
+weak_alias(__libc_##name,name);
+
+#undef _syscall3
+#define _syscall3(type,name,type1,arg1,type2,arg2,type3,arg3) \
+_syscall3_base(type,name,type1,arg1,type2,arg2,type3,arg3) \
+weak_alias(__libc_##name,name);
+
+#undef _syscall4
+#define _syscall4(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4) \
+_syscall4_base(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4) \
+weak_alias(__libc_##name,name);
+
+#undef _syscall5
+#define _syscall5(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4, \
+          type5,arg5) \
+_syscall5_base(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4,type5,arg5) \
+weak_alias(__libc_##name,name);
 
 #undef _syscall6
 #define _syscall6(type,name,type1,arg1,type2,arg2,type3,arg3,type4,arg4, \
