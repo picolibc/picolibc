@@ -408,7 +408,6 @@ pthread::cancel (void)
       SetEvent (cancel_event);
       return 0;
     }
-
   else if (equal (thread, self))
     {
       mutex.unlock ();
@@ -767,14 +766,14 @@ void
 pthread::suspend_except_self ()
 {
   if (valid && this != pthread::self ())
-    SuspendThread (win32_obj_id); 
+    SuspendThread (win32_obj_id);
 }
 
 void
 pthread::resume ()
 {
   if (valid)
-    ResumeThread (win32_obj_id); 
+    ResumeThread (win32_obj_id);
 }
 
 /* static members */
@@ -3310,7 +3309,7 @@ semaphore::post (sem_t *sem)
 int
 semaphore::getvalue (sem_t *sem, int *sval)
 {
-  
+
   if (!is_good_object (sem)
       || __check_null_invalid_struct (sval, sizeof (int)))
     {
