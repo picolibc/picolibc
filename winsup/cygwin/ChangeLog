@@ -1,5 +1,14 @@
 2004-01-14  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler_console.cc (fhandler_console::close): Fix debugging output.
+	(fhandler_console::fixup_after_fork): Decrement open_fhs prior to call
+	to fhandler_console::open since this would cause incrementing too much
+	incrementing in child processes.  (Probably needs to be handled more
+	elegantly someday)
+	(fhandler_console::fixup_after_exec): Ditto.
+
+2004-01-14  Christopher Faylor  <cgf@redhat.com>
+
 	* cygtls.h (_threadinfo::call): Remove regparm declaration to work
 	around compiler bug.
 
