@@ -2,7 +2,7 @@
 
 	* dcrt0.cc (dll_crt0_1): Move debug_fixup_after_fork_exec.
 	* cygheap.cc (cygheap_fixup_in_child): Call debug_fixup_after_fork_exec
-	immediately after cygheap has ben set up.
+	immediately after cygheap has been set up.
 
 2002-07-29  Corinna Vinschen  <corinna@vinschen.de>
 
