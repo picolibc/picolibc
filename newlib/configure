@@ -3216,13 +3216,6 @@ EOF
 
 fi
 
-if test "${newlib_iconv}" = "yes"; then
-cat >> confdefs.h <<EOF
-#define _ICONV_ENABLED 1
-EOF
-
-fi
-
 cat >> confdefs.h <<EOF
 #define _NEWLIB_VERSION "$VERSION"
 EOF
@@ -3234,6 +3227,42 @@ else
   multilib_arg=
 fi
 
+if test "${newlib_iconv}" = "yes"; then
+cat >> confdefs.h <<EOF
+#define _ICONV_ENABLED 1
+EOF
+
+fi
+
+if test "x${builtin_converters}" != "x"; then
+  
+    if test x${newlib_iconv} = x; then
+      { echo "configure: error: --enable-newlib-builtin-converters option can't be used if iconv library is disabled - use --enable-newlib-iconv to enable it" 1>&2; exit 1; }
+  fi
+  
+    builtin_converters=`echo "${builtin_converters}" | sed -e 's/,/ /g' -e 's/-/_/g' -e 'y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/'`
+  
+      available_converters=`cat "${srcdir}/libc/iconv/charset.aliases" | sed -e '/#/d' | sed -e 'N; s/\n //;'`
+    
+      builtin_converters1="${builtin_converters}"
+  builtin_converters=""
+  for converter in ${builtin_converters1}; do
+      result=`echo "${available_converters}" | grep -e "\(^\| \)${converter}\( \|\$\)"`
+      if test $? != "0"; then
+          { echo "configure: error: ${converter} is not supported - see ${srcdir}/libc/iconv/charset.aliases file for the list of available converters" 1>&2; exit 1; }
+      fi
+      converter1=`echo "${result}" | sed -e 's/\(^[^ ]*\).*$/\1/'`
+      builtin_converters="${builtin_converters} ${converter1}"
+  done
+
+    for converter in ${builtin_converters}; do
+      opt=_ICONV_CONVERTER_`echo "${converter}" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
+      cat >> confdefs.h <<EOF
+#define $opt 1
+EOF
+
+  done
+fi;
 
 trap '' 1 2 15
 cat > confcache <<\EOF

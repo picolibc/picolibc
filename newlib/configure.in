@@ -150,10 +150,6 @@ else
 AC_DEFINE_UNQUOTED(_MB_LEN_MAX,1)
 fi
 
-if test "${newlib_iconv}" = "yes"; then
-AC_DEFINE_UNQUOTED(_ICONV_ENABLED,1)
-fi
-
 AC_DEFINE_UNQUOTED(_NEWLIB_VERSION,"$VERSION")
 
 if test "${multilib}" = "yes"; then
@@ -162,6 +158,44 @@ else
   multilib_arg=
 fi
 
+if test "${newlib_iconv}" = "yes"; then
+AC_DEFINE_UNQUOTED(_ICONV_ENABLED,1)
+fi
+
+dnl Parse --enable-newlib-builtin-converters option argument
+if test "x${builtin_converters}" != "x"; then
+  
+  dnl Check that --enable-newlib-iconv was enabled
+  if test x${newlib_iconv} = x; then
+      AC_MSG_ERROR(--enable-newlib-builtin-converters option can't be used if iconv library is disabled - use --enable-newlib-iconv to enable it)
+  fi
+  
+  dnl Normalize converter names and delete commas
+  builtin_converters=`echo "${builtin_converters}" | sed -e 's/,/ /g' -e 's/-/_/g' -e 'y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/'`
+  
+  dnl Get the list of available converters excluding comments
+  dnl Join line with previous if the first character is whitespace
+  available_converters=`cat "${srcdir}/libc/iconv/charset.aliases" | sed -e '/#/d' | sed -e 'N; s/\n //;'`
+    
+  dnl Check if required converters are supported
+  dnl Convert aliases to "official" names
+  builtin_converters1="${builtin_converters}"
+  builtin_converters=""
+  for converter in ${builtin_converters1}; do
+      result=`echo "${available_converters}" | grep -e "\(^\| \)${converter}\( \|\$\)"`
+      if test $? != "0"; then
+          AC_MSG_ERROR(${converter} is not supported - see ${srcdir}/libc/iconv/charset.aliases file for the list of available converters)
+      fi
+      converter1=`echo "${result}" | sed -e 's/\(^[[^ ]]*\).*$/\1/'`
+      builtin_converters="${builtin_converters} ${converter1}"
+  done
+
+  dnl Enable appropriate option in newlib.h
+  for converter in ${builtin_converters}; do
+      opt=_ICONV_CONVERTER_`echo "${converter}" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
+      AC_DEFINE_UNQUOTED($opt,1)
+  done
+fi;
 
 AC_OUTPUT(Makefile,
 [if test -n "$CONFIG_FILES"; then
