@@ -1,3 +1,7 @@
+Wed Jun 21 01:02:38 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* mkvers.sh: Fix sed usage for older seds.
+
 Tue Jun 20 20:46:28 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Don't touch winver_stamp if mkvers.sh was unsuccessful.

@@ -111,8 +111,9 @@ fi
 # These strings are strictly for use by a user to scan the DLL for
 # interesting information.
 #
-(sed -n -e 's%#define CYGWIN_\(INFO\|VERSION\)_\([A-Z_]*\)[ 	][ 	]*\([a-zA-Z0-9"][^/]*\).*%_\2\
-\3%p' $incfile | sed -e 's/["\\]//g'  -e '/^_/y/ABCDEFGHIJKLMNOPQRSTUVWXYZ_/abcdefghijklmnopqrstuvwxyz /';
+(sed -n -e 's%#define CYGWIN_INFO_\([A-Z_]*\)[ 	][ 	]*\([a-zA-Z0-9"][^/]*\).*%_\1\
+\2%p' -e 's%#define CYGWIN_VERSION_\([A-Z_]*\)[ 	][ 	]*\([a-zA-Z0-9"][^/]*\).*%_\1\
+\2%p' $incfile | sed -e 's/["\\]//g'  -e '/^_/y/ABCDEFGHIJKLMNOPQRSTUVWXYZ_/abcdefghijklmnopqrstuvwxyz /';
 echo ' build date'; echo $build_date; [ -n "$cvs_tag" ] && echo "$cvs_tag";\
 [ -n "$snapshot" ] && echo "$snapshot"
 ) | while read var; do
