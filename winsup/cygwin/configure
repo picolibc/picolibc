@@ -1904,11 +1904,13 @@ fi
 if test "${enable_server+set}" = set; then
   enableval="$enable_server"
   case "${enableval}" in
-yes)	 cat >> confdefs.h <<\EOF
-#define USE_CYGSERVER 1
+yes)
+	 cat >> confdefs.h <<\EOF
+#define USE_SERVER 1
 EOF
- ;;
-no)	 ;;
+
+	 LIBSERVER='$(bupdir)/cygserver/libcygserver.a' ;;
+no)	 LIBSERVER=;;
 esac
 
 fi
@@ -1960,6 +1962,7 @@ case "$target_cpu" in
 		CONFIG_DIR="ppc"  ;;
    *)		{ echo "configure: error: Invalid target processor \"$target_cpu\"" 1>&2; exit 1; } ;;
 esac
+
 
 
 
@@ -2132,6 +2135,7 @@ s%@CPP@%$CPP%g
 s%@ALLOCA@%$ALLOCA%g
 s%@SET_MAKE@%$SET_MAKE%g
 s%@MALLOC_OFILES@%$MALLOC_OFILES%g
+s%@LIBSERVER@%$LIBSERVER%g
 s%@DLL_ENTRY@%$DLL_ENTRY%g
 s%@DEF_DLL_ENTRY@%$DEF_DLL_ENTRY%g
 s%@CONFIG_DIR@%$CONFIG_DIR%g

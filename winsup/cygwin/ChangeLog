@@ -1,3 +1,11 @@
+2003-08-25  Christopher Faylor  <cgf@redhat.com>
+
+	Throughout, change USE_CYGSERVER to USE_SERVER.
+	* Makefile.in (LIBSERVER): Define and use.
+	* configure.in: Set LIBSERVER as appropriate.
+	* environ.cc: Rename allow_daemon to allow_server.  Only recognize when
+	USE_SERVER is defined.
+
 2003-08-23  Christopher Faylor  <cgf@redhat.com>
 
 	* syscalls.cc (_remove_r): Define.

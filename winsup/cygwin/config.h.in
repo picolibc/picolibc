@@ -38,4 +38,4 @@
 #undef NEWVFORK
 
 /* Define if using cygserver */
-#undef USE_CYGSERVER
+#undef USE_SERVER
