@@ -111,12 +111,8 @@ unwelcome.  For example, the following are off-topic:
 If you do not follow the above guidelines, you may still elicit a
 response, but you may not appreciate it!
 
-Inquiries about support contracts and commercial licensing should go to
-info@@cygnus.com.  If you want to purchase the Cygwin 1.0 CD-ROM, visit
-@file{http://www.cygnus.com/cygwin/} or write to
-cygwin-info@@cygnus.com.  While not strictly @emph{unappreciated} in the
-main cygwin list, you'll get the information you need more quickly if
-you write to the correct address in the first place.
+For inquiries about support contracts and commercial licensing, visit
+@file{http://www.redhat.com/software/cygwin/}.
 
 Beyond that, perhaps nobody has time to answer your question.  Perhaps
 nobody knows the answer.
