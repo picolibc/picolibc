@@ -173,8 +173,6 @@ threadname (DWORD tid, int lockit)
 #include <stdlib.h>
 #define NFREEH (sizeof (cygheap->debug.freeh) / sizeof (cygheap->debug.freeh[0]))
 
-void debug_init ();
-
 class lock_debug
 {
   static muto *locker;
@@ -223,16 +221,19 @@ out:
   return hl;
 }
 
+#ifdef DEBUGGING_AND_FDS_PROTECTED
 void
-setclexec (HANDLE oh, HANDLE nh, bool setit)
+setclexec (HANDLE oh, HANDLE nh, bool not_inheriting)
 {
   handle_list *hl = find_handle (oh);
   if (hl)
     {
-      hl->clexec = setit;
+      hl = hl->next;
+      hl->inherited = !not_inheriting;
       hl->h = nh;
     }
 }
+#endif
 
 /* Create a new handle record */
 static handle_list * __stdcall
@@ -287,11 +288,11 @@ add_handle (const char *func, int ln, HANDLE h, const char *name, bool inh)
   hl->func = func;
   hl->ln = ln;
   hl->next = NULL;
-  hl->clexec = !inh;
+  hl->inherited = inh;
   hl->pid = GetCurrentProcessId ();
   cygheap->debug.endh->next = hl;
   cygheap->debug.endh = hl;
-  debug_printf ("protecting handle '%s', clexec flag %d", hl->name, hl->clexec);
+  debug_printf ("protecting handle '%s', inherited flag %d", hl->name, hl->inherited);
 
   return;
 }
@@ -300,6 +301,7 @@ static void __stdcall
 delete_handle (handle_list *hl)
 {
   handle_list *hnuke = hl->next;
+  debug_printf ("nuking handle '%s'", hnuke->name);
   hl->next = hl->next->next;
   if (hnuke->allocated)
     free (hnuke);
@@ -313,13 +315,10 @@ debug_fixup_after_fork_exec ()
   /* No lock needed at this point */
   handle_list *hl;
   for (hl = &cygheap->debug.starth; hl->next != NULL; /* nothing */)
-    if (!hl->next->clexec)
+    if (hl->next->inherited)
       hl = hl->next;
     else
-      {
-	debug_printf ("nuking handle '%s'", hl->next->name);
-	delete_handle (hl);	// removes hl->next
-      }
+      delete_handle (hl);	// removes hl->next
 }
 
 static bool __stdcall

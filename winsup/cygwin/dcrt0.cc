@@ -631,8 +631,13 @@ dll_crt0_1 ()
   /* Initialize the cygwin subsystem if this is the first process,
      or attach to shared data structures if it's already running. */
   memory_init ();
+
   ProtectHandle (hMainProc);
   ProtectHandle (hMainThread);
+
+  /* Initialize debug muto, if DLL is built with --enable-debugging.
+     Need to do this before any helper threads start. */
+  debug_init ();
 
   cygheap->fdtab.vfork_child_fixup ();
 
@@ -803,7 +808,7 @@ initial_env ()
       len = GetModuleFileName (NULL, buf1, MAX_PATH);
       char *p = strchr (buf, '=');
       if (!p)
-	p = "gdb.exe -nw";
+	p = (char *) "gdb.exe -nw";
       else
 	*p++ = '\0';
       if (strstr (buf1, buf))

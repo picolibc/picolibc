@@ -1,5 +1,37 @@
 2002-07-14  Christopher Faylor  <cgf@redhat.com>
 
+	* dcrt0.cc (dll_crt0_1): Move debug_init call back to here.  Avoid a
+	compiler warning.
+	* shared.cc (memory_init): Remove debug_init call.
+	* debug.h (handle_list): Change "clexec" to "inherited".
+	* debug.cc: Remove a spurious declaration.
+	(setclexec): Conditionalize away since it is currently unused.
+	(add_handle): Use inherited field rather than clexec.
+	(debug_fixup_after_fork_exec): Ditto.  Move debugging output to
+	delete_handle.
+	(delete_handle): Add debugging output.
+	* fhandler.cc (fhandler_base::set_inheritance): Don't bother setting
+	inheritance in debugging table since the handle was never protected
+	anyway.
+	(fhandler_base::fork_fixup): Ditto.
+
+	* exceptions.cc (debugger_command): Revert.
+
+2002-07-14  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* debug.cc (clexec): Add missing `hl = hl->next'.
+
+2002-07-14  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (cygrun.exe): Add a -lcygwin on the end.
+
+2002-07-14  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (cygserver.exe): Add -lstdc++.
+	(cygrun.exe): Move -lgcc last.
+
+2002-07-14  Christopher Faylor  <cgf@redhat.com>
+
 	* woutsup.h (system_printf): Remove extraneous semicolon from macro
 	definition.
 

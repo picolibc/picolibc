@@ -1067,7 +1067,7 @@ fhandler_dev_null::dump (void)
 void
 fhandler_base::set_inheritance (HANDLE &h, int not_inheriting)
 {
-#ifdef DEBUGGING
+#ifdef DEBUGGING_AND_FDS_PROTECTED
   HANDLE oh = h;
 #endif
   /* Note that we could use SetHandleInformation here but it is not available
@@ -1078,7 +1078,7 @@ fhandler_base::set_inheritance (HANDLE &h, int not_inheriting)
   if (!DuplicateHandle (hMainProc, h, hMainProc, &h, 0, !not_inheriting,
 			     DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
     debug_printf ("DuplicateHandle failed, %E");
-#ifdef DEBUGGING
+#ifdef DEBUGGING_AND_FDS_PROTECTED
   if (h)
     setclexec (oh, h, not_inheriting);
 #endif
@@ -1087,21 +1087,16 @@ fhandler_base::set_inheritance (HANDLE &h, int not_inheriting)
 void
 fhandler_base::fork_fixup (HANDLE parent, HANDLE &h, const char *name)
 {
-#ifdef DEBUGGING
-  HANDLE oh = h;
-#endif
   if (/* !is_socket () && */ !get_close_on_exec ())
     debug_printf ("handle %p already opened", h);
   else if (!DuplicateHandle (parent, h, hMainProc, &h, 0, !get_close_on_exec (),
 			     DUPLICATE_SAME_ACCESS))
     system_printf ("%s - %E, handle %s<%p>", get_name (), name, h);
-#ifdef DEBUGGING
+#ifdef DEBUGGING_AND_FDS_PROTECTED
+  else if (get_close_on_exec ())
+    ProtectHandle (h);	/* would have to be fancier than this */
   else
-    {
-      debug_printf ("%s success - oldh %p, h %p", get_name (), oh, h);
-      // someday, maybe ProtectHandle2 (h, name);
-      setclexec (oh, h, !get_close_on_exec ());
-    }
+    /* ProtectHandleINH (h) */;	/* Should already be protected */
 #endif
 }
 

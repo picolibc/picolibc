@@ -143,8 +143,6 @@ memory_init ()
       cygheap->user.set_name (user_name);
     }
 
-  debug_init ();
-
   cygheap->shared_h = shared_h;
   ProtectHandleINH (cygheap->shared_h);
 
