@@ -387,12 +387,14 @@ Usage mount
   -i, --import-old-mounts copy  old registry mount table mounts into the current
                                 mount areas
   -p, --show-cygdrive-prefix    show user and/or system cygdrive path prefix
-  -s, --system                  add mount point to system-wide registry location
+  -s, --system     (default)    add mount point to system-wide registry location
   -t, --text       (default)    text files get \r\n line endings
-  -u, --user       (default)    add mount point to user registry location
+  -u, --user                    add mount point to user registry location
   -x, --executable              treat all files under mount point as executables
   -X, --cygwin-executable       treat all files under mount point as cygwin
-                                executables
+                                executables.  Use to speed up file access.
+  -E, --no-executable           don't open files to see if they contain executable
+                                magic.  Use to speed up file access.
   -m, --mount-commands          write mount commands to replace user and
                                 system mount points and cygdrive prefixes
 
@@ -592,7 +594,7 @@ program.</para>
 Usage umount [options] &lt;posixpath&gt;
   -A, --remove-all-mounts       remove all mounts
   -c, --remove-cygdrive-prefix  remove cygdrive prefix
-  -s, --system                  remove system mount
+  -s, --system                  remove system mount (default)
   -S, --remove-system-mounts    remove all system mounts
   -u, --user                    remove user mount
   -U, --remove-user-mounts      remove all user mounts

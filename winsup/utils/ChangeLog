@@ -1,3 +1,16 @@
+2002-05-12  Christopher Faylor  <cgf@redhat.com>
+
+	* mount.cc (do_mount): Default to non-exec option for remote drives.
+	Report warnings before attempting a mount.
+	(longopts): Add no-executable option.
+	(mount_commands): Ditto.
+	(opts): Ditto.
+	(usage): Ditto.  Indicate that system mount is now the default.
+	(main): Accommodate no-executable option.  Make system mount the
+	default.
+	* umount.cc (usage): Indicate that system umount is now the default.
+	(main): Make system umount the default.
+
 2002-05-07  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
 	* dumper.cc (usage) Standardize usage output.  Generalize to allow use
@@ -359,7 +372,7 @@ Fri Dec 14 12:10:39 2001  Jason Tishler <jason@tishler.net>
 
 Tue Oct  9 21:59:00 2001  Christopher Faylor <cgf@cygnus.com>
 
-	* Makefile.in (MINGW_INCLUDES): Accomodate changes in Makefile.common.
+	* Makefile.in (MINGW_INCLUDES): Accommodate changes in Makefile.common.
 
 Sun Oct  7 23:06:39 2001  Christopher Faylor <cgf@cygnus.com>
 

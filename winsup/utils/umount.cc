@@ -43,7 +43,7 @@ usage (void)
   fprintf (stderr, "Usage %s [OPTION] [<posixpath>]\n\
   -A, --remove-all-mounts       remove all mounts\n\
   -c, --remove-cygdrive-prefix  remove cygdrive prefix\n\
-  -s, --system                  remove system mount\n\
+  -s, --system                  remove system mount (default)\n\
   -S, --remove-system-mounts    remove all system mounts\n\
   -u, --user                    remove user mount\n\
   -U, --remove-user-mounts      remove all user mounts\n\
@@ -63,6 +63,7 @@ main (int argc, char **argv)
 {
   int i;
   int flags = 0;
+  int default_flag = MOUNT_SYSTEM;
   progname = argv[0];
   enum do_what
   {
@@ -99,6 +100,7 @@ main (int argc, char **argv)
 	break;
       case 'u':
 	flags &= ~MOUNT_SYSTEM;
+	default_flag = 0;
 	break;
       case 'U':
 	if (do_what != nada)
@@ -134,7 +136,7 @@ main (int argc, char **argv)
     default:
       if (optind != argc - 1)
 	usage ();
-      if (cygwin_umount (argv[optind], flags) != 0)
+      if (cygwin_umount (argv[optind], flags | default_flag) != 0)
 	error (argv[optind]);
     }
 

@@ -22,6 +22,8 @@ details. */
 #endif
 #include <errno.h>
 
+#define EXEC_FLAGS (MOUNT_EXEC | MOUNT_NOTEXEC | MOUNT_CYGWIN_EXEC)
+
 static void mount_commands (void);
 static void show_mounts (void);
 static void show_cygdrive_info (void);
@@ -69,19 +71,40 @@ do_mount (const char *dev, const char *where, int flags)
     }
 #endif
 
-  if (mount (dev, where, flags))
-    error (where);
-
   if (statres == -1)
     {
-      if (force == FALSE)
+      if (!force)
 	fprintf (stderr, "%s: warning - %s does not exist.\n", progname, where);
     }
   else if (!(statbuf.st_mode & S_IFDIR))
     {
-      if (force == FALSE)
+      if (!force)
 	fprintf (stderr, "%s: warning: %s is not a directory.\n", progname, where);
     }
+
+  if (!force && !(flags & EXEC_FLAGS) && strlen (dev))
+    {
+      char devtmp[1 + 2 * strlen (dev)];
+      strcpy (devtmp, dev);
+      char c = strchr (devtmp, '\0')[-1];
+      if (c == '/' || c == '\\')
+	strcat (devtmp, ".");
+      /* Use a curious property of Windows which allows the use of \.. even
+         on non-directory paths. */
+      for (const char *p = dev; (p = strpbrk (p, "/\\")); p++)
+	strcat (devtmp, "\\..");
+      strcat (devtmp, "\\");
+      if (GetDriveType (devtmp) == DRIVE_REMOTE)
+	{
+	  fprintf (stderr, "%s: defaulting to '--no-executable' flag for speed since native path\n"
+		   "%*creferences a remote share.  Use '-f' option to override.\n", progname,
+		   strlen(progname) + 2, ' ');
+	  flags |= MOUNT_NOTEXEC;
+	}
+    }
+
+  if (mount (dev, where, flags))
+    error (where);
 
   exit (0);
 }
@@ -95,6 +118,7 @@ struct option longopts[] =
   {"text", no_argument, NULL, 't'},
   {"user", no_argument, NULL, 'u'},
   {"executable", no_argument, NULL, 'x'},
+  {"no-executable", no_argument, NULL, 'E'},
   {"change-cygdrive-prefix", no_argument, NULL, 'c'},
   {"cygwin-executable", no_argument, NULL, 'X'},
   {"show-cygdrive-prefix", no_argument, NULL, 'p'},
@@ -103,7 +127,7 @@ struct option longopts[] =
   {NULL, 0, NULL, 0}
 };
 
-char opts[] = "hbfstuxXpicm";
+char opts[] = "hbfstuxXEpicm";
 
 static void
 usage (void)
@@ -117,9 +141,9 @@ usage (void)
   -i, --import-old-mounts       copy old registry mount table mounts into the\n\
                                 current mount areas\n\
   -p, --show-cygdrive-prefix    show user and/or system cygdrive path prefix\n\
-  -s, --system                  add mount point to system-wide registry location\n\
+  -s, --system     (default)    add system-wide mount point\n\
   -t, --text       (default)    text files get \\r\\n line endings\n\
-  -u, --user       (default)    add mount point to user registry location\n\
+  -u, --user                    add user-only mount point\n\
   -x, --executable              treat all files under mount point as executables\n\
   -X, --cygwin-executable       treat all files under mount point as cygwin\n\
 				executables\n\
@@ -134,6 +158,7 @@ main (int argc, char **argv)
 {
   int i;
   int flags = 0;
+  int default_flag = MOUNT_SYSTEM;
   enum do_what
   {
     nada,
@@ -186,12 +211,16 @@ main (int argc, char **argv)
 	break;
       case 'u':
 	flags &= ~MOUNT_SYSTEM;
+	default_flag = 0;
 	break;
       case 'X':
 	flags |= MOUNT_CYGWIN_EXEC;
 	break;
       case 'x':
 	flags |= MOUNT_EXEC;
+	break;
+      case 'E':
+	flags |= MOUNT_NOTEXEC;
 	break;
       case 'm':
 	if (do_what == nada)
@@ -202,6 +231,12 @@ main (int argc, char **argv)
       default:
 	usage ();
       }
+
+  if (flags & MOUNT_NOTEXEC && flags & (MOUNT_EXEC | MOUNT_CYGWIN_EXEC))
+    {
+      fprintf (stderr, "%s: invalid combination of executable options\n", progname);
+      exit (1);
+    }
 
   argc--;
   switch (do_what)
@@ -237,7 +272,7 @@ main (int argc, char **argv)
 	  usage ();
 	}
       if (force || !mount_already_exists (argv[optind + 1], flags))
-	do_mount (argv[optind], argv[optind + 1], flags);
+	do_mount (argv[optind], argv[optind + 1], flags | default_flag);
       else
 	{
 	  errno = EBUSY;
@@ -278,6 +313,8 @@ mount_commands (void)
         strcat (opts, " -t");
       if (strstr (p->mnt_opts, ",exec"))
         strcat (opts, " -x");
+      if (strstr (p->mnt_opts, ",noexec"))
+        strcat (opts, " -E");
       while ((c = strchr (p->mnt_fsname, '\\')) != NULL)
         *c = '/';
       printf (format_mnt, opts, p->mnt_fsname, p->mnt_dir);
