@@ -80,7 +80,7 @@ static double one = 1.0, half=0.5, huge = 1.0e300;
     /* |x| in [log(maxdouble), overflowthresold] */
 	GET_LOW_WORD(lx,x);
 	if (ix<0x408633CE || 
-	      (ix==0x408633ce)&&(lx<=(__uint32_t)0x8fb9f87d)) {
+             (ix==0x408633ce && lx<=(__uint32_t)0x8fb9f87d)) {
 	    w = __ieee754_exp(half*fabs(x));
 	    t = half*w;
 	    return t*w;

@@ -73,7 +73,7 @@ static double one = 1.0, shuge = 1.0e307;
 
     /* |x| in [log(maxdouble), overflowthresold] */
 	GET_LOW_WORD(lx,x);
-	if (ix<0x408633CE || (ix==0x408633ce)&&(lx<=(__uint32_t)0x8fb9f87d)) {
+       if (ix<0x408633CE || (ix==0x408633ce && lx<=(__uint32_t)0x8fb9f87d)) {
 	    w = __ieee754_exp(0.5*fabs(x));
 	    t = h*w;
 	    return t*w;
