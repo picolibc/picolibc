@@ -308,6 +308,7 @@ struct mips_opcode
 #define INSN_ISA3		    0x00000003
 /* MIPS ISA 4 instruction (R8000).  */
 #define INSN_ISA4		    0x00000004
+#define INSN_ISA5		    0x00000005
 
 /* Chip specific instructions.  These are bitmasks.  */
 /* MIPS R4650 instruction.  */

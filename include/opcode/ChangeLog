@@ -1,3 +1,7 @@
+1999-11-18  Gavin Romig-Koch  <gavin@cygnus.com>
+
+	* mips.h (INSN_ISA5): New.
+
 1999-11-01  Gavin Romig-Koch  <gavin@cygnus.com>
 
 	* mips.h (OPCODE_IS_MEMBER): New.
