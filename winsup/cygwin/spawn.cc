@@ -34,6 +34,7 @@ details. */
 #include "perthread.h"
 #include "registry.h"
 #include "environ.h"
+#include "cygthread.h"
 
 #define LINE_BUF_CHUNK (MAX_PATH * 2)
 
@@ -715,12 +716,13 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       cygheap_setup_for_child_cleanup (newheap, &ciresrv, 1);
       if (mode == _P_OVERLAY)
 	ResumeThread (pi.hThread);
+      cygthread::terminate ();
     }
 
-  if (mode == _P_OVERLAY)
-    cygpid = myself->pid;
-  else
+  if (mode != _P_OVERLAY)
     cygpid = cygwin_pid (pi.dwProcessId);
+  else
+    cygpid = myself->pid;
 
   /* We print the original program name here so the user can see that too.  */
   syscall_printf ("%d = spawn_guts (%s, %.132s)",

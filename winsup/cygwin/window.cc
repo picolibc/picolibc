@@ -121,7 +121,7 @@ Winmain (VOID *)
   while (GetMessage (&msg, ourhwnd, 0, 0) == TRUE)
     DispatchMessage (&msg);
 
-  return msg.wParam;
+  ExitThread (0);
 }
 
 HWND __stdcall
@@ -139,13 +139,6 @@ gethwnd ()
   CloseHandle (window_started);
   h->zap_h ();
   return ourhwnd;
-}
-
-void __stdcall
-window_terminate ()
-{
-  if (ourhwnd)
-    SendMessage (ourhwnd, WM_DESTROY, 0, 0);
 }
 
 extern "C" int

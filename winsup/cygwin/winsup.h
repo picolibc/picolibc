@@ -169,7 +169,6 @@ BOOL __stdcall check_pty_fds (void);
 
 /* Invisible window initialization/termination. */
 HWND __stdcall gethwnd (void);
-void __stdcall window_terminate (void);
 
 /* Globals that handle initialization of winsock in a child process. */
 extern HANDLE wsock32_handle;

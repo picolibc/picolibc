@@ -945,29 +945,32 @@ __main (void)
   do_global_ctors (user_data->ctors, FALSE);
 }
 
-enum
+enum exit_states
   {
-    ES_THREADTERM = 1,
-    ES_SIGNAL = 2,
-    ES_CLOSEALL = 3,
-    ES_SIGPROCTERMINATE = 4
+    ES_NOT_EXITING = 0,
+    ES_THREADTERM,
+    ES_SIGNAL,
+    ES_CLOSEALL,
+    ES_SIGPROCTERMINATE,
+    ES_TITLE,
+    ES_HUP_PGRP,
+    ES_HUP_SID,
+    ES_TTY_TERMINATE,
+    ES_EVENTS_TERMINATE
   };
+
+exit_states NO_COPY exit_state;
 
 extern "C" void __stdcall
 do_exit (int status)
 {
   UINT n = (UINT) status;
-  static int NO_COPY exit_state = 0;
 
   syscall_printf ("do_exit (%d)", n);
 
   vfork_save *vf = vfork_storage.val ();
   if (vf != NULL && vf->pid < 0)
     vf->restore_exit (status);
-
-  if (!DisableThreadLibraryCalls (cygwin_hmodule))
-    system_printf ("DisableThreadLibraryCalls (%p) failed, %E",
-		   cygwin_hmodule);
 
   if (exit_state < ES_THREADTERM)
     {
@@ -999,16 +1002,18 @@ do_exit (int status)
       sigproc_terminate ();
     }
 
-  if (n & EXIT_REPARENTING)
-    n &= ~EXIT_REPARENTING;
-  else
+  myself->stopsig = 0;
+  if (exit_state < ES_TITLE)
     {
-      myself->stopsig = 0;
-
+      exit_state = ES_TITLE;
       /* restore console title */
       if (old_title && display_title)
 	set_console_title (old_title);
+    }
 
+  if (exit_state < ES_HUP_PGRP)
+    {
+      exit_state = ES_HUP_PGRP;
       /* Kill orphaned children on group leader exit */
       if (myself->has_pgid_children && myself->pid == myself->pgid)
 	{
@@ -1016,7 +1021,11 @@ do_exit (int status)
 			  myself->pid, myself->pgid);
 	  kill_pgrp (myself->pgid, -SIGHUP);
 	}
+    }
 
+  if (exit_state < ES_HUP_SID)
+    {
+      exit_state = ES_HUP_SID;
       /* Kill the foreground process group on session leader exit */
       if (getpgrp () > 0 && myself->pid == myself->sid && real_tty_attached (myself))
 	{
@@ -1029,12 +1038,19 @@ do_exit (int status)
 	    tp->kill_pgrp (SIGHUP);
 	}
 
+    }
+
+  if (exit_state < ES_TTY_TERMINATE)
+    {
+      exit_state = ES_TTY_TERMINATE;
       tty_terminate ();
     }
 
-  window_terminate ();
-  events_terminate ();
-  shared_terminate ();
+  if (exit_state < ES_EVENTS_TERMINATE)
+    {
+      exit_state = ES_EVENTS_TERMINATE;
+      events_terminate ();
+    }
 
   minimal_printf ("winpid %d, exit %d", GetCurrentProcessId (), n);
   myself->exit (n);

@@ -12,6 +12,7 @@ class cygthread
   DWORD id;
   HANDLE h;
   HANDLE ev;
+  HANDLE thread_sync;
   const char *__name;
   LPTHREAD_START_ROUTINE func;
   VOID *arg;

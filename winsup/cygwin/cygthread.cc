@@ -25,6 +25,51 @@ int NO_COPY cygthread::initialized;
    per-thread initialization and loops waiting for new thread functions
    to execute.  */
 DWORD WINAPI
+cygthread::stub (VOID *arg)
+{
+  DECLARE_TLS_STORAGE;
+  exception_list except_entry;
+
+  /* Initialize this thread's ability to respond to things like
+     SIGSEGV or SIGFPE. */
+  init_exceptions (&except_entry);
+
+  cygthread *info = (cygthread *) arg;
+  if (info->arg == cygself)
+    info->ev = info->thread_sync = NULL;
+  else
+    {
+      info->ev = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
+      info->thread_sync = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+    }
+  while (1)
+    {
+      if (!info->func || initialized < 0)
+	ExitThread (0);
+
+      /* Cygwin threads should not call ExitThread directly */
+      info->func (info->arg == cygself ? info : info->arg);
+      /* ...so the above should always return */
+
+#ifdef DEBUGGING
+      info->func = NULL;	// catch erroneous activation
+#endif
+      SetEvent (info->ev);
+      info->__name = NULL;
+      switch (WaitForSingleObject (info->thread_sync, INFINITE))
+	{
+	case WAIT_OBJECT_0:
+	  continue;
+	default:
+	  api_fatal ("WFSO failed, %E");
+	  break;
+	}
+    }
+}
+
+/* Overflow stub called by cygthread constructor. Calls specified function
+   and then exits the thread.  */
+DWORD WINAPI
 cygthread::simplestub (VOID *arg)
 {
   DECLARE_TLS_STORAGE;
@@ -37,45 +82,6 @@ cygthread::simplestub (VOID *arg)
   cygthread *info = (cygthread *) arg;
   info->func (info->arg == cygself ? info : info->arg);
   ExitThread (0);
-}
-
-/* Initial stub called by cygthread constructor. Performs initial
-   per-thread initialization and loops waiting for new thread functions
-   to execute.  */
-DWORD WINAPI
-cygthread::stub (VOID *arg)
-{
-  DECLARE_TLS_STORAGE;
-  exception_list except_entry;
-
-  /* Initialize this thread's ability to respond to things like
-     SIGSEGV or SIGFPE. */
-  init_exceptions (&except_entry);
-
-  cygthread *info = (cygthread *) arg;
-  if (info->arg == cygself)
-    info->ev = NULL;
-  else
-    info->ev = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
-  while (1)
-    {
-      if (!info->func)
-	ExitThread (0);
-
-      /* Cygwin threads should not call ExitThread directly */
-      info->func (info->arg == cygself ? info : info->arg);
-      /* ...so the above should always return */
-
-#ifdef DEBUGGING
-      info->func = NULL;	// catch erroneous activation
-#endif
-      SetEvent (info->ev);
-      info->__name = NULL;
-      if (initialized >= 0)
-	SuspendThread (info->h);
-      else
-	ExitThread (0);
-    }
 }
 
 /* This function runs in a secondary thread and starts up a bunch of
@@ -95,15 +101,16 @@ cygthread::runner (VOID *arg)
   ExitThread (0);
 }
 
+HANDLE NO_COPY runner_handle;
+DWORD NO_COPY runner_tid;
 /* Start things going.  Called from dll_crt0_1. */
 void
 cygthread::init ()
 {
-  DWORD tid;
-  HANDLE h = CreateThread (&sec_none_nih, 0, cygthread::runner, NULL, 0, &tid);
-  if (!h)
+  runner_handle = CreateThread (&sec_none_nih, 0, cygthread::runner, NULL, 0,
+				&runner_tid);
+  if (!runner_handle)
     api_fatal ("can't start thread_runner, %E");
-  CloseHandle (h);
   main_thread_id = GetCurrentThreadId ();
 }
 
@@ -179,7 +186,7 @@ cygthread::cygthread (LPTHREAD_START_ROUTINE start, LPVOID param,
     api_fatal ("name should never be NULL");
 #endif
   thread_printf ("name %s, id %p", name, id);
-  while (!h || ResumeThread (h) != 1)
+  while (!h)
 #ifndef DEBUGGING
     Sleep (0);
 #else
@@ -191,6 +198,10 @@ cygthread::cygthread (LPTHREAD_START_ROUTINE start, LPVOID param,
   __name = name;	/* Need to set after thread has woken up to
 			   ensure that it won't be cleared by exiting
 			   thread. */
+  if (thread_sync)
+    SetEvent (thread_sync);
+  else
+    ResumeThread (h);
 }
 
 /* Return the symbolic name of the current thread for debugging.
@@ -241,7 +252,7 @@ cygthread::exit_thread ()
 }
 
 /* Detach the cygthread from the current thread.  Note that the
-   theory is that cygthread's are only associated with one thread.
+   theory is that cygthreads are only associated with one thread.
    So, there should be no problems with multiple threads doing waits
    on the one cygthread. */
 void
@@ -280,9 +291,32 @@ cygthread::detach ()
 void
 cygthread::terminate ()
 {
-  initialized = -1;
-  /* Signal the event for all running threads */
-  for (cygthread *info = threads + NTHREADS - 1; info >= threads; info--)
-    if (!InterlockedExchange ((LPLONG) &info->avail, 0) && info->ev)
-      SetEvent (info->ev);
+  /* Wow.  All of this seems to be necessary or (on Windows 9x at least) the
+     process will sometimes deadlock if there are suspended threads.  I assume
+     that something funky is happening like a suspended thread being created
+     while the process is exiting or something.  In particular, it seems like
+     the WaitForSingleObjects are necessary since it appears that the
+     TerminateThread call may happen asynchronously, i.e., when TerminateThread
+     returns, the thread may not yet have terminated. */
+  if (runner_handle && initialized >= 0)
+    {
+      /* Don't care about detaching (or attaching) threads now */
+      if (cygwin_hmodule && !DisableThreadLibraryCalls (cygwin_hmodule))
+	system_printf ("DisableThreadLibraryCalls (%p) failed, %E",
+		       cygwin_hmodule);
+      initialized = -1;
+      (void) TerminateThread (runner_handle, 0);
+      (void) WaitForSingleObject (runner_handle, INFINITE);
+      (void) CloseHandle (runner_handle);
+      for (unsigned i = 0; i < NTHREADS; i++)
+	if (threads[i].h)
+	  {
+	    TerminateThread (threads[i].h, 0);
+	    (void) WaitForSingleObject (threads[i].h, INFINITE);
+	    (void) CloseHandle (threads[i].h);
+#ifdef DEBUGGING
+	    threads[i].h = NULL;
+#endif
+	  }
+    }
 }

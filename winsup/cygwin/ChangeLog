@@ -1,3 +1,31 @@
+2002-10-13  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::stub): Don't create event for long-running
+	threads.  Initialize thread_sync event here which is used to Suspend
+	using an event rather than relying on SuspendThread/ResumeThread.
+	(cygthread::init): Save handle to runner thread for future termination.
+	(cygthread::cygthread): Only resume thread when it is actually
+	suspended.  Otherwise signal thread completion event.
+	(cygthread::terminate): Forcibly terminate runner thread and any helper
+	threads.  Call DisableThreadLibrary calls if execing.
+	* cygthread.h (cygthread::thread_sync): Declare.
+	* dcrt0.cc (do_exit): Eliminate calls to obsolete window_terminate and
+	shared_terminate.
+	* exceptions.cc (events_terminate): Don't bother closing title_mutex
+	since it is going away anyway.
+	* pinfo.cc (_pinfo::exit): Call cygthread::terminate to ensure that
+	threads are shut down before process exit or otherwise strange races
+	seem to occur.
+	* shared.cc (shared_terminate): Eliminate.
+	* shared.h (shared_terminate): Eliminate declaration.
+	* winsup.h (window_terminate): Eliminate declaration.
+	* spawn.cc (spawn_guts): Call cygthread::terminate early in process if
+	execing.  Call DisableThreadLibrary calls if execing.
+	* window.cc (Winmain): Call ExitThread to force exit.
+	(window_terminate): Eliminate.
+
+	* dcrt0.cc (do_exit): Track exit state more closely.
+
 2002-10-10  Christopher Faylor  <cgf@redhat.com>
 
 	* window.cc (gethwnd): Use SetThreadPriority method.

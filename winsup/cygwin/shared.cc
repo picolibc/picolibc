@@ -170,15 +170,6 @@ memory_init ()
 
 }
 
-void __stdcall
-shared_terminate ()
-{
-  if (cygheap->shared_h)
-    ForceCloseHandle (cygheap->shared_h);
-  if (cygwin_mount_h)
-    ForceCloseHandle (cygwin_mount_h);
-}
-
 unsigned
 shared_info::heap_chunk_size ()
 {

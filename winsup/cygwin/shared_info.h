@@ -162,7 +162,6 @@ extern mount_info *mount_table;
 extern HANDLE cygwin_mount_h;
 
 void __stdcall memory_init (void);
-void __stdcall shared_terminate (void);
 
 #define shared_align_past(p) \
   ((char *) (system_info.dwAllocationGranularity * \

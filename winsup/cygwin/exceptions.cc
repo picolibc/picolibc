@@ -1136,7 +1136,6 @@ events_init (void)
 void
 events_terminate (void)
 {
-  ForceCloseHandle (title_mutex);
   exit_already = 1;
 }
 

@@ -26,6 +26,7 @@ details. */
 #include <assert.h>
 #include <ntdef.h>
 #include "ntdll.h"
+#include "cygthread.h"
 
 static char NO_COPY pinfo_dummy[sizeof (_pinfo)] = {0};
 
@@ -109,6 +110,7 @@ _pinfo::exit (UINT n, bool norecord)
       add_rusage (&rusage_self, &r);
     }
 
+  cygthread::terminate ();
   sigproc_printf ("Calling ExitProcess %d", n);
   ExitProcess (n);
 }
