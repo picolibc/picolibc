@@ -181,12 +181,22 @@ __change_mode:
 #endif
 
 #endif
+
+#ifdef __USES_INITFINI__
+	/* Some arm/elf targets use the .init and .fini sections
+	   to create constructors and destructors, and for these
+	   targets we need to call the _init function and arrange
+	   for _fini to be called at program exit.  */
+	ldr	r0, .Lfini
+	bl	FUNCTION (atexit)
+	bl	FUNCTION (_init)
+#endif	
 	bl	FUNCTION (main)
 
-	bl	FUNCTION (exit)		/* Should not return */
+	bl	FUNCTION (exit)		/* Should not return.  */
 
 #ifdef __thumb__
-	/* Come out of Thumb mode... This code should be redundant...   */
+	/* Come out of Thumb mode.  This code should be redundant.  */
 
 	mov	a4, pc
 	bx	a4
@@ -195,16 +205,14 @@ __change_mode:
 	.global change_back
 change_back:
 	/* Halt the execution.  This code should never be executed.  */
-	/*
-	** With no debug monitor, this probably aborts (eventually).
-	** With a Demon debug monitor, this halts cleanly.
-	** With an Angel debug monitor, this will report 'Unknown SWI'.
-	*/
+	/* With no debug monitor, this probably aborts (eventually).
+	   With a Demon debug monitor, this halts cleanly.
+	   With an Angel debug monitor, this will report 'Unknown SWI'.	 */
 	swi	SWI_Exit
 #endif
 	
 	/* For Thumb, constants must be after the code since only 
-	positive offsets are supported for PC relative addresses. */
+	   positive offsets are supported for PC relative addresses.  */
 	
 	.align 0
 .LC0:
@@ -215,7 +223,7 @@ change_back:
 #ifdef __pe__
 	.word	0x800000
 #else
-/*	.word	0x80000	*/		/* Top of RAM on the PIE board */
+/*	.word	0x80000	*/		/* Top of RAM on the PIE board.  */
 #endif
 #endif
 #endif
@@ -223,19 +231,23 @@ change_back:
 	.word	__bss_start__
 .LC2:
 	.word	__bss_end__
-
+#ifdef __USES_INITFINI__
+.Lfini:
+	.word	FUNCTION(_fini)
+#endif
 #ifdef ARM_RDI_MONITOR
-.LC30:	.word	CommandLine
+.LC30:
+	.word	CommandLine
 	.word	255
 
-/*  Workspace for Angel calls. */
+/*  Workspace for Angel calls.  */
 	.data
-/*  Data returned by monitor SWI */
+/*  Data returned by monitor SWI.  */
 HeapBase:	.word	0
 HeapLimit:	.word	0
 StackBase:	.word	0
 StackLimit:	.word	0
-CommandLine:	.space	256,0	/*  Maximum length of 255 chars handled */
+CommandLine:	.space	256,0	/*  Maximum length of 255 chars handled.  */
 #endif
 	
 #ifdef __pe__
