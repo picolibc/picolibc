@@ -1,3 +1,7 @@
+2002-01-28  Jason Merrill  <jason@redhat.com>
+
+	* elf/dwarf2.h: Sync with gcc version.
+
 2002-01-28  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
 	* libiberty.h (C_alloca): Add ATTRIBUTE_MALLOC.
