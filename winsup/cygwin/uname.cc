@@ -21,6 +21,10 @@ uname (struct utsname *name)
 {
   DWORD len;
   SYSTEM_INFO sysinfo;
+
+  if (check_null_invalid_struct_errno (name))
+    return -1;
+    
   char *snp = strstr  (cygwin_version.dll_build_date, "SNP");
 
   memset (name, 0, sizeof (*name));

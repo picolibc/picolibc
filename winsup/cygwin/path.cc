@@ -2399,6 +2399,19 @@ symlink (const char *topath, const char *frompath)
   DWORD written;
   SECURITY_ATTRIBUTES sa = sec_none_nih;
 
+  /* POSIX says that empty 'frompath' is invalid input whlie empty
+     'topath' is valid -- it's symlink resolver job to verify if
+     symlink contents point to existing filesystem object */ 
+  if (check_null_empty_str_errno (topath) == EFAULT ||
+      check_null_empty_str_errno (frompath))
+    goto done;
+
+  if (strlen (topath) >= MAX_PATH)
+    {
+      set_errno (ENAMETOOLONG);
+      goto done;
+    }
+
   win32_path.check (frompath, PC_SYM_NOFOLLOW);
   if (allow_winsymlinks && !win32_path.error)
     {
@@ -2414,17 +2427,6 @@ symlink (const char *topath, const char *frompath)
     }
 
   syscall_printf ("symlink (%s, %s)", topath, win32_path.get_win32 ());
-
-  if (topath[0] == 0)
-    {
-      set_errno (EINVAL);
-      goto done;
-    }
-  if (strlen (topath) >= MAX_PATH)
-    {
-      set_errno (ENAMETOOLONG);
-      goto done;
-    }
 
   if (win32_path.is_device () ||
       win32_path.file_attributes () != (DWORD) -1)
@@ -2984,7 +2986,12 @@ hashit:
 char *
 getcwd (char *buf, size_t ulen)
 {
-  return cygheap->cwd.get (buf, 1, 1, ulen);
+  char* res = NULL;
+  if (ulen == 0)
+    set_errno (EINVAL);
+  else if (!__check_null_invalid_struct_errno (buf, ulen))
+    res = cygheap->cwd.get (buf, 1, 1, ulen);
+  return res;
 }
 
 /* getwd: standards? */

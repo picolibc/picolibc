@@ -1768,7 +1768,11 @@ ftruncate (int fd, off_t length)
   sigframe thisframe (mainthread);
   int res = -1;
 
-  if (cygheap->fdtab.not_open (fd))
+  if (length < 0)
+    {
+      set_errno (EINVAL);
+    }
+  else if (cygheap->fdtab.not_open (fd))
     {
       set_errno (EBADF);
     }

@@ -1,3 +1,11 @@
+2001-09-16  Egor Duda  <deo@logos-m.ru>
+
+	* path.cc (symlink): Check arguments for validity.
+	(getcwd): Ditto.
+	* syscalls.cc (ftruncate): Ditto.
+	* times.cc (times): Ditto.
+	* uname.cc (uname): Ditto.
+
 Sat Sep 15 22:54:49 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* net.cc (dup_servent_ptr): Detect old Windows 95 misaligned structure
