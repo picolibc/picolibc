@@ -125,7 +125,7 @@ If you look at the "Cygwin 1.1.0" (or similar) shortcut created in the
 @code{C:\cygwin}).  The contents should look something like this:
 
 @example
-	@echo off
+	@@echo off
 	SET MAKE_MODE=unix
 	SET PATH=C:\cygwin\bin;C:\cygwin\usr\local\bin;%PATH%
 	bash
