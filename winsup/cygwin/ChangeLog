@@ -1,3 +1,8 @@
+2005-03-03  Christopher Faylor  <cgf@timesys.com>
+
+	* cygthread.cc (cygthread::detach): Use a slightly higher priority when
+	waiting for thread signalling.
+
 2005-03-02  Christopher Faylor  <cgf@timesys.com>
 
 	* autoload.cc (std_dll_init): Save and restore fpu control register

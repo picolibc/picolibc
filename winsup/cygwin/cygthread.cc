@@ -316,7 +316,7 @@ cygthread::detach (HANDLE sigwait)
 	  /* Lower our priority and give priority to the read thread */
 	  HANDLE hth = GetCurrentThread ();
 	  LONG prio = GetThreadPriority (hth);
-	  (void) ::SetThreadPriority (hth, THREAD_PRIORITY_IDLE);
+	  (void) ::SetThreadPriority (hth, THREAD_PRIORITY_BELOW_NORMAL);
 
 	  HANDLE w4[2];
 	  unsigned n = 2;
