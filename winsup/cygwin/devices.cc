@@ -14884,7 +14884,7 @@ device::parsedisk (int drive, int part)
   else
     {
       base = DEV_SD1_MAJOR;
-      drive -= 'q' - 'q';
+      drive -= 'q' - 'a';
     }
   parse (base, part + (drive * 16));
 }
