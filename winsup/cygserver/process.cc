@@ -1,6 +1,6 @@
 /* process.cc
 
-   Copyright 2001, 2002, 2003, 2004 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2004, 2005 Red Hat Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -60,13 +60,17 @@ process::process (const pid_t cygpid, const DWORD winpid, HANDLE signal_arrived)
   else
     debug_printf ("got handle %p for new cache process %d(%lu)",
 		  _hProcess, _cygpid, _winpid);
-  if (signal_arrived != INVALID_HANDLE_VALUE)
+  if (!signal_arrived)
+    system_printf ("signal_arrived NULL for process %d(%lu)",
+		   _cygpid, _winpid);
+  else if (signal_arrived != INVALID_HANDLE_VALUE)
     {
       if (!DuplicateHandle (_hProcess, signal_arrived,
 			    GetCurrentProcess (), &_signal_arrived,
 			    0, FALSE, DUPLICATE_SAME_ACCESS))
 	system_printf ("error getting signal_arrived to server (%lu)",
 		       GetLastError ());
+	_signal_arrived = INVALID_HANDLE_VALUE;
     }
   InitializeCriticalSection (&_access);
   debug ("initialized (%lu)", _cygpid);

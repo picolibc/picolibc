@@ -1,6 +1,6 @@
 /* bsd_mutex.cc
 
-   Copyright 2003, 2004 Red Hat Inc.
+   Copyright 2003, 2004, 2005 Red Hat Inc.
 
 This file is part of Cygwin.
 
@@ -236,7 +236,7 @@ _msleep (void *ident, struct mtx *mtx, int priority,
   if ((priority & PCATCH)
       && td->client->signal_arrived () != INVALID_HANDLE_VALUE)
     obj_cnt = 4;
-  
+
   switch (WaitForMultipleObjects (obj_cnt, obj, FALSE, timo ?: INFINITE))
     {
       case WAIT_OBJECT_0:	/* wakeup() has been called. */
