@@ -1,5 +1,9 @@
 2003-06-12  Christopher Faylor  <cgf@redhat.com>
 
+	* cygcheck.cc (pretty_id): Rework slightly to not rely on spaces.
+
+2003-06-12  Christopher Faylor  <cgf@redhat.com>
+
 	* cygpath.cc: Throughout, always return error when GetShortPathName
 	returns 0.
 

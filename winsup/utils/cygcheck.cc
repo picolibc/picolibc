@@ -784,8 +784,8 @@ pretty_id (const char *s, char *cygwin, size_t cyglen)
 
   char buf[16384];
   fgets (buf, sizeof (buf), f);
-  char *uid = strtok (buf, " ") + sizeof ("uid=") - 1;
-  char *gid = strtok (NULL, " ") + sizeof ("gid=") - 1;
+  char *uid = strtok (buf, ")") + strlen ("uid=");
+  char *gid = strtok (NULL, ")") + strlen ("gid=") + 1;
   char **ng;
   size_t sz = 0;
   for (ng = groups; (*ng = strtok (NULL, ",")); ng++)
@@ -794,21 +794,21 @@ pretty_id (const char *s, char *cygwin, size_t cyglen)
       if (p)
 	*p = '\0';
       if (ng == groups)
-	*ng += sizeof ("groups=") - 1;
+	*ng += strlen (" groups=");
       size_t len = strlen (*ng);
       if (sz < len)
 	sz = len;
     }
 
-  printf ("\n%s output (%s)\n", id, s);
-  int szmaybe = sizeof ("UID: ") + strlen (uid) - 1;
+  printf ("\nOutput from %s (%s)\n", id, s);
+  int szmaybe = strlen ("UID: ") + strlen (uid);
   if (sz < szmaybe)
     sz = szmaybe;
   sz += 1;
   int n = 80 / (int) sz;
   sz = -sz;
-  ng[0] += sizeof ("groups=") - 1;
-  printf ("UID: %*s GID: %s\n", sz + (sizeof ("UID: ") - 1), uid, gid);
+  ng[0] += strlen ("groups=");
+  printf ("UID: %.*s) GID: %s)\n", sz + (sizeof ("UID: ") - 1), uid, gid);
   int i = 0;
   for (char **g = groups; g < ng; g++)
     {
