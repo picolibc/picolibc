@@ -184,6 +184,19 @@ extern "C" {
 #endif
 #endif
 
+/* FIXME: This will make some code compile. The programs will most
+   likely crash when an exception is raised, but at least they will
+   compile. */
+#if defined (__GNUC__) && defined (__SEH_NOP)
+#define __try
+#define __except(x) if (0) /* don't execute handler */
+#define __finally
+
+#define _try __try
+#define _except __except
+#define _finally __finally
+#endif
+
 typedef unsigned long DWORD;
 typedef int WINBOOL,*PWINBOOL,*LPWINBOOL;
 /* FIXME: Is there a good solution to this? */

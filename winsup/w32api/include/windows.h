@@ -48,7 +48,6 @@
 #include <windef.h>
 #include <wincon.h>
 #include <basetyps.h>
-#include <excpt.h>
 #include <winbase.h>
 #ifndef _WINGDI_H
 #include <wingdi.h>
