@@ -1443,19 +1443,73 @@ get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
   PSECURITY_DESCRIPTOR psd = NULL;
   cygpsid owner_sid;
   cygpsid group_sid;
-  PACL acl;
+  PACL acl = NULL;
 
-  if (ERROR_SUCCESS != GetSecurityInfo (handle, object_type,
-					DACL_SECURITY_INFORMATION |
-					GROUP_SECURITY_INFORMATION |
-					OWNER_SECURITY_INFORMATION,
-					(PSID *) &owner_sid,
-					(PSID *) &group_sid,
-					&acl, NULL, &psd))
+  if (object_type == SE_REGISTRY_KEY)
     {
-      __seterrno ();
-      debug_printf ("GetSecurityInfo %E");
-      return -1;
+      // use different code for registry handles, for performance reasons
+      char sd_buf[4096];
+      PSECURITY_DESCRIPTOR psd2 = (PSECURITY_DESCRIPTOR) & sd_buf[0];
+      DWORD len = sizeof (sd_buf);
+      if (ERROR_SUCCESS != RegGetKeySecurity ((HKEY) handle,
+                                              DACL_SECURITY_INFORMATION |
+                                              GROUP_SECURITY_INFORMATION |
+                                              OWNER_SECURITY_INFORMATION,
+                                              psd2, &len))
+        {
+          __seterrno ();
+          debug_printf ("RegGetKeySecurity %E");
+          return -1;
+        }
+
+      BOOL bDaclPresent;
+      BOOL bDaclDefaulted;
+      if (!GetSecurityDescriptorDacl (psd2,
+                                      &bDaclPresent, &acl, &bDaclDefaulted))
+        {
+          __seterrno ();
+          debug_printf ("GetSecurityDescriptorDacl %E");
+          return -1;
+        }
+      if (!bDaclPresent)
+        {
+          acl = NULL;
+        }
+
+      BOOL bGroupDefaulted;
+      if (!GetSecurityDescriptorGroup (psd2,
+                                       (PSID *) & group_sid,
+                                       &bGroupDefaulted))
+        {
+          __seterrno ();
+          debug_printf ("GetSecurityDescriptorGroup %E");
+          return -1;
+        }
+
+      BOOL bOwnerDefaulted;
+      if (!GetSecurityDescriptorOwner (psd2,
+                                       (PSID *) & owner_sid,
+                                       &bOwnerDefaulted))
+        {
+          __seterrno ();
+          debug_printf ("GetSecurityDescriptorOwner %E");
+          return -1;
+        }
+    }
+  else
+    {
+      if (ERROR_SUCCESS != GetSecurityInfo (handle, object_type,
+                                            DACL_SECURITY_INFORMATION |
+                                            GROUP_SECURITY_INFORMATION |
+                                            OWNER_SECURITY_INFORMATION,
+                                            (PSID *) & owner_sid,
+                                            (PSID *) & group_sid,
+                                            &acl, NULL, &psd))
+        {
+          __seterrno ();
+          debug_printf ("GetSecurityInfo %E");
+          return -1;
+        }
     }
 
   __uid32_t uid;
