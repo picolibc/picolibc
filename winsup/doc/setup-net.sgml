@@ -56,10 +56,10 @@ this; search the list for <command>mkcygwget</command> for ideas.
 <sect2><title>Selecting an Install Directory</title>
 <para>
 The <literal>Root Directory</literal> for Cygwin (default
-<literal>C:\cygwin</literal>) will become <literal>'/'</literal> 
-within your Cygwin installation. All Windows drives can be accessed
-with the <literal>/cygdrive/X/</literal> virtual directory and
-Cygwin's <command>mount</command> utility. 
+<literal>C:\cygwin</literal>) will become <literal>/</literal> 
+within your Cygwin installation. You must have write access to
+the parent directory, and any ACLs on the parent directory will
+determine access to installed files.
 </para>
 <para>
 The <literal>Install For</literal> options of 
@@ -67,8 +67,8 @@ The <literal>Install For</literal> options of
 <literal>Just Me</literal> are especially for multiuser systems
 or Domain users. If you have a single-user workstation, this 
 option probably does not concern you. If you are seeking to rollout
-Cygwin on a large Domain, you will want to think carefully
-about the implications of each type and possibly consult the Cygwin
+Cygwin on a large Domain, you will want to see <Xref Linkend="ntsec">
+in the Cygwin User's Guide and possibly consult the Cygwin
 mailing list archives about others' experiences.
 </para>
 <para>
