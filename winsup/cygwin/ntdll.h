@@ -1,6 +1,6 @@
 /* ntdll.h.  Contains ntdll specific stuff not defined elsewhere.
 
-   Copyright 2000, 2001 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003 Red Hat, Inc.
 
    This file is part of Cygwin.
 

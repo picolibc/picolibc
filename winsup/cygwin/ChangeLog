@@ -1,3 +1,15 @@
+2003-01-15  Corinna Vinschen <corinna@vinschen.de>
+
+	* autoload.cc: Fix copyright date.
+	* fhandler_dsp.cc: Ditto.
+	* mmap.cc: Ditto.
+	* net.cc: Ditto.
+	* ntdll.h: Ditto.
+	* signal.cc: Ditto.
+	* syscalls.cc: Ditto.
+	* uname.cc: Ditto.
+	* wait.cc: Ditto.
+
 2003-01-14  Corinna Vinschen <corinna@vinschen.de>
 
 	* mmap.cc (fixup_mmaps_after_fork): Copy protection to child process.
