@@ -61,6 +61,13 @@ host_modules= { module= uudecode; };
 host_modules= { module= wdiff; };
 host_modules= { module= zip; no_check_cross=true; };
 host_modules= { module= zlib; no_install=true; no_check=true; };
+host_modules= { module= gdb; with_x=true; };
+host_modules= { module= expect; with_x=true; };
+host_modules= { module= guile; with_x=true; };
+host_modules= { module= tclX; with_x=true; };
+host_modules= { module= tk; with_x=true; };
+host_modules= { module= tix; with_x=true; };
+
 
 target_modules = { module= libstdc++-v3; };
 target_modules = { module= newlib; };

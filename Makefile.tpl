@@ -1,4 +1,4 @@
-[+ AutoGen5 template -*- Mode: Makefile -*-
+[+ AutoGen5 template
 in
 +]
 
@@ -85,16 +85,16 @@ INSTALL_DATA = $(INSTALL) -m 644
 
 INSTALL_DOSREL = install-dosrel-fake
 
-AS = as
-AR = ar
+AS = @AS@
+AR = @AR@
 AR_FLAGS = rc
 CC = cc
 
 # Special variables passed down in EXTRA_GCC_FLAGS.  They are defined
 # here so that they can be overridden by Makefile fragments.
 HOST_CC = $(CC_FOR_BUILD)
-BUILD_PREFIX = 
-BUILD_PREFIX_1 = loser-
+BUILD_PREFIX = @BUILD_PREFIX@
+BUILD_PREFIX_1 = @BUILD_PREFIX_1@
 
 # These flag values are normally overridden by the configure script.
 CFLAGS = -g
@@ -120,25 +120,27 @@ LIBCXXFLAGS = $(CXXFLAGS) -fno-implicit-templates
 CXXFLAGS_FOR_TARGET = $(CXXFLAGS)
 LIBCXXFLAGS_FOR_TARGET = $(CXXFLAGS_FOR_TARGET) -fno-implicit-templates
 
-DLLTOOL = dlltool
-WINDRES = windres
+DLLTOOL = @DLLTOOL@
+WINDRES = @WINDRES@
 
-NM = nm
+NM = @NM@
 
-LD = ld
+LD = @LD@
 
 # These values are substituted by configure.
 DEFAULT_YACC = @DEFAULT_YACC@
 DEFAULT_LEX = @DEFAULT_LEX@
 DEFAULT_M4 = @DEFAULT_M4@
 
-BISON = `if [ -f $$r/bison/bison ] ; then \
+BISON=@BISON@
+USUAL_BISON = `if [ -f $$r/bison/bison ] ; then \
 	    echo $$r/bison/bison -L $$s/bison/ ; \
 	 else \
 	    echo bison ; \
 	 fi`
 
-YACC = `if [ -f $$r/bison/bison ] ; then \
+YACC=@YACC@
+USUAL_YACC = `if [ -f $$r/bison/bison ] ; then \
 	    echo $$r/bison/bison -y -L $$s/bison/ ; \
 	elif [ -f $$r/byacc/byacc ] ; then \
 	    echo $$r/byacc/byacc ; \
@@ -146,7 +148,8 @@ YACC = `if [ -f $$r/bison/bison ] ; then \
 	    echo ${DEFAULT_YACC} ; \
 	fi`
 
-LEX = `if [ -f $$r/flex/flex ] ; \
+LEX=@LEX@
+USUAL_LEX = `if [ -f $$r/flex/flex ] ; \
 	then echo $$r/flex/flex ; \
 	else echo ${DEFAULT_LEX} ; fi`
 
@@ -156,7 +159,8 @@ M4 = `if [ -f $$r/m4/m4 ] ; \
 
 # For an installed makeinfo, we require it to be from texinfo 4 or
 # higher, else we use the "missing" dummy.
-MAKEINFO = `if [ -f $$r/texinfo/makeinfo/makeinfo ] ; \
+MAKEINFO=@MAKEINFO@
+USUAL_MAKEINFO = `if [ -f $$r/texinfo/makeinfo/makeinfo ] ; \
 	then echo $$r/texinfo/makeinfo/makeinfo ; \
 	else if (makeinfo --version \
 	  | egrep 'texinfo[^0-9]*([1-3][0-9]|[4-9])') >/dev/null 2>&1; \
@@ -178,7 +182,7 @@ RUNTEST = `if [ -f $$s/dejagnu/runtest ] ; \
 
 # compilers to use to create programs which must be run in the build
 # environment.
-CC_FOR_BUILD = $(CC)
+CC_FOR_BUILD = @CC_FOR_BUILD@
 CXX_FOR_BUILD = $(CXX)
 
 SUBDIRS = @configdirs@
@@ -250,9 +254,11 @@ GCJ_FOR_TARGET = @GCJ_FOR_TARGET@
 # variable is passed down to the gcc Makefile, where it is used to
 # build libgcc2.a.  We define it here so that it can itself be
 # overridden on the command line.
-GCC_FOR_TARGET = $(STAGE_CC_WRAPPER) $$r/gcc/xgcc -B$$r/gcc/ $(FLAGS_FOR_TARGET)
+GCC_FOR_TARGET=@GCC_FOR_TARGET@
+USUAL_GCC_FOR_TARGET = $(STAGE_CC_WRAPPER) $$r/gcc/xgcc -B$$r/gcc/ $(FLAGS_FOR_TARGET)
 
-AS_FOR_TARGET = ` \
+AS_FOR_TARGET=@AS_FOR_TARGET@
+USUAL_AS_FOR_TARGET = ` \
   if [ -f $$r/gas/as-new ] ; then \
     echo $$r/gas/as-new ; \
   elif [ -f $$r/gcc/xgcc ]; then \
@@ -265,7 +271,8 @@ AS_FOR_TARGET = ` \
     fi; \
   fi`
 
-LD_FOR_TARGET = ` \
+LD_FOR_TARGET=@LD_FOR_TARGET@
+USUAL_LD_FOR_TARGET = ` \
   if [ -f $$r/ld/ld-new ] ; then \
     echo $$r/ld/ld-new ; \
   elif [ -f $$r/gcc/xgcc ]; then \
@@ -278,7 +285,8 @@ LD_FOR_TARGET = ` \
     fi; \
   fi`
 
-DLLTOOL_FOR_TARGET = ` \
+DLLTOOL_FOR_TARGET=@DLLTOOL_FOR_TARGET@
+USUAL_DLLTOOL_FOR_TARGET = ` \
   if [ -f $$r/binutils/dlltool ] ; then \
     echo $$r/binutils/dlltool ; \
   else \
@@ -289,7 +297,8 @@ DLLTOOL_FOR_TARGET = ` \
     fi; \
   fi`
 
-WINDRES_FOR_TARGET = ` \
+WINDRES_FOR_TARGET=@WINDRES_FOR_TARGET@
+USUAL_WINDRES_FOR_TARGET = ` \
   if [ -f $$r/binutils/windres ] ; then \
     echo $$r/binutils/windres ; \
   else \
@@ -300,7 +309,8 @@ WINDRES_FOR_TARGET = ` \
     fi; \
   fi`
 
-AR_FOR_TARGET = ` \
+AR_FOR_TARGET=@AR_FOR_TARGET@
+USUAL_AR_FOR_TARGET = ` \
   if [ -f $$r/binutils/ar ] ; then \
     echo $$r/binutils/ar ; \
   else \
@@ -311,7 +321,8 @@ AR_FOR_TARGET = ` \
     fi; \
   fi`
 
-RANLIB_FOR_TARGET = ` \
+RANLIB_FOR_TARGET=@RANLIB_FOR_TARGET@
+USUAL_RANLIB_FOR_TARGET = ` \
   if [ -f $$r/binutils/ranlib ] ; then \
     echo $$r/binutils/ranlib ; \
   else \
@@ -326,7 +337,8 @@ RANLIB_FOR_TARGET = ` \
     fi; \
   fi`
 
-NM_FOR_TARGET = ` \
+NM_FOR_TARGET=@NM_FOR_TARGET@
+USUAL_NM_FOR_TARGET = ` \
   if [ -f $$r/binutils/nm-new ] ; then \
     echo $$r/binutils/nm-new ; \
   elif [ -f $$r/gcc/xgcc ]; then \
@@ -522,10 +534,8 @@ CONFIGURE_BUILD_MODULES = \
 
 # This is a list of the targets for all of the modules which are compiled
 # using $(FLAGS_TO_PASS).
-ALL_MODULES =[+
-    FOR host_modules +] \
-	all-[+module+][+
-    ENDFOR host_modules +] \
+ALL_MODULES = [+ FOR host_modules +][+ IF with_x +][+ ELSE with_x +]\
+	all-[+module+] [+ ENDIF with_x +][+ ENDFOR host_modules +]\
 	$(EXTRA_TARGET_HOST_ALL_MODULES)
 
 # This is a list of the check targets for all of the modules which are
@@ -541,113 +551,64 @@ NATIVE_CHECK_MODULES = \
 	check-flex \
 	check-zip
 
-CROSS_CHECK_MODULES =[+
-    FOR host_modules +][+
-        IF (not (or (exist? "no_check_cross") (exist? "no_check")))
-           +] \
-	check-[+module+][+
-        ENDIF no_check +][+
-    ENDFOR host_modules +] \
+CROSS_CHECK_MODULES = [+ FOR host_modules +][+ IF no_check  +][+ ELIF no_check_cross +][+ ELIF with_x +][+ ELSE check +]\
+	check-[+module+] [+ ENDIF no_check +][+ ENDFOR host_modules +]\
 	$(EXTRA_TARGET_HOST_CHECK_MODULES)
 
 CHECK_MODULES=$(NATIVE_CHECK_MODULES) $(CROSS_CHECK_MODULES)
 
 # This is a list of the install targets for all of the modules which are
 # compiled using $(FLAGS_TO_PASS).
-INSTALL_MODULES =[+
-    FOR host_modules+][+
-        IF (not (exist? "no_install")) +] \
-	install-[+module+][+
-        ENDIF no_install +][+
-    ENDFOR host_modules +] \
+INSTALL_MODULES = [+ FOR host_modules+][+ IF no_install +][+ ELIF with_x +][+ ELSE install +]\
+	install-[+module+] [+ ENDIF no_install +][+ ENDFOR host_modules +]\
 	$(EXTRA_TARGET_HOST_INSTALL_MODULES)
 
 # This is a list of the targets for all of the modules which are compiled
 # using $(X11_FLAGS_TO_PASS).
-ALL_X11_MODULES = \
-	all-gdb \
-	all-expect \
-	all-guile \
-	all-tclX \
-	all-tk \
-	all-tix
+ALL_X11_MODULES = [+ FOR host_modules +][+ IF with_x +]\
+	all-[+module+] [+ ENDIF with_x +][+ ENDFOR host_modules +]
 
 # This is a list of the check targets for all of the modules which are
 # compiled using $(X11_FLAGS_TO_PASS).
-CHECK_X11_MODULES = \
-	check-gdb \
-	check-guile \
-	check-expect \
-	check-tclX \
-	check-tk \
-	check-tix
+CHECK_X11_MODULES = [+ FOR host_modules +][+ IF with_x +]\
+	check-[+module+] [+ ENDIF with_x +][+ ENDFOR host_modules +]
 
 # This is a list of the install targets for all the modules which are
 # compiled using $(X11_FLAGS_TO_PASS).
-INSTALL_X11_MODULES = \
-	install-gdb \
-	install-guile \
-	install-expect \
-	install-tclX \
-	install-tk \
-	install-tix
+INSTALL_X11_MODULES = [+ FOR host_modules +][+ IF with_x +]\
+	install-[+module+] [+ ENDIF with_x +][+ ENDFOR host_modules +]
 
 # This is a list of the targets for all of the modules which are compiled
 # using $(TARGET_FLAGS_TO_PASS).
-ALL_TARGET_MODULES =[+
-    FOR target_modules +] \
-	all-target-[+module+][+
-    ENDFOR target_modules +]
+ALL_TARGET_MODULES = [+ FOR target_modules +]\
+	all-target-[+module+] [+ ENDFOR target_modules +]
 
 # This is a list of the configure targets for all of the modules which
 # are compiled using the target tools.
-CONFIGURE_TARGET_MODULES =[+
-    FOR target_modules +] \
-	configure-target-[+module+][+
-    ENDFOR target_modules +]
+CONFIGURE_TARGET_MODULES = [+ FOR target_modules +]\
+	configure-target-[+module+] [+ ENDFOR target_modules +]
 
 # This is a list of the check targets for all of the modules which are
 # compiled using $(TARGET_FLAGS_TO_PASS).
-CHECK_TARGET_MODULES =[+
-    FOR target_modules +][+
-        IF (not (exist? "no_check")) +] \
-	check-target-[+module+][+
-        ENDIF no_check +][+
-    ENDFOR target_modules +]
+CHECK_TARGET_MODULES = [+ FOR target_modules +][+ IF no_check +][+ ELSE check +]\
+	check-target-[+module+] [+ ENDIF no_check +][+ ENDFOR target_modules +]
 
 # This is a list of the install targets for all of the modules which are
 # compiled using $(TARGET_FLAGS_TO_PASS).
-INSTALL_TARGET_MODULES =[+
-    FOR target_modules +][+
-        IF (not (exist? "no_install")) +] \
-	install-target-[+module+][+
-        ENDIF no_install +][+
-    ENDFOR target_modules +]
+INSTALL_TARGET_MODULES = [+ FOR target_modules +][+ IF no_install +][+ ELSE install +]\
+	install-target-[+module+] [+ ENDIF no_install +][+ ENDFOR target_modules +]
 
 # This is a list of the targets for which we can do a clean-{target}.
-CLEAN_MODULES =[+
-    FOR host_modules +][+
-        IF (not (exist? "no_clean")) +] \
-	clean-[+module+][+
-        ENDIF no_clean +][+
-    ENDFOR host_modules +]
+CLEAN_MODULES = [+ FOR host_modules +][+ IF no_clean +][+ ELIF with_x +][+ ELSE clean +]\
+	clean-[+module+] [+ ENDIF no_clean +][+ ENDFOR host_modules +]
 
 # All of the target modules that can be cleaned
-CLEAN_TARGET_MODULES =[+
-    FOR target_modules +][+
-        IF (not (exist? "no_clean")) +] \
-	clean-target-[+module+][+
-        ENDIF no_clean +][+
-    ENDFOR target_modules +]
+CLEAN_TARGET_MODULES = [+ FOR target_modules +][+ IF no_clean +][+ ELSE clean +]\
+	clean-target-[+module+] [+ ENDIF no_clean +][+ ENDFOR target_modules +]
 
 # All of the x11 modules that can be cleaned
-CLEAN_X11_MODULES = \
-	clean-gdb \
-	clean-expect \
-	clean-guile \
-	clean-tclX \
-	clean-tk \
-	clean-tix
+CLEAN_X11_MODULES = [+ FOR host_modules +][+ IF with_x +]\
+	clean-[+module+] [+ ENDIF with_x +][+ ENDFOR host_modules +]
 
 # The target built for a native build.
 .PHONY: all.normal

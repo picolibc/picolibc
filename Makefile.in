@@ -82,16 +82,16 @@ INSTALL_DATA = $(INSTALL) -m 644
 
 INSTALL_DOSREL = install-dosrel-fake
 
-AS = as
-AR = ar
+AS = @AS@
+AR = @AR@
 AR_FLAGS = rc
 CC = cc
 
 # Special variables passed down in EXTRA_GCC_FLAGS.  They are defined
 # here so that they can be overridden by Makefile fragments.
 HOST_CC = $(CC_FOR_BUILD)
-BUILD_PREFIX = 
-BUILD_PREFIX_1 = loser-
+BUILD_PREFIX = @BUILD_PREFIX@
+BUILD_PREFIX_1 = @BUILD_PREFIX_1@
 
 # These flag values are normally overridden by the configure script.
 CFLAGS = -g
@@ -117,25 +117,27 @@ LIBCXXFLAGS = $(CXXFLAGS) -fno-implicit-templates
 CXXFLAGS_FOR_TARGET = $(CXXFLAGS)
 LIBCXXFLAGS_FOR_TARGET = $(CXXFLAGS_FOR_TARGET) -fno-implicit-templates
 
-DLLTOOL = dlltool
-WINDRES = windres
+DLLTOOL = @DLLTOOL@
+WINDRES = @WINDRES@
 
-NM = nm
+NM = @NM@
 
-LD = ld
+LD = @LD@
 
 # These values are substituted by configure.
 DEFAULT_YACC = @DEFAULT_YACC@
 DEFAULT_LEX = @DEFAULT_LEX@
 DEFAULT_M4 = @DEFAULT_M4@
 
-BISON = `if [ -f $$r/bison/bison ] ; then \
+BISON=@BISON@
+USUAL_BISON = `if [ -f $$r/bison/bison ] ; then \
 	    echo $$r/bison/bison -L $$s/bison/ ; \
 	 else \
 	    echo bison ; \
 	 fi`
 
-YACC = `if [ -f $$r/bison/bison ] ; then \
+YACC=@YACC@
+USUAL_YACC = `if [ -f $$r/bison/bison ] ; then \
 	    echo $$r/bison/bison -y -L $$s/bison/ ; \
 	elif [ -f $$r/byacc/byacc ] ; then \
 	    echo $$r/byacc/byacc ; \
@@ -143,7 +145,8 @@ YACC = `if [ -f $$r/bison/bison ] ; then \
 	    echo ${DEFAULT_YACC} ; \
 	fi`
 
-LEX = `if [ -f $$r/flex/flex ] ; \
+LEX=@LEX@
+USUAL_LEX = `if [ -f $$r/flex/flex ] ; \
 	then echo $$r/flex/flex ; \
 	else echo ${DEFAULT_LEX} ; fi`
 
@@ -153,7 +156,8 @@ M4 = `if [ -f $$r/m4/m4 ] ; \
 
 # For an installed makeinfo, we require it to be from texinfo 4 or
 # higher, else we use the "missing" dummy.
-MAKEINFO = `if [ -f $$r/texinfo/makeinfo/makeinfo ] ; \
+MAKEINFO=@MAKEINFO@
+USUAL_MAKEINFO = `if [ -f $$r/texinfo/makeinfo/makeinfo ] ; \
 	then echo $$r/texinfo/makeinfo/makeinfo ; \
 	else if (makeinfo --version \
 	  | egrep 'texinfo[^0-9]*([1-3][0-9]|[4-9])') >/dev/null 2>&1; \
@@ -175,7 +179,7 @@ RUNTEST = `if [ -f $$s/dejagnu/runtest ] ; \
 
 # compilers to use to create programs which must be run in the build
 # environment.
-CC_FOR_BUILD = $(CC)
+CC_FOR_BUILD = @CC_FOR_BUILD@
 CXX_FOR_BUILD = $(CXX)
 
 SUBDIRS = @configdirs@
@@ -247,9 +251,11 @@ GCJ_FOR_TARGET = @GCJ_FOR_TARGET@
 # variable is passed down to the gcc Makefile, where it is used to
 # build libgcc2.a.  We define it here so that it can itself be
 # overridden on the command line.
-GCC_FOR_TARGET = $(STAGE_CC_WRAPPER) $$r/gcc/xgcc -B$$r/gcc/ $(FLAGS_FOR_TARGET)
+GCC_FOR_TARGET=@GCC_FOR_TARGET@
+USUAL_GCC_FOR_TARGET = $(STAGE_CC_WRAPPER) $$r/gcc/xgcc -B$$r/gcc/ $(FLAGS_FOR_TARGET)
 
-AS_FOR_TARGET = ` \
+AS_FOR_TARGET=@AS_FOR_TARGET@
+USUAL_AS_FOR_TARGET = ` \
   if [ -f $$r/gas/as-new ] ; then \
     echo $$r/gas/as-new ; \
   elif [ -f $$r/gcc/xgcc ]; then \
@@ -262,7 +268,8 @@ AS_FOR_TARGET = ` \
     fi; \
   fi`
 
-LD_FOR_TARGET = ` \
+LD_FOR_TARGET=@LD_FOR_TARGET@
+USUAL_LD_FOR_TARGET = ` \
   if [ -f $$r/ld/ld-new ] ; then \
     echo $$r/ld/ld-new ; \
   elif [ -f $$r/gcc/xgcc ]; then \
@@ -275,7 +282,8 @@ LD_FOR_TARGET = ` \
     fi; \
   fi`
 
-DLLTOOL_FOR_TARGET = ` \
+DLLTOOL_FOR_TARGET=@DLLTOOL_FOR_TARGET@
+USUAL_DLLTOOL_FOR_TARGET = ` \
   if [ -f $$r/binutils/dlltool ] ; then \
     echo $$r/binutils/dlltool ; \
   else \
@@ -286,7 +294,8 @@ DLLTOOL_FOR_TARGET = ` \
     fi; \
   fi`
 
-WINDRES_FOR_TARGET = ` \
+WINDRES_FOR_TARGET=@WINDRES_FOR_TARGET@
+USUAL_WINDRES_FOR_TARGET = ` \
   if [ -f $$r/binutils/windres ] ; then \
     echo $$r/binutils/windres ; \
   else \
@@ -297,7 +306,8 @@ WINDRES_FOR_TARGET = ` \
     fi; \
   fi`
 
-AR_FOR_TARGET = ` \
+AR_FOR_TARGET=@AR_FOR_TARGET@
+USUAL_AR_FOR_TARGET = ` \
   if [ -f $$r/binutils/ar ] ; then \
     echo $$r/binutils/ar ; \
   else \
@@ -308,7 +318,8 @@ AR_FOR_TARGET = ` \
     fi; \
   fi`
 
-RANLIB_FOR_TARGET = ` \
+RANLIB_FOR_TARGET=@RANLIB_FOR_TARGET@
+USUAL_RANLIB_FOR_TARGET = ` \
   if [ -f $$r/binutils/ranlib ] ; then \
     echo $$r/binutils/ranlib ; \
   else \
@@ -323,7 +334,8 @@ RANLIB_FOR_TARGET = ` \
     fi; \
   fi`
 
-NM_FOR_TARGET = ` \
+NM_FOR_TARGET=@NM_FOR_TARGET@
+USUAL_NM_FOR_TARGET = ` \
   if [ -f $$r/binutils/nm-new ] ; then \
     echo $$r/binutils/nm-new ; \
   elif [ -f $$r/gcc/xgcc ]; then \
@@ -721,27 +733,27 @@ ALL_X11_MODULES = \
 	all-guile \
 	all-tclX \
 	all-tk \
-	all-tix
+	all-tix 
 
 # This is a list of the check targets for all of the modules which are
 # compiled using $(X11_FLAGS_TO_PASS).
 CHECK_X11_MODULES = \
 	check-gdb \
-	check-guile \
 	check-expect \
+	check-guile \
 	check-tclX \
 	check-tk \
-	check-tix
+	check-tix 
 
 # This is a list of the install targets for all the modules which are
 # compiled using $(X11_FLAGS_TO_PASS).
 INSTALL_X11_MODULES = \
 	install-gdb \
-	install-guile \
 	install-expect \
+	install-guile \
 	install-tclX \
 	install-tk \
-	install-tix
+	install-tix 
 
 # This is a list of the targets for all of the modules which are compiled
 # using $(TARGET_FLAGS_TO_PASS).
@@ -906,7 +918,7 @@ CLEAN_X11_MODULES = \
 	clean-guile \
 	clean-tclX \
 	clean-tk \
-	clean-tix
+	clean-tix 
 
 # The target built for a native build.
 .PHONY: all.normal

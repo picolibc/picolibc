@@ -1,3 +1,14 @@
+2002-11-29  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	(Starting slow-motion replay merge from gcc 3.4 b-i-b branch)
+	* configure: Remove 'removing', which doesn't work.  Replace $subdir
+	with . everywhere.  Replace $subdirs with ''.  Replace $makesrcdir
+	with $srcdir.  Reformat indentation.  Substitute some variables
+	formerly hard-coded in the Makefile for build=host.
+	* Makefile.tpl: Autogenerate more; make more autoconf-friendly.
+	* Makefile.def: Autogenerate more.
+	* Makefile.in: Regenerate.
+
 2002-11-13  Bruce Korb  <bkorb@gnu.org>
 
 	* Makefile.tpl: syntactic cleanup
