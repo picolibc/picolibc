@@ -184,7 +184,7 @@ class cygheap_fdmanip
   fhandler_base **fh;
   bool locked;
  public:
-  cygheap_fdmanip () {}
+  cygheap_fdmanip (): fh (NULL) {}
   virtual ~cygheap_fdmanip ()
   {
     if (locked)
@@ -198,6 +198,7 @@ class cygheap_fdmanip
   operator fhandler_base* &() {return *fh;}
   void operator = (fhandler_base *fh) {*this->fh = fh;}
   fhandler_base *operator -> () const {return *fh;}
+  bool isopen () const {return *fh;}
 };
 
 class cygheap_fdnew : public cygheap_fdmanip

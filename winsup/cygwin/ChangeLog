@@ -1,3 +1,19 @@
+2001-10-30  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.h (cygheap_fdmanip::cygheap_fdmanip): Clear fh.
+	(cygheap_fdmanip::isopen): New method.
+	* syscalls.cc (_read): Avoid accessing closed fd.
+
+	* path.h (fe_types): New enum.
+	(path_conv::set_path): New method.
+	(find_exec): Change null_if_not_found argument to something more
+	generic.
+	* spawn.cc (find_exec): Default to returning the POSIX path rather than
+	the windows path, unless instructed otherwise.
+	(spawn_guts): Force call to find_exec to use native paths.
+	* dlfcn.cc (check_path_access): Accommodate new find_exec arguments.
+	* environ.h (win_env::get_posix): New method.
+
 2001-10-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::close): Add error handling.

@@ -322,6 +322,9 @@ _read (int fd, void *ptr, size_t len)
 	  goto out;
 	}
 
+      if (!cfd.isopen())
+	return -1;
+
       /* Check to see if this is a background read from a "tty",
 	 sending a SIGTTIN, if appropriate */
       res = cfd->bg_check (SIGTTIN);
