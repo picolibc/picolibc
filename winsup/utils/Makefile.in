@@ -35,7 +35,7 @@ CXXFLAGS:=@CXXFLAGS@ -fno-exceptions -fno-rtti
 
 include $(srcdir)/../Makefile.common
 
-MINGW_INCLUDES:=-I$(mingw_source)/include -I$(cygwin_source)/include -I$(w32api_include)
+MINGW_INCLUDES:=-I$(mingw_source)/include -I$(w32api_include)
 
 libbfd:=${shell $(CC) -L$(bupdir2)/bfd --print-file-name=libbfd.a}
 libintl:=${shell $(CC) -L$(bupdir2)/intl --print-file-name=libintl.a}
@@ -43,7 +43,7 @@ build_dumper:=${shell test -r $(libbfd) && test -r ${libintl} &&  echo 1}
 
 DUMPER_INCLUDES:=-I$(bupdir2)/bfd -I$(updir1)/include
 
-MINGW_CXXFLAGS:=$(CXXFLAGS) -mno-cygwin $(MINGW_INCLUDES)
+MINGW_CXXFLAGS:=${filter-out $(newlib_source)/%,$(CXXFLAGS)} -mno-cygwin $(MINGW_INCLUDES)
 MINGW_CFLAGS:=-mno-cygwin $(MINGW_INCLUDES)
 
 libcygwin:=$(cygwin_build)/libcygwin.a
@@ -125,7 +125,7 @@ ifdef VERBOSE
 	$(COMPILE_CC) $c -o $(@D)/$(basename $@)$o $(MINGW_CFLAGS) $<
 else
 	@echo $(CC) $c -o $(@D)/$(basename $@)$o $(MINGW_CFLAGS) ... $^;\
-	$(COMPILE_CC) $c -o $(@D)/$(basename $@)$o $(MINGW_CFLAGS) $<
+	${filter-out -I$(newlib_source)/%,$(COMPILE_CC)} $c -o $(@D)/$(basename $@)$o $(MINGW_CFLAGS) $<
 endif
 
 clean:

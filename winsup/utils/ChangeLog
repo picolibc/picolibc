@@ -1,3 +1,7 @@
+Wed Sep 19 12:22:08 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Filter newlib includes from mingw compilation.
+
 2001-09-14  Egor Duda  <deo@logos-m.ru>
 
 	* dumper.cc (dumper::dumper): Print error code in case of error.
