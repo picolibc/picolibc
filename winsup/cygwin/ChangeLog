@@ -1,3 +1,21 @@
+2003-02-04  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* security.h (class cygpsid): New class.
+	(class cygsid): Use cygpsid as base. Remove members psid, get_id,
+	get_uid, get_gid, string, debug_printf and the == and != operators.
+	(cygsidlist::clear_supp): Only do work if setgroups has been called.
+	* sec_helper.cc: Define sid_auth NO_COPY.
+	(cygpsid::operator==): New operator.
+	(cygpsid::get_id): New function.
+	(cygpsid::string): New function.
+	(cygsid::string): Delete.
+	(cygsid::get_id): Delete.
+	* pwdgrp.h: Change arguments of internal_getpwsid,
+	internal_getgrsid and internal_getgroups to cygpsid.
+	* passwd.cc (internal_getpwsid): Change argument from cygsid to cygpsid.
+	* grp.cc (internal_getgrsid): Ditto. 
+	(internal_getgroups): Ditto.
+
 2003-02-03  Christopher Faylor  <cgf@redhat.com>
 
 	Eliminate most unneeded this-> pointers throughout.

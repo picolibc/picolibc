@@ -107,7 +107,7 @@ pwdgrp::read_group ()
 }
 
 struct __group32 *
-internal_getgrsid (cygsid &sid)
+internal_getgrsid (cygpsid &sid)
 {
   char sid_string[128];
 
@@ -231,7 +231,7 @@ internal_getgrent (int pos)
 }
 
 int
-internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygsid * srchsid)
+internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygpsid * srchsid)
 {
   HANDLE hToken = NULL;
   DWORD size;

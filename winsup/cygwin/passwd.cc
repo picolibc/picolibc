@@ -97,7 +97,7 @@ pwdgrp::read_passwd ()
 }
 
 struct passwd *
-internal_getpwsid (cygsid &sid)
+internal_getpwsid (cygpsid &sid)
 {
   struct passwd *pw;
   char *ptr1, *ptr2, *endptr;
