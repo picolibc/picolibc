@@ -421,6 +421,8 @@ acl_worker (const char *path, int cmd, int nentries, __aclent32_t *aclbufp,
     }
   else
     res = fh->facl (cmd, nentries, aclbufp);
+
+  delete fh;
   syscall_printf ("%d = acl (%s)", res, path);
   return res;
 }

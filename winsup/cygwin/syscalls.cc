@@ -837,6 +837,7 @@ chown_worker (const char *name, unsigned fmode, __uid32_t uid, __gid32_t gid)
   else
     res = fh->fchown (uid, gid);
 
+  delete fh;
   syscall_printf ("%d = %schown (%s,...)",
 		  res, (fmode & PC_SYM_NOFOLLOW) ? "l" : "", name);
   return res;
@@ -922,6 +923,7 @@ chmod (const char *path, mode_t mode)
   else
     res = fh->fchmod (mode);
 
+  delete fh;
   syscall_printf ("%d = chmod (%s, %p)", res, path, mode);
   return res;
 }
@@ -1070,7 +1072,7 @@ stat_worker (const char *name, struct __stat64 *buf, int nofollow)
       if (!res)
 	{
 	  if (!buf->st_ino)
-	    buf->st_ino = hash_path_name (0, fh->get_win32_name ());
+	    buf->st_ino = fh->get_namehash ();
 	  if (!buf->st_dev)
 	    buf->st_dev = fh->get_device ();
 	  if (!buf->st_rdev)
