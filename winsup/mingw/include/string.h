@@ -42,10 +42,7 @@
 
 #ifndef RC_INVOKED
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
+__BEGIN_CSTD_NAMESPACE
 /*
  * Prototypes of the ANSI Standard C library string functions.
  */
@@ -72,8 +69,10 @@ size_t	strspn (const char*, const char*);
 char*	strstr (const char*, const char*);
 char*	strtok (char*, const char*);
 size_t	strxfrm (char*, const char*, size_t);
+__END_CSTD_NAMESPACE
 
 #ifndef __STRICT_ANSI__
+__BEGIN_CGLOBAL_NAMESPACE
 /*
  * Extra non-ANSI functions provided by the CRTDLL library
  */
@@ -97,57 +96,6 @@ int  _strncoll(const char*, const char*, size_t);
 int  _strnicoll(const char*, const char*, size_t);
 #endif
 
-#endif	/* Not __STRICT_ANSI__ */
-
-/*
- * Unicode versions of the standard calls.
- */
-wchar_t* wcscat (wchar_t*, const wchar_t*);
-wchar_t* wcschr (const wchar_t*, wchar_t);
-int	wcscmp (const wchar_t*, const wchar_t*);
-int	wcscoll (const wchar_t*, const wchar_t*);
-wchar_t* wcscpy (wchar_t*, const wchar_t*);
-size_t	wcscspn (const wchar_t*, const wchar_t*);
-/* Note: No wcserror in CRTDLL. */
-size_t	wcslen (const wchar_t*);
-wchar_t* wcsncat (wchar_t*, const wchar_t*, size_t);
-int	wcsncmp(const wchar_t*, const wchar_t*, size_t);
-wchar_t* wcsncpy(wchar_t*, const wchar_t*, size_t);
-wchar_t* wcspbrk(const wchar_t*, const wchar_t*);
-wchar_t* wcsrchr(const wchar_t*, wchar_t);
-size_t	wcsspn(const wchar_t*, const wchar_t*);
-wchar_t* wcsstr(const wchar_t*, const wchar_t*);
-wchar_t* wcstok(wchar_t*, const wchar_t*);
-size_t	wcsxfrm(wchar_t*, const wchar_t*, size_t);
-
-#ifndef	__STRICT_ANSI__
-/*
- * Unicode versions of non-ANSI functions provided by CRTDLL.
- */
-
-/* NOTE: _wcscmpi not provided by CRTDLL, this define is for portability */
-#define		_wcscmpi	_wcsicmp
-
-wchar_t* _wcsdup (const wchar_t*);
-int	_wcsicmp (const wchar_t*, const wchar_t*);
-int	_wcsicoll (const wchar_t*, const wchar_t*);
-wchar_t* _wcslwr (wchar_t*);
-int	_wcsnicmp (const wchar_t*, const wchar_t*, size_t);
-wchar_t* _wcsnset (wchar_t*, wchar_t, size_t);
-wchar_t* _wcsrev (wchar_t*);
-wchar_t* _wcsset (wchar_t*, wchar_t);
-wchar_t* _wcsupr (wchar_t*);
-
-#ifdef __MSVCRT__
-int  _wcsncoll(const wchar_t*, const wchar_t*, size_t);
-int  _wcsnicoll(const wchar_t*, const wchar_t*, size_t);
-#endif
-
-
-#endif	/* Not __STRICT_ANSI__ */
-
-
-#ifndef	__STRICT_ANSI__
 #ifndef	_NO_OLDNAMES
 
 /*
@@ -174,6 +122,63 @@ char*	strupr (char*);
 void	swab (const char*, char*, size_t);
 #endif /* _UWIN */
 
+#endif	/* Not _NO_OLDNAMES */
+
+__END_CGLOBAL_NAMESPACE
+
+#endif	/* Not strict ANSI */
+
+
+#ifndef _WSTRING_DEFINED
+/*
+ * Unicode versions of the standard calls.
+ * Also in wchar.h, where they really belong.
+ */
+__BEGIN_CSTD_NAMESPACE
+wchar_t* wcscat (wchar_t*, const wchar_t*);
+wchar_t* wcschr (const wchar_t*, wchar_t);
+int	wcscmp (const wchar_t*, const wchar_t*);
+int	wcscoll (const wchar_t*, const wchar_t*);
+wchar_t* wcscpy (wchar_t*, const wchar_t*);
+size_t	wcscspn (const wchar_t*, const wchar_t*);
+/* Note: No wcserror in CRTDLL. */
+size_t	wcslen (const wchar_t*);
+wchar_t* wcsncat (wchar_t*, const wchar_t*, size_t);
+int	wcsncmp(const wchar_t*, const wchar_t*, size_t);
+wchar_t* wcsncpy(wchar_t*, const wchar_t*, size_t);
+wchar_t* wcspbrk(const wchar_t*, const wchar_t*);
+wchar_t* wcsrchr(const wchar_t*, wchar_t);
+size_t	wcsspn(const wchar_t*, const wchar_t*);
+wchar_t* wcsstr(const wchar_t*, const wchar_t*);
+wchar_t* wcstok(wchar_t*, const wchar_t*);
+size_t	wcsxfrm(wchar_t*, const wchar_t*, size_t);
+__END_CSTD_NAMESPACE
+
+#ifndef __STRICT_ANSI__
+__BEGIN_CGLOBAL_NAMESPACE
+/*
+ * Unicode versions of non-ANSI functions provided by CRTDLL.
+ */
+
+/* NOTE: _wcscmpi not provided by CRTDLL, this define is for portability */
+#define		_wcscmpi	_wcsicmp
+
+wchar_t* _wcsdup (const wchar_t*);
+int	_wcsicmp (const wchar_t*, const wchar_t*);
+int	_wcsicoll (const wchar_t*, const wchar_t*);
+wchar_t* _wcslwr (wchar_t*);
+int	_wcsnicmp (const wchar_t*, const wchar_t*, size_t);
+wchar_t* _wcsnset (wchar_t*, wchar_t, size_t);
+wchar_t* _wcsrev (wchar_t*);
+wchar_t* _wcsset (wchar_t*, wchar_t);
+wchar_t* _wcsupr (wchar_t*);
+
+#ifdef __MSVCRT__
+int  _wcsncoll(const wchar_t*, const wchar_t*, size_t);
+int  _wcsnicoll(const wchar_t*, const wchar_t*, size_t);
+#endif
+
+#ifndef __NO_OLDNAMES
 /* NOTE: There is no _wcscmpi, but this is for compatibility. */
 int	wcscmpi	(const wchar_t*, const wchar_t*);
 wchar_t* wcsdup (wchar_t*);
@@ -185,14 +190,13 @@ wchar_t* wcsnset (wchar_t*, wchar_t, size_t);
 wchar_t* wcsrev (wchar_t*);
 wchar_t* wcsset (wchar_t*, wchar_t);
 wchar_t* wcsupr (wchar_t*);
-
 #endif	/* Not _NO_OLDNAMES */
+
+__END_CGLOBAL_NAMESPACE
+
 #endif	/* Not strict ANSI */
-
-
-#ifdef __cplusplus
-}
-#endif
+#define _WSTRING_DEFINED
+#endif  /* _WSTRING_DEFINED */
 
 #endif	/* Not RC_INVOKED */
 

@@ -47,58 +47,6 @@
 
 #ifndef RC_INVOKED
 
-__BEGIN_CGLOBAL_NAMESPACE
-
-#ifndef	__STRICT_ANSI__
-
-#ifndef	_FSIZE_T_DEFINED
-typedef	unsigned long	_fsize_t;
-#define _FSIZE_T_DEFINED
-#endif
-
-#ifndef _WFINDDATA_T_DEFINED
-struct _wfinddata_t {
-    	unsigned	attrib;
-    	time_t		time_create;	/* -1 for FAT file systems */
-    	time_t		time_access;	/* -1 for FAT file systems */
-    	time_t		time_write;
-    	_fsize_t	size;
-    	wchar_t		name[FILENAME_MAX];	/* may include spaces. */
-};
-struct _wfinddatai64_t {
-    unsigned    attrib;
-    time_t      time_create;
-    time_t      time_access;
-    time_t      time_write;
-    __int64     size;
-    wchar_t     name[FILENAME_MAX];
-};
-#define _WFINDDATA_T_DEFINED
-#endif
-
-/* Wide character versions. Also defined in io.h. */
-/* CHECK: I believe these only exist in MSVCRT, and not in CRTDLL. Also
-   applies to other wide character versions? */
-#if !defined (_WIO_DEFINED)
-#if defined (__MSVCRT__)
-int	 _waccess (const wchar_t*, int);
-int	_wchmod (const wchar_t*, int);
-int	_wcreat (const wchar_t*, int);
-long	_wfindfirst (const wchar_t*, struct _wfinddata_t *);
-int	_wfindnext (long, struct _wfinddata_t *);
-int	_wunlink (const wchar_t*);
-int	_wopen (const wchar_t*, int, ...);
-int	_wsopen (const wchar_t*, int, int, ...);
-wchar_t* _wmktemp (wchar_t*);
-long	_wfindfirsti64 (const wchar_t*, struct _wfinddatai64_t*);
-int 	_wfindnexti64 (long, struct _wfinddatai64_t*);
-#endif /* defined (__MSVCRT__) */
-#define _WIO_DEFINED
-#endif /* _WIO_DEFINED */
-#endif /* __STRICT_ANSI__ */
-
-__END_CGLOBAL_NAMESPACE
-
 #ifndef _WSTDIO_DEFINED
 __BEGIN_CSTD_NAMESPACE
 /*  also in stdio.h - keep in sync */
@@ -153,17 +101,146 @@ vsnwprintf (wchar_t* s, size_t n, const wchar_t* format, __VALIST arg)
   { return _vsnwprintf ( s, n, format, arg);}
 #endif
 __END_CGLOBAL_NAMESPACE
+
 #define _WSTDIO_DEFINED
 #endif /* _WSTDIO_DEFINED */
 
-
-__BEGIN_CGLOBAL_NAMESPACE
+#ifndef _WSTRING_DEFINED
+/*
+ * Unicode versions of the standard calls.
+ * Also in stdio.h, since MSDN puts them in both headers well */ 
+ */
+__BEGIN_CSTD_NAMESPACE
+wchar_t* wcscat (wchar_t*, const wchar_t*);
+wchar_t* wcschr (const wchar_t*, wchar_t);
+int	wcscmp (const wchar_t*, const wchar_t*);
+int	wcscoll (const wchar_t*, const wchar_t*);
+wchar_t* wcscpy (wchar_t*, const wchar_t*);
+size_t	wcscspn (const wchar_t*, const wchar_t*);
+/* Note: No wcserror in CRTDLL. */
+size_t	wcslen (const wchar_t*);
+wchar_t* wcsncat (wchar_t*, const wchar_t*, size_t);
+int	wcsncmp(const wchar_t*, const wchar_t*, size_t);
+wchar_t* wcsncpy(wchar_t*, const wchar_t*, size_t);
+wchar_t* wcspbrk(const wchar_t*, const wchar_t*);
+wchar_t* wcsrchr(const wchar_t*, wchar_t);
+size_t	wcsspn(const wchar_t*, const wchar_t*);
+wchar_t* wcsstr(const wchar_t*, const wchar_t*);
+wchar_t* wcstok(wchar_t*, const wchar_t*);
+size_t	wcsxfrm(wchar_t*, const wchar_t*, size_t);
+__END_CSTD_NAMESPACE
 
 #ifndef __STRICT_ANSI__
+__BEGIN_CGLOBAL_NAMESPACE
 /*
- * wide char functions from direct.h, sys/stat.h and
- * locale.h
+ * Unicode versions of non-ANSI functions provided by CRTDLL.
  */
+
+/* NOTE: _wcscmpi not provided by CRTDLL, this define is for portability */
+#define		_wcscmpi	_wcsicmp
+
+wchar_t* _wcsdup (const wchar_t*);
+int	_wcsicmp (const wchar_t*, const wchar_t*);
+int	_wcsicoll (const wchar_t*, const wchar_t*);
+wchar_t* _wcslwr (wchar_t*);
+int	_wcsnicmp (const wchar_t*, const wchar_t*, size_t);
+wchar_t* _wcsnset (wchar_t*, wchar_t, size_t);
+wchar_t* _wcsrev (wchar_t*);
+wchar_t* _wcsset (wchar_t*, wchar_t);
+wchar_t* _wcsupr (wchar_t*);
+
+#ifdef __MSVCRT__
+int  _wcsncoll(const wchar_t*, const wchar_t*, size_t);
+int  _wcsnicoll(const wchar_t*, const wchar_t*, size_t);
+#endif
+
+#ifndef __NO_OLDNAMES
+/* NOTE: There is no _wcscmpi, but this is for compatibility. */
+int	wcscmpi	(const wchar_t*, const wchar_t*);
+wchar_t* wcsdup (wchar_t*);
+int	wcsicmp (const wchar_t*, const wchar_t*);
+int	wcsicoll (const wchar_t*, const wchar_t*);
+wchar_t* wcslwr (wchar_t*);
+int	wcsnicmp (const wchar_t*, const wchar_t*, size_t);
+wchar_t* wcsnset (wchar_t*, wchar_t, size_t);
+wchar_t* wcsrev (wchar_t*);
+wchar_t* wcsset (wchar_t*, wchar_t);
+wchar_t* wcsupr (wchar_t*);
+#endif	/* Not _NO_OLDNAMES */
+
+__END_CGLOBAL_NAMESPACE
+#endif	/* Not strict ANSI */
+
+#define _WSTRING_DEFINED
+#endif  /* _WSTRING_DEFINED */
+
+
+#ifndef __STRICT_ANSI__
+__BEGIN_CGLOBAL_NAMESPACE
+/*
+ * non_ANSI wide char functions from io.h, direct.h, sys/stat.h
+ * and locale.h
+ */
+#ifndef	_FSIZE_T_DEFINED
+typedef	unsigned long	_fsize_t;
+#define _FSIZE_T_DEFINED
+#endif
+
+#ifndef _WFINDDATA_T_DEFINED
+struct _wfinddata_t {
+    	unsigned	attrib;
+    	time_t		time_create;	/* -1 for FAT file systems */
+    	time_t		time_access;	/* -1 for FAT file systems */
+    	time_t		time_write;
+    	_fsize_t	size;
+    	wchar_t		name[FILENAME_MAX];	/* may include spaces. */
+};
+struct _wfinddatai64_t {
+    unsigned    attrib;
+    time_t      time_create;
+    time_t      time_access;
+    time_t      time_write;
+    __int64     size;
+    wchar_t     name[FILENAME_MAX];
+};
+#define _WFINDDATA_T_DEFINED
+#endif
+
+#if !defined (_WIO_DEFINED)
+/* Wide character versions from io.h  */
+#if defined (__MSVCRT__)
+int 		_waccess(const wchar_t*, int);
+int 		_wchmod(const wchar_t*, int);
+int 		_wcreat(const wchar_t*, int);
+long 		_wfindfirst(const wchar_t*, struct _wfinddata_t*);
+int 		_wfindnext(long, struct _wfinddata_t *);
+int 		_wunlink(const wchar_t*);
+int 		_wopen(const wchar_t*, int, ...);
+int 		_wsopen(const wchar_t*, int, int, ...);
+wchar_t * 	_wmktemp(wchar_t*);
+long  _wfindfirsti64(const wchar_t*, struct _wfinddatai64_t*);
+int  _wfindnexti64(long, struct _wfinddatai64_t*);
+
+#ifndef __NO_OLDNAMES
+/* Where do these live? Not in libmoldname.a nor in libmsvcrt.a */
+#if 0
+int 		waccess(const wchar_t *, int);
+int 		wchmod(const wchar_t *, int);
+int 		wcreat(const wchar_t *, int);
+long 		wfindfirst(wchar_t *, struct _wfinddata_t *);
+int 		wfindnext(long, struct _wfinddata_t *);
+int 		wunlink(const wchar_t *);
+int 		wrename(const wchar_t *, const wchar_t *);
+int 		wopen(const wchar_t *, int, ...);
+int 		wsopen(const wchar_t *, int, int, ...);
+wchar_t * 	wmktemp(wchar_t *);
+#endif
+#endif
+#endif /* defined (__MSVCRT__) */
+
+#define _WIO_DEFINED
+#endif /* _WIO_DEFINED */
+
 #ifndef _WDIRECT_DEFINED
 /* Also in direct.h */
 #ifdef __MSVCRT__ 
@@ -247,9 +324,9 @@ int	_wstati64 (const wchar_t*, struct _stati64*);
 wchar_t* _wsetlocale (int, const wchar_t*);
 #define _WLOCALE_DEFINED
 #endif
+__END_CGLOBAL_NAMESPACE
 #endif /* __STRICT_ANSI__ */
 
-__END_CGLOBAL_NAMESPACE
 
 #ifndef _WTIME_DEFINED
 __BEGIN_CGLOBAL_NAMESPACE
@@ -282,29 +359,6 @@ __END_CSTD_NAMESPACE
 #define  _WSTDLIB_DEFINED
 #endif
 
-__BEGIN_CGLOBAL_NAMESPACE
-#ifndef __STRICT_ANSI__
-#ifndef	_NO_OLDNAMES
-
-/* Wide character versions. Also declared in io.h. */
-/* CHECK: Are these in the oldnames???  NO! */
-#if (0)
-int		waccess (const wchar_t *, int);
-int		wchmod (const wchar_t *, int);
-int		wcreat (const wchar_t *, int);
-long		wfindfirst (wchar_t *, struct _wfinddata_t *);
-int		wfindnext (long, struct _wfinddata_t *);
-int		wunlink (const wchar_t *);
-int		wrename (const wchar_t *, const wchar_t *);
-int		wremove (const wchar_t *);
-int		wopen (const wchar_t *, int, ...);
-int		wsopen (const wchar_t *, int, int, ...);
-wchar_t*	wmktemp (wchar_t *);
-#endif
-#endif /* _NO_OLDNAMES */
-#endif /* not __STRICT_ANSI__ */
-
-__END_CGLOBAL_NAMESPACE
 __BEGIN_CSTD_NAMESPACE
 
 /* These are resolved by -lmsvcp60 */

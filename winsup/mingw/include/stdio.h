@@ -173,7 +173,7 @@ typedef long long fpos_t;
 typedef long	fpos_t;
 #endif
 
-#if defined __cplusplus
+#if defined (__cplusplus)  && __HAVE_STD_CXX
 namespace std
 {
   using  ::FILE;

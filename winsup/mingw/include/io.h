@@ -38,7 +38,6 @@
 /* MSVC's io.h contains the stuff from dir.h, so I will too.
  * NOTE: This also defines off_t, the file offset type, through
  *       an inclusion of sys/types.h */
-#ifndef __STRICT_ANSI__
 
 #include <sys/types.h>	/* To get time_t. */
 
@@ -156,7 +155,6 @@ int chmod (const char*, int);
 
 #endif	/* Not RC_INVOKED */
 
-#endif	/* Not __STRICT_ANSI__ */
 
 /* TODO: Maximum number of open handles has not been tested, I just set
  * it the same as FOPEN_MAX. */
@@ -223,25 +221,6 @@ int		_umask (int);
 int		_unlink (const char*);
 int		_write (int, const void*, unsigned int);
 
-/* Wide character versions. Also declared in wchar.h. */
-/* Not in crtdll.dll */
-#if !defined (_WIO_DEFINED)
-#if defined (__MSVCRT__)
-int 		_waccess(const wchar_t*, int);
-int 		_wchmod(const wchar_t*, int);
-int 		_wcreat(const wchar_t*, int);
-long 		_wfindfirst(const wchar_t*, struct _wfinddata_t*);
-int 		_wfindnext(long, struct _wfinddata_t *);
-int 		_wunlink(const wchar_t*);
-int 		_wopen(const wchar_t*, int, ...);
-int 		_wsopen(const wchar_t*, int, int, ...);
-wchar_t * 	_wmktemp(wchar_t*);
-long  _wfindfirsti64(const wchar_t*, struct _wfinddatai64_t*);
-int  _wfindnexti64(long, struct _wfinddatai64_t*);
-#endif /* defined (__MSVCRT__) */
-#define _WIO_DEFINED
-#endif /* _WIO_DEFINED */
-
 #ifndef	_NO_OLDNAMES
 /*
  * Non-underscored versions of non-ANSI functions to improve portability.
@@ -268,8 +247,25 @@ int		umask (int);
 int		unlink (const char*);
 int		write (int, const void*, unsigned int);
 #endif /* _UWIN */
+#endif	/* Not _NO_OLDNAMES */
 
 /* Wide character versions. Also declared in wchar.h. */
+/* Not in crtdll.dll */
+#if !defined (_WIO_DEFINED)
+#if defined (__MSVCRT__)
+int 		_waccess(const wchar_t*, int);
+int 		_wchmod(const wchar_t*, int);
+int 		_wcreat(const wchar_t*, int);
+long 		_wfindfirst(const wchar_t*, struct _wfinddata_t*);
+int 		_wfindnext(long, struct _wfinddata_t *);
+int 		_wunlink(const wchar_t*);
+int 		_wopen(const wchar_t*, int, ...);
+int 		_wsopen(const wchar_t*, int, int, ...);
+wchar_t * 	_wmktemp(wchar_t*);
+long  _wfindfirsti64(const wchar_t*, struct _wfinddatai64_t*);
+int  _wfindnexti64(long, struct _wfinddatai64_t*);
+
+#ifndef __NO_OLDNAMES
 /* Where do these live? Not in libmoldname.a nor in libmsvcrt.a */
 #if 0
 int 		waccess(const wchar_t *, int);
@@ -283,8 +279,11 @@ int 		wopen(const wchar_t *, int, ...);
 int 		wsopen(const wchar_t *, int, int, ...);
 wchar_t * 	wmktemp(wchar_t *);
 #endif
+#endif
+#endif /* defined (__MSVCRT__) */
 
-#endif	/* Not _NO_OLDNAMES */
+#define _WIO_DEFINED
+#endif /* _WIO_DEFINED */
 
 #ifdef	__cplusplus
 }

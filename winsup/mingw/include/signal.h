@@ -58,11 +58,6 @@
 
 #ifndef	RC_INVOKED
 
-#ifndef _SIG_ATOMIC_T_DEFINED
-typedef int sig_atomic_t;
-#define _SIG_ATOMIC_T_DEFINED
-#endif
-
 /*
  * The prototypes (below) are the easy part. The hard part is figuring
  * out what signals are available and what numbers they are assigned
@@ -84,9 +79,13 @@ typedef	void (*__p_sig_fn_t)(int);
 #define	SIG_IGN	((__p_sig_fn_t) 1)
 #define	SIG_ERR ((__p_sig_fn_t) -1)
 
-#ifdef	__cplusplus
-extern "C" {
+__BEGIN_CSTD_NAMESPACE
+
+#ifndef _SIG_ATOMIC_T_DEFINED
+typedef int sig_atomic_t;
+#define _SIG_ATOMIC_T_DEFINED
 #endif
+
 
 /*
  * Call signal to set the signal handler for signal sig to the
@@ -101,9 +100,7 @@ __p_sig_fn_t	signal(int, __p_sig_fn_t);
  */
 int	raise (int);
 
-#ifdef	__cplusplus
-}
-#endif
+__END_CSTD_NAMESPACE
 
 #endif	/* Not RC_INVOKED */
 
