@@ -133,7 +133,7 @@ set </para></listitem>
 to Cygwin version 1.1.0. Later versions use `access denied ACEs' as well
 to reflect the UNIX permissions as good as possible.</para>
 
-<para>The possible permissions on objects are more complicated than in
+<para>The possible permissions on objects are more detailed than in
 UNIX. For example, the permission to delete an object is different
 from the write permission.</para>
 
@@ -145,8 +145,9 @@ The ntsec patch tries to do this in cygwin.</para>
 
 <para>You ask "Mostly? Why mostly???" Because there's a leak in the NT model.
 I will describe that in detail in chapter 4.</para>
-<para>The creation of explicit object security is a bit complicated, so
-typically only two simple variations are used:</para>
+
+<para>Creating  explicit object security is not that easy so you will often
+see only two simple variations in use:</para>
 
 <itemizedlist spacing="compact">
 <listitem><para>default permissions, computed by the operating system </para></listitem>
@@ -155,10 +156,10 @@ typically only two simple variations are used:</para>
 
 <para>For parameters to functions that create or open securable objects another
 data structure is used, the `security attributes' (SA). This structure
-contains an SD and a flag, that specifies whether the returned handle
-to the created or opened object is inherited to child processes or not.
-This property is not important for the ntsec patch description, so in
-this document SDs and SAs are more or less identical.</para>
+contains an SD and a flag that specifies whether the returned handle
+to the object is inherited to child processes or not.
+This property is not important for the ntsec patch description so in
+this document the difference between SDs and SAs is ignored.</para>
 
 </sect2>
 
@@ -315,7 +316,7 @@ and in the gr_passwd field in <filename>/etc/group</filename>.</para>
 <itemizedlist spacing="compact">
 <listitem><para>ntsec works better in domain environments.</para></listitem>
 <listitem><para>Accounts (users and groups) may get another name in
-cygwin that their NT account name. The name in <filename>/etc/passwd</filename>
+cygwin than their NT account name. The name in <filename>/etc/passwd</filename>
 or <filename>/etc/group</filename> is transparently used by cygwin
 applications (eg. <command>chown</command>, <command>chmod</command>,
 <command>ls</command>):</para>
@@ -332,8 +333,8 @@ adminstrator::500:513::/home/root:/bin/sh
 
 <para>Caution: If you like to use the account as login account via
 <command>telnet</command> etc. you have to remain the name unchanged or
-you have to use a special version of <command>login</command> which will
-be part of the release 1.1 soon.</para></listitem>
+you have to use the special version of <command>login</command> which is
+part of the standard Cygwin distribution since 1.1.</para></listitem>
 <listitem><para>Cygwin UIDs and GIDs are now not necessarily the RID
 part of the NT SID:</para>
 
@@ -408,7 +409,7 @@ group membership of the caller.</para></listitem>
 <listitem><para>The order of ACEs is important. The system reads them
 in sequence until either any needed right is denied or all needed rights
 are granted. Later ACEs are then not taken into account.</para></listitem>
-<listitem><para>ALl access denied ACEs _should_ precede any
+<listitem><para>All access denied ACEs _should_ precede any
 access allowed ACE.</para></listitem>
 </itemizedlist>
 

@@ -1,3 +1,7 @@
+Thu Oct 26 10:00:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* ntsec.sgml: Slight changes. Fix some errors.
+
 Thu Oct 26  9:35:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* ntsec.sgml: Changed the (now incorrect) hint that ntsec only
