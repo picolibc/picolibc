@@ -25,6 +25,9 @@
 /* Define if DEBUGGING support is requested.  */
 #undef DEBUGGING
 
+/* Define if MALLOC_DEBUGGING support is requested.  */
+#undef MALLOC_DEBUG
+
 /* Define if building "extra" thread-safe Cygwin DLL.  */
 #undef _CYG_THREAD_FAILSAFE
 

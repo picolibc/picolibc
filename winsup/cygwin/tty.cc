@@ -29,14 +29,14 @@ extern fhandler_tty_master *tty_master;
 
 extern "C"
 int
-grantpt (void)
+grantpt (int fd)
 {
   return 0;
 }
 
 extern "C"
 int
-unlockpt (void)
+unlockpt (int fd)
 {
   return 0;
 }

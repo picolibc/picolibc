@@ -1,3 +1,16 @@
+2001-04-24  Egor Duda  <deo@logos-m.ru>
+
+	* dlmalloc.c: New file. Port of Doug Lea's malloc
+	* dlmalloc.h: Ditto.
+	* Makefile.in: Add support for MALLOC_DEBUG
+	* config.h.in: Ditto.
+	* winsup.h: Ditto.
+	* configure.in: Add --enable-malloc-debugging option.
+	* configure: Regenerate.
+	* debug.h: Include declarations for debugging malloc.
+	* tty.cc (grantpt): Fix definition.
+	(unlockpt): Ditto.
+
 Mon Apr 23 22:00:29 2001  Christopher Faylor <cgf@cygnus.com>
 
 	Remove trailing underscore from fhandler_base and friends, throughout.

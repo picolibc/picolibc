@@ -58,7 +58,9 @@ extern char case_folded_lower[];
 extern char case_folded_upper[];
 #define cyg_toupper(c) (case_folded_upper[(unsigned char)(c)])
 
+#ifndef MALLOC_DEBUG
 #define cfree newlib_cfree_dont_use
+#endif
 
 #define WIN32_LEAN_AND_MEAN 1
 #define _WINGDI_H

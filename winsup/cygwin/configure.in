@@ -166,6 +166,17 @@ no)	 ;;
 esac
 ])
 
+MALLOC_OFILES=
+AC_ARG_ENABLE(malloc-debugging,
+[ --enable-malloc-debugging		Build a cygwin DLL with heap sanity checking (this is very slow, use only if you have heap corruption problems)],
+[case "${enableval}" in
+yes)	 AC_DEFINE(MALLOC_DEBUG)
+	 MALLOC_OFILES=dlmalloc.o
+	 ;;
+no)	 ;;
+esac
+])
+
 AC_ARG_ENABLE(vfork,
 [ --enable-vfork		Build a cygwin DLL which uses experimental vfork code],
 [case "${enableval}" in
@@ -234,6 +245,7 @@ case "$target_cpu" in
    *)		AC_MSG_ERROR(Invalid target processor \"$target_cpu\") ;;
 esac
 
+AC_SUBST(MALLOC_OFILES)
 AC_SUBST(DLL_ENTRY)
 AC_SUBST(DEF_DLL_ENTRY)
 AC_SUBST(ALLOCA)

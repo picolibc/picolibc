@@ -9,6 +9,8 @@ details. */
 #ifndef MALLOC_DEBUG
 #define MALLOC_CHECK do {} while (0)
 #else
+#include <stdlib.h>
+#include "dlmalloc.h"
 #define MALLOC_CHECK ({\
   debug_printf ("checking malloc pool");\
   (void)mallinfo ();\

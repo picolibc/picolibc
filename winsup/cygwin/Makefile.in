@@ -111,6 +111,8 @@ EXTRA_DLL_OFILES:=${addsuffix .o,${basename ${notdir ${wildcard $(CONFIG_DIR)/*.
 
 EXTRA_OFILES=$(bupdir1)/libiberty/random.o $(bupdir1)/libiberty/strsignal.o
 
+MALLOC_OFILES=@MALLOC_OFILES@
+
 DLL_IMPORTS:=$(w32api_lib)/libkernel32.a
 
 DLL_OFILES:=assert.o autoload.o cygheap.o dcrt0.o debug.o delqueue.o dir.o \
@@ -126,7 +128,7 @@ DLL_OFILES:=assert.o autoload.o cygheap.o dcrt0.o debug.o delqueue.o dir.o \
 	smallprint.o spawn.o strace.o strsep.o sync.o syscalls.o sysconf.o \
 	syslog.o termios.o thread.o times.o tty.o uinfo.o uname.o wait.o \
 	window.o \
-	$(EXTRA_DLL_OFILES) $(EXTRA_OFILES) $(MT_SAFE_OBJECTS)
+	$(EXTRA_DLL_OFILES) $(EXTRA_OFILES) $(MALLOC_OFILES) $(MT_SAFE_OBJECTS) 
 
 GMON_OFILES:= gmon.o mcount.o profil.o
 
