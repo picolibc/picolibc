@@ -1,3 +1,11 @@
+2004-03-25  Stan Shebs  <shebs@apple.com>
+
+	Remove MPW support, no longer used.
+	* mpw-README, mpw-build.in, mpw-config.in, mpw-configure,
+	mpw-install: Remove files.
+	* src-release (DEVO_SUPPORT): Remove names of removed files.
+	* MAINTAINERS: Likewise.
+
 2004-03-24  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	* Makefile.tpl (top level bootstrap support): Remove now-unneeded
