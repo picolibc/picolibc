@@ -1,3 +1,25 @@
+2004-06-16  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winnt.h (IMAGE_ORDINAL_FLAG): Map to ...
+	(IMAGE_ORDINAL_FLAG{32,64}: New defines.
+	(IMAGE_SNAP_BY_ORDINAL): Map to ...
+	(IMAGE_SNAP_BY_ORDINAL{32,64}: New defines.
+	(IMAGE_ORDINAL): Map to ...
+	(IMAGE_ORDINAL{32,64}: New defines.
+	(IMAGE_THUNK_DATA):  Map to ...
+	(IMAGE_THUNK_DATA{32,64}: New structures.
+	(IMAGE_THUNK_DATA): Map to ...
+	(IMAGE_THUNK_DATA{32,64}: New structures.
+	(IMAGE_IMPORT_DESCRIPTOR):  Map to ...
+	(IMAGE_IMPORT_DESCRIPTOR{32,64}: New structures.
+	(IMAGE_IMAGE_TLS_DIRECTORY)  Map to ...
+	(IMAGE_IMAGE_TLS_DIRECTORY{32,64}: New structures.
+
+2004-06-16  Bang Jun-Young <junyoung@NetBSD.org>
+
+	* w32api/include/winnt.h (WAITORTIMERCALLBACKFUNC): Protect with 
+	_WIN32_WINNT >= 0x0500.
+
 2004-06-05  Luke Dunstan  <infidel@users.sourceforge.net>
 
 	* include/winbase.h (GetWriteWatch): Correct prototype.
