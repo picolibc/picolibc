@@ -16,6 +16,7 @@ details. */
 
 #ifdef _MT_SAFE
 #include "winsup.h"
+#include <limits.h>
 #include <errno.h>
 #include <assert.h>
 #include <stdlib.h>

@@ -1,3 +1,7 @@
+Thu Jan  4 10:29:54  2001  Earnie Boyd  <earnie_boyd@yahoo.com>
+
+	* thread.cc: Need LONG_MAX definition.
+
 Wed Jan  3 13:47:23 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* thread.cc (MTinterface::CreateSemaphore): Correctly set semaphore
