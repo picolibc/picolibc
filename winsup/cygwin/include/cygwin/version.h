@@ -144,10 +144,11 @@ details. */
        44: Export dirfd
        45: perprocess change, gamma_r, gammaf_r, lgamma_r, lgammaf_r
        46: Remove cygwin_getshared
+       47: Report EOTWarningZoneSize in struct mtget.
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 46
+#define CYGWIN_VERSION_API_MINOR 47
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

@@ -795,6 +795,7 @@ fhandler_dev_tape::tape_status (struct mtget *get)
   get->mt_defblksize = dp.DefaultBlockSize;
   get->mt_featureslow = dp.FeaturesLow;
   get->mt_featureshigh = dp.FeaturesHigh;
+  get->mt_eotwarningzonesize = dp.EOTWarningZoneSize;
 
   return 0;
 }
