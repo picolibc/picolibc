@@ -155,12 +155,24 @@ extern "C" int
 gettimeofday(struct timeval *tv, struct timezone *tz)
 {
   static hires gtod;
+  static tzflag;
   LONGLONG now = gtod.usecs (false);
   if (now == (LONGLONG) -1)
     return -1;
 
   tv->tv_sec = now / 1000000;
   tv->tv_usec = now % 1000000;
+
+  if (tz != NULL)
+    {
+      if (!tzflag) {
+        tzset();
+        tzflag = 1;
+      }
+      tz->tz_minuteswest = _timezone / 60;
+      tz->tz_dsttime = _daylight;
+    }
+
   return 0;
 }
 
