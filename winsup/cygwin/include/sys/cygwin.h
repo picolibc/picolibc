@@ -207,6 +207,7 @@ extern void cygwin_set_impersonation_token (const HANDLE);
 extern int cygwin32_attach_handle_to_fd (char *, int, HANDLE, mode_t, DWORD);
 extern int cygwin_attach_handle_to_fd (char *, int, HANDLE, mode_t, DWORD);
 
+#ifdef __CYGWIN__
 #include <sys/resource.h>
 
 #define TTY_CONSOLE	0x40000000
@@ -250,11 +251,10 @@ struct external_pinfo
   __uid32_t uid32;
   __gid32_t gid32;
 };
-
+#endif /*__CYGWIN__*/
 #endif /*WINVER*/
 
 #ifdef __cplusplus
 };
 #endif
-
 #endif /* _SYS_CYGWIN_H */

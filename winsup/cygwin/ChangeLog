@@ -1,5 +1,10 @@
 2003-08-31  Christopher Faylor  <cgf@redhat.com>
 
+	* include/sys/cygwin.h: Don't define cygwin-specific things if
+	!__CYGWIN__.
+
+2003-08-31  Christopher Faylor  <cgf@redhat.com>
+
 	* cygheap.cc (cygheap_init): Allocate space for sigaction array in
 	cygheap.
 	* cygheap.h (cygheap_types): Add HEAP_SIGS.
