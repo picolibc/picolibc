@@ -1,3 +1,7 @@
+Wed Aug 29  0:45:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* resource.cc (getrlimit): Return actual values on RLIMIT_STACK.
+
 Tue Aug 28 16:37:17 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* dir.cc (rmdir): Report ENOENT when file doesn't exist rather than

@@ -106,6 +106,8 @@ extern "C"
 int
 getrlimit (int resource, struct rlimit *rlp)
 {
+  MEMORY_BASIC_INFORMATION m;
+
   if (check_null_invalid_struct_errno (rlp))
     return -1;
 
@@ -117,7 +119,16 @@ getrlimit (int resource, struct rlimit *rlp)
     case RLIMIT_CPU:
     case RLIMIT_FSIZE:
     case RLIMIT_DATA:
+      break;
     case RLIMIT_STACK:
+      if (!VirtualQuery ((LPCVOID) &m, &m, sizeof m))
+	debug_printf ("couldn't get stack info, returning def.values. %E");
+      else
+        {
+	  rlp->rlim_cur = (DWORD) &m - (DWORD) m.AllocationBase;
+	  rlp->rlim_max = (DWORD) m.BaseAddress + m.RegionSize
+			  - (DWORD) m.AllocationBase;
+	}
       break;
     case RLIMIT_NOFILE:
       rlp->rlim_cur = getdtablesize ();
