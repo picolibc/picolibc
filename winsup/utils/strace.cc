@@ -43,7 +43,6 @@ static int numerror = 1;
 static int usecs = 1;
 static int delta = 1;
 static int hhmmss = 0;
-static int toggle = 0;
 static int bufsize = 0;
 static int new_window = 0;
 static long flush_period = 0;
@@ -898,6 +897,7 @@ main (int argc, char **argv)
   FILE *ofile = NULL;
   pid_t pid = 0;
   int opt;
+  int toggle = 0;
 
   if (!(pgm = strrchr (*argv, '\\')) && !(pgm = strrchr (*argv, '/')))
     pgm = *argv;
