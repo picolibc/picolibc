@@ -1,5 +1,10 @@
 2002-10-03  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/cytpe.h (_imp____mbcur_max): Add missing ';'.
+	(_imp____mbcur_max_dll): Likewise.
+
+2002-10-03  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/fcntl.h (_fmode): Remove declarations and
 	compatibility defines.
 	(_setmode, setmode): Remove prototypes.
