@@ -63,6 +63,7 @@
 #include <aclapi.h>
 #include <security.h>
 #include <schnlsp.h>
+#include <shlwapi.h>
 
 #ifndef __OBJC__  /* problems with BOOL */
 #include <ole2.h>

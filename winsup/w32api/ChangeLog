@@ -1,3 +1,11 @@
+2002-07-22  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/shlwapi.h: New file.
+	Thanks to: Mattia Barbon  <mbarbon@dsi.unive.it> and
+	Victor Porton  <porton@narod.ru> for contributions.
+	* lib/shlwapi.def: New file.
+	* lib/test.c: #include shlwapi.h.
+
 2002-07-21  Bart Oldeman  <bart.oldeman@btinternet.com>
 
 	* include/shlobj.h (FCIDM_MENU_FAVORITES): Remove bogus
