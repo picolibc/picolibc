@@ -1,3 +1,7 @@
+2003-10-13  Steven Edwards  <Steven_Ed4153@yahoo.com>
+
+	* include/winnt.h (CONTAINING_RECORD): Add macro.
+
 2003-10-13  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winnt.h: (FILE_SUPERSEDED, FILE_OPENED, FILE_CREATED,

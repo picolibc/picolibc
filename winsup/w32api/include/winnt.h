@@ -806,7 +806,13 @@ typedef DWORD FLONG;
 #define MESSAGE_RESOURCE_UNICODE 1
 #define RTL_CRITSECT_TYPE 0
 #define RTL_RESOURCE_TYPE 1
+/* Also in winddk.h */
 #define FIELD_OFFSET(t,f) ((LONG)&(((t*)0)->f))
+#ifndef CONTAINING_RECORD
+#define CONTAINING_RECORD(address, type, field) \
+  ((type*)((PCHAR)(address) - (PCHAR)(&((type *)0)->field)))
+#endif
+/* end winddk.h */
 #define IMAGE_SIZEOF_FILE_HEADER	20
 #define IMAGE_FILE_RELOCS_STRIPPED	1
 #define IMAGE_FILE_EXECUTABLE_IMAGE	2
