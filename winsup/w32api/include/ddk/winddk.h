@@ -138,8 +138,6 @@ typedef enum _MODE {
   MaximumMode
 } MODE;
 
-typedef PUNICODE_STRING PCUNICODE_STRING;
-
 typedef struct _SINGLE_LIST_ENTRY {
   struct _SINGLE_LIST_ENTRY  *Next;
 } SINGLE_LIST_ENTRY, *PSINGLE_LIST_ENTRY;

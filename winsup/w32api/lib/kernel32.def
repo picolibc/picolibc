@@ -486,6 +486,10 @@ MapUserPhysicalPagesScatter@12
 MapViewOfFile@20
 MapViewOfFileEx@24
 MapViewOfFileVlm@28
+Module32First@8
+Module32FirstW@8
+Module32Next@8
+Module32NextW@8
 MoveFileA@8
 MoveFileW@8
 MoveFileExA@12
@@ -518,6 +522,10 @@ PeekConsoleInputW@16
 PeekNamedPipe@24
 PostQueuedCompletionStatus@16
 PrepareTape@12
+Process32First@8
+Process32FirstW@8
+Process32Next@8
+Process32NextW@8
 PulseEvent@4
 PurgeComm@8
 QueryDosDeviceA@12
@@ -671,6 +679,8 @@ SystemTimeToTzSpecificLocalTime@12
 TerminateJobObject@8
 TerminateProcess@8
 TerminateThread@8
+Thread32First@8
+Thread32Next@8
 TlsAlloc@0
 TlsFree@4
 TlsGetValue@4

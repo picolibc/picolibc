@@ -1,3 +1,15 @@
+2003-03-13  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/ddk/winddk.h (PCUNICODE_STRING): Remove incorrect
+	typedef.
+
+2003-03-13  Bang Jun-Young  <junyoung@netbsd.org>
+
+	* lib/kernel32.def (Module32{First,Next}{,W}): Add missing exports.
+	(Process32{First,Next}{,W}): Ditto.
+	(Thread32{First,Next}): Ditto.
+	* include/ntdef.h (PCUNICODE_STRING): Add typedef.
+
 2003-03-12  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/mswsock.h: Correct invalid filter for _WINSOCK2_H.
