@@ -1,3 +1,8 @@
+2005-02-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* times.cc (utimes): Open files with FILE_WRITE_ATTRIBUTES first,
+	if that fails, try opeing with GENERIC_WRITE.  Fix comments.
+
 2005-02-15  Christopher Faylor  <cgf@timesys.com>
 
 	* path.h (path_conv::issocket): Return true if device == FH_UNIX rather
