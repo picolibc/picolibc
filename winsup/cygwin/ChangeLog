@@ -1,3 +1,8 @@
+2001-01-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (dtable::init_std_file_from_handle): Don't treat NULL
+	handle as errorneous.
+
 2002-01-04  Christopher Faylor  <cgf@redhat.com>
 
 	* cygmagic: Change logic for equality test.

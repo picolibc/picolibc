@@ -196,7 +196,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle, DWORD myaccess)
 
   first_fd_for_open = 0;
 
-  if (!handle || handle == INVALID_HANDLE_VALUE)
+  if (handle == INVALID_HANDLE_VALUE)
     return;
 
   if (__fmode)
