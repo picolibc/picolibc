@@ -1,3 +1,7 @@
+2002-07-25  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/oleidl.h (MK_ALT): Define.
+
 2002-07-26  Mattia Barbon  <mbarbon@dsi.unive.it>
 
 	* include/exdisp.h: New file.

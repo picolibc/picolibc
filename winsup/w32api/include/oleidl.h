@@ -9,6 +9,9 @@ extern "C" {
 #endif
 
 #include <objfwd.h>
+
+#define MK_ALT	32
+
 typedef interface IParseDisplayname *LPPARSEDISPLAYNAME;
 typedef interface IOleContainer *LPOLECONTAINER;
 typedef interface IOleClientSite *LPOLECLIENTSITE;
