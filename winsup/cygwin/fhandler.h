@@ -397,15 +397,12 @@ class fhandler_socket: public fhandler_base
   int getsockname (struct sockaddr *name, int *namelen);
   int getpeername (struct sockaddr *name, int *namelen);
 
-  int recv (void *ptr, size_t len, unsigned int flags);
   int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   int recvfrom (void *ptr, size_t len, unsigned int flags,
 		struct sockaddr *from, int *fromlen);
   int recvmsg (struct msghdr *msg, int flags);
 
-  int send (const void *ptr, size_t len, unsigned int flags);
   int write (const void *ptr, size_t len);
-
   int sendto (const void *ptr, size_t len, unsigned int flags,
 	      const struct sockaddr *to, int tolen);
   int sendmsg (const struct msghdr *msg, int flags);

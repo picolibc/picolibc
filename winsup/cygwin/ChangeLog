@@ -1,3 +1,17 @@
+2002-08-11  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* fhandler.h (fhandler_socket::recv): Remove method.
+	(fhandler_socket::send): Ditto.
+	* fhandler_socket.cc (fhandler_socket::recv): Ditto.
+	(fhandler_socket::send): Ditto.
+	(fhandler_socket::read): Delegate to fhandler_socket::recvfrom.
+	(fhandler_socket::write): Delegate to fhandler_socket::sendto.
+	(fhandler_socket::sendto): Check for null `to' address.
+	* net.cc (cygwin_sendto): Check for zero request length.
+	(cygwin_recvfrom): Ditto.  Fix signature, use void *buf.
+	(cygwin_recv): Delegate to cygwin_recvfrom.
+	(cygwin_send): Delegate to cygwin_sendto.
+
 2002-08-11  Christopher Faylor  <cgf@redhat.com>
 
 	* cygthread.cc (cygthread::cygthread): Close another race.

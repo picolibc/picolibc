@@ -574,7 +574,7 @@ cygwin_sendto (int fd, const void *buf, int len, unsigned int flags,
       || (to &&__check_invalid_read_ptr_errno (to, tolen))
       || !fh)
     res = -1;
-  else
+  else if ((res = len) != 0)
     res = fh->sendto (buf, len, flags, to, tolen);
 
   syscall_printf ("%d = sendto (%d, %x, %x, %x)", res, fd, buf, len, flags);
@@ -584,19 +584,19 @@ cygwin_sendto (int fd, const void *buf, int len, unsigned int flags,
 
 /* exported as recvfrom: standards? */
 extern "C" int
-cygwin_recvfrom (int fd, char *buf, int len, int flags, struct sockaddr *from,
+cygwin_recvfrom (int fd, void *buf, int len, int flags, struct sockaddr *from,
 		 int *fromlen)
 {
   int res;
   fhandler_socket *fh = get (fd);
 
-  if (__check_null_invalid_struct_errno (buf, (unsigned) len)
+  if ((len && __check_null_invalid_struct_errno (buf, (unsigned) len))
       || (from
 	  && (check_null_invalid_struct_errno (fromlen)
 	      ||__check_null_invalid_struct_errno (from, (unsigned) *fromlen)))
       || !fh)
     res = -1;
-  else
+  else if ((res = len) != 0)
     res = fh->recvfrom (buf, len, flags, from, fromlen);
 
   syscall_printf ("%d = recvfrom (%d, %x, %x, %x)", res, fd, buf, len, flags);
@@ -1148,32 +1148,14 @@ cygwin_getpeername (int fd, struct sockaddr *name, int *len)
 extern "C" int
 cygwin_recv (int fd, void *buf, int len, unsigned int flags)
 {
-  int res;
-  fhandler_socket *fh = get (fd);
-
-  if (__check_null_invalid_struct_errno (buf, len) || !fh)
-    res = -1;
-  else
-    res = fh->recv (buf, len, flags);
-
-  syscall_printf ("%d = recv (%d, %x, %x, %x)", res, fd, buf, len, flags);
-  return res;
+  return cygwin_recvfrom (fd, buf, len, flags, NULL, NULL);
 }
 
 /* exported as send: standards? */
 extern "C" int
 cygwin_send (int fd, const void *buf, int len, unsigned int flags)
 {
-  int res;
-  fhandler_socket *fh = get (fd);
-
-  if ((len &&__check_invalid_read_ptr_errno (buf, len)) || !fh)
-    res = -1;
-  else
-    res = fh->send (buf, len, flags);
-
-  syscall_printf ("%d = send (%d, %x, %d, %x)", res, fd, buf, len, flags);
-  return res;
+  return cygwin_sendto (fd, buf, len, flags, NULL, 0);
 }
 
 /* getdomainname: standards? */
