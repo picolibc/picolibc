@@ -1,3 +1,11 @@
+1999-07-22  Ian Lance Taylor  <ian@zembu.com>
+
+	* Makefile.in (binutils.tar.bz2): Don't pass makeall.bat and
+	configure.bat in SUPPORT_FILES.
+	(gas+binutils.tar.bz2): Likewise.
+
+	* makeall.bat: Remove; obsolete.
+
 1999-07-21  Ian Lance Taylor  <ian@zembu.com>
 
 	From Mark Elbrecht:
