@@ -218,11 +218,11 @@ tty_list::allocate_tty (int with_console)
       __small_sprintf (buf, "cygwin.find.console.%d", myself->pid);
       SetConsoleTitle (buf);
       for (int times = 0; times < 25; times++)
-        {
-          Sleep (10);
-          if ((console = FindWindow (NULL, buf)))
+	{
+	  Sleep (10);
+	  if ((console = FindWindow (NULL, buf)))
 	    break;
-        }
+	}
       SetConsoleTitle (oldtitle);
       Sleep (40);
       ReleaseMutex (title_mutex);

@@ -338,17 +338,17 @@ set_bits (select_record *me, fd_set *readfds, fd_set *writefds,
     {
       UNIX_FD_SET (me->fd, writefds);
       if (me->except_on_write && me->fh->get_device () == FH_SOCKET)
-        ((fhandler_socket *) me->fh)->set_connect_state (CONNECTED);
+	((fhandler_socket *) me->fh)->set_connect_state (CONNECTED);
       ready++;
     }
   if ((me->except_selected || me->except_on_write) && me->except_ready)
     {
       if (me->except_on_write) /* Only on sockets */
-        {
+	{
 	  UNIX_FD_SET (me->fd, writefds);
 	  if (me->fh->get_device () == FH_SOCKET)
 	    ((fhandler_socket *) me->fh)->set_connect_state (CONNECTED);
-        }
+	}
       if (me->except_selected)
 	UNIX_FD_SET (me->fd, exceptfds);
       ready++;

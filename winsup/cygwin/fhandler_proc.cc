@@ -425,7 +425,7 @@ format_proc_uptime (char *destbuf, size_t maxsize)
     {
       idle_time = spt.IdleTime.QuadPart / 100000ULL;
       uptime = (spt.KernelTime.QuadPart +
-		        spt.UserTime.QuadPart) / 100000ULL;
+			spt.UserTime.QuadPart) / 100000ULL;
     }
 
   return __small_sprintf (destbuf, "%U.%02u %U.%02u\n",

@@ -169,9 +169,9 @@ read_etc_passwd ()
 	      DWORD siz;
 
 	      if (OpenProcessToken (hMainProc, TOKEN_QUERY, &ptok))
-	        {
+		{
 		  if (GetTokenInformation (ptok, TokenUser, &tu, sizeof tu,
-		                           &siz)
+					   &siz)
 		      && GetTokenInformation (ptok, TokenPrimaryGroup, &tg,
 					      sizeof tg, &siz))
 		    {
@@ -180,16 +180,16 @@ read_etc_passwd ()
 				"%s::%lu:%lu:%s:%s:/bin/sh",
 				cygheap->user.name (),
 				*GetSidSubAuthority (tu,
-				             *GetSidSubAuthorityCount(tu) - 1),
+					     *GetSidSubAuthorityCount(tu) - 1),
 				*GetSidSubAuthority (tg,
-				             *GetSidSubAuthorityCount(tg) - 1),
+					     *GetSidSubAuthorityCount(tg) - 1),
 				tu.string (strbuf), getenv ("HOME") ?: "/");
 		      debug_printf ("Emulating /etc/passwd: %s", linebuf);
 		      add_pwd_line (linebuf);
 		      passwd_state = emulated;
 		    }
 		  CloseHandle (ptok);
-	        }
+		}
 	    }
 	  if (passwd_state != emulated)
 	    {

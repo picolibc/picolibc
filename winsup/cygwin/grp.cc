@@ -178,12 +178,12 @@ read_etc_group ()
 	      DWORD siz;
 
 	      if (OpenProcessToken (hMainProc, TOKEN_QUERY, &ptok))
-	        {
+		{
 		  if (GetTokenInformation (ptok, TokenPrimaryGroup, &tg,
 					   sizeof tg, &siz)
 		      && LookupAccountSidA (NULL, tg, group_name,
 					    &group_name_len, domain_name,
-				            &domain_name_len, &acType))
+					    &domain_name_len, &acType))
 		    {
 		      char strbuf[100];
 		      snprintf (linebuf, sizeof (linebuf), "%s:%s:%lu:",

@@ -48,7 +48,7 @@ fhandler_dev_random* entropy_source;
 /* cygwin internal: map sockaddr into internet domain address */
 static int
 get_inet_addr (const struct sockaddr *in, int inlen,
-               struct sockaddr_in *out, int *outlen, int* secret = 0)
+	       struct sockaddr_in *out, int *outlen, int* secret = 0)
 {
   int secret_buf [4];
   int* secret_ptr = (secret ? : secret_buf);
@@ -63,24 +63,24 @@ get_inet_addr (const struct sockaddr *in, int inlen,
     {
       int fd = _open (in->sa_data, O_RDONLY);
       if (fd == -1)
-        return 0;
+	return 0;
 
       int ret = 0;
       char buf[128];
       memset (buf, 0, sizeof buf);
       if (read (fd, buf, sizeof buf) != -1)
-        {
-          sockaddr_in sin;
-          sin.sin_family = AF_INET;
-          sscanf (buf + strlen (SOCKET_COOKIE), "%hu %08x-%08x-%08x-%08x",
-                  &sin.sin_port,
-                  secret_ptr, secret_ptr + 1, secret_ptr + 2, secret_ptr + 3);
-          sin.sin_port = htons (sin.sin_port);
-          sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
-          *out = sin;
-          *outlen = sizeof sin;
-          ret = 1;
-        }
+	{
+	  sockaddr_in sin;
+	  sin.sin_family = AF_INET;
+	  sscanf (buf + strlen (SOCKET_COOKIE), "%hu %08x-%08x-%08x-%08x",
+		  &sin.sin_port,
+		  secret_ptr, secret_ptr + 1, secret_ptr + 2, secret_ptr + 3);
+	  sin.sin_port = htons (sin.sin_port);
+	  sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
+	  *out = sin;
+	  *outlen = sizeof sin;
+	  ret = 1;
+	}
       _close (fd);
       return ret;
     }
@@ -507,12 +507,12 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
       ev[0] = WSACreateEvent ();
 
       if (ev[0] != WSA_INVALID_EVENT &&
-          !WSAEventSelect (get_socket (), ev[0], FD_ACCEPT))
-        {
-          WSANETWORKEVENTS sock_event;
-          int wait_result;
+	  !WSAEventSelect (get_socket (), ev[0], FD_ACCEPT))
+	{
+	  WSANETWORKEVENTS sock_event;
+	  int wait_result;
 
-          wait_result = WSAWaitForMultipleEvents (2, ev, FALSE, WSA_INFINITE,
+	  wait_result = WSAWaitForMultipleEvents (2, ev, FALSE, WSA_INFINITE,
 						  FALSE);
 	  if (wait_result == WSA_WAIT_EVENT_0)
 	    WSAEnumNetworkEvents (get_socket (), ev[0], &sock_event);

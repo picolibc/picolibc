@@ -48,8 +48,8 @@ private:
 
     attach_t (class process *const client)
       : _client (client),
-        _refcnt (0),
-        _next (NULL)
+	_refcnt (0),
+	_next (NULL)
     {}
   };
 
