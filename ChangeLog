@@ -1,3 +1,11 @@
+2004-10-05  Ulrich Weigand  <uweigand@de.ibm.com>
+
+	Merged from GCC / libtool upstream:
+	2004-10-02  P.J. Darcy  <darcypj@us.ibm.com>
+	* ltcf-c.sh (tpf*): Add ld_shlibs=yes.
+	* ltcf-cxx.sh (tpf*): Likewise.
+	* ltconfig (tpf*): Add TPF OS configuration support.
+
 2004-09-30  Tomer Levi  <Tomer.Levi@nsc.com>
 
 	* configure.in: Enable target-libgloss for crx-*-*.

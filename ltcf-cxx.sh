@@ -652,6 +652,9 @@ case $host_os in
         ;;
     esac
     ;;
+  tpf*)
+    ld_shlibs=yes
+    ;;
   unixware*)
     # FIXME: insert proper C++ library support
     ld_shlibs=no
