@@ -1252,10 +1252,10 @@ wait_subproc (VOID *)
 	    else
 	      {
 		system_printf ("nchildren %d, event[%d] %p, pchildren[%d] %p, events[0] %p, %E",
-			       nchildren, i, events[i], i, (_pinfo *) pchildren[i], events[0]);
+			       nchildren, i, events[i], i - 1, (_pinfo *) pchildren[i - 1], events[0]);
 		system_printf ("pid %d, dwProcessId %u, progname '%s'",
-			       pchildren[i]->pid, pchildren[i]->dwProcessId,
-			       pchildren[i]->progname);
+			       pchildren[i - 1]->pid, pchildren[i - 1]->dwProcessId,
+			       pchildren[i - 1]->progname);
 	      }
 	  break;
 	}
