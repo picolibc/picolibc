@@ -1,3 +1,9 @@
+2003-03-21  Martin Schwidefsky  <schwidefsky@de.ibm.com>
+
+	* s390.h (s390_opcode_arch_val): Rename to s390_opcode_mode_val.
+	(S390_OPCODE_ESAME): Rename to S390_OPCODE_ZARCH.
+	(s390_opcode): Remove architecture. Add modes and min_cpu.
+
 2003-03-17 D.Venkatasubramanian <dvenkat@noida.hcltech.com>
 
 	* h8300.h (O_SYS_CMDLINE): New pseudo opcode for command line
