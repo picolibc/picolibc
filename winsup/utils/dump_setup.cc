@@ -18,6 +18,15 @@ details. */
 #include <sys/stat.h>
 #include <errno.h>
 #include "path.h"
+#if 0
+#include "zlib.h"
+#endif
+
+#ifndef ZLIB_VERSION
+typedef void * gzFile;
+#define gzgets(fp, buf, size) ({0;})
+#define gzclose(fp) ({0;})
+#endif
 
 static int package_len = 20;
 static unsigned int version_len = 10;
@@ -234,27 +243,22 @@ file_exists (int verbose, char *filename, const char *alt, char *package)
   return true;
 }
 
-static FILE *
+static gzFile
 open_package_list (char *package)
 {
-  char filelist[MAX_PATH + 1] = "etc/setup/";
+  char filelist[MAX_PATH + 1] = "/etc/setup/";
   strcat (strcat (filelist, package), ".lst.gz");
-  if (!file_exists (false, filelist, NULL, NULL))
+  if (!file_exists (false, filelist + 1, NULL, NULL))
     return NULL;
 
-  static char *zcat;
-  static char *zcat_end;
-  if (!zcat)
-    {
-      zcat = cygpath ("/bin/gzip.exe", NULL);
-      while (char *p = strchr (zcat, '/'))
-	*p = '\\';
-      zcat = (char *) realloc (zcat, strlen (zcat) + sizeof (" -dc /") + MAX_PATH);
-      zcat_end = strchr (strcat (zcat, " -dc /"), '\0');
-    }
-
-  strcpy (zcat_end, filelist);
-  FILE *fp = popen (zcat, "rt");
+  gzFile fp;
+#ifndef ZLIB_VERSION
+  fp = NULL;
+#else
+  char *fn = cygpath (filelist, NULL);
+  fp = gzopen (fn, "rb9");
+  free (fn);
+#endif
 
   return fp;
 }
@@ -262,7 +266,7 @@ open_package_list (char *package)
 static bool
 check_package_files (int verbose, char *package)
 {
-  FILE *fp = open_package_list (package);
+  gzFile fp = open_package_list (package);
   if (!fp)
     {
       if (verbose)
@@ -272,7 +276,7 @@ check_package_files (int verbose, char *package)
 
   bool result = true;
   char buf[MAX_PATH + 1];
-  while (fgets (buf, MAX_PATH, fp))
+  while (gzgets (fp, buf, MAX_PATH))
     {
       char *filename = strtok(buf, "\n");
 
@@ -298,7 +302,7 @@ check_package_files (int verbose, char *package)
         }
     }
 
-  fclose (fp);
+  gzclose (fp);
   return result;
 }
 
@@ -414,7 +418,7 @@ package_list (int verbose, char **argv)
 
   for (int i = 0; packages[i].name; i++)
     {
-      FILE *fp = open_package_list (packages[i].name);
+      gzFile fp = open_package_list (packages[i].name);
       if (!fp)
 	{
 	  if (verbose)
@@ -427,14 +431,14 @@ package_list (int verbose, char **argv)
 	printf ("Package: %s-%s\n", packages[i].name, packages[i].ver);
 
       char buf[MAX_PATH + 1];
-      while (fgets (buf, MAX_PATH, fp))
+      while (gzgets (fp, buf, MAX_PATH))
 	{
 	  char *lastchar = strchr(buf, '\n');
 	  if (lastchar[-1] != '/')
 	    printf ("%s/%s", (verbose?"    ":""), buf);
 	}
 
-      fclose (fp);
+      gzclose (fp);
     }
 
   free (packages);
@@ -454,13 +458,13 @@ package_find (int verbose, char **argv)
 
   for (int i = 0; packages[i].name; i++)
     {
-      FILE *fp = open_package_list (packages[i].name);
+      gzFile fp = open_package_list (packages[i].name);
       if (!fp)
 	continue;
 
       char buf[MAX_PATH + 2];
       buf[0] = '/';
-      while (fgets (buf + 1, MAX_PATH, fp))
+      while (gzgets (fp, buf + 1, MAX_PATH))
 	{
 	  char *filename = strtok(buf, "\n");
 	  int flen = strlen (filename);
@@ -488,7 +492,7 @@ package_find (int verbose, char **argv)
 	    }
 	}
 
-      fclose (fp);
+      gzclose (fp);
     }
 
   free (packages);

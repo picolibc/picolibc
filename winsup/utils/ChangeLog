@@ -1,3 +1,16 @@
+2003-09-07  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Detect existence of mingw zlib headers and libraries.
+	Build cygcheck wihtout package checking if they are unavailable.
+	* dump_setup.cc: Generate dummy zlib macros when zlib is not available.
+	(open_package_list): Use zlib functions to uncompress package lists.
+	Return gzFile rather than FILE *.
+	(check_package_files): Change fp to gzFile to accommodate zlib
+	functions.  Use gzgets to read from package file.  Use gzclose to close
+	the handle.
+	(package_list): Ditto.
+	(package_find): Ditto.
+
 2003-09-05  Igor Pechtchanski  <pechtcha@cs.nyu.edu>
 
 	* dump_setup.cc (check_package_files): Don't fail on empty package.

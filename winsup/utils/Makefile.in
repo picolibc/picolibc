@@ -40,6 +40,15 @@ libbfd:=${shell $(CC) -B$(bupdir2)/bfd/ --print-file-name=libbfd.a}
 libintl:=${shell $(CC) -B$(bupdir2)/intl/ --print-file-name=libintl.a}
 build_dumper:=${shell test -r $(libbfd) && test -r ${libintl} &&  echo 1}
 
+libz:=${shell $(CC) -mno-cygwin --print-file-name=libz.a}
+zlib_h:=-include ${patsubst %/lib/libz.a,%/include/libz.h,$(libz)}
+zconf_h:=-include ${patsubst %/lib/libz.a,%/include/zconf.h,$(libz)}
+ifeq "${dir $(libz)}" "./"
+zlib_h:=
+zconf_h:=
+libz:=
+endif
+
 DUMPER_INCLUDES:=-I$(bupdir2)/bfd -I$(updir1)/include
 
 libcygwin:=$(cygwin_build)/libcygwin.a
@@ -90,11 +99,14 @@ else
 endif
 
 cygcheck.exe: cygcheck.o mingw_getopt.o path.o dump_setup.o $(MINGW_DEP_LDLIBS)
+ifeq "$(libz)" ""
+	echo '*** Building cygcheck without package content checking due to missing mingw libz.a.'
+endif
 ifdef VERBOSE
-	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,4,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
+	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,4,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS) $(libz)
 else
-	@echo $(CXX) -o $@ ${wordlist 1,2,$^} ${filter-out -B%, $(MINGW_CXXFLAGS) $(MINGW_LDFLAGS)};\
-	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,4,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
+	@echo $(CXX) -o $@ ${wordlist 1,2,$^} ${filter-out -B%, $(MINGW_CXXFLAGS) $(MINGW_LDFLAGS)} $(libz);\
+	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,4,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS) $(libz)
 endif
 
 dumper.o: dumper.cc dumper.h
@@ -139,10 +151,10 @@ endif
 
 dump_setup.o: dump_setup.cc
 ifdef VERBOSE
-	${filter-out -I$(newlib_source)/%,$(COMPILE_CXX)} $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) $<
+	${filter-out -I$(newlib_source)/%,$(COMPILE_CXX)} $(zconf_h) $(zlib_h) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) $<
 else
 	@echo $(CXX) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) ... $^;\
-	${filter-out -I$(newlib_source)/%,$(COMPILE_CXX)} $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) $<
+	${filter-out -I$(newlib_source)/%,$(COMPILE_CXX)} $(zconf_h) $(zlib_h) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) $<
 endif
 
 cygcheck.o: cygcheck.cc
