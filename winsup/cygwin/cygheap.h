@@ -1,6 +1,6 @@
 /* cygheap.h: Cygwin heap manager.
 
-   Copyright 2000, 2001 Red Hat, Inc.
+   Copyright 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 

@@ -1,6 +1,6 @@
 /* thread.h: Locking and threading module definitions
 
-   Copyright 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
    Copyright 2001 Red Hat, Inc.
 
    Written by Marco Fuykschot <marco@ddi.nl>

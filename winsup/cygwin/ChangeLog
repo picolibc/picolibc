@@ -1,11 +1,19 @@
 2002-02-10  Corinna Vinschen  <corinna@vinschen.de>
 
-	* (child_info.h, cygheap.h, dcrt0.cc, dir.cc, fhandler.cc, fhandler.h,
+	* child_info.h, cygheap.h, fhandler_clipboard.cc, fhandler_dsp.cc,
+	fhandler_floppy.cc, fhandler_mem.cc, fhandler_random.cc,
+	fhandler_tape.cc, fhandler_zero.cc, grp.cc, mmap.cc, passwd.cc,
+	pinfo.cc, pinfo.h, pipe.cc, sec_acl.cc, sec_helper.cc, security.cc,
+	security.h, thread.h, uinfo.cc, include/cygwin/acl.h: Fix copyright.
+
+2002-02-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* child_info.h, cygheap.h, dcrt0.cc, dir.cc, fhandler.cc, fhandler.h,
 	fhandler_clipboard.cc, fhandler_disk_file.cc, fhandler_dsp.cc,
 	fhandler_floppy.cc, fhandler_mem.cc, fhandler_random.cc,
 	fhandler_tape.cc, fhandler_zero.cc, grp.cc, mmap.cc, passwd.cc,
 	pinfo.cc, pinfo.h, pipe.cc, sec_acl.cc, sec_helper.cc, security.cc,
-	security.h, spawn.cc, syscalls.cc, thread.h, uinfo.cc, winsup.h):
+	security.h, spawn.cc, syscalls.cc, thread.h, uinfo.cc, winsup.h:
 	Change usage of uid_t to __uid16_t, gid_t to __gid16_t and
 	off_t to __off32_t throughout.  Use INVALID_UID, INVALID_GID and
 	INVALID_SEEK instead casting -1 to the appropriate type.

@@ -1,6 +1,6 @@
 /* fhandler_dev_clipboard: code to access /dev/clipboard
 
-   Copyright 2000, 2001 Red Hat, Inc
+   Copyright 2000, 2001, 2002 Red Hat, Inc
 
    Written by Charles Wilson (cwilson@ece.gatech.edu)
 
