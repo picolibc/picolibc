@@ -814,10 +814,10 @@ pretty_id (const char *s, char *cygwin, size_t cyglen)
     }
 
   char **ng = groups - 1;
-  size_t len_uid = strlen (uid);
-  size_t len_gid = strlen (gid);
-  *++ng = groups[0] = (char *) alloca (len_uid += sizeof ("UID: )") - 1);
-  *++ng = groups[1] = (char *) alloca (len_gid += sizeof ("GID: )") - 1);
+  size_t len_uid = strlen ("UID: ") + strlen (uid);
+  size_t len_gid = strlen ("GID: ") + strlen (gid);
+  *++ng = groups[0] = (char *) alloca (len_uid + 1);
+  *++ng = groups[1] = (char *) alloca (len_gid + 1);
   sprintf (groups[0], "UID: %s)", uid);
   sprintf (groups[1], "GID: %s)", gid);
   size_t sz = max (len_uid, len_gid);

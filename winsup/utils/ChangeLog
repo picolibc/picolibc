@@ -1,6 +1,12 @@
 2004-10-15  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
 	    Christopher Faylor  <cgf@timesys.com>
 
+	* cygcheck.cc (pretty_id): Allocate space for trailing '\0' on uid and
+	guid.
+
+2004-10-15  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
+	    Christopher Faylor  <cgf@timesys.com>
+
 	* cygcheck.cc (pretty_id): Don't exit on id error.  Fix size
 	calculations.
 
