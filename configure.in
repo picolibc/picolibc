@@ -905,13 +905,13 @@ case "${target}" in
     if [ x${is_cross_compiler} != xno ] ; then
 	   target_configdirs="${target_configdirs} target-libstub target-cygmon"
     fi
-    noconfigdirs="target-libffi"
+    noconfigdirs="$noconfigdirs target-libffi"
     ;;
   sparclite-*-*)
     if [ x${is_cross_compiler} != xno ] ; then
 	   target_configdirs="${target_configdirs} target-bsp target-libstub target-cygmon"
     fi
-    noconfigdirs="target-libffi"
+    noconfigdirs="$noconfigdirs target-libffi"
     ;;
   sparc-*-sunos4*)
     if [ x${is_cross_compiler} != xno ] ; then
@@ -956,7 +956,7 @@ case "${target}" in
   *-*-mpw*)
     # Macs want a resource compiler.
     configdirs="$configdirs grez"
-    noconfigdirs="target-libffi"
+    noconfigdirs="$noconfigdirs target-libffi"
     ;;    
 esac
 
