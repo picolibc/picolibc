@@ -215,13 +215,15 @@ cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
 void
 dtable::init_std_file_from_handle (int fd, HANDLE handle)
 {
-  const char *name;
+  const char *name = NULL;
   CONSOLE_SCREEN_BUFFER_INFO buf;
   struct sockaddr sa;
   int sal = sizeof (sa);
   DCB dcb;
   unsigned bin = O_BINARY;
+  device dev;
 
+  dev.devn = 0;		/* FIXME: device */
   first_fd_for_open = 0;
 
   if (!not_open (fd))
@@ -229,36 +231,34 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 
   SetLastError (0);
   DWORD ft = GetFileType (handle);
-  if (ft == FILE_TYPE_UNKNOWN && GetLastError () == ERROR_INVALID_HANDLE)
-    name = NULL;
-  else
+  if (ft != FILE_TYPE_UNKNOWN || GetLastError () != ERROR_INVALID_HANDLE)
     {
       /* See if we can consoleify it */
       if (GetConsoleScreenBufferInfo (handle, &buf))
 	{
 	  if (ISSTATE (myself, PID_USETTY))
-	    name = "/dev/tty";
+	    dev.parse ("/dev/tty");
 	  else
-	    name = "/dev/conout";
+	    dev = *console_dev;
 	}
       else if (GetNumberOfConsoleInputEvents (handle, (DWORD *) &buf))
 	{
 	  if (ISSTATE (myself, PID_USETTY))
-	    name = "/dev/tty";
+	    dev.parse ("/dev/tty");
 	  else
-	    name = "/dev/conin";
+	    dev = *console_dev;
 	}
       else if (ft == FILE_TYPE_PIPE)
 	{
 	  if (fd == 0)
-	    name = "/dev/piper";
+	    dev = *piper_dev;
 	  else
-	    name = "/dev/pipew";
+	    dev = *pipew_dev;
 	}
       else if (wsock_started && getpeername ((SOCKET) handle, &sa, &sal) == 0)
-	name = "/dev/socket";
+	dev = *socket_dev;
       else if (GetCommState (handle, &dcb))
-	name = "/dev/ttyS0"; // FIXME - determine correct device
+	dev.parse ("/dev/ttyS0");
       else
 	{
 	  name = handle_to_fn (handle, (char *) alloca (MAX_PATH + 100));
@@ -266,16 +266,26 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 	}
     }
 
-  if (!name)
+  if (!name && !dev)
     fds[fd] = NULL;
   else
     {
       path_conv pc;
-      fhandler_base *fh = build_fhandler_from_name (fd, name, handle, pc);
+      fhandler_base *fh;
+
+      if (dev)
+	fh = build_fhandler (fd, dev);
+      else
+	fh = build_fhandler_from_name (fd, name, handle, pc);
+
       if (!bin)
 	{
 	  bin = fh->get_default_fmode (O_RDWR);
-	  if (!bin && name != unknown_file)
+	  if (bin)
+	    /* nothing */;
+	  else if (dev)
+	    bin = O_BINARY;
+	  else if (name != unknown_file)
 	    bin = pc.binmode ();
 	}
 
@@ -299,32 +309,51 @@ dtable::build_fhandler_from_name (int fd, const char *name, HANDLE handle,
   if (!pc.exists () && handle)
     pc.fillin (handle);
 
-  fhandler_base *fh = build_fhandler (fd, pc.get_devn (),
+  fhandler_base *fh = build_fhandler (fd, pc.dev,
 				      pc.return_and_clear_normalized_path (),
-				      pc, pc.get_unitn ());
+				      pc);
   return fh;
 }
 
 fhandler_base *
-dtable::build_fhandler (int fd, DWORD dev, const char *unix_name,
-			const char *win32_name, int unit)
+dtable::build_fhandler (int fd, const device& dev, const char *unix_name,
+			const char *win32_name)
 {
-  return build_fhandler (fd, dev, cstrdup (unix_name), win32_name, unit);
+  return build_fhandler (fd, dev, cstrdup (unix_name), win32_name);
 }
 
 #define cnew(name) new ((void *) ccalloc (HEAP_FHANDLER, 1, sizeof (name))) name
 fhandler_base *
-dtable::build_fhandler (int fd, DWORD dev, char *unix_name,
-			const char *win32_name, int unit)
+dtable::build_fhandler (int fd, const device& dev, char *unix_name,
+			const char *win32_name)
 {
-  fhandler_base *fh;
+  fhandler_base *fh = NULL;
 
-  dev &= FH_DEVMASK;
-  switch (dev)
-    {
-      case FH_TTYM:
-	fh = cnew (fhandler_tty_master) (unit);
+  if (dev.upper)
+    switch (dev.major)
+      {
+      case DEV_TTYS_MAJOR:
+	fh = cnew (fhandler_tty_slave) (dev.minor);
 	break;
+      case DEV_TTYM_MAJOR:
+	fh = cnew (fhandler_tty_master) (dev.minor);
+	break;
+      case DEV_CYGDRIVE_MAJOR:
+	fh = cnew (fhandler_cygdrive) (dev.minor);
+	break;
+      case DEV_FLOPPY_MAJOR:
+      case DEV_CDROM_MAJOR:
+      case DEV_SD_MAJOR:
+      case DEV_RAWDRIVE_MAJOR:
+	fh = cnew (fhandler_dev_floppy) (dev.minor);
+	break;
+      case DEV_TAPE_MAJOR:
+	fh = cnew (fhandler_dev_tape) (dev.minor);
+	break;
+      }
+  else
+    switch (dev)
+      {
       case FH_CONSOLE:
       case FH_CONIN:
       case FH_CONOUT:
@@ -334,17 +363,11 @@ dtable::build_fhandler (int fd, DWORD dev, char *unix_name,
       case FH_PTYM:
 	fh = cnew (fhandler_pty_master) ();
 	break;
-      case FH_TTYS:
-	if (unit < 0)
-	  fh = cnew (fhandler_tty_slave) ();
-	else
-	  fh = cnew (fhandler_tty_slave) (unit);
-	break;
       case FH_WINDOWS:
 	fh = cnew (fhandler_windows) ();
 	break;
       case FH_SERIAL:
-	fh = cnew (fhandler_serial) (unit);
+	fh = cnew (fhandler_serial) (dev.minor);
 	break;
       case FH_PIPE:
       case FH_PIPER:
@@ -355,17 +378,8 @@ dtable::build_fhandler (int fd, DWORD dev, char *unix_name,
 	if ((fh = cnew (fhandler_socket) ()))
 	  inc_need_fixup_before ();
 	break;
-      case FH_DISK:
+      case FH_FS:
 	fh = cnew (fhandler_disk_file) ();
-	break;
-      case FH_CYGDRIVE:
-	fh = cnew (fhandler_cygdrive) (unit);
-	break;
-      case FH_FLOPPY:
-	fh = cnew (fhandler_dev_floppy) (unit);
-	break;
-      case FH_TAPE:
-	fh = cnew (fhandler_dev_tape) (unit);
 	break;
       case FH_NULL:
 	fh = cnew (fhandler_dev_null) ();
@@ -374,10 +388,12 @@ dtable::build_fhandler (int fd, DWORD dev, char *unix_name,
 	fh = cnew (fhandler_dev_zero) ();
 	break;
       case FH_RANDOM:
-	fh = cnew (fhandler_dev_random) (unit);
+      case FH_URANDOM:
+	fh = cnew (fhandler_dev_random) (dev.minor);
 	break;
       case FH_MEM:
-	fh = cnew (fhandler_dev_mem) (unit);
+      case FH_PORT:
+	fh = cnew (fhandler_dev_mem) (dev.minor);
 	break;
       case FH_CLIPBOARD:
 	fh = cnew (fhandler_dev_clipboard) ();
@@ -394,24 +410,39 @@ dtable::build_fhandler (int fd, DWORD dev, char *unix_name,
       case FH_PROCESS:
 	fh = cnew (fhandler_process) ();
 	break;
-      default:
-	system_printf ("internal error -- unknown device - %p", dev);
-	fh = NULL;
     }
 
+  if (!fh)
+    api_fatal ("internal error -- unknown device - %p, '%s'", (int) dev, dev.name);
+
+  char w32buf[MAX_PATH + 1];
+  if (!unix_name)
+    {
+      if (!win32_name && dev.fmt && *dev.fmt)
+	{
+	  sprintf (w32buf, dev.fmt, dev.minor);
+	  win32_name = w32buf;
+	}
+      if (win32_name)
+	{
+	  unix_name = cstrdup (w32buf);
+	  for (char *p = strchr (unix_name, '\\'); p; p = strchr (p + 1, '\\'))
+	    *p = '/';
+	}
+    }
+
+  fh->dev = dev;
   if (unix_name)
     {
-      char new_win32_name[strlen (unix_name) + 1];
       if (!win32_name)
 	{
-	  char *p;
 	  /* FIXME: ? Should we call win32_device_name here?
 	     It seems like overkill, but... */
-	  win32_name = strcpy (new_win32_name, unix_name);
-	  for (p = (char *) win32_name; (p = strchr (p, '/')); p++)
+	  win32_name = strcpy (w32buf, unix_name);
+	  for (char *p = w32buf; (p = strchr (p, '/')); p++)
 	    *p = '\\';
 	}
-      fh->set_name (unix_name, win32_name, fh->get_unit ());
+      fh->set_name (unix_name, win32_name);
     }
   debug_printf ("fd %d, fh %p", fd, fh);
   return fd >= 0 ? (fds[fd] = fh) : fh;
@@ -420,7 +451,7 @@ dtable::build_fhandler (int fd, DWORD dev, char *unix_name,
 fhandler_base *
 dtable::dup_worker (fhandler_base *oldfh)
 {
-  fhandler_base *newfh = build_fhandler (-1, oldfh->get_device ());
+  fhandler_base *newfh = build_fhandler (-1, oldfh->dev);
   *newfh = *oldfh;
   newfh->set_io_handle (NULL);
   if (oldfh->dup (newfh))
