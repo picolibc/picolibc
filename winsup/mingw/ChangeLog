@@ -1,4 +1,9 @@
 
+Tue Jan 30 07:31:22  2001  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* include/time.h: (CLOCKS_PER_SEC): Type cast the constant.
+	Thanks to: Cosmin Truta  <cosmin@cs.toronto.edu>
+
 Mon Jan 29 14:03:07  2001  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* time.h: (CLOCKS_PER_SEC) Change from FP to  integer constant.
