@@ -16,12 +16,6 @@ class wsock_event
   WSAEVENT		event;
 public:
   wsock_event () : event (NULL) {};
-  ~wsock_event ()
-    {
-      if (event)
-	WSACloseEvent (event);
-      event = NULL;
-    };
 
   /* The methods are implemented in net.cc */
   bool prepare (int sock, long event_mask);

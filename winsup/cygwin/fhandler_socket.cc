@@ -953,7 +953,8 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
 		      break;
 		    }
 		}
-	      while (!(res = wsock_evt.wait (get_socket (), has_been_closed)));
+	      while (!(res = wsock_evt.wait (get_socket (), has_been_closed))
+		     && !has_been_closed);
 	      wsock_evt.release (get_socket ());
 	    }
 	}
@@ -1088,7 +1089,8 @@ fhandler_socket::sendmsg (const struct msghdr *msg, int flags, ssize_t tot)
                       break;
                     }
                 }
-              while (!(res = wsock_evt.wait (get_socket (), has_been_closed)));
+              while (!(res = wsock_evt.wait (get_socket (), has_been_closed))
+	             && !has_been_closed);
 	      wsock_evt.release (get_socket ());
 	    }
 	}

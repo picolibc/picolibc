@@ -75,32 +75,33 @@ wsock_event::wait (int sock, int &closed)
     {
       case WSA_WAIT_EVENT_0:
         WSANETWORKEVENTS evts;
-	memset (&evts, 0, sizeof evts);
-	WSAEnumNetworkEvents (sock, event, &evts);
-	if (evts.lNetworkEvents & FD_READ)
+	if (!WSAEnumNetworkEvents (sock, event, &evts))
 	  {
-	    if (evts.iErrorCode[FD_READ_BIT])
-	      wsa_err = evts.iErrorCode[FD_READ_BIT];
-	    else
-	      ret = 0;
+	    if (evts.lNetworkEvents & FD_READ)
+	      {
+		if (evts.iErrorCode[FD_READ_BIT])
+		  wsa_err = evts.iErrorCode[FD_READ_BIT];
+		else
+		  ret = 0;
+	      }
+	    else if (evts.lNetworkEvents & FD_WRITE)
+	      {
+		if (evts.iErrorCode[FD_WRITE_BIT])
+		  wsa_err = evts.iErrorCode[FD_WRITE_BIT];
+		else
+		  ret = 0;
+	      }
+	    if (evts.lNetworkEvents & FD_CLOSE)
+	      {
+		closed = 1;
+		if (!wsa_err && evts.iErrorCode[FD_CLOSE_BIT])
+		  wsa_err = evts.iErrorCode[FD_CLOSE_BIT];
+		else
+		  ret = 0;
+	      }
+	    if (wsa_err)
+	      WSASetLastError (wsa_err);
 	  }
-	else if (evts.lNetworkEvents & FD_WRITE)
-	  {
-	    if (evts.iErrorCode[FD_WRITE_BIT])
-	      wsa_err = evts.iErrorCode[FD_WRITE_BIT];
-	    else
-	      ret = 0;
-	  }
-	if (evts.lNetworkEvents & FD_CLOSE)
-	  {
-	    closed = 1;
-	    if (!wsa_err && evts.iErrorCode[FD_CLOSE_BIT])
-	      wsa_err = evts.iErrorCode[FD_CLOSE_BIT];
-	    else
-	      ret = 0;
-	  }
-	if (wsa_err)
-	  WSASetLastError (wsa_err);
 	break;
       case WSA_WAIT_EVENT_0 + 1:
         WSASetLastError (WSAEINTR);
@@ -114,10 +115,14 @@ wsock_event::wait (int sock, int &closed)
 void
 wsock_event::release (int sock)
 {
+  int last_err = WSAGetLastError ();
   WSAEventSelect (sock, event, 0);
   WSACloseEvent (event);
   unsigned long non_block = 0;
-  ioctlsocket (sock, FIONBIO, &non_block);
+  if (ioctlsocket (sock, FIONBIO, &non_block))
+    debug_printf ("return to blocking failed: %d", WSAGetLastError ());
+  else
+    WSASetLastError (last_err);
 }
 
 WSADATA wsadata;
