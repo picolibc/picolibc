@@ -715,21 +715,19 @@ enum ansi_intensity
   INTENSITY_BOLD
 };
 
-#define normal 1
-#define gotesc 2
-#define gotsquare 3
-#define gotarg1 4
-#define gotrsquare 5
-#define gotcommand 6
-#define gettitle 7
-#define eattitle 8
+#define normal 0
+#define gotesc 1
+#define gotsquare 2
+#define gotarg1 3
+#define gotrsquare 4
+#define gotcommand 5
+#define gettitle 6
+#define eattitle 7
 #define MAXARGS 10
 
-/* This is a input and output console handle */
-class fhandler_console: public fhandler_termios
+class fhandler_console;
+class dev_console
 {
- private:
-
   WORD default_color, underline_color, dim_color;
 
   /* Used to determine if an input keystroke should be modified with META. */
@@ -777,6 +775,14 @@ class fhandler_console: public fhandler_termios
   bool insert_mode;
   bool use_mouse;
   bool raw_win32_keyboard_mode;
+  friend class fhandler_console;
+};
+
+/* This is a input and output console handle */
+class fhandler_console: public fhandler_termios
+{
+ private:
+  static dev_console *dev_state;
 
 /* Output calls */
   void set_default_attr ();
@@ -820,7 +826,7 @@ class fhandler_console: public fhandler_termios
 
   int ioctl (unsigned int cmd, void *);
   void init (HANDLE, DWORD, mode_t);
-  bool mouse_aware () {return use_mouse;}
+  bool mouse_aware () {return dev_state->use_mouse;}
 
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
@@ -830,6 +836,7 @@ class fhandler_console: public fhandler_termios
   void fixup_after_fork (HANDLE parent);
   void set_input_state ();
   void send_winch_maybe ();
+  static tty_min *get_tty_stuff (int);
 };
 
 class fhandler_tty_common: public fhandler_termios

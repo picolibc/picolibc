@@ -1,3 +1,14 @@
+2002-10-08  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.h (dev_console): New class.
+	(fhandler_console::dev_state): New class element.
+	(fhandler_console::mouse_aware): Use dev_state element.
+	(fhandler_console::get_tty_stuff): Declare new function.
+	* fhandler_console.cc: Use dev_state fhandler_console element,
+	throughout.
+	(fhandler_console::get_tty_stuff): Move to fhandler_console class.
+	Incorporate dev_console information.  Move constructor stuff here.
+
 2002-10-07  Christopher Faylor  <cgf@redhat.com>
 
 	* dtable.cc (dtable::init_std_file_from_handle): Try to mimic standard
