@@ -21,6 +21,10 @@
 start:
 _start:
 _mainCRTStartup:
+#if defined(__ELF__) && !defined(__USING_SJLJ_EXCEPTIONS__)
+	/* Annotation for EABI unwinding tables.  */
+	.fnstart
+#endif
 
 /* Start by setting up a stack */
 #ifdef ARM_RDP_MONITOR
@@ -328,6 +332,11 @@ change_back:
 	.weak FUNCTION (software_init_hook)
 #endif
 	
+#endif
+#if defined(__ELF__) && !defined(__USING_SJLJ_EXCEPTIONS__)
+	/* Protect against unhandled exceptions.  */
+	.cantunwind
+	.fnend
 #endif
 .LC1:
 	.word	__bss_start__
