@@ -1,6 +1,13 @@
 2003-11-21  Christopher Faylor  <cgf@redhat.com>
 
-	* msg.cc: Always include signal.h to handle SIGSYS raise when !USE_SERVER.
+	* sem.cc: Always include signal.h to handle SIGSYS raise when
+	!USE_SERVER.
+	* shm.cc: Ditto.
+
+2003-11-21  Christopher Faylor  <cgf@redhat.com>
+
+	* msg.cc: Always include signal.h to handle SIGSYS raise when
+	!USE_SERVER.
 
 2003-11-20  Christopher Faylor  <cgf@redhat.com>
 

@@ -10,6 +10,7 @@ details. */
 
 #include "winsup.h"
 #include "cygerrno.h"
+#include <signal.h>
 #ifdef USE_SERVER
 #include <sys/types.h>
 #include <sys/queue.h>
