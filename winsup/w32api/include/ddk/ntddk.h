@@ -67,7 +67,7 @@ typedef CONST char *PCSZ;
 #include "ntstatus.h"
 
 /* Windows NT definitions exported to user mode */
-#include "winnt.h"
+#include <winnt.h>
 
 /* Windows Device Driver Kit */
 #include "winddk.h"
