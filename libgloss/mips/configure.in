@@ -112,6 +112,11 @@ case "${target}" in
         script_list="idt pmon ddb ddb-kseg0 lsi idtecoff nullmon"
         bsp_list="libidt.a libpmon.a liblsi.a libnullmon.a"
 	;;
+  mips64vr-*-* | mips64vrel-*-*)
+	part_specific_obj="vr5xxx.o cma101.o"
+	script_list="ddb ddb-kseg0 nullmon"
+	bsp_list="libpmon.a libnullmon.a"
+	;;
   *)
         part_specific_obj="vr4300.o cma101.o"
 	part_specific_defines=

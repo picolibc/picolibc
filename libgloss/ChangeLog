@@ -1,3 +1,8 @@
+2002-01-08  Richard Sandiford  <rsandifo@redhat.com
+
+	* mips/configure.in (mips64vr-elf, mips64vrel-elf): New config.
+	* mips/configure: Regenerate.
+
 2002-01-07  Chris Demetriou  <cgd@broadcom.com>
 
 	* crt0.S: Check for definition of __mips64 rather than
