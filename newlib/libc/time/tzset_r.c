@@ -12,7 +12,7 @@ static char __tzname_dst[11];
 static char *prev_tzenv = NULL;
 
 /* default to GMT */
-char *_tzname[2] = {"GMT" "GMT"};
+char *_tzname[2] = {"GMT", "GMT"};
 int _daylight = 0;
 time_t _timezone = (time_t)0;
 
