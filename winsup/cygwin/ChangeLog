@@ -8,6 +8,8 @@
 	pointer to access_worker so that it can use the proper method for
 	determining stat information.
 	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Ditto.
+	* path.cc (path_conv::check): Add read-only attribute to /cygdrive
+	default settings.
 
 2003-12-14  Christopher Faylor  <cgf@redhat.com>
 
