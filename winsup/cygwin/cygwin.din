@@ -1308,3 +1308,9 @@ acltotext
 _acltotext = acltotext
 aclfromtext
 _aclfromtext = aclfromtext
+setprotoent = cygwin_setprotoent
+setservent = cygwin_setservent
+getservent = cygwin_getservent
+getprotoent = cygwin_getprotoent
+endprotoent = cygwin_endprotoent
+endservent = cygwin_endservent

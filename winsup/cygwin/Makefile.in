@@ -135,16 +135,15 @@ DLL_OFILES:=assert.o autoload.o cxx.o cygheap.o cygserver_client.o \
 	fhandler_raw.o fhandler_registry.o fhandler_serial.o \
 	fhandler_socket.o fhandler_tape.o fhandler_termios.o \
 	fhandler_tty.o fhandler_virtual.o fhandler_windows.o \
-	fhandler_zero.o fnmatch.o fork.o glob.o grp.o heap.o init.o \
-	ioctl.o ipc.o localtime.o malloc.o malloc_wrapper.o \
-	miscfuncs.o mmap.o msg.o net.o ntea.o passwd.o path.o pinfo.o \
-	pipe.o poll.o pthread.o regcomp.o regerror.o regexec.o \
-	regfree.o registry.o resource.o scandir.o sched.o sec_acl.o \
-	sec_helper.o security.o select.o sem.o shared.o shm.o signal.o \
-	sigproc.o smallprint.o spawn.o strace.o strsep.o sync.o \
-	syscalls.o sysconf.o syslog.o termios.o thread.o times.o tty.o \
-	uinfo.o uname.o v8_regexp.o v8_regerror.o v8_regsub.o wait.o \
-	wincap.o window.o \
+	fhandler_zero.o fnmatch.o fork.o glob.o grp.o heap.o init.o ioctl.o \
+	ipc.o localtime.o malloc.o malloc_wrapper.o miscfuncs.o mmap.o msg.o \
+	net.o netdb.o ntea.o passwd.o path.o pinfo.o pipe.o poll.o pthread.o \
+	regcomp.o regerror.o regexec.o regfree.o registry.o resource.o \
+	scandir.o sched.o sec_acl.o sec_helper.o security.o select.o sem.o \
+	shared.o shm.o signal.o sigproc.o smallprint.o spawn.o strace.o \
+	strsep.o sync.o syscalls.o sysconf.o syslog.o termios.o thread.o \
+	times.o tty.o uinfo.o uname.o v8_regexp.o v8_regerror.o v8_regsub.o \
+	wait.o wincap.o window.o \
 	$(EXTRA_DLL_OFILES) $(EXTRA_OFILES) $(MALLOC_OFILES) $(MT_SAFE_OBJECTS)
 
 GMON_OFILES:=gmon.o mcount.o profil.o

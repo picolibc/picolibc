@@ -1,3 +1,10 @@
+2002-12-04  Craig McGeachie  <slapdau@yahoo.com.au>
+
+	* netdb.cc: New file.
+	* Makeile.in (DLL_OFILES): Add reference to the new netdb.cc file.
+	* cygwin.din : Add new aliased exports for service and protocol
+	enumerations in netdb.cc.
+
 2002-11-26  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* cxx.cc: New file. Implement new, new[], delete and delete[]
