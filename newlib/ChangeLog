@@ -1,5 +1,11 @@
 2001-02-08  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/include/sys/stat.h: Must revert change for mknod
+	for CYGWIN until winsup/cygwin/syscalls.cc changes mknod
+	prototype.
+
+2001-02-08  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/include/stdio.h: Revert putw prototype.
 
 2001-02-08  Edward M. Lee  <tailbert@yahoo.com>
