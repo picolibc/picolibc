@@ -284,8 +284,6 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   if (fixup_mmaps_after_fork (hParent))
     api_fatal ("recreate_mmaps_after_fork_failed");
 
-  pinfo_fixup_after_fork ();
-
   MALLOC_CHECK;
 
   /* If we haven't dynamically loaded any dlls, just signal
@@ -308,6 +306,7 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
     api_fatal ("recreate_shm areas after fork failed");
 
   cygthread::init ();
+  pinfo_fixup_after_fork ();
   signal_fixup_after_fork ();
 
   /* Set thread local stuff to zero.  Under Windows 95/98 this is sometimes

@@ -1,3 +1,8 @@
+2002-10-19  Christopher Faylor  <cgf@redhat.com>
+
+	* fork.cc (fork_child): Move pinfo fixup later to attempt some minor
+	gains from concurrency from cythread::init.
+
 2002-10-18  Christopher Faylor  <cgf@redhat.com>
 
 	* dcrt0.cc (dll_crt0_1): Initialize cygwin threads here only when not
