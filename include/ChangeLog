@@ -1,3 +1,7 @@
+2003-09-15  Daniel Jacobowitz  <drow@mvista.com>
+
+	* floatformat.h (floatformat_is_valid): Add prototype.
+
 2003-08-27  Andrew Cagney  <cagney@redhat.com>
 
 	* dis-asm.h (init_disassemble_info): Declare.
