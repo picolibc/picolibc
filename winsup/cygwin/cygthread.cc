@@ -297,7 +297,7 @@ cygthread::detach (HANDLE sigwait)
 	  else
 	    {
 	      terminate_thread ();
-	      set_errno (EINTR);	/* caller should be dealing with return
+	      set_sig_errno (EINTR);	/* caller should be dealing with return
 					   values. */
 	      avail = 0;
 	      signalled = true;

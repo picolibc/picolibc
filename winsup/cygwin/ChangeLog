@@ -1,3 +1,8 @@
+2002-12-25  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::detach): Set errno with set_sig_errno so
+	that EINTR is properly restored after signal.
+
 2002-12-21  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in: Default fhandler objects to -fomit-frame-pointer.
