@@ -1,3 +1,7 @@
+2000-07-13  DJ Delorie  <dj@cygnus.com>
+
+	* libc/stdio/vfprintf.c: pad 0.0 correctly with %e
+
 Wed Jun 28 14:08:00 2000  Keith Walker  <keith.walker@arm.com>
 
 	* libc/sys/arm/crt0.S (.LC30): Added missing length parameter
