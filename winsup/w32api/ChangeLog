@@ -1,4 +1,9 @@
 
+Tue Jan 30 09:35:30  2001  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* include/iptypes.h: Include <sys/types.h> for time_t declaration.
+	Fix typo's.
+
 Tue Jan 30 08:30:33  2001  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* objidl.h: (GetClassID): Argument needs to be a pointer.

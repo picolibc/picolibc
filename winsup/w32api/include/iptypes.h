@@ -1,5 +1,6 @@
 #ifndef _IPTYPES_H
 #define _IPTYPES_H
+#include <sys/types.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -24,13 +25,13 @@ typedef struct {
   char String[16];
 } IP_ADDRESS_STRING, *PIP_ADDRESS_STRING, IP_MASK_STRING, *PIP_MASK_STRING;
 typedef struct _IP_ADDR_STRING {
-  struct __IP_ADDR_STRING* Next;
+  struct _IP_ADDR_STRING* Next;
   IP_ADDRESS_STRING IpAddress;
   IP_MASK_STRING IpMask;
   DWORD Context;
 } IP_ADDR_STRING, *PIP_ADDR_STRING;
 typedef struct _IP_ADAPTER_INFO {
-  struct __IP_ADAPTER_INFO* Next;
+  struct _IP_ADAPTER_INFO* Next;
   DWORD ComboIndex;
   char AdapterName[MAX_ADAPTER_NAME_LENGTH+4];
   char Description[MAX_ADAPTER_DESCRIPTION_LENGTH+4];
