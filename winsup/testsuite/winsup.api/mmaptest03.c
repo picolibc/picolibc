@@ -40,7 +40,7 @@ main(int argc, char **argv)
 {
   int fd, status;
   struct stat statbuf;
-  char c, *buf1, *buf2;
+  volatile char c, *buf1, *buf2;
   pid_t pid;
 
   /* Create data file */
@@ -96,7 +96,7 @@ main(int argc, char **argv)
   if (setjmp (r))
     perror_exit (pid ? "SEGV in parent's munmap" : "SEGV in child's munmap");
 
-  if (munmap(buf1, statbuf.st_size))
+  if (munmap((void *) buf1, statbuf.st_size))
     perror_exit (pid ? "munmap failed in parent" : "munmap failed in child");
 
   if (setjmp (r) == 0)
@@ -113,7 +113,7 @@ main(int argc, char **argv)
   if (setjmp (r))
     perror_exit (pid ? "SEGV in parent's munmap" : "SEGV in child's munmap");
 
-  if (munmap(buf2, statbuf.st_size))
+  if (munmap((void *) buf2, statbuf.st_size))
     perror_exit (pid ? "munmap failed in parent" : "munmap failed in child");
 
   if (pid)

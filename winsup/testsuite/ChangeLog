@@ -1,5 +1,10 @@
 2003-01-23  Christopher Faylor  <cgf@redhat.com>
 
+	* winsup.api/mmaptest03.c (main): Mark variables as volatile to avoid
+	optimization induced problems.
+
+2003-01-23  Christopher Faylor  <cgf@redhat.com>
+
 	* Makefile (check): Add cygrun.exe dependency.
 
 2003-01-23  Christopher Faylor  <cgf@redhat.com>
