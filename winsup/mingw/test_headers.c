@@ -36,7 +36,6 @@
 #include <time.h>
 #include <unistd.h>
 #include <values.h>
-#include <varargs.h>
 #include <wchar.h>
 #include <wctype.h>
 #include <sys/fcntl.h>

@@ -260,7 +260,7 @@ crt1.o dllcrt1.o:
 crt2.o dllcrt2.o:
 	$(CC) -c -D__MSVCRT__ -U__CRTDLL__ $(ALL_CFLAGS) $< -o $@
 
-TEST_H_OPTIONS = $(ALL_CFLAGS) -Wall  -Wsystem-headers -c \
+TEST_H_OPTIONS = $(ALL_CFLAGS) -Wall -W -Wsystem-headers -c \
 	$(srcdir)/test_headers.c -o test_headers.o
 
 .PHONY: test_headers
@@ -268,12 +268,16 @@ test_headers:
 	@echo "Testing runtime headers..."
 	@for lang in c c++ objective-c ; do \
 		echo "$$lang ..."; \
-		$(CC) -x$$lang -std=c89 $(TEST_H_OPTIONS) ; \
-		echo "$$lang c89 ..."; \
-		$(CC) -x$$lang -std=c89 $(TEST_H_OPTIONS) ; \
-		echo "$$lang c99..."; \
-		$(CC) -x$$lang -std=c99  $(TEST_H_OPTIONS) ; \
+		$(CC) -x$$lang  $(TEST_H_OPTIONS) ; \
+		echo "$$lang -ansi"; \
+		$(CC) -x$$lang -ansi $(TEST_H_OPTIONS) ; \
 	done
+# specify -std=xx only for C
+	@for std in gnu89 gnu99 c89 c99 ; do \
+		echo "std = $$std"; \
+		$(CC) -std=$$std  $(TEST_H_OPTIONS) ; \
+	done
+
 	@rm -f test_headers.o
 
 clean:
