@@ -1,3 +1,9 @@
+2001-11-13  Zack Weinberg <zack@codesourcery.com>
+	    Alan Modra  <amodra@bigpond.net.au>
+
+	* i386.h (i386_optab): Add entries for "sldr", "smsw" and "str" to
+	accept WordReg.
+
 2001-11-04  Chris Demetriou  <cgd@broadcom.com>
 
 	* mips.h (OPCODE_IS_MEMBER): Remove extra space.
