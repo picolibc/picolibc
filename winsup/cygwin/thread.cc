@@ -213,6 +213,10 @@ void
 MTinterface::fixup_after_fork (void)
 {
   pthread_key::fixup_after_fork ();
+
+  threadcount = 1;
+  pthread::initMainThread (true);
+
   pthread_mutex *mutex = mutexs;
   debug_printf ("mutexs is %x",mutexs);
   while (mutex)
@@ -234,10 +238,6 @@ MTinterface::fixup_after_fork (void)
       sem->fixup_after_fork ();
       sem = sem->next;
     }
-
-  pthread::initMainThread (true);
-
-  threadcount = 1;
 }
 
 /* pthread calls */

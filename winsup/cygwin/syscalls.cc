@@ -139,31 +139,31 @@ unlink (const char *ourname)
       goto done;
     }
 
-  /* Check for shortcut as symlink condition. */
-  if (win32_name.has_attribute (FILE_ATTRIBUTE_READONLY))
+  SetFileAttributes (win32_name, (DWORD) win32_name & ~(FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM));
+  /* Attempt to use "delete on close" semantics to handle removing
+     a file which may be open. */
+  HANDLE h;
+  h = CreateFile (win32_name, GENERIC_READ, FILE_SHARE_DELETE, &sec_none_nih,
+		  OPEN_EXISTING, FILE_FLAG_DELETE_ON_CLOSE, 0);
+
+  (void) SetFileAttributes (win32_name, (DWORD) win32_name);
+  (void) DeleteFile (win32_name);
+  DWORD lasterr;
+  lasterr = GetLastError ();
+  if (h != INVALID_HANDLE_VALUE)
+    CloseHandle (h);
+
+  if (GetFileAttributes (win32_name) == INVALID_FILE_ATTRIBUTES
+      || (!win32_name.isremote () && wincap.has_delete_on_close ()))
     {
-      int len = strlen (win32_name);
-      if (len > 4 && strcasematch ((char *) win32_name + len - 4, ".lnk"))
-	SetFileAttributes (win32_name, (DWORD) win32_name & ~FILE_ATTRIBUTE_READONLY);
+      syscall_printf ("DeleteFile succeeded");
+      goto ok;
     }
 
-  DWORD lasterr;
-  lasterr = 0;
-  for (int i = 0; i < 2; i++)
+  if (DeleteFile (win32_name))
     {
-      if (DeleteFile (win32_name))
-	{
-	  syscall_printf ("DeleteFile succeeded");
-	  goto ok;
-	}
-
-      lasterr = GetLastError ();
-      if (i || lasterr != ERROR_ACCESS_DENIED || win32_name.issymlink ())
-	break;		/* Couldn't delete it. */
-
-      /* if access denied, chmod to be writable, in case it is not,
-	 and try again */
-      (void) chmod (win32_name, 0777);
+      syscall_printf ("DeleteFile after CreateFile/ClosHandle succeeded");
+      goto ok;
     }
 
   /* Windows 9x seems to report ERROR_ACCESS_DENIED rather than sharing
@@ -172,45 +172,6 @@ unlink (const char *ourname)
   if (wincap.access_denied_on_delete () && lasterr == ERROR_ACCESS_DENIED
       && !win32_name.isremote ())
     lasterr = ERROR_SHARING_VIOLATION;
-
-  /* Tried to delete file by normal DeleteFile and by resetting protection
-     and then deleting.  That didn't work.
-
-     There are two possible reasons for this:  1) The file may be opened and
-     Windows is not allowing it to be deleted, or 2) We may not have permissions
-     to delete the file.
-
-     So, first assume that it may be 1) and try to remove the file using the
-     Windows FILE_FLAG_DELETE_ON_CLOSE semantics.  This seems to work only
-     spottily on Windows 9x/Me but it does seem to work reliably on NT as
-     long as the file doesn't exist on a remote drive. */
-
-  bool delete_on_close_ok;
-
-  delete_on_close_ok  = !win32_name.isremote ()
-			&& wincap.has_delete_on_close ();
-
-  /* Attempt to use "delete on close" semantics to handle removing
-     a file which may be open. */
-  HANDLE h;
-  h = CreateFile (win32_name, GENERIC_READ, FILE_SHARE_READ, &sec_none_nih,
-		  OPEN_EXISTING, FILE_FLAG_DELETE_ON_CLOSE, 0);
-  if (h == INVALID_HANDLE_VALUE)
-    {
-      if (GetLastError () == ERROR_FILE_NOT_FOUND)
-	goto ok;
-    }
-  else
-    {
-      CloseHandle (h);
-      syscall_printf ("CreateFile/CloseHandle succeeded");
-      /* Everything is fine if the file has disappeared or if we know that the
-	 FILE_FLAG_DELETE_ON_CLOSE will eventually work. */
-      if (GetFileAttributes (win32_name) == INVALID_FILE_ATTRIBUTES
-	  || delete_on_close_ok)
-	goto ok;	/* The file is either gone already or will eventually be
-			   deleted by the OS. */
-    }
 
   /* FILE_FLAGS_DELETE_ON_CLOSE was a bust.  If this is a sharing
      violation, then queue the file for deletion when the process
@@ -629,8 +590,9 @@ link (const char *a, const char *b)
 {
   int res = -1;
   sigframe thisframe (mainthread);
-  path_conv real_a (a, PC_SYM_FOLLOW | PC_FULL);
+  path_conv real_a (a, PC_SYM_NOFOLLOW | PC_FULL);
   path_conv real_b (b, PC_SYM_NOFOLLOW | PC_FULL);
+  extern BOOL allow_winsymlinks;
 
   if (real_a.error)
     {
@@ -658,14 +620,20 @@ link (const char *a, const char *b)
       goto done;
     }
 
+  /* Shortcut hack. */
+  char new_lnk_buf[MAX_PATH + 5];
+  if (allow_winsymlinks && real_a.is_lnk_symlink () && !real_b.case_clash)
+    {
+      strcpy (new_lnk_buf, b);
+      strcat (new_lnk_buf, ".lnk");
+      b = new_lnk_buf;
+      real_b.check (b, PC_SYM_NOFOLLOW | PC_FULL);
+    }
   /* Try to make hard link first on Windows NT */
   if (wincap.has_hard_links ())
     {
       if (CreateHardLinkA (real_b, real_a, NULL))
-	{
-	  res = 0;
-	  goto done;
-	}
+	goto success;
 
       HANDLE hFileSource;
 
@@ -747,7 +715,13 @@ link (const char *a, const char *b)
       if (!bSuccess)
 	goto docopy;
 
+    success:
       res = 0;
+      if (!allow_winsymlinks && real_a.is_lnk_symlink ())
+	SetFileAttributes (real_b, (DWORD) real_a
+			           | FILE_ATTRIBUTE_SYSTEM
+				   | FILE_ATTRIBUTE_READONLY);
+
       goto done;
     }
 docopy:
@@ -947,7 +921,7 @@ chmod (const char *path, mode_t mode)
       else
 	(DWORD) win32_path |= FILE_ATTRIBUTE_READONLY;
 
-      if (S_ISLNK (mode) || S_ISSOCK (mode))
+      if (!win32_path.is_lnk_symlink () && S_ISLNK (mode) || S_ISSOCK (mode))
 	(DWORD) win32_path |= FILE_ATTRIBUTE_SYSTEM;
 
       if (!SetFileAttributes (win32_path, win32_path))
@@ -1280,16 +1254,12 @@ rename (const char *oldpath, const char *newpath)
 
   /* Shortcut hack. */
   char new_lnk_buf[MAX_PATH + 5];
-  if (real_old.issymlink () && !real_new.error && !real_new.case_clash)
+  if (real_old.is_lnk_symlink () && !real_new.error && !real_new.case_clash)
     {
-      int len_old = strlen (real_old.get_win32 ());
-      if (strcasematch (real_old.get_win32 () + len_old - 4, ".lnk"))
-	{
-	  strcpy (new_lnk_buf, newpath);
-	  strcat (new_lnk_buf, ".lnk");
-	  newpath = new_lnk_buf;
-	  real_new.check (newpath, PC_SYM_NOFOLLOW);
-	}
+      strcpy (new_lnk_buf, newpath);
+      strcat (new_lnk_buf, ".lnk");
+      newpath = new_lnk_buf;
+      real_new.check (newpath, PC_SYM_NOFOLLOW);
     }
 
   if (real_new.error || real_new.case_clash)
@@ -1319,9 +1289,8 @@ rename (const char *oldpath, const char *newpath)
     SetFileAttributes (real_new, (DWORD) real_new & ~FILE_ATTRIBUTE_READONLY);
 
   /* Shortcut hack No. 2, part 1 */
-  if (!real_old.issymlink () && !real_new.error && real_new.issymlink () &&
-      real_new.known_suffix && strcasematch (real_new.known_suffix, ".lnk") &&
-      (lnk_suffix = strrchr (real_new.get_win32 (), '.')))
+  if (!real_old.issymlink () && !real_new.error && real_new.is_lnk_symlink ()
+      && (lnk_suffix = strrchr (real_new.get_win32 (), '.')))
      *lnk_suffix = '\0';
 
   if (!MoveFile (real_old, real_new))
@@ -2106,7 +2075,8 @@ seteuid32 (__uid32_t uid)
 
   /* Set process def dacl to allow access to impersonated token */
   char dacl_buf[MAX_DACL_LEN (5)];
-  if (usersid != (origpsid =  cygheap->user.orig_sid ())) psid2 = usersid;
+  if (usersid != (origpsid = cygheap->user.orig_sid ()))
+    psid2 = usersid;
   if (sec_acl ((PACL) dacl_buf, FALSE, origpsid, psid2))
     {
       TOKEN_DEFAULT_DACL tdacl;
@@ -2176,11 +2146,11 @@ success:
   groups.ischanged = FALSE;
   return 0;
 
- failed:
+failed:
   cygheap->user.token = sav_token;
   cygheap->user.impersonated = sav_impersonated;
   if (cygheap->user.issetuid ()
-       && !ImpersonateLoggedOnUser (cygheap->user.token))
+      && !ImpersonateLoggedOnUser (cygheap->user.token))
     system_printf ("Impersonating in seteuid failed: %E");
   return -1;
 }
@@ -2537,6 +2507,7 @@ login (struct utmp *ut)
   register int fd;
 
   pututline (ut);
+  endutent ();
   if ((fd = open (_PATH_WTMP, O_WRONLY | O_APPEND | O_BINARY, 0)) >= 0)
     {
       (void) write (fd, (char *) ut, sizeof (struct utmp));
@@ -2584,8 +2555,8 @@ logout (char *line)
 	      /* Found the entry for LINE; mark it as logged out.  */
 	      {
 		/* Zero out entries describing who's logged in.  */
-		bzero (ut->ut_name, sizeof (ut->ut_name));
-		bzero (ut->ut_host, sizeof (ut->ut_host));
+		memset (ut->ut_name, 0, sizeof (ut->ut_name));
+		memset (ut->ut_host, 0, sizeof (ut->ut_host));
 		time (&ut->ut_time);
 
 		/* Now seek back to the position in utmp at which UT occured,
@@ -2616,10 +2587,9 @@ setutent ()
 {
   sigframe thisframe (mainthread);
   if (utmp_fd == -2)
-    {
-      utmp_fd = open (utmp_file, O_RDWR);
-    }
-  lseek (utmp_fd, 0, SEEK_SET);
+    utmp_fd = open (utmp_file, O_RDWR);
+  else
+    lseek (utmp_fd, 0, SEEK_SET);
 }
 
 extern "C" void

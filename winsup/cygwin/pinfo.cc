@@ -520,7 +520,8 @@ pinfo::release ()
   if (h)
     {
 #ifdef DEBUGGING
-      if (((DWORD) procinfo & 0x77000000) == 0x61000000) try_to_debug ();
+      if (((DWORD) procinfo & 0x77000000) == 0x61000000)
+	try_to_debug ();
 #endif
       UnmapViewOfFile (procinfo);
       procinfo = NULL;
