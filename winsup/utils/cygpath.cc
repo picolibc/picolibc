@@ -141,6 +141,8 @@ doit (char *filename)
 {
   char *buf;
   size_t len;
+  int retval;
+  int (*conv_func)(const char *, char *);
 
   if (path_flag)
     {
@@ -155,7 +157,14 @@ doit (char *filename)
     }
 
   if (! path_flag)
-    len = strlen (filename) + 100;
+    {
+      len = strlen (filename) + 100;
+      if (len == 100)
+        {
+          fprintf(stderr, "%s: can't convert empty path\n", prog_name);
+          exit (1);
+        }
+    }
   else
     {
       if (unix_flag)
@@ -188,13 +197,20 @@ doit (char *filename)
   else
     {
       if (unix_flag)
-	(absolute_flag ? cygwin_conv_to_full_posix_path : cygwin_conv_to_posix_path) (filename, buf);
+	conv_func = (absolute_flag ? cygwin_conv_to_full_posix_path : 
+                     cygwin_conv_to_posix_path);
       else
-	{
-	  (absolute_flag ? cygwin_conv_to_full_win32_path : cygwin_conv_to_win32_path) (filename, buf);
-	  if (shortname_flag)
-	    buf = get_short_name (buf);
-	}
+        conv_func = (absolute_flag ? cygwin_conv_to_full_win32_path :
+                     cygwin_conv_to_win32_path);
+      retval = conv_func (filename, buf);
+      if (retval < 0)
+        {
+          fprintf (stderr, "%s: error converting \"%s\"\n",
+                   prog_name, filename);
+          exit (1);
+        }
+      if (!unix_flag && shortname_flag)
+        buf = get_short_name (buf);
     }
 
   puts (buf);
@@ -214,6 +230,8 @@ main (int argc, char **argv)
     prog_name = strrchr (argv[0], '\\');
   if (prog_name == NULL)
     prog_name = argv[0];
+  else
+    prog_name++;
 
   path_flag = 0;
   unix_flag = 0;

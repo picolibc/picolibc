@@ -1,3 +1,10 @@
+2001-12-26  Jonathan Kamens  <jik@curl.com>
+
+	* cygpath.cc (doit): Detect and warn about an empty path.  Detect and
+	warn about errors converting a path.
+	(main): Set prog_name correctly -- don't leave an extra slash or
+	backslash at the beginning of it.
+
 Fri Dec 14 14:04:37 2001  Jason Tishler <jason@tishler.net>
 
 	* mkpasswd.c (enum_users): Change to unconditionally use
