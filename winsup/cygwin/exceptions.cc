@@ -684,6 +684,10 @@ interrupt_setup (int sig, void *handler, DWORD retaddr, DWORD *retaddr_on_stack,
       myself->stopsig = 0;
       myself->process_state |= PID_STOPPED;
     }
+  /* Clear any waiting threads prior to dispatching to handler function */
+  proc_subproc (PROC_CLEARWAIT, 1);
+  int res = SetEvent (signal_arrived);	// For an EINTR case
+  sigproc_printf ("armed signal_arrived %p, res %d", signal_arrived, res);
 }
 
 static bool interrupt_now (CONTEXT *, int, void *, struct sigaction&) __attribute__((regparm(3)));
@@ -692,7 +696,7 @@ interrupt_now (CONTEXT *ctx, int sig, void *handler, struct sigaction& siga)
 {
   interrupt_setup (sig, handler, ctx->Eip, 0, siga);
   ctx->Eip = (DWORD) sigdelayed;
-  SetThreadContext (myself->getthread2signal (), ctx); /* Restart the thread */
+  SetThreadContext (myself->getthread2signal (), ctx); /* Restart the thread in a new location */
   return 1;
 }
 
@@ -853,20 +857,15 @@ setup_handler (int sig, void *handler, struct sigaction& siga)
     }
 
  set_pending:
-  if (!interrupted)
+  if (interrupted)
+    res = 1;
+  else
     {
       pending_signals = 1;	/* FIXME: Probably need to be more tricky here */
       sig_set_pending (sig);
       sig_dispatch_pending (1);
       Sleep (0);		/* Hopefully, other process will be waking up soon. */
       sigproc_printf ("couldn't send signal %d", sig);
-    }
-  else
-    {
-      /* Clear any waiting threads prior to dispatching to handler function */
-      proc_subproc (PROC_CLEARWAIT, 1);
-      res = SetEvent (signal_arrived);	// For an EINTR case
-      sigproc_printf ("armed signal_arrived %p, res %d", signal_arrived, res);
     }
 
   if (th)
@@ -1157,68 +1156,61 @@ void unused_sig_wrapper ()
    to restore any mask, restores any potentially clobbered registers
    and returns to original caller. */
 __asm__ volatile ("\n\
-	.text\n\
-\n\
-_sigreturn:\n\
-	addl	$4,%%esp	# Remove argument\n\
-	movl	%%esp,%%ebp\n\
-	addl	$36,%%ebp\n\
-\n\
-	cmpl	$0,%4		# Did a signal come in?\n\
-	jz	1f		# No, if zero\n\
-	call	_call_signal_handler_now@0 # yes handle the signal\n\
-\n\
-# FIXME: There is a race here.  The signal handler could set up\n\
-# the sigsave structure between _call_signal_handler and the\n\
-# end of _set_process_mask.  This would make cygwin detect an\n\
-# incorrect signal mask.\n\
-\n\
-1:	call	_set_process_mask@4\n\
-	popl	%%eax		# saved errno\n\
-	testl	%%eax,%%eax	# Is it < 0\n\
-	jl	2f		# yup.  ignore it\n\
-	movl	%1,%%ebx\n\
-	movl	%%eax,(%%ebx)\n\
-2:	popl	%%eax\n\
-	popl	%%ebx\n\
-	popl	%%ecx\n\
-	popl	%%edx\n\
-	popl	%%edi\n\
-	popl	%%esi\n\
-	popf\n\
-	popl	%%ebp\n\
-	ret\n\
-\n\
-__no_sig_start:\n\
-_sigdelayed:\n\
-	pushl	%2			# original return address\n\
-_sigdelayed0:\n\
-	pushl	%%ebp\n\
-	movl	%%esp,%%ebp\n\
-	pushf\n\
-	pushl	%%esi\n\
-	pushl	%%edi\n\
-	pushl	%%edx\n\
-	pushl	%%ecx\n\
-	pushl	%%ebx\n\
-	pushl	%%eax\n\
-	pushl	%7			# saved errno\n\
-	pushl	%3			# oldmask\n\
-	pushl	%4			# signal argument\n\
-	pushl	$_sigreturn\n\
-\n\
-	call	_reset_signal_arrived@0\n\
-	pushl	%5			# signal number\n\
-	pushl	%8			# newmask\n\
-	movl	$0,%0			# zero the signal number as a\n\
+	.text								\n\
+_sigreturn:								\n\
+	addl	$4,%%esp	# Remove argument			\n\
+	movl	%%esp,%%ebp						\n\
+	addl	$36,%%ebp						\n\
+	call	_set_process_mask@4					\n\
+									\n\
+	cmpl	$0,%4		# Did a signal come in?			\n\
+	jz	1f		# No, if zero				\n\
+	call	_call_signal_handler_now@0 # yes handle the signal	\n\
+									\n\
+1:	popl	%%eax		# saved errno				\n\
+	testl	%%eax,%%eax	# Is it < 0				\n\
+	jl	2f		# yup.  ignore it			\n\
+	movl	%1,%%ebx						\n\
+	movl	%%eax,(%%ebx)						\n\
+2:	popl	%%eax							\n\
+	popl	%%ebx							\n\
+	popl	%%ecx							\n\
+	popl	%%edx							\n\
+	popl	%%edi							\n\
+	popl	%%esi							\n\
+	popf								\n\
+	popl	%%ebp							\n\
+	ret								\n\
+									\n\
+__no_sig_start:								\n\
+_sigdelayed:								\n\
+	pushl	%2			# original return address	\n\
+_sigdelayed0:								\n\
+	pushl	%%ebp							\n\
+	movl	%%esp,%%ebp						\n\
+	pushf								\n\
+	pushl	%%esi							\n\
+	pushl	%%edi							\n\
+	pushl	%%edx							\n\
+	pushl	%%ecx							\n\
+	pushl	%%ebx							\n\
+	pushl	%%eax							\n\
+	pushl	%7			# saved errno			\n\
+	pushl	%3			# oldmask			\n\
+	pushl	%4			# signal argument		\n\
+	pushl	$_sigreturn						\n\
+									\n\
+	call	_reset_signal_arrived@0					\n\
+	pushl	%5			# signal number			\n\
+	pushl	%8			# newmask			\n\
+	movl	$0,%0			# zero the signal number as a	\n\
 					# flag to the signal handler thread\n\
 					# that it is ok to set up sigsave\n\
-\n\
-	call	_set_process_mask@4\n\
-	popl	%%eax\n\
-	jmp	*%%eax\n\
-__no_sig_end:\n\
-\n\
+									\n\
+	call	_set_process_mask@4					\n\
+	popl	%%eax							\n\
+	jmp	*%%eax							\n\
+__no_sig_end:								\n\
 " : "=m" (sigsave.sig) : "m" (&_impure_ptr->_errno),
   "g" (sigsave.retaddr), "g" (sigsave.oldmask), "g" (sigsave.sig),
     "g" (sigsave.func), "o" (pid_offset), "g" (sigsave.saved_errno), "g" (sigsave.newmask)

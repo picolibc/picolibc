@@ -302,7 +302,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
       return -1;
     }
 
-  syscall_printf ("spawn_guts (%.132s)", prog_arg);
+  syscall_printf ("spawn_guts (%d, %.132s)", mode, prog_arg);
 
   if (argv == NULL)
     {
@@ -708,9 +708,9 @@ skip_arg_parsing:
     {
       /* These are both duplicated in the child code.  We do this here,
 	 primarily for strace. */
-      strcpy (myself->progname, real_path);
       strace.execing = 1;
       hExeced = pi.hProcess;
+      strcpy (myself->progname, real_path);
     }
   else
     {
@@ -723,10 +723,10 @@ skip_arg_parsing:
 	  syscall_printf ("-1 = spawnve (), process table full");
 	  return -1;
 	}
-      child->progname[0] = '\0';
       child->dwProcessId = pi.dwProcessId;
       child->hProcess = pi.hProcess;
       child.remember ();
+      strcpy (child->progname, real_path);
       /* Start the child running */
       ResumeThread (pi.hThread);
     }
@@ -761,7 +761,8 @@ skip_arg_parsing:
 	  break;
 	case WAIT_OBJECT_0 + 1:
 	  sigproc_printf ("signal arrived");
-	  ResetEvent (signal_arrived);
+	  // reset_signal_arrived ();
+	  thisframe.call_signal_handler ();
 	  continue;
 	case WAIT_OBJECT_0 + 2:
 	  if (mode == _P_OVERLAY)
@@ -890,6 +891,7 @@ _spawnve (HANDLE hToken, int mode, const char *path, const char *const *argv,
       ret = spawn_guts (hToken, path, argv, envp, mode);
       if (vf && ret > 0)
 	{
+	  debug_printf ("longjmping due to vfork");
 	  vf->pid = ret;
 	  longjmp (vf->j, 1);
 	}

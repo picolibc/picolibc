@@ -708,7 +708,9 @@ vfork ()
       for (pp = (char **)vf->frame, esp = vf->vfork_esp;
 	   esp <= vf->vfork_ebp + 1; pp++, esp++)
 	*pp = *esp;
-      return cygheap->fdtab.vfork_child_dup () ? 0 : -1;
+      int res = cygheap->fdtab.vfork_child_dup () ? 0 : -1;
+      debug_printf ("%d = vfork()", res);
+      return res;
     }
 
   cygheap->fdtab.vfork_parent_restore ();

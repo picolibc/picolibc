@@ -306,7 +306,7 @@ proc_subproc (DWORD what, DWORD val)
       zombies[nzombies] = pchildren[val];	// Add to zombie array
       zombies[nzombies++]->process_state = PID_ZOMBIE;// Walking dead
 
-      sigproc_printf ("removing [%d], pid %d, handle %p, nchildren %d",
+      sigproc_printf ("zombifying [%d], pid %d, handle %p, nchildren %d",
 		      val, pchildren[val]->pid, hchildren[val], nchildren);
       if ((int) val < --nchildren)
 	{
