@@ -189,8 +189,8 @@ _threadinfo::pop ()
   assert (stackptr > stack);
 #endif
   __stack_t res = *--stackptr;
-#ifndef DEBUGGING
-  _my_tls.stackptr = 0;
+#ifdef DEBUGGING
+  *stackptr = 0;
   debug_printf ("popped %p, stack %p, stackptr %p", res, stack, stackptr);
 #endif
   return res;

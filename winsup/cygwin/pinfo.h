@@ -26,8 +26,6 @@ enum picom
   PICOM_FIFO = 2
 };
 
-extern struct sigaction *global_sigs;
-
 class _pinfo
 {
 public:
