@@ -1,3 +1,8 @@
+Fri Sep 21 20:40:30 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in (mingw_getopt.o): Ensure that newlib include directories
+	are not searched.
+
 Thu Sep 20 21:00:20 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in (MINGW_INCLUDES): Still need cygwin/include directory.
