@@ -1,3 +1,12 @@
+2002-07-04  Egor Duda  <deo@logos-m.ru>
+
+	* winsup.api/pthread/cancel1.c: New test. Port from pthreads-win32 
+	project.
+	* winsup.api/pthread/cancel2.c: Ditto.
+	* winsup.api/pthread/cancel3.c: Ditto.
+	* winsup.api/pthread/cancel4.c: Ditto.
+	* winsup.api/pthread/cancel5.c: Ditto.
+
 2002-07-03  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in: Eliminate unneeded Makefile recreation rule.
