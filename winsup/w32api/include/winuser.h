@@ -3754,6 +3754,9 @@ BOOL WINAPI UnionRect(LPRECT,LPCRECT,LPCRECT);
 BOOL WINAPI UnloadKeyboardLayout(HKL);
 BOOL WINAPI UnregisterClassA(LPCSTR,HINSTANCE);
 BOOL WINAPI UnregisterClassW(LPCWSTR,HINSTANCE);
+#if (_WIN32_WINDOWS >= 0x0410 || _WIN32_WINNT >= 0x0500)
+BOOL WINAPI UnregisterDeviceNotification(HANDLE);
+#endif
 BOOL WINAPI UnregisterHotKey(HWND,int);
 BOOL WINAPI UpdateWindow(HWND);
 #if (_WIN32_WINNT >= 0x0500)

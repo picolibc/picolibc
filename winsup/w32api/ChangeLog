@@ -1,3 +1,11 @@
+2004-03-27  Hosaka Yuji  <hos@tamanegi.org>
+
+	* include/dbt.h (DBT_DEVTYP_DEVICEINTERFACE, DBT_DEVTYP_HANDLE):
+	Add define.
+	(DEV_BROADCAST_DEVICEINTERFACE, DEV_BROADCAST_HANDLE): Add struct.
+	* include/winuser.h (UnregisterDeviceNotification): Add prototype.
+	* lib/user32.def (UnregisterDeviceNotification): Add export stub.
+
 2004-03-27  Filip Navara  <xnavara@volny.cz>
 
 	* include/directx: New subdir.
