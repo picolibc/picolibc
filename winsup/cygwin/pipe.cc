@@ -85,7 +85,7 @@ fhandler_pipe::read (void *in_ptr, size_t& in_len)
 
 int fhandler_pipe::close ()
 {
-  int res = this->fhandler_base::close ();
+  int res = fhandler_base::close ();
   if (guard)
     CloseHandle (guard);
   if (writepipe_exists)
