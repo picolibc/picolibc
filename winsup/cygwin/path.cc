@@ -406,7 +406,7 @@ path_conv::fillin (HANDLE h)
       fs.serial = local.dwVolumeSerialNumber;
     }
     fs.drive_type = DRIVE_UNKNOWN;
-} 
+}
 
 /* Convert an arbitrary path SRC to a pure Win32 path, suitable for
    passing to Win32 API routines.
@@ -2641,7 +2641,7 @@ symlink (const char *topath, const char *frompath)
     set_security_attribute (S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO,
 			    &sa, alloca (4096), 4096);
 
-  h = CreateFileA(win32_path, GENERIC_WRITE, 0, &sa,
+  h = CreateFile (win32_path, GENERIC_WRITE, 0, &sa,
 		  CREATE_NEW, FILE_ATTRIBUTE_NORMAL, 0);
   if (h == INVALID_HANDLE_VALUE)
     __seterrno ();
@@ -3037,8 +3037,8 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 
       /* Open the file.  */
 
-      h = CreateFileA (suffix.path, GENERIC_READ, FILE_SHARE_READ, &sec_none_nih, OPEN_EXISTING,
-		       FILE_ATTRIBUTE_NORMAL, 0);
+      h = CreateFile (suffix.path, GENERIC_READ, FILE_SHARE_READ,
+		      &sec_none_nih, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
       res = -1;
       if (h == INVALID_HANDLE_VALUE)
 	goto file_not_symlink;
