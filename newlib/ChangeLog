@@ -1,3 +1,19 @@
+2004-10-05  Tomer Levi  <Tomer.Levi@nsc.com>
+
+        * configure.host: Add support for crx.
+        * libc/include/machine/ieeefp.h: Ditto.
+        * libc/include/machine/setjmp.h: Ditto.
+        * libc/machine/crx/Makefile.am: New file.
+        * libc/machine/crx/configure.in: Ditto.
+        * libc/machine/crx/setjmp.S: Ditto.
+        * libc/machine/crx/getenv.c: Ditto.
+        * libc/machine/crx/aclocal.m4: Generate.
+        * libc/machine/crx/configure: Ditto.
+        * libc/machine/crx/Makefile.in: Ditto.
+        * libc/machine/crx/sys/asm.h: New file.
+        * libc/machine/crx/sys/libh.h: Ditto.
+        * libc/machine/crx/sys/syscall.h: Ditto.
+
 2004-10-05  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* Makefile.am (stmp-targ-include): Support sys header files

@@ -214,6 +214,10 @@
 #endif
 #endif
 
+#ifdef __CRX__
+#define __IEEE_LITTLE_ENDIAN
+#endif
+
 #ifdef __fr30__
 #define __IEEE_BIG_ENDIAN
 #endif

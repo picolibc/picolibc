@@ -93,6 +93,9 @@ case "${host_cpu}" in
   avr*)
 	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -mcall-prologues"
 	;;
+  crx*)
+	machine_dir=crx
+	;;
   d10v*)
 	machine_dir=d10v
 	;;
@@ -307,6 +310,9 @@ case "${host}" in
 	  sys_dir=arm
 	fi
 	;;
+  crx*)
+	sys_dir=
+	;;
   d10v*)
 	sys_dir=d10v
 	;;
@@ -495,6 +501,10 @@ case "${host}" in
 	;;
   avr*)
 	newlib_cflags="${newlib_cflags} -DNO_EXEC -DSMALL_MEMORY -DMISSING_SYSCALL_NAMES"
+	;;
+  crx-*-*)
+  	newlib_cflags="${newlib_cflags} -DHAVE_RENAME -DMISSING_SYSCALL_NAMES"
+	syscall_dir=
 	;;
   d10v*)
 	newlib_cflags="${newlib_cflags} -DSMALL_MEMORY"

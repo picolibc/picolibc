@@ -174,6 +174,10 @@ _BEGIN_STD_C
 #define _JBTYPE double
 #endif
 
+#ifdef __CRX__
+#define _JBLEN 9
+#endif
+
 #ifdef __fr30__
 #define _JBLEN 10
 #endif
