@@ -150,5 +150,7 @@ typedef	long	fd_mask;
 #include <linux/types.h>
 #include <bits/types.h>
 #define __mode_t_defined
+#define __gid_t_defined
+#define __uid_t_defined
 
 #endif

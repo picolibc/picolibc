@@ -13,6 +13,7 @@ LIB_SOURCES = \
 	brk.c \
 	cfspeed.c \
 	flockfile.c \
+	ftok.c \
 	funlockfile.c \
 	gethostname.c \
 	getoptlong.c \
@@ -21,8 +22,17 @@ LIB_SOURCES = \
 	inode.c \
 	io.c \
 	io64.c \
+	ipc.c \
 	linux.c \
 	mmap.c \
+	mq_close.c \
+	mq_getattr.c \
+	mq_notify.c \
+	mq_open.c \
+	mq_receive.c \
+	mq_send.c \
+	mq_setattr.c \
+	mq_unlink.c \
 	pread.c \
 	pread64.c \
 	process.c \

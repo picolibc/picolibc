@@ -1,3 +1,23 @@
+2002-06-19  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/sys/linux/Makefile.am: Add support for message queue routines,
+        ipc routines, and ftok.
+        * libc/sys/linux/Makefile.in: Regenerated.
+        * libc/sys/linux/ftok.c: New file.
+        * libc/sys/linux/ipc.c: Ditto.
+        * libc/sys/linux/mq_close.c: Ditto.
+        * libc/sys/linux/mq_getattr.c: Ditto.
+        * libc/sys/linux/mq_notify.c: Ditto.
+        * libc/sys/linux/mq_open.c: Ditto.
+        * libc/sys/linux/mq_receive.c: Ditto.
+        * libc/sys/linux/mq_send.c: Ditto.
+        * libc/sys/linux/mq_setattr.c: Ditto.
+        * libc/sys/linux/mq_unlink.c: Ditto.
+        * libc/sys/linux/mqlocal.h: Ditto.
+        * libc/sys/linux/include/mqueue.h: Ditto.
+        * libc/sys/linux/sys/types.h: Define __gid_t_defined and
+        __uid_t_defined.
+
 2002-06-19  J"orn Rennecke <joern.rennecke@superh.com>
 
 	* libm/common/sf_lround.c (round): Change name to: (lround).
@@ -186,9 +206,6 @@ Thu Jun 13 19:23:40 2002  J"orn Rennecke <joern.rennecke@superh.com>
         * libc/sys/linux/sigaction.c: New file.
         * libc/sys/linux/signal.c: Changed to be linux signal() function
         so as to override regular newlib default signal.c.
-        * libc/sys/linux/linuxthreads/config.h: Add __ASSUME_REALTIME_SIGNALS
-        definition.
-        * libc/sys/linux/linuxthreads/testrtsig.h: New file.
         * libc/sys/linux/machine/i386/Makefile.am: Remove sigset.c.
         * libc/sys/linux/machine/i386/Makefile.in: Regenerated.
         * libc/sys/linux/machine/i386/sigset.c: Moved to linux main directory.
