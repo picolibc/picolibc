@@ -481,10 +481,13 @@ path_conv::check (const char *src, unsigned opt,
 
 	  if (devn == FH_CYGDRIVE)
 	    {
-	      if (component)
-		devn = FH_BAD;
-	      fileattr = !unit ? FILE_ATTRIBUTE_DIRECTORY
-			       : GetFileAttributes (full_path);
+	      if (!component)
+		fileattr = FILE_ATTRIBUTE_DIRECTORY;
+	      else
+		{
+		  devn = FH_BAD;
+		  fileattr = GetFileAttributes (this->path);
+		}
 	      goto out;
 	    }
 	  /* devn should not be a device.  If it is, then stop parsing now. */
@@ -519,7 +522,7 @@ path_conv::check (const char *src, unsigned opt,
 
 	  if ((opt & PC_SYM_IGNORE) && pcheck_case == PCHECK_RELAXED)
 	    {
-	      fileattr = GetFileAttributes (full_path);
+	      fileattr = GetFileAttributes (this->path);
 	      goto out;
 	    }
 
