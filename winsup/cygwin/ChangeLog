@@ -1,5 +1,10 @@
 2003-09-03  Christopher Faylor  <cgf@redhat.com>
 
+	* cxx.cc (new): Fix formatting.  Just return result of ccalloc rather
+	than calling memset explicitly.
+
+2003-09-03  Christopher Faylor  <cgf@redhat.com>
+
 	* exceptions.cc (set_process_mask): Set pending signals only when
 	signals become unmasked.
 	* sigproc.cc (pending_signals): Flip back to a global.
