@@ -52,7 +52,16 @@ SECTIONS
   .rdata : {
     *(.rdata)
   }
-   _fdata = ALIGN(16);
+  .rodata : {
+    *(.rodata)
+  }
+  .eh_frame :
+  {
+    PROVIDE (__EH_FRAME_BEGIN__ = .);
+    *(.eh_frame)
+    PROVIDE (__EH_FRAME_END__ = .);
+  }
+  _fdata = ALIGN(16);
   .data : {
     *(.data)
     *(.gcc_except_table)

@@ -1,3 +1,11 @@
+2003-08-08  Mark Salter <msalter@redhat.com>
+
+        * i386/cygmon.ld: Add 4 byte alignment to __CTOR_LIST__
+
+        Bernd Schmidt  <bernds@redhat.com>
+
+        * i386/cygmon.ld: Add entry for .rodata.
+
 2003-07-14  Kazuhiro Inaoka <inaoka.kazuhiro@renesas.com>
 
 	* m32r/configure.in: fixed bug to delete ../config-ml.in.
