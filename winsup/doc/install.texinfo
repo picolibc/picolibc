@@ -230,3 +230,39 @@ default.
 It's up to you to deal with other changes you made to your system, such
 as installing the inetd service, altering system paths, etc.  Setup
 would not have done any of these things for you.
+
+@subsection Can I use setup to install snapshots?
+
+Yes.  If experimenting with developer snapshots from
+@file{http://cygwin.com/snapshots/}, you should generally install the
+full @code{cygwin-inst-YYYYMMDD.tar.bz2} update, rather than just the
+DLL, otherwise some components may be out of sync.  However, Cygwin tar
+won't work because it will load the DLL that you're trying to update,
+and a non-Cygwin program like WinZip will put everything in the wrong
+place.  The solution is to use @code{setup.exe}.
+
+Just bunzip2 the cygwin-inst tarball, rename it to cygwin-YYYYMMDD.tar,
+gzip it, put it in an empty directory, and run @code{setup.exe} there.
+You should be given the option to install it.
+
+The obvious warnings about updating the cygwin package and using developer
+snapshots apply:
+
+@enumerate
+
+@item Always download the latest version of setup from
+@file{http://cygwin.com/setup.exe}.
+
+@item Close all Cygwin apps, including shells and services
+(e.g. inetd), before running setup.  You may have to restart Windows to
+clear the DLL from memory.
+
+@item Snapshots are risky.  They have not been tested.  Use them @strong{only} if
+there is a feature or bugfix that you need to try.
+
+@item If you cannot download a snapshot from the main ftp distribution
+site, use a mirror, and look in the @samp{snapshots} directory.  You may
+have to hunt for one that has a copy of the latest snapshot.  Start at
+@file{http://cygwin.com/mirrors.html}.
+
+@end enumerate
