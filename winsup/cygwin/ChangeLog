@@ -1,5 +1,9 @@
 2002-07-03  Christopher Faylor  <cgf@redhat.com>
 
+	* include/cygwin/version.h: Bump DLL minor number.
+
+2002-07-03  Christopher Faylor  <cgf@redhat.com>
+
 	* include/sys/statfs.h: New header file.
 
 2002-07-03  Christopher Faylor  <cgf@redhat.com>
