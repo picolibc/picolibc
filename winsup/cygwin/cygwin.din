@@ -213,6 +213,10 @@ _fchown = fchown
 fchown32
 fclose
 _fclose = fclose
+fcloseall
+_fcloseall = fcloseall
+_fcloseall_r
+fcloseall_r = _fcloseall_r
 _fcntl
 fcntl = _fcntl
 fcvt

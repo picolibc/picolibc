@@ -41,11 +41,11 @@ details. */
 #include "lm.h"
 
 extern BOOL allow_ntea;
-BOOL allow_ntsec;
+BOOL allow_ntsec = true;
 /* allow_smbntsec is handled exclusively in path.cc (path_conv::check).
    It's defined here because of it's strong relationship to allow_ntsec.
    The default is TRUE to reflect the old behaviour. */
-BOOL allow_smbntsec = TRUE;
+BOOL allow_smbntsec;
 
 extern "C" void
 cygwin_set_impersonation_token (const HANDLE hToken)
@@ -525,10 +525,8 @@ get_group_sidlist (cygsidlist &grp_list,
 	  auth_pos = grp_list.count - 1;
 	}
       extract_nt_dom_user (pw, domain, user);
-      /* Fail silently if DC is not reachable */
-      if (get_logon_server (domain, server, wserver) &&
-	  !get_user_groups (wserver, grp_list, user, domain))
-	return FALSE;
+      if (get_logon_server (domain, server, wserver))
+	get_user_groups (wserver, grp_list, user, domain);
       get_unix_group_sidlist (pw, grp_list);
       if (!get_user_local_groups (grp_list, usersid))
 	return FALSE;

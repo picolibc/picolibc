@@ -152,12 +152,13 @@ details. */
        52: Export strptime
        53: Export strlcat, strlcpy.
        54: Export __fpclassifyd, __fpclassifyf, __signbitd, __signbitf.
+       55: Export fcloseall, fcloseall_r.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 54
+#define CYGWIN_VERSION_API_MINOR 55
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

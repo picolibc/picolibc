@@ -1,3 +1,53 @@
+2002-07-25  Christopher Faylor  <cgf@redhat.com>
+
+	* security.cc (allow_ntsec): Default to on.
+	(allow_smbntsec): Default to off.
+
+2002-07-24  David MacMahon  <davidm@smartsc.com>
+
+	* times.cc (to_time_t): Always round time_t down to nearest second.
+
+2002-07-25  Egor Duda  <deo@logos-m.ru>
+
+	* Makefile.in: Check if API version is updated when exports are 
+	changed and stop if not so.
+
+2002-07-24  Egor Duda  <deo@logos-m.ru>
+
+	* include/cygwin/version.h: Bump minor API version.
+
+2002-07-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_serial.cc: Change 'must_init_serial_line capability'
+	to 'supports_reading_modem_output_lines' throughout (negated meaning).
+	* wincap.cc: Ditto.
+	* wincap.h: Ditto.
+
+2002-07-23  Nicholas Wourms  <nwourms@netscape.net>
+
+	* cygwin.din (fcloseall): Add symbol for export.
+	(fcloseall_r): Ditto.
+
+2002-07-24  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (path_conv::check): Always set fileattr when component == 0.
+	(readlink): Use path_conv method rather than field.
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat_helper): Ditto,
+	throughout.
+	* path.h (path_conv): Make fileattr private.
+	* exceptions.cc (try_to_debug): Default to idle priority when looping.
+
+2002-07-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_serial.cc: Use must_init_serial_line capability throughout.
+	* wincap.cc: Set flag must_init_serial_line appropriately.
+	* wincap.h: Add flag must_init_serial_line.
+
+2002-07-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (get_group_sidlist): Create group list from /etc files
+	even if DC is available but access fails.
+
 2002-07-22  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_serial.cc: Fix formatting problems introduced by below

@@ -272,7 +272,7 @@ fhandler_serial::open (path_conv *, int flags, mode_t mode)
   request TIOCMGET could return correct value of RTS and DTR lines.
   Important only for Win 9x systems */
 
-  if (!wincap.is_winnt ())
+  if (!wincap.supports_reading_modem_output_lines ())
     {
       if (EscapeCommFunction (get_handle (), SETDTR) == 0)
 	system_printf ("couldn't set initial state of DTR for %s, %E", get_name ());
@@ -409,7 +409,7 @@ fhandler_serial::ioctl (unsigned int cmd, void *buffer)
 	modemStatus |= TIOCM_RI;
       if (modemLines & MS_RLSD_ON)
 	modemStatus |= TIOCM_CD;
-      if (!wincap.is_winnt ())
+      if (!wincap.supports_reading_modem_output_lines ())
 	modemStatus |= rts | dtr;
       else
 	{

@@ -212,7 +212,6 @@ to_time_t (FILETIME *ptr)
      stuffed into two long words.
      A time_t is the number of seconds since jan 1 1970.  */
 
-  long rem;
   long long x = ((long long) ptr->dwHighDateTime << 32) + ((unsigned)ptr->dwLowDateTime);
 
   /* pass "no time" as epoch */
@@ -220,10 +219,7 @@ to_time_t (FILETIME *ptr)
     return 0;
 
   x -= FACTOR;			/* number of 100ns between 1601 and 1970 */
-  rem = x % ((long long)NSPERSEC);
-  rem += (NSPERSEC / 2);
   x /= (long long) NSPERSEC;		/* number of 100ns in a second */
-  x += (long long) (rem / NSPERSEC);
   return x;
 }
 

@@ -447,7 +447,6 @@ path_conv::check (const char *src, unsigned opt,
     error = 0;
   else if ((error = check_null_empty_str (src)))
     return;
-
   /* This loop handles symlink expansion.  */
   for (;;)
     {
@@ -603,7 +602,10 @@ path_conv::check (const char *src, unsigned opt,
 	  if (!(opt & PC_SYM_IGNORE))
 	    {
 	      if (!component)
-		path_flags = sym.pflags;
+		{
+		  fileattr = sym.fileattr;
+		  path_flags = sym.pflags;
+		}
 
 	      /* If symlink.check found an existing non-symlink file, then
 		 it sets the appropriate flag.  It also sets any suffix found
@@ -612,10 +614,7 @@ path_conv::check (const char *src, unsigned opt,
 		{
 		  error = sym.error;
 		  if (component == 0)
-		    {
-		      fileattr = sym.fileattr;
-		      add_ext_from_sym (sym);
-		    }
+		    add_ext_from_sym (sym);
 		  if (pcheck_case == PCHECK_RELAXED)
 		    goto out;	// file found
 		  /* Avoid further symlink evaluation. Only case checks are
@@ -633,7 +632,6 @@ path_conv::check (const char *src, unsigned opt,
 		  if (component == 0 && !need_directory && !(opt & PC_SYM_FOLLOW))
 		    {
 		      set_symlink (); // last component of path is a symlink.
-		      fileattr = sym.fileattr;
 		      if (opt & PC_SYM_CONTENTS)
 			{
 			  strcpy (path, sym.contents);
@@ -3072,7 +3070,7 @@ readlink (const char *path, char *buf, int buflen)
 
   if (!pathbuf.issymlink ())
     {
-      if (pathbuf.fileattr != INVALID_FILE_ATTRIBUTES)
+      if (pathbuf.exists ())
 	set_errno (EINVAL);
       return -1;
     }

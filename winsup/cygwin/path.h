@@ -70,6 +70,7 @@ struct fs_info
 class path_conv
 {
   char path[MAX_PATH];
+  DWORD fileattr;
   fs_info fs;
   void add_ext_from_sym (symlink_info&);
  public:
@@ -79,7 +80,6 @@ class path_conv
   int error;
   DWORD devn;
   int unit;
-  DWORD fileattr;
   BOOL case_clash;
   char *normalized_path;
 
@@ -138,8 +138,8 @@ class path_conv
     check (src, opt | PC_NULLEMPTY, suffixes);
   }
 
-  path_conv (): path_flags (0), known_suffix (NULL), error (0), devn (0),
-  		unit (0), fileattr (INVALID_FILE_ATTRIBUTES),
+  path_conv (): fileattr (INVALID_FILE_ATTRIBUTES), path_flags (0),
+  		known_suffix (NULL), error (0), devn (0), unit (0),
 		normalized_path (NULL) {path[0] = '\0';}
 
   inline char *get_win32 () { return path; }

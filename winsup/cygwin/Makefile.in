@@ -149,6 +149,8 @@ NEW_FUNCTIONS:=regcomp posix_regcomp \
 	       regexec posix_regexec \
 	       regfree posix_regfree
 
+API_VER:=$(srcdir)/include/cygwin/version.h
+
 PWD:=${shell pwd}
 SUBLIBS:=libpthread.a $(PWD)/libm.a libc.a
 EXTRALIBS:=libautomode.a libbinmode.a libtextmode.a
@@ -252,7 +254,7 @@ maintainer-clean realclean: clean
 
 
 # Rule to build cygwin.dll
-new-$(DLL_NAME): $(LDSCRIPT) $(DLL_OFILES) $(DEF_FILE) $(DLL_IMPORTS) $(LIBC) $(LIBM) Makefile winver_stamp
+new-$(DLL_NAME): $(LDSCRIPT) $(DLL_OFILES) $(DEF_FILE) $(DLL_IMPORTS) $(LIBC) $(LIBM) $(API_VER) Makefile winver_stamp
 	$(CXX) $(CXXFLAGS) -nostdlib -Wl,-T$(firstword $^) -Wl,--out-implib,cygdll.a -shared -o $@ \
 	-e $(DLL_ENTRY) $(DEF_FILE) $(DLL_OFILES) version.o winver.o \
 	$(DLL_IMPORTS) $(MALLOC_OBJ) $(LIBM) $(LIBC) \
@@ -276,6 +278,10 @@ dll_ofiles: $(DLL_OFILES)
 
 $(LIBGMON_A): $(GMON_OFILES) $(GMON_START)
 	$(AR) rcv $(LIBGMON_A) $(GMON_OFILES)
+
+$(API_VER): $(srcdir)/cygwin.din
+	@echo Error: Version info is older than DLL API!
+	@false
 
 version.cc winver.o: winver_stamp
 	@ :

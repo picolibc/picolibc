@@ -46,6 +46,7 @@ static NO_COPY wincaps wincap_unknown = {
   has_valid_processorlevel:false,
   has_64bit_file_access:false,
   has_process_io_counters:false,
+  supports_reading_modem_output_lines:false,
 };
 
 static NO_COPY wincaps wincap_95 = {
@@ -83,6 +84,7 @@ static NO_COPY wincaps wincap_95 = {
   has_valid_processorlevel:false,
   has_64bit_file_access:false,
   has_process_io_counters:false,
+  supports_reading_modem_output_lines:false,
 };
 
 static NO_COPY wincaps wincap_95osr2 = {
@@ -120,6 +122,7 @@ static NO_COPY wincaps wincap_95osr2 = {
   has_valid_processorlevel:false,
   has_64bit_file_access:false,
   has_process_io_counters:false,
+  supports_reading_modem_output_lines:false,
 };
 
 static NO_COPY wincaps wincap_98 = {
@@ -157,6 +160,7 @@ static NO_COPY wincaps wincap_98 = {
   has_valid_processorlevel:true,
   has_64bit_file_access:false,
   has_process_io_counters:false,
+  supports_reading_modem_output_lines:false,
 };
 
 static NO_COPY wincaps wincap_98se = {
@@ -194,6 +198,7 @@ static NO_COPY wincaps wincap_98se = {
   has_valid_processorlevel:true,
   has_64bit_file_access:false,
   has_process_io_counters:false,
+  supports_reading_modem_output_lines:false,
 };
 
 static NO_COPY wincaps wincap_me = {
@@ -231,6 +236,7 @@ static NO_COPY wincaps wincap_me = {
   has_valid_processorlevel:true,
   has_64bit_file_access:false,
   has_process_io_counters:false,
+  supports_reading_modem_output_lines:false,
 };
 
 static NO_COPY wincaps wincap_nt3 = {
@@ -268,6 +274,7 @@ static NO_COPY wincaps wincap_nt3 = {
   has_valid_processorlevel:true,
   has_64bit_file_access:true,
   has_process_io_counters:false,
+  supports_reading_modem_output_lines:true,
 };
 
 static NO_COPY wincaps wincap_nt4 = {
@@ -305,6 +312,7 @@ static NO_COPY wincaps wincap_nt4 = {
   has_valid_processorlevel:true,
   has_64bit_file_access:true,
   has_process_io_counters:false,
+  supports_reading_modem_output_lines:true,
 };
 
 static NO_COPY wincaps wincap_nt4sp4 = {
@@ -342,6 +350,7 @@ static NO_COPY wincaps wincap_nt4sp4 = {
   has_valid_processorlevel:true,
   has_64bit_file_access:true,
   has_process_io_counters:false,
+  supports_reading_modem_output_lines:true,
 };
 
 static NO_COPY wincaps wincap_2000 = {
@@ -379,6 +388,7 @@ static NO_COPY wincaps wincap_2000 = {
   has_valid_processorlevel:true,
   has_64bit_file_access:true,
   has_process_io_counters:true,
+  supports_reading_modem_output_lines:true,
 };
 
 static NO_COPY wincaps wincap_xp = {
@@ -416,6 +426,7 @@ static NO_COPY wincaps wincap_xp = {
   has_valid_processorlevel:true,
   has_64bit_file_access:true,
   has_process_io_counters:true,
+  supports_reading_modem_output_lines:true,
 };
 
 wincapc wincap;

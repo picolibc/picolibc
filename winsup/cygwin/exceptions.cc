@@ -391,9 +391,9 @@ try_to_debug (bool waitloop)
     system_printf ("Failed to start debugger: %E");
   else
     {
+      SetThreadPriority (hMainThread, THREAD_PRIORITY_IDLE);
       if (!waitloop)
 	return 1;
-      SetThreadPriority (hMainThread, THREAD_PRIORITY_IDLE);
       while (!being_debugged ())
 	/* spin */;
       Sleep (4000);

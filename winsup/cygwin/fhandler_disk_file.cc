@@ -260,7 +260,7 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
   buf->st_mode = 0;
   /* Using a side effect: get_file_attibutes checks for
      directory. This is used, to set S_ISVTX, if needed.  */
-  if (pc->fileattr & FILE_ATTRIBUTE_DIRECTORY)
+  if (pc->isdir ())
     buf->st_mode = S_IFDIR;
   else if (pc->issymlink ())
     buf->st_mode = S_IFLNK;
@@ -273,7 +273,7 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
 			  &uid, &gid) == 0)
     {
       /* If read-only attribute is set, modify ntsec return value */
-      if ((pc->fileattr & FILE_ATTRIBUTE_READONLY) && !get_symlink_p ())
+      if (pc->has_attribute (FILE_ATTRIBUTE_READONLY) && !get_symlink_p ())
 	buf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
 
       if (!(buf->st_mode & S_IFMT))
@@ -283,7 +283,7 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
     {
       buf->st_mode |= STD_RBITS;
 
-      if (!(pc->fileattr & FILE_ATTRIBUTE_READONLY))
+      if (!pc->has_attribute (FILE_ATTRIBUTE_READONLY))
 	buf->st_mode |= STD_WBITS;
       /* | S_IWGRP | S_IWOTH; we don't give write to group etc */
 
