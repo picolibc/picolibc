@@ -43,17 +43,14 @@ int sscanf (const char *, const char *, ...);
 
 fhandler_dev_random* entropy_source;
 
-static char *
-secret_event_name (short port, int *secret_ptr)
+static void
+secret_event_name (char *buf, short port, int *secret_ptr)
 {
-  static NO_COPY char buf[MAX_PATH] = {0};
-
   __small_sprintf (buf, "%scygwin.local_socket.secret.%d.%08x-%08x-%08x-%08x",
 		   wincap.has_terminal_services () ? "Global\\" : "",
   		   port,
 		   secret_ptr [0], secret_ptr [1],
 		   secret_ptr [2], secret_ptr [3]);
-  return buf;
 }
 
 /* cygwin internal: map sockaddr into internet domain address */
@@ -251,8 +248,8 @@ fhandler_socket::create_secret_event (int* secret)
       return NULL;
     }
 
-  char *event_name = secret_event_name (sin.sin_port,
-  					secret ?: connect_secret);
+  char event_name[MAX_PATH];
+  secret_event_name (event_name, sin.sin_port, secret ?: connect_secret);
   LPSECURITY_ATTRIBUTES sec = get_inheritance (true);
   secret_event = CreateEvent (sec, FALSE, FALSE, event_name);
   if (!secret_event && GetLastError () == ERROR_ALREADY_EXISTS)
@@ -291,8 +288,10 @@ fhandler_socket::close_secret_event ()
 int
 fhandler_socket::check_peer_secret_event (struct sockaddr_in* peer, int* secret)
 {
-  char *event_name = secret_event_name (peer->sin_port,
-  					secret ?: connect_secret);
+
+  char event_name[MAX_PATH];
+  
+  secret_event_name (event_name, peer->sin_port, secret ?: connect_secret);
   HANDLE ev = CreateEvent (&sec_all_nih, FALSE, FALSE, event_name);
   if (!ev && GetLastError () == ERROR_ALREADY_EXISTS)
     {

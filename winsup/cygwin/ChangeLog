@@ -1,5 +1,13 @@
 2003-05-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc (secret_event_name): Return void.  Use incoming
+	char *parameter instead of local static buffer.
+	(fhandler_socket::create_secret_event): Accomodate new calling
+	convention for secret_event_name.
+	(fhandler_socket::close_secret_event): Ditto.
+
+2003-05-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (SECRET_EVENT_NAME): Remove.
 	(ENTROPY_SOURCE_NAME): Ditto.
 	(secret_event_name): New static function.  Create shared event name
