@@ -111,6 +111,9 @@ pinfo::maybe_set_exit_code_from_windows ()
   DWORD oexitcode = self->exitcode;
   if (hProcess && !(self->exitcode & EXITCODE_SET))
     {
+      WaitForSingleObject (hProcess, INFINITE);	// just to be safe, in case
+      						// process hasn't quite exited
+						// after closing pipe
       GetExitCodeProcess (hProcess, &x);
       self->exitcode = EXITCODE_SET | (x & 0xff) << 8;
     }
@@ -137,7 +140,10 @@ pinfo::exit (DWORD n)
 
   maybe_set_exit_code_from_windows ();
   if (n != EXITCODE_NOSET)
-    self->alert_parent (0);
+    {
+      SetCurrentDirectory ("c:\\");
+      self->alert_parent (0);
+    }
   int exitcode = self->exitcode;
   release ();
   

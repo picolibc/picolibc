@@ -1,3 +1,11 @@
+2005-01-22  Christopher Faylor  <cgf@timesys.com>
+
+	* pinfo.cc (pinfo::maybe_set_exit_code_from_windows): Make sure that
+	process has exited before getting an error code.
+	(pinfo::exit): "cd" to innocuous location before exiting to make sure
+	that process does not keep the current working directory busy while it
+	is in the process of really exiting.
+
 2005-01-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (CoInitialize): Remove.
