@@ -165,7 +165,7 @@ bash$ cd //MACHINE/Share
 bash$ mkdir -p path/to/new/dir
 @end example
 
-@subsection Why doesn't my script work?
+@subsection Why doesn't my shell script work?
 
 There are two basic problems you might run into.  One is the fact that
 /bin/sh is really ash, and is missing some features you might expect in
@@ -175,6 +175,7 @@ There are two basic problems you might run into.  One is the fact that
 @item No job control
 @item No getopts
 @item No functions exported
+@item Must use `.' instead of `source' (true of sh and ksh too, not just ash)
 @end itemize
 
 Or it could be a permission problem, and Cygwin doesn't understand that
