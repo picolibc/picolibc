@@ -1,3 +1,7 @@
+2000-04-17  DJ Delorie  <dj@cygnus.com>
+
+	* remove dependence on where pwd is
+	
 Sun Apr  9 23:47:45 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.common: Resolve srcdir to absolute path or it will confuse
