@@ -1,3 +1,10 @@
+2001-09-20  Egor Duda  <deo@logos-m.ru>
+
+	* libltp/lib/get_high_address.c (get_high_address): Get inaccessible
+	address more robustly.
+	* winsup.api/ltp/stat06.c (high_address_setup): Use generic function
+	from ltp library to obtain inaccessible address.
+
 2001-09-15  Egor Duda  <deo@logos-m.ru>
 
 	* winsup.api/ltp/sbrk01.c (main): Force output at startup to

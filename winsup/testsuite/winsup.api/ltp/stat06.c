@@ -129,6 +129,8 @@ char *TCID="stat06";		/* Test program identifier.    */
 int TST_TOTAL=8;    		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 
+extern char *get_high_address();
+
 int exp_enos[]={0, 0};
 
 int high_address_setup();
@@ -327,11 +329,7 @@ high_address_setup()
     for (ind=0; Test_cases[ind].desc != NULL; ind++ ) {
 	if ( Test_cases[ind].pathname == High_address ) {
 	/*if ( strcmp(Test_cases[ind].pathname, HIGH_ADDRESS) == 0 ) { ***/
-#ifndef __CYGWIN__
-	    Test_cases[ind].pathname = (char *)(sbrk(0)+5);
-#else
-	    Test_cases[ind].pathname = (char *)0xffff0000;
-#endif
+	    Test_cases[ind].pathname = get_high_address();
 	    break;
 	}
     }
