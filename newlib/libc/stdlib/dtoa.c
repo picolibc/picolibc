@@ -229,7 +229,7 @@ _DEFUN (_dtoa_r,
   int denorm;
   __ULong x;
 #endif
-  _Bigint *b, *b1, *delta, *mlo, *mhi, *S;
+  _Bigint *b, *b1, *delta, *mlo = NULL, *mhi, *S;
   double ds;
   char *s, *s0;
 

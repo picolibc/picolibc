@@ -15,7 +15,10 @@
 #include "varargs.h"
 #endif
 
+#if 0
 static char *parse_number ();
+#endif
+
 static long get_number ();
 static void print_number ();
 static void write_char ();
@@ -147,6 +150,7 @@ __dprintf (fmt, va_alist)
   va_end (args);
 }
 
+#if 0
 /* Parse a positive decimal integer at S.
    FIXME: Was used in earlier version, but not currently used.
    Keep for now.  */
@@ -167,6 +171,7 @@ parse_number (s, p)
   *p = x;
   return s;
 }
+#endif
 
 /* Fetch the number at S of SIZE bytes.  */
 

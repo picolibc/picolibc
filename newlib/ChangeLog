@@ -1,3 +1,10 @@
+2002-02-05  Manik Raina <manik@cisco.com>
+
+	* libc/misc/dprintf (parse_number): #if 0 unused function.
+	* libc/stdlib/ldtoa.c (_ldcheck): Remove unused local variables
+	s, p, k, and outstr.
+	* libc/stdlib/dtoa.c (_dtoa_r): Initialize mlo.
+
 2002-02-04  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/reent.h [(!_REENT_SMALL]: Add

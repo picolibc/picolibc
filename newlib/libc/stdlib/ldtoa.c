@@ -2838,11 +2838,8 @@ int
 _ldcheck (long double *d)
 {
 unsigned short e[NI];
-char *s, *p;
-int k;
 LDPARMS rnd;
 LDPARMS *ldp = &rnd;
-char *outstr;
 
 rnd.rlast = -1;
 rnd.rndprc = NBITS;
