@@ -1,7 +1,36 @@
+2000-12-04  Danny Smith  <danny_r_smith_2001@yahoo.co.nz>
+
+	* include/winnls.h: NORM_IGNORE* remove duplicate defines. 
+	SORT_STRINGSORT: ditto. 
+	CMAP*: ditto. 
+	CTRY_*: add new defines. 
+	LGRPID_*: ditto. 
+	LCMAP*: change defines to hex notation. 
+	CALID: change from ULONG to DWORD. 
+	CALTYPE: ditto. 
+	_cpinfoex[AW]: add structure. 
+	FoldString: correct Unicode mappings. 
+	GetCPInfoEx[AW]: add prototypes. 
+	EnumCalendarInfoEx[AW]: ditto. 
+	EnumDateFormatsEx[AW]: ditto. 
+	EnumSystemLanguageGroups[AW]: ditto. 
+	EnumLanguageGroupLocales[AW]: ditto. 
+	EnumUILanguages[AW]: ditto. 
+	GetSystemDefaultUILanguage[AW]: ditto. 
+	GetUserDefaultUILanguage[AW]: ditto. 
+	IsValidLanguageGroup[AW]: ditto. 
+	CALINFO_ENUMPROCEX[AW]: add function pointer typedef 
+	LANGUAGEGROUP_ENUMPROC[AW]: ditto 
+	LANGGROUPLOCALE_ENUMPROC[AW]: ditto 
+	UILANGUAGE_ENUMPROC[AW]: ditto 
+	DATEFMT_ENUMPROCEX[AW]: ditto 
+	LPCURRENCYFMT[AW]: add structure pointer typedef 
+	LPNUMBERFMT[AW]: ditto 
+
 Sun Dec 02 14:21:02 2000  Matt Hargett <matt@use.net>
 
-	* Added a define for INVALID_SET_FILE_POINTER, a possible return
-	code for the SetFilePointer() win32 API call.
+	* include/winbase.h: Added a define for INVALID_SET_FILE_POINTER, a 
+	possible return code for the SetFilePointer() win32 API call.
 
 Mon Oct  9 11:49:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
