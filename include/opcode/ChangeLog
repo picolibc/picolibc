@@ -1,3 +1,13 @@
+2000-12-01  Chris Demetriou  <cgd@sibyte.com>
+
+        mips.h (OP_MASK_SYSCALL, OP_SH_SYSCALL): Delete.
+        (OP_MASK_CODE20, OP_SH_CODE20): Define, with values of old
+        OP_*_SYSCALL definitions.
+        (OP_SH_CODE19, OP_MASK_CODE19): Define, for use as
+        19 bit wait codes.
+        (MIPS operand specifier comments): Remove 'm', add 'U' and
+        'J', and update the meaning of 'B' so that it's more general.
+
 2000-10-20  Jakub Jelinek  <jakub@redhat.com>
 
 	* sparc.h (enum sparc_opcode_arch_val): Add SPARC_OPCODE_ARCH_V9B.

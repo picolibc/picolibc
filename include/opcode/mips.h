@@ -48,9 +48,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  *
    breakpoint instruction are not defined; Kane says the breakpoint
    code field in BREAK is 20 bits; yet MIPS assemblers and debuggers
    only use ten bits).  An optional two-operand form of break/sdbbp
-   allows the lower ten bits to be set too.
+   allows the lower ten bits to be set too, and MIPS32 and later
+   architectures allow 20 bits to be set with a signal operand
+   (using CODE20).
 
-   The syscall instruction uses SYSCALL.
+   The syscall instruction uses CODE20.
 
    The general coprocessor instructions use COPZ.  */
 
@@ -82,8 +84,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  *
 #define OP_SH_PREFX		11
 #define OP_MASK_CCC		0x7
 #define OP_SH_CCC		8
-#define OP_MASK_SYSCALL		0xfffff
-#define OP_SH_SYSCALL		6
+#define OP_MASK_CODE20		0xfffff /* 20 bit syscall/breakpoint code.  */
+#define OP_SH_CODE20		6
 #define OP_MASK_SHAMT		0x1f
 #define OP_SH_SHAMT		6
 #define OP_MASK_FD		0x1f
@@ -100,17 +102,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  *
 #define OP_SH_FUNCT		0
 #define OP_MASK_SPEC		0x3f
 #define OP_SH_SPEC		0
-#define OP_SH_LOCC              8       /* FP condition code */
-#define OP_SH_HICC              18      /* FP condition code */
+#define OP_SH_LOCC              8       /* FP condition code.  */
+#define OP_SH_HICC              18      /* FP condition code.  */
 #define OP_MASK_CC              0x7
-#define OP_SH_COP1NORM          25      /* Normal COP1 encoding */
-#define OP_MASK_COP1NORM        0x1     /* a single bit */
-#define OP_SH_COP1SPEC          21      /* COP1 encodings */
+#define OP_SH_COP1NORM          25      /* Normal COP1 encoding.  */
+#define OP_MASK_COP1NORM        0x1     /* a single bit.  */
+#define OP_SH_COP1SPEC          21      /* COP1 encodings.  */
 #define OP_MASK_COP1SPEC        0xf
 #define OP_MASK_COP1SCLR        0x4
 #define OP_MASK_COP1CMP         0x3
 #define OP_SH_COP1CMP           4
-#define OP_SH_FORMAT            21      /* FP short format field */
+#define OP_SH_FORMAT            21      /* FP short format field.  */
 #define OP_MASK_FORMAT          0x7
 #define OP_SH_TRUE              16
 #define OP_MASK_TRUE            0x1
@@ -120,16 +122,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  *
 #define OP_MASK_UNSIGNED        0x1
 #define OP_SH_HINT              16
 #define OP_MASK_HINT            0x1f
-#define OP_SH_MMI               0       /* Multimedia (parallel) op */
+#define OP_SH_MMI               0       /* Multimedia (parallel) op.  */
 #define OP_MASK_MMI             0x3f 
 #define OP_SH_MMISUB            6
 #define OP_MASK_MMISUB          0x1f
-#define OP_MASK_PERFREG		0x1f	/* Performance monitoring */
+#define OP_MASK_PERFREG		0x1f	/* Performance monitoring.  */
 #define OP_SH_PERFREG		1
-#define OP_SH_SEL		0	/* Coprocessor select field */
-#define OP_MASK_SEL		0x7	/* The sel field of mfcZ and mtcZ. */
-#define OP_SH_CODE20		6	/* 20 bit breakpoint code */
-#define OP_MASK_CODE20		0xfffff
+#define OP_SH_SEL		0	/* Coprocessor select field.  */
+#define OP_MASK_SEL		0x7	/* The sel field of mfcZ and mtcZ.  */
+#define OP_SH_CODE19		6       /* 19 bit wait code.  */
+#define OP_MASK_CODE19		0x7ffff
+
 
 /* This structure holds information for a particular instruction.  */
 
@@ -176,7 +179,6 @@ struct mips_opcode
    "i" 16 bit unsigned immediate (OP_*_IMMEDIATE)
    "j" 16 bit signed immediate (OP_*_DELTA)
    "k" 5 bit cache opcode in target register position (OP_*_CACHE)
-   "m" 20 bit breakpoint code (OP_*_CODE20)
    "o" 16 bit signed offset (OP_*_DELTA)
    "p" 16 bit PC relative branch target address (OP_*_DELTA)
    "q" 10 bit extra breakpoint code (OP_*_CODE2)
@@ -186,8 +188,11 @@ struct mips_opcode
    "u" 16 bit upper 16 bits of address (OP_*_IMMEDIATE)
    "v" 5 bit same register used as both source and destination (OP_*_RS)
    "w" 5 bit same register used as both target and destination (OP_*_RT)
+   "U" 5 bit same destination register in both OP_*_RD and OP_*_RT
+       (used by clo and clz)
    "C" 25 bit coprocessor function code (OP_*_COPZ)
-   "B" 20 bit syscall function code (OP_*_SYSCALL)
+   "B" 20 bit syscall/breakpoint function code (OP_*_CODE20)
+   "J" 19 bit wait function code (OP_*_CODE19)
    "x" accept and ignore register name
    "z" must be zero register
 
@@ -221,8 +226,8 @@ struct mips_opcode
 
    Characters used so far, for quick reference when adding more:
    "<>(),"
-   "ABCDEFGHILMNPSTRVW"
-   "abcdfhijklmopqrstuvwxz"
+   "ABCDEFGHIJLMNPRSTUVW"
+   "abcdfhijklopqrstuvwxz"
 */
 
 /* These are the bits which may be set in the pinfo field of an
