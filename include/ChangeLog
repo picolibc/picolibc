@@ -1,3 +1,7 @@
+2005-03-16  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* bfdlink.h (bfd_link_info): Add gc_sections.
+
 2005-03-12  Zack Weinberg  <zack@codesourcery.com>
 
 	* opcode/arm.h: Adjust comments for ARM_EXT_V4T and ARM_EXT_V5T.
