@@ -1,3 +1,17 @@
+2003-01-09  Thomas Pfaff  <tpfaff@gmx.net>
+	
+	* winsup.api/pthread/mutex1d.c: New test. Port from pthreads-win32 
+	project.
+	* winsup.api/pthread/mutex1e.c: Ditto.
+	* winsup.api/pthread/mutex4.c: Ditto.
+	* winsup.api/pthread/mutex5.c: Ditto.
+	* winsup.api/pthread/mutex6d.c: Ditto.
+	* winsup.api/pthread/mutex6e.c: Ditto.
+	* winsup.api/pthread/mutex7.c: Ditto.
+	* winsup.api/pthread/mutex7d.c: Ditto.
+	* winsup.api/pthread/mutex7e.c: Ditto.
+	* winsup.api/pthread/mutex7r.c: Ditto.
+
 2002-11-25  Robert Collins  <rbtcollins@hotmail.com>
 
 	* readme: Document running portions of the test suite (Thanks Egor!).
