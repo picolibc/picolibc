@@ -61,11 +61,12 @@ internal_getlogin (cygheap_user &user)
       /* If that failed, try to get that info from NetBIOS */
       else if (!NetWkstaUserGetInfo (NULL, 1, (LPBYTE *)&wui))
 	{
-	  char buf[512];
+	  char buf[512]; /* Bigger than each of the below defines. */
 
 	  sys_wcstombs (buf, wui->wkui1_username, UNLEN + 1);
 	  user.set_name (buf);
-	  sys_wcstombs (buf, wui->wkui1_logon_server, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+	  sys_wcstombs (buf, wui->wkui1_logon_server,
+	  		INTERNET_MAX_HOST_NAME_LENGTH + 1);
 	  user.set_logsrv (buf);
 	  sys_wcstombs (buf, wui->wkui1_logon_domain,
 			INTERNET_MAX_HOST_NAME_LENGTH + 1);

@@ -1,3 +1,7 @@
+Mon Apr 30 20:26:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* uinfo.cc (internal_getlogin): Formatting change.
+
 Mon Apr 30 19:58:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* grp.cc: Eliminate MAX_DOMAIN_NAME define.
