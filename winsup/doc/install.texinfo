@@ -140,6 +140,22 @@ Good question!  That very issue has been debated on the
 @samp{cygwin-apps} mailing list.  Check the list archives if you want to
 know more.  Start at @file{http://sources.redhat.com/cygwin/lists.html}.
 
+@subsection My Windows logon name has a space in it, will this cause problems?
+
+Most definitely yes!  UNIX shells (and thus Cygwin) use the space
+character as a word delimiter.  Under certain circumstances, it is
+possible to get around this with various shell quoting mechanisms, but
+you are much better off if you can avoid the problem entirely.
+
+In particular, the environment variables @samp{USER} and @samp{HOME} are
+set for you in /etc/profile.  By default these derive from your Windows
+logon name.  You may edit this file and set them explicitly to something
+without spaces.
+
+(If you use the @samp{login} package or anything else that reads
+/etc/passwd, you may need to make corresponding changes there.  See the
+README file for that package.)
+
 @subsection How do I uninstall Cygwin?
 
 Setup has no automatic uninstall facility.  Just delete everything
