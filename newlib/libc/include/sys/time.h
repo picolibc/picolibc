@@ -39,7 +39,7 @@ struct  itimerval {
 };
 
 /* BSD time macros used by RTEMS code */
-#if defined(__rtems__)
+#if defined (__rtems__) || defined (__CYGWIN__)
 
 /* Convenience macros for operations on timevals.
    NOTE: `timercmp' does not work for >= or <=.  */
@@ -68,7 +68,7 @@ struct  itimerval {
       (result)->tv_usec += 1000000;					      \
     }									      \
   } while (0)
-#endif
+#endif /* defined (__rtems__) || defined (__CYGWIN__) */
 
 int _EXFUN(gettimeofday, (struct timeval *__p, struct timezone *__z));
 int _EXFUN(settimeofday, (const struct timeval *, const struct timezone *));

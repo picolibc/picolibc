@@ -1,3 +1,8 @@
+Fri Apr 20 23:17:51 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* libc/include/sys/time.h: Define timercmp and other macros for
+	__CYGWIN__, too.
+
 2001-04-20  Jeff Johnston  <jjohnstn@redhat.com>
 	
 	* acinclude.m4: Added --enable-malloc-debugging configure flag.
