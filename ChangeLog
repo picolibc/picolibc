@@ -1,3 +1,10 @@
+2002-12-13  Jason Merrill  <jason@redhat.com>
+
+	* Makefile.tpl (check-gcc-c++): Renamed from check-c++.  Don't run
+	library tests.
+	(check-c++): Just depend on it and check-target-libstdc++-v3.
+	* Makefile.in: Regenerate.
+
 2002-12-13  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	* configure.in, Makefile.tpl, Makefile.def: Remove tclX.
