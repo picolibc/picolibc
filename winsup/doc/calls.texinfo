@@ -365,18 +365,18 @@ net release.)}
 @item funlockfile: P96 8.2.6.1 -- unimplemented
 @item fwrite: C 4.9.8.2, P 8.2.3.6
 @item getc: C 4.9.7.5, P 8.2.3.5
-@item getc_unlocked: P96 8.2.7.1 -- unimplemented
+@item getc_unlocked: P96 8.2.7.1
 @item getchar: C 4.9.7.6, P 8.2.3.5
-@item getchar_unlocked: P96 8.2.7.1 -- unimplemented
+@item getchar_unlocked: P96 8.2.7.1
 @item gets: C 4.9.7.7, P 8.2.3.5
 @item gmtime_r: P96 8.3.6.1 -- unimplemented
 @item localtime_r: P96 8.3.7.1 -- unimplemented
 @item perror: C 4.9.10.4, P 8.2.3.8
 @item printf: C 4.9.6.3, P 8.2.3.6
 @item putc: C 4.9.7.8, P 8.2.3.6
-@item putc_unlocked: P96 8.2.7.1 -- unimplemented
+@item putc_unlocked: P96 8.2.7.1
 @item putchar: C 4.9.7.9, P 8.2.3.6
-@item putchar_unlocked: P96 8.2.7.1 -- unimplemented
+@item putchar_unlocked: P96 8.2.7.1
 @item puts: C 4.9.7.10, P 8.2.3.6
 @item rand_r: P96 8.3.8.1 -- unimplemented
 @item remove: C 4.9.4.1, P 8.2.4

@@ -1,3 +1,8 @@
+2002-08-27  Nicholas Wourms  <nwourms@netscape.net>
+
+	* calls.texinfo: Add getc_unlocked, getchar_unlocked, putc_unlocked
+	and putchar_unlocked.
+
 2002-08-21  Christopher Faylor  <cgf@redhat.com>
 
 	* dll.sgml: Remove indirect reference to older gccs.
