@@ -1,5 +1,11 @@
 2005-03-25  Daniel Jacobowitz  <dan@codesourcery.com>
 
+	* gdb/arm-tdep.c (target_is_thumb, caller_is_thumb)
+	(arm_pc_is_thumb_dummy): Remove.
+	(arm_breakpoint_from_pc): Don't call arm_pc_is_thumb_dummy.
+
+2005-03-25  Daniel Jacobowitz  <dan@codesourcery.com>
+
 	* gdb/arm-linux-tdep.c (arm_linux_thumb_be_breakpoint)
 	(arm_linux_thumb_le_breakpoint): New.  Update comments.
 	(arm_linux_init_abi): Set Thumb breakpoints also.
