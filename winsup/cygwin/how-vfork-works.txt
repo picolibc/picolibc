@@ -1,0 +1,34 @@
+How does vfork work?
+
+When a program calls vfork, cygwin attempts to short circuit its
+normal, expensive fork mechanism.
+
+Vfork is mainly smoke and mirrors.  A call to vfork contines to execute
+in the current process but first it returns a pid of 0 so that process
+will execute code intended for the child in a UNIX system.  Before
+returning the zero, vfork makes a copy of the current fd table so that
+closing an fd in the "child" will not affect the "parent".
+
+Some of this info is stored in a per-thread structure but vfork is not
+really thread-safe since it also stores the fd "backup" table in the
+global fd table.
+
+The process continues to execute until it hits some type of exec call.
+The exec call is essentially translated into a spawn NO_WAIT call and
+the new process is started via this mechanism.  After execing, the
+"child" process no longer should exist, so the spawn code longjmps back
+to the original vfork call.  The previously opened fds are closed and
+the parent's fd table is restored.  vfork() then returns the pid of the
+just-spawned process.
+
+Meanwhile, the just-spawned child notices that it has been spawned as
+the result of a vfork and closes the extra file handles.
+
+This all relies on the fact that the child in a vfork call can affect
+just about everything in the parent except for the parent's fds.
+The assumption is that you don't return from the call that invoked the
+vfork.
+
+The assumption is also that all of this is much faster than the
+slow method that cygwin uses to implement fork().
+
