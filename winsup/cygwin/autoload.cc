@@ -530,6 +530,15 @@ LoadDLLfuncEx (timeGetTime, 0, winmm, 1)
 LoadDLLfuncEx (timeBeginPeriod, 4, winmm, 1)
 LoadDLLfuncEx (timeEndPeriod, 4, winmm, 1)
 
+LoadDLLfuncEx (waveInGetNumDevs, 0, winmm, 1)
+LoadDLLfuncEx (waveInOpen, 24, winmm, 1)
+LoadDLLfuncEx (waveInUnprepareHeader, 12, winmm, 1)
+LoadDLLfuncEx (waveInPrepareHeader, 12, winmm, 1)
+LoadDLLfuncEx (waveInAddBuffer, 12, winmm, 1)
+LoadDLLfuncEx (waveInStart, 4, winmm, 1)
+LoadDLLfuncEx (waveInReset, 4, winmm, 1)
+LoadDLLfuncEx (waveInClose, 4, winmm, 1)
+
 LoadDLLfuncEx (UuidCreate, 4, rpcrt4, 1)
 LoadDLLfuncEx (UuidCreateSequential, 4, rpcrt4, 1)
 }

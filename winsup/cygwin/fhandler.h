@@ -1105,14 +1105,20 @@ class fhandler_windows: public fhandler_base
   bool is_slow () {return 1;}
 };
 
-class fhandler_dev_dsp : public fhandler_base
+class fhandler_dev_dsp: public fhandler_base
 {
+ public:
+  class Audio;
+  class Audio_out;
+  class Audio_in;
  private:
   int audioformat_;
   int audiofreq_;
   int audiobits_;
   int audiochannels_;
-  bool setupwav(const char *pData, int nBytes);
+  static int open_count; // per process
+  Audio_out *audio_out_;
+  Audio_in  *audio_in_;
  public:
   fhandler_dev_dsp ();
   ~fhandler_dev_dsp();
@@ -1125,6 +1131,7 @@ class fhandler_dev_dsp : public fhandler_base
   int close (void);
   int dup (fhandler_base *child);
   void dump (void);
+  void fixup_after_fork (HANDLE parent);
   void fixup_after_exec ();
 };
 

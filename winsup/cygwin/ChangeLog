@@ -1,3 +1,34 @@
+2004-03-23  Gerd Spalink  <Gerd.Spalink@t-online.de>
+
+	* autoload.cc: Load eight more functions for waveIn support.
+	* fhandler.h (class fhandler_dev_dsp): Add class Audio, class Audio_in
+	and class Audio_out members and audio_in_, audio_out_ pointers so
+	that future changes are restricted to file fhandler_dsp.cc.  
+	* fhandler_dsp.cc (fhandler_dev_dsp::Audio): Add this class to treat
+	things common to audio recording and playback.
+	Add more format conversions.
+	(fhandler_dev_dsp::Audio::queue): New queues for buffer management
+	to fix incomplete cleanup of buffers passed to the wave device.
+	(fhandler_dev_dsp::Audio_in): New, added class to implement audio
+	recording.
+	(fhandler_dev_dsp::Audio_out): Rework to use functionality provided
+	by fhandler_dev_dsp::Audio.  Allocate memory audio buffers late,
+	just before write.
+	(fhandler_dev_dsp::Audio_out::start): Size of wave buffer allocated
+	here depends on audio rate/bits/channels.
+	(fhandler_dev_dsp::Audio_in::start): Ditto.
+	(fhandler_dev_dsp::setupwav): Replaced by following function.
+	(fhandler_dev_dsp::Audio_out::parsewav): Does not setup wave device
+	any more. Discard wave header properly.
+	(fhandler_dev_dsp::open): Add O_RDONLY and_RDWR as legal modes.
+	Protect against re-open. Activate fork_fixup.
+	(fhandler_dev_dsp::ioctl): Protect against actions when audio is
+	active.  SNDCTL_DSP_GETFMTS only returns formats supported by
+	mmsystem wave API, not all supported formats.  SNDCTL_DSP_GETBLKSIZE
+	result now depends on current audio format.
+	(fhandler_dev_dsp::fixup_after_fork): Call fork_fixup for the Audio
+	classes to let them duplicate the CRITICAL_SECTION.
+
 2004-03-19  Pierre Humblet  <pierre.humblet@ieee.org>
 	    Christopher Faylor  <cgf@redhat.com>
 
