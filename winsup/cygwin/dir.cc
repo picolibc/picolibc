@@ -320,14 +320,14 @@ mkdir (const char *dir, mode_t mode)
     goto done;
 
   if (allow_ntsec && real_dir.has_acls ())
-    set_security_attribute (S_IFDIR | ((mode & 0777) & ~cygheap->umask),
+    set_security_attribute (S_IFDIR | ((mode & 07777) & ~cygheap->umask),
 			    &sa, alloca (256), 256);
 
   if (CreateDirectoryA (real_dir.get_win32 (), &sa))
     {
       if (!allow_ntsec && allow_ntea)
 	set_file_attribute (real_dir.has_acls (), real_dir.get_win32 (),
-			    S_IFDIR | ((mode & 0777) & ~cygheap->umask));
+			    S_IFDIR | ((mode & 07777) & ~cygheap->umask));
       res = 0;
     }
   else

@@ -466,7 +466,7 @@ _open (const char *unix_path, int flags, ...)
 	set_errno (ENMFILE);
       else if ((fh = cygheap->fdtab.build_fhandler (fd, unix_path, NULL)) == NULL)
 	res = -1;		// errno already set
-      else if (!fh->open (unix_path, flags, (mode & 0777) & ~cygheap->umask))
+      else if (!fh->open (unix_path, flags, (mode & 07777) & ~cygheap->umask))
 	{
 	  cygheap->fdtab.release (fd);
 	  res = -1;

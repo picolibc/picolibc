@@ -1,3 +1,11 @@
+Tue Aug  7 18:11:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* security.cc (alloc_sd): Don't set FILE_DELETE_CHILD for group
+	if S_ISVTX attribute is given.
+	* dir.cc (mkdir): Allow immediate setting of S_ISUID, S_ISGID and
+	S_ISVTX attribute.
+	* syscalls.cc (_open): Ditto.
+
 Tue Aug  7 16:24:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* dir.cc (mkdir): Set security attributes correctly for

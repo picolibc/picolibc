@@ -1393,7 +1393,8 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
   if (attribute & S_IXGRP)
     group_allow |= FILE_GENERIC_EXECUTE;
   if ((attribute & (S_IFDIR | S_IWGRP | S_IXGRP))
-      == (S_IFDIR | S_IWGRP | S_IXGRP))
+      == (S_IFDIR | S_IWGRP | S_IXGRP)
+      && !(attribute & S_ISVTX))
     group_allow |= FILE_DELETE_CHILD;
 
   /* Construct allow attribute for everyone. */
