@@ -116,8 +116,8 @@ fhandler_dev_raw::writebuf (void)
   return ret;
 }
 
-fhandler_dev_raw::fhandler_dev_raw (DWORD devtype)
-  : fhandler_base (devtype)
+fhandler_dev_raw::fhandler_dev_raw ()
+  : fhandler_base ()
 {
   clear ();
   set_need_fork_fixup ();
