@@ -1,3 +1,9 @@
+2004-10-04  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdio/vfscanf.c (__svfscanf_r): For int conversions,
+	count skipped zero characters as part of the nread count for %n.
+	* libc/machine/powerpc/vfscanf.c: Ditto.
+
 2004-09-24  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/local.h: Include <stdlib.h>.

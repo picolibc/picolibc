@@ -765,6 +765,7 @@ _DEFUN(__svfscanf_r, (rptr, fp, fmt0, ap),
 	{
 	  /* scan an integer as if by strtol/strtoul */
 	  unsigned width_left = 0;
+	  int skips = 0;
 #ifdef hardway
 	  if (width == 0 || width > sizeof (buf) - 1)
 #else
@@ -813,6 +814,7 @@ _DEFUN(__svfscanf_r, (rptr, fp, fmt0, ap),
 		      width_left--;
 		      width++;
 		    }
+		  ++skips;
 		  goto skip;
 
 		  /* 1 through 7 always legal */
@@ -957,7 +959,7 @@ _DEFUN(__svfscanf_r, (rptr, fp, fmt0, ap),
 		}
 	      nassigned++;
 	    }
-	  nread += p - buf;
+	  nread += p - buf + skips;
 	  break;
 	}
 #ifdef FLOATING_POINT

@@ -803,6 +803,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	case CT_INT:
 	  {
 	  unsigned int_width_left = 0;
+	  int skips = 0;
 	  int_width = width;
 #ifdef hardway
 	  if (int_width == 0 || int_width > sizeof (buf) - 1)
@@ -852,6 +853,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 		      int_width_left--;
 		      int_width++;
 		    }
+		  ++skips;
 		  goto skip;
 
 		  /* 1 through 7 always legal */
@@ -1009,7 +1011,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	      if (!(flags & VECTOR))
 		nassigned++;
 	    }
-	  nread += p - buf;
+	  nread += p - buf + skips;
 	  break;
 	  }
 
