@@ -352,9 +352,20 @@ _CRTIMP int __cdecl	fsetpos (FILE*, const fpos_t*);
  * Error Functions
  */
 
-_CRTIMP void __cdecl	clearerr (FILE*);
 _CRTIMP int __cdecl	feof (FILE*);
 _CRTIMP int __cdecl	ferror (FILE*);
+
+#ifdef __cplusplus
+inline int __cdecl feof (FILE* __F)
+  { return __F->_flag & _IOEOF; }
+inline int __cdecl ferror (FILE* __F)
+  { return __F->_flag & _IOERR; }
+#else
+#define feof(__F)     ((__F)->_flag & _IOEOF)
+#define ferror(__F)   ((__F)->_flag & _IOERR)
+#endif
+
+_CRTIMP void __cdecl	clearerr (FILE*);
 _CRTIMP void __cdecl	perror (const char*);
 
 
