@@ -273,7 +273,7 @@ _read (int fd, void *ptr, size_t len)
 	}
 
     out:
-      if (res >= 0 || get_errno () == EINTR || !thisframe.call_signal_handler ())
+      if (res >= 0 || get_errno () != EINTR || !thisframe.call_signal_handler ())
 	break;
     }
 

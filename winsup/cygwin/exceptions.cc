@@ -1119,14 +1119,22 @@ events_terminate (void)
 }
 
 extern "C" {
-static int __stdcall call_signal_handler_now ();
+static int __stdcall
+call_signal_handler_now ()
+{
+  int sa_flags = sigsave.sa_flags;
+  sigproc_printf ("sa_flags %p", sa_flags);
+  *sigsave.retaddr_on_stack = sigsave.retaddr;
+  sigdelayed0 ();
+  return sa_flags & SA_RESTART;
+}
 };
 
 int
 sigframe::call_signal_handler ()
 {
   unregister ();
-  call_signal_handler_now ();
+  return call_signal_handler_now ();
 }
 
 #define pid_offset (unsigned)(((_pinfo *)NULL)->pid)
@@ -1136,16 +1144,6 @@ reset_signal_arrived ()
 {
   (void) ResetEvent (signal_arrived);
   sigproc_printf ("reset signal_arrived");
-}
-
-static int __stdcall
-call_signal_handler_now ()
-{
-  int sa_flags = sigsave.sa_flags;
-  sigproc_printf ("sa_flags %p", sa_flags);
-  *sigsave.retaddr_on_stack = sigsave.retaddr;
-  sigdelayed0 ();
-  return sa_flags & SA_RESTART;
 }
 
 void unused_sig_wrapper ()

@@ -71,7 +71,7 @@ public:
       t.get_winapi_lock ();
   }
 
-  sigframe () {st = NULL;}
+  sigframe (): st (NULL) {}
   sigframe (sigthread &t, DWORD ebp = (DWORD) __builtin_frame_address (0))
   {
     if (!t.frame && t.id == GetCurrentThreadId ())

@@ -1,3 +1,11 @@
+Sun Apr  1 20:10:34 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (sigframe::call_signal_handler): Return value of
+	call_signal_handler_now.
+	* sigproc.h (sigframe): Use constructor.
+	* syscalls.cc (_read): Correct errno test prior to calling signal
+	handler.
+
 Sun Apr  1 00:38:06 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (sigframe::call_signal_handler): Move outside of "C"
