@@ -123,6 +123,8 @@ public:
   bool dup_proc_pipe (HANDLE) __attribute__ ((regparm(2)));
   void sync_proc_pipe ();
   bool alert_parent (char);
+  int __stdcall kill (siginfo_t&) __attribute__ ((regparm (2)));
+  bool __stdcall exists () __attribute__ ((regparm (1)));
 
   friend void __stdcall set_myself (HANDLE);
 

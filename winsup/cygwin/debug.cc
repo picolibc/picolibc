@@ -162,7 +162,7 @@ static void __stdcall
 delete_handle (handle_list *hl)
 {
   handle_list *hnuke = hl->next;
-  debug_printf ("nuking handle '%s'", hnuke->name);
+  debug_printf ("nuking handle '%s' (%p)", hnuke->name, hnuke->h);
   hl->next = hl->next->next;
   memset (hnuke, 0, sizeof (*hnuke));
 }

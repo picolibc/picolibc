@@ -181,7 +181,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
     }
 
   void *mapaddr;
-  bool createit = !!(flag & (PID_IN_USE | PID_EXECED));
+  int createit = flag & (PID_IN_USE | PID_EXECED);
   bool created = false;
   DWORD access = FILE_MAP_READ
 		 | (flag & (PID_IN_USE | PID_EXECED | PID_MAP_RW)
@@ -257,7 +257,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 
       if (procinfo->process_state & PID_EXECED)
 	{
-	  assert (!i);
+	  assert (i == 0);
 	  pid_t realpid = procinfo->pid;
 	  debug_printf ("execed process windows pid %d, cygwin pid %d", n, realpid);
 	  if (realpid == n)
@@ -296,7 +296,8 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 
     loop:
       release ();
-      low_priority_sleep (0);
+      if (h0)
+	low_priority_sleep (0);
     }
 
   if (h)
@@ -338,7 +339,7 @@ _pinfo::set_ctty (tty_min *tc, int flags, fhandler_tty_slave *arch)
 		      tc->ntty, sid, pid, pgid, tc->getsid ());
 
       pinfo p (tc->getsid ());
-      if (sid == pid && (!p || p->pid == pid || !proc_exists (p)))
+      if (sid == pid && (!p || p->pid == pid || !p->exists ()))
 	{
 	  paranoid_printf ("resetting tty%d sid.  Was %d, now %d.  pgid was %d, now %d.",
 			   tc->ntty, tc->getsid (), sid, tc->getpgid (), pgid);
@@ -1132,17 +1133,15 @@ pinfo::release ()
 {
   if (procinfo)
     {
-#ifdef DEBUGGING
-      if (((DWORD) procinfo & 0x77000000) == 0x61000000)
-	try_to_debug ();
-#endif
-      UnmapViewOfFile (procinfo);
+      void *unmap_procinfo = procinfo;
       procinfo = NULL;
+      UnmapViewOfFile (unmap_procinfo);
     }
   if (h)
     {
-      ForceCloseHandle1 (h, pinfo_shared_handle);
+      HANDLE close_h = h;
       h = NULL;
+      ForceCloseHandle1 (close_h, pinfo_shared_handle);
     }
 }
 

@@ -1,3 +1,23 @@
+2005-02-26  Christopher Faylor  <cgf@timesys.com>
+
+	* debug.cc (delete_handle): Report on handle value in debugging output.
+
+	* pinfo.h (_pinfo::exists): Declare "new" function.
+	(_pinfo::kill): Ditto.
+	* fhandler_termios.cc (tty_min::kill_pgrp): Use _pinfo::exists rather
+	than proc_exists.
+	* pinfo.cc (pinfo::init): Ditto.  Don't do a low_priority_sleep(0) when
+	looping to find exec'ed procinfo.
+	(pinfo::release): Be more careful about unmapping and closing.
+	* signal.cc (_pinfo::kill): Rename from kill_worker.  Accommodate entry
+	into _pinfo class.
+	(kill0): Use _pinfo::kill rather than kill_worker.
+	(kill_pgrp): Ditto.  Use _pinfo::exists rather than proc_exists.
+	* sigproc.cc (_pinfo::exists): Rename from proc_exists.
+	(pid_exists): Use _pinfo::exists rather than proc_exists.
+	(remove_proc): Ditto.
+	* sigproc.h (proc_exists): Delete declaration.
+
 2005-02-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (class fhandler_base): Declare fixup_mmap_after_fork
@@ -145,7 +165,7 @@
 	(fhandler_base::fstat_by_name): Pass pc.volser () to fstat_helper.
 	Accomodate dropping default values for last three arguments of
 	fstat_helper.
-	(fhandler_base::fstat_helper): Add dwVolumeSerialNumber argument. 
+	(fhandler_base::fstat_helper): Add dwVolumeSerialNumber argument.
 	Use for st_dev member unless 0 in which case pc.volser () is used.
 
 2005-02-20  Corinna Vinschen  <corinna@vinschen.de>

@@ -73,7 +73,6 @@ class _pinfo;
 void __stdcall proc_terminate ();
 void __stdcall sigproc_init ();
 void __stdcall sigproc_terminate ();
-bool __stdcall proc_exists (_pinfo *) __attribute__ ((regparm(1)));
 bool __stdcall pid_exists (pid_t) __attribute__ ((regparm(1)));
 int __stdcall sig_send (_pinfo *, siginfo_t&, class _cygtls *tls = NULL) __attribute__ ((regparm (3)));
 int __stdcall sig_send (_pinfo *, int) __attribute__ ((regparm (2)));

@@ -192,16 +192,15 @@ proc_can_be_signalled (_pinfo *p)
 bool __stdcall
 pid_exists (pid_t pid)
 {
-  pinfo p (pid);
-  return proc_exists (p);
+  return pinfo (pid)->exists ();
 }
 
 /* Test to determine if a process really exists and is processing signals.
  */
 bool __stdcall
-proc_exists (_pinfo *p)
+_pinfo::exists ()
 {
-  return p && !(p->process_state & PID_EXITED);
+  return this && !(process_state & PID_EXITED);
 }
 
 /* Return true if this is one of our children, false otherwise.  */
@@ -847,7 +846,7 @@ out:
 static bool __stdcall
 remove_proc (int ci)
 {
-  if (proc_exists (procs[ci]))
+  if (procs[ci]->exists ())
     return true;
 
   sigproc_printf ("removing procs[%d], pid %d, nprocs %d", ci, procs[ci]->pid,

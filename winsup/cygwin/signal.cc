@@ -182,16 +182,15 @@ handle_sigprocmask (int sig, const sigset_t *set, sigset_t *oldset, sigset_t& op
   return 0;
 }
 
-static int
-kill_worker (pid_t pid, siginfo_t& si)
+int __stdcall
+_pinfo::kill (siginfo_t& si)
 {
   sig_dispatch_pending ();
 
   int res = 0;
-  pinfo dest (pid);
   bool sendSIGCONT;
 
-  if (!dest)
+  if (!exists ())
     {
       set_errno (ESRCH);
       return -1;
@@ -200,14 +199,10 @@ kill_worker (pid_t pid, siginfo_t& si)
   if ((sendSIGCONT = (si.si_signo < 0)))
     si.si_signo = -si.si_signo;
 
-  DWORD process_state = dest->process_state;
+  DWORD this_process_state = process_state;
   if (si.si_signo == 0)
-    {
-      res = proc_exists (dest) ? 0 : -1;
-      if (res < 0)
-	set_errno (ESRCH);
-    }
-  else if ((res = sig_send (dest, si)))
+    /* ok */;
+  else if ((res = sig_send (this, si)))
     {
       sigproc_printf ("%d = sig_send, %E ", res);
       res = -1;
@@ -218,11 +213,11 @@ kill_worker (pid_t pid, siginfo_t& si)
       si2.si_signo = SIGCONT;
       si2.si_code = SI_KERNEL;
       si2.si_pid = si2.si_uid = si2.si_errno = 0;
-      (void) sig_send (dest, si2);
+      (void) sig_send (this, si2);
     }
 
-  syscall_printf ("%d = kill_worker (%d, %d), process_state %p", res, pid,
-		  si.si_signo, process_state);
+  syscall_printf ("%d = _pinfo::kill (%d, %d), process_state %p", res, pid,
+		  si.si_signo, this_process_state);
   return res;
 }
 
@@ -250,7 +245,7 @@ kill0 (pid_t pid, siginfo_t& si)
       (si.si_signo == SIGTSTP || si.si_signo == SIGTTIN || si.si_signo == SIGTTOU))
     si.si_signo = 0;
 
-  return (pid > 0) ? kill_worker (pid, si) : kill_pgrp (-pid, si);
+  return (pid > 0) ? pinfo (pid)->kill (si) : kill_pgrp (-pid, si);
 }
 
 int
@@ -286,7 +281,7 @@ kill_pgrp (pid_t pid, siginfo_t& si)
     {
       _pinfo *p = pids[i];
 
-      if (!proc_exists (p))
+      if (!p->exists ())
 	continue;
 
       /* Is it a process we want to kill?  */
@@ -298,12 +293,12 @@ kill_pgrp (pid_t pid, siginfo_t& si)
 		      p->pid, p->pgid, p->ctty, myself->ctty);
       if (p == myself)
 	killself++;
-      else if (kill_worker (p->pid, si))
+      else if (p->kill (si))
 	res = -1;
       found++;
     }
 
-  if (killself && !exit_state && kill_worker (myself->pid, si))
+  if (killself && !exit_state && myself->kill (si))
     res = -1;
 
   if (!found)
