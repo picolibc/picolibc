@@ -478,8 +478,8 @@ static const struct i860_opcode i860_opcodes[] =
 { "pfaddp",	0x48000450, 0xb40001af, "e,f,g", 0 },	/* pfaddp fsrc1,fsrc2,fdest */
 { "faddz",	0x480001d1, 0xb400042e, "e,f,g", 0 },	/* faddz fsrc1,fsrc2,fdest */
 { "pfaddz",	0x480005d1, 0xb400002e, "e,f,g", 0 },	/* pfaddz fsrc1,fsrc2,fdest */
-{ "form",	0x480001da, 0xb4000425, "e,g", 0 },	/* form fsrc1,fdest */
-{ "pform",	0x480005da, 0xb4000025, "e,g", 0 },	/* pform fsrc1,fdest */
+{ "form.dd",	0x480001da, 0xb4000425, "e,g", 0 },	/* form fsrc1,fdest */
+{ "pform.dd",	0x480005da, 0xb4000025, "e,g", 0 },	/* pform fsrc1,fdest */
 
 /* Floating point pseudo-instructions.  */
 { "fmov.ss",	0x48000049, 0xb7e005b6, "e,g", 0 },	/* fiadd.ss fsrc1,f0,fdest */

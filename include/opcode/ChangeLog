@@ -1,3 +1,7 @@
+2003-05-18  Jason Eckhardt  <jle@rice.edu>
+
+	* i860.h (form, pform): Add missing .dd suffix.
+
 2003-05-13  Stephane Carrez  <stcarrez@nerim.fr>
 
 	* m68hc11.h (M68HC12_BANK_VIRT): Define to 0x010000
