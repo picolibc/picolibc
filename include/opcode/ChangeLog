@@ -1,7 +1,8 @@
 2001-10-12  matthew green  <mrg@redhat.com>
 
-	* ppc.h (PPC_OPCODE_BOOKE, PPC_OPCODE_403): New opcode flags for
-	BookE and PowerPC403 instructions.
+	* ppc.h (PPC_OPCODE_BOOKE, PPC_OPCODE_BOOKE64, PPC_OPCODE_403): New
+	opcode flags for BookE 32-bit, BookE 64-bit and PowerPC 403
+	instructions, respectively.
 
 2001-09-27  Nick Clifton  <nickc@cambridge.redhat.com>
 
