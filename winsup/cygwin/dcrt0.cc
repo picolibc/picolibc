@@ -743,12 +743,6 @@ dll_crt0_1 (char *)
   /* Initialize SIGSEGV handling, etc. */
   init_exceptions (&cygwin_except_entry);
 
-  /* Nasty static stuff needed by newlib -- point to a local copy of
-     the reent stuff.
-     Note: this MUST be done here (before the forkee code) as the
-     fork copy code doesn't copy the data in libccrt0.cc (that's why we
-     pass in the per_process struct into the .dll from libccrt0). */
-
   user_data->resourcelocks->Init ();
   user_data->threadinterface->Init ();
   ProtectHandle (hMainProc);

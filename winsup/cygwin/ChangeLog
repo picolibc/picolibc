@@ -1,3 +1,8 @@
+2004-02-15  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.cc (_csbrk): Report failing condition to stderr rather than
+	strace.
+
 2004-02-14  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in: Compile syscalls.o with -fomit-frame-pointer.

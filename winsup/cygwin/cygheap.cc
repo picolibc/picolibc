@@ -205,7 +205,8 @@ _csbrk (int sbs)
     /* nothing to do */;
   else if (!VirtualAlloc (prebrk, (DWORD) sbs, MEM_COMMIT, PAGE_READWRITE))
     {
-      malloc_printf ("couldn't commit memory for cygwin heap, %E");
+      malloc_printf ("couldn't commit memory for cygwin heap, prebrk %p, size %d, heapsize now %d, max heap size %d, %E",
+		     prebrk, sbs, (char *) cygheap_max - (char *) cygheap, CYGHEAPSIZE);
       __seterrno ();
       cygheap_max = (char *) cygheap_max - sbs;
       return NULL;
