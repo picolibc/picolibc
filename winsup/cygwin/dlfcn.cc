@@ -129,10 +129,12 @@ dlclose (void *handle)
   SetResourceLock(LOCK_DLL_LIST,READ_LOCK|WRITE_LOCK," dlclose");
 
   int ret = -1;
-  if (FreeLibrary ((HMODULE) handle))
+  void *temphandle = (void *) GetModuleHandle (NULL);
+  if (temphandle == handle || FreeLibrary ((HMODULE) handle))
     ret = 0;
   if (ret)
     set_dl_error ("dlclose");
+  CloseHandle ((HMODULE) temphandle);
 
   ReleaseResourceLock(LOCK_DLL_LIST,READ_LOCK|WRITE_LOCK," dlclose");
   return ret;
