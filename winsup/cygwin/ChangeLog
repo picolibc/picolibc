@@ -1,5 +1,9 @@
 2004-12-20  Christopher Faylor  <cgf@timesys.com>
 
+	* path.cc (normalize_win32_path): Remove unneeded check for dots.
+
+2004-12-20  Christopher Faylor  <cgf@timesys.com>
+
 	* path.cc (normalize_posix_path): Remove unneeded check for dots.
 	(path_conv::set_normalized_path): Strip trailing dots, similarly to
 	what had previously been done for the win32 path.

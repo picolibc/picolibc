@@ -1010,7 +1010,9 @@ normalize_win32_path (const char *src, char *dst, char *&tail)
 	       /* dst must be greater than dst_start */
 	       && tail[-1] == '\\')
 	{
-	  if (isdirsep (src[2]) || src[2] == 0)
+	  if (!isdirsep (src[2]) && src[2] != '\0')
+	      *tail++ = *src++;
+	  else
 	    {
 	      /* Back up over /, but not if it's the first one.  */
 	      if (tail > dst + 1)
@@ -1021,13 +1023,6 @@ normalize_win32_path (const char *src, char *dst, char *&tail)
 	      src += 2;
 	      if (isdirsep (*src))
 		src++;
-	    }
-	  else
-	    {
-	      int n = strspn (src, ".");
-	      if (!src[n] || isdirsep (src[n])) /* just dots... */
-		return ENOENT;
-	      *tail++ = *src++;
 	    }
 	}
       /* Otherwise, add char to result.  */
