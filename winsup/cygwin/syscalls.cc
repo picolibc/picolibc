@@ -162,14 +162,6 @@ unlink (const char *ourname)
       goto done;
     }
 
-  /* Windows won't check the directory mode, so we do that ourselves.  */
-  if (!writable_directory (win32_name))
-    {
-      syscall_printf ("non-writable directory");
-      set_errno (EPERM);
-      goto done;
-    }
-
   bool setattrs;
   if (!((DWORD) win32_name & (FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM)))
     setattrs = false;
@@ -1209,13 +1201,6 @@ rename (const char *oldpath, const char *newpath)
     {
       syscall_printf ("-1 = rename (%s, %s)", oldpath, newpath);
       set_errno (real_new.case_clash ? ECASECLASH : real_new.error);
-      return -1;
-    }
-
-  if (!writable_directory (real_old) || !writable_directory (real_new))
-    {
-      syscall_printf ("-1 = rename (%s, %s)", oldpath, newpath);
-      set_errno (EACCES);
       return -1;
     }
 

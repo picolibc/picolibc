@@ -1,3 +1,11 @@
+2004-05-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dir.cc (writable_directory): Remove.
+	(mkdir): Remove call to writable_directory.
+	* syscalls.cc (unlink): Ditto.
+	(rename): Ditto.
+	* winsup.h (writable_directory): Remove declaration.
+
 2004-04-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::open): Call path_conv::get_nt_native_path

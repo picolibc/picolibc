@@ -240,7 +240,6 @@ extern bool cygwin_finished_initializing;
 /**************************** Miscellaneous ******************************/
 
 void __stdcall set_std_handle (int);
-int __stdcall writable_directory (const char *file);
 int __stdcall stat_dev (DWORD, int, unsigned long, struct __stat64 *);
 
 __ino64_t __stdcall hash_path_name (__ino64_t hash, const char *name) __attribute__ ((regparm(2)));

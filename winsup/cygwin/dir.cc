@@ -24,39 +24,6 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 
-/* Cygwin internal */
-/* Return whether the directory of a file is writable.  Return 1 if it
-   is.  Otherwise, return 0, and set errno appropriately.  */
-int __stdcall
-writable_directory (const char *file)
-{
-#if 0
-  char dir[strlen (file) + 1];
-
-  strcpy (dir, file);
-
-  const char *usedir;
-  char *slash = strrchr (dir, '\\');
-  if (slash == NULL)
-    usedir = ".";
-  else if (slash == dir)
-    {
-      usedir = "\\";
-    }
-  else
-    {
-      *slash = '\0';
-      usedir = dir;
-    }
-
-  int acc = access (usedir, W_OK);
-
-  return acc == 0;
-#else
-  return 1;
-#endif
-}
-
 extern "C" int
 dirfd (DIR *dir)
 {
@@ -274,8 +241,6 @@ mkdir (const char *dir, mode_t mode)
     }
 
   nofinalslash (real_dir.get_win32 (), real_dir.get_win32 ());
-  if (! writable_directory (real_dir.get_win32 ()))
-    goto done;
 
   if (allow_ntsec && real_dir.has_acls ())
     set_security_attribute (S_IFDIR | ((mode & 07777) & ~cygheap->umask),
