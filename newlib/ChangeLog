@@ -1,5 +1,10 @@
 2002-07-04  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/sys/linux/inode.c: Fix utime prototype and add _LIBC
+	define before including <sys/lock.h>.
+
+2002-07-04  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/include/utime.h: Add include of <_ansi.h>.
 	* libc/sys/linux/Makefile.am: Add utimes.c.
 	* libc/sys/linux/Makefile.in: Regenerated.

@@ -9,8 +9,10 @@
 #include <sys/stat.h>
 #include <sys/utime.h>
 #include <linux/dirent.h>
-#include <sys/lock.h>
 #include <machine/syscall.h>
+
+#define _LIBC
+#include <sys/lock.h>
 
 __LOCK_INIT(static, umask_lock);
 
@@ -21,7 +23,7 @@ _syscall1(int,unlink,const char *,pathname)
 _syscall1(int,chdir,const char *,path)
 _syscall3(int,mknod,const char *,pathname,mode_t,mode,dev_t,dev)
 _syscall2(int,chmod,const char *,path,mode_t,mode)
-_syscall2(int,utime,const char *,filename,struct utimbuf *,buf)
+_syscall2(int,utime,const char *,filename,const struct utimbuf *,buf)
 _syscall2(int,access,const char *,filename,int,mode)
 _syscall2(int,mkdir,const char *,pathname,mode_t,mode)
 _syscall1(int,rmdir,const char *,pathname)
