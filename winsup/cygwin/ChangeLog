@@ -1,3 +1,8 @@
+Sat Nov 25 11:27:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* include/cygwin/version.h: Bump minor API version due to adding
+	inet_aton.
+
 Sat Nov 25 11:07:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* net.cc (cygwin_inet_aton): New function.

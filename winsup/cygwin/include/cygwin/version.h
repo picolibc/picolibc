@@ -121,10 +121,11 @@ details. */
        28: Accidentally bumped by cgf
        29: Export hstrerror
        30: CW_GET_CYGDRIVE_INFO addition to external.cc
+       31: Export inet_aton
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 30
+#define CYGWIN_VERSION_API_MINOR 31
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
