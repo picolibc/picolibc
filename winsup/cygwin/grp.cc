@@ -26,6 +26,7 @@ details. */
 #include "path.h"
 #include "cygheap.h"
 #include "cygerrno.h"
+#include "pwdgrp.h"
 
 /* Read /etc/group only once for better performance.  This is done
    on the first call that needs information from it. */
@@ -42,57 +43,7 @@ static int max_lines;
 static int grp_pos = 0;
 #endif
 
-/* Set to loaded when /etc/passwd has been read in by read_etc_passwd ().
-   Set to emulated if passwd is emulated. */
-/* Functions in this file need to check the value of passwd_state
-   and read in the password file if it isn't set. */
-enum grp_state {
-  uninitialized = 0,
-  initializing,
-  emulated,
-  loaded
-};
-class grp_check {
-  grp_state state;
-  FILETIME  last_modified;
-  char	    grp_w32[MAX_PATH];
-
-public:
-  grp_check () : state (uninitialized)
-    {
-      last_modified.dwLowDateTime = last_modified.dwHighDateTime = 0;
-      grp_w32[0] = '\0';
-    }
-  operator grp_state ()
-    {
-      HANDLE h;
-      WIN32_FIND_DATA data;
-
-      if (!grp_w32[0])	/* First call. */
-	{
-	  path_conv g ("/etc/group", PC_SYM_FOLLOW | PC_FULL);
-	  if (!g.error)
-	    strcpy (grp_w32, g.get_win32 ());
-	}
-
-      if ((h = FindFirstFile (grp_w32, &data)) != INVALID_HANDLE_VALUE)
-	{
-	  if (CompareFileTime (&data.ftLastWriteTime, &last_modified) > 0)
-	    {
-	      state = uninitialized;
-	      last_modified = data.ftLastWriteTime;
-	    }
-	  FindClose (h);
-	}
-      return state;
-    }
-  void operator = (grp_state nstate)
-    {
-      state = nstate;
-    }
-};
-
-static grp_check group_state;
+static pwdgrp_check group_state;
 
 static int
 parse_grp (struct group &grp, const char *line)
@@ -215,6 +166,7 @@ read_etc_group ()
 		add_grp_line (linebuf);
 	    }
 
+	  group_state.set_last_modified (f);
 	  fclose (f);
 	  group_state = loaded;
 	}

@@ -214,6 +214,9 @@ extern "C" int __small_vsprintf (char *dst, const char *fmt, va_list ap) /*__att
 extern "C" void __malloc_lock (struct _reent *);
 extern "C" void __malloc_unlock (struct _reent *);
 
+extern "C" void __malloc_lock (struct _reent *);
+extern "C" void __malloc_unlock (struct _reent *);
+
 /**************************** Exports ******************************/
 
 extern "C" {

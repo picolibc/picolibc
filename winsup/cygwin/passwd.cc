@@ -1,6 +1,6 @@
 /* passwd.cc: getpwnam () and friends
 
-   Copyright 1996, 1997, 1998 Cygnus Solutions.
+   Copyright 1996, 1997, 1998, 2001 Cygnus Solutions.
 
 This file is part of Cygwin.
 
@@ -23,6 +23,7 @@ details. */
 #include "pinfo.h"
 #include "cygheap.h"
 #include <sys/termios.h>
+#include "pwdgrp.h"
 
 /* Read /etc/passwd only once for better performance.  This is done
    on the first call that needs information from it. */
@@ -31,57 +32,7 @@ static struct passwd *passwd_buf;	/* passwd contents in memory */
 static int curr_lines;
 static int max_lines;
 
-/* Set to loaded when /etc/passwd has been read in by read_etc_passwd ().
-   Set to emulated if passwd is emulated. */
-/* Functions in this file need to check the value of passwd_state
-   and read in the password file if it isn't set. */
-enum pwd_state {
-  uninitialized = 0,
-  initializing,
-  emulated,
-  loaded
-};
-class pwd_check {
-  pwd_state state;
-  FILETIME  last_modified;
-  char	    pwd_w32[MAX_PATH];
-
-public:
-  pwd_check () : state (uninitialized)
-    {
-      last_modified.dwLowDateTime = last_modified.dwHighDateTime = 0;
-      pwd_w32[0] = '\0';
-    }
-  operator pwd_state ()
-    {
-      HANDLE h;
-      WIN32_FIND_DATA data;
-
-      if (!pwd_w32[0])	/* First call. */
-	{
-	  path_conv p ("/etc/passwd", PC_SYM_FOLLOW | PC_FULL);
-	  if (!p.error)
-	    strcpy (pwd_w32, p.get_win32 ());
-	}
-
-      if ((h = FindFirstFile (pwd_w32, &data)) != INVALID_HANDLE_VALUE)
-	{
-	  if (CompareFileTime (&data.ftLastWriteTime, &last_modified) > 0)
-	    {
-	      state = uninitialized;
-	      last_modified = data.ftLastWriteTime;
-	    }
-	  FindClose (h);
-	}
-      return state;
-    }
-  void operator = (pwd_state nstate)
-    {
-      state = nstate;
-    }
-};
-
-static pwd_check passwd_state;
+static pwdgrp_check passwd_state;
 
 
 /* Position in the passwd cache */
@@ -200,6 +151,7 @@ read_etc_passwd ()
 		  add_pwd_line (linebuf);
 	      }
 
+	    passwd_state.set_last_modified (f);
 	    fclose (f);
 	    passwd_state = loaded;
 	  }

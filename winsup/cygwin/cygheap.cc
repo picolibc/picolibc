@@ -16,6 +16,7 @@
 #include "security.h"
 #include "fhandler.h"
 #include "dtable.h"
+#include "path.h"
 #include "cygheap.h"
 #include "child_info.h"
 #include "heap.h"
@@ -343,6 +344,39 @@ cstrdup1 (const char *s)
   strcpy (p, s);
   MALLOC_CHECK;
   return p;
+}
+
+bool
+init_cygheap::etc_changed ()
+{
+  bool res = 0;
+
+  if (!etc_changed_h)
+    {
+      path_conv pwd ("/etc");
+      etc_changed_h = FindFirstChangeNotification (pwd, FALSE,
+					      FILE_NOTIFY_CHANGE_LAST_WRITE);
+      if (etc_changed_h == INVALID_HANDLE_VALUE)
+	system_printf ("Can't open /etc for checking, %E", (char *) pwd,
+	    	       etc_changed_h);
+      else if (!DuplicateHandle (hMainProc, etc_changed_h, hMainProc,
+	    			 &etc_changed_h, 0, TRUE,
+				 DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
+	{
+	  system_printf ("Can't inherit /etc handle, %E", (char *) pwd,
+	      		 etc_changed_h);
+	  etc_changed_h = INVALID_HANDLE_VALUE;
+	}
+    }
+
+   if (etc_changed_h != INVALID_HANDLE_VALUE
+       && WaitForSingleObject (etc_changed_h, 0) == WAIT_OBJECT_0)
+     {
+       (void) FindNextChangeNotification (etc_changed_h);
+       res = 1;
+     }
+
+  return res;
 }
 
 void

@@ -161,8 +161,11 @@ struct init_cygheap
   mode_t umask;
   HANDLE shared_h;
   HANDLE console_h;
+  HANDLE etc_changed_h;
   cwdstuff cwd;
   dtable fdtab;
+
+  bool etc_changed ();
 };
 
 #define CYGHEAPSIZE (sizeof (init_cygheap) + (4000 * sizeof (fhandler_union)) + (2 * 65536))

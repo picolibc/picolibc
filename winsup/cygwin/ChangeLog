@@ -1,3 +1,23 @@
+Sun Sep  9 18:36:00 2001  Corinna Vinschen <corinna@vinschen.de>
+			  Christopher Faylor <cgf@cygnus.com>
+
+	* cygheap.cc (init_cygheap::etc_changed): New method to signal
+	a change in /etc.
+	* cygheap.h (struct init_cygheap): Add member `etc_changed_h'
+	and method `etc_changed'.
+	* grp.cc (enum grp_state): Eliminate.
+	(class grp_check): Ditto.
+	(group_state): Define as `class pwdgrp_check'.
+	(parse_grp): Remeber path and modification time of /etc/group file.
+	* passwd.cc (enum_pwd_state): Eliminate.
+	(class pwd_check): Ditto.
+	(passwd_state): Define as `class pwdgrp_check'.
+	(read_etc_passwd): Remember path and modification time of /etc/passwd
+	file.
+	* pwdgrp.h: New file.
+	(enum pwdgrp_state): Substitutes `pwd_state' and `grp_state'.
+	(class pwdgrp_check): Substitutes `pwd_check' and `grp_check'.
+
 Sun Sep  9 14:31:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* include/cygwin/version.h: Bump API minor version to 45 according
