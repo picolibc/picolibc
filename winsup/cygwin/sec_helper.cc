@@ -69,11 +69,11 @@ cygsid::string (char *nsidstr) const
   if (!psid || !nsidstr)
     return NULL;
   strcpy (nsidstr, "S-1-");
-  __small_sprintf(t, "%u", GetSidIdentifierAuthority (psid)->Value[5]);
+  __small_sprintf (t, "%u", GetSidIdentifierAuthority (psid)->Value[5]);
   strcat (nsidstr, t);
   for (i = 0; i < *GetSidSubAuthorityCount (psid); ++i)
     {
-      __small_sprintf(t, "-%lu", *GetSidSubAuthority (psid, i));
+      __small_sprintf (t, "-%lu", *GetSidSubAuthority (psid, i));
       strcat (nsidstr, t);
     }
   return nsidstr;
@@ -90,7 +90,7 @@ cygsid::get_sid (DWORD s, DWORD cnt, DWORD *r)
       return NULL;
     }
   set ();
-  InitializeSid(psid, &sid_auth[s], cnt);
+  InitializeSid (psid, &sid_auth[s], cnt);
   for (i = 0; i < cnt; ++i)
     memcpy ((char *) psid + 8 + sizeof (DWORD) * i, &r[i], sizeof (DWORD));
   return psid;
@@ -198,7 +198,7 @@ cygsid::get_id (BOOL search_grp, int *type)
     }
 
   /* We use the RID as default UID/GID */
-  int id = *GetSidSubAuthority(psid, *GetSidSubAuthorityCount(psid) - 1);
+  int id = *GetSidSubAuthority (psid, *GetSidSubAuthorityCount (psid) - 1);
 
   /*
    * The RID maybe -1 if accountname == computername.
@@ -325,13 +325,13 @@ lookup_name (const char *name, const char *logsrv, PSID ret_sid)
       if (LookupAccountName (NULL, domuser, sid, SIDLEN, dom, DOMLEN,&acc_type))
 	goto got_it;
     }
-  debug_printf ("LookupAccountName(%s) %E", name);
+  debug_printf ("LookupAccountName (%s) %E", name);
   __seterrno ();
   return FALSE;
 
 got_it:
-  debug_printf ("sid : [%d]", *GetSidSubAuthority((PSID) sid,
-			      *GetSidSubAuthorityCount((PSID) sid) - 1));
+  debug_printf ("sid : [%d]", *GetSidSubAuthority ((PSID) sid,
+			      *GetSidSubAuthorityCount ((PSID) sid) - 1));
 
   if (ret_sid)
     memcpy (ret_sid, sid, sidlen);
@@ -376,7 +376,7 @@ set_process_privilege (const char *privilege, BOOL enable)
       goto out;
     }
   /* AdjustTokenPrivileges returns TRUE even if the privilege could not
-     be enabled. GetLastError() returns an correct error code, though. */
+     be enabled. GetLastError () returns an correct error code, though. */
   if (enable && GetLastError () == ERROR_NOT_ALL_ASSIGNED)
     {
       debug_printf ("Privilege %s couldn't be assigned", privilege);

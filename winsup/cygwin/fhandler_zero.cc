@@ -38,7 +38,7 @@ fhandler_dev_zero::write (const void *, size_t len)
 int __stdcall
 fhandler_dev_zero::read (void *ptr, size_t len)
 {
-  memset(ptr, 0, len);
+  memset (ptr, 0, len);
   return len;
 }
 
@@ -51,5 +51,5 @@ fhandler_dev_zero::lseek (__off64_t, int)
 void
 fhandler_dev_zero::dump ()
 {
-  paranoid_printf("here, fhandler_dev_zero");
+  paranoid_printf ("here, fhandler_dev_zero");
 }

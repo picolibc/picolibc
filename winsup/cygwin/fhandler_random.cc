@@ -24,7 +24,7 @@ details. */
 #define PSEUDO_SHIFTVAL		(21)
 
 fhandler_dev_random::fhandler_dev_random (int nunit)
-  : fhandler_base (FH_RANDOM), unit(nunit), crypt_prov((HCRYPTPROV) NULL)
+  : fhandler_base (FH_RANDOM), unit (nunit), crypt_prov ((HCRYPTPROV) NULL)
 {
 }
 
@@ -145,7 +145,7 @@ fhandler_dev_random::close (void)
   if (crypt_prov)
     while (!CryptReleaseContext (crypt_prov, 0)
 	   && GetLastError () == ERROR_BUSY)
-      Sleep(10);
+      Sleep (10);
   return 0;
 }
 
@@ -161,6 +161,6 @@ fhandler_dev_random::dup (fhandler_base *child)
 void
 fhandler_dev_random::dump ()
 {
-  paranoid_printf("here, fhandler_dev_random");
+  paranoid_printf ("here, fhandler_dev_random");
 }
 

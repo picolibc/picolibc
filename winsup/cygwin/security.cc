@@ -1206,8 +1206,8 @@ write_sd (const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size)
 }
 
 static void
-get_attribute_from_acl(int * attribute, PACL acl, PSID owner_sid,
-		       PSID group_sid, BOOL grp_member)
+get_attribute_from_acl (int * attribute, PACL acl, PSID owner_sid,
+			PSID group_sid, BOOL grp_member)
 {
   ACCESS_ALLOWED_ACE *ace;
   int allow = 0;
@@ -1387,7 +1387,7 @@ get_file_attribute (int use_ntsec, const char *file,
   if (allow_ntea)
     {
       int oatt = *attribute;
-      res = NTReadEA (file, ".UNIXATTR", (char *)attribute, sizeof(*attribute));
+      res = NTReadEA (file, ".UNIXATTR", (char *)attribute, sizeof (*attribute));
       *attribute |= oatt;
     }
   else

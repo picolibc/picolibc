@@ -70,18 +70,18 @@ wsock_event::wait (int socket, LPDWORD flags)
   int ret = -1;
   WSAEVENT ev[2] = { event, signal_arrived };
 
-  switch (WSAWaitForMultipleEvents(2, ev, FALSE, WSA_INFINITE, FALSE))
+  switch (WSAWaitForMultipleEvents (2, ev, FALSE, WSA_INFINITE, FALSE))
     {
     case WSA_WAIT_EVENT_0:
       DWORD len;
-      if (WSAGetOverlappedResult(socket, &ovr, &len, FALSE, flags))
+      if (WSAGetOverlappedResult (socket, &ovr, &len, FALSE, flags))
 	ret = (int) len;
       break;
     case WSA_WAIT_EVENT_0 + 1:
       if (!CancelIo ((HANDLE)socket))
 	{
 	  debug_printf ("CancelIo() %E, fallback to blocking io");
-	  WSAGetOverlappedResult(socket, &ovr, &len, TRUE, flags);
+	  WSAGetOverlappedResult (socket, &ovr, &len, TRUE, flags);
 	}
       else
 	WSASetLastError (WSAEINTR);
@@ -417,9 +417,9 @@ dup_addr_list (char **src, unsigned int size)
     return NULL;
   while (cnt-- > 0)
     {
-      if (!(dst[cnt] = (char *) malloc(size)))
+      if (!(dst[cnt] = (char *) malloc (size)))
 	return NULL;
-      memcpy(dst[cnt], src[cnt], size);
+      memcpy (dst[cnt], src[cnt], size);
     }
   return dst;
 }
@@ -1229,12 +1229,12 @@ get_2k_ifconf (struct ifconf *ifc, int what)
   struct sockaddr_in *sa = NULL;
   struct sockaddr *so = NULL;
 
-  if (GetIfTable(NULL, &siz_if_table, TRUE) == ERROR_INSUFFICIENT_BUFFER &&
-      GetIpAddrTable(NULL, &siz_ip_table, TRUE) == ERROR_INSUFFICIENT_BUFFER &&
+  if (GetIfTable (NULL, &siz_if_table, TRUE) == ERROR_INSUFFICIENT_BUFFER &&
+      GetIpAddrTable (NULL, &siz_ip_table, TRUE) == ERROR_INSUFFICIENT_BUFFER &&
       (ift = (PMIB_IFTABLE) alloca (siz_if_table)) &&
       (ipt = (PMIB_IPADDRTABLE) alloca (siz_ip_table)) &&
-      !GetIfTable(ift, &siz_if_table, TRUE) &&
-      !GetIpAddrTable(ipt, &siz_ip_table, TRUE))
+      !GetIfTable (ift, &siz_if_table, TRUE) &&
+      !GetIpAddrTable (ipt, &siz_ip_table, TRUE))
     {
       /* Iterate over all known interfaces */
       for (if_cnt = 0; if_cnt < ift->dwNumEntries; ++if_cnt)
@@ -1903,7 +1903,7 @@ socketpair (int family, int type, int protocol, int *sb)
   cygheap_fdnew sb0;
   fhandler_socket *fh;
 
-  if (__check_null_invalid_struct_errno (sb, 2 * sizeof(int)))
+  if (__check_null_invalid_struct_errno (sb, 2 * sizeof (int)))
     return -1;
 
   if (family != AF_LOCAL && family != AF_INET)

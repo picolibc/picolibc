@@ -131,8 +131,8 @@ create_shortcut_header (void)
   (path_prefix_p (mount_table->cygdrive, (path), mount_table->cygdrive_len))
 
 #define iscygdrive_device(path) \
-  (isalpha(path[mount_table->cygdrive_len]) && \
-   (isdirsep(path[mount_table->cygdrive_len + 1]) || \
+  (isalpha (path[mount_table->cygdrive_len]) && \
+   (isdirsep (path[mount_table->cygdrive_len + 1]) || \
     !path[mount_table->cygdrive_len + 1]))
 
 #define isproc(path) \
@@ -843,7 +843,7 @@ static __inline int
 digits (const char *name)
 {
   char *p;
-  int n = strtol(name, &p, 10);
+  int n = strtol (name, &p, 10);
 
   return p > name && !*p ? n : -1;
 }
@@ -1985,7 +1985,7 @@ mount_info::read_cygdrive_info_from_registry ()
 	 error. */
       cygdrive_flags = r.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_CYGDRIVE);
       slashify (cygdrive, cygdrive, 1);
-      cygdrive_len = strlen(cygdrive);
+      cygdrive_len = strlen (cygdrive);
     }
 }
 
@@ -2043,7 +2043,7 @@ mount_info::write_cygdrive_info_to_registry (const char *cygdrive_prefix, unsign
     {
       slashify (cygdrive_prefix, mount_table->cygdrive, 1);
       mount_table->cygdrive_flags = flags;
-      mount_table->cygdrive_len = strlen(mount_table->cygdrive);
+      mount_table->cygdrive_len = strlen (mount_table->cygdrive);
     }
 
   return 0;
@@ -2334,7 +2334,7 @@ static mntent *
 fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
 {
 #ifdef _MT_SAFE
-  struct mntent &ret=_reent_winsup()->mntbuf;
+  struct mntent &ret=_reent_winsup ()->mntbuf;
 #else
   static NO_COPY struct mntent ret;
 #endif
@@ -3220,7 +3220,7 @@ hashit:
      \a\b\.  but allow a single \ if that's all there is. */
   do
     {
-      int ch = cyg_tolower(*name);
+      int ch = cyg_tolower (*name);
       hash = (hash << 5) - hash + ch;
     }
   while (*++name != '\0' &&
@@ -3311,7 +3311,7 @@ chdir (const char *in_dir)
       path.get_win32 ()[3] = '\0';
     }
   int res;
-  int devn = path.get_devn();
+  int devn = path.get_devn ();
   if (!isvirtual_dev (devn))
     res = SetCurrentDirectory (native_dir) ? 0 : -1;
   else if (!path.exists ())
@@ -3725,7 +3725,7 @@ cwdstuff::get (char *buf, int need_posix, int with_chroot, unsigned ulen)
   else
     tocopy = posix;
 
-  debug_printf("posix %s", posix);
+  debug_printf ("posix %s", posix);
   if (strlen (tocopy) >= ulen)
     {
       set_errno (ERANGE);

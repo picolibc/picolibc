@@ -1,3 +1,15 @@
+2002-09-21  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.cc (fhandler_base::dup): Don't set handle on failure.
+	Caller has already taken care of that.
+	* fhandler_console.cc (fhandler_console::open): Initialize handles to
+	NULL.
+	(fhandler_console::close): Ditto.
+
+2002-09-21  Christopher Faylor  <cgf@redhat.com>
+
+	GNUify non-GNU formatted functions calls throughout.
+
 2002-09-21  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygwin_ipc.h: Move to "include/cygwin/ipc.h".

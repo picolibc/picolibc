@@ -31,9 +31,9 @@ pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 }
 
 int
-pthread_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void))
+pthread_atfork (void (*prepare)(void), void (*parent)(void), void (*child)(void))
 {
-  return pthread::atfork(prepare, parent, child);
+  return pthread::atfork (prepare, parent, child);
 }
 
 int
@@ -141,7 +141,7 @@ pthread_attr_getstackaddr (const pthread_attr_t * attr, void **stackaddr)
 void
 pthread_exit (void *value_ptr)
 {
-  return pthread::self()->exit (value_ptr);
+  return pthread::self ()->exit (value_ptr);
 }
 
 int
@@ -176,7 +176,7 @@ pthread_getsequence_np (pthread_t * thread)
 {
   if (!pthread::isGoodObject (thread))
     return EINVAL;
-  return (*thread)->getsequence_np();
+  return (*thread)->getsequence_np ();
 }
 
 /* Thread SpecificData */
@@ -221,7 +221,7 @@ pthread_sigmask (int operation, const sigset_t * set, sigset_t * old_set)
 
 pthread_t pthread_self ()
 {
-  return pthread::self();
+  return pthread::self ();
 }
 
 int
@@ -431,31 +431,31 @@ pthread_cancel (pthread_t thread)
 int
 pthread_setcancelstate (int state, int *oldstate)
 {
-  return pthread::self()->setcancelstate (state, oldstate);
+  return pthread::self ()->setcancelstate (state, oldstate);
 }
 
 int
 pthread_setcanceltype (int type, int *oldtype)
 {
-  return pthread::self()->setcanceltype (type, oldtype);
+  return pthread::self ()->setcanceltype (type, oldtype);
 }
 
 void
 pthread_testcancel (void)
 {
-  pthread::self()->testcancel ();
+  pthread::self ()->testcancel ();
 }
 
 void
 _pthread_cleanup_push (__pthread_cleanup_handler *handler)
 {
-  pthread::self()->push_cleanup_handler (handler);
+  pthread::self ()->push_cleanup_handler (handler);
 }
 
 void
 _pthread_cleanup_pop (int execute)
 {
-  pthread::self()->pop_cleanup_handler (execute);
+  pthread::self ()->pop_cleanup_handler (execute);
 }
 
 /* Semaphores */

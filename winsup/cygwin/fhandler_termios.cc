@@ -114,7 +114,7 @@ tty_min::set_ctty (int ttynum, int flags)
 	  (p == myself || !proc_exists (p)))
 	{
 	  paranoid_printf ("resetting tty%d sid.  Was %d, now %d.  pgid was %d, now %d.",
-			   ttynum, getsid(), myself->sid, getpgid (), myself->pgid);
+			   ttynum, getsid (), myself->sid, getpgid (), myself->pgid);
 	  /* We are the session leader */
 	  setsid (myself->sid);
 	  setpgid (myself->pgid);
@@ -137,7 +137,7 @@ fhandler_termios::bg_check (int sig)
   if (sig < 0)
     sig = -sig;
 
-  termios_printf("bg I/O pgid %d, tpgid %d, ctty %d",
+  termios_printf ("bg I/O pgid %d, tpgid %d, ctty %d",
 		    myself->pgid, tc->getpgid (), myself->ctty);
 
   if (tc->getsid () == 0)
@@ -154,7 +154,7 @@ fhandler_termios::bg_check (int sig)
      return with error */
   int pgid_gone = !pid_exists (myself->pgid);
   int sigs_ignored =
-    ((void *) myself->getsig(sig).sa_handler == (void *) SIG_IGN) ||
+    ((void *) myself->getsig (sig).sa_handler == (void *) SIG_IGN) ||
     (myself->getsigmask () & SIGTOMASK (sig));
 
   if (pgid_gone)

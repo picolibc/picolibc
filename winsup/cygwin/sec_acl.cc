@@ -86,13 +86,13 @@ setacl (const char *file, int nentries, __aclent16_t *aclbufp)
       __seterrno ();
       return -1;
     }
-  if (!SetSecurityDescriptorOwner(&sd, owner, FALSE))
+  if (!SetSecurityDescriptorOwner (&sd, owner, FALSE))
     {
       __seterrno ();
       return -1;
     }
   if (group
-      && !SetSecurityDescriptorGroup(&sd, group, FALSE))
+      && !SetSecurityDescriptorGroup (&sd, group, FALSE))
     {
       __seterrno ();
       return -1;
@@ -538,7 +538,7 @@ acl_worker (const char *path, int cmd, int nentries, __aclent16_t *aclbufp,
   switch (cmd)
     {
       case SETACL:
-	if (!aclsort(nentries, 0, aclbufp))
+	if (!aclsort (nentries, 0, aclbufp))
 	  return setacl (real_path.get_win32 (),
 			 nentries, aclbufp);
 	break;
@@ -732,9 +732,9 @@ extern "C"
 int acecmp (const void *a1, const void *a2)
 {
 #define ace(i) ((const __aclent16_t *) a##i)
-  int ret = ace(1)->a_type - ace(2)->a_type;
+  int ret = ace (1)->a_type - ace (2)->a_type;
   if (!ret)
-    ret = ace(1)->a_id - ace(2)->a_id;
+    ret = ace (1)->a_id - ace (2)->a_id;
   return ret;
 #undef ace
 }
@@ -750,7 +750,7 @@ aclsort (int nentries, int, __aclent16_t *aclbufp)
       set_errno (EINVAL);
       return -1;
     }
-  qsort((void *) aclbufp, nentries, sizeof (__aclent16_t), acecmp);
+  qsort ((void *) aclbufp, nentries, sizeof (__aclent16_t), acecmp);
   return 0;
 }
 
@@ -791,7 +791,7 @@ acltomode (__aclent16_t *aclbufp, int nentries, mode_t *modep)
 
 extern "C"
 int
-aclfrommode(__aclent16_t *aclbufp, int nentries, mode_t *modep)
+aclfrommode (__aclent16_t *aclbufp, int nentries, mode_t *modep)
 {
   int pos;
 

@@ -153,7 +153,7 @@ read_etc_passwd ()
 	    if (strlen (line))
 	      add_pwd_line (line);
 
-	  passwd_state.set_last_modified (pr.get_fhandle(), pr.get_fname ());
+	  passwd_state.set_last_modified (pr.get_fhandle (), pr.get_fname ());
 	  passwd_state = loaded;
 	  pr.close ();
 	  debug_printf ("Read /etc/passwd, %d lines", curr_lines);
@@ -179,9 +179,9 @@ read_etc_passwd ()
 		      snprintf (linebuf, sizeof (linebuf),
 				"%s::%lu:%lu:%s:%s:/bin/sh",
 				cygheap->user.name (),
-				*GetSidSubAuthority(tu,
+				*GetSidSubAuthority (tu,
 				             *GetSidSubAuthorityCount(tu) - 1),
-				*GetSidSubAuthority(tg,
+				*GetSidSubAuthority (tg,
 				             *GetSidSubAuthorityCount(tg) - 1),
 				tu.string (strbuf), getenv ("HOME") ?: "/");
 		      debug_printf ("Emulating /etc/passwd: %s", linebuf);
@@ -246,7 +246,7 @@ getpwuid32 (__uid32_t uid)
   if (passwd_state  <= initializing)
     read_etc_passwd ();
 
-  pthread_testcancel();
+  pthread_testcancel ();
 
   return search_for (uid, 0);
 }
@@ -268,7 +268,7 @@ getpwuid_r32 (__uid32_t uid, struct passwd *pwd, char *buffer, size_t bufsize, s
   if (passwd_state  <= initializing)
     read_etc_passwd ();
 
-  pthread_testcancel();
+  pthread_testcancel ();
 
   struct passwd *temppw = search_for (uid, 0);
 
@@ -311,7 +311,7 @@ getpwnam (const char *name)
   if (passwd_state  <= initializing)
     read_etc_passwd ();
 
-  pthread_testcancel();
+  pthread_testcancel ();
 
   return search_for (0, name);
 }
@@ -332,7 +332,7 @@ getpwnam_r (const char *nam, struct passwd *pwd, char *buffer, size_t bufsize, s
   if (passwd_state  <= initializing)
     read_etc_passwd ();
 
-  pthread_testcancel();
+  pthread_testcancel ();
 
   struct passwd *temppw = search_for (0, nam);
 

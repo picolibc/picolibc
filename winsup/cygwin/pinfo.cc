@@ -61,8 +61,7 @@ set_myself (pid_t pid, HANDLE h)
   myself->process_state |= PID_IN_USE;
   myself->start_time = time (NULL); /* Register our starting time. */
 
-  (void) GetModuleFileName (NULL, myself->progname,
-			    sizeof(myself->progname));
+  (void) GetModuleFileName (NULL, myself->progname, sizeof (myself->progname));
   if (!strace.active)
     strace.hello ();
   return;

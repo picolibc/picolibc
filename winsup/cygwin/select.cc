@@ -71,7 +71,7 @@ typedef long fd_mask;
 
 #define NULL_fd_set ((fd_set *) NULL)
 #define sizeof_fd_set(n) \
-  ((unsigned) (NULL_fd_set->fds_bits + unix_howmany((n), UNIX_NFDBITS)))
+  ((unsigned) (NULL_fd_set->fds_bits + unix_howmany ((n), UNIX_NFDBITS)))
 #define UNIX_FD_SET(n, p) \
   ((p)->fds_bits[(n)/UNIX_NFDBITS] |= (1L << ((n) % UNIX_NFDBITS)))
 #define UNIX_FD_CLR(n, p) \
@@ -1290,7 +1290,7 @@ start_thread_socket (select_record *me, select_stuff *stuff)
   int tmp = 1;
   (void) setsockopt (si->exitsock, SOL_SOCKET, SO_REUSEADDR, (char *) &tmp, sizeof (tmp));
 
-  int sin_len = sizeof(si->sin);
+  int sin_len = sizeof (si->sin);
   memset (&si->sin, 0, sizeof (si->sin));
   si->sin.sin_family = AF_INET;
   si->sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
@@ -1340,8 +1340,8 @@ socket_cleanup (select_record *, select_stuff *stuff)
 
       /* Set LINGER with 0 timeout for hard close */
       struct linger tmp = {1, 0}; /* On, 0 delay */
-      (void) setsockopt (s, SOL_SOCKET, SO_LINGER, (char *)&tmp, sizeof(tmp));
-      (void) setsockopt (si->exitsock, SOL_SOCKET, SO_LINGER, (char *)&tmp, sizeof(tmp));
+      (void) setsockopt (s, SOL_SOCKET, SO_LINGER, (char *)&tmp, sizeof (tmp));
+      (void) setsockopt (si->exitsock, SOL_SOCKET, SO_LINGER, (char *)&tmp, sizeof (tmp));
 
       /* Connecting to si->exitsock will cause any executing select to wake
 	 up.  When this happens then the exitsock condition will cause the

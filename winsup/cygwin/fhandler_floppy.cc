@@ -93,7 +93,7 @@ fhandler_dev_floppy::lseek (__off64_t offset, int whence)
   PARTITION_INFORMATION pi;
   DWORD bytes_read;
 
-  if (!DeviceIoControl (get_handle(),
+  if (!DeviceIoControl (get_handle (),
 			  IOCTL_DISK_GET_DRIVE_GEOMETRY,
 			  NULL, 0,
 			  &di, sizeof (di),

@@ -708,7 +708,7 @@ fhandler_tty_slave::read (void *ptr, size_t len)
 	  termios_printf ("failed to acquire input mutex after input event arrived");
 	  break;
 	}
-      if (!PeekNamedPipe (get_handle (), peek_buf, sizeof(peek_buf), &bytes_in_pipe, NULL, NULL))
+      if (!PeekNamedPipe (get_handle (), peek_buf, sizeof (peek_buf), &bytes_in_pipe, NULL, NULL))
 	{
 	  termios_printf ("PeekNamedPipe failed, %E");
 	  _raise (SIGHUP);

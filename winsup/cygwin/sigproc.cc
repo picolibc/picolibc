@@ -461,7 +461,7 @@ proc_terminate (void)
       hwait_subproc->detach ();
       hwait_subproc = NULL;
 
-      sync_proc_subproc->acquire(WPSP);
+      sync_proc_subproc->acquire (WPSP);
       (void) proc_subproc (PROC_CLEARWAIT, 1);
 
       /* Clean out zombie processes from the pid list. */
@@ -474,7 +474,7 @@ proc_terminate (void)
 	      ForceCloseHandle1 (zombies[i]->pid_handle, pid_handle);
 	    }
 	  zombies[i]->process_state = PID_EXITED;	/* CGF FIXME - still needed? */
-	  zombies[i].release();		// FIXME: this breaks older gccs for some reason
+	  zombies[i].release ();	// FIXME: this breaks older gccs for some reason
 	}
 
       /* Disassociate my subprocesses */
@@ -564,7 +564,7 @@ sigproc_init ()
 
   /* local event signaled when main thread has been dispatched
      to a signal handler function. */
-  signal_arrived = CreateEvent(&sec_none_nih, TRUE, FALSE, NULL);
+  signal_arrived = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
   ProtectHandle (signal_arrived);
 
   hwait_sig = new cygthread (wait_sig, cygself, "sig");

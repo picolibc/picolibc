@@ -238,14 +238,14 @@ tcsetpgrp (int fd, pid_t pgid)
 extern "C" speed_t
 cfgetospeed (struct termios *tp)
 {
-  return __tonew_termios(tp)->c_ospeed;
+  return __tonew_termios (tp)->c_ospeed;
 }
 
 /* cfgetispeed: POSIX96 7.1.3.1 */
 extern "C" speed_t
 cfgetispeed (struct termios *tp)
 {
-  return __tonew_termios(tp)->c_ispeed;
+  return __tonew_termios (tp)->c_ispeed;
 }
 
 /* cfsetospeed: POSIX96 7.1.3.1 */

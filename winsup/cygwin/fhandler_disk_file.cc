@@ -307,10 +307,10 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
 
 	      /* First retrieve current position, set to beginning
 		 of file if not already there. */
-	      cur = SetFilePointer (get_handle(), 0, NULL, FILE_CURRENT);
+	      cur = SetFilePointer (get_handle (), 0, NULL, FILE_CURRENT);
 	      if (cur != INVALID_SET_FILE_POINTER &&
 		  (!cur ||
-		   SetFilePointer (get_handle(), 0, NULL, FILE_BEGIN)
+		   SetFilePointer (get_handle (), 0, NULL, FILE_BEGIN)
 		   != INVALID_SET_FILE_POINTER))
 		{
 		  /* FIXME should we use /etc/magic ? */
@@ -321,7 +321,7 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
 		      set_execable_p ();
 		      pc->set_exec ();
 		    }
-		  SetFilePointer (get_handle(), cur, NULL, FILE_BEGIN);
+		  SetFilePointer (get_handle (), cur, NULL, FILE_BEGIN);
 		}
 	    }
 	  if (pc->exec_state () == is_executable)
@@ -453,7 +453,7 @@ fhandler_disk_file::lock (int cmd, struct flock *fl)
       case SEEK_END:
 	{
 	  BY_HANDLE_FILE_INFORMATION finfo;
-	  if (GetFileInformationByHandle (get_handle(), &finfo) == 0)
+	  if (GetFileInformationByHandle (get_handle (), &finfo) == 0)
 	    {
 	      __seterrno ();
 	      return -1;
