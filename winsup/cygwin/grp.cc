@@ -37,11 +37,11 @@ bool
 pwdgrp::parse_group ()
 {
 # define grp (*group_buf)[curr_lines]
-  grp.gr_name = next_str ();
+  grp.gr_name = next_str (':');
   if (!*grp.gr_name)
     return false;
 
-  grp.gr_passwd = next_str ();
+  grp.gr_passwd = next_str (':');
 
   if (!next_num (grp.gr_gid))
     return false;

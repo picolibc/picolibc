@@ -394,24 +394,17 @@ cygheap_user::env_name (const char *name, size_t namelen)
 char *
 pwdgrp::next_str (char c)
 {
-  if (!lptr)
-    return NULL;
-  char search[] = ":\n\0\0";
-  search[2] = c;
   char *res = lptr;
-  char *p = strpbrk (lptr, search);
-  if (p)
-    {
-      lptr = (*p == '\n') ? p : p + 1;
-      *p = '\0';
-    }
+  lptr = strechr (lptr, c);
+  if (*lptr)
+    *lptr++ = '\0';
   return res;
 }
 
 bool
 pwdgrp::next_num (unsigned long& n)
 {
-  char *p = next_str ();
+  char *p = next_str (':');
   if (!p)
     return -1;
   char *cp;
@@ -425,11 +418,13 @@ pwdgrp::add_line (char *eptr)
   if (eptr)
     {
       lptr = eptr;
-      eptr = strchr (lptr, '\n');
-      if (eptr)
+      eptr = strechr (lptr, '\n');
+      if (*eptr)
 	{
 	  if (eptr > lptr && eptr[-1] == '\r')
-	    eptr[-1] = '\n';
+	    eptr[-1] = '\0';
+	  else
+	    *eptr = '\0';
 	  eptr++;
 	}
       if (curr_lines >= max_lines)
