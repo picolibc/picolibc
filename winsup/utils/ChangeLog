@@ -1,3 +1,8 @@
+2005-02-23  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
+
+	* cygpath.cc (usage): Clarify help output to indicate acceptance
+	of multiple file names as arguments.
+
 2005-01-16  Christopher Faylor  <cgf@timesys.com>
 
 	* ps.cc (main): Eliminate use of PID_ZOMBIE.

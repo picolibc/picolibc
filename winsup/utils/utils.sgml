@@ -112,22 +112,23 @@ for example:</para>
 <sect2 id="cygpath"><title>cygpath</title>
 
 <screen>
-Usage: cygpath (-d|-m|-u|-w|-t TYPE) [-c HANDLE] [-f FILE] [options] NAME
+Usage: cygpath (-d|-m|-u|-w|-t TYPE) [-f FILE] [OPTION]... NAME...
+       cygpath [-c HANDLE] 
        cygpath [-ADHPSW] 
 Convert Unix and Windows format paths, or output system path information
 
 Output type options:
-  -d, --dos             print DOS (short) form of NAME (C:\PROGRA~1\)
+  -d, --dos             print DOS (short) form of NAMEs (C:\PROGRA~1\)
   -m, --mixed           like --windows, but with regular slashes (C:/WINNT)
   -M, --mode		report on mode of file (currently binmode or textmode)
-  -u, --unix            (default) print Unix form of NAME (/cygdrive/c/winnt)
-  -w, --windows         print Windows form of NAME (C:\WINNT)
+  -u, --unix            (default) print Unix form of NAMEs (/cygdrive/c/winnt)
+  -w, --windows         print Windows form of NAMEs (C:\WINNT)
   -t, --type TYPE       print TYPE form: 'dos', 'mixed', 'unix', or 'windows'
 Path conversion options:
   -a, --absolute        output absolute path
-  -l, --long-name       print Windows long form of NAME (with -w, -m only)
+  -l, --long-name       print Windows long form of NAMEs (with -w, -m only)
   -p, --path            NAME is a PATH list (i.e., '/bin:/usr/bin')
-  -s, --short-name      print DOS (short) form of NAME (with -w, -m only)
+  -s, --short-name      print DOS (short) form of NAMEs (with -w, -m only)
 System information:
   -A, --allusers        use `All Users' instead of current user for -D, -P
   -D, --desktop         output `Desktop' directory and exit

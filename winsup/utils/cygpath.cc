@@ -65,22 +65,23 @@ usage (FILE * stream, int status)
 {
   if (!ignore_flag || !status)
     fprintf (stream, "\
-Usage: %s (-d|-m|-u|-w|-t TYPE) [-c HANDLE] [-f FILE] [options] NAME\n\
+Usage: %s (-d|-m|-u|-w|-t TYPE) [-f FILE] [OPTION]... NAME...\n\
+       %s [-c HANDLE] \n\
        %s [-ADHPSW] \n\
 Convert Unix and Windows format paths, or output system path information\n\
 \n\
 Output type options:\n\
-  -d, --dos	        print DOS (short) form of NAME (C:\\PROGRA~1\\)\n\
+  -d, --dos	        print DOS (short) form of NAMEs (C:\\PROGRA~1\\)\n\
   -m, --mixed           like --windows, but with regular slashes (C:/WINNT)\n\
   -M, --mode		report on mode of file (binmode or textmode)\n\
-  -u, --unix	        (default) print Unix form of NAME (/cygdrive/c/winnt)\n\
-  -w, --windows         print Windows form of NAME (C:\\WINNT)\n\
+  -u, --unix	        (default) print Unix form of NAMEs (/cygdrive/c/winnt)\n\
+  -w, --windows         print Windows form of NAMEs (C:\\WINNT)\n\
   -t, --type TYPE       print TYPE form: 'dos', 'mixed', 'unix', or 'windows'\n\
 Path conversion options:\n\
   -a, --absolute        output absolute path\n\
-  -l, --long-name	print Windows long form of NAME (with -w, -m only)\n\
+  -l, --long-name	print Windows long form of NAMEs (with -w, -m only)\n\
   -p, --path	        NAME is a PATH list (i.e., '/bin:/usr/bin')\n\
-  -s, --short-name	print DOS (short) form of NAME (with -w, -m only)\n\
+  -s, --short-name	print DOS (short) form of NAMEs (with -w, -m only)\n\
 System information:\n\
   -A, --allusers        use `All Users' instead of current user for -D, -P\n\
   -D, --desktop		output `Desktop' directory and exit\n\
