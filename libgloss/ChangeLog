@@ -1,3 +1,10 @@
+2002-02-05  Mark Salter  <msalter@redhat.com>
+
+	* arm/elf-iq80310.specs: Ditto.
+	* arm/elf-redboot.specs: Ditto.
+	* arm/elf-redboot.ld: Fix eh_frame sections. Add .jcr section.
+	* arm/redboot-crt0.S: Add support for __USES_INITFINI__.
+
 2002-02-01  Geoffrey Keating  <geoffk@redhat.com>
 
 	* xstormy16/Makefile.in (SIM_OBJS): Remove sbrk.o, add
