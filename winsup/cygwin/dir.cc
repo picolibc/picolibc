@@ -184,7 +184,7 @@ readdir (DIR * dir)
         {
 	  char fbuf[MAX_PATH + 1];
 	  strcpy (fbuf, dir->__d_dirname);
-	  strcat (fbuf + strlen (fbuf) - 1, dir->__d_dirent->d_name);
+	  strcpy (fbuf + strlen (fbuf) - 1, dir->__d_dirent->d_name);
 	  path_conv fpath (fbuf, PC_SYM_NOFOLLOW);
 	  if (fpath.issymlink ())
             c[len - 4] = '\0';
