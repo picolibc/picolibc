@@ -1,3 +1,7 @@
+2002-07-03  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure.in: Make --without-x work.
+
 2002-07-03  Nick Clifton  <nickc@cambridge.redhat.com>
 
 	* contrib: New directory.  Created to contain a copy of the
