@@ -1,5 +1,13 @@
 2003-08-01  Danny Smith <dannysmith@users.sourceforge.net>
 
+	* include/shlobj.h (SHELLFLAGSTATE): Add structure.
+	(SHGetInstanceExplorer): Correct return type.
+	(SHGetFolderPath[AW]): Likewise.
+	Thanks to Magnus Olsen  <greatlord@sourceforge.users.net>
+	for report.
+
+2003-08-01  Danny Smith <dannysmith@users.sourceforge.net>
+
 	* lib/test.c: Include winldap.h, ntldap.h, winber.h.
 
 2003-08-01  Filip Navara  <xnavara@volny.cz>

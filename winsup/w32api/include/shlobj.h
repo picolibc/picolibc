@@ -759,6 +759,23 @@ DECLARE_INTERFACE_(IShellIcon,IUnknown)
 };
 typedef IShellIcon *LPSHELLICON;
 
+typedef struct {
+	BOOL fShowAllObjects : 1;
+	BOOL fShowExtensions : 1;
+	BOOL fNoConfirmRecycle : 1;
+	BOOL fShowSysFiles : 1;
+	BOOL fShowCompColor : 1;
+	BOOL fDoubleClickInWebView : 1;
+	BOOL fDesktopHTML : 1;
+	BOOL fWin95Classic : 1;
+	BOOL fDontPrettyPath : 1;
+	BOOL fShowAttribCol : 1;
+	BOOL fMapNetDrvBtn : 1;
+	BOOL fShowInfoTip : 1;
+	BOOL fHideIcons : 1;
+	UINT fRestFlags : 3;
+} SHELLFLAGSTATE, * LPSHELLFLAGSTATE;
+
 void WINAPI SHAddToRecentDocs(UINT,PCVOID);
 LPITEMIDLIST WINAPI SHBrowseForFolderA(PBROWSEINFOA);
 LPITEMIDLIST WINAPI SHBrowseForFolderW(PBROWSEINFOW);
@@ -766,7 +783,7 @@ void WINAPI SHChangeNotify(LONG,UINT,PCVOID,PCVOID);
 HRESULT WINAPI SHGetDataFromIDListA(LPSHELLFOLDER,LPCITEMIDLIST,int,PVOID,int);
 HRESULT WINAPI SHGetDataFromIDListW(LPSHELLFOLDER,LPCITEMIDLIST,int,PVOID,int);
 HRESULT WINAPI SHGetDesktopFolder(LPSHELLFOLDER*);
-HRESULT WINAPI SHGetInstanceExplorer(LPUNKNOWN);
+HRESULT WINAPI SHGetInstanceExplorer(IUnknown **);
 HRESULT WINAPI SHGetMalloc(LPMALLOC*);
 BOOL WINAPI SHGetPathFromIDListA(LPCITEMIDLIST,LPSTR);
 BOOL WINAPI SHGetPathFromIDListW(LPCITEMIDLIST,LPWSTR);
@@ -777,8 +794,8 @@ BOOL WINAPI SHGetSpecialFolderPathA(HWND,LPSTR,int,BOOL);
 BOOL WINAPI SHGetSpecialFolderPathW(HWND,LPWSTR,int,BOOL);
 #endif 
 /* SHGetFolderPath in shfolder.dll on W9x, NT4, also in shell32.dll on W2K */
-BOOL WINAPI SHGetFolderPathA(HWND,int,HANDLE,DWORD,LPSTR);
-BOOL WINAPI SHGetFolderPathW(HWND,int,HANDLE,DWORD,LPWSTR);
+HRESULT WINAPI SHGetFolderPathA(HWND,int,HANDLE,DWORD,LPSTR);
+HRESULT WINAPI SHGetFolderPathW(HWND,int,HANDLE,DWORD,LPWSTR);
 #if (_WIN32_WINDOWS >= 0x0490) || (_WIN32_WINNT >= 0x0500) /* ME or W2K */
 HRESULT WINAPI SHGetFolderLocation(HWND,int,HANDLE,DWORD,LPITEMIDLIST*);
 #endif
