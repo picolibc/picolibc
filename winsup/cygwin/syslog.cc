@@ -50,12 +50,12 @@ openlog (const char *ident, int logopt, int facility)
     if (_my_tls.locals.process_ident != NULL)
       {
 	free (_my_tls.locals.process_ident);
-	_my_tls.locals.process_ident = 0;
+	_my_tls.locals.process_ident = NULL;
       }
     if (ident)
       {
 	_my_tls.locals.process_ident = (char *) malloc (strlen (ident) + 1);
-	if (_my_tls.locals.process_ident == NULL)
+	if (!_my_tls.locals.process_ident)
 	  {
 	    debug_printf ("failed to allocate memory for _my_tls.locals.process_ident");
 	    return;
@@ -138,6 +138,7 @@ pass_handler::initialize (int pass_number)
       return total_len_ + 1;
 
     fp_ = fopen ("/dev/null", "wb");
+    setbuf (fp_, NULL);
     if (fp_ == NULL)
       {
 	debug_printf ("failed to open /dev/null");

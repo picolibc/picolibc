@@ -114,13 +114,6 @@ ntohs (unsigned short x)
   return htons (x);
 }
 
-static void
-dump_protoent (struct protoent *p)
-{
-  if (p)
-    debug_printf ("protoent %s %x %x", p->p_name, p->p_aliases, p->p_proto);
-}
-
 /* exported as inet_ntoa: BSD 4.3 */
 extern "C" char *
 cygwin_inet_ntoa (struct in_addr in)
@@ -365,7 +358,7 @@ struct unionent
 
 enum struct_type
 {
-  is_hostent, is_protoent, is_servent
+  t_hostent, t_protoent, t_servent
 };
 
 static const char *entnames[] = {"host", "proto", "serv"};
@@ -379,37 +372,37 @@ static const char *entnames[] = {"host", "proto", "serv"};
    The 'unionent' struct is a union of all of the currently used
    *ent structure.  */
 
+#define dup_ent(old, src, type) __dup_ent ((unionent *&) (_my_tls.locals.old), (unionent *) (src), type)
 #ifdef DEBUGGING
 static void *
 #else
 static inline void *
 #endif
-dup_ent (void *old, void *src0, struct_type type)
+__dup_ent (unionent *&dst, unionent *src, struct_type type)
 {
-  if (old)
+  if (dst)
+    debug_printf ("old %sent structure \"%s\" %p\n", entnames[type],
+		  ((unionent *) dst)->name, dst);
+
+  if (!src)
     {
-      debug_printf ("freeing old %sent structure \"%s\" %p\n", entnames[type],
-		    ((unionent *) old)->name, old);
-      free (old);
+      set_winsock_errno ();
+      return NULL;
     }
 
-  if (!src0)
-    return NULL;
-
-  unionent *src = (unionent *) src0;
   debug_printf ("duping %sent \"%s\", %p", entnames[type], src->name, src);
 
   /* Find the size of the raw structure minus any character strings, etc. */
   int sz, struct_sz;
   switch (type)
     {
-    case is_protoent:
+    case t_protoent:
       struct_sz = sizeof (protoent);
       break;
-    case is_servent:
+    case t_servent:
       struct_sz = sizeof (servent);
       break;
-    case is_hostent:
+    case t_hostent:
       struct_sz = sizeof (hostent);
       break;
     default:
@@ -443,7 +436,7 @@ dup_ent (void *old, void *src0, struct_type type)
   int protolen = 0;
   int addr_list_len = 0;
   char *s_proto = NULL;
-  if (type == is_servent)
+  if (type == t_servent)
     {
       if (src->s_proto)
 	{
@@ -456,7 +449,7 @@ dup_ent (void *old, void *src0, struct_type type)
 	  sz += (protolen = strlen_round (s_proto));
 	}
     }
-  else if (type == is_hostent)
+  else if (type == t_hostent)
     {
       /* Calculate the length and storage used for h_addr_list */
       for (av = src->h_addr_list; av && *av; av++)
@@ -471,12 +464,16 @@ dup_ent (void *old, void *src0, struct_type type)
 	}
     }
 
-  /* Allocate the storage needed */
-  unionent *dst = (unionent *) calloc (1, sz);
+  /* Allocate the storage needed.  Allocate a rounded size to attempt to force
+     reuse of this buffer so that a poorly-written caller will not be using
+     a freed buffer. */
+  unsigned rsz = 256 * ((sz + 255) / 256);
+  dst = (unionent *) realloc (dst, rsz);
 
   /* Hopefully, this worked. */
   if (dst)
     {
+      memset (dst, 0, sz);
       /* This field is common to all *ent structures but named differently
 	 in each, of course.  */
       dst->port_proto_addrtype = src->port_proto_addrtype;
@@ -504,8 +501,10 @@ dup_ent (void *old, void *src0, struct_type type)
 	    }
 	}
 
-      /* Do servent/hostent specific processing. */
-      if (type == is_servent)
+      /* Do servent/protoent/hostent specific processing. */
+      if (type == t_protoent)
+	debug_printf ("protoent %s %x %x", dst->name, dst->list, dst->port_proto_addrtype);
+      else if (type == t_servent)
 	{
 	  if (s_proto)
 	    {
@@ -513,7 +512,7 @@ dup_ent (void *old, void *src0, struct_type type)
 	      dp += protolen;
 	    }
 	}
-      else if (type == is_hostent)
+      else if (type == t_hostent)
 	{
 	  /* Transfer h_len and duplicate contents of h_addr_list, using
 	     memory after 'list' allocation. */
@@ -539,28 +538,14 @@ cygwin_getprotobyname (const char *p)
 {
   if (check_null_str_errno (p))
     return NULL;
-  _my_tls.locals.protoent_buf =
-    (protoent *) dup_ent (_my_tls.locals.protoent_buf, getprotobyname (p),
-			  is_protoent);
-  if (!_my_tls.locals.protoent_buf)
-    set_winsock_errno ();
-
-  dump_protoent (_my_tls.locals.protoent_buf);
-  return _my_tls.locals.protoent_buf;
+  __builtin_return (dup_ent (protoent_buf, getprotobyname (p), t_protoent));
 }
 
 /* exported as getprotobynumber: standards? */
 extern "C" struct protoent *
 cygwin_getprotobynumber (int number)
 {
-  _my_tls.locals.protoent_buf =
-    (protoent *) dup_ent (_my_tls.locals.protoent_buf,
-			  getprotobynumber (number), is_protoent);
-  if (!_my_tls.locals.protoent_buf)
-    set_winsock_errno ();
-
-  dump_protoent (_my_tls.locals.protoent_buf);
-  return _my_tls.locals.protoent_buf;
+  __builtin_return (dup_ent (protoent_buf, getprotobynumber (number), t_protoent));
 }
 
 bool
@@ -904,12 +889,8 @@ cygwin_getservbyname (const char *name, const char *proto)
       || (proto != NULL && check_null_str_errno (proto)))
     return NULL;
 
-  _my_tls.locals.servent_buf = (servent *) dup_ent (_my_tls.locals.servent_buf, getservbyname (name, proto),
-				     is_servent);
-  if (!_my_tls.locals.servent_buf)
-    set_winsock_errno ();
-
-  syscall_printf ("%x = getservbyname (%s, %s)", _my_tls.locals.servent_buf, name, proto);
+  dup_ent (servent_buf, getservbyname (name, proto), t_servent);
+  syscall_printf ("%p = getservbyname (%s, %s)", _my_tls.locals.servent_buf, name, proto);
   return _my_tls.locals.servent_buf;
 }
 
@@ -921,12 +902,8 @@ cygwin_getservbyport (int port, const char *proto)
   if (proto != NULL && check_null_str_errno (proto))
     return NULL;
 
-  _my_tls.locals.servent_buf = (servent *) dup_ent (_my_tls.locals.servent_buf, getservbyport (port, proto),
-				     is_servent);
-  if (!_my_tls.locals.servent_buf)
-    set_winsock_errno ();
-
-  syscall_printf ("%x = getservbyport (%d, %s)", _my_tls.locals.servent_buf, port, proto);
+  dup_ent (servent_buf, getservbyport (port, proto), t_servent);
+  syscall_printf ("%p = getservbyport (%d, %s)", _my_tls.locals.servent_buf, port, proto);
   return _my_tls.locals.servent_buf;
 }
 
@@ -955,6 +932,10 @@ cygwin_gethostname (char *name, size_t len)
 extern "C" struct hostent *
 cygwin_gethostbyname (const char *name)
 {
+  sig_dispatch_pending ();
+  if (check_null_str_errno (name))
+    return NULL;
+
   unsigned char tmp_addr[4];
   struct hostent tmp, *h;
   char *tmp_aliases[1] = {0};
@@ -962,12 +943,10 @@ cygwin_gethostbyname (const char *name)
   unsigned int a, b, c, d;
   char dummy;
 
-  sig_dispatch_pending ();
-  if (check_null_str_errno (name))
-    return NULL;
-
-  if (sscanf (name, "%u.%u.%u.%u%c", &a, &b, &c, &d, &dummy) == 4
-      && a < 256 && b < 256 && c < 256 && d < 256)
+  if (sscanf (name, "%u.%u.%u.%u%c", &a, &b, &c, &d, &dummy) != 4
+      || a >= 256 || b >= 256 || c >= 256 || d >= 256)
+    h = gethostbyname (name);
+  else
     {
       /* In case you don't have DNS, at least x.x.x.x still works */
       memset (&tmp, 0, sizeof (tmp));
@@ -983,20 +962,13 @@ cygwin_gethostbyname (const char *name)
       tmp.h_addr_list = tmp_addr_list;
       h = &tmp;
     }
+
+  if (dup_ent (hostent_buf, h, t_hostent))
+    debug_printf ("h_name %s", _my_tls.locals.hostent_buf->h_name);
   else
-    h = gethostbyname (name);
-
-  _my_tls.locals.hostent_buf = (hostent *) dup_ent (_my_tls.locals.hostent_buf, h, is_hostent);
-
-  if (!_my_tls.locals.hostent_buf)
     {
-      debug_printf ("name %s", name);
-      set_winsock_errno ();
+      debug_printf ("dup_ent failed for name %s", name);
       set_host_errno ();
-    }
-  else
-    {
-      debug_printf ("h_name %s", _my_tls.locals.hostent_buf->h_name);
     }
   return _my_tls.locals.hostent_buf;
 }
@@ -1009,18 +981,10 @@ cygwin_gethostbyaddr (const char *addr, int len, int type)
   if (__check_invalid_read_ptr_errno (addr, len))
     return NULL;
 
-  _my_tls.locals.hostent_buf = (hostent *) dup_ent (_my_tls.locals.hostent_buf,
-				     gethostbyaddr (addr, len, type),
-				     is_hostent);
-  if (!_my_tls.locals.hostent_buf)
-    {
-      set_winsock_errno ();
-      set_host_errno ();
-    }
+  if (dup_ent (hostent_buf, gethostbyaddr (addr, len, type), t_hostent))
+    debug_printf ("h_name %s", _my_tls.locals.hostent_buf->h_name);
   else
-    {
-      debug_printf ("h_name %s", _my_tls.locals.hostent_buf->h_name);
-    }
+    set_host_errno ();
   return _my_tls.locals.hostent_buf;
 }
 

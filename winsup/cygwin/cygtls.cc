@@ -149,6 +149,13 @@ _cygtls::fixup_after_fork ()
   wq.thread_ev = NULL;
 }
 
+#define free_local(x) \
+  if (locals.x) \
+    { \
+      free (locals.x); \
+      locals.x = NULL; \
+    }
+
 void
 _cygtls::remove (DWORD wait)
 {
@@ -159,8 +166,12 @@ _cygtls::remove (DWORD wait)
   // select to control this themselves
   if (locals.exitsock != INVALID_SOCKET)
     closesocket (locals.exitsock);
-  if (locals.process_ident != NULL)
-    free (locals.process_ident);
+  free_local (process_ident);
+  free_local (ntoa_buf);
+  free_local (protoent_buf);
+  free_local (servent_buf);
+  free_local (hostent_buf);
+
   do
     {
       sentry here (wait);

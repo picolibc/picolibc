@@ -73,7 +73,7 @@ struct _local_storage
   char strerror_buf[20];
 
   /* sysloc.cc */
-  char *process_ident;
+  char *process_ident;			// note: malloced
   int process_logopt;
   int process_facility;
   int process_logmask;
@@ -86,10 +86,10 @@ struct _local_storage
   char username[UNLEN + 1];
 
   /* net.cc */
-  char *ntoa_buf;
-  struct protoent *protoent_buf;
-  struct servent *servent_buf;
-  struct hostent *hostent_buf;
+  char *ntoa_buf;			// note: malloced
+  struct protoent *protoent_buf;	// note: malloced
+  struct servent *servent_buf;		// note: malloced
+  struct hostent *hostent_buf;		// note: malloced
   char signamebuf[sizeof ("Unknown signal 4294967295   ")];
 };
 

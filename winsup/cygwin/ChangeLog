@@ -1,3 +1,28 @@
+2005-03-16  Christopher Faylor  <cgf@timesys.com>
+
+	* cygtls.cc (free_local): New macro.
+	(_cygtls::remove): Use free_local to free known-malloced local
+	variables.
+	* cygtls.h: Mark some variables as "malloced".
+	* net.cc (enum struct_type): Rename from is_* to t_* for clarity.
+	(dump_protoent): Delete.
+	(dup_ent): New macro.
+	(__dup_ent): Renamed from dup_ent.  Change arguments for convenience.
+	Replace first argument with newly alloced value.  Allocate a rounded
+	number of bytes in an attempt to try to reuse space.  Subsume
+	"dump_protent".
+	(cygwin_getprotobyname): Simplify using new dup_ent functionality.
+	(cygwin_getprotobynumber): Ditto.
+	(cygwin_getservbyname): Ditto.
+	(cygwin_getservbyport): Ditto.
+	(cygwin_gethostname): Ditto.
+	(cygwin_gethostbyname): Ditto.
+	* tlsoffsets.h: Regenerate.
+
+	* syslog.cc (openlog): Use NULL rather than 0, for consistency with the
+	rest of cygwin.
+	(pass_handler::initialize): Use unbuffered I/O in pass one.
+
 2005-03-15  Christopher Faylor  <cgf@timesys.com>
 
 	* errno.cc (errmap): Correct typo in previous change.
