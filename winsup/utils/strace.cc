@@ -436,7 +436,7 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
   buf[len] = '\0';
   char *s = strtok (buf, " ");
 
-  unsigned n = strtoul (s, NULL, 16);
+  unsigned long n = strtoul (s, NULL, 16);
 
   s = strchr (s, '\0') + 1;
 
@@ -562,7 +562,7 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
   if (include_hex)
     {
       s -= 8;
-      sprintf (s, "%p", n);
+      sprintf (s, "%p", (void *) n);
       strchr (s, '\0')[0] = ' ';
     }
   child->last_usecs = usecs;
