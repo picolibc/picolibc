@@ -1,3 +1,9 @@
+Fri Sep 28 02:57:03 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* passwd.cc (read_etc_passwd): Don't bother with locking when
+	in cygwin initialization since there is only one thread.
+	* grp.cc (read_etc_group): Ditto.
+
 Fri Sep 28 01:50:09 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* pipe.cc (fhandler_pipe::hit_eof): Return correct value when there is
