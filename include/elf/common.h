@@ -177,6 +177,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define EM_ARC_A5      93	/* ARC Cores Tangent-A5 */
 #define EM_XTENSA      94	/* Tensilica Xtensa Architecture */
 #define EM_IP2K	       101	/* Ubicom IP2022 micro controller */
+#define EM_MSP430      105	/* TI msp430 micro controller */
 
 /* If it is necessary to assign new unofficial EM_* values, please pick large
    random numbers (0x8523, 0xa7f2, etc.) to minimize the chances of collision
@@ -255,10 +256,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
       Written in the absense everything.  */
 #define EM_MSP430_OLD		0x1059
 
-/* TI msp430 micro controller.  */
-#define EM_MSP430      		0x430
-
-/* Vitesse IQ2000 */
+/* Vitesse IQ2000.  */
 #define EM_IQ2000		0xFEBA
 /* See the above comment before you add a new EM_* value here.  */
 
