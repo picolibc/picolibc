@@ -1,3 +1,12 @@
+2002-08-15  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/wincrypt.h (ALG_*): Add defines.
+	(CALG_*): Ditto.
+	(CRYPT_*): Ditto.
+	(PP_*): Ditto.
+	(PROV_*): Ditto.
+	(PRIVATEKEYBLOB): Add define.
+
 2002-08-14  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/shlobj.h (SHGetFolderPath): Add define.
