@@ -1,3 +1,8 @@
+2001-03-13  Alexandre Oliva  <aoliva@redhat.com>
+
+	* libc/stdio/vfprintf.c (QUADINT) [_NO_LONGLONG]: Make it
+	equivalent to LONGINT.
+
 2001-03-08  Richard Sandiford  <rsandifo@redhat.com>
 
         * (libc/include/machine/setjmp.h): Use 23 long long ints for a

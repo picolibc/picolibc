@@ -279,7 +279,13 @@ static int exponent _PARAMS((char *, int, int));
 #define	LADJUST		0x004		/* left adjustment */
 #define	LONGDBL		0x008		/* long double */
 #define	LONGINT		0x010		/* long integer */
+#ifndef _NO_LONGLONG
 #define	QUADINT		0x020		/* quad integer */
+#else /* ifdef _NO_LONGLONG, make QUADINT equivalent to LONGINT, so
+	 that %lld behaves the same as %ld, not as %d, as expected if:
+	 sizeof (long long) = sizeof long > sizeof int  */
+#define	QUADINT		LONGINT
+#endif
 #define	SHORTINT	0x040		/* short integer */
 #define	ZEROPAD		0x080		/* zero (as opposed to blank) pad */
 #define FPT		0x100		/* Floating point number */
