@@ -1,3 +1,12 @@
+2003-07-09  Alexandre Oliva  <aoliva@redhat.com>
+
+	2000-04-01  Alexandre Oliva  <aoliva@cygnus.com>
+	* mn10300.h (AM33_2): Renamed from AM33.
+	2000-03-31  Alexandre Oliva  <aoliva@cygnus.com>
+	* mn10300.h (AM332, FMT_D3): Defined.
+	(MN10300_OPERAND_FSREG, MN10300_OPERAND_FDREG): Likewise.
+	(MN10300_OPERAND_FPCR): Likewise.
+
 2003-07-01  Martin Schwidefsky  <schwidefsky@de.ibm.com>
 
 	* s390.h (s390_opcode_cpu_val): Add enum for cpu type z990.
