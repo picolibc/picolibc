@@ -1,3 +1,14 @@
+Thu Jan  5  9:33:00  2001  Corinna Vinschen <corina@vinschen.de>
+
+	* resource.cc (getrlimit): Set errno on EFAULT instead of returning
+	it.
+	(setrlimit): Ditto.
+
+Thu Jan  5  3:38:00  2001  David Sainty <David.Sainty@optimation.co.nz>
+
+	* resource.cc (setrlimit): Prevent failing with an error when the
+	operation would not have changed anything.
+
 Thu Jan  4 10:29:54  2001  Earnie Boyd  <earnie_boyd@yahoo.com>
 
 	* thread.cc: Need LONG_MAX definition.

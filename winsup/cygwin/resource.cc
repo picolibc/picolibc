@@ -1,6 +1,6 @@
 /* resource.cc: getrusage () and friends.
 
-   Copyright 1996, 1997, 1998, 2000 Cygnus Solutions.
+   Copyright 1996, 1997, 1998, 2000, 2001 Cygnus Solutions.
 
    Written by Steve Chamberlain (sac@cygnus.com), Doug Evans (dje@cygnus.com),
    Geoffrey Noer (noer@cygnus.com) of Cygnus Support.
@@ -106,7 +106,10 @@ getrlimit (int resource, struct rlimit *rlp)
 {
   MEMORY_BASIC_INFORMATION m;
   if (!rlp || !VirtualQuery (rlp, &m, sizeof (m)) || (m.State != MEM_COMMIT))
-    return EFAULT;
+    {
+      set_errno (EFAULT);
+      return -1;
+    }
 
   rlp->rlim_cur = RLIM_INFINITY;
   rlp->rlim_max = RLIM_INFINITY;
@@ -139,7 +142,23 @@ setrlimit (int resource, const struct rlimit *rlp)
 {
   MEMORY_BASIC_INFORMATION m;
   if (!rlp || !VirtualQuery (rlp, &m, sizeof (m)) || (m.State != MEM_COMMIT))
-    return EFAULT;
+    {
+      set_errno (EFAULT);
+      return -1;
+    }
+
+  struct rlimit oldlimits;
+
+  // Check if the request is to actually change the resource settings.
+  // If it does not result in a change, take no action and do not
+  // fail.
+  if (getrlimit(resource, &oldlimits) < 0)
+    return -1;
+
+  if (oldlimits.rlim_cur == rlp->rlim_cur &&
+      oldlimits.rlim_max == rlp->rlim_max)
+    // No change in resource requirements, succeed immediately
+    return 0;
 
   switch (resource)
     {
