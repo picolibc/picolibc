@@ -1,3 +1,7 @@
+2003-04-17  Christopher Faylor  <cgf@redhat.com>
+
+	* syscalls.cc (setsid): Don't call FreeConsole if ctty is already < 0.
+
 2003-04-17  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* Makefile.in: Add finline-functions optimization to CXXFLAGS.

@@ -283,13 +283,13 @@ setsid (void)
 
   if (myself->pgid != myself->pid)
     {
-      myself->ctty = -1;
-      if (fhandler_console::open_fhs <= 0)
+      if (myself->ctty >= 0 && fhandler_console::open_fhs <= 0)
 	{
 	  syscall_printf ("open_fhs %d, freeing console",
 			  fhandler_console::open_fhs);
 	  FreeConsole ();
 	}
+      myself->ctty = -1;
       myself->sid = getpid ();
       myself->pgid = getpid ();
       syscall_printf ("sid %d, pgid %d, ctty %d", myself->sid, myself->pgid, myself->ctty);
