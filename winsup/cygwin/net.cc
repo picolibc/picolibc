@@ -247,26 +247,24 @@ static struct tl errmap[] =
  {0, NULL, 0}
 };
 
+static int
+find_winsock_errno (int why)
+{
+  for (int i = 0; errmap[i].w != 0; ++i)
+    if (why == errmap[i].w)
+      return errmap[i].e;
+
+  return EPERM;
+}
+
 /* Cygwin internal */
 void
 __set_winsock_errno (const char *fn, int ln)
 {
-  int i;
-  int why = WSAGetLastError ();
-  for (i = 0; errmap[i].w != 0; ++i)
-    if (why == errmap[i].w)
-      break;
-
-  if (errmap[i].w != 0)
-    {
-      syscall_printf ("%s:%d - %d (%s) -> %d", fn, ln, why, errmap[i].s, errmap[i].e);
-      set_errno (errmap[i].e);
-    }
-  else
-    {
-      syscall_printf ("%s:%d - unknown error %d", fn, ln, why);
-      set_errno (EPERM);
-    }
+  DWORD werr = WSAGetLastError ();
+  int err = find_winsock_errno (werr);
+  set_errno (err);
+  syscall_printf ("%s:%d - winsock error %d -> errno %d", fn, ln, werr, err);
 }
 
 /*
@@ -524,6 +522,9 @@ cygwin_setsockopt (int fd,
 	case SO_OOBINLINE:
 	  name="SO_OOBINLINE";
 	  break;
+	case SO_ERROR:
+	  name="SO_ERROR";
+	  break;
 	}
 
       res = setsockopt (h->get_socket (), level, optname,
@@ -584,10 +585,19 @@ cygwin_getsockopt (int fd,
 	case SO_OOBINLINE:
 	  name="SO_OOBINLINE";
 	  break;
+	case SO_ERROR:
+	  name="SO_ERROR";
+	  break;
 	}
 
       res = getsockopt (h->get_socket (), level, optname,
 				       (char *) optval, (int *) optlen);
+
+      if (optname == SO_ERROR)
+	{
+	  int *e = (int *) optval;
+	  *e = find_winsock_errno (*e);
+	}
 
       if (res)
 	set_winsock_errno ();

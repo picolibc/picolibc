@@ -1,3 +1,18 @@
+Mon Apr  2 22:48:58 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* cygrun.c (main): Fix compiler warning.
+	* gmon.c (_mcleanup): Ditto.
+	* profil.c (profile_off): Ditto.
+
+	* net.cc (find_winsock_errno): New function.
+	(__set_winsock_errno): Use find_winsock_errno.
+	(cygwin_setsockopt): Detect SO_ERROR for debugging.
+	(cygwin_getsockopt): Ditto.  Translate error when getsockopt returns
+	SO_ERROR.
+	* winsup.h: regparmize __set_winsock_errno.
+	* include/sys/strace.h: Document that strace functions can't use
+	regparm.
+
 2001-04-02  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
 	* fhandler.cc (fhandler_disk_file::open): Avoid checking a magic

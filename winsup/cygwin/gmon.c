@@ -200,7 +200,10 @@ _mcleanup()
 		proffile = "gmon.out";
 	}
 #else
-	proffile = "gmon.out";
+	{
+	  char gmon_out[] = "gmon.out";
+	  proffile = gmon_out;
+	}
 #endif
 
 	fd = open(proffile , O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, 0666);

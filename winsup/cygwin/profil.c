@@ -98,7 +98,7 @@ profile_off (struct profinfo *p)
 static int
 profile_on (struct profinfo *p)
 {
-  int thrid;
+  DWORD thrid;
 
   /* get handle for this thread */
   if (!DuplicateHandle (GetCurrentProcess (), GetCurrentThread (),

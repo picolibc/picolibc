@@ -1666,9 +1666,9 @@ setmode (int fd, int mode)
   setmode_file = fd;
   _fwalk (_REENT, setmode_helper);
 
-  syscall_printf ("setmode (%d, %s) returns %s\n", fd,
-		  mode&O_TEXT ? "text" : "binary",
-		  res&O_TEXT ? "text" : "binary");
+  syscall_printf ("setmode (%d<%s>, %s) returns %s\n", fd, p->get_name (),
+		  mode & O_TEXT ? "text" : "binary",
+		  res & O_TEXT ? "text" : "binary");
 
   return res;
 }

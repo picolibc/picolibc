@@ -15,6 +15,7 @@ details. */
 
 #include <stdio.h>
 #include <windows.h>
+#include <stdlib.h>
 
 int
 main(int argc, char **argv)
@@ -29,7 +30,7 @@ main(int argc, char **argv)
       exit (0);
     }
 
-  setenv("CYGWIN_TESTING", "1");
+  putenv("CYGWIN_TESTING=1");
   SetEnvironmentVariable("CYGWIN_TESTING", "1");
 
   memset(&sa, 0, sizeof(sa));

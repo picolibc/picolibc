@@ -212,12 +212,12 @@ void __stdcall set_console_title (char *);
 void set_console_handler ();
 
 #define set_winsock_errno() __set_winsock_errno (__FUNCTION__, __LINE__)
-void __set_winsock_errno (const char *fn, int ln);
+void __set_winsock_errno (const char *fn, int ln) __attribute__ ((regparm(2)));
 
 /* Printf type functions */
 extern "C" void __api_fatal (const char *, ...) __attribute__ ((noreturn));
-extern "C" int __small_sprintf (char *dst, const char *fmt, ...);
-extern "C" int __small_vsprintf (char *dst, const char *fmt, va_list ap);
+extern "C" int __small_sprintf (char *dst, const char *fmt, ...) /*__attribute__ ((regparm (2)))*/;
+extern "C" int __small_vsprintf (char *dst, const char *fmt, va_list ap) /*__attribute__ ((regparm (3)))*/;
 
 /**************************** Exports ******************************/
 
