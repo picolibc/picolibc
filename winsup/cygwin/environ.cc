@@ -28,6 +28,7 @@ details. */
 #include "registry.h"
 #include "environ.h"
 
+extern BOOL allow_daemon;
 extern BOOL allow_glob;
 extern bool ignore_case_with_glob;
 extern BOOL allow_ntea;
@@ -505,6 +506,7 @@ static struct parse_thing
   {"binmode", {x: &binmode}, justset, NULL, {{O_TEXT}, {O_BINARY}}},
   {"check_case", {func: &check_case_init}, isfunc, NULL, {{0}, {0}}},
   {"codepage", {func: &codepage_init}, isfunc, NULL, {{0}, {0}}},
+  {"daemon", {&allow_daemon}, justset, NULL, {{FALSE}, {TRUE}}},
   {"envcache", {&envcache}, justset, NULL, {{TRUE}, {FALSE}}},
   {"error_start", {func: &error_start_init}, isfunc, NULL, {{0}, {0}}},
   {"export", {&export_settings}, justset, NULL, {{FALSE}, {TRUE}}},

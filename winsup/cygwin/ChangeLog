@@ -1,3 +1,10 @@
+Tue Oct  2 23:24:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* cygserver_client.cc: New flag allow_daemon to disable the daemon completely.
+	(cygserver_request): Check it.
+	(cygserver_init): Ditto.
+	* environ.cc (parse_thing): Add (no)daemon option.
+
 Tue Oct  2 23:00:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
 	* shm.cc: Update to handle include changes from HEAD.

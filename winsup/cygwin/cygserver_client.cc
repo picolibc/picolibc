@@ -33,6 +33,8 @@
 
 /* 0 = untested, 1 = running, 2 = dead */
 int cygserver_running=CYGSERVER_UNKNOWN;
+/* on by default during development. For release, we probably want off by default */
+int allow_daemon = TRUE;
 
 client_request_get_version::client_request_get_version () : client_request (CYGSERVER_REQUEST_GET_VERSION, sizeof (version))
 {
@@ -112,7 +114,7 @@ cygserver_request (client_request * req)
 {
   class transport_layer_base *transport;
 
-  if (!req)
+  if (!req || allow_daemon != TRUE)
     return -1;
 
   /* dont' retry every request if the server's not there */
@@ -169,6 +171,11 @@ void
 cygserver_init ()
 {
   int rc;
+  if (allow_daemon != TRUE)
+    {
+      cygserver_running = CYGSERVER_DEAD;
+      return;
+    }
 
   if (cygserver_running==CYGSERVER_OK)
     return;
