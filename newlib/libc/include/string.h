@@ -69,7 +69,7 @@ char	*_EXFUN(strupr,(char *));
 char    *_EXFUN(strsignal, (int __signo));
 int     _EXFUN(strtosigno, (const char *__name));
 #endif
-void	 _EXFUN(swab,(const void *, void *, ssize_t));
+void	 _EXFUN(swab,(const void *, void *, size_t));
 
 /* These function names are used on Windows and perhaps other systems.  */
 #ifndef strcmpi

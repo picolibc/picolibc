@@ -1,3 +1,8 @@
+Wed Mar  8 17:11:41 2000  Jeff Johnston <jjohnstn@cygnus.com>
+
+        * libc/include/string.h: Changed last argument to size_t.
+        * libc/string/swab.c: Changed last argument to size_t.
+
 Wed Mar  8 00:46:41 2000  Alexandre Oliva  <oliva@lsd.ic.unicamp.br>
 
 	* libc/reent/Makefile.am (lib_a_SOURCES): Added unlinkr.c.

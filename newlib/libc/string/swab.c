@@ -27,11 +27,11 @@ void
 _DEFUN (swab, (b1, b2, length),
 	_CONST void *b1 _AND
 	void *b2 _AND
-	ssize_t length)
+	size_t length)
 {
   const char *from = b1;
   char *to = b2;
-  ssize_t ptr;
+  size_t ptr;
   for (ptr = 1; ptr < length; ptr += 2)
     {
       char p = from[ptr];
