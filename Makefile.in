@@ -1324,6 +1324,47 @@ all-build-libiberty: configure-build-libiberty
 # Modules which run on the host machine
 # --------------------------------------
 
+.PHONY: configure-ash maybe-configure-ash
+maybe-configure-ash:
+configure-ash: ash/Makefile
+
+ash/Makefile: config.status
+	@[ -d ash ] || mkdir ash; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in ash; \
+	cd ash || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/ash"; \
+	    libsrcdir="$$s/ash";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/ash"; \
+	    libsrcdir="$$s/ash";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-ash maybe-all-ash
 maybe-all-ash:
 all-ash:
@@ -1350,6 +1391,47 @@ install-ash: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd ash; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-autoconf maybe-configure-autoconf
+maybe-configure-autoconf:
+configure-autoconf: autoconf/Makefile
+
+autoconf/Makefile: config.status
+	@[ -d autoconf ] || mkdir autoconf; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in autoconf; \
+	cd autoconf || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/autoconf"; \
+	    libsrcdir="$$s/autoconf";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/autoconf"; \
+	    libsrcdir="$$s/autoconf";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-autoconf maybe-all-autoconf
 maybe-all-autoconf:
@@ -1378,6 +1460,47 @@ install-autoconf: installdirs
 	  (cd autoconf; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-automake maybe-configure-automake
+maybe-configure-automake:
+configure-automake: automake/Makefile
+
+automake/Makefile: config.status
+	@[ -d automake ] || mkdir automake; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in automake; \
+	cd automake || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/automake"; \
+	    libsrcdir="$$s/automake";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/automake"; \
+	    libsrcdir="$$s/automake";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-automake maybe-all-automake
 maybe-all-automake:
 all-automake:
@@ -1404,6 +1527,47 @@ install-automake: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd automake; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-bash maybe-configure-bash
+maybe-configure-bash:
+configure-bash: bash/Makefile
+
+bash/Makefile: config.status
+	@[ -d bash ] || mkdir bash; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in bash; \
+	cd bash || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/bash"; \
+	    libsrcdir="$$s/bash";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/bash"; \
+	    libsrcdir="$$s/bash";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-bash maybe-all-bash
 maybe-all-bash:
@@ -1432,6 +1596,47 @@ install-bash: installdirs
 	  (cd bash; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-bfd maybe-configure-bfd
+maybe-configure-bfd:
+configure-bfd: bfd/Makefile
+
+bfd/Makefile: config.status
+	@[ -d bfd ] || mkdir bfd; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in bfd; \
+	cd bfd || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/bfd"; \
+	    libsrcdir="$$s/bfd";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/bfd"; \
+	    libsrcdir="$$s/bfd";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-bfd maybe-all-bfd
 maybe-all-bfd:
 all-bfd:
@@ -1458,6 +1663,47 @@ install-bfd: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd bfd; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-opcodes maybe-configure-opcodes
+maybe-configure-opcodes:
+configure-opcodes: opcodes/Makefile
+
+opcodes/Makefile: config.status
+	@[ -d opcodes ] || mkdir opcodes; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in opcodes; \
+	cd opcodes || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/opcodes"; \
+	    libsrcdir="$$s/opcodes";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/opcodes"; \
+	    libsrcdir="$$s/opcodes";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-opcodes maybe-all-opcodes
 maybe-all-opcodes:
@@ -1486,6 +1732,47 @@ install-opcodes: installdirs
 	  (cd opcodes; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-binutils maybe-configure-binutils
+maybe-configure-binutils:
+configure-binutils: binutils/Makefile
+
+binutils/Makefile: config.status
+	@[ -d binutils ] || mkdir binutils; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in binutils; \
+	cd binutils || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/binutils"; \
+	    libsrcdir="$$s/binutils";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/binutils"; \
+	    libsrcdir="$$s/binutils";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-binutils maybe-all-binutils
 maybe-all-binutils:
 all-binutils:
@@ -1512,6 +1799,47 @@ install-binutils: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd binutils; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-bison maybe-configure-bison
+maybe-configure-bison:
+configure-bison: bison/Makefile
+
+bison/Makefile: config.status
+	@[ -d bison ] || mkdir bison; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in bison; \
+	cd bison || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/bison"; \
+	    libsrcdir="$$s/bison";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/bison"; \
+	    libsrcdir="$$s/bison";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-bison maybe-all-bison
 maybe-all-bison:
@@ -1543,6 +1871,47 @@ install-bison: installdirs
 	  (cd bison; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-byacc maybe-configure-byacc
+maybe-configure-byacc:
+configure-byacc: byacc/Makefile
+
+byacc/Makefile: config.status
+	@[ -d byacc ] || mkdir byacc; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in byacc; \
+	cd byacc || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/byacc"; \
+	    libsrcdir="$$s/byacc";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/byacc"; \
+	    libsrcdir="$$s/byacc";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-byacc maybe-all-byacc
 maybe-all-byacc:
 all-byacc:
@@ -1573,6 +1942,47 @@ install-byacc: installdirs
 	  (cd byacc; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-bzip2 maybe-configure-bzip2
+maybe-configure-bzip2:
+configure-bzip2: bzip2/Makefile
+
+bzip2/Makefile: config.status
+	@[ -d bzip2 ] || mkdir bzip2; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in bzip2; \
+	cd bzip2 || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/bzip2"; \
+	    libsrcdir="$$s/bzip2";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/bzip2"; \
+	    libsrcdir="$$s/bzip2";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-bzip2 maybe-all-bzip2
 maybe-all-bzip2:
 all-bzip2:
@@ -1599,6 +2009,47 @@ install-bzip2: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd bzip2; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-db maybe-configure-db
+maybe-configure-db:
+configure-db: db/Makefile
+
+db/Makefile: config.status
+	@[ -d db ] || mkdir db; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in db; \
+	cd db || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/db"; \
+	    libsrcdir="$$s/db";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/db"; \
+	    libsrcdir="$$s/db";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-db maybe-all-db
 maybe-all-db:
@@ -1627,6 +2078,47 @@ install-db: installdirs
 	  (cd db; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-dejagnu maybe-configure-dejagnu
+maybe-configure-dejagnu:
+configure-dejagnu: dejagnu/Makefile
+
+dejagnu/Makefile: config.status
+	@[ -d dejagnu ] || mkdir dejagnu; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in dejagnu; \
+	cd dejagnu || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/dejagnu"; \
+	    libsrcdir="$$s/dejagnu";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/dejagnu"; \
+	    libsrcdir="$$s/dejagnu";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-dejagnu maybe-all-dejagnu
 maybe-all-dejagnu:
 all-dejagnu:
@@ -1653,6 +2145,47 @@ install-dejagnu: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd dejagnu; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-diff maybe-configure-diff
+maybe-configure-diff:
+configure-diff: diff/Makefile
+
+diff/Makefile: config.status
+	@[ -d diff ] || mkdir diff; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in diff; \
+	cd diff || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/diff"; \
+	    libsrcdir="$$s/diff";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/diff"; \
+	    libsrcdir="$$s/diff";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-diff maybe-all-diff
 maybe-all-diff:
@@ -1681,6 +2214,47 @@ install-diff: installdirs
 	  (cd diff; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-dosutils maybe-configure-dosutils
+maybe-configure-dosutils:
+configure-dosutils: dosutils/Makefile
+
+dosutils/Makefile: config.status
+	@[ -d dosutils ] || mkdir dosutils; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in dosutils; \
+	cd dosutils || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/dosutils"; \
+	    libsrcdir="$$s/dosutils";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/dosutils"; \
+	    libsrcdir="$$s/dosutils";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-dosutils maybe-all-dosutils
 maybe-all-dosutils:
 all-dosutils:
@@ -1703,6 +2277,47 @@ install-dosutils: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd dosutils; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-etc maybe-configure-etc
+maybe-configure-etc:
+configure-etc: etc/Makefile
+
+etc/Makefile: config.status
+	@[ -d etc ] || mkdir etc; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in etc; \
+	cd etc || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/etc"; \
+	    libsrcdir="$$s/etc";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/etc"; \
+	    libsrcdir="$$s/etc";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-etc maybe-all-etc
 maybe-all-etc:
@@ -1730,6 +2345,47 @@ install-etc: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd etc; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-fastjar maybe-configure-fastjar
+maybe-configure-fastjar:
+configure-fastjar: fastjar/Makefile
+
+fastjar/Makefile: config.status
+	@[ -d fastjar ] || mkdir fastjar; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in fastjar; \
+	cd fastjar || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/fastjar"; \
+	    libsrcdir="$$s/fastjar";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/fastjar"; \
+	    libsrcdir="$$s/fastjar";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-fastjar maybe-all-fastjar
 maybe-all-fastjar:
@@ -1761,6 +2417,47 @@ install-fastjar: installdirs
 	  (cd fastjar; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-fileutils maybe-configure-fileutils
+maybe-configure-fileutils:
+configure-fileutils: fileutils/Makefile
+
+fileutils/Makefile: config.status
+	@[ -d fileutils ] || mkdir fileutils; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in fileutils; \
+	cd fileutils || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/fileutils"; \
+	    libsrcdir="$$s/fileutils";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/fileutils"; \
+	    libsrcdir="$$s/fileutils";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-fileutils maybe-all-fileutils
 maybe-all-fileutils:
 all-fileutils:
@@ -1787,6 +2484,47 @@ install-fileutils: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd fileutils; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-findutils maybe-configure-findutils
+maybe-configure-findutils:
+configure-findutils: findutils/Makefile
+
+findutils/Makefile: config.status
+	@[ -d findutils ] || mkdir findutils; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in findutils; \
+	cd findutils || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/findutils"; \
+	    libsrcdir="$$s/findutils";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/findutils"; \
+	    libsrcdir="$$s/findutils";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-findutils maybe-all-findutils
 maybe-all-findutils:
@@ -1815,6 +2553,47 @@ install-findutils: installdirs
 	  (cd findutils; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-find maybe-configure-find
+maybe-configure-find:
+configure-find: find/Makefile
+
+find/Makefile: config.status
+	@[ -d find ] || mkdir find; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in find; \
+	cd find || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/find"; \
+	    libsrcdir="$$s/find";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/find"; \
+	    libsrcdir="$$s/find";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-find maybe-all-find
 maybe-all-find:
 all-find:
@@ -1841,6 +2620,47 @@ install-find: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd find; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-flex maybe-configure-flex
+maybe-configure-flex:
+configure-flex: flex/Makefile
+
+flex/Makefile: config.status
+	@[ -d flex ] || mkdir flex; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in flex; \
+	cd flex || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/flex"; \
+	    libsrcdir="$$s/flex";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/flex"; \
+	    libsrcdir="$$s/flex";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-flex maybe-all-flex
 maybe-all-flex:
@@ -1872,6 +2692,47 @@ install-flex: installdirs
 	  (cd flex; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-gas maybe-configure-gas
+maybe-configure-gas:
+configure-gas: gas/Makefile
+
+gas/Makefile: config.status
+	@[ -d gas ] || mkdir gas; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in gas; \
+	cd gas || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/gas"; \
+	    libsrcdir="$$s/gas";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/gas"; \
+	    libsrcdir="$$s/gas";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-gas maybe-all-gas
 maybe-all-gas:
 all-gas:
@@ -1898,6 +2759,47 @@ install-gas: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd gas; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-gawk maybe-configure-gawk
+maybe-configure-gawk:
+configure-gawk: gawk/Makefile
+
+gawk/Makefile: config.status
+	@[ -d gawk ] || mkdir gawk; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in gawk; \
+	cd gawk || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/gawk"; \
+	    libsrcdir="$$s/gawk";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/gawk"; \
+	    libsrcdir="$$s/gawk";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-gawk maybe-all-gawk
 maybe-all-gawk:
@@ -1926,6 +2828,47 @@ install-gawk: installdirs
 	  (cd gawk; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-gettext maybe-configure-gettext
+maybe-configure-gettext:
+configure-gettext: gettext/Makefile
+
+gettext/Makefile: config.status
+	@[ -d gettext ] || mkdir gettext; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in gettext; \
+	cd gettext || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/gettext"; \
+	    libsrcdir="$$s/gettext";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/gettext"; \
+	    libsrcdir="$$s/gettext";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-gettext maybe-all-gettext
 maybe-all-gettext:
 all-gettext:
@@ -1952,6 +2895,47 @@ install-gettext: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd gettext; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-gnuserv maybe-configure-gnuserv
+maybe-configure-gnuserv:
+configure-gnuserv: gnuserv/Makefile
+
+gnuserv/Makefile: config.status
+	@[ -d gnuserv ] || mkdir gnuserv; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in gnuserv; \
+	cd gnuserv || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/gnuserv"; \
+	    libsrcdir="$$s/gnuserv";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/gnuserv"; \
+	    libsrcdir="$$s/gnuserv";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-gnuserv maybe-all-gnuserv
 maybe-all-gnuserv:
@@ -1980,6 +2964,47 @@ install-gnuserv: installdirs
 	  (cd gnuserv; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-gprof maybe-configure-gprof
+maybe-configure-gprof:
+configure-gprof: gprof/Makefile
+
+gprof/Makefile: config.status
+	@[ -d gprof ] || mkdir gprof; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in gprof; \
+	cd gprof || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/gprof"; \
+	    libsrcdir="$$s/gprof";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/gprof"; \
+	    libsrcdir="$$s/gprof";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-gprof maybe-all-gprof
 maybe-all-gprof:
 all-gprof:
@@ -2006,6 +3031,47 @@ install-gprof: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd gprof; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-grep maybe-configure-grep
+maybe-configure-grep:
+configure-grep: grep/Makefile
+
+grep/Makefile: config.status
+	@[ -d grep ] || mkdir grep; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in grep; \
+	cd grep || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/grep"; \
+	    libsrcdir="$$s/grep";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/grep"; \
+	    libsrcdir="$$s/grep";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-grep maybe-all-grep
 maybe-all-grep:
@@ -2034,6 +3100,47 @@ install-grep: installdirs
 	  (cd grep; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-gzip maybe-configure-gzip
+maybe-configure-gzip:
+configure-gzip: gzip/Makefile
+
+gzip/Makefile: config.status
+	@[ -d gzip ] || mkdir gzip; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in gzip; \
+	cd gzip || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/gzip"; \
+	    libsrcdir="$$s/gzip";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/gzip"; \
+	    libsrcdir="$$s/gzip";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-gzip maybe-all-gzip
 maybe-all-gzip:
 all-gzip:
@@ -2060,6 +3167,47 @@ install-gzip: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd gzip; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-hello maybe-configure-hello
+maybe-configure-hello:
+configure-hello: hello/Makefile
+
+hello/Makefile: config.status
+	@[ -d hello ] || mkdir hello; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in hello; \
+	cd hello || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/hello"; \
+	    libsrcdir="$$s/hello";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/hello"; \
+	    libsrcdir="$$s/hello";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-hello maybe-all-hello
 maybe-all-hello:
@@ -2088,6 +3236,47 @@ install-hello: installdirs
 	  (cd hello; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-indent maybe-configure-indent
+maybe-configure-indent:
+configure-indent: indent/Makefile
+
+indent/Makefile: config.status
+	@[ -d indent ] || mkdir indent; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in indent; \
+	cd indent || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/indent"; \
+	    libsrcdir="$$s/indent";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/indent"; \
+	    libsrcdir="$$s/indent";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-indent maybe-all-indent
 maybe-all-indent:
 all-indent:
@@ -2114,6 +3303,47 @@ install-indent: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd indent; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-intl maybe-configure-intl
+maybe-configure-intl:
+configure-intl: intl/Makefile
+
+intl/Makefile: config.status
+	@[ -d intl ] || mkdir intl; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in intl; \
+	cd intl || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/intl"; \
+	    libsrcdir="$$s/intl";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/intl"; \
+	    libsrcdir="$$s/intl";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-intl maybe-all-intl
 maybe-all-intl:
@@ -2142,6 +3372,47 @@ install-intl: installdirs
 	  (cd intl; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-tcl maybe-configure-tcl
+maybe-configure-tcl:
+configure-tcl: tcl/Makefile
+
+tcl/Makefile: config.status
+	@[ -d tcl ] || mkdir tcl; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in tcl; \
+	cd tcl || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/tcl"; \
+	    libsrcdir="$$s/tcl";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/tcl"; \
+	    libsrcdir="$$s/tcl";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-tcl maybe-all-tcl
 maybe-all-tcl:
 all-tcl:
@@ -2168,6 +3439,47 @@ install-tcl: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd tcl; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-itcl maybe-configure-itcl
+maybe-configure-itcl:
+configure-itcl: itcl/Makefile
+
+itcl/Makefile: config.status
+	@[ -d itcl ] || mkdir itcl; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in itcl; \
+	cd itcl || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/itcl"; \
+	    libsrcdir="$$s/itcl";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/itcl"; \
+	    libsrcdir="$$s/itcl";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-itcl maybe-all-itcl
 maybe-all-itcl:
@@ -2196,6 +3508,47 @@ install-itcl: installdirs
 	  (cd itcl; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-ld maybe-configure-ld
+maybe-configure-ld:
+configure-ld: ld/Makefile
+
+ld/Makefile: config.status
+	@[ -d ld ] || mkdir ld; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in ld; \
+	cd ld || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/ld"; \
+	    libsrcdir="$$s/ld";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/ld"; \
+	    libsrcdir="$$s/ld";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-ld maybe-all-ld
 maybe-all-ld:
 all-ld:
@@ -2222,6 +3575,47 @@ install-ld: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd ld; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-libgui maybe-configure-libgui
+maybe-configure-libgui:
+configure-libgui: libgui/Makefile
+
+libgui/Makefile: config.status
+	@[ -d libgui ] || mkdir libgui; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in libgui; \
+	cd libgui || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/libgui"; \
+	    libsrcdir="$$s/libgui";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/libgui"; \
+	    libsrcdir="$$s/libgui";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-libgui maybe-all-libgui
 maybe-all-libgui:
@@ -2250,6 +3644,47 @@ install-libgui: installdirs
 	  (cd libgui; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-libiberty maybe-configure-libiberty
+maybe-configure-libiberty:
+configure-libiberty: libiberty/Makefile
+
+libiberty/Makefile: config.status
+	@[ -d libiberty ] || mkdir libiberty; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in libiberty; \
+	cd libiberty || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/libiberty"; \
+	    libsrcdir="$$s/libiberty";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/libiberty"; \
+	    libsrcdir="$$s/libiberty";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-libiberty maybe-all-libiberty
 maybe-all-libiberty:
 all-libiberty:
@@ -2276,6 +3711,47 @@ install-libiberty: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd libiberty; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-libtool maybe-configure-libtool
+maybe-configure-libtool:
+configure-libtool: libtool/Makefile
+
+libtool/Makefile: config.status
+	@[ -d libtool ] || mkdir libtool; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in libtool; \
+	cd libtool || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/libtool"; \
+	    libsrcdir="$$s/libtool";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/libtool"; \
+	    libsrcdir="$$s/libtool";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-libtool maybe-all-libtool
 maybe-all-libtool:
@@ -2304,6 +3780,47 @@ install-libtool: installdirs
 	  (cd libtool; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-m4 maybe-configure-m4
+maybe-configure-m4:
+configure-m4: m4/Makefile
+
+m4/Makefile: config.status
+	@[ -d m4 ] || mkdir m4; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in m4; \
+	cd m4 || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/m4"; \
+	    libsrcdir="$$s/m4";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/m4"; \
+	    libsrcdir="$$s/m4";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-m4 maybe-all-m4
 maybe-all-m4:
 all-m4:
@@ -2330,6 +3847,47 @@ install-m4: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd m4; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-make maybe-configure-make
+maybe-configure-make:
+configure-make: make/Makefile
+
+make/Makefile: config.status
+	@[ -d make ] || mkdir make; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in make; \
+	cd make || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/make"; \
+	    libsrcdir="$$s/make";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/make"; \
+	    libsrcdir="$$s/make";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-make maybe-all-make
 maybe-all-make:
@@ -2358,6 +3916,47 @@ install-make: installdirs
 	  (cd make; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-mmalloc maybe-configure-mmalloc
+maybe-configure-mmalloc:
+configure-mmalloc: mmalloc/Makefile
+
+mmalloc/Makefile: config.status
+	@[ -d mmalloc ] || mkdir mmalloc; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in mmalloc; \
+	cd mmalloc || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/mmalloc"; \
+	    libsrcdir="$$s/mmalloc";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/mmalloc"; \
+	    libsrcdir="$$s/mmalloc";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-mmalloc maybe-all-mmalloc
 maybe-all-mmalloc:
 all-mmalloc:
@@ -2380,6 +3979,47 @@ install-mmalloc: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd mmalloc; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-patch maybe-configure-patch
+maybe-configure-patch:
+configure-patch: patch/Makefile
+
+patch/Makefile: config.status
+	@[ -d patch ] || mkdir patch; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in patch; \
+	cd patch || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/patch"; \
+	    libsrcdir="$$s/patch";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/patch"; \
+	    libsrcdir="$$s/patch";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-patch maybe-all-patch
 maybe-all-patch:
@@ -2408,6 +4048,47 @@ install-patch: installdirs
 	  (cd patch; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-perl maybe-configure-perl
+maybe-configure-perl:
+configure-perl: perl/Makefile
+
+perl/Makefile: config.status
+	@[ -d perl ] || mkdir perl; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in perl; \
+	cd perl || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/perl"; \
+	    libsrcdir="$$s/perl";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/perl"; \
+	    libsrcdir="$$s/perl";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-perl maybe-all-perl
 maybe-all-perl:
 all-perl:
@@ -2434,6 +4115,47 @@ install-perl: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd perl; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-prms maybe-configure-prms
+maybe-configure-prms:
+configure-prms: prms/Makefile
+
+prms/Makefile: config.status
+	@[ -d prms ] || mkdir prms; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in prms; \
+	cd prms || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/prms"; \
+	    libsrcdir="$$s/prms";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/prms"; \
+	    libsrcdir="$$s/prms";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-prms maybe-all-prms
 maybe-all-prms:
@@ -2462,6 +4184,47 @@ install-prms: installdirs
 	  (cd prms; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-rcs maybe-configure-rcs
+maybe-configure-rcs:
+configure-rcs: rcs/Makefile
+
+rcs/Makefile: config.status
+	@[ -d rcs ] || mkdir rcs; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in rcs; \
+	cd rcs || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/rcs"; \
+	    libsrcdir="$$s/rcs";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/rcs"; \
+	    libsrcdir="$$s/rcs";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-rcs maybe-all-rcs
 maybe-all-rcs:
 all-rcs:
@@ -2488,6 +4251,47 @@ install-rcs: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd rcs; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-readline maybe-configure-readline
+maybe-configure-readline:
+configure-readline: readline/Makefile
+
+readline/Makefile: config.status
+	@[ -d readline ] || mkdir readline; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in readline; \
+	cd readline || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/readline"; \
+	    libsrcdir="$$s/readline";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/readline"; \
+	    libsrcdir="$$s/readline";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-readline maybe-all-readline
 maybe-all-readline:
@@ -2516,6 +4320,47 @@ install-readline: installdirs
 	  (cd readline; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-release maybe-configure-release
+maybe-configure-release:
+configure-release: release/Makefile
+
+release/Makefile: config.status
+	@[ -d release ] || mkdir release; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in release; \
+	cd release || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/release"; \
+	    libsrcdir="$$s/release";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/release"; \
+	    libsrcdir="$$s/release";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-release maybe-all-release
 maybe-all-release:
 all-release:
@@ -2534,6 +4379,47 @@ check-release:
 maybe-install-release:
 install-release:
 
+
+.PHONY: configure-recode maybe-configure-recode
+maybe-configure-recode:
+configure-recode: recode/Makefile
+
+recode/Makefile: config.status
+	@[ -d recode ] || mkdir recode; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in recode; \
+	cd recode || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/recode"; \
+	    libsrcdir="$$s/recode";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/recode"; \
+	    libsrcdir="$$s/recode";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-recode maybe-all-recode
 maybe-all-recode:
@@ -2562,6 +4448,47 @@ install-recode: installdirs
 	  (cd recode; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-sed maybe-configure-sed
+maybe-configure-sed:
+configure-sed: sed/Makefile
+
+sed/Makefile: config.status
+	@[ -d sed ] || mkdir sed; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in sed; \
+	cd sed || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/sed"; \
+	    libsrcdir="$$s/sed";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/sed"; \
+	    libsrcdir="$$s/sed";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-sed maybe-all-sed
 maybe-all-sed:
 all-sed:
@@ -2588,6 +4515,47 @@ install-sed: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd sed; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-send-pr maybe-configure-send-pr
+maybe-configure-send-pr:
+configure-send-pr: send-pr/Makefile
+
+send-pr/Makefile: config.status
+	@[ -d send-pr ] || mkdir send-pr; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in send-pr; \
+	cd send-pr || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/send-pr"; \
+	    libsrcdir="$$s/send-pr";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/send-pr"; \
+	    libsrcdir="$$s/send-pr";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-send-pr maybe-all-send-pr
 maybe-all-send-pr:
@@ -2616,6 +4584,47 @@ install-send-pr: installdirs
 	  (cd send-pr; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-shellutils maybe-configure-shellutils
+maybe-configure-shellutils:
+configure-shellutils: shellutils/Makefile
+
+shellutils/Makefile: config.status
+	@[ -d shellutils ] || mkdir shellutils; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in shellutils; \
+	cd shellutils || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/shellutils"; \
+	    libsrcdir="$$s/shellutils";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/shellutils"; \
+	    libsrcdir="$$s/shellutils";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-shellutils maybe-all-shellutils
 maybe-all-shellutils:
 all-shellutils:
@@ -2642,6 +4651,47 @@ install-shellutils: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd shellutils; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-sid maybe-configure-sid
+maybe-configure-sid:
+configure-sid: sid/Makefile
+
+sid/Makefile: config.status
+	@[ -d sid ] || mkdir sid; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in sid; \
+	cd sid || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/sid"; \
+	    libsrcdir="$$s/sid";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/sid"; \
+	    libsrcdir="$$s/sid";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-sid maybe-all-sid
 maybe-all-sid:
@@ -2670,6 +4720,47 @@ install-sid: installdirs
 	  (cd sid; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-sim maybe-configure-sim
+maybe-configure-sim:
+configure-sim: sim/Makefile
+
+sim/Makefile: config.status
+	@[ -d sim ] || mkdir sim; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in sim; \
+	cd sim || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/sim"; \
+	    libsrcdir="$$s/sim";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/sim"; \
+	    libsrcdir="$$s/sim";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-sim maybe-all-sim
 maybe-all-sim:
 all-sim:
@@ -2696,6 +4787,47 @@ install-sim: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd sim; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-snavigator maybe-configure-snavigator
+maybe-configure-snavigator:
+configure-snavigator: snavigator/Makefile
+
+snavigator/Makefile: config.status
+	@[ -d snavigator ] || mkdir snavigator; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in snavigator; \
+	cd snavigator || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/snavigator"; \
+	    libsrcdir="$$s/snavigator";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/snavigator"; \
+	    libsrcdir="$$s/snavigator";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-snavigator maybe-all-snavigator
 maybe-all-snavigator:
@@ -2724,6 +4856,47 @@ install-snavigator: installdirs
 	  (cd snavigator; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-tar maybe-configure-tar
+maybe-configure-tar:
+configure-tar: tar/Makefile
+
+tar/Makefile: config.status
+	@[ -d tar ] || mkdir tar; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in tar; \
+	cd tar || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/tar"; \
+	    libsrcdir="$$s/tar";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/tar"; \
+	    libsrcdir="$$s/tar";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-tar maybe-all-tar
 maybe-all-tar:
 all-tar:
@@ -2751,6 +4924,47 @@ install-tar: installdirs
 	  (cd tar; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-texinfo maybe-configure-texinfo
+maybe-configure-texinfo:
+configure-texinfo: texinfo/Makefile
+
+texinfo/Makefile: config.status
+	@[ -d texinfo ] || mkdir texinfo; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in texinfo; \
+	cd texinfo || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/texinfo"; \
+	    libsrcdir="$$s/texinfo";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/texinfo"; \
+	    libsrcdir="$$s/texinfo";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-texinfo maybe-all-texinfo
 maybe-all-texinfo:
 all-texinfo:
@@ -2773,6 +4987,47 @@ check-texinfo:
 maybe-install-texinfo:
 install-texinfo:
 
+
+.PHONY: configure-textutils maybe-configure-textutils
+maybe-configure-textutils:
+configure-textutils: textutils/Makefile
+
+textutils/Makefile: config.status
+	@[ -d textutils ] || mkdir textutils; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in textutils; \
+	cd textutils || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/textutils"; \
+	    libsrcdir="$$s/textutils";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/textutils"; \
+	    libsrcdir="$$s/textutils";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-textutils maybe-all-textutils
 maybe-all-textutils:
@@ -2801,6 +5056,47 @@ install-textutils: installdirs
 	  (cd textutils; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-time maybe-configure-time
+maybe-configure-time:
+configure-time: time/Makefile
+
+time/Makefile: config.status
+	@[ -d time ] || mkdir time; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in time; \
+	cd time || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/time"; \
+	    libsrcdir="$$s/time";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/time"; \
+	    libsrcdir="$$s/time";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-time maybe-all-time
 maybe-all-time:
 all-time:
@@ -2827,6 +5123,47 @@ install-time: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd time; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-uudecode maybe-configure-uudecode
+maybe-configure-uudecode:
+configure-uudecode: uudecode/Makefile
+
+uudecode/Makefile: config.status
+	@[ -d uudecode ] || mkdir uudecode; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in uudecode; \
+	cd uudecode || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/uudecode"; \
+	    libsrcdir="$$s/uudecode";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/uudecode"; \
+	    libsrcdir="$$s/uudecode";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-uudecode maybe-all-uudecode
 maybe-all-uudecode:
@@ -2855,6 +5192,47 @@ install-uudecode: installdirs
 	  (cd uudecode; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-wdiff maybe-configure-wdiff
+maybe-configure-wdiff:
+configure-wdiff: wdiff/Makefile
+
+wdiff/Makefile: config.status
+	@[ -d wdiff ] || mkdir wdiff; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in wdiff; \
+	cd wdiff || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/wdiff"; \
+	    libsrcdir="$$s/wdiff";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/wdiff"; \
+	    libsrcdir="$$s/wdiff";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-wdiff maybe-all-wdiff
 maybe-all-wdiff:
 all-wdiff:
@@ -2881,6 +5259,47 @@ install-wdiff: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd wdiff; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-zip maybe-configure-zip
+maybe-configure-zip:
+configure-zip: zip/Makefile
+
+zip/Makefile: config.status
+	@[ -d zip ] || mkdir zip; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in zip; \
+	cd zip || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/zip"; \
+	    libsrcdir="$$s/zip";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/zip"; \
+	    libsrcdir="$$s/zip";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-zip maybe-all-zip
 maybe-all-zip:
@@ -2912,6 +5331,47 @@ install-zip: installdirs
 	  (cd zip; $(MAKE) $(FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-zlib maybe-configure-zlib
+maybe-configure-zlib:
+configure-zlib: zlib/Makefile
+
+zlib/Makefile: config.status
+	@[ -d zlib ] || mkdir zlib; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in zlib; \
+	cd zlib || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/zlib"; \
+	    libsrcdir="$$s/zlib";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/zlib"; \
+	    libsrcdir="$$s/zlib";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-zlib maybe-all-zlib
 maybe-all-zlib:
 all-zlib:
@@ -2930,6 +5390,47 @@ check-zlib:
 maybe-install-zlib:
 install-zlib:
 
+
+.PHONY: configure-gdb maybe-configure-gdb
+maybe-configure-gdb:
+configure-gdb: gdb/Makefile
+
+gdb/Makefile: config.status
+	@[ -d gdb ] || mkdir gdb; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in gdb; \
+	cd gdb || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/gdb"; \
+	    libsrcdir="$$s/gdb";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/gdb"; \
+	    libsrcdir="$$s/gdb";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-gdb maybe-all-gdb
 maybe-all-gdb:
@@ -2958,6 +5459,47 @@ install-gdb: installdirs
 	  (cd gdb; $(MAKE) $(FLAGS_TO_PASS) $(X11_FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-expect maybe-configure-expect
+maybe-configure-expect:
+configure-expect: expect/Makefile
+
+expect/Makefile: config.status
+	@[ -d expect ] || mkdir expect; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in expect; \
+	cd expect || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/expect"; \
+	    libsrcdir="$$s/expect";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/expect"; \
+	    libsrcdir="$$s/expect";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-expect maybe-all-expect
 maybe-all-expect:
 all-expect:
@@ -2984,6 +5526,47 @@ install-expect: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd expect; $(MAKE) $(FLAGS_TO_PASS) $(X11_FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-guile maybe-configure-guile
+maybe-configure-guile:
+configure-guile: guile/Makefile
+
+guile/Makefile: config.status
+	@[ -d guile ] || mkdir guile; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in guile; \
+	cd guile || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/guile"; \
+	    libsrcdir="$$s/guile";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/guile"; \
+	    libsrcdir="$$s/guile";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-guile maybe-all-guile
 maybe-all-guile:
@@ -3012,6 +5595,47 @@ install-guile: installdirs
 	  (cd guile; $(MAKE) $(FLAGS_TO_PASS) $(X11_FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-tclX maybe-configure-tclX
+maybe-configure-tclX:
+configure-tclX: tclX/Makefile
+
+tclX/Makefile: config.status
+	@[ -d tclX ] || mkdir tclX; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in tclX; \
+	cd tclX || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/tclX"; \
+	    libsrcdir="$$s/tclX";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/tclX"; \
+	    libsrcdir="$$s/tclX";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-tclX maybe-all-tclX
 maybe-all-tclX:
 all-tclX:
@@ -3038,6 +5662,47 @@ install-tclX: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd tclX; $(MAKE) $(FLAGS_TO_PASS) $(X11_FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-tk maybe-configure-tk
+maybe-configure-tk:
+configure-tk: tk/Makefile
+
+tk/Makefile: config.status
+	@[ -d tk ] || mkdir tk; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in tk; \
+	cd tk || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/tk"; \
+	    libsrcdir="$$s/tk";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/tk"; \
+	    libsrcdir="$$s/tk";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-tk maybe-all-tk
 maybe-all-tk:
@@ -3066,6 +5731,47 @@ install-tk: installdirs
 	  (cd tk; $(MAKE) $(FLAGS_TO_PASS) $(X11_FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-tix maybe-configure-tix
+maybe-configure-tix:
+configure-tix: tix/Makefile
+
+tix/Makefile: config.status
+	@[ -d tix ] || mkdir tix; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in tix; \
+	cd tix || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/tix"; \
+	    libsrcdir="$$s/tix";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/tix"; \
+	    libsrcdir="$$s/tix";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-tix maybe-all-tix
 maybe-all-tix:
 all-tix:
@@ -3093,6 +5799,47 @@ install-tix: installdirs
 	  (cd tix; $(MAKE) $(FLAGS_TO_PASS) $(X11_FLAGS_TO_PASS) install)
 
 
+.PHONY: configure-libtermcap maybe-configure-libtermcap
+maybe-configure-libtermcap:
+configure-libtermcap: libtermcap/Makefile
+
+libtermcap/Makefile: config.status
+	@[ -d libtermcap ] || mkdir libtermcap; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in libtermcap; \
+	cd libtermcap || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/libtermcap"; \
+	    libsrcdir="$$s/libtermcap";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/libtermcap"; \
+	    libsrcdir="$$s/libtermcap";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-libtermcap maybe-all-libtermcap
 maybe-all-libtermcap:
 all-libtermcap:
@@ -3115,6 +5862,47 @@ install-libtermcap: installdirs
 	  $(SET_LIB_PATH) \
 	  (cd libtermcap; $(MAKE) $(FLAGS_TO_PASS) install)
 
+
+.PHONY: configure-utils maybe-configure-utils
+maybe-configure-utils:
+configure-utils: utils/Makefile
+
+utils/Makefile: config.status
+	@[ -d utils ] || mkdir utils; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in utils; \
+	cd utils || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/utils"; \
+	    libsrcdir="$$s/utils";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/utils"; \
+	    libsrcdir="$$s/utils";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
 
 .PHONY: all-utils maybe-all-utils
 maybe-all-utils:
@@ -4688,6 +7476,47 @@ install-target-rda: installdirs
 # build modules.  So GCC is a sort of hybrid.
 
 # gcc is the only module which uses GCC_FLAGS_TO_PASS.
+.PHONY: configure-gcc maybe-configure-gcc
+maybe-configure-gcc:
+configure-gcc: gcc/Makefile
+
+gcc/Makefile: config.status
+	@[ -d gcc ] || mkdir gcc; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in gcc; \
+	cd gcc || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/gcc"; \
+	    libsrcdir="$$s/gcc";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/gcc"; \
+	    libsrcdir="$$s/gcc";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-gcc maybe-all-gcc
 maybe-all-gcc:
 all-gcc:
@@ -4821,6 +7650,8 @@ gcc-no-fixedincludes:
 # it's safer to use a soft dependency.
 
 # Host modules specific to gcc.
+# GCC needs to identify certain tools.
+gcc/Makefile: maybe-configure-binutils maybe-configure-gas maybe-configure-ld maybe-configure-bison maybe-configure-flex
 all-gcc: maybe-all-libiberty maybe-all-bison maybe-all-byacc maybe-all-binutils maybe-all-gas maybe-all-ld maybe-all-zlib
 # This is a slightly kludgy method of getting dependencies on 
 # all-build-libiberty correct; it would be better to build it every time.
@@ -4828,12 +7659,16 @@ all-gcc: maybe-all-build-libiberty
 all-bootstrap: maybe-all-libiberty maybe-all-texinfo maybe-all-bison maybe-all-byacc maybe-all-binutils maybe-all-gas maybe-all-ld maybe-all-zlib
 
 # Host modules specific to gdb.
+# GDB needs to know that the simulator is being built.
+gdb/Makefile: maybe-configure-tcl maybe-configure-tk maybe-configure-sim
 GDB_TK = @GDB_TK@
 all-gdb: maybe-all-libiberty maybe-all-opcodes maybe-all-bfd maybe-all-mmalloc maybe-all-readline maybe-all-bison maybe-all-byacc maybe-all-sim $(gdbnlmrequirements) $(GDB_TK)
 install-gdb: maybe-install-tcl maybe-install-tk maybe-install-itcl maybe-install-tix maybe-install-libgui
+libgui/Makefile: maybe-configure-tcl maybe-configure-tk
 all-libgui: maybe-all-tcl maybe-all-tk maybe-all-itcl
 
 # Host modules specific to binutils.
+bfd/Makefile: configure-libiberty
 all-bfd: maybe-all-libiberty maybe-all-intl
 all-binutils: maybe-all-libiberty maybe-all-opcodes maybe-all-bfd maybe-all-flex maybe-all-bison maybe-all-byacc maybe-all-intl
 # We put install-opcodes before install-binutils because the installed
@@ -4847,7 +7682,9 @@ all-opcodes: maybe-all-bfd maybe-all-libiberty
 
 # Other host modules in the 'src' repository.
 all-dejagnu: maybe-all-tcl maybe-all-expect maybe-all-tk
+expect/Makefile: maybe-configure-tcl maybe-configure-tk
 all-expect: maybe-all-tcl maybe-all-tk
+itcl/Makefile: maybe-configure-tcl maybe-configure-tk
 all-itcl: maybe-all-tcl maybe-all-tk
 # We put install-tcl before install-itcl because itcl wants to run a
 # program on installation which uses the Tcl libraries.
@@ -4855,7 +7692,9 @@ install-itcl: maybe-install-tcl
 all-sid: maybe-all-tcl maybe-all-tk
 install-sid: maybe-install-tcl maybe-install-tk
 all-sim: maybe-all-libiberty maybe-all-bfd maybe-all-opcodes maybe-all-readline
+tk/Makefile: maybe-configure-tcl
 all-tk: maybe-all-tcl
+tix/Makefile: maybe-configure-tcl maybe-configure-tk
 all-tix: maybe-all-tcl maybe-all-tk
 all-texinfo: maybe-all-libiberty
 

@@ -867,6 +867,47 @@ all-build-[+module+]: configure-build-[+module+]
 # Modules which run on the host machine
 # --------------------------------------
 [+ FOR host_modules +]
+.PHONY: configure-[+module+] maybe-configure-[+module+]
+maybe-configure-[+module+]:
+configure-[+module+]: [+module+]/Makefile
+
+[+module+]/Makefile: config.status
+	@[ -d [+module+] ] || mkdir [+module+]; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in [+module+]; \
+	cd [+module+] || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/[+module+]"; \
+	    libsrcdir="$$s/[+module+]";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/[+module+]"; \
+	    libsrcdir="$$s/[+module+]";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-[+module+] maybe-all-[+module+]
 maybe-all-[+module+]:
 all-[+module+]:
@@ -1057,6 +1098,47 @@ install-target-[+module+]: installdirs
 # build modules.  So GCC is a sort of hybrid.
 
 # gcc is the only module which uses GCC_FLAGS_TO_PASS.
+.PHONY: configure-gcc maybe-configure-gcc
+maybe-configure-gcc:
+configure-gcc: gcc/Makefile
+
+gcc/Makefile: config.status
+	@[ -d gcc ] || mkdir gcc; \
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	CC="$(CC)"; export CC; \
+	CFLAGS="$(CFLAGS)"; export CFLAGS; \
+	CXX="$(CXX)"; export CXX; \
+	CXXFLAGS="$(CXXFLAGS)"; export CXXFLAGS; \
+	if [ z$(build_canonical) !=  z$(host_canoncial) ] ; then \
+	  AR="$(AR)"; export AR; \
+	  AS="$(AS)"; export AS; \
+	  CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
+	  DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
+	  LD="$(LD)"; export LD; \
+	  NM="$(NM)"; export NM; \
+	  RANLIB="$(RANLIB)"; export RANLIB; \
+	  WINDRES="$(WINDRES)"; export WINDRES; \
+	  OBJCOPY="$(OBJCOPY)"; export OBJCOPY; \
+	  OBJDUMP="$(OBJDUMP)"; export OBJDUMP; \
+	fi; \
+	echo Configuring in gcc; \
+	cd gcc || exit 1; \
+	case $(srcdir) in \
+	  \.) \
+	    srcdiroption="--srcdir=."; \
+	    libsrcdir=".";; \
+	  /* | [A-Za-z]:[\\/]*) \
+	    srcdiroption="--srcdir=$(srcdir)/gcc"; \
+	    libsrcdir="$$s/gcc";; \
+	  *) \
+	    srcdiroption="--srcdir=../$(srcdir)/gcc"; \
+	    libsrcdir="$$s/gcc";; \
+	esac; \
+	$(SHELL) $${libsrcdir}/configure \
+	  $(HOST_CONFIGARGS) $${srcdiroption} \
+	  || exit 1
+
 .PHONY: all-gcc maybe-all-gcc
 maybe-all-gcc:
 all-gcc:
@@ -1190,6 +1272,8 @@ gcc-no-fixedincludes:
 # it's safer to use a soft dependency.
 
 # Host modules specific to gcc.
+# GCC needs to identify certain tools.
+gcc/Makefile: maybe-configure-binutils maybe-configure-gas maybe-configure-ld maybe-configure-bison maybe-configure-flex
 all-gcc: maybe-all-libiberty maybe-all-bison maybe-all-byacc maybe-all-binutils maybe-all-gas maybe-all-ld maybe-all-zlib
 # This is a slightly kludgy method of getting dependencies on 
 # all-build-libiberty correct; it would be better to build it every time.
@@ -1197,12 +1281,16 @@ all-gcc: maybe-all-build-libiberty
 all-bootstrap: maybe-all-libiberty maybe-all-texinfo maybe-all-bison maybe-all-byacc maybe-all-binutils maybe-all-gas maybe-all-ld maybe-all-zlib
 
 # Host modules specific to gdb.
+# GDB needs to know that the simulator is being built.
+gdb/Makefile: maybe-configure-tcl maybe-configure-tk maybe-configure-sim
 GDB_TK = @GDB_TK@
 all-gdb: maybe-all-libiberty maybe-all-opcodes maybe-all-bfd maybe-all-mmalloc maybe-all-readline maybe-all-bison maybe-all-byacc maybe-all-sim $(gdbnlmrequirements) $(GDB_TK)
 install-gdb: maybe-install-tcl maybe-install-tk maybe-install-itcl maybe-install-tix maybe-install-libgui
+libgui/Makefile: maybe-configure-tcl maybe-configure-tk
 all-libgui: maybe-all-tcl maybe-all-tk maybe-all-itcl
 
 # Host modules specific to binutils.
+bfd/Makefile: configure-libiberty
 all-bfd: maybe-all-libiberty maybe-all-intl
 all-binutils: maybe-all-libiberty maybe-all-opcodes maybe-all-bfd maybe-all-flex maybe-all-bison maybe-all-byacc maybe-all-intl
 # We put install-opcodes before install-binutils because the installed
@@ -1216,7 +1304,9 @@ all-opcodes: maybe-all-bfd maybe-all-libiberty
 
 # Other host modules in the 'src' repository.
 all-dejagnu: maybe-all-tcl maybe-all-expect maybe-all-tk
+expect/Makefile: maybe-configure-tcl maybe-configure-tk
 all-expect: maybe-all-tcl maybe-all-tk
+itcl/Makefile: maybe-configure-tcl maybe-configure-tk
 all-itcl: maybe-all-tcl maybe-all-tk
 # We put install-tcl before install-itcl because itcl wants to run a
 # program on installation which uses the Tcl libraries.
@@ -1224,7 +1314,9 @@ install-itcl: maybe-install-tcl
 all-sid: maybe-all-tcl maybe-all-tk
 install-sid: maybe-install-tcl maybe-install-tk
 all-sim: maybe-all-libiberty maybe-all-bfd maybe-all-opcodes maybe-all-readline
+tk/Makefile: maybe-configure-tcl
 all-tk: maybe-all-tcl
+tix/Makefile: maybe-configure-tcl maybe-configure-tk
 all-tix: maybe-all-tcl maybe-all-tk
 all-texinfo: maybe-all-libiberty
 

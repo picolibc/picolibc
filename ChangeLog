@@ -1,5 +1,9 @@
 2002-12-03  Nathanael Nerode  <neroden@gcc.gnu.org>
 
+	* Makefile.tpl: Add targets for configuring host subdirs in Makefile,
+	and corresponding dependencies.
+	* Makefile.in: Regenerate.
+
 	* configure.in (host_tools): Order binutils, gas and ld for
 	convenience in running the testsuites.
 
