@@ -1,3 +1,8 @@
+Thu Oct 26  9:35:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* ntsec.sgml: Changed the (now incorrect) hint that ntsec only
+	uses access allowed ACEs.
+
 Fri Sep 29 23:52:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* pathnames.sgml: Add documentation about raw block special

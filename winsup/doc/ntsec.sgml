@@ -129,7 +129,9 @@ set </para></listitem>
 </itemizedlist>
 
 <para>The two important types of ACEs are the `access allowed ACE' and the
-`access denied ACE'. The ntsec patch only uses `access allowed ACEs'.</para>
+`access denied ACE'. The ntsec patch only used `access allowed ACEs' up
+to Cygwin version 1.1.0. Later versions use `access denied ACEs' as well
+to reflect the UNIX permissions as good as possible.</para>
 
 <para>The possible permissions on objects are more complicated than in
 UNIX. For example, the permission to delete an object is different
