@@ -1,3 +1,8 @@
+2003-02-14  Rainer Orth  <ro@TechFak.Uni-Bielefeld.DE>
+
+	* Makefile.tpl (RANLIB): Define.
+	* Makefile.in: Regenerate.
+
 2003-02-06  Keith R Seitz  <keiths@redhat.com>
 
 	* Makefile.def: Remove "snavigator", "grep", and "db" modules.
