@@ -166,7 +166,7 @@ compar (const void *a, const void *b)
 bool
 match_argv (char **argv, const char *name)
 {
-  if (!*argv)
+  if (!argv || !*argv)
     return true;
   for (char **a = argv; *a; a++)
     if (strcasecmp (*a, name) == 0)
@@ -179,7 +179,7 @@ dump_setup (int verbose, char **argv)
 {
   char *setup = cygpath ("/etc/setup/installed.db", NULL);
   FILE *fp = fopen (setup, "rt");
-  puts ("Cygwin Setup information");
+  puts ("Cygwin Package Information");
   if (fp == NULL)
     goto err;
   if (verbose)
@@ -188,7 +188,6 @@ dump_setup (int verbose, char **argv)
       if (dump_file ("Last downloaded files from: ", "last-mirror") || need_nl)
 	puts ("");
     }
-  if (!*argv)
 
   if (!fp)
     goto err;
@@ -233,8 +232,7 @@ dump_setup (int verbose, char **argv)
 	}
     }
 
-  if (!argv)
-    qsort (packages, n, sizeof (packages[0]), compar);
+  qsort (packages, n, sizeof (packages[0]), compar);
 
   for (int i = 0; i < n; i++)
     printf ("%-*s%-*s\n", package_len, packages[i].name,

@@ -1,5 +1,11 @@
 2001-11-11  Christopher Faylor  <cgf@redhat.com>
 
+	* cygcheck.cc (main): Display package info when '-s' is specified.
+	* dump_setup.cc (dump_setup): Change header.  Remove typo.  Always sort
+	packages output.
+
+2001-11-11  Christopher Faylor  <cgf@redhat.com>
+
 	* dump_setup.cc: New file.
 	* Makefile.in: Add info for dump_setup.o.
 	* cygcheck.cc (main): Recognize '-c' option for checking setup

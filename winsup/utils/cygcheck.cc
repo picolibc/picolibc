@@ -1281,7 +1281,14 @@ main (int argc, char **argv)
       }
 
   if (sysinfo)
-    dump_sysinfo ();
+    {
+      dump_sysinfo ();
+      if (!check_setup)
+	{
+	  dump_setup (verbose, NULL);
+	  puts ("");
+	}
+    }
 
   if (!givehelp)
     printf ("Use -h to see help about each section\n");
