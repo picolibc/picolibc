@@ -37,7 +37,7 @@ class transport_layer_base *create_server_transport()
   if (wincap.is_winnt ())
     temp = new transport_layer_pipes ();
   else
-    temp = new transport_layer_base ();
+    temp = new transport_layer_sockets ();
   return temp;
 }
 

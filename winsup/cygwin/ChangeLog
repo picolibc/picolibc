@@ -1,3 +1,9 @@
+2002-06-10  Robert Collins  <rbtcollins@hotmail.com>
+
+	* cygserver_transport.cc (create_server_transport): Finish the split
+	out of sockets code from transport_layer_base. Thanks to Nicholas
+	Wourms and Conrad Scott for catching this.
+
 2002-06-08  Christopher Faylor  <cgf@redhat.com>
 
 	* pinfo.cc (pinfo_dummy): Initialize to correct size.
