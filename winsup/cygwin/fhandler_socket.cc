@@ -344,7 +344,10 @@ fhandler_socket::dup (fhandler_base *child)
 	{
 	  fhs->fixup_after_fork (hMainProc);
 	  if (fhs->get_io_handle() != (HANDLE) INVALID_SOCKET)
-	    return 0;
+	    {
+	      cygheap->fdtab.inc_need_fixup_before ();
+	      return 0;
+	    }
 	}
       debug_printf ("WSADuplicateSocket failed, trying DuplicateHandle");
     }
@@ -363,6 +366,7 @@ fhandler_socket::dup (fhandler_base *child)
     }
   VerifyHandle (nh);
   fhs->set_io_handle (nh);
+  cygheap->fdtab.inc_need_fixup_before ();
   return 0;
 }
 
