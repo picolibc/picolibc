@@ -445,13 +445,13 @@ fork ()
 
 
       MALLOC_CHECK;
-      rc = fork_copy (pi, "dll data", dll_data_start, dll_data_end,
-		      dll_bss_start, dll_bss_end, NULL);
       rc = fork_copy (pi, "user/cygwin data",
 		      user_data->data_start, user_data->data_end,
 		      user_data->bss_start, user_data->bss_end,
+		      ch.heapbase, ch.heapptr,
 		      stack_here, ch.stackbottom,
-		      NULL);
+		      dll_data_start, dll_data_end,
+		      dll_bss_start, dll_bss_end, NULL);
 
       MALLOC_CHECK;
       if (!rc)
@@ -526,21 +526,13 @@ fork ()
         }
 
       sync_with_parent ("after longjmp.", TRUE);
+      ProtectHandle (hParent);
 
 #ifdef DEBUGGING
       char c;
       if (GetEnvironmentVariable ("FORKDEBUG", &c, 1))
 	try_to_debug ();
-      char buf[80];
-      if (GetEnvironmentVariable ("CYGWIN_FORK_SLEEP", buf, sizeof (buf)))
-	{
-	  small_printf ("Sleeping %d after fork, pid %u\n", atoi (buf), GetCurrentProcessId ());
-	  Sleep (atoi(buf));
-	}
 #endif
-
-      heap_init ();
-      ProtectHandle (hParent);
 
       /* If we've played with the stack, stacksize != 0.  That means that
 	 fork() was invoked from other than the main thread.  Make sure that

@@ -20,8 +20,6 @@ details. */
 
 static unsigned page_const = 0;
 
-HANDLE cygwin_heap;
-
 static  __inline__ int
 getpagesize(void)
 {
@@ -38,9 +36,9 @@ heap_init ()
   /* If we're the forkee, we must allocate the heap at exactly the same place
      as our parent.  If not, we don't care where it ends up.  */
 
+  page_const = getpagesize();
   if (brkbase)
     {
-
       DWORD chunk = brkchunk;	/* allocation chunk */
       /* total size commited in parent */
       DWORD allocsize = (char *) brktop - (char *) brkbase;
@@ -48,13 +46,14 @@ heap_init ()
       DWORD reserve_size = chunk * ((allocsize + (chunk - 1)) / chunk);
 
       /* Loop until we've managed to reserve an adequate amount of memory. */
-      void *p;
+      char *p;
       for (;;)
 	{
-	  p = MapViewOfFileEx (cygwin_heap, FILE_MAP_COPY, 0L, 0L, 0L, brkbase);
+	  p = (char *) VirtualAlloc (brkbase, reserve_size,
+				     MEM_RESERVE, PAGE_READWRITE);
 	  if (p)
 	    break;
-	  if ((reserve_size -= (page_const + 1)) <= allocsize)
+	  if ((reserve_size -= page_const) <= allocsize)
 	    break;
 	}
       if (p == NULL)
@@ -62,25 +61,20 @@ heap_init ()
 		   brkchunk, myself->pid);
       if (p != brkbase)
 	api_fatal ("heap allocated but not at %p", brkbase);
-      if (!VirtualAlloc (brkbase, allocsize, MEM_COMMIT, PAGE_READWRITE))
+      if (! VirtualAlloc (brkbase, allocsize, MEM_COMMIT, PAGE_READWRITE))
 	api_fatal ("MEM_COMMIT failed, %E");
     }
   else
     {
-      page_const = getpagesize() - 1;
       /* Initialize page mask and default heap size.  Preallocate a heap
        * to assure contiguous memory.  */
-      cygwin_heap = CreateFileMapping ((HANDLE) 0xffffffff, &sec_all, PAGE_WRITECOPY | SEC_RESERVE, 0L, brkchunk, NULL);
-      if (cygwin_heap == NULL)
-	api_fatal ("2. unable to allocate shared memory for heap, heap_chunk_size %d, %E", brkchunk);
-      
-      brk = brktop = brkbase = MapViewOfFile (cygwin_heap, 0, 0L, 0L, 0);
-//    brk = brktop = brkbase = VirtualAlloc(NULL, brkchunk, MEM_RESERVE, PAGE_NOACCESS);
+      brk = brktop = brkbase = VirtualAlloc(NULL, brkchunk, MEM_RESERVE, PAGE_NOACCESS);
       if (brkbase == NULL)
 	api_fatal ("2. unable to allocate heap, heap_chunk_size %d, %E",
 		   brkchunk);
     }
 
+  page_const--;
   malloc_init ();
 }
 
