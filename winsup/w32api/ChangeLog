@@ -1,4 +1,11 @@
 
+Wed Jan 31 17:35:59  2001  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* Makefile.in: Increment VERSION to 0.5
+	* include/winnt.h: Change TEXT to _TEXT throughout.
+	(SID_RELEASE): Define.
+	Thanks to: Eric PAIRE <eric.paire@ri.silicomp.com>
+
 Tue Jan 30 10:42:28  2001  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* Apply Phil Krylov patches.

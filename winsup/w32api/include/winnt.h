@@ -79,12 +79,12 @@ typedef TCHAR TBYTE,*PTCH,*PTBYTE;
 typedef TCHAR *LPTCH,*PTSTR,*LPTSTR,*LP,*PTCHAR;
 typedef const TCHAR *LPCTSTR;
 #ifdef UNICODE
-#define TEXT(q) L##q
+#define _TEXT(q) L##q
 #else
-#define TEXT(q) q
+#define _TEXT(q) q
 #endif
 #ifndef _T
-#define _T TEXT
+#define _T _TEXT
 #endif
 typedef SHORT *PSHORT;
 typedef LONG *PLONG;
@@ -273,6 +273,7 @@ typedef BYTE BOOLEAN,*PBOOLEAN;
 #define SECURITY_LOCAL_SYSTEM_RID	18
 #define SECURITY_BUILTIN_DOMAIN_RID   32
 #define SECURITY_PRINCIPAL_SELF_RID   10
+#define SID_REVISION 1
 #define DOMAIN_USER_RID_ADMIN 0x1F4L
 #define DOMAIN_USER_RID_GUEST 0x1F5L
 #define DOMAIN_GROUP_RID_ADMINS	0x200L
@@ -286,30 +287,30 @@ typedef BYTE BOOLEAN,*PBOOLEAN;
 #define DOMAIN_ALIAS_RID_PRINT_OPS	0x226L
 #define DOMAIN_ALIAS_RID_BACKUP_OPS	0x227L
 #define DOMAIN_ALIAS_RID_REPLICATOR	0x228L
-#define SE_CREATE_TOKEN_NAME	TEXT("SeCreateTokenPrivilege")
-#define SE_ASSIGNPRIMARYTOKEN_NAME	TEXT("SeAssignPrimaryTokenPrivilege")
-#define SE_LOCK_MEMORY_NAME	TEXT("SeLockMemoryPrivilege")
-#define SE_INCREASE_QUOTA_NAME	TEXT("SeIncreaseQuotaPrivilege")
-#define SE_UNSOLICITED_INPUT_NAME	TEXT("SeUnsolicitedInputPrivilege")
-#define SE_MACHINE_ACCOUNT_NAME TEXT("SeMachineAccountPrivilege")
-#define SE_TCB_NAME	TEXT("SeTcbPrivilege")
-#define SE_SECURITY_NAME	TEXT("SeSecurityPrivilege")
-#define SE_TAKE_OWNERSHIP_NAME	TEXT("SeTakeOwnershipPrivilege")
-#define SE_LOAD_DRIVER_NAME	TEXT("SeLoadDriverPrivilege")
-#define SE_SYSTEM_PROFILE_NAME	TEXT("SeSystemProfilePrivilege")
-#define SE_SYSTEMTIME_NAME	TEXT("SeSystemtimePrivilege")
-#define SE_PROF_SINGLE_PROCESS_NAME	TEXT("SeProfileSingleProcessPrivilege")
-#define SE_INC_BASE_PRIORITY_NAME	TEXT("SeIncreaseBasePriorityPrivilege")
-#define SE_CREATE_PAGEFILE_NAME TEXT("SeCreatePagefilePrivilege")
-#define SE_CREATE_PERMANENT_NAME	TEXT("SeCreatePermanentPrivilege")
-#define SE_BACKUP_NAME TEXT("SeBackupPrivilege")
-#define SE_RESTORE_NAME	TEXT("SeRestorePrivilege")
-#define SE_SHUTDOWN_NAME	TEXT("SeShutdownPrivilege")
-#define SE_DEBUG_NAME	TEXT("SeDebugPrivilege")
-#define SE_AUDIT_NAME	TEXT("SeAuditPrivilege")
-#define SE_SYSTEM_ENVIRONMENT_NAME	TEXT("SeSystemEnvironmentPrivilege")
-#define SE_CHANGE_NOTIFY_NAME	TEXT("SeChangeNotifyPrivilege")
-#define SE_REMOTE_SHUTDOWN_NAME	TEXT("SeRemoteShutdownPrivilege")
+#define SE_CREATE_TOKEN_NAME	_TEXT("SeCreateTokenPrivilege")
+#define SE_ASSIGNPRIMARYTOKEN_NAME	_TEXT("SeAssignPrimaryTokenPrivilege")
+#define SE_LOCK_MEMORY_NAME	_TEXT("SeLockMemoryPrivilege")
+#define SE_INCREASE_QUOTA_NAME	_TEXT("SeIncreaseQuotaPrivilege")
+#define SE_UNSOLICITED_INPUT_NAME	_TEXT("SeUnsolicitedInputPrivilege")
+#define SE_MACHINE_ACCOUNT_NAME _TEXT("SeMachineAccountPrivilege")
+#define SE_TCB_NAME	_TEXT("SeTcbPrivilege")
+#define SE_SECURITY_NAME	_TEXT("SeSecurityPrivilege")
+#define SE_TAKE_OWNERSHIP_NAME	_TEXT("SeTakeOwnershipPrivilege")
+#define SE_LOAD_DRIVER_NAME	_TEXT("SeLoadDriverPrivilege")
+#define SE_SYSTEM_PROFILE_NAME	_TEXT("SeSystemProfilePrivilege")
+#define SE_SYSTEMTIME_NAME	_TEXT("SeSystemtimePrivilege")
+#define SE_PROF_SINGLE_PROCESS_NAME	_TEXT("SeProfileSingleProcessPrivilege")
+#define SE_INC_BASE_PRIORITY_NAME	_TEXT("SeIncreaseBasePriorityPrivilege")
+#define SE_CREATE_PAGEFILE_NAME _TEXT("SeCreatePagefilePrivilege")
+#define SE_CREATE_PERMANENT_NAME	_TEXT("SeCreatePermanentPrivilege")
+#define SE_BACKUP_NAME _TEXT("SeBackupPrivilege")
+#define SE_RESTORE_NAME	_TEXT("SeRestorePrivilege")
+#define SE_SHUTDOWN_NAME	_TEXT("SeShutdownPrivilege")
+#define SE_DEBUG_NAME	_TEXT("SeDebugPrivilege")
+#define SE_AUDIT_NAME	_TEXT("SeAuditPrivilege")
+#define SE_SYSTEM_ENVIRONMENT_NAME	_TEXT("SeSystemEnvironmentPrivilege")
+#define SE_CHANGE_NOTIFY_NAME	_TEXT("SeChangeNotifyPrivilege")
+#define SE_REMOTE_SHUTDOWN_NAME	_TEXT("SeRemoteShutdownPrivilege")
 #define LANG_NEUTRAL	0x00
 #define LANG_ARABIC 	0x01
 #define LANG_BULGARIAN 	0x02
