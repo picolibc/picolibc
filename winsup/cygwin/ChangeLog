@@ -1,3 +1,14 @@
+2003-03-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::dup): On NT systems avoid
+	using WinSock2 socket duplication methods.  Add comment.
+
+2003-03-11  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* fhandler_socket.cc (fhandler_socket::fixup_after_fork):
+	Set io_handle to INVALID_SOCKET in case of failure.
+	(fhandler_socket::dup): Return 0 if the io_handle is valid.
+
 2003-03-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_acl.cc (setacl): Don't handle DELETE flag specially.

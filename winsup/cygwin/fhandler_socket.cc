@@ -344,6 +344,7 @@ fhandler_socket::fixup_after_fork (HANDLE parent)
 				   prot_info_ptr, 0, 0)) == INVALID_SOCKET)
     {
       debug_printf ("WSASocket error");
+      set_io_handle ((HANDLE)INVALID_SOCKET);
       set_winsock_errno ();
     }
   else if (!new_sock && !winsock2_active)
@@ -385,11 +386,19 @@ fhandler_socket::dup (fhandler_base *child)
     fhs->set_sun_path (get_sun_path ());
   fhs->set_socket_type (get_socket_type ());
 
-  fhs->fixup_before_fork_exec (GetCurrentProcessId ());
-  if (winsock2_active)
+  /* Using WinSock2 methods for dup'ing sockets seem to collide
+     with user context switches under... some... conditions.  So we
+     drop this for NT systems at all and return to the good ol'
+     DuplicateHandle way of life.  This worked fine all the time on
+     NT anyway and it's even a bit faster. */
+  if (!wincap.has_security ())
     {
-      fhs->fixup_after_fork (hMainProc);
-      return 0;
+      fhs->fixup_before_fork_exec (GetCurrentProcessId ());
+      if (winsock2_active)
+	{
+	  fhs->fixup_after_fork (hMainProc);
+	  return get_io_handle () == (HANDLE) INVALID_SOCKET;
+	}
     }
   return fhandler_base::dup (child);
 }
