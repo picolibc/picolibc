@@ -1,3 +1,10 @@
+2002-07-13  Nicholas Wourms  <nwourms@netscape.com>
+
+	* threaded_queue.h (class queue_submission_loop): Correct friend
+	declaration for GCC 3.1.1.
+	* include/cygwin/cygserver_process.h (class process): Ditto.
+	(class process_cache): Ditto.
+
 2002-07-12  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_shm.cc (server_shmmgr::shmdt): Only call

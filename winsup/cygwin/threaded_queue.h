@@ -73,7 +73,7 @@ private:
 
 class queue_submission_loop
 {
-  friend threaded_queue;
+  friend class threaded_queue;
 
 public:
   queue_submission_loop (threaded_queue *, bool ninterruptible);

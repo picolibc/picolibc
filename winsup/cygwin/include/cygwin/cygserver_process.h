@@ -55,8 +55,8 @@ class process_cache;
 
 class process
 {
-  friend process_cache;
-  friend process_cleanup;
+  friend class process_cache;
+  friend class process_cleanup;
 
 public:
   process (pid_t cygpid, DWORD winpid);
@@ -110,7 +110,7 @@ class process_cache
     virtual void request_loop ();
   };
 
-  friend submission_loop;
+  friend class submission_loop;
 
 public:
   process_cache (unsigned int initial_workers);
