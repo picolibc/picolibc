@@ -62,6 +62,7 @@ public:
   int getsid () {return sid;}
   void setsid (pid_t tsid) {sid = tsid;}
   void set_ctty (int ttynum, int flags);
+  void kill_pgrp (int sig);
   struct termios ti;
   struct winsize winsize;
 

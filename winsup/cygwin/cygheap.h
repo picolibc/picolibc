@@ -140,7 +140,7 @@ struct cwdstuff
   char *posix;
   char *win32;
   DWORD hash;
-  muto *lock;
+  muto *cwd_lock;
   char *get (char *buf, int need_posix = 1, int with_chroot = 0, unsigned ulen = MAX_PATH);
   DWORD get_hash ();
   void init ();

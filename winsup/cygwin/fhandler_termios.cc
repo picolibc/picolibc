@@ -83,6 +83,25 @@ fhandler_termios::tcgetpgrp ()
 }
 
 void
+tty_min::kill_pgrp (int sig)
+{
+  int killself = 0;
+  winpids pids;
+  for (unsigned i = 0; i < pids.npids; i++)
+    {
+      _pinfo *p = pids[i];
+      if (!proc_exists (p) || p->ctty != ntty || p->pgid != pgid)
+	continue;
+      if (p == myself)
+	killself++;
+      else
+	(void) sig_send (p, sig);
+    }
+  if (killself)
+    sig_send (myself, sig);
+}
+       
+void
 tty_min::set_ctty (int ttynum, int flags)
 {
   if ((myself->ctty < 0 || myself->ctty == ttynum) && !(flags & O_NOCTTY))
@@ -218,7 +237,7 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
 
 	  termios_printf ("got interrupt %d, sending signal %d", c, sig);
 	  eat_readahead (-1);
-	  kill_pgrp (tc->getpgid (), sig);
+	  tc->kill_pgrp (sig);
 	  tc->ti.c_lflag &= ~FLUSHO;
 	  sawsig = 1;
 	  goto restart_output;

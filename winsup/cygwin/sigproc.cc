@@ -318,12 +318,14 @@ proc_subproc (DWORD what, DWORD val)
       if (hchildren[val] != pchildren[val]->hProcess)
 	{
 	  sigproc_printf ("pid %d[%d], reparented old hProcess %p, new %p",
-		      pchildren[val]->pid, val, hchildren[val], pchildren[val]->hProcess);
-	  ForceCloseHandle1 (hchildren[val], childhProc);
+			  pchildren[val]->pid, val, hchildren[val], pchildren[val]->hProcess);
+	  HANDLE h = hchildren[val];
 	  hchildren[val] = pchildren[val]->hProcess; /* Filled out by child */
+	  sync_proc_subproc->release ();	// Release the lock ASAP
+	  ForceCloseHandle1 (h, childhProc);
 	  ProtectHandle1 (pchildren[val]->hProcess, childhProc);
 	  rc = 0;
-	  break;			// This was an exec()
+	  goto out;			// This was an exec()
 	}
 
       sigproc_printf ("pid %d[%d] terminated, handle %p, nchildren %d, nzombies %d",
@@ -590,7 +592,7 @@ sigproc_init ()
   /* sync_proc_subproc is used by proc_subproc.  It serialises
    * access to the children and zombie arrays.
    */
-  sync_proc_subproc = new_muto ("sync_proc_subproc");
+  new_muto (sync_proc_subproc);
 
   /* Initialize waitq structure for main thread.  A waitq structure is
    * allocated for each thread that executes a wait to allow multiple threads

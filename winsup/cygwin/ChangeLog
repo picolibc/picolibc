@@ -1,3 +1,46 @@
+2002-02-22  Christopher Faylor  <cgf@redhat.com>
+
+	* sync.h (new_muto): Just accept an argument which denotes the name of
+	the muto.  Use this argument to construct static storage.
+	* cygheap.cc (cygheap_init): Reflect above change.
+	* exceptions.cc (events_init): Ditto.
+	* malloc.cc (malloc_init): Ditto.
+	* path.cc (cwdstuff::init): Ditto.
+	* cygheap.h (cwdstuff): Change name of lock element to make it less
+	generic.
+	* path.cc (cwdstuff::get_hash): Ditto.
+	(cwdstuff::get_initial): Ditto.
+	(cwdstuff::set): Ditto.
+	(cwdstuff::get): Ditto.
+	* sigproc.cc (proc_subproc): Ditto.
+
+	* debug.cc (lock_debug): Change to method.  Use method rather than
+	macro throughout.
+
+	* tty.h (tty_min::kill_pgrp): Declare new method.
+	* fhandler_termios.cc (tty_min::kill_pgrp): New method.
+	(fhandler_termios::line_edit): Use new method for killing process.
+	* dcrt0.cc (do_exit): Ditto.
+
+	* dtable.cc (dtable::get_debugger_info): New method for inheriting
+	dtable info from a debugger.
+	* tty.cc (tty_init): Attempt to grab file handle info from parent
+	debugger, if appropriate.
+
+	# dtable.cc (dtable::stdio_init): Make this a method.
+	(dtable::init_std_file_from_handle): Don't set fd unless it's not open.
+	(dtable::build_fhandler_from_name): Move name setting to
+	dtable::build_fhandler.
+	(dtable::build_fhandler): Add win32 name parameter.
+	* dcrt0.cc (dll_crt0_1): Change to use dtable stdio_init.
+	* dtable.h (dtable): Reflect build_fhandler parameter change.
+	* mmap.cc (mmap_record::alloc_fh): Don't set name parameter in
+	build_fhandler.
+	* net.cc (fdsock): Remove set_name call since it is now handled by
+	build_fhandler.
+
+	* sigproc.cc (proc_subproc): Release muto as early as possible.
+
 2001-02-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* smallprint.c (rn): Allow long long values.

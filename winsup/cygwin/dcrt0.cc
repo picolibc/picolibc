@@ -719,7 +719,7 @@ dll_crt0_1 ()
       user_data->premain[i] (__argc, __argv, user_data);
 
   /* Set up standard fds in file descriptor table. */
-  stdio_init ();
+  cygheap->fdtab.stdio_init ();
 
   /* Set up __progname for getopt error call. */
   __progname = __argv[0];
@@ -792,7 +792,6 @@ initial_env ()
 	_cygwin_testing_magic = 0x10;
     }
 }
-
 
 /* Wrap the real one, otherwise gdb gets confused about
    two symbols with the same name, but different addresses.
@@ -979,7 +978,7 @@ do_exit (int status)
 
 	/* CGF FIXME: This can't be right. */
 	  if (tp->getsid () == myself->sid)
-	    kill_pgrp (tp->getpgid (), SIGHUP);
+	    tp->kill_pgrp (SIGHUP);
 	}
 
       tty_terminate ();
