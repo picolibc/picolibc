@@ -140,7 +140,7 @@ int
 main(int ac, char **av)
 {
     int lc;		/* loop counter */
-    char *msg;		/* message returned from parse_opts */
+    const char *msg;		/* message returned from parse_opts */
     
     Tst_nobuf=1;	/* turn off buffering in tst_ routines */
 

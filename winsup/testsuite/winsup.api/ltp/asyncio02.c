@@ -151,7 +151,7 @@ main(int ac, char **av)
     int ret_val;	/* return value from testrun call */
     int eok;		/* everything is ok flag */
     int lc;             /* loop counter */
-    char *msg;          /* message returned from parse_opts */
+    const char *msg;          /* message returned from parse_opts */
     int flag_cnt;
 
     Tst_nobuf=1;

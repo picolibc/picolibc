@@ -122,7 +122,7 @@ int exp_enos[]={EFAULT, 0};  /* List must end with 0 */
 int main(int ac, char **av)
 {
     int lc;		/* loop counter */
-    char *msg;		/* message returned from parse_opts */
+    const char *msg;		/* message returned from parse_opts */
     
      
 

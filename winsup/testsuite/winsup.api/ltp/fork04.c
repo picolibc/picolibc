@@ -320,7 +320,7 @@ int
 main(int ac, char **av)
 {
     int lc;		/* loop counter */
-    char *msg;		/* message returned from parse_opts */
+    const char *msg;		/* message returned from parse_opts */
     int kid_status;     /* status returned from child */
     int wait_status;    /* status of wait system call in parent */
     int fails;          /* indicates whether to continue with tests */

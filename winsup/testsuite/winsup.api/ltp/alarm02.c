@@ -119,7 +119,7 @@ main(int ac, char **av)
 
     /* Parameters for usc code  */
     int lc;             /* loop counter */
-    char *msg;          /* message returned from parse_opts */
+    const char *msg;          /* message returned from parse_opts */
 
     /* Parameters for alarm test */
     char *buf[] = { "-1", "ULONG_MAX", "ULONG_MAX+1"};

@@ -157,7 +157,7 @@ int Ntc = sizeof(Test_cases) / sizeof(struct test_case_t);
 int main(int ac, char **av)
 {
     int lc;		/* loop counter */
-    char *msg;		/* message returned from parse_opts */
+    const char *msg;		/* message returned from parse_opts */
     int tc;
 
     TST_TOTAL=Ntc;

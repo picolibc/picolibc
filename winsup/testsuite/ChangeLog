@@ -1,3 +1,11 @@
+2000-09-06  Egor Duda  <deo@logos-m.ru>
+
+	Add 'const' qualifiers where needed to avoid compiler warnings.
+	* libltp/lib/tst_sig.c (tst_sig): Don't attempt to cleanup on
+	fatal errors.
+	* libltp/lib/parse_opts.c (parse_opts): Initialize allocated
+	string to prevent heap corruption.
+
 2000-09-04  Egor Duda  <deo@logos-m.ru>
 
 	*  Makefile.in: Always add libltp headers directory to headers

@@ -97,7 +97,7 @@ int
 main(int ac, char **av)
 {
     int lc;             /* loop counter */
-    char *ptr;          /* message returned from parse_opts */
+    const char *ptr;          /* message returned from parse_opts */
 
     int	i,			/* counter */
 	group,			/* return value from Getgid() call */

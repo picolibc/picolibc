@@ -54,7 +54,7 @@ int offset;
    int ind;	/* index into CHARS array */
    char *chr;
    int chars_size;
-   char *charlist;
+   const char *charlist;
 
 	chr=buffer;
 	total=offset+bsize;
@@ -90,7 +90,7 @@ char **errmsg;
    int ind;	/* index into CHARS array */
    char *chr;
    int chars_size;
-   char *charlist;
+   const char *charlist;
 
 	chr=buffer;
 	total=offset+bsize;

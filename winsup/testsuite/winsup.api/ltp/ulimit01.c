@@ -157,7 +157,7 @@ main(int ac, char **av)
 {
     int lc;		/* loop counter */
     int i;		/* inner loop (test case) counter */
-    char *msg;		/* message returned from parse_opts */
+    const char *msg;		/* message returned from parse_opts */
     int tmp;
 
     TST_TOTAL = sizeof(Scenarios)/sizeof(struct limits_t);

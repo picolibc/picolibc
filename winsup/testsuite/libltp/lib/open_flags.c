@@ -109,7 +109,7 @@
 static char Open_symbols[512];	  /* space for openflags2symbols return value */
 
 struct open_flag_t {
-    char *symbol;
+    const char *symbol;
     int  flag;
 };
 

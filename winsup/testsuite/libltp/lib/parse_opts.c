@@ -144,8 +144,8 @@ static char *STD_start_break=0; /* original sbrk size */
 static int  Debug=0;
 
 struct std_option_t {
-    char *optstr;
-    char *help;
+    const char *optstr;
+    const char *help;
     char *flag;
     char **arg;
 } std_options[] = {
@@ -197,7 +197,7 @@ static void usc_recressive_func();
 /**********************************************************************
  * parse_opts: 
  **********************************************************************/
-char *
+const char *
 parse_opts(int ac, char **av, option_t *user_optarr, void (*uhf)())
 {
     int found;		/* flag to indicate that an option specified was */
@@ -235,6 +235,8 @@ parse_opts(int ac, char **av, option_t *user_optarr, void (*uhf)())
     optionstr = (char *)malloc(optstrlen);
     if (!optionstr) 
 	return "parse_opts: ERROR - Could not allocate memory for optionstr";
+
+    optionstr[0] = '\0';
 
     for (i = 0; std_options[i].optstr; ++i)
 	strcat(optionstr, std_options[i].optstr);

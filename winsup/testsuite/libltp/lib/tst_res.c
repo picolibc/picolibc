@@ -153,7 +153,7 @@
  */
 static void check_env();
 static void tst_condense(int tnum, int ttype, char *tmesg);
-static void tst_print(char *tcid, int tnum, int trange, int ttype, char *tmesg);
+static void tst_print(char *tcid, int tnum, int trange, int ttype, const char *tmesg);
 static void cat_file(char *filename);
 
 
@@ -216,7 +216,7 @@ char *TESTDIR = NULL;
  *             eventually get here to print the results.
  */
 void
-tst_res(int ttype, char *fname, char *arg_fmt, ...)
+tst_res(int ttype, char *fname, const char *arg_fmt, ...)
 {
    int  i;
    char tmesg[USERMESG];     /* expanded message */
@@ -407,7 +407,7 @@ tst_flush()
  *               stream.
  */
 static void
-tst_print(char *tcid, int tnum, int trange, int ttype, char *tmesg)
+tst_print(char *tcid, int tnum, int trange, int ttype, const char *tmesg)
 {
    char type[5];
 
@@ -581,7 +581,7 @@ tst_environ()
  *             tests cases.
  */
 void
-tst_brk(int ttype, char *fname, void (*func)(), char *arg_fmt, ...)
+tst_brk(int ttype, char *fname, void (*func)(), const char *arg_fmt, ...)
 {
    char    tmesg[USERMESG];      /* expanded message */
 
@@ -652,7 +652,7 @@ tst_brk(int ttype, char *fname, void (*func)(), char *arg_fmt, ...)
  *                 remaining test cases within test case loop.
  */
 void
-tst_brkloop(int ttype, char *fname, void (*func)(), char *arg_fmt, ...)
+tst_brkloop(int ttype, char *fname, void (*func)(), const char *arg_fmt, ...)
 {
    char    tmesg[USERMESG];      /* expanded message */
 
@@ -727,7 +727,7 @@ tst_brkloop(int ttype, char *fname, void (*func)(), char *arg_fmt, ...)
  * tst_resm() - Interface to tst_res(), with no filename.
  */
 void
-tst_resm(int ttype, char *arg_fmt, ...)
+tst_resm(int ttype, const char *arg_fmt, ...)
 {
    char    tmesg[USERMESG];      /* expanded message */
 
@@ -752,7 +752,7 @@ tst_resm(int ttype, char *arg_fmt, ...)
  * tst_brkm() - Interface to tst_brk(), with no filename.
  */
 void
-tst_brkm(int ttype, void (*func)(), char *arg_fmt, ...)
+tst_brkm(int ttype, void (*func)(), const char *arg_fmt, ...)
 {
    char    tmesg[USERMESG];      /* expanded message */
 
@@ -777,7 +777,7 @@ tst_brkm(int ttype, void (*func)(), char *arg_fmt, ...)
  * tst_brkloopm() - Interface to tst_brkloop(), with no filename.
  */
 void
-tst_brkloopm(int ttype, void (*func)(), char *arg_fmt, ...)
+tst_brkloopm(int ttype, void (*func)(), const char *arg_fmt, ...)
 {
    char    tmesg[USERMESG];      /* expanded message */
 

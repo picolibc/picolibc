@@ -340,7 +340,7 @@ void do_open();
 /*
  * Lets be optimistic and only define messages for passing test cases
  */
-char *msgs[] = {
+const char *msgs[] = {
  "Creation of symbolic link file to no object file is ok",
  "Creation of symbolic link file and object file via symbolic link is ok", 
  "Creating an existing symbolic link file error is caught", 
@@ -515,7 +515,7 @@ main(int argc, char *argv[])
     int do_syscalltests();
     void cleanup();
     int lc;             /* loop counter */
-    char *msg;          /* message returned from parse_opts */
+    const char *msg;          /* message returned from parse_opts */
 
 
    /***************************************************************

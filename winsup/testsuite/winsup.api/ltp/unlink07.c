@@ -166,7 +166,7 @@ int
 main(int ac, char **av)
 {
     int lc;		/* loop counter */
-    char *msg;		/* message returned from parse_opts */
+    const char *msg;		/* message returned from parse_opts */
     char *fname;
     char *desc;
     int ind;

@@ -190,14 +190,14 @@ extern void tst_clear_error();
  * The following prototypes are needed to remove compile errors
  * on IRIX systems when compiled with -n32 and -64.
  */
-extern void tst_res(int ttype, char *fname, char *arg_fmt, ...);
-extern void tst_resm(int ttype, char *arg_fmt, ...);
+extern void tst_res(int ttype, char *fname, const char *arg_fmt, ...);
+extern void tst_resm(int ttype, const char *arg_fmt, ...);
 extern void tst_brk(int ttype, char *fname, void (*func)(), 
-							char *arg_fmt, ...);
+							const char *arg_fmt, ...);
 extern void tst_brkloop(int ttype, char *fname, void (*func)(), 
-							char *arg_fmt, ...);
-extern void tst_brkm(int ttype, void (*func)(), char *arg_fmt, ...);
-extern void tst_brkloopm(int ttype, void (*func)(), char *arg_fmt, ...);
+							const char *arg_fmt, ...);
+extern void tst_brkm(int ttype, void (*func)(), const char *arg_fmt, ...);
+extern void tst_brkloopm(int ttype, void (*func)(), const char *arg_fmt, ...);
 
 extern int  tst_environ();
 extern void tst_exit();
