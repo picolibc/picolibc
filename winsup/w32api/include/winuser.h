@@ -1253,7 +1253,10 @@ extern "C" {
 #define WM_MOUSELAST 522
 #define WM_MOUSEHOVER	0x2A1
 #define WM_MOUSELEAVE	0x2A3
+#if(_WIN32_WINNT >= 0x0400)
 #define WHEEL_DELTA 120
+#define GET_WHEEL_DELTA_WPARAM(wparam) ((short)HIWORD (wparam))
+#endif
 #define BM_CLICK 245
 #define BM_GETCHECK 240
 #define BM_GETIMAGE 246

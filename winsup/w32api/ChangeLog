@@ -1,6 +1,15 @@
+2001-08-08 Danny Smith <dannysmith@users.sourceforge.net>
+
+	* include/winuser.h (GET_WHEEL_DELTA_WPARAM): Add macro.
+	Thanks to: Harold Hunt <Harold@compasstechnologies.com>.
+
+2001-08-08 Danny Smith <dannysmith@users.sourceforge.net>
+
+	* lib/oleaut32.def: Regenerate.
+
 2001-08-04  Danny Smith <dannysmith@users.sourceforge.net>
 
-	* include/wtypes.h: (DECIMAL_SETZERO): Correct typo.
+	* include/wtypes.h (DECIMAL_SETZERO): Correct typo.
 
 2001-08-02  Danny Smith <dannysmith@users.sourceforge.net>
 
