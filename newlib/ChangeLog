@@ -1,3 +1,12 @@
+2003-07-31  Nick Clifton  <nickc@redhat.com>
+
+	* libc/sys/sysnecv850/crt0.S (_start): Allocate 4 slots on stack
+	before calling main, in case it saves its argument registers.
+        Remove reference to deleted v850ea port.
+        * configure.host: Remove reference to deleted v850ea port.
+        Do not use -mv850 when building for v850e target.  This
+	prevents the ctbp system register from being initialised.
+
 2003-07-29  Honda Hiroki  <hhonda@ipflex.com>
 
 	* libc/stdio/vfprintf.c: Set output size to 1 when

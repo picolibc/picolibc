@@ -5,7 +5,7 @@
 
 _start:
 
-#if defined __v850e__ || defined __v850ea__
+#if defined __v850e__
 	
 	movea   255,		r0,	r20
 	mov     65535,		r21
@@ -23,7 +23,7 @@ _start:
 	bl      .L0
 .L1:
 	jarl    ___main,	r31
-	addi    -12,		sp,	sp
+	addi    -16,		sp,	sp
 	mov     0,		r6
 	mov     0,		r7
 	mov     0,		r8
@@ -53,7 +53,7 @@ _start:
 	bl      .L0
 .L1:
 	jarl    ___main,	r31
-	addi    -12,		sp,	sp
+	addi    -16,		sp,	sp
 	mov     0,		r6
 	mov     0,		r7
 	mov     0,		r8
