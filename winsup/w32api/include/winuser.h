@@ -3175,6 +3175,14 @@ typedef struct tagRAWINPUTDEVICELIST {
 } RAWINPUTDEVICELIST,*PRAWINPUTDEVICELIST;
 #endif /* (_WIN32_WINNT >= 0x0501) */
 
+typedef struct {
+	POINT pt;
+	DWORD mouseData;
+	DWORD flags;
+	DWORD time;
+	ULONG_PTR dwExtraInfo;
+} MSLLHOOKSTRUCT, *PMSLLHOOKSTRUCT;
+
 #define AnsiToOem CharToOemA
 #define OemToAnsi OemToCharA
 #define AnsiToOemBuff CharToOemBuffA

@@ -1,5 +1,9 @@
 2004-11-19  Magnus Olsen  <greatlord@sourceforge.users.net>
 
+	* include/winuser.h (MSLLHOOKSTRUCT): Add structure.
+
+2004-11-19  Magnus Olsen  <greatlord@sourceforge.users.net>
+
 	* include/winuser.h (LLKHF_EXTENDED, LLKHF_INJECTED, LLKHF_UP):
 	Add defines.
 	(LLKHF_ALTDOWN): Define based on KF_ALTDOWN,
