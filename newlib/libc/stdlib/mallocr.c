@@ -2334,7 +2334,7 @@ Void_t* mALLOc(RARG bytes) RDECL size_t bytes;
   INTERNAL_SIZE_T nb  = request2size(bytes);  /* padded request size; */
 
   /* Check for overflow and just fail, if so. */
-  if (nb > INT_MAX)
+  if (nb > INT_MAX || nb < bytes)
     return 0;
 
   MALLOC_LOCK;
@@ -2797,7 +2797,7 @@ Void_t* rEALLOc(RARG oldmem, bytes) RDECL Void_t* oldmem; size_t bytes;
   nb = request2size(bytes);
 
   /* Check for overflow and just fail, if so. */
-  if (nb > INT_MAX)
+  if (nb > INT_MAX || nb < bytes)
     return 0;
 
 #if HAVE_MMAP
@@ -3028,6 +3028,11 @@ Void_t* mEMALIGn(RARG alignment, bytes) RDECL size_t alignment; size_t bytes;
   /* Call malloc with worst case padding to hit alignment. */
 
   nb = request2size(bytes);
+
+  /* Check for overflow. */
+  if (nb > INT_MAX || nb < bytes)
+    return 0;
+
   m  = (char*)(mALLOc(RCALL nb + alignment + MINSIZE));
 
   if (m == 0) return 0; /* propagate failure */
