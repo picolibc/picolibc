@@ -405,6 +405,7 @@ public:
   int ioctl (unsigned int cmd, void *buf);
 
   void fixup_after_fork (HANDLE);
+  void fixup_after_exec (HANDLE parent) { fixup_after_fork (parent); }
 };
 
 class fhandler_dev_floppy: public fhandler_dev_raw
