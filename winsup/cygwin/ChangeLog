@@ -3,6 +3,17 @@
 	* fhandler_console.cc (fhandler_console::open): Reinstate setting of
 	flags.
 
+	* dtable.cc (dtable::init_std_file_from_handle): Default to using
+	binmode derived from path_conv, when required.
+	* fhandler.h (fhandler_base::get_w_binary): Default to binmode if
+	nothing else is specified.
+	* fhandler.h (fhandler_base::get_r_binary): Ditto.
+
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat_by_handle): Work
+	around g++ warning.
+
+	* path.cc (path_conv::check): Remove a debugging statement.
+
 2002-05-31  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_console.cc (fhandler_console::open): Always default to
