@@ -1,5 +1,11 @@
 2002-10-04  "KJK::Hyperion"  <noog@libero.it>
 
+	*include/windef.h (WPARAM): Update typedef.
+	(LPARAM): Ditto.
+	(LRESULT): Ditto.
+
+2002-10-04  "KJK::Hyperion"  <noog@libero.it>
+
 	* include/shlobj.h (CSIDL_*): Add defines.
 
 2002-09-24  Danny Smith  <dannysmith@users.sourceforge.net>

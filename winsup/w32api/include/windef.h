@@ -245,9 +245,9 @@ typedef unsigned int UINT,*PUINT,*LPUINT;
 
 #include <winnt.h>
 
-typedef UINT WPARAM;
-typedef LONG LPARAM;
-typedef LONG LRESULT;
+typedef UINT_PTR WPARAM;
+typedef LONG_PTR LPARAM;
+typedef LONG_PTR LRESULT;
 #ifndef _HRESULT_DEFINED
 typedef LONG HRESULT;
 #define _HRESULT_DEFINED
