@@ -71,7 +71,7 @@ struct pa_opcode
    In the args field, the following characters are unused:
 
 	'  "#  &     -  /   34 6789:;< > @'
-	' BC      JK            XY [\]  '
+	'  C      JK            XY [\]  '
 	'   de  h    m           y { } '
 
    Here are all the characters:
@@ -145,6 +145,7 @@ Also these:
    l	,l completer for new syntax branch
    M    ,push completer for new syntax branch
    L    ,%r2 completer for new syntax branch
+   B    ,pop completer for new syntax branch
 
 Completer operands all have 'c' as the prefix:
 
@@ -369,6 +370,10 @@ static const struct pa_opcode pa_opcodes[] =
 { "blr",	0xe8004000, 0xfc00e001, "nx,b", pa10},
 { "bv",		0xe800c000, 0xfc00fffd, "nx(b)", pa10},
 { "bv",		0xe800c000, 0xfc00fffd, "n(b)", pa10},
+{ "bve",	0xe800f000, 0xfc00fffe, "ln(b)L", pa20, FLAG_STRICT},
+{ "bve",	0xe800f001, 0xfc00fffe, "lMn(b)L", pa20, FLAG_STRICT},
+{ "bve",	0xe800f001, 0xfc00fffe, "Bn(b)", pa20, FLAG_STRICT},
+{ "bve",	0xe800d000, 0xfc00fffe, "n(b)", pa20, FLAG_STRICT},
 { "be",		0xe4000000, 0xfc000000, "lnz(S,b)", pa10, FLAG_STRICT},
 { "be",		0xe0000000, 0xfc000000, "nz(S,b)", pa10, FLAG_STRICT},
 { "be",		0xe0000000, 0xfc000000, "nz(S,b)", pa10},
