@@ -404,7 +404,7 @@ static const struct pa_opcode pa_opcodes[] =
 { "b",		0xe800a000, 0xfc00e000, "clnXL", pa20, FLAG_STRICT},
 { "b",		0xe8000000, 0xfc00e000, "clnW,b", pa10, FLAG_STRICT},
 { "b",		0xe8002000, 0xfc00e000, "cgnW,b", pa10, FLAG_STRICT},
-{ "b",		0xe8000000, 0xffe0e000, "nW", pa10},  /* b,l foo,r0 */
+{ "b",		0xe8000000, 0xffe0e000, "nW", pa10, 0},  /* b,l foo,r0 */
 { "bl",		0xe8000000, 0xfc00e000, "nW,b", pa10, 0},
 { "gate",	0xe8002000, 0xfc00e000, "nW,b", pa10, 0},
 { "blr",	0xe8004000, 0xfc00e001, "nx,b", pa10, 0},
