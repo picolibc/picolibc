@@ -1,3 +1,8 @@
+2003-01-27  Phil Edwards  <pme@gcc.gnu.org>
+
+	* configure.in:  Revert 24Jan change.
+	* configure:  Regenerate.
+
 2003-01-23  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	* configure.in: Revert previous change.
