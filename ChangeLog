@@ -1,3 +1,8 @@
+2000-06-07  Phillip Thomas  <pthomas@suse.de>
+
+	* README-maintainer-mode: New file: Contains notes on using
+	--enable-maintainer-mode with binutils.
+
 Mon May 29 13:50:03 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* texinfo/texinfo.tex: Update. Version from makeinfo 4.0.
