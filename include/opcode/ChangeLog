@@ -1,3 +1,8 @@
+2004-12-09  Ian Lance Taylor  <ian@wasabisystems.com>
+
+	* mips.h (CPU_RM9000): Define.
+	(OPCODE_IS_MEMBER): Handle CPU_RM9000.
+
 2004-11-25 Jan Beulich  <jbeulich@novell.com>
 
 	* i386.h: CpuNo64 mov can't reasonably have a 'q' suffix. Moves
