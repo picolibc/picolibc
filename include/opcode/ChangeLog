@@ -1,3 +1,7 @@
+2003-07-18  Michael Snyder  <msnyder@redhat.com>
+
+	* include/opcode/h8sx.h (DO_MOVA1, DO_MOVA2): Reformatting.
+
 2003-07-15  Richard Sandiford  <rsandifo@redhat.com>
 
 	* mips.h (CPU_RM7000): New macro.
