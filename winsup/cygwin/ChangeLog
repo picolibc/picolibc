@@ -1,5 +1,20 @@
 2004-11-20  Christopher Faylor  <cgf@timesys.com>
 
+	* pinfo.h (pinfo::alert_parent): New function.
+	* exceptions.cc (sig_handle_tty_stop): Use alert_parent to send
+	"signals" to parent.
+	* fork.cc (fork_parent): Don't close pi.hProcess.  Let the waiter
+	thread do that.
+	* pinfo.cc (proc_waiter): Detect case where process exits without
+	setting the exit code and use value from GetExitCodeProcess.
+	Reluctantly implement __SIGREPARENT.
+	(pinfo::alert_parent): Define.
+	* sigproc.h (__SIGREPARENT): New enum.
+	* spawn.cc (spawn_guts): Send reparent signal to parent on exec.
+	Always create process in suspended state to avoid races.
+
+2004-11-20  Christopher Faylor  <cgf@timesys.com>
+
 	Remove cygthread.h in favor of cygtls.h throughout since cygtls now
 	includes cygthread.h.  Eliminate ppid_handle usage throughout.
 	* child_info.h: Regenerate magic number

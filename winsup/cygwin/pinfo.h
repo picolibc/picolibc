@@ -43,7 +43,7 @@ public:
   /* Handle associated with initial Windows pid which started it all. */
   HANDLE pid_handle;
 
-  /* True if started by a cygwin process (DWORD for hysterical reasons) */
+  /* > 0 if started by a cygwin process */
   DWORD cygstarted;
 
   /* Parent process id.  */
@@ -153,7 +153,8 @@ public:
   _pinfo *operator * () const {return procinfo;}
   operator _pinfo * () const {return procinfo;}
   // operator bool () const {return (int) h;}
-  void preserve() { destroy = false; }
+  void preserve () { destroy = false; }
+  void alert_parent (int);
 #ifndef _SIGPROC_H
   int remember () {system_printf ("remember is not here"); return 0;}
 #else

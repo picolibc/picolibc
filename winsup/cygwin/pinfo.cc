@@ -698,14 +698,22 @@ proc_waiter (void *arg)
       switch (buf)
 	{
 	case 0:
+	  CloseHandle (vchild.rd_proc_pipe);
+	  vchild.rd_proc_pipe = NULL;
+
+	  if (vchild->process_state != PID_EXITED && vchild.hProcess)
+	    {
+	      DWORD exit_code;
+	      if (GetExitCodeProcess (vchild.hProcess, &exit_code))
+		vchild->exitcode = (exit_code & 0xff) << 8;
+	    }
+	  ForceCloseHandle1 (vchild.hProcess, childhProc);
 	  if (WIFEXITED (vchild->exitcode))
 	    si.si_sigval.sival_int = CLD_EXITED;
 	  else if (WCOREDUMP (vchild->exitcode))
 	    si.si_sigval.sival_int = CLD_DUMPED;
 	  else
 	    si.si_sigval.sival_int = CLD_KILLED;
-	  CloseHandle (vchild.rd_proc_pipe);
-	  vchild.rd_proc_pipe = NULL;
 	  si.si_status = vchild->exitcode;
 	  vchild->process_state = PID_ZOMBIE;
 	  break;
@@ -717,6 +725,16 @@ proc_waiter (void *arg)
 	  break;
 	case SIGCONT:
 	  continue;
+	case __SIGREPARENT: /* sigh */
+	  if (vchild.hProcess)
+	    ForceCloseHandle1 (vchild.hProcess, childhProc);
+	  vchild.hProcess = OpenProcess (PROCESS_QUERY_INFORMATION, FALSE,
+					 vchild->dwProcessId);
+	  vchild->cygstarted++;
+	  if (vchild.hProcess)
+	    ProtectHandle1 (vchild.hProcess, childhProc);
+	  continue;
+	  break;
 	default:
 	  system_printf ("unknown value %d on proc pipe", buf);
 	  continue;
@@ -781,6 +799,25 @@ pinfo::wait ()
     }
 
   return 1;
+}
+
+void
+pinfo::alert_parent (int sig)
+{
+  /* See if we have a living parent.  If so, send it a special signal.
+     It will figure out exactly which pid has stopped by scanning
+     its list of subprocesses.  */
+  if (my_parent_is_alive ())
+    {
+      pinfo parent (myself->ppid);
+      if (NOTSTATE (parent, PID_NOCLDSTOP))
+	{
+	  DWORD nb;
+	  unsigned char pipesig = sig;
+	  if (!WriteFile (myself->wr_proc_pipe, &pipesig, 1, &nb, NULL))
+	    debug_printf ("sending %d notification to parent failed, %E", sig);
+	}
+    }
 }
 
 void

@@ -569,8 +569,6 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
       (void) resume_child (pi, forker_finished);
     }
 
-  if (pi.hProcess)
-    ForceCloseHandle1 (pi.hProcess, childhProc);
   ForceCloseHandle (subproc_ready);
   ForceCloseHandle (pi.hThread);
   ForceCloseHandle (forker_finished);

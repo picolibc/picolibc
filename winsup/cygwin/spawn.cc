@@ -618,23 +618,19 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     flags |= DETACHED_PROCESS;
 
   HANDLE saved_sendsig;
-  if (mode == _P_OVERLAY)
+  if (mode != _P_OVERLAY)
+    saved_sendsig = NULL;
+  else
     {
       saved_sendsig = myself->sendsig;
       myself->sendsig = INVALID_HANDLE_VALUE;
-    }
-  else
-    {
-      flags |= CREATE_SUSPENDED;
-      saved_sendsig = NULL;
     }
 
   /* Some file types (currently only sockets) need extra effort in the
      parent after CreateProcess and before copying the datastructures
      to the child. So we have to start the child in suspend state,
      unfortunately, to avoid a race condition. */
-  if (!myself->wr_proc_pipe || cygheap->fdtab.need_fixup_before ())
-    flags |= CREATE_SUSPENDED;
+  flags |= CREATE_SUSPENDED;
 
   const char *runpath = null_app_name ? NULL : (const char *) real_path;
 
@@ -771,14 +767,17 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   ProtectHandle1 (pi.hProcess, childhProc);
 
   int wait_for_myself = false;
+  DWORD exec_cygstarted;
   if (mode == _P_OVERLAY)
     {
+      exec_cygstarted = myself->cygstarted;
+      myself->dwProcessId = dwExeced = pi.dwProcessId;
+      myself.alert_parent (__SIGREPARENT);
       CloseHandle (saved_sendsig);
       /* These are both duplicated in the child code.  We do this here,
 	 primarily for strace. */
       strace.execing = 1;
       hExeced = pi.hProcess;
-      dwExeced = pi.dwProcessId;
       strcpy (myself->progname, real_path);
       close_all_files ();
       if (!myself->wr_proc_pipe)
@@ -790,6 +789,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     }
   else
     {
+      exec_cygstarted = 0;
       myself->set_has_pgid_children ();
       ProtectHandle (pi.hThread);
       pinfo child (cygpid, PID_IN_USE);
@@ -825,14 +825,18 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   if (flags & CREATE_SUSPENDED)
     ResumeThread (pi.hThread);
   ForceCloseHandle (pi.hThread);
-  ForceCloseHandle1 (pi.hProcess, childhProc);
 
   sigproc_printf ("spawned windows pid %d", pi.dwProcessId);
 
-  if (!wait_for_myself)
-    res = 0;
-  else
+  if (wait_for_myself)
     waitpid (myself->pid, &res, 0);
+  else
+    {
+      if (exec_cygstarted)
+	while (myself->cygstarted == exec_cygstarted)
+	  low_priority_sleep (0);
+      res = 42;
+    }
 
   switch (mode)
     {

@@ -600,21 +600,7 @@ sig_handle_tty_stop (int sig)
     }
 
   myself->stopsig = sig;
-  char pipesig;
-  DWORD nb;
-  /* See if we have a living parent.  If so, send it a special signal.
-     It will figure out exactly which pid has stopped by scanning
-     its list of subprocesses.  */
-  if (my_parent_is_alive ())
-    {
-      pinfo parent (myself->ppid);
-      if (NOTSTATE (parent, PID_NOCLDSTOP))
-	{
-	  pipesig = sig;
-	  if (!WriteFile (myself->wr_proc_pipe, &pipesig, 1, &nb, NULL))
-	    debug_printf ("sending stop notification to parent failed, %E");
-	}
-    }
+  myself.alert_parent (sig);
   sigproc_printf ("process %d stopped by signal %d", myself->pid, sig);
   HANDLE w4[2];
   w4[0] = sigCONT;
@@ -624,16 +610,7 @@ sig_handle_tty_stop (int sig)
     case WAIT_OBJECT_0:
     case WAIT_OBJECT_0 + 1:
       reset_signal_arrived ();
-      if (my_parent_is_alive ())
-	{
-	  pinfo parent (myself->ppid);
-	  if (parent)
-	    {
-	      sig = SIGCONT;
-	      if (!WriteFile (myself->wr_proc_pipe, &sig, 1, &nb, NULL))
-		debug_printf ("sending stop notification to parent failed, %E");
-	    }
-	}
+      myself.alert_parent (SIGCONT);
       break;
     default:
       api_fatal ("WaitSingleObject failed, %E");

@@ -22,7 +22,8 @@ enum
   __SIGDELETE	    = -(NSIG + 5),
   __SIGFLUSHFAST    = -(NSIG + 6),
   __SIGHOLD	    = -(NSIG + 7),
-  __SIGNOHOLD	    = -(NSIG + 8)
+  __SIGNOHOLD	    = -(NSIG + 8),
+  __SIGREPARENT	    = (NSIG + 2)
 };
 #endif
 
