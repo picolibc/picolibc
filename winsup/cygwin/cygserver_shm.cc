@@ -360,7 +360,9 @@ server_shmmgr::initialise_instance ()
  *---------------------------------------------------------------------------*/
 
 server_shmmgr::server_shmmgr ()
-  : _segments_head (NULL)
+  : _segments_head (NULL),
+    _shmid_cnt (0),
+    _shmid_max (0)
 {
   InitializeCriticalSection (&_segments_lock);
 }

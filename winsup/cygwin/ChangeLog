@@ -1,5 +1,10 @@
 2002-06-30  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* cygserver_shm.cc (server_shmmgr::server_shmmgr): All fields have
+	to be initialized now that the singleton is no longer static.
+
+2002-06-30  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* cygserver_shm.cc (server_shmmgr::_instance): New static field.
 	(server_shmmgr::_instance_once): Ditto.
 	(server_shmmgr::initialise_instance): New static method.
