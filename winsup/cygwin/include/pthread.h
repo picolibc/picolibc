@@ -28,7 +28,7 @@ extern "C"
 
 /* FIXME: this should allocate a new cond variable, and return the value  that
  would normally be written to the passed parameter of pthread_cond_init(lvalue, NULL); */
-// #define PTHREAD_COND_INITIALIZER 0
+/* #define PTHREAD_COND_INITIALIZER 0 */
 
 #define PTHREAD_DESTRUCTOR_ITERATIONS 1
 /* Tls has 64 items for pre win2000 - and we don't want to use them all :]

@@ -1,3 +1,7 @@
+Wed May  9 10:43:30 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* include/pthread.h: Remove C++ comment.
+
 Tue May  8 11:09:59 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* cygheap.cc (_cfree): Add regparm attribute.
