@@ -15,6 +15,7 @@ details. */
 #include <ctype.h>
 #include <sys/types.h>
 #include <sys/mount.h>
+#include <sys/strace.h>
 #include <errno.h>
 #include "shortcut.h"
 
@@ -125,9 +126,9 @@ check_shortcut (const char *path, DWORD fileattr, HANDLE h,
       if (FAILED(hres))
 	goto close_it;
     }
-  /* It's a symlink.  */
-  *pflags = PATH_SYMLINK;
   res = strlen (contents);
+  if (res) /* It's a symlink.  */
+    *pflags = PATH_SYMLINK;
 
 close_it:
   /* Release the pointer to IPersistFile. */

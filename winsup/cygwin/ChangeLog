@@ -1,3 +1,7 @@
+Sun Feb 25 10:18:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* shortcut.c: Change symlink condition.
+
 Fri Feb 23 10:42:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* mmap.cc (fhandler_disk_file::mmap): Use `addr' correctly.
