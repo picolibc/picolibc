@@ -398,16 +398,31 @@ _pinfo::commune_recv ()
       }
     case PICOM_FIFO:
       {
-	int formic;
-	if (!ReadFile (__fromthem, &formic, sizeof formic, &nr, NULL)
-	    || nr != sizeof formic)
+	char path[CYG_MAX_PATH + 1];
+	unsigned len;
+	if (!ReadFile (__fromthem, &len, sizeof len, &nr, NULL)
+	    || nr != sizeof len)
+	  {
+	    /* __seterrno ();*/	// this is run from the signal thread, so don't set errno
+	    goto out;
+	  }
+	/* Get null-terminated path */
+	if (!ReadFile (__fromthem, path, len, &nr, NULL)
+	    || nr != len)
 	  {
 	    /* __seterrno ();*/	// this is run from the signal thread, so don't set errno
 	    goto out;
 	  }
 
-	fhandler_fifo *fh = cygheap->fdtab.find_fifo ((ATOM) formic);
-	HANDLE it[] = {(fh->get_handle ()), (fh->get_output_handle ())};
+	fhandler_fifo *fh = cygheap->fdtab.find_fifo (path);
+	HANDLE it[2];
+	if (fh == NULL)
+	  it[0] = it[1] = NULL;
+	else
+	  {
+	    it[0] = fh->get_handle ();
+	    it[1] = fh->get_output_handle ();
+	  }
 
 	if (!WriteFile (__tothem, it, sizeof (it), &nr, NULL))
 	  {
@@ -474,8 +489,9 @@ _pinfo::commune_send (DWORD code, ...)
     {
     case PICOM_FIFO:
       {
-	int formic = va_arg (args, int);
-	if (!WriteFile (tothem, &formic, sizeof formic, &nr, NULL) || nr != sizeof formic)
+	char *path = va_arg (args, char *);
+	size_t len = strlen (path) + 1;
+	if (!WriteFile (tothem, path, len, &nr, NULL) || nr != len)
 	  {
 	    __seterrno ();
 	    goto err;

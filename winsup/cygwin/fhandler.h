@@ -481,7 +481,6 @@ class fhandler_fifo: public fhandler_pipe
 {
   HANDLE output_handle;
   HANDLE owner;		// You can't have too many mutexes, now, can you?
-  ATOM upand;
   long read_use;
   long write_use;
 public:
@@ -496,7 +495,6 @@ public:
   void set_use ();
   int dup (fhandler_base *child);
   bool is_slow () {return 1;}
-  ATOM& get_atom () {return upand;}
 };
 
 class fhandler_dev_raw: public fhandler_base

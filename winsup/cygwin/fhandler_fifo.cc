@@ -23,7 +23,7 @@
 #include "pinfo.h"
 
 fhandler_fifo::fhandler_fifo ()
-  : fhandler_pipe (), output_handle (NULL), owner (NULL), upand (0),
+  : fhandler_pipe (), output_handle (NULL), owner (NULL),
     read_use (0), write_use (0)
 {
 }
@@ -45,11 +45,6 @@ fhandler_fifo::set_use (int incr)
 
   if (incr >= 0)
     return;
-  char buf[24];
-  __small_sprintf (buf, "%x.%x", upand, myself->pid);
-  ATOM ant = GlobalFindAtom (buf);
-  if (!ant)
-    return;
   if (read_use <= 0 && oread_use != read_use)
     {
       HANDLE h = get_handle ();
@@ -58,7 +53,6 @@ fhandler_fifo::set_use (int incr)
 	  set_io_handle (NULL);
 	  CloseHandle (h);
 	}
-      DeleteAtom (ant);
     }
 }
 
@@ -75,7 +69,6 @@ fhandler_fifo::close ()
 int
 fhandler_fifo::open_not_mine (int flags)
 {
-  char buf[24];
   winpids pids;
   static int flagtypes[] = {DUMMY_O_RDONLY | O_RDWR, O_WRONLY | O_APPEND | O_RDWR};
   HANDLE *usehandles[2] = {&(get_handle ()), &(get_output_handle ())};
@@ -84,10 +77,6 @@ fhandler_fifo::open_not_mine (int flags)
   for (unsigned i = 0; i < pids.npids; i++)
     {
       _pinfo *p = pids[i];
-      __small_sprintf (buf, "%x.%x", upand, p->pid);
-      if (!GlobalFindAtom (buf))
-	continue;
-
       HANDLE hp = OpenProcess (PROCESS_DUP_HANDLE, false, p->dwProcessId);
       if (!hp)
 	{
@@ -97,7 +86,10 @@ fhandler_fifo::open_not_mine (int flags)
 
       HANDLE handles[2];
       commune_result r;
-      r = p->commune_send (PICOM_FIFO, upand);
+      r = p->commune_send (PICOM_FIFO, get_win32_name ());
+      if (r.handles[0] == NULL)
+	continue;		// process doesn't own fifo
+
       flags = (flags & (O_RDWR | O_WRONLY | O_APPEND)) ?: DUMMY_O_RDONLY;
       for (int i = 0; i < 2; i++)
 	{
@@ -139,28 +131,10 @@ int
 fhandler_fifo::open (int flags, mode_t)
 {
   int res = 1;
-  char buf[24];
-
-  upand = GlobalAddAtom (pc);
-  __small_sprintf (buf, "%x.owner", upand);
-  debug_printf ("mutex %s", buf);
-
-  HANDLE h = CreateMutex (&sec_none, false, buf);
-  if (!h)
-    goto errnout;
-
-  if (GetLastError () == ERROR_ALREADY_EXISTS)
-    {
-      CloseHandle (h);
-      return open_not_mine (flags);
-    }
 
   fhandler_pipe *fhs[2];
   if (create (fhs, 0, flags, true))
-    {
-      CloseHandle (h);
-      goto errout;
-    }
+    goto errnout;
 
   set_flags (fhs[0]->get_flags ());
   set_io_handle (fhs[0]->get_handle ());
@@ -173,13 +147,10 @@ fhandler_fifo::open (int flags, mode_t)
   delete (fhs[0]);
   delete (fhs[1]);
   set_use (1);
-  __small_sprintf (buf, "%x.%x", upand, myself->pid);
-  (void) GlobalAddAtom (buf);
   goto out;
 
 errnout:
   __seterrno ();
-errout:
   res = 0;
 
 out:

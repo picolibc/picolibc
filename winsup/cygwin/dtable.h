@@ -79,7 +79,7 @@ public:
 #ifdef NEWVFORK
   bool in_vfork_cleanup () {return fds_on_hold == fds;}
 #endif
-  fhandler_fifo *find_fifo (ATOM);
+  fhandler_fifo *find_fifo (const char *);
   fhandler_base *find_archetype (device& dev);
   fhandler_base **add_archetype ();
   void delete_archetype (fhandler_base *);

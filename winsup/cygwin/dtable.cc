@@ -554,13 +554,13 @@ done:
 }
 
 fhandler_fifo *
-dtable::find_fifo (ATOM hill)
+dtable::find_fifo (const char *path)
 {
   lock ();
   for (unsigned i = 0; i < size; i++)
     {
       fhandler_base *fh = fds[i];
-      if (fh && fh->isfifo () && ((fhandler_fifo *) fh)->get_atom () == hill)
+      if (fh && fh->isfifo () && strcmp (path, fh->get_win32_name ()) == 0)
 	return (fhandler_fifo *) fh;
     }
   return NULL;

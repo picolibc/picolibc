@@ -51,11 +51,27 @@ static void __stdcall _cfree (void *ptr) __attribute__((regparm(1)));
 static void
 init_cheap ()
 {
-  for (cygheap = NULL, alloc_sz = CYGHEAPSIZE;
-       !cygheap && alloc_sz > CYGHEAPSIZE_MIN;
-       alloc_sz -= 2 * (1024 * 1024))
-    cygheap = (init_cygheap *) VirtualAlloc ((void *) &_cygheap_start, alloc_sz,
-					     MEM_RESERVE, PAGE_NOACCESS);
+#ifndef DEBUGGING
+  alloc_sz = CYGHEAPSIZE;
+#else
+  char buf[80];
+  DWORD initial_sz = 0;
+  if (!GetEnvironmentVariable ("CYGWIN_HEAPSIZE", buf, sizeof buf - 1))
+    alloc_sz = CYGHEAPSIZE;
+  else
+    {
+      initial_sz = alloc_sz = atoi (buf);
+      small_printf ("using cygheap size %d\n", alloc_sz);
+    }
+#endif
+  do
+    if ((cygheap = (init_cygheap *) VirtualAlloc ((void *) &_cygheap_start,
+						  alloc_sz, MEM_RESERVE,
+						  PAGE_NOACCESS)))
+      break;
+  while ((alloc_sz -= 2 * (1024 * 1024)) >= CYGHEAPSIZE_MIN);
+  if (alloc_sz != initial_sz)
+    small_printf ("reset initial cygheap size to %u\n", alloc_sz);
   if (!cygheap)
     {
       MEMORY_BASIC_INFORMATION m;
@@ -213,9 +229,15 @@ _csbrk (int sbs)
     /* nothing to do */;
   else if (!VirtualAlloc (prebrk, (DWORD) sbs, MEM_COMMIT, PAGE_READWRITE))
     {
+#if 1
+      system_printf ("couldn't commit memory for cygwin heap, prebrk %p, size %d, heapsize now %d, max heap size %u, %E",
+		     prebrk, sbs, (char *) cygheap_max - (char *) cygheap,
+		     alloc_sz);
+#else
       malloc_printf ("couldn't commit memory for cygwin heap, prebrk %p, size %d, heapsize now %d, max heap size %u, %E",
 		     prebrk, sbs, (char *) cygheap_max - (char *) cygheap,
 		     alloc_sz);
+#endif
       __seterrno ();
       cygheap_max = (char *) cygheap_max - sbs;
       return NULL;
@@ -389,10 +411,8 @@ ccalloc (cygheap_types x, DWORD n, DWORD size)
   c = (cygheap_entry *) _cmalloc (sizeof_cygheap (n));
   if (c)
     memset (c->data, 0, n);
-#ifdef DEBUGGING
   if (!c)
     system_printf ("ccalloc returned NULL");
-#endif
   return creturn (x, c, n);
 }
 

@@ -1,3 +1,19 @@
+2004-03-21  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.cc (init_cheap): Add ability to specify minimal cygwin heap
+	size when debugging.
+	(_csbrk): Report error in allocation to stderr.
+	(ccalloc): Ditto.
+	* dtable.cc (dtable::find_fifo): Remove use of atoms.
+	* dtable.h (dtable::find_fifo): Ditto.
+	* fhandler.h (fhandler_fifo): Ditto.
+	* fhandler_fifo.cc (fhandler_fifo::fhandler_fifo): Ditto.
+	(fhandler_fifo::set_use): Ditto.
+	(fhandler_fifo::open_not_mine): Ditto.
+	(fhandler_fifo::open): Ditto.
+	* pinfo.cc (_pinfo::commune_recv): Ditto.
+	(_pinfo::commune_send): Ditto.
+
 2004-03-19  Pierre Humblet <pierre.humblet@ieee.org>
 
         * dir.cc (rmdir): Reorganize error handling to reduce indentation.
