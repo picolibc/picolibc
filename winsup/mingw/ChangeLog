@@ -1,5 +1,10 @@
 2003-02-10  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/math.h: Remove _CRTIMP from pow() prototype,
+	unless __NO_ISOCEXT.
+
+2003-02-10  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* mingwex/math/cephes_emath.h: Don't redefine INFINITY.
 
 2003-02-10  Danny Smith  <dannysmith@users.sourceforge.net>

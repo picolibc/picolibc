@@ -159,7 +159,10 @@ _CRTIMP double __cdecl atan2 (double, double);
 _CRTIMP double __cdecl exp (double);
 _CRTIMP double __cdecl log (double);
 _CRTIMP double __cdecl log10 (double);
-_CRTIMP double __cdecl pow (double, double);
+#ifdef __NO_ISOCEXT
+_CRTIMP
+#endif
+	double __cdecl pow (double, double);
 _CRTIMP double __cdecl sqrt (double);
 _CRTIMP double __cdecl ceil (double);
 _CRTIMP double __cdecl floor (double);
