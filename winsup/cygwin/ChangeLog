@@ -1,3 +1,10 @@
+Mon Apr 30 12:35:40 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (path_conv::check): Don't use path_flags when converting to
+	MS-DOS syntax unless parsing tail of path component.  Stop parsing path
+	when we reach the 'root' of the path.  Correctly copy tail to path
+	component.
+
 Sun Apr 29 22:28:06 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (INIT_EXCEPTION_HANDLER): Eliminate.

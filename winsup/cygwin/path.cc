@@ -388,7 +388,7 @@ path_conv::check (const char *src, unsigned opt,
 	{
 	  const suffix_info *suff;
 	  char pathbuf[MAX_PATH];
-	  char *full_path;
+	  char *full_path, *rel_path, *realpath;
 
 	  /* Don't allow symlink.check to set anything in the path_conv
 	     class if we're working on an inner component of the path */
@@ -396,17 +396,21 @@ path_conv::check (const char *src, unsigned opt,
 	    {
 	      suff = NULL;
 	      sym.pflags = 0;
-	      full_path = pathbuf;
+	      rel_path = NULL;
+	      realpath = full_path = pathbuf;
 	    }
 	  else
 	    {
 	      suff = suffixes;
 	      sym.pflags = path_flags;
-	      full_path = this->path;
+	      if (opt & PC_FULL)
+		rel_path = NULL, realpath = full_path = this->path;
+	      else
+		realpath = rel_path = this->path, full_path = pathbuf;
 	    }
 
-	  error = mount_table->conv_to_win32_path (path_copy, NULL, full_path, devn,
-						   unit, &path_flags);
+	  error = mount_table->conv_to_win32_path (path_copy, rel_path, full_path, devn,
+						   unit, &sym.pflags);
 
 	  if (devn != FH_BAD)
 	    {
@@ -415,24 +419,24 @@ path_conv::check (const char *src, unsigned opt,
 	    }
 
 	  /* Eat trailing slashes */
-	  char *dostail = strchr (full_path, '\0');
+	  char *dostail = strchr (realpath, '\0');
 
 	  /* If path is only a drivename, Windows interprets it as the current working
 	     directory on this drive instead of the root dir which is what we want. So
 	     we need the trailing backslash in this case. */
-	  while (dostail > full_path + 3 && (*--dostail == '\\'))
+	  while (dostail > realpath + 3 && (*--dostail == '\\'))
 	    *tail = '\0';
 
-	  if (full_path[0] && full_path[1] == ':' && full_path[2] == '\0')
-	    strcat (full_path, "\\");
+	  if (realpath[0] && realpath[1] == ':' && realpath[2] == '\0')
+	    strcat (realpath, "\\");
 
 	  if ((opt & PC_SYM_IGNORE) && pcheck_case == PCHECK_RELAXED)
 	    {
-	      fileattr = GetFileAttributesA (full_path);
+	      fileattr = GetFileAttributesA (realpath);
 	      goto out;
 	    }
 
-	  int len = sym.check (full_path, suff, opt);
+	  int len = sym.check (realpath, suff, opt);
 
 	  if (sym.case_clash)
 	    {
@@ -507,7 +511,7 @@ path_conv::check (const char *src, unsigned opt,
 	  if (tail != path_end)
 	    *tail = '/';
 
-	  if (!newtail)
+	  if (!newtail || newtail == path_copy || (newtail == path_copy + 1 && newtail[-1] == '/'))
 	    goto out;	// all done
 
 	  tail = newtail;
@@ -527,7 +531,7 @@ path_conv::check (const char *src, unsigned opt,
 
       MALLOC_CHECK;
 
-      int taillen = strlen (tail + 1);
+      int taillen = strlen (++tail);
       int buflen = strlen (sym.contents);
       if (buflen + taillen > MAX_PATH)
 	  {
@@ -554,7 +558,7 @@ path_conv::check (const char *src, unsigned opt,
       
       for (p = sym.contents; *p; p++)
 	*headptr++ = *p == '\\' ? '/' : *p;
-      if (tail == path_end)
+      if (tail >= path_end)
 	*headptr = '\0';
       else
 	{
@@ -565,7 +569,6 @@ path_conv::check (const char *src, unsigned opt,
       src = tmp_buf;
     }
 
-/*fillin:*/
   if (!(opt & PC_SYM_CONTENTS))
     add_ext_from_sym (sym);
 
@@ -586,7 +589,10 @@ out:
   DWORD serial, volflags;
   char fs_name[16];
 
-  strcpy (tmp_buf, this->path);
+  if (isabspath (this->path))
+    strcpy (tmp_buf, this->path);
+  else
+    cygheap->cwd.get (tmp_buf, 1, 1, MAX_PATH);
   if (allow_ntsec && (!rootdir (tmp_buf) ||
       !GetVolumeInformation (tmp_buf, NULL, 0, &serial, NULL,
       			     &volflags, fs_name, 16)))
