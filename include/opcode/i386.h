@@ -85,7 +85,7 @@ static const template i386_optab[] =
 #define MOV_AX_DISP32 0xa0
 /* In the 64bit mode the short form mov immediate is redefined to have
    64bit displacement value.  */
-{ "mov",   2,	0xa0, X, CpuNo64,bwlq_Suf|D|W,			{ Disp16|Disp32, Acc, 0 } },
+{ "mov",   2,	0xa0, X, CpuNo64,bwl_Suf|D|W,			{ Disp16|Disp32, Acc, 0 } },
 { "mov",   2,	0x88, X, 0,	 bwlq_Suf|D|W|Modrm,		{ Reg, Reg|AnyMem, 0} },
 /* In the 64bit mode the short form mov immediate is redefined to have
    64bit displacement value.  */
@@ -109,7 +109,7 @@ static const template i386_optab[] =
 { "mov",   2, 0x0f20, X, Cpu64,	 q_Suf|D|Modrm|IgnoreSize|NoRex64,{ Control, Reg64|InvMem, 0} },
 { "mov",   2, 0x0f21, X, Cpu386|CpuNo64, l_Suf|D|Modrm|IgnoreSize,{ Debug, Reg32|InvMem, 0} },
 { "mov",   2, 0x0f21, X, Cpu64,	 q_Suf|D|Modrm|IgnoreSize|NoRex64,{ Debug, Reg64|InvMem, 0} },
-{ "mov",   2, 0x0f24, X, Cpu386, l_Suf|D|Modrm|IgnoreSize,	{ Test, Reg32|InvMem, 0} },
+{ "mov",   2, 0x0f24, X, Cpu386|CpuNo64, l_Suf|D|Modrm|IgnoreSize,	{ Test, Reg32|InvMem, 0} },
 { "movabs",2,	0xa0, X, Cpu64, bwlq_Suf|D|W,			{ Disp64, Acc, 0 } },
 { "movabs",2,	0xb0, X, Cpu64,	q_Suf|W|ShortForm,		{ Imm64, Reg64, 0 } },
 
@@ -219,8 +219,8 @@ static const template i386_optab[] =
 {"cli",	   0,	0xfa, X, 0,	 NoSuf,			{ 0, 0, 0} },
 {"clts",   0, 0x0f06, X, Cpu286, NoSuf,			{ 0, 0, 0} },
 {"cmc",	   0,	0xf5, X, 0,	 NoSuf,			{ 0, 0, 0} },
-{"lahf",   0,	0x9f, X, CpuNo64,NoSuf,			{ 0, 0, 0} },
-{"sahf",   0,	0x9e, X, CpuNo64,NoSuf,			{ 0, 0, 0} },
+{"lahf",   0,	0x9f, X, 0,	 NoSuf,			{ 0, 0, 0} },
+{"sahf",   0,	0x9e, X, 0,	 NoSuf,			{ 0, 0, 0} },
 {"pushf",  0,	0x9c, X, CpuNo64,wl_Suf|DefaultSize,	{ 0, 0, 0} },
 {"pushf",  0,	0x9c, X, Cpu64,	 wq_Suf|DefaultSize|NoRex64,{ 0, 0, 0} },
 {"popf",   0,	0x9d, X, CpuNo64,wl_Suf|DefaultSize,	{ 0, 0, 0} },
@@ -578,7 +578,7 @@ static const template i386_optab[] =
 {"sgdt",   1, 0x0f01, 0, Cpu286|CpuNo64, wl_Suf|Modrm,		{ WordMem, 0, 0} },
 {"sgdt",   1, 0x0f01, 0, Cpu64, q_Suf|Modrm|NoRex64,		{ LLongMem, 0, 0} },
 {"sidt",   1, 0x0f01, 1, Cpu286|CpuNo64, wl_Suf|Modrm,		{ WordMem, 0, 0} },
-{"sidt",   1, 0x0f01, 1, Cpu64, q_Suf|Modrm,		{ LLongMem, 0, 0} },
+{"sidt",   1, 0x0f01, 1, Cpu64, q_Suf|Modrm|NoRex64,		{ LLongMem, 0, 0} },
 {"sldt",   1, 0x0f00, 0, Cpu286, wlq_Suf|Modrm,		{ WordReg|InvMem, 0, 0} },
 {"sldt",   1, 0x0f00, 0, Cpu286, w_Suf|Modrm|IgnoreSize,{ ShortMem, 0, 0} },
 {"smsw",   1, 0x0f01, 4, Cpu286, wlq_Suf|Modrm,		{ WordReg|InvMem, 0, 0} },
@@ -912,8 +912,8 @@ static const template i386_optab[] =
 /* Pentium II/Pentium Pro extensions.  */
 {"sysenter",0, 0x0f34, X, Cpu686, NoSuf,		{ 0, 0, 0} },
 {"sysexit", 0, 0x0f35, X, Cpu686, NoSuf,		{ 0, 0, 0} },
-{"fxsave",  1, 0x0fae, 0, Cpu686, FP|Modrm,		{ LLongMem, 0, 0} },
-{"fxrstor", 1, 0x0fae, 1, Cpu686, FP|Modrm,		{ LLongMem, 0, 0} },
+{"fxsave",  1, 0x0fae, 0, Cpu686, q_Suf|Modrm,		{ LLongMem, 0, 0} },
+{"fxrstor", 1, 0x0fae, 1, Cpu686, q_Suf|Modrm,		{ LLongMem, 0, 0} },
 {"rdpmc",   0, 0x0f33, X, Cpu686, NoSuf,		{ 0, 0, 0} },
 /* official undefined instr. */
 {"ud2",	    0, 0x0f0b, X, Cpu686, NoSuf,		{ 0, 0, 0} },
@@ -1316,6 +1316,7 @@ static const template i386_optab[] =
 
 {"addsubpd",  2, 0x660fd0,  X, CpuPNI, NoSuf|IgnoreSize|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
 {"addsubps",  2, 0xf20fd0,  X, CpuPNI, NoSuf|IgnoreSize|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
+{"cmpxchg16b",1, 0x0fc7,    1, CpuPNI|Cpu64, NoSuf|Modrm|Rex64, { LLongMem, 0, 0} },
 {"fisttp",    1, 0xdf,      1, CpuPNI, sl_FP|Modrm,	{ ShortMem|LongMem, 0, 0} },
 {"fisttp",    1, 0xdd,      1, CpuPNI, q_FP|Modrm,	{ LLongMem, 0, 0} },
 {"fisttpll",  1, 0xdd,      1, CpuPNI, FP|Modrm,	{ LLongMem, 0, 0} },

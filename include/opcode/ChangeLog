@@ -1,4 +1,13 @@
-2004-11-23 Jan Beulich <jbeulich@novell.com>
+2004-11-25 Jan Beulich  <jbeulich@novell.com>
+
+	* i386.h: CpuNo64 mov can't reasonably have a 'q' suffix. Moves
+	to/from test registers are illegal in 64-bit mode. Add missing
+	NoRex64 to sidt. fxsave/fxrstor now allow for a 'q' suffix
+	(previously one had to explicitly encode a rex64 prefix). Re-enable
+	lahf/sahf in 64-bit mode as at least some Athlon64/Opteron steppings
+	support it there. Add cmpxchg16b as per Intel's 64-bit documentation.
+
+2004-11-23 Jan Beulich  <jbeulich@novell.com>
 
 	* i386.h (i386_optab): paddq and psubq, even in their MMX form, are
 	available only with SSE2. Change the MMX additions introduced by SSE
@@ -35,7 +44,7 @@
 	(cris_imm_oprnd_size_type): New members SIZE_FIELD_SIGNED and
 	SIZE_FIELD_UNSIGNED.
 
-2004-11-04 Jan Beulich <jbeulich@novell.com>
+2004-11-04 Jan Beulich  <jbeulich@novell.com>
 
 	* i386.h (sldx_Suf): Remove.
 	(FP, l_FP, sl_FP, x_FP): Don't imply IgnoreSize.
