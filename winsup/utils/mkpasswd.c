@@ -525,6 +525,9 @@ main (int argc, char **argv)
       if (!GetUserName (name, (len = 256, &len)))
 	strcpy (name, "unknown");
 
+      if (passed_home_path[0] == '\0')
+	strcpy (passed_home_path, "/home/");
+
       printf ("%s::%ld:%ld::%s%s:/bin/bash\n", name,
 					     DOMAIN_USER_RID_ADMIN,
 					     DOMAIN_ALIAS_RID_ADMINS,
