@@ -571,6 +571,8 @@ class fhandler_dev_tape: public fhandler_dev_raw
 
 class fhandler_disk_file: public fhandler_base
 {
+  void touch_ctime (void);
+
  public:
   fhandler_disk_file ();
 

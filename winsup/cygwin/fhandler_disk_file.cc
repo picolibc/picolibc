@@ -376,6 +376,18 @@ fhandler_disk_file::fstat (struct __stat64 *buf)
   return fstat_fs (buf);
 }
 
+void
+fhandler_disk_file::touch_ctime (void)
+{
+  SYSTEMTIME st;
+  FILETIME ft;
+
+  GetSystemTime (&st);
+  SystemTimeToFileTime (&st, &ft);
+  if (!SetFileTime (get_io_handle (), &ft, NULL, NULL))
+    debug_printf ("SetFileTime (%s) failed, %E", get_win32_name ());
+}
+
 int __stdcall
 fhandler_disk_file::fchmod (mode_t mode)
 {
@@ -391,9 +403,13 @@ fhandler_disk_file::fchmod (mode_t mode)
       enable_restore_privilege ();
       if (!get_io_handle () && pc.has_acls ())
 	{
-	  query_open (query_write_control);
-	  if (!(oret = open_fs (O_BINARY, 0)))
-	    return -1;
+	  /* Open for writing required to be able to set ctime. */
+	  if (!(oret = open_fs (O_WRONLY | O_BINARY, 0)))
+	    {
+	      query_open (query_write_control);
+	      if (!(oret = open_fs (O_BINARY, 0)))
+		return -1;
+	    }
 	}
 
       if (!allow_ntsec && allow_ntea) /* Not necessary when manipulating SD. */
@@ -404,9 +420,6 @@ fhandler_disk_file::fchmod (mode_t mode)
 			       ILLEGAL_UID, ILLEGAL_GID, mode)
 	  && allow_ntsec)
 	res = 0;
-
-      if (oret)
-	close_fs ();
     }
 
   /* if the mode we want has any write bits set, we can't be read only. */
@@ -420,6 +433,12 @@ fhandler_disk_file::fchmod (mode_t mode)
   else if (!allow_ntsec || !pc.has_acls ())
     /* Correct NTFS security attributes have higher priority */
     res = 0;
+
+  if (!res && !query_open ())
+    touch_ctime ();
+
+  if (oret)
+    close_fs ();
 
   return res;
 }
@@ -439,9 +458,13 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
   enable_restore_privilege ();
   if (!get_io_handle ())
     {
-      query_open (query_write_control);
-      if (!(oret = open_fs (O_BINARY, 0)))
-	return -1;
+      /* Open for writing required to be able to set ctime. */
+      if (!(oret = open_fs (O_WRONLY | O_BINARY, 0)))
+        {
+	  query_open (query_write_control);
+	  if (!(oret = open_fs (O_BINARY, 0)))
+	    return -1;
+      	}
     }
 
   mode_t attrib = 0;
@@ -449,8 +472,12 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
     attrib |= S_IFDIR;
   int res = get_file_attribute (pc.has_acls (), get_io_handle (), pc, &attrib);
   if (!res)
-    res = set_file_attribute (pc.has_acls (), get_io_handle (), pc,
-			      uid, gid, attrib);
+    {
+      res = set_file_attribute (pc.has_acls (), get_io_handle (), pc,
+				uid, gid, attrib);
+      if (!res && !query_open ())
+	touch_ctime ();
+    }
 
   if (oret)
     close_fs ();
@@ -518,9 +545,16 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 	enable_restore_privilege ();
       if (!get_io_handle ())
 	{
-	  query_open (cmd == SETACL ? query_write_control : query_read_control);
-	  if (!(oret = open_fs (O_BINARY, 0)))
-	    return -1;
+	  /* Open for writing required to be able to set ctime. */
+	  if (cmd == SETACL)
+	    oret = open_fs (O_WRONLY | O_BINARY, 0);
+	  if (!oret)
+	    {
+	      query_open (cmd == SETACL ? query_write_control
+	      				: query_read_control);
+	      if (!(oret = open_fs (O_BINARY, 0)))
+		return -1;
+	    }
 	}
       switch (cmd)
 	{
@@ -541,6 +575,9 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 	    break;
 	}
     }
+
+  if (!res && cmd == SETACL && !query_open ())
+    touch_ctime ();
 
   if (oret)
     close_fs ();
