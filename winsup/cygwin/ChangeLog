@@ -1,3 +1,10 @@
+2002-08-19  Christopher Faylor  <cgf@redhat.com>
+
+	* pinfo.h (pinfo::remember): Arrange for destructor call if
+	proc_subproc returns error.
+	* sigproc.cc (zombies): Store 1 + total zombies since proc_subproc uses
+	NZOMBIES element.
+
 2002-08-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* pwdgrp.h (pwdgrp_read::pwdgrp_read): Remove.

@@ -107,7 +107,7 @@ Static HANDLE events[PSIZE + 1];	  // All my children's handles++
 #define hchildren (events + 1)		// Where the children handles begin
 Static char cpchildren[PSIZE * sizeof (pinfo)];		// All my children info
 Static int nchildren;			// Number of active children
-Static char czombies[NZOMBIES * sizeof (pinfo)];		// All my deceased children info
+Static char czombies[(NZOMBIES + 1) * sizeof (pinfo)];		// All my deceased children info
 Static int nzombies;			// Number of deceased children
 
 #define pchildren ((pinfo *) cpchildren)
