@@ -60,7 +60,7 @@ heap_init ()
 		   cygheap->heapbase, cygwin_shared->heap_chunk_size (), myself->pid);
       if (p != cygheap->heapbase)
 	api_fatal ("heap allocated but not at %p", cygheap->heapbase);
-      if (! VirtualAlloc (cygheap->heapbase, allocsize, MEM_COMMIT, PAGE_READWRITE))
+      if (!VirtualAlloc (cygheap->heapbase, allocsize, MEM_COMMIT, PAGE_READWRITE))
 	api_fatal ("MEM_COMMIT failed, %E");
     }
   else

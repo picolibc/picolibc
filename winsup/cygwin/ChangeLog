@@ -1,5 +1,10 @@
 2002-10-18  Christopher Faylor  <cgf@redhat.com>
 
+	* cygthread.cc: Bump number of cygthreads up to accommodate
+	applications which use ttys.
+
+2002-10-18  Christopher Faylor  <cgf@redhat.com>
+
 	* fork.cc (fork_child): Move mmap initialization.
 	* shared.cc (shared_info::heap_chunk_size): Store info as megabytes.
 	Search HKEY_LOCAL_MACHINE as well as HKEY_CURRENT_USER.
