@@ -163,6 +163,16 @@ int _EXFUN(nanosleep, (const struct timespec  *rqtp, struct timespec *rmtp));
 #ifdef __cplusplus
 }
 #endif
+#else
+#ifdef __CYGWIN__
+#ifdef __cplusplus
+extern "C" {
+#endif
+int _EXFUN(nanosleep, (const struct timespec  *rqtp, struct timespec *rmtp));
+#ifdef __cplusplus
+}
+#endif
+#endif /* __CYGWIN__ */
 #endif /* _POSIX_TIMERS */
 
 #ifdef __cplusplus

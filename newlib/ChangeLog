@@ -1,3 +1,7 @@
+2003-01-29  Jason Tishler  <jason@tishler.net>
+
+	* libc/include/time.h: Declare nanosleep() under Cygwin.
+
 2003-01-24  Nick Clifton  <nickc@redhat.com>
 
 	* Add sh2e support:
