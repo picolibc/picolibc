@@ -73,11 +73,11 @@ clean:
 	rm -f *.o *.dll
 
 install: all
-	$(SHELL) $(updir1)/mkinstalldirs $(bindir)
-	for i in $(PROGS) ; do \
-	  n=`echo $$i | sed '$(program_transform_name)'`; \
-	  $(INSTALL_PROGRAM) $$i $(bindir)/$$n; \
-	done
+	# $(SHELL) $(updir1)/mkinstalldirs $(bindir)
+	# for i in $(PROGS) ; do \
+	#   n=`echo $$i | sed '$(program_transform_name)'`; \
+	#   $(INSTALL_PROGRAM) $$i $(bindir)/$$n; \
+	# done || exit 0
 
 %.o: %.c
 ifdef VERBOSE
