@@ -1644,7 +1644,7 @@ fhandler_base::fork_fixup (HANDLE parent, HANDLE &h, const char *name)
     {
       debug_printf ("%s success - oldh %p, h %p", get_name (), oh, h);
       // someday, maybe ProtectHandle2 (h, name);
-      setclexec_pid (h, h, !get_close_on_exec ());
+      setclexec_pid (oh, h, !get_close_on_exec ());
     }
 #endif
 }

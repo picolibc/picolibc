@@ -1,5 +1,10 @@
 2001-10-30  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler.cc (fhandler_base::fork_fixup): Pass old handle to
+	setclexec_pid.
+
+2001-10-30  Christopher Faylor  <cgf@redhat.com>
+
 	* cygheap.h (cygheap_fdmanip::cygheap_fdmanip): Clear fh.
 	(cygheap_fdmanip::isopen): New method.
 	* syscalls.cc (_read): Avoid accessing closed fd.
