@@ -1,3 +1,7 @@
+2002-02-02  H.J. Lu  (hjl@gnu.org)
+
+	* demangle.h (cplus_demangle_v3_type): New prototype.
+
 2002-01-31  Ivan Guzvinec  <ivang@opencores.org>
 
 	* dis-asm.h : Add support for or32 targets
