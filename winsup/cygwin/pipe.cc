@@ -380,7 +380,7 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode, bool fif
 	}
     }
 
-  syscall_printf ("%d = ([%p, %p], %d, %p)", res, fhs[0], fhs[1], psize, mode);
+  syscall_printf ("%d = pipe ([%p, %p], %d, %p)", res, fhs[0], fhs[1], psize, mode);
   return res;
 }
 

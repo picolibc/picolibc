@@ -914,7 +914,6 @@ fhandler_base::write (const void *ptr, size_t len)
 	}
     }
 
-  debug_printf ("%d = write (%p, %d)", res, ptr, len);
   return res;
 }
 

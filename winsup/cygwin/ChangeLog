@@ -1,5 +1,10 @@
 2004-11-20  Pierre Humblet <pierre.humblet@ieee.org>
 
+	* fhandler.cc (fhandler::write): Remove debug_printf.
+	* pipe.cc (fhandler_pipe::create): Edit syscall_printf format.
+
+2004-11-20  Pierre Humblet <pierre.humblet@ieee.org>
+
 	* cygheap.h (cygheap_user::get_windows_id): New method.
 	* registry.h (get_registry_hive_path): Change argument type.
 	(load_registry_hive): Ditto.
