@@ -1,7 +1,7 @@
 2005-02-25  Corinna Vinschen  <corinna@vinschen.de>
 
-	* mmap.cc (mmap64): Handle MAP_FIXED request on non-granulation
-	boundary.
+	* mmap.cc (mmap64): Handle anonymous MAP_FIXED request on
+	non-granulation boundary.
 
 2005-02-25  Corinna Vinschen  <corinna@vinschen.de>
 
@@ -12,7 +12,7 @@
 	mapping can be used.
 	Only use existing mapping if requested access mode matches the one
 	in the existing mapping.
-	Add check for existing mapping for MAP_FIXED case.
+	Add check for existing mapping for anonymous MAP_FIXED case.
 
 2005-02-23  Corinna Vinschen  <corinna@vinschen.de>
 	
