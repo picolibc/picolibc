@@ -35,12 +35,8 @@ char * __stdcall
 shared_name (char *ret_buf, const char *str, int num)
 {
   extern bool _cygwin_testing;
-  static const char *prefix =
-    wincap.has_terminal_services ()
-    && (set_process_privilege (SE_CREATE_GLOBAL_NAME, true) >= 0
-	|| GetLastError () == ERROR_NO_SUCH_PRIVILEGE) ? "Global\\" : "";
 
-  __small_sprintf (ret_buf, "%s%s.%s.%d", prefix,
+  __small_sprintf (ret_buf, "%s%s.%s.%d", cygheap->shared_prefix,
 		   cygwin_version.shared_id, str, num);
   if (_cygwin_testing)
     strcat (ret_buf, cygwin_version.dll_build_date);

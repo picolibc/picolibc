@@ -254,6 +254,7 @@ struct init_cygheap
   char *cygwin_regname;
   cwdstuff cwd;
   dtable fdtab;
+  const char *shared_prefix;
 #ifdef DEBUGGING
   cygheap_debug debug;
 #endif

@@ -206,6 +206,12 @@ cygheap_init ()
     cygheap->fdtab.init ();
   if (!cygheap->sigs)
     sigalloc ();
+  if (!cygheap->shared_prefix)
+    cygheap->shared_prefix = cstrdup (
+	    wincap.has_terminal_services ()
+	    && (set_process_privilege (SE_CREATE_GLOBAL_NAME, true) >= 0
+		|| GetLastError () == ERROR_NO_SUCH_PRIVILEGE)
+	    ? "Global\\" : "");
 }
 
 /* Copyright (C) 1997, 2000 DJ Delorie */
