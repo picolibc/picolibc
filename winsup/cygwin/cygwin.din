@@ -919,6 +919,7 @@ bind = cygwin_bind
 connect = cygwin_connect
 herror = cygwin_herror
 inet_addr = cygwin_inet_addr
+inet_network = cygwin_inet_network
 inet_netof
 inet_makeaddr
 listen = cygwin_listen

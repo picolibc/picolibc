@@ -1,3 +1,8 @@
+2000-04-24  Vadim Egorov  <egorovv@mailandnews.com>
+
+	* net.cc (cygwin_inet_network): new function.
+	* cygwin.din (inet_network): new export
+
 Fri Apr 21 10:37:08 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (normalize_posix_path): Previous two patches were still
