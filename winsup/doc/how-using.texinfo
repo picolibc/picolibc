@@ -182,18 +182,18 @@ backward-slashes ('\').  (But see the warning below!)  This maps in the
 obvious way to the Windows path, but will be converted internally to use
 the Cygwin path, following mounts (default or explicit).  For example:
 @example
-	bash-2.03$ cd C:/Windows
-	bash-2.03$ pwd
+	bash$ cd C:/Windows
+	bash$ pwd
         /cygdrive/c/Windows
 @end example
 and
 @example
-	bash-2.03$ cd C:/cygwin
-	bash-2.03$ pwd
+	bash$ cd C:/cygwin
+	bash$ pwd
         /
 @end example
-for a default setup.  (You could also use backward-slashes in the
-Windows path, but these would have to be escaped from the shell.)
+for a default setup.  You could also use backward-slashes in the
+Windows path, but these would have to be escaped from the shell.
 
 @strong{Warning:} There is some ambiguity in going from a Windows path
 to the posix path, because different posix paths, through different
@@ -209,9 +209,12 @@ You can avoid the ambiguity of Windows paths, and avoid typing
 	bash$ mount c:/ /c
 	bash$ ls /c
 @end example
+Then @samp{/cygdrive/c/Windows} becomes @samp{/c/Windows} which is a
+little less typing.
+
 Note that you only need to mount drives once.  The mapping is kept
 in the registry so mounts stay valid pretty much indefinitely.
-You can only get rid of them with umount (or the registry editor).
+You can only get rid of them with umount, or the registry editor.
 
 The '-b' option to mount mounts the mountpoint in binary mode
 ("binmode") where text and binary files are treated equivalently.  This
@@ -220,6 +223,13 @@ flags are missing from open calls.  It is also the setting for /,
 /usr/bin and /usr/lib in a default Cygwin installation.  The default for
 new mounts is text mode ("textmode"), which is also the mode for all
 "cygdrive" mounts.
+
+You can change the default @samp{cygdrive} prefix and whether it is
+binmode or textmode using the @code{mount} command.  For example,
+@example
+	bash$ mount -b --change-cygdrive-prefix cygdrive
+@end example
+will change all @code{/cygdrive/...} mounts to binmode.
 
 @subsection How can I copy and paste into Cygwin console windows?
 
