@@ -424,7 +424,7 @@ err:
   res.n = 0;
 out:
   myself->hello_pid = 0;
-  LeaveCriticalSection (&lock);
+  LeaveCriticalSection (&myself->lock);
   return res;
 }
 

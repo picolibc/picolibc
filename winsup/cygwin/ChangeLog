@@ -1,3 +1,8 @@
+2003-01-05  Christopher Faylor  <cgf@redhat.com>
+
+	* pinfo.cc (_pinfo::commune_send): Use myself->lock rather than just
+	lock when leaving.
+
 2003-01-03  Christopher Faylor  <cgf@redhat.com>
 
 	* dtable.h (dtable::in_vfork_cleanup): New function.  True if vfork
