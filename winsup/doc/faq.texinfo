@@ -8,7 +8,6 @@
 
 @include what.texinfo
 @include install.texinfo
-@include calls.texinfo
 @include how.texinfo
 @include relnotes.texinfo
 @include history.texinfo

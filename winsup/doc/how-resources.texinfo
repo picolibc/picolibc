@@ -33,7 +33,7 @@ cygwin-subscribe@@cygwin.com.  To unsubscribe from the
 main list, send a message to cygwin-unsubscribe@@cygwin.com.
 In both cases, the subject and body of the message are ignored.
 
-Similarly, to subscribe to the Cygwin annoucements list, send a message
+Similarly, to subscribe to the Cygwin announcements list, send a message
 to cygwin-announce-subscribe@@cygwin.com.  To unsubscribe,
 send a message to cygwin-announce-unsubscribe@@cygwin.com.
 

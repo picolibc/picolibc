@@ -43,7 +43,7 @@ would be difficult.
 Objective C is not distributed with the Cygwin version of gcc, and there
 are no plans to do so.  The gcc package maintainer had difficulty
 building it, and once built there were problems using it.  It appears
-that there is only minimual support for the Objective C front-end in the
+that there is only minimal support for the Objective C front-end in the
 main GCC distribution, anyway.
 
 @subsection Why is make behaving badly?
@@ -185,7 +185,7 @@ No, you must use one or the other, they are mutually exclusive.
 The default during compilation is to produce a console application.
 It you are writing a GUI program, you should either compile with
 -mwindows as explained above, or add the string
-"-Wl,--subsystem,windows" to the GCC commandline.
+"-Wl,--subsystem,windows" to the GCC command line.
 
 @subsection Why does make complain about a "missing separator"?
 
@@ -223,7 +223,7 @@ or
 @enumerate
 @item Extract all the object files from the .lib using LIB.EXE.
 @item Build a dummy C file referencing all the functions you need, either
-      withth a direct call or through an initialized function pointer.
+      with a direct call or through an initialized function pointer.
 @item Build a dummy LibMain.
 @item Link all the objects with this file+LibMain.
 @item Write a .def.
@@ -318,7 +318,7 @@ gcc as:
 
 @code{gcc -Wl,--heap,1024,--stack,4096 -o foo foo.c}
 
-@subsection How can I find out which dlls are needed by an executable?
+@subsection How can I find out which DLLs are needed by an executable?
 
 @samp{objdump -p} provides this information, but is rather verbose.
 
@@ -461,8 +461,8 @@ like -ltcl80 in your linker command.
 
 You can debug your application using @code{gdb}.  Make sure you
 compile it with the -g flag!  If your application calls functions in
-MS dlls, gdb will complain about not being able to load debug information
-for them when you run your program.  This is normal since these dlls
+MS DLLs, gdb will complain about not being able to load debug information
+for them when you run your program.  This is normal since these DLLs
 don't contain debugging information (and even if they did, that debug
 info would not be compatible with gdb).
 

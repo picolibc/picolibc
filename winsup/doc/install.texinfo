@@ -160,7 +160,7 @@ code.
 After installation, the package archives remain in your ``Local
 Package Directory'', by default the location of @code{setup.exe}.  You
 may conserve disk space by deleting the subdirectories there.  These
-directories will have very wierd looking names, being encoded with
+directories will have very weird looking names, being encoded with
 their URLs.
 
 @subsection What if setup fails?
@@ -169,7 +169,7 @@ First, make sure that you are using the latest version of Cygwin
 Setup.  The latest version is always available from the 'Install
 Cygwin now' link on the Cygwin Home Page at @file{http://cygwin.com/}.
 
-If you are downloading from the internet, setup will fail if it cannot
+If you are downloading from the Internet, setup will fail if it cannot
 download the list of mirrors at
 @file{http://cygwin.com/mirrors.html}.  It could be that
 the network is too busy.  Similarly for an ftp download site that isn't

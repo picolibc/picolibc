@@ -15,3 +15,5 @@ net release.)}
 @include changes.texinfo
 
 @include relnotes.texinfo
+
+@include calls.texinfo

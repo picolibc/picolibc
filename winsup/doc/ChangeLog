@@ -1,3 +1,13 @@
+2004-06-13  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* faq.texinfo: Move outdated calls.texinfo to readme.texinfo.
+	* how-api.texinfo: Fix typos.
+	* how-programming.texinfo: Fix typos.
+	* how-resources.texinfo: Fix typos.
+	* how-using.texinfo: Fix typos.
+	* install.texinfo: Fix typos.
+	* readme.texinfo: Move outdated calls.texinfo to readme.texinfo.
+
 2004-05-21  Brian Ford  <ford@vss.fsi.com>
 
 	* pathnames.sgml: Remove /dev/kmem from the supported POSIX
@@ -329,4 +339,3 @@ Tue May  3  0:25:00 2000  Corinna Vinschen <corinna@vinschen.de>
         the changes in release 1.1.
         * setup.sgml: Include ntsec.
         * setup-net.sgml: Ditto.
-

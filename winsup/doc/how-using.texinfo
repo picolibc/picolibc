@@ -10,7 +10,7 @@ repair the damage, you must run Cygwin Setup again, and re-install the
 @samp{libncurses5} package.
 
 Note that Cygwin Setup won't show this option by default.  In the
-``Select packages to install'' dialogue, click on the @samp{Full/Part}
+``Select packages to install'' dialog, click on the @samp{Full/Part}
 button.  This lists all packages, even those that are already
 installed.  Scroll down to locate the @samp{libncurses5} package.
 Click on the ``cycle'' glyph until it says ``Reinstall''.  Continue
@@ -345,9 +345,9 @@ rather behave strangely, for example, with NumLock off, keys on numeric
 keyboard work, until you press usual cursor keys, when even numeric
 stop working, but they start working again after hitting alphanumeric
 key, etc. This reported to happen on localized versions of Win98 and
-Win95, and not specific to Cygwin (there're known cases of Alt+Enter
+Win95, and not specific to Cygwin; there are known cases of Alt+Enter
 (fullscreen/windowed toggle) not working and shifts sticking with
-other programs). The cause of this problem is Microsoft keyboard
+other programs. The cause of this problem is Microsoft keyboard
 localizer which by default installed in 'autoexec.bat'. Corresponding
 line looks like:
 
@@ -358,7 +358,7 @@ keyb ru,,C:\WINDOWS\COMMAND\keybrd3.sys
 (That's for russian locale.) You should comment that line if you want
 your keys working properly. Of course, this will deprive you of your
 local alphabet keyboard support, so you should think about
-another localizer. exUSSR users are of course knowledgeable of Keyrus
+another localizer. ex-USSR users are of course knowledgeable of Keyrus
 localizer, and it might work for other locales too, since it has keyboard
 layout editor. But it has russian messages and documentation ;-(
 Reference URL is http://www.hnet.ru/software/contrib/Utils/KeyRus/
@@ -377,7 +377,7 @@ cygwin1.dll without exiting @emph{all} Cygwin apps (including inetd)
 beforehand.
 
 If you're trying to find multiple versions of the DLL that are causing
-this problem, reboot first, in case DLL's still loaded in memory are the
+this problem, reboot first, in case DLLs still loaded in memory are the
 cause.  Then use the Windows System find utility to search your whole
 machine, not just components in your PATH (as 'type' would do) or
 cygwin-mounted filesystems (as Cygwin 'find' would do).
