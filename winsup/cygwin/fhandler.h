@@ -752,6 +752,7 @@ class dev_console
   int nargs_;
   unsigned rarg;
   bool saw_question_mark;
+  bool alternate_charset_active;
 
   char my_title_buf [TITLESIZE + 1];
 
@@ -788,6 +789,10 @@ class dev_console
   bool insert_mode;
   bool use_mouse;
   bool raw_win32_keyboard_mode;
+
+  BOOL con_to_str (char *d, const char *s, DWORD sz);
+  BOOL str_to_con (char *d, const char *s, DWORD sz);
+
   friend class fhandler_console;
 };
 

@@ -54,27 +54,6 @@ cp_convert (UINT destcp, char *dest, UINT srccp, const char *src, DWORD size)
   return TRUE;
 }
 
-/* The results of GetConsoleCP() and GetConsoleOutputCP() cannot be
-   cached, because a program or the user can change these values at
-   any time. */
-inline BOOL
-con_to_str (char *d, const char *s, DWORD sz)
-{
-  return cp_convert (get_cp (), d, GetConsoleCP (), s, sz);
-}
-
-inline BOOL
-str_to_con (char *d, const char *s, DWORD sz)
-{
-  if (alternate_charset_active)
-    {
-      /* no translation when alternate charset is active */
-      memcpy(d, s, sz);
-      return TRUE;
-    }
-  return cp_convert (GetConsoleOutputCP (), d, get_cp (), s, sz);
-}
-
 /*
  * Scroll the screen context.
  * x1, y1 - ul corner
@@ -185,6 +164,27 @@ set_console_state_for_spawn ()
 
   CloseHandle (h);
   return 1;
+}
+
+/* The results of GetConsoleCP() and GetConsoleOutputCP() cannot be
+   cached, because a program or the user can change these values at
+   any time. */
+inline BOOL
+dev_console::con_to_str (char *d, const char *s, DWORD sz)
+{
+  return cp_convert (get_cp (), d, GetConsoleCP (), s, sz);
+}
+
+inline BOOL
+dev_console::str_to_con (char *d, const char *s, DWORD sz)
+{
+  if (alternate_charset_active)
+    {
+      /* no translation when alternate charset is active */
+      memcpy(d, s, sz);
+      return TRUE;
+    }
+  return cp_convert (GetConsoleOutputCP (), d, get_cp (), s, sz);
 }
 
 BOOL
@@ -375,7 +375,7 @@ fhandler_console::read (void *pv, size_t& buflen)
 	      /* Need this check since US code page seems to have a bug when
 		 converting a CTRL-U. */
 	      if ((unsigned char) ich > 0x7f)
-		con_to_str (tmp + 1, tmp + 1, 1);
+		dev_state->con_to_str (tmp + 1, tmp + 1, 1);
 	      /* Determine if the keystroke is modified by META.  The tricky
 		 part is to distinguish whether the right Alt key should be
 		 recognized as Alt, or as AltGr. */
@@ -1118,10 +1118,10 @@ fhandler_console::char_command (char c)
 	       dev_state->intensity = INTENSITY_DIM;
 	       break;
              case 10:   /* end alternate charset */
-               alternate_charset_active = FALSE;
+               dev_state->alternate_charset_active = FALSE;
 	       break;
              case 11:   /* start alternate charset */
-               alternate_charset_active = TRUE;
+               dev_state->alternate_charset_active = TRUE;
 	       break;
 	     case 24:
 	       dev_state->underline = FALSE;
@@ -1434,7 +1434,7 @@ fhandler_console::write_normal (const unsigned char *src,
 	  DWORD buf_len;
 	  char buf[CONVERT_LIMIT];
 	  done = buf_len = min (sizeof (buf), len);
-	  if (!str_to_con (buf, (const char *) src, buf_len))
+	  if (!dev_state->str_to_con (buf, (const char *) src, buf_len))
 	    {
 	      debug_printf ("conversion error, handle %p",
 			    get_output_handle ());

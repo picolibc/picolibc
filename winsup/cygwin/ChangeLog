@@ -1,3 +1,17 @@
+2003-10-14  Micha Nelissen  <M.Nelissen@student.tue.nl>
+
+	* dcrt0.cc: Remove local variable alternate_charset_active.
+	* fhandler.h: Add variable alternate_charset_active, functions
+	str_to_con, con_to_str to dev_console structure.
+	* fhandler_console.cc (con_to_str): Move function into dev_console
+	class.
+	(str_to_con): Ditto.
+	(fhandler_console::read): Call con_to_str on dev_state.
+	(fhandler_console::write_normal): Call str_to_con on dev_state.
+	(fhandler_console::char_command): Change active_charset_active
+	assignment to be on dev_state.
+	* winsup.h: Remove global external variable alternate_charset_active.
+
 2003-10-13  Micha Nelissen  <M.Nelissen@student.tue.nl>
 
 	* fhandler_console.cc (char_command): Add escape sequence for codepage
