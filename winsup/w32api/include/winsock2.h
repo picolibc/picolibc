@@ -333,7 +333,7 @@ struct sockaddr {
 struct sockaddr_storage {
     short ss_family;
     char __ss_pad1[6];    /* pad to 8 */
-    long long __ss_align; /* force alignment */
+    __int64 __ss_align; /* force alignment */
     char __ss_pad2[112];  /* pad to 128 */
 };
 

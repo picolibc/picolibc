@@ -25,7 +25,7 @@ void* GetFiberData(void)
     return ret;
 }
 
-#else
+#elif !defined (__WATCOMC__)
 
 void* GetCurrentFiber(void)
 {

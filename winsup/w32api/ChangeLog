@@ -1,3 +1,12 @@
+2002-07-21  Bart Oldeman  <bart.oldeman@btinternet.com>
+
+	* include/shlobj.h (FCIDM_MENU_FAVORITES): Remove bogus
+	character.
+	* include/winsock2.h (struct sockaddr): Use __int64 instead of
+	long long.
+	* include/kernel32.c (GetCurrentFiber, GetFiberData): Watcom
+	does not need external *Fiber library functions.
+
 2002-07-20  Casper S. Hornstrup  <chorns@users.sourceforge.net>
 
 	* include/winbase.h (GetEnvironmentStringsA): Remove duplicate
