@@ -1,3 +1,25 @@
+2002-07-09  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_transport_pipes.cc: The main change is to make the
+	client try harder to connect to the server if it's previously
+	connected, and so has good grounds for believing that the server
+	is running.
+	(MAX_WAIT_NAMED_PIPE_RETRY): Change to be an enumerator.
+	(WAIT_NAMED_PIPE_TIMEOUT): Ditto.
+	(transport_layer_pipes::accept): Use interlocked operators on
+	`pipe_instance'.
+	(transport_layer_pipes::close): Rearrange so that FlushFileBuffers
+	and DisconnectNamedPipe are only called for accepted endpoints.
+	Use interlocked operators on `pipe_instance'.
+	(transport_layer_pipes::read): Use set_errno where required.
+	(transport_layer_pipes::write): Ditto.
+	(transport_layer_pipes::connect): Add local static variable
+	`assume_cygserver'.  Set it if a connection is made to cygserver,
+	clear it if a connection is not made even after retrying.  If set,
+	ignore all errors from CreateFile and retry the connection.  Catch
+	the situation where WaitNamedPipe fails to wait [sic] and add a
+	`Sleep (0)' so that the server gets a chance to run.
+
 2002-07-09  Christopher Faylor  <cgf@redhat.com>
 
 	* debug.cc: Avoid explicit zeroing of globals.
