@@ -1,3 +1,7 @@
+2002-05-03  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* configure.in (CC_FOR_NEWLIB): Change -isystem's to -I's.
+
 2002-05-01  Christopher Faylor  <cgf@redhat.com>
 
 	* utmp.h: Define more UNIX constants.
