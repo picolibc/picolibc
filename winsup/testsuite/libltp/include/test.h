@@ -54,7 +54,6 @@ int execvp(const char *, const char * const []);
 /* CGF: Avoid compilation warnings for undefined functions */
 extern int setregid (gid_t, gid_t);
 int setreuid (uid_t, uid_t);
-int gethostid (void);
 
 #define TPASS    0    /* Test passed flag */
 #define TFAIL    1    /* Test failed flag */

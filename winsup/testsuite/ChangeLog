@@ -1,3 +1,7 @@
+2003-05-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libltp/include/test.h: Remove gethostid declaration.
+
 2003-04-08  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* winsup.api/pthread/condvar9.c: Fix test.
