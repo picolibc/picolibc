@@ -1,7 +1,12 @@
+2002-08-02  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winbase.h (ReadFileScatter, WriteFileGather):
+	Change second parameter to pointer.
+
 2002-07-31  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wininet.h (InternetReadFileEx[AW]). Add prototypes and
-	UNICODE mapings.
+	UNICODE mappings.
 	* lib/wininet.def: Regenerate.
 
 2002-07-30  Danny Smith  <dannysmith@users.sourceforge.net>
@@ -11,7 +16,7 @@
 	(PVOID64): New typeddef.
 
 	* include/winnt,h (FILE_SEGMENT_ELEMENT): Define union.
-	* include/winbase.h: (ReadFileScatter, WriteFileGather):
+	* include/winbase.h (ReadFileScatter, WriteFileGather):
 	Add prototypes.
 
 	* include/winnt,h (PROCESSOR_ARCHITECTURE_*): Add defines.
