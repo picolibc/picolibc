@@ -1,3 +1,16 @@
+2002-09-12  Nick Clifton  <nickc@redhat.com>
+
+	* Import these changes from the config master repository:
+
+	2002-09-05  Svein E. Seldal  <Svein.Seldal@solidas.com>
+
+		* config.sub: Add tic4x target.
+
+	2002-09-03  Ben Elliston  <bje@redhat.com>
+
+		* config.guess: Detect NSR-D machines for nsr-tandem-nsk.
+		Reported by <Duncan_Stodart@insession.com>.
+
 2002-09-10  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* COPYING.NEWLIB: More updates.
