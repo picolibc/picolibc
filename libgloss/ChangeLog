@@ -1,3 +1,8 @@
+2003-08-26  Jason Merrill  <jason@redhat.com>
+
+	* sparc/elfsim.ld: Fix __EH_FRAME_BEGIN__ definition.
+	* sparc/sparc86x.ld: Likewise.
+
 2003-08-20  Chris Demetriou  <cgd@broadcom.com>
 
         * mips/crt0_cfe.S: New file.

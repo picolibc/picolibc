@@ -82,7 +82,6 @@ SECTIONS
   .text : {
     stext = .;
     _stext = .;
-    __EH_FRAME_BEGIN__ = .;
 
     CREATE_OBJECT_SYMBOLS
     *(.text)
@@ -108,6 +107,7 @@ SECTIONS
     *(.lit)
     *(.rodata)
     *(.shdata)
+    __EH_FRAME_BEGIN__ = .;
     *(.eh_frame)
     *(.gnu.linkonce.t*)
     *(.gnu.linkonce.r*)

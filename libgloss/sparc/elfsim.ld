@@ -95,7 +95,6 @@ SECTIONS
   {
     _stext = .;
     PROVIDE (stext = .);
-    __EH_FRAME_BEGIN__ = .;
     *(.text)
     _etext = .;
     PROVIDE (etext = .);
@@ -123,6 +122,7 @@ SECTIONS
     *(.lit)
     *(.rodata)
     *(.shdata)
+    __EH_FRAME_BEGIN__ = .;
     *(.eh_frame)
     *(.gnu.linkonce.t*)
     *(.gnu.linkonce.r*)
