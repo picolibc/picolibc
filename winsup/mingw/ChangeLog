@@ -1,5 +1,10 @@
 2004-02-05  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* mingwex/getopt.c: Define IS_POSIXLY_CORRECT as per
+	NetBSD getopt_long.c.
+
+2004-02-05  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* mingwex/strtold.c (__asctoe64) Reorganise. Fix setting error
 	codes and handling of special chars.
 

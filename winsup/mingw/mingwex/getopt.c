@@ -73,7 +73,11 @@ extern char __declspec(dllimport) *__progname;
 #define PRINT_ERROR	((opterr) && ((*options != ':') \
 				      || (IGNORE_FIRST && options[1] != ':')))
 
-#define IS_POSIXLY_CORRECT (getenv("POSIXLY_INCORRECT_GETOPT") == NULL)
+/* This differs from the cygwin implementation, which effectively defaults to
+   PC, but is consistent with the NetBSD implementation and doc's.  */
+#ifndef IS_POSIXLY_CORRECT
+#define IS_POSIXLY_CORRECT (getenv("POSIXLY_CORRECT") != NULL)
+#endif
 
 #define PERMUTE         (!IS_POSIXLY_CORRECT && !IGNORE_FIRST)
 /* XXX: GNU ignores PC if *options == '-' */
