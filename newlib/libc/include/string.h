@@ -13,6 +13,7 @@ extern "C" {
 
 #include "_ansi.h"
 #include <sys/reent.h>
+#include <sys/types.h>
 
 #define __need_size_t
 #include <stddef.h>

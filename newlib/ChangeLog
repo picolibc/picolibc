@@ -1,3 +1,7 @@
+Fri Mar 10 16:09:20 2000  Jeff Johnston <jjohnstn@cygnus.com>
+
+	* libc/include/string.h: Include <sys/types.h>.
+
 Fri Mar 10 14:53:50 2000  Alexandre Oliva  <oliva@lsd.ic.unicamp.br>
 
 	* libc/stdio/putw.c (putw): Return 0 on success, to be compliant
