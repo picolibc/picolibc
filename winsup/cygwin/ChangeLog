@@ -1,3 +1,7 @@
+Thu Aug 24 12:30:17 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* debug.h: Allow some debug defines for use in header files.
+
 Wed Aug 23 23:00:24 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dcrt0.cc (dll_crt0_1): Move exception list and constructor stuff

@@ -6,13 +6,14 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#define NO_DEBUG_DEFINES
 #include "winsup.h"
 #include "exceptions.h"
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "perthread.h"
+
+#undef CloseHandle
 
 static muto NO_COPY *threadname_lock = NULL;
 #define lock_threadname() \
