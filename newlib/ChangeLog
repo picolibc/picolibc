@@ -1,3 +1,7 @@
+2001-03-02  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/machine/ansi.h: New dummy header file.
+
 2001-02-22  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/machine/setjmp-dj.h: With DJ Delorie's permission,
