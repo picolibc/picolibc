@@ -1,3 +1,11 @@
+2002-05-26  Christopher Faylor  <cgf@redhat.com>
+
+	* strace.cc (attach_process): Don't tell process to start stracing
+	here.
+	(proc_child): Do it here, instead, after first debug event.  This
+	should work around inexplicable races with DebugActiveProcess.
+	(dostrace): Pass any pid argument to proc_child.
+
 2002-05-23  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
         * setfacl.c (usage): Standardize usage output. Change return type to

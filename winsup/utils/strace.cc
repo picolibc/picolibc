@@ -291,7 +291,6 @@ attach_process (pid_t pid)
   if (!DebugActiveProcess (child_pid))
     error (0, "couldn't attach to pid %d<%d> for debugging", pid, child_pid);
 
-  (void) cygwin_internal (CW_STRACE_TOGGLE, pid);
   printf ("Attached to pid %d (windows pid %u)\n", pid, (unsigned) child_pid);
   return;
 }
@@ -572,7 +571,7 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
 }
 
 static void
-proc_child (unsigned mask, FILE *ofile)
+proc_child (unsigned mask, FILE *ofile, pid_t pid)
 {
   DEBUG_EVENT ev;
   int processes = 0;
@@ -594,6 +593,12 @@ proc_child (unsigned mask, FILE *ofile)
 
       if (!debug_event)
 	continue;
+
+      if (pid)
+	{
+	  (void) cygwin_internal (CW_STRACE_TOGGLE, pid);
+	  pid = 0;
+	}
 
       switch (ev.dwDebugEventCode)
 	{
@@ -651,7 +656,7 @@ dostrace (unsigned mask, FILE *ofile, pid_t pid, char **argv)
     create_child (argv);
   else
     attach_process (pid);
-  proc_child (mask, ofile);
+  proc_child (mask, ofile, pid);
 
   return;
 }
