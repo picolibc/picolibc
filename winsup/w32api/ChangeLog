@@ -1,3 +1,8 @@
+2004-04-24  Luke Dunstan  <infidel@users.sourceforge.net>
+
+	* include/windns.h (DNSREC_QUESTION, DNSREC_ANSWER, DNSREC_AUTHORITY,
+	DNSREC_ADDITIONAL): Add defines.
+
 2004-04-23  Robert Wruck  <wruck@tweerlei.de>
 
 	* include/commctrl.h (LPNMLVDISPINFO): Add defines.
