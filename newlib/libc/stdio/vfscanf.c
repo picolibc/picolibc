@@ -998,10 +998,12 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	    }
 	  if ((flags & SUPPRESS) == 0)
 	    {
-#ifdef _NO_LONGDBL
 	      double res;
+#ifdef _NO_LONGDBL
+#define QUAD_RES res;
 #else  /* !_NO_LONG_DBL */
-	      long double res;
+	      long double qres;
+#define QUAD_RES qres;
 #endif /* !_NO_LONG_DBL */
 	      long new_exp = 0;
 
@@ -1023,11 +1025,17 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 		    exp_start = buf + sizeof (buf) - MAX_LONG_LEN - 1;
                  sprintf (exp_start, "e%ld", new_exp);
 		}
-#ifdef _NO_LONGDBL
-	      res = _strtod_r (rptr, buf, NULL);
-#else  /* !_NO_LONGDBL */
-	      res = _strtold (buf, NULL);
-#endif /* !_NO_LONGDBL */
+
+	      /* Current _strtold routine is markedly slower than 
+	         _strtod_r.  Only use it if we have a long double
+	         result.  */
+#ifndef _NO_LONGDBL /* !_NO_LONGDBL */
+	      if (flags & LONGDBL)
+	      	qres = _strtold (buf, NULL);
+	      else
+#endif
+	        res = _strtod_r (rptr, buf, NULL);
+
 	      if (flags & LONG)
 		{
 		  dp = va_arg (ap, double *);
@@ -1036,7 +1044,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	      else if (flags & LONGDBL)
 		{
 		  ldp = va_arg (ap, _LONG_DOUBLE *);
-		  *ldp = res;
+		  *ldp = QUAD_RES;
 		}
 	      else
 		{

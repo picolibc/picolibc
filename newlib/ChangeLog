@@ -1,3 +1,9 @@
+2003-11-21  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdio/vfscanf.c (__svfscanf_r)[!_NO_LONGDBL]: Don't use
+	_strtold routine for processing floats and doubles since it
+	is not as fast as _strtod_r.
+
 2003-11-20 Dhananjay Deshpande <dhananjayd@kpitcummins.com> 
 
 	* libc/machine/h8300/defines.h : Correct pointer register defines 
