@@ -1,3 +1,8 @@
+Fri May 28 15:26:11 1999  Jeffrey A Law  (law@cygnus.com)
+
+	* hppa.h (pa_opcodes): Move integer arithmetic instructions after
+	integer logical instructions.  
+
 1999-05-28  Linus Nordberg  <linus.nordberg@canit.se>
 
 	* m68k.h: Document new formats `E', `G', `H' and new places `N',
