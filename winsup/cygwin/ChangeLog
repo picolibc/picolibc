@@ -1,3 +1,13 @@
+2002-12-19  Steve Osborn  <bub@io.com>
+
+	* fhandler.h (line_edit_status): Add a new element.
+	* fhandler_termios.cc (fhandler_termios::line_edit): After
+	accept_input, handle both potential error condition and pipe full
+	conditions.
+	* fhandler_tty.cc (fhandler_pty_master::accept_input): Return -1 on
+	error.
+	(fhandler_pty_master::write): Handle pipe full condition.
+
 2002-12-16  Steve Osborn  <bub@io.com>
 	    Christopher Faylor <cgf@redhat.com>
 

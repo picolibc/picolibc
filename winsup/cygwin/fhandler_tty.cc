@@ -169,6 +169,7 @@ fhandler_pty_master::accept_input ()
 	{
 	  debug_printf ("error writing to pipe %E");
 	  get_ttyp ()->read_retval = -1;
+	  ret = -1;
 	}
       else
 	{
@@ -1077,11 +1078,17 @@ fhandler_pty_master::close ()
 int
 fhandler_pty_master::write (const void *ptr, size_t len)
 {
-  size_t i;
+  int i;
   char *p = (char *) ptr;
-  for (i=0; i<len; i++)
-    if (line_edit (p++, 1) == line_edit_error)
+  for (i=0; i < (int) len; i++)
+    {
+      line_edit_status status = line_edit (p++, 1);
+      if (status == line_edit_ok || status == line_edit_input_done)
+	continue;
+      if (status != line_edit_pipe_full)
+	i = -1;
       break;
+    }
   return i;
 }
 

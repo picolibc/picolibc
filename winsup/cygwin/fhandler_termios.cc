@@ -326,9 +326,10 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
       put_readahead (c);
       if (!iscanon || always_accept || input_done)
 	{
-	  if (!accept_input ()) 
+	  int status = accept_input ();
+	  if (status != 1) 
 	    {
-	      ret = line_edit_error;
+	      ret = status ? line_edit_error : line_edit_pipe_full;
 	      eat_readahead (1);
 	      break;
 	    }
