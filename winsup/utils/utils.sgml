@@ -108,7 +108,7 @@ omitted.</para>
 <example><title>Example cygpath usage</title>
 <screen>
 #!/bin/sh
-for i in `echo *.exe | sed 's/\.exe/cc/'`
+for i in `echo *.exe | sed 's/\.exe/.cc/'`
 do
   notepad "`cygpath -w $i`"
 done
