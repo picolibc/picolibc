@@ -80,10 +80,7 @@
 
 #ifndef RC_INVOKED
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
+__BEGIN_CGLOBAL_NAMESPACE
 /*
  * HUGE_VAL is returned by strtod when the value would overflow the
  * representation of 'double'. There are other uses as well.
@@ -128,6 +125,8 @@ struct _exception
 	double	retval;
 };
 
+__END_CGLOBAL_NAMESPACE
+__BEGIN_CSTD_NAMESPACE
 
 double	sin (double);
 double	cos (double);
@@ -163,6 +162,9 @@ double	ldexp (double, int);
 double	frexp (double, int*);
 double	modf (double, double*);
 double	fmod (double, double);
+
+__END_CSTD_NAMESPACE
+__BEGIN_CGLOBAL_NAMESPACE
 
 
 #ifndef	__STRICT_ANSI__
@@ -229,6 +231,7 @@ int fpclass (double);
 
 #endif /* __STRICT_ANSI__ */
 
+/* FIXME: Should 99 math functions go into namespace std? */
 
 #ifndef __NO_ISOCEXT
 #if (defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) \
@@ -367,15 +370,15 @@ extern long double atan2l (long double, long double);
 
 /* 7.12.5 Hyperbolic functions: Double in C89  */
 extern __inline__ float sinhf (float x)
-  {return (float) sinh (x);}
+  {return (float) __CSTD sinh (x);}
 extern long double sinhl (long double);
 
 extern __inline__ float coshf (float x)
-  {return (float) cosh (x);}
+  {return (float) __CSTD cosh (x);}
 extern long double coshl (long double);
 
 extern __inline__ float tanhf (float x)
-  {return (float) tanh (x);}
+  {return (float) __CSTD tanh (x);}
 extern long double tanhl (long double);
 
 /*
@@ -384,7 +387,7 @@ extern long double tanhl (long double);
 
 /* 7.12.6.1 Double in C89 */
 extern __inline__ float expf (float x)
-  {return (float) exp (x);}
+  {return (float) __CSTD exp (x);}
 extern long double expl (long double);
 
 /* 7.12.6.2 */
@@ -396,7 +399,7 @@ extern long double exp2l(long double);
 
 /* 7.12.6.4 Double in C89 */
 extern __inline__ float frexpf (float x, int* expn)
-  {return (float) frexp (x, expn);}
+  {return (float) __CSTD frexp (x, expn);}
 extern long double frexpl (long double, int*);
 
 /* 7.12.6.5 */
@@ -408,7 +411,7 @@ extern int ilogbl (long double);
 
 /* 7.12.6.6  Double in C89 */
 extern __inline__ float ldexpf (float x, int expn)
-  {return (float) ldexp (x, expn);}
+  {return (float) __CSTD ldexp (x, expn);}
 extern long double ldexpl (long double, int);
 
 /* 7.12.6.7 Double in C89 */
@@ -500,7 +503,7 @@ extern long double hypotl (long double, long double);
 
 /* 7.12.7.4 The pow functions. Double in C89 */
 extern __inline__ float powf (float x, float y)
-  {return (float) pow (x, y);}
+  {return (float) __CSTD pow (x, y);}
 extern long double powl (long double, long double);
 
 /* 7.12.7.5 The sqrt functions. Double in C89. */
@@ -739,10 +742,8 @@ __fp_unordered_compare (long double x, long double y){
 #endif /* __STDC_VERSION__ >= 199901L */
 #endif /* __NO_ISOCEXT */
 
+__END_CGLOBAL_NAMESPACE
 
-#ifdef __cplusplus
-}
-#endif
 #endif	/* Not RC_INVOKED */
 
 

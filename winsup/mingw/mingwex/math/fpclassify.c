@@ -18,3 +18,6 @@ int __fpclassify (double _x){
 	);
   return sw & (FP_NAN | FP_NORMAL | FP_ZERO );
 }
+
+#undef fpclassify 
+int __attribute__ ((alias ("__fpclassify"))) fpclassify (double);

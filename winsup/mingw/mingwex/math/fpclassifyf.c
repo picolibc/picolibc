@@ -8,3 +8,5 @@ int __fpclassifyf (float _x){
 	);
   return sw & (FP_NAN | FP_NORMAL | FP_ZERO );
 }
+
+int __attribute__ ((alias ("__fpclassifyf"))) fpclassifyf (float);
