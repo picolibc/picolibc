@@ -181,6 +181,10 @@ fabs
 _fabs = fabs
 fabsf
 _fabsf = fabsf
+_f_atan2
+__f_atan2 = _f_atan2
+_f_atan2f
+__f_atan2f = _f_atan2f
 fchmod
 _fchmod = fchmod
 fclose
@@ -199,8 +203,16 @@ feof
 _feof = feof
 ferror
 _ferror = ferror
+_f_exp
+__f_exp = _f_exp
+_f_expf
+__f_expf = _f_expf
 fflush
 _fflush = fflush
+_f_frexp
+__f_frexp = _f_frexp
+_f_frexpf
+__f_frexpf = _f_frexpf
 fgetc
 _fgetc = fgetc
 fgetpos
@@ -217,6 +229,18 @@ finitef
 _finitef = finitef
 fiprintf
 _fiprintf = fiprintf
+_f_ldexp
+__f_ldexp = _f_ldexp
+_f_ldexpf
+__f_ldexpf = _f_ldexpf
+_f_log
+__f_log = _f_log
+_f_logf
+__f_logf = _f_logf
+_f_log10
+__f_log10 = _f_log10
+_f_log10f
+__f_log10f = _f_log10f
 floor
 _floor = floor
 floorf
@@ -230,6 +254,10 @@ _fopen = fopen
 fork
 _fork = fork
 fpathconf
+_f_pow
+__f_pow = _f_pow
+_f_powf
+__f_powf = _f_powf
 fprintf
 _fprintf = fprintf
 fputc
@@ -258,6 +286,10 @@ fstatfs
 _fstatfs = fstatfs
 fsync
 _fsync = fsync
+_f_tan
+__f_tan = _f_tan
+_f_tanf
+__f_tanf = _f_tanf
 ftell
 _ftell = ftell
 ftime

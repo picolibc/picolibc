@@ -2288,6 +2288,7 @@ Fri May 14 19:30:53 1999  Christopher Faylor <cgf@cygnus.com>
 
 	* include/winbase.h: Change conditional to correctly refer
 	to UNDER_CE rather than UNICODE.
+	* include/winnt.h: Update MIPS and SHx CONTEXT definitions.
 
 Tue May 11 21:19:59 1999  Christopher Faylor <cgf@cygnus.com>
 
@@ -2322,6 +2323,10 @@ Fri May  7 17:28:12 1999  Christopher Faylor <cgf@cygnus.com>
 	* include/winnls.h: Add new code page defines.
 	* include/winnt.h: Various fixes from Anders Norlander
 	<anorland@hem2.passagen.se>.
+
+Tue May  4 22:20:05 1999  Christopher Faylor <cgf@cygnus.com>
+
+	* include/winnt.h: Fix CONTEXT pointer typedefs.
 
 Mon May  3 11:32:32 1999  Mumit Khan  <khan@xraylith.wisc.edu>
 
@@ -2361,6 +2366,7 @@ Thu Apr 29 11:06:37 1999  Mumit Khan  <khan@xraylith.wisc.edu>
 
 Wed Apr 28 17:01:12 1999  Christopher Faylor <cgf@cygnus.com>
 
+	* include/winnt.h: Add some handheld support.
 	* shared.cc (open_shared): Don't call OpenFileMapping with
 	a null name pointer.  If the name is NULL it can't be opened.
 
@@ -2705,6 +2711,10 @@ Mon Mar 15 12:54:48 1999  Geoffrey Noer  <noer@cygnus.com>
 
 	* net.cc (gethostbyname): support a.b.c.d notation internally,
 	in case there's no DNS at least partial support is there.
+
+Thu Mar 11 21:27:41 1999  Jeff Johnston  <jjohnstn@cygnus.com>
+
+	* cygwin.din: Added references to new fast-math routines.
 
 Wed Mar 10 19:22:46 1999  Geoffrey Noer  <noer@cygnus.com>
 
