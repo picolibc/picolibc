@@ -559,7 +559,8 @@ fhandler_tty_slave::open (int flags, mode_t)
 
   set_open_status ();
   if (fhandler_console::open_fhs++ == 0 && !GetConsoleCP ()
-      && !output_done_event && wincap.pty_needs_alloc_console ())
+      && !output_done_event && wincap.pty_needs_alloc_console ()
+      && !GetProcessWindowStation ())
     {
       BOOL b;
       HWINSTA h = CreateWindowStation (NULL, 0, GENERIC_READ | GENERIC_WRITE, &sec_none_nih);

@@ -1,5 +1,10 @@
 2003-10-10  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler_tty.cc (fhandler_tty_slave::open): Don't create a new window
+	station if one already exists.
+
+2003-10-10  Christopher Faylor  <cgf@redhat.com>
+
 	* shared.cc (shared_info::initialize): Remove myself check since
 	hMainProc initialization will allow user initialization to work.
 
