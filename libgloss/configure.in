@@ -86,7 +86,8 @@ case "${target}" in
 	configdirs="${configdirs} fr30 testsuite"
 	;;
   frv*-*-*)
-	configdirs="${configdirs} frv testsuite";;
+	configdirs="${configdirs} frv testsuite"
+	;;
   mcore-*-*)
 	configdirs="${configdirs} mcore testsuite"
 	;;
