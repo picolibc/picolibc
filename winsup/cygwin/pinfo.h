@@ -188,13 +188,23 @@ class winpids
 {
   DWORD *pidlist;
   DWORD npidlist;
+  pinfo *pinfolist;
+  DWORD (winpids::* enum_processes) (bool winpid);
+  DWORD enum_init (bool winpid);
+  DWORD enumNT (bool winpid);
+  DWORD enum9x (bool winpid);
+  void add (DWORD& nelem, bool, DWORD pid);
 public:
   DWORD npids;
-  void reset () { npids = 0; }
-  winpids (int) { reset (); }
-  winpids (): pidlist (NULL), npidlist (0) { init (); };
-  void init ();
-  int operator [] (int i) const {return pidlist[i];}
+  inline void reset () { npids = 0; release (); }
+  void init (bool winpid);
+  winpids (int): enum_processes (&winpids::enum_init) { reset (); }
+  winpids (): pidlist (NULL), npidlist (0), pinfolist (NULL),
+	      enum_processes (&winpids::enum_init), npids (0) { init (0); }
+  inline DWORD& winpid (int i) const {return pidlist[i];}
+  inline _pinfo *operator [] (int i) const {return (_pinfo *) pinfolist[i];}
+  ~winpids ();
+  void release ();
 };
 
 extern __inline pid_t

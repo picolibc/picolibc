@@ -1,3 +1,17 @@
+Sun Nov  5 01:34:51 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* pinfo.cc (winpids:add): New method.
+	(winpids::enumNT): New method renamed from EnumProcessesNT.
+	Use add method to add elements to the lists.
+	(winpids::enum9x): New method renamed from EnumProcesses9x.
+	Use add method to add elements to the lists.
+	(winpids::enum_init): Accept 'winpid' parameter to control whether
+	to add all windows pids to the list.
+	(winpids::release): New method.
+	* pinfo.h (winpids): Reflect above changes.
+	* signal.cc (kill_pgrp): Ditto.
+	* external.cc (fillout_pinfo): Ditto.
+
 Sat Nov  4 22:07:03 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (handle_sigsuspend): Record frame here for signalling.

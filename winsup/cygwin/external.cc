@@ -32,23 +32,22 @@ fillout_pinfo (pid_t pid, int winpid)
   static winpids pids (0);
 
   if (!pids.npids || !nextpid)
-    pids.init ();
+    pids.init (winpid);
 
   static unsigned int i = 0;
   if (!pid)
     i = 0;
 
   memset (&ep, 0, sizeof ep);
-  for (; i < pids.npids;)
+  while (i < pids.npids)
     {
-      DWORD thispid = pids[i++];
-      if (!thispid)
-	continue;
-      pinfo p (thispid, PID_NOREDIR);
+      DWORD thispid = pids.winpid (i);
+      _pinfo *p = pids[i];
+      i++;
 
       if (!p)
 	{
-	  if (!winpid || (!nextpid && thispid != (DWORD) pid))
+	  if (!nextpid && thispid != (DWORD) pid)
 	    continue;
 	  ep.pid = thispid;
 	  ep.dwProcessId = cygwin_pid (thispid);

@@ -282,7 +282,6 @@ cygwin_winpid_to_pid (int winpid)
 
 #include <tlhelp32.h>
 
-typedef DWORD (WINAPI * ENUMPROCESSES) (DWORD* &, DWORD &);
 typedef HANDLE (WINAPI * CREATESNAPSHOT) (DWORD, DWORD);
 typedef BOOL (WINAPI * PROCESSWALK) (HANDLE, LPPROCESSENTRY32);
 typedef BOOL (WINAPI * CLOSESNAPSHOT) (HANDLE);
@@ -290,15 +289,43 @@ typedef BOOL (WINAPI * CLOSESNAPSHOT) (HANDLE);
 static NO_COPY CREATESNAPSHOT myCreateToolhelp32Snapshot = NULL;
 static NO_COPY PROCESSWALK myProcess32First = NULL;
 static NO_COPY PROCESSWALK myProcess32Next  = NULL;
-static DWORD WINAPI enum_init (DWORD* &, DWORD&);
-
-static NO_COPY ENUMPROCESSES myEnumProcesses = enum_init;
 
 #define slop_pidlist 200
 #define size_pidlist(i) (sizeof (pidlist[0]) * ((i) + 1))
+#define size_pinfolist(i) (sizeof (pinfolist[0]) * ((i) + 1))
 
-static DWORD WINAPI
-EnumProcessesNT (DWORD* &pidlist, DWORD &npidlist)
+inline void
+winpids::add (DWORD& nelem, bool winpid, DWORD pid)
+{
+  pid_t cygpid = cygwin_pid (pid);
+  if (nelem >= npidlist)
+    {
+      npidlist += slop_pidlist;
+      pidlist = (DWORD *) realloc (pidlist, size_pidlist (npidlist));
+      pinfolist = (pinfo *) realloc (pinfolist, size_pinfolist (npidlist));
+    }
+
+  pinfolist[nelem].init (cygpid, PID_NOREDIR);
+  if (winpid)
+    /* nothing to do */;
+  else if (!pinfolist[nelem])
+    return;
+  else
+    /* Scan list of previously recorded pids to make sure that this pid hasn't
+       shown up before.  This can happen when a process execs. */
+    for (unsigned i = 0; i < nelem; i++)
+      if (pinfolist[i]->pid == pinfolist[nelem]->pid )
+	{
+	  if ((_pinfo *) pinfolist[nelem] != (_pinfo *) myself)
+	    pinfolist[nelem].release ();
+	  return;
+	}
+
+  pidlist[nelem++] = pid;
+}
+
+DWORD
+winpids::enumNT (bool winpid)
 {
   static DWORD szprocs = 0;
   static SYSTEM_PROCESSES *procs;
@@ -328,24 +355,17 @@ EnumProcessesNT (DWORD* &pidlist, DWORD &npidlist)
   for (;;)
     {
       if (px->ProcessId)
-	{
-	  if (nelem >= npidlist)
-	    {
-	      npidlist += slop_pidlist;
-	      pidlist = (DWORD *) realloc (pidlist, size_pidlist (npidlist));
-	    }
-	  pidlist[nelem++] = cygwin_pid (px->ProcessId);
-	  if (!px->NextEntryDelta)
-	    break;
-	}
+	add (nelem, winpid, px->ProcessId);
+      if (!px->NextEntryDelta)
+	break;
       px = (SYSTEM_PROCESSES *) ((char *) px + px->NextEntryDelta);
     }
 
   return nelem;
 }
 
-static DWORD WINAPI
-EnumProcesses9x (DWORD* &pidlist, DWORD &npidlist)
+DWORD
+winpids::enum9x (bool winpid)
 {
   DWORD nelem = 0;
 
@@ -362,14 +382,8 @@ EnumProcesses9x (DWORD* &pidlist, DWORD &npidlist)
   if (myProcess32First(h, &proc))
     do
       {
-	if (!proc.th32ProcessID)
-	  continue;
-	if (nelem >= npidlist)
-	  {
-	    npidlist += slop_pidlist;
-	    pidlist = (DWORD *) realloc (pidlist, size_pidlist (npidlist));
-	  }
-	pidlist[nelem++] = cygwin_pid (proc.th32ProcessID);
+	if (proc.th32ProcessID)
+	  add (nelem, winpid, proc.th32ProcessID);
       }
     while (myProcess32Next (h, &proc));
 
@@ -378,18 +392,18 @@ EnumProcesses9x (DWORD* &pidlist, DWORD &npidlist)
 }
 
 void
-winpids::init ()
+winpids::init (bool winpid)
 {
-  npids = myEnumProcesses (pidlist, npidlist);
+  npids = (this->*enum_processes) (winpid);
   pidlist[npids] = 0;
 }
 
-static DWORD WINAPI
-enum_init (DWORD* &pidlist, DWORD& npidlist)
+DWORD
+winpids::enum_init (bool winpid)
 {
   HINSTANCE h;
   if (os_being_run == winNT)
-    myEnumProcesses = EnumProcessesNT;
+    enum_processes = &winpids::enumNT;
   else
     {
       h = GetModuleHandle("kernel32.dll");
@@ -405,8 +419,26 @@ enum_init (DWORD* &pidlist, DWORD& npidlist)
 	  return 0;
 	}
 
-      myEnumProcesses = EnumProcesses9x;
+      enum_processes = &winpids::enum9x;
     }
 
-  return myEnumProcesses (pidlist, npidlist);
+  return (this->*enum_processes) (winpid);
+}
+
+void
+winpids::release ()
+{
+  for (unsigned i = 0; i < npids; i++)
+    if (pinfolist[i] && (_pinfo *) pinfolist[i] != (_pinfo *) myself)
+      pinfolist[i].release ();
+}
+
+winpids::~winpids ()
+{
+  if (npidlist)
+    {
+      release ();
+      free (pidlist);
+      free (pinfolist);
+    }
 }
