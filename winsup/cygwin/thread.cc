@@ -238,6 +238,7 @@ MTinterface::fixup_after_fork (void)
   threadcount = 1;
   pthread::init_mainthread ();
 
+  pthread::fixup_after_fork ();
   pthread_mutex::fixup_after_fork ();
   pthread_cond::fixup_after_fork ();
   pthread_rwlock::fixup_after_fork ();
@@ -284,11 +285,16 @@ pthread::get_tls_self_pointer ()
 
 
 
+List<pthread> pthread::threads;
+
 /* member methods */
 pthread::pthread ():verifyable_object (PTHREAD_MAGIC), win32_obj_id (0),
+		    running (false), suspended (false), 
 		    cancelstate (0), canceltype (0), cancel_event (0),
-		    joiner (NULL), cleanup_stack (NULL)
+		    joiner (NULL), next (NULL), cleanup_stack (NULL)
 {
+  if (this != pthread_null::get_null_pthread ())
+    threads.insert (this);
 }
 
 pthread::~pthread ()
@@ -297,6 +303,9 @@ pthread::~pthread ()
     CloseHandle (win32_obj_id);
   if (cancel_event)
     CloseHandle (cancel_event);
+
+  if (this != pthread_null::get_null_pthread ())
+    threads.remove (this);
 }
 
 void
@@ -370,13 +379,15 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
 void
 pthread::postcreate ()
 {
-    InterlockedIncrement (&MT_INTERFACE->threadcount);
-    /* FIXME: set the priority appropriately for system contention scope */
-    if (attr.inheritsched == PTHREAD_EXPLICIT_SCHED)
-      {
-	/* FIXME: set the scheduling settings for the new thread */
-	/* sched_thread_setparam (win32_obj_id, attr.schedparam); */
-      }
+  running = true;
+
+  InterlockedIncrement (&MT_INTERFACE->threadcount);
+  /* FIXME: set the priority appropriately for system contention scope */
+  if (attr.inheritsched == PTHREAD_EXPLICIT_SCHED)
+    {
+      /* FIXME: set the scheduling settings for the new thread */
+      /* sched_thread_setparam (win32_obj_id, attr.schedparam); */
+    }
 }
 
 void
@@ -395,6 +406,7 @@ pthread::exit (void *value_ptr)
     delete this;
   else
     {
+      running = false;
       return_ptr = value_ptr;
       mutex.unlock ();
     }
@@ -412,6 +424,12 @@ pthread::cancel (void)
   class pthread *self = pthread::self ();
 
   mutex.lock ();
+
+  if (!running)
+    {
+      mutex.unlock ();
+      return 0;
+    }
 
   if (canceltype == PTHREAD_CANCEL_DEFERRED ||
       cancelstate == PTHREAD_CANCEL_DISABLE)
@@ -760,6 +778,19 @@ pthread::init_current_thread ()
     win32_obj_id = NULL;
   set_thread_id_to_current ();
   set_tls_self_pointer (this);
+}
+
+void
+pthread::_fixup_after_fork ()
+{
+  /* set thread to not running if it is not the forking thread */
+  if (this != pthread::self ())
+    {
+      magic = 0;
+      running = false;
+      win32_obj_id = NULL;
+      cancel_event = NULL;
+    }
 }
 
 /* static members */
@@ -2211,7 +2242,7 @@ pthread::detach (pthread_t *thread)
     }
 
   // check if thread is still alive
-  if (WaitForSingleObject ((*thread)->win32_obj_id, 0) == WAIT_TIMEOUT)
+  if ((*thread)->running && WaitForSingleObject ((*thread)->win32_obj_id, 0) == WAIT_TIMEOUT)
     {
       // force cleanup on exit
       (*thread)->joiner = *thread;

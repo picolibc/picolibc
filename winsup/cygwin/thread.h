@@ -385,11 +385,11 @@ public:
   void *(*function) (void *);
   void *arg;
   void *return_ptr;
+  bool running;
   bool suspended;
   int cancelstate, canceltype;
   HANDLE cancel_event;
   pthread_t joiner;
-  // int joinable;
 
   /* signal handling */
   struct sigaction *sigs;
@@ -442,10 +442,20 @@ public:
     return t1 == t2;
   }
 
+  /* List support calls */
+  class pthread *next;
+  static void fixup_after_fork ()
+  {
+    threads.for_each (&pthread::_fixup_after_fork);
+  }
+
 private:
+  static List<pthread> threads;
   DWORD thread_id;
   __pthread_cleanup_handler *cleanup_stack;
   pthread_mutex mutex;
+
+  void _fixup_after_fork ();
 
   void pop_all_cleanup_handlers (void);
   void precreate (pthread_attr *);

@@ -1,3 +1,24 @@
+2003-06-24  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.cc (MTinterface::fixup_after_fork): Fix thread list after
+	fork.
+	(pthread::threads): Instantiate.
+	(pthread::pthread): Initialize running and suspendend.
+	Initialize next with NULL.
+	Add thread to thread list if it is not the null_pthread.
+	(pthread::~pthread): Remove thread from thread list if it is
+	not the null_pthread.
+	(pthread::postcreate): Set running flag.
+	(pthread::exit): Reset running flag.
+	(pthread::cancel): Try to cancel thread only if still running.
+	(pthread::_fixup_after_fork): Implement.
+	(pthread::detach): Check if thread is still running before detach.
+	* thread.h (pthread::running): New member.
+	(pthread::next): Ditto.
+	(pthread::fixup_after_fork): New static method.
+	(pthread::threads): New static method.
+	(pthread::_fixup_after_fork): New method.
+
 2003-06-20  Christopher Faylor  <cgf@redhat.com>
 
 	* pinfo.cc (_pinfo::commune_send): Don't attempt to communicate with a
