@@ -1,3 +1,9 @@
+2000-11-22  Earnie Boyd  <earnie_boyd@yahoo.com>
+
+	* Makefile.in: Fix bindist target to distribute the correct files.
+	Remove the use of SNAPSHOT variable and test SNAPDATE instead.
+	Set SNAPDATE within the snapshot target on recursive call to $(MAKE).
+
 2000-11-21  Earnie Boyd  <earnie_boyd@yahoo.com>
 
 	* Makefile.in: Add missing line continuation `\' for $(SUBDIRS) target.

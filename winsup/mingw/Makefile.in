@@ -105,7 +105,16 @@ FLAGS_TO_PASS:=\
 	AR="$(AR)" \
 	RANLIB="$(RANLIB)" \
 	LD="$(LD)" \
-	DLLTOOL="$(DLLTOOL)"
+	DLLTOOL="$(DLLTOOL)" \
+	exec_prefix="$(exec_prefix)" \
+	bindir="$(bindir)" \
+	libdir="$(libdir)" \
+	tooldir="$(tooldir)" \
+	datadir="$(datadir)" \
+	infodir="$(infodir)" \
+	includedir="$(includedir)" \
+	prefix="$(prefix)" \
+	target_alias="$(target_alias)"
 
 CRT0S = crt$(CRT_ID).o dllcrt$(CRT_ID).o CRT_noglob.o crtmt.o crtst.o
 MINGW_OBJS = CRTglob.o CRTfmode.o CRTinit.o dirent.o dllmain.o gccmain.o \
@@ -210,7 +219,7 @@ distclean:
 	-rm -f config.cache config.status config.log 
 	-rm -f Makefile
 
-ifdef SNAPSHOT
+ifdef SNAPDATE
    distdir=$(PACKAGE)-$(VERSION)-$(SNAPDATE)
 else
    distdir=$(PACKAGE)-$(VERSION)
@@ -233,6 +242,7 @@ srcdist:
 	mkdir $(distdir)/include/sys
 	cp $(srcdir)/include/*.h $(distdir)/include/
 	cp $(srcdir)/include/sys/*.h $(distdir)/include/sys/
+#end FIXME
 	rm -f $(distdir)-src.tar.gz
 	$(TAR) czf $(distdir)-src.tar.gz $(distdir)
 
@@ -241,13 +251,21 @@ bindist:
 	rm -rf $(distdir)
 	mkdir $(distdir)
 	chmod 755 $(distdir)
-	$(MAKE) install prefix=../$(distdir)
+	$(MAKE) install prefix=$(shell pwd)/$(distdir)
 	rm -f $(distdir).tar.gz
-	cd $(distdir); $(TAR) czf ../$(distdir).tar.gz .
+#FIXME does the install process really need to install into the $(tooldir)? 
+	cd $(distdir) ; \
+	cd $(target_alias); \
+	for i in *; do \
+	   mv $$i ../; \
+        done; \
+	cd ..; \
+	rmdir $(target_alias); \
+	$(TAR) czf ../$(distdir).tar.gz *
+#end FIXME
 
-SNAPDATE = $(shell date '+%Y%m%d')
 snapshot: 
-	make dist SNAPSHOT=1
+	make dist SNAPDATE=$(shell date '+%Y%m%d')
 
 info:
 
