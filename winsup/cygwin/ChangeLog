@@ -1,4 +1,16 @@
-Tue May 28 21:34:00 2001  Corinna Vinschen <corinna@vinschen.de>
+Tue May 29 19:02:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* sec_helper.cc (cygsid::getfrompw): Change parameter to `const'.
+	(cygsid::getfromgr): Ditto.
+	* security.cc: Use `sys_mbstowcs' and `sys_wcstombs' throughout.
+	(extract_nt_dom_user): Try to get user and domain from SID in
+	pw->pw_gecos first.
+	* security.h (class cygsid): Change parameter of getfrompw() and
+	getfromgr() to `const'.
+	* uinfo.cc (internal_getlogin): Change order for evaluating user
+	information in winNT case. Drop usage of NetWkstaUserGetInfo().
+
+Mon May 28 21:34:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* shortcut.c (check_shortcut): Treat only Cygwin shortcuts as symlinks.
 

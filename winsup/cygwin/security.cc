@@ -22,6 +22,7 @@ details. */
 #include <sys/stat.h>
 #include <sys/acl.h>
 #include <ctype.h>
+#include <winnls.h>
 #include <wingdi.h>
 #include <winuser.h>
 #include <wininet.h>
@@ -64,12 +65,21 @@ cygwin_set_impersonation_token (const HANDLE hToken)
 void
 extract_nt_dom_user (const struct passwd *pw, char *domain, char *user)
 {
+  cygsid psid;
+  DWORD ulen = UNLEN + 1;
+  DWORD dlen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
+  SID_NAME_USE use;
   char buf[INTERNET_MAX_HOST_NAME_LENGTH + UNLEN + 2];
   char *c;
 
   strcpy (domain, "");
   strcpy (buf, pw->pw_name);
   debug_printf ("pw_gecos = %x (%s)", pw->pw_gecos, pw->pw_gecos);
+
+  if (psid.getfrompw (pw) &&
+      LookupAccountSid (NULL, psid, user, &ulen, domain, &dlen, &use))
+    return;
+
   if (pw->pw_gecos)
     {
       if ((c = strstr (pw->pw_gecos, "U-")) != NULL &&
@@ -153,7 +163,7 @@ str2buf2uni (UNICODE_STRING &tgt, WCHAR *buf, const char *srcstr)
   tgt.Length = strlen (srcstr) * sizeof (WCHAR);
   tgt.MaximumLength = tgt.Length + sizeof(WCHAR);
   tgt.Buffer = (PWCHAR) buf;
-  mbstowcs (buf, srcstr, tgt.MaximumLength);
+  sys_mbstowcs (buf, srcstr, tgt.MaximumLength);
 }
 
 static void
@@ -219,15 +229,15 @@ get_lsa_srv_inf (LSA_HANDLE lsa, char *logonserver, char *domain)
                             &cnt, &tot, SV_TYPE_DOMAIN_CTRL, primary, NULL))
       == STATUS_SUCCESS && cnt > 0)
     {
-      wcstombs (name, buf[0].sv101_name, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+      sys_wcstombs (name, buf[0].sv101_name, INTERNET_MAX_HOST_NAME_LENGTH + 1);
       if (domain)
-        wcstombs (domain, primary, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+        sys_wcstombs (domain, primary, INTERNET_MAX_HOST_NAME_LENGTH + 1);
     }
   else
     {
-      wcstombs (name, account, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+      sys_wcstombs (name, account, INTERNET_MAX_HOST_NAME_LENGTH + 1);
       if (domain)
-        wcstombs (domain, account, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+        sys_wcstombs (domain, account, INTERNET_MAX_HOST_NAME_LENGTH + 1);
     }
   if (ret == STATUS_SUCCESS)
     NetApiBufferFree (buf);
@@ -259,7 +269,7 @@ static BOOL
 get_user_groups (WCHAR *wlogonserver, cygsidlist &grp_list, char *user)
 {
   WCHAR wuser[UNLEN + 1]; 
-  mbstowcs (wuser, user, UNLEN + 1);
+  sys_mbstowcs (wuser, user, UNLEN + 1);
   LPGROUP_USERS_INFO_0 buf; 
   DWORD cnt, tot;
   NET_API_STATUS ret;
@@ -282,14 +292,14 @@ get_user_groups (WCHAR *wlogonserver, cygsidlist &grp_list, char *user)
       DWORD dlen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
       SID_NAME_USE use = SidTypeInvalid;
 
-      wcstombs (group, buf[i].grui0_name, UNLEN + 1);
+      sys_wcstombs (group, buf[i].grui0_name, UNLEN + 1);
       if (!LookupAccountName (NULL, group, gsid, &glen, domain, &dlen, &use))
         debug_printf ("LookupAccountName(%s): %lu\n", group, GetLastError ());
       if (!legal_sid_type (use))
         {
           strcat (strcpy (group, domain), "\\");
-          wcstombs (group + strlen (group), buf[i].grui0_name,
-                    UNLEN + 1 - strlen (group));
+          sys_wcstombs (group + strlen (group), buf[i].grui0_name,
+                        UNLEN + 1 - strlen (group));
           glen = UNLEN + 1;
           dlen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
           if (!LookupAccountName(NULL, group, gsid, &glen, domain, &dlen, &use))
@@ -353,7 +363,7 @@ get_user_local_groups (WCHAR *wlogonserver, const char *logonserver,
 	DWORD dlen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
 	SID_NAME_USE use = SidTypeInvalid;
 
-	wcstombs (group, buf[i].lgrpi0_name, UNLEN + 1);
+	sys_wcstombs (group, buf[i].lgrpi0_name, UNLEN + 1);
 	if (!LookupAccountName (NULL, group, gsid, &glen, domain, &dlen, &use))
 	  {
 	    glen = UNLEN + 1;
@@ -366,8 +376,8 @@ get_user_local_groups (WCHAR *wlogonserver, const char *logonserver,
 	else if (!legal_sid_type (use))
 	  {
 	    strcat (strcpy (group, domain), "\\");
-	    wcstombs (group + strlen (group), buf[i].lgrpi0_name,
-		      UNLEN + 1 - strlen (group));
+	    sys_wcstombs (group + strlen (group), buf[i].lgrpi0_name,
+		          UNLEN + 1 - strlen (group));
 	    glen = UNLEN + 1;
 	    dlen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
 	    if (!LookupAccountName (NULL, group, gsid, &glen,
@@ -409,7 +419,7 @@ get_user_primary_group (WCHAR *wlogonserver, const char *user,
       return TRUE;
     }
 
-  mbstowcs (wuser, user, UNLEN + 1);
+  sys_mbstowcs (wuser, user, UNLEN + 1);
   if (NetUserGetInfo (wlogonserver, wuser, 3, (LPBYTE *) &buf))
     return FALSE;
   pgrpsid = usersid;
@@ -435,7 +445,7 @@ get_group_sidlist (const char *logonserver, cygsidlist &grp_list,
   SID_NAME_USE use;
   
   auth_pos = -1;
-  mbstowcs (wserver, logonserver, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+  sys_mbstowcs (wserver, logonserver, INTERNET_MAX_HOST_NAME_LENGTH + 1);
   if (!LookupAccountSid (NULL, usersid, user, &ulen, domain, &dlen, &use))
     {
       debug_printf ("LookupAccountSid () %E");
@@ -569,7 +579,8 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list)
           PTOKEN_PRIVILEGES tmp;
           DWORD tmp_count;
 
-          wcstombs (buf, privstrs[i].Buffer, INTERNET_MAX_HOST_NAME_LENGTH + 1);
+          sys_wcstombs (buf, privstrs[i].Buffer,
+	  		INTERNET_MAX_HOST_NAME_LENGTH + 1);
           if (!LookupPrivilegeValue (NULL, buf, &priv))
             continue;
 

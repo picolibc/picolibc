@@ -45,8 +45,8 @@ public:
 
   inline PSID set () { return psid = (PSID) sbuf; }
 
-  BOOL getfrompw (struct passwd *pw);
-  BOOL getfromgr (struct group *gr);
+  BOOL getfrompw (const struct passwd *pw);
+  BOOL getfromgr (const struct group *gr);
 
   int get_id (BOOL search_grp, int *type = NULL);
   inline int get_uid () { return get_id (FALSE); }

@@ -31,195 +31,122 @@ struct passwd *
 internal_getlogin (cygheap_user &user)
 {
   char username[UNLEN + 1];
-  DWORD username_len = UNLEN + 1;
+  DWORD ulen = UNLEN + 1;
   struct passwd *pw = NULL;
 
-  if (!GetUserName (username, &username_len))
+  if (!GetUserName (username, &ulen))
     user.set_name ("unknown");
   else
     user.set_name (username);
-  debug_printf ("GetUserName() = %s", user.name ());
 
   if (os_being_run == winNT)
     {
-      LPWKSTA_USER_INFO_1 wui;
-      NET_API_STATUS ret;
-      char buf[512];
-      char dom[INTERNET_MAX_HOST_NAME_LENGTH + 1];
-      char *env, *un = NULL;
+      HANDLE ptok = user.token; /* Which is INVALID_HANDLE_VALUE if no
+				   impersonation took place. */
+      DWORD siz;
+      cygsid tu;
+      NET_API_STATUS ret = 0;
+      char domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+      DWORD dlen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
+      SID_NAME_USE use;
+      char buf[MAX_PATH];
 
-      /* First trying to get logon info from environment */
-      if ((env = getenv ("USERNAME")) != NULL)
-	un = env;
-      if ((env = getenv ("LOGONSERVER")) != NULL)
-	user.set_logsrv (env + 2); /* filter leading double backslashes */
-      if ((env = getenv ("USERDOMAIN")) != NULL)
-	user.set_domain (env);
-      /* Trust only if usernames are identical */
-      if (un && strcasematch (user.name (), un)
-	  && user.domain () && user.logsrv ())
-	debug_printf ("Domain: %s, Logon Server: %s",
-		      user.domain (), user.logsrv ());
-      /* If that failed, try to get that info from NetBIOS */
-      else if (!(ret = NetWkstaUserGetInfo (NULL, 1, (LPBYTE *)&wui)))
-	{
-	  sys_wcstombs (buf, wui->wkui1_username, UNLEN + 1);
-	  user.set_name (buf);
-	  sys_wcstombs (buf, wui->wkui1_logon_server,
-	  		INTERNET_MAX_HOST_NAME_LENGTH + 1);
-	  user.set_logsrv (buf);
-	  sys_wcstombs (buf, wui->wkui1_logon_domain,
-			INTERNET_MAX_HOST_NAME_LENGTH + 1);
-	  user.set_domain (buf);
-	  /* Save values in environment */
-	  if (!strcasematch (user.name (), "SYSTEM")
-	      && user.domain () && user.logsrv ())
-	    {
-	      LPUSER_INFO_3 ui = NULL;
-	      WCHAR wbuf[INTERNET_MAX_HOST_NAME_LENGTH + 2];
-
-	      strcat (strcpy (buf, "\\\\"), user.logsrv ());
-	      setenv ("USERNAME", user.name (), 1);
-	      setenv ("LOGONSERVER", buf, 1);
-	      setenv ("USERDOMAIN", user.domain (), 1);
-	      /* HOMEDRIVE and HOMEPATH are wrong most of the time, too,
-		 after changing user context! */
-	      sys_mbstowcs (wbuf, buf, INTERNET_MAX_HOST_NAME_LENGTH + 2);
-	      if (!NetUserGetInfo (NULL, wui->wkui1_username, 3, (LPBYTE *)&ui)
-		  || !NetUserGetInfo (wbuf,wui->wkui1_username,3,(LPBYTE *)&ui))
-		{
-		  sys_wcstombs (buf, ui->usri3_home_dir, MAX_PATH);
-		  if (!buf[0])
-		    {
-		      sys_wcstombs (buf, ui->usri3_home_dir_drive, MAX_PATH);
-		      if (buf[0])
-			strcat (buf, "\\");
-		      else
-			{
-			  env = getenv ("SYSTEMDRIVE");
-			  if (env && *env)
-			    strcat (strcpy (buf, env), "\\");
-			  else
-			    GetSystemDirectoryA (buf, MAX_PATH);
-			}
-		    }
-		  setenv ("HOMEPATH", buf + 2, 1);
-		  buf[2] = '\0';
-		  setenv ("HOMEDRIVE", buf, 1);
-		  NetApiBufferFree (ui);
-		}
-	    }
-	  debug_printf ("Domain: %s, Logon Server: %s, Windows Username: %s",
-			user.domain (), user.logsrv (), user.name ());
-	  NetApiBufferFree (wui);
-	}
+      /* Try to get the SID either from already impersonated token
+	 or from current process first. To differ that two cases is
+	 important, because you can't rely on the user information
+	 in a process token of a currently impersonated process. */
+      user.set_sid (NO_SID);
+      if (ptok == INVALID_HANDLE_VALUE
+	  && !OpenProcessToken (GetCurrentProcess (),
+				TOKEN_ADJUST_DEFAULT | TOKEN_QUERY,
+				&ptok))
+	debug_printf ("OpenProcessToken(): %E");
+      else if (!GetTokenInformation (ptok, TokenUser, &tu, sizeof tu, &siz))
+	debug_printf ("GetTokenInformation(): %E");
+      else if (!(ret = user.set_sid (tu)))
+	debug_printf ("Couldn't retrieve SID from access token!");
+      else if (!LookupAccountSid (NULL, user.sid (), username, &ulen,
+				  domain, &dlen, &use))
+	debug_printf ("LookupAccountSid (): %E");
       else
-        {
-	  /* If `NetWkstaUserGetInfo' failed, try to get default values known
-	     by local policy object.*/
-          debug_printf ("NetWkstaUserGetInfo() Err %d", ret);
-
-	  if (get_logon_server_and_user_domain (buf, dom))
-	    {
-	      user.set_logsrv (buf + 2);
-	      user.set_domain (dom);
-	      setenv ("LOGONSERVER", buf, 1);
-	      setenv ("USERDOMAIN", dom, 1);
-	    }
-	  else
-	    debug_printf ("get_logon_server_and_user_domain() failed");
-	}
-      if (allow_ntsec)
 	{
-	  HANDLE ptok = user.token; /* Which is INVALID_HANDLE_VALUE if no
-				       impersonation took place. */
-	  DWORD siz;
-	  cygsid tu;
-	  int ret = 0;
+	  user.set_name (username);
+	  user.set_domain (domain);
+	}
+      if (get_logon_server_and_user_domain (domain, NULL))
+	user.set_logsrv (domain + 2);
+      setenv ("USERNAME", user.name (), 1);
+      setenv ("LOGONSERVER", user.logsrv (), 1);
+      setenv ("USERDOMAIN", user.domain (), 1);
 
-	  /* Try to get the SID either from already impersonated token
-	     or from current process first. To differ that two cases is
-	     important, because you can't rely on the user information
-	     in a process token of a currently impersonated process. */
-	  if (ptok == INVALID_HANDLE_VALUE
-	      && !OpenProcessToken (GetCurrentProcess (),
-	      			    TOKEN_ADJUST_DEFAULT | TOKEN_QUERY,
-				    &ptok))
-	    debug_printf ("OpenProcessToken(): %E\n");
-	  else if (!GetTokenInformation (ptok, TokenUser, &tu, sizeof tu, &siz))
-	    debug_printf ("GetTokenInformation(): %E");
-	  else if (!(ret = user.set_sid (tu)))
-	    debug_printf ("Couldn't retrieve SID from access token!");
-	  /* If that failes, try to get the SID from localhost. This can only
-	     be done if a domain is given because there's a chance that a local
-	     and a domain user may have the same name. */
-	  if (!ret && user.domain ())
+      LPUSER_INFO_3 ui;
+      WCHAR wlogsrv[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+      WCHAR wuser[UNLEN + 1];
+      sys_mbstowcs (wlogsrv, user.logsrv (), INTERNET_MAX_HOST_NAME_LENGTH + 1);
+      sys_mbstowcs (wuser, user.name (), UNLEN + 1);
+      if (!NetUserGetInfo (wlogsrv, wuser, 3, (LPBYTE *)&ui) ||
+          !NetUserGetInfo (NULL, wuser, 3, (LPBYTE *)&ui))
+	{
+	  sys_wcstombs (buf, ui->usri3_home_dir, MAX_PATH);
+	  if (!buf[0])
 	    {
-	      /* Concat DOMAIN\USERNAME for the next lookup */
-	      strcat (strcat (strcpy (buf, user.domain ()), "\\"), user.name ());
-	      if (!(ret = lookup_name (buf, NULL, user.sid ())))
-		debug_printf ("Couldn't retrieve SID locally!");
-	    }
-
-	  /* If that fails, too, as a last resort try to get the SID from
-	     the logon server. */
-	  if (!ret && !(ret = lookup_name (user.name (), user.logsrv (),
-					   user.sid ())))
-	    debug_printf ("Couldn't retrieve SID from '%s'!", user.logsrv ());
-
-	  /* If we have a SID, try to get the corresponding Cygwin user name
-	     which can be different from the Windows user name. */
-	  cygsid gsid (NO_SID);
-	  if (ret)
-	    {
-	      cygsid psid;
-
-	      for (int pidx = 0; (pw = internal_getpwent (pidx)); ++pidx)
-		if (psid.getfrompw (pw) && EqualSid (user.sid (), psid))
-		  {
-		    user.set_name (pw->pw_name);
-		    struct group *gr = getgrgid (pw->pw_gid);
-		    if (gr)
-		      if (!gsid.getfromgr (gr))
-			  gsid = NO_SID;
-		    extract_nt_dom_user (pw, dom, buf);
-		    setenv ("USERNAME", buf, 1);
-		    if (*dom)
-		      user.set_domain (dom);
-		    else if (user.logsrv ())
-		      user.set_domain (user.logsrv ());
-		    if (user.domain ())
-		      setenv ("USERDOMAIN", user.domain (), 1);
-		    break;
-		  }
-	      if (!strcasematch (user.name (), "SYSTEM")
-		  && user.domain () && user.logsrv ())
+	      sys_wcstombs (buf, ui->usri3_home_dir_drive, MAX_PATH);
+	      if (buf[0])
+		strcat (buf, "\\");
+	      else
 		{
-		  if (get_registry_hive_path (user.sid (), buf))
-		    setenv ("USERPROFILE", buf, 1);
+		  char *env = getenv ("SYSTEMDRIVE");
+		  if (env && *env)
+		    strcat (strcpy (buf, env), "\\");
 		  else
-		    unsetenv ("USERPROFILE");
+		    GetSystemDirectoryA (buf, MAX_PATH);
 		}
 	    }
-
-	  /* If this process is started from a non Cygwin process,
-	     set token owner to the same value as token user and
-	     primary group to the group which is set as primary group
-	     in /etc/passwd. */
-	  if (ptok != INVALID_HANDLE_VALUE && myself->ppid == 1)
-	    {
-	      if (!SetTokenInformation (ptok, TokenOwner, &tu, sizeof tu))
-		debug_printf ("SetTokenInformation(TokenOwner): %E");
-	      if (gsid && !SetTokenInformation (ptok, TokenPrimaryGroup,
-		  			        &gsid, sizeof gsid))
-		debug_printf ("SetTokenInformation(TokenPrimaryGroup): %E");
-	    }
-
-	  /* Close token only if it's a result from OpenProcessToken(). */
-	  if (ptok != INVALID_HANDLE_VALUE
-	      && user.token == INVALID_HANDLE_VALUE)
-	    CloseHandle (ptok);
+	  setenv ("HOMEPATH", buf + 2, 1);
+	  buf[2] = '\0';
+	  setenv ("HOMEDRIVE", buf, 1);
+	  NetApiBufferFree (ui);
 	}
+
+      /* If we have a SID, try to get the corresponding Cygwin user name
+	 which can be different from the Windows user name. */
+      cygsid gsid (NO_SID);
+      if (user.sid ())
+	{
+	  cygsid psid;
+
+	  for (int pidx = 0; (pw = internal_getpwent (pidx)); ++pidx)
+	    if (psid.getfrompw (pw) && EqualSid (user.sid (), psid))
+	      {
+		user.set_name (pw->pw_name);
+		struct group *gr = getgrgid (pw->pw_gid);
+		if (gr && !gsid.getfromgr (gr))
+		  gsid = NO_SID;
+	      }
+	  if (!strcasematch (user.name (), "SYSTEM"))
+	    if (get_registry_hive_path (user.sid (), buf))
+	      setenv ("USERPROFILE", buf, 1);
+	    else
+	      unsetenv ("USERPROFILE");
+	}
+
+      /* If this process is started from a non Cygwin process,
+	 set token owner to the same value as token user and
+	 primary group to the group which is set as primary group
+	 in /etc/passwd. */
+      if (ptok != INVALID_HANDLE_VALUE && myself->ppid == 1)
+	{
+	  if (!SetTokenInformation (ptok, TokenOwner, &tu, sizeof tu))
+	    debug_printf ("SetTokenInformation(TokenOwner): %E");
+	  if (gsid && !SetTokenInformation (ptok, TokenPrimaryGroup,
+					    &gsid, sizeof gsid))
+	    debug_printf ("SetTokenInformation(TokenPrimaryGroup): %E");
+	}
+
+      /* Close token only if it's a result from OpenProcessToken(). */
+      if (ptok != INVALID_HANDLE_VALUE
+	  && user.token == INVALID_HANDLE_VALUE)
+	CloseHandle (ptok);
     }
   debug_printf ("Cygwins Username: %s", user.name ());
   return pw ?: getpwnam(user.name ());
