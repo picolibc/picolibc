@@ -1,5 +1,10 @@
 2003-03-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (login): Fix comment.
+	(logout): Ditto.
+
+2003-03-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc: Slightly cleanup all utmp functions.
 	(login): Use mutex to secure against concurrent access to wtmp file.
 	(logout): Rewrite using POSIX calls.
