@@ -1,3 +1,8 @@
+2003-08-17  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (special_name): Accommodate all special names with
+	extensions.
+
 2003-08-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (mmap64): Avoid crash if file size is less than requested
@@ -10,7 +15,7 @@
 
 2003-08-13  Corinna Vinschen  <corinna@vinschen.de>
 
-	* cygwin.din: Accomodate change from cygwin_lstat to lstat.
+	* cygwin.din: Accommodate change from cygwin_lstat to lstat.
 	* syscalls.cc: Add defines to avoid declaration issues when
 	renaming cygwin_lstat back to lstat.
 	(lstat): Reverted name change from cygwin_lstat.
@@ -740,7 +745,7 @@
 	* shared_info.h: Match shared_name declaration with below change.
 	* shared.cc (shared_name): Use incoming char * parameter instead of
 	local static buffer.
-	(open_shared): Accomodate new calling convention for shared_name.
+	(open_shared): Accommodate new calling convention for shared_name.
 	* exceptions.cc (events_init): Ditto.
 	* sigproc.cc (getsem): Ditto.
 	* syscalls.cc (login): Ditto.
@@ -751,7 +756,7 @@
 
 	* fhandler_socket.cc (secret_event_name): Return void.  Use incoming
 	char * parameter instead of local static buffer.
-	(fhandler_socket::create_secret_event): Accomodate new calling
+	(fhandler_socket::create_secret_event): Accommodate new calling
 	convention for secret_event_name.
 	(fhandler_socket::close_secret_event): Ditto.
 
@@ -770,7 +775,7 @@
 	* wincap.cc: Set has_terminal_services capability throughout.
 	(wincap_2003): New global object representing Windows 2003 Server
 	capabilities.
-	(wincapc::init): Accomodate Windows 2003 Server.
+	(wincapc::init): Accommodate Windows 2003 Server.
 	* wincap.h (struct wincaps): Add has_terminal_services capability.
 
 2003-05-20  Charles Wilson  <cygwin@cwilson.fastmail.fm>
@@ -2222,7 +2227,7 @@
 	(mmap_record::fixup_map): Format change.
 	(list::add_record): Add offset and length parameter to call
 	mmap_record::alloc_map() correctly.
-	(mmap64): Rename `l' variable to `map_list'.  Accomodate above changes.
+	(mmap64): Rename `l' variable to `map_list'.  Accommodate above changes.
 	(munmap): Rename `l' variable to `map_list'.
 	(msync): Ditto.
 	(fhandler_disk_file::mmap): Streamline code.

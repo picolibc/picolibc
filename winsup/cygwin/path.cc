@@ -1418,24 +1418,21 @@ special_name (const char *s, int inc = 1)
   if (strpbrk (s, special_chars))
     return !strncasematch (s, "%2f", 3);
 
-  // FIXME: add com0 and {com,lpt}N.*
-  if (strcasematch (s, "nul")
-      || strncasematch (s, "nul.", 4)
-      || strcasematch (s, "aux")
-      || strncasematch (s, "aux.", 4)
-      || strcasematch (s, "prn")
-      || strncasematch (s, "prn.", 4)
-      || strcasematch (s, "con")
-      || strncasematch (s, "con.", 4)
-      || strcasematch (s, "conin$")
-      || strcasematch (s, "conout$"))
+  const char *p;
+  if (strcasematch (s, "conin$") || strcasematch (s, "conout$"))
     return -1;
-  if (!strncasematch (s, "com", 3)
-      && !strncasematch (s, "lpt", 3))
+
+  if (strncasematch (s, "nul", 3)
+      || strncasematch (s, "aux", 3)
+      || strncasematch (s, "prn", 3)
+      || strncasematch (s, "con", 3))
+    p = s + 3;
+  else if (strncasematch (s, "com", 3) || strncasematch (s, "lpt", 3))
+    (void) strtoul (s + 3, (char **) &p, 10);
+  else
     return false;
-  char *p;
-  (void) strtoul (s + 3, &p, 10);
-  return -(*p == '\0');
+
+  return (*p == '\0' || *p == '.') ? -1 : false;
 }
 
 bool
