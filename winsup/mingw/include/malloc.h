@@ -35,6 +35,14 @@ typedef	struct _heapinfo
 #define _USEDENTRY 0
 #define _FREEENTRY 1
 
+/* Return codes for _heapwalk()  */
+#define _HEAPEMPTY	(-1)
+#define _HEAPOK		(-2)
+#define _HEAPBADBEGIN	(-3)
+#define _HEAPBADNODE	(-4)
+#define _HEAPEND	(-5)
+#define _HEAPBADPTR	(-6)
+
 #ifdef	__cplusplus
 extern "C" {
 #endif

@@ -1,3 +1,8 @@
+2005-01-26  Oliver Stoeneberg  <oliverst@online.de>
+
+	* include/malloc.h: Add missing return code defines for
+	_heapwalk()
+
 2005-01-17  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/sys/stat.h (struct __stat64): Change st_size type to
