@@ -1037,6 +1037,12 @@ extern int cgen_macro_insn_count PARAMS ((CGEN_CPU_DESC));
 /* Return value of base part of INSN.  */
 #define CGEN_INSN_BASE_VALUE(insn) \
   CGEN_OPCODE_BASE_VALUE (CGEN_INSN_OPCODE (insn))
+
+/* Standard way to test whether INSN is supported by MACH.
+   MACH is one of enum mach_attr.
+   The "|1" is because the base mach is always selected.  */
+#define CGEN_INSN_MACH_HAS_P(insn, mach) \
+((CGEN_INSN_ATTR_VALUE ((insn), CGEN_INSN_MACH) & ((1 << (mach)) | 1)) != 0)
 
 /* Macro instructions.
    Macro insns aren't real insns, they map to one or more real insns.

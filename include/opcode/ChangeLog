@@ -1,3 +1,7 @@
+Wed Aug 18 18:14:40 1999  Doug Evans  <devans@canuck.cygnus.com>
+
+	* cgen.h (CGEN_INSN_MACH_HAS_P): New macro.
+
 Fri Aug  6 09:46:35 1999  Jerry Quinn <jquinn@nortelnetworks.com>
 
 	* hppa.h (pa_opcodes): Add 64 bit versions of or, xor, and,
