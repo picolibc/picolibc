@@ -83,6 +83,7 @@ extern "C" {
 #define FILE_BEGIN	0
 #define FILE_CURRENT	1
 #define FILE_END	2
+#define INVALID_SET_FILE_POINTER	((DWORD)-1)
 #define OF_READ 0
 #define OF_READWRITE	2
 #define OF_WRITE	1

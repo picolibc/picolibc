@@ -1,3 +1,8 @@
+Sun Dec 02 14:21:02 2000  Matt Hargett <matt@use.net>
+
+	* Added a define for INVALID_SET_FILE_POINTER, a possible return
+	code for the SetFilePointer() win32 API call.
+
 Mon Oct  9 11:49:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* include/winnt.h: Add missing FILE_NAMED_STREAMS define.
