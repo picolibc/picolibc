@@ -632,24 +632,34 @@ main (int argc, char **argv)
   if (!isNT)
     {
       /* This takes Windows 9x/ME into account. */
-      if (!disp_username)
-        {
-	  if (GetUserName (name, (len = 256, &len)))
-	    disp_username = name;
-	  else
-	    /* Same behaviour as in cygwin/shared.cc (memory_init). */
-	    disp_username = (char *) "unknown";
-	}
-
       if (passed_home_path[0] == '\0')
 	strcpy (passed_home_path, "/home/");
-
-      printf ("%s:*:%ld:%ld:%s:%s%s:/bin/bash\n", disp_username,
-					        DOMAIN_USER_RID_ADMIN,
-					        DOMAIN_ALIAS_RID_ADMINS,
-	                                        disp_username,
-					        passed_home_path,
-					        disp_username);
+      if (!disp_username)
+        {
+	  printf ("admin:use_crypt:%lu:%lu:Administrator:%sadmin:/bin/bash\n", 
+		  DOMAIN_USER_RID_ADMIN,
+		  DOMAIN_ALIAS_RID_ADMINS,
+		  passed_home_path);
+	  if (GetUserName (name, (len = 256, &len)))
+	    disp_username = name;
+	}
+      if (disp_username && disp_username[0])
+        {
+	  /* Create a pseudo random uid */
+	  unsigned long uid = 0, i;
+	  for (i = 0; disp_username[i]; i++)
+	    uid += toupper (disp_username[i]) << ((6 * i) % 25);
+	  uid = (uid % (65535 - DOMAIN_USER_RID_ADMIN - 1)) 
+	    + DOMAIN_USER_RID_ADMIN + 1;
+    	  
+	  printf ("%s:use_crypt:%lu:%lu:%s:%s%s:/bin/bash\n", 
+		  disp_username,
+		  uid,
+		  DOMAIN_ALIAS_RID_ADMINS,
+		  disp_username,
+		  passed_home_path,
+		  disp_username);
+	}
       return 0;
     }
   if (!print_local && !print_domain && !print_local_groups)

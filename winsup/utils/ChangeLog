@@ -1,3 +1,11 @@
+2003-03-01  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* mkpasswd.cc (main): On Win95, output both a default line and a 
+	line for the current user (if known) with a pseudorandom uid. If
+	the -u switch is given, produce a line for the specified user.
+	* mkgroup.cc (main): On Win95 change the group name from "unknown" to 
+	"all". 
+
 2003-02-28  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in (cygcheck.o): Fix so that actual mingw include files are

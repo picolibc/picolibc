@@ -612,7 +612,7 @@ main (int argc, char **argv)
   /* This takes Windows 9x/ME into account. */
   if (!isNT)
     {
-      printf ("unknown::%ld:\n", DOMAIN_ALIAS_RID_ADMINS);
+      printf ("all::%ld:\n", DOMAIN_ALIAS_RID_ADMINS);
       return 0;
     }
 
