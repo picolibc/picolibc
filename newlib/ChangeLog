@@ -1,5 +1,10 @@
 2002-06-27  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
+	* libm/mathfp/s_pow.c (pow): Fix checks on variable k.  Add
+	exponent_is_even_int variable.  Handle case where x is
+	negative, and y is an odd integer.
+	* libm/mathfp/sf_pow.c (powf): Likewise.
+
 	* libm/mathfp/er_lgamma.c: Remove __kernel references.
 	* libm/mathfp/erf_lgamma.c: Likewise.
 	* libm/mathfp/s_tgamma.c: Likewise.

@@ -7,56 +7,66 @@
 float powf (float x, float y)
 {
   float d, t, r = 1.0;
-  int n, k, sign = 0;
+  int n, k, sign = 0, exponent_is_even_int = 0;
   __int32_t px;
 
   GET_FLOAT_WORD (px, x);
 
   k = modff (y, &d);
+
   if (k == 0.0) 
     {
+      /* Exponent y is an integer. */
       if (modff (ldexpf (y, -1), &t))
-        sign = 0;
+        {
+          /* y is odd. */
+          exponent_is_even_int = 0;
+        }
       else
-        sign = 1; 
+        {
+          /* y is even. */
+          exponent_is_even_int = 1;
+        }
     }
 
-  if (x == 0.0 && y <= 0.0) 
-    errno = EDOM;
-
+  if (x == 0.0 && y <= 0.0)
+    {
+      errno = EDOM;
+    }
   else if ((t = y * log (fabsf (x))) >= BIGX) 
     {
       errno = ERANGE;
       if (px & 0x80000000) 
         {
-          if (!k) 
+          /* x is negative. */
+          if (k) 
             {
+              /* y is not an integer. */
               errno = EDOM;
               x = 0.0;
             }
-          else if (sign)
-            x = -z_infinity_f.f;
+          else if (exponent_is_even_int)
+            x = z_infinity_f.f;
           else
-            x =  z_infinity_f.f;
+            x = -z_infinity_f.f;
         }
-
-    else 
-      x = z_infinity_f.f;
-  }
-
+    else
+      {
+        x = z_infinity_f.f;
+      }
+    }
   else if (t < SMALLX)
     {
       errno = ERANGE;
       x = 0.0;
     }
-
   else 
     {
-      if ( k && fabsf (d) <= 32767 ) 
+      if ( !k && fabsf (d) <= 32767 ) 
         {
           n = (int) d;
 
-          if (sign = (n < 0))
+          if ((sign = (n < 0)))
             n = -n;
 
           while ( n > 0 ) 
@@ -72,13 +82,14 @@ float powf (float x, float y)
 
           return r;
         }
-		
       else 
         {
           if ( px & 0x80000000 ) 
             {
-              if ( !k ) 
+              /* x is negative. */
+              if (k) 
                 {
+                  /* y is not an integer. */
                   errno = EDOM;
                   return 0.0;
                 }
@@ -86,13 +97,19 @@ float powf (float x, float y)
 
           x = exp (t);
 
-          if ( sign ) 
+          if (!exponent_is_even_int) 
             { 
-              px ^= 0x80000000;
-              SET_FLOAT_WORD (x, px);
+              if (px & 0x80000000)
+                {
+                  /* y is an odd integer, and x is negative,
+                     so the result is negative. */
+                  GET_FLOAT_WORD (px, x);
+                  px |= 0x80000000;
+                  SET_FLOAT_WORD (x, px);
+                }
             }
         }
-      }
+    }
 
   return x;
 }
