@@ -252,7 +252,8 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 	 \r\n conversion.  Note that we already checked for FLUSHO and
 	 output_stopped at the time that we read the character, so we
 	 don't check again here.  */
-      buf[0] = '\n';
+      if (buf)
+	buf[0] = '\n';
       need_nl = 0;
       rc = 1;
       goto out;
@@ -290,6 +291,9 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 		break;
 	      if (hit_eof ())
 		goto out;
+	      /* DISCARD (FLUSHO) and tcflush can finish here. */
+	      if (n == 0 && (get_ttyp ()->ti.c_lflag & FLUSHO || !buf))
+	        goto out;
 	      if (n == 0 && is_nonblocking ())
 		{
 		  set_errno (EAGAIN);
@@ -309,7 +313,7 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
       if (output_done_event != NULL)
 	SetEvent (output_done_event);
 
-      if (get_ttyp ()->ti.c_lflag & FLUSHO)
+      if (get_ttyp ()->ti.c_lflag & FLUSHO || !buf)
 	continue;
 
       char *optr;
@@ -697,7 +701,9 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
 
   termios_printf ("read(%x, %d) handle %p", ptr, len, get_handle ());
 
-  if ((get_ttyp ()->ti.c_lflag & ICANON))
+  if (!ptr) /* Indicating tcflush(). */
+    time_to_wait = 0;
+  else if ((get_ttyp ()->ti.c_lflag & ICANON))
     time_to_wait = INFINITE;
   else
     {
@@ -718,7 +724,7 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
   w4[0] = signal_arrived;
   w4[1] = input_available_event;
 
-  DWORD waiter = INFINITE;
+  DWORD waiter = !ptr ? 0 : INFINITE;
   while (len)
     {
       rc = WaitForMultipleObjects (2, w4, FALSE, waiter);
@@ -761,7 +767,11 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
 	  bytes_in_pipe = 0;
 	}
 
-      if (!vmin && !time_to_wait)
+      /* On first peek determine no. of bytes to flush. */
+      if (!ptr && len == UINT_MAX)
+        len = (size_t) bytes_in_pipe;
+
+      if (ptr && !vmin && !time_to_wait)
 	{
 	  ReleaseMutex (input_mutex);
 	  len = (size_t) bytes_in_pipe;
@@ -770,7 +780,7 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
 
       readlen = min (bytes_in_pipe, min (len, sizeof (buf)));
 
-      if (vmin && readlen > (unsigned) vmin)
+      if (ptr && vmin && readlen > (unsigned) vmin)
 	readlen = vmin;
 
       DWORD n = 0;
@@ -796,8 +806,11 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
 	    {
 	      len -= n;
 	      totalread += n;
-	      memcpy (ptr, buf, n);
-	      ptr = (char *) ptr + n;
+	      if (ptr)
+	        {
+		  memcpy (ptr, buf, n);
+		  ptr = (char *) ptr + n;
+		}
 	    }
 	}
 
@@ -805,6 +818,13 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
 	ResetEvent (input_available_event);
 
       ReleaseMutex (input_mutex);
+
+      if (!ptr)
+	{
+	  if (!bytes_in_pipe)
+	    break;
+	  continue;
+        }
 
       if (get_ttyp ()->read_retval < 0)	// read error
 	{
@@ -970,9 +990,25 @@ fhandler_tty_slave::tcsetattr (int, const struct termios *t)
 }
 
 int
-fhandler_tty_slave::tcflush (int)
+fhandler_tty_slave::tcflush (int queue)
 {
-  return 0;
+  int ret = 0;
+
+  termios_printf ("tcflush(%d) handle %p", queue, get_handle ());
+
+  if (queue == TCIFLUSH || queue == TCIOFLUSH)
+    {
+      size_t len = UINT_MAX;
+      read (NULL, len);
+      ret = len >= 0;
+    }
+  if (queue == TCOFLUSH || queue == TCIOFLUSH)
+    {
+      /* do nothing for now. */
+    }
+
+  termios_printf ("%d=tcflush(%d)", ret, queue);
+  return ret;
 }
 
 int
@@ -1174,9 +1210,21 @@ fhandler_pty_master::tcsetattr (int, const struct termios *t)
 }
 
 int
-fhandler_pty_master::tcflush (int)
+fhandler_pty_master::tcflush (int queue)
 {
-  return 0;
+  int ret = 0;
+
+  termios_printf ("tcflush(%d) handle %p", queue, get_handle ());
+
+  if (queue == TCIFLUSH || queue == TCIOFLUSH)
+    ret = process_slave_output (NULL, OUT_BUFFER_SIZE, 0);
+  else if (queue == TCIFLUSH || queue == TCIOFLUSH)
+    {
+      /* do nothing for now. */
+    }
+
+  termios_printf ("%d=tcflush(%d)", ret, queue);
+  return ret;
 }
 
 int

@@ -1,3 +1,19 @@
+2003-09-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_tty.cc (fhandler_pty_master::process_slave_output): Handle
+	buf == NULL as flushing the buffer.
+	(fhandler_tty_slave::read): Handle ptr == NULL as flushing the buffer.
+	(fhandler_tty_slave::tcflush): Implement input queue flushing by
+	calling read with NULL buffer.
+	(fhandler_pty_master::tcflush): Ditto, calling process_slave_output.
+	* termios.cc (tcflush): Check for legal `queue' value.  Return EINVAL
+	otherwise.
+
+2003-09-18  Brian Ford  <ford@vss.fsi.com>
+
+        * syscalls.cc (gethostid): Add lpFreeBytesAvailable argument to
+        GetDiskFreeSpaceEx call since NT4 requires it.
+
 2003-09-18  Christopher Faylor  <cgf@redhat.com>
 
         * fhandler_disk_file.cc (path_conv::ndisk_links): Fix potential
@@ -169,11 +185,11 @@
 	* security.h: Add _SECURITY_H guard.
 	(sec_user): Use sec_none in the no ntsec case.
 	* spawn.cc (spawn_guts): Remove call to load_registry_hive.
-	* syscalls (seteuid32): If warranted, call load_registry_hive,  
+	* syscalls (seteuid32): If warranted, call load_registry_hive,
 	user_shared_initialize and RegCloseKey(HKEY_CURRENT_USER).
 	* shared.cc (user_shared_initialize): New.
 	(open_shared): Add and use psa argument.
-	(memory_init): Move mount table initialization to 
+	(memory_init): Move mount table initialization to
 	user_shared_initialize. Call it.
 
 2003-09-09  Corinna Vinschen  <corinna@vinschen.de>
