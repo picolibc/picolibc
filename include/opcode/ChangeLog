@@ -1,6 +1,8 @@
 1999-12-30  Andrew Haley  <aph@cygnus.com>
 
-	* mips.h (OPCODE_IS_MEMBER): Add gp32 arg.
+	* mips.h (OPCODE_IS_MEMBER): Add gp32 arg, which determines
+	whether synthetic opcodes (e.g. move) generate 32-bit or 64-bit
+	insns.
 
 2000-01-15  Alan Modra  <alan@spri.levels.unisa.edu.au>
 
