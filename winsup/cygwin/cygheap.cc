@@ -110,18 +110,18 @@ cygheap_setup_for_child_cleanup (void *newcygheap, child_info *ci,
 
 /* Called by fork or spawn to reallocate cygwin heap */
 void __stdcall
-cygheap_fixup_in_child (child_info *ci, bool execed)
+cygheap_fixup_in_child (bool execed)
 {
-  cygheap = ci->cygheap;
-  cygheap_max = ci->cygheap_max;
+  cygheap = child_proc_info->cygheap;
+  cygheap_max = child_proc_info->cygheap_max;
   void *addr = !wincap.map_view_of_file_ex_sucks () ? cygheap : NULL;
   void *newaddr;
 
-  newaddr = MapViewOfFileEx (ci->cygheap_h, MVMAP_OPTIONS, 0, 0, 0, addr);
+  newaddr = MapViewOfFileEx (child_proc_info->cygheap_h, MVMAP_OPTIONS, 0, 0, 0, addr);
   if (newaddr != cygheap)
     {
       if (!newaddr)
-	newaddr = MapViewOfFileEx (ci->cygheap_h, MVMAP_OPTIONS, 0, 0, 0, NULL);
+	newaddr = MapViewOfFileEx (child_proc_info->cygheap_h, MVMAP_OPTIONS, 0, 0, 0, NULL);
       DWORD n = (DWORD) cygheap_max - (DWORD) cygheap;
       /* Reserve cygwin heap in same spot as parent */
       if (!VirtualAlloc (cygheap, CYGHEAPSIZE, MEM_RESERVE, PAGE_NOACCESS))
@@ -144,7 +144,7 @@ cygheap_fixup_in_child (child_info *ci, bool execed)
       UnmapViewOfFile (newaddr);
     }
 
-  ForceCloseHandle1 (ci->cygheap_h, passed_cygheap_h);
+  ForceCloseHandle1 (child_proc_info->cygheap_h, passed_cygheap_h);
 
   cygheap_init ();
 
@@ -449,7 +449,9 @@ cygheap_user::set_name (const char *new_name)
     cfree (plogsrv);
   if (pdomain)
     cfree (pdomain);
-  plogsrv = pdomain = NULL;
+  if (winname)
+    cfree (winname);
+  plogsrv = pdomain = winname = NULL;
 }
 
 BOOL

@@ -207,11 +207,13 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	  memcpy (homedrive_env_buf, p, 2);
 	  homedrive = homedrive_env_buf;
 	}
+
       if ((p = getenv ("HOMEPATH")))
 	{
 	  strcpy (homepath_env_buf, p);
 	  homepath = homepath_env_buf;
 	}
+
       if ((p = getenv ("HOME")))
 	debug_printf ("HOME is already in the environment %s", p);
       else
@@ -307,6 +309,9 @@ cygheap_user::env_logsrv ()
   if (plogsrv)
     return plogsrv;
 
+  if (strcasematch (env_name (), "SYSTEM"))
+    return NULL;
+
   char logsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];
   if (!get_logon_server (env_domain (), logsrv, NULL))
     return NULL;
@@ -331,19 +336,21 @@ cygheap_user::env_domain ()
       __seterrno ();
       return NULL;
     }
+  if (winname)
+    cfree (winname);
+  winname = cstrdup (username);
   return pdomain = cstrdup (userdomain);
 }
 
 const char *
 cygheap_user::env_userprofile ()
 {
-  if (strcasematch (name (), "SYSTEM") || !env_domain () || !env_logsrv ())
-    return NULL;
-
-  if (get_registry_hive_path (sid (), userprofile_env_buf))
+  /* FIXME: Should this just be setting a puserprofile like everything else? */
+  if (!strcasematch (env_name (), "SYSTEM")
+      && get_registry_hive_path (sid (), userprofile_env_buf))
     return userprofile_env_buf;
-  else
-    return NULL;
+
+  return NULL;
 }
 
 const char *
@@ -361,5 +368,6 @@ cygheap_user::env_homedrive ()
 const char *
 cygheap_user::env_name ()
 {
-  return name ();
+  (void) env_domain ();
+  return winname;
 }

@@ -451,10 +451,7 @@ check_sanity_and_sync (per_process *p)
     signal_shift_subtract = 0;
 }
 
-static NO_COPY STARTUPINFO si;
-# define fork_info ((struct child_info_fork *)(si.lpReserved2))
-# define spawn_info ((struct child_info_spawn *)(si.lpReserved2))
-child_info_fork NO_COPY *child_proc_info = NULL;
+child_info NO_COPY *child_proc_info = NULL;
 static MEMORY_BASIC_INFORMATION sm;
 
 #define CYGWIN_GUARD ((wincap.has_page_guard ()) ? PAGE_GUARD : PAGE_NOACCESS)
@@ -588,10 +585,10 @@ dll_crt0_1 ()
       switch (child_proc_info->type)
 	{
 	  case _PROC_FORK:
-	    cygheap_fixup_in_child (child_proc_info, 0);
+	    cygheap_fixup_in_child (0);
 	    alloc_stack (fork_info);
 	    set_myself (mypid);
-	    ProtectHandle (child_proc_info->forker_finished);
+	    ProtectHandle (fork_info->forker_finished);
 	    break;
 	  case _PROC_SPAWN:
 	    if (spawn_info->hexec_proc)
@@ -601,7 +598,7 @@ dll_crt0_1 ()
 	    hexec_proc = spawn_info->hexec_proc;
 	  around:
 	    HANDLE h;
-	    cygheap_fixup_in_child (spawn_info, 1);
+	    cygheap_fixup_in_child (1);
 	    if (!spawn_info->moreinfo->myself_pinfo ||
 		!DuplicateHandle (hMainProc, spawn_info->moreinfo->myself_pinfo,
 				  hMainProc, &h, 0, 0,
@@ -805,6 +802,7 @@ _dll_crt0 ()
   DECLARE_TLS_STORAGE;
   initial_env ();
   char zeros[sizeof (fork_info->zero)] = {0};
+  static NO_COPY STARTUPINFO si;
 #ifdef DEBUGGING
   strace.microseconds ();
 #endif
@@ -822,42 +820,42 @@ _dll_crt0 ()
 		   &hMainThread, 0, false, DUPLICATE_SAME_ACCESS);
 
   GetStartupInfo (&si);
+  child_proc_info = (child_info *) si.lpReserved2;
   if (si.cbReserved2 >= EXEC_MAGIC_SIZE &&
-      memcmp (fork_info->zero, zeros, sizeof (zeros)) == 0)
+      memcmp (child_proc_info->zero, zeros, sizeof (zeros)) == 0)
     {
-      if ((fork_info->intro & OPROC_MAGIC_MASK) == OPROC_MAGIC_GENERIC)
-	multiple_cygwin_problem ("proc", fork_info->intro, 0);
-      else if (fork_info->intro == PROC_MAGIC_GENERIC
-	       && fork_info->magic != CHILD_INFO_MAGIC)
-	multiple_cygwin_problem ("proc", fork_info->magic, CHILD_INFO_MAGIC);
+      if ((child_proc_info->intro & OPROC_MAGIC_MASK) == OPROC_MAGIC_GENERIC)
+	multiple_cygwin_problem ("proc", child_proc_info->intro, 0);
+      else if (child_proc_info->intro == PROC_MAGIC_GENERIC
+	       && child_proc_info->magic != CHILD_INFO_MAGIC)
+	multiple_cygwin_problem ("proc", child_proc_info->magic, CHILD_INFO_MAGIC);
       unsigned should_be_cb = 0;
-      switch (fork_info->type)
+      switch (child_proc_info->type)
 	{
 	  case _PROC_FORK:
-	    user_data->forkee = fork_info->cygpid;
+	    user_data->forkee = child_proc_info->cygpid;
 	    should_be_cb = sizeof (child_info_fork);
 	    /* fall through */;
 	  case _PROC_SPAWN:
-	    if (fork_info->pppid_handle)
-	      CloseHandle (fork_info->pppid_handle);
+	    if (child_proc_info->pppid_handle)
+	      CloseHandle (child_proc_info->pppid_handle);
 	    /* fall through */;
 	  case _PROC_EXEC:
 	    if (!should_be_cb)
 	      should_be_cb = sizeof (child_info);
-	    if (should_be_cb != fork_info->cb)
-	      multiple_cygwin_problem ("proc size", fork_info->cb, should_be_cb);
-	    else if (sizeof (fhandler_union) != fork_info->fhandler_union_cb)
-	      multiple_cygwin_problem ("fhandler size", fork_info->fhandler_union_cb, sizeof (fhandler_union));
+	    if (should_be_cb != child_proc_info->cb)
+	      multiple_cygwin_problem ("proc size", child_proc_info->cb, should_be_cb);
+	    else if (sizeof (fhandler_union) != child_proc_info->fhandler_union_cb)
+	      multiple_cygwin_problem ("fhandler size", child_proc_info->fhandler_union_cb, sizeof (fhandler_union));
 	    else
 	      {
-		child_proc_info = fork_info;
 		cygwin_mount_h = child_proc_info->mount_h;
 		mypid = child_proc_info->cygpid;
 		break;
 	      }
 	  default:
-	    system_printf ("unknown exec type %d", fork_info->type);
-	    fork_info = NULL;
+	    system_printf ("unknown exec type %d", child_proc_info->type);
+	    child_proc_info = NULL;
 	    break;
 	}
     }

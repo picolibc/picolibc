@@ -618,7 +618,7 @@ dtable::vfork_child_dup ()
   int res = 1;
 
   /* Remove impersonation */
-  if (cygheap->user.impersonated && cygheap->user.token != INVALID_HANDLE_VALUE)
+  if (cygheap->user.issetuid ())
     RevertToSelf ();
 
   for (size_t i = 0; i < size; i++)
@@ -638,7 +638,7 @@ dtable::vfork_child_dup ()
 
 out:
   /* Restore impersonation */
-  if (cygheap->user.impersonated && cygheap->user.token != INVALID_HANDLE_VALUE)
+  if (cygheap->user.issetuid ())
     ImpersonateLoggedOnUser (cygheap->user.token);
 
   ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");

@@ -2093,9 +2093,8 @@ seteuid32 (__uid32_t uid)
  failed:
   cygheap->user.token = sav_token;
   cygheap->user.impersonated = sav_impersonated;
-  if ( cygheap->user.token != INVALID_HANDLE_VALUE &&
-       cygheap->user.impersonated &&
-       !ImpersonateLoggedOnUser (cygheap->user.token))
+  if (cygheap->user.issetuid ()
+       && !ImpersonateLoggedOnUser (cygheap->user.token))
     system_printf ("Impersonating in seteuid failed: %E");
   return -1;
 }
@@ -2144,8 +2143,7 @@ setegid32 (__gid32_t gid)
   myself->gid = gid;
 
   /* If impersonated, update primary group and revert */
-  if (cygheap->user.token != INVALID_HANDLE_VALUE
-      && cygheap->user.impersonated)
+  if (cygheap->user.issetuid ())
     {
       if (!SetTokenInformation (cygheap->user.token,
 				TokenPrimaryGroup,
@@ -2166,8 +2164,7 @@ setegid32 (__gid32_t gid)
 		      "TokenPrimaryGroup): %E");
       CloseHandle (ptok);
     }
-  if (cygheap->user.token != INVALID_HANDLE_VALUE
-      && cygheap->user.impersonated
+  if (cygheap->user.issetuid ()
       && !ImpersonateLoggedOnUser (cygheap->user.token))
     system_printf ("Impersonating in setegid failed: %E");
   return 0;

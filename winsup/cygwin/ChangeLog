@@ -311,6 +311,68 @@
 	* Makefile.in: Remove special __OUTSIDE_CYGWIN__ case for
 	cygserver_shm.cc.
 
+2002-06-16  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.h (cygheap_user::issetuid): New method.
+	* dtable.cc (dtable::vfork_child_dup): Use new method to determine if
+	we are in "setuid mode."
+	* fork.cc (fork_parent): Ditto.
+	* spawn.cc (spawn_guts): Ditto.
+	* syscalls.cc (seteuid32): Ditto.
+	(setegid32): Ditto.
+	* environ.cc (spenv::retrieve): (Suggested by Pierre Humblet) Do
+	potential recalculation of cygheap_user stuff when in setuid mode.
+	Return special value when environment variable should be calculated but
+	not added.
+	(build_env): Don't add retrieved value to dstp if it is 'dont_add'.
+
+2002-06-16  Christopher Faylor  <cgf@redhat.com>
+
+	Changes suggested by Pierre Humblet.
+	* environ.cc (NL): New macro.
+	(conv_envvars): Use NL macro to fill in name and namelen.
+	(spenv::namelen): New field.
+	(spenvs): Use NL to fill in name and namelen.
+	(spenv::retrieve): Eliminate length argument.  Instead, use namelen
+	throughout.
+	(build_env): Don't calculate length of initial FOO= part of
+	environment.  Accommodate spenv::retrive argument change.
+
+2002-06-16  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.h (cygheap_user::winname): New field.
+	* cygheap.cc (cygheap_user::set_name): Clear winname when name changes.
+	* uinfo.cc (cygheap_user::env_logsrv): Avoid calculating server when
+	Windows user == SYSTEM.
+	(cygheap_user::env_domain): Set winname here too.
+	(cygheap_user::env_userprofile): Eliminate superfluous tests.
+	(cygheap_user::env_name): Seed winname by calling env_domain().
+
+2002-06-12  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* spawn.cc (spawn_guts): Revert removal of ciresrv.moreinfo->uid =
+	ILLEGAL_UID.
+
+2002-06-15  Christopher Faylor  <cgf@redhat.com>
+
+	* child_info.h (child_proc_info): Declare as base class.
+	(spawn_info): Declare as alias of child_proc_info to aid debugging.
+	(fork_info): Ditto.
+	* cygheap.cc (cygheap_fixup_in_child): Use child_proc_info global
+	rather than parameter.
+	* cygheap.h (cygheap_fixup_in_child): Reflect above change in
+	declaration.
+	* dcrt0.cc (_dll_crt0): Move 'si' definition here.  Assign
+	child_proc_info.
+	(dll_crt0_1): Accommodate cygheap_fixup_in_child and *_info changes.
+	* environ.cc (spenv::retrieve): Make regparm.
+	* environ.h (environ_init): Ditto.
+	(win_env::add_cache): Ditto.
+	(build_env): Ditto.
+	(getwinenv): Ditto.
+	* fork.cc (sync_with_parent): Use fork_info global.
+	(fork_child): Ditto.
+
 2002-06-14  Christopher Faylor  <cgf@redhat.com>
 
 	* uinfo.cc (cygheap_user::ontherange): Don't set HOMEDRIVE or HOMEPATH

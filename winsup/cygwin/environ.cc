@@ -44,6 +44,7 @@ static char **lastenviron;
   (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) \
 	  <= CYGWIN_VERSION_DLL_MALLOC_ENV)
 
+#define NL(x) x, (sizeof (x) - 1)
 /* List of names which are converted from dos to unix
    on the way in and back again on the way out.
 
@@ -53,19 +54,19 @@ static char **lastenviron;
 static int return_MAX_PATH (const char *) {return MAX_PATH;}
 static NO_COPY win_env conv_envvars[] =
   {
-    {"PATH=", 5, NULL, NULL, cygwin_win32_to_posix_path_list,
+    {NL ("PATH="), NULL, NULL, cygwin_win32_to_posix_path_list,
      cygwin_posix_to_win32_path_list,
      cygwin_win32_to_posix_path_list_buf_size,
      cygwin_posix_to_win32_path_list_buf_size},
-    {"HOME=", 5, NULL, NULL, cygwin_conv_to_full_posix_path, cygwin_conv_to_full_win32_path,
+    {NL ("HOME="), NULL, NULL, cygwin_conv_to_full_posix_path, cygwin_conv_to_full_win32_path,
      return_MAX_PATH, return_MAX_PATH},
-    {"LD_LIBRARY_PATH=", 16, NULL, NULL, cygwin_conv_to_full_posix_path,
+    {NL ("LD_LIBRARY_PATH="), NULL, NULL, cygwin_conv_to_full_posix_path,
      cygwin_conv_to_full_win32_path, return_MAX_PATH, return_MAX_PATH},
-    {"TMPDIR=", 7, NULL, NULL, cygwin_conv_to_full_posix_path, cygwin_conv_to_full_win32_path,
+    {NL ("TMPDIR="), NULL, NULL, cygwin_conv_to_full_posix_path, cygwin_conv_to_full_win32_path,
      return_MAX_PATH, return_MAX_PATH},
-    {"TMP=", 4, NULL, NULL, cygwin_conv_to_full_posix_path, cygwin_conv_to_full_win32_path,
+    {NL ("TMP="), NULL, NULL, cygwin_conv_to_full_posix_path, cygwin_conv_to_full_win32_path,
      return_MAX_PATH, return_MAX_PATH},
-    {"TEMP=", 5, NULL, NULL, cygwin_conv_to_full_posix_path, cygwin_conv_to_full_win32_path,
+    {NL ("TEMP="), NULL, NULL, cygwin_conv_to_full_posix_path, cygwin_conv_to_full_win32_path,
      return_MAX_PATH, return_MAX_PATH},
     {NULL, 0, NULL, NULL, NULL, NULL, 0, 0}
   };
@@ -753,58 +754,63 @@ env_sort (const void *a, const void *b)
 struct spenv
 {
   const char *name;
+  size_t namelen;
   const char * (cygheap_user::*from_cygheap) ();
-  char *retrieve (bool, const char * const = NULL, int = 0);
+  char *retrieve (bool, const char * const = NULL)
+    __attribute__ ((regparm (3)));
 };
+
+char env_dontadd[] = "";
 
 /* Keep this list in upper case and sorted */
 static NO_COPY spenv spenvs[] =
 {
-  {"HOMEPATH=", &cygheap_user::env_homepath},
-  {"HOMEDRIVE=", &cygheap_user::env_homedrive},
-  {"LOGONSERVER=", &cygheap_user::env_logsrv},
-  {"SYSTEMDRIVE=", NULL},
-  {"SYSTEMROOT=", NULL},
-  {"USERDOMAIN=", &cygheap_user::env_domain},
-  {"USERNAME=", &cygheap_user::env_name},
-  {"USERPROFILE=", &cygheap_user::env_userprofile},
+  {NL ("HOMEPATH="), &cygheap_user::env_homepath},
+  {NL ("HOMEDRIVE="), &cygheap_user::env_homedrive},
+  {NL ("LOGONSERVER="), &cygheap_user::env_logsrv},
+  {NL ("SYSTEMDRIVE="), NULL},
+  {NL ("SYSTEMROOT="), NULL},
+  {NL ("USERDOMAIN="), &cygheap_user::env_domain},
+  {NL ("USERNAME="), &cygheap_user::env_name},
+  {NL ("USERPROFILE="), &cygheap_user::env_userprofile},
 };
 
 char *
-spenv::retrieve (bool no_envblock, const char *const envname, int len)
+spenv::retrieve (bool no_envblock, const char *const envname)
 {
-  if (len && !strncasematch (envname, name, len))
+  if (envname && !strncasematch (envname, name, namelen))
     return NULL;
   if (from_cygheap)
     {
       const char *p;
-      if (!len)
-	return NULL;			/* No need to force these into the
+      if (!cygheap->user.issetuid ())
+	{
+	  if (!envname)
+	    return NULL;		/* No need to force these into the
 					   environment */
 
-      if (no_envblock)
-	return cstrdup1 (envname);	/* Don't really care what it's set to
+	  if (no_envblock)
+	    return cstrdup1 (envname);	/* Don't really care what it's set to
 					   if we're calling a cygwin program */
+	}
 
-      /* Make a FOO=BAR entry from the value returned by the cygheap_user
-         method. */
-      if (!(p = (cygheap->user.*from_cygheap) ()))
-        return NULL;
-      int namelen = strlen (name);
+      /* Calculate (potentially) value for given environment variable.  */
+      p = (cygheap->user.*from_cygheap) ();
+      if (!p || (no_envblock && !envname))
+        return env_dontadd;
       char *s = (char *) cmalloc (HEAP_1_STR, namelen + strlen (p) + 1);
       strcpy (s, name);
       (void) strcpy (s + namelen, p);
       return s;
     }
 
-  if (len)
+  if (envname)
     return cstrdup1 (envname);
 
   char dum[1];
   int vallen = GetEnvironmentVariable (name, dum, 0);
   if (vallen > 0)
     {
-      int namelen = strlen (name);
       char *p = (char *) cmalloc (HEAP_1_STR, namelen + ++vallen);
       strcpy (p, name);
       if (GetEnvironmentVariable (name, p + namelen, vallen))
@@ -845,24 +851,28 @@ build_env (const char * const *envp, char *&envblock, int &envc,
   int tl = 0;
   /* Iterate over input list, generating a new environment list and refreshing
      "special" entries, if necessary. */
-  for (srcp = envp, dstp = newenv; *srcp; srcp++, dstp++)
+  for (srcp = envp, dstp = newenv; *srcp; srcp++)
     {
-      len = strcspn (*srcp, "=") + 1;
-
       /* Look for entries that require special attention */
       for (unsigned i = 0; i < SPENVS_SIZE; i++)
-	if (!saw_spenv[i]
-	    && (*dstp = spenvs[i].retrieve (no_envblock, *srcp, len)))
+	if (!saw_spenv[i] && (*dstp = spenvs[i].retrieve (no_envblock, *srcp)))
 	  {
 	    saw_spenv[i] = 1;
-	    goto next;
+	    if (*dstp == env_dontadd)
+	      goto next1;
+	    goto  next0;
 	  }
 
+      /* Add entry to new environment */
       *dstp = cstrdup1 (*srcp);
 
-    next:
+    next0:
+      /* If necessary, calculate rough running total for envblock size */
       if (!no_envblock)
 	tl += strlen (*dstp) + 1;
+      dstp++;
+    next1:
+      continue;
     }
 
   /* Fill in any required-but-missing environment variables. */
@@ -870,7 +880,7 @@ build_env (const char * const *envp, char *&envblock, int &envc,
     if (!saw_spenv[i])
       {
 	*dstp = spenvs[i].retrieve (no_envblock);
-	if (*dstp)
+	if (*dstp && *dstp != env_dontadd)
 	  {
 	    if (!no_envblock)
 	      tl += strlen (*dstp) + 1;
@@ -878,7 +888,7 @@ build_env (const char * const *envp, char *&envblock, int &envc,
 	  }
       }
 
-  envc = dstp - newenv;
+  envc = dstp - newenv;		/* Number of entries in newenv */
   *dstp = NULL;			/* Terminate */
 
   if (no_envblock)

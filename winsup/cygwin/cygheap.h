@@ -103,6 +103,7 @@ class cygheap_user
   char  *pdomain;       /* Logon domain of the user */
   char  *homedrive;	/* User's home drive */
   char  *homepath;	/* User's home path */
+  char  *winname;	/* User's name as far as Windows knows it */
   PSID   psid;          /* buffer for user's SID */
   PSID   orig_psid;     /* Remains intact even after impersonation */
   static char homedrive_env_buf[3]; /* Where the HOMEDRIVE environment variable
@@ -143,6 +144,10 @@ public:
   PSID sid () const { return psid; }
   PSID orig_sid () const { return orig_psid; }
   const char *ontherange (homebodies what, struct passwd * = NULL);
+  bool issetuid () const
+  {
+    return impersonated && token != INVALID_HANDLE_VALUE;
+  }
 };
 
 /* cwd cache stuff.  */
@@ -276,7 +281,7 @@ class cygheap_fdget : public cygheap_fdmanip
 class child_info;
 void *__stdcall cygheap_setup_for_child (child_info *ci, bool dup_later) __attribute__ ((regparm(2)));
 void __stdcall cygheap_setup_for_child_cleanup (void *, child_info *, bool) __attribute__ ((regparm(3)));
-void __stdcall cygheap_fixup_in_child (child_info *, bool);
+void __stdcall cygheap_fixup_in_child (bool);
 extern "C" {
 void __stdcall cfree (void *) __attribute__ ((regparm(1)));
 void *__stdcall cmalloc (cygheap_types, DWORD) __attribute__ ((regparm(2)));

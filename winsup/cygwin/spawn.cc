@@ -610,7 +610,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   cygbench ("spawn-guts");
   ciresrv.mount_h = cygwin_mount_h;
 
-  if (!cygheap->user.impersonated || cygheap->user.token == INVALID_HANDLE_VALUE)
+  if (!cygheap->user.issetuid ())
     {
       PSECURITY_ATTRIBUTES sec_attribs = sec_user_nih (sa_buf);
       ciresrv.moreinfo->envp = build_env (envp, envblock, ciresrv.moreinfo->envc,
@@ -646,6 +646,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       char wstname[1024];
       char dskname[1024];
 
+      ciresrv.moreinfo->uid = ILLEGAL_UID;
       hwst = GetProcessWindowStation ();
       SetUserObjectSecurity (hwst, &dsi, get_null_sd ());
       GetUserObjectInformation (hwst, UOI_NAME, wstname, 1024, &n);

@@ -196,11 +196,11 @@ sync_with_parent(const char *s, bool hang_self)
 {
   debug_printf ("signalling parent: %s", s);
   /* Tell our parent we're waiting. */
-  if (!SetEvent (child_proc_info->subproc_ready))
+  if (!SetEvent (fork_info->subproc_ready))
     api_fatal ("fork child - SetEvent for %s failed, %E", s);
   if (hang_self)
     {
-      HANDLE h = child_proc_info->forker_finished;
+      HANDLE h = fork_info->forker_finished;
       /* Wait for the parent to fill in our stack and heap.
 	 Don't wait forever here.  If our parent dies we don't want to clog
 	 the system.  If the wait fails, we really can't continue so exit.  */
@@ -213,10 +213,10 @@ sync_with_parent(const char *s, bool hang_self)
 	  break;
 	case WAIT_FAILED:
 	  if (GetLastError () == ERROR_INVALID_HANDLE &&
-	      WaitForSingleObject (child_proc_info->forker_finished, 1) != WAIT_FAILED)
+	      WaitForSingleObject (fork_info->forker_finished, 1) != WAIT_FAILED)
 	    break;
 	  api_fatal ("WFSO failed for %s, fork_finished %p, %E", s,
-		     child_proc_info->forker_finished);
+		     fork_info->forker_finished);
 	  break;
 	default:
 	  debug_printf ("no problems");
@@ -265,10 +265,10 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
      fork() was invoked from other than the main thread.  Make sure that
      when the "main" thread exits it calls do_exit, like a normal process.
      Exit with a status code of 0. */
-  if (child_proc_info->stacksize)
+  if (fork_info->stacksize)
     {
-      ((DWORD *)child_proc_info->stackbottom)[-17] = (DWORD)do_exit;
-      ((DWORD *)child_proc_info->stackbottom)[-15] = (DWORD)0;
+      ((DWORD *)fork_info->stackbottom)[-17] = (DWORD)do_exit;
+      ((DWORD *)fork_info->stackbottom)[-15] = (DWORD)0;
     }
 
   set_file_api_mode (current_codepage);
@@ -298,8 +298,8 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
     }
 
   ForceCloseHandle (hParent);
-  (void) ForceCloseHandle (child_proc_info->subproc_ready);
-  (void) ForceCloseHandle (child_proc_info->forker_finished);
+  (void) ForceCloseHandle (fork_info->subproc_ready);
+  (void) ForceCloseHandle (fork_info->forker_finished);
 
   if (fixup_shms_after_fork ())
     api_fatal ("recreate_shm areas after fork failed");
@@ -441,7 +441,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   si.cbReserved2 = sizeof(ch);
 
   /* Remove impersonation */
-  if (cygheap->user.impersonated && cygheap->user.token != INVALID_HANDLE_VALUE)
+  if (cygheap->user.issetuid ())
     RevertToSelf ();
 
   ch.parent = hParent;
@@ -490,8 +490,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
       ForceCloseHandle(subproc_ready);
       ForceCloseHandle(forker_finished);
       /* Restore impersonation */
-      if (cygheap->user.impersonated
-	  && cygheap->user.token != INVALID_HANDLE_VALUE)
+      if (cygheap->user.issetuid ())
 	ImpersonateLoggedOnUser (cygheap->user.token);
       cygheap_setup_for_child_cleanup (newheap, &ch, 0);
       return -1;
@@ -519,7 +518,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   strcpy(forked->progname, myself->progname);
 
   /* Restore impersonation */
-  if (cygheap->user.impersonated && cygheap->user.token != INVALID_HANDLE_VALUE)
+  if (cygheap->user.issetuid ())
     ImpersonateLoggedOnUser (cygheap->user.token);
 
   ProtectHandle (pi.hThread);
