@@ -77,7 +77,7 @@ Michael Meissner put in many long hours working on the now-defunct
 PowerPC port.  Jason Molenda and Mark Eichin have also made important
 contributions.
 
-Please note that those of us here at Cygnus that work on Cygwin try to
+Please note that all of us working on Cygwin try to
 be as responsive as possible and deal with patches and questions as we
 get them, but realistically we don't have time to answer all of the
 email that is sent to the main mailing list.  Making Net releases of the
