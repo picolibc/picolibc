@@ -1,3 +1,9 @@
+Tue Oct 31 20:56:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler_tape.cc (fhandler_dev_tape::open): Fix memory allocation.
+	Use Cygwin heap instead of user heap.
+	(fhandler_dev_tape::ioctl): Ditto.
+
 Tue Oct 31 12:00:06 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* pinfo.cc (enum_init): Don't suffer silently if we can't load the

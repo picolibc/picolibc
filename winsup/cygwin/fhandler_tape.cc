@@ -16,6 +16,7 @@ details. */
 #include <unistd.h>
 
 #include <sys/mtio.h>
+#include "cygheap.h"
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "path.h"
@@ -88,7 +89,7 @@ fhandler_dev_tape::open (const char *path, int flags, mode_t)
 	varblkop = get.mt_dsreg == 0;
 
       if (devbufsiz > 1L)
-	devbuf = new char [ devbufsiz ];
+	devbuf = (char *) cmalloc (HEAP_BUF, devbufsiz);
 
       /* The following rewind in position 0 solves a problem which appears
        * in case of multi volume archives: The last ReadFile on first medium
@@ -348,7 +349,7 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 		      size = get.mt_maxblksize;
 		      ret = NO_ERROR;
 		    }
-		  char *buf = new char [ size ];
+		  char *buf = (char *) cmalloc (HEAP_BUF, size);
 		  if (!buf)
 		    {
 		      ret = ERROR_OUTOFMEMORY;
@@ -358,7 +359,7 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 		    {
 		      memcpy(buf,devbuf + devbufstart, devbufend - devbufstart);
 		      devbufend -= devbufstart;
-		      delete [] devbuf;
+		      cfree (devbuf);
 		    }
 		  else
 		    devbufend = 0;
