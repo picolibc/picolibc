@@ -1,3 +1,18 @@
+2004-06-02  Rocher Laurent  <lrocher@users.sourceforge.net>
+
+	* include/commctrl.h (Animate_OpenEx): Define.
+	(DateTime_GetSystemTime, DateTime_SetSystemTime): Correct names.
+	(ListView_GetNumberOfWorkAreas): Correct macro.
+	(ListView_SetUnicodeFormat, ListView_GetUnicodeFormat,
+	ListView_SetItemCountEx, ListView_GetISearchString,
+	TreeView_GetLastVisible, Header_CreateDragImage,
+	Header_SetImageList, Header_GetImageList): Define.
+	(LVM_SETUNICODEFORMAT, LVM_GETUNICODEFORMAT,
+	MCM_GETUNICODEFORMAT, MCM_SETUNICODEFORMAT,
+	TBSTATE_ELLIPSES): Define.
+	(MonthCal_SetRange): Correct macro.
+	(ImageList_Duplicate): Declare.
+
 2004-05-29  Filip Navara  <xnavara@volny.cz>
 
 	* include/winnt.h (IMAGE_EXPORT_DIRECTORY): Fixed declaration.
