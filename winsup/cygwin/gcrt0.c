@@ -16,7 +16,7 @@ extern u_char eprol asm ("__eprol");
 extern void _mcleanup (void);
 extern void monstartup (u_long, u_long);
 
-foo void _monstartup (void) __attribute__((__constructor__));
+void _monstartup (void) __attribute__((__constructor__));
 
 /* startup initialization for -pg support */
 
