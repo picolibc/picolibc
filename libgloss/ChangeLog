@@ -1,3 +1,10 @@
+2003-04-29  Nick Clifton  <nickc@redhat.com>
+
+	* libnosys/sbrk.c: Remove unnecessary #include's.
+	Change return type of _sbrk() function to void * to match
+	definition in system header files.
+	Fix formatting.
+
 2003-04-23  Andrew Haley  <aph@cambridge.redhat.com>
 
 	* xstormy16/sim_rom.ld: New.
