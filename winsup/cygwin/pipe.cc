@@ -89,6 +89,9 @@ fhandler_pipe::close ()
     CloseHandle (guard);
   if (writepipe_exists)
     CloseHandle (writepipe_exists);
+  // FIXME is this vfork_cleanup test right?  Is it responsible for some of
+  // the strange pipe behavior that has been reported in the cygwin mailing
+  // list?
   if (read_state && !cygheap->fdtab.in_vfork_cleanup ())
     CloseHandle (read_state);
   if (get_handle ())

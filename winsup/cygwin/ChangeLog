@@ -1,5 +1,11 @@
 2004-01-16  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler_console.cc (fhandler_console::close): Remove obsolete test
+	for vfork_cleanup.
+	* pipe.cc (fhandler_pipe::close): Add comment.
+
+2004-01-16  Christopher Faylor  <cgf@redhat.com>
+
 	* cygheap.cc (init_cygheap::close_ctty): Don't NULL ctty if it is still
 	active.
 

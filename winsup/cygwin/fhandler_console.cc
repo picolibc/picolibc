@@ -677,8 +677,7 @@ fhandler_console::close (void)
   CloseHandle (get_output_handle ());
   set_io_handle (NULL);
   set_output_handle (NULL);
-  if (!cygheap->fdtab.in_vfork_cleanup () && --(cygheap->open_fhs) <= 0
-      && myself->ctty != TTY_CONSOLE)
+  if (--(cygheap->open_fhs) <= 0 && myself->ctty != TTY_CONSOLE)
     {
       syscall_printf ("open_fhs %d", cygheap->open_fhs);
       FreeConsole ();
