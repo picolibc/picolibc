@@ -1,3 +1,9 @@
+2002-06-18  Dave Brolley  <brolley@redhat.com>
+
+	From Catherine Moore, Michael Meissner, Dave Brolley:
+	* common.h (EM_CYGNUS_FRV): New macro.
+	* frv.h: New file.
+
 2002-06-06  Lars Brinkhoff  <lars@nocrew.org>
 
 	* common.h: Change registry@sco.com to registry@caldera.com.
