@@ -1,3 +1,7 @@
+Mon Jan 29 10:23:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* mmap.cc (mmap_record::find_empty): Fix loop condition.
+
 Sun Jan 28 19:40:40 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* syscalls.cc (_link): Make sure that newpath does not exist.  Set
