@@ -1,3 +1,7 @@
+2000-05-17  Maciej W. Rozycki  <macro@ds2.pg.gda.pl>
+
+	* i386.h: Use sl_FP, not sl_Suf for fild.
+
 2000-05-16  Frank Ch. Eigler  <fche@redhat.com>
 
 	* cgen.h (CGEN_MAX_SYNTAX_BYTES): Increase to 32.  Check that

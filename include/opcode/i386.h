@@ -106,14 +106,14 @@ static const template i386_optab[] = {
 {"movsbl", 2, 0x0fbe, X, Cpu386, NoSuf|Modrm,			{ Reg8|ByteMem, Reg32, 0} },
 {"movsbw", 2, 0x0fbe, X, Cpu386, NoSuf|Modrm,			{ Reg8|ByteMem, Reg16, 0} },
 {"movswl", 2, 0x0fbf, X, Cpu386, NoSuf|Modrm,			{ Reg16|ShortMem, Reg32, 0} },
-/* Intel Syntax */
+/* Intel Syntax next 2 insns */
 {"movsx",  2, 0x0fbf, X, Cpu386, w_Suf|Modrm|IgnoreSize,	{ Reg16|ShortMem, Reg32, 0} },
 {"movsx",  2, 0x0fbe, X, Cpu386, b_Suf|Modrm,			{ Reg8|ByteMem, WordReg, 0} },
 
 /* Move with zero extend.  */
 {"movzb",  2, 0x0fb6, X, Cpu386, wl_Suf|Modrm,			{ Reg8|ByteMem, WordReg, 0} },
 {"movzwl", 2, 0x0fb7, X, Cpu386, NoSuf|Modrm,			{ Reg16|ShortMem, Reg32, 0} },
-/* Intel Syntax */
+/* Intel Syntax next 2 insns */
 {"movzx",  2, 0x0fb7, X, Cpu386, w_Suf|Modrm|IgnoreSize,	{ Reg16|ShortMem, Reg32, 0} },
 {"movzx",  2, 0x0fb6, X, Cpu386, b_Suf|Modrm,			{ Reg8|ByteMem, WordReg, 0} },
 
@@ -518,7 +518,7 @@ static const template i386_optab[] = {
 {"fld",	   1, 0xd9c0, X, 0,	 l_FP|ShortForm|Ugh,	{ FloatReg, 0, 0} },
 /* Intel Syntax */
 {"fld",    1,	0xdb, 5, 0,	 x_FP|Modrm,		{ LLongMem, 0, 0} },
-{"fild",   1,	0xdf, 0, 0,	 sl_Suf|FloatMF|Modrm,	{ ShortMem|LongMem, 0, 0} },
+{"fild",   1,	0xdf, 0, 0,	 sl_FP|FloatMF|Modrm,	{ ShortMem|LongMem, 0, 0} },
 /* Intel Syntax */
 {"fildd",  1,	0xdf, 5, 0,	 FP|Modrm,		{ LLongMem, 0, 0} },
 {"fildq",  1,	0xdf, 5, 0,	 FP|Modrm,		{ LLongMem, 0, 0} },
