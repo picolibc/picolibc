@@ -1,3 +1,8 @@
+Tue Sep  5 17:49:34 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (readlink): 'max' should be a 'min' or we'll suffer
+	buffer overflow.
+
 Mon Sep  4 22:53:58 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (cwd_win32): Eliminate.
