@@ -1,3 +1,7 @@
+2000-05-13  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* include/cygwin/socket.h (AF_INET6): Use same value as winsock2.
+
 2000-05-12  Mumit Khan  <khan@xraylith.wisc.edu>
 
 	* include/cygwin/in.h (struct in6_addr): Fix spelling.
