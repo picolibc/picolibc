@@ -1,3 +1,7 @@
+2003-02-07  Christopher Faylor  <cgf@redhat.com>
+
+	* how.texinfo: Add more w32api words.
+
 2003-02-07  Igor Pechtchanski <pechtcha@cs.nyu.edu>
 
 	* ntsec.sgml: Add note on special names for missing user/group.

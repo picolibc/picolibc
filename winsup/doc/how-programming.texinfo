@@ -234,12 +234,16 @@ rewriting the runtime library in question from specs...
 @subsection How do I rebuild the tools on my NT box?
 
 Install all required components in one directory (we'll call it /src).
-Ideally, you should check out what you need from CVS (@file{http://cygwin.com/cvs.html}) but
-otherwise, you can install the appropriate source packages from the
-cygwin distribution.
+Ideally, you should check out what you need from CVS
+(@file{http://cygwin.com/cvs.html}).  This is the @emph(preferred
+method) for acquiring the sources.  Otherwise, you can install the
+appropriate source packages from the cygwin distribution.
 
 As of this writing, you need to install at least the cygwin source
-package and the w32api source package.
+package and the w32api source package.  The winsup source package
+should be extracted first and the w32api source directory should
+be extracted into the resulting 'winsup' directory.  Then rename
+w32api-whatever to w32api.
 
 It is possible that the cygwin source package may require a newer
 version of the w32api package since the release of the packages is
