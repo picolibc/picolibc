@@ -1,3 +1,7 @@
+Fri Oct  5 00:31:35 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* heap.h (inheap): Check for NULL.
+
 Thu Oct  4 23:17:49 2001  Christopher Faylor <cgf@cygnus.com>
 
 	Add second path_conv * argument to fstat()s throughout.
