@@ -1,5 +1,28 @@
 2004-02-02  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler.h (*::fixup_after_exec): Eliminate unused handle argument.
+	* fhandler.h (dtable::fixup_after_exec): Eliminate unused handle
+	argument.
+	* dcrt0.cc (dll_crt0_1): Reflect elimination of unused handle argument
+	to fixup_after_exec.
+	* dtable.cc (dtable::fixup_after_exec): Ditto.
+	* fhandler_console.cc (fhandler_console::fixup_after_exec): Ditto.
+	* fhandler_dsp.cc (fhandler_dsp::fixup_after_exec): Ditto.
+	* fhandler_raw.cc (fhandler_raw::fixup_after_exec): Ditto.
+	* fhandler_socket.cc (fhandler_socket::fixup_after_exec): Ditto.
+	* fhandler_virtual.cc (fhandler_virtual::fixup_after_exec): Ditto.
+	* pipe.cc (fhandler_pipe::fixup_after_exec): Ditto.
+
+2004-02-02  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* spawn.cc (spawn_guts): Do not set ciresrv.parent.
+	* child_info.h (child_info_spawn::~child_info_spawn): Do not close
+	parent.  Update CURR_CHILD_INFO_MAGIC.
+	* dcrt0.cc (dll_crt0_0): Do not close spawn_info->parent.  Pass NULL to
+	cygheap->fdtab.fixup_after_exec().
+
+2004-02-02  Christopher Faylor  <cgf@redhat.com>
+
 	Throughout, change name from set_inheritance to set_no_inheritance to
 	better reflect input arguments of this function.
 

@@ -659,7 +659,7 @@ dtable::set_file_pointers_for_exec ()
 }
 
 void
-dtable::fixup_after_exec (HANDLE parent)
+dtable::fixup_after_exec ()
 {
   first_fd_for_open = 0;
   fhandler_base *fh;
@@ -676,7 +676,7 @@ dtable::fixup_after_exec (HANDLE parent)
 	  }
 	else
 	  {
-	    fh->fixup_after_exec (parent);
+	    fh->fixup_after_exec ();
 	    if (i == 0)
 	      SetStdHandle (std_consts[i], fh->get_io_handle ());
 	    else if (i <= 2)

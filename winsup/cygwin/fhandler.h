@@ -211,7 +211,7 @@ class fhandler_base
 
   virtual void fixup_before_fork_exec (DWORD) {}
   virtual void fixup_after_fork (HANDLE);
-  virtual void fixup_after_exec (HANDLE) {}
+  virtual void fixup_after_exec () {}
 
   bool get_symlink_p () { return FHISSETF (SYMLINK); }
   void set_symlink_p (int val) { FHCONDSETF (val, SYMLINK); }
@@ -424,7 +424,7 @@ class fhandler_socket: public fhandler_base
   void set_close_on_exec (int val);
   virtual void fixup_before_fork_exec (DWORD);
   void fixup_after_fork (HANDLE);
-  void fixup_after_exec (HANDLE);
+  void fixup_after_exec ();
   bool need_fixup_before () const {return true;}
 
   select_record *select_read (select_record *s);
@@ -467,7 +467,7 @@ public:
   int dup (fhandler_base *child);
   int ioctl (unsigned int cmd, void *);
   void fixup_after_fork (HANDLE);
-  void fixup_after_exec (HANDLE);
+  void fixup_after_exec ();
   bool hit_eof ();
   void set_eof () {broken_pipe = true;}
   HANDLE get_guard () const {return guard;}
@@ -539,7 +539,7 @@ class fhandler_dev_raw: public fhandler_base
   int ioctl (unsigned int cmd, void *buf);
 
   void fixup_after_fork (HANDLE);
-  void fixup_after_exec (HANDLE);
+  void fixup_after_exec ();
 };
 
 class fhandler_dev_floppy: public fhandler_dev_raw
@@ -676,7 +676,7 @@ class fhandler_serial: public fhandler_base
   void dump ();
   int is_tty () { return 1; }
   void fixup_after_fork (HANDLE parent);
-  void fixup_after_exec (HANDLE);
+  void fixup_after_exec ();
 
   /* We maintain a pgrp so that tcsetpgrp and tcgetpgrp work, but we
      don't use it for permissions checking.  fhandler_tty_slave does
@@ -721,7 +721,7 @@ class fhandler_termios: public fhandler_base
   virtual DWORD __acquire_output_mutex (const char *fn, int ln, DWORD ms) {return 1;}
   virtual void __release_output_mutex (const char *fn, int ln) {}
   void fixup_after_fork (HANDLE);
-  void fixup_after_exec (HANDLE parent) { fixup_after_fork (parent); }
+  void fixup_after_exec () { fixup_after_fork (NULL); }
   void echo_erase (int force = 0);
   virtual _off64_t lseek (_off64_t, int);
 };
@@ -853,7 +853,7 @@ class fhandler_console: public fhandler_termios
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
-  void fixup_after_exec (HANDLE);
+  void fixup_after_exec ();
   void set_close_on_exec (int val);
   void fixup_after_fork (HANDLE parent);
   void set_input_state ();
@@ -1106,7 +1106,7 @@ class fhandler_dev_dsp : public fhandler_base
   int close (void);
   int dup (fhandler_base *child);
   void dump (void);
-  void fixup_after_exec (HANDLE);
+  void fixup_after_exec ();
 };
 
 class fhandler_virtual : public fhandler_base
@@ -1136,7 +1136,7 @@ class fhandler_virtual : public fhandler_base
   int close (void);
   int __stdcall fstat (struct stat *buf) __attribute__ ((regparm (2)));
   virtual bool fill_filebuf ();
-  void fixup_after_exec (HANDLE);
+  void fixup_after_exec ();
 };
 
 class fhandler_proc: public fhandler_virtual

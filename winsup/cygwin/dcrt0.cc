@@ -703,9 +703,8 @@ dll_crt0_0 ()
 	    envp = spawn_info->moreinfo->envp;
 	    envc = spawn_info->moreinfo->envc;
 	    envp = spawn_info->moreinfo->envp;
-	    cygheap->fdtab.fixup_after_exec (spawn_info->parent);
+	    cygheap->fdtab.fixup_after_exec ();
 	    signal_fixup_after_exec ();
-	    CloseHandle (spawn_info->parent);
 	    if (spawn_info->moreinfo->old_title)
 	      {
 		old_title = strcpy (title_buf, spawn_info->moreinfo->old_title);

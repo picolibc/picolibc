@@ -397,14 +397,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   init_child_info (chtype, &ciresrv, (mode == _P_OVERLAY) ? myself->pid : 1,
 		   subproc_ready);
-  if (!DuplicateHandle (hMainProc, hMainProc, hMainProc, &ciresrv.parent, 0, 1,
-			DUPLICATE_SAME_ACCESS))
-     {
-       system_printf ("couldn't create handle to myself for child, %E");
-       return -1;
-     }
 
-  VerifyHandle (ciresrv.parent);
   ciresrv.moreinfo = (cygheap_exec_info *) ccalloc (HEAP_1_EXEC, 1, sizeof (cygheap_exec_info));
   ciresrv.moreinfo->old_title = NULL;
 

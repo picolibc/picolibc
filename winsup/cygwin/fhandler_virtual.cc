@@ -37,7 +37,7 @@ fhandler_virtual::~fhandler_virtual ()
 }
 
 void
-fhandler_virtual::fixup_after_exec (HANDLE)
+fhandler_virtual::fixup_after_exec ()
 {
   if (filebuf)
     filebuf = NULL;

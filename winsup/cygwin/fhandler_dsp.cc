@@ -646,7 +646,7 @@ fhandler_dev_dsp::dump ()
 }
 
 void
-fhandler_dev_dsp::fixup_after_exec (HANDLE)
+fhandler_dev_dsp::fixup_after_exec ()
 {
   /* FIXME:  Is there a better way to do this? */
   s_audio = new (audio_buf) Audio;

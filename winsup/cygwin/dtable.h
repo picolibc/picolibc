@@ -67,7 +67,7 @@ public:
   void release (int fd);
   void init_std_file_from_handle (int fd, HANDLE handle);
   int dup2 (int oldfd, int newfd);
-  void fixup_after_exec (HANDLE);
+  void fixup_after_exec ();
   inline fhandler_base *&operator [](int fd) const { return fds[fd]; }
   select_record *select_read (int fd, select_record *s);
   select_record *select_write (int fd, select_record *s);

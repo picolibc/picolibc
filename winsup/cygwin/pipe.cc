@@ -123,7 +123,7 @@ fhandler_pipe::hit_eof ()
 }
 
 void
-fhandler_pipe::fixup_after_exec (HANDLE parent)
+fhandler_pipe::fixup_after_exec ()
 {
   if (read_state)
     {
@@ -140,7 +140,7 @@ fhandler_pipe::fixup_after_fork (HANDLE parent)
     fork_fixup (parent, guard, "guard");
   if (writepipe_exists)
     fork_fixup (parent, writepipe_exists, "guard");
-  fixup_after_exec (parent);
+  fixup_after_exec ();
 }
 
 int

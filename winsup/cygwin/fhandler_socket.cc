@@ -303,11 +303,11 @@ fhandler_socket::fixup_after_fork (HANDLE parent)
 }
 
 void
-fhandler_socket::fixup_after_exec (HANDLE parent)
+fhandler_socket::fixup_after_exec ()
 {
   debug_printf ("here");
   if (!get_close_on_exec ())
-    fixup_after_fork (parent);
+    fixup_after_fork (NULL);
 #if 0
   else if (!winsock2_active)
     closesocket (get_socket ());

@@ -508,7 +508,7 @@ fhandler_dev_raw::fixup_after_fork (HANDLE)
 }
 
 void
-fhandler_dev_raw::fixup_after_exec (HANDLE)
+fhandler_dev_raw::fixup_after_exec ()
 {
   if (devbufsiz > 1L)
     devbuf = new char [devbufsiz];

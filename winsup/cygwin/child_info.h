@@ -1,6 +1,6 @@
 /* child_info.h: shared child info for cygwin
 
-   Copyright 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -29,7 +29,7 @@ enum
 
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
-#define CURR_CHILD_INFO_MAGIC 0x1e4c5751U
+#define CURR_CHILD_INFO_MAGIC 0x4239088U
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -88,8 +88,6 @@ public:
   child_info_spawn (): moreinfo (NULL) {}
   ~child_info_spawn ()
   {
-    if (parent)
-      CloseHandle (parent);
     if (moreinfo)
       {
 	if (moreinfo->old_title)

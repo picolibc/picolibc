@@ -1785,7 +1785,7 @@ set_console_title (char *title)
 }
 
 void
-fhandler_console::fixup_after_exec (HANDLE)
+fhandler_console::fixup_after_exec ()
 {
   HANDLE h = get_handle ();
   HANDLE oh = get_output_handle ();
