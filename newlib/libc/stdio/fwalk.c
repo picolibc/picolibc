@@ -36,10 +36,13 @@ _fwalk (ptr, function)
   register struct _glue *g;
 
   /* Must traverse given list for std streams.  */
-  for (g = &ptr->__sglue; g != NULL; g = g->_next)
-    for (fp = g->_iobs, n = g->_niobs; --n >= 0; fp++)
-      if (fp->_flags != 0)
-	ret |= (*function) (fp);
+  if (ptr != _GLOBAL_REENT)
+    {
+      for (g = &ptr->__sglue; g != NULL; g = g->_next)
+        for (fp = g->_iobs, n = g->_niobs; --n >= 0; fp++)
+          if (fp->_flags != 0)
+	    ret |= (*function) (fp);
+    }
 
   /* Must traverse global list for all other streams.  */
   for (g = &_GLOBAL_REENT->__sglue; g != NULL; g = g->_next)
