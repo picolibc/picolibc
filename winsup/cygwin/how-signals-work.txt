@@ -27,9 +27,10 @@ This array is located in the 'sigtodo' array in the procinfo class.
 
 The signal thread uses the InterlockedDecrement function to atomically
 inspect elements of the array.  If one one of the elements of the array
-is non-zero, then cygwin checks to see if the user has blocked the signal
-by inspecting the process signal mask.  If the signal is blocked, then
-the array is reincremented and the next element is checked.
+is non-zero, then cygwin checks to see if the user has blocked the
+signal by inspecting the process signal mask.  If the signal is blocked,
+then the current array element is reincremented and the next element is
+checked.
 
 If the signal is not blocked, then the function "sig_handle" is called
 with the signal number as an argument.  This is a fairly straightforward
@@ -53,13 +54,16 @@ signal processing is in setup_handler.
 
 setup_handler has a "simple" task.  It tries to stop the appropriate
 thread and redirect its execution to the signal handler function.
-Currently, the "appropriate thread" is only the main thread.
+Currently, the "appropriate thread" is only the main thread.  Someday
+we'll have to change this to allow cygwin to interrupt other user
+threads.
 
-To accomplish this, setup_handler first inspects the static sigsave
+To accomplish its task, setup_handler first inspects the static sigsave
 structure.  This structure contains information on any not-yet-handled
 signals that may have been set up by a previous call to setup_handler
 but not yet dispatched in the main thread.  If the sigsave structure
-seems to be "active", then a "pending" flag is set (see below).
+seems to be "active", then a "pending" flag is set (see below) and the
+function returns.  Otherwise processing continues.
 
 After determining that sigsave is available, setup_handler will take
 one of two routes, depending on whether the main thread is executing
@@ -85,11 +89,11 @@ caller.  Rather, it returns to sigdelayed.
 The sigdelayed function saves a lot of state on the stack and sets the
 signal mask as appropriate for POSIX.  It uses information from the
 sigsave structure which has been filled in by interrupt_on_return, as
-called by setup_handler.  sigdelayed pushes another "sigreturn" address
-on the stack.  This will be the return address seen by the signal
-handler.  After setting up the return value, modifying the signal mask,
-and saving other information on the stack, sigreturn clears the sigsave
-structure (so that setup_handler can use it) and jumps to the signal
-handler function.
+called by setup_handler.  sigdelayed pushes a "call" the function
+"sigreturn" on the stack.  This will be the return address seen by the
+signal handler.  After setting up the return value, modifying the signal
+mask, and saving other information on the stack, sigreturn clears the
+sigsave structure (so that setup_handler can use it) and jumps to the
+signal handler function.
 
 
