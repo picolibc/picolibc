@@ -214,7 +214,10 @@ main (int argc, char **argv)
     default:
       if (optind != (argc - 1))
 	{
-	  fprintf (stderr, "%s: too many arguments\n", progname);
+	  if (optind >= argc)
+	    fprintf (stderr, "%s: not enough arguments\n", progname);
+	  else
+	    fprintf (stderr, "%s: too many arguments\n", progname, optind, argc);
 	  usage ();
 	}
       if (force || !mount_already_exists (argv[optind + 1], flags))
