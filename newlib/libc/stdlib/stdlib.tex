@@ -11,6 +11,7 @@ The corresponding declarations are in the header file @file{stdlib.h}.
 * atexit::      Request execution of functions at program exit
 * atof::        String to double or float
 * atoi::        String to integer
+* atoll::       String to long long
 * calloc::      Allocate space for arrays
 * div::         Divide two integers
 * ecvtbuf::     Double or float to string of digits
@@ -21,6 +22,8 @@ The corresponding declarations are in the header file @file{stdlib.h}.
 * getenv::      Look up environment variable
 * labs::        Long integer absolute value (magnitude)
 * ldiv::        Divide two long integers
+* llabs::       Long long integer absolute value (magnitude)
+* lldiv::       Divide two long long integers
 * malloc::      Allocate and manage memory (malloc, realloc, free)
 * mallinfo::	Get information about allocated memory
 * __malloc_lock::	Lock memory pool for malloc and free
@@ -56,6 +59,9 @@ The corresponding declarations are in the header file @file{stdlib.h}.
 @include stdlib/atoi.def
 
 @page
+@include stdlib/atoll.def
+
+@page
 @include stdlib/calloc.def
 
 @page
@@ -81,6 +87,12 @@ The corresponding declarations are in the header file @file{stdlib.h}.
 
 @page
 @include stdlib/ldiv.def
+
+@page
+@include stdlib/llabs.def
+
+@page
+@include stdlib/lldiv.def
 
 @page
 @include stdlib/malloc.def

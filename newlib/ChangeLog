@@ -1,3 +1,15 @@
+2003-11-27  Artem B. Bityuckiy  <mail_lists@mail.ru>
+	    Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/stdlib.h (lldiv_t): New type.
+	(atoll, llabs, lldiv): New prototypes.
+	* libc/stdlib/Makefile.am: Add support for atoll, llabs, and lldiv.
+	* libc/stdlib/stdlib.tex: Ditto.
+	* libc/stdlib/Makefile.in: Regenerated.
+	* libc/stdlib/atoll.c: New file.
+	* libc/stdlib/llabs.c: Ditto.
+	* libc/stdlib/lldiv.c: Ditto.
+
 2003-11-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/fcntl.h: Declare syscalls only when building newlib.

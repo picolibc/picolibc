@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -176,7 +176,10 @@ EXTENDED_SOURCES = \
 	strtoll.c	\
 	strtoll_r.c	\
 	strtoull.c	\
-	strtoull_r.c
+	strtoull_r.c	\
+	atoll.c		\
+	llabs.c		\
+	lldiv.c
 
 
 ELIX_2_OBJS = \
@@ -246,16 +249,19 @@ CHEWOUT_FILES = \
 	assert.def	\
 	atexit.def	\
 	atof.def 	\
-	ecvtbuf.def	\
 	atoi.def 	\
+	atoll.def 	\
 	calloc.def	\
 	div.def		\
+	ecvtbuf.def	\
 	efgcvt.def 	\
 	envlock.def	\
 	exit.def	\
 	getenv.def	\
 	labs.def	\
 	ldiv.def	\
+	llabs.def	\
+	lldiv.def	\
 	malloc.def	\
 	mallocr.def	\
 	mblen.def	\
@@ -314,7 +320,8 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@mtrim.$(OBJEXT) nrand48.$(OBJEXT) rand48.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@seed48.$(OBJEXT) srand48.$(OBJEXT) strtoll.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@strtoll_r.$(OBJEXT) strtoull.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@strtoull_r.$(OBJEXT)
+@USE_LIBTOOL_FALSE@strtoull_r.$(OBJEXT) atoll.$(OBJEXT) llabs.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@lldiv.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 @USE_LIBTOOL_TRUE@libstdlib_la_OBJECTS =  __adjust.lo __exp10.lo \
@@ -330,7 +337,8 @@ LTLIBRARIES =  $(noinst_LTLIBRARIES)
 @USE_LIBTOOL_TRUE@ecvtbuf.lo efgcvt.lo erand48.lo jrand48.lo lcong48.lo \
 @USE_LIBTOOL_TRUE@lrand48.lo mrand48.lo msize.lo mtrim.lo nrand48.lo \
 @USE_LIBTOOL_TRUE@rand48.lo seed48.lo srand48.lo strtoll.lo \
-@USE_LIBTOOL_TRUE@strtoll_r.lo strtoull.lo strtoull_r.lo
+@USE_LIBTOOL_TRUE@strtoll_r.lo strtoull.lo strtoull_r.lo atoll.lo \
+@USE_LIBTOOL_TRUE@llabs.lo lldiv.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

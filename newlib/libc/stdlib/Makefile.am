@@ -69,7 +69,10 @@ EXTENDED_SOURCES = \
 	strtoll.c	\
 	strtoll_r.c	\
 	strtoull.c	\
-	strtoull_r.c
+	strtoull_r.c	\
+	atoll.c		\
+	llabs.c		\
+	lldiv.c
 
 ELIX_2_OBJS = \
 	a64l.$(oext)		\
@@ -185,16 +188,19 @@ CHEWOUT_FILES= \
 	assert.def	\
 	atexit.def	\
 	atof.def 	\
-	ecvtbuf.def	\
 	atoi.def 	\
+	atoll.def 	\
 	calloc.def	\
 	div.def		\
+	ecvtbuf.def	\
 	efgcvt.def 	\
 	envlock.def	\
 	exit.def	\
 	getenv.def	\
 	labs.def	\
 	ldiv.def	\
+	llabs.def	\
+	lldiv.def	\
 	malloc.def	\
 	mallocr.def	\
 	mblen.def	\

@@ -33,6 +33,14 @@ typedef struct
   long rem; /* remainder */
 } ldiv_t;
 
+#ifndef __STRICT_ANSI__
+typedef struct
+{
+  long long int quot; /* quotient */
+  long long int rem; /* remainder */
+} lldiv_t;
+#endif
+
 #ifndef NULL
 #define NULL 0
 #endif
@@ -155,6 +163,9 @@ unsigned short *
        _EXFUN(_seed48_r,(struct _reent *, unsigned short [3]));
 _VOID  _EXFUN(srand48,(long));
 _VOID  _EXFUN(_srand48_r,(struct _reent *, long));
+long long _EXFUN(atoll,(const char *__nptr));
+long long _EXFUN(llabs,(long long));
+lldiv_t	_EXFUN(lldiv,(long long __numer, long long __denom));
 long long _EXFUN(strtoll,(const char *__n, char **__end_PTR, int __base));
 long long _EXFUN(_strtoll_r,(struct _reent *, const char *__n, char **__end_PTR, int __base));
 unsigned long long _EXFUN(strtoull,(const char *__n, char **__end_PTR, int __base));
