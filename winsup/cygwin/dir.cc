@@ -67,7 +67,8 @@ opendir (const char *dirname)
       goto failed;
     }
 
-  if (stat (real_dirname.get_win32 (), &statbuf) == -1)
+  if (stat (myself->rootlen ? dirname : real_dirname.get_win32 (),
+            &statbuf) == -1)
     goto failed;
 
   if (!(statbuf.st_mode & S_IFDIR))

@@ -1917,12 +1917,42 @@ setegid (gid_t gid)
 }
 
 /* chroot: privileged Unix system call.  */
+/* FIXME: Not privileged here. How should this be done? */
 extern "C"
 int
-chroot (const char *)
+chroot (const char *newroot)
 {
-  set_errno (ENOSYS);
-  return -1;
+  int ret = -1;
+  path_conv path(newroot, PC_SYM_FOLLOW | PC_FULL);
+  
+  if (path.error)
+    goto done;
+  if (path.file_attributes () == (DWORD)-1)
+    {
+      set_errno (ENOENT);
+      goto done;
+    }
+  if (!(path.file_attributes () & FILE_ATTRIBUTE_DIRECTORY))
+    {
+      set_errno (ENOTDIR);
+      goto done;
+    }
+  ret = cygwin_shared->mount.conv_to_posix_path (path.get_win32 (),
+                                                 myself->root, 0);
+  if (ret)
+    {
+      set_errno (ret);
+      goto done;
+    }
+  myself->rootlen = strlen (myself->root);
+  if (myself->root[myself->rootlen - 1] == '/')
+    myself->root[--myself->rootlen] = '\0';
+  ret = 0;
+
+done:
+  syscall_printf ("%d = chroot (%s)", ret ? get_errno () : 0,
+                                      newroot ? newroot : "NULL");
+  return ret;
 }
 
 extern "C"

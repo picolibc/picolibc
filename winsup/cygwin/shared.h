@@ -102,6 +102,11 @@ class pinfo
   uid_t real_uid;        /* Remains intact on seteuid, replaced by setuid */
   gid_t real_gid;	 /* Ditto */
 
+  /* Filled when chroot() is called by the process or one of it's parents.
+     Saved without trailing backslash. */
+  char root[MAX_PATH+1];
+  size_t rootlen;
+
   /* Non-zero if process was stopped by a signal. */
   char stopsig;
 

@@ -83,7 +83,7 @@ details. */
 #include <winioctl.h>
 
 static int normalize_win32_path (const char *cwd, const char *src, char *dst);
-static char *getcwd_inner (char *buf, size_t ulen, int posix_p);
+static char *getcwd_inner (char *buf, size_t ulen, int posix_p, int with_chroot);
 static void slashify (const char *src, char *dst, int trailing_slash_p);
 static void backslashify (const char *src, char *dst, int trailing_slash_p);
 static int path_prefix_p_ (const char *path1, const char *path2, int len1);
@@ -151,6 +151,11 @@ static char *cwd_win32;
 static char *cwd_posix;
 static unsigned long cwd_hash;
 #endif
+
+#define ischrootpath(path) \
+        (myself->rootlen && \
+         strncasematch (myself->root, path, myself->rootlen) && \
+         (path[myself->rootlen] == '/' || path[myself->rootlen] == '\0'))
 
 static int
 path_prefix_p_ (const char *path1, const char *path2, int len1)
@@ -584,6 +589,11 @@ normalize_posix_path (const char *cwd, const char *src, char *dst)
   /* Two leading /'s?  If so, preserve them.  */
   else if (isslash (src[1]))
     {
+      if (myself->rootlen)
+        {
+	  debug_printf ("ENOENT = normalize_posix_path (%s)", src);
+	  return ENOENT;
+        }
       *dst++ = '/';
       *dst++ = '/';
       src += 2;
@@ -593,6 +603,12 @@ normalize_posix_path (const char *cwd, const char *src, char *dst)
 	  *dst++ = '/';
 	  src = src_start + 1;
 	}
+    }
+  /* Exactly one leading slash. Absolute path. Check for chroot. */
+  else if (myself->rootlen)
+    {
+      strcpy (dst, myself->root);
+      dst += myself->rootlen;
     }
 
   while (*src)
@@ -620,8 +636,10 @@ normalize_posix_path (const char *cwd, const char *src, char *dst)
 		{
 		  if (src[2] && !isslash (src[2]))
 		    break;
-		  while (dst > dst_start && !isslash (*--dst))
-		    continue;
+                  if (!ischrootpath (dst_start) ||
+                      dst - dst_start != (int) myself->rootlen)
+                    while (dst > dst_start && !isslash (*--dst))
+		      continue;
 		  src++;
 		}
 	    }
@@ -644,12 +662,12 @@ normalize_posix_path (const char *cwd, const char *src, char *dst)
 
    The result is 0 for success, or an errno error value.
    FIXME: A lot of this should be mergeable with the POSIX critter.  */
-
 static int
 normalize_win32_path (const char *cwd, const char *src, char *dst)
 {
   const char *src_start = src;
   char *dst_start = dst;
+  char *dst_root_start = dst;
 
   if (!SLASH_P (src[0]) && strchr (src, ':') == NULL)
     {
@@ -666,8 +684,24 @@ normalize_win32_path (const char *cwd, const char *src, char *dst)
   /* Two leading \'s?  If so, preserve them.  */
   else if (SLASH_P (src[0]) && SLASH_P (src[1]))
     {
+      if (myself->rootlen)
+        {
+	  debug_printf ("ENOENT = normalize_win32_path (%s)", src);
+	  return ENOENT;
+        }
       *dst++ = '\\';
       ++src;
+    }
+  /* If absolute path, care for chroot. */
+  else if (SLASH_P (src[0]) && !SLASH_P (src[1]) && myself->rootlen)
+    {
+      strcpy (dst, myself->root);
+      char *c;
+      while ((c = strchr (dst, '/')) != NULL)
+        *c = '\\';
+      dst += myself->rootlen;
+      dst_root_start = dst;
+      *dst++ = '\\';
     }
 
   while (*src)
@@ -689,10 +723,10 @@ normalize_win32_path (const char *cwd, const char *src, char *dst)
 	       && (SLASH_P (src[2]) || src[2] == 0))
 	{
 	  /* Back up over /, but not if it's the first one.  */
-	  if (dst > dst_start + 1)
+	  if (dst > dst_root_start + 1)
 	    dst--;
 	  /* Now back up to the next /.  */
-	  while (dst > dst_start + 1 && dst[-1] != '\\' && dst[-2] != ':')
+	  while (dst > dst_root_start + 1 && dst[-1] != '\\' && dst[-2] != ':')
 	    dst--;
 	  src += 2;
 	  if (SLASH_P (*src))
@@ -908,7 +942,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
   char pathbuf[MAX_PATH];
 
   char cwd[MAX_PATH];
-  getcwd_inner (cwd, MAX_PATH, TRUE); /* FIXME: check rc */
+  getcwd_inner (cwd, MAX_PATH, TRUE, 0); /* FIXME: check rc */
 
   /* Determine where the destination should be placed. */
   if (full_win32_path != NULL)
@@ -932,6 +966,22 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
 	}
       isrelpath = !isabspath (src_path);
       *flags = set_flags_from_win32_path (dst);
+      if (myself->rootlen && dst[0] && dst[1] == ':')
+        {
+          char posix_path[MAX_PATH + 1];
+
+          rc = cygwin_shared->mount.conv_to_posix_path (dst, posix_path, 0);
+          if (rc)
+            {
+              debug_printf ("conv_to_posix_path failed, rc %d", rc);
+              return rc;
+            }
+          if (!ischrootpath (posix_path))
+            {
+              debug_printf ("ischrootpath failed");
+              return ENOENT;
+            }
+        }
       goto fillin;
     }
 
@@ -1161,7 +1211,7 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
 
   /* No need to fetch cwd if path is absolute. */
   if (relative_path_p)
-    getcwd_inner (cwd, MAX_PATH, 0); /* FIXME: check rc */
+    getcwd_inner (cwd, MAX_PATH, 0, 0); /* FIXME: check rc */
   else
     strcpy (cwd, "/"); /* some innocuous value */
 
@@ -2345,7 +2395,7 @@ get_cwd_win32 ()
 /* getcwd */
 
 char *
-getcwd_inner (char *buf, size_t ulen, int posix_p)
+getcwd_inner (char *buf, size_t ulen, int posix_p, int with_chroot)
 {
   char *resbuf = NULL;
   size_t len = ulen;
@@ -2369,8 +2419,16 @@ getcwd_inner (char *buf, size_t ulen, int posix_p)
     }
   else if (cwd_posix != NULL)
     {
+      debug_printf("myself->root: %s, cwd_posix: %s", myself->root, cwd_posix);
       if (strlen (cwd_posix) >= len)
 	set_errno (ERANGE);
+      else if (with_chroot && ischrootpath(cwd_posix))
+        {
+          strcpy (buf, cwd_posix + myself->rootlen);
+          if (!buf[0])
+            strcpy (buf, "/");
+          resbuf = buf;
+        }
       else
 	{
 	  strcpy (buf, cwd_posix);
@@ -2391,10 +2449,20 @@ getcwd_inner (char *buf, size_t ulen, int posix_p)
 
   size_t tlen = strlen (temp);
 
+  if (with_chroot && ischrootpath (temp))
+    tlen -= myself->rootlen;
+
   cwd_posix = (char *) realloc (
 				  cwd_posix, tlen + 1);
   if (cwd_posix != NULL)
-    strcpy (cwd_posix, temp);
+    if (with_chroot && ischrootpath (temp))
+      {
+        strcpy (cwd_posix, temp + myself->rootlen);
+        if (!buf[0])
+          strcpy (buf, "/");
+      }
+    else
+      strcpy (cwd_posix, temp);
 
   if (tlen >= ulen)
     {
@@ -2421,12 +2489,12 @@ getcwd (char *buf, size_t ulen)
   if (buf == NULL || ulen == 0)
     {
       buf = (char *) alloca (MAX_PATH);
-      res = getcwd_inner (buf, MAX_PATH, 1);
+      res = getcwd_inner (buf, MAX_PATH, 1, 1);
       res = strdup (buf);
     }
   else
     {
-      res = getcwd_inner (buf, ulen, 1);
+      res = getcwd_inner (buf, ulen, 1, 1);
     }
 
   return res;
@@ -2477,6 +2545,13 @@ chdir (const char *dir)
 
       char pathbuf[MAX_PATH];
       (void) normalize_posix_path (cwd_posix, dir, pathbuf);
+      /* Look for trailing path component consisting entirely of dots.  This
+         is needed only in case of chdir since Windows simply ignores count
+         of dots > 2 here instead of returning an error code.  Counts of dots
+         <= 2 are already eliminated by normalize_posix_path. */
+      char *last_slash = strrchr (pathbuf, '/');
+      if (last_slash && strspn (last_slash + 1, ".") == strlen (last_slash + 1))
+        *last_slash = '\0';
       free (cwd_posix);
       cwd_posix = strdup (pathbuf);
     }

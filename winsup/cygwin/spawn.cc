@@ -852,6 +852,8 @@ _spawnve (HANDLE hToken, int mode, const char *path, const char *const *argv,
           child->psid = child->sidbuf;
         memcpy (child->logsrv, myself->logsrv, MAX_HOST_NAME);
         memcpy (child->domain, myself->domain, MAX_COMPUTERNAME_LENGTH+1);
+        memcpy (child->root, myself->root, MAX_PATH+1);
+        child->rootlen = myself->rootlen;
 	subproc_init ();
 	ret = spawn_guts (hToken, path, argv, envp, child, mode);
 	if (ret == -1)

@@ -1,3 +1,20 @@
+Wed Jul 19 22:11:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* shared.h (class pinfo): New members `root' and `rootlen'.
+	* syscalls.cc (chroot): Set new root for process.
+	* path.cc (getcwd_inner): Add parameter to force use of
+	new root from chroot() call.
+	(ischrootpath): New macro.
+	(normalize_posix_path): Care for changed root dir.
+	(normalize_win32_path): Ditto.
+	(getcwd_inner): Ditto.
+	(chdir): Eliminate trailing path component consisting
+	entirely of dots.
+	* fork.cc (fork): Copy pinfo members regarding chroot().
+	* spawn.cc (_spawnve): Ditto.
+	* dir.cc (opendir): Don't use computed win32 path if
+	chroot() took place.
+
 Mon Jul 17 22:21:34 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dll_init.cc (dll_list::alloc): Fix debugging output.

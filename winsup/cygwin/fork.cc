@@ -437,6 +437,8 @@ fork ()
       child->orig_gid = myself->orig_gid;
       child->real_uid = myself->real_uid;
       child->real_gid = myself->real_gid;
+      memcpy (child->root, myself->root, MAX_PATH+1);
+      child->rootlen = myself->rootlen;
       set_child_mmap_ptr (child);
 
       /* Wait for subproc to initialize itself. */
