@@ -1,3 +1,9 @@
+Sat Mar 17 20:46:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* net.cc (get_95_ifconf): Use strcasematch instead of strcasecmp.
+	* syscalls.cc (_unlink): Ditto.
+	(_rename): Ditto.
+
 Sat Mar 17 12:43:15 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (suffix_scan::next): Avoid searching for foo.lnk twice when

@@ -98,7 +98,7 @@ _unlink (const char *ourname)
   if (atts != 0xffffffff && atts & FILE_ATTRIBUTE_READONLY)
     {
       int len = strlen (win32_name.get_win32 ());
-      if (len > 4 && !strcasecmp (win32_name.get_win32 () + len - 4, ".lnk"))
+      if (len > 4 && strcasematch (win32_name.get_win32 () + len - 4, ".lnk"))
 	SetFileAttributes (win32_name.get_win32 (),
 		      win32_name.file_attributes () & ~FILE_ATTRIBUTE_READONLY);
     }
@@ -1278,7 +1278,7 @@ _rename (const char *oldpath, const char *newpath)
   if (real_old.issymlink () && !real_new.error)
     {
       int len_old = strlen (real_old.get_win32 ());
-      if (!strcasecmp (real_old.get_win32 () + len_old - 4, ".lnk"))
+      if (strcasematch (real_old.get_win32 () + len_old - 4, ".lnk"))
 	{
 	  strcpy (new_lnk_buf, newpath);
 	  strcat (new_lnk_buf, ".lnk");

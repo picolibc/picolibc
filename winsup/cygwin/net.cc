@@ -1519,7 +1519,7 @@ get_95_ifconf (struct ifconf *ifc, int what)
           if (RegQueryValueEx (subkey, "AdapterName", 0,
                                NULL, (unsigned char *) adapter,
                                (size = sizeof adapter, &size)) == ERROR_SUCCESS
-              && !strcasecmp (adapter, "MS$PPP"))
+              && strcasematch (adapter, "MS$PPP"))
             {
               ++*ppp;
               strcpy (ifr->ifr_name, "ppp");
