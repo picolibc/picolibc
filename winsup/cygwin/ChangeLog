@@ -1,3 +1,65 @@
+2004-03-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* errno.cc (errmap): Handle ERROR_BUS_RESET.
+	* fhandler.h (fhandler_dev_raw::write_file): New method, created
+	from former static function.
+	(fhandler_dev_raw::read_file): Ditto.
+	(reset_devbuf): New inline method.
+	(class fhandler_dev_tape): Add TAPE_GET_DRIVE_PARAMETERS
+	member `dp'.
+	(fhandler_dev_tape::write_file): New method.
+	(fhandler_dev_tape::read_file): Ditto.
+	(fhandler_dev_tape::tape_get_feature): Convert to inline method.
+	(fhandler_dev_tape::tape_error): New method, created from former
+	static function. 
+	(fhandler_dev_tape::tape_get_blocksize): Remove declaration.
+	* fhandler_raw.cc (fhandler_dev_raw::write_file): New method, created
+	from former static function.
+	(fhandler_dev_raw::read_file): Ditto.
+	(fhandler_dev_raw::writebuf): Accomodate the fact that no devbuf
+	exists under variable block size condition.
+	(fhandler_dev_raw::raw_read): Ditto. Add local p pointer to simplify
+	pointer arithmetic.
+	(fhandler_dev_raw::raw_write): Always set devbufend to 0 when starting
+	with writing. Accomodate the fact that no devbuf exists under
+	variable block size condition.
+	* fhandler_tape.cc: Various formatting changes.
+	(TAPE_FUNC): New macro. Use throughout as tape function loop.
+	(get_ll): Convert into macro.
+	(IS_EOM): New macro.
+	(IS_EOF): New macro.
+	(fhandler_dev_tape::is_eom): Use IS_EOM macro.
+	(fhandler_dev_tape::is_eof): Use IS_EOF macro.
+	(fhandler_dev_tape::write_file): New method.
+	(fhandler_dev_tape::read_file): New method.
+	(fhandler_dev_tape::open): Get drive information block here once.
+	(fhandler_dev_tape::lseek): Remove unneeded duplicate code.
+	(fhandler_dev_tape::dup): Duplicate drive information block.
+	(fhandler_dev_tape::ioctl): Remove drvbuf in variable block size mode.
+	Return ERROR_INVALID_BLOCK_LENGTH instead of ERROR_MORE_DATA if
+	buffer contains data which would get lost on buffer size changing.
+	Use absolute tape positioning also if drive only supports logical
+	block positioning.
+	(fhandler_dev_tape::tape_error): New method, created from former
+	static function.
+	(fhandler_dev_tape::tape_get_pos): Allow logical block reporting.
+	Workaround tape driver bug.
+	(fhandler_dev_tape::_tape_set_pos): Reset device buffer and flags
+	after successful repositioning.
+	(fhandler_dev_tape::tape_set_pos): Allow logical block positioning.
+	Workaround tape driver bug.
+	(fhandler_dev_tape::tape_erase): Use dp instead of calling
+	GetTapeParameters.
+	(fhandler_dev_tape::tape_prepare): Ditto.
+	(fhandler_dev_tape::tape_get_blocksize): Remove.
+	(fhandler_dev_tape::tape_set_blocksize): Don't call tape_get_blocksize.
+	Error handling already done in fhandler_dev_tape::ioctl.
+	(fhandler_dev_tape::tape_status): Remove local `dp' variable.
+	Accomodate logical tape reporting.  Call tape_get_feature instead
+	of accessing feature words directly.
+	(fhandler_dev_tape::tape_compression): Use dp instead of calling
+	GetTapeParameters.  Fix resetting datcompression.
+
 2004-03-12  Christopher Faylor  <cgf@redhat.com>
 
 	* wait.cc (wait4): Initialize pointer on entry.  Avoid calling

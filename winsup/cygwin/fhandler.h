@@ -514,6 +514,9 @@ class fhandler_dev_raw: public fhandler_base
   int varblkop	      : 1;
 
   virtual void clear (void);
+  virtual BOOL write_file (const void *buf, DWORD to_write,
+			   DWORD *written, int *err);
+  virtual BOOL read_file (void *buf, DWORD to_read, DWORD *read, int *err);
   virtual int writebuf (void);
 
   /* returns not null, if `win_error' determines an end of media condition */
@@ -522,6 +525,13 @@ class fhandler_dev_raw: public fhandler_base
   virtual int is_eof(int win_error) = 0;
 
   fhandler_dev_raw ();
+
+  inline void reset_devbuf (void)
+    {
+      devbufstart = devbufend = 0;
+      eom_detected = eof_detected = 0;
+      lastblk_to_read = is_writing = has_written = 0;
+    }
 
  public:
   ~fhandler_dev_raw (void);
@@ -562,14 +572,17 @@ class fhandler_dev_floppy: public fhandler_dev_raw
 class fhandler_dev_tape: public fhandler_dev_raw
 {
   int lasterr;
+  TAPE_GET_DRIVE_PARAMETERS dp;
 
   bool is_rewind_device () { return get_unit () < 128; }
 
  protected:
   virtual void clear (void);
-
   virtual int is_eom (int win_error);
   virtual int is_eof (int win_error);
+  virtual BOOL write_file (const void *buf, DWORD to_write,
+			   DWORD *written, int *err);
+  virtual BOOL read_file (void *buf, DWORD to_read, DWORD *read, int *err);
 
  public:
   fhandler_dev_tape ();
@@ -586,13 +599,19 @@ class fhandler_dev_tape: public fhandler_dev_raw
   virtual int ioctl (unsigned int cmd, void *buf);
 
  private:
+  inline bool tape_get_feature (DWORD parm)
+    {
+      return ((parm & TAPE_DRIVE_HIGH_FEATURES)
+	      ? ((dp.FeaturesHigh & parm) != 0)
+	      : ((dp.FeaturesLow & parm) != 0));
+    }
+  int tape_error (const char *txt);
   int tape_write_marks (int marktype, DWORD len);
   int tape_get_pos (unsigned long *ret);
   int tape_set_pos (int mode, long count, bool sfm_func = false);
+  int _tape_set_pos (int mode, long count);
   int tape_erase (int mode);
   int tape_prepare (int action);
-  bool tape_get_feature (DWORD parm);
-  int tape_get_blocksize (long *min, long *def, long *max, long *cur);
   int tape_set_blocksize (long count);
   int tape_status (struct mtget *get);
   int tape_compression (long count);

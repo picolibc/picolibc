@@ -21,6 +21,24 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 
+/* Media changes and bus resets are sometimes reported and the function
+   hasn't been executed.  We repeat all functions which return with one
+   of these error codes. */
+#define TAPE_FUNC(func) do { \
+			  lasterr = (func); \
+			} while (lasterr == ERROR_MEDIA_CHANGED \
+				 || lasterr == ERROR_BUS_RESET)
+
+/* Convert LARGE_INTEGER into long long */
+#define get_ll(pl)  (((long long) (pl).HighPart << 32) | (pl).LowPart)
+
+#define IS_EOM(err) ((err) == ERROR_END_OF_MEDIA \
+		     || (err) == ERROR_EOM_OVERFLOW \
+		     || (err) == ERROR_NO_DATA_DETECTED)
+
+#define IS_EOF(err) ((err) == ERROR_FILEMARK_DETECTED \
+		     || (err) == ERROR_SETMARK_DETECTED)
+
 /**********************************************************************/
 /* fhandler_dev_tape */
 
@@ -34,9 +52,7 @@ fhandler_dev_tape::clear (void)
 int
 fhandler_dev_tape::is_eom (int win_error)
 {
-  int ret = ((win_error == ERROR_END_OF_MEDIA)
-	  || (win_error == ERROR_EOM_OVERFLOW)
-	  || (win_error == ERROR_NO_DATA_DETECTED));
+  int ret = IS_EOM (win_error);
   if (ret)
     debug_printf ("end of medium");
   return ret;
@@ -45,10 +61,44 @@ fhandler_dev_tape::is_eom (int win_error)
 int
 fhandler_dev_tape::is_eof (int win_error)
 {
-  int ret = ((win_error == ERROR_FILEMARK_DETECTED)
-	  || (win_error == ERROR_SETMARK_DETECTED));
+  int ret = IS_EOF (win_error);
   if (ret)
     debug_printf ("end of file");
+  return ret;
+}
+
+BOOL
+fhandler_dev_tape::write_file (const void *buf, DWORD to_write,
+			       DWORD *written, int *err)
+{
+  BOOL ret;
+
+  do
+    {
+      *err = 0;
+      if (!(ret = WriteFile (get_handle (), buf, to_write, written, 0)))
+	*err = GetLastError ();
+    }
+  while (*err == ERROR_MEDIA_CHANGED || *err == ERROR_BUS_RESET);
+  syscall_printf ("%d (err %d) = WriteFile (%d, %d, write %d, written %d, 0)",
+		  ret, *err, get_handle (), buf, to_write, *written);
+  return ret;
+}
+
+BOOL
+fhandler_dev_tape::read_file (void *buf, DWORD to_read, DWORD *read, int *err)
+{
+  BOOL ret;
+
+  do
+    {
+      *err = 0;
+      if (!(ret = ReadFile (get_handle (), buf, to_read, read, 0)))
+	*err = GetLastError ();
+    }
+  while (*err == ERROR_MEDIA_CHANGED || *err == ERROR_BUS_RESET);
+  syscall_printf ("%d (err %d) = ReadFile (%d, %d, to_read %d, read %d, 0)",
+		  ret, *err, get_handle (), buf, to_read, *read);
   return ret;
 }
 
@@ -71,6 +121,10 @@ fhandler_dev_tape::open (int flags, mode_t)
       struct mtget get;
       struct mtop op;
       struct mtpos pos;
+      DWORD varlen;
+
+      TAPE_FUNC (GetTapeParameters (get_handle (), GET_TAPE_DRIVE_INFORMATION,
+				    (varlen = sizeof dp, &varlen), &dp));
 
       if (!ioctl (MTIOCGET, &get))
 	/* Tape drive supports and is set to variable block size. */
@@ -116,7 +170,7 @@ fhandler_dev_tape::close (void)
   if (is_writing)
     {
       ret = writebuf ();
-      if ((has_written) && (! eom_detected))
+      if (has_written && !eom_detected)
 	{
 	  /* if last operation was writing, write a filemark */
 	  debug_printf ("writing filemark");
@@ -170,9 +224,6 @@ fhandler_dev_tape::lseek (_off64_t offset, int whence)
   debug_printf ("lseek (%s, %d, %d)", get_name (), offset, whence);
 
   writebuf ();
-  eom_detected = eof_detected = 0;
-  lastblk_to_read = 0;
-  devbufstart = devbufend = 0;
 
   if (ioctl (MTIOCPOS, &pos))
     {
@@ -223,6 +274,7 @@ fhandler_dev_tape::dup (fhandler_base *child)
   fhandler_dev_tape *fhc = (fhandler_dev_tape *) child;
 
   fhc->lasterr = lasterr;
+  fhc->dp = dp;
   return fhandler_dev_raw::dup (child);
 }
 
@@ -236,7 +288,7 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
     {
       struct mtop *op = (struct mtop *) buf;
 
-      if (! op)
+      if (!op)
 	ret = ERROR_INVALID_PARAMETER;
       else
 	switch (op->mt_op)
@@ -272,9 +324,9 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 	  case MTNOP:
 	    break;
 	  case MTRETEN:
-	    if (! tape_get_feature (TAPE_DRIVE_END_OF_DATA))
+	    if (!tape_get_feature (TAPE_DRIVE_END_OF_DATA))
 	      ret = ERROR_INVALID_PARAMETER;
-	    else if (! (ret = tape_set_pos (TAPE_REWIND, 0, false)))
+	    else if (!(ret = tape_set_pos (TAPE_REWIND, 0, false)))
 	      ret = tape_prepare (TAPE_TENSION);
 	    break;
 	  case MTBSFM:
@@ -299,53 +351,45 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 	    break;
 	  case MTSETBLK:
 	    {
-	      long min, max;
-
-	      if (! tape_get_feature (TAPE_DRIVE_SET_BLOCK_SIZE))
+	      if (!tape_get_feature (TAPE_DRIVE_SET_BLOCK_SIZE))
 		{
 		  ret = ERROR_INVALID_PARAMETER;
 		  break;
 		}
-	      ret = tape_get_blocksize (&min, NULL, &max, NULL);
-	      if (ret)
-		  break;
-	      if (devbuf && (size_t) op->mt_count == devbufsiz && !varblkop)
+	      if ((devbuf && (size_t) op->mt_count == devbufsiz)
+	          || (!devbuf && op->mt_count == 0))
 		{
+		  /* Nothing has changed. */
 		  ret = 0;
 		  break;
 		}
 	      if ((op->mt_count == 0
 		   && !tape_get_feature (TAPE_DRIVE_VARIABLE_BLOCK))
 		  || (op->mt_count > 0
-		      && (op->mt_count < min || op->mt_count > max)))
+		      && ((DWORD) op->mt_count < dp.MinimumBlockSize
+			  || (DWORD) op->mt_count > dp.MaximumBlockSize)))
 		{
 		  ret = ERROR_INVALID_PARAMETER;
 		  break;
 		}
-	      if (devbuf && op->mt_count > 0
-		  && (size_t) op->mt_count < devbufend - devbufstart)
+	      if (devbuf && devbufend - devbufstart > 0
+	          && (op->mt_count == 0
+		      || (op->mt_count > 0
+		          && (size_t) op->mt_count < devbufend - devbufstart)))
 		{
-		  ret = ERROR_MORE_DATA;
+		  /* Not allowed if still data in devbuf. */
+		  ret = ERROR_INVALID_BLOCK_LENGTH; /* EIO */
 		  break;
 		}
-	      if (! (ret = tape_set_blocksize (op->mt_count)))
+	      if (!(ret = tape_set_blocksize (op->mt_count)))
 		{
-		  size_t size = 0;
-		  if (op->mt_count == 0)
-		    {
-		      struct mtget get;
-		      if ((ret = tape_status (&get)) != NO_ERROR)
-			break;
-		      size = get.mt_maxblksize;
-		      ret = NO_ERROR;
-		    }
 		  char *buf = NULL;
-		  if (size > 1L && !(buf = new char [size]))
+		  if (op->mt_count > 1L && !(buf = new char [op->mt_count]))
 		    {
 		      ret = ERROR_OUTOFMEMORY;
 		      break;
 		    }
-		  if (devbufsiz > 1L && size > 1L)
+		  if (devbufsiz > 1L && op->mt_count > 1L)
 		    {
 		      memcpy (buf, devbuf + devbufstart,
 			      devbufend - devbufstart);
@@ -353,11 +397,10 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 		    }
 		  else
 		    devbufend = 0;
-		  if (devbufsiz > 1L)
-		    delete [] devbuf;
 		  devbufstart = 0;
+		  delete [] devbuf;
 		  devbuf = buf;
-		  devbufsiz = size;
+		  devbufsiz = op->mt_count;
 		  varblkop = op->mt_count == 0;
 		}
 	    }
@@ -366,19 +409,15 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 	    ret = ERROR_INVALID_PARAMETER;
 	    break;
 	  case MTSEEK:
-	    if (tape_get_feature (TAPE_DRIVE_ABSOLUTE_BLK))
-	      {
-		ret = tape_set_pos (TAPE_ABSOLUTE_BLOCK, op->mt_count);
-		break;
-	      }
-	    if (! (ret = tape_get_pos (&block)))
-	      {
-		ret = tape_set_pos (TAPE_SPACE_RELATIVE_BLOCKS,
-				 op->mt_count - block);
-	      }
+	    if (tape_get_feature (TAPE_DRIVE_ABSOLUTE_BLK)
+	        || tape_get_feature (TAPE_DRIVE_LOGICAL_BLK))
+	      ret = tape_set_pos (TAPE_ABSOLUTE_BLOCK, op->mt_count);
+	    else if (!(ret = tape_get_pos (&block)))
+	      ret = tape_set_pos (TAPE_SPACE_RELATIVE_BLOCKS,
+				  op->mt_count - block);
 	    break;
 	  case MTTELL:
-	    if (! (ret = tape_get_pos (&block)))
+	    if (!(ret = tape_get_pos (&block)))
 	      op->mt_count = block;
 	    break;
 	  case MTSETDRVBUFFER:
@@ -440,12 +479,11 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 /*                  Private functions used by `ioctl'                 */
 /* ------------------------------------------------------------------ */
 
-static int
-tape_error (DWORD lasterr, const char *txt)
+int
+fhandler_dev_tape::tape_error (const char *txt)
 {
   if (lasterr)
     debug_printf ("%s: error: %d", txt, lasterr);
-
   return lasterr;
 }
 
@@ -453,14 +491,8 @@ int
 fhandler_dev_tape::tape_write_marks (int marktype, DWORD len)
 {
   syscall_printf ("write_tapemark");
-  while (((lasterr = WriteTapemark (get_handle (),
-				    marktype,
-				    len,
-				    FALSE)) == ERROR_MEDIA_CHANGED)
-	 || (lasterr == ERROR_BUS_RESET))
-    ;
-
-  return tape_error (lasterr, "tape_write_marks");
+  TAPE_FUNC (WriteTapemark (get_handle (), marktype, len, FALSE));
+  return tape_error ("tape_write_marks");
 }
 
 int
@@ -468,33 +500,42 @@ fhandler_dev_tape::tape_get_pos (unsigned long *ret)
 {
   DWORD part, low, high;
 
-  while (((lasterr = GetTapePosition (get_handle (),
-				      TAPE_ABSOLUTE_POSITION,
-				      &part,
-				      &low,
-				      &high)) == ERROR_MEDIA_CHANGED)
-	 || (lasterr == ERROR_BUS_RESET))
-    ;
-  if (! tape_error (lasterr, "tape_get_pos") && ret)
+  lasterr = ERROR_INVALID_PARAMETER;
+  if (tape_get_feature (TAPE_DRIVE_GET_ABSOLUTE_BLK))
+    {
+      TAPE_FUNC (GetTapePosition (get_handle (), TAPE_ABSOLUTE_POSITION,
+				  &part, &low, &high));
+      /* Workaround bug in Tandberg SLR device driver, which pretends
+         to support reporting of absolute blocks but instead returns
+	 ERROR_INVALID_FUNCTION. */
+      if (lasterr != ERROR_INVALID_FUNCTION)
+	goto out;
+      dp.FeaturesLow &= ~TAPE_DRIVE_GET_ABSOLUTE_BLK;
+    }
+  if (tape_get_feature (TAPE_DRIVE_GET_LOGICAL_BLK))
+    TAPE_FUNC (GetTapePosition (get_handle (), TAPE_LOGICAL_POSITION,
+				&part, &low, &high));
+
+out:
+  if (!tape_error ("tape_get_pos") && ret)
     *ret = low;
 
   return lasterr;
 }
 
-static int _tape_set_pos (HANDLE hTape, int mode, long count)
+int
+fhandler_dev_tape::_tape_set_pos (int mode, long count)
 {
-  int err;
-
-  while (((err = SetTapePosition (hTape,
-				  mode,
-				  1,
-				  count,
-				  count < 0 ? -1 : 0,
-				  FALSE)) == ERROR_MEDIA_CHANGED)
-	 || (err == ERROR_BUS_RESET))
-    ;
-
-  return err;
+  TAPE_FUNC (SetTapePosition (get_handle (), mode, 0, count,
+			      count < 0 ? -1 : 0, FALSE));
+  /* Reset buffer after successful repositioning. */
+  if (!lasterr || IS_EOF (lasterr) || IS_EOM (lasterr))
+    {
+      reset_devbuf ();
+      eof_detected = IS_EOF (lasterr);
+      eom_detected = IS_EOM (lasterr);
+    }
+  return lasterr;
 }
 
 int
@@ -505,25 +546,19 @@ fhandler_dev_tape::tape_set_pos (int mode, long count, bool sfm_func)
   switch (mode)
     {
       case TAPE_SPACE_RELATIVE_BLOCKS:
-	lasterr = tape_get_pos (&pos);
-
-	if (lasterr)
+	if (tape_get_pos (&pos))
 	  return lasterr;
 
 	tgtpos = pos + count;
 
-	while (((lasterr = _tape_set_pos (get_handle (),
-					  mode,
-					  count)) == ERROR_FILEMARK_DETECTED)
-	       || (lasterr == ERROR_SETMARK_DETECTED))
+	while (count && (_tape_set_pos (mode, count), IS_EOF (lasterr)))
 	  {
-	    lasterr = tape_get_pos (&pos);
-	    if (lasterr)
+	    if (tape_get_pos (&pos))
 	      return lasterr;
 	    count = tgtpos - pos;
 	  }
 
-	if (lasterr == ERROR_BEGINNING_OF_MEDIA && ! tgtpos)
+	if (lasterr == ERROR_BEGINNING_OF_MEDIA && !tgtpos)
 	  lasterr = NO_ERROR;
 
 	break;
@@ -532,223 +567,132 @@ fhandler_dev_tape::tape_set_pos (int mode, long count, bool sfm_func)
 	  {
 	    if (pos > 0)
 	      {
-		if ((! _tape_set_pos (get_handle (),
-				  TAPE_SPACE_RELATIVE_BLOCKS,
-				  -1))
+		if (!_tape_set_pos (TAPE_SPACE_RELATIVE_BLOCKS, -1)
 		    || (sfm_func))
 		  ++count;
-		_tape_set_pos (get_handle (), TAPE_SPACE_RELATIVE_BLOCKS, 1);
+		_tape_set_pos (TAPE_SPACE_RELATIVE_BLOCKS, 1);
 	      }
 
-	    while (! (lasterr = _tape_set_pos (get_handle (), mode, -1))
-		   && count++ < 0)
+	    while (!_tape_set_pos (mode, -1) && count++ < 0)
 	      ;
 
 	    if (lasterr == ERROR_BEGINNING_OF_MEDIA)
 	      {
-		if (! count)
+		if (!count)
 		  lasterr = NO_ERROR;
 	      }
-	    else if (! sfm_func)
-	      lasterr = _tape_set_pos (get_handle (), mode, 1);
+	    else if (!sfm_func)
+	      _tape_set_pos (mode, 1);
 	  }
 	else
 	  {
 	    if (sfm_func)
 	      {
-		if (_tape_set_pos (get_handle (),
-				   TAPE_SPACE_RELATIVE_BLOCKS,
-				   1) == ERROR_FILEMARK_DETECTED)
+		if (_tape_set_pos (TAPE_SPACE_RELATIVE_BLOCKS, 1)
+		    == ERROR_FILEMARK_DETECTED)
 		  ++count;
-		_tape_set_pos (get_handle (), TAPE_SPACE_RELATIVE_BLOCKS, -1);
+		_tape_set_pos (TAPE_SPACE_RELATIVE_BLOCKS, -1);
 	      }
 
-	    if (! (lasterr = _tape_set_pos (get_handle (), mode, count))
-		&& sfm_func)
-	      lasterr = _tape_set_pos (get_handle (), mode, -1);
+	    if (!_tape_set_pos (mode, count) && sfm_func)
+	      _tape_set_pos (mode, -1);
 	  }
 	break;
-      case TAPE_SPACE_SETMARKS:
       case TAPE_ABSOLUTE_BLOCK:
+	if (!tape_get_feature (TAPE_DRIVE_ABSOLUTE_BLK))
+	  mode = TAPE_LOGICAL_BLOCK;
+	_tape_set_pos (mode, count);
+	/* Workaround bug in Tandberg SLR device driver, which pretends
+	   to support absolute block positioning but instead returns
+	   ERROR_INVALID_FUNCTION. */
+	if (lasterr == ERROR_INVALID_FUNCTION && mode == TAPE_ABSOLUTE_BLOCK)
+	  {
+	    dp.FeaturesHigh &= TAPE_DRIVE_HIGH_FEATURES
+			       | ~TAPE_DRIVE_ABSOLUTE_BLK;
+	    _tape_set_pos (TAPE_LOGICAL_BLOCK, count);
+	  }
+	  break;
+      case TAPE_SPACE_SETMARKS:
       case TAPE_SPACE_END_OF_DATA:
       case TAPE_REWIND:
-	lasterr = _tape_set_pos (get_handle (), mode, count);
+	_tape_set_pos (mode, count);
 	break;
     }
 
-  return tape_error (lasterr, "tape_set_pos");
+  return tape_error ("tape_set_pos");
 }
 
 int
 fhandler_dev_tape::tape_erase (int mode)
 {
-  DWORD varlen;
-  TAPE_GET_DRIVE_PARAMETERS dp;
-
-  while (((lasterr = GetTapeParameters (get_handle (),
-					GET_TAPE_DRIVE_INFORMATION,
-					(varlen = sizeof dp, &varlen),
-					&dp)) == ERROR_MEDIA_CHANGED)
-	 || (lasterr == ERROR_BUS_RESET))
-    ;
-
   switch (mode)
     {
       case TAPE_ERASE_SHORT:
-	if (! lasterr && ! (dp.FeaturesLow & TAPE_DRIVE_ERASE_SHORT))
+	if (!tape_get_feature (TAPE_DRIVE_ERASE_SHORT))
 	  mode = TAPE_ERASE_LONG;
 	break;
       case TAPE_ERASE_LONG:
-	if (! lasterr && ! (dp.FeaturesLow & TAPE_DRIVE_ERASE_LONG))
+	if (!tape_get_feature (TAPE_DRIVE_ERASE_LONG))
 	  mode = TAPE_ERASE_SHORT;
 	break;
     }
-
-  return tape_error (EraseTape (get_handle (), mode, false), "tape_erase");
+  TAPE_FUNC (EraseTape (get_handle (), mode, false));
+  /* Reset buffer after successful tape erasing. */
+  if (!lasterr)
+    reset_devbuf ();
+  return tape_error ("tape_erase");
 }
 
 int
 fhandler_dev_tape::tape_prepare (int action)
 {
-  while (((lasterr = PrepareTape (get_handle (),
-				  action,
-				  FALSE)) == ERROR_MEDIA_CHANGED)
-	 || (lasterr == ERROR_BUS_RESET))
-    ;
-  return tape_error (lasterr, "tape_prepare");
-}
-
-bool
-fhandler_dev_tape::tape_get_feature (DWORD parm)
-{
-  DWORD varlen;
-  TAPE_GET_DRIVE_PARAMETERS dp;
-
-  while (((lasterr = GetTapeParameters (get_handle (),
-					GET_TAPE_DRIVE_INFORMATION,
-					(varlen = sizeof dp, &varlen),
-					&dp)) == ERROR_MEDIA_CHANGED)
-	 || (lasterr == ERROR_BUS_RESET))
-    ;
-
-  if (lasterr)
-    return false;
-
-  return ((parm & TAPE_DRIVE_HIGH_FEATURES)
-	  ? ((dp.FeaturesHigh & parm) != 0)
-	  : ((dp.FeaturesLow & parm) != 0));
-}
-
-int
-fhandler_dev_tape::tape_get_blocksize (long *min, long *def, long *max, long *cur)
-{
-  DWORD varlen;
-  TAPE_GET_DRIVE_PARAMETERS dp;
-  TAPE_GET_MEDIA_PARAMETERS mp;
-
-  while (((lasterr = GetTapeParameters (get_handle (),
-					GET_TAPE_DRIVE_INFORMATION,
-					(varlen = sizeof dp, &varlen),
-					&dp)) == ERROR_MEDIA_CHANGED)
-	 || (lasterr == ERROR_BUS_RESET))
-    ;
-
-  if (lasterr)
-    return tape_error (lasterr, "tape_get_blocksize");
-
-  while (((lasterr = GetTapeParameters (get_handle (),
-					GET_TAPE_MEDIA_INFORMATION,
-					(varlen = sizeof dp, &varlen),
-					&mp)) == ERROR_MEDIA_CHANGED)
-	 || (lasterr == ERROR_BUS_RESET))
-    ;
-
-  if (lasterr)
-    return tape_error (lasterr, "tape_get_blocksize");
-
-  if (min)
-    *min = (long) dp.MinimumBlockSize;
-  if (def)
-    *def = (long) dp.DefaultBlockSize;
-  if (max)
-    *max = (long) dp.MaximumBlockSize;
-  if (cur)
-    *cur = (long) mp.BlockSize;
-
-  return tape_error (lasterr, "tape_get_blocksize");
+  TAPE_FUNC (PrepareTape (get_handle (), action, FALSE));
+  /* Reset buffer after all successful preparations but lock and unlock. */
+  if (!lasterr && action != TAPE_LOCK && action != TAPE_UNLOCK)
+    reset_devbuf ();
+  return tape_error ("tape_prepare");
 }
 
 int
 fhandler_dev_tape::tape_set_blocksize (long count)
 {
-  long min, max;
   TAPE_SET_MEDIA_PARAMETERS mp;
 
-  lasterr = tape_get_blocksize (&min, NULL, &max, NULL);
-
-  if (lasterr)
-    return lasterr;
-
-  if (count != 0 && (count < min || count > max))
-    return tape_error (ERROR_INVALID_PARAMETER, "tape_set_blocksize");
-
   mp.BlockSize = count;
-
-  return tape_error (SetTapeParameters (get_handle (),
-					SET_TAPE_MEDIA_INFORMATION,
-					&mp),
-		     "tape_set_blocksize");
-}
-
-static long long
-get_ll (PLARGE_INTEGER i)
-{
-  long long l = 0;
-
-  l = i->HighPart;
-  l <<= 32;
-  l |= i->LowPart;
-  return l;
+  TAPE_FUNC (SetTapeParameters (get_handle (), SET_TAPE_MEDIA_INFORMATION,
+  				&mp));
+  return tape_error ("tape_set_blocksize");
 }
 
 int
 fhandler_dev_tape::tape_status (struct mtget *get)
 {
   DWORD varlen;
-  TAPE_GET_DRIVE_PARAMETERS dp;
   TAPE_GET_MEDIA_PARAMETERS mp;
   int notape = 0;
 
-  if (! get)
+  if (!get)
     return ERROR_INVALID_PARAMETER;
 
-  while (((lasterr = GetTapeParameters (get_handle (),
-					GET_TAPE_DRIVE_INFORMATION,
-					(varlen = sizeof dp, &varlen),
-					&dp)) == ERROR_MEDIA_CHANGED)
-	 || (lasterr == ERROR_BUS_RESET))
-    ;
-
-  /* Setting varlen to sizeof DP is by intention, actually! Never set
+  /* Setting varlen to sizeof DP is by intention, actually!  Never set
      it to sizeof MP which seems to be more correct but results in a
      ERROR_MORE_DATA error at least on W2K. */
-  if ((lasterr) || (lasterr = GetTapeParameters (get_handle (),
-						 GET_TAPE_MEDIA_INFORMATION,
-						 (varlen = sizeof dp, &varlen),
-						 &mp)))
+  TAPE_FUNC (GetTapeParameters (get_handle (), GET_TAPE_MEDIA_INFORMATION,
+				(varlen = sizeof dp, &varlen), &mp));
+  if (lasterr)
     notape = 1;
 
   memset (get, 0, sizeof *get);
 
   get->mt_type = MT_ISUNKNOWN;
 
-  if (! notape && (dp.FeaturesLow & TAPE_DRIVE_TAPE_REMAINING))
+  if (!notape && tape_get_feature (TAPE_DRIVE_TAPE_REMAINING))
     {
-      get->mt_remaining = get_ll (&mp.Remaining);
+      get->mt_remaining = get_ll (mp.Remaining);
       get->mt_resid = get->mt_remaining >> 10;
     }
 
-  if ((dp.FeaturesHigh & TAPE_DRIVE_SET_BLOCK_SIZE) && ! notape)
+  if (tape_get_feature (TAPE_DRIVE_SET_BLOCK_SIZE) && !notape)
     get->mt_dsreg = mp.BlockSize;
   else
     get->mt_dsreg = dp.DefaultBlockSize;
@@ -756,33 +700,34 @@ fhandler_dev_tape::tape_status (struct mtget *get)
   if (notape)
     get->mt_gstat |= GMT_DR_OPEN (-1);
 
-  if (! notape)
+  if (!notape)
     {
-      if (dp.FeaturesLow & TAPE_DRIVE_GET_ABSOLUTE_BLK)
+      if (tape_get_feature (TAPE_DRIVE_GET_ABSOLUTE_BLK)
+	  || tape_get_feature (TAPE_DRIVE_GET_LOGICAL_BLK))
 	tape_get_pos ((unsigned long *) &get->mt_blkno);
 
-      if (! get->mt_blkno)
+      if (!get->mt_blkno)
 	get->mt_gstat |= GMT_BOT (-1);
 
       get->mt_gstat |= GMT_ONLINE (-1);
 
-      if ((dp.FeaturesLow & TAPE_DRIVE_WRITE_PROTECT) && mp.WriteProtected)
+      if (tape_get_feature (TAPE_DRIVE_WRITE_PROTECT) && mp.WriteProtected)
 	get->mt_gstat |= GMT_WR_PROT (-1);
 
-      if (dp.FeaturesLow & TAPE_DRIVE_TAPE_CAPACITY)
-	get->mt_capacity = get_ll (&mp.Capacity);
+      if (tape_get_feature (TAPE_DRIVE_TAPE_CAPACITY))
+	get->mt_capacity = get_ll (mp.Capacity);
     }
 
-  if ((dp.FeaturesLow & TAPE_DRIVE_COMPRESSION) && dp.Compression)
+  if (tape_get_feature (TAPE_DRIVE_COMPRESSION) && dp.Compression)
     get->mt_gstat |= GMT_HW_COMP (-1);
 
-  if ((dp.FeaturesLow & TAPE_DRIVE_ECC) && dp.ECC)
+  if (tape_get_feature (TAPE_DRIVE_ECC) && dp.ECC)
     get->mt_gstat |= GMT_HW_ECC (-1);
 
-  if ((dp.FeaturesLow & TAPE_DRIVE_PADDING) && dp.DataPadding)
+  if (tape_get_feature (TAPE_DRIVE_PADDING) && dp.DataPadding)
     get->mt_gstat |= GMT_PADDING (-1);
 
-  if ((dp.FeaturesLow & TAPE_DRIVE_REPORT_SMKS) && dp.ReportSetmarks)
+  if (tape_get_feature (TAPE_DRIVE_REPORT_SMKS) && dp.ReportSetmarks)
     get->mt_gstat |= GMT_IM_REP_EN (-1);
 
   get->mt_erreg = lasterr;
@@ -800,40 +745,20 @@ fhandler_dev_tape::tape_status (struct mtget *get)
 int
 fhandler_dev_tape::tape_compression (long count)
 {
-  DWORD varlen;
-  TAPE_GET_DRIVE_PARAMETERS dpg;
   TAPE_SET_DRIVE_PARAMETERS dps;
 
-  while (((lasterr = GetTapeParameters (get_handle (),
-					GET_TAPE_DRIVE_INFORMATION,
-					(varlen = sizeof dpg, &varlen),
-					&dpg)) == ERROR_MEDIA_CHANGED)
-	 || (lasterr == ERROR_BUS_RESET))
-    ;
-
-  if (lasterr)
-    return tape_error (lasterr, "tape_compression");
-
-  if (! (dpg.FeaturesLow & TAPE_DRIVE_COMPRESSION))
+  if (!tape_get_feature (TAPE_DRIVE_COMPRESSION))
     return ERROR_INVALID_PARAMETER;
 
-  if (count)
-    {
-      dps.ECC = dpg.ECC;
-      dps.Compression = count ? TRUE : FALSE;
-      dps.DataPadding = dpg.DataPadding;
-      dps.ReportSetmarks = dpg.ReportSetmarks;
-      dps.EOTWarningZoneSize = dpg.EOTWarningZoneSize;
-      lasterr = SetTapeParameters (get_handle (),
-				   SET_TAPE_DRIVE_INFORMATION,
-				   &dps);
-
-      if (lasterr)
-	return tape_error (lasterr, "tape_compression");
-
-      dpg.Compression = dps.Compression;
-    }
-
-  return 0;
+  dps.ECC = dp.ECC;
+  dps.Compression = count ? TRUE : FALSE;
+  dps.DataPadding = dp.DataPadding;
+  dps.ReportSetmarks = dp.ReportSetmarks;
+  dps.EOTWarningZoneSize = dp.EOTWarningZoneSize;
+  TAPE_FUNC (SetTapeParameters (get_handle (), SET_TAPE_DRIVE_INFORMATION,
+				&dps));
+  if (!lasterr)
+    dp.Compression = dps.Compression;
+  return tape_error ("tape_compression");
 }
 

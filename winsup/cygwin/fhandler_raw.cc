@@ -24,52 +24,6 @@
 #include "cygheap.h"
 #include "ntdll.h"
 
-/* static wrapper functions to hide the effect of media changes and
-   bus resets which occurs after a new media is inserted. This is
-   also related to the used tape device.  */
-
-static BOOL write_file (HANDLE fh, const void *buf, DWORD to_write,
-			DWORD *written, int *err)
-{
-  BOOL ret;
-
-  *err = 0;
-  if (!(ret = WriteFile (fh, buf, to_write, written, 0)))
-    {
-      if ((*err = GetLastError ()) == ERROR_MEDIA_CHANGED
-	  || *err == ERROR_BUS_RESET)
-	{
-	  *err = 0;
-	  if (!(ret = WriteFile (fh, buf, to_write, written, 0)))
-	    *err = GetLastError ();
-	}
-    }
-  syscall_printf ("%d (err %d) = WriteFile (%d, %d, write %d, written %d, 0)",
-		  ret, *err, fh, buf, to_write, *written);
-  return ret;
-}
-
-static BOOL read_file (HANDLE fh, void *buf, DWORD to_read,
-		       DWORD *read, int *err)
-{
-  BOOL ret;
-
-  *err = 0;
-  if (!(ret = ReadFile (fh, buf, to_read, read, 0)))
-    {
-      if ((*err = GetLastError ()) == ERROR_MEDIA_CHANGED
-	  || *err == ERROR_BUS_RESET)
-	{
-	  *err = 0;
-	  if (!(ret = ReadFile (fh, buf, to_read, read, 0)))
-	    *err = GetLastError ();
-	}
-    }
-  syscall_printf ("%d (err %d) = ReadFile (%d, %d, to_read %d, read %d, 0)",
-		  ret, *err, fh, buf, to_read, *read);
-  return ret;
-}
-
 /**********************************************************************/
 /* fhandler_dev_raw */
 
@@ -86,13 +40,43 @@ fhandler_dev_raw::clear (void)
   varblkop = 0;
 }
 
+/* Wrapper functions to allow fhandler_dev_tape to detect and care for
+   media changes and bus resets. */
+
+BOOL
+fhandler_dev_raw::write_file (const void *buf, DWORD to_write,
+			      DWORD *written, int *err)
+{
+  BOOL ret;
+
+  *err = 0;
+  if (!(ret = WriteFile (get_handle (), buf, to_write, written, 0)))
+    *err = GetLastError ();
+  syscall_printf ("%d (err %d) = WriteFile (%d, %d, write %d, written %d, 0)",
+		  ret, *err, get_handle (), buf, to_write, *written);
+  return ret;
+}
+
+BOOL
+fhandler_dev_raw::read_file (void *buf, DWORD to_read, DWORD *read, int *err)
+{
+  BOOL ret;
+
+  *err = 0;
+  if (!(ret = ReadFile (get_handle (), buf, to_read, read, 0)))
+    *err = GetLastError ();
+  syscall_printf ("%d (err %d) = ReadFile (%d, %d, to_read %d, read %d, 0)",
+		  ret, *err, get_handle (), buf, to_read, *read);
+  return ret;
+}
+
 int
 fhandler_dev_raw::writebuf (void)
 {
   DWORD written;
   int ret = 0;
 
-  if (is_writing && devbuf && devbufend)
+  if (!varblkop && is_writing && devbuf && devbufend)
     {
       DWORD to_write;
       int ret = 0;
@@ -100,11 +84,9 @@ fhandler_dev_raw::writebuf (void)
       memset (devbuf + devbufend, 0, devbufsiz - devbufend);
       if (get_major () != DEV_TAPE_MAJOR)
 	to_write = ((devbufend - 1) / 512 + 1) * 512;
-      else if (varblkop)
-	to_write = devbufend;
       else
 	to_write = devbufsiz;
-      if (!write_file (get_handle (), devbuf, to_write, &written, &ret)
+      if (!write_file (devbuf, to_write, &written, &ret)
 	  && is_eom (ret))
 	eom_detected = 1;
       if (written)
@@ -216,6 +198,7 @@ fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
   int ret;
   size_t len = ulen;
   char *tgt;
+  char *p = (char *) ptr;
 
   /* In mode O_RDWR the buffer has to be written to device first */
   ret = writebuf ();
@@ -251,10 +234,10 @@ fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
 	    {
 	      bytes_to_read = min (len, devbufend - devbufstart);
 	      debug_printf ("read %d bytes from buffer (rest %d)",
-			    bytes_to_read, devbufstart - devbufend);
-	      memcpy (ptr, devbuf + devbufstart, bytes_to_read);
+			    bytes_to_read, devbufend - devbufend);
+	      memcpy (p, devbuf + devbufstart, bytes_to_read);
 	      len -= bytes_to_read;
-	      ptr = (void *) ((char *) ptr + bytes_to_read);
+	      p += bytes_to_read;
 	      bytes_read += bytes_to_read;
 	      devbufstart += bytes_to_read;
 
@@ -266,20 +249,14 @@ fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
 	    }
 	  if (len > 0)
 	    {
-	      if (!varblkop && len >= devbufsiz)
+	      if (len >= devbufsiz)
 		{
 		  if (get_major () == DEV_TAPE_MAJOR)
 		    bytes_to_read = (len / devbufsiz) * devbufsiz;
 		  else
 		    bytes_to_read = (len / 512) * 512;
-		  tgt = (char *) ptr;
+		  tgt = p;
 		  debug_printf ("read %d bytes direct from file",bytes_to_read);
-		}
-	      else if (varblkop)
-		{
-		  tgt = (char *) ptr;
-		  bytes_to_read = len;
-		  debug_printf ("read variable bytes direct from file");
 		}
 	      else
 		{
@@ -288,16 +265,11 @@ fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
 		  debug_printf ("read %d bytes from file into buffer",
 				bytes_to_read);
 		}
-	      if (!read_file (get_handle (), tgt, bytes_to_read, &read2, &ret))
+	      if (!read_file (tgt, bytes_to_read, &read2, &ret))
 		{
 		  if (!is_eof (ret) && !is_eom (ret))
 		    {
-		      if (varblkop && ret == ERROR_MORE_DATA)
-		        /* *ulen < blocksize.  Linux returns ENOMEM here
-			   when reading with variable blocksize . */
-		        set_errno (ENOMEM);
-		      else
-			__seterrno ();
+		      __seterrno ();
 		      goto err;
 		    }
 
@@ -325,26 +297,24 @@ fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
 		  devbufstart = 0;
 		  devbufend = read2;
 		}
-	      else if (varblkop)
-		{
-		  /* When reading tapes with variable block size, we
-		     leave right after reading one block. */
-		  bytes_read = read2;
-		  break;
-		}
 	      else
 		{
 		  len -= read2;
-		  ptr = (void *) ((char *) ptr + read2);
+		  p += read2;
 		  bytes_read += read2;
 		}
 	    }
 	}
     }
-  else if (!read_file (get_handle (), ptr, len, &bytes_read, &ret))
+  else if (!read_file (p, len, &bytes_read, &ret))
     {
       if (!is_eof (ret) && !is_eom (ret))
 	{
+	  if (varblkop && ret == ERROR_MORE_DATA)
+	    /* *ulen < blocksize.  Linux returns ENOMEM here
+	       when reading with variable blocksize . */
+	    set_errno (ENOMEM);
+	  else
 	  __seterrno ();
 	  goto err;
 	}
@@ -389,18 +359,14 @@ fhandler_dev_raw::raw_write (const void *ptr, size_t len)
     }
 
   if (!is_writing)
-    {
-      devbufend = devbufstart;
-      devbufstart = 0;
-    }
+    devbufstart = devbufend = 0;
   is_writing = 1;
 
   if (devbuf)
     {
       while (len > 0)
 	{
-	  if (!varblkop &&
-	      (len < devbufsiz || devbufend > 0) && devbufend < devbufsiz)
+	  if ((len < devbufsiz || devbufend > 0) && devbufend < devbufsiz)
 	    {
 	      bytes_to_write = min (len, devbufsiz - devbufend);
 	      memcpy (devbuf + devbufend, p, bytes_to_write);
@@ -411,12 +377,7 @@ fhandler_dev_raw::raw_write (const void *ptr, size_t len)
 	    }
 	  else
 	    {
-	      if (varblkop)
-		{
-		  bytes_to_write = len;
-		  tgt = p;
-		}
-	      else if (devbufend == devbufsiz)
+	      if (devbufend == devbufsiz)
 		{
 		  bytes_to_write = devbufsiz;
 		  tgt = devbuf;
@@ -428,7 +389,7 @@ fhandler_dev_raw::raw_write (const void *ptr, size_t len)
 		}
 
 	      ret = 0;
-	      write_file (get_handle (), tgt, bytes_to_write, &written, &ret);
+	      write_file (tgt, bytes_to_write, &written, &ret);
 	      if (written)
 		has_written = 1;
 
@@ -471,7 +432,7 @@ fhandler_dev_raw::raw_write (const void *ptr, size_t len)
     }
   else if (len > 0)
     {
-      if (!write_file (get_handle (), ptr, len, &bytes_written, &ret))
+      if (!write_file (p, len, &bytes_written, &ret))
 	{
 	  if (bytes_written)
 	    has_written = 1;
