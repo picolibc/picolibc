@@ -397,8 +397,7 @@ dup_ent (void *old, void *src0, struct_type type)
     return NULL;
 
   unionent *src = (unionent *) src0;
-  debug_printf ("duping %sent \"%s\", %p", entnames[type],
-		src ? src->name : "<null!>", src);
+  debug_printf ("duping %sent \"%s\", %p", entnames[type], src->name, src);
 
   /* Find the size of the raw structure minus any character strings, etc. */
   int sz, struct_sz;
@@ -482,11 +481,14 @@ dup_ent (void *old, void *src0, struct_type type)
 	 in each, of course.  */
       dst->port_proto_addrtype = src->port_proto_addrtype;
 
-      /* Copy the name field to dst, using space just beyond the end of
-	 the dst structure. */
       char *dp = ((char *) dst) + struct_sz;
-      strcpy (dst->name = dp, src->name);
-      dp += namelen;
+      if (namelen)
+	{
+	  /* Copy the name field to dst, using space just beyond the end of
+	     the dst structure. */
+	  strcpy (dst->name = dp, src->name);
+	  dp += namelen;
+	}
 
       /* Copy the 'list' type to dst, using space beyond end of structure
 	 + storage for name. */
