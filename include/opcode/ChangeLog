@@ -1,3 +1,7 @@
+1999-07-13  Alan Modra  <alan@spri.levels.unisa.edu.au>
+
+	* i386.h: Add "undocumented" AMD 3DNow! pf2iw, pi2fw, pswapw insns.
+
 Thu Jul  1 00:17:24 1999  Jeffrey A Law  (law@cygnus.com)
 
 	* hppa.h (struct pa_opcode): Add new field "flags".
