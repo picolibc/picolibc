@@ -1,3 +1,9 @@
+2000-09-01  Alexandre Oliva  <aoliva@redhat.com>
+
+	* sh.h (R_SH_GOT32, R_SH_PLT32, R_SH_COPY, R_SH_GLOB_DAT,
+	R_SH_JMP_SLOT, R_SH_RELATIVE, R_SH_GOTOFF, R_SH_GOTPC): New relocs.
+	(R_SH_FIRST_INVALID_RELOC): Adjust.
+
 2000-08-14  Jim Wilson  <wilson@cygnus.com>
 
 	* elf/ia64.h (EF_IA_64_REDUCEDFP, EF_IA_64_CONS_GP,
