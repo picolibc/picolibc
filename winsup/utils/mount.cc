@@ -14,6 +14,7 @@ details. */
 #include <mntent.h>
 #include <windows.h>
 #include <sys/cygwin.h>
+#include <stdlib.h>
 
 #ifdef errno
 #undef errno

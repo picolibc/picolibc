@@ -12,6 +12,7 @@ details. */
 #include <string.h>
 #include <sys/mount.h>
 #include <mntent.h>
+#include <stdlib.h>
 
 static void remove_all_mounts ();
 static void remove_all_automounts ();

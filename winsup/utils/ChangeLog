@@ -1,3 +1,9 @@
+2000-06-05  DJ Delorie  <dj@cygnus.com>
+
+	* mount.cc: add stdlib.h for exit
+	* umount.cc: ditto
+	* strace.cc: add #define for alloca
+
 Fri May 20  0:01:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* regtool.cc (find_key): Add parameter `access'.

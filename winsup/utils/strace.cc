@@ -14,6 +14,9 @@
    is built using -mno-cygwin as is intended.  */
 int _impure_ptr;
 
+/* we *know* we're being built with GCC */
+#define alloca __builtin_alloca
+
 static const char *pgm;
 static int forkdebug = 0;
 static int numerror = 1;
