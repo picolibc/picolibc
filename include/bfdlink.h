@@ -285,8 +285,8 @@ struct bfd_link_info
   /* TRUE if global symbols in discarded sections should be stripped.  */
   unsigned int strip_discarded: 1;
 
-  /* TRUE if relaxation is being finalized.  */
-  unsigned int relax_finalizing: 1;
+  /* TRUE if the final relax pass is needed.  */
+  unsigned int need_relax_finalize: 1;
 
   /* TRUE if generating a position independent executable.  */
   unsigned int pie: 1;
