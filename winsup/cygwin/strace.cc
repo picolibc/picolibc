@@ -34,6 +34,13 @@ void
 strace::hello()
 {
   char buf[30];
+
+  if (inited)
+    {
+      active ^= 1;
+      return;
+    }
+
   __small_sprintf (buf, "cYg%8x %x", _STRACE_INTERFACE_ACTIVATE_ADDR, &active);
   OutputDebugString (buf);
 

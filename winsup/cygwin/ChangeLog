@@ -1,3 +1,19 @@
+2002-02-14  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (unused_sig_wrapper): Eliminate unused parameter to
+	asm.
+	* external.cc (cygwin_internal): Change CW_STRACE_ON to
+	CW_STRACE_TOGGLE.
+	* strace.cc (strace::hello): Toggle strace on and off.
+	* sync.cc (muto::init): Renamed from constructor.
+	* sync.h (muto::new): Delete.
+	(muto::delete): Ditto.
+	(new_muto): Simplify.  Use muto.init for nearly everything.
+	* uinfo.cc (uinfo_init): Avoid closing a NULL handle.
+	* include/sys/cygwin.h (cygwin_getinfo_types): Rename CW_STRACE_OFF to
+	CW_STRACE_TOGGLE.  Delete CW_STRACE_OFF.
+	* include/sys/strace.h (strace): Add "inited" field.
+
 2001-02-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/acl.h: Fix definition of aclent_t.

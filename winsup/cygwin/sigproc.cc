@@ -1182,7 +1182,7 @@ wait_sig (VOID *)
 		  /* just forcing the loop */
 		  break;
 
-		/* Internal signal to force a flush of strace data to disk. */
+		/* Internal signal to turn on stracing. */
 		case __SIGSTRACE:
 		  strace.hello ();
 		  break;

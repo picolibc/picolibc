@@ -145,7 +145,7 @@ read_etc_group ()
 
   strncpy (group_name, "Administrators", sizeof (group_name));
 
-  static NO_COPY group_lock here;
+  static NO_COPY group_lock here = group_lock();
   if (cygwin_finished_initializing)
     here.arm ();
 

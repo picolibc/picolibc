@@ -67,8 +67,7 @@ typedef enum
     CW_GET_CYGDRIVE_INFO,
     CW_SET_CYGWIN_REGISTRY_NAME,
     CW_GET_CYGWIN_REGISTRY_NAME,
-    CW_STRACE_ON,
-    CW_STRACE_OFF,
+    CW_STRACE_TOGGLE,
     CW_CYGWIN_PID_TO_WINPID
   } cygwin_getinfo_types;
 

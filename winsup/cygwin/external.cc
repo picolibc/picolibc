@@ -206,7 +206,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 #	  undef cr
 	}
 
-      case CW_STRACE_ON:
+      case CW_STRACE_TOGGLE:
 	{
 	  pid_t pid = va_arg (arg, pid_t);
 	  pinfo p (pid);
@@ -221,6 +221,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	      return (DWORD) -1;
 	    }
 	}
+
       case CW_CYGWIN_PID_TO_WINPID:
 	{
 	  pinfo p (va_arg (arg, pid_t));
