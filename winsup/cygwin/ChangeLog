@@ -1,3 +1,8 @@
+2003-01-04  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_tty.cc (fhandler_tty_slave::get_unit): Fix test for tty unit
+	number based on whether this is just a /dev/tty or a /dev/ttyN.
+
 2003-01-03  Christopher Faylor  <cgf@redhat.com>
 
 	* dtable.h (dtable::in_vfork_cleanup): New function.  True if vfork
