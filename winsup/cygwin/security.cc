@@ -525,10 +525,8 @@ get_group_sidlist (cygsidlist &grp_list,
 	  auth_pos = grp_list.count - 1;
 	}
       extract_nt_dom_user (pw, domain, user);
-      /* Fail silently if DC is not reachable */
-      if (get_logon_server (domain, server, wserver) &&
-	  !get_user_groups (wserver, grp_list, user, domain))
-	return FALSE;
+      if (get_logon_server (domain, server, wserver))
+	get_user_groups (wserver, grp_list, user, domain);
       get_unix_group_sidlist (pw, grp_list);
       if (!get_user_local_groups (grp_list, usersid))
 	return FALSE;

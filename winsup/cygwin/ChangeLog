@@ -1,3 +1,8 @@
+2002-07-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (get_group_sidlist): Create group list from /etc files
+	even if DC is available but access fails.
+
 2002-07-22  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_serial.cc: Fix formatting problems introduced by below
