@@ -1,3 +1,9 @@
+2004-04-21  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winuser.h (SPI_GETACTIVEWINDOWTRACKING,
+	SPI_GETACTIVEWNDTRKZORDER, SPI_SETACTIVEWINDOWTRACKING,
+	SPI_SETACTIVEWNDTRKZORDER): Remove duplicate defines.
+
 2004-04-20  Christopher Faylor  <cgf@alum.bu.edu>
 
 	* include/wingdi.h: Protect non-unicode case of below.
@@ -306,7 +312,7 @@
 
 2004-02-11  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* lib/dnsapi.a: New file.
+	* lib/dnsapi.def: New file.
 	* lib/test.c: Include windns.h.
  
 2004-02-11  Pierre A. Humblet  <Pierre.Humblet@ieee.org>
