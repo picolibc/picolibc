@@ -1,3 +1,29 @@
+2001-02-14  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
+
+        * libc/include/stdlib.h: Add declarations of rand48 functions and
+        their reentrant versions.
+        * libc/include/sys/reent.h: Move macros from rand48.h. Add
+        struct _rand48 for shared parameters of rand48 functions.
+        (struct _reent): Add a variable _r48 of struct _rand48.
+        (_REENT_INIT): Add _r48 initialization.
+        * libc/stdlib/Makefile.am (lib_a_SOURCES): Add rand48 functions.
+        (CHEWOUT_FILES): Add rand48.def.
+        * libc/stdlib/Makefile.am: Add dependencies for rand48 functions.
+        * libc/stdlib/Makefile.in: Regenerated.
+        * libc/stdlib/drand48.c (drand48, _drand48_r): Derived from the
+        NetBSD C library.
+        * libc/stdlib/erand48.c (erand48, _erand48_r): Ditto.
+        * libc/stdlib/jrand48.c (jrand48, _jrand48_r): Ditto.
+        * libc/stdlib/lcong48.c (lcong48, _lcong48_r): Ditto.
+        * libc/stdlib/lrand48.c (lrand48, _lrand48_r): Ditto.
+        * libc/stdlib/mrand48.c (mrand48, _mrand48_r): Ditto.
+        * libc/stdlib/nrand48.c (nrand48, _nrand48_r): Ditto.
+        * libc/stdlib/seed48.c (seed48, _seed48_r): Ditto.
+        * libc/stdlib/srand48.c (srand48, _srand48_r): Ditto.
+        * libc/stdlib/rand48.c (__dorand48): Ditto.
+        * libc/stdlib/rand48.h: Ditto, and modify declarations of global
+        parameters into macros referring them in the reentrant structure.
+
 2001-02-12  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/stat.h: Add mknod for Cygwin now that

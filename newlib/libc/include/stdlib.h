@@ -114,6 +114,27 @@ char *	_EXFUN(ecvtf,(float,int,int *,int *));
 char *	_EXFUN(dtoa,(double, int, int, int *, int*, char**));
 int	_EXFUN(rand_r,(unsigned *__seed));
 
+double _EXFUN(drand48,(_VOID));
+double _EXFUN(_drand48_r,(struct _reent *));
+double _EXFUN(erand48,(unsigned short [3]));
+double _EXFUN(_erand48_r,(struct _reent *, unsigned short [3]));
+long   _EXFUN(jrand48,(unsigned short [3]));
+long   _EXFUN(_jrand48_r,(struct _reent *, unsigned short [3]));
+_VOID  _EXFUN(lcong48,(unsigned short [7]));
+_VOID  _EXFUN(_lcong48_r,(struct _reent *, unsigned short [7]));
+long   _EXFUN(lrand48,(_VOID));
+long   _EXFUN(_lrand48_r,(struct _reent *));
+long   _EXFUN(mrand48,(_VOID));
+long   _EXFUN(_mrand48_r,(struct _reent *));
+long   _EXFUN(nrand48,(unsigned short [3]));
+long   _EXFUN(_nrand48_r,(struct _reent *, unsigned short [3]));
+unsigned short *
+       _EXFUN(seed48,(unsigned short [3]));
+unsigned short *
+       _EXFUN(_seed48_r,(struct _reent *, unsigned short [3]));
+_VOID  _EXFUN(srand48,(long));
+_VOID  _EXFUN(_srand48_r,(struct _reent *, long));
+
 #ifndef __CYGWIN__
 _VOID	_EXFUN(cfree,(_PTR));
 #else

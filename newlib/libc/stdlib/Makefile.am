@@ -21,6 +21,7 @@ lib_a_SOURCES = \
 	bsearch.c	\
 	calloc.c	\
 	div.c  		\
+	drand48.c	\
 	dtoa.c 		\
 	dtoastub.c 	\
 	ecvtbuf.c 	\
@@ -28,13 +29,17 @@ lib_a_SOURCES = \
 	environ.c	\
 	envlock.c	\
 	eprintf.c	\
+	erand48.c	\
 	exit.c 		\
 	getenv.c  	\
 	getenv_r.c	\
 	getopt.c	\
+	jrand48.c	\
 	labs.c 		\
+	lcong48.c	\
 	ldiv.c  	\
 	ldtoa.c		\
+	lrand48.c	\
 	malign.c	\
 	malloc.c  	\
 	mblen.c		\
@@ -45,17 +50,22 @@ lib_a_SOURCES = \
 	mbtowc_r.c	\
 	mlock.c		\
 	mprec.c		\
+	mrand48.c	\
 	msize.c		\
 	mstats.c	\
 	mtrim.c		\
+	nrand48.c	\
 	putenv.c	\
 	putenv_r.c	\
 	qsort.c		\
 	rand.c		\
+	rand48.c	\
 	rand_r.c	\
 	realloc.c	\
+	seed48.c	\
 	setenv.c	\
 	setenv_r.c	\
+	srand48.c	\
 	strdup.c	\
 	strdup_r.c	\
 	strtod.c	\
@@ -135,6 +145,7 @@ CHEWOUT_FILES= \
 	mstats.def	\
 	qsort.def	\
 	rand.def	\
+	rand48.def	\
 	strtod.def 	\
 	strtol.def 	\
 	strtoul.def 	\
@@ -166,3 +177,13 @@ mbtowc_r.o: mbtowc_r.c mbctype.h
 mprec.o: mprec.c mprec.h
 strtod.o: strtod.c mprec.h
 wctomb_r.o: wctomb_r.c mbctype.h
+drand48.o: drand48.c rand48.h
+erand48.o: erand48.c rand48.h
+jrand48.o: jrand48.c rand48.h
+lcong48.o: lcong48.c rand48.h
+lrand48.o: lrand48.c rand48.h
+mrand48.o: mrand48.c rand48.h
+nrand48.o: nrand48.c rand48.h
+rand48.o: rand48.c rand48.h
+seed48.o: seed48.c rand48.h
+srand48.o: srand48.c rand48.h
