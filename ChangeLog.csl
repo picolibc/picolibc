@@ -1,3 +1,8 @@
+2005-03-28  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* elf32-arm.c (elf32_arm_check_relocs): Increment count for all
+	relocation types.  Don't count relocations which will use a PLT.
+
 2005-03-23  Jim Blandy  <jimb@redhat.com>
 
 	* config/tc-arm.c (arm_adjust_symtab): Fetch elf_sym's binding
