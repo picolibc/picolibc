@@ -84,7 +84,7 @@ extern HANDLE signal_arrived;
 extern HANDLE parent_alive;
 
 BOOL __stdcall my_parent_is_alive ();
-extern "C" int __stdcall sig_dispatch_pending (int force = FALSE) __asm__ ("sig_dispatch_pending");
+extern "C" int __stdcall sig_dispatch_pending (int force = FALSE);
 extern "C" void __stdcall set_process_mask (sigset_t newmask);
 int __stdcall sig_handle (int);
 void __stdcall sig_clear (int);

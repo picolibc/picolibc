@@ -815,7 +815,6 @@ sig_send (_pinfo *p, int sig, DWORD ebp)
 
   if (!ReleaseSemaphore (thiscatch, 1, NULL) && (int) GetLastError () > 0)
     {
-sigproc_printf ("ReleaseSemaphore failed, %E");
       /* Couldn't signal the semaphore.  This probably means that the
        * process is exiting.
        */
@@ -833,7 +832,6 @@ sigproc_printf ("ReleaseSemaphore failed, %E");
 	}
       goto out;
     }
-sigproc_printf ("ReleaseSemaphore succeeded");
 
   /* No need to wait for signal completion unless this was a signal to
    * this process.

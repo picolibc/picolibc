@@ -34,6 +34,8 @@ extern void siglast ();
 extern DWORD __sigfirst, __siglast;
 };
 
+extern DWORD sigtid;
+
 static BOOL WINAPI ctrl_c_handler (DWORD);
 static void signal_exit (int) __attribute__ ((noreturn));
 static char windows_system_directory[1024];
@@ -491,6 +493,7 @@ handle_exceptions (EXCEPTION_RECORD *e, void *, CONTEXT *in, void *)
       }
 
   if (!myself->progname[0]
+      || GetCurrentThreadId () == sigtid
       || (void *) myself->getsig (sig).sa_handler == (void *) SIG_DFL
       || (void *) myself->getsig (sig).sa_handler == (void *) SIG_IGN
       || (void *) myself->getsig (sig).sa_handler == (void *) SIG_ERR)
@@ -859,8 +862,6 @@ ctrl_c_handler (DWORD type)
 extern "C" void __stdcall
 set_process_mask (sigset_t newmask)
 {
-  extern DWORD sigtid;
-
   mask_sync->acquire (INFINITE);
   sigset_t oldmask = myself->getsigmask ();
   newmask &= ~SIG_NONMASKABLE;

@@ -1,3 +1,10 @@
+Fri Sep 15 22:30:40 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (handle_exceptions): Just "core dump" if SIGSEGV in signal thread.
+	* external.cc (fillout_pinfo): Fix compiler warning.
+	* sigproc.h: Eliminate special asm naming for sig_dispatch_pending.
+	* sigproc.cc (sig_send): Remove debugging statements.
+
 Wed Sep 13 14:56:47 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* spawn.cc (av): Hide 'calloced' field and limit cstrduping to class

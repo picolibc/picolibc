@@ -48,7 +48,7 @@ fillout_pinfo (pid_t pid, int winpid)
 
       if (!p)
 	{
-	  if (!winpid || (!nextpid && thispid != pid))
+	  if (!winpid || (!nextpid && thispid != (DWORD) pid))
 	    continue;
 	  ep.pid = thispid;
 	  ep.dwProcessId = cygwin_pid (thispid);
