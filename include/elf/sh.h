@@ -1,5 +1,5 @@
 /* SH ELF support for BFD.
-   Copyright (C) 1998 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2000 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -76,6 +76,8 @@ START_RELOC_NUMBERS (elf_sh_reloc_type)
   RELOC_NUMBER (R_SH_SWITCH8, 33)
   RELOC_NUMBER (R_SH_GNU_VTINHERIT, 34)
   RELOC_NUMBER (R_SH_GNU_VTENTRY, 35)
+  RELOC_NUMBER (R_SH_LOOP_START, 36)
+  RELOC_NUMBER (R_SH_LOOP_END, 37)
   EMPTY_RELOC (R_SH_max)
 END_RELOC_NUMBERS
 
