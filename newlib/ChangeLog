@@ -1,3 +1,8 @@
+2000-09-13  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/machine/v850/setjmp.S: Fixed tab problems caused by
+	clipping patch from e-mail reader.
+
 2000-09-13  Will Cohen  <wcohen@redhat.com>
 
 	* libc/machine/v850/setjmp.S (_setjmp): Save r1 rather than r0.

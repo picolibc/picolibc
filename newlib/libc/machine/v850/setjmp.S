@@ -4,7 +4,7 @@
 	.align 1
 	.global _setjmp
 _setjmp:
-      st.w r1,0[r6]
+	st.w r1,0[r6]
 	st.w r3,4[r6]
 	st.w r4,8[r6]
 	st.w r20,12[r6]
@@ -19,12 +19,12 @@ _setjmp:
 	st.w r29,48[r6]
 	st.w r30,52[r6]
 	st.w r31,56[r6]
-      mov r0, r10
+	mov r0, r10
 	jmp [r31]
 
 	.global _longjmp
 _longjmp:
-      ld.w 0[r6],r1
+	ld.w 0[r6],r1
 	ld.w 4[r6],r3
 	ld.w 8[r6],r4
 	ld.w 12[r6],r20
@@ -39,9 +39,9 @@ _longjmp:
 	ld.w 48[r6],r29
 	ld.w 52[r6],r30
 	ld.w 56[r6],r31
-      cmp r7, r0
-      jne 1f
-      mov 1,r7
+	cmp r7, r0
+	jne 1f
+	mov 1,r7
 1:
-      mov r7, r10
+	mov r7, r10
 	jmp [r31]
