@@ -1,3 +1,10 @@
+2001-01-14  Alan Modra  <alan@linuxcare.com.au>
+
+	* hppa.h: Describe new '<' and '>' operand types, and tidy
+	existing comments.
+	(pa_opcodes): Add entries for missing wide mode ldi,ldo,ldw,stw.
+	Remove duplicate "ldw j(s,b),x".  Sort some entries.
+
 Sat Jan 13 09:56:32 MET 2001  Jan Hubicka  <jh@suse.cz>
 
 	* i386.h (i386_optab): Fix pusha and ret templates.
