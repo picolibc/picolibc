@@ -1,3 +1,8 @@
+2004-08-28  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* syscalls.cc (ftruncate64): On 9x, call write with a zero length
+	to zero fill when the file is extended.
+
 2004-08-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (link): Avoid compiler warning.

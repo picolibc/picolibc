@@ -1676,7 +1676,7 @@ setmode (int fd, int mode)
 extern "C" int
 ftruncate64 (int fd, _off64_t length)
 {
-  int res = -1;
+  int res = -1, res_bug = 0;
 
   if (length < 0)
     set_errno (EINVAL);
@@ -1693,10 +1693,13 @@ ftruncate64 (int fd, _off64_t length)
 	      _off64_t prev_loc = cfd->lseek (0, SEEK_CUR);
 
 	      cfd->lseek (length, SEEK_SET);
+	      /* Fill the space with 0, if needed */
+	      if (wincap.has_lseek_bug ())
+		res_bug = cfd->write (&res, 0);
 	      if (!SetEndOfFile (h))
 		__seterrno ();
 	      else
-		res = 0;
+		res = res_bug;
 
 	      /* restore original file pointer location */
 	      cfd->lseek (prev_loc, SEEK_SET);
