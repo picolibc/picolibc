@@ -715,6 +715,12 @@ setlocale
 _setlocale = setlocale
 setpgid
 _setpgid = setpgid
+setregid
+_setregid = setregid
+setregid32
+setreuid
+_setreuid = setreuid
+setreuid32
 setrlimit
 _setrlimit = setrlimit
 setsid
