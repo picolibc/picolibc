@@ -1,5 +1,11 @@
 2002-05-21  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/stdint.h: Include stddef.h to get
+	wchar_t and wint_t.
+	(WINT_MAX): Define to ((wint_t)-1).
+
+2002-05-21  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/wctype.h: Replace 'inline' with '__inline__'.
 	* include/inttypes.h: Likewise.
 
