@@ -429,7 +429,7 @@ path_conv::set_normalized_path (const char *path_copy)
   char *eopath = strchr (path, '\0');
   size_t n;
 
-  if (dev.devn != FH_FS || strncmp (path_copy, "//./", 4) == 0)
+  if (dev.devn != FH_FS || !*path_copy || strncmp (path_copy, "//./", 4) == 0)
     n = strlen (path_copy) + 1;
   else
     {
