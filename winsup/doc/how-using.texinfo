@@ -27,23 +27,32 @@ containing packages, see
 
 @subsection Why is Cygwin suddenly @emph{so} slow?
 
-If you recently upgraded the @samp{cygwin} package and suddenly
-@emph{every} command takes a @emph{very} long time, then you probably
-have the obsolete @code{//c} notation in your PATH.  This now means
-the @emph{network share} @code{c}, which will slow things down
-tremendously if it does not exist.  See then next FAQ entry.
+If you recently upgraded and suddenly @emph{every} command takes a
+@emph{very} long time, then something is probably attempting to 
+access a network share.  You may have the obsolete @code{//c}
+notation in your PATH or startup files.  This now means the
+@emph{network share} @code{c}, which will slow things down
+tremendously if it does not exist.  
 
-@subsection Why doesn't //c (for C:) work anymore?
-
-(Similarly for any drive letter, e.g. @code{//z} for @code{Z:})
-
-This ``feature'' has long been deprecated, and no longer works at all
-in the latest release.  As of release 1.3.3, @code{//c} now means the
-@emph{network share} @code{c}.
-
+Using //c (for C:) doesn't work anymore.  (Similarly for any drive
+letter, e.g. @code{//z} for @code{Z:}) This ``feature'' has long been
+deprecated, and no longer works at all in the latest release.  As of
+release 1.3.3, @code{//c} now means the @emph{network share} @code{c}.
 For a detailed discussion of why this change was made, and how deal
 with it now, refer to
 @file{http://sources.redhat.com/ml/cygwin/2001-09/msg00014.html}.
+
+@subsection Why can't I access my network shares with @samp{cron}, or when using pubkey authentication with @samp{ssh}?
+
+Some Cygwin services normally run as the SYSTEM user, which has
+certain limitations. Under the Windows authentication scheme, the
+SYSTEM user cannot access network shares that require authentication.
+For more information, see
+@file{http://cygwin.com/cygwin-ug-net/ntsec.html}.
+
+Workarounds include using public network share that does not require
+authentication (for non-critical files), or running the service as
+your own user with @samp{cygrunsrv}.
 
 @subsection How should I set my PATH?
 

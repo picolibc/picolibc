@@ -78,10 +78,9 @@ MAKE_MODE to "UNIX" (actually case is not significant) or "WIN32"
 
 @subsection Why the undefined reference to @samp{WinMain@@16}?
 
-Try adding an empty main() function to one of your sources.
-
-Or, perhaps you have @samp{-lm} too early in the link command line.  It
-should be at the end:
+If you're using @samp{gcc}, try adding an empty main() function to one
+of your sources.  Or, perhaps you have @samp{-lm} too early in the
+link command line.  It should be at the end:
 
 @example
     bash$ gcc hello.c -lm
@@ -100,6 +99,12 @@ works, but
 @end example
 
 This is an artifact of libm.a being a symbolic link to libcygwin.a.
+
+If you're using GCJ, you need to pass a "--main" flag:
+
+@example
+gcj --main=Hello Hello.java
+@end example
 
 @subsection How do I use Win32 API calls?
 

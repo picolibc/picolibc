@@ -90,8 +90,7 @@ disk if you are paranoid.
 This should be safe, but only if Cygwin Setup is not substituted by
 something malicious, and no mirror has been compromised.
 
-@subsection What packages should I download?
-
+@subsection What packages should I download? Where are 'make', 'gcc', 'vi', etc?  
 When using Cygwin Setup for the first time, the default is to install
 a minimal subset of packages.  If you want anything beyond that, you
 will have to select it explicitly.  See
@@ -100,7 +99,7 @@ packages.
 
 If you want to build programs, of course you'll need @samp{gcc},
 @samp{binutils}, @samp{make} and probably other packages from the
-``Devel'' category.
+``Devel'' category. Text editors can be found under ``Editors''.
 
 @subsection How do I just get everything?
 
