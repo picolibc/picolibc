@@ -1,3 +1,17 @@
+2004-10-27  Tomer Levi  <Tomer.Levi@nsc.com>
+
+	* opcode/crx.h (enum reg): Rearrange registers, remove 'ccfg' and `'pc'.
+	(enum reg_type): Remove CRX_PC_REGTYPE, CRX_MTPR_REGTYPE.
+	(enum operand_type): Rearrange operands, edit comments.
+	replace us<N> with ui<N> for unsigned immediate.
+	replace d<N> with disps<N>/dispu<N>/dispe<N> for signed/unsigned/escaped 
+	displacements (respectively).
+	replace rbase_ridx_scl2_dispu<N> with rindex_disps<N> for register index.
+	(instruction type): Add NO_TYPE_INS.
+	(instruction flags): Add USER_REG, CST4MAP, NO_SP, NO_RPTR.
+	(operand_entry): New field - 'flags'.
+	(operand flags): New.
+
 2004-10-26  Paul Brook  <paul@codesourcery.com>
 
 	* bfdlink.h (struct bfd_link_info): Add create_default_symver.
