@@ -1,3 +1,7 @@
+2003-02-18  Jason Merrill  <jason@redhat.com>
+
+	* Makefile.tpl (check-c++): Allow parallelism.
+
 2003-02-17  Andrew Cagney  <ac131313@redhat.com>
 
 	* configure: Regenerate using autoconf 000227.
