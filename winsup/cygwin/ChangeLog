@@ -1,3 +1,15 @@
+2005-03-11  Christopher Faylor  <cgf@timesys.com>
+
+	* path.h (pathconv_arg): Define PC_NO_ACCESS_CHECK.
+	(path_types): Define PATH_NO_ACCESS_CHECK == PC_NO_ACCESS_CHECK.
+	* path.cc (symlink_info::check_sysfile): Move to symlink_info class and
+	eliminate arguments that are part of class.  Use set_error.
+	(symlink_info::check_shortcut): Ditto.
+	(symlink_info::set_error): New function.
+	(path_conv::check): Pass PC_NO_ACCESS_CHECK to symlink_info::check.
+	(symlink_info::check): Preserve PC_NO_ACCESS_CHECK in pflags.  Use
+	set_error.
+
 2005-03-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (is_floppy): New function.

@@ -99,6 +99,9 @@ struct symlink_info
   int set (char *path);
   bool parse_device (const char *);
   bool case_check (char *path);
+  int check_sysfile (const char *path, HANDLE h);
+  int check_shortcut (const char *path, HANDLE h);
+  void set_error (int);
 };
 
 int pcheck_case = PCHECK_RELAXED; /* Determines the case check behaviour. */
@@ -544,6 +547,7 @@ path_conv::check (const char *src, unsigned opt,
     error = 0;
   else if ((error = check_null_empty_str (src)))
     return;
+  unsigned pflags_or = (opt & PC_NO_ACCESS_CHECK);
   /* This loop handles symlink expansion.  */
   for (;;)
     {
@@ -602,6 +606,8 @@ path_conv::check (const char *src, unsigned opt,
 
 	  if (error)
 	    return;
+
+	  sym.pflags |= pflags_or;
 
 	  if (dev.major == DEV_CYGDRIVE_MAJOR)
 	    {
@@ -767,7 +773,7 @@ is_virtual_symlink:
 		  else
 		    break;
 		}
-	      else if (sym.error != ENOENT && sym.error != ENOSHARE) /* E. g. EACCES */
+	      else if (sym.error != ENOENT && sym.error != ENOSHARE)
 		{
 		  error = sym.error;
 		  goto out;
@@ -2776,9 +2782,8 @@ cmp_shortcut_header (win_shortcut_hdr *file_header)
       && file_header->run == SW_NORMAL;
 }
 
-static int
-check_shortcut (const char *path, DWORD fileattr, HANDLE h,
-		char *contents, int *error, unsigned *pflags)
+int
+symlink_info::check_shortcut (const char *path, HANDLE h)
 {
   win_shortcut_hdr *file_header;
   char *buf, *cp;
@@ -2795,7 +2800,7 @@ check_shortcut (const char *path, DWORD fileattr, HANDLE h,
   buf = (char *) alloca (size);
   if (!ReadFile (h, buf, size, &got, 0))
     {
-      *error = EIO;
+      set_error (EIO);
       goto close_it;
     }
   file_header = (win_shortcut_hdr *) buf;
@@ -2810,13 +2815,13 @@ check_shortcut (const char *path, DWORD fileattr, HANDLE h,
   contents[len] = '\0';
   res = len;
   if (res) /* It's a symlink.  */
-    *pflags = PATH_SYMLINK | PATH_LNK;
+    pflags = PATH_SYMLINK | PATH_LNK;
   goto close_it;
 
 file_not_symlink:
   /* Not a symlink, see if executable.  */
-  if (!(*pflags & PATH_ALL_EXEC) && has_exec_chars ((const char *) &file_header, got))
-    *pflags |= PATH_EXEC;
+  if (!(pflags & PATH_ALL_EXEC) && has_exec_chars ((const char *) &file_header, got))
+    pflags |= PATH_EXEC;
 
 close_it:
   CloseHandle (h);
@@ -2824,9 +2829,8 @@ close_it:
 }
 
 
-static int
-check_sysfile (const char *path, DWORD fileattr, HANDLE h,
-	       char *contents, int *error, unsigned *pflags)
+int
+symlink_info::check_sysfile (const char *path, HANDLE h)
 {
   char cookie_buf[sizeof (SYMLINK_COOKIE) - 1];
   DWORD got;
@@ -2835,19 +2839,19 @@ check_sysfile (const char *path, DWORD fileattr, HANDLE h,
   if (!ReadFile (h, cookie_buf, sizeof (cookie_buf), &got, 0))
     {
       debug_printf ("ReadFile1 failed");
-      *error = EIO;
+      set_error (EIO);
     }
   else if (got == sizeof (cookie_buf)
 	   && memcmp (cookie_buf, SYMLINK_COOKIE, sizeof (cookie_buf)) == 0)
     {
       /* It's a symlink.  */
-      *pflags = PATH_SYMLINK;
+      pflags = PATH_SYMLINK;
 
       res = ReadFile (h, contents, CYG_MAX_PATH + 1, &got, 0);
       if (!res)
 	{
 	  debug_printf ("ReadFile2 failed");
-	  *error = EIO;
+	  set_error (EIO);
 	}
       else
 	{
@@ -2866,19 +2870,19 @@ check_sysfile (const char *path, DWORD fileattr, HANDLE h,
     }
   else if (got == sizeof (cookie_buf)
 	   && memcmp (cookie_buf, SOCKET_COOKIE, sizeof (cookie_buf)) == 0)
-    *pflags |= PATH_SOCKET;
+    pflags |= PATH_SOCKET;
   else
     {
       /* Not a symlink, see if executable.  */
-      if (*pflags & PATH_ALL_EXEC)
+      if (pflags & PATH_ALL_EXEC)
 	/* Nothing to do */;
       else if (has_exec_chars (cookie_buf, got))
-	*pflags |= PATH_EXEC;
+	pflags |= PATH_EXEC;
       else
-	*pflags |= PATH_NOTEXEC;
+	pflags |= PATH_NOTEXEC;
       }
   syscall_printf ("%d = symlink.check_sysfile (%s, %s) (%p)",
-		  res, path, contents, *pflags);
+		  res, path, contents, pflags);
 
   CloseHandle (h);
   return res;
@@ -3001,6 +3005,14 @@ suffix_scan::next ()
     }
 }
 
+void
+symlink_info::set_error (int in_errno)
+{
+  if ((pflags & PATH_NO_ACCESS_CHECK) && in_errno != ENAMETOOLONG)
+    return;
+  error = in_errno;
+}
+
 bool
 symlink_info::parse_device (const char *contents)
 {
@@ -3075,6 +3087,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
   minor = 0;
 
   pflags &= ~(PATH_SYMLINK | PATH_LNK);
+  unsigned pflags_or = pflags & PATH_NO_ACCESS_CHECK;
 
   case_clash = false;
 
@@ -3088,7 +3101,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	     matter, so we just return 0.  For example, getting the
 	     attributes of \\HOST will typically fail.  */
 	  debug_printf ("GetFileAttributes (%s) failed", suffix.path);
-	  error = geterrno_from_win_error (GetLastError (), EACCES);
+	  set_error (geterrno_from_win_error (GetLastError (), EACCES));
 	  continue;
 	}
 
@@ -3122,7 +3135,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
       if (sym_check > 0 && opt & PC_CHECK_EA &&
 	  (res = get_symlink_ea (suffix.path, contents, sizeof (contents))) > 0)
 	{
-	  pflags = PATH_SYMLINK;
+	  pflags = PATH_SYMLINK | pflags_or;
 	  if (sym_check == 1)
 	    pflags |= PATH_LNK;
 	  debug_printf ("Got symlink from EA: %s", contents);
@@ -3142,7 +3155,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
       switch (sym_check)
 	{
 	case 1:
-	  res = check_shortcut (suffix.path, fileattr, h, contents, &error, &pflags);
+	  res = check_shortcut (suffix.path, h);
 	  if (!res)
 	    /* check more below */;
 	  else if (contents[0] == ':' && contents[1] == '\\' && parse_device (contents))
@@ -3157,7 +3170,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	  fileattr = INVALID_FILE_ATTRIBUTES;
 	  continue;		/* in case we're going to tack *another* .lnk on this filename. */
 	case 2:
-	  res = check_sysfile (suffix.path, fileattr, h, contents, &error, &pflags);
+	  res = check_sysfile (suffix.path, h);
 	  if (!res)
 	    goto file_not_symlink;
 	  break;
@@ -3453,7 +3466,7 @@ fchdir (int fd)
 extern "C" int
 cygwin_conv_to_win32_path (const char *path, char *win32_path)
 {
-  path_conv p (path, PC_SYM_FOLLOW);
+  path_conv p (path, PC_SYM_FOLLOW | PC_NO_ACCESS_CHECK);
   if (p.error)
     {
       win32_path[0] = '\0';
@@ -3468,7 +3481,7 @@ cygwin_conv_to_win32_path (const char *path, char *win32_path)
 extern "C" int
 cygwin_conv_to_full_win32_path (const char *path, char *win32_path)
 {
-  path_conv p (path, PC_SYM_FOLLOW | PC_FULL);
+  path_conv p (path, PC_SYM_FOLLOW | PC_FULL | PC_NO_ACCESS_CHECK);
   if (p.error)
     {
       win32_path[0] = '\0';
