@@ -1,3 +1,8 @@
+2001-02-12  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/stat.h: Add mknod for Cygwin now that
+	Cygwin definition has correct prototype.
+
 2001-02-08  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/stat.h: Must revert change for mknod
