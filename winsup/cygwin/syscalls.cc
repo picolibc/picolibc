@@ -2873,7 +2873,7 @@ long gethostid(void)
   // a random hashing algorithm
   // dependancy on md5 is probably too costly
   for (int i=0;i<13;i++)
-        hostid ^= ((data[i] << (i << 2)) | (data[i] >> (32 - (i << 2))));
+    hostid ^= ((data[i] << (i << 2)) | (data[i] >> (32 - (i << 2))));
 
   if (opmask && !SetThreadAffinityMask (GetCurrentThread (), opmask))
     debug_printf ("SetThreadAffinityMask to %p failed, %E", opmask);
