@@ -1,3 +1,11 @@
+2003-09-20  Christopher Faylor  <cgf@redhat.com>
+
+	* spawn.cc (pthread_cleanup): New struct.
+	(do_cleanup): New function.
+	(spawn_guts): Initialize struct for pthread_cleanup handling to ensure
+	proper restoration of signals if/when thread is cancelled.  Restore
+	settings using pthread_cancel_pop.
+
 2003-09-19  Christopher Faylor  <cgf@redhat.com>
 
 	* thread.h (__reent_t::init_clib): Declare new function.

@@ -323,6 +323,28 @@ av::unshift (const char *what, int conv)
   return 1;
 }
 
+struct pthread_cleanup
+{
+  _sig_func_ptr oldint;
+  _sig_func_ptr oldquit;
+  sigset_t oldmask;
+  pthread_cleanup (): oldint (NULL), oldquit (NULL), oldmask (0) {}
+};
+
+static void
+do_cleanup (void *args)
+{
+# define cleanup ((pthread_cleanup *) args)
+  if (cleanup->oldint)
+    signal (SIGINT, cleanup->oldint);
+  if (cleanup->oldquit)
+    signal (SIGQUIT, cleanup->oldquit);
+  if (cleanup->oldmask)
+    sigprocmask (SIG_SETMASK, &(cleanup->oldmask), NULL);
+# undef cleanup
+}
+
+
 static int __stdcall
 spawn_guts (const char * prog_arg, const char *const *argv,
 	    const char *const envp[], int mode)
@@ -689,17 +711,17 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   /* FIXME: There is a small race here */
 
-  sigset_t old_mask;
-  _sig_func_ptr oldint = (_sig_func_ptr) NULL;
-  _sig_func_ptr oldquit = (_sig_func_ptr) NULL;
+  DWORD res;
+  pthread_cleanup cleanup;
+  pthread_cleanup_push (do_cleanup, (void *) &cleanup);
   if (mode == _P_SYSTEM)
     {
       sigset_t child_block;
-      oldint = signal (SIGINT, SIG_IGN);
-      oldquit = signal (SIGQUIT, SIG_IGN);
+      cleanup.oldint = signal (SIGINT, SIG_IGN);
+      cleanup.oldquit = signal (SIGQUIT, SIG_IGN);
       sigemptyset (&child_block);
       sigaddset (&child_block, SIGCHLD);
-      (void) sigprocmask (SIG_BLOCK, &child_block, &old_mask);
+      (void) sigprocmask (SIG_BLOCK, &child_block, &cleanup.oldmask);
     }
 
   /* Restore impersonation. In case of _P_OVERLAY this isn't
@@ -792,7 +814,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   sigproc_printf ("spawned windows pid %d", pi.dwProcessId);
 
-  DWORD res;
   BOOL exited;
 
   res = 0;
@@ -885,12 +906,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     case _P_WAIT:
     case _P_SYSTEM:
       waitpid (cygpid, (int *) &res, 0);
-      if (mode == _P_SYSTEM)
-	{
-	  signal (SIGINT, oldint);
-	  signal (SIGQUIT, oldquit);
-	  sigprocmask (SIG_SETMASK, &old_mask, NULL);
-	}
       break;
     case _P_DETACH:
       res = 0;	/* Lose all memory of this child. */
@@ -904,6 +919,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       break;
     }
 
+  pthread_cleanup_pop (1);
   return (int) res;
 }
 
