@@ -357,11 +357,25 @@ typedef struct _FILE_NAME_INFORMATION
   WCHAR FileName[MAX_PATH + 100];
 } FILE_NAME_INFORMATION;
 
+typedef struct _FILE_COMPRESSION_INFORMATION
+{
+  LARGE_INTEGER CompressedSize;
+  USHORT CompressionFormat;
+  UCHAR	CompressionUnitShift;
+  UCHAR Unknown;
+  UCHAR ClusterSizeShift;
+} FILE_COMPRESSION_INFORMATION, *PFILE_COMPRESSION_INFORMATION;
+
+typedef enum _FILE_INFORMATION_CLASS
+{
+  FileCompressionInformation = 28
+} FILE_INFORMATION_CLASS, *PFILE_INFORMATION_CLASS;
+
 typedef enum _OBJECT_INFORMATION_CLASS
 {
-   ObjectBasicInformation = 0,
-   ObjectNameInformation = 1,
-   ObjectHandleInformation = 4
+  ObjectBasicInformation = 0,
+  ObjectNameInformation = 1,
+  ObjectHandleInformation = 4
    // and many more
 } OBJECT_INFORMATION_CLASS;
 

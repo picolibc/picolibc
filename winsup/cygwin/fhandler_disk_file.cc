@@ -23,6 +23,8 @@ details. */
 #include "cygheap.h"
 #include "shared_info.h"
 #include "pinfo.h"
+#include <ntdef.h>
+#include "ntdll.h"
 #include <assert.h>
 #include <ctype.h>
 
@@ -94,24 +96,12 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
 int __stdcall
 fhandler_base::fstat_by_handle (struct __stat64 *buf)
 {
-  int res = 0;
   BY_HANDLE_FILE_INFORMATION local;
-
-  /* NT 3.51 seems to have a bug when attempting to get vol serial
-     numbers.  This loop gets around this. */
-  for (int i = 0; i < 2; i++)
-    {
-      if (!(res = GetFileInformationByHandle (get_handle (), &local)))
-	break;
-      if (local.dwVolumeSerialNumber && (long) local.dwVolumeSerialNumber != -1)
-	break;
-    }
-
+  BOOL res = GetFileInformationByHandle (get_handle (), &local);
   debug_printf ("%d = GetFileInformationByHandle (%s, %d)",
 		res, get_win32_name (), get_handle ());
-  if (res == 0)
-    /* GetFileInformationByHandle will fail if it's given stdin/out/err
-       or a pipe*/
+  /* GetFileInformationByHandle will fail if it's given stdio handle or pipe*/
+  if (!res)
     {
       memset (&local, 0, sizeof (local));
       local.nFileSizeLow = GetFileSize (get_handle (), &local.nFileSizeHigh);
@@ -231,6 +221,9 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 			     DWORD nFileIndexLow,
 			     DWORD nNumberOfLinks)
 {
+  IO_STATUS_BLOCK st;
+  FILE_COMPRESSION_INFORMATION fci;
+
   /* This is for FAT filesystems, which don't support atime/ctime */
   if (ftLastAccessTime.dwLowDateTime == 0
       && ftLastAccessTime.dwHighDateTime == 0)
@@ -276,16 +269,13 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 
   buf->st_blksize = S_BLKSIZE;
 
-  /* GetCompressedFileSize() gets autoloaded.  It returns INVALID_FILE_SIZE
-     if it doesn't exist.  Since that's also a valid return value on 64bit
-     capable file systems, we must additionally check for the win32 error. */
-  nFileSizeLow = GetCompressedFileSizeA (pc, &nFileSizeHigh);
-  if (nFileSizeLow != INVALID_FILE_SIZE || GetLastError () == NO_ERROR)
-    /* On systems supporting compressed (and sparsed) files,
-       GetCompressedFileSize() returns the actual amount of
-       bytes allocated on disk.  */
-    buf->st_blocks = (((_off64_t)nFileSizeHigh << 32)
-		     + nFileSizeLow + S_BLKSIZE - 1) / S_BLKSIZE;
+  /* On compressed and sparsed files, we request the actual amount of bytes
+     allocated on disk.  */
+  if (pc.has_attribute (FILE_ATTRIBUTE_COMPRESSED | FILE_ATTRIBUTE_SPARSE_FILE)
+      && get_io_handle ()
+      && !NtQueryInformationFile (get_io_handle (), &st, (PVOID) &fci,
+      				  sizeof fci, FileCompressionInformation))
+    buf->st_blocks = (fci.CompressedSize.QuadPart + S_BLKSIZE - 1) / S_BLKSIZE;
   else
     /* Just compute no. of blocks from file size. */
     buf->st_blocks  = (buf->st_size + S_BLKSIZE - 1) / S_BLKSIZE;

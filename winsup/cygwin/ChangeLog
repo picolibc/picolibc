@@ -1,5 +1,15 @@
 2004-04-03  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Request
+	compressed size only if the matching attributes are set.  Use
+	NtQueryInformationFile instead of GetCompressedFileSize.
+	(fhandler_base::fstat_by_handle): Remove NT 3.5 cruft since
+	local.dwVolumeSerialNumber isn't used subsequently.
+	* ntdll.h: Add typedefs for FILE_COMPRESSION_INFORMATION and
+	FILE_INFORMATION_CLASS.
+
+2004-04-03  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_raw.cc (fhandler_dev_raw::open): Actually use "options".
 
 2004-04-04  Gerd Spalink  <Gerd.Spalink@t-online.de>
