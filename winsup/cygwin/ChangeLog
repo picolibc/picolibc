@@ -1,3 +1,9 @@
+Mon Dec  4 20:49:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* Makefile.in: Change `-nostartfiles' to `-nostdlib' to avoid
+	automatic linking with default libraries when linking new-cygwin1.dll.
+	Link with libgcc.a and libstdc++.a explicitly.
+
 Sun Dec  3 01:20:25 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (normalize_win32_path): Handle UNC paths better.
