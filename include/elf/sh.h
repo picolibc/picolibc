@@ -34,10 +34,12 @@
 #define EF_SH4		   9
 #define EF_SH2E            11
 #define EF_SH4A		   12
+#define EF_SH2A            13
 
 #define EF_SH4_NOFPU	   16
 #define EF_SH4A_NOFPU	   17
 #define EF_SH4_NOMMU_NOFPU 18
+#define EF_SH2A_NOFPU      19
 #define EF_SH3_NOMMU       20
 
 /* This one can only mix in objects from other EF_SH5 objects.  */
@@ -60,11 +62,12 @@
 /* EF_SH5		*/ 0, \
 /* EF_SH2E		*/ bfd_mach_sh2e	, \
 /* EF_SH4A		*/ bfd_mach_sh4a	, \
-/* 13, 14, 15		*/ 0, 0, 0, \
+/* EF_SH2A		*/ bfd_mach_sh2a        , \
+/* 14, 15		*/ 0, 0, \
 /* EF_SH4_NOFPU		*/ bfd_mach_sh4_nofpu	, \
 /* EF_SH4A_NOFPU	*/ bfd_mach_sh4a_nofpu	, \
 /* EF_SH4_NOMMU_NOFPU	*/ bfd_mach_sh4_nommu_nofpu, \
-/* 19			*/ 0, \
+/* EF_SH2A_NOFPU	*/ bfd_mach_sh2a_nofpu  , \
 /* EF_SH3_NOMMU		*/ bfd_mach_sh3_nommu
 
 /* Convert arch_sh* into EF_SH*.  */

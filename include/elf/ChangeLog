@@ -1,3 +1,11 @@
+2004-07-29  Alexandre Oliva  <aoliva@redhat.com>
+
+	Introduce SH2a support.
+	2004-02-18  Corinna Vinschen  <vinschen@redhat.com>
+	* sh.h (EF_SH2A_NOFPU): New.
+	2003-12-01  Michael Snyder  <msnyder@redhat.com>
+	* sh.h (EF_SH2A): New.
+
 2004-07-27  Tomer Levi  <Tomer.Levi@nsc.com>
 
 	* crx.h: Add BFD_RELOC_CRX_SWITCH8, BFD_RELOC_CRX_SWITCH16,
