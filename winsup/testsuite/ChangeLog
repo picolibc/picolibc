@@ -1,5 +1,14 @@
 2001-09-13  Egor Duda  <deo@logos-m.ru>
 
+	* winsup.api/winsup.exp: Run only selected test if environment
+	variable CYGWIN_TESTSUITE_TESTS is set. Use its value as regular
+	expression to filter test names.
+	* winsup.api/ltp/symlink01.c (creat_path_max): Provide explicit
+	buffer to getcwd to conform to standards and avoid memory leak.
+	(do_chdir): Ditto.
+
+2001-09-13  Egor Duda  <deo@logos-m.ru>
+
 	* libltp/lib/tst_sig.c: Pass SIGSEGV to application to consider
 	whether it's expected or not.
 	* winsup.api/known_bugs.tcl: lseek10 is known to fail because mknod

@@ -818,9 +818,10 @@ creat_path_max(path1, path2, path3)
 char *path1, *path2, *path3;
 {
    int ctr, to_go, size, whole_chunks;
-   char *cwd, *getcwd();
+   char buf [PATH_MAX];
+   char *cwd;
 
-   if ((cwd = getcwd((char *)NULL, 64)) == NULL)
+   if ((cwd = getcwd(buf, sizeof (buf))) == NULL)
    {
       TEST_RESULT=TBROK;
       sprintf(test_msg,
@@ -828,7 +829,6 @@ char *path1, *path2, *path3;
 	path1, path2, path3);
       return(0);
    }
-   cwd = getcwd((char *)NULL, 64);
    size = strlen(cwd);
 
    to_go = PATH_MAX - size;
@@ -1583,7 +1583,8 @@ struct all_test_cases *tc_ptr;
 		Buffer, "symbolic link which which pointed at object");
         else {
 
-           char *cwd, *getcwd();
+           char buf [PATH_MAX];
+           char *cwd;
            char expected_location[PATH_MAX];
            /*
            *  Build expected current directory position
@@ -1592,7 +1593,7 @@ struct all_test_cases *tc_ptr;
            strcat(expected_location, "/");
            strcat(expected_location, tc_ptr->fn_arg[2]);
 
-           if ((cwd = getcwd((char *)NULL, 64)) == NULL)
+           if ((cwd = getcwd(buf, sizeof (buf))) == NULL)
               tst_resm(TFAIL, "getcwd(3) FAILURE");
            else if (strcmp(cwd, expected_location) == 0)
 	      if ( TEST_RESULT != TPASS || STD_FUNCTIONAL_TEST  )

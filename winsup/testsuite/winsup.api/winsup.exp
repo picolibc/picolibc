@@ -13,6 +13,12 @@ set add_libs ""
 set ltp_includes "-I$ltp_includes"
 set ltp_libs "$rootme/libltp.a"
 
+set test_filter ""
+
+if { [info exists env(CYGWIN_TESTSUITE_TESTS)] } {
+    set test_filter "$env(CYGWIN_TESTSUITE_TESTS)"
+}
+
 proc ws_spawn {cmd args} {
     global rv
     verbose "running $cmd\n"
@@ -20,7 +26,14 @@ proc ws_spawn {cmd args} {
     verbose send "catchCode = $rv\n"
 }
 
+verbose "Filter: $test_filter"
+
 foreach src [glob -nocomplain $srcdir/$subdir/*.c $srcdir/$subdir/*/*.c] {
+    if { $test_filter != "" && ! [regexp $test_filter $src] } {
+	verbose -log "Skipping $src"
+	continue
+    }
+
     regsub "^$srcdir/$subdir/" $src "" testcase
     regsub ".c$" $testcase "" base
     regsub ".*/" $base "" basename
