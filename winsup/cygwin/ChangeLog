@@ -1,5 +1,10 @@
 2005-03-31  Corinna Vinschen  <corinna@vinschen.de>
 
+	* gentls_offsets: Add '-m32' flag to native compiler call to satisfy
+	cross platform builds.
+
+2005-03-31  Corinna Vinschen  <corinna@vinschen.de>
+
 	* errno.cc (NO_SYSTEM_RESOURCES): Map to EAGAIN.
 	(NONPAGED_SYSTEM_RESOURCES): Ditto.
 	(PAGED_SYSTEM_RESOURCES): Ditto.
