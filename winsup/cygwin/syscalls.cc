@@ -547,7 +547,7 @@ _link (const char *a, const char *b)
 
       lpContext = NULL;
       cygwin_conv_to_full_win32_path (real_b.get_win32 (), buf);
-      cbPathLen = MultiByteToWideChar (CP_ACP, 0, buf, -1, wbuf, MAX_PATH) * sizeof (WCHAR);
+      cbPathLen = sys_mbstowcs (wbuf, buf, MAX_PATH);
 
       StreamId.dwStreamId = BACKUP_LINK;
       StreamId.dwStreamAttributes = 0;

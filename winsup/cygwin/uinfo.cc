@@ -30,34 +30,33 @@ internal_getlogin (struct pinfo *pi)
   if (os_being_run == winNT)
     {
       LPWKSTA_USER_INFO_1 wui;
-      char buf[256], *env;
+      char buf[MAX_PATH], *env;
+      char *un = NULL;
 
       /* First trying to get logon info from environment */
-      buf[0] = '\0';
       if ((env = getenv ("USERNAME")) != NULL)
-        strcpy (buf, env);
+        un = env;
       if ((env = getenv ("LOGONSERVER")) != NULL)
         strcpy (pi->logsrv, env + 2); /* filter leading double backslashes */
       if ((env = getenv ("USERDOMAIN")) != NULL)
         strcpy (pi->domain, env);
       /* Trust only if usernames are identical */
-      if (strcasematch (pi->username, buf) && pi->domain[0] && pi->logsrv[0])
+      if (un && strcasematch (pi->username, un)
+          && pi->domain[0] && pi->logsrv[0])
         debug_printf ("Domain: %s, Logon Server: %s", pi->domain, pi->logsrv);
       /* If that failed, try to get that info from NetBIOS */
       else if (!NetWkstaUserGetInfo (NULL, 1, (LPBYTE *)&wui))
         {
-          wcstombs (pi->username, wui->wkui1_username,
-                    (wcslen (wui->wkui1_username) + 1) * sizeof (WCHAR));
-          wcstombs (pi->logsrv, wui->wkui1_logon_server,
-                    (wcslen (wui->wkui1_logon_server) + 1) * sizeof (WCHAR));
-          wcstombs (pi->domain, wui->wkui1_logon_domain,
-                    (wcslen (wui->wkui1_logon_domain) + 1) * sizeof (WCHAR));
+          sys_wcstombs (pi->username, wui->wkui1_username, MAX_USER_NAME);
+          sys_wcstombs (pi->logsrv, wui->wkui1_logon_server, MAX_HOST_NAME);
+          sys_wcstombs (pi->domain, wui->wkui1_logon_domain,
+                        MAX_COMPUTERNAME_LENGTH + 1);
           /* Save values in environment */
           if (!strcasematch (pi->username, "SYSTEM")
               && pi->domain[0] && pi->logsrv[0])
             {
               LPUSER_INFO_3 ui = NULL;
-              WCHAR wbuf[256];
+              WCHAR wbuf[MAX_HOST_NAME + 2];
 
               strcat (strcpy (buf, "\\\\"), pi->logsrv);
               setenv ("USERNAME", pi->username, 1);
@@ -65,19 +64,25 @@ internal_getlogin (struct pinfo *pi)
               setenv ("USERDOMAIN", pi->domain, 1);
               /* HOMEDRIVE and HOMEPATH are wrong most of the time, too,
                  after changing user context! */
-              mbstowcs (wbuf, buf, 256);
+              sys_mbstowcs (wbuf, buf, MAX_HOST_NAME + 2);
               if (!NetUserGetInfo (NULL, wui->wkui1_username, 3, (LPBYTE *)&ui)
                   || !NetUserGetInfo (wbuf,wui->wkui1_username,3,(LPBYTE *)&ui))
                 {
-                  wcstombs (buf, ui->usri3_home_dir,  256);
+                  sys_wcstombs (buf, ui->usri3_home_dir, MAX_PATH);
                   if (!buf[0])
                     {
-                      wcstombs (buf, ui->usri3_home_dir_drive, 256);
+                      sys_wcstombs (buf, ui->usri3_home_dir_drive, MAX_PATH);
                       if (buf[0])
                         strcat (buf, "\\");
+                      else
+                        {
+                          env = getenv ("SYSTEMDRIVE");
+                          if (env && *env)
+                            strcat (strcpy (buf, env), "\\");
+                          else
+                            GetSystemDirectoryA (buf, MAX_PATH);
+                        }
                     }
-                  if (!buf[0])
-                    strcat (strcpy (buf, getenv ("SYSTEMDRIVE")), "\\");
                   setenv ("HOMEPATH", buf + 2, 1);
                   buf[2] = '\0';
                   setenv ("HOMEDRIVE", buf, 1);

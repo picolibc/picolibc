@@ -60,6 +60,11 @@ extern os_type os_being_run;
 /* Used to check if Cygwin DLL is dynamically loaded. */
 extern int dynamically_loaded;
 
+#define sys_wcstombs(tgt,src,len) \
+                    WideCharToMultiByte(CP_ACP,0,(src),-1,(tgt),(len),NULL,NULL)
+#define sys_mbstowcs(tgt,src,len) \
+                    MultiByteToWideChar(CP_ACP,0,(src),-1,(tgt),(len))
+
 #include <cygwin/version.h>
 
 #define TITLESIZE 1024

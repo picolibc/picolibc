@@ -1,3 +1,14 @@
+Sat Jul 22 18:40:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	Patch suggested by Kazuhiro Fujieda  <fujieda@jaist.ac.jp>.
+	* winsup.h: Add new macros sys_wcstombs and sys_mbstowcs.
+	* syscalls.cc (_link): Replace calls to mbstowcs by call to
+	sys_mbstowcs.
+	* uinfo.cc (internal_getlogin): Replace calls to wcstombs and
+	mbstowcs by calls to sys_wcstombs and sys_mbstowcs. Replace
+	usage of constants by meaningful defines. Use result of
+	GetSystemDirectory for HOMEPATH and HOMEDRIVE as a last resort.
+
 Fri Jul 21 21:33:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* spawn.cc (span_guts): Retrieve security attributes before setting
