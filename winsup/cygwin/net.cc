@@ -2198,6 +2198,8 @@ socketpair (int family, int type, int protocol, int *sb)
 	((fhandler_socket *) sb0)->set_addr_family (family);
 	((fhandler_socket *) sb0)->set_socket_type (type);
 	((fhandler_socket *) sb0)->connect_state (connected);
+	if (family == AF_LOCAL && type == SOCK_STREAM)
+	  ((fhandler_socket *) sb0)->set_socketpair_eids ();
 
 	cygheap_fdnew sb1 (sb0, false);
 
@@ -2207,6 +2209,8 @@ socketpair (int family, int type, int protocol, int *sb)
 	    ((fhandler_socket *) sb1)->set_addr_family (family);
 	    ((fhandler_socket *) sb1)->set_socket_type (type);
 	    ((fhandler_socket *) sb1)->connect_state (connected);
+	    if (family == AF_LOCAL && type == SOCK_STREAM)
+	      ((fhandler_socket *) sb1)->set_socketpair_eids ();
 
 	    sb[0] = sb0;
 	    sb[1] = sb1;

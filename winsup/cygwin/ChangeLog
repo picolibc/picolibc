@@ -1,3 +1,22 @@
+2005-02-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_socket): Declare new method
+	set_socketpair_eids.
+	* fhandler_socket.cc (fhandler_socket::set_socketpair_eids): New method.
+	(fhandler_socket::dup): Duplicate sec_pipe if necessary.
+	(fhandler_socket::listen): Only create sec_pipe if named pipes are
+	available. Initialized sec_peer_pid to 0 as on Linux.
+	(fhandler_socket::connect): Only run eid credential transaction if
+	named pipes are available.  Fake otherwise. Initialized sec_peer_pid
+	to 0 as on Linux.
+	(fhandler_socket::accept): Ditto.
+	(fhandler_socket::close): Move closing sec_pipe handle from here...
+	(fhandler_socket::~fhandler_socket): ... to here.
+	* net.cc (socketpair): Set eid credentials by calling
+	fhandler_socket::set_socketpair_eids() on both socket ends.
+	* wincap.h (wincaps::has_named_pipes): New element.
+	* wincap.cc: Implement above element throughout.
+
 2005-02-26  Christopher Faylor  <cgf@timesys.com>
 
 	* sigproc.cc (_pinfo::set_ctty): Move function

@@ -60,6 +60,14 @@ fhandler_socket::eid_pipe_name (char *buf)
   return buf;
 }
 
+void
+fhandler_socket::set_socketpair_eids (void)
+{
+  sec_pid = sec_peer_pid = getpid ();
+  sec_uid = sec_peer_uid = geteuid32 ();
+  sec_gid = sec_peer_gid = getegid32 ();
+}
+
 /* cygwin internal: map sockaddr into internet domain address */
 static int
 get_inet_addr (const struct sockaddr *in, int inlen,
@@ -154,6 +162,9 @@ fhandler_socket::~fhandler_socket ()
     cfree (prot_info_ptr);
   if (sun_path)
     cfree (sun_path);
+  /* Close eid credentials pipe handle. */
+  if (sec_pipe != INVALID_HANDLE_VALUE)
+    CloseHandle (sec_pipe);
 }
 
 char *fhandler_socket::get_proc_fd_name (char *buf)
@@ -341,12 +352,37 @@ fhandler_socket::fixup_after_exec ()
 int
 fhandler_socket::dup (fhandler_base *child)
 {
+  HANDLE nh;
+
   debug_printf ("here");
   fhandler_socket *fhs = (fhandler_socket *) child;
   fhs->addr_family = addr_family;
-  if (get_addr_family () == AF_LOCAL)
-    fhs->set_sun_path (get_sun_path ());
   fhs->set_socket_type (get_socket_type ());
+  if (get_addr_family () == AF_LOCAL)
+    {
+      fhs->set_sun_path (get_sun_path ());
+      if (get_socket_type () == SOCK_STREAM)
+        {
+	  fhs->sec_pid = sec_pid;
+	  fhs->sec_uid = sec_uid;
+	  fhs->sec_gid = sec_gid;
+	  fhs->sec_peer_pid = sec_peer_pid;
+	  fhs->sec_peer_uid = sec_peer_uid;
+	  fhs->sec_peer_gid = sec_peer_gid;
+	  if (sec_pipe != INVALID_HANDLE_VALUE)
+	    {
+	      if (!DuplicateHandle (hMainProc, sec_pipe, hMainProc, &nh, 0,
+				    TRUE, DUPLICATE_SAME_ACCESS))
+		{
+		  system_printf ("!DuplicateHandle(%x) failed, %E", sec_pipe);
+		  __seterrno ();
+		  return -1;
+		}
+	      else
+	        fhs->sec_pipe = nh;
+	    }
+	}
+    }
   fhs->connect_state (connect_state ());
 
   if (winsock2_active)
@@ -378,12 +414,13 @@ fhandler_socket::dup (fhandler_base *child)
      having winsock called from fhandler_base and it creates only
      inheritable sockets which is wrong for winsock2. */
 
-  HANDLE nh;
   if (!DuplicateHandle (hMainProc, get_io_handle (), hMainProc, &nh, 0,
 			!winsock2_active, DUPLICATE_SAME_ACCESS))
     {
       system_printf ("!DuplicateHandle(%x) failed, %E", get_io_handle ());
       __seterrno ();
+      if (fhs->sec_pipe != INVALID_HANDLE_VALUE)
+        CloseHandle (fhs->sec_pipe);
       return -1;
     }
   VerifyHandle (nh);
@@ -630,20 +667,30 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 	}
 
       /* eid credential transaction. */
-      struct ucred in = { getpid (), geteuid32 (), getegid32 () };
-      struct ucred out = { (pid_t) -1, (__uid32_t) -1, (__gid32_t) -1 };
-      DWORD bytes = 0;
-      if (CallNamedPipe(eid_pipe_name ((char *) alloca (CYG_MAX_PATH + 1)),
-      			&in, sizeof in, &out, sizeof out, &bytes, 1000))
-	{
-	  debug_printf ("Received eid credentials: pid: %d, uid: %d, gid: %d",
-			out.pid, out.uid, out.gid);
-	  sec_peer_pid = out.pid;
-	  sec_peer_uid = out.uid;
-	  sec_peer_gid = out.gid;
-        }
-      else
-        debug_printf ("Receiving eid credentials failed: %E");
+      if (wincap.has_named_pipes ())
+        {
+	  struct ucred in = { getpid (), geteuid32 (), getegid32 () };
+	  struct ucred out = { (pid_t) 0, (__uid32_t) -1, (__gid32_t) -1 };
+	  DWORD bytes = 0;
+	  if (CallNamedPipe(eid_pipe_name ((char *) alloca (CYG_MAX_PATH + 1)),
+			    &in, sizeof in, &out, sizeof out, &bytes, 1000))
+	    {
+	      debug_printf ("Received eid credentials: pid: %d, uid: %d, gid: %d",
+			    out.pid, out.uid, out.gid);
+	      sec_peer_pid = out.pid;
+	      sec_peer_uid = out.uid;
+	      sec_peer_gid = out.gid;
+	    }
+	  else
+	    debug_printf ("Receiving eid credentials failed: %E");
+	}
+      else /* 9x */
+        {
+	  /* Incorrect but wrong pid at least doesn't break getpeereid. */
+	  sec_peer_pid = getpid ();
+	  sec_peer_uid = geteuid32 ();
+	  sec_peer_gid = getegid32 ();
+	}
     }
 
   err = WSAGetLastError ();
@@ -669,10 +716,13 @@ fhandler_socket::listen (int backlog)
 	  sec_pid = getpid ();
 	  sec_uid = geteuid32 ();
 	  sec_gid = getegid32 ();
-	  sec_peer_pid = (pid_t) -1;
+	  sec_peer_pid = (pid_t) 0;
 	  sec_peer_uid = (__uid32_t) -1;
 	  sec_peer_gid = (__gid32_t) -1;
-	  sec_pipe =
+	  /* A listening socket can call listen again, but that shouldn't
+	     result in trying to create another pipe. */
+	  if (wincap.has_named_pipes () && sec_pipe == INVALID_HANDLE_VALUE)
+	    sec_pipe =
 	    CreateNamedPipe (eid_pipe_name ((char *) alloca (CYG_MAX_PATH + 1)),
 			     PIPE_ACCESS_DUPLEX,
 			     PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE,
@@ -692,7 +742,7 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
   bool secret_check_failed = false;
   bool in_progress = false;
   struct ucred in = { sec_pid, sec_uid, sec_gid };
-  struct ucred out = { (pid_t) -1, (__uid32_t) -1, (__gid32_t) -1 };
+  struct ucred out = { (pid_t) 0, (__uid32_t) -1, (__gid32_t) -1 };
 
   /* Allows NULL peer and len parameters. */
   struct sockaddr_in peer_dummy;
@@ -747,21 +797,31 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 	}
 
       /* eid credential transaction. */
-      DWORD bytes = 0;
-      bool ret = ConnectNamedPipe (sec_pipe, NULL);
-      if (ret || GetLastError () == ERROR_PIPE_CONNECTED)
+      if (wincap.has_named_pipes ())
         {
-	  if (!ReadFile (sec_pipe, &out, sizeof out, &bytes, NULL))
-	    debug_printf ("Receiving eid credentials failed: %E");
+	  DWORD bytes = 0;
+	  bool ret = ConnectNamedPipe (sec_pipe, NULL);
+	  if (ret || GetLastError () == ERROR_PIPE_CONNECTED)
+	    {
+	      if (!ReadFile (sec_pipe, &out, sizeof out, &bytes, NULL))
+		debug_printf ("Receiving eid credentials failed: %E");
+	      else
+		 debug_printf ("Received eid credentials: pid: %d, uid: %d, gid: %d",
+			       out.pid, out.uid, out.gid);
+	      if (!WriteFile (sec_pipe, &in, sizeof in, &bytes, NULL))
+		debug_printf ("Sending eid credentials failed: %E");
+	      DisconnectNamedPipe (sec_pipe);
+	    }
 	  else
-	     debug_printf ("Received eid credentials: pid: %d, uid: %d, gid: %d",
-			   out.pid, out.uid, out.gid);
-	  if (!WriteFile (sec_pipe, &in, sizeof in, &bytes, NULL))
-	    debug_printf ("Sending eid credentials failed: %E");
-	  DisconnectNamedPipe (sec_pipe);
+	    debug_printf ("Connecting the eid credential pipe failed: %E");
 	}
-      else
-        debug_printf ("Connecting the eid credential pipe failed: %E");
+      else /* 9x */
+	{
+	  /* Incorrect but wrong pid at least doesn't break getpeereid. */
+	  out.pid = sec_pid;
+	  out.uid = sec_uid;
+	  out.gid = sec_gid;
+	}
     }
 
   if ((SOCKET) res == INVALID_SOCKET)
@@ -1391,10 +1451,6 @@ fhandler_socket::close ()
   linger.l_linger = 240; /* secs. default 2MSL value according to MSDN. */
   setsockopt (get_socket (), SOL_SOCKET, SO_LINGER,
 	      (const char *)&linger, sizeof linger);
-
-  /* Close eid credentials pipe handle. */
-  if (sec_pipe != INVALID_HANDLE_VALUE)
-    CloseHandle (sec_pipe);
 
   while ((res = closesocket (get_socket ())) != 0)
     {

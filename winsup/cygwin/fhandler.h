@@ -365,7 +365,10 @@ class fhandler_socket: public fhandler_base
   __uid32_t sec_peer_uid;
   __gid32_t sec_peer_gid;
   char *eid_pipe_name (char *buf);
+ public:
+  void set_socketpair_eids (void);
 
+ private:
   struct _WSAPROTOCOL_INFOA *prot_info_ptr;
   char *sun_path;
   struct status_flags
