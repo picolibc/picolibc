@@ -149,12 +149,6 @@ fhandler_tty_common::__release_output_mutex (const char *fn, int ln)
     }
 }
 
-#define acquire_output_mutex(ms) \
-  __acquire_output_mutex (__PRETTY_FUNCTION__, __LINE__, ms);
-
-#define release_output_mutex() \
-  __release_output_mutex (__PRETTY_FUNCTION__, __LINE__);
-
 /* Process tty input. */
 
 void
@@ -298,13 +292,6 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 	  if (output_done_event != NULL)
 	    SetEvent (output_done_event);
 	  continue;
-	}
-
-      if (get_ttyp ()->OutputStopped)
-	{
-	  termios_printf ("waiting for restart_output_event");
-	  WaitForSingleObject (restart_output_event, INFINITE);
-	  termios_printf ("done waiting for restart_output_event");
 	}
 
       char *optr;
@@ -866,7 +853,6 @@ fhandler_pty_master::fhandler_pty_master (const char *name, DWORD devtype, int u
   set_cb (sizeof *this);
   ioctl_request_event = NULL;
   ioctl_done_event = NULL;
-  restart_output_event = NULL;
   pktmode = need_nl = 0;
   inuse = NULL;
 }
@@ -895,8 +881,6 @@ fhandler_tty_common::close ()
     termios_printf ("CloseHandle (ioctl_done_event), %E");
   if (ioctl_request_event && !CloseHandle (ioctl_request_event))
     termios_printf ("CloseHandle (ioctl_request_event), %E");
-  if (restart_output_event && !CloseHandle (restart_output_event))
-    termios_printf ("CloseHandle (restart_output_event), %E");
   if (inuse && !CloseHandle (inuse))
     termios_printf ("CloseHandle (inuse), %E");
   if (!ForceCloseHandle (output_mutex))
@@ -1051,7 +1035,6 @@ void
 fhandler_pty_master::set_close_on_exec (int val)
 {
   this->fhandler_tty_common::set_close_on_exec (val);
-  set_inheritance (restart_output_event, val);
 
   /* FIXME: There is a console handle leak here. */
   if (get_ttyp ()->master_pid == GetCurrentProcessId ())
@@ -1059,14 +1042,6 @@ fhandler_pty_master::set_close_on_exec (int val)
       get_ttyp ()->from_slave = get_handle ();
       get_ttyp ()->to_slave = get_output_handle ();
     }
-}
-
-void
-fhandler_pty_master::fixup_after_fork (HANDLE child)
-{
-  this->fhandler_tty_common::fixup_after_fork (child);
-  if (restart_output_event)
-    fork_fixup (child, restart_output_event, "restart_output_event");
 }
 
 void

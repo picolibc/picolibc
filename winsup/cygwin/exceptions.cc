@@ -1007,6 +1007,12 @@ signal_exit (int rc)
   /* If the exception handler gets a trap, we could recurse awhile.
      If this is non-zero, skip the cleaning up and exit NOW.  */
 
+  muto *m;
+  /* FIXME: Make multi-thread aware */
+  for (m = muto_start.next;  m != NULL; m = m->next)
+    if (m->unstable () || m->owner () == mainthread.id)
+      m->reset ();
+
   rc = EXIT_SIGNAL | (rc << 8);
   if (exit_already++)
     {

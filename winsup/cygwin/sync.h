@@ -40,6 +40,7 @@ public:
   int ismine () {return tid == GetCurrentThreadId ();}
   DWORD owner () {return tid;}
   int unstable () {return !tid && (sync || waiters >= 0);}
+  void reset ();
 };
 
 extern muto muto_start;

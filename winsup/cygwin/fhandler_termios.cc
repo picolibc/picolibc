@@ -213,14 +213,18 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
 	{
 	  if (c == tc->ti.c_cc[VSTOP])
 	    {
-	      tc->OutputStopped++;
+	      if (!tc->OutputStopped)
+		{
+		  tc->OutputStopped = 1;
+		  acquire_output_mutex (INFINITE);
+		}
 	      continue;
 	    }
 	  else if (c == tc->ti.c_cc[VSTART])
 	    {
     restart_output:
 	      tc->OutputStopped = 0;
-	      SetEvent (restart_output_event);
+	      release_output_mutex ();
 	      continue;
 	    }
 	  else if ((tc->ti.c_iflag & IXANY) && tc->OutputStopped)

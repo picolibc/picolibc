@@ -1,3 +1,24 @@
+Wed Sep  6 21:11:13 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (signal_exit): Reset all mutos owned by the main
+	thread.
+	* fhandler.h: Define *_output_mutex macros for serializing tty output.
+	(fhandler_termios): Remove restart_output_event.  Define dummy output
+	mutex methods.
+	(fhandler_pty_master): Remove unneeded fixup_after_fork method.
+	* fhandler_termios.cc (fhandler_termios::line_edit): Acquire
+	output_mutex when CTRL-S is hit.  Release it on CTRL-Q.
+	* fhandler_tty.cc (fhandler_pty_master::process_slave_output): Remove
+	inappropriate OutputStopped test here.  Just use the output mutex.
+	(fhandler_pty_master::fhandler_pty_master): Remove obsolete reference
+	to restart_output_event.
+	(fhandler_tty_common::close): Ditto.
+	(fhandler_pty_master::set_close_on_exec): Ditto.
+	(fhandler_pty_master::fixup_after_fork): Delete.
+	* tty.cc (tty::common_init): Ditto.
+	* sync.cc (muto::reset): New method.
+	* sync.h: Declare above method.
+
 Wed Sep  6 16:56:38 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* sigproc.cc: Add include file for proper definitions.

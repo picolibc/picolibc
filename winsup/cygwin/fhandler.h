@@ -505,6 +505,12 @@ public:
   int ready_for_read (int fd, DWORD howlong, int ignra);
 };
 
+#define acquire_output_mutex(ms) \
+  __acquire_output_mutex (__PRETTY_FUNCTION__, __LINE__, ms);
+
+#define release_output_mutex() \
+  __release_output_mutex (__PRETTY_FUNCTION__, __LINE__);
+
 class fhandler_termios: public fhandler_base
 {
 protected:
@@ -518,7 +524,6 @@ public:
   {
     // nothing to do
   }
-  HANDLE restart_output_event;
   HANDLE get_output_handle () const { return output_handle; }
   int line_edit (const char *rptr, int nread, int always_accept = 0);
   void set_output_handle (HANDLE h) { output_handle = h; }
@@ -528,6 +533,8 @@ public:
   int tcsetpgrp (int pid);
   void set_ctty (int ttynum, int flags);
   int bg_check (int sig);
+  virtual DWORD __acquire_output_mutex (const char *fn, int ln, DWORD ms) {return 1;}
+  virtual void __release_output_mutex (const char *fn, int ln) {}
 };
 
 /* This is a input and output console handle */
@@ -692,7 +699,6 @@ public:
   char *ptsname ();
 
   void set_close_on_exec (int val);
-  void fixup_after_fork (HANDLE parent);
   BOOL hit_eof ();
 };
 

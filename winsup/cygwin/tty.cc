@@ -388,9 +388,6 @@ tty::common_init (fhandler_pty_master *ptym)
 
   /* Create synchronisation events */
 
-  if (!(ptym->restart_output_event = get_event (RESTART_OUTPUT_EVENT, TRUE)))
-    return FALSE;
-
   if (ptym->get_device () != FH_TTYM)
     {
       ptym->output_done_event = ptym->ioctl_done_event =

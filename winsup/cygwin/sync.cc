@@ -125,3 +125,16 @@ muto::release ()
 
   return 1;	/* success. */
 }
+
+/* Call only when we're exiting.  This is not thread safe. */
+void
+muto::reset ()
+{
+  visits = sync = tid = 0;
+  InterlockedExchange (&waiters, -1);
+  if (bruteforce)
+    {
+      CloseHandle (bruteforce);
+      bruteforce = CreateEvent (&sec_none_nih, FALSE, FALSE, name);
+    }
+}
