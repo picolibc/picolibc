@@ -826,6 +826,8 @@ strdup
 _strdup = strdup
 strerror
 _strerror = strerror
+strerror_r
+_strerror_r = strerror_r
 strlen
 _strlen = strlen
 strlwr
