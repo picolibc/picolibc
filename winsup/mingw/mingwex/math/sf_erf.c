@@ -16,10 +16,13 @@
 /*
 #include "fdlibm.h"
 */
+#include <math.h>
 #include <stdint.h>
+#include <errno.h>
+
 #define __ieee754_expf expf
 
-#include <math.h>
+
 
 typedef union
 {
@@ -254,6 +257,8 @@ sb7  = -2.2440952301e+01; /* 0xc1b38712 */
 			__ieee754_expf((z-x)*(z+x)+R/S);
 	    if(hx>0) return r/x; else return two-r/x;
 	} else {
+	    /* set range error */
+            errno = ERANGE;
 	    if(hx>0) return tiny*tiny; else return two-tiny;
 	}
 }

@@ -110,6 +110,7 @@
 
 #include <math.h>
 #include <stdint.h>
+#include <errno.h>
 
 #define __ieee754_exp exp
 
@@ -337,6 +338,8 @@ sb7  = -2.24409524465858183362e+01; /* 0xC03670E2, 0x42712D62 */
 			__ieee754_exp((z-x)*(z+x)+R/S);
 	    if(hx>0) return r/x; else return two-r/x;
 	} else {
+	    /* set range error */
+            errno = ERANGE;
 	    if(hx>0) return tiny*tiny; else return two-tiny;
 	}
 }

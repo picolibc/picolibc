@@ -1,3 +1,9 @@
+2003-10-21  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/math/s_erf.c (erf): Set errno to ERANGE if
+	beyond approximation limit.
+	* mingwex/math/sf_erf.c (erff): Likewise.
+
 2003-10-17  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/stdio.h (getc): Cast result to unsigned char before
