@@ -54,6 +54,7 @@ struct wincaps
   unsigned has_terminal_services			: 1;
   unsigned has_switch_to_thread				: 1;
   unsigned cant_debug_dll_entry				: 1;
+  unsigned has_ioctl_storage_get_media_types_ex		: 1;
 };
 
 class wincapc
@@ -112,6 +113,7 @@ public:
   bool  IMPLEMENT (has_terminal_services)
   bool  IMPLEMENT (has_switch_to_thread)
   bool	IMPLEMENT (cant_debug_dll_entry)
+  bool	IMPLEMENT (has_ioctl_storage_get_media_types_ex)
 
 #undef IMPLEMENT
 };

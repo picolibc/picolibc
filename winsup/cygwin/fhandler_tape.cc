@@ -12,7 +12,9 @@ details. */
 #include "winsup.h"
 #include <sys/termios.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <sys/mtio.h>
+#include <ddk/ntddstor.h>
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "security.h"
@@ -24,6 +26,10 @@ details. */
 /* Media changes and bus resets are sometimes reported and the function
    hasn't been executed.  We repeat all functions which return with one
    of these error codes. */
+/* FIXME: Note that this is wrong!  The correct behaviour after getting
+   an ERROR_BUS_RESET is to raise a flag and then to block any access,
+   except for MTREW, MTOFFL, MT_RETEN, MTERASE, MTSEEK and MTEOM, and
+   to set errno to EIO in all other cases. */
 #define TAPE_FUNC(func) do { \
 			  lasterr = (func); \
 			} while (lasterr == ERROR_MEDIA_CHANGED \
@@ -127,12 +133,16 @@ fhandler_dev_tape::open (int flags, mode_t)
 				    (varlen = sizeof dp, &varlen), &dp));
 
       if (!ioctl (MTIOCGET, &get))
-	/* Tape drive supports and is set to variable block size. */
-	if (get.mt_dsreg == 0)
-	  devbufsiz = get.mt_maxblksize;
-	else
-	  devbufsiz = get.mt_dsreg;
-	varblkop = get.mt_dsreg == 0;
+        {
+	  long blksize = (get.mt_dsreg & MT_ST_BLKSIZE_MASK)
+	  		 >> MT_ST_BLKSIZE_SHIFT;
+	  /* Tape drive supports and is set to variable block size. */
+	  if (blksize == 0)
+	    devbufsiz = get.mt_maxblksize;
+	  else
+	    devbufsiz = blksize;
+	  varblkop = blksize == 0;
+	}
 
       if (devbufsiz > 1L)
 	devbuf = new char [devbufsiz];
@@ -319,9 +329,11 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 	    ret = tape_set_pos (TAPE_REWIND, 0);
 	    break;
 	  case MTOFFL:
+	  case MTUNLOAD:
 	    ret = tape_prepare (TAPE_UNLOAD);
 	    break;
 	  case MTNOP:
+	    reset_devbuf ();
 	    break;
 	  case MTRETEN:
 	    if (!tape_get_feature (TAPE_DRIVE_END_OF_DATA))
@@ -350,63 +362,59 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 	    ret = ERROR_INVALID_PARAMETER;
 	    break;
 	  case MTSETBLK:
-	    {
-	      if (!tape_get_feature (TAPE_DRIVE_SET_BLOCK_SIZE))
-		{
-		  ret = ERROR_INVALID_PARAMETER;
-		  break;
-		}
-	      if ((devbuf && (size_t) op->mt_count == devbufsiz)
-	          || (!devbuf && op->mt_count == 0))
-		{
-		  /* Nothing has changed. */
-		  ret = 0;
-		  break;
-		}
-	      if ((op->mt_count == 0
-		   && !tape_get_feature (TAPE_DRIVE_VARIABLE_BLOCK))
-		  || (op->mt_count > 0
-		      && ((DWORD) op->mt_count < dp.MinimumBlockSize
-			  || (DWORD) op->mt_count > dp.MaximumBlockSize)))
-		{
-		  ret = ERROR_INVALID_PARAMETER;
-		  break;
-		}
-	      if (devbuf && devbufend - devbufstart > 0
-	          && (op->mt_count == 0
-		      || (op->mt_count > 0
-		          && (size_t) op->mt_count < devbufend - devbufstart)))
-		{
-		  /* Not allowed if still data in devbuf. */
-		  ret = ERROR_INVALID_BLOCK_LENGTH; /* EIO */
-		  break;
-		}
-	      if (!(ret = tape_set_blocksize (op->mt_count)))
-		{
-		  char *buf = NULL;
-		  if (op->mt_count > 1L && !(buf = new char [op->mt_count]))
-		    {
-		      ret = ERROR_OUTOFMEMORY;
-		      break;
-		    }
-		  if (devbufsiz > 1L && op->mt_count > 1L)
-		    {
-		      memcpy (buf, devbuf + devbufstart,
-			      devbufend - devbufstart);
-		      devbufend -= devbufstart;
-		    }
-		  else
-		    devbufend = 0;
-		  devbufstart = 0;
-		  delete [] devbuf;
-		  devbuf = buf;
-		  devbufsiz = op->mt_count;
-		  varblkop = op->mt_count == 0;
-		}
-	    }
-	    break;
-	  case MTSETDENSITY:
-	    ret = ERROR_INVALID_PARAMETER;
+	    if (!tape_get_feature (TAPE_DRIVE_SET_BLOCK_SIZE))
+	      {
+		ret = ERROR_INVALID_PARAMETER;
+		break;
+	      }
+	    if ((devbuf && (size_t) op->mt_count == devbufsiz)
+		|| (!devbuf && op->mt_count == 0))
+	      {
+		/* Nothing has changed. */
+		ret = 0;
+		break;
+	      }
+	    if ((op->mt_count == 0
+		 && !tape_get_feature (TAPE_DRIVE_VARIABLE_BLOCK))
+		|| (op->mt_count > 0
+		    && ((DWORD) op->mt_count < dp.MinimumBlockSize
+			|| (DWORD) op->mt_count > dp.MaximumBlockSize)))
+	      {
+		ret = ERROR_INVALID_PARAMETER;
+		break;
+	      }
+	    if (devbuf && devbufend - devbufstart > 0
+		&& (op->mt_count == 0
+		    || (op->mt_count > 0
+			&& (size_t) op->mt_count < devbufend - devbufstart)))
+	      {
+		/* Not allowed if still data in devbuf. */
+		ret = ERROR_INVALID_BLOCK_LENGTH; /* EIO */
+		break;
+	      }
+	    if (!(ret = tape_set_blocksize (op->mt_count)))
+	      {
+		char *buf = NULL;
+		if (op->mt_count > 1L && !(buf = new char [op->mt_count]))
+		  {
+		    ret = ERROR_OUTOFMEMORY;
+		    break;
+		  }
+		if (devbufsiz > 1L && op->mt_count > 1L)
+		  {
+		    memcpy (buf, devbuf + devbufstart,
+			    devbufend - devbufstart);
+		    devbufend -= devbufstart;
+		  }
+		else
+		  devbufend = 0;
+		devbufstart = 0;
+		delete [] devbuf;
+		devbuf = buf;
+		devbufsiz = op->mt_count;
+		varblkop = op->mt_count == 0;
+	      }
+	    reset_devbuf ();
 	    break;
 	  case MTSEEK:
 	    if (tape_get_feature (TAPE_DRIVE_ABSOLUTE_BLK)
@@ -420,9 +428,6 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 	    if (!(ret = tape_get_pos (&block)))
 	      op->mt_count = block;
 	    break;
-	  case MTSETDRVBUFFER:
-	    ret = ERROR_INVALID_PARAMETER;
-	    break;
 	  case MTFSS:
 	    ret = tape_set_pos (TAPE_SPACE_SETMARKS, op->mt_count);
 	    break;
@@ -431,6 +436,7 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 	    break;
 	  case MTWSM:
 	    ret = tape_write_marks (TAPE_SETMARKS, op->mt_count);
+	    reset_devbuf ();
 	    break;
 	  case MTLOCK:
 	    ret = tape_prepare (TAPE_LOCK);
@@ -441,14 +447,14 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 	  case MTLOAD:
 	    ret = tape_prepare (TAPE_LOAD);
 	    break;
-	  case MTUNLOAD:
-	    ret = tape_prepare (TAPE_UNLOAD);
-	    break;
 	  case MTCOMPRESSION:
 	    ret = tape_compression (op->mt_count);
 	    break;
 	  case MTSETPART:
 	  case MTMKPART:
+	  case MTSETDENSITY:
+	  case MTSETDRVBUFFER:
+	    reset_devbuf ();
 	  default:
 	    ret = ERROR_INVALID_PARAMETER;
 	    break;
@@ -541,67 +547,29 @@ fhandler_dev_tape::_tape_set_pos (int mode, long count)
 int
 fhandler_dev_tape::tape_set_pos (int mode, long count, bool sfm_func)
 {
-  unsigned long pos, tgtpos;
-
   switch (mode)
     {
       case TAPE_SPACE_RELATIVE_BLOCKS:
-	if (tape_get_pos (&pos))
-	  return lasterr;
-
-	tgtpos = pos + count;
-
-	while (count && (_tape_set_pos (mode, count), IS_EOF (lasterr)))
-	  {
-	    if (tape_get_pos (&pos))
-	      return lasterr;
-	    count = tgtpos - pos;
-	  }
-
-	if (lasterr == ERROR_BEGINNING_OF_MEDIA && !tgtpos)
-	  lasterr = NO_ERROR;
-
-	break;
       case TAPE_SPACE_FILEMARKS:
-	if (count < 0)
+        if (!count)
 	  {
-	    if (pos > 0)
-	      {
-		if (!_tape_set_pos (TAPE_SPACE_RELATIVE_BLOCKS, -1)
-		    || (sfm_func))
-		  ++count;
-		_tape_set_pos (TAPE_SPACE_RELATIVE_BLOCKS, 1);
-	      }
-
-	    while (!_tape_set_pos (mode, -1) && count++ < 0)
-	      ;
-
-	    if (lasterr == ERROR_BEGINNING_OF_MEDIA)
-	      {
-		if (!count)
-		  lasterr = NO_ERROR;
-	      }
-	    else if (!sfm_func)
-	      _tape_set_pos (mode, 1);
-	  }
-	else
-	  {
-	    if (sfm_func)
-	      {
-		if (_tape_set_pos (TAPE_SPACE_RELATIVE_BLOCKS, 1)
-		    == ERROR_FILEMARK_DETECTED)
-		  ++count;
-		_tape_set_pos (TAPE_SPACE_RELATIVE_BLOCKS, -1);
-	      }
-
-	    if (!_tape_set_pos (mode, count) && sfm_func)
-	      _tape_set_pos (mode, -1);
+	    lasterr = 0;
+	    return tape_error ("tape_set_pos");
 	  }
 	break;
       case TAPE_ABSOLUTE_BLOCK:
-	if (!tape_get_feature (TAPE_DRIVE_ABSOLUTE_BLK))
+        if (!tape_get_feature (TAPE_DRIVE_ABSOLUTE_BLK))
 	  mode = TAPE_LOGICAL_BLOCK;
-	_tape_set_pos (mode, count);
+	break;
+    }
+  _tape_set_pos (mode, count);
+  switch (mode)
+    {
+      case TAPE_SPACE_FILEMARKS:
+	if (!lasterr && sfm_func)
+	  return tape_set_pos (mode, count > 0 ? -1 : 1, false);
+	break;
+      case TAPE_ABSOLUTE_BLOCK:
 	/* Workaround bug in Tandberg SLR device driver, which pretends
 	   to support absolute block positioning but instead returns
 	   ERROR_INVALID_FUNCTION. */
@@ -612,13 +580,7 @@ fhandler_dev_tape::tape_set_pos (int mode, long count, bool sfm_func)
 	    _tape_set_pos (TAPE_LOGICAL_BLOCK, count);
 	  }
 	  break;
-      case TAPE_SPACE_SETMARKS:
-      case TAPE_SPACE_END_OF_DATA:
-      case TAPE_REWIND:
-	_tape_set_pos (mode, count);
-	break;
     }
-
   return tape_error ("tape_set_pos");
 }
 
@@ -693,10 +655,37 @@ fhandler_dev_tape::tape_status (struct mtget *get)
     }
 
   if (tape_get_feature (TAPE_DRIVE_SET_BLOCK_SIZE) && !notape)
-    get->mt_dsreg = mp.BlockSize;
+    get->mt_dsreg = (mp.BlockSize << MT_ST_BLKSIZE_SHIFT)
+		    & MT_ST_BLKSIZE_MASK;
   else
-    get->mt_dsreg = dp.DefaultBlockSize;
-
+    get->mt_dsreg = (dp.DefaultBlockSize << MT_ST_BLKSIZE_SHIFT)
+		    & MT_ST_BLKSIZE_MASK;
+  if (wincap.has_ioctl_storage_get_media_types_ex ())
+    {
+      DWORD size = sizeof (GET_MEDIA_TYPES) + 10 * sizeof (DEVICE_MEDIA_INFO);
+      void *buf = alloca (size);
+      if (DeviceIoControl (get_handle (), IOCTL_STORAGE_GET_MEDIA_TYPES_EX,
+			   NULL, 0, buf, size, &size, NULL)
+	  || GetLastError () == ERROR_MORE_DATA)
+	{
+	  PGET_MEDIA_TYPES gmt = (PGET_MEDIA_TYPES) buf;
+	  for (DWORD i = 0; i < gmt->MediaInfoCount; ++i)
+	    {
+	      PDEVICE_MEDIA_INFO dmi = &gmt->MediaInfo[i];
+#define TINFO DeviceSpecific.TapeInfo
+	      if (dmi->TINFO.MediaCharacteristics & MEDIA_CURRENTLY_MOUNTED)
+		{
+		  get->mt_type = dmi->DeviceSpecific.TapeInfo.MediaType;
+		  if (dmi->TINFO.BusType == BusTypeScsi)
+		    get->mt_dsreg |=
+		      (dmi->TINFO.BusSpecificData.ScsiInformation.DensityCode
+		       << MT_ST_DENSITY_SHIFT)
+		      & MT_ST_DENSITY_MASK;
+		}
+#undef TINFO
+	    }
+	}
+    }
   if (notape)
     get->mt_gstat |= GMT_DR_OPEN (-1);
 

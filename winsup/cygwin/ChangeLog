@@ -1,7 +1,30 @@
+2004-03-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* errno.cc (errmap): Map ERROR_BEGINNING_OF_MEDIA and
+	ERROR_SETMARK_DETECTED to EIO instead of ESPIPE.
+	Handle ERROR_FILEMARK_DETECTED.
+	* fhandler_tape.cc (TAPE_FUNC): Add comment that ERROR_BUS_RESET
+	has still to be handled correctly.
+	(fhandler_dev_tape::open): Accomodate fact that get.mt_dsreg
+	also contains density code.
+	(fhandler_dev_tape::ioctl): Rearrange slightly.  Reset devbuf also on
+	MTNOP, MTWSM, MTSETBLK, MTSETDRVBUFFER, MTSETPART and MTMKPART.
+	(fhandler_dev_tape::tape_set_pos): Rearrange.  Match behaviour to
+	the Linux tape driver.
+	(fhandler_dev_tape::tape_status): Call IOCTL_STORAGE_GET_MEDIA_TYPES_EX
+	if available.  Return device type and density code in appropriate
+	mtget members.
+	* wincap.h (wincaps::has_ioctl_storage_get_media_types_ex): New element.
+	* wincap.cc: Implement above element throughout.
+	* include/cygwin/mtio.h: Add tape device types as returned by
+	IOCTL_STORAGE_GET_MEDIA_TYPES_EX.
+	(MT_TAPE_INFO): Use above type codes.
+	(struct mtget): Change mt_dsreg comment.
+
 2004-03-14  Pierre Humblet <pierre.humblet@ieee.org>
 
-        * dir.cc (rmdir): Construct real_dir with flag PC_FULL.
-        Use a loop instead of recursion to handle the current directory.
+	* dir.cc (rmdir): Construct real_dir with flag PC_FULL.
+	Use a loop instead of recursion to handle the current directory.
 
 2004-03-14  Christopher Faylor  <cgf@redhat.com>
 

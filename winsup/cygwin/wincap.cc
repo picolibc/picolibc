@@ -52,7 +52,8 @@ static NO_COPY wincaps wincap_unknown = {
   pty_needs_alloc_console:false,
   has_terminal_services:false,
   has_switch_to_thread:false,
-  cant_debug_dll_entry:false
+  cant_debug_dll_entry:false,
+  has_ioctl_storage_get_media_types_ex:false
 };
 
 static NO_COPY wincaps wincap_95 = {
@@ -96,7 +97,8 @@ static NO_COPY wincaps wincap_95 = {
   pty_needs_alloc_console:false,
   has_terminal_services:false,
   has_switch_to_thread:false,
-  cant_debug_dll_entry:true
+  cant_debug_dll_entry:true,
+  has_ioctl_storage_get_media_types_ex:false
 };
 
 static NO_COPY wincaps wincap_95osr2 = {
@@ -140,7 +142,8 @@ static NO_COPY wincaps wincap_95osr2 = {
   pty_needs_alloc_console:false,
   has_terminal_services:false,
   has_switch_to_thread:false,
-  cant_debug_dll_entry:true
+  cant_debug_dll_entry:true,
+  has_ioctl_storage_get_media_types_ex:false
 };
 
 static NO_COPY wincaps wincap_98 = {
@@ -184,7 +187,8 @@ static NO_COPY wincaps wincap_98 = {
   pty_needs_alloc_console:false,
   has_terminal_services:false,
   has_switch_to_thread:false,
-  cant_debug_dll_entry:true
+  cant_debug_dll_entry:true,
+  has_ioctl_storage_get_media_types_ex:false
 };
 
 static NO_COPY wincaps wincap_98se = {
@@ -228,7 +232,8 @@ static NO_COPY wincaps wincap_98se = {
   pty_needs_alloc_console:false,
   has_terminal_services:false,
   has_switch_to_thread:false,
-  cant_debug_dll_entry:true
+  cant_debug_dll_entry:true,
+  has_ioctl_storage_get_media_types_ex:false
 };
 
 static NO_COPY wincaps wincap_me = {
@@ -272,7 +277,8 @@ static NO_COPY wincaps wincap_me = {
   pty_needs_alloc_console:false,
   has_terminal_services:false,
   has_switch_to_thread:false,
-  cant_debug_dll_entry:true
+  cant_debug_dll_entry:true,
+  has_ioctl_storage_get_media_types_ex:false
 };
 
 static NO_COPY wincaps wincap_nt3 = {
@@ -316,7 +322,8 @@ static NO_COPY wincaps wincap_nt3 = {
   pty_needs_alloc_console:true,
   has_terminal_services:false,
   has_switch_to_thread:false,
-  cant_debug_dll_entry:false
+  cant_debug_dll_entry:false,
+  has_ioctl_storage_get_media_types_ex:false
 };
 
 static NO_COPY wincaps wincap_nt4 = {
@@ -360,7 +367,8 @@ static NO_COPY wincaps wincap_nt4 = {
   pty_needs_alloc_console:true,
   has_terminal_services:false,
   has_switch_to_thread:true,
-  cant_debug_dll_entry:false
+  cant_debug_dll_entry:false,
+  has_ioctl_storage_get_media_types_ex:false
 };
 
 static NO_COPY wincaps wincap_nt4sp4 = {
@@ -404,7 +412,8 @@ static NO_COPY wincaps wincap_nt4sp4 = {
   pty_needs_alloc_console:true,
   has_terminal_services:false,
   has_switch_to_thread:true,
-  cant_debug_dll_entry:false
+  cant_debug_dll_entry:false,
+  has_ioctl_storage_get_media_types_ex:false
 };
 
 static NO_COPY wincaps wincap_2000 = {
@@ -448,7 +457,8 @@ static NO_COPY wincaps wincap_2000 = {
   pty_needs_alloc_console:true,
   has_terminal_services:true,
   has_switch_to_thread:true,
-  cant_debug_dll_entry:false
+  cant_debug_dll_entry:false,
+  has_ioctl_storage_get_media_types_ex:false
 };
 
 static NO_COPY wincaps wincap_xp = {
@@ -492,7 +502,8 @@ static NO_COPY wincaps wincap_xp = {
   pty_needs_alloc_console:true,
   has_terminal_services:true,
   has_switch_to_thread:true,
-  cant_debug_dll_entry:false
+  cant_debug_dll_entry:false,
+  has_ioctl_storage_get_media_types_ex:true
 };
 
 static NO_COPY wincaps wincap_2003 = {
@@ -536,7 +547,8 @@ static NO_COPY wincaps wincap_2003 = {
   pty_needs_alloc_console:true,
   has_terminal_services:true,
   has_switch_to_thread:true,
-  cant_debug_dll_entry:false
+  cant_debug_dll_entry:false,
+  has_ioctl_storage_get_media_types_ex:true
 };
 
 wincapc wincap;

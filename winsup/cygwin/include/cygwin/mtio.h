@@ -89,8 +89,8 @@ struct	mtget {
 				 *  Cygwin: remaining KB.
 				 */
 	/* the following registers are device dependent */
-	long	mt_dsreg;	/* status register, Cygwin returns current
-				   blocksize here. */
+	long	mt_dsreg;	/* status register, Contains blocksize and
+				   density code.  See MT_ST_xxx macros below */
 	long	mt_gstat;	/* generic (device independent) status */
 	long	mt_erreg;	/* error register */
 	/* The next two fields are not always used */
@@ -157,6 +157,8 @@ struct	mtpos {
 /*
  * Constants for mt_type. Not all of these are supported,
  * and these are not all of the ones that are supported.
+ *
+ * Only used when not colliding with Windows codes (see below)
  */
 #define MT_ISUNKNOWN		0x01
 #define MT_ISQIC02		0x02	/* Generic QIC-02 tape streamer */
@@ -177,6 +179,41 @@ struct	mtpos {
 #define MT_ISSCSI1		0x71	/* Generic ANSI SCSI-1 tape unit */
 #define MT_ISSCSI2		0x72	/* Generic ANSI SCSI-2 tape unit */
 
+/* More constants for mt_type.  These are the codes used by Windows >= 5.1 */
+#define MT_ISDDS_4mm 		0x20
+#define MT_ISMiniQic 		0x21
+#define MT_ISTravan 		0x22
+#define MT_ISQIC 		0x23
+#define MT_ISMP_8mm 		0x24
+#define MT_ISAME_8mm 		0x25
+#define MT_ISAIT1_8mm 		0x26
+#define MT_ISDLT 		0x27
+#define MT_ISNCTP 		0x28
+#define MT_ISIBM_3480 		0x29
+#define MT_ISIBM_3490E 		0x2a
+#define MT_ISIBM_Magstar_3590 	0x2b
+#define MT_ISIBM_Magstar_MP 	0x2c
+#define MT_ISSTK_DATA_D3 	0x2d
+#define MT_ISSONY_DTF 		0x2e
+#define MT_ISDV_6mm 		0x2f
+#define MT_ISDMI 		0x30
+#define MT_ISSONY_D2 		0x31
+#define MT_ISCLEANER_CARTRIDGE 	0x32
+#define MT_ISAVATAR_F2 		0x4f
+#define MT_ISMP2_8mm 		0x50
+#define MT_ISDST_S 		0x51
+#define MT_ISDST_M 		0x52
+#define MT_ISDST_L 		0x53
+#define MT_ISVXATape_1 		0x54
+#define MT_ISVXATape_2 		0x55
+#define MT_ISSTK_9840 		0x56
+#define MT_ISLTO_Ultrium 	0x57
+#define MT_ISLTO_Accelis 	0x58
+#define MT_ISAIT_8mm 		0x5a
+#define MT_ISADR_1 		0x5b
+#define MT_ISADR_2 		0x5c
+#define MT_ISSTK_9940 		0x5d
+
 struct mt_tape_info {
 	long t_type;		/* device type id (mt_type) */
 	char *t_name;		/* descriptive name */
@@ -196,7 +233,39 @@ struct mt_tape_info {
 	{MT_ISQIC02_ALL_FEATURES, "Generic QIC-02 tape, all features"}, \
 	{MT_ISWT5099EEN24,	"Wangtek 5099-een24, 60MB"}, \
 	{MT_ISTEAC_MT2ST,	"Teac MT-2ST 155mb data cassette drive"}, \
-	{MT_ISEVEREX_FT40A,	"Everex FT40A, QIC-40"}, \
+	{MT_ISDDS_4mm,		"DDS"}, \
+	{MT_ISMiniQic,		"MiniQic"}, \
+	{MT_ISTravan,		"Travan tape"}, \
+	{MT_ISQIC,		"QIC tape"}, \
+	{MT_ISMP_8mm,		"8mm Exabyte metal particle tape"}, \
+	{MT_ISAME_8mm,		"8mm Exabyte advanced metal evap tape"}, \
+	{MT_ISAIT1_8mm,		"8mm Sony AIT1 tape"}, \
+	{MT_ISDLT,		"DLT compact tape)"}, \
+	{MT_ISNCTP,		"Philips NCTP tape"}, \
+	{MT_ISIBM_3480,		"IBM 3480 tape"}, \
+	{MT_ISIBM_3490E,	"IBM 3490E tape"}, \
+	{MT_ISIBM_Magstar_3590,	"IBM Magstar 3590 tape"}, \
+	{MT_ISIBM_Magstar_MP,	"IBM Magstar MP tape"}, \
+	{MT_ISSTK_DATA_D3,	"STK data D3 tape"}, \
+	{MT_ISSONY_DTF,		"Sony DTF tape"}, \
+	{MT_ISDV_6mm,		"6mm digital video tape"}, \
+	{MT_ISDMI,		"Exabyte DMI tape"}, \
+	{MT_ISSONY_D2,		"Sony D2S or D2L tape"}, \
+	{MT_ISCLEANER_CARTRIDGE, "Cleaner (all drive types that support cleaners)"}, \
+	{MT_ISAVATAR_F2,	"Avatar 2"}, \
+	{MT_ISMP2_8mm,		"8mm Hitachi tape"}, \
+	{MT_ISDST_S,		"Ampex DST small tape"}, \
+	{MT_ISDST_M,		"Ampex DST medium tape"}, \
+	{MT_ISDST_L,		"Ampex DST large tape"}, \
+	{MT_ISVXATape_1,	"Ecrix 8mm tape"}, \
+	{MT_ISVXATape_2,	"Ecrix 8mm tape"}, \
+	{MT_ISSTK_9840,		"STK 9840"}, \
+	{MT_ISLTO_Ultrium,	"LTO Ultrium (IBM, HP, Seagate)"}, \
+	{MT_ISLTO_Accelis,	"LTO Accelis (IBM, HP, Seagate)"}, \
+	{MT_ISAIT_8mm,		"AIT tape (AIT2 or higher)"}, \
+	{MT_ISADR_1,		"OnStream ADR1"}, \
+	{MT_ISADR_2,		"OnStream ADR2"}, \
+	{MT_ISSTK_9940,		"STK 9940"}, \
 	{MT_ISSCSI1,		"Generic SCSI-1 tape"}, \
 	{MT_ISSCSI2,		"Generic SCSI-2 tape"}, \
 	{0, NULL} \
