@@ -1,3 +1,8 @@
+2005-02-08  Andrew Cagney  <cagney@gnu.org>
+
+	* MAINTAINERS: Delete reference to dejagnu/ and mmalloc/ from the
+	gdb/ section.  Update GDB's URL.
+
 2005-01-31  Andrew Cagney  <cagney@gnu.org>
 
 	* gettext.m4: Only set ENABLE_NLS when gettext is present.
