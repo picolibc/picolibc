@@ -166,13 +166,13 @@ fhandler_disk_file::fstat (struct __stat64 *buf, path_conv *pc)
 	}
     }
 
-  if (oret)
+  if (!oret)
+    res = fstat_by_name (buf, pc);
+  else
     {
       res = fstat_by_handle (buf, pc);
       close ();
     }
-  else if (pc->exists ())
-    res = fstat_by_name (buf, pc);
 
   return res;
 }

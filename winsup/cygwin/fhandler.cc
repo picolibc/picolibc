@@ -434,7 +434,7 @@ fhandler_base::open (path_conv *pc, int flags, mode_t mode)
   else if (fmode & O_TEXT)
     bin = O_TEXT;
   else if (get_device () == FH_DISK)
-    bin = get_w_binary () || get_r_binary ();
+    bin = get_w_binary () || get_r_binary () || O_BINARY;
   else
     bin = (binmode == O_BINARY) || get_w_binary () || get_r_binary ();
 

@@ -1,3 +1,9 @@
+2002-05-30  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat): Always call
+	fstat_by_name if fd is not opened to allow fstat_by_name to properly
+	set errno.
+
 2002-05-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc: Replace autoload statments for ZwXXX by NtXXX.
@@ -16,6 +22,10 @@
 	of ZwXXX functions by declarations of NtXXX.
 	* pinfo.cc (winpids::enumNT): Replace call to ZwQuerySystemInformation
 	by call to NtQuerySystemInformation.
+
+2002-05-29  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.cc (binmode): Default to binmode when mode is not known.
 
 2002-05-29  Christopher Faylor  <cgf@redhat.com>
 
