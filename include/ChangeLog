@@ -1,3 +1,14 @@
+2003-11-14  Nick Clifton  <nickc@redhat.com>
+
+	* dis-asm.h (struct disassemble_info): Add new field
+	'symbol_is_valid' which is a function which can tell the
+	disassembler to skip certain symbols as they should not be
+	displayed to the user.
+        (arm_symbol_is_valid): New prototype.  This is the ARM
+	specific function for the symbol_is_valid field.
+        (generic_symbol_is_valid): New prototype.  This is the default
+	function pointed to by the symbol_is_valid field.
+        
 2003-11-06  Bruno Rohee  <bruno@rohee.com>
 
 	* hp-symtab.h: Fix "the the" typo.
