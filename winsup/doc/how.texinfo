@@ -1006,10 +1006,17 @@ make > make.log 2>&1
 make install > install.log 2>&1
 @end example
 
-This will normally attempt to build the documentation, which
-additionally requires texinfo, texi2html, db2html and possibly others.
+Normally, this will also attempt to build the documentation, which
+additionally requires db2html, texi2html and possibly others.
 These tools are not included in the Cygwin distribution, but are readily
-obtainable (or build OOTB).
+obtainable:
+
+@table @samp
+@item db2html
+Part of docbook, from @file{http://sources.redhat.com/docbook-tools/}.
+@item texi2html
+From @file{http://www.mathematik.uni-kl.de/~obachman/Texi2html/}.
+@end table
 
 To check a cygwin1.dll, run "make check" in the winsup/cygwin directory.
 If that works, install everything @emph{except} the dll (if you can).
