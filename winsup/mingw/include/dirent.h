@@ -1,23 +1,8 @@
 /*
  * DIRENT.H (formerly DIRLIB.H)
- *
- * by M. J. Weinstein   Released to public domain 1-Jan-89
- *
- * Because I have heard that this feature (opendir, readdir, closedir)
- * it so useful for programmers coming from UNIX or attempting to port
- * UNIX code, and because it is reasonably light weight, I have included
- * it in the Mingw32 package. I have also added an implementation of
- * rewinddir, seekdir and telldir.
- *   - Colin Peters <colin@bird.fu.is.saga-u.ac.jp>
- *
- *  This code is distributed in the hope that is will be useful but
- *  WITHOUT ANY WARRANTY. ALL WARRANTIES, EXPRESS OR IMPLIED ARE HEREBY
- *  DISCLAIMED. This includeds but is not limited to warranties of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *
- * $Revision$
- * $Author$
- * $Date$
+ * This file has no copyright assigned and is placed in the Public Domain.
+ * This file is a part of the mingw-runtime package.
+ * No warranty is given; refer to the file DISCLAIMER within the package.
  *
  */
 #ifndef _DIRENT_H_

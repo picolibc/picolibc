@@ -1,25 +1,16 @@
 ;
-; crtdll.def
+;* crtdll.def
+;* This file has no copyright assigned and is placed in the Public Domain.
+;* This file is a part of the mingw-runtime package.
+;* No warranty is given; refer to the file DISCLAIMER within the package.
 ;
 ; Exports from crtdll.dll from Windows 95 SYSTEM directory. Hopefully this
 ; should also work with the crtdll provided with Windows NT.
 ;
-; Contributors:
-;  Created by Colin Peters <colin@bird.fu.is.saga-u.ac.jp>
-;
-;  THIS SOFTWARE IS NOT COPYRIGHTED
-;
-;  This source code is offered for use in the public domain. You may
-;  use, modify or distribute it freely.
-;
-;  This code is distributed in the hope that it will be useful but
-;  WITHOUT ANY WARRANTY. ALL WARRENTIES, EXPRESS OR IMPLIED ARE HEREBY
-;  DISCLAMED. This includes but is not limited to warrenties of
-;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-;
-; $Revision$
-; $Author$
-; $Date$
+; NOTE: The crtdll is OBSOLETE and msvcrt should be used instead.  The msvcrt
+; is available for free download from Microsoft Corporation and will work on
+; Windows 95.  Support for the crtdll is deprecated and this file may be
+; deleted in future versions.
 ;
 ; These three functions appear to be name mangled in some way, so GCC is
 ; probably not going to be able to use them in any case.

@@ -1,3 +1,59 @@
+2004-04-20  Earnie Boyd  <earnie@users.sf.net>
+
+	* CONTRIBUTORS: New file.
+	* DISCLAIMER: Ditto.
+	* CRT_noglob.c: Reword copyright and disclaimer.  Move Contributors
+	section CONTRIBUTORS file.  Remove RCS tags.
+	* CRTFmode.c: Ditto.
+	* CRTglob.c: Ditto.
+	* CRTinit.c: Ditto.
+	* crt1.c: Ditto.
+	* crtdll.dev: Ditto.
+	* dllcrt1.c: Ditto.
+	* dllmain.c: Ditto.
+	* gccmain.c: Ditto.
+	* init.c: Ditto.
+	* isascii.c: Ditto.
+	* iscsym.c: Ditto.
+	* iscsymf.c: Ditto.
+	* jamfile: Ditto.
+	* main.c: Ditto.
+	* msvcrt.def.in: Ditto.
+	* strcasecmp.c: Ditto.
+	* toascii.c: Ditto.
+	* wcscmpi.c: Ditto.
+	* include/assert.h: Ditto.
+	* include/conio.h: Ditto.
+	* include/ctype.h: Ditto.
+	* include/direct.h: Ditto.
+	* include/dirent.h: Ditto.
+	* include/dos.h: Ditto.
+	* include/errno.h: Ditto.
+	* include/excpt.h: Ditto.
+	* include/fcntl.h: Ditto.
+	* include/float.h: Ditto.
+	* include/io.h: Ditto.
+	* include/locale.h: Ditto.
+	* include/malloc.h: Ditto.
+	* include/math.h: Ditto.
+	* include/process.h: Ditto.
+	* include/setjmp.h: Ditto.
+	* include/share.h: Ditto.
+	* include/signal.h: Ditto.
+	* include/stdio.h: Ditto.
+	* include/stdlib.h: Ditto.
+	* include/string.h: Ditto.
+	* include/tchar.h: Ditto.
+	* include/time.h: Ditto.
+	* include/wchar.h: Ditto.
+	* include/sys/locking.h: Ditto.
+	* include/sys/param.h: Ditto.
+	* include/sys/stat.h: Ditto.
+	* include/sys/timeb.h: Ditto.
+	* include/sys/types.h: Ditto.
+	* include/sys/utime.h: Ditto.
+	* mingwex/dirent.c: Ditto.
+
 2004-04-19  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/_mingw.h: Revert to primary release 3 and increment minor

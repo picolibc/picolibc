@@ -1,10 +1,9 @@
 #
 # Jamfile for building various libraries and object files for the
 # Minimalist GNU-Win32 package.
-#
-# $Revision$
-# $Author$
-# $Date$
+#* This file has no copyright assigned and is placed in the Public Domain.
+#* This file is a part of the mingw-runtime package.
+#* No warranty is given; refer to the file DISCLAIMER within the package.
 #
 
 # Change this line if you have installed Mingw32 in another directory.
