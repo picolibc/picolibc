@@ -143,7 +143,6 @@ Compiled on %s\n\
 int
 main (int argc, char **argv)
 {
-  extern int optind;
   int c, i;
   int aopt = 0;
   int dopt = 0;

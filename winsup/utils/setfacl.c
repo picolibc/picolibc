@@ -423,8 +423,6 @@ Compiled on %s\n\
 int
 main (int argc, char **argv)
 {
-  extern char *optarg;
-  extern int optind;
   int c;
   action_t action = NoAction;
   int ropt = 0;
