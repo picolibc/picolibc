@@ -25,15 +25,16 @@
 #define ARM_EXT_V3	 0x00000008	/* MSR MRS.                */
 #define ARM_EXT_V3M	 0x00000010	/* Allow long multiplies.  */
 #define ARM_EXT_V4	 0x00000020	/* Allow half word loads.  */
-#define ARM_EXT_V4T	 0x00000040	/* Thumb v1.               */
+#define ARM_EXT_V4T	 0x00000040	/* Thumb.                  */
 #define ARM_EXT_V5	 0x00000080	/* Allow CLZ, etc.         */
-#define ARM_EXT_V5T	 0x00000100	/* Thumb v2.               */
+#define ARM_EXT_V5T	 0x00000100	/* Improved interworking.  */
 #define ARM_EXT_V5ExP	 0x00000200	/* DSP core set.           */
 #define ARM_EXT_V5E	 0x00000400	/* DSP Double transfers.   */
 #define ARM_EXT_V5J	 0x00000800	/* Jazelle extension.	   */
 #define ARM_EXT_V6       0x00001000     /* ARM V6.                 */
 #define ARM_EXT_V6K      0x00002000     /* ARM V6K.                */
 #define ARM_EXT_V6Z      0x00004000     /* ARM V6Z.                */
+#define ARM_EXT_V6T2	 0x00008000	/* Thumb-2.                */
 
 /* Co-processor space extensions.  */
 #define ARM_CEXT_XSCALE   0x00800000	/* Allow MIA etc.          */
@@ -65,6 +66,10 @@
 #define ARM_ARCH_V6K    (ARM_ARCH_V6    | ARM_EXT_V6K)
 #define ARM_ARCH_V6Z    (ARM_ARCH_V6    | ARM_EXT_V6Z)
 #define ARM_ARCH_V6ZK   (ARM_ARCH_V6    | ARM_EXT_V6K | ARM_EXT_V6Z)
+#define ARM_ARCH_V6T2   (ARM_ARCH_V6    | ARM_EXT_V6T2)
+#define ARM_ARCH_V6KT2  (ARM_ARCH_V6    | ARM_EXT_V6T2 | ARM_EXT_V6K)
+#define ARM_ARCH_V6ZT2  (ARM_ARCH_V6    | ARM_EXT_V6T2 | ARM_EXT_V6Z)
+#define ARM_ARCH_V6ZKT2 (ARM_ARCH_V6    | ARM_EXT_V6T2 | ARM_EXT_V6K | ARM_EXT_V6Z)
 
 /* Processors with specific extensions in the co-processor space.  */
 #define ARM_ARCH_XSCALE	(ARM_ARCH_V5TE	| ARM_CEXT_XSCALE)

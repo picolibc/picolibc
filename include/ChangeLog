@@ -1,3 +1,9 @@
+2005-03-12  Zack Weinberg  <zack@codesourcery.com>
+
+	* opcode/arm.h: Adjust comments for ARM_EXT_V4T and ARM_EXT_V5T.
+	Add ARM_EXT_V6T2, ARM_ARCH_V6T2, ARM_ARCH_V6KT2, ARM_ARCH_V6ZT2,
+	and ARM_ARCH_V6ZKT2.
+
 2005-03-09  Mark Mitchell  <mark@codesourcery.com>
 
 	* libiberty.h (gettimeofday): Declare.
@@ -58,7 +64,7 @@
 	* dis-asm.h: Add prototype for print_insn_maxq_little.
 
 2004-11-05  Tomer Levi  <Tomer.Levi@nsc.com>
-	
+
 	* opcode/crx.h (enum argtype): Rename types, remove unused types.
 
 2004-10-27  Richard Earnshaw  <rearnsha@arm.com>
@@ -71,7 +77,7 @@
 	(enum reg_type): Remove CRX_PC_REGTYPE, CRX_MTPR_REGTYPE.
 	(enum operand_type): Rearrange operands, edit comments.
 	replace us<N> with ui<N> for unsigned immediate.
-	replace d<N> with disps<N>/dispu<N>/dispe<N> for signed/unsigned/escaped 
+	replace d<N> with disps<N>/dispu<N>/dispe<N> for signed/unsigned/escaped
 	displacements (respectively).
 	replace rbase_ridx_scl2_dispu<N> with rindex_disps<N> for register index.
 	(instruction type): Add NO_TYPE_INS.
