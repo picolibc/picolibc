@@ -1,3 +1,11 @@
+2002-06-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.cc (cygheap_user::set_name): Remove setting homedrive and
+	homepath to NULL.
+	(cygheap_user::set_logsrv):  Fix free'ing of plogsrv.
+	* cygheap.h (cygheap_user::cygheap_user): Initialize homedrive and
+	homepath to NULL.
+
 2002-06-13  Christopher Faylor  <cgf@redhat.com>
 
 	* security.cc (get_logon_server): Use strcasematch rather than

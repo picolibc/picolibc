@@ -429,7 +429,7 @@ cygheap_user::~cygheap_user ()
   if (pname)
     cfree (pname);
   if (plogsrv)
-    cfree (plogsrv);
+    cfree (plogsrv - 2);
   if (pdomain)
     cfree (pdomain);
   if (psid)
@@ -443,15 +443,13 @@ cygheap_user::set_name (const char *new_name)
   if (pname)
     cfree (pname);
   pname = cstrdup (new_name ? new_name : "");
-  homedrive = NULL;
-  homepath = NULL;
 }
 
 void
 cygheap_user::set_logsrv (const char *new_logsrv)
 {
   if (plogsrv)
-    cfree (plogsrv);
+    cfree (plogsrv - 2);
   if (!new_logsrv || !*new_logsrv)
     plogsrv = NULL;
   else

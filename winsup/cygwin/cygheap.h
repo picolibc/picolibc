@@ -117,6 +117,7 @@ public:
   BOOL   impersonated;
 
   cygheap_user () : pname (NULL), plogsrv (NULL), pdomain (NULL),
+		    homedrive (NULL), homepath (NULL),
 		    psid (NULL), token (INVALID_HANDLE_VALUE) {}
   ~cygheap_user ();
 
