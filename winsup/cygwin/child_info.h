@@ -12,7 +12,7 @@ details. */
 
 enum
 {
-  PROC_MAGIC = 0xaf0cf000,
+  PROC_MAGIC = 0xaf0df000,
   PROC_FORK = PROC_MAGIC + 1,
   PROC_EXEC = PROC_MAGIC + 2,
   PROC_SPAWN = PROC_MAGIC + 3,
