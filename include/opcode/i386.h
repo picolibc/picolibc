@@ -1,6 +1,6 @@
 /* opcode/i386.h -- Intel 80386 opcode table
    Copyright 1989, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
-   2000, 2001
+   2000, 2001, 2002, 2003, 2004
    Free Software Foundation, Inc.
 
 This file is part of GAS, the GNU Assembler, and GDB, the GNU Debugger.
@@ -896,8 +896,8 @@ static const template i386_optab[] = {
 {"cmpxchg8b",1,0x0fc7, 1, Cpu586, NoSuf|Modrm,		{ LLongMem, 0, 0} },
 
 /* Pentium II/Pentium Pro extensions.  */
-{"sysenter",0, 0x0f34, X, Cpu686|CpuNo64, NoSuf,	{ 0, 0, 0} },
-{"sysexit", 0, 0x0f35, X, Cpu686|CpuNo64, NoSuf,	{ 0, 0, 0} },
+{"sysenter",0, 0x0f34, X, Cpu686, NoSuf,		{ 0, 0, 0} },
+{"sysexit", 0, 0x0f35, X, Cpu686, NoSuf,		{ 0, 0, 0} },
 {"fxsave",  1, 0x0fae, 0, Cpu686, FP|Modrm,		{ LLongMem, 0, 0} },
 {"fxrstor", 1, 0x0fae, 1, Cpu686, FP|Modrm,		{ LLongMem, 0, 0} },
 {"rdpmc",   0, 0x0f33, X, Cpu686, NoSuf,		{ 0, 0, 0} },
