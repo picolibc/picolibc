@@ -1,3 +1,7 @@
+Mon Sep 17 17:29:47 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* libc/include/process.h: Add getpid() declaration.
+
 2001-09-14  Nick Clifton  <nickc@cambridge.redhat.com>
 
 	* libc/sys/arm/crt0.S: Add calls to _init and _fini (via atexit)

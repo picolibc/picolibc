@@ -41,6 +41,7 @@ pid_t sexecv(void *, const char *path, const char * const *argv);
 pid_t sexecve(void *, const char *path, const char * const *argv, const char * const *envp);
 pid_t sexecvp(void *, const char *path, const char * const *argv);
 pid_t sexecvpe(void *, const char *path, const char * const *argv, const char * const *envp);
+pid_t  getpid(void);
 #endif
 
 int cwait(int *, int, int);
