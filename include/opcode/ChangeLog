@@ -1,3 +1,7 @@
+2002-07-08  Alan Modra  <amodra@bigpond.net.au>
+
+	* i386.h: Remove IgnoreSize from movsx and movzx.
+
 2002-06-08  Alan Modra  <amodra@bigpond.net.au>
 
 	* a29k.h: Replace CONST with const.
