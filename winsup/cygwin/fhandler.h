@@ -793,13 +793,11 @@ class select_stuff
 {
 public:
   ~select_stuff ();
-  select_stuff (): always_ready (0), windows_used (0),
-		   total (0), start (0)
+  select_stuff (): always_ready (0), windows_used (0), start (0)
   {
     memset (device_specific, 0, sizeof (device_specific));
   }
   BOOL always_ready, windows_used;
-  int total;
   select_record start;
   void *device_specific[FH_NDEV];
 

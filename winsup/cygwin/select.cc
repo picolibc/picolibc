@@ -154,10 +154,10 @@ cygwin_select (int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   else
     select_printf ("to NULL, ms %x", ms);
 
-  select_printf ("sel.total %d, sel.always_ready %d", sel.total, sel.always_ready);
+  select_printf ("sel.always_ready %d", sel.always_ready);
 
   /* Degenerate case.  No fds to wait for.  Just wait. */
-  if (sel.total == 0)
+  if (sel.start.next == NULL)
     {
       if (WaitForSingleObject (signal_arrived, ms) == WAIT_OBJECT_0)
 	{
@@ -225,7 +225,6 @@ select_stuff::test_and_set (int i, fd_set *readfds, fd_set *writefds,
 
   s->next = start.next;
   start.next = s;
-  total++;
   return 1;
 }
 
@@ -247,7 +246,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 		    DWORD ms)
 {
   int wait_ret;
-  HANDLE w4[total + 1];
+  HANDLE w4[MAXIMUM_WAIT_OBJECTS];
   select_record *s = &start;
   int m = 0;
 

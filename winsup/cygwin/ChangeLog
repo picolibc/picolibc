@@ -1,3 +1,10 @@
+Mon Apr  3 14:10:44 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler.h (select_stuff): Eliminate use of 'total'.
+	* select.cc (cygwin_select): Ditto.
+	(select_stuff::wait): Use maximum size for w4 rather than calculating
+	what will fit.
+
 Mon Apr 03 13:58:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
         * grp.cc (parse_grp): Save empty array instead of
