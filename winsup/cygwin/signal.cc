@@ -181,14 +181,13 @@ kill_worker (pid_t pid, int sig)
 }
 
 int
-_raise (int sig)
+raise (int sig)
 {
-  return _kill (myself->pid, sig);
+  return kill (myself->pid, sig);
 }
 
-/* This is called _kill because the real kill is in newlib.  */
 int
-_kill (pid_t pid, int sig)
+kill (pid_t pid, int sig)
 {
   sigframe thisframe (mainthread);
   syscall_printf ("kill (%d, %d)", pid, sig);
@@ -256,7 +255,7 @@ kill_pgrp (pid_t pid, int sig)
 extern "C" int
 killpg (pid_t pgrp, int sig)
 {
-  return _kill (-pgrp, sig);
+  return kill (-pgrp, sig);
 }
 
 extern "C" void
@@ -279,7 +278,7 @@ abort (void)
   sigdelset (&sig_mask, SIGABRT);
   set_process_mask (sig_mask);
 
-  _raise (SIGABRT);
+  raise (SIGABRT);
   (void) thisframe.call_signal_handler (); /* Call any signal handler */
   do_exit (1);	/* signal handler didn't exit.  Goodbye. */
 }

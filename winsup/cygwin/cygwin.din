@@ -485,8 +485,8 @@ jn
 _jn = jn
 jnf
 _jnf = jnf
-_kill
-kill = _kill
+kill
+_kill = kill
 labs
 _labs = labs
 lchown

@@ -2214,7 +2214,7 @@ __pthread_kill (pthread_t thread, int sig)
   if (thread->sigs)
     myself->setthread2signal (thread);
 
-  int rval = _kill (myself->pid, sig);
+  int rval = raise (sig);
 
   // unlock myself
   return rval;

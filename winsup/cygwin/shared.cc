@@ -128,9 +128,11 @@ open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, shared_locat
 	  offsets[0] = (char *) shared;
 	}
 
+#if 0
       if (!child_proc_info && wincap.needs_memory_protection ())
 	for (DWORD s = 0x950000; s <= 0xa40000; s += 0x1000)
 	  VirtualAlloc ((void *) s, 4, MEM_RESERVE, PAGE_NOACCESS);
+#endif
     }
 
   debug_printf ("name %s, shared %p (wanted %p), h %p", name, shared, addr, shared_h);
@@ -227,7 +229,6 @@ memory_init ()
 unsigned
 shared_info::heap_chunk_size ()
 {
-  unsigned val;
   if (!initial_heap_size)
     {
       /* Fetch misc. registry entries.  */

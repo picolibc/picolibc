@@ -1,3 +1,16 @@
+2002-10-20  Christopher Faylor  <cgf@redhat.com>
+
+	Rename _kill() to kill() throughout.  Rename _raise() to raise()
+	throughout.  Rename _pid() to pid() throughout.
+	* Makefile.in: Compile some objects with -fomit-frame-pointer.
+	* cygwin.din: Reverse aliasing for _kill.
+	* syscalls.cc (_getpid_r): New function, implemented for newlib
+	compatibility.
+
+	* shared.cc (open_shared): Remove reserving of memory since previous
+	change eliminate the need for this hack.
+
+
 2002-10-19  Christopher Faylor  <cgf@redhat.com>
 
 	* fork.cc (fork_child): Move pinfo fixup later to attempt some minor

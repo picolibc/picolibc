@@ -252,9 +252,15 @@ remove (const char *ourname)
 }
 
 extern "C" pid_t
-_getpid ()
+getpid ()
 {
   return myself->pid;
+}
+
+extern "C" pid_t
+_getpid_r (struct _reent *)
+{
+  return getpid ();
 }
 
 /* getppid: POSIX 4.1.1.1 */
@@ -288,8 +294,8 @@ setsid (void)
 	  && !check_pty_fds ())
 	FreeConsole ();
       myself->ctty = -1;
-      myself->sid = _getpid ();
-      myself->pgid = _getpid ();
+      myself->sid = getpid ();
+      myself->pgid = getpid ();
       syscall_printf ("sid %d, pgid %d, ctty %d", myself->sid, myself->pgid, myself->ctty);
       return myself->sid;
     }

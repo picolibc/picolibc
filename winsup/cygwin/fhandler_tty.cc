@@ -612,7 +612,7 @@ fhandler_tty_slave::write (const void *ptr, size_t len)
 	    default:
 	      __seterrno_from_win_error (err);
 	    }
-	  _raise (SIGHUP);		/* FIXME: Should this be SIGTTOU? */
+	  raise (SIGHUP);		/* FIXME: Should this be SIGTTOU? */
 	  towrite = (DWORD) -1;
 	  break;
 	}
@@ -704,7 +704,7 @@ fhandler_tty_slave::read (void *ptr, size_t len)
       if (!PeekNamedPipe (get_handle (), peek_buf, sizeof (peek_buf), &bytes_in_pipe, NULL, NULL))
 	{
 	  termios_printf ("PeekNamedPipe failed, %E");
-	  _raise (SIGHUP);
+	  raise (SIGHUP);
 	  bytes_in_pipe = 0;
 	}
 
@@ -726,7 +726,7 @@ fhandler_tty_slave::read (void *ptr, size_t len)
 	  if (ReadFile (get_handle (), buf, readlen, &n, NULL) == FALSE)
 	    {
 	      termios_printf ("read failed, %E");
-	      _raise (SIGHUP);
+	      raise (SIGHUP);
 	    }
 	  /* MSDN states that 5th prameter can be used to determine total
 	     number of bytes in pipe, but for some reason this number doesn't
@@ -735,7 +735,7 @@ fhandler_tty_slave::read (void *ptr, size_t len)
 	  if (!PeekNamedPipe (get_handle (), peek_buf, 1, &bytes_in_pipe, NULL, NULL))
 	    {
 	      termios_printf ("PeekNamedPipe failed, %E");
-	      _raise (SIGHUP);
+	      raise (SIGHUP);
 	      bytes_in_pipe = 0;
 	    }
 	  if (n)
@@ -923,7 +923,7 @@ fhandler_tty_slave::ioctl (unsigned int cmd, void *arg)
       /* background process */
       termios_printf ("bg ioctl pgid %d, tpgid %d, ctty %d",
 		      myself->pgid, get_ttyp ()->getpgid (), myself->ctty);
-      _raise (SIGTTOU);
+      raise (SIGTTOU);
     }
 
   switch (cmd)
@@ -1104,7 +1104,7 @@ fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
 	break;
       case TIOCSWINSZ:
 	get_ttyp ()->winsize = * (struct winsize *) arg;
-	_kill (-get_ttyp ()->getpgid (), SIGWINCH);
+	kill (-get_ttyp ()->getpgid (), SIGWINCH);
 	break;
       case FIONBIO:
 	set_nonblocking (*(int *) arg);
