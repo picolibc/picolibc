@@ -302,7 +302,7 @@ sys_mbstowcs (WCHAR *tgt, const char *src, int len)
   return MultiByteToWideChar (get_cp (), 0, src, -1, tgt, len);
 }
 
-int __stdcall
+extern "C" int __stdcall
 low_priority_sleep (DWORD secs)
 {
   HANDLE thisthread = GetCurrentThread ();
