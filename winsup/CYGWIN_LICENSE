@@ -25,7 +25,7 @@ This means that you can port an Open Source(tm) application to cygwin,
 and distribute that executable as if it didn't include a copy of
 libcygwin.a linked into it.  Note that this does not apply to the cygwin
 DLL itself.  If you distribute a (possibly modified) version of the DLL
-you must adhere to the terms of the GPL, i.e., you must provide sources
+you must adhere to the terms of the GPL, i.e. you must provide sources
 for the cygwin DLL.
 
 See http://www.opensource.org/osd.html for the precise Open Source
