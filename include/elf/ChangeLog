@@ -1,3 +1,7 @@
+2003-09-04  Nick Clifton  <nickc@redhat.com>
+
+	* v850.h (E_V850E1_ARCH): Define.
+
 2003-08-21  James Cownie <jcownie@etnus.com>
 
 	* dwarf2.h: Add PGI dwarf extensions.
