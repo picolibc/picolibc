@@ -1,3 +1,8 @@
+2005-01-26  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winuser.h (SW_SMOOTHSCROLL): Add define. 
+	Reported by: Christian Ehrlicher  <chehrlic@users.sf.net>
+
 2005-01-21  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
 	* include/commdlg.h (OFN_DONTADDTORECENT): Added definition.
