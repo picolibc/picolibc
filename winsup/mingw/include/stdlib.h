@@ -377,7 +377,7 @@ _CRTIMP char* __cdecl	getenv	(const char*);
 
 _CRTIMP void* __cdecl	bsearch	(const void*, const void*, size_t, size_t, 
 				 int (*)(const void*, const void*));
-_CRTIMP void __cdecl	qsort	(const void*, size_t, size_t,
+_CRTIMP void __cdecl	qsort	(void*, size_t, size_t,
 				 int (*)(const void*, const void*));
 
 _CRTIMP int __cdecl	abs	(int);

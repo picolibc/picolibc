@@ -1,3 +1,8 @@
+2003-03-10  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/stdlib.h (qsort): Remove const from first parm.
+	Thanks to: Tien-Ren Chen  <trchen@sourceforge.users.net>
+
 2003-03-03  Christopher Faylor  <cgf@redhat.com>
 
 	* mingwex/getopt.c: Refresh from NetBSD sources.
