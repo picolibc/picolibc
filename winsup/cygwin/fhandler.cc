@@ -13,6 +13,7 @@ details. */
 #include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 
 static NO_COPY const int CHUNK_SIZE = 1024; /* Used for crlf conversions */
 

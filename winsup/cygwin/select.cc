@@ -250,6 +250,11 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
      counting the number of active fds. */
   while ((s = s->next))
     {
+      if (m > MAXIMUM_WAIT_OBJECTS)
+	{
+	  set_errno (EINVAL);
+	  return -1;
+	}
       if (!s->startup (s, this))
 	{
 	  __seterrno ();

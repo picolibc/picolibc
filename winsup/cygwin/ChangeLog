@@ -1,3 +1,8 @@
+Thu Aug 10 15:31:39 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* winsup.h: Change strchr inline for strange gcc problem.
+	* select.cc (select_stuff::wait): Bounds check w4 array.
+
 Thu Aug 10 15:17:53 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dir.cc (readdir): Ensure that errno is *only* set when we've run out

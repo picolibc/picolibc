@@ -38,7 +38,7 @@ details. */
 
 #undef strchr
 #define strchr cygwin_strchr
-extern inline char * strchr(const char * s, int c)
+extern "C" inline __stdcall char * strchr(const char * s, int c)
 {
 register char * __res;
 __asm__ __volatile__(
