@@ -1,3 +1,20 @@
+2002-09-11  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* lib/shell32.def (SHBindtoParent,SHCreateDirectoryEx[AW],
+	SHCreateProcessAsUserW,SHCreateQueryCancelAutoPlayMoniker,
+	SHCreateShellItem,SHEmptyRecycleBin[AW],
+	SHEnumerateUnreadMailAccountsW,SHExtractIconsW,
+	SHGetDataFromIDList[AW],SHGetDiskFreeSpace[AW],
+	SHGetDiskFreeSpaceEx[AW],SHGetFolderLocation,
+	SHGetFolderPathAndSubDir[AW],SHGetIconOverlayIndex[AW],
+	SHGetNewLinkInfo[AW],SHGetSettings,SHGetUnreadMailCountW,
+	SHInvokePrinterCommand[AW],SHIsFileAvailableOffline,
+	SHLoadNonloadedIconOverlayIdentifiers,
+	SHOpenFolderAndSelectItems,SHParseDisplayName,
+	SHPathPrepareForWrite[AW],SHQueryRecycleBin[AW],
+	SHSetLocalizedName,SHSetUnreadMailCountW,
+	SHUpdateRecycleBinIcon: Add missing stubs.
+
 2002-09-07  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/windef.h (WINVER): Add documentation.
