@@ -1,5 +1,5 @@
 /* bfdlink.h -- header file for BFD link routines
-   Copyright 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000
+   Copyright 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2002
    Free Software Foundation, Inc.
    Written by Steve Chamberlain and Ian Lance Taylor, Cygnus Support.
 
@@ -446,7 +446,6 @@ enum bfd_link_order_type
 {
   bfd_undefined_link_order,	/* Undefined.  */
   bfd_indirect_link_order,	/* Built from a section.  */
-  bfd_fill_link_order,		/* Fill with a 16 bit constant.  */
   bfd_data_link_order,		/* Set to explicit data.  */
   bfd_section_reloc_link_order,	/* Relocate against a section.  */
   bfd_symbol_reloc_link_order	/* Relocate against a symbol.  */
@@ -480,13 +479,12 @@ struct bfd_link_order
 	} indirect;
       struct
 	{
-	  /* Value to fill with.  */
-	  unsigned int value;
-	} fill;
-      struct
-	{
-	  /* Data to put into file.  The size field gives the number
-	     of bytes which this field points to.  */
+	  /* Size of contents, or zero when contents size == size
+	     within output section.
+	     A non-zero value allows filling of the output section
+	     with an arbitrary repeated pattern.  */
+	  unsigned int size;
+	  /* Data to put into file.  */
 	  bfd_byte *contents;
 	} data;
       struct
