@@ -357,6 +357,7 @@ class fhandler_socket: public fhandler_base
 {
  private:
   int addr_family;
+  int type;
   int connect_secret [4];
   HANDLE secret_event;
   struct _WSAPROTOCOL_INFOA *prot_info_ptr;
@@ -397,6 +398,8 @@ class fhandler_socket: public fhandler_base
   select_record *select_except (select_record *s);
   void set_addr_family (int af) {addr_family = af;}
   int get_addr_family () {return addr_family;}
+  void set_socket_type (int st) { type = st;}
+  int get_socket_type () {return type;}
   void set_sun_path (const char *path);
   char *get_sun_path () {return sun_path;}
   void set_connect_secret ();

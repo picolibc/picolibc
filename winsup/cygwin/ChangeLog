@@ -1,3 +1,17 @@
+2002-04-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_accept): Set socket type for accepted socket.
+	(socketpair): Set socket type for both sockets.
+
+2002-04-12  Egor Duda  <deo@logos-m.ru>
+
+	* fhandler.h (class fhandler_socket): New member to store socket type.  
+	(fhandler_socket::get_socket_type): Access it.
+	(fhandler_socket::set_socket_type): Ditto.
+	* net.cc (cygwin_socket): Store socket type.
+	(cygwin_connect): Disable security checks for connectionless sockets.
+	(cygwin_accept): Ditto.
+
 2002-04-09  Mark Bradshaw  <bradshaw@staff.crosswalk.com>
 
 	* cygwin.din: Add strptime.
