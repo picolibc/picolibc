@@ -1,3 +1,12 @@
+Mon Oct  2 22:15:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* dcrt0.cc: Add LoadDLLFunc statement for RegEnumValueA().
+	* net.cc: Change comments related to get_ifconf.
+	(get_2k_ifconf): Eliminate `type' variable. Eliminate `sa' parameter.
+	(get_nt_ifconf): Ditto.
+	(get_9x_ifconf): Ditto. Rewritten.
+	(get_ifconf): Chage calls to OS specific functions.
+
 Mon Oct  2 15:15:01 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* signal.cc (sigaction): Allow new action == oldaction.
