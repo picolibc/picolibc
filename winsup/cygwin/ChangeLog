@@ -1,3 +1,21 @@
+2002-10-22  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.cc (cygheap_fixup_in_child): Use user_heap element in
+	cygheap.
+	(init_cheap): Ditto for declaration.
+	* fork.cc (fork_parent): Use user_heap element in cygheap.
+	* heap.h (inheap): Ditto.
+	* heap.cc (sbrk): Ditto.
+	(heap_init): Ditto.  Reorganize to shrink heap chunk as required and
+	record new value in cygheap.
+	* dcrt0.cc (dll_crt0_1): More "move the cygthread init" games.
+	* shared.cc (open_shared): Rework memory protection to properly deal
+	with relocated shared segment.
+	(shared_info::heap_chunk_size): Rename element to 'heap_chunk'.
+	* shared_info.h (shared_info): Ditto for declaration.
+	* strace.cc (strace::hello): Report on heap chunk size from cygheap
+	since it may shrink.
+
 2002-10-20  Christopher Faylor  <cgf@redhat.com>
 
 	Change _function() to function() throughout.

@@ -585,11 +585,11 @@ dll_crt0_1 ()
 	{
 	  case _PROC_FORK:
 	    alloc_stack (fork_info);
-	    cygthread::init ();
 	    cygheap_fixup_in_child (0);
-	    close_ppid_handle = !!child_proc_info->pppid_handle;
 	    memory_init ();
+	    cygthread::init ();
 	    set_myself (mypid);
+	    close_ppid_handle = !!child_proc_info->pppid_handle;
 	    break;
 	  case _PROC_SPAWN:
 	    /* Have to delay closes until after cygheap is setup */

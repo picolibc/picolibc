@@ -138,7 +138,7 @@ public:
 
 #define SHARED_INFO_CB 47112
 
-#define CURR_SHARED_MAGIC 0xd9e0bc22U
+#define CURR_SHARED_MAGIC 0x359218a2U
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -148,7 +148,7 @@ class shared_info
   DWORD version;
   DWORD cb;
  public:
-  unsigned initial_heap_size;
+  unsigned heap_chunk;
   DWORD sys_mount_table_counter;
 
   tty_list tty;

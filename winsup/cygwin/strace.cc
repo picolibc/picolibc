@@ -14,12 +14,18 @@ details. */
 #include <wingdi.h>
 #include <winuser.h>
 #include <ctype.h>
+#include <errno.h>
 #include "pinfo.h"
 #include "perprocess.h"
 #include "cygwin_version.h"
 #include "hires.h"
+#include "security.h"
 #include "cygthread.h"
-#include "shared_info.h"
+#include "fhandler.h"
+#include "path.h"
+#include "dtable.h"
+#include "cygerrno.h"
+#include "cygheap.h"
 
 #define PROTECT(x) x[sizeof (x)-1] = 0
 #define CHECK(x) if (x[sizeof (x)-1] != 0) { small_printf ("array bound exceeded %d\n", __LINE__); ExitProcess (1); }
@@ -58,7 +64,7 @@ strace::hello ()
 	     cygwin_version.api_major, cygwin_version.api_minor);
       prntf (1, NULL, "DLL build:    %s", cygwin_version.dll_build_date);
       prntf (1, NULL, "OS version:   Windows %s", wincap.osname ());
-      prntf (1, NULL, "Heap size:    %u", cygwin_shared->heap_chunk_size ());
+      prntf (1, NULL, "Heap size:    %u", cygheap->user_heap.chunk);
       prntf (1, NULL, "**********************************************");
     }
 }

@@ -198,18 +198,21 @@ struct cygheap_debug
 };
 #endif
 
+struct user_heap_info
+{
+  void *base;
+  void *ptr;
+  void *top;
+  unsigned chunk;
+};
+
 struct init_cygheap
 {
   _cmalloc_entry *chain;
   char *buckets[32];
-  struct /* User heap stuff. */
-    {
-      void *heapbase;
-      void *heapptr;
-      void *heaptop;
-    };
   cygheap_root root;
   cygheap_user user;
+  user_heap_info user_heap;
   mode_t umask;
   HANDLE shared_h;
   HANDLE console_h;

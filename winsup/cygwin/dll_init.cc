@@ -261,8 +261,10 @@ release_upto (const char *name, DWORD here)
       {
 	size = mb.RegionSize;
 	if (!(mb.State == MEM_RESERVE && mb.AllocationProtect == PAGE_NOACCESS &&
-	    (((void *) start < cygheap->heapbase || (void *) start > cygheap->heaptop) &&
-	     ((void *) start < (void *) cygheap || (void *) start > (void *) ((char *) cygheap + CYGHEAPSIZE)))))
+	    (((void *) start < cygheap->user_heap.base
+	      || (void *) start > cygheap->user_heap.top) &&
+	     ((void *) start < (void *) cygheap 
+	      | (void *) start > (void *) ((char *) cygheap + CYGHEAPSIZE)))))
 	  continue;
 	if (!VirtualFree ((void *) start, 0, MEM_RELEASE))
 	  api_fatal ("couldn't release memory %p(%d) for '%s' alignment, %E\n",

@@ -551,7 +551,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   rc = fork_copy (pi, "user/cygwin data",
 		  user_data->data_start, user_data->data_end,
 		  user_data->bss_start, user_data->bss_end,
-		  cygheap->heapbase, cygheap->heapptr,
+		  cygheap->user_heap.base, cygheap->user_heap.ptr,
 		  stack_here, ch.stackbottom,
 		  dll_data_start, dll_data_end,
 		  dll_bss_start, dll_bss_end, NULL);

@@ -156,7 +156,7 @@ cygheap_fixup_in_child (bool execed)
 
   if (execed)
     {
-      cygheap->heapbase = NULL;		/* We can allocate the heap anywhere */
+      cygheap->user_heap.base = NULL;		/* We can allocate the heap anywhere */
       /* Walk the allocated memory chain looking for orphaned memory from
 	 previous execs */
       for (_cmalloc_entry *rvc = cygheap->chain; rvc; rvc = rvc->prev)

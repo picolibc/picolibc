@@ -47,28 +47,29 @@ shared_name (const char *str, int num)
 #define page_const (65535)
 #define pround(n) (((size_t) (n) + page_const) & ~page_const)
 
+static char *offsets[] =
+{
+  (char *) cygwin_shared_address,
+  (char *) cygwin_shared_address
+    + pround (sizeof (shared_info)),
+  (char *) cygwin_shared_address
+    + pround (sizeof (shared_info))
+    + pround (sizeof (mount_info)),
+  (char *) cygwin_shared_address
+    + pround (sizeof (shared_info))
+    + pround (sizeof (mount_info))
+    + pround (sizeof (console_state)),
+  (char *) cygwin_shared_address
+    + pround (sizeof (shared_info))
+    + pround (sizeof (mount_info))
+    + pround (sizeof (console_state))
+    + pround (sizeof (_pinfo))
+};
+
 void * __stdcall
 open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, shared_locations m)
 {
   void *shared;
-  static char *offsets[] =
-  {
-    (char *) cygwin_shared_address,
-    (char *) cygwin_shared_address
-      + pround (sizeof (shared_info)),
-    (char *) cygwin_shared_address
-      + pround (sizeof (shared_info))
-      + pround (sizeof (mount_info)),
-    (char *) cygwin_shared_address
-      + pround (sizeof (shared_info))
-      + pround (sizeof (mount_info))
-      + pround (sizeof (console_state)),
-    (char *) cygwin_shared_address
-      + pround (sizeof (shared_info))
-      + pround (sizeof (mount_info))
-      + pround (sizeof (console_state))
-      + pround (sizeof (_pinfo))
-  };
 
   void *addr;
   if (!wincap.needs_memory_protection ())
@@ -117,16 +118,18 @@ open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, shared_locat
   if (!shared)
     api_fatal ("MapViewOfFileEx '%s'(%p), %E.  Terminating.", name, shared_h);
 
-  if (m == SH_CYGWIN_SHARED)
+  if (m == SH_CYGWIN_SHARED && wincap.needs_memory_protection ())
     {
+      unsigned delta = (char *) shared - offsets[0];
+      offsets[0] = (char *) shared;
       for (int i = SH_CYGWIN_SHARED + 1; i < SH_TOTAL_SIZE; i++)
 	{
-	  offsets[i] += (char *) shared - offsets[0];
-	  if (!VirtualAlloc (offsets[i], offsets[i + 1] - offsets[i],
-			     MEM_RESERVE, PAGE_NOACCESS))
+	  unsigned size = offsets[i + 1] - offsets[i];
+	  offsets[i] += delta;
+	  if (!VirtualAlloc (offsets[i], size, MEM_RESERVE, PAGE_NOACCESS))
 	    continue;  /* oh well */
-	  offsets[0] = (char *) shared;
 	}
+      offsets[SH_TOTAL_SIZE] += delta;
 
 #if 0
       if (!child_proc_info && wincap.needs_memory_protection ())
@@ -137,9 +140,6 @@ open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, shared_locat
 
   debug_printf ("name %s, shared %p (wanted %p), h %p", name, shared, addr, shared_h);
 
-  /* FIXME: I couldn't find anywhere in the documentation a note about
-     whether the memory is initialized to zero.  The code assumes it does
-     and since this part seems to be working, we'll leave it as is.  */
   return shared;
 }
 
@@ -229,7 +229,7 @@ memory_init ()
 unsigned
 shared_info::heap_chunk_size ()
 {
-  if (!initial_heap_size)
+  if (!heap_chunk)
     {
       /* Fetch misc. registry entries.  */
 
@@ -240,20 +240,20 @@ shared_info::heap_chunk_size ()
       /* FIXME: We should not be restricted to a fixed size heap no matter
       what the fixed size is. */
 
-      initial_heap_size = reg.get_int ("heap_chunk_in_mb", 0);
-      if (!initial_heap_size) {
+      heap_chunk = reg.get_int ("heap_chunk_in_mb", 0);
+      if (!heap_chunk) {
 	reg_key r1 (HKEY_LOCAL_MACHINE, KEY_READ, "SOFTWARE",
 		    CYGWIN_INFO_CYGNUS_REGISTRY_NAME,
 		    CYGWIN_INFO_CYGWIN_REGISTRY_NAME, NULL);
-        initial_heap_size = reg.get_int ("heap_chunk_in_mb", 384);
+        heap_chunk = reg.get_int ("heap_chunk_in_mb", 384);
       }
 
-      if (initial_heap_size < 4)
-	initial_heap_size = 4 * 1024 * 1024;
+      if (heap_chunk < 4)
+	heap_chunk = 4 * 1024 * 1024;
       else
-	initial_heap_size <<= 20;
-      debug_printf ("fixed heap size is %u", initial_heap_size);
+	heap_chunk <<= 20;
+      debug_printf ("fixed heap size is %u", heap_chunk);
     }
 
-  return initial_heap_size;
+  return heap_chunk;
 }
