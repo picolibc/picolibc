@@ -638,6 +638,10 @@ dll_crt0_1 ()
   threadname_init ();
   debug_init ();
 
+  /* Allow backup semantics. It's better done only once on process start
+     instead of each time a file is opened. */
+  set_process_privileges ();
+  
   /* Initialize SIGSEGV handling, etc...  Because the exception handler
      references data in the shared area, this must be done after
      shared_init. */

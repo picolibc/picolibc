@@ -114,54 +114,6 @@ fhandler_base::get_readahead_into_buffer (char *buf, size_t buflen)
   return copied_chars;
 }
 
-uid_t __stdcall
-get_file_owner (int use_ntsec, const char *filename)
-{
-  if (use_ntsec && allow_ntsec)
-    {
-      extern LONG ReadSD(const char *, PSECURITY_DESCRIPTOR, LPDWORD);
-      DWORD sd_size = 4096;
-      char psd_buffer[4096];
-      PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) psd_buffer;
-      PSID psid;
-      BOOL bOwnerDefaulted = TRUE;
-
-      if (ReadSD (filename, psd, &sd_size) <= 0)
-        return getuid();
-
-      if (!GetSecurityDescriptorOwner (psd, &psid, &bOwnerDefaulted))
-        return getuid ();
-
-      return psid ? get_uid_from_sid (psid) : getuid ();
-    }
-
-  return getuid();
-}
-
-gid_t __stdcall
-get_file_group (int use_ntsec, const char *filename)
-{
-  if (use_ntsec && allow_ntsec)
-    {
-      extern LONG ReadSD(const char *, PSECURITY_DESCRIPTOR, LPDWORD);
-      DWORD sd_size = 4096;
-      char psd_buffer[4096];
-      PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) psd_buffer;
-      PSID psid;
-      BOOL bGroupDefaulted = TRUE;
-
-      if (ReadSD (filename, psd, &sd_size) <= 0)
-        return getgid();
-
-      if (!GetSecurityDescriptorGroup (psd, &psid, &bGroupDefaulted))
-        return getgid ();
-
-      return psid ? get_gid_from_sid (psid) : getuid ();
-    }
-
-  return getgid ();
-}
-
 /**********************************************************************/
 /* fhandler_base */
 
@@ -959,14 +911,16 @@ fhandler_disk_file::fstat (struct stat *buf)
 
   buf->st_blksize = S_BLKSIZE;
   buf->st_blocks  = (buf->st_size + S_BLKSIZE-1) / S_BLKSIZE;
-  buf->st_uid     = get_file_owner (has_acls (), get_win32_name ());
-  buf->st_gid     = get_file_group (has_acls (), get_win32_name ());
 
   /* Using a side effect: get_file_attibutes checks for
      directory. This is used, to set S_ISVTX, if needed.  */
   if (local.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
     buf->st_mode |= S_IFDIR;
-  if (! get_file_attribute (has_acls (), get_win32_name (), &buf->st_mode))
+  if (! get_file_attribute (has_acls (),
+                            get_win32_name (),
+                            &buf->st_mode,
+                            &buf->st_uid,
+                            &buf->st_gid))
     {
       /* If read-only attribute is set, modify ntsec return value */
       if (local.dwFileAttributes & FILE_ATTRIBUTE_READONLY)

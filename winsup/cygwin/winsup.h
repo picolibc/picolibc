@@ -414,7 +414,9 @@ const char * __stdcall find_exec (const char *name, char *buf, const char *winen
 			int null_if_notfound = 0, const char **known_suffix = NULL);
 
 /* File manipulation */
-int __stdcall get_file_attribute (int, const char *, int *);
+int __stdcall set_process_privileges ();
+int __stdcall get_file_attribute (int, const char *, int *,
+                                  uid_t * = NULL, gid_t * = NULL);
 int __stdcall set_file_attribute (int, const char *, int);
 int __stdcall set_file_attribute (int, const char *, uid_t, gid_t, int, const char *);
 void __stdcall set_std_handle (int);

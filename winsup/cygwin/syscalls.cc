@@ -659,7 +659,9 @@ chown (const char * name, uid_t uid, gid_t gid)
         attrib |= S_IFDIR;
       int has_acls;
       has_acls = allow_ntsec && win32_path.has_acls ();
-      res = get_file_attribute (has_acls, win32_path.get_win32 (), (int *) &attrib);
+      res = get_file_attribute (has_acls,
+                                win32_path.get_win32 (),
+                                (int *) &attrib);
       if (!res)
 	res = set_file_attribute (win32_path.has_acls (),
                                   win32_path.get_win32 (),
@@ -723,14 +725,15 @@ chmod (const char *path, mode_t mode)
       SetFileAttributesA (win32_path.get_win32 (),
 			  attr & ~FILE_ATTRIBUTE_READONLY);
 
-      int has_acls = allow_ntsec && win32_path.has_acls ();
-      uid_t uid = get_file_owner (has_acls, win32_path.get_win32 ());
-      if (! set_file_attribute (has_acls, win32_path.get_win32 (),
-				uid,
-				get_file_group (has_acls,
-                                                win32_path.get_win32 ()),
-				mode,
-                                myself->logsrv)
+      uid_t uid;
+      gid_t gid;
+      get_file_attribute (win32_path.has_acls (),
+                          win32_path.get_win32 (),
+                          NULL, &uid, &gid);
+      if (! set_file_attribute (win32_path.has_acls (),
+                                win32_path.get_win32 (),
+				uid, gid,
+				mode, myself->logsrv)
 	  && allow_ntsec)
 	res = 0;
 
@@ -903,7 +906,8 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
   int res = -1;
   int atts;
   char *win32_name;
-  char drive[4] = "X:\\";
+  char root[MAX_PATH];
+  UINT dtype;
   MALLOC_CHECK;
 
   debug_printf ("%s (%s, %p)", caller, name, buf);
@@ -945,14 +949,13 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 
   debug_printf ("%d = GetFileAttributesA (%s)", atts, win32_name);
 
-  drive[0] = win32_name[0];
-  UINT dtype;
+  strcpy (root, win32_name);
+  dtype = GetDriveType (rootdir (root));
 
   if (atts == -1 || !(atts & FILE_ATTRIBUTE_DIRECTORY) ||
       (os_being_run == winNT
-       && (((dtype = GetDriveType (drive)) != DRIVE_NO_ROOT_DIR
-	     //&& dtype != DRIVE_REMOTE
-	     && dtype != DRIVE_UNKNOWN))))
+       && dtype != DRIVE_NO_ROOT_DIR
+       && dtype != DRIVE_UNKNOWN))
     {
       fhandler_disk_file fh (NULL);
 
@@ -961,28 +964,30 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 	{
 	  res = fh.fstat (buf);
 	  fh.close ();
+          /* See the comment 10 lines below */
 	  if (atts != -1 && (atts & FILE_ATTRIBUTE_DIRECTORY))
-	    buf->st_nlink = num_entries (win32_name);
+            buf->st_nlink =
+                (dtype == DRIVE_REMOTE ? 2 : num_entries (win32_name));
 	}
     }
   else
     {
       WIN32_FIND_DATA wfd;
       HANDLE handle;
-      /* hmm, the number of links to a directory includes the
-	 number of entries in the directory, since all the things
-	 in the directory point to it */
-      buf->st_nlink += num_entries (win32_name);
+      /* The number of links to a directory includes the
+	 number of subdirectories in the directory, since all
+         those subdirectories point to it.
+         This is too slow on remote drives, so we do without it and
+         set the number of links to 2. */
+      buf->st_nlink = (dtype == DRIVE_REMOTE ? 2 : num_entries (win32_name));
       buf->st_dev = FHDEVN(FH_DISK) << 8;
       buf->st_ino = hash_path_name (0, real_path.get_win32 ());
       buf->st_mode = S_IFDIR | STD_RBITS | STD_XBITS;
       if ((atts & FILE_ATTRIBUTE_READONLY) == 0)
 	buf->st_mode |= STD_WBITS;
 
-      int has_acls = allow_ntsec && real_path.has_acls ();
-
-      buf->st_uid = get_file_owner (has_acls, real_path.get_win32 ());
-      buf->st_gid = get_file_group (has_acls, real_path.get_win32 ());
+      get_file_attribute (real_path.has_acls (), real_path.get_win32 (),
+                          NULL, &buf->st_uid, &buf->st_gid);
 
       if ((handle = FindFirstFile (real_path.get_win32(), &wfd)) != INVALID_HANDLE_VALUE)
 	{

@@ -380,9 +380,17 @@ out:
   strcpy (root, full_path);
   if (!rootdir (root) ||
       !GetVolumeInformation (root, NULL, 0, &serial, NULL, &volflags, NULL, 0))
-    set_has_acls (FALSE);
+    {
+      debug_printf ("GetVolumeInformation(%s) = ERR, full_path(%s), set_has_acls(FALSE)",
+                    root, full_path, GetLastError ());
+      set_has_acls (FALSE);
+    }
   else
-    set_has_acls (volflags & FS_PERSISTENT_ACLS);
+    {
+      debug_printf ("GetVolumeInformation(%s) = OK, full_path(%s), set_has_acls(%d)",
+                    root, full_path, volflags & FS_PERSISTENT_ACLS);
+      set_has_acls (volflags & FS_PERSISTENT_ACLS);
+    }
 }
 
 #define deveq(s) (strcasematch (name, (s)))
@@ -997,7 +1005,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
       if (slash_drive_prefix_p (pathbuf))
 	slash_drive_to_win32_path (pathbuf, dst, trailing_slash_p);
       else
-	backslashify (src_path, dst, trailing_slash_p);	/* just convert */
+	backslashify (pathbuf, dst, trailing_slash_p);	/* just convert */
       *flags = 0;
     }
   else
@@ -2370,7 +2378,7 @@ get_current_directory_name ()
 
 /* getcwd */
 
-static char *
+char *
 getcwd_inner (char *buf, size_t ulen, int posix_p)
 {
   char *resbuf = NULL;

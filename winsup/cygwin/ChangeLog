@@ -1,3 +1,32 @@
+Thu Mar 16 14:15:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * security.cc (set_process_privileges): Removed `static'.
+        (get_nt_attribute): Returns uid and gid additionally. Removed call
+        to set_process_privileges().
+        (get_file_attribute): Returns uid and gid additionally. Don't
+        call ntea if ntsec is ON.
+        (set_nt_attribute): Removed call to set_process_privileges().
+        Don't call ntea if ntsec is ON.
+        (acl): Removed call to set_process_privileges().
+        * dcrt0.cc (dll_crt0_1): Calls set_process_privileges() now.
+        * winsup.h: New prototype for set_process_privileges(),
+        changed prototype for get_file_attribute().
+        * fhandler.cc (get_file_owner): Discarded.
+        (get_file_group): Ditto.
+        (fhandler_disk_file::fstat): Discard calls to get_file_owner() and
+        get_file_group().
+        * path.cc (path_conv::path_conv): Added debugging output for result
+        of GetVolumeInformation().
+        (mount_info::conv_to_win32_path): Call backslashify() with pathbuf
+        instead of src_path.
+        * syscalls.cc (chown): Reformatted.
+        (chmod): Replace get_file_owner() and get_file_group() calls
+        by a call to get_file_attribute(). Discard local variable has_acls.
+        Slightly reformatted.
+        (stat_worker): Replaced idiot's (it's me) root dir check by call
+        to rootdir(). Don't call num_entries() on remote drives.
+        Discard local variable has_acls.
+
 Wed Mar 15 20:38:06 2000  Corinna Vinschen <corinna@vinschen.de>
 
         * errno.cc: Map ERROR_NOACCESS to EFAULT.

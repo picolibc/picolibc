@@ -532,7 +532,7 @@ WriteSD(const char *file, PSECURITY_DESCRIPTOR sdBuf, DWORD sdBufSize)
   return 0;
 }
 
-static int
+int
 set_process_privileges ()
 {
   HANDLE hProcess = NULL;
@@ -597,15 +597,13 @@ out:
 }
 
 static int
-get_nt_attribute (const char *file, int *attribute)
+get_nt_attribute (const char *file, int *attribute,
+                  uid_t *uidret, gid_t *gidret)
 {
   if (os_being_run != winNT)
     return 0;
 
   syscall_printf ("file: %s", file);
-
-  if (set_process_privileges () < 0)
-    return -1;
 
   /* Yeah, sounds too much, but I've seen SDs of 2100 bytes! */
   DWORD sd_size = 4096;
@@ -638,15 +636,28 @@ get_nt_attribute (const char *file, int *attribute)
       return -1;
     }
 
-  if (! acl_exists || ! acl)
+  uid_t uid = get_uid_from_sid (owner_sid);
+  gid_t gid = get_gid_from_sid (group_sid);
+  if (uidret)
+    *uidret = uid;
+  if (gidret)
+    *gidret = gid;
+
+  if (! attribute)
     {
-      *attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
-      syscall_printf ("file: %s No ACL = %x", file, *attribute);
+      syscall_printf ("file: %s uid %d, gid %d", uid, gid);
       return 0;
     }
 
-  BOOL grp_member = is_grp_member (get_uid_from_sid (owner_sid),
-                                   get_gid_from_sid (group_sid));
+  BOOL grp_member = is_grp_member (uid, gid);
+
+  if (! acl_exists || ! acl)
+    {
+      *attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
+      syscall_printf ("file: %s No ACL = %x, uid %d, gid %d",
+                      file, *attribute, uid, gid);
+      return 0;
+    }
 
   ACCESS_ALLOWED_ACE *ace;
   int allow = 0;
@@ -722,38 +733,35 @@ get_nt_attribute (const char *file, int *attribute)
   *attribute &= ~(S_IRWXU|S_IRWXG|S_IRWXO|S_ISVTX);
   *attribute |= allow;
   *attribute &= ~deny;
-  syscall_printf ("file: %s %x", file, *attribute);
+  syscall_printf ("file: %s %x, uid %d, gid %d", file, *attribute, uid, gid);
   return 0;
 }
 
 int
-get_file_attribute (int use_ntsec, const char *file, int *attribute)
+get_file_attribute (int use_ntsec, const char *file, int *attribute,
+                    uid_t *uidret, gid_t *gidret)
 {
-  if (!attribute)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-
-  int res;
-
   if (use_ntsec && allow_ntsec)
-    {
-      res = get_nt_attribute (file, attribute);
-      if (!res)
-        return 0;
-    }
+    return get_nt_attribute (file, attribute, uidret, gidret);
 
-  res = NTReadEA (file, ".UNIXATTR", (char *) attribute, sizeof (*attribute));
+  if (uidret)
+    *uidret = getuid ();
+  if (gidret)
+    *gidret = getgid ();
+
+  if (! attribute)
+    return 0;
+
+  int res = NTReadEA (file, ".UNIXATTR",
+                      (char *) attribute, sizeof (*attribute));
 
   // symlinks are anything for everyone!
   if ((*attribute & S_IFLNK) == S_IFLNK)
     *attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
 
-  if (res > 0)
-    return 0;
-  set_errno (ENOSYS);
-  return -1;
+  if (res <= 0)
+    set_errno (ENOSYS);
+  return res > 0 ? 0 : -1;
 }
 
 BOOL add_access_allowed_ace (PACL acl, int offset, DWORD attributes,
@@ -1020,9 +1028,6 @@ set_nt_attribute (const char *file, uid_t uid, gid_t gid,
   if (os_being_run != winNT)
     return 0;
 
-  if (set_process_privileges () < 0)
-    return -1;
-
   DWORD sd_size = 4096;
   char sd_buf[4096];
   PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) sd_buf;
@@ -1050,11 +1055,10 @@ set_file_attribute (int use_ntsec, const char *file,
   if ((attribute & S_IFLNK) == S_IFLNK)
     attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
 
-  BOOL ret = NTWriteEA (file, ".UNIXATTR",
-			(char *) &attribute, sizeof (attribute));
   if (!use_ntsec || !allow_ntsec)
     {
-      if (! ret)
+      if (! NTWriteEA (file, ".UNIXATTR",
+                       (char *) &attribute, sizeof (attribute)))
 	{
 	  __seterrno ();
 	  return -1;
@@ -1062,10 +1066,10 @@ set_file_attribute (int use_ntsec, const char *file,
       return 0;
     }
 
-  int ret2 = set_nt_attribute (file, uid, gid, logsrv, attribute);
+  int ret = set_nt_attribute (file, uid, gid, logsrv, attribute);
   syscall_printf ("%d = set_file_attribute (%s, %d, %d, %p)",
-		  ret2, file, uid, gid, attribute);
-  return ret2;
+		  ret, file, uid, gid, attribute);
+  return ret;
 }
 
 int
@@ -1518,9 +1522,6 @@ extern "C"
 int
 acl (const char *path, int cmd, int nentries, aclent_t *aclbufp)
 {
-  if (set_process_privileges () < 0)
-    return -1;
-
   path_conv real_path (path);
   if (real_path.error)
     {
