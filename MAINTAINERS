@@ -1,0 +1,75 @@
+Please feel free to add, edit, delete this file.
+Please do not make ChangeLog entries.
+
+COPYING, COPYING.LIB, README
+	http://gnu.org.
+
+Makefile.in, configure, configure.in
+	Please notify the following of any committed patches.
+		bfd@sourceware.cygnus.com
+		gdb-patches@sourceware.cygnus.com
+
+bfd/, binutils/, gas/, gprof/, ld/, opcodes/ & BFD's part of include/
+	binutils: http://sourceware.cygnus.com/binutils/
+	Patches to binutils@sourceware.cygnus.com.
+	Please notify the following of any interface changes:
+		gdb-patches@sourceware.cygnus.com
+
+config.guess, config.sub
+	config: http://gnu.org
+	Changes need to be done in tandem with the official CONFIG
+	sources or submitted to the master file maintainer and brought
+	in via a merge.
+
+libiberty/ & libiberty's part of include/ 
+	gcc: http://gcc.gnu.org
+	Changes need to be done in tandem with the official GCC
+	sources or submitted to the master file maintainer and brought
+	in via a merge.
+
+ltconfig, ltmain.sh
+	libtool: http://gnu.org
+	Changes need to be done in tandem with the official LIBTOOL
+	sources or submitted to the master file maintainer and brought
+	in via a merge.
+
+mkinstalldirs, move-if-change, symlink-tree
+	autoconf: http://gnu.org
+	Change need to be done in tandem with the official AUTOCONF
+	sources or submitted to the master file maintainer and brought
+	in via a merge.
+
+newlib/, libgloss/
+	http://sourceware.cygnus.com/newlib/
+	Patches to newlib@sourceware.cygnus.com.
+
+gdb/, mmalloc/, readline/, sim/ & GDB's part of include/
+	gdb: http://sourceware.cygnus.com/gdb/
+	Patches to gdb-patches@sourceware.cygnus.com.
+	See also gdb/MAINTAINERS, sim/MAINTAINERS, mmalloc/MAINTAINERS.
+
+itcl/, tcl/, tix/, tk/, libgui/
+	insight: http://sourceware.cygnus.com/insight/
+	Contact insight@sourceware.cygnus.com.
+
+winsup/
+	cygwin: http://sourceware.cygnus.com/cygwin
+	Contact cygwin@sourceware.cygnus.com.
+	See also winsup/MAINTAINERS.
+
+expect/, dejagnu/, config-ml.in, mpw-README, mpw-build.in,
+mpw-config.in, mpw-configure, mpw-install, setup.com, texinfo/,
+missing, makefile.vms, utils/, config/, config.if, makefile.vms,
+missing, ylwrap, mkdep, etc/, install-sh, intl/
+	?
+
+modules file
+	Obviously changes to this file should not go through
+	overseers@sourceware.cygnus.com.  If you understand the file
+	format (or can cut-and-paste existing entries), modify it. If
+	it scares you, get someone who does understand it to help you.
+	Be prepared to fix it if you do break it.
+
+/* Local variables: */
+/* change-log-default-name: "/dev/null" */
+/* End: */
