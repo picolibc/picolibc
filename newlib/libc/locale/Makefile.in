@@ -110,7 +110,7 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = locale.c
+LIB_SOURCES = timelocal.h timelocal.c ldpart.h ldpart.c fix_grouping.c locale.c nl_langinfo.c lnumeric.h lnumeric.c lmonetary.h lmonetary.c lmessages.h lmessages.c
 
 liblocale_la_LDFLAGS = -Xcompiler -nostdlib
 
@@ -139,11 +139,16 @@ DEFS = @DEFS@ -I. -I$(srcdir)
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 lib_a_LIBADD = 
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  locale.$(OBJEXT)
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  timelocal.$(OBJEXT) ldpart.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@fix_grouping.$(OBJEXT) locale.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@nl_langinfo.$(OBJEXT) lnumeric.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@lmonetary.$(OBJEXT) lmessages.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 liblocale_la_LIBADD = 
-@USE_LIBTOOL_TRUE@liblocale_la_OBJECTS =  locale.lo
+@USE_LIBTOOL_TRUE@liblocale_la_OBJECTS =  timelocal.lo ldpart.lo \
+@USE_LIBTOOL_TRUE@fix_grouping.lo locale.lo nl_langinfo.lo lnumeric.lo \
+@USE_LIBTOOL_TRUE@lmonetary.lo lmessages.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

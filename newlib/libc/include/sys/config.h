@@ -3,6 +3,10 @@
 
 #include <machine/ieeefp.h>  /* floating point macros */
 
+/* Length of longest possible multibyte sequence among all supported
+   locales. */
+#define MB_LEN_MAX 8
+
 /* exceptions first */
 #if defined(__H8300__) || defined(__H8500__) || defined (__H8300H__) ||  defined(__W65__) || defined (__H8300S__)
 #define __SMALL_BITFIELDS

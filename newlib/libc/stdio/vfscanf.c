@@ -107,6 +107,8 @@ Supporting OS subroutines required:
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <wchar.h>
+#include <string.h>
 #ifdef _HAVE_STDC
 #include <stdarg.h>
 #else
@@ -257,7 +259,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
   char buf[BUF];		/* buffer for numeric conversions */
   char *lptr;                   /* literal pointer */
 #ifdef MB_CAPABLE
-  int state = 0;                /* value to keep track of multibyte state */
+  mbstate_t state;                /* value to keep track of multibyte state */
 #endif
 
   short *sp;
@@ -283,6 +285,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 #ifndef MB_CAPABLE
       wc = *fmt;
 #else
+      memset (&state, '\0', sizeof (state));
       nbytes = _mbtowc_r (rptr, &wc, fmt, MB_CUR_MAX, &state);
 #endif
       fmt += nbytes;

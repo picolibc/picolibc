@@ -4,7 +4,7 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = locale.c
+LIB_SOURCES = timelocal.h timelocal.c ldpart.h ldpart.c fix_grouping.c locale.c nl_langinfo.c lnumeric.h lnumeric.c lmonetary.h lmonetary.c lmessages.h lmessages.c
 
 liblocale_la_LDFLAGS = -Xcompiler -nostdlib
 

@@ -79,7 +79,15 @@ LIB_SOURCES = \
 	wcstombs.c	\
 	wcstombs_r.c	\
 	wctomb.c	\
-	wctomb_r.c
+	wctomb_r.c	\
+	btowc.c		\
+	mbrlen.c	\
+	mbrtowc.c	\
+	mbsinit.c	\
+	mbsrtowcs.c	\
+	wcrtomb.c	\
+	wcsrtombs.c	\
+	wctob.c
 
 # Because of how libtool moves objects around, mallocr must be built last.
 LIBADD_OBJS = freer.$(oext) reallocr.$(oext) callocr.$(oext) cfreer.$(oext) malignr.$(oext) \

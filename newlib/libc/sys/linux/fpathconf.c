@@ -215,7 +215,7 @@ posix_fpathconf (fd, name)
 	/* AIO is only allowed on regular files and block devices.  */
 	struct stat64 st;
 
-	if (__fxstat64 (_STAT_VER, fd, &st) < 0
+	if (fstat64 (fd, &st) < 0
 	    || (! S_ISREG (st.st_mode) && ! S_ISBLK (st.st_mode)))
 	  return -1;
 	else

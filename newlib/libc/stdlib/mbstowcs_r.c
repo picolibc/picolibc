@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <wchar.h>
 
 size_t
 _DEFUN (_mbstowcs_r, (reent, pwcs, s, n, state),
@@ -6,7 +7,7 @@ _DEFUN (_mbstowcs_r, (reent, pwcs, s, n, state),
         wchar_t       *pwcs _AND
         const char    *s    _AND
         size_t         n    _AND
-        int           *state)
+        mbstate_t     *state)
 {
   wchar_t *ptr = pwcs;
   size_t max = n;
@@ -16,7 +17,7 @@ _DEFUN (_mbstowcs_r, (reent, pwcs, s, n, state),
   while (n > 0)
     {
       bytes = _mbtowc_r (r, ptr, t, MB_CUR_MAX, state);
-      if (bytes == -1)
+      if (bytes < 0)
         return -1;
       else if (bytes == 0)
         return ptr - pwcs;

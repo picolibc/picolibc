@@ -2,7 +2,7 @@
 
 AUTOMAKE_OPTIONS = cygnus
 
-INCLUDES = -I$(srcdir)/include $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+INCLUDES = -I$(srcdir)/include $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS) $(INCLTDL)
 
 SUBDIRS = machine \
 	cmath \
@@ -76,6 +76,8 @@ LIB_SOURCES = \
 	pread.c \
 	pread64.c \
 	process.c \
+	prof-freq.c \
+	profile.c \
 	psignal.c \
 	pvallocr.c \
 	pwrite.c \
@@ -165,8 +167,19 @@ lib.a:  $(ADD_OBJS) $(lib_a_OBJECTS)
 
 endif # USE_LIBTOOL
 
-
-include $(srcdir)/../../../Makefile.shared
+objectlist.awk.in: $(noinst_LTLIBRARIES) $(SUBLIBS)
+	-rm -f objectlist.awk.in
+	for i in `ls *.lo` ; \
+	  do \
+	    echo $$i `pwd`/$$i >> objectlist.awk.in ; \
+	done
+	for j in $(SUBLIBS) ; \
+	  do \
+	    export i=`echo $$j | sed -e 's,\(.*\)\/[^\/]*$$,\1,'`; \
+	    if test $$i != "." && test -f $$i/objectlist.awk.in; then \
+	    	cat $$i/objectlist.awk.in >> objectlist.awk.in ; \
+	    fi; \
+	done
 
 all: crt0.o crt1.o
 

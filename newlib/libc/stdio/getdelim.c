@@ -109,21 +109,24 @@ __getdelim (bufptr, n, delim, fp)
             }
         }
 
-      /* Buffer is too small so reallocate a larger buffer.  */
-      pos = ptr - buf;
-      newsize = (*n << 1);
-      buf = realloc (buf, newsize);
-      if (buf == NULL)
+      if (cont)
         {
-          cont = 0;
-          break;
-        }
+          /* Buffer is too small so reallocate a larger buffer.  */
+          pos = ptr - buf;
+          newsize = (*n << 1);
+          buf = realloc (buf, newsize);
+          if (buf == NULL)
+            {
+              cont = 0;
+              break;
+            }
 
-      /* After reallocating, continue in new buffer */          
-      *bufptr = buf;
-      *n = newsize;
-      ptr = buf + pos;
-      numbytes = newsize - pos;
+          /* After reallocating, continue in new buffer */          
+          *bufptr = buf;
+          *n = newsize;
+          ptr = buf + pos;
+          numbytes = newsize - pos;
+        }
     }
 
   _funlockfile (fp);

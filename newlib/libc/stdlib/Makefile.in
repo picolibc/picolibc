@@ -185,7 +185,15 @@ LIB_SOURCES = \
 	wcstombs.c	\
 	wcstombs_r.c	\
 	wctomb.c	\
-	wctomb_r.c
+	wctomb_r.c	\
+	btowc.c		\
+	mbrlen.c	\
+	mbrtowc.c	\
+	mbsinit.c	\
+	mbsrtowcs.c	\
+	wcrtomb.c	\
+	wcsrtombs.c	\
+	wctob.c
 
 
 # Because of how libtool moves objects around, mallocr must be built last.
@@ -294,7 +302,10 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@strtoull_r.$(OBJEXT) system.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@valloc.$(OBJEXT) wcstombs.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@wcstombs_r.$(OBJEXT) wctomb.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@wctomb_r.$(OBJEXT)
+@USE_LIBTOOL_FALSE@wctomb_r.$(OBJEXT) btowc.$(OBJEXT) mbrlen.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@mbrtowc.$(OBJEXT) mbsinit.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@mbsrtowcs.$(OBJEXT) wcrtomb.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wcsrtombs.$(OBJEXT) wctob.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 @USE_LIBTOOL_TRUE@libstdlib_la_DEPENDENCIES =  freer.$(oext) \
@@ -318,7 +329,8 @@ LTLIBRARIES =  $(noinst_LTLIBRARIES)
 @USE_LIBTOOL_TRUE@strtod.lo strtol.lo strtoll.lo strtoll_r.lo \
 @USE_LIBTOOL_TRUE@strtoul.lo strtoull.lo strtoull_r.lo system.lo \
 @USE_LIBTOOL_TRUE@valloc.lo wcstombs.lo wcstombs_r.lo wctomb.lo \
-@USE_LIBTOOL_TRUE@wctomb_r.lo
+@USE_LIBTOOL_TRUE@wctomb_r.lo btowc.lo mbrlen.lo mbrtowc.lo mbsinit.lo \
+@USE_LIBTOOL_TRUE@mbsrtowcs.lo wcrtomb.lo wcsrtombs.lo wctob.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

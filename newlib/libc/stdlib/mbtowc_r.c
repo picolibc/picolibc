@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <locale.h>
 #include "mbctype.h"
+#include <wchar.h>
+#include <string.h>
 
 #ifdef MB_CAPABLE
 typedef enum { ESCAPE, DOLLAR, BRACKET, AT, B, J, 
@@ -51,7 +53,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
         wchar_t       *pwc _AND 
         const char    *s   _AND        
         size_t         n   _AND
-        int           *state)
+        mbstate_t      *state)
 {
   wchar_t dummy;
   unsigned char *t = (unsigned char *)s;
@@ -60,13 +62,13 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
     pwc = &dummy;
 
   if (s != NULL && n == 0)
-    return -1;
+    return -2;
 
 #ifdef MB_CAPABLE
   if (r->_current_locale == NULL ||
       (strlen (r->_current_locale) <= 1))
     { /* fall-through */ }
-  else if (!strcmp (r->_current_locale, "UTF-8"))
+  else if (!strcmp (r->_current_locale, "C-UTF-8"))
     {
       wchar_t char1 = 0;
 
@@ -139,7 +141,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
                 return 3;
             }
           else
-            return -1;
+            return -2;
         }
       else if (char1 >= 0xf0 && char1 <= 0xf7)
         {
@@ -172,7 +174,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
               return 4;
             }
           else
-            return -1;
+            return -2;
         }
       else if (char1 >= 0xf8 && char1 <= 0xfb)
         {
@@ -208,7 +210,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
               return 5;
             }
           else
-            return -1;
+            return -2;
         }
       else if (char1 >= 0xfc && char1 <= 0xfd)
         {
@@ -248,7 +250,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
               return 6;
             }
           else
-            return -1;
+            return -2;
         }
       else
         return -1;
@@ -263,7 +265,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
         {
           int char2 = t[1];
           if (n <= 1)
-            return -1;
+            return -2;
           if (_issjis2 (char2))
             {
               *pwc = (((wchar_t)*t) << 8) + (wchar_t)(*(t+1));
@@ -283,7 +285,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
         {
           int char2 = t[1];     
           if (n <= 1)
-            return -1;
+            return -2;
           if (_iseucjp (char2))
             {
               *pwc = (((wchar_t)*t) << 8) + (wchar_t)(*(t+1));
@@ -303,11 +305,11 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
  
       if (s == NULL)
         {
-          *state = 0;
+          state->__count = 0;
           return 1;  /* state-dependent */
         }
 
-      curr_state = (*state == 0 ? ASCII : JIS);
+      curr_state = (state->__count == 0 ? ASCII : JIS);
       ptr = t;
 
       for (i = 0; i < n; ++i)
@@ -351,19 +353,19 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
             case NOOP:
               break;
             case EMPTY:
-              *state = 0;
+              state->__count = 0;
               *pwc = (wchar_t)0;
               return i;
             case COPY_A:
-	      *state = 0;
+	      state->__count = 0;
               *pwc = (wchar_t)*ptr;
               return (i + 1);
             case COPY_J:
-              *state = 0;
+              state->__count = 0;
               *pwc = (((wchar_t)*ptr) << 8) + (wchar_t)(*(ptr+1));
               return (i + 1);
             case COPY_J2:
-              *state = 1;
+              state->__count = 1;
               *pwc = (((wchar_t)*ptr) << 8) + (wchar_t)(*(ptr+1));
               return (ptr - t) + 2;
             case MAKE_A:
@@ -377,7 +379,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
 
         }
 
-      return -1;  /* n < bytes needed */
+      return -2;  /* n < bytes needed */
     }
 #endif /* MB_CAPABLE */               
 
@@ -392,4 +394,3 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
 
   return 1;
 }
-

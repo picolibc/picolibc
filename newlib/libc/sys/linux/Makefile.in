@@ -11,7 +11,6 @@
 # PARTICULAR PURPOSE.
 
 
-
 SHELL = @SHELL@
 
 srcdir = @srcdir@
@@ -97,7 +96,7 @@ sys_dir = @sys_dir@
 
 AUTOMAKE_OPTIONS = cygnus
 
-INCLUDES = -I$(srcdir)/include $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+INCLUDES = -I$(srcdir)/include $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS) $(INCLTDL)
 
 SUBDIRS = machine \
 	cmath \
@@ -173,6 +172,8 @@ LIB_SOURCES = \
 	pread.c \
 	pread64.c \
 	process.c \
+	prof-freq.c \
+	profile.c \
 	psignal.c \
 	pvallocr.c \
 	pwrite.c \
@@ -287,6 +288,7 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@mstats.$(OBJEXT) mtrim.$(OBJEXT) mtrimr.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@ntp_gettime.$(OBJEXT) pathconf.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@pread.$(OBJEXT) pread64.$(OBJEXT) process.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@prof-freq.$(OBJEXT) profile.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@psignal.$(OBJEXT) pvallocr.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@pwrite.$(OBJEXT) pwrite64.$(OBJEXT) raise.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@readdir64.$(OBJEXT) realloc.$(OBJEXT) \
@@ -325,10 +327,10 @@ LTLIBRARIES =  $(noinst_LTLIBRARIES)
 @USE_LIBTOOL_TRUE@mq_open.lo mq_receive.lo mq_send.lo mq_setattr.lo \
 @USE_LIBTOOL_TRUE@mq_unlink.lo msize.lo msizer.lo mstats.lo mtrim.lo \
 @USE_LIBTOOL_TRUE@mtrimr.lo ntp_gettime.lo pathconf.lo pread.lo \
-@USE_LIBTOOL_TRUE@pread64.lo process.lo psignal.lo pvallocr.lo \
-@USE_LIBTOOL_TRUE@pwrite.lo pwrite64.lo raise.lo readdir64.lo \
-@USE_LIBTOOL_TRUE@realloc.lo reallocr.lo realpath.lo rename.lo \
-@USE_LIBTOOL_TRUE@resource.lo scandir64.lo sched.lo select.lo \
+@USE_LIBTOOL_TRUE@pread64.lo process.lo prof-freq.lo profile.lo \
+@USE_LIBTOOL_TRUE@psignal.lo pvallocr.lo pwrite.lo pwrite64.lo raise.lo \
+@USE_LIBTOOL_TRUE@readdir64.lo realloc.lo reallocr.lo realpath.lo \
+@USE_LIBTOOL_TRUE@rename.lo resource.lo scandir64.lo sched.lo select.lo \
 @USE_LIBTOOL_TRUE@seteuid.lo sethostname.lo setrlimit64.lo shm_open.lo \
 @USE_LIBTOOL_TRUE@shm_unlink.lo sig.lo sigaction.lo sigqueue.lo \
 @USE_LIBTOOL_TRUE@signal.lo siglongjmp.lo sigset.lo sigwait.lo \
@@ -357,7 +359,7 @@ OBJECTS = $(lib_a_OBJECTS) $(liblinux_la_OBJECTS)
 all: all-redirect
 .SUFFIXES:
 .SUFFIXES: .S .c .lo .o .obj .s
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(srcdir)/../../../Makefile.shared
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
@@ -688,11 +690,18 @@ maintainer-clean
 @USE_LIBTOOL_FALSE@	$(RANLIB) $@
 @USE_LIBTOOL_FALSE@	rm -rf tmp
 
-objectlist.awk.in: $(noinst_LTLIBRARIES)
+objectlist.awk.in: $(noinst_LTLIBRARIES) $(SUBLIBS)
 	-rm -f objectlist.awk.in
 	for i in `ls *.lo` ; \
-	do \
-	  echo $$i `pwd`/$$i >> objectlist.awk.in ; \
+	  do \
+	    echo $$i `pwd`/$$i >> objectlist.awk.in ; \
+	done
+	for j in $(SUBLIBS) ; \
+	  do \
+	    export i=`echo $$j | sed -e 's,\(.*\)\/[^\/]*$$,\1,'`; \
+	    if test $$i != "." && test -f $$i/objectlist.awk.in; then \
+	    	cat $$i/objectlist.awk.in >> objectlist.awk.in ; \
+	    fi; \
 	done
 
 all: crt0.o crt1.o

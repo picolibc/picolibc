@@ -51,6 +51,7 @@ effects vary with the locale.
 #ifndef _REENT_ONLY
 
 #include <stdlib.h>
+#include <wchar.h>
 
 size_t
 _DEFUN (wcstombs, (s, pwcs, n),
@@ -59,7 +60,8 @@ _DEFUN (wcstombs, (s, pwcs, n),
         size_t         n)
 {
 #ifdef MB_CAPABLE
-        int state = 0;
+        mbstate_t state;
+        state.__count = 0;
 
         return _wcstombs_r (_REENT, s, pwcs, n, &state);
 #else /* not MB_CAPABLE */

@@ -44,6 +44,7 @@ effects vary with the locale.
 #ifndef _REENT_ONLY
 
 #include <stdlib.h>
+#include <wchar.h>
 
 int
 _DEFUN (mblen, (s, n), 
@@ -51,9 +52,15 @@ _DEFUN (mblen, (s, n),
         size_t n)
 {
 #ifdef MB_CAPABLE
+        int retval = 0;
         _REENT_CHECK_MISC(_REENT);
 
-        return _mbtowc_r (_REENT, NULL, s, n, &(_REENT_MBLEN_STATE(_REENT)));
+        retval = _mbtowc_r (_REENT, NULL, s, n, &(_REENT_MBLEN_STATE(_REENT)));
+        if (retval < 0)
+          return -1;
+        else
+          return retval;
+
 #else /* not MB_CAPABLE */
         if (s == NULL || *s == '\0')
                 return 0;

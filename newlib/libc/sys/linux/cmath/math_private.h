@@ -200,6 +200,8 @@ extern int32_t __ieee754_rem_pio2 (double,double*);
 extern double __ieee754_scalb (double,double);
 #endif
 
+/* This is necessary because the hardware accelerated version of libm
+   does not provide the __ieee754 functions. */
 #define __ieee754_sinh   sinh
 #define __ieee754_hypot  hypot
 #define __ieee754_hypotf hypotf

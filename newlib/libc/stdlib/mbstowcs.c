@@ -50,6 +50,7 @@ effects vary with the locale.
 #ifndef _REENT_ONLY
 
 #include <stdlib.h>
+#include <wchar.h>
 
 size_t
 _DEFUN (mbstowcs, (pwcs, s, n),
@@ -58,7 +59,8 @@ _DEFUN (mbstowcs, (pwcs, s, n),
         size_t n)
 {
 #ifdef MB_CAPABLE
-        int state = 0;
+        mbstate_t state;
+        state.__count = 0;
 
         return _mbstowcs_r (_REENT, pwcs, s, n, &state);
 #else /* not MB_CAPABLE */

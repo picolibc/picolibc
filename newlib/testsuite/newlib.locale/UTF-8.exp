@@ -7,7 +7,7 @@
 load_lib checkoutput.exp
 
 set expected_output {
-"Set UTF-8 locale."
+"Set C-UTF-8 locale."
 "* U-00000000"
 "* U-00000080"
 "* U-00000800"

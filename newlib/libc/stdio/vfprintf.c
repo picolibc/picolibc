@@ -184,6 +184,8 @@ static char *rcsid = "$Id$";
 #include <stdlib.h>
 #include <string.h>
 #include <reent.h>
+#include <wchar.h>
+#include <string.h>
 
 #ifdef _HAVE_STDC
 #include <stdarg.h>
@@ -426,7 +428,7 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	struct __siov iov[NIOV];/* ... and individual io vectors */
 	char buf[BUF];		/* space for %c, %[diouxX], %[eEfgG] */
 	char ox[2];		/* space for 0x hex-prefix */
-        int state = 0;          /* mbtowc calls from library must not change state */
+        mbstate_t state;          /* mbtowc calls from library must not change state */
 
 	/*
 	 * Choose PADSIZE to trade efficiency vs. size.  If larger printf
@@ -439,6 +441,7 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	static _CONST char zeroes[PADSIZE] =
 	 {'0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'};
 
+        memset (&state, '\0', sizeof (state));
 	/*
 	 * BEWARE, these `goto error' on error, and PAD uses `n'.
 	 */
@@ -1367,13 +1370,15 @@ get_arg (int n, char *fmt, va_list *ap, int *numargs_p, union arg_val *args,
   STATE state, next_state;
   ACTION action;
   int pos, last_arg;
-  int wc_state = 0;
+  mbstate_t wc_state;
   int max_pos_arg = n;
   enum types { INT, LONG_INT, SHORT_INT, QUAD_INT, CHAR, CHAR_PTR, DOUBLE, LONG_DOUBLE };
   
   /* if this isn't the first call, pick up where we left off last time */
   if (*last_fmt != NULL)
     fmt = *last_fmt;
+
+  memset (&wc_state, '\0', sizeof (wc_state));
 
   /* we need to process either to end of fmt string or until we have actually
      read the desired parameter from the vararg list. */

@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <wchar.h>
 #include <locale.h>
 #include "mbctype.h"
 
@@ -8,11 +9,11 @@ _DEFUN (_wctomb_r, (r, s, wchar, state),
         struct _reent *r     _AND 
         char          *s     _AND
         wchar_t        wchar _AND
-        int           *state)
+        mbstate_t     *state)
 {
   if (strlen (r->_current_locale) <= 1)
     { /* fall-through */ }
-  else if (!strcmp (r->_current_locale, "UTF-8"))
+  else if (!strcmp (r->_current_locale, "C-UTF-8"))
     {
       if (s == NULL)
         return 0; /* UTF-8 encoding is not state-dependent */
@@ -125,10 +126,10 @@ _DEFUN (_wctomb_r, (r, s, wchar, state),
         /* first byte is non-zero..validate multi-byte char */
           if (_isjis (char1) && _isjis (char2)) 
             {
-              if (*state == 0)
+              if (state->__count == 0)
                 {
                   /* must switch from ASCII to JIS state */
-                  *state = 1;
+                  state->__count = 1;
                   *s++ = ESC_CHAR;
                   *s++ = '$';
                   *s++ = 'B';
@@ -143,10 +144,10 @@ _DEFUN (_wctomb_r, (r, s, wchar, state),
         }
       else
         {
-          if (*state != 0)
+          if (state->__count != 0)
             {
               /* must switch from JIS to ASCII state */
-              *state = 0;
+              state->__count = 0;
               *s++ = ESC_CHAR;
               *s++ = '(';
               *s++ = 'B';

@@ -44,13 +44,14 @@ effects vary with the locale.
 */
 
 #include <stdlib.h>
+#include <wchar.h>
 
 int
 _DEFUN (_mblen_r, (r, s, n, state), 
         struct _reent *r    _AND
         const char *s _AND
         size_t n _AND
-        int *state)
+        mbstate_t *state)
 {
 #ifdef MB_CAPABLE
 

@@ -242,7 +242,7 @@ fi
 # Enable printf positional argument support if requested.
 
 if [ "${newlib_io_pos_args}" = "yes" ] ; then
-        newlib_cflags="${newlib_cflags} -DWANT_IO_POS_ARGS"
+	newlib_cflags="${newlib_cflags} -DWANT_IO_POS_ARGS"
 fi
 
 # Verify if shared newlib support is allowed and set appropriate variables
@@ -338,6 +338,7 @@ case "${host}" in
 	##newlib_cflags="${newlib_cflags} -I`newlib-flags --kernel-dir`/include"
 	##newlib_cflags="${newlib_cflags} -idirafter ${gcc_dir}include"
 	;;
+
   m68hc11-*-*|m6811-*-*|m6812-*-*|m68hc12-*-*)
 	;;
 
@@ -500,8 +501,8 @@ case "${host}" in
 	syscall_dir=syscalls
 	;;
   m68hc11-*-*|m6811-*-*|m68hc12-*-*|m6812-*-*)
-        newlib_cflags="${newlib_cflags} -DNO_EXEC -DABORT_PROVIDED -DSMALL_MEMORY -DMISSING_SYSCALL_NAMES"
-        ;;
+	newlib_cflags="${newlib_cflags} -DNO_EXEC -DABORT_PROVIDED -DSMALL_MEMORY -DMISSING_SYSCALL_NAMES"
+	;;
   mcore-*-*)
 	newlib_cflags="${newlib_cflags}"
 	syscall_dir=syscalls

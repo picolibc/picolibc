@@ -1,3 +1,66 @@
+2002-08-22  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* libc/include/langinfo.h: New file.
+	* libc/include/wchar.h: Likewise.
+	* libc/include/sys/syslimits.h: Likewise.
+	* libc/locale/fix_grouping.c: Likewise.
+	* libc/locale/ldpart.c: Likewise.
+	* libc/locale/ldpart.h: Likewise.
+	* libc/locale/lmessages.c: Likewise.
+	* libc/locale/lmessages.h: Likewise.
+	* libc/locale/lmonetary.c: Likewise.
+	* libc/locale/lmonetary.h: Likewise.
+	* libc/locale/lnumeric.c: Likewise.
+	* libc/locale/lnumeric.h: Likewise.
+	* libc/locale/nl_langinfo.3: Likewise.
+	* libc/locale/nl_langinfo.c: Likewise.
+	* libc/locale/timelocal.c: Likewise.
+	* libc/locale/timelocal.h: Likewise.
+	* libc/stdlib/btowc.c: Likewise.
+	* libc/stdlib/mbrlen.c: Likewise.
+	* libc/stdlib/mbrtowc.c: Likewise.
+	* libc/stdlib/mbsinit.c: Likewise.
+	* libc/stdlib/mbsrtowcs.c: Likewise.
+	* libc/stdlib/wcrtomb.c: Likewise.
+	* libc/stdlib/wcsrtombs.c: Likewise.
+	* libc/stdlib/wctob.c: Likewise.
+	* libc/sys/linux/prof-freq.c: Likewise.
+	* libc/sys/linux/profile.c: Likewise.
+	* libc/sys/linux/machine/i386/dl-procinfo.c: Likewise.
+	* libc/sys/linux/machine/i386/dl-procinfo.h: Likewise.
+	* libc/include/stdlib.h: Change re-entrant functions to take
+	mbstate_t pointers.
+	* libc/include/sys/_types.h: Define _mbstate_t.
+	* libc/include/sys/config.h (MB_LEN_MAX): New macro.
+	* libc/include/sys/errno.h (EILSEQ): New error code.
+	* libc/include/sys/reent.h: Include wchar.h.  Change reentrant
+	structure to use mbstate_t.
+	* libc/locale/Makefile.am (LIB_SOURCES): Add new files.
+	* libc/machine/powerpc/vfprintf.c: Use mbstate_t.
+	* libc/machine/powerpc/vfscanf.c: Likewise.
+	* libc/stdio/getdelim.c: Reallocate buffer only when necessary.
+	* libc/stdio/vfprintf.c: Likewise.
+	* libc/stdio/vfscanf.c: Likewise.
+	* libc/stdlib/Makefile.am (LIB_SOURCES): Add new files.
+	* libc/stdlib/mblen.c: Use mbstate_t.
+	* libc/stdlib/mblen_r.c: Likewise.
+	* libc/stdlib/mbstowcs.c: Likewise.
+	* libc/stdlib/mbstowcs_r.c: Likewise.
+	* libc/stdlib/mbtowc.c: Likewise.
+	* libc/stdlib/mbtowc_r.c: Likewise.
+	* libc/stdlib/wcstombs.c: Likewise.
+	* libc/stdlib/wcstombs_r.c: Likewise.
+	* libc/stdlib/wctomb_r.c: Likewise.
+	* libc/sys/linux/Makefile.am (LIB_SOURCES): Add prof-freq.c and
+	profile.c.
+	* libc/sys/linux/machine/i386/Makefile.am (LIB_SOURCES): Add
+	dl-procinfo.c.
+	* libc/sys/linux/sys/errno.h (EILSEQ): New error code.
+	* libc/sys/linux/sys/types.h (off_t): Define type.
+	* testsuite/newlib.locale/UTF-8.c: Change locale name from UTF-8
+	to C-UTF-8.
+	* testsuite/newlib.locale/UTF-8.exp: Likewise.
+
 2002-08-20  Casper S. Hornstrup  <chorns@users.sourceforge.net>
 
         * libc/stdlib/mallocr.c: #include windows.h on Win32.

@@ -307,9 +307,9 @@ struct _misc_reent
 {
   /* miscellaneous reentrant data */
   char *_strtok_last;
-  int _mblen_state;
-  int _wctomb_state;
-  int _mbtowc_state;
+  _mbstate_t _mblen_state;
+  _mbstate_t _wctomb_state;
+  _mbstate_t _mbtowc_state;
   char _l64a_buf[8];
   int _getdate_err;
 };
@@ -463,9 +463,12 @@ struct _reent
 #define _REENT_INIT_MISC(var) do { \
   struct _reent *_r = (var); \
   _r->_misc->_strtok_last = _NULL; \
-  _r->_misc->_mblen_state = 0; \
-  _r->_misc->_wctomb_state = 0; \
-  _r->_misc->_mbtowc_state = 0; \
+  _r->_misc->_mblen_state.__count = 0; \
+  _r->_misc->_mblen_state.__value.__wch = 0; \
+  _r->_misc->_wctomb_state.__count = 0; \
+  _r->_misc->_wctomb_state.__value.__wch = 0; \
+  _r->_misc->_mbtowc_state.__count = 0; \
+  _r->_misc->_mbtowc_state.__value.__wch = 0; \
   _r->_misc->_l64a_buf[0] = '\0'; \
   _r->_misc->_getdate_err = 0; \
 } while (0)
@@ -537,9 +540,9 @@ struct _reent
           int _gamma_signgam;
           __extension__ unsigned long long _rand_next;
           struct _rand48 _r48;
-          int _mblen_state;
-          int _mbtowc_state;
-          int _wctomb_state;
+          _mbstate_t _mblen_state;
+          _mbstate_t _mbtowc_state;
+          _mbstate_t _wctomb_state;
           char _l64a_buf[8];
           char _signal_buf[_REENT_SIGNAL_SIZE];
           int _getdate_err;  
@@ -575,7 +578,7 @@ struct _reent
     { 0,0,0,0,0,0,0,0}, 0, 1, \
     {{_RAND48_SEED_0, _RAND48_SEED_1, _RAND48_SEED_2}, \
      {_RAND48_MULT_0, _RAND48_MULT_1, _RAND48_MULT_2}, _RAND48_ADD}, \
-    0, 0, 0, "", "", 0} } }
+    {0, {0}}, {0, {0}}, {0, {0}}, "", "", 0} } }
 
 #define _REENT_INIT_PTR(var) \
   { int i; \
@@ -612,9 +615,12 @@ struct _reent
     var->_new._reent._r48._mult[1] = _RAND48_MULT_1; \
     var->_new._reent._r48._mult[2] = _RAND48_MULT_2; \
     var->_new._reent._r48._add = _RAND48_ADD; \
-    var->_new._reent._mblen_state = 0; \
-    var->_new._reent._mbtowc_state = 0; \
-    var->_new._reent._wctomb_state = 0; \
+    var->_new._reent._mblen_state.__count = 0; \
+    var->_new._reent._mblen_state.__value.__wch = 0; \
+    var->_new._reent._mbtowc_state.__count = 0; \
+    var->_new._reent._mbtowc_state.__value.__wch = 0; \
+    var->_new._reent._wctomb_state.__count = 0; \
+    var->_new._reent._wctomb_state.__value.__wch = 0; \
     var->_new._reent._l64a_buf[0] = '\0'; \
     var->_new._reent._signal_buf[0] = '\0'; \
     var->_new._reent._getdate_err = 0; \

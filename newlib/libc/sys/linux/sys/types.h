@@ -149,6 +149,7 @@ typedef __ino64_t ino64_t;
 typedef __uint32_t uintptr_t;
 typedef __int32_t intptr_t;
 typedef __off64_t off64_t;
+typedef __off_t off_t;
 
 #if !defined(_ANSI_SOURCE) && !defined(_POSIX_SOURCE)
 typedef	struct _physadr {

@@ -107,6 +107,7 @@ Supporting OS subroutines required:
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <wchar.h>
 #include <string.h>
 #ifdef _HAVE_STDC
 #include <stdarg.h>
@@ -278,7 +279,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
   vec_union vec_buf;
   char *lptr;                   /* literal pointer */
 #ifdef MB_CAPABLE
-  int state;                    /* value to keep track of multibyte state */
+  mbstate_t state;                /* value to keep track of multibyte state */
 #endif
 
   char *ch_dest;

@@ -4,7 +4,7 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = get_clockfreq.c getpagesize.c hp-timing.c setjmp.S sigaction.c
+LIB_SOURCES = get_clockfreq.c getpagesize.c hp-timing.c setjmp.S sigaction.c dl-procinfo.c
 
 liblinuxi386_la_LDFLAGS = -Xcompiler -nostdlib
 

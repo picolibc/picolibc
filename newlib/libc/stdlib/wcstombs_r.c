@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <wchar.h>
 
 size_t
 _DEFUN (_wcstombs_r, (reent, s, pwcs, n, state),
@@ -6,7 +7,7 @@ _DEFUN (_wcstombs_r, (reent, s, pwcs, n, state),
         char          *s    _AND
         const wchar_t *pwcs _AND
         size_t         n    _AND
-        int           *state)
+        mbstate_t     *state)
 {
   char *ptr = s;
   size_t max = n;

@@ -18,4 +18,29 @@ typedef int _ssize_t;
 typedef long _ssize_t;
 #endif
 
+#define __need_wint_t
+#include <stddef.h>
+
+#ifndef _MBSTATE_T
+#define _MBSTATE_T
+/* Conversion state information.  */
+typedef struct
+{
+  int __count;
+  union
+  {
+    wint_t __wch;
+    char __wchb[4];
+  } __value;		/* Value so far.  */
+} _mbstate_t;
+#endif /* _MBSTATE_T */
+
+#ifdef __CYGWIN__
+# ifndef MBSTATE_T
+#  define MBSTATE_T
+typedef _mbstate_t mbstate_t;
+# endif /* MBSTATE_T */
+# define WEOF (0xffffffffu)
+#endif /* __CYGWIN__ */
+
 #endif	/* _SYS__TYPES_H */

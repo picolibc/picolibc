@@ -139,13 +139,13 @@ int main()
     int retval;
     int i;
 
-    if (!setlocale(LC_CTYPE, "UTF-8"))
+    if (!setlocale(LC_CTYPE, "C-UTF-8"))
       {
-        printf("Failed to set UTF-8 locale.\n");
+        printf("Failed to set C-UTF-8 locale.\n");
         return 1;
       }
     else
-      printf("Set UTF-8 locale.\n");
+      printf("Set C-UTF-8 locale.\n");
 
     /* 2  Boundary condition test cases */
     /* 2.1  First possible sequence of a certain length */
