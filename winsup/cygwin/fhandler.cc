@@ -974,16 +974,23 @@ fhandler_disk_file::fstat (struct stat *buf)
 		buf->st_mode |= S_IFREG;
 		if (!dont_care_if_execable () && !get_execable_p ())
 		  {
-		    DWORD done;
+		    DWORD cur, done;
 		    char magic[3];
-		    /* FIXME should we use /etc/magic ? */
-		    magic[0] = magic[1] = magic[2] = '\0';
-		    if (ReadFile (get_handle (), magic, 3, &done, 0)
-			&& done == 3)
+
+		    /* First retrieve current position, set to beginning
+		       of file if not already there. */
+		    cur = SetFilePointer (get_handle(), 0, NULL, FILE_CURRENT);
+		    if (cur != INVALID_SET_FILE_POINTER &&
+		        (!cur ||
+			 SetFilePointer (get_handle(), 0, NULL, FILE_BEGIN)
+			 != INVALID_SET_FILE_POINTER))
 		      {
-			if (has_exec_chars (magic, done))
-			  set_execable_p ();
-			SetFilePointer (get_handle(), -(LONG) done, NULL, FILE_CURRENT);
+			/* FIXME should we use /etc/magic ? */
+			magic[0] = magic[1] = magic[2] = '\0';
+			if (ReadFile (get_handle (), magic, 3, &done, 0) &&
+			    done == 3 && has_exec_chars (magic, done))
+			    set_execable_p ();
+			SetFilePointer (get_handle(), cur, NULL, FILE_BEGIN);
 		      }
 		  }
 		if (get_execable_p ())

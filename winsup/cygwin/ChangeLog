@@ -1,3 +1,8 @@
+Tue Jun  5 11:18:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_disk_file::fstat): Always reset file position
+	to original value after checking for executable magic.
+
 Mon Jun  4 16:21:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* cygheap.h (cygheap_user::cygheap_user): Initialize token to
