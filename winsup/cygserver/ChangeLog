@@ -1,3 +1,8 @@
+2003-07-25  Christopher Faylor  <cgf@redhat.com>
+
+	* configure.in: Always use install-sh.
+	* configure: Regenerate.
+
 2003-07-01  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in (OBJS): Move some more files from cygwin directory.

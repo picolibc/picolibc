@@ -83,6 +83,8 @@ if test "x$cross_compiling" = "xyes"; then
   fi
 fi
 
+INSTALL=`cd $srcdir/../..; echo $(pwd)/install-sh`
+
 AC_PROG_INSTALL
 
 AM_EXEEXT

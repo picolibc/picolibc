@@ -1,5 +1,10 @@
 2003-07-25  Christopher Faylor  <cgf@redhat.com>
 
+	* configure.in: Always use install-sh.
+	* configure: Regenerate.
+
+2003-07-25  Christopher Faylor  <cgf@redhat.com>
+
 	* include/cygwin/socket.h: Conditionalize [AP]F_INET6 define.
 
 2003-07-25  Christopher Faylor  <cgf@redhat.com>
