@@ -250,18 +250,7 @@ normalize_posix_path (const char *src, char *dst, char *&tail)
 		    break;
 		}
 	      else if (src[2] && !isslash (src[2]))
-		{
-		  if (src[2] == '.')
-		    {
-		      /* Is this a run of dots? That would be an invalid
-			 filename.  A bunch of leading dots would be ok,
-			 though. */
-		      int n = strspn (src, ".");
-		      if (!src[n] || isslash (src[n])) /* just dots... */
-			return ENOENT;
-		    }
-		  break;
-		}
+		break;
 	      else
 		{
 		  while (tail > dst && !isslash (*--tail))
@@ -438,7 +427,18 @@ void
 path_conv::set_normalized_path (const char *path_copy)
 {
   char *eopath = strchr (path, '\0');
-  size_t n = strlen (path_copy) + 1;
+  size_t n;
+
+  if (dev.devn != FH_FS || strncmp (path_copy, "//./", 4) == 0)
+    n = strlen (path_copy) + 1;
+  else
+    {
+      char *p = strchr (path_copy, '\0');
+      while (*--p == '.' || *p == ' ')
+	continue;
+      p[1] = '\0';
+      n = 2 + p - path_copy;
+    }
 
   normalized_path = path + sizeof (path) - n;
   if (normalized_path > eopath)
@@ -448,6 +448,7 @@ path_conv::set_normalized_path (const char *path_copy)
       normalized_path = (char *) cmalloc (HEAP_STR, n);
       normalized_path_size = 0;
     }
+
   memcpy (normalized_path, path_copy, n);
 }
 
