@@ -671,7 +671,7 @@ case "$target_os" in
   ;;
 esac
 
-W32API_INCLUDE='$(subdir)/../w32api/include'
+W32API_INCLUDE='-I $(subdir)/../w32api/include'
 
 
 
