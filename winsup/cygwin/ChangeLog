@@ -1,3 +1,28 @@
+2003-09-24  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* shared_info.h (class user_info): New.
+	(cygwin_user_h): New.
+	(user_shared): New.
+	(enum shared_locations): Replace SH_MOUNT_TABLE by SH_USER_SHARED;
+	(mount_table): Change from variable to macro.
+	* shared.cc: Use sizeof(user_info) in "offsets".
+	(user_shared_initialize): Add "reinit" argument to indicate need
+	to reinitialize the mapping. Replace "mount_table" by "user_shared"
+	throughout. Call user_shared->mountinfo.init and 
+	user_shared->delqueue.init.
+	(shared_info::initialize): Do not call delqueue.init.
+	(memory_init): Add argument to user_shared_initialize.
+	* child_info.h (child_info::mount_h): Delete. 
+	(child_info::user_h): New.	
+	* sigpproc.cc (init_child_info): Use user_h instead of mount_h.
+	* dcrt0.cc (_dll_crt0): Ditto.
+	* fhandler_disk_file.cc (fhandler_disk_file::close): Use 
+	user_shared->delqueue instead of cygwin_shared->delqueue.
+	* fhandler_virtual.cc (fhandler_virtual::close): Ditto.
+	* syscalls.cc (close_all_files): Ditto.
+	(unlink): Ditto.
+	(seteuid32): Add argument to user_shared_initialize.
+
 2003-09-24  Christopher Faylor  <cgf@redhat.com>
 
 	* devices.cc: New file.
