@@ -1,3 +1,12 @@
+2002-09-20  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/stdio.h: Reorder ANSI vs non-ANSI declarations
+	Use C++ c-header compatability defines.
+	* include/wchar.h: Likewise.
+	* include/time.h: Use C++ c-header compatability defines.
+
+	* include/tchar.h: ANSI-fy comment.
+
 2002-09-21  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/stdlib.h: Move _Exit prototype into main C99 block.

@@ -47,9 +47,7 @@
 
 #ifndef RC_INVOKED
 
-#ifdef __cplusplus 
-extern "C" {
-#endif
+__BEGIN_CGLOBAL_NAMESPACE
 
 #ifndef	__STRICT_ANSI__
 
@@ -99,57 +97,73 @@ int 	_wfindnexti64 (long, struct _wfinddatai64_t*);
 #endif /* _WIO_DEFINED */
 #endif /* __STRICT_ANSI__ */
 
+__END_CGLOBAL_NAMESPACE
+
 #ifndef _WSTDIO_DEFINED
-/* also in stdio.h - keep in sync */
+__BEGIN_CSTD_NAMESPACE
+/*  also in stdio.h - keep in sync */
 int	fwprintf (FILE*, const wchar_t*, ...);
 int	wprintf (const wchar_t*, ...);
 int	swprintf (wchar_t*, const wchar_t*, ...);
-int	_snwprintf (wchar_t*, size_t, const wchar_t*, ...);
-int	vfwprintf (FILE*, const wchar_t*, va_list);
-int	vwprintf (const wchar_t*, va_list);
-int	vswprintf (wchar_t*, const wchar_t*, va_list);
-int	_vsnwprintf (wchar_t*, size_t, const wchar_t*, va_list);
+int	vfwprintf (FILE*, const wchar_t*, __VALIST);
+int	vwprintf (const wchar_t*, __VALIST);
+int	vswprintf (wchar_t*, const wchar_t*, __VALIST);
 int	fwscanf (FILE*, const wchar_t*, ...);
 int	wscanf (const wchar_t*, ...);
 int	swscanf (const wchar_t*, const wchar_t*, ...);
 wint_t	fgetwc (FILE*);
 wint_t	fputwc (wchar_t, FILE*);
 wint_t	ungetwc (wchar_t, FILE*);
-
-#ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
-int snwprintf(wchar_t* s, size_t n, const wchar_t*  format, ...);
-extern __inline__ int vsnwprintf (wchar_t* s, size_t n, const wchar_t* format,
-			   va_list arg)
-  { return _vsnwprintf ( s, n, format, arg); }
-#endif
-
 #ifdef __MSVCRT__ 
 wchar_t* fgetws (wchar_t*, int, FILE*);
 int	fputws (const wchar_t*, FILE*);
 wint_t	getwc (FILE*);
-wint_t  getwchar (void);
+wint_t	getwchar (void);
 wint_t	putwc (wint_t, FILE*);
 wint_t	putwchar (wint_t);
+#endif
 
+__END_CSTD_NAMESPACE
+__BEGIN_CGLOBAL_NAMESPACE
+
+#ifdef __MSVCRT__ 
 #ifndef __STRICT_ANSI__
 wchar_t* _getws (wchar_t*);
 int	_putws (const wchar_t*);
 FILE*	_wfdopen(int, wchar_t *);
 FILE*	_wfopen (const wchar_t*, const wchar_t*);
 FILE*	_wfreopen (const wchar_t*, const wchar_t*, FILE*);
-FILE*   _wfsopen (const wchar_t*, const wchar_t*, int);
+FILE*	_wfsopen (const wchar_t*, const wchar_t*, int);
 wchar_t* _wtmpnam (wchar_t*);
 wchar_t* _wtempnam (const wchar_t*, const wchar_t*);
-int 	_wrename (const wchar_t*, const wchar_t*);
-int	_wremove (const wchar_t*)
-FILE*	  _wpopen (const wchar_t*, const wchar_t*)
-void	  _wperror (const wchar_t*);
-#endif /* __STRICT_ANSI__ */
+int	_wrename (const wchar_t*, const wchar_t*);
+int	_wremove (const wchar_t*);
+void	_wperror (const wchar_t*);
+FILE*	_wpopen (const wchar_t*, const wchar_t*);
+#endif	/* Not __STRICT_ANSI__ */
 #endif	/* __MSVCRT__ */
+
+/* C99 names, but non-standard behaviour */
+int	_snwprintf (wchar_t*, size_t, const wchar_t*, ...);
+int	_vsnwprintf (wchar_t*, size_t, const wchar_t*, __VALIST);
+#ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
+int snwprintf(wchar_t* s, size_t n, const wchar_t*  format, ...);
+extern __inline__ int
+vsnwprintf (wchar_t* s, size_t n, const wchar_t* format, __VALIST arg)
+  { return _vsnwprintf ( s, n, format, arg);}
+#endif
+__END_CGLOBAL_NAMESPACE
 #define _WSTDIO_DEFINED
 #endif /* _WSTDIO_DEFINED */
 
+
+__BEGIN_CGLOBAL_NAMESPACE
+
 #ifndef __STRICT_ANSI__
+/*
+ * wide char functions from direct.h, sys/stat.h and
+ * locale.h
+ */
 #ifndef _WDIRECT_DEFINED
 /* Also in direct.h */
 #ifdef __MSVCRT__ 
@@ -229,9 +243,16 @@ int	_wstati64 (const wchar_t*, struct _stati64*);
 #define _WSTAT_DEFINED
 #endif /* ! _WSTAT_DEFIND  */
 
-#endif /*  __STRICT_ANSI__ */
+#ifndef _WLOCALE_DEFINED  /* also declared in locale.h */
+wchar_t* _wsetlocale (int, const wchar_t*);
+#define _WLOCALE_DEFINED
+#endif
+#endif /* __STRICT_ANSI__ */
+
+__END_CGLOBAL_NAMESPACE
 
 #ifndef _WTIME_DEFINED
+__BEGIN_CGLOBAL_NAMESPACE
 #ifdef __MSVCRT__
 #ifndef __STRICT_ANSI__
 /* wide function prototypes, also declared in time.h */
@@ -241,18 +262,15 @@ wchar_t*	_wstrdate (wchar_t*);
 wchar_t*	_wstrtime (wchar_t*);
 #endif /* __MSVCRT__ */
 #endif /* __STRICT_ANSI__ */
+__END_CGLOBAL_NAMESPACE
+__BEGIN_CSTD_NAMESPACE
 size_t		wcsftime (wchar_t*, size_t, const wchar_t*, const struct tm*);
+__END_CSTD_NAMESPACE
 #define _WTIME_DEFINED
 #endif /* _WTIME_DEFINED */ 
 
-#ifndef __STRICT_ANSI__
-#ifndef _WLOCALE_DEFINED  /* also declared in locale.h */
-wchar_t* _wsetlocale (int, const wchar_t*);
-#define _WLOCALE_DEFINED
-#endif
-#endif /* __STRICT_ANSI__ */
-
 #ifndef _WSTDLIB_DEFINED /* also declared in stdlib.h */
+__BEGIN_CSTD_NAMESPACE
 long	wcstol	(const wchar_t*, wchar_t**, int);
 unsigned long	wcstoul (const wchar_t*, wchar_t**, int);
 double	wcstod	(const wchar_t*, wchar_t**);
@@ -260,9 +278,11 @@ double	wcstod	(const wchar_t*, wchar_t**);
 extern __inline__ float wcstof( const wchar_t *nptr, wchar_t **endptr)
 {  return (wcstod(nptr, endptr)); }
 #endif /* __NO_ISOCEXT */
+__END_CSTD_NAMESPACE
 #define  _WSTDLIB_DEFINED
 #endif
 
+__BEGIN_CGLOBAL_NAMESPACE
 #ifndef __STRICT_ANSI__
 #ifndef	_NO_OLDNAMES
 
@@ -283,6 +303,9 @@ wchar_t*	wmktemp (wchar_t *);
 #endif
 #endif /* _NO_OLDNAMES */
 #endif /* not __STRICT_ANSI__ */
+
+__END_CGLOBAL_NAMESPACE
+__BEGIN_CSTD_NAMESPACE
 
 /* These are resolved by -lmsvcp60 */
 /* If you don't have msvcp60.dll in your windows system directory, you can
@@ -315,9 +338,7 @@ unsigned long long wcstoull(const wchar_t* __restrict__ nptr,
 
 #endif /* __NO_ISOCEXT */
 
-#ifdef __cplusplus
-}	/* end of extern "C" */
-#endif
+__END_CSTD_NAMESPACE
 
 #endif /* Not RC_INVOKED */
 

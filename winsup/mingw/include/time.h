@@ -52,6 +52,8 @@
 
 #ifndef RC_INVOKED
 
+__BEGIN_CSTD_NAMESPACE
+
 /*
  * A type for storing the current time and date. This is the number of
  * seconds since midnight Jan 1, 1970.
@@ -89,9 +91,6 @@ struct tm
 				 * -1 don't know */
 };
 
-#ifdef	__cplusplus
-extern "C" {
-#endif
 
 clock_t	clock (void);
 time_t	time (time_t*);
@@ -117,6 +116,9 @@ struct tm*	localtime (const time_t*);
 size_t	strftime (char*, size_t, const char*, const struct tm*);
 
 size_t	wcsftime (wchar_t*, size_t, const wchar_t*, const struct tm*);
+
+__END_CSTD_NAMESPACE
+__BEGIN_CGLOBAL_NAMESPACE
 
 #ifndef __STRICT_ANSI__
 extern void	_tzset (void);
@@ -210,9 +212,7 @@ __MINGW_IMPORT char 	*tzname[2];
 
 #endif	/* Not _NO_OLDNAMES */
 
-#ifdef	__cplusplus
-}
-#endif
+__END_CGLOBAL_NAMESPACE
 
 #endif	/* Not RC_INVOKED */
 

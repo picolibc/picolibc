@@ -158,7 +158,28 @@ typedef struct _iobuf
 	char*	_tmpfname;
 } FILE;
 #endif	/* Not _FILE_DEFINED */
+/*
+ * An opaque data type used for storing file positions... The contents of
+ * this type are unknown, but we (the compiler) need to know the size
+ * because the programmer using fgetpos and fsetpos will be setting aside
+ * storage for fpos_t structres. Actually I tested using a byte array and
+ * it is fairly evident that the fpos_t type is a long (in CRTDLL.DLL).
+ * Perhaps an unsigned long? TODO? It's definitely a 64-bit number in
+ * MSVCRT however, and for now `long long' will do.
+ */
+#ifdef __MSVCRT__
+typedef long long fpos_t;
+#else
+typedef long	fpos_t;
+#endif
 
+#if defined __cplusplus
+namespace std
+{
+  using  ::FILE;
+  using  ::fpos_t;
+}
+#endif
 
 /*
  * The standard file handles
@@ -179,9 +200,7 @@ __MINGW_IMPORT FILE _iob[];	/* An array of FILE imported from DLL. */
 #define stdout	(&_iob[STDOUT_FILENO])
 #define stderr	(&_iob[STDERR_FILENO])
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+__BEGIN_CSTD_NAMESPACE
 
 /*
  * File Operations
@@ -212,10 +231,14 @@ void	setbuf (FILE*, char*);
 int	fprintf (FILE*, const char*, ...);
 int	printf (const char*, ...);
 int	sprintf (char*, const char*, ...);
-int	_snprintf (char*, size_t, const char*, ...);
 int	vfprintf (FILE*, const char*, __VALIST);
 int	vprintf (const char*, __VALIST);
 int	vsprintf (char*, const char*, __VALIST);
+
+__END_CSTD_NAMESPACE
+__BEGIN_CGLOBAL_NAMESPACE
+
+int	_snprintf (char*, size_t, const char*, ...);
 int	_vsnprintf (char*, size_t, const char*, __VALIST);
 
 #ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
@@ -224,6 +247,9 @@ extern __inline__ int vsnprintf (char* s, size_t n, const char* format,
 			   __VALIST arg)
   { return _vsnprintf ( s, n, format, arg); }
 #endif
+
+__END_CGLOBAL_NAMESPACE
+__BEGIN_CSTD_NAMESPACE
 
 /*
  * Formatted Input
@@ -263,21 +289,6 @@ int	fseek (FILE*, long, int);
 long	ftell (FILE*);
 void	rewind (FILE*);
 
-/*
- * An opaque data type used for storing file positions... The contents of
- * this type are unknown, but we (the compiler) need to know the size
- * because the programmer using fgetpos and fsetpos will be setting aside
- * storage for fpos_t structres. Actually I tested using a byte array and
- * it is fairly evident that the fpos_t type is a long (in CRTDLL.DLL).
- * Perhaps an unsigned long? TODO? It's definitely a 64-bit number in
- * MSVCRT however, and for now `long long' will do.
- */
-#ifdef __MSVCRT__
-typedef long long fpos_t;
-#else
-typedef long	fpos_t;
-#endif
-
 int	fgetpos	(FILE*, fpos_t*);
 int	fsetpos (FILE*, const fpos_t*);
 
@@ -290,6 +301,8 @@ int	feof (FILE*);
 int	ferror (FILE*);
 void	perror (const char*);
 
+__END_CSTD_NAMESPACE
+__BEGIN_CGLOBAL_NAMESPACE
 
 #ifndef __STRICT_ANSI__
 /*
@@ -322,18 +335,19 @@ int	fileno (FILE*);
 
 #endif	/* Not __STRICT_ANSI__ */
 
+__END_CGLOBAL_NAMESPACE
+
 /* Wide  versions */
 
 #ifndef _WSTDIO_DEFINED
+__BEGIN_CSTD_NAMESPACE
 /*  also in wchar.h - keep in sync */
 int	fwprintf (FILE*, const wchar_t*, ...);
 int	wprintf (const wchar_t*, ...);
 int	swprintf (wchar_t*, const wchar_t*, ...);
-int	_snwprintf (wchar_t*, size_t, const wchar_t*, ...);
 int	vfwprintf (FILE*, const wchar_t*, __VALIST);
 int	vwprintf (const wchar_t*, __VALIST);
 int	vswprintf (wchar_t*, const wchar_t*, __VALIST);
-int	_vsnwprintf (wchar_t*, size_t, const wchar_t*, __VALIST);
 int	fwscanf (FILE*, const wchar_t*, ...);
 int	wscanf (const wchar_t*, ...);
 int	swscanf (const wchar_t*, const wchar_t*, ...);
@@ -347,7 +361,12 @@ wint_t	getwc (FILE*);
 wint_t	getwchar (void);
 wint_t	putwc (wint_t, FILE*);
 wint_t	putwchar (wint_t);
+#endif
 
+__END_CSTD_NAMESPACE
+__BEGIN_CGLOBAL_NAMESPACE
+
+#ifdef __MSVCRT__ 
 #ifndef __STRICT_ANSI__
 wchar_t* _getws (wchar_t*);
 int	_putws (const wchar_t*);
@@ -364,6 +383,9 @@ FILE*	_wpopen (const wchar_t*, const wchar_t*);
 #endif	/* Not __STRICT_ANSI__ */
 #endif	/* __MSVCRT__ */
 
+/* C99 names, but non-standard behaviour */
+int	_snwprintf (wchar_t*, size_t, const wchar_t*, ...);
+int	_vsnwprintf (wchar_t*, size_t, const wchar_t*, __VALIST);
 #ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
 int snwprintf(wchar_t* s, size_t n, const wchar_t*  format, ...);
 extern __inline__ int
@@ -371,8 +393,12 @@ vsnwprintf (wchar_t* s, size_t n, const wchar_t* format, __VALIST arg)
   { return _vsnwprintf ( s, n, format, arg);}
 #endif
 
+__END_CGLOBAL_NAMESPACE
+
 #define _WSTDIO_DEFINED
 #endif /* _WSTDIO_DEFINED */
+
+__BEGIN_CGLOBAL_NAMESPACE
 
 #ifndef __STRICT_ANSI__
 #ifdef __MSVCRT__
@@ -409,9 +435,7 @@ int __mingw_fwrite (const void*, size_t, size_t, FILE*);
 
 #endif /* __STRICT_ANSI */
 
-#ifdef __cplusplus
-}
-#endif
+__END_CGLOBAL_NAMESPACE
 
 #endif	/* Not RC_INVOKED */
 
