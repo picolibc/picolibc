@@ -11,6 +11,8 @@
 ac_help=
 ac_default_prefix=/usr/local
 # Any additions from configure.in:
+ac_help="$ac_help
+ --enable-server		Build a cygwin DLL which can communicate with cygserver"
 
 # Initialize some variables set by options.
 # The variables have the same names as the options, with
@@ -574,7 +576,7 @@ else { echo "configure: error: can not run $ac_config_sub" 1>&2; exit 1; }
 fi
 
 echo $ac_n "checking host system type""... $ac_c" 1>&6
-echo "configure:578: checking host system type" >&5
+echo "configure:580: checking host system type" >&5
 
 host_alias=$host
 case "$host_alias" in
@@ -595,7 +597,7 @@ host_os=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 echo "$ac_t""$host" 1>&6
 
 echo $ac_n "checking target system type""... $ac_c" 1>&6
-echo "configure:599: checking target system type" >&5
+echo "configure:601: checking target system type" >&5
 
 target_alias=$target
 case "$target_alias" in
@@ -613,7 +615,7 @@ target_os=`echo $target | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 echo "$ac_t""$target" 1>&6
 
 echo $ac_n "checking build system type""... $ac_c" 1>&6
-echo "configure:617: checking build system type" >&5
+echo "configure:619: checking build system type" >&5
 
 build_alias=$build
 case "$build_alias" in
@@ -645,7 +647,7 @@ fi
 # Extract the first word of "${ac_tool_prefix}gcc", so it can be a program name with args.
 set dummy ${ac_tool_prefix}gcc; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:649: checking for $ac_word" >&5
+echo "configure:651: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -677,7 +679,7 @@ if test -n "$ac_tool_prefix"; then
   # Extract the first word of "gcc", so it can be a program name with args.
 set dummy gcc; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:681: checking for $ac_word" >&5
+echo "configure:683: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -713,7 +715,7 @@ if test -z "$CC"; then
   # Extract the first word of "cc", so it can be a program name with args.
 set dummy cc; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:717: checking for $ac_word" >&5
+echo "configure:719: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CC'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -762,7 +764,7 @@ fi
 fi
 
 echo $ac_n "checking whether we are using GNU C""... $ac_c" 1>&6
-echo "configure:766: checking whether we are using GNU C" >&5
+echo "configure:768: checking whether we are using GNU C" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_gcc'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -771,7 +773,7 @@ else
   yes;
 #endif
 EOF
-if { ac_try='${CC-cc} -E conftest.c'; { (eval echo configure:775: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
+if { ac_try='${CC-cc} -E conftest.c'; { (eval echo configure:777: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }; } | egrep yes >/dev/null 2>&1; then
   ac_cv_prog_gcc=yes
 else
   ac_cv_prog_gcc=no
@@ -786,7 +788,7 @@ if test $ac_cv_prog_gcc = yes; then
   ac_save_CFLAGS="$CFLAGS"
   CFLAGS=
   echo $ac_n "checking whether ${CC-cc} accepts -g""... $ac_c" 1>&6
-echo "configure:790: checking whether ${CC-cc} accepts -g" >&5
+echo "configure:792: checking whether ${CC-cc} accepts -g" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_cc_g'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -816,7 +818,7 @@ fi
 # Extract the first word of "${ac_tool_prefix}g++", so it can be a program name with args.
 set dummy ${ac_tool_prefix}g++; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:820: checking for $ac_word" >&5
+echo "configure:822: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CXX'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -848,7 +850,7 @@ if test -n "$ac_tool_prefix"; then
   # Extract the first word of "g++", so it can be a program name with args.
 set dummy g++; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:852: checking for $ac_word" >&5
+echo "configure:854: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CXX'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -884,7 +886,7 @@ if test -z "$CXX"; then
   # Extract the first word of "c++", so it can be a program name with args.
 set dummy c++; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:888: checking for $ac_word" >&5
+echo "configure:890: checking for $ac_word" >&5
 if eval "test \"`echo '$''{'ac_cv_prog_CXX'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -916,6 +918,22 @@ fi
 CXXFLAGS='$(CFLAGS)'
 
 
+use_cygserver=''
+# Check whether --enable-server or --disable-server was given.
+if test "${enable_server+set}" = set; then
+  enableval="$enable_server"
+  case "${enableval}" in
+yes)	 cat >> confdefs.h <<\EOF
+#define USE_CYGSERVE 1
+EOF
+
+	 use_cygserver=1 ;;
+no)	 ;;
+esac
+
+fi
+
+
 SUBDIRS='cygwin w32api'
 test -d $srcdir/mingw && SUBDIRS="mingw $SUBDIRS"
 
@@ -924,7 +942,7 @@ case "$with_cross_host" in
     # test -d $srcdir/bz2lib && SUBDIRS="$SUBDIRS bz2lib"
     # test -d $srcdir/zlib && SUBDIRS="$SUBDIRS zlib"
     # test -d $srcdir/subauth && SUBDIRS="$SUBDIRS subauth"
-    test -d $srcdir/cygserver && SUBDIRS="$SUBDIRS cygserver"
+    test -n "$use_cygserver" -a -d $srcdir/cygserver && SUBDIRS="$SUBDIRS cygserver"
     SUBDIRS="$SUBDIRS utils doc"
     ;;
 esac
@@ -933,7 +951,7 @@ subdirs="$SUBDIRS"
 
 
 echo $ac_n "checking whether ${MAKE-make} sets \${MAKE}""... $ac_c" 1>&6
-echo "configure:937: checking whether ${MAKE-make} sets \${MAKE}" >&5
+echo "configure:955: checking whether ${MAKE-make} sets \${MAKE}" >&5
 set dummy ${MAKE-make}; ac_make=`echo "$2" | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_prog_make_${ac_make}_set'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
