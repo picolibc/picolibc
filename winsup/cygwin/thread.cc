@@ -272,8 +272,8 @@ pthread::setTlsSelfPointer (pthread *thisThread)
 
 /* member methods */
 pthread::pthread ():verifyable_object (PTHREAD_MAGIC), win32_obj_id (0),
-                    cancelstate (0), canceltype (0), cancel_event (0),
-                    joiner (NULL), cleanup_stack (NULL)
+		    cancelstate (0), canceltype (0), cancel_event (0),
+		    joiner (NULL), cleanup_stack (NULL)
 {
 }
 
@@ -995,7 +995,7 @@ pthread_key::~pthread_key ()
 {
   /* We may need to make the list code lock the list during operations
    */
-  if (magic != 0) 
+  if (magic != 0)
     {
       keys.Remove (this);
       TlsFree (dwTlsIndex);
@@ -2247,7 +2247,7 @@ int
 __pthread_mutex_lock (pthread_mutex_t *mutex)
 {
   pthread_mutex_t *themutex = mutex;
-  /* This could be simplified via isGoodInitializerOrObject 
+  /* This could be simplified via isGoodInitializerOrObject
      and isGoodInitializer, but in a performance critical call like this....
      no.
      */
@@ -2300,7 +2300,7 @@ __pthread_mutex_destroy (pthread_mutex_t *mutex)
 {
   if (pthread_mutex::isGoodInitializer (mutex))
     return 0;
-  if (!pthread_mutex::isGoodObject (mutex)) 
+  if (!pthread_mutex::isGoodObject (mutex))
     return EINVAL;
 
   /*reading a word is atomic */
