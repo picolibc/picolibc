@@ -1,6 +1,7 @@
 /* syscalls.cc: syscalls
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+   2005 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -1674,7 +1675,7 @@ setmode (int fd, int mode)
   else
     setmode_mode = O_BINARY;
   setmode_file = fd;
-  _fwalk (_REENT, setmode_helper);
+  _fwalk (_GLOBAL_REENT, setmode_helper);
 
   syscall_printf ("(%d<%s>, %p) returning %s", fd, cfd->get_name (),
 		  mode, res & O_TEXT ? "text" : "binary");
