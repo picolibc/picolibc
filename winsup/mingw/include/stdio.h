@@ -144,6 +144,7 @@
  * internals of this structure. Provided by Pedro A. Aranda Gutiirrez
  * <paag@tid.es>.
  */
+__BEGIN_CSTD_NAMESPACE
 #ifndef _FILE_DEFINED
 #define	_FILE_DEFINED
 typedef struct _iobuf
@@ -172,27 +173,20 @@ typedef long long fpos_t;
 #else
 typedef long	fpos_t;
 #endif
-
-#if defined (__cplusplus)  && __HAVE_STD_CXX
-namespace std
-{
-  using  ::FILE;
-  using  ::fpos_t;
-}
-#endif
+__END_CSTD_NAMESPACE
 
 /*
  * The standard file handles
  */
 #ifndef __DECLSPEC_SUPPORTED
 
-extern FILE (*_imp___iob)[];	/* A pointer to an array of FILE */
+extern __CSTD FILE (*_imp___iob)[];	/* A pointer to an array of FILE */
 
 #define _iob	(*_imp___iob)	/* An array of FILE */
 
 #else /* __DECLSPEC_SUPPORTED */
 
-__MINGW_IMPORT FILE _iob[];	/* An array of FILE imported from DLL. */
+__MINGW_IMPORT __CSTD FILE _iob[];	/* An array of FILE imported from DLL. */
 
 #endif /* __DECLSPEC_SUPPORTED */
 
@@ -214,11 +208,6 @@ int	remove (const char*);
 int	rename (const char*, const char*);
 FILE*	tmpfile (void);
 char*	tmpnam (char*);
-char*	_tempnam (const char*, const char*);
-
-#ifndef	NO_OLDNAMES
-char*	tempnam (const char*, const char*);
-#endif
 
 int	setvbuf (FILE*, char*, int, size_t);
 
@@ -305,15 +294,20 @@ __END_CSTD_NAMESPACE
 __BEGIN_CGLOBAL_NAMESPACE
 
 #ifndef __STRICT_ANSI__
+
+char*	_tempnam (const char*, const char*);
+#ifndef	NO_OLDNAMES
+char*	tempnam (const char*, const char*);
+#endif
 /*
  * Pipes
  */
-FILE*	_popen (const char*, const char*);
-int	_pclose (FILE*);
+__CSTD FILE* _popen (const char*, const char*);
+int	_pclose (__CSTD FILE*);
 
 #ifndef NO_OLDNAMES
-FILE*	popen (const char*, const char*);
-int	pclose (FILE*);
+__CSTD FILE* popen (const char*, const char*);
+int	pclose (__CSTD FILE*);
 #endif
 
 /*
@@ -322,15 +316,15 @@ int	pclose (FILE*);
 int	_flushall (void);
 int	_fgetchar (void);
 int	_fputchar (int);
-FILE*	_fdopen (int, const char*);
-int	_fileno (FILE*);
+__CSTD FILE*	_fdopen (int, const char*);
+int	_fileno (__CSTD FILE*);
 int 	_fcloseall(void);
 
 #ifndef _NO_OLDNAMES
 int	fgetchar (void);
 int	fputchar (int);
-FILE*	fdopen (int, const char*);
-int	fileno (FILE*);
+__CSTD FILE*	fdopen (int, const char*);
+int	fileno (__CSTD FILE*);
 #endif	/* Not _NO_OLDNAMES */
 
 #endif	/* Not __STRICT_ANSI__ */
@@ -370,16 +364,16 @@ __BEGIN_CGLOBAL_NAMESPACE
 #ifndef __STRICT_ANSI__
 wchar_t* _getws (wchar_t*);
 int	_putws (const wchar_t*);
-FILE*	_wfdopen(int, wchar_t *);
-FILE*	_wfopen (const wchar_t*, const wchar_t*);
-FILE*	_wfreopen (const wchar_t*, const wchar_t*, FILE*);
-FILE*	_wfsopen (const wchar_t*, const wchar_t*, int);
+__CSTD FILE* _wfdopen(int, wchar_t *);
+__CSTD FILE* _wfopen (const wchar_t*, const wchar_t*);
+__CSTD FILE* _wfreopen (const wchar_t*, const wchar_t*, __CSTD FILE*);
+__CSTD FILE* _wfsopen (const wchar_t*, const wchar_t*, int);
 wchar_t* _wtmpnam (wchar_t*);
 wchar_t* _wtempnam (const wchar_t*, const wchar_t*);
 int	_wrename (const wchar_t*, const wchar_t*);
 int	_wremove (const wchar_t*);
 void	_wperror (const wchar_t*);
-FILE*	_wpopen (const wchar_t*, const wchar_t*);
+__CSTD FILE* _wpopen (const wchar_t*, const wchar_t*);
 #endif	/* Not __STRICT_ANSI__ */
 #endif	/* __MSVCRT__ */
 
@@ -403,7 +397,7 @@ __BEGIN_CGLOBAL_NAMESPACE
 #ifndef __STRICT_ANSI__
 #ifdef __MSVCRT__
 #ifndef NO_OLDNAMES
-FILE*	wpopen (const wchar_t*, const wchar_t*);
+__CSTD FILE*	wpopen (const wchar_t*, const wchar_t*);
 #endif /* not NO_OLDNAMES */
 #endif /* MSVCRT runtime */
 
@@ -412,14 +406,14 @@ FILE*	wpopen (const wchar_t*, const wchar_t*);
  */
 wint_t	_fgetwchar (void);
 wint_t	_fputwchar (wint_t);
-int	_getw (FILE*);
-int	_putw (int, FILE*);
+int	_getw (__CSTD FILE*);
+int	_putw (int, __CSTD FILE*);
 
 #ifndef _NO_OLDNAMES
 wint_t	fgetwchar (void);
 wint_t	fputwchar (wint_t);
-int	getw (FILE*);
-int	putw (int, FILE*);
+int	getw (__CSTD FILE*);
+int	putw (int, __CSTD FILE*);
 #endif	/* Not _NO_OLDNAMES */
 
 #ifdef __USE_MINGW_FSEEK  /* These are in libmingwex.a */
@@ -427,8 +421,8 @@ int	putw (int, FILE*);
  * Workaround for limitations on win9x where a file contents are
  * not zero'd out if you seek past the end and then write.
  */
-int __mingw_fseek (FILE *, long, int);
-int __mingw_fwrite (const void*, size_t, size_t, FILE*);
+int __mingw_fseek (__CSTD FILE *, long, int);
+int __mingw_fwrite (const void*, size_t, size_t, __CSTD FILE*);
 #define fseek(fp, offset, whence)  __mingw_fseek(fp, offset, whence)
 #define fwrite(buffer, size, count, fp)  __mingw_fwrite(buffer, size, count, fp)
 #endif /* __USE_MINGW_FSEEK */

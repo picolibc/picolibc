@@ -1,3 +1,12 @@
+2002-09-25  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/stdio.h (tempnam): Move out of __CSTD namespace.
+	(FILE): Declare in __CSTD.
+	(fpos_t): Likewise.
+	(FILE): Qualify with __CSTD when used in non-std functions,
+	throughout.
+	* include/io.h (fileno): Remove prototype.
+
 2002-09-24  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/io.h: Move wide char prototypes together.

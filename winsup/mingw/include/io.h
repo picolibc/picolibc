@@ -186,7 +186,6 @@ int		_creat (const char*, int);
 int		_dup (int);
 int		_dup2 (int, int);
 long		_filelength (int);
-int		_fileno (FILE*);
 long		_get_osfhandle (int);
 int		_isatty (int);
 
@@ -236,7 +235,6 @@ int		dup (int);
 int		dup2 (int, int);
 int		eof (int);
 long		filelength (int);
-int		fileno (FILE*);
 int		isatty (int);
 long		lseek (int, long, int);
 int		open (const char*, int, ...);
