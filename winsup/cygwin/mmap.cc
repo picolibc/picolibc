@@ -23,10 +23,10 @@ details. */
 #include "pinfo.h"
 #include "sys/cygwin.h"
 
-#define PAGE_CNT(bytes) howmany(bytes,getpagesize())
+#define PAGE_CNT(bytes) howmany((bytes),getpagesize())
 
 #define PGBITS		(sizeof(DWORD)*8)
-#define MAPSIZE(pages)	howmany(pages,PGBITS)
+#define MAPSIZE(pages)	howmany((pages),PGBITS)
 
 #define MAP_SET(n)	(map_map_[(n)/PGBITS] |= (1L << ((n) % PGBITS)))
 #define MAP_CLR(n)	(map_map_[(n)/PGBITS] &= ~(1L << ((n) % PGBITS)))
@@ -315,7 +315,8 @@ list::match (__off64_t off, DWORD len)
     {
       for (int i = 0; i < nrecs; ++i)
 	if (off >= recs[i].get_offset ()
-	    && off + len <= recs[i].get_offset () + recs[i].get_size ())
+	    && off + len <= recs[i].get_offset ()
+			 + (PAGE_CNT (recs[i].get_size ()) * getpagesize ()))
 	  return recs + i;
     }
   return NULL;
@@ -327,7 +328,8 @@ list::match (caddr_t addr, DWORD len, __off32_t start)
 {
   for (int i = start + 1; i < nrecs; ++i)
     if (addr >= recs[i].get_address ()
-	&& addr + len <= recs[i].get_address () + recs[i].get_size ())
+	&& addr + len <= recs[i].get_address ()
+			 + (PAGE_CNT (recs[i].get_size ()) * getpagesize ()))
       return i;
   return -1;
 }
