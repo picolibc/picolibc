@@ -79,15 +79,16 @@ fhandler_serial::raw_read (void *ptr, size_t ulen)
 			// if vmin > ulen then things won't work right.
 	  overlapped_armed = -1;
 	}
-      if (!overlapped_armed)
+
+      if (!ClearCommError (get_handle (), &ev, &st))
+	goto err;
+      else if (ev)
+	termios_printf ("error detected %x", ev);
+      else if (st.cbInQue)
+	inq = st.cbInQue;
+      else if (!overlapped_armed)
 	{
-	  if (!ClearCommError (get_handle (), &ev, &st))
-	    goto err;
-	  else if (ev)
-	    termios_printf ("error detected %x", ev);
-	  else if (st.cbInQue)
-	    inq = st.cbInQue;
-	  else if ((size_t)tot >= minchars)
+	  if ((size_t)tot >= minchars)
 	    break;
 	  else if (WaitCommEvent (get_handle (), &ev, &io_status))
 	    {

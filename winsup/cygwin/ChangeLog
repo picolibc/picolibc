@@ -1,3 +1,8 @@
+Wed Dec 20 00:57:10 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler_serial.cc (fhandler_serial::raw_read): Always find number of
+	bytes ready to be read whether overlapped_armed or not.
+
 Tue Dec 19 21:39:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* syscalls.cc (remove): New function, overriding the newlib
