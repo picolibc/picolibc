@@ -27,10 +27,10 @@ extern "C" {
 #define MS_DEF_DH_SCHANNEL_PROV_W	L"Microsoft DH SChannel Cryptographic Provider"
 #define MS_SCARD_PROV_A	"Microsoft Base Smart Card Crypto Provider"
 #define MS_SCARD_PROV_W	L"Microsoft Base Smart Card Crypto Provider"
-#if (WIN32_WINNT == 0x0501)
+#if (_WIN32_WINNT == 0x0501)
 #define MS_ENH_RSA_AES_PROV_A "Microsoft Enhanced RSA and AES Cryptographic Provider (Prototype)"
 #define MS_ENH_RSA_AES_PROV_W L"Microsoft Enhanced RSA and AES Cryptographic Provider (Prototype)"
-#elif (WIN32_WINNT > 0x0501)
+#elif (_WIN32_WINNT > 0x0501)
 #define MS_ENH_RSA_AES_PROV_A "Microsoft Enhanced RSA and AES Cryptographic Provider"
 #define MS_ENH_RSA_AES_PROV_W L"Microsoft Enhanced RSA and AES Cryptographic Provider"
 #endif
@@ -696,7 +696,7 @@ BOOL WINAPI CryptSetProviderW(LPCWSTR,DWORD);
 #define MS_ENH_DSS_DH_PROV MS_ENH_DSS_DH_PROV_W
 #define MS_DEF_DH_SCHANNEL_PROV MS_DEF_DH_SCHANNEL_PROV_W
 #define MS_SCARD_PROV MS_SCARD_PROV_W
-#if (WIN32_WINNT >= 0x0501)
+#if (_WIN32_WINNT >= 0x0501)
 #define MS_ENH_RSA_AES_PROV MS_ENH_RSA_AES_PROV_W
 #endif
 #else
@@ -718,7 +718,7 @@ BOOL WINAPI CryptSetProviderW(LPCWSTR,DWORD);
 #define MS_ENH_DSS_DH_PROV MS_ENH_DSS_DH_PROV_A
 #define MS_DEF_DH_SCHANNEL_PROV MS_DEF_DH_SCHANNEL_PROV_A
 #define MS_SCARD_PROV MS_SCARD_PROV_A
-#if (WIN32_WINNT >= 0x0501)
+#if (_WIN32_WINNT >= 0x0501)
 #define MS_ENH_RSA_AES_PROV MS_ENH_RSA_AES_PROV_A
 #endif
 #endif

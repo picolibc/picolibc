@@ -1,3 +1,7 @@
+2004-08-10   Danny Smith  <dannysmith@users.sourceforeg.net>
+
+	* include/wincrypt.h: Correct _WIN32_WINNT typo.
+
 2004-08-10  Ed Schaller  <schallee@darkmist.net>
 
 	* include/wincrypt.h (MS_ENH_RSA_AES_PROV_A, MS_ENH_RSA_AES_PROV_W)
