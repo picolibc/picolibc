@@ -1,3 +1,7 @@
+2001-10-29  Egor Duda  <deo@logos-m.ru>
+
+	* winsup.api/signal-into-win32-api.c: Supress compiler warning.
+
 Mon Oct  8 14:15:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* winsup.api/mmaptest01.c: Add several tests on mmaps.  Use libltp.
