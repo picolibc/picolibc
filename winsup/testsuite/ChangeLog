@@ -1,3 +1,8 @@
+2003-01-23  Christopher Faylor  <cgf@redhat.com>
+
+	* Makeifle.in: Use ALL_CFLAGS to build test programs so that correct
+	libraries and other options are used.
+
 2003-01-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygrun.c: Move here from ../cygwin.
