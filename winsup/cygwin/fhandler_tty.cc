@@ -1014,7 +1014,7 @@ fhandler_tty_common::close ()
     termios_printf ("CloseHandle (get_output_handle ()<%p>), %E", get_output_handle ());
 
   inuse = NULL;
-  termios_printf ("tty%d closed", ttynum);
+  termios_printf ("tty%d <%p,%p> closed", ttynum, get_handle (), get_output_handle ());
   return 0;
 }
 

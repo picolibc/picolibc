@@ -74,7 +74,7 @@ cygheap_setup_for_child (child_info *ci)
   newcygheap = MapViewOfFileEx (ci->cygheap_h, FILE_MAP_READ | FILE_MAP_WRITE,
 				0, 0, 0, NULL);
   if (!VirtualAlloc (newcygheap, n, MEM_COMMIT, PAGE_READWRITE))
-    api_fatal ("couldn't allocate new heap for child, %E");
+    api_fatal ("couldn't allocate new cygwin heap for child, %E");
   memcpy (newcygheap, cygheap, n);
   UnmapViewOfFile (newcygheap);
   ci->cygheap = cygheap;
@@ -96,9 +96,11 @@ cygheap_fixup_in_child (child_info *ci, bool execed)
 			DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
     cygheap_h = ci->cygheap_h;
 #endif
+  VirtualFree (cygheap, CYGHEAPSIZE, MEM_DECOMMIT);
+  VirtualFree (cygheap, 0, MEM_RELEASE);
   if (MapViewOfFileEx (ci->cygheap_h, FILE_MAP_READ | FILE_MAP_WRITE,
-		       0, 0, 0, cygheap) != cygheap)
-    api_fatal ("Couldn't allocate space for child's heap from %p, to %p, %E",
+		       0, 0, CYGHEAPSIZE, cygheap) != cygheap)
+    api_fatal ("Couldn't allocate space for child's cygwin heap from %p, to %p, %E",
 	       cygheap, cygheap_max);
 
   ForceCloseHandle1 (ci->cygheap_h, passed_cygheap_h);

@@ -337,6 +337,7 @@ dtable::dup_worker (fhandler_base *oldfh)
 
   newfh->set_close_on_exec_flag (0);
   MALLOC_CHECK;
+  debug_printf ("duped '%s' old %p, new %p", oldfh->get_name (), oldfh->get_io_handle (), newfh->get_io_handle ());
   return newfh;
 }
 
@@ -534,7 +535,9 @@ dtable::vfork_child_dup ()
   for (size_t i = 0; i < size; i++)
     if (not_open (i))
       continue;
-    else if ((newtable[i] = dup_worker (fds[i])) == NULL)
+    else if ((newtable[i] = dup_worker (fds[i])) != NULL)
+      newtable[i]->set_close_on_exec (fds[i]->get_close_on_exec ());
+    else
       {
 	res = 0;
 	set_errno (EBADF);
@@ -568,6 +571,7 @@ dtable::vfork_child_fixup ()
 {
   if (!fds_on_hold)
     return;
+  debug_printf ("here");
   fhandler_base **saveme = fds;
   fds = fds_on_hold;
 

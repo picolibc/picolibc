@@ -1,3 +1,12 @@
+Fri 20 Jul 2001 11:15:50 PM EDT  Christopher Faylor <cgf@cygnus.com>
+
+	* cygheap.cc (cygheap_fixup_in_child): Attempt Win95 workaround.
+	* dtable.cc (dtable::dup_worker): Add debugging output.
+	(dtable::vfork_child_dup): Correctly set close_on_exec.
+	* fhandler.cc (fhandler_base::fork_fixup): Don't mess with handle if
+	there is no need to get it from the parent.
+	* fhandler_tty.cc (fhandler_tty_common::close): Add debugging output.
+
 Fri 20 Jul 2001 09:15:00  Mark Bradshaw <bradshaw@staff.crosswalk.com>
 
 	* dir.cc (readdir): Protect FindNextFileA against INVALID_HANDLE_VALUE.
