@@ -13,6 +13,8 @@
 #include <time.h>
 #include <paths.h>
 
+#define UTMP_FILE _PATH_UTMP
+
 #ifdef __cplusplus
 extern "C" {
 #endif

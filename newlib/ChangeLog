@@ -1,3 +1,7 @@
+2001-12-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/sys/cygwin/sys/utmp.h: Add definition of UTMP_FILE.
+
 2001-12-22  Geoffrey Keating  <geoffk@redhat.com>
 	    Catherine Moore  <clm@redhat.com>
 	    Richard Henderson  <rth@redhat.com>
