@@ -1,5 +1,22 @@
 2002-06-06  Christopher Faylor  <cgf@redhat.com>
 
+	* autoload.cc (timeGetDevCaps): Define new autoload function.
+	(timeGetTime): Ditto.
+	(timeBeginPeriod): Ditto.
+	(timeEndPeriod): Ditto.
+	* hires.h (hires_base): New class.  Renamed from hires.
+	(hires_us): New class.
+	(hires_ms): New class.
+	* strace.cc (strace::microseconds): Use hires_us class.
+	* times.cc (gettimeofday): Use hires-ms class.
+	(hires_us::prime): Renamed from hires::prime.
+	(hires_us::usecs): Renamed from hires:usecs.
+	(hires_ms::prime): New method.
+	(hires_ms::usecs): New method.
+	(hires_ms::~hires_ms): New destructor.
+
+2002-06-06  Christopher Faylor  <cgf@redhat.com>
+
 	* autoload.cc (noload): Correctly save argument count register.
 
 2002-06-05  Conrad Scott  <conrad.scott@dsl.pipex.com>

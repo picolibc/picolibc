@@ -504,4 +504,8 @@ LoadDLLfuncEx (waveOutSetVolume, 8, winmm, 1)
 LoadDLLfuncEx (waveOutUnprepareHeader, 12, winmm, 1)
 LoadDLLfuncEx (waveOutPrepareHeader, 12, winmm, 1)
 LoadDLLfuncEx (waveOutWrite, 12, winmm, 1)
+LoadDLLfuncEx (timeGetDevCaps, 8, winmm, 1)
+LoadDLLfuncEx (timeGetTime, 0, winmm, 1)
+LoadDLLfuncEx (timeBeginPeriod, 4, winmm, 1)
+LoadDLLfuncEx (timeEndPeriod, 4, winmm, 1)
 }

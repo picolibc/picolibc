@@ -63,7 +63,7 @@ strace::hello()
 int
 strace::microseconds ()
 {
-  static hires now;
+  static hires_us now;
   return (int) now.usecs (true);
 }
 

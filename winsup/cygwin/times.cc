@@ -143,9 +143,9 @@ totimeval (struct timeval *dst, FILETIME *src, int sub, int flag)
 
 /* FIXME: Make thread safe */
 extern "C" int
-gettimeofday(struct timeval *tv, struct timezone *tz)
+gettimeofday (struct timeval *tv, struct timezone *tz)
 {
-  static hires gtod;
+  static hires_ms gtod;
   static bool tzflag;
   LONGLONG now = gtod.usecs (false);
   if (now == (LONGLONG) -1)
@@ -580,7 +580,7 @@ cygwin_tzset ()
 }
 
 void
-hires::prime ()
+hires_us::prime ()
 {
   LARGE_INTEGER ifreq;
   if (!QueryPerformanceFrequency (&ifreq))
@@ -612,7 +612,7 @@ hires::prime ()
 }
 
 LONGLONG
-hires::usecs (bool justdelta)
+hires_us::usecs (bool justdelta)
 {
   if (!inited)
     prime ();
@@ -632,4 +632,43 @@ hires::usecs (bool justdelta)
   // FIXME: Use round() here?
   now.QuadPart = (LONGLONG) (freq * (double) (now.QuadPart - primed_pc.QuadPart));
   return justdelta ? now.QuadPart : primed_ft.QuadPart + now.QuadPart;
+}
+
+void
+hires_ms::prime ()
+{
+  TIMECAPS tc;
+  FILETIME f;
+  int priority = GetThreadPriority (GetCurrentThread ());
+  SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
+
+  if (timeGetDevCaps (&tc, sizeof (tc)) != TIMERR_NOERROR)
+    minperiod = 0;
+  else
+    {
+      minperiod = min (max(tc.wPeriodMin, 1), tc.wPeriodMax);
+      timeBeginPeriod (minperiod);
+    }
+  initime_ms = timeGetTime ();
+  GetSystemTimeAsFileTime (&f);
+  SetThreadPriority (GetCurrentThread (), priority);
+  initime_us.HighPart = f.dwHighDateTime;
+  initime_us.LowPart = f.dwLowDateTime;
+  initime_us.QuadPart /= 10;
+}
+
+LONGLONG
+hires_ms::usecs (bool justdelta)
+{
+  if (!inited)
+    prime ();
+  DWORD now = timeGetTime ();
+  // FIXME: Not sure how this will handle the 49.71 day wrap around
+  LONGLONG res = initime_us.QuadPart + ((LONGLONG) (now - initime_ms) * 1000);
+  return res;
+}
+
+hires_ms::~hires_ms ()
+{
+  timeEndPeriod (minperiod);
 }
