@@ -21,6 +21,7 @@ details. */
 #include "pinfo.h"
 #include "cygheap.h"
 #include "cygerrno.h"
+#include "security.h"
 
 /* Read /etc/group only once for better performance.  This is done
    on the first call that needs information from it. */
@@ -239,31 +240,63 @@ setgrent ()
 int
 getgroups (int gidsetsize, gid_t *grouplist, gid_t gid, const char *username)
 {
+  HANDLE hToken = NULL;
+  char buf[4096];
+  DWORD size;
+  int cnt = 0;
+
   if (!group_in_memory_p)
     read_etc_group();
 
-  int cnt = 0;
+  if (allow_ntsec &&
+      OpenProcessToken (hMainProc, TOKEN_QUERY, &hToken) &&
+      GetTokenInformation (hToken, TokenGroups, buf, 4096, &size))
+    {
+      TOKEN_GROUPS *groups = (TOKEN_GROUPS *) buf;
+      char ssid[256];
 
-  for (int i = 0; i < curr_lines; ++i)
-    if (gid == group_buf[i].gr_gid)
-      {
-        if (cnt < gidsetsize)
-          grouplist[cnt] = group_buf[i].gr_gid;
-        ++cnt;
-        if (gidsetsize && cnt > gidsetsize)
-          goto error;
-      }
-    else if (group_buf[i].gr_mem)
-      for (int gi = 0; group_buf[i].gr_mem[gi]; ++gi)
-        if (strcasematch (username, group_buf[i].gr_mem[gi]))
-          {
-            if (cnt < gidsetsize)
-              grouplist[cnt] = group_buf[i].gr_gid;
-            ++cnt;
-            if (gidsetsize && cnt > gidsetsize)
-              goto error;
-          }
-  return cnt;
+      for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
+        {
+	  convert_sid_to_string_sid (groups->Groups[pg].Sid, ssid);
+          for (int gg = 0; gg < curr_lines; ++gg)
+	    {
+	      if (!strcmp (group_buf[gg].gr_passwd, ssid))
+	        {
+		  if (cnt < gidsetsize)
+		    grouplist[cnt] = group_buf[gg].gr_gid;
+		  ++cnt;
+		  if (gidsetsize && cnt > gidsetsize)
+		    goto error;
+		  break;
+		}
+	    }
+        }
+      CloseHandle (hToken);
+      return cnt;
+    }
+  else
+    {
+      for (int i = 0; i < curr_lines; ++i)
+	if (gid == group_buf[i].gr_gid)
+	  {
+	    if (cnt < gidsetsize)
+	      grouplist[cnt] = group_buf[i].gr_gid;
+	    ++cnt;
+	    if (gidsetsize && cnt > gidsetsize)
+	      goto error;
+	  }
+	else if (group_buf[i].gr_mem)
+	  for (int gi = 0; group_buf[i].gr_mem[gi]; ++gi)
+	    if (strcasematch (username, group_buf[i].gr_mem[gi]))
+	      {
+		if (cnt < gidsetsize)
+		  grouplist[cnt] = group_buf[i].gr_gid;
+		++cnt;
+		if (gidsetsize && cnt > gidsetsize)
+		  goto error;
+	      }
+      return cnt;
+    }
 
 error:
   set_errno (EINVAL);

@@ -1,3 +1,8 @@
+Mon Apr 16 16:01:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* grp.cc (getgroups): If `allow_ntsec' is set, use the process token
+	information to evaluate the groups list.
+
 Mon Apr 16 00:08:02 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* features.h: Remove this file as it is now being supplied by newlib.
