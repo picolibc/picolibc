@@ -1,5 +1,10 @@
+2004-09-24  Kelley Cook <kcook@gcc.gnu.org>
+
+	* ylwrap: Revert to previous version.
+
 2004-09-23  H.J. Lu  <hongjiu.lu@intel.com>
 
+	PR bootstrap/17369
 	* Makefile.tpl (REALLY_SET_LIB_PATH): Add @SET_GCC_LIB_PATH@.
 	(HOST_EXPORTS]): Add @SET_GCC_LIB_PATH@. Set and export
 	SET_GCC_LIB_PATH_CMD.
