@@ -19,12 +19,11 @@ typedef __dev32_t _dev_t;
 
 enum fh_devices
 {
-  /* "Slow" devices */
   FH_TTY     = FHDEV (5, 0),
   FH_CONSOLE = FHDEV (5, 1),
-  FH_CONIN   = FHDEV (5, 512),
-  FH_CONOUT  = FHDEV (5, 513),
   FH_PTYM    = FHDEV (5, 2),	/* /dev/ptmx */
+  FH_CONIN   = FHDEV (5, 255),
+  FH_CONOUT  = FHDEV (5, 254),
 
   DEV_TTYM_MAJOR = 128,
   FH_TTYM    = FHDEV (DEV_TTYM_MAJOR, 0),
@@ -37,15 +36,19 @@ enum fh_devices
   DEV_SERIAL_MAJOR = 117,
   FH_SERIAL  = FHDEV (117, 0),	/* /dev/ttyS? */
 
-  FH_PIPE    = FHDEV (0, 512),
-  FH_PIPER   = FHDEV (0, 513),
-  FH_PIPEW   = FHDEV (0, 514),
-  FH_FIFO    = FHDEV (0, 515),
-  FH_SOCKET  = FHDEV (0, 516),
-  FH_WINDOWS = FHDEV (13, 512),
+  FH_WINDOWS = FHDEV (13, 255),
+  FH_CLIPBOARD=FHDEV (13, 254),
 
-  /* Fast devices */
-  FH_FS      = FHDEV (0, 517),	/* filesystem based device */
+  FH_PIPE    = FHDEV (0, 255),
+  FH_PIPER   = FHDEV (0, 254),
+  FH_PIPEW   = FHDEV (0, 253),
+  FH_FIFO    = FHDEV (0, 252),
+  FH_SOCKET  = FHDEV (0, 251),
+  FH_PROC    = FHDEV (0, 250),
+  FH_REGISTRY= FHDEV (0, 249),
+  FH_PROCESS = FHDEV (0, 248),
+
+  FH_FS      = FHDEV (0, 247),	/* filesystem based device */
 
   DEV_FLOPPY_MAJOR = 2,
   FH_FLOPPY  = FHDEV (DEV_FLOPPY_MAJOR, 0),
@@ -68,17 +71,12 @@ enum fh_devices
   FH_PORT    = FHDEV (1, 5),
   FH_RANDOM  = FHDEV (1, 8),
   FH_URANDOM = FHDEV (1, 9),
-  FH_CLIPBOARD=FHDEV (13, 513),
   FH_OSS_DSP = FHDEV (14, 3),
 
   DEV_CYGDRIVE_MAJOR = 30,
   FH_CYGDRIVE= FHDEV (DEV_CYGDRIVE_MAJOR, 0),
   FH_CYGDRIVE_A= FHDEV (DEV_CYGDRIVE_MAJOR, 'a'),
   FH_CYGDRIVE_Z= FHDEV (DEV_CYGDRIVE_MAJOR, 'z'),
-
-  FH_PROC    = FHDEV (0, 519),
-  FH_REGISTRY= FHDEV (0, 520),
-  FH_PROCESS = FHDEV (0, 521),
 
   DEV_RAWDRIVE_MAJOR = 65,
   FH_RAWDRIVE= FHDEV (DEV_RAWDRIVE_MAJOR, 0),
