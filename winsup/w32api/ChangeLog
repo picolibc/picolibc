@@ -1,4 +1,11 @@
 
+2001-03-12  Earnie Boyd  <earnie@users.sourceforge.net
+
+	* include/commctrl.h (TBSTYLE_FLAT): New definition.
+	(TB_GETBUTTONSIZE): Ditto.
+	(TCS_HOTTRACK): Ditto.
+	Thanks to: Chris Hansen <popeofpop@softhome.net>
+
 2001-03-01  Earnie Boyd  <earnie@users.sourceforge.net
 
 	* Makefile.in: (snapshot): Add target.
