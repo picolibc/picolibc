@@ -1,3 +1,20 @@
+2002-05-15  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/include/stdlib.h: Add on_exit prototype.
+        * libc/include/sys/reent.h (struct _atexit): Add argument array
+        and bits to track type of exit routine to support both on_exit
+        and atexit.
+        (_REENT_INIT_PTR): Add missing fields that won't be zeroed out
+        by default and change the setting of the atexit structure.
+        (_REENT_INIT)[!_REENT_SMALL]: Remove extraneous end brace.
+        * libc/stdlib/on_exit.c: New file.
+        * libc/stdlib/Makefile.am: Add support for on_exit.
+        * libc/stdlib/Makefile.in: Regenerated.
+        * libc/stdlib/atexit.c: Change to initialize types field.
+        * libc/stdlib/exit.c: Change to look at types field for each
+        exit routine and either call an atexit-style or an on_exit-style
+        routine accordingly.
+
 2002-05-13  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/machine/powerpc/vfprintf.c(__VFPRINTF_R)[__ALTIVEC__]: Don't

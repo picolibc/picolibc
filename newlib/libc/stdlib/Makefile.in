@@ -153,6 +153,7 @@ LIB_SOURCES = \
 	mstats.c	\
 	mtrim.c		\
 	nrand48.c	\
+	on_exit.c	\
 	putenv.c	\
 	putenv_r.c	\
 	qsort.c		\
@@ -226,6 +227,7 @@ CHEWOUT_FILES = \
 	mbtowc.def	\
 	mlock.def	\
 	mstats.def	\
+	on_exit.def	\
 	qsort.def	\
 	rand.def	\
 	rand48.def	\
@@ -268,12 +270,13 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@lcong48.o ldiv.o ldtoa.o lrand48.o malign.o malloc.o \
 @USE_LIBTOOL_FALSE@mblen.o mblen_r.o mbstowcs.o mbstowcs_r.o mbtowc.o \
 @USE_LIBTOOL_FALSE@mbtowc_r.o mlock.o mprec.o mrand48.o msize.o \
-@USE_LIBTOOL_FALSE@mstats.o mtrim.o nrand48.o putenv.o putenv_r.o \
-@USE_LIBTOOL_FALSE@qsort.o rand.o rand48.o rand_r.o realloc.o seed48.o \
-@USE_LIBTOOL_FALSE@setenv.o setenv_r.o srand48.o strdup.o strdup_r.o \
-@USE_LIBTOOL_FALSE@strtod.o strtol.o strtoll.o strtoll_r.o strtoul.o \
-@USE_LIBTOOL_FALSE@strtoull.o strtoull_r.o system.o valloc.o wcstombs.o \
-@USE_LIBTOOL_FALSE@wcstombs_r.o wctomb.o wctomb_r.o
+@USE_LIBTOOL_FALSE@mstats.o mtrim.o nrand48.o on_exit.o putenv.o \
+@USE_LIBTOOL_FALSE@putenv_r.o qsort.o rand.o rand48.o rand_r.o \
+@USE_LIBTOOL_FALSE@realloc.o seed48.o setenv.o setenv_r.o srand48.o \
+@USE_LIBTOOL_FALSE@strdup.o strdup_r.o strtod.o strtol.o strtoll.o \
+@USE_LIBTOOL_FALSE@strtoll_r.o strtoul.o strtoull.o strtoull_r.o \
+@USE_LIBTOOL_FALSE@system.o valloc.o wcstombs.o wcstombs_r.o wctomb.o \
+@USE_LIBTOOL_FALSE@wctomb_r.o
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 @USE_LIBTOOL_TRUE@libstdlib_la_DEPENDENCIES =  freer.$(oext) \
@@ -291,10 +294,10 @@ LTLIBRARIES =  $(noinst_LTLIBRARIES)
 @USE_LIBTOOL_TRUE@ldtoa.lo lrand48.lo malign.lo malloc.lo mblen.lo \
 @USE_LIBTOOL_TRUE@mblen_r.lo mbstowcs.lo mbstowcs_r.lo mbtowc.lo \
 @USE_LIBTOOL_TRUE@mbtowc_r.lo mlock.lo mprec.lo mrand48.lo msize.lo \
-@USE_LIBTOOL_TRUE@mstats.lo mtrim.lo nrand48.lo putenv.lo putenv_r.lo \
-@USE_LIBTOOL_TRUE@qsort.lo rand.lo rand48.lo rand_r.lo realloc.lo \
-@USE_LIBTOOL_TRUE@seed48.lo setenv.lo setenv_r.lo srand48.lo strdup.lo \
-@USE_LIBTOOL_TRUE@strdup_r.lo strtod.lo strtol.lo strtoll.lo \
+@USE_LIBTOOL_TRUE@mstats.lo mtrim.lo nrand48.lo on_exit.lo putenv.lo \
+@USE_LIBTOOL_TRUE@putenv_r.lo qsort.lo rand.lo rand48.lo rand_r.lo \
+@USE_LIBTOOL_TRUE@realloc.lo seed48.lo setenv.lo setenv_r.lo srand48.lo \
+@USE_LIBTOOL_TRUE@strdup.lo strdup_r.lo strtod.lo strtol.lo strtoll.lo \
 @USE_LIBTOOL_TRUE@strtoll_r.lo strtoul.lo strtoull.lo strtoull_r.lo \
 @USE_LIBTOOL_TRUE@system.lo valloc.lo wcstombs.lo wcstombs_r.lo \
 @USE_LIBTOOL_TRUE@wctomb.lo wctomb_r.lo

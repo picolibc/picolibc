@@ -55,6 +55,7 @@ LIB_SOURCES = \
 	mstats.c	\
 	mtrim.c		\
 	nrand48.c	\
+	on_exit.c	\
 	putenv.c	\
 	putenv_r.c	\
 	qsort.c		\
@@ -167,6 +168,7 @@ CHEWOUT_FILES= \
 	mbtowc.def	\
 	mlock.def	\
 	mstats.def	\
+	on_exit.def	\
 	qsort.def	\
 	rand.def	\
 	rand48.def	\

@@ -74,6 +74,7 @@ _DEFUN (atexit,
       if ((p = (struct _atexit *) malloc (sizeof *p)) == NULL)
 	return -1;
       p->_ind = 0;
+      p->_fntypes = 0;
       p->_next = _REENT->_atexit;
       _REENT->_atexit = p;
     }

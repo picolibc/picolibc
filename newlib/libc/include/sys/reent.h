@@ -72,11 +72,15 @@ struct _atexit {
 	struct	_atexit *_next;			/* next in list */
 	int	_ind;				/* next index in this table */
 	void	(*_fns[_ATEXIT_SIZE])(void);	/* the table itself */
+	void	*_fnargs[_ATEXIT_SIZE];	        /* fn args for on_exit */
+	__uint32_t _fntypes;           	        /* type of exit routine */
 };
 #else
 struct _atexit {
 	int	_ind;				/* next index in this table */
 	void	(*_fns[_ATEXIT_SIZE])(void);	/* the table itself */
+	void	*_fnargs[_ATEXIT_SIZE];	        /* fn args for on_exit */
+	__uint32_t _fntypes;           	        /* type of exit routine */
 };
 #endif
 
@@ -304,14 +308,15 @@ struct _reent
 };
 
 #define _REENT_INIT(var) \
-  { &var.__sf_fake, &var.__sf_fake, &var.__sf_fake, 0, 0, _NULL, 0, 0, \
+  { (struct __sFILE *)&var.__sf_fake, (struct __sFILE *)&var.__sf_fake, \
+    (struct __sFILE *)&var.__sf_fake, 0, 0, _NULL, 0, 0, \
     "C", _NULL, _NULL, 0, 0, _NULL, _NULL, _NULL, _NULL, _NULL, \
-    { 0, _NULL }, { _NULL, 0, _NULL }, 0, _NULL }
+    { 0, _NULL, _NULL, 0 }, { _NULL, 0, _NULL }, _NULL, 0, _NULL }
 
 #define _REENT_INIT_PTR(var) \
-  { var->_stdin = &var->__sf_fake; \
-    var->_stdout = &var->__sf_fake; \
-    var->_stderr = &var->__sf_fake; \
+  { var->_stdin = (struct __sFILE *)&var->__sf_fake; \
+    var->_stdout = (struct __sFILE *)&var->__sf_fake; \
+    var->_stderr = (struct __sFILE *)&var->__sf_fake; \
     var->_errno = 0; \
     var->_inc = 0; \
     var->_emergency = _NULL; \
@@ -328,12 +333,21 @@ struct _reent
     var->_asctime_buf = _NULL; \
     var->_sig_func = _NULL; \
     var->_atexit._ind = 0; \
-    var->_atexit._fns = _NULL}; \
+    var->_atexit._fns[0] = _NULL; \
+    var->_atexit._fnargs[0] = _NULL; \
+    var->_atexit._fntypes = 0; \
     var->__sglue._next = _NULL; \
     var->__sglue._niobs = 0; \
     var->__sglue._iobs = _NULL; \
     var->__sf = 0; \
     var->_misc = _NULL; \
+    var->__sf_fake._p = _NULL; \
+    var->__sf_fake._r = 0; \
+    var->__sf_fake._w = 0; \
+    var->__sf_fake._flags = 0; \
+    var->__sf_fake._file = 0; \
+    var->__sf_fake._lbfsize = 0; \
+    var->__sf_fake._data = _NULL; \
   }
 
   /* signal info */
@@ -537,6 +551,15 @@ struct _reent
     var->_new._reent._mbtowc_state = 0; \
     var->_new._reent._wctomb_state = 0; \
     var->_new._reent._l64a_buf[0] = '\0'; \
+    var->_atexit = _NULL; \
+    var->_atexit0._ind = 0; \
+    var->_atexit0._fns[0] = _NULL; \
+    var->_atexit0._fntypes = 0; \
+    var->_sig_func = _NULL; \
+    var->__sglue._next = _NULL; \
+    var->__sglue._niobs = 0; \
+    var->__sglue._iobs = _NULL; \
+    memset(var->__sf,0,sizeof(var->__sf)); \
   }
 
 #define _REENT_CHECK_RAND48(ptr)	/* nothing */
