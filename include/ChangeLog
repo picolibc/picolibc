@@ -1,18 +1,18 @@
 2001-03-10  Neil Booth  <neil@daikokuya.demon.co.uk>
+	    John David Anglin  <dave@hiauly1.hia.nrc.ca>
 
-	John David Anglin  <dave@hiauly1.hia.nrc.ca>
 	* libiberty.h: Add lbasename.
-	
+
 2001-03-06  Zack Weinberg  <zackw@stanford.edu>
 
 	* libiberty.h: Prototype C_alloca; define alloca to either
 	__builtin_alloca or C_alloca as appropriate.
-	
+
 2001-03-01  John David Anglin  <dave@hiauly1.hia.nrc.ca>
 
 	* safe-ctype.h (_sch_test): Cast enum bit to unsigned short int for pcc
 	compatibility.
-	
+
 2001-02-18  lars brinkhoff  <lars@nocrew.org>
 
 	* dis-asm.h: Add PDP-11 target.
@@ -60,7 +60,7 @@
 2000-12-06  Rodney Brown  <RodneyBrown@mynd.com>
 
 	* getopt.h obstack.h: Standarize copyright statement.
-	
+
 2000-12-05  Richard Henderson  <rth@redhat.com>
 
 	* demangle.h: Change "new_abi" to "v3" everywhere.
@@ -68,7 +68,7 @@
 2000-11-29  Zack Weinberg  <zack@wolery.stanford.edu>
 
 	* libiberty.h: Move #includes to top.  Prototype xmalloc_failed.
-	
+
 2000-11-15  Kenneth Block  <kenneth.block@compaq.com>
 
 	* demangle.h: Add gnat and java demangle styles.
@@ -152,7 +152,7 @@
 	dyn_string_insert_cstr, dyn_string_append, dyn_string_append_cstr,
 	dyn_string_append_char, dyn_string_substring): Change return type
 	to int.
-	
+
 2000-06-18  Stephane Carrez  <stcarrez@worldnet.fr>
 
 	* dis-asm.h (print_insn_m68hc12): Define.
@@ -180,7 +180,7 @@
 	(GNU_NEW_ABI_DEMANGLING_STYLE_STRING): New macro.
 	(GNU_NEW_ABI_DEMANGLING): Likewise.
 	(cplus_demangle_new_abi): New declaration.
-	
+
 Tue May 30 16:53:34 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* floatformat.h (struct floatformat): Add field name.
@@ -342,7 +342,7 @@ Tue Feb  8 17:01:13 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* dis-asm.h (struct disassemble_info): Added octets_per_byte
 	field and initialize it to one (1).
-	
+
 2000-01-27  Nick Clifton  <nickc@redhat.com>
 
 	* dis-asm.h: Add prototype for disassembler_usage().
@@ -470,7 +470,7 @@ Tue Sep 14 00:35:02 1999  Marc Espie <espie@cvs.openbsd.org>
 	(ELF32_MS_REL_INDEX): New macro.
 	(ELF32_MS_FLAGS): Likewise.
 	(ELF32_MS_INFO): Likewise.
-	
+
 1999-06-14  Nick Clifton  <nickc@cygnus.com>
 
 	* dis-asm.h (arm_toggle_regnames): New prototype.
