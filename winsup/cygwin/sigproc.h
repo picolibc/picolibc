@@ -94,8 +94,7 @@ int __stdcall handle_sigsuspend (sigset_t);
 
 int __stdcall proc_subproc (DWORD, DWORD);
 
-#include "pinfo.h"
-
+class _pinfo;
 void __stdcall proc_terminate ();
 void __stdcall sigproc_init ();
 void __stdcall subproc_init ();

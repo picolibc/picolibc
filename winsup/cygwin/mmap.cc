@@ -13,7 +13,8 @@ details. */
 #include <stddef.h>
 #include <sys/mman.h>
 #include <errno.h>
-
+#include "dtable.h"
+#include "pinfo.h"
 
 /*
  * Simple class used to keep a record of all current

@@ -13,6 +13,7 @@ details. */
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include "pinfo.h"
 
 #define _COMPILING_NEWLIB
 #include "dirent.h"

@@ -11,6 +11,7 @@
 #include <sys/poll.h>
 #include <errno.h>
 #include "winsup.h"
+#include "dtable.h"
 
 extern "C"
 int

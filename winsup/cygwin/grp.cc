@@ -15,6 +15,7 @@ details. */
 #include <grp.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "pinfo.h"
 
 /* Read /etc/group only once for better performance.  This is done
    on the first call that needs information from it. */

@@ -16,6 +16,8 @@ details. */
 #include <stdarg.h>
 #include <errno.h>
 #include "dll_init.h"
+#include "dtable.h"
+#include "pinfo.h"
 
 DWORD NO_COPY chunksize = 0;
 /* Timeout to wait for child to start, parent to init child, etc.  */

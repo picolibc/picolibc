@@ -1,3 +1,10 @@
+Sat Aug 12 01:33:12 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* winsup.h: Split out dtable definitions into separate header file.
+	* dtable.h: New file.
+	* sigproc.h: Eliminate pinfo.h usage here.  Use it in source files that
+	need it.
+
 Sat Aug 12 01:08:11 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Use dtable.o rather than hinfo.o.

@@ -18,6 +18,7 @@ details. */
 #include <stdlib.h>
 #include <wchar.h>
 #include <lm.h>
+#include "pinfo.h"
 
 char *
 internal_getlogin (_pinfo *pi)

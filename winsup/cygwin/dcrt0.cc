@@ -16,6 +16,8 @@ details. */
 #include "dll_init.h"
 #include "autoload.h"
 #include <ctype.h>
+#include "dtable.h"
+#include "pinfo.h"
 
 #define MAX_AT_FILE_LEVEL 10
 
@@ -730,7 +732,7 @@ dll_crt0_1 ()
     }
 
   /* Allocate fdtab */
-  fdtab_init ();
+  dtable_init ();
 
 /* Initialize uid, gid. */
   uinfo_init ();

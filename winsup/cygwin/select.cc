@@ -33,6 +33,7 @@ details. */
 #include <stdio.h>
 #include <winsock.h>
 #include "select.h"
+#include "dtable.h"
 
 /*
  * All these defines below should be in sys/types.h

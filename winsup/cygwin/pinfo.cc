@@ -13,6 +13,8 @@ details. */
 #include <time.h>
 #include <errno.h>
 #include <limits.h>
+#include "dtable.h"
+#include "pinfo.h"
 
 static char NO_COPY pinfo_dummy[sizeof(pinfo)] = {0};
 

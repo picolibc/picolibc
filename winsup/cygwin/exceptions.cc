@@ -15,6 +15,7 @@ details. */
 
 #include "exceptions.h"
 #include <imagehlp.h>
+#include "pinfo.h"
 
 char debugger_command[2 * MAX_PATH + 20];
 

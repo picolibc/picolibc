@@ -16,6 +16,8 @@ details. */
 #include <errno.h>
 #include <ctype.h>
 #include <limits.h>
+#include "pinfo.h"
+#include "dtable.h"
 
 /* Tty master stuff */
 

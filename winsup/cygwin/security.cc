@@ -22,6 +22,8 @@ details. */
 #include <sys/stat.h>
 #include <sys/acl.h>
 #include <ctype.h>
+#include "dtable.h"
+#include "pinfo.h"
 
 extern BOOL allow_ntea;
 BOOL allow_ntsec = FALSE;

@@ -14,6 +14,7 @@ details. */
 #include <unistd.h>
 #include <errno.h>
 #include <ctype.h>
+#include "pinfo.h"
 
 /* Common functions shared by tty/console */
 

@@ -19,7 +19,9 @@ details. */
 #include <wingdi.h>
 #include <winuser.h>
 #include <ctype.h>
-#include "paths.h"
+#include <paths.h>
+#include "dtable.h"
+#include "pinfo.h"
 
 extern BOOL allow_ntsec;
 

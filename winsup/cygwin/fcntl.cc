@@ -13,6 +13,7 @@ details. */
 #include <stdarg.h>
 #include <errno.h>
 #include <unistd.h>
+#include "dtable.h"
 
 extern "C"
 int

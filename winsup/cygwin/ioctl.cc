@@ -14,6 +14,7 @@ details. */
 #include "winsup.h"
 #include <sys/ioctl.h>
 #include <errno.h>
+#include "dtable.h"
 
 extern "C"
 int

@@ -13,6 +13,7 @@ details. */
 
 #include "winsup.h"
 #include <errno.h>
+#include "pinfo.h"
 
 extern "C"
 _sig_func_ptr

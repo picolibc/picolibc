@@ -13,6 +13,7 @@ details. */
 #include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include "pinfo.h"
 
 /**********************************************************************/
 /* fhandler_serial */

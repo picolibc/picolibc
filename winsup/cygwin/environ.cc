@@ -13,6 +13,7 @@ details. */
 #include <stddef.h>
 #include <ctype.h>
 #include <fcntl.h>
+#include "pinfo.h"
 
 extern BOOL allow_glob;
 extern BOOL allow_ntea;

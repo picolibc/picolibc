@@ -13,6 +13,7 @@ details. */
 #include <errno.h>
 #include <time.h>
 #include <limits.h>
+#include "dtable.h"
 
 /* sysconf: POSIX 4.8.1.1 */
 /* Allows a portable app to determine quantities of resources or

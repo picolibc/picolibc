@@ -22,6 +22,7 @@ details. */
 #include <wingdi.h>
 #include <winuser.h>
 #include <ctype.h>
+#include "pinfo.h"
 
 /*
  * Scroll the screen context.

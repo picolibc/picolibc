@@ -20,12 +20,14 @@ details. */
 #include <fcntl.h>
 
 #include <winsock.h>
+#include "dtable.h"
+#include "pinfo.h"
 
 dtable fdtab;
 
 /* Set aside space for the table of fds */
 void
-fdtab_init (void)
+dtable_init (void)
 {
   if (!fdtab.size)
     fdtab.extend(NOFILE_INCR);

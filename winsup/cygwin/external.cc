@@ -11,6 +11,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include "pinfo.h"
 
 static external_pinfo *
 fillout_pinfo (pid_t pid, int winpid)

@@ -14,6 +14,7 @@ details. */
 #include <stdlib.h>
 #include <grp.h>
 #include <pwd.h>
+#include "pinfo.h"
 
 #define SHAREDVER (unsigned)(cygwin_version.api_major << 16 | \
 		   cygwin_version.api_minor)

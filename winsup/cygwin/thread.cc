@@ -18,9 +18,9 @@ details. */
 #include "winsup.h"
 #include <errno.h>
 #include <assert.h>
-
 #include <stdlib.h>
 #include <syslog.h>
+#include "pinfo.h"
 
 extern int threadsafe;
 
