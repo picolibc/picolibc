@@ -1292,14 +1292,7 @@ slash_unc_prefix_p (const char *path)
   return ret && isalnum (p[1]);
 }
 
-/* conv_path_list: Convert a list of path names to/from Win32/POSIX.
-
-   SRC is not a const char * because we temporarily modify it to ease
-   the implementation.
-
-   I believe Win32 always has '.' in $PATH.   POSIX obviously doesn't.
-   We certainly don't want to handle that here, but it is something for
-   the caller to think about.  */
+/* conv_path_list: Convert a list of path names to/from Win32/POSIX. */
 
 static void
 conv_path_list (const char *src, char *dst, int to_posix_p)
