@@ -1,3 +1,23 @@
+2001-05-07  Thiemo Seufer <seufer@csv.ica.uni-stuttgart.de>
+
+	* external.h: Fix typo.
+	* mips.h: Add/Extend many comments with reference to the MIPS ELF64
+	spec v. 2.4, available at e.g.
+	ftp://oss.sgi.com/pub/linux/mips/doc/ABI/ELF64.ps.
+	(EF_MIPS_UCODE): Define.
+	(EF_MIPS_OPTIONS_FIRST): Define.
+	(EF_MIPS_ARCH_ASE): Define.
+	(EF_MIPS_ARCH_ASE_MDMX): Define.
+	(EF_MIPS_ARCH_ASE_M16): Define.
+	(SHF_MIPS_ADDR): Renamed SHF_MIPS_ADDR32.
+	(SHF_MIPS_STRING): Renamed SHF_MIPS_ADDR64.
+	(SHF_MIPS_NODUPES): Define.
+	(ELF64_MIPS_R_SSYM): New MIPS ELF 64 relocation info access macro.
+	(ELF64_MIPS_R_TYPE3): Likewise.
+	(ELF64_MIPS_R_TYPE2): Likewise.
+	(ELF64_MIPS_R_TYPE): Likewise.
+	(OHW_R10KLDL): Define.
+
 2001-04-24  Todd Fries  <todd@fries.net>
 
 	* sparc.h: Fix typo.

@@ -1,5 +1,5 @@
 /* ELF support for BFD.
-   Copyright 1991, 1992, 1993, 1995, 1997, 1998, 1999
+   Copyright 1991, 1992, 1993, 1995, 1997, 1998, 1999, 2001
    Free Software Foundation, Inc.
 
    Written by Fred Fish @ Cygnus Support, from information published
@@ -26,7 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* This file is part of ELF support for BFD, and contains the portions
    that describe how ELF is represented externally by the BFD library.
    I.E. it describes the in-file representation of ELF.  It requires
-   the elf-common.h file which contains the portions that are common to
+   the elf/common.h file which contains the portions that are common to
    both the internal and external representations. */
 
 /* The 64-bit stuff is kind of random.  Perhaps someone will publish a
