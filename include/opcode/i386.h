@@ -108,15 +108,15 @@ static const template i386_optab[] = {
 {"movsbw", 2, 0x0fbe, X, Cpu386, NoSuf|Modrm,			{ Reg8|ByteMem, Reg16, 0} },
 {"movswl", 2, 0x0fbf, X, Cpu386, NoSuf|Modrm,			{ Reg16|ShortMem, Reg32, 0} },
 /* Intel Syntax next 2 insns */
-{"movsx",  2, 0x0fbf, X, Cpu386, w_Suf|Modrm|IgnoreSize,	{ Reg16|ShortMem, Reg32, 0} },
 {"movsx",  2, 0x0fbe, X, Cpu386, b_Suf|Modrm,			{ Reg8|ByteMem, WordReg, 0} },
+{"movsx",  2, 0x0fbf, X, Cpu386, w_Suf|Modrm|IgnoreSize,	{ Reg16|ShortMem, Reg32, 0} },
 
 /* Move with zero extend.  */
 {"movzb",  2, 0x0fb6, X, Cpu386, wl_Suf|Modrm,			{ Reg8|ByteMem, WordReg, 0} },
 {"movzwl", 2, 0x0fb7, X, Cpu386, NoSuf|Modrm,			{ Reg16|ShortMem, Reg32, 0} },
 /* Intel Syntax next 2 insns */
-{"movzx",  2, 0x0fb7, X, Cpu386, w_Suf|Modrm|IgnoreSize,	{ Reg16|ShortMem, Reg32, 0} },
 {"movzx",  2, 0x0fb6, X, Cpu386, b_Suf|Modrm,			{ Reg8|ByteMem, WordReg, 0} },
+{"movzx",  2, 0x0fb7, X, Cpu386, w_Suf|Modrm|IgnoreSize,	{ Reg16|ShortMem, Reg32, 0} },
 
 /* Push instructions.  */
 {"push",   1,	0x50, X, 0,	 wl_Suf|ShortForm|DefaultSize,	{ WordReg, 0, 0 } },

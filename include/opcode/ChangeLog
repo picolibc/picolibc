@@ -1,3 +1,8 @@
+2000-08-15  H.J. Lu  <hjl@gnu.org>
+
+	* i386.h: Swap the Intel syntax "movsx"/"movzx" due to the
+	IgnoreSize change.
+
 2000-07-29  Marek Michalkiewicz  <marekm@linux.org.pl>
 
 	* avr.h (AVR_UNDEF_P, AVR_SKIP_P, AVR_DISP0_P): New macros.
