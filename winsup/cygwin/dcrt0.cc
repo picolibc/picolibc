@@ -574,6 +574,7 @@ void __stdcall
 dll_crt0_0 ()
 {
   wincap.init ();
+  muto::init ();
   initial_env ();
 
   char zeros[sizeof (child_proc_info->zero)] = {0};

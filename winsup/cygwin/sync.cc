@@ -28,6 +28,13 @@ details. */
 #undef WaitForSingleObject
 
 DWORD NO_COPY muto::exiting_thread;
+CRITICAL_SECTION NO_COPY muto::init_lock;
+
+void
+muto::init ()
+{
+  InitializeCriticalSection (&init_lock);
+}
 
 void
 muto::grab ()
@@ -39,15 +46,23 @@ muto::grab ()
 muto *
 muto::init (const char *s)
 {
-  waiters = -1;
-  /* Create event which is used in the fallback case when blocking is necessary */
-  if (!(bruteforce = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL)))
+  muto *res = this;
+  EnterCriticalSection (&init_lock);
+  if (!bruteforce)
     {
-      DWORD oerr = GetLastError ();
-      SetLastError (oerr);
-      return NULL;
+      waiters = -1;
+      bruteforce = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+      /* Create event which is used in the fallback case when blocking is necessary */
+      if (bruteforce)
+	name = s;
+      else
+	{
+	  DWORD oerr = GetLastError ();
+	  SetLastError (oerr);
+	  res = NULL;
+	}
     }
-  name = s;
+  LeaveCriticalSection (&init_lock);
   return this;
 }
 

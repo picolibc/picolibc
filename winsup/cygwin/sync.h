@@ -17,6 +17,7 @@ details. */
 class muto
 {
   static DWORD exiting_thread;
+  static CRITICAL_SECTION init_lock;
   LONG sync;	/* Used to serialize access to this class. */
   LONG waiters;	/* Number of threads waiting for lock. */
   HANDLE bruteforce; /* event handle used to control waiting for lock. */
@@ -39,6 +40,7 @@ public:
   void upforgrabs () {tls = this;}  // just set to an invalid address
   void grab () __attribute__ ((regparm (1)));
   static void set_exiting_thread () {exiting_thread = GetCurrentThreadId ();}
+  static void init ();
 };
 
 extern muto muto_start;
