@@ -174,7 +174,7 @@ internal_getlogin (cygheap_user &user)
 	    if (psid.getfrompw (pw) && EqualSid (user.sid (), psid))
 	      {
 		user.set_name (pw->pw_name);
-		struct group *gr = getgrgid (pw->pw_gid);
+		struct __group16 *gr = getgrgid (pw->pw_gid);
 		if (gr)
 		  if (!gsid.getfromgr (gr))
 		      gsid = NO_SID;
@@ -249,9 +249,9 @@ uinfo_init ()
   cygheap->user.token = INVALID_HANDLE_VALUE;
   cygheap->user.impersonated = TRUE;
 
-  /* If uid is USHRT_MAX, the process is started from a non cygwin
+  /* If uid is ILLEGAL_UID, the process is started from a non cygwin
      process or the user context was changed in spawn.cc */
-  if (myself->uid == USHRT_MAX)
+  if (myself->uid == ILLEGAL_UID)
     if ((p = internal_getlogin (cygheap->user)) != NULL)
       {
 	myself->uid = p->pw_uid;
@@ -283,25 +283,25 @@ getlogin (void)
   return strcpy (this_username, cygheap->user.name ());
 }
 
-extern "C" uid_t
+extern "C" __uid16_t
 getuid (void)
 {
   return cygheap->user.real_uid;
 }
 
-extern "C" gid_t
+extern "C" __gid16_t
 getgid (void)
 {
   return cygheap->user.real_gid;
 }
 
-extern "C" uid_t
+extern "C" __uid16_t
 geteuid (void)
 {
   return myself->uid;
 }
 
-extern "C" gid_t
+extern "C" __gid16_t
 getegid (void)
 {
   return myself->gid;

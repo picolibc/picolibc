@@ -31,8 +31,8 @@ fhandler_pipe::fhandler_pipe (DWORD devtype)
 {
 }
 
-off_t
-fhandler_pipe::lseek (off_t offset, int whence)
+__off32_t
+fhandler_pipe::lseek (__off32_t offset, int whence)
 {
   debug_printf ("(%d, %d)", offset, whence);
   set_errno (ESPIPE);

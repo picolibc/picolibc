@@ -54,7 +54,7 @@ struct _winsup_t
   /*
      Needed for the group functions
    */
-  struct group _grp;
+  struct __group16 _grp;
   char *_namearray[2];
   int _grp_pos;
 

@@ -77,16 +77,16 @@ fhandler_dev_floppy::close (void)
   return fhandler_dev_raw::close ();
 }
 
-off_t
-fhandler_dev_floppy::lseek (off_t offset, int whence)
+__off32_t
+fhandler_dev_floppy::lseek (__off32_t offset, int whence)
 {
   int ret;
   char buf[512];
   long long drive_size = 0;
   long long lloffset = offset;
   long long current_position;
-  off_t sector_aligned_offset;
-  off_t bytes_left;
+  __off32_t sector_aligned_offset;
+  __off32_t bytes_left;
   DWORD low;
   LONG high = 0;
 
@@ -158,12 +158,12 @@ fhandler_dev_floppy::lseek (off_t offset, int whence)
     }
   high = lloffset >> 32;
   low = lloffset & 0xffffffff;
-  if (high || (off_t) low < 0)
+  if (high || (__off32_t) low < 0)
     {
       set_errno (EFBIG);
       return -1;
     }
-  offset = (off_t) low;
+  offset = (__off32_t) low;
 
   /* FIXME: sector can possibly be not 512 bytes long */
   sector_aligned_offset = (offset / 512) * 512;

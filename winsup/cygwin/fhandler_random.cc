@@ -132,8 +132,8 @@ fhandler_dev_random::read (void *ptr, size_t len)
   return -1;
 }
 
-off_t
-fhandler_dev_random::lseek (off_t, int)
+__off32_t
+fhandler_dev_random::lseek (__off32_t, int)
 {
   return 0;
 }

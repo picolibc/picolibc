@@ -96,10 +96,10 @@ class cygheap_user
   char  *pdomain;       /* Logon domain of the user */
   PSID   psid;          /* buffer for user's SID */
 public:
-  uid_t orig_uid;      /* Remains intact even after impersonation */
-  uid_t orig_gid;      /* Ditto */
-  uid_t real_uid;      /* Remains intact on seteuid, replaced by setuid */
-  gid_t real_gid;      /* Ditto */
+  __uid16_t orig_uid;      /* Remains intact even after impersonation */
+  __uid16_t orig_gid;      /* Ditto */
+  __uid16_t real_uid;      /* Remains intact on seteuid, replaced by setuid */
+  __gid16_t real_gid;      /* Ditto */
 
   /* token is needed if set(e)uid should be called. It can be set by a call
      to `set_impersonation_token()'. */

@@ -164,8 +164,8 @@ fhandler_dev_tape::fstat (struct stat *buf, path_conv *pc)
   return ret;
 }
 
-off_t
-fhandler_dev_tape::lseek (off_t offset, int whence)
+__off32_t
+fhandler_dev_tape::lseek (__off32_t offset, int whence)
 {
   struct mtop op;
   struct mtpos pos;
@@ -179,7 +179,7 @@ fhandler_dev_tape::lseek (off_t offset, int whence)
 
   if (ioctl (MTIOCPOS, &pos))
     {
-      return (off_t) -1;
+      return ILLEGAL_SEEK;
     }
 
   switch (whence)

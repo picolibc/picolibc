@@ -58,12 +58,27 @@ extern "C" {
 #define MASK            CLASS_OBJ
 #define OTHER           OTHER_OBJ
 
-typedef struct acl {
-    int      a_type;    /* entry type */
-    uid_t    a_id;      /* UID | GID  */
-    mode_t   a_perm;    /* permissions */
-} aclent_t;
+#ifdef __INSIDE_CYGWIN__
+typedef struct __acl16 {
+    int          a_type;    /* entry type */
+    __uid16_t    a_id;      /* UID | GID  */
+    mode_t       a_perm;    /* permissions */
+} __aclent16_t;
 
+typedef struct __acl32 {
+    int          a_type;    /* entry type */
+    __uid32_t    a_id;      /* UID | GID  */
+    mode_t       a_perm;    /* permissions */
+} __aclent32_t;
+#endif
+
+typedef struct __acl {
+    int          a_type;    /* entry type */
+    uid_t      a_id;      /* UID | GID  */
+    mode_t       a_perm;    /* permissions */
+} __aclent_t;
+
+#ifndef __INSIDE_CYGWIN__
 int _EXFUN(acl,(const char *path, int cmd, int nentries, aclent_t *aclbufp));
 int _EXFUN(lacl,(const char *path, int cmd, int nentries, aclent_t *aclbufp));
 int _EXFUN(facl,(int fd, int cmd, int nentries, aclent_t *aclbufp));
@@ -75,6 +90,7 @@ int _EXFUN(acltopbits,(aclent_t *aclbufp, int nentries, mode_t *pbitsp));
 int _EXFUN(aclfrompbits,(aclent_t *aclbufp, int nentries, mode_t *pbitsp));
 char *_EXFUN(acltotext,(aclent_t *aclbufp, int aclcnt));
 aclent_t *_EXFUN(aclfromtext,(char *acltextp, int *aclcnt));
+#endif
 
 #ifdef __cplusplus
 }

@@ -145,6 +145,10 @@ extern "C" void __stdcall do_exit (int) __attribute__ ((noreturn));
 /* UID/GID */
 void uinfo_init (void);
 
+#define ILLEGAL_UID ((__uid16_t)-1)
+#define ILLEGAL_GID ((__gid16_t)-1)
+#define ILLEGAL_SEEK ((__off32_t)-1)
+
 /* various events */
 void events_init (void);
 void events_terminate (void);

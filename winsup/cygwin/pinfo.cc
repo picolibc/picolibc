@@ -87,7 +87,7 @@ pinfo_init (char **envp, int envc)
       myself->ppid = 1;
       myself->pgid = myself->sid = myself->pid;
       myself->ctty = -1;
-      myself->uid = USHRT_MAX;
+      myself->uid = ILLEGAL_UID;
 
       environ_init (NULL, 0);	/* call after myself has been set up */
     }

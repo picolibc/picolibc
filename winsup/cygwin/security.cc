@@ -42,7 +42,6 @@ details. */
 #include "ntdll.h"
 #include "lm.h"
 
-
 extern BOOL allow_ntea;
 BOOL allow_ntsec;
 /* allow_smbntsec is handled exclusively in path.cc (path_conv::check).
@@ -451,7 +450,7 @@ get_user_primary_group (WCHAR *wlogonserver, const char *user,
 static int
 get_supplementary_group_sidlist (const char *username, cygsidlist &grp_list)
 {
-  struct group *gr;
+  struct __group16 *gr;
   int cnt = 0;
 
   for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
@@ -1086,7 +1085,7 @@ write_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size)
 
 static int
 get_nt_attribute (const char *file, int *attribute,
-		  uid_t *uidret, gid_t *gidret)
+		  __uid16_t *uidret, __gid16_t *gidret)
 {
   if (!wincap.has_security ())
     return 0;
@@ -1124,8 +1123,8 @@ get_nt_attribute (const char *file, int *attribute,
       return -1;
     }
 
-  uid_t uid = cygsid(owner_sid).get_uid ();
-  gid_t gid = cygsid(group_sid).get_gid ();
+  __uid16_t uid = cygsid(owner_sid).get_uid ();
+  __gid16_t gid = cygsid(group_sid).get_gid ();
   if (uidret)
     *uidret = uid;
   if (gidret)
@@ -1235,7 +1234,7 @@ get_nt_attribute (const char *file, int *attribute,
 
 int
 get_file_attribute (int use_ntsec, const char *file,
-		    int *attribute, uid_t *uidret, gid_t *gidret)
+		    int *attribute, __uid16_t *uidret, __gid16_t *gidret)
 {
   int res;
 
@@ -1306,7 +1305,7 @@ add_access_denied_ace (PACL acl, int offset, DWORD attributes,
 }
 
 PSECURITY_DESCRIPTOR
-alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
+alloc_sd (__uid16_t uid, __gid16_t gid, const char *logsrv, int attribute,
 	  PSECURITY_DESCRIPTOR sd_ret, DWORD *sd_size_ret)
 {
   BOOL dummy;
@@ -1334,7 +1333,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
 
   /* Get SID and name of new group. */
   cygsid group_sid (NO_SID);
-  struct group *grp = getgrgid (gid);
+  struct __group16 *grp = getgrgid (gid);
   if (grp)
     {
       if ((!grp || !group_sid.getfromgr (grp))
@@ -1575,7 +1574,7 @@ set_security_attribute (int attribute, PSECURITY_ATTRIBUTES psa,
 }
 
 static int
-set_nt_attribute (const char *file, uid_t uid, gid_t gid,
+set_nt_attribute (const char *file, __uid16_t uid, __gid16_t gid,
 		  const char *logsrv, int attribute)
 {
   if (!wincap.has_security ())
@@ -1601,7 +1600,7 @@ set_nt_attribute (const char *file, uid_t uid, gid_t gid,
 
 int
 set_file_attribute (int use_ntsec, const char *file,
-		    uid_t uid, gid_t gid,
+		    __uid16_t uid, __gid16_t gid,
 		    int attribute, const char *logsrv)
 {
   int ret = 0;

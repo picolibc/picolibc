@@ -527,10 +527,10 @@ _open (const char *unix_path, int flags, ...)
   return res;
 }
 
-extern "C" off_t
-_lseek (int fd, off_t pos, int dir)
+extern "C" __off32_t
+_lseek (int fd, __off32_t pos, int dir)
 {
-  off_t res;
+  __off32_t res;
   sigframe thisframe (mainthread);
 
   if (dir != SEEK_SET && dir != SEEK_CUR && dir != SEEK_END)
@@ -744,11 +744,11 @@ done:
  * systems, it is only a stub that always returns zero.
  */
 static int
-chown_worker (const char *name, unsigned fmode, uid_t uid, gid_t gid)
+chown_worker (const char *name, unsigned fmode, __uid16_t uid, __gid16_t gid)
 {
   int res;
-  uid_t old_uid;
-  gid_t old_gid;
+  __uid16_t old_uid;
+  __gid16_t old_gid;
 
   if (check_null_empty_str_errno (name))
     return -1;
@@ -785,9 +785,9 @@ chown_worker (const char *name, unsigned fmode, uid_t uid, gid_t gid)
 				&old_gid);
       if (!res)
 	{
-	  if (uid == (uid_t) -1)
+	  if (uid == ILLEGAL_UID)
 	    uid = old_uid;
-	  if (gid == (gid_t) -1)
+	  if (gid == ILLEGAL_GID)
 	    gid = old_gid;
 	  if (win32_path.isdir())
 	    attrib |= S_IFDIR;
@@ -809,21 +809,21 @@ done:
 }
 
 extern "C" int
-chown (const char * name, uid_t uid, gid_t gid)
+chown (const char * name, __uid16_t uid, __gid16_t gid)
 {
   sigframe thisframe (mainthread);
   return chown_worker (name, PC_SYM_FOLLOW, uid, gid);
 }
 
 extern "C" int
-lchown (const char * name, uid_t uid, gid_t gid)
+lchown (const char * name, __uid16_t uid, __gid16_t gid)
 {
   sigframe thisframe (mainthread);
   return chown_worker (name, PC_SYM_NOFOLLOW, uid, gid);
 }
 
 extern "C" int
-fchown (int fd, uid_t uid, gid_t gid)
+fchown (int fd, __uid16_t uid, __gid16_t gid)
 {
   sigframe thisframe (mainthread);
   cygheap_fdget cfd (fd);
@@ -888,8 +888,8 @@ chmod (const char *path, mode_t mode)
       /* temporary erase read only bit, to be able to set file security */
       SetFileAttributes (win32_path, (DWORD) win32_path & ~FILE_ATTRIBUTE_READONLY);
 
-      uid_t uid;
-      gid_t gid;
+      __uid16_t uid;
+      __gid16_t gid;
 
       if (win32_path.isdir ())
 	mode |= S_IFDIR;
@@ -1609,7 +1609,7 @@ setmode (int fd, int mode)
 
 /* ftruncate: P96 5.6.7.1 */
 extern "C" int
-ftruncate (int fd, off_t length)
+ftruncate (int fd, __off32_t length)
 {
   sigframe thisframe (mainthread);
   int res = -1;
@@ -1626,7 +1626,7 @@ ftruncate (int fd, off_t length)
 	  if (cfd->get_handle ())
 	    {
 	      /* remember curr file pointer location */
-	      off_t prev_loc = cfd->lseek (0, SEEK_CUR);
+	      __off32_t prev_loc = cfd->lseek (0, SEEK_CUR);
 
 	      cfd->lseek (length, SEEK_SET);
 	      if (!SetEndOfFile (h))
@@ -1646,7 +1646,7 @@ ftruncate (int fd, off_t length)
 
 /* truncate: Provided by SVR4 and 4.3+BSD.  Not part of POSIX.1 or XPG3 */
 extern "C" int
-truncate (const char *pathname, off_t length)
+truncate (const char *pathname, __off32_t length)
 {
   sigframe thisframe (mainthread);
   int fd;
@@ -1844,7 +1844,7 @@ mkfifo (const char *_path, mode_t mode)
 
 /* setgid: POSIX 4.2.2.1 */
 extern "C" int
-setgid (gid_t gid)
+setgid (__gid16_t gid)
 {
   int ret = setegid (gid);
   if (!ret)
@@ -1854,7 +1854,7 @@ setgid (gid_t gid)
 
 /* setuid: POSIX 4.2.2.1 */
 extern "C" int
-setuid (uid_t uid)
+setuid (__uid16_t uid)
 {
   int ret = seteuid (uid);
   if (!ret)
@@ -1867,7 +1867,7 @@ extern struct passwd *internal_getlogin (cygheap_user &user);
 
 /* seteuid: standards? */
 extern "C" int
-seteuid (uid_t uid)
+seteuid (__uid16_t uid)
 {
   sigframe thisframe (mainthread);
   if (wincap.has_security ())
@@ -1880,7 +1880,7 @@ seteuid (uid_t uid)
       DWORD dlen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
       SID_NAME_USE use;
 
-      if (uid == (uid_t) -1 || uid == myself->uid)
+      if (uid == ILLEGAL_UID || uid == myself->uid)
 	{
 	  debug_printf ("new euid == current euid, nothing happens");
 	  return 0;
@@ -1935,7 +1935,7 @@ seteuid (uid_t uid)
 	  BOOL current_token_is_internal_token = FALSE;
 	  BOOL explicitely_created_token = FALSE;
 
-	  struct group *gr = getgrgid (myself->gid);
+	  struct __group16 *gr = getgrgid (myself->gid);
 	  debug_printf ("myself->gid: %d, gr: %d", myself->gid, gr);
 
 	  usersid.getfrompw (pw_new);
@@ -2087,14 +2087,14 @@ seteuid (uid_t uid)
 
 /* setegid: from System V.  */
 extern "C" int
-setegid (gid_t gid)
+setegid (__gid16_t gid)
 {
   sigframe thisframe (mainthread);
   if (wincap.has_security ())
     {
-      if (gid != (gid_t) -1)
+      if (gid != ILLEGAL_GID)
 	{
-	  struct group *gr;
+	  struct __group16 *gr;
 
 	  if (!(gr = getgrgid (gid)))
 	    {
@@ -2377,7 +2377,7 @@ logout (char *line)
     {
       struct utmp *ut;
       struct utmp ut_buf[100];
-      off_t pos = 0;		/* Position in file */
+      __off32_t pos = 0;		/* Position in file */
       DWORD rd;
 
       while (!res && ReadFile (ut_fd, ut_buf, sizeof ut_buf, &rd, NULL)

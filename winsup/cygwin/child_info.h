@@ -70,7 +70,7 @@ class fhandler_base;
 class cygheap_exec_info
 {
 public:
-  uid_t uid;
+  __uid16_t uid;
   char *old_title;
   int argc;
   char **argv;

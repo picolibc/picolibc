@@ -231,8 +231,8 @@ fhandler_dev_mem::close (void)
   return fhandler_base::close ();
 }
 
-off_t
-fhandler_dev_mem::lseek (off_t offset, int whence)
+__off32_t
+fhandler_dev_mem::lseek (__off32_t offset, int whence)
 {
   switch (whence)
     {
@@ -251,13 +251,13 @@ fhandler_dev_mem::lseek (off_t offset, int whence)
 
     default:
       set_errno (EINVAL);
-      return (off_t) -1;
+      return ILLEGAL_SEEK;
     }
 
   if (pos > mem_size)
     {
       set_errno (EINVAL);
-      return (off_t) -1;
+      return ILLEGAL_SEEK;
     }
 
   return pos;
@@ -265,7 +265,7 @@ fhandler_dev_mem::lseek (off_t offset, int whence)
 
 HANDLE
 fhandler_dev_mem::mmap (caddr_t *addr, size_t len, DWORD access,
-			int flags, off_t off)
+			int flags, __off32_t off)
 {
   if ((DWORD) off >= mem_size
       || (DWORD) len >= mem_size

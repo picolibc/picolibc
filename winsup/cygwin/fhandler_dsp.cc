@@ -482,8 +482,8 @@ fhandler_dev_dsp::read (void *ptr, size_t len)
   return len;
 }
 
-off_t
-fhandler_dev_dsp::lseek (off_t offset, int whence)
+__off32_t
+fhandler_dev_dsp::lseek (__off32_t offset, int whence)
 {
   return 0;
 }

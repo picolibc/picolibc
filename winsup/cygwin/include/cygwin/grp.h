@@ -34,6 +34,9 @@ struct __group32
   __gid32_t gr_gid;
   char **gr_mem;
 };
+
+struct __group16 * getgrgid (__gid16_t gid);
+struct __group16 * getgrnam (const char *name);
 #endif
 
 #ifdef __cplusplus

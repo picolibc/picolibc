@@ -256,7 +256,7 @@ public:
   mmap_record *add_record (mmap_record r);
   void erase (int i);
   mmap_record *match (DWORD off, DWORD len);
-  off_t match (caddr_t addr, DWORD len, off_t start);
+  __off32_t match (caddr_t addr, DWORD len, __off32_t start);
 };
 
 list::list ()
@@ -307,14 +307,14 @@ list::match (DWORD off, DWORD len)
 }
 
 /* Used in munmap() */
-off_t
-list::match (caddr_t addr, DWORD len, off_t start)
+__off32_t
+list::match (caddr_t addr, DWORD len, __off32_t start)
 {
   for (int i = start + 1; i < nrecs; ++i)
     if (addr >= recs[i].get_address ()
 	&& addr + len <= recs[i].get_address () + recs[i].get_size ())
       return i;
-  return (off_t)-1;
+  return ILLEGAL_SEEK;
 }
 
 void
@@ -400,7 +400,7 @@ static map *mmapped_areas;
 
 extern "C"
 caddr_t
-mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
+mmap (caddr_t addr, size_t len, int prot, int flags, int fd, __off32_t off)
 {
   syscall_printf ("addr %x, len %d, prot %x, flags %x, fd %d, off %d",
 		  addr, len, prot, flags, fd, off);
@@ -589,7 +589,7 @@ munmap (caddr_t addr, size_t len)
       list *l = mmapped_areas->lists[it];
       if (l)
 	{
-	  off_t li = -1;
+	  __off32_t li = ILLEGAL_SEEK;
 	  if ((li = l->match(addr, len, li)) >= 0)
 	    {
 	      mmap_record *rec = l->recs + li;
@@ -695,7 +695,7 @@ msync (caddr_t addr, size_t len, int flags)
 */
 HANDLE
 fhandler_base::mmap (caddr_t *addr, size_t len, DWORD access,
-		     int flags, off_t off)
+		     int flags, __off32_t off)
 {
   set_errno (ENODEV);
   return INVALID_HANDLE_VALUE;
@@ -726,7 +726,7 @@ fhandler_base::fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
 /* Implementation for disk files. */
 HANDLE
 fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
-			  int flags, off_t off)
+			  int flags, __off32_t off)
 {
   DWORD protect;
 

@@ -623,7 +623,7 @@ dll_crt0_1 ()
 	      }
 	    if (child_proc_info->subproc_ready)
 	      ProtectHandle (child_proc_info->subproc_ready);
-	    if (myself->uid == USHRT_MAX)
+	    if (myself->uid == ILLEGAL_UID)
 	      cygheap->user.set_sid (NULL);
 	    break;
 	}

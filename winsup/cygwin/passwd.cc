@@ -183,7 +183,7 @@ read_etc_passwd ()
 /* Cygwin internal */
 /* If this ever becomes non-reentrant, update all the getpw*_r functions */
 static struct passwd *
-search_for (uid_t uid, const char *name)
+search_for (__uid16_t uid, const char *name)
 {
   struct passwd *res = 0;
   struct passwd *default_pw = 0;
@@ -214,7 +214,7 @@ search_for (uid_t uid, const char *name)
 }
 
 extern "C" struct passwd *
-getpwuid (uid_t uid)
+getpwuid (__uid16_t uid)
 {
   if (passwd_state  <= initializing)
     read_etc_passwd ();
@@ -225,7 +225,7 @@ getpwuid (uid_t uid)
 }
 
 extern "C" int
-getpwuid_r (uid_t uid, struct passwd *pwd, char *buffer, size_t bufsize, struct passwd **result)
+getpwuid_r (__uid16_t uid, struct passwd *pwd, char *buffer, size_t bufsize, struct passwd **result)
 {
   *result = NULL;
 
@@ -337,7 +337,7 @@ getpwent (void)
 }
 
 extern "C" struct passwd *
-getpwduid (uid_t)
+getpwduid (__uid16_t)
 {
   return NULL;
 }

@@ -65,8 +65,8 @@ fhandler_disk_file::fstat (struct stat *buf, path_conv *pc)
 {
   int res = -1;
   int oret;
-  uid_t uid;
-  gid_t gid;
+  __uid16_t uid;
+  __gid16_t gid;
   int open_flags = O_RDONLY | O_BINARY | O_DIROPEN;
 
   if (!pc)
@@ -455,7 +455,7 @@ fhandler_disk_file::lock (int cmd, struct flock *fl)
 	startpos = 0;
 	break;
       case SEEK_CUR:
-	if ((off_t) (startpos = lseek (0, SEEK_CUR)) == (off_t)-1)
+	if ((__off32_t) (startpos = lseek (0, SEEK_CUR)) == ILLEGAL_SEEK)
 	  return -1;
 	break;
       case SEEK_END:
@@ -714,14 +714,14 @@ fhandler_disk_file::readdir (DIR *dir)
   return res;
 }
 
-off_t
+__off32_t
 fhandler_disk_file::telldir (DIR *dir)
 {
   return dir->__d_position;
 }
 
 void
-fhandler_disk_file::seekdir (DIR *dir, off_t loc)
+fhandler_disk_file::seekdir (DIR *dir, __off32_t loc)
 {
     rewinddir (dir);
     while (loc > dir->__d_position)
@@ -818,14 +818,14 @@ fhandler_cygdrive::readdir (DIR *dir)
   return dir->__d_dirent;
 }
 
-off_t
+__off32_t
 fhandler_cygdrive::telldir (DIR *dir)
 {
   return fhandler_disk_file::telldir (dir);
 }
 
 void
-fhandler_cygdrive::seekdir (DIR *dir, off_t loc)
+fhandler_cygdrive::seekdir (DIR *dir, __off32_t loc)
 {
   if (!iscygdrive_root ())
     return fhandler_disk_file::seekdir (dir, loc);

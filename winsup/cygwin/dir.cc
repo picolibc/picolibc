@@ -119,7 +119,7 @@ readdir (DIR *dir)
 }
 
 /* telldir */
-extern "C" off_t
+extern "C" __off32_t
 telldir (DIR *dir)
 {
   if (check_null_invalid_struct_errno (dir))
@@ -132,7 +132,7 @@ telldir (DIR *dir)
 
 /* seekdir */
 extern "C" void
-seekdir (DIR *dir, off_t loc)
+seekdir (DIR *dir, __off32_t loc)
 {
   if (check_null_invalid_struct_errno (dir))
     return;

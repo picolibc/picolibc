@@ -693,10 +693,10 @@ fhandler_base::write (const void *ptr, size_t len)
   return res;
 }
 
-off_t
-fhandler_base::lseek (off_t offset, int whence)
+__off32_t
+fhandler_base::lseek (__off32_t offset, int whence)
 {
-  off_t res;
+  __off32_t res;
 
   /* Seeks on text files is tough, we rewind and read till we get to the
      right place.  */
@@ -1181,7 +1181,7 @@ fhandler_base::readdir (DIR *)
   return NULL;
 }
 
-off_t
+__off32_t
 fhandler_base::telldir (DIR *)
 {
   set_errno (ENOTDIR);
@@ -1189,7 +1189,7 @@ fhandler_base::telldir (DIR *)
 }
 
 void
-fhandler_base::seekdir (DIR *, off_t)
+fhandler_base::seekdir (DIR *, __off32_t)
 {
   set_errno (ENOTDIR);
   return;

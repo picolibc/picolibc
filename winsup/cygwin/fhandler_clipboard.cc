@@ -246,8 +246,8 @@ fhandler_dev_clipboard::read (void *ptr, size_t len)
     }
 }
 
-off_t
-fhandler_dev_clipboard::lseek (off_t offset, int whence)
+__off32_t
+fhandler_dev_clipboard::lseek (__off32_t offset, int whence)
 {
   /* On reads we check this at read time, not seek time.
    * On writes we use this to decide how to write - empty and write, or open, copy, empty
