@@ -171,8 +171,9 @@ self-contained executable.
 If this is an issue because you intend to distribute your Cygwin
 application, then you had better read and understand
 @file{http://cygwin.com/licensing.html}, which explains the licensing
-options.  Unless you purchase a special commercial license from
-Red Hat, then your Cygwin application must conform to the GPL.
+options.  Unless you purchase a special commercial license from Red
+Hat, then your software must comply with the Open Source Definition or
+the GPL.
 
 @subsection Can I link with both MSVCRT*.DLL and cygwin1.dll?
 
