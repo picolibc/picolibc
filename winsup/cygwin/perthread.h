@@ -1,6 +1,6 @@
-/* perthread.h: Header file for cygwin synchronization primitives.
+/* perthread.h: Header file for cygwin thread-local storage.
 
-   Copyright 2000, 2001 Red Hat, Inc.
+   Copyright 2000, 2001, 2002 Red Hat, Inc.
 
    Written by Christopher Faylor <cgf@cygnus.com>
 
