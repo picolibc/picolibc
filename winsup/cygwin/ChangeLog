@@ -1,3 +1,8 @@
+2002-05-25  Robert Collins   <rbtcollins@hotmail.com>
+
+	* winsup.h: Remove duplicate declarations of malloc_lock and
+	malloc_unlock.
+
 2002-05-24  Christopher Faylor  <cgf@redhat.com>
 
 	Remove unneeded sync.h, where appropriate, throughout.

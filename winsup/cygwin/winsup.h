@@ -228,9 +228,6 @@ extern void multiple_cygwin_problem (const char *, unsigned, unsigned);
 extern "C" void __malloc_lock (struct _reent *);
 extern "C" void __malloc_unlock (struct _reent *);
 
-extern "C" void __malloc_lock (struct _reent *);
-extern "C" void __malloc_unlock (struct _reent *);
-
 class path_conv;
 int __stdcall stat_worker (const char *name, struct __stat64 *buf, int nofollow,
 			   path_conv *pc = NULL) __attribute__ ((regparm (3)));
