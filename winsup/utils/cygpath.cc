@@ -30,28 +30,30 @@ static int path_flag, unix_flag, windows_flag, absolute_flag;
 static int shortname_flag, longname_flag;
 static int ignore_flag, allusers_flag, output_flag;
 static int mixed_flag;
-static const char *windows_format_arg;
+static const char *format_type_arg;
 
 static struct option long_options[] = {
-  {(char *) "help", no_argument, NULL, 'h'},
   {(char *) "absolute", no_argument, NULL, 'a'},
+  {(char *) "close", required_argument, NULL, 'c'},
+  {(char *) "dos", no_argument, NULL, 'd'},
+  {(char *) "file", required_argument, NULL, 'f'},
+  {(char *) "help", no_argument, NULL, 'h'},
+  {(char *) "ignore", no_argument, NULL, 'i'},
+  {(char *) "long-name", no_argument, NULL, 'l'},
+  {(char *) "mixed", no_argument, NULL, 'm'},
   {(char *) "option", no_argument, NULL, 'o'},
   {(char *) "path", no_argument, NULL, 'p'},
-  {(char *) "close", required_argument, (int *) &close_arg, 'c'},
+  {(char *) "short-name", no_argument, NULL, 's'},
+  {(char *) "type", required_argument, NULL, 't'},
   {(char *) "unix", no_argument, NULL, 'u'},
-  {(char *) "file", required_argument, (int *) &file_arg, 'f'},
   {(char *) "version", no_argument, NULL, 'v'},
   {(char *) "windows", no_argument, NULL, 'w'},
-  {(char *) "short-name", no_argument, NULL, 's'},
-  {(char *) "long-name", no_argument, NULL, 'l'},
-  {(char *) "windir", no_argument, NULL, 'W'},
-  {(char *) "sysdir", no_argument, NULL, 'S'},
-  {(char *) "ignore", no_argument, NULL, 'i'},
   {(char *) "allusers", no_argument, NULL, 'A'},
   {(char *) "desktop", no_argument, NULL, 'D'},
-  {(char *) "smprograms", no_argument, NULL, 'P'},
-  {(char *) "type", required_argument, (int *) &windows_format_arg, 't'},
   {(char *) "homeroot", no_argument, NULL, 'H'},
+  {(char *) "smprograms", no_argument, NULL, 'P'},
+  {(char *) "sysdir", no_argument, NULL, 'S'},
+  {(char *) "windir", no_argument, NULL, 'W'},
   {0, no_argument, 0, 0}
 };
 
@@ -60,33 +62,41 @@ usage (FILE * stream, int status)
 {
   if (!ignore_flag || !status)
     fprintf (stream, "\
-Usage: %s (-u|-w|-t TYPE) [-c HANDLE] [-f FILE] [options] NAME\n\n\
-       %s [-ADHPSW] \n\n\
-Output type options (required):\n\
-  -u|--unix		print Unix form of NAME (default)\n\
-  -w|--windows		print Windows form of NAME \n\n\
-  -t|--type             print Windows form of NAME with TYPE one of\n\
-     dos                drive letter with backslashes (C:\\WINNT)\n\
-     mixed              drive letter with regular slashes (C:/WINNT)\n\
+Usage: %s (-d|-m|-u|-w|-t TYPE) [-c HANDLE] [-f FILE] [options] NAME\n\
+       %s [-ADHPSW] \n\
+Output type options:\n\
+  -d, --dos	        print DOS (short) form of NAME (C:\\PROGRA~1\\)\n\
+  -m, --mixed           like --windows, but with regular slashes (C:/WINNT)\n\
+  -u, --unix	        (default) print Unix form of NAME (/cygdrive/c/winnt)\n\
+  -w, --windows         print Windows form of NAME (C:\\WINNT)\n\
+  -t, --type TYPE       print TYPE form: 'dos', 'mixed', 'unix', or 'windows'\n\
 Path conversion options:\n\
-  -a|--absolute		output absolute path\n\
-  -c|--close HANDLE     close HANDLE (for use in captured process)\n\
-  -f|--file FILE        read FILE for input; use - to read from STDIN\n\
-  -i|--ignore		ignore missing argument\n\
-  -l|--long-name	print Windows long form of NAME (with -w only)\n\
-  -p|--path		NAME is a PATH list (i.e., '/bin:/usr/bin')\n\
-  -s|--short-name	print Windows short form of NAME (with -w only)\n\
-System information output:\n\
-  -A|--allusers		use `All Users' instead of current user for -D, -P\n\
-  -D|--desktop		output `Desktop' directory and exit\n\
-  -H|--homeroot		output `Profiles' directory (home root) and exit\n\
-  -P|--smprograms	output Start Menu `Programs' directory and exit\n\
-  -S|--sysdir		output system directory and exit\n\
-  -W|--windir		output `Windows' directory and exit\n\n\
+  -a, --absolute        output absolute path\n\
+  -l, --long-name	print Windows long form of NAME (with -w, -m only)\n\
+  -p, --path	        NAME is a PATH list (i.e., '/bin:/usr/bin')\n\
+  -s, --short-name	print DOS (short) form of NAME (with -w, -m only)\n\
+System information:\n\
+  -A, --allusers        use `All Users' instead of current user for -D, -P\n\
+  -D, --desktop		output `Desktop' directory and exit\n\
+  -H, --homeroot        output `Profiles' directory (home root) and exit\n\
+  -P, --smprograms	output Start Menu `Programs' directory and exit\n\
+  -S, --sysdir		output system directory and exit\n\
+  -W, --windir		output `Windows' directory and exit\n\
+", prog_name, prog_name);
+  if (stream == stdout)
+    {
+    fprintf (stream, "\
 Other options:\n\
-  -h|--help             output usage information and exit\n\
-  -v|--version		output version information and exit\n\
-  ", prog_name, prog_name);
+  -f, --file FILE       read FILE for input; use - to read from STDIN\n\
+  -o, --option          read options from FILE as well (for use with --file)\n\
+  -c, --close HANDLE    close HANDLE (for use in captured process)\n\
+  -i, --ignore		ignore missing argument\n\
+  -h, --help            output usage information and exit\n\
+  -v, --version		output version information and exit\
+");
+    }
+  else
+    fprintf(stream, "Try `%s --help' for more information.", prog_name);
   exit (ignore_flag ? 0 : status);
 }
 
@@ -543,7 +553,7 @@ main (int argc, char **argv)
     prog_name++;
 
   path_flag = 0;
-  unix_flag = 0;
+  unix_flag = 1;
   windows_flag = 0;
   shortname_flag = 0;
   longname_flag = 0;
@@ -552,7 +562,7 @@ main (int argc, char **argv)
   options_from_file_flag = 0;
   allusers_flag = 0;
   output_flag = 0;
-  while ((c = getopt_long (argc, argv, (char *) "hac:f:opslSuvwt:WiDPAH",
+  while ((c = getopt_long (argc, argv, (char *) "ac:df:hilmopst:uvwADHPSW",
 			   long_options, (int *) NULL)) != EOF)
     {
       switch (c)
@@ -563,6 +573,14 @@ main (int argc, char **argv)
 
 	case 'c':
 	  CloseHandle ((HANDLE) strtoul (optarg, NULL, 16));
+	  break;
+
+	case 'd':
+	  if (windows_flag) 
+	    usage (stderr, 1);
+	  unix_flag = 0;
+	  windows_flag = 1;
+	  shortname_flag = 1;
 	  break;
 
 	case 'f':
@@ -578,40 +596,63 @@ main (int argc, char **argv)
 	  break;
 
 	case 'u':
-	  if (unix_flag || windows_flag)
+	  if (windows_flag || mixed_flag)
 	    usage (stderr, 1);
 	  unix_flag = 1;
 	  break;
 
 	case 'w':
-	  if (unix_flag || windows_flag)
+	  if (windows_flag || mixed_flag)
 	    usage (stderr, 1);
+	  unix_flag = 0;
 	  windows_flag = 1;
 	  break;
 
+	 case 'm':
+	  unix_flag = 0;
+	  windows_flag = 1;
+	  mixed_flag = 1;
+	  break;
+
 	case 'l':
-	  if (unix_flag || shortname_flag)
-	    usage (stderr, 1);
 	  longname_flag = 1;
 	  break;
 
 	case 's':
-	  if (unix_flag || longname_flag)
-	    usage (stderr, 1);
 	  shortname_flag = 1;
 	  break;
 
 	 case 't':
-	  if (unix_flag || (optarg == NULL))
+	  if (optarg == NULL)
 	    usage (stderr, 1);
 
-	  windows_flag = 1;
-	  windows_format_arg = (*optarg == '=') ? (optarg + 1) : (optarg);
-
-	  if (strcasecmp (windows_format_arg, "mixed") == 0)
+	  format_type_arg = (*optarg == '=') ? (optarg + 1) : (optarg);
+	  if (strcasecmp (format_type_arg, "dos") == 0)
+            {
+            if (windows_flag || longname_flag)
+              usage (stderr, 1);
+            unix_flag = 0;
+            windows_flag = 1;
+            shortname_flag = 1;
+            }
+	  else if (strcasecmp (format_type_arg, "mixed") == 0)
+            {
+            unix_flag = 0;
 	    mixed_flag = 1;
-	  else if (strcasecmp (windows_format_arg, "dos") == 0)
-	    /* nothing */;
+            }
+	  else if (strcasecmp (format_type_arg, "unix") == 0)
+            {
+            if (windows_flag)
+              usage (stderr, 1);
+	    unix_flag = 1;
+            }
+	  else if (strcasecmp (format_type_arg, "windows") == 0)
+            {
+            if (mixed_flag)
+              usage (stderr, 1);
+            unix_flag = 0;
+            windows_flag = 1;
+            }
 	  else
 	    usage (stderr, 1);
 	  break;
@@ -652,7 +693,13 @@ main (int argc, char **argv)
   if (options_from_file_flag && !file_arg)
     usage (stderr, 1);
 
-  if (!output_flag && !unix_flag && !windows_flag && !options_from_file_flag)
+  if (longname_flag && !windows_flag)
+    usage (stderr, 1);
+
+  if (shortname_flag && !windows_flag)
+    usage (stderr, 1);
+
+  if (!unix_flag && !windows_flag && !mixed_flag && !options_from_file_flag)
     usage (stderr, 1);
 
   if (!file_arg)
@@ -714,6 +761,10 @@ main (int argc, char **argv)
 		    shortname_flag = 0;
 		    longname_flag = 1;
 		    break;
+		  case 'm':
+		    unix_flag = 0;
+		    windows_flag = 1;
+		    mixed_flag = 1;
 		  case 'w':
 		    unix_flag = 0;
 		    windows_flag = 1;

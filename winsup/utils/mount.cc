@@ -296,7 +296,7 @@ main (int argc, char **argv)
 	    fprintf (stderr, "%s: too many arguments\n", progname);
 	  usage ();
 	}
-      if (force || !mount_already_exists (argv[optind + 1], flags))
+      if (force || !mount_already_exists (argv[optind + 1], flags | default_flag))
 	do_mount (argv[optind], argv[optind + 1], flags | default_flag);
       else
 	{

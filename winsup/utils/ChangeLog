@@ -1,3 +1,16 @@
+2002-07-01  Christopher Faylor  <cgf@redhat.com>
+
+	* mount.cc (main): Ensure that mount_already_exists() also gets default
+	flag that is passed to do_mount.
+
+2002-06-22  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
+
+	* cygpath.cc (long_options): Add "dos" and "mixed", correct "close",
+	"file" and "type" to use NULL flag.
+	(usage): Clean up usage output (more), accomodate new options.
+	(main): Add --dos and --mixed options; accomodate all output forms in
+	--type.  Make UNIXy output default.
+
 2002-06-18  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* cygpath.cc (usage): Clean up usage output.
@@ -162,14 +175,6 @@
 	(proc_child): Do it here, instead, after first debug event.  This
 	should work around inexplicable races with DebugActiveProcess.
 	(dostrace): Pass any pid argument to proc_child.
-
-2002-05-23  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
-
-	* setfacl.c (usage): Standardize usage output. Change return type to
-	static void.
-	(print_version): New function.
-	(longopts): Added longopts for all options.
-	(main): Accommodate changes in usage function and new version option.
 
 2002-05-23  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
