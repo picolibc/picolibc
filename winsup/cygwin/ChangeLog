@@ -1,8 +1,8 @@
 2001-03-12  Egor Duda  <deo@logos-m.ru>
 
 	* fhandler.h (fhandler_termios::fixup_after_exec): New function.
-	* fhandler.cc (fhandler_termios::fixup_after_fork): New function.
-	Fixup output handle.
+	* fhandler_termios.cc (fhandler_termios::fixup_after_fork): New
+	function. Fixup output handle.
 	* fhandler_tty.cc (fhandler_tty_common::fixup_after_fork): Output
 	handle is now fixed up in fhandler_termios::fixup_after_fork().
 
