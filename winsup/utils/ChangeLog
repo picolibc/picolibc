@@ -1,5 +1,13 @@
 2002-05-23  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
+        * setfacl.c (usage): Standardize usage output. Change return type to
+        static void.
+        (print_version): New function.
+        (longopts): Added longopts for all options.
+        (main): Accommodate changes in usage function and new version option.
+
+2002-05-23  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
+
 	* getfacl.c (usage): Standardize usage output. Change return type to
 	static void.
 	(print_version): New function.

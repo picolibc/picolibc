@@ -37,6 +37,9 @@ details. */
 #define ILLEGAL_MODE ((mode_t)0xffffffff)
 #endif
 
+static const char version[] = "$Revision$";
+static char *prog_name;
+
 typedef enum {
   NoAction,
   Set,
@@ -45,8 +48,6 @@ typedef enum {
   ModNDel,
   SetFromFile
 } action_t;
-
-char *myname;
 
 mode_t getperm (char *in)
 {
@@ -267,117 +268,156 @@ setfacl (action_t action, char *path, aclent_t *acls, int cnt)
   if (action == Set)
     {
       if (acl (path, SETACL, cnt, acls))
-        perror (myname);
+        perror (prog_name);
       return;
     }
   if ((lcnt = acl (path, GETACL, MAX_ACL_ENTRIES, lacl)) < 0
       || (lcnt = modacl (lacl, lcnt, acls, cnt)) < 0
       || (lcnt = acl (path, SETACL, lcnt, lacl)) < 0)
-    perror (myname);
+    perror (prog_name);
 }
 
-#define pn(txt)	fprintf (fp, txt "\n", myname)
-#define p(txt)	fprintf (fp, txt "\n")
-
-int
-usage (int help)
+static void
+usage (FILE * stream)
 {
-  FILE *fp = help ? stdout : stderr;
-
-  pn ("usage: %s [-r] -s acl_entries file...");
-  pn ("       %s [-r] -md acl_entries file...");
-  pn ("       %s [-r] -f acl_file file...");
-  if (!help)
-    pn ("Try `%s --help' for more information.");
+  fprintf (stream, ""
+            "Usage: %s [-r] (-f ACL_FILE | -s acl_entries) FILE...\n"
+            "       %s [-r] ([-d acl_entries] [-m acl_entries]) FILE...\n"
+            "\n"
+            "Modify file and directory access control lists (ACLs)\n"
+            "\n"
+            "  -d, --delete     delete one or more specified ACL entries\n"
+            "  -f, --file       set ACL entries for FILE to ACL entries read\n"
+            "                   from a ACL_FILE\n"
+            "  -m, --modify     modify one or more specified ACL entries\n"
+            "  -r, --replace    replace mask entry with maximum permissions\n"
+            "                   needed for the file group class\n"
+            "  -s, --substitute substitute specified ACL entries for the\n"
+            "                   ACL of FILE\n"
+            "  -h, --help       output usage information and exit\n"
+            "  -v, --version    output version information and exit\n"
+            "\n"
+            "At least one of (-d, -f, -m, -s) must be specified\n"
+            "\n"
+            "", prog_name, prog_name);
+  if (stream == stdout) 
+  {
+    printf(""
+            "     Acl_entries are one or more comma-separated ACL entries \n"
+            "     from the following list:\n"
+            "\n"
+            "         u[ser]::perm\n"
+            "         u[ser]:uid:perm\n"
+            "         g[roup]::perm\n"
+            "         g[roup]:gid:perm\n"
+            "         m[ask]::perm\n"
+            "         o[ther]::perm\n"
+            "\n"
+            "     Default entries are like the above with the additional\n"
+            "     default identifier. For example: \n"
+            "\n"
+            "         d[efault]:u[ser]:uid:perm\n"
+            "\n"
+            "     `perm' is either a 3-char permissions string in the form\n"
+            "     \"rwx\" with the character - for no permission\n"
+            "     or it is the octal representation of the permissions, a\n"
+            "     value from 0 (equivalent to \"---\") to 7 (\"rwx\").\n"
+            "     `uid' is a user name or a numerical uid.\n"
+            "     `gid' is a group name or a numerical gid.\n"
+            "\n"
+            "\n"
+            "For each file given as parameter, %s will either replace its\n"
+            "complete ACL (-s, -f), or it will add, modify, or delete ACL\n"
+            "entries.\n"
+            "\n"
+            "The following options are supported:\n"
+            "\n"
+            "-d   Delete one or more specified entries from the file's ACL.\n"
+            "     The owner, group and others entries must not be deleted.\n"
+            "     Acl_entries to be deleted should be specified without\n"
+            "     permissions, as in the following list:\n"
+            "\n"
+            "         u[ser]:uid\n"
+            "         g[roup]:gid\n"
+            "         d[efault]:u[ser]:uid\n"
+            "         d[efault]:g[roup]:gid\n"
+            "         d[efault]:m[ask]:\n"
+            "         d[efault]:o[ther]:\n"
+            "\n"
+            "-f   Take the Acl_entries from ACL_FILE one per line. Whitespace\n"
+            "     characters are ignored, and the character \"#\" may be used\n"
+            "     to start a comment.  The special filename \"-\" indicates\n"
+            "     reading from stdin.\n"
+            "     Required entries are\n"
+            "     - One user entry for the owner of the file.\n"
+            "     - One group entry for the group of the file.\n"
+            "     - One other entry.\n"
+            "     If additional user and group entries are given:\n"
+            "     - A mask entry for the file group class of the file.\n"
+            "     - No duplicate user or group entries with the same uid/gid.\n"
+            "     If it is a directory:\n"
+            "     - One default user entry for the owner of the file.\n"
+            "     - One default group entry for the group of the file.\n"
+            "     - One default mask entry for the file group class.\n"
+            "     - One default other entry.\n"
+            "\n"
+            "-m   Add or modify one or more specified ACL entries.\n"
+            "     Acl_entries is a comma-separated list of entries from the \n"
+            "     same list as above.\n"
+            "\n"
+            "-r   Causes the permissions specified in the mask entry to be\n"
+            "     ignored and replaced by the maximum permissions needed for\n"
+            "     the file group class.\n"
+            "\n"
+            "-s   Like -f, but substitute the file's ACL with Acl_entries\n" 
+            "     specified in a comma-separated list on the command line.\n"
+            "\n"
+            "While the -d and -m options may be used in the same command, the\n"
+            "-f and -s options may be used only exclusively.\n"
+            "\n"
+            "Directories may contain default ACL entries.  Files created\n"
+            "in a directory that contains default ACL entries will have\n"
+            "permissions according to the combination of the current umask,\n"
+            "the explicit permissions requested and the default ACL entries\n"
+            "Note: Under Cygwin, the default ACL entries are not taken into\n"
+            "account currently.\n", prog_name);
+  }
   else
-    {
-      p ("");
-      p ("Modify file and directory access control lists (ACLs)");
-      p ("");
-      pn ("For each file given as parameter, %s will either replace its");
-      p ("complete ACL (-s, -f)), or it will add, modify, or delete ACL");
-      p ("entries.");
-      p ("");
-      p ("The following options are supported:");
-      p ("");
-      p ("-s   Substitute the ACL of the file by the entries specified on");
-      p ("     the command line.  Required entries are");
-      p ("     - One user entry for the owner of the file.");
-      p ("     - One group entry for the group of the file.");
-      p ("     - One other entry.");
-      p ("     If additional user and group entries are given:");
-      p ("     - A mask entry for the file group class of the file.");
-      p ("     - No duplicate user or group entries with the same uid/gid.");
-      p ("     If it is a directory:");
-      p ("     - One default user entry for the owner of the file.");
-      p ("     - One default group entry for the group of the file.");
-      p ("     - One default mask entry for the file group class of the file.");
-      p ("     - One default other entry.");
-      p ("");
-      p ("     Acl_entries are one or more comma-separated ACL entries from");
-      p ("     the following list:");
-      p ("");
-      p ("         u[ser]::perm");
-      p ("         u[ser]:uid:perm");
-      p ("         g[roup]::perm");
-      p ("         g[roup]:gid:perm");
-      p ("         m[ask]::perm");
-      p ("         o[ther]::perm");
-      p ("");
-      p ("     Default entries are like the above with the trailing default");
-      p ("     identifier.  E.g.");
-      p ("");
-      p ("         d[efault]:u[ser]:uid:perm");
-      p ("");
-      p ("     `perm' is either a 3-char permissions string in the form");
-      p ("     \"rwx\" with the character - for not setting a permission");
-      p ("     or it is the octal representation of the permissions, a");
-      p ("     value from 0 (equivalent to \"---\") to 7 (\"rwx\").");
-      p ("     `uid' is a user name or a numerical uid.");
-      p ("     `gid' is a group name or a numerical gid.");
-      p ("");
-      p ("-f   Like -s but take the ACL entries from `acl_file'.  Acl_entries");
-      p ("     are given one per line.  Whitespace characters are ignored,");
-      p ("     the character \"#\" may be used to start a comment.  The");
-      p ("     special filename \"-\" indicates reading from stdin.");
-      p ("");
-      p ("-m   Add or modify one or more specified ACL entries.  Acl_entries");
-      p ("     is a comma-separated list of entries from the same list as");
-      p ("     above.");
-      p ("");
-      p ("-d   Delete one or more specified entries from the file's ACL.");
-      p ("     The owner, group and others entries must not be deleted");
-      p ("     Acl_entries are one or more comma-separated ACL entries");
-      p ("     without permissions, taken from the following list:");
-      p ("");
-      p ("         u[ser]:uid");
-      p ("         g[roup]:gid");
-      p ("         d[efault]:u[ser]:uid");
-      p ("         d[efault]:g[roup]:gid");
-      p ("         d[efault]:m[ask]:");
-      p ("         d[efault]:o[ther]:");
-      p ("");
-      p ("-r   Causes the permissions specified in the mask entry to be");
-      p ("     ignored and replaced by the maximum permissions needed for");
-      p ("     the file group class.");
-      p ("");
-      p ("While the -m and -d options may be used in the same command, the");
-      p ("-s and -f options may be used only exclusively.");
-      p ("");
-      p ("Directories may contain default ACL entries.  Files created");
-      p ("in a directory that contains default ACL entries will have");
-      p ("permissions according to the combination of the current umask,");
-      p ("the explicit permissions requested and the default ACL entries");
-      p ("Note: Under Cygwin, the default ACL entries are not taken into");
-      p ("account currently.");
-    }
-  return 1;
+    fprintf(stream, "Try `%s --help' for more information.", prog_name);
 }
 
 struct option longopts[] = {
+  {"delete", required_argument, NULL, 'd'},
+  {"file", required_argument, NULL, 'f'},
+  {"modify", required_argument, NULL, 'm'},
+  {"replace", no_argument, NULL, 'r'},
+  {"substitute", required_argument, NULL, 's'},
   {"help", no_argument, NULL, 'h'},
+  {"version", no_argument, NULL, 'v'},
   {0, no_argument, NULL, 0}
 };
+
+static void
+print_version ()
+{
+  const char *v = strchr (version, ':');
+  int len;
+  if (!v)
+    {
+      v = "?";
+      len = 1;
+    }
+  else
+    {
+      v += 2;
+      len = strchr (v, ' ') - v;
+    }
+  printf ("\
+setfacl (cygwin) %.*s\n\
+ACL Modification Utility\n\
+Copyright 2000, 2001, 2002 Red Hat, Inc.\n\
+Compiled on %s", len, v, __DATE__);
+}
 
 int
 main (int argc, char **argv)
@@ -390,9 +430,16 @@ main (int argc, char **argv)
   aclent_t acls[MAX_ACL_ENTRIES];
   int aclidx = 0;
 
-  myname = argv[0];
+  prog_name = strrchr (argv[0], '/');
+  if (prog_name == NULL)
+    prog_name = strrchr (argv[0], '\\');
+  if (prog_name == NULL)
+    prog_name = argv[0];
+  else
+    prog_name++;
+
   memset (acls, 0, sizeof acls);
-  while ((c = getopt_long (argc, argv, "d:f:m:rs:", longopts, NULL)) != EOF)
+  while ((c = getopt_long (argc, argv, "d:f:hm:rs:v", longopts, NULL)) != EOF)
     switch (c)
       {
       case 'd':
@@ -401,10 +448,13 @@ main (int argc, char **argv)
         else if (action == Modify)
           action = ModNDel;
         else
-          return usage (0);
+          {
+            usage (stderr);
+            return 1;
+	  }
         if (! getaclentries (Delete, optarg, acls, &aclidx))
           {
-            fprintf (stderr, "%s: illegal acl entries\n", myname);
+            fprintf (stderr, "%s: illegal acl entries\n", prog_name);
             return 2;
           }
         break;
@@ -412,23 +462,32 @@ main (int argc, char **argv)
         if (action == NoAction)
           action = Set;
         else
-          return usage (0);
+          {
+            usage (stderr);
+            return 1;
+	  }
         if (! getaclentries (SetFromFile, optarg, acls, &aclidx))
           {
-            fprintf (stderr, "%s: illegal acl entries\n", myname);
+            fprintf (stderr, "%s: illegal acl entries\n", prog_name);
             return 2;
           }
         break;
+      case 'h':
+        usage (stdout);
+        return 0;
       case 'm':
         if (action == NoAction)
           action = Modify;
         else if (action == Delete)
           action = ModNDel;
         else
-          return usage (0);
+          {
+            usage (stderr);
+            return 1;
+	  }
         if (! getaclentries (Modify, optarg, acls, &aclidx))
           {
-            fprintf (stderr, "%s: illegal acl entries\n", myname);
+            fprintf (stderr, "%s: illegal acl entries\n", prog_name);
             return 2;
           }
         break;
@@ -436,55 +495,69 @@ main (int argc, char **argv)
         if (!ropt)
           ropt = 1;
         else
-          return usage (0);
+          {
+            usage (stderr);
+            return 1;
+	  }
         break;
       case 's':
         if (action == NoAction)
           action = Set;
         else
-          return usage (0);
+          {
+            usage (stderr);
+            return 1;
+	  }
         break;
         if (! getaclentries (Set, optarg, acls, &aclidx))
           {
-            fprintf (stderr, "%s: illegal acl entries\n", myname);
+            fprintf (stderr, "%s: illegal acl entries\n", prog_name);
             return 2;
           }
         break;
-      case 'h':
-        return usage (1);
+      case 'v':
+        print_version ();
+        return 0;
       default:
-        return usage (0);
+        usage (stderr);
+        return 1;
       }
   if (action == NoAction)
-    return usage (0);
+    {
+      usage (stderr);
+      return 1;
+    }
   if (optind > argc - 1)
-    return usage (0);
+    {
+      usage (stderr);
+      return 1;
+    }
   if (action == Set)
     switch (aclcheck (acls, aclidx, NULL))
       {
       case GRP_ERROR:
-        fprintf (stderr, "%s: more than one group entry.\n", myname);
+        fprintf (stderr, "%s: more than one group entry.\n", prog_name);
         return 2;
       case USER_ERROR:
-        fprintf (stderr, "%s: more than one user entry.\n", myname);
+        fprintf (stderr, "%s: more than one user entry.\n", prog_name);
         return 2;
       case CLASS_ERROR:
-        fprintf (stderr, "%s: more than one mask entry.\n", myname);
+        fprintf (stderr, "%s: more than one mask entry.\n", prog_name);
         return 2;
       case OTHER_ERROR:
-        fprintf (stderr, "%s: more than one other entry.\n", myname);
+        fprintf (stderr, "%s: more than one other entry.\n", prog_name);
         return 2;
       case DUPLICATE_ERROR:
-        fprintf (stderr, "%s: duplicate additional user or group.\n", myname);
+        fprintf (stderr, "%s: duplicate additional user or group.\n", prog_name);
         return 2;
       case ENTRY_ERROR:
-        fprintf (stderr, "%s: invalid entry type.\n", myname);
+        fprintf (stderr, "%s: invalid entry type.\n", prog_name);
         return 2;
       case MISS_ERROR:
-        fprintf (stderr, "%s: missing entries.\n", myname);
+        fprintf (stderr, "%s: missing entries.\n", prog_name);
         return 2;
       case MEM_ERROR:
-        fprintf (stderr, "%s: out of memory.\n", myname);
+        fprintf (stderr, "%s: out of memory.\n", prog_name);
         return 2;
       default:
         break;
