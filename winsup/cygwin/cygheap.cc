@@ -64,8 +64,17 @@ init_cheap ()
   cygheap_max = cygheap + 1;
 }
 
-void __stdcall
-cygheap_setup_for_child (child_info *ci)
+static void dup_now (void *, child_info *, unsigned) __attribute__ ((regparm(3)));
+static void
+dup_now (void *newcygheap, child_info *ci, unsigned n)
+{
+  if (!VirtualAlloc (newcygheap, n, MEM_COMMIT, PAGE_READWRITE))
+    api_fatal ("couldn't allocate new cygwin heap for child, %E");
+  memcpy (newcygheap, cygheap, n);
+}
+
+void *__stdcall
+cygheap_setup_for_child (child_info *ci, bool dup_later)
 {
   void *newcygheap;
   cygheap_protect->acquire ();
@@ -73,20 +82,29 @@ cygheap_setup_for_child (child_info *ci)
   ci->cygheap_h = CreateFileMapping (INVALID_HANDLE_VALUE, &sec_none,
 				     CFMAP_OPTIONS, 0, CYGHEAPSIZE, NULL);
   newcygheap = MapViewOfFileEx (ci->cygheap_h, MVMAP_OPTIONS, 0, 0, 0, NULL);
-  if (!VirtualAlloc (newcygheap, n, MEM_COMMIT, PAGE_READWRITE))
-    api_fatal ("couldn't allocate new cygwin heap for child, %E");
-  memcpy (newcygheap, cygheap, n);
-  UnmapViewOfFile (newcygheap);
+  ProtectHandle1 (ci->cygheap_h, passed_cygheap_h);
+  if (!dup_later)
+    dup_now (newcygheap, ci, n);
+  cygheap_protect->release ();
   ci->cygheap = cygheap;
   ci->cygheap_max = cygheap_max;
-  ProtectHandle1 (ci->cygheap_h, passed_cygheap_h);
-  cygheap_protect->release ();
-  return;
+  return newcygheap;
 }
 
 void __stdcall
-cygheap_setup_for_child_cleanup (child_info *ci)
+cygheap_setup_for_child_cleanup (void *newcygheap, child_info *ci,
+    				 bool dup_it_now)
 {
+  if (dup_it_now)
+    {
+      /* NOTE: There is an assumption here that cygheap_max has not changed
+         between the time that cygheap_setup_for_child was called and now.
+	 Make sure that this is a correct assumption.  */
+      cygheap_protect->acquire ();
+      dup_now (newcygheap, ci, (char *) cygheap_max - (char *) cygheap);
+      cygheap_protect->release ();
+    }
+  UnmapViewOfFile (newcygheap);
   ForceCloseHandle1 (ci->cygheap_h, passed_cygheap_h);
 }
 

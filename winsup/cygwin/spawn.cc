@@ -590,6 +590,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 
   syscall_printf ("spawn_guts null_app_name %d (%s, %.132s)", null_app_name, runpath, one_line.buf);
 
+  void *newheap;
   cygbench ("spawn-guts");
   if (!hToken)
     {
@@ -597,7 +598,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
       /* FIXME: This leaks a handle in the CreateProcessAsUser case since the
 	 child process doesn't know about cygwin_mount_h. */
       ciresrv.mount_h = cygwin_mount_h;
-      cygheap_setup_for_child (&ciresrv);
+      newheap = cygheap_setup_for_child (&ciresrv, cygheap->fdtab.need_fixup_before ());
       rc = CreateProcess (runpath,	/* image name - with full path */
 			  one_line.buf,	/* what was passed to exec */
 					  /* process security attrs */
@@ -659,7 +660,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
       strcat (wstname, dskname);
       si.lpDesktop = wstname;
 
-      cygheap_setup_for_child (&ciresrv);
+      newheap = cygheap_setup_for_child (&ciresrv, cygheap->fdtab.need_fixup_before ());
       rc = CreateProcessAsUser (hToken,
 		       runpath,		/* image name - with full path */
 		       one_line.buf,	/* what was passed to exec */
@@ -682,7 +683,6 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
   MALLOC_CHECK;
   if (envblock)
     free (envblock);
-  cygheap_setup_for_child_cleanup (&ciresrv);
   MALLOC_CHECK;
 
   /* Set errno now so that debugging messages from it appear before our
@@ -694,14 +694,18 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
       syscall_printf ("CreateProcess failed, %E");
       if (spr)
 	ForceCloseHandle (spr);
+      cygheap_setup_for_child_cleanup (newheap, &ciresrv, 0);
       return -1;
     }
 
   /* Fixup the parent datastructure if needed and resume the child's
      main thread. */
-  if (cygheap->fdtab.need_fixup_before ())
+  if (!cygheap->fdtab.need_fixup_before ())
+    cygheap_setup_for_child_cleanup (newheap, &ciresrv, 0);
+  else
     {
       cygheap->fdtab.fixup_before_exec (pi.dwProcessId);
+      cygheap_setup_for_child_cleanup (newheap, &ciresrv, 1);
       if (mode == _P_OVERLAY)
 	ResumeThread (pi.hThread);
     }

@@ -177,8 +177,8 @@ extern init_cygheap *cygheap;
 extern void *cygheap_max;
 
 class child_info;
-void __stdcall cygheap_setup_for_child (child_info *ci) __attribute__ ((regparm(1)));
-void __stdcall cygheap_setup_for_child_cleanup (child_info *ci) __attribute__ ((regparm(1)));
+void *__stdcall cygheap_setup_for_child (child_info *ci, bool dup_later) __attribute__ ((regparm(2)));
+void __stdcall cygheap_setup_for_child_cleanup (void *, child_info *, bool) __attribute__ ((regparm(3)));
 void __stdcall cygheap_fixup_in_child (child_info *, bool);
 extern "C" {
 void __stdcall cfree (void *) __attribute__ ((regparm(1)));

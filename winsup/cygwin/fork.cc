@@ -464,7 +464,8 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   syscall_printf ("CreateProcess (%s, %s, 0, 0, 1, %x, 0, 0, %p, %p)",
 		  myself->progname, myself->progname, c_flags, &si, &pi);
   __malloc_lock (_reent_clib ());
-  cygheap_setup_for_child (&ch);
+  void *newheap;
+  newheap = cygheap_setup_for_child (&ch,cygheap->fdtab.need_fixup_before ());
   rc = CreateProcess (myself->progname, /* image to run */
 		      myself->progname, /* what we send in arg0 */
 		      allow_ntsec ? sec_user (sa_buf) : &sec_none_nih,
@@ -477,7 +478,6 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 		      &pi);
 
   CloseHandle (hParent);
-  cygheap_setup_for_child_cleanup (&ch);
 
   if (!rc)
     {
@@ -489,14 +489,18 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
       if (cygheap->user.impersonated
 	  && cygheap->user.token != INVALID_HANDLE_VALUE)
 	ImpersonateLoggedOnUser (cygheap->user.token);
+      cygheap_setup_for_child_cleanup (newheap, &ch, 0);
       return -1;
     }
 
   /* Fixup the parent datastructure if needed and resume the child's
      main thread. */
-  if (cygheap->fdtab.need_fixup_before ())
+  if (!cygheap->fdtab.need_fixup_before ())
+    cygheap_setup_for_child_cleanup (newheap, &ch, 0);
+  else
     {
       cygheap->fdtab.fixup_before_fork (pi.dwProcessId);
+      cygheap_setup_for_child_cleanup (newheap, &ch, 1);
       ResumeThread (pi.hThread);
     }
 
@@ -718,17 +722,18 @@ vfork ()
   cygheap->fdtab.vfork_parent_restore ();
 
   vf = get_vfork_val ();
+
+  __asm__ volatile ("movl %%esp,%0": "=r" (esp):);
+  for (pp = (char **)vf->frame, esp = vf->vfork_esp;
+       esp <= vf->vfork_ebp + 1; pp++, esp++)
+    *esp = *pp;
+
   if (vf->pid < 0)
     {
       int exitval = -vf->pid;
       if ((vf->pid = fork ()) == 0)
 	exit (exitval);
     }
-
-  __asm__ volatile ("movl %%esp,%0": "=r" (esp):);
-  for (pp = (char **)vf->frame, esp = vf->vfork_esp;
-       esp <= vf->vfork_ebp + 1; pp++, esp++)
-    *esp = *pp;
 
   return vf->pid;
 #endif

@@ -1,3 +1,16 @@
+Thu Sep 13 20:46:05 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* cygheap.cc (dup_now): New function.
+	(cygheap_setup_for_child): Accept new argument controlling whether to
+	delay copying of cygheap to shared memory region.
+	(cygheap_setup_for_child_cleanup): Accept new arguments controlling
+	whether to copy cygheap at this point.
+	* cygheap.h: Reflect above changes.
+	* fork.cc (fork_parent): Break copying of cygheap into two parts when
+	fork_fixup is required so that the child can see the parent's changes.
+	(vfork): Do stack cleanup prior to forcing a fork error.
+	* spawn.cc (spawn_guts): Ditto.
+
 Thu Sep 13 17:14:59 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* cygheap.cc (ccalloc): Pass correct length to creturn so that
