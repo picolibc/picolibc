@@ -158,8 +158,10 @@ unlink (const char *ourname)
   else
     {
       /* Allow us to delete even if read-only */
-      SetFileAttributes (win32_name, (DWORD) win32_name & ~(FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM));
-      setattrs = true;
+      setattrs = SetFileAttributes (win32_name,
+				    (DWORD) win32_name
+				    & ~(FILE_ATTRIBUTE_READONLY
+					| FILE_ATTRIBUTE_SYSTEM));
     }
   /* Attempt to use "delete on close" semantics to handle removing
      a file which may be open. */
@@ -189,7 +191,7 @@ unlink (const char *ourname)
   /* Try a delete with attributes reset */
   if (DeleteFile (win32_name))
     {
-      syscall_printf ("DeleteFile after CreateFile/ClosHandle succeeded");
+      syscall_printf ("DeleteFile after CreateFile/CloseHandle succeeded");
       goto ok;
     }
 
