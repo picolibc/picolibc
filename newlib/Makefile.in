@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -496,7 +496,7 @@ maintainer-clean-recursive:
 	dot_seen=no; \
 	rev=''; list='$(SUBDIRS)'; for subdir in $$list; do \
 	  rev="$$subdir $$rev"; \
-	  test "$$subdir" = "." && dot_seen=yes; \
+	  test "$$subdir" != "." || dot_seen=yes; \
 	done; \
 	test "$$dot_seen" = "no" && rev=". $$rev"; \
 	target=`echo $@ | sed s/-recursive//`; \
@@ -801,7 +801,7 @@ stmp-targ-include: config.status
 install-data-local:	install-toollibLIBRARIES
 @USE_LIBTOOL_FALSE@	rm -f $(DESTDIR)$(toollibdir)/libg.a
 @USE_LIBTOOL_FALSE@	ln $(DESTDIR)$(toollibdir)/libc.a $(DESTDIR)$(toollibdir)/libg.a >/dev/null 2>/dev/null || cp $(DESTDIR)$(toollibdir)/libc.a $(DESTDIR)$(toollibdir)/libg.a
-	$(MULTIDO) $(AM_MAKEFLAGS) DO=install multi-do
+	$(MULTIDO) $(AM_MAKEFLAGS) DO=install multi-do # $(MAKE)
 	-if [ -z "$(MULTISUBDIR)" ]; then \
 	  $(mkinstalldirs) $(DESTDIR)$(tooldir)/include; \
 	  for i in $(srcdir)/libc/include/*.h; do \
@@ -860,18 +860,19 @@ clean-recursive: clean-multi
 distclean-recursive: distclean-multi
 maintainer-clean-recursive: maintainer-clean-multi
 
+# The $(MAKE) comments below are to enable parallel building.
 all-multi:
-	$(MULTIDO) $(AM_MAKEFLAGS) DO=all multi-do
+	$(MULTIDO) $(AM_MAKEFLAGS) DO=all multi-do # $(MAKE)
 check-multi:
-	$(MULTIDO) $(AM_MAKEFLAGS) DO=check multi-do
+	$(MULTIDO) $(AM_MAKEFLAGS) DO=check multi-do # $(MAKE)
 mostlyclean-multi:
-	$(MULTICLEAN) $(AM_MAKEFLAGS) DO=mostlyclean multi-clean
+	$(MULTICLEAN) $(AM_MAKEFLAGS) DO=mostlyclean multi-clean # $(MAKE)
 clean-multi:
-	$(MULTICLEAN) $(AM_MAKEFLAGS) DO=clean multi-clean
+	$(MULTICLEAN) $(AM_MAKEFLAGS) DO=clean multi-clean # $(MAKE)
 distclean-multi:
-	$(MULTICLEAN) $(AM_MAKEFLAGS) DO=distclean multi-clean
+	$(MULTICLEAN) $(AM_MAKEFLAGS) DO=distclean multi-clean # $(MAKE)
 maintainer-clean-multi:
-	$(MULTICLEAN) $(AM_MAKEFLAGS) DO=maintainer-clean multi-clean
+	$(MULTICLEAN) $(AM_MAKEFLAGS) DO=maintainer-clean multi-clean # $(MAKE)
 
 site.exp: Makefile
 	@echo 'Making a new site.exp file...'
