@@ -1,3 +1,8 @@
+2003-03-17  Bob Cassels  <bcassels@abinitio.com>
+
+        * libc/string/wcschr.c: (wcschr): Look for character first, 
+	then for end of string, so you can do wcschr(x, '\0').
+
 2003-03-10  Corinna Vinschen  <corinna@vinschen.de>     
 
 	* libc/include/stdio.h: Declare fgetpos, fsetpos, fseeko and ftello

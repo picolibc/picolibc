@@ -69,14 +69,13 @@ _DEFUN (wcschr, (s, c),
   _CONST wchar_t *p;
 
   p = s;
-  while (*p)
+  do
     {
       if (*p == c)
 	{
 	  /* LINTED interface specification */
 	  return (wchar_t *) p;
 	}
-      p++;
-    }
+    } while (*p++);
   return NULL;
 }
