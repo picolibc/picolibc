@@ -573,7 +573,10 @@ dll_crt0_1 ()
   char **envp = NULL;
 
   if (!child_proc_info)
-    memory_init ();
+    {
+      memory_init ();
+      cygthread::init ();
+    }
   else
     {
       bool close_ppid_handle = false;
@@ -616,6 +619,7 @@ dll_crt0_1 ()
 		old_title = strcpy (title_buf, spawn_info->moreinfo->old_title);
 		cfree (spawn_info->moreinfo->old_title);
 	      }
+	    cygthread::init ();
 	    break;
 	}
       if (close_hexec_proc)
@@ -623,8 +627,6 @@ dll_crt0_1 ()
       if (close_ppid_handle)
 	CloseHandle (child_proc_info->pppid_handle);
     }
-
-  cygthread::init ();
 
   ProtectHandle (hMainProc);
   ProtectHandle (hMainThread);

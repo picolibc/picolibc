@@ -30,6 +30,7 @@ details. */
 #include "sync.h"
 #include "shared_info.h"
 #include "cygmalloc.h"
+#include "cygthread.h"
 
 #ifdef DEBUGGING
 static int npid;
@@ -284,7 +285,6 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
     api_fatal ("recreate_mmaps_after_fork_failed");
 
   pinfo_fixup_after_fork ();
-  signal_fixup_after_fork ();
 
   MALLOC_CHECK;
 
@@ -306,6 +306,9 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
 
   if (fixup_shms_after_fork ())
     api_fatal ("recreate_shm areas after fork failed");
+
+  cygthread::init ();
+  signal_fixup_after_fork ();
 
   /* Set thread local stuff to zero.  Under Windows 95/98 this is sometimes
      non-zero, for some reason.

@@ -1,5 +1,14 @@
 2002-10-18  Christopher Faylor  <cgf@redhat.com>
 
+	* dcrt0.cc (dll_crt0_1): Initialize cygwin threads here only when not
+	forking.
+	* fork.cc (fork_child): Initialize cygwin thread later in process to
+	avoid allocating memory for thread stacks.
+	* shared.cc (open_shared): Issue warning if NT and shared segment is
+	relocated.
+
+2002-10-18  Christopher Faylor  <cgf@redhat.com>
+
 	* cygthread.cc: Bump number of cygthreads up to accommodate
 	applications which use ttys.
 
