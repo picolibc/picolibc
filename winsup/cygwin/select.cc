@@ -418,12 +418,23 @@ peek_pipe (select_record *s, int ignra)
 	  goto out;
 	}
 
-      if (!ignra && fh->get_device () != FH_PTYM && fh->get_device () != FH_TTYM &&
-	  fh->get_readahead_valid ())
+      switch (fh->get_device ())
 	{
-	  select_printf ("readahead");
-	  gotone = s->read_ready = 1;
-	  goto out;
+	case FH_PTYM:
+	case FH_TTYM:
+	  if (((fhandler_pty_master *)fh)->need_nl)
+	    {
+	      gotone = s->read_ready = 1;
+	      goto out;
+	    }
+	  break;
+	default:
+	  if (!ignra && fh->get_readahead_valid ())
+	    {
+	      select_printf ("readahead");
+	      gotone = s->read_ready = 1;
+	      goto out;
+	    }
 	}
     }
 

@@ -1,3 +1,7 @@
+Wed Nov  8 21:00:31 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* select.cc (peek_pipe): Deal with pending newline in pty_master.
+
 Wed Nov  8 15:35:32 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* environ.cc (_addenv): malloc space for setenv if cygwin1.dll is used
