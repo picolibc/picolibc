@@ -1,3 +1,7 @@
+Tue Jun 20 13:38:12 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Change to build the DLL during a cross-compiler build.
+
 Mon Jun 19 20:46:33 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* select.cc (socket_cleanup): Shutdown I/O on dummy sockets prior to
