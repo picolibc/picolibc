@@ -1,3 +1,8 @@
+2003-04-23  Christopher Faylor  <cgf@redhat.com>
+
+	* fork.cc: Change SLOW_PID_REUSE to NO_SLOW_PID_REUSE and invert ifdef
+	sense throughout.
+
 2003-04-22  Christopher Faylor  <cgf@redhat.com>
 
 	* select.cc (fhandler_pipe::ready_for_read): Assure that get_guard is

@@ -325,11 +325,11 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   return 0;
 }
 
-#ifdef SLOW_PID_REUSE
+#ifndef NO_SLOW_PID_REUSE
 static void
 slow_pid_reuse (HANDLE h)
 {
-  static NO_COPY HANDLE last_fork_procs[8] = {0};
+  static NO_COPY HANDLE last_fork_procs[4] = {0};
   static NO_COPY unsigned nfork_procs = 0;
 
   if (nfork_procs >= (sizeof (last_fork_procs) / sizeof (last_fork_procs [0])))
@@ -538,7 +538,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
       goto cleanup;
     }
 
-#ifdef SLOW_PID_REUSE
+#ifndef NO_SLOW_PID_REUSE
   slow_pid_reuse (pi.hProcess);
 #endif
 
