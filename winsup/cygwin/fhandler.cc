@@ -265,7 +265,7 @@ fhandler_base::get_default_fmode (int flags)
 	  const char *stem = get_name () + nlen - pflen;
 	  if (pflen > nlen || (stem != get_name () && !isdirsep (stem[-1])))
 	    continue;
-	  else if (strcasematch (stem, pf->name) && ACCFLAGS (pf->flags) == accflags)
+	  else if (ACCFLAGS (pf->flags) == accflags && strcasematch (stem, pf->name))
 	    return pf->flags & ~(O_RDONLY | O_WRONLY | O_RDWR);
 	}
     }
