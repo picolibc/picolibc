@@ -125,6 +125,7 @@ _difftime = difftime
 div
 _div = div
 dll_crt0__FP11per_process
+cygwin_dll_init
 dll_dllcrt0
 dll_noncygwin_dllcrt0
 cygwin_detach_dll

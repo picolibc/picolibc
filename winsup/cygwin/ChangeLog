@@ -1,3 +1,10 @@
+2000-06-07  DJ Delorie  <dj@cygnus.com>
+
+	* cygwin.din: add cygwin_dll_init
+	* dcrt0.cc (cygwin_dll_init): new
+	(dll_crt0_1): short circuit if manually loaded
+	* path.cc (mount_info::init): don't init if manually loaded
+
 Wed Jun  7 13:47:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* include/netinet/in_systm.h: New file.

@@ -854,6 +854,9 @@ mount_info::init ()
      the registry.  */
   from_registry ();
 
+  if (dynamically_loaded)
+    return;
+
   /* If slash isn't already mounted, mount system directory as slash. */
   if (nmounts != 0)
     for (int i = 0; i < nmounts; i++)

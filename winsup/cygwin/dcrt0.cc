@@ -724,6 +724,10 @@ dll_crt0_1 ()
 /* Initialize uid, gid. */
   uinfo_init ();
 
+  /* beyond this we only do for cygwin apps or dlls */
+  if (dynamically_loaded)
+    return;
+
   /* Initialize signal/subprocess handling. */
   sigproc_init ();
 
@@ -839,6 +843,46 @@ dll_crt0 (per_process *uptr)
 	      api_fatal ("conflicting versions of cygwin1.dll detected.  Use only the most recent version.\n");
 	}
     }
+  dll_crt0_1 ();
+}
+
+extern "C" void *export_malloc (unsigned int);
+extern "C" void export_free (void *);
+extern "C" void *export_realloc (void *, unsigned int);
+extern "C" void *export_calloc (unsigned int, unsigned int);
+
+/* This must be called by anyone who uses LoadLibrary to load cygwin1.dll */
+extern "C" void cygwin_dll_init ();
+void
+cygwin_dll_init ()
+{
+  static struct _reent *temp_impure;
+  static char **envp;
+  static int _fmode;
+  user_data->heapbase = user_data->heapptr = user_data->heaptop = NULL;
+
+  if (!DuplicateHandle (GetCurrentProcess (), GetCurrentProcess (),
+		       GetCurrentProcess (), &hMainProc, 0, FALSE,
+			DUPLICATE_SAME_ACCESS))
+    hMainProc = GetCurrentProcess ();
+
+  DuplicateHandle (hMainProc, GetCurrentThread (), hMainProc,
+		   &hMainThread, 0, FALSE, DUPLICATE_SAME_ACCESS);
+  user_data->dll_major = CYGWIN_VERSION_DLL_MAJOR;
+  user_data->dll_minor = CYGWIN_VERSION_DLL_MINOR;
+  user_data->api_major = CYGWIN_VERSION_API_MAJOR;
+  user_data->api_minor = CYGWIN_VERSION_API_MINOR;
+  user_data->magic_biscuit = sizeof (per_process);
+
+  user_data->impure_ptr_ptr = &temp_impure;
+  user_data->envptr = &envp;
+  user_data->fmode_ptr = &_fmode;
+
+  user_data->malloc = &export_malloc;
+  user_data->free = &export_free;
+  user_data->realloc = &export_realloc;
+  user_data->calloc = &export_calloc;
+
   dll_crt0_1 ();
 }
 
