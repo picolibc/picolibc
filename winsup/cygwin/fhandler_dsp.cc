@@ -1370,6 +1370,38 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
       }
       break;
 
+      CASE (SNDCTL_DSP_CHANNELS)
+      {
+	int nChannels = *intptr;
+
+	if (audio_out_)
+	  {	    
+	    RETURN_ERROR_WHEN_BUSY (audio_out_);
+	    audio_out_->stop ();
+	    if (audio_out_->query (audiofreq_, audiobits_, nChannels))
+	      audiochannels_ = nChannels;
+	    else
+	      {
+		*intptr = audiochannels_;
+		return -1;
+	      }
+	  }
+	if (audio_in_)
+	  {
+	    RETURN_ERROR_WHEN_BUSY (audio_in_);
+	    audio_in_->stop ();
+	    if (audio_in_->query (audiofreq_, audiobits_, nChannels))
+	      audiochannels_ = nChannels;
+	    else
+	      {
+		*intptr = audiochannels_;
+		return -1;
+	      }
+	  }
+	return 0;
+      }
+      break;
+
       CASE (SNDCTL_DSP_GETOSPACE)
       {
 	audio_buf_info *p = (audio_buf_info *) ptr;
@@ -1395,6 +1427,13 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
       CASE (SNDCTL_DSP_GETFMTS)
       {
 	*intptr = AFMT_S16_LE | AFMT_U8; // only native formats returned here
+	return 0;
+      }
+      break;
+
+      CASE (SNDCTL_DSP_GETCAPS)
+      {
+	*intptr = DSP_CAP_BATCH | DSP_CAP_DUPLEX;
 	return 0;
       }
       break;
