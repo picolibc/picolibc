@@ -106,6 +106,9 @@ case "${target}" in
   arm*-*-elf | arm*-*-coff)
 	configdirs="${configdirs} arm testsuite";
 	;;
+  ep9312-*-elf | ep9312-*-coff)
+	configdirs="${configdirs} arm testsuite";
+	;;
   xscale-*-elf | xscale-*-coff)
 	configdirs="${configdirs} arm testsuite";
 	;;

@@ -47,9 +47,26 @@ OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
 	then echo ${objroot}/../binutils/objcopy ; \
 	else t='$(program_transform_name)'; echo objcopy | sed -e $$t ; fi`
 
-REDBOOT_OBJS	= redboot-crt0.o  redboot-syscalls.o
+CRT0		= crt0.o
+CRT0_INSTALL	= install-crt0
+
+REDBOOT_CRT0	= redboot-crt0.o 
+REDBOOT_OBJS	= redboot-syscalls.o
 REDBOOT_SCRIPTS	= redboot.ld redboot.specs
 REDBOOT_INSTALL	= install-redboot
+
+RDPMON_CRT0	= rdpmon-crt0.o
+RDPMON_BSP	= librdpmon.a
+RDPMON_OBJS	= syscalls.o libcfunc.o trap.o
+RDPMON_SCRIPTS	= rdpmon.specs
+RDPMON_INSTALL	= install-rdpmon
+
+RDIMON_CRT0	= rdimon-crt0.o
+RDIMON_BSP	= librdimon.a
+RDIMON_OBJS	= rdimon-syscalls.o rdimon-libcfunc.o rdimon-trap.o
+RDIMON_SCRIPTS	= rdimon.specs
+RDIMON_INSTALL	= install-rdimon
+
 CFLAGS		= -g
 
 # Here is all of the eval board stuff
@@ -67,7 +84,7 @@ IQ80310_INSTALL	= install-iq80310
 # build a test program for each target board. Just trying to get
 # it to link is a good test, so we ignore all the errors for now.
 #
-all: ${REDBOOT_OBJS}
+all: ${CRT0} ${REDBOOT_CRT0} ${REDBOOT_OBJS} ${RDPMON_CRT0} ${RDPMON_BSP} ${RDIMON_CRT0} ${RDIMON_BSP}
 
 #
 # here's where we build the test programs for each target
@@ -76,8 +93,32 @@ all: ${REDBOOT_OBJS}
 test:
 
 #
+crt0.o: crt0.S
 redboot-crt0.o: redboot-crt0.S
 redboot-syscalls.o: redboot-syscalls.c $(srcdir)/../syscall.h
+
+rdpmon-crt0.o: crt0.S
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDP_MONITOR -o $@ -c $<
+
+rdimon-crt0.o: crt0.S
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+
+rdimon-trap.o: trap.S
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+
+rdimon-syscalls.o: syscalls.c
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+
+rdimon-libcfunc.o: libcfunc.c
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+
+$(RDPMON_BSP): $(RDPMON_OBJS)
+	${AR} ${ARFLAGS} $@ $(IDTOBJS)
+	${RANLIB} $@
+
+$(RDIMON_BSP): $(RDIMON_OBJS)
+	${AR} ${ARFLAGS} $@ $(IDTOBJS)
+	${RANLIB} $@
 
 clean mostlyclean:
 	rm -f a.out core *.i *.o *-test *.srec *.dis *.x $(SIM_BSP) $(IQ80310_BSP)
@@ -86,12 +127,23 @@ distclean maintainer-clean realclean: clean
 	rm -f Makefile config.status *~
 
 .PHONY: install info install-info clean-info
-install: ${REDBOOT_INSTALL} ${IQ80310_INSTALL}  ${PID_INSTALL}
+install: ${CRT0_INSTALL} ${REDBOOT_INSTALL} ${RDPMON_INSTALL} ${RDIMON_INSTALL} ${IQ80310_INSTALL}  ${PID_INSTALL}
 
+install-crt0:
+	${INSTALL_DATA} ${CRT0} ${tooldir}/lib${MULTISUBDIR}/$$x
 
 install-redboot:
-	set -e; for x in ${REDBOOT_OBJS}; do ${INSTALL_DATA} $$x ${tooldir}/lib${MULTISUBDIR}/$$x; done
+	set -e; for x in ${REDBOOT_CRT0} ${REDBOOT_OBJS}; do ${INSTALL_DATA} $$x ${tooldir}/lib${MULTISUBDIR}/$$x; done
 	set -e; for x in ${REDBOOT_SCRIPTS}; do ${INSTALL_DATA} ${srcdir}/${objtype}$$x ${tooldir}/lib${MULTISUBDIR}/$$x; done
+
+install-rdpmon:
+	set -e; for x in ${RDPMON_CRT0} ${RDPMON_BSP}; do ${INSTALL_DATA} $$x ${tooldir}/lib${MULTISUBDIR}/$$x; done
+	set -e; for x in ${RDPMON_SCRIPTS}; do ${INSTALL_DATA} ${srcdir}/${objtype}$$x ${tooldir}/lib${MULTISUBDIR}/$$x; done
+
+install-rdimon:
+	set -e; for x in ${RDIMON_CRT0} ${RDIMON_BSP}; do ${INSTALL_DATA} $$x ${tooldir}/lib${MULTISUBDIR}/$$x; done
+	set -e; for x in ${RDIMON_SCRIPTS}; do ${INSTALL_DATA} ${srcdir}/${objtype}$$x ${tooldir}/lib${MULTISUBDIR}/$$x; done
+
 
 install-pid:
 	set -e; for x in ${PID_SCRIPTS}; do ${INSTALL_DATA} ${srcdir}/${objtype}$$x ${tooldir}/lib${MULTISUBDIR}/$$x; done

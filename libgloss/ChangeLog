@@ -1,3 +1,17 @@
+2004-06-09  Toralf Lund  <toralf@procaptura.com>
+
+	* arm/crt0.S: Copied from newlib and it now also sets up stacks for 
+	FIQ and IRQ mode, plus calls hardware_init_hook() and 
+	software_init_hook() if present.
+	* arm/libcfunc.c, arm/swi.h, arm/syscalls.c: Copied
+	from newlib.
+	* arm/Makefile.in: Build crt0.o, rdpmon-crt0.o, rdimon-crt0.o,
+	librdpmon.a, librdimon.a - support file for "bare" setup, as well
+	as "RDP" and "RDI" monitors.
+	* arm/coff-rdpmon.specs, arm/elf-rdpmon.specs,
+	arm/coff-rdimon.specs, arm/elf-rdimon.specs: gcc specs files to go
+	with above mentioned support libs and startfiles.
+
 2004-06-03  Alexandre Oliva  <aoliva@redhat.com>
 
         * mn10300/sim.ld: Start at address 4, to avoid ambiguity with NULL
