@@ -748,10 +748,10 @@ typedef VOID DDKAPI
   IN ULONG Reserved);
 
 typedef struct _IO_STATUS_BLOCK {
-  union {
+  _ANONYMOUS_UNION union {
     NTSTATUS  Status;
     PVOID  Pointer;
-  };
+  } DUMMYUNIONNAME;
   ULONG_PTR  Information;
 } IO_STATUS_BLOCK;
 
@@ -958,21 +958,21 @@ typedef struct _IRP {
   PVOID  UserBuffer;
   union {
     struct {
-      union {
+      _ANONYMOUS_UNION union {
         KDEVICE_QUEUE_ENTRY  DeviceQueueEntry;
-        struct {
+        _ANONYMOUS_STRUCT struct {
           PVOID  DriverContext[4];
-        };
-      };
+        } DUMMYSTRUCTNAME;
+      } DUMMYUNIONNAME;
       PETHREAD  Thread;
       PCHAR  AuxiliaryBuffer;
-      struct {
+      _ANONYMOUS_STRUCT struct {
         LIST_ENTRY  ListEntry;
-        union {
+        _ANONYMOUS_UNION union {
           struct _IO_STACK_LOCATION  *CurrentStackLocation;
           ULONG  PacketType;
-        };
-      };
+        } DUMMYUNIONNAME;
+      } DUMMYSTRUCTNAME;
       struct _FILE_OBJECT  *OriginalFileObject;
     } Overlay;
     KAPC  Apc;
@@ -2003,10 +2003,10 @@ typedef ERESOURCE_THREAD *PERESOURCE_THREAD;
 
 typedef struct _OWNER_ENTRY {
   ERESOURCE_THREAD  OwnerThread;
-  union {
+  _ANONYMOUS_UNION union {
       LONG  OwnerCount;
       ULONG  TableSize;
-  };
+  } DUMMYUNIONNAME;
 } OWNER_ENTRY, *POWNER_ENTRY;
 
 /* ERESOURCE.Flag */
@@ -2028,10 +2028,10 @@ typedef struct _ERESOURCE {
   ULONG  ContentionCount;
   USHORT  NumberOfSharedWaiters;
   USHORT  NumberOfExclusiveWaiters;
-  union {
+  _ANONYMOUS_UNION union {
     PVOID  Address;
     ULONG_PTR  CreatorBackTraceIndex;
-  };
+  } DUMMYUNIONNAME;
   KSPIN_LOCK  SpinLock;
 } ERESOURCE, *PERESOURCE;
 
@@ -3380,15 +3380,15 @@ typedef VOID DDKAPI
   IN BOOLEAN  Create);
 
 typedef struct _IMAGE_INFO {
-  union {
+  _ANONYMOUS_UNION union {
     ULONG  Properties;
-    struct {
+    _ANONYMOUS_STRUCT struct {
       ULONG  ImageAddressingMode  : 8;
       ULONG  SystemModeImage      : 1;
       ULONG  ImageMappedToAllPids : 1;
       ULONG  Reserved             : 22;
-    };
-  };
+    } DUMMYSTRUCTNAME;
+  } DUMMYUNIONNAME;
   PVOID  ImageBase;
   ULONG  ImageSelector;
   SIZE_T  ImageSize;
@@ -3516,15 +3516,15 @@ typedef struct _CREATE_DISK_GPT {
 
 typedef struct _CREATE_DISK {
   PARTITION_STYLE  PartitionStyle;
-  union {
+  _ANONYMOUS_UNION union {
     CREATE_DISK_MBR  Mbr;
     CREATE_DISK_GPT  Gpt;
-  };
+  } DUMMYUNIONNAME;
 } CREATE_DISK, *PCREATE_DISK;
 
 typedef struct _DISK_SIGNATURE {
   ULONG  PartitionStyle;
-  union {
+  _ANONYMOUS_UNION union {
     struct {
       ULONG  Signature;
       ULONG  CheckSum;
@@ -3532,7 +3532,7 @@ typedef struct _DISK_SIGNATURE {
     struct {
       GUID  DiskId;
     } Gpt;
-  };
+  } DUMMYUNIONNAME;
 } DISK_SIGNATURE, *PDISK_SIGNATURE;
 
 typedef VOID DDKFASTAPI
@@ -3671,10 +3671,10 @@ typedef struct _KPCR_TIB {
   PVOID  StackBase;             /* 04 */
   PVOID  StackLimit;            /* 08 */
   PVOID  SubSystemTib;          /* 0C */
-  union {
+  _ANONYMOUS_UNION union {
     PVOID  FiberData;           /* 10 */
     DWORD  Version;             /* 10 */
-  };
+  } DUMMYUNIONNAME;
   PVOID  ArbitraryUserPointer;  /* 14 */
 } KPCR_TIB, *PKPCR_TIB;         /* 18 */
 
@@ -3689,7 +3689,8 @@ typedef struct _KPCR {
   ULONG  IRR;                   /* 24 */
   ULONG  IrrActive;             /* 28 */
   ULONG  IDR;                   /* 2C */
-  PVOID  KdVersionBlock;        /* 30 */  PUSHORT  IDT;                 /* 34 */
+  PVOID  KdVersionBlock;        /* 30 */
+  PUSHORT  IDT;                 /* 34 */
   PUSHORT  GDT;                 /* 38 */
   struct _KTSS  *TSS;           /* 3C */
   USHORT  MajorVersion;         /* 40 */

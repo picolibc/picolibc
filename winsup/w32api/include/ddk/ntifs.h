@@ -3099,13 +3099,13 @@ KeInsertQueue (
 );
 
 NTKERNELAPI
-VOID
+BOOLEAN
 NTAPI
 KeInsertQueueApc (
-    IN PKAPC    Apc,
-    IN PVOID    SystemArgument1,
-    IN PVOID    SystemArgument2,
-    UCHAR       Unknown
+    IN PKAPC      Apc,
+    IN PVOID      SystemArgument1,
+    IN PVOID      SystemArgument2,
+    IN KPRIORITY  PriorityBoost
 );
 
 NTKERNELAPI

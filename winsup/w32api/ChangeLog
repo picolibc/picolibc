@@ -1,3 +1,14 @@
+2003-07-13  Casper S. Hornstrup  <chorns@users.sourceforge.net>
+
+	* include/ddk/ntifs.h (KeInsertQueueApc): Make return type
+	BOOLEAN. Name parameter 4 PriorityBoost and make it of type
+	KPRIORITY.
+	* include/ddk/winddk.h (_KPCR): Put IDT field on next line.
+	* include/ddk/winddk.h (_IO_STATUS_BLOCK, _IRP, _OWNER_ENTRY,
+	_ERESOURCE, _IMAGE_INFO, _CREATE_DISK, _DISK_SIGNATURE, _KPCR_TIB):
+	Apply _ANONYMOUS_UNION to anonymous unions and _ANONYMOUS_STRUCT
+	to anonymous structs.
+
 2003-07-12  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winnt.h (PVOID): Move to before HANDLE typedef.
