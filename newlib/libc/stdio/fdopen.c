@@ -1,4 +1,21 @@
 /*
+ * Copyright (c) 1990 The Regents of the University of California.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * advertising materials, and other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * by the University of California, Berkeley.  The name of the
+ * University may not be used to endorse or promote products derived
+ * from this software without specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
+
+/*
 FUNCTION
 <<fdopen>>---turn open file into a stream
 
@@ -10,9 +27,9 @@ INDEX
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	FILE *fdopen(int <[fd]>, const char *<[mode]>);
-	FILE *_fdopen_r(void *<[reent]>,
-                     int <[fd]>, const char *<[mode]>);
-
+	FILE *_fdopen_r(struct _reent *<[reent]>,
+                        int <[fd]>, const char *<[mode]>);
+  
 TRAD_SYNOPSIS
 	#include <stdio.h>
 	FILE *fdopen(<[fd]>, <[mode]>)
@@ -20,7 +37,7 @@ TRAD_SYNOPSIS
 	char *<[mode]>;
 
 	FILE *_fdopen_r(<[reent]>, <[fd]>, <[mode]>)
-	char *<[reent]>;
+	struct _reent *<[reent]>;
         int <[fd]>;
 	char *<[mode]>);
 
@@ -37,21 +54,20 @@ PORTABILITY
 <<fdopen>> is ANSI.
 */
 
+#include <_ansi.h>
+#include <reent.h>
 #include <sys/types.h>
 #include <sys/fcntl.h>
-
 #include <stdio.h>
 #include <errno.h>
 #include "local.h"
 #include <_syslist.h>
 
-extern int __sflags ();
-
 FILE *
-_DEFUN (_fdopen_r, (ptr, fd, mode),
-	struct _reent *ptr _AND
-	int fd _AND
-	_CONST char *mode)
+_DEFUN(_fdopen_r, (ptr, fd, mode),
+       struct _reent *ptr _AND
+       int fd             _AND
+       _CONST char *mode)
 {
   register FILE *fp;
   int flags, oflags;
@@ -77,7 +93,7 @@ _DEFUN (_fdopen_r, (ptr, fd, mode),
   if ((fp = __sfp (ptr)) == 0)
     return 0;
 
-  _flockfile(fp);
+  _flockfile (fp);
 
   fp->_flags = flags;
   /*
@@ -107,23 +123,23 @@ _DEFUN (_fdopen_r, (ptr, fd, mode),
 #ifdef __SCLE
   /* Explicit given mode results in explicit setting mode on fd */
   if (oflags & O_BINARY)
-    setmode(fp->_file, O_BINARY);
+    setmode (fp->_file, O_BINARY);
   else if (oflags & O_TEXT)
-    setmode(fp->_file, O_TEXT);
-  if (__stextmode(fp->_file))
+    setmode (fp->_file, O_TEXT);
+  if (__stextmode (fp->_file))
     fp->_flags |= __SCLE;
 #endif
 
-  _funlockfile(fp);
+  _funlockfile (fp);
   return fp;
 }
 
 #ifndef _REENT_ONLY
 
 FILE *
-_DEFUN (fdopen, (fd, mode),
-	int fd _AND
-	_CONST char *mode)
+_DEFUN(fdopen, (fd, mode),
+       int fd _AND
+       _CONST char *mode)
 {
   return _fdopen_r (_REENT, fd, mode);
 }

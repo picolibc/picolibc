@@ -51,14 +51,15 @@ ANSI C requires <<fflush>>.
 No supporting OS subroutines are required.
 */
 
+#include <_ansi.h>
 #include <stdio.h>
 #include "local.h"
 
 /* Flush a single file, or (if fp is NULL) all files.  */
 
 int
-_DEFUN (fflush, (fp),
-	register FILE * fp)
+_DEFUN(fflush, (fp),
+       register FILE * fp)
 {
   register unsigned char *p;
   register int n, t;
@@ -66,14 +67,14 @@ _DEFUN (fflush, (fp),
   if (fp == NULL)
     return _fwalk (_GLOBAL_REENT, fflush);
 
-  _flockfile(fp);
+  _flockfile (fp);
 
   CHECK_INIT (fp);
 
   t = fp->_flags;
   if ((t & __SWR) == 0 || (p = fp->_bf._base) == NULL)
     {
-      _funlockfile(fp);
+      _funlockfile (fp);
       return 0;
     }
   n = fp->_p - p;		/* write this much */
@@ -92,12 +93,12 @@ _DEFUN (fflush, (fp),
       if (t <= 0)
 	{
           fp->_flags |= __SERR;
-          _funlockfile(fp);
+          _funlockfile (fp);
           return EOF;
 	}
       p += t;
       n -= t;
     }
-  _funlockfile(fp);
+  _funlockfile (fp);
   return 0;
 }

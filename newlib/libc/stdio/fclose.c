@@ -1,4 +1,21 @@
 /*
+ * Copyright (c) 1990 The Regents of the University of California.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * advertising materials, and other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * by the University of California, Berkeley.  The name of the
+ * University may not be used to endorse or promote products derived
+ * from this software without specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
+
+/*
 FUNCTION
 <<fclose>>---close a file
 
@@ -10,7 +27,7 @@ INDEX
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	int fclose(FILE *<[fp]>);
-	int _fclose_r(void *<[reent]>, FILE *<[fp]>);
+	int _fclose_r(struct _reent *<[reent]>, FILE *<[fp]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
@@ -18,7 +35,7 @@ TRAD_SYNOPSIS
 	FILE *<[fp]>;
         
 	int fclose(<[fp]>)
-        void *<[reent]>
+        struct _reent *<[reent]>
 	FILE *<[fp]>;
 
 DESCRIPTION
@@ -40,37 +57,17 @@ Required OS subroutines: <<close>>, <<fstat>>, <<isatty>>, <<lseek>>,
 <<read>>, <<sbrk>>, <<write>>.
 */
 
-/*
- * Copyright (c) 1990 The Regents of the University of California.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms are permitted
- * provided that the above copyright notice and this paragraph are
- * duplicated in all such forms and that any documentation,
- * advertising materials, and other materials related to such
- * distribution and use acknowledge that the software was developed
- * by the University of California, Berkeley.  The name of the
- * University may not be used to endorse or promote products derived
- * from this software without specific prior written permission.
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
- */
-
+#include <_ansi.h>
 #include <reent.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "local.h"
 #include <sys/lock.h>
-
-/*
- * Close a file.
- */
+#include "local.h"
 
 int
-_DEFUN (_fclose_r, (rptr, fp),
-       struct _reent *rptr _AND
-       register FILE * fp)
+_DEFUN(_fclose_r, (rptr, fp),
+      struct _reent *rptr _AND
+      register FILE * fp)
 {
   int r;
 
@@ -79,13 +76,13 @@ _DEFUN (_fclose_r, (rptr, fp),
 
   __sfp_lock_acquire ();
 
-  _flockfile(fp);
+  _flockfile (fp);
   
   CHECK_INIT (fp);
 
   if (fp->_flags == 0)		/* not open! */
     {
-      _funlockfile(fp);
+      _funlockfile (fp);
       __sfp_lock_release ();
       return (0);
     }
@@ -99,7 +96,7 @@ _DEFUN (_fclose_r, (rptr, fp),
   if (HASLB (fp))
     FREELB (fp);
   fp->_flags = 0;		/* release this FILE for reuse */
-  _funlockfile(fp);
+  _funlockfile (fp);
 #ifndef __SINGLE_THREAD__
   __lock_close_recursive (*(_LOCK_RECURSIVE_T *)&fp->_lock);
 #endif
@@ -112,8 +109,8 @@ _DEFUN (_fclose_r, (rptr, fp),
 #ifndef _REENT_ONLY
 
 int
-_DEFUN (fclose, (fp),
-	register FILE * fp)
+_DEFUN(fclose, (fp),
+       register FILE * fp)
 {
   return _fclose_r(_REENT, fp);
 }

@@ -54,14 +54,15 @@ static char sccsid[] = "%W% (Berkeley) %G%";
  * A subroutine version of the macro getchar_unlocked.
  */
 
-#include <stdio.h>
+#include <_ansi.h>
 #include <reent.h>
+#include <stdio.h>
 
 #undef getchar_unlocked
 
 int
-_getchar_unlocked_r (f)
-     struct _reent *f;
+_DEFUN(_getchar_unlocked_r, (f),
+       struct _reent *f)
 {
   return getc_unlocked (_stdin_r (f));
 }
@@ -69,7 +70,7 @@ _getchar_unlocked_r (f)
 #ifndef _REENT_ONLY
 
 int
-getchar_unlocked ()
+_DEFUN_VOID(getchar_unlocked)
 {
   /* CHECK_INIT is called (eventually) by __srefill.  */
 

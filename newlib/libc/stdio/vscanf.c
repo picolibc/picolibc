@@ -18,39 +18,35 @@
  */
 
 #include <_ansi.h>
+#include <reent.h>
 #include <stdio.h>
-#include "local.h"
-
 #ifdef _HAVE_STDC
 #include <stdarg.h>
 #else
 #include <varargs.h>
 #endif
-
-/*
- * vscanf
- */
+#include "local.h"
 
 #ifndef _REENT_ONLY
 
 int
-_DEFUN (vscanf, (fmt, ap), 
-    _CONST char *fmt _AND 
-    va_list ap)
+_DEFUN(vscanf, (fmt, ap), 
+       _CONST char *fmt _AND 
+       va_list ap)
 {
-  _REENT_SMALL_CHECK_INIT(_stdin_r (_REENT));
+  _REENT_SMALL_CHECK_INIT (_stdin_r (_REENT));
   return __svfscanf_r (_REENT, _stdin_r (_REENT), fmt, ap);
 }
 
 #endif /* !_REENT_ONLY */
 
 int
-_DEFUN (_vscanf_r, (ptr, fmt, ap),
-    struct _reent *ptr _AND 
-    _CONST char *fmt _AND 
-    va_list ap)
+_DEFUN(_vscanf_r, (ptr, fmt, ap),
+       struct _reent *ptr _AND 
+       _CONST char *fmt   _AND 
+       va_list ap)
 {
-  _REENT_SMALL_CHECK_INIT(_stdin_r (ptr));
+  _REENT_SMALL_CHECK_INIT (_stdin_r (ptr));
   return __svfscanf_r (ptr, _stdin_r (ptr), fmt, ap);
 }
 

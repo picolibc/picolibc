@@ -54,14 +54,16 @@ static char sccsid[] = "%W% (Berkeley) %G%";
  * A subroutine version of the macro putchar_unlocked.
  */
 
+#include <_ansi.h>
+#include <reent.h>
 #include <stdio.h>
 
 #undef putchar_unlocked
 
 int
-_putchar_unlocked_r (ptr, c)
-     struct _reent *ptr;
-     int c;
+_DEFUN(_putchar_unlocked_r, (ptr, c),
+       struct _reent *ptr _AND
+       int c)
 {
   return putc_unlocked (c, _stdout_r (ptr));
 }
@@ -69,12 +71,12 @@ _putchar_unlocked_r (ptr, c)
 #ifndef _REENT_ONLY
 
 int
-putchar_unlocked (c)
-     int c;
+_DEFUN(putchar_unlocked, (c),
+       int c)
 {
   /* CHECK_INIT is (eventually) called by __swbuf.  */
 
-  _putchar_unlocked_r (_REENT, c);
+  return _putchar_unlocked_r (_REENT, c);
 }
 
 #endif

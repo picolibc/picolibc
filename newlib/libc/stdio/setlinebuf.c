@@ -14,7 +14,6 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-
 /* 
 Modified copy of setbuf.c to support setlinebuf function
 defined as part of BSD.
@@ -23,7 +22,6 @@ Modifications by Gareth Pearce, 2001.
 
 /*
 FUNCTION
-
 <<setlinebuf>>---specify line buffering for a file or stream
 
 INDEX
@@ -63,8 +61,8 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include "local.h"
 
 int
-_DEFUN (setlinebuf, (fp),
-	FILE * fp)
+_DEFUN(setlinebuf, (fp),
+       FILE * fp)
 {
   return (setvbuf (fp, (char *) NULL, _IOLBF, (size_t) 0));
 }

@@ -28,7 +28,7 @@ ANSI_SYNOPSIS
 	#include <stdio.h>
 	int getchar(void);
 
-	int _getchar_r(void *<[reent]>);
+	int _getchar_r(struct _reent *<[reent]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
@@ -71,25 +71,25 @@ static char sccsid[] = "%W% (Berkeley) %G%";
  * A subroutine version of the macro getchar.
  */
 
-#include <stdio.h>
+#include <_ansi.h>
 #include <reent.h>
-
+#include <stdio.h>
 #include "local.h"
 
 #undef getchar
 
 int
-_getchar_r (f)
-     struct _reent *f;
+_DEFUN(_getchar_r, (f),
+       struct _reent *f)
 {
-  _REENT_SMALL_CHECK_INIT(_stdin_r (f));
+  _REENT_SMALL_CHECK_INIT (_stdin_r (f));
   return getc (_stdin_r (f));
 }
 
 #ifndef _REENT_ONLY
 
 int
-getchar ()
+_DEFUN_VOID(getchar)
 {
   /* CHECK_INIT is called (eventually) by __srefill.  */
 

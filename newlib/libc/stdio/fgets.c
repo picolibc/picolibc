@@ -16,9 +16,9 @@
  */
 
 /*
-
 FUNCTION
-        <<fgets>>---get character string from a file or stream
+<<fgets>>---get character string from a file or stream
+
 INDEX
 	fgets
 
@@ -54,10 +54,10 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.
 */
 
+#include <_ansi.h>
 #include <stdio.h>
 #include <string.h>
-
-extern int __srefill ();
+#include "local.h"
 
 /*
  * Read at most n-1 characters from the given file.
@@ -66,10 +66,10 @@ extern int __srefill ();
  */
 
 char *
-_DEFUN (fgets, (buf, n, fp),
-	char *buf _AND
-	int n _AND
-	FILE * fp)
+_DEFUN(fgets, (buf, n, fp),
+       char *buf _AND
+       int n     _AND
+       FILE * fp)
 {
   size_t len;
   char *s;
@@ -80,13 +80,13 @@ _DEFUN (fgets, (buf, n, fp),
 
   s = buf;
 
-  _flockfile(fp);
+  _flockfile (fp);
 #ifdef __SCLE
   if (fp->_flags & __SCLE)
     {
       int c;
       /* Sorry, have to do it the slow way */
-      while (--n > 0 && (c = __sgetc(fp)) != EOF)
+      while (--n > 0 && (c = __sgetc (fp)) != EOF)
 	{
 	  *s++ = c;
 	  if (c == '\n')
@@ -94,11 +94,11 @@ _DEFUN (fgets, (buf, n, fp),
 	}
       if (c == EOF && s == buf)
         {
-          _funlockfile(fp);
+          _funlockfile (fp);
           return NULL;
         }
       *s = 0;
-      _funlockfile(fp);
+      _funlockfile (fp);
       return buf;
     }
 #endif
@@ -116,7 +116,7 @@ _DEFUN (fgets, (buf, n, fp),
 	      /* EOF: stop with partial or no line */
 	      if (s == buf)
                 {
-                  _funlockfile(fp);
+                  _funlockfile (fp);
                   return 0;
                 }
 	      break;
@@ -139,18 +139,18 @@ _DEFUN (fgets, (buf, n, fp),
 	  len = ++t - p;
 	  fp->_r -= len;
 	  fp->_p = t;
-	  (void) memcpy ((_PTR) s, (_PTR) p, len);
+	  _CAST_VOID memcpy ((_PTR) s, (_PTR) p, len);
 	  s[len] = 0;
-          _funlockfile(fp);
+          _funlockfile (fp);
 	  return (buf);
 	}
       fp->_r -= len;
       fp->_p += len;
-      (void) memcpy ((_PTR) s, (_PTR) p, len);
+      _CAST_VOID memcpy ((_PTR) s, (_PTR) p, len);
       s += len;
     }
   while ((n -= len) != 0);
   *s = 0;
-  _funlockfile(fp);
+  _funlockfile (fp);
   return buf;
 }

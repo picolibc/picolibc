@@ -23,6 +23,7 @@
  */
 
 #include <_ansi.h>
+#include <reent.h>
 #include <stdarg.h>
 #include <reent.h>
 #include <unistd.h>
@@ -31,15 +32,16 @@ extern int    _EXFUN(__svfscanf_r,(struct _reent *,FILE *, _CONST char *,va_list
 extern FILE  *_EXFUN(__sfp,(struct _reent *));
 extern int    _EXFUN(__sflags,(struct _reent *,_CONST char*, int*));
 extern int    _EXFUN(__srefill,(FILE *));
-extern _READ_WRITE_RETURN_TYPE _EXFUN(__sread,(void *, char *, int));
-extern _READ_WRITE_RETURN_TYPE _EXFUN(__swrite,(void *, char const *, int));
-extern _fpos_t _EXFUN(__sseek,(void *, _fpos_t, int));
-extern int    _EXFUN(__sclose,(void *));
+extern _READ_WRITE_RETURN_TYPE _EXFUN(__sread,(_PTR, char *, int));
+extern _READ_WRITE_RETURN_TYPE _EXFUN(__swrite,(_PTR, char _CONST *, int));
+extern _fpos_t _EXFUN(__sseek,(_PTR, _fpos_t, int));
+extern int    _EXFUN(__sclose,(_PTR));
 extern int    _EXFUN(__stextmode,(int));
-extern void   _EXFUN(__sinit,(struct _reent *));
-extern void   _EXFUN(_cleanup_r,(struct _reent *));
-extern void   _EXFUN(__smakebuf,(FILE *));
+extern _VOID   _EXFUN(__sinit,(struct _reent *));
+extern _VOID   _EXFUN(_cleanup_r,(struct _reent *));
+extern _VOID   _EXFUN(__smakebuf,(FILE *));
 extern int    _EXFUN(_fwalk,(struct _reent *, int (*)(FILE *)));
+extern int    _EXFUN(_fwalk_reent,(struct _reent *, int (*)(FILE *)));
 struct _glue * _EXFUN(__sfmoreglue,(struct _reent *,int n));
 extern int   _EXFUN(__srefill,(FILE *fp));
 
@@ -92,6 +94,6 @@ char *_EXFUN(_llicvt,(char *, long long, char));
 #define __sfp_lock_acquire()
 #define __sfp_lock_release()
 #else
-void _EXFUN(__sfp_lock_acquire,(void));
-void _EXFUN(__sfp_lock_release,(void));
+_VOID _EXFUN(__sfp_lock_acquire,(_VOID));
+_VOID _EXFUN(__sfp_lock_release,(_VOID));
 #endif

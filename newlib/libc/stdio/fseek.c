@@ -98,6 +98,8 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.
 */
 
+#include <_ansi.h>
+#include <reent.h>
 #include <stdio.h>
 #include <time.h>
 #include <fcntl.h>
@@ -114,19 +116,20 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
  */
 
 int
-_DEFUN (_fseek_r, (ptr, fp, offset, whence),
-     struct _reent *ptr _AND
-     register FILE *fp _AND
-     long offset _AND
-     int whence)
+_DEFUN(_fseek_r, (ptr, fp, offset, whence),
+       struct _reent *ptr _AND
+       register FILE *fp  _AND
+       long offset        _AND
+       int whence)
 {
-  _fpos_t _EXFUN ((*seekfn), (void *, _fpos_t, int));
-  _fpos_t target, curoff;
+  _fpos_t _EXFUN((*seekfn), (_PTR, _fpos_t, int));
+  _fpos_t target;
+  _fpos_t curoff = 0;
   size_t n;
   struct stat st;
   int havepos;
 
-  _flockfile(fp);
+  _flockfile (fp);
 
   /* Make sure stdio is set up.  */
 
@@ -146,7 +149,7 @@ _DEFUN (_fseek_r, (ptr, fp, offset, whence),
   if ((seekfn = fp->_seek) == NULL)
     {
       ptr->_errno = ESPIPE;	/* ??? */
-      _funlockfile(fp);
+      _funlockfile (fp);
       return EOF;
     }
 
@@ -163,7 +166,7 @@ _DEFUN (_fseek_r, (ptr, fp, offset, whence),
        * we have to first find the current stream offset a la
        * ftell (see ftell for details).
        */
-      fflush(fp);   /* may adjust seek offset on append stream */
+      fflush (fp);   /* may adjust seek offset on append stream */
       if (fp->_flags & __SOFF)
 	curoff = fp->_offset;
       else
@@ -171,7 +174,7 @@ _DEFUN (_fseek_r, (ptr, fp, offset, whence),
 	  curoff = (*seekfn) (fp->_cookie, (_fpos_t) 0, SEEK_CUR);
 	  if (curoff == -1L)
 	    {
-	      _funlockfile(fp);
+	      _funlockfile (fp);
 	      return EOF;
 	    }
 	}
@@ -196,7 +199,7 @@ _DEFUN (_fseek_r, (ptr, fp, offset, whence),
 
     default:
       ptr->_errno = EINVAL;
-      _funlockfile(fp);
+      _funlockfile (fp);
       return (EOF);
     }
 
@@ -306,7 +309,7 @@ _DEFUN (_fseek_r, (ptr, fp, offset, whence),
       if (HASUB (fp))
 	FREEUB (fp);
       fp->_flags &= ~__SEOF;
-      _funlockfile(fp);
+      _funlockfile (fp);
       return 0;
     }
 
@@ -335,7 +338,7 @@ _DEFUN (_fseek_r, (ptr, fp, offset, whence),
       fp->_p += n;
       fp->_r -= n;
     }
-  _funlockfile(fp);
+  _funlockfile (fp);
   return 0;
 
   /*
@@ -346,7 +349,7 @@ _DEFUN (_fseek_r, (ptr, fp, offset, whence),
 dumb:
   if (fflush (fp) || (*seekfn) (fp->_cookie, offset, whence) == POS_ERR)
     {
-      _funlockfile(fp);
+      _funlockfile (fp);
       return EOF;
     }
   /* success: clear EOF indicator and discard ungetc() data */
@@ -356,17 +359,17 @@ dumb:
   fp->_r = 0;
   /* fp->_w = 0; *//* unnecessary (I think...) */
   fp->_flags &= ~__SEOF;
-  _funlockfile(fp);
+  _funlockfile (fp);
   return 0;
 }
 
 #ifndef _REENT_ONLY
 
 int
-_DEFUN (fseek, (fp, offset, whence),
-     register FILE *fp _AND
-     long offset _AND
-     int whence)
+_DEFUN(fseek, (fp, offset, whence),
+       register FILE *fp _AND
+       long offset       _AND
+       int whence)
 {
   return _fseek_r (_REENT, fp, offset, whence);
 }

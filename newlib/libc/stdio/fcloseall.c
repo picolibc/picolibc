@@ -1,4 +1,21 @@
 /*
+ * Copyright (c) 1990 The Regents of the University of California.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * advertising materials, and other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * by the University of California, Berkeley.  The name of the
+ * University may not be used to endorse or promote products derived
+ * from this software without specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
+
+/*
 FUNCTION
 <<fcloseall>>---close all files
 
@@ -37,34 +54,18 @@ PORTABILITY
 Required OS subroutines: <<close>>, <<fstat>>, <<isatty>>, <<lseek>>,
 <<read>>, <<sbrk>>, <<write>>.
 */
-
 /* This file based upon fwalk.c. */
 
-/*
- * Copyright (c) 1990 The Regents of the University of California.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms are permitted
- * provided that the above copyright notice and this paragraph are
- * duplicated in all such forms and that any documentation,
- * advertising materials, and other materials related to such
- * distribution and use acknowledge that the software was developed
- * by the University of California, Berkeley.  The name of the
- * University may not be used to endorse or promote products derived
- * from this software without specific prior written permission.
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
- */
-
+#include <_ansi.h>
+#include <reent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include "local.h"
 
 int
-_fcloseall_r (ptr)
-     struct _reent *ptr;
+_DEFUN(_fcloseall_r, (ptr),
+       struct _reent *ptr)
 {
   return _fwalk_reent (ptr, _fclose_r);
 }
@@ -72,7 +73,7 @@ _fcloseall_r (ptr)
 #ifndef _REENT_ONLY
 
 int
-fcloseall (void)
+_DEFUN_VOID(fcloseall)
 {
   return _fcloseall_r (_GLOBAL_REENT);
 }

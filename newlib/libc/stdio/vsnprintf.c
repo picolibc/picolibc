@@ -1,7 +1,3 @@
-/* doc in vfprintf.c */
-
-/* This code created by modifying vsprintf.c so copyright inherited. */
-
 /*
  * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
@@ -18,6 +14,7 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
+/* doc in vfprintf.c */
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "%W% (Berkeley) %G%";
@@ -36,11 +33,11 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #ifndef _REENT_ONLY
 
 int
-_DEFUN (vsnprintf, (str, size, fmt, ap),
-     char *str _AND
-     size_t size _AND
-     _CONST char *fmt _AND
-     va_list ap)
+_DEFUN(vsnprintf, (str, size, fmt, ap),
+       char *str        _AND
+       size_t size      _AND
+       _CONST char *fmt _AND
+       va_list ap)
 {
   int ret;
   FILE f;
@@ -57,12 +54,12 @@ _DEFUN (vsnprintf, (str, size, fmt, ap),
 #endif /* !_REENT_ONLY */
 
 int
-_DEFUN (_vsnprintf_r, (ptr, str, size, fmt, ap),
-     struct _reent *ptr _AND
-     char *str _AND
-     size_t size _AND
-     _CONST char *fmt _AND
-     va_list ap)
+_DEFUN(_vsnprintf_r, (ptr, str, size, fmt, ap),
+       struct _reent *ptr _AND
+       char *str          _AND
+       size_t size        _AND
+       _CONST char *fmt   _AND
+       va_list ap)
 {
   int ret;
   FILE f;

@@ -1,5 +1,3 @@
-/* No user fns here.  Pesch 15apr92. */
-
 /*
  * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
@@ -16,20 +14,23 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
+/* No user fns here.  Pesch 15apr92. */
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
+#include <_ansi.h>
+#include <reent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include "local.h"
 
 static int
-__fwalk (ptr, function)
-     struct _reent *ptr;
-     register int (*function) ();
+_DEFUN(__fwalk, (ptr, function),
+       struct _reent *ptr _AND
+       register int (*function) ())
 {
   register FILE *fp;
   register int n, ret = 0;
@@ -51,9 +52,9 @@ __fwalk (ptr, function)
 /* Special version of __fwalk where the function pointer is a reentrant
    I/O function (e.g. _fclose_r).  */
 static int
-__fwalk_reent (ptr, reent_function)
-     struct _reent *ptr;
-     register int (*reent_function) ();
+_DEFUN(__fwalk_reent, (ptr, reent_function),
+       struct _reent *ptr _AND
+       register int (*reent_function) ())
 {
   register FILE *fp;
   register int n, ret = 0;
@@ -73,9 +74,9 @@ __fwalk_reent (ptr, reent_function)
 }
 
 int
-_fwalk (ptr, function)
-     struct _reent *ptr;
-     register int (*function) ();
+_DEFUN(_fwalk, (ptr, function),
+       struct _reent *ptr _AND
+       register int (*function)())
 {
   register int ret = 0;
 
@@ -96,9 +97,9 @@ _fwalk (ptr, function)
 /* Special version of _fwalk which handles a function pointer to a
    reentrant I/O function (e.g. _fclose_r).  */
 int
-_fwalk_reent (ptr, reent_function)
-     struct _reent *ptr;
-     register int (*reent_function) ();
+_DEFUN(_fwalk_reent, (ptr, reent_function),
+       struct _reent *ptr _AND
+       register int (*reent_function) ())
 {
   register int ret = 0;
 

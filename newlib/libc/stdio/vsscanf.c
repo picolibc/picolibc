@@ -28,12 +28,11 @@
 #endif
 #include "local.h"
 
-static
-_READ_WRITE_RETURN_TYPE
-eofread1 (cookie, buf, len)
-    _PTR cookie;
-    char *buf;
-    int len;
+static _READ_WRITE_RETURN_TYPE
+_DEFUN(eofread1, (cookie, buf, len),
+       _PTR cookie _AND
+       char *buf   _AND
+       int len)
 {
   return 0;
 }
@@ -45,10 +44,10 @@ eofread1 (cookie, buf, len)
 #ifndef _REENT_ONLY
 
 int
-_DEFUN (vsscanf, (str, fmt, ap), 
-    _CONST char *str _AND 
-    _CONST char *fmt _AND 
-    va_list ap)
+_DEFUN(vsscanf, (str, fmt, ap), 
+       _CONST char *str _AND 
+       _CONST char *fmt _AND 
+       va_list ap)
 {
   return _vsscanf_r (_REENT, str, fmt, ap);
 }
@@ -56,11 +55,11 @@ _DEFUN (vsscanf, (str, fmt, ap),
 #endif /* !_REENT_ONLY */
 
 int
-_DEFUN (_vsscanf_r, (ptr, str, fmt, ap),
-    struct _reent *ptr _AND 
-    _CONST char *str _AND 
-    _CONST char *fmt _AND 
-    va_list ap)
+_DEFUN(_vsscanf_r, (ptr, str, fmt, ap),
+       struct _reent *ptr _AND 
+       _CONST char *str   _AND 
+       _CONST char *fmt   _AND 
+       va_list ap)
 {
   FILE f;
 

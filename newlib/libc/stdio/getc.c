@@ -62,6 +62,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
+#include <_ansi.h>
 #include <stdio.h>
 
 /*
@@ -71,13 +72,13 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #undef getc
 
 int
-getc (fp)
-     register FILE *fp;
+_DEFUN(getc, (fp),
+       register FILE *fp)
 {
   int result;
-  _flockfile(fp);
+  _flockfile (fp);
   /* CHECK_INIT is called (eventually) by __srefill.  */
   result = __sgetc (fp);
-  _funlockfile(fp);
+  _funlockfile (fp);
   return result;
 }

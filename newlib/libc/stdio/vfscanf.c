@@ -1,3 +1,20 @@
+/*-
+ * Copyright (c) 1990 The Regents of the University of California.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * advertising materials, and other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * by the University of California, Berkeley.  The name of the
+ * University may not be used to endorse or promote products derived
+ * from this software without specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
+
 /*
 FUNCTION
 <<vscanf>>, <<vfscanf>>, <<vsscanf>>---format argument list
@@ -16,11 +33,11 @@ ANSI_SYNOPSIS
 	int vfscanf(FILE *<[fp]>, const char *<[fmt]>, va_list <[list]>);
 	int vsscanf(const char *<[str]>, const char *<[fmt]>, va_list <[list]>);
 
-	int _vscanf_r(void *<[reent]>, const char *<[fmt]>, 
+	int _vscanf_r(struct _reent *<[reent]>, const char *<[fmt]>, 
                        va_list <[list]>);
-	int _vfscanf_r(void *<[reent]>, FILE *<[fp]>, const char *<[fmt]>, 
+	int _vfscanf_r(struct _reent *<[reent]>, FILE *<[fp]>, const char *<[fmt]>, 
                        va_list <[list]>);
-	int _vsscanf_r(void *<[reent]>, const char *<[str]>, const char *<[fmt]>, 
+	int _vsscanf_r(struct _reent *<[reent]>, const char *<[str]>, const char *<[fmt]>, 
                        va_list <[list]>);
 
 TRAD_SYNOPSIS
@@ -41,18 +58,18 @@ TRAD_SYNOPSIS
 	va_list <[list]>;
 
 	int _vscanf_r( <[reent]>, <[fmt]>, <[ist]>)
-	char *<[reent]>;
+	struct _reent *<[reent]>;
 	char *<[fmt]>;
 	va_list <[list]>;
 
 	int _vfscanf_r( <[reent]>, <[fp]>, <[fmt]>, <[list]>)
-	char *<[reent]>;
+	struct _reent *<[reent]>;
 	FILE *<[fp]>;
 	char *<[fmt]>;
 	va_list <[list]>;
 	
 	int _vsscanf_r( <[reent]>, <[str]>, <[fmt]>, <[list]>)
-	char *<[reent]>;
+	struct _reent *<[reent]>;
 	char *<[str]>;
 	char *<[fmt]>;
 	va_list <[list]>;
@@ -85,24 +102,8 @@ These are GNU extensions.
 Supporting OS subroutines required:
 */
 
-/*-
- * Copyright (c) 1990 The Regents of the University of California.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms are permitted
- * provided that the above copyright notice and this paragraph are
- * duplicated in all such forms and that any documentation,
- * advertising materials, and other materials related to such
- * distribution and use acknowledge that the software was developed
- * by the University of California, Berkeley.  The name of the
- * University may not be used to endorse or promote products derived
- * from this software without specific prior written permission.
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
- */
-
 #include <_ansi.h>
+#include <reent.h>
 #include <ctype.h>
 #include <wctype.h>
 #include <stdio.h>
@@ -212,20 +213,20 @@ typedef unsigned long long u_long_long;
 #ifndef _REENT_ONLY
 
 int
-_DEFUN (vfscanf, (fp, fmt, ap), 
-    register FILE *fp _AND 
-    _CONST char *fmt _AND 
-    va_list ap)
+_DEFUN(vfscanf, (fp, fmt, ap), 
+       register FILE *fp _AND 
+       _CONST char *fmt _AND 
+       va_list ap)
 {
   CHECK_INIT(fp);
   return __svfscanf_r (_REENT, fp, fmt, ap);
 }
 
 int
-__svfscanf (fp, fmt0, ap)
-     register FILE *fp;
-     char _CONST *fmt0;
-     va_list ap;
+_DEFUN(__svfscanf, (fp, fmt0, ap),
+       register FILE *fp _AND
+       char _CONST *fmt0 _AND
+       va_list ap)
 {
   return __svfscanf_r (_REENT, fp, fmt0, ap);
 }
@@ -233,22 +234,22 @@ __svfscanf (fp, fmt0, ap)
 #endif /* !_REENT_ONLY */
 
 int
-_DEFUN (_vfscanf_r, (data, fp, fmt, ap),
-    struct _reent *data _AND 
-    register FILE *fp _AND 
-    _CONST char *fmt _AND 
-    va_list ap)
+_DEFUN(_vfscanf_r, (data, fp, fmt, ap),
+       struct _reent *data _AND 
+       register FILE *fp   _AND 
+       _CONST char *fmt    _AND 
+       va_list ap)
 {
   return __svfscanf_r (data, fp, fmt, ap);
 }
 
 
 int
-__svfscanf_r (rptr, fp, fmt0, ap)
-     struct _reent *rptr;
-     register FILE *fp;
-     char _CONST *fmt0;
-     va_list ap;
+_DEFUN(__svfscanf_r, (rptr, fp, fmt0, ap),
+       struct _reent *rptr _AND
+       register FILE *fp   _AND
+       char _CONST *fmt0   _AND
+       va_list ap)
 {
   register u_char *fmt = (u_char *) fmt0;
   register int c;		/* character from format, or conversion */
@@ -555,7 +556,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
           if (flags & LONG) 
             {
               if ((flags & SUPPRESS) == 0)
-                wcp = va_arg(ap, wchar_t *);
+                wcp = va_arg (ap, wchar_t *);
               else
                 wcp = NULL;
               n = 0;
@@ -566,8 +567,8 @@ __svfscanf_r (rptr, fp, fmt0, ap)
                   buf[n++] = *fp->_p;
                   fp->_r -= 1;
                   fp->_p += 1;
-                  memset((void *)&state, '\0', sizeof(mbstate_t));
-                  if ((mbslen = _mbrtowc_r(rptr, wcp, buf, n, &state)) 
+                  memset ((_PTR)&state, '\0', sizeof (mbstate_t));
+                  if ((mbslen = _mbrtowc_r (rptr, wcp, buf, n, &state)) 
                                                          == (size_t)-1)
                     goto input_failure; /* Invalid sequence */
                   if (mbslen == 0 && !(flags & SUPPRESS))
@@ -684,19 +685,19 @@ __svfscanf_r (rptr, fp, fmt0, ap)
             {
               /* Process %S and %ls placeholders */
               if ((flags & SUPPRESS) == 0)
-                wcp = va_arg(ap, wchar_t *);
+                wcp = va_arg (ap, wchar_t *);
               else
                 wcp = &wc;
               n = 0;
-              while (!isspace(*fp->_p) && width != 0) 
+              while (!isspace (*fp->_p) && width != 0) 
                 {
                   if (n == MB_CUR_MAX)
                     goto input_failure;
                   buf[n++] = *fp->_p;
                   fp->_r -= 1;
                   fp->_p += 1;
-                  memset((void *)&state, '\0', sizeof(mbstate_t));
-                  if ((mbslen = _mbrtowc_r(rptr, wcp, buf, n, &state)) 
+                  memset ((_PTR)&state, '\0', sizeof (mbstate_t));
+                  if ((mbslen = _mbrtowc_r (rptr, wcp, buf, n, &state)) 
                                                         == (size_t)-1)
                     goto input_failure;
                   if (mbslen == 0)
@@ -706,7 +707,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
                       if (iswspace(*wcp)) 
                         {
                           while (n != 0)
-                            ungetc(buf[--n], fp);
+                            ungetc (buf[--n], fp);
                           break;
                         }
                       nread += n;
@@ -1171,9 +1172,9 @@ all_done:
 
 /*static*/
 u_char *
-__sccl (tab, fmt)
-     register char *tab;
-     register u_char *fmt;
+_DEFUN(__sccl, (tab, fmt),
+       register char *tab _AND
+       register u_char *fmt)
 {
   register int c, n, v;
 

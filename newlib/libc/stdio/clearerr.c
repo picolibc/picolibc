@@ -52,14 +52,15 @@ ANSI C requires <<clearerr>>.
 No supporting OS subroutines are required.
 */
 
+#include <_ansi.h>
 #include <stdio.h>
 #undef	clearerr
 
 _VOID
-_DEFUN (clearerr, (fp),
-	FILE * fp)
+_DEFUN(clearerr, (fp),
+       FILE * fp)
 {
-  _flockfile(fp);
+  _flockfile (fp);
   __sclearerr (fp);
-  _funlockfile(fp);
+  _funlockfile (fp);
 }

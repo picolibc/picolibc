@@ -54,14 +54,15 @@ Supporting OS subroutines required: <<fread>>.  */
 static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
+#include <_ansi.h>
 #include <stdio.h>
 
 int
-getw (fp)
-     register FILE *fp;
+_DEFUN(getw, (fp),
+       register FILE *fp)
 {
   int result;
-  if (fread((char*)&result, sizeof(result), 1, fp) != 1)
+  if (fread ((char*)&result, sizeof (result), 1, fp) != 1)
     return EOF;
   return result;
 }

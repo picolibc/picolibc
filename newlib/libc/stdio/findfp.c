@@ -1,5 +1,3 @@
-/* No user fns here.  Pesch 15apr92. */
-
 /*
  * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
@@ -16,7 +14,10 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
+/* No user fns here.  Pesch 15apr92. */
 
+#include <_ansi.h>
+#include <reent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -25,12 +26,12 @@
 #include <sys/lock.h>
 #include "local.h"
 
-static void
-std (ptr, flags, file, data)
-     FILE *ptr;
-     int flags;
-     int file;
-     struct _reent *data;
+static _VOID
+_DEFUN(std, (ptr, flags, file, data),
+            FILE *ptr _AND
+            int flags _AND
+            int file  _AND
+            struct _reent *data)
 {
   ptr->_p = 0;
   ptr->_r = 0;
@@ -54,15 +55,15 @@ std (ptr, flags, file, data)
 #endif
 
 #ifdef __SCLE
-  if (__stextmode(ptr->_file))
+  if (__stextmode (ptr->_file))
     ptr->_flags |= __SCLE;
 #endif
 }
 
 struct _glue *
-__sfmoreglue (d, n)
-     struct _reent *d;
-     register int n;
+_DEFUN(__sfmoreglue, (d, n),
+       struct _reent *d _AND
+       register int n)
 {
   struct _glue *g;
   FILE *p;
@@ -83,8 +84,8 @@ __sfmoreglue (d, n)
  */
 
 FILE *
-__sfp (d)
-     struct _reent *d;
+_DEFUN(__sfp, (d),
+       struct _reent *d)
 {
   FILE *fp;
   int n;
@@ -138,17 +139,17 @@ found:
  * The name `_cleanup' is, alas, fairly well known outside stdio.
  */
 
-void
-_cleanup_r (ptr)
-     struct _reent *ptr;
+_VOID
+_DEFUN(_cleanup_r, (ptr),
+       struct _reent *ptr)
 {
-  /* (void) _fwalk(fclose); */
-  (void) _fwalk (ptr, fflush);	/* `cheating' */
+  /* _CAST_VOID _fwalk(fclose); */
+  _CAST_VOID _fwalk (ptr, fflush);	/* `cheating' */
 }
 
 #ifndef _REENT_ONLY
-void
-_cleanup ()
+_VOID
+_DEFUN_VOID(_cleanup)
 {
   _cleanup_r (_GLOBAL_REENT);
 }
@@ -158,9 +159,9 @@ _cleanup ()
  * __sinit() is called whenever stdio's internal variables must be set up.
  */
 
-void
-__sinit (s)
-     struct _reent *s;
+_VOID
+_DEFUN(__sinit, (s),
+       struct _reent *s)
 {
   /* make sure we clean up on exit */
   s->__cleanup = _cleanup_r;	/* conservative */
@@ -197,50 +198,50 @@ __sinit (s)
 
 __LOCK_INIT_RECURSIVE(static, __sfp_lock);
 
-void
-__sfp_lock_acquire ()
+_VOID
+_DEFUN_VOID(__sfp_lock_acquire)
 {
-  __lock_acquire(__sfp_lock); 
+  __lock_acquire_recursive (__sfp_lock); 
 }
 
-void
-__sfp_lock_release ()
+_VOID
+_DEFUN_VOID(__sfp_lock_release)
 {
-  __lock_release(__sfp_lock); 
+  __lock_release_recursive (__sfp_lock); 
 }
 
 /* Walkable file locking routine.  */
 static int
-__fp_lock (ptr)
-     FILE * ptr;
+_DEFUN(__fp_lock, (ptr),
+       FILE * ptr)
 {
-  _flockfile(ptr);
+  _flockfile (ptr);
 
   return 0;
 }
 
 /* Walkable file unlocking routine.  */
 static int
-__fp_unlock (ptr)
-     FILE * ptr;
+_DEFUN(__fp_unlock, (ptr),
+       FILE * ptr)
 {
-  _funlockfile(ptr);
+  _funlockfile (ptr);
 
   return 0;
 }
 
-void
-__fp_lock_all ()
+_VOID
+_DEFUN_VOID(__fp_lock_all)
 {
   __sfp_lock_acquire (); 
 
-  (void) _fwalk (_REENT, __fp_lock);
+  _CAST_VOID _fwalk (_REENT, __fp_lock);
 }
 
-void
-__fp_unlock_all ()
+_VOID
+_DEFUN_VOID(__fp_unlock_all)
 {
-  (void) _fwalk (_REENT, __fp_unlock);
+  _CAST_VOID _fwalk (_REENT, __fp_unlock);
 
   __sfp_lock_release ();
 }

@@ -66,37 +66,39 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<open>>, <<read>>, <<sbrk>>, <<write>>.
 */
 
+#include <_ansi.h>
+#include <reent.h>
 #include <time.h>
 #include <stdio.h>
 #include <fcntl.h>
 #include <stdlib.h>
-#include "local.h"
 #include <sys/lock.h>
+#include "local.h"
 
 /*
  * Re-direct an existing, open (probably) file to some other file.
  */
 
 FILE *
-_DEFUN (_freopen_r, (ptr, file, mode, fp),
-	struct _reent *ptr _AND
-	_CONST char *file _AND
-	_CONST char *mode _AND
-	register FILE *fp)
+_DEFUN(_freopen_r, (ptr, file, mode, fp),
+       struct _reent *ptr _AND
+       _CONST char *file _AND
+       _CONST char *mode _AND
+       register FILE *fp)
 {
   register int f;
   int flags, oflags, e;
 
   __sfp_lock_acquire ();
 
-  _flockfile(fp);
+  _flockfile (fp);
 
   CHECK_INIT (fp);
 
   if ((flags = __sflags (ptr, mode, &oflags)) == 0)
     {
-      _funlockfile(fp);
-      (void) _fclose_r (ptr, fp);
+      _funlockfile (fp);
+      _CAST_VOID _fclose_r (ptr, fp);
       __sfp_lock_release ();
       return NULL;
     }
@@ -114,10 +116,10 @@ _DEFUN (_freopen_r, (ptr, file, mode, fp),
   else
     {
       if (fp->_flags & __SWR)
-	(void) fflush (fp);
+	_CAST_VOID fflush (fp);
       /* if close is NULL, closing is a no-op, hence pointless */
       if (fp->_close != NULL)
-	(void) (*fp->_close) (fp->_cookie);
+	_CAST_VOID (*fp->_close) (fp->_cookie);
     }
 
   /*
@@ -153,7 +155,7 @@ _DEFUN (_freopen_r, (ptr, file, mode, fp),
     {				/* did not get it after all */
       fp->_flags = 0;		/* set it free */
       ptr->_errno = e;		/* restore in case _close clobbered */
-      _funlockfile(fp);
+      _funlockfile (fp);
 #ifndef __SINGLE_THREAD__
       __lock_close_recursive (*(_LOCK_RECURSIVE_T *)&fp->_lock);
 #endif
@@ -170,11 +172,11 @@ _DEFUN (_freopen_r, (ptr, file, mode, fp),
   fp->_close = __sclose;
 
 #ifdef __SCLE
-  if (__stextmode(fp->_file))
+  if (__stextmode (fp->_file))
     fp->_flags |= __SCLE;
 #endif
 
-  _funlockfile(fp);
+  _funlockfile (fp);
   __sfp_lock_release ();
   return fp;
 }
@@ -182,10 +184,10 @@ _DEFUN (_freopen_r, (ptr, file, mode, fp),
 #ifndef _REENT_ONLY
 
 FILE *
-_DEFUN (freopen, (file, mode, fp),
-	_CONST char *file _AND
-	_CONST char *mode _AND
-	register FILE *fp)
+_DEFUN(freopen, (file, mode, fp),
+       _CONST char *file _AND
+       _CONST char *mode _AND
+       register FILE *fp)
 {
   return _freopen_r (_REENT, file, mode, fp);
 }

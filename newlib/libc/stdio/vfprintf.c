@@ -1,117 +1,4 @@
 /*
-FUNCTION
-<<vprintf>>, <<vfprintf>>, <<vsprintf>>---format argument list
-
-INDEX
-	vprintf
-INDEX
-	vfprintf
-INDEX
-	vsprintf
-INDEX
-	vsnprintf
-
-ANSI_SYNOPSIS
-	#include <stdio.h>
-	#include <stdarg.h>
-	int vprintf(const char *<[fmt]>, va_list <[list]>);
-	int vfprintf(FILE *<[fp]>, const char *<[fmt]>, va_list <[list]>);
-	int vsprintf(char *<[str]>, const char *<[fmt]>, va_list <[list]>);
-	int vasprintf(char **<[strp]>, const char *<[fmt]>, va_list <[list]>);
-	int vsnprintf(char *<[str]>, size_t <[size]>, const char *<[fmt]>, va_list <[list]>);
-
-	int _vprintf_r(void *<[reent]>, const char *<[fmt]>,
-                        va_list <[list]>);
-	int _vfprintf_r(void *<[reent]>, FILE *<[fp]>, const char *<[fmt]>,
-                        va_list <[list]>);
-	int _vasprintf_r(void *<[reent]>, char **<[str]>, const char *<[fmt]>,
-                        va_list <[list]>);
-	int _vsprintf_r(void *<[reent]>, char *<[str]>, const char *<[fmt]>,
-                        va_list <[list]>);
-	int _vsnprintf_r(void *<[reent]>, char *<[str]>, size_t <[size]>, const char *<[fmt]>,
-                        va_list <[list]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	#include <varargs.h>
-	int vprintf( <[fmt]>, <[list]>)
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int vfprintf(<[fp]>, <[fmt]>, <[list]>)
-	FILE *<[fp]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int vasprintf(<[strp]>, <[fmt]>, <[list]>)
-	char **<[strp]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int vsprintf(<[str]>, <[fmt]>, <[list]>)
-	char *<[str]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int vsnprintf(<[str]>, <[size]>, <[fmt]>, <[list]>)
-	char *<[str]>;
-        size_t <[size]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int _vprintf_r(<[reent]>, <[fmt]>, <[list]>)
-	char *<[reent]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int _vfprintf_r(<[reent]>, <[fp]>, <[fmt]>, <[list]>)
-	char *<[reent]>;
-	FILE *<[fp]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int _vasprintf_r(<[reent]>, <[strp]>, <[fmt]>, <[list]>)
-	char *<[reent]>;
-	char **<[strp]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int _vsprintf_r(<[reent]>, <[str]>, <[fmt]>, <[list]>)
-	char *<[reent]>;
-	char *<[str]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int _vsnprintf_r(<[reent]>, <[str]>, <[size]>, <[fmt]>, <[list]>)
-	char *<[reent]>;
-	char *<[str]>;
-        size_t <[size]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-DESCRIPTION
-<<vprintf>>, <<vfprintf>>, <<vasprintf>>, <<vsprintf>> and <<vsnprintf>> are 
-(respectively) variants of <<printf>>, <<fprintf>>, <<asprintf>>, <<sprintf>>,
-and <<snprintf>>.  They differ only in allowing their caller to pass the 
-variable argument list as a <<va_list>> object (initialized by <<va_start>>) 
-rather than directly accepting a variable number of arguments.
-
-RETURNS
-The return values are consistent with the corresponding functions:
-<<vasprintf>>/<<vsprintf>> returns the number of bytes in the output string,
-save that the concluding <<NULL>> is not counted.
-<<vprintf>> and <<vfprintf>> return the number of characters transmitted.
-If an error occurs, <<vprintf>> and <<vfprintf>> return <<EOF>> and
-<<vasprintf>> returns -1.  No error returns occur for <<vsprintf>>.
-
-PORTABILITY
-ANSI C requires all three functions.
-
-Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
-<<lseek>>, <<read>>, <<sbrk>>, <<write>>.
-*/
-
-/*
  * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
@@ -147,6 +34,119 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
  * SUCH DAMAGE.
  */
 
+/*
+FUNCTION
+<<vprintf>>, <<vfprintf>>, <<vsprintf>>---format argument list
+
+INDEX
+	vprintf
+INDEX
+	vfprintf
+INDEX
+	vsprintf
+INDEX
+	vsnprintf
+
+ANSI_SYNOPSIS
+	#include <stdio.h>
+	#include <stdarg.h>
+	int vprintf(const char *<[fmt]>, va_list <[list]>);
+	int vfprintf(FILE *<[fp]>, const char *<[fmt]>, va_list <[list]>);
+	int vsprintf(char *<[str]>, const char *<[fmt]>, va_list <[list]>);
+	int vasprintf(char **<[strp]>, const char *<[fmt]>, va_list <[list]>);
+	int vsnprintf(char *<[str]>, size_t <[size]>, const char *<[fmt]>, va_list <[list]>);
+
+	int _vprintf_r(struct _reent *<[reent]>, const char *<[fmt]>,
+                        va_list <[list]>);
+	int _vfprintf_r(struct _reent *<[reent]>, FILE *<[fp]>, const char *<[fmt]>,
+                        va_list <[list]>);
+	int _vasprintf_r(struct _reent *<[reent]>, char **<[str]>, const char *<[fmt]>,
+                        va_list <[list]>);
+	int _vsprintf_r(struct _reent *<[reent]>, char *<[str]>, const char *<[fmt]>,
+                        va_list <[list]>);
+	int _vsnprintf_r(struct _reent *<[reent]>, char *<[str]>, size_t <[size]>, const char *<[fmt]>,
+                        va_list <[list]>);
+
+TRAD_SYNOPSIS
+	#include <stdio.h>
+	#include <varargs.h>
+	int vprintf( <[fmt]>, <[list]>)
+	char *<[fmt]>;
+	va_list <[list]>;
+
+	int vfprintf(<[fp]>, <[fmt]>, <[list]>)
+	FILE *<[fp]>;
+	char *<[fmt]>;
+	va_list <[list]>;
+
+	int vasprintf(<[strp]>, <[fmt]>, <[list]>)
+	char **<[strp]>;
+	char *<[fmt]>;
+	va_list <[list]>;
+
+	int vsprintf(<[str]>, <[fmt]>, <[list]>)
+	char *<[str]>;
+	char *<[fmt]>;
+	va_list <[list]>;
+
+	int vsnprintf(<[str]>, <[size]>, <[fmt]>, <[list]>)
+	char *<[str]>;
+        size_t <[size]>;
+	char *<[fmt]>;
+	va_list <[list]>;
+
+	int _vprintf_r(<[reent]>, <[fmt]>, <[list]>)
+	struct _reent *<[reent]>;
+	char *<[fmt]>;
+	va_list <[list]>;
+
+	int _vfprintf_r(<[reent]>, <[fp]>, <[fmt]>, <[list]>)
+	struct _reent *<[reent]>;
+	FILE *<[fp]>;
+	char *<[fmt]>;
+	va_list <[list]>;
+
+	int _vasprintf_r(<[reent]>, <[strp]>, <[fmt]>, <[list]>)
+	struct _reent *<[reent]>;
+	char **<[strp]>;
+	char *<[fmt]>;
+	va_list <[list]>;
+
+	int _vsprintf_r(<[reent]>, <[str]>, <[fmt]>, <[list]>)
+	struct _reent *<[reent]>;
+	char *<[str]>;
+	char *<[fmt]>;
+	va_list <[list]>;
+
+	int _vsnprintf_r(<[reent]>, <[str]>, <[size]>, <[fmt]>, <[list]>)
+	struct _reent *<[reent]>;
+	char *<[str]>;
+        size_t <[size]>;
+	char *<[fmt]>;
+	va_list <[list]>;
+
+DESCRIPTION
+<<vprintf>>, <<vfprintf>>, <<vasprintf>>, <<vsprintf>> and <<vsnprintf>> are 
+(respectively) variants of <<printf>>, <<fprintf>>, <<asprintf>>, <<sprintf>>,
+and <<snprintf>>.  They differ only in allowing their caller to pass the 
+variable argument list as a <<va_list>> object (initialized by <<va_start>>) 
+rather than directly accepting a variable number of arguments.
+
+RETURNS
+The return values are consistent with the corresponding functions:
+<<vasprintf>>/<<vsprintf>> returns the number of bytes in the output string,
+save that the concluding <<NULL>> is not counted.
+<<vprintf>> and <<vfprintf>> return the number of characters transmitted.
+If an error occurs, <<vprintf>> and <<vfprintf>> return <<EOF>> and
+<<vasprintf>> returns -1.  No error returns occur for <<vsprintf>>.
+
+PORTABILITY
+ANSI C requires all three functions.
+
+Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
+<<lseek>>, <<read>>, <<sbrk>>, <<write>>.
+*/
+
 #if defined(LIBC_SCCS) && !defined(lint)
 /*static char *sccsid = "from: @(#)vfprintf.c	5.50 (Berkeley) 12/16/92";*/
 static char *rcsid = "$Id$";
@@ -180,21 +180,19 @@ static char *rcsid = "$Id$";
 #endif
 
 #include <_ansi.h>
+#include <reent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
-#include <reent.h>
 #include <wchar.h>
 #include <string.h>
 #include <sys/lock.h>
-
 #ifdef _HAVE_STDC
 #include <stdarg.h>
 #else
 #include <varargs.h>
 #endif
-
 #include "local.h"
 #include "fvwrite.h"
 #include "vfieeefp.h"
@@ -212,9 +210,9 @@ static char *rcsid = "$Id$";
  * then reset it so that it can be reused.
  */
 static int
-__sprint(fp, uio)
-	FILE *fp;
-	register struct __suio *uio;
+_DEFUN(__sprint, (fp, uio),
+       FILE *fp _AND
+       register struct __suio *uio)
 {
 	register int err;
 
@@ -234,10 +232,10 @@ __sprint(fp, uio)
  * worries about ungetc buffers and so forth.
  */
 static int
-__sbprintf(fp, fmt, ap)
-	register FILE *fp;
-	const char *fmt;
-	va_list ap;
+_DEFUN(__sbprintf, (fp, fmt, ap),
+       register FILE *fp _AND
+       _CONST char *fmt  _AND
+       va_list ap)
 {
 	int ret;
 	FILE fake;
@@ -251,14 +249,14 @@ __sbprintf(fp, fmt, ap)
 
 	/* set up the buffer */
 	fake._bf._base = fake._p = buf;
-	fake._bf._size = fake._w = sizeof(buf);
+	fake._bf._size = fake._w = sizeof (buf);
 	fake._lbfsize = 0;	/* not actually used, but Just In Case */
 #ifndef __SINGLE_THREAD__
 	__lock_init_recursive (*(_LOCK_RECURSIVE_T *)&fake._lock);
 #endif
 
 	/* do the work, then copy any error status */
-	ret = VFPRINTF(&fake, fmt, ap);
+	ret = VFPRINTF (&fake, fmt, ap);
 	if (ret >= 0 && fflush(&fake))
 		ret = EOF;
 	if (fake._flags & __SERR)
@@ -285,13 +283,15 @@ __sbprintf(fp, fmt, ap)
 #define	DEFPREC		6
 
 #ifdef _NO_LONGDBL
-static char *cvt _PARAMS((struct _reent *, double, int, int, char *, int *, int, int *));
+static char *
+_EXFUN(cvt, (struct _reent *, double, int, int, char *, int *, int, int *));
 #else
-static char *cvt _PARAMS((struct _reent *, _LONG_DOUBLE, int, int, char *, int *, int, int *));
-extern int  _ldcheck _PARAMS((_LONG_DOUBLE *));
+static char *
+_EXFUN(cvt, (struct _reent *, _LONG_DOUBLE, int, int, char *, int *, int, int *));
+extern int _EXFUN(_ldcheck,(_LONG_DOUBLE *));
 #endif
 
-static int exponent _PARAMS((char *, int, int));
+static int _EXFUN(exponent, (char *, int, int));
 
 #else /* no FLOATING_POINT */
 
@@ -308,7 +308,7 @@ static int exponent _PARAMS((char *, int, int));
 #endif
 
 typedef quad_t * quad_ptr_t;
-typedef void *   void_ptr_t;
+typedef _PTR     void_ptr_t;
 typedef char *   char_ptr_t;
 typedef long *   long_ptr_t;
 typedef int  *   int_ptr_t;
@@ -337,16 +337,17 @@ union arg_val
   wint_t val_wint_t;
 };
 
-static union arg_val *get_arg (struct _reent *data, int n, char *fmt, 
-                               va_list *ap, int *numargs, union arg_val *args, 
-			       int *arg_type, char **last_fmt);
+static union arg_val *
+_EXFUN(get_arg, (struct _reent *data, int n, char *fmt, 
+                 va_list *ap, int *numargs, union arg_val *args, 
+                 int *arg_type, char **last_fmt));
 #endif /* !_NO_POS_ARGS */
 
 /*
  * Macros for converting digits to letters and vice versa
  */
 #define	to_digit(c)	((c) - '0')
-#define is_digit(c)	((unsigned)to_digit(c) <= 9)
+#define is_digit(c)	((unsigned)to_digit (c) <= 9)
 #define	to_char(n)	((n) + '0')
 
 /*
@@ -368,28 +369,28 @@ static union arg_val *get_arg (struct _reent *data, int n, char *fmt,
 #define	ZEROPAD		0x080		/* zero (as opposed to blank) pad */
 #define FPT		0x100		/* Floating point number */
 
-int _EXFUN (_VFPRINTF_R, (struct _reent *, FILE *, _CONST char *, va_list));
+int _EXFUN(_VFPRINTF_R, (struct _reent *, FILE *, _CONST char *, va_list));
 
 int 
-_DEFUN (VFPRINTF, (fp, fmt0, ap),
-	FILE * fp _AND
-	_CONST char *fmt0 _AND
-	va_list ap)
+_DEFUN(VFPRINTF, (fp, fmt0, ap),
+       FILE * fp         _AND
+       _CONST char *fmt0 _AND
+       va_list ap)
 {
   int result;
-  _flockfile(fp);
+  _flockfile (fp);
   CHECK_INIT (fp);
   result = _VFPRINTF_R (_REENT, fp, fmt0, ap);
-  _funlockfile(fp);
+  _funlockfile (fp);
   return result;
 }
 
 int 
-_DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
-	struct _reent *data _AND
-	FILE * fp _AND
-	_CONST char *fmt0 _AND
-	va_list ap)
+_DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
+       struct _reent *data _AND
+       FILE * fp           _AND
+       _CONST char *fmt0   _AND
+       va_list ap)
 {
 	register char *fmt;	/* format string */
 	register int ch;	/* character from fmt */
@@ -476,10 +477,10 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 #define	PAD(howmany, with) { \
 	if ((n = (howmany)) > 0) { \
 		while (n > PADSIZE) { \
-			PRINT(with, PADSIZE); \
+			PRINT (with, PADSIZE); \
 			n -= PADSIZE; \
 		} \
-		PRINT(with, n); \
+		PRINT (with, n); \
 	} \
 }
 #define	FLUSH() { \
@@ -499,11 +500,11 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
       : arg_index++ < numargs \
          ? args[n].val_##type \
          : numargs < MAX_POS_ARGS \
-           ? args[numargs++].val_##type = va_arg(ap, type) \
-           : va_arg(ap, type) \
+           ? args[numargs++].val_##type = va_arg (ap, type) \
+           : va_arg (ap, type) \
   )
 #else
-#define GET_ARG(n, ap, type) (va_arg(ap, type))
+#define GET_ARG(n, ap, type) (va_arg (ap, type))
 #endif
     
 	/*
@@ -512,34 +513,34 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	 */
 #ifndef _NO_LONGLONG
 #define	SARG() \
-	(flags&QUADINT ? GET_ARG(N, ap, quad_t) : \
-	    flags&LONGINT ? GET_ARG(N, ap, long) : \
-	    flags&SHORTINT ? (long)(short)GET_ARG(N, ap, int) : \
-	    (long)GET_ARG(N, ap, int))
+	(flags&QUADINT ? GET_ARG (N, ap, quad_t) : \
+	    flags&LONGINT ? GET_ARG (N, ap, long) : \
+	    flags&SHORTINT ? (long)(short)GET_ARG (N, ap, int) : \
+	    (long)GET_ARG (N, ap, int))
 #define	UARG() \
-	(flags&QUADINT ? GET_ARG(N, ap, u_quad_t) : \
-	    flags&LONGINT ? GET_ARG(N, ap, u_long) : \
-	    flags&SHORTINT ? (u_long)(u_short)GET_ARG(N, ap, int) : \
-	    (u_long)GET_ARG(N, ap, u_int))
+	(flags&QUADINT ? GET_ARG (N, ap, u_quad_t) : \
+	    flags&LONGINT ? GET_ARG (N, ap, u_long) : \
+	    flags&SHORTINT ? (u_long)(u_short)GET_ARG (N, ap, int) : \
+	    (u_long)GET_ARG (N, ap, u_int))
 #else
 #define	SARG() \
-	(flags&LONGINT ? GET_ARG(N, ap, long) : \
-	    flags&SHORTINT ? (long)(short)GET_ARG(N, ap, int) : \
-	    (long)GET_ARG(N, ap, int))
+	(flags&LONGINT ? GET_ARG (N, ap, long) : \
+	    flags&SHORTINT ? (long)(short)GET_ARG (N, ap, int) : \
+	    (long)GET_ARG (N, ap, int))
 #define	UARG() \
-	(flags&LONGINT ? GET_ARG(N, ap, u_long) : \
-	    flags&SHORTINT ? (u_long)(u_short)GET_ARG(N, ap, int) : \
-	    (u_long)GET_ARG(N, ap, u_int))
+	(flags&LONGINT ? GET_ARG (N, ap, u_long) : \
+	    flags&SHORTINT ? (u_long)(u_short)GET_ARG (N, ap, int) : \
+	    (u_long)GET_ARG (N, ap, u_int))
 #endif
 
 	/* sorry, fprintf(read_only_file, "") returns EOF, not 0 */
-	if (cantwrite(fp))
+	if (cantwrite (fp))
 		return (EOF);
 
 	/* optimise fprintf(stderr) (and other unbuffered Unix files) */
 	if ((fp->_flags & (__SNBF|__SWR|__SRW)) == (__SNBF|__SWR) &&
 	    fp->_file >= 0)
-		return (__sbprintf(fp, fmt0, ap));
+		return (__sbprintf (fp, fmt0, ap));
 
 	fmt = (char *)fmt0;
 	uio.uio_iov = iovp = iov;
@@ -560,7 +561,7 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	for (;;) {
 	        cp = fmt;
 #ifdef MB_CAPABLE
-	        while ((n = _mbtowc_r(data, &wc, fmt, MB_CUR_MAX, &state)) > 0) {
+	        while ((n = _mbtowc_r (data, &wc, fmt, MB_CUR_MAX, &state)) > 0) {
                     if (wc == '%')
                         break;
                     fmt += n;
@@ -570,7 +571,7 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
                     fmt += 1;
 #endif
 		if ((m = fmt - cp) != 0) {
-			PRINT(cp, m);
+			PRINT (cp, m);
 			ret += m;
 		}
 #ifdef MB_CAPABLE
@@ -613,15 +614,15 @@ reswitch:	switch (ch) {
 			/* we must check for positional arg used for dynamic width */
 			old_is_pos_arg = is_pos_arg;
 			is_pos_arg = 0;
-			if (is_digit(*fmt)) {
+			if (is_digit (*fmt)) {
 				char *old_fmt = fmt;
 
 				n = 0;
 				ch = *fmt++;
 				do {
-					n = 10 * n + to_digit(ch);
+					n = 10 * n + to_digit (ch);
 					ch = *fmt++;
-				} while (is_digit(ch));
+				} while (is_digit (ch));
 
 				if (ch == '$') {
 					if (n <= MAX_POS_ARGS) {
@@ -644,7 +645,7 @@ reswitch:	switch (ch) {
 			 *	-- ANSI X3J11
 			 * They don't exclude field widths read from args.
 			 */
-			width = GET_ARG(n, ap, int);
+			width = GET_ARG (n, ap, int);
 #ifndef _NO_POS_ARGS
 			is_pos_arg = old_is_pos_arg;
 #endif
@@ -665,15 +666,15 @@ reswitch:	switch (ch) {
 				/* we must check for positional arg used for dynamic width */
 				old_is_pos_arg = is_pos_arg;
 				is_pos_arg = 0;
-				if (is_digit(*fmt)) {
+				if (is_digit (*fmt)) {
 					char *old_fmt = fmt;
 
 					n = 0;
 					ch = *fmt++;
 					do {
-						n = 10 * n + to_digit(ch);
+						n = 10 * n + to_digit (ch);
 						ch = *fmt++;
-					} while (is_digit(ch));
+					} while (is_digit (ch));
 
 					if (ch == '$') {
 						if (n <= MAX_POS_ARGS) {
@@ -689,7 +690,7 @@ reswitch:	switch (ch) {
 					}
 				}
 #endif /* !_NO_POS_ARGS */
-				prec = GET_ARG(n, ap, int);
+				prec = GET_ARG (n, ap, int);
 #ifndef _NO_POS_ARGS
 				is_pos_arg = old_is_pos_arg;
 #endif
@@ -698,8 +699,8 @@ reswitch:	switch (ch) {
 				goto rflag;
 			}
 			n = 0;
-			while (is_digit(ch)) {
-				n = 10 * n + to_digit(ch);
+			while (is_digit (ch)) {
+				n = 10 * n + to_digit (ch);
 				ch = *fmt++;
 			}
 			prec = n < 0 ? -1 : n;
@@ -716,9 +717,9 @@ reswitch:	switch (ch) {
 		case '5': case '6': case '7': case '8': case '9':
 			n = 0;
 			do {
-				n = 10 * n + to_digit(ch);
+				n = 10 * n + to_digit (ch);
 				ch = *fmt++;
-			} while (is_digit(ch));
+			} while (is_digit (ch));
 #ifndef _NO_POS_ARGS
 			if (ch == '$') {
 				if (n <= MAX_POS_ARGS) {
@@ -757,14 +758,14 @@ reswitch:	switch (ch) {
 			if (ch == 'C' || (flags & LONGINT)) {
 				mbstate_t ps;
 
-				memset((void *)&ps, '\0', sizeof(mbstate_t));
-				if ((size = (int)_wcrtomb_r(data, cp, 
-				    	       (wchar_t)GET_ARG(N, ap, wint_t), 
+				memset ((_PTR)&ps, '\0', sizeof (mbstate_t));
+				if ((size = (int)_wcrtomb_r (data, cp, 
+				    	       (wchar_t)GET_ARG (N, ap, wint_t), 
 					        &ps)) == -1)
 					goto error; 
 			}
 			else {
-				*cp = GET_ARG(N, ap, int);
+				*cp = GET_ARG (N, ap, int);
 				size = 1;
 			}
 			sign = '\0';
@@ -774,7 +775,7 @@ reswitch:	switch (ch) {
 			/*FALLTHROUGH*/
 		case 'd':
 		case 'i':
-			_uquad = SARG();
+			_uquad = SARG ();
 #ifndef _NO_LONGLONG
 			if ((quad_t)_uquad < 0)
 #else
@@ -801,20 +802,20 @@ reswitch:	switch (ch) {
 
 #ifdef _NO_LONGDBL
 			if (flags & LONGDBL) {
-				_fpvalue = (double) GET_ARG(N, ap, _LONG_DOUBLE);
+				_fpvalue = (double) GET_ARG (N, ap, _LONG_DOUBLE);
 			} else {
-				_fpvalue = GET_ARG(N, ap, double);
+				_fpvalue = GET_ARG (N, ap, double);
 			}
 
 			/* do this before tricky precision changes */
-			if (isinf(_fpvalue)) {
+			if (isinf (_fpvalue)) {
 				if (_fpvalue < 0)
 					sign = '-';
 				cp = "Inf";
 				size = 3;
 				break;
 			}
-			if (isnan(_fpvalue)) {
+			if (isnan (_fpvalue)) {
 				cp = "NaN";
 				size = 3;
 				break;
@@ -823,9 +824,9 @@ reswitch:	switch (ch) {
 #else /* !_NO_LONGDBL */
 			
 			if (flags & LONGDBL) {
-				_fpvalue = GET_ARG(N, ap, _LONG_DOUBLE);
+				_fpvalue = GET_ARG (N, ap, _LONG_DOUBLE);
 			} else {
-				_fpvalue = (_LONG_DOUBLE)GET_ARG(N, ap, double);
+				_fpvalue = (_LONG_DOUBLE)GET_ARG (N, ap, double);
 			}
 
 			/* do this before tricky precision changes */
@@ -846,7 +847,7 @@ reswitch:	switch (ch) {
 
 			flags |= FPT;
 
-			cp = cvt(data, _fpvalue, prec, flags, &softsign,
+			cp = cvt (data, _fpvalue, prec, flags, &softsign,
 				&expt, ch, &ndig);
 
 			if (ch == 'g' || ch == 'G') {
@@ -857,7 +858,7 @@ reswitch:	switch (ch) {
 			} 
 			if (ch <= 'e') {	/* 'e' or 'E' fmt */
 				--expt;
-				expsize = exponent(expstr, expt, ch);
+				expsize = exponent (expstr, expt, ch);
 				size = expsize + ndig;
 				if (ndig > 1 || flags & ALT)
 					++size;
@@ -885,21 +886,21 @@ reswitch:	switch (ch) {
 		case 'n':
 #ifndef _NO_LONGLONG
 			if (flags & QUADINT)
-				*GET_ARG(N, ap, quad_ptr_t) = ret;
+				*GET_ARG (N, ap, quad_ptr_t) = ret;
 			else 
 #endif
 			if (flags & LONGINT)
-				*GET_ARG(N, ap, long_ptr_t) = ret;
+				*GET_ARG (N, ap, long_ptr_t) = ret;
 			else if (flags & SHORTINT)
-				*GET_ARG(N, ap, short_ptr_t) = ret;
+				*GET_ARG (N, ap, short_ptr_t) = ret;
 			else
-				*GET_ARG(N, ap, int_ptr_t) = ret;
+				*GET_ARG (N, ap, int_ptr_t) = ret;
 			continue;	/* no output */
 		case 'O':
 			flags |= LONGINT;
 			/*FALLTHROUGH*/
 		case 'o':
-			_uquad = UARG();
+			_uquad = UARG ();
 			base = OCT;
 			goto nosign;
 		case 'p':
@@ -911,7 +912,7 @@ reswitch:	switch (ch) {
 			 *	-- ANSI X3J11
 			 */
 			/* NOSTRICT */
-			_uquad = (u_long)(unsigned _POINTER_INT)GET_ARG(N, ap, void_ptr_t);
+			_uquad = (u_long)(unsigned _POINTER_INT)GET_ARG (N, ap, void_ptr_t);
 			base = HEX;
 			xdigs = "0123456789abcdef";
 			flags |= HEXPREFIX;
@@ -920,7 +921,7 @@ reswitch:	switch (ch) {
 		case 's':
 		case 'S':
 			sign = '\0';
-			if ((cp = GET_ARG(N, ap, char_ptr_t)) == NULL) {
+			if ((cp = GET_ARG (N, ap, char_ptr_t)) == NULL) {
 				cp = "(null)";
 				size = 6;
 			}
@@ -930,7 +931,7 @@ reswitch:	switch (ch) {
  
 				wcp = (_CONST wchar_t *)cp;
 				size = m = 0;
-				memset((void *)&ps, '\0', sizeof(mbstate_t));
+				memset ((_PTR)&ps, '\0', sizeof (mbstate_t));
  
 				/* Count number of bytes needed for multibyte
 				   string that will be produced from widechar
@@ -939,7 +940,7 @@ reswitch:	switch (ch) {
 					while (1) {
 						if (wcp[m] == L'\0')
 							break;
-						if ((n = (int)_wcrtomb_r(data, 
+						if ((n = (int)_wcrtomb_r (data, 
                                                      buf, wcp[m], &ps)) == -1)
 							goto error;
 						if (n + size > prec)
@@ -951,7 +952,7 @@ reswitch:	switch (ch) {
 					}
 				}
 				else {
-					if ((size = (int)_wcsrtombs_r(data, 
+					if ((size = (int)_wcsrtombs_r (data, 
                                                    NULL, &wcp, 0, &ps)) == -1)
 						goto error; 
 					wcp = (_CONST wchar_t *)cp;
@@ -961,12 +962,12 @@ reswitch:	switch (ch) {
 					break;
  
 				if ((malloc_buf = 
-				    (char *)_malloc_r(data, size + 1)) == NULL)
+				    (char *)_malloc_r (data, size + 1)) == NULL)
 					goto error;
                              
 				/* Convert widechar string to multibyte string. */
-				memset((void *)&ps, '\0', sizeof(mbstate_t));
-				if (_wcsrtombs_r(data, malloc_buf, 
+				memset ((_PTR)&ps, '\0', sizeof (mbstate_t));
+				if (_wcsrtombs_r (data, malloc_buf, 
                                                  &wcp, size, &ps) != size)
 					goto error;
 				cp = malloc_buf;
@@ -976,9 +977,9 @@ reswitch:	switch (ch) {
 				/*
 				 * can't use strlen; can only look for the
 				 * NUL in the first `prec' characters, and
-				 * strlen() will go further.
+				 * strlen () will go further.
 				 */
-				char *p = memchr(cp, 0, prec);
+				char *p = memchr (cp, 0, prec);
 
 				if (p != NULL) {
 					size = p - cp;
@@ -987,14 +988,14 @@ reswitch:	switch (ch) {
 				} else
 					size = prec;
 			} else
-				size = strlen(cp);
+				size = strlen (cp);
 
 			break;
 		case 'U':
 			flags |= LONGINT;
 			/*FALLTHROUGH*/
 		case 'u':
-			_uquad = UARG();
+			_uquad = UARG ();
 			base = DEC;
 			goto nosign;
 		case 'X':
@@ -1002,7 +1003,7 @@ reswitch:	switch (ch) {
 			goto hex;
 		case 'x':
 			xdigs = "0123456789abcdef";
-hex:			_uquad = UARG();
+hex:			_uquad = UARG ();
 			base = HEX;
 			/* leading 0x/X only if non-zero */
 			if (flags & ALT && _uquad != 0)
@@ -1033,7 +1034,7 @@ number:			if ((dprec = prec) >= 0)
 				switch (base) {
 				case OCT:
 					do {
-						*--cp = to_char(_uquad & 7);
+						*--cp = to_char (_uquad & 7);
 						_uquad >>= 3;
 					} while (_uquad);
 					/* handle octal leading 0 */
@@ -1044,10 +1045,10 @@ number:			if ((dprec = prec) >= 0)
 				case DEC:
 					/* many numbers are 1 digit */
 					while (_uquad >= 10) {
-						*--cp = to_char(_uquad % 10);
+						*--cp = to_char (_uquad % 10);
 						_uquad /= 10;
 					}
-					*--cp = to_char(_uquad);
+					*--cp = to_char (_uquad);
 					break;
 
 				case HEX:
@@ -1059,7 +1060,7 @@ number:			if ((dprec = prec) >= 0)
 
 				default:
 					cp = "bug in vfprintf: bad base";
-					size = strlen(cp);
+					size = strlen (cp);
 					goto skipsize;
 				}
 			}
@@ -1111,93 +1112,93 @@ number:			if ((dprec = prec) >= 0)
 
 		/* right-adjusting blank padding */
 		if ((flags & (LADJUST|ZEROPAD)) == 0)
-			PAD(width - realsz, blanks);
+			PAD (width - realsz, blanks);
 
 		/* prefix */
 		if (sign) {
-			PRINT(&sign, 1);
+			PRINT (&sign, 1);
 		} else if (flags & HEXPREFIX) {
 			ox[0] = '0';
 			ox[1] = ch;
-			PRINT(ox, 2);
+			PRINT (ox, 2);
 		}
 
 		/* right-adjusting zero padding */
 		if ((flags & (LADJUST|ZEROPAD)) == ZEROPAD)
-			PAD(width - realsz, zeroes);
+			PAD (width - realsz, zeroes);
 
 		/* leading zeroes from decimal precision */
-		PAD(dprec - size, zeroes);
+		PAD (dprec - size, zeroes);
 
 		/* the string or number proper */
 #ifdef FLOATING_POINT
 		if ((flags & FPT) == 0) {
-			PRINT(cp, size);
+			PRINT (cp, size);
 		} else {	/* glue together f_p fragments */
 			if (ch >= 'f') {	/* 'f' or 'g' */
 				if (_fpvalue == 0) {
 					/* kludge for __dtoa irregularity */
-					PRINT("0", 1);
+					PRINT ("0", 1);
 					if (expt < ndig || (flags & ALT) != 0) {
-						PRINT(decimal_point, 1);
-						PAD(ndig - 1, zeroes);
+						PRINT (decimal_point, 1);
+						PAD (ndig - 1, zeroes);
 					}
 				} else if (expt <= 0) {
-					PRINT("0", 1);
+					PRINT ("0", 1);
 					if(expt || ndig) {
-						PRINT(decimal_point, 1);
-						PAD(-expt, zeroes);
-						PRINT(cp, ndig);
+						PRINT (decimal_point, 1);
+						PAD (-expt, zeroes);
+						PRINT (cp, ndig);
 					}
 				} else if (expt >= ndig) {
-					PRINT(cp, ndig);
-					PAD(expt - ndig, zeroes);
+					PRINT (cp, ndig);
+					PAD (expt - ndig, zeroes);
 					if (flags & ALT)
-						PRINT(".", 1);
+						PRINT (".", 1);
 				} else {
-					PRINT(cp, expt);
+					PRINT (cp, expt);
 					cp += expt;
-					PRINT(".", 1);
-					PRINT(cp, ndig-expt);
+					PRINT (".", 1);
+					PRINT (cp, ndig-expt);
 				}
 			} else {	/* 'e' or 'E' */
 				if (ndig > 1 || flags & ALT) {
 					ox[0] = *cp++;
 					ox[1] = '.';
-					PRINT(ox, 2);
+					PRINT (ox, 2);
                                        if (_fpvalue) {
-						PRINT(cp, ndig-1);
+						PRINT (cp, ndig-1);
 					} else	/* 0.[0..] */
 						/* __dtoa irregularity */
-						PAD(ndig - 1, zeroes);
+						PAD (ndig - 1, zeroes);
 				} else	/* XeYYY */
-					PRINT(cp, 1);
-				PRINT(expstr, expsize);
+					PRINT (cp, 1);
+				PRINT (expstr, expsize);
 			}
 		}
 #else
-		PRINT(cp, size);
+		PRINT (cp, size);
 #endif
 		/* left-adjusting padding (always blank) */
 		if (flags & LADJUST)
-			PAD(width - realsz, blanks);
+			PAD (width - realsz, blanks);
 
 		/* finally, adjust ret */
 		ret += width > realsz ? width : realsz;
 
-		FLUSH();	/* copy out the I/O vectors */
+		FLUSH ();	/* copy out the I/O vectors */
 
                 if (malloc_buf != NULL) {
-			free(malloc_buf);
+			free (malloc_buf);
 			malloc_buf = NULL;
 		}
 	}
 done:
-	FLUSH();
+	FLUSH ();
 error:
 	if (malloc_buf != NULL)
-		free(malloc_buf);
-	return (__sferror(fp) ? EOF : ret);
+		free (malloc_buf);
+	return (__sferror (fp) ? EOF : ret);
 	/* NOTREACHED */
 }
 
@@ -1213,16 +1214,29 @@ extern char *_ldtoa_r _PARAMS((struct _reent *, _LONG_DOUBLE, int,
 #define word0(x) ldword0(x)
 #endif
 
-static char *
-cvt(data, value, ndigits, flags, sign, decpt, ch, length)
-	struct _reent *data;
 #ifdef _NO_LONGDBL
-	double value;
+static char *
+_DEFUN(cvt, (data, value, ndigits, flags, sign, decpt, ch, length),
+       struct _reent *data _AND
+       double value _AND
+       int ndigits  _AND
+       int flags    _AND
+       char *sign   _AND
+       int *decpt   _AND
+       int ch       _AND
+       int *length)
 #else
-	_LONG_DOUBLE value;
+static char *
+_DEFUN(cvt, (data, value, ndigits, flags, sign, decpt, ch, length),
+       struct _reent *data _AND
+       _LONG_DOUBLE value  _AND
+       int ndigits         _AND
+       int flags           _AND
+       char *sign          _AND
+       int *decpt          _AND
+       int ch              _AND
+       int *length)
 #endif
-	int ndigits, flags, *decpt, ch, *length;
-	char *sign;
 {
 	int mode, dsgn;
 	char *digits, *bp, *rve;
@@ -1248,13 +1262,13 @@ cvt(data, value, ndigits, flags, sign, decpt, ch, length)
 #ifdef _NO_LONGDBL
         tmp.d = value;
 
-	if (word0(tmp) & Sign_bit) { /* this will check for < 0 and -0.0 */
+	if (word0 (tmp) & Sign_bit) { /* this will check for < 0 and -0.0 */
 		value = -value;
 		*sign = '-';
         } else
 		*sign = '\000';
 
-	digits = _dtoa_r(data, value, mode, ndigits, decpt, &dsgn, &rve);
+	digits = _dtoa_r (data, value, mode, ndigits, decpt, &dsgn, &rve);
 #else /* !_NO_LONGDBL */
 	ldptr = (struct ldieee *)&value;
 	if (ldptr->sign) { /* this will check for < 0 and -0.0 */
@@ -1263,7 +1277,7 @@ cvt(data, value, ndigits, flags, sign, decpt, ch, length)
         } else
 		*sign = '\000';
 
-	digits = _ldtoa_r(data, value, mode, ndigits, decpt, &dsgn, &rve);
+	digits = _ldtoa_r (data, value, mode, ndigits, decpt, &dsgn, &rve);
 #endif /* !_NO_LONGDBL */
 
 	if ((ch != 'g' && ch != 'G') || flags & ALT) {	/* Print trailing zeros */
@@ -1283,9 +1297,10 @@ cvt(data, value, ndigits, flags, sign, decpt, ch, length)
 }
 
 static int
-exponent(p0, exp, fmtch)
-	char *p0;
-	int exp, fmtch;
+_DEFUN(exponent, (p0, exp, fmtch),
+       char *p0 _AND
+       int exp  _AND
+       int fmtch)
 {
 	register char *p, *t;
 	char expbuf[40];
@@ -1301,14 +1316,14 @@ exponent(p0, exp, fmtch)
 	t = expbuf + 40;
 	if (exp > 9) {
 		do {
-			*--t = to_char(exp % 10);
+			*--t = to_char (exp % 10);
 		} while ((exp /= 10) > 9);
-		*--t = to_char(exp);
+		*--t = to_char (exp);
 		for (; t < expbuf + 40; *p++ = *t++);
 	}
 	else {
 		*p++ = '0';
-		*p++ = to_char(exp);
+		*p++ = to_char (exp);
 	}
 	return (p - p0);
 }
@@ -1389,7 +1404,7 @@ typedef enum {
   PWPOS,   /* get positional parameter value for variable width or precision */
 } ACTION;
 
-const static CH_CLASS chclass[256] = {
+_CONST static CH_CLASS chclass[256] = {
   /* 00-07 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
   /* 08-0f */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
   /* 10-17 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
@@ -1424,7 +1439,7 @@ const static CH_CLASS chclass[256] = {
   /* f8-ff */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
 };
 
-const static STATE state_table[MAX_STATE][MAX_CH_CLASS] = {
+_CONST static STATE state_table[MAX_STATE][MAX_CH_CLASS] = {
   /*             '0'     '1-9'     '$'     MODFR    SPEC    '.'     '*'    FLAG    OTHER */ 
   /* START */  { SFLAG,   WDIG,    DONE,   SMOD,    DONE,   SDOT,  VARW,   SFLAG,  DONE },
   /* SFLAG */  { SFLAG,   WDIG,    DONE,   SMOD,    DONE,   SDOT,  VARW,   SFLAG,  DONE },
@@ -1439,7 +1454,7 @@ const static STATE state_table[MAX_STATE][MAX_CH_CLASS] = {
   /* VPDIG */  { DONE,    DONE,    PREC,   DONE,    DONE,   DONE,  DONE,   DONE,   DONE },
 };
 
-const static ACTION action_table[MAX_STATE][MAX_CH_CLASS] = {
+_CONST static ACTION action_table[MAX_STATE][MAX_CH_CLASS] = {
   /*             '0'     '1-9'     '$'     MODFR    SPEC    '.'     '*'    FLAG    OTHER */ 
   /* START */  { NOOP,    NUMBER,  NOOP,   GETMOD,  GETARG, NOOP,  NOOP,   NOOP,   NOOP },
   /* SFLAG */  { NOOP,    NUMBER,  NOOP,   GETMOD,  GETARG, NOOP,  NOOP,   NOOP,   NOOP },
@@ -1456,9 +1471,15 @@ const static ACTION action_table[MAX_STATE][MAX_CH_CLASS] = {
 
 /* function to get positional parameter N where n = N - 1 */
 static union arg_val *
-get_arg (struct _reent *data, int n, char *fmt, va_list *ap, 
-         int *numargs_p, union arg_val *args, 
-	 int *arg_type, char **last_fmt) 
+_DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
+       struct _reent *data _AND
+       int n               _AND
+       char *fmt           _AND
+       va_list *ap         _AND
+       int *numargs_p      _AND
+       union arg_val *args _AND
+       int *arg_type       _AND
+       char **last_fmt)
 {
   int ch;
   int number, flags;
@@ -1489,7 +1510,7 @@ get_arg (struct _reent *data, int n, char *fmt, va_list *ap,
   while (*fmt && n >= numargs)
     {
 #ifdef MB_CAPABLE
-      while ((nbytes = _mbtowc_r(data, &wc, fmt, MB_CUR_MAX, &wc_state)) > 0) 
+      while ((nbytes = _mbtowc_r (data, &wc, fmt, MB_CUR_MAX, &wc_state)) > 0) 
 	{
 	  fmt += nbytes;
 	  if (wc == '%') 
@@ -1610,27 +1631,27 @@ get_arg (struct _reent *data, int n, char *fmt, va_list *ap,
 		    switch (spec_type)
 		      {
 		      case LONG_INT:
-			args[numargs++].val_long = va_arg(*ap, long);
+			args[numargs++].val_long = va_arg (*ap, long);
 			break;
 		      case QUAD_INT:
-			args[numargs++].val_quad_t = va_arg(*ap, quad_t);
+			args[numargs++].val_quad_t = va_arg (*ap, quad_t);
 			break;
 		      case WIDE_CHAR:
-			args[numargs++].val_wint_t = va_arg(*ap, wint_t);
+			args[numargs++].val_wint_t = va_arg (*ap, wint_t);
 			break;
 		      case CHAR:
 		      case SHORT_INT:
 		      case INT:
-			args[numargs++].val_int = va_arg(*ap, int);
+			args[numargs++].val_int = va_arg (*ap, int);
 			break;
 		      case CHAR_PTR:
-			args[numargs++].val_char_ptr_t = va_arg(*ap, char *);
+			args[numargs++].val_char_ptr_t = va_arg (*ap, char *);
 			break;
 		      case DOUBLE:
-			args[numargs++].val_double = va_arg(*ap, double);
+			args[numargs++].val_double = va_arg (*ap, double);
 			break;
 		      case LONG_DOUBLE:
-			args[numargs++].val__LONG_DOUBLE = va_arg(*ap, _LONG_DOUBLE);
+			args[numargs++].val__LONG_DOUBLE = va_arg (*ap, _LONG_DOUBLE);
 			break;
 		      }
 		  }
@@ -1638,13 +1659,13 @@ get_arg (struct _reent *data, int n, char *fmt, va_list *ap,
 	      break;
 	    case GETPOS: /* we have positional specifier */
 	      if (arg_type[0] == -1)
-		memset (arg_type, 0, sizeof(int) * MAX_POS_ARGS);
+		memset (arg_type, 0, sizeof (int) * MAX_POS_ARGS);
 	      pos = number - 1;
 	      max_pos_arg = (max_pos_arg > pos ? max_pos_arg : pos);
 	      break;
 	    case PWPOS:  /* we have positional specifier for width or precision */
 	      if (arg_type[0] == -1)
-		memset (arg_type, 0, sizeof(int) * MAX_POS_ARGS);
+		memset (arg_type, 0, sizeof (int) * MAX_POS_ARGS);
 	      number -= 1;
 	      arg_type[number] = INT;
 	      max_pos_arg = (max_pos_arg > number ? max_pos_arg : number);
@@ -1653,18 +1674,18 @@ get_arg (struct _reent *data, int n, char *fmt, va_list *ap,
 	      --fmt;
 	      /* fallthrough */
 	    case GETPW:  /* we have a variable precision or width to acquire */
-	      args[numargs++].val_int = va_arg(*ap, int);
+	      args[numargs++].val_int = va_arg (*ap, int);
 	      break;
 	    case NUMBER: /* we have a number to process */
 	      number = (ch - '0');
-	      while ((ch = *fmt) != '\0' && is_digit(ch))
+	      while ((ch = *fmt) != '\0' && is_digit (ch))
 		{
 		  number = number * 10 + (ch - '0');
 		  ++fmt;
 		}
 	      break;
 	    case SKIPNUM: /* we have a number to skip */
-	      while ((ch = *fmt) != '\0' && is_digit(ch))
+	      while ((ch = *fmt) != '\0' && is_digit (ch))
 		++fmt;
 	      break;
 	    case NOOP:
@@ -1686,28 +1707,28 @@ get_arg (struct _reent *data, int n, char *fmt, va_list *ap,
       switch (arg_type[numargs])
 	{
 	case LONG_INT:
-	  args[numargs++].val_long = va_arg(*ap, long);
+	  args[numargs++].val_long = va_arg (*ap, long);
 	  break;
 	case QUAD_INT:
-	  args[numargs++].val_quad_t = va_arg(*ap, quad_t);
+	  args[numargs++].val_quad_t = va_arg (*ap, quad_t);
 	  break;
 	case CHAR_PTR:
-	  args[numargs++].val_char_ptr_t = va_arg(*ap, char *);
+	  args[numargs++].val_char_ptr_t = va_arg (*ap, char *);
 	  break;
 	case DOUBLE:
-	  args[numargs++].val_double = va_arg(*ap, double);
+	  args[numargs++].val_double = va_arg (*ap, double);
 	  break;
 	case LONG_DOUBLE:
-	  args[numargs++].val__LONG_DOUBLE = va_arg(*ap, _LONG_DOUBLE);
+	  args[numargs++].val__LONG_DOUBLE = va_arg (*ap, _LONG_DOUBLE);
 	  break;
 	case WIDE_CHAR:
-	  args[numargs++].val_wint_t = va_arg(*ap, wint_t);
+	  args[numargs++].val_wint_t = va_arg (*ap, wint_t);
 	  break;
 	case INT:
 	case SHORT_INT:
 	case CHAR:
 	default:
-	  args[numargs++].val_int = va_arg(*ap, int);
+	  args[numargs++].val_int = va_arg (*ap, int);
 	  break;
 	}
     }

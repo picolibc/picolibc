@@ -1,3 +1,40 @@
+2004-04-23  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
+
+	* libc/stdio/asprintf.c libc/stdio/clearerr.c,
+	libc/stdio/fclose.c libc/stdio/fcloseall.c libc/stdio/fdopen.c,
+	libc/stdio/feof.c libc/stdio/ferror.c libc/stdio/fflush.c,
+	libc/stdio/fgetc.c libc/stdio/fgetpos.c libc/stdio/fgets.c,
+	libc/stdio/fileno.c libc/stdio/findfp.c libc/stdio/fiprintf.c,
+	libc/stdio/flags.c libc/stdio/fopen.c libc/stdio/fprintf.c,
+	libc/stdio/fputc.c libc/stdio/fputs.c libc/stdio/fread.c,
+	libc/stdio/freopen.c libc/stdio/fscanf.c libc/stdio/fseek.c,
+	libc/stdio/fseeko.c libc/stdio/fsetpos.c libc/stdio/ftell.c,
+	libc/stdio/ftello.c libc/stdio/fvwrite.c libc/stdio/fwalk.c,
+	libc/stdio/fwrite.c libc/stdio/getc.c libc/stdio/getc_u.c,
+	libc/stdio/getchar.c libc/stdio/getchar_u.c,
+	libc/stdio/getdelim.c libc/stdio/getline.c libc/stdio/gets.c,
+	libc/stdio/getw.c libc/stdio/iprintf.c libc/stdio/local.h,
+	libc/stdio/makebuf.c libc/stdio/mktemp.c libc/stdio/perror.c,
+	libc/stdio/printf.c libc/stdio/putc.c libc/stdio/putc_u.c,
+	libc/stdio/putchar.c libc/stdio/putchar_u.c libc/stdio/puts.c,
+	libc/stdio/putw.c libc/stdio/refill.c libc/stdio/remove.c,
+	libc/stdio/rename.c libc/stdio/rewind.c libc/stdio/rget.c,
+	libc/stdio/scanf.c libc/stdio/setbuf.c libc/stdio/setbuffer.c,
+	libc/stdio/setlinebuf.c libc/stdio/setvbuf.c,
+	libc/stdio/siprintf.c libc/stdio/snprintf.c,
+	libc/stdio/sprintf.c libc/stdio/sscanf.c libc/stdio/stdio.c,
+	libc/stdio/tmpfile.c libc/stdio/tmpnam.c libc/stdio/ungetc.c,
+	libc/stdio/vasprintf.c libc/stdio/vfieeefp.h,
+	libc/stdio/vfprintf.c libc/stdio/vfscanf.c,
+	libc/stdio/vprintf.c libc/stdio/vscanf.c,
+	libc/stdio/vsnprintf.c libc/stdio/vsprintf.c,
+	libc/stdio/vsscanf.c libc/stdio/wbuf.c,
+	libc/stdio/wsetup.c: Perform minor formatting changes.  Move
+	copyright notices to top of file, ensure that <_ansi.h> is
+	included, be consistent with open parentheses, use _DEFUN macro,
+	include "local.h" where needed, and remove various compiler
+	warnings.
+
 2004-04-21  J"orn Rennecke <joern.rennecke@superh.com>
 
 	* libc/stdio/vfscanf.c (NNZDIGITS): New define.

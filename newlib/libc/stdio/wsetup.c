@@ -17,6 +17,7 @@
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#include <_ansi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "local.h"
@@ -28,8 +29,8 @@
  */
 
 int
-_DEFUN (__swsetup, (fp),
-	register FILE * fp)
+_DEFUN(__swsetup, (fp),
+       register FILE * fp)
 {
   /* Make sure stdio is set up.  */
 

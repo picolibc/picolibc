@@ -28,7 +28,7 @@ ANSI_SYNOPSIS
 	#include <stdio.h>
 	int putchar(int <[ch]>);
 
-	int _putchar_r(void *<[reent]>, int <[ch]>);
+	int _putchar_r(struct _reent *<[reent]>, int <[ch]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
@@ -36,7 +36,7 @@ TRAD_SYNOPSIS
 	int <[ch]>;
 
 	int _putchar_r(<[reent]>, <[ch]>)
-	char *<[reent]>;
+	struct _reent *<[reent]>;
 	int <[ch]>;
 
 DESCRIPTION
@@ -68,26 +68,27 @@ static char sccsid[] = "%W% (Berkeley) %G%";
  * A subroutine version of the macro putchar.
  */
 
+#include <_ansi.h>
+#include <reent.h>
 #include <stdio.h>
-
 #include "local.h"
 
 #undef putchar
 
 int
-_putchar_r (ptr, c)
-     struct _reent *ptr;
-     int c;
+_DEFUN(_putchar_r, (ptr, c),
+       struct _reent *ptr _AND
+       int c)
 {
-  _REENT_SMALL_CHECK_INIT(_stdout_r (ptr));
+  _REENT_SMALL_CHECK_INIT (_stdout_r (ptr));
   return putc (c, _stdout_r (ptr));
 }
 
 #ifndef _REENT_ONLY
 
 int
-putchar (c)
-     int c;
+_DEFUN(putchar, (c),
+       int c)
 {
   /* CHECK_INIT is (eventually) called by __swbuf.  */
 

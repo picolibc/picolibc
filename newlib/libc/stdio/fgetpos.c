@@ -1,4 +1,21 @@
 /*
+ * Copyright (c) 1990 The Regents of the University of California.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * advertising materials, and other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * by the University of California, Berkeley.  The name of the
+ * University may not be used to endorse or promote products derived
+ * from this software without specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
+
+/*
 FUNCTION
 <<fgetpos>>---record position in a stream or file
 
@@ -54,32 +71,34 @@ conforming C implementations may return a different result from
 No supporting OS subroutines are required.
 */
 
+#include <_ansi.h>
+#include <reent.h>
 #include <stdio.h>
 
 int
-_DEFUN (_fgetpos_r, (ptr, fp, pos),
-	struct _reent * ptr _AND
-	FILE * fp _AND
-	_fpos_t * pos)
+_DEFUN(_fgetpos_r, (ptr, fp, pos),
+       struct _reent * ptr _AND
+       FILE * fp           _AND
+       _fpos_t * pos)
 {
-  _flockfile(fp);
+  _flockfile (fp);
   *pos = _ftell_r (ptr, fp);
 
   if (*pos != -1)
     {
-      _funlockfile(fp);
+      _funlockfile (fp);
       return 0;
     }
-  _funlockfile(fp);
+  _funlockfile (fp);
   return 1;
 }
 
 #ifndef _REENT_ONLY
 
 int
-_DEFUN (fgetpos, (fp, pos),
-	FILE * fp _AND
-	_fpos_t * pos)
+_DEFUN(fgetpos, (fp, pos),
+       FILE * fp _AND
+       _fpos_t * pos)
 {
   return _fgetpos_r (_REENT, fp, pos);
 }

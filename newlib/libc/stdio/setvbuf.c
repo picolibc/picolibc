@@ -96,15 +96,15 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
  */
 
 int
-_DEFUN (setvbuf, (fp, buf, mode, size),
-	register FILE * fp _AND
-	char *buf _AND
-	register int mode _AND
-	register size_t size)
+_DEFUN(setvbuf, (fp, buf, mode, size),
+       register FILE * fp _AND
+       char *buf          _AND
+       register int mode  _AND
+       register size_t size)
 {
   int ret = 0;
 
-  _flockfile(fp);
+  _flockfile (fp);
 
   CHECK_INIT (fp);
 
@@ -115,7 +115,7 @@ _DEFUN (setvbuf, (fp, buf, mode, size),
 
   if ((mode != _IOFBF && mode != _IOLBF && mode != _IONBF) || (int)(_POINTER_INT) size < 0)
     {
-      _funlockfile(fp);
+      _funlockfile (fp);
       return (EOF);
     }
 
@@ -126,11 +126,11 @@ _DEFUN (setvbuf, (fp, buf, mode, size),
    * non buffer flags, and clear malloc flag.
    */
 
-  (void) fflush (fp);
+  _CAST_VOID fflush (fp);
   fp->_r = 0;
   fp->_lbfsize = 0;
   if (fp->_flags & __SMBF)
-    _free_r (_REENT, (void *) fp->_bf._base);
+    _free_r (_REENT, (_PTR) fp->_bf._base);
   fp->_flags &= ~(__SLBF | __SNBF | __SMBF);
 
   if (mode == _IONBF)
@@ -158,7 +158,7 @@ nbf:
           fp->_w = 0;
           fp->_bf._base = fp->_p = fp->_nbuf;
           fp->_bf._size = 1;
-          _funlockfile(fp);
+          _funlockfile (fp);
           return (ret);
         }
       fp->_flags |= __SMBF;
@@ -193,6 +193,6 @@ nbf:
   if (fp->_flags & __SWR)
     fp->_w = fp->_flags & (__SLBF | __SNBF) ? 0 : size;
 
-  _funlockfile(fp);
+  _funlockfile (fp);
   return 0;
 }

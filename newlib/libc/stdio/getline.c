@@ -1,3 +1,4 @@
+/* Copyright 2002, Red Hat Inc. - all rights reserved */
 /*
 FUNCTION
 <<getline>>---read a line from a file
@@ -37,17 +38,16 @@ PORTABILITY
 No supporting OS subroutines are directly required.
 */
 
-/* Copyright 2002, Red Hat Inc. - all rights reserved */
-
+#include <_ansi.h>
 #include <stdio.h>
 
-extern ssize_t __getdelim (char **, size_t *, int, FILE *);
+extern ssize_t _EXFUN(__getdelim, (char **, size_t *, int, FILE *));
 
 ssize_t
-__getline (lptr, n, fp)
-     char **lptr;
-     size_t *n;
-     FILE *fp;
+_DEFUN(__getline, (lptr, n, fp),
+       char **lptr _AND
+       size_t *n   _AND
+       FILE *fp)
 {
   return __getdelim (lptr, n, '\n', fp);
 }

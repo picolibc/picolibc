@@ -1,8 +1,3 @@
-/* This is file MKTEMP.C */
-/* This file may have been modified by DJ Delorie (Jan 1991).  If so,
-** these modifications are Copyright (C) 1991 DJ Delorie.
-*/
-
 /*
  * Copyright (c) 1987 Regents of the University of California.
  * All rights reserved.
@@ -21,6 +16,10 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
+/* This is file MKTEMP.C */
+/* This file may have been modified by DJ Delorie (Jan 1991).  If so,
+** these modifications are Copyright (C) 1991 DJ Delorie.
+*/
 
 /*
 FUNCTION
@@ -40,8 +39,8 @@ ANSI_SYNOPSIS
 	char *mktemp(char *<[path]>);
 	int mkstemp(char *<[path]>);
 
-	char *_mktemp_r(void *<[reent]>, char *<[path]>);
-	int *_mkstemp_r(void *<[reent]>, char *<[path]>);
+	char *_mktemp_r(struct _reent *<[reent]>, char *<[path]>);
+	int *_mkstemp_r(struct _reent *<[reent]>, char *<[path]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
@@ -52,11 +51,11 @@ TRAD_SYNOPSIS
 	char *<[path]>;
 
 	char *_mktemp_r(<[reent]>, <[path]>)
-	char *<[reent]>;
+	struct _reent *<[reent]>;
 	char *<[path]>;
 
 	int _mkstemp_r(<[reent]>, <[path]>)
-	char *<[reent]>;
+	struct _reent *<[reent]>;
 	char *<[path]>;
 
 DESCRIPTION
@@ -93,19 +92,20 @@ V Interface Definition requires <<mktemp>> as of Issue 2.
 Supporting OS subroutines required: <<getpid>>, <<open>>, <<stat>>.
 */
 
+#include <_ansi.h>
+#include <reent.h>
 #include <sys/types.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <errno.h>
 #include <stdio.h>
 #include <ctype.h>
-#include <reent.h>
 
 static int
-_DEFUN (_gettemp, (ptr, path, doopen),
-	struct _reent *ptr _AND
-	char *path _AND
-	register int *doopen)
+_DEFUN(_gettemp, (ptr, path, doopen),
+       struct _reent *ptr _AND
+       char *path         _AND
+       register int *doopen)
 {
   register char *start, *trv;
   struct stat sbuf;
@@ -190,9 +190,9 @@ _DEFUN (_gettemp, (ptr, path, doopen),
 }
 
 int
-_DEFUN (_mkstemp_r, (ptr, path),
-	struct _reent *ptr _AND
-	char *path)
+_DEFUN(_mkstemp_r, (ptr, path),
+       struct _reent *ptr _AND
+       char *path)
 {
   int fd;
 
@@ -200,9 +200,9 @@ _DEFUN (_mkstemp_r, (ptr, path),
 }
 
 char *
-_DEFUN (_mktemp_r, (ptr, path),
-	struct _reent *ptr _AND
-	char *path)
+_DEFUN(_mktemp_r, (ptr, path),
+       struct _reent *ptr _AND
+       char *path)
 {
   return (_gettemp (ptr, path, (int *) NULL) ? path : (char *) NULL);
 }
@@ -210,8 +210,8 @@ _DEFUN (_mktemp_r, (ptr, path),
 #ifndef _REENT_ONLY
 
 int
-_DEFUN (mkstemp, (path),
-	char *path)
+_DEFUN(mkstemp, (path),
+       char *path)
 {
   int fd;
 
@@ -219,8 +219,8 @@ _DEFUN (mkstemp, (path),
 }
 
 char *
-_DEFUN (mktemp, (path),
-	char *path)
+_DEFUN(mktemp, (path),
+       char *path)
 {
   return (_gettemp (_REENT, path, (int *) NULL) ? path : (char *) NULL);
 }

@@ -1,5 +1,3 @@
-/* doc in vfprintf.c */
-
 /*
  * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
@@ -16,15 +14,14 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-
 /* This code was based on vsprintf.c */
+/* doc in vfprintf.c */
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <limits.h>
 #ifdef _HAVE_STDC
@@ -36,10 +33,10 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #ifndef _REENT_ONLY
 
 int
-_DEFUN (vasprintf, (strp, fmt, ap),
-     char **strp _AND
-     _CONST char *fmt _AND
-     va_list ap)
+_DEFUN(vasprintf, (strp, fmt, ap),
+       char **strp      _AND
+       _CONST char *fmt _AND
+       va_list ap)
 {
   int ret;
   FILE f;
@@ -57,11 +54,11 @@ _DEFUN (vasprintf, (strp, fmt, ap),
 #endif /* !_REENT_ONLY */
 
 int
-_DEFUN (_vasprintf_r, (ptr, strp, fmt, ap),
-     struct _reent *ptr _AND
-     char **strp _AND
-     _CONST char *fmt _AND
-     va_list ap)
+_DEFUN(_vasprintf_r, (ptr, strp, fmt, ap),
+       struct _reent *ptr _AND
+       char **strp        _AND
+       _CONST char *fmt   _AND
+       va_list ap)
 {
   int ret;
   FILE f;

@@ -16,30 +16,30 @@
  */
 
 #include <_ansi.h>
+#include <reent.h>
 #include <stdio.h>
-#include "local.h"
-
 #ifdef _HAVE_STDC
 #include <stdarg.h>
 #else
 #include <varargs.h>
 #endif
+#include "local.h"
 
 #ifndef _REENT_ONLY
 
 int
 #ifdef _HAVE_STDC
-scanf (const char *fmt, ...)
+scanf(_CONST char *fmt, ...)
 #else
-scanf (fmt, va_alist)
-     char *fmt;
-     va_dcl
+scanf(fmt, va_alist)
+      char *fmt;
+      va_dcl
 #endif
 {
   int ret;
   va_list ap;
 
-  _REENT_SMALL_CHECK_INIT(_stdin_r (_REENT));
+  _REENT_SMALL_CHECK_INIT (_stdin_r (_REENT));
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
 #else
@@ -54,18 +54,18 @@ scanf (fmt, va_alist)
 
 int
 #ifdef _HAVE_STDC
-_scanf_r (struct _reent *ptr, const char *fmt, ...)
+_scanf_r(struct _reent *ptr, _CONST char *fmt, ...)
 #else
-_scanf_r (ptr, fmt, va_alist)
-     struct _reent *ptr;
-     char *fmt;
-     va_dcl
+_scanf_r(ptr, fmt, va_alist)
+         struct _reent *ptr;
+         char *fmt;
+         va_dcl
 #endif
 {
   int ret;
   va_list ap;
 
-  _REENT_SMALL_CHECK_INIT(_stdin_r (ptr));
+  _REENT_SMALL_CHECK_INIT (_stdin_r (ptr));
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
 #else
@@ -75,5 +75,4 @@ _scanf_r (ptr, fmt, va_alist)
   va_end (ap);
   return (ret);
 }
-
 

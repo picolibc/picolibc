@@ -28,7 +28,7 @@ ANSI_SYNOPSIS
 	#include <stdio.h>
 	FILE *fopen(const char *<[file]>, const char *<[mode]>);
 
-	FILE *_fopen_r(void *<[reent]>, 
+	FILE *_fopen_r(struct _reent *<[reent]>, 
                        const char *<[file]>, const char *<[mode]>);
 
 TRAD_SYNOPSIS
@@ -38,7 +38,7 @@ TRAD_SYNOPSIS
 	char *<[mode]>;
 
 	FILE *_fopen_r(<[reent]>, <[file]>, <[mode]>)
-	void *<[reent]>;
+	struct _reent *<[reent]>;
 	char *<[file]>;
 	char *<[mode]>;
 
@@ -113,19 +113,21 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
+#include <_ansi.h>
+#include <reent.h>
 #include <stdio.h>
 #include <errno.h>
-#include "local.h"
+#include <sys/lock.h>
 #ifdef __CYGWIN__
 #include <fcntl.h>
 #endif
-#include <sys/lock.h>
+#include "local.h"
 
 FILE *
-_DEFUN (_fopen_r, (ptr, file, mode),
-	struct _reent *ptr _AND
-	_CONST char *file _AND
-	_CONST char *mode)
+_DEFUN(_fopen_r, (ptr, file, mode),
+       struct _reent *ptr _AND
+       _CONST char *file _AND
+       _CONST char *mode)
 {
   register FILE *fp;
   register int f;
@@ -147,7 +149,7 @@ _DEFUN (_fopen_r, (ptr, file, mode),
       return NULL;
     }
 
-  _flockfile(fp);
+  _flockfile (fp);
 
   fp->_file = f;
   fp->_flags = flags;
@@ -165,16 +167,16 @@ _DEFUN (_fopen_r, (ptr, file, mode),
     fp->_flags |= __SCLE;
 #endif
 
-  _funlockfile(fp);
+  _funlockfile (fp);
   return fp;
 }
 
 #ifndef _REENT_ONLY
 
 FILE *
-_DEFUN (fopen, (file, mode),
-	_CONST char *file _AND
-	_CONST char *mode)
+_DEFUN(fopen, (file, mode),
+       _CONST char *file _AND
+       _CONST char *mode)
 {
   return _fopen_r (_REENT, file, mode);
 }

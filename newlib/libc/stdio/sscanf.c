@@ -16,9 +16,8 @@
  */
 
 /*
-
 FUNCTION
-	<<scanf>>, <<fscanf>>, <<sscanf>>---scan and format input
+<<scanf>>, <<fscanf>>, <<sscanf>>---scan and format input
 
 INDEX
 	scanf
@@ -375,12 +374,11 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 /* | ARGSUSED */
 /*SUPPRESS 590*/
-static
-_READ_WRITE_RETURN_TYPE
-eofread (cookie, buf, len)
-     _PTR cookie;
-     char *buf;
-     int len;
+static _READ_WRITE_RETURN_TYPE
+_DEFUN(eofread, (cookie, buf, len),
+       _PTR cookie _AND
+       char *buf   _AND
+       int len)
 {
   return 0;
 }
@@ -389,13 +387,15 @@ eofread (cookie, buf, len)
 
 #ifdef _HAVE_STDC
 int 
-_DEFUN (sscanf, (str, fmt), _CONST char *str _AND _CONST char *fmt _DOTS)
+_DEFUN(sscanf, (str, fmt),
+       _CONST char *str _AND
+       _CONST char *fmt _DOTS)
 #else
 int 
-sscanf (str, fmt, va_alist)
-     _CONST char *str;
-     _CONST char *fmt;
-     va_dcl
+sscanf(str, fmt, va_alist)
+       _CONST char *str;
+       _CONST char *fmt;
+       va_dcl
 #endif
 {
   int ret;
@@ -422,14 +422,17 @@ sscanf (str, fmt, va_alist)
 
 #ifdef _HAVE_STDC
 int 
-_DEFUN (_sscanf_r, (ptr, str, fmt), struct _reent *ptr _AND _CONST char *str _AND _CONST char *fmt _DOTS)
+_DEFUN(_sscanf_r, (ptr, str, fmt), 
+       struct _reent *ptr _AND
+       _CONST char *str   _AND
+       _CONST char *fmt _DOTS)
 #else
 int 
-_sscanf_r (ptr, str, fmt, va_alist)
-     struct _reent *ptr;
-     _CONST char *str;
-     _CONST char *fmt;
-     va_dcl
+_sscanf_r(ptr, str, fmt, va_alist)
+          struct _reent *ptr;
+          _CONST char *str;
+          _CONST char *fmt;
+          va_dcl
 #endif
 {
   int ret;

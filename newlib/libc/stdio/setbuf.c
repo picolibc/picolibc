@@ -70,10 +70,10 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <stdio.h>
 #include "local.h"
 
-void
-_DEFUN (setbuf, (fp, buf),
-	FILE * fp _AND
-	char *buf)
+_VOID
+_DEFUN(setbuf, (fp, buf),
+       FILE * fp _AND
+       char *buf)
 {
-  (void) setvbuf (fp, buf, buf ? _IOFBF : _IONBF, BUFSIZ);
+  _CAST_VOID setvbuf (fp, buf, buf ? _IOFBF : _IONBF, BUFSIZ);
 }

@@ -55,17 +55,18 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.
 */
 
+#include <_ansi.h>
 #include <stdio.h>
 #include <string.h>
 #include "local.h"
 
 #ifdef __SCLE
 static size_t
-_DEFUN (crlf, (fp, buf, count, eof),
-        FILE * fp _AND
-        char * buf _AND
-        size_t count _AND
-        int eof)
+_DEFUN(crlf, (fp, buf, count, eof),
+       FILE * fp _AND
+       char * buf _AND
+       size_t count _AND
+       int eof)
 {
   int newcount = 0, r;
   char *s, *d, *e;
@@ -84,11 +85,11 @@ _DEFUN (crlf, (fp, buf, count, eof),
     {
       if (*s == '\r')
         {
-          int c = __sgetc_raw(fp);
+          int c = __sgetc_raw (fp);
           if (c == '\n')
             *s = '\n';
           else
-            ungetc(c, fp);
+            ungetc (c, fp);
         }
       *d++ = *s++;
     }
@@ -96,7 +97,7 @@ _DEFUN (crlf, (fp, buf, count, eof),
 
   while (d < e)
     {
-      r = getc(fp);
+      r = getc (fp);
       if (r == EOF)
         return count - (e-d);
       *d++ = r;
@@ -109,11 +110,11 @@ _DEFUN (crlf, (fp, buf, count, eof),
 #endif
 
 size_t
-_DEFUN (fread, (buf, size, count, fp),
-	_PTR buf _AND
-	size_t size _AND
-	size_t count _AND
-	FILE * fp)
+_DEFUN(fread, (buf, size, count, fp),
+       _PTR buf _AND
+       size_t size _AND
+       size_t count _AND
+       FILE * fp)
 {
   register size_t resid;
   register char *p;
@@ -123,7 +124,7 @@ _DEFUN (fread, (buf, size, count, fp),
   if ((resid = count * size) == 0)
     return 0;
 
-  _flockfile(fp);
+  _flockfile (fp);
   if (fp->_r < 0)
     fp->_r = 0;
   total = resid;
@@ -131,7 +132,7 @@ _DEFUN (fread, (buf, size, count, fp),
 
   while (resid > (r = fp->_r))
     {
-      (void) memcpy ((void *) p, (void *) fp->_p, (size_t) r);
+      _CAST_VOID memcpy ((_PTR) p, (_PTR) fp->_p, (size_t) r);
       fp->_p += r;
       /* fp->_r = 0 ... done in __srefill */
       p += r;
@@ -142,24 +143,24 @@ _DEFUN (fread, (buf, size, count, fp),
 #ifdef __SCLE
           if (fp->_flags & __SCLE)
             {
-              _funlockfile(fp);
-              return crlf(fp, buf, total-resid, 1) / size;
+              _funlockfile (fp);
+              return crlf (fp, buf, total-resid, 1) / size;
             }
 #endif
-          _funlockfile(fp);
+          _funlockfile (fp);
 	  return (total - resid) / size;
 	}
     }
-  (void) memcpy ((void *) p, (void *) fp->_p, resid);
+  _CAST_VOID memcpy ((_PTR) p, (_PTR) fp->_p, resid);
   fp->_r -= resid;
   fp->_p += resid;
 #ifdef __SCLE
   if (fp->_flags & __SCLE)
     {
-      _funlockfile(fp);
+      _funlockfile (fp);
       return crlf(fp, buf, total, 0) / size;
     }
 #endif
-  _funlockfile(fp);
+  _funlockfile (fp);
   return count;
 }

@@ -15,11 +15,10 @@
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-
 /*
-
 FUNCTION
-        <<gets>>---get character string (obsolete, use <<fgets>> instead)
+<<gets>>---get character string (obsolete, use <<fgets>> instead)
+
 INDEX
 	gets
 INDEX
@@ -30,7 +29,7 @@ ANSI_SYNOPSIS
 
 	char *gets(char *<[buf]>);
 
-	char *_gets_r(void *<[reent]>, char *<[buf]>);
+	char *_gets_r(struct _reent *<[reent]>, char *<[buf]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
@@ -39,7 +38,7 @@ TRAD_SYNOPSIS
 	char *<[buf]>;
 
 	char *_gets_r(<[reent]>, <[buf]>)
-	char *<[reent]>;
+	struct _reent *<[reent]>;
 	char *<[buf]>;
 
 DESCRIPTION
@@ -68,12 +67,14 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.
 */
 
+#include <_ansi.h>
+#include <reent.h>
 #include <stdio.h>
 
 char *
-_gets_r (ptr, buf)
-     struct _reent *ptr;
-     char *buf;
+_DEFUN(_gets_r, (ptr, buf),
+       struct _reent *ptr _AND
+       char *buf)
 {
   register int c;
   register char *s = buf;
@@ -93,8 +94,8 @@ _gets_r (ptr, buf)
 #ifndef _REENT_ONLY
 
 char *
-gets (buf)
-     char *buf;
+_DEFUN(gets, (buf),
+       char *buf)
 {
   return _gets_r (_REENT, buf);
 }

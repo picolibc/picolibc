@@ -1,3 +1,4 @@
+/* Copyright 2002, Red Hat Inc. - all rights reserved */
 /*
 FUNCTION
 <<getdelim>>---read a line up to a specified line delimeter
@@ -37,8 +38,7 @@ PORTABILITY
 No supporting OS subroutines are directly required.
 */
 
-/* Copyright 2002, Red Hat Inc. - all rights reserved */
-
+#include <_ansi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -48,11 +48,11 @@ No supporting OS subroutines are directly required.
 #define DEFAULT_LINE_SIZE 128
 
 ssize_t
-__getdelim (bufptr, n, delim, fp)
-     char **bufptr;
-     size_t *n;
-     int delim;
-     FILE *fp;
+_DEFUN(__getdelim, (bufptr, n, delim, fp),
+       char **bufptr _AND
+       size_t *n     _AND
+       int delim     _AND 
+       FILE *fp)
 {
   char *buf;
   char *ptr;
@@ -79,9 +79,9 @@ __getdelim (bufptr, n, delim, fp)
       *n = DEFAULT_LINE_SIZE;
     }
 
-  _flockfile(fp);
+  _flockfile (fp);
 
-  CHECK_INIT(fp);
+  CHECK_INIT (fp);
 
   numbytes = *n;
   ptr = buf;

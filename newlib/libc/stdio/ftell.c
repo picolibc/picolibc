@@ -92,19 +92,20 @@ static char sccsid[] = "%W% (Berkeley) %G%";
  * ftell: return current offset.
  */
 
+#include <_ansi.h>
+#include <reent.h>
 #include <stdio.h>
 #include <errno.h>
-
 #include "local.h"
 
 long
-_DEFUN (_ftell_r, (ptr, fp),
-	struct _reent *ptr _AND
-	register FILE * fp)
+_DEFUN(_ftell_r, (ptr, fp),
+       struct _reent *ptr _AND
+       register FILE * fp)
 {
   _fpos_t pos;
 
-  _flockfile(fp);
+  _flockfile (fp);
 
   /* Ensure stdio is set up.  */
 
@@ -113,7 +114,7 @@ _DEFUN (_ftell_r, (ptr, fp),
   if (fp->_seek == NULL)
     {
       ptr->_errno = ESPIPE;
-      _funlockfile(fp);
+      _funlockfile (fp);
       return -1L;
     }
 
@@ -127,7 +128,7 @@ _DEFUN (_ftell_r, (ptr, fp),
       pos = (*fp->_seek) (fp->_cookie, (_fpos_t) 0, SEEK_CUR);
       if (pos == -1L)
         {
-          _funlockfile(fp);
+          _funlockfile (fp);
           return pos;
         }
     }
@@ -152,15 +153,15 @@ _DEFUN (_ftell_r, (ptr, fp),
       pos += fp->_p - fp->_bf._base;
     }
 
-  _funlockfile(fp);
+  _funlockfile (fp);
   return pos;
 }
 
 #ifndef _REENT_ONLY
 
 long
-_DEFUN (ftell, (fp),
-	register FILE * fp)
+_DEFUN(ftell, (fp),
+       register FILE * fp)
 {
   return _ftell_r (_REENT, fp);
 }

@@ -28,7 +28,7 @@ ANSI_SYNOPSIS
 	#include <stdio.h>
 	int puts(const char *<[s]>);
 
-	int _puts_r(void *<[reent]>, const char *<[s]>);
+	int _puts_r(struct _reent *<[reent]>, const char *<[s]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
@@ -36,7 +36,7 @@ TRAD_SYNOPSIS
 	char *<[s]>;
 
 	int _puts_r(<[reent]>, <[s]>)
-	char *<[reent]>;
+	struct _reent *<[reent]>;
 	char *<[s]>;
 
 DESCRIPTION
@@ -55,15 +55,17 @@ ANSI C requires <<puts>>, but does not specify that the result on
 success must be <<0>>; any non-negative value is permitted.
 
 Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
-<<lseek>>, <<read>>, <<sbrk>>, <<write>>.  */
+<<lseek>>, <<read>>, <<sbrk>>, <<write>>.
+*/
 
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
+#include <_ansi.h>
+#include <reent.h>
 #include <stdio.h>
 #include <string.h>
-
 #include "fvwrite.h"
 #include "local.h"
 
@@ -72,9 +74,9 @@ static char sccsid[] = "%W% (Berkeley) %G%";
  */
 
 int
-_DEFUN (_puts_r, (ptr, s),
-	struct _reent *ptr _AND
-	_CONST char * s)
+_DEFUN(_puts_r, (ptr, s),
+       struct _reent *ptr _AND
+       _CONST char * s)
 {
   size_t c = strlen (s);
   struct __suio uio;
@@ -88,15 +90,15 @@ _DEFUN (_puts_r, (ptr, s),
   uio.uio_iov = &iov[0];
   uio.uio_iovcnt = 2;
 
-  _REENT_SMALL_CHECK_INIT(_stdout_r (ptr));
+  _REENT_SMALL_CHECK_INIT (_stdout_r (ptr));
   return (__sfvwrite (_stdout_r (ptr), &uio) ? EOF : '\n');
 }
 
 #ifndef _REENT_ONLY
 
 int
-_DEFUN (puts, (s),
-	char _CONST * s)
+_DEFUN(puts, (s),
+       char _CONST * s)
 {
   return _puts_r (_REENT, s);
 }

@@ -19,6 +19,7 @@
 static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
+#include <_ansi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,8 +34,8 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 
 /*static*/
 int
-__submore (fp)
-     register FILE *fp;
+_DEFUN(__submore, (fp),
+       register FILE *fp)
 {
   register int i;
   register unsigned char *p;
@@ -58,7 +59,7 @@ __submore (fp)
   p = (unsigned char *) _realloc_r (_REENT, (_PTR) (fp->_ub._base), i << 1);
   if (p == NULL)
     return EOF;
-  (void) memcpy ((void *) (p + i), (void *) p, (size_t) i);
+  _CAST_VOID memcpy ((_PTR) (p + i), (_PTR) p, (size_t) i);
   fp->_p = p + i;
   fp->_ub._base = p;
   fp->_ub._size = i << 1;
@@ -66,14 +67,14 @@ __submore (fp)
 }
 
 int
-ungetc (c, fp)
-     int c;
-     register FILE *fp;
+_DEFUN(ungetc, (c, fp),
+       int c _AND
+       register FILE *fp)
 {
   if (c == EOF)
     return (EOF);
 
-  _flockfile(fp);
+  _flockfile (fp);
   
   /* Ensure stdio has been initialized.
      ??? Might be able to remove this as some other stdio routine should
@@ -92,14 +93,14 @@ ungetc (c, fp)
        */
       if ((fp->_flags & __SRW) == 0)
         {
-          _funlockfile(fp);
+          _funlockfile (fp);
           return EOF;
         }
       if (fp->_flags & __SWR)
 	{
 	  if (fflush (fp))
             {
-              _funlockfile(fp);
+              _funlockfile (fp);
               return EOF;
             }
 	  fp->_flags &= ~__SWR;
@@ -119,12 +120,12 @@ ungetc (c, fp)
     {
       if (fp->_r >= fp->_ub._size && __submore (fp))
         {
-          _funlockfile(fp);
+          _funlockfile (fp);
           return EOF;
         }
       *--fp->_p = c;
       fp->_r++;
-      _funlockfile(fp);
+      _funlockfile (fp);
       return c;
     }
 
@@ -138,7 +139,7 @@ ungetc (c, fp)
     {
       fp->_p--;
       fp->_r++;
-      _funlockfile(fp);
+      _funlockfile (fp);
       return c;
     }
 
@@ -154,6 +155,6 @@ ungetc (c, fp)
   fp->_ubuf[sizeof (fp->_ubuf) - 1] = c;
   fp->_p = &fp->_ubuf[sizeof (fp->_ubuf) - 1];
   fp->_r = 1;
-  _funlockfile(fp);
+  _funlockfile (fp);
   return c;
 }

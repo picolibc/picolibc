@@ -17,7 +17,6 @@
 
 #include <_ansi.h>
 #include <stdio.h>
-
 #ifdef _HAVE_STDC
 #include <stdarg.h>
 #else
@@ -26,13 +25,13 @@
 
 #ifdef _HAVE_STDC
 int
-fprintf (FILE * fp, const char *fmt,...)
+fprintf(FILE * fp, _CONST char *fmt,...)
 #else
 int
-fprintf (fp, fmt, va_alist)
-     FILE *fp;
-     char *fmt;
-     va_dcl
+fprintf(fp, fmt, va_alist)
+        FILE *fp;
+        char *fmt;
+        va_dcl
 #endif
 {
   int ret;

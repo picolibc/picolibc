@@ -53,6 +53,7 @@ No supporting OS subroutines are required.
 static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
+#include <_ansi.h>
 #include <stdio.h>
 
 /* A subroutine version of the macro ferror.  */
@@ -60,12 +61,12 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #undef ferror
 
 int
-_DEFUN (ferror, (fp),
-	FILE * fp)
+_DEFUN(ferror, (fp),
+       FILE * fp)
 {
   int result;
-  _flockfile(fp);
+  _flockfile (fp);
   result = __sferror (fp);
-  _funlockfile(fp);
+  _funlockfile (fp);
   return result;
 }

@@ -14,9 +14,10 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-
 /* This code was copied from sprintf.c */
 
+#include <_ansi.h>
+#include <reent.h>
 #include <stdio.h>
 #ifdef _HAVE_STDC
 #include <stdarg.h>
@@ -24,18 +25,20 @@
 #include <varargs.h>
 #endif
 #include <limits.h>
-#include <_ansi.h>
 #include "local.h"
 
 int
 #ifdef _HAVE_STDC
-_DEFUN (_asprintf_r, (ptr, strp, fmt), struct _reent *ptr _AND char **strp _AND _CONST char *fmt _DOTS)
+_DEFUN(_asprintf_r, (ptr, strp, fmt),
+       struct _reent *ptr _AND
+       char **strp        _AND
+       _CONST char *fmt _DOTS)
 #else
-_asprintf_r (ptr, strp, fmt, va_alist)
-     struct _reent *ptr;
-     char **strp;
-     _CONST char *fmt;
-     va_dcl
+_asprintf_r(ptr, strp, fmt, va_alist)
+           struct _reent *ptr;
+           char **strp;
+           _CONST char *fmt;
+           va_dcl
 #endif
 {
   int ret;
@@ -63,12 +66,14 @@ _asprintf_r (ptr, strp, fmt, va_alist)
 
 int
 #ifdef _HAVE_STDC
-_DEFUN (asprintf, (strp, fmt), char **strp _AND _CONST char *fmt _DOTS)
+_DEFUN(asprintf, (strp, fmt),
+       char **strp _AND
+       _CONST char *fmt _DOTS)
 #else
-asprintf (strp, fmt, va_alist)
-     char **strp;
-     _CONST char *fmt;
-     va_dcl
+asprintf(strp, fmt, va_alist)
+        char **strp;
+        _CONST char *fmt;
+        va_dcl
 #endif
 {
   int ret;

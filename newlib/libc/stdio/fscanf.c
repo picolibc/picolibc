@@ -16,26 +16,25 @@
  */
 
 #include <_ansi.h>
+#include <reent.h>
 #include <stdio.h>
-
 #ifdef _HAVE_STDC
 #include <stdarg.h>
 #else
 #include <varargs.h>
 #endif
-
 #include "local.h"
 
 #ifndef _REENT_ONLY
 
 int
 #ifdef _HAVE_STDC
-fscanf (FILE *fp, const char *fmt, ...)
+fscanf(FILE *fp, _CONST char *fmt, ...)
 #else
-fscanf (FILE *fp, fmt, va_alist)
-     FILE *fp;
-     char *fmt;
-     va_dcl
+fscanf(FILE *fp, fmt, va_alist)
+       FILE *fp;
+       char *fmt;
+       va_dcl
 #endif
 {
   int ret;
@@ -55,13 +54,13 @@ fscanf (FILE *fp, fmt, va_alist)
 
 int
 #ifdef _HAVE_STDC
-_fscanf_r (struct _reent *ptr, FILE *fp, const char *fmt, ...)
+_fscanf_r(struct _reent *ptr, FILE *fp, _CONST char *fmt, ...)
 #else
-_fscanf_r (ptr, FILE *fp, fmt, va_alist)
-     struct _reent *ptr;
-     FILE *fp;
-     char *fmt;
-     va_dcl
+_fscanf_r(ptr, FILE *fp, fmt, va_alist)
+          struct _reent *ptr;
+          FILE *fp;
+          char *fmt;
+          va_dcl
 #endif
 {
   int ret;
