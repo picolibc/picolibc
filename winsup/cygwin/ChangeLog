@@ -1,3 +1,7 @@
+2001-11-05  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump version to 1.3.5.
+
 2001-11-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mmap.cc (mmap_record::find_empty): Add input parameter check.
