@@ -7,11 +7,11 @@ choose the packages you wish to install, and update them individually.
 
 The following packages are available with the latest net release:
 
-ash, bash, binutils, bison, byacc, bzip2, clear, common, cygwin,
-dejagnu, diff, expect, fileutils, findutils, flex, gawk, gcc, gdb,
-gperf, grep, groff, gzip, inetutils, less, libpng, login, m4, make, man,
-patch, sed, shellutils, tar, tcltk, termcap, texinfo, textutils, time,
-zlib
+ash(really '/bin/sh'), bash, binutils, bison, byacc, bzip2, clear, common,
+cygwin, dejagnu, diff, expect, fileutils, findutils, flex, gawk, gcc,
+gdb, gperf, grep, groff, gzip, inetutils, less, libpng, login, m4, make,
+man, patch, sed, shellutils, tar, tcltk, termcap, texinfo, textutils,
+time, zlib
 
 Full source code is available for all packages and tools.
 
@@ -109,6 +109,11 @@ invokes bash with various environment variables set correctly.  The
 job.  If you want to completely uninstall Cygwin, you will probably have
 to delete some things by hand.
 
+Once setup is complete you may remove the temporary directory.  It will
+contain @code{setup.exe}, the downloaded @code{.tar.gz} files, and a
+setup log file, which is not needed, but may contain helpful diagnostics
+if your installation failed for some reason.
+
 @subsection Directory installation with @code{setup.exe}
 
 Before proceeding, you must download packages into the temporary
@@ -146,6 +151,11 @@ invokes bash with various environment variables set correctly.  The
 "Uninstall Cygwin" shortcut, if present, is unlikely to do a complete
 job.  If you want to completely uninstall Cygwin, you will probably have
 to delete some things by hand.
+
+Once setup is complete you may remove the temporary directory.  It will
+contain @code{setup.exe}, the downloaded @code{.tar.gz} files, and a
+setup log file, which is not needed, but may contain helpful diagnostics
+if your installation failed for some reason.
 
 @subsection Adding or updating packages
 
@@ -186,6 +196,11 @@ should not use @code{-u}.  Omitting @code{-u} forces @code{setup.exe} to
 perform the update, regardless of whether @code{setup.exe} deems it
 necessary.
 
+Once setup is complete you may remove the temporary directory.  It will
+contain @code{setup.exe}, the downloaded @code{.tar.gz} files, and a
+setup log file, which is not needed, but may contain helpful diagnostics
+if your installation failed for some reason.
+
 @subsection Problems running @code{setup.exe}
 
 @subsubsection Error message: "Unable to retrieve the list of cygwin mirrors..."
@@ -210,6 +225,7 @@ probably want to:
 @item scan it all for viruses
 @item disable the anti-virus software
 @item perform a (d)irectory install
+@item re-enable the anti-virus software
 @item scan everything below your Cygwin root directory (@code{C:\cygwin} by default)
 @end enumerate
 
