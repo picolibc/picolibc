@@ -73,16 +73,6 @@ pthread_key_destructor::Next ()
   return next;
 }
 
-void
-pthread_key_destructor_list::Insert (pthread_key_destructor *node)
-{
-  if (!node)
-    return;
-  head = node->InsertAfter (head);
-  if (!head)
-    head = node;		/*first node special case */
-}
-
   /*remove a given dataitem, wherever in the list it is */
 pthread_key_destructor *
 pthread_key_destructor_list::Remove (pthread_key *key)
@@ -103,15 +93,6 @@ pthread_key_destructor_list::Remove (pthread_key *key)
   return NULL;
 }
 
-  /*get the first item and remove at the same time */
-pthread_key_destructor *
-pthread_key_destructor_list::Pop ()
-{
-  pthread_key_destructor *temp = head;
-  head = head->Next ();
-  return temp;
-}
-
 pthread_key_destructor::
 pthread_key_destructor (void (*thedestructor) (void *), pthread_key *key)
 {
@@ -126,7 +107,7 @@ pthread_key_destructor_list::IterateNull ()
   pthread_key_destructor *temp = head;
   while (temp)
     {
-      temp->destructor ((temp->key)->get ());
+      temp->key->run_destructor ();
       temp = temp->Next ();
     }
 }
@@ -1056,7 +1037,7 @@ pthread_key::isGoodObject (pthread_key_t const *key)
 
 /* non-static members */
 
-pthread_key::pthread_key (void (*destructor) (void *)):verifyable_object (PTHREAD_KEY_MAGIC)
+pthread_key::pthread_key (void (*aDestructor) (void *)):verifyable_object (PTHREAD_KEY_MAGIC), destructor (aDestructor)
 {
   dwTlsIndex = TlsAlloc ();
   if (dwTlsIndex == TLS_OUT_OF_INDEXES)
@@ -1098,7 +1079,7 @@ pthread_key::set (const void *value)
 }
 
 void *
-pthread_key::get ()
+pthread_key::get () const
 {
   int savedError = ::GetLastError();
   void *result = TlsGetValue (dwTlsIndex);
@@ -1119,6 +1100,13 @@ pthread_key::recreateKeyFromBuffer ()
   if (dwTlsIndex == TLS_OUT_OF_INDEXES)
     api_fatal ("pthread_key::recreateKeyFromBuffer () failed to reallocate Tls storage");
   set (fork_buf);
+}
+
+void
+pthread_key::run_destructor () const
+{
+  if (destructor)
+    destructor (get());
 }
 
 /*pshared mutexs:

@@ -1,5 +1,22 @@
 2002-09-21  Robert Collins <rbtcollins@hotmail.com>
 
+	* thread.cc: Partial refactoring of pthread_key destructor 
+	handling. Loosely based on Thomas Pfaff's work.
+	(pthread_key_destructor_list::Insert): Remove.
+	(pthread_key_destructor_list::Pop): Remove.
+	(pthread_key_destructor_list::IterateNull): Call the key's
+	run_destructor method.
+	(pthread_key::pthread_key): Initialize new member.
+	(pthread_key::get): Mark as const for correctness.
+	(pthread_key::run_destructor): Implement.
+	* thread.h (pthread_key::get): Mark as const for correctness.
+	(pthread_key::run_destructor): Declare.
+	(List): New template class that implements a generic list.
+	(pthread_key_destructor_list): Inherit from List, and remove
+	now duplicate functions.
+
+2002-09-21  Robert Collins <rbtcollins@hotmail.com>
+
 	* thread.cc: Change verifyable_object_isvalid calls with
 	PTHREAD_CONDATTR_MAGIC, PTHREAD_MUTEXATTR_MAGIC, PTHREAD_COND_MAGIC,
 	SEM_MAGIC to objecttype::isGoodObject() calls throughout.

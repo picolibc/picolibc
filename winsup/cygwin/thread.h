@@ -183,9 +183,10 @@ public:
   class pthread_key *next;
 
   int set (const void *);
-  void *get ();
+  void *get () const;
+  void run_destructor () const;
 
-    pthread_key (void (*)(void *));
+  pthread_key (void (*)(void *));
    ~pthread_key ();
   static void fixup_before_fork();
   static void fixup_after_fork();
@@ -194,7 +195,52 @@ private:
   static pthread_key * keys;
   void saveKeyToBuffer ();
   void recreateKeyFromBuffer ();
+  void (*destructor) (void *);
 };
+
+/* interface */
+template <class ListNode> class List {
+public:
+  void Insert (ListNode *aNode);
+  ListNode *Remove ( ListNode *aNode);
+  ListNode *Pop ();
+protected:
+  ListNode *head;
+};
+/* implementation */
+template <class ListNode> void
+List<ListNode>::Insert (ListNode *aNode)
+{
+  if (!aNode)
+    return;
+  head = aNode->InsertAfter (head);
+  if (!head)
+    head = aNode;                /*first node special case */
+}
+template <class ListNode> ListNode *
+List<ListNode>::Remove ( ListNode *aNode)
+{
+  if (!aNode)
+    return NULL;
+  if (!head)
+    return NULL;
+  if (aNode == head)
+    return Pop ();
+  ListNode *resultPrev = head;
+  while (resultPrev && resultPrev->Next() && !(aNode == resultPrev->Next()))
+    resultPrev = resultprev->Next();
+  if (resultPrev)
+    return resultPrev->UnlinkNext ();
+  return NULL;
+}
+template <class ListNode> ListNode *
+List<ListNode>::Pop ()
+{
+  ListNode *result = head;
+  head = head->Next();
+  return result;
+}
+
 
 /* FIXME: test using multiple inheritance and merging key_destructor into pthread_key
  * for efficiency */
@@ -211,20 +257,12 @@ public:
   pthread_key *key;
 };
 
-class pthread_key_destructor_list
+class pthread_key_destructor_list : public List<pthread_key_destructor>
 {
 public:
-  void Insert (pthread_key_destructor * node);
-/* remove a given dataitem, wherever in the list it is */
-  pthread_key_destructor *Remove (pthread_key_destructor * item);
-/* get the first item and remove at the same time */
-  pthread_key_destructor *Pop ();
   pthread_key_destructor *Remove (pthread_key * key);
   void IterateNull ();
-private:
-    pthread_key_destructor * head;
 };
-
 
 class pthread_attr:public verifyable_object
 {
