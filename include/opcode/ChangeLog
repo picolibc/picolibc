@@ -1,3 +1,8 @@
+2001-05-04  Alan Modra  <amodra@one.net.au>
+
+	* i386.h (i386_optab): Move InvMem to first operand of pmovmskb
+	and pextrw to swap reg/rm assignments.
+
 2001-04-05  Hans-Peter Nilsson  <hp@axis.com>
 
 	* cris.h (enum cris_insn_version_usage): Correct comment for
