@@ -1,0 +1,3 @@
+2004-01-04  Daniel Jacobowitz  <drow@mvista.com>
+
+	* cp-demangle.h: New file.
