@@ -1,3 +1,12 @@
+Tue Mar 28 16:45:42 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Use default rules when compiling cygrun.o.
+	* dcrt0.cc (host_dependent_constants::init): Limit non-NT platforms to
+	32K chunks when copying regions during a fork.
+	* path.cc (symlink_check_one): Add temporary debugging output.
+	Simplify PATH_EXEC test.
+	* syscalls.cc (stat_suffixes): Null terminate this list.
+
 Sat Mar 25 20:46:39 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (symlink_check_one): Recognize symlink settings from the

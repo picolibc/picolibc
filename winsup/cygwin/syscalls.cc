@@ -920,7 +920,8 @@ stat_dev (DWORD devn, int unit, unsigned long ino, struct stat *buf)
 static suffix_info stat_suffixes[] = 
 {
   suffix_info ("", 1),
-  suffix_info (".exe", 1)
+  suffix_info (".exe", 1),
+  suffix_info (NULL)
 };
 
 /* Cygwin internal */

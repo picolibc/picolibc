@@ -2164,18 +2164,18 @@ symlink_check_one (const char *in_path, char *buf, int buflen, DWORD& fileattr,
       if (fileattr & FILE_ATTRIBUTE_DIRECTORY)
         unixattr |= S_IFDIR;
 
-      if (! get_file_attribute (TRUE, path, &unixattr))
+      if (!get_file_attribute (TRUE, path, &unixattr))
 	{
 	  if (unixattr & STD_XBITS)
 	    *pflags |= PATH_EXEC;
-	  if (! S_ISLNK (unixattr))
-	    ;
 	}
 
       /* Open the file.  */
 
       h = CreateFileA (path, GENERIC_READ, FILE_SHARE_READ, &sec_none_nih, OPEN_EXISTING,
 		       FILE_ATTRIBUTE_NORMAL, 0);
+
+syscall_printf ("opened '%s'(%p)", path, h);
 
       res = -1;
       if (h == INVALID_HANDLE_VALUE)
@@ -2185,6 +2185,7 @@ symlink_check_one (const char *in_path, char *buf, int buflen, DWORD& fileattr,
 	  char cookie_buf[sizeof (SYMLINK_COOKIE) - 1];
 	  DWORD got;
 
+syscall_printf ("ReadFile");
 	  if (! ReadFile (h, cookie_buf, sizeof (cookie_buf), &got, 0))
 	    set_errno (EIO);
 	  else if (got == sizeof (cookie_buf)
@@ -2215,24 +2216,24 @@ symlink_check_one (const char *in_path, char *buf, int buflen, DWORD& fileattr,
 		   && memcmp (cookie_buf, SOCKET_COOKIE,
 			      sizeof (cookie_buf)) == 0)
 	    {
-	      res = 0;
 	      *pflags |= PATH_SOCKET;
 	      goto close_and_return;
 	    }
-	  else if (*pflags & PATH_EXEC)
-	    goto close_and_return;
-	  else if (!(*pflags & PATH_EXEC))
+	  else
 	    {
 	      /* Not a symlink, see if executable.  */
-	      if (got >= 2 &&
+	      if (!(*pflags & PATH_EXEC) && got >= 2 &&
 		  ((cookie_buf[0] == '#' && cookie_buf[1] == '!') ||
 		   (cookie_buf[0] == ':' && cookie_buf[1] == '\n')))
 		*pflags |= PATH_EXEC;
-	  close_and_return:
+	    close_and_return:
+syscall_printf ("close_and_return");
 	      CloseHandle (h);
 	      goto file_not_symlink;
 	    }
 	}
+
+syscall_printf ("breaking from loop");
       CloseHandle (h);
       break;
     }
@@ -2241,6 +2242,7 @@ symlink_check_one (const char *in_path, char *buf, int buflen, DWORD& fileattr,
 
 file_not_symlink:
   set_errno (EINVAL);
+  syscall_printf ("not a symlink");
   if (ext_here)
     strcpy (buf, ext_here);
   res = 0;

@@ -151,6 +151,7 @@ host_dependent_constants NO_COPY host_dependent;
 void
 host_dependent_constants::init ()
 {
+  extern DWORD chunksize;
   /* fhandler_disk_file::lock needs a platform specific upper word
      value for locking entire files.
 
@@ -169,6 +170,7 @@ host_dependent_constants::init ()
     case win32s:
       win32_upper = 0x00000000;
       shared = FILE_SHARE_READ | FILE_SHARE_WRITE;
+      chunksize = 32 * 1024 * 1024;
       break;
 
     default:
