@@ -1,3 +1,11 @@
+2003-08-22  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.cc (user_heap_info::max): New field.
+	* heap.cc (heap_init): Save pointer to end of heap reserved memory.
+	(sbrk): Don't attempt to commit memory beyond end of heap reserved
+	memory.  Attempt to honor comment and reserve commitbytes if heapchunk
+	fails.
+
 2003-08-20  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* exceptions.cc (sigreturn): Don't clobber ebp in recursive signal
