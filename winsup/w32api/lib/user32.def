@@ -246,6 +246,7 @@ GetDlgItemTextW@16
 GetDoubleClickTime@0
 GetFocus@0
 GetForegroundWindow@0
+GetGUIThreadInfo@8
 GetIconInfo@8
 GetInputDesktop@0
 GetInputState@0

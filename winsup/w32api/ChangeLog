@@ -1,3 +1,10 @@
+2003-09-24  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/uxtheme.h: New file.
+	* include/tmschema.h: New file.
+	* include/uxtheme.def: New file.
+	* lib/test.c: Include uxtheme.h, tmschema.h.
+
 2003-09-23  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/winuser.h (KEYEVENTF_UNICODE, KEYEVENTF_SCANCODE):
