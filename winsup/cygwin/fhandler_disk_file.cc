@@ -260,7 +260,20 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
     }
 
   buf->st_blksize = S_BLKSIZE;
-  buf->st_blocks  = (buf->st_size + S_BLKSIZE - 1) / S_BLKSIZE;
+
+  /* GetCompressedFileSize() gets autoloaded.  It returns INVALID_FILE_SIZE
+     if it doesn't exist.  Since that's also a valid return value on 64bit
+     capable file systems, we must additionally check for the win32 error. */
+  nFileSizeLow = GetCompressedFileSizeA (pc->get_win32 (), &nFileSizeHigh);
+  if (nFileSizeLow != INVALID_FILE_SIZE || GetLastError () == NO_ERROR)
+    /* On systems supporting compressed (and sparsed) files,
+       GetCompressedFileSize() returns the actual amount of
+       bytes allocated on disk.  */
+    buf->st_blocks = (((__off64_t)nFileSizeHigh << 32)
+		     + nFileSizeLow + S_BLKSIZE - 1) / S_BLKSIZE;
+  else
+    /* Just compute no. of blocks from file size. */
+    buf->st_blocks  = (buf->st_size + S_BLKSIZE - 1) / S_BLKSIZE;
 
   buf->st_mode = 0;
   /* Using a side effect: get_file_attibutes checks for

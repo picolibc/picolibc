@@ -1,3 +1,9 @@
+2003-02-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (GetCompressedFileSize): Add.
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat_helper): Compute
+	st_blocks value from GetCompressedFileSize() if available.
+
 2003-02-18  Vaclav Haisman  <V.Haisman@sh.cvut.cz>
 
 	* wincap.h (wincaps::supports_sparse_files): New flag.
