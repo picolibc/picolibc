@@ -32,10 +32,10 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #endif
 
 int
-vsprintf (str, fmt, ap)
-     char *str;
-     char _CONST *fmt;
-     va_list ap;
+_DEFUN (vsprintf, (str, fmt, ap),
+     char *str _AND
+     _CONST char *fmt _AND
+     va_list ap)
 {
   int ret;
   FILE f;
@@ -50,11 +50,11 @@ vsprintf (str, fmt, ap)
 }
 
 int
-vsprintf_r (ptr, str, fmt, ap)
-     struct _reent *ptr;
-     char *str;
-     char _CONST *fmt;
-     va_list ap;
+_DEFUN (_vsprintf_r, (ptr, str, fmt, ap),
+     struct _reent *ptr _AND
+     char *str _AND
+     _CONST char *fmt _AND
+     va_list ap)
 {
   int ret;
   FILE f;
@@ -63,7 +63,7 @@ vsprintf_r (ptr, str, fmt, ap)
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = INT_MAX;
   f._data = ptr;
-  ret = vfprintf (&f, fmt, ap);
+  ret = _vfprintf_r (ptr, &f, fmt, ap);
   *f._p = 0;
   return ret;
 }

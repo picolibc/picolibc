@@ -1,3 +1,14 @@
+2001-04-24  Charles Wilson  <cwilson@ece.gatech.edu
+
+        * libc/stdio/vprintf.c (vprintf): fix signature to use _DEFUN
+        * libc/stdio/vprintf.c (_vprintf_r): new function
+        * libc/stdio/vsnprintf.c (vsnprintf): fix signature to use _DEFUN
+        * libc/stdio/vsnprintf.c (_vsnprintf_r): fix signature to use
+        _DEFUN, and call _vfprintf_r, not vfprintf.
+        * libc/stdio/vsprintf.c (vsprintf.c): fix signature to use _DEFUN
+        * libc/stdio/vsprintf.c (_vsprintf_r): fix signature to use
+        _DEFUN, and call _vfprintf_r, not vfprintf.
+
 2001-04-22  Earnie Boyd  <earnie@users.sourceforge.net>
   
 	* libc/include/sys/unistd.h [X_OK]: Use better protection against

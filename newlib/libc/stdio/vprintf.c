@@ -27,9 +27,18 @@
 #endif
 
 int
-vprintf (fmt, ap)
-     char _CONST *fmt;
-     va_list ap;
+_DEFUN (vprintf, (fmt, ap),
+     _CONST char *fmt _AND
+     va_list ap)
 {
   return vfprintf (stdout, fmt, ap);
+}
+
+int
+_DEFUN (_vprintf_r, (ptr, fmt, ap),
+     struct _reent *ptr _AND
+     _CONST char *fmt _AND
+     va_list ap)
+{
+  return _vfprintf_r (ptr, _stdout_r (ptr), fmt, ap);
 }
