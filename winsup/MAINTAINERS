@@ -10,10 +10,15 @@ ntsec stuff			Corinna Vinschen <corinna@vinschen.de>
 cygwin/fhandler_raw.cc		Corinna Vinschen <corinna@vinschen.de>
 cygwin/fhandler_floppy.cc	Corinna Vinschen <corinna@vinschen.de>
 cygwin/fhandler_tape.cc		Corinna Vinschen <corinna@vinschen.de>
+utils/getfacl.c			Corinna Vinschen <corinna@vinschen.de>
+utils/mkgroup.c			Corinna Vinschen <corinna@vinschen.de>
+utils/mkpasswd.c		Corinna Vinschen <corinna@vinschen.de>
+utils/passwd.c			Corinna Vinschen <corinna@vinschen.de>
+utils/setfacl.c			Corinna Vinschen <corinna@vinschen.de>
+mingw/*				Mumit Khan <xraylith.wisc.edu>
+w32api/*			Mumit Khan <xraylith.wisc.edu>
 cygwin/{everything else}	Chris Faylor <cgf@cygnus.com>,
 				DJ Delorie <cgf@cygnus.com>
 doc/*				DJ Delorie <cgf@cygnus.com>
-mingw/*				Mumit Khan <xraylith.wisc.edu>
 utils/*				Chris Faylor <cgf@cygnus.com>,
 				DJ Delorie <dj@cygnus.com>
-w32api/*			Mumit Khan <xraylith.wisc.edu>
