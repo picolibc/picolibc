@@ -1,5 +1,13 @@
 2001-11-24  Christopher Faylor  <cgf@redhat.com>
 
+	* autoload.cc (IsDebuggerPresent): Make conditional load since it is
+	not available everywhere.
+
+	* path.cc (mount_info::conv_to_win32_path): Only consider /cygdrive to
+	be FH_CYGDRIVE, not /cygdrive/x.
+
+2001-11-24  Christopher Faylor  <cgf@redhat.com>
+
 	* net.cc (inet_makeaddr): Revert previous change.
 
 2001-11-23  Christopher Faylor  <cgf@redhat.com>

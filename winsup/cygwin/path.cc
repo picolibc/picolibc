@@ -1390,13 +1390,13 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
 	{
 	  unit = 0;
 	  dst[0] = '\0';
+	  if (mount_table->cygdrive_len > 1)
+	    devn = FH_CYGDRIVE;
 	}
       else if (!cygdrive_win32_path (pathbuf, dst, unit))
 	return ENOENT;
       else
 	*flags = cygdrive_flags;
-      if (mount_table->cygdrive_len > 1)
-	devn = FH_CYGDRIVE;
       goto out;
     }
 
