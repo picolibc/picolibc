@@ -1,3 +1,7 @@
+2004-08-30  Michal Ludvig  <mludvig@suse.cz>
+
+	* i386.h (i386_optab): Added montmul/xsha1/xsha256 insns.
+
 2004-07-22  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* i386.h (i386_optab): Allow cs/ds in 64bit for branch hints.
