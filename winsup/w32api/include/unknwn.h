@@ -1,6 +1,5 @@
 #ifndef COM_NO_WINDOWS_H
 #include <windows.h>
-#include <ole2.h>
 #endif
 
 #ifndef _UNKNWN_H

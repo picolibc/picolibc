@@ -25,7 +25,6 @@
 #if defined(__LCC__) || defined(__GNUC__)
 #define INITGUID 1
 #include <windows.h>
-#include <objbase.h>
 #else
 #include <basetyps.h>
 #endif 
