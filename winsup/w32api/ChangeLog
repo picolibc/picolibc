@@ -1,3 +1,9 @@
+2003-7-31  Martin Fuchs  <Martin-Fuchs@gmx.net>
+
+	* include/shlobj.h (SFGAO_COMPRESSED): Add define.
+	(SFGAOF, SHGDNF): Add typedef's. 
+	(SHCONTF): Extend enum.
+
 2003-07-31  Danny Smith <dannysmith@users.sourceforge.net>
 
 	* include/shellapi.h: Include all structs within pshpack2.h/
