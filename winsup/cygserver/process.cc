@@ -40,13 +40,6 @@ process_cleanup::process ()
 
 /*****************************************************************************/
 
-/* cleanup_routine */
-cleanup_routine::~cleanup_routine ()
-{
-}
-
-/*****************************************************************************/
-
 process::process (const pid_t cygpid, const DWORD winpid)
   : _cygpid (cygpid),
     _winpid (winpid),

@@ -46,7 +46,7 @@ public:
       _next (NULL)
   {}
 
-  virtual ~cleanup_routine ();
+  virtual ~cleanup_routine () = 0;
 
   bool operator== (const cleanup_routine &rhs) const
   {

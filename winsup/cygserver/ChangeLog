@@ -1,3 +1,9 @@
+2004-01-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* process.h (cleanup_routine::~cleanup_routine): Make pure virtual
+	function to avoid miscompilation with certain versions of gcc.
+	* process.cc (cleanup_routine::~cleanup_routine): Remove.
+
 2003-12-26  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in (CFLAGS, CXXFLAGS): Remove unneeded include.
