@@ -17,8 +17,8 @@ class hires
   LARGE_INTEGER primed_ft;
   LARGE_INTEGER primed_pc;
   double freq;
-  void prime ();
+  void prime () __attribute__ ((regparm (1)));
  public:
-  LONGLONG utime ();
+  LONGLONG usecs (bool justdelta) __attribute__ ((regparm (2)));
 };
 #endif /*__HIRES_H__*/

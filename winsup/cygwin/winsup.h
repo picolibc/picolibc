@@ -23,7 +23,7 @@ details. */
 # define memset __builtin_memset
 #endif
 
-#define NO_COPY __attribute__((section(".data_cygwin_nocopy")))
+#define NO_COPY __attribute__((nocommon)) __attribute__((section(".data_cygwin_nocopy")))
 
 #ifdef EXPCGF
 #define DECLARE_TLS_STORAGE char **tls[4096] __attribute__ ((unused))

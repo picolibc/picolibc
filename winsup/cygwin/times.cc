@@ -155,7 +155,7 @@ extern "C" int
 gettimeofday(struct timeval *tv, struct timezone *tz)
 {
   static hires gtod;
-  LONGLONG now = gtod.utime ();
+  LONGLONG now = gtod.usecs (false);
   if (now == (LONGLONG) -1)
     return -1;
 
@@ -590,7 +590,7 @@ hires::prime ()
 }
 
 LONGLONG
-hires::utime ()
+hires::usecs (bool justdelta)
 {
   if (!inited)
     prime ();
@@ -607,7 +607,7 @@ hires::utime ()
       return -1;
     }
 
-  now.QuadPart -= primed_pc.QuadPart;
   // FIXME: Use round() here?
-  return primed_ft.QuadPart + (LONGLONG) ((double) now.QuadPart * freq);
+  now.QuadPart = (LONGLONG) (freq * (double) (now.QuadPart - primed_pc.QuadPart));
+  return justdelta ? now.QuadPart : primed_ft.QuadPart + now.QuadPart;
 }

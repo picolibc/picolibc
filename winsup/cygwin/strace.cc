@@ -19,6 +19,7 @@ details. */
 #include "pinfo.h"
 #include "perprocess.h"
 #include "cygwin_version.h"
+#include "hires.h"
 
 #define PROTECT(x) x[sizeof(x)-1] = 0
 #define CHECK(x) if (x[sizeof(x)-1] != 0) { small_printf("array bound exceeded %d\n", __LINE__); ExitProcess(1); }
@@ -61,37 +62,10 @@ strace::hello()
 }
 
 int
-strace::microseconds()
+strace::microseconds ()
 {
-  static NO_COPY int first_microsec = 0;
-  static NO_COPY long long hires_frequency = 0;
-  static NO_COPY int hires_initted = 0;
-
-  int microsec;
-
-  if (!hires_initted)
-    {
-      hires_initted = 1;
-      QueryPerformanceFrequency ((LARGE_INTEGER *) &hires_frequency);
-      if (hires_frequency == 0)
-	  hires_initted = 2;
-    }
-  if (hires_initted == 2)
-    {
-      int count = GetTickCount ();
-      microsec = count * 1000;
-    }
-  else
-    {
-      long long thiscount;
-      QueryPerformanceCounter ((LARGE_INTEGER *) &thiscount);
-      thiscount = (long long) (((double) thiscount/(double) hires_frequency)
-			       * 1000000.0);
-      microsec = thiscount;
-    }
-  if (first_microsec == 0)
-    first_microsec = microsec;
-  return microsec - first_microsec;
+  static hires now;
+  return (int) now.usecs (true);
 }
 
 static int __stdcall

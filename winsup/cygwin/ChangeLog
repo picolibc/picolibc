@@ -1,5 +1,17 @@
 2002-02-15  Christopher Faylor  <cgf@redhat.com>
 
+	* hires.h (hires::usecs): Rename from utime.  Accept an argument.
+	* strace.cc (strace::microseconds): Use hires class for calculating
+	times.
+	* sync.h (new_muto): Use NO_COPY explicitly in declaration.
+	* times.cc (gettimeofday): Reflect change in usecs argument.
+	(hires::usecs): Ditto.  Changed name from utime.
+	* winsup.h (NO_COPY): Add nocommon attribute to force setting aside
+	space for variable.
+	* regcomp.c (REQUIRE): Add a void cast to bypass a warning.
+
+2002-02-15  Christopher Faylor  <cgf@redhat.com>
+
 	* hires.h: New file.
 	* times.cc (gettimeofday): Use hires class for calculating current time.
 	(hires::prime): New method.
