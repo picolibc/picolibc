@@ -35,6 +35,7 @@ extern int    _EXFUN(__sread,(void *, char *, int));
 extern int    _EXFUN(__swrite,(void *, char const *, int));
 extern fpos_t _EXFUN(__sseek,(void *, fpos_t, int));
 extern int    _EXFUN(__sclose,(void *));
+extern int    _EXFUN(__stextmode,(int));
 extern void   _EXFUN(__sinit,(struct _reent *));
 extern void   _EXFUN(_cleanup_r,(struct _reent *));
 extern void   _EXFUN(__smakebuf,(FILE *));

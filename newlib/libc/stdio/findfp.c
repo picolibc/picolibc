@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#include <fcntl.h>
 #include "local.h"
 
 static void
@@ -44,6 +45,11 @@ std (ptr, flags, file, data)
   ptr->_seek = __sseek;
   ptr->_close = __sclose;
   ptr->_data = data;
+
+#ifdef __SCLE
+  if (__stextmode(ptr->_file))
+    ptr->_flags |= __SCLE;
+#endif
 }
 
 struct _glue *

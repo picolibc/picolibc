@@ -153,7 +153,7 @@ _DEFUN (_fopen_r, (ptr, file, mode),
     fseek (fp, 0, SEEK_END);
 
 #ifdef __SCLE
-  if (setmode(fp->_file, O_BINARY) == O_TEXT)
+  if (__stextmode (fp->_file))
     fp->_flags |= __SCLE;
 #endif
 

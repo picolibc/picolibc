@@ -37,7 +37,18 @@ __sread (cookie, buf, n)
   register FILE *fp = (FILE *) cookie;
   register int ret;
 
+#ifdef __SCLE
+  int oldmode = 0;
+  if (fp->_flags & __SCLE)
+    oldmode = setmode(fp->_file, O_BINARY);
+#endif
+
   ret = _read_r (fp->_data, fp->_file, buf, n);
+
+#ifdef __SCLE
+  if (oldmode)
+    setmode(fp->_file, oldmode);
+#endif
 
   /* If the read succeeded, update the current offset.  */
 
@@ -55,11 +66,25 @@ __swrite (cookie, buf, n)
      int n;
 {
   register FILE *fp = (FILE *) cookie;
+  int w, oldmode=0;
 
   if (fp->_flags & __SAPP)
     (void) _lseek_r (fp->_data, fp->_file, (off_t) 0, SEEK_END);
   fp->_flags &= ~__SOFF;	/* in case O_APPEND mode is set */
-  return _write_r (fp->_data, fp->_file, buf, n);
+
+#ifdef __SCLE
+  if (fp->_flags & __SCLE)
+    oldmode = setmode(fp->_file, O_BINARY);
+#endif
+
+  w = _write_r (fp->_data, fp->_file, buf, n);
+
+#ifdef __SCLE
+  if (oldmode)
+    setmode(fp->_file, oldmode);
+#endif
+
+  return w;
 }
 
 fpos_t
@@ -90,3 +115,15 @@ __sclose (cookie)
 
   return _close_r (fp->_data, fp->_file);
 }
+
+#ifdef __SCLE
+int
+__stextmode (int fd)
+{
+#ifdef __CYGWIN__
+  return _cygwin_istext_for_stdio (fd);
+#else
+  return 0;
+#endif
+}
+#endif

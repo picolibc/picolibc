@@ -102,7 +102,7 @@ _DEFUN (_fdopen_r, (ptr, fd, mode),
   fp->_close = __sclose;
 
 #ifdef __SCLE
-  if (setmode(fp->_file, O_BINARY) == O_TEXT)
+  if (__stextmode(fp->_file))
     fp->_flags |= __SCLE;
 #endif
 

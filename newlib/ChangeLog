@@ -1,3 +1,16 @@
+2000-05-19  DJ Delorie  <dj@cygnus.com>
+
+	* libc/stdio/stdio.c (__stextmode): new, see if file is text mode
+	(__sread): always read in binary mode
+	(__swrite): always write in binary mode
+	* libc/include/stdio.h: no getc/putc macros for cygwin; causes
+	compatibility issues with different dll versions
+	* libc/stdio/fopen.c: use __stextmode
+	* libc/stdio/fdopen.c: ditto
+	* libc/stdio/freopen.c: ditto
+	* libc/stdio/findfp.c: set up __SCLE for std{in,out,err}
+	* libc/stdio/local.h: declare __stextmode
+	
 2000-05-18  DJ Delorie  <dj@cygnus.com>
 
 	* libc/stdio/fgets.c (fgets): perform CRLF conversions if __SCLE

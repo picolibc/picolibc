@@ -318,10 +318,12 @@ static __inline int __sputc(int _c, FILE *_p) {
 #define	fileno(p)	__sfileno(p)
 #endif
 
+#ifndef __CYGWIN__
 #ifndef lint
 #define	getc(fp)	__sgetc(fp)
 #define putc(x, fp)	__sputc(x, fp)
 #endif /* lint */
+#endif /* __CYGWIN__ */
 
 #define	getchar()	getc(stdin)
 #define	putchar(x)	putc(x, stdout)
