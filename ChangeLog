@@ -1,3 +1,8 @@
+2004-10-12  Kelley Cook  <kcook@gcc.gnu.org>
+
+	* configure.in (*-*-cygwin*): Supress warning if newlib not present.
+	* configure: Regenerate.
+
 2004-10-06  Paolo Bonzini  <bonzini@gnu.org>
 
 	Fix wrong conflict resolution in:
