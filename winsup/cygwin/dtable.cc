@@ -321,12 +321,12 @@ build_fh_dev (const device& dev, const char *unix_name)
 
   __small_sprintf (w32buf, dev.fmt, dev.minor);
   if (unix_name)
-    pc.normalized_path = cstrdup (unix_name);
+    pc.set_normalized_path (unix_name);
   else if (!dev.upper)
-    pc.normalized_path = cstrdup (dev.name);
+    pc.set_normalized_path (dev.name);
   else
     {
-      pc.normalized_path = cstrdup (w32buf);
+      pc.set_normalized_path (w32buf);
       for (char *p = strchr (pc.normalized_path, '\\');
 	   p;
 	   p = strchr (p + 1, '\\'))

@@ -173,17 +173,18 @@ class path_conv
   DWORD drive_type () {return fs.drive_type;}
   BOOL fs_fast_ea () {return fs.sym_opt & PC_CHECK_EA;}
   void set_path (const char *p) {strcpy (path, p);}
-  char *return_and_clear_normalized_path ();
   const char * root_dir () { return fs.root_dir; }
   DWORD volser () { return fs.serial; }
   const char *volname () {return fs.name; }
   void fillin (HANDLE h);
   inline size_t size ()
   {
-    return (sizeof (*this) - sizeof (path)) + strlen (path) + 1;
+    return (sizeof (*this) - sizeof (path)) + strlen (path) + 1 + normalized_path_size;
   }
 
   char *normalized_path;
+  size_t normalized_path_size;
+  void set_normalized_path (const char *) __attribute__ ((regparm (2)));
  private:
   char path[MAX_PATH];
 };

@@ -1,3 +1,17 @@
+2003-02-14  Christopher Faylor  <cgf@redhat.com>
+
+	* path.h (path_conv::set_normalized_path): Declare.
+	(path_conv::normalized_path_size): Declare.
+	(path_conv::return_and_clear_normalized_path): Delete declaration.
+	* path.cc (path_conv::set_normalized_path): Define.  Puts normalized
+	path in path buf if there is room.
+	(path_conv::check): Call set_normalized_path.
+	(path_conv::return_and_clear_normalized_path): Delete definition.
+	* dtable.cc (build_fh_dev): Ditto.
+	* fhandler.cc (fhandler_base::operator =): Ditto.
+	(fhandler_base::~fhandler_base): Only free normalized_path when
+	appropriate.
+
 2003-02-13  Christopher Faylor  <cgf@redhat.com>
 
 	Reorganize includes throughout so that path.h comes before fhandler.h.

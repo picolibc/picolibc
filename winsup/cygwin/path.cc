@@ -392,14 +392,6 @@ fs_info::update (const char *win32_path)
   return true;
 }
 
-char *
-path_conv::return_and_clear_normalized_path ()
-{
-  char *s = normalized_path;
-  normalized_path = NULL;
-  return s;
-}
-
 void
 path_conv::fillin (HANDLE h)
 {
@@ -415,6 +407,23 @@ path_conv::fillin (HANDLE h)
       fs.serial = local.dwVolumeSerialNumber;
     }
     fs.drive_type = DRIVE_UNKNOWN;
+}
+
+void
+path_conv::set_normalized_path (const char *path_copy)
+{
+  char *eopath = strchr (path, '\0');
+  size_t n = strlen (path_copy) + 1;
+
+  normalized_path = path + sizeof (path) - n;
+  if (normalized_path > eopath)
+    normalized_path_size = n;
+  else
+    {
+      normalized_path = (char *) cmalloc (HEAP_STR, n);
+      normalized_path_size = 0;
+    }
+  memcpy (normalized_path, path_copy, n);
 }
 
 /* Convert an arbitrary path SRC to a pure Win32 path, suitable for
@@ -770,12 +779,6 @@ path_conv::check (const char *src, unsigned opt,
     add_ext_from_sym (sym);
 
 out:
-  if (opt & PC_POSIX)
-    {
-      if (tail[1] != '\0')
-	*tail = '/';
-      normalized_path = cstrdup (path_copy);
-    }
   /* Deal with Windows stupidity which considers filename\. to be valid
      even when "filename" is not a directory. */
   if (!need_directory || error)
@@ -845,6 +848,15 @@ out:
 	   strcasematch (".bat", p) ||
 	   strcasematch (".com", p)))
 	path_flags |= PATH_EXEC;
+    }
+
+  if (!(opt & PC_POSIX))
+    normalized_path_size = 0;
+  else
+    {
+      if (tail[1] != '\0')
+	*tail = '/';
+      set_normalized_path (path_copy);
     }
 
 #if 0

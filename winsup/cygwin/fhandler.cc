@@ -38,7 +38,7 @@ inline fhandler_base&
 fhandler_base::operator =(fhandler_base &x)
 {
   memcpy (this, &x, sizeof *this);
-  pc.normalized_path = cstrdup (pc.normalized_path);
+  pc.set_normalized_path (pc.normalized_path);
   rabuf = NULL;
   ralen = 0;
   raixget = 0;
@@ -1148,7 +1148,7 @@ fhandler_base::fhandler_base ():
 /* Normal I/O destructor */
 fhandler_base::~fhandler_base (void)
 {
-  if (pc.normalized_path)
+  if (!pc.normalized_path_size && pc.normalized_path)
     cfree (pc.normalized_path);
   if (rabuf)
     free (rabuf);
