@@ -4,10 +4,12 @@
 	* using.sgml: Include Cygserver docs.
 
 2004-03-26  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
 	* cygwinenv.sgml: Add example for CYGWIN=error_start.
 	* pathnames.sgml: Update list of /dev/ devices.
 
 2004-02-22  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
 	* Makefile.in: Fix problem links in faq0.html file.
 	* what.texinfo: Remove outdated 'recent' history.
 
@@ -22,9 +24,11 @@
 	* cygwinenv.sgml: Add server option description.
 
 2004-02-04  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
 	* Makefile.in: Generate monolithic faq0.html file.
 
 2004-01-24  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
 	* cygwinenv.sgml: Cleanup minor markup problems.
 	* dll.sgml: Cleanup minor markup problems.
 	* effectively.sgml: Cleanup minor markup problems.
