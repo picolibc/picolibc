@@ -1,3 +1,8 @@
+Tue Nov 14 17:05:00 2000  Eric Fifer <efifer@dircon.co.uk>
+
+	* dir.cc (rewinddir): Always set __d_position = 0, so next
+	call to readdir() will restart the directory scan.
+
 Tue Nov 14 00:51:28 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* cygheap.h (init_cygheap): New struct holding values that live in the

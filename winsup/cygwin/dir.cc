@@ -245,8 +245,8 @@ rewinddir (DIR * dir)
     {
       (void) FindClose (dir->__d_u.__d_data.__handle);
       dir->__d_u.__d_data.__handle = INVALID_HANDLE_VALUE;
-      dir->__d_position = 0;
     }
+  dir->__d_position = 0;
 }
 
 /* closedir: POSIX 5.1.2.1 */
