@@ -1,6 +1,6 @@
 /* init.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -12,8 +12,6 @@ details. */
 #include <stdlib.h>
 #include "thread.h"
 #include "perprocess.h"
-
-extern HMODULE cygwin_hmodule;
 
 int NO_COPY dynamically_loaded;
 
@@ -29,26 +27,22 @@ WINAPI dll_entry (HANDLE h, DWORD reason, void *static_load)
     case DLL_THREAD_ATTACH:
       if (user_data->threadinterface)
 	{
-	  if (!TlsSetValue(user_data->threadinterface->reent_index,
-		    &user_data->threadinterface->reents))
-	    api_fatal("Sig proc MT init failed\n");
+	  if (!TlsSetValue (user_data->threadinterface->reent_index,
+			    &user_data->threadinterface->reents))
+	    api_fatal ("Sig proc MT init failed\n");
 	}
       break;
     case DLL_PROCESS_DETACH:
       break;
     case DLL_THREAD_DETACH:
-#if 0 // FIXME: REINSTATE SOON
-      waitq *w;
-      if ((w = waitq_storage.get ()) != NULL)
-	{
-	  if (w->thread_ev != NULL)
-	    {
-	      system_printf ("closing %p", w->thread_ev);
-	      (void) CloseHandle (w->thread_ev);
-	    }
-	  memset (w, 0, sizeof(*w));	// FIXME: memory leak
-	}
-	// FIXME: Need to add other per_thread stuff here
+#if 0
+      pthread *thisthread = (pthread *)
+	TlsGetValue (user_data->threadinterface->thread_self_dwTlsIndex);
+      if (thisthread) {
+	  /* Some non-pthread call created this thread,
+	   * but we need to clean it up */
+	  thisthread->exit (0);
+      }
 #endif
       break;
     }

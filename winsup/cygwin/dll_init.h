@@ -73,18 +73,18 @@ public:
   void detach (dll *);
   void init ();
   void load_after_fork (HANDLE, dll *);
-  dll *istart (dll_type t)
-  {
-    hold_type = t;
-    hold = &start;
-    return inext ();
-  }
   dll *inext ()
   {
     while ((hold = hold->next))
       if (hold_type == DLL_ANY || hold->type == hold_type)
 	break;
     return hold;
+  }
+  dll *istart (dll_type t)
+  {
+    hold_type = t;
+    hold = &start;
+    return inext ();
   }
 };
 

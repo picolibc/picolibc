@@ -1,6 +1,6 @@
 /* fhandler_mem.cc.  See fhandler.h for a description of the fhandler classes.
 
-   Copyright 2000, 2001 Red Hat, Inc.
+   Copyright 2000, 2001, 2002 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -9,7 +9,6 @@
    details. */
 
 #include "winsup.h"
-#include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
 #include <sys/mman.h>
@@ -23,9 +22,8 @@
 /**********************************************************************/
 /* fhandler_dev_mem */
 
-fhandler_dev_mem::fhandler_dev_mem (const char *name, int nunit)
-: fhandler_base (FH_MEM, name),
-  unit (nunit)
+fhandler_dev_mem::fhandler_dev_mem (int nunit)
+  : fhandler_base (FH_MEM), unit (nunit)
 {
   /* Reading physical memory only supported on NT/W2K. */
   if (!wincap.has_physical_mem_access ())
@@ -72,7 +70,7 @@ fhandler_dev_mem::~fhandler_dev_mem (void)
 }
 
 int
-fhandler_dev_mem::open (const char *, int flags, mode_t)
+fhandler_dev_mem::open (path_conv *, int flags, mode_t)
 {
   if (!wincap.has_physical_mem_access ())
     {
@@ -95,9 +93,9 @@ fhandler_dev_mem::open (const char *, int flags, mode_t)
   RtlInitUnicodeString (&memstr, L"\\device\\physicalmemory");
 
   OBJECT_ATTRIBUTES attr;
-  InitializeObjectAttributes(&attr, &memstr,
-			     OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
-			     NULL, NULL);
+  InitializeObjectAttributes (&attr, &memstr,
+			      OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
+			      NULL, NULL);
 
   ACCESS_MASK section_access;
   if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDONLY)
@@ -178,7 +176,7 @@ fhandler_dev_mem::write (const void *ptr, size_t ulen)
   return ulen;
 }
 
-int
+int __stdcall
 fhandler_dev_mem::read (void *ptr, size_t ulen)
 {
   if (!ulen || pos >= mem_size)
@@ -232,8 +230,8 @@ fhandler_dev_mem::close (void)
   return fhandler_base::close ();
 }
 
-off_t
-fhandler_dev_mem::lseek (off_t offset, int whence)
+__off64_t
+fhandler_dev_mem::lseek (__off64_t offset, int whence)
 {
   switch (whence)
     {
@@ -252,13 +250,13 @@ fhandler_dev_mem::lseek (off_t offset, int whence)
 
     default:
       set_errno (EINVAL);
-      return (off_t) -1;
+      return ILLEGAL_SEEK;
     }
 
   if (pos > mem_size)
     {
       set_errno (EINVAL);
-      return (off_t) -1;
+      return ILLEGAL_SEEK;
     }
 
   return pos;
@@ -266,11 +264,11 @@ fhandler_dev_mem::lseek (off_t offset, int whence)
 
 HANDLE
 fhandler_dev_mem::mmap (caddr_t *addr, size_t len, DWORD access,
-			int flags, off_t off)
+			int flags, __off64_t off)
 {
-  if ((DWORD) off >= mem_size
+  if (off >= mem_size
       || (DWORD) len >= mem_size
-      || (DWORD) off + len >= mem_size)
+      || off + len >= mem_size)
     {
       set_errno (EINVAL);
       syscall_printf ("-1 = mmap(): illegal parameter, set EINVAL");
@@ -281,9 +279,9 @@ fhandler_dev_mem::mmap (caddr_t *addr, size_t len, DWORD access,
   RtlInitUnicodeString (&memstr, L"\\device\\physicalmemory");
 
   OBJECT_ATTRIBUTES attr;
-  InitializeObjectAttributes(&attr, &memstr,
-			     OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
-			     NULL, NULL);
+  InitializeObjectAttributes (&attr, &memstr,
+			      OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
+			      NULL, NULL);
 
   ACCESS_MASK section_access;
   ULONG protect;
@@ -403,23 +401,15 @@ fhandler_dev_mem::fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
 }
 
 int
-fhandler_dev_mem::fstat (struct stat *buf)
+fhandler_dev_mem::fstat (struct __stat64 *buf, path_conv *pc)
 {
-  if (!buf)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-
-  memset (buf, 0, sizeof *buf);
+  this->fhandler_base::fstat (buf, pc);
   buf->st_mode = S_IFCHR;
-  if (!wincap.has_physical_mem_access ())
+  if (wincap.has_physical_mem_access ())
     buf->st_mode |= S_IRUSR | S_IWUSR |
 		    S_IRGRP | S_IWGRP |
 		    S_IROTH | S_IWOTH;
-  buf->st_nlink = 1;
   buf->st_blksize = getpagesize ();
-  buf->st_dev = buf->st_rdev = get_device () << 8 | (unit & 0xff);
 
   return 0;
 }
@@ -442,5 +432,5 @@ fhandler_dev_mem::dup (fhandler_base *child)
 void
 fhandler_dev_mem::dump ()
 {
-  paranoid_printf("here, fhandler_dev_mem");
+  paranoid_printf ("here, fhandler_dev_mem");
 }

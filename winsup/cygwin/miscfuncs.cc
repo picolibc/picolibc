@@ -11,8 +11,13 @@ details. */
 #include "winsup.h"
 #include "cygerrno.h"
 #include <sys/errno.h>
+#include <sys/uio.h>
+#include <assert.h>
+#include <limits.h>
+#include <winbase.h>
+#include <winnls.h>
 
-/********************** String Helper Functions ************************/
+long tls_ix = -1;
 
 const char case_folded_lower[] NO_COPY = {
    0,   1,   2,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,  13,  14,  15,
@@ -116,15 +121,21 @@ strcasestr (const char *searchee, const char *lookfor)
 }
 
 int __stdcall
+check_null_str (const char *name)
+{
+  if (name && !IsBadStringPtr (name, MAX_PATH))
+    return 0;
+
+  return EFAULT;
+}
+
+int __stdcall
 check_null_empty_str (const char *name)
 {
-  if (!name || IsBadStringPtr (name, MAX_PATH))
-    return EFAULT;
+  if (name && !IsBadStringPtr (name, MAX_PATH))
+    return !*name ? ENOENT : 0;
 
-  if (!*name)
-    return ENOENT;
-
-  return 0;
+  return EFAULT;
 }
 
 int __stdcall
@@ -137,19 +148,124 @@ check_null_empty_str_errno (const char *name)
 }
 
 int __stdcall
-__check_null_invalid_struct (const void *s, unsigned sz)
+check_null_str_errno (const char *name)
 {
-  if (!s || IsBadWritePtr ((void *) s, sz))
-    return EFAULT;
-
-  return 0;
+  int __err;
+  if ((__err = check_null_str (name)))
+    set_errno (__err);
+  return __err;
 }
 
 int __stdcall
-__check_null_invalid_struct_errno (const void *s, unsigned sz)
+__check_null_invalid_struct (void *s, unsigned sz)
 {
-  int __err;
-  if ((__err = __check_null_invalid_struct (s, sz)))
-    set_errno (__err);
-  return __err;
+  if (s && !IsBadWritePtr (s, sz))
+    return 0;
+
+  return EFAULT;
+}
+
+int __stdcall
+__check_null_invalid_struct_errno (void *s, unsigned sz)
+{
+  int err;
+  if ((err = __check_null_invalid_struct (s, sz)))
+    set_errno (err);
+  return err;
+}
+
+int __stdcall
+__check_invalid_read_ptr_errno (const void *s, unsigned sz)
+{
+  if (s && !IsBadReadPtr (s, sz))
+    return 0;
+  return set_errno (EFAULT);
+}
+
+ssize_t
+check_iovec_for_read (const struct iovec *iov, int iovcnt)
+{
+  if (iovcnt <= 0 || iovcnt > IOV_MAX)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+
+  if (__check_invalid_read_ptr_errno (iov, iovcnt * sizeof (*iov)))
+    return -1;
+
+  size_t tot = 0;
+
+  while (iovcnt != 0)
+    {
+      if (iov->iov_len > SSIZE_MAX || (tot += iov->iov_len) > SSIZE_MAX)
+	{
+	  set_errno (EINVAL);
+	  return -1;
+	}
+
+      if (iov->iov_len
+	  && __check_null_invalid_struct_errno (iov->iov_base, iov->iov_len))
+	return -1;
+
+      iov += 1;
+      iovcnt -= 1;
+    }
+
+  assert (tot <= SSIZE_MAX);
+
+  return (ssize_t) tot;
+}
+
+ssize_t
+check_iovec_for_write (const struct iovec *iov, int iovcnt)
+{
+  if (iovcnt <= 0 || iovcnt > IOV_MAX)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+
+  if (__check_invalid_read_ptr_errno (iov, iovcnt * sizeof (*iov)))
+    return -1;
+
+  size_t tot = 0;
+
+  while (iovcnt != 0)
+    {
+      if (iov->iov_len > SSIZE_MAX || (tot += iov->iov_len) > SSIZE_MAX)
+	{
+	  set_errno (EINVAL);
+	  return -1;
+	}
+
+      if (iov->iov_len
+	  && __check_invalid_read_ptr_errno (iov->iov_base, iov->iov_len))
+	return -1;
+
+      iov += 1;
+      iovcnt -= 1;
+    }
+
+  assert (tot <= SSIZE_MAX);
+
+  return (ssize_t) tot;
+}
+
+UINT
+get_cp ()
+{
+  return current_codepage == ansi_cp ? GetACP() : GetOEMCP();
+}
+
+int __stdcall
+sys_wcstombs (char *tgt, const WCHAR *src, int len)
+{
+  return WideCharToMultiByte (get_cp (), 0, src, -1, tgt, len, NULL, NULL);
+}
+
+int __stdcall
+sys_mbstowcs (WCHAR *tgt, const char *src, int len)
+{
+  return MultiByteToWideChar (get_cp (), 0, src, -1, tgt, len);
 }

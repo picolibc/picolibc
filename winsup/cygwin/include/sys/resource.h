@@ -50,16 +50,16 @@ struct rusage {
 	long ru_ixrss;               /* XXX: 0 */
 	long ru_idrss;               /* XXX: sum of rm_asrss */
 	long ru_isrss;               /* XXX: 0 */
-        long ru_minflt;              /* any page faults not requiring I/O */
-        long ru_majflt;              /* any page faults requiring I/O */
-        long ru_nswap;               /* swaps */
-        long ru_inblock;             /* block input operations */
-        long ru_oublock;             /* block output operations */
-        long ru_msgsnd;              /* messages sent */
-        long ru_msgrcv;              /* messages received */
-        long ru_nsignals;            /* signals received */
-        long ru_nvcsw;               /* voluntary context switches */
-        long ru_nivcsw;              /* involuntary " */
+	long ru_minflt;              /* any page faults not requiring I/O */
+	long ru_majflt;              /* any page faults requiring I/O */
+	long ru_nswap;               /* swaps */
+	long ru_inblock;             /* block input operations */
+	long ru_oublock;             /* block output operations */
+	long ru_msgsnd;              /* messages sent */
+	long ru_msgrcv;              /* messages received */
+	long ru_nsignals;            /* signals received */
+	long ru_nvcsw;               /* voluntary context switches */
+	long ru_nivcsw;              /* involuntary " */
 #define ru_last         ru_nivcsw
 };
 

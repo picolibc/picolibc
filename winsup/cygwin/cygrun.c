@@ -1,6 +1,6 @@
 /* cygrun.c: testsuite support program
 
-   Copyright 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -18,34 +18,47 @@ details. */
 #include <stdlib.h>
 
 int
-main(int argc, char **argv)
+main (int argc, char **argv)
 {
   STARTUPINFO sa;
   PROCESS_INFORMATION pi;
   DWORD ec = 1;
+  char *p;
 
   if (argc < 2)
     {
-      fprintf(stderr, "Usage: cygrun [program]\n");
+      fprintf (stderr, "Usage: cygrun [program]\n");
       exit (0);
     }
 
-  putenv("CYGWIN_TESTING=1");
-  SetEnvironmentVariable("CYGWIN_TESTING", "1");
-
-  memset(&sa, 0, sizeof(sa));
-  memset(&pi, 0, sizeof(pi));
-  if (!CreateProcess(0, argv[1], 0, 0, 1, 0, 0, 0, &sa, &pi))
+  SetEnvironmentVariable ("CYGWIN_TESTING", "1");
+  if ((p = getenv ("CYGWIN")) == NULL || (strstr (p, "ntsec") == NULL))
     {
-      fprintf(stderr, "CreateProcess %s failed\n", argv[1]);
-      exit(1);
+      char buf[4096];
+      if (!p)
+	p[0] = '\0';
+      else
+	{
+	  strcat (buf, p);
+	  strcat (buf, " ");
+	}
+      strcat(buf, "ntsec");
+      SetEnvironmentVariable ("CYGWIN", buf);
     }
 
-  WaitForSingleObject(pi.hProcess, INFINITE);
+  memset (&sa, 0, sizeof (sa));
+  memset (&pi, 0, sizeof (pi));
+  if (!CreateProcess (0, argv[1], 0, 0, 1, 0, 0, 0, &sa, &pi))
+    {
+      fprintf (stderr, "CreateProcess %s failed\n", argv[1]);
+      exit (1);
+    }
 
-  GetExitCodeProcess(pi.hProcess, &ec);
+  WaitForSingleObject (pi.hProcess, INFINITE);
 
-  CloseHandle(pi.hProcess);
-  CloseHandle(pi.hThread);
+  GetExitCodeProcess (pi.hProcess, &ec);
+
+  CloseHandle (pi.hProcess);
+  CloseHandle (pi.hThread);
   return ec;
 }

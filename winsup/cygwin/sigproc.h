@@ -1,6 +1,6 @@
 /* sigproc.h
 
-   Copyright 1997, 1998, 2000, 2001 Red Hat, Inc.
+   Copyright 1997, 1998, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -8,6 +8,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#ifndef _SIGPROC_H
+#define _SIGPROC_H
 #include <signal.h>
 
 #define EXIT_SIGNAL	 0x010000
@@ -50,7 +52,7 @@ class sigframe
 {
 private:
   sigthread *st;
-  bool unregister ()
+  inline bool unregister ()
   {
     if (!st)
       return 0;
@@ -64,7 +66,7 @@ private:
   }
 
 public:
-  void set (sigthread &t, DWORD ebp, bool is_exception = 0)
+  inline void set (sigthread &t, DWORD ebp, bool is_exception = 0)
   {
     DWORD oframe = t.frame;
     st = &t;
@@ -73,16 +75,16 @@ public:
     if (!oframe)
       t.get_winapi_lock ();
   }
-
-  sigframe (): st (NULL) {}
-  sigframe (sigthread &t, DWORD ebp = (DWORD) __builtin_frame_address (0)) {init (t, ebp);}
-  void init (sigthread &t, DWORD ebp = (DWORD) __builtin_frame_address (0))
+  inline void init (sigthread &t, DWORD ebp = (DWORD) __builtin_frame_address (0))
   {
     if (!t.frame && t.id == GetCurrentThreadId ())
       set (t, ebp);
     else
       st = NULL;
   }
+
+  sigframe (): st (NULL) {}
+  sigframe (sigthread &t, DWORD ebp = (DWORD) __builtin_frame_address (0)) {init (t, ebp);}
   ~sigframe ()
   {
     unregister ();
@@ -93,12 +95,13 @@ public:
 
 extern sigthread mainthread;
 extern HANDLE signal_arrived;
+extern HANDLE sigCONT;
 
 BOOL __stdcall my_parent_is_alive ();
 extern "C" int __stdcall sig_dispatch_pending (int force = FALSE);
 extern "C" void __stdcall set_process_mask (sigset_t newmask);
 extern "C" void __stdcall reset_signal_arrived ();
-int __stdcall sig_handle (int);
+int __stdcall sig_handle (int, bool);
 void __stdcall sig_clear (int);
 void __stdcall sig_set_pending (int);
 int __stdcall handle_sigsuspend (sigset_t);
@@ -116,6 +119,7 @@ int __stdcall sig_send (_pinfo *, int, DWORD ebp = (DWORD) __builtin_frame_addre
 			bool exception = 0)  __attribute__ ((regparm(3)));
 void __stdcall signal_fixup_after_fork ();
 void __stdcall signal_fixup_after_exec (bool);
+void __stdcall wait_for_sigthread ();
 
 extern char myself_nowait_dummy[];
 extern char myself_nowait_nonmain_dummy[];
@@ -124,3 +128,4 @@ extern char myself_nowait_nonmain_dummy[];
 
 #define myself_nowait ((_pinfo *)myself_nowait_dummy)
 #define myself_nowait_nonmain ((_pinfo *)myself_nowait_nonmain_dummy)
+#endif /*_SIGPROC_H*/

@@ -12,7 +12,7 @@ details. */
 #define _SYS_VFS_H_
 
 struct statfs {
-   long    f_type;     /* type of filesystem (see below) */
+   long    f_type;     /* type of filesystem */
    long    f_bsize;    /* optimal transfer block size */
    long    f_blocks;   /* total data blocks in file system */
    long    f_bfree;    /* free blocks in fs */

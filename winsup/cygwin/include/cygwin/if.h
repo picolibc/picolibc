@@ -38,20 +38,20 @@ struct ifreq
 {
 #define IFNAMSIZ        16
 #define IFHWADDRLEN     6
-        union
-        {
-                char    ifrn_name[IFNAMSIZ];            /* if name, e.g. "en0" */
-        } ifr_ifrn;
+	union
+	{
+		char    ifrn_name[IFNAMSIZ];            /* if name, e.g. "en0" */
+	} ifr_ifrn;
 
-        union {
-                struct  sockaddr ifru_addr;
-                struct  sockaddr ifru_broadaddr;
-                struct  sockaddr ifru_netmask;
-                struct  sockaddr ifru_hwaddr;
-                short   ifru_flags;
-                int     ifru_metric;
-                int     ifru_mtu;
-        } ifr_ifru;
+	union {
+		struct  sockaddr ifru_addr;
+		struct  sockaddr ifru_broadaddr;
+		struct  sockaddr ifru_netmask;
+		struct  sockaddr ifru_hwaddr;
+		short   ifru_flags;
+		int     ifru_metric;
+		int     ifru_mtu;
+	} ifr_ifru;
 };
 
 #define ifr_name        ifr_ifrn.ifrn_name      /* interface name       */
@@ -73,12 +73,12 @@ struct ifreq
 
 struct ifconf
 {
-        int     ifc_len;                        /* size of buffer       */
-        union
-        {
-                caddr_t ifcu_buf;
-                struct  ifreq *ifcu_req;
-        } ifc_ifcu;
+	int     ifc_len;                        /* size of buffer       */
+	union
+	{
+		caddr_t ifcu_buf;
+		struct  ifreq *ifcu_req;
+	} ifc_ifcu;
 };
 #define ifc_buf ifc_ifcu.ifcu_buf               /* buffer address       */
 #define ifc_req ifc_ifcu.ifcu_req               /* array of structures  */

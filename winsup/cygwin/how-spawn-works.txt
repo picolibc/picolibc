@@ -1,0 +1,32 @@
+Spawn.cc in cygwin handles spawn, vfork and exec calls. It does this via
+a mode parameter that determines its behaviour with respect to the
+child.
+
+Of particular interest is the exec behaviour.
+
+In general spawn_guts (where the action happens) does the following:
+* Finds the actual program being run (which may include path searching).
+* Determines the type (.exe, shell script, perl etc) and for non binary
+programs finds the correct interpreter.
+* Creates a commandline (based on the type and the user parameters).
+* Guesses at whether the binary that will be invoked is a cygwin program
+or not (if (real_path.iscygexec ())) and uses that information to copy
+the argv table, or to translate it for win32 program usage.
+* passes a handle to the parent to the child (note: this handle should
+have it's rights restricted  the daemon is merged).
+* Start the process.
+* if the mode is _P_OVERLAY (we are doing an exec)
+wait for the child to
+a) if it's a cygwin process, signal us via an event.
+b) if it's a win32 process, exit.
+c) exit.
+
+If a) occurs, we 'reparent' the child which makes it look to the current
+process's parent in the pid and process group chains.
+b) is where the cygwin process hangs around as a 'stub' presenting it's
+pid as the win32 process's pid, to allow cygwin tools to kill the win32
+process.
+once a-c has occured, execution resumes.
+* If the mode is _P_OVERLAY, this process exits, otherwise it's
+behaviour depends on the mode parameter. See the last block of
+spawn_guts.

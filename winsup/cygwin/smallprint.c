@@ -1,6 +1,6 @@
 /* smallprint.c: small print routines for WIN32
 
-   Copyright 1996, 1998, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1998, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -19,11 +19,11 @@ int __small_sprintf (char *dst, const char *fmt,...);
 int __small_vsprintf (char *dst, const char *fmt, va_list ap);
 
 static char *
-rn (char *dst, int base, int dosign, int val, int len, int pad)
+rn (char *dst, int base, int dosign, long long val, int len, int pad)
 {
-  /* longest number is 4294967295, 10 digits */
+  /* longest number is ULLONG_MAX, 18446744073709551615, 20 digits */
   unsigned uval;
-  char res[10];
+  char res[20];
   static const char str[16] = "0123456789ABCDEF";
   int l = 0;
 
@@ -126,8 +126,17 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		case 'd':
 		  dst = rn (dst, 10, addsign, va_arg (ap, int), len, pad);
 		  break;
+		case 'D':
+		  dst = rn (dst, 10, addsign, va_arg (ap, long long), len, pad);
+		  break;
 		case 'u':
 		  dst = rn (dst, 10, 0, va_arg (ap, int), len, pad);
+		  break;
+		case 'U':
+		  dst = rn (dst, 10, 0, va_arg (ap, long long), len, pad);
+		  break;
+		case 'o':
+		  dst = rn (dst, 8, 0, va_arg (ap, unsigned), len, pad);
 		  break;
 		case 'p':
 		  *dst++ = '0';
@@ -135,6 +144,9 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		  /* fall through */
 		case 'x':
 		  dst = rn (dst, 16, 0, va_arg (ap, int), len, pad);
+		  break;
+		case 'X':
+		  dst = rn (dst, 16, 0, va_arg (ap, long long), len, pad);
 		  break;
 		case 'P':
 		  if (!GetModuleFileName (NULL, tmp, MAX_PATH))

@@ -1,7 +1,6 @@
 /* thread.h: Locking and threading module definitions
 
-   Copyright 1998, 1999, 2000, 2001 Red Hat, Inc.
-   Copyright 2001 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
    Written by Marco Fuykschot <marco@ddi.nl>
    Major update 2001 Robert Collins <rbtcollins@hotmail.com>
@@ -54,7 +53,7 @@ struct _winsup_t
   /*
      Needed for the group functions
    */
-  struct group _grp;
+  struct __group16 _grp;
   char *_namearray[2];
   int _grp_pos;
 
@@ -164,7 +163,7 @@ public:
    ~verifyable_object ();
 };
 
-typedef enum 
+typedef enum
 {
   VALID_OBJECT,
   INVALID_OBJECT,
@@ -174,51 +173,98 @@ typedef enum
 verifyable_object_state verifyable_object_isvalid (void const *, long);
 verifyable_object_state verifyable_object_isvalid (void const *, long, void *);
 
+/* interface */
+template <class ListNode> class List {
+public:
+  List();
+  void Insert (ListNode *aNode);
+  ListNode *Remove ( ListNode *aNode);
+  ListNode *Pop ();
+  void forEach (void (*)(ListNode *aNode));
+protected:
+  ListNode *head;
+};
+
 class pthread_key:public verifyable_object
 {
 public:
+  static bool isGoodObject (pthread_key_t const *);
+  static void runAllDestructors ();
 
   DWORD dwTlsIndex;
+
   int set (const void *);
-  void *get ();
+  void *get () const;
 
-    pthread_key (void (*)(void *));
+  pthread_key (void (*)(void *));
    ~pthread_key ();
-};
+  static void fixup_before_fork();
+  static void fixup_after_fork();
 
-/* FIXME: test using multiple inheritance and merging key_destructor into pthread_key
- * for efficiency */
-class pthread_key_destructor
-{
-public:
-  void (*destructor) (void *);
-  pthread_key_destructor *InsertAfter (pthread_key_destructor * node);
-  pthread_key_destructor *UnlinkNext ();
-  pthread_key_destructor *Next ();
-
-    pthread_key_destructor (void (*thedestructor) (void *), pthread_key * key);
-  pthread_key_destructor *next;
-  pthread_key *key;
-};
-
-class pthread_key_destructor_list
-{
-public:
-  void Insert (pthread_key_destructor * node);
-/* remove a given dataitem, wherever in the list it is */
-  pthread_key_destructor *Remove (pthread_key_destructor * item);
-/* get the first item and remove at the same time */
-  pthread_key_destructor *Pop ();
-  pthread_key_destructor *Remove (pthread_key * key);
-  void IterateNull ();
+  /* List support calls */
+  class pthread_key *next;
 private:
-    pthread_key_destructor * head;
+  // lists of objects. USE THREADSAFE INSERTS AND DELETES.
+  static List<pthread_key> keys;
+  static void saveAKey (pthread_key *);
+  static void restoreAKey (pthread_key *);
+  static void destroyAKey (pthread_key *);
+  void saveKeyToBuffer ();
+  void recreateKeyFromBuffer ();
+  void (*destructor) (void *);
+  void run_destructor () const;
+  void *fork_buf;
 };
 
+/* implementation */
+template <class ListNode>
+List<ListNode>::List<ListNode> () : head(NULL)
+{
+}
+template <class ListNode> void
+List<ListNode>::Insert (ListNode *aNode)
+{
+  if (!aNode)
+    return;
+  aNode->next = (ListNode *) InterlockedExchangePointer (&head, aNode);
+}
+template <class ListNode> ListNode *
+List<ListNode>::Remove ( ListNode *aNode)
+{
+  if (!aNode)
+    return NULL;
+  if (!head)
+    return NULL;
+  if (aNode == head)
+    return Pop ();
+  ListNode *resultPrev = head;
+  while (resultPrev && resultPrev->next && !(aNode == resultPrev->next))
+    resultPrev = resultPrev->next;
+  if (resultPrev)
+    return (ListNode *)InterlockedExchangePointer (&resultPrev->next, resultPrev->next->next);
+  return NULL;
+}
+template <class ListNode> ListNode *
+List<ListNode>::Pop ()
+{
+  return (ListNode *) InterlockedExchangePointer (&head, head->next);
+}
+/* poor mans generic programming. */
+template <class ListNode> void
+List<ListNode>::forEach (void (*callback)(ListNode *))
+{
+  ListNode *aNode = head;
+  while (aNode) 
+    {
+      callback (aNode);
+      aNode = aNode->next;
+    }
+}
 
 class pthread_attr:public verifyable_object
 {
 public:
+  static bool isGoodObject(pthread_attr_t const *);
   int joinable;
   int contentionscope;
   int inheritsched;
@@ -227,6 +273,38 @@ public:
 
     pthread_attr ();
    ~pthread_attr ();
+};
+
+class pthread_mutexattr:public verifyable_object
+{
+public:
+  static bool isGoodObject(pthread_mutexattr_t const *);
+  int pshared;
+  int mutextype;
+    pthread_mutexattr ();
+   ~pthread_mutexattr ();
+};
+
+class pthread_mutex:public verifyable_object
+{
+public:
+  static bool isGoodObject(pthread_mutex_t const *);
+  static bool isGoodInitializer(pthread_mutex_t const *);
+  static bool isGoodInitializerOrObject(pthread_mutex_t const *);
+  CRITICAL_SECTION criticalsection;
+  HANDLE win32_obj_id;
+  LONG condwaits;
+  int pshared;
+  class pthread_mutex * next;
+
+  int Lock ();
+  int TryLock ();
+  int UnLock ();
+  void fixup_after_fork ();
+
+  pthread_mutex (pthread_mutexattr * = NULL);
+  pthread_mutex (pthread_mutex_t *, pthread_mutexattr *);
+  ~pthread_mutex ();
 };
 
 class pthread:public verifyable_object
@@ -239,62 +317,96 @@ public:
   void *return_ptr;
   bool suspended;
   int cancelstate, canceltype;
+  HANDLE cancel_event;
+  pthread_t joiner;
   // int joinable;
-
-  DWORD GetThreadId ()
-  {
-    return thread_id;
-  }
-  void setThreadIdtoCurrent ()
-  {
-    thread_id = GetCurrentThreadId ();
-  }
 
   /* signal handling */
   struct sigaction *sigs;
   sigset_t *sigmask;
   LONG *sigtodo;
-  void create (void *(*)(void *), pthread_attr *, void *);
+  virtual void create (void *(*)(void *), pthread_attr *, void *);
 
-    pthread ();
-   ~pthread ();
+   pthread ();
+   virtual ~pthread ();
+
+   static void initMainThread(pthread *, HANDLE);
+   static bool isGoodObject(pthread_t const *);
+   static void atforkprepare();
+   static void atforkparent();
+   static void atforkchild();
+
+   /* API calls */
+   static int cancel (pthread_t);
+   static int join (pthread_t * thread, void **return_val);
+   static int detach (pthread_t * thread);
+   static int create (pthread_t * thread, const pthread_attr_t * attr,
+			      void *(*start_routine) (void *), void *arg);
+   static int once (pthread_once_t *, void (*)(void));
+   static int atfork(void (*)(void), void (*)(void), void (*)(void));
+   static int suspend (pthread_t * thread);
+   static int resume (pthread_t * thread);
+
+   virtual void exit (void *value_ptr);
+
+   virtual int cancel ();
+   
+   virtual void testcancel ();
+   static void static_cancel_self ();
+
+   virtual int setcancelstate (int state, int *oldstate);
+   virtual int setcanceltype (int type, int *oldtype);
+
+   virtual void push_cleanup_handler (__pthread_cleanup_handler *handler);
+   virtual void pop_cleanup_handler (int const execute);
+
+   static pthread* self ();
+   static void *thread_init_wrapper (void *);
+
+   virtual unsigned long getsequence_np();
 
 private:
     DWORD thread_id;
+    __pthread_cleanup_handler *cleanup_stack;
+    pthread_mutex mutex;
+
+    void pop_all_cleanup_handlers (void);
+    void precreate (pthread_attr *);
+    void postcreate ();
+    void setThreadIdtoCurrent();
+    static void setTlsSelfPointer(pthread *);
+    void cancel_self ();
+    DWORD getThreadId ();
 };
 
-class pthread_mutexattr:public verifyable_object
+class pthreadNull : public pthread
 {
-public:
-  int pshared;
-  int mutextype;
-    pthread_mutexattr ();
-   ~pthread_mutexattr ();
-};
+  public:
+    static pthread *getNullpthread();
+    ~pthreadNull();
 
-class pthread_mutex:public verifyable_object
-{
-public:
-  CRITICAL_SECTION criticalsection;
-  HANDLE win32_obj_id;
-  LONG condwaits;
-  int pshared;
-  class pthread_mutex * next;
+    /* From pthread These should never get called
+     * as the ojbect is not verifyable
+     */
+    void create (void *(*)(void *), pthread_attr *, void *);
+    void exit (void *value_ptr);
+    int cancel ();
+    void testcancel ();
+    int setcancelstate (int state, int *oldstate);
+    int setcanceltype (int type, int *oldtype);
+    void push_cleanup_handler (__pthread_cleanup_handler *handler);
+    void pop_cleanup_handler (int const execute);
+    unsigned long getsequence_np();
 
-  int Lock ();
-  int TryLock ();
-  int UnLock ();
-  void fixup_after_fork ();
-
-  pthread_mutex (unsigned short);
-  pthread_mutex (pthread_mutexattr *);
-  pthread_mutex (pthread_mutex_t *, pthread_mutexattr *);
-  ~pthread_mutex ();
+  private:
+    pthreadNull ();
+    static pthreadNull _instance;
 };
 
 class pthread_condattr:public verifyable_object
 {
 public:
+  static bool isGoodObject(pthread_condattr_t const *);
   int shared;
 
   pthread_condattr ();
@@ -304,8 +416,12 @@ public:
 class pthread_cond:public verifyable_object
 {
 public:
+  static bool isGoodObject(pthread_cond_t const *);
+  static bool isGoodInitializer(pthread_cond_t const *);
+  static bool isGoodInitializerOrObject(pthread_cond_t const *);
   int shared;
   LONG waiting;
+  LONG ExitingWait;
   pthread_mutex *mutex;
   /* to allow atomic behaviour for cond_broadcast */
   pthread_mutex_t cond_access;
@@ -331,6 +447,14 @@ public:
 class semaphore:public verifyable_object
 {
 public:
+  static bool isGoodObject(sem_t const *);
+  /* API calls */
+  static int init (sem_t * sem, int pshared, unsigned int value);
+  static int destroy (sem_t * sem);
+  static int wait (sem_t * sem);
+  static int trywait (sem_t * sem);
+  static int post (sem_t * sem);
+  
   HANDLE win32_obj_id;
   class semaphore * next;
   int shared;
@@ -367,41 +491,29 @@ public:
   struct _winsup_t winsup_reent;
   pthread mainthread;
 
-  pthread_key_destructor_list destructors;
   callback *pthread_prepare;
   callback *pthread_child;
   callback *pthread_parent;
 
-  // list of mutex's. USE THREADSAFE INSERTS AND DELETES.
+  // lists of pthread objects. USE THREADSAFE INSERTS AND DELETES.
   class pthread_mutex * mutexs;
   class pthread_cond  * conds;
   class semaphore     * semaphores;
 
   void Init (int);
+  void fixup_before_fork (void);
   void fixup_after_fork (void);
 
-    MTinterface ():reent_index (0), indexallocated (0), threadcount (1)
-  {
-    pthread_prepare = NULL;
-    pthread_child   = NULL;
-    pthread_parent  = NULL;
-  }
+  MTinterface ():reent_index (0), indexallocated (0), threadcount (1)
+    {
+      pthread_prepare = NULL;
+      pthread_child   = NULL;
+      pthread_parent  = NULL;
+    }
 };
-
-void __pthread_atforkprepare(void);
-void __pthread_atforkparent(void);
-void __pthread_atforkchild(void);
 
 extern "C"
 {
-void *thread_init_wrapper (void *);
-
-/*  ThreadCreation */
-int __pthread_create (pthread_t * thread, const pthread_attr_t * attr,
-		      void *(*start_routine) (void *), void *arg);
-int __pthread_once (pthread_once_t *, void (*)(void));
-int __pthread_atfork(void (*)(void), void (*)(void), void (*)(void));
-
 int __pthread_attr_init (pthread_attr_t * attr);
 int __pthread_attr_destroy (pthread_attr_t * attr);
 int __pthread_attr_setdetachstate (pthread_attr_t *, int);
@@ -421,20 +533,6 @@ int __pthread_attr_setschedparam (pthread_attr_t *,
 int __pthread_attr_setschedpolicy (pthread_attr_t *, int);
 int __pthread_attr_setscope (pthread_attr_t *, int);
 int __pthread_attr_setstackaddr (pthread_attr_t *, void *);
-
-
-
-/* Thread Exit */
-void __pthread_exit (void *value_ptr);
-int __pthread_join (pthread_t * thread, void **return_val);
-int __pthread_detach (pthread_t * thread);
-
-/* Thread suspend */
-
-int __pthread_suspend (pthread_t * thread);
-int __pthread_continue (pthread_t * thread);
-
-unsigned long __pthread_getsequence_np (pthread_t * thread);
 
 /* Thread SpecificData */
 int __pthread_key_create (pthread_key_t * key, void (*destructor) (void *));
@@ -460,9 +558,7 @@ int __pthread_sigmask (int operation, const sigset_t * set,
 		       sigset_t * old_set);
 
 /*  ID */
-pthread_t __pthread_self ();
 int __pthread_equal (pthread_t * t1, pthread_t * t2);
-
 
 /* Mutexes  */
 int __pthread_mutex_init (pthread_mutex_t *, const pthread_mutexattr_t *);
@@ -496,21 +592,7 @@ int __pthread_getschedparam (pthread_t thread, int *policy,
 int __pthread_setschedparam (pthread_t thread, int policy,
 			     const struct sched_param *param);
 
-/* cancelability states */
-int __pthread_cancel (pthread_t thread);
-int __pthread_setcancelstate (int state, int *oldstate);
-int __pthread_setcanceltype (int type, int *oldtype);
-void __pthread_testcancel (void);
-
-
-/* Semaphores */
-int __sem_init (sem_t * sem, int pshared, unsigned int value);
-int __sem_destroy (sem_t * sem);
-int __sem_wait (sem_t * sem);
-int __sem_trywait (sem_t * sem);
-int __sem_post (sem_t * sem);
 };
-
 #endif // MT_SAFE
 
 #endif // _CYGNUS_THREADS_

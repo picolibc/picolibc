@@ -1,6 +1,6 @@
 /* pthread.cc: posix pthread interface for Cygwin
 
-   Copyright 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
    Originally written by Marco Fuykschot <marco@ddi.nl>
 
@@ -12,6 +12,7 @@
 
 #include "winsup.h"
 #include "thread.h"
+#include "errno.h"
 
 extern "C"
 {
@@ -20,19 +21,19 @@ int
 pthread_create (pthread_t * thread, const pthread_attr_t * attr,
 		void *(*start_routine) (void *), void *arg)
 {
-  return __pthread_create (thread, attr, start_routine, arg);
+  return pthread::create (thread, attr, start_routine, arg);
 }
 
 int
 pthread_once (pthread_once_t * once_control, void (*init_routine) (void))
 {
-  return __pthread_once (once_control, init_routine);
+  return pthread::once (once_control, init_routine);
 }
 
 int
-pthread_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void))
+pthread_atfork (void (*prepare)(void), void (*parent)(void), void (*child)(void))
 {
-  return __pthread_atfork(prepare, parent, child);
+  return pthread::atfork (prepare, parent, child);
 }
 
 int
@@ -140,19 +141,19 @@ pthread_attr_getstackaddr (const pthread_attr_t * attr, void **stackaddr)
 void
 pthread_exit (void *value_ptr)
 {
-  return __pthread_exit (value_ptr);
+  return pthread::self ()->exit (value_ptr);
 }
 
 int
 pthread_join (pthread_t thread, void **return_val)
 {
-  return __pthread_join (&thread, (void **) return_val);
+  return pthread::join (&thread, (void **) return_val);
 }
 
 int
 pthread_detach (pthread_t thread)
 {
-  return __pthread_detach (&thread);
+  return pthread::detach (&thread);
 }
 
 
@@ -160,20 +161,22 @@ pthread_detach (pthread_t thread)
 int
 pthread_suspend (pthread_t thread)
 {
-  return __pthread_suspend (&thread);
+  return pthread::suspend (&thread);
 }
 
 /* same */
 int
 pthread_continue (pthread_t thread)
 {
-  return __pthread_continue (&thread);
+  return pthread::resume (&thread);
 }
 
 unsigned long
 pthread_getsequence_np (pthread_t * thread)
 {
-  return __pthread_getsequence_np (thread);
+  if (!pthread::isGoodObject (thread))
+    return EINVAL;
+  return (*thread)->getsequence_np ();
 }
 
 /* Thread SpecificData */
@@ -218,7 +221,7 @@ pthread_sigmask (int operation, const sigset_t * set, sigset_t * old_set)
 
 pthread_t pthread_self ()
 {
-  return __pthread_self ();
+  return pthread::self ();
 }
 
 int
@@ -422,58 +425,68 @@ pthread_setschedparam (pthread_t thread, int policy,
 int
 pthread_cancel (pthread_t thread)
 {
-  return __pthread_cancel (thread);
+  return pthread::cancel (thread);
 }
-
-
 
 int
 pthread_setcancelstate (int state, int *oldstate)
 {
-  return __pthread_setcancelstate (state, oldstate);
+  return pthread::self ()->setcancelstate (state, oldstate);
 }
 
 int
 pthread_setcanceltype (int type, int *oldtype)
 {
-  return __pthread_setcanceltype (type, oldtype);
+  return pthread::self ()->setcanceltype (type, oldtype);
 }
 
 void
 pthread_testcancel (void)
 {
-  __pthread_testcancel ();
+  pthread::self ()->testcancel ();
+}
+
+void
+_pthread_cleanup_push (__pthread_cleanup_handler *handler)
+{
+  pthread::self ()->push_cleanup_handler (handler);
+}
+
+void
+_pthread_cleanup_pop (int execute)
+{
+  pthread::self ()->pop_cleanup_handler (execute);
 }
 
 /* Semaphores */
 int
 sem_init (sem_t * sem, int pshared, unsigned int value)
 {
-  return __sem_init (sem, pshared, value);
+  return semaphore::init (sem, pshared, value);
 }
 
 int
 sem_destroy (sem_t * sem)
 {
-  return __sem_destroy (sem);
+  return semaphore::destroy (sem);
 }
 
 int
 sem_wait (sem_t * sem)
 {
-  return __sem_wait (sem);
+  return semaphore::wait (sem);
 }
 
 int
 sem_trywait (sem_t * sem)
 {
-  return __sem_trywait (sem);
+  return semaphore::trywait (sem);
 }
 
 int
 sem_post (sem_t * sem)
 {
-  return __sem_post (sem);
+  return semaphore::post (sem);
 }
 
 }

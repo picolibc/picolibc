@@ -1,6 +1,6 @@
 /* grp.cc
 
-   Copyright 1996, 1997, 1998, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2000, 2001, 2002 Red Hat, Inc.
 
    Original stubs by Jason Molenda of Cygnus Support, crash@cygnus.com
    First implementation by Gunther Ebert, gunther.ebert@ixos-leipzig.de
@@ -17,28 +17,25 @@ details. */
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-#include "sync.h"
-#include "sigproc.h"
 #include "pinfo.h"
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
-#include "cygheap.h"
 #include "cygerrno.h"
+#include "cygheap.h"
 #include "pwdgrp.h"
 
 /* Read /etc/group only once for better performance.  This is done
    on the first call that needs information from it. */
 
-static NO_COPY const char *etc_group = "/etc/group";
-static struct group *group_buf;		/* group contents in memory */
+static struct __group32 *group_buf;		/* group contents in memory */
 static int curr_lines;
 static int max_lines;
 
 /* Position in the group cache */
 #ifdef _MT_SAFE
-#define grp_pos _reent_winsup()->_grp_pos
+#define grp_pos _reent_winsup ()->_grp_pos
 #else
 static int grp_pos = 0;
 #endif
@@ -46,22 +43,19 @@ static int grp_pos = 0;
 static pwdgrp_check group_state;
 
 static int
-parse_grp (struct group &grp, const char *line)
+parse_grp (struct __group32 &grp, char *line)
 {
-  int len = strlen(line);
-  char *newline = (char *) malloc (len + 1);
-  (void) memcpy (newline, line, len + 1);
+  int len = strlen (line);
+  if (line[--len] == '\r')
+    line[len] = '\0';
 
-  if (newline[--len] == '\n')
-    newline[len] = '\0';
-
-  char *dp = strchr (newline, ':');
+  char *dp = strchr (line, ':');
 
   if (!dp)
     return 0;
 
   *dp++ = '\0';
-  grp.gr_name = newline;
+  grp.gr_name = line;
 
   grp.gr_passwd = dp;
   dp = strchr (grp.gr_passwd, ':');
@@ -106,12 +100,12 @@ parse_grp (struct group &grp, const char *line)
 
 /* Read one line from /etc/group into the group cache */
 static void
-add_grp_line (const char *line)
+add_grp_line (char *line)
 {
     if (curr_lines == max_lines)
     {
 	max_lines += 10;
-	group_buf = (struct group *) realloc (group_buf, max_lines * sizeof (struct group));
+	group_buf = (struct __group32 *) realloc (group_buf, max_lines * sizeof (struct __group32));
     }
     if (parse_grp (group_buf[curr_lines], line))
       curr_lines++;
@@ -119,16 +113,22 @@ add_grp_line (const char *line)
 
 class group_lock
 {
-  pthread_mutex_t mutex;
+  bool armed;
+  static NO_COPY pthread_mutex_t mutex;
  public:
-  group_lock (): mutex ((pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER) {}
-  void arm () {pthread_mutex_lock (&mutex); }
+  group_lock (bool doit)
+  {
+    if (armed = doit)
+      pthread_mutex_lock (&mutex);
+  }
   ~group_lock ()
   {
-    if (mutex != (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER)
+    if (armed)
       pthread_mutex_unlock (&mutex);
   }
 };
+
+pthread_mutex_t NO_COPY group_lock::mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
 
 /* Cygwin internal */
 /* Read in /etc/group and save contents in the group cache */
@@ -139,15 +139,9 @@ class group_lock
 void
 read_etc_group ()
 {
-  char linebuf [200];
-  char group_name [UNLEN + 1];
-  DWORD group_name_len = UNLEN + 1;
+  static pwdgrp_read gr;
 
-  strncpy (group_name, "Administrators", sizeof (group_name));
-
-  static NO_COPY group_lock here;
-  if (cygwin_finished_initializing)
-    here.arm ();
+  group_lock here (cygwin_finished_initializing);
 
   /* if we got blocked by the mutex, then etc_group may have been processed */
   if (group_state != uninitialized)
@@ -156,64 +150,100 @@ read_etc_group ()
   if (group_state != initializing)
     {
       group_state = initializing;
-      if (max_lines) /* When rereading, free allocated memory first. */
+      if (gr.open ("/etc/group"))
 	{
-	  for (int i = 0; i < curr_lines; ++i)
-	    {
-	      free (group_buf[i].gr_name);
-	      free (group_buf[i].gr_mem);
-	    }
-	  curr_lines = 0;
-	}
+	  char *line;
+	  while ((line = gr.gets ()) != NULL)
+	    if (strlen (line))
+	      add_grp_line (line);
 
-      FILE *f = fopen (etc_group, "rt");
-
-      if (f)
-	{
-	  while (fgets (linebuf, sizeof (linebuf), f) != NULL)
-	    {
-	      if (strlen (linebuf))
-		add_grp_line (linebuf);
-	    }
-
-	  group_state.set_last_modified (f);
-	  fclose (f);
+	  group_state.set_last_modified (gr.get_fhandle (), gr.get_fname ());
 	  group_state = loaded;
+	  gr.close ();
+	  debug_printf ("Read /etc/group, %d lines", curr_lines);
 	}
       else /* /etc/group doesn't exist -- create default one in memory */
 	{
+	  char group_name [UNLEN + 1];
+	  DWORD group_name_len = UNLEN + 1;
 	  char domain_name [INTERNET_MAX_HOST_NAME_LENGTH + 1];
 	  DWORD domain_name_len = INTERNET_MAX_HOST_NAME_LENGTH + 1;
 	  SID_NAME_USE acType;
-	  debug_printf ("Emulating /etc/group");
-	  if (! LookupAccountSidA (NULL ,
-				    well_known_admins_sid,
-				    group_name,
-				    &group_name_len,
-				    domain_name,
-				    &domain_name_len,
-				    &acType))
-	    {
-	      strcpy (group_name, "unknown");
-	      debug_printf ("Failed to get local admins group name. %E");
-	    }
+	  static char linebuf [200];
 
-	  snprintf (linebuf, sizeof (linebuf), "%s::%u:\n", group_name, DEFAULT_GID);
-	  add_grp_line (linebuf);
-	  group_state = emulated;
+	  if (wincap.has_security ())
+	    {
+	      HANDLE ptok;
+	      cygsid tg;
+	      DWORD siz;
+
+	      if (OpenProcessToken (hMainProc, TOKEN_QUERY, &ptok))
+	        {
+		  if (GetTokenInformation (ptok, TokenPrimaryGroup, &tg,
+					   sizeof tg, &siz)
+		      && LookupAccountSidA (NULL, tg, group_name,
+					    &group_name_len, domain_name,
+				            &domain_name_len, &acType))
+		    {
+		      char strbuf[100];
+		      snprintf (linebuf, sizeof (linebuf), "%s:%s:%lu:",
+				group_name,
+				tg.string (strbuf),
+				*GetSidSubAuthority (tg,
+					     *GetSidSubAuthorityCount (tg) - 1));
+		      debug_printf ("Emulating /etc/group: %s", linebuf);
+		      add_grp_line (linebuf);
+		      group_state = emulated;
+		    }
+		  CloseHandle (ptok);
+		}
+	    }
+	  if (group_state != emulated)
+	    {
+	      strncpy (group_name, "Administrators", sizeof (group_name));
+	      if (!LookupAccountSidA (NULL, well_known_admins_sid, group_name,
+				      &group_name_len, domain_name,
+				      &domain_name_len, &acType))
+		{
+		  strcpy (group_name, "unknown");
+		  debug_printf ("Failed to get local admins group name. %E");
+		}
+	      snprintf (linebuf, sizeof (linebuf), "%s::%u:", group_name,
+			(unsigned) DEFAULT_GID);
+	      debug_printf ("Emulating /etc/group: %s", linebuf);
+	      add_grp_line (linebuf);
+	      group_state = emulated;
+	    }
 	}
     }
 
   return;
 }
 
-extern "C"
-struct group *
-getgrgid (gid_t gid)
+static
+struct __group16 *
+grp32togrp16 (struct __group16 *gp16, struct __group32 *gp32)
 {
-  struct group * default_grp = NULL;
+  if (!gp16 || !gp32)
+    return NULL;
+
+  /* Copying the pointers is actually unnecessary.  Just having the correct
+     return type is important. */
+  gp16->gr_name = gp32->gr_name;
+  gp16->gr_passwd = gp32->gr_passwd;
+  gp16->gr_gid = (__gid16_t) gp32->gr_gid;		/* Not loss-free */
+  gp16->gr_mem = gp32->gr_mem;
+
+  return gp16;
+}
+
+extern "C"
+struct __group32 *
+getgrgid32 (__gid32_t gid)
+{
+  struct __group32 * default_grp = NULL;
   if (group_state  <= initializing)
-    read_etc_group();
+    read_etc_group ();
 
   for (int i = 0; i < curr_lines; i++)
     {
@@ -223,15 +253,24 @@ getgrgid (gid_t gid)
 	return group_buf + i;
     }
 
-  return default_grp;
+  return allow_ntsec ? NULL : default_grp;
 }
 
 extern "C"
-struct group *
-getgrnam (const char *name)
+struct __group16 *
+getgrgid (__gid16_t gid)
+{
+  static struct __group16 g16;
+
+  return grp32togrp16 (&g16, getgrgid32 ((__gid32_t) gid));
+}
+
+extern "C"
+struct __group32 *
+getgrnam32 (const char *name)
 {
   if (group_state  <= initializing)
-    read_etc_group();
+    read_etc_group ();
 
   for (int i = 0; i < curr_lines; i++)
     if (strcasematch (group_buf[i].gr_name, name))
@@ -242,23 +281,41 @@ getgrnam (const char *name)
 }
 
 extern "C"
+struct __group16 *
+getgrnam (const char *name)
+{
+  static struct __group16 g16;
+
+  return grp32togrp16 (&g16, getgrnam32 (name));
+}
+
+extern "C"
 void
-endgrent()
+endgrent ()
 {
   grp_pos = 0;
 }
 
 extern "C"
-struct group *
-getgrent()
+struct __group32 *
+getgrent32 ()
 {
   if (group_state  <= initializing)
-    read_etc_group();
+    read_etc_group ();
 
   if (grp_pos < curr_lines)
     return group_buf + grp_pos++;
 
   return NULL;
+}
+
+extern "C"
+struct __group16 *
+getgrent ()
+{
+  static struct __group16 g16;
+
+  return grp32togrp16 (&g16, getgrent32 ());
 }
 
 extern "C"
@@ -269,11 +326,11 @@ setgrent ()
 }
 
 /* Internal function. ONLY USE THIS INTERNALLY, NEVER `getgrent'!!! */
-struct group *
+struct __group32 *
 internal_getgrent (int pos)
 {
   if (group_state  <= initializing)
-    read_etc_group();
+    read_etc_group ();
 
   if (pos < curr_lines)
     return group_buf + pos;
@@ -281,15 +338,16 @@ internal_getgrent (int pos)
 }
 
 int
-getgroups (int gidsetsize, gid_t *grouplist, gid_t gid, const char *username)
+getgroups32 (int gidsetsize, __gid32_t *grouplist, __gid32_t gid,
+	     const char *username)
 {
   HANDLE hToken = NULL;
   DWORD size;
   int cnt = 0;
-  struct group *gr;
+  struct __group32 *gr;
 
   if (group_state  <= initializing)
-    read_etc_group();
+    read_etc_group ();
 
   if (allow_ntsec &&
       OpenProcessToken (hMainProc, TOKEN_QUERY, &hToken))
@@ -307,7 +365,8 @@ getgroups (int gidsetsize, gid_t *grouplist, gid_t gid, const char *username)
 	      for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
 		if (sid.getfromgr (gr))
 		  for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
-		    if (sid == groups->Groups[pg].Sid)
+		    if (sid == groups->Groups[pg].Sid &&
+			sid != well_known_world_sid)
 		      {
 			if (cnt < gidsetsize)
 			  grouplist[cnt] = gr->gr_gid;
@@ -356,14 +415,108 @@ error:
 
 extern "C"
 int
-getgroups (int gidsetsize, gid_t *grouplist)
+getgroups32 (int gidsetsize, __gid32_t *grouplist)
 {
-  return getgroups (gidsetsize, grouplist, myself->gid, cygheap->user.name ());
+  return getgroups32 (gidsetsize, grouplist, myself->gid,
+		      cygheap->user.name ());
 }
 
 extern "C"
 int
-initgroups (const char *, gid_t)
+getgroups (int gidsetsize, __gid16_t *grouplist)
 {
+  __gid32_t *grouplist32 = NULL;
+
+  if (gidsetsize < 0)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+  if (gidsetsize > 0 && grouplist)
+    grouplist32 = (__gid32_t *) alloca (gidsetsize * sizeof (__gid32_t));
+
+  int ret = getgroups32 (gidsetsize, grouplist32, myself->gid,
+			 cygheap->user.name ());
+
+  if (gidsetsize > 0 && grouplist)
+    for (int i = 0; i < ret; ++ i)
+      grouplist[i] = grouplist32[i];
+
+  return ret;
+}
+
+extern "C"
+int
+initgroups32 (const char *, __gid32_t)
+{
+  if (wincap.has_security ())
+    cygheap->user.groups.clear_supp ();
   return 0;
+}
+
+extern "C"
+int
+initgroups (const char * name, __gid16_t gid)
+{
+  return initgroups32 (name, gid16togid32(gid));
+}
+
+/* setgroups32: standards? */
+extern "C"
+int
+setgroups32 (int ngroups, const __gid32_t *grouplist)
+{
+  if (ngroups < 0 || (ngroups > 0 && !grouplist))
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+
+  if (!wincap.has_security ())
+    return 0;
+
+  cygsidlist gsids (cygsidlist_alloc, ngroups);
+  struct __group32 *gr;
+
+  if (ngroups && !gsids.sids)
+    return -1;
+
+  for (int gidx = 0; gidx < ngroups; ++gidx)
+    {
+      for (int gidy = 0; gidy < gidx; gidy++)
+	if (grouplist[gidy] == grouplist[gidx])
+	  goto found; /* Duplicate */
+      for (int gidy = 0; (gr = internal_getgrent (gidy)); ++gidy)
+	if (gr->gr_gid == (__gid32_t) grouplist[gidx])
+	  {
+	    if (gsids.addfromgr (gr))
+	      goto found;
+	    break;
+	  }
+      debug_printf ("No sid found for gid %d", grouplist[gidx]);
+      gsids.free_sids ();
+      set_errno (EINVAL);
+      return -1;
+    found:
+      continue;
+    }
+  cygheap->user.groups.update_supp (gsids);
+  return 0;
+}
+
+extern "C"
+int
+setgroups (int ngroups, const __gid16_t *grouplist)
+{
+  __gid32_t *grouplist32 = NULL;
+
+  if (ngroups > 0 && grouplist)
+    {
+      grouplist32 = (__gid32_t *) alloca (ngroups * sizeof (__gid32_t));
+      if (grouplist32 == NULL)
+	return -1;
+      for (int i = 0; i < ngroups; i++)
+	grouplist32[i] = grouplist[i];
+    }
+  return setgroups32 (ngroups, grouplist32);
 }

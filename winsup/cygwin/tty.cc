@@ -1,6 +1,6 @@
 /* tty.cc
 
-   Copyright 1997, 1998, 2000, 2001 Red Hat, Inc.
+   Copyright 1997, 1998, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -21,12 +21,10 @@ details. */
 #include "path.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "sync.h"
-#include "sigproc.h"
 #include "pinfo.h"
-#include "cygwin/cygserver_transport.h"
 #include "cygwin/cygserver.h"
 #include "shared_info.h"
+#include "cygthread.h"
 
 extern fhandler_tty_master *tty_master;
 
@@ -56,6 +54,9 @@ ttyslot (void)
 void __stdcall
 tty_init (void)
 {
+  if (!myself->ppid_handle && NOTSTATE (myself, PID_CYGPARENT))
+    cygheap->fdtab.get_debugger_info ();
+
   if (NOTSTATE (myself, PID_USETTY))
     return;
   if (myself->ctty == -1)
@@ -72,8 +73,8 @@ tty_init (void)
 void __stdcall
 create_tty_master (int ttynum)
 {
-  tty_master = (fhandler_tty_master *) cygheap->fdtab.build_fhandler (-1, FH_TTYM,
-							     "/dev/ttym", ttynum);
+  tty_master = (fhandler_tty_master *)
+    cygheap->fdtab.build_fhandler (-1, FH_TTYM, "/dev/ttym", NULL, ttynum);
   if (tty_master->init (ttynum))
     api_fatal ("Can't create master tty");
   else
@@ -143,7 +144,8 @@ tty_list::terminate (void)
       ForceCloseHandle1 (t->to_slave, to_pty);
       ForceCloseHandle1 (t->from_slave, from_pty);
       CloseHandle (tty_master->inuse);
-      WaitForSingleObject (tty_master->hThread, INFINITE);
+      if (tty_master->output_thread)
+	tty_master->output_thread->detach ();
       t->init ();
 
       char buf[20];
@@ -193,7 +195,7 @@ tty_list::allocate_tty (int with_console)
 
   if (!with_console)
     console = NULL;
-  else
+  else if (!(console = GetConsoleWindow ()))
     {
       char *oldtitle = new char [TITLESIZE];
 
@@ -215,8 +217,12 @@ tty_list::allocate_tty (int with_console)
 
       __small_sprintf (buf, "cygwin.find.console.%d", myself->pid);
       SetConsoleTitle (buf);
-      Sleep (40);
-      console = FindWindow (NULL, buf);
+      for (int times = 0; times < 25; times++)
+        {
+          Sleep (10);
+          if ((console = FindWindow (NULL, buf)))
+	    break;
+        }
       SetConsoleTitle (oldtitle);
       Sleep (40);
       ReleaseMutex (title_mutex);
@@ -360,14 +366,14 @@ tty::make_pipes (fhandler_pty_master *ptym)
       return FALSE;
     }
 
-  ProtectHandle1 (to_slave, to_pty);
+  // ProtectHandle1INH (to_slave, to_pty);
   if (CreatePipe (&from_slave, &to_master, &sec_all, 0) == FALSE)
     {
       termios_printf ("can't create output pipe");
       set_errno (ENOENT);
       return FALSE;
     }
-  ProtectHandle1 (from_slave, from_pty);
+  // ProtectHandle1INH (from_slave, from_pty);
   termios_printf ("tty%d from_slave %p, to_slave %p", ntty, from_slave,
 		  to_slave);
 
@@ -395,10 +401,20 @@ tty::common_init (fhandler_pty_master *ptym)
 
   /* Allow the others to open us (for handle duplication) */
 
-  if (wincap.has_security () && cygserver_running==CYGSERVER_OK &&
-      (SetKernelObjectSecurity (hMainProc, DACL_SECURITY_INFORMATION,
-			       get_null_sd ()) == FALSE))
-    small_printf ("Can't set process security, %E");
+  /* FIXME: we shold NOT set the security wide open when the
+     daemon is running
+   */
+  if (wincap.has_security ())
+    {
+      if (cygserver_running == CYGSERVER_UNKNOWN)
+	cygserver_init ();
+
+      if (cygserver_running != CYGSERVER_OK
+	  && !SetKernelObjectSecurity (hMainProc,
+				       DACL_SECURITY_INFORMATION,
+				       get_null_sd ()))
+	system_printf ("Can't set process security, %E");
+    }
 
   /* Create synchronisation events */
 
@@ -437,8 +453,8 @@ tty::common_init (fhandler_pty_master *ptym)
       return FALSE;
     }
 
-  ProtectHandle1 (ptym->output_mutex, output_mutex);
-  ProtectHandle1 (ptym->input_mutex, input_mutex);
+  ProtectHandle1INH (ptym->output_mutex, output_mutex);
+  ProtectHandle1INH (ptym->input_mutex, input_mutex);
   winsize.ws_col = 80;
   winsize.ws_row = 25;
 

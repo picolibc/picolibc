@@ -11,9 +11,8 @@ details. */
 #undef __INSIDE_CYGWIN__
 #include <windows.h>
 #include <sys/cygwin.h>
+#include <stdlib.h>
 #include "crt0.h"
-
-#define alloca __builtin_alloca
 
 extern void dll_crt0__FP11per_process (struct per_process *)  __declspec (dllimport) __attribute ((noreturn));
 

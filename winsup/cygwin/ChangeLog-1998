@@ -24,7 +24,7 @@ Wed Dec 30 21:41:25 1998  Christopher Faylor <cgf@cygnus.com>
 	assignment here but only do it when it is necessary or
 	programs will die abnormally.
 	* fhandler.h: Add raw_write method to fhandler_serial.
-	* fhandler_serial.cc (raw_write): New method.  Accomodates
+	* fhandler_serial.cc (raw_write): New method.  Accommodates
 	overlapped I/O that now must be used with serial.
 	* utils/kill.cc (main): Allow `0' signal.  Just checks
 	for existence of process.
@@ -430,7 +430,7 @@ Tue Dec  1 14:43:35 1998  Christopher Faylor <cgf@cygnus.com>
 
 Tue Dec  1 08:34:18 1998  Christopher Faylor <cgf@cygnus.com>
 
-	* mkvers.sh: Accomodate lack of timezone in date output so that
+	* mkvers.sh: Accommodate lack of timezone in date output so that
 	year shows up correctly.
 
 Mon Nov 30 14:30:51 1998  Jeff Johnston  <jjohnstn@cygnus.com>
@@ -2113,7 +2113,7 @@ Thu Sep 10 21:09:51 1998  Christopher Faylor <cgf@cygnus.com>
 	overhead.
 	(symlink_check_one): Check extensions for existence for use
 	with spawn.
-	(readlink): Accomodate changes to symlink_check_one.
+	(readlink): Accommodate changes to symlink_check_one.
 	* spawn.cc (perhaps_suffix): Use new extension checking
 	capabilities of path_conv.
 	(find_exec_1): Delete.
@@ -2369,7 +2369,7 @@ Thu Sep 10 21:09:51 1998  Christopher Faylor <cgf@cygnus.com>
 	(setenv): Convert special environment variables to native here,
 	when they are set.
 	(struct parse_thing): Simplify struct.
-	(struct parse_things): Extend table to accomodate "envcache"
+	(struct parse_things): Extend table to accommodate "envcache"
 	setting.
 	(parse_options): Add "envcache" option to control whether special
 	environment variables are cached.  Simplify handling of remembered
@@ -2722,7 +2722,7 @@ Thu Aug 27 14:20:38 1998  Christopher Faylor <cgf@cygnus.com>
 Wed Aug 26 14:15:22 1998  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler.h (fhandler_base): Make set_name() public and implement
-	clear_name() to accomodate dup2.
+	clear_name() to accommodate dup2.
 	* hinfo.cc (dup2): Previous change exposed problem with dup2.
 	Same unix_path_name_ ptr was being used in two separate fds.
 	Fix this.
@@ -3722,7 +3722,7 @@ Tue Mar 10 15:41:29 1998  Geoffrey Noer  <noer@cygnus.com>
 	Reorganize lpReserved2 buffer to avoid conflicts with Microsoft
 	usage which resulted in incorrect stdin/stdout operation with
 	programs compiled using MSVC.
-	* pinfo.cc (pinfo_init):  Accomodate change to lpReserved2
+	* pinfo.cc (pinfo_init):  Accommodate change to lpReserved2
 	organization.
 
 Mon Mar  9 19:27:17 1998  Geoffrey Noer  <noer@cygnus.com>

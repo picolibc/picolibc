@@ -1,6 +1,6 @@
 /* debug.h
 
-   Copyright 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -23,16 +23,13 @@ DWORD __stdcall WFMO (DWORD, CONST HANDLE *, BOOL, DWORD) __attribute__ ((regpar
 }
 
 #define WaitForSingleObject WFSO
-#define WaitForMultipleObject WFMO
+#define WaitForMultipleObjects WFMO
 
 #if !defined(_DEBUG_H_)
 #define _DEBUG_H_
 
-void threadname_init ();
-HANDLE __stdcall makethread (LPTHREAD_START_ROUTINE, LPVOID, DWORD, const char *) __attribute__ ((regparm(3)));
-const char * __stdcall threadname (DWORD, int lockit = TRUE) __attribute__ ((regparm(2)));
-void __stdcall regthread (const char *, DWORD) __attribute__ ((regparm(1)));
-int __stdcall iscygthread ();
+#define being_debugged() \
+  (IsDebuggerPresent () /* || GetLastError () == ERROR_PROC_NOT_FOUND*/)
 
 #ifndef DEBUGGING
 # define cygbench(s)
@@ -42,9 +39,12 @@ int __stdcall iscygthread ();
 # define ProtectHandle(h) do {} while (0)
 # define ProtectHandle1(h,n) do {} while (0)
 # define ProtectHandle2(h,n) do {} while (0)
+# define ProtectHandleINH(h) do {} while (0)
+# define ProtectHandle1INH(h,n) do {} while (0)
+# define ProtectHandle2INH(h,n) do {} while (0)
 # define debug_init() do {} while (0)
-# define setclexec_pid(h, b) do {} while (0)
-# define debug_fixup_after_fork() do {} while (0)
+# define setclexec(h, nh, b) do {} while (0)
+# define debug_fixup_after_fork_exec() do {} while (0)
 
 #else
 
@@ -64,17 +64,31 @@ int __stdcall iscygthread ();
 # define ProtectHandle(h) add_handle (__PRETTY_FUNCTION__, __LINE__, (h), #h)
 # define ProtectHandle1(h, n) add_handle (__PRETTY_FUNCTION__, __LINE__, (h), #n)
 # define ProtectHandle2(h, n) add_handle (__PRETTY_FUNCTION__, __LINE__, (h), n)
+# define ProtectHandleINH(h) add_handle (__PRETTY_FUNCTION__, __LINE__, (h), #h, 1)
+# define ProtectHandle1INH(h, n) add_handle (__PRETTY_FUNCTION__, __LINE__, (h), #n, 1)
+# define ProtectHandle2INH(h, n) add_handle (__PRETTY_FUNCTION__, __LINE__, (h), n, 1)
 
 void debug_init ();
-void __stdcall add_handle (const char *, int, HANDLE, const char *)
+void __stdcall add_handle (const char *, int, HANDLE, const char *, bool = false)
   __attribute__ ((regparm (3)));
 BOOL __stdcall close_handle (const char *, int, HANDLE, const char *, BOOL)
   __attribute__ ((regparm (3)));
 void __stdcall cygbench (const char *s) __attribute__ ((regparm (1)));
 extern "C" void console_printf (const char *fmt,...);
-void setclexec_pid (HANDLE, bool);
-void debug_fixup_after_fork ();
+void setclexec (HANDLE, HANDLE, bool);
+void debug_fixup_after_fork_exec ();
 extern int pinger;
+
+struct handle_list
+  {
+    HANDLE h;
+    const char *name;
+    const char *func;
+    int ln;
+    bool inherited;
+    DWORD pid;
+    struct handle_list *next;
+  };
 
 #endif /*DEBUGGING*/
 #endif /*_DEBUG_H_*/

@@ -1,6 +1,6 @@
 /* autoload.cc: all dynamic load stuff.
 
-   Copyright 2000, 2001 Red Hat, Inc.
+   Copyright 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -72,9 +72,10 @@ details. */
 /* Standard DLL load macro.  Invokes a fatal warning if the function isn't
    found. */
 #define LoadDLLfunc(name, n, dllname) LoadDLLfuncEx (name, n, dllname, 0)
+#define LoadDLLfuncEx(name, n, dllname, notimp) LoadDLLfuncEx2(name, n, dllname, notimp, 0)
 
 /* Main DLL setup stuff. */
-#define LoadDLLfuncEx(name, n, dllname, notimp) \
+#define LoadDLLfuncEx2(name, n, dllname, notimp, err) \
   LoadDLLprime (dllname, dll_func_load)			\
   __asm__ ("						\n\
   .section	." #dllname "_text,\"wx\"		\n\
@@ -83,10 +84,12 @@ details. */
   .align	8					\n\
 _" mangle (name, n) ":					\n\
 _win32_" mangle (name, n) ":				\n\
-  movl		(1f),%eax				\n\
+  .byte		0xe9					\n\
+  .long		-4 + 1f - .				\n\
+1:movl		(2f),%eax				\n\
   call		*(%eax)					\n\
-1:.long		." #dllname "_info			\n\
-  .long		" #n "+" #notimp "			\n\
+2:.long		." #dllname "_info			\n\
+  .long		(" #n "+" #notimp ") | " #err "<<16	\n\
   .asciz	\"" #name "\"				\n\
   .text							\n\
 ");
@@ -122,10 +125,14 @@ noload:									\n\
 	decl	%eax		# Yes.  This is the # of bytes + 1	\n\
 	popl	%edx		# Caller's caller			\n\
 	addl	%eax,%esp	# Pop off bytes				\n\
+	andl	$0xffff0000,%eax# upper word				\n\
+	subl	%eax,%esp	# adjust for possible return value	\n\
+	pushl	%eax		# Save for later			\n\
 	movl	$127,%eax	# ERROR_PROC_NOT_FOUND			\n\
 	pushl	%eax		# First argument			\n\
 	call	_SetLastError@4	# Set it				\n\
-	xor	%eax,%eax	# Zero functional return		\n\
+	popl	%eax		# Get back argument			\n\
+	shrl	$16,%eax	# return value in high order word	\n\
 	jmp	*%edx		# Return				\n\
 1:									\n\
 	movl	(%edx),%eax	# Handle value				\n\
@@ -148,12 +155,11 @@ dll_func_load:								\n\
 	jne	gotit		# Yes					\n\
 	jmp	noload		# Issue an error or return		\n\
 gotit:									\n\
-	popl	%ecx		# Pointer to 'return address'		\n\
-	movb	$0xe9,-7(%ecx)	# Turn preceding call to a jmp *%eax	\n\
-	movl	%eax,%edx	# Save					\n\
-	subl	%ecx,%eax	# Make it relative			\n\
-	addl	$2,%eax		# Tweak					\n\
-	movl	%eax,-6(%ecx)	# Move relative address after jump	\n\
+	popl	%edx		# Pointer to 'return address'		\n\
+	subl	%edx,%eax	# Make it relative			\n\
+	addl	$7,%eax		# Tweak					\n\
+	subl	$12,%edx	# Point to jmp				\n\
+	movl	%eax,1(%edx)	# Move relative address after jump	\n\
 	jmp	*%edx		# Jump to actual function		\n\
 									\n\
 	.global	dll_chain						\n\
@@ -241,10 +247,8 @@ static long long
 wsock_init ()
 {
   static LONG NO_COPY here = -1L;
-  extern WSADATA wsadata;
   struct func_info *func = (struct func_info *) __builtin_return_address (0);
   struct dll_info *dll = func->dll;
-  retchain ret;
 
   __asm__ ("						\n\
 	.section .ws2_32_info				\n\
@@ -262,7 +266,7 @@ wsock_init ()
       Sleep (0);
     }
 
-  if (!wsock_started && (wsock32_handle || ws2_32_handle))
+  if (!wsock_started && (winsock_active || winsock2_active))
     {
       /* Don't use autoload to load WSAStartup to eliminate recursion. */
       int (*wsastartup) (int, WSADATA *);
@@ -293,6 +297,7 @@ wsock_init ()
 	movl	$dll_chain1,4(%ebp)	\n\
   ");
 
+  volatile retchain ret;
   /* Set "arguments for dll_chain1. */
   ret.low = (long) dll_func_load;
   ret.high = (long) func;
@@ -317,10 +322,12 @@ LoadDLLfuncEx (DuplicateTokenEx, 24, advapi32, 1)
 LoadDLLfunc (EqualSid, 8, advapi32)
 LoadDLLfunc (GetAce, 12, advapi32)
 LoadDLLfunc (GetFileSecurityA, 20, advapi32)
+LoadDLLfunc (GetKernelObjectSecurity, 20, advapi32)
 LoadDLLfunc (GetLengthSid, 4, advapi32)
 LoadDLLfunc (GetSecurityDescriptorDacl, 16, advapi32)
 LoadDLLfunc (GetSecurityDescriptorGroup, 12, advapi32)
 LoadDLLfunc (GetSecurityDescriptorOwner, 12, advapi32)
+LoadDLLfunc (GetSecurityInfo, 32, advapi32)
 LoadDLLfunc (GetSidIdentifierAuthority, 4, advapi32)
 LoadDLLfunc (GetSidSubAuthority, 8, advapi32)
 LoadDLLfunc (GetSidSubAuthorityCount, 4, advapi32)
@@ -353,6 +360,7 @@ LoadDLLfunc (RegLoadKeyA, 12, advapi32)
 LoadDLLfunc (RegEnumKeyExA, 32, advapi32)
 LoadDLLfunc (RegEnumValueA, 32, advapi32)
 LoadDLLfunc (RegOpenKeyExA, 20, advapi32)
+LoadDLLfunc (RegQueryInfoKeyA, 48, advapi32)
 LoadDLLfunc (RegQueryValueExA, 24, advapi32)
 LoadDLLfunc (RegSetValueExA, 24, advapi32)
 LoadDLLfunc (RegisterEventSourceA, 8, advapi32)
@@ -366,21 +374,27 @@ LoadDLLfunc (SetSecurityDescriptorOwner, 12, advapi32)
 LoadDLLfunc (SetTokenInformation, 16, advapi32)
 
 LoadDLLfunc (NetApiBufferFree, 4, netapi32)
+LoadDLLfuncEx (NetGetDCName, 12, netapi32, 1)
 LoadDLLfunc (NetLocalGroupEnum, 28, netapi32)
 LoadDLLfunc (NetLocalGroupGetMembers, 32, netapi32)
-LoadDLLfunc (NetServerEnum, 36, netapi32)
 LoadDLLfunc (NetUserGetGroups, 28, netapi32)
 LoadDLLfunc (NetUserGetInfo, 16, netapi32)
 LoadDLLfunc (NetWkstaUserGetInfo, 12, netapi32)
 
 LoadDLLfuncEx (NtCreateToken, 52, ntdll, 1)
 LoadDLLfuncEx (NtMapViewOfSection, 40, ntdll, 1)
+LoadDLLfuncEx (NtOpenFile, 24, ntdll, 1)
 LoadDLLfuncEx (NtOpenSection, 12, ntdll, 1)
+LoadDLLfuncEx (NtQueryInformationFile, 20, ntdll, 1)
+LoadDLLfuncEx (NtQueryInformationProcess, 20, ntdll, 1)
+LoadDLLfuncEx2 (NtQueryObject, 20, ntdll, 1, 1)
 LoadDLLfuncEx (NtQuerySystemInformation, 16, ntdll, 1)
+LoadDLLfuncEx (NtQueryVirtualMemory, 24, ntdll, 1)
 LoadDLLfuncEx (NtUnmapViewOfSection, 8, ntdll, 1)
 LoadDLLfuncEx (RtlInitUnicodeString, 8, ntdll, 1)
 LoadDLLfuncEx (RtlNtStatusToDosError, 4, ntdll, 1)
-LoadDLLfuncEx (ZwQuerySystemInformation, 16, ntdll, 1)
+
+LoadDLLfuncEx (GetProcessMemoryInfo, 12, psapi, 1)
 
 LoadDLLfuncEx (LsaDeregisterLogonProcess, 4, secur32, 1)
 LoadDLLfuncEx (LsaFreeReturnBuffer, 4, secur32, 1)
@@ -418,11 +432,12 @@ LoadDLLfunc (SetClipboardData, 8, user32)
 LoadDLLfunc (SetTimer, 16, user32)
 LoadDLLfunc (SetUserObjectSecurity, 12, user32)
 
+LoadDLLfuncEx (load_wsock32, 0, wsock32, 1) // non-existent function forces wsock32 load
 LoadDLLfunc (WSAAsyncSelect, 16, wsock32)
 LoadDLLfunc (WSACleanup, 0, wsock32)
 LoadDLLfunc (WSAGetLastError, 0, wsock32)
 LoadDLLfunc (WSASetLastError, 4, wsock32)
-LoadDLLfunc (WSAStartup, 8, wsock32)
+// LoadDLLfunc (WSAStartup, 8, wsock32)
 LoadDLLfunc (__WSAFDIsSet, 8, wsock32)
 LoadDLLfunc (accept, 12, wsock32)
 LoadDLLfunc (bind, 12, wsock32)
@@ -466,6 +481,8 @@ LoadDLLfuncEx (WSASendTo, 36, ws2_32, 1)
 LoadDLLfuncEx (WSASetEvent, 4, ws2_32, 1)
 LoadDLLfuncEx (WSASocketA, 24, ws2_32, 1)
 LoadDLLfuncEx (WSAWaitForMultipleEvents, 20, ws2_32, 1)
+LoadDLLfuncEx (WSAEventSelect, 12, ws2_32, 1)
+LoadDLLfuncEx (WSAEnumNetworkEvents, 12, ws2_32, 1)
 
 LoadDLLfuncEx (GetIfTable, 12, iphlpapi, 1)
 LoadDLLfuncEx (GetIpAddrTable, 12, iphlpapi, 1)
@@ -474,12 +491,14 @@ LoadDLLfunc (CoInitialize, 4, ole32)
 LoadDLLfunc (CoUninitialize, 0, ole32)
 LoadDLLfunc (CoCreateInstance, 20, ole32)
 
-LoadDLLfuncEx (SignalObjectAndWait, 16, kernel32, 1)
 LoadDLLfuncEx (CancelIo, 4, kernel32, 1)
+LoadDLLfuncEx (CreateHardLinkA, 12, kernel32, 1)
+LoadDLLfuncEx (CreateToolhelp32Snapshot, 8, kernel32, 1)
+LoadDLLfuncEx (GetConsoleWindow, 0, kernel32, 1)
+LoadDLLfuncEx2 (IsDebuggerPresent, 0, kernel32, 1, 1)
 LoadDLLfuncEx (Process32First, 8, kernel32, 1)
 LoadDLLfuncEx (Process32Next, 8, kernel32, 1)
-LoadDLLfuncEx (CreateToolhelp32Snapshot, 8, kernel32, 1)
-LoadDLLfuncEx (CreateHardLinkA, 12, kernel32, 1)
+LoadDLLfuncEx (SignalObjectAndWait, 16, kernel32, 1)
 LoadDLLfunc (TryEnterCriticalSection, 4, kernel32)
 
 LoadDLLfuncEx (waveOutGetNumDevs, 0, winmm, 1)
@@ -491,4 +510,8 @@ LoadDLLfuncEx (waveOutSetVolume, 8, winmm, 1)
 LoadDLLfuncEx (waveOutUnprepareHeader, 12, winmm, 1)
 LoadDLLfuncEx (waveOutPrepareHeader, 12, winmm, 1)
 LoadDLLfuncEx (waveOutWrite, 12, winmm, 1)
+LoadDLLfuncEx (timeGetDevCaps, 8, winmm, 1)
+LoadDLLfuncEx (timeGetTime, 0, winmm, 1)
+LoadDLLfuncEx (timeBeginPeriod, 4, winmm, 1)
+LoadDLLfuncEx (timeEndPeriod, 4, winmm, 1)
 }

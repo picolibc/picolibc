@@ -42,8 +42,9 @@ extern "C"
 #define PTHREAD_CANCEL_ENABLE 0
 #define PTHREAD_CANCEL_DEFERRED 0
 #define PTHREAD_CANCEL_DISABLE 1
-#define PTHREAD_CANCELED
-#define PTHREAD_COND_INITIALIZER
+#define PTHREAD_CANCELED ((void *)-1)
+/* this should be a value that can never be a valid address */
+#define PTHREAD_COND_INITIALIZER (void *)21
 #define PTHREAD_CREATE_DETACHED 1
 /* the default : joinable */
 #define PTHREAD_CREATE_JOINABLE 0
@@ -83,7 +84,7 @@ int pthread_attr_setscope (pthread_attr_t *, int);
 
 #ifdef _POSIX_THREAD_ATTR_STACKADDR
 /* These functions may be implementable via some low level trickery. For now they are
- * Not supported or implemented. The prototypes are here so if someone greps the 
+ * Not supported or implemented. The prototypes are here so if someone greps the
  * source they will see these comments
  */
 int pthread_attr_getstackaddr (const pthread_attr_t *, void **);
@@ -96,16 +97,26 @@ int pthread_attr_setstacksize (pthread_attr_t *, size_t);
 #endif
 
 int pthread_cancel (pthread_t);
-/* Macros for cleanup_push and pop; 
+/* Macros for cleanup_push and pop;
  * The function definitions are
 void pthread_cleanup_push (void (*routine)(void*), void *arg);
 void pthread_cleanup_pop (int execute);
 */
 typedef void (*__cleanup_routine_type) (void *);
+typedef struct _pthread_cleanup_handler 
+{
+  __cleanup_routine_type function;
+  void *arg;
+  struct _pthread_cleanup_handler *next;
+} __pthread_cleanup_handler;
 
-#define pthread_cleanup_push(fn, arg) { __cleanup_routine_type __cleanup_routine=fn; \
-void *__cleanup_param=arg;
-#define pthread_cleanup_pop(execute) if (execute) __cleanup_routine(__cleanup_param); }
+void _pthread_cleanup_push (__pthread_cleanup_handler *handler);
+void _pthread_cleanup_pop (int execute);
+
+#define pthread_cleanup_push(_fn, _arg) { __pthread_cleanup_handler __cleanup_handler = \
+                                         { _fn, _arg, NULL }; \
+                                         _pthread_cleanup_push( &__cleanup_handler );
+#define pthread_cleanup_pop(_execute) _pthread_cleanup_pop( _execute ); }
 
 /* Condition variables */
 int pthread_cond_broadcast (pthread_cond_t *);

@@ -1,6 +1,6 @@
 /* wincap.h: Header for OS capability class.
 
-   Copyright 2001 Red Hat, Inc.
+   Copyright 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -12,7 +12,7 @@ details. */
 #define _WINCAP_H
 
 struct wincaps
-{ 
+{
   DWORD    lock_file_highword;
   DWORD    chunksize;
   int      shared;
@@ -23,7 +23,6 @@ struct wincaps
   unsigned has_security                                 : 1;
   unsigned has_security_descriptor_control              : 1;
   unsigned has_get_process_times                        : 1;
-  unsigned has_specific_access_rights                   : 1;
   unsigned has_lseek_bug                                : 1;
   unsigned has_lock_file_ex                             : 1;
   unsigned has_signal_object_and_wait                   : 1;
@@ -44,6 +43,11 @@ struct wincaps
   unsigned has_negative_pids                            : 1;
   unsigned has_unreliable_pipes                         : 1;
   unsigned has_try_enter_critical_section		: 1;
+  unsigned has_raw_devices				: 1;
+  unsigned has_valid_processorlevel			: 1;
+  unsigned has_64bit_file_access			: 1;
+  unsigned has_process_io_counters                      : 1;
+  unsigned supports_reading_modem_output_lines          : 1;
 };
 
 class wincapc
@@ -56,7 +60,7 @@ public:
   void init ();
 
   void set_chunksize (DWORD nchunksize);
-  
+
   const char *osname () const { return osnam; }
 
 #define IMPLEMENT(cap) cap() const { return ((wincaps *)this->caps)->cap; }
@@ -71,7 +75,6 @@ public:
   bool  IMPLEMENT (has_security)
   bool  IMPLEMENT (has_security_descriptor_control)
   bool  IMPLEMENT (has_get_process_times)
-  bool  IMPLEMENT (has_specific_access_rights)
   bool  IMPLEMENT (has_lseek_bug)
   bool  IMPLEMENT (has_lock_file_ex)
   bool  IMPLEMENT (has_signal_object_and_wait)
@@ -92,6 +95,11 @@ public:
   bool  IMPLEMENT (has_negative_pids)
   bool  IMPLEMENT (has_unreliable_pipes)
   bool  IMPLEMENT (has_try_enter_critical_section)
+  bool  IMPLEMENT (has_raw_devices)
+  bool  IMPLEMENT (has_valid_processorlevel)
+  bool  IMPLEMENT (has_64bit_file_access)
+  bool  IMPLEMENT (has_process_io_counters)
+  bool  IMPLEMENT (supports_reading_modem_output_lines)
 
 #undef IMPLEMENT
 };

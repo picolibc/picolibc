@@ -1,6 +1,6 @@
 /* strace.cc: system/windows tracing
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -14,52 +14,58 @@ details. */
 #include <wingdi.h>
 #include <winuser.h>
 #include <ctype.h>
-#include "sync.h"
-#include "sigproc.h"
 #include "pinfo.h"
+#include "perprocess.h"
+#include "cygwin_version.h"
+#include "hires.h"
+#include "cygthread.h"
 
 #define PROTECT(x) x[sizeof(x)-1] = 0
-#define CHECK(x) if (x[sizeof(x)-1] != 0) { small_printf("array bound exceeded %d\n", __LINE__); ExitProcess(1); }
+#define CHECK(x) if (x[sizeof(x)-1] != 0) { small_printf ("array bound exceeded %d\n", __LINE__); ExitProcess (1); }
 
-class NO_COPY strace strace;
-
-/* 'twould be nice to declare this in winsup.h but winsup.h doesn't require
-   stdarg.h, so we declare it here instead. */
+class strace NO_COPY strace;
 
 #ifndef NOSTRACE
 
-int
-strace::microseconds()
+void
+strace::hello ()
 {
-  static NO_COPY int first_microsec = 0;
-  static NO_COPY long long hires_frequency = 0;
-  static NO_COPY int hires_initted = 0;
+  char buf[30];
 
-  int microsec;
+  if (inited)
+    {
+      active ^= 1;
+      return;
+    }
 
-  if (!hires_initted)
+  inited = 1;
+  if (!being_debugged ())
+    return;
+
+  __small_sprintf (buf, "cYg%8x %x", _STRACE_INTERFACE_ACTIVATE_ADDR, &active);
+  OutputDebugString (buf);
+
+  if (active)
     {
-      hires_initted = 1;
-      QueryPerformanceFrequency ((LARGE_INTEGER *) &hires_frequency);
-      if (hires_frequency == 0)
-	  hires_initted = 2;
+      prntf (1, NULL, "**********************************************");
+      prntf (1, NULL, "Program name: %s (%d)", myself->progname, myself->pid ?: GetCurrentProcessId ());
+      prntf (1, NULL, "App version:  %d.%d, api: %d.%d",
+	     user_data->dll_major, user_data->dll_minor,
+	     user_data->api_major, user_data->api_minor);
+      prntf (1, NULL, "DLL version:  %d.%d, api: %d.%d",
+	     cygwin_version.dll_major, cygwin_version.dll_minor,
+	     cygwin_version.api_major, cygwin_version.api_minor);
+      prntf (1, NULL, "DLL build:    %s", cygwin_version.dll_build_date);
+      prntf (1, NULL, "OS version:   Windows %s", wincap.osname ());
+      prntf (1, NULL, "**********************************************");
     }
-  if (hires_initted == 2)
-    {
-      int count = GetTickCount ();
-      microsec = count * 1000;
-    }
-  else
-    {
-      long long thiscount;
-      QueryPerformanceCounter ((LARGE_INTEGER *) &thiscount);
-      thiscount = (long long) (((double) thiscount/(double) hires_frequency)
-			       * 1000000.0);
-      microsec = thiscount;
-    }
-  if (first_microsec == 0)
-    first_microsec = microsec;
-  return microsec - first_microsec;
+}
+
+int
+strace::microseconds ()
+{
+  static hires_us now;
+  return (int) now.usecs (true);
 }
 
 static int __stdcall
@@ -106,8 +112,8 @@ strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
   char fmt[80];
   static NO_COPY int nonewline = FALSE;
   DWORD err = GetLastError ();
-  const char *tn = threadname (0);
-  char *pn = __progname ?: myself->progname;
+  const char *tn = cygthread::name ();
+  char *pn = __progname ?: (myself ? myself->progname : NULL);
 
   int microsec = microseconds ();
   lmicrosec = microsec;
@@ -133,7 +139,8 @@ strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
       if ((p = strrchr (progname, '.')) != NULL && strcasematch (p, ".exe"))
 	*p = '\000';
       p = progname;
-      count = __small_sprintf (buf, fmt, p && *p ? p : "?", myself->pid,
+      count = __small_sprintf (buf, fmt, p && *p ? p : "?",
+			       myself->pid ?: GetCurrentProcessId (),
 			       execing ? "!" : "");
       if (func)
 	count += getfunc (buf + count, func);
@@ -189,11 +196,11 @@ strace::vprntf (unsigned category, const char *func, const char *fmt, va_list ap
   int count;
   char buf[10000];
 
-  PROTECT(buf);
+  PROTECT (buf);
   SetLastError (err);
 
   count = this->vsprntf (buf, func, fmt, ap);
-  CHECK(buf);
+  CHECK (buf);
   if (category & _STRACE_SYSTEM)
     {
       DWORD done;
@@ -229,7 +236,7 @@ strace_printf (unsigned category, const char *func, const char *fmt, ...)
     }
 }
 
-static NO_COPY const struct tab
+static NO_COPY struct tab
 {
   int v;
   const char *n;

@@ -1,7 +1,7 @@
 /* fhandler_tape.cc.  See fhandler.h for a description of the fhandler
    classes.
 
-   Copyright 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -11,7 +11,6 @@ details. */
 
 #include "winsup.h"
 #include <sys/termios.h>
-#include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
 #include <sys/mtio.h>
@@ -29,7 +28,6 @@ details. */
 void
 fhandler_dev_tape::clear (void)
 {
-  norewind = 0;
   lasterr = 0;
   fhandler_dev_raw::clear ();
 }
@@ -55,34 +53,27 @@ fhandler_dev_tape::is_eof (int win_error)
   return ret;
 }
 
-fhandler_dev_tape::fhandler_dev_tape (const char *name, int unit) : fhandler_dev_raw (FH_TAPE, name, unit)
+fhandler_dev_tape::fhandler_dev_tape (int unit)
+  : fhandler_dev_raw (FH_TAPE, unit)
 {
-  set_cb (sizeof *this);
+  debug_printf ("unit: %d", unit);
 }
 
 int
-fhandler_dev_tape::open (const char *path, int flags, mode_t)
+fhandler_dev_tape::open (path_conv *real_path, int flags, mode_t)
 {
   int ret;
-  int minor;
 
-  if (get_device_number (path, minor) != FH_TAPE)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-
-  norewind = (minor >= 128);
   devbufsiz = 1L;
 
-  ret = fhandler_dev_raw::open (path, flags);
+  ret = fhandler_dev_raw::open (real_path, flags);
   if (ret)
     {
       struct mtget get;
       struct mtop op;
       struct mtpos pos;
 
-      if (! ioctl (MTIOCGET, &get))
+      if (!ioctl (MTIOCGET, &get))
 	/* Tape drive supports and is set to variable block size. */
 	if (get.mt_dsreg == 0)
 	  devbufsiz = get.mt_maxblksize;
@@ -138,7 +129,7 @@ fhandler_dev_tape::close (void)
   // To protected reads on signaling (e.g. Ctrl-C)
   eof_detected = 1;
 
-  if (! norewind)
+  if (is_rewind_device ())
     {
       debug_printf ("rewinding\n");
       op.mt_op = MTREW;
@@ -155,25 +146,23 @@ fhandler_dev_tape::close (void)
 }
 
 int
-fhandler_dev_tape::fstat (struct stat *buf)
+fhandler_dev_tape::fstat (struct __stat64 *buf, path_conv *pc)
 {
   int ret;
 
-  if (! (ret = fhandler_dev_raw::fstat (buf)))
+  if (!(ret = fhandler_base::fstat (buf, pc)))
     {
       struct mtget get;
 
-      if (! ioctl (MTIOCGET, &get))
-	{
-	  buf->st_blocks = get.mt_capacity / buf->st_blksize;
-	}
+      if (!ioctl (MTIOCGET, &get))
+	buf->st_blocks = get.mt_capacity / buf->st_blksize;
     }
 
   return ret;
 }
 
-off_t
-fhandler_dev_tape::lseek (off_t offset, int whence)
+__off64_t
+fhandler_dev_tape::lseek (__off64_t offset, int whence)
 {
   struct mtop op;
   struct mtpos pos;
@@ -187,7 +176,7 @@ fhandler_dev_tape::lseek (off_t offset, int whence)
 
   if (ioctl (MTIOCPOS, &pos))
     {
-      return (off_t) -1;
+      return ILLEGAL_SEEK;
     }
 
   switch (whence)
@@ -233,7 +222,6 @@ fhandler_dev_tape::dup (fhandler_base *child)
 {
   fhandler_dev_tape *fhc = (fhandler_dev_tape *) child;
 
-  fhc->norewind = norewind;
   fhc->lasterr = lasterr;
   return fhandler_dev_raw::dup (child);
 }
@@ -359,8 +347,8 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 		    }
 		  if (devbufsiz > 1L && size > 1L)
 		    {
-		      memcpy(buf, devbuf + devbufstart,
-			     devbufend - devbufstart);
+		      memcpy (buf, devbuf + devbufstart,
+			      devbufend - devbufstart);
 		      devbufend -= devbufstart;
 		    }
 		  else
@@ -701,7 +689,7 @@ fhandler_dev_tape::tape_set_blocksize (long count)
   if (lasterr)
     return lasterr;
 
-  if (count < min || count > max)
+  if (count != 0 && (count < min || count > max))
     return tape_error (ERROR_INVALID_PARAMETER, "tape_set_blocksize");
 
   mp.BlockSize = count;
@@ -804,6 +792,7 @@ fhandler_dev_tape::tape_status (struct mtget *get)
   get->mt_defblksize = dp.DefaultBlockSize;
   get->mt_featureslow = dp.FeaturesLow;
   get->mt_featureshigh = dp.FeaturesHigh;
+  get->mt_eotwarningzonesize = dp.EOTWarningZoneSize;
 
   return 0;
 }

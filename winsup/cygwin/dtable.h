@@ -48,11 +48,14 @@ public:
   void fixup_before_exec (DWORD win_proc_id);
   void fixup_before_fork (DWORD win_proc_id);
   void fixup_after_fork (HANDLE);
-  fhandler_base *build_fhandler (int fd, DWORD dev, const char *name,
-				 int unit = -1);
-  fhandler_base *build_fhandler (int fd, const char *name, HANDLE h,
-      				 path_conv& pc, unsigned opts = PC_SYM_FOLLOW,
-				 suffix_info *si = NULL);
+  fhandler_base *build_fhandler (int fd, DWORD dev, const char *unix_name,
+				 const char *win32_name = NULL, int unit = -1);
+  fhandler_base *build_fhandler (int fd, DWORD dev, char *unix_name = NULL,
+				 const char *win32_name = NULL, int unit = -1);
+  fhandler_base *build_fhandler_from_name (int fd, const char *name, HANDLE h,
+					   path_conv& pc,
+					   unsigned opts = PC_SYM_FOLLOW,
+					   suffix_info *si = NULL);
   inline int not_open (int fd)
   {
     SetResourceLock (LOCK_FD_LIST, READ_LOCK, "not_open");
@@ -62,7 +65,6 @@ public:
     ReleaseResourceLock (LOCK_FD_LIST, READ_LOCK, "not open");
     return res;
   }
-  void reset_unix_path_name (int fd, const char *name);
   int find_unused_handle (int start);
   int find_unused_handle () { return find_unused_handle (first_fd_for_open);}
   void release (int fd);
@@ -74,6 +76,8 @@ public:
   select_record *select_write (int fd, select_record *s);
   select_record *select_except (int fd, select_record *s);
   operator fhandler_base **() {return fds;}
+  void stdio_init ();
+  void get_debugger_info ();
 };
 
 void dtable_init (void);

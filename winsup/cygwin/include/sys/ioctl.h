@@ -1,6 +1,6 @@
 /* sys/ioctl.h
 
-   Copyright 1998, 2001 Red Hat, Inc.
+   Copyright 1998, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -23,7 +23,7 @@ details. */
 
 __BEGIN_DECLS
 
-int ioctl (int __fd, int __cmd, void *);
+int ioctl (int __fd, int __cmd, ...);
 
 __END_DECLS
 

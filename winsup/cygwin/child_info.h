@@ -1,6 +1,6 @@
-/* childinfo.h: shared child info for cygwin
+/* child_info.h: shared child info for cygwin
 
-   Copyright 2000 Red Hat, Inc.
+   Copyright 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -12,26 +12,36 @@ details. */
 
 enum
 {
-  PROC_MAGIC = 0xaf12f000,
-  PROC_FORK = PROC_MAGIC + 1,
-  PROC_EXEC = PROC_MAGIC + 2,
-  PROC_SPAWN = PROC_MAGIC + 3,
-  PROC_FORK1 = PROC_MAGIC + 4,	// Newer versions provide stack
-				// location information
-  PROC_SPAWN1 = PROC_MAGIC + 5
+  _PROC_EXEC,
+  _PROC_SPAWN,
+  _PROC_FORK,
+  _PROC_WHOOPS
 };
 
-#define PROC_MAGIC_MASK 0xff00f000
-#define PROC_MAGIC_GENERIC 0xaf00f000
-#define PROC_MAGIC_VER_MASK 0x0ff0000
+#define OPROC_MAGIC_MASK 0xff00ff00
+#define OPROC_MAGIC_GENERIC 0xaf00f000
+
+#define PROC_MAGIC_GENERIC 0xaf00fa00
+
+#define PROC_EXEC (_PROC_EXEC)
+#define PROC_SPAWN (_PROC_SPAWN)
+#define PROC_FORK (_PROC_FORK)
 
 #define EXEC_MAGIC_SIZE sizeof(child_info)
+
+#define CURR_CHILD_INFO_MAGIC 0xb3836013U
+
+/* NOTE: Do not make gratuitous changes to the names or organization of the
+   below class.  The layout is checksummed to determine compatibility between
+   different cygwin versions. */
 class child_info
 {
 public:
   DWORD zero[4];	// must be zeroed
   DWORD cb;		// size of this record
-  DWORD type;		// type of record
+  DWORD intro;		// improbable string
+  unsigned long magic;	// magic number unique to child_info
+  unsigned short type;	// type of record, exec, spawn, fork
   int cygpid;		// cygwin pid of child process
   HANDLE subproc_ready;	// used for synchronization with parent
   HANDLE mount_h;
@@ -40,6 +50,7 @@ public:
   init_cygheap *cygheap;
   void *cygheap_max;
   HANDLE cygheap_h;
+  unsigned fhandler_union_cb;
 };
 
 class child_info_fork: public child_info
@@ -60,7 +71,7 @@ class fhandler_base;
 class cygheap_exec_info
 {
 public:
-  uid_t uid;
+  __uid32_t uid;
   char *old_title;
   int argc;
   char **argv;
@@ -98,4 +109,6 @@ public:
 
 void __stdcall init_child_info (DWORD, child_info *, int, HANDLE);
 
-extern child_info_fork *child_proc_info;
+extern child_info *child_proc_info;
+extern child_info_spawn *spawn_info __attribute__ ((alias ("child_proc_info")));
+extern child_info_fork *fork_info __attribute__ ((alias ("child_proc_info")));

@@ -1,6 +1,6 @@
 /* cygheap.cc: Cygwin heap manager.
 
-   Copyright 2000, 2001 Red Hat, Inc.
+   Copyright 2000, 2001, 2002 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -17,10 +17,10 @@
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
+#include "cygerrno.h"
 #include "cygheap.h"
 #include "child_info.h"
 #include "heap.h"
-#include "cygerrno.h"
 #include "sync.h"
 #include "shared_info.h"
 
@@ -45,7 +45,6 @@ struct cygheap_entry
 
 extern "C" {
 static void __stdcall _cfree (void *ptr) __attribute__((regparm(1)));
-extern void *_cygheap_start;
 }
 
 inline static void
@@ -57,11 +56,11 @@ init_cheap ()
       MEMORY_BASIC_INFORMATION m;
       if (!VirtualQuery ((LPCVOID) &_cygheap_start, &m, sizeof m))
 	system_printf ("couldn't get memory info, %E");
-      small_printf ("AllocationBase %p, BaseAddress %p, RegionSize %p, State %p\n",
-		    m.AllocationBase, m.BaseAddress, m.RegionSize, m.State);
-      api_fatal ("Couldn't reserve space for cygwin's heap, %E");
+      system_printf ("Couldn't reserve space for cygwin's heap, %E");
+      api_fatal ("AllocationBase %p, BaseAddress %p, RegionSize %p, State %p\n",
+		 m.AllocationBase, m.BaseAddress, m.RegionSize, m.State);
     }
-  cygheap_max = cygheap + 1;
+  cygheap_max = cygheap;
 }
 
 static void dup_now (void *, child_info *, unsigned) __attribute__ ((regparm(3)));
@@ -82,7 +81,7 @@ cygheap_setup_for_child (child_info *ci, bool dup_later)
   ci->cygheap_h = CreateFileMapping (INVALID_HANDLE_VALUE, &sec_none,
 				     CFMAP_OPTIONS, 0, CYGHEAPSIZE, NULL);
   newcygheap = MapViewOfFileEx (ci->cygheap_h, MVMAP_OPTIONS, 0, 0, 0, NULL);
-  ProtectHandle1 (ci->cygheap_h, passed_cygheap_h);
+  ProtectHandle1INH (ci->cygheap_h, passed_cygheap_h);
   if (!dup_later)
     dup_now (newcygheap, ci, n);
   cygheap_protect->release ();
@@ -93,12 +92,12 @@ cygheap_setup_for_child (child_info *ci, bool dup_later)
 
 void __stdcall
 cygheap_setup_for_child_cleanup (void *newcygheap, child_info *ci,
-    				 bool dup_it_now)
+				 bool dup_it_now)
 {
   if (dup_it_now)
     {
       /* NOTE: There is an assumption here that cygheap_max has not changed
-         between the time that cygheap_setup_for_child was called and now.
+	 between the time that cygheap_setup_for_child was called and now.
 	 Make sure that this is a correct assumption.  */
       cygheap_protect->acquire ();
       dup_now (newcygheap, ci, (char *) cygheap_max - (char *) cygheap);
@@ -110,31 +109,31 @@ cygheap_setup_for_child_cleanup (void *newcygheap, child_info *ci,
 
 /* Called by fork or spawn to reallocate cygwin heap */
 void __stdcall
-cygheap_fixup_in_child (child_info *ci, bool execed)
+cygheap_fixup_in_child (bool execed)
 {
-  cygheap = ci->cygheap;
-  cygheap_max = ci->cygheap_max;
+  cygheap = child_proc_info->cygheap;
+  cygheap_max = child_proc_info->cygheap_max;
   void *addr = !wincap.map_view_of_file_ex_sucks () ? cygheap : NULL;
   void *newaddr;
 
-  newaddr = MapViewOfFileEx (ci->cygheap_h, MVMAP_OPTIONS, 0, 0, 0, addr);
+  newaddr = MapViewOfFileEx (child_proc_info->cygheap_h, MVMAP_OPTIONS, 0, 0, 0, addr);
   if (newaddr != cygheap)
     {
       if (!newaddr)
-	newaddr = MapViewOfFileEx (ci->cygheap_h, MVMAP_OPTIONS, 0, 0, 0, NULL);
+	newaddr = MapViewOfFileEx (child_proc_info->cygheap_h, MVMAP_OPTIONS, 0, 0, 0, NULL);
       DWORD n = (DWORD) cygheap_max - (DWORD) cygheap;
       /* Reserve cygwin heap in same spot as parent */
       if (!VirtualAlloc (cygheap, CYGHEAPSIZE, MEM_RESERVE, PAGE_NOACCESS))
-      {
-	MEMORY_BASIC_INFORMATION m;
-	memset (&m, 0, sizeof m);
-	if (!VirtualQuery ((LPCVOID) cygheap, &m, sizeof m))
-	  system_printf ("couldn't get memory info, %E");
+	{
+	  MEMORY_BASIC_INFORMATION m;
+	  memset (&m, 0, sizeof m);
+	  if (!VirtualQuery ((LPCVOID) cygheap, &m, sizeof m))
+	    system_printf ("couldn't get memory info, %E");
 
-	small_printf ("m.AllocationBase %p, m.BaseAddress %p, m.RegionSize %p, m.State %p\n",
-		      m.AllocationBase, m.BaseAddress, m.RegionSize, m.State);
-	api_fatal ("Couldn't reserve space for cygwin's heap (%p <%p>) in child, %E", cygheap, newaddr);
-      }
+	  system_printf ("Couldn't reserve space for cygwin's heap (%p <%p>) in child, %E", cygheap, newaddr);
+	  api_fatal ("m.AllocationBase %p, m.BaseAddress %p, m.RegionSize %p, m.State %p\n",
+		     m.AllocationBase, m.BaseAddress, m.RegionSize, m.State);
+	}
 
       /* Allocate same amount of memory as parent */
       if (!VirtualAlloc (cygheap, n, MEM_COMMIT, PAGE_READWRITE))
@@ -144,9 +143,10 @@ cygheap_fixup_in_child (child_info *ci, bool execed)
       UnmapViewOfFile (newaddr);
     }
 
-  ForceCloseHandle1 (ci->cygheap_h, passed_cygheap_h);
+  ForceCloseHandle1 (child_proc_info->cygheap_h, passed_cygheap_h);
 
   cygheap_init ();
+  debug_fixup_after_fork_exec ();
 
   if (execed)
     {
@@ -171,34 +171,26 @@ cygheap_fixup_in_child (child_info *ci, bool execed)
 static void *__stdcall
 _csbrk (int sbs)
 {
-  void *lastheap;
-  bool needalloc;
-
-  if (cygheap)
-    needalloc = 0;
-  else
-    {
-      init_cheap ();
-      needalloc = 1;
-    }
-
-  lastheap = cygheap_max;
+  void *prebrk = cygheap_max;
+  void *prebrka = pagetrunc (prebrk);
   (char *) cygheap_max += sbs;
-  void *heapalign = (void *) pagetrunc (lastheap);
-
-  if (!needalloc)
-    needalloc = sbs && ((heapalign == lastheap) || heapalign != pagetrunc (cygheap_max));
-  if (needalloc && !VirtualAlloc (lastheap, (DWORD) sbs ?: 1, MEM_COMMIT, PAGE_READWRITE))
+  if (!sbs || (prebrk != prebrka && prebrka == pagetrunc (cygheap_max)))
+    /* nothing to do */;
+  else if (!VirtualAlloc (prebrk, (DWORD) sbs, MEM_COMMIT, PAGE_READWRITE))
     api_fatal ("couldn't commit memory for cygwin heap, %E");
 
-  return lastheap;
+  return prebrk;
 }
 
 extern "C" void __stdcall
 cygheap_init ()
 {
-  cygheap_protect = new_muto (FALSE, "cygheap_protect");
-  _csbrk (0);
+  new_muto (cygheap_protect);
+  if (!cygheap)
+    {
+      init_cheap ();
+      (void) _csbrk (sizeof (*cygheap));
+    }
   if (!cygheap->fdtab)
     cygheap->fdtab.init ();
 }
@@ -322,10 +314,17 @@ crealloc (void *s, DWORD n)
 extern "C" void __stdcall
 cfree (void *s)
 {
-  MALLOC_CHECK;
   assert (!inheap (s));
   (void) _cfree (tocygheap (s));
   MALLOC_CHECK;
+}
+
+extern "C" void __stdcall
+cfree_and_set (char *&s, char *what)
+{
+  if (s && s != almost_null)
+    cfree (s);
+  s = what;
 }
 
 extern "C" void *__stdcall
@@ -378,13 +377,13 @@ init_cygheap::etc_changed ()
 					      FILE_NOTIFY_CHANGE_LAST_WRITE);
       if (etc_changed_h == INVALID_HANDLE_VALUE)
 	system_printf ("Can't open /etc for checking, %E", (char *) pwd,
-	    	       etc_changed_h);
+		       etc_changed_h);
       else if (!DuplicateHandle (hMainProc, etc_changed_h, hMainProc,
-	    			 &etc_changed_h, 0, TRUE,
+				 &etc_changed_h, 0, TRUE,
 				 DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
 	{
 	  system_printf ("Can't inherit /etc handle, %E", (char *) pwd,
-	      		 etc_changed_h);
+			 etc_changed_h);
 	  etc_changed_h = INVALID_HANDLE_VALUE;
 	}
     }
@@ -430,7 +429,7 @@ cygheap_user::~cygheap_user ()
   if (pname)
     cfree (pname);
   if (plogsrv)
-    cfree (plogsrv);
+    cfree (plogsrv - 2);
   if (pdomain)
     cfree (pdomain);
   if (psid)
@@ -441,41 +440,47 @@ cygheap_user::~cygheap_user ()
 void
 cygheap_user::set_name (const char *new_name)
 {
-  if (pname)
-    cfree (pname);
+  bool allocated = !!pname;
+
+  if (allocated)
+    {
+      if (strcasematch (new_name, pname))
+	return;
+      cfree (pname);
+    }
+
   pname = cstrdup (new_name ? new_name : "");
-}
+  if (!allocated)
+    return;		/* Initializing.  Don't bother with other stuff. */
 
-void
-cygheap_user::set_logsrv (const char *new_logsrv)
-{
-  if (plogsrv)
-    cfree (plogsrv);
-  plogsrv = (new_logsrv && *new_logsrv) ? cstrdup (new_logsrv) : NULL;
-}
-
-void
-cygheap_user::set_domain (const char *new_domain)
-{
-  if (pdomain)
-    cfree (pdomain);
-  pdomain = (new_domain && *new_domain) ? cstrdup (new_domain) : NULL;
+  cfree_and_set (homedrive);
+  cfree_and_set (homepath);
+  cfree_and_set (plogsrv);
+  cfree_and_set (pdomain);
+  cfree_and_set (pwinname);
 }
 
 BOOL
 cygheap_user::set_sid (PSID new_sid)
 {
-  if (!new_sid)
-    {
-      if (psid)
-	cfree (psid);
-      psid = NULL;
-      return TRUE;
-    }
-  else
+  if (new_sid)
     {
       if (!psid)
 	psid = cmalloc (HEAP_STR, MAX_SID_LEN);
-      return CopySid (MAX_SID_LEN, psid, new_sid);
+      if (psid)
+	return CopySid (MAX_SID_LEN, psid, new_sid);
     }
+  return FALSE;
+}
+
+BOOL
+cygheap_user::set_orig_sid ()
+{
+  if (psid)
+    {
+      if (!orig_psid) orig_psid = cmalloc (HEAP_STR, MAX_SID_LEN);
+      if (orig_psid)
+	  return CopySid (MAX_SID_LEN, orig_psid, psid);
+    }
+  return FALSE;
 }

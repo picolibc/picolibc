@@ -4,15 +4,12 @@
 */
 /* Temporarily merged private.h and tzfile.h for ease of management - DJ */
 
-/* CYGNUS LOCAL */
 #include "winsup.h"
 #include "cygerrno.h"
 #include <windows.h>
 #define lint
 
 #define USG_COMPAT
-
-/* END CYGNUS LOCAL */
 
 #ifndef lint
 #ifndef NOID
@@ -501,7 +498,7 @@ struct tzhead {
 
 static char wildabbr[] NO_COPY = WILDABBR;
 
-static const char gmt[] NO_COPY = "GMT";
+static char gmt[] NO_COPY = "GMT";
 
 struct ttinfo {				/* time type information */
 	long		tt_gmtoff;	/* UTC offset in seconds */
@@ -1399,10 +1396,10 @@ tzsetwall P((void))
 	    dst = cp = buf;
 	    for (src = tz.StandardName; *src; src++)
 	      if (is_upper(*src)) *dst++ = *src;
-	    if (cp == dst)
+	    if ((dst - cp) < 3)
 	      {
-		/* In Asian Windows, tz.StandardName may not contain
-		   the timezone name. */
+		/* In non-english Windows, converted tz.StandardName
+		   may not contain a valid standard timezone name. */
 		strcpy(cp, wildabbr);
 		cp += strlen(wildabbr);
 	      }
@@ -1417,11 +1414,11 @@ tzsetwall P((void))
 		dst = cp;
 		for (src = tz.DaylightName; *src; src++)
 		  if (is_upper(*src)) *dst++ = *src;
-		if (cp == dst)
+		if ((dst - cp) < 3)
 		  {
-		    /* In Asian Windows, tz.StandardName may not contain
-		       the daylight name. */
-		    strcpy(buf, wildabbr);
+		    /* In non-english Windows, converted tz.DaylightName
+		       may not contain a valid daylight timezone name. */
+		    strcpy(cp, wildabbr);
 		    cp += strlen(wildabbr);
 		  }
 		else

@@ -4,8 +4,12 @@ EXPORTS
 __assert
 __eprintf
 __errno
+__fpclassifyd
+__fpclassifyf
 __infinity
 __main
+__signbitd
+__signbitf
 __signgam
 __srget
 __swbuf
@@ -80,8 +84,8 @@ cabs
 _cabs = cabs
 cabsf
 _cabsf = cabsf
-calloc = export_calloc
-_calloc = export_calloc
+calloc
+_calloc = calloc
 cbrt
 _cbrt = cbrt
 cbrtf
@@ -100,13 +104,14 @@ chmod
 _chmod = chmod
 chown
 _chown = chown
+chown32
 cleanup_glue
 clearerr
 _clearerr = clearerr
 clock
 _clock = clock
-close
-_close = close
+_close
+close = _close
 closedir
 _closedir = closedir
 copysign
@@ -159,6 +164,8 @@ ecvtf
 _ecvtf = ecvtf
 endgrent
 _endgrent = endgrent
+endutent
+_endutent = endutent
 erf
 _erf = erf
 erfc
@@ -203,10 +210,15 @@ fchmod
 _fchmod = fchmod
 fchown
 _fchown = fchown
+fchown32
 fclose
 _fclose = fclose
-fcntl
-_fcntl = fcntl
+fcloseall
+_fcloseall = fcloseall
+_fcloseall_r
+fcloseall_r = _fcloseall_r
+_fcntl
+fcntl = _fcntl
 fcvt
 _fcvt = fcvt
 fcvtbuf
@@ -261,6 +273,8 @@ floor
 _floor = floor
 floorf
 _floorf = floorf
+fnmatch
+_fnmatch = fnmatch
 fmod
 _fmod = fmod
 fmodf
@@ -282,8 +296,8 @@ fputs
 _fputs = fputs
 fread
 _fread = fread
-free = export_free
-_free = export_free
+free
+_free = free
 freopen
 _freopen = freopen
 frexp
@@ -298,8 +312,9 @@ fseek
 _fseek = fseek
 fsetpos
 _fsetpos = fsetpos
-fstat
-_fstat = fstat
+_fstat
+fstat = _fstat
+fstat64
 fstatfs
 _fstatfs = fstatfs
 fsync
@@ -314,6 +329,7 @@ ftime
 _ftime = ftime
 ftruncate
 _ftruncate = ftruncate
+ftruncate64
 fwrite
 _fwrite = fwrite
 gamma
@@ -330,24 +346,34 @@ gcvtf
 _gcvtf = gcvtf
 getc
 _getc = getc
+getc_unlocked
+_getc_unlocked = getc_unlocked
 getchar
 _getchar = getchar
+getchar_unlocked
+_getchar_unlocked = getchar_unlocked
 getcwd
 _getcwd = getcwd
 getdtablesize
 _getdtablesize = getdtablesize
 getegid
 _getegid = getegid
+getegid32
 geteuid
 _geteuid = geteuid
+geteuid32
 getgid
 _getgid = getgid
+getgid32
 getgrgid
 _getgrgid = getgrgid
+getgrgid32
 getgrnam
 _getgrnam = getgrnam
+getgrnam32
 getgroups
 _getgroups = getgroups
+getgroups32
 gethostname = cygwin_gethostname
 _gethostname = cygwin_gethostname
 getlogin
@@ -372,10 +398,18 @@ getrusage
 _getrusage = getrusage
 gets
 _gets = gets
+getsid
 gettimeofday
 _gettimeofday = gettimeofday
 getuid
 _getuid = getuid
+getuid32
+getutent
+_getutent = getutent
+getutid
+_getutid = getutid
+getutline
+_getutline = getutline
 glob
 _glob = glob
 globfree
@@ -400,6 +434,7 @@ _infinity = infinity
 infinityf
 _infinityf = infinityf
 initgroups
+initgroups32
 ioctl
 _ioctl = ioctl
 iprintf
@@ -450,12 +485,13 @@ jn
 _jn = jn
 jnf
 _jnf = jnf
-kill
-_kill = kill
+_kill
+kill = _kill
 labs
 _labs = labs
 lchown
 _lchown = lchown
+lchown32
 ldexp
 _ldexp = ldexp
 ldexpf
@@ -498,12 +534,18 @@ login
 logout
 longjmp
 _longjmp = longjmp
-lseek
-_lseek = lseek
-lstat
-_lstat = lstat
-malloc = export_malloc
-_malloc = export_malloc
+_lseek
+lseek = _lseek
+lseek64
+lstat = cygwin_lstat
+_lstat = cygwin_lstat
+lstat64
+malloc
+_malloc = malloc
+malloc_stats
+malloc_trim
+malloc_usable_size
+mallopt
 matherr
 _matherr = matherr
 mblen
@@ -512,6 +554,7 @@ mbstowcs
 _mbstowcs = mbstowcs
 mbtowc
 _mbtowc = mbtowc
+memalign
 memchr
 _memchr = memchr
 memcmp
@@ -534,6 +577,7 @@ _mktemp = mktemp
 mktime
 _mktime = mktime
 mmap
+mmap64
 mprotect
 msync
 munmap
@@ -549,8 +593,8 @@ nextafter
 _nextafter = nextafter
 nextafterf
 _nextafterf = nextafterf
-open
-_open = open
+_open
+open = _open
 opendir
 _opendir = opendir
 pathconf
@@ -569,8 +613,12 @@ printf
 _printf = printf
 putc
 _putc = putc
+putc_unlocked
+_putc_unlocked = putc_unlocked
 putchar
 _putchar = putchar
+putchar_unlocked
+_putchar_unlocked = putchar_unlocked
 puts
 _puts = puts
 putw
@@ -584,34 +632,28 @@ _rand = rand
 random
 initstate
 setstate
-read
-_read = read
+_read
+read = _read
 readdir
 _readdir = readdir
 readlink
 _readlink = readlink
 readv
 _readv = readv
-realloc = export_realloc
-_realloc = export_realloc
-regcomp
-_regcomp = regcomp
-regexec
-_regexec = regexec
-regerror
-_regerror = regerror
-regfree
-_regfree = regfree
-regsub
-_regsub = regsub
+realloc
+_realloc = realloc
+posix_regcomp
+posix_regerror
+posix_regexec
+posix_regfree
 remainder
 _remainder = remainder
 remainderf
 _remainderf = remainderf
 remove
 _remove = remove
-rename
-_rename = rename
+_rename
+rename = _rename
 rewind
 _rewind = rewind
 rewinddir
@@ -642,12 +684,17 @@ _scanf_r
 scanf_r = _scanf_r
 seekdir
 _seekdir = seekdir
+seekdir64
 setbuf
 _setbuf = setbuf
 setdtablesize
 _setdtablesize = setdtablesize
 setgid
 _setgid = setgid
+setgid32
+setgroups
+_setgroups = setgroups
+setgroups32
 setjmp
 _setjmp = setjmp
 setlocale
@@ -662,10 +709,15 @@ settimeofday
 _settimeofday = settimeofday
 seteuid
 _seteuid = seteuid
+seteuid32
 setegid
 _setegid = setegid
+setegid32
 setuid
 _setuid = setuid
+setuid32
+setutent
+_setutent = setutent
 chroot
 _chroot = chroot
 setvbuf
@@ -737,8 +789,9 @@ sscanf
 _sscanf = sscanf
 _sscanf_r
 sscanf_r = _sscanf_r
-stat
-_stat = stat
+_stat
+stat = _stat
+stat64
 statfs
 _statfs = statfs
 strcasecmp
@@ -835,12 +888,13 @@ tcsetpgrp
 _tcsetpgrp = tcsetpgrp
 telldir
 _telldir = telldir
+telldir64
 tempnam
 _tempnam = tempnam
 time
 _time = time
-times
-_times = times
+_times
+times = _times
 timezone
 tmpfile
 _tmpfile = tmpfile
@@ -854,22 +908,30 @@ toupper
 _toupper = toupper
 truncate
 _truncate = truncate
+truncate64
 ttyname
 _ttyname = ttyname
 tzset
 _tzset = tzset
+ualarm
+_ualarm = ualarm
 umask
 _umask = umask
 uname
 _uname = uname
 ungetc
 _ungetc = ungetc
-unlink
-_unlink = unlink
+_unlink
+unlink = _unlink
+usleep
+_usleep = usleep
 utime
 _utime = utime
 utimes
 _utimes = utimes
+utmpname
+_utmpname = utmpname
+valloc
 vfiprintf
 _vfiprintf = vfiprintf
 vfork
@@ -894,8 +956,8 @@ vsscanf
 _vsscanf = vsscanf
 _vsscanf_r
 vsscanf_r = _vsscanf_r
-wait
-_wait = wait
+_wait
+wait = _wait
 waitpid
 _waitpid = waitpid
 wait3
@@ -904,8 +966,8 @@ wcstombs
 _wcstombs = wcstombs
 wctomb
 _wctomb = wctomb
-write
-_write = write
+_write
+write = _write
 writev
 _writev = writev
 y0
@@ -945,6 +1007,12 @@ pclose
 _pclose = pclose
 strftime
 _strftime = strftime
+strlcat
+_strlcat = strlcat
+strlcpy
+_strlcpy = strlcpy
+strptime
+_strptime = strptime
 setgrent
 _setgrent = setgrent
 cuserid
@@ -963,8 +1031,6 @@ wcscmp
 _wcscmp = wcscmp
 wcslen
 _wcslen = wcslen
-usleep
-_usleep = usleep
 wprintf
 _wprintf = wprintf
 memccpy
@@ -982,11 +1048,14 @@ _getpwnam = getpwnam
 getpwnam_r
 getpwuid
 _getpwuid = getpwuid
+getpwuid32
 getpwuid_r
+getpwuid_r32
 getpgrp
 _getpgrp = getpgrp
 getgrent
 _getgrent = getgrent
+getgrent32
 ntohl
 _ntohl = ntohl
 htonl
@@ -1025,6 +1094,8 @@ setsockopt = cygwin_setsockopt
 inet_aton = cygwin_inet_aton
 inet_ntoa = cygwin_inet_ntoa
 recvfrom = cygwin_recvfrom
+recvmsg = cygwin_recvmsg
+sendmsg = cygwin_sendmsg
 sendto = cygwin_sendto
 shutdown = cygwin_shutdown
 sethostent
@@ -1098,14 +1169,14 @@ _tzname DATA
 ptsname
 grantpt
 unlockpt
-sexecve
-sexecl
-sexecle
-sexeclp
-sexeclpe
-sexecv
-sexecp
-sexecvpe
+sexecve = sexecve_is_bad
+sexecl = sexecve_is_bad
+sexecle = sexecve_is_bad
+sexeclp = sexecve_is_bad
+sexeclpe = sexecve_is_bad
+sexecv = sexecve_is_bad
+sexecp = sexecve_is_bad
+sexecvpe = sexecve_is_bad
 ttyslot
 rcmd = cygwin_rcmd
 rresvport = cygwin_rresvport
@@ -1140,6 +1211,8 @@ pthread_attr_setschedpolicy
 pthread_attr_setscope
 pthread_attr_setstacksize
 pthread_cancel
+_pthread_cleanup_push
+_pthread_cleanup_pop
 pthread_cond_broadcast
 pthread_cond_destroy
 pthread_cond_init
@@ -1224,8 +1297,3 @@ acltotext
 _acltotext = acltotext
 aclfromtext
 _aclfromtext = aclfromtext
-ftok
-shmat
-shmctl
-shmdt
-shmget

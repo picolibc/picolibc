@@ -1,6 +1,6 @@
 /* termios.cc: termios for WIN32.
 
-   Copyright 1996, 1997, 1998, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 2000, 2001, 2002 Red Hat, Inc.
 
    Written by Doug Evans and Steve Chamberlain of Cygnus Support
    dje@cygnus.com, sac@cygnus.com
@@ -14,6 +14,7 @@ details. */
 #include "winsup.h"
 #include <errno.h>
 #include <signal.h>
+#include <stdlib.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "fhandler.h"
@@ -22,6 +23,7 @@ details. */
 #include "cygheap.h"
 #include "cygwin/version.h"
 #include "perprocess.h"
+#include "sigproc.h"
 #include <sys/termios.h>
 
 /* tcsendbreak: POSIX 7.2.2.1 */
@@ -30,22 +32,14 @@ tcsendbreak (int fd, int duration)
 {
   int res = -1;
 
-  if (cygheap->fdtab.not_open (fd))
-    {
-      set_errno (EBADF);
-      goto out;
-    }
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    goto out;
 
-  fhandler_base *fh;
-  fh = cygheap->fdtab[fd];
-
-  if (!fh->is_tty ())
+  if (!cfd->is_tty ())
     set_errno (ENOTTY);
-  else
-    {
-      if ((res = fh->bg_check (-SIGTTOU)) > bg_eof)
-	res = fh->tcsendbreak (duration);
-    }
+  else if ((res = cfd->bg_check (-SIGTTOU)) > bg_eof)
+    res = cfd->tcsendbreak (duration);
 
 out:
   syscall_printf ("%d = tcsendbreak (%d, %d)", res, fd, duration);
@@ -60,22 +54,14 @@ tcdrain (int fd)
 
   termios_printf ("tcdrain");
 
-  if (cygheap->fdtab.not_open (fd))
-    {
-      set_errno (EBADF);
-      goto out;
-    }
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    goto out;
 
-  fhandler_base *fh;
-  fh = cygheap->fdtab[fd];
-
-  if (!fh->is_tty ())
+  if (!cfd->is_tty ())
     set_errno (ENOTTY);
-  else
-    {
-      if ((res = fh->bg_check (-SIGTTOU)) > bg_eof)
-	res = fh->tcdrain ();
-    }
+  else if ((res = cfd->bg_check (-SIGTTOU)) > bg_eof)
+    res = cfd->tcdrain ();
 
 out:
   syscall_printf ("%d = tcdrain (%d)", res, fd);
@@ -88,22 +74,14 @@ tcflush (int fd, int queue)
 {
   int res = -1;
 
-  if (cygheap->fdtab.not_open (fd))
-    {
-      set_errno (EBADF);
-      goto out;
-    }
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    goto out;
 
-  fhandler_base *fh;
-  fh = cygheap->fdtab[fd];
-
-  if (!fh->is_tty ())
+  if (!cfd->is_tty ())
     set_errno (ENOTTY);
-  else
-    {
-      if ((res = fh->bg_check (-SIGTTOU)) > bg_eof)
-	res = fh->tcflush (queue);
-    }
+  else if ((res = cfd->bg_check (-SIGTTOU)) > bg_eof)
+    res = cfd->tcflush (queue);
 
 out:
   termios_printf ("%d = tcflush (%d, %d)", res, fd, queue);
@@ -116,22 +94,14 @@ tcflow (int fd, int action)
 {
   int res = -1;
 
-  if (cygheap->fdtab.not_open (fd))
-    {
-      set_errno (EBADF);
-      goto out;
-    }
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    goto out;
 
-  fhandler_base *fh;
-  fh = cygheap->fdtab[fd];
-
-  if (!fh->is_tty ())
+  if (!cfd->is_tty ())
     set_errno (ENOTTY);
-  else
-    {
-      if ((res = fh->bg_check (-SIGTTOU)) > bg_eof)
-	res = fh->tcflow (action);
-    }
+  else if ((res = cfd->bg_check (-SIGTTOU)) > bg_eof)
+    res = cfd->tcflow (action);
 
 out:
   syscall_printf ("%d = tcflow (%d, %d)", res, fd, action);
@@ -142,29 +112,55 @@ out:
 extern "C" int
 tcsetattr (int fd, int a, const struct termios *t)
 {
-  int res = -1;
-
-  if (cygheap->fdtab.not_open (fd))
-    {
-      set_errno (EBADF);
-      goto out;
-    }
-
+  int res;
   t = __tonew_termios (t);
+  int e = get_errno ();
 
-  fhandler_base *fh;
-  fh = cygheap->fdtab[fd];
-
-  if (!fh->is_tty ())
-    set_errno (ENOTTY);
-  else
+  while (1)
     {
-      if ((res = fh->bg_check (-SIGTTOU)) > bg_eof)
-	res = fh->tcsetattr (a, t);
+      sigframe thisframe (mainthread);
+
+      res = -1;
+      cygheap_fdget cfd (fd);
+      if (cfd < 0)
+	{
+	  e = get_errno ();
+	  break;
+	}
+
+      if (!cfd->is_tty ())
+	{
+	  e = ENOTTY;
+	  break;
+	}
+
+      res = cfd->bg_check (-SIGTTOU);
+
+      switch (res)
+	{
+	case bg_eof:
+	  e = get_errno ();
+	  break;
+	case bg_ok:
+	  if (cfd.isopen ())
+	    res = cfd->tcsetattr (a, t);
+	  else
+	    e = get_errno ();
+	  break;
+	case bg_signalled:
+	  if (thisframe.call_signal_handler ())
+	    continue;
+	  res = -1;
+	  /* fall through intentionally */
+	default:
+	  e = get_errno ();
+	  break;
+	}
+      break;
     }
 
-out:
-  termios_printf ("iflag %x, oflag %x, cflag %x, lflag %x, VMIN %d, VTIME %d",
+  set_errno (e);
+  termios_printf ("iflag %p, oflag %p, cflag %p, lflag %p, VMIN %d, VTIME %d",
 	t->c_iflag, t->c_oflag, t->c_cflag, t->c_lflag, t->c_cc[VMIN],
 	t->c_cc[VTIME]);
   termios_printf ("%d = tcsetattr (%d, %d, %x)", res, fd, a, t);
@@ -178,15 +174,13 @@ tcgetattr (int fd, struct termios *in_t)
   int res = -1;
   struct termios *t = __makenew_termios (in_t);
 
-  if (cygheap->fdtab.not_open (fd))
-    set_errno (EBADF);
-  else if (!cygheap->fdtab[fd]->is_tty ())
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    /* saw an error */;
+  else if (!cfd->is_tty ())
     set_errno (ENOTTY);
-  else
-    {
-      if ((res = cygheap->fdtab[fd]->tcgetattr (t)) == 0)
-	(void) __toapp_termios (in_t, t);
-    }
+  else if ((res = cfd->tcgetattr (t)) == 0)
+    (void) __toapp_termios (in_t, t);
 
   if (res)
     termios_printf ("%d = tcgetattr (%d, %p)", res, fd, in_t);
@@ -204,12 +198,13 @@ tcgetpgrp (int fd)
 {
   int res = -1;
 
-  if (cygheap->fdtab.not_open (fd))
-    set_errno (EBADF);
-  else if (!cygheap->fdtab[fd]->is_tty ())
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    /* saw an error */;
+  else if (!cfd->is_tty ())
     set_errno (ENOTTY);
   else
-    res = cygheap->fdtab[fd]->tcgetpgrp ();
+    res = cfd->tcgetpgrp ();
 
   termios_printf ("%d = tcgetpgrp (%d)", res, fd);
   return res;
@@ -221,12 +216,13 @@ tcsetpgrp (int fd, pid_t pgid)
 {
   int res = -1;
 
-  if (cygheap->fdtab.not_open (fd))
-    set_errno (EBADF);
-  else if (!cygheap->fdtab[fd]->is_tty ())
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    /* saw an error */;
+  else if (!cfd->is_tty ())
     set_errno (ENOTTY);
   else
-    res = cygheap->fdtab[fd]->tcsetpgrp (pgid);
+    res = cfd->tcsetpgrp (pgid);
 
   termios_printf ("%d = tcsetpgrp (%d, %x)", res, fd, pgid);
   return res;
@@ -242,14 +238,14 @@ tcsetpgrp (int fd, pid_t pgid)
 extern "C" speed_t
 cfgetospeed (struct termios *tp)
 {
-  return __tonew_termios(tp)->c_ospeed;
+  return __tonew_termios (tp)->c_ospeed;
 }
 
 /* cfgetispeed: POSIX96 7.1.3.1 */
 extern "C" speed_t
 cfgetispeed (struct termios *tp)
 {
-  return __tonew_termios(tp)->c_ispeed;
+  return __tonew_termios (tp)->c_ispeed;
 }
 
 /* cfsetospeed: POSIX96 7.1.3.1 */

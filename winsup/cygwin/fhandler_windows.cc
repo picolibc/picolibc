@@ -1,6 +1,6 @@
 /* fhandler_windows.cc: code to access windows message queues.
 
-   Copyright 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
    Written by Sergey S. Okhapkin (sos@prospect.com.ru).
    Feedback and testing by Andy Piper (andyp@parallax.co.uk).
@@ -46,18 +46,15 @@ The following unix-style calls are supported:
 	select () call marks read fd when any message posted to queue.
 */
 
-fhandler_windows::fhandler_windows (const char *name) :
-	fhandler_base (FH_WINDOWS, name)
+fhandler_windows::fhandler_windows ()
+  : fhandler_base (FH_WINDOWS), hWnd_ (NULL), method_ (WINDOWS_POST)
 {
-  set_cb (sizeof *this);
-  hWnd_ = NULL;
-  method_ = WINDOWS_POST;
 }
 
 int
-fhandler_windows::open (const char *, int flags, mode_t)
+fhandler_windows::open (path_conv *, int flags, mode_t)
 {
-  set_flags (flags);
+  set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_close_on_exec_flag (1);
   set_open_status ();
   return 1;
@@ -82,7 +79,7 @@ fhandler_windows::write (const void *buf, size_t)
     return SendMessage (ptr->hwnd, ptr->message, ptr->wParam, ptr->lParam);
 }
 
-int
+int __stdcall
 fhandler_windows::read (void *buf, size_t len)
 {
   MSG *ptr = (MSG *) buf;

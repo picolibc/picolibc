@@ -120,7 +120,7 @@ Sat Dec  9 16:29:45 2000  Christopher Faylor <cgf@cygnus.com>
 
 Fri Dec  8 22:21:01 2000  Christopher Faylor <cgf@cygnus.com>
 
-	* path.cc (normalize_win32_path): Reorganize logic to accomodate
+	* path.cc (normalize_win32_path): Reorganize logic to accommodate
 	chroot.  Always check for MAX_PATH overrun.  Avoid adding one too many
 	backslashes when src path begins with a slash.  From Corinna Vinschen.
 	* winsup.h: Force demangling for dll_crt0 for newer compilers.
@@ -567,7 +567,7 @@ Thu Nov  2 00:10:23 2000  Christopher Faylor <cgf@cygnus.com>
 	psapi.h.
 	(EnumProcesses9x): Rename from EnumProcessesW95.  Change arguments to
 	be more useful for cygwin.
-	(winpids::init): Accomodate argument changes.
+	(winpids::init): Accommodate argument changes.
 	(enum_init): Ditto.
 	* pinfo.h (winpids): Make pidlist dynamically extendable by storing it
 	as a pointer and remembering the size.
@@ -958,7 +958,7 @@ Mon Oct 16 18:37:22 2000  Christopher Faylor <cgf@cygnus.com>
 	(normalize_win32_path): Ditto.
 	(cwdstuff::get_initial): Always set lock.
 	* sigproc.h: Remove hExeced.
-	* strace.cc (strace::vsprntf): Modify to accomodate for lack of hExeced.
+	* strace.cc (strace::vsprntf): Modify to accommodate for lack of hExeced.
 	* thread.cc (MTinterface::Init): Merge Init1 and ClearReent into this method.
 	(MTinterface::Init1): Eliminate.
 	(MTinterface::ClearReent): Eliminate.
@@ -1301,7 +1301,7 @@ Sun Oct  1 16:36:00 2000  Corinna Vinschen <corinna@vinschen.de>
 Sun Oct  1 22:20:39 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* cygheap.cc (cygheap_init): Born again function.
-	(_cmalloc): Reorganize to accomodate muto locking.
+	(_cmalloc): Reorganize to accommodate muto locking.
 	(_cfree): Use muto lock to avoid multi-thread problems.
 	* cygheap.h (incygheap): Just use cygheap_max to find upper cygwin heap
 	bounds.
@@ -1334,8 +1334,8 @@ Sat Sep 30 00:43:42 2000  Christopher Faylor <cgf@cygnus.com>
 	execed or not.  In execed case, walk the heap, cleaning up any orphaned
 	blocks.
 	* cygheap.h: Add a "MAX" value to cygheap_types.  Remove cygheap_init
-	declaration.  Accomodate new argument to cygheap_fixup_in child.
-	* fork.cc (fork): Accomodate extra argument to cygheap_fixup_in_child.
+	declaration.  Accommodate new argument to cygheap_fixup_in child.
+	* fork.cc (fork): Accommodate extra argument to cygheap_fixup_in_child.
 	* dcrt0.cc (dll_crt0_1): Ditto.  Remove call to cygheap_init.
 
 Fri Sep 29 21:49:27 2000  Christopher Faylor <cgf@cygnus.com>
@@ -1360,7 +1360,7 @@ Thu Sep 28 01:46:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 Wed Sep 27 01:10:07 2000  Christopher Faylor <cgf@cygnus.com>
 
-	* spawn.cc (spawn_guts): Attempt to accomodate archaic windows quoting
+	* spawn.cc (spawn_guts): Attempt to accommodate archaic windows quoting
 	mechanism when dealing with '\' and '"'.
 
 Mon Sep 25 20:47:04 2000  Christopher Faylor <cgf@cygnus.com>
@@ -1606,7 +1606,7 @@ Mon Sep  4 22:53:58 2000  Christopher Faylor <cgf@cygnus.com>
 	(normalize_win32_path): Ditto.
 	(mount_info::conv_to_win32_path): Eliminate cwd retrieval here.
 	(mount_info::conv_to_posix_path): Ditto.
-	(hash_path_name): Accomodate additional methods in cwdstuff.
+	(hash_path_name): Accommodate additional methods in cwdstuff.
 	(get_cwd_win32): Eliminate.
 	(getcwd): Use cwdstuff methods.  Properly handle case where buf == NULL
 	and len < 0.
@@ -1641,7 +1641,7 @@ Sun Sep  3 00:07:32 2000  Christopher Faylor <cgf@cygnus.com>
 	* dcrt0.cc (quoted): Simplify due to new method for passing arguments
 	between cygwin programs.
 	(alloc_stack_hard_way): Attempt to handle overlapped stack.
-	(dll_crt0_1): Move child_info processing here.  Accomodate new method
+	(dll_crt0_1): Move child_info processing here.  Accommodate new method
 	for passing arguments between cygwin programs.  Initialize cygwin heap.
 	Establish __argc and __argv variables.
 	(_dll_crt0): Move most of child_info processing to dll_crt0_1.
@@ -1668,7 +1668,7 @@ Sun Sep  3 00:07:32 2000  Christopher Faylor <cgf@cygnus.com>
 	(fhandler_base::de_linearize): Delete.
 	(fhandler_base::operator delete): Free from cygwin heap.
 	(fhandler_base::~fhandler_base): Ditto.
-	* fhandler.h: Accomodate elimination of *linearize and other changes
+	* fhandler.h: Accommodate elimination of *linearize and other changes
 	above.
 	* fhandler_console.cc (fhandler_console::fixup_after_exec): Rename from
 	de_linearize.
@@ -1687,10 +1687,10 @@ Sun Sep  3 00:07:32 2000  Christopher Faylor <cgf@cygnus.com>
 	(cwd_posix): New function.
 	(cwd_hash): New function.
 	(cwd_fixup_after_exec): New function.
-	* path.h: Accomodate path.cc changes.
+	* path.h: Accommodate path.cc changes.
 	* pinfo.cc (pinfo_init): Accept a pointer to an environment table.
 	Pass this to environ_init.  Eliminate old 'title' tests.
-	* pinfo.h: Accomodate above change in argument.
+	* pinfo.h: Accommodate above change in argument.
 	* spawn.cc (struct av): New method for building argv list.
 	(av::unshift): New method.
 	(spawn_guts): Allocate everything that the child process needs in the
@@ -2069,8 +2069,8 @@ Sat Jul 29 12:01:32 2000  Christopher Faylor <cgf@cygnus.com>
 
 	Redefine process structure to avoid a fixed size table.  Redefine
 	pinfo/_pinfo classes.  Use these throughout.
-	* dcrt0.cc (dll_crt0_1): Accomodate set_myself argument change.
-	(__api_fatal): Accomodate _pinfo::record_death argument change.
+	* dcrt0.cc (dll_crt0_1): Accommodate set_myself argument change.
+	(__api_fatal): Accommodate _pinfo::record_death argument change.
 	* exceptions.cc (really_exit): Ditto.
 	(sig_handle_tty_stop): Use pinfo constructor to access process info.
 	(events_init): Don't create pinfo_mutex since it is no longer required.
@@ -2089,7 +2089,7 @@ Sat Jul 29 12:01:32 2000  Christopher Faylor <cgf@cygnus.com>
 	(set_myself): Accept a pid argument now.  Call pinfo initializer to
 	initialize myself.  Detect when this is an "execed" process and create
 	an "indirect" pid block.
-	(pinfo_init): Accomodate set_myself arg change.
+	(pinfo_init): Accommodate set_myself arg change.
 	(procinfo): Remove.
 	(pinfo::lock_pinfo): Remove.
 	(pinfo::unlock_pinfo): Remove.
@@ -2126,7 +2126,7 @@ Sat Jul 29 12:01:32 2000  Christopher Faylor <cgf@cygnus.com>
 	(internal_getlogin): Use _pinfo.
 	* winsup.h: Eliminate pinfo_mutex.  Eliminate spawn_guts declaration
 	since it is static now.  Reflect set_myself argument change.
-	* include/sys/cygwin.h: Add some PID_* enums to accomodate new pinfo
+	* include/sys/cygwin.h: Add some PID_* enums to accommodate new pinfo
 	stuff.
 
 Sat Jul 29 12:13:27 2000  Christopher Faylor <cgf@cygnus.com>
@@ -2312,7 +2312,7 @@ Fri Jul 21 12:03:00 2000  Corinna Vinschen <corinna@vinschen.de>
 Wed Jul 19 22:24:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* spawn.cc (spawn_guts): Don't restore impersonation in case
-	of _P_OVERLAY. Clean up slightly. Accomodate comments.
+	of _P_OVERLAY. Clean up slightly. Accommodate comments.
 
 Wed Jul 19 22:11:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
@@ -2488,7 +2488,7 @@ Sat Jul  8 00:15:01 2000  Christopher Faylor <cgf@cygnus.com>
 	__cygwin_user_data pointer from cygwin_internal.  If it doesn't exist,
 	return failure.  Use either this pointer or passed in pointer
 	throughout.  Clear forkee.
-	* lib/crt0.h: Accomodate argument changes to _cygwin_crt0_common.
+	* lib/crt0.h: Accommodate argument changes to _cygwin_crt0_common.
 	* lib/cygwin_attach_dll.c (cygwin_attach_dll): Reorganize to allow use
 	of newer binaries with older DLLs.  Detect older DLLs when
 	_cygwin_crt0_common returns 0 and allocate space for a per_process
@@ -2518,7 +2518,7 @@ Wed Jul  5 18:56:58 2000  Christopher Faylor <cgf@cygnus.com>
 	(DllListIterator::operator *): Ditto.
 	(dll_dllcrt0): Default to __cygwin_user_data if arg is NULL.
 	* include/sys/cygwin.h: Reorganize per_process to eliminate obsolete
-	fields and accomodate new way of initializing.
+	fields and accommodate new way of initializing.
 	* lib/_cygwin_crt0_common: Initialize _impure_ptr from
 	__cygwin_user_data.impure_ptr.
 
@@ -2624,7 +2624,7 @@ Sat Jul  1 11:43:32 2000  Christopher Faylor <cgf@cygnus.com>
 Sat Jul  1 00:24:04 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dcrt0.cc (_dll_crt0): Renamed from dll_crt0 ().
-	* winsup.h: Accomodate above change.
+	* winsup.h: Accommodate above change.
 	* cygwin.din: Ditto.
 	* lib/cygwin_crt0.c: Ditto.
 
@@ -2813,7 +2813,7 @@ Sat Jun 17 13:51:48 2000  Christopher Faylor <cgf@cygnus.com>
 	* configure.in: Detect "cross-hosting" situation and set appropriate
 	variables in Makefile to avoid building excess stuff.
 	* configure: Regenerate.
-	* Makefile.in: Accomodate above change.
+	* Makefile.in: Accommodate above change.
 
 Sat Jun 17 19:52:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
@@ -3189,7 +3189,7 @@ Mon May 15 00:35:35 2000  Christopher Faylor <cgf@cygnus.com>
 Sun May 14 23:41:24 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* shared.h: Bump PROC_MAGIC.
-	* include/cygwin/version.h: Bump API minor to accomodate two recent
+	* include/cygwin/version.h: Bump API minor to accommodate two recent
 	exports.
 
 2000-05-13  Mumit Khan  <khan@xraylith.wisc.edu>
@@ -3438,7 +3438,7 @@ Fri Apr 21 10:37:08 2000  Christopher Faylor <cgf@cygnus.com>
 Thu Apr 20 17:32:42 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (handle_exceptions): Search further for stack info to
-	accomodate Windows 95.
+	accommodate Windows 95.
 
 Thu Apr 20 16:39:18 2000  Christopher Faylor <cgf@cygnus.com>
 
@@ -3956,7 +3956,7 @@ Sat Feb  5 00:26:01 2000  Christopher Faylor <cgf@cygnus.com>
 	* exceptions.cc (sigWaitForSingleObject): Eliminate obsolete function
 	definition.
 	* fhandler.h: Reflect change to select_stuff wait method.
-	* fhandler_tape.cc (get_ll): Accomodate new w32api LARGE_INTEGER
+	* fhandler_tape.cc (get_ll): Accommodate new w32api LARGE_INTEGER
 	definition.
 	* ntea.c (NTReadEARaw): Ditto.
 	(NTWriteEA): Ditto.

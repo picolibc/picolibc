@@ -1,6 +1,6 @@
 /* external.cc: Interface to Cygwin internals from external programs.
 
-   Copyright 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
    Written by Christopher Faylor <cgf@cygnus.com>
 
@@ -11,15 +11,23 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include <errno.h>
 #include "security.h"
 #include "fhandler.h"
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include <exceptions.h>
 #include "shared_info.h"
 #include "cygwin_version.h"
 #include "perprocess.h"
+#include "cygerrno.h"
+#include "fhandler.h"
+#include "path.h"
+#include "dtable.h"
+#include "cygheap.h"
+#include "wincap.h"
+#include "heap.h"
+#include "cygthread.h"
 
 static external_pinfo *
 fillout_pinfo (pid_t pid, int winpid)
@@ -32,10 +40,13 @@ fillout_pinfo (pid_t pid, int winpid)
 
   static winpids pids (0);
 
-  if (!pids.npids || !nextpid)
-    pids.init (winpid);
-
   static unsigned int i;
+  if (!pids.npids || !nextpid)
+    {
+      pids.init (winpid);
+      i = 0;
+    }
+
   if (!pid)
     i = 0;
 
@@ -73,9 +84,12 @@ fillout_pinfo (pid_t pid, int winpid)
 	  ep.rusage_children = p->rusage_children;
 	  strcpy (ep.progname, p->progname);
 	  ep.strace_mask = 0;
-	  ep.strace_file = 0;
+	  ep.version = EXTERNAL_PINFO_VERSION;
 
 	  ep.process_state = p->process_state;
+
+	  ep.uid32 = p->uid;
+	  ep.gid32 = p->gid;
 	  break;
 	}
     }
@@ -112,6 +126,16 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 {
   va_list arg;
   va_start (arg, t);
+  if (t != CW_USER_DATA)
+    {
+      wincap.init ();
+      if (!myself)
+	{
+	  memory_init ();
+	  malloc_init ();
+	  set_myself (1);
+	}
+    }
 
   switch (t)
     {
@@ -122,13 +146,12 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	return 1;
 
       case CW_GETTHREADNAME:
-	return (DWORD) threadname (va_arg (arg, DWORD));
+	return (DWORD) cygthread::name (va_arg (arg, DWORD));
 
       case CW_SETTHREADNAME:
 	{
-	  char *name = va_arg (arg, char *);
-	  regthread (name, va_arg (arg, DWORD));
-	  return 1;
+	  set_errno (ENOSYS);
+	  return 0;
 	}
 
       case CW_GETPINFO:
@@ -138,9 +161,8 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	return (DWORD) cygwin_version_strings;
 
       case CW_READ_V1_MOUNT_TABLES:
-	/* Upgrade old v1 registry mounts to new location. */
-	mount_table->import_v1_mounts ();
-	return 0;
+	set_errno (ENOSYS);
+	return 1;
 
       case CW_USER_DATA:
 	return (DWORD) &__cygwin_user_data;
@@ -172,6 +194,53 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  return get_cygdrive_info (user, system, user_flags, system_flags);
 	}
 
+      case CW_SET_CYGWIN_REGISTRY_NAME:
+	{
+#	  define cr ((char *) arg)
+	  if (check_null_empty_str_errno (cr))
+	    return (DWORD) NULL;
+	  cygheap->cygwin_regname = (char *) crealloc (cygheap->cygwin_regname,
+						       strlen (cr) + 1);
+	  strcpy (cygheap->cygwin_regname, cr);
+      case CW_GET_CYGWIN_REGISTRY_NAME:
+	  return (DWORD) cygheap->cygwin_regname;
+#	  undef cr
+	}
+
+      case CW_STRACE_TOGGLE:
+	{
+	  pid_t pid = va_arg (arg, pid_t);
+	  pinfo p (pid);
+	  if (p)
+	    {
+	      sig_send (p, __SIGSTRACE);
+	      return 0;
+	    }
+	  else
+	    {
+	      set_errno (ESRCH);
+	      return (DWORD) -1;
+	    }
+	}
+
+      case CW_STRACE_ACTIVE:
+	{
+	  return strace.active;
+	}
+
+      case CW_CYGWIN_PID_TO_WINPID:
+	{
+	  pinfo p (va_arg (arg, pid_t));
+	  return p ? p->dwProcessId : 0;
+	}
+      case CW_EXTRACT_DOMAIN_AND_USER:
+	{
+	  struct passwd *pw = va_arg (arg, struct passwd *);
+	  char *domain = va_arg (arg, char *);
+	  char *user = va_arg (arg, char *);
+	  extract_nt_dom_user (pw, domain, user);
+	  return 0;
+	}
       default:
 	return (DWORD) -1;
     }

@@ -13,6 +13,26 @@ details. */
 #ifndef	_SYS_TERMIOS_H
 #define _SYS_TERMIOS_H
 
+#define	TIOCMGET	0x5415
+#define	TIOCMSET	0x5418
+#define	TIOCINQ		0x541B	
+
+/* TIOCINQ is utilized instead of FIONREAD which has been
+accupied for other purposes under CYGWIN.
+Other UNIX ioctl requests has been omited because
+effects of their work one can achive by standard
+POSIX commands */
+
+
+#define	TIOCM_DTR	0x002
+#define	TIOCM_RTS	0x004
+#define	TIOCM_CTS	0x020
+#define	TIOCM_CAR	0x040
+#define	TIOCM_RNG	0x080
+#define	TIOCM_DSR	0x100
+#define	TIOCM_CD	TIOCM_CAR
+#define	TIOCM_RI	TIOCM_RNG
+
 #define TCOOFF		0
 #define TCOON		1
 #define TCIOFF		2
@@ -194,6 +214,14 @@ details. */
 #define VWERASE	17
 
 #define NCCS		18
+
+/* `c_cc' member of 'struct termios' structure can be disabled by
+   using the value _POSIX_VDISABLE.  */
+#define	_POSIX_VDISABLE	'\0'
+
+/* Compare a character C to a value VAL from the `c_cc' array in a
+   `struct termios'.  If VAL is _POSIX_VDISABLE, no character can match it.  */
+#define CCEQ(val, c)	((c) == (val) && (val) != _POSIX_VDISABLE)
 
 typedef unsigned char cc_t;
 typedef unsigned int  tcflag_t;

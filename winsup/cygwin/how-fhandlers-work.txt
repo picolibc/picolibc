@@ -63,3 +63,13 @@ cannot.
 
 For an example step-by-step to create a new fhandler, see
 ../doc/fhandler-tut.txt
+
+Note: In most case, it is safe to assume that using new/delete (or
+malloc/free) in an fhandler is dangerous and to be avoided.  The reason
+for this is that memory allocated to fhandlers is copied between execed
+processes in the cygwin heap.  Memory allocated in new/delete is only
+copied to forked processes.  So use cmalloc/cfree.
+
+Obviously it is possible to use new/delete in some situations but if you're
+seeing strange core dumps with usages like cat < /my/newfhandler then the
+above may well be the culprit.

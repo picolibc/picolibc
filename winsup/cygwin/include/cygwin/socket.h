@@ -112,6 +112,8 @@ struct msghdr
 #define MSG_OOB         0x1             /* process out-of-band data */
 #define MSG_PEEK        0x2             /* peek at incoming message */
 #define MSG_DONTROUTE   0x4             /* send without using routing tables */
+#define MSG_WINMASK     0x7             /* flags understood by WinSock calls */
+#define MSG_NOSIGNAL    0x20            /* Don't raise SIGPIPE */
 
 /* Setsockoptions(2) level. Thanks to BSD these must match IPPROTO_xxx */
 #define SOL_IP		0
@@ -123,9 +125,11 @@ struct msghdr
 #define SOL_UDP		17
 
 /* IP options */
+#ifndef IPTOS_LOWDELAY
 #define	IPTOS_LOWDELAY		0x10
 #define	IPTOS_THROUGHPUT	0x08
 #define	IPTOS_RELIABILITY	0x04
+#endif
 
 /* These need to appear somewhere around here */
 #define IP_DEFAULT_MULTICAST_TTL        1
@@ -148,8 +152,10 @@ struct msghdr
 #define IPX_TYPE	1
 
 /* TCP options - this way around because someone left a set in the c library includes */
+#ifndef TCP_NODELAY
 #define TCP_NODELAY     0x0001
 #define TCP_MAXSEG	2
+#endif
 
 /* The various priorities. */
 #define SOPRI_INTERACTIVE	0
