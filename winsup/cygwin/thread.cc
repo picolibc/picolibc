@@ -1098,7 +1098,7 @@ pthread_mutex::isGoodInitializerOrObject (pthread_mutex_t const *mutex)
   return true;
 }
 
-bool 
+bool
 pthread_mutex::isGoodInitializerOrBadObject (pthread_mutex_t const *mutex)
 {
     verifyable_object_state objectState = verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC, PTHREAD_MUTEX_INITIALIZER);
@@ -1365,10 +1365,10 @@ verifyable_object_state
 verifyable_object_isvalid (void const * objectptr, long magic, void *static_ptr)
 {
   verifyable_object **object = (verifyable_object **)objectptr;
-  if (static_ptr && *object == static_ptr)
-    return VALID_STATIC_OBJECT;
   if (check_valid_pointer (object))
     return INVALID_OBJECT;
+  if (static_ptr && *object == static_ptr)
+    return VALID_STATIC_OBJECT;
   if (!*object)
     return INVALID_OBJECT;
   if (check_valid_pointer (*object))

@@ -1,3 +1,8 @@
+2002-10-18  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.cc (verifyable_object_isvalid): Test for a valid object
+	pointer before testing for static ptr.
+
 2002-10-17  Christopher Faylor  <cgf@redhat.com>
 
 	* dtable.cc (dtable::init_std_file_from_handle): Force "devices" to
