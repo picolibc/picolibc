@@ -1,3 +1,7 @@
+2003-02-21  Noida D.Venkatasubramanian  <dvenkat@noida.hcltech.com>
+
+	* h8300.h (ldmac, stmac): Replace MACREG with MS32 and MD32.
+
 2003-01-23  Alan Modra  <amodra@bigpond.net.au>
 
 	* m68hc11.h (cpu6812s): Define.
