@@ -52,6 +52,7 @@ effects vary with the locale.
 #ifndef _REENT_ONLY
 
 #include <stdlib.h>
+#include <wchar.h>
 
 int
 _DEFUN (mbtowc, (pwc, s, n),
@@ -60,23 +61,28 @@ _DEFUN (mbtowc, (pwc, s, n),
         size_t n)
 {
 #ifdef MB_CAPABLE
-        int retval = 0;
-        _REENT_CHECK_MISC(_REENT);
+  int retval = 0;
+  mbstate_t *ps;
 
-        retval = _mbtowc_r (_REENT, pwc, s, n, &(_REENT_MBTOWC_STATE(_REENT)));
-
-        if (retval < 0)
-          return -1;
-        else
-          return retval;
+  _REENT_CHECK_MISC(_REENT);
+  ps = &(_REENT_MBTOWC_STATE(_REENT));
+  
+  retval = _mbtowc_r (_REENT, pwc, s, n, ps);
+  
+  if (retval < 0)
+    {
+      ps->__count = 0;
+      return -1;
+    }
+  return retval;
 #else /* not MB_CAPABLE */
-        if (s == NULL)
-                return 0;
-        if (n == 0)
-                return -1;
-        if (pwc)
-                *pwc = (wchar_t) *s;
-        return (*s != '\0');
+  if (s == NULL)
+    return 0;
+  if (n == 0)
+    return -1;
+  if (pwc)
+    *pwc = (wchar_t) *s;
+  return (*s != '\0');
 #endif /* not MB_CAPABLE */
 }
 

@@ -30,7 +30,7 @@ typedef struct
   union
   {
     wint_t __wch;
-    char __wchb[4];
+    unsigned char __wchb[4];
   } __value;		/* Value so far.  */
 } _mbstate_t;
 #endif /* _MBSTATE_T */

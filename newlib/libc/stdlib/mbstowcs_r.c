@@ -18,7 +18,10 @@ _DEFUN (_mbstowcs_r, (reent, pwcs, s, n, state),
     {
       bytes = _mbtowc_r (r, ptr, t, MB_CUR_MAX, state);
       if (bytes < 0)
-        return -1;
+	{
+	  state->__count = 0;
+	  return -1;
+	}
       else if (bytes == 0)
         return ptr - pwcs;
       t += bytes;

@@ -4,6 +4,9 @@
 #include <locale.h>
 #include "mbctype.h"
 
+/* for some conversions, we use the __count field as a place to store a state value */
+#define __state __count
+
 int
 _DEFUN (_wctomb_r, (r, s, wchar, state),
         struct _reent *r     _AND 
@@ -126,10 +129,10 @@ _DEFUN (_wctomb_r, (r, s, wchar, state),
         /* first byte is non-zero..validate multi-byte char */
           if (_isjis (char1) && _isjis (char2)) 
             {
-              if (state->__count == 0)
+              if (state->__state == 0)
                 {
                   /* must switch from ASCII to JIS state */
-                  state->__count = 1;
+                  state->__state = 1;
                   *s++ = ESC_CHAR;
                   *s++ = '$';
                   *s++ = 'B';
@@ -144,10 +147,10 @@ _DEFUN (_wctomb_r, (r, s, wchar, state),
         }
       else
         {
-          if (state->__count != 0)
+          if (state->__state != 0)
             {
               /* must switch from JIS to ASCII state */
-              state->__count = 0;
+              state->__state = 0;
               *s++ = ESC_CHAR;
               *s++ = '(';
               *s++ = 'B';

@@ -52,21 +52,26 @@ _DEFUN (mblen, (s, n),
         size_t n)
 {
 #ifdef MB_CAPABLE
-        int retval = 0;
-        _REENT_CHECK_MISC(_REENT);
-
-        retval = _mbtowc_r (_REENT, NULL, s, n, &(_REENT_MBLEN_STATE(_REENT)));
-        if (retval < 0)
-          return -1;
-        else
-          return retval;
-
+  int retval = 0;
+  mbstate_t *state;
+  
+  _REENT_CHECK_MISC(_REENT);
+  state = &(_REENT_MBLEN_STATE(_REENT));
+  retval = _mbtowc_r (_REENT, NULL, s, n, state);
+  if (retval < 0)
+    {
+      state->__count = 0;
+      return -1;
+    }
+  else
+    return retval;
+  
 #else /* not MB_CAPABLE */
-        if (s == NULL || *s == '\0')
-                return 0;
-        if (n == 0)
-                return -1;
-        return 1;
+  if (s == NULL || *s == '\0')
+    return 0;
+  if (n == 0)
+    return -1;
+  return 1;
 #endif /* not MB_CAPABLE */
 }
 

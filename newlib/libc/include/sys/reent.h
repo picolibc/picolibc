@@ -321,6 +321,11 @@ struct _misc_reent
   _mbstate_t _mbtowc_state;
   char _l64a_buf[8];
   int _getdate_err;
+  _mbstate_t _mbrlen_state;
+  _mbstate_t _mbrtowc_state;
+  _mbstate_t _mbsrtowcs_state;
+  _mbstate_t _wcrtomb_state;
+  _mbstate_t _wcsrtombs_state;
 };
 
 /* This version of _reent is layed our with "int"s in pairs, to help
@@ -478,6 +483,16 @@ struct _reent
   _r->_misc->_wctomb_state.__value.__wch = 0; \
   _r->_misc->_mbtowc_state.__count = 0; \
   _r->_misc->_mbtowc_state.__value.__wch = 0; \
+  _r->_misc->_mbrlen_state.__count = 0; \
+  _r->_misc->_mbrlen_state.__value.__wch = 0; \
+  _r->_misc->_mbrtowc_state.__count = 0; \
+  _r->_misc->_mbrtowc_state.__value.__wch = 0; \
+  _r->_misc->_mbsrtowcs_state.__count = 0; \
+  _r->_misc->_mbsrtowcs_state.__value.__wch = 0; \
+  _r->_misc->_wcrtomb_state.__count = 0; \
+  _r->_misc->_wcrtomb_state.__value.__wch = 0; \
+  _r->_misc->_wcsrtombs_state.__count = 0; \
+  _r->_misc->_wcsrtombs_state.__value.__wch = 0; \
   _r->_misc->_l64a_buf[0] = '\0'; \
   _r->_misc->_getdate_err = 0; \
 } while (0)
@@ -503,6 +518,11 @@ struct _reent
 #define _REENT_MBLEN_STATE(ptr)	((ptr)->_misc->_mblen_state)
 #define _REENT_MBTOWC_STATE(ptr)((ptr)->_misc->_mbtowc_state)
 #define _REENT_WCTOMB_STATE(ptr)((ptr)->_misc->_wctomb_state)
+#define _REENT_MBRLEN_STATE(ptr) ((ptr)->_misc->_mbrlen_state)
+#define _REENT_MBRTOWC_STATE(ptr) ((ptr)->_misc->_mbrtowc_state)
+#define _REENT_MBSRTOWCS_STATE(ptr) ((ptr)->_misc->_mbsrtowcs_state)
+#define _REENT_WCRTOMB_STATE(ptr) ((ptr)->_misc->_wcrtomb_state)
+#define _REENT_WCSRTOMBS_STATE(ptr) ((ptr)->_misc->_wcsrtombs_state)
 #define _REENT_L64A_BUF(ptr)    ((ptr)->_misc->_l64a_buf)
 #define _REENT_GETDATE_ERR_P(ptr) (&((ptr)->_misc->_getdate_err))
 #define _REENT_SIGNAL_BUF(ptr)  ((ptr)->_signal_buf)
@@ -555,6 +575,11 @@ struct _reent
           char _l64a_buf[8];
           char _signal_buf[_REENT_SIGNAL_SIZE];
           int _getdate_err;  
+          _mbstate_t _mbrlen_state;
+          _mbstate_t _mbrtowc_state;
+          _mbstate_t _mbsrtowcs_state;
+          _mbstate_t _wcrtomb_state;
+          _mbstate_t _wcsrtombs_state;
         } _reent;
   /* Two next two fields were once used by malloc.  They are no longer
      used. They are used to preserve the space used before so as to
@@ -587,7 +612,7 @@ struct _reent
     { 0,0,0,0,0,0,0,0}, 0, 1, \
     {{_RAND48_SEED_0, _RAND48_SEED_1, _RAND48_SEED_2}, \
      {_RAND48_MULT_0, _RAND48_MULT_1, _RAND48_MULT_2}, _RAND48_ADD}, \
-    {0, {0}}, {0, {0}}, {0, {0}}, "", "", 0} } }
+    {0, {0}}, {0, {0}}, {0, {0}}, "", "", 0, {0, {0}}, {0, {0}}, {0, {0}}, {0, {0}}, {0, {0}} } } }
 
 #define _REENT_INIT_PTR(var) \
   { int i; \
@@ -630,6 +655,16 @@ struct _reent
     var->_new._reent._mbtowc_state.__value.__wch = 0; \
     var->_new._reent._wctomb_state.__count = 0; \
     var->_new._reent._wctomb_state.__value.__wch = 0; \
+    var->_new._reent._mbrlen_state.__count = 0; \
+    var->_new._reent._mbrlen_state.__value.__wch = 0; \
+    var->_new._reent._mbrtowc_state.__count = 0; \
+    var->_new._reent._mbrtowc_state.__value.__wch = 0; \
+    var->_new._reent._mbsrtowcs_state.__count = 0; \
+    var->_new._reent._mbsrtowcs_state.__value.__wch = 0; \
+    var->_new._reent._wcrtomb_state.__count = 0; \
+    var->_new._reent._wcrtomb_state.__value.__wch = 0; \
+    var->_new._reent._wcsrtombs_state.__count = 0; \
+    var->_new._reent._wcsrtombs_state.__value.__wch = 0; \
     var->_new._reent._l64a_buf[0] = '\0'; \
     var->_new._reent._signal_buf[0] = '\0'; \
     var->_new._reent._getdate_err = 0; \
@@ -668,6 +703,11 @@ struct _reent
 #define _REENT_MBLEN_STATE(ptr)	((ptr)->_new._reent._mblen_state)
 #define _REENT_MBTOWC_STATE(ptr)((ptr)->_new._reent._mbtowc_state)
 #define _REENT_WCTOMB_STATE(ptr)((ptr)->_new._reent._wctomb_state)
+#define _REENT_MBRLEN_STATE(ptr)((ptr)->_new._reent._mbrlen_state)
+#define _REENT_MBRTOWC_STATE(ptr)((ptr)->_new._reent._mbrtowc_state)
+#define _REENT_MBSRTOWCS_STATE(ptr)((ptr)->_new._reent._mbsrtowcs_state)
+#define _REENT_WCRTOMB_STATE(ptr)((ptr)->_new._reent._wcrtomb_state)
+#define _REENT_WCSRTOMBS_STATE(ptr)((ptr)->_new._reent._wcsrtombs_state)
 #define _REENT_L64A_BUF(ptr)    ((ptr)->_new._reent._l64a_buf)
 #define _REENT_SIGNAL_BUF(ptr)  ((ptr)->_new._reent._signal_buf)
 #define _REENT_GETDATE_ERR_P(ptr) (&((ptr)->_new._reent._getdate_err))

@@ -1,3 +1,34 @@
+2002-09-09  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/include/sys/_types.h (_mbstate_t): Changed to use
+        unsigned char internally.
+        * libc/sys/linux/sys/_types.h: Ditto.
+        * libc/include/sys/reent.h
+        * libc/stdlib/mblen.c (mblen): Use function-specific state
+        value from default reentrancy structure.
+        * libc/stdlib/mblen_r.c (_mblen_r):  If return code from
+        _mbtowc_r is less than 0, reset state __count value and
+        return -1.
+        * libc/stdlib/mbrlen.c (mbrlen): If the input state pointer
+        is NULL, use the function-specific pointer provided in the
+        default reentrancy structure.
+        * libc/stdlib/mbrtowc.c: Add reentrant form of function.
+        If input state pointer is NULL, use function-specific area
+        provided in reentrancy structure.
+        * libc/stdlib/mbsrtowcs.c: Ditto.
+        * libc/stdlib/wcrtomb.c: Ditto.
+        * libc/stdlib/wcsrtombs.c: Ditto.
+        * libc/stdlib/mbstowcs.c: Reformat.
+        * libc/stdlib/wcstombs.c: Ditto.
+        * libc/stdlib/mbstowcs_r.c (_mbstowcs_r): If an error occurs,
+        reset the state's __count value and return -1.
+        * libc/stdlib/mbtowc.c: Ditto.
+        * libc/stdlib/mbtowc_r.c (_mbtowc_r): Add restartable functionality.
+        If number of bytes is used up before completing a valid multibyte
+        character, return -2 and save the state.
+        * libc/stdlib/wctomb_r.c (_wctomb_r): Define __state as __count
+        and change some __count references to __state for clarity.
+
 2002-09-06  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/config.h (MB_LEN_MAX): Removed as this

@@ -54,14 +54,22 @@ _DEFUN (_mblen_r, (r, s, n, state),
         mbstate_t *state)
 {
 #ifdef MB_CAPABLE
+  int retval;
+  retval = _mbtowc_r (r, NULL, s, n, state);
 
-        return _mbtowc_r (r, NULL, s, n, state);
+  if (retval < 0)
+    {
+      state->__count = 0;
+      return -1;
+    }
+
+  return retval;
 #else /* not MB_CAPABLE */
-        if (s == NULL || *s == '\0')
-                return 0;
-        if (n == 0)
-                return -1;
-        return 1;
+  if (s == NULL || *s == '\0')
+    return 0;
+  if (n == 0)
+    return -1;
+  return 1;
 #endif /* not MB_CAPABLE */
 }
 

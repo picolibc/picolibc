@@ -7,9 +7,9 @@
 #ifdef MB_CAPABLE
 typedef enum { ESCAPE, DOLLAR, BRACKET, AT, B, J, 
                NUL, JIS_CHAR, OTHER, JIS_C_NUM } JIS_CHAR_TYPE;
-typedef enum { ASCII, A_ESC, A_ESC_DL, JIS, JIS_1, JIS_2, J_ESC, J_ESC_BR,
-               J2_ESC, J2_ESC_BR, DONE, INV, JIS_S_NUM } JIS_STATE; 
-typedef enum { COPY_A, COPY_J, COPY_J2, MAKE_A, MAKE_J, NOOP, EMPTY, ERROR } JIS_ACTION;
+typedef enum { ASCII, JIS, A_ESC, A_ESC_DL, JIS_1, J_ESC, J_ESC_BR,
+               INV, JIS_S_NUM } JIS_STATE; 
+typedef enum { COPY_A, COPY_J1, COPY_J2, MAKE_A, NOOP, EMPTY, ERROR } JIS_ACTION;
 
 /************************************************************************************** 
  * state/action tables for processing JIS encoding
@@ -20,32 +20,29 @@ typedef enum { COPY_A, COPY_J, COPY_J2, MAKE_A, MAKE_J, NOOP, EMPTY, ERROR } JIS
 
 static JIS_STATE JIS_state_table[JIS_S_NUM][JIS_C_NUM] = {
 /*              ESCAPE   DOLLAR    BRACKET   AT       B       J        NUL      JIS_CHAR  OTHER */
-/* ASCII */   { A_ESC,   DONE,     DONE,     DONE,    DONE,   DONE,    DONE,    DONE,     DONE },
-/* A_ESC */   { DONE,    A_ESC_DL, DONE,     DONE,    DONE,   DONE,    DONE,    DONE,     DONE },
-/* A_ESC_DL */{ DONE,    DONE,     DONE,     JIS,     JIS,    DONE,    DONE,    DONE,     DONE }, 
+/* ASCII */   { A_ESC,   ASCII,    ASCII,    ASCII,   ASCII,  ASCII,   ASCII,   ASCII,    ASCII },
 /* JIS */     { J_ESC,   JIS_1,    JIS_1,    JIS_1,   JIS_1,  JIS_1,   INV,     JIS_1,    INV },
-/* JIS_1 */   { INV,     JIS_2,    JIS_2,    JIS_2,   JIS_2,  JIS_2,   INV,     JIS_2,    INV },
-/* JIS_2 */   { J2_ESC,  DONE,     DONE,     DONE,    DONE,   DONE,    INV,     DONE,     DONE },
+/* A_ESC */   { ASCII,   A_ESC_DL, ASCII,    ASCII,   ASCII,  ASCII,   ASCII,   ASCII,    ASCII },
+/* A_ESC_DL */{ ASCII,   ASCII,    ASCII,    JIS,     JIS,    ASCII,   ASCII,   ASCII,    ASCII }, 
+/* JIS_1 */   { INV,     JIS,      JIS,      JIS,     JIS,    JIS,     INV,     JIS,      INV },
 /* J_ESC */   { INV,     INV,      J_ESC_BR, INV,     INV,    INV,     INV,     INV,      INV },
 /* J_ESC_BR */{ INV,     INV,      INV,      INV,     ASCII,  ASCII,   INV,     INV,      INV },
-/* J2_ESC */  { INV,     INV,      J2_ESC_BR,INV,     INV,    INV,     INV,     INV,      INV },
-/* J2_ESC_BR*/{ INV,     INV,      INV,      INV,     DONE,   DONE,    INV,     INV,      INV },
 };
 
 static JIS_ACTION JIS_action_table[JIS_S_NUM][JIS_C_NUM] = {
 /*              ESCAPE   DOLLAR    BRACKET   AT       B        J        NUL      JIS_CHAR  OTHER */
 /* ASCII */   { NOOP,    COPY_A,   COPY_A,   COPY_A,  COPY_A,  COPY_A,  EMPTY,   COPY_A,  COPY_A},
+/* JIS */     { NOOP,    COPY_J1,  COPY_J1,  COPY_J1, COPY_J1, COPY_J1, ERROR,   COPY_J1, ERROR },
 /* A_ESC */   { COPY_A,  NOOP,     COPY_A,   COPY_A,  COPY_A,  COPY_A,  COPY_A,  COPY_A,  COPY_A},
-/* A_ESC_DL */{ COPY_A,  COPY_A,   COPY_A,   MAKE_J,  MAKE_J,  COPY_A,  COPY_A,  COPY_A,  COPY_A},
-/* JIS */     { NOOP,    NOOP,     NOOP,     NOOP,    NOOP,    NOOP,    ERROR,   NOOP,    ERROR },
-/* JIS_1 */   { ERROR,   NOOP,     NOOP,     NOOP,    NOOP,    NOOP,    ERROR,   NOOP,    ERROR },
-/* JIS_2 */   { NOOP,    COPY_J2,  COPY_J2,  COPY_J2, COPY_J2, COPY_J2, ERROR,   COPY_J2, COPY_J2},
+/* A_ESC_DL */{ COPY_A,  COPY_A,   COPY_A,   NOOP,    NOOP,    COPY_A,  COPY_A,  COPY_A,  COPY_A},
+/* JIS_1 */   { ERROR,   COPY_J2,  COPY_J2,  COPY_J2, COPY_J2, COPY_J2, ERROR,   COPY_J2, ERROR },
 /* J_ESC */   { ERROR,   ERROR,    NOOP,     ERROR,   ERROR,   ERROR,   ERROR,   ERROR,   ERROR },
-/* J_ESC_BR */{ ERROR,   ERROR,    ERROR,    ERROR,   NOOP,    NOOP,    ERROR,   ERROR,   ERROR },
-/* J2_ESC */  { ERROR,   ERROR,    NOOP,     ERROR,   ERROR,   ERROR,   ERROR,   ERROR,   ERROR },
-/* J2_ESC_BR*/{ ERROR,   ERROR,    ERROR,    ERROR,   COPY_J,  COPY_J,  ERROR,   ERROR,   ERROR },
+/* J_ESC_BR */{ ERROR,   ERROR,    ERROR,    ERROR,   MAKE_A,  MAKE_A,  ERROR,   ERROR,   ERROR },
 };
 #endif /* MB_CAPABLE */
+
+/* we override the mbstate_t __count field for more complex encodings and use it store a state value */
+#define __state __count
 
 int
 _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
@@ -70,230 +67,305 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
     { /* fall-through */ }
   else if (!strcmp (r->_current_locale, "C-UTF-8"))
     {
-      wchar_t char1 = 0;
+      int ch;
+      int i = 0;
 
       if (s == NULL)
         return 0; /* UTF-8 character encodings are not state-dependent */
 
-      /* we know n >= 1 if we get here */
-      *pwc = 0;
-      char1 = (wchar_t)*t;
+      if (state->__count == 0)
+	ch = t[i++];
+      else
+	{
+	  ++n;
+	  ch = state->__value.__wchb[0];
+	}
 
-      if (char1 == '\0')
-        return 0; /* s points to the null character */
+      if (ch == '\0')
+	{
+	  *pwc = 0;
+	  state->__count = 0;
+	  return 0; /* s points to the null character */
+	}
 
-      if (char1 >= 0x0 && char1 <= 0x7f)
-        {
-          /* single-byte sequence */
-          *pwc = char1;
-          return 1;
-        }
-      else if (char1 >= 0xc0 && char1 <= 0xdf)
-        {
-          /* two-byte sequence */
-          if (n >= 2)
-            {
-              wchar_t char2 = (wchar_t)*(t+1);
-
-              if (char2 < 0x80 || char2 > 0xbf)
-                return -1;
-
-              if (char1 < 0xc2)
-                /* overlong UTF-8 sequence */
-                return -1;
-
-              *pwc = ((char1 & 0x1f) << 6)
-                |     (char2 & 0x3f);
-              return 2;
-            }
-          else
-            return -1;
-        }
-      else if (char1 >= 0xe0 && char1 <= 0xef)
-        {
-          /* three-byte sequence */
-          if (n >= 3)
-            {
-              wchar_t char2 = (wchar_t)*(t+1);
-              wchar_t char3 = (wchar_t)*(t+2);
-
-              if (char2 < 0x80 || char2 > 0xbf)
-                return -1;
-              if (char3 < 0x80 || char3 > 0xbf)
-                return -1;
-
-              if (char1 == 0xe0)
-                {
-                  if (char2 < 0xa0)
-                    /* overlong UTF-8 sequence */
-                    return -1;
-                }
-
-              *pwc = ((char1 & 0x0f) << 12)
-                |    ((char2 & 0x3f) << 6)
-                |     (char3 & 0x3f);
-
-              if (*pwc >= 0xd800 && *pwc <= 0xdfff)
-                {
-                  return -1;
-                }
-              else
-                return 3;
-            }
-          else
-            return -2;
-        }
-      else if (char1 >= 0xf0 && char1 <= 0xf7)
-        {
-          /* four-byte sequence */
-          if (n >= 4)
-            {
-              wchar_t char2 = (wchar_t)*(t+1);
-              wchar_t char3 = (wchar_t)*(t+2);
-              wchar_t char4 = (wchar_t)*(t+3);
-
-              if (char2 < 0x80 || char2 > 0xbf)
-                return -1;
-              if (char3 < 0x80 || char3 > 0xbf)
-                return -1;
-              if (char4 < 0x80 || char4 > 0xbf)
-                return -1;
-
-              if (char1 == 0xf0)
-                {
-                  if (char2 < 0x90)
-                    /* overlong UTF-8 sequence */
-                    return -1;
-                }
-                    
-              *pwc = ((char1 & 0x07) << 18)
-                |    ((char2 & 0x3f) << 12)
-                |    ((char3 & 0x3f) << 6)
-                |     (char4 & 0x3f);
-
-              return 4;
-            }
-          else
-            return -2;
-        }
-      else if (char1 >= 0xf8 && char1 <= 0xfb)
-        {
-          /* five-byte sequence */
-          if (n >= 5)
-            {
-              wchar_t char2 = (wchar_t)*(t+1);
-              wchar_t char3 = (wchar_t)*(t+2);
-              wchar_t char4 = (wchar_t)*(t+3);
-              wchar_t char5 = (wchar_t)*(t+4);
-
-              if (char2 < 0x80 || char2 > 0xbf)
-                return -1;
-              if (char3 < 0x80 || char3 > 0xbf)
-                return -1;
-              if (char4 < 0x80 || char4 > 0xbf)
-                return -1;
-              if (char5 < 0x80 || char5 > 0xbf)
-                return -1;
-
-              if (char1 == 0xf8)
-                {
-                  if (char2 < 0x88)
-                    /* overlong UTF-8 sequence */
-                    return -1;
-                }
-                    
-              *pwc = ((char1 & 0x03) << 24)
-                |    ((char2 & 0x3f) << 18)
-                |    ((char3 & 0x3f) << 12)
-                |    ((char4 & 0x3f) << 6)
-                |     (char5 & 0x3f);
-              return 5;
-            }
-          else
-            return -2;
-        }
-      else if (char1 >= 0xfc && char1 <= 0xfd)
+      if (ch >= 0x0 && ch <= 0x7f)
+	{
+	  /* single-byte sequence */
+	  state->__count = 0;
+	  *pwc = ch;
+	  return 1;
+	}
+      else if (ch >= 0xc0 && ch <= 0xdf)
+	{
+	  /* two-byte sequence */
+	  state->__value.__wchb[0] = ch;
+	  state->__count = 1;
+	  if (n < 2)
+	    return -2;
+	  ch = t[i++];
+	  if (ch < 0x80 || ch > 0xbf)
+	    return -1;
+	  if (state->__value.__wchb[0] < 0xc2)
+	    /* overlong UTF-8 sequence */
+	    return -1;
+	  state->__count = 0;
+	  *pwc = (wchar_t)((state->__value.__wchb[0] & 0x1f) << 6)
+	    |    (wchar_t)(ch & 0x3f);
+	  return i;
+	}
+      else if (ch >= 0xe0 && ch <= 0xef)
+	{
+	  /* three-byte sequence */
+	  wchar_t tmp;
+	  state->__value.__wchb[0] = ch;
+	  if (state->__count == 0)
+	    state->__count = 1;
+	  else
+	    ++n;
+	  if (n < 2)
+	    return -2;
+	  ch = (state->__count == 1) ? t[i++] : state->__value.__wchb[1];
+	  if (state->__value.__wchb[0] == 0xe0 && ch < 0xa0)
+	    /* overlong UTF-8 sequence */
+	    return -1;
+	  if (ch < 0x80 || ch > 0xbf)
+	    return -1;
+	  state->__value.__wchb[1] = ch;
+	  state->__count = 2;
+	  if (n < 3)
+	    return -2;
+	  ch = t[i++];
+	  if (ch < 0x80 || ch > 0xbf)
+	    return -1;
+	  state->__count = 0;
+	  tmp = (wchar_t)((state->__value.__wchb[0] & 0x0f) << 12)
+	    |    (wchar_t)((state->__value.__wchb[1] & 0x3f) << 6)
+	    |     (wchar_t)(ch & 0x3f);
+	
+	  if (tmp >= 0xd800 && tmp <= 0xdfff)
+	    return -1;
+	  *pwc = tmp;
+	  return i;
+	}
+      else if (ch >= 0xf0 && ch <= 0xf7)
+	{
+	  /* four-byte sequence */
+	  if (sizeof(wchar_t) < 4)
+	    return -1; /* we can't store such a value */
+	  state->__value.__wchb[0] = ch;
+	  if (state->__count == 0)
+	    state->__count = 1;
+	  else
+	    ++n;
+	  if (n < 2)
+	    return -2;
+	  ch = (state->__count == 1) ? t[i++] : state->__value.__wchb[1];
+	  if (state->__value.__wchb[0] == 0xf0 && ch < 0x90)
+	    /* overlong UTF-8 sequence */
+	    return -1;
+	  if (ch < 0x80 || ch > 0xbf)
+	    return -1;
+	  state->__value.__wchb[1] = ch;
+	  if (state->__count == 1)
+	    state->__count = 2;
+	  else
+	    ++n;
+	  if (n < 3)
+	    return -2;
+	  ch = (state->__count == 2) ? t[i++] : state->__value.__wchb[2];
+	  if (ch < 0x80 || ch > 0xbf)
+	    return -1;
+	  state->__value.__wchb[2] = ch;
+	  state->__count = 3;
+	  if (n < 4)
+	    return -2;
+	  ch = t[i++];
+	  if (ch < 0x80 || ch > 0xbf)
+	    return -1;
+	  *pwc = (wchar_t)((state->__value.__wchb[0] & 0x07) << 18)
+	    |    (wchar_t)((state->__value.__wchb[1] & 0x3f) << 12)
+	    |    (wchar_t)((state->__value.__wchb[2] & 0x3f) << 6)
+	    |    (wchar_t)(ch & 0x3f);
+	
+	  state->__count = 0;
+	  return i;
+	}
+      else if (ch >= 0xf8 && ch <= 0xfb)
+	{
+	  /* five-byte sequence */
+	  if (sizeof(wchar_t) < 4)
+	    return -1; /* we can't store such a value */
+	  state->__value.__wchb[0] = ch;
+	  if (state->__count == 0)
+	    state->__count = 1;
+	  else
+	    ++n;
+	  if (n < 2)
+	    return -2;
+	  ch = (state->__count == 1) ? t[i++] : state->__value.__wchb[1];
+	  if (state->__value.__wchb[0] == 0xf8 && ch < 0x88)
+	    /* overlong UTF-8 sequence */
+	    return -1;
+	  if (ch < 0x80 || ch > 0xbf)
+	    return -1;
+	  state->__value.__wchb[1] = ch;
+	  if (state->__count == 1)
+	    state->__count = 2;
+	  else
+	    ++n;
+	  if (n < 3)
+	    return -2;
+	  ch = (state->__count == 2) ? t[i++] : state->__value.__wchb[2];
+	  if (ch < 0x80 || ch > 0xbf)
+	    return -1;
+	  state->__value.__wchb[2] = ch;
+	  if (state->__count == 2)
+	    state->__count = 3;
+	  else
+	    ++n;
+	  if (n < 4)
+	    return -2;
+	  ch = (state->__count == 3) ? t[i++] : state->__value.__wchb[3];
+	  if (ch < 0x80 || ch > 0xbf)
+	    return -1;
+	  state->__value.__wchb[3] = ch;
+	  state->__count = 4;
+	  if (n < 5)
+	    return -2;
+	  ch = t[i++];
+	  *pwc = (wchar_t)((state->__value.__wchb[0] & 0x03) << 24)
+	    |    (wchar_t)((state->__value.__wchb[1] & 0x3f) << 18)
+	    |    (wchar_t)((state->__value.__wchb[2] & 0x3f) << 12)
+	    |    (wchar_t)((state->__value.__wchb[3] & 0x3f) << 6)
+	    |    (wchar_t)(ch & 0x3f);
+	
+	  state->__count = 0;
+	  return i;
+	}
+      else if (ch >= 0xfc && ch <= 0xfd)
         {
           /* six-byte sequence */
-          if (n >= 6)
-            {
-              wchar_t char2 = (wchar_t)*(t+1);
-              wchar_t char3 = (wchar_t)*(t+2);
-              wchar_t char4 = (wchar_t)*(t+3);
-              wchar_t char5 = (wchar_t)*(t+4);
-              wchar_t char6 = (wchar_t)*(t+5);
-
-              if (char2 < 0x80 || char2 > 0xbf)
-                return -1;
-              if (char3 < 0x80 || char3 > 0xbf)
-                return -1;
-              if (char4 < 0x80 || char4 > 0xbf)
-                return -1;
-              if (char5 < 0x80 || char5 > 0xbf)
-                return -1;
-              if (char6 < 0x80 || char6 > 0xbf)
-                return -1;
-
-              if (char1 == 0xfc)
-                {
-                  if (char2 < 0x84)
-                    /* overlong UTF-8 sequence */
-                    return -1;
-                }
-
-              *pwc = ((char1 & 0x01) << 30)
-                |    ((char2 & 0x3f) << 24)
-                |    ((char3 & 0x3f) << 18)
-                |    ((char4 & 0x3f) << 12)
-                |    ((char5 & 0x3f) << 6)
-                |     (char6 & 0x3f);
-              return 6;
-            }
-          else
-            return -2;
-        }
+	  int ch2;
+	  if (sizeof(wchar_t) < 4)
+	    return -1; /* we can't store such a value */
+	  state->__value.__wchb[0] = ch;
+	  if (state->__count == 0)
+	    state->__count = 1;
+	  else
+	    ++n;
+	  if (n < 2)
+	    return -2;
+	  ch = (state->__count == 1) ? t[i++] : state->__value.__wchb[1];
+	  if (state->__value.__wchb[0] == 0xfc && ch < 0x84)
+	    /* overlong UTF-8 sequence */
+	    return -1;
+	  if (ch < 0x80 || ch > 0xbf)
+	    return -1;
+	  state->__value.__wchb[1] = ch;
+	  if (state->__count == 1)
+	    state->__count = 2;
+	  else
+	    ++n;
+	  if (n < 3)
+	    return -2;
+	  ch = (state->__count == 2) ? t[i++] : state->__value.__wchb[2];
+	  if (ch < 0x80 || ch > 0xbf)
+	    return -1;
+	  state->__value.__wchb[2] = ch;
+	  if (state->__count == 2)
+	    state->__count = 3;
+	  else
+	    ++n;
+	  if (n < 4)
+	    return -2;
+	  ch = (state->__count == 3) ? t[i++] : state->__value.__wchb[3];
+	  if (ch < 0x80 || ch > 0xbf)
+	    return -1;
+	  state->__value.__wchb[3] = ch;
+	  if (state->__count == 3)
+	    state->__count = 4;
+	  else
+	    ++n;
+	  if (n < 5)
+	    return -2;
+	  if (n == 5)
+	    return -1; /* at this point we can't save enough to restart */
+	  ch = t[i++];
+	  if (ch < 0x80 || ch > 0xbf)
+	    return -1;
+	  ch2 = t[i++];
+	  *pwc = (wchar_t)((state->__value.__wchb[0] & 0x01) << 30)
+	    |    (wchar_t)((state->__value.__wchb[1] & 0x3f) << 24)
+	    |    (wchar_t)((state->__value.__wchb[2] & 0x3f) << 18)
+	    |    (wchar_t)((state->__value.__wchb[3] & 0x3f) << 12)
+	    |    (wchar_t)((ch & 0x3f) << 6)
+	    |    (wchar_t)(ch2 & 0x3f);
+	
+	  state->__count = 0;
+	  return i;
+	}
       else
-        return -1;
+	return -1;
     }      
   else if (!strcmp (r->_current_locale, "C-SJIS"))
     {
-      int char1;
+      int ch;
+      int i = 0;
       if (s == NULL)
         return 0;  /* not state-dependent */
-      char1 = *t;
-      if (_issjis1 (char1))
-        {
-          int char2 = t[1];
-          if (n <= 1)
-            return -2;
-          if (_issjis2 (char2))
-            {
-              *pwc = (((wchar_t)*t) << 8) + (wchar_t)(*(t+1));
-              return 2;
-            }
-          else  
-            return -1;
-        }
+      ch = t[i++];
+      if (state->__count == 0)
+	{
+	  if (_issjis1 (ch))
+	    {
+	      state->__value.__wchb[0] = ch;
+	      state->__count = 1;
+	      if (n <= 1)
+		return -2;
+	      ch = t[i++];
+	    }
+	}
+      if (state->__count == 1)
+	{
+	  if (_issjis2 (ch))
+	    {
+	      *pwc = (((wchar_t)state->__value.__wchb[0]) << 8) + (wchar_t)ch;
+	      state->__count = 0;
+	      return i;
+	    }
+	  else  
+	    return -1;
+	}
     }
   else if (!strcmp (r->_current_locale, "C-EUCJP"))
     {
-      int char1;
+      int ch;
+      int i = 0;
       if (s == NULL)
         return 0;  /* not state-dependent */
-      char1 = *t;
-      if (_iseucjp (char1))
-        {
-          int char2 = t[1];     
-          if (n <= 1)
-            return -2;
-          if (_iseucjp (char2))
-            {
-              *pwc = (((wchar_t)*t) << 8) + (wchar_t)(*(t+1));
-              return 2;
-            }
-          else
-            return -1;
-        }
+      ch = t[i++];
+      if (state->__count == 0)
+	{
+	  if (_iseucjp (ch))
+	    {
+	      state->__value.__wchb[0] = ch;
+	      state->__count = 1;
+	      if (n <= 1)
+		return -2;
+	      ch = t[i++];
+	    }
+	}
+      if (state->__count == 1)
+	{
+	  if (_iseucjp (ch))
+	    {
+	      *pwc = (((wchar_t)state->__value.__wchb[0]) << 8) + (wchar_t)ch;
+	      state->__count = 0;
+	      return i;
+	    }
+	  else
+	    return -1;
+	}
     }
   else if (!strcmp (r->_current_locale, "C-JIS"))
     {
@@ -301,15 +373,16 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
       JIS_ACTION action;
       JIS_CHAR_TYPE ch;
       unsigned char *ptr;
-      int i, curr_ch;
+      unsigned int i;
+      int curr_ch;
  
       if (s == NULL)
         {
-          state->__count = 0;
+          state->__state = ASCII;
           return 1;  /* state-dependent */
         }
 
-      curr_state = (state->__count == 0 ? ASCII : JIS);
+      curr_state = state->__state;
       ptr = t;
 
       for (i = 0; i < n; ++i)
@@ -353,23 +426,21 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
             case NOOP:
               break;
             case EMPTY:
-              state->__count = 0;
+              state->__state = ASCII;
               *pwc = (wchar_t)0;
-              return i;
+              return 0;
             case COPY_A:
-	      state->__count = 0;
+	      state->__state = ASCII;
               *pwc = (wchar_t)*ptr;
               return (i + 1);
-            case COPY_J:
-              state->__count = 0;
-              *pwc = (((wchar_t)*ptr) << 8) + (wchar_t)(*(ptr+1));
-              return (i + 1);
+            case COPY_J1:
+              state->__value.__wchb[0] = t[i];
+	      break;
             case COPY_J2:
-              state->__count = 1;
-              *pwc = (((wchar_t)*ptr) << 8) + (wchar_t)(*(ptr+1));
-              return (ptr - t) + 2;
+              state->__state = JIS;
+              *pwc = (((wchar_t)state->__value.__wchb[0]) << 8) + (wchar_t)(t[i]);
+              return (i + 1);
             case MAKE_A:
-            case MAKE_J:
               ptr = (char *)(t + i + 1);
               break;
             case ERROR:
@@ -379,6 +450,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
 
         }
 
+      state->__state = curr_state;
       return -2;  /* n < bytes needed */
     }
 #endif /* MB_CAPABLE */               
