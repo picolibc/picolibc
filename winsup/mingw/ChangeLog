@@ -2,6 +2,7 @@
 
 	* include/_mingw.h: Increment minor version for 3.5 release.
 	* Makefile.in: Ditto.
+	* mingwex/Makefile.in: Correct typo in list of DISTFILES.
 
 2004-08-24  Danny Smith  <dannysmith@users.sourceforge.net>
 

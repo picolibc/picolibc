@@ -30,7 +30,7 @@ DISTFILES = Makefile.in configure configure.in \
 	fegetexceptflag.c fegetround.c feholdexcept.c feraiseexcept.c \
 	fesetenv.c fesetexceptflag.c fesetround.c fetestexcept.c \
 	feupdateenv.c ftruncate.c fwide.c  getopt.c imaxabs.c imaxdiv.c \
-	ldtoa.c lltoa.c lltow.c mbsinit.c mingw-aligned-malloc.o \
+	ldtoa.c lltoa.c lltow.c mbsinit.c mingw-aligned-malloc.c \
 	mingw-fseek.c sitest.c strtof.c strtoimax.c strtold.c strtoumax.c \
 	testwmem.c tst-aligned-malloc.c ulltoa.c ulltow.c wcstof.c \
 	wcstoimax.c wcstold.c wcstoumax.c wdirent.c wmemchr.c wmemcmp.c \
