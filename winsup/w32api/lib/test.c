@@ -55,6 +55,7 @@
 #include <winresrc.h>
 #include <winsock.h>
 #include <ws2tcpip.h>
+#include <wsnetbs.h>
 #include <setupapi.h>
 #include <aclapi.h>
 

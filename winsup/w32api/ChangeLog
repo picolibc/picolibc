@@ -1,3 +1,11 @@
+2002-01-28  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* lib/test.c: Include wsnetbsd.h.
+
+2002-01-28  Kai Henningsen  <kai-henningsen@users.sourceforge.net>
+
+	* include/wsnetbs.h: New file.
+
 2002-01-25  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/winnt.h: Remove merge conflict.
