@@ -187,31 +187,26 @@ cuserid (char *src)
   return src;
 }
 
-char cygheap_user::homepath_env_buf[MAX_PATH + 1];
-char cygheap_user::homedrive_env_buf[3];
-char cygheap_user::userprofile_env_buf[MAX_PATH + 1];
-
 const char *
 cygheap_user::ontherange (homebodies what, struct passwd *pw)
 {
   LPUSER_INFO_3 ui = NULL;
   WCHAR wuser[UNLEN + 1];
   NET_API_STATUS ret;
+  char homepath_env_buf[MAX_PATH + 1];
+  char homedrive_env_buf[3];
+  char *newhomedrive = NULL;
+  char *newhomepath = NULL;
+
 
   if (what == CH_HOME)
     {
       char *p;
       if ((p = getenv ("HOMEDRIVE")))
-	{
-	  memcpy (homedrive_env_buf, p, 2);
-	  homedrive = homedrive_env_buf;
-	}
+	newhomedrive = p;
 
       if ((p = getenv ("HOMEPATH")))
-	{
-	  strcpy (homepath_env_buf, p);
-	  homepath = homepath_env_buf;
-	}
+	newhomepath = p;
 
       if ((p = getenv ("HOME")))
 	debug_printf ("HOME is already in the environment %s", p);
@@ -224,21 +219,20 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	      setenv ("HOME", pw->pw_dir, 1);
 	      debug_printf ("Set HOME (from /etc/passwd) to %s", pw->pw_dir);
 	    }
-	  else if (homedrive && homepath)
+	  else if (newhomedrive && newhomepath)
 	    {
 	      char home[MAX_PATH];
 	      char buf[MAX_PATH + 1];
-	      strcpy (buf, homedrive);
-	      strcat (buf, homepath);
+	      strcpy (buf, newhomedrive);
+	      strcat (buf, newhomepath);
 	      cygwin_conv_to_full_posix_path (buf, home);
 	      setenv ("HOME", home, 1);
 	      debug_printf ("Set HOME (from HOMEDRIVE/HOMEPATH) to %s", home);
 	    }
 	}
-      return NULL;
     }
 
-  if (homedrive == NULL || !homedrive[0])
+  if (homepath == NULL && newhomepath == NULL)
     {
       if (!pw)
 	pw = getpwnam (name ());
@@ -246,6 +240,7 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	cygwin_conv_to_full_win32_path (pw->pw_dir, homepath_env_buf);
       else
 	{
+	  homepath_env_buf[0] = homepath_env_buf[1] = '\0';
 	  if (env_logsrv ())
 	    {
 	      WCHAR wlogsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];
@@ -275,17 +270,25 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 
       if (homepath_env_buf[1] != ':')
 	{
-	  homedrive_env_buf[0] = homedrive_env_buf[1] = '\0';
-	  homepath = homepath_env_buf;
+	  newhomedrive = almost_null;
+	  newhomepath = homepath_env_buf;
 	}
       else
 	{
 	  homedrive_env_buf[0] = homepath_env_buf[0];
 	  homedrive_env_buf[1] = homepath_env_buf[1];
-	  homepath = homepath_env_buf + 2;
+	  homedrive_env_buf[2] = '\0';
+	  newhomedrive = homedrive_env_buf;
+	  newhomepath = homepath_env_buf + 2;
 	}
-      homedrive = homedrive_env_buf;
     }
+
+  if (newhomedrive)
+    cfree_and_set (homedrive, (newhomedrive == almost_null)
+		   	      ? almost_null : cstrdup (newhomedrive));
+
+  if (newhomepath)
+    cfree_and_set (homepath, cstrdup (newhomepath));
 
   switch (what)
     {
@@ -308,9 +311,10 @@ cygheap_user::env_logsrv ()
     return NULL;
 
   char logsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];
-  if (!get_logon_server (env_domain (), logsrv, NULL))
-    return NULL;
-  return plogsrv = cstrdup (logsrv);
+  cfree_and_set (plogsrv, almost_null);
+  if (get_logon_server (env_domain (), logsrv, NULL))
+    plogsrv = cstrdup (logsrv);
+  return plogsrv;
 }
 
 const char *
@@ -325,27 +329,30 @@ cygheap_user::env_domain ()
   DWORD dlen = sizeof (userdomain);
   SID_NAME_USE use;
 
+  cfree_and_set (winname, almost_null);
+  cfree_and_set (pdomain, almost_null);
   if (!LookupAccountSid (NULL, sid (), username, &ulen,
 			 userdomain, &dlen, &use))
+    __seterrno ();
+  else
     {
-      __seterrno ();
-      return NULL;
+      winname = cstrdup (username);
+      pdomain = cstrdup (userdomain);
     }
-  if (winname)
-    cfree (winname);
-  winname = cstrdup (username);
-  return pdomain = cstrdup (userdomain);
+  return pdomain;
 }
 
 const char *
 cygheap_user::env_userprofile ()
 {
+  char userprofile_env_buf[MAX_PATH + 1];
+  cfree_and_set (puserprof, almost_null);
   /* FIXME: Should this just be setting a puserprofile like everything else? */
   if (!strcasematch (env_name (), "SYSTEM")
       && get_registry_hive_path (sid (), userprofile_env_buf))
-    return userprofile_env_buf;
+    puserprof = cstrdup (userprofile_env_buf);
 
-  return NULL;
+  return puserprof;
 }
 
 const char *

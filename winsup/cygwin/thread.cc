@@ -399,7 +399,10 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
 				this, CREATE_SUSPENDED, &thread_id);
 
   if (!win32_obj_id)
-    magic = 0;
+    {
+      thread_printf ("CreateThread failed: this %p LastError %E", this);
+      magic = 0;
+    }
   else
     {
       InterlockedIncrement (&MT_INTERFACE->threadcount);

@@ -327,6 +327,14 @@ cfree (void *s)
   MALLOC_CHECK;
 }
 
+extern "C" void __stdcall
+cfree_and_set (char *&s, char *what)
+{
+  if (s && s != almost_null)
+    cfree (s);
+  s = what;
+}
+
 extern "C" void *__stdcall
 ccalloc (cygheap_types x, DWORD n, DWORD size)
 {
@@ -453,15 +461,11 @@ cygheap_user::set_name (const char *new_name)
   if (!allocated)
     return;		/* Initializing.  Don't bother with other stuff. */
 
-  homedrive = NULL;
-  homepath = NULL;
-  if (plogsrv)
-    cfree (plogsrv);
-  if (pdomain)
-    cfree (pdomain);
-  if (winname)
-    cfree (winname);
-  plogsrv = pdomain = winname = NULL;
+  cfree_and_set (homedrive);
+  cfree_and_set (homepath);
+  cfree_and_set (plogsrv);
+  cfree_and_set (pdomain);
+  cfree_and_set (winname);
 }
 
 BOOL

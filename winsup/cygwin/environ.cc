@@ -759,7 +759,7 @@ struct spenv
     __attribute__ ((regparm (3)));
 };
 
-char env_dontadd[] = "";
+#define env_dontadd almost_null
 
 /* Keep this list in upper case and sorted */
 static NO_COPY spenv spenvs[] =

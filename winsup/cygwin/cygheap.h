@@ -104,15 +104,9 @@ class cygheap_user
   char  *homedrive;	/* User's home drive */
   char  *homepath;	/* User's home path */
   char  *winname;	/* User's name as far as Windows knows it */
+  char  *puserprof;	/* User profile */
   PSID   psid;          /* buffer for user's SID */
   PSID   orig_psid;     /* Remains intact even after impersonation */
-  static char homedrive_env_buf[3]; /* Where the HOMEDRIVE environment variable
-				       info may live. */
-  static char homepath_env_buf[MAX_PATH + 1]; /* Where the HOMEPATH environment
-						 variable info may live. */
-  static char userprofile_env_buf[MAX_PATH + 1]; /* Where the USERPROFILE
-						    environment variable info
-						    may live. */
 public:
   __uid32_t orig_uid;      /* Remains intact even after impersonation */
   __gid32_t orig_gid;      /* Ditto */
@@ -124,9 +118,17 @@ public:
   HANDLE token;
   BOOL   impersonated;
 
+  /* CGF 2002-06-27.  I removed the initializaton from this constructor
+     since this class is always allocated statically.  That means that everything
+     is zero anyway so there is no need to initialize it to zero.  Since the
+     token initialization is always handled during process startup as well,
+     I've removed the constructor entirely.  Please reinstate this f this
+     situation ever changes.
   cygheap_user () : pname (NULL), plogsrv (NULL), pdomain (NULL),
-		    homedrive (NULL), homepath (NULL),
-		    psid (NULL), token (INVALID_HANDLE_VALUE) {}
+		    homedrive (NULL), homepath (NULL), psid (NULL),
+		    token (INVALID_HANDLE_VALUE) {}
+  */
+
   ~cygheap_user ();
 
   void set_name (const char *new_name);
@@ -289,5 +291,6 @@ void *__stdcall crealloc (void *, DWORD) __attribute__ ((regparm(2)));
 void *__stdcall ccalloc (cygheap_types, DWORD, DWORD) __attribute__ ((regparm(3)));
 char *__stdcall cstrdup (const char *) __attribute__ ((regparm(1)));
 char *__stdcall cstrdup1 (const char *) __attribute__ ((regparm(1)));
+void __stdcall cfree_and_set (char *&, char * = NULL) __attribute__ ((regparm(2)));
 void __stdcall cygheap_init ();
 }

@@ -72,6 +72,42 @@
 	* cygwin_shm.h: Ditto.
 	* woutsup.h: Add definition of _WIN32_WINNT.
 
+2002-06-27  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.cc (cfree_and_set): New function.
+	(cygheap_user::set_name): Use cfree_and_set to reset members.
+	* cygheap.h (cygheap_user): Delete static members.
+	(cygheap_user::puserprof): New member.
+	(cfree_and_set): Declare.
+	* dcrt0.cc (almost_null): Define.
+	* environ.cc (env_dontadd): Redefine as "almost_null".
+	* winsup.h (almost_null): Declare.
+	* syscalls.cc (cfree_and_set): Remove unused variable.
+	* uinfo.cc (cygheap_user::homepath_env_buf): Eliminate.
+	(cygheap_user::homedrive_env_buf): Ditto.
+	(cygheap_user::userprofile_env_buf): Ditto.
+	(cygheap_user::ontherange): YA change to try to preserve existing
+	HOMEPATH and HOMEDRIVE.  Return almost_null values when variables
+	should not actually exist.
+	(cygheap_user::env_logsrv): Ditto.
+	(cygheap_user::env_domain): Ditto.
+	(cygheap_user::env_userprofile): Ditto.
+
+2002-06-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc (dll_crt0_1): Let __progname point to the applications
+	basename.  Move eliminating ".exe" suffix from argv[0] so that it
+	always also affects __progname.
+
+2002-06-27  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.cc (pthread::create): Added trace printf to get CreateThread
+	LastError.
+
+2002-06-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (list::match): Check using pagesize aligned size.
+
 2002-06-26  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::fstat_by_name): Force
