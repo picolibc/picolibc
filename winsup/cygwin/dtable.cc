@@ -357,9 +357,9 @@ build_fh_dev (const device& dev, const char *unix_name)
 {
   path_conv pc (dev);
   if (unix_name)
-    pc.set_normalized_path (unix_name);
+    pc.set_normalized_path (unix_name, false);
   else
-    pc.set_normalized_path (dev.name);
+    pc.set_normalized_path (dev.name, false);
   return build_fh_pc (pc);
 }
 

@@ -41,7 +41,7 @@ inline fhandler_base&
 fhandler_base::operator =(fhandler_base& x)
 {
   memcpy (this, &x, sizeof *this);
-  pc.set_normalized_path (x.pc.normalized_path);
+  pc.set_normalized_path (x.pc.normalized_path, false);
   rabuf = NULL;
   ralen = 0;
   raixget = 0;
@@ -151,7 +151,7 @@ void
 fhandler_base::set_name (path_conv &in_pc)
 {
   memcpy (&pc, &in_pc, in_pc.size ());
-  pc.set_normalized_path (in_pc.normalized_path);
+  pc.set_normalized_path (in_pc.normalized_path, false);
 }
 
 /* Detect if we are sitting at EOF for conditions where Windows

@@ -1,3 +1,12 @@
+2004-12-23  Pierre Humblet <pierre.humblet@ieee.org>
+	    Christopher Faylor  <cgf@timesys.com>
+
+	* path.h (path_conv::set_normalized_path): Add second argument and fill
+	it in throughout.
+	* path.cc (path_conv::check): Declare, set and use "strip_tail".
+	(path_conv::set_normalized_path): Add and use second argument,
+	replacing all tail stripping tests.
+
 2004-12-23  Christopher Faylor  <cgf@timesys.com>
 
 	* cygthread.cc (cygthread::cygthread): Guard debugging variable with

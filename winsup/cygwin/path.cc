@@ -424,23 +424,22 @@ path_conv::fillin (HANDLE h)
 }
 
 void
-path_conv::set_normalized_path (const char *path_copy)
+path_conv::set_normalized_path (const char *path_copy, bool strip_tail)
 {
-  char *eopath = strchr (path, '\0');
-  size_t n;
+  char *p = strchr (path_copy, '\0');
 
-  if (dev.devn != FH_FS || !*path_copy || strncmp (path_copy, "//./", 4) == 0)
-    n = strlen (path_copy) + 1;
-  else
+  if (strip_tail)
     {
-      char *p = strchr (path_copy, '\0');
       while (*--p == '.' || *p == ' ')
 	continue;
-      p[1] = '\0';
-      n = 2 + p - path_copy;
+      *++p = '\0';
     }
 
+  size_t n = 1 + p - path_copy;
+
   normalized_path = path + sizeof (path) - n;
+
+  char *eopath = strchr (path, '\0');
   if (normalized_path > eopath)
     normalized_path_size = n;
   else
@@ -804,6 +803,7 @@ path_conv::check (const char *src, unsigned opt,
     add_ext_from_sym (sym);
 
 out:
+  bool strip_tail = false;
   /* If the user wants a directory, do not return a symlink */
   if (!need_directory || error)
     /* nothing to do */;
@@ -836,7 +836,10 @@ out:
 	  if (!tail)
 	    /* nothing */;
 	  else if (tail[-1] != '\\')
-	    *tail = '\0';
+	    {
+	      *tail = '\0';
+	      strip_tail = true;
+	    }
 	  else
 	    {
 	      error = ENOENT;
@@ -901,7 +904,7 @@ out:
     {
       if (tail < path_end && tail > path_copy + 1)
 	*tail = '/';
-      set_normalized_path (path_copy);
+      set_normalized_path (path_copy, strip_tail);
     }
 
 #if 0
@@ -1838,12 +1841,12 @@ mount_info::add_reg_mount (const char *native_path, const char *posix_path, unsi
   if (res != ERROR_SUCCESS)
     goto err;
   res = subkey.set_int ("flags", mountflags);
-  
+
   if (mountflags & MOUNT_SYSTEM)
     {
       sys_mount_table_counter++;
       cygwin_shared->sys_mount_table_counter++;
-    }  
+    }
   return 0; /* Success */
 }
 
@@ -1893,12 +1896,12 @@ mount_info::read_cygdrive_info_from_registry ()
       if (i)
 	cygheap->user.reimpersonate ();
 
-      if (r.get_string (CYGWIN_INFO_CYGDRIVE_PREFIX, cygdrive, sizeof (cygdrive), 
+      if (r.get_string (CYGWIN_INFO_CYGDRIVE_PREFIX, cygdrive, sizeof (cygdrive),
 			CYGWIN_INFO_CYGDRIVE_DEFAULT_PREFIX) != ERROR_SUCCESS && i == 0)
 	continue;
 
       /* Fetch user cygdrive_flags from registry; returns MOUNT_CYGDRIVE on error. */
-      cygdrive_flags = r.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, 
+      cygdrive_flags = r.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS,
 				  MOUNT_CYGDRIVE | MOUNT_BINARY);
       /* Sanitize */
       if (i == 0)
@@ -1931,7 +1934,7 @@ mount_info::write_cygdrive_info_to_registry (const char *cygdrive_prefix, unsign
   /* Ensure that there is never a final slash */
   nofinalslash (cygdrive_prefix, hold_cygdrive_prefix);
 
-  reg_key r (flags & MOUNT_SYSTEM, KEY_ALL_ACCESS, 
+  reg_key r (flags & MOUNT_SYSTEM, KEY_ALL_ACCESS,
 	     CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME, NULL);
   int res;
   res = r.set_string (CYGWIN_INFO_CYGDRIVE_PREFIX, hold_cygdrive_prefix);
@@ -1962,7 +1965,7 @@ mount_info::write_cygdrive_info_to_registry (const char *cygdrive_prefix, unsign
 int
 mount_info::remove_cygdrive_info_from_registry (const char *cygdrive_prefix, unsigned flags)
 {
-  reg_key r (flags & MOUNT_SYSTEM, KEY_ALL_ACCESS, 
+  reg_key r (flags & MOUNT_SYSTEM, KEY_ALL_ACCESS,
 	     CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME,
 	     NULL);
 
