@@ -67,17 +67,17 @@ __sfvwrite (fp, uio)
   if (fp->_flags & __SCLE) /* text mode */
     {
       do
-      {
-        GETIOV (;);
-        while (len > 0)
-          {
-            if (putc(*p, fp) == EOF)
-              return EOF;
-            p++;
-            len--;
-            uio->uio_resid--;
-          }
-      }
+        {
+          GETIOV (;);
+          while (len > 0)
+            {
+              if (putc(*p, fp) == EOF)
+                return EOF;
+              p++;
+              len--;
+              uio->uio_resid--;
+            }
+        }
       while (uio->uio_resid > 0);
       return 0;
     }

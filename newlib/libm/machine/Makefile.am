@@ -20,7 +20,7 @@ endif # USE_LIBTOOL
 
 $(libm_machine_dir)/lib.a:
 
-doc:  
+doc:
 
 ACLOCAL_AMFLAGS = -I ../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

@@ -27,7 +27,7 @@
 #   newlib_cflags	Special CFLAGS to use when building
 #   machine_dir		Subdirectory of libc/machine to configure
 #   sys_dir		Subdirectory of libc/sys to configure
-#   have_sys_mach_dir   Is there a machine subdirectory in sys subdirectory
+#   have_sys_mach_dir	Is there a machine subdirectory in sys subdirectory
 #   posix_dir		"posix" to build libc/posix, "" otherwise
 #   signal_dir		"signal" to build libc/signal, "" otherwise
 #   syscall_dir		"syscalls" to build libc/syscalls, "" otherwise
@@ -486,7 +486,7 @@ case "${host}" in
   powerpc*-*-rtem* | \
   powerpc*-*-sysv* | \
   powerpc*-*-solaris*)
-	newlib_cflags="${newlib_cflags} -mrelocatable-lib -mno-eabi -mstrict-align -DMISSING_SYSCALL_NAMES"
+	newlib_cflags="${newlib_cflags} -mrelocatable-lib -mno-eabi -mstrict-align -DMISSING_SYSCALL_NAMES -DWANT_PRINTF_LONG_LONG"
 	;;
   powerpcle-*-pe)
 	newlib_cflags="${newlib_cflags} -DHAVE_OPENDIR -DHAVE_RENAME -DHAVE_FCNTL"
@@ -555,9 +555,9 @@ case "${host}" in
 	newlib_cflags="${newlib_cflags} -DSMALL_DTOA -DSMALL_MEMORY"
 	;;	
   xstormy16-*-*)
-        newlib_cflags="${newlib_cflags} -DHAVE_GETTIMEOFDAY"
-        syscall_dir=syscalls
-        ;;
+	newlib_cflags="${newlib_cflags} -DHAVE_GETTIMEOFDAY"
+	syscall_dir=syscalls
+	;;
   z8k-*-*)
 	syscall_dir=syscalls
 	;;

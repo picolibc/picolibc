@@ -1,5 +1,5 @@
 /* This file may have been modified by DJ Delorie (Jan 1991).  If so,
-** these modifications are Copyright (C) 1991 DJ Delorie
+** these modifications are Copyright (C) 1991 DJ Delorie.
 */
 
 /*-

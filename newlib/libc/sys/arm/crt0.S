@@ -55,6 +55,7 @@ _mainCRTStartup:
 	sub	sl, sp, #64 << 10	/* Still assumes 256bytes below sl */
 #endif
 #endif
+	/* Zero the memory in the .bss section.  */
 	mov 	a2, #0			/* Second arg: fill value */
 	mov	fp, a2			/* Null frame pointer */
 	mov	r7, a2			/* Null frame pointer for Thumb */
@@ -259,4 +260,3 @@ CommandLine:	.space	256,0	/*  Maximum length of 255 chars handled.  */
 	.section .idata$3
 	.long	0,0,0,0,0,0,0,0
 #endif
-

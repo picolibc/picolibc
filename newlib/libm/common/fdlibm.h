@@ -11,11 +11,11 @@
  * ====================================================
  */
 
-/* CYGNUS LOCAL: Include files.  */
+/* REDHAT LOCAL: Include files.  */
 #include <math.h>
 #include <machine/ieeefp.h>
 
-/* CYGNUS LOCAL: Default to XOPEN_MODE.  */
+/* REDHAT LOCAL: Default to XOPEN_MODE.  */
 #define _XOPEN_MODE
 
 /* Most routines need to check whether a float is finite, infinite, or not a

@@ -193,7 +193,6 @@
 #define __SMALL_BITFIELDS
 #endif
 
-
 #ifndef __IEEE_BIG_ENDIAN
 #ifndef __IEEE_LITTLE_ENDIAN
 #error Endianess not declared!!

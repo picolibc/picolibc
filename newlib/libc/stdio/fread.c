@@ -62,10 +62,10 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #ifdef __SCLE
 static size_t
 _DEFUN (crlf, (fp, buf, count, eof),
-      FILE * fp _AND
-      char * buf _AND
-      size_t count _AND
-      int eof)
+        FILE * fp _AND
+        char * buf _AND
+        size_t count _AND
+        int eof)
 {
   int newcount = 0, r;
   char *s, *d, *e;
@@ -77,19 +77,19 @@ _DEFUN (crlf, (fp, buf, count, eof),
   for (s=d=buf; s<e-1; s++)
     {
       if (*s == '\r' && s[1] == '\n')
-      s++;
+        s++;
       *d++ = *s;
     }
   if (s < e)
     {
       if (*s == '\r')
-      {
-        int c = __sgetc_raw(fp);
-        if (c == '\n')
-          *s = '\n';
-        else
-          ungetc(c, fp);
-      }
+        {
+          int c = __sgetc_raw(fp);
+          if (c == '\n')
+            *s = '\n';
+          else
+            ungetc(c, fp);
+        }
       *d++ = *s++;
     }
 
@@ -98,7 +98,7 @@ _DEFUN (crlf, (fp, buf, count, eof),
     {
       r = getc(fp);
       if (r == EOF)
-      return count - (e-d);
+        return count - (e-d);
       *d++ = r;
     }
 
@@ -138,7 +138,7 @@ _DEFUN (fread, (buf, size, count, fp),
 	{
 	  /* no more input: return partial result */
 #ifdef __SCLE
-        if (fp->_flags & __SCLE)
+          if (fp->_flags & __SCLE)
             return crlf(fp, buf, total-resid, 1) / size;
 #endif
 	  return (total - resid) / size;

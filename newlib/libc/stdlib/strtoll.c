@@ -16,14 +16,14 @@ ANSI_SYNOPSIS
 
 TRAD_SYNOPSIS
 	#include <stdlib.h>
-	long strtoll (<[s]>, <[ptr]>, <[base]>)
-        char *<[s]>;
+	long long strtoll (<[s]>, <[ptr]>, <[base]>)
+        const char *<[s]>;
         char **<[ptr]>;
         int <[base]>;
 
-	long _strtoll_r (<[reent]>, <[s]>, <[ptr]>, <[base]>)
+	long long _strtoll_r (<[reent]>, <[s]>, <[ptr]>, <[base]>)
 	char *<[reent]>;
-        char *<[s]>;
+        const char *<[s]>;
         char **<[ptr]>;
         int <[base]>;
 

@@ -145,7 +145,6 @@ typedef int jmp_buf[_JBLEN];
 #define _JBTYPE double
 #endif
 
-
 #ifdef __fr30__
 #define _JBLEN 10
 #endif
