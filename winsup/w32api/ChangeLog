@@ -1,5 +1,9 @@
 2000-02-28  Mumit Khan  <khan@xraylith.wisc.edu>
 
+	* include/largeint.h: Rename HAVE_INT64 macro to _HAVE_INT64 to avoid
+	namespace pollution.
+	* include/rpcndr.h: Likewise.
+	* include/winnt.h: Likewise.
 	* include/shlobj.h (SHGetDataFromIDList{A,W}): Fix typo.
 	(SHGetSpecialFolderPath{A,W}): Add prototypes.
 	* lib/ole32.def: Add missing exports.
