@@ -1,3 +1,12 @@
+2003-07-03  Christopher Faylor  <cgf@redhat.com>
+
+	* mount.cc (longopts): Add long "options" keyword.
+	(opts): Add -o option.
+	(usage): Display -o option.
+	(struct opt): New.
+	(concat3): New function.
+	(main): Handle -o flag.
+
 2003-06-12  Christopher Faylor  <cgf@redhat.com>
 
 	* cygcheck.cc (pretty_id): Rework slightly to not rely on spaces.

@@ -1,6 +1,6 @@
 /* mount.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -120,6 +120,7 @@ static struct option longopts[] =
   {"help", no_argument, NULL, 'h' },
   {"mount-commands", no_argument, NULL, 'm'},
   {"no-executable", no_argument, NULL, 'E'},
+  {"options", required_argument, NULL, 'E'},
   {"show-cygdrive-prefix", no_argument, NULL, 'p'},
   {"system", no_argument, NULL, 's'},
   {"text", no_argument, NULL, 't'},
@@ -128,7 +129,7 @@ static struct option longopts[] =
   {NULL, 0, NULL, 0}
 };
 
-static char opts[] = "bcfhmpstuvxEX";
+static char opts[] = "bcfhmpstuvxEXo:";
 
 static void
 usage (FILE *where = stderr)
@@ -144,6 +145,7 @@ Display information about mounted filesystems, or mount a filesystem\n\
   -h, --help                    output usage information and exit\n\
   -m, --mount-commands          write mount commands to replace user and\n\
 				system mount points and cygdrive prefixes\n\
+  -o, --options X[,X...]	specify mount options\n\
   -p, --show-cygdrive-prefix    show user and/or system cygdrive path prefix\n\
   -s, --system     (default)    add system-wide mount point\n\
   -t, --text                    text files get \\r\\n line endings\n\
@@ -157,6 +159,25 @@ Display information about mounted filesystems, or mount a filesystem\n\
 ", progname);
   exit (where == stderr ? 1 : 0);
 }
+
+struct opt
+{
+  const char *name;
+  unsigned val;
+  bool clear;
+} oopts[] =
+{
+  {"user", MOUNT_SYSTEM, 1},
+  {"system", MOUNT_SYSTEM, 0},
+  {"binary", MOUNT_BINARY, 0},
+  {"text", MOUNT_BINARY, 1},
+  {"exec", MOUNT_EXEC, 0},
+  {"notexec", MOUNT_NOTEXEC, 0},
+  {"cygexec", MOUNT_CYGWIN_EXEC, 0},
+  {"suid", 0, 0},
+  {"posix", MOUNT_ENC, 0},
+  {"managed", MOUNT_ENC, 0}
+};
 
 static void
 print_version ()
@@ -181,12 +202,21 @@ Compiled on %s\n\
 ", progname, len, v, __DATE__);
 }
 
+static char *
+concat3 (char *a, const char *b, const char *c)
+{
+  size_t totlen = strlen (a) + strlen (b) + strlen (c) + 1;
+  a = (char *) realloc (a, totlen);
+  return strcat (strcat (a, b), c);
+}
+
 int
 main (int argc, char **argv)
 {
   int i;
   int flags = MOUNT_BINARY;
   int default_flag = MOUNT_SYSTEM;
+  char *options = strdup ("");
   enum do_what
   {
     nada,
@@ -233,6 +263,12 @@ main (int argc, char **argv)
 	else
 	  usage ();
 	break;
+      case 'o':
+	if (*options)
+	  options = concat3 (options, ",", optarg);
+	else
+	  options = strdup (optarg);
+	break;
       case 'p':
 	if (do_what == nada)
 	  do_what = saw_show_cygdrive_prefix;
@@ -265,6 +301,30 @@ main (int argc, char **argv)
       default:
 	usage ();
       }
+
+  while (*options)
+    {
+      char *p = strchr (options, ',');
+      if (p)
+	*p++ = '\0';
+      else
+	p = strchr (options, '\0');
+
+      for (opt *o = oopts; o < (oopts + (sizeof (oopts) / sizeof (oopts[0]))); o++)
+	if (strcmp (options, o->name) == 0)
+	  {
+	    if (o->clear)
+	      flags &= ~o->val;
+	    else
+	      flags |= o->val;
+	    goto gotit;
+	  }
+      fprintf (stderr, "%s: invalid option - '%s'\n", progname, options);
+      exit (1);
+
+    gotit:
+      options = p;
+    }
 
   if (flags & MOUNT_NOTEXEC && flags & (MOUNT_EXEC | MOUNT_CYGWIN_EXEC))
     {
