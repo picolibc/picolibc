@@ -1361,12 +1361,6 @@ start_thread_socket (select_record *me, select_stuff *stuff)
 	  select_printf ("cannot create socket, %E");
 	  return -1;
 	}
-#if 0
-      /* Allow rapid reuse of the port. */
-      int tmp = 1;
-      (void) setsockopt (si->exitsock, SOL_SOCKET, SO_REUSEADDR, (char *) &tmp, sizeof (tmp));
-#endif
-
       int sin_len = sizeof (_my_tls.locals.exitsock_sin);
       memset (&_my_tls.locals.exitsock_sin, 0, sin_len);
       _my_tls.locals.exitsock_sin.sin_family = AF_INET;

@@ -1,3 +1,7 @@
+2004-10-12  Christopher Faylor  <cgf@timesys.com>
+
+	* select.cc (start_thread_socket): Remove unused code.
+
 2004-10-11  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_termios.cc (fhandler_termios::tcsetpgrp): Revert previous checkin.
