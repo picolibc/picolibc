@@ -232,6 +232,8 @@ __fp_unlock (ptr)
 void
 __fp_lock_all ()
 {
+  __sfp_lock_acquire (); 
+
   (void) _fwalk (_REENT, __fp_lock);
 }
 
@@ -239,5 +241,7 @@ void
 __fp_unlock_all ()
 {
   (void) _fwalk (_REENT, __fp_unlock);
+
+  __sfp_lock_release ();
 }
 #endif

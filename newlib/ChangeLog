@@ -1,3 +1,9 @@
+2003-03-30  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* libc/stdio/findfp.c (__fp_lock_all): Add call to
+	__sfp_lock_acquire.
+	(__fp_unlock_all): Add call to __sfp_lock_release. 
+
 2004-03-25  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* libc/stdio/fclose.c (fclose): Protect file pointer list when
