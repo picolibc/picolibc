@@ -1,6 +1,6 @@
 /* cygserver_shm.cc: Single unix specification IPC interface for Cygwin
 
-   Copyright 2001 Red Hat, Inc.
+   Copyright 2001, 2002 Red Hat, Inc.
 
    Originally written by Robert Collins <robert.collins@hotmail.com>
 
@@ -77,7 +77,7 @@ client_request_shm::client_request_shm ():client_request (CYGSERVER_REQUEST_SHM_
 }
 
 /* FIXME: If building on a 64-bit compiler, the address->int typecast will fail.
- * Solution: manually calculate the next id value 
+ * Solution: manually calculate the next id value
  */
 
 #if 0
@@ -136,7 +136,7 @@ shmat (int shmid, const void *shmaddr, int parameters.in.shmflg)
  */
 
 /* Test result from openbsd: shm ids are persistent cross process if a handle is left
- * open. This could lead to resource starvation: we're not copying that behaviour 
+ * open. This could lead to resource starvation: we're not copying that behaviour
  * unless we have to. (It will involve acygwin1.dll gloal shared list :[ ).
  */
 /* FIXME: shmid should be a verifyable object
@@ -182,9 +182,9 @@ delete_shmnode (shmnode **nodeptr)
     {
       shmnode *tempnode = shm_head;
       while (tempnode && tempnode->next != node)
-        tempnode = tempnode->next;
+	tempnode = tempnode->next;
       if (tempnode)
-        tempnode->next = node->next;
+	tempnode->next = node->next;
       // else log the unexpected !
     }
 
@@ -198,7 +198,7 @@ delete_shmnode (shmnode **nodeptr)
     delete node;
     nodeptr = NULL;
 }
-  
+
 void
 client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 {
@@ -207,7 +207,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
   PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) parameters.in.sd_buf;
 //  /* create a sd for our open requests based on shmflag & 0x01ff */
 //  psd = alloc_sd (getuid (), getgid (), cygheap->user.logsrv (),
-//                parameters.in.shmflg & 0x01ff, psd, &sd_size);
+//		    parameters.in.shmflg & 0x01ff, psd, &sd_size);
 
   HANDLE from_process_handle = NULL;
   HANDLE token_handle = NULL;
@@ -216,8 +216,8 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
   from_process_handle = cache->process (parameters.in.pid)->handle ();
   /* possible TODO: reduce the access on the handle before we use it */
   /* Note that unless we do this, we don't need to call CloseHandle - it's kept open
-   * by the process cache until the process terminates. 
-   * We may need a refcount on the cache however... 
+   * by the process cache until the process terminates.
+   * We may need a refcount on the cache however...
    */
   if (!from_process_handle)
     {
@@ -243,7 +243,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 
 
   /* we trust the clients request - we will be doing it as them, and
-   * the worst they can do is open their own permissions 
+   * the worst they can do is open their own permissions
    */
 
 
@@ -364,9 +364,9 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 		    delete_shmnode (&temp2);
 		  }
 		
-	        header.error_code = 0;
-	        CloseHandle (token_handle);
-	        return;
+		header.error_code = 0;
+		CloseHandle (token_handle);
+		return;
 	      }
 	    tempnode = &(*tempnode)->next;
 	  }
@@ -409,7 +409,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
       /* attempt to open the key */
 
       /* get an existing key */
-      /* On unix the same shmid identifier is returned on multiple calls to shm_get 
+      /* On unix the same shmid identifier is returned on multiple calls to shm_get
        * with the same key and size. Different modes is a ?.
        */
 
@@ -433,7 +433,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 		  CloseHandle (token_handle);
 		  return;
 		}
-	      /* FIXME: can the same process call this twice without error ? test 
+	      /* FIXME: can the same process call this twice without error ? test
 	       * on unix
 	       */
 	      if ((parameters.in.shmflg & IPC_CREAT)
@@ -447,12 +447,12 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 		  CloseHandle (token_handle);
 		  return;
 		}
-	      // FIXME: do we need to other tests of the requested mode with the 
+	      // FIXME: do we need to other tests of the requested mode with the
 	      // tempnode->shm_id mode ? testcase on unix needed.
 	      // FIXME how do we do the security test? or
 	      // do we wait for shmat to bother with that?
 	      /* One possibly solution: impersonate the client, and then test we can
-	       * reopen the area. In fact we'll probably have to do that to get 
+	       * reopen the area. In fact we'll probably have to do that to get
 	       * handles back to them, alternatively just tell them the id, and then
 	       * let them attempt the open.
 	       */
@@ -495,7 +495,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
       /* This may need sh_none... it's only a control structure */
       HANDLE filemap = CreateFileMapping (INVALID_HANDLE_VALUE,	// system pagefile.
 					  &sa,
-					  PAGE_READWRITE,	// protection  
+					  PAGE_READWRITE,	// protection
 					  0x00000000,
 					  getsystemallocgranularity (),
 					  shmname	// object name
@@ -621,9 +621,9 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
       tempnode->next = shm_head;
       shm_head = tempnode;
 
-      /* we now have the area in the daemon list, opened. 
+      /* we now have the area in the daemon list, opened.
 
-         FIXME: leave the system wide shm mutex */
+	 FIXME: leave the system wide shm mutex */
 
       parameters.out.shm_id = tempnode->shm_id;
       if (check_and_dup_handle (GetCurrentProcess (), from_process_handle,

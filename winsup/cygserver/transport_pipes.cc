@@ -1,6 +1,6 @@
 /* cygserver_transport_pipes.cc
 
-   Copyright 2001 Red Hat Inc.
+   Copyright 2001, 2002 Red Hat Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -41,7 +41,7 @@ transport_layer_pipes::transport_layer_pipes (HANDLE new_pipe)
     init_security();
 };
 
-transport_layer_pipes::transport_layer_pipes () 
+transport_layer_pipes::transport_layer_pipes ()
 {
   inited = false;
   pipe = NULL;
@@ -80,11 +80,11 @@ transport_layer_pipes::accept ()
     }
 
   pipe = CreateNamedPipe (pipe_name,
-                          PIPE_ACCESS_DUPLEX,
-                          PIPE_TYPE_BYTE | PIPE_WAIT,
-                          PIPE_UNLIMITED_INSTANCES,
-                          0, 0, 1000,
-                          &sec_all_nih );
+			  PIPE_ACCESS_DUPLEX,
+			  PIPE_TYPE_BYTE | PIPE_WAIT,
+			  PIPE_UNLIMITED_INSTANCES,
+			  0, 0, 1000,
+			  &sec_all_nih );
   if (pipe == INVALID_HANDLE_VALUE)
     {
       debug_printf ("error creating pipe (%lu)\n.", GetLastError ());
@@ -99,11 +99,11 @@ transport_layer_pipes::accept ()
       pipe = NULL;
       return NULL;
     }
-  
+
   transport_layer_pipes *new_conn = new transport_layer_pipes (pipe);
   pipe = NULL;
 
-  return new_conn;  
+  return new_conn;
 }
 
 void
@@ -164,27 +164,27 @@ transport_layer_pipes::connect ()
   while (1)
     {
       pipe = CreateFile (pipe_name,
-		         GENERIC_READ | GENERIC_WRITE,
-		         FILE_SHARE_READ | FILE_SHARE_WRITE,
-		         &sec_all_nih,
-		         OPEN_EXISTING,
-		         0, NULL);
+			 GENERIC_READ | GENERIC_WRITE,
+			 FILE_SHARE_READ | FILE_SHARE_WRITE,
+			 &sec_all_nih,
+			 OPEN_EXISTING,
+			 0, NULL);
 
       if (pipe != INVALID_HANDLE_VALUE)
 	/* got the pipe */
-        return true;
+	return true;
 
       if (GetLastError () != ERROR_PIPE_BUSY)
-        {
-          debug_printf ("Error opening the pipe (%lu)\n", GetLastError ());
-          pipe = NULL;
-          return false;
-        }
+	{
+	  debug_printf ("Error opening the pipe (%lu)\n", GetLastError ());
+	  pipe = NULL;
+	  return false;
+	}
       if (!WaitNamedPipe (pipe_name, 20000))
-        debug_printf ( "error connecting to server pipe after 20 seconds (%lu)\n", GetLastError () );
+	debug_printf ( "error connecting to server pipe after 20 seconds (%lu)\n", GetLastError () );
       /* We loop here, because the pipe exists but is busy. If it doesn't exist
        * the != ERROR_PIPE_BUSY will catch it.
-       */ 
+       */
     }
 }
 
@@ -204,7 +204,7 @@ transport_layer_pipes::impersonate_client ()
 void
 transport_layer_pipes::revert_to_self ()
 {
-  RevertToSelf (); 
+  RevertToSelf ();
   debug_printf("I am who I yam\n");
 }
 

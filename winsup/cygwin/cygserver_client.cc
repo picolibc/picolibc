@@ -1,6 +1,6 @@
 /* cygserver_client.cc
 
-   Copyright 2001 Red Hat Inc.
+   Copyright 2001, 2002 Red Hat Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -98,7 +98,7 @@ client_request::send (transport_layer_base *conn)
 
   if ((bytes_read = conn->read ((char *)&header, sizeof (header)))
     != sizeof (header) || (header.cb &&
-    (bytes_read = conn->read (buffer, header.cb) ) != header.cb))
+    (bytes_read = conn->read (buffer, header.cb)) != header.cb))
     {
       header.error_code = -1;
       debug_printf("failed reading response \n");
@@ -180,7 +180,7 @@ cygserver_init ()
   if (cygserver_running==CYGSERVER_OK)
     return;
 
-  client_request_get_version *req = 
+  client_request_get_version *req =
 	new client_request_get_version ();
 
   rc = cygserver_request (req);
@@ -188,11 +188,11 @@ cygserver_init ()
   if (rc < 0)
     cygserver_running = CYGSERVER_DEAD;
   else if (rc > 0)
-    api_fatal ( "error connecting to cygwin server. error: %d", rc );
+    api_fatal ("error connecting to cygwin server. error: %d", rc);
   else if (req->version.major != CYGWIN_SERVER_VERSION_MAJOR ||
 	   req->version.api != CYGWIN_SERVER_VERSION_API ||
 	   req->version.minor > CYGWIN_SERVER_VERSION_MINOR)
-    api_fatal ( "incompatible version of cygwin server.\n\
+    api_fatal ("incompatible version of cygwin server.\n\
  client version %d.%d.%d.%d, server version%ld.%ld.%ld.%ld",
     CYGWIN_SERVER_VERSION_MAJOR,
     CYGWIN_SERVER_VERSION_API,
@@ -201,7 +201,7 @@ cygserver_init ()
     req->version.major,
     req->version.api,
     req->version.minor,
-    req->version.patch );
+    req->version.patch);
   else
     cygserver_running = CYGSERVER_OK;
 }

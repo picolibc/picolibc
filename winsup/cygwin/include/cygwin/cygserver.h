@@ -1,6 +1,6 @@
 /* cygserver.h
 
-   Copyright 2001 Red Hat Inc.
+   Copyright 2001, 2002 Red Hat Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 

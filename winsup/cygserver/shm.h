@@ -1,6 +1,6 @@
 /* cygserver_shm.h
 
-   Copyright 2001 Red Hat Inc.
+   Copyright 2001, 2002 Red Hat Inc.
    Written by Robert Collins <rbtcollins@hotmail.com>
 
 This file is part of Cygwin.

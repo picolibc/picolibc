@@ -1,6 +1,6 @@
 /* cygserver_process.cc
 
-   Copyright 2001 Red Hat Inc.
+   Copyright 2001, 2002 Red Hat Inc.
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
@@ -117,10 +117,10 @@ process_cache::remove_process (class process *theprocess)
     {
       entry = (class process *) InterlockedExchangePointer (&head, theprocess->next);
       if (entry != theprocess)
-        {
-          printf ("Bug encountered, process cache corrupted\n");
+	{
+	  printf ("Bug encountered, process cache corrupted\n");
 	  exit (1);
-        }
+	}
     }
   else
     {
@@ -138,10 +138,9 @@ process_cache::remove_process (class process *theprocess)
   add_task (theprocess);
 }
 	
-      
 /* copy <= max_copy HANDLEs to dest[], starting at an offset into _our list_ of
  * begin_at. (Ie begin_at = 5, the first copied handle is still written to dest[0]
- * NOTE: Thread safe, but not thread guaranteed - a newly added process may be missed. 
+ * NOTE: Thread safe, but not thread guaranteed - a newly added process may be missed.
  * Who cares - It'll get caught the next time.
  */
 int
@@ -227,7 +226,7 @@ process::handle ()
 //  thehandle = OpenProcess (PROCESS_ALL_ACCESS, FALSE, winpid);
 //  debug_printf ("Got handle %p when refreshing cache process %ld\n", thehandle, winpid);
 //  /* FIXME: what if OpenProcess fails ? */
-//  if (thehandle) 
+//  if (thehandle)
 //    {
 //      _exit_status = STILL_ACTIVE;
 //      exit_code ();
@@ -281,7 +280,7 @@ process::add_cleanup_routine (class cleanup_routine *new_cleanup)
   if (cleaning_up)
     return false;
   EnterCriticalSection (&access);
-  /* check that we didn't block with ::cleanup () 
+  /* check that we didn't block with ::cleanup ()
    * This rigmarole is to get around win9x's glaring missing TryEnterCriticalSection call
    * which would be a whole lot easier
    */

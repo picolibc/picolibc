@@ -1,6 +1,6 @@
 /* cygserver.cc
 
-   Copyright 2001 Red Hat Inc.
+   Copyright 2001, 2002 Red Hat Inc.
 
    Written by Egor Duda <deo@logos-m.ru>
 
@@ -47,26 +47,26 @@ setup_privileges ()
   HANDLE hToken = NULL;
   TOKEN_PRIVILEGES sPrivileges;
 
-  rc = OpenProcessToken ( GetCurrentProcess() , TOKEN_ALL_ACCESS , &hToken ) ;
-  if ( !rc )
+  rc = OpenProcessToken (GetCurrentProcess() , TOKEN_ALL_ACCESS , &hToken) ;
+  if (!rc)
     {
-      printf ( "error opening process token (%lu)\n", GetLastError () );
+      printf ("error opening process token (%lu)\n", GetLastError ());
       ret_val = FALSE;
       goto out;
     }
-  rc = LookupPrivilegeValue ( NULL, SE_DEBUG_NAME, &sPrivileges.Privileges[0].Luid );
-  if ( !rc )
+  rc = LookupPrivilegeValue (NULL, SE_DEBUG_NAME, &sPrivileges.Privileges[0].Luid);
+  if (!rc)
     {
-      printf ( "error getting prigilege luid (%lu)\n", GetLastError () );
+      printf ("error getting prigilege luid (%lu)\n", GetLastError ());
       ret_val = FALSE;
       goto out;
     }
   sPrivileges.PrivilegeCount = 1 ;
   sPrivileges.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED ;
-  rc = AdjustTokenPrivileges ( hToken, FALSE, &sPrivileges, 0, NULL, NULL ) ;
-  if ( !rc )
+  rc = AdjustTokenPrivileges (hToken, FALSE, &sPrivileges, 0, NULL, NULL) ;
+  if (!rc)
     {
-      printf ( "error adjusting prigilege level. (%lu)\n", GetLastError () );
+      printf ("error adjusting prigilege level. (%lu)\n", GetLastError ());
       ret_val = FALSE;
       goto out;
     }
@@ -79,16 +79,16 @@ setup_privileges ()
   ret_val = TRUE;
 
 out:
-  CloseHandle ( hToken );
+  CloseHandle (hToken);
   return ret_val;
 }
 
 int
 check_and_dup_handle (HANDLE from_process, HANDLE to_process,
 		      HANDLE from_process_token,
-                      DWORD access,
-                      HANDLE from_handle,
-                      HANDLE* to_handle_ptr, BOOL bInheritHandle = FALSE)
+		      DWORD access,
+		      HANDLE from_handle,
+		      HANDLE* to_handle_ptr, BOOL bInheritHandle = FALSE)
 {
   HANDLE local_handle = NULL;
   int ret_val = EACCES;
@@ -100,53 +100,53 @@ check_and_dup_handle (HANDLE from_process, HANDLE to_process,
   BOOL status;
 
   if (from_process != GetCurrentProcess ())
-{ 
+    {
 
   if (!DuplicateHandle (from_process, from_handle,
-	                GetCurrentProcess (), &local_handle,
-                        0, bInheritHandle,
-                        DUPLICATE_SAME_ACCESS))
+			GetCurrentProcess (), &local_handle,
+			0, bInheritHandle,
+			DUPLICATE_SAME_ACCESS))
     {
-      printf ( "error getting handle(%u) to server (%lu)\n", (unsigned int)from_handle, GetLastError ());
+      printf ("error getting handle(%u) to server (%lu)\n", (unsigned int)from_handle, GetLastError ());
       goto out;
     }
 } else
  local_handle = from_handle;
 
   if (!GetKernelObjectSecurity (local_handle,
-  			        OWNER_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION	| DACL_SECURITY_INFORMATION,
+				OWNER_SECURITY_INFORMATION | GROUP_SECURITY_INFORMATION	| DACL_SECURITY_INFORMATION,
 				sd, sizeof (sd_buf), &bytes_needed))
     {
-      printf ( "error getting handle SD (%lu)\n", GetLastError ());
+      printf ("error getting handle SD (%lu)\n", GetLastError ());
       goto out;
     }
 
   MapGenericMask (&access, &access_mapping);
 
   if (!AccessCheck (sd, from_process_token, access, &access_mapping,
-  		    &ps, &ps_len, &access, &status))
+		    &ps, &ps_len, &access, &status))
     {
-      printf ( "error checking access rights (%lu)\n", GetLastError ());
+      printf ("error checking access rights (%lu)\n", GetLastError ());
       goto out;
     }
 
   if (!status)
     {
-      printf ( "access to object denied\n");
+      printf ("access to object denied\n");
       goto out;
     }
 
   if (!DuplicateHandle (from_process, from_handle,
-	                to_process, to_handle_ptr,
-                        access, bInheritHandle, 0))
+			to_process, to_handle_ptr,
+			access, bInheritHandle, 0))
     {
-      printf ( "error getting handle to client (%lu)\n", GetLastError ());
+      printf ("error getting handle to client (%lu)\n", GetLastError ());
       goto out;
     }
   debug_printf ("Duplicated %p to %p\n", from_handle, *to_handle_ptr);
 
   ret_val = 0;
-                    
+
 out:
   if (local_handle && from_process != GetCurrentProcess ())
     CloseHandle (local_handle);
@@ -178,7 +178,7 @@ client_request_attach_tty::serve(transport_layer_base *conn, class process_cache
     }
 
   debug_printf ("pid %ld:(%p,%p) -> pid %ld\n", req.master_pid,
-  	  			req.from_master, req.to_master,
+				req.from_master, req.to_master,
 				req.pid);
 
   debug_printf ("opening process %ld\n", req.master_pid);
@@ -194,11 +194,11 @@ client_request_attach_tty::serve(transport_layer_base *conn, class process_cache
 
   debug_printf ("Impersonating client\n");
   conn->impersonate_client ();
-  
+
   debug_printf ("about to open thread token\n");
   rc = OpenThreadToken (GetCurrentThread (),
-  			TOKEN_QUERY,
-                        TRUE,
+			TOKEN_QUERY,
+			TRUE,
 			&token_handle);
 
   debug_printf ("opened thread token, rc=%lu\n", rc);
@@ -212,10 +212,10 @@ client_request_attach_tty::serve(transport_layer_base *conn, class process_cache
     }
 
   if (check_and_dup_handle (from_process_handle, to_process_handle,
-                            token_handle,
-                            GENERIC_READ,
-                            req.from_master,
-                            &req.from_master, TRUE) != 0)
+			    token_handle,
+			    GENERIC_READ,
+			    req.from_master,
+			    &req.from_master, TRUE) != 0)
     {
       printf ("error duplicating from_master handle (%lu)\n", GetLastError ());
       header.error_code = EACCES;
@@ -238,7 +238,7 @@ client_request_attach_tty::serve(transport_layer_base *conn, class process_cache
 
 #if DEBUG
   printf ("%ld -> %ld(%p,%p)\n", req.master_pid, req.pid,
-  	  			req.from_master, req.to_master);
+				req.from_master, req.to_master);
 #endif
 
   header.error_code = 0;
@@ -309,7 +309,7 @@ request_loop (LPVOID LpParam)
      * _AFTER_ the shutdown request. And sending ourselves a request is ugly
      */
      if (new_conn && queue->active)
-         queue->add (new_conn);
+	 queue->add (new_conn);
   }
   return 0;
 }
@@ -382,10 +382,10 @@ server_request::process ()
 
       bytes_read = conn->read (req->buffer, req->header.cb);
       if (bytes_read != req->header.cb)
-        {
-          debug_printf ("error reading from connection (%lu)\n", GetLastError ());
-          goto out;
-        }
+	{
+	  debug_printf ("error reading from connection (%lu)\n", GetLastError ());
+	  goto out;
+	}
       debug_printf ("got body (%ld)\n",bytes_read);
     }
 
@@ -458,10 +458,10 @@ main (int argc, char **argv)
     switch (i)
       {
       case 's':
-        shutdown = 1;
-        break;
+	shutdown = 1;
+	break;
       default:
-        break;
+	break;
        /*NOTREACHED*/
       }
 
@@ -489,17 +489,17 @@ main (int argc, char **argv)
   char version[200];
   /* Cygwin dll release */
   snprintf (version, 200, "%d.%d.%d(%d.%d/%d/%d)-(%d.%d.%d.%d) %s",
-                 cygwin_version.dll_major / 1000,
-                 cygwin_version.dll_major % 1000,
-                 cygwin_version.dll_minor,
-                 cygwin_version.api_major,
-                 cygwin_version.api_minor,
-                 cygwin_version.shared_data,
+		 cygwin_version.dll_major / 1000,
+		 cygwin_version.dll_major % 1000,
+		 cygwin_version.dll_minor,
+		 cygwin_version.api_major,
+		 cygwin_version.api_minor,
+		 cygwin_version.shared_data,
 		 CYGWIN_SERVER_VERSION_MAJOR,
 		 CYGWIN_SERVER_VERSION_API,
 		 CYGWIN_SERVER_VERSION_MINOR,
 		 CYGWIN_SERVER_VERSION_PATCH,
-                 cygwin_version.mount_registry,
+		 cygwin_version.mount_registry,
 		 cygwin_version.dll_build_date);
   setbuf (stdout, NULL);
   printf ("daemon version %s starting up", version);
@@ -533,7 +533,7 @@ main (int argc, char **argv)
   /* WaitForMultipleObjects abort && request_queue && process_queue && signal
      -- if signal event then retrigger it
    */
-  while (1 && request_queue.active) 
+  while (1 && request_queue.active)
     {
       sleep (1);
     }
