@@ -177,7 +177,7 @@ fhandler_base::set_name (const char *unix_path, const char *win32_path)
      win32 name since it has theoretically been previously detected by
      path_conv. Ideally, we should pass in a format string and build the
      unix_path, too. */
-  if (!is_device () || *win32_path_name != '\\')
+  if (!is_auto_device () || *win32_path_name != '\\')
     unix_path_name = unix_path;
   else
     {
