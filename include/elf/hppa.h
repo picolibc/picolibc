@@ -99,7 +99,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* ELF/HPPA relocation types */
 
 /* Note: PA-ELF is defined to use only RELA relocations.  */
-#include "reloc-macros.h"
+#include "elf/reloc-macros.h"
 
 START_RELOC_NUMBERS (elf_hppa_reloc_type)
      RELOC_NUMBER (R_PARISC_NONE,      0)	/* No reloc */

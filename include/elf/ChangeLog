@@ -1,3 +1,9 @@
+1999-12-09  Fred Fish  <fnf@cygnus.com>
+
+	* i960.h (reloc-macros.h):  Include using relative dir elf/.
+	* i386.h (reloc-macros.h):  Include using relative dir elf/.
+	* hppa.h (reloc-macros.h):  Include using relative dir elf/.
+	
 1999-12-07  Jim Blandy  <jimb@cygnus.com>
 
 	* common.h (NT_PRXFPREG): New definition.

@@ -20,7 +20,7 @@
 #ifndef _ELF_I386_H
 #define _ELF_I386_H
 
-#include "reloc-macros.h"
+#include "elf/reloc-macros.h"
 
 START_RELOC_NUMBERS (elf_i386_reloc_type)
      RELOC_NUMBER (R_386_NONE,      0)	/* No reloc */
