@@ -1,5 +1,14 @@
 2001-11-01  Christopher Faylor  <cgf@redhat.com>
 
+	* cygheap.h (cygheap_fdmanip::isopen): Set appropriate errno if fd not
+	open.
+	* select.cc (fhandler_base::ready_for_read): Release an open guard
+	mutex when exiting with an error condition.
+	* syscalls.cc (_read): Check frequently for closed fd as a kludge until
+	something better is invented.
+
+2001-11-01  Christopher Faylor  <cgf@redhat.com>
+
 	* dtable.cc (dtable::build_fhandler): Issue internal error on unknown
 	device.
 	* fhandler.cc (fhandler_base::close): Show both name and handle in

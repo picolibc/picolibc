@@ -310,7 +310,7 @@ _read (int fd, void *ptr, size_t len)
       /* Could block, so let user know we at least got here.  */
       syscall_printf ("read (%d, %p, %d) %sblocking, sigcatchers %d", fd, ptr, len, wait ? "" : "non", sigcatchers);
 
-      if (wait && (/*!sigcatchers || */!cfd->is_slow () || cfd->get_r_no_interrupt ()))
+      if (wait && (!cfd->is_slow () || cfd->get_r_no_interrupt ()))
 	debug_printf ("non-interruptible read\n");
       else if (!cfd->ready_for_read (fd, wait, 0))
 	{
@@ -318,15 +318,24 @@ _read (int fd, void *ptr, size_t len)
 	  goto out;
 	}
 
+      /* FIXME: This is not thread safe.  We need some method to
+         ensure that an fd, closed in another thread, aborts I/O
+	 operations. */
       if (!cfd.isopen())
 	return -1;
 
       /* Check to see if this is a background read from a "tty",
 	 sending a SIGTTIN, if appropriate */
       res = cfd->bg_check (SIGTTIN);
+
+      if (!cfd.isopen())
+	return -1;
+
       if (res > bg_eof)
 	{
 	  myself->process_state |= PID_TTYIN;
+	  if (!cfd.isopen())
+	    return -1;
 	  res = cfd->read (ptr, len);
 	  myself->process_state &= ~PID_TTYIN;
 	}

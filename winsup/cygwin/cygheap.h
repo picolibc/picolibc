@@ -198,7 +198,13 @@ class cygheap_fdmanip
   operator fhandler_base* &() {return *fh;}
   void operator = (fhandler_base *fh) {*this->fh = fh;}
   fhandler_base *operator -> () const {return *fh;}
-  bool isopen () const {return *fh;}
+  bool isopen () const
+  {
+    if (*fh)
+      return true;
+    set_errno (EBADF);
+    return false;
+  }
 };
 
 class cygheap_fdnew : public cygheap_fdmanip

@@ -1102,6 +1102,9 @@ fhandler_base::ready_for_read (int fd, DWORD howlong, int ignra)
 	}
     }
 
+  if (get_guard () && !avail && me.read_ready)
+    ReleaseMutex (get_guard ());
+
   select_printf ("read_ready %d, avail %d", me.read_ready, avail);
   return avail;
 }
