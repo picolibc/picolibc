@@ -957,6 +957,14 @@ build_env (const char * const *envp, char *&envblock, int &envc,
 	  win_env *conv;
 	  len = strcspn (*srcp, "=") + 1;
 
+	  /* Check for a bad entry.  This is necessary to get rid of empty
+	     strings, induced by putenv and changing the string afterwards.
+	     Note that this doesn't stop invalid strings without '=' in it
+	     etc., but we're opting for speed here for now.  Adding complete
+	     checking would be pretty expensive. */
+	  if (len == 1)
+	    continue;
+
 	  /* See if this entry requires posix->win32 conversion. */
 	  conv = getwinenv (*srcp, *srcp + len);
 	  if (conv)

@@ -1,3 +1,8 @@
+2005-01-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* environ.cc (build_env): Disallow empty strings and strings starting
+	with '=' in Win32 environment.
+
 2005-01-08  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* syscalls.cc (seteuid32): Only change the default dacl when
