@@ -1,3 +1,6 @@
+Tue Feb 13 22:38:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* include/shlobj.h: Add missing SLR_* flags.
 
 2001-02-12:  Earnie Boyd  <earnie@users.sourceforge.net>
 
