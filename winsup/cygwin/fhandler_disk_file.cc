@@ -200,9 +200,9 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
       && ftCreationTime.dwHighDateTime == 0)
     ftCreationTime = ftLastWriteTime;
 
-  buf->st_atime   = to_time_t (&ftLastAccessTime);
-  buf->st_mtime   = to_time_t (&ftLastWriteTime);
-  buf->st_ctime   = to_time_t (&ftCreationTime);
+  to_timestruc_t (&ftLastAccessTime, &buf->st_atim);
+  to_timestruc_t (&ftLastWriteTime, &buf->st_mtim);
+  to_timestruc_t (&ftCreationTime, &buf->st_ctim);
   buf->st_nlink   = nNumberOfLinks;
   buf->st_dev     = pc->volser ();
   buf->st_size    = ((__off64_t)nFileSizeHigh << 32) + nFileSizeLow;

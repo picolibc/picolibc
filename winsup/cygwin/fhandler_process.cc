@@ -121,7 +121,8 @@ fhandler_process::fstat (struct __stat64 *buf, path_conv *pc)
       return 0;
     case 2:
       buf->st_ctime = buf->st_mtime = p->start_time;
-      buf->st_atime = time(NULL);
+      buf->st_ctim.tv_nsec = buf->st_mtim.tv_nsec = 0;
+      time_as_timestruc_t(&buf->st_atim);
       buf->st_uid = p->uid;
       buf->st_gid = p->gid;
       buf->st_mode |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;

@@ -27,12 +27,9 @@ struct __stat32
   __gid16_t     st_gid;
   __dev16_t     st_rdev;
   __off32_t     st_size;
-  time_t        st_atime;
-  long          st_spare1;
-  time_t        st_mtime;
-  long          st_spare2;
-  time_t        st_ctime;
-  long          st_spare3;
+  timestruc_t   st_atim;
+  timestruc_t   st_mtim;
+  timestruc_t   st_ctim;
   blksize_t     st_blksize;
   __blkcnt32_t  st_blocks;
   long          st_spare4[2];
@@ -48,12 +45,9 @@ struct __stat64
   __gid32_t     st_gid;
   __dev32_t     st_rdev;
   __off64_t     st_size;
-  time_t        st_atime;
-  long          st_spare1;
-  time_t        st_mtime;
-  long          st_spare2;
-  time_t        st_ctime;
-  long          st_spare3;
+  timestruc_t   st_atim;
+  timestruc_t   st_mtim;
+  timestruc_t   st_ctim;
   blksize_t     st_blksize;
   __blkcnt64_t  st_blocks;
   long          st_spare4[2];
@@ -75,16 +69,17 @@ struct stat
   gid_t         st_gid;
   dev_t         st_rdev;
   off_t         st_size;
-  time_t        st_atime;
-  long          st_spare1;
-  time_t        st_mtime;
-  long          st_spare2;
-  time_t        st_ctime;
-  long          st_spare3;
+  timestruc_t   st_atim;
+  timestruc_t   st_mtim;
+  timestruc_t   st_ctim;
   blksize_t     st_blksize;
   blkcnt_t      st_blocks;
   long          st_spare4[2];
 };
+
+#define st_atime st_atim.tv_sec
+#define st_mtime st_mtim.tv_sec
+#define st_ctime st_ctim.tv_sec
 
 #ifdef __cplusplus
 }

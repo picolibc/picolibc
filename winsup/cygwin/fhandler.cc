@@ -842,7 +842,8 @@ fhandler_base::fstat (struct __stat64 *buf, path_conv *)
   buf->st_mode |= get_device () == FH_FLOPPY ? S_IFBLK : S_IFCHR;
   buf->st_nlink = 1;
   buf->st_blksize = S_BLKSIZE;
-  buf->st_atime = buf->st_mtime = buf->st_ctime = time (NULL) - 1;
+  time_as_timestruc_t (&buf->st_ctim);
+  buf->st_atim = buf->st_mtim = buf->st_ctim;
   return 0;
 }
 

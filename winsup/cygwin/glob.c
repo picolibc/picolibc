@@ -818,9 +818,9 @@ stat32_to_STAT (struct __stat32 *src, struct STAT *dst)
   dst->st_gid = src->st_gid;
   dst->st_rdev = src->st_rdev;
   dst->st_size = src->st_size;
-  dst->st_atime = src->st_atime;
-  dst->st_mtime = src->st_mtime;
-  dst->st_ctime = src->st_ctime;
+  dst->st_atim = src->st_atim;
+  dst->st_mtim = src->st_mtim;
+  dst->st_ctim = src->st_ctim;
   dst->st_blksize = src->st_blksize;
   dst->st_blocks = src->st_blocks;
 }

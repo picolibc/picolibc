@@ -227,6 +227,47 @@ to_time_t (FILETIME *ptr)
   return x;
 }
 
+/* Cygwin internal */
+/* Convert a Win32 time to "UNIX" timestruc_t format. */
+void __stdcall
+to_timestruc_t (FILETIME *ptr, timestruc_t *out)
+{
+  /* A file time is the number of 100ns since jan 1 1601
+     stuffed into two long words.
+     A timestruc_t is the number of seconds and microseconds since jan 1 1970
+     stuffed into a time_t and a long.  */
+
+  long rem;
+  long long x = ((long long) ptr->dwHighDateTime << 32) + ((unsigned)ptr->dwLowDateTime);
+
+  /* pass "no time" as epoch */
+  if (x == 0)
+    {
+      out->tv_sec = 0;
+      out->tv_nsec = 0;
+      return;
+    }
+
+  x -= FACTOR;			/* number of 100ns between 1601 and 1970 */
+  rem = x % ((long long)NSPERSEC);
+  x /= (long long) NSPERSEC;		/* number of 100ns in a second */
+  out->tv_nsec = rem * 100;	/* as tv_nsec is in nanoseconds */
+  out->tv_sec = x;
+}
+
+/* Cygwin internal */
+/* Get the current time as a "UNIX" timestruc_t format. */
+void __stdcall
+time_as_timestruc_t (timestruc_t * out)
+{
+  SYSTEMTIME systemtime;
+  FILETIME filetime;
+
+  GetSystemTime (&systemtime);
+  SystemTimeToFileTime (&systemtime, &filetime);
+  to_timestruc_t (&filetime, out);
+}
+
 /* time: POSIX 4.5.1.1, C 4.12.2.4 */
 /* Return number of seconds since 00:00 UTC on jan 1, 1970 */
 extern "C"

@@ -206,6 +206,8 @@ extern "C" char *__stdcall strcasestr (const char *searchee, const char *lookfor
 /* Time related */
 void __stdcall totimeval (struct timeval *dst, FILETIME * src, int sub, int flag);
 long __stdcall to_time_t (FILETIME * ptr);
+void __stdcall to_timestruc_t (FILETIME * ptr, timestruc_t * out);
+void __stdcall time_as_timestruc_t (timestruc_t * out);
 
 void __stdcall set_console_title (char *);
 void early_stuff_init ();

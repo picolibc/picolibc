@@ -1,3 +1,22 @@
+2002-06-05  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* fhandler.cc (fhandler_base::fstat): Initialise tv_nsec member of
+	st_atim, st_mtim, and st_ctim fields.
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat_helper): Ditto.
+	* fhandler_process.cc (fhandler_process::fstat): Ditto.
+	* glob.c (stat32_to_STAT): Copy across the whole st_atim,
+	st_mtime, and st_ctim fields.
+	* syscalls.cc (stat64_to_stat32): Ditto.
+	* times.cc (to_timestruc_t): New function.
+	(time_as_timestruc_t): New function.
+	* winsup.h: Add to_timestruc_t and time_as_timestruc_t functions.
+	* include/cygwin/stat.h: Replace time_t with timestruc_t
+	throughout for all file times, removing the st_spare1, st_spare2,
+	and st_spare3 fields in the process. Add macros to access tv_sec
+	fields by old names.
+	* include/cygwin/types.h: Typedef timespec_t and timestruc_t as
+	struct timespec.
+
 2002-06-03  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* sec_helper.cc (lookup_name): Suppress.
