@@ -1,3 +1,8 @@
+Thu Sep 20 13:34:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::fixup_after_exec): Close
+	socket only when not using Winsock2.
+
 Thu Sep 20 13:20:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_socket::fixup_after_exec): Remove inline

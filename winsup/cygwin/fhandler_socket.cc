@@ -214,9 +214,10 @@ fhandler_socket::fixup_after_fork (HANDLE parent)
 void
 fhandler_socket::fixup_after_exec (HANDLE parent)
 {
+  extern WSADATA wsadata;
   if (!get_close_on_exec ())
     fixup_after_fork (parent);
-  else
+  else if (wsadata.wVersion < 512) /* < Winsock 2.0 */
     closesocket (get_socket ());
 }
 
