@@ -1,3 +1,8 @@
+2000-05-19  DJ Delorie  <dj@cygnus.com>
+
+	* cygpath.cc: add --windir/--sysdir options
+	* utils.sgml: and document them
+
 Thu May 18 14:38:26 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Eliminate WINSUP_DEPS.

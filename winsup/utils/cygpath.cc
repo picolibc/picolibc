@@ -35,6 +35,8 @@ static struct option long_options[] =
   { (char *) "file", required_argument, (int *) &file_arg, 'f'},
   { (char *) "version", no_argument, NULL, 'v' },
   { (char *) "windows", no_argument, NULL, 'w' },
+  { (char *) "windir", no_argument, NULL, 'W' },
+  { (char *) "sysdir", no_argument, NULL, 'S' },
   { 0, no_argument, 0, 0 }
 };
 
@@ -48,6 +50,8 @@ Usage: %s [-p|--path] (-u|--unix)|(-w|--windows) filename\n\
   -f|--file file	read file for path information\n\
   -u|--unix     	print Unix form of filename\n\
   -w|--windows  	print Windows form of filename\n\
+  -W|--windir 	 	print `Windows' directory\n\
+  -S|--sysdir 	 	print `system' directory\n\
   -p|--path     	filename argument is a path\n",
 	   prog_name);
   exit (status);
@@ -115,6 +119,7 @@ main (int argc, char **argv)
   int c;
   int options_from_file_flag;
   char *filename;
+  char buf[MAX_PATH], buf2[MAX_PATH];
 
   prog_name = strrchr (argv[0], '/');
   if (prog_name == NULL)
@@ -126,7 +131,7 @@ main (int argc, char **argv)
   unix_flag = 0;
   windows_flag = 0;
   options_from_file_flag = 0;
-  while ((c = getopt_long (argc, argv, (char *) "hac:f:opuvw", long_options, (int *) NULL))
+  while ((c = getopt_long (argc, argv, (char *) "hac:f:opSuvwW", long_options, (int *) NULL))
 	 != EOF)
     {
       switch (c)
@@ -163,13 +168,25 @@ main (int argc, char **argv)
 	  windows_flag = 1;
 	  break;
 
+	case 'W':
+	  GetWindowsDirectory(buf, MAX_PATH);
+	  cygwin_conv_to_posix_path(buf, buf2);
+	  printf("%s\n", buf2);
+	  exit(0);
+
+	case 'S':
+	  GetSystemDirectory(buf, MAX_PATH);
+	  cygwin_conv_to_posix_path(buf, buf2);
+	  printf("%s\n", buf2);
+	  exit(0);
+
 	case 'h':
 	  usage (stdout, 0);
 	  break;
 
 	case 'v':
 	  printf ("Cygwin pathconv version 1.0\n");
-	  printf ("Copyright 1998 Cygnus Solutions\n");
+	  printf ("Copyright 1998,1999,2000 Cygnus Solutions\n");
 	  exit (0);
 
 	default:

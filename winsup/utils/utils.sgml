@@ -66,10 +66,13 @@ or if you know what everything is already, just leave this out.</para>
 <screen>
 Usage: cygpath [-p|--path] (-u|--unix)|(-w|--windows) filename
        cygpath [-v|--version]
+       cygpath [-W|--windir|-S|--sysdir]
   -u|--unix     print UNIX form of filename
   -w|--windows  print Windows form of filename
   -p|--path     filename argument is a path
   -v|--version  print program version
+  -W|--windir   print windows directory
+  -S|--sysdir   print system directory
 </screen>
 
 <para>The <command>cygpath</command> program is a utility that
