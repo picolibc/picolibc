@@ -1,3 +1,19 @@
+2003-09-12  Christopher Faylor  <cgf@redhat.com>
+
+	* dcrt0.cc (_dll_crt0): Accommodate breaking apart of early_stuff_init.
+	* exceptions.cc (early_stuff_init): Delete.
+	(init_console_handler): New function - top half of early_stuff_init.
+	(init_global_security): New function - bottom half of early_stuff_init.
+	(sig_handle): Avoid special hExeced test for SIGINT.  Just terminate
+	the captive process.
+	(signal_exit): Add debugging output.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Don't allocate a console
+	if one already seems to exist.  Properly initialize ctrl-c handling if
+	we do allocate a console.
+	* winsup.h (early_stuff_init): Delete declaration.
+	(init_console_handler): New declaration.
+	(init_global_security): New declaration.
+
 2003-09-11  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_disk_file.cc (path_conv::ndisk_links): Rename from

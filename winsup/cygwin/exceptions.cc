@@ -115,12 +115,16 @@ init_exception_handler (exception_list *el)
 #endif
 
 void
-early_stuff_init ()
+init_console_handler ()
 {
   (void) SetConsoleCtrlHandler (ctrl_c_handler, FALSE);
   if (!SetConsoleCtrlHandler (ctrl_c_handler, TRUE))
     system_printf ("SetConsoleCtrlHandler failed, %E");
+}
 
+void
+init_global_security ()
+{
   /* Initialize global security attribute stuff */
 
   sec_none.nLength = sec_none_nih.nLength =
@@ -1024,7 +1028,7 @@ sig_handle (int sig)
   if (handler == (void *) SIG_DFL)
     {
       if (sig == SIGCHLD || sig == SIGIO || sig == SIGCONT || sig == SIGWINCH
-	  || sig == SIGURG || (hExeced && sig == SIGINT))
+	  || sig == SIGURG)
 	{
 	  sigproc_printf ("default signal %d ignored", sig);
 	  goto done;
@@ -1107,7 +1111,10 @@ signal_exit (int rc)
   user_data->resourcelocks->Init ();
 
   if (hExeced)
-    TerminateProcess (hExeced, rc);
+    {
+      sigproc_printf ("terminating captive process");
+      TerminateProcess (hExeced, rc);
+    }
 
   sigproc_printf ("about to call do_exit (%x)", rc);
   (void) SetEvent (signal_arrived);
