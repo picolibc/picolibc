@@ -1,3 +1,7 @@
+2002-12-20  DJ Delorie  <dj@redhat.com>
+
+	* xstormy16.h: Add XSTORMY16_12.
+
 2002-12-16  Andrew MacLeod  <amacleod@redhat.com>
 
 	* xstormy16.h (START_RELOC_NUMBERS) Add relocation numbers
