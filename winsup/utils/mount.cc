@@ -16,6 +16,7 @@ details. */
 #include <sys/cygwin.h>
 #include <stdlib.h>
 #include <getopt.h>
+#include <dirent.h>
 
 #ifdef errno
 #undef errno
@@ -101,6 +102,25 @@ do_mount (const char *dev, const char *where, int flags)
 		   "%*creferences a remote share.  Use '-f' option to override.\n", progname,
 		   strlen(progname) + 2, ' ');
 	  flags |= MOUNT_NOTEXEC;
+	}
+    }
+
+  if (!force && flags & MOUNT_ENC)
+    {
+      DIR *dd = opendir (dev);
+      if (dd)
+	{
+	  struct dirent *d;
+	  while ((d = readdir (dd)))
+	    {
+	      if (d->d_name[0] != '.')
+		/* fall through */;
+	      else if (d->d_name[1] == '\0'
+		       || (d->d_name[1] == '.' && d->d_name[2] == '\0'))
+		continue;
+	      fprintf (stderr, "%s: error: don't use \"-o managed\" on non-empty directories\n", progname);
+	      exit (1);
+	    }
 	}
     }
 
