@@ -209,8 +209,8 @@ extern int cygwin_attach_handle_to_fd (char *, int, HANDLE, mode_t, DWORD);
 #define TTY_CONSOLE	0x40000000
 
 #ifndef _SYS_TYPES_H
-typedef short uid_t;
-typedef short gid_t;
+typedef unsigned short __uid16_t;
+typedef unsigned short __gid16_t;
 #endif
 
 struct external_pinfo
@@ -219,8 +219,8 @@ struct external_pinfo
   pid_t ppid;
   HANDLE hProcess;
   DWORD dwProcessId, dwSpawnedProcessId;
-  uid_t uid;
-  gid_t gid;
+  __uid16_t uid;
+  __gid16_t gid;
   pid_t pgid;
   pid_t sid;
   int ctty;

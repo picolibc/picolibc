@@ -1,5 +1,14 @@
 2002-02-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/cygwin/grp.h: New file.
+	* include/cygwin/stat.h: Ditto.
+	* include/cygwin/types.h: Add definitions for __off32_t,
+	__off64_t, off_t, __uid16_t, __uid32_t, uid_t, __gid16_t,
+	__gid32_t and gid_t.
+	* include/sys/cygwin.h: Use correct uid and gid types.
+
+2002-02-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dtable.cc (dtable::dup2): Revert previous patch.
 	* fhandler.h: Ditto.
 	(fhandler_socket::recv): Define new method.
