@@ -448,8 +448,8 @@ map::del_list (int i)
     }
 }
 
-extern "C" caddr_t
-mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, _off64_t off)
+extern "C" void *
+mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 {
   syscall_printf ("addr %x, len %u, prot %x, flags %x, fd %d, off %D",
 		  addr, len, prot, flags, fd, off);
@@ -576,7 +576,7 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, _off64_t off)
       && (wincap.has_working_copy_on_write () || fd != -1))
     access = FILE_MAP_COPY;
 
-  caddr_t base = addr;
+  caddr_t base = (caddr_t)addr;
   /* This shifts the base address to the next lower 64K boundary.
      The offset is re-added when evaluating the return value. */
   if (base)
@@ -631,8 +631,8 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, _off64_t off)
   return ret;
 }
 
-extern "C" caddr_t
-mmap (caddr_t addr, size_t len, int prot, int flags, int fd, _off_t off)
+extern "C" void *
+mmap (void *addr, size_t len, int prot, int flags, int fd, _off_t off)
 {
   return mmap64 (addr, len, prot, flags, fd, (_off64_t)off);
 }
@@ -640,7 +640,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, _off_t off)
 /* munmap () removes all mmapped pages between addr and addr+len. */
 
 extern "C" int
-munmap (caddr_t addr, size_t len)
+munmap (void *addr, size_t len)
 {
   syscall_printf ("munmap (addr %x, len %u)", addr, len);
 
@@ -672,7 +672,7 @@ munmap (caddr_t addr, size_t len)
       caddr_t u_addr;
       DWORD u_len;
 
-      while ((record_idx = map_list->search_record(addr, len, u_addr,
+      while ((record_idx = map_list->search_record((caddr_t)addr, len, u_addr,
       						   u_len, record_idx)) >= 0)
 	{
 	  mmap_record *rec = map_list->get_record (record_idx);
@@ -680,7 +680,7 @@ munmap (caddr_t addr, size_t len)
 	    {
 	      /* The whole record has been unmapped, so... */
 	      fhandler_base *fh = rec->alloc_fh ();
-	      fh->munmap (rec->get_handle (), addr, len);
+	      fh->munmap (rec->get_handle (), (caddr_t)addr, len);
 	      rec->free_fh (fh);
 
 	      /* ...delete the record. */
@@ -703,7 +703,7 @@ munmap (caddr_t addr, size_t len)
 /* Sync file with memory. Ignore flags for now. */
 
 extern "C" int
-msync (caddr_t addr, size_t len, int flags)
+msync (void *addr, size_t len, int flags)
 {
   syscall_printf ("addr = %x, len = %u, flags = %x",
 		  addr, len, flags);
@@ -740,14 +740,15 @@ msync (caddr_t addr, size_t len, int flags)
       	   (rec = map_list->get_record (record_idx));
 	   ++record_idx)
 	{
-	  if (rec->access (addr))
+	  if (rec->access ((caddr_t)addr))
 	    {
 	      /* Check whole area given by len. */
 	      for (DWORD i = getpagesize (); i < len; ++i)
-		if (!rec->access (addr + i))
+		if (!rec->access ((caddr_t)addr + i))
 		  goto invalid_address_range;
 	      fhandler_base *fh = rec->alloc_fh ();
-	      int ret = fh->msync (rec->get_handle (), addr, len, flags);
+	      int ret = fh->msync (rec->get_handle (), (caddr_t)addr, len,
+	      			   flags);
 	      rec->free_fh (fh);
 
 	      if (ret)
@@ -769,6 +770,62 @@ invalid_address_range:
 
   ReleaseResourceLock (LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "msync");
   return -1;
+}
+
+/* Set memory protection */
+
+extern "C" int
+mprotect (void *addr, size_t len, int prot)
+{
+  DWORD old_prot;
+  DWORD new_prot = 0;
+
+  syscall_printf ("mprotect (addr %x, len %u, prot %x)", addr, len, prot);
+
+  if (!wincap.virtual_protect_works_on_shared_pages ()
+      && addr >= (caddr_t)0x80000000 && addr <= (caddr_t)0xBFFFFFFF)
+    {
+      syscall_printf ("0 = mprotect (9x: No VirtualProtect on shared memory)");
+      return 0;
+    }
+
+  switch (prot)
+    {
+      case PROT_READ | PROT_WRITE | PROT_EXEC:
+      case PROT_WRITE | PROT_EXEC:
+	new_prot = PAGE_EXECUTE_READWRITE;
+	break;
+      case PROT_READ | PROT_WRITE:
+      case PROT_WRITE:
+	new_prot = PAGE_READWRITE;
+	break;
+      case PROT_READ | PROT_EXEC:
+	new_prot = PAGE_EXECUTE_READ;
+	break;
+      case PROT_READ:
+	new_prot = PAGE_READONLY;
+	break;
+      case PROT_EXEC:
+	new_prot = PAGE_EXECUTE;
+	break;
+      case PROT_NONE:
+	new_prot = PAGE_NOACCESS;
+	break;
+      default:
+	syscall_printf ("-1 = mprotect (): invalid prot value");
+	set_errno (EINVAL);
+	return -1;
+     }
+
+  if (VirtualProtect (addr, len, new_prot, &old_prot) == 0)
+    {
+      __seterrno ();
+      syscall_printf ("-1 = mprotect (): %E");
+      return -1;
+    }
+
+  syscall_printf ("0 = mprotect ()");
+  return 0;
 }
 
 /*
@@ -928,62 +985,6 @@ fhandler_disk_file::fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
 		     address, base, m.AllocationBase, m.State, m.RegionSize);
     }
   return base == address;
-}
-
-/* Set memory protection */
-
-extern "C" int
-mprotect (caddr_t addr, size_t len, int prot)
-{
-  DWORD old_prot;
-  DWORD new_prot = 0;
-
-  syscall_printf ("mprotect (addr %x, len %u, prot %x)", addr, len, prot);
-
-  if (!wincap.virtual_protect_works_on_shared_pages ()
-      && addr >= (caddr_t)0x80000000 && addr <= (caddr_t)0xBFFFFFFF)
-    {
-      syscall_printf ("0 = mprotect (9x: No VirtualProtect on shared memory)");
-      return 0;
-    }
-
-  switch (prot)
-    {
-      case PROT_READ | PROT_WRITE | PROT_EXEC:
-      case PROT_WRITE | PROT_EXEC:
-	new_prot = PAGE_EXECUTE_READWRITE;
-	break;
-      case PROT_READ | PROT_WRITE:
-      case PROT_WRITE:
-	new_prot = PAGE_READWRITE;
-	break;
-      case PROT_READ | PROT_EXEC:
-	new_prot = PAGE_EXECUTE_READ;
-	break;
-      case PROT_READ:
-	new_prot = PAGE_READONLY;
-	break;
-      case PROT_EXEC:
-	new_prot = PAGE_EXECUTE;
-	break;
-      case PROT_NONE:
-	new_prot = PAGE_NOACCESS;
-	break;
-      default:
-	syscall_printf ("-1 = mprotect (): invalid prot value");
-	set_errno (EINVAL);
-	return -1;
-     }
-
-  if (VirtualProtect (addr, len, new_prot, &old_prot) == 0)
-    {
-      __seterrno ();
-      syscall_printf ("-1 = mprotect (): %E");
-      return -1;
-    }
-
-  syscall_printf ("0 = mprotect ()");
-  return 0;
 }
 
 /*

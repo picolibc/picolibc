@@ -1,3 +1,13 @@
+2003-09-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (mmap64): Change address types from caddr_t to void *
+	according to SUSv3.
+	(mmap): Ditto.  
+	(munmap): Ditto.
+	(msync): Ditto.
+	(mprotect): Ditto.  Move to before the fhandler methods.
+	* include/sys/mman.h: Change prototypes accordingly.
+
 2003-09-08  Christopher Faylor  <cgf@redhat.com>
 
 	* dcrt0.cc (dlL_crt0_1): Set __argc_safe after __argc is absolutely

@@ -41,11 +41,11 @@ extern "C" {
 #define MS_INVALIDATE 4
 
 #ifndef __INSIDE_CYGWIN__
-extern caddr_t mmap (caddr_t __addr, size_t __len, int __prot, int __flags, int __fd, off_t __off);
+extern void *mmap (void *__addr, size_t __len, int __prot, int __flags, int __fd, off_t __off);
 #endif
-extern int munmap (caddr_t __addr, size_t __len);
-extern int mprotect (caddr_t __addr, size_t __len, int __prot);
-extern int msync (caddr_t __addr, size_t __len, int __flags);
+extern int munmap (void *__addr, size_t __len);
+extern int mprotect (void *__addr, size_t __len, int __prot);
+extern int msync (void *__addr, size_t __len, int __flags);
 
 #ifdef __cplusplus
 };
