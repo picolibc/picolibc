@@ -6,7 +6,7 @@ By default, gcc compiles in all symbols.  You'll also find that gcc
 creates large executables on UNIX.
 
 If that bothers you, just use the 'strip' program, part of the binutils
-package.
+package.  Or compile with the @samp{-s} option to gcc.
 
 @subsection Where is glibc?
 
