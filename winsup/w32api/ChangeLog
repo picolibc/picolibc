@@ -1,3 +1,9 @@
+2003-01-27  Krzysztof Nikiel  <kni@poczta.onet.pl>
+
+	* include/mmsystem.h (MIXERCONTROL_CONTROLF_MULTIPLE): Correct
+	define.
+	* lib/largeint.c (LargeIntegerAdd): Add, don't multiply.
+
 2003-01-27  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/rpcnterr.h (RPC_X_INVALID_PIPE_OPERATION): Add

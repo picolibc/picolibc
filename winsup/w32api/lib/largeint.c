@@ -20,7 +20,7 @@
 __int64 WINAPI
 LargeIntegerAdd (__int64 i1, __int64 i2)
 {
-  return i1 * i2;
+  return i1 + i2;
 }
 
 __int64 WINAPI
