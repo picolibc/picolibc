@@ -1,3 +1,26 @@
+2004-01-22  Christopher Faylor  <cgf@redhat.com>
+
+	* dcrt0.cc (reent_data): Make global.
+	* cygwin.din: Reexport reent_data.
+
+2004-01-22  Christopher Faylor  <cgf@redhat.com>
+
+	* cygtls.cc (_threadinfo::remove): Don't assume that we are removing
+	_my_tls.
+	* exceptions.cc (setup_handler): Improve debugging output.
+	(call_signal_handler_now): Remove ill-advised debugger call.
+	* sigproc.cc (sigcomplete_main): Delete.
+	(sig_send): Honor FIXME and avoid using main thread's completion event
+	for everything or suffer races.
+	(pending_signals::add): Default stored mask to current process mask
+	rather than mask at time of signal send.
+	(wait_sig): Add debugging output.
+	* sigproc.h (sigpacket::mask_storage): Delete.
+
+2004-01-22  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.cc (fhandler_base::open): Revert isfs change.
+
 2004-01-21  Christopher Faylor  <cgf@redhat.com>
 
 	* devices.in: Change raw com device to more correct form.

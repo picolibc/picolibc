@@ -133,9 +133,6 @@ HANDLE NO_COPY signal_arrived;		// Event signaled when a signal has
 
 Static DWORD proc_loop_wait = 1000;	// Wait for subprocesses to exit
 
-Static HANDLE sigcomplete_main;		// Event signaled when a signal has
-					//  finished processing for the main
-					//  thread
 HANDLE NO_COPY sigCONT;			// Used to "STOP" a process
 Static cygthread *hwait_sig;		// Handle of wait_sig thread
 Static cygthread *hwait_subproc;	// Handle of sig_subproc thread
@@ -665,7 +662,6 @@ sigproc_terminate (void)
     {
       sigproc_printf ("entering");
 				//  finished with anything it is doing
-      ForceCloseHandle (sigcomplete_main);
       if (!hExeced)
 	{
 	  HANDLE sendsig = myself->sendsig;
@@ -691,8 +687,8 @@ sig_send (_pinfo *p, int sig, void *tls)
   HANDLE sendsig;
   sigpacket pack;
 
+  pack.wakeup = NULL;
   bool wait_for_completion;
-  // FIXMENOW: Avoid using main thread's completion event!
   if (!(its_me = (p == NULL || p == myself || p == myself_nowait)))
     wait_for_completion = false;
   else
@@ -720,11 +716,7 @@ sig_send (_pinfo *p, int sig, void *tls)
     }
 
   if (its_me)
-    {
-      sendsig = myself->sendsig;
-      if (wait_for_completion)
-	pack.wakeup = sigcomplete_main;
-    }
+    sendsig = myself->sendsig;
   else
     {
       HANDLE hp = OpenProcess (PROCESS_DUP_HANDLE, false, p->dwProcessId);
@@ -763,11 +755,18 @@ sig_send (_pinfo *p, int sig, void *tls)
   pack.sig = sig;
   pack.pid = myself->pid;
   pack.tls = (_threadinfo *) tls;
+  if (wait_for_completion)
+     {
+       pack.wakeup = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+       sigproc_printf ("wakeup %p", pack.wakeup);
+       ProtectHandle (pack.wakeup);
+     }
+
   DWORD nb;
   if (!WriteFile (sendsig, &pack, sizeof (pack), &nb, NULL) || nb != sizeof (pack))
     {
       /* Couldn't send to the pipe.  This probably means that the
-         process is exiting.  */
+	 process is exiting.  */
       if (!its_me)
 	{
 	  sigproc_printf ("WriteFile for pipe %p failed, %E", sendsig);
@@ -820,6 +819,9 @@ sig_send (_pinfo *p, int sig, void *tls)
     call_signal_handler_now ();
 
 out:
+  if (pack.wakeup)
+    ForceCloseHandle (pack.wakeup);
+
   if (sig != __SIGPENDING)
     /* nothing */;
   else if (!rc)
@@ -1082,12 +1084,8 @@ wait_sig (VOID *self)
   /* Initialization */
   (void) SetThreadPriority (GetCurrentThread (), WAIT_SIG_PRIORITY);
 
-  /* sigcomplete_main	   - event used to signal main thread on signal
-    			     completion */
   if (!CreatePipe (&readsig, &myself->sendsig, sec_user_nih (sa_buf), 0))
     api_fatal ("couldn't create signal pipe, %E");
-  sigcomplete_main = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
-  sigproc_printf ("sigcomplete_main %p", sigcomplete_main);
   sigCONT = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
 
   /* Setting dwProcessId flags that this process is now capable of receiving
@@ -1097,8 +1095,6 @@ wait_sig (VOID *self)
   myself->dwProcessId = GetCurrentProcessId ();
   myself->process_state |= PID_ACTIVE;
   myself->process_state &= ~PID_INITIALIZING;
-
-  ProtectHandle (sigcomplete_main);
 
   /* If we've been execed, then there is still a stub left in the previous
      windows process waiting to see if it's started a cygwin process or not.
@@ -1199,7 +1195,10 @@ wait_sig (VOID *self)
 	  break;
 	}
       if (pack.wakeup)
-	SetEvent (pack.wakeup);
+	{
+	  SetEvent (pack.wakeup);
+	  sigproc_printf ("signalled %p", pack.wakeup);
+	}
     }
 
   sigproc_printf ("done");

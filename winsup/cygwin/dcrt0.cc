@@ -93,7 +93,7 @@ extern "C"
   char ***main_environ;
   /* __progname used in getopt error message */
   char *__progname;
-  static struct _reent reent_data;
+  struct _reent reent_data;
   struct per_process __cygwin_user_data =
   {/* initial_sp */ 0, /* magic_biscuit */ 0,
    /* dll_major */ CYGWIN_VERSION_DLL_MAJOR,

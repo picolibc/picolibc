@@ -139,10 +139,11 @@ _threadinfo::remove (DWORD wait)
   if (here.acquired ())
     {
       for (size_t i = 0; i < nthreads; i++)
-	if (&_my_tls == cygheap->threadlist[i])
+	if (this == cygheap->threadlist[i])
 	  {
 	    if (i < --nthreads)
 	      cygheap->threadlist[i] = cygheap->threadlist[nthreads];
+	    debug_printf ("removed %p element %d", this, i);
 	    break;
 	  }
     }
