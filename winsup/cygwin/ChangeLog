@@ -1,3 +1,13 @@
+Fri Mar 30 13:02:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_console): Add members `savebufsiz' and
+	`savebuf' to allow save/restore of screen.
+	* fhandler_console.cc (fhandler_console::dup): Duplicate savebuf.
+	(fhandler_console::fhandler_console): Initialize `savebufsiz' and
+	`savebuf'.
+	(fhandler_console::char_command): Add terminal capabilities
+	"save screen content" = \E[?47h and "restore screen content" = \E[?47l.
+
 Wed Mar 28 19:28:50 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (chdir): Eat trailing whitespace on input path.

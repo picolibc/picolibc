@@ -630,6 +630,10 @@ private:
   /* saved cursor coordinates */
   int savex, savey;
 
+  /* saved screen */
+  COORD savebufsiz;
+  PCHAR_INFO savebuf;
+
   struct
     {
       short Top, Bottom;

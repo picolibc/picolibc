@@ -565,6 +565,15 @@ fhandler_console::dup (fhandler_base *child)
   fhc->savex = savex;
   fhc->savey = savey;
 
+  fhc->savebufsiz = savebufsiz;
+  if (savebuf)
+    {
+      fhc->savebuf = (PCHAR_INFO) malloc (sizeof (CHAR_INFO) *
+      					  savebufsiz.X * savebufsiz.Y);
+      memcpy (fhc->savebuf, savebuf, sizeof (CHAR_INFO) *
+      				     savebufsiz.X * savebufsiz.Y);
+    }
+
   fhc->scroll_region = scroll_region;
   fhc->dwLastCursorPosition = dwLastCursorPosition;
   fhc->dwLastButtonState = dwLastButtonState;
@@ -784,6 +793,8 @@ fhandler_console::fhandler_console (const char *name) :
   nargs_ = 0;
   for (int i = 0; i < MAXARGS; i++) args_ [i] = 0;
   savex = savey = 0;
+  savebufsiz.X = savebufsiz.Y = 0;
+  savebuf = NULL;
   scroll_region.Top = 0;
   scroll_region.Bottom = -1;
   dwLastCursorPosition.X = -1;
@@ -1088,6 +1099,46 @@ fhandler_console::char_command (char c)
 	break;
       switch (args_[0])
 	{
+	case 47:   /* Save/Restore screen */
+	  if (c == 'h') /* save */
+	    {
+	      CONSOLE_SCREEN_BUFFER_INFO now;
+	      COORD cob = { 0, 0 };
+
+	      if (!GetConsoleScreenBufferInfo (get_output_handle (), &now))
+	        break;
+
+	      savebufsiz.X = now.srWindow.Right - now.srWindow.Left;
+	      savebufsiz.Y = now.srWindow.Bottom - now.srWindow.Top;
+
+	      if (savebuf)
+	        free (savebuf);
+	      savebuf = (PCHAR_INFO) malloc (sizeof (CHAR_INFO) *
+	      				     savebufsiz.X * savebufsiz.Y);
+
+	      ReadConsoleOutputA (get_output_handle (), savebuf,
+				  savebufsiz, cob, &now.srWindow);
+	    }
+	  else          /* restore */
+	    {
+	      CONSOLE_SCREEN_BUFFER_INFO now;
+	      COORD cob = { 0, 0 };
+
+	      if (!GetConsoleScreenBufferInfo (get_output_handle (), &now))
+	        break;
+
+	      if (!savebuf)
+	        break;
+
+	      WriteConsoleOutputA (get_output_handle (), savebuf,
+	      			   savebufsiz, cob, &now.srWindow);
+
+	      free (savebuf);
+	      savebuf = NULL;
+	      savebufsiz.X = savebufsiz.Y = 0;
+	    }
+	  break;
+
 	case 1000: /* Mouse support */
 	  use_mouse = (c == 'h') ? TRUE : FALSE;
 	  syscall_printf("mouse support %sabled", use_mouse ? "en" : "dis");
