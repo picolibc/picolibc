@@ -1980,6 +1980,7 @@ seteuid (uid_t uid)
 	  DWORD siz;
 	  HANDLE sav_token = INVALID_HANDLE_VALUE;
 	  BOOL sav_impersonation;
+	  BOOL current_token_is_internal_token = FALSE;
 	  BOOL explicitely_created_token = FALSE;
 
 	  struct group *gr = getgrgid (myself->gid);
@@ -1988,9 +1989,10 @@ seteuid (uid_t uid)
 	  usersid.getfrompw (pw_new);
 	  pgrpsid.getfromgr (gr);
 
+	  /* Only when ntsec is ON! */
 	  /* Check if new user == user of impersonation token and
-	     - if available - new pgrp == pgrp of impersonation token. */
-	  if (cygheap->user.token != INVALID_HANDLE_VALUE)
+	     - if reasonable - new pgrp == pgrp of impersonation token. */
+	  if (allow_ntsec && cygheap->user.token != INVALID_HANDLE_VALUE)
 	    {
 	      if (!GetTokenInformation (cygheap->user.token, TokenUser,
 					&tok_usersid, sizeof tok_usersid, &siz))
@@ -2004,8 +2006,19 @@ seteuid (uid_t uid)
 		  debug_printf ("GetTokenInformation(): %E");
 		  tok_pgrpsid = NO_SID;
 		}
+	      /* Check if the current user token was internally created. */
+	      TOKEN_SOURCE ts;
+	      if (!GetTokenInformation (cygheap->user.token, TokenSource,
+					&ts, sizeof ts, &siz))
+		debug_printf ("GetTokenInformation(): %E");
+	      else if (!memcmp (ts.SourceName, "Cygwin.1", 8))
+		current_token_is_internal_token = TRUE;
 	      if ((usersid && tok_usersid && usersid != tok_usersid) ||
-	          (pgrpsid && tok_pgrpsid && pgrpsid != tok_pgrpsid))
+		  /* Check for pgrp only if current token is an internal
+		     token. Otherwise the external provided token is
+		     very likely overwritten here. */
+	          (current_token_is_internal_token &&
+		   pgrpsid && tok_pgrpsid && pgrpsid != tok_pgrpsid))
 		{
 		  /* If not, RevertToSelf and close old token. */
 		  debug_printf ("tsid != usersid");
@@ -2017,9 +2030,10 @@ seteuid (uid_t uid)
 		}
 	    }
 
+	  /* Only when ntsec is ON! */
 	  /* If no impersonation token is available, try to 
 	     authenticate using NtCreateToken() or subauthentication. */
-	  if (cygheap->user.token == INVALID_HANDLE_VALUE)
+	  if (allow_ntsec && cygheap->user.token == INVALID_HANDLE_VALUE)
 	    {
 	      HANDLE ptok = INVALID_HANDLE_VALUE;
 
@@ -2036,15 +2050,9 @@ seteuid (uid_t uid)
 	        {
 		  cygwin_set_impersonation_token (ptok);
 		  /* If sav_token was internally created, destroy it. */
-		  if (sav_token != INVALID_HANDLE_VALUE)
-		    {
-		      TOKEN_SOURCE ts;
-		      if (!GetTokenInformation (sav_token, TokenSource,
-		      				&ts, sizeof ts, &siz))
-			debug_printf ("GetTokenInformation(): %E");
-		      else if (!memcmp (ts.SourceName, "Cygwin.1", 8))
-		        CloseHandle (sav_token);
-		    }
+		  if (sav_token != INVALID_HANDLE_VALUE &&
+		      current_token_is_internal_token)
+		    CloseHandle (sav_token);
 	        }
 	      else if (sav_token != INVALID_HANDLE_VALUE)
 		cygheap->user.token = sav_token;

@@ -1,3 +1,10 @@
+Wed May 23 17:45:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* syscalls.cc (seteuid): Restrict overriding external provided
+	user tokens to ntsec. Don't test external tokens for primary
+	group to evaluate if it should be overridden. Restrict creating
+	internal tokens to ntsec.
+
 Wed May 23 10:11:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* syscalls.cc (chown_worker): Don't check for ENOSYS.
