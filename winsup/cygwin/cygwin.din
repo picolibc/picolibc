@@ -749,6 +749,8 @@ strtodf
 _strtodf = strtodf
 strtok
 _strtok = strtok
+strtok_r
+_strtok_r = strtok_r
 strtol
 _strtol = strtol
 strtoul
