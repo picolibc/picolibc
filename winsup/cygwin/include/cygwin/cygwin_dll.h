@@ -24,9 +24,6 @@ details. */
 #define DECLARE_CYGWIN_DLL(Entry)					      \
 									      \
 CDECL_BEGIN								      \
-  int WINAPI _cygwin_dll_entry (HANDLE h, DWORD reason, void *ptr);	      \
-  int WINAPI _cygwin_noncygwin_dll_entry (HANDLE h, DWORD reason, void *ptr); \
-									      \
   int WINAPI Entry (HANDLE h, DWORD reason, void *ptr);		              \
   typedef int (*mainfunc) (int, char **, char **);			      \
   extern int cygwin_attach_dll (HMODULE, mainfunc);			      \
