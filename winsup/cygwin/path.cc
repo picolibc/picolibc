@@ -3311,6 +3311,11 @@ chdir (const char *in_dir)
       set_errno (ENOENT);
       return -1;
     }
+  else if (!path.isdir ())
+    {
+      set_errno (ENOTDIR);
+      return -1;
+    }
   else
     {
       native_dir = "c:\\";

@@ -1,3 +1,7 @@
+2002-06-01  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (chdir): Don't allow cd'ing to a non-directory virtual path.
+
 2002-05-31  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_disk_file.cc (readdir): Move inode calculation into caller.
