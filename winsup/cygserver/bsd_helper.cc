@@ -87,12 +87,12 @@ struct ipc_hookthread_storage {
 };
 
 struct ipc_hookthread {
-  SLIST_ENTRY(ipc_hookthread) sht_next;
+  SLIST_ENTRY (ipc_hookthread) sht_next;
   HANDLE thread;
   DWORD  winpid;
   struct vmspace vmspace;
 };
-static SLIST_HEAD(, ipc_hookthread) ipcht_list; /* list of hook threads */
+static SLIST_HEAD (, ipc_hookthread) ipcht_list; /* list of hook threads */
 
 static HANDLE ipcexit_event;
 
@@ -115,7 +115,7 @@ ipc_p_vmspace (struct proc *proc)
 }
 
 static DWORD WINAPI
-ipcexit_hookthread(const LPVOID param)
+ipcexit_hookthread (const LPVOID param)
 {
   ipc_hookthread_storage *shs = (ipc_hookthread_storage *) param;
   HANDLE obj[2] = { ipcexit_event, shs->process_hdl };
@@ -163,7 +163,7 @@ ipcexit_hookthread(const LPVOID param)
 /* Deletes all pending hook threads.  Called by ipcunload() which in turn
    is called by the cygserver main routine. */
 static void
-ipcexit_dispose_hookthreads(void)
+ipcexit_dispose_hookthreads (void)
 {
   SetEvent (ipcexit_event);
   ipc_hookthread *ipcht_entry;
@@ -180,7 +180,7 @@ ipcexit_dispose_hookthreads(void)
 /* Creates the per process wait thread.  Called by semget() under locked
    Giant mutex condition. */
 int
-ipcexit_creat_hookthread(struct thread *td)
+ipcexit_creat_hookthread (struct thread *td)
 {
   ipc_hookthread *ipcht_entry;
   int ret = -1;
@@ -259,7 +259,7 @@ ipcinit ()
   SetSecurityDescriptorDacl (&sec_all_nih_sd, TRUE, 0, FALSE);
 
   init_admin_sid ();
-  mtx_init(&Giant, "Giant", NULL, MTX_DEF);
+  mtx_init (&Giant, "Giant", NULL, MTX_DEF);
   msleep_init ();
   ipcexit_event = CreateEvent (NULL, TRUE, FALSE, NULL);
   if (!ipcexit_event)
@@ -276,7 +276,7 @@ ipcinit ()
 int
 ipcunload ()
 {
-  ipcexit_dispose_hookthreads();
+  ipcexit_dispose_hookthreads ();
   CloseHandle (ipcexit_event);
   wakeup_all ();
   if (support_semaphores == TUN_TRUE)
@@ -284,8 +284,8 @@ ipcunload ()
   if (support_sharedmem == TUN_TRUE)
     shmunload ();
   if (support_msgqueues == TUN_TRUE)
-    msgunload();
-  mtx_destroy(&Giant);
+    msgunload ();
+  mtx_destroy (&Giant);
   return 0;
 }
 
@@ -466,9 +466,9 @@ vm_object_t
 vm_object_duplicate (struct thread *td, vm_object_t object)
 {
   vm_object_t dup_object;
-  if (!DuplicateHandle(GetCurrentProcess (), object,
-		       td->client->handle (), &dup_object,
-		       0, TRUE, DUPLICATE_SAME_ACCESS))
+  if (!DuplicateHandle (GetCurrentProcess (), object,
+		        td->client->handle (), &dup_object,
+		        0, TRUE, DUPLICATE_SAME_ACCESS))
     panic ("!DuplicateHandle in vm_object_duplicate failed, %E");
   return dup_object;
 }

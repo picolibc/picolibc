@@ -49,17 +49,17 @@ mtx_owned (mtx *m)
 }
 
 void
-_mtx_assert(mtx *m, int what, const char *file, int line)
+_mtx_assert (mtx *m, int what, const char *file, int line)
 {
   switch (what)
     {
       case MA_OWNED:
         if (!mtx_owned (m))
-	  _panic(file, line, "Mutex %s not owned", m->name);
+	  _panic (file, line, "Mutex %s not owned", m->name);
 	break;
       case MA_NOTOWNED:
         if (mtx_owned (m))
-	  _panic(file, line, "Mutex %s is owned", m->name);
+	  _panic (file, line, "Mutex %s is owned", m->name);
         break;
       default:
         break;
