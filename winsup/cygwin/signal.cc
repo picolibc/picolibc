@@ -66,19 +66,24 @@ extern "C" unsigned int
 sleep (unsigned int seconds)
 {
   int rc;
-  unsigned start_time;
-  unsigned int res;
   sigframe thisframe (mainthread);
+  DWORD ms, start_time, end_time;
 
+  ms = seconds * 1000;
   start_time = GetTickCount ();
-
+  end_time = start_time + (seconds * 1000);
   syscall_printf ("sleep (%d)", seconds);
-  rc = WaitForSingleObject (signal_arrived, seconds * 1000);
-  if (rc == WAIT_TIMEOUT)
-    res = 0;
-  else
-    res = seconds - (GetTickCount () - start_time)/1000;
 
+  rc = WaitForSingleObject (signal_arrived, ms);
+  DWORD now = GetTickCount ();
+  if (rc == WAIT_TIMEOUT || now >= end_time)
+    ms = 0;
+  else
+    ms = end_time - now;
+  if (WaitForSingleObject (signal_arrived, 0) == WAIT_OBJECT_0)
+    (void) thisframe.call_signal_handler ();
+
+  DWORD res = (ms + 500) / 1000;
   syscall_printf ("%d = sleep (%d)", res, seconds);
 
   return res;

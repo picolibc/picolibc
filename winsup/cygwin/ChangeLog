@@ -1,3 +1,8 @@
+Sat Jun  2 23:11:52 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* syscalls.cc (sleep): Try to be a little more accomodating of signal
+	arrival.  Ensure that the signal handler is called.
+
 Sat Jun  2 14:07:28 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* cygheap.cc (cygheap_root::cygheap_rot): Remove constructor.
