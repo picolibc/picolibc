@@ -1,3 +1,7 @@
+2003-01-10  Corinna Vinschen <corinna@vinschen.de>
+
+	* net.cc (cygwin_gethostname): Fix call to wsock function gethostname.
+
 2003-01-09  Christopher Faylor  <cgf@redhat.com>
 
 	* cygthread.cc (cygthread::cygthread): Be more noisy about odd

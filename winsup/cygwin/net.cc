@@ -891,14 +891,12 @@ cygwin_getservbyport (int port, const char *proto)
 extern "C" int
 cygwin_gethostname (char *name, size_t len)
 {
-  int PASCAL win32_gethostname (char *, int);
-
   sig_dispatch_pending (0);
   sigframe thisframe (mainthread);
   if (__check_null_invalid_struct_errno (name, len))
     return -1;
 
-  if (wsock32_handle == NULL || win32_gethostname (name, len) == SOCKET_ERROR)
+  if (gethostname (name, len) == SOCKET_ERROR)
     {
       DWORD local_len = len;
 
