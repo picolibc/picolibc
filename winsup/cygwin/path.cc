@@ -203,7 +203,7 @@ normalize_posix_path (const char *src, char *dst)
 
   syscall_printf ("src %s", src);
 
-  if (isdrive (src) || strpbrk (src, "\\:"))
+  if (isdrive (src))
     {
       int err = normalize_win32_path (src, dst);
       if (!err && isdrive (dst))
@@ -499,7 +499,7 @@ path_conv::check (const char *src, unsigned opt,
 
       /* Scan path_copy from right to left looking either for a symlink
 	 or an actual existing file.  If an existing file is found, just
-	 return.  If a symlink is found exit the for loop.
+	 return.  If a symlink is found, exit the for loop.
 	 Also: be careful to preserve the errno returned from
 	 symlink.check as the caller may need it. */
       /* FIXME: Do we have to worry about multiple \'s here? */
@@ -1390,10 +1390,99 @@ set_flags (unsigned *flags, unsigned val)
     }
 }
 
+char special_chars[] =
+    "\001" "\002" "\003" "\004" "\005" "\006" "\007" "\010"
+    "\011" "\012" "\013" "\014" "\015" "\016" "\017" "\020"
+    "\021" "\022" "\023" "\024" "\025" "\026" "\027" "\030"
+    "\031" "\032" "\033" "\034" "\035" "\036" "\037"
+    ":"    "\\"   "*"    "?"    "%"
+    "A"    "B"    "C"    "D"    "E"    "F"    "G"    "H"
+    "I"    "J"    "K"    "L"    "M"    "N"    "O"    "P"
+    "Q"    "R"    "S"    "T"    "U"    "V"    "W"    "X"
+    "Y"    "Z";
+
+static inline char
+special_char (const char *s)
+{
+  char *p = strechr (special_chars, *s);
+  if (*p == '%' && strlen (p) >= 3)
+    {
+      char hex[] = {s[1], s[2], '\0'};
+      unsigned char c = strtoul (hex, &p, 16);
+      p = strechr (special_chars, c);
+    }
+  return *p;
+}
+
+bool
+fnunmunge (char *dst, const char *src) 
+{
+  bool converted = false;
+  char c;
+
+  while (*src)
+    if (*src != '%' || !(c = special_char (src)))
+      *dst++ = *src++;
+    else
+      {
+	converted = true;
+	*dst++ = c;
+	src += 3;
+      }
+
+  *dst = *src;
+  return converted;
+}
+
+/* Determines if name is "special".  Assumes that name is empty or "absolute" */
+static int
+special_name (const char *s)
+{
+  if (!*s)
+    return false;
+
+  if (strpbrk (++s, special_chars))
+    return !strncasematch (s, "%2f", 3);
+
+  if (strcasematch (s, "nul")
+      || strcasematch (s, "aux")
+      || strcasematch (s, "prn"))
+    return -1;
+  if (!strncasematch (s, "com", 3)
+      && !strncasematch (s, "lpt", 3))
+    return false;
+  char *p;
+  (void) strtol (s, &p, 10);
+  return -(*p == '\0');
+}
+
 void
 mount_item::fnmunge (char *dst, const char *src)
 {
-  strcpy (dst, src);
+  int name_type;
+  if (!(flags & MOUNT_ENC) || !(name_type = special_name (src)))
+    strcpy (dst, src);
+  else
+    {
+      char *d = dst;
+      *d++ = *src++;
+      if (name_type < 0)
+	{
+	  __small_sprintf (d, "%%%02x", (unsigned char) *src++);
+	  d += 3;
+	}
+
+      while (*src)
+	if (!special_char (src))
+	  *d++ = *src++;
+	else
+	  {
+	    __small_sprintf (d, "%%%02x", (unsigned char) *src++);
+	    d += 3;
+	  }
+      *d = *src;
+    }
+
   backslashify (dst, dst, 0);
 }
 
@@ -1420,7 +1509,7 @@ mount_item::build_win32 (char *dst, const char *src, unsigned *outflags, unsigne
   const char *p = src + real_posix_pathlen;
   if (*p == '/')
     /* nothing */;
-  else if ((isdrive (dst) && !dst[2]) || *p)
+  else if ((!(flags & MOUNT_ENC) && isdrive (dst) && !dst[2]) || *p)
     dst[n++] = '\\';
   fnmunge (dst + n, p);
 }
@@ -1474,22 +1563,6 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
 
   if (dst == NULL)
     goto out;		/* Sanity check. */
-
-  /* An MS-DOS spec has either a : or a \.  If this is found, short
-     circuit most of the rest of this function. */
-  if (strpbrk (src_path, ":\\") != NULL || slash_unc_prefix_p (src_path))
-    {
-      debug_printf ("%s already win32", src_path);
-      rc = normalize_win32_path (src_path, dst);
-      if (rc)
-	{
-	  debug_printf ("normalize_win32_path failed, rc %d", rc);
-	  return rc;
-	}
-
-      set_flags (flags, (unsigned) set_flags_from_win32_path (dst));
-      goto out;
-    }
 
   /* Normalize the path, taking out ../../ stuff, we need to do this
      so that we can move from one mounted directory to another with relative
@@ -1587,16 +1660,21 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
 	break;
     }
 
-  if (i >= nmounts)
-    {
-      backslashify (pathbuf, dst, 0);	/* just convert */
-      set_flags (flags, PATH_BINARY);
-      chroot_ok = !cygheap->root.exists ();
-    }
-  else
+  if (i < nmounts)
     {
       mi->build_win32 (dst, pathbuf, flags, chroot_pathlen);
       chroot_ok = true;
+    }
+  else
+    {
+      if (strpbrk (src_path, ":\\") != NULL || slash_unc_prefix_p (src_path))
+	rc = normalize_win32_path (src_path, dst);
+      else
+	{
+	  backslashify (pathbuf, dst, 0);	/* just convert */
+	  set_flags (flags, PATH_BINARY);
+	}
+      chroot_ok = !cygheap->root.exists ();
     }
 
   if (!isvirtual_dev (devn))
@@ -1759,6 +1837,12 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
 	{
 	  const char *p = cygheap->root.unchroot (posix_path);
 	  memmove (posix_path, p, strlen (p) + 1);
+	}
+      if (mi.flags & MOUNT_ENC)
+	{
+	  char tmpbuf[MAX_PATH + 1];
+	  if (fnunmunge (tmpbuf, posix_path))
+	    strcpy (posix_path, tmpbuf);
 	}
       goto out;
     }
@@ -2420,6 +2504,8 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
     strcat (_reent_winsup ()->mnt_opts, (char *) ",exec");
   else if (flags & MOUNT_NOTEXEC)
     strcat (_reent_winsup ()->mnt_opts, (char *) ",noexec");
+  if (flags & MOUNT_ENC)
+    strcat (_reent_winsup ()->mnt_opts, ",posix");
 
   if ((flags & MOUNT_CYGDRIVE))		/* cygdrive */
     strcat (_reent_winsup ()->mnt_opts, (char *) ",noumount");
@@ -3344,7 +3430,7 @@ chdir (const char *in_dir)
       return -1;
     }
 
-  const char *native_dir = path.get_win32 ();
+  const char *native_dir = path;
 
   /* Check to see if path translates to something like C:.
      If it does, append a \ to the native directory specification to

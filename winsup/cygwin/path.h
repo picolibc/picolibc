@@ -46,6 +46,7 @@ enum path_types
   PATH_EXEC = MOUNT_EXEC,
   PATH_NOTEXEC = MOUNT_NOTEXEC,
   PATH_CYGWIN_EXEC = MOUNT_CYGWIN_EXEC,
+  PATH_ENC = MOUNT_ENC,
   PATH_ALL_EXEC = (PATH_CYGWIN_EXEC | PATH_EXEC),
   PATH_LNK =	      0x01000000,
   PATH_TEXT =	      0x02000000,
@@ -89,6 +90,7 @@ class path_conv
   int has_symlinks () const {return path_flags & PATH_HAS_SYMLINKS;}
   int hasgood_inode () const {return path_flags & PATH_HASACLS;}  // Not strictly correct
   int has_buggy_open () const {return path_flags & PATH_HASBUGGYOPEN;}
+  bool isencoded () {return path_flags & PATH_ENC;}
   int binmode () const
   {
     if (path_flags & PATH_BINARY)
@@ -209,6 +211,8 @@ has_exec_chars (const char *buf, int len)
 
 int pathmatch (const char *path1, const char *path2) __attribute__ ((regparm (2)));
 int pathnmatch (const char *path1, const char *path2, int len) __attribute__ ((regparm (2)));
+
+bool fnunmunge (char *, const char *) __attribute__ ((regparm (2)));
 
 int path_prefix_p (const char *path1, const char *path2, int len1) __attribute__ ((regparm (3)));
 

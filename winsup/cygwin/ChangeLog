@@ -1,3 +1,25 @@
+2003-07-02  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.h (FH_ENC): New enum.
+	(fhandler_base::get_encoded): New function.
+	(fhandler_base::set_encoded): Ditto.
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Set encoded flag
+	in fhandler, as appropriate.
+	(fhandler_disk_file::readdir): Unmunge filename as appropriate based on
+	new encoding flag.
+	* path.cc (normalize_posix_path): Don't punt on files with colons.
+	(special_char): New function.
+	(mount_item::fnmunge): Ditto.
+	(fnunmunge): Ditto.
+	(special_name): Ditto.
+	(mount_item::build_win32): Avoid drive considerations when file is
+	encoded.
+	(mount_info::conv_to_win32_path): Handle encoded filenames.
+	(mount_info::conv_to_posix_path): Ditto.
+	(fillout_mntent): Add posix string when directory is encoded.
+	* path.h (fnunmunge): Declare.
+	(path_conv::is_encoded): Declare.
+
 2003-07-03  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_tty.cc (fhandler_tty_slave::open): Conditionalize a little
