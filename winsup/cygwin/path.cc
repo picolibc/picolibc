@@ -949,7 +949,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
 	  return rc;
 	}
       isrelpath = !isabspath (src_path);
-      *flags = set_flags_from_win32_path (pathbuf);
+      *flags = set_flags_from_win32_path (dst);
       goto fillin;
     }
 
