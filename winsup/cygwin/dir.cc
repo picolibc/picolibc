@@ -341,7 +341,8 @@ rmdir (const char *dir)
       /* Under Windows 9X or on a samba share, ERROR_ACCESS_DENIED is
          returned if you try to remove a file. On 9X the same error is
          returned if you try to remove a non-empty directory. */
-     if (real_dir.file_attributes () != (DWORD) -1 && !(real_dir.fileattr & FILE_ATTRIBUTE_DIRECTORY))
+     if (real_dir.file_attributes () != (DWORD) -1 &&
+	 !(real_dir.file_attributes () & FILE_ATTRIBUTE_DIRECTORY))
        set_errno (ENOTDIR);
      else if (os_being_run != winNT)
        set_errno (ENOTEMPTY);
