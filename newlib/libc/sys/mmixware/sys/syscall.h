@@ -17,6 +17,7 @@
 #define	SYS_Fopen	1
 #define	SYS_Fclose	2
 #define	SYS_Fread	3
+#define	SYS_Fgets	4
 #define	SYS_Fwrite	6
 #define	SYS_Fseek	9
 #define	SYS_Ftell	10

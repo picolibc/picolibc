@@ -1,3 +1,9 @@
+2002-07-10  Florian Shrack  <florian.schrack@freenet.de>
+
+	* libc/sys/mmixware/read.c: Use SYS_Fgets syscall if dealing with
+	a terminal.
+	* libc/sys/mmixware/sys/syscall.h (SYS_Fgets): Definition added.
+
 2002-07-08  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/include/math.h (MAXFLOAT): Added.
