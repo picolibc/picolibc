@@ -1,3 +1,17 @@
+2003-05-14  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* string_old.c: Remove, splitting into...
+	* strcasecmp.c: New file.
+	* strncasecmp.c: New file.
+	* wscmpi.c : New file.
+	* ctype_old.c: Remove, splitting into...
+	* isascii.c: New file.
+	* iscsym.c: New file.
+	* iscsymf.c: New file.
+	* toascii.c: New file.
+	* Makefile.in (MOLD_OBJS): Adjust.
+	(SRCDIST_FILES): Adjust.
+
 2003-05-13  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/math.h (fabs) : Remove inline definition.

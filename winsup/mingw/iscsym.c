@@ -1,5 +1,5 @@
 /*
- * ctype_old.c
+ * iscsym.c
  *
  * Oldnames from ANSI header ctype.h
  *
@@ -26,24 +26,6 @@
  */
 
 #include <ctype.h>
-
-int
-isascii (int c)
-{
-	return __isascii(c);
-}
-
-int
-toascii (int c)
-{
-	return __toascii(c);
-}
-
-int
-iscsymf (int c)
-{
-	return __iscsymf(c);
-}
 
 int
 iscsym (int c)

@@ -1,7 +1,7 @@
 /*
- * string_old.c
+ * iscsymf.c
  *
- * Oldnames from ANSI header string.h
+ * Oldnames from ANSI header ctype.h
  *
  * Some wrapper functions for those old name functions whose appropriate
  * equivalents are not simply underscore prefixed.
@@ -25,23 +25,11 @@
  *
  */
 
-#include <string.h>
+#include <ctype.h>
 
 int
-strcasecmp (const char *sz1, const char *sz2)
+iscsymf (int c)
 {
-  return _stricmp (sz1, sz2);
-}
-
-int
-strncasecmp (const char *sz1, const char *sz2, size_t sizeMaxCompare)
-{
-  return _strnicmp (sz1, sz2, sizeMaxCompare);
-}
-
-int
-wcscmpi (const wchar_t * ws1, const wchar_t * ws2)
-{
-  return _wcsicmp (ws1, ws2);
+	return __iscsymf(c);
 }
 
