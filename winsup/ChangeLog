@@ -1,3 +1,7 @@
+2002-08-10  Earnie Boyd  <earnie@users.sf.net>
+
+	* w32sdk: New winsup module.
+
 2002-07-06  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.common (MINGW_INCLUDES): Simplify.
