@@ -1,5 +1,9 @@
 2003-09-08  Christopher Faylor  <cgf@redhat.com>
 
+	* passwe.cc (getpwnam_r): Initialize pw_comment field.
+
+2003-09-08  Christopher Faylor  <cgf@redhat.com>
+
 	* passwd.cc (getpwuid_r32): Initialize pw_comment field.
 
 2003-09-08  Christopher Faylor  <cgf@redhat.com>
