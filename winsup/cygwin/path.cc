@@ -474,6 +474,11 @@ path_conv::check (const char *src, unsigned opt,
 	  /* devn should not be a device.  If it is, then stop parsing now. */
 	  if (devn != FH_BAD)
 	    {
+	      if (component)
+		{
+		  error = ENOTDIR;
+		  return;
+		}
 	      fileattr = 0;
 	      goto out;		/* Found a device.  Stop parsing. */
 	    }

@@ -1,3 +1,8 @@
+Thu Oct  4 20:52:42 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (path_conv::check): Return ENOTDIR when leading device and
+	trailing component.
+
 Thu Oct  4 18:49:23 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* syscalls.cc (stat_worker): Make global.  Accept path_conv parameter
