@@ -1,3 +1,12 @@
+2001-09-14  Egor Duda  <deo@logos-m.ru>
+
+	* dumper.cc (dumper::dumper): Print error code in case of error.
+	(dumper::add_thread): Ditto.
+	(dumper::collect_memory_sections): Ditto.
+	(dumper::dump_memory_region): Ditto.
+	(dumper::collect_process_information): Ditto.
+	(print_section_name): Fix formatting.
+
 2001-09-13  Egor Duda  <deo@logos-m.ru>
 
 	* dumper.cc (main): Properly recognize negative pids (used by w9x).

@@ -69,7 +69,7 @@ dumper::dumper (DWORD pid, DWORD tid, const char *file_name)
 			  pid);
   if (!hProcess)
     {
-      fprintf (stderr, "Failed to open process #%lu\n", pid);
+      fprintf (stderr, "Failed to open process #%lu, error %ld\n", pid, GetLastError ());
       return;
     }
 
@@ -117,7 +117,7 @@ dumper::sane ()
 void
 print_section_name (bfd* abfd, asection* sect, PTR obj)
 {
-  deb_printf ( " %s", bfd_get_section_name (abfd, sect));
+  deb_printf (" %s", bfd_get_section_name (abfd, sect));
 }
 
 void
@@ -167,7 +167,10 @@ dumper::add_thread (DWORD tid, HANDLE hThread)
   pcontext = &(new_entity->u.thread.context);
   pcontext->ContextFlags = CONTEXT_FULL | CONTEXT_FLOATING_POINT;
   if (!GetThreadContext (hThread, pcontext))
-    return 0;
+    {
+      deb_printf ("Failed to read thread context (tid=%x), error %ld\n", tid, GetLastError ());
+      return 0;
+    }
 
   deb_printf ("added thread %u\n", tid);
   return 1;
@@ -294,6 +297,7 @@ dumper::collect_memory_sections ()
 	     all-nonreadable */
 	  if (!ReadProcessMemory (hProcess, current_page_address, mem_buf, sizeof (mem_buf), &done))
 	    {
+	      DWORD err = GetLastError ();
 	      const char *pt[10];
 	      pt[0] = (mbi.Protect & PAGE_READONLY) ? "RO " : "";
 	      pt[1] = (mbi.Protect & PAGE_READWRITE) ? "RW " : "";
@@ -310,10 +314,10 @@ dumper::collect_memory_sections ()
 	      for (int i = 0; i < 10; i++)
 		strcat (buf, pt[i]);
 
-	      deb_printf ("warning: failed to read memory at %08x-%08x. protect = %s\n",
+	      deb_printf ("warning: failed to read memory at %08x-%08x (protect = %s), error %ld.\n",
 			  (DWORD) current_page_address,
 			  (DWORD) current_page_address + mbi.RegionSize,
-			  buf);
+			  buf, err);
 	      skip_region_p = 1;
 	    }
 	}
@@ -366,7 +370,7 @@ dumper::dump_memory_region (asection * to, process_mem_region * memory)
       todo = min (size, PAGE_BUFFER_SIZE);
       if (!ReadProcessMemory (hProcess, pos, mem_buf, todo, &done))
 	{
-	  deb_printf ("Error reading process memory at %x(%x) %u\n", pos, todo, GetLastError ());
+	  deb_printf ("Failed to read process memory at %x(%x), error %ld\n", pos, todo, GetLastError ());
 	  return 0;
 	}
       size -= done;
@@ -497,7 +501,7 @@ dumper::collect_process_information ()
 
   if (!DebugActiveProcess (pid))
     {
-      fprintf (stderr, "Cannot attach to process #%lu", pid);
+      fprintf (stderr, "Cannot attach to process #%lu, error %ld", pid, GetLastError ());
       return 0;
     }
 
