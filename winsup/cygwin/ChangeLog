@@ -1,5 +1,10 @@
 2002-11-04  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler_process.cc (fhandler_process::fill_filebuf): Deal with error
+	condition from cmdline retrieval.
+
+2002-11-04  Christopher Faylor  <cgf@redhat.com>
+
 	* sigproc.cc (WAIT_SIG_PRIORITY): Bump to highest priority.
 
 2002-11-04  Christopher Faylor  <cgf@redhat.com>

@@ -301,7 +301,7 @@ fhandler_process::fill_filebuf ()
 	if (filebuf)
 	  free (filebuf);
 	filebuf = p->cmdline (filesize);
-	if (!*filebuf)
+	if (!filebuf || !*filebuf)
 	  filebuf = strdup ("<defunct>");
 	break;
       }
