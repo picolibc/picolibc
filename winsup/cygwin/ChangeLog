@@ -1,5 +1,17 @@
 2001-10-29  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler.cc (fhandler_base::set_name): Set namehash here to catch
+	name changes.
+	(fhandler_base::open): Remove namehash setting.
+	(fhandler_base::fstat): Subtract 1 from arbitrary time setting to avoid
+	strange ls -l granularity problem.
+
+2001-10-24  Christopher Faylor  <cgf@redhat.com>
+
+        * shared_info.h (MOUNT_VE
+
+2001-10-29  Christopher Faylor  <cgf@redhat.com>
+
 	* select.cc (MAKEready): Remove extraneous select_read.
 
 2001-10-29  Corinna Vinschen  <corinna@vinschen.de>

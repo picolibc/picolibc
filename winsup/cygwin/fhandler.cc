@@ -189,6 +189,7 @@ fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit
       system_printf ("fatal error. strdup failed");
       exit (ENOMEM);
     }
+  namehash = hash_path_name (0, win32_path_name);
 }
 
 void
@@ -411,7 +412,6 @@ fhandler_base::open (path_conv *, int flags, mode_t mode)
       && !allow_ntsec && allow_ntea)
     set_file_attribute (has_acls (), get_win32_name (), mode);
 
-  namehash = hash_path_name (0, get_win32_name ());
   set_io_handle (x);
   int bin;
   int fmode;
@@ -870,7 +870,7 @@ fhandler_base::fstat (struct stat *buf, path_conv *)
   buf->st_blksize = S_BLKSIZE;
   buf->st_dev = buf->st_rdev = FHDEVN (get_device ()) << 8 | (get_unit () & 0xff);
   buf->st_ino = get_namehash ();
-  buf->st_atime = buf->st_mtime = buf->st_ctime = time (NULL);
+  buf->st_atime = buf->st_mtime = buf->st_ctime = time (NULL) - 1;
   return 0;
 }
 
