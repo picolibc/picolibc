@@ -178,11 +178,21 @@ class pthread_key:public verifyable_object
 public:
 
   DWORD dwTlsIndex;
+  void *fork_buf;
+  class pthread_key *next;
+
   int set (const void *);
   void *get ();
 
     pthread_key (void (*)(void *));
    ~pthread_key ();
+  static void fixup_before_fork();
+  static void fixup_after_fork();
+private:
+  // lists of objects. USE THREADSAFE INSERTS AND DELETES.
+  static pthread_key * keys;
+  void saveKeyToBuffer ();
+  void recreateKeyFromBuffer ();
 };
 
 /* FIXME: test using multiple inheritance and merging key_destructor into pthread_key
@@ -281,6 +291,9 @@ public:
 
    static void initMainThread(pthread *, HANDLE);
    static bool isGoodObject(pthread_t *);
+   static void atforkprepare();
+   static void atforkparent();
+   static void atforkchild();
 
    virtual void exit (void *value_ptr);
 
@@ -421,12 +434,13 @@ public:
   callback *pthread_child;
   callback *pthread_parent;
 
-  // list of mutex's. USE THREADSAFE INSERTS AND DELETES.
+  // lists of pthread objects. USE THREADSAFE INSERTS AND DELETES.
   class pthread_mutex * mutexs;
   class pthread_cond  * conds;
   class semaphore     * semaphores;
 
   void Init (int);
+  void fixup_before_fork (void);
   void fixup_after_fork (void);
 
   MTinterface ():reent_index (0), indexallocated (0), threadcount (1)
@@ -436,10 +450,6 @@ public:
       pthread_parent  = NULL;
     }
 };
-
-void __pthread_atforkprepare(void);
-void __pthread_atforkparent(void);
-void __pthread_atforkchild(void);
 
 /* Cancellation */
 int __pthread_cancel (pthread_t thread);

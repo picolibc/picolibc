@@ -1,3 +1,36 @@
+2002-09-17  Robert Collins  <rbtcollins@hotmail.com>
+
+	This work inspires by Thomas Pfaff's pthread_fork patch (1).
+	* fork.cc (fork_child): Remove MTinterface fixup call, it's
+	adsorbed by pthread::atforkchild.
+	Rename __pthread_atforkchild to pthread::atforkchild to give
+	access to private members.
+	(fork_parent): Rename __pthread_atforkparent to 
+	pthread::atforkparent to give it access to private members.
+	Ditto for __pthread_atforkprepare.
+	* thread.cc: Fix some formatting problems throughout.
+	(MTinterface::fixup_before_fork): Implement.
+	(MTinterface::fixup_after_fork): Fix pthread_keys.
+	(pthread_key::keys): Implement.
+	(pthread_key::fixup_before_fork): Ditto.
+	(pthread_key::fixup_after_fork): Ditto.
+	(pthread_key::pthread_key): Add to pthread_key::keys.
+	(pthread_key::~pthread_key): Remove from pthread_key::keys.
+	(pthread_key::saveKeyToBuffer): Implement.
+	(pthread_key::recreateKeyFromBuffer): Ditto.
+	(pthread::atforkprepare): Prepare all MT classes for fork.
+	(pthread::atforkchild): And fix them up afterwards.
+	* thread.h (pthread_key): Buffer the key value during
+	fork in fork_buf.
+	List the keys needing to be fixed up in a linked list with
+	head pthread_key::keys.
+	(pthread): Move atfork cygwin internal calls into the class.
+	(MTInterface): Provide a fixup_before_fork for objecst that
+	need to save state.
+	(__pthread_atforkprepare): Remove.
+	(__pthread_atforkparent): Remove.
+	(__pthread_atforkchild): Remove.
+
 2002-09-16  Christopher Faylor  <cgf@redhat.com>
 
 	* init.cc: Cleanup slightly and remove obsolete code.

@@ -313,10 +313,8 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
     if ((*t)->clear_on_fork ())
       (*t)->set ();
 
-  user_data->threadinterface->fixup_after_fork ();
-
   wait_for_sigthread ();
-  __pthread_atforkchild ();
+  pthread::atforkchild ();
   cygbench ("fork-child");
   return 0;
 }
@@ -354,8 +352,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   DWORD rc;
   PROCESS_INFORMATION pi = {0, NULL, 0, 0};
 
-  /* call the pthread_atfork prepare functions */
-  __pthread_atforkprepare ();
+  pthread::atforkprepare ();
 
   subproc_init ();
 
@@ -601,7 +598,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   ForceCloseHandle (forker_finished);
   forker_finished = NULL;
   pi.hThread = NULL;
-  __pthread_atforkparent ();
+  pthread::atforkparent ();
 
   return forked->pid;
 
