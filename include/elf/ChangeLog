@@ -1,3 +1,8 @@
+2003-07-01  Martin Schwidefsky  <schwidefsky@de.ibm.com>
+
+	* s390.h (elf_s390_reloc_type): Add long displacement relocations
+	R_390_20, R_390_GOT20, R_390_GOTPLT20 and R_390_TLS_GOTIE20.
+
 2003-06-29  Andreas Jaeger  <aj@suse.de>
 
 	* mmix.h: Convert to ISO C90 prototypes.
