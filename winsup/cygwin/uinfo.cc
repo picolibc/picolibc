@@ -109,9 +109,6 @@ uinfo_init ()
 {
   struct passwd *p;
 
-  if (myself->username[0])
-    return;
-
   myself->psid = (PSID) myself->sidbuf;
   if ((p = getpwnam (internal_getlogin (myself))) != NULL)
     {
@@ -140,7 +137,6 @@ getlogin (void)
   static NO_COPY char this_username[MAX_USER_NAME];
 #endif
 
-  uinfo_init ();
   return strcpy (this_username, myself->username);
 }
 

@@ -1,3 +1,11 @@
+Sun May 21 20:51:44 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dcrt0.cc (dll_crt0_1): Move uinfo_init call to before sigproc_init to
+	avoid a race.
+	(noload): Add an extra argument for debugging.
+	* uinfo.cc (uinfo_init): Eliminate test for multiple calls.
+	(getlogin): Assume that uinfo_init has already been called.
+
 Sat May 20 01:34:57 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (interruptible): Add an argument to control whether

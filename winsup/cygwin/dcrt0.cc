@@ -721,6 +721,9 @@ dll_crt0_1 ()
   /* Allocate dtable */
   dtable_init ();
 
+/* Initialize uid, gid. */
+  uinfo_init ();
+
   /* Initialize signal/subprocess handling. */
   sigproc_init ();
 
@@ -729,11 +732,6 @@ dll_crt0_1 ()
 
   /* Set up standard fds in file descriptor table. */
   hinfo_init ();
-
-#if 0
-  /* Initialize uid, gid. */
-  uinfo_init ();
-#endif
 
   /* Scan the command line and build argv.  Expand wildcards if not
      called from another cygwin process. */
@@ -758,14 +756,11 @@ dll_crt0_1 ()
   set_errno (0);
   debug_printf ("user_data->main %p", user_data->main);
 
-  /* Initialize uid, gid. */
-  uinfo_init ();
-
   /* Flush signals and ensure that signal thread is up and running. Can't
      do this for noncygwin case since the signal thread is blocked due to
      LoadLibrary serialization. */
   if (!dynamically_loaded)
-    sig_send (NULL, __SIGFLUSH);
+    sig_send (NULL, __SIGFLUSH);	/* also initializes uid, gid */
 
   if (user_data->main && !dynamically_loaded)
     exit (user_data->main (argc, argv, *user_data->envptr));
@@ -992,13 +987,14 @@ __api_fatal (const char *fmt, ...)
 }
 
 extern "C" {
-static void noload (char *s) __asm__ ("noload");
+static void noload (HANDLE h, char *s) __asm__ ("noload");
 static void __attribute__((unused))
-noload (char *s)
+noload (HANDLE h, char *s)
 {
-  api_fatal ("couldn't dynamically determine load address for '%s', %E", s);
+  api_fatal ("couldn't dynamically determine load address for '%s' (handle %p), %E", s, h);
 }
 
+/* FIXME: This is not thread-safe! */
 __asm__ ("
 .globl	cygwin_dll_func_load
 cygwin_dll_func_load:
@@ -1013,6 +1009,8 @@ cygwin_dll_func_load:
   popl %eax		# No.  Get back
   addl $8,%eax		#  pointer to name
   pushl %eax		#   and
+  movl -4(%eax),%eax	# Address of Handle to DLL
+  pushl (%eax)		# Handle to DLL
   call noload		#    issue an error
 gotit:
   popl %ecx		# Pointer to 'return address'
