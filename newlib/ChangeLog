@@ -1,3 +1,35 @@
+2002-06-14  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* libc/argz: New directory.
+	* libc/argz/*: New files.
+	* libc/argz/argz_add.c: New file.
+	* libc/argz/argz_add_sep.c: New file.
+	* libc/argz/argz_append.c: New file.
+	* libc/argz/argz_count.c: New file.
+	* libc/argz/argz_create.c: New file.
+	* libc/argz/argz_create_sep.c: New file.
+	* libc/argz/argz_delete.c: New file.
+	* libc/argz/argz_extract.c: New file.
+	* libc/argz/argz_insert.c: New file.
+	* libc/argz/argz_next.c: New file.
+	* libc/argz/argz_replace.c: New file.
+	* libc/argz/argz_stringify.c: New file.
+	* libc/argz/buf_findstr.c: New file.
+	* libc/argz/envz_add.c: New file.
+	* libc/argz/envz_entry.c: New file.
+	* libc/argz/envz_get.c: New file.
+	* libc/argz/envz_merge.c: New file.
+	* libc/argz/envz_remove.c: New file.
+	* libc/argz/envz_strip.c: New file.
+	* libc/include/argz.h: New file.
+	* libc/include/envz.h: New file.
+	* Makefile.am (LIBC_OBJECTLISTS): Add
+	libc/argz/objectlist.awk.in.
+	* libc/Makefile.am (SUBDIRS): Add argz.
+	(SUBLIBS): Add argz/libargz.la.
+	* libc/configure.in (AC_OUTPUT): Add argz/Makefile.
+	* libc/include/errno.h: Add error_t typedef.
+
 2002-06-13  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/stdlib.h: Add _Exit prototype.

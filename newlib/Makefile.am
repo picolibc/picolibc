@@ -103,6 +103,7 @@ LIBC_OBJECTLISTS = \
 	$(SIGNAL_OBJECTLIST) \
 	$(SYSCALL_OBJECTLIST) \
 	$(UNIX_OBJECTLIST) \
+	libc/argz/objectlist.awk.in \
 	libc/stdlib/objectlist.awk.in \
 	libc/time/objectlist.awk.in \
 	libc/ctype/objectlist.awk.in \
