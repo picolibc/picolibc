@@ -1,3 +1,9 @@
+Fri May 11 16:53:38 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* external.cc (fillout_pinfo): Use correct pids.
+	* path.cc (mount_info::conv_to_win32_path): Correct test for whether to
+	include a slash.
+
 Fri May 11 01:04:17 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (handle_exceptions): Don't print message when executing

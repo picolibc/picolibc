@@ -1265,7 +1265,9 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
       int n = mi->native_pathlen;
       memcpy (dst, mi->native_path, n + 1);
       char *p = pathbuf + mi->posix_pathlen;
-      if ((isdrive (dst) && !dst[2]) || (*p && *p != '/'))
+      if (*p == '/')
+	/* nothing */;
+      else if ((isdrive (dst) && !dst[2]) || *p)
 	dst[n++] = '\\';
       strcpy (dst + n, p);
       backslashify (dst, dst, 0);
