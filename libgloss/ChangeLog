@@ -1,5 +1,10 @@
 2003-02-18  Richard Sandiford  <rsandifo@redhat.com>
 
+	* mips/nullmon.c (_ftext, _end): Adjust declaration.
+	(get_mem_info): Rework.
+
+2003-02-18  Richard Sandiford  <rsandifo@redhat.com>
+
 	* mips/crt0.S (zerobss): Reload __memsize after call.
 
 2003-02-17  Chris Demetriou  <cgd@broadcom.com>

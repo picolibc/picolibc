@@ -32,8 +32,8 @@
 #if ! defined(BOARD_MEM_SIZE)
 #define BOARD_MEM_SIZE 0x100000 /* About a megabyte */
 #endif
-extern unsigned char _ftext ; /* Defined in nullmon.ld */
-extern unsigned char _end ;   /* Defined in nullmon.ld */
+extern char _ftext[]; /* Defined in nullmon.ld */
+extern char _end[];   /* Defined in nullmon.ld */
 
 #if defined(FIXME_WARNINGS)
 #warning("FIXME: struct s_mem belongs in a header file")
@@ -47,13 +47,8 @@ struct s_mem
 void
 get_mem_info (mem)
      struct s_mem *mem;
-{ char * t1, * t2 ;
-  unsigned long long tmp ;
-  t1 = & _ftext ;
-  t2 = & _end ;
-  tmp = (unsigned long long) (t2 - t1) ;
-  tmp = (unsigned long long) BOARD_MEM_SIZE - tmp ;
-  mem->size = tmp ;
+{
+  mem->size = BOARD_MEM_SIZE - (_end - _ftext);
 }
 
 /*  SYSTEM INTERFACE
