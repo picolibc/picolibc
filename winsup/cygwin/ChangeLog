@@ -1,3 +1,16 @@
+Tue Dec 27  1:08:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* cygwin.din: Add symbols for `getrlimit' and `setrlimit'.
+	* exceptions.cc (stackdump): Avoid creating stackdump when
+	`rlim_core' is 0.
+	* resource.cc: New global variable `rlim_core'.
+	(getrlimit): New function.
+	(setrlimit): Ditto.
+	include/cygwin/version.h: Bump minor API version to 32 due to
+	adding `getrlimit' and `setrlimit'.
+	include/sys/resource.h: Add defines, types and prototypes for
+	`getrlimit' and `setrlimit'.
+
 Mon Dec 25 22:18:42 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* autoload.h: Make DLL initializers global to avoid inlining.

@@ -97,3 +97,58 @@ getrusage (int intwho, struct rusage *rusage_in)
   syscall_printf ("%d = getrusage (%d, %p)", res, intwho, rusage_in);
   return res;
 }
+
+unsigned long rlim_core = RLIM_INFINITY;
+
+extern "C"
+int
+getrlimit (int resource, struct rlimit *rlp)
+{
+  MEMORY_BASIC_INFORMATION m;
+  if (!rlp || !VirtualQuery (rlp, &m, sizeof (m)) || (m.State != MEM_COMMIT))
+    return EFAULT;
+
+  rlp->rlim_cur = RLIM_INFINITY;
+  rlp->rlim_max = RLIM_INFINITY;
+
+  switch (resource)
+    {
+    case RLIMIT_CPU:
+    case RLIMIT_FSIZE:
+    case RLIMIT_DATA:
+    case RLIMIT_STACK:
+    case RLIMIT_NOFILE:
+      break;
+    case RLIMIT_CORE:
+      rlp->rlim_cur = rlim_core;
+      break;
+    case RLIMIT_AS:
+      rlp->rlim_cur = 0x80000000UL;
+      rlp->rlim_max = 0x80000000UL;
+      break;
+    default:
+      set_errno (EINVAL);
+      return -1;
+    }
+  return 0;
+}
+
+extern "C"
+int
+setrlimit (int resource, const struct rlimit *rlp)
+{
+  MEMORY_BASIC_INFORMATION m;
+  if (!rlp || !VirtualQuery (rlp, &m, sizeof (m)) || (m.State != MEM_COMMIT))
+    return EFAULT;
+
+  switch (resource)
+    {
+    case RLIMIT_CORE:
+      rlim_core = rlp->rlim_cur;
+      break;
+    default:
+      set_errno (EINVAL);
+      return -1;
+    }
+  return 0;
+}

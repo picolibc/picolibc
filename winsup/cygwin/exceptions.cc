@@ -381,7 +381,12 @@ try_to_debug ()
 static void
 stackdump (EXCEPTION_RECORD *e, CONTEXT *in)
 {
+  extern unsigned long rlim_core;
   const char *p;
+
+  if (rlim_core == 0UL)
+    return;
+
   if (myself->progname[0])
     {
       /* write to progname.stackdump if possible */

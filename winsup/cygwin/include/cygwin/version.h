@@ -122,10 +122,11 @@ details. */
        29: Export hstrerror
        30: CW_GET_CYGDRIVE_INFO addition to external.cc
        31: Export inet_aton
+       32: Export getrlimit/setrlimit
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 31
+#define CYGWIN_VERSION_API_MINOR 32
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

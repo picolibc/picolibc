@@ -347,6 +347,8 @@ getpid
 _getpid = getpid
 getppid
 _getppid = getppid
+getrlimit
+_getrlimit = getrlimit
 getrusage
 _getrusage = getrusage
 gets
@@ -622,6 +624,8 @@ setlocale
 _setlocale = setlocale
 setpgid
 _setpgid = setpgid
+setrlimit
+_setrlimit = setrlimit
 setsid
 _setsid = setsid
 settimeofday

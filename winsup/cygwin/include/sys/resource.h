@@ -7,6 +7,26 @@
 extern "C" {
 #endif
 
+#define RLIMIT_CPU	0		/* CPU time in seconds */
+#define RLIMIT_FSIZE	1		/* Maximum filesize */
+#define RLIMIT_DATA	2		/* max data size */
+#define RLIMIT_STACK	3		/* max stack size */
+#define RLIMIT_CORE	4		/* max core file size */
+#define RLIMIT_NOFILE	5		/* max number of open files */
+#define RLIMIT_OFILE	RLIMIT_NOFILE	/* BSD name */
+#define RLIMIT_AS	6		/* address space (virt. memory) limit */
+
+#define RLIM_INFINITY	(0xffffffffUL)
+#define RLIM_SAVED_MAX	RLIM_INFINITY
+#define RLIM_SAVED_CUR	RLIM_INFINITY
+
+typedef unsigned long rlim_t;
+
+struct rlimit {
+	rlim_t	rlim_cur;
+	rlim_t	rlim_max;
+};
+
 #define	RUSAGE_SELF	0		/* calling process */
 #define	RUSAGE_CHILDREN	-1		/* terminated child processes */
 
@@ -29,6 +49,9 @@ struct rusage {
         long ru_nivcsw;              /* involuntary " */
 #define ru_last         ru_nivcsw
 };
+
+int getrlimit (int __resource, struct rlimit *__rlp);
+int setrlimit (int __resource, const struct rlimit *__rlp);
 
 int getrusage (int __who, struct rusage *__rusage);
 
