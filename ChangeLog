@@ -1,3 +1,7 @@
+2001-02-06  Ben Elliston  <bje@redhat.com>
+
+	* configure: Output host type to stdout, not stderr.
+
 2001-02-04  Michael Sokolov  <msokolov@ivan.Harhan.ORG>
 
 	* config.guess: Import from subversions.gnu.org (revision 1.181).
