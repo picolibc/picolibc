@@ -988,11 +988,13 @@ set_signal_mask (sigset_t newmask, sigset_t& oldmask)
 }
 
 _threadinfo *
-find_tls (int sig)
+_threadinfo::find_tls (int sig)
 {
+  EnterCriticalSection (&protect_linked_list);
   for (_threadinfo *t = _last_thread; t ; t = t->prev)
     if (sigismember (&t->sigwait_mask, sig))
       return t;
+  LeaveCriticalSection (&protect_linked_list);
   return NULL;
 }
 
@@ -1023,7 +1025,7 @@ sig_handle (int sig, sigset_t mask, int pid, _threadinfo *tls)
 	  || ISSTATE (myself, PID_STOPPED)))
     {
       sigproc_printf ("signal %d blocked", sig);
-      if (insigwait_mask || (tls = find_tls (sig)) != NULL)
+      if (insigwait_mask || (tls = _threadinfo::find_tls (sig)) != NULL)
 	goto thread_specific;
       rc = -1;
       goto done;

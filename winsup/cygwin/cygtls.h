@@ -46,6 +46,7 @@ struct _threadinfo
   void init_thread (void *);
   static void call (void (*) (void *, void *), void *);
   void call2 (void (*) (void *, void *), void *, void *);
+  static struct _threadinfo *find_tls (int sig);
   void remove ();
   void push (__stack_t, bool = false);
   __stack_t pop ();
