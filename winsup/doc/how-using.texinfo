@@ -1,20 +1,29 @@
 @section Using Cygwin
 
-@subsection My application cannot locate cygncurses5.dll!!!
+@subsection Why can't my application locate cygncurses5.dll?  or cygintl.dll?  or cygreadline5.dll?  or ...?
 
 If you upgraded recently, and suddenly vim (or some other Cygwin
-application) fails with this message, it means that you did not follow
-these instructions properly:
+application) cannot find @code{cygncurses5.dll}, it means that you did
+not follow these instructions properly:
 @file{http://cygwin.com/ml/cygwin-announce/2001/msg00124.html}.  To
-repair the damage, you must run setup.exe again, and re-install the
+repair the damage, you must run Cygwin Setup again, and re-install the
 @samp{libncurses5} package.
 
-Note that setup won't show this option by default.  In the ``Select
-packages to install'' dialogue, click on the @samp{Full/Part}
+Note that Cygwin Setup won't show this option by default.  In the
+``Select packages to install'' dialogue, click on the @samp{Full/Part}
 button.  This lists all packages, even those that are already
 installed.  Scroll down to locate the @samp{libncurses5} package.
 Click on the ``cycle'' glyph until it says ``Reinstall''.  Continue
-with setup.
+with the installation.
+
+Similarly, if something cannot find @code{cygintl.dll}, then run
+Cygwin Setup and re-install the @samp{libintl} and @samp{libintl1}
+packages.
+
+For a detailed explanation of the general problem, and how to extend
+it to other missing DLLs (like cygreadline5.dll) and identify their
+containing packages, see
+@file{http://cygwin.com/ml/cygwin/2002-01/msg01619.html}.
 
 @subsection Why is Cygwin suddenly @emph{so} slow?
 
