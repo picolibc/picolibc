@@ -1,6 +1,6 @@
 /* external.cc: Interface to Cygwin internals from external programs.
 
-   Copyright 1997, 1998, 1999, 2000 Cygnus Solutions.
+   Copyright 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
 
    Written by Christopher Faylor <cgf@cygnus.com>
 
