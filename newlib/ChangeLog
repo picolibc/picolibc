@@ -1,3 +1,10 @@
+2004-09-15  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/reent/impure.c (reent_data): Define as alias to impure_data
+	when building for Cygwin.
+	* libc/include/sys/reent.h (_GLOBAL_REENT): Revert definition to
+	_global_impure_ptr.
+
 2004-09-15  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* configure.host: Reverting 2004-09-14 change as fix has occurred on
