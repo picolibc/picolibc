@@ -50,6 +50,8 @@ NtUnlockVirtualMemory@16
 NtWriteFile@36
 NtWriteVirtualMemory@20
 RtlAcquirePebLock@0
+RtlAcquireResourceExclusive@8
+RtlAcquireResourceShared@8
 RtlAddAccessAllowedAce@16
 RtlAllocateAndInitializeSid@44
 RtlAllocateHandle@8
@@ -81,6 +83,7 @@ RtlCreateProcessParameters@40
 RtlCreateSecurityDescriptor@8
 RtlCreateUnicodeString@8
 RtlCreateUnicodeStringFromAsciiz@8
+RtlDeleteResource@4
 RtlDeNormalizeProcessParams@4
 RtlDestroyEnvironment@4
 RtlDestroyHandleTable@4
@@ -138,6 +141,7 @@ RtlInitString@8
 RtlInitUnicodeString@8
 RtlInitializeBitMap@12
 RtlInitializeHandleTable@12
+RtlInitializeResource@4
 RtlInitializeSid@12
 RtlIntegerToChar@16
 RtlIntegerToUnicodeString@12
@@ -168,6 +172,7 @@ RtlPrefixUnicodeString@12
 RtlQueryEnvironmentVariable_U@12
 RtlReAllocateHeap@16
 RtlReleasePebLock@0
+RtlReleaseResource@4
 RtlResetRtlTranslations@4
 RtlSetAllBits@4
 RtlSetBits@12
@@ -181,6 +186,7 @@ RtlSetSaclSecurityDescriptor@16
 RtlSizeHeap@12
 RtlSubAuthorityCountSid@4
 RtlSubAuthoritySid@8
+RtlTimeToSecondsSince1970@8
 RtlUnicodeStringToAnsiSize@4
 RtlUnicodeStringToAnsiString@12
 RtlUnicodeStringToCountedOemString@12

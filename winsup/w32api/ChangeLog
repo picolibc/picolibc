@@ -1,3 +1,10 @@
+2002-10-11  Steven Edwards  <Steven_Ed4153@yahoo.com>
+
+	* lib/ntdll.def (RtlAcquireResourceExclusive,
+	RtlAcquireResourceShared, RtlDeleteResource,
+	RtlInitializeResource, RtlReleaseResource,
+	RtlTimeToSecondsSince1970) : Added missing exports.
+
 2002-10-08  Heiko Gerdau  <hg@technosis.de>
 
 	* include/oleacc.h: New file.
