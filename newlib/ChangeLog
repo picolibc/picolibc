@@ -1,5 +1,9 @@
 2005-03-06  Ralf Corsepious  <ralf.corsepius@rtems.org>
 
+	* libc/string/memcmp.c: Fix to avoid pointer signedness warning.
+
+2005-03-06  Ralf Corsepious  <ralf.corsepius@rtems.org>
+
 	* libc/include/machine/_types.h: New file.
 	* libc/include/sys/types.h: Do not check for __rtems__
 	when including <machine/_types.h>.  Remove some redundant

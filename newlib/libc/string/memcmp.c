@@ -95,8 +95,8 @@ _DEFUN (memcmp, (m1, m2, n),
 
       /* check m mod LBLOCKSIZE remaining characters */
 
-      s1 = (char*)a1;
-      s2 = (char*)a2;
+      s1 = (unsigned char*)a1;
+      s2 = (unsigned char*)a2;
     }
 
   while (n--)
