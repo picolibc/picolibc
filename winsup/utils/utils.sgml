@@ -34,7 +34,7 @@ dealing with Cygwin programs. If you are familiar with
 <command>dpkg</command> or <command>rpm</command>,
 <command>cygcheck</command> is similar in many ways. (The major difference
 is that <command>setup.exe</command> handles installing and uninstalling
-packages; see <xref linkend="internet-setup"> for more information.)
+packages; see <xref linkend="internet-setup"></xref> for more information.)
 </para>
 <para>
 The <literal>-c</literal> option checks the version and status of 
@@ -287,7 +287,7 @@ ACL.  For directories <command>getfacl</command> displays additionally the
 default ACL.  With no options specified, <command>getfacl</command> displays 
 the filename, the owner, the group, and both the ACL and the default ACL, if 
 it exists. For more information on Cygwin and Windows ACLs, see
-see <Xref Linkend="ntsec"> in the Cygwin User's Guide.
+see <xref linkend="ntsec"></xref> in the Cygwin User's Guide.
 The format for ACL output is as follows:
 <screen>
      # file: filename
@@ -465,7 +465,7 @@ The <literal>-o</literal> option allows for special cases
 (such as multiple domains) where the GIDs might match otherwise.
 The <literal>-s</literal>
 option omits the NT Security Identifier (SID).  For more information on 
-SIDs, see <Xref Linkend="ntsec"> in the Cygwin User's Guide.  The
+SIDs, see <xref linkend="ntsec"></xref> in the Cygwin User's Guide.  The
 <literal>-u</literal> option causes <command>mkgroup</command> to 
 enumerate the users for each group, placing the group members in the 
 gr_mem (last) field.  Note that this can greatly increase
@@ -543,7 +543,7 @@ file ownership.  The <literal>-m</literal> option bypasses the current
 mount table so that, for example, two users who have a Windows home 
 directory of H: could mount them differently.  The <literal>-s</literal>
 option omits the NT Security Identifier (SID).  For more information on
-SIDs, see <Xref Linkend="ntsec"> in the Cygwin User's Guide.  The
+SIDs, see <xref linkend="ntsec"></xref> in the Cygwin User's Guide.  The
 <literal>-p</literal> option causes <command>mkpasswd</command> to
 use the specified prefix instead of the account home dir or <literal>/home/
 </literal>. For example, this command:
@@ -591,7 +591,7 @@ Display information about mounted filesystems, or mount a filesystem
 <para>The <command>mount</command> program is used to map your drives
 and shares onto Cygwin's simulated POSIX directory tree, much like as is
 done by mount commands on typical UNIX systems.  Please see
-<Xref Linkend="mount-table"> for more information on the concepts
+<xref linkend="mount-table"></xref> for more information on the concepts
 behind the Cygwin POSIX file system and strategies for using
 mounts. To remove mounts, use <command>umount</command></para>
 
@@ -1066,7 +1066,7 @@ For each file given as parameter, <command>setfacl</command> will
 either replace its complete ACL (<literal>-s</literal>, <literal>-f</literal>), 
 or it will add, modify, or delete ACL entries.
 For more information on Cygwin and Windows ACLs, see
-see <Xref Linkend="ntsec"> in the Cygwin User's Guide.
+see <xref linkend="ntsec"></xref> in the Cygwin User's Guide.
 </para>
 
 <para>
@@ -1490,7 +1490,7 @@ mounts in the current user's registry area (<literal>-U</literal>),
 or all mounts in the system-wide registry area (<literal>-S</literal>) 
 (with Administrator privileges).</para>
 
-<para>See <Xref Linkend="mount"> for more information on the mount
+<para>See <xref linkend="mount"></xref> for more information on the mount
 table.</para>
 </sect2>
 

@@ -1,12 +1,12 @@
-<sect1 id="using-cygwinenv"><title>The <EnVar>CYGWIN</EnVar> environment
+<sect1 id="using-cygwinenv"><title>The <envar>CYGWIN</envar> environment
 variable</title>
 
-<para>The <EnVar>CYGWIN</EnVar> environment variable is used to configure
+<para>The <envar>CYGWIN</envar> environment variable is used to configure
 many global settings for the Cygwin runtime system. It contains the options
 listed below, separated by blank characters. Many options can be turned off
 by prefixing with <literal>no </literal>.</para>
 
-<itemizedlist Mark="bullet">
+<itemizedlist mark="bullet">
 <listitem>
 <para><envar>(no)binmode</envar> - if set, non-disk 
 (e.g. pipe and COM ports) file opens default to binary mode 
@@ -27,7 +27,7 @@ Cygwin when a user tries to open or create a file using a case different from
 the case of the path as saved on the disk.
 <literal>level</literal> is one of <literal>relaxed</literal>,
 <literal>adjust</literal> and <literal>strict</literal>.</para>
-<itemizedlist Mark="bullet">
+<itemizedlist mark="bullet">
 <listitem>
 <para><envar>relaxed</envar> which is the default behaviour simply
 ignores case. That's the default for native Windows applications as well.</para>
@@ -111,15 +111,15 @@ If supplied, wildcard matching is case insensitive.  The default is <literal>noi
 <para><envar>(no)ntea</envar> - if set, use the full NT Extended
 Attributes to store UNIX-like inode information.
 This option only operates under Windows NT. Defaults to not set. </para>
-<Warning><Title>Warning!</Title> <para>This may create additional
-<emphasis>large</emphasis> files on non-NTFS partitions.</para></Warning>
+<warning><title>Warning!</title> <para>This may create additional
+<emphasis>large</emphasis> files on non-NTFS partitions.</para></warning>
 </listitem>
 <listitem>
 <para><envar>(no)ntsec</envar> - if set, use the NT security
 model to set UNIX-like permissions on files and processes. The
 file permissions can only be set on NTFS partitions. FAT doesn't
 support the NT file security. Defaults to set. For more information, read
-the documentation in <Xref Linkend="ntsec">.</para>
+the documentation in <xref linkend="ntsec"></xref>.</para>
 </listitem>
 <listitem>
 <para><envar>(no)smbntsec</envar> - if set, use <envar>ntsec</envar> on remote

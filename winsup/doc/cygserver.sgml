@@ -11,7 +11,7 @@
 <para>
   The implemented services so far are:
 </para>
-<itemizedlist Mark="bullet">
+<itemizedlist mark="bullet">
   <listitem><para>Control slave tty/pty handle dispersal from tty owner to other
     processes without compromising the owner processes' security.</para></listitem>
   <listitem><para>XSI IPC Message Queues.</para></listitem>

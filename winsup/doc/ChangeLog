@@ -1,3 +1,23 @@
+2004-12-24  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* cygserver.sgml: Cleanup markup for XML validity.
+	* cygwin-api.in.sgml: Cleanup markup for XML validity.
+	* cygwin-ug-net.in.sgml: Cleanup markup for XML validity.
+	* cygwin-ug.in.sgml: Cleanup markup for XML validity.
+	* cygwinenv.sgml: Cleanup markup for XML validity.
+	* dll.sgml: Cleanup markup for XML validity.
+	* effectively.sgml: Cleanup markup for XML validity.
+	* filemodes.sgml: Cleanup markup for XML validity.
+	* legal.sgml: Cleanup markup for XML validity.
+	* ntsec.sgml: Cleanup markup for XML validity.
+	* overview.sgml: Cleanup markup for XML validity.
+	* overview2.sgml: Cleanup markup for XML validity.
+	* pathnames.sgml: Cleanup markup for XML validity.
+	* setup-net.sgml: Cleanup markup for XML validity.
+	* setup2.sgml: Cleanup markup for XML validity.
+	* textbinary.sgml: Cleanup markup for XML validity.
+	* utils.sgml: Cleanup markup for XML validity.
+
 2004-12-02  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* cygserver.sgml: Cleanup minor markup problem.

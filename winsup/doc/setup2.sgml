@@ -73,7 +73,7 @@ and set it to the desired memory limit in decimal MB. It is preferred to do
 this in Cygwin using the <command>regtool</command> program included in the 
 Cygwin package.
 (For more information about <command>regtool</command> or the other Cygwin 
-utilities, see <Xref Linkend="using-utils"> or use each the
+utilities, see <xref linkend="using-utils"></xref> or use each the
 <literal>--help</literal> option of each util.)  You should always be careful 
 when using <command>regtool</command> since damaging your system registry can 
 result in an unusable system.  This example sets memory limit to 1024 MB:

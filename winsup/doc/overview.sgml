@@ -6,7 +6,7 @@
 Cygwin is a Linux-like environment for Windows. It consists of a DLL
 (<filename>cygwin1.dll</filename>), which acts as an emulation layer
 providing substantial <ulink
-URL="http://www.pasc.org/#POSIX">POSIX</ulink> (Portable Operating
+url="http://www.pasc.org/#POSIX">POSIX</ulink> (Portable Operating
 System Interface) system call functionality, and a collection of tools,
 which provide a Linux look and feel. The Cygwin DLL works with all x86
 versions of Windows since Windows 95.
@@ -30,19 +30,19 @@ DOCTOOL-INSERT-ov-ex-unix
 
 <sect1 id="are-free"><title>Are the Cygwin tools free software?</title>
 
-<para>Yes. Parts are <ulink URL="http://www.gnu.org/">GNU</ulink> software 
+<para>Yes. Parts are <ulink url="http://www.gnu.org/">GNU</ulink> software 
 (<command>gcc</command>, <command>gas</command>, <command>ld</command>, etc.),
 parts are covered by the standard 
-<ulink URL="http://www.x.org/Downloads_terms.html">X11 license</ulink>, 
+<ulink url="http://www.x.org/Downloads_terms.html">X11 license</ulink>, 
 some of it is public domain, some of it was written by Red Hat and placed under
-the <ulink URL="http://www.gnu.org/licenses/gpl.html">GNU General Public 
+the <ulink url="http://www.gnu.org/licenses/gpl.html">GNU General Public 
 License</ulink> (GPL). None of it is shareware. You don't have to pay anyone to
 use it but you should be sure to read the copyright section of the FAQ for more
 information on how the GNU GPL may affect your use of these
 tools. If you intend to port a proprietary application using the Cygwin
 library, you may want the Cygwin proprietary-use license.
 For more information about the proprietary-use license, please go to
-<ulink URL="http://www.redhat.com/software/tools/cygwin/">http://www.redhat.com/software/tools/cygwin/
+<ulink url="http://www.redhat.com/software/tools/cygwin/">http://www.redhat.com/software/tools/cygwin/
 </ulink>.  Customers of the native Win32 GNUPro should feel free to submit bug
 reports and ask questions through the normal channels.  All other
 questions should be sent to the project mailing list
@@ -55,9 +55,9 @@ questions should be sent to the project mailing list
 <note>
 <para>
 A more complete historical look Cygwin is Geoffrey J. Noer's 1998 paper,
-"Cygwin32: A Free Win32 Porting Layer for UNIX® Applications" which can be
+"Cygwin32: A Free Win32 Porting Layer for UNIX&reg; Applications" which can be
 found at the <ulink
-URL="http://www.usenix.org/publications/library/proceedings/usenix-nt98/technical.html">
+url="http://www.usenix.org/publications/library/proceedings/usenix-nt98/technical.html">
 2nd USENIX Windows NT Symposium Online Proceedings</ulink>.
 </para>
 </note>
@@ -96,7 +96,7 @@ the GNU configure mechanism. Self hosting was achieved as of the beta
 <para>
 The entire Cygwin toolset was available as a monolithic install. In
 April 2000, the project announced a
-<ulink URL="http://www.cygwin.com/ml/cygwin/2000-04/msg00269.html">
+<ulink url="http://www.cygwin.com/ml/cygwin/2000-04/msg00269.html">
 New Cygwin Net Release</ulink> which provided the native Win32 program
 <command>setup.exe</command> to install and upgrade each package
 separately. Since then, the Cygwin DLL and <command>setup.exe</command> 

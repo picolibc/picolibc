@@ -35,7 +35,7 @@ information needed to tell the OS how your program interacts with
 <para>This page gives only a few simple examples of gcc's DLL-building 
 capabilities. To begin an exploration of the many additional options,
 see the gcc documentation and website, currently at 
-<ulink URL="http://gcc.gnu.org/">http://gcc.gnu.org/</ulink>
+<ulink url="http://gcc.gnu.org/">http://gcc.gnu.org/</ulink>
 </para>
 
 <para>Let's go through a simple example of how to build a dll.
@@ -100,7 +100,7 @@ The name of your library is <literal>${module}</literal>, prefixed with
 <literal>cyg</literal> for the DLL and <literal>lib</literal> for the
 import library. Cygwin DLLs use the <literal>cyg</literal> prefix to 
 differentiate them from native-Windows MinGW DLLs, see 
-<ulink URL="http://mingw.org">the MinGW website</ulink> for more details.
+<ulink url="http://mingw.org">the MinGW website</ulink> for more details.
 <literal>${old_libs}</literal> are all
 your object files, bundled together in static libs or single object
 files and the <literal>${dependency_libs}</literal> are import libs you 
@@ -113,7 +113,7 @@ need to link against, e.g
 
 <para>If you have an existing DLL already, you need to build a
 Cygwin-compatible import library.  If you have the source to compile
-the DLL, see <Xref Linkend="dll-build"> for details on having 
+the DLL, see <xref linkend="dll-build"></xref> for details on having 
 <filename>gcc</filename> build one for you.  If you do not have the
 source or a supplied working import library, you can get most of
 the way by creating a .def file with these commands (you might need to

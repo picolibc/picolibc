@@ -33,7 +33,7 @@ program.  For those people coming from a Windows background, the
 subdirectories somewhere else.</para>
 
 <para>The mapping is stored in the current user's Cygwin
-<FirstTerm>mount table</FirstTerm> in the Windows registry so that the
+<firstterm>mount table</firstterm> in the Windows registry so that the
 information will be retrieved next time the user logs in.  Because it
 is sometimes desirable to have system-wide as well as user-specific
 mounts, there is also a system-wide mount table that all Cygwin users
@@ -82,7 +82,7 @@ e: on /cygdrive/e type user (binmode,noumount)
 
 <para>You can also use the <command>mount</command> command to add
 new mount points, and the <command>umount</command> to delete
-them.  See <Xref Linkend="mount"> and <Xref Linkend="umount"> for more
+them.  See <xref linkend="mount"></xref> and <xref linkend="umount"></xref> for more
 information on how to use these utilities to set up your Cygwin POSIX
 file system.</para>
 
@@ -94,13 +94,13 @@ path <filename>/cygdrive</filename>.  For example, if Cygwin accesses
 mount table, then <filename>Z:\</filename> would be automatically
 converted to <filename>/cygdrive/Z</filename>.  The default
 prefix of <filename>/cygdrive</filename> may be changed (see the
-<Xref Linkend="mount"> for more information).</para>
+<xref linkend="mount"></xref> for more information).</para>
 
 <para>It is possible to assign some special attributes to each mount
 point.  Automatically mounted partitions are displayed as "auto"
 mounts.  Mounts can also be marked as either "textmode" or "binmode"
 -- whether text files are read in the same manner as binary files by
-default or not (see <Xref Linkend="using-textbinary"> for more
+default or not (see <xref linkend="using-textbinary"></xref> for more
 information on text and binary modes.</para>
 
 </sect2>
@@ -109,10 +109,10 @@ information on text and binary modes.</para>
 
 <para>The <command>cygpath</command> program provides the ability to
 translate between Win32 and POSIX pathnames in shell scripts. See
-<Xref Linkend="cygpath"> for the details.</para>
+<xref linkend="cygpath"></xref> for the details.</para>
 
-<para>The <EnVar>HOME</EnVar>, <EnVar>PATH</EnVar>, and
-<EnVar>LD_LIBRARY_PATH</EnVar> environment variables are automatically
+<para>The <envar>HOME</envar>, <envar>PATH</envar>, and
+<envar>LD_LIBRARY_PATH</envar> environment variables are automatically
 converted from Win32 format to POSIX format (e.g.  from
 <filename>c:\cygwin\bin</filename> to <filename>/bin</filename>, if
 there was a mount from that Win32 path to that POSIX path) when a Cygwin

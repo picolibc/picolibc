@@ -1,14 +1,14 @@
 <sect1 id="ntsec"><title>NT security and usage of <literal>ntsec</literal></title>
 
 <para>The setting of UNIX like object permissions is controlled by the 
-<link linkend="using-cygwinenv"><EnVar>CYGWIN</EnVar> environment
+<link linkend="using-cygwinenv"><envar>CYGWIN</envar> environment
 variable</link> setting <literal>(no)ntsec</literal> which is set to
 <literal>ntsec</literal> by default.</para>
 
 <para>The design goal of <literal>ntsec</literal> is to get a more UNIX-like
 permission structure based upon the security features of Windows NT.
 To describe the changes, I will first give a short overview in
-<xref linkend="ntsec-common">.
+<xref linkend="ntsec-common"></xref>.
 </para>
 <para><link linkend="ntsec-processes" endterm="ntsec-processes.title"></link>
 discusses the changes in ntsec related to privileges on processes.</para>

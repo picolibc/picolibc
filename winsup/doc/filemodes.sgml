@@ -11,7 +11,7 @@ needs to open and read files. It can thus be relatively slow.</para>
 <para>Under NT, file permissions default to the same behavior as Windows
 9x but there is optional functionality in Cygwin that can make file
 systems behave more like on UNIX systems.  This is turned on by adding
-the "ntea" option to the <EnVar>CYGWIN</EnVar> environment variable.</para>
+the "ntea" option to the <envar>CYGWIN</envar> environment variable.</para>
 
 <para>When the "ntea" feature is activated, Cygwin will start with basic
 permissions as determined above, but can store POSIX file permissions in NT
@@ -24,7 +24,7 @@ have a large number of files on the partition in question, slowing the
 system to a crawl.  In addition, the <filename>EA DATA. SF</filename> file
 can only be deleted outside of Windows because of its "in use" status.  For
 these reasons, the use of NT Extended Attributes is off by default in
-Cygwin.  Finally, note that specifying "ntea" in <EnVar>CYGWIN</EnVar> has no
+Cygwin.  Finally, note that specifying "ntea" in <envar>CYGWIN</envar> has no
 effect under Windows 9x. </para>
 
 <para>Under NT, the test "[ -w filename]" is only true if filename is

@@ -1,15 +1,6 @@
-<!doctype book PUBLIC "-//OASIS//DTD DocBook V4.2//EN" [
-  <!ENTITY cygnus-copyright "<YEAR>1998</YEAR><HOLDER>Red Hat, Inc.</HOLDER>">
-  <!ENTITY cygnus-code-copyright "
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Copyright (C) 1998,2001 Red Hat, Inc.
-
-This is copyrighted software that may only
-be reproduced, modified, or distributed
-under license from Red Hat, Inc.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-">
- ]>
+<?xml version="1.0"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd"[]>
 
 <book id="cygwin-api">
 

@@ -12,7 +12,7 @@ To install a basic Cygwin environment, run the
 <command>setup.exe</command> program and click <literal>Next</literal>
 at each page.  The default settings are correct for most users. If you
 want to know more about what each option means, see 
-<Xref Linkend="internet-setup">. Use <command>setup.exe</command>
+<xref linkend="internet-setup"></xref>. Use <command>setup.exe</command>
 any time you want to update or install a Cygwin package.  If you are
 installing Cygwin for a specific purpose, use it to install the tools
 that you need. For example, if you want to compile C++ programs, you 
@@ -47,7 +47,7 @@ If you are an experienced UNIX user who misses a powerful command-line
 environment, you will enjoy Cygwin. Note that there are some workarounds
 that cause Cygwin to behave differently than most UNIX-like operating
 systems; these are described in more detail in 
-<xref linkend="using-effectively">.
+<xref linkend="using-effectively"></xref>.
 </para>
 <para>
 Any time you want to update or install a Cygwin package, use the
@@ -55,9 +55,9 @@ graphical <command>setup.exe</command> program. By default,
 <command>setup.exe</command> only installs a minimal set of packages, 
 so look around and choose your favorite utilities on the package
 selection screen. You may also search for specfic tools on the Cygwin
-website's <ulink URL="http://cygwin.com/packages/">Setup Package
+website's <ulink url="http://cygwin.com/packages/">Setup Package
 Search</ulink> For more information about what each option in
-<command>setup.exe</command> means, see <xref linkend="internet-setup">. 
+<command>setup.exe</command> means, see <xref linkend="internet-setup"></xref>. 
 </para>
 <para>
 Another option is to install everything by clicking on the

@@ -24,14 +24,14 @@ better coverage, which Windows 2000 and XP expanded.
 Microsoft also provides free downloads for Windows NT 4.0 (the Resource Kit 
 Support Tools), Windows 2000 (the Resource Kit Tools), and XP (the 
 Windows Support Tools). Additionally, many independent sites such as 
-<ulink URL="http://download.com.com">download.com</ulink>, 
-<ulink URL="http://simtel.net">simtel.net</ulink>, 
-and <ulink URL="http://sysinternals.com">sysinternals.com</ulink>
+<ulink url="http://download.com.com">download.com</ulink>, 
+<ulink url="http://simtel.net">simtel.net</ulink>, 
+and <ulink url="http://sysinternals.com">sysinternals.com</ulink>
 provide command-line utilities.  A few Windows tools, such as 
 <command>find.exe</command> and <command>sort.exe</command>,
 may conflict with the Cygwin versions; make sure that you use the full 
 path (<command>/usr/bin/find</command>) or that your Cygwin 
-<literal>bin</literal> directory comes first in your <EnVar>PATH</EnVar>.
+<literal>bin</literal> directory comes first in your <envar>PATH</envar>.
 </para>
 
 <sect2> <title>Pathnames</title>
@@ -41,7 +41,7 @@ Windows programs do not understand POSIX pathnames, so any arguments
 that reference the filesystem must be in Windows (or DOS) format or 
 translated.  Cygwin provides the <command>cygpath</command> utility for 
 converting between Windows and POSIX paths. A complete description of its 
-options and examples of its usage are in <Xref Linkend="cygpath">, 
+options and examples of its usage are in <xref linkend="cygpath"></xref>, 
 including a shell script for starting Windows Explorer in any directory. 
 The same format works for most Windows programs, for example 
 <screen>
@@ -82,10 +82,10 @@ Windows verses Unix compatibility behavior.  To be most compatible with
 Windows programs, use a DOS prompt, running only the occasional Cygwin 
 command or script. Next would be to run <command>bash</command> with 
 the default DOS box. To make Cygwin more Unix compatible in this case, 
-set <EnVar>CYGWIN=tty</EnVar> (see <Xref Linkend="using-cygwinenv">).
+set <envar>CYGWIN=tty</envar> (see <xref linkend="using-cygwinenv"></xref>).
 Alternatively, the optional <systemitem>rxvt</systemitem> package provides 
 a native-Windows version of the popular X11 terminal emulator (it is not 
-necessary to set <EnVar>CYGWIN=tty</EnVar> with <command>rxvt</command>). 
+necessary to set <envar>CYGWIN=tty</envar> with <command>rxvt</command>). 
 Using <command>rxvt.exe</command> provides the most Unix-like environment, 
 but expect some compatibility problems with Windows programs.
 </para>
@@ -116,9 +116,9 @@ Windows 95, 98, and ME) for automating dialup connections.
 Users who frequently change their network 
 configuration can script these changes with <command>netsh.exe</command> 
 (Windows 2000 and XP). For proxy users, the open source 
-<ulink URL="http://apserver.sourceforge.net">
+<ulink url="http://apserver.sourceforge.net">
 NTLM Authorization Proxy Server</ulink> or the no-charge
-<ulink URL="http://www.hummingbird.com/products/nc/socks/index.html">
+<ulink url="http://www.hummingbird.com/products/nc/socks/index.html">
 Hummingbird SOCKS Proxy</ulink> may allow you to use Cygwin network
 programs in your environment.
 </para>
@@ -137,7 +137,7 @@ for interacting with Windows.
 
 <para>
 One of the hassles of Unix-Windows interoperability is the different line 
-endings on text files.  As mentioned in <Xref Linkend="using-textbinary">, 
+endings on text files.  As mentioned in <xref linkend="using-textbinary"></xref>, 
 Unix tools such as <command>tr</command> can convert between CRLF and LF 
 endings, but <systemitem>cygutils</systemitem> provides several dedicated programs: 
 <command>conv</command>, <command>d2u</command>, <command>dos2unix</command>, 
@@ -178,7 +178,7 @@ There are several options for printing from Cygwin, including the
 <command>lpr</command> found in <systemitem>cygutils</systemitem> (not to be confused with the 
 native Windows <command>lpr.exe</command>). The easiest way to use <systemitem>cygutils</systemitem>' 
 <command>lpr</command> is to specify a default device name in the 
-<EnVar>PRINTER</EnVar> environment variable.  You may also specify a device 
+<envar>PRINTER</envar> environment variable.  You may also specify a device 
 on the command line with the <literal>-d</literal> or <literal>-P</literal> 
 options, which will override the environment variable setting. 
 </para>
@@ -202,7 +202,7 @@ text files for printing. The <systemitem>ghostscript</systemitem> package also
 provides some translation
 from PostScript to various native printer languages. Additionally, a native 
 Windows application for printing PostScript, <command>gsprint</command>, is 
-available from the <ulink URL="http://www.cs.wisc.edu/~ghost/">Ghostscript
+available from the <ulink url="http://www.cs.wisc.edu/~ghost/">Ghostscript
 website</ulink>.
 </para>
 

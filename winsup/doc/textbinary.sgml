@@ -33,7 +33,7 @@ other programs (such as <command>cat</command>, <command>cmp</command>,
 <para>The Cygwin system gives us some flexibility in deciding how files 
 are to be opened when the mode is not specified explicitly. 
 The rules are evolving, this section gives the design goals.</para>
-<OrderedList Numeration="Loweralpha">
+<orderedlist numeration="loweralpha">
 <listitem>
 <para>If the file appears to reside on a file system that is mounted
 (i.e. if its pathname starts with a directory displayed by
@@ -48,11 +48,11 @@ applies.</para>
 </listitem>
 <listitem>
 <para>Pipes and non-file devices are opened in binary mode,
-except if the <EnVar>CYGWIN</EnVar> environment variable contains
+except if the <envar>CYGWIN</envar> environment variable contains
 <literal>nobinmode</literal>.</para>
-<warning><Title>Warning!</Title><para>In b20.1 of 12/98, a file will be opened
+<warning><title>Warning!</title><para>In b20.1 of 12/98, a file will be opened
 in binary mode if any of the following conditions hold:</para> 
-<OrderedList Numeration="arabic" Spacing="Compact">
+<orderedlist numeration="arabic" spacing="compact">
 <listitem><para>binary mode is specified in the open call</para>
 </listitem>
 <listitem><para><envar>CYGWIN</envar> contains <literal>binmode</literal></para>
@@ -61,7 +61,7 @@ in binary mode if any of the following conditions hold:</para>
 </listitem>
 <listitem><para>the file is not a disk file</para>
 </listitem>
-</OrderedList>
+</orderedlist>
 </warning>
 </listitem>
 
@@ -78,7 +78,7 @@ non-Cygwin shells the commands <command> cat filename | program </command>
 and <command> program &lt; filename </command> are not equivalent when
 <filename>filename</filename> is on a text-mounted partition. </para>
 </listitem>
-</OrderedList>
+</orderedlist>
 </sect2>
 
 <sect2><title>Example</title>
