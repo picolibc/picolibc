@@ -1349,13 +1349,20 @@ typedef struct tagDIBSECTION {
 	HANDLE dshSection;
 	DWORD dsOffset;
 } DIBSECTION;
-typedef struct {
+typedef struct _DOCINFOA {
 	int cbSize;
 	LPCTSTR lpszDocName;
 	LPCTSTR lpszOutput;
 	LPCTSTR lpszDatatype;
 	DWORD fwType;
-} DOCINFO,*LPDOCINFO;
+} DOCINFOA,*LPDOCINFOA;
+typedef struct _DOCINFOW {
+	int cbSize;
+	LPCWSTR lpszDocName;
+	LPCWSTR lpszOutput;
+	LPCWSTR lpszDatatype;
+	DWORD fwType;
+} DOCINFOW,*LPDOCINFOW;
 typedef struct tagEMR {
 	DWORD iType;
 	DWORD nSize;
@@ -2646,8 +2653,8 @@ BOOL WINAPI SetWindowExtEx(HDC,int,int,LPSIZE);
 BOOL WINAPI SetWindowOrgEx(HDC,int,int,LPPOINT);
 HENHMETAFILE WINAPI SetWinMetaFileBits(UINT,const BYTE*,HDC,const METAFILEPICT*);
 BOOL WINAPI SetWorldTransform(HDC,const XFORM *);
-int WINAPI StartDocA(HDC,const DOCINFO*);
-int WINAPI StartDocW(HDC,const DOCINFO*);
+int WINAPI StartDocA(HDC,const LPDOCINFOA);
+int WINAPI StartDocW(HDC,const LPDOCINFOW);
 int WINAPI StartPage(HDC);
 BOOL WINAPI StretchBlt(HDC,int,int,int,int,HDC,int,int,int,int,DWORD);
 int WINAPI StretchDIBits(HDC,int,int,int,int,int,int,int,int,const VOID *,const BITMAPINFO *,UINT,DWORD);
@@ -2683,6 +2690,7 @@ BOOL WINAPI wglUseFontOutlinesW(HDC,DWORD,DWORD,DWORD,FLOAT,FLOAT,int,LPGLYPHMET
 
 #ifdef UNICODE
 typedef WCHAR BCHAR;
+typedef DOCINFOW DOCINFO, *LPDOCINFO;
 typedef LOGFONTW LOGFONT,*PLOGFONT,*LPLOGFONT;
 typedef TEXTMETRICW TEXTMETRIC,*PTEXTMETRIC,*LPTEXTMETRIC;
 #define ICMENUMPROC ICMENUMPROCW
@@ -2744,6 +2752,7 @@ typedef ENUMLOGFONTEXW ENUMLOGFONTEX,*LPENUMLOGFONTEX;
 #define wglUseFontOutlines wglUseFontOutlinesW
 #else
 typedef BYTE BCHAR;
+typedef DOCINFOW DOCINFO, *LPDOCINFO;
 typedef LOGFONTA LOGFONT,*PLOGFONT,*LPLOGFONT;
 typedef TEXTMETRICA TEXTMETRIC,*PTEXTMETRIC,*LPTEXTMETRIC;
 #define ICMENUMPROC ICMENUMPROCA

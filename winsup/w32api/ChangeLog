@@ -1,6 +1,13 @@
 
 2001-02-21  Danny Smith <dannysmith@users.sourceforge.net>
 
+	* include/wingdi.h (struct _DOCINFO[AW]): UNICODE it.
+	(StartDoc[AW]): Use UNICODE'd LPDOCINFO[AW] 
+	* include/winuser.h (struct tagMOUSEKEYS): Define new structure.
+	* include/winerror.h (NTE_*): Add CryptoAPI error codes. 
+
+2001-02-21  Danny Smith <dannysmith@users.sourceforge.net>
+
 	* include/mswsock.h: New file.
 	* include/ws2tcpip.h: New file.
 	* include/winsock.h (IPPROTO_IGMP): New define.
