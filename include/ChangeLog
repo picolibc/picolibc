@@ -1,3 +1,7 @@
+Mon Apr 24 15:20:51 2000  Clinton Popetz  <cpopetz@cygnus.com>
+
+	* include/coff/rs6k64.h: New file.
+
 Fri Apr 21 13:20:53 2000  Richard Henderson  <rth@cygnus.com>
 			  David Mosberger  <davidm@hpl.hp.com>
 
