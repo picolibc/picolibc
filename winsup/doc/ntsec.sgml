@@ -1,23 +1,43 @@
-<sect1 id="ntsec"><title>NT security and the <literal>ntsec</literal> usage</title>
+<sect1 id="ntsec"><title>NT security and usage of <literal>ntsec</literal></title>
 
-<para>The design goal of ntsec is to get a more UNIX like
+<para>The setting of UNIX like object permissions is controlled by the 
+<link linkend="using-cygwinenv"><EnVar>CYGWIN</EnVar> environment
+variable</link> setting <literal>(no)ntsec</literal> which is set to
+<literal>ntsec</literal> by default.</para>
+
+<para>The design goal of <literal>ntsec</literal> is to get a more UNIX-like
 permission structure based upon the security features of Windows NT.
-To describe the changes, I will give a short overview of NT security
-in chapter one.</para>
-<para>Chapter two discusses the changes in ntsec related to privileges on
-processes.</para>
-<para>Chapter three shows the basics of UNIX like setting of
-file permissions.</para>
-<para>Chapter four talks about the advanced settings introduced in
-release 1.1</para>
-<para>Chapter five illustrates the permission mapping leak of Windows NT.</para>
-<para>Chapter six describes the new support of a setuid concept introduced
-with release 1.1.3.</para>
+To describe the changes, I will first give a short overview in
+<xref linkend="ntsec-common">.
+</para>
+<para><link linkend="ntsec-processes" endterm="ntsec-processes.title"></link>
+discusses the changes in ntsec related to privileges on processes.</para>
 
-<para>Chapter six describes in short the new acl API since release 1.1</para>
+<para><link linkend="ntsec-files" endterm="ntsec-files.title"></link> shows
+the basics of UNIX-like setting of file permissions.</para>
 
-<para>The setting of UNIX like object permissions is controlled by the new
-<EnVar>CYGWIN</EnVar> variable setting <literal>(no)ntsec</literal>.</para>
+<para><link linkend="ntsec-sids" endterm="ntsec-sids.title"></link>
+talks about using SIDs in <filename>/etc/passwd</filename> and
+<filename>/etc/group</filename>.</para>
+
+<para><link linkend="ntsec-mapping" endterm="ntsec-mapping.title"></link>
+illustrates the permission mapping leak of Windows NT.</para>
+
+<para><link linkend="ntsec-aclfuncs" endterm="ntsec-aclfuncs.title"></link>
+describes in short the ACL API since release 1.1.</para>
+
+<para><link linkend="ntsec-setuid" endterm="ntsec-setuid.title"></link>
+describes the new support of a setuid concept introduced with release
+1.1.3.</para>
+
+<para><link linkend="ntsec-switch" endterm="ntsec-switch.title"></link>
+gives the basics of using the SYSTEM user to switch user context.
+</para>
+
+<para><link linkend="ntsec-ids" endterm="ntsec-ids.title"></link>
+explains the way Cygwin shows users and groups that are not in 
+<filename>/etc/passwd</filename> or <filename>/etc/group</filename>.
+</para>
 
 <sect2 id="ntsec-common"><title>NT security</title>
 
@@ -54,7 +74,7 @@ identifies the source that issued the SID.</para>
 <para>While each system in a NT network has it's own SID, the situation
 is modified in NT domains: The SID of the domain controller is the
 base SID for each domain user. If an NT user has one account as domain
-user and another account on his local machine, this accounts are under
+user and another account on his local machine, these accounts are under
 any circumstances DIFFERENT, regardless of the usage of the same user
 name and password!</para>
 
@@ -71,15 +91,15 @@ name and password!</para>
 </screen>
 
 <para>The last part of the SID, the so called `relative identifier' (RID),
-is by default used as UID and/or GID under cygwin. As the name and the
+is by default used as UID and/or GID under Cygwin. As the name and the
 above example implies, this id is unique only relative to one system or
 domain.</para>
 
-<para>Note, that it's possible, that an user has the same RID on two
+<para>Note, that it's possible that a user has the same RID on two
 different systems. The resulting SIDs are nevertheless different, so
 the SIDs are representing different users in an NT network.</para>
 
-<para>There is a big difference between UNIX IDs and NT SIDs, the existence of
+<para>There is a big difference between UNIX IDs and NT SIDs: the existence of
 the so called `well known groups'. For example UNIX has no GID for the
 group of `all users'. NT has an SID for them, called `Everyone' in the
 English versions. The SIDs of well-known groups are not unique across
@@ -128,6 +148,7 @@ has a potentially infinite number of members. Every member is a so called
 set </para></listitem>
 </itemizedlist>
 
+<!-- Is the historical note really important here? we're at version 1.5.9, after all.. -->
 <para>The two important types of ACEs are the `access allowed ACE' and the
 `access denied ACE'. The ntsec functionality only used `access allowed ACEs' up
 to Cygwin version 1.1.0. Later versions also use `access denied ACEs' 
@@ -144,7 +165,7 @@ system. The NT security model is MOSTLY able to reproduce the POSIX model.
 The ntsec method tries to do this in cygwin.</para>
 
 <para>You ask "Mostly? Why mostly???" Because there's a leak in the NT model.
-I will describe that in detail in chapter 4.</para>
+I will describe that in detail in chapter 5.</para>
 
 <para>Creating  explicit object security is not that easy so you will often
 see only two simple variations in use:</para>
@@ -163,9 +184,9 @@ this document the difference between SDs and SAs is ignored.</para>
 
 </sect2>
 
-<sect2 id="ntsec-processes"><title>Process privileges</title>
+<sect2 id="ntsec-processes"><title id="ntsec-processes.title">Process privileges</title>
 
-<para>Any process started under control of cygwin has a semaphore attached
+<para>Any process started under control of Cygwin has a semaphore attached
 to it, that is used for signaling purposes. The creation of this semaphore
 can be found in sigproc.cc, function `getsem'. The first parameter to the
 function call `CreateSemaphore' is an SA. Without ntsec this SA 
@@ -181,18 +202,18 @@ administrators' group and for `system', which is a synonym for the
 operating system itself. The creation of this SA is done by the function
 `sec_user', that can be found in `shared.cc'. Each member of the
 administrators' group is now allowed to send signals to any process
-created in cygwin, regardless of the process owner.</para>
+created in Cygwin, regardless of the process owner.</para>
 
 <para>Moreover, each process now has the appropriate security settings, when
 it is started via `CreateProcess'. You will find this in function
 `spawn_guts' in module `spawn.cc'. The security settings for starting a
-process in another user context have to add the sid of the new user, too.
+process in another user context have to add the SID of the new user, too.
 In the case of the `CreateProcessAsUser' call, sec_user creates an SA with
 an additional entry for the sid of the new user.</para>
 
 </sect2>
 
-<sect2 id="ntsec-files"><title>File permissions</title>
+<sect2 id="ntsec-files"><title id="ntsec-files.title">File permissions</title>
 
 <para>If ntsec is turned on, file permissions are set as in UNIX. An SD is
 assigned to the file containing the owner and group and ACEs for the
@@ -205,7 +226,7 @@ functions `read_sd' and `write_sd'. `write_sd' uses the function `BackupRead'
 instead of the simpler function `SetFileSecurity' because the latter is
 unable to set owners different from the caller.</para>
 
-<para>If you are creating a file `foo' outside of cygwin, you will see something
+<para>If you are creating a file `foo' outside of Cygwin, you will see something
 like the following on <command>ls -ln</command>:</para>
 
 <para>If your login is member of the administrators' group:</para>
@@ -218,9 +239,9 @@ like the following on <command>ls -ln</command>:</para>
 </screen>
 
 <para>Note the user and group IDs. 544 is the UID of the administrators' group.
-This is a `feature' <literal>:-P</literal> of WinNT. If one is a member of
-the administrators' group, every file, that he has created is owned by the
-administrators' group, instead by him.</para>
+This is a `feature' <literal>:-P</literal> of WinNT. If you are a member of
+the administrators' group, every file that you create is owned by the
+administrators' group, instead of by you.</para>
 
 <para>The second example shows the UID of the first user, that has been
 created with NT's the user administration tool. The users and groups are
@@ -235,17 +256,17 @@ the group `None' is never shown in the user admin tool outside of domains!
 This is very confusing but this seems to have no negative consequences.</para>
 
 <para>To work correctly, ntsec depends on the files
-<filename>/etc/passwd/</filename> and <filename>/etc/group</filename>.
-In cygwin release 1.0 the names and the IDs must correspond to the
-appropriate NT IDs! The IDs used in cygwin are the RID of the NT SID, as
+<filename>/etc/passwd</filename> and <filename>/etc/group</filename>.
+In Cygwin release 1.0 the names and the IDs must correspond to the
+appropriate NT IDs! The IDs used in Cygwin are the RID of the NT SID, as
 mentioned earlier.
-An SID of e.g. the user `corinna' on my NT workstation:</para>
+A SID of e.g. the user `corinna' on my NT workstation:</para>
 
 <screen>
   S-1-5-21-165875785-1005667432-441284377-1000
 </screen>
 
-<para>Note the last number: It's the RID 1000, the cygwin's UID.</para>
+<para>Note the last number: It's the RID 1000, Cygwin's UID.</para>
 
 <para>Unfortunately, workstations and servers outside of domains are not
 able to set primary groups! In these cases, where there is no correlation
@@ -292,25 +313,26 @@ by the powerusers group instead of None.  This is the way I liked it.</para>
 
 <para>Groups may be mentioned in the passwd file, too. This has two
 advantages:</para>
+
 <itemizedlist spacing="compact">
 <listitem><para>Because NT assigns them to files as owners, a
 <command>ls -l</command> is often more readable.</para></listitem>
 <listitem><para>Moreover it's possible to assigned them to files as
-owners with cygwin's <command>chown</command>.</para></listitem>
+owners with Cygwin's <command>chown</command>.</para></listitem>
 </itemizedlist>
 
 <para>The group `system' is the aforementioned synonym for the operating system
-itself and is normally the owner of processes, that are started through
-service manager. The same is true for files, that are created by
+itself and is normally the owner of processes that are started through
+service manager. The same is true for files that are created by
 processes, which are started through service manager.</para>
 
 </sect2>
 
-<sect2 id="ntsec-release1.1"><title>New since Cygwin release 1.1</title>
+<sect2 id="ntsec-sids"><title id="ntsec-sids.title">NT SIDs in Cygwin</title>
 
 <para>In Cygwin release 1.1 a new technique of using the 
 <filename>/etc/passwd</filename> and <filename>/etc/group</filename>
- is introduced.</para>
+ was introduced.</para>
 
 <para>Both files may now contain SIDs of users and groups. They
 are saved in the last field of pw_gecos in <filename>/etc/passwd</filename>
@@ -320,9 +342,9 @@ and in the gr_passwd field in <filename>/etc/group</filename>.</para>
 <itemizedlist spacing="compact">
 <listitem><para>ntsec works better in domain environments.</para></listitem>
 <listitem><para>Accounts (users and groups) may get another name in
-cygwin than their NT account name. The name in <filename>/etc/passwd</filename>
-or <filename>/etc/group</filename> is transparently used by cygwin
-applications (eg. <command>chown</command>, <command>chmod</command>,
+Cygwin than their NT account name. The name in <filename>/etc/passwd</filename>
+or <filename>/etc/group</filename> is transparently used by Cygwin
+applications (e.g. <command>chown</command>, <command>chmod</command>,
 <command>ls</command>):</para>
 
 <screen>
@@ -378,10 +400,10 @@ the options <literal>-s</literal> or <literal>--no-sids</literal>. I suggest
 not to do this since ntsec works better when having the SIDs available.</para>
 
 <para>Please note that the pw_gecos field in <filename>/etc/passwd</filename>
-is defined as a comma seperated list. The SID has to be the last field!</para>
+is defined as a comma separated list. The SID has to be the last field!</para>
 
-<para>As aforementioned you are able to use cygwin account names different
-from the NT account names. If you want to login thru `telnet' or something
+<para>As aforementioned you are able to use Cygwin account names different
+from the NT account names. If you want to login through `telnet' or something
 else you have to use the special <command>login</command>. You may then
 add another field to pw_gecos which contains the NT user name including
 it's domain. So you are able to login as each domain user. The syntax
@@ -441,13 +463,14 @@ users:S-1-5-32-545:545:
 <para>If you want to do similar changes to your files, please do that only
 if you're feeling comfortably with the concepts.  Otherwise don't be surprised
 if some stuff doesn't work anymore.  If you screwed up things, revert to files
-created by mkpasswd and mkgroup.  Especially don't change the uid or the name
+created by mkpasswd and mkgroup.  Especially don't change the UID or the name
 of user SYSTEM.  Even if that works mostly, some Cygwin applications running
-as local service under that account could behave strangly suddenly.</para>
+as local service under that account could suddenly start behaving strangely.
+</para>
 
 </sect2>
 
-<sect2 id="ntsec-mapping"><title>The mapping leak</title>
+<sect2 id="ntsec-mapping"><title id="ntsec-mapping.title">The mapping leak</title>
 
 <para>Now its time to point out the leak in the NT permissions.
 The official documentation explains in short the following:</para>
@@ -463,7 +486,7 @@ access allowed ACE.</para></listitem>
 
 <para>Note that the last rule is a preference, not a law. NT will correctly
 deal with the ACL regardless of the sequence order. The second rule is
-not modified to get the ACEs in the prefered order.</para>
+not modified to get the ACEs in the preferred order.</para>
 
 <para>Unfortunately the security tab of the NT4 explorer is completely
 unable to deal with access denied ACEs while the explorer of W2K rearranges
@@ -509,7 +532,7 @@ OthersAllow: 110
 </screen>
 
 <para>Now the group may not write as intended but unfortunately the user may
-not write anymore, too. How should this problem be solved? According to
+not write anymore, either. How should this problem be solved? According to
 the official rules a UserAllow has to follow the GroupDeny but it's
 easy to see that this can never be solved that way.</para>
 
@@ -528,9 +551,9 @@ able to deal with that order.</para>
 
 </sect2>
 
-<sect2 id="ntsec-aclfuncs"><title>New acl API</title>
+<sect2 id="ntsec-aclfuncs"><title id="ntsec-aclfuncs.title">The ACL API</title>
 
-<para>For dealing with ACLs Cygwin now has the acl API as it's
+<para>For dealing with ACLs Cygwin now has the ACL API as it's
 implemented in newer versions of Solaris. The new data structure
 for a single ACL entry (ACE in NT terminology) is defined in
 <filename>sys/acl.h</filename> as:</para>
@@ -544,7 +567,7 @@ typedef struct acl {
 </screen>
 
 <para>The a_perm member of the aclent_t type contains only the bits
-for read, write and execute as in the file mode. If eg. read permission
+for read, write and execute as in the file mode. If e.g. read permission
 is granted, all read bits (S_IRUSR, S_IRGRP, S_IROTH) are set.
 CLASS_OBJ or MASK ACL entries are not fully implemented yet.</para>
 
@@ -563,12 +586,12 @@ acltotext(3), aclfromtext(3)
 ACLs on the command line: <command>getfacl</command> and
 <command>setfacl</command>.</para>
 
-<para>Online man pages for the aforementioned commands and API calls
-can be found on eg. http://docs.sun.com</para>
+<para>Online man pages for the aforementioned commands and API calls can be
+found on <ulink url="http://docs.sun.com">http://docs.sun.com</ulink> </para>
 
 </sect2>
 
-<sect2 id="ntsec-setuid"><title>New setuid concept</title>
+<sect2 id="ntsec-setuid"><title id="ntsec-setuid.title">New setuid concept</title>
 
 <para>UNIX applications which have to switch the user context are using
 the <command>setuid</command> and <command>seteuid</command> calls which
@@ -577,7 +600,7 @@ Nevertheless these calls are supported under Windows NT/W2K since Cygwin
 release 1.1.3.  Because of the nature of NT security an application which
 needs the ability has to be patched, though.</para>
 
-<para>NT uses so called `access tokens' to identify a user and it's
+<para>NT uses so-called `access tokens' to identify a user and it's
 permissions. To switch the user context the application has to request
 such an `access token'. This is typically done by calling the NT API
 function <command>LogonUser</command>. The access token is returned and
@@ -655,7 +678,7 @@ a short example:</para>
 
 </screen>
 
-<para>The new Cygwin call to retrive an access token is defined as follows:</para>
+<para>The new Cygwin call to retrieve an access token is defined as follows:</para>
 
 <screen>
 #include &lt;windows.h&gt;
@@ -666,7 +689,7 @@ cygwin_logon_user (struct passwd *pw, const char *cleartext_password)
 </screen>
 
 <para>You can call that function as often as you want for different user
-logons and remeber the access tokens for further calls to the second function.</para>
+logons and remember the access tokens for further calls to the second function.</para>
 
 <screen>
 #include &lt;windows.h&gt;
@@ -678,8 +701,8 @@ cygwin_set_impersonation_token (HANDLE hToken);
 
 <para> is the call to inform Cygwin about the user context to which further
 calls to <command>setuid</command>/<command>seteuid</command> should switch to.
-While you need always the correct access token to do a
-<command>setuid</command>/<command>seteuid</command> to another users context,
+While you always need the correct access token to do a
+<command>setuid</command>/<command>seteuid</command> to another user's context,
 you are always able to use <command>setuid</command>/<command>seteuid</command>
 to return to your own user context by giving your own uid as parameter.</para>
 
@@ -710,7 +733,8 @@ etc.
 
 </sect2>
 
-<sect2 id="ntsec-release1.3.3"><title>New since Cygwin release 1.3.3</title>
+<sect2 id="ntsec-switch"><title id="ntsec-switch.title">Switching User
+Context</title>
 
 <para>
 Since Cygwin release 1.3.3, applications having the
@@ -723,7 +747,7 @@ the user context using e. g. rhosts authentication or (when running sshd
 under SYSTEM account as service) public key authentication.
 </para>
 <para>
-An important restriction of this method is, that a process started under
+An important restriction of this method is that a process started under
 SYSTEM account can't access network shares which require authentication.
 This also applies to the subprocesses which switched the user context 
 without a password.  People using network home drives are typically not
@@ -732,7 +756,7 @@ able to access it when trying to login using ssh or rsh without password.
 
 </sect2>
 
-<sect2 id="ntsec-release1.3.20"><title>Special values of user and group
+<sect2 id="ntsec-ids"><title id="ntsec-ids.title">Special values of user and group
 ids</title>
 
 <para>

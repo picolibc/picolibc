@@ -1,3 +1,12 @@
+2004-03-30  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* ntsec.sgml: Replace chapter numbers with <link>s, 
+	replace release-numbers in <title>s with descriptions.
+
+2004-03-30  Ronald Landheer-Cieslak <ronald@landheer.com> 
+
+	* ntsec.sgml: Fix typos, correct chapter numbers.
+
 2004-03-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* pathnames.sgml: Fix /dev/srX description.
