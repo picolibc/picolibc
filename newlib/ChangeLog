@@ -1,5 +1,9 @@
 2003-05-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/include/stdio.h: Change one __CYGWIN__ to __CYGWIN32__.
+
+2003-05-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* configure.host: Accomodate removing the libc/sys/cygwin dir.
 	* libc/locale/ldpart.c (__part_load_locale): Use 64 bit stat call
 	if __CYGWIN_USE_BIG_TYPES__ is set.
