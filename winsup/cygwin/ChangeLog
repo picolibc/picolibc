@@ -1,3 +1,7 @@
+2001-11-11  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump version to 1.3.6.
+
 2001-11-10  Christopher Faylor  <cgf@redhat.com>
 
 	* dtable.cc (dtable::build_fhandler): Don't increment console fd count
