@@ -1,3 +1,9 @@
+2003-11-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/sys/fcntl.h: Declare _open64.
+	* libc/include/sys/stat.h: Declare _fstat64.
+	* libc/include/sys/unistd.h: Declare _lseek64.
+
 2003-11-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/stdlib.h (getprogname): Declare for Cygwin.

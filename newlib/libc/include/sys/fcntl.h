@@ -171,6 +171,9 @@ extern int fcntl _PARAMS ((int, int, ...));
    of newlib.  */
 extern int _open _PARAMS ((const char *, int, ...));
 extern int _fcntl _PARAMS ((int, int, ...));
+#ifdef __LARGE64_FILES
+extern int _open64 _PARAMS ((const char *, int, ...));
+#endif
 
 #ifdef __cplusplus
 }

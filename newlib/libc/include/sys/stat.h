@@ -140,6 +140,9 @@ int	_EXFUN(mknod,( const char *__path, mode_t __mode, dev_t __dev ));
 #ifndef __INSIDE_CYGWIN__
 int	_EXFUN(_fstat,( int __fd, struct stat *__sbuf ));
 int	_EXFUN(_stat,( const char *__path, struct stat *__sbuf ));
+#ifdef __LARGE64_FILES
+int	_EXFUN(_fstat64,( int __fd, struct stat64 *__sbuf ));
+#endif
 #endif
 
 #endif /* !_STAT_H_ */
