@@ -935,7 +935,7 @@ pthread_cond::fixup_after_fork ()
 
 /* pthread_key */
 /* static members */
-List<pthread_key> pthread_key::keys;
+List<pthread_key> pthread_key::keys NO_COPY;
 
 void
 pthread_key::saveAKey (pthread_key *key)
@@ -1097,7 +1097,7 @@ pthread_mutex::isGoodInitializerOrObject (pthread_mutex_t const *mutex)
   return true;
 }
 
-pthread_mutex::nativeMutex pthread_mutex::mutexInitializationLock;
+pthread_mutex::nativeMutex pthread_mutex::mutexInitializationLock NO_COPY;
 
 /* We can only be called once.
    TODO: (no rush) use a non copied memory section to
@@ -2640,6 +2640,6 @@ pthreadNull::getsequence_np ()
   return 0;
 }
 
-pthreadNull pthreadNull::_instance = pthreadNull ();
+pthreadNull NO_COPY pthreadNull::_instance;
 
 #endif // MT_SAFE
