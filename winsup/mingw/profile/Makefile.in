@@ -25,6 +25,8 @@ INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 mkinstalldirs = $(SHELL) $(srcdir)/../../mkinstalldirs
+DISTFILES = Makefile.in configure configure.in gcrt0.c gmon.c gmon.h mcount.c \
+profil.c profil.h profile.h
 
 CC = @CC@
 # FIXME: Which is it, CC or CC_FOR_TARGET?
@@ -117,3 +119,9 @@ distclean:
 .c.o:
 	$(CC) -c $(ALL_CPPFLAGS) $(ALL_CFLAGS) $< -o $@
 
+dist:
+	mkdir $(distdir)/profile
+	chmod 755 $(distdir)/profile
+	@for i in $(DISTFILES); do\
+		cp -p $(srcdir)/$$i $(distdir)/profile/$$i ; \
+	done

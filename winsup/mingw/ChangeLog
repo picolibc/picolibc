@@ -1,3 +1,21 @@
+2000-11-21  Earnie Boyd  <earnie_boyd@yahoo.com>
+
+	* Makefile.in: Add missing line continuation `\' for $(SUBDIRS) target.
+	Add variables and targets to control binary and source distributions.
+	Add variables and targets to control snapshot distribution.
+	* profile/gmon.h: Add missing #endif for #ifndef.
+	* profile/ChangeLog: Merge entries here and remove.
+	* profile/Makefile.in: Add variables and targets to control 
+	distribution.
+	* README: Add.
+	* TODO: ditto.
+	* config.guess: ditto.
+	* config.sub: ditto.
+	* mkinstalldirs: ditto.
+	* install-sh: ditto.
+	* configure: regenerate.
+	* profile/configure: ditto.
+
 2000-11-20  Earnie Boyd  <earnie_boyd@yahoo.com>
 
 	* Merge in changes from
@@ -118,6 +136,8 @@ Tue Dec 21 02:22:14 1999  Mumit Khan  <khan@xraylith.wisc.edu>
 
 Thu Nov 18 00:22:26 1999  Mumit Khan  <khan@xraylith.wisc.edu>
 
+	* profile/profil.c (profile_on): Set the profiler thread priority to
+	be time critical. Thanks to Pascal Obry <pascal_obry@csi.com>.
 	* Snapshot 1999-11-18.
 
 Sun Nov  7 02:50:09 1999  Mumit Khan  <khan@xraylith.wisc.edu>
@@ -129,12 +149,25 @@ Sun Nov  7 02:50:09 1999  Mumit Khan  <khan@xraylith.wisc.edu>
 	* dirent.h (struct _stat): Rename from struct stat.
 	* include/tchar.h: Add some new macros. Thanks to
 	Eric Kohl <ekohl@abo.rhein-zeitung.de>.
+	* profile/Makefile.in (install): Fix target.
 
 Thu Nov  4 14:32:58 1999  Mumit Khan  <khan@xraylith.wisc.edu>
 
 	* Makefile.in: Add support for profile directory.
 	* configure.in: Likewise.
 	* configure: Regenerate.
+
+	* profile: Imported profiling sources from winsup-19991026 snapshot.
+	* profile/Makefile.in: New file.
+	* profile/configure.in: New file.
+	* profile/configure: Generate.
+	* profile/gcrt0.c (u_char, u_short, u_int, u_long): typedef for Mingw.
+	* profile/gmon.h (u_char, u_short, u_int, u_long): Likewise.
+	* profile/gmon.c (unistd.h): Include conditionally.
+	(sys/param.h): Likewise.
+	* profile/mcount.c (sys/param.h): Likewise.
+	* profile/profil.c (profile_on): thread id is DWORD, not int.
+
 
 Wed Nov  3 16:26:44 1999  Mumit Khan  <khan@xraylith.wisc.edu>
 

@@ -17,6 +17,9 @@
 
 # This makefile requires GNU make.
 
+PACKAGE = mingw-runtime
+VERSION = 0.4
+
 VPATH = @srcdir@
 srcdir = @srcdir@
 objdir = .
@@ -54,9 +57,9 @@ CXXFLAGS = @CXXFLAGS@
 # compiling with Cygwin?
 MNO_CYGWIN = @MNO_CYGWIN@
 ifdef MNO_CYGWIN
-subdirforlib=/mingw
+   subdirforlib=/mingw
 else
-libdir=
+   libdir=
 endif
 
 # Either crtdll (CRT_ID 1) or msvcrt (CRT_ID 2).
@@ -89,6 +92,7 @@ DLLTOOL_FLAGS = --as $(AS_FOR_TARGET)
 DLLWRAP = @DLLWRAP@
 DLLWRAP_FOR_TARGET = $(DLLWRAP)
 DLLWRAP_FLAGS = --dlltool $(DLLTOOL) --as $(AS) --driver-name $(CC)
+TAR = tar
 
 SUBDIRS := @SUBDIRS@
 
@@ -113,10 +117,17 @@ LIBS = libcrtdll.a libmsvcrt.a libmsvcrt20.a libmsvcrt40.a libmingw32.a \
 
 DLLS = $(THREAD_DLL_NAME)
 
+SRCDIST_FILES = CRT_noglob.c CRTfmode.c CRTglob.c CRTinit.c ChangeLog \
+Makefile.in README TODO config.guess config.sub configure configure.in \
+crt1.c crtdll.def crtmt.c crtst.c ctype_old.c dirent.c dllcrt1.c dllmain.c \
+gccmain.c init.c install-sh jamfile main.c mkinstalldirs moldname-crtdll.def \
+moldname-msvcrt.def moldname.def moldname.def.in msvcrt.def msvcrt20.def \
+msvcrt40.def mthr.c mthr_init.c mthr_stub.c readme.txt string_old.c
+
 all_dlls_host = @all_dlls_host@
 install_dlls_host = @install_dlls_host@
 
-all : $(CRT0S) $(LIBS) $(all_dlls_host)
+all: $(CRT0S) $(LIBS) $(all_dlls_host)
 	@$(MAKE) subdirs DO=$@ $(FLAGS_TO_PASS)
 
 all_dlls_host: $(DLLS)
@@ -199,6 +210,45 @@ distclean:
 	-rm -f config.cache config.status config.log 
 	-rm -f Makefile
 
+ifdef SNAPSHOT
+   distdir=$(PACKAGE)-$(VERSION)-$(SNAPDATE)
+else
+   distdir=$(PACKAGE)-$(VERSION)
+endif
+
+dist: srcdist bindist
+
+srcdist:
+	rm -rf $(distdir)
+	mkdir $(distdir)
+	chmod 755 $(distdir)
+	for i in $(SRCDIST_FILES); do \
+		cp -p $(srcdir)/$$i $(distdir)/$$i ; \
+	done
+	for i in $(SUBDIRS); do \
+		(cd $$i; $(MAKE) distdir=../$(distdir) dist); \
+	done
+#FIXME this needs to be done with SUBDIRS and Makefiles.
+	mkdir $(distdir)/include
+	mkdir $(distdir)/include/sys
+	cp $(srcdir)/include/*.h $(distdir)/include/
+	cp $(srcdir)/include/sys/*.h $(distdir)/include/sys/
+	rm -f $(distdir)-src.tar.gz
+	$(TAR) czf $(distdir)-src.tar.gz $(distdir)
+
+
+bindist:
+	rm -rf $(distdir)
+	mkdir $(distdir)
+	chmod 755 $(distdir)
+	$(MAKE) install prefix=../$(distdir)
+	rm -f $(distdir).tar.gz
+	cd $(distdir); $(TAR) czf ../$(distdir).tar.gz .
+
+SNAPDATE = $(shell date '+%Y%m%d')
+snapshot: 
+	make dist SNAPSHOT=1
+
 info:
 
 info-html:
@@ -235,7 +285,7 @@ subdirs: $(SUBDIRS)
 	  echo "Making $(DO) in $@..." ; \
 	  if (rootme=`pwd`/ ; export rootme ; \
 	    rootsrc=`cd $(srcdir); pwd`/ ; export rootsrc ; \
-	    cd ./$@; 
+	    cd ./$@; \
 	    $(MAKE) $(FLAGS_TO_PASS) $(DO)) ; then true ; \
 	  else exit 1 ; fi ; \
 	else true ; fi ; \

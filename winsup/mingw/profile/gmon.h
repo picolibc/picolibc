@@ -51,13 +51,14 @@
 #include <profile.h>
 
 #ifdef __MINGW32__
-#if !defined _BSDTYPES_DEFINED
+#ifndef _BSDTYPES_DEFINED
 typedef unsigned char u_char;
 typedef unsigned short u_short;
 typedef unsigned int u_int;
 typedef unsigned long u_long;
 #define _BSDTYPES_DEFINED
-#endif
+#endif /* _BSDTYPES_DEFINED */
+#endif /* __MINGW32__*/
 
 /*
  * Structure prepended to gmon.out profiling data file.
