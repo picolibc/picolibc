@@ -533,13 +533,15 @@ void
 wincapc::init ()
 {
   const char *os;
+  bool has_osversioninfoex = false;
 
   if (caps)
     return;		// already initialized
 
   memset (&version, 0, sizeof version);
+  /* Request simple version info first. */
   version.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
-  GetVersionEx (reinterpret_cast<LPOSVERSIONINFO> (&version));
+  GetVersionEx (reinterpret_cast<LPOSVERSIONINFO>(&version));
 
   switch (version.dwPlatformId)
     {
@@ -555,10 +557,15 @@ wincapc::init ()
 	      if (strcmp (version.szCSDVersion, "Service Pack 4") < 0)
 		caps = &wincap_nt4;
 	      else
-		caps = &wincap_nt4sp4;
+	        {
+		  caps = &wincap_nt4sp4;
+		  if (strcmp (version.szCSDVersion, "Service Pack 6") >= 0)
+		    has_osversioninfoex = true;
+		}
 	      break;
 	    case 5:
 	      os = "NT";
+	      has_osversioninfoex = true;
 	      switch (version.dwMinorVersion)
 	        {
 		  case 0:
@@ -612,9 +619,11 @@ wincapc::init ()
 	break;
     }
 
-  if (((wincaps *)this->caps)->is_winnt && version.dwMajorVersion > 4)
+  if (has_osversioninfoex)
     {
-      version.dwOSVersionInfoSize = sizeof version;
+      /* Request extended version to get server info.
+	 Available since NT4 SP6. */
+      version.dwOSVersionInfoSize = sizeof (OSVERSIONINFOEX);
       GetVersionEx (reinterpret_cast<LPOSVERSIONINFO>(&version));
       if (version.wProductType != VER_NT_WORKSTATION)
 	((wincaps *)this->caps)->is_server = true;

@@ -1,3 +1,7 @@
+2003-09-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* wincap.cc (wincapc::init): Allow requesting server info for NT4 SP6.
+
 2003-09-27  Christopher Faylor  <cgf@redhat.com>
 
 	* path.cc (symlink_info::check): Use new introducer for mknod'ed files.
