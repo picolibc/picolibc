@@ -77,7 +77,7 @@ $(INSTALL_SUBDIRS):
 
 $(CLEAN_SUBDIRS):
 	@if cd ${patsubst clean_%,%,$@} 2>/dev/null; then \
-	    make install; \
+	    make clean; \
 	fi || exit 0
 
 .PRECIOUS: Makefile
