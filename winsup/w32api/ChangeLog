@@ -1,4 +1,8 @@
-003-06-06  Danny Smith  <dannysmith@users.sourceforge.net>
+2003-06-18  Steven Edwards  <Steven_Ed4153@yahoo.com>
+
+	* include/winuser.h (TPM_RECURSE): Add define.
+
+2003-06-06  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/test.c: #include <powerprof.h>.
 

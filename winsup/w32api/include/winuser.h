@@ -1749,6 +1749,7 @@ extern "C" {
 #define TPM_BOTTOMALIGN 32
 #define TPM_NONOTIFY 128
 #define TPM_RETURNCMD 256
+#define TPM_RECURSE 1
 #define HELP_COMMAND 0x102
 #define HELP_CONTENTS 3
 #define HELP_CONTEXT 1
