@@ -206,6 +206,7 @@ extern int print_insn_tic54x		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_tic80		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_pj		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_avr		PARAMS ((bfd_vma, disassemble_info*));
+extern int print_insn_s390            PARAMS ((bfd_vma, disassemble_info*)); 
 
 extern void print_arm_disassembler_options PARAMS ((FILE *));
 extern void parse_arm_disassembler_option  PARAMS ((char *));

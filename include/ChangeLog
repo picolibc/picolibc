@@ -1,3 +1,7 @@
+2001-02-09  Martin Schwidefsky  <schwidefsky@de.ibm.com>
+
+	* dis-asm.h: Add linux target for S/390.
+
 2001-01-11  Peter Targett  <peter.targett@arccores.com>
 
 	* dis-asm.h (arc_get_disassembler): Correct declaration.

@@ -1,3 +1,7 @@
+2001-02-09  Martin Schwidefsky  <schwidefsky@de.ibm.com>
+
+	* s390.h: New file.
+
 2001-02-02  Patrick Macdonald  <patrickm@redhat.com>
 
         * cgen.h (CGEN_SYNTAX_CHAR_TYPE): Typedef as unsigned short.

@@ -114,6 +114,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define EM_960         19       /* Intel 80960 */
 #define EM_PPC	       20	/* PowerPC */
 #define EM_PPC64       21	/* 64-bit PowerPC */
+#define EM_S390        22	/* IBM S/390 */
 
 #define EM_V800        36	/* NEC V800 series */
 #define EM_FR20	       37	/* Fujitsu FR20 */
@@ -194,6 +195,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 /* Alpha backend magic number.  Written in the absence of an ABI.  */
 #define EM_ALPHA	0x9026
+
+/* old S/390 backend magic number. Written in the absence of an ABI.  */
+#define EM_S390_OLD	0xa390
 
 /* D10V backend magic number.  Written in the absence of an ABI.  */
 #define EM_CYGNUS_D10V	0x7650
