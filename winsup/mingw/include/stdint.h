@@ -170,16 +170,18 @@ typedef unsigned long long   uintmax_t;
 #define INT8_C(val) (INT_LEAST8_MAX-INT_LEAST8_MAX+(val))
 #define INT16_C(val) (INT_LEAST16_MAX-INT_LEAST16_MAX+(val))
 #define INT32_C(val) (INT_LEAST32_MAX-INT_LEAST32_MAX+(val))
-#define INT64_C(val) (INT_LEAST64_MAX-INT_LEAST64_MAX+(val))
+/*  The 'trick' doesn't work in C89 for long long because, without
+    suffix, (val) will be evaluated as int, not intmax_t */ 
+#define INT64_C(val) val##LL
 
 #define UINT8_C(val) (UINT_LEAST8_MAX-UINT_LEAST8_MAX+(val))
 #define UINT16_C(val) (UINT_LEAST16_MAX-UINT_LEAST16_MAX+(val))
 #define UINT32_C(val) (UINT_LEAST32_MAX-UINT_LEAST32_MAX+(val))
-#define UINT64_C(val) (UINT_LEAST64_MAX-UINT_LEAST64_MAX+(val))
+#define UINT64_C(val) val##ULL
 
 /* 7.18.4.2  Macros for greatest-width integer constants */
-#define INTMAX_C(val) (INTMAX_MAX-INTMAX_MAX+(val))
-#define UINTMAX_C(val) (UINTMAX_MAX-UINTMAX_MAX+(val))
+#define INTMAX_C(val) val##LL
+#define UINTMAX_C(val) val##ULL
 
 #endif  /* !defined ( __cplusplus) || defined __STDC_CONSTANT_MACROS */
 

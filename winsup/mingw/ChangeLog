@@ -1,5 +1,11 @@
 2002-10-11  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/stdint.h (INT64_C, UINT64_C ): Append suffix to let
+	macros work with C89.
+	(INTMAX_C, UINTMAX_C): Likewise.
+
+2002-10-11  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/string.h (strcasecmp): Make extern __inline__.
 	(strncasecmp): Likewise.
 	(wcscmpi): Likewise.
