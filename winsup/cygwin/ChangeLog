@@ -1,3 +1,8 @@
+Sun Sep  9 23:09:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* pwdgrp.h (pwdgrp_check::set_last_modified): Call GetFileTime()
+	instead of GetFileInformationByHandle().
+
 Sun Sep  9 15:59:53 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* heap.h (inheap): Rewrite macro to accomodate removal of brk macros

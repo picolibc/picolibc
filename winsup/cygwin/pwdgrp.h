@@ -49,9 +49,7 @@ public:
       if (!file_w32[0])
         strcpy (file_w32, cygheap->fdtab[fileno (f)]->get_win32_name ());
 
-      BY_HANDLE_FILE_INFORMATION inf;
-      if (GetFileInformationByHandle (cygheap->fdtab[fileno (f)]->get_handle (),
-                                      &inf))
-        last_modified = inf.ftLastWriteTime;
+      GetFileTime (cygheap->fdtab[fileno (f)]->get_handle (),
+		   NULL, NULL, &last_modified);
     }
 };
