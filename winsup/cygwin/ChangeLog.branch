@@ -1,3 +1,8 @@
+2003-02-23  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.cc (fhandler_base::set_name): Explicitly set posix name.
+	(fhandler_base::dup): Ditto.
+
 2003-02-14  Christopher Faylor  <cgf@redhat.com>
 
 	* path.h (path_conv::set_normalized_path): Declare.

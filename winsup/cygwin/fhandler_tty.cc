@@ -579,17 +579,17 @@ fhandler_tty_slave::cygserver_attach_tty (LPHANDLE from_master_ptr,
 void
 fhandler_tty_slave::init (HANDLE, DWORD a, mode_t)
 {
-  int mode = 0;
+  int flags = 0;
 
   a &= GENERIC_READ | GENERIC_WRITE;
   if (a == GENERIC_READ)
-    mode = O_RDONLY;
+    flags = O_RDONLY;
   if (a == GENERIC_WRITE)
-    mode = O_WRONLY;
+    flags = O_WRONLY;
   if (a == (GENERIC_READ | GENERIC_WRITE))
-    mode = O_RDWR;
+    flags = O_RDWR;
 
-  open (0, mode);
+  open (flags);
 }
 
 int

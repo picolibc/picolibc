@@ -26,6 +26,7 @@ details. */
 #include "pinfo.h"
 #include <assert.h>
 #include <ctype.h>
+#include <winioctl.h>
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>
@@ -265,7 +266,20 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
     }
 
   buf->st_blksize = S_BLKSIZE;
-  buf->st_blocks  = (buf->st_size + S_BLKSIZE - 1) / S_BLKSIZE;
+
+  /* GetCompressedFileSize() gets autoloaded.  It returns INVALID_FILE_SIZE
+     if it doesn't exist.  Since that's also a valid return value on 64bit
+     capable file systems, we must additionally check for the win32 error. */
+  nFileSizeLow = GetCompressedFileSizeA (pc, &nFileSizeHigh);
+  if (nFileSizeLow != INVALID_FILE_SIZE || GetLastError () == NO_ERROR)
+    /* On systems supporting compressed (and sparsed) files,
+       GetCompressedFileSize() returns the actual amount of
+       bytes allocated on disk.  */
+    buf->st_blocks = (((__off64_t)nFileSizeHigh << 32)
+		     + nFileSizeLow + S_BLKSIZE - 1) / S_BLKSIZE;
+  else
+    /* Just compute no. of blocks from file size. */
+    buf->st_blocks  = (buf->st_size + S_BLKSIZE - 1) / S_BLKSIZE;
 
   buf->st_mode = 0;
   /* Using a side effect: get_file_attibutes checks for
@@ -402,6 +416,26 @@ fhandler_base::open_fs (int flags, mode_t mode)
       close_fs ();
       set_errno (ENOENT);
       return 0;
+    }
+
+  /* Attributes may be set only if a file is _really_ created.
+     This code is now only used for ntea here since the files
+     security attributes are set in CreateFile () now. */
+  if (flags & O_CREAT
+      && GetLastError () != ERROR_ALREADY_EXISTS
+      && !allow_ntsec && allow_ntea)
+    set_file_attribute (has_acls (), get_win32_name (), mode);
+
+  /* Set newly created and truncated files as sparse files. */
+  if ((pc.fs_flags () & FILE_SUPPORTS_SPARSE_FILES)
+      && (get_access () & GENERIC_WRITE) == GENERIC_WRITE)
+    {
+      DWORD dw;
+      HANDLE h = get_handle ();
+      BOOL r = DeviceIoControl (h , FSCTL_SET_SPARSE, NULL, 0, 	NULL, 0, &dw,
+				NULL);
+      syscall_printf ("%d = DeviceIoControl(0x%x, FSCTL_SET_SPARSE, NULL, 0, "
+		      "NULL, 0, &dw, NULL)", r, h);
     }
 
   set_symlink_p (pc.issymlink ());
@@ -611,22 +645,25 @@ fhandler_disk_file::opendir ()
       strcpy (dir->__d_dirname, get_win32_name ());
       dir->__d_dirent->d_version = __DIRENT_VERSION;
       cygheap_fdnew fd;
-      fd = this;
-      fd->set_nohandle (true);
-      dir->__d_dirent->d_fd = fd;
-      dir->__d_u.__d_data.__fh = this;
-      /* FindFirstFile doesn't seem to like duplicate /'s. */
-      len = strlen (dir->__d_dirname);
-      if (len == 0 || isdirsep (dir->__d_dirname[len - 1]))
-	strcat (dir->__d_dirname, "*");
-      else
-	strcat (dir->__d_dirname, "\\*");  /**/
-      dir->__d_cookie = __DIRENT_COOKIE;
-      dir->__d_u.__d_data.__handle = INVALID_HANDLE_VALUE;
-      dir->__d_position = 0;
-      dir->__d_dirhash = get_namehash ();
+      if (fd >= 0)
+        {
+	  fd = this;
+	  fd->set_nohandle (true);
+	  dir->__d_dirent->d_fd = fd;
+	  dir->__d_u.__d_data.__fh = this;
+	  /* FindFirstFile doesn't seem to like duplicate /'s. */
+	  len = strlen (dir->__d_dirname);
+	  if (len == 0 || isdirsep (dir->__d_dirname[len - 1]))
+	    strcat (dir->__d_dirname, "*");
+	  else
+	    strcat (dir->__d_dirname, "\\*");  /**/
+	  dir->__d_cookie = __DIRENT_COOKIE;
+	  dir->__d_u.__d_data.__handle = INVALID_HANDLE_VALUE;
+	  dir->__d_position = 0;
+	  dir->__d_dirhash = get_namehash ();
 
-      res = dir;
+	  res = dir;
+	}
     }
 
   syscall_printf ("%p = opendir (%s)", res, get_name ());

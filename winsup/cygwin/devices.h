@@ -109,7 +109,7 @@ enum fh_devices
   DEV_RAWDRIVE_MAJOR = 65,
   FH_RAWDRIVE= FHDEV (DEV_RAWDRIVE_MAJOR, 0),
 
-  FH_BAD     = 0
+  FH_BAD     = FHDEV (0, 0)
 };
 
 struct device

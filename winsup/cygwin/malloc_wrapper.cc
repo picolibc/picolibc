@@ -25,6 +25,8 @@ details. */
 #include "sync.h"
 #include "perprocess.h"
 #include "cygmalloc.h"
+#include <malloc.h>
+extern "C" struct mallinfo dlmallinfo ();
 
 /* we provide these stubs to call into a user's
    provided malloc if there is one - otherwise
@@ -274,6 +276,22 @@ malloc_stats ()
     }
 
   return;
+}
+
+extern "C" struct mallinfo
+mallinfo ()
+{
+  struct mallinfo m;
+  if (!use_internal_malloc)
+    set_errno (ENOSYS);
+  else
+    {
+      __malloc_lock ();
+      m = dlmallinfo ();
+      __malloc_unlock ();
+    }
+
+  return m;
 }
 
 extern "C" char *

@@ -1,3 +1,112 @@
+2003-02-22  Christopher Faylor  <cgf@redhat.com>
+
+	* cygmalloc.h: Remove MORECORE_CANNOT_TRIM.  It's not true.
+	# cygwin.din: Export mallinfo.
+	# malloc_wrapper.cc (mallinfo): New function.
+
+2003-02-22  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* syslog.cc (syslog): Do not print the Windows pid.  Print the Cygwin
+	pid as an unsigned decimal.  On Win95 print a timestamp and attempt to
+	lock the file up to four times in 3 ms.
+
+2003-02-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::fhandler_socket): Fix compiler
+	warning.
+	(fhandler_socket::fstat): Simplify.  Set st_uid/st_gid to effective
+	uid/gid of current process in case of open sockets.
+
+2003-02-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (dtable::build_fhandler_from_name): Set some fhandler
+	data on sockets to evaluate AF_LOCAL sockets correctly.
+	(dtable::build_fhandler): Set unit number on sockets.
+	* fhandler.h (fhandler_socket): Add unit number.
+	(fhandler_socket::get_unit): New method.
+	* fhandler_socket.cc (fhandler_socket::fhandler_socket): Set unit
+	number.
+	(fhandler_socket::fstat): Reorganize to return more Linux-like
+	values.
+	* net.cc: include ctype.h.
+	(fdsock): Set unit number when building fhandler.
+	* path.cc (path_conv::check): Set device type to FH_SOCKET if file
+	is a AF_UNIX socket.
+	(get_devn): Evaluate unit for virtual socket devices.
+	(win32_device_name): Set windows path for sockets to unix_path with
+	just backslashes to keep the different names.
+	* syscalls.cc (fstat64): Don't override st_ino, st_dev and st_rdev
+	for sockets.
+	(stat_worker): Ditto.
+
+2003-02-21  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* autoload.cc (AccessCheck): Add.
+	(DuplicateToken): Add.
+	* security.h (check_file_access): Declare.
+	* syscalls.cc (access): Convert path to Windows, check existence
+	and readonly attribute. Call check_file_access instead of acl_access.
+	* security.cc (check_file_access): Create.
+	* sec_acl (acl_access): Delete.
+
+2003-02-19  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.cc (fhandler_base::open): Move some filesystem specific
+	stuff.
+	(fhandler_disk_file::open): Accept some filesystem specific stuff.
+	* sigproc.cc (wait_for_sigthread): Become slightly more thread safe.
+	(sig_send): Don't assume that signal thread is ready.
+
+2003-02-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* wincap.h (wincap): Remove unnecessary definition of
+	supports_sparse_files.
+	* wincap.cc: Ditto.
+
+2003-02-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Check descriptor
+	created by cygheap_fdnew constructor.
+	* fhandler_virtual.cc (fhandler_virtual::opendir): Ditto.
+	* fhandler_socket.cc (fhandler_socket::accept): Ditto and move
+	creation of file descriptor behind blocking OS call.
+	* net.cc (cygwin_socket): Ditto.
+	(cygwin_rcmd): Ditto.
+	(cygwin_rresvport): Ditto.
+	(cygwin_rexec): Ditto.
+	(socketpair): Ditto.
+
+2003-02-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (GetCompressedFileSize): Add.
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat_helper): Compute
+	st_blocks value from GetCompressedFileSize() if available.
+
+2003-02-18  Vaclav Haisman  <V.Haisman@sh.cvut.cz>
+
+	* wincap.h (wincaps::supports_sparse_files): New flag.
+	(wincapc::supports_sparse_files): New method.
+	* wincap.cc (wincap_unknown): Define value for the new flag.
+	(wincap_95): Ditto.
+	(wincap_95osr2): Ditto.
+	(wincap_98): Ditto.
+	(wincap_98se): Ditto.
+	(wincap_me): Ditto.
+	(wincap_nt3): Ditto.
+	(wincap_nt4): Ditto.
+	(wincap_nt4sp4): Ditto.
+	(wincap_2000): Ditto.
+	(wincap_xp): Ditto.
+	* path.h (path_conv::fs_flags): New method.
+	* fhandler_disk_file.cc: Include winioctl.h for DeviceIoControl.   
+	(fhandler_disk_file::open): Set newly created and truncated files as    
+	sparse on platforms that support it.
+
+2003-02-17  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* grp.cc (internal_getgroups): Handle properly tokens with
+	no groups. Fix bug introduced on 2003-02-04.
+
 2003-02-16  Christopher Faylor  <cgf@redhat.com>
 
 	* cygwin.din: Export all appropriate newlibc libm functions.  Sort.

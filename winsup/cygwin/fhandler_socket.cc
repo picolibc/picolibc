@@ -99,6 +99,14 @@ fhandler_socket::fhandler_socket ()
   set_need_fork_fixup ();
   prot_info_ptr = (LPWSAPROTOCOL_INFOA) cmalloc (HEAP_BUF,
 						 sizeof (WSAPROTOCOL_INFOA));
+#if 0
+  if (pc.is_fs_special ())
+    {
+      fhandler_socket * fhs = (fhandler_socket *) fh;
+      fhs->set_addr_family (AF_LOCAL);
+      fhs->set_sun_path (posix_path);
+    }
+#endif
 }
 
 fhandler_socket::~fhandler_socket ()
@@ -484,7 +492,6 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
   WSAEVENT ev[2] = { WSA_INVALID_EVENT, signal_arrived };
   BOOL secret_check_failed = FALSE;
   BOOL in_progress = FALSE;
-  cygheap_fdnew res_fd;
 
   /* Allows NULL peer and len parameters. */
   struct sockaddr_in peer_dummy;
@@ -593,19 +600,28 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 	}
     }
 
-  if (res_fd < 0)
-    /* FIXME: what is correct errno? */;
-  else if ((SOCKET) res == (SOCKET) INVALID_SOCKET)
+  if ((SOCKET) res == (SOCKET) INVALID_SOCKET)
     set_winsock_errno ();
   else
     {
-      fhandler_socket* res_fh = fdsock (res_fd, get_name (), res);
-      if (get_addr_family () == AF_LOCAL)
-	res_fh->set_sun_path (get_sun_path ());
-      res_fh->set_addr_family (get_addr_family ());
-      res_fh->set_socket_type (get_socket_type ());
-      res_fh->set_connect_state (CONNECTED);
-      res = res_fd;
+      cygheap_fdnew res_fd;
+      fhandler_socket* res_fh = NULL;
+      if (res_fd >= 0)
+	  res_fh = fdsock (res_fd, get_name (), res);
+      if (res_fh)
+        {
+	  if (get_addr_family () == AF_LOCAL)
+	    res_fh->set_sun_path (get_sun_path ());
+	  res_fh->set_addr_family (get_addr_family ());
+	  res_fh->set_socket_type (get_socket_type ());
+	  res_fh->set_connect_state (CONNECTED);
+	  res = res_fd;
+	}
+      else
+        {
+	  closesocket (res);
+	  res = -1;
+	}
     }
 
 done:

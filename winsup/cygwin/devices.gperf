@@ -161,7 +161,7 @@ void
 device::tty_to_real_device ()
 {
   if (!real_tty_attached (myself))
-    *this = *console_dev;
+    *this = myself->ctty < 0 ? *bad_dev : *console_dev;
   else
     {
       *this = *ttys_dev;

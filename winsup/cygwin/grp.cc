@@ -267,7 +267,6 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygpsid * srchsid)
 		  for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
 		    if ((cnt = (*srchsid == groups->Groups[pg].Sid)))
 		      break;
-		  cnt = -1;
 		}
 	      else
 		for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
@@ -293,8 +292,7 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygpsid * srchsid)
 	debug_printf ("%d = GetTokenInformation(NULL) %E", size);
       if (hToken != cygheap->user.token)
 	CloseHandle (hToken);
-      if (cnt)
-	return cnt;
+      return cnt;
     }
 
   gid = myself->gid;

@@ -63,7 +63,7 @@ EOF
 	    next;
 	};
 	my ($str, $fh) = (split(/, /, $f))[0..1];
-	if ($str !~ "/dev") {
+	if ($str !~ m!^"(?:/dev|:bad:)!) {
 	    $ix++;
 	} else {
 	    my $what = lc(($fh =~ /FH_(.+)/o)[0]) . '_dev' ;

@@ -629,6 +629,9 @@ path_conv::check (const char *src, unsigned opt,
 	      goto out;
 	    }
 
+	  if (sym.pflags & PATH_SOCKET)
+	    dev.setfs (1);
+
 	  if (sym.case_clash)
 	    {
 	      if (pcheck_case == PCHECK_STRICT)
@@ -814,6 +817,7 @@ out:
 	  set_has_buggy_open (strcmp (fs.name, "SUNWNFS") == 0);
 	}
     }
+
 #if 0
   if (issocket ())
     devn = FH_SOCKET;

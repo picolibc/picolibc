@@ -35,10 +35,10 @@ struct __cygwin_perfile *perfile_table;
 DWORD binmode;
 
 inline fhandler_base&
-fhandler_base::operator =(fhandler_base &x)
+fhandler_base::operator =(fhandler_base& x)
 {
   memcpy (this, &x, sizeof *this);
-  pc.set_normalized_path (pc.normalized_path);
+  pc.set_normalized_path (x.pc.normalized_path);
   rabuf = NULL;
   ralen = 0;
   raixget = 0;
@@ -148,6 +148,7 @@ void
 fhandler_base::set_name (path_conv &in_pc)
 {
   memcpy (&pc, &in_pc, in_pc.size ());
+  pc.set_normalized_path (in_pc.normalized_path);
   namehash = hash_path_name (0, get_win32_name ());
 }
 
@@ -423,10 +424,6 @@ fhandler_base::open (int flags, mode_t mode)
   x = CreateFile (get_win32_name (), access, shared, &sa, creation_distribution,
 		  file_attributes, 0);
 
-  syscall_printf ("%p = CreateFile (%s, %p, %p, %p, %p, %p, 0)",
-		  x, get_win32_name (), access, shared, &sa,
-		  creation_distribution, file_attributes);
-
   if (x == INVALID_HANDLE_VALUE)
     {
       if (!wincap.can_open_directories () && pc.isdir ())
@@ -439,20 +436,16 @@ fhandler_base::open (int flags, mode_t mode)
 	    set_nohandle (true);
 	}
       else if (GetLastError () == ERROR_INVALID_HANDLE)
-	set_errno (ENOENT);
+       set_errno (ENOENT);
       else
-	__seterrno ();
+       __seterrno ();
       if (!get_nohandle ())
-	goto done;
-    }
+       goto done;
+   }
 
-  /* Attributes may be set only if a file is _really_ created.
-     This code is now only used for ntea here since the files
-     security attributes are set in CreateFile () now. */
-  if (flags & O_CREAT && get_device () == FH_FS
-      && GetLastError () != ERROR_ALREADY_EXISTS
-      && !allow_ntsec && allow_ntea)
-    set_file_attribute (has_acls (), get_win32_name (), mode);
+  syscall_printf ("%p = CreateFile (%s, %p, %p, %p, %p, %p, 0)",
+		  x, get_win32_name (), access, shared, &sa,
+		  creation_distribution, file_attributes);
 
   set_io_handle (x);
   set_flags (flags, pc.binmode ());

@@ -1179,8 +1179,6 @@ cygwin_lstat (const char *name, struct __stat32 *buf)
   return ret;
 }
 
-extern int acl_access (const char *, int);
-
 extern "C" int
 access (const char *fn, int flags)
 {
@@ -1192,11 +1190,33 @@ access (const char *fn, int flags)
       return -1;
     }
 
-  if (allow_ntsec)
-    return acl_access (fn, flags);
+  path_conv real_path (fn, PC_SYM_FOLLOW | PC_FULL, stat_suffixes);
+  if (real_path.error)
+    {
+      set_errno (real_path.error);
+      return -1;
+    }
+
+  if (!real_path.exists ())
+    {
+      set_errno (ENOENT);
+      return -1;
+    }
+
+  if (!(flags & (R_OK | W_OK | X_OK)))
+    return 0;
+
+  if (real_path.has_attribute (FILE_ATTRIBUTE_READONLY) && (flags & W_OK))
+    {
+      set_errno (EACCES);
+      return -1;
+    }
+
+  if (real_path.has_acls () && allow_ntsec)
+    return check_file_access (real_path, flags);
 
   struct __stat64 st;
-  int r = stat_worker (fn, &st, 0);
+  int r = stat_worker (real_path, &st, 0);
   if (r)
     return -1;
   r = -1;
@@ -1824,7 +1844,7 @@ statfs (const char *fname, struct statfs *sfs)
     }
 
   path_conv full_path (fname, PC_SYM_FOLLOW | PC_FULL);
-  char *root = rootdir (full_path);
+  const char *root = full_path.root_dir ();
 
   syscall_printf ("statfs %s", root);
 
