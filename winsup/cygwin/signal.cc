@@ -483,7 +483,8 @@ extern "C" int
 sigwait (const sigset_t *set, int *sig)
 {
   pthread_testcancel ();
-  _my_tls.event = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+  HANDLE h;
+  h = _my_tls.event = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
   if (!_my_tls.event)
     {
       __seterrno ();
@@ -492,16 +493,20 @@ sigwait (const sigset_t *set, int *sig)
 
   _my_tls.sigwait_mask = *set;
 
+  int res;
   switch (WaitForSingleObject (_my_tls.event, INFINITE))
     {
     case WAIT_OBJECT_0:
-      CloseHandle (_my_tls.event);
-      _my_tls.event = NULL;
       *sig = InterlockedExchange ((LONG *) &_my_tls.sig, (LONG) 0);
+      res = 0;
       break;
     default:
       __seterrno ();
-      return -1;
+      res = -1;
     }
-  return 0;
+  _my_tls.event = NULL;
+  _my_tls.sig = 0;
+  CloseHandle (h);
+  sig_dispatch_pending ();
+  return res;
 }

@@ -29,7 +29,7 @@ typedef struct
 
   union
   {
-    __uint32_t __pad[120];		/* plan for future growth */
+    __uint32_t __pad[32];		/* plan for future growth */
     union
     {
       /* timers */

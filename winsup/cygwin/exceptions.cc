@@ -559,6 +559,7 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
   si.si_addr = ebp;
   si.si_code = SI_KERNEL;
   si.si_errno = si.si_pid = si.si_uid = 0;
+  _my_tls.push ((__stack_t) ebp, true);
   sig_send (NULL, si, &_my_tls);	// Signal myself
   return 1;
 }

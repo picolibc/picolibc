@@ -744,6 +744,7 @@ sig_send (_pinfo *p, siginfo_t& si, _threadinfo *tls)
     pack.si.si_uid = myself->uid;
   pack.pid = myself->pid;
   pack.tls = (_threadinfo *) tls;
+  pack.mask_storage = 0;
   DWORD nb;
   if (!WriteFile (sendsig, &pack, sizeof (pack), &nb, NULL) || nb != sizeof (pack))
     {
@@ -1246,7 +1247,14 @@ wait_subproc (VOID *)
 	  si.si_pid = pchildren[rc]->pid;
 	  si.si_uid = pchildren[rc]->uid;
 	  si.si_errno = 0;
-	  si.si_status = si.si_utime = si.si_stime = 0;	// FIXME fill these in someday
+	  GetExitCodeProcess (hchildren[rc], (DWORD *) &si.si_status);
+#if 0	// FIXME: This is tricky to get right
+	  si.si_utime = pchildren[rc]->rusage_self.ru_utime;
+	  si.si_stime = pchildren[rc].rusage_self.ru_stime;
+#else
+	  si.si_utime = 0;
+	  si.si_stime = 0;
+#endif
 	  rc = proc_subproc (PROC_CHILDTERMINATED, rc);
 	  if (!proc_loop_wait)		// Don't bother if wait_subproc is
 	    break;			//  exiting

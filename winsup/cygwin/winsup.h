@@ -219,7 +219,7 @@ void uinfo_init (void);
 void events_init (void);
 void events_terminate (void);
 
-void __stdcall close_all_files (void);
+void __stdcall close_all_files ();
 
 /* Invisible window initialization/termination. */
 HWND __stdcall gethwnd (void);

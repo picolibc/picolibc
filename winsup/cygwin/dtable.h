@@ -1,6 +1,6 @@
 /* dtable.h: fd table definition.
 
-   Copyright 2000, 2001, 2003 Red Hat, Inc.
+   Copyright 2000, 2001, 2003, 2004 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -21,7 +21,6 @@ class fhandler_fifo;
 class dtable
 {
   muto *lock_cs;
-  //CRITICAL_SECTION lock_cs;
   fhandler_base **fds;
   fhandler_base **fds_on_hold;
   fhandler_base **archetypes;

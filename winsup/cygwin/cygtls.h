@@ -102,6 +102,7 @@ struct _threadinfo
   sigset_t sigmask;
   sigset_t sigwait_mask;
   siginfo_t *sigwait_info;
+  unsigned threadkill;
   siginfo_t infodata;
   struct pthread *tid;
   struct _reent local_clib;
@@ -132,6 +133,8 @@ struct _threadinfo
   void init_threadlist_exceptions (struct _exception_list *);
   operator HANDLE () const {return tid->win32_obj_id;}
   void set_siginfo (struct sigpacket *) __attribute__ ((regparm (3)));
+  void set_threadkill () {threadkill = true;}
+  void reset_threadkill () {threadkill = false;}
   /*gentls_offsets*/
 };
 #pragma pack(pop)

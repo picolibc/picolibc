@@ -542,8 +542,12 @@ initial_env ()
       buf[0] = '\0';
       len = GetModuleFileName (NULL, buf, CYG_MAX_PATH);
       console_printf ("Sleeping %d, pid %u %s\n", ms, GetCurrentProcessId (), buf);
-      while (ms--)
-	Sleep (1);
+      Sleep (ms);
+      if (!strace.active)
+	{
+	  strace.inited = 0;
+	  strace.hello ();
+	}
     }
   if (GetEnvironmentVariable ("CYGWIN_DEBUG", buf, sizeof (buf) - 1))
     {
@@ -573,7 +577,6 @@ void __stdcall
 dll_crt0_0 ()
 {
   wincap.init ();
-  initial_env ();
 
   char zeros[sizeof (child_proc_info->zero)] = {0};
 
@@ -719,6 +722,7 @@ dll_crt0_1 (char *)
   /* FIXME: Verify forked children get their exception handler set up ok. */
   exception_list cygwin_except_entry;
 
+  initial_env ();
   check_sanity_and_sync (user_data);
   malloc_init ();
 

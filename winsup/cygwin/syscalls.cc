@@ -85,7 +85,7 @@ static int __stdcall stat_worker (const char *name, struct __stat64 *buf,
    ensure we don't leave any such files lying around.  */
 
 void __stdcall
-close_all_files (void)
+close_all_files ()
 {
   cygheap->fdtab.lock ();
 
