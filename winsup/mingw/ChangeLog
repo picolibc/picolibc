@@ -1,3 +1,19 @@
+2002-10-07  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/math/powil.c: Rename powil to __powil.
+	* mingwex/math/powl.c: Adjust declaration and call
+	to __powil. Remove comment on powil.
+	* mingwex/math/powi.c: New file.
+	* mingwex/math/powif.c: New file.
+	* mingwex/math/pow.c: New file.
+	* mingwex/math/cephes_mconf.h. Add double and float
+	versions of constants.
+	(polevl): Add double precision function.
+	(p1evl): Likewise.
+	* mingwex/Makefile.in (MATH_DISTFILES): Add pow.c,
+	powi.c, powif.c.
+	(MATH_OBJS): Add pow.o,	powi.o, powif.o.
+
 2002-10-03  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/cytpe.h (_imp____mbcur_max): Add missing ';'.

@@ -382,7 +382,7 @@ static long double w, W, Wa, Wb, ya, yb, u;
 
 #ifdef __MINGW32__
 static __inline__ long double reducl( long double );
-extern long double powil ( long double, int );
+extern long double __powil ( long double, int );
 extern long double powl ( long double x, long double y);
 #else
 #ifdef ANSIPROT
@@ -392,14 +392,14 @@ extern long double frexpl ( long double, int * );
 extern long double ldexpl ( long double, int );
 extern long double polevll ( long double, void *, int );
 extern long double p1evll ( long double, void *, int );
-extern long double powil ( long double, int );
+extern long double __powil ( long double, int );
 extern int isnanl ( long double );
 extern int isfinitel ( long double );
 static long double reducl( long double );
 extern int signbitl ( long double );
 #else
 long double floorl(), fabsl(), frexpl(), ldexpl();
-long double polevll(), p1evll(), powil();
+long double polevll(), p1evll(), __powil();
 static long double reducl();
 int isnanl(), isfinitel(), signbitl();
 #endif
@@ -603,7 +603,7 @@ if( iyflg )
 	w = floorl(x);
 	if( (w == x) && (fabsl(y) < 32768.0) )
 		{
-		w = powil( x, (int) y );
+		w = __powil( x, (int) y );
 		return( w );
 		}
 	}
@@ -764,40 +764,3 @@ t = ldexpl( t, -LNXT );
 return(t);
 }
 
-/*							powil.c
- *
- *	Real raised to integer power, long double precision
- *
- *
- *
- * SYNOPSIS:
- *
- * long double x, y, powil();
- * int n;
- *
- * y = powil( x, n );
- *
- *
- *
- * DESCRIPTION:
- *
- * Returns argument x raised to the nth power.
- * The routine efficiently decomposes n as a sum of powers of
- * two. The desired power is a product of two-to-the-kth
- * powers of x.  Thus to compute the 32767 power of x requires
- * 28 multiplications instead of 32767 multiplications.
- *
- *
- *
- * ACCURACY:
- *
- *
- *                      Relative error:
- * arithmetic   x domain   n domain  # trials      peak         rms
- *    IEEE     .001,1000  -1022,1023  50000       4.3e-17     7.8e-18
- *    IEEE        1,2     -1022,1023  20000       3.9e-17     7.6e-18
- *    IEEE     .99,1.01     0,8700    10000       3.6e-16     7.2e-17
- *
- * Returns INFINITY on overflow, zero on underflow.
- *
- */

@@ -50,8 +50,9 @@ MATH_DISTFILES = \
 	log10f.S log10l.S log1p.S log1pf.S log1pl.S log2.S log2f.S \
 	log2l.S logb.c logbf.c logbl.c logf.S logl.S lrint.c lrintf.c \
 	lrintl.c lround.c lroundf.c lroundl.c modff.c modfl.c \
-	nearbyint.S nearbyintf.S nearbyintl.S nextafterf.c powf.c powil.c \
-	powl.c remainder.S remainderf.S remainderl.S remquo.S \
+	nearbyint.S nearbyintf.S nearbyintl.S nextafterf.c \
+	pow.c powf.c powi.c powif.c powil.c powl.c \
+	remainder.S remainderf.S remainderl.S remquo.S \
 	remquof.S remquol.S rint.c rintf.c rintl.c round.c roundf.c \
 	roundl.c scalbn.S scalbnf.S scalbnl.S signbit.c signbitf.c \
 	signbitl.c sinf.S sinhf.c sinhl.c sinl.S  sqrtf.c sqrtl.c \
@@ -115,8 +116,9 @@ MATH_OBJS = \
 	log10f.o log10l.o log1p.o log1pf.o log1pl.o log2.o log2f.o \
 	log2l.o logb.o logbf.o logbl.o logf.o logl.o lrint.o lrintf.o \
 	lrintl.o lround.o lroundf.o lroundl.o modff.o modfl.o \
-	nearbyint.o nearbyintf.o nearbyintl.o nextafterf.o powf.o powil.o \
-	powl.o remainder.o remainderf.o remainderl.o remquo.o \
+	nearbyint.o nearbyintf.o nearbyintl.o nextafterf.o \
+	pow.o powf.o powi.o powif.o powil.o powl.o \
+	remainder.o remainderf.o remainderl.o remquo.o \
 	remquof.o remquol.o rint.o rintf.o rintl.o round.o roundf.o \
 	roundl.o scalbn.o scalbnf.o scalbnl.o signbit.o signbitf.o \
 	signbitl.o sinf.o sinhf.o sinhl.o sinl.o sqrtf.o sqrtl.o \

@@ -1,15 +1,15 @@
-/*							__powil.c
+/*							powi.c
  *
- *	Real raised to integer power, long double precision
+ *	Real raised to integer power
  *
  *
  *
  * SYNOPSIS:
  *
- * long double x, y, __powil();
+ * double x, y, __powi();
  * int n;
  *
- * y = __powil( x, n );
+ * y = __powi( x, n );
  *
  *
  *
@@ -28,20 +28,19 @@
  *
  *                      Relative error:
  * arithmetic   x domain   n domain  # trials      peak         rms
- *    IEEE     .001,1000  -1022,1023  50000       4.3e-17     7.8e-18
- *    IEEE        1,2     -1022,1023  20000       3.9e-17     7.6e-18
- *    IEEE     .99,1.01     0,8700    10000       3.6e-16     7.2e-17
+ *    DEC       .04,26     -26,26    100000       2.7e-16     4.3e-17
+ *    IEEE      .04,26     -26,26     50000       2.0e-15     3.8e-16
+ *    IEEE        1,2    -1022,1023   50000       8.6e-14     1.6e-14
  *
- * Returns INFINITY on overflow, zero on underflow.
+ * Returns MAXNUM on overflow, zero on underflow.
  *
  */
-
-/*							__powil.c	*/
+
+/*							powi.c	*/
 
 /*
-Cephes Math Library Release 2.2:  December, 1990
-Copyright 1984, 1990 by Stephen L. Moshier
-Direct inquiries to 30 Frost Street, Cambridge, MA 02140
+Cephes Math Library Release 2.8:  June, 2000
+Copyright 1984, 1995, 2000 by Stephen L. Moshier
 */
 
 /*
@@ -53,42 +52,51 @@ Modified for mingw
 #include "cephes_mconf.h"
 #else
 #include "mconf.h"
-extern long double MAXNUML, MAXLOGL, MINLOGL;
-extern long double LOGE2L;
 #ifdef ANSIPROT
-extern long double frexpl ( long double, int * );
+extern double log ( double );
+extern double frexp ( double, int * );
+extern int signbit ( double );
 #else
-long double frexpl();
+double log(), frexp();
+int signbit();
 #endif
+extern double NEGZERO, INFINITY, MAXNUM, MAXLOG, MINLOG, LOGE2;
 #endif /* __MINGW32__ */
 
 #ifndef _SET_ERRNO
 #define _SET_ERRNO(x)
 #endif
 
-long double __powil( x, nn )
-long double x;
+double __powi( x, nn )
+double x;
 int nn;
 {
-long double w, y;
-long double s;
 int n, e, sign, asign, lx;
+double w, y, s;
 
-if( x == 0.0L )
+/* See pow.c for these tests.  */
+if( x == 0.0 )
 	{
 	if( nn == 0 )
-		return( 1.0L );
+		return( 1.0 );
 	else if( nn < 0 )
-		return( INFINITYL );
+	    return( INFINITY );
 	else
-		return( 0.0L );
+	  {
+	    if( nn & 1 )
+	      return( x );
+	    else
+	      return( 0.0 );
+	  }
 	}
 
 if( nn == 0 )
-	return( 1.0L );
+	return( 1.0 );
 
+if( nn == -1 )
+	return( 1.0/x );
 
-if( x < 0.0L )
+if( x < 0.0 )
 	{
 	asign = -1;
 	x = -x;
@@ -108,55 +116,62 @@ else
 	n = nn;
 	}
 
+/* Even power will be positive. */
+if( (n & 1) == 0 )
+	asign = 0;
+
 /* Overflow detection */
 
 /* Calculate approximate logarithm of answer */
-s = x;
-s = frexpl( s, &lx );
+s = frexp( x, &lx );
 e = (lx - 1)*n;
 if( (e == 0) || (e > 64) || (e < -64) )
 	{
-	s = (s - 7.0710678118654752e-1L) / (s +  7.0710678118654752e-1L);
-	s = (2.9142135623730950L * s - 0.5L + lx) * nn * LOGE2L;
+	s = (s - 7.0710678118654752e-1) / (s +  7.0710678118654752e-1);
+	s = (2.9142135623730950 * s - 0.5 + lx) * nn * LOGE2;
 	}
 else
 	{
-	s = LOGE2L * e;
+	s = LOGE2 * e;
 	}
 
-if( s > MAXLOGL )
+if( s > MAXLOG )
 	{
-	mtherr( "__powil", OVERFLOW );
+	mtherr( "powi", OVERFLOW );
 	_SET_ERRNO(ERANGE);
-	y = INFINITYL;
+	y = INFINITY;
 	goto done;
 	}
 
-if( s < MINLOGL )
+#if DENORMAL
+if( s < MINLOG )
 	{
-	mtherr( "__powil", UNDERFLOW );
-	_SET_ERRNO(ERANGE);
-	return(0.0L);
+	y = 0.0;
+	goto done;
 	}
+
 /* Handle tiny denormal answer, but with less accuracy
  * since roundoff error in 1.0/x will be amplified.
  * The precise demarcation should be the gradual underflow threshold.
  */
-if( s < (-MAXLOGL+2.0L) )
+if( (s < (-MAXLOG+2.0)) && (sign < 0) )
 	{
-	x = 1.0L/x;
+	x = 1.0/x;
 	sign = -sign;
 	}
+#else
+/* do not produce denormal answer */
+if( s < -MAXLOG )
+	return(0.0);
+#endif
+
 
 /* First bit of the power */
 if( n & 1 )
 	y = x;
 		
 else
-	{
-	y = 1.0L;
-	asign = 0;
-	}
+	y = 1.0;
 
 w = x;
 n >>= 1;
@@ -168,12 +183,18 @@ while( n )
 	n >>= 1;
 	}
 
+if( sign < 0 )
+	y = 1.0/y;
 
 done:
 
 if( asign )
-	y = -y; /* odd power of negative number */
-if( sign < 0 )
-	y = 1.0L/y;
+	{
+	/* odd power of negative number */
+	if( y == 0.0 )
+		y = NEGZERO;
+	else
+		y = -y;
+	}
 return(y);
 }
