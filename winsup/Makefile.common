@@ -76,13 +76,13 @@ endif
 # Attempt to properly detect missing mingw or w32api and adjust command
 # line parameters appropriately
 
-nostdinc:=${shell [ -d "$(updir)/w32api" ] && echo "-nostdinc"}
-ifneq (,$(nostdinc))
+# nostdinc:=${shell [ -d "$(updir)/w32api" ] && echo "-nostdinc"}
+# ifneq (,$(nostdinc))
 nostdincxx:=-nostdinc++
-ifeq (,${findstring $(w32api_source),$(CFLAGS) $(CXXFLAGS) $(CXX) $(CC)})
+# ifeq (,${findstring $(w32api_source),$(CFLAGS) $(CXXFLAGS) $(CXX) $(CC)})
 w32api_include:=-I$(w32api_source)/include
-endif
-endif
+# endif
+# endif
 
 mingw_include:=${shell [ -d "$(mingw_source)/include" ] && echo "-I$(mingw_source)/include"}
 ifneq (,$(mingw_include))
@@ -120,7 +120,7 @@ ifndef PREPROCESS
 c=-c
 o=.o
 else
-c=-E
+c=-E -dD
 o=.E
 endif
 
