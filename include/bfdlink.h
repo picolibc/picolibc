@@ -3,21 +3,21 @@
    Free Software Foundation, Inc.
    Written by Steve Chamberlain and Ian Lance Taylor, Cygnus Support.
 
-This file is part of BFD, the Binary File Descriptor library.
+   This file is part of BFD, the Binary File Descriptor library.
 
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 #ifndef BFDLINK_H
 #define BFDLINK_H
@@ -288,9 +288,10 @@ struct bfd_link_info
   /* May be used to set DT_FLAGS_1 for ELF. */
   bfd_vma flags_1;
 
-  /* True if auto-import thunks for DATA items in pei386 DLLs 
-     should be generated/linked against.  */
-  boolean pei386_auto_import;
+  /* Non-zero if auto-import thunks for DATA items in pei386 DLLs 
+     should be generated/linked against.  Set to 1 if this feature
+     is explicitly requested by the user, -1 if enabled by default.  */
+  int pei386_auto_import;
 
   /* True if non-PLT relocs should be merged into one reloc section
      and sorted so that relocs against the same symbol come together.  */
