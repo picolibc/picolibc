@@ -556,6 +556,10 @@ case "${host}" in
 	default_newlib_io_long_long="yes"
 	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES"
 	;;
+  mips*-*-elf*)
+	default_newlib_io_long_long="yes"
+	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES"
+	;;
   mmix-*)
 	syscall_dir=syscalls
 	# We need every symbol 32-bit aligned, so the invalid
