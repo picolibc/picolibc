@@ -1,3 +1,10 @@
+2005-02-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* localtime.cc: Temporary implementation of setting __tzrule's offset
+	member to be used by strftime.
+	(__tzrule): New global variable.
+	(tzparse): Set __tzrule's offset member appropriately.
+
 2005-02-17  Christopher Faylor  <cgf@timesys.com>
 
 	* path.cc (path_conv::check): Set fs flag when a unix-domain socket

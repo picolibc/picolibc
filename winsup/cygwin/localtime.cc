@@ -637,6 +637,20 @@ int			daylight;
 time_t			altzone;
 #endif /* defined ALTZONE */
 
+/* Must be equivalent to definiton in newlib/libc/time/local.h */
+typedef struct __tzrule_struct
+{
+  char ch;
+  int m;
+  int n;
+  int d;
+  int s;
+  time_t change;
+  int offset;
+} __tzrule_type;
+__tzrule_type __tzrule[2] = { {'J', 0, 0, 0, 0, (time_t)0, 0 }, 
+			      {'J', 0, 0, 0, 0, (time_t)0, 0 } };
+
 static long
 detzcode(const char *codep)
 {
@@ -1235,6 +1249,8 @@ tzparse(const char *name, struct state *sp, const int lastditch)
 				janfirst += year_lengths[isleap(year)] *
 					SECSPERDAY;
 			}
+			__tzrule[0].offset = -sp->ttis[1].tt_gmtoff;
+			__tzrule[1].offset = -sp->ttis[0].tt_gmtoff;
 		} else {
 			register long	theirstdoffset;
 			register long	theirdstoffset;
@@ -1321,6 +1337,8 @@ tzparse(const char *name, struct state *sp, const int lastditch)
 			sp->ttis[1].tt_isdst = true;
 			sp->ttis[1].tt_abbrind = stdlen + 1;
 			sp->typecnt = 2;
+			__tzrule[0].offset = -sp->ttis[0].tt_gmtoff;
+			__tzrule[1].offset = -sp->ttis[1].tt_gmtoff;
 		}
 	} else {
 		dstlen = 0;
@@ -1329,6 +1347,8 @@ tzparse(const char *name, struct state *sp, const int lastditch)
 		sp->ttis[0].tt_gmtoff = -stdoffset;
 		sp->ttis[0].tt_isdst = 0;
 		sp->ttis[0].tt_abbrind = 0;
+		__tzrule[0].offset = -sp->ttis[0].tt_gmtoff;
+		__tzrule[1].offset = -sp->ttis[0].tt_gmtoff;
 	}
 	sp->charcnt = stdlen + 1;
 	if (dstlen != 0)
