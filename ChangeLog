@@ -1,3 +1,7 @@
+2005-01-27  Andrew Cagney  <cagney@gnu.org>
+
+	* gettext.m4: Don't use NONE as a default for CATOBJEXT.
+
 2005-01-24  Andrew Cagney  <cagney@gnu.org>
 
 	* gettext.m4: Only fall back to ../intl/ when it's present.
