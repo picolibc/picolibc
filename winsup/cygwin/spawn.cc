@@ -715,8 +715,10 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       cygheap->fdtab.fixup_before_exec (pi.dwProcessId);
       cygheap_setup_for_child_cleanup (newheap, &ciresrv, 1);
       if (mode == _P_OVERLAY)
-	ResumeThread (pi.hThread);
-      cygthread::terminate ();
+	{
+	  ResumeThread (pi.hThread);
+	  cygthread::terminate ();
+	}
     }
 
   if (mode != _P_OVERLAY)
