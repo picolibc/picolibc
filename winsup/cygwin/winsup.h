@@ -98,6 +98,8 @@ extern int dynamically_loaded;
 
 extern int cygserver_running;
 
+#define _MT_SAFE	// DELTEME someday
+
 #define TITLESIZE 1024
 
 /* status bit manipulation */
@@ -197,7 +199,6 @@ extern int cygwin_finished_initializing;
 void __stdcall set_std_handle (int);
 int __stdcall writable_directory (const char *file);
 int __stdcall stat_dev (DWORD, int, unsigned long, struct __stat64 *);
-extern BOOL allow_ntsec;
 
 __ino64_t __stdcall hash_path_name (__ino64_t hash, const char *name) __attribute__ ((regparm(2)));
 void __stdcall nofinalslash (const char *src, char *dst) __attribute__ ((regparm(2)));
@@ -292,7 +293,7 @@ extern SYSTEM_INFO system_info;
 
 /* The title on program start. */
 extern char *old_title;
-extern BOOL display_title;
+extern bool display_title;
 
 extern HANDLE hMainThread;
 extern HANDLE hMainProc;

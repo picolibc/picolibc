@@ -298,8 +298,10 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   (void) ForceCloseHandle1 (fork_info->subproc_ready, subproc_ready);
   (void) ForceCloseHandle1 (fork_info->forker_finished, forker_finished);
 
+#ifdef USE_CYGSERVER
   if (fixup_shms_after_fork ())
     api_fatal ("recreate_shm areas after fork failed");
+#endif
 
   pinfo_fixup_after_fork ();
   signal_fixup_after_fork ();

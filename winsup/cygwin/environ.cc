@@ -1,7 +1,7 @@
 /* environ.cc: Cygwin-adopted functions from newlib to manipulate
    process's environment.
 
-   Copyright 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -26,17 +26,17 @@ details. */
 #include "environ.h"
 #include "child_info.h"
 
-extern BOOL allow_daemon;
-extern BOOL allow_glob;
+extern bool allow_glob;
 extern bool ignore_case_with_glob;
-extern BOOL allow_ntea;
-extern BOOL allow_smbntsec;
-extern BOOL allow_winsymlinks;
-extern BOOL strip_title_path;
+extern bool allow_ntea;
+extern bool allow_smbntsec;
+extern bool allow_winsymlinks;
+extern bool strip_title_path;
 extern int pcheck_case;
 extern int subauth_id;
-BOOL reset_com = FALSE;
-static BOOL envcache = TRUE;
+bool reset_com = false;
+bool allow_daemon = false;
+static bool envcache = true;
 
 static char **lastenviron;
 
@@ -365,7 +365,7 @@ ucenv (char *p, char *eq)
 
 /* Parse CYGWIN options */
 
-static NO_COPY BOOL export_settings = false;
+static NO_COPY bool export_settings = false;
 
 enum settings
   {
@@ -384,18 +384,18 @@ glob_init (const char *buf)
 {
   if (!buf || !*buf)
     {
-      allow_glob = FALSE;
-      ignore_case_with_glob = FALSE;
+      allow_glob = false;
+      ignore_case_with_glob = false;
     }
   else if (strncasematch (buf, "ignorecase", 10))
     {
-      allow_glob = TRUE;
-      ignore_case_with_glob = TRUE;
+      allow_glob = true;
+      ignore_case_with_glob = true;
     }
   else
     {
-      allow_glob = TRUE;
-      ignore_case_with_glob = FALSE;
+      allow_glob = true;
+      ignore_case_with_glob = false;
     }
 }
 
@@ -488,7 +488,7 @@ static struct parse_thing
     const char *name;
     union parse_setting
       {
-	BOOL *b;
+	bool *b;
 	DWORD *x;
 	int *i;
 	void (*func)(const char *);
@@ -506,21 +506,21 @@ static struct parse_thing
   {"binmode", {x: &binmode}, justset, NULL, {{O_TEXT}, {O_BINARY}}},
   {"check_case", {func: &check_case_init}, isfunc, NULL, {{0}, {0}}},
   {"codepage", {func: &codepage_init}, isfunc, NULL, {{0}, {0}}},
-  {"daemon", {&allow_daemon}, justset, NULL, {{FALSE}, {TRUE}}},
-  {"envcache", {&envcache}, justset, NULL, {{TRUE}, {FALSE}}},
+  {"daemon", {&allow_daemon}, justset, NULL, {{false}, {true}}},
+  {"envcache", {&envcache}, justset, NULL, {{true}, {false}}},
   {"error_start", {func: &error_start_init}, isfunc, NULL, {{0}, {0}}},
-  {"export", {&export_settings}, justset, NULL, {{FALSE}, {TRUE}}},
+  {"export", {&export_settings}, justset, NULL, {{false}, {true}}},
   {"forkchunk", {func: set_chunksize}, isfunc, NULL, {{0}, {0}}},
   {"glob", {func: &glob_init}, isfunc, NULL, {{0}, {s: "normal"}}},
-  {"ntea", {&allow_ntea}, justset, NULL, {{FALSE}, {TRUE}}},
-  {"ntsec", {&allow_ntsec}, justset, NULL, {{FALSE}, {TRUE}}},
-  {"smbntsec", {&allow_smbntsec}, justset, NULL, {{FALSE}, {TRUE}}},
-  {"reset_com", {&reset_com}, justset, NULL, {{FALSE}, {TRUE}}},
-  {"strip_title", {&strip_title_path}, justset, NULL, {{FALSE}, {TRUE}}},
+  {"ntea", {&allow_ntea}, justset, NULL, {{false}, {true}}},
+  {"ntsec", {&allow_ntsec}, justset, NULL, {{false}, {true}}},
+  {"smbntsec", {&allow_smbntsec}, justset, NULL, {{false}, {true}}},
+  {"reset_com", {&reset_com}, justset, NULL, {{false}, {true}}},
+  {"strip_title", {&strip_title_path}, justset, NULL, {{false}, {true}}},
   {"subauth_id", {func: &subauth_id_init}, isfunc, NULL, {{0}, {0}}},
-  {"title", {&display_title}, justset, NULL, {{FALSE}, {TRUE}}},
+  {"title", {&display_title}, justset, NULL, {{false}, {true}}},
   {"tty", {NULL}, set_process_state, NULL, {{0}, {PID_USETTY}}},
-  {"winsymlinks", {&allow_winsymlinks}, justset, NULL, {{FALSE}, {TRUE}}},
+  {"winsymlinks", {&allow_winsymlinks}, justset, NULL, {{false}, {true}}},
   {NULL, {0}, justset, 0, {{0}, {0}}}
 };
 
@@ -676,7 +676,7 @@ environ_init (char **envp, int envc)
 
   /* Set ntsec explicit as default, if NT is running */
   if (wincap.has_security ())
-    allow_ntsec = TRUE;
+    allow_ntsec = true;
 
   if (!envp)
     envp_passed_in = 0;

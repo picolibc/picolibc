@@ -12,11 +12,11 @@ ac_help=
 ac_default_prefix=/usr/local
 # Any additions from configure.in:
 ac_help="$ac_help
- --enable-threadsafe=[runtime]	Build a cygwin DLL which is thread safe"
-ac_help="$ac_help
  --enable-extra-threadsafe-checking	Build a cygwin DLL which is thread safe with extra consistency checking"
 ac_help="$ac_help
  --enable-debugging		Build a cygwin DLL which has more consistency checking for debugging"
+ac_help="$ac_help
+ --enable-server		Build a cygwin DLL which can communicate with cygserver"
 ac_help="$ac_help
  --enable-malloc-debugging		Build a cygwin DLL with heap sanity checking (this is very slow, use only if you have heap corruption problems)"
 ac_help="$ac_help
@@ -1865,28 +1865,6 @@ ac_link='${CC-cc} -o conftest${ac_exeext} $CFLAGS $CPPFLAGS $LDFLAGS conftest.$a
 cross_compiling=$ac_cv_prog_cc_cross
 
 
-mt_safe_val=1
-MT_SAFE=yes
-
-# Check whether --enable-threadsafe or --disable-threadsafe was given.
-if test "${enable_threadsafe+set}" = set; then
-  enableval="$enable_threadsafe"
-  case "${enableval}" in
-yes)
-    ;;
-runtime)
-  mt_safe_val=2
-  MT_SAFE=yes
-  ;;
-no)
-  mt_safe_val=0
-  MT_SAFE=no
-  ;;
-esac
-
-fi
-
-
 # Check whether --enable-extra-threadsafe-checking or --disable-extra-threadsafe-checking was given.
 if test "${enable_extra_threadsafe_checking+set}" = set; then
   enableval="$enable_extra_threadsafe_checking"
@@ -1906,21 +1884,26 @@ esac
 fi
 
 
-if test "$MT_SAFE" = "yes"; then
-  cat >> confdefs.h <<EOF
-#define _MT_SAFE $mt_safe_val
-EOF
-
-fi
-
-
-
 # Check whether --enable-debugging or --disable-debugging was given.
 if test "${enable_debugging+set}" = set; then
   enableval="$enable_debugging"
   case "${enableval}" in
 yes)	 cat >> confdefs.h <<\EOF
 #define DEBUGGING 1
+EOF
+ ;;
+no)	 ;;
+esac
+
+fi
+
+
+# Check whether --enable-cygserver or --disable-cygserver was given.
+if test "${enable_cygserver+set}" = set; then
+  enableval="$enable_cygserver"
+  case "${enableval}" in
+yes)	 cat >> confdefs.h <<\EOF
+#define USE_CYGSERVE 1
 EOF
  ;;
 no)	 ;;
@@ -2146,7 +2129,6 @@ s%@WINDRES@%$WINDRES%g
 s%@CPP@%$CPP%g
 s%@ALLOCA@%$ALLOCA%g
 s%@SET_MAKE@%$SET_MAKE%g
-s%@MT_SAFE@%$MT_SAFE%g
 s%@MALLOC_OFILES@%$MALLOC_OFILES%g
 s%@DLL_ENTRY@%$DLL_ENTRY%g
 s%@DEF_DLL_ENTRY@%$DEF_DLL_ENTRY%g

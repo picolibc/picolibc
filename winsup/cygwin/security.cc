@@ -40,12 +40,11 @@ details. */
 #include "lm.h"
 #include "pwdgrp.h"
 
-extern BOOL allow_ntea;
-BOOL allow_ntsec;
+bool allow_ntsec;
 /* allow_smbntsec is handled exclusively in path.cc (path_conv::check).
    It's defined here because of it's strong relationship to allow_ntsec.
    The default is TRUE to reflect the old behaviour. */
-BOOL allow_smbntsec;
+bool allow_smbntsec;
 
 cygsid *
 cygsidlist::alloc_sids (int n)

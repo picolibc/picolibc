@@ -1514,8 +1514,6 @@ getpagesize ()
 static int
 check_posix_perm (const char *fname, int v)
 {
-  extern int allow_ntea, allow_ntsec, allow_smbntsec;
-
   /* Windows 95/98/ME don't support file system security at all. */
   if (!wincap.has_security ())
     return 0;

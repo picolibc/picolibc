@@ -12,7 +12,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-
+#ifdef USE_CYGSERVER
 #include <sys/types.h>
 
 #include <assert.h>
@@ -690,3 +690,4 @@ client_request_shm::client_request_shm (const key_t key,
 
   msglen (sizeof (_parameters.in));
 }
+#endif /* USE_CYGSERVER */

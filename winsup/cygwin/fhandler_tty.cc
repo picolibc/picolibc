@@ -507,9 +507,12 @@ fhandler_tty_slave::open (path_conv *, int flags, mode_t)
 
   HANDLE from_master_local, to_master_local;
 
-  if (!wincap.has_security () ||
-      cygserver_running == CYGSERVER_UNAVAIL ||
-      !cygserver_attach_tty (&from_master_local, &to_master_local))
+  if (!wincap.has_security ()
+#ifdef USE_CYGSERVER
+      || cygserver_running == CYGSERVER_UNAVAIL
+      || !cygserver_attach_tty (&from_master_local, &to_master_local)
+#endif
+)
     {
       termios_printf ("cannot dup handles via server. using old method.");
 
@@ -596,6 +599,7 @@ fhandler_tty_slave::cygserver_attach_tty (LPHANDLE from_master_ptr,
   if (!from_master_ptr || !to_master_ptr)
     return 0;
 
+#ifdef USE_CYGSERVER
   client_request_attach_tty req ((DWORD) get_ttyp ()->master_pid,
 				 (HANDLE) get_ttyp ()->from_master,
 				 (HANDLE) get_ttyp ()->to_master);
@@ -605,6 +609,8 @@ fhandler_tty_slave::cygserver_attach_tty (LPHANDLE from_master_ptr,
 
   *from_master_ptr = req.from_master ();
   *to_master_ptr = req.to_master ();
+#endif
+
   return 1;
 }
 

@@ -16,7 +16,7 @@ details. */
 #include "security.h"
 
 /* Default to not using NTEA information */
-BOOL allow_ntea;
+bool allow_ntea;
 
 /*
 From Windows NT DDK:

@@ -209,9 +209,9 @@ legal_sid_type (SID_NAME_USE type)
       || type == SidTypeAlias || type == SidTypeWellKnownGroup;
 }
 
-extern BOOL allow_ntea;
-extern BOOL allow_ntsec;
-extern BOOL allow_smbntsec;
+extern bool allow_ntea;
+extern bool allow_ntsec;
+extern bool allow_smbntsec;
 
 /* File manipulation */
 int __stdcall set_process_privileges ();

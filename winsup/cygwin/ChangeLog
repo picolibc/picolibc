@@ -1,3 +1,27 @@
+2003-07-01  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Remove cygserver stuff.
+	* acconfig.h: Add USE_CYGSERVER define.
+	* config.h.in: Regenerate.
+	* configure.in: Add --enable-server setting.
+	* configure: Regenerate.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Conditionalize
+	compilation of cygserver stuff.
+	* fork.cc (fork_child): Ditto.
+	* shm.cc: Ditto.
+	* tty.cc (tty::common_init): Ditto.
+
+	* dcrt0.cc: Use bool rather than BOOL for CYGWIN environment variable
+	definitions.
+	* environ.cc: Ditto.
+	* ntea.cc: Ditto.
+	* security.cc: Ditto.
+	* security.h: Ditto.
+	* syscalls.cc (check_posix_perm): Remove externs that were already
+	declared in a header.
+	* winsup.h: Ditto.  Declare _MT_SAFE here.  Delete it someday since
+	cygwin should always be _MT_SAFE.
+
 2003-06-30  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* cygheap.h (enum impersonation): New enum.
