@@ -23,6 +23,8 @@
 #include <lmerr.h>
 #include <lmcons.h>
 
+#define print_win_error(x) _print_win_error(x, __LINE__)
+
 static const char version[] = "$Revision$";
 
 SID_IDENTIFIER_AUTHORITY sid_world_auth = {SECURITY_WORLD_SID_AUTHORITY};
@@ -111,7 +113,7 @@ uni2ansi (LPWSTR wcs, char *mbs, int size)
 }
 
 void
-print_win_error(DWORD code)
+_print_win_error(DWORD code, int line)
 {
   char buf[4096];
 
@@ -121,9 +123,9 @@ print_win_error(DWORD code)
       code,
       MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
       (LPTSTR) buf, sizeof (buf), NULL))
-    fprintf (stderr, "mkpasswd: [%lu] %s", code, buf);
+    fprintf (stderr, "mkpasswd (%d): [%lu] %s", line, code, buf);
   else
-    fprintf (stderr, "mkpasswd: error %lu", code);
+    fprintf (stderr, "mkpasswd (%d): error %lu", line, code);
 }
 
 void
@@ -159,10 +161,7 @@ current_user (int print_sids, int print_cygpath,
       || (!CloseHandle (ptok) && (errpos = __LINE__)))
     {
       if (errpos)
-	{
-	  print_win_error (GetLastError ());
-	  fprintf(stderr, " on line %d\n", errpos);
-	}
+	_print_win_error (GetLastError (), errpos);
       return;
     }
 
@@ -309,6 +308,7 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
 				      &acc_type))
 		{
 	  	  print_win_error(GetLastError ());
+		  fprintf(stderr, " (%s)\n", username);
 		  continue;
 		}
 	      else if (acc_type == SidTypeDomain)
@@ -327,6 +327,7 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
 					  &acc_type))
 		    {
 		      print_win_error(GetLastError ());
+		      fprintf(stderr, " (%s)\n", domname);
 		      continue;
 		    }
 		}
@@ -401,6 +402,7 @@ enum_local_groups (int print_sids)
 				  &acc_type))
 	    {
 	      print_win_error(GetLastError ());
+	      fprintf(stderr, " (%s)\n", localgroup_name);
 	      continue;
 	    }
 	  else if (acc_type == SidTypeDomain)
@@ -418,6 +420,7 @@ enum_local_groups (int print_sids)
 				      &acc_type))
 		{
 		  print_win_error(GetLastError ());
+		  fprintf(stderr, " (%s)\n", domname);
 		  continue;
 		}
 	    }

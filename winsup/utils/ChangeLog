@@ -1,3 +1,12 @@
+2005-01-11  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* mkpasswd.c (print_win_error): Transform into macro.
+	(_print_win_error): Upgrade former print_win_error by
+	printing the line.
+	(current_user): Call _print_win_error.
+	(enum_users): Print name in case of lookup failure.
+	(enum_local_groups): Ditto.
+
 2004-11-18  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
 
 	* cygcheck.cc (eprintf): New function.
