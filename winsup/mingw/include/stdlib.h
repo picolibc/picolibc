@@ -101,10 +101,10 @@ extern wchar_t***   __p___wargv(void);
 
 #ifndef __DECLSPEC_SUPPORTED
 
-extern int*    __imp___argc_dll;
-extern char***  __imp___argv_dll;
-#define __argc (*__imp___argc_dll)
-#define __argv (*__imp___argv_dll)
+extern int*    _imp____argc_dll;
+extern char***  _imp____argv_dll;
+#define __argc (*_imp____argc_dll)
+#define __argv (*_imp____argv_dll)
 
 #else /* __DECLSPEC_SUPPORTED */
 
@@ -121,16 +121,27 @@ __MINGW_IMPORT char**  __argv_dll;
  * Also defined in ctype.h.
  */
 
+/* Also defined in stdlib.h */
 #ifndef MB_CUR_MAX
+#ifdef __DECLSPEC_SUPPORTED
 # ifdef __MSVCRT__
 #  define MB_CUR_MAX __mb_cur_max
    __MINGW_IMPORT int __mb_cur_max;
-# else /* not __MSVCRT */
+# else		/* not __MSVCRT */
 #  define MB_CUR_MAX __mb_cur_max_dll
    __MINGW_IMPORT int __mb_cur_max_dll;
-# endif /* not __MSVCRT */
-#endif  /* MB_CUR_MAX */
+# endif		/* not __MSVCRT */
 
+#else		/* ! __DECLSPEC_SUPPORTED */
+# ifdef __MSVCRT__
+   extern int* _imp____mbcur_max
+#  define MB_CUR_MAX (*_imp____mb_cur_max)
+# else		/* not __MSVCRT */
+   extern int*  _imp____mbcur_max_dll
+#  define MB_CUR_MAX (*_imp____mb_cur_max_dll)
+# endif 	/* not __MSVCRT */
+#endif  	/*  __DECLSPEC_SUPPORTED */
+#endif  /* MB_CUR_MAX */
 /* 
  * MS likes to declare errno in stdlib.h as well. 
  */
@@ -156,8 +167,8 @@ int*	__doserrno(void);
 # define _wenviron (*__p__wenviron())
 #else /* ! __MSVCRT__ */
 # ifndef __DECLSPEC_SUPPORTED
-    extern char *** __imp__environ_dll;
-#   define _environ (*__imp__environ_dll)
+    extern char *** _imp___environ_dll;
+#   define _environ (*_imp___environ_dll)
 # else /* __DECLSPEC_SUPPORTED */
     __MINGW_IMPORT char ** _environ_dll;
 #   define _environ _environ_dll
@@ -170,8 +181,8 @@ int*	__doserrno(void);
 /* One of the MSVCRTxx libraries */
 
 #ifndef __DECLSPEC_SUPPORTED
-  extern int*	__imp__sys_nerr;
-# define	sys_nerr	(*__imp__sys_nerr)
+  extern int*	_imp___sys_nerr;
+# define	sys_nerr	(*_imp___sys_nerr)
 #else /* __DECLSPEC_SUPPORTED */
   __MINGW_IMPORT int	_sys_nerr;
 # ifndef _UWIN
@@ -184,8 +195,8 @@ int*	__doserrno(void);
 /* CRTDLL run time library */
 
 #ifndef __DECLSPEC_SUPPORTED
-  extern int*	__imp__sys_nerr_dll;
-# define sys_nerr	(*__imp__sys_nerr_dll)
+  extern int*	_imp___sys_nerr_dll;
+# define sys_nerr	(*_imp___sys_nerr_dll)
 #else /* __DECLSPEC_SUPPORTED */
   __MINGW_IMPORT int	_sys_nerr_dll;
 # define sys_nerr	_sys_nerr_dll
@@ -194,8 +205,8 @@ int*	__doserrno(void);
 #endif /* ! __MSVCRT__ */
 
 #ifndef __DECLSPEC_SUPPORTED
-extern char***	__imp__sys_errlist;
-#define	sys_errlist	(*__imp__sys_errlist)
+extern char***	_imp__sys_errlist;
+#define	sys_errlist	(*_imp___sys_errlist)
 #else /* __DECLSPEC_SUPPORTED */
 __MINGW_IMPORT char*	_sys_errlist[];
 #ifndef _UWIN
@@ -262,7 +273,7 @@ wchar_t**  __p__wpgmptr(void);
 #else /* ! __MSVCRT__ */
 # ifndef __DECLSPEC_SUPPORTED
   extern char** __imp__pgmptr_dll;
-# define _pgmptr (*__imp__pgmptr_dll)
+# define _pgmptr (*_imp___pgmptr_dll)
 # else /* __DECLSPEC_SUPPORTED */
  __MINGW_IMPORT char* _pgmptr_dll;
 # define _pgmptr _pgmptr_dll

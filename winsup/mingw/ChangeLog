@@ -1,5 +1,17 @@
 2002-04-26  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/dos.h: Change  prefix "__imp_"  to "_imp__" for
+	__GNUC__ without __DECLSPEC_SUPPORTED.
+	* include/fnctl.h: Likewise.
+	* include/math.h: Likewise.
+	* include/stdio.h: Likewise.
+	* include/stdlib.h: Likewise.
+	* include/time.h: Likewise.
+	* include/wctype.h: Likewise.
+	* include/ctype.h: Likewise.
+
+2002-04-26  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	Add atexit support for dlls.
 	* crt1.c (atexit): Force thunk to _imp__atexit.
 	(_onexit): Force thunk to _imp___onexit.

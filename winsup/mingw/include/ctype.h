@@ -95,22 +95,47 @@ int	_toupper(int);
 
 /* Also defined in stdlib.h */
 #ifndef MB_CUR_MAX
+#ifdef __DECLSPEC_SUPPORTED
 # ifdef __MSVCRT__
 #  define MB_CUR_MAX __mb_cur_max
    __MINGW_IMPORT int __mb_cur_max;
-# else /* not __MSVCRT */
+# else	/* not __MSVCRT */
 #  define MB_CUR_MAX __mb_cur_max_dll
    __MINGW_IMPORT int __mb_cur_max_dll;
-# endif /* not __MSVCRT */
+# endif	/* not __MSVCRT */
+
+#else		/* ! __DECLSPEC_SUPPORTED */
+# ifdef __MSVCRT__
+   extern int* _imp____mbcur_max
+#  define MB_CUR_MAX (*_imp____mb_cur_max)
+# else		/* not __MSVCRT */
+   extern int*  _imp____mbcur_max_dll
+#  define MB_CUR_MAX (*_imp____mb_cur_max_dll)
+# endif 	/* not __MSVCRT */
+#endif  	/*  __DECLSPEC_SUPPORTED */
 #endif  /* MB_CUR_MAX */
 
+
+#ifdef __DECLSPEC_SUPPORTED
 __MINGW_IMPORT unsigned short _ctype[];
-#ifdef __MSVCRT__
-__MINGW_IMPORT unsigned short* _pctype;
-#else /* CRTDLL */
-__MINGW_IMPORT unsigned short* _pctype_dll;
-#define  _pctype _pctype_dll
-#endif
+# ifdef __MSVCRT__
+  __MINGW_IMPORT unsigned short* _pctype;
+# else /* CRTDLL */
+  __MINGW_IMPORT unsigned short* _pctype_dll;
+# define  _pctype _pctype_dll
+# endif 
+
+#else		/*  __DECLSPEC_SUPPORTED */
+extern unsigned short** _imp___ctype;
+#define _ctype (*_imp___ctype)
+# ifdef __MSVCRT__
+  extern unsigned short** _imp___pctype;
+# define _pctype (*_imp___pctype)
+# else /* CRTDLL */
+  extern unsigned short** _imp___pctype_dll;
+# define _pctype (*_imp___pctype_dll)
+# endif /* CRTDLL */
+#endif		/*  __DECLSPEC_SUPPORTED */
 
 /*
  * Use inlines here rather than macros, because macros will upset 

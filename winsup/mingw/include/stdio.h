@@ -158,9 +158,9 @@ typedef struct _iobuf
  */
 #ifndef __DECLSPEC_SUPPORTED
 
-extern FILE (*__imp__iob)[];	/* A pointer to an array of FILE */
+extern FILE (*_imp___iob)[];	/* A pointer to an array of FILE */
 
-#define _iob	(*__imp__iob)	/* An array of FILE */
+#define _iob	(*_imp___iob)	/* An array of FILE */
 
 #else /* __DECLSPEC_SUPPORTED */
 

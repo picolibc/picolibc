@@ -86,13 +86,27 @@ int	isleadbyte (int);
 
 /* Also in ctype.h */
 
+#ifdef __DECLSPEC_SUPPORTED
 __MINGW_IMPORT unsigned short _ctype[];
-#ifdef __MSVCRT__
-__MINGW_IMPORT unsigned short* _pctype;
-#else
-__MINGW_IMPORT unsigned short* _pctype_dll;
-#define  _pctype _pctype_dll
-#endif
+# ifdef __MSVCRT__
+  __MINGW_IMPORT unsigned short* _pctype;
+# else	/* CRTDLL */
+  __MINGW_IMPORT unsigned short* _pctype_dll;
+# define  _pctype _pctype_dll
+# endif
+
+#else		/* ! __DECLSPEC_SUPPORTED */
+extern unsigned short** _imp___ctype;
+#define _ctype (*_imp___ctype)
+# ifdef __MSVCRT__
+  extern unsigned short** _imp___pctype;
+# define _pctype (*_imp___pctype)
+# else	/* CRTDLL */
+  extern unsigned short** _imp___pctype_dll;
+# define _pctype (*_imp___pctype_dll)
+# endif	/* CRTDLL */
+#endif		/*  __DECLSPEC_SUPPORTED */
+
 
 #if !(defined(__NO_CTYPE_INLINES) || defined(__WCTYPE_INLINES_DEFINED))
 #define __WCTYPE_INLINES_DEFINED

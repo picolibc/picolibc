@@ -98,12 +98,12 @@ extern "C" {
 #ifndef __DECLSPEC_SUPPORTED
 
 #ifdef __MSVCRT__
-extern double*	__imp__HUGE;
-#define	HUGE_VAL	(*__imp__HUGE)
+extern double*	_imp___HUGE;
+#define	HUGE_VAL	(*_imp___HUGE)
 #else
 /* CRTDLL */
-extern double*	__imp__HUGE_dll;
-#define	HUGE_VAL	(*__imp__HUGE_dll)
+extern double*	_imp___HUGE_dll;
+#define	HUGE_VAL	(*_imp___HUGE_dll)
 #endif
 
 #else /* __DECLSPEC_SUPPORTED */
