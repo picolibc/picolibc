@@ -936,14 +936,12 @@ win32_device_name (const char *src_path, char *win32_path, device& dev)
 static bool __stdcall
 is_unc_share (const char *path)
 {
-  char *p = NULL;
-  int ret = (isdirsep (path[0])
-	     && isdirsep (path[1])
-	     && (isalnum (path[2]) || path[2] == '.')
-	     && ((p = strpbrk (path + 3, "\\/")) != NULL));
-  if (!ret || p == NULL)
-    return false;
-  return ret && isalnum (p[1]);
+  const char *p;
+  return (isdirsep (path[0])
+	 && isdirsep (path[1])
+	 && (isalnum (path[2]) || path[2] == '.')
+	 && ((p = strpbrk (path + 3, "\\/")) != NULL)
+	 && isalnum (p[1]));
 }
 
 /* Normalize a Win32 path.
