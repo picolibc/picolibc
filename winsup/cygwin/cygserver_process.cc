@@ -48,13 +48,14 @@ cleanup_routine::~cleanup_routine ()
 
 /*****************************************************************************/
 
-process::process (const DWORD winpid)
-  : _winpid (winpid),
-    _next (NULL),
+process::process (const pid_t cygpid, const DWORD winpid)
+  : _cygpid (cygpid),
+    _winpid (winpid),
+    _hProcess (NULL),
     _cleaning_up (false),
-    _routines_head (NULL),
     _exit_status (STILL_ACTIVE),
-    _hProcess (NULL)
+    _routines_head (NULL),
+    _next (NULL)
 {
   _hProcess = OpenProcess (PROCESS_ALL_ACCESS, FALSE, winpid);
   if (!_hProcess)
@@ -99,6 +100,8 @@ process::exit_code ()
 bool
 process::add (cleanup_routine *const new_cleanup)
 {
+  assert (new_cleanup);
+
   if (_cleaning_up)
     return false;
   EnterCriticalSection (&_access);
@@ -125,6 +128,7 @@ void
 process::cleanup ()
 {
   EnterCriticalSection (&_access);
+  assert (_exit_status != STILL_ACTIVE);
   assert (!_cleaning_up);
   InterlockedExchange (&_cleaning_up, true);
   cleanup_routine *entry = _routines_head;
@@ -135,7 +139,7 @@ process::cleanup ()
     {
       cleanup_routine *const ptr = entry;
       entry = entry->_next;
-      ptr->cleanup (_winpid);
+      ptr->cleanup (this);
       safe_delete (cleanup_routine, ptr);
     }
 }
@@ -194,7 +198,7 @@ process_cache::~process_cache ()
  * have been deleted once it has been unlocked.
  */
 class process *
-process_cache::process (const DWORD winpid)
+process_cache::process (const pid_t cygpid, const DWORD winpid)
 {
   /* TODO: make this more granular, so a search doesn't involve the
    * write lock.
@@ -215,7 +219,7 @@ process_cache::process (const DWORD winpid)
 	  return NULL;
 	}
 
-      entry = safe_new (class process, winpid);
+      entry = safe_new (class process, cygpid, winpid);
       if (entry->_exit_status != STILL_ACTIVE)
 	{
 	  LeaveCriticalSection (&_cache_write_access);

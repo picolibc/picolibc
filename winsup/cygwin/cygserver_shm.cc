@@ -80,45 +80,96 @@ details. */
 class server_shmmgr
 {
 private:
-  class segment_t
+  class attach_t
   {
   public:
+    class process *const _client;
+    unsigned int _refcnt;
+
+    attach_t *_next;
+
+    attach_t (class process *const client)
+      : _client (client),
+        _refcnt (0),
+        _next (NULL)
+    {}
+  };
+
+  class segment_t
+  {
+  private:
     // Bits for the _flg field.
-    enum { REMOVED = 0x01 };
+    enum { IS_DELETED = 0x01 };
 
-    static long _sequence;
-
+  public:
     const int _intid;
     const int _shmid;
     struct shmid_ds _ds;
-    int _flg;
-    const HANDLE _hFileMap;
 
     segment_t *_next;
 
-    segment_t (const key_t key, const int intid, const HANDLE hFileMap)
-      : _intid (intid),
-	_shmid (ipc_int2ext (_intid, IPC_SHMOP, _sequence)),
-	_flg (0),
-	_hFileMap (hFileMap),
-	_next (NULL)
-    {
-      assert (0 <= _intid && _intid < SHMMNI);
+    segment_t (const key_t key, const int intid, const HANDLE hFileMap);
+    ~segment_t ();
 
-      memset (&_ds, '\0', sizeof (_ds));
-      _ds.shm_perm.key = key;
+    bool is_deleted () const
+    {
+      return _flg & IS_DELETED;
     }
+
+    bool is_pending_delete () const
+    {
+      return !_ds.shm_nattch && is_deleted ();
+    }
+
+    void mark_deleted ()
+    {
+      assert (!is_deleted ());
+
+      _flg |= IS_DELETED;
+    }
+
+    int attach (class process *, HANDLE & hFileMap);
+    int detach (const class process *);
+
+  private:
+    static long _sequence;
+
+    int _flg;
+    const HANDLE _hFileMap;
+    attach_t *_attach_head;	// A list sorted by winpid;
+
+    attach_t *find (const class process *, attach_t **previous = NULL);
+  };
+
+  class cleanup_t : public cleanup_routine
+  {
+  public:
+    cleanup_t (segment_t *const segptr)
+      : _segptr (segptr)
+    {
+      assert (_segptr);
+    }
+
+    virtual void cleanup (const class process *const client)
+    {
+      assert (_segptr);
+
+      shmmgr.shmdt (_segptr->_shmid, client);
+    }
+
+  private:
+    segment_t *const _segptr;
   };
 
 public:
   static server_shmmgr & instance ();
 
   int shmat (HANDLE & hFileMap,
-	     int shmid, int shmflg, pid_t, process_cache *, DWORD winpid);
+	     int shmid, int shmflg, class process *);
   int shmctl (int & out_shmid, struct shmid_ds & out_ds,
 	      struct shminfo & out_shminfo, struct shm_info & out_shm_info,
 	      const int shmid, int cmd, const struct shmid_ds &, pid_t);
-  int shmdt (int shmid, pid_t);
+  int shmdt (int shmid, const class process *);
   int shmget (int & out_shmid, key_t, size_t, int shmflg, pid_t, uid_t, gid_t);
 
 private:
@@ -132,6 +183,7 @@ private:
 
   int _shm_ids;			// Number of shm segments (for ipcs(8)).
   int _shm_tot;			// Total bytes of shm segments (for ipcs(8)).
+  int _shm_atts;		// Number of attached segments (for ipcs(8)).
   int _intid_max;		// Highest intid yet allocated (for ipcs(8)).
 
   server_shmmgr ();
@@ -156,6 +208,168 @@ private:
 /* static */ pthread_once_t server_shmmgr::_instance_once = PTHREAD_ONCE_INIT;
 
 /*---------------------------------------------------------------------------*
+ * server_shmmgr::segment_t::segment_t ()
+ *---------------------------------------------------------------------------*/
+
+server_shmmgr::segment_t::segment_t (const key_t key,
+				     const int intid,
+				     const HANDLE hFileMap)
+  : _intid (intid),
+    _shmid (ipc_int2ext (intid, IPC_SHMOP, _sequence)),
+    _next (NULL),
+    _flg (0),
+    _hFileMap (hFileMap),
+    _attach_head (NULL)
+{
+  assert (0 <= _intid && _intid < SHMMNI);
+
+  memset (&_ds, '\0', sizeof (_ds));
+  _ds.shm_perm.key = key;
+}
+
+/*---------------------------------------------------------------------------*
+ * server_shmmgr::segment_t::~segment_t ()
+ *---------------------------------------------------------------------------*/
+
+server_shmmgr::segment_t::~segment_t ()
+{
+  assert (!_attach_head);
+
+  if (!CloseHandle (_hFileMap))
+    with_strerr
+      (msg,
+       syscall_printf (("failed to close file map [handle = 0x%x]: %s"),
+		       _hFileMap, msg));
+}
+
+/*---------------------------------------------------------------------------*
+ * server_shmmgr::segment_t::attach ()
+ *---------------------------------------------------------------------------*/
+
+int
+server_shmmgr::segment_t::attach (class process *const client,
+				  HANDLE & hFileMap)
+{
+  assert (client);
+
+  if (!DuplicateHandle (GetCurrentProcess (),
+			_hFileMap,
+			client->handle (),
+			&hFileMap,
+			0,
+			FALSE, // bInheritHandle
+			DUPLICATE_SAME_ACCESS))
+    {
+      with_strerr
+	(msg,
+	 syscall_printf (("failed to duplicate handle for client "
+			  "[key = 0x%016llx, shmid = %d, handle = 0x%x]:"
+			  "%s"),
+			 _ds.shm_perm.key, _shmid, _hFileMap,
+			 msg));
+
+      return -EACCES;	// FIXME: Case analysis?
+    }
+
+  _ds.shm_lpid  = client->cygpid ();
+  _ds.shm_nattch += 1;
+  _ds.shm_atime = time (NULL); // FIXME: sub-second times.
+
+  attach_t *previous = NULL;
+  attach_t *attptr = find (client, &previous);
+
+  if (!attptr)
+    {
+      attptr = safe_new (attach_t, client);
+
+      if (previous)
+	{
+	  attptr->_next = previous->_next;
+	  previous->_next = attptr;
+	}
+      else
+	{
+	  attptr->_next = _attach_head;
+	  _attach_head = attptr;
+	}
+    }
+
+  attptr->_refcnt += 1;
+
+  cleanup_t *const cleanup = safe_new (cleanup_t, this);
+
+  // FIXME: ::add should only fail if the process object is already
+  // cleaning up; but it can't be doing that since this thread has it
+  // locked.
+
+  const bool result = client->add (cleanup);
+
+  assert (result);
+
+  return 0;
+}
+
+/*---------------------------------------------------------------------------*
+ * server_shmmgr::segment_t::detach ()
+ *---------------------------------------------------------------------------*/
+
+int
+server_shmmgr::segment_t::detach (const class process *const client)
+{
+  attach_t *previous = NULL;
+  attach_t *const attptr = find (client, &previous);
+
+  if (!attptr)
+    return -EINVAL;
+
+  attptr->_refcnt -= 1;
+
+  if (!attptr->_refcnt)
+    {
+      assert (previous ? previous->_next == attptr : _attach_head == attptr);
+
+      if (previous)
+	previous->_next = attptr->_next;
+      else
+	_attach_head = attptr->_next;
+
+      safe_delete (attach_t, attptr);
+    }
+
+  assert (_ds.shm_nattch > 0);
+
+  _ds.shm_lpid  = client->cygpid ();
+  _ds.shm_nattch -= 1;
+  _ds.shm_dtime = time (NULL); // FIXME: sub-second times.
+
+  return 0;
+}
+
+/*---------------------------------------------------------------------------*
+ * server_shmmgr::segment_t::find ()
+ *---------------------------------------------------------------------------*/
+
+server_shmmgr::attach_t *
+server_shmmgr::segment_t::find (const class process *const client,
+				attach_t **previous)
+{
+  if (previous)
+    *previous = NULL;
+
+  // Nb. The _attach_head list is sorted by winpid.
+
+  for (attach_t *attptr = _attach_head; attptr; attptr = attptr->_next)
+    if (attptr->_client == client)
+      return attptr;
+    else if (attptr->_client->winpid () > client->winpid ())
+      return NULL;
+    else if (previous)
+      *previous = attptr;
+
+  return NULL;
+}
+
+/*---------------------------------------------------------------------------*
  * server_shmmgr::instance ()
  *---------------------------------------------------------------------------*/
 
@@ -176,22 +390,10 @@ server_shmmgr::instance ()
 int
 server_shmmgr::shmat (HANDLE & hFileMap,
 		      const int shmid, const int shmflg,
-		      const pid_t cygpid,
-		      process_cache *const cache, const DWORD winpid)
+		      class process *const client)
 {
-  syscall_printf ("shmat (shmid = %d, shmflg = 0%o) for %d(%lu)",
-		  shmid, shmflg, cygpid, winpid);
-
-  process *const client = cache->process (winpid);
-
-  if (!client)
-    {
-      syscall_printf (("-1 [%d] = shmat (shmid = %d, shmflg = 0%o) "
-		       "for %d(%lu)"),
-		      0, EAGAIN, shmid, shmflg,
-		      cygpid, winpid);
-      return -EAGAIN;
-    }
+  syscall_printf ("shmat (shmid = %d, shmflg = 0%o) for %d",
+		  shmid, shmflg, client->cygpid ());
 
   int result = 0;
   EnterCriticalSection (&_segments_lock);
@@ -200,40 +402,20 @@ server_shmmgr::shmat (HANDLE & hFileMap,
 
   if (!segptr)
     result = -EINVAL;
-  else if (!DuplicateHandle (GetCurrentProcess (),
-			     segptr->_hFileMap,
-			     client->handle (),
-			     &hFileMap,
-			     0,
-			     FALSE, // bInheritHandle
-			     DUPLICATE_SAME_ACCESS))
-    {
-      with_strerr (msg,
-		   syscall_printf (("failed to duplicate handle for client "
-				    "[key = 0x%016llx, shmid = %d, handle = 0x%x]:"
-				    "%s"),
-				   segptr->_ds.shm_perm.key, segptr->_shmid,
-				   segptr->_hFileMap, msg));
-
-      result = -EACCES;		// FIXME
-    }
   else
-    {
-      segptr->_ds.shm_lpid  = cygpid;
-      segptr->_ds.shm_nattch += 1;
-      segptr->_ds.shm_atime = time (NULL); // FIXME: sub-second times.
-    }
+    result = segptr->attach (client, hFileMap);
+
+  if (!result)
+    _shm_atts += 1;
 
   LeaveCriticalSection (&_segments_lock);
 
-  client->release ();
-
   if (result < 0)
-    syscall_printf ("-1 [%d] = shmat (shmid = %d, shmflg = 0%o) for %d(%lu)",
-		    -result, shmid, shmflg, cygpid, winpid);
+    syscall_printf ("-1 [%d] = shmat (shmid = %d, shmflg = 0%o) for %d",
+		    -result, shmid, shmflg, client->cygpid ());
   else
-    syscall_printf ("0x%x = shmat (shmid = %d, shmflg = 0%o) for %d(%lu)",
-		    hFileMap, shmid, shmflg, cygpid, winpid);
+    syscall_printf ("0x%x = shmat (shmid = %d, shmflg = 0%o) for %d",
+		    hFileMap, shmid, shmflg, client->cygpid ());
 
   return result;
 }
@@ -291,12 +473,12 @@ server_shmmgr::shmctl (int & out_shmid,
 	      break;
 
 	    case IPC_RMID:
-	      if (segptr->_flg & segment_t::REMOVED)
+	      if (segptr->is_deleted ())
 		result = -EIDRM;
 	      else
 		{
-		  segptr->_flg |= segment_t::REMOVED;
-		  if (!segptr->_ds.shm_nattch)
+		  segptr->mark_deleted ();
+		  if (segptr->is_pending_delete ())
 		    delete_segment (segptr);
 		}
 	      break;
@@ -321,6 +503,7 @@ server_shmmgr::shmctl (int & out_shmid,
       out_shmid = _intid_max;
       out_shm_info.shm_ids = _shm_ids;
       out_shm_info.shm_tot = _shm_tot;
+      out_shm_info.shm_atts = _shm_atts;
       break;
 
     default:
@@ -351,10 +534,10 @@ server_shmmgr::shmctl (int & out_shmid,
  *---------------------------------------------------------------------------*/
 
 int
-server_shmmgr::shmdt (const int shmid, const pid_t cygpid)
+server_shmmgr::shmdt (const int shmid, const class process *const client)
 {
   syscall_printf ("shmdt (shmid = %d) for %d",
-		  shmid, cygpid);
+		  shmid, client->cygpid ());
 
   int result = 0;
   EnterCriticalSection (&_segments_lock);
@@ -364,25 +547,22 @@ server_shmmgr::shmdt (const int shmid, const pid_t cygpid)
   if (!segptr)
     result = -EINVAL;
   else
-    {
-      assert (segptr->_ds.shm_nattch > 0);
+    result = segptr->detach (client);
 
-      segptr->_ds.shm_lpid  = cygpid;
-      segptr->_ds.shm_nattch -= 1;
-      segptr->_ds.shm_dtime = time (NULL); // FIXME: sub-second times.
+  if (!result)
+    _shm_atts -= 1;
 
-      if (!segptr->_ds.shm_nattch && (segptr->_flg & segment_t::REMOVED))
-	delete_segment (segptr);
-    }
+  if (segptr->is_pending_delete ())
+    delete_segment (segptr);
 
   LeaveCriticalSection (&_segments_lock);
 
   if (result < 0)
     syscall_printf ("-1 [%d] = shmdt (shmid = %d) for %d",
-		    -result, shmid, cygpid);
+		    -result, shmid, client->cygpid ());
   else
     syscall_printf ("%d = shmdt (shmid = %d) for %d",
-		    result, shmid, cygpid);
+		    result, shmid, client->cygpid ());
 
   return result;
 }
@@ -414,7 +594,7 @@ server_shmmgr::shmget (int & out_shmid,
 	  result = new_segment (key, size, shmflg, cygpid, uid, gid);
 	else
 	  result = -ENOENT;
-      else if (segptr->_flg & segment_t::REMOVED)
+      else if (segptr->is_deleted ())
 	result = -EIDRM;
       else if ((shmflg & IPC_CREAT) && (shmflg & IPC_EXCL))
 	result = -EEXIST;
@@ -462,6 +642,8 @@ server_shmmgr::initialise_instance ()
   assert (!_instance);
 
   _instance = safe_new0 (server_shmmgr);
+
+  assert (_instance);
 }
 
 /*---------------------------------------------------------------------------*
@@ -472,6 +654,7 @@ server_shmmgr::server_shmmgr ()
   : _segments_head (NULL),
     _shm_ids (0),
     _shm_tot (0),
+    _shm_atts (0),
     _intid_max (0)
 {
   InitializeCriticalSection (&_segments_lock);
@@ -543,10 +726,10 @@ server_shmmgr::new_segment (const key_t key,
 
   if (!hFileMap)
     {
-      with_strerr (msg,
-		   syscall_printf (("failed to create file mapping "
-				    "[size = %lu]: %s"),
-				   size, msg));
+      with_strerr
+	(msg,
+	 syscall_printf (("failed to create file mapping [size = %lu]: %s"),
+			 size, msg));
 
       return -ENOMEM;		// FIXME
     }
@@ -580,6 +763,7 @@ server_shmmgr::segment_t *
 server_shmmgr::new_segment (const key_t key, const size_t size,
 			    const HANDLE hFileMap)
 {
+  // FIXME: Overflow risk.
   if (_shm_tot + size > SHMALL)
     return NULL;
 
@@ -632,8 +816,7 @@ void
 server_shmmgr::delete_segment (segment_t *const segptr)
 {
   assert (segptr);
-  assert (!segptr->_ds.shm_nattch);
-  assert (segptr->_flg & segment_t::REMOVED);
+  assert (segptr->is_pending_delete ());
 
   segment_t *previous = NULL;
 
@@ -646,12 +829,6 @@ server_shmmgr::delete_segment (segment_t *const segptr)
     previous->_next = segptr->_next;
   else
     _segments_head = segptr->_next;
-
-  if (!CloseHandle (segptr->_hFileMap))
-    with_strerr (msg,
-		 syscall_printf (("failed to close file map "
-				  "[handle = 0x%x]: %s"),
-				 segptr->_hFileMap, msg));
 
   assert (_shm_ids > 0);
   _shm_ids -= 1;
@@ -695,6 +872,16 @@ client_request_shm::serve (transport_layer_base *const conn,
   // FIXME: Get a return code out of this and don't continue on error.
   conn->impersonate_client ();
 
+  class process *const client = cache->process (_parameters.in.cygpid,
+						_parameters.in.winpid);
+
+  if (!client)
+    {
+      error_code (EAGAIN);
+      msglen (0);
+      return;
+    }
+
   int result = -EINVAL;
 
   switch (_parameters.in.shmop)
@@ -709,12 +896,11 @@ client_request_shm::serve (transport_layer_base *const conn,
     case SHMOP_shmat:
       result = shmmgr.shmat (_parameters.out.hFileMap,
 			     _parameters.in.shmid, _parameters.in.shmflg,
-			     _parameters.in.cygpid,
-			     cache, _parameters.in.winpid);
+			     client);
       break;
 
     case SHMOP_shmdt:
-      result = shmmgr.shmdt (_parameters.in.shmid, _parameters.in.cygpid);
+      result = shmmgr.shmdt (_parameters.in.shmid, client);
       break;
 
     case SHMOP_shmctl:
@@ -726,6 +912,7 @@ client_request_shm::serve (transport_layer_base *const conn,
       break;
     }
 
+  client->release ();
   conn->revert_to_self ();
 
   if (result < 0)

@@ -1,5 +1,65 @@
 2002-07-11  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* cygserver_shm.cc: Automatically detach processes from any
+	segments they are attached to at exit.
+	(class server_shmmgr::attach_t): New class.
+	(server_shmmgr::segment_t::IS_DELETED): Rename and make private.
+	(server_shmmgr::segment_t::_sequence): Make private.
+	(server_shmmgr::segment_t::_flg): Ditto.
+	(server_shmmgr::segment_t::_hFileMap): Ditto.
+	(server_shmmgr::segment_t::_attach_head): New private field.
+	(server_shmmgr::segment_t::segment_t): Initialise new fields.
+	Make non-inline.
+	(server_shmmgr::segment_t::~segment_t): New method.
+	(server_shmmgr::segment_t::is_deleted): Ditto.
+	(server_shmmgr::segment_t::is_pending_delete): Ditto.
+	(server_shmmgr::segment_t::mark_deleted): Ditto.
+	(server_shmmgr::segment_t::attach): Ditto.
+	(server_shmmgr::segment_t::detach): Ditto.
+	(server_shmmgr::segment_t::find): Ditto.
+	(class server_shmmgr::cleanup_t): New class.
+	(server_shmmgr::_shm_atts): New private field.
+	(server_shmmgr::shmat): Add a process object argument to replace
+	the removed process_cache, cygpid and winpid arguments.  Remove
+	the process_cache manipulations.  Move body of code to the
+	segment_t::attach method.  Increment _shm_atts when required.
+	Update tracing statements.
+	(server_shmmgr::shmdt): Add a process object argument to replace
+	the removed cygpid argument.  Move body of code to the
+	segment_t::detach method.  Decrement _shm_atts when required.
+	Update tracing statements.
+	(server_shmmgr::shmget): Use the new segment_t::is_deleted method.
+	(server_shmmgr::server_shmmgr): Initialise the new _shm_atts
+	field.
+	(server_shmmgr::delete_segment): Remove the CloseHandle code, as
+	this is now done in the segment_t destructor.
+	(client_request_shm::serve): Look up the client's process object
+	and pass to the server_shmmgr::shmat and server_shmmgr::shmdt
+	methods rather than passing the cache, winpid and cygpid.
+	* cygserver_process.h: Add a cygpid to the process object to make
+	it more useful and then pass process objects rather than winpids
+	where possible.
+	(cleanup_routine::cleanup): Change argument to be a pointer to a
+	process object.
+	(class process): Re-order fields for no discernible reason.
+	(process::_cygpid): New field.
+	(process::process): Add a cygpid argument.
+	(process::winpid): New method.
+	(process::cygpid): Ditto.
+	(process::add): Make public, as it always should have been.
+	(process_cache::process): Add a cygpid argument.
+	* cygserver_process.cc (process::process): Add a cygpid argument
+	and use it to initialise the `_cygpid' field.  Re-order
+	initialisers to match new field order.
+	(process::cleanup): Pass `this' rather than just the winpid to
+	cleanup_routine::cleanup.
+	(process_cache::process): Add a cygpid argument and pass it to the
+	process object constructor.
+	* include/sys/shm.h (shmatt_t): Make unsigned as per SUSv3.
+	(shm_info::shm_atts): New field.
+
+2002-07-11  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* cygserver_shm.cc (class server_shmmgr::segment_t): Add `_'
 	prefix to the names of all fields.
 

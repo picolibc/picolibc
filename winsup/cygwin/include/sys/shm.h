@@ -36,7 +36,7 @@ extern "C"
 
 /* Unsigned integer used for the number of current attaches.
  */
-typedef long int shmatt_t;
+typedef unsigned int shmatt_t;
 
 struct shmid_ds
 {
@@ -78,6 +78,8 @@ struct shm_info
 {
   unsigned long shm_ids;	/* Number of allocated segments. */
   unsigned long shm_tot;	/* Size in bytes of allocated segments. */
+  unsigned long shm_atts;	/* Number of attached segments, system
+				   wide. */
 };
 
 void *shmat (int shmid, const void *shmaddr, int shmflg);

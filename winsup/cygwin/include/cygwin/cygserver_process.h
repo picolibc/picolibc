@@ -45,7 +45,7 @@ public:
   virtual ~cleanup_routine ();
 
   /* MUST BE SYNCHRONOUS */
-  virtual void cleanup (DWORD winpid) = 0;
+  virtual void cleanup (const class process *) = 0;
 
 private:
   cleanup_routine *_next;
@@ -59,26 +59,30 @@ class process
   friend process_cleanup;
 
 public:
-  process (DWORD winpid);
+  process (pid_t cygpid, DWORD winpid);
   ~process ();
 
+  pid_t cygpid () const { return _cygpid; }
+  DWORD winpid () const { return _winpid; }
   HANDLE handle () const { return _hProcess; }
 
   void hold () { EnterCriticalSection (&_access); }
   void release () { LeaveCriticalSection (&_access); }
 
+  bool add (cleanup_routine *);
+
 private:
+  const pid_t _cygpid;
   const DWORD _winpid;
-  class process *_next;
-  long _cleaning_up;
-  cleanup_routine *_routines_head;
-  DWORD _exit_status;		// Set in the constructor and in exit_code ().
   HANDLE _hProcess;
+  long _cleaning_up;
+  DWORD _exit_status;		// Set in the constructor and in exit_code ().
+  cleanup_routine *_routines_head;
   /* used to prevent races-on-delete */
   CRITICAL_SECTION _access;
+  class process *_next;
   
   DWORD exit_code ();
-  bool add (cleanup_routine *);
   void cleanup ();
 };
 
@@ -112,7 +116,7 @@ public:
   process_cache (unsigned int initial_workers);
   ~process_cache ();
 
-  class process *process (DWORD winpid);
+  class process *process (pid_t cygpid, DWORD winpid);
 
   bool running () const { return _queue.running (); }
 
