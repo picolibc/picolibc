@@ -15,91 +15,20 @@
 #include <unistd.h>
 #include <ntdef.h>
 
+#include "autoload.h"
 #include "cygheap.h"
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "path.h"
 
-static int inited = FALSE;
-NTSTATUS (__stdcall *NtMapViewOfSection)(HANDLE,HANDLE,PVOID*,ULONG,ULONG,
-                                         PLARGE_INTEGER,PULONG,SECTION_INHERIT,
-                                         ULONG,ULONG);
-NTSTATUS (__stdcall *NtOpenSection)(PHANDLE,ACCESS_MASK,POBJECT_ATTRIBUTES);
-NTSTATUS (__stdcall *NtUnmapViewOfSection)(HANDLE,PVOID);
-VOID (__stdcall *RtlInitUnicodeString)(PUNICODE_STRING,PCWSTR);
-ULONG (__stdcall *RtlNtStatusToDosError) (NTSTATUS);
-
-int
-load_ntdll_funcs ()
-{
-  int ret = 0;
-
-  if (os_being_run != winNT)
-    {
-      set_errno (ENOENT);
-      debug_printf ("/dev/mem is accessible under NT/W2K only");
-      return 0;
-    }
-
-  HMODULE ntdll = GetModuleHandle ("ntdll.dll");
-
-  if (inited)
-    {
-      debug_printf ("function pointers already inited");
-      return 1;
-    }
-
-  if (!ntdll)
-    {
-      __seterrno ();
-      goto out;
-    }
-
-  if (!(NtMapViewOfSection = (NTSTATUS (__stdcall *)(HANDLE,HANDLE,PVOID*,ULONG,
-                                                     ULONG,PLARGE_INTEGER,
-                                                     PULONG,SECTION_INHERIT,
-                                                     ULONG,ULONG))
-                             GetProcAddress (ntdll, "NtMapViewOfSection")))
-    {
-      __seterrno ();
-      goto out;
-    }
-
-  if (!(NtOpenSection = (NTSTATUS (__stdcall *)(PHANDLE,ACCESS_MASK,
-                                                POBJECT_ATTRIBUTES))
-                        GetProcAddress (ntdll, "NtOpenSection")))
-    {
-      __seterrno ();
-      goto out;
-    }
-
-  if (!(NtUnmapViewOfSection = (NTSTATUS (__stdcall *)(HANDLE,PVOID))
-                               GetProcAddress (ntdll, "NtUnmapViewOfSection")))
-    {
-      __seterrno ();
-      goto out;
-    }
-
-  if (!(RtlInitUnicodeString = (VOID (__stdcall *)(PUNICODE_STRING,PCWSTR))
-                               GetProcAddress (ntdll, "RtlInitUnicodeString")))
-    {
-      __seterrno ();
-      goto out;
-    }
-
-  if (!(RtlNtStatusToDosError = (ULONG (__stdcall *)(NTSTATUS))
-                               GetProcAddress (ntdll, "RtlNtStatusToDosError")))
-    {
-      __seterrno ();
-      goto out;
-    }
-
-  inited = TRUE;
-  ret = 1;
-
-out:
-  debug_printf ("%d = load_ntdll_funcs()", ret);
-  return ret;
+extern "C" {
+NTSTATUS NTAPI NtMapViewOfSection(HANDLE,HANDLE,PVOID*,ULONG,ULONG,
+                                      PLARGE_INTEGER,PULONG,SECTION_INHERIT,
+                                      ULONG,ULONG);
+NTSTATUS NTAPI NtOpenSection(PHANDLE,ACCESS_MASK,POBJECT_ATTRIBUTES);
+NTSTATUS NTAPI NtUnmapViewOfSection(HANDLE,PVOID);
+VOID NTAPI RtlInitUnicodeString(PUNICODE_STRING,PCWSTR);
+ULONG NTAPI RtlNtStatusToDosError(NTSTATUS);
 }
 
 /**********************************************************************/
@@ -118,8 +47,12 @@ fhandler_dev_mem::~fhandler_dev_mem (void)
 int
 fhandler_dev_mem::open (const char *, int flags, mode_t)
 {
-  if (!load_ntdll_funcs ())
-    return 0;
+  if (os_being_run != winNT)
+    {
+      set_errno (ENOENT);
+      debug_printf ("/dev/mem is accessible under NT/W2K only");
+      return 0;
+    }
 
   UNICODE_STRING memstr;
   RtlInitUnicodeString (&memstr, L"\\device\\physicalmemory");
@@ -259,4 +192,42 @@ void
 fhandler_dev_mem::dump ()
 {
   paranoid_printf("here, fhandler_dev_mem");
+}
+
+extern "C" {
+
+LoadDLLinitfunc (ntdll)
+{
+  HANDLE h;
+  static NO_COPY LONG here = -1L;
+
+  while (InterlockedIncrement (&here))
+    {
+      InterlockedDecrement (&here);
+small_printf ("Multiple tries to read ntdll.dll\n");
+      Sleep (0);
+    }
+
+  if (ntdll_handle)
+    /* nothing to do */;
+  else if ((h = LoadLibrary ("ntdll.dll")) != NULL)
+    ntdll_handle = h;
+  else if (!ntdll_handle)
+    api_fatal ("could not load ntdll.dll, %E");
+
+  InterlockedDecrement (&here);
+  return 0;
+}
+
+static void dummy_autoload (void) __attribute__ ((unused));
+static void
+dummy_autoload (void)
+{
+LoadDLLinit (ntdll)
+LoadDLLfuncEx (NtMapViewOfSection, 40, ntdll, 1)
+LoadDLLfuncEx (NtOpenSection, 12, ntdll, 1)
+LoadDLLfuncEx (NtUnmapViewOfSection, 8, ntdll, 1)
+LoadDLLfuncEx (RtlInitUnicodeString, 8, ntdll, 1)
+LoadDLLfuncEx (RtlNtStatusToDosError, 4, ntdll, 1)
+}
 }
