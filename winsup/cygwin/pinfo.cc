@@ -193,8 +193,25 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
 	}
 
       procinfo = (_pinfo *) MapViewOfFileEx (h, access, 0, 0, 0, mapaddr);
-      if (!procinfo)
-	api_fatal ("MapViewOfFileEx(%p) failed, %E", h);
+      if (procinfo)
+	/* it worked */;
+      else if (exit_state)
+	return;		/* exiting */
+      else
+	{
+	  if (GetLastError () == ERROR_INVALID_HANDLE)
+	    api_fatal ("MapViewOfFileEx(%p, in_h %p) failed, %E", h, in_h);
+	  else
+	    {
+	      debug_printf ("MapViewOfFileEx(%p, in_h %p) failed, %E", h, in_h);
+	      CloseHandle (h);
+	    }
+	  if (i < 9)
+	    continue;
+	  else
+	    return;
+	}
+
       ProtectHandle1 (h, pinfo_shared_handle);
 
       if ((procinfo->process_state & PID_INITIALIZING) && (flag & PID_NOREDIR)

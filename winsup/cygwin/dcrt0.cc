@@ -665,7 +665,7 @@ dll_crt0_0 ()
 	{
 	  case _PROC_FORK:
 	    alloc_stack (fork_info);
-	    cygheap_fixup_in_child (0);
+	    cygheap_fixup_in_child (false);
 	    memory_init ();
 	    set_myself (mypid);
 	    close_ppid_handle = !!child_proc_info->pppid_handle;
@@ -679,11 +679,11 @@ dll_crt0_0 ()
 	    hexec_proc = spawn_info->hexec_proc;
 	  around:
 	    HANDLE h;
-	    cygheap_fixup_in_child (1);
+	    cygheap_fixup_in_child (true);
 	    memory_init ();
 	    if (!spawn_info->moreinfo->myself_pinfo ||
 		!DuplicateHandle (hMainProc, spawn_info->moreinfo->myself_pinfo,
-				  hMainProc, &h, 0, 0,
+				  hMainProc, &h, 0, FALSE,
 				  DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
 	      h = NULL;
 	    set_myself (mypid, h);

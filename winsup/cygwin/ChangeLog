@@ -1,3 +1,11 @@
+2004-07-24  Christopher Faylor  <cgf@timesys.com>
+
+	* dcrt0.cc (dll_crt0_0): Use proper boolean arguments.
+	* pinfo.cc (pinfo::init): Don't consider MapViewOfFileEx error to be
+	fatal if exiting.
+	* pinfo.h (pinfo::init): Eliminate default argument and supply the
+	argument in the one case that needed it.
+
 2004-07-24  Corinna Vinschen  <corinna@vinschen.de>
 	    Christopher Faylor  <cgf@timesys.com>
 
