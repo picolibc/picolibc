@@ -71,7 +71,8 @@ case "$with_cross_host" in
   ""|*cygwin*)
     test -d $srcdir/bz2lib && SUBDIRS="$SUBDIRS bz2lib"
     test -d $srcdir/cinstall && SUBDIRS="$SUBDIRS cinstall"
-    SUBDIRS="$SUBDIRS utils doc testsuite subauth"
+    test -d $srcdir/cinstall && SUBDIRS="$SUBDIRS subauth"
+    SUBDIRS="$SUBDIRS utils doc testsuite"
     ;;
 esac
 

@@ -1,3 +1,8 @@
+Fri May  4 11:24:53 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* configure.in: Make subauth configuration optional.
+	* configure: Regenerate.
+
 Fri May  4 15:06:00  Corinna Vinschen <corinna@vinschen.de>
 
 	* subauth: New subdirectory.
