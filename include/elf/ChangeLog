@@ -1,3 +1,7 @@
+2004-10-06  Eric Christopher  <echristo@redhat.com>
+
+	* dwarf2.h: Sync with gcc dwarf2.h. Fix typo.
+
 2004-10-01  Paul Brook  <paul@codesourcery.com>
 
 	* arm.h (SHT_ARM_EXIDX): Define.
