@@ -319,8 +319,7 @@ fhandler_process::fill_filebuf ()
 	  strcpy (filebuf, "<defunct>");
 	else
 	  {
-	    charplus x (p->progname);
-	    mount_table->conv_to_posix_path (x, filebuf, 1);
+	    mount_table->conv_to_posix_path (p->progname, filebuf, 1);
 	    int len = strlen (filebuf);
 	    if (len > 4)
 	      {

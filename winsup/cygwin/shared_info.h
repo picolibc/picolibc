@@ -11,17 +11,6 @@ details. */
 #include "tty.h"
 #include "security.h"
 
-struct charplus
-{
-  char buf[CYG_MAX_PATH];
-  char tailch;
-  char *tail;
-  operator char * () { return buf; }
-  operator const char * () const { return buf; }
-  charplus (const char *s) : tailch (0), tail (0) {strcpy (buf, s);}
-  charplus () : tailch (0), tail (0) {*buf = '\0';}
-};
-
 /* Mount table entry */
 
 class mount_item
@@ -44,7 +33,7 @@ class mount_item
 
   struct mntent *getmntent ();
   int fnmunge (char *, const char *, int&);
-  int build_win32 (char *, const charplus&, unsigned *, unsigned);
+  int build_win32 (char *, const char *, unsigned *, unsigned);
 };
 
 /* Warning: Decreasing this value will cause cygwin.dll to ignore existing
@@ -91,9 +80,9 @@ class mount_info
   int del_reg_mount (const char * posix_path, unsigned mountflags);
 
   unsigned set_flags_from_win32_path (const char *path);
-  int conv_to_win32_path (const charplus& src_path, char *dst, device&,
+  int conv_to_win32_path (const char *src_path, char *dst, device&,
 			  unsigned *flags = NULL);
-  int conv_to_posix_path (const charplus& src_path, char *posix_path,
+  int conv_to_posix_path (const char *src_path, char *posix_path,
 			  int keep_rel_p);
   struct mntent *getmntent (int x);
 
