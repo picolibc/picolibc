@@ -1419,8 +1419,8 @@ EOF
 		    -e "s:^DEFAULT_M4[  ]*=.*$:DEFAULT_M4 = ${DEFAULT_M4}:" \
                     ${subdir}/Makefile.tem >> ${Makefile}
   
-	    mv -f ${Makefile}.tem ${Makefile}
 	    sed -e "s:^GDB_TK[	 ]*=.*$:GDB_TK = ${GDB_TK}:" ${Makefile} >${Makefile}.tem
+	    mv -f ${Makefile}.tem ${Makefile}
 
 	    # If this is a Canadian Cross, preset the values of many more
 	    # tools.
