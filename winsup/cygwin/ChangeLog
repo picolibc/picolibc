@@ -1,3 +1,10 @@
+2001-02-28  Egor Duda  <deo@logos-m.ru>
+
+	* fhandler_floppy.cc (fhandler_dev_floppy::lseek): Determine
+	drive geometry or partition size to allow seeking from the end of
+	raw floppy device. Don't allow positioning past the end of media or
+	to offsets bigger then max off_t.
+
 2001-02-27  Egor Duda  <deo@logos-m.ru>
 
 	* fhandler.h (class fhandler_console): Make all variables that

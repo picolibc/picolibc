@@ -16,6 +16,7 @@ details. */
 #include <unistd.h>
 #include "fhandler.h"
 #include "cygerrno.h"
+#include <winioctl.h>
 
 /**********************************************************************/
 /* fhandler_dev_floppy */
@@ -80,78 +81,114 @@ off_t
 fhandler_dev_floppy::lseek (off_t offset, int whence)
 {
   int ret;
-  DWORD off;
   char buf[512];
+  long long drive_size = 0;
+  long long lloffset = offset;
+  long long current_position;
+  off_t sector_aligned_offset;
+  off_t bytes_left;
+  DWORD low;
+  LONG high = 0;
 
-  if (whence == SEEK_SET)
+  if (os_being_run == winNT)
     {
-      if (offset < 0)
+      DISK_GEOMETRY di;
+      PARTITION_INFORMATION pi;
+      DWORD bytes_read;
+
+      if ( !DeviceIoControl ( get_handle(),
+                              IOCTL_DISK_GET_DRIVE_GEOMETRY,
+                              NULL, 0,
+                              &di, sizeof (di),
+                              &bytes_read, NULL) )
         {
-	  set_errno (EINVAL);
-	  return -1;
-	}
-
-      /* Invalidate buffer. */
-      ret = writebuf ();
-      if (ret)
-	return ret;
-      devbufstart = devbufend = 0;
-
-      off = (offset / 512) * 512;
-
-      if (SetFilePointer (get_handle (), off, NULL, FILE_BEGIN)
-          == INVALID_SET_FILE_POINTER)
+          __seterrno ();
+          return -1;
+        }
+      debug_printf ( "disk geometry: (%ld cyl)*(%ld trk)*(%ld sec)*(%ld bps)",
+                     di.Cylinders.LowPart,
+                     di.TracksPerCylinder,
+                     di.SectorsPerTrack,
+                     di.BytesPerSector );
+      if ( DeviceIoControl ( get_handle (),
+                             IOCTL_DISK_GET_PARTITION_INFO,
+                             NULL, 0,
+                             &pi, sizeof (pi),
+                             &bytes_read, NULL ))
         {
-	  __seterrno ();
-	  return -1;
-	}
-      return raw_read (buf, offset - off);
+          debug_printf ( "partition info: %ld (%ld)",
+                          pi.StartingOffset.LowPart,
+                          pi.PartitionLength.LowPart);
+          drive_size = (long long) pi.PartitionLength.QuadPart;
+        }
+      else
+        {
+          drive_size = (long long) di.Cylinders.QuadPart * di.TracksPerCylinder *
+                       di.SectorsPerTrack * di.BytesPerSector;
+        }
+      debug_printf ( "drive size: %ld", drive_size );
     }
-  else if (whence == SEEK_CUR)
-    {
-      DWORD low;
-      LONG high = 0;
 
+  if (whence == SEEK_END && drive_size > 0)
+    {
+      lloffset = offset + drive_size;
+      whence = SEEK_SET; 
+    }
+
+  if (whence == SEEK_CUR)
+    {
       low = SetFilePointer (get_handle (), 0, &high, FILE_CURRENT);
       if (low == INVALID_SET_FILE_POINTER && GetLastError ())
 	{
 	  __seterrno ();
 	  return -1;
 	}
-      long long cur = (long long) high << 32 + low;
+      current_position = (long long) low + ((long long) high << 32);
       if (is_writing)
-	cur += devbufend - devbufstart;
+	current_position += devbufend - devbufstart;
       else
-	cur -= devbufend - devbufstart;
-      
+	current_position -= devbufend - devbufstart;
+
+      lloffset += current_position;
+      whence = SEEK_SET;
+    }
+
+  if (lloffset < 0 ||
+      drive_size > 0 && lloffset > drive_size)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+  high = lloffset >> 32;
+  low = lloffset & 0xffffffff;
+  if ( high || (off_t) low < 0 )
+    {
+      set_errno (EFBIG);
+      return -1;
+    }
+  offset = (off_t) low;
+
+  /* FIXME: sector can possibly be not 512 bytes long */
+  sector_aligned_offset = (offset / 512) * 512;
+  bytes_left = offset - sector_aligned_offset;
+
+  if (whence == SEEK_SET)
+    {
       /* Invalidate buffer. */
       ret = writebuf ();
       if (ret)
 	return ret;
       devbufstart = devbufend = 0;
 
-      cur += offset;
-      if (cur < 0)
-	{
-	  set_errno (EINVAL);
-	  return -1;
-	}
-
-      long long set = (cur / 512) * 512;
-      high = set >> 32;
-      low = set & 0xffffffff;
-
-      off = cur - set;
-
-      low = SetFilePointer (get_handle (), low, &high, FILE_BEGIN);
-      if (low == INVALID_SET_FILE_POINTER && GetLastError ())
-	{
+      if (SetFilePointer (get_handle (), sector_aligned_offset, NULL, FILE_BEGIN)
+          == INVALID_SET_FILE_POINTER)
+        {
 	  __seterrno ();
 	  return -1;
 	}
-      return raw_read (buf, off);
+      return sector_aligned_offset + raw_read (buf, bytes_left);
     }
-  /* SEEK_END is not supported on raw disk devices. */
+
   set_errno (EINVAL);
   return -1;
 }
