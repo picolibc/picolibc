@@ -1,3 +1,8 @@
+Mon Nov 20 18:58:12 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Use a different variable name for subdirectory since the
+	previous one was used by the top level make.
+
 Sun Nov 19 20:50:51 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Install mingw stuff in a subdirectory if building under

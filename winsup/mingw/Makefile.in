@@ -54,7 +54,7 @@ CXXFLAGS = @CXXFLAGS@
 # compiling with Cygwin?
 MNO_CYGWIN = @MNO_CYGWIN@
 ifdef MNO_CYGWIN
-libsubdir=/mingw
+subdirforlib=/mingw
 else
 libdir=
 endif
@@ -207,14 +207,14 @@ install-info: info
 
 install-dirs:
 	$(mkinstalldirs) $(bindir)
-	$(mkinstalldirs) $(tooldir)/lib$(libsubdir)
+	$(mkinstalldirs) $(tooldir)/lib$(subdirforlib)
 
 install: all install-dirs $(install_dlls_host)
 	for i in $(LIBS); do \
-		$(INSTALL_DATA) $$i $(tooldir)/lib$(libsubdir)/$$i ; \
+		$(INSTALL_DATA) $$i $(tooldir)/lib$(subdirforlib)/$$i ; \
 	done
 	for i in $(CRT0S); do \
-		$(INSTALL_DATA) $$i $(tooldir)/lib/$(libsubdir)/$$i ; \
+		$(INSTALL_DATA) $$i $(tooldir)/lib/$(subdirforlib)/$$i ; \
 	done
 	for sub in . sys ; do \
 		dstdir=$(tooldir)/include/$(HEADER_SUBDIR)/$$sub ; \
