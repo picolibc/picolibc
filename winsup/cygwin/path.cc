@@ -2991,25 +2991,44 @@ getwd (char *buf)
 /* chdir: POSIX 5.2.1.1 */
 extern "C"
 int
-chdir (const char *dir)
+chdir (const char *in_dir)
 {
-  MALLOC_CHECK;
-  path_conv path (dir, PC_FULL | PC_SYM_FOLLOW);
-  if (path.error)
+  int dir_error = check_null_empty_path (in_dir);
+  if (dir_error)
     {
-      set_errno (path.error);
-      syscall_printf ("-1 = chdir (%s)", dir);
+      syscall_printf ("NULL or invalid input to chdir");
+      set_errno (dir_error);
       return -1;
     }
-  syscall_printf ("dir %s", dir);
+
+  syscall_printf ("dir '%s'", in_dir);
 
   char *s;
+  char dir[strlen (in_dir) + 1];
+  strcpy (dir, in_dir);
   /* Incredibly. Windows allows you to specify a path with trailing
      whitespace to SetCurrentDirectory.  This doesn't work too well
      with other parts of the API, though, apparently.  So nuke trailing
      white space. */
   for (s = strchr (dir, '\0'); --s >= dir && isspace ((unsigned int) (*s & 0xff)); )
     *s = '\0';
+
+  if (!*s)
+    {
+      set_errno (ENOENT);
+      return -1;
+    }
+
+  /* Convert path.  Third argument ensures that we don't check for NULL/empty/invalid
+     again. */
+  path_conv path (dir, PC_FULL | PC_SYM_FOLLOW, NULL);
+  if (path.error)
+    {
+      set_errno (path.error);
+      syscall_printf ("-1 = chdir (%s)", dir);
+      return -1;
+    }
+
 
   /* Look for trailing path component consisting entirely of dots.  This
      is needed only in case of chdir since Windows simply ignores count

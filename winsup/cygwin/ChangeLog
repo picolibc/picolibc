@@ -1,3 +1,9 @@
+Sun Jun 10 20:19:47 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (chdir): Pre-check path for validity before eating trailing
+	space.  Then, ensure that path_conv doesn't check the path for validity
+	again.
+
 Sun Jun 10 12:56:00 2001  Christopher Faylor <cgf@redhat.com>
 
 	* exceptions.cc (sigdelayed): Ensure that signal is cleared as
