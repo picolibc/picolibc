@@ -94,12 +94,10 @@ cygthread::simplestub (VOID *arg)
   ExitThread (0);
 }
 
-static NO_COPY muto *cygthread_protect;
 /* Start things going.  Called from dll_crt0_1. */
 void
 cygthread::init ()
 {
-  new_muto (cygthread_protect);
   main_thread_id = GetCurrentThreadId ();
 }
 
@@ -129,30 +127,27 @@ cygthread::freerange ()
 void * cygthread::operator
 new (size_t)
 {
-  DWORD id;
+  LONG is_avail;
   cygthread *info;
-
-  cygthread_protect->acquire ();
 
   /* Search the threads array for an empty slot to use */
   for (info = threads; info < threads + NTHREADS; info++)
-    if ((LONG) (id = (DWORD) InterlockedExchange ((LPLONG) &info->avail, -1)) < 0)
-      /* being considered */;
-    else if (id > 0)
+    if ((is_avail = InterlockedExchange (&info->avail, -1)) < 0)
+      /* in use */;
+    else if (is_avail > 0)
       {
+	/* available */
 #ifdef DEBUGGING
 	if (info->__name)
-	  api_fatal ("name not NULL? id %p, i %d", id, info - threads);
+	  api_fatal ("name not NULL? id %p, i %d", info->id, info - threads);
 	if (!info->h)
-	  api_fatal ("h not set? id %p, i %d", id, info - threads);
+	  api_fatal ("h not set? id %p, i %d", info->id, info - threads);
 #endif
 	goto out;
       }
-    else if (info->id)
-      InterlockedExchange ((LPLONG) &info->avail, 0);	/* Not available yet */
     else
       {
-	/* Available as soon as thread is created */
+	/* Uninitialized.  Available as soon as thread is created */
 	info->h = CreateThread (&sec_none_nih, 0, cygthread::stub, info,
 				CREATE_SUSPENDED, &info->id);
 	goto out;
@@ -160,15 +155,13 @@ new (size_t)
 
 #ifdef DEBUGGING
   char buf[1024];
-  if (!GetEnvironmentVariable ("CYGWIN_NOFREERANGE_NOCHECK", buf, sizeof (buf)))
+  if (!GetEnvironmentVariable ("CYGWIN_FREERANGE_NOCHECK", buf, sizeof (buf)))
     api_fatal ("Overflowed cygwin thread pool");
 #endif
 
   info = freerange ();	/* exhausted thread pool */
 
 out:
-  InterlockedExchange ((LPLONG) &info->avail, 0);
-  cygthread_protect->release ();
   return info;
 }
 
@@ -270,21 +263,21 @@ cygthread::terminate_thread ()
   thread_sync = ev = h = NULL;
   __name = NULL;
   id = 0;
+  (void) InterlockedExchange (&avail, 0); /* No longer initialized */
 }
 
 /* Detach the cygthread from the current thread.  Note that the
    theory is that cygthreads are only associated with one thread.
-   So, there should be no problems with multiple threads doing waits
-   on the one cygthread. */
+   So, there should be never be multiple threads doing waits
+   on the same cygthread. */
 bool
 cygthread::detach (HANDLE sigwait)
 {
   bool signalled = false;
-  if (avail)
-    system_printf ("called detach on available thread %d?", avail);
+  if (avail >= 0)
+    system_printf ("called detach but avail %d, thread %d?", avail, id);
   else
     {
-      DWORD avail = id;
       DWORD res;
 
       if (!sigwait)
@@ -304,18 +297,17 @@ cygthread::detach (HANDLE sigwait)
 	    res = WaitForSingleObject (*this, INFINITE);
 	  else
 	    {
+	      signalled = true;
 	      terminate_thread ();
 	      set_sig_errno (EINTR);	/* caller should be dealing with return
 					   values. */
-	      avail = 0;
-	      signalled = true;
 	    }
 	}
 
       thread_printf ("%s returns %d, id %p", sigwait ? "WFMO" : "WFSO",
 		     res, id);
 
-      if (!avail)
+      if (signalled)
 	/* already handled */;
       else if (is_freerange)
 	{
@@ -325,8 +317,8 @@ cygthread::detach (HANDLE sigwait)
       else
 	{
 	  ResetEvent (*this);
-	  /* Mark the thread as available by setting avail to non-zero */
-	  (void) InterlockedExchange ((LPLONG) &this->avail, avail);
+	  /* Mark the thread as available by setting avail to positive value */
+	  (void) InterlockedExchange (&avail, 1);
 	}
     }
   return signalled;
