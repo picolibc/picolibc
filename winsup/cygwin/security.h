@@ -204,6 +204,8 @@ extern SECURITY_ATTRIBUTES *__stdcall __sec_user (PVOID sa_buf, PSID sid2, BOOL 
 
 int __stdcall NTReadEA (const char *file, const char *attrname, char *buf, int len);
 BOOL __stdcall NTWriteEA (const char *file, const char *attrname, const char *buf, int len);
+PSECURITY_DESCRIPTOR alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
+          PSECURITY_DESCRIPTOR sd_ret, DWORD *sd_size_ret);
 
 extern inline SECURITY_ATTRIBUTES *
 sec_user_nih (char sa_buf[], PSID sid = NULL)

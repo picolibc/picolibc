@@ -840,6 +840,8 @@ class fhandler_tty_slave: public fhandler_tty_common
   __off64_t lseek (__off64_t, int) { return 0; }
   select_record *select_read (select_record *s);
   int ready_for_read (int fd, DWORD howlong);
+
+  int cygserver_attach_tty (HANDLE*, HANDLE*);
 };
 
 class fhandler_pty_master: public fhandler_tty_common

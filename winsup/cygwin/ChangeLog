@@ -1,5 +1,296 @@
 2002-02-28  Robert Collins  <rbtcollins@hotmail.com>
 
+	* Merged cygwin_daemon into head minus the new shm and ipc exports.
+
+2002-02-28  Robert Collins  <rbtcollins@hotmail.com>
+
+	* fhandler_tty.cc (fhandler_tty_slave::open): More debugging.
+	(fhandler_tty_slave::read): Fix printf type for the handle.
+	* tty.cc (tty::common_init): Add a FIXME for security.
+
+2002-01-29  Robert Collins  <rbtcollins@hotmail.com>
+
+	* Makefile.in (OBJS): Remove duplicate localtime.o.
+
+2002-01-17  Robert Collins  <rbtcollins@hotmail.com>
+
+	* cygserver.cc (check_and_dup_handle): Consolidate the two variants for 
+	simplicity.
+	Add Some basic debug output.
+	(client_request_attach_tty::serve): Use the new debug_printf for clarity.
+	Mark the duplicated handles as inheritable - fixup_after_fork() doesn't reopen
+	tty's.
+
+2002-01-16  Robert Collins  <rbtcollins@hotmail.com>
+
+	* cygserver.cc (transport): Correct scope.
+	(client_request_attach_tty::serve): Add more debug information.
+	Fix erroneous use of transport instead of conn.
+	* cygserver_transport_pipes.cc (transport_layer_pipes::close): More debug.
+	(transport_layer_pipes::read): Ditto.
+	(transport_layer_pipes::write): Ditto.
+	(transport_layer_pipes::impersonate_client): Ditto.
+
+Mon Oct  8  7:41:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* cygserver.cc (server_request::process): Rename client_request_shm_get to
+	client_request_shm.
+	* cygserver_process.cc (process_cache::add): Rename to add_task.
+	Use process_cleanup instead of process_request.
+	(process_cache::remove_process): New method.
+	(process::process): Initialize new members.
+	(process::~process): New member.
+	(process::cleanup): New method.
+	(process::add_cleanup_routine): New method.
+	(process_request::process): Rename to process_cleanup.
+	Call the process object's cleanup method and then delete it.
+	(process_process_param::request_loop): Remove the signalling process.
+	* cygserver_shm.cc: Globally rename client_request_shm_get to client_request_shm.
+	(client_request_shm_get::serve): Handle attach request counting.
+	* cygserver_shm.h: Globally rename client_request_shm_get to client_request_shm.
+	(class shm_cleanup): New class.
+	* shm.cc: Globally rename client_request_shm_get to client_request_shm.
+	(client_request_shm::client_request_shm): New constructor for attach requests.
+	(shmat): Use it.
+	* include/cygwin/cygserver_process.h (class process_request): Rename to 
+	process_cleanup.
+	(class cleanup_routine): New class.
+	(class process): New members and methods to allow calling back when the process
+	terminates.
+
+Thu Oct  4 14:12:00 2001  Robert Collins <rbtcollins@hotmail.com>
+	* cygserver.cc (request_loop): Make static.
+	(main): Use new cache constructor syntax.
+	Start cache worker threads.
+	Cleanup the cache at shutdown.
+	* cygserver_process.cc: Run indent.
+	(process_cache::process_cache): Add a trigger to use when adding a process.
+	(process_cache::process): Move process_entry to process.
+	Insert at the end of the list.
+	Trigger the request loop when new process's inserted.
+	(process_cache::process_requests): Do it.
+	(process_cache::add): New method.
+	(process_cache::handle_snapshot): New method.
+	(process::process): Merge in the process_entry fields.
+	(process::handle): Make a stub function.
+	(process::exit_code): New method.
+	(process_request::process): New method.
+	(process_process_param::request_loop): New method.
+	* cygserver_shm.cc: New header dependency - threaded_queue.h.
+	* threaded_queue.cc (threaded_queue::cleanup): Clearer messages.
+	(queue_process_param::stop): Short spinlock on interruptible threads.
+	* threaded_queue.h (class threaded_queue): New constructor.
+	* include/cygwin/cygserver_process.h (process_request): New class.
+	(process_entry): Remove.
+	(process): Merge in process_entry.
+	(process_cache): Inherit from threaded_queue.
+
+Tue Oct  2 23:24:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* cygserver.cc (class server_process_param): Use new constructor syntax.
+	* cygserver_process.cc (process_cache::~process_cache): New function.
+	* threaded_queue.cc: Define condition debug_printf.
+	Run indent.
+	(threaded_queue::cleanup): Move queue_process_param guts to a method.
+	(threaded_queue::process_requests): Ditto.
+	(queue_process_param::queue_process_param): New method.
+	(queue_process_param::~queue_process_param): Ditto.
+	(queue_process_param::start): Ditto.
+	(queue_process_param::stop): Ditto.
+	* threaded_queue.h (class queue_process_param): Add support for 
+	interruptible request loops.
+	* cygwin/include/cygwin/cygserver_process.h (class process_cache): Add
+	destructor.
+
+Tue Oct  2 23:24:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* cygserver_client.cc: New flag allow_daemon to disable the daemon completely.
+	(cygserver_request): Check it.
+	(cygserver_init): Ditto.
+	* environ.cc (parse_thing): Add (no)daemon option.
+
+Tue Oct  2 23:00:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* shm.cc: Update to handle include changes from HEAD.
+
+Tue Oct  2 16:06:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* Makefile.in: Remove cygserver_shm.o from cygwin1.dll. 
+	Rename cygserver_shm_outside.o to cygserver_shm.o.
+	* cygserver.cc (server_request::process): Use the new client_request
+	constructor.
+	* cygserver_client.cc: Remove the #ifdef's stubs for the server method
+	within cygwin.
+	(client_request_attach_tty::client_request_attach_tty): Use the new
+	client_request constructor.
+	(client_request_shutdown::client_request_shutdown): Ditto.
+	(client_request::client_request): Ditto.
+	* cygserver_shm.cc (client_request_shm_get::serve): Remove the 
+	#ifdef'd stub for in-cygwin builds.
+	(client_request_shm_get::client_request_shm_get): Use the new
+	client_request constructor, and remove the in-cygwin variants.
+	* cygserver_shm.h (class client_request_shm_get): #ifndef test the
+	serve method - it's only used in cygserver.
+	* shm.cc (client_request_shm_get::client_request_shm_get): New function.
+	* include/cygwin/cygserver.h (request_header): New constructor.
+	(class client_request): Use it. 
+	New constructor accepting the header size.
+	#ifndef test the server method - it's only used within cygserver.
+	(client_request_get_version): #ifdef test the server method.
+	(client_request_shutdown): Ditto.
+	(client_request_attach_tty): Ditto.
+
+Tue Oct  2  9:57:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* Makefile.in: add threaded_queue.o to cygserver.exe.
+	* cygserver.cc: Include threaded_queue.h
+	(class server_request): Inherit from queue_request.
+	(class server_process_param): Inherit from queue_process_param.
+	(class server_request_queue): Inherit from threaded_queue.
+	(request_loop): Adjust for new types.
+	(server_request_queue::process_requests): Remove guts to 
+	threaded_queue::process_requests.
+	(server_request::server_request): Adjust for new types.
+	(worker_function): Delete.
+	(server_request_queue::create_workers): Delete.
+	(server_request_queue::cleanup): Delete.
+	(server_request_queue::add): Move guts to threaded_queue::add.
+	* threaded_queue.cc: New file.
+	* threaded_queue.h: New file.
+
+Mon Oct  1 12:38:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* cygserver.cc (client_request::serve): New function.
+	* cygserver_process.cc: Inlude <pthread.h> for pthread_once.
+	(process_cache::process_cache): Initialise a crtiical section for write access.
+	(process_cache::process): Use the critical section. Also add missing entries to 
+	the cache.
+	(do_process_init): New function to initalise class process static variables.
+	(process::process): Ensure that the process access critical section is 
+	initialised.
+	(process::handle): Close the handle of old process's when they have terminated
+	and we are returning the handle for a process with the same pid.
+	* cygserver_shm.cc: Run indent.
+	Include cygserver_process.h to allow process cache functionality.
+	(client_request_shm_get::serve): New parameter for process cache support.
+	Use the process cache, not OpenProcess to get a handle to the originating process.
+	Fix a handle leak with token_handle.
+	* cygserver_shm.h (class client_request_shm_get): Update ::serve for process 
+	cache support.
+	* cygserver_transport_pipes.cc: Redefine debug_printf to be conditional on DEBUG.
+	* include/cygwin/cygserver.h: Do not implement client_request::serve in the 
+	header.
+	* include/cygwin/cygserver_process.h (class process_cache): Add a write access 
+	critical section to prevent races when requests from a  multithreaded 
+	application arrive.
+
+Sun Sep 30 23:41:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* Makefile.in: Add cygserver_process.o to cygserver.exe.
+	* cygserver.cc: Include signal.h and cygwin_version.h.
+	Define debug_printf as a macro.
+	Define DEBUG to a value.
+	(client_request_attach_tty::serve): Add beginning of process cache support.
+	Change from #ifdef DEBUG to work with new DEBUG style.
+	(client_request_get_version::serve): Add beginning of process cache support.
+	(class server_request): New prototype for support of process cache.
+	(class queue_process_param): New class to allow request loop threading.
+	(class server_request_queue): Add beginning of process cache support.
+	Allow request loop threading.
+	(request_loop): Thread function for request loops.
+	(server_request_queue::process_requests): Initiator for threaded request loops.
+	(client_request_shutdown::serve): Add beginning of process cache support.
+	(server_request::server_request): Ditto.
+	(server_request::process): Use debug_printf. Add beginning of process cache 
+	support.
+	(server_request_queue::cleanup): Kill off any request loop threads.
+	(server_request_queue::add): Add beginning of process cache support.
+	(handle_signal): Trigger a shutdown.
+	(main): Print out some useful info at startup - version, date time.
+	Add process cache support.
+	Spawn a separate thread for the transport request loop, thus allowing concurrent
+	support for multiple transports.
+	* cygserver_client.cc (client_request_get_version::serve): Add process cache 
+	support.
+	(client_request_attach_tty::serve): Add process cache support.
+	(client_request_shutdown::serve): Add process cache support.
+	* cygsserver_process.cc: New file with the process cache support.
+	* cygserver_shm.cc: Redefine debug_printf to allow conditional output.
+	* cygwin.din: Export shmdt().
+	* shm.cc: Run indent.
+	Update FIXME's.
+	(shmdt): New function.
+	* include/cygwin/cygserver.h (class client_request): Add process cache support.
+	(class client_request_get_version): Ditto.
+	(class client_request_shutdown): Ditto.
+	(class client_request_attach_tty): Ditto.
+	* include/cygwin/cygserver_process.h: New header for process cache support.
+
+Sun Sep 30  8:52:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* include/cygwin/cygserver_transport.h: Add copyright header.
+	* include/cygwin/cygserver_transport_pipes.h: Ditto.
+	* include/cygwin/cygserver_transport_sockets.h: Ditto.
+
+Sat Sep 29 20:40:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* Makefile.in: Add cygserver_transport_sockets.o to DLL_OFILES.
+	Add cygserver_transport_sockets_outside.o to cygserver.exe.
+	* cygserver.cc: Include new include files.
+	* cygserver_client.cc: Ditto.
+	* cygserver_shm.h: No need to include <sys/socket.h> now.
+	* cygerver_transport.cc: Include new include files.
+	(transport_layer_base::transport_layer_base): Strip back to a stub.
+	(transport_layer_base::listen): Ditto.
+	(transport_layer_base::accept): Ditto.
+	(transport_layer_base::close): Ditto.
+	(transport_layer_base::read): Ditto.
+	(transport_layer_base::write): Ditto.
+	(transport_layer_base::connect): Ditto.
+	* cygserver_transport_pipes.cc: Include new header 
+	"cygwin/cygserver_transport_pipes.h".
+	* cygserver_transport_sockets.cc: New file.
+	* dcrt0.cc: No need to include <sys/socket.h> now.
+	* fhandler_tty.cc: Ditto.
+	* tty.cc: Ditto.
+	* include/cygwin/cygserver_transport.h: Strip the base class to a stub.
+	Remove the cygserver_transport_pipes class.
+	* include/cygwin/cygserver_transport_pipes.h: New file.
+	* include/cygwin/cygserver_transport_sockets.h: New file.
+
+Tue Sep 25 16:22:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* autoload.cc: Add dynamic load statement for 'ImpersonateNamedPipeClient'.
+	* Makefile.in: Add new object files, and build instructions for cygserver.exe.
+	* cygwin.din: Export ftok, shmat, shmctl and shmget.
+	* dcrt0.cc: Additional includes for cygserver support.
+	(dll_crt0_1): Initialise the cygserver client.
+	* fhandler.h (fhandler_tty): New method cygserver_attach_tty.
+	* fhandler_tty.cc: Additional includes for cygserver support.
+	(fhandler_tty_slave::open): Attempt to use the cygserver when obtaining
+	handles from the parent process. On failure or 9x use the current method.
+	(fhandler_tty_slave::cygserver_attach_tty): New function.
+	* fork.cc (fork_child): Fixup shm memory mapped areas.
+	* pinfo.h: Declare fixup_shms_after_fork().
+	* security.h: Declare alloc_sd().
+	* tty.cc: Additonal includes to support cygserver.
+	(tty::common_init): Don't allow others to open us if the cygserver is running.
+	* winsup.h: Declare cygserver_running.
+	* cygserver.cc: New file.
+	* cygserver_client.cc: New file.
+	* cygserver_shm.cc: New file.
+	* cygserver_shm.h: New file.
+	* cygserver_transport.cc: New file.
+	* cygserver_transport_pipes.cc: New file.
+	* ipc.cc: New file.
+	* shm.cc: New file.
+	* include/cygwin/cygserver.h: New file.
+	* include/cygwin/cygserver_transport.h: New file.
+	* include/sys/ipc.h: New file.
+	* include/sys/shm.h: New file.
+
+2002-02-28  Robert Collins  <rbtcollins@hotmail.com>
+
 	* thread.cc (semaphore::TryWait): Set errno as required by posix 1003.1.
 	(__sem_wait): Ditto.
 	(__sem_trywait): Ditto.
@@ -554,10 +845,9 @@
 
 2002-01-01  Christopher Faylor  <cgf@redhat.com>
 
-	* speclib: Remove temp files automatically.
+        * speclib: Remove temp files automatically.
 
 2002-01-01  Corinna Vinschen  <corinna@vinschen.de>
-
 	* fhandler.h (fhandler_socket::sun_path): New private member.
 	(fhandler_socket::set_sun_path): New method.
 	(fhandler_socket::get_sun_path): Ditto.
