@@ -2208,7 +2208,7 @@ typedef struct _WNDCLASSA {
 	WNDPROC lpfnWndProc;
 	int cbClsExtra;
 	int cbWndExtra;
-	HANDLE hInstance;
+	HINSTANCE hInstance;
 	HICON hIcon;
 	HCURSOR hCursor;
 	HBRUSH hbrBackground;
@@ -2220,7 +2220,7 @@ typedef struct _WNDCLASSW {
 	WNDPROC lpfnWndProc;
 	int cbClsExtra;
 	int cbWndExtra;
-	HANDLE hInstance;
+	HINSTANCE hInstance;
 	HICON hIcon;
 	HCURSOR hCursor;
 	HBRUSH hbrBackground;
@@ -2233,7 +2233,7 @@ typedef struct _WNDCLASSEXA {
 	WNDPROC lpfnWndProc;
 	int cbClsExtra;
 	int cbWndExtra;
-	HANDLE hInstance;
+	HINSTANCE hInstance;
 	HICON hIcon;
 	HCURSOR hCursor;
 	HBRUSH hbrBackground;
@@ -2247,7 +2247,7 @@ typedef struct _WNDCLASSEXW {
 	WNDPROC lpfnWndProc;
 	int cbClsExtra;
 	int cbWndExtra;
-	HANDLE hInstance;
+	HINSTANCE hInstance;
 	HICON hIcon;
 	HCURSOR hCursor;
 	HBRUSH hbrBackground;
