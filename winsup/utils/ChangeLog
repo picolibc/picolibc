@@ -1,3 +1,7 @@
+Thu Sep 20 21:00:20 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in (MINGW_INCLUDES): Still need cygwin/include directory.
+
 Wed Sep 19 12:22:08 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Filter newlib includes from mingw compilation.
