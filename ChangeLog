@@ -1,3 +1,19 @@
+2002-11-30  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	(Continuing slow-motion replay)
+	* configure: More autoconf-style substitutions.
+	* Makefile.tpl: More autoconf-style substitutions.
+	* Makefile.in: Regenerate.
+
+2002-11-30  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	(Continuing slow-motion replay)
+	* configure: Substitute more variables in a more autoconf-friendly
+	way.  Simplify slightly.
+	* Makefile.tpl: Make more variables substitutable in an
+	autoconf-friendly way.
+	* Makefile.in: Regenerate.
+
 2002-11-29  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	(Continuing slow-motion replay)

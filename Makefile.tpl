@@ -29,6 +29,32 @@ in
 NOTPARALLEL = .NOTPARALLEL
 $(NOTPARALLEL):
 
+VPATH=@srcdir@
+links=@configlinks@
+
+build_alias=@build_alias@
+build_cpu=@build_cpu@
+build_vendor=@build_vendor@
+build_os=@build_os@
+build_canonical=@build_cpu@-@build_vendor@-@build_os@
+host_alias=@host_alias@
+host_cpu=@host_cpu@
+host_vendor=@host_vendor@
+host_os=@host_os@
+host_canonical=@host_cpu@-@host_vendor@-@host_os@
+target_alias=@target_alias@
+target_cpu=@target_cpu@
+target_vendor=@target_vendor@
+target_os=@target_os@
+target_canonical=@target_cpu@-@target_vendor@-@target_os@
+
+enable_shared = @enable_shared@
+enable_threads = @enable_threads@
+enable_version_specific_runtime_libs = @enable_version_specific_runtime_libs@
+# The file containing GCC's version number.
+gcc_version_trigger = @gcc_version_trigger@
+gcc_version = @gcc_version@
+
 srcdir = @srcdir@
 
 prefix = @prefix@
@@ -1492,6 +1518,9 @@ $(srcdir)/Makefile.in: # $(srcdir)/Makefile.tpl $(srcdir)/Makefile.def
 	cd $(srcdir) && autogen Makefile.def
 
 # with the gnu make, this is done automatically.
+
+host_makefile_frag=@host_makefile_frag@
+target_makefile_frag=@target_makefile_frag@
 
 Makefile: Makefile.in configure.in $(host_makefile_frag) $(target_makefile_frag) $(gcc_version_trigger)
 	$(SHELL) ./config.status
