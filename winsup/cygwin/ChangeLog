@@ -1,3 +1,23 @@
+2002-07-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_socket::is_unconnected): Constify.
+	(fhandler_socket::is_connect_pending): Ditto.
+	(fhandler_socket::is_connected): Ditto.
+	(fhandler_socket::set_connect_state): New method.
+	(struct select_record): Add member `except_on_write'.
+	(select_record::select_record): Initialize all bool values to `false'.
+	* fhandler_socket.cc: Use set_connect_state() method throughout.
+	(fhandler_socket::connect): Set state always to connected if connection
+	isn't pending.
+	* net.cc (cygwin_getsockopt): Revert erroneous previous patch.
+	* select.cc (set_bits): Check for `except_on_write'.  Set fd in
+	write_fds if set.  Set connect state to connected if fd has been
+	returned by WINSOCK_SELECT.
+	(peek_socket): Check for `except_on_write'.
+	(start_thread_socket): Ditto.
+	(fhandler_socket::select_write): Don't set `write_ready' if connect
+	is pending.  Set `except_on_write' if connect is pending.
+
 2002-07-05  Christopher Faylor  <cgf@redhat.com>
 
 	* ntdll.h (_SYSTEM_PROCESSOR_TIMES): Force eight byte alignment.

@@ -385,9 +385,10 @@ class fhandler_socket: public fhandler_base
   void set_shutdown_read () {FHSETF (SHUTRD);}
   void set_shutdown_write () {FHSETF (SHUTWR);}
 
-  bool is_unconnected () {return had_connect_or_listen == UNCONNECTED;}
-  bool is_connect_pending () {return had_connect_or_listen == CONNECT_PENDING;}
-  bool is_connected () {return had_connect_or_listen == CONNECTED;}
+  bool is_unconnected () const {return had_connect_or_listen == UNCONNECTED;}
+  bool is_connect_pending () const {return had_connect_or_listen == CONNECT_PENDING;}
+  bool is_connected () const {return had_connect_or_listen == CONNECTED;}
+  void set_connect_state (int newstate) { had_connect_or_listen = newstate; }
 
   int bind (const struct sockaddr *name, int namelen);
   int connect (const struct sockaddr *name, int namelen);
@@ -1185,6 +1186,7 @@ struct select_record
   bool windows_handle;
   bool read_ready, write_ready, except_ready;
   bool read_selected, write_selected, except_selected;
+  bool except_on_write;
   int (*startup) (select_record *me, class select_stuff *stuff);
   int (*peek) (select_record *, bool);
   int (*verify) (select_record *me, fd_set *readfds, fd_set *writefds,
@@ -1193,9 +1195,10 @@ struct select_record
   struct select_record *next;
 
   select_record (fhandler_base *in_fh = NULL) : fd (0), h (NULL),
-		 fh (in_fh), saw_error (0), windows_handle (0),
-		 read_ready (0), write_ready (0), except_ready (0),
-		 read_selected (0), write_selected (0), except_selected (0),
+		 fh (in_fh), saw_error (false), windows_handle (false),
+		 read_ready (false), write_ready (false), except_ready (false),
+		 read_selected (false), write_selected (false),
+		 except_selected (false), except_on_write (false),
 		 startup (NULL), peek (NULL), verify (NULL), cleanup (NULL),
 		 next (NULL) {}
 };
