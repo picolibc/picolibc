@@ -180,7 +180,9 @@ cygthread::cygthread (LPTHREAD_START_ROUTINE start, LPVOID param,
       if (!h)
 	api_fatal ("thread handle not set - %p<%p>, %E", h, id);
       thread_printf ("created thread %p", h);
+#ifdef DEBUGGING
       terminated = false;
+#endif
     }
 }
 
@@ -236,7 +238,9 @@ cygthread::release (bool nuke_h)
 {
   if (nuke_h)
     h = NULL;
+#ifdef DEBUGGING
   __oldname = __name;
+#endif
   __name = NULL;
   stack_ptr = NULL;
   func = NULL;
