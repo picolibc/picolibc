@@ -1,3 +1,11 @@
+2002-07-22  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* libc/libc.texinfo: Change copyright notices to Red Hat from
+	Cygnus.
+	* libm/libm.texinfo: Likewise.
+	* README: Change docs URL to
+	http://sources.redhat.com/newlib/docs.html.
+
 2002-07-19  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/sys/linux/Makefile.am: Add pathconf.c and fpathconf.c.

@@ -28,7 +28,7 @@ END-INFO-DIR-ENTRY
 @ifinfo
 This file documents the ANSI C library.
 
-Copyright (C) 1992, 1993 Cygnus Support
+Copyright (C) 1992, 1993, 1994-2002 Red Hat, Inc.
 
 @file{libc} includes software developed by the
 University of California, Berkeley and its contributors.
@@ -79,22 +79,23 @@ into another language, under the above conditions for modified versions.
 @c @cropmarks
 @finalout
 @setchapternewpage odd
-@settitle Cygnus C Support Library, Full
+@settitle Red Hat newlib C Library, Full
 @titlepage
-@title The Cygnus C Support Library
+@title The Red Hat newlib C Library
 @subtitle Full Configuration
 @sp 1
-@subtitle @code{libc} 1.4
-@subtitle May 1993
+@subtitle @code{libc} 1.10.0
+@subtitle July 2002 
 @author {Steve Chamberlain}
 @author {Roland Pesch}
-@author {Cygnus Support}
+@author {Red Hat Support}
+@author {Jeff Johnston}
 @page
 
 @tex
 {\parskip=0pt
-sac@@cygnus.com, pesch@@cygnus.com\hfill {\it The Cygnus C Support Library}\par
-Copyright \copyright{} 1992, 1993 Cygnus Support
+sac@@cygnus.com, pesch@@cygnus.com, jjohnstn@redhat.com\hfill {\it The Red Hat newlib C Library}\par
+Copyright \copyright{} 1992, 1993, 1994-2002 Red Hat Inc. 
 }
 \global\parindent=0pt % Steve likes it this way
 @end tex
@@ -105,7 +106,7 @@ University of California, Berkeley and its contributors.
 @file{libc} includes software developed by Martin Jackson, Graham Haley
 and Steve Chamberlain of Tadpole Technology and released to Cygnus.
 
-@file{libc} uses floating point converstion software developed at AT&T,
+@file{libc} uses floating point conversion software developed at AT&T,
 which includes this copyright information:
 
 @cartouche
@@ -144,7 +145,7 @@ into another language, under the above conditions for modified versions.
 
 @ifinfo
 @node Top
-@top The Cygnus C Support Library
+@top The Red Hat newlib C Library
 
 @c The menu contents depend on the configuration, so we include them
 @c as a separate file

@@ -43,7 +43,7 @@ More Documentation
 ==================
 
    Newlib documentation is available on the net via:
-   http://www.cygnus.com/pubs/gnupro
+   http://sources.redhat.com/newlib/docs.html
 
    All the documentation for NEWLIB comes as part of the machine-readable
 distribution.  The documentation is written in Texinfo format, which is
