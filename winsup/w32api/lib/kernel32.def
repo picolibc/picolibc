@@ -46,6 +46,7 @@ ConnectNamedPipe@8
 ConsoleMenuControl@12
 ContinueDebugEvent@12
 ConvertDefaultLocale@4
+ConvertFiberToThread@0
 ConvertThreadToFiber@4
 ConvertToGlobalHandle@4
 CopyFileA@12
@@ -60,6 +61,7 @@ CreateDirectoryW@8
 CreateEventA@16
 CreateEventW@16
 CreateFiber@12
+CreateFiberEx@12
 CreateFileA@28
 CreateFileMappingA@24
 CreateFileMappingW@24

@@ -1,5 +1,19 @@
 2003-10-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/winbase.h [_WIN32_WINNT >= 0x0400] (ConvertFiberToThread):
+	Add function. Sometimes I don't understand MSDN. This function is
+	available on Windows XP and Server 2003, but the SDK is supposed to
+	make it available when _WIN32_WINNT >= 0x0400, or so says the MSDN.
+	Mmmh...
+
+	* include/winbase.h [_WIN32_WINNT >= 0x0400] (CreateFiberEx):
+	Guard function. Same remark as above.
+
+	* lib/user32.def (ConvertFiberToThread, CreateFiberEx):
+	Add functions.
+
+2003-10-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winbase.h [_WIN32_WINNT >= 0x0501] (ACTCTX_FLAG_*):
 	Add constants.
 
