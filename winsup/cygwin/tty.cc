@@ -196,7 +196,7 @@ tty_list::allocate_tty (int with_console)
 
   if (!with_console)
     console = NULL;
-  else
+  else if (!(console = GetConsoleWindow ()))
     {
       char *oldtitle = new char [TITLESIZE];
 
@@ -218,8 +218,12 @@ tty_list::allocate_tty (int with_console)
 
       __small_sprintf (buf, "cygwin.find.console.%d", myself->pid);
       SetConsoleTitle (buf);
-      Sleep (40);
-      console = FindWindow (NULL, buf);
+      for (int times = 0; times < 25; times++)
+        {
+          Sleep (10);
+          if ((console = FindWindow (NULL, buf)))
+	    break;
+        }
       SetConsoleTitle (oldtitle);
       Sleep (40);
       ReleaseMutex (title_mutex);
