@@ -1273,10 +1273,12 @@ socket_cleanup (select_record *, select_stuff *stuff)
 	  select_printf ("connect failed");
 	  /* FIXME: now what? */
 	}
+      shutdown (s, 2);
       closesocket (s);
 
       /* Wait for thread to go away */
       WaitForSingleObject (si->thread, INFINITE);
+      shutdown (si->exitsock, 2);
       closesocket (si->exitsock);
       CloseHandle (si->thread);
       stuff->device_specific[FHDEVN(FH_SOCKET)] = NULL;

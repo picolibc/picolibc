@@ -1,3 +1,8 @@
+Mon Jun 19 20:46:33 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* select.cc (socket_cleanup): Shutdown I/O on dummy sockets prior to
+	closing them.
+
 Mon Jun 19 19:35:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* dcrt0.cc: Add load statements for `GetSidIdentifierAuthority'
