@@ -956,26 +956,18 @@ __main (void)
   do_global_ctors (user_data->ctors, FALSE);
 }
 
-enum exit_states
-  {
-    ES_NOT_EXITING = 0,
-    ES_THREADTERM,
-    ES_SIGNAL,
-    ES_CLOSEALL,
-    ES_SIGPROCTERMINATE,
-    ES_TITLE,
-    ES_HUP_PGRP,
-    ES_HUP_SID,
-    ES_TTY_TERMINATE,
-    ES_EVENTS_TERMINATE
-  };
-
 exit_states NO_COPY exit_state;
 extern CRITICAL_SECTION exit_lock;
 
-extern "C" void __stdcall
+void __stdcall
 do_exit (int status)
 {
+  if (exit_state < ES_EVENTS_TERMINATE)
+    {
+      exit_state = ES_EVENTS_TERMINATE;
+      events_terminate ();
+    }
+
   EnterCriticalSection (&exit_lock);
   UINT n = (UINT) status;
 
@@ -1057,12 +1049,6 @@ do_exit (int status)
     {
       exit_state = ES_TTY_TERMINATE;
       tty_terminate ();
-    }
-
-  if (exit_state < ES_EVENTS_TERMINATE)
-    {
-      exit_state = ES_EVENTS_TERMINATE;
-      events_terminate ();
     }
 
   minimal_printf ("winpid %d, exit %d", GetCurrentProcessId (), n);

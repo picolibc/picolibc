@@ -162,7 +162,23 @@ extern "C" int dll_dllcrt0 (HMODULE, per_process *);
 extern "C" int dll_noncygwin_dllcrt0 (HMODULE, per_process *);
 
 /* exit the program */
-extern "C" void __stdcall do_exit (int) __attribute__ ((noreturn));
+
+enum exit_states
+  {
+    ES_NOT_EXITING = 0,
+    ES_EVENTS_TERMINATE,
+    ES_THREADTERM,
+    ES_SIGNAL,
+    ES_CLOSEALL,
+    ES_SIGPROCTERMINATE,
+    ES_TITLE,
+    ES_HUP_PGRP,
+    ES_HUP_SID,
+    ES_TTY_TERMINATE
+  };
+
+extern exit_states exit_state;
+void __stdcall do_exit (int) __attribute__ ((regparm (1), noreturn));
 
 /* UID/GID */
 void uinfo_init (void);

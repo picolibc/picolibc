@@ -1,3 +1,14 @@
+2003-09-22  Christopher Faylor  <cgf@redhat.com>
+
+	* dcrt0.cc (do_exit): Eliminate "C" linkage.  Call events_terminate
+	early.
+	(exit_states): Move out of source file into header file.
+	* winsup.h: Move exit_states here.  Remove "C" linkage from do_exit
+	declaration.
+	* debug.cc (lock_debug): Remove explicit (and incorrect) external for
+	exit_state.
+	* sigproc.cc (sig_dispatch_pending): Don't flush signals if exiting.
+
 2003-09-20  Christopher Faylor  <cgf@redhat.com>
 
 	* spawn.cc (pthread_cleanup): New struct.
