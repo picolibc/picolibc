@@ -524,7 +524,7 @@ fi
 
 
 
-INSTALL=`cd $srcdir/../..; echo $(pwd)/install-sh`
+INSTALL=`cd $srcdir/../..; echo $(pwd)/install-sh -c`
 
 ac_aux_dir=
 for ac_dir in $srcdir $srcdir/.. $srcdir/../..; do
