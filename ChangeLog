@@ -1,3 +1,11 @@
+2003-08-28  Daniel Jacobowitz  <drow@mvista.com>
+
+	Merge from gcc:
+	2003-07-20  Phil Edwards  <pme@gcc.gnu.org>
+	* install-sh:  Update to newer upstream versions (associated with
+	aclocal 1.7).
+	* missing:  Likewise, plus $1Help2man -> $1 typo fix.
+
 2003-08-27  Daniel Jacobowitz  <drow@mvista.com>
 
 	* configure.in: Set RAW_CXX_FOR_TARGET if unset.
