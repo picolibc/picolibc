@@ -25,6 +25,7 @@
 #include <wininet.h>
 #include <regstr.h>
 #include <custcntl.h>
+#include <mapi.h>
 
 #include <dbt.h>
 #include <httpext.h>

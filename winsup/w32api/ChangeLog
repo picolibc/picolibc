@@ -1,3 +1,14 @@
+2002-01-30  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* lib/test.c: Include mapi.h.
+	* include/commctrl.h (TBSTYLE_*): Add missing defines.
+	Thanks to: "Ron"  <ron@debian.org> 
+
+2002-01-30  John Fattaruso  <fattaruso@ieee.org>
+
+	* include/mapi.h: New file.
+	* lib/mapi.def: Add missing function stubs.	
+	
 2002-01-28  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winuser.h (GetWindowLongPtr[AW],
