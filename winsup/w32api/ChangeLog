@@ -1,3 +1,9 @@
+2001-10-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/winnetwk.h (WNetGetResourceInformationA): Add declaration.
+	(WNetGetResourceInformationW): Ditto.
+	(WNetGetResourceInformation): Add define.
+
 2001-09-18  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winnt.h (_[U]LARGE_INTEGER): Mark nameless structure
