@@ -106,10 +106,10 @@ faq.html: $(srcdir)/faq.texinfo $(srcdir)/*.texinfo
 
 TBFILES = cygwin-ug-net.dvi cygwin-ug-net.rtf cygwin-ug-net.ps \
 	  cygwin-ug-net.pdf cygwin-ug-net.sgml \
-	  cygwin-api-int.dvi cygwin-api-int.rtf cygwin-api-int.ps \
-	  cygwin-api-int.pdf cygwin-api-int.sgml
-TBDIRS = cygwin-ug-net cygwin-api-int
-TBDEPS = cygwin-ug-net/cygwin-ug-net.html cygwin-api-int/cygwin-api-int.html
+	  cygwin-api.dvi cygwin-api.rtf cygwin-api.ps \
+	  cygwin-api.pdf cygwin-api.sgml
+TBDIRS = cygwin-ug-net cygwin-api
+TBDEPS = cygwin-ug-net/cygwin-ug-net.html cygwin-api/cygwin-api.html
 
 tarball : cygwin-docs.tar.gz
 cygwin-docs.tar.gz : $(TBFILES) $(TBDEPS)
