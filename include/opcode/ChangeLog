@@ -1,3 +1,7 @@
+2004-09-09  Segher Boessenkool  <segher@kernel.crashing.org>
+
+	* ppc.h (PPC_OPERAND_OPTIONAL): Fix comment.
+
 2004-08-24  Dmitry Diky  <diwil@spec.ru>
 
 	* msp430.h (msp430_opc): Add new instructions.

@@ -249,7 +249,7 @@ extern const struct powerpc_operand powerpc_operands[];
 #define PPC_OPERAND_ABSOLUTE (01000)
 
 /* This operand is optional, and is zero if omitted.  This is used for
-   the optional BF and L fields in the comparison instructions.  The
+   example, in the optional BF field in the comparison instructions.  The
    assembler must count the number of operands remaining on the line,
    and the number of operands remaining for the opcode, and decide
    whether this operand is present or not.  The disassembler should
