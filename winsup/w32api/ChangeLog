@@ -1,3 +1,9 @@
+2004-01-03  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/mshtml.h (IHTMLDocument2): Correct write, writeln
+	declarations.
+	Thanks to: Rene Nyffenegger <renenyffenegger@users.sf.net>.
+
 2004-01-03  Filip Navara  <xnavara@volny.cz>
 
 	* include/cguid.h (CLSID_StdGlobalInterfaceTable): Declare IID.
