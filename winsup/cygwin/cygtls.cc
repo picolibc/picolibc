@@ -155,22 +155,12 @@ _threadinfo::remove (DWORD wait)
 void
 _threadinfo::push (__stack_t addr, bool exception)
 {
+  if (exception)
+    lock (true);
   *stackptr++ = (__stack_t) addr;
+  if (exception)
+    unlock ();
   set_state (exception);
-}
-
-__stack_t
-_threadinfo::pop ()
-{
-#ifdef DEBUGGING
-  assert (stackptr > stack);
-#endif
-  __stack_t res = *--stackptr;
-#ifdef DEBUGGING
-  *stackptr = 0;
-  debug_printf ("popped %p, stack %p, stackptr %p", res, stack, stackptr);
-#endif
-  return res;
 }
 
 #define BAD_IX ((size_t) -1)

@@ -1565,6 +1565,7 @@ localtime(const time_t *timep)
 extern "C" struct tm *
 localtime_r(const time_t *timep, struct tm *tm)
 {
+	tzset();
 	localsub(timep, 0L, tm);
 	return tm;
 }

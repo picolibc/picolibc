@@ -1,3 +1,30 @@
+2004-02-08  Christopher Faylor  <cgf@redhat.com>
+
+	* localtime.cc (localtime_r): Call tzset.
+
+	* Makefile.in: Make version.h/cygwin.din version check a warning since
+	it is not foolproof.
+
+	* cygheap.h (CYGHEAPSIZE): Bump size down.
+
+	* cygtls.h (_threadinfo::stacklock): New element.
+	(_threadinfo::pop): Make regparm.
+	(_threadinfo::lock): New function.
+	(_threadinfo::unlock): New function.
+	* cygtls.cc (_threadinfo::push): Wait for a lock on the stack before
+	performing the operation.
+	(_threadinfo::pop): Move to another file.
+	* cygwin.din: More SIGFE changes.
+	* exceptions.cc (try_to_debug): Always display messages on console.
+	(handle_exceptions): Unwind stack only when actually about to call
+	sig_send.
+	(setup_handler): Lock stack prior to performing any operations.
+	* gendef (_sigfe): Ditto.
+	(_sigbe): Ditto.
+	(_threadinfo::pop): Ditto.  Move here.
+	* gen_tlsoffsets: Generate positive offsets.
+	* tlsoffsets.h: Regenerate.
+
 2004-02-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygserver.h (CYGWIN_SERVER_VERSION_API): Bump.

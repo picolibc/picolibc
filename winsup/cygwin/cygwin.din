@@ -479,19 +479,19 @@ fdimf NOSIGFE
 fdopen SIGFE
 _fdopen = fdopen SIGFE
 _fdopen64 = fdopen64 SIGFE
-feof NOSIGFE
-_feof = feof NOSIGFE
+feof SIGFE
+_feof = feof SIGFE
 ferror NOSIGFE
 _ferror = ferror NOSIGFE
-fflush NOSIGFE
-_fflush = fflush NOSIGFE
+fflush SIGFE
+_fflush = fflush SIGFE
 ffs NOSIGFE
 _ffs = ffs NOSIGFE
 fgetc SIGFE
 _fgetc = fgetc SIGFE
-fgetpos NOSIGFE
-_fgetpos = fgetpos NOSIGFE
-_fgetpos64 = fgetpos64 NOSIGFE
+fgetpos SIGFE
+_fgetpos = fgetpos SIGFE
+_fgetpos64 = fgetpos64 SIGFE
 fgets SIGFE
 _fgets = fgets SIGFE
 fileno NOSIGFE
@@ -502,7 +502,6 @@ finitef NOSIGFE
 _finitef = finitef NOSIGFE
 fiprintf SIGFE
 _fiprintf = fiprintf SIGFE
-flock SIGFE
 flock SIGFE
 floor NOSIGFE
 _floor = floor NOSIGFE
@@ -559,11 +558,11 @@ fstatfs SIGFE
 _fstatfs = fstatfs SIGFE
 fsync SIGFE
 _fsync = fsync SIGFE
-ftell NOSIGFE
-_ftell = ftell NOSIGFE
-ftello NOSIGFE
-_ftello = ftello NOSIGFE
-_ftello64 = ftello64 NOSIGFE
+ftell SIGFE
+_ftell = ftell SIGFE
+ftello SIGFE
+_ftello = ftello SIGFE
+_ftello64 = ftello64 SIGFE
 ftime SIGFE
 _ftime = ftime SIGFE
 ftok SIGFE

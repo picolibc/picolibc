@@ -111,6 +111,7 @@ struct _threadinfo
   struct _threadinfo *prev, *next;
   __stack_t *stackptr;
   int sig;
+  unsigned stacklock;
   __stack_t stack[TLS_STACK_SIZE];
   unsigned padding[0];
 
@@ -123,7 +124,7 @@ struct _threadinfo
   static struct _threadinfo *find_tls (int sig);
   void remove (DWORD);
   void push (__stack_t, bool = false) __attribute__ ((regparm (3)));
-  __stack_t pop ();
+  __stack_t pop () __attribute__ ((regparm (1)));
   bool isinitialized () {return initialized == CYGTLS_INITIALIZED || initialized == CYGTLS_EXCEPTION;}
   void set_state (bool);
   void reset_exception ();
@@ -136,6 +137,8 @@ struct _threadinfo
   void set_siginfo (struct sigpacket *) __attribute__ ((regparm (3)));
   void set_threadkill () {threadkill = true;}
   void reset_threadkill () {threadkill = false;}
+  int lock (int wait) __attribute__ ((regparm (2)));
+  void unlock () __attribute__ ((regparm (1)));
   /*gentls_offsets*/
 };
 #pragma pack(pop)

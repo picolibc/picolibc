@@ -361,8 +361,8 @@ try_to_debug (bool waitloop)
 	}
     }
 
-  small_printf ("*** starting debugger for pid %u\n",
-		cygwin_pid (GetCurrentProcessId ()));
+  console_printf ("*** starting debugger for pid %u\n",
+		  cygwin_pid (GetCurrentProcessId ()));
   BOOL dbg;
   dbg = CreateProcess (NULL,
 		       debugger_command,
@@ -380,17 +380,18 @@ try_to_debug (bool waitloop)
   else
     {
       if (!waitloop)
-	return 1;
+	return dbg;
       SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_IDLE);
       while (!being_debugged ())
 	Sleep (0);
       Sleep (2000);
-      small_printf ("*** continuing pid %u from debugger call\n",
-		    cygwin_pid (GetCurrentProcessId ()));
     }
 
+  console_printf ("*** continuing pid %u from debugger call (%d)\n",
+		  cygwin_pid (GetCurrentProcessId ()), dbg);
+
   SetThreadPriority (GetCurrentThread (), prio);
-  return 0;
+  return dbg;
 }
 
 /* Main exception handler. */
@@ -415,10 +416,6 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
 
   EXCEPTION_RECORD e = *e0;
   CONTEXT in = *in0;
-
-  extern DWORD ret_here[];
-  RtlUnwind (frame, ret_here, e0, 0);
-  __asm__ volatile (".equ _ret_here,.");
 
   siginfo_t si;
   /* Coerce win32 value to posix value.  */
@@ -556,6 +553,10 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
 
       signal_exit (0x80 | si.si_signo);	// Flag signal + core dump
     }
+
+  extern DWORD ret_here[];
+  RtlUnwind (frame, ret_here, e0, 0);
+  __asm__ volatile (".equ _ret_here,.");
 
   si.si_addr = ebp;
   si.si_code = SI_KERNEL;
@@ -766,12 +767,15 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _threadinfo *tls)
       __stack_t *retaddr_on_stack = tls->stackptr - 1;
       if (retaddr_on_stack >= tls->stack)
 	{
+	  if (!tls->lock (false))
+	    continue;
 	  __stack_t retaddr = InterlockedExchange ((LONG *) retaddr_on_stack, 0);
 	  if (!retaddr)
 	    continue;
 	  tls->reset_exception ();
 	  tls->interrupt_setup (sig, handler, siga, retaddr);
 	  sigproc_printf ("interrupted known cygwin routine");
+	  tls->unlock ();
 	  interrupted = true;
 	  break;
 	}

@@ -272,7 +272,7 @@ struct init_cygheap
   void close_ctty ();
 };
 
-#define CYGHEAPSIZE (sizeof (init_cygheap) + (20000 * sizeof (fhandler_union)) + (64 * 1024 * 1024))
+#define CYGHEAPSIZE (sizeof (init_cygheap) + (20000 * sizeof (fhandler_union)) + (32 * 1024 * 1024))
 
 extern init_cygheap *cygheap;
 extern void *cygheap_max;
