@@ -1,5 +1,23 @@
 2002-11-12  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/ddk/(atm.h, batclass.h, cfg.h, cfgmgr32.h, d4drvif.h,
+	d4iface.h, ddkmapi.h, hidclass.h, hidpi.h, hidusage.h, mcd.h,
+	miniport.h, minitape.h, mountdev.h, mountmgr.h, ndis.h,
+	ndisquid.h, ndistapi.h, ndisvan.h, netevent.h, netpnp.h,
+	netdev.h, ntapi.h, ntdd8042.h, ntddbeep.h, ntddcdrm.h,
+	ntddcdvd.h, ntddchgr.h, ntdddisk.h, ntddk.h, ntddkbd.h,
+	ntddmou.h, ntddndis.h, ntddpar.h, ntddpcm.h, ntddscsi.h,
+	ntddser.h, ntddstor.h, ntddtape.h, ntddtdi.h, ntddvdeo.h,
+	ntddvol.h, ntifs.h, ntpoapi.h, ntstatus.h, parallel.h, pfhook.h,
+	poclass.h, scsi.h, scsiscan.h, scsiwmi.h, smbus.h, srb.h,
+	storport.h, tdi.h, tdiinfo.h, tdikrnl.h, tdistat.h, tvout.h,
+	upssvc.h, usb.h, usb100.h, usbcamdi.h, usbdi.h, usbioctl.h,
+	usbiodef.h, usbscan.h, usbuser.h, video.h, videoagp.h, win2k.h,
+	winddi.h, winddk.h, winnt4.h, winxp.h, ws2san.h, 
+	xfilter.h): Fix typo in disclaimer comment.
+
+2002-11-12  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/exdisp.h: Include oaidl.h as system header.
 
 2002-11-12  Earnie Boyd <earnie@users.sf.net>
