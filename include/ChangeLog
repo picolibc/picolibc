@@ -1,3 +1,8 @@
+2004-10-08  Daniel Jacobowitz  <dan@debian.org>
+
+	* elf/common.h (PT_SUNW_EH_FRAME): Define.
+	* elf/x86-64.h (SHT_X86_64_UNWIND): Define.
+
 2004-10-07  Bob Wilson  <bob.wilson@acm.org>
 
 	* xtensa-config.h (XSHAL_USE_ABSOLUTE_LITERALS,
