@@ -9,11 +9,9 @@
    The MIPS 64 version saves registers fp20 to fp31.  23 registers
    are saved in all.  */
 
-#ifndef __mips64
 #ifdef __mips16
 /* This file contains 32 bit assembly code.  */
 	.set nomips16
-#endif
 #endif
 
 /* int setjmp (jmp_buf);  */
