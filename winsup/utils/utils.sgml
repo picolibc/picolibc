@@ -498,10 +498,10 @@ takes in a large domain.
 <sect2 id="mount"><title>mount</title>
 
 <screen>
-Usage: mount [OPTION] [<win32path> <posixpath>]
+Usage: mount [OPTION] [&lt;win32path&gt; &lt;posixpath&gt;]
   -b, --binary                  text files are equivalent to binary files
                                 (newline = \n)
-  -c, --change-cygdrive-prefix  change the cygdrive path prefix to <posixpath>
+  -c, --change-cygdrive-prefix  change the cygdrive path prefix to &lt;posixpath&gt;
   -f, --force                   force mount, don't warn about missing mount
                                 point directories
   -h, --help                    output usage information and exit
@@ -1266,8 +1266,8 @@ $ ssp <literal>-v</literal> <literal>-s</literal> <literal>-l</literal> <literal
 <sect2 id="strace"><title>strace</title>
 
 <screen>
-Usage: strace.exe [OPTIONS] <command-line>
-Usage: strace.exe [OPTIONS] -p <pid>
+Usage: strace.exe [OPTIONS] &lt;command-line&gt;
+Usage: strace.exe [OPTIONS] -p &lt;pid&gt;
   -b, --buffer-size=SIZE       set size of output file buffer
   -d, --no-delta               don't display the delta-t microsecond timestamp
   -f, --trace-children         trace child processes (toggle - default true)
@@ -1281,7 +1281,7 @@ Usage: strace.exe [OPTIONS] -p <pid>
   -t, --timestamp              use an absolute hh:mm:ss timestamp insted of 
                                the default microsecond timestamp.  Implies -d
   -T, --toggle                 toggle tracing in a process already being
-                               traced. Requires -p <pid>
+                               traced. Requires -p &lt;pid&gt;
   -v, --version                output version information and exit
   -w, --new-window             spawn program under test in a new window
 
@@ -1337,7 +1337,7 @@ Cygwin DLL itself.</para>
 <sect2 id="umount"><title>umount</title>
 
 <screen>
-Usage: umount.exe [OPTION] [<posixpath>]
+Usage: umount.exe [OPTION] [&lt;posixpath&gt;]
   -A, --remove-all-mounts       remove all mounts
   -c, --remove-cygdrive-prefix  remove cygdrive prefix
   -h, --help                    output usage information and exit
