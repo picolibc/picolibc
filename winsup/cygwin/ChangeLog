@@ -1,3 +1,7 @@
+2002-01-04  Christopher Faylor  <cgf@redhat.com>
+
+	* dir.cc (opendir): Don't attempt to call sub-opendir if ENOENT.
+
 2001-01-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc: Replace usage of AF_UNIX by Posix compliant AF_LOCAL

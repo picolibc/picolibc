@@ -88,6 +88,8 @@ opendir (const char *name)
 						PC_SYM_FOLLOW | PC_FULL, NULL);
   if (!fh)
     res = NULL;
+  else if (!pc.exists ())
+    set_errno (ENOENT);
   else
     {
       res = fh->opendir (pc);
