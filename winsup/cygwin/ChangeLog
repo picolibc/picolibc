@@ -1,3 +1,8 @@
+Mon Aug  7 00:11:35 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* include/cygwin/cygwin_dll.h: Remove extraneous (and incorrect)
+	declarations.
+
 Thu Aug  3 20:44:39 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* select.cc (fhandler_console::select_read): Call set_cursor_maybe
