@@ -1,3 +1,11 @@
+2004-03-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_proc.cc (format_proc_meminfo): On NT, try to figure out
+	real swap file usage by requesting SystemPagefileInformation.  Use
+	GlobalMemoryStatus as fallback.
+	* ntdll.h (_SYSTEM_INFORMATION_CLASS): Add SystemPagefileInformation.
+	(struct _SYSTEM_PAGEFILE_INFORMATION): Define.
+
 2004-03-17  Christopher Faylor  <cgf@redhat.com>
 
 	* pipe.cc (fhandler_pipe::dup): Fix debugging message.

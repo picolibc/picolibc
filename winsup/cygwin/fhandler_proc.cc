@@ -390,8 +390,42 @@ format_proc_meminfo (char *destbuf, size_t maxsize)
   GlobalMemoryStatus (&memory_status);
   mem_total = memory_status.dwTotalPhys;
   mem_free = memory_status.dwAvailPhys;
-  swap_total = memory_status.dwTotalPageFile - mem_total;
-  swap_free = memory_status.dwAvailPageFile - mem_total;
+  PSYSTEM_PAGEFILE_INFORMATION spi = NULL;
+  ULONG size = 512;
+  NTSTATUS ret;
+  spi = (PSYSTEM_PAGEFILE_INFORMATION) malloc (size);
+  if (spi)
+    {
+      ret = NtQuerySystemInformation (SystemPagefileInformation, (PVOID) spi,
+				      size, &size);
+      if (ret == STATUS_INFO_LENGTH_MISMATCH)
+        {
+	  free (spi);
+	  spi = (PSYSTEM_PAGEFILE_INFORMATION) malloc (size);
+	  if (spi)
+	    ret = NtQuerySystemInformation (SystemPagefileInformation,
+					    (PVOID) spi, size, &size);
+	}
+    }
+  if (!spi || ret || (!ret && GetLastError () == ERROR_PROC_NOT_FOUND))
+    {
+      swap_total = memory_status.dwTotalPageFile - mem_total;
+      swap_free = memory_status.dwAvailPageFile - mem_total;
+    }
+  else
+    {
+      PSYSTEM_PAGEFILE_INFORMATION spp = spi;
+      do
+        {
+	  swap_total += spp->CurrentSize * getpagesize ();
+	  swap_free += (spp->CurrentSize - spp->TotalUsed) * getpagesize ();
+	}
+      while (spp->NextEntryOffset
+	     && (spp = (PSYSTEM_PAGEFILE_INFORMATION)
+			   ((char *) spp + spp->NextEntryOffset)));
+    }
+  if (spi)
+    free (spi);
   return __small_sprintf (destbuf, "         total:      used:      free:\n"
 				   "Mem:  %10lu %10lu %10lu\n"
 				   "Swap: %10lu %10lu %10lu\n"

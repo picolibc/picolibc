@@ -31,6 +31,7 @@ typedef enum _SYSTEM_INFORMATION_CLASS
   SystemTimeOfDayInformation = 3,
   SystemProcessesAndThreadsInformation = 5,
   SystemProcessorTimes = 8,
+  SystemPagefileInformation = 18,
   /* There are a lot more of these... */
 } SYSTEM_INFORMATION_CLASS;
 
@@ -48,6 +49,15 @@ typedef struct _SYSTEM_BASIC_INFORMATION
   ULONG ActiveProcessors;
   UCHAR NumberProcessors;
 } SYSTEM_BASIC_INFORMATION, *PSYSTEM_BASIC_INFORMATION;
+
+typedef struct _SYSTEM_PAGEFILE_INFORMATION
+{
+  ULONG NextEntryOffset;
+  ULONG CurrentSize;
+  ULONG TotalUsed;
+  ULONG PeakUsed;
+  UNICODE_STRING FileName;
+} SYSTEM_PAGEFILE_INFORMATION, *PSYSTEM_PAGEFILE_INFORMATION;
 
 typedef struct __attribute__ ((aligned (8))) _SYSTEM_PROCESSOR_TIMES
 {
