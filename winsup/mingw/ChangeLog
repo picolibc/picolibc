@@ -1,3 +1,23 @@
+2002-12-07  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/math.h: Add traditional/XOPEN math constants.
+
+2002-11-27  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/math/lgamma.c: New file.
+	* mingwex/math/lgammaf.c: New file.
+	* mingwex/math/lgammal.c: New file.
+	* mingwex/math/tgamma.c: New file.
+	* mingwex/math/tgammaf.c: New file.
+	* mingwex/math/tgammal.c: New file.
+	* mingwex/math/cephes_mconf (polevlf): Add float version.
+	(p1evlf): Likewise.
+	Define _CEPHES_USE_ERRNO.
+	* mingwex/Makefile.in (MATH_DISTFILES): Add new files.
+	(MATH_OBJS): Add new objects.
+	* include/math.h (lgamma[fl]): Add prototypes.
+	(tgamma[fl]): Add prototypes.
+
 2002-11-26  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/strtold.c: New file.
