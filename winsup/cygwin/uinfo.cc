@@ -449,6 +449,28 @@ cygheap_user::env_name (const char *name, size_t namelen)
   return pwinname;
 }
 
+const char *
+cygheap_user::env_systemroot (const char *name, size_t namelen)
+{
+  if (!psystemroot)
+    {
+      int size = GetWindowsDirectory (NULL, 0);
+      if (size > 0)
+        {
+	  psystemroot = (char *) cmalloc (HEAP_STR, ++size);
+	  size = GetWindowsDirectory (psystemroot, size);
+	  if (size <= 0)
+	    {
+	      cfree (psystemroot);
+	      psystemroot = NULL;
+	    }
+	}
+      if (size <= 0)
+        debug_printf ("GetWindowsDirectory(), %E");
+    }
+  return psystemroot;
+}
+
 char *
 pwdgrp::next_str (char c)
 {

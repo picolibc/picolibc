@@ -819,7 +819,9 @@ struct spenv
 {
   const char *name;
   size_t namelen;
+  bool add_always;	/* If true, always add to env if missing */
   const char * (cygheap_user::*from_cygheap) (const char *, size_t);
+
   char *retrieve (bool, const char * const = NULL)
     __attribute__ ((regparm (3)));
 };
@@ -829,14 +831,14 @@ struct spenv
 /* Keep this list in upper case and sorted */
 static NO_COPY spenv spenvs[] =
 {
-  {NL ("HOMEDRIVE="), &cygheap_user::env_homedrive},
-  {NL ("HOMEPATH="), &cygheap_user::env_homepath},
-  {NL ("LOGONSERVER="), &cygheap_user::env_logsrv},
-  {NL ("SYSTEMDRIVE="), NULL},
-  {NL ("SYSTEMROOT="), NULL},
-  {NL ("USERDOMAIN="), &cygheap_user::env_domain},
-  {NL ("USERNAME="), &cygheap_user::env_name},
-  {NL ("USERPROFILE="), &cygheap_user::env_userprofile},
+  {NL ("HOMEDRIVE="), false, &cygheap_user::env_homedrive},
+  {NL ("HOMEPATH="), false, &cygheap_user::env_homepath},
+  {NL ("LOGONSERVER="), false, &cygheap_user::env_logsrv},
+  {NL ("SYSTEMDRIVE="), false, NULL},
+  {NL ("SYSTEMROOT="), true, &cygheap_user::env_systemroot},
+  {NL ("USERDOMAIN="), false, &cygheap_user::env_domain},
+  {NL ("USERNAME="), false, &cygheap_user::env_name},
+  {NL ("USERPROFILE="), false, &cygheap_user::env_userprofile},
 };
 
 char *
@@ -928,9 +930,8 @@ build_env (const char * const *envp, char *&envblock, int &envc,
 
   assert ((srcp - envp) == n);
   /* Fill in any required-but-missing environment variables. */
-  if (cygheap->user.issetuid ())
-    for (unsigned i = 0; i < SPENVS_SIZE; i++)
-      if (!saw_spenv[i])
+  for (unsigned i = 0; i < SPENVS_SIZE; i++)
+    if (!saw_spenv[i] && (spenvs[i].add_always || cygheap->user.issetuid ()))
       {
 	  *dstp = spenvs[i].retrieve (no_envblock);
 	  if (*dstp && !no_envblock && *dstp != env_dontadd)

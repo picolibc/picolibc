@@ -106,6 +106,7 @@ class cygheap_user
   char  *pdomain;       /* Logon domain of the user */
   char  *homedrive;	/* User's home drive */
   char  *homepath;	/* User's home path */
+  char  *psystemroot;	/* Value of SYSTEMROOT */
   char  *pwinname;	/* User's name as far as Windows knows it */
   char  *puserprof;	/* User profile */
   cygsid effec_cygsid;  /* buffer for user's SID */
@@ -146,6 +147,7 @@ public:
   const char *env_userprofile (const char *, size_t);
   const char *env_domain (const char *, size_t);
   const char *env_name (const char *, size_t);
+  const char *env_systemroot (const char *, size_t);
 
   const char *logsrv ()
   {
