@@ -1,3 +1,8 @@
+2003-01-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/sys/unistd.h: Add setregid and setreuid declarations
+	for Cygwin.
+
 2003-01-21 Anita Kulkarni  <anitak@kpit.com>
   
 	* libc/time/difftime.c : Typecast the result to double.

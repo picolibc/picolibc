@@ -106,6 +106,10 @@ int	_EXFUN(setgroups, (int ngroups, const gid_t *grouplist ));
 #endif
 int     _EXFUN(setpgid, (pid_t __pid, pid_t __pgid ));
 int     _EXFUN(setpgrp, (void ));
+#if defined(__CYGWIN__)
+int	_EXFUN(setregid, (gid_t __rgid, gid_t __egid));
+int	_EXFUN(setreuid, (uid_t __ruid, uid_t __euid));
+#endif
 pid_t   _EXFUN(setsid, (void ));
 int     _EXFUN(setuid, (uid_t __uid ));
 #if defined(__CYGWIN__)
