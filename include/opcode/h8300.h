@@ -1,5 +1,5 @@
 /* Opcode table for the H8/300
-   Copyright 1991, 1992, 1993, 1994, 1996, 1997, 1998, 2000
+   Copyright 1991, 1992, 1993, 1994, 1996, 1997, 1998, 2000, 2002
    Free Software Foundation, Inc.
    Written by Steve Chamberlain <sac@cygnus.com>.
    
@@ -21,7 +21,7 @@
    02111-1307, USA.  */
 
 /* Instructions are stored as a sequence of nibbles.
-   If the nibble has value 15 or less then the representation is complete.
+   If the nibble has value 15 or less than the representation is complete.
    Otherwise, we record what it contains with several flags.  */
 
 typedef int op_type;
