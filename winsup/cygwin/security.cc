@@ -1374,44 +1374,35 @@ get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
 {
   security_descriptor sd;
   PSECURITY_DESCRIPTOR psd = NULL;
-  LONG ret;
 
-  if (object_type == SE_REGISTRY_KEY)
+  NTSTATUS ret;
+  ULONG len = 0;
+  ret = NtQuerySecurityObject (handle,
+			       DACL_SECURITY_INFORMATION
+			       | GROUP_SECURITY_INFORMATION
+			       | OWNER_SECURITY_INFORMATION,
+			       sd, len, &len);
+  if (ret == STATUS_BUFFER_TOO_SMALL)
     {
-      /* use different code for registry handles, for performance reasons */
-      DWORD len = 0;
-      if ((ret = RegGetKeySecurity ((HKEY) handle,
-				    DACL_SECURITY_INFORMATION
-				    | GROUP_SECURITY_INFORMATION
-				    | OWNER_SECURITY_INFORMATION,
-				    sd, &len)) != ERROR_INSUFFICIENT_BUFFER)
-	__seterrno_from_win_error (ret);
-      else if (!sd.malloc (len))
+      if (!sd.malloc (len))
 	set_errno (ENOMEM);
-      else if ((ret = RegGetKeySecurity ((HKEY) handle,
-					 DACL_SECURITY_INFORMATION
-					 | GROUP_SECURITY_INFORMATION
-					 | OWNER_SECURITY_INFORMATION,
-					 sd, &len)) != ERROR_SUCCESS)
-	__seterrno_from_win_error (ret);
       else
-        psd = sd;
-      get_info_from_sd (psd, attribute, uidret, gidret);
+	ret = NtQuerySecurityObject (handle,
+				     DACL_SECURITY_INFORMATION
+				     | GROUP_SECURITY_INFORMATION
+				     | OWNER_SECURITY_INFORMATION,
+				     sd, len, &len);
     }
-  else if ((ret = GetSecurityInfo (handle, object_type,
-				   DACL_SECURITY_INFORMATION
-				   | GROUP_SECURITY_INFORMATION
-				   | OWNER_SECURITY_INFORMATION,
-				   NULL, NULL, NULL, NULL, &psd)))
+  if (ret != STATUS_SUCCESS)
     {
-      __seterrno_from_win_error (ret);
-      return -1;
+      __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+      if (object_type == SE_FILE_OBJECT)
+        return -1;
     }
   else
-    {
-      get_info_from_sd (psd, attribute, uidret, gidret);
-      LocalFree (psd);
-    }
+    psd = sd;
+  get_info_from_sd (psd, attribute, uidret, gidret);
+
   return 0;
 }
 
