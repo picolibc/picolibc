@@ -142,9 +142,9 @@ GMON_OFILES:= gmon.o mcount.o profil.o
 all_host=@all_host@
 install_host=@install_host@
 
-all: new-$(DLL_NAME) $(all_host) all_target
+all: all_target $(all_host)
 
-all_target: $(LIBGMON_A) $(LIB_NAME) automode.o binmode.o textmode.o
+all_target: $(LIB_NAME) automode.o binmode.o textmode.o $(LIBGMON_A)
 
 all_host: new-$(LIB_NAME) cygrun.exe
 
@@ -179,10 +179,8 @@ maintainer-clean realclean: clean
 
 # Rule to build libcygwin.a
 
-$(LIB_NAME): $(DEF_FILE) $(LIBCOS)
-	$(DLLTOOL) --as=$(AS) --dllname $(DLL_NAME) --def $(DEF_FILE) --output-lib templib.a
-	$(AR) rcv templib.a $(LIBCOS)
-	mv templib.a $(LIB_NAME)
+$(LIB_NAME): new-$(DLL_NAME) $(LIBCOS)
+	$(AR) rcv $(LIB_NAME) $(LIBCOS)
 
 # Rule to make stub library used by testsuite
 
@@ -196,7 +194,7 @@ new-$(LIB_NAME): $(LIB_NAME)
 # Rule to build cygwin.dll
 
 new-$(DLL_NAME): $(LDSCRIPT) $(DLL_OFILES) $(DEF_FILE) $(DLL_IMPORTS) $(LIBC) $(LIBM) Makefile winver_stamp
-	$(CXX) $(CXXFLAGS) -nostdlib -Wl,-T$(firstword $^) -shared -o $@ \
+	$(CXX) $(CXXFLAGS) -nostdlib -Wl,-T$(firstword $^) -Wl,--out-implib,$(LIB_NAME) -shared -o $@ \
 	-e $(DLL_ENTRY) $(DEF_FILE) $(DLL_OFILES) version.o winver.o \
 	$(DLL_IMPORTS) $(MALLOC_OBJ) $(LIBM) $(LIBC) \
 	-lstdc++ -lgcc -lshell32 -luuid

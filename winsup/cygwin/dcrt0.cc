@@ -808,7 +808,7 @@ _dll_crt0 ()
     hMainProc = GetCurrentProcess ();
 
   DuplicateHandle (hMainProc, GetCurrentThread (), hMainProc,
-		   &hMainThread, 0, FALSE, DUPLICATE_SAME_ACCESS);
+		   &hMainThread, 0, false, DUPLICATE_SAME_ACCESS);
 
   GetStartupInfo (&si);
   if (si.cbReserved2 >= EXEC_MAGIC_SIZE &&
@@ -820,7 +820,8 @@ _dll_crt0 ()
 	  case PROC_FORK1:
 	    user_data->forkee = fork_info->cygpid;
 	  case PROC_SPAWN:
-	    CloseHandle (fork_info->pppid_handle);
+	    if (fork_info->pppid_handle)
+	      CloseHandle (fork_info->pppid_handle);
 	  case PROC_EXEC:
 	    {
 	      child_proc_info = fork_info;

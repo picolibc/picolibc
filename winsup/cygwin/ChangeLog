@@ -1,3 +1,10 @@
+Sat Sep 15 00:28:40 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Generate libcygwin.a during the link pass rather than as
+	a separate dlltool step.
+	* dcrt0.cc (_dll_crt0): pppid_handle could be NULL.  Don't close it if
+	so.
+
 Fri Sep 14 20:48:18 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* dcrt0.cc (dll_crt0_1): Create vfork main storage here so that it can
