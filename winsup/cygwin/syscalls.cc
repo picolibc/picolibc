@@ -1021,7 +1021,7 @@ fstat64 (int fd, struct __stat64 *buf)
 	  if (!buf->st_ino)
 	    buf->st_ino = hash_path_name (0, cfd->get_win32_name ());
 	  if (!buf->st_dev)
-	    buf->st_dev = (cfd->get_device () << 16) | cfd->get_unit ();
+	    buf->st_dev = cfd->get_device ();
 	  if (!buf->st_rdev)
 	    buf->st_rdev = buf->st_dev;
 	}
@@ -1111,7 +1111,7 @@ stat_worker (const char *name, struct __stat64 *buf, int nofollow,
 	  if (!buf->st_ino)
 	    buf->st_ino = hash_path_name (0, fh->get_win32_name ());
 	  if (!buf->st_dev)
-	    buf->st_dev = (fh->get_device () << 16) | fh->get_unit ();
+	    buf->st_dev = fh->get_device ();
 	  if (!buf->st_rdev)
 	    buf->st_rdev = buf->st_dev;
 	}
@@ -1505,7 +1505,7 @@ fpathconf (int fd, int v)
 	}
     case _PC_POSIX_PERMISSIONS:
     case _PC_POSIX_SECURITY:
-      if (cfd->get_device () == FH_DISK)
+      if (cfd->get_device () == FH_FS)
 	return check_posix_perm (cfd->get_win32_name (), v);
       set_errno (EINVAL);
       return -1;
@@ -1602,7 +1602,7 @@ _cygwin_istext_for_stdio (int fd)
       return 0;
     }
 
-  if (cfd->get_device () != FH_DISK)
+  if (cfd->get_device () != FH_FS)
     {
       syscall_printf (" _cifs: fd not disk file");
       return 0;
