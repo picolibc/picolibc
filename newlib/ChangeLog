@@ -1,5 +1,10 @@
 2003-03-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/include/sys/config.h: Define __CYGWIN_USE_BIG_TYPES__ for
+	Cygwin.
+
+2003-03-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/include/pwd.h: Add guards to avoid type clashes when compiling
 	Cygwin.
 	* libc/include/sys/stat.h: Ditto.
