@@ -1,3 +1,8 @@
+Sat Nov 18 18:57:50 2000  Alexandre Oliva  <aoliva@redhat.com>
+
+	* Makefile.in (HOST_LIB_PATH, TARGET_LIB_PATH): New macros.
+	(REALLY_SET_LIB_PATH): Use them.
+
 Mon Nov  6 14:19:35 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* config.sub: Add support for Sun Chorus
