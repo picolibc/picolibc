@@ -411,7 +411,7 @@ StorPortSynchronizeAccess(
   IN PSTOR_SYNCHRONIZED_ACCESS  SynchronizedAccessRoutine,
   IN PVOID  Context);
 
-#if DBG
+#ifdef DBG
 #define DebugPrint(x) StorPortDebugPrint x
 #else
 #define DebugPrint(x)

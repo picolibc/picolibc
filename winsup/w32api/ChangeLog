@@ -1,3 +1,13 @@
+2004-01-15  Filip Navara  <xnavara@volny.cz>
+
+	* include/ddk/mcd.h: Don't care about value of DBG define.
+	* include/ddk/srb.h: Ditto.
+	* include/ddk/storport.h: Ditto.
+	* include/ddk/video.h: Ditto.
+	* include/nspapi.h (SetServiceW, GetAddressByNameA,
+	GetAddressByNameW): Correct protoype.
+	* include/ntsecapi.h (PCUNICODE_STRING): Define.
+
 2004-01-05  Filip Navara  <xnavara@volny.cz>
 
 	* include/prsht.h (LPCPROPSHEETPAGEW): Fix definition.
