@@ -3,6 +3,9 @@
 	* ntdll.h (_SYSTEM_PROCESSOR_TIMES): Force eight byte alignment.
 	(_SYSTEM_TIME_OF_DAY_INFORMATION): Ditto.
 
+	* path.cc (suffix_scan::has): Reorganize to eliminate double scanning
+	for for .exe (in the typical case).
+
 2002-07-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (UNCONNECTED): New define.
