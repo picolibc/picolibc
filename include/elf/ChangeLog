@@ -1,3 +1,11 @@
+2004-01-21  Roland McGrath  <roland@redhat.com>
+
+	* common.h (AT_SUN_UID, AT_SUN_RUID, AT_SUN_GID): New macros.
+	(AT_SUN_RGID, AT_SUN_LDELF, AT_SUN_LDSHDR, AT_SUN_LDNAME,
+	AT_SUN_LPAGESZ, AT_SUN_PLATFORM, AT_SUN_HWCAP, AT_SUN_IFLUSH,
+	AT_SUN_CPU, AT_SUN_EMUL_ENTRY, AT_SUN_EMUL_EXECFD,
+	AT_SUN_EXECNAME) AT_SUN_MMU, AT_SUN_LDDATA): Likewise.
+
 2004-01-17  Mark Kettenis  <kettenis@gnu.org>
 
 	* common.h (NT_OPENBSD_IDENT): Define.
