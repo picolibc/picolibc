@@ -1,5 +1,10 @@
 2005-03-25  Daniel Jacobowitz  <dan@codesourcery.com>
 
+	* gdb/arm-linux-nat.c (store_register, store_regs): Handle
+	ARM_PS_REGNUM.
+
+2005-03-25  Daniel Jacobowitz  <dan@codesourcery.com>
+
 	* gdb/arm-tdep.c (target_is_thumb, caller_is_thumb)
 	(arm_pc_is_thumb_dummy): Remove.
 	(arm_breakpoint_from_pc): Don't call arm_pc_is_thumb_dummy.
