@@ -94,7 +94,10 @@ _DEFUN (_findenv_r, (reent_ptr, name, offset),
   /* In some embedded systems, this does not get set.  This protects
      newlib from dereferencing a bad pointer.  */
   if (!*p_environ)
-    return NULL;
+    {
+      ENV_UNLOCK;
+      return NULL;
+    }
 
   c = name;
   len = 0;

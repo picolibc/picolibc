@@ -1,3 +1,7 @@
+2002-04-01  Till Straumann <strauman@SLAC.Stanford.EDU>
+
+	* libc/stdlib/getenv_r.c (_findenv_r): Add missing ENV_UNLOCK.
+
 Wed Mar 27 07:34:44 2002  Jason Tishler <jason@tishler.net>
 
 	* libc/include/sys/features.h (_POSIX_SEMAPHORES): New Cygwin define.
