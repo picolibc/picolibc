@@ -1,3 +1,9 @@
+2005-04-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	Unify usage of CYG_MAX_PATH throughout.  Change buffers from
+	size CYG_MAX_PATH + 1 to CYG_MAX_PATH.  Change length tests
+	accordingly.
+
 2005-04-02  Christopher Faylor  <cgf@timesys.com>
 
 	* include/cygwin/version.h: Bump DLL minor number to 15.

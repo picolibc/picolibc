@@ -48,7 +48,7 @@ get_full_path_of_dll (const char* str, char *name)
   int len = strlen (str);
 
   /* empty string or too long to be legal win32 pathname? */
-  if (len == 0 || len >= CYG_MAX_PATH - 1)
+  if (len == 0 || len >= CYG_MAX_PATH)
     return str;		/* Yes.  Let caller deal with it. */
 
   const char *ret;

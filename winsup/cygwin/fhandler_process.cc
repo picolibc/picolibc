@@ -520,8 +520,8 @@ format_process_maps (_pinfo *p, char *&destbuf, size_t maxsize)
   DWORD_PTR wset_size;
   DWORD_PTR *workingset = NULL;
   MODULEINFO info;
-  char modname[CYG_MAX_PATH + 1];
-  char posix_modname[CYG_MAX_PATH + 1];
+  char modname[CYG_MAX_PATH];
+  char posix_modname[CYG_MAX_PATH];
 
   if (!EnumProcessModules (proc, NULL, 0, &needed))
     {

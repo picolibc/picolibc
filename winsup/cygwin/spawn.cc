@@ -304,7 +304,7 @@ av::unshift (const char *what, int conv)
 
   argv = av;
   memmove (argv + 1, argv, (argc + 1) * sizeof (char *));
-  char buf[CYG_MAX_PATH + 1];
+  char buf[CYG_MAX_PATH];
   if (conv)
     {
       cygwin_conv_to_posix_path (what, buf);
@@ -440,7 +440,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
       DWORD done;
 
-      char buf[2 * CYG_MAX_PATH + 1];
+      char buf[2 * CYG_MAX_PATH];
       buf[0] = buf[1] = buf[2] = buf[sizeof (buf) - 1] = '\0';
       if (!ReadFile (hnd, buf, sizeof (buf) - 1, &done, 0))
 	{

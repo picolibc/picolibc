@@ -226,7 +226,7 @@ get_registry_hive_path (const char *name, char *path)
       path[0] = '\0';
       if (!RegQueryValueExA (hkey, "ProfileImagePath", 0, &type,
 			     (BYTE *)buf, (siz = sizeof (buf), &siz)))
-	ExpandEnvironmentStringsA (buf, path, CYG_MAX_PATH + 1);
+	ExpandEnvironmentStringsA (buf, path, CYG_MAX_PATH);
       RegCloseKey (hkey);
       if (path[0])
 	return path;
@@ -238,7 +238,7 @@ get_registry_hive_path (const char *name, char *path)
 void
 load_registry_hive (const char * name)
 {
-  char path[CYG_MAX_PATH + 1];
+  char path[CYG_MAX_PATH];
   HKEY hkey;
   LONG ret;
 

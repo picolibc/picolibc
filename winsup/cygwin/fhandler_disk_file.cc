@@ -1193,7 +1193,7 @@ fhandler_disk_file::readdir (DIR *dir)
       int len = strlen (c);
       if (strcasematch (c + len - 4, ".lnk"))
 	{
-	  char fbuf[CYG_MAX_PATH + 1];
+	  char fbuf[CYG_MAX_PATH];
 	  strcpy (fbuf, dir->__d_dirname);
 	  strcpy (fbuf + strlen (fbuf) - 1, c);
 	  path_conv fpath (fbuf, PC_SYM_NOFOLLOW);

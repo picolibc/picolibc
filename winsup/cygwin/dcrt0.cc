@@ -528,7 +528,7 @@ break_here ()
 static void
 initial_env ()
 {
-  char buf[CYG_MAX_PATH + 1];
+  char buf[CYG_MAX_PATH];
   if (GetEnvironmentVariable ("CYGWIN_TESTING", buf, sizeof (buf) - 1))
     _cygwin_testing = 1;
 
@@ -550,7 +550,7 @@ initial_env ()
     }
   if (GetEnvironmentVariable ("CYGWIN_DEBUG", buf, sizeof (buf) - 1))
     {
-      char buf1[CYG_MAX_PATH + 1];
+      char buf1[CYG_MAX_PATH];
       len = GetModuleFileName (NULL, buf1, CYG_MAX_PATH);
       strlwr (buf1);
       strlwr (buf);

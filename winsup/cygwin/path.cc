@@ -525,7 +525,7 @@ path_conv::check (const char *src, unsigned opt,
 
 #if 0
   static path_conv last_path_conv;
-  static char last_src[CYG_MAX_PATH + 1];
+  static char last_src[CYG_MAX_PATH];
 
   if (*last_src && strcmp (last_src, src) == 0)
     {
@@ -1407,7 +1407,7 @@ mount_item::build_win32 (char *dst, const char *src, unsigned *outflags, unsigne
     dst[n++] = '\\';
   if (!*p || !(flags & MOUNT_ENC))
     {
-      if ((n + strlen (p)) > CYG_MAX_PATH)
+      if ((n + strlen (p)) >= CYG_MAX_PATH)
 	err = ENAMETOOLONG;
       else
 	backslashify (p, dst + n, 0);
@@ -1731,7 +1731,7 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
 	}
       if (mi.flags & MOUNT_ENC)
 	{
-	  char tmpbuf[CYG_MAX_PATH + 1];
+	  char tmpbuf[CYG_MAX_PATH];
 	  if (fnunmunge (tmpbuf, posix_path))
 	    strcpy (posix_path, tmpbuf);
 	}
@@ -2557,9 +2557,9 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
   int res = -1;
   path_conv win32_path, win32_topath;
   char from[CYG_MAX_PATH + 5];
-  char cwd[CYG_MAX_PATH + 1], *cp = NULL, c = 0;
-  char w32topath[CYG_MAX_PATH + 1];
-  char reltopath[CYG_MAX_PATH + 1] = { 0 };
+  char cwd[CYG_MAX_PATH], *cp = NULL, c = 0;
+  char w32topath[CYG_MAX_PATH];
+  char reltopath[CYG_MAX_PATH] = { 0 };
   DWORD written;
   SECURITY_ATTRIBUTES sa = sec_none_nih;
   security_descriptor sd;
@@ -2612,7 +2612,7 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
     {
       if (!isabspath (topath))
 	{
-	  getcwd (cwd, CYG_MAX_PATH + 1);
+	  getcwd (cwd, CYG_MAX_PATH);
 	  if ((cp = strrchr (from, '/')) || (cp = strrchr (from, '\\')))
 	    {
 	      c = *cp;
@@ -2671,7 +2671,7 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
 	  win_shortcut_hdr *shortcut_header = (win_shortcut_hdr *) buf;
 	  HRESULT hres;
 	  IShellFolder *psl;
-	  WCHAR wc_path[CYG_MAX_PATH + 1];
+	  WCHAR wc_path[CYG_MAX_PATH];
 	  ITEMIDLIST *pidl = NULL, *p;
 	  unsigned short len;
 
@@ -2686,7 +2686,7 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
 	  if (SUCCEEDED (hres))
 	    {
 	      MultiByteToWideChar (CP_ACP, 0, w32topath, -1, wc_path,
-				   CYG_MAX_PATH + 1);
+				   CYG_MAX_PATH);
 	      hres = psl->ParseDisplayName (NULL, NULL, wc_path, NULL,
 					    &pidl, NULL);
 	      if (SUCCEEDED (hres))
@@ -2809,7 +2809,7 @@ symlink_info::check_shortcut (const char *path, HANDLE h)
   cp = buf + sizeof (win_shortcut_hdr);
   if (file_header->flags & WSH_FLAG_IDLIST) /* Skip ITEMIDLIST */
     cp += *(unsigned short *) cp + 2;
-  if ((len = *(unsigned short *) cp) == 0 || len > CYG_MAX_PATH)
+  if ((len = *(unsigned short *) cp) == 0 || len >= CYG_MAX_PATH)
     goto file_not_symlink;
   strncpy (contents, cp += 2, len);
   contents[len] = '\0';
@@ -2847,7 +2847,7 @@ symlink_info::check_sysfile (const char *path, HANDLE h)
       /* It's a symlink.  */
       pflags = PATH_SYMLINK;
 
-      res = ReadFile (h, contents, CYG_MAX_PATH + 1, &got, 0);
+      res = ReadFile (h, contents, CYG_MAX_PATH, &got, 0);
       if (!res)
 	{
 	  debug_printf ("ReadFile2 failed");
@@ -3966,7 +3966,7 @@ etc::file_changed (int n)
 extern "C" char *
 basename (char *path)
 {
-  static char buf[CYG_MAX_PATH + 1];
+  static char buf[CYG_MAX_PATH];
   char *c, *d, *bs = buf;
 
   if (!path || !*path)
@@ -4004,7 +4004,7 @@ basename (char *path)
 extern "C" char *
 dirname (char *path)
 {
-  static char buf[CYG_MAX_PATH + 1];
+  static char buf[CYG_MAX_PATH];
   char *c, *d, *bs = buf;
 
   if (!path || !*path)

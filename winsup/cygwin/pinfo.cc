@@ -398,7 +398,7 @@ extern char **__argv;
 void
 _pinfo::commune_recv ()
 {
-  char path[CYG_MAX_PATH + 1];
+  char path[CYG_MAX_PATH];
   DWORD nr;
   DWORD code;
   HANDLE hp;
@@ -833,7 +833,7 @@ _pinfo::fd (int fd, size_t &n)
       if (cfd < 0)
 	s = strdup ("");
       else
-	s = cfd->get_proc_fd_name ((char *) malloc (CYG_MAX_PATH + 1));
+	s = cfd->get_proc_fd_name ((char *) malloc (CYG_MAX_PATH));
       n = strlen (s) + 1;
     }
   return s;

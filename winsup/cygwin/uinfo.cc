@@ -251,7 +251,7 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
   LPUSER_INFO_3 ui = NULL;
   WCHAR wuser[UNLEN + 1];
   NET_API_STATUS ret;
-  char homepath_env_buf[CYG_MAX_PATH + 1];
+  char homepath_env_buf[CYG_MAX_PATH];
   char homedrive_env_buf[3];
   char *newhomedrive = NULL;
   char *newhomepath = NULL;
@@ -285,7 +285,7 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	  else
 	    {
 	      char home[CYG_MAX_PATH];
-	      char buf[CYG_MAX_PATH + 1];
+	      char buf[CYG_MAX_PATH];
 	      strcpy (buf, newhomedrive);
 	      strcat (buf, newhomepath);
 	      cygwin_conv_to_full_posix_path (buf, home);
@@ -418,7 +418,7 @@ cygheap_user::env_userprofile (const char *name, size_t namelen)
   if (test_uid (puserprof, name, namelen))
     return puserprof;
 
-  char userprofile_env_buf[CYG_MAX_PATH + 1];
+  char userprofile_env_buf[CYG_MAX_PATH];
   char win_id[UNLEN + 1]; /* Large enough for SID */
 
   cfree_and_set (puserprof, almost_null);

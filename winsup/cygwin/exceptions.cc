@@ -131,7 +131,7 @@ error_start_init (const char *buf)
       return;
     }
 
-  char pgm[CYG_MAX_PATH + 1];
+  char pgm[CYG_MAX_PATH];
   if (!GetModuleFileName (NULL, pgm, CYG_MAX_PATH))
     strcpy (pgm, "cygwin1.dll");
   for (char *p = strchr (pgm, '\\'); p; p = strchr (p, '\\'))
