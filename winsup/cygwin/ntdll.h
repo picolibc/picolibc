@@ -333,7 +333,7 @@ typedef enum _MEMORY_INFORMATION_CLASS
   MemoryBasicInformation,
   MemoryWorkingSetList,
   MemorySectionName,
-  MemoryBaiscVlmInformation
+  MemoryBasicVlmInformation
 } MEMORY_INFORMATION_CLASS;
 
 typedef struct _MEMORY_WORKING_SET_LIST
