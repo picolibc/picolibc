@@ -1,3 +1,9 @@
+2000-04-07  Timothy Wall  <twall@cygnus.com>
+
+	* internal.h: Fix some comments related to TI COFF (instead of tic80).
+	* ti.h: New.
+	* tic54x.h: New.
+	
 Wed Apr  5 22:08:41 2000  J"orn Rennecke <amylaar@cygnus.co.uk>
 
 	* sh.h (R_SH_LOOP_START, R_SH_LOOP_END): Define.
