@@ -1,4 +1,10 @@
-/* Posix dirent.h for WIN32.  */
+/* Posix dirent.h for WIN32.
+
+   Copyright 2001 Red Hat, Inc.
+
+   This software is a copyrighted work licensed under the terms of the
+   Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+   details. */
 
 /* Including this file should not require any Windows headers.  */
    

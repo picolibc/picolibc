@@ -1,3 +1,11 @@
+Wed Mar 14  9:34:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* libc/sys/cygwin/crt0.c: Add copyright hint.
+	* libc/sys/cygwin/sys/dirent.h: Ditto.
+	* libc/sys/cygwin/sys/param.h: Ditto.
+	* libc/sys/cygwin/sys/utime.h: Ditto.
+	* libc/sys/cygwin/sys/utmp.h: Ditto.
+
 2001-03-13  Alexandre Oliva  <aoliva@redhat.com>
 
 	* libc/stdio/vfprintf.c (QUADINT) [_NO_LONGLONG]: Make it
