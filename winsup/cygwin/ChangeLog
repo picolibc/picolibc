@@ -1,3 +1,8 @@
+Fri May 26 02:23:35 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* sigproc.h (sigframe::set): Accept a default frame pointer.
+	* sigproc.cc (sig_send): Use passed in frame pointer, if appropriate.
+
 Thu May 25 17:44:25 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dir.cc (rmdir): Use file attributes that have already been discovered

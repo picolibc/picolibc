@@ -49,12 +49,15 @@ private:
   sigthread *st;
 
 public:
-  void set (sigthread &t, int up = 1)
+  void set (sigthread &t, int up = 1, DWORD ebp = 0)
   {
     t.lock->acquire ();
     st = &t;
-    t.frame = (DWORD) (up ? __builtin_frame_address (1) :
-			   __builtin_frame_address (0));
+    if (ebp)
+      t.frame = ebp;
+    else
+      t.frame = (DWORD) (up ? __builtin_frame_address (1) :
+			     __builtin_frame_address (0));
     t.lock->release ();
   }
 
