@@ -562,6 +562,7 @@ sigproc_init ()
     }
   memset (w, 0, sizeof *w);	// Just to be safe
 
+  myself->getsig (SIGSTOP).sa_flags = SA_RESTART | SA_NODEFER;
   sigproc_printf ("process/signal handling enabled(%x)", myself->process_state);
   return;
 }

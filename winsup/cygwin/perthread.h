@@ -1,6 +1,6 @@
 /* perthread.h: Header file for cygwin synchronization primitives.
 
-   Copyright 2000 Cygnus Solutions.
+   Copyright 2000, 2001 Red Hat, Inc.
 
    Written by Christopher Faylor <cgf@cygnus.com>
 
@@ -96,6 +96,7 @@ struct signal_dispatch
   void (*func) (int);
   int sig;
   int saved_errno;
+  int sa_flags;
   DWORD oldmask;
   DWORD newmask;
   DWORD retaddr;

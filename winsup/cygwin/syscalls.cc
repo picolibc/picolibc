@@ -220,6 +220,8 @@ _read (int fd, void *ptr, size_t len)
 {
   sigframe thisframe (mainthread);
   extern int sigcatchers;
+
+beg:
   if (fdtab.not_open (fd))
     {
       set_errno (EBADF);
@@ -257,8 +259,11 @@ _read (int fd, void *ptr, size_t len)
     }
 
 out:
-  syscall_printf ("%d = read (%d<%s>, %p, %d), errno %d", res, fd, fh->get_name (),
-		  ptr, len, get_errno ());
+  if (res < 0 && WaitForSingleObject (signal_arrived, 0) == WAIT_OBJECT_0 &&
+      call_signal_handler ())
+    goto beg;
+  syscall_printf ("%d = read (%d<%s>, %p, %d), bin %d, errno %d", res, fd, fh->get_name (),
+		  ptr, len, fh->get_r_binary (), get_errno ());
   MALLOC_CHECK;
   return res;
 }

@@ -262,8 +262,7 @@ sigaction (int sig, const struct sigaction *newact, struct sigaction *oldact)
 
   if (newact)
     {
-      if ((sig == SIGKILL || sig == SIGSTOP || sig == SIGCONT) &&
-	  newact->sa_handler != SIG_DFL)
+      if ((sig == SIGKILL || sig == SIGSTOP) && newact->sa_handler != SIG_DFL)
 	{
 	  set_errno (EINVAL);
 	  return -1;

@@ -1,3 +1,17 @@
+Fri Jan 12 00:35:15 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* debug.h: Add regparm attributes to some functions.
+
+	* signal.cc (sigaction): Don't treat SIGCONT specially.
+
+	* exceptions.cc (interrupt_setup): Save sa_flags of interrupted signal for later use.
+	(sig_handler): Default any stopping signal to SIGSTOP.
+	(call_signal_handler): New function.
+	(sigdelayed0): New function.
+	* sigproc.cc (sigproc_init): Initialize SIGSTOP sigaction for special behavior.
+	* sigproc.h: Define call_signal_handler.
+	* syscalls.cc (_read): Allow restartable signal behavior.
+
 Thu Jan 11 13:17:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_base): New method `fixup_mmap_after_fork'.

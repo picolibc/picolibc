@@ -31,6 +31,7 @@ extern "C" {
 static int handle_exceptions (EXCEPTION_RECORD *, void *, CONTEXT *, void *);
 extern void sigreturn ();
 extern void sigdelayed ();
+extern void sigdelayed0 ();
 extern void siglast ();
 extern DWORD __no_sig_start, __no_sig_end;
 };
@@ -634,6 +635,7 @@ interrupt_setup (int sig, void *handler, DWORD retaddr, DWORD *retaddr_on_stack,
   sigsave.oldmask = myself->getsigmask ();	// Remember for restoration
   /* FIXME: Not multi-thread aware */
   sigsave.newmask = myself->getsigmask () | siga.sa_mask | SIGTOMASK (sig);
+  sigsave.sa_flags = siga.sa_flags;
   sigsave.func = (void (*)(int)) handler;
   sigsave.sig = sig;
   sigsave.saved_errno = -1;		// Flag: no errno to save
@@ -987,6 +989,7 @@ sig_handle (int sig)
 
 stop:
   handler = (void *) sig_handle_tty_stop;
+  thissig = myself->getsig (SIGSTOP);
 
 dosig:
   /* Dispatch to the appropriate function. */
@@ -1091,6 +1094,16 @@ reset_signal_arrived ()
   sigproc_printf ("reset signal_arrived");
 }
 
+int __stdcall
+call_signal_handler ()
+{
+  int sa_flags = sigsave.sa_flags;
+  sigproc_printf ("sa_flags %p", sa_flags);
+  *sigsave.retaddr_on_stack = sigsave.retaddr;
+  sigdelayed0 ();
+  return sa_flags & SA_RESTART;
+}
+
 void unused_sig_wrapper ()
 {
 /* Signal cleanup stuff.  Cleans up stack (too bad that we didn't
@@ -1123,6 +1136,7 @@ _sigreturn:
 __no_sig_start:
 _sigdelayed:
 	pushl	%2			# original return address
+_sigdelayed0:
 	pushl	%%ebp
 	movl	%%esp,%%ebp
 	pushf
