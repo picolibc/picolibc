@@ -3,11 +3,6 @@
 	* bfdlink.h (bfd_link_info): Correct comments for the
 	unresolved_syms_in_objects field.
 
-2004-03-12  Jakub Jelinek  <jakub@redhat.com>
-
-	* opcode/i386.h (i386_optab): Remove CpuNo64 from sysenter and
-	sysexit.
-
 2004-02-24  Ian Lance Taylor  <ian@wasabisystems.com>
 
 	* dyn-string.h: Update copyright date.
