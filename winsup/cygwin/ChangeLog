@@ -1,3 +1,9 @@
+2004-02-26  Brian Ford  <ford@vss.fsi.com>
+
+	* miscfuncs.cc (check_invalid_virtual_addr): Assure the last page
+	in the range is always tested.  Add appropriate const.
+	* mmap.cc (mmap_record::aloc_fh): Remove unused static path_conf object.
+
 2004-02-25  Christopher Faylor  <cgf@redhat.com>
 
 	* exceptions.cc (setup_handler): Signal event for any sigwaitinfo if it

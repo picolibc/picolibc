@@ -218,9 +218,10 @@ int __stdcall
 check_invalid_virtual_addr (const void *s, unsigned sz)
 {
   MEMORY_BASIC_INFORMATION mbuf;
-  void *end;
+  const void *end;
 
-  for (end = (char *) s + sz; s < end; s = (char *) s + mbuf.RegionSize)
+  for (end = (char *) s + sz; s < end;
+       s = (char *) mbuf.BaseAddress + mbuf.RegionSize)
     if (!VirtualQuery (s, &mbuf, sizeof mbuf))
       return EINVAL;
   return 0;

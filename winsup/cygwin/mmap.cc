@@ -295,7 +295,6 @@ mmap_record::alloc_fh ()
       return &fh_paging_file;
     }
 
-  static path_conv pc; // should be thread safe - CGF
   /* The file descriptor could have been closed or, even
      worse, could have been reused for another file before
      the call to fork(). This requires creating a fhandler
