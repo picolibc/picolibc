@@ -665,38 +665,6 @@ done:
   return res;
 }
 
-#if 0
-static BOOL
-rel2abssd (PSECURITY_DESCRIPTOR psd_rel, PSECURITY_DESCRIPTOR psd_abs,
-		DWORD abslen)
-{
-#ifdef _MT_SAFE
-  struct _winsup_t *r=_reent_winsup ();
-  char *dacl_buf=r->_dacl_buf;
-  char *sacl_buf=r->_sacl_buf;
-  char *ownr_buf=r->_ownr_buf;
-  char *grp_buf=r->_grp_buf;
-#else
-  static char dacl_buf[1024];
-  static char sacl_buf[1024];
-  static char ownr_buf[1024];
-  static char grp_buf[1024];
-#endif
-  DWORD dacl_len = 1024;
-  DWORD sacl_len = 1024;
-  DWORD ownr_len = 1024;
-  DWORD grp_len = 1024;
-
-  BOOL res = MakeAbsoluteSD (psd_rel, psd_abs, &abslen, (PACL) dacl_buf,
-			     &dacl_len, (PACL) sacl_buf, &sacl_len,
-			     (PSID) ownr_buf, &ownr_len, (PSID) grp_buf,
-			     &grp_len);
-
-  syscall_printf ("%d = rel2abssd (...)", res);
-  return res;
-}
-#endif
-
 /* chown: POSIX 5.6.5.1 */
 /*
  * chown () is only implemented for Windows NT.  Under other operating

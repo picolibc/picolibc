@@ -77,6 +77,14 @@ details. */
 #include <assert.h>
 #include "shortcut.h"
 
+#ifdef _MT_SAFE
+#define iteration _reent_winsup ()->_iteration
+#define available_drives _reent_winsup ()->available_drives
+#else
+static int iteration;
+static DWORD available_drives;
+#endif
+
 static int normalize_win32_path (const char *src, char *dst);
 static void slashify (const char *src, char *dst, int trailing_slash_p);
 static void backslashify (const char *src, char *dst, int trailing_slash_p);
@@ -1720,15 +1728,6 @@ mount_info::get_cygdrive_info (char *user, char *system, char* user_flags,
   return (res != ERROR_SUCCESS) ? res : res2;
 }
 
-struct mntent *
-mount_info::getmntent (int x)
-{
-  if (x < 0 || x >= nmounts)
-    return NULL;
-
-  return mount[native_sorted[x]].getmntent ();
-}
-
 static mount_item *mounts_for_sort;
 
 /* sort_by_posix_name: qsort callback to sort the mount entries.  Sort
@@ -2028,11 +2027,11 @@ mount_info::import_v1_mounts ()
 
 /************************* mount_item class ****************************/
 
-struct mntent *
-mount_item::getmntent ()
+static mntent *
+fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
 {
 #ifdef _MT_SAFE
-  struct mntent &ret=_reent_winsup()->_ret;
+  struct mntent &ret=_reent_winsup()->mntbuf;
 #else
   static NO_COPY struct mntent ret;
 #endif
@@ -2053,7 +2052,7 @@ mount_item::getmntent ()
     strcpy (mount_table->mnt_type, (char *) "system");
 
   if ((flags & MOUNT_AUTO))		/* cygdrive */
-    strcat (mount_table->mnt_type, (char *) ",auto");
+    strcat (mount_table->mnt_type, (char *) ",noumount");
 
   ret.mnt_type = mount_table->mnt_type;
 
@@ -2077,6 +2076,42 @@ mount_item::getmntent ()
   ret.mnt_freq = 1;
   ret.mnt_passno = 1;
   return &ret;
+}
+
+struct mntent *
+mount_item::getmntent ()
+{
+  return fillout_mntent (native_path, posix_path, flags);
+}
+
+static struct mntent *
+cygdrive_getmntent ()
+{
+  if (!available_drives)
+    return NULL;
+
+  DWORD mask, drive;
+  for (mask = 1, drive = 'a'; drive <= 'z'; mask <<= 1, drive++)
+    if (available_drives & mask)
+      {
+	available_drives &= ~mask;
+	break;
+      }
+
+  char native_path[3];
+  char posix_path[MAX_PATH];
+  __small_sprintf (native_path, "%c:", drive);
+  __small_sprintf (posix_path, "%s%c", mount_table->cygdrive, drive);
+  return fillout_mntent (native_path, posix_path, mount_table->cygdrive_flags);
+}
+  
+struct mntent *
+mount_info::getmntent (int x)
+{
+  if (x < 0 || x >= nmounts)
+    return cygdrive_getmntent ();
+
+  return mount[native_sorted[x]].getmntent ();
 }
 
 /* Fill in the fields of a mount table entry.  */
@@ -2161,17 +2196,12 @@ cygwin_umount (const char *path, unsigned flags)
   return res;
 }
 
-#ifdef _MT_SAFE
-#define iteration _reent_winsup()->_iteration
-#else
-static int iteration;
-#endif
-
 extern "C"
 FILE *
 setmntent (const char *filep, const char *)
 {
   iteration = 0;
+  available_drives = GetLogicalDrives ();
   return (FILE *) filep;
 }
 

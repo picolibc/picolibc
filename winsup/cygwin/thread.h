@@ -26,9 +26,9 @@ details. */
 extern "C"
 {
 #if defined (_CYG_THREAD_FAILSAFE) && defined (_MT_SAFE)
-  void AssertResourceOwner (int, int);
+void AssertResourceOwner (int, int);
 #else
-# define AssertResourceOwner(i,ii)
+#define AssertResourceOwner(i,ii)
 #endif
 }
 
@@ -63,73 +63,64 @@ extern "C"
 extern "C"
 {
 
-  struct _winsup_t
-  {
-/*
- Needed for the group functions
-*/
-    struct group _grp;
-    char *_namearray[2];
-    char _linebuf[100];
-    int _grp_pos;
+struct _winsup_t
+{
+  /*
+  Needed for the group functions
+  */
+  struct group _grp;
+  char *_namearray[2];
+  int _grp_pos;
 
-/* console.cc */
-    unsigned _rarg;
+  /* console.cc */
+  unsigned _rarg;
 
-/* dlfcn.cc */
-    int _dl_error;
-    char _dl_buffer[256];
+  /* dlfcn.cc */
+  int _dl_error;
+  char _dl_buffer[256];
 
-/* passwd.cc */
-    struct passwd _res;
-    char _tmpbuf[100];
-    char _pass[_PASSWORD_LEN];
-    int _pw_pos;
+  /* passwd.cc */
+  struct passwd _res;
+  char _pass[_PASSWORD_LEN];
+  int _pw_pos;
 
-/* path.cc */
-    struct mntent _ret;
-    int _iteration;
+  /* path.cc */
+  struct mntent mntbuf;
+  int _iteration;
+  DWORD available_drives;
 
-/* strerror */
-    char _strerror_buf[20];
+  /* strerror */
+  char _strerror_buf[20];
 
-/* syscalls.cc */
-    char _dacl_buf[1024];
-    char _sacl_buf[1024];
-    char _ownr_buf[1024];
-    char _grp_buf[1024];
+  /* sysloc.cc */
+  char *_process_ident;
+  int _process_logopt;
+  int _process_facility;
+  int _process_logmask;
 
-/* sysloc.cc */
-    char *_process_ident;
-    int _process_logopt;
-    int _process_facility;
-    int _process_logmask;
+  /* times.cc */
+  char timezone_buf[20];
+  struct tm _localtime_buf;
 
-/* times.cc */
-    char _b[20];
-    struct tm _localtime_buf;
-    char _buf1[33];
-    char _buf2[33];
-
-/* uinfo.cc */
-    char _username[MAX_USER_NAME];
-  };
+  /* uinfo.cc */
+  char _username[MAX_USER_NAME];
+};
 
 
-  struct __reent_t
-  {
-    struct _reent *_clib;
-    struct _winsup_t *_winsup;
-  };
+struct __reent_t
+{
+  struct _reent *_clib;
+  struct _winsup_t *_winsup;
+};
 
-  _reent *_reent_clib ();
-  _winsup_t *_reent_winsup ();
-  void SetResourceLock (int, int, const char *) __attribute__ ((regparm (3)));
-  void ReleaseResourceLock (int, int, const char *)
-    __attribute__ ((regparm (3)));
+_reent *_reent_clib ();
+_winsup_t *_reent_winsup ();
+void SetResourceLock (int, int, const char *) __attribute__ ((regparm (3)));
+void ReleaseResourceLock (int, int, const char *)
+  __attribute__ ((regparm (3)));
 
 #ifdef _CYG_THREAD_FAILSAFE
-  void AssertResourceOwner (int, int);
+void AssertResourceOwner (int, int);
 #else
 #define AssertResourceOwner(i,ii)
 #endif
@@ -141,9 +132,7 @@ class pinfo;
 class ResourceLocks
 {
 public:
-  ResourceLocks ()
-  {
-  };
+  ResourceLocks () {}
   LPCRITICAL_SECTION Lock (int);
   void Init ();
   void Delete ();
@@ -170,8 +159,8 @@ class verifyable_object
 public:
   long magic;
 
-    verifyable_object (long);
-   ~verifyable_object ();
+  verifyable_object (long);
+  ~verifyable_object ();
 };
 
 int verifyable_object_isvalid (verifyable_object *, long);
@@ -182,8 +171,8 @@ public:
   int joinable;
   size_t stacksize;
 
-    pthread_attr ();
-   ~pthread_attr ();
+  pthread_attr ();
+  ~pthread_attr ();
 };
 
 class pthread:public verifyable_object
@@ -211,18 +200,16 @@ public:
   LONG *sigtodo;
   void create (void *(*)(void *), pthread_attr *, void *);
 
-    pthread ();
-   ~pthread ();
+  pthread ();
+  ~pthread ();
 
 private:
-    DWORD thread_id;
-
+  DWORD thread_id;
 };
 
 class pthread_mutexattr:public verifyable_object
 {
 public:
-
   pthread_mutexattr ();
   ~pthread_mutexattr ();
 };
@@ -237,8 +224,8 @@ public:
   int TryLock ();
   int UnLock ();
 
-    pthread_mutex (pthread_mutexattr *);
-   ~pthread_mutex ();
+  pthread_mutex (pthread_mutexattr *);
+  ~pthread_mutex ();
 };
 
 class pthread_key:public verifyable_object
@@ -249,8 +236,8 @@ public:
   int set (const void *);
   void *get ();
 
-    pthread_key ();
-   ~pthread_key ();
+  pthread_key ();
+  ~pthread_key ();
 };
 
 class pthread_condattr:public verifyable_object
@@ -258,8 +245,8 @@ class pthread_condattr:public verifyable_object
 public:
   int shared;
 
-    pthread_condattr ();
-   ~pthread_condattr ();
+  pthread_condattr ();
+  ~pthread_condattr ();
 };
 
 class pthread_cond:public verifyable_object
@@ -273,8 +260,8 @@ public:
   void BroadCast ();
   void Signal ();
 
-    pthread_cond (pthread_condattr *);
-   ~pthread_cond ();
+  pthread_cond (pthread_condattr *);
+  ~pthread_cond ();
 };
 
 /* shouldn't be here */
@@ -287,8 +274,8 @@ public:
   void Post ();
   int TryWait ();
 
-    semaphore (int, unsigned int);
-   ~semaphore ();
+  semaphore (int, unsigned int);
+  ~semaphore ();
 };
 
 typedef class pthread *pthread_t;
@@ -318,15 +305,13 @@ public:
 
   void Init (int);
 
-    MTinterface ():reent_index (0), indexallocated (0)
-  {
-  }
+  MTinterface ():reent_index (0), indexallocated (0)
+  {}
 };
 
 
 extern "C"
 {
-
   void *thread_init_wrapper (void *);
 
 /*  ThreadCreation */
@@ -400,7 +385,6 @@ __pthread_attr_getstackaddr(...);
   int __sem_wait (sem_t * sem);
   int __sem_trywait (sem_t * sem);
   int __sem_post (sem_t * sem);
-
 };
 
 #endif // MT_SAFE

@@ -1,3 +1,16 @@
+Sat Mar 31 21:56:19 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* thread.h (struct _winsup_t): Remove obsolete elements.  Add
+	available_drives element.
+	* path.cc (mount_info::getmntent): Report "/cygdrive" drives when
+	mounted drives are exhausted.
+	(fillout_mntent): New function.
+	(mount_item::getmntent): Use fillout_mntent.
+	(cygdrives_mntent): New function.  Returns next available "/cygdrive".
+	(setmntent): Initialize available "/cygdrives".
+	* syscalls.cc: Remove some if 0'ed code.
+	* times.cc (timezone): Use more descriptive variable name.
+
 Sat Mar 31 18:59:52 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* sigproc.h (class sigframe): Implement 'unregister()' method.

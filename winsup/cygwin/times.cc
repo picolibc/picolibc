@@ -123,7 +123,7 @@ extern "C" char *
 timezone ()
 {
 #ifdef _MT_SAFE
-  char *b=_reent_winsup()->_b;
+  char *b=_reent_winsup()->timezone_buf;
 #else
   static NO_COPY char b[20] = {0};
 #endif
