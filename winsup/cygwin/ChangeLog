@@ -1,3 +1,11 @@
+2001-10-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_tape.cc (fhandler_dev_tape::tape_status): Report
+	EOTWarningZoneSize in get->mt_eotwarningzonesize.
+	* include/cygwin/mtio.h: Define DEFTAPE.
+	(struct mtget): Add member `mt_eotwarningzonesize'. Add a comment.
+	* include/cygwin/version.h: Bump API minor version to 47.
+	
 2001-10-16  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler.cc (fhandler_base::fork_fixup): Guard against compiler
