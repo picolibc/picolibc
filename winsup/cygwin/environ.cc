@@ -433,6 +433,12 @@ regopt (const char *name)
   MALLOC_CHECK;
   if (r.get_string (lname, buf, sizeof (buf) - 1, "") == ERROR_SUCCESS)
     parse_options (buf);
+  else
+    {
+      reg_key r1 (HKEY_LOCAL_MACHINE, KEY_READ, CYGWIN_INFO_PROGRAM_OPTIONS_NAME, NULL);
+      if (r1.get_string (lname, buf, sizeof (buf) - 1, "") == ERROR_SUCCESS)
+	parse_options (buf);
+    }
   MALLOC_CHECK;
 }
 

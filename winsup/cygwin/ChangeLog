@@ -1,3 +1,7 @@
+Mon May 22 17:11:25 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* environ.cc (regopt): Scan HKLM if HKCU scan fails.
+
 Mon May 16 23:39:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* dir.cc (rmdir): Care for misleading error messages
