@@ -257,6 +257,7 @@ class fhandler_base
 
   /* fixup fd possibly non-inherited handles after fork */
   void fork_fixup (HANDLE parent, HANDLE &h, const char *name);
+  virtual bool need_fixup_before () const {return false;}
 
   virtual int open (int flags, mode_t mode = 0);
   int open_fs (int flags, mode_t mode = 0);
@@ -311,7 +312,7 @@ class fhandler_base
   virtual bool isdevice () { return true; }
   virtual bool isfifo () { return false; }
   virtual char *ptsname () { return NULL;}
-  virtual class fhandler_socket *is_socket () { return 0; }
+  virtual class fhandler_socket *is_socket () { return NULL; }
   virtual class fhandler_console *is_console () { return 0; }
   virtual int is_windows () {return 0; }
 
@@ -410,6 +411,7 @@ class fhandler_socket: public fhandler_base
   virtual void fixup_before_fork_exec (DWORD);
   void fixup_after_fork (HANDLE);
   void fixup_after_exec (HANDLE);
+  bool need_fixup_before () const {return true;}
 
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);

@@ -1,3 +1,25 @@
+2003-03-02  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (devicess.cc): Make generation dependent on cygwin-gperf.
+	* cygheap.h (cygheap_fdmanip): Add fhandler_socket cast.
+	* cygwin-gperf: Autogenerate references to network devices.
+	* devices.h: Create separate device types for all network types.
+	Export references to global network device storage.
+	* dtable.cc (dtable::release): Use generic determination to control
+	when need_fixup_before needs to be decremented.
+	(dtable::init_std_file_from_handle): Replace use of 'socket_dev' with
+	'tcp_dev'.
+	(build_fh_pc): Adapt to new socket types.  Don't increment fixup_before
+	here.
+	* fhandler.h (fhandler_base::need_fixup_before): Declare/define.
+	(fhandler_socket::need_fixup_before): Ditto.
+	* fhandler_socket.cc (fhandler_socket::accept): Accommodate new fdsock
+	definition.
+	* net.cc: Throughout, change use of fdsock to return true/false for
+	success/failure and take cygheap_fdmanip type and device
+	* select.cc (set_bits): Use 'is_socket ()' test rather than
+	specificially testing device type.
+
 2003-02-24  Christopher Faylor  <cgf@redhat.com>
 
 	* device.gperf: Remove nonsensical devices.

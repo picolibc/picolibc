@@ -177,12 +177,8 @@ dtable::release (int fd)
 {
   if (!not_open (fd))
     {
-      switch (fds[fd]->get_device ())
-	{
-	case FH_SOCKET:
-	  dec_need_fixup_before ();
-	  break;
-	}
+      if (fds[fd]->need_fixup_before ())
+	dec_need_fixup_before ();
       delete fds[fd];
       fds[fd] = NULL;
     }
@@ -245,7 +241,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 	    dev = *pipew_dev;
 	}
       else if (wsock_started && getpeername ((SOCKET) handle, &sa, &sal) == 0)
-	dev = *socket_dev;
+	dev = *tcp_dev;
       else if (GetCommState (handle, &dcb))
 	dev.parse ("/dev/ttyS0");
       else
@@ -380,9 +376,13 @@ build_fh_pc (path_conv& pc)
       case FH_PIPEW:
 	fh = cnew (fhandler_pipe) ();
 	break;
-      case FH_SOCKET:
-	if ((fh = cnew (fhandler_socket) ()))
-	  cygheap->fdtab.inc_need_fixup_before ();
+      case FH_TCP:
+      case FH_UCP:
+      case FH_ICMP:
+      case FH_UNIX:
+      case FH_STREAM:
+      case FH_DGRAM:
+	fh = cnew (fhandler_socket) ();
 	break;
       case FH_FS:
 	fh = cnew (fhandler_disk_file) ();

@@ -43,7 +43,6 @@ enum fh_devices
   FH_PIPER   = FHDEV (0, 254),
   FH_PIPEW   = FHDEV (0, 253),
   FH_FIFO    = FHDEV (0, 252),
-  FH_SOCKET  = FHDEV (0, 251),
   FH_PROC    = FHDEV (0, 250),
   FH_REGISTRY= FHDEV (0, 249),
   FH_PROCESS = FHDEV (0, 248),
@@ -109,6 +108,14 @@ enum fh_devices
   DEV_RAWDRIVE_MAJOR = 65,
   FH_RAWDRIVE= FHDEV (DEV_RAWDRIVE_MAJOR, 0),
 
+  DEV_TCP_MAJOR = 30,
+  FH_TCP = FHDEV (DEV_TCP_MAJOR, 36),
+  FH_UCP = FHDEV (DEV_TCP_MAJOR, 39),
+  FH_ICMP = FHDEV (DEV_TCP_MAJOR, 33),
+  FH_UNIX = FHDEV (DEV_TCP_MAJOR, 120),
+  FH_STREAM = FHDEV (DEV_TCP_MAJOR, 121),
+  FH_DGRAM = FHDEV (DEV_TCP_MAJOR, 122),
+
   FH_BAD     = FHDEV (0, 0)
 };
 
@@ -155,3 +162,9 @@ extern const device *socket_dev;
 extern const device *ttym_dev;
 extern const device *ttys_dev;
 extern const device *urandom_dev;
+extern const device *tcp_dev;
+extern const device *udp_dev;
+extern const device *icmp_dev;
+extern const device *unix_dev;
+extern const device *stream_dev;
+extern const device *dgram_dev;

@@ -36,13 +36,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
-
-/*#include "namespace.h"*/
-
 #include <assert.h>
 #include <errno.h>
-/*#include <err.h>*/
 #include <stdlib.h>
 #include <string.h>
 #include <getopt.h>
@@ -92,9 +87,9 @@ extern char __declspec(dllimport) *__progname;
 
 #define	EMSG	""
 
-static int getopt_internal __P((int, char * const *, const char *));
-static int gcd __P((int, int));
-static void permute_args __P((int, int, int, char * const *));
+static int getopt_internal (int, char * const *, const char *);
+static int gcd (int, int);
+static void permute_args (int, int, int, char * const *);
 
 static const char *place = EMSG; /* option letter processing */
 

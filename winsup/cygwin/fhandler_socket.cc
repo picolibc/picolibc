@@ -37,7 +37,7 @@
 #define SECRET_EVENT_NAME "cygwin.local_socket.secret.%d.%08x-%08x-%08x-%08x"
 #define ENTROPY_SOURCE_NAME "/dev/urandom"
 
-extern fhandler_socket *fdsock (int& fd, const char *name, SOCKET soc);
+extern bool fdsock (cygheap_fdmanip& fd, const device *, SOCKET soc);
 extern "C" {
 int sscanf (const char *, const char *, ...);
 } /* End of "C" section */
@@ -698,16 +698,13 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
   else
     {
       cygheap_fdnew res_fd;
-      fhandler_socket* res_fh = NULL;
-      if (res_fd >= 0)
-	  res_fh = fdsock (res_fd, get_name (), res);
-      if (res_fh)
+      if (res_fd >= 0 && fdsock (res_fd, &dev (), res))
         {
 	  if (get_addr_family () == AF_LOCAL)
-	    res_fh->set_sun_path (get_sun_path ());
-	  res_fh->set_addr_family (get_addr_family ());
-	  res_fh->set_socket_type (get_socket_type ());
-	  res_fh->set_connect_state (CONNECTED);
+	    ((fhandler_socket *) res_fd)->set_sun_path (get_sun_path ());
+	  ((fhandler_socket *) res_fd)->set_addr_family (get_addr_family ());
+	  ((fhandler_socket *) res_fd)->set_socket_type (get_socket_type ());
+	  ((fhandler_socket *) res_fd)->set_connect_state (CONNECTED);
 	  res = res_fd;
 	}
       else

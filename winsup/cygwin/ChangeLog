@@ -1,5 +1,9 @@
 2003-03-02  Christopher Faylor  <cgf@redhat.com>
 
+	* lib/getopt.c: Nuke use of unneeded BSDisms.
+
+2003-03-02  Christopher Faylor  <cgf@redhat.com>
+
 	* dll_init.cc (dll_list::load_after_fork): Don't revert to LoadLibrary
 	if LoadLibraryEx fails.
 	* dtable.cc (dtable::dec_console_fds): Eliminate.

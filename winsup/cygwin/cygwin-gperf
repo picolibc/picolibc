@@ -21,7 +21,12 @@ my %fh_declare = (
     'process_dev' => '&process_dev_storage',
     'piper_dev' => '&piper_dev_storage',
     'pipew_dev' => '&pipew_dev_storage',
-    'socket_dev' => '&socket_dev_storage'
+    'tcp_dev' => '&tcp_dev_storage',
+    'udp_dev' => '&udp_dev_storage',
+    'icmp_dev' => '&icmp_dev_storage',
+    'unix_dev' => '&unix_dev_storage',
+    'stream_dev' => '&stream_dev_storage',
+    'dgram_dev' => '&dgram_dev_storage'
 );
 
 foreach (@lines) {
@@ -49,8 +54,23 @@ static const device registry_dev_storage =
 static const device process_dev_storage =
   {"", FH_PROCESS, "", 0, 0, 0, 0};
 
-static const device socket_dev_storage =
-  {"", FH_SOCKET, "", 0, 0, 0, 0};
+static const device tcp_dev_storage =
+  {"/dev/inet/tcp", FH_TCP, "", 0, 0, 0, 0};
+
+static const device udp_dev_storage =
+  {"/dev/inet/udp", FH_UCP, "", 0, 0, 0, 0};
+
+static const device icmp_dev_storage =
+  {"/dev/inet/icmp", FH_ICMP, "", 0, 0, 0, 0};
+
+static const device unix_dev_storage =
+  {"/dev/inet/unix", FH_UNIX, "", 0, 0, 0, 0};
+
+static const device stream_dev_storage =
+  {"/dev/inet/stream", FH_STREAM, "", 0, 0, 0, 0};
+
+static const device dgram_dev_storage =
+  {"/dev/inet/dgram", FH_DGRAM, "", 0, 0, 0, 0};
 
 static const device piper_dev_storage =
   {"", FH_PIPER, "", 0, 0, 0, 0};
