@@ -625,12 +625,12 @@ struct bfd_elf_version_expr
   struct bfd_elf_version_expr *next;
   /* Glob pattern.  */
   const char *pattern;
+  /* NULL for a glob pattern, otherwise a straight symbol.  */
+  const char *symbol;
   /* Defined by ".symver".  */
   unsigned int symver : 1;
   /* Defined by version script.  */
   unsigned int script : 1;
-  /* Is this a wildcard?.  */
-  unsigned int wildcard : 1;
   /* Pattern type.  */
 #define BFD_ELF_VERSION_C_TYPE		1
 #define BFD_ELF_VERSION_CXX_TYPE	2

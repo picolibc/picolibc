@@ -1,3 +1,8 @@
+2003-10-24  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* bfdlink.h (bfd_elf_version_expr): Add "symbol" and remove
+	"wildcard".
+
 2003-10-22  Joseph S. Myers  <jsm@polyomino.org.uk>
 
 	* obstack.h: Merge the following change from gnulib:
