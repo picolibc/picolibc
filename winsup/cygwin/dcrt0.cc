@@ -177,10 +177,15 @@ set_os_type ()
 	    os_being_run = win95;
 	    os = "95";
 	  }
-	else /* os_version_info.dwMinorVersion == 10 */
+	else if (os_version_info.dwMinorVersion < 90)
 	  {
 	    os_being_run = win98;
 	    os = "98";
+	  }
+	else /* os_version_info.dwMinorVersion == 90 */
+	  {
+	    os_being_run = winME;
+	    os = "ME";
 	  }
 	break;
       default:
@@ -213,6 +218,7 @@ host_dependent_constants::init ()
       shared = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
       break;
 
+    case winME:
     case win98:
     case win95:
     case win32s:

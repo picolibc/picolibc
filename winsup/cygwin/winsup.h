@@ -74,7 +74,7 @@ return __res;
 extern "C" DWORD WINAPI GetLastError (void);
 
 /* Used for runtime OS check/decisions. */
-enum os_type {winNT = 1, win95, win98, win32s, unknown};
+enum os_type {winNT = 1, win95, win98, winME, win32s, unknown};
 extern os_type os_being_run;
 
 /* Used to check if Cygwin DLL is dynamically loaded. */

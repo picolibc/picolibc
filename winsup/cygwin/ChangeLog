@@ -1,3 +1,10 @@
+Sat Sep 30 03:34:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* winsup.h: Add `winME' to os_type symbols.
+	* dcrt0.cc (set_os_type): Identify Windows ME systems.
+	* (host_dependent_constants::init): Care for winME.
+	* uname.cc (uname): Ditto.
+
 Thu Sep 28 01:46:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* net.cc (get_ifconf): Code cleanup. Split. Call os dependent

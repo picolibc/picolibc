@@ -59,6 +59,7 @@ uname (struct utsname *name)
 	  {
 	    case win95:
 	    case win98:
+	    case winME:
 	      /* dwProcessorType only valid in Windows 95 */
 	      if ((sysinfo.dwProcessorType == PROCESSOR_INTEL_386) ||
 		  (sysinfo.dwProcessorType == PROCESSOR_INTEL_486) ||
