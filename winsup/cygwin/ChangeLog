@@ -1,3 +1,8 @@
+Wed Sep 19 17:49:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::fhandler_socket): Revert
+	memory allocation to use cmalloc again.
+
 Tue Sep 18 21:04:26 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* cygwin.din (__argv): Export.

@@ -45,7 +45,7 @@ fhandler_socket::fhandler_socket (const char *name) :
 {
   set_cb (sizeof *this);
   set_need_fork_fixup ();
-  prot_info_ptr = (LPWSAPROTOCOL_INFOA) ccalloc (HEAP_BUF, 1,
+  prot_info_ptr = (LPWSAPROTOCOL_INFOA) cmalloc (HEAP_BUF, 
 						 sizeof (WSAPROTOCOL_INFOA));
 }
 
