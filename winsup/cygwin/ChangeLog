@@ -1,5 +1,9 @@
 2004-12-01  Christopher Faylor  <cgf@timesys.com>
 
+	* include/features.h: Include sys/cdefs.h, like linux.
+
+2004-12-01  Christopher Faylor  <cgf@timesys.com>
+
 	* syscalls.cc (truncate64): Don't second-guess errno if open fails.
 	* devices.in: Don't allow /dev/com0.
 
