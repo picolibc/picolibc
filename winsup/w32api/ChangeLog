@@ -1,3 +1,9 @@
+
+2001-04-11  John Fortin  <fortinj@attglobal.net>
+
+	* include/windef.h (*PBOOL): Unprotect from XFree86Server.
+	(*LPBOOL): Ditto.
+
 Sun Apr  8 20:48:01 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* include/winnt.h (GetCurrentFiber): Make "external __inline" or asm

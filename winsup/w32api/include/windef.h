@@ -126,9 +126,9 @@ typedef WINBOOL BOOL;
 #else
 #define BOOL WINBOOL
 #endif
-typedef BOOL *PBOOL,*LPBOOL;
 typedef unsigned char BYTE;
 #endif /* ndef XFree86Server */
+typedef BOOL *PBOOL,*LPBOOL;
 typedef unsigned short WORD;
 typedef float FLOAT;
 typedef FLOAT *PFLOAT;
