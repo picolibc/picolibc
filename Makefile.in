@@ -1747,14 +1747,19 @@ taz: $(DEVO_SUPPORT) $(SUPPORT_FILES) texinfo/texinfo.tex
 	else \
 	  ver=`sed <$(TOOL)/Makefile.in -n 's/^VERSION *= *//p'`; \
 	fi; \
-	$(MAKE) -f Makefile.in do-tar-bz2 TOOL=$(TOOL) VER=$$ver
+	if test x"$(PACKAGE)" = x; then \
+	  package="$(TOOL)"; \
+	else \
+	  package="$(PACKAGE)"; \
+	fi; \
+	$(MAKE) -f Makefile.in do-tar-bz2 TOOL=$(TOOL) VER=$$ver PACKAGE=$$package
 
 do-tar-bz2:
-	echo "==> Making $(TOOL)-$(VER).tar.bz2"
-	-rm -f $(TOOL)-$(VER)
-	ln -s proto-toplev $(TOOL)-$(VER)
-	tar cfh $(TOOL)-$(VER).tar $(TOOL)-$(VER)
-	$(BZIPPROG) -v -9 $(TOOL)-$(VER).tar
+	echo "==> Making $(PACKAGE)-$(VER).tar.bz2"
+	-rm -f $(PACKAGE)-$(VER)
+	ln -s proto-toplev $(PACKAGE)-$(VER)
+	tar cfh $(PACKAGE)-$(VER).tar $(PACKAGE)-$(VER)
+	$(BZIPPROG) -v -9 $(PACKAGE)-$(VER).tar
 
 TEXINFO_SUPPORT= texinfo/texinfo.tex
 DIST_SUPPORT= $(DEVO_SUPPORT) $(TEXINFO_SUPPORT)
@@ -1791,10 +1796,33 @@ gnats.tar.bz2: $(DIST_SUPPORT) $(GNATS_SUPPORT_DIRS) gnats
 
 .PHONY: gdb.tar.bz2
 GDB_SUPPORT_DIRS= bfd include libiberty mmalloc opcodes readline sim utils intl
-GDBTK_SUPPORT_DIRS= `if [ -d tcl -a -d tk ] ; then echo tcl tk itcl tix libgui; fi`
 gdb.tar.bz2: $(DIST_SUPPORT) $(GDB_SUPPORT_DIRS) gdb
 	$(MAKE) -f Makefile.in taz TOOL=gdb \
-		SUPPORT_FILES="$(GDB_SUPPORT_DIRS) $(GDBTK_SUPPORT_DIRS)"
+		SUPPORT_FILES="$(GDB_SUPPORT_DIRS)"
+
+.PHONY: dejagnu.tar.bz2
+DEJAGNU_SUPPORT_DIRS=  tcl expect libiberty
+dejagnu.tar.bz2: $(DIST_SUPPORT) $(DEJAGNU_SUPPORT_DIRS) dejagnu
+	$(MAKE) -f Makefile.in taz TOOL=dejagnu \
+		SUPPORT_FILES="$(DEJAGNU_SUPPORT_DIRS)"
+
+.PHONY: gdb+dejagnu.tar.bz2
+GDBD_SUPPORT_DIRS= $(GDB_SUPPORT_DIRS) tcl expect dejagnu
+gdb+dejagnu.tar.bz2: $(DIST_SUPPORT) $(GDBD_SUPPORT_DIRS) gdb
+	$(MAKE) -f Makefile.in taz TOOL=gdb PACKAGE=gdb+dejagnu \
+		SUPPORT_FILES="$(GDBD_SUPPORT_DIRS)"
+
+.PHONY: insight.tar.bz2
+INSIGHT_SUPPORT_DIRS= $(GDB_SUPPORT_DIRS) tcl tk itcl tix libgui
+insight.tar.bz2: $(DIST_SUPPORT) $(GDB_SUPPORT_DIRS) gdb
+	$(MAKE) -f Makefile.in taz TOOL=gdb PACKAGE=insight \
+		SUPPORT_FILES="$(INSIGHT_SUPPORT_DIRS)"
+
+.PHONY: insight+dejagnu.tar.bz2
+INSIGHTD_SUPPORT_DIRS= $(INSIGHT_SUPPORT_DIRS) expect dejagnu
+insight+dejagnu.tar.bz2: $(DIST_SUPPORT) $(INSIGHTD_SUPPORT_DIRS) gdb
+	$(MAKE) -f Makefile.in taz TOOL=gdb PACKAGE="insight+dejagnu" \
+		SUPPORT_FILES="$(INSIGHTD_SUPPORT_DIRS)"
 
 .PHONY: newlib.tar.bz2
 NEWLIB_SUPPORT_DIRS=libgloss

@@ -1,3 +1,11 @@
+Fri Mar  3 18:44:08 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* Makefile.in (taz): Set PACKAGE to TOOL when not defined.
+	(do-tar-bz2): Replace TOOL with PACKAGE.
+	(gdb.tar.bz2): Remove GDBTK from GDB package.
+	(gdb+dejagnu.tar.bz2, insight.tar.bz2, insight+dejagnu.tar.bz2,
+ 	dejagnu.tar.bz2): New packages.
+
 2000-02-27  Andreas Jaeger  <aj@suse.de>
 
 	* configure.in: Add entry for mips*-*-linux*, move catch all
