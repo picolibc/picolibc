@@ -1,3 +1,8 @@
+2002-02-01  Mo DeJong  <supermo@bayarea.net>
+
+	* Makefile.in: Add all-tix to deps for all-snavigator
+	so that tix is built when building snavigator.
+
 2002-02-01  Ben Elliston  <bje@redhat.com>
 
 	* config.guess: Import from master sources, rev 1.229.
