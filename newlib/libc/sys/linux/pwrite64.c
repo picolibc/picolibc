@@ -29,7 +29,7 @@ RETURNS
 PORTABILITY
 <<pwrite64>> is an EL/IX extension.
 
-Supporting OS subroutine required: <<write64>>, <<lseek64>>.
+Supporting OS subroutine required: <<write>>, <<lseek64>>.
 */
 
 #include <_ansi.h>
@@ -52,7 +52,7 @@ _DEFUN (pwrite64, (fd, buf, n, off),
   if (lseek64 (fd, off, SEEK_SET) == (loff_t)-1)
     return -1;
 
-  num_written = write64 (fd, buf, n);
+  num_written = write (fd, buf, n);
 
   if (lseek64 (fd, cur_pos, SEEK_SET) == (loff_t)-1)
     return -1;

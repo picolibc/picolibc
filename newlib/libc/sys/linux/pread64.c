@@ -29,7 +29,7 @@ RETURNS
 PORTABILITY
 <<pread64>> is an EL/IX extension.
 
-Supporting OS subroutine required: <<read64>>, <<lseek64>>.
+Supporting OS subroutine required: <<read>>, <<lseek64>>.
 */
 
 #include <_ansi.h>
@@ -52,7 +52,7 @@ _DEFUN (pread64, (fd, buf, n, off),
   if (lseek64 (fd, off, SEEK_SET) == (loff_t)-1)
     return -1;
 
-  num_read = read64 (fd, buf, n);
+  num_read = read (fd, buf, n);
 
   if (lseek64 (fd, cur_pos, SEEK_SET) == (loff_t)-1)
     return -1;

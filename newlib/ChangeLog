@@ -1,3 +1,10 @@
+2002-05-06  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/unix/pread.c: Fix typo for _pread_r.
+        * libc/unix/pwrite.c: Fix type for _pwrite_r.
+        * libc/sys/linux/pread64.c: Fix typo for read syscall.
+        * libc/sys/linux/pwrite64.c: Fix typo for write syscall.
+
 2002-05-03  Christopher Faylor  <cgf@redhat.com>
 
 	* libc/include/sys/unistd.h: Define getdomainname under cygwin.

@@ -52,7 +52,7 @@ Supporting OS subroutine required: <<read>>, <<lseek>>.
 #include <reent.h>
 
 ssize_t
-_DEFUN (pread_r, (rptr, fd, buf, n, off),
+_DEFUN (_pread_r, (rptr, fd, buf, n, off),
      struct _reent *rptr _AND
      int fd _AND
      _PTR buf _AND
