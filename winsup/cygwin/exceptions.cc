@@ -1127,6 +1127,12 @@ extern "C" {
 static int __stdcall
 call_signal_handler_now ()
 {
+  if (!sigsave.sig)
+    {
+      sigproc_printf ("call_signal_handler_now called when no signal active");
+      return 0;
+    }
+
   int sa_flags = sigsave.sa_flags;
   sigproc_printf ("sa_flags %p", sa_flags);
   *sigsave.retaddr_on_stack = sigsave.retaddr;

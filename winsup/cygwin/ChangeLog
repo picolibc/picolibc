@@ -1,3 +1,9 @@
+Wed Sep 12 01:03:36 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (call_signal_handler_now): Add additional guard against
+	inappropriately calling signal handler.
+	* syscalls.cc (_read): Reset errno if not exiting due to signal.
+
 Wed Sep 12 13:03:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
 	* autoload.cc (LoadDLLfuncEx): Auto load TryEnterCriticalSection - it's

@@ -275,6 +275,7 @@ _read (int fd, void *ptr, size_t len)
   int res;
   fhandler_base *fh;
   extern int sigcatchers;
+  int e = get_errno ();
 
   while (1)
     {
@@ -318,6 +319,7 @@ _read (int fd, void *ptr, size_t len)
     out:
       if (res >= 0 || get_errno () != EINTR || !thisframe.call_signal_handler ())
 	break;
+      set_errno (e);
     }
 
   syscall_printf ("%d = read (%d<%s>, %p, %d), bin %d, errno %d", res, fd, fh->get_name (),
