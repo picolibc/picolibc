@@ -25,12 +25,15 @@ int registry = 0;
 int sysinfo = 0;
 int givehelp = 0;
 int keycheck = 0;
+int check_setup = 0;
 
 #ifdef __GNUC__
 typedef long long longlong;
 #else
 typedef __int64 longlong;
 #endif
+
+void dump_setup (int, char **);
 
 const char *known_env_vars[] = {
   "c_include_path",
@@ -1191,6 +1194,7 @@ usage ()
 }
 
 struct option longopts[] = {
+  {"check-setup", no_argument, NULL, 'c'},
   {"sysinfo", no_argument, NULL, 's'},
   {"registry", no_argument, NULL, 'r'},
   {"verbose", no_argument, NULL, 'v'},
@@ -1199,7 +1203,7 @@ struct option longopts[] = {
   {0, no_argument, NULL, 0}
 };
 
-char opts[] = "srvkh";
+char opts[] = "srvkhc";
 
 int
 main (int argc, char **argv)
@@ -1211,6 +1215,9 @@ main (int argc, char **argv)
       {
       case 's':
 	sysinfo = 1;
+	break;
+      case 'c':
+	check_setup = 1;
 	break;
       case 'r':
 	registry = 1;
@@ -1230,10 +1237,10 @@ main (int argc, char **argv)
   argc -= optind;
   argv += optind;
 
-  if (argc == 0 && !sysinfo && !keycheck)
+  if (argc == 0 && !sysinfo && !keycheck && !check_setup)
     usage ();
 
-  if (sysinfo && keycheck)
+  if ((check_setup || sysinfo) && keycheck)
     usage ();
 
   if (keycheck)
@@ -1241,7 +1248,8 @@ main (int argc, char **argv)
 
   init_paths ();
 
-  if (argc >= 1 && givehelp)
+  /* FIXME: Add help for check_setup */
+  if (argc >= 1 && givehelp && !check_setup)
     {
       if (argc == 1)
 	{
@@ -1260,11 +1268,17 @@ main (int argc, char **argv)
 	printf ("\n");
     }
 
-  for (i = 0; i < argc; i++)
+  if (check_setup)
     {
-      cygcheck (argv[i]);
-      printf ("\n");
+      dump_setup (verbose, argv);
+      puts ("");
     }
+  else
+    for (i = 0; i < argc; i++)
+      {
+	cygcheck (argv[i]);
+	puts ("");
+      }
 
   if (sysinfo)
     dump_sysinfo ();

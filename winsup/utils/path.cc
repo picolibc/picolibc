@@ -1,17 +1,12 @@
-/*
- * Copyright (c) 2000, Red Hat, Inc.
- *
- *     This program is free software; you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation; either version 2 of the License, or
- *     (at your option) any later version.
- *
- *     A copy of the GNU General Public License can be found at
- *     http://www.gnu.org/
- *
- * Written by DJ Delorie <dj@cygnus.com>
- *
- */
+/* path.cc
+
+   Copyright 2001 Red Hat, Inc.
+
+This file is part of Cygwin.
+
+This software is a copyrighted work licensed under the terms of the
+Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+details. */
 
 /* The purpose of this file is to hide all the details about accessing
    Cygwin's mount table.  If the format or location of the mount table
@@ -94,7 +89,7 @@ get_cygdrive (HKEY key, mnt *m, int issystem)
   return m + 1;
 }
 
-void
+static void
 read_mounts ()
 {
   DWORD posix_path_size;
@@ -277,6 +272,8 @@ cygpath (const char *s, ...)
   int max_len = -1;
   struct mnt *m, *match = NULL;
 
+  if (!mount_table[0].posix)
+    read_mounts ();
   va_start (v, s);
   char *path = vconcat (s, v);
   if (strncmp (path, "./", 2) == 0)
