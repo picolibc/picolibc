@@ -2999,6 +2999,9 @@ int WINAPI LBItemFromPt(HWND,POINT,BOOL);
 	SNDMSG((w),LVM_SETITEMPOSITION32,i,(LPARAM)&p);\
 }
 #define ListView_GetSelectedCount(w) (UINT)SNDMSG((w),LVM_GETSELECTEDCOUNT,0,0)
+#define ListView_GetCheckState(w,i) ((((UINT)(SNDMSG((w),LVM_GETITEMSTATE,(WPARAM)(i),LVIS_STATEIMAGEMASK)))>>12)-1)
+#define ListView_SetCheckState(w,i,f) ListView_SetItemState(w,i,INDEXTOSTATEIMAGEMASK((f)+1),LVIS_STATEIMAGEMASK)
+
 BOOL WINAPI MakeDragList(HWND);
 void WINAPI MenuHelp(UINT,WPARAM,LPARAM,HMENU,HINSTANCE,HWND,PUINT);
 #define MonthCal_GetColor(hwnd,icolor) SNDMSG(hwnd,MCM_GETCOLOR,(WPARAM)icolor,(LPARAM)0)

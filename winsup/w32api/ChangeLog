@@ -1,3 +1,30 @@
+2003-12-08  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winuser.h (DISPLAY_DEVICE_*): Remove defines.
+	* include/wingdi.h  (DISPLAY_DEVICE_REMOVABLE,
+	DISPLAY_DEVICE_MODESPRINED): Add defines.
+
+2003-12-08  Hartmut Honisch  <hhonisch@users.sourceforge.net>
+
+	* include/commctrl.h (ListView_Get_State, ListView_Check_State):
+	Add macros.
+	* include/wingdi.h  (DISPLAY_DEVICE_*): Add multi-monitor
+	constants.
+	* include/shlobj.h (SHCOLUMNINIT); Add structure.
+	(SHCOLUMNDAT): Likwise.
+	(SHCOLUMNID): Likewise.
+	(SHCOLUMNINFO): Likewise.
+	(SHCOLSTATE): Add enum.
+	(IColumnProvider): Add COM interface.
+	(IQueryInfo): Likewise.
+	(IShellIconOverlayIdentifier): Likewise. 
+  	* include/shlguid.h (IID_IColumnProvider) Declare.
+	(IID_IQueryInfo): Likweise.
+	(IID_IShellIconOverlayIdentifier): Likwise. 
+	* lib/shell32.c (IID_IColumnProvider) Define.
+	(IID_IQueryInfo): Likweise.
+	(IID_IShellIconOverlayIdentifier): Likwise.
+
 2003-12-08  Roald Ribe <rrib@users.sourceforge.net>
 
 	* include/winuser.h (RT_MANIFEST): Add define.
