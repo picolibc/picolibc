@@ -35,3 +35,11 @@ __mingwthr_key_dtor (DWORD key, void (*dtor) (void *))
   return 0;
 }
 
+
+int
+__mingwthr_remove_key_dtor (DWORD key )
+{
+  assert (0);
+  /* NOTREACHED */
+  return 0;
+}

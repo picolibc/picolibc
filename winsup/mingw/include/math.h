@@ -15,7 +15,7 @@
  *
  *  This code is distributed in the hope that it will be useful but
  *  WITHOUT ANY WARRANTY. ALL WARRANTIES, EXPRESS OR IMPLIED ARE HEREBY
- *  DISCLAMED. This includes but is not limited to warranties of
+ *  DISCLAIMED. This includes but is not limited to warranties of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
  * $Revision$
@@ -46,6 +46,23 @@
  */
 
 #ifndef	__STRICT_ANSI__
+
+/* These are also defined in Mingw float.h; needed here as well to work 
+   around GCC build issues.  */
+#ifndef __MINGW_FPCLASS_DEFINED
+#define __MINGW_FPCLASS_DEFINED 1
+#define	_FPCLASS_SNAN	0x0001	/* Signaling "Not a Number" */
+#define	_FPCLASS_QNAN	0x0002	/* Quiet "Not a Number" */
+#define	_FPCLASS_NINF	0x0004	/* Negative Infinity */
+#define	_FPCLASS_NN	0x0008	/* Negative Normal */
+#define	_FPCLASS_ND	0x0010	/* Negative Denormal */
+#define	_FPCLASS_NZ	0x0020	/* Negative Zero */
+#define	_FPCLASS_PZ	0x0040	/* Positive Zero */
+#define	_FPCLASS_PD	0x0080	/* Positive Denormal */
+#define	_FPCLASS_PN	0x0100	/* Positive Normal */
+#define	_FPCLASS_PINF	0x0200	/* Positive Infinity */
+#endif /* __MINGW_FPCLASS_DEFINED */
+
 #ifndef	_NO_OLDNAMES
 
 #define	DOMAIN		_DOMAIN
@@ -152,6 +169,25 @@ double	_y0 (double);
 double	_y1 (double);
 double	_yn (int, double);
 int	_matherr (struct _exception *);
+
+/* These are also declared in Mingw float.h; needed here as well to work 
+   around GCC build issues.  */
+/* BEGIN FLOAT.H COPY */
+/*
+ * IEEE recommended functions
+ */
+
+double	_chgsign	(double);
+double	_copysign	(double, double);
+double	_logb		(double);
+double	_nextafter	(double, double);
+double	_scalb		(double, long);
+
+int	_finite		(double);
+int	_fpclass	(double);
+int	_isnan		(double);
+
+/* END FLOAT.H COPY */
 
 #ifndef	_NO_OLDNAMES
 

@@ -19,7 +19,7 @@
  *
  *  This code is distributed in the hope that it will be useful but
  *  WITHOUT ANY WARRANTY. ALL WARRANTIES, EXPRESS OR IMPLIED ARE HEREBY
- *  DISCLAMED. This includes but is not limited to warranties of
+ *  DISCLAIMED. This includes but is not limited to warranties of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
  * $Revision$
@@ -98,7 +98,7 @@ typedef PEXCEPTION_REGISTRATION PEXCEPTION_REGISTRATION_RECORD;
 	__asm__ ("pushl %0;pushl %%fs:0;movl %%esp,%%fs:0;" : : "g" (pHandler));
 
 /*
- * A macro which (dispite its name) *removes* an installed
+ * A macro which (despite its name) *removes* an installed
  * exception handler. Should be used only in conjunction with the above
  * install routine __try1.
  * Move the pointer to the old reg. struct (at the current stack

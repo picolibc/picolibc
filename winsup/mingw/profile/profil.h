@@ -1,6 +1,6 @@
 /* profil.h: gprof profiling header file
 
-   Copyright 1998 Cygnus Solutions.
+   Copyright 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -28,8 +28,10 @@ details. */
   })
 
 /* convert an index into an address */
-#define PROFADDR(idx, base, scale)	\
-	((base) + ((((idx) << 16) / (scale)) << 1))
+#define PROFADDR(idx, base, scale)		\
+  ((base)					\
+   + ((((unsigned long long)(idx) << 16)	\
+       / (unsigned long long)(scale)) << 1))
 
 /* convert a bin size into a scale */
 #define PROFSCALE(range, bins)		(((bins) << 16) / ((range) >> 1))

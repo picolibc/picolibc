@@ -1,6 +1,6 @@
 /* profil.c -- win32 profil.c equivalent
 
-   Copyright 1998 Cygnus Solutions.
+   Copyright 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
    This file is part of Cygwin.
 

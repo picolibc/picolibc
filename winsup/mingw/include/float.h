@@ -24,7 +24,7 @@
  *
  *  This code is distributed in the hope that it will be useful but
  *  WITHOUT ANY WARRANTY. ALL WARRANTIES, EXPRESS OR IMPLIED ARE HEREBY
- *  DISCLAMED. This includes but is not limited to warranties of
+ *  DISCLAIMED. This includes but is not limited to warranties of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
  * $Revision$
@@ -137,7 +137,11 @@
 #define	_PC_53		0x00010000
 #define	_PC_64		0x00000000
 
+/* These are also defined in Mingw math.h, needed to work around
+   GCC build issues.  */
 /* Return values for fpclass. */
+#ifndef __MINGW_FPCLASS_DEFINED
+#define __MINGW_FPCLASS_DEFINED 1
 #define	_FPCLASS_SNAN	0x0001	/* Signaling "Not a Number" */
 #define	_FPCLASS_QNAN	0x0002	/* Quiet "Not a Number" */
 #define	_FPCLASS_NINF	0x0004	/* Negative Infinity */
@@ -148,6 +152,7 @@
 #define	_FPCLASS_PD	0x0080	/* Positive Denormal */
 #define	_FPCLASS_PN	0x0100	/* Positive Normal */
 #define	_FPCLASS_PINF	0x0200	/* Positive Infinity */
+#endif /* __MINGW_FPCLASS_DEFINED */
 
 /* invalid subconditions (_SW_INVALID also set) */
 #define _SW_UNEMULATED		0x0040  /* unemulated instruction */
@@ -181,16 +186,16 @@ unsigned int	_controlfp (unsigned int unNew, unsigned int unMask);
 unsigned int	_control87 (unsigned int unNew, unsigned int unMask);
 
 
-unsigned int	_clearfp ();	/* Clear the FPU status word */
-unsigned int	_statusfp ();	/* Report the FPU status word */
+unsigned int	_clearfp (void);	/* Clear the FPU status word */
+unsigned int	_statusfp (void);	/* Report the FPU status word */
 #define		_clear87	_clearfp
 #define		_status87	_statusfp
 
-void		_fpreset ();	/* Reset the FPU */
-void		fpreset ();
+void		_fpreset (void);	/* Reset the FPU */
+void		fpreset (void);
 
 /* Global 'variable' for the current floating point error code. */
-int *	__fpecode();
+int *	__fpecode(void);
 #define	_fpecode	(*(__fpecode()))
 
 /*

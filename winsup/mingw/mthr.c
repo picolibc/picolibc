@@ -26,7 +26,6 @@
 /* To protect the thread/key association data structure modifications. */
 CRITICAL_SECTION __mingwthr_cs;
 
-typedef struct __mingwthr_thread __mingwthr_thread_t;
 typedef struct __mingwthr_key __mingwthr_key_t;
 
 /* The list of threads active with key/dtor pairs. */
@@ -36,14 +35,8 @@ struct __mingwthr_key {
   __mingwthr_key_t *next;
 };
 
-/* The list of key/dtor pairs for a particular thread. */
-struct __mingwthr_thread {
-  DWORD thread_id;
-  __mingwthr_key_t *keys;
-  __mingwthr_thread_t *next;
-};
 
-static __mingwthr_thread_t *__mingwthr_thread_list;
+static __mingwthr_key_t *key_dtor_list;
 
 /*
  * __mingwthr_key_add:
@@ -55,9 +48,8 @@ static __mingwthr_thread_t *__mingwthr_thread_list;
  */
 
 static int
-__mingwthr_add_key_dtor (DWORD thread_id, DWORD key, void (*dtor) (void *))
+___mingwthr_add_key_dtor ( DWORD key, void (*dtor) (void *))
 {
-  __mingwthr_thread_t *threadp;
   __mingwthr_key_t *new_key;
 
   new_key = (__mingwthr_key_t *) calloc (1, sizeof (__mingwthr_key_t));
@@ -67,45 +59,66 @@ __mingwthr_add_key_dtor (DWORD thread_id, DWORD key, void (*dtor) (void *))
   new_key->key = key;
   new_key->dtor = dtor;
 
-  /* This may be called by multiple threads, and so we need to protect
-     the whole process of adding the key/dtor pair.  */ 
   EnterCriticalSection (&__mingwthr_cs);
 
-  for (threadp = __mingwthr_thread_list; 
-       threadp && (threadp->thread_id != thread_id); 
-       threadp = threadp->next)
-    ;
-  
-  if (threadp == NULL)
-    {
-      threadp = (__mingwthr_thread_t *) 
-        calloc (1, sizeof (__mingwthr_thread_t));
-      if (threadp == NULL)
-        {
-	  free (new_key);
-	  LeaveCriticalSection (&__mingwthr_cs);
-	  return -1;
-	}
-      threadp->thread_id = thread_id;
-      threadp->next = __mingwthr_thread_list;
-      __mingwthr_thread_list = threadp;
-    }
-
-  new_key->next = threadp->keys;
-  threadp->keys = new_key;
+  new_key->next = key_dtor_list;
+  key_dtor_list = new_key;
 
   LeaveCriticalSection (&__mingwthr_cs);
 
 #ifdef DEBUG
-  printf ("%s: allocating: (%ld, %ld, %x)\n", 
-          __FUNCTION__, thread_id, key, dtor);
+  printf ("%s: allocating: (%ld, %x)\n", 
+          __FUNCTION__, key, dtor);
 #endif
 
   return 0;
 }
 
+static int
+___mingwthr_remove_key_dtor ( DWORD key )
+{
+  __mingwthr_key_t *prev_key;
+  __mingwthr_key_t *cur_key;
+
+  EnterCriticalSection (&__mingwthr_cs);
+
+  prev_key = NULL;
+  cur_key = key_dtor_list;
+
+  while( cur_key != NULL )
+  {
+     if( cur_key->key == key )
+     {
+// take key/dtor out of list
+        if( prev_key == NULL )
+        {
+           key_dtor_list = cur_key->next;
+        }
+        else
+        {
+           prev_key->next = cur_key->next;
+        }
+
+#ifdef DEBUG
+        printf ("%s: removing: (%ld)\n", 
+                __FUNCTION__, key );
+#endif
+
+        free( cur_key );
+        break;
+     }
+
+     prev_key = cur_key;
+     cur_key = cur_key->next;
+  }
+
+  LeaveCriticalSection (&__mingwthr_cs);
+
+  return 0;
+}
+
 /*
- * __mingwthr_run_key_dtors (DWORD thread_id):
+ * __mingwthr_run_key_dtors (void):
  *
  * Callback from DllMain when thread detaches to clean up the key
  * storage. 
@@ -118,68 +131,41 @@ __mingwthr_add_key_dtor (DWORD thread_id, DWORD key, void (*dtor) (void *))
  */
 
 void
-__mingwthr_run_key_dtors (DWORD thread_id)
+__mingwthr_run_key_dtors (void)
 {
-  __mingwthr_thread_t *prev_threadp, *threadp;
   __mingwthr_key_t *keyp;
 
 #ifdef DEBUG
-  printf ("%s: Entering Thread id %ld\n", __FUNCTION__, thread_id);
+  printf ("%s: Entering Thread id %ld\n", __FUNCTION__, GetCurrentThreadId() );
 #endif
 
-  /* Since this is called just once per thread, we only need to protect 
-     the part where we take out this thread's entry and reconfigure the 
-     list instead of wrapping the whole process in a critical section. */
   EnterCriticalSection (&__mingwthr_cs);
 
-  prev_threadp = NULL;
-  for (threadp = __mingwthr_thread_list; 
-       threadp && (threadp->thread_id != thread_id); 
-       prev_threadp = threadp, threadp = threadp->next)
-    ;
+  for (keyp = key_dtor_list; keyp; )
+  {
+     LPVOID value = TlsGetValue (keyp->key);
+     if (GetLastError () == ERROR_SUCCESS)
+     {
+#ifdef DEBUG
+        printf ("   (%ld, %x)\n", keyp->key, keyp->dtor);
+#endif
+        if (value)
+           (*keyp->dtor) (value);
+     }
+#ifdef DEBUG
+     else
+     {
+        printf ("   TlsGetValue FAILED  (%ld, %x)\n", 
+                keyp->key, keyp->dtor);
+     }
+#endif
+     keyp = keyp->next;
+  }
   
-  if (threadp == NULL)
-    {
-      LeaveCriticalSection (&__mingwthr_cs);
-      return;
-    }
-
-  /* take the damned thread out of the chain. */
-  if (prev_threadp == NULL)		/* first entry hit. */
-    __mingwthr_thread_list = threadp->next;
-  else
-    prev_threadp->next = threadp->next;
-
   LeaveCriticalSection (&__mingwthr_cs);
 
-  for (keyp = threadp->keys; keyp; )
-    {
-      __mingwthr_key_t *prev_keyp;
-      LPVOID value = TlsGetValue (keyp->key);
-      if (GetLastError () == ERROR_SUCCESS)
-	{
 #ifdef DEBUG
-	  printf ("   (%ld, %x)\n", keyp->key, keyp->dtor);
-#endif
-	  if (value)
-	    (*keyp->dtor) (value);
-	}
-#ifdef DEBUG
-      else
-	{
-	  printf ("   TlsGetValue FAILED  (%ld, %x)\n", 
-		  keyp->key, keyp->dtor);
-	}
-#endif
-      prev_keyp = keyp;
-      keyp = keyp->next;
-      free (prev_keyp);
-    }
-  
-  free (threadp);
-
-#ifdef DEBUG
-  printf ("%s: Exiting Thread id %ld\n", __FUNCTION__, thread_id);
+  printf ("%s: Exiting Thread id %ld\n", __FUNCTION__, GetCurrentThreadId() );
 #endif
 }
   
@@ -197,10 +183,15 @@ __mingwthr_key_dtor (DWORD key, void (*dtor) (void *))
 {
   if (dtor)
     {
-      DWORD thread_id = GetCurrentThreadId ();
-      return __mingwthr_add_key_dtor (thread_id, key, dtor);
+      return ___mingwthr_add_key_dtor (key, dtor);
     }
 
   return 0;
 }
 
+__declspec(dllexport)
+int
+__mingwthr_remove_key_dtor (DWORD key )
+{
+   return ___mingwthr_remove_key_dtor ( key );
+}

@@ -26,7 +26,7 @@
  *
  *  This code is distributed in the hope that it will be useful but
  *  WITHOUT ANY WARRANTY. ALL WARRANTIES, EXPRESS OR IMPLIED ARE HEREBY
- *  DISCLAMED. This includes but is not limited to warranties of
+ *  DISCLAIMED. This includes but is not limited to warranties of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
  * $Revision$
@@ -55,6 +55,7 @@
 #ifndef _TCHAR_DEFINED
 #ifndef RC_INVOKED
 typedef	wchar_t	TCHAR;
+typedef wchar_t _TCHAR;
 #endif	/* Not RC_INVOKED */
 #define _TCHAR_DEFINED
 #endif
@@ -209,6 +210,7 @@ typedef	wchar_t	TCHAR;
 #ifndef _TCHAR_DEFINED
 #ifndef RC_INVOKED
 typedef char	TCHAR;
+typedef char	_TCHAR;
 #endif
 #define _TCHAR_DEFINED
 #endif

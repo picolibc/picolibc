@@ -15,7 +15,7 @@
  *
  *  This code is distributed in the hope that it will be useful but
  *  WITHOUT ANY WARRANTY. ALL WARRANTIES, EXPRESS OR IMPLIED ARE HEREBY
- *  DISCLAMED. This includes but is not limited to warranties of
+ *  DISCLAIMED. This includes but is not limited to warranties of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
  */
@@ -63,7 +63,7 @@ typedef wchar_t wctype_t;
 #define _WCTYPE_T_DEFINED
 #endif
 
-/* Wide character equivalents */
+/* Wide character equivalents - also in ctype.h */
 int	iswalnum(wint_t);
 int	iswalpha(wint_t);
 int	iswascii(wint_t);
@@ -83,6 +83,34 @@ wchar_t	towlower(wchar_t);
 wchar_t	towupper(wchar_t);
 
 int	isleadbyte (int);
+
+/* Also in ctype.h */
+
+__MINGW_IMPORT unsigned short _ctype[];
+#ifdef __MSVCRT__
+__MINGW_IMPORT unsigned short* _pctype;
+#else
+__MINGW_IMPORT unsigned short* _pctype_dll;
+#define  _pctype _pctype_dll
+#endif
+
+#if !(defined(__NO_CTYPE_INLINES) || defined(__WCTYPE_INLINES_DEFINED))
+#define __WCTYPE_INLINES_DEFINED
+extern inline int iswalnum(wint_t wc) {return (iswctype(wc,_ALPHA|_DIGIT));}
+extern inline int iswalpha(wint_t wc) {return (iswctype(wc,_ALPHA));}
+extern inline int iswascii(wint_t wc) {return (((unsigned)wc & 0x7F) ==0);}
+extern inline int iswcntrl(wint_t wc) {return (iswctype(wc,_CONTROL));}
+extern inline int iswdigit(wint_t wc) {return (iswctype(wc,_DIGIT));}
+extern inline int iswgraph(wint_t wc) {return (iswctype(wc,_PUNCT|_ALPHA|_DIGIT));}
+extern inline int iswlower(wint_t wc) {return (iswctype(wc,_LOWER));}
+extern inline int iswprint(wint_t wc) {return (iswctype(wc,_BLANK|_PUNCT|_ALPHA|_DIGIT));}
+extern inline int iswpunct(wint_t wc) {return (iswctype(wc,_PUNCT));}
+extern inline int iswspace(wint_t wc) {return (iswctype(wc,_SPACE));}
+extern inline int iswupper(wint_t wc) {return (iswctype(wc,_UPPER));}
+extern inline int iswxdigit(wint_t wc) {return (iswctype(wc,_HEX));}
+extern inline int isleadbyte(int c) {return (_pctype[(unsigned char)(c)] & _LEADBYTE);}
+#endif /* !(defined(__NO_CTYPE_INLINES) || defined(__WCTYPE_INLINES_DEFINED)) */
+
 
 typedef wchar_t wctrans_t;
 wint_t 		towctrans(wint_t, wctrans_t);

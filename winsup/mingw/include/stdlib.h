@@ -15,7 +15,7 @@
  *
  *  This code is distributed in the hope that it will be useful but
  *  WITHOUT ANY WARRANTY. ALL WARRANTIES, EXPRESS OR IMPLIED ARE HEREBY
- *  DISCLAMED. This includes but is not limited to warranties of
+ *  DISCLAIMED. This includes but is not limited to warranties of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
  * $Revision$
@@ -48,7 +48,7 @@
  * These values may be used as exit status codes.
  */
 #define	EXIT_SUCCESS	0
-#define	EXIT_FAILURE	-1
+#define	EXIT_FAILURE	1
 
 /*
  * Definitions for path name functions.
@@ -150,8 +150,8 @@ int*	__doserrno(void);
  */
 
 #ifdef __MSVCRT__
-  extern char *** __p__environ();
-  extern wchar_t *** __p__wenviron();
+  extern char *** __p__environ(void);
+  extern wchar_t *** __p__wenviron(void);
 # define _environ (*__p__environ())
 # define _wenviron (*__p__wenviron())
 #else /* ! __MSVCRT__ */
@@ -348,6 +348,10 @@ void	_seterrormode (int);
 void	_sleep (unsigned long);
 
 void	_exit	(int) _ATTRIB_NORETURN;
+
+/* _onexit is MS extension. Use atexit for portability.  */
+typedef  int (* _onexit_t)(void); 
+_onexit_t _onexit( _onexit_t );
 
 int	_putenv	(const char*);
 void	_searchenv (const char*, const char*, char*);

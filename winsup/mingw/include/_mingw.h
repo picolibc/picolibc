@@ -15,7 +15,7 @@
  *
  *  This code is distributed in the hope that it will be useful but
  *  WITHOUT ANY WARRANTY. ALL WARRANTIES, EXPRESS OR IMPLIED ARE HEREBY
- *  DISCLAMED. This includes but is not limited to warranties of
+ *  DISCLAIMED. This includes but is not limited to warranties of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
  */
@@ -60,9 +60,9 @@
 # define __int64 long long
 #endif /* __GNUC__ */
 
-#define __MINGW32_VERSION 1.2
+#define __MINGW32_VERSION 1.3
 #define __MINGW32_MAJOR_VERSION 1
-#define __MINGW32_MINOR_VERSION 2
+#define __MINGW32_MINOR_VERSION 3
 
 #endif /* __MINGW_H */
 
