@@ -143,11 +143,12 @@ MALLOC_OFILES=@MALLOC_OFILES@
 
 DLL_IMPORTS:=$(w32api_lib)/libkernel32.a
 
+MT_SAFE_OBJECTS:=
 # Please maintain this list in sorted order, with maximum files per 80 col line
 DLL_OFILES:=assert.o autoload.o cxx.o cygheap.o cygserver_client.o \
 	cygserver_transport.o cygserver_transport_pipes.o \
 	cygserver_transport_sockets.o cygthread.o dcrt0.o debug.o \
-	delqueue.o dir.o dlfcn.o dll_init.o dtable.o environ.o errno.o \
+	delqueue.o devices.o dir.o dlfcn.o dll_init.o dtable.o environ.o errno.o \
 	exceptions.o exec.o external.o fcntl.o fhandler.o \
 	fhandler_clipboard.o fhandler_console.o fhandler_disk_file.o \
 	fhandler_dsp.o fhandler_floppy.o fhandler_mem.o \
@@ -358,6 +359,15 @@ cygserver_transport_sockets_outside.o: cygserver_transport_sockets.cc
 
 cygserver_client_outside.o: cygserver_client.cc
 	 $(COMPILE_CXX) -D__OUTSIDE_CYGWIN__ -o $@ $<
+
+#	gperf -c --key-positions='1-126' -r -t -C -E -L 'ANSI-C' -Hdevhash -N'device::lookup' -Z devstring -7 $? |\
+
+$(srcdir)/devices.cc: devices.gperf
+	gperf -c --key-positions='1-2,5-7,9-10' -r -t -C -E -T -L 'ANSI-C' -Hdevhash -N'device::lookup' -Z devstring -7 $? |\
+	sed -e 's/\[\(str\[[^\]]*\]\)\]/[(unsigned) cyg_tolower (\1)]/' \
+	    -e 's/static \(.* wordlist\)/static NO_COPY \1/g' \
+	    -e 's/\([ 	]*\)if (\*str.*$$/\1if (strncasematch (str, s, len))/' > $@
+#	sed -e 's/\[str\[/[(unsigned) str[/' -e 's/static \([^(]*\)$$/static NO_COPY \1/g'  >$@
 
 cygserver.exe: cygserver.o cygserver_shm.o cygserver_transport_outside.o cygserver_transport_pipes_outside.o cygserver_transport_sockets_outside.o cygserver_client_outside.o cygserver_process.o threaded_queue.o wincap.o version.o smallprint.o
 	$(CXX) -o $@ $^ -lstdc++
