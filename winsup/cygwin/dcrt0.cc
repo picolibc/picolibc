@@ -1038,6 +1038,7 @@ do_exit (int status)
 	  sigproc_printf ("%d == sid %d, send SIGHUP to children",
 			  myself->pid, myself->sid);
 
+	/* CGF FIXME: This can't be right. */
 	  if (tp->getsid () == myself->sid)
 	    kill_pgrp (tp->getpgid (), SIGHUP);
 	}
