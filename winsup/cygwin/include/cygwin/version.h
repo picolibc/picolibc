@@ -161,12 +161,15 @@ details. */
        60: MSG_NOSIGNAL
        61: Export getc_unlocked, getchar_unlocked, putc_unlocked,
 	   putchar_unlocked
+       62: Export wcscat, wcschr, wcscpy, wcscspn, wcslcat, wcslcpy, wcsncat,
+           wcsncmp, wcsncpy, wcspbrk, wcsrchr, wcsspn, wcsstr, wmemchr,
+	   wmemcmp, wmemcpy, wmemmove, wmemset
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 61
+#define CYGWIN_VERSION_API_MINOR 62
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

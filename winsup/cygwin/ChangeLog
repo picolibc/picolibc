@@ -1,3 +1,8 @@
+2002-08-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din: Add prototypes for new wchar functions in newlib.
+	* include/cygwin/version.h: Bump API minor number.
+
 2002-08-29  Boris Schaeling  <boriss@web.de>
 	    Corinna Vinschen  <corinna@vinschen.de>
 
