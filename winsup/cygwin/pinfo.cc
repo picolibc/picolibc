@@ -337,10 +337,16 @@ enum_init (DWORD *lpidProcess, DWORD cb, DWORD *cbneeded)
     {
       h = LoadLibrary ("psapi.dll");
       if (!h)
-	return 0;
+	{
+	  system_printf ("couldn't load psapi.dll, %E");
+	  return 0;
+	}
       myEnumProcesses = (ENUMPROCESSES) GetProcAddress (h, "EnumProcesses");
       if (!myEnumProcesses)
-	return 0;
+	{
+	  system_printf ("couldn't locate EnumProcesses in psapi.dll, %E");
+	  return 0;
+	}
     }
   else
     {
@@ -352,7 +358,10 @@ enum_init (DWORD *lpidProcess, DWORD cb, DWORD *cbneeded)
       myProcess32Next  = (PROCESSWALK)
 	      GetProcAddress(h, "Process32Next");
       if (!myCreateToolhelp32Snapshot || !myProcess32First || !myProcess32Next)
-	return 0;
+	{
+	  system_printf ("Couldn't find toolhelp processes, %E");
+	  return 0;
+	}
 
       myEnumProcesses = EnumProcessesW95;
     }

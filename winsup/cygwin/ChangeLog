@@ -1,3 +1,8 @@
+Tue Oct 31 12:00:06 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* pinfo.cc (enum_init): Don't suffer silently if we can't load the
+	process enumerators.
+
 Mon Oct 30 16:54:26 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* signal.cc (kill_pgrp): Revert 25-Oct change.
