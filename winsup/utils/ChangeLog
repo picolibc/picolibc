@@ -1,3 +1,11 @@
+2002-05-23  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
+
+	* getfacl.c (usage): Standardize usage output. Change return type to
+	static void.
+	(print_version): New function.
+	(longopts): Added longopts for all options.
+	(main): Accommodate new help and version options.
+
 2002-05-22  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
 	* mount.cc (version) New global variable.

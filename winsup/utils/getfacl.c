@@ -1,6 +1,6 @@
 /* getfacl.c
 
-   Copyright 2000, 2001 Red Hat Inc.
+   Copyright 2000, 2001, 2002 Red Hat Inc.
 
    Written by Corinna Vinschen <vinschen@redhat.com>
 
@@ -19,6 +19,9 @@ details. */
 #include <sys/acl.h>
 #include <sys/stat.h>
 #include <string.h>
+
+static const char version[] = "$Revision$";
+static char *prog_name;
 
 char *
 permstr (mode_t perm)
@@ -58,67 +61,83 @@ groupname (gid_t gid)
   return gbuf;
 }
 
-#define pn(txt)	fprintf (fp, txt "\n", name)
-#define p(txt)	fprintf (fp, txt "\n")
-
-int
-usage (const char *name, int help)
+static void
+usage (FILE * stream)
 {
-  FILE *fp = help ? stdout : stderr;
-
-  pn ("usage: %s [-adn] file...");
-  if (!help)
-    pn ("Try `%s --help' for more information.");
-  else
+  fprintf (stream, "Usage: %s [-adn] FILE [FILE2...]\n"
+            "Display file and directory access control lists (ACLs).\n"
+            "\n"
+            "  -a, --all      display the filename, the owner, the group, and\n"
+            "                 the ACL of the file\n"
+            "  -d, --dir      display the filename, the owner, the group, and\n"
+            "                 the default ACL of the directory, if it exists\n"
+            "  -h, --help     output usage information and exit\n"
+            "  -n, --noname   display user and group IDs instead of names\n"
+            "  -v, --version  output version information and exit\n"
+            "\n"
+            "When multiple files are specified on the command line, a blank\n"
+            "line separates the ACLs for each file.\n", prog_name);
+  if (stream == stdout) 
     {
-      p ("");
-      p ("Display file and directory access control lists (ACLs).");
-      p ("");
-      p ("For each argument that is a regular file, special file or");
-      p ("directory, getfacl displays the owner, the group, and the ACL.");
-      p ("For directories getfacl displays additionally the default ACL.");
-      p ("");
-      p ("With no options specified, getfacl displays the filename, the");
-      p ("owner, the group, and both the ACL and the default ACL, if it");
-      p ("exists.");
-      p ("");
-      p ("The following options are supported:");
-      p ("");
-      p ("-a   Display the filename, the owner, the group, and the ACL");
-      p ("     of the file.");
-      p ("");
-      p ("-d   Display the filename, the owner, the group, and the default");
-      p ("     ACL of the directory, if it exists.");
-      p ("");
-      p ("-n   Display user and group IDs instead of names.");
-      p ("");
-      p ("The format for ACL output is as follows:");
-      p ("     # file: filename");
-      p ("     # owner: name or uid");
-      p ("     # group: name or uid");
-      p ("     user::perm");
-      p ("     user:name or uid:perm");
-      p ("     group::perm");
-      p ("     group:name or gid:perm");
-      p ("     mask:perm");
-      p ("     other:perm");
-      p ("     default:user::perm");
-      p ("     default:user:name or uid:perm");
-      p ("     default:group::perm");
-      p ("     default:group:name or gid:perm");
-      p ("     default:mask:perm");
-      p ("     default:other:perm");
-      p ("");
-      p ("When multiple files are specified on the command line, a blank");
-      p ("line separates the ACLs for each file.");
+      fprintf (stream, ""
+            "For each argument that is a regular file, special file or\n"
+            "directory, getfacl displays the owner, the group, and the ACL.\n"
+            "For directories getfacl displays additionally the default ACL.\n"
+            "\n"
+            "With no options specified, getfacl displays the filename, the\n"
+            "owner, the group, and both the ACL and the default ACL, if it\n"
+            "exists.\n"
+            "\n"
+            "The format for ACL output is as follows:\n"
+            "     # file: filename\n"
+            "     # owner: name or uid\n"
+            "     # group: name or uid\n"
+            "     user::perm\n"
+            "     user:name or uid:perm\n"
+            "     group::perm\n"
+            "     group:name or gid:perm\n"
+            "     mask:perm\n"
+            "     other:perm\n"
+            "     default:user::perm\n"
+            "     default:user:name or uid:perm\n"
+            "     default:group::perm\n"
+            "     default:group:name or gid:perm\n"
+            "     default:mask:perm\n"
+            "     default:other:perm\n"
+            "\n");
     }
-  return 1;
 }
 
 struct option longopts[] = {
+  {"all", no_argument, NULL, 'a'},
+  {"dir", no_argument, NULL, 'd'},
   {"help", no_argument, NULL, 'h'},
+  {"noname", no_argument, NULL, 'n'},
+  {"version", no_argument, NULL, 'v'},
   {0, no_argument, NULL, 0}
 };
+
+static void
+print_version ()
+{
+  const char *v = strchr (version, ':');
+  int len;
+  if (!v)
+    {
+      v = "?";
+      len = 1;
+    }
+  else
+    {
+      v += 2;
+      len = strchr (v, ' ') - v;
+    }
+  printf ("\
+getfacl (cygwin) %.*s\n\
+ACL Utility\n\
+Copyright (c) 2000, 2001, 2002 Red Hat, Inc.\n\
+Compiled on %s", len, v, __DATE__);
+}
 
 int
 main (int argc, char **argv)
@@ -132,7 +151,15 @@ main (int argc, char **argv)
   struct stat st;
   aclent_t acls[MAX_ACL_ENTRIES];
 
-  while ((c = getopt_long (argc, argv, "adn", longopts, NULL)) != EOF)
+  prog_name = strrchr (argv[0], '/');
+  if (prog_name == NULL)
+    prog_name = strrchr (argv[0], '\\');
+  if (prog_name == NULL)
+    prog_name = argv[0];
+  else
+    prog_name++;
+
+  while ((c = getopt_long (argc, argv, "adhnv", longopts, NULL)) != EOF)
     switch (c)
       {
       case 'a':
@@ -141,16 +168,24 @@ main (int argc, char **argv)
       case 'd':
 	dopt = 1;
 	break;
+      case 'h':
+	usage (stdout);
+	return 0;
       case 'n':
 	nopt = 1;
 	break;
-      case 'h':
-        return usage (argv[0], 1);
+      case 'v':
+	print_version ();
+	return 0;
       default:
-	return usage (argv[0], 0);
+	usage (stderr);
+	return 1;
       }
   if (optind > argc - 1)
-    return usage (argv[0], 0);
+    {
+      usage (stderr);
+      return 1;
+    }
   while ((c = optind++) < argc)
     {
       if (stat (argv[c], &st))
