@@ -1,3 +1,7 @@
+2003-12-04  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (setup_handler): Remove ill-advised debugging output.
+
 2003-12-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/types.h (struct __fcntl64): Fix datatype of l_start.

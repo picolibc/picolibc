@@ -797,10 +797,6 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _threadinfo *tls)
     {
       __stack_t retaddr;
       __stack_t *retaddr_on_stack = tls->stackptr - 1;
-#ifdef DEBUGGING
-      if (tls->stackptr > (tls->stack + 1))
-	try_to_debug ();
-#endif
       if (retaddr_on_stack >= tls->stack
 	  && (retaddr = InterlockedExchange ((LONG *) retaddr_on_stack, 0)))
 	{
