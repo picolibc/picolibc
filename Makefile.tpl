@@ -858,6 +858,7 @@ configure-[+module+]:
 	CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
 	DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
 	LD="$(LD)"; export LD; \
+	LDFLAGS="$(LDFLAGS)"; export LDFLAGS; \
 	NM="$(NM)"; export NM; \
 	RANLIB="$(RANLIB)"; export RANLIB; \
 	WINDRES="$(WINDRES)"; export WINDRES; \
@@ -1090,6 +1091,7 @@ configure-gcc:
 	CC_FOR_BUILD="$(CC_FOR_BUILD)"; export CC_FOR_BUILD; \
 	DLLTOOL="$(DLLTOOL)"; export DLLTOOL; \
 	LD="$(LD)"; export LD; \
+	LDFLAGS="$(LDFLAGS)"; export LDFLAGS; \
 	NM="$(NM)"; export NM; \
 	RANLIB="$(RANLIB)"; export RANLIB; \
 	WINDRES="$(WINDRES)"; export WINDRES; \
