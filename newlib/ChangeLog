@@ -1,3 +1,10 @@
+2000-08-30  Werner Almesberger  <Werner.Almesberger@epfl.ch>
+
+        * libc/posix/execve.c: included unistd.h for "_execve" prototype.
+        * libc/misc/unctrl.c libc/sys/sysvi386/crt0.c (sccsid): changed
+        "#ifndef lint" to "#if defined(LIBC_SCCS) && !defined(lint)" like
+        everywhere else.
+
 2000-08-30  Geoffrey Keating  <geoffk@cygnus.com>
 
 	* libc/string/swab.c: Specify that it's defined in <unistd.h>.

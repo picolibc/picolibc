@@ -70,9 +70,9 @@ No supporting OS subroutines are required.
 
 #include <_ansi.h>
 
-#ifndef lint
+#if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)unctrl.c	8.1 (Berkeley) 6/4/93";
-#endif /* not lint */
+#endif /* LIBC_SCCS and not lint */
 
 _CONST char * _CONST __unctrl[256] = {
 	"^@",  "^A",  "^B",  "^C",  "^D",  "^E",  "^F",  "^G",
