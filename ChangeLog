@@ -1,5 +1,7 @@
 2002-10-01  Nathanael Nerode  <neroden@gcc.gnu.org>
 
+	* Makefile.tpl: Insert configure-target target, for src-release.
+
 	* configure: Finish reverting change which Andrew Cagney started
 	reverting.  Should fix bustage.
 
