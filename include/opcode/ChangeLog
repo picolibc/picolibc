@@ -1,3 +1,13 @@
+2000-05-13  Alan Modra  <alan@linuxcare.com.au>,
+	    Alexander Sokolov <robocop@netlink.ru>
+
+	* i386.h (i386_optab): Add cpu_flags for all instructions.
+
+2000-05-13  Alan Modra  <alan@linuxcare.com.au>
+
+	From Gavin Romig-Koch <gavin@cygnus.com>
+	* i386.h (wld_Suf): Define.  Use on pushf, popf, pusha, popa.
+
 2000-05-04  Timothy Wall  <twall@cygnus.com>
 
 	* tic54x.h: New.
