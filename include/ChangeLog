@@ -1,3 +1,13 @@
+2002-10-24  Nathan Tallent  <eraxxon@alumni.rice.edu>
+
+	* ansidecl.h (__STDC__): Add (__alpha && __cplusplus) to the
+	list of	platform compilers that may look, smell and act
+	like __STDC__ but that may not define it.
+
+2002-10-11  David O'Brien  <obrien@FreeBSD.org>
+
+	* getopt.h: getopt is in unistd.h (based on SUSv2).
+
 2002-09-26  Jakub Jelinek  <jakub@redhat.com>
 
 	* elf/x86-64.h: Add TLS relocs.
