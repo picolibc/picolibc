@@ -1,3 +1,7 @@
+2004-02-22  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+	* Makefile.in: Fix problem links in faq0.html file.
+	* what.texinfo: Remove outdated 'recent' history.
+
 2004-02-19  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* cygwinenv.sgml: Remove incorrect ^Z information. Add 

@@ -111,7 +111,8 @@ faq0.html: $(srcdir)/faq.texinfo $(srcdir)/*.texinfo
 	    -e 's?\([.+a-zA-Z0-9-]*@@[.a-zA-Z0-9-]*[a-zA-Z0-9]\)?<A HREF="mailto:\1">\1</A>?' >./`basename $$i` ; done; \
 	$(TEXI2HTML) -monolithic ./faq.texinfo; \
 	rm -f *.texinfo; \
-	[ -r faq.html ] && mv faq.html faq0.html; exit 0
+	sed -e 's;faq.html;faq0.html;g' faq.html > faq0.html; \
+	rm -f faq.html; exit 0
 
 faq.html: $(srcdir)/faq.texinfo $(srcdir)/*.texinfo
 	-rm -f faq_toc.html; \
