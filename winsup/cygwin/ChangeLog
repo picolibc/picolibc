@@ -1,5 +1,12 @@
 2003-01-14  Thomas Pfaff  <tpfaff@gmx.net>
 
+	* wait.cc: Include thread.h
+	(wait4): Add pthread_testcancel call.
+	Wait for child process and cancellation event.
+	* thread.cc: Update list of cancellation points.
+
+2003-01-14  Thomas Pfaff  <tpfaff@gmx.net>
+
 	* signal.cc (sleep): Add pthread_testcancel call.
 	Wait for signal and cancellation event.
 	(usleep): Ditto.

@@ -15,6 +15,7 @@ details. */
 #include "cygerrno.h"
 #include "sigproc.h"
 #include "perthread.h"
+#include "thread.h"
 
 /* This is called _wait and not wait because the real wait is defined
    in libc/syscalls/syswait.c.  It calls us.  */
@@ -51,6 +52,8 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
   HANDLE waitfor;
   bool sawsig;
 
+  pthread_testcancel ();
+
   while (1)
     {
       sig_dispatch_pending (0);
@@ -84,7 +87,7 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
       if ((waitfor = w->ev) == NULL)
 	goto nochildren;
 
-      res = WaitForSingleObject (waitfor, INFINITE);
+      res = pthread::cancelable_wait (waitfor, INFINITE);
 
       sigproc_printf ("%d = WaitForSingleObject (...)", res);
 
