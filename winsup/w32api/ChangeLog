@@ -1,3 +1,7 @@
+Fri Nov  3 21:50:47 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* lib/Makefile.in: Install header files in w32api subdirectory.
+
 2000-10-31  Earnie Boyd  <earnie_boyd@yahoo.com>
 
 	* CONTRIBUTIONS: New file.
