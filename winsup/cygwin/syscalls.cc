@@ -1228,6 +1228,7 @@ _rename (const char *oldpath, const char *newpath)
 {
   sigframe thisframe (mainthread);
   int res = 0;
+  char *lnk_suffix = NULL;
 
   path_conv real_old (oldpath, PC_SYM_NOFOLLOW);
 
@@ -1276,13 +1277,18 @@ _rename (const char *oldpath, const char *newpath)
        return (-1);
     }
 
+  /* Destination file exists and is read only, change that or else
+     the rename won't work. */
   if (real_new.file_attributes () != (DWORD) -1 &&
       real_new.file_attributes () & FILE_ATTRIBUTE_READONLY)
-    {
-      /* Destination file exists and is read only, change that or else
-	 the rename won't work. */
-      SetFileAttributesA (real_new.get_win32 (), real_new.file_attributes () & ~ FILE_ATTRIBUTE_READONLY);
-    }
+    SetFileAttributesA (real_new.get_win32 (),
+    			real_new.file_attributes () & ~FILE_ATTRIBUTE_READONLY);
+
+  /* Shortcut hack No. 2, part 1 */
+  if (!real_old.issymlink () && !real_new.error && real_new.issymlink () &&
+      real_new.known_suffix && strcasematch (real_new.known_suffix, ".lnk") &&
+      (lnk_suffix = strrchr (real_new.get_win32 (), '.')))
+     *lnk_suffix = '\0';
 
   if (!MoveFile (real_old.get_win32 (), real_new.get_win32 ()))
     res = -1;
@@ -1322,12 +1328,26 @@ _rename (const char *oldpath, const char *newpath)
 
 done:
   if (res)
-    __seterrno ();
-
-  if (res == 0)
+    {
+      __seterrno ();
+      /* Reset R/O attributes if neccessary. */
+      if (real_new.file_attributes () != (DWORD) -1 &&
+	  real_new.file_attributes () & FILE_ATTRIBUTE_READONLY)
+	SetFileAttributesA (real_new.get_win32 (), real_new.file_attributes ());
+    }
+  else
     {
       /* make the new file have the permissions of the old one */
       SetFileAttributesA (real_new.get_win32 (), real_old.file_attributes ());
+
+      /* Shortcut hack, No. 2, part 2 */
+      /* if the new filename was an existing shortcut, remove it now if the
+         new filename is equal to the shortcut name without .lnk suffix. */
+      if (lnk_suffix)
+        {
+	  *lnk_suffix = '.';
+	  DeleteFile (real_new.get_win32 ());
+	}
     }
 
   syscall_printf ("%d = rename (%s, %s)", res, real_old.get_win32 (),
