@@ -1,3 +1,12 @@
+2002-05-22  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* syscalls.cc (seteuid): Do not take allow_ntsec into account.
+	Attempt to use an existing or new token even when the uid
+	matches orig_uid, but the gid is not in the process token.
+	Major reorganization after several incremental changes.
+	(setegid): Do not take allow_ntsec into account. Minor
+	reorganization after several incremental changes.
+
 2002-05-26  Christopher Faylor  <cgf@redhat.com>
 
 	* debug.h (being_debugged): New macro.
