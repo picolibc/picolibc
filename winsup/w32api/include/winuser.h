@@ -3197,7 +3197,7 @@ BOOL WINAPI EnableScrollBar(HWND,UINT,UINT);
 BOOL WINAPI EnableWindow(HWND,BOOL);
 BOOL WINAPI EndDeferWindowPos(HDWP);
 BOOL WINAPI EndDialog(HWND,int);
-BOOL WINAPI EndMenu(VOID);
+BOOL WINAPI EndMenu(void);
 BOOL WINAPI EndPaint(HWND,const PAINTSTRUCT*);
 #if (_WIN32_WINNT >= 0x0500)
 BOOL WINAPI EndTask(HWND,BOOL,BOOL);
@@ -3336,7 +3336,7 @@ BOOL WINAPI GetScrollInfo(HWND,int,LPSCROLLINFO);
 int WINAPI GetScrollPos(HWND,int);
 BOOL WINAPI GetScrollRange(HWND,int,LPINT,LPINT);
 #if (_WIN32_WINNT >= 0x0500)
-HWND WINAPI GetShellWindow(VOID);
+HWND WINAPI GetShellWindow(void);
 #endif
 HMENU WINAPI GetSubMenu(HMENU,int);
 DWORD WINAPI GetSysColor(int);
@@ -3401,7 +3401,7 @@ BOOL WINAPI GrayStringW(HDC,HBRUSH,GRAYSTRINGPROC,LPARAM,int,int,int,int,int);
 BOOL WINAPI HideCaret(HWND);
 BOOL WINAPI HiliteMenuItem(HWND,HMENU,UINT,UINT);
 BOOL WINAPI InflateRect(LPRECT,int,int);
-BOOL WINAPI InSendMessage(VOID);
+BOOL WINAPI InSendMessage(void);
 #if (_WIN32_WINNT >= 0x0500 || _WIN32_WINDOWS >= 0x0410)
 DWORD WINAPI InSendMessageEx(LPVOID);
 #endif
@@ -3467,7 +3467,7 @@ int WINAPI LoadStringA(HINSTANCE,UINT,LPSTR,int);
 int WINAPI LoadStringW(HINSTANCE,UINT,LPWSTR,int);
 BOOL WINAPI LockWindowUpdate(HWND);
 #if (_WIN32_WINNT >= 0x0500)
-BOOL WINAPI LockWorkStation(VOID);
+BOOL WINAPI LockWorkStation(void);
 #endif
 int WINAPI LookupIconIdFromDirectory(PBYTE,BOOL);
 int WINAPI LookupIconIdFromDirectoryEx(PBYTE,BOOL,int,int,UINT);

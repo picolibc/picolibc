@@ -80,6 +80,7 @@
 #include <vfw.h>
 #include <uxtheme.h>
 #include <tmschema.h>
+#include <dhcpcsdk.h>
 
 #ifndef __OBJC__  /* problems with BOOL */
 #include <ole2.h>

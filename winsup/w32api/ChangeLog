@@ -1,5 +1,14 @@
 2003-09-30  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/dhcpcsvc.h: New file.
+	Note that MSDN is confused about whether it should start constant
+	and structure names with DHCPCAPI or DHCPAPI. It's using both but
+	experience suggests it's DHCPCAPI with `C'.
+
+	* lib/dhcpcsvc.def: New file.
+
+2003-09-30  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winuser.h [_WIN32_WINNT >= 0x0501] (RIM_INPUT,
 	RIM_INPUTSINK): Add constants, for use by WM_INPUT notification.
 
