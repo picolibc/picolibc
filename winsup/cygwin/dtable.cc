@@ -559,6 +559,10 @@ dtable::vfork_child_dup ()
   newtable = (fhandler_base **) ccalloc (HEAP_ARGV, size, sizeof (fds[0]));
   int res = 1;
 
+  /* Remove impersonation */
+  if (cygheap->user.impersonated && cygheap->user.token != INVALID_HANDLE_VALUE)
+    RevertToSelf ();
+
   for (size_t i = 0; i < size; i++)
     if (not_open (i))
       continue;
@@ -570,6 +574,10 @@ dtable::vfork_child_dup ()
 	set_errno (EBADF);
 	goto out;
       }
+
+  /* Restore impersonation */
+  if (cygheap->user.impersonated && cygheap->user.token != INVALID_HANDLE_VALUE)
+    ImpersonateLoggedOnUser (cygheap->user.token);
 
   fds_on_hold = fds;
   fds = newtable;

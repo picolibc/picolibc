@@ -1,3 +1,8 @@
+2001-10-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dtable.cc (dtable::vfork_child_dup): Revert impersonation
+	before duplicating fhandler.
+
 2001-10-30  Christopher Faylor  <cgf@redhat.com>
 
 	* exceptions.cc (signal_exit): Weight the odds against the main thread
