@@ -1,3 +1,12 @@
+2004-09-16  Antony King  <antony.king@st.com>
+
+	* libc/ctype/ctype.tex: Added missing documentation.
+	* libc/stdio/stdio.tex Ditto.
+	* libc/stdlib/stdlib.tex Ditto.
+	* libc/string/strings.tex Ditto.
+	* libc/time/time.tex: Ditto.
+	* libc/stdio/setbuffer.c: Removed setlinebuf documentation.
+
 2004-09-15  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/reent/impure.c (reent_data): Define as alias to impure_data

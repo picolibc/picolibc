@@ -65,41 +65,6 @@ This function comes from BSD not ANSI or POSIX.
 
 Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.
-
-
-FUNCTION
-<<setlinebuf>>---specify line buffering for a file or stream
-
-INDEX
-	setlinebuf
-
-ANSI_SYNOPSIS
-	#include <stdio.h>
-	void setlinebuf(FILE *<[fp]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	void setlinebuf(<[fp]>)
-	FILE *<[fp]>;
-
-DESCRIPTION
-<<setlinebuf>> specifies that output to the file or stream identified by
-<[fp]> should be line buffered.  This causes the file or stream to pass
-on output to the host system at every newline, as well as when the
-buffer is full, or when an input operation intervenes.
-
-WARNINGS
-You may only use <<setlinebuf>> before performing any file operation
-other than opening the file.
-
-RETURNS
-<<setlinebuf>> returns as per setvbuf.
-
-PORTABILITY
-This function comes from BSD not ANSI or POSIX.
-
-Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
-<<lseek>>, <<read>>, <<sbrk>>, <<write>>.
 */
 
 #include <_ansi.h>

@@ -26,12 +26,14 @@ managing areas of memory.  The corresponding declarations are in
 * strcpy::      Copy string
 * strcspn::     Count chars not in string
 * strerror::    Convert error number to string
+* strerror_r::  Convert error number to string
 * strlen::      Character string length
 * strlwr::	Convert string to lower case
 * strncasecmp::	Compare strings ignoring case
 * strncat::     Concatenate strings
 * strncmp::     Character string compare
 * strncpy::     Counted copy string
+* strnlen::     Character string length
 * strpbrk::     Find chars in string
 * strrchr::     Reverse search for character in string
 * strspn::      Find initial match
@@ -103,6 +105,9 @@ managing areas of memory.  The corresponding declarations are in
 @include string/strerror.def
 
 @page
+@include string/strerror_r.def
+
+@page
 @include string/strlen.def
 
 @page
@@ -119,6 +124,9 @@ managing areas of memory.  The corresponding declarations are in
 
 @page
 @include string/strncpy.def
+
+@page
+@include string/strnlen.def
 
 @page
 @include string/strpbrk.def
