@@ -1,3 +1,8 @@
+2003-02-23  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winbase.h (EVENTLOG_SUCCESS): Add define.
+	Thanks to: Thomas Weber  <thomasweber@sourceforge.net>
+
 2003-02-22  Roland Schwingel  <roland.schwingel@onevision.de>
 
 	* include/wingdi.h (AddFontMemResourceEx[AW]): Add.
