@@ -96,6 +96,7 @@ Kinds of operands:
    N	nullification for spop and copr instructions
    w    12 bit branch displacement
    W    17 bit branch displacement (PC relative)
+   X    22 bit branch displacement (PC relative)
    z    17 bit branch displacement (just a number, not an address)
 
 Also these:
@@ -247,6 +248,8 @@ static const struct pa_opcode pa_opcodes[] =
 
 
 { "b",		0xe8002000, 0xfc00e000, "gnW,b", pa10, FLAG_STRICT},
+{ "b",		0xe8008000, 0xfc00e000, "lMnXL", pa20, FLAG_STRICT},
+{ "b",		0xe800a000, 0xfc00e000, "lnXL", pa20, FLAG_STRICT},
 { "b",		0xe8000000, 0xfc00e000, "lnW,b", pa10, FLAG_STRICT},
 { "b",		0xe8000000, 0xffe0e000, "nW", pa10}, /* bl foo,r0 */
 { "ldi",	0x34000000, 0xffe0c000, "j,x", pa10},	/* ldo val(r0),r */
