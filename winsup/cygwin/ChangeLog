@@ -65,7 +65,7 @@ Wed Nov 15 01:20:24 2000  Christopher Faylor <cgf@cygnus.com>
 	arguments.
 	(slow_pid_reuse): New function to grab last 'n' pids to prevent pid
 	reuse.
-	(fork_parent): Move last_fork_proc into slow_pid_reuse.  Handle
+	(fork_parent): Move last_fork_proc into slow_pid_reuse.
 	fork_pids debugging.  Eliminate unnecessary call to set_child_mmap_ptr.
 	(fork_init): New debugging function.
 	* mmap.cc (fixup_mmaps_after_fork): Renamed from
