@@ -409,6 +409,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define SHN_COMMON      0xFFF2		/* Associated symbol is in common */
 #define SHN_XINDEX      0xFFFF		/* Section index is held elsewhere */
 #define SHN_HIRESERVE   0xFFFF		/* End range of reserved indices */
+#define SHN_BAD		((unsigned) -1) /* Used internally by bfd */
 
 /* The following constants control how a symbol may be accessed once it has
    become part of an executable or shared library.  */

@@ -1,3 +1,10 @@
+2001-12-17  Alan Modra  <amodra@bigpond.net.au>
+
+	* external.h (Elf_External_Sym_Shndx): Declare.
+	* internal.h (struct elf_internal_sym <st_shndx>): Make it an
+	unsigned int.
+	* common.h (SHN_BAD): Define.
+
 2001-12-11  Alan Modra  <amodra@bigpond.net.au>
 
 	* common.h (SHN_XINDEX): Comment typo fix.
