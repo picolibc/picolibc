@@ -1,3 +1,9 @@
+2002-10-08  Heiko Gerdau  <hg@technosis.de>
+
+	* include/tchar.h (_tchdir. _tgetcwd, _tgetdcwd.
+	_tmkdir, _trmdir, _tstat): Add ASCII and UNICODE
+	mappings.
+
 2002-10-07  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/math/powil.c: Rename powil to __powil.
