@@ -110,7 +110,7 @@
 
 struct external_PEI_filehdr
 {
-  /* DOS header fields */
+  /* DOS header fields - always at offset zero in the EXE file */
   char e_magic[2];		/* Magic number, 0x5a4d */
   char e_cblp[2];		/* Bytes on last page of file, 0x90 */
   char e_cp[2];			/* Pages in file, 0x3 */
@@ -129,8 +129,12 @@ struct external_PEI_filehdr
   char e_oemid[2];		/* OEM identifier (for e_oeminfo), 0x0 */
   char e_oeminfo[2];		/* OEM information; e_oemid specific, 0x0 */
   char e_res2[10][2];		/* Reserved words, all 0x0 */
-  char e_lfanew[4];		/* File address of new exe header, 0x80 */
+  char e_lfanew[4];		/* File address of new exe header, usually 0x80 */
   char dos_message[16][4];	/* other stuff, always follow DOS header */
+
+  /* Note: additional bytes may be inserted before the signature.  Use
+   the e_lfanew field to find the actual location of the NT signature */
+
   char nt_signature[4];		/* required NT signature, 0x4550 */ 
 
   /* From standard header */  
