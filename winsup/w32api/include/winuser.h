@@ -3161,7 +3161,7 @@ BOOL WINAPI CloseWindow(HWND);
 BOOL WINAPI CloseWindowStation(HWINSTA);
 int WINAPI CopyAcceleratorTableA(HACCEL,LPACCEL,int);
 int WINAPI CopyAcceleratorTableW(HACCEL,LPACCEL,int);
-HCURSOR WINAPI CopyCursor(HCURSOR);
+#define CopyCursor(c) ((HCURSOR)CopyIcon((HICON)(c)))
 HICON WINAPI CopyIcon(HICON);
 HANDLE WINAPI CopyImage(HANDLE,UINT,int,int,UINT);
 BOOL WINAPI CopyRect(LPRECT,LPCRECT);
