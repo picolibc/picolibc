@@ -2510,14 +2510,18 @@ static void malloc_init_state(av) mstate av;
 
 #if __STD_C
 static Void_t*  sYSMALLOc(INTERNAL_SIZE_T, mstate);
+#ifndef MORECORE_CANNOT_TRIM
 static int      sYSTRIm(size_t, mstate);
+#endif
 static void     malloc_consolidate(mstate);
 #ifdef NEED_INDEPENDENT
 static Void_t** iALLOc(size_t, size_t*, int, Void_t**);
 #endif
 #else
 static Void_t*  sYSMALLOc();
+#ifndef MORECORE_CANNOT_TRIM
 static int      sYSTRIm();
+#endif
 static void     malloc_consolidate();
 #ifdef NEED_INDEPENDENT
 static Void_t** iALLOc();
