@@ -2,7 +2,7 @@
 
 	* pwdgrp.cc (pwdgrp::reparse): Declare.
 	* uinfo.cc (pwdgrp::reparse): Define.
-	* grp.cc (pwdgrp::parse_group): Use.
+	* grp.cc (pwdgrp::parse_group): Use reparse.
 
 2003-01-25  Pierre Humblet  <pierre.humblet@ieee.org>
 
