@@ -145,15 +145,21 @@ SECTIONS
   {
     *(.init) 
   } =0
+  /* Put trampolines at beginning of text at 0x4400 so that they
+     are not in memory bank window.  */
+  .tramp :
+  {
+    *(.tramp)
+  } > text
   .text  :
   {
     /* Put startup code at beginning so that _start keeps same address.  */
     /* Startup code.  */
-    *(.install0)	/* Section should setup the stack pointer.  */
-    *(.install1)	/* Place holder for applications.  */
-    *(.install2)	/* Optional installation of data sections in RAM.  */
-    *(.install3)	/* Place holder for applications.  */
-    *(.install4)	/* Section that calls the main.  */
+    KEEP (*(.install0))	/* Section should setup the stack pointer.  */
+    KEEP (*(.install1))	/* Place holder for applications.  */
+    KEEP (*(.install2))	/* Optional installation of data sections in RAM.  */
+    KEEP (*(.install3))	/* Place holder for applications.  */
+    KEEP (*(.install4))	/* Section that calls the main.  */
     *(.init)
     *(.text)
     *(.text.*)
@@ -161,11 +167,11 @@ SECTIONS
     *(.gnu.warning)
     *(.gnu.linkonce.t.*)
     /* Finish code.  */
-    *(.fini0)		/* Beginning of finish code (_exit symbol).  */
-    *(.fini1)		/* Place holder for applications.  */
-    *(.fini2)		/* C++ destructors.  */
-    *(.fini3)		/* Place holder for applications.  */
-    *(.fini4)		/* Runtime exit.  */
+    KEEP (*(.fini0))	/* Beginning of finish code (_exit symbol).  */
+    KEEP (*(.fini1))	/* Place holder for applications.  */
+    KEEP (*(.fini2))	/* C++ destructors.  */
+    KEEP (*(.fini3))	/* Place holder for applications.  */
+    KEEP (*(.fini4))	/* Runtime exit.  */
     _etext = .;
     PROVIDE (etext = .);
   }  > text
@@ -173,6 +179,10 @@ SECTIONS
   {
     *(.eh_frame)
   }  > text
+  .gcc_except_table :
+  {
+    *(.gcc_except_table)
+  } > text
   .rodata    :
   {
     *(.rodata)
@@ -187,25 +197,13 @@ SECTIONS
   .ctors   : 
   {
      PROVIDE (__CTOR_LIST__ = .); 
-    *(.ctors)
-    /* We don't want to include the .ctor section from
-       from the crtend.o file until after the sorted ctors.
-       The .ctor section from the crtend file contains the
-       end of ctors marker and it must be last
-    KEEP (*(EXCLUDE_FILE (*crtend.o) .ctors))
-    KEEP (*(SORT(.ctors.*)))
-    KEEP (*(.ctors)) */
+     KEEP (*(.ctors))
      PROVIDE(__CTOR_END__ = .); 
   }  > text
     .dtors	  :
   {
      PROVIDE(__DTOR_LIST__ = .); 
-    *(.dtors)
-    /*
-    KEEP (*crtbegin.o(.dtors))
-    KEEP (*(EXCLUDE_FILE (*crtend.o) .dtors))
-    KEEP (*(SORT(.dtors.*)))
-    KEEP (*(.dtors)) */
+     KEEP (*(.dtors))
      PROVIDE(__DTOR_END__ = .); 
   }  > text
   /* Start of the data section image in ROM.  */
@@ -274,7 +272,7 @@ SECTIONS
   PROVIDE (_vectors_addr = DEFINED (vectors_addr) ? vectors_addr : 0xffc0);
   .vectors DEFINED (vectors_addr) ? vectors_addr : 0xffc0 :
   {
-    *(.vectors)
+    KEEP (*(.vectors))
   }
   /* Stabs debugging sections.  */
   .stab		 0 : { *(.stab) }

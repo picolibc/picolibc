@@ -1,3 +1,15 @@
+2004-03-03  Stephane Carrez  <stcarrez@nerim.fr>
+
+	* m68hc11/sci-inout.S: Supports -mlong-calls.
+	* m68hc11/sim-valid-m68hc11.ld (.tramp): New section for trampolines.
+	(.text): Mark the .installN and .finiN section with KEEP.
+	(.vectors): Likewise for .vectors.
+	(.gcc_except_table): New section.
+	* m68hc11/sim-valid-m68hc12.ld (.tramp): New section for trampolines.
+	(.text): Mark the .installN and .finiN section with KEEP.
+	(.vectors): Likewise for .vectors.
+	(.gcc_except_table): New section.
+
 2004-01-23  Gábor Lóki  <loki@inf.u-szeged.hu>
 
 	* m68k/leds.c: remove led_putnum(), zylons() forward
