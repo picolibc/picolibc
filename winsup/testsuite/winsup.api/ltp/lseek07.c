@@ -149,7 +149,7 @@ main(int ac, char **av)
 			 * the current offset position.
 			 */
 			if (write(fildes, write_buf2, strlen(write_buf2)) !=
-				       strlen(write_buf2)) {
+				       (int)strlen(write_buf2)) {
 				tst_brkm(TFAIL, cleanup, "write() failed to "
 					 "write additional data, error = %d",
 					 errno);
@@ -244,7 +244,7 @@ setup()
 
 	/* Write data into temporary file */
 	if(write(fildes, write_buf1, strlen(write_buf1)) !=
-							strlen(write_buf1)) {
+						     (int)strlen(write_buf1)) {
 		tst_brkm(TBROK, cleanup, "write(2) on %s Failed, errno=%d : %s",
 			 TEMP_FILE, errno, strerror(errno));
 	}

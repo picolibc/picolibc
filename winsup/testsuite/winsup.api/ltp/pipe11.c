@@ -203,7 +203,7 @@ setup()
 	j = 0;
 	for (i = 0; i < szcharbuf; ) {
 		wrbuf[i++] = rawchars[j++];
-		if (j >= sizeof(rawchars)) {
+		if (j >= (int)sizeof(rawchars)) {
 			j = 0;
 		}
 	}

@@ -67,7 +67,7 @@ main(int argc, char **argv)
 	const char *msg;
 	
 	struct stat statbuf;
-	int mskval = 0000;
+	unsigned mskval = 0000;
 	int fildes, i;
 	unsigned low9mode;
 

@@ -122,7 +122,7 @@ main(int ac, char **av)
 
 		/* write the message to the pipe */
 		if (write(fildes[1], write_buf, strlen(write_buf))
-						< strlen(write_buf)) {
+						< (int)strlen(write_buf)) {
 			tst_brkm(TBROK, cleanup, "write() failed on write "
 				 "to pipe, error:%d", errno);
 		}
@@ -166,7 +166,7 @@ main(int ac, char **av)
 
 			/* Read data from read end of pipe */
 			if (read(fildes[0], read_buf, sizeof(read_buf)) !=
-				     strlen(write_buf)) {
+				     (int)strlen(write_buf)) {
 				tst_brkm(TFAIL, NULL, "read() failed - "
 					 "error:%d", errno);
 				exit(1);

@@ -96,7 +96,7 @@ main(int ac, char **av)
 	int lc;			/* loop counter */
 	const char *msg;	/* message returned from parse_opts */
 	int ind;		/* counter variable for chmod(2) tests */
-	int mode;		/* file mode permission */
+	unsigned mode;		/* file mode permission */
     
 	TST_TOTAL = sizeof(Modes) / sizeof(int);
 

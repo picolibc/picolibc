@@ -129,7 +129,7 @@ extern int Tst_count;		/* Test Case counter for tst_* routines */
 
 /* list of environment variables to test */
 const char *environ_list[] = {"TERM","NoTSetzWq","TESTPROG"};
-#define NUMBER_OF_ENVIRON sizeof(environ_list)/sizeof(char *)
+#define NUMBER_OF_ENVIRON (int)(sizeof(environ_list)/sizeof(char *))
 int TST_TOTAL=NUMBER_OF_ENVIRON;		/* Total number of test cases. */
 
 /***************************************************************

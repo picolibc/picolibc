@@ -1,3 +1,29 @@
+2003-02-19  Vaclav Haisman  <V.Haisman@sh.cvut.cz>
+
+	* winsup.api/crlf.c: Fix C signed/unsigned compare warning.
+	* winsup.api/mmaptest01.c: Ditto.
+	* winsup.api/ltp/chmod01.c: Ditto.
+	* winsup.api/ltp/fork04.c: Ditto.
+	* winsup.api/ltp/lseek03.c: Ditto.
+	* winsup.api/ltp/lseek06.c: Ditto.
+	* winsup.api/ltp/lseek07.c: Ditto.
+	* winsup.api/ltp/lseek08.c: Ditto.
+	* winsup.api/ltp/mmap001.c: Ditto.
+	* winsup.api/ltp/mmap02.c: Ditto.
+	* winsup.api/ltp/mmap03.c: Ditto.
+	* winsup.api/ltp/mmap04.c: Ditto.
+	* winsup.api/ltp/mmap05.c: Ditto.
+	* winsup.api/ltp/mmap06.c: Ditto.
+	* winsup.api/ltp/mmap07.c: Ditto.
+	* winsup.api/ltp/mmap08.c: Ditto.
+	* winsup.api/ltp/pipe11.c: Ditto.
+	* winsup.api/ltp/poll01.c: Ditto.
+	* winsup.api/ltp/sync02.c: Ditto.   
+	* winsup.api/ltp/times03.c: Ditto.
+	* winsup.api/ltp/umask03.c: Ditto.
+	* winsup.api/ltp/getpgid01.c: Remove unused obsolete include.
+	* winsup.api/ltp/getpgid02.c: Ditto.
+
 2003-02-08  Christopher Faylor  <cgf@redhat.com>
 
 	* winsup.api/winsup.exp (ws_spawn): Tweak slightly to work with tcl

@@ -87,7 +87,7 @@ int main ()
 
   char buf3[20];
 
-  int i;
+  unsigned i;
 
   strcpy (fnam1, "mmaptest01.1.XXXXXX");
   strcpy (fnam2, "mmaptest01.2.XXXXXX");

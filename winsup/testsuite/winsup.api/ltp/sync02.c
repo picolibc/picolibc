@@ -199,7 +199,7 @@ setup()
 
 	/* Write the buffer data into file */
 	if (write(fildes, write_buffer, strlen(write_buffer)) != \
-				strlen(write_buffer)) {
+				(int)strlen(write_buffer)) {
 		tst_brkm(TBROK, cleanup,
 			 "write() failed to write buffer data to %s",
 			 TEMP_FILE);

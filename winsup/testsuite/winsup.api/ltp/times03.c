@@ -88,7 +88,7 @@ main(int argc, char **argv)
 	 */
 	start_time = time(NULL);
 	for (;;) {
-		if (times(&buf1) == -1) {
+		if (times(&buf1) == (clock_t)-1) {
 			TEST_ERROR_LOG(errno);
 			tst_resm(TFAIL, "Call to times(2) "
 				 "failed, errno = %d", errno);
@@ -98,7 +98,7 @@ main(int argc, char **argv)
 			break;
 		}
 	}
-	if (times(&buf1) == -1) {
+	if (times(&buf1) == (clock_t)-1) {
 		TEST_ERROR_LOG(errno);
 		tst_resm(TFAIL, "Call to times(2) failed, "
 			 "errno = %d", errno);
@@ -145,7 +145,7 @@ main(int argc, char **argv)
 				 */
 				start_time = time(NULL);
 				for (;;) {
-					if (times(&buf2) == -1) {
+					if (times(&buf2) == (clock_t)-1) {
 						tst_resm(TFAIL,
 							"Call to times "
 							"failed, "
@@ -166,7 +166,7 @@ main(int argc, char **argv)
 				tst_resm(TFAIL, "Call to times(2) "
 						"failed in child");
 			}
-			if (times(&buf2) == -1) {	
+			if (times(&buf2) == (clock_t)-1) {	
 				TEST_ERROR_LOG(TEST_ERRNO);
 				tst_resm(TFAIL, "Call to times failed "
 						"errno = %d", errno);

@@ -137,7 +137,7 @@ main(int ac, char **av)
     int lc;		/* loop counter */
     const char *msg;		/* message returned from parse_opts */
 
-    int ind;
+    unsigned ind;
     int whence;
 
     TST_TOTAL=sizeof(Whences)/sizeof(int);

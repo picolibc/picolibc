@@ -201,7 +201,7 @@ setup()
 	}
 
 	/* Write data into temporary file */
-	if(write(fildes, write_buf, strlen(write_buf)) != strlen(write_buf)) {
+	if(write(fildes, write_buf, strlen(write_buf)) != (int)strlen(write_buf)) {
 		tst_brkm(TBROK, cleanup, "write(2) on %s Failed, errno=%d : %s",
 			 TEMP_FILE, errno, strerror(errno));
 	}

@@ -156,7 +156,7 @@ int commands[] = {
 
 int errors = 0;
 
-#define num_commands (sizeof(commands)/sizeof(commands[0]))
+#define num_commands (int)(sizeof(commands)/sizeof(commands[0]))
 
 int pc;
 int askfor, get, expect, count, posn, whence, size;
