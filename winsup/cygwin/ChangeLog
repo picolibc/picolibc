@@ -1,8 +1,35 @@
+Wed May 17 01:05:52 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (mount_info::cygdrive_posix_path): Don't add trailing slash
+	if referring to something like c:\.
+	* dcrt0.cc (dll_crt0_1): Move uinfo initialization prior to sig_send
+	initialization to give signal thread a chance to finish.
+	* debug.cc (WFSO): Move to sigproc.cc
+	(WFMO): Ditto.
+	* exceptions.cc (interruptible): Allocate slightly more space for
+	directory just for paranoia's sake.
+	(call_handler): Eliminate nonmain argument.  Determine if main thread
+	has set a frame pointer and use it if so.
+	(sig_handle): Eliminate nonmain argument.
+	* net.cc: Record frame information in appropriate routines throughout.
+	* select.cc (select): Ditto.
+	* sigproc.cc: Use sigthread structure to record mainthread id
+	throughout.
+	(sig_send): Record frame information for signal handler.
+	(wait_sig): Reflect argument change in sig_handle.
+	(WFSO): Move here and record frame information for signal handler.
+	(WFMO): Ditto.
+	* sigproc.h: Implement new "sigthread" class.  Implement "sigframe"
+	class for manipulating signal frame info.
+	* thread.cc (__pthread_kill): Use standard _kill() function rather than
+	calling sig_send directly.
+	* winsup.h: Eliminate ebp element from signal_dispatch class.
+
 Tue May 16 23:39:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	Patch suggested by John Rowley <wjr@bgs.ac.uk>
 	* fhandler_tape.cc (fhandler_dev_tape::ioctl): Check
-        for filemark feature on MTWEOF operation.
+	for filemark feature on MTWEOF operation.
 
 Tue May 16 11:49:13 2000  Christopher Faylor <cgf@cygnus.com>
 

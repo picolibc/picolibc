@@ -16,7 +16,6 @@ details. */
 #include <errno.h>
 #include <stdlib.h>
 #include "winsup.h"
-#include "sync.h"
 
 extern BOOL allow_ntsec;
 
@@ -101,7 +100,7 @@ Static waitq waitq_main;		// Storage for main thread
 
 muto NO_COPY *sync_proc_subproc = NULL;	// Control access to subproc stuff
 
-DWORD NO_COPY maintid = 0;		// ID of the main thread
+sigthread NO_COPY mainthread;		// ID of the main thread
 DWORD NO_COPY sigtid = 0;		// ID of the signal thread
 
 int NO_COPY pending_signals = 0;	// TRUE if signals pending
@@ -605,7 +604,7 @@ sigproc_init ()
      to a signal handler function. */
   signal_arrived = CreateEvent(&sec_none_nih, TRUE, FALSE, NULL);
 
-  maintid = GetCurrentThreadId ();// For use in determining if signals
+  mainthread.id = GetCurrentThreadId ();// For use in determining if signals
 				  //  should be blocked.
 
   if (!(hwait_sig = makethread (wait_sig, NULL, 0, "sig")))
@@ -719,10 +718,10 @@ sig_send (pinfo *p, int sig, DWORD ebp)
   HANDLE thiscatch = NULL;
   HANDLE thiscomplete = NULL;
   BOOL wait_for_completion;
-  extern signal_dispatch sigsave;
+  sigframe thisframe;
 
   if (p == myself_nowait_nonmain)
-    p = (tid == maintid) ? myself : myself_nowait;
+    p = (tid == mainthread.id) ? myself : myself_nowait;
   if (!(its_me = (p == NULL || p == myself || p == myself_nowait)))
     wait_for_completion = FALSE;
   else
@@ -751,7 +750,7 @@ sig_send (pinfo *p, int sig, DWORD ebp)
     {
       if (!wait_for_completion)
 	thiscatch = sigcatch_nosync;
-      else if (tid != maintid)
+      else if (tid != mainthread.id)
 	{
 	  thiscatch = sigcatch_nonmain;
 	  thiscomplete = sigcomplete_nonmain;
@@ -760,7 +759,7 @@ sig_send (pinfo *p, int sig, DWORD ebp)
 	{
 	  thiscatch = sigcatch_main;
 	  thiscomplete = sigcomplete_main;
-	  sigsave.ebp = ebp ?: (DWORD) __builtin_frame_address (1);
+	  thisframe.set (mainthread);
 	}
     }
   else if (!(thiscatch = getsem (p, "sigcatch", 0, 0)))
@@ -1262,7 +1261,7 @@ wait_sig (VOID *)
 		/* Signalled from a child process that it has stopped */
 		case __SIGCHILDSTOPPED:
 		  sip_printf ("Received child stopped notification");
-		  dispatched |= sig_handle (SIGCHLD, rc);
+		  dispatched |= sig_handle (SIGCHLD);
 		  if (proc_subproc (PROC_CHILDSTOPPED, 0))
 		    dispatched |= 1;
 		  break;
@@ -1270,7 +1269,7 @@ wait_sig (VOID *)
 		/* A normal UNIX signal */
 		default:
 		  sip_printf ("Got signal %d", sig);
-		  int wasdispatched = sig_handle (sig, rc);
+		  int wasdispatched = sig_handle (sig);
 		  dispatched |= wasdispatched;
 		  if (sig == SIGCHLD && wasdispatched)
 		    dispatched_sigchld = 1;
@@ -1293,14 +1292,11 @@ wait_sig (VOID *)
 	{
 	case 0:
 	  SetEvent (sigcomplete_main);
-sigproc_printf ("signalled sigcomplete_main %p", sigcomplete_main);
 	  break;
 	case 1:
 	  ReleaseSemaphore (sigcomplete_nonmain, 1, NULL);
-sigproc_printf ("signalled sigcomplete_nonmain %p", sigcomplete_nonmain);
 	  break;
 	default:
-sigproc_printf ("Did not signal anyone");
 	  /* Signal from another process.  No need to synchronize. */
 	  break;
 	}
@@ -1366,4 +1362,30 @@ wait_subproc (VOID *)
   events[0] = NULL;
   sip_printf ("done");
   return 0;
+}
+
+extern "C" {
+/* Provide a stack frame when calling WaitFor* functions */
+
+#undef WaitForSingleObject
+
+DWORD __stdcall
+WFSO (HANDLE hHandle, DWORD dwMilliseconds)
+{
+  DWORD ret;
+  sigframe thisframe (mainthread);
+  ret = WaitForSingleObject (hHandle, dwMilliseconds);
+  return ret;
+}
+
+#undef WaitForMultipleObjects
+
+DWORD __stdcall
+WFMO (DWORD nCount, CONST HANDLE *lpHandles, BOOL fWaitAll, DWORD dwMilliseconds)
+{
+  DWORD ret;
+  sigframe thisframe (mainthread);
+  ret = WaitForMultipleObjects (nCount, lpHandles, fWaitAll, dwMilliseconds);
+  return ret;
+}
 }

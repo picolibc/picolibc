@@ -184,6 +184,7 @@ static int
 read_handler (int fd, void *ptr, size_t len)
 {
   int res;
+  sigframe thisframe (mainthread);
   fhandler_base *fh = dtable[fd];
 
   if (dtable.not_open (fd))

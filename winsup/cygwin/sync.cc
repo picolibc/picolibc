@@ -20,12 +20,11 @@ details. */
 #include <errno.h>
 #include <stdlib.h>
 #include "winsup.h"
-#include "sync.h"
 
 muto NO_COPY muto_start;
 
 /* Constructor */
-muto::muto(int inh, const char *s) : sync (0), visits(0), waiters(-1), tid (0), next (NULL)
+muto::muto (int inh, const char *s) : sync (0), visits(0), waiters(-1), tid (0), next (NULL)
 {
   /* Create event which is used in the fallback case when blocking is necessary */
   if (!(bruteforce = CreateEvent (inh ? &sec_all_nih : &sec_none_nih, FALSE, FALSE, name)))

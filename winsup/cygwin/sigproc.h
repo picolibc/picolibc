@@ -32,12 +32,60 @@ typedef struct struct_waitq
   HANDLE thread_ev;
 } waitq;
 
+class muto;
+
+struct sigthread
+{
+  DWORD id;
+  DWORD frame;
+  muto *lock;
+  sigthread () : id (0), frame (0), lock (0) {}
+};
+
+class sigframe
+{
+private:
+  sigthread *st;
+
+public:
+  void set (sigthread &t, int up = 1)
+  {
+    if (!t.lock)
+      t.lock = new_muto (FALSE, "sigthread");
+    t.lock->acquire ();
+    st = &t;
+    t.frame = (DWORD) (up ? __builtin_frame_address (1) :
+			   __builtin_frame_address (0));
+    t.lock->release ();
+  }
+
+  sigframe () {st = NULL;}
+  sigframe (sigthread &t, int up = 1)
+  {
+    if (!t.frame || t.id == GetCurrentThreadId ())
+      set (t, up);
+    else
+      st = NULL;
+  }
+  ~sigframe ()
+  {
+    if (st)
+      {
+	st->lock->acquire ();
+	st->frame = 0;
+	st->lock->release ();
+	st = NULL;
+      }
+  }
+};
+
+extern sigthread mainthread;
 extern HANDLE signal_arrived;
 
 BOOL __stdcall my_parent_is_alive ();
 extern "C" int __stdcall sig_dispatch_pending (int force = FALSE) __asm__ ("sig_dispatch_pending");
 extern "C" void __stdcall set_process_mask (sigset_t newmask);
-int __stdcall sig_handle (int, int);
+int __stdcall sig_handle (int);
 void __stdcall sig_clear (int);
 void __stdcall sig_set_pending (int);
 int __stdcall handle_sigsuspend (sigset_t);
@@ -53,7 +101,6 @@ void __stdcall signal_fixup_after_fork ();
 
 extern char myself_nowait_dummy[];
 extern char myself_nowait_nonmain_dummy[];
-extern DWORD maintid;
 extern HANDLE hExeced;		// Process handle of new window
 				//  process created by spawn_guts()
 

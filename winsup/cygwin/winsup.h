@@ -85,6 +85,7 @@ extern HANDLE hMainProc;
 
 /* Now that pinfo has been defined, include... */
 #include "debug.h"
+#include "sync.h"
 #include "sigproc.h"
 #include "fhandler.h"
 #include "path.h"
@@ -308,7 +309,6 @@ struct signal_dispatch
   void (*func) (int);
   int sig;
   int saved_errno;
-  DWORD ebp;
   DWORD oldmask;
   DWORD retaddr;
   DWORD *retaddr_on_stack;

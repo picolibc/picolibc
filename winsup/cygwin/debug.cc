@@ -9,7 +9,6 @@ details. */
 #define NO_DEBUG_DEFINES
 #include "winsup.h"
 #include "exceptions.h"
-#include "sync.h"
 
 static muto NO_COPY *threadname_lock = NULL;
 #define lock_threadname() \
@@ -52,7 +51,7 @@ int __stdcall
 iscygthread()
 {
   DWORD tid = GetCurrentThreadId ();
-  if (tid != maintid)
+  if (tid != mainthread.id)
     for (DWORD i = 0; i < NTHREADS && threads[i].name != NULL; i++)
       if (threads[i].id == tid)
 	return 1;
@@ -302,27 +301,3 @@ close_handle (const char *func, int ln, HANDLE h, const char *name, BOOL force)
   return ret;
 }
 #endif /*DEBUGGING*/
-
-extern "C" {
-/* Provide a stack frame when calling WaitFor* functions */
-
-#undef WaitForSingleObject
-
-DWORD __stdcall
-WFSO (HANDLE hHandle, DWORD dwMilliseconds)
-{
-  DWORD ret;
-  ret = WaitForSingleObject (hHandle, dwMilliseconds);
-  return ret;
-}
-
-#undef WaitForMultipleObjects
-
-DWORD __stdcall
-WFMO (DWORD nCount, CONST HANDLE *lpHandles, BOOL fWaitAll, DWORD dwMilliseconds)
-{
-  DWORD ret;
-  ret = WaitForMultipleObjects (nCount, lpHandles, fWaitAll, dwMilliseconds);
-  return ret;
-}
-}

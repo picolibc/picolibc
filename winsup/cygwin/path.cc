@@ -1101,7 +1101,7 @@ mount_info::cygdrive_posix_path (const char *src, char *dst, int trailing_slash_
      The cygdrive prefix always ends with a trailing slash so
      the drive letter is added after the path. */
   dst[len++] = tolower (src[0]);
-  if (!src[2])
+  if (!src[2] || (SLASH_P (src[2]) && !src[3]))
     dst[len++] = '\000';
   else
     {
@@ -1136,11 +1136,17 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
 				int keep_rel_p)
 {
   int src_path_len = strlen (src_path);
-  int trailing_slash_p = (src_path_len > 0
-			  && SLASH_P (src_path[src_path_len - 1]));
-  int relative_path_p = (! SLASH_P (*src_path)
-			 && strchr (src_path, ':') == NULL);
+  int relative_path_p = !isabspath (src_path);
+  int trailing_slash_p;
 
+  if (src_path_len <= 1)
+    trailing_slash_p = 0;
+  else
+    {
+      const char *lastchar = src_path + src_path_len - 1;
+      trailing_slash_p = SLASH_P (*lastchar) && lastchar[-1] != ':';
+    }
+    
   debug_printf ("conv_to_posix_path (%s, %s)", src_path,
 		keep_rel_p ? "keep-rel" : "no-keep-rel");
   MALLOC_CHECK;
@@ -1212,8 +1218,7 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
      caller must want an absolute path (otherwise we would have returned
      above).  So we always return an absolute path at this point. */
   if ((isalpha (pathbuf[0])) && (pathbuf[1] == ':'))
-    cygdrive_posix_path (pathbuf, posix_path, trailing_slash_p &&
-					      pathbuflen > 3);
+    cygdrive_posix_path (pathbuf, posix_path, trailing_slash_p);
   else
     {
       /* The use of src_path and not pathbuf here is intentional.

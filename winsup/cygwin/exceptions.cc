@@ -18,7 +18,6 @@ details. */
 #define DECLSPEC_IMPORT
 #include <imagehlp.h>
 #include "autoload.h"
-#include "sync.h"
 
 char debugger_command[2 * MAX_PATH + 20];
 
@@ -566,7 +565,8 @@ interruptible (DWORD pc)
       if (!VirtualQuery ((LPCVOID) pc, &m, sizeof m))
 	sigproc_printf ("couldn't get memory info, %E");
 
-      char *checkdir = (char *) alloca (windows_system_directory_length + 2);
+      char *checkdir = (char *) alloca (windows_system_directory_length + 4);
+      memset (checkdir, 0, sizeof (checkdir));
 #     define h ((HMODULE) m.AllocationBase)
       if (h == user_data->hmodule)
 	res = 1;
@@ -597,7 +597,6 @@ interrupt_setup (int sig, struct sigaction& siga, void *handler,
   sigsave.func = (void (*)(int)) handler;
   sigsave.sig = sig;
   sigsave.saved_errno = -1;		// Flag: no errno to save
-  sigsave.ebp = 0;
 }
 
 static void
@@ -656,18 +655,33 @@ set_sig_errno (int e)
 }
 
 static int
-call_handler (int sig, struct sigaction& siga, void *handler, int nonmain)
+call_handler (int sig, struct sigaction& siga, void *handler)
 {
   CONTEXT cx;
-  DWORD ebp;
   int interrupted = 1;
   HANDLE hth = NULL;
+  DWORD ebp;
   int res;
+  int locked;
 
-  if (!nonmain)
-    ebp = sigsave.ebp;
+  if (!mainthread.lock)
+    locked = 0;
   else
     {
+      mainthread.lock->acquire ();
+      locked = 1;
+    }
+
+  if (mainthread.frame)
+    ebp = mainthread.frame;
+  else
+    {
+      if (locked)
+	{
+	  mainthread.lock->release ();
+	  locked = 0;
+	}
+
       hth = myself->getthread2signal ();
       /* Suspend the thread which will receive the signal.  But first ensure that
 	 this thread doesn't have the sync_proc_subproc and mask_sync mutos, since
@@ -682,8 +696,14 @@ call_handler (int sig, struct sigaction& siga, void *handler, int nonmain)
 	  muto *m;
 	  /* FIXME: Make multi-thread aware */
 	  for (m = muto_start.next;  m != NULL; m = m->next)
-	    if (m->unstable () || m->owner () == maintid)
+	    if (m->unstable () || m->owner () == mainthread.id)
 	      goto keep_looping;
+
+	  if (mainthread.frame)
+	    {
+	      ebp = mainthread.frame;	/* try to avoid a race */
+	      goto ebp_set;
+	    }
 
 	  break;
 
@@ -707,7 +727,8 @@ call_handler (int sig, struct sigaction& siga, void *handler, int nonmain)
       ebp = cx.Ebp;
     }
 
-  if (hExeced != NULL || (nonmain && interruptible (cx.Eip)))
+ebp_set:
+  if (hExeced != NULL || (!mainthread.frame && interruptible (cx.Eip)))
     interrupt_now (&cx, sig, siga, handler);
   else if (!interrupt_on_return (ebp, sig, siga, handler))
     {
@@ -733,6 +754,9 @@ out:
       res = ResumeThread (hth);
       sigproc_printf ("ResumeThread returned %d", res);
     }
+
+  if (locked)
+    mainthread.lock->release ();
 
   sigproc_printf ("returning %d", interrupted);
   return interrupted;
@@ -835,7 +859,7 @@ sig_handle_tty_stop (int sig)
 }
 
 int __stdcall
-sig_handle (int sig, int nonmain)
+sig_handle (int sig)
 {
   int rc = 0;
 
@@ -914,7 +938,7 @@ stop:
 dosig:
   /* Dispatch to the appropriate function. */
   sigproc_printf ("signal %d, about to call %p", sig, thissig.sa_handler);
-  rc = call_handler (sig, thissig, handler, nonmain);
+  rc = call_handler (sig, thissig, handler);
 
 done:
   sigproc_printf ("returning %d", rc);

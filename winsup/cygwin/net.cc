@@ -421,6 +421,7 @@ cygwin_sendto (int fd,
 {
   fhandler_socket *h = (fhandler_socket *) dtable[fd];
   sockaddr_in sin;
+  sigframe thisframe (mainthread, 0);
 
   if (get_inet_addr (to, tolen, &sin, &tolen) == 0)
     return -1;
@@ -446,6 +447,7 @@ cygwin_recvfrom (int fd,
 		   int *fromlen)
 {
   fhandler_socket *h = (fhandler_socket *) dtable[fd];
+  sigframe thisframe (mainthread, 0);
 
   debug_printf ("recvfrom %d", h->get_socket ());
 
@@ -602,6 +604,7 @@ cygwin_connect (int fd,
   int res;
   fhandler_socket *sock = get (fd);
   sockaddr_in sin;
+  sigframe thisframe (mainthread, 0);
 
   if (get_inet_addr (name, namelen, &sin, &namelen) == 0)
     return -1;
@@ -714,6 +717,7 @@ int
 cygwin_accept (int fd, struct sockaddr *peer, int *len)
 {
   int res = -1;
+  sigframe thisframe (mainthread, 0);
 
   fhandler_socket *sock = get (fd);
   if (sock)
@@ -899,7 +903,7 @@ int
 cygwin_shutdown (int fd, int how)
 {
   int res = -1;
-
+  sigframe thisframe (mainthread, 0);
 
   fhandler_socket *sock = get (fd);
   if (sock)
@@ -942,6 +946,7 @@ int
 cygwin_recv (int fd, void *buf, int len, unsigned int flags)
 {
   fhandler_socket *h = (fhandler_socket *) dtable[fd];
+  sigframe thisframe (mainthread, 0);
 
   int res = recv (h->get_socket (), (char *) buf, len, flags);
   if (res == SOCKET_ERROR)
@@ -967,6 +972,7 @@ int
 cygwin_send (int fd, const void *buf, int len, unsigned int flags)
 {
   fhandler_socket *h = (fhandler_socket *) dtable[fd];
+  sigframe thisframe (mainthread, 0);
 
   int res = send (h->get_socket (), (const char *) buf, len, flags);
   if (res == SOCKET_ERROR)
@@ -1353,6 +1359,7 @@ cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
 {
   int res = -1;
   SOCKET fd2s;
+  sigframe thisframe (mainthread, 0);
 
   int res_fd = dtable.find_unused_handle ();
   if (res_fd == -1)
@@ -1392,6 +1399,7 @@ int
 cygwin_rresvport (int *port)
 {
   int res = -1;
+  sigframe thisframe (mainthread, 0);
 
   int res_fd = dtable.find_unused_handle ();
   if (res_fd == -1)
@@ -1420,6 +1428,7 @@ cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
 {
   int res = -1;
   SOCKET fd2s;
+  sigframe thisframe (mainthread, 0);
 
   int res_fd = dtable.find_unused_handle ();
   if (res_fd == -1)
@@ -1597,6 +1606,7 @@ fhandler_socket::~fhandler_socket ()
 int
 fhandler_socket::read (void *ptr, size_t len)
 {
+  sigframe thisframe (mainthread);
   int res = recv (get_socket (), (char *) ptr, len, 0);
   if (res == SOCKET_ERROR)
     {
@@ -1608,6 +1618,7 @@ fhandler_socket::read (void *ptr, size_t len)
 int
 fhandler_socket::write (const void *ptr, size_t len)
 {
+  sigframe thisframe (mainthread);
   int res = send (get_socket (), (const char *) ptr, len, 0);
   if (res == SOCKET_ERROR)
     {
@@ -1623,6 +1634,7 @@ int
 fhandler_socket::close ()
 {
   int res = 0;
+  sigframe thisframe (mainthread);
 
   if (closesocket (get_socket ()))
     {
@@ -1661,6 +1673,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
   int res;
   struct ifconf *ifc;
   struct ifreq *ifr;
+  sigframe thisframe (mainthread);
 
   switch (cmd)
     {

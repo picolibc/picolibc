@@ -746,14 +746,14 @@ dll_crt0_1 ()
   set_errno (0);
   debug_printf ("user_data->main %p", user_data->main);
 
+  /* Initialize uid, gid. */
+  uinfo_init ();
+
   /* Flush signals and ensure that signal thread is up and running. Can't
      do this for noncygwin case since the signal thread is blocked due to
      LoadLibrary serialization. */
   if (!dynamically_loaded)
     sig_send (NULL, __SIGFLUSH);
-
-  /* Initialize uid, gid. */
-  uinfo_init ();
 
   if (user_data->main && !dynamically_loaded)
     exit (user_data->main (argc, argv, *user_data->envptr));

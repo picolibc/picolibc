@@ -110,6 +110,7 @@ cygwin_select (int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   fd_set *dummy_readfds = allocfd_set (n);
   fd_set *dummy_writefds = allocfd_set (n);
   fd_set *dummy_exceptfds = allocfd_set (n);
+  sigframe thisframe (mainthread, 0);
 
 #if 0
   if (n > FD_SETSIZE)
