@@ -1,3 +1,8 @@
+2002-09-17  Robert Collins <rbtcollins@hotmail.com>
+
+	* thread.cc (pthread_key::set): Preserve GetLastError(). Reported
+	by Thomas Pffaf.
+
 2002-09-17  Robert Collins  <rbtcollins@hotmail.com>
 
 	This work inspires by Thomas Pfaff's pthread_fork patch (1).
