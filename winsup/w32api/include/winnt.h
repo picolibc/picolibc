@@ -2058,11 +2058,11 @@ typedef struct _SINGLE_LIST_ENTRY {
 #define PSLIST_ENTRY PSINGLE_LIST_ENTRY
 typedef union _SLIST_HEADER {
 	ULONGLONG Alignment;
-	struct {
+	_ANONYMOUS_STRUCT struct {
 		SLIST_ENTRY Next;
 		WORD Depth;
 		WORD Sequence;
-	};
+	} DUMMYSTRUCTNAME;
 } SLIST_HEADER,*PSLIST_HEADER;
 #endif /* !_SLIST_HEADER_ */
 

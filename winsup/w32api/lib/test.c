@@ -43,6 +43,7 @@
 #include <ntdef.h>
 #include <ntsecapi.h>
 #include <odbcinst.h>
+#include <powrprof.h>
 #include <psapi.h>
 #include <ras.h>
 #include <rasdlg.h>

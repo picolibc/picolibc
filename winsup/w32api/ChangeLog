@@ -1,3 +1,17 @@
+003-06-06  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* lib/test.c: #include <powerprof.h>.
+
+2003-06-06  James E. Lucas  <xelloss@sourceforge.net>
+
+	* include/powerprof.h: New file.
+	* lib/powerprof.def: New file.
+
+2003-06-06  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winnt (SLIST_HEADER): Add C90 anonymous struct
+	protection.
+
 2003-06-05  Luke Dunstan  <infidel@users.sourceforge.net>
 
 	* include/winuser.h (WNDCLASS[AW], WNDCLASSEX[AW]): Change type of
