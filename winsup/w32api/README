@@ -1,8 +1,11 @@
         Free headers and libraries for the Win32 API
 
-        Written by Anders Norlander
-        Send bug reports and questions to anorland@hem2.passagen.se
+        Written by Anders Norlander <anorland@hem2.passagen.se>
         URL: http://www.acc.umu.se/~anorland/gnu-win32/
+
+	Maintained by MinGW Developers
+        Send bug reports and questions to MinGW-users@lists.sourceforge.net
+	URL: http://www.mingw.org
 
 * License
 
