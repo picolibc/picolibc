@@ -1,5 +1,9 @@
 2002-04-24  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/math.h (__signbitl, __isnanl, copysignl): Declare.
+
+2002-04-24  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	Start on long double functions.
 	* include/math.h (nanl, __fpcassifyl, fminl, fmaxl, rintl,
 	roundl, truncl, fmal, log2l): Declare.
