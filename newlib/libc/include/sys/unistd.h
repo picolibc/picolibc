@@ -73,6 +73,9 @@ int _EXFUN(getlogin_r, (char *name, size_t namesize) );
 #endif
 char 	_EXFUN(*getpass, (const char *__prompt));
 size_t  _EXFUN(getpagesize, (void));
+#if defined(__CYGWIN__)
+int    _EXFUN(getpeereid, (int, uid_t *, gid_t *));
+#endif
 pid_t   _EXFUN(getpgid, (pid_t));
 pid_t   _EXFUN(getpgrp, (void ));
 pid_t   _EXFUN(getpid, (void ));

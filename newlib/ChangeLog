@@ -1,3 +1,7 @@
+2005-02-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/sys/unistd.h: Define getpeereid for Cygwin.
+
 2005-02-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/sys/unistd.h: Define fdatasync also for Cygwin.
