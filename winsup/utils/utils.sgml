@@ -144,6 +144,7 @@ same output.
 <screen>
 Usage: kill [-f] [-sigN] [-s sigN] pid1 [pid2 ...]
 Usage: kill -l [signal]
+Usage: Kill -h
 </screen>
 
 <para>The <command>kill</command> program allows you to send arbitrary
@@ -161,6 +162,8 @@ list of running programs and their Cygwin pids, use the Cygwin
 
 <para>The <command>kill -l</command> option prints the name of the
 given signal, or a list of all signal names if no signal is given.</para>
+
+<para><command>kill -h</command> just displays the kill usage message.</para>
 
 <para>To send a specific signal, use the <literal>-signN</literal>
 option, either with a signal number or a signal name (minus the "SIG"
