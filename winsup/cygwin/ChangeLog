@@ -1,3 +1,8 @@
+Wed May 31 15:57:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* dcrt0.cc: Use LoadDLLfuncEx for loading Crypto API functions
+	with parameter `notimp' set to 1.
+
 Tue May 30 16:58:33 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (mount_info::conv_to_win32_path): Previous patch was too
@@ -38,13 +43,13 @@ Mon May 29 20:18:47 2000  Christopher Faylor <cgf@cygnus.com>
 	path when it translates to a drive.  Add defensive code to avoid
 	writing beyond the end of 'dst'.
 
-Wed May 27 15:57:00 2000  Corinna Vinschen <corinna@vinschen.de>
+Sat May 27 15:57:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler_random.cc (read): Use CRYPT_MACHINE_KEYSET in
 	call to CryptAcquireContext() to serve users that did not
 	log in interactively.
 
-Wed May 26 11:16:00 2000  Corinna Vinschen <corinna@vinschen.de>
+Fri May 26 11:16:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* errno.cc (errmap): Map ERROR_BAD_NET_NAME to errno ENOSHARE.
 
