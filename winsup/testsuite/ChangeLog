@@ -1,3 +1,9 @@
+2001-04-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winsup.api/mmaptest02.c: New test.
+	* winsup.api/mmaptest03.c: Ditto.
+	* winsup.api/mmaptest04.c: Ditto.
+
 2001-04-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* winsup.api/mmaptest01.c: New test.
