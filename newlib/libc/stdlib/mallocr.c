@@ -273,6 +273,10 @@ extern "C" {
 #include <stdio.h>    /* needed for malloc_stats */
 #include <limits.h>   /* needed for overflow checks */
 
+#ifdef WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
 
 /*
   Compile-time options
@@ -1077,7 +1081,7 @@ struct mallinfo mALLINFo();
 
 #ifdef WIN32
 
-#define AlignPage(add) (((add) + (malloc_getpagesize-1)) &
+#define AlignPage(add) (((add) + (malloc_getpagesize-1)) & \
 ~(malloc_getpagesize-1))
 
 /* resrve 64MB to insure large contiguous space */ 
