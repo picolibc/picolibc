@@ -1,5 +1,10 @@
 2005-01-06  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/_mingw.h (__int16): Define as short.
+	Thanks to: Leo Yuriev  <leoyuriev at users dot sf dot net>
+
+2005-01-06  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/stdio.h (P_tmpdir): Add define.
 
 2005-01-03  Earnie Boyd  <earnie@users.sf.net>
