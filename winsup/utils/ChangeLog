@@ -1,3 +1,12 @@
+2002-05-27  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
+
+	* ps.cc (prog_name): New global variable.
+	(longopts): Ditto.
+	(opts): Ditto.
+	(usage): New function.
+	(print_version): New function.
+	(main): Accomodate longopts and new --help, --version options.
+
 2002-05-26  Christopher Faylor  <cgf@redhat.com>
 
 	* strace.cc (attach_process): Don't tell process to start stracing

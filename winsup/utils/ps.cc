@@ -1,6 +1,6 @@
 /* ps.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -18,6 +18,25 @@ details. */
 #include <sys/cygwin.h>
 #include <tlhelp32.h>
 #include <psapi.h>
+
+static const char version[] = "$Revision$";
+static char *prog_name;
+
+static struct option longopts[] =
+{
+  {"all", no_argument, NULL, 'a' },
+  {"everyone", no_argument, NULL, 'e' },
+  {"full", no_argument, NULL, 'f' },
+  {"help", no_argument, NULL, 'h' },
+  {"long", no_argument, NULL, 'l' },
+  {"summary", no_argument, NULL, 's' },
+  {"user", required_argument, NULL, 'u'},
+  {"version", no_argument, NULL, 'v'},
+  {"windows", no_argument, NULL, 'W'},
+  {NULL, 0, NULL, 0}
+};
+
+static char opts[] = "aefhlsu:vW";
 
 typedef BOOL (WINAPI *ENUMPROCESSMODULES)(
   HANDLE hProcess,      // handle to the process
@@ -177,6 +196,46 @@ ttynam (int ntty)
   return buf;
 }
 
+static void
+usage (FILE * stream, int status)
+{
+  fprintf (stream, "\
+Usage: %s [-aefls] [-u UID]\n\
+ -a, --all       show processes of all users\n\
+ -e, --everyone  show processes of all users\n\
+ -f, --full      show process uids, ppids\n\
+ -h, --help      output usage information and exit\n\
+ -l, --long      show process uids, ppids, pgids, winpids\n\
+ -s, --summary   show process summary\n\
+ -u, --user      list processes owned by UID\n\
+ -v, --version   output version information and exit\n\
+ -W, --windows   show windows as well as cygwin processes\n\
+With options, %s outputs the long format by default\n", prog_name, prog_name);
+  exit (status);
+}
+
+static void
+print_version ()
+{
+  const char *v = strchr (version, ':');
+  int len;
+  if (!v)
+    {
+      v = "?";
+      len = 1;
+    }
+  else
+    {
+      v += 2;
+      len = strchr (v, ' ') - v;
+    }
+  printf ("\
+%s (cygwin) %.*s\n\
+Process Statistics\n\
+Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.\n\
+Compiled on %s", prog_name, len, v, __DATE__);
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -195,7 +254,15 @@ main (int argc, char *argv[])
   uid = getuid ();
   lflag = 1;
 
-  while ((ch = getopt (argc, argv, "aelfsu:W")) != -1)
+  prog_name = strrchr (argv[0], '/');
+  if (prog_name == NULL)
+    prog_name = strrchr (argv[0], '\\');
+  if (prog_name == NULL)
+    prog_name = argv[0];
+  else
+    prog_name++;
+
+  while ((ch = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (ch)
       {
       case 'a':
@@ -205,6 +272,8 @@ main (int argc, char *argv[])
       case 'f':
         fflag = 1;
         break;
+      case 'h':
+        usage (stdout, 0);
       case 'l':
         lflag = 1;
         break;
@@ -221,10 +290,14 @@ main (int argc, char *argv[])
               uid = pw->pw_uid;
             else
               {
-                fprintf (stderr, "user %s unknown\n", optarg);
+                fprintf (stderr, "%s: user %s unknown\n", prog_name, optarg);
                 exit (1);
               }
           }
+        break;
+      case 'v':
+        print_version ();
+        exit (0);
         break;
       case 'W':
 	query = CW_GETPINFO_FULL;
@@ -232,14 +305,7 @@ main (int argc, char *argv[])
 	break;
 
       default:
-        fprintf (stderr, "Usage %s [-aefl] [-u uid]\n", argv[0]);
-        fprintf (stderr, "-f = show process uids, ppids\n");
-        fprintf (stderr, "-l = show process uids, ppids, pgids, winpids\n");
-        fprintf (stderr, "-u uid = list processes owned by uid\n");
-        fprintf (stderr, "-a, -e = show processes of all users\n");
-	fprintf (stderr, "-s = show process summary\n");
-	fprintf (stderr, "-W = show windows as well as cygwin processes\n");
-        exit (1);
+        usage (stderr, 1);
       }
 
   if (sflag)
