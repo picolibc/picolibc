@@ -38,7 +38,7 @@
 	scanning.  Close file handle after reading buffer into memory.  Parse
 	buffer by calling second argument.
 	(pwdgrp::gets): Reorganize slightly to rely on eptr starting at
-	beginning of buffer.  Free buffer when memory exhausted.
+	beginning of buffer.
 	(pwdgrp::close): Remove.
 	* uinfo.cc (etc::dir_changed): New function.
 	(etc::init): Ditto.
