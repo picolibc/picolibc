@@ -1,3 +1,8 @@
+2004-10-18  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	= include/wsahelp.h (WINSOCK_MAPPING, WSHGetWinsockMapping,
+        PWSH_GET_WINSOCK_MAPPING): Don't define if __OBJC__.
+
 2004-10-15  Robert Wruck  <wruck@tweerlei.de>
             Danny Smith  <dannysmith@users.sourceforge.net>
 
