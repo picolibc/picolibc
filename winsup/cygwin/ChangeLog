@@ -1,3 +1,8 @@
+Wed Jan 17 23:23:12 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* syscalls.cc (setdtablesize): Call with amount to increment not total
+	amount.  Return success or failure error code.
+
 Wed Jan 17 09:47:13 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* autoload.cc (LoadDLLinitfunc): Remove debugging statement.

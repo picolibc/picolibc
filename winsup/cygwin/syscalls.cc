@@ -1345,11 +1345,13 @@ system (const char *cmdstring)
   return res;
 }
 
-extern "C" void
+extern "C" int
 setdtablesize (int size)
 {
-  if (size > (int)fdtab.size)
-    fdtab.extend (size);
+  if (size <= (int)fdtab.size || fdtab.extend (size - fdtab.size))
+    return 0;
+
+  return -1;
 }
 
 extern "C" int
