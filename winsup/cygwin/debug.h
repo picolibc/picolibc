@@ -92,7 +92,7 @@ struct handle_list
     const char *name;
     const char *func;
     int ln;
-    bool clexec;
+    bool inherited;
     DWORD pid;
     struct handle_list *next;
   };
