@@ -807,17 +807,51 @@ g_opendir(str, pglob)
 	return(opendir(buf));
 }
 
+static void
+stat32_to_STAT (struct __stat32 *src, struct STAT *dst)
+{
+  dst->st_dev = src->st_dev;
+  dst->st_ino = src->st_ino;
+  dst->st_mode = src->st_mode;
+  dst->st_nlink = src->st_nlink;
+  dst->st_uid = src->st_uid;
+  dst->st_gid = src->st_gid;
+  dst->st_rdev = src->st_rdev;
+  dst->st_size = src->st_size;
+  dst->st_atime = src->st_atime;
+  dst->st_mtime = src->st_mtime;
+  dst->st_ctime = src->st_ctime;
+  dst->st_blksize = src->st_blksize;
+  dst->st_blocks = src->st_blocks;
+}
+
 static int
 g_lstat(fn, sb, pglob)
 	register Char *fn;
 	struct STAT *sb;
 	glob_t *pglob;
 {
+	/* FIXME: This only works as long as the application uses the old
+	   struct stat with 32 bit off_t types!!!
+	   
+	   As soon as we switch over to 64 bit, we have to decide by
+	   the applications API minor version number, whether to use
+	   a pointer to a __stat64 or a _stat32 struct to the
+	   pglob->gl_lstat function. */
+#ifdef __CYGWIN_USE_BIG_TYPES__
+#error FIXME check apps API minor and use correct struct stat
+#endif
 	char buf[MAXPATHLEN];
 
 	g_Ctoc(fn, buf);
-	if (pglob->gl_flags & GLOB_ALTDIRFUNC)
-		return((*pglob->gl_lstat)(buf, sb));
+	if (pglob->gl_flags & GLOB_ALTDIRFUNC) {
+		struct __stat32 lsb;
+		int ret;
+
+		if (!(ret = (*pglob->gl_lstat)(buf, &lsb)))
+			stat32_to_STAT (&lsb, sb);
+		return ret;
+	}
 #ifdef __INSIDE_CYGWIN__
 	return(lstat64(buf, sb));
 #else
@@ -831,11 +865,27 @@ g_stat(fn, sb, pglob)
 	struct STAT *sb;
 	glob_t *pglob;
 {
+	/* FIXME: This only works as long as the application uses the old
+	   struct stat with 32 bit off_t types!!!
+	   
+	   As soon as we switch over to 64 bit, we have to decide by
+	   the applications API minor version number, whether to use
+	   a pointer to a __stat64 or a _stat32 struct to the
+	   pglob->gl_stat function. */
+#ifdef __CYGWIN_USE_BIG_TYPES__
+#error FIXME check apps API minor and use correct struct stat
+#endif
 	char buf[MAXPATHLEN];
 
 	g_Ctoc(fn, buf);
-	if (pglob->gl_flags & GLOB_ALTDIRFUNC)
-		return((*pglob->gl_stat)(buf, sb));
+	if (pglob->gl_flags & GLOB_ALTDIRFUNC) {
+		struct __stat32 lsb;
+		int ret;
+
+		if (!(ret = (*pglob->gl_stat)(buf, &lsb)))
+			stat32_to_STAT (&lsb, sb);
+		return ret;
+	}
 #ifdef __INSIDE_CYGWIN__
 	return(stat64(buf, sb));
 #else

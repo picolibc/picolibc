@@ -1,3 +1,12 @@
+2002-03-15  Corinna Vinschen  <corina@vinschen.de>
+
+	* glob.c (stat32_to_STAT): New function.   
+	(g_lstat): Call user space functions always with 32 bit struct stat
+	as a workaround.
+	(g_stat): Ditto.
+	* include/glob.h (struct glob): Don't prototype function pointers
+	when compiling Cygwin.
+
 2002-03-14  Christopher Faylor  <cgf@redhat.com>
 
 	* pinfo.cc (pinfo::init): Properly handle execed process stub when
