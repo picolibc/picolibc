@@ -244,14 +244,6 @@ extern SYSTEM_INFO system_info;
 #define STD_WBITS (S_IWUSR)
 #define STD_XBITS (S_IXUSR | S_IXGRP | S_IXOTH)
 
-#define O_NOSYMLINK 0x080000
-#define O_DIROPEN   0x100000
-
-/* newlib used to define O_NDELAY differently from O_NONBLOCK.  Now it
-   properly defines both to be the same.  Unfortunately, we have to
-   behave properly the old version, too, to accomodate older executables. */
-#define OLD_O_NDELAY	(CYGWIN_VERSION_CHECK_FOR_OLD_O_NONBLOCK ? 4 : 0)
-
 /* The title on program start. */
 extern char *old_title;
 extern BOOL display_title;

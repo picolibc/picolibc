@@ -1,3 +1,23 @@
+Mon Aug 13 22:34:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::fcntl): Use new O_NONBLOCK_MASK define.
+	* fhandler.h: Move definitions of O_NOSYMLINK, O_DIROPEN and
+	OLD_O_NDELAY from winsup.h to here. Add O_NONBLOCK_MASK define.
+	* fhandler_socket.cc (fhandler_socket::close): Add hack to allow
+	a graceful shutdown even if shutdown() hasn't been called by the
+	application. Add debug output.
+	(fhandler_socket::ioctl): Set fhandler's NONBLOCK flag according
+	to FIONBIO setting.
+	(fhandler_socket::fcntl): Use new O_NONBLOCK_MASK define. Actually
+	set `request' before using it.
+	* fhandler_tty.cc: Use new O_NONBLOCK_MASK define throughout.
+	(fhandler_tty_slave::ioctl): Set fhandler's NONBLOCK flag according
+	to FIONBIO setting.
+	(fhandler_pty_master::ioctl): Ditto.
+	* net.cc (wsock_event::prepare): Compare WSACreateEvent return code
+	with `WSA_INVALID_EVENT' according to MSDN.
+	* syscalls.cc (_read): Use new O_NONBLOCK_MASK define.
+
 Wed Aug  8 15:24:59 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* include/wchar.h: Define __need_wint_t.

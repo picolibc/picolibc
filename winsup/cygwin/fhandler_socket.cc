@@ -257,6 +257,15 @@ fhandler_socket::close ()
   int res = 0;
   sigframe thisframe (mainthread);
 
+  /* HACK to allow a graceful shutdown even if shutdown() hasn't been
+     called by the application. Note that this isn't the ultimate
+     solution but it helps in many cases. */
+  struct linger linger;
+  linger.l_onoff = 1;
+  linger.l_linger = 60; /* seconds. 2MSL according to BSD implementation. */
+  setsockopt (get_socket (), SOL_SOCKET, SO_LINGER,
+	      (const char *)&linger, sizeof linger);
+
   if (closesocket (get_socket ()))
     {
       set_winsock_errno ();
@@ -265,6 +274,7 @@ fhandler_socket::close ()
 
   close_secret_event ();
 
+  debug_printf ("%d = fhandler_socket::close()", res);
   return res;
 }
 
@@ -395,6 +405,10 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	  /* Start AsyncSelect if async socket unblocked */
 	  if (*(int *) p && get_async ())
 	    WSAAsyncSelect (get_socket (), gethwnd (), WM_ASYNCIO, ASYNC_MASK);
+
+	  int current = get_flags () & O_NONBLOCK_MASK;
+	  int new_flags = *(int *) p ? (!current ? O_NONBLOCK : current) : 0;
+	  set_flags ((get_flags () & ~O_NONBLOCK_MASK) | new_flags);
 	}
       break;
     }
@@ -412,20 +426,17 @@ fhandler_socket::fcntl (int cmd, void *arg)
     {
     case F_SETFL:
       {
-        /* Care for the old O_NDELAY flag. If one of the flags is set,
-           both flags are set. */
-        const int allowed_flags = O_NONBLOCK | OLD_O_NDELAY;
-
         /* Carefully test for the O_NONBLOCK or deprecated OLD_O_NDELAY flag.
 	   Set only the flag that has been passed in.  If both are set, just
 	   record O_NONBLOCK.   */
-	int new_flags = (int) arg & allowed_flags;
+	int new_flags = (int) arg & O_NONBLOCK_MASK;
 	if ((new_flags & OLD_O_NDELAY) && (new_flags & O_NONBLOCK))
 	  new_flags = O_NONBLOCK;
-        current = get_flags () & allowed_flags;
+        current = get_flags () & O_NONBLOCK_MASK;
+	request = new_flags ? 1 : 0;
         if (!!current != !!new_flags && (res = ioctl (FIONBIO, &request)))
           break;
-	set_flags ((get_flags () & ~allowed_flags) | new_flags);
+	set_flags ((get_flags () & ~O_NONBLOCK_MASK) | new_flags);
         break;
       }
     default:

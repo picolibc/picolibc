@@ -70,7 +70,7 @@ wsock_event::prepare ()
   LPWSAOVERLAPPED ret = NULL;
 
   SetLastError (0);
-  if ((event = WSACreateEvent ()))
+  if ((event = WSACreateEvent ()) != WSA_INVALID_EVENT)
     {
       memset (&ovr, 0, sizeof ovr);
       ovr.hEvent = event;

@@ -271,7 +271,7 @@ _read (int fd, void *ptr, size_t len)
 
       // set_sig_errno (0);
       fh = cygheap->fdtab[fd];
-      DWORD wait = (fh->get_flags () & (O_NONBLOCK | OLD_O_NDELAY)) ? 0 : INFINITE;
+      DWORD wait = (fh->get_flags () & O_NONBLOCK_MASK) ? 0 : INFINITE;
 
       /* Could block, so let user know we at least got here.  */
       syscall_printf ("read (%d, %p, %d) %sblocking, sigcatchers %d", fd, ptr, len, wait ? "" : "non", sigcatchers);
