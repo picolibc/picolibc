@@ -47,7 +47,7 @@ __cpu_timer_poll:
 	j	ra
 	nop			#				{DELAY SLOT}
 1:
-	mfc0	v0, $9		# C0_COUNT:  get current counter value
+	mfc0	v0, C0_COUNT	# get current counter value
 	nop
 	nop
 	# We cannot just do the simple test, of adding our delta onto
@@ -66,7 +66,7 @@ __cpu_timer_poll:
 	# sign-extended to fill the 64bit register value).
 2:
 	# get current counter value:
-	mfc0	v0, $9	# C0_COUNT
+	mfc0	v0, C0_COUNT
 	nop
 	nop
 	# This is an unsigned 32bit subtraction:

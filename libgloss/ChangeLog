@@ -1,3 +1,10 @@
+2004-04-02  Chris Demetriou  <cgd@broadcom.com>
+
+	* mips/regs.S (C0_COUNT): Fix comment that kept this from being
+	defined.
+	* mips/vr4300.S: Use C0_COUNT as appropriate instead of hardcoding $9.
+	* mips/vr5xxx.S: Likewise.
+
 2004-03-23  Eric Christopher  <echristo@redhat.com>
 
 	* frv/crt0.S: Fix comment.
