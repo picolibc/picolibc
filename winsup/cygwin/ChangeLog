@@ -1,3 +1,17 @@
+2003-05-28  Christopher Faylor  <cgf@redhat.com>
+
+	* mkvers.sh: Avoid "-dontuse" tags.
+
+	* path.cc (path_conv::check): Set exec state based on known situations.
+
+	* path.cc (mount_item::fnmunge): New function.
+	(mount_item::build_win32): New function.
+	(mount_info::conv_to_win32_path): Use build_win32 to build windows
+	path.
+	* path.h (mount_item::fnmunge): Declare new function.
+        (mount_item::build_win32): Ditto.
+	* sys/mount.h (MOUNT_ENC): Define.
+
 2003-05-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::dup): If running impersonated,
