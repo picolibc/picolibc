@@ -743,6 +743,8 @@ HRESULT WINAPI SHLoadInProc(REFCLSID);
 /* FIXME/TODO: Only valid for _WIN32_IE >= 400? */
 BOOL WINAPI SHGetSpecialFolderPathA(HWND,LPSTR,int,BOOL);
 BOOL WINAPI SHGetSpecialFolderPathW(HWND,LPSTR,int,BOOL);
+BOOL WINAPI SHGetFolderPathA(HWND,int,HANDLE,DWORD,LPTSTR);
+BOOL WINAPI SHGetFolderPathW(HWND,int,HANDLE,DWORD,LPTSTR);
 
 #ifdef UNICODE
 typedef IShellExecuteHookW IShellExecuteHook;
@@ -753,6 +755,7 @@ typedef BROWSEINFOW BROWSEINFO,*PBROWSEINFO,*LPBROWSEINFO;
 #define SHGetPathFromIDList SHGetPathFromIDListW
 /* FIXME/TODO: Only valid for _WIN32_IE >= 400? */
 #define SHGetSpecialFolderPath SHGetSpecialFolderPathW
+#define SHGetFolderPath SHGetFolderPathW
 #else
 typedef IShellExecuteHookA IShellExecuteHook;
 typedef IShellLinkA IShellLink;
@@ -762,6 +765,7 @@ typedef BROWSEINFOA BROWSEINFO,*PBROWSEINFO,*LPBROWSEINFO;
 #define SHGetPathFromIDList SHGetPathFromIDListA
 /* FIXME/TODO: Only valid for _WIN32_IE >= 400? */
 #define SHGetSpecialFolderPath SHGetSpecialFolderPathA
+#define SHGetFolderPath SHGetFolderPathA
 #endif
 
 #pragma pack(pop)

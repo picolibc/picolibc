@@ -59,7 +59,11 @@ SheChangeDirExA@4
 SheChangeDirA@4
 SHLoadInProc@4
 SHHelpShortcuts_RunDLL@16
+SHGetFolderPathA@20
+SHGetFolderPathW@20
 SHGetSpecialFolderLocation@12
+SHGetSpecialFolderPathA@16
+SHGetSpecialFolderPathW@16
 SHGetPathFromIDListW@8
 SHGetPathFromIDListA@8
 SHGetPathFromIDList@8
