@@ -35,7 +35,7 @@ int _impure_ptr;
 #define alloca __builtin_alloca
 
 // Version string.
-static const char *version_string = "@(#)strace V1.0, Copyright (C) 2001, 2002 Red Hat Inc., " __DATE__ "\n";
+static const char version[] = "$Revision$";
 
 static const char *pgm;
 static int forkdebug = 1;
@@ -782,25 +782,27 @@ parse_mask (const char *ms, char **endptr)
 }
 
 static void
-usage ()
+usage (FILE *where = stderr)
 {
-  fprintf (stderr, "\
-Usage: strace [OPTIONS] <command-line>\n\
+  fprintf (where, "\
+Usage: %s [OPTIONS] <command-line>\n\
   -b, --buffer-size=SIZE       set size of output file buffer\n\
   -d, --no-delta               don't display the delta-t microsecond timestamp\n\
   -f, --trace-children         trace child processes (toggle - default true)\n\
-  -h, --help                   display this help info\n\
+  -h, --help                   output usage information and exit\n\
   -m, --mask=MASK              set message filter mask\n\
   -o, --output=FILENAME        set output file to FILENAME\n\
   -p, --pid=n                  attach to executing program with cygwin pid n\n\
   -n, --crack-error-numbers    output descriptive text instead of error\n\
                                numbers for Windows errors\n\
   -S, --flush-period=PERIOD    flush buffered strace output every PERIOD secs\n\
-  -t, --timestamp              use an absolute hh:mm:ss timestamp insted of the\n\
-                               default microsecond timestamp.  Implies -d\n\
-  -v, --version                display version info\n\
+  -t, --timestamp              use an absolute hh:mm:ss timestamp insted of \n\
+                               the default microsecond timestamp.  Implies -d\n\
+  -v, --version                output version information and exit\n\
   -w, --new-window             spawn program under test in a new window\n\
-\n\
+\n", pgm);
+  if ( where == stdout)
+    fprintf (stdout, "\
     MASK can be any combination of the following mnemonics and/or hex values\n\
     (0x is optional).  Combine masks with '+' or ',' like so:\n\
 \n\
@@ -822,17 +824,14 @@ Usage: strace [OPTIONS] <command-line>\n\
     sigp     0x00800 (_STRACE_SIGP)     Trace signal and process handling.\n\
     minimal  0x01000 (_STRACE_MINIMAL)  Very minimal strace output.\n\
     exitdump 0x04000 (_STRACE_EXITDUMP) Dump strace cache on exit.\n\
-    system   0x08000 (_STRACE_SYSTEM)   Serious error which goes to console and log.\n\
+    system   0x08000 (_STRACE_SYSTEM)   Serious error; goes to console and log.\n\
     nomutex  0x10000 (_STRACE_NOMUTEX)  Don't use mutex for synchronization.\n\
     malloc   0x20000 (_STRACE_MALLOC)   Trace malloc calls.\n\
     thread   0x40000 (_STRACE_THREAD)   Thread-locking calls.\n\
 ");
-}
-
-static void
-version ()
-{
-  fputs (version_string + 4, stderr);
+  if (where == stderr)
+    fprintf (stderr, "Try '%s --help' for more information.\n", pgm);
+  exit (where == stderr ? 1 : 0 );
 }
 
 struct option longopts[] = {
@@ -853,6 +852,28 @@ struct option longopts[] = {
 };
 
 static const char *const opts = "b:dhfm:no:p:S:tuvw";
+
+static void
+print_version ()
+{
+  const char *v = strchr (version, ':');
+  int len;
+  if (!v)
+    {
+      v = "?";
+      len = 1;
+    }
+  else
+    {
+      v += 2;
+      len = strchr (v, ' ') - v;
+    }
+  printf ("\
+%s (cygwin) %.*s\n\
+System Trace\n\
+Copyright 2000, 2001, 2002 Red Hat, Inc.\n\
+Compiled on %s", pgm, len, v, __DATE__);
+}
 
 int
 main (int argc, char **argv)
@@ -881,8 +902,7 @@ main (int argc, char **argv)
 	break;
       case 'h':
 	// Print help and exit
-	usage ();
-	return 1;
+	usage (stdout);
 	break;
       case 'm':
 	{
@@ -921,13 +941,16 @@ character #%d.\n", optarg, (int) (endptr - optarg), endptr);
 	break;
       case 'v':
 	// Print version info and exit
-	version ();
-	return 1;
+	print_version ();
+	return 0;
 	break;
       case 'w':
 	new_window ^= 1;
 	break;
       }
+
+  if ( argv[optind] == NULL)
+    usage ();
 
   if (!mask)
     mask = 1;
