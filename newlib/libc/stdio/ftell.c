@@ -143,7 +143,7 @@ _DEFUN(_ftell_r, (ptr, fp),
       if (HASUB (fp))
 	pos -= fp->_ur;
     }
-  else if (fp->_flags & __SWR && fp->_p != NULL)
+  else if ((fp->_flags & __SWR) && fp->_p != NULL)
     {
       /*
        * Writing.  Any buffered characters cause the

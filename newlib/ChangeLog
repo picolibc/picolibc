@@ -1,5 +1,10 @@
 2005-01-06  Hans-Peter Nilsson  <hp@axis.com>
                                                                                 
+	* libc/stdio/ftell.c (ftell_r): Add parenthesis for __SWR
+	bit-test in combination with NULL test.
+                                                                                
+2005-01-06  Hans-Peter Nilsson  <hp@axis.com>
+                                                                                
         * README: Fix typo of LGPL.  Change "license" to "copyright".
                                                                                 
 2004-12-17  Jeff Johnston  <jjohnstn@redhat.com>
