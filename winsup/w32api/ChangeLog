@@ -1,3 +1,8 @@
+2002-01-28  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winuser.h (GetWindowLongPtr[AW],
+	SetWindowLongPtr[AW]): Add prototypes for _WIN64.
+
 2002-01-28  Mattia Barbon  <mbarbon@users.sourceforge.net>
 
 	* include/winuser.h (GWLP_*,DWLP_*): Add missing constants.

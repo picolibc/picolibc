@@ -2854,8 +2854,13 @@ DWORD WINAPI GetTabbedTextExtentA(HDC,LPCSTR,int,int,LPINT);
 DWORD WINAPI GetTabbedTextExtentW(HDC,LPCWSTR,int,int,LPINT);
 LONG WINAPI GetWindowLongA(HWND,int);
 LONG WINAPI GetWindowLongW(HWND,int);
+#ifdef _WIN64
+LONG_PTR WINAPI GetWindowLongPtrA(HWND,int);
+LONG_PTR WINAPI GetWindowLongPtrW(HWND,int);
+#else
 #define GetWindowLongPtrA GetWindowLongA
 #define GetWindowLongPtrW GetWindowLongW
+#endif
 HDESK WINAPI GetThreadDesktop(DWORD);
 HWND WINAPI GetTopWindow(HWND);
 BOOL WINAPI GetUpdateRect(HWND,LPRECT,BOOL);
@@ -3073,8 +3078,13 @@ BOOL WINAPI SetUserObjectSecurity(HANDLE,PSECURITY_INFORMATION,PSECURITY_DESCRIP
 BOOL WINAPI SetWindowContextHelpId(HWND,DWORD);
 LONG WINAPI SetWindowLongA(HWND,int,LONG);
 LONG WINAPI SetWindowLongW(HWND,int,LONG);
+#ifdef _WIN64
+LONG_PTR WINAPI SetWindowLongPtrA(HWND,int,LONG_PTR);
+LONG_PTR WINAPI SetWindowLongPtrW(HWND,int,LONG_PTR);
+#else 
 #define SetWindowLongPtrA SetWindowLongA
 #define SetWindowLongPtrW SetWindowLongW
+#endif
 BOOL WINAPI SetWindowPlacement(HWND hWnd,const WINDOWPLACEMENT*);
 BOOL WINAPI SetWindowPos(HWND,HWND,int,int,int,int,UINT);
 int WINAPI SetWindowRgn(HWND,HRGN,BOOL);
