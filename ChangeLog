@@ -1,4 +1,9 @@
-2003-04-26  Daniel Jacobowitz  <drow@mvista.com>
+2003-04-27  Daniel Jacobowitz  <drow@mvista.com>
+
+	* Makefile.tpl: Clean $(BUILD_SUBDIR).
+	* Makefile.in: Regenerated.
+
+2003-04-27  Daniel Jacobowitz  <drow@mvista.com>
 
 	* src-release (BINUTILS_SUPPORT_DIRS): Remove "cpu", since it is
 	still unused.
