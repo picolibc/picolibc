@@ -12,6 +12,7 @@
 #include <sys/times.h>
 #include <errno.h>
 #include <reent.h>
+#include <unistd.h>
 #include "swi.h"
 
 /* Forward prototypes.  */
@@ -125,11 +126,11 @@ remap_handle (int fh)
        CHECK_INIT(stderr);
        std_files_checked = 1;
     }
-  if (fh == __sfileno (stdin))
+  if (fh == STDIN_FILENO)
     return monitor_stdin;
-  if (fh == __sfileno (stdout))
+  if (fh == STDOUT_FILENO)
     return monitor_stdout;
-  if (fh == __sfileno (stderr))
+  if (fh == STDERR_FILENO)
     return monitor_stderr;
 
   return fh - FILE_HANDLE_OFFSET;
