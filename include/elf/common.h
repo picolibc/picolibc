@@ -409,17 +409,26 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define DT_FINI_ARRAYSZ 28
 #define DT_RUNPATH      29
 #define DT_FLAGS        30
-#define DT_ENCODING     31 /* Note: Oct 4, 1999 Draft specifies this as 32, but this conflicts with DT_PREINIT_ARRAY */
-#define DT_PREINIT_ARRAY 32
+
+#define DT_ENCODING     32
+#define DT_PREINIT_ARRAY   32
 #define DT_PREINIT_ARRAYSZ 33
 
-#define DT_LOOS         0x60000000 /* Note: Oct 4, 1999 draft has this as 0x6fff000d */
-#define DT_HIOS         0x6fffffff /* Note: Oct 4, 1999 draft has this as 0x6fff0000 */
+/* Note, the Oct 4, 1999 draft of the ELF ABI changed the values
+   for DT_LOOS and DT_HIOS.  Some implementations however, use
+   values outside of the new range (see below).  */
+#define OLD_DT_LOOS	0x60000000
+#define DT_LOOS         0x6000000d
+#define DT_HIOS         0x6fff0000
+#define OLD_DT_HIOS     0x6fffffff
+
 #define DT_LOPROC       0x70000000
 #define DT_HIPROC       0x7fffffff
 
 /* The next four dynamic tags are used on Solaris.  We support them
-   everywhere.  */
+   everywhere.  Note these values lie outside of the (new) range for
+   OS specific values.  This is a deliberate special case and we
+   maintain it for backwards compatability.  */
 #define DT_VALRNGLO	0x6ffffd00
 #define DT_PLTPADSZ	0x6ffffdf9
 #define DT_MOVEENT	0x6ffffdfa

@@ -1,3 +1,13 @@
+2000-01-11  Nick Clifton  <nickc@cygnus.com>
+
+	* common.h (DT_ENCODING): Fix definition of this value.
+	(DT_LOOS): Fix definition of this value.
+	(DT_HIOS): Fix definition of this value.
+	(OLD_DT_LOOS): Value of DT_LOOS before Oct 4, 1999 draft
+	of ELF spec changed it.
+	(OLD_DT_HIOS): Value of DT_HIOS before Oct 4, 1999 draft
+	of ELF spec changed it.
+
 2000-01-10  Egor Duda  <deo@logos-m.ru>
 
 	* common.h (NT_WIN32PSTATUS): Define.  (cygwin elf core dumps). 
