@@ -1001,6 +1001,14 @@ fhandler_disk_file::fstat (struct stat *buf, path_conv *pc)
       if ((handle = FindFirstFile (pc->get_win32 (), &wfd))
 	  != INVALID_HANDLE_VALUE)
 	{
+	  /* This is for FAT filesystems, which don't support atime/ctime */
+	  if (wfd.ftLastAccessTime.dwLowDateTime == 0
+	      && wfd.ftLastAccessTime.dwHighDateTime == 0)
+	    wfd.ftLastAccessTime = wfd.ftLastWriteTime;
+	  if (wfd.ftCreationTime.dwLowDateTime == 0
+	      && wfd.ftCreationTime.dwHighDateTime == 0)
+	    wfd.ftCreationTime = wfd.ftLastWriteTime;
+
 	  buf->st_atime   = to_time_t (&wfd.ftLastAccessTime);
 	  buf->st_mtime   = to_time_t (&wfd.ftLastWriteTime);
 	  buf->st_ctime   = to_time_t (&wfd.ftCreationTime);
@@ -1062,18 +1070,20 @@ fhandler_disk_file::fstat_helper (struct stat *buf)
       return -1;
     }
 
+  /* This is for FAT filesystems, which don't support atime/ctime */
+  if (local.ftLastAccessTime.dwLowDateTime == 0
+      && local.ftLastAccessTime.dwHighDateTime == 0)
+    local.ftLastAccessTime = local.ftLastWriteTime;
+  if (local.ftCreationTime.dwLowDateTime == 0
+      && local.ftCreationTime.dwHighDateTime == 0)
+    local.ftCreationTime = local.ftLastWriteTime;
+
   buf->st_atime   = to_time_t (&local.ftLastAccessTime);
   buf->st_mtime   = to_time_t (&local.ftLastWriteTime);
   buf->st_ctime   = to_time_t (&local.ftCreationTime);
   buf->st_nlink   = local.nNumberOfLinks;
   buf->st_dev     = local.dwVolumeSerialNumber;
   buf->st_size    = local.nFileSizeLow;
-
-  /* This is for FAT filesystems, which don't support atime/ctime */
-  if (buf->st_atime == 0)
-    buf->st_atime = buf->st_mtime;
-  if (buf->st_ctime == 0)
-    buf->st_ctime = buf->st_mtime;
 
   /* Allocate some place to determine the root directory. Need to allocate
      enough so that rootdir can add a trailing slash if path starts with \\. */
