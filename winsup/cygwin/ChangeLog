@@ -1,5 +1,9 @@
 2003-02-13  Christopher Faylor  <cgf@redhat.com>
 
+	* include/cygwin/types.h: Use correct ifdef guard for u_ definitions.
+
+2003-02-13  Christopher Faylor  <cgf@redhat.com>
+
 	* environ.cc (environ_init): Use strechr.
 
 2003-02-13  Christopher Faylor  <cgf@redhat.com>

@@ -145,20 +145,20 @@ typedef __uint32_t uint32_t;
 typedef __uint64_t uint64_t;
 #endif
 
-#ifndef __uint8_t_defined
-#define __uint8_t_defined
+#ifndef __u_int8_t_defined
+#define __u_int8_t_defined
 typedef unsigned char u_int8_t;
 #endif
-#ifndef __uint16_t_defined
-#define __uint16_t_defined
+#ifndef __u_int16_t_defined
+#define __u_int16_t_defined
 typedef __uint16_t u_int16_t;
 #endif
-#ifndef __uint32_t_defined
-#define __uint32_t_defined
+#ifndef __u_int32_t_defined
+#define __u_int32_t_defined
 typedef __uint32_t u_int32_t;
 #endif
-#ifndef __uint64_t_defined
-#define __uint64_t_defined
+#ifndef __u_int64_t_defined
+#define __u_int64_t_defined
 typedef __uint64_t u_int64_t;
 #endif
 
