@@ -205,7 +205,8 @@ DESCRIPTION
 		<<l>> forces the following <<d>>, <<i>>, <<o>>, <<u>>,
 		<<x>> or <<X>> conversion <[type]> to apply to a <<long>> or
 		<<unsigned long>>.  <<l>> also forces a following <<n>> <[type]> to
-		apply to a pointer to a <<long>>. If an <<h>>
+		apply to a pointer to a <<long>>.  <<l>> with <<c>>, <<s>> is
+		equivalent to <<C>>, <<S>> respectively.  If an <<h>>
 		or an <<l>> appears with another conversion
 		specifier, the behavior is undefined.  <<L>> forces a
 		following <<e>>, <<E>>, <<f>>, <<g>> or <<G>> conversion <[type]> to
@@ -224,9 +225,17 @@ DESCRIPTION
 		o c
 		prints <[arg]> as single character
 		
+		o C
+		prints wchar_t <[arg]> as single multibyte character
+		
 		o s
 		prints characters until precision is reached or a null terminator
 		is encountered; takes a string pointer
+
+		o S
+		converts wchar_t characters to multibyte output characters until
+		precision is reached or a null wchar_t terminator
+		is encountered; takes a wchar_t pointer
 
 		o d
 		prints a signed decimal integer; takes an <<int>> (same as <<i>>)

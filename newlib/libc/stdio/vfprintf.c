@@ -183,6 +183,7 @@ static char *rcsid = "$Id$";
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 #include <reent.h>
 #include <wchar.h>
 #include <string.h>
@@ -267,7 +268,12 @@ __sbprintf(fp, fmt, ap)
 #include <math.h>
 #include "floatio.h"
 
-#define	BUF		(MAXEXP+MAXFRACT+1)	/* + decimal point */
+#if ((MAXEXP+MAXFRACT+1) > MB_LEN_MAX)
+#  define BUF (MAXEXP+MAXFRACT+1) /* + decimal point */
+#else 
+#  define BUF MB_LEN_MAX
+#endif
+
 #define	DEFPREC		6
 
 #ifdef _NO_LONGDBL
@@ -320,6 +326,7 @@ union arg_val
   void_ptr_t val_void_ptr_t;
   quad_t val_quad_t;
   u_quad_t val_u_quad_t;
+  wint_t val_wint_t;
 };
 
 static union arg_val *get_arg (struct _reent *data, int n, char *fmt, 
@@ -428,7 +435,8 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	struct __siov iov[NIOV];/* ... and individual io vectors */
 	char buf[BUF];		/* space for %c, %[diouxX], %[eEfgG] */
 	char ox[2];		/* space for 0x hex-prefix */
-        mbstate_t state;          /* mbtowc calls from library must not change state */
+	mbstate_t state;        /* mbtowc calls from library must not change state */
+	char *malloc_buf = NULL;/* handy pointer for malloced buffers */
 
 	/*
 	 * Choose PADSIZE to trade efficiency vs. size.  If larger printf
@@ -728,8 +736,21 @@ reswitch:	switch (ch) {
 			flags |= QUADINT;
 			goto rflag;
 		case 'c':
-			*(cp = buf) = GET_ARG(N, ap, int);
-			size = 1;
+		case 'C':
+			cp = buf;
+			if (*fmt == 'C' || (flags & LONGINT)) {
+				mbstate_t ps;
+
+				memset((void *)&ps, '\0', sizeof(mbstate_t));
+				if ((size = (int)wcrtomb(cp, 
+				    	       (wchar_t)GET_ARG(N, ap, wint_t), 
+					        &ps)) == -1)
+					goto error; 
+			}
+			else {
+				*cp = GET_ARG(N, ap, int);
+				size = 1;
+			}
 			sign = '\0';
 			break;
 		case 'D':
@@ -881,9 +902,61 @@ reswitch:	switch (ch) {
 			ch = 'x';
 			goto nosign;
 		case 's':
-			if ((cp = GET_ARG(N, ap, char_ptr_t)) == NULL)
+		case 'S':
+			sign = '\0';
+			if ((cp = GET_ARG(N, ap, char_ptr_t)) == NULL) {
 				cp = "(null)";
-			if (prec >= 0) {
+				size = 6;
+			}
+			else if (ch == 'S' || (flags & LONGINT)) {
+				mbstate_t ps;
+				_CONST wchar_t *wcp;
+ 
+				wcp = (_CONST wchar_t *)cp;
+				size = m = 0;
+				memset((void *)&ps, '\0', sizeof(mbstate_t));
+ 
+				/* Count number of bytes needed for multibyte
+				   string that will be produced from widechar
+				   string.  */
+  				if (prec >= 0) {
+					while (1) {
+						if (wcp[m] == L'\0')
+							break;
+						if ((n = (int)wcrtomb(buf, 
+							wcp[m], &ps)) == -1)
+							goto error;
+						if (n + size > prec)
+							break;
+						m += 1;
+						size += n;
+						if (size == prec)
+							break;
+					}
+				}
+				else {
+					if ((size = (int)wcsrtombs(NULL, &wcp, 
+								0, &ps)) == -1)
+						goto error; 
+					wcp = (_CONST wchar_t *)cp;
+				}
+ 
+				if (size == 0)
+					break;
+ 
+				if ((malloc_buf = 
+				    (char *)malloc(size + 1)) == NULL)
+					goto error;
+                             
+				/* Convert widechar string to multibyte string. */
+				memset((void *)&ps, '\0', sizeof(mbstate_t));
+				if (wcsrtombs(malloc_buf, &wcp, size, &ps) 
+				    != size)
+					goto error;
+				cp = malloc_buf;
+				cp[size] = '\0';
+			}
+			else if (prec >= 0) {
 				/*
 				 * can't use strlen; can only look for the
 				 * NUL in the first `prec' characters, and
@@ -899,7 +972,7 @@ reswitch:	switch (ch) {
 					size = prec;
 			} else
 				size = strlen(cp);
-			sign = '\0';
+
 			break;
 		case 'U':
 			flags |= LONGINT;
@@ -1097,10 +1170,17 @@ number:			if ((dprec = prec) >= 0)
 		ret += width > realsz ? width : realsz;
 
 		FLUSH();	/* copy out the I/O vectors */
+
+                if (malloc_buf != NULL) {
+			free(malloc_buf);
+			malloc_buf = NULL;
+		}
 	}
 done:
 	FLUSH();
 error:
+	if (malloc_buf != NULL)
+		free(malloc_buf);
 	return (__sferror(fp) ? EOF : ret);
 	/* NOTREACHED */
 }
@@ -1302,9 +1382,9 @@ const static CH_CLASS chclass[256] = {
   /* 28-2f */  OTHER,   OTHER,   STAR,    FLAG,    OTHER,   FLAG,    DOT,     OTHER,
   /* 30-37 */  ZERO,    DIGIT,   DIGIT,   DIGIT,   DIGIT,   DIGIT,   DIGIT,   DIGIT,
   /* 38-3f */  DIGIT,   DIGIT,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
-  /* 40-47 */  OTHER,   OTHER,   OTHER,   OTHER,   SPEC,    SPEC,    OTHER,   SPEC, 
+  /* 40-47 */  OTHER,   OTHER,   OTHER,   SPEC,    SPEC,    SPEC,    OTHER,   SPEC, 
   /* 48-4f */  OTHER,   OTHER,   OTHER,   OTHER,   MODFR,   OTHER,   OTHER,   SPEC, 
-  /* 50-57 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   SPEC,    OTHER,   SPEC, 
+  /* 50-57 */  OTHER,   OTHER,   OTHER,   SPEC,    OTHER,   SPEC,    OTHER,   SPEC, 
   /* 58-5f */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
   /* 60-67 */  OTHER,   OTHER,   OTHER,   SPEC,    SPEC,    SPEC,    SPEC,    SPEC, 
   /* 68-6f */  MODFR,   SPEC,    OTHER,   OTHER,   MODFR,   OTHER,   OTHER,   SPEC, 
@@ -1375,7 +1455,7 @@ get_arg (struct _reent *data, int n, char *fmt, va_list *ap,
   int pos, last_arg;
   mbstate_t wc_state;
   int max_pos_arg = n;
-  enum types { INT, LONG_INT, SHORT_INT, QUAD_INT, CHAR, CHAR_PTR, DOUBLE, LONG_DOUBLE };
+  enum types { INT, LONG_INT, SHORT_INT, QUAD_INT, CHAR, CHAR_PTR, DOUBLE, LONG_DOUBLE, WIDE_CHAR };
   
   /* if this isn't the first call, pick up where we left off last time */
   if (*last_fmt != NULL)
@@ -1481,11 +1561,15 @@ get_arg (struct _reent *data, int n, char *fmt, va_list *ap,
 		      spec_type = DOUBLE;
 		    break;
 		  case 's':
+		  case 'S':
 		  case 'p':
 		    spec_type = CHAR_PTR;
 		    break;
 		  case 'c':
 		    spec_type = CHAR;
+		    break;
+		  case 'C':
+		    spec_type = WIDE_CHAR;
 		    break;
 		  }
 
@@ -1502,6 +1586,9 @@ get_arg (struct _reent *data, int n, char *fmt, va_list *ap,
 			break;
 		      case QUAD_INT:
 			args[numargs++].val_quad_t = va_arg(*ap, quad_t);
+			break;
+		      case WIDE_CHAR:
+			args[numargs++].val_wint_t = va_arg(*ap, wint_t);
 			break;
 		      case CHAR:
 		      case SHORT_INT:
@@ -1584,6 +1671,9 @@ get_arg (struct _reent *data, int n, char *fmt, va_list *ap,
 	  break;
 	case LONG_DOUBLE:
 	  args[numargs++].val__LONG_DOUBLE = va_arg(*ap, _LONG_DOUBLE);
+	  break;
+	case WIDE_CHAR:
+	  args[numargs++].val_wint_t = va_arg(*ap, wint_t);
 	  break;
 	case INT:
 	case SHORT_INT:

@@ -1,4 +1,13 @@
 2003-11-05  Jeff Johnston  <jjohnstn@redhat.com>
+            Artem B. Bityuckiy  <mail_lists@mail.ru>
+
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Add support for
+	%ls, %S, %lc, and %C format specifiers.
+	(get_arg): Ditto.
+	* libc/stdio/sprintf.c: Add documentation regarding new
+	format specifiers added in vfprintf.c.
+
+2003-11-05  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdlib/wcsrtombs.c (_wcsrtombs_r): Numerous fixes
 	to make code work as specified in standard.
