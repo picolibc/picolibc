@@ -229,6 +229,7 @@ extern int print_insn_rs6000		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_s390              PARAMS ((bfd_vma, disassemble_info*)); 
 extern int print_insn_sh		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_tic30		PARAMS ((bfd_vma, disassemble_info*));
+extern int print_insn_tic4x		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_tic54x		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_tic80		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_v850		PARAMS ((bfd_vma, disassemble_info*));

@@ -600,6 +600,7 @@ struct internal_reloc
 };
 
 #define R_DIR16 	 1
+#define R_REL24          5
 #define R_DIR32 	 6
 #define R_IMAGEBASE	 7
 #define R_RELBYTE	15
@@ -608,12 +609,15 @@ struct internal_reloc
 #define R_PCRBYTE	18
 #define R_PCRWORD	19
 #define R_PCRLONG	20
+#define R_PCR24         21
 #define R_IPRSHORT	24
 #define R_IPRLONG	26
 #define R_GETSEG	29
 #define R_GETPA 	30
 #define R_TAGWORD	31
 #define R_JUMPTARG	32	/* strange 29k 00xx00xx reloc */
+#define R_PARTLS16      32
+#define R_PARTMS8       33
 
 #define R_PCR16L       128
 #define R_PCR26L       129
