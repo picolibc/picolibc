@@ -409,7 +409,7 @@ fhandler_disk_file::fchmod (mode_t mode)
 
   if (!SetFileAttributes (pc, pc))
     __seterrno ();
-  else if (!allow_ntsec)
+  else if (!allow_ntsec || !pc.has_acls ())
     /* Correct NTFS security attributes have higher priority */
     res = 0;
 
