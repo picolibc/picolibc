@@ -433,8 +433,6 @@ fork_parent (void *stack_here, HANDLE& hParent, dll *&first_dll,
   si.cbReserved2 = sizeof(ch);
 
   /* Remove impersonation */
-  uid_t uid;
-  uid = geteuid();
   if (cygheap->user.impersonated && cygheap->user.token != INVALID_HANDLE_VALUE)
     RevertToSelf ();
 

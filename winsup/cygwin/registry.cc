@@ -202,7 +202,8 @@ get_registry_hive_path (const PSID psid, char *path)
 
   if (!psid || !path)
     return NULL;
-  convert_sid_to_string_sid (psid, sid);
+  cygsid csid (psid);
+  csid.string (sid);
   strcpy (key,"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\ProfileList\\");
   strcat (key, sid);
   if (!RegOpenKeyExA (HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hkey))
@@ -232,8 +233,9 @@ load_registry_hive (PSID psid)
   if (!psid)
     return;
   /* Check if user hive is already loaded. */
-  if (!RegOpenKeyExA (HKEY_USERS, convert_sid_to_string_sid (psid, sid),
-		      0, KEY_READ, &hkey))
+  cygsid csid (psid);
+  csid.string (sid);
+  if (!RegOpenKeyExA (HKEY_USERS, csid.string (sid), 0, KEY_READ, &hkey))
     {
       debug_printf ("User registry hive for %s already exists", sid);
       RegCloseKey (hkey);

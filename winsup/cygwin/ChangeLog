@@ -1,3 +1,38 @@
+Tue May 15 19:52:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* fork.cc (fork): Eliminate superfluous call to getuid().
+	* security.h: New define `NO_SID'. Remove declarations of functions
+	moved to methods into class cygsid.
+	(class cygsid): Declare new methods `getfromstr', `get_sid',
+	`getfrompw', `getfromgr', `get_rid', `get_uid', `get_gid', `string'
+	and new constructors and operators =, == and !=.
+	Declare new global cygsids `well_known_XXX_sid' substituting the
+	corresponding `get_XXX_sid' functions. Remove declarations of
+	these functions.
+	* sec_helper.cc (well_known_admin_sid): New global variable.
+	(well_known_system_sid): Ditto
+	(well_known_creator_owner_sid): Ditto
+	(well_known_world_sid): Ditto
+	(cygsid::string): New method, substituting `convert_sid_to_string_sid'.
+	(cygsid::get_sid): New method, substituting `get_sid'.
+	(cygsid::getfromstr): New method, substituting
+	`convert_string_sid_to_sid'.
+	(cygsid::getfrompw): New method, substituting `get_pw_sid'.
+	(cygsid::getfromgr): New method, substituting `get_gr_sid'.
+	(cygsid::get_id): New method, substituting `get_id_from_sid'.
+	(get_admin_sid): Eliminated.
+	(get_system_sid): Ditto.
+	(get_creator_owner_sid): Ditto.
+	(get_world_sid): Ditto.
+	* grp.cc: Use new cygsid methods and well known sids throughout.
+	* registry.cc: Ditto.
+	* sec_acl.cc: Ditto.
+	* security.cc: Ditto.
+	* shared.cc: Ditto.
+	* syscalls.cc (seteuid): Ditto. Eliminate redundant conditional.
+	* uinfo.cc (internal_getlogin): Ditto.
+	* spawn.cc (spawn_guts) Revert previous patch.
+
 Tue May 15 10:20:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::ioctl): Convert s_addr

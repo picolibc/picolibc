@@ -249,9 +249,9 @@ sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
   size_t acl_len = sizeof (ACL)
 		   + 4 * (sizeof (ACCESS_ALLOWED_ACE) - sizeof (DWORD))
 		   + GetLengthSid (sid)
-		   + GetLengthSid (get_admin_sid ())
-		   + GetLengthSid (get_system_sid ())
-		   + GetLengthSid (get_creator_owner_sid ());
+		   + GetLengthSid (well_known_admin_sid)
+		   + GetLengthSid (well_known_system_sid)
+		   + GetLengthSid (well_known_creator_owner_sid);
   if (sid2)
     acl_len += sizeof (ACCESS_ALLOWED_ACE) - sizeof (DWORD)
 	       + GetLengthSid (sid2);
@@ -266,17 +266,17 @@ sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
 
   if (! AddAccessAllowedAce (acl, ACL_REVISION,
 			     SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
-			     get_admin_sid ()))
+			     well_known_admin_sid))
     debug_printf ("AddAccessAllowedAce(admin) %E");
 
   if (! AddAccessAllowedAce (acl, ACL_REVISION,
 			     SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
-			     get_system_sid ()))
+			     well_known_system_sid))
     debug_printf ("AddAccessAllowedAce(system) %E");
 
   if (! AddAccessAllowedAce (acl, ACL_REVISION,
 			     SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
-			     get_creator_owner_sid ()))
+			     well_known_creator_owner_sid))
     debug_printf ("AddAccessAllowedAce(creator_owner) %E");
 
   if (sid2)

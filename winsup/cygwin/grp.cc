@@ -125,8 +125,6 @@ add_grp_line (const char *line)
       curr_lines++;
 }
 
-extern PSID get_admin_sid ();
-
 /* Cygwin internal */
 /* Read in /etc/group and save contents in the group cache */
 /* This sets group_in_memory_p to 1 so functions in this file can
@@ -176,7 +174,7 @@ read_etc_group ()
 	  SID_NAME_USE acType;
 	  debug_printf ("Emulating /etc/group");
 	  if (! LookupAccountSidA (NULL ,
-				    get_admin_sid () ,
+				    well_known_admin_sid,
 				    group_name,
 				    &group_name_len,
 				    domain_name,
@@ -294,7 +292,7 @@ getgroups (int gidsetsize, gid_t *grouplist, gid_t gid, const char *username)
 	      cygsid sid;
 
 	      for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
-		if (get_gr_sid (sid, gr))
+		if (sid.getfromgr (gr))
 		  for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
 		    if (sid == groups->Groups[pg].Sid)
 		      {

@@ -428,8 +428,8 @@ get_nt_attribute (const char *file, int *attribute,
       return -1;
     }
 
-  uid_t uid = get_uid_from_sid (owner_sid);
-  gid_t gid = get_gid_from_sid (group_sid);
+  uid_t uid = cygsid(owner_sid).get_uid ();
+  gid_t gid = cygsid(group_sid).get_gid ();
   if (uidret)
     *uidret = uid;
   if (gidret)
@@ -498,7 +498,7 @@ get_nt_attribute (const char *file, int *attribute,
 	    *flags |= S_IXGRP
 		      | ((grp_member && !(*anti & S_IXUSR)) ? S_IXUSR : 0);
 	}
-      else if (ace_sid == get_world_sid ())
+      else if (ace_sid == well_known_world_sid)
 	{
 	  if (ace->Mask & FILE_READ_DATA)
 	    *flags |= S_IROTH
@@ -615,7 +615,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
   cygsid owner_sid;
   struct passwd *pw = getpwuid (uid);
   strcpy (owner, pw ? pw->pw_name : getlogin ());
-  if ((!pw || !get_pw_sid (owner_sid, pw))
+  if ((!pw || !owner_sid.getfrompw (pw))
       && !lookup_name (owner, logsrv, owner_sid))
     return NULL;
   debug_printf ("owner: %s [%d]", owner,
@@ -623,11 +623,11 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
 		*GetSidSubAuthorityCount(owner_sid) - 1));
 
   /* Get SID and name of new group. */
-  cygsid group_sid (NULL);
+  cygsid group_sid (NO_SID);
   struct group *grp = getgrgid (gid);
   if (grp)
     {
-      if ((!grp || !get_gr_sid (group_sid.set (), grp))
+      if ((!grp || !group_sid.getfromgr (grp))
 	  && !lookup_name (grp->gr_name, logsrv, group_sid))
 	return NULL;
     }
@@ -767,7 +767,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
 
   /* Set allow ACE for everyone. */
   if (!add_access_allowed_ace (acl, ace_off++, other_allow,
-				get_world_sid (), acl_len, inherit))
+				well_known_world_sid, acl_len, inherit))
     return NULL;
 
   /* Get owner and group from current security descriptor. */
@@ -793,7 +793,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
 	      || (owner_sid && ace_sid == owner_sid)
 	      || (cur_group_sid && ace_sid == cur_group_sid)
 	      || (group_sid && ace_sid == group_sid)
-	      || (ace_sid == get_world_sid ()))
+	      || (ace_sid == well_known_world_sid))
 	    continue;
 	  /*
 	   * Add unrelated ACCESS_DENIED_ACE to the beginning but

@@ -34,11 +34,10 @@ internal_getlogin (cygheap_user &user)
   DWORD username_len = UNLEN + 1;
   struct passwd *pw = NULL;
 
-  if (!user.name ())
-    if (!GetUserName (username, &username_len))
-      user.set_name ("unknown");
-    else
-      user.set_name (username);
+  if (!GetUserName (username, &username_len))
+    user.set_name ("unknown");
+  else
+    user.set_name (username);
 
   if (os_being_run == winNT)
     {
@@ -153,7 +152,7 @@ internal_getlogin (cygheap_user &user)
 
 	  /* If we have a SID, try to get the corresponding Cygwin user name
 	     which can be different from the Windows user name. */
-	  cygsid gsid (NULL);
+	  cygsid gsid (NO_SID);
 	  if (ret)
 	    {
 	      cygsid psid;
@@ -165,13 +164,13 @@ internal_getlogin (cygheap_user &user)
 		    setenv ("USERPROFILE", buf, 1);
 		}
 	      for (int pidx = 0; (pw = internal_getpwent (pidx)); ++pidx)
-		if (get_pw_sid (psid, pw) && EqualSid (user.sid (), psid))
+		if (psid.getfrompw (pw) && EqualSid (user.sid (), psid))
 		  {
 		    user.set_name (pw->pw_name);
 		    struct group *gr = getgrgid (pw->pw_gid);
 		    if (gr)
-		      if (!get_gr_sid (gsid.set (), gr))
-			  gsid = NULL;
+		      if (!gsid.getfromgr (gr))
+			  gsid = NO_SID;
 		    break;
 		  }
 	    }

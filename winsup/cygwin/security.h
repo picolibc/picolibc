@@ -12,21 +12,37 @@ details. */
 #define INHERIT_ALL  (CONTAINER_INHERIT_ACE|OBJECT_INHERIT_ACE)
 #define INHERIT_ONLY (INHERIT_ONLY_ACE|CONTAINER_INHERIT_ACE|OBJECT_INHERIT_ACE)
 
-#define MAX_SID_LEN 40
-
 #define DEFAULT_UID DOMAIN_USER_RID_ADMIN
 #define DEFAULT_GID DOMAIN_ALIAS_RID_ADMINS
+
+#define MAX_SID_LEN 40
+
+#define NO_SID ((PSID)NULL)
 
 class cygsid {
   PSID psid;
   char sbuf[MAX_SID_LEN];
+
+  const PSID getfromstr (const char *nsidstr);
+  PSID get_sid (DWORD s, DWORD cnt, DWORD *r);
+
 public:
   inline cygsid () : psid ((PSID) sbuf) {}
-  inline cygsid (PSID nsid) { *this = nsid; }
+  inline cygsid (const PSID nsid) { *this = nsid; }
+  inline cygsid (const char *nstrsid) { *this = nstrsid; }
 
   inline PSID set () { return psid = (PSID) sbuf; }
 
-  inline const PSID operator= (PSID nsid)
+  BOOL getfrompw (struct passwd *pw);
+  BOOL getfromgr (struct group *gr);
+
+  int get_id (BOOL search_grp, int *type = NULL);
+  inline int get_uid () { return get_id (FALSE); }
+  inline int get_gid () { return get_id (TRUE); }
+
+  char *string (char *nsidstr);
+
+  inline const PSID operator= (const PSID nsid)
     {
       if (!nsid)
         psid = NULL;
@@ -37,14 +53,32 @@ public:
 	}
       return psid;
     }
-  inline BOOL operator== (PSID nsid)
+  inline const PSID operator= (const char *nsidstr)
+    { return getfromstr (nsidstr); }
+
+  inline BOOL operator== (const PSID nsid) const
     {
       if (!psid || !nsid)
         return nsid == psid;
       return EqualSid (psid, nsid);
     }
+  inline BOOL operator== (const char *nsidstr) const
+    {
+      cygsid nsid (nsidstr);
+      return *this == nsid;
+    }
+  inline BOOL operator!= (const PSID nsid) const
+    { return !(*this == nsid); }
+  inline BOOL operator!= (const char *nsidstr) const
+    { return !(*this == nsidstr); }
+
   inline operator const PSID () { return psid; }
 };
+
+extern cygsid well_known_admin_sid;
+extern cygsid well_known_system_sid;
+extern cygsid well_known_creator_owner_sid;
+extern cygsid well_known_world_sid;
 
 extern BOOL allow_ntsec;
 extern BOOL allow_smbntsec;
@@ -70,27 +104,12 @@ BOOL __stdcall add_access_denied_ace (PACL acl, int offset, DWORD attributes, PS
 HANDLE subauth (struct passwd *pw);
 
 /* sec_helper.cc: Security helper functions. */
-char *__stdcall convert_sid_to_string_sid (PSID psid, char *sid_str);
-PSID __stdcall convert_string_sid_to_sid (PSID psid, const char *sid_str);
-PSID __stdcall get_sid (PSID psid, DWORD s, DWORD cnt, DWORD *r);
-BOOL __stdcall get_pw_sid (PSID sid, struct passwd *pw);
-BOOL __stdcall get_gr_sid (PSID sid, struct group *gr);
-PSID __stdcall get_admin_sid ();
-PSID __stdcall get_system_sid ();
-PSID __stdcall get_creator_owner_sid ();
-PSID __stdcall get_world_sid ();
-int get_id_from_sid (PSID psid, BOOL search_grp, int *type);
-int __stdcall get_id_from_sid (PSID psid, BOOL search_grp);
-BOOL __stdcall legal_sid_type (SID_NAME_USE type);
 BOOL __stdcall is_grp_member (uid_t uid, gid_t gid);
 /* `lookup_name' should be called instead of LookupAccountName.
  * logsrv may be NULL, in this case only the local system is used for lookup.
  * The buffer for ret_sid (40 Bytes) has to be allocated by the caller! */
 BOOL __stdcall lookup_name (const char *, const char *, PSID);
 int set_process_privilege (const char *privilege, BOOL enable = TRUE);
-
-extern inline int get_uid_from_sid (PSID psid) { return get_id_from_sid (psid, FALSE);}
-extern inline int get_gid_from_sid (PSID psid) { return get_id_from_sid (psid, TRUE); }
 
 /* shared.cc: */
 /* Retrieve a security descriptor that allows all access */

@@ -157,7 +157,7 @@ setacl (const char *file, int nentries, aclent_t *aclbufp)
 	case USER:
 	case DEF_USER:
 	  if (!(pw = getpwuid (aclbufp[i].a_id))
-	      || !get_pw_sid (sid, pw)
+	      || !sid.getfrompw (pw)
 	      || !add_access_allowed_ace (acl, ace_off++, allow,
 					   sid, acl_len, inheritance))
 	    return -1;
@@ -171,7 +171,7 @@ setacl (const char *file, int nentries, aclent_t *aclbufp)
 	case GROUP:
 	case DEF_GROUP:
 	  if (!(gr = getgrgid (aclbufp[i].a_id))
-	      || !get_gr_sid (sid, gr)
+	      || !sid.getfromgr (gr)
 	      || !add_access_allowed_ace (acl, ace_off++, allow,
 					   sid, acl_len, inheritance))
 	    return -1;
@@ -179,7 +179,8 @@ setacl (const char *file, int nentries, aclent_t *aclbufp)
 	case OTHER_OBJ:
 	case DEF_OTHER_OBJ:
 	  if (!add_access_allowed_ace (acl, ace_off++, allow,
-					get_world_sid(), acl_len, inheritance))
+				       well_known_world_sid,
+				       acl_len, inheritance))
 	    return -1;
 	  break;
 	}
@@ -261,7 +262,7 @@ getacl (const char *file, DWORD attr, int nentries, aclent_t *aclbufp)
       __seterrno ();
       return -1;
     }
-  uid = get_uid_from_sid (owner_sid);
+  uid = cygsid (owner_sid).get_uid ();
 
   if (!GetSecurityDescriptorGroup (psd, &group_sid, &dummy))
     {
@@ -269,7 +270,7 @@ getacl (const char *file, DWORD attr, int nentries, aclent_t *aclbufp)
       __seterrno ();
       return -1;
     }
-  gid = get_gid_from_sid (group_sid);
+  gid = cygsid (group_sid).get_gid ();
 
   aclent_t lacl[MAX_ACL_ENTRIES];
   memset (&lacl, 0, MAX_ACL_ENTRIES * sizeof (aclent_t));
@@ -321,18 +322,18 @@ getacl (const char *file, DWORD attr, int nentries, aclent_t *aclbufp)
 	  type = GROUP_OBJ;
 	  id = gid;
 	}
-      else if (ace_sid == get_world_sid ())
+      else if (ace_sid == well_known_world_sid)
 	{
 	  type = OTHER_OBJ;
 	  id = 0;
 	}
       else
 	{
-	  id = get_id_from_sid (ace_sid, FALSE, &type);
+	  id = ace_sid.get_id (FALSE, &type);
 	  if (type != GROUP)
 	    {
 	      int type2 = 0;
-	      int id2 = get_id_from_sid (ace_sid, TRUE, &type2);
+	      int id2 = ace_sid.get_id (TRUE, &type2);
 	      if (type2 == GROUP)
 		{
 		  id = id2;
@@ -424,10 +425,10 @@ acl_access (const char *path, int flags)
 	      struct group *gr = NULL;
 
 	      if ((pw = getpwuid (acls[i].a_id)) != NULL
-		  && get_pw_sid (owner, pw))
+		  && owner.getfrompw (pw))
 		{
 		  for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
-		    if (get_gr_sid (group, gr)
+		    if (group.getfromgr (gr)
 			&& owner == group
 			&& is_grp_member (myself->uid, gr->gr_gid))
 		      break;

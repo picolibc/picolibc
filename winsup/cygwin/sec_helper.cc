@@ -44,41 +44,46 @@ SID_IDENTIFIER_AUTHORITY sid_auth[] = {
         {SECURITY_NT_AUTHORITY}
 };
 
+cygsid well_known_admin_sid ("S-1-5-32-544");
+cygsid well_known_system_sid ("S-1-5-18");
+cygsid well_known_creator_owner_sid ("S-1-3-0");
+cygsid well_known_world_sid ("S-1-1-0");
+
 char *
-convert_sid_to_string_sid (PSID psid, char *sid_str)
+cygsid::string (char *nsidstr)
 {
   char t[32];
   DWORD i;
 
-  if (!psid || !sid_str)
+  if (!psid || !nsidstr)
     return NULL;
-  strcpy (sid_str, "S-1-");
+  strcpy (nsidstr, "S-1-");
   __small_sprintf(t, "%u", GetSidIdentifierAuthority (psid)->Value[5]);
-  strcat (sid_str, t);
+  strcat (nsidstr, t);
   for (i = 0; i < *GetSidSubAuthorityCount (psid); ++i)
     {
       __small_sprintf(t, "-%lu", *GetSidSubAuthority (psid, i));
-      strcat (sid_str, t);
+      strcat (nsidstr, t);
     }
-  return sid_str;
+  return nsidstr;
 }
 
 PSID
-get_sid (PSID psid, DWORD s, DWORD cnt, DWORD *r)
+cygsid::get_sid (DWORD s, DWORD cnt, DWORD *r)
 {
   DWORD i;
 
-  if (!psid || s > 5 || cnt < 1 || cnt > 8)
+  if (s > 5 || cnt < 1 || cnt > 8)
     return NULL;
-
+  set ();
   InitializeSid(psid, &sid_auth[s], cnt);
   for (i = 0; i < cnt; ++i)
     memcpy ((char *) psid + 8 + sizeof (DWORD) * i, &r[i], sizeof (DWORD));
   return psid;
 }
 
-PSID
-convert_string_sid_to_sid (PSID psid, const char *sid_str)
+const PSID
+cygsid::getfromstr (const char *nsidstr)
 {
   char sid_buf[256];
   char *t, *lasts;
@@ -86,10 +91,10 @@ convert_string_sid_to_sid (PSID psid, const char *sid_str)
   DWORD s = 0;
   DWORD i, r[8];
 
-  if (!sid_str || strncmp (sid_str, "S-1-", 4))
+  if (!nsidstr || strncmp (nsidstr, "S-1-", 4))
     return NULL;
 
-  strcpy (sid_buf, sid_str);
+  strcpy (sid_buf, nsidstr);
 
   for (t = sid_buf + 4, i = 0;
        cnt < 8 && (t = strtok_r (t, "-", &lasts));
@@ -99,68 +104,33 @@ convert_string_sid_to_sid (PSID psid, const char *sid_str)
     else
       r[cnt++] = strtoul (t, NULL, 10);
 
-  return get_sid (psid, s, cnt, r);
+  return get_sid (s, cnt, r);
 }
 
 BOOL
-get_pw_sid (PSID sid, struct passwd *pw)
+cygsid::getfrompw (struct passwd *pw)
 {
   char *sp = pw->pw_gecos ? strrchr (pw->pw_gecos, ',') : NULL;
 
   if (!sp)
     return FALSE;
-  return convert_string_sid_to_sid (sid, ++sp) != NULL;
+  return (*this = ++sp) != NULL;
 }
 
 BOOL
-get_gr_sid (PSID sid, struct group *gr)
+cygsid::getfromgr (struct group *gr)
 {
-  return convert_string_sid_to_sid (sid, gr->gr_passwd) != NULL;
-}
-
-PSID
-get_admin_sid ()
-{
-  static NO_COPY cygsid admin_sid (NULL);
-
-  if (!admin_sid)
-    convert_string_sid_to_sid (admin_sid.set (), "S-1-5-32-544");
-  return admin_sid;
-}
-
-PSID
-get_system_sid ()
-{
-  static NO_COPY cygsid system_sid (NULL);
-
-  if (!system_sid)
-    convert_string_sid_to_sid (system_sid.set (), "S-1-5-18");
-  return system_sid;
-}
-
-PSID
-get_creator_owner_sid ()
-{
-  static NO_COPY cygsid owner_sid (NULL);
-
-  if (!owner_sid)
-    convert_string_sid_to_sid (owner_sid.set (), "S-1-3-0");
-  return owner_sid;
-}
-
-PSID
-get_world_sid ()
-{
-  static NO_COPY cygsid world_sid (NULL);
-
-  if (!world_sid)
-    convert_string_sid_to_sid (world_sid.set (), "S-1-1-0");
-  return world_sid;
+  return (*this = gr->gr_passwd) != NULL;
 }
 
 int
-get_id_from_sid (PSID psid, BOOL search_grp, int *type)
+cygsid::get_id (BOOL search_grp, int *type)
 {
+  if (!psid)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
   if (!IsValidSid (psid))
     {
       __seterrno ();
@@ -179,7 +149,7 @@ get_id_from_sid (PSID psid, BOOL search_grp, int *type)
 	  struct passwd *pw;
 	  for (int pidx = 0; (pw = internal_getpwent (pidx)); ++pidx)
 	    {
-	      if (get_pw_sid (sid, pw) && sid == psid)
+	      if (sid.getfrompw (pw) && sid == psid)
 		{
 		  id = pw->pw_uid;
 		  break;
@@ -197,7 +167,7 @@ get_id_from_sid (PSID psid, BOOL search_grp, int *type)
 	  struct group *gr;
 	  for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
 	    {
-	      if (get_gr_sid (sid, gr) && sid == psid)
+	      if (sid.getfromgr (gr) && sid == psid)
 		{
 		  id = gr->gr_gid;
 		  break;
@@ -268,13 +238,7 @@ get_id_from_sid (PSID psid, BOOL search_grp, int *type)
   return id;
 }
 
-int
-get_id_from_sid (PSID psid, BOOL search_grp)
-{
-  return get_id_from_sid (psid, search_grp, NULL);
-}
-
-BOOL
+static BOOL
 legal_sid_type (SID_NAME_USE type)
 {
   return type == SidTypeUser || type == SidTypeGroup

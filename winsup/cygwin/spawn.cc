@@ -612,10 +612,9 @@ skip_arg_parsing:
       DWORD ret_len;
       if (!GetTokenInformation (hToken, TokenUser, &sid, sizeof sid, &ret_len))
         {
-	  sid = NULL;
+	  sid = NO_SID;
 	  system_printf ("GetTokenInformation: %E");
 	}
-
       /* Retrieve security attributes before setting psid to NULL
 	 since it's value is needed by `sec_user'. */
       PSECURITY_ATTRIBUTES sec_attribs = allow_ntsec && sid
@@ -623,9 +622,10 @@ skip_arg_parsing:
 					 : &sec_all_nih;
 
       /* Remove impersonation */
+      uid_t uid = geteuid ();
       if (cygheap->user.impersonated
           && cygheap->user.token != INVALID_HANDLE_VALUE)
-	RevertToSelf ();
+	seteuid (cygheap->user.orig_uid);
 
       /* Load users registry hive. */
       load_registry_hive (sid);
@@ -664,7 +664,7 @@ skip_arg_parsing:
       if (mode != _P_OVERLAY && mode != _P_VFORK
 	  && cygheap->user.impersonated
 	  && cygheap->user.token != INVALID_HANDLE_VALUE)
-	ImpersonateLoggedOnUser (cygheap->user.token);
+	seteuid (uid);
     }
 
   MALLOC_CHECK;
