@@ -1,5 +1,10 @@
 2003-10-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/winuser.h [_WIN32_WINNT >= 0x0501] (EVENT_*, CONSOLE_*):
+	Add constants, related to Console Accessibility.
+
+2003-10-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winuser.h [WINVER >= 0x0500] (EVENT_MAX): Ooops...
 	wrong value for constant.
 
