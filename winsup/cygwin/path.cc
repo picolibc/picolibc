@@ -1048,7 +1048,9 @@ fillin:
       if (!cygcwd.get (cwd_win32, 0))
 	return get_errno ();
       unsigned cwdlen = strlen (cwd_win32);
-      if (path_prefix_p (cwd_win32, dst, cwdlen))
+      if (!path_prefix_p (cwd_win32, dst, cwdlen))
+	strcpy (win32_path, dst);
+      else
 	{
 	  size_t n = strlen (dst);
 	  if (n < cwdlen)
@@ -2885,10 +2887,12 @@ cwdstuff::fixup_after_exec (char *win32_cwd, char *posix_cwd, DWORD hash_cwd)
 bool
 cwdstuff::get_initial ()
 {
-  lock->acquire ();
-  DWORD len, dlen;
+  if (win32)
+    return 1;
 
+  lock->acquire ();
   int i;
+  DWORD len, dlen;
   for (i = 0, dlen = MAX_PATH, len = 0; i < 3; dlen *= 2, i++)
     {
       win32 = (char *) crealloc (win32, dlen + 2);
