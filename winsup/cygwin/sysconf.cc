@@ -122,6 +122,8 @@ sysconf (int in)
 	  }
       case _SC_RTSIG_MAX:
 	return RTSIG_MAX;
+      case _SC_TTY_NAME_MAX:
+        return TTY_NAME_MAX;
     }
 
   /* Invalid input or unimplemented sysconf name */

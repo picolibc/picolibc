@@ -1536,8 +1536,8 @@ ttyname_r (int fd, char *buf, size_t buflen)
 extern "C" char *
 ttyname (int fd)
 {
-  static char name[CYG_MAX_PATH];
-  int ret = ttyname_r (fd, name, CYG_MAX_PATH);
+  static char name[TTY_NAME_MAX + 1];
+  int ret = ttyname_r (fd, name, TTY_NAME_MAX + 1);
   if (ret)
     {
       set_errno (ret);

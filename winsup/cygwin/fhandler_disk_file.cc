@@ -377,7 +377,8 @@ fhandler_disk_file::fchmod (mode_t mode)
   if (pc.is_fs_special ())
     return chmod_device (pc, mode);
 
-  if (!get_io_handle () && !(oret = open_fs (O_RDONLY | O_BINARY, 0)))
+  query_open (query_read_control);
+  if (!get_io_handle () && !(oret = open_fs (O_BINARY, 0)))
     return -1;
 
   SetFileAttributes (get_win32_name (), (DWORD) pc & ~FILE_ATTRIBUTE_READONLY);

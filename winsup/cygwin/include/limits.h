@@ -151,6 +151,10 @@ details. */
 #undef TIMER_MAX
 #define TIMER_MAX 32
 
+/* Maximum number of characters in a tty name. */
+#undef TTY_NAME_MAX
+#define TTY_NAME_MAX 12
+
 /* POSIX values */
 /* These should never vary from one system type to another */
 /* They represent the minimum values that POSIX systems must support.
@@ -170,6 +174,7 @@ details. */
 #define _POSIX_TZNAME_MAX       3
 #define _POSIX_RTSIG_MAX	8
 #define _POSIX_TIMER_MAX	32
+#define _POSIX_TTY_NAME_MAX	9
 
 #define RTSIG_MAX		_POSIX_RTSIG_MAX
 

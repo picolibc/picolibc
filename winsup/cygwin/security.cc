@@ -1141,64 +1141,33 @@ write_sd (const char *file, security_descriptor &sd)
   else
     res = saved_res;
   if (res == 1 && owner != cygheap->user.sid ())
-    return -1;
-
+    {
+      set_errno (EPERM);
+      return -1;
+    }
   HANDLE fh;
-  fh = CreateFile (file,
-		   WRITE_OWNER | WRITE_DAC,
-		   FILE_SHARE_READ | FILE_SHARE_WRITE,
-		   &sec_none_nih,
-		   OPEN_EXISTING,
-		   FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
-		   NULL);
-
-  if (fh == INVALID_HANDLE_VALUE)
+  if ((fh = CreateFile (file,
+		        WRITE_OWNER | WRITE_DAC,
+		        FILE_SHARE_READ | FILE_SHARE_WRITE,
+		        &sec_none_nih,
+		        OPEN_EXISTING,
+		        FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
+		        NULL)) == INVALID_HANDLE_VALUE)
     {
       __seterrno ();
       return -1;
     }
-
-  LPVOID context = NULL;
-  DWORD bytes_written = 0;
-  WIN32_STREAM_ID header;
-
-  memset (&header, 0, sizeof (header));
-  /* write new security info header */
-  header.dwStreamId = BACKUP_SECURITY_DATA;
-  header.dwStreamAttributes = STREAM_CONTAINS_SECURITY;
-  header.Size.HighPart = 0;
-  header.Size.LowPart = sd.size ();
-  header.dwStreamNameSize = 0;
-  if (!BackupWrite (fh, (LPBYTE) &header,
-		    3 * sizeof (DWORD) + sizeof (LARGE_INTEGER),
-		    &bytes_written, FALSE, TRUE, &context))
-    {
-      __seterrno ();
-      CloseHandle (fh);
-      return -1;
-    }
-
-  /* write new security descriptor */
-  if (!BackupWrite (fh, (LPBYTE) (PSECURITY_DESCRIPTOR) sd,
-		    header.Size.LowPart + header.dwStreamNameSize,
-		    &bytes_written, FALSE, TRUE, &context))
-    {
-      /* Samba returns ERROR_NOT_SUPPORTED.
-	 FAT returns ERROR_INVALID_SECURITY_DESCR.
-	 This shouldn't return as error, but better be ignored. */
-      DWORD ret = GetLastError ();
-      if (ret != ERROR_NOT_SUPPORTED && ret != ERROR_INVALID_SECURITY_DESCR)
-	{
-	  __seterrno ();
-	  BackupWrite (fh, NULL, 0, &bytes_written, TRUE, TRUE, &context);
-	  CloseHandle (fh);
-	  return -1;
-	}
-    }
-
-  /* terminate the restore process */
-  BackupWrite (fh, NULL, 0, &bytes_written, TRUE, TRUE, &context);
+  NTSTATUS ret = NtSetSecurityObject (fh,
+				      DACL_SECURITY_INFORMATION 
+				      | GROUP_SECURITY_INFORMATION
+				      | OWNER_SECURITY_INFORMATION,
+				      sd);
   CloseHandle (fh);
+  if (ret != STATUS_SUCCESS)
+    {
+      __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+      return -1;
+    }
   return 0;
 }
 
@@ -1391,7 +1360,6 @@ get_nt_object_security (HANDLE handle, SE_OBJECT_TYPE object_type,
     }
   if (ret != STATUS_SUCCESS)
     {
-      sd_ret.free ();
       __seterrno_from_win_error (RtlNtStatusToDosError (ret));
       return -1;
     }

@@ -1,5 +1,21 @@
 2004-04-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (NtSetSecurityObject): Add.
+	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Only request
+	READ_CONTROL rights when opening the file.
+	* ntdll.h (NtSetSecurityObject): Add declaration.
+	* security.cc (write_sd): Call NtSetSecurityObject instead of
+	BackupWrite.
+	(get_nt_object_security): Don't free security descriptor here.
+
+2004-04-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (ttyname): Use buffer of length TTY_NAME_MAX + 1.
+	* sysconf.cc (sysconf): Handle _SC_TTY_NAME_MAX request.
+	* include/limits.h: Define TTY_NAME_MAX and _POSIX_TTY_NAME_MAX.
+
+2004-04-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwin.din: Export rand_r and ttyname_r.
 	* syscalls.cc (ttyname_r): New function.
 	(ttyname): Move functionality to ttyname_r.  Call it from here.
