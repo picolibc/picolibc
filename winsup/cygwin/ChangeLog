@@ -1,5 +1,10 @@
 2005-02-01  Christopher Faylor  <cgf@timesys.com>
 
+	* fhandler_proc.cc (format_proc_partitions): Remove PartitionType check
+	since it could skip over partitions that are actually interesting.
+
+2005-02-01  Christopher Faylor  <cgf@timesys.com>
+
 	* cygthread.cc (cygthread::terminate_thread): Wait briefly for
 	notification event in the event that the thread was actually in the
 	process of exiting.

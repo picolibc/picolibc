@@ -1,6 +1,6 @@
 /* fhandler_proc.cc: fhandler for /proc virtual filesystem
 
-   Copyright 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -1012,8 +1012,7 @@ format_proc_partitions (char *destbuf, size_t maxsize)
 		  DRIVE_LAYOUT_INFORMATION *dli = (DRIVE_LAYOUT_INFORMATION *) buf;
 		  for (unsigned partition = 0; partition < dli->PartitionCount; partition++)
 		    {
-		      if (!dli->PartitionEntry[partition].PartitionLength.QuadPart
-			  || !dli->PartitionEntry[partition].PartitionType)
+		      if (!dli->PartitionEntry[partition].PartitionLength.QuadPart)
 			continue;
 		      device dev;
 		      dev.parsedisk (drive_number, partition + 1);
