@@ -282,6 +282,8 @@ int access_worker (path_conv&, int) __attribute__ ((regparm (2)));
 extern "C" int low_priority_sleep (DWORD) __attribute__ ((regparm (1)));
 #define SLEEP_0_STAY_LOW INFINITE
 
+size_t getshmlba (void);
+
 /**************************** Exports ******************************/
 
 extern "C" {

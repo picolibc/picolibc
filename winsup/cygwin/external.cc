@@ -274,6 +274,10 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  set_security_attribute (attribute, psa, sd_buf, sd_buf_size);
 	  return psa->lpSecurityDescriptor ? 0 : -1;
         }
+      case CW_GET_SHMLBA:
+        {
+	  return getshmlba ();
+	}
       default:
 	return (DWORD) -1;
     }

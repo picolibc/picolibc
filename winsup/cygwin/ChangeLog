@@ -1,3 +1,12 @@
+2003-11-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (getshmlba): New function.
+	* external.cc (cygwin_internal): Add CW_GET_SHMLBA handling.
+	* mmap.cc (mmap64): Call getshmlba to evaluate granularity.
+	* winsup.h (getshmlba): Add declaration.
+	* include/cygwin/version.h: Bump API minor number.
+	* include/sys/cygwin.h (cygwin_getinfo_types): Add CW_GET_SHMLBA.
+
 2003-11-06  Christopher Faylor  <cgf@redhat.com>
 
 	* winsup.h: Declare access_worker.

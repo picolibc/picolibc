@@ -455,13 +455,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
   syscall_printf ("addr %x, len %u, prot %x, flags %x, fd %d, off %D",
 		  addr, len, prot, flags, fd, off);
 
-  static DWORD granularity;
-  if (!granularity)
-    {
-      SYSTEM_INFO si;
-      GetSystemInfo (&si);
-      granularity = si.dwAllocationGranularity;
-    }
+  static DWORD granularity = getshmlba ();
 
   /* Error conditions according to SUSv2 */
   if (off % getpagesize ()

@@ -1529,6 +1529,14 @@ getpagesize ()
   return (int) system_info.dwPageSize;
 }
 
+size_t
+getshmlba ()
+{
+  if (!system_info.dwAllocationGranularity)
+    GetSystemInfo (&system_info);
+  return system_info.dwAllocationGranularity;
+}
+
 static int
 check_posix_perm (const char *fname, int v)
 {
