@@ -186,7 +186,7 @@ out:
 }
 
 fhandler_registry::fhandler_registry ():
-fhandler_proc (FH_REGISTRY)
+fhandler_proc ()
 {
 }
 

@@ -36,7 +36,6 @@
 
 #define SECRET_EVENT_NAME "cygwin.local_socket.secret.%d.%08x-%08x-%08x-%08x"
 #define ENTROPY_SOURCE_NAME "/dev/urandom"
-#define ENTROPY_SOURCE_DEV_UNIT 9
 
 extern fhandler_socket *fdsock (int& fd, const char *name, SOCKET soc);
 extern "C" {
@@ -95,7 +94,7 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 /* fhandler_socket */
 
 fhandler_socket::fhandler_socket ()
-  : fhandler_base (FH_SOCKET), sun_path (NULL)
+  : fhandler_base (), sun_path (NULL)
 {
   set_need_fork_fixup ();
   prot_info_ptr = (LPWSAPROTOCOL_INFOA) cmalloc (HEAP_BUF,
@@ -116,7 +115,8 @@ fhandler_socket::set_connect_secret ()
   if (!entropy_source)
     {
       void *buf = malloc (sizeof (fhandler_dev_random));
-      entropy_source = new (buf) fhandler_dev_random (ENTROPY_SOURCE_DEV_UNIT);
+      entropy_source = new (buf) fhandler_dev_random ();
+      entropy_source->dev = *urandom_dev;
     }
   if (entropy_source &&
       !entropy_source->open (NULL, O_RDONLY))

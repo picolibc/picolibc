@@ -13,6 +13,7 @@ details. */
 #include <time.h>
 #include <errno.h>
 #include <limits.h>
+#include <stdarg.h>
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"
@@ -28,6 +29,8 @@ details. */
 #include "ntdll.h"
 #include "cygthread.h"
 #include "shared_info.h"
+#include "cygheap.h"
+#include "fhandler.h"
 
 static char NO_COPY pinfo_dummy[sizeof (_pinfo)] = {0};
 
@@ -304,11 +307,34 @@ _pinfo::commune_recv ()
 		sigproc_printf ("WriteFile arg %d failed, %E", a - __argv);
 		break;
 	      }
-	  if (!WriteFile (__tothem, "", 1, &nr, NULL))
-	    {
-	      sigproc_printf ("WriteFile null failed, %E");
-	      break;
-	    }
+	if (!WriteFile (__tothem, "", 1, &nr, NULL))
+	  {
+	    sigproc_printf ("WriteFile null failed, %E");
+	    break;
+	  }
+	break;
+      }
+    case PICOM_FIFO:
+      {
+	int formic;
+	if (!ReadFile (__fromthem, &formic, sizeof formic, &nr, NULL)
+	    || nr != sizeof formic)
+	  {
+	    /* __seterrno ();*/	// this is run from the signal thread, so don't set errno
+	    goto out;
+	  }
+
+	fhandler_fifo *fh = cygheap->fdtab.find_fifo ((ATOM) formic);
+	HANDLE it[] = {(fh->get_handle ()), (fh->get_output_handle ())};
+
+	if (!WriteFile (__tothem, it, sizeof (it), &nr, NULL))
+	  {
+	    /*__seterrno ();*/	// this is run from the signal thread, so don't set errno
+	    sigproc_printf ("WriteFile read handle failed, %E");
+	  }
+
+	(void) ReadFile (__fromthem, &nr, sizeof (nr), &nr, NULL);
+	break;
       }
     }
 
@@ -322,12 +348,15 @@ out:
 #define PIPEBUFSIZE (16 * sizeof (DWORD))
 
 commune_result
-_pinfo::commune_send (DWORD code)
+_pinfo::commune_send (DWORD code, ...)
 {
   HANDLE fromthem = NULL, tome = NULL;
   HANDLE fromme = NULL, tothem = NULL;
   DWORD nr;
   commune_result res;
+  va_list args;
+
+  va_start (args, code);
 
   res.s = NULL;
   res.n = 0;
@@ -359,6 +388,20 @@ _pinfo::commune_send (DWORD code)
       goto err;
     }
 
+  switch (code)
+    {
+    case PICOM_FIFO:
+      {
+	int formic = va_arg (args, int);
+	if (!WriteFile (tothem, &formic, sizeof formic, &nr, NULL) || nr != sizeof formic)
+	  {
+	    __seterrno ();
+	    goto err;
+	  }
+	break;
+      }
+    }
+
   if (sig_send (this, __SIGCOMMUNE))
     goto err;
 
@@ -388,14 +431,14 @@ _pinfo::commune_send (DWORD code)
     }
 
   size_t n;
-  if (!ReadFile (fromthem, &n, sizeof n, &nr, NULL) || nr != sizeof n)
-    {
-      __seterrno ();
-      goto err;
-    }
   switch (code)
     {
     case PICOM_CMDLINE:
+      if (!ReadFile (fromthem, &n, sizeof n, &nr, NULL) || nr != sizeof n)
+	{
+	  __seterrno ();
+	  goto err;
+	}
       res.s = (char *) malloc (n);
       char *p;
       for (p = res.s; ReadFile (fromthem, p, n, &nr, NULL); p += nr)
@@ -407,6 +450,19 @@ _pinfo::commune_send (DWORD code)
 	}
       res.n = n;
       break;
+    case PICOM_FIFO:
+      {
+	DWORD x = ReadFile (fromthem, res.handles, sizeof (res.handles), &nr, NULL);
+	WriteFile (tothem, &x, sizeof (x), &x, NULL);
+	if (!x)
+	  goto err;
+	if (nr != sizeof (res.handles))
+	  {
+	    set_errno (EPIPE);
+	    goto err;
+	  }
+	break;
+      }
     }
   CloseHandle (tothem);
   CloseHandle (fromthem);
@@ -421,7 +477,8 @@ err:
     CloseHandle (tothem);
   if (fromme)
     CloseHandle (fromme);
-  res.n = 0;
+  memset (&res, 0, sizeof (res));
+
 out:
   myself->hello_pid = 0;
   LeaveCriticalSection (&myself->lock);

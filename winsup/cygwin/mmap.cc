@@ -43,26 +43,26 @@ class mmap_record
   private:
     int fdesc_;
     HANDLE mapping_handle_;
-    int devtype_;
     DWORD access_mode_;
     __off64_t offset_;
     DWORD size_to_map_;
     caddr_t base_address_;
     DWORD *map_map_;
+    device dev;
 
   public:
     mmap_record (int fd, HANDLE h, DWORD ac, __off64_t o, DWORD s, caddr_t b) :
        fdesc_ (fd),
        mapping_handle_ (h),
-       devtype_ (0),
        access_mode_ (ac),
        offset_ (o),
        size_to_map_ (s),
        base_address_ (b),
        map_map_ (NULL)
       {
+	dev.devn = 0;
 	if (fd >= 0 && !cygheap->fdtab.not_open (fd))
-	  devtype_ = cygheap->fdtab[fd]->get_device ();
+	  dev = cygheap->fdtab[fd]->dev;
       }
 
     /* Default Copy constructor/operator=/destructor are ok */
@@ -70,7 +70,7 @@ class mmap_record
     /* Simple accessors */
     int get_fd () const { return fdesc_; }
     HANDLE get_handle () const { return mapping_handle_; }
-    DWORD get_device () const { return devtype_; }
+    device& get_device () { return dev; }
     DWORD get_access () const { return access_mode_; }
     DWORD get_offset () const { return offset_; }
     DWORD get_size () const { return size_to_map_; }
@@ -486,7 +486,7 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, __off64_t off)
 	  return MAP_FAILED;
 	}
       fh = cfd;
-      if (fh->get_device () == FH_DISK)
+      if (fh->get_device () == FH_FS)
 	{
 	  DWORD high;
 	  DWORD low = GetFileSize (fh->get_handle (), &high);

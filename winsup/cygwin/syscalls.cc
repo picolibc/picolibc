@@ -55,6 +55,9 @@ details. */
 
 SYSTEM_INFO system_info;
 
+static int __stdcall mknod_worker (const char *, mode_t, mode_t, _major_t,
+				   _minor_t);
+
 /* Close all files and process any queued deletions.
    Lots of unix style applications will open a tmp file, unlink it,
    but never call close.  This function is called by _exit to
@@ -533,6 +536,11 @@ open (const char *unix_path, int flags, ...)
 	  if (!(fh = cygheap->fdtab.build_fhandler_from_name (fd, unix_path,
 							      NULL, pc)))
 	    res = -1;		// errno already set
+	  else if (fh->is_fs_special () && fh->device_access_denied (flags))
+	    {
+	      fd.release ();
+	      res = -1;
+	    }
 	  else if (!fh->open (&pc, flags, (mode & 07777) & ~cygheap->umask))
 	    {
 	      fd.release ();
@@ -797,7 +805,7 @@ chown_worker (const char *name, unsigned fmode, __uid32_t uid, __gid32_t gid)
 
       /* FIXME: This makes chown on a device succeed always.  Someday we'll want
 	 to actually allow chown to work properly on devices. */
-      if (win32_path.is_device ())
+      if (win32_path.is_auto_device ())
 	{
 	  res = 0;
 	  goto done;
@@ -898,6 +906,12 @@ umask (mode_t mask)
   return oldmask;
 }
 
+int
+chmod_device (path_conv& pc, mode_t mode)
+{
+  return mknod_worker (pc, pc.dev.mode & S_IFMT, mode, pc.dev.major, pc.dev.minor);
+}
+
 /* chmod: POSIX 5.6.4.1 */
 extern "C" int
 chmod (const char *path, mode_t mode)
@@ -915,9 +929,14 @@ chmod (const char *path, mode_t mode)
 
   /* FIXME: This makes chmod on a device succeed always.  Someday we'll want
      to actually allow chmod to work properly on devices. */
-  if (win32_path.is_device ())
+  if (win32_path.is_auto_device ())
     {
       res = 0;
+      goto done;
+    }
+  if (win32_path.is_fs_special ())
+    {
+      res = chmod_device (win32_path, mode);
       goto done;
     }
 
@@ -1021,7 +1040,7 @@ fstat64 (int fd, struct __stat64 *buf)
 	  if (!buf->st_ino)
 	    buf->st_ino = hash_path_name (0, cfd->get_win32_name ());
 	  if (!buf->st_dev)
-	    buf->st_dev = (cfd->get_device () << 16) | cfd->get_unit ();
+	    buf->st_dev = cfd->get_device ();
 	  if (!buf->st_rdev)
 	    buf->st_rdev = buf->st_dev;
 	}
@@ -1111,7 +1130,7 @@ stat_worker (const char *name, struct __stat64 *buf, int nofollow,
 	  if (!buf->st_ino)
 	    buf->st_ino = hash_path_name (0, fh->get_win32_name ());
 	  if (!buf->st_dev)
-	    buf->st_dev = (fh->get_device () << 16) | fh->get_unit ();
+	    buf->st_dev = fh->get_device ();
 	  if (!buf->st_rdev)
 	    buf->st_rdev = buf->st_dev;
 	}
@@ -1507,7 +1526,7 @@ fpathconf (int fd, int v)
 	}
     case _PC_POSIX_PERMISSIONS:
     case _PC_POSIX_SECURITY:
-      if (cfd->get_device () == FH_DISK)
+      if (cfd->get_device () == FH_FS)
 	return check_posix_perm (cfd->get_win32_name (), v);
       set_errno (EINVAL);
       return -1;
@@ -1549,7 +1568,7 @@ pathconf (const char *file, int v)
 	    set_errno (full_path.error);
 	    return -1;
 	  }
-	if (full_path.is_device ())
+	if (full_path.is_auto_device ())
 	  {
 	    set_errno (EINVAL);
 	    return -1;
@@ -1567,9 +1586,7 @@ ttyname (int fd)
 {
   cygheap_fdget cfd (fd);
   if (cfd < 0 || !cfd->is_tty ())
-    {
-      return 0;
-    }
+    return 0;
   return (char *) (cfd->ttyname ());
 }
 
@@ -1604,7 +1621,7 @@ _cygwin_istext_for_stdio (int fd)
       return 0;
     }
 
-  if (cfd->get_device () != FH_DISK)
+  if (cfd->get_device () != FH_FS)
     {
       syscall_printf (" _cifs: fd not disk file");
       return 0;
@@ -1924,6 +1941,16 @@ regfree ()
   return 0;
 }
 
+static int __stdcall
+mknod_worker (const char *path, mode_t type, mode_t mode, _major_t major,
+	      _minor_t minor)
+{
+  char buf[sizeof (":00000000:00000000:00000000") + MAX_PATH];
+  sprintf (buf, ":%x:%x:%x", major, minor,
+	   type | (mode & (S_IRWXU | S_IRWXG | S_IRWXO)));
+  return symlink_worker (buf, path, true, true);
+}
+
 /* mknod was the call to create directories before the introduction
    of mkdir in 4.2BSD and SVR3.  Use of mknod required superuser privs
    so the mkdir command had to be setuid root.
@@ -1931,16 +1958,56 @@ regfree ()
    fileutils) assume its existence so we must provide a stub that always
    fails. */
 extern "C" int
-mknod (const char *_path, mode_t mode, dev_t dev)
+mknod (const char *path, mode_t mode, dev_t dev)
 {
-  set_errno (ENOSYS);
-  return -1;
+  if (check_null_empty_str_errno (path))
+    return -1;
+
+  if (strlen (path) >= MAX_PATH)
+    return -1;
+
+  path_conv w32path (path, PC_SYM_NOFOLLOW | PC_FULL);
+  if (w32path.exists ())
+    {
+      set_errno (EEXIST);
+      return -1;
+    }
+
+  mode_t type = mode & S_IFMT;
+  _major_t major = dev >> 8 /* SIGH.  _major (dev) */;
+  _minor_t minor = dev & 0xff /* SIGH _minor (dev) */;
+  switch (type)
+    {
+    case S_IFCHR:
+    case S_IFBLK:
+      break;
+
+    case S_IFIFO:
+      major = _major (FH_FIFO);
+      minor = _minor (FH_FIFO) & 0xff; /* SIGH again */
+      break;
+
+    case 0:
+    case S_IFREG:
+      {
+	int fd = open (path, O_CREAT, mode);
+	if (fd < 0)
+	  return -1;
+	close (fd);
+	return 0;
+      }
+
+    default:
+      set_errno (EINVAL);
+      return -1;
+    }
+
+  return mknod_worker (w32path, type, mode, major, minor);
 }
 
 extern "C" int
 mkfifo (const char *_path, mode_t mode)
 {
-  set_errno (ENOSYS);
   return -1;
 }
 
@@ -1948,7 +2015,6 @@ mkfifo (const char *_path, mode_t mode)
 extern "C" int
 seteuid32 (__uid32_t uid)
 {
-
   debug_printf ("uid: %d myself->gid: %d", uid, myself->gid);
 
   if (!wincap.has_security ()

@@ -33,7 +33,7 @@ static const NO_COPY char *CYGWIN_NATIVE = "CYGWIN_NATIVE_CLIPBOARD";
 static UINT cygnativeformat;
 
 fhandler_dev_clipboard::fhandler_dev_clipboard ()
-  : fhandler_base (FH_CLIPBOARD), pos (0), membuffer (NULL), msize (0),
+  : fhandler_base (), pos (0), membuffer (NULL), msize (0),
   eof (true)
 {
   /* FIXME: check for errors and loop until we can open the clipboard */

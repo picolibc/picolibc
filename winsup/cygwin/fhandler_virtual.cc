@@ -25,8 +25,8 @@ details. */
 #define _COMPILING_NEWLIB
 #include <dirent.h>
 
-fhandler_virtual::fhandler_virtual (DWORD devtype):
-  fhandler_base (devtype), filebuf (NULL), bufalloc ((size_t) -1),
+fhandler_virtual::fhandler_virtual ():
+  fhandler_base (), filebuf (NULL), bufalloc ((size_t) -1),
   fileid (-1)
 {
 }

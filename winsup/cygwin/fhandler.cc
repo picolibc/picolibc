@@ -150,7 +150,7 @@ fhandler_base::get_readahead_into_buffer (char *buf, size_t buflen)
    be too long (e.g. devices or some such).
    The unix_path_name is also used by virtual fhandlers.  */
 void
-fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit)
+fhandler_base::set_name (const char *unix_path, const char *win32_path)
 {
   if (unix_path == NULL || !*unix_path)
     return;
@@ -161,7 +161,7 @@ fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit
     {
       const char *fmt = get_native_name ();
       char *w =  (char *) cmalloc (HEAP_STR, strlen (fmt) + 16);
-      __small_sprintf (w, fmt, unit);
+      __small_sprintf (w, fmt, get_unit ());
       win32_path_name = w;
     }
 
@@ -177,7 +177,7 @@ fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit
      win32 name since it has theoretically been previously detected by
      path_conv. Ideally, we should pass in a format string and build the
      unix_path, too. */
-  if (!is_device () || *win32_path_name != '\\')
+  if (!is_auto_device () || *win32_path_name != '\\')
     unix_path_name = unix_path;
   else
     {
@@ -318,7 +318,7 @@ fhandler_base::raw_write (const void *ptr, size_t len)
 {
   DWORD bytes_written;
 
-  if (!WriteFile (get_handle (), ptr, len, &bytes_written, 0))
+  if (!WriteFile (get_output_handle (), ptr, len, &bytes_written, 0))
     {
       if (GetLastError () == ERROR_DISK_FULL && bytes_written > 0)
 	return bytes_written;
@@ -359,6 +359,20 @@ fhandler_base::get_default_fmode (int flags)
 	  }
     }
   return fmode;
+}
+
+bool
+fhandler_base::device_access_denied (int flags)
+{
+  int mode = 0;
+  if (flags & O_RDWR)
+    mode |= R_OK | W_OK;
+  if (flags & (O_WRONLY | O_APPEND))
+    mode |= W_OK;
+  if (!mode)
+    mode |= R_OK;
+
+  return ::access (get_win32_name (), mode);
 }
 
 /* Open system call handler function. */
@@ -425,7 +439,7 @@ fhandler_base::open (path_conv *pc, int flags, mode_t mode)
     file_attributes |= FILE_FLAG_OVERLAPPED;
 
 #ifdef HIDDEN_DOT_FILES
-  if (flags & O_CREAT && get_device () == FH_DISK)
+  if (flags & O_CREAT && get_device () == FH_FS)
     {
       char *c = strrchr (get_win32_name (), '\\');
       if ((c && c[1] == '.') || *get_win32_name () == '.')
@@ -449,7 +463,7 @@ fhandler_base::open (path_conv *pc, int flags, mode_t mode)
 
   /* If the file should actually be created and ntsec is on,
      set files attributes. */
-  if (flags & O_CREAT && get_device () == FH_DISK && allow_ntsec && has_acls ())
+  if (flags & O_CREAT && get_device () == FH_FS && allow_ntsec && has_acls ())
     set_security_attribute (mode, &sa, alloca (4096), 4096);
 
   x = CreateFile (get_win32_name (), access, shared, &sa, creation_distribution,
@@ -481,7 +495,7 @@ fhandler_base::open (path_conv *pc, int flags, mode_t mode)
   /* Attributes may be set only if a file is _really_ created.
      This code is now only used for ntea here since the files
      security attributes are set in CreateFile () now. */
-  if (flags & O_CREAT && get_device () == FH_DISK
+  if (flags & O_CREAT && get_device () == FH_FS
       && GetLastError () != ERROR_ALREADY_EXISTS
       && !allow_ntsec && allow_ntea)
     set_file_attribute (has_acls (), get_win32_name (), mode);
@@ -617,15 +631,15 @@ fhandler_base::write (const void *ptr, size_t len)
   int res;
 
   if (get_append_p ())
-    SetFilePointer (get_handle (), 0, 0, FILE_END);
+    SetFilePointer (get_output_handle (), 0, 0, FILE_END);
   else if (wincap.has_lseek_bug () && get_check_win95_lseek_bug ())
     {
       /* Note: this bug doesn't happen on NT4, even though the documentation
 	 for WriteFile() says that it *may* happen on any OS. */
       int actual_length, current_position;
       set_check_win95_lseek_bug (0); /* don't do it again */
-      actual_length = GetFileSize (get_handle (), NULL);
-      current_position = SetFilePointer (get_handle (), 0, 0, FILE_CURRENT);
+      actual_length = GetFileSize (get_output_handle (), NULL);
+      current_position = SetFilePointer (get_output_handle (), 0, 0, FILE_CURRENT);
       if (current_position > actual_length)
 	{
 	  /* Oops, this is the bug case - Win95 uses whatever is on the disk
@@ -634,20 +648,20 @@ fhandler_base::write (const void *ptr, size_t len)
 	  char zeros[512];
 	  int number_of_zeros_to_write = current_position - actual_length;
 	  memset (zeros, 0, 512);
-	  SetFilePointer (get_handle (), 0, 0, FILE_END);
+	  SetFilePointer (get_output_handle (), 0, 0, FILE_END);
 	  while (number_of_zeros_to_write > 0)
 	    {
 	      DWORD zeros_this_time = (number_of_zeros_to_write > 512
 				     ? 512 : number_of_zeros_to_write);
 	      DWORD written;
-	      if (!WriteFile (get_handle (), zeros, zeros_this_time, &written,
+	      if (!WriteFile (get_output_handle (), zeros, zeros_this_time, &written,
 			      NULL))
 		{
 		  __seterrno ();
 		  if (get_errno () == EPIPE)
 		    raise (SIGPIPE);
 		  /* This might fail, but it's the best we can hope for */
-		  SetFilePointer (get_handle (), current_position, 0, FILE_BEGIN);
+		  SetFilePointer (get_output_handle (), current_position, 0, FILE_BEGIN);
 		  return -1;
 
 		}
@@ -655,7 +669,7 @@ fhandler_base::write (const void *ptr, size_t len)
 		{
 		  set_errno (ENOSPC);
 		  /* This might fail, but it's the best we can hope for */
-		  SetFilePointer (get_handle (), current_position, 0, FILE_BEGIN);
+		  SetFilePointer (get_output_handle (), current_position, 0, FILE_BEGIN);
 		  return -1;
 		}
 	      number_of_zeros_to_write -= written;
@@ -967,9 +981,13 @@ rootdir (char *full_path)
 }
 
 int __stdcall
-fhandler_base::fstat (struct __stat64 *buf, path_conv *)
+fhandler_base::fstat (struct __stat64 *buf, path_conv *pc)
 {
   debug_printf ("here");
+
+  if (is_fs_special ())
+    return fstat_fs (buf, pc);
+
   switch (get_device ())
     {
     case FH_PIPE:
@@ -1157,8 +1175,8 @@ fhandler_base::operator delete (void *p)
 }
 
 /* Normal I/O constructor */
-fhandler_base::fhandler_base (DWORD devtype, int unit):
-  status (devtype),
+fhandler_base::fhandler_base ():
+  status (0),
   access (0),
   io_handle (NULL),
   namehash (0),
@@ -1191,7 +1209,7 @@ fhandler_base::~fhandler_base (void)
 /* /dev/null */
 
 fhandler_dev_null::fhandler_dev_null () :
-	fhandler_base (FH_NULL)
+	fhandler_base ()
 {
 }
 

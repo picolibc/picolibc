@@ -14,6 +14,8 @@ details. */
 #include "thread.h"
 
 class suffix_info;
+class fhandler_fifo;
+
 class dtable
 {
   fhandler_base **fds;
@@ -48,10 +50,10 @@ public:
   void fixup_before_exec (DWORD win_proc_id);
   void fixup_before_fork (DWORD win_proc_id);
   void fixup_after_fork (HANDLE);
-  fhandler_base *build_fhandler (int fd, DWORD dev, const char *unix_name,
-				 const char *win32_name = NULL, int unit = -1);
-  fhandler_base *build_fhandler (int fd, DWORD dev, char *unix_name = NULL,
-				 const char *win32_name = NULL, int unit = -1);
+  fhandler_base *build_fhandler (int fd, const device& dev, const char *unix_name,
+				 const char *win32_name = NULL);
+  fhandler_base *build_fhandler (int fd, const device& dev, char *unix_name = NULL,
+				 const char *win32_name = NULL);
   fhandler_base *build_fhandler_from_name (int fd, const char *name, HANDLE h,
 					   path_conv& pc,
 					   unsigned opts = PC_SYM_FOLLOW,
@@ -80,6 +82,7 @@ public:
   void get_debugger_info ();
   void set_file_pointers_for_exec ();
   bool in_vfork_cleanup () {return fds_on_hold == fds;}
+  fhandler_fifo *find_fifo (ATOM);
 };
 
 void dtable_init (void);

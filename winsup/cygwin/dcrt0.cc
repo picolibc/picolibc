@@ -551,6 +551,7 @@ dll_crt0_1 ()
 
   /* Set the os_being_run global. */
   wincap.init ();
+  device::init ();
   check_sanity_and_sync (user_data);
 
   do_global_ctors (&__CTOR_LIST__, 1);

@@ -30,6 +30,11 @@ details. */
 #define _COMPILING_NEWLIB
 #include <dirent.h>
 
+/* The fhandler_base stat calls and helpers are actually only
+   applicable to files on disk.  However, they are part of the
+   base class so that on-disk device files can also access them
+   as appropriate.  */
+
 static int __stdcall
 num_entries (const char *win32_name)
 {
@@ -60,7 +65,7 @@ num_entries (const char *win32_name)
 }
 
 int __stdcall
-fhandler_disk_file::fstat_by_handle (struct __stat64 *buf, path_conv *pc)
+fhandler_base::fstat_by_handle (struct __stat64 *buf, path_conv *pc)
 {
   int res = 0;
   BY_HANDLE_FILE_INFORMATION local;
@@ -74,6 +79,7 @@ fhandler_disk_file::fstat_by_handle (struct __stat64 *buf, path_conv *pc)
       if (local.dwVolumeSerialNumber && (long) local.dwVolumeSerialNumber != -1)
 	break;
     }
+
   debug_printf ("%d = GetFileInformationByHandle (%s, %d)",
 		res, get_win32_name (), get_handle ());
   if (res == 0)
@@ -96,11 +102,9 @@ fhandler_disk_file::fstat_by_handle (struct __stat64 *buf, path_conv *pc)
 }
 
 int __stdcall
-fhandler_disk_file::fstat_by_name (struct __stat64 *buf, path_conv *pc)
+fhandler_base::fstat_by_name (struct __stat64 *buf, path_conv *pc)
 {
   int res;
-  HANDLE handle;
-  WIN32_FIND_DATA local;
 
   if (!pc->exists ())
     {
@@ -125,28 +129,30 @@ fhandler_disk_file::fstat_by_name (struct __stat64 *buf, path_conv *pc)
 	  name = drivebuf;
 	}
 
-      if ((handle = FindFirstFile (name, &local)) == INVALID_HANDLE_VALUE)
-      {
-	debug_printf ("FindFirstFile failed for '%s', %E", name);
-	__seterrno ();
-	res = -1;
-      }
-    else
-      {
-	FindClose (handle);
-	res = fstat_helper (buf, pc,
-			    local.ftCreationTime,
-			    local.ftLastAccessTime,
-			    local.ftLastWriteTime,
-			    local.nFileSizeHigh,
-			    local.nFileSizeLow);
-      }
+      HANDLE h;
+      WIN32_FIND_DATA local;
+      if ((h = FindFirstFile (name, &local)) == INVALID_HANDLE_VALUE)
+	{
+	  debug_printf ("FindFirstFile failed for '%s', %E", name);
+	  __seterrno ();
+	  res = -1;
+	}
+      else
+	{
+	  FindClose (h);
+	  res = fstat_helper (buf, pc,
+			      local.ftCreationTime,
+			      local.ftLastAccessTime,
+			      local.ftLastWriteTime,
+			      local.nFileSizeHigh,
+			      local.nFileSizeLow);
+	}
     }
   return res;
 }
 
 int __stdcall
-fhandler_disk_file::fstat (struct __stat64 *buf, path_conv *pc)
+fhandler_base::fstat_fs (struct __stat64 *buf, path_conv *pc)
 {
   int res = -1;
   int oret;
@@ -172,7 +178,7 @@ fhandler_disk_file::fstat (struct __stat64 *buf, path_conv *pc)
   if (query_open_already && strncasematch (pc->volname (), "FAT", 3)
       && !strpbrk (get_win32_name (), "?*|<>"))
     oret = 0;
-  else if (!(oret = open (pc, open_flags, 0)))
+  else if (!(oret = open_fs (pc, open_flags, 0)))
     {
       int ntsec_atts = 0;
       /* If we couldn't open the file, try a "query open" with no permissions.
@@ -200,22 +206,22 @@ fhandler_disk_file::fstat (struct __stat64 *buf, path_conv *pc)
   else
     {
       res = fstat_by_handle (buf, pc);
-      close ();
+      close_fs ();
     }
 
   return res;
 }
 
 int __stdcall
-fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
-				  FILETIME ftCreationTime,
-				  FILETIME ftLastAccessTime,
-				  FILETIME ftLastWriteTime,
-				  DWORD nFileSizeHigh,
-				  DWORD nFileSizeLow,
-				  DWORD nFileIndexHigh,
-				  DWORD nFileIndexLow,
-				  DWORD nNumberOfLinks)
+fhandler_base::fstat_helper (struct __stat64 *buf, path_conv *pc,
+			     FILETIME ftCreationTime,
+			     FILETIME ftLastAccessTime,
+			     FILETIME ftLastWriteTime,
+			     DWORD nFileSizeHigh,
+			     DWORD nFileSizeLow,
+			     DWORD nFileIndexHigh,
+			     DWORD nFileIndexLow,
+			     DWORD nNumberOfLinks)
 {
   /* This is for FAT filesystems, which don't support atime/ctime */
   if (ftLastAccessTime.dwLowDateTime == 0
@@ -297,6 +303,11 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
 	/* nothing */;
       else if (pc->issocket ())
 	buf->st_mode |= S_IFSOCK;
+      else if (is_fs_special ())
+	{
+	  buf->st_dev = dev;
+	  buf->st_mode = dev.mode;
+	}
       else
 	{
 	  buf->st_mode |= S_IFREG;
@@ -345,18 +356,25 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
   return 0;
 }
 
-fhandler_disk_file::fhandler_disk_file (DWORD devtype) :
-  fhandler_base (devtype)
+int __stdcall
+fhandler_disk_file::fstat (struct __stat64 *buf, path_conv *pc)
 {
+  return fstat_fs (buf, pc);
 }
 
 fhandler_disk_file::fhandler_disk_file () :
-  fhandler_base (FH_DISK)
+  fhandler_base ()
 {
 }
 
 int
 fhandler_disk_file::open (path_conv *real_path, int flags, mode_t mode)
+{
+  return open_fs (real_path, flags, mode);
+}
+
+int
+fhandler_base::open_fs (path_conv *real_path, int flags, mode_t mode)
 {
   if (real_path->case_clash && flags & O_CREAT)
     {
@@ -381,7 +399,7 @@ fhandler_disk_file::open (path_conv *real_path, int flags, mode_t mode)
   if (real_path->has_buggy_open () && !real_path->exists ())
     {
       debug_printf ("Buggy open detected.");
-      close ();
+      close_fs ();
       set_errno (ENOENT);
       return 0;
     }
@@ -399,25 +417,26 @@ out:
 int
 fhandler_disk_file::close ()
 {
+  return close_fs ();
+}
+
+int
+fhandler_base::close_fs ()
+{
   int res = this->fhandler_base::close ();
   if (!res)
     cygwin_shared->delqueue.process_queue ();
   return res;
 }
 
-/*
- * FIXME !!!
- * The correct way to do this to get POSIX locking
- * semantics is to keep a linked list of posix lock
- * requests and map them into Win32 locks. The problem
- * is that Win32 does not deal correctly with overlapping
- * lock requests. Also another pain is that Win95 doesn't do
- * non-blocking or non exclusive locks at all. For '95 just
- * convert all lock requests into blocking,exclusive locks.
- * This shouldn't break many apps but denying all locking
- * would.
- * For now just convert to Win32 locks and hope for the best.
- */
+/* FIXME: The correct way to do this to get POSIX locking semantics is to
+   keep a linked list of posix lock requests and map them into Win32 locks.
+   he problem is that Win32 does not deal correctly with overlapping lock
+   requests. Also another pain is that Win95 doesn't do non-blocking or
+   non-exclusive locks at all. For '95 just convert all lock requests into
+   blocking,exclusive locks.  This shouldn't break many apps but denying all
+   locking would.  For now just convert to Win32 locks and hope for
+   the best.  */
 
 int
 fhandler_disk_file::lock (int cmd, struct flock *fl)
@@ -665,7 +684,7 @@ fhandler_disk_file::readdir (DIR *dir)
 	  strcpy (fbuf, dir->__d_dirname);
 	  strcpy (fbuf + strlen (fbuf) - 1, dir->__d_dirent->d_name);
 	  path_conv fpath (fbuf, PC_SYM_NOFOLLOW);
-	  if (fpath.issymlink ())
+	  if (fpath.issymlink () || fpath.isspecial ())
 	    c[len - 4] = '\0';
 	}
     }
@@ -717,8 +736,8 @@ fhandler_disk_file::closedir (DIR *dir)
   return 0;
 }
 
-fhandler_cygdrive::fhandler_cygdrive (int unit) :
-  fhandler_disk_file (FH_CYGDRIVE), unit (unit), ndrives (0), pdrive (NULL)
+fhandler_cygdrive::fhandler_cygdrive () :
+  fhandler_disk_file (), ndrives (0), pdrive (NULL)
 {
 }
 
