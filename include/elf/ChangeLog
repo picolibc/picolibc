@@ -1,3 +1,8 @@
+1999-09-02  Ulrich Drepper  <drepper@cygnus.com>
+
+	* hppa.h: Add HPUX specific dynamic and program header table
+	specific definitions.
+
 1999-08-31  Scott Bambrough <scottb@netwinder.org>
 
 	* common.h (NT_TASKSTRUCT): Define.

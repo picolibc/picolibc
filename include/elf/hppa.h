@@ -55,7 +55,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    compilation.  */
 #define SHN_PARISC_ANSI_COMMON 	0xff00
 
-/* A symbol that has been declared as a common block using the 
+/* A symbol that has been declared as a common block using the
    huge memory model.  */
 #define SHN_PARISC_HUGE_COMMON	0xff01
 
@@ -103,7 +103,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 START_RELOC_NUMBERS (elf_hppa_reloc_type)
      RELOC_NUMBER (R_PARISC_NONE,      0)	/* No reloc */
-     
+
      /* These relocation types do simple base + offset relocations.  */
 
      RELOC_NUMBER (R_PARISC_DIR32,  1)
@@ -118,14 +118,14 @@ START_RELOC_NUMBERS (elf_hppa_reloc_type)
        PCREL17C never reports a relocation error.
 
        When supporting argument relocations, function calls must be
-       accompanied by parameter relocation information.  This information is 
+       accompanied by parameter relocation information.  This information is
        carried in the ten high-order bits of the addend field.  The remaining
        22 bits of of the addend field are sign-extended to form the Addend.
 
-       Note the code to build argument relocations depends on the 
+       Note the code to build argument relocations depends on the
        addend being zero.  A consequence of this limitation is GAS
        can not perform relocation reductions for function symbols.  */
-     
+
     RELOC_NUMBER (R_PARISC_PCREL32, 9)
     RELOC_NUMBER (R_PARISC_PCREL21L, 10)
     RELOC_NUMBER (R_PARISC_PCREL17R, 11)
@@ -241,7 +241,7 @@ START_RELOC_NUMBERS (elf_hppa_reloc_type)
     RELOC_NUMBER (R_PARISC_LTOFF_FPTR16WF, 126)
     RELOC_NUMBER (R_PARISC_LTOFF_FPTR16DF, 127)
 
- 
+
     RELOC_NUMBER (R_PARISC_COPY, 128)
     RELOC_NUMBER (R_PARISC_IPLT, 129)
     RELOC_NUMBER (R_PARISC_EPLT, 130)
@@ -277,4 +277,45 @@ typedef enum elf_hppa_reloc_type elf_hppa_reloc_type;
 #define PT_PARISC_ARCHEXT	0x70000000
 #define PT_PARISC_UNWIND	0x70000001
 #define PF_PARISC_SBP		0x08000000
+
+/* Processor specific dynamic array tags.  */
+
+#define DT_HP_LOAD_MAP		(DT_LOOS + 0x0)
+#define DT_HP_DLD_FLAGS		(DT_LOOS + 0x1)
+#define DT_HP_DLD_HOOK		(DT_LOOS + 0x2)
+#define DT_HP_UX10_INIT		(DT_LOOS + 0x3)
+#define DT_HP_UX10_INITSZ	(DT_LOOS + 0x4)
+#define DT_HP_PREINIT		(DT_LOOS + 0x5)
+#define DT_HP_PREINITSZ		(DT_LOOS + 0x6)
+#define DT_HP_NEEDED		(DT_LOOS + 0x7)
+#define DT_HP_TIME_STAMP	(DT_LOOS + 0x8)
+#define DT_HP_CHECKSUM		(DT_LOOS + 0x9)
+
+/* Values for DT_HP_DLD_FLAGS.  */
+#define DT_HP_DEBUG_PRIVATE		0x0001 /* Map text private */
+#define DT_HP_DEBUG_CALLBACK		0x0002 /* Callback */
+#define DT_HP_DEBUG_CALLBACK_BOR	0x0004 /* BOR callback */
+#define DT_HP_NO_ENVVAR			0x0008 /* No env var */
+#define DT_HP_BIND_NOW			0x0010 /* Bind now */
+#define DT_HP_BIND_NONFATAL		0x0020 /* Bind non-fatal */
+#define DT_HP_BIND_VERBOSE		0x0040 /* Bind verbose */
+#define DT_HP_BIND_RESTRICTED		0x0080 /* Bind restricted */
+#define DT_HP_BIND_SYMBOLIC		0x0100 /* Bind symbolic */
+#define DT_HP_RPATH_FIRST		0x0200 /* RPATH first */
+#define DT_HP_BIND_DEPTH_FIRST		0x0400 /* Bind depth-first */
+
+/* Program header extensions.  */
+#define PT_HP_TLS		(PT_LOOS + 0x0)
+#define PT_HP_CORE_NONE		(PT_LOOS + 0x1)
+#define PT_HP_CORE_VERSION	(PT_LOOS + 0x2)
+#define PT_HP_CORE_KERNEL	(PT_LOOS + 0x3)
+#define PT_HP_CORE_COMM		(PT_LOOS + 0x4)
+#define PT_HP_CORE_PROC		(PT_LOOS + 0x5)
+#define PT_HP_CORE_LOADABLE	(PT_LOOS + 0x6)
+#define PT_HP_CORE_STACK	(PT_LOOS + 0x7)
+#define PT_HP_CORE_SHM		(PT_LOOS + 0x8)
+#define PT_HP_CORE_MMF		(PT_LOOS + 0x9)
+#define PT_HP_PARALLEL		(PT_LOOS + 0x10)
+#define PT_HP_FASTBIND		(PT_LOOS + 0x11)
+
 #endif /* _ELF_HPPA_H */
