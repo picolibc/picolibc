@@ -1,3 +1,12 @@
+2002-07-09  Christopher Faylor  <cgf@redhat.com>
+
+	* debug.cc: Avoid explicit zeroing of globals.
+	(lock_debug): Make locker a static member.  Avoid unlocking when
+	already unlocked (from Conrad Scott).
+	(debug_init): Initialize lock_debug::locker here.
+	* fork.cc (fork_child): Fix up fdtab earlier to avoid some (but not
+	all) confusion with close-on-exec craziness.
+
 2002-07-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_socket::is_unconnected): Constify.
@@ -748,6 +757,49 @@
 2002-06-26  Christopher Faylor  <cgf@redhat.com>
 
 	* include/cygwin/version.h: Bump DLL minor number.
+
+2002-06-25  Thomas Pfaff  <tpfaff@gmx.net>
+
+        * include/pthread.h (PTHREAD_CANCELED): Defined a reasonable
+        value.
+	* pthread.cc (pthread_exit): Call method instead of function.
+	(pthread_setcancelstate): Ditto.
+	(pthread_setcanceltype): Ditto.
+	(pthread_testcancel): Ditto.
+	* thread.h (pthread::cancel_event): New member.
+        (__pthread_cancel_self): New prototype.
+	(pthread::exit): New Method.
+	(pthread::cancel): Ditto.
+	(pthread::testcancel): Ditto.
+	(pthread::cancel_self): Ditto.
+	(pthread::static_cancel_self): Ditto.
+	(pthread::setcancelstate): Ditto.
+	(pthread::setcanceltype): Ditto.
+	(__pthread_cancel): Give c++ linkage.
+	(__pthread_exit): Remove.
+	(__pthread_setcancelstate): Ditto.
+	(__pthread_setcanceltype): Ditto.
+	(__pthread_testcancel): Ditto.
+	 * thread.cc (pthread::pthread): Inititialize cancel_event.
+	(pthread::~pthread): Close cancel_event if needed.
+	(pthread::create): Create cancel_event.
+	(pthread::exit): New method. Replacement for __pthread_exit.
+	(pthread::cancel): New method.
+	(pthread::testcancel): Ditto.
+	(pthread::static_cancel_self); New static method.
+	(pthread::setcancelstate): New method. Replacement for
+	__pthread_setcancelstate.
+	(pthread::setcanceltype): New method. Replacement for
+	__pthread_setcanceltype.
+	(pthread::pop_cleanup_handler): Added lock for async cancel safe
+	cancellation.
+	(pthread::thread_init_wrapper): Change __pthread_exit to
+	thread->exit().
+	(__pthread_cancel): Call method thread->cancel().
+	(__pthread_exit): Remove.
+	(__pthread_setcancelstate): Ditto.
+	(__pthread_setcanceltype): Ditto.
+	(__pthread_testcancel): Ditto.
 
 2002-06-25  Christopher Faylor  <cgf@redhat.com>
 

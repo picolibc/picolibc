@@ -176,27 +176,45 @@ typedef struct _h
     struct _h *next;
   } handle_list;
 
-static NO_COPY handle_list starth = {0, NULL, NULL, NULL, 0, 0, NULL};
-static NO_COPY handle_list *endh = NULL;
+static NO_COPY handle_list starth;
+static NO_COPY handle_list *endh;
 
-static handle_list NO_COPY freeh[1000] = {{0, NULL, NULL, NULL, 0, 0, NULL}};
+static NO_COPY handle_list freeh[1000];
 #define NFREEH (sizeof (freeh) / sizeof (freeh[0]))
 
-static muto NO_COPY *debug_lock = NULL;
+void debug_init ();
 
-struct lock_debug
+class lock_debug
 {
-  lock_debug () {if (debug_lock) debug_lock->acquire (INFINITE);}
-  void unlock () {if (debug_lock) debug_lock->release ();}
+  static muto *locker;
+  bool acquired;
+ public:
+  lock_debug () : acquired (0)
+  {
+    if (locker)
+      acquired = !!locker->acquire (INFINITE);
+  }
+  void unlock ()
+  {
+    if (locker && acquired)
+      {
+	locker->release ();
+	acquired = false;
+      }
+  }
   ~lock_debug () {unlock ();}
+  friend void debug_init ();
 };
+
+muto NO_COPY *lock_debug::locker = NULL;
 
 static bool __stdcall mark_closed (const char *, int, HANDLE, const char *, BOOL);
 
 void
 debug_init ()
 {
-  new_muto (debug_lock);
+  muto *debug_lock_muto;
+  lock_debug::locker = new_muto (debug_lock_muto);
 }
 
 /* Find a registered handle in the linked list of handles. */
@@ -296,6 +314,7 @@ delete_handle (handle_list *hl)
 void
 debug_fixup_after_fork ()
 {
+  /* No lock needed at this point */
   handle_list *hl;
   for (hl = &starth; hl->next != NULL; hl = hl->next)
     if (hl->next->clexec_pid)

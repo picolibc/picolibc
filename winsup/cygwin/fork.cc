@@ -243,7 +243,6 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
     }
 
   sync_with_parent ("after longjmp.", TRUE);
-  ProtectHandle (hParent);
   sigproc_printf ("hParent %p, child 1 first_dll %p, load_dlls %d\n", hParent,
 		  first_dll, load_dlls);
 
@@ -275,9 +274,11 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
 
   MALLOC_CHECK;
 
+  cygheap->fdtab.fixup_after_fork (hParent);
+  ProtectHandle (hParent);
+
   debug_fixup_after_fork ();
   pinfo_fixup_after_fork ();
-  cygheap->fdtab.fixup_after_fork (hParent);
   signal_fixup_after_fork ();
 
   MALLOC_CHECK;
