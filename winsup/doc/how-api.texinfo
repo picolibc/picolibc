@@ -58,7 +58,7 @@ binary mode and tools that deal with text files (e.g. bash) operate in
 text mode.
 
 Some people push the notion of globally setting the default processing
-mode to binary via mount point options or by setting the CYGWIN32
+mode to binary via mount point options or by setting the CYGWIN
 environment variable.  But that creates a different problem.  In
 binary mode, the program receives all of the data in the file, including
 a \r.  Since the programs will no longer deal with these properly for
