@@ -23,7 +23,11 @@ _memcpy:
 	bne	byteloop
 
 wordloop:
+#ifdef __NORMAL_MODE__
+	sub	#2,A1P
+#else
 	subs	#2,A1P		; point to word
+#endif
 	mov.w	@A1P,A2		; get word
 	mov.w	A2,@-A0P	; save word
 	CMPP	A0P,A3P		; at the front again ?
@@ -31,7 +35,11 @@ wordloop:
 	rts
 
 byteloop:
+#ifdef __NORMAL_MODE__
+	sub	#1,A1P
+#else
 	subs	#1,A1P		; point to byte
+#endif
 	mov.b	@A1P,A2L	; get byte
 	mov.b	A2L,@-A0P	; save byte
 	CMPP	A0P,A3P 	; at the front again ?

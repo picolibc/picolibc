@@ -14,7 +14,11 @@ _strcmp:
 	mov.b	@A3P+,A0L
 	cmp.b	A0L,A1L
 	beq	.L5
+#ifdef __NORMAL_MODE__
+	sub	#1,A3P
+#else
 	subs	#1,A3P
+#endif
 .L3:
 	mov.b	@(-1,A2P),A0L
 	mov.b	@A3P,A1L

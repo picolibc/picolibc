@@ -28,6 +28,7 @@
 #define S2H r6h
 
 #ifdef __H8300__
+
 #define MOVP	mov.w	/* pointers are 16 bits */
 #define ADDP	add.w
 #define CMPP	cmp.w
@@ -41,9 +42,29 @@
 #define S0P	r4
 #define S1P	r5
 #define S2P	r6
-#endif
+
+#endif /* __H8300__ */
 
 #ifdef __H8300H__
+
+#ifdef __NORMAL_MODE__
+
+#define MOVP	mov.w	/* pointers are 16 bits */
+#define ADDP	add.w
+#define CMPP	cmp.w
+#define PUSHP	push
+#define POPP	pop
+
+#define A0P	r0
+#define A1P	r1
+#define A2P	r2
+#define A3P	r3
+#define S0P	r4
+#define S1P	r5
+#define S2P	r6
+
+#else /* !__NORMAL_MODE__ */
+
 #define MOVP	mov.l	/* pointers are 32 bits */
 #define ADDP	add.l
 #define CMPP	cmp.l
@@ -58,13 +79,35 @@
 #define S1P	er5
 #define S2P	er6
 
+#endif /* !__NORMAL_MODE__ */
+
 #define A0E	e0
 #define A1E	e1
 #define A2E	e2
 #define A3E	e3
-#endif
+
+#endif /* __H8300H__ */
 
 #ifdef __H8300S__
+
+#ifdef __NORMAL_MODE__
+
+#define MOVP	mov.w	/* pointers are 16 bits */
+#define ADDP	add.w
+#define CMPP	cmp.w
+#define PUSHP	push
+#define POPP	pop
+
+#define A0P	r0
+#define A1P	r1
+#define A2P	r2
+#define A3P	r3
+#define S0P	r4
+#define S1P	r5
+#define S2P	r6
+
+#else /* !__NORMAL_MODE__ */
+
 #define MOVP	mov.l	/* pointers are 32 bits */
 #define ADDP	add.l
 #define CMPP	cmp.l
@@ -79,8 +122,11 @@
 #define S1P	er5
 #define S2P	er6
 
+#endif /* !__NORMAL_MODE__ */
+
 #define A0E	e0
 #define A1E	e1
 #define A2E	e2
 #define A3E	e3
-#endif
+
+#endif /* __H8300S__ */

@@ -1,3 +1,13 @@
+2003-11-20 Dhananjay Deshpande <dhananjayd@kpitcummins.com> 
+
+	* libc/machine/h8300/defines.h : Correct pointer register defines 
+	for normal mode.
+	* libc/machine/h8300/memcpy.S : Use add/sub instead of adds/subs 
+	for normal mode.
+	* libc/machine/h8300/reg_memcpy.S : Likewise.
+	* libc/machine/h8300/reg_memset.S : Likewise.
+	* libc/machine/h8300/strcmp.S : Likewise.
+
 2003-11-19  Nicholas Wourms  <nwourms@netscape.net>
 
 	* configure.host: Enable positional arguments for printf

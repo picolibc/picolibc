@@ -14,8 +14,12 @@ ___reg_memcpy:
 	CMPP	A0P,A3P	; see if anything to do
 	beq	quit
 
-
-loop:	subs	#1,A1P		; point to byte
+loop:
+#ifdef __NORMAL_MODE__
+	sub     #1,A1P		; point to byte
+#else
+	subs    #1,A1P          ; point to byte
+#endif
 	mov.b	@A1P,A2L	; get byte
 	mov.b	A2L,@-A0P	; save byte
 	CMPP	A0P,A3P 	; at the front again ?
