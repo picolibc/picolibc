@@ -536,6 +536,10 @@ dtable::fixup_after_fork (HANDLE parent)
 	    debug_printf ("fd %d (%s)", i, fh->get_name ());
 	    fh->fixup_after_fork (parent);
 	  }
+	if (i == 0)
+	  SetStdHandle (std_consts[i], fh->get_io_handle ());
+	else if (i <= 2)
+	  SetStdHandle (std_consts[i], fh->get_output_handle ());
       }
 }
 

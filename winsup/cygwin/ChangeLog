@@ -1,3 +1,8 @@
+Sun Sep  9 22:11:27 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* dtable.cc (dtable::fixup_after_fork): Use SetStdHandle appropriately
+	on inherited fds.
+
 Sun Sep  9 20:09:11 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* sigproc.cc (NZOMBIES): Reduce substantially to minimize memory use.
