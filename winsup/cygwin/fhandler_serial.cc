@@ -189,7 +189,7 @@ fhandler_serial::raw_write (const void *ptr, size_t len)
     }
 
   ForceCloseHandle(write_status.hEvent);
- 
+
   return bytes_written;
 
 err:

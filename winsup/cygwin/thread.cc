@@ -44,6 +44,7 @@ details. */
 #include "security.h"
 #include <semaphore.h>
 #include <stdio.h>
+#include <sys/timeb.h>
 
 extern int threadsafe;
 
@@ -396,7 +397,7 @@ pthread_cond::pthread_cond (pthread_condattr * attr):verifyable_object (PTHREAD_
 				     NULL /* no name */);
   /* TODO: make a shared mem mutex if out attributes request shared mem cond */
   cond_access=NULL;
-  if ((temperr = pthread_mutex_init (&this->cond_access, NULL))) 
+  if ((temperr = pthread_mutex_init (&this->cond_access, NULL)))
     {
       system_printf ("couldn't init mutex, this %0p errno=%d\n", this, temperr);
       /* we need the mutex for correct behaviour */
@@ -420,12 +421,12 @@ pthread_cond::BroadCast ()
   if (pthread_mutex_lock (&cond_access))
     system_printf ("Failed to lock condition variable access mutex, this %0p\n", this);
   int count = waiting;
-  if (!verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC)) 
+  if (!verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC))
     {
       if (pthread_mutex_unlock (&cond_access))
-        system_printf ("Failed to unlock condition variable access mutex, this %0p\n", this);
-      /* This isn't and API error - users are allowed to call this when no threads 
-	 are waiting 
+	system_printf ("Failed to unlock condition variable access mutex, this %0p\n", this);
+      /* This isn't and API error - users are allowed to call this when no threads
+	 are waiting
 	 system_printf ("Broadcast called with invalid mutex\n");
       */
       return;
@@ -444,8 +445,8 @@ pthread_cond::Signal ()
   if (!verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC))
     {
       if (pthread_mutex_unlock (&cond_access))
-        system_printf ("Failed to unlock condition variable access mutex, this %0p\n",
-                       this);
+	system_printf ("Failed to unlock condition variable access mutex, this %0p\n",
+		       this);
       return;
     }
   PulseEvent (win32_obj_id);
@@ -472,6 +473,7 @@ pthread_cond::TimedWait (DWORD dwMilliseconds)
     case WAIT_FAILED:
       return 0;			/* POSIX doesn't allow errors after we modify the mutex state */
     case WAIT_ABANDONED:
+    case WAIT_TIMEOUT:
       return ETIMEDOUT;
     case WAIT_OBJECT_0:
       return 0;			/* we have been signaled */
@@ -580,23 +582,23 @@ pthread_mutex::pthread_mutex (pthread_mutex_t *mutex, pthread_mutexattr * attr):
       char stringbuf[29];
       unsigned short id = 1;
       while (id < 256)
-        {
-          snprintf (stringbuf, 29, "CYGWINMUTEX0x%0x", id & 0x000f);
-          system_printf ("name of mutex to create %s\n",stringbuf);
-          this->win32_obj_id =::CreateMutex (&sec_none_nih, false, stringbuf);
-          if (this->win32_obj_id && GetLastError () != ERROR_ALREADY_EXISTS)
-            {
-              MT_INTERFACE->pshared_mutexs[id] = this;
+	{
+	  snprintf (stringbuf, 29, "CYGWINMUTEX0x%0x", id & 0x000f);
+	  system_printf ("name of mutex to create %s\n",stringbuf);
+	  this->win32_obj_id =::CreateMutex (&sec_none_nih, false, stringbuf);
+	  if (this->win32_obj_id && GetLastError () != ERROR_ALREADY_EXISTS)
+	    {
+	      MT_INTERFACE->pshared_mutexs[id] = this;
 	      pshared_mutex *pmutex=(pshared_mutex *)(mutex);
 	      pmutex->id = id;
-              pmutex->flags = SYS_BASE;
+	      pmutex->flags = SYS_BASE;
 	      pshared = PTHREAD_PROCESS_SHARED;
 	      condwaits = 0;
 	      return;
 	    }
 	  id++;
 	  CloseHandle (win32_obj_id);
-        }
+	}
       magic = 0;
       win32_obj_id = NULL;
     }
@@ -605,7 +607,7 @@ pthread_mutex::pthread_mutex (pthread_mutex_t *mutex, pthread_mutexattr * attr):
       this->win32_obj_id =::CreateMutex (&sec_none_nih, false, NULL);
 
       if (!win32_obj_id)
-        magic = 0;
+	magic = 0;
       condwaits = 0;
       pshared = PTHREAD_PROCESS_PRIVATE;
     }
@@ -1636,7 +1638,7 @@ int
 __pthread_cond_timedwait (pthread_cond_t * cond, pthread_mutex_t * mutex,
 			  const struct timespec *abstime)
 {
-// and yes cond_access here is still open to a race. (we increment, context swap, 
+// and yes cond_access here is still open to a race. (we increment, context swap,
 // broadcast occurs -  we miss the broadcast. the functions aren't split properly.
   int rv;
   if (!abstime)
@@ -1654,16 +1656,23 @@ __pthread_cond_timedwait (pthread_cond_t * cond, pthread_mutex_t * mutex,
     return EINVAL;
   if (!verifyable_object_isvalid (*cond, PTHREAD_COND_MAGIC))
     return EINVAL;
+  struct timeb currSysTime;
+  long waitlength;
+  ftime(&currSysTime);
+  waitlength = (abstime->tv_sec - currSysTime.time) * 1000;
+  if (waitlength < 0)
+    return ETIMEDOUT;
 
+  /* if the cond variable is blocked, then the above timer test maybe wrong. *shrug* */
   if (pthread_mutex_lock (&(*cond)->cond_access))
     system_printf ("Failed to lock condition variable access mutex, this %0p\n", *cond);
 
   if ((*cond)->waiting)
     if ((*cond)->mutex && ((*cond)->mutex != (*themutex)))
       {
-        if (pthread_mutex_unlock (&(*cond)->cond_access))
-          system_printf ("Failed to unlock condition variable access mutex, this %0p\n", *cond);
-        return EINVAL;
+	if (pthread_mutex_unlock (&(*cond)->cond_access))
+	  system_printf ("Failed to unlock condition variable access mutex, this %0p\n", *cond);
+	return EINVAL;
       }
   InterlockedIncrement (&((*cond)->waiting));
 
@@ -1671,7 +1680,7 @@ __pthread_cond_timedwait (pthread_cond_t * cond, pthread_mutex_t * mutex,
   InterlockedIncrement (&((*themutex)->condwaits));
   if (pthread_mutex_unlock (&(*cond)->cond_access))
     system_printf ("Failed to unlock condition variable access mutex, this %0p\n", *cond);
-  rv = (*cond)->TimedWait (abstime->tv_sec * 1000);
+  rv = (*cond)->TimedWait (waitlength);
   (*cond)->mutex->Lock ();
   if (pthread_mutex_lock (&(*cond)->cond_access))
     system_printf ("Failed to lock condition variable access mutex, this %0p\n", *cond);
@@ -1708,9 +1717,9 @@ __pthread_cond_wait (pthread_cond_t * cond, pthread_mutex_t * mutex)
   if ((*cond)->waiting)
     if ((*cond)->mutex && ((*cond)->mutex != (*themutex)))
       {
-        if (pthread_mutex_unlock (&(*cond)->cond_access))
-          system_printf ("Failed to unlock condition variable access mutex, this %0p\n", *cond);
-        return EINVAL;
+	if (pthread_mutex_unlock (&(*cond)->cond_access))
+	  system_printf ("Failed to unlock condition variable access mutex, this %0p\n", *cond);
+	return EINVAL;
       }
   InterlockedIncrement (&((*cond)->waiting));
 
@@ -1856,11 +1865,11 @@ __pthread_mutex_init (pthread_mutex_t * mutex,
       mutex = __pthread_mutex_getpshared ((pthread_mutex_t *) mutex);
 
       if (!verifyable_object_isvalid (*mutex, PTHREAD_MUTEX_MAGIC))
-        {
-          delete throwaway;
-          *mutex = NULL;
-          return EAGAIN;
-        }
+	{
+	  delete throwaway;
+	  *mutex = NULL;
+	  return EAGAIN;
+	}
       return 0;
     }
   *mutex = new pthread_mutex (attr ? (*attr) : NULL);

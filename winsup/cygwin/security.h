@@ -109,7 +109,7 @@ public:
   BOOL add (const PSID nsid) { return add (nsid); }
   BOOL add (const char *sidstr)
     { cygsid nsi (sidstr); return add (nsi); }
-  
+
   BOOL operator+= (cygsid &si) { return add (si); }
   BOOL operator+= (const char *sidstr) { return add (sidstr); }
 

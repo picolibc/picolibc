@@ -268,9 +268,9 @@ get_logon_server_and_user_domain (char *logonserver, char *userdomain)
 static BOOL
 get_user_groups (WCHAR *wlogonserver, cygsidlist &grp_list, char *user)
 {
-  WCHAR wuser[UNLEN + 1]; 
+  WCHAR wuser[UNLEN + 1];
   sys_mbstowcs (wuser, user, UNLEN + 1);
-  LPGROUP_USERS_INFO_0 buf; 
+  LPGROUP_USERS_INFO_0 buf;
   DWORD cnt, tot;
   NET_API_STATUS ret;
 
@@ -443,7 +443,7 @@ get_group_sidlist (const char *logonserver, cygsidlist &grp_list,
   DWORD ulen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
   DWORD dlen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
   SID_NAME_USE use;
-  
+
   auth_pos = -1;
   sys_mbstowcs (wserver, logonserver, INTERNET_MAX_HOST_NAME_LENGTH + 1);
   if (!LookupAccountSid (NULL, usersid, user, &ulen, domain, &dlen, &use))
@@ -625,7 +625,7 @@ get_dacl (PACL acl, cygsid usersid, cygsidlist &grp_list)
     {
       __seterrno ();
       return FALSE;
-    } 
+    }
   if (grp_list.contains (well_known_admin_sid))
     {
       if (!AddAccessAllowedAce(acl, ACL_REVISION, GENERIC_ALL,
@@ -690,7 +690,7 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
   /* SE_CREATE_TOKEN_NAME privilege needed to call NtCreateToken. */
   if ((old_priv_state = set_process_privilege (SE_CREATE_TOKEN_NAME)) < 0)
     goto out;
-   
+ 
   /* Open policy object. */
   if ((lsa = open_local_policy ()) == INVALID_HANDLE_VALUE)
     goto out;
@@ -710,7 +710,7 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
   else
     {
       /* Switching user context to SYSTEM doesn't inherit the authentication
-         id of the user account running current process. */
+	 id of the user account running current process. */
       if (usersid != well_known_system_sid)
 	if (!GetTokenInformation (my_token, TokenStatistics,
 				  &stats, sizeof stats, &size))
@@ -719,9 +719,9 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
 	  auth_luid = stats.AuthenticationId;
 
       /* Retrieving current processes group list to be able to inherit
-         some important well known group sids. */
+	 some important well known group sids. */
       if (!GetTokenInformation (my_token, TokenGroups, NULL, 0, &size) &&
-          GetLastError () != ERROR_INSUFFICIENT_BUFFER)
+	  GetLastError () != ERROR_INSUFFICIENT_BUFFER)
 	debug_printf ("GetTokenInformation(my_token, TokenGroups): %E\n");
       else if (!(my_grps = (PTOKEN_GROUPS) malloc (size)))
 	debug_printf ("malloc (my_grps) failed.");
@@ -751,10 +751,10 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
     {
       grps->Groups[i].Sid = grpsids.sids[i];
       grps->Groups[i].Attributes = SE_GROUP_MANDATORY |
-                                   SE_GROUP_ENABLED_BY_DEFAULT |
-                                   SE_GROUP_ENABLED;
+				   SE_GROUP_ENABLED_BY_DEFAULT |
+				   SE_GROUP_ENABLED;
       if (auth_pos >= 0 && i == (DWORD) auth_pos)
-        grps->Groups[i].Attributes |= SE_GROUP_LOGON_ID;
+	grps->Groups[i].Attributes |= SE_GROUP_LOGON_ID;
     }
 
   /* Retrieve list of privileges of that user. */
@@ -780,7 +780,7 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
 
   /* Convert to primary token. */
   if (!DuplicateTokenEx (token, TOKEN_ALL_ACCESS, &sa,
-  			 SecurityImpersonation, TokenPrimary,
+			 SecurityImpersonation, TokenPrimary,
 			 &primary_token))
     __seterrno ();
 
@@ -879,7 +879,7 @@ subauth (struct passwd *pw)
   subbuf.auth.ParameterControl = 0 | (subauth_id << 24);
   /* Try to logon... */
   ret = LsaLogonUser(lsa_hdl, (PLSA_STRING) &origin, Network,
-  		     package_id, &subbuf, sizeof subbuf,
+		     package_id, &subbuf, sizeof subbuf,
 		     NULL, &ts, (PVOID *)&profile, &size,
 		     &luid, &user_token, &quota, &ret2);
   if (ret != STATUS_SUCCESS)
@@ -892,7 +892,7 @@ subauth (struct passwd *pw)
   LsaFreeReturnBuffer(profile);
   /* Convert to primary token. */
   if (!DuplicateTokenEx (user_token, TOKEN_ALL_ACCESS, &sa,
-  			 SecurityImpersonation, TokenPrimary,
+			 SecurityImpersonation, TokenPrimary,
 			 &primary_token))
     __seterrno ();
 
@@ -943,7 +943,7 @@ read_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd_size)
     }
 
   if (!GetFileSecurity (pfile,
-	 		OWNER_SECURITY_INFORMATION
+			OWNER_SECURITY_INFORMATION
 			 | GROUP_SECURITY_INFORMATION
 			 | DACL_SECURITY_INFORMATION,
 			 sd_buf, *sd_size, &len))

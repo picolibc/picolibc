@@ -68,7 +68,6 @@ public:
       return 1;
     return strncasematch (m->native_path, path, m->native_pathlen)
             && (path[m->native_pathlen] == '\\' || !path[m->native_pathlen]);
- 
   }
   const char *unchroot (const char *path)
   {

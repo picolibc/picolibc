@@ -5,7 +5,7 @@
 
    Written by Marco Fuykschot <marco@ddi.nl>
    Major update 2001 Robert Collins <rbtcollins@hotmail.com>
-   
+
 This file is part of Cygwin.
 
 This software is a copyrighted work licensed under the terms of the
@@ -268,11 +268,11 @@ public:
   int Lock ();
   int TryLock ();
   int UnLock ();
- 
-    pthread_mutex (unsigned short);
-    pthread_mutex (pthread_mutexattr *);
-    pthread_mutex (pthread_mutex_t *, pthread_mutexattr *);
-   ~pthread_mutex ();
+
+  pthread_mutex (unsigned short);
+  pthread_mutex (pthread_mutexattr *);
+  pthread_mutex (pthread_mutex_t *, pthread_mutexattr *);
+  ~pthread_mutex ();
 };
 
 class pthread_condattr:public verifyable_object
@@ -280,8 +280,8 @@ class pthread_condattr:public verifyable_object
 public:
   int shared;
 
-    pthread_condattr ();
-   ~pthread_condattr ();
+  pthread_condattr ();
+  ~pthread_condattr ();
 };
 
 class pthread_cond:public verifyable_object

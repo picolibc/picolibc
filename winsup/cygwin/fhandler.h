@@ -974,7 +974,6 @@ private:
   int audiobits_;
   int audiochannels_;
   bool setupwav(const char *pData, int nBytes);
-  
 public:
   fhandler_dev_dsp (const char *name = 0);
   ~fhandler_dev_dsp();

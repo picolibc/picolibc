@@ -1,11 +1,11 @@
 /* fhandler_dev_dsp: code to emulate OSS sound model /dev/dsp
- 
+
    Copyright 2001 Red Hat, Inc
- 
+
    Written by Andy Younger (andy@snoogie.demon.co.uk)
- 
+
 This file is part of Cygwin.
- 
+
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */

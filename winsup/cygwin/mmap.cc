@@ -428,7 +428,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
   if ((flags & MAP_PRIVATE) && (os_being_run == winNT || (prot & ~PROT_READ)))
     access = FILE_MAP_COPY;
 
-  SetResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
+  SetResourceLock(LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
 
 #if 0
   /* Windows 95 does not have fixed addresses */
@@ -452,7 +452,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
 	{
 	  set_errno (ENOMEM);
 	  syscall_printf ("-1 = mmap(): ENOMEM");
-	  ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
+	  ReleaseResourceLock(LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
 	  return MAP_FAILED;
 	}
     }
@@ -475,7 +475,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
 	{
 	  set_errno (EBADF);
 	  syscall_printf ("-1 = mmap(): EBADF");
-	  ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
+	  ReleaseResourceLock(LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
 	  return MAP_FAILED;
 	}
       fh = cygheap->fdtab[fd];
@@ -509,7 +509,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
 	  off = rec->map_map (off, len);
 	  caddr_t ret = rec->get_address () + off;
 	  syscall_printf ("%x = mmap() succeeded", ret);
-	  ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
+	  ReleaseResourceLock(LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
 	  return ret;
 	}
     }
@@ -518,7 +518,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
 
   if (h == INVALID_HANDLE_VALUE)
     {
-      ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
+      ReleaseResourceLock(LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
       return MAP_FAILED;
     }
 
@@ -541,7 +541,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
           fh->munmap (h, base, gran_len);
           set_errno (ENOMEM);
           syscall_printf ("-1 = mmap(): ENOMEM");
-          ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
+          ReleaseResourceLock(LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
           return MAP_FAILED;
         }
       l = mmapped_areas->add_list (l, fd);
@@ -552,7 +552,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
   off = rec->map_map (off, len);
   caddr_t ret = rec->get_address () + off;
   syscall_printf ("%x = mmap() succeeded", ret);
-  ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
+  ReleaseResourceLock(LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
   return ret;
 }
 
@@ -573,13 +573,13 @@ munmap (caddr_t addr, size_t len)
       return -1;
     }
 
-  SetResourceLock(LOCK_MMAP_LIST,WRITE_LOCK|READ_LOCK," munmap");
+  SetResourceLock(LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "munmap");
   /* Check if a mmap'ed area was ever created */
   if (mmapped_areas == NULL)
     {
       syscall_printf ("-1 = munmap(): mmapped_areas == NULL");
       set_errno (EINVAL);
-      ReleaseResourceLock(LOCK_MMAP_LIST,WRITE_LOCK|READ_LOCK," munmap");
+      ReleaseResourceLock(LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "munmap");
       return -1;
     }
 
@@ -605,7 +605,7 @@ munmap (caddr_t addr, size_t len)
 		  l->erase (li);
 		}
 	      syscall_printf ("0 = munmap(): %x", addr);
-	      ReleaseResourceLock(LOCK_MMAP_LIST,WRITE_LOCK|READ_LOCK," munmap");
+	      ReleaseResourceLock(LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "munmap");
 	      return 0;
 	    }
 	}
@@ -614,7 +614,7 @@ munmap (caddr_t addr, size_t len)
   set_errno (EINVAL);
   syscall_printf ("-1 = munmap(): EINVAL");
 
-  ReleaseResourceLock(LOCK_MMAP_LIST,WRITE_LOCK|READ_LOCK," munmap");
+  ReleaseResourceLock(LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "munmap");
   return -1;
 }
 
@@ -636,13 +636,13 @@ msync (caddr_t addr, size_t len, int flags)
       return -1;
     }
 
-  SetResourceLock(LOCK_MMAP_LIST,WRITE_LOCK|READ_LOCK," msync");
+  SetResourceLock(LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "msync");
   /* Check if a mmap'ed area was ever created */
   if (mmapped_areas == NULL)
     {
       syscall_printf ("-1 = msync(): mmapped_areas == NULL");
       set_errno (EINVAL);
-      ReleaseResourceLock(LOCK_MMAP_LIST,WRITE_LOCK|READ_LOCK," msync");
+      ReleaseResourceLock(LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "msync");
       return -1;
     }
 
@@ -668,7 +668,7 @@ msync (caddr_t addr, size_t len, int flags)
                   else
 		    syscall_printf ("0 = msync()");
 
-		  ReleaseResourceLock(LOCK_MMAP_LIST,WRITE_LOCK|READ_LOCK," msync");
+		  ReleaseResourceLock(LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "msync");
 		  return 0;
 		}
 	     }
@@ -679,7 +679,7 @@ msync (caddr_t addr, size_t len, int flags)
   set_errno (ENOMEM);
   syscall_printf ("-1 = msync(): ENOMEM");
 
-  ReleaseResourceLock(LOCK_MMAP_LIST,WRITE_LOCK|READ_LOCK," msync");
+  ReleaseResourceLock(LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "msync");
   return -1;
 }
 

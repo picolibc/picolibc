@@ -27,31 +27,30 @@
 /* for getpid */
 #include <unistd.h>
 
-
 /* Win32 priority to UNIX priority Mapping.
    For now, I'm just following the spec: any range of priorities is ok.
    There are probably many many issues with this...
-  
-   We don't want process's going realtime. Well, they probably could, but the issues 
+
+   We don't want process's going realtime. Well, they probably could, but the issues
    with avoiding the priority values 17-22 and 27-30 (not supported before win2k)
-   make that inefficient. 
+   make that inefficient.
    However to complicate things most unixes use lower is better priorities.
-  
-   So we map -14 to 15, and 15 to 1 via (16- ((n+16) >> 1)) 
+
+   So we map -14 to 15, and 15 to 1 via (16- ((n+16) >> 1))
    we then map 1 to 15 to various process class and thread priority combinations
-  
-   Then we need to look at the threads vi process priority. As win95 98 and NT 4 
+
+   Then we need to look at the threads vi process priority. As win95 98 and NT 4
    Don't support opening threads cross-process (unless a thread HANDLE is passed around)
-   for now, we'll just use the priority class. 
-  
+   for now, we'll just use the priority class.
+
    The code and logic are present to calculate the priority for thread
-   , if a thread handle can be obtained. Alternatively, if the symbols wouldn't be 
+   , if a thread handle can be obtained. Alternatively, if the symbols wouldn't be
    resolved until they are used
-   we could support this on windows 2000 and ME now, and just fall back to the 
+   we could support this on windows 2000 and ME now, and just fall back to the
    class only on pre win2000 machines.
-  
+
    Lastly, because we can't assume that the pid we're given are Windows pids, we can't
-   alter non-cygwin started programs. 
+   alter non-cygwin started programs.
 */
 
 extern "C"
@@ -95,9 +94,9 @@ valid_sched_parameters(const struct sched_param *param)
 
 /* get sched params for process
 
-   Note, I'm never returning EPERM, 
+   Note, I'm never returning EPERM,
    Always ESRCH. This is by design (If cygwin ever looks at paranoid security
-   Walking the pid values is a known hole in some os's) 
+   Walking the pid values is a known hole in some os's)
 */
 int
 sched_getparam (pid_t pid, struct sched_param *param)
@@ -222,7 +221,7 @@ sched_getparam (pid_t pid, struct sched_param *param)
     }
 
   /* reverse out winpri = (16- ((unixpri+16) >> 1)) */
-  /*  
+  /*
      winpri-16 = -  (unixpri +16 ) >> 1
 
      -(winpri-16) = unixpri +16 >> 1
@@ -238,7 +237,7 @@ sched_getparam (pid_t pid, struct sched_param *param)
 /* get the scheduler for pid
 
    All process's on WIN32 run with SCHED_FIFO.
-   So we just give an answer. 
+   So we just give an answer.
    (WIN32 uses a multi queue FIFO).
 */
 int
@@ -255,11 +254,11 @@ sched_getscheduler (pid_t pid)
    We can't return -11, errno ENOSYS, because that implies that
    sched_get_priority_max & min are also not supported (according to the spec)
    so some spec-driven autoconf tests will likely assume they aren't present either
-  
-   returning ESRCH might confuse some applications (if they assumed that when 
-   rr_get_interval is called on pid 0 it always works). 
-  
-   If someone knows the time quanta for the various win32 platforms, then a 
+
+   returning ESRCH might confuse some applications (if they assumed that when
+   rr_get_interval is called on pid 0 it always works).
+
+   If someone knows the time quanta for the various win32 platforms, then a
    simple check for the os we're running on will finish this function
 */
 int
@@ -408,8 +407,8 @@ sched_set_thread_priority(HANDLE thread, int priority)
   real_pri = 16 - ((priority + 16) >> 1);
   if (real_pri <1 || real_pri > 15)
     return EINVAL;
-  
-  if (real_pri < 4) 
+
+  if (real_pri < 4)
     real_pri = THREAD_PRIORITY_LOWEST;
   else if (real_pri < 7)
     real_pri = THREAD_PRIORITY_BELOW_NORMAL;

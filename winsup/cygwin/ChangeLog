@@ -1,3 +1,14 @@
+Tue Jun 26 10:47:24 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* mmap.cc: Clean up *ResourceLock calls throughout.
+
+Tue Jun 26 22:10:00 2001  Robert Collins rbtcollins@hotmail.com
+
+	* thread.cc (pthread_cond::TimedWait): Check for WAIT_TIMEOUT as well
+	as WAIT_ABANDONED.
+	(__pthread_cond_timedwait): Calculate a relative wait from the abstime
+	parameter.
+
 Sun Jun 24 17:38:19 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (interrupt_setup): Move actions from setup_handler to
@@ -29,7 +40,7 @@ Thu Jun 21 22:01:39 2001  Marius Gedminas <mgedmin@delfi.lt>
 
 2001-06-22  Robert Collins  <rbbtcollins@hotmail.com>
 
-	* thread.cc (__pthread_cond_timedwait): Lock the waiting mutex before 
+	* thread.cc (__pthread_cond_timedwait): Lock the waiting mutex before
 	the condition protect mutex to avoid deadlocking. (Found by Greg Smith).
 	(__pthread_cond_wait): Ditto.
 	

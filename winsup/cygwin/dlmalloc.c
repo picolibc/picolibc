@@ -28,6 +28,13 @@
  *  malloc_usable_size(P) is equivalent to realloc(P, malloc_usable_size(P))
  *
  * $Log$
+ * Revision 1.3  2001/06/26 14:47:48  cgf
+ * * mmap.cc: Clean up *ResourceLock calls throughout.
+ * * thread.cc (pthread_cond::TimedWait): Check for WAIT_TIMEOUT as well as
+ * WAIT_ABANDONED.
+ * (__pthread_cond_timedwait): Calculate a relative wait from the abstime
+ * parameter.
+ *
  * Revision 1.2  2001/06/24 22:26:49  cgf
  * forced commit
  *
@@ -2001,7 +2008,7 @@ static void do_check_chunk(p) mchunkptr p;
   if (!chunk_is_mmapped(p))
   {
     INTERNAL_SIZE_T sz;
-    
+
     unless((char*)p >= sbrk_base, "chunk precedes sbrk_base", p);
     unless((char*)p + MINSIZE <= (char*)top + chunksize(top),
 	   "chunk past sbrk area", p);
@@ -2057,7 +2064,7 @@ static void do_check_inuse_chunk(p) mchunkptr p;
 {
   mchunkptr next;
   do_check_chunk(p);
-  
+
   if (chunk_is_mmapped(p))
     return;
 
@@ -2178,7 +2185,7 @@ static void do_init_freed_chunk(mchunkptr p, INTERNAL_SIZE_T freehead,
   p->alloced = 0;
   memset((char *)mem - MOATWIDTH, MOATFILL, MOATWIDTH);
   memset((char *)mem + bytes, MOATFILL, MOATWIDTH);
-  
+
   /* To avoid terrible O(n^2) performance when free() repeatedly grows a free
    * chunk, it's important not to free-fill regions that are already
    * free-filled.
@@ -2576,7 +2583,7 @@ static void malloc_extend_top(nb) INTERNAL_SIZE_T nb;
     }
 #endif   /* OTHER_SBRKS */
   }
-  
+
   init_freed_chunk(top, old_top == initial_top ? old_top_size : 0, 0);
 
   if ((unsigned long)sbrked_mem > (unsigned long)max_sbrked_mem)
@@ -2699,7 +2706,7 @@ Void_t* mALLOc(bytes) size_t bytes;
       check_freefill(victim, victim_size, victim_size);
       init_malloced_chunk(victim, bytes);
       check_malloced_chunk(victim, nb);
-      
+
       return chunk2mem(victim);
     }
 
@@ -2952,7 +2959,7 @@ void fREe(mem) Void_t* mem;
 
   p = mem2chunk(mem);
   check_inuse_chunk(p);
-  
+
   hd = p->size;
 
 #if HAVE_MMAP
@@ -3644,7 +3651,7 @@ static void malloc_update_mallinfo(void)
   INTERNAL_SIZE_T avail = chunksize(top);
   int   navail = avail >= MINSIZE ? 1 : 0;
   check_freefill(top, avail, avail);
-  
+
 #if DEBUG
   if (lowest_chunk)
     for (p = lowest_chunk;
@@ -3652,7 +3659,7 @@ static void malloc_update_mallinfo(void)
 	 p = next_chunk(p))
       check_inuse_chunk(p);
 #endif
-  
+
   for (i = 1; i < NAV; ++i)
   {
     b = bin_at(i);
@@ -3662,9 +3669,9 @@ static void malloc_update_mallinfo(void)
       check_free_chunk(p);
       check_freefill(p, chunksize(p), chunksize(p));
       for (q = next_chunk(p);
-           q < top && inuse(q) && chunksize(q) >= MINSIZE;
-           q = next_chunk(q))
-        check_inuse_chunk(q);
+	   q < top && inuse(q) && chunksize(q) >= MINSIZE;
+	   q = next_chunk(q))
+	check_inuse_chunk(q);
 #endif
       avail += chunksize(p);
       navail++;
@@ -3701,14 +3708,14 @@ void malloc_stats(void)
 {
   malloc_update_mallinfo();
   fprintf(stderr, "max system bytes = %10u\n",
-          (unsigned int)(max_total_mem));
+	  (unsigned int)(max_total_mem));
   fprintf(stderr, "system bytes     = %10u\n",
-          (unsigned int)(sbrked_mem + mmapped_mem));
+	  (unsigned int)(sbrked_mem + mmapped_mem));
   fprintf(stderr, "in use bytes     = %10u\n",
-          (unsigned int)(current_mallinfo.uordblks + mmapped_mem));
+	  (unsigned int)(current_mallinfo.uordblks + mmapped_mem));
 #if HAVE_MMAP
   fprintf(stderr, "max mmap regions = %10u\n",
-          (unsigned int)max_n_mmaps);
+	  (unsigned int)max_n_mmaps);
 #endif
 }
 
@@ -3779,13 +3786,13 @@ History:
       * Added anonymously donated WIN32 sbrk emulation
       * Malloc, calloc, getpagesize: add optimizations from Raymond Nijssen
       * malloc_extend_top: fix mask error that caused wastage after
-        foreign sbrks
+	foreign sbrks
       * Add linux mremap support code from HJ Liu
 
     V2.6.2 Tue Dec  5 06:52:55 1995  Doug Lea  (dl at gee)
       * Integrated most documentation with the code.
       * Add support for mmap, with help from
-        Wolfram Gloger (Gloger@lrz.uni-muenchen.de).
+	Wolfram Gloger (Gloger@lrz.uni-muenchen.de).
       * Use last_remainder in more cases.
       * Pack bins using idea from  colin@nyx10.cs.du.edu
       * Use ordered bins instead of best-fit threshhold
@@ -3793,34 +3800,34 @@ History:
       * Support another case of realloc via move into top
       * Fix error occuring when initial sbrk_base not word-aligned.
       * Rely on page size for units instead of SBRK_UNIT to
-        avoid surprises about sbrk alignment conventions.
+	avoid surprises about sbrk alignment conventions.
       * Add mallinfo, mallopt. Thanks to Raymond Nijssen
-        (raymond@es.ele.tue.nl) for the suggestion.
+	(raymond@es.ele.tue.nl) for the suggestion.
       * Add `pad' argument to malloc_trim and top_pad mallopt parameter.
       * More precautions for cases where other routines call sbrk,
-        courtesy of Wolfram Gloger (Gloger@lrz.uni-muenchen.de).
+	courtesy of Wolfram Gloger (Gloger@lrz.uni-muenchen.de).
       * Added macros etc., allowing use in linux libc from
-        H.J. Lu (hjl@gnu.ai.mit.edu)
+	H.J. Lu (hjl@gnu.ai.mit.edu)
       * Inverted this history list
 
     V2.6.1 Sat Dec  2 14:10:57 1995  Doug Lea  (dl at gee)
       * Re-tuned and fixed to behave more nicely with V2.6.0 changes.
       * Removed all preallocation code since under current scheme
-        the work required to undo bad preallocations exceeds
-        the work saved in good cases for most test programs.
+	the work required to undo bad preallocations exceeds
+	the work saved in good cases for most test programs.
       * No longer use return list or unconsolidated bins since
-        no scheme using them consistently outperforms those that don't
-        given above changes.
+	no scheme using them consistently outperforms those that don't
+	given above changes.
       * Use best fit for very large chunks to prevent some worst-cases.
       * Added some support for debugging
 
     V2.6.0 Sat Nov  4 07:05:23 1995  Doug Lea  (dl at gee)
       * Removed footers when chunks are in use. Thanks to
-        Paul Wilson (wilson@cs.texas.edu) for the suggestion.
+	Paul Wilson (wilson@cs.texas.edu) for the suggestion.
 
     V2.5.4 Wed Nov  1 07:54:51 1995  Doug Lea  (dl at gee)
       * Added malloc_trim, with help from Wolfram Gloger
-        (wmglo@Dent.MED.Uni-Muenchen.DE).
+	(wmglo@Dent.MED.Uni-Muenchen.DE).
 
     V2.5.3 Tue Apr 26 10:16:01 1994  Doug Lea  (dl at g)
 
@@ -3836,11 +3843,11 @@ History:
     V2.5.1 Sat Aug 14 15:40:43 1993  Doug Lea  (dl at g)
       * faster bin computation & slightly different binning
       * merged all consolidations to one part of malloc proper
-         (eliminating old malloc_find_space & malloc_clean_bin)
+	 (eliminating old malloc_find_space & malloc_clean_bin)
       * Scan 2 returns chunks (not just 1)
       * Propagate failure in realloc if malloc returns 0
       * Add stuff to allow compilation on non-ANSI compilers
-          from kpv@research.att.com
+	  from kpv@research.att.com
 
     V2.5 Sat Aug  7 07:41:59 1993  Doug Lea  (dl at g.oswego.edu)
       * removed potential for odd address access in prev_chunk
@@ -3848,11 +3855,11 @@ History:
       * misc cosmetics and a bit more internal documentation
       * anticosmetics: mangled names in macros to evade debugger strangeness
       * tested on sparc, hp-700, dec-mips, rs6000
-          with gcc & native cc (hp, dec only) allowing
-          Detlefs & Zorn comparison study (in SIGPLAN Notices.)
+	  with gcc & native cc (hp, dec only) allowing
+	  Detlefs & Zorn comparison study (in SIGPLAN Notices.)
 
     Trial version Fri Aug 28 13:14:29 1992  Doug Lea  (dl at g.oswego.edu)
       * Based loosely on libg++-1.2X malloc. (It retains some of the overall
-         structure of old version,  but most details differ.)
+	 structure of old version,  but most details differ.)
 
 */
