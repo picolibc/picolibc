@@ -848,35 +848,6 @@ digits (const char *name)
   return p > name && !*p ? n : -1;
 }
 
-const char *windows_device_names[] NO_COPY =
-{
-  NULL,
-  "\\dev\\console",
-  "conin",
-  "conout",
-  "\\dev\\ttym",
-  "\\dev\\tty%d",
-  "\\dev\\ptym",
-  "\\\\.\\com%d",
-  "\\dev\\pipe",
-  "\\dev\\piper",
-  "\\dev\\pipew",
-  "\\dev\\socket",
-  "\\dev\\windows",
-
-  NULL, NULL, NULL,
-
-  "\\dev\\disk",
-  "\\dev\\fd%d",
-  "\\dev\\st%d",
-  "nul",
-  "\\dev\\zero",
-  "\\dev\\%srandom",
-  "\\dev\\mem",
-  "\\dev\\clipboard",
-  "\\dev\\dsp"
-};
-
 #define deveq(s) (strcasematch (name, (s)))
 #define deveqn(s, n) (strncasematch (name, (s), (n)))
 #define wdeveq(s) (strcasematch (w32_path, (s)))
