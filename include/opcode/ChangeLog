@@ -1,3 +1,17 @@
+2002-09-30  Gavin Romig-Koch  <gavin@redhat.com>
+            Ken Raeburn  <raeburn@cygnus.com>
+            Aldy Hernandez  <aldyh@redhat.com>
+            Eric Christopher  <echristo@redhat.com>
+            Richard Sandiford  <rsandifo@redhat.com>
+
+	* mips.h: Update comment for new opcodes.
+	(OP_MASK_VECBYTE, OP_SH_VECBYTE): New.
+	(OP_MASK_VECALIGN, OP_SH_VECALIGN): New.
+	(INSN_4111, INSN_4120, INSN_5400, INSN_5500): New.
+	(CPU_VR4120, CPU_VR5400, CPU_VR5500): New.
+	(OPCODE_IS_MEMBER): Handle the new CPU_* values and INSN_* flags.
+	Don't match CPU_R4111 with INSN_4100.
+
 2002-08-19  Elena Zannoni <ezannoni@redhat.com>
  
         From matthew green  <mrg@redhat.com>

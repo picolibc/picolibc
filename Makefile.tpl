@@ -1,3 +1,6 @@
+[+ AutoGen5 template
+in
++]
 
 # Makefile.in is generated from Makefile.tpl by 'autogen Makefile.def'.
 #
@@ -519,67 +522,8 @@ CONFIGURE_BUILD_MODULES = \
 
 # This is a list of the targets for all of the modules which are compiled
 # using $(FLAGS_TO_PASS).
-ALL_MODULES = \
-	all-ash \
-	all-autoconf \
-	all-automake \
-	all-bash \
-	all-bfd \
-	all-opcodes \
-	all-binutils \
-	all-bison \
-	all-byacc \
-	all-bzip2 \
-	all-db \
-	all-dejagnu \
-	all-diff \
-	all-dosutils \
-	all-etc \
-	all-fastjar \
-	all-fileutils \
-	all-findutils \
-	all-find \
-	all-flex \
-	all-gas \
-	all-gawk \
-	all-gettext \
-	all-gnuserv \
-	all-gprof \
-	all-grep \
-	all-gzip \
-	all-hello \
-	all-indent \
-	all-intl \
-	all-tcl \
-	all-itcl \
-	all-ld \
-	all-libgui \
-	all-libiberty \
-	all-libtool \
-	all-m4 \
-	all-make \
-	all-mmalloc \
-	all-patch \
-	all-perl \
-	all-prms \
-	all-rcs \
-	all-readline \
-	all-release \
-	all-recode \
-	all-sed \
-	all-send-pr \
-	all-shellutils \
-	all-sid \
-	all-sim \
-	all-snavigator \
-	all-tar \
-	all-texinfo \
-	all-textutils \
-	all-time \
-	all-uudecode \
-	all-wdiff \
-	all-zip \
-	all-zlib \
+ALL_MODULES = [+ FOR host_modules +]\
+	all-[+module+] [+ ENDFOR host_modules +]\
 	$(EXTRA_TARGET_HOST_ALL_MODULES)
 
 # This is a list of the check targets for all of the modules which are
@@ -595,122 +539,16 @@ NATIVE_CHECK_MODULES = \
 	check-flex \
 	check-zip
 
-CROSS_CHECK_MODULES = \
-	check-ash \
-	check-autoconf \
-	check-automake \
-	check-bash \
-	check-bfd \
-	check-opcodes \
-	check-binutils \
-	check-bzip2 \
-	check-db \
-	check-dejagnu \
-	check-diff \
-	check-etc \
-	check-fileutils \
-	check-findutils \
-	check-find \
-	check-gas \
-	check-gawk \
-	check-gettext \
-	check-gnuserv \
-	check-gprof \
-	check-grep \
-	check-gzip \
-	check-hello \
-	check-indent \
-	check-intl \
-	check-tcl \
-	check-itcl \
-	check-ld \
-	check-libgui \
-	check-libiberty \
-	check-libtool \
-	check-m4 \
-	check-make \
-	check-patch \
-	check-perl \
-	check-prms \
-	check-rcs \
-	check-readline \
-	check-recode \
-	check-sed \
-	check-send-pr \
-	check-shellutils \
-	check-sid \
-	check-sim \
-	check-snavigator \
-	check-tar \
-	check-texinfo \
-	check-textutils \
-	check-time \
-	check-uudecode \
-	check-wdiff \
+CROSS_CHECK_MODULES = [+ FOR host_modules +][+ IF no_check  +][+ ELIF no_check_cross +][+ ELSE x +]\
+	check-[+module+] [+ ENDIF no_check +][+ ENDFOR host_modules +]\
 	$(EXTRA_TARGET_HOST_CHECK_MODULES)
 
 CHECK_MODULES=$(NATIVE_CHECK_MODULES) $(CROSS_CHECK_MODULES)
 
 # This is a list of the install targets for all of the modules which are
 # compiled using $(FLAGS_TO_PASS).
-INSTALL_MODULES = \
-	install-ash \
-	install-autoconf \
-	install-automake \
-	install-bash \
-	install-bfd \
-	install-opcodes \
-	install-binutils \
-	install-bison \
-	install-byacc \
-	install-bzip2 \
-	install-db \
-	install-dejagnu \
-	install-diff \
-	install-dosutils \
-	install-etc \
-	install-fastjar \
-	install-fileutils \
-	install-findutils \
-	install-find \
-	install-flex \
-	install-gas \
-	install-gawk \
-	install-gettext \
-	install-gnuserv \
-	install-gprof \
-	install-grep \
-	install-gzip \
-	install-hello \
-	install-indent \
-	install-intl \
-	install-tcl \
-	install-itcl \
-	install-ld \
-	install-libgui \
-	install-libiberty \
-	install-libtool \
-	install-m4 \
-	install-make \
-	install-mmalloc \
-	install-patch \
-	install-perl \
-	install-prms \
-	install-rcs \
-	install-readline \
-	install-recode \
-	install-sed \
-	install-send-pr \
-	install-shellutils \
-	install-sid \
-	install-sim \
-	install-snavigator \
-	install-tar \
-	install-textutils \
-	install-time \
-	install-uudecode \
-	install-wdiff \
-	install-zip \
+INSTALL_MODULES = [+ FOR host_modules+][+ IF no_install +][+ ELSE no_install +]\
+	install-[+module+] [+ ENDIF no_install +][+ ENDFOR host_modules +]\
 	$(EXTRA_TARGET_HOST_INSTALL_MODULES)
 
 # This is a list of the targets for all of the modules which are compiled
@@ -745,154 +583,31 @@ INSTALL_X11_MODULES = \
 
 # This is a list of the targets for all of the modules which are compiled
 # using $(TARGET_FLAGS_TO_PASS).
-ALL_TARGET_MODULES = \
-	all-target-libstdc++-v3 \
-	all-target-newlib \
-	all-target-libf2c \
-	all-target-libobjc \
-	all-target-libtermcap \
-	all-target-winsup \
-	all-target-libgloss \
-	all-target-libiberty \
-	all-target-gperf \
-	all-target-examples \
-	all-target-libffi \
-	all-target-libjava \
-	all-target-zlib \
-	all-target-boehm-gc \
-	all-target-qthreads 
+ALL_TARGET_MODULES = [+ FOR target_modules +]\
+	all-target-[+module+] [+ ENDFOR target_modules +]
 
 # This is a list of the configure targets for all of the modules which
 # are compiled using the target tools.
-CONFIGURE_TARGET_MODULES = \
-	configure-target-libstdc++-v3 \
-	configure-target-newlib \
-	configure-target-libf2c \
-	configure-target-libobjc \
-	configure-target-libtermcap \
-	configure-target-winsup \
-	configure-target-libgloss \
-	configure-target-libiberty \
-	configure-target-gperf \
-	configure-target-examples \
-	configure-target-libffi \
-	configure-target-libjava \
-	configure-target-zlib \
-	configure-target-boehm-gc \
-	configure-target-qthreads 
+CONFIGURE_TARGET_MODULES = [+ FOR target_modules +]\
+	configure-target-[+module+] [+ ENDFOR target_modules +]
 
 # This is a list of the check targets for all of the modules which are
 # compiled using $(TARGET_FLAGS_TO_PASS).
-CHECK_TARGET_MODULES = \
-	check-target-libstdc++-v3 \
-	check-target-newlib \
-	check-target-libf2c \
-	check-target-libobjc \
-	check-target-winsup \
-	check-target-libiberty \
-	check-target-gperf \
-	check-target-libffi \
-	check-target-libjava \
-	check-target-zlib \
-	check-target-boehm-gc \
-	check-target-qthreads 
+CHECK_TARGET_MODULES = [+ FOR target_modules +][+ IF no_check +][+ ELSE check +]\
+	check-target-[+module+] [+ ENDIF no_check +][+ ENDFOR target_modules +]
 
 # This is a list of the install targets for all of the modules which are
 # compiled using $(TARGET_FLAGS_TO_PASS).
-INSTALL_TARGET_MODULES = \
-	install-target-libstdc++-v3 \
-	install-target-newlib \
-	install-target-libf2c \
-	install-target-libobjc \
-	install-target-libtermcap \
-	install-target-winsup \
-	install-target-libgloss \
-	install-target-libiberty \
-	install-target-gperf \
-	install-target-libjava \
-	install-target-zlib \
-	install-target-boehm-gc \
-	install-target-qthreads 
+INSTALL_TARGET_MODULES = [+ FOR target_modules +][+ IF no_install +][+ ELSE install +]\
+	install-target-[+module+] [+ ENDIF no_install +][+ ENDFOR target_modules +]
 
 # This is a list of the targets for which we can do a clean-{target}.
-CLEAN_MODULES = \
-	clean-ash \
-	clean-autoconf \
-	clean-automake \
-	clean-bash \
-	clean-bfd \
-	clean-opcodes \
-	clean-binutils \
-	clean-bison \
-	clean-byacc \
-	clean-bzip2 \
-	clean-db \
-	clean-dejagnu \
-	clean-diff \
-	clean-dosutils \
-	clean-etc \
-	clean-fastjar \
-	clean-fileutils \
-	clean-findutils \
-	clean-find \
-	clean-flex \
-	clean-gas \
-	clean-gawk \
-	clean-gettext \
-	clean-gnuserv \
-	clean-gprof \
-	clean-grep \
-	clean-gzip \
-	clean-hello \
-	clean-indent \
-	clean-intl \
-	clean-tcl \
-	clean-itcl \
-	clean-ld \
-	clean-libgui \
-	clean-libiberty \
-	clean-libtool \
-	clean-m4 \
-	clean-make \
-	clean-mmalloc \
-	clean-patch \
-	clean-perl \
-	clean-prms \
-	clean-rcs \
-	clean-readline \
-	clean-release \
-	clean-recode \
-	clean-sed \
-	clean-send-pr \
-	clean-shellutils \
-	clean-sid \
-	clean-sim \
-	clean-snavigator \
-	clean-tar \
-	clean-texinfo \
-	clean-textutils \
-	clean-time \
-	clean-uudecode \
-	clean-wdiff \
-	clean-zip \
-	clean-zlib 
+CLEAN_MODULES = [+ FOR host_modules +][+ IF no_clean +][+ ELSE no_clean +]\
+	clean-[+module+] [+ ENDIF no_clean +][+ ENDFOR host_modules +]
 
 # All of the target modules that can be cleaned
-CLEAN_TARGET_MODULES = \
-	clean-target-libstdc++-v3 \
-	clean-target-newlib \
-	clean-target-libf2c \
-	clean-target-libobjc \
-	clean-target-winsup \
-	clean-target-libgloss \
-	clean-target-libiberty \
-	clean-target-gperf \
-	clean-target-examples \
-	clean-target-libffi \
-	clean-target-libjava \
-	clean-target-zlib \
-	clean-target-boehm-gc \
-	clean-target-qthreads 
+CLEAN_TARGET_MODULES = [+ FOR target_modules +][+ IF no_clean +][+ ELSE clean +]\
+	clean-target-[+module+] [+ ENDIF no_clean +][+ ENDFOR target_modules +]
 
 # All of the x11 modules that can be cleaned
 CLEAN_X11_MODULES = \
@@ -1747,22 +1462,8 @@ install-itcl: install-tcl
 
 
 # Dependencies of all-target-foo on configure-target-foo.
-all-target-libstdc++-v3: configure-target-libstdc++-v3
-all-target-newlib: configure-target-newlib
-all-target-libf2c: configure-target-libf2c
-all-target-libobjc: configure-target-libobjc
-all-target-libtermcap: configure-target-libtermcap
-all-target-winsup: configure-target-winsup
-all-target-libgloss: configure-target-libgloss
-all-target-libiberty: configure-target-libiberty
-all-target-gperf: configure-target-gperf
-all-target-examples: configure-target-examples
-all-target-libffi: configure-target-libffi
-all-target-libjava: configure-target-libjava
-all-target-zlib: configure-target-zlib
-all-target-boehm-gc: configure-target-boehm-gc
-all-target-qthreads: configure-target-qthreads
-
+[+ FOR target_modules +]all-target-[+module+]: configure-target-[+module+]
+[+ ENDFOR target_modules +]
 
 ### other supporting targets
 
