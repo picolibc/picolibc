@@ -9,6 +9,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include <sys/fcntl.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -59,6 +60,18 @@ writable_directory (const char *file)
 #else
   return 1;
 #endif
+}
+
+extern "C" int
+dirfd (DIR *dir)
+{
+  if (dir->__d_cookie != __DIRENT_COOKIE)
+    {
+      set_errno (EBADF);
+      syscall_printf ("-1 = dirfd (%p)", dir);
+      return -1;
+    }
+  return dir->__d_dirent->d_fd;
 }
 
 /* opendir: POSIX 5.1.2.1 */
@@ -114,6 +127,7 @@ opendir (const char *dirname)
       goto failed;
     }
   strcpy (dir->__d_dirname, real_dirname.get_win32 ());
+  dir->__d_dirent->d_fd = open (dir->__d_dirname, O_RDONLY | O_DIROPEN);
   /* FindFirstFile doesn't seem to like duplicate /'s. */
   len = strlen (dir->__d_dirname);
   if (len == 0 || SLASH_P (dir->__d_dirname[len - 1]))
@@ -289,6 +303,9 @@ closedir (DIR * dir)
       syscall_printf ("-1 = closedir (%p)", dir);
       return -1;
     }
+
+  if (dir->__d_dirent->d_fd >= 0)
+    close (dir->__d_dirent->d_fd);
 
   /* Reset the marker in case the caller tries to use `dir' again.  */
   dir->__d_cookie = 0;

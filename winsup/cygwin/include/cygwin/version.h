@@ -141,10 +141,11 @@ details. */
        41: __signgam
        42: sys_errlist, sys_nerr
        43: sigsetjmp, siglongjmp fixed
+       44: Export dirfd
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 43
+#define CYGWIN_VERSION_API_MINOR 44
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
