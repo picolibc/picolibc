@@ -2386,6 +2386,12 @@ typedef struct tagTOGGLEKEYS {
 	DWORD cbSize;
 	DWORD dwFlags;
 } TOGGLEKEYS;
+typedef struct tagMOUSEHOOKSTRUCT {
+	POINT pt;
+	HWND hwnd;
+	UINT wHitTestCode;
+	DWORD dwExtraInfo;
+} MOUSEHOOKSTRUCT, FAR *LPMOUSEHOOKSTRUCT, *PMOUSEHOOKSTRUCT;
 typedef struct tagTRACKMOUSEEVENT {
 	DWORD cbSize;
 	DWORD dwFlags;

@@ -1,3 +1,7 @@
+2002-06-13  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/winuser.h (MOUSEHOOKSTRUCT): Define structure.
+
 2002-06-13  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/test.c: #include comcat.h.
