@@ -1,8 +1,7 @@
 2003-01-21  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* winsup.api/pthread/cancel9.c: Make child pid static global.
-	(main): Wait in mainthread until child process
-	has terminated.
+	(main): Wait in mainthread until child process has terminated.
 
 2003-01-14  Thomas Pfaff  <tpfaff@gmx.net>
 
