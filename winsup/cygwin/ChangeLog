@@ -1,3 +1,10 @@
+Sat Mar 17 21:48:03 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* external.cc (fillout_pinfo): Match windows pid, as well as cygwin pid
+	when passed in pid.  Don't prematurely break when searching for a pid.
+
+	* thread.h (_winsup_t): Eliminate unneeded field.
+
 Sat Mar 17 20:46:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* net.cc (get_95_ifconf): Use strcasematch instead of strcasecmp.

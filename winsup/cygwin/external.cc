@@ -53,8 +53,9 @@ fillout_pinfo (pid_t pid, int winpid)
 	  ep.dwProcessId = cygwin_pid (thispid);
 	  ep.process_state = PID_IN_USE;
 	  ep.ctty = -1;
+	  break;
 	}
-      else if (nextpid || p->pid == pid)
+      else if (nextpid || p->pid == pid || (winpid && thispid == (DWORD) pid))
 	{
 	  ep.ctty = tty_attached (p) ? p->ctty : -1;
 	  ep.pid = p->pid;
@@ -74,8 +75,8 @@ fillout_pinfo (pid_t pid, int winpid)
 	  ep.strace_file = 0;
 
 	  ep.process_state = p->process_state;
+	  break;
 	}
-      break;
     }
 
   if (!ep.pid)

@@ -61,7 +61,6 @@ struct _winsup_t
 
 /* console.cc */
   unsigned _rarg;
-  char _my_title_buf[TITLESIZE + 1];
 
 /* dlfcn.cc */
   int _dl_error;
