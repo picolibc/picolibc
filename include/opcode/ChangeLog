@@ -1,3 +1,9 @@
+1999-08-04  Alan Modra  <alan@spri.levels.unisa.edu.au>
+
+	* i386.h (i386_optab): Add DefaultSize modifier to all insns
+	that implicitly modify %esp.  #undef d_Suf, x_suf, sld_suf,
+	sldx_suf, bwld_Suf, d_FP, x_FP, sld_FP, sldx_FP at end of table.
+
 Wed Jul 28 02:04:24 1999  Jerry Quinn <jquinn@nortelnetworks.com>
 			  Jeff Law <law@cygnus.com>
 

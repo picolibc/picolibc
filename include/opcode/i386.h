@@ -105,23 +105,23 @@ static const template i386_optab[] = {
 {"movzx",  2, 0x0fb6, X, b_Suf|Modrm,			{ Reg8|ByteMem, WordReg, 0} },
 
 /* push instructions */
-{"push",   1,	0x50, X, wl_Suf|ShortForm,	{ WordReg, 0, 0 } },
-{"push",   1,	0xff, 6, wl_Suf|Modrm,		{ WordReg|WordMem, 0, 0 } },
-{"push",   1,	0x6a, X, wl_Suf,		{ Imm8S, 0, 0} },
-{"push",   1,	0x68, X, wl_Suf,		{ Imm16|Imm32, 0, 0} },
-{"push",   1,	0x06, X, wl_Suf|Seg2ShortForm,	{ SReg2, 0, 0 } },
-{"push",   1, 0x0fa0, X, wl_Suf|Seg3ShortForm,	{ SReg3, 0, 0 } },
+{"push",   1,	0x50, X, wl_Suf|ShortForm|DefaultSize,	{ WordReg, 0, 0 } },
+{"push",   1,	0xff, 6, wl_Suf|Modrm|DefaultSize,	{ WordReg|WordMem, 0, 0 } },
+{"push",   1,	0x6a, X, wl_Suf|DefaultSize,		{ Imm8S, 0, 0} },
+{"push",   1,	0x68, X, wl_Suf|DefaultSize,		{ Imm16|Imm32, 0, 0} },
+{"push",   1,	0x06, X, wl_Suf|Seg2ShortForm|DefaultSize, { SReg2, 0, 0 } },
+{"push",   1, 0x0fa0, X, wl_Suf|Seg3ShortForm|DefaultSize, { SReg3, 0, 0 } },
 /* push all */
-{"pusha",  0,	0x60, X, wl_Suf,		{ 0, 0, 0 } },
+{"pusha",  0,	0x60, X, wl_Suf|DefaultSize,		{ 0, 0, 0 } },
 
 /* pop instructions */
-{"pop",	   1,	0x58, X, wl_Suf|ShortForm,	{ WordReg, 0, 0 } },
-{"pop",	   1,	0x8f, 0, wl_Suf|Modrm,		{ WordReg|WordMem, 0, 0 } },
+{"pop",	   1,	0x58, X, wl_Suf|ShortForm|DefaultSize,	{ WordReg, 0, 0 } },
+{"pop",	   1,	0x8f, 0, wl_Suf|Modrm|DefaultSize,	{ WordReg|WordMem, 0, 0 } },
 #define POP_SEG_SHORT 0x07
-{"pop",	   1,	0x07, X, wl_Suf|Seg2ShortForm,	{ SReg2, 0, 0 } },
-{"pop",	   1, 0x0fa1, X, wl_Suf|Seg3ShortForm,	{ SReg3, 0, 0 } },
+{"pop",	   1,	0x07, X, wl_Suf|Seg2ShortForm|DefaultSize, { SReg2, 0, 0 } },
+{"pop",	   1, 0x0fa1, X, wl_Suf|Seg3ShortForm|DefaultSize, { SReg3, 0, 0 } },
 /* pop all */
-{"popa",   0,	0x61, X, wl_Suf,		{ 0, 0, 0 } },
+{"popa",   0,	0x61, X, wl_Suf|DefaultSize,		{ 0, 0, 0 } },
 
 /* xchg exchange instructions
    xchg commutes:  we allow both operand orders */
@@ -158,8 +158,8 @@ static const template i386_optab[] = {
 {"cmc",	   0,	0xf5, X, NoSuf,			{ 0, 0, 0} },
 {"lahf",   0,	0x9f, X, NoSuf,			{ 0, 0, 0} },
 {"sahf",   0,	0x9e, X, NoSuf,			{ 0, 0, 0} },
-{"pushf",  0,	0x9c, X, wl_Suf,		{ 0, 0, 0} },
-{"popf",   0,	0x9d, X, wl_Suf,		{ 0, 0, 0} },
+{"pushf",  0,	0x9c, X, wl_Suf|DefaultSize,	{ 0, 0, 0} },
+{"popf",   0,	0x9d, X, wl_Suf|DefaultSize,	{ 0, 0, 0} },
 {"stc",	   0,	0xf9, X, NoSuf,			{ 0, 0, 0} },
 {"std",	   0,	0xfd, X, NoSuf,			{ 0, 0, 0} },
 {"sti",	   0,	0xfb, X, NoSuf,			{ 0, 0, 0} },
@@ -311,12 +311,12 @@ static const template i386_optab[] = {
 {"sar",	   1,	0xd0, 7, bwl_Suf|W|Modrm,	{ Reg|AnyMem, 0, 0} },
 
 /* control transfer instructions */
-{"call",   1,	0xe8, X, wl_Suf|JumpDword,	{ Disp16|Disp32, 0, 0} },
-{"call",   1,	0xff, 2, wl_Suf|Modrm,		{ WordReg|WordMem|JumpAbsolute, 0, 0} },
+{"call",   1,	0xe8, X, wl_Suf|JumpDword|DefaultSize,	{ Disp16|Disp32, 0, 0} },
+{"call",   1,	0xff, 2, wl_Suf|Modrm|DefaultSize,	{ WordReg|WordMem|JumpAbsolute, 0, 0} },
 /* Intel Syntax */
-{"call",   2,	0x9a, X, wl_Suf|JumpInterSegment, { Imm16, Imm16|Imm32, 0} },
-{"lcall",  2,	0x9a, X, wl_Suf|JumpInterSegment, { Imm16, Imm16|Imm32, 0} },
-{"lcall",  1,	0xff, 3, wl_Suf|Modrm,		{ WordMem, 0, 0} },
+{"call",   2,	0x9a, X, wl_Suf|JumpInterSegment|DefaultSize, { Imm16, Imm16|Imm32, 0} },
+{"lcall",  2,	0x9a, X, wl_Suf|JumpInterSegment|DefaultSize, { Imm16, Imm16|Imm32, 0} },
+{"lcall",  1,	0xff, 3, wl_Suf|Modrm|DefaultSize,	{ WordMem, 0, 0} },
 
 #define JUMP_PC_RELATIVE 0xeb
 {"jmp",	   1,	0xeb, X, NoSuf|Jump,		{ Disp, 0, 0} },
@@ -327,12 +327,12 @@ static const template i386_optab[] = {
 {"ljmp",   2,	0xea, X, wl_Suf|JumpInterSegment, { Imm16, Imm16|Imm32, 0} },
 {"ljmp",   1,	0xff, 5, wl_Suf|Modrm,		{ WordMem, 0, 0} },
 
-{"ret",	   0,	0xc3, X, wl_Suf,		{ 0, 0, 0} },
-{"ret",	   1,	0xc2, X, wl_Suf,		{ Imm16, 0, 0} },
-{"lret",   0,	0xcb, X, wl_Suf,		{ 0, 0, 0} },
-{"lret",   1,	0xca, X, wl_Suf,		{ Imm16, 0, 0} },
-{"enter",  2,	0xc8, X, wl_Suf,		{ Imm16, Imm8, 0} },
-{"leave",  0,	0xc9, X, wl_Suf,		{ 0, 0, 0} },
+{"ret",	   0,	0xc3, X, wl_Suf|DefaultSize,	{ 0, 0, 0} },
+{"ret",	   1,	0xc2, X, wl_Suf|DefaultSize,	{ Imm16, 0, 0} },
+{"lret",   0,	0xcb, X, wl_Suf|DefaultSize,	{ 0, 0, 0} },
+{"lret",   1,	0xca, X, wl_Suf|DefaultSize,	{ Imm16, 0, 0} },
+{"enter",  2,	0xc8, X, wl_Suf|DefaultSize,	{ Imm16, Imm8, 0} },
+{"leave",  0,	0xc9, X, wl_Suf|DefaultSize,	{ 0, 0, 0} },
 
 /* conditional jumps */
 {"jo",	   1,	0x70, X, NoSuf|Jump,		{ Disp, 0, 0} },
@@ -1035,14 +1035,23 @@ static const template i386_optab[] = {
 #undef b_Suf
 #undef w_Suf
 #undef l_Suf
+#undef d_Suf
+#undef x_Suf
 #undef bw_Suf
 #undef bl_Suf
 #undef wl_Suf
 #undef sl_Suf
+#undef sld_Suf
+#undef sldx_Suf
 #undef bwl_Suf
+#undef bwld_Suf
 #undef FP
 #undef l_FP
+#undef d_FP
+#undef x_FP
 #undef sl_FP
+#undef sld_FP
+#undef sldx_FP
 
 #define MAX_MNEM_SIZE 16	/* for parsing insn mnemonics from input */
 
