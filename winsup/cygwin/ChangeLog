@@ -1,3 +1,9 @@
+2001-12-03  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (mount_info::conv_to_win32_path): Avoid returning error if
+	cygdrive == '/'.
+	(mount_info::cygdrive_win32_path): Return 0 if invalid cygdrive path.
+
 2001-11-30  Christopher Faylor  <cgf@redhat.com>
 
 	* debug.cc (makethread): Eliminate unneeded function call.

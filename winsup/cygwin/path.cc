@@ -1389,12 +1389,15 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
 	  dst[0] = '\0';
 	  if (mount_table->cygdrive_len > 1)
 	    devn = FH_CYGDRIVE;
+	  goto out;
 	}
-      else if (!cygdrive_win32_path (pathbuf, dst, unit))
+      else if (cygdrive_win32_path (pathbuf, dst, unit))
+	{
+	  *flags = cygdrive_flags;
+	  goto out;
+	}
+      else if (mount_table->cygdrive_len > 1)
 	return ENOENT;
-      else
-	*flags = cygdrive_flags;
-      goto out;
     }
 
   int chrooted_path_len;
@@ -1518,8 +1521,9 @@ mount_info::cygdrive_win32_path (const char *src, char *dst, int& unit)
   const char *p = src + cygdrive_len;
   if (!isalpha (*p) || (!isdirsep (p[1]) && p[1]))
     {
-      res = unit = -1;
+      unit = -1;
       dst[0] = '\0';
+      res = 0;
     }
   else
     {
@@ -1528,9 +1532,10 @@ mount_info::cygdrive_win32_path (const char *src, char *dst, int& unit)
       strcpy (dst + 2, p + 1);
       backslashify (dst, dst, !dst[2]);
       unit = dst[0];
+      res = 1;
     }
   debug_printf ("src '%s', dst '%s'", src, dst);
-  return 1;
+  return res;
 }
 
 /* conv_to_posix_path: Ensure src_path is a POSIX path.
