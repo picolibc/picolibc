@@ -93,7 +93,6 @@ fhandler_##what::ready_for_read (int fd, DWORD howlong, int ignra) \
 { \
   select_record me (this); \
   me.fd = fd; \
-  (void) select_read (&me); \
   while (select_read (&me) && !me.read_ready && \
          !peek_##what (&me, ignra) && howlong == INFINITE) \
     if (fd >= 0 && cygheap->fdtab.not_open (fd)) \
