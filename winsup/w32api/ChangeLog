@@ -1,3 +1,8 @@
+2004-09-05   Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winuser.h (WINUSERAPI): New define.
+	Use it to mark user32.dll imports, throughout.
+
 2004-09-05  Hosaka Yuji  <hos@tamanegi.org>
  
 	* lib/ddk/hid.def (HidD_FlushQueue, HidD_FreePreparsedData,
