@@ -1,3 +1,8 @@
+2001-04-19  Egor Duda  <deo@logos-m.ru>
+
+	* dumper.cc (dumper::init_core_dump): Set architecture field in dump
+	header.
+
 Mon Apr 16 15:08:00 2001  Corinna Vinschen <vinschen@redhat.com>
 
 	* mkgroup.c: Add function pointers `netlocalgroupgetmembers' and

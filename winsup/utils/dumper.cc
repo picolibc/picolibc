@@ -593,6 +593,12 @@ dumper::init_core_dump ()
       goto failed;
     }
 
+  if (!bfd_set_arch_mach (core_bfd, bfd_arch_i386, 0))
+    {
+      bfd_perror ("setting bfd architecture");
+      goto failed;
+    }
+
   return 1;
 
 failed:
