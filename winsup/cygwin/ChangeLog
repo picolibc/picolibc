@@ -1,3 +1,9 @@
+Sun Sep 23 16:55:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* syscalls.cc (_open): Set name in fhandler object after successful
+	creation.
+	(stat_dev): Set device type to block device in FH_FLOPPY case.
+
 Sun Sep 23 11:15:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* dtable.cc (dtable::build_fhandler): Initialize unit when using
