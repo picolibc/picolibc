@@ -1,3 +1,8 @@
+2000-09-05  Jeff Johnston <jjohnstn@redhat.com>
+
+	* libc/include/fcntl.h (_FNDELAY): Changed to be _FNONBLOCK to
+	make O_NDELAY and O_NONBLOCK have the same value.
+
 2000-08-30  Kazu Hirata  <kazu@hxi.com>
 
         * libc/sys/h8300hms/crt0.S: Optimize for both speed and code size.
