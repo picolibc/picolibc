@@ -109,8 +109,8 @@ long __stdcall I_RpcConnectionSetSockBuffSize(unsigned long,unsigned long);
 long __stdcall I_RpcBindingSetAsync(HANDLE,RPC_BLOCKING_FUNCTION);
 long __stdcall I_RpcAsyncSendReceive(RPC_MESSAGE*,void*);
 long __stdcall I_RpcGetThreadWindowHandle(void**);
-long __stdcall I_RpcServerThreadPauseListening();
-long __stdcall I_RpcServerThreadContinueListening();
+long __stdcall I_RpcServerThreadPauseListening(void);
+long __stdcall I_RpcServerThreadContinueListening(void);
 long __stdcall I_RpcServerUnregisterEndpointA(unsigned char*,unsigned char*);
 long __stdcall I_RpcServerUnregisterEndpointW(unsigned short*,unsigned short*);
 #ifdef UNICODE

@@ -12,9 +12,9 @@ RPC_STATUS RPC_ENTRY I_RpcNsGetBuffer(IN PRPC_MESSAGE);
 RPC_STATUS RPC_ENTRY I_RpcNsSendReceive(IN PRPC_MESSAGE,OUT RPC_BINDING_HANDLE*);
 void RPC_ENTRY I_RpcNsRaiseException(IN PRPC_MESSAGE,IN RPC_STATUS);
 RPC_STATUS RPC_ENTRY I_RpcReBindBuffer(IN PRPC_MESSAGE);
-RPC_STATUS RPC_ENTRY I_NsServerBindSearch();
-RPC_STATUS RPC_ENTRY I_NsClientBindSearch();
-void RPC_ENTRY I_NsClientBindDone();
+RPC_STATUS RPC_ENTRY I_NsServerBindSearch(void);
+RPC_STATUS RPC_ENTRY I_NsClientBindSearch(void);
+void RPC_ENTRY I_NsClientBindDone(void);
 #ifdef __cplusplus
 }
 #endif

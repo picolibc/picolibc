@@ -1,3 +1,16 @@
+2002-01-11 Ralf Habacker  <Ralf.Habacker@freenet.de>
+
+	* include/ntsecapi.h:  Fixed missing void parameter type in some prototypes.
+	* include/objbase.h: Ditto.
+	* include/rapi.h: Ditto.
+	* include/rpc.h: Ditto.
+	* include/rpcdce.h: Ditto.
+	* include/rpcdcep.h: Ditto.
+	* include/rpcndr.h: Ditto.
+	* include/rpcnsip.h: Ditto.
+	* include/rpcproxy.h: Ditto.
+	* include/windef.h: Ditto.
+									
 2001-12-30  Guido Serassio <serassio@libero.it>
 
 	* include/winsvc.h: Add EnumServiceStatusEx(),

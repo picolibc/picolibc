@@ -249,7 +249,7 @@ typedef struct _MIDL_FORMAT_STRING {
 	unsigned char Format[1];
 } MIDL_FORMAT_STRING;
 typedef void(__RPC_API *STUB_THUNK)(PMIDL_STUB_MESSAGE);
-typedef long(__RPC_API *SERVER_ROUTINE)();
+typedef long(__RPC_API *SERVER_ROUTINE)(void);
 typedef struct _MIDL_SERVER_INFO_ {
 	PMIDL_STUB_DESC pStubDesc;
 	const SERVER_ROUTINE *DispatchTable;

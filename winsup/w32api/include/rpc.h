@@ -46,7 +46,7 @@ typedef long RPC_STATUS;
 #endif /* 0 */
 
 RPC_STATUS RPC_ENTRY RpcImpersonateClient(RPC_BINDING_HANDLE);
-RPC_STATUS RPC_ENTRY RpcRevertToSelf();
+RPC_STATUS RPC_ENTRY RpcRevertToSelf(void);
 long RPC_ENTRY I_RpcMapWin32Status(RPC_STATUS);
 #ifdef __cplusplus
 }

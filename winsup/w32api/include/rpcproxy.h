@@ -32,11 +32,11 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL,DWORD fdwReason,LPVOID lpvReserved) \
 if(fdwReason == DLL_PROCESS_ATTACH) hProxyDll = hinstDLL; \
 return TRUE; \
 } \
-HRESULT STDAPICALLTYPE DllRegisterServer() \
+HRESULT STDAPICALLTYPE DllRegisterServer(void) \
 {\
 return NdrDllRegisterProxy(hProxyDll, pProxyFileList, pClsID); \
 }\
-HRESULT STDAPICALLTYPE DllUnregisterServer()\
+HRESULT STDAPICALLTYPE DllUnregisterServer(void)\
 {\
 return NdrDllUnregisterProxy(hProxyDll, pProxyFileList, pClsID);\
 }
@@ -64,7 +64,7 @@ void RPC_ENTRY GetProxyDllInfo( const ProxyFileInfo*** pInfo, const CLSID ** pId
 { *pInfo = pPFList; *pId = pClsid; };
 #define DLLGETCLASSOBJECTROUTINE(pPFlist, pClsid,pFactory) HRESULT STDAPICALLTYPE DllGetClassObject(REFCLSID rclsid,REFIID riid,void **ppv) \
 { return NdrDllGetClassObject(rclsid,riid,ppv,pPFlist,pClsid,pFactory ); }
-#define DLLCANUNLOADNOW(pFactory) HRESULT STDAPICALLTYPE DllCanUnloadNow() \
+#define DLLCANUNLOADNOW(pFactory) HRESULT STDAPICALLTYPE DllCanUnloadNow(void) \
 { return NdrDllCanUnloadNow( pFactory ); }
 #define DLLDUMMYPURECALL void __cdecl _purecall(void) { }
 #define CSTDSTUBBUFFERRELEASE(pFactory) ULONG STDMETHODCALLTYPE CStdStubBuffer_Release(IRpcStubBuffer *This) \

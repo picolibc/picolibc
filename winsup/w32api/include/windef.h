@@ -200,9 +200,9 @@ DECLARE_HANDLE(HKL);
 typedef int HFILE;
 typedef HICON HCURSOR;
 typedef DWORD COLORREF;
-typedef int (WINAPI *FARPROC)();
-typedef int (WINAPI *NEARPROC)();
-typedef int (WINAPI *PROC)();
+typedef int (WINAPI *FARPROC)(void);
+typedef int (WINAPI *NEARPROC)(void);
+typedef int (WINAPI *PROC)(void);
 typedef struct tagRECT {
 	LONG left;
 	LONG top;
