@@ -145,6 +145,9 @@ case "${host_cpu}" in
   strongarm)
 	machine_dir=arm
 	;;
+  xscale)
+	machine_dir=xscale
+	;;
   thumb)
 	machine_dir=arm
 	;;
@@ -261,6 +264,9 @@ case "${host}" in
 	unix_dir=unix
 	;;
   strongarm-*-*)
+	sys_dir=arm 
+	;;
+  xscale-*-*)
 	sys_dir=arm 
 	;;
   thumb-*-*)
@@ -418,6 +424,11 @@ case "${host}" in
 	esac
 	;;
   strongarm-*-*)
+	syscall_dir=syscalls
+	newlib_cflags="${newlib_cflags} -DABORT_PROVIDED -DHAVE_GETTIMEOFDAY"
+	newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
+	;;
+  xscale-*-*)
 	syscall_dir=syscalls
 	newlib_cflags="${newlib_cflags} -DABORT_PROVIDED -DHAVE_GETTIMEOFDAY"
 	newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"

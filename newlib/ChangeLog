@@ -1,3 +1,22 @@
+2000-11-29  Nick Clifton  <nickc@redhat.com>
+
+	* configure.host: Add xscale target.
+	* libc/machine/xscale: New directory.
+	* libc/machine/xscale/Makefile.am: New file.
+	* libc/machine/xscale/Makefile.in: New file.
+	* libc/machine/xscale/aclocal.m4: New file.
+	* libc/machine/xscale/configure: New file.
+	* libc/machine/xscale/configure.in: New file.
+	* libc/machine/xscale/memchr.S: New file.
+	* libc/machine/xscale/memcmp.S: New file.
+	* libc/machine/xscale/memcpy.S: New file.
+	* libc/machine/xscale/memmove.S: New file.
+	* libc/machine/xscale/memset.S: New file.
+	* libc/machine/xscale/strchr.S: New file.
+	* libc/machine/xscale/strcmp.S: New file.
+	* libc/machine/xscale/strcpy.S: New file.
+	* libc/machine/xscale/strlen.S: New file.
+
 Sat Nov 25 11:24:00 2000  Corinna Vinschen <vinschen@cygnus.com>
 
 	* libc/include/sys/types.h: Change i to `__i' in FD_ZERO macro to
