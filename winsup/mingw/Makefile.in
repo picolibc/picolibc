@@ -218,13 +218,13 @@ libmingw32.a: $(MINGW_OBJS)
 $(srcdir)/moldname-crtdll.def: moldname.def.in
 	$(CC) -DRUNTIME=crtdll \
 		-D__FILENAME__=moldname-crtdll.def \
-		-D__CRTDLL__  -c -E -P \
+		-D__CRTDLL__  -C -E -P \
 		-xc-header $? > $@
 
 $(srcdir)/moldname-msvcrt.def: moldname.def.in
 	$(CC) -DRUNTIME=msvcrt \
 		-D__FILENAME__=moldname-msvcrt.def \
-		-D__MSVCRT__  -c -E -P \
+		-D__MSVCRT__  -C -E -P \
 		-xc-header $? > $@
 
 libcoldname.a: $(srcdir)/moldname-crtdll.def $(MOLD_OBJS)

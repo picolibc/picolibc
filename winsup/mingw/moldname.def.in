@@ -33,9 +33,9 @@ chsize
 close
 creat
 cwait
-#if (__MSVCRT__) 
+#if !(__CRTDLL__)
 daylight DATA
-#endif 
+#endif
 dup
 dup2
 ecvt
@@ -114,7 +114,7 @@ strupr
 swab
 tell
 tempnam
-#if (__MSVCRT__) 
+#if  !(__CRTDLL__)
 timezone DATA
 #endif
 ; export tzname for both. See <time.h>
@@ -133,6 +133,9 @@ wcsnset
 wcsrev
 wcsset
 wcsupr
+#if  !(__CRTDLL__)
+wpopen
+#endif
 write
 y0
 y1
