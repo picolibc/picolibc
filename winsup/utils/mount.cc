@@ -217,7 +217,7 @@ main (int argc, char **argv)
 	  if (optind >= argc)
 	    fprintf (stderr, "%s: not enough arguments\n", progname);
 	  else
-	    fprintf (stderr, "%s: too many arguments\n", progname, optind, argc);
+	    fprintf (stderr, "%s: too many arguments\n", progname);
 	  usage ();
 	}
       if (force || !mount_already_exists (argv[optind + 1], flags))

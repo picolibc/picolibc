@@ -1,3 +1,7 @@
+Sat Sep  1 15:58:11 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* mount.cc (main): Eliminate excess arguments in printf.
+
 2001-08-30  Egor Duda  <deo@logos-m.ru>
 
 	* dumper.h: Update copyright notice.
