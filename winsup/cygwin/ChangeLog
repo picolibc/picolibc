@@ -1,3 +1,7 @@
+2002-09-22  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (DLL_O_FILES): Restore formatting.
+
 2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	GNUify non-GNU formatted functions calls throughout.
