@@ -1,3 +1,18 @@
+2003-01-01  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* pseudo-reloc.c (do_pseudo_reloc): Make static.
+	* pseudo-reloc-list.c: New file.
+	* crt1.c (_pei386_runtime_relocator): Declare.
+	(__mingw_CRTStartup): Call it.
+	* dllcrt1.c (_pei386_runtime_relocator): Declare.
+	(DllMainCRTStartup): Call it.
+	* Makefile.in: Add pseudo-reloc.o pseude-reloc-list.o to
+	libmingw32.a.
+
+2003-01-01  Egor Duda  <deo@logos-m.ru>
+
+	* pseudo-reloc.c: New file.
+
 2002-12-20  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/_mingw.h: Increment version to 2.4.

@@ -150,7 +150,8 @@ FLAGS_TO_PASS:=\
 CRT0S = crt1.o dllcrt1.o crt2.o dllcrt2.o CRT_noglob.o crtmt.o crtst.o \
 	CRT_fp8.o CRT_fp10.o txtmode.o binmode.o
 MINGW_OBJS = CRTglob.o CRTfmode.o CRTinit.o  dllmain.o gccmain.o \
-	     main.o crtst.o mthr_stub.o CRT_fp10.o txtmode.o
+	     main.o crtst.o mthr_stub.o CRT_fp10.o txtmode.o \
+	     pseudo-reloc.o pseudo-reloc-list.o
 MOLD_OBJS = ctype_old.o string_old.o
 
 LIBS = libcrtdll.a libmsvcrt.a libmsvcrt20.a libmsvcrt40.a libmingw32.a \
@@ -164,7 +165,9 @@ crt1.c crtdll.def crtmt.c crtst.c ctype_old.c  dllcrt1.c dllmain.c \
 gccmain.c init.c install-sh jamfile main.c mkinstalldirs moldname-crtdll.def \
 moldname-msvcrt.def moldname.def moldname.def.in msvcrt.def msvcrt20.def \
 msvcrt40.def mthr.c mthr_init.c mthr_stub.c readme.txt string_old.c \
-CRT_fp8.c CRT_fp10.c test_headers.c txtmode.c binmode.c
+CRT_fp8.c CRT_fp10.c test_headers.c txtmode.c binmode.c pseudo-reloc.c \
+pseudo-reloc-list.c
+
 
 all_dlls_host = @all_dlls_host@
 install_dlls_host = @install_dlls_host@

@@ -54,6 +54,7 @@ p_atexit_fn __dllonexit (p_atexit_fn, p_atexit_fn**, p_atexit_fn**);
 
 extern BOOL WINAPI DllMain (HANDLE, DWORD, LPVOID);
 
+extern void _pei386_runtime_relocator (void);
 
 BOOL WINAPI
 DllMainCRTStartup (HANDLE hDll, DWORD dwReason, LPVOID lpReserved)
@@ -62,6 +63,11 @@ DllMainCRTStartup (HANDLE hDll, DWORD dwReason, LPVOID lpReserved)
 
   if (dwReason == DLL_PROCESS_ATTACH)
     {
+
+#ifdef DEBUG
+      printf ("%s: DLL_PROCESS_ATTACH (%d)\n", __FUNCTION__);
+#endif
+
       /* Initialize private atexit table for this dll.
 	 32 is min size required by ANSI */
 
@@ -74,11 +80,10 @@ DllMainCRTStartup (HANDLE hDll, DWORD dwReason, LPVOID lpReserved)
       *first_atexit =  NULL;
       next_atexit = first_atexit;
 
-#ifdef DEBUG
-        printf ("%s: DLL_PROCESS_ATTACH (%d)\n", __FUNCTION__);
-#endif
+      /* Adust references to dllimported data (from other DLL's)
+	 that have non-zero offsets.  */ 
+      _pei386_runtime_relocator ();
 
-                
 #ifdef	__GNUC__
       /* From libgcc.a, __main calls global class constructors,
 	 __do_global_ctors, which registers __do_global_dtors
