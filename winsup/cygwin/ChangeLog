@@ -1,6 +1,10 @@
+Wed Jan 31 13:22:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* include/sys/resource.h: Fix typo.
+
 Wed Jan 31 13:20:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
-	* include/sys/resources.h: Add RLIMIT_NLIMITS and RLIM_NLIMITS.
+	* include/sys/resource.h: Add RLIMIT_NLIMITS and RLIM_NLIMITS.
 
 Tue Jan 30 18:15:23 2001  Christopher Faylor <cgf@cygnus.com>
 

@@ -17,7 +17,7 @@ extern "C" {
 #define RLIMIT_AS	6		/* address space (virt. memory) limit */
 
 #define RLIMIT_NLIMITS  7		/* upper bound of RLIMIT_* defines */
-#define RLIM_NLIMITS    RLIM_NLIMITS
+#define RLIM_NLIMITS    RLIMIT_NLIMITS
 
 #define RLIM_INFINITY	(0xffffffffUL)
 #define RLIM_SAVED_MAX	RLIM_INFINITY
