@@ -543,7 +543,7 @@ const char *windows_device_names[] =
   "\\dev\\socket",
   "\\dev\\windows",
   
-  NULL, NULL,
+  NULL, NULL, NULL,
 
   "\\dev\\disk",
   "\\dev\\fd%d",
