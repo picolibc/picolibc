@@ -78,7 +78,18 @@ out:
   return hl;
 }
 
-#ifdef DEBUGGING_AND_FDS_PROTECTED
+void
+verify_handle (const char *func, int ln, HANDLE h)
+{
+  handle_list *hl = find_handle (h);
+  if (!hl)
+    return;
+  system_printf ("%s:%d - multiple attempts to add handle %p", func, ln, h);
+
+  system_printf (" previously allocated by %s:%d(%s<%p>) winpid %d",
+		 hl->func, hl->ln, hl->name, hl->h, hl->pid);
+}
+
 void
 setclexec (HANDLE oh, HANDLE nh, bool not_inheriting)
 {
@@ -90,7 +101,6 @@ setclexec (HANDLE oh, HANDLE nh, bool not_inheriting)
       hl->h = nh;
     }
 }
-#endif
 
 /* Create a new handle record */
 static handle_list * __stdcall

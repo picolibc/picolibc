@@ -1,5 +1,39 @@
 2004-01-23  Christopher Faylor  <cgf@redhat.com>
 
+	* configure.in: Remove NEWVFORK default.
+	* configure: Regenerate.
+	* dcrt0.cc: Conditionalize vfork stuff throughout.
+	* dtable.cc: Ditto.
+	* perthread.h: Ditto.
+	* pipe.cc (fhandler_pipe::close): Ditto.
+	* spawn.cc (spawnve): Ditto.
+	* syscalls.cc (setsid): Ditto.
+	* exceptions.cc (sigpacket::process): Use macro to refer to vfork pid.
+
+	* debug.cc (verify_handle): Define new function.
+	* debug.h (VerifyHandle): Define new macro.
+	(verify_handle): Declare new function
+	* fhandler.cc (fhandler_base::dup): Verify that dup'ed handle is not
+	supposed to be in use.
+	(fhandler_base::set_inheritance): Ditto.
+	(fhandler_base::fork_fixup): Ditto.
+	* fhandler_socket.cc (fhandler_socket::dup): Ditto.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Ditto.
+	* net.cc (set_socket_inheritance): Ditto.
+	* pinfo.cc (pinfo_fixup_after_exec): Ditto.
+	* sigproc.cc (proc_subproc): Ditto.
+	(sig_send): Ditto.
+	* spawn.cc (spawn_guts): Ditto.
+	* thread.cc (pthread::init_mainthread): Ditto.
+	* pipe.cc (fhandler_pipe::close): Close read_state with
+	ForceCloseHandle since it was protected.
+	(fhandler_pipe::fixup_after_exec): Protect read_state handle.
+	(fhandler_pipe::dup): Correctly close open handles on error condition.
+	Verify that dup'ed handle is not supposed to be in use.
+	(fhandler_pipe::create): Protect read_state.
+
+2004-01-23  Christopher Faylor  <cgf@redhat.com>
+
 	* exceptions.cc (sig_handle_tty_stop): Fix boneheaded mistake by using
 	correct check for parent state rather than inverted check mistakenly
 	introduced on 2003-09-15.

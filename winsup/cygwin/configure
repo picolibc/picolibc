@@ -1924,7 +1924,7 @@ fi
 
 case "$vfork" in
 no)	 ;;
-yes|*)	 cat >> confdefs.h <<EOF
+yes)	 cat >> confdefs.h <<EOF
 #define NEWVFORK 1
 EOF
  ;;

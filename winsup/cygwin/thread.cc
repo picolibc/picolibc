@@ -144,6 +144,7 @@ pthread::init_mainthread ()
     api_fatal ("failed to create mainthread handle");
   if (!thread->create_cancel_event ())
     api_fatal ("couldn't create cancel event for main thread");
+  VerifyHandle (thread->win32_obj_id);
   thread->postcreate ();
 }
 

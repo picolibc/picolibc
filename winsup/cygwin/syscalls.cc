@@ -300,6 +300,7 @@ getppid ()
 extern "C" pid_t
 setsid (void)
 {
+#ifdef NEWVFORK
   vfork_save *vf = vfork_storage.val ();
   /* This is a horrible, horrible kludge */
   if (vf && vf->pid < 0)
@@ -312,6 +313,7 @@ setsid (void)
 	}
       /* assuming that fork was successful */
     }
+#endif
 
   if (myself->pgid == myself->pid)
     syscall_printf ("hmm.  pgid %d pid %d", myself->pgid, myself->pid);

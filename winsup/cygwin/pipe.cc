@@ -89,11 +89,15 @@ fhandler_pipe::close ()
     CloseHandle (guard);
   if (writepipe_exists)
     CloseHandle (writepipe_exists);
+#ifndef NEWVFORK
+  if (read_state)
+#else
   // FIXME is this vfork_cleanup test right?  Is it responsible for some of
   // the strange pipe behavior that has been reported in the cygwin mailing
   // list?
   if (read_state && !cygheap->fdtab.in_vfork_cleanup ())
-    CloseHandle (read_state);
+#endif
+    ForceCloseHandle (read_state);
   if (get_handle ())
     {
       CloseHandle (get_handle ());
@@ -122,7 +126,10 @@ void
 fhandler_pipe::fixup_after_exec (HANDLE parent)
 {
   if (read_state)
-    read_state = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+    {
+      read_state = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+      ProtectHandle (read_state);
+    }
 }
 
 void
@@ -139,14 +146,16 @@ fhandler_pipe::fixup_after_fork (HANDLE parent)
 int
 fhandler_pipe::dup (fhandler_base *child)
 {
+  int res = -1;
+  fhandler_pipe *ftp = (fhandler_pipe *) child;
+  ftp->guard = ftp->writepipe_exists = ftp->read_state = NULL;
+
   if (get_handle ())
     {
-      int res = fhandler_base::dup (child);
+      res = fhandler_base::dup (child);
       if (res)
-	return res;
+	goto err;
     }
-
-  fhandler_pipe *ftp = (fhandler_pipe *) child;
 
   /* FIXME: This leaks handles in the failing condition */
   if (guard == NULL)
@@ -155,7 +164,7 @@ fhandler_pipe::dup (fhandler_base *child)
 			     DUPLICATE_SAME_ACCESS))
     {
       debug_printf ("couldn't duplicate guard %p, %E", guard);
-      return -1;
+      goto err;
     }
 
   if (writepipe_exists == NULL)
@@ -165,7 +174,7 @@ fhandler_pipe::dup (fhandler_base *child)
 			     DUPLICATE_SAME_ACCESS))
     {
       debug_printf ("couldn't duplicate writepipe_exists %p, %E", writepipe_exists);
-      return -1;
+      goto err;
     }
 
   if (read_state == NULL)
@@ -175,12 +184,31 @@ fhandler_pipe::dup (fhandler_base *child)
 			     DUPLICATE_SAME_ACCESS))
     {
       debug_printf ("couldn't duplicate read_state %p, %E", writepipe_exists);
-      return -1;
+      goto err;
     }
 
+  res = 0;
+  goto out;
+
+err:
+  if (!ftp->guard)
+    CloseHandle (ftp->guard);
+  if (!ftp->writepipe_exists)
+    CloseHandle (ftp->writepipe_exists);
+  if (!ftp->read_state)
+    CloseHandle (ftp->read_state);
+  goto leave;
+
+out:
   ftp->id = id;
   ftp->orig_pid = orig_pid;
-  return 0;
+  VerifyHandle (ftp->guard);
+  VerifyHandle (ftp->writepipe_exists);
+  VerifyHandle (ftp->read_state);
+
+leave:
+  debug_printf ("res %d", res);
+  return res;
 }
 
 int
@@ -208,6 +236,7 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode, bool fif
 
       fhs[0]->read_state = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
       fhs[0]->set_need_fork_fixup ();
+      ProtectHandle1 (fhs[0]->read_state, read_state);
 
       res = 0;
       fhs[0]->create_guard (sa);

@@ -363,6 +363,7 @@ fhandler_socket::dup (fhandler_base *child)
       __seterrno ();
       return -1;
     }
+  VerifyHandle (nh);
   fhs->set_io_handle (nh);
   return 0;
 }

@@ -178,6 +178,9 @@ init_cygheap::close_ctty ()
   debug_printf ("closing cygheap->ctty %p", cygheap->ctty);
   int usecount = cygheap->ctty->usecount;
   cygheap->ctty->close ();
+#ifndef NEWVFORK
+  cygheap->ctty = NULL;
+#else  // FIXME: This code ain't right
   if (cygheap->ctty_on_hold == cygheap->ctty)
     cygheap->ctty_on_hold = NULL;
   if (usecount == 1)
@@ -185,6 +188,7 @@ init_cygheap::close_ctty ()
       cygheap->ctty = NULL;
       debug_printf ("setting cygheap->ctty to NULL");
     }
+#endif
 }
 
 #define pagetrunc(x) ((void *) (((DWORD) (x)) & ~(4096 - 1)))

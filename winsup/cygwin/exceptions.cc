@@ -957,7 +957,7 @@ sigpacket::process ()
   bool special_case;
   bool insigwait_mask;
   insigwait_mask = masked = false;
-  if (special_case = (main_vfork->pid || ISSTATE (myself, PID_STOPPED)))
+  if (special_case = (VFORKPID || ISSTATE (myself, PID_STOPPED)))
     /* nothing to do */;
   else if (tls && sigismember (&tls->sigwait_mask, si.si_signo))
     insigwait_mask = true;

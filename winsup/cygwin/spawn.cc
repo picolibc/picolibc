@@ -404,6 +404,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
        return -1;
      }
 
+  VerifyHandle (ciresrv.parent);
   ciresrv.moreinfo = (cygheap_exec_info *) ccalloc (HEAP_1_EXEC, 1, sizeof (cygheap_exec_info));
   ciresrv.moreinfo->old_title = NULL;
 
@@ -612,6 +613,8 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 			&ciresrv.moreinfo->myself_pinfo, 0,
 			TRUE, DUPLICATE_SAME_ACCESS))
     ciresrv.moreinfo->myself_pinfo = NULL;
+  else
+    VerifyHandle (ciresrv.moreinfo->myself_pinfo);
 
  skip_arg_parsing:
   PROCESS_INFORMATION pi = {NULL, 0, 0, 0};
@@ -901,6 +904,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 				    0, FALSE, DUPLICATE_SAME_ACCESS);
 	  sigproc_printf ("%d = DuplicateHandle, oldh %p, newh %p",
 			  rc, oldh, myself->hProcess);
+	  VerifyHandle (myself->hProcess);
 	  if (!rc && my_parent_is_alive ())
 	    {
 	      system_printf ("Reparent failed, parent handle %p, %E", h);
@@ -958,12 +962,14 @@ spawnve (int mode, const char *path, const char *const *argv,
 	 const char *const *envp)
 {
   int ret;
+#ifdef NEWVFORK
   vfork_save *vf = vfork_storage.val ();
 
   if (vf != NULL && (vf->pid < 0) && mode == _P_OVERLAY)
     mode = _P_NOWAIT;
   else
     vf = NULL;
+#endif
 
   syscall_printf ("spawnve (%s, %s, %x)", path, argv[0], envp);
 
@@ -984,6 +990,7 @@ spawnve (int mode, const char *path, const char *const *argv,
     case _P_SYSTEM:
       subproc_init ();
       ret = spawn_guts (path, argv, envp, mode);
+#ifdef NEWVFORK
       if (vf)
 	{
 	  if (ret > 0)
@@ -992,6 +999,7 @@ spawnve (int mode, const char *path, const char *const *argv,
 	      vf->restore_pid (ret);
 	    }
 	}
+#endif
       break;
     default:
       set_errno (EINVAL);
