@@ -1,9 +1,13 @@
-2002-12-11  Danny Smith  <dannysmith@users.sourveforge.net>
+2002-12-12  Dimitri Papadopoulos  <dimitri_at@sourceforge.users.net>
+
+	* include/oleacc.h (SELFLAG_*): Change to enum.
+
+2002-12-11  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/shlobj.h (IShellLinkW::GetPath): Correct prototype.
 	Thanks to: Dimitri Papadopoulos <dimitri_at@sourceforge.users.net>
 
-2002-12-09  Danny Smith  <dannysmith@users.sourveforge.net>
+2002-12-09  Danny Smith  <dannysmith@users.sourceforge.net>
 	
 	* include/shellapi.h (ExtractIconEx[AW]): Correct return type
 	to UINT.
