@@ -615,14 +615,15 @@ _link (const char *a, const char *b)
 {
   int res = -1;
   sigframe thisframe (mainthread);
-  path_conv real_a (a, PC_SYM_NOFOLLOW | PC_FULL);
   path_conv real_b (b, PC_SYM_NOFOLLOW | PC_FULL);
-
+  path_conv real_a (a, PC_SYM_NOFOLLOW | PC_FULL);
+  
   if (real_a.error)
     {
       set_errno (real_a.error);
       goto done;
     }
+
   if (real_b.error)
     {
       set_errno (real_b.case_clash ? ECASECLASH : real_b.error);
@@ -631,11 +632,12 @@ _link (const char *a, const char *b)
 
   if (real_b.exists ())
     {
-      syscall_printf ("file '%s' exists?", (char *)real_b);
+      syscall_printf ("file '%s' exists?", (char *) real_b);
       set_errno (EEXIST);
       goto done;
     }
-  if (real_b.get_win32 ()[strlen (real_b.get_win32 ()) - 1] == '.')
+
+  if (real_b[strlen (real_b) - 1] == '.')
     {
       syscall_printf ("trailing dot, bailing out");
       set_errno (EINVAL);
@@ -645,7 +647,7 @@ _link (const char *a, const char *b)
   /* Try to make hard link first on Windows NT */
   if (wincap.has_hard_links ())
     {
-      if (CreateHardLinkA (real_b.get_win32 (), real_a.get_win32 (), NULL))
+      if (CreateHardLinkA (real_b, real_a, NULL))
 	{
 	  res = 0;
 	  goto done;
@@ -663,7 +665,7 @@ _link (const char *a, const char *b)
       BOOL bSuccess;
 
       hFileSource = CreateFile (
-	real_a.get_win32 (),
+	real_a,
 	FILE_WRITE_ATTRIBUTES,
 	FILE_SHARE_READ | FILE_SHARE_WRITE /*| FILE_SHARE_DELETE*/,
 	&sec_none_nih, // sa
@@ -678,8 +680,7 @@ _link (const char *a, const char *b)
 	  goto docopy;
 	}
 
-      lpContext = NULL;
-      cbPathLen = sys_mbstowcs (wbuf, real_b.get_win32 (), MAX_PATH) * sizeof (WCHAR);
+      cbPathLen = sys_mbstowcs (wbuf, real_b, MAX_PATH) * sizeof (WCHAR);
 
       StreamId.dwStreamId = BACKUP_LINK;
       StreamId.dwStreamAttributes = 0;
@@ -688,8 +689,9 @@ _link (const char *a, const char *b)
       StreamId.Size.LowPart = cbPathLen;
 
       StreamSize = sizeof (WIN32_STREAM_ID) - sizeof (WCHAR**) +
-					    StreamId.dwStreamNameSize;
+		   StreamId.dwStreamNameSize;
 
+      lpContext = NULL;
       /* Write the WIN32_STREAM_ID */
       bSuccess = BackupWrite (
 	hFileSource,
@@ -741,7 +743,7 @@ _link (const char *a, const char *b)
     }
 docopy:
   /* do this with a copy */
-  if (CopyFileA (real_a.get_win32 (), real_b.get_win32 (), 1))
+  if (CopyFileA (real_a, real_b, 1))
     res = 0;
   else
     __seterrno ();

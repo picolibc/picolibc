@@ -1,3 +1,18 @@
+2002-06-26  Christopher Faylor  <cgf@redhat.com>
+
+	* winsup.h: Minor cleanup.
+	* path.h (path_conv::[]): New operator.
+	* syscalls.cc (_link): Use path_conv operators rather than methods,
+	where appropriate.  Minor white space cleanup.
+
+2002-06-26  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number.
+
+2002-06-25  Christopher Faylor  <cgf@redhat.com>
+
+	* dcrt0.cc (sm): Make NO_COPY.
+
 2002-06-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (chown): Convert uid to 32 bit.

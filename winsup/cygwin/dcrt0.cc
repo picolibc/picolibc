@@ -452,7 +452,7 @@ check_sanity_and_sync (per_process *p)
 }
 
 child_info NO_COPY *child_proc_info = NULL;
-static MEMORY_BASIC_INFORMATION sm;
+static MEMORY_BASIC_INFORMATION NO_COPY sm;
 
 #define CYGWIN_GUARD ((wincap.has_page_guard ()) ? PAGE_GUARD : PAGE_NOACCESS)
 
