@@ -96,7 +96,7 @@ class mmap_record
     __off64_t map_map (__off64_t off, DWORD len);
     BOOL unmap_map (caddr_t addr, DWORD len);
     void fixup_map (void);
-    int access (char *address);
+    int access (caddr_t address);
 
     fhandler_base *alloc_fh ();
     void free_fh (fhandler_base *fh);
@@ -226,7 +226,7 @@ mmap_record::fixup_map ()
 }
 
 int
-mmap_record::access (char *address)
+mmap_record::access (caddr_t address)
 {
   if (address < base_address_ || address >= base_address_ + size_to_map_)
     return 0;
@@ -889,6 +889,13 @@ mprotect (caddr_t addr, size_t len, int prot)
 
   syscall_printf ("mprotect (addr %x, len %d, prot %x)", addr, len, prot);
 
+  if (!wincap.virtual_protect_works_on_shared_pages ()
+      && addr >= (caddr_t)0x80000000 && addr <= (caddr_t)0xBFFFFFFF)
+    {
+      syscall_printf ("0 = mprotect (9x: No VirtualProtect on shared memory)");
+      return 0;
+    }
+
   if (prot == PROT_NONE)
     new_prot = PAGE_NOACCESS;
   else
@@ -948,7 +955,7 @@ fixup_mmaps_after_fork (HANDLE parent)
   for (int it = 0; it < mmapped_areas->nlists; ++it)
     {
       list *l = mmapped_areas->lists[it];
-      if (l != 0)
+      if (l)
 	{
 	  int li;
 	  for (li = 0; li < l->nrecs; ++li)
@@ -978,9 +985,47 @@ fixup_mmaps_after_fork (HANDLE parent)
 			&& !ReadProcessMemory (parent, address, address,
 					       getpagesize (), NULL))
 		      {
-			system_printf ("ReadProcessMemory failed for MAP_PRIVATE address %p, %E",
-				       rec->get_address ());
-			return -1;
+			DWORD old_prot;
+
+			if (GetLastError () != ERROR_PARTIAL_COPY ||
+			    !wincap.virtual_protect_works_on_shared_pages ())
+			  {
+			    system_printf ("ReadProcessMemory failed for "
+			    		   "MAP_PRIVATE address %p, %E",
+					   rec->get_address ());
+			    return -1;
+			  }
+			if (!VirtualProtectEx (parent,
+					       address, getpagesize (),
+					       PAGE_READONLY, &old_prot))
+			  {
+			    system_printf ("VirtualProtectEx failed for "
+					   "MAP_PRIVATE address %p, %E",
+					   rec->get_address ());
+			    return -1;
+			  }
+			else
+			  {
+			    BOOL ret, ret2;
+			    ret = ReadProcessMemory (parent, address, address,
+						     getpagesize (), NULL);
+			    ret2 = VirtualProtectEx(parent,
+			    			    address, getpagesize (),
+						    old_prot, &old_prot);
+			    if (!ret2)
+			      system_printf ("WARNING: VirtualProtectEx to"
+			      		     "return to previous state "
+					     "in parent failed for "
+					     "MAP_PRIVATE address %p, %E",
+					     rec->get_address ());
+			    if (!ret)
+			      {
+				system_printf ("ReadProcessMemory FAILED for "
+					       "MAP_PRIVATE address %p, %E",
+					       rec->get_address ());
+				return -1;
+			      }
+			  }
 		      }
 		}
 	      rec->fixup_map ();

@@ -1,3 +1,13 @@
+2003-01-14  Corinna Vinschen <corinna@vinschen.de>
+
+	* mmap.cc (mmap_record::access): Change argument type to caddr_t
+	for strictness.
+	(mprotect): Protect against calling VirtualProtect() for shared
+	pages on 9x/Me.
+	(fixup_mmaps_after_fork): If ReadProcessMemory() fails, try to
+	change protection of parent page to PAGE_READONLY, then try again.
+	Revert protection afterwards.
+
 2003-01-14  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* syscalls.cc (system): Add pthread_testcancel call.
