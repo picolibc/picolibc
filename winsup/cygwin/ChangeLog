@@ -4,7 +4,7 @@ Fri Oct  5 21:01:14 2001  Christopher Faylor <cgf@cygnus.com>
 	record it as non-inheritable for debugging purposes in case there is a
 	subsequent fork or exec.
 	* fhandler_tty.cc (fhandler_tty_common::fixup_after_fork): Allow
-	fork_fixup to call ProtecHandle.
+	fork_fixup to call ProtectHandle.
 
 Fri Oct  5 14:22:47 2001  Christopher Faylor <cgf@cygnus.com>
 
