@@ -100,10 +100,10 @@ LIBM_A=@LIBM_A@
 W32API_INCLUDE = @W32API_INCLUDE@
 INCLUDES+= -I$(srcdir)/include \
   -I$(srcdir)/../include \
-  -nostdinc -nostdinc++ \
+  -nostdinc \
   -iwithprefixbefore include
 ALL_CFLAGS = $(CFLAGS) $(W32API_INCLUDE) $(INCLUDES) $(MNO_CYGWIN)
-ALL_CXXFLAGS = $(CXXFLAGS) $(W32API_INCLUDE) $(INCLUDES) $(MNO_CYGWIN)
+ALL_CXXFLAGS = $(CXXFLAGS) $(W32API_INCLUDE) $(INCLUDES) -nostdinc++ $(MNO_CYGWIN)
 
 AS = @AS@
 AR = @AR@

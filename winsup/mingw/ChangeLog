@@ -1,5 +1,7 @@
 2004-07-13  Earnie Boyd  <earnie@users.sourcefourge.net>
 
+	* Makefile.in: Move use of --nostdinc++ as GCC3.4 refuses to use it
+	for C modules.
 	* include/limits.h: Change to new file header preamble.
 	* include/_mingw.h: Increment minor version for 3.4 release.
 	* Makefile.in: Ditto.
