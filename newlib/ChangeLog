@@ -1,5 +1,7 @@
 2002-06-14  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
+	* libc/sys/linux/sys/errno.h (EFTYPE): Add macro.
+
 	* libc/argz: New directory.
 	* libc/argz/*: New files.
 	* libc/argz/argz_add.c: New file.

@@ -26,5 +26,6 @@ extern __IMPORT int _sys_nerr;
 #include <asm/errno.h>
 
 #define ENOTSUP EOPNOTSUPP
+#define EFTYPE          79              /* Inappropriate file type or format */
 
 #endif
