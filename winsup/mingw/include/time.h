@@ -32,6 +32,7 @@
 
 #define __need_wchar_t
 #define __need_size_t
+#define __need_NULL
 #ifndef RC_INVOKED
 #include <stddef.h>
 #endif	/* Not RC_INVOKED */
