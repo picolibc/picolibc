@@ -1,3 +1,21 @@
+Mon Apr 16 15:08:00 2001  Corinna Vinschen <vinschen@redhat.com>
+
+	* mkgroup.c: Add function pointers `netlocalgroupgetmembers' and
+	`netgroupgetusers'.
+	(load_netapi): Load function pointers `netlocalgroupgetmembers'
+	and `netgroupgetusers'.
+	(enum_local_users): New function.
+	(enum_local_groups): Call `enum_local_users' for each group if
+	`print_users' is set.
+	(enum_users): New function.
+	(enum_groups): Call `enum_users' for each group if `print_users' is set.
+	(usage): Add usage text for `-u/--users'.
+	(longopts): Add option `--users'.
+	(opts): Add option character `u'.
+	(main): Set `print_users' according to option `-u/--users'.
+	Call `enum_local_groups' and `enum_groups' with additional parameter
+	`print_users'.
+
 2001-04-15  Michael A Chase <mchase@ix.netcom.com>
   
 	* mount.cc (longopts): Add help to options list.

@@ -24,7 +24,9 @@ SID_IDENTIFIER_AUTHORITY sid_nt_auth = {SECURITY_NT_AUTHORITY};
 NET_API_STATUS WINAPI (*netapibufferfree)(PVOID);
 NET_API_STATUS WINAPI (*netgroupenum)(LPWSTR,DWORD,PBYTE*,DWORD,PDWORD,PDWORD,PDWORD);
 NET_API_STATUS WINAPI (*netlocalgroupenum)(LPWSTR,DWORD,PBYTE*,DWORD,PDWORD,PDWORD,PDWORD);
+NET_API_STATUS WINAPI (*netlocalgroupgetmembers)(LPWSTR,LPWSTR,DWORD,PBYTE*,DWORD,PDWORD,PDWORD,PDWORD);
 NET_API_STATUS WINAPI (*netgetdcname)(LPWSTR,LPWSTR,PBYTE*);
+NET_API_STATUS WINAPI (*netgroupgetusers)(LPWSTR,LPWSTR,DWORD,PBYTE*,DWORD,PDWORD,PDWORD,PDWORD);
 
 #ifndef min
 #define min(a,b) (((a)<(b))?(a):(b))
@@ -42,7 +44,11 @@ load_netapi ()
     return FALSE;
   if (!(netgroupenum = GetProcAddress (h, "NetGroupEnum")))
     return FALSE;
+  if (!(netgroupgetusers = GetProcAddress (h, "NetGroupGetUsers")))
+    return FALSE;
   if (!(netlocalgroupenum = GetProcAddress (h, "NetLocalGroupEnum")))
+    return FALSE;
+  if (!(netlocalgroupgetmembers = GetProcAddress (h, "NetLocalGroupGetMembers")))
     return FALSE;
   if (!(netgetdcname = GetProcAddress (h, "NetGetDCName")))
     return FALSE;
@@ -100,8 +106,38 @@ uni2ansi (LPWSTR wcs, char *mbs, int size)
     *mbs = '\0';
 }
 
+void
+enum_local_users (LPWSTR groupname)
+{
+  LOCALGROUP_MEMBERS_INFO_1 *buf1;
+  DWORD entries = 0;
+  DWORD total = 0;
+  DWORD reshdl = 0;
+
+  if (!netlocalgroupgetmembers (NULL, groupname,
+				1, (LPBYTE *) &buf1,
+				MAX_PREFERRED_LENGTH,
+				&entries, &total, &reshdl))
+    {
+      int i, first = 1;
+
+      for (i = 0; i < entries; ++i)
+	if (buf1[i].lgrmi1_sidusage == SidTypeUser)
+	  {
+	    char user[256];
+
+	    if (!first)
+	      printf (",");
+	    first = 0;
+	    uni2ansi (buf1[i].lgrmi1_name, user, sizeof (user));
+	    printf ("%s", user);
+	  }
+      netapibufferfree (buf1);
+    }
+}
+
 int
-enum_local_groups (int print_sids)
+enum_local_groups (int print_sids, int print_users)
 {
   LOCALGROUP_INFO_0 *buffer;
   DWORD entriesread = 0;
@@ -113,7 +149,7 @@ enum_local_groups (int print_sids)
     {
       DWORD i;
 
-      rc = netlocalgroupenum (NULL, 0, (LPBYTE *) & buffer, 1024,
+      rc = netlocalgroupenum (NULL, 0, (LPBYTE *) &buffer, 1024,
 			      &entriesread, &totalentries, &resume_handle);
       switch (rc)
 	{
@@ -173,9 +209,12 @@ enum_local_groups (int print_sids)
 
 	  gid = *GetSidSubAuthority (psid, *GetSidSubAuthorityCount(psid) - 1);
 
-	  printf ("%s:%s:%ld:\n", localgroup_name,
-                                  print_sids ? put_sid (psid) : "",
-                                  gid);
+	  printf ("%s:%s:%ld:", localgroup_name,
+                                print_sids ? put_sid (psid) : "",
+                                gid);
+	  if (print_users)
+	    enum_local_users (buffer[i].lgrpi0_name);
+	  printf ("\n");
 	}
 
       netapibufferfree (buffer);
@@ -187,7 +226,36 @@ enum_local_groups (int print_sids)
 }
 
 void
-enum_groups (LPWSTR servername, int print_sids, int id_offset)
+enum_users (LPWSTR servername, LPWSTR groupname)
+{
+  GROUP_USERS_INFO_0 *buf1;
+  DWORD entries = 0;
+  DWORD total = 0;
+  DWORD reshdl = 0;
+
+  if (!netgroupgetusers (servername, groupname,
+			 0, (LPBYTE *) &buf1,
+			 MAX_PREFERRED_LENGTH,
+			 &entries, &total, &reshdl))
+    {
+      int i, first = 1;
+
+      for (i = 0; i < entries; ++i)
+	{
+	  char user[256];
+
+	  if (!first)
+	    printf (",");
+	  first = 0;
+	  uni2ansi (buf1[i].grui0_name, user, sizeof (user));
+	  printf ("%s", user);
+	}
+      netapibufferfree (buf1);
+    }
+}
+
+void
+enum_groups (LPWSTR servername, int print_sids, int print_users, int id_offset)
 {
   GROUP_INFO_2 *buffer;
   DWORD entriesread = 0;
@@ -271,9 +339,12 @@ enum_groups (LPWSTR servername, int print_sids, int id_offset)
                     }
                 }
             }
-	  printf ("%s:%s:%d:\n", groupname,
-                                 print_sids ? put_sid (psid) : "",
-                                 gid + id_offset);
+	  printf ("%s:%s:%d:", groupname,
+                               print_sids ? put_sid (psid) : "",
+                               gid + id_offset);
+	  if (print_users)
+	    enum_users (servername, buffer[i].grpi2_name);
+	  printf ("\n");
 	}
 
       netapibufferfree (buffer);
@@ -299,6 +370,7 @@ usage ()
   fprintf (stderr, "                          in domain accounts.\n");
   fprintf (stderr, "   -s,--no-sids           don't print SIDs in pwd field\n");
   fprintf (stderr, "                          (this affects ntsec)\n");
+  fprintf (stderr, "   -u,--users             print user list in gr_mem field\n");
   fprintf (stderr, "   -?,--help              print this message\n\n");
   fprintf (stderr, "One of `-l' or `-d' must be given on NT/W2K.\n");
   return 1;
@@ -309,11 +381,12 @@ struct option longopts[] = {
   {"domain", no_argument, NULL, 'd'},
   {"id-offset", required_argument, NULL, 'o'},
   {"no-sids", no_argument, NULL, 's'},
+  {"users", no_argument, NULL, 'u'},
   {"help", no_argument, NULL, 'h'},
   {0, no_argument, NULL, 0}
 };
 
-char opts[] = "ldo:sh";
+char opts[] = "ldo:suh";
 
 int
 main (int argc, char **argv)
@@ -324,6 +397,7 @@ main (int argc, char **argv)
   int print_local = 0;
   int print_domain = 0;
   int print_sids = 1;
+  int print_users = 0;
   int domain_specified = 0;
   int id_offset = 10000;
   int i;
@@ -352,6 +426,9 @@ main (int argc, char **argv)
 	      break;
 	    case 's':
 	      print_sids = 0;
+	      break;
+	    case 'u':
+	      print_users = 1;
 	      break;
 	    case 'h':
 	      return usage ();
@@ -471,11 +548,11 @@ main (int argc, char **argv)
 	  exit (1);
 	}
 
-      enum_groups (servername, print_sids, id_offset);
+      enum_groups (servername, print_sids, print_users, id_offset);
     }
 
   if (print_local)
-    enum_local_groups (print_sids);
+    enum_local_groups (print_sids, print_users);
 
   return 0;
 }
