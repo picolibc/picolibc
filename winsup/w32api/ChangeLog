@@ -1,3 +1,8 @@
+Tue Aug  8 21:29:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* include/userenv.h: New header file.
+	* lib/userenv.def: New stub for userenv.dll.
+
 Tue Aug  8 10:25:14 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* include/winuser.h: Correct PCWPSTRUCT typo.
