@@ -144,7 +144,7 @@ updates to what you have already installed.  Then...
 @item Run Cygwin Setup again, and apply the above technique to get all
 new packages that would not be installed by default.  You can check
 the list in the Partial View before proceeding, in case there's
-something you really emph{don't} want.
+something you really @emph{don't} want.
 
 @end enumerate
 
