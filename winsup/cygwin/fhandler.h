@@ -43,6 +43,8 @@ details. */
 
      fhandler_dev_mem     /dev/mem implementation (fhandler_mem.cc)
 
+     fhandler_dev_clipboard	/dev/clipboard implementation (fhandler_clipboard.cc)
+
      fhandler_proc	  Interesting possibility, not implemented yet
 */
 
@@ -97,8 +99,9 @@ enum
   FH_ZERO    = 0x00000014,	/* is the zero device */
   FH_RANDOM  = 0x00000015,	/* is a random device */
   FH_MEM     = 0x00000016,	/* is a mem device */
+  FH_CLIPBOARD = 0x00000017, /* is a clipbaord device */
 
-  FH_NDEV    = 0x00000017,	/* Maximum number of devices */
+  FH_NDEV    = 0x00000018,	/* Maximum number of devices */
   FH_DEVMASK = 0x00000fff,	/* devices live here */
   FH_BAD     = 0xffffffff
 };
@@ -792,6 +795,20 @@ public:
   HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, off_t off);
   int munmap (HANDLE h, caddr_t addr, size_t len);
   int msync (HANDLE h, caddr_t addr, size_t len, int flags);
+
+  void dump ();
+} ;
+ 
+class fhandler_dev_clipboard: public fhandler_base
+{
+public:
+  fhandler_dev_clipboard (const char *name);
+  int is_windows (void) { return 1; }
+  int open (const char *path, int flags, mode_t mode = 0);
+  int write (const void *ptr, size_t len);
+  int read (void *ptr, size_t len);
+  off_t lseek (off_t offset, int whence);
+  int close (void);
 
   void dump ();
 };

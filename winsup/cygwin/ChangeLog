@@ -1,3 +1,15 @@
+2000-10-16  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* fhandler_clipboard.cc: new file
+	* Makefile.in: include fhandler_clipboard.o in DLL_OFILES list.
+	* fhandler.h: add FH_CLIPBOARD to the devices enum.
+	(fhandler_dev_clipboard): new
+	* path.cc (windows_device_names): add "\\dev\\clipboard"
+	(get_device_number): check for "clipboard"
+	* dcrt0.cc: declare a few more functions from winuser.h
+	* dtable.cc (dtable::build_fhandler): check for FH_CLIPBOARD in
+	switch().
+
 Mon Oct 16 21:36:57 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* debug.cc (add_handle): Issue warning on attempts to add the same

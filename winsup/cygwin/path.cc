@@ -431,6 +431,7 @@ const char *windows_device_names[] =
   "\\dev\\zero",
   "\\dev\\%srandom",
   "\\dev\\mem",
+  "\\dev\\clipboard",
 };
 
 static int
@@ -505,6 +506,8 @@ get_device_number (const char *name, int &unit, BOOL from_conv)
           devn = FH_MEM;
           unit = 1;
         }
+      else if (deveq ("clipboard"))
+        devn = FH_CLIPBOARD;
       else if (deveq ("port"))
         {
           devn = FH_MEM;
