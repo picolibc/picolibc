@@ -1,3 +1,18 @@
+2004-05-11  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
+
+	* libc/stdio/vfprintf.c (VFPRINTF_R): Use _free_r instead
+	of free.
+
+2004-05-07  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
+
+	* libc/stdio/iprintf.c (_iprintf_r): Fix old-style argument
+	list for reentrant pointer.  Call _vfiprintf_r.
+	* libc/stdio/siprintf.c (_siprintf_r): New function.
+	* libc/stdio/vfprintf.c (__sbprintf): Add reetrant struct
+	pointer argument.  Change all callers.  Call _VFPRINTF_R.
+	* libc/include/stdio.h (_siprintf_r, _vfiprintf_r): New
+	prototypes.
+
 2004-05-07  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/param.h: Remove endian info and include

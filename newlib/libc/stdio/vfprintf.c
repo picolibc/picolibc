@@ -1201,7 +1201,7 @@ number:			if ((dprec = prec) >= 0)
 		FLUSH ();	/* copy out the I/O vectors */
 
                 if (malloc_buf != NULL) {
-			free (malloc_buf);
+			_free_r (data, malloc_buf);
 			malloc_buf = NULL;
 		}
 	}
@@ -1209,7 +1209,7 @@ done:
 	FLUSH ();
 error:
 	if (malloc_buf != NULL)
-		free (malloc_buf);
+		_free_r (data, malloc_buf);
 	return (__sferror (fp) ? EOF : ret);
 	/* NOTREACHED */
 }
