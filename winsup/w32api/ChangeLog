@@ -1,3 +1,18 @@
+2003-08-24   Danny Smith <dannysmith@users.sourceforge.net>
+
+	* include/objidl.h (COBJMACROS): Define macros only
+	if using C interace.
+	* include/unknwn.h: Ditto.
+	* include/comcat.h: Ditto.
+
+2003-08-24  Filip Navara  <xnavara@volny.cz>
+
+	* include/prsht.h (PSH_WIZARDHASFINISH, PSH_WIZARD_LITE,
+	PSH_NOCONTEXTHELP): Define.
+	(PSH_WIZARD97): Fix definition for _WIN32_IE >= 0x500.
+	* include/winuser.h (DFCS_TRANSPARENT, DFCS_HOT): Define.
+	(LPDLGTEMPLATE[AW]): Add typedefs.
+
 2003-08-22  Filip Navara  <xnavara@volny.cz>
 
 	* include/aclapi.h (BuildImpersonateExplicitAccessWithName[AW]):

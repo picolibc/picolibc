@@ -1410,7 +1410,9 @@ HRESULT STDMETHODCALLTYPE ILockBytes_ReadAt_Proxy(ILockBytes*,ULARGE_INTEGER,voi
 HRESULT STDMETHODCALLTYPE ILockBytes_ReadAt_Stub(ILockBytes*,ULARGE_INTEGER,BYTE*,ULONG,ULONG*);
 HRESULT STDMETHODCALLTYPE ILockBytes_WriteAt_Proxy(ILockBytes*,ULARGE_INTEGER,const void*,ULONG,ULONG*);
 HRESULT STDMETHODCALLTYPE ILockBytes_WriteAt_Stub(ILockBytes*,ULARGE_INTEGER,BYTE*,ULONG,ULONG*);
-#ifdef COBJMACROS
+
+#if (!defined (__cplusplus) || defined (CINTERFACE)) \
+    && defined (COBJMACROS)
 #define IMarshal_QueryInterface(T,r,p) (T)->lpVtbl->QueryInterface(T,r,p)
 #define IMarshal_AddRef(This) (This)->lpVtbl->AddRef(This)
 #define IMarshal_Release(This) (This)->lpVtbl->Release(This)

@@ -451,6 +451,10 @@ extern "C" {
 #define DFCS_INACTIVE	256
 #define DFCS_PUSHED	512
 #define DFCS_CHECKED	1024
+#if (WINVER >= _W2K)
+#define DFCS_TRANSPARENT	0x800
+#define DFCS_HOT	0x1000
+#endif /* WINVER >= _W2K */
 #define DFCS_ADJUSTRECT	0x2000
 #define DFCS_FLAT	0x4000
 #define DFCS_MONO	0x8000
@@ -2176,7 +2180,7 @@ typedef struct {
 	short y;
 	short cx;
 	short cy;
-} DLGTEMPLATE,*LPDLGTEMPLATE;
+} DLGTEMPLATE,*LPDLGTEMPLATE,*LPDLGTEMPLATEA,*LPDLGTEMPLATEW;
 typedef const DLGTEMPLATE *LPCDLGTEMPLATE;
 #pragma pack(pop)
 typedef struct tagDRAWITEMSTRUCT {

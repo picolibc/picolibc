@@ -31,7 +31,8 @@ DECLARE_INTERFACE_(IEnumGUID,IUnknown)
 	STDMETHOD(Clone)(THIS_ LPENUMGUID*) PURE;
 };
 #undef INTERFACE
-#ifdef COBJMACROS
+#if (!defined (__cplusplus) || defined (CINTERFACE)) \
+    && defined (COBJMACROS)
 #define IEnumGUID_QueryInterface(p,a,b) (p)->lpVtbl->QueryInterface(p,a,b)
 #define IEnumGUID_AddRef(p)             (p)->lpVtbl->AddRef(p)
 #define IEnumGUID_Release(p)            (p)->lpVtbl->Release(p)
@@ -103,7 +104,8 @@ DECLARE_INTERFACE_(ICatInformation,IUnknown)
 	STDMETHOD(EnumReqCategoriesOfClass)(THIS_ REFCLSID,LPENUMCATID*) PURE;
 };
 #undef INTERFACE
-#ifdef COBJMACROS
+#if (!defined (__cplusplus) || defined (CINTERFACE)) \
+    && defined (COBJMACROS)
 #define ICatInformation_QueryInterface(p,a,b) (p)->lpVtbl->QueryInterface(p,a,b)
 #define ICatInformation_AddRef(p)             (p)->lpVtbl->AddRef(p)
 #define ICatInformation_Release(p)            (p)->lpVtbl->Release(p)
@@ -129,7 +131,8 @@ DECLARE_INTERFACE_(ICatRegister,IUnknown)
 	STDMETHOD(UnRegisterClassReqCategories)(THIS_ REFCLSID,ULONG,CATID*) PURE;
 };
 #undef INTERFACE
-#ifdef COBJMACROS
+#if (!defined (__cplusplus) || defined (CINTERFACE)) \
+    && defined (COBJMACROS)
 #define ICatRegister_QueryInterface(p,a,b) (p)->lpVtbl->QueryInterface(p,a,b)
 #define ICatRegister_AddRef(p)             (p)->lpVtbl->AddRef(p)
 #define ICatRegister_Release(p)            (p)->lpVtbl->Release(p)
@@ -155,7 +158,8 @@ DECLARE_INTERFACE_(IEnumCATEGORYINFO,IUnknown)
 	STDMETHOD(Clone)(THIS_ LPENUMCATEGORYINFO*) PURE;
 };
 #undef INTERFACE
-#ifdef COBJMACROS
+#if (!defined (__cplusplus) || defined (CINTERFACE)) \
+    && defined (COBJMACROS)
 #define IEnumCATEGORYINFO_QueryInterface(p,a,b) (p)->lpVtbl->QueryInterface(p,a,b)
 #define IEnumCATEGORYINFO_AddRef(p)             (p)->lpVtbl->AddRef(p)
 #define IEnumCATEGORYINFO_Release(p)            (p)->lpVtbl->Release(p)
