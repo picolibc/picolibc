@@ -547,8 +547,13 @@ initial_env (bool first)
 #ifdef DEBUGGING
   DWORD len;
   static bool NO_COPY did_debugging_stuff;
+#if 0
   if (did_debugging_stuff || (first && wincap.cant_debug_dll_entry ()))
     return;
+#else
+  if (first)
+    return;
+#endif
 
   did_debugging_stuff = true;
   if (GetEnvironmentVariable ("CYGWIN_SLEEP", buf, sizeof (buf) - 1))
@@ -752,10 +757,7 @@ dll_crt0_1 (char *)
   /* Initialize pthread mainthread when not forked and it is safe to call new,
      otherwise it is reinitalized in fixup_after_fork */
   if (!user_data->forkee)
-    {
-      __sinit (_impure_ptr);
-      pthread::init_mainthread ();
-    }
+    pthread::init_mainthread ();
 
 #ifdef DEBUGGING
   strace.microseconds ();
@@ -933,15 +935,18 @@ _dll_crt0 ()
   main_environ = user_data->envptr;
   *main_environ = NULL;
 
-  if (child_proc_info && child_proc_info->type == _PROC_FORK)
-    user_data->forkee = child_proc_info->cygpid;
-
   char padding[CYGTLS_PADSIZE];
   _impure_ptr = &reent_data;
   _impure_ptr->_stdin = &_impure_ptr->__sf[0];
   _impure_ptr->_stdout = &_impure_ptr->__sf[1];
   _impure_ptr->_stderr = &_impure_ptr->__sf[2];
   _impure_ptr->_current_locale = "C";
+
+  if (child_proc_info && child_proc_info->type == _PROC_FORK)
+    user_data->forkee = child_proc_info->cygpid;
+  else
+    __sinit (_impure_ptr);
+
   initialize_main_tls (padding);
   dll_crt0_1 (padding);
 }

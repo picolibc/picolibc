@@ -383,7 +383,8 @@ try_to_debug (bool waitloop)
 	return 1;
       SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_IDLE);
       while (!being_debugged ())
-	low_priority_sleep (0);
+	Sleep (0);
+      Sleep (2000);
       small_printf ("*** continuing pid %u from debugger call\n",
 		    cygwin_pid (GetCurrentProcessId ()));
     }
