@@ -1,3 +1,8 @@
+Wed Jul 26 14:32:38 2000  Egor Duda <deo@logos-m.ru>
+
+	* syscalls.cc (stat_worker): Make stat return correct st_blocks for
+	files with size bigger than 2Gb and less than 4Gb
+
 Wed Jul 26 17:43:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* security.cc (lookup_name): Search on local machine first if

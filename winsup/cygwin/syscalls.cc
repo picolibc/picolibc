@@ -689,36 +689,36 @@ chown_worker (const char *name, unsigned fmode, uid_t uid, gid_t gid)
 
       DWORD attrib = 0;
       if (win32_path.file_attributes () & FILE_ATTRIBUTE_DIRECTORY)
-        attrib |= S_IFDIR;
+	attrib |= S_IFDIR;
       res = get_file_attribute (win32_path.has_acls (),
-                                win32_path.get_win32 (),
-                                (int *) &attrib,
-                                &old_uid,
-                                &old_gid);
+				win32_path.get_win32 (),
+				(int *) &attrib,
+				&old_uid,
+				&old_gid);
       if (!res)
-        {
-          if (uid == (uid_t) -1)
-            uid = old_uid;
-          if (gid == (gid_t) -1)
-            gid = old_gid;
-          if (win32_path.file_attributes () & FILE_ATTRIBUTE_DIRECTORY)
-            attrib |= S_IFDIR;
+	{
+	  if (uid == (uid_t) -1)
+	    uid = old_uid;
+	  if (gid == (gid_t) -1)
+	    gid = old_gid;
+	  if (win32_path.file_attributes () & FILE_ATTRIBUTE_DIRECTORY)
+	    attrib |= S_IFDIR;
 	  res = set_file_attribute (win32_path.has_acls (),
-                                    win32_path.get_win32 (),
+				    win32_path.get_win32 (),
 				    uid, gid, attrib,
-                                    myself->logsrv);
-        }
+				    myself->logsrv);
+	}
       if (res != 0 && get_errno () == ENOSYS)
       {
-        /* fake - if not supported, pretend we're like win95
-           where it just works */
-        res = 0;
+	/* fake - if not supported, pretend we're like win95
+	   where it just works */
+	res = 0;
       }
     }
 
 done:
   syscall_printf ("%d = %schown (%s,...)",
-                  res, (fmode & PC_SYM_IGNORE) ? "l" : "", name);
+		  res, (fmode & PC_SYM_IGNORE) ? "l" : "", name);
   return res;
 }
 
@@ -757,7 +757,7 @@ fchown (int fd, uid_t uid, gid_t gid)
     }
 
   syscall_printf ("fchown (%d,...): calling chown_worker (%s,FOLLOW,...)",
-                  fd, path);
+		  fd, path);
   return chown_worker (path, PC_SYM_FOLLOW, uid, gid);
 }
 
@@ -809,14 +809,14 @@ chmod (const char *path, mode_t mode)
       gid_t gid;
 
       if (win32_path.file_attributes () & FILE_ATTRIBUTE_DIRECTORY)
-        mode |= S_IFDIR;
+	mode |= S_IFDIR;
       get_file_attribute (win32_path.has_acls (),
-                          win32_path.get_win32 (),
-                          NULL, &uid, &gid);
+			  win32_path.get_win32 (),
+			  NULL, &uid, &gid);
       if (win32_path.file_attributes () & FILE_ATTRIBUTE_DIRECTORY)
-        mode |= S_IFDIR;
+	mode |= S_IFDIR;
       if (! set_file_attribute (win32_path.has_acls (),
-                                win32_path.get_win32 (),
+				win32_path.get_win32 (),
 				uid, gid,
 				mode, myself->logsrv)
 	  && allow_ntsec)
@@ -1030,8 +1030,8 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 
   if ((atts == -1 || !(atts & FILE_ATTRIBUTE_DIRECTORY) ||
        (os_being_run == winNT
-        && dtype != DRIVE_NO_ROOT_DIR
-        && dtype != DRIVE_UNKNOWN))
+	&& dtype != DRIVE_NO_ROOT_DIR
+	&& dtype != DRIVE_UNKNOWN))
       && (oret = fh.open (real_path, O_RDONLY | O_BINARY | O_DIROPEN |
 			  (nofollow ? O_NOSYMLINK : 0), 0)))
     {
@@ -1039,58 +1039,59 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
       fh.close ();
       /* The number of links to a directory includes the
 	 number of subdirectories in the directory, since all
-         those subdirectories point to it.
-         This is too slow on remote drives, so we do without it and
-         set the number of links to 2. */
+	 those subdirectories point to it.
+	 This is too slow on remote drives, so we do without it and
+	 set the number of links to 2. */
       /* Unfortunately the count of 2 confuses `find(1)' command. So
-         let's try it with `1' as link count. */
+	 let's try it with `1' as link count. */
       if (atts != -1 && (atts & FILE_ATTRIBUTE_DIRECTORY))
-        buf->st_nlink =
-            (dtype == DRIVE_REMOTE ? 1 : num_entries (real_path.get_win32 ()));
+	buf->st_nlink =
+	    (dtype == DRIVE_REMOTE ? 1 : num_entries (real_path.get_win32 ()));
     }
   else if (atts != -1 || (!oret && get_errno () != ENOENT
-                                && get_errno () != ENOSHARE))
+				&& get_errno () != ENOSHARE))
     {
       /* Unfortunately, the above open may fail if the file exists, though.
-         So we have to care for this case here, too. */
+	 So we have to care for this case here, too. */
       WIN32_FIND_DATA wfd;
       HANDLE handle;
       buf->st_nlink = 1;
       if (atts != -1
-          && (atts & FILE_ATTRIBUTE_DIRECTORY)
-          && dtype != DRIVE_REMOTE)
-        buf->st_nlink = num_entries (real_path.get_win32 ());
+	  && (atts & FILE_ATTRIBUTE_DIRECTORY)
+	  && dtype != DRIVE_REMOTE)
+	buf->st_nlink = num_entries (real_path.get_win32 ());
       buf->st_dev = FHDEVN(FH_DISK) << 8;
       buf->st_ino = hash_path_name (0, real_path.get_win32 ());
       if (atts != -1 && (atts & FILE_ATTRIBUTE_DIRECTORY))
-        buf->st_mode = S_IFDIR;
+	buf->st_mode = S_IFDIR;
       else if (real_path.issymlink ())
-        buf->st_mode = S_IFLNK;
+	buf->st_mode = S_IFLNK;
       else if (real_path.issocket ())
-        buf->st_mode = S_IFSOCK;
+	buf->st_mode = S_IFSOCK;
       else
-        buf->st_mode = S_IFREG;
+	buf->st_mode = S_IFREG;
       if (!real_path.has_acls ()
-          || get_file_attribute (real_path.has_acls (), real_path.get_win32 (),
-                                 &buf->st_mode, &buf->st_uid, &buf->st_gid))
-        {
-          buf->st_mode |= STD_RBITS | STD_XBITS;
-          if ((atts & FILE_ATTRIBUTE_READONLY) == 0)
-            buf->st_mode |= STD_WBITS;
-          get_file_attribute (FALSE, real_path.get_win32 (),
-                              NULL, &buf->st_uid, &buf->st_gid);
-        }
+	  || get_file_attribute (real_path.has_acls (), real_path.get_win32 (),
+				 &buf->st_mode, &buf->st_uid, &buf->st_gid))
+	{
+	  buf->st_mode |= STD_RBITS | STD_XBITS;
+	  if ((atts & FILE_ATTRIBUTE_READONLY) == 0)
+	    buf->st_mode |= STD_WBITS;
+	  get_file_attribute (FALSE, real_path.get_win32 (),
+			      NULL, &buf->st_uid, &buf->st_gid);
+	}
       if ((handle = FindFirstFile (real_path.get_win32(), &wfd))
-          != INVALID_HANDLE_VALUE)
-        {
-          buf->st_atime   = to_time_t (&wfd.ftLastAccessTime);
-          buf->st_mtime   = to_time_t (&wfd.ftLastWriteTime);
-          buf->st_ctime   = to_time_t (&wfd.ftCreationTime);
-          buf->st_size    = wfd.nFileSizeLow;
-          buf->st_blksize = S_BLKSIZE;
-          buf->st_blocks  = (buf->st_size + S_BLKSIZE-1) / S_BLKSIZE;
-          FindClose (handle);
-        }
+	  != INVALID_HANDLE_VALUE)
+	{
+	  buf->st_atime   = to_time_t (&wfd.ftLastAccessTime);
+	  buf->st_mtime   = to_time_t (&wfd.ftLastWriteTime);
+	  buf->st_ctime   = to_time_t (&wfd.ftCreationTime);
+	  buf->st_size    = wfd.nFileSizeLow;
+	  buf->st_blksize = S_BLKSIZE;
+	  buf->st_blocks  = ((unsigned long) buf->st_size +
+			    S_BLKSIZE-1) / S_BLKSIZE;
+	  FindClose (handle);
+	}
       res = 0;
     }
 
@@ -1139,47 +1140,47 @@ access (const char *fn, int flags)
   if (flags & R_OK)
     {
       if (st.st_uid == myself->uid)
-        {
-          if (!(st.st_mode & S_IRUSR))
-            goto done;
-        }
+	{
+	  if (!(st.st_mode & S_IRUSR))
+	    goto done;
+	}
       else if (st.st_gid == myself->gid)
-        {
-          if (!(st.st_mode & S_IRGRP))
-            goto done;
-        }
+	{
+	  if (!(st.st_mode & S_IRGRP))
+	    goto done;
+	}
       else if (!(st.st_mode & S_IROTH))
-        goto done;
+	goto done;
     }
   if (flags & W_OK)
     {
       if (st.st_uid == myself->uid)
-        {
-          if (!(st.st_mode & S_IWUSR))
-            goto done;
-        }
+	{
+	  if (!(st.st_mode & S_IWUSR))
+	    goto done;
+	}
       else if (st.st_gid == myself->gid)
-        {
-          if (!(st.st_mode & S_IWGRP))
-            goto done;
-        }
+	{
+	  if (!(st.st_mode & S_IWGRP))
+	    goto done;
+	}
       else if (!(st.st_mode & S_IWOTH))
-        goto done;
+	goto done;
     }
   if (flags & X_OK)
     {
       if (st.st_uid == myself->uid)
-        {
-          if (!(st.st_mode & S_IXUSR))
-            goto done;
-        }
+	{
+	  if (!(st.st_mode & S_IXUSR))
+	    goto done;
+	}
       else if (st.st_gid == myself->gid)
-        {
-          if (!(st.st_mode & S_IXGRP))
-            goto done;
-        }
+	{
+	  if (!(st.st_mode & S_IXGRP))
+	    goto done;
+	}
       else if (!(st.st_mode & S_IXOTH))
-        goto done;
+	goto done;
     }
   r = 0;
 done:
@@ -1237,7 +1238,7 @@ _rename (const char *oldpath, const char *newpath)
     res = -1;
 
   if (res == 0 || (GetLastError () != ERROR_ALREADY_EXISTS
-                   && GetLastError () != ERROR_FILE_EXISTS))
+		   && GetLastError () != ERROR_FILE_EXISTS))
     goto done;
 
   if (os_being_run == winNT)
@@ -1832,57 +1833,57 @@ seteuid (uid_t uid)
   if (os_being_run == winNT)
     {
       if (uid != (uid_t) -1)
-        {
-          struct passwd *pw_new = getpwuid (uid);
-          if (!pw_new)
-            {
-              set_errno (EINVAL);
-              return -1;
-            }
+	{
+	  struct passwd *pw_new = getpwuid (uid);
+	  if (!pw_new)
+	    {
+	      set_errno (EINVAL);
+	      return -1;
+	    }
 
-          if (uid != myself->uid)
-            if (uid == myself->orig_uid)
-              {
-                debug_printf ("RevertToSelf() (uid == orig_uid, token=%d)",
-                              myself->token);
-                RevertToSelf();
-                if (myself->token != INVALID_HANDLE_VALUE)
-                  myself->impersonated = FALSE;
-              }
-            else if (!myself->impersonated)
-              {
-                debug_printf ("Impersonate(uid == %d)", uid);
-                RevertToSelf();
-                if (myself->token != INVALID_HANDLE_VALUE)
-                  if (!ImpersonateLoggedOnUser (myself->token))
-                    system_printf ("Impersonate(%d) in set(e)uid failed: %E",
-                                   myself->token);
-                  else
-                    myself->impersonated = TRUE;
-              }
+	  if (uid != myself->uid)
+	    if (uid == myself->orig_uid)
+	      {
+		debug_printf ("RevertToSelf() (uid == orig_uid, token=%d)",
+			      myself->token);
+		RevertToSelf();
+		if (myself->token != INVALID_HANDLE_VALUE)
+		  myself->impersonated = FALSE;
+	      }
+	    else if (!myself->impersonated)
+	      {
+		debug_printf ("Impersonate(uid == %d)", uid);
+		RevertToSelf();
+		if (myself->token != INVALID_HANDLE_VALUE)
+		  if (!ImpersonateLoggedOnUser (myself->token))
+		    system_printf ("Impersonate(%d) in set(e)uid failed: %E",
+				   myself->token);
+		  else
+		    myself->impersonated = TRUE;
+	      }
 
-          struct pinfo pi;
-          pi.psid = (PSID) pi.sidbuf;
-          /* pi.token is used in internal_getlogin() to determine if
-             impersonation is active. If so, the token is used for
-             retrieving user's SID. */
-          pi.token = myself->impersonated ? myself->token
-                                          : INVALID_HANDLE_VALUE;
-          struct passwd *pw_cur = getpwnam (internal_getlogin (&pi));
-          if (pw_cur != pw_new)
-            {
-              debug_printf ("Diffs!!! token: %d, cur: %d, new: %d, orig: %d",
-                            myself->token, pw_cur->pw_uid,
-                            pw_new->pw_uid, myself->orig_uid);
-              set_errno (EPERM);
-              return -1;
-            }
-          myself->uid = uid;
-          strcpy (myself->username, pi.username);
-          strcpy (myself->logsrv, pi.logsrv);
-          strcpy (myself->domain, pi.domain);
-          memcpy (myself->sidbuf, pi.sidbuf, MAX_SID_LEN);
-        }
+	  struct pinfo pi;
+	  pi.psid = (PSID) pi.sidbuf;
+	  /* pi.token is used in internal_getlogin() to determine if
+	     impersonation is active. If so, the token is used for
+	     retrieving user's SID. */
+	  pi.token = myself->impersonated ? myself->token
+					  : INVALID_HANDLE_VALUE;
+	  struct passwd *pw_cur = getpwnam (internal_getlogin (&pi));
+	  if (pw_cur != pw_new)
+	    {
+	      debug_printf ("Diffs!!! token: %d, cur: %d, new: %d, orig: %d",
+			    myself->token, pw_cur->pw_uid,
+			    pw_new->pw_uid, myself->orig_uid);
+	      set_errno (EPERM);
+	      return -1;
+	    }
+	  myself->uid = uid;
+	  strcpy (myself->username, pi.username);
+	  strcpy (myself->logsrv, pi.logsrv);
+	  strcpy (myself->domain, pi.domain);
+	  memcpy (myself->sidbuf, pi.sidbuf, MAX_SID_LEN);
+	}
     }
   else
     set_errno (ENOSYS);
@@ -1898,14 +1899,14 @@ setegid (gid_t gid)
   if (os_being_run == winNT)
     {
       if (gid != (gid_t) -1)
-        {
-          if (!getgrgid (gid))
-            {
-              set_errno (EINVAL);
-              return -1;
-            }
-          myself->gid = gid;
-        }
+	{
+	  if (!getgrgid (gid))
+	    {
+	      set_errno (EINVAL);
+	      return -1;
+	    }
+	  myself->gid = gid;
+	}
     }
   else
     set_errno (ENOSYS);
@@ -1920,7 +1921,7 @@ chroot (const char *newroot)
 {
   int ret = -1;
   path_conv path(newroot, PC_SYM_FOLLOW | PC_FULL);
-  
+
   if (path.error)
     goto done;
   if (path.file_attributes () == (DWORD)-1)
@@ -1934,7 +1935,7 @@ chroot (const char *newroot)
       goto done;
     }
   ret = cygwin_shared->mount.conv_to_posix_path (path.get_win32 (),
-                                                 myself->root, 0);
+						 myself->root, 0);
   if (ret)
     {
       set_errno (ret);
@@ -1947,7 +1948,7 @@ chroot (const char *newroot)
 
 done:
   syscall_printf ("%d = chroot (%s)", ret ? get_errno () : 0,
-                                      newroot ? newroot : "NULL");
+				      newroot ? newroot : "NULL");
   return ret;
 }
 
