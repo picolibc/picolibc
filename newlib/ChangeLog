@@ -1,3 +1,7 @@
+2002-07-08  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/include/math.h (MAXFLOAT): Added.
+
 Mon Jul  8 13:55:23 2002  J"orn Rennecke <joern.rennecke@superh.com>
 
 	* libc/machine/sh/Makefile.am (lib_a_SOURCES):

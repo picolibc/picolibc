@@ -313,6 +313,8 @@ extern int matherr _PARAMS((struct exception *e));
 
 /* Useful constants.  */
 
+#define MAXFLOAT	3.40282347e+38F
+
 #define M_E		2.7182818284590452354
 #define M_LOG2E		1.4426950408889634074
 #define M_LOG10E	0.43429448190325182765
