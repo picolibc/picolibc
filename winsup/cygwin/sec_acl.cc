@@ -140,7 +140,7 @@ setacl (const char *file, int nentries, __aclent16_t *aclbufp)
 			       aclbufp[i].a_type | ACL_DEFAULT,
 			       (aclbufp[i].a_type & (USER|GROUP))
 			       ? aclbufp[i].a_id : -1)) >= 0
-	  && pos < nentries
+	  && aclbufp[pos].a_type
 	  && aclbufp[i].a_perm == aclbufp[pos].a_perm)
 	{
 	  inheritance = SUB_CONTAINERS_AND_OBJECTS_INHERIT;
@@ -213,29 +213,35 @@ setacl (const char *file, int nentries, __aclent16_t *aclbufp)
   return write_sd (file, psd, sd_size);
 }
 
+/* Temporary access denied bits */
+#define DENY_R 040000
+#define DENY_W 020000
+#define DENY_X 010000
+
 static void
-getace (__aclent16_t &acl, int type, int id, DWORD win_ace_mask, DWORD win_ace_type)
+getace (__aclent16_t &acl, int type, int id, DWORD win_ace_mask,
+        DWORD win_ace_type)
 {
   acl.a_type = type;
   acl.a_id = id;
 
-  if (win_ace_mask & FILE_READ_DATA)
+  if ((win_ace_mask & FILE_READ_DATA) && !(acl.a_perm & (S_IROTH | DENY_R)))
     if (win_ace_type == ACCESS_ALLOWED_ACE_TYPE)
-      acl.a_perm |= (acl.a_perm & S_IRGRP) ? 0 : S_IRUSR;
+      acl.a_perm |= S_IROTH;
     else if (win_ace_type == ACCESS_DENIED_ACE_TYPE)
-      acl.a_perm &= ~S_IRGRP;
+      acl.a_perm |= DENY_R;
 
-  if (win_ace_mask & FILE_WRITE_DATA)
+  if ((win_ace_mask & FILE_WRITE_DATA) && !(acl.a_perm & (S_IWOTH | DENY_W)))
     if (win_ace_type == ACCESS_ALLOWED_ACE_TYPE)
-      acl.a_perm |= (acl.a_perm & S_IWGRP) ? 0 : S_IWUSR;
+      acl.a_perm |= S_IWOTH;
     else if (win_ace_type == ACCESS_DENIED_ACE_TYPE)
-      acl.a_perm &= ~S_IWGRP;
+      acl.a_perm |= DENY_W;
 
-  if (win_ace_mask & FILE_EXECUTE)
+  if ((win_ace_mask & FILE_EXECUTE) && !(acl.a_perm & (S_IXOTH | DENY_X)))
     if (win_ace_type == ACCESS_ALLOWED_ACE_TYPE)
-      acl.a_perm |= (acl.a_perm & S_IXGRP) ? 0 : S_IXUSR;
+      acl.a_perm |= S_IXOTH;
     else if (win_ace_type == ACCESS_DENIED_ACE_TYPE)
-      acl.a_perm &= ~S_IXGRP;
+      acl.a_perm |= DENY_X;
 }
 
 static int
@@ -281,6 +287,10 @@ getacl (const char *file, DWORD attr, int nentries, __aclent16_t *aclbufp)
   lacl[1].a_type = GROUP_OBJ;
   lacl[1].a_id = gid;
   lacl[2].a_type = OTHER_OBJ;
+  lacl[2].a_id = ILLEGAL_GID;
+  lacl[3].a_type = CLASS_OBJ;
+  lacl[3].a_id = ILLEGAL_GID;
+  lacl[3].a_perm = S_IROTH | S_IWOTH | S_IXOTH;
 
   PACL acl;
   BOOL acl_exists;
@@ -292,106 +302,90 @@ getacl (const char *file, DWORD attr, int nentries, __aclent16_t *aclbufp)
       return -1;
     }
 
-  int pos, i;
+  int pos, i, types_def = 0;
 
   if (!acl_exists || !acl)
+    for (pos = 0; pos < 3; ++pos) /* Don't change CLASS_OBJ entry */
+      lacl[pos].a_perm = S_IROTH | S_IWOTH | S_IXOTH;
+  else
     {
-      for (pos = 0; pos < MIN_ACL_ENTRIES; ++pos)
-	lacl[pos].a_perm = S_IRWXU | S_IRWXG | S_IRWXO;
-      pos = nentries < MIN_ACL_ENTRIES ? nentries : MIN_ACL_ENTRIES;
-      memcpy (aclbufp, lacl, pos * sizeof (__aclent16_t));
-      return pos;
-    }
-
-  for (i = 0; i < acl->AceCount && (!nentries || i < nentries); ++i)
-    {
-      ACCESS_ALLOWED_ACE *ace;
-
-      if (!GetAce (acl, i, (PVOID *) &ace))
-	continue;
-
-      cygsid ace_sid ((PSID) &ace->SidStart);
-      int id;
-      int type = 0;
-
-      if (ace_sid == well_known_world_sid)
+      for (i = 0; i < acl->AceCount; ++i)
 	{
-	  type = OTHER_OBJ;
-	  id = 0;
-	}
-      else if (ace_sid == owner_sid)
-	{
-	  type = USER_OBJ;
-	  id = uid;
-	}
-      else if (ace_sid == group_sid)
-	{
-	  type = GROUP_OBJ;
-	  id = gid;
-	}
-      else
-	{
-	  id = ace_sid.get_id (FALSE, &type);
-	  if (type != GROUP)
+	  ACCESS_ALLOWED_ACE *ace;
+	  
+	  if (!GetAce (acl, i, (PVOID *) &ace))
+	    continue;
+
+	  cygsid ace_sid ((PSID) &ace->SidStart);
+	  int id;
+	  int type = 0;
+
+	  if (ace_sid == well_known_world_sid)
 	    {
-	      int type2 = 0;
-	      int id2 = ace_sid.get_id (TRUE, &type2);
-	      if (type2 == GROUP)
+	      type = OTHER_OBJ;
+	      id = ILLEGAL_GID;
+	    }
+	  else if (ace_sid == group_sid)
+	    {
+	      type = GROUP_OBJ;
+	      id = gid;
+	    }
+	  else if (ace_sid == owner_sid)
+	    {
+	      type = USER_OBJ;
+	      id = uid;
+	    }
+	  else
+	    {
+	      id = ace_sid.get_id (FALSE, &type);
+	      if (type != GROUP)
 		{
-		  id = id2;
-		  type = GROUP;
+		  int type2 = 0;
+		  int id2 = ace_sid.get_id (TRUE, &type2);
+		  if (type2 == GROUP)
+		    {
+		      id = id2;
+		      type = GROUP;
+		    }
 		}
 	    }
+	  if (!type)
+	    continue;
+	  if (!(ace->Header.AceFlags & INHERIT_ONLY))
+	    {
+	      if ((pos = searchace (lacl, MAX_ACL_ENTRIES, type, id)) >= 0)
+		getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType);
+	    }
+	  if ((ace->Header.AceFlags & SUB_CONTAINERS_AND_OBJECTS_INHERIT)
+	      && (attr & FILE_ATTRIBUTE_DIRECTORY))
+	    {
+	      type |= ACL_DEFAULT;
+	      types_def |= type;
+	      if ((pos = searchace (lacl, MAX_ACL_ENTRIES, type, id)) >= 0)
+		getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType);
+	    }
 	}
-      if (!type)
-	continue;
-      if (!(ace->Header.AceFlags & INHERIT_ONLY))
+      /* Include DEF_CLASS_OBJ if any default ace exists */
+      if ((types_def & (USER|GROUP)) 
+	  && ((pos = searchace (lacl, MAX_ACL_ENTRIES, DEF_CLASS_OBJ)) >= 0))
 	{
-	  if ((pos = searchace (lacl, MAX_ACL_ENTRIES, type, id)) >= 0)
-	    getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType);
-	}
-      if ((ace->Header.AceFlags & SUB_CONTAINERS_AND_OBJECTS_INHERIT)
-	  && (attr & FILE_ATTRIBUTE_DIRECTORY))
-	{
-	  type |= ACL_DEFAULT;
-	  if ((pos = searchace (lacl, MAX_ACL_ENTRIES, type, id)) >= 0)
-	    getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType);
+	  lacl[pos].a_type = DEF_CLASS_OBJ;
+	  lacl[pos].a_id = ILLEGAL_GID;
+	  lacl[pos].a_perm = S_IRWXU | S_IRWXG | S_IRWXO;
 	}
     }
   if ((pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) < 0)
     pos = MAX_ACL_ENTRIES;
-  for (i = 0; i < pos; ++i)
-    {
-      lacl[i].a_perm = (lacl[i].a_perm & S_IRWXU)
-		       & ~((lacl[i].a_perm & S_IRWXG) << 3);
-      lacl[i].a_perm |= (lacl[i].a_perm & S_IRWXU) >> 3
-			| (lacl[i].a_perm & S_IRWXU) >> 6;
-    }
-  if ((searchace (lacl, MAX_ACL_ENTRIES, USER) >= 0
-       || searchace (lacl, MAX_ACL_ENTRIES, GROUP) >= 0)
-      && (pos = searchace (lacl, MAX_ACL_ENTRIES, CLASS_OBJ)) >= 0)
-    {
-      lacl[pos].a_type = CLASS_OBJ;
-      lacl[pos].a_perm =
-	  lacl[searchace (lacl, MAX_ACL_ENTRIES, GROUP_OBJ)].a_perm;
-    }
-  int dgpos;
-  if ((searchace (lacl, MAX_ACL_ENTRIES, DEF_USER) >= 0
-       || searchace (lacl, MAX_ACL_ENTRIES, DEF_GROUP) >= 0)
-      && (dgpos = searchace (lacl, MAX_ACL_ENTRIES, DEF_GROUP_OBJ)) >= 0
-      && (pos = searchace (lacl, MAX_ACL_ENTRIES, DEF_CLASS_OBJ)) >= 0
-      && (attr & FILE_ATTRIBUTE_DIRECTORY))
-    {
-      lacl[pos].a_type = DEF_CLASS_OBJ;
-      lacl[pos].a_perm = lacl[dgpos].a_perm;
-    }
-  if ((pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) < 0)
-    pos = MAX_ACL_ENTRIES;
-  if (pos > nentries)
-    pos = nentries;
-  if (aclbufp)
+  if (aclbufp) {
+    if (EqualSid (owner_sid, group_sid)) 
+      lacl[0].a_perm = lacl[1].a_perm;
+    if (pos > nentries)
+      pos = nentries;
     memcpy (aclbufp, lacl, pos * sizeof (__aclent16_t));
-  aclsort (pos, 0, aclbufp);
+    for (i = 0; i < pos; ++i)
+      aclbufp[i].a_perm &= ~(DENY_R | DENY_W | DENY_X);
+    aclsort (pos, 0, aclbufp);
+  }
   syscall_printf ("%d = getacl (%s)", pos, file);
   return pos;
 }
@@ -406,7 +400,7 @@ acl_access (const char *path, int flags)
     return -1;
 
   /* Only check existance. */
-  if (!(flags & (R_OK|W_OK|X_OK)))
+  if (!(flags & (R_OK | W_OK | X_OK)))
     return 0;
 
   for (int i = 0; i < cnt; ++i)
@@ -450,9 +444,9 @@ acl_access (const char *path, int flags)
 	default:
 	  continue;
 	}
-      if ((!(flags & R_OK) || (acls[i].a_perm & S_IREAD))
-	  && (!(flags & W_OK) || (acls[i].a_perm & S_IWRITE))
-	  && (!(flags & X_OK) || (acls[i].a_perm & S_IEXEC)))
+      if ((!(flags & R_OK) || (acls[i].a_perm & S_IROTH))
+	  && (!(flags & W_OK) || (acls[i].a_perm & S_IWOTH))
+	  && (!(flags & X_OK) || (acls[i].a_perm & S_IXOTH)))
 	return 0;
     }
   set_errno (EACCES);
@@ -472,7 +466,7 @@ acl_worker (const char *path, int cmd, int nentries, __aclent16_t *aclbufp,
       syscall_printf ("-1 = acl (%s)", path);
       return -1;
     }
-  if (!real_path.has_acls ())
+  if (!real_path.has_acls () || !allow_ntsec)
     {
       struct __stat64 st;
       int ret = -1;
@@ -493,33 +487,25 @@ acl_worker (const char *path, int cmd, int nentries, __aclent16_t *aclbufp,
 		{
 		  lacl[0].a_type = USER_OBJ;
 		  lacl[0].a_id = st.st_uid;
-		  lacl[0].a_perm = (st.st_mode & S_IRWXU)
-				   | (st.st_mode & S_IRWXU) >> 3
-				   | (st.st_mode & S_IRWXU) >> 6;
+		  lacl[0].a_perm = (st.st_mode & S_IRWXU) >> 6;
 		}
 	      if (nentries > 1)
 		{
 		  lacl[1].a_type = GROUP_OBJ;
 		  lacl[1].a_id = st.st_gid;
-		  lacl[1].a_perm = (st.st_mode & S_IRWXG)
-				   | (st.st_mode & S_IRWXG) << 3
-				   | (st.st_mode & S_IRWXG) >> 3;
+		  lacl[1].a_perm = (st.st_mode & S_IRWXG) >> 3;
 		}
 	      if (nentries > 2)
 		{
 		  lacl[2].a_type = OTHER_OBJ;
-		  lacl[2].a_id = 0;
-		  lacl[2].a_perm = (st.st_mode & S_IRWXO)
-				   | (st.st_mode & S_IRWXO) << 6
-				   | (st.st_mode & S_IRWXO) << 3;
+		  lacl[2].a_id = ILLEGAL_GID;
+		  lacl[2].a_perm = st.st_mode & S_IRWXO;
 		}
 	      if (nentries > 3)
 		{
 		  lacl[3].a_type = CLASS_OBJ;
-		  lacl[3].a_id = 0;
-		  lacl[3].a_perm = (st.st_mode & S_IRWXG)
-				   | (st.st_mode & S_IRWXG) << 3
-				   | (st.st_mode & S_IRWXG) >> 3;
+		  lacl[3].a_id = ILLEGAL_GID;
+		  lacl[3].a_perm = S_IRWXU | S_IRWXG | S_IRWXO;
 		}
 	      if (nentries > 4)
 		nentries = 4;
@@ -766,26 +752,31 @@ acltomode (__aclent16_t *aclbufp, int nentries, mode_t *modep)
       return -1;
     }
   *modep = 0;
-  if ((pos = searchace (aclbufp, nentries, USER_OBJ)) < 0)
+  if ((pos = searchace (aclbufp, nentries, USER_OBJ)) < 0
+      || !aclbufp[pos].a_type)
     {
       set_errno (EINVAL);
       return -1;
     }
-  *modep |= aclbufp[pos].a_perm & S_IRWXU;
-  if ((pos = searchace (aclbufp, nentries, GROUP_OBJ)) < 0)
+  *modep |= (aclbufp[pos].a_perm & S_IRWXO) << 6;
+  if ((pos = searchace (aclbufp, nentries, GROUP_OBJ)) < 0
+      || !aclbufp[pos].a_type)
     {
       set_errno (EINVAL);
       return -1;
     }
-  if (searchace (aclbufp, nentries, CLASS_OBJ) < 0)
-    pos = searchace (aclbufp, nentries, CLASS_OBJ);
-  *modep |= (aclbufp[pos].a_perm & S_IRWXU) >> 3;
-  if ((pos = searchace (aclbufp, nentries, OTHER_OBJ)) < 0)
+  *modep |= (aclbufp[pos].a_perm & S_IRWXO) << 3;
+  int cpos;
+  if ((cpos = searchace (aclbufp, nentries, CLASS_OBJ)) >= 0
+      && aclbufp[cpos].a_type == CLASS_OBJ)
+    *modep |= ((aclbufp[pos].a_perm & S_IRWXO) & aclbufp[cpos].a_perm) << 3;
+  if ((pos = searchace (aclbufp, nentries, OTHER_OBJ)) < 0
+      || !aclbufp[pos].a_type)
     {
       set_errno (EINVAL);
       return -1;
     }
-  *modep |= (aclbufp[pos].a_perm & S_IRWXU) >> 6;
+  *modep |= aclbufp[pos].a_perm & S_IRWXO;
   return 0;
 }
 
@@ -800,32 +791,30 @@ aclfrommode (__aclent16_t *aclbufp, int nentries, mode_t *modep)
       set_errno (EINVAL);
       return -1;
     }
-  if ((pos = searchace (aclbufp, nentries, USER_OBJ)) < 0)
+  if ((pos = searchace (aclbufp, nentries, USER_OBJ)) < 0
+      || !aclbufp[pos].a_type)
     {
       set_errno (EINVAL);
       return -1;
     }
-  aclbufp[pos].a_perm = (*modep & S_IRWXU)
-			| (*modep & S_IRWXU) >> 3
-			| (*modep & S_IRWXU) >> 6;
-  if ((pos = searchace (aclbufp, nentries, GROUP_OBJ)) < 0)
+  aclbufp[pos].a_perm = (*modep & S_IRWXU) >> 6;
+  if ((pos = searchace (aclbufp, nentries, GROUP_OBJ)) < 0
+      || !aclbufp[pos].a_type)
     {
       set_errno (EINVAL);
       return -1;
     }
-  if (searchace (aclbufp, nentries, CLASS_OBJ) < 0)
-    pos = searchace (aclbufp, nentries, CLASS_OBJ);
-  aclbufp[pos].a_perm = (*modep & S_IRWXG)
-			| (*modep & S_IRWXG) << 3
-			| (*modep & S_IRWXG) >> 3;
-  if ((pos = searchace (aclbufp, nentries, OTHER_OBJ)) < 0)
+  aclbufp[pos].a_perm = (*modep & S_IRWXG) >> 3;
+  if ((pos = searchace (aclbufp, nentries, CLASS_OBJ)) >= 0
+      && aclbufp[pos].a_type == CLASS_OBJ)
+    aclbufp[pos].a_perm = (*modep & S_IRWXG) >> 3;
+  if ((pos = searchace (aclbufp, nentries, OTHER_OBJ)) < 0
+      || !aclbufp[pos].a_type)
     {
       set_errno (EINVAL);
       return -1;
     }
-  aclbufp[pos].a_perm = (*modep & S_IRWXO)
-			| (*modep & S_IRWXO) << 6
-			| (*modep & S_IRWXO) << 3;
+  aclbufp[pos].a_perm = (*modep & S_IRWXO);
   return 0;
 }
 
@@ -848,9 +837,9 @@ permtostr (mode_t perm)
 {
   static char pbuf[4];
 
-  pbuf[0] = (perm & S_IREAD) ? 'r' : '-';
-  pbuf[1] = (perm & S_IWRITE) ? 'w' : '-';
-  pbuf[2] = (perm & S_IEXEC) ? 'x' : '-';
+  pbuf[0] = (perm & S_IROTH) ? 'r' : '-';
+  pbuf[1] = (perm & S_IWOTH) ? 'w' : '-';
+  pbuf[2] = (perm & S_IXOTH) ? 'x' : '-';
   pbuf[3] = '\0';
   return pbuf;
 }
@@ -918,15 +907,15 @@ permfromstr (char *perm)
   if (strlen (perm) != 3)
     return 01000;
   if (perm[0] == 'r')
-    mode |= S_IRUSR | S_IRGRP | S_IROTH;
+    mode |= S_IROTH;
   else if (perm[0] != '-')
     return 01000;
   if (perm[1] == 'w')
-    mode |= S_IWUSR | S_IWGRP | S_IWOTH;
+    mode |= S_IWOTH;
   else if (perm[1] != '-')
     return 01000;
   if (perm[2] == 'x')
-    mode |= S_IXUSR | S_IXGRP | S_IXOTH;
+    mode |= S_IXOTH;
   else if (perm[2] != '-')
     return 01000;
   return mode;

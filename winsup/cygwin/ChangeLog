@@ -1,3 +1,25 @@
+2002-11-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_acl.cc: Fix some formatting.  Only set and check `other' bits in
+	a_perm throughout.  Use ILLEGAL_GID id for all entries having no id.
+	(setacl): Fix inheritance condition.
+	(getacl): Set all permission bits in CLASS_OBJ and DEF_CLASS_OBJ
+	entries.  Remove DENY bits before returning to calling function.
+	(acltomode): Fix usage of searchace().  If available, use CLASS_OBJ
+	to mask GROUP_OBJ permissions.
+	(aclfrommode): Fix usage of searchace().  If available, set CLASS_OBJ
+	permissions to same value as GROUP_OBJ permissions.
+
+2002-11-24  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* sec_acl.cc (getace): Fix the behavior when allow and
+	deny entries are present in arbitrary order.
+	(getacl): Report the actual number of entries when
+	aclbufp is NULL, even if nentries is zero. Fix the mask
+	reporting, handle the case where the owner and group sids
+	are equal and streamline the code.
+	(acl_worker): Take allow_ntsec into account.
+
 2002-11-05  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* dcrt0.cc (dll_crt0_1): Add call to pthread::initMainThread to
