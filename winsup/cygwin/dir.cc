@@ -352,9 +352,15 @@ rmdir (const char *dir)
       goto done;
     }
 
+  /* Does the file exist? */
+  if (real_dir.file_attributes () == (DWORD) -1)
+    {
+      set_errno (ENOENT);
+      goto done;
+    }
+
   /* Is `dir' a directory? */
-  if (real_dir.file_attributes () == (DWORD) -1 ||
-      !(real_dir.file_attributes () & FILE_ATTRIBUTE_DIRECTORY))
+  if  (!(real_dir.file_attributes () & FILE_ATTRIBUTE_DIRECTORY))
     {
       set_errno (ENOTDIR);
       goto done;

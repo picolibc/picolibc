@@ -1,3 +1,8 @@
+Tue Aug 28 16:37:17 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* dir.cc (rmdir): Report ENOENT when file doesn't exist rather than
+	ENOTDIR.
+
 Mon Aug 27 11:58:19 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* select.cc (cygwin_select): Ensure that arguments are zeroed on

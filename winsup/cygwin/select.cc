@@ -168,7 +168,8 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   /* Degenerate case.  No fds to wait for.  Just wait. */
   if (sel.start.next == NULL)
     {
-      if (WaitForSingleObject (signal_arrived, ms) == WAIT_OBJECT_0)
+      if (readfds != dummy_readfds && writefds != dummy_writefds && exceptfds != dummy_exceptfds &&
+      WaitForSingleObject (signal_arrived, ms) == WAIT_OBJECT_0)
 	{
 	  select_printf ("signal received");
 	  set_sig_errno (EINTR);
@@ -480,9 +481,12 @@ static int
 poll_pipe (select_record *me, fd_set *readfds, fd_set *writefds,
 	   fd_set *exceptfds)
 {
-  return peek_pipe (me, 0) ?
-	 set_bits (me, readfds, writefds, exceptfds) :
-	 0;
+  int doit = me->read_ready || me->write_ready || me->except_ready;
+
+  if (!doit)
+    peek_pipe (me, 0);
+
+  return doit ? set_bits (me, readfds, writefds, exceptfds) : 0;
 }
 
 MAKEready(pipe)
@@ -1188,9 +1192,12 @@ static int
 poll_socket (select_record *me, fd_set *readfds, fd_set *writefds,
 	   fd_set *exceptfds)
 {
-  return peek_socket (me, 0) ?
-	 set_bits (me, readfds, writefds, exceptfds) :
-	 0;
+  int doit = me->read_ready || me->write_ready || me->except_ready;
+
+  if (!doit)
+    peek_socket (me, 0);
+
+  return doit ? set_bits (me, readfds, writefds, exceptfds) : 0;
 }
 
 MAKEready (socket)
