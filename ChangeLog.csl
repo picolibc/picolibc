@@ -1,3 +1,15 @@
+2005-03-31  Mark Mitchell  <mark@codesourcery.com>
+
+	* gdb/ser-tcp.c (net_write_prim): Correct prototype.
+	
+	* readline/input.c (rl_getc): Use getche to read console input on
+	Windows.
+	
+	Revert:
+	2005-03-28  Mark Mitchell  <mark@codesourcery.com>
+	* gdb/event-top.c (gdb_setup_readline): Put console into
+	character-at-a-time mode under Windows.
+
 2005-03-30  Paul Brook  <paul@codesourcery.com>
 
 	* arm/wrapper.c: Provide SIGTRAP and SIGBUS.
