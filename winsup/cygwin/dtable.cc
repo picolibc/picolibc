@@ -54,8 +54,6 @@ hinfo::extend (int howmuch)
   /* Try to allocate more space for fd table. We can't call realloc()
      here to preserve old table if memory allocation fails */
 
-debug_printf ("here size %d", size);
-
   if (!(newfds = (fhandler_base **) calloc (new_size, sizeof newfds[0])))
     {
       debug_printf ("calloc failed");
@@ -69,7 +67,7 @@ debug_printf ("here size %d", size);
 
   size = new_size;
   fds = newfds;
-  debug_printf ("size %d, fds %d", size, fds);
+  debug_printf ("size %d, fds %p", size, fds);
   return 1;
 }
 

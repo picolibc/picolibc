@@ -1,3 +1,7 @@
+Wed Feb 23 21:59:44 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* hinfo.cc (hinfo::extend): Clean up debugging output.
+
 Wed Feb 23 21:34:58 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (interruptible): Change method for determining if
