@@ -44,19 +44,22 @@ extern "C"
 unsigned int
 sleep (unsigned int seconds)
 {
-  int res;
+  int rc;
   unsigned start_time;
+  unsigned int res;
 
   start_time = GetTickCount ();
 
   syscall_printf ("sleep (%d)", seconds);
-  res = WaitForSingleObject (signal_arrived, seconds * 1000);
-  if (res == WAIT_TIMEOUT)
-    {
-      syscall_printf ("0 = sleep (%d)", seconds);
-      return 0;
-    }
-  return (GetTickCount () - start_time)/1000;
+  rc = WaitForSingleObject (signal_arrived, seconds * 1000);
+  if (rc == WAIT_TIMEOUT)
+    res = 0;
+  else
+    res = seconds - (GetTickCount () - start_time)/1000;
+
+  syscall_printf ("%d = sleep (%d)", res, seconds);
+
+  return res;
 }
 
 extern "C"

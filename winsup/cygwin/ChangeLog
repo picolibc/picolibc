@@ -1,3 +1,8 @@
+2000-09-16  Egor Duda  <deo@logos-m.ru>
+
+	* signal.cc (sleep): If interrupted by signal, return the
+	requested time minus the time actually slept.
+
 Fri Sep 15 22:30:40 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (handle_exceptions): Just "core dump" if SIGSEGV in signal thread.
