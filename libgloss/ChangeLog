@@ -1,3 +1,9 @@
+2001-02-22  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* mn10200/access.c: With DJ Delorie's permission, this code is
+	now freely modifiable with no reference to "copying.dj".
+	* mn10300/access.c: Ditto.
+
 2001-02-06  Will Cohen  <wcohen@redhat.com>
 
         * rs6000/sim-errno.c (__errno): Removed.
