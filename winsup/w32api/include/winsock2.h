@@ -17,10 +17,6 @@
 
 #include <windows.h>
 
-#ifndef _WTYPES_H
-#include <wtypes.h> /* for BLOB */
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -709,6 +705,13 @@ typedef struct _WSAVersion
  * but itself needs LPSOCKADDR which is defined earlier in this file 
 */
 #include <nspapi.h>
+#ifndef __BLOB_T_DEFINED /* also in wtypes.h */
+#define __BLOB_T_DEFINED
+typedef struct _BLOB {
+	ULONG	cbSize;
+	BYTE	*pBlobData;
+} BLOB,*PBLOB,*LPBLOB;
+#endif
 
 typedef struct _WSAQuerySetA
 {

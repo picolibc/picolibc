@@ -141,5 +141,5 @@ BOOL INSTAPI SQLWriteFileDSNW(LPCWSTR,LPCWSTR,LPCWSTR,LPCWSTR);
 #endif /* RC_INVOKED */
 #ifdef __cplusplus
 }
-#endif 
+#endif
 #endif /* _ODBCINST_H */

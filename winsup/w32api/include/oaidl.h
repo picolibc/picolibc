@@ -61,6 +61,7 @@ typedef interface IDispatch *LPDISPATCH;
 typedef interface IEnumVARIANT *LPENUMVARIANT;
 typedef interface ICreateErrorInfo *LPCREATEERRORINFO;
 typedef interface ISupportErrorInfo *LPSUPPORTERRORINFO;
+typedef interface IRecordInfo *LPRECORDINFO;
 
 extern const IID IID_ITypeLib;
 extern const IID IID_ICreateTypeInfo;
@@ -73,6 +74,7 @@ extern const IID IID_IDispatch;
 extern const IID IID_IEnumVARIANT;
 extern const IID IID_ICreateErrorInfo;
 extern const IID IID_ISupportErrorInfo;
+extern const IID IID_IRecordInfo;
 
 typedef enum tagSYSKIND {
 	SYS_WIN16,SYS_WIN32,SYS_MAC
@@ -122,6 +124,21 @@ typedef enum tagSF_TYPE {
 	SF_DISPATCH=VT_DISPATCH,
 	SF_VARIANT=VT_VARIANT
 }SF_TYPE;
+typedef struct _wireBRECORD  {
+	ULONG fFlags;
+	ULONG clSize;
+	LPRECORDINFO* pRecInfo;
+	byte* pRecord;
+} *wireBRECORD;
+typedef struct _wireSAFEARR_BRECORD {
+    ULONG Size;
+    wireBRECORD* aRecord;
+    } SAFEARR_BRECORD;
+typedef struct _wireSAFEARR_HAVEIID {
+	ULONG Size;
+	IUnknown** apUnknown;
+	IID iid;
+	} SAFEARR_HAVEIID;
 typedef struct _wireSAFEARRAY_UNION {
 	ULONG sfType;
 	union {
@@ -129,6 +146,8 @@ typedef struct _wireSAFEARRAY_UNION {
 		SAFEARR_UNKNOWN UnknownStr;
 		SAFEARR_DISPATCH DispatchStr;
 		SAFEARR_VARIANT VariantStr;
+		SAFEARR_BRECORD RecordStr;
+		SAFEARR_HAVEIID HaveIidStr;
 		BYTE_SIZEDARR ByteStr;
 		WORD_SIZEDARR WordStr;
 		DWORD_SIZEDARR LongStr;
@@ -153,13 +172,13 @@ typedef struct tagSAFEARRAY {
 	SAFEARRAYBOUND rgsabound[1];
 }SAFEARRAY,*LPSAFEARRAY;
 typedef struct tagVARIANT {
-  union {
-    struct __tagVARIANT {
+  _ANONYMOUS_UNION union {
+	struct __tagVARIANT {
 	VARTYPE vt;
 	WORD wReserved1;
 	WORD wReserved2;
 	WORD wReserved3;
-	union {
+	_ANONYMOUS_UNION union {
 		long lVal;
 		unsigned char bVal;
 		short iVal;
@@ -179,6 +198,7 @@ typedef struct tagVARIANT {
 		float *pfltVal;
 		double *pdblVal;
 		VARIANT_BOOL *pboolVal;
+		_VARIANT_BOOL  *pbool;
 		SCODE *pscode;
 		CY *pcyVal;
 		DATE *pdate;
@@ -199,7 +219,7 @@ typedef struct tagVARIANT {
 		ULONG  *pulVal;
 		INT  *pintVal;
 		UINT  *puintVal;
-		struct {
+		_ANONYMOUS_STRUCT struct {
 			PVOID pvRecord;
 			struct IRecordInfo *pRecInfo;
 		} __VARIANT_NAME_4;
@@ -230,7 +250,8 @@ typedef struct _wireVARIANT {
 		wireBSTR bstrVal;
 		IUnknown *punkVal;
 		LPDISPATCH pdispVal;
-		wireSAFEARRAY parray;
+		wirePSAFEARRAY parray;
+		wireBRECORD brecVal;
 		BYTE *pbVal;
 		SHORT *piVal;
 		LONG *plVal;
@@ -243,7 +264,7 @@ typedef struct _wireVARIANT {
 		wireBSTR *pbstrVal;
 		IUnknown **ppunkVal;
 		LPDISPATCH *ppdispVal;
-		wireSAFEARRAY *pparray;
+		wirePSAFEARRAY *pparray;
 		struct _wireVARIANT *pvarVal;
 		CHAR cVal;
 		USHORT uiVal;
@@ -258,7 +279,7 @@ typedef struct _wireVARIANT {
 		INT *pintVal;
 		UINT *puintVal;
 	} DUMMYUNIONNAME;
-} wireVARIANT;
+} *wireVARIANT;  
 typedef LONG DISPID;
 typedef DISPID MEMBERID;
 typedef DWORD HREFTYPE;
@@ -267,7 +288,7 @@ typedef enum tagTYPEKIND {
 	TKIND_COCLASS,TKIND_ALIAS,TKIND_UNION,TKIND_MAX
 }TYPEKIND;
 typedef struct tagTYPEDESC {
-	union {
+	_ANONYMOUS_UNION union {
 		struct tagTYPEDESC *lptdesc;
 		struct tagARRAYDESC *lpadesc;
 		HREFTYPE hreftype;
@@ -547,6 +568,32 @@ DECLARE_INTERFACE_(ISupportErrorInfo, IUnknown)
 	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
 	STDMETHOD_(ULONG,Release)(THIS) PURE;
 	STDMETHOD(InterfaceSupportsErrorInfo)(THIS_ REFIID) PURE;
+};
+
+EXTERN_C const IID IID_IRecordInfo;
+#undef INTERFACE
+#define INTERFACE IRecordInfo
+DECLARE_INTERFACE_(IRecordInfo, IUnknown)
+{
+	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG,Release)(THIS) PURE;
+	STDMETHOD(RecordInit)(THIS_ PVOID) PURE;
+	STDMETHOD(RecordClear)(THIS_ PVOID) PURE;
+	STDMETHOD(RecordCopy)(THIS_ PVOID, PVOID) PURE;
+	STDMETHOD(GetGuid)(THIS_ GUID*) PURE;
+	STDMETHOD(GetName)(THIS_ BSTR*) PURE;
+	STDMETHOD(GetSize)(THIS_ ULONG*) PURE;
+	STDMETHOD(GetTypeInfo)(THIS_ ITypeInfo**) PURE;
+	STDMETHOD(GetField)(THIS_ PVOID,LPCOLESTR,VARIANT*) PURE;
+	STDMETHOD(GetFieldNoCopy)(THIS_ PVOID,LPCOLESTR,VARIANT*,PVOID*) PURE;
+	STDMETHOD(PutField )(THIS_ ULONG,PVOID,LPCOLESTR, VARIANT*) PURE;
+	STDMETHOD(PutFieldNoCopy)(THIS_ ULONG,PVOID,LPCOLESTR,VARIANT*) PURE;
+	STDMETHOD(GetFieldNames)(THIS_ ULONG*,BSTR*) PURE;
+	STDMETHOD_(BOOL,IsMatchingType)(THIS_ THIS) PURE;
+	STDMETHOD_(PVOID,RecordCreate)(THIS) PURE;
+	STDMETHOD(RecordCreateCopy)(THIS_ PVOID,PVOID*) PURE;
+	STDMETHOD(RecordDestroy )(THIS_ PVOID) PURE;
 };
 
 #ifdef __cplusplus

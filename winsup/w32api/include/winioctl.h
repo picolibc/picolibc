@@ -177,14 +177,14 @@ typedef enum _MEDIA_TYPE {
 	F5_160_512,
 	RemovableMedia,
 	FixedMedia
-} MEDIA_TYPE;
+} MEDIA_TYPE, *PMEDIA_TYPE ;
 typedef struct _DISK_GEOMETRY {
 	LARGE_INTEGER Cylinders;
 	MEDIA_TYPE MediaType;
 	DWORD TracksPerCylinder;
 	DWORD SectorsPerTrack;
 	DWORD BytesPerSector;
-} DISK_GEOMETRY;
+} DISK_GEOMETRY,  *PDISK_GEOMETRY;
 typedef struct _DISK_PERFORMANCE {
     LARGE_INTEGER BytesRead;
     LARGE_INTEGER BytesWritten;
@@ -193,7 +193,7 @@ typedef struct _DISK_PERFORMANCE {
     DWORD ReadCount;
     DWORD WriteCount;
     DWORD QueueDepth;
-} DISK_PERFORMANCE;
+} DISK_PERFORMANCE, *PDISK_PERFORMANCE;
 typedef struct _DISK_RECORD {
 	LARGE_INTEGER ByteOffset;
 	LARGE_INTEGER StartTime;

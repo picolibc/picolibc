@@ -132,6 +132,7 @@ extern "C" {
 #define EM_GETREDONAME	(WM_USER+87)
 #define EM_STOPGROUPTYPING	(WM_USER+88)
 #define EM_GETTEXTLENGTHEX	(WM_USER+95)
+#define EM_AUTOURLDETECT	(WM_USER+91)
 #define EM_SETLANGOPTIONS	(WM_USER+120)
 #define EM_GETLANGOPTIONS	(WM_USER+121)
 #define EM_GETIMECOMPMODE	(WM_USER+122)
@@ -144,6 +145,7 @@ extern "C" {
 #define EN_CORRECTTEXT 1797
 #define EN_DROPFILES 1795
 #define EN_IMECHANGE 1799
+#define EN_LINK 1803
 #define EN_MSGFILTER 1792
 #define EN_OLEOPFAILED 1801
 #define EN_PROTECTED 1796
@@ -162,6 +164,7 @@ extern "C" {
 #define ENM_SCROLL 4
 #define ENM_SELCHANGE 524288
 #define ENM_UPDATE 2
+#define ENM_LINK 67108864
 #define ECO_AUTOWORDSELECTION	1
 #define ECO_AUTOVSCROLL	64
 #define ECO_AUTOHSCROLL	128
@@ -273,6 +276,13 @@ typedef struct _endropfiles {
 	LONG cp;
 	BOOL fProtected;
 } ENDROPFILES;
+typedef struct _enlink {
+	NMHDR nmhdr;
+	UINT msg;
+	WPARAM wParam;
+	LPARAM lParam;
+	CHARRANGE chrg;
+} ENLINK;
 typedef struct {
 	NMHDR nmhdr;
 	LONG iob;

@@ -3,8 +3,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#ifndef CNLEN /* also in lmcons.h */
 #define CNLEN 15
-#define UNCLEN 17
+#define UNCLEN (CNLEN + 2)
+#endif
 #define SEP_CHAR ','
 #define BAR_CHAR "|"
 #define SEP_WCHAR L','

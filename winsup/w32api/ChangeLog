@@ -1,4 +1,76 @@
-2001-08-10 Danny Smith <dannysmith@users.sourceforge.net>
+2001-08-21  Earnie Boyd  <earnie@SF.Net>
+
+	* include/setupapi.h: Formatting.
+
+2001-08-21  Earnie Boyd  <earnie@SF.Net>
+
+	* include/shlobj.h: Remove \r from the line endings.
+
+2001-08-21  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/setupapi.h : New file.
+	* lib/setupapi.def:New file.
+	* lib/test.c: Include setupapi.h.
+
+2001-08-21  Danny Smith  <dannysmith@users.sourceforge.net>
+	* include/winioctl.h (_DISK_PERFORMANCE): Correct typo.
+
+2001-08-21  Mattia Barbon  <mbarbon@dsi.unive.it>
+
+	* include/richedit.h (ENLINK): Add structure definition.
+	(EM_AUTOURLDETECT, EN_LINK, ENM_LINK): Add defines.
+
+2001-08-21  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/shlobj.h (CMIC_*): Remove duplicate defines.
+	(CMDSTR_*): Remove duplicates; UNICODE string constants.
+	(GCS_*): Make UNICODE.
+	(CSIDL_*): Add more defines.
+	* include/winioctl.h (_MEDIA_TYPE): Add pointer typedef.
+	(_DISK_GEOMETRY): Ditto.
+	(_DISK_PERFORMANCE): Ditto.
+	* include/winbase.h (HasOverlappedIoCompleted): Add macro.
+
+2001-08-15  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winnt.h: Move CHAR, SHORT and LONG typedefs outside
+	of block protected by #ifndef VOID.
+	(This reverts 1998-12-01 Anders Norlander change.)
+	* include/odbcinst.h: End file with newline.
+	* include/raserror.h: Ditto.	
+
+2001-08-15  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winsock2.h (#include <wtypes.h): Don't.
+	(_BLOB): Define instead, if not already done.
+	(__BLOB_T_DEFINED: New define for guarding _BLOB.
+	* include/wtypes.h (_BLOB): Guard against prior definition. 
+
+2001-08-15  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/oaidl.h (tagVARIANT): Mark anonymous structs and unions
+	 as 	__extension__.
+	(tagTYPEDESC): Ditto.
+	(_wireBRECORD): Add structure definition.
+	(_wireSAFEARR_BRECORD): Ditto.
+	(_wireSAFEARR_HAVEIID): Ditto.
+	(_wireSAFEARRAY_UNION.u): Add fields SAFEARR_BRECORD RecordStr,
+	SAFEARR_HAVEIID HaveIidStr.
+	(tagVariant): Add fields _VARIANT_BOOL bool,*pbool. 
+	(_wireVARIANT): Change field parray to type wirePSAFEARRAY,
+	pparray to wirePSAFEARRAY*.
+	(_wireVARIANT): Add field wireBRECORD brecVal.
+	(wireVARIANT): Change typedef to struct _wireVariant*.
+	(IRecordInfo): Add interface definition.
+	(LPRECORDINFO): Add typedef for IRecordInfo*.
+	(IID_IRecordInfo): Add forward decalaration.
+
+2001-08-15  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/lmcons.h: Guard CNLEN and UNCLEN against prior definition.
+	* include/nddeapi.h: Likewise.
+
+2001-08-10  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/test.c (Win32_Winsock): Replace with __USE_W32_SOCKETS.
 	Add more includes of w32api headers.
@@ -8,26 +80,26 @@
 	* include/winnt.h (GetCurrentFiber): Change __inline to __inline__.
 	Swap asm code with that of GetFiberData.
 	(GetFiberData): Ditto.
-	* lib/kernels.c: New file, containing library versions of
+	* lib/kernel32.c: New file, containing library versions of
 	GetCurrentFiber and GetFiberData.
 	* lib/makefile.in: Add kernel32.o as static object to libkernal32.a.
 
-2001-08-08 Danny Smith <dannysmith@users.sourceforge.net>
+2001-08-08  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winuser.h (GET_WHEEL_DELTA_WPARAM): Add macro.
 	Thanks to: Harold Hunt <Harold@compasstechnologies.com>.
 
-2001-08-08 Danny Smith <dannysmith@users.sourceforge.net>
+2001-08-08  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/oleaut32.def: Regenerate.
 
-2001-08-04  Danny Smith <dannysmith@users.sourceforge.net>
+2001-08-04  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wtypes.h (DECIMAL_SETZERO): Correct typo.
 
-2001-08-02  Danny Smith <dannysmith@users.sourceforge.net>
+2001-08-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	Apply Dmitry Bely <dbely@mail.ru> patch 437834 (with additions).
+	Apply Dmitry Bely  <dbely@mail.ru> patch 437834 (with additions).
  	* include/oleidl.h (ISupportErrorInfo, ICreateInfo): Move from here
 	* include/oaidl.h: ... to here.
 	* include/oaidl.h ICreateErrorInfo): Add interface definition.
@@ -35,16 +107,16 @@
 	(LPSUPPORTERRORINFO): Add typedef.
 	(IID_ISupportErrorInfo): Change forward decl. of type to IID.
 
-2001-08-02  Danny Smith <dannysmith@users.sourceforge.net>
+2001-08-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winsock2.h (WSAGET* and WSAMAKE*): Remove duplicate
 	defines.
 
-2001-07-30  Danny Smith <dannysmith@users.sourceforge.net>
+2001-07-30  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/commctrl.h (TreeView_SetIndent): Correct typo.
 
-2001-07-30  Danny Smith <dannysmith@users.sourceforge.net>
+2001-07-30  Danny Smith  <dannysmith@users.sourceforge.net>
  
 	* include/commctrl.h (TBSTYPE_FLAT): Remove define.
 	Thanks to: Jason Craig  <jacraig@softhome.net>
@@ -60,37 +132,37 @@
 	(tagNMTVCUSTOMDRAW): Likewise.
 	(tagNMLVCACHEHINT): Likewise.
 	
-2001-07-06 Danny Smith <dannysmith@users.sourceforge.net>
+2001-07-06  Danny Smith  <dannysmith@users.sourceforge.net>
  
 	* include/basetsd.h (#include <_mingw.h>): Remove.
 	(__int64): Define.
 
-2001-06-28 Danny Smith <dannysmith@users.sourceforge.net>
+2001-06-28  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wingdi.h (AC_SRC_OVER): Add define.
 	(struct _BLENDFUNCTION): Add.
 
-2001-06-28 Danny Smith <dannysmith@users.sourceforge.net>
+2001-06-28  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/shlobj.h:  Add BIF_* defines.
 
-2001-06-27 Danny Smith <dannysmith@users.sourceforge.net>
+2001-06-27  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winerror.h (E_PENDING): Add error code define.
 
-2001-06-27 Danny Smith <dannysmith@users.sourceforge.net>
+2001-06-27  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/basetsd.h (#include <_mingw.h>): Add directive.
 
-2001-06-25 Danny Smith <dannysmith@users.sourceforge.net>
+2001-06-25  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/winbase.h(InterlockedCompareExchange): Change args
+	* include/winbase.h (InterlockedCompareExchange): Change args
 	and return value from PVOID to LONG.
 	(InterlockedExchange): Change first arg to LPLONG.
 	(InterlockedCompareExchangePointer): New macro.
 	(InterlockedExchangePointer): New macro.
 
-2001-06-19 Danny Smith <dannysmith@users.sourceforge.net>
+2001-06-19  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/kernel32.def: Add LanguageGroup and UILanguage symbols.
 	Thanks to Kevin Chase <kevincha99@hotmail.com>. 
@@ -100,7 +172,7 @@
 	* objidl.h (IMalloc::ReAlloc()): Correct declaration.
 	(IMalloc::Free()): Ditto.
 
-2001-06-11 Danny Smith <dannysmith@users.sourceforge.net>
+2001-06-11  Danny Smith <dannysmith@users.sourceforge.net>
 
 	* include/shlobj.h (REGSTR_PATH_EXPLORER): Unicode it. 
 	(REGSTR_PATH_SPECIAL_FOLDERS): Ditto.
@@ -185,7 +257,7 @@ Mon Apr 23 13:17:32 2001  Christopher Faylor <cgf@cygnus.com>
 	* include/winnt.h: Ditto.
 	* include/wtypes.h: Ditto.
 
-2001-04-11 Danny Smith <dannysmith@users.sourceforge.net>
+2001-04-11  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/windows.h (#include <winsock.h>): Include <winsock2.h>
 	instead if (_WIN32_WINNT >= 0x0400)&&(__W32API_MAJOR_VERSION > 0).

@@ -11,10 +11,13 @@ extern "C" {
 #define CBPCLIPDATA(d) ((d).cbSize-sizeof((d).ulClipFmt))
 #define DECIMAL_NEG ((BYTE)0x80)
 #define DECIMAL_SETZERO(d) {(d).Lo64=(d).Hi32=(d).signscale=0;}
+#ifndef __BLOB_T_DEFINED /* also in winsock2.h */
+#define __BLOB_T_DEFINED
 typedef struct _BLOB {
 	ULONG	cbSize;
 	BYTE	*pBlobData;
 } BLOB,*PBLOB,*LPBLOB;
+#endif
 typedef enum tagDVASPECT {
 	DVASPECT_CONTENT=1,
 	DVASPECT_THUMBNAIL=2,

@@ -8,7 +8,10 @@
 #define API_RET_TYPE NET_API_STATUS
 #define MIN_LANMAN_MESSAGE_ID NERR_BASE
 #define MAX_LANMAN_MESSAGE_ID 5799
+#ifndef CNLEN /* also in nddeapi.h */
 #define CNLEN 15
+#define UNCLEN (CNLEN + 2)
+#endif
 #define DNLEN 15
 #define LM20_CNLEN 15
 #define LM20_DNLEN 15
@@ -17,7 +20,6 @@
 #define LM20_UNCLEN (LM20_CNLEN+2)
 #define LM20_NNLEN 12
 #define LM20_RMLEN (LM20_UNCLEN+1+LM20_NNLEN)
-#define UNCLEN (CNLEN+2)
 #define NNLEN 80
 #define RMLEN (UNCLEN+1+NNLEN)
 #define SNLEN 80

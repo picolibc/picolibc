@@ -1291,6 +1291,7 @@ VOID WINAPI GlobalUnfix(HGLOBAL);
 BOOL WINAPI GlobalUnlock(HGLOBAL);
 BOOL WINAPI GlobalUnWire(HGLOBAL);
 PVOID WINAPI GlobalWire(HGLOBAL);
+#define HasOverlappedIoCompleted(lpOverlapped)  ((lpOverlapped)->Internal != STATUS_PENDING)
 PVOID WINAPI HeapAlloc(HANDLE,DWORD,DWORD);
 UINT WINAPI HeapCompact(HANDLE,DWORD);
 HANDLE WINAPI HeapCreate(DWORD,DWORD,DWORD);

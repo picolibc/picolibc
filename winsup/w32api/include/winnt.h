@@ -41,10 +41,10 @@ extern "C" {
 
 #ifndef VOID
 #define VOID void
+#endif
 typedef char CHAR;
 typedef short SHORT;
 typedef long LONG;
-#endif
 typedef CHAR CCHAR;
 typedef unsigned char UCHAR,*PUCHAR;
 typedef unsigned short USHORT,*PUSHORT;
