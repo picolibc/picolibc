@@ -500,10 +500,12 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
     }
 
 #ifdef DEBUGGING
-  pinfo forked ((ch.cygpid != 1 ? ch.cygpid : cygwin_pid (pi.dwProcessId)), 1);
+  int forked_pid = ch.cygpid != 1 ? ch.cygpid : cygwin_pid (pi.dwProcessId);
 #else
-  pinfo forked (cygwin_pid (pi.dwProcessId), 1);
+  int forked_pid = cygwin_pid (pi.dwProcessId);
 #endif
+  pinfo forked (forked_pid, 1);
+
   if (!forked)
     {
       syscall_printf ("pinfo failed");
@@ -511,8 +513,6 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 	set_errno (EAGAIN);
       goto cleanup;
     }
-
-  int forked_pid;
 
   /* Initialize things that are done later in dll_crt0_1 that aren't done
      for the forkee.  */
@@ -550,7 +550,6 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   if (!sync_with_child (pi, subproc_ready, true, "waiting for longjmp"))
     goto cleanup;
 
-  forked_pid = forked->pid;
   /* CHILD IS STOPPED */
   debug_printf ("child is alive (but stopped)");
 

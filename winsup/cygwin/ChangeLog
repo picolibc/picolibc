@@ -1,3 +1,8 @@
+2004-08-30  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* fork.cc (fork_parent): Return the cygpid directly derived from the
+	winpid.
+
 2004-08-30  Christopher Faylor  <cgf@timesys.com>
 
 	* fork.cc (fork_parent): Record child's pid when we're sure that it has
@@ -11,7 +16,7 @@
 
 2004-08-28  Pierre Humblet <pierre.humblet@ieee.org>
 
-	* fhandler.cc (fhandler_base::write): In the lseek_bug case, set EOF 
+	* fhandler.cc (fhandler_base::write): In the lseek_bug case, set EOF
 	before zero filling. Combine similar error handling statements.
 
 2004-08-28  Pierre Humblet <pierre.humblet@ieee.org>
