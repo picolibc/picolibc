@@ -1,5 +1,12 @@
 2002-09-03  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/string/wcschr.c: Add include of <stddef.h>.
+	* libc/string/wcspbrk.c: Ditto.
+	* libc/string/wcsrchr.c: Ditto.
+	* libc/string/wcsstr.c: Ditto.
+
+2002-09-03  Jeff Johnston  <jjohnstn@redhat.com>
+
         * libc/include/sys/_types.h (_flock_t): Added.
         * libc/include/sys/lock.h (__lock_try_acquire): New interface.
         (__lock_try_acquire_recursive): Ditto.

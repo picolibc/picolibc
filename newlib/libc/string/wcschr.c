@@ -58,6 +58,7 @@ No supporting OS subroutines are required.
  */
 
 #include <_ansi.h>
+#include <stddef.h>
 #include <wchar.h>
 
 wchar_t *
