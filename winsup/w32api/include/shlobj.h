@@ -462,7 +462,8 @@ typedef enum {
 } SLR_FLAGS;
 typedef enum {
 	SLGP_SHORTPATH=1,
-	SLGP_UNCPRIORITY
+	SLGP_UNCPRIORITY=2,
+	SLGP_RAWPATH=4
 } SLGP_FLAGS;
 typedef PBYTE LPVIEWSETTINGS;
 typedef enum {

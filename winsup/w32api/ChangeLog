@@ -1,6 +1,17 @@
+2004-12-29 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
+
+	*include/winuser.h (MNS_*, WM_MENUCOMMAND,
+	WM_MENUGETOBJECT, WM_MENUDRAG, WM_NCMOUSEHOVER,
+	WM_NCMOUSELEAVE, WM_UNINITMENUPOPUP,
+	SPI_GETFOREGROUNDLOCKTIMEOUT,
+	SPI_SETFOREGROUNDLOCKTIMEOUT): Added definitions.
+	*include/imm.h (WM_IME_REQUEST): Added definition.
+	*include/shlobj.h (SLGP_RAWPATH,
+	SLGP_UNCPRIORITY): Added definition.
+
 2004-12-28 Chris Sutcliffe <ir0nh34d@users.sourceforge.net>
 
-	*include/winuser.f (HSHELL_FLASH): Added definition.
+	*include/winuser.h (HSHELL_FLASH): Added definition.
 
 2004-12-23  Chris Sutcliffe  <ir0nh34d@users.sourceforge.net>
 
