@@ -1,3 +1,14 @@
+2003-07-10  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (get_device_number): Remove special com?  consideration.
+	(special_chars): Make static.
+	(special_introducers): New.
+	(special_char): Allow specified valid_chars args.
+	(fnunmunge): Handle aux-like filenames correctly.
+	(special_name): Add con, conin$, conout$.
+	(mount_item::fnmunge): Use __small_sprintf return value to calculate
+	increments.
+
 2003-07-09  Christopher Faylor  <cgf@redhat.com>
 
 	* include/cygwin/version.h: Bump DLL minor number to 1.
