@@ -655,12 +655,6 @@ path_conv::check (const char *src, unsigned opt,
 	      full_path[3] = '\0';
 	    }
 
-	  if ((opt & PC_SYM_IGNORE) && pcheck_case == PCHECK_RELAXED)
-	    {
-	      fileattr = GetFileAttributes (this->path);
-	      goto out;
-	    }
-
 	  symlen = sym.check (full_path, suff, opt | fs.has_ea ());
 
 	  if (sym.minor || sym.major)
@@ -706,6 +700,11 @@ path_conv::check (const char *src, unsigned opt,
 		  error = sym.error;
 		  if (component == 0)
 		    add_ext_from_sym (sym);
+                  else if (!(sym.fileattr & FILE_ATTRIBUTE_DIRECTORY))
+                    {
+                      error = ENOTDIR;
+		      goto out;
+                    }	
 		  if (pcheck_case == PCHECK_RELAXED)
 		    goto out;	// file found
 		  /* Avoid further symlink evaluation. Only case checks are
@@ -937,15 +936,6 @@ path_conv::~path_conv ()
       cfree (normalized_path);
       normalized_path = NULL;
     }
-}
-
-static __inline int
-digits (const char *name)
-{
-  char *p;
-  int n = strtol (name, &p, 10);
-
-  return p > name && !*p ? n : -1;
 }
 
 /* Return true if src_path is a valid, internally supported device name.

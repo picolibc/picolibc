@@ -1,3 +1,9 @@
+2005-01-26  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* path.cc (path_conv::check): Return ENOTDIR rather than ENOENT
+	when a component is not a directory. Remove unreachable code.
+	(digits): Delete.
+
 2005-01-25  Christopher Faylor  <cgf@timesys.com>
 
 	* pinfo.h (pinfo::init): Make third parameter non-optional and
