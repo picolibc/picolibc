@@ -58,10 +58,16 @@ winsup/
 	General discussion cygwin@sourceware.cygnus.com.
 	See also winsup/MAINTAINERS.
 
+texinfo/texinfo.tex
+	texinfo: http://ftp.gnu.org.
+	Latest version can be found on ftp://ftp.gnu.org and can be
+	imported at any (reasonable) time.
+	Please not use GCC's texinfo.  Please do not import texinfo.
+
 expect/, dejagnu/, config-ml.in, mpw-README, mpw-build.in,
-mpw-config.in, mpw-configure, mpw-install, setup.com, texinfo/,
-missing, makefile.vms, utils/, config/, config.if, makefile.vms,
-missing, ylwrap, mkdep, etc/, install-sh, intl/
+mpw-config.in, mpw-configure, mpw-install, setup.com, missing,
+makefile.vms, utils/, config/, config.if, makefile.vms, missing,
+ylwrap, mkdep, etc/, install-sh, intl/
 	?
 
 modules file
