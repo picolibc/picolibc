@@ -1318,22 +1318,21 @@ get_attribute_from_acl (mode_t *attribute, PACL acl, PSID owner_sid,
   return;
 }
 
-static int
-get_nt_attribute (const char *file, mode_t *attribute,
+static void
+get_info_from_sd (PSECURITY_DESCRIPTOR psd, mode_t *attribute,
 		  __uid32_t *uidret, __gid32_t *gidret)
 {
-  syscall_printf ("file: %s", file);
-
-  /* Yeah, sounds too much, but I've seen SDs of 2100 bytes! */
-  DWORD sd_size = 4096;
-  char sd_buf[4096];
-  PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) sd_buf;
-
-  int ret;
-  if ((ret = read_sd (file, psd, &sd_size)) <= 0)
+  if (!psd)
     {
-      debug_printf ("read_sd %E");
-      return -1;
+      /* If reading the security descriptor failed, treat the object
+	 as unreadable. */
+      if (attribute)
+	*attribute &= ~(S_IRWXU | S_IRWXG | S_IRWXO);
+      if (uidret)
+	*uidret = ILLEGAL_UID;
+      if (gidret)
+	*gidret = ILLEGAL_GID;
+      return;
     }
 
   cygpsid owner_sid;
@@ -1345,16 +1344,6 @@ get_nt_attribute (const char *file, mode_t *attribute,
   if (!GetSecurityDescriptorGroup (psd, (PSID *) &group_sid, &dummy))
     debug_printf ("GetSecurityDescriptorGroup %E");
 
-  PACL acl;
-  BOOL acl_exists;
-
-  if (!GetSecurityDescriptorDacl (psd, &acl_exists, &acl, &dummy))
-    {
-      __seterrno ();
-      debug_printf ("GetSecurityDescriptorDacl %E");
-      return -1;
-    }
-
   __uid32_t uid;
   __gid32_t gid;
   BOOL grp_member = get_sids_info (owner_sid, group_sid, &uid, &gid);
@@ -1365,21 +1354,46 @@ get_nt_attribute (const char *file, mode_t *attribute,
 
   if (!attribute)
     {
-      syscall_printf ("file: %s uid %d, gid %d", file, uid, gid);
-      return 0;
+      syscall_printf ("uid %d, gid %d", uid, gid);
+      return;
     }
 
-  if (!acl_exists || !acl)
+  PACL acl;
+  BOOL acl_exists;
+
+  if (!GetSecurityDescriptorDacl (psd, &acl_exists, &acl, &dummy))
     {
-      *attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
-      syscall_printf ("file: %s No ACL = %x, uid %d, gid %d",
-		      file, *attribute, uid, gid);
-      return 0;
+      __seterrno ();
+      debug_printf ("GetSecurityDescriptorDacl %E");
+      *attribute &= ~(S_IRWXU | S_IRWXG | S_IRWXO);
     }
-  get_attribute_from_acl (attribute, acl, owner_sid, group_sid, grp_member);
+  else if (!acl_exists || !acl)
+    *attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
+  else
+    get_attribute_from_acl (attribute, acl, owner_sid, group_sid, grp_member);
 
-  syscall_printf ("file: %s %x, uid %d, gid %d", file, *attribute, uid, gid);
-  return 0;
+  syscall_printf ("%sACL = %x, uid %d, gid %d",
+		  (!acl_exists || !acl)?"NO ":"", *attribute, uid, gid);
+  return;
+}
+
+static void
+get_nt_attribute (const char *file, mode_t *attribute,
+		  __uid32_t *uidret, __gid32_t *gidret)
+{
+  /* Yeah, sounds too much, but I've seen SDs of 2100 bytes! */
+  DWORD sd_size = 4096;
+  char sd_buf[4096];
+  PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) sd_buf;
+
+  if (read_sd (file, psd, &sd_size) <= 0)
+    {
+      debug_printf ("read_sd %E");
+      psd = NULL;
+    }
+
+  get_info_from_sd (psd, attribute, uidret, gidret);
+  return;
 }
 
 int
@@ -1387,22 +1401,11 @@ get_file_attribute (int use_ntsec, const char *file,
 		    mode_t *attribute, __uid32_t *uidret, __gid32_t *gidret)
 {
   int res;
+  syscall_printf ("file: %s", file);
 
   if (use_ntsec && allow_ntsec && wincap.has_security ())
     {
-      res = get_nt_attribute (file, attribute, uidret, gidret);
-      if (res)
-	{
-	  /* If reading the security descriptor failed, treat the file
-	     as unreadable. */
-	  *attribute &= ~(S_IRWXU | S_IRWXG | S_IRWXO);
-	  if (uidret)
-	    *uidret = ILLEGAL_UID;
-	  if (gidret)
-	    *gidret = ILLEGAL_GID;
-	}
-      else if (attribute && S_ISLNK (*attribute))
-	*attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
+      get_nt_attribute (file, attribute, uidret, gidret);
       return 0;
     }
 
@@ -1423,119 +1426,51 @@ get_file_attribute (int use_ntsec, const char *file,
   else
     res = 0;
 
-  /* symlinks are everything for everyone! */
-  if (S_ISLNK (*attribute))
-    *attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
-
   return res > 0 ? 0 : -1;
 }
 
-static int
+static void
 get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
 			 mode_t *attribute, __uid32_t *uidret, __gid32_t *gidret)
 {
-  PSECURITY_DESCRIPTOR psd = NULL;
-  cygpsid owner_sid;
-  cygpsid group_sid;
-  PACL acl = NULL;
+  PSECURITY_DESCRIPTOR psd;
+  char sd_buf[4096];
 
   if (object_type == SE_REGISTRY_KEY)
     {
-      // use different code for registry handles, for performance reasons
-      char sd_buf[4096];
-      PSECURITY_DESCRIPTOR psd2 = (PSECURITY_DESCRIPTOR) & sd_buf[0];
+      /* use different code for registry handles, for performance reasons */
+      psd = (PSECURITY_DESCRIPTOR) & sd_buf[0];
       DWORD len = sizeof (sd_buf);
       if (ERROR_SUCCESS != RegGetKeySecurity ((HKEY) handle,
                                               DACL_SECURITY_INFORMATION |
                                               GROUP_SECURITY_INFORMATION |
                                               OWNER_SECURITY_INFORMATION,
-                                              psd2, &len))
+                                              psd, &len))
         {
           __seterrno ();
           debug_printf ("RegGetKeySecurity %E");
-          return -1;
+          psd = NULL;
         }
-
-      BOOL bDaclPresent;
-      BOOL bDaclDefaulted;
-      if (!GetSecurityDescriptorDacl (psd2,
-                                      &bDaclPresent, &acl, &bDaclDefaulted))
-        {
-          __seterrno ();
-          debug_printf ("GetSecurityDescriptorDacl %E");
-          return -1;
-        }
-      if (!bDaclPresent)
-        {
-          acl = NULL;
-        }
-
-      BOOL bGroupDefaulted;
-      if (!GetSecurityDescriptorGroup (psd2,
-                                       (PSID *) & group_sid,
-                                       &bGroupDefaulted))
-        {
-          __seterrno ();
-          debug_printf ("GetSecurityDescriptorGroup %E");
-          return -1;
-        }
-
-      BOOL bOwnerDefaulted;
-      if (!GetSecurityDescriptorOwner (psd2,
-                                       (PSID *) & owner_sid,
-                                       &bOwnerDefaulted))
-        {
-          __seterrno ();
-          debug_printf ("GetSecurityDescriptorOwner %E");
-          return -1;
-        }
-    }
+      }
   else
     {
       if (ERROR_SUCCESS != GetSecurityInfo (handle, object_type,
-                                            DACL_SECURITY_INFORMATION |
-                                            GROUP_SECURITY_INFORMATION |
-                                            OWNER_SECURITY_INFORMATION,
-                                            (PSID *) & owner_sid,
-                                            (PSID *) & group_sid,
-                                            &acl, NULL, &psd))
+					    DACL_SECURITY_INFORMATION |
+					    GROUP_SECURITY_INFORMATION |
+					    OWNER_SECURITY_INFORMATION,
+					    NULL, NULL, NULL, NULL, &psd))
         {
-          __seterrno ();
-          debug_printf ("GetSecurityInfo %E");
-          return -1;
-        }
+	  __seterrno ();
+	  debug_printf ("GetSecurityInfo %E");
+	  psd = NULL;
+	}
     }
 
-  __uid32_t uid;
-  __gid32_t gid;
-  BOOL grp_member = get_sids_info (owner_sid, group_sid, &uid, &gid);
+  get_info_from_sd (psd, attribute, uidret, gidret);
+  if (psd != (PSECURITY_DESCRIPTOR) & sd_buf[0])
+    LocalFree (psd);
 
-  if (uidret)
-    *uidret = uid;
-  if (gidret)
-    *gidret = gid;
-
-  if (!attribute)
-    {
-      syscall_printf ("uid %d, gid %d", uid, gid);
-      LocalFree (psd);
-      return 0;
-    }
-
-  if (!acl)
-    {
-      *attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
-      syscall_printf ("No ACL = %x, uid %d, gid %d", *attribute, uid, gid);
-      LocalFree (psd);
-      return 0;
-    }
-
-  get_attribute_from_acl (attribute, acl, owner_sid, group_sid, grp_member);
-
-  LocalFree (psd);
-
-  syscall_printf ("%x, uid %d, gid %d", *attribute, uid, gid);
-  return 0;
+  return;
 }
 
 int
@@ -1544,26 +1479,11 @@ get_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
 {
   if (allow_ntsec && wincap.has_security ())
     {
-      int res = get_nt_object_attribute (handle, object_type, attribute,
-					 uidret, gidret);
-      if (attribute && S_ISLNK (*attribute))
-	*attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
-      return res;
+      get_nt_object_attribute (handle, object_type, attribute, uidret, gidret);
+      return 0;
     }
-
-  if (uidret)
-    *uidret = getuid32 ();
-  if (gidret)
-    *gidret = getgid32 ();
-
-  if (!attribute)
-    return 0;
-
-  /* symlinks are everything for everyone! */
-  if (S_ISLNK (*attribute))
-    *attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
-
-  return 0;
+  /* The entries are already set to default values */
+  return -1;
 }
 
 BOOL

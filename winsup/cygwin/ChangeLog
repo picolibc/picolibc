@@ -1,3 +1,19 @@
+2003-04-11  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* security.cc (get_info_from_sd): New function.
+	(get_nt_attribute): Only call read_sd and get_info_from_sd.
+	Return void.
+	(get_file_attribute): Move sd error handling to get_info_from_sd.
+	and symlink handling to fhandler_disk_file::fstat_helper.
+	(get_nt_object_attribute): Only call read_sd and get_info_from_sd.
+	Return void.
+	(get_object_attribute): Remove symlink handling and simply return -1
+	when ntsec is off.
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat_helper): For
+	symlinks set the attribute, call get_file_attribute to get the ids
+	and return.  In the normal case call get_file_attribute with the
+	addresses of the buffer ids and do not recheck if the file is a socket.
+
 2003-04-10  Christopher Faylor  <cgf@redhat.com>
 
 	* cygthread.cc (cygthread::stub): Initialize stack pointer earlier.

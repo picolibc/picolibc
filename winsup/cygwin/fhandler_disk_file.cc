@@ -281,14 +281,18 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
   if (pc->isdir ())
     buf->st_mode = S_IFDIR;
   else if (pc->issymlink ())
-    buf->st_mode = S_IFLNK;
+    {
+      /* symlinks are everything for everyone! */
+      buf->st_mode = S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO;
+      get_file_attribute (pc->has_acls (), get_win32_name (), NULL,
+			  &buf->st_uid, &buf->st_gid);
+      goto done;
+    }
   else if (pc->issocket ())
     buf->st_mode = S_IFSOCK;
 
-  __uid32_t uid;
-  __gid32_t gid;
   if (get_file_attribute (pc->has_acls (), get_win32_name (), &buf->st_mode,
-			  &uid, &gid) == 0)
+			  &buf->st_uid, &buf->st_gid) == 0)
     {
       /* If read-only attribute is set, modify ntsec return value */
       if (pc->has_attribute (FILE_ATTRIBUTE_READONLY) && !get_symlink_p ())
@@ -309,8 +313,6 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
 	buf->st_mode |= S_IFDIR | STD_XBITS;
       else if (buf->st_mode & S_IFMT)
 	/* nothing */;
-      else if (pc->issocket ())
-	buf->st_mode |= S_IFSOCK;
       else
 	{
 	  buf->st_mode |= S_IFREG;
@@ -344,15 +346,12 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
 	buf->st_mode |= STD_XBITS;
     }
 
-  buf->st_uid = uid;
-  buf->st_gid = gid;
-
   /* The number of links to a directory includes the
      number of subdirectories in the directory, since all
      those subdirectories point to it.
      This is too slow on remote drives, so we do without it and
      set the number of links to 2. */
-
+ done:
   syscall_printf ("0 = fstat (, %p) st_atime=%x st_size=%D, st_mode=%p, st_ino=%d, sizeof=%d",
 		  buf, buf->st_atime, buf->st_size, buf->st_mode,
 		  (int) buf->st_ino, sizeof (*buf));
