@@ -36,8 +36,8 @@ endif
 datadir = @datadir@
 infodir = @infodir@
 ifneq (,$(findstring cygwin,$(target_alias)))
-inst_includedir:=$(tooldir)/include/ddk
-inst_libdir:=$(tooldir)/lib
+inst_includedir:=$(tooldir)/include/w32api/ddk
+inst_libdir:=$(tooldir)/lib/w32api
 else
 inst_includedir:=$(includedir)/ddk
 inst_libdir:=$(libdir)
@@ -167,15 +167,15 @@ uninstall-headers:
 
 
 dist:
-	mkdir $(distdir)/include
-	chmod 755 $(distdir)/include
+	mkdir $(distdir)/include/ddk
+	chmod 755 $(distdir)/include/ddk
 	@for i in $(HEADERS); do \
-		cp -p $(srcdir)/../../ddk/include/$$i $(distdir)/include/ddk/$$i ; \
+		cp -p $(srcdir)/../../include/ddk/$$i $(distdir)/include/ddk/$$i ; \
 	done
-	mkdir $(distdir)/lib
-	chmod 755 $(distdir)/lib
+	mkdir $(distdir)/lib/ddk
+	chmod 755 $(distdir)/lib/ddk
 	@for i in $(DISTFILES); do \
-		cp -p $(srcdir)/$$i $(distdir)/lib/$$i ; \
+		cp -p $(srcdir)/$$i $(distdir)/lib/ddk/$$i ; \
 	done
 
 Makefile: Makefile.in ../../config.status ../../configure

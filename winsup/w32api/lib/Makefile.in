@@ -172,7 +172,7 @@ lib%.a: %.o
 	$(AR) rc $@ $*.o
 	$(RANLIB) $@
 
-.PHONY: install install-libraries install-headers install-pdk
+.PHONY: install install-libraries install-headers install-ddk
 # install headers and libraries in a target specified directory.
 install: install-libraries install-headers install-ddk
 
@@ -193,10 +193,10 @@ install-headers:
 	done
 
 install-ddk: install-libraries install-headers
-	(cd ddk; $(MAKE) install)
+	(cd ddk && $(MAKE) install $(FLAGS_TO_PASS) prefix=../$(prefix) exec_prefix=../$(exec_prefix))
 
 # uninstall headers and libraries from a target specified directory
-uninstall: uninstall-pdk uninstall-libraries uninstall-headers
+uninstall: uninstall-ddk uninstall-libraries uninstall-headers
 
 uninstall-libraries:
 	@for i in $(LIBS); do \
@@ -210,8 +210,8 @@ uninstall-headers:
 	done
 	rmdir $(inst_includedir)
 
-uninstall-pdk:
-	cd ddk && $(MAKE) -C uninstall
+uninstall-ddk:
+	cd ddk && $(MAKE) -C uninstall $(FLAGS_TO_PASS)
 
 dist:
 	mkdir $(distdir)/include
@@ -219,10 +219,17 @@ dist:
 	@for i in $(HEADERS); do \
 		cp -p $(srcdir)/../include/$$i $(distdir)/include/$$i ; \
 	done
+	mkdir $(distdir)/include/GL
+	@for i in $(GL_HEADERS); do \
+		cp -p $(srcdir)/../include/GL/$$i $(distdir)/include/GL/$$i ; \
+	done
 	mkdir $(distdir)/lib
 	chmod 755 $(distdir)/lib
 	@for i in $(DISTFILES); do \
 		cp -p $(srcdir)/$$i $(distdir)/lib/$$i ; \
+	done
+	for i in $(SUBDIRS); do \
+		(cd $$i; $(MAKE) distdir=../$(distdir) dist); \
 	done
 
 Makefile: Makefile.in ../config.status ../configure
