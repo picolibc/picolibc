@@ -1,3 +1,7 @@
+2003-02-12  Christopher Faylor  <cgf@redhat.com>
+
+	* MAINTAINERS: Remove out-of-date file.
+
 2003-02-06  Christopher Faylor  <cgf@redhat.com>
 
 	* configure.in: Make w32api directory optional.
