@@ -511,7 +511,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define DF_1_DIRECT	0x00000100
 #define DF_1_TRANS	0x00000200
 #define DF_1_INTERPOSE	0x00000400
-#define DF_1_NODEPLIB	0x00000800
+#define DF_1_NODEFLIB	0x00000800
 #define DF_1_NODUMP	0x00001000
 #define DF_1_CONLFAT	0x00002000
 

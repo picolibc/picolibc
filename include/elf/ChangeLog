@@ -1,5 +1,9 @@
 2000-07-19  H.J. Lu  <hjl@gnu.org>
 
+	* common.h (DF_1_NODEFLIB): Renamed from DF_1_NODEPLIB.
+
+2000-07-19  H.J. Lu  <hjl@gnu.org>
+
 	* common.h (DT_CHECKSUM): Set to 0x6ffffdf8.
 	(DTF_1_CONFEXP): It is 0x00000002 as suspected.
 
