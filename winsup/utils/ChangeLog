@@ -1,3 +1,9 @@
+2002-05-18  Christopher Faylor  <cgf@redhat.com>
+
+	* strace.cc (add_child): Use calloc since new requires working
+	libstdc++.a.
+	(fhandler_disk_file::fstat): Ditto for delete/free.
+
 2002-05-15  Mark Blackburn  <marklist@fangorn.ca>
 
 	* cygpath.cc (get_short_paths): Fix more error checking.

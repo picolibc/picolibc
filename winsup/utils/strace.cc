@@ -114,7 +114,7 @@ static void
 add_child (DWORD id, HANDLE hproc)
 {
   child_list *c = children.next;
-  children.next = new (child_list);
+  children.next = (child_list *) calloc (1, sizeof (child_list));
   children.next->next = c;
   lastid = children.next->id = id;
   lasth = children.next->hproc = hproc;
@@ -142,7 +142,7 @@ remove_child (DWORD id)
       {
 	child_list *c1 = c->next;
 	c->next = c1->next;
-	delete c1;
+	free (c1);
 	return;
       }
 
