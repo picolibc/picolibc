@@ -1,3 +1,8 @@
+2004-10-19  Christopher Faylor  <cgf@timesys.com>
+
+	* fhandler_console.cc (fhandler_console::fixup_after_exec): Fix error
+	message.
+
 2004-10-12  Christopher Faylor  <cgf@timesys.com>
 
 	* select.cc (start_thread_socket): Remove unused code.

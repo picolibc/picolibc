@@ -1347,10 +1347,13 @@ start_thread_socket (select_record *me, select_stuff *stuff)
 
   if (_my_tls.locals.exitsock != INVALID_SOCKET)
     {
-      char buf[1];
-      si->exitsock = _my_tls.locals.exitsock;
-      select_printf ("read a byte from %p", si->exitsock);
-      recv (si->exitsock, buf, 1, 0);
+      if (!si->exitsock)
+	{
+	  char buf[1];
+	  si->exitsock = _my_tls.locals.exitsock;
+	  select_printf ("read a byte from %p", si->exitsock);
+	  recv (si->exitsock, buf, 1, 0);
+	}
     }
   else 
     {

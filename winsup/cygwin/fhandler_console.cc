@@ -1792,16 +1792,16 @@ fhandler_console::fixup_after_exec ()
   cygheap->open_fhs--;		/* The downside of storing this in cygheap. */
   if (!open (O_NOCTTY | get_flags (), 0))
     {
-      int sawerr = 0;
+      bool sawerr = false;
       if (!get_io_handle ())
 	{
 	  system_printf ("error opening input console handle after exec, errno %d, %E", get_errno ());
-	  sawerr = 1;
+	  sawerr = true;
 	}
       if (!get_output_handle ())
 	{
-	  system_printf ("error opening input console handle after exec, errno %d, %E", get_errno ());
-	  sawerr = 1;
+	  system_printf ("error opening output console handle after exec, errno %d, %E", get_errno ());
+	  sawerr = true;
 	}
 
       if (!sawerr)
