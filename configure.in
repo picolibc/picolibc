@@ -347,7 +347,6 @@ case "${enable_target_optspace}:${target}" in
   yes:*)
     target_makefile_frag="${target_makefile_frag} config/mt-ospace"
     ;;
-  # CYGNUS LOCAL d10v, d30v, fr30
   :d30v-*)
     target_makefile_frag="${target_makefile_frag} config/mt-d30v"
     ;;
@@ -617,15 +616,12 @@ case "${target}" in
   thumb-*-coff)
     noconfigdirs="$noconfigdirs target-libgloss"
     ;;
-# CYGNUS LOCAL clm/arm-elf
   thumb-*-elf)
     noconfigdirs="$noconfigdirs target-libgloss"
     ;;
   thumb-*-oabi)
     noconfigdirs="$noconfigdirs target-libgloss"
     ;;
-# END CYGNUS LOCAL
-# CYGNUS LOCAL nickc/strongarm
   strongarm-*-elf)
     noconfigdirs="$noconfigdirs target-libgloss"
     if [ x${is_cross_compiler} != xno ] ; then
@@ -638,8 +634,7 @@ case "${target}" in
 	   target_configdirs="${target_configdirs} target-bsp target-cygmon"
     fi
     ;;
-# END CYGNUS LOCAL
-  thumb-*-pe) # CYGNUS LOCAL nickc/thumb
+  thumb-*-pe)
     noconfigdirs="$noconfigdirs target-libgloss"
     ;;
   arm-*-riscix*)
@@ -648,17 +643,13 @@ case "${target}" in
   d10v-*-*)
     noconfigdirs="$noconfigdirs target-librx target-libg++ target-libstdc++ target-libio"
     ;;
-# CYGNUS LOCAL d30v
   d30v-*-*)
     ;;
-# END CYGNUS LOCAL
-# CYGNUS LOCAL fr30
   fr30-*-elf*)
     if [ x${is_cross_compiler} != xno ] ; then
 	   target_configdirs="${target_configdirs} target-bsp target-libstub target-cygmon"
     fi
     ;;
-# END CYGNUS LOCAL
   h8300*-*-* | \
   h8500-*-*)
     noconfigdirs="$noconfigdirs target-libg++ target-libstdc++ target-libio target-librx target-libgloss"
@@ -870,12 +861,12 @@ case "${target}" in
   v850-*-*)
     noconfigdirs="$noconfigdirs target-libgloss"
     ;;
-  v850e-*-*) # CYGNUS LOCAL v850e
+  v850e-*-*)
     noconfigdirs="$noconfigdirs target-libgloss"
     ;;
   v850ea-*-*)
     noconfigdirs="$noconfigdirs target-libgloss"
-    ;;       # END CYGNUS LOCAL
+    ;;
   vax-*-vms)
     noconfigdirs="$noconfigdirs bfd binutils gdb ld target-newlib opcodes target-libgloss"
     ;;
