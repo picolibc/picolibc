@@ -268,12 +268,12 @@ The format for ACL output is as follows:
 
 <screen>
 Usage: kill [-f] [-signal] [-s signal] pid1 [pid2 ...]
-kill -l [signal]
--f, --force     force, using win32 interface if necessary
--l, --list      print a list of signal names
--s, --signal    send signal (use kill --list for a list)
--h, --help      output usage information and exit
--v, --version   output version information and exit
+       kill -l [signal]
+ -f, --force     force, using win32 interface if necessary
+ -l, --list      print a list of signal names
+ -s, --signal    send signal (use kill --list for a list)
+ -h, --help      output usage information and exit
+ -v, --version   output version information and exit
 </screen>
 
 <para>The <command>kill</command> program allows you to send arbitrary
@@ -388,9 +388,11 @@ One of `-l' or `-d' must be given on NT/W2K.
 <para>The <command>mkgroup</command> program can be used to help
 configure your Windows system to be more UNIX-like by creating an
 initial <filename>/etc/group</filename> substitute (some commands need this
-file) from your system information. It only works on NT.
-To initially set up your machine,
-you'd do something like this:</para>
+file) from your system information. It only works on the NT series
+(Windows NT, 2000, and XP). <command>mkgroup</command> does not work on 
+the Win9x series (Windows 95, 98, and Me) because they lack the security model 
+to support it. To initially set up your machine, you'd do something like 
+this:</para>
 
 <example><title>Setting up the groups file</title>
 <screen>
@@ -405,7 +407,16 @@ for it to have the new information.</para>
 
 <para>The <literal>-d</literal> and <literal>-l</literal> options
 allow you to specify where the information comes from, either the
-local machine or the default (or given) domain.</para>
+local machine or the default (or given) domain.  The <literal>-o</literal>
+option allows for special cases (such as multiple domains) where the GIDs 
+might match otherwise. The <literal>-s</literal>
+option omits the NT Security Identifier (SID).  For more information on 
+SIDs, see <Xref Linkend="ntsec"> in the Cygwin User's Guide.  The
+<literal>-u</literal> option causes <command>mkgroup</command> to 
+enumerate the users for each group, placing the group members in the 
+gr_mem (last) field.  Note that this can greatly increase
+the time for <command>mkgroup</command> to run in a large domain.
+</para>
 
 </sect2>
 
@@ -438,8 +449,11 @@ One of `-l', `-d' or `-g' must be given on NT/W2K.
 <para>The <command>mkpasswd</command> program can be used to help
 configure your Windows system to be more UNIX-like by creating an
 initial <filename>/etc/passwd</filename> substitute (some commands
-need this file) from your system information. It only works on NT.
-To initially set up your machine, you'd do something like this:</para>
+need this file) from your system information. It only works on the NT series
+(Windows NT, 2000, and XP). <command>mkpasswd</command> does not work on 
+the Win9x series (Windows 95, 98, and Me) because they lack the security model 
+to support it. To initially set up your machine, you'd do something like 
+this:</para>
 
 <example><title>Setting up the passwd file</title>
 <screen>
@@ -454,7 +468,221 @@ for it to have the new information.</para>
 
 <para>The <literal>-d</literal> and <literal>-l</literal> options
 allow you to specify where the information comes from, either the
-local machine or the default (or given) domain.</para>
+local machine or the default (or given) domain.  The <literal>-o</literal>
+option allows for special cases (such as multiple domains) where the UIDs
+might match otherwise.  The <literal>-g</literal> option creates a local
+user that corresponds to each local group. This is because NT assigns groups
+file ownership.  The <literal>-m</literal> option bypasses the current
+mount table so that, for example, two users who have a Windows home 
+directory of H: could mount them differently.  The <literal>-s</literal>
+option omits the NT Security Identifier (SID).  For more information on
+SIDs, see <Xref Linkend="ntsec"> in the Cygwin User's Guide.  The
+<literal>-p</literal> option causes <command>mkpasswd</command> to
+use a prefix other than <literal>/home/</literal>. For example, this command:
+
+<example><title>Using an alternate home root</title>
+<screen>
+<prompt>$</prompt> <userinput>mkpasswd -l -p "$(cygpath -H)" &gt; /etc/passwd</userinput>
+</screen>
+</example>
+
+would put local users' home directories in the Windows 'Profiles' directory. 
+The <literal>-u</literal> option allows <command>mkpasswd</command> to 
+search for a specific username, greatly reducing the amount of time it 
+takes in a large domain. 
+
+</sect2>
+
+<sect2 id="mount"><title>mount</title>
+
+<screen>
+Usage: mount [OPTION] [<win32path> <posixpath>]
+  -b, --binary                  text files are equivalent to binary files
+                                (newline = \n)
+  -c, --change-cygdrive-prefix  change the cygdrive path prefix to <posixpath>
+  -f, --force                   force mount, don't warn about missing mount
+                                point directories
+  -h, --help                    output usage information and exit
+  -m, --mount-commands          write mount commands to replace user and
+                                system mount points and cygdrive prefixes
+  -p, --show-cygdrive-prefix    show user and/or system cygdrive path prefix
+  -s, --system     (default)    add system-wide mount point
+  -t, --text       (default)    text files get \r\n line endings
+  -u, --user                    add user-only mount point
+  -v, --version                 output version information and exit
+  -x, --executable              treat all files under mount point as executables
+  -E, --no-executable           treat all files under mount point as 
+                                non-executables
+  -X, --cygwin-executable       treat all files under mount point as cygwin
+                                executables
+</screen>
+
+<para>The <command>mount</command> program is used to map your drives
+and shares onto Cygwin's simulated POSIX directory tree, much like as is
+done by mount commands on typical UNIX systems.  Please see
+<Xref Linkend="mount-table"> for more information on the concepts
+behind the Cygwin POSIX file system and strategies for using
+mounts.</para>
+
+<sect3><title>Using mount</title>
+
+<para>If you just type <command>mount</command> with no parameters, it
+will display the current mount table for you.</para>
+
+<example>
+<title>Displaying the current set of mount points</title>
+<screen>
+<prompt>c:\cygwin\&gt;</prompt> <userinput>mount</userinput>
+c:\cygwin\bin on /usr/bin type system (binmode)
+c:\cygwin\lib on /usr/lib type system (binmode)
+c:\cygwin on / type system (binmode)
+c: on /c type user (binmode,noumount)
+d: on /d type user (binmode,noumount)
+</screen>
+</example>
+
+<para>In this example, c:\cygwin is the POSIX root and D drive is mapped to
+<filename>/d</filename>.  Note that in this case, the root mount is a
+system-wide mount point that is visible to all users running Cygwin
+programs, whereas the <filename>/d</filename> mount is only visible
+to the current user.</para>
+
+<para>The <command>mount</command> utility is also the mechanism for
+adding new mounts to the mount table.  The following example
+demonstrates how to mount the directory
+<filename>\\pollux\home\joe\data</filename> to <filename>/data</filename>.
+</para>
+
+<example>
+<title>Adding mount points</title>
+<screen>
+<prompt>c:\cygwin\&gt;</prompt> <userinput>ls /data</userinput>
+ls: /data: No such file or directory
+<prompt>c:\cygwin\&gt;</prompt> <userinput>mount \\pollux\home\joe\data /data</userinput>
+mount: warning - /data does not exist!
+<prompt>c:\cygwin\&gt;</prompt> <userinput>mount</userinput>
+\\pollux\home\joe\data on /data type sytem (binmode)
+c:\cygwin\bin on /usr/bin type system (binmode)
+c:\cygwin\lib on /usr/lib type system (binmode)
+c:\cygwin on / type system (binmode)
+c: on /c type user (binmode,noumount)
+d: on /d type user (binmode,noumount)
+</screen>
+</example>
+
+<para>Note that <command>mount</command> was invoked from the Windows
+command shell in the previous example.  In many Unix shells, including
+bash, it is legal and convenient to use the forward "/" in Win32
+pathnames since the "\" is the shell's escape character. </para>
+
+<para>The <literal>-s</literal> flag to <command>mount</command> is used to add a mount
+in the system-wide mount table used by all Cygwin users on the system,
+instead of the user-specific one.  System-wide mounts are displayed
+by <command>mount</command> as being of the "system" type, as is the
+case for the <filename>/</filename> partition in the last example.
+Under Windows NT, only those users with Administrator priviledges are
+permitted to modify the system-wide mount table.</para>
+
+<para>Note that a given POSIX path may only exist once in the user
+table and once in the global, system-wide table.  Attempts to replace
+the mount will fail with a busy error.  The <literal>-f</literal> (force) flag causes
+the old mount to be silently replaced with the new one.  It will also
+silence warnings about the non-existence of directories at the Win32
+path location.</para>
+
+<para>The <literal>-b</literal> flag is used to instruct Cygwin to treat binary and
+text files in the same manner by default.  Binary mode mounts are
+marked as "binmode" in the Flags column of <command>mount</command>
+output.  By default, mounts are in text mode ("textmode" in the Flags
+column).</para>
+
+<para>Normally, files ending in certain extensions (.exe, .com, .bat, .cmd) 
+are assumed to be executable.  Files whose first two characters begin with 
+'#!' are also considered to be executable.  
+The <literal>-x</literal> flag is used to instruct Cygwin that the 
+mounted file is "executable".  If the <literal>-x</literal> flag is used 
+with a directory then all files in the directory are executable.  
+This option allows other files to be marked as executable and avoids the 
+overhead of opening each file to check for a '#!'.  The <literal>-X</literal>
+option is very similar to <literal>-x</literal>, but also prevents Cygwin
+from setting up commands and environment variables for a normal Windows 
+program, adding another small performance gain.  The opposite of these 
+flags is the <literal>-E</literal> flag, which means that no files should be 
+marked as executable.  </para>
+
+<para>
+The <literal>-m</literal> option causes the <command>mount</command> utility
+to output a series of commands that could recreate both user and system mount 
+points. You can save this output as a backup when experimenting with the
+mount table. It also makes moving your settings to a different machine
+much easier.
+</para>
+
+</sect3>
+
+<sect3><title>Cygdrive mount points</title>
+
+<para>Whenever Cygwin cannot use any of the existing mounts to convert
+from a particular Win32 path to a POSIX one, Cygwin will, instead,
+convert to a POSIX path using a default mount point:
+<filename>/cygdrive</filename>.  For example, if Cygwin accesses
+<filename>z:\foo</filename> and the z drive is not currently in the
+mount table, then <filename>z:\</filename> will be accessible as
+<filename>/cygdrive/z</filename>.  The <command>mount</command> utility 
+can be used to change this default automount prefix through the use of the
+"--change-cygdrive-prefix" option.  In the following example, we will
+set the automount prefix to <filename>/</filename>:</para>
+
+<example>
+<title>Changing the default prefix</title>
+<screen>
+<prompt>c:\cygwin\&gt;</prompt> <userinput>mount --change-cygdrive-prefix /</userinput>
+</screen>
+</example>
+
+<para>Note that you if you set a new prefix in this manner, you can
+specify the <literal>-s</literal> flag to make this the system-wide default 
+prefix.  By default, the cygdrive-prefix applies only to the current user.  
+You can always see the user and system cygdrive prefixes with the 
+<literal>-p</literal> option.  Using the <literal>-b</literal>
+flag with <literal>--change-cygdrive-prefix</literal> makes all new 
+automounted filesystems default to binary mode file accesses.</para>
+
+</sect3>
+
+<sect3><title>Limitations</title>
+
+<para>Limitations: there is a hard-coded limit of 30 mount
+points.  Also, although you can mount to pathnames that do not start
+with "/", there is no way to make use of such mount points.</para>
+
+<para>Normally the POSIX mount point in Cygwin is an existing empty
+directory, as in standard UNIX. If this is the case, or if there is a
+place-holder for the mount point (such as a file, a symbolic link
+pointing anywhere, or a non-empty directory), you will get the expected
+behavior. Files present in a mount point directory before the mount
+become invisible to Cygwin programs.
+</para>
+
+<para>It is sometimes desirable to mount to a non-existent directory,
+for example to avoid cluttering the root directory with names
+such as
+<filename>a</filename>, <filename>b</filename>, <filename>c</filename>
+pointing to disks.
+Although <command>mount</command> will give you a warning, most
+everything will work properly when you refer to the mount point
+explicitly.  Some strange effects can occur however.
+For example if your current working directory is
+<filename>/dir</filename>,
+say, and <filename>/dir/mtpt</filename> is a mount point, then
+<filename>mtpt</filename> will not show up in an <command>ls</command>
+or
+<command>echo *</command> command and <command>find .</command> will
+not
+find <filename>mtpt</filename>.
+</para>
+
+</sect3>
 
 </sect2>
 
@@ -532,195 +760,6 @@ option.  The status information is self explanatory.</para>
 
 <para>Limitations: Users may not be able to change their password on
 some systems.</para>
-
-</sect2>
-
-<sect2 id="mount"><title>mount</title>
-
-<screen>
-Usage: mount [OPTION] [<win32path> <posixpath>]
-  -b, --binary                  text files are equivalent to binary files
-                                (newline = \n)
-  -c, --change-cygdrive-prefix  change the cygdrive path prefix to <posixpath>
-  -f, --force                   force mount, don't warn about missing mount
-                                point directories
-  -h, --help                    output usage information and exit
-  -m, --mount-commands          write mount commands to replace user and
-                                system mount points and cygdrive prefixes
-  -p, --show-cygdrive-prefix    show user and/or system cygdrive path prefix
-  -s, --system     (default)    add system-wide mount point
-  -t, --text       (default)    text files get \r\n line endings
-  -u, --user                    add user-only mount point
-  -v, --version                 output version information and exit
-  -x, --executable              treat all files under mount point as executables
-  -E, --no-executable           treat all files under mount point as 
-                                non-executables
-  -X, --cygwin-executable       treat all files under mount point as cygwin
-                                executables
-</screen>
-
-<para>The <command>mount</command> program is used to map your drives
-and shares onto Cygwin's simulated POSIX directory tree, much like as is
-done by mount commands on typical UNIX systems.  Please see
-<Xref Linkend="mount-table"> for more information on the concepts
-behind the Cygwin POSIX file system and strategies for using
-mounts.</para>
-
-<sect3><title>Using mount</title>
-
-<para>If you just type <command>mount</command> with no parameters, it
-will display the current mount table for you.</para>
-
-<example>
-<title>Displaying the current set of mount points</title>
-<screen>
-<prompt>c:\cygnus\&gt;</prompt> <userinput>mount</userinput>
-Device           Directory           Type        Flags
-D:               /d                  user        textmode
-C:               /                   system      textmode
-</screen>
-</example>
-
-<para>In this example, the C
-drive is the POSIX root and D drive is mapped to
-<filename>/d</filename>.  Note that in this case, the root mount is a
-system-wide mount point that is visible to all users running Cygwin
-programs, whereas the <filename>/d</filename> mount is only visible
-to the current user.</para>
-
-<para>The <command>mount</command> utility is also the mechanism for
-adding new mounts to the mount table.  The following example
-demonstrates how to mount the directory
-<filename>C:\cygnus\cygwin-b20\H-i586-cygwin32\bin</filename>
-to <filename>/bin</filename> and the network directory
-<filename>\\pollux\home\joe\data</filename> to <filename>/data</filename>.
-<filename>/bin</filename> is assumed to already exist.</para>
-
-<example>
-<title>Adding mount points</title>
-<screen>
-<prompt>c:\cygnus\&gt;</prompt> <userinput>ls /bin /data</userinput>
-ls: /data: No such file or directory
-<prompt>c:\cygnus\&gt;</prompt> <userinput>mount C:\cygnus\cygwin-b20\H-i586-cygwin32\bin /bin</userinput>
-<prompt>c:\cygnus\&gt;</prompt> <userinput>mount \\pollux\home\joe\data /data</userinput>
-Warning: /data does not exist!
-<prompt>c:\cygnus\&gt;</prompt> <userinput>mount</userinput>
-Device           Directory           Type        Flags
-\\pollux\home\joe\data   /data       user        textmode
-C:\cygnus\cygwin-b20\H-i586-cygwin32\bin   /bin   user   textmode
-D:               /d                  user        textmode
-\\.\tape1:       /dev/st1            user        textmode
-\\.\tape0:       /dev/st0            user        textmode
-\\.\b:           /dev/fd1            user        textmode
-\\.\a:           /dev/fd0            user        textmode
-C:               /                   system      textmode
-<prompt>c:\cygnus\&gt;</prompt> <userinput>ls /bin/sh</userinput>
-/bin/sh
-</screen>
-</example>
-
-<para>Note that <command>mount</command> was invoked from the Windows
-command shell in the previous example.  In many Unix shells, including
-bash, it is legal and convenient to use the forward "/" in Win32
-pathnames since the "\" is the shell's escape character. </para>
-
-<para>The "-s" flag to <command>mount</command> is used to add a mount
-in the system-wide mount table used by all Cygwin users on the system,
-instead of the user-specific one.  System-wide mounts are displayed
-by <command>mount</command> as being of the "system" type, as is the
-case for the <filename>/</filename> partition in the last example.
-Under Windows NT, only those users with Administrator priviledges are
-permitted to modify the system-wide mount table.</para>
-
-<para>Note that a given POSIX path may only exist once in the user
-table and once in the global, system-wide table.  Attempts to replace
-the mount will fail with a busy error.  The "-f" (force) flag causes
-the old mount to be silently replaced with the new one.  It will also
-silence warnings about the non-existence of directories at the Win32
-path location.</para>
-
-<para>The "-b" flag is used to instruct Cygwin to treat binary and
-text files in the same manner by default.  Binary mode mounts are
-marked as "binmode" in the Flags column of <command>mount</command>
-output.  By default, mounts are in text mode ("textmode" in the Flags
-column).</para>
-
-<para>The "-x" flag is used to instruct Cygwin that the mounted file
-is "executable".  If the "-x" flag is used with a directory then
-all files in the directory are executable.  Files ending in certain
-extensions (.exe, .com, .bat, .cmd) are assumed to be executable
-by default.  Files whose first two characters begin with '#!' are
-also considered to be executable.  This option allows other files
-to be marked as executable and avoids the overhead of opening each
-file to check for a '#!'.</para>
-
-</sect3>
-
-<sect3><title>Cygdrive mount points</title>
-
-<para>Whenever Cygwin cannot use any of the existing mounts to convert
-from a particular Win32 path to a POSIX one, Cygwin will, instead,
-convert to a POSIX path using a default mount point:
-<filename>/cygdrive</filename>.  For example, if Cygwin accesses
-<filename>Z:\foo</filename> and the Z drive is not currently in the
-mount table, then <filename>Z:\</filename> will be accessible as
-<filename>/cygdrive/Z</filename>.  The default prefix of
-<filename>/cygdrive</filename> may be changed via the
-<Xref Linkend="mount"> command.</para>
-
-<para>The <command>mount</command> utility can be used to change this
-default automount prefix through the use of the
-"--change-cygdrive-prefix" flag.  In the following example, we will
-set the automount prefix to <filename>/</filename>:</para>
-
-<example>
-<title>Changing the default prefix</title>
-<screen>
-<prompt>c:\cygnus\&gt;</prompt> <userinput>mount --change-cygdrive-prefix /</userinput>
-</screen>
-</example>
-
-<para>Note that you if you set a new prefix in this manner, you can
-specify the "-s" flag to make this the system-wide default prefix.  By
-default, the cygdrive-prefix applies only to the current user.  In the
-same way, you can specify the "-b" flag such that all new automounted
-filesystems default to binary mode file accesses.</para>
-
-</sect3>
-
-<sect3><title>Limitations</title>
-
-<para>Limitations: there is a hard-coded limit of 30 mount
-points.  Also, although you can mount to pathnames that do not start
-with "/", there is no way to make use of such mount points.</para>
-
-<para>Normally the POSIX mount point in Cygwin is an existing empty
-directory, as in standard UNIX. If this is the case, or if there is a
-place-holder for the mount point (such as a file, a symbolic link
-pointing anywhere, or a non-empty directory), you will get the expected
-behavior. Files present in a mount point directory before the mount
-become invisible to Cygwin programs.
-</para>
-
-<para>It is sometimes desirable to mount to a non-existent directory,
-for example to avoid cluttering the root directory with names
-such as
-<filename>a</filename>, <filename>b</filename>, <filename>c</filename>
-pointing to disks.
-Although <command>mount</command> will give you a warning, most
-everything will work properly when you refer to the mount point
-explicitly.  Some strange effects can occur however.
-For example if your current working directory is
-<filename>/dir</filename>,
-say, and <filename>/dir/mtpt</filename> is a mount point, then
-<filename>mtpt</filename> will not show up in an <command>ls</command>
-or
-<command>echo *</command> command and <command>find .</command> will
-not
-find <filename>mtpt</filename>.
-</para>
-
-</sect3>
 
 </sect2>
 
