@@ -115,7 +115,7 @@ endif
 libgcc:=${subst \,/,${shell $(CC_FOR_TARGET) -print-libgcc-file-name}}
 gcc_libdir:=${word 1,${dir $(libgcc)}}
 ifeq (,${findstring $(gcc_libdir),$(CFLAGS) $(CXXFLAGS) $(CXX) $(CC)})
-GCC_INCLUDE:=-I$(gcc_libdir)/include
+GCC_INCLUDE:=${subst //,/,-I$(gcc_libdir)/include}
 endif
 
 COMPILE_CXX=$(CXX) $c -nostdinc++ -nostdinc $(ALL_CXXFLAGS) $(GCC_INCLUDE) \
