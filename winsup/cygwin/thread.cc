@@ -79,37 +79,6 @@ _reent_winsup ()
   return _r->_winsup;
 }
 
-bool
-native_mutex::init ()
-{
-  theHandle = CreateMutex (&sec_none_nih, FALSE, NULL);
-  if (!theHandle)
-    {
-      debug_printf ("CreateMutex failed. %E");
-      return false;
-    }
-  return true;
-}
-
-bool
-native_mutex::lock ()
-{
-  DWORD waitResult = WaitForSingleObject (theHandle, INFINITE);
-  if (waitResult != WAIT_OBJECT_0)
-    {
-      system_printf ("Received unexpected wait result %d on handle %p, %E", waitResult, theHandle);
-      return false;
-    }
-  return true;
-}
-
-void
-native_mutex::unlock ()
-{
-  if (!ReleaseMutex (theHandle))
-    system_printf ("Received a unexpected result releasing mutex. %E");
-}
-
 inline LPCRITICAL_SECTION
 ResourceLocks::Lock (int _resid)
 {
@@ -720,7 +689,7 @@ pthread::push_cleanup_handler (__pthread_cleanup_handler *handler)
     // TODO: do it?
     api_fatal ("Attempt to push a cleanup handler across threads");
   handler->next = cleanup_stack;
-  InterlockedExchangePointer (&cleanup_stack, handler);
+  cleanup_stack = handler;
 }
 
 void
@@ -830,7 +799,7 @@ pthread_condattr::~pthread_condattr ()
 List<pthread_cond> pthread_cond::conds;
 
 /* This is used for cond creation protection within a single process only */
-native_mutex NO_COPY pthread_cond::cond_initialization_lock;
+fast_mutex NO_COPY pthread_cond::cond_initialization_lock;
 
 /* We can only be called once.
    TODO: (no rush) use a non copied memory section to
@@ -1040,7 +1009,7 @@ pthread_rwlockattr::~pthread_rwlockattr ()
 List<pthread_rwlock> pthread_rwlock::rwlocks;
 
 /* This is used for rwlock creation protection within a single process only */
-native_mutex NO_COPY pthread_rwlock::rwlock_initialization_lock;
+fast_mutex NO_COPY pthread_rwlock::rwlock_initialization_lock;
 
 /* We can only be called once.
    TODO: (no rush) use a non copied memory section to
@@ -1055,11 +1024,18 @@ pthread_rwlock::init_mutex ()
 pthread_rwlock::pthread_rwlock (pthread_rwlockattr *attr) :
   verifyable_object (PTHREAD_RWLOCK_MAGIC),
   shared (0), waiting_readers (0), waiting_writers (0), writer (NULL),
-  readers (NULL), mtx (NULL), cond_readers (NULL), cond_writers (NULL),
+  readers (NULL), readers_mx (), mtx (NULL), cond_readers (NULL), cond_writers (NULL),
   next (NULL)
 {
   pthread_mutex *verifyable_mutex_obj = &mtx;
   pthread_cond *verifyable_cond_obj;
+
+  if (!readers_mx.init ())
+    {
+      thread_printf ("Internal rwlock synchronisation mutex is not valid. this %p", this);
+      magic = 0;
+      return;
+    }
 
   if (attr)
     if (attr->shared != PTHREAD_PROCESS_PRIVATE)
@@ -1265,34 +1241,28 @@ pthread_rwlock::unlock ()
 void
 pthread_rwlock::add_reader (struct RWLOCK_READER *rd)
 {
-  rd->next = (struct RWLOCK_READER *)
-    InterlockedExchangePointer (&readers, rd);
+  List_insert (readers_mx, readers, rd);
 }
 
 void
 pthread_rwlock::remove_reader (struct RWLOCK_READER *rd)
 {
-  if (readers == rd)
-    InterlockedExchangePointer (&readers, rd->next);
-  else
-    {
-      struct RWLOCK_READER *temp = readers;
-      while (temp->next && temp->next != rd)
-	temp = temp->next;
-      /* but there may be a race between the loop above and this statement */
-      InterlockedExchangePointer (&temp->next, rd->next);
-    }
+  List_remove (readers_mx, readers, rd);
 }
 
 struct pthread_rwlock::RWLOCK_READER *
 pthread_rwlock::lookup_reader (pthread_t thread)
 {
-  struct RWLOCK_READER *temp = readers;
+  readers_mx.lock ();
 
-  while (temp && temp->thread != thread)
-    temp = temp->next;
+  struct RWLOCK_READER *cur = readers;
 
-  return temp;
+  while (cur && cur->thread != thread)
+    cur = cur->next;
+
+  readers_mx.unlock ();
+
+  return cur;
 }
 
 void
@@ -1323,6 +1293,9 @@ pthread_rwlock::_fixup_after_fork ()
 
   waiting_readers = 0;
   waiting_writers = 0;
+
+  if (!readers_mx.init ())
+    api_fatal ("pthread_rwlock::_fixup_after_fork () failed to recreate mutex");
 
   /* Unlock eventually locked mutex */
   mtx.unlock ();
@@ -1395,13 +1368,13 @@ pthread_key::get () const
 }
 
 void
-pthread_key::save_key_to_buffer ()
+pthread_key::_fixup_before_fork ()
 {
   fork_buf = get ();
 }
 
 void
-pthread_key::recreate_key_from_buffer ()
+pthread_key::_fixup_after_fork ()
 {
   tls_index = TlsAlloc ();
   if (tls_index == TLS_OUT_OF_INDEXES)
@@ -1496,7 +1469,7 @@ pthread_mutex::can_be_unlocked (pthread_mutex_t const *mutex)
 List<pthread_mutex> pthread_mutex::mutexes;
 
 /* This is used for mutex creation protection within a single process only */
-native_mutex NO_COPY pthread_mutex::mutex_initialization_lock;
+fast_mutex NO_COPY pthread_mutex::mutex_initialization_lock;
 
 /* We can only be called once.
    TODO: (no rush) use a non copied memory section to
@@ -2452,8 +2425,8 @@ pthread_cond::init (pthread_cond_t *cond, const pthread_condattr_t *attr)
 {
   if (attr && !pthread_condattr::is_good_object (attr))
     return EINVAL;
-  if (!cond_initialization_lock.lock ())
-    return EINVAL;
+
+  cond_initialization_lock.lock ();
 
   if (!is_good_initializer_or_bad_object (cond))
     {
@@ -2650,8 +2623,8 @@ pthread_rwlock::init (pthread_rwlock_t *rwlock, const pthread_rwlockattr_t *attr
 {
   if (attr && !pthread_rwlockattr::is_good_object (attr))
     return EINVAL;
-  if (!rwlock_initialization_lock.lock ())
-    return EINVAL;
+
+  rwlock_initialization_lock.lock ();
 
   if (!is_good_initializer_or_bad_object (rwlock))
     {
@@ -2844,8 +2817,8 @@ pthread_mutex::init (pthread_mutex_t *mutex,
 {
   if (attr && !pthread_mutexattr::is_good_object (attr) || check_valid_pointer (mutex))
     return EINVAL;
-  if (!mutex_initialization_lock.lock ())
-    return EINVAL;
+
+  mutex_initialization_lock.lock ();
 
   if (!is_good_initializer_or_bad_object (mutex))
     {

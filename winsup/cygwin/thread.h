@@ -44,6 +44,7 @@ extern "C"
 #include <signal.h>
 #include <pwd.h>
 #include <grp.h>
+#include <security.h>
 #define _NOMNTENT_FUNCS
 #include <mntent.h>
 
@@ -123,14 +124,46 @@ void AssertResourceOwner (int, int);
 #endif
 }
 
-class native_mutex
+class fast_mutex
 {
 public:
-  bool init ();
-  bool lock ();
-  void unlock ();
+  fast_mutex () :
+    lock_counter (0), win32_obj_id (0)
+  {
+  }
+
+  ~fast_mutex ()
+  {
+    if(win32_obj_id)
+      CloseHandle (win32_obj_id);
+  }
+
+  bool init ()
+  {
+    win32_obj_id = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
+    if (!win32_obj_id)
+      {
+        debug_printf ("CreateSemaphore failed. %E");
+        return false;
+      }
+    return true;
+  }
+
+  void lock ()
+  {
+    if (InterlockedIncrement ((long *)&lock_counter) != 1)
+      WaitForSingleObject (win32_obj_id, INFINITE);
+  }
+
+  void unlock ()
+  {
+    if (InterlockedDecrement ((long *)&lock_counter))
+      ::ReleaseSemaphore (win32_obj_id, 1, NULL);
+  }
+
 private:
-  HANDLE theHandle;
+  unsigned long lock_counter;
+  HANDLE win32_obj_id;
 };
 
 class per_process;
@@ -189,51 +222,85 @@ typedef enum
 verifyable_object_state verifyable_object_isvalid (void const *, long);
 verifyable_object_state verifyable_object_isvalid (void const *, long, void *);
 
-template <class list_node> class List {
-public:
+template <class list_node> inline void
+List_insert (fast_mutex &mx, list_node *&head, list_node *node)
+{
+  if (!node)
+    return;
+  mx.lock ();
+  node->next = head;
+  head = node;
+  mx.unlock ();
+}
+
+template <class list_node> inline void
+List_remove (fast_mutex &mx, list_node *&head, list_node *node)
+{
+  if (!node)
+    return;
+  mx.lock ();
+  if (node == head)
+    head = head->next;
+  else if (head)
+    {
+      list_node *cur = head;
+
+      while (cur->next && node != cur->next)
+        cur = cur->next;
+      if (node == cur->next)
+        cur->next = cur->next->next;
+    }
+  mx.unlock ();
+}
+ 
+
+template <class list_node> class List
+{
+ public:
   List() : head(NULL)
   {
+    mx_init ();
+  }
+
+  ~List()
+  {
+  }
+
+  void fixup_after_fork ()
+  {
+    mx_init ();
   }
 
   void insert (list_node *node)
   {
-    if (!node)
-      return;
-    node->next = (list_node *) InterlockedExchangePointer (&head, node);
+    List_insert (mx, head, node);
   }
 
-  list_node *remove ( list_node *node)
+  void remove (list_node *node)
   {
-    if (!node || !head)
-      return NULL;
-    if (node == head)
-      return pop ();
-
-    list_node *result_prev = head;
-    while (result_prev && result_prev->next && !(node == result_prev->next))
-      result_prev = result_prev->next;
-    if (result_prev)
-      return (list_node *)InterlockedExchangePointer (&result_prev->next, result_prev->next->next);
-    return NULL;
+    List_remove (mx, head, node);
   }
 
-  list_node *pop ()
-  {
-    return (list_node *) InterlockedExchangePointer (&head, head->next);
-  }
-
-  /* poor mans generic programming. */
   void for_each (void (list_node::*callback) ())
   {
-    list_node *node = head;
-    while (node)
+    mx.lock ();
+    list_node *cur = head;
+    while (cur)
       {
-        (node->*callback) ();
-        node = node->next;
+        (cur->*callback) ();
+        cur = cur->next;
       }
+    mx.unlock ();
   }
 
 protected:
+  void mx_init ()
+  {
+    if (!mx.init ())
+      api_fatal ("Could not create mutex for list synchronisation.");
+  }
+
+  fast_mutex mx;
   list_node *head;
 };
 
@@ -248,14 +315,15 @@ public:
 
   pthread_key (void (*)(void *));
   ~pthread_key ();
-  static void fixup_before_fork()
+  static void fixup_before_fork ()
   {
-    keys.for_each (&pthread_key::save_key_to_buffer);
+    keys.for_each (&pthread_key::_fixup_before_fork);
   }
 
-  static void fixup_after_fork()
+  static void fixup_after_fork ()
   {
-    keys.for_each (&pthread_key::recreate_key_from_buffer);
+    keys.fixup_after_fork ();
+    keys.for_each (&pthread_key::_fixup_after_fork);
   }
 
   static void run_all_destructors ()
@@ -267,8 +335,8 @@ public:
   class pthread_key *next;
 private:
   static List<pthread_key> keys;
-  void save_key_to_buffer ();
-  void recreate_key_from_buffer ();
+  void _fixup_before_fork ();
+  void _fixup_after_fork ();
   void (*destructor) (void *);
   void run_destructor ();
   void *fork_buf;
@@ -361,6 +429,7 @@ public:
   class pthread_mutex * next;
   static void fixup_after_fork ()
   {
+    mutexes.fixup_after_fork ();
     mutexes.for_each (&pthread_mutex::_fixup_after_fork);
   }
 
@@ -373,7 +442,7 @@ private:
   void _fixup_after_fork ();
 
   static List<pthread_mutex> mutexes;
-  static native_mutex mutex_initialization_lock;
+  static fast_mutex mutex_initialization_lock;
 };
 
 #define WAIT_CANCELED   (WAIT_OBJECT_0 + 1)
@@ -447,6 +516,7 @@ public:
   class pthread *next;
   static void fixup_after_fork ()
   {
+    threads.fixup_after_fork ();
     threads.for_each (&pthread::_fixup_after_fork);
   }
 
@@ -533,6 +603,7 @@ public:
   class pthread_cond * next;
   static void fixup_after_fork ()
   {
+    conds.fixup_after_fork ();
     conds.for_each (&pthread_cond::_fixup_after_fork);
   }
 
@@ -540,7 +611,7 @@ private:
   void _fixup_after_fork ();
 
   static List<pthread_cond> conds;
-  static native_mutex cond_initialization_lock;
+  static fast_mutex cond_initialization_lock;
 };
 
 class pthread_rwlockattr:public verifyable_object
@@ -573,6 +644,7 @@ public:
     struct RWLOCK_READER *next;
     pthread_t thread;
   } *readers;
+  fast_mutex readers_mx;
 
   int rdlock ();
   int tryrdlock ();
@@ -592,6 +664,7 @@ public:
   class pthread_rwlock * next;
   static void fixup_after_fork ()
   {
+    rwlocks.fixup_after_fork ();
     rwlocks.for_each (&pthread_rwlock::_fixup_after_fork);
   }
 
@@ -619,7 +692,7 @@ private:
 
   void _fixup_after_fork ();
 
-  static native_mutex rwlock_initialization_lock;
+  static fast_mutex rwlock_initialization_lock;
 };
 
 class pthread_once
@@ -651,6 +724,7 @@ public:
   class semaphore * next;
   static void fixup_after_fork ()
   {
+    semaphores.fixup_after_fork ();
     semaphores.for_each (&semaphore::_fixup_after_fork);
   }
 

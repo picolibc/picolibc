@@ -1,3 +1,40 @@
+2003-10-24  Thomas Pfaff  <tpfaff@gmx.net>
+
+	Rename native_mutex to fast_mutex throughout.
+	Rename pthread_key::save_key_to_buffer to
+	pthread_key::_fixup_before_fork throughout.
+	Rename pthread_key::recreate_key_from_buffer to
+	pthread_key::_fixup_after_fork throughout.
+
+	* thread.cc (native_mutex::init): Remove.
+	(native_mutex::lock): Ditto.
+	(native_mutex::unlock): Ditto.
+	(pthread::push_cleanup_handler): InterlockedExchangePointer
+	is not needed here.
+	(pthread_rwlock::pthread_rwlock): Initialize readers list mutex.
+	(pthread_rwlock::add_reader): Add reader via List_insert.
+	(pthread_rwlock::lookup_reader): Lock list while walking through.
+	(pthread_cond::init): Locking the init mutex is now void.
+	(pthread_rwlock::init): Ditto.
+	(pthread_mutex::init): Ditto.
+	* thread.h: Include security.h.
+	(fast_mutex): New class. Replacement for native_mutex.
+	(List_insert): New template function.
+	(List_remove): Ditto.
+	(List::List): Initialize synchronising mutex.
+	(List::fixup_after_fork): New method.
+	(List::insert): Add node via List_insert.
+	(List::remove): Remove node via List_remove.
+	(List::pop): Remove.
+	(List::for_each): Lock list while walking through.
+	(List::mx_init): New method.
+	(pthread_mutex::fixup_after_fork): Fixup mutex list after fork.
+	(pthread::fixup_after_fork): Ditto.
+	(pthread_conds::fixup_after_fork): Ditto.
+	(pthread_rwlock::fixup_after_fork): Ditto.
+	(semaphore::fixup_after_fork): Ditto.
+	(pthread_rwlock::readers_mx): New member.
+
 2003-10-24  Brian Ford  <ford@vss.fsi.com>
 
 	* fhandler.cc (fhandler_base::fcntl): Don't clobber O_APPEND when
