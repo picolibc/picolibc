@@ -18,6 +18,33 @@ before starting a Cygwin shell to have an effect on redirection.
 always open in binary mode.</para></warning>
 </listitem>
 <listitem>
+<para><FirstTerm>check_case:level</FirstTerm> - Controls the behaviour of
+Cygwin when a user tries to open or create a file using a case different from
+the case of the path as asved on the disk.
+<literal>level</literal> is one of <literal>relaxed</literal>,
+<literal>adjust</literal> and <literal>strict</literal>.</para>
+<itemizedlist Mark="bullet">
+<listitem>
+<para><FirstTerm>relaxed</FirstTerm> which is the default behaviour simply
+ignores case. That's the default for native Windows applications as well.</para>
+</listitem>
+<listitem>
+<para><FirstTerm>adjust</FirstTerm> behaves mostly invisible. The POSIX input
+path is internally adjusted in case, so that the resulting DOS path uses the
+correct case throughout. You can see the result when changing the directory
+using a wrong case and calling <command>/bin/pwd</command> afterwards.</para>
+</listitem>
+<listitem>
+<para><FirstTerm>strict</FirstTerm> results in a error message if the case
+isn't correct. Trying to open a file <filename>Foo</filename> while a file
+<filename>fOo</filename> exists results in a "no such file or directory"
+error. Trying to create a file <filename>BAR</filename> while a file
+<filename>Bar</filename> exists results in a "Filename exists with different
+case" error.</para>
+</listitem>
+</itemizedlist>
+</listitem>
+<listitem>
 <para><FirstTerm>(no)envcache</FirstTerm> - If set, environment variable
 conversions (between Win32 and POSIX) are cached.  Note that this is may
 cause problems if the mount table changes, as the cache is not invalidated
