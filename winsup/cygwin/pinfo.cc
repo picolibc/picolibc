@@ -144,7 +144,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
       return;
     }
 
-  int createit = flag & PID_IN_USE | PID_EXECED;
+  int createit = flag & (PID_IN_USE | PID_EXECED);
   for (int i = 0; i < 10; i++)
     {
       int created;

@@ -1,4 +1,4 @@
-Sat Oct 21 15:27:55 2000  Christopher Faylor <cgf@cygnus.com>
+Sat Oct 21 16:57:23 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* pinfo.cc (pinfo::init): Make PID_EXECED signal creation as well as
 	PID_IN_USE.
