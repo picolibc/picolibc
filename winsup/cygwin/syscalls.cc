@@ -1231,7 +1231,8 @@ _rename (const char *oldpath, const char *newpath)
   if (!MoveFile (real_old.get_win32 (), real_new.get_win32 ()))
     res = -1;
 
-  if (res == 0 || GetLastError () != ERROR_ALREADY_EXISTS)
+  if (res == 0 || (GetLastError () != ERROR_ALREADY_EXISTS
+                   && GetLastError () != ERROR_FILE_EXISTS))
     goto done;
 
   if (os_being_run == winNT)

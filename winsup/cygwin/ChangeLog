@@ -1,3 +1,11 @@
+Mon May 16 23:39:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* dir.cc (rmdir): Care for misleading error messages
+	when trying to remove a directory on a samba share.
+        Eliminate superfluous else branch.
+	* syscalls.cc (_rename): Additional check for ERROR_FILE_EXISTS
+	if MoveFile fails.
+
 Sun May 21 20:51:44 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dcrt0.cc (dll_crt0_1): Move uinfo_init call to before sigproc_init to

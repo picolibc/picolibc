@@ -319,18 +319,27 @@ rmdir (const char *dir)
     }
 
   if (RemoveDirectoryA (real_dir.get_win32 ()))
-    res = 0;
-  else if (os_being_run != winNT && GetLastError() == ERROR_ACCESS_DENIED)
     {
-      /* Under Windows 95 & 98, ERROR_ACCESS_DENIED is returned
-	 if you try to remove a file or a non-empty directory. */
+      /* RemoveDirectory on a samba drive doesn't return an error if the
+         directory can't be removed because it's not empty. Checking for
+         existence afterwards keeps us informed about success. */
+      if (GetFileAttributesA (real_dir.get_win32 ()) != (DWORD) -1)
+        set_errno (ENOTEMPTY);
+      else
+        res = 0;
+    }
+  else if (GetLastError() == ERROR_ACCESS_DENIED)
+    {
+      /* Under Windows 9X or on a samba share, ERROR_ACCESS_DENIED is
+         returned if you try to remove a file. On 9X the same error is
+         returned if you try to remove a non-empty directory. */
      if (GetFileAttributes (real_dir.get_win32()) != FILE_ATTRIBUTE_DIRECTORY)
        set_errno (ENOTDIR);
-     else
+     else if (os_being_run != winNT)
        set_errno (ENOTEMPTY);
+     else
+       __seterrno ();
     }
-  else if (GetLastError () == ERROR_DIRECTORY)
-    set_errno (ENOTDIR);
   else
     __seterrno ();
 
