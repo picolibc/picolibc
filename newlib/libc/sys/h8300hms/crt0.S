@@ -16,8 +16,14 @@ _start:
 #ifdef __ELF__
 	mov.l   #__fini,r0
 	jsr     @_atexit
+#ifdef __SIMULATOR__
+        jsr     @0xcc
+#endif
 	jsr     @__init
 #else
+#ifdef __SIMULATOR__
+        jsr     @0xcc
+#endif
 	jsr	@___main
 #endif
 	jsr	@_main
@@ -45,8 +51,14 @@ _start:
 #ifdef __ELF__
 	mov.l   #__fini,r0
 	jsr     @_atexit
+#ifdef __SIMULATOR__
+        jsr     @0xcc
+#endif
 	jsr     @__init
 #else
+#ifdef __SIMULATOR__
+        jsr     @0xcc
+#endif
 	jsr	@___main
 #endif
 	jsr	@_main
@@ -74,8 +86,14 @@ _start:
 #ifdef __ELF__
 	mov.l   #__fini,r0
 	jsr     @_atexit
+#ifdef __SIMULATOR__
+        jsr     @0xcc
+#endif
 	jsr     @__init
 #else
+#ifdef __SIMULATOR__
+        jsr     @0xcc
+#endif
 	jsr	@___main
 #endif
 	jsr	@_main

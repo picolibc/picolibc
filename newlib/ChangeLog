@@ -1,3 +1,10 @@
+2003-03-18  D.Venkatasubramanian  <dvenkat@noida.hcltech.com>
+
+	* libc/include/sys/h8300hms/crt0.S[__SIMULATOR__]: Add commandline
+	support.
+	* configure.host (h8300*-*-*): Added comment regarding -D__SIMULATOR__
+	flag to support simulator only extensions.
+
 2003-03-17  Bob Cassels  <bcassels@abinitio.com>
 
         * libc/string/wcschr.c: (wcschr): Look for character first, 
