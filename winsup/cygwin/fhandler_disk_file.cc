@@ -107,8 +107,7 @@ fhandler_disk_file::fstat (struct __stat64 *buf, path_conv *pc)
       /* Unfortunately the count of 2 confuses `find (1)' command. So
 	 let's try it with `1' as link count. */
       if (pc->isdir ())
-	buf->st_nlink = (pc->isremote ()
-			 ? 1 : num_entries (pc->get_win32 ()));
+	buf->st_nlink = pc->isremote () ? 1 : num_entries (pc->get_win32 ());
       close ();
     }
   else if (pc->exists ())
@@ -118,8 +117,8 @@ fhandler_disk_file::fstat (struct __stat64 *buf, path_conv *pc)
       WIN32_FIND_DATA wfd;
       HANDLE handle;
       buf->st_nlink = 1;
-      if (pc->isdir () && pc->isremote ())
-	buf->st_nlink = num_entries (pc->get_win32 ());
+      if (pc->isdir ())
+	buf->st_nlink = pc->isremote () ? 1 : num_entries (pc->get_win32 ());
       buf->st_dev = FHDEVN (FH_DISK) << 8;
       buf->st_ino = hash_path_name (0, pc->get_win32 ());
       if (pc->isdir ())

@@ -1,5 +1,10 @@
 2002-05-18  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat): Make handling of
+	nlink consistent for remote files.
+
+2002-05-18  Christopher Faylor  <cgf@redhat.com>
+
 	* path.cc (path_conv::check): Always set executable bit for executable
 	extension.
 
