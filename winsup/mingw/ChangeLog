@@ -1,11 +1,15 @@
+2002-09-21  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/stdlib.h: Move _Exit prototype into main C99 block.
+	Use C++ c-header compatability defines.
+
 2002-09-20  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/math.h: Use C++ c-header compatability defines.
 
-	* mingwex.math/fpclassify.c: Add non-underscored alias.
-	* mingwex.math/fpclassifyf.c: Likewise.
-	* mingwex.math/fpclassifyl.c: Likewise.
-
+	* mingwex/math/fpclassify.c: Add non-underscored alias.
+	* mingwex/math/fpclassifyf.c: Likewise.
+	* mingwex/math/fpclassifyl.c: Likewise.
 
 2002-09-20  Danny Smith  <dannysmith@users.sourceforge.net>
 
