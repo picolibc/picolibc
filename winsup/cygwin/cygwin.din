@@ -419,6 +419,14 @@ erfcf
 _erfcf = erfcf
 erff
 _erff = erff
+err
+errx
+verr
+verrx
+warn
+warnx
+vwarn
+vwarnx
 execl
 _execl = execl
 execle
