@@ -1,3 +1,8 @@
+Sun Apr  8 20:48:01 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* include/winnt.h (GetCurrentFiber): Make "external __inline" or asm
+	code will be included in every module which includes this header.
+	(GetFiberData): Ditto.
 
 2001-04-08  Earnie Boyd  <earnie@users.sourceforge.net>
 
