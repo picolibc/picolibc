@@ -63,7 +63,7 @@ get usage information.  For example (on my installation):
         /usr/bin/cygwin.bat
 @end example
 Note that bash interprets the backslash '\' as an escape character, so
-you must type it twice in the bash shell if you want it to be recognised
+you must type it twice in the bash shell if you want it to be recognized
 as such.
 
 @subsection Why doesn't bash read my .bashrc file on startup?
@@ -236,7 +236,7 @@ keyb ru,,C:\WINDOWS\COMMAND\keybrd3.sys
 (That's for russian locale.) You should comment that line if you want
 your keys working properly. Of course, this will deprive you of your
 local alphabet keyboard support, so you should think about
-another localizer. exUSSR users are of course knowledgable of Keyrus
+another localizer. exUSSR users are of course knowledgeable of Keyrus
 localizer, and it might work for other locales too, since it has keyboard
 layout editor. But it has russian messages and documentation ;-(
 Reference URL is http://www.hnet.ru/software/contrib/Utils/KeyRus/
@@ -306,7 +306,7 @@ Windows path, but these would have to be escaped from the shell.
 to the posix path, because different posix paths, through different
 mount points, could map to the same Windows directory.  This matters
 because different mount points may be binmode or textmode, so the
-behaviour of Cygwin apps will vary depending on the posix path used to
+behavior of Cygwin apps will vary depending on the posix path used to
 get there.
 
 You can avoid the ambiguity of Windows paths, and avoid typing
@@ -346,6 +346,13 @@ be ON.  Save the properties.
 
 Under Windows 9x, open the properties dialog of the console window.
 Select the Misc tab.  Uncheck Fast Pasting.  Check QuickEdit.
+
+You can also bind the insert key to paste from the clipboard by adding 
+the following line to your .inputrc file: 
+@example
+	"\e[2~": paste-from-clipboard 
+@end example 
+
 
 @subsection What does "mount failed: Device or resource busy" mean?
 
