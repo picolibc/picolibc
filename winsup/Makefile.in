@@ -95,7 +95,7 @@ check: cygwin
 	else \
 	    (mkdir testsuite 2>/dev/null || exit 0); \
 	    cd testsuite; \
-	    sed -n -e '1,/^done/{' -e 's%/cygwin%/testsuite%g; ' -e 'p; }'  ../cygwin/config.status > config.status; \
+	    sed -n -e '1,/^done/{' -e 's%winsup/cygwin\([ /]\)%winsup/testsuite\1%g; ' -e 'p; }'  ../cygwin/config.status > config.status; \
 	    chmod a+x config.status; \
 	    sh ./config.status --recheck; \
 	    sh ./config.status; \
