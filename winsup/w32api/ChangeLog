@@ -1,3 +1,9 @@
+Fri Jan 26 13:34:55  2001  Earnie Boyde  <earnie@users.sourceforge.net>
+
+	* lib/msvcp60.def: Apply Danny Smith patch 103321.
+	2001-01-17  Danny Smith  <danny_r_smith_2001@yahoo.co.nz>.
+	New file.
+
 Fri Jan 26 11:34:04 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* include/winnt.h: Add PTOKEN_USER.
