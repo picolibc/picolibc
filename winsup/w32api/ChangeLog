@@ -1,3 +1,24 @@
+2004-03-02  Martin Fuchs  <martin-fuchs@gmx.net>
+
+	* include/oleauto.h (VAR_VALIDDATE, VAR_FORMAT_NOSUBSTITUTE,
+	VAR_FOURDIGITYEARS) Define new constants. Group VAR_*  defines
+	together.
+	(V_UI2, V_UI4, V_UI4REF, V_UI, V_UI8REF) Define macros.
+	(V_I8, V_I8REF): Correct macros.
+	(V_DECIMAL): Correct macro deginitions.
+	(V_INT_PTR, V_UINT_PTR, V_INT_PTRREF, V_UINT_PTRREF): Define
+	constants.
+	(VTBIT_*): Define constants.
+	(UDATE): Add structure definition.
+	(VarDateFromUdate, VarDateFromUdateEx, VarUdateFromDate): Declare
+	functions.
+	(SafeArrayCreateVector): Correct parameter type from UINT to ULONG
+	(SafeArrayCreateVectorEx): Declare function.
+	(Var*): declare VARIANT manipulation functions.
+	* include/ocidl.h (IPicture_*): Define IPicture COBJ macros.
+	* include/oaidl.h (IRecordInfo_*): Define IRecordInfo COBJ
+	macros.
+
 2004-03-01  Martin Fuchs  <martin-fuchs@gmx.net>
 
 	* include/oaidl.h (FADF_*) Define missing constants.
