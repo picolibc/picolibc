@@ -527,6 +527,8 @@ perror
 _perror = perror
 pipe
 _pipe
+poll
+_poll = poll
 pow
 _pow = pow
 powf
