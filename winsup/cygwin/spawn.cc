@@ -608,7 +608,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   char sa_buf[1024];
 
   cygbench ("spawn-guts");
-  ciresrv.mount_h = cygwin_mount_h;
 
   if (!cygheap->user.issetuid ())
     {

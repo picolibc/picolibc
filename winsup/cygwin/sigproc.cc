@@ -828,6 +828,7 @@ init_child_info (DWORD chtype, child_info *ch, pid_t pid, HANDLE subproc_ready)
   ch->subproc_ready = subproc_ready;
   ch->pppid_handle = myself->ppid_handle;
   ch->fhandler_union_cb = sizeof (fhandler_union);
+  ch->mount_h = cygwin_mount_h;
 }
 
 /* Check the state of all of our children to see if any are stopped or
