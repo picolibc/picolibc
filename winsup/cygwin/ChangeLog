@@ -1,5 +1,10 @@
 2004-01-19  Christopher Faylor  <cgf@redhat.com>
 
+	* include/cygwin/version.h: Bump DLL minor number to 7 (should have been
+	done earlier).
+
+2004-01-19  Christopher Faylor  <cgf@redhat.com>
+
 	* cygwin/include/signal.h: Add copyright notice.
 
 	* cygwin.din: Make clock SIGFE.  Add clock_gettime, sigwaitinfo,
