@@ -87,7 +87,7 @@ thread_stub (VOID *arg)
   exception_list except_entry;
 
   /* Give up our slot in the start_buf array */
-  InterlockedExchange (&((thread_start *) arg)->notavail, 0);
+  (void) InterlockedExchange (&((thread_start *) arg)->notavail, 0);
 
   /* Initialize this thread's ability to respond to things like
      SIGSEGV or SIGFPE. */

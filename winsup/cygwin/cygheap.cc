@@ -12,12 +12,22 @@
 #include <errno.h>
 #include <fhandler.h>
 #include <assert.h>
+#include <stdlib.h>
 #include "cygheap.h"
 #include "heap.h"
 #include "cygerrno.h"
+#include "sync.h"
 
 void *cygheap = NULL;
 void *cygheap_max = NULL;
+
+static NO_COPY muto *cygheap_protect = NULL;
+
+extern "C" void __stdcall
+cygheap_init ()
+{
+  cygheap_protect = new_muto (FALSE, "cygheap_protect");
+}
 
 inline static void
 init_cheap ()
@@ -116,30 +126,35 @@ _cmalloc (int size)
     init_buckets ();
 
   b = size2bucket (size);
+  cygheap_protect->acquire ();
   if (buckets[b])
     {
       rvc = (_cmalloc_entry *) buckets[b];
       buckets[b] = rvc->ptr;
       rvc->b = b;
-      return rvc->data;
     }
+  else
+    {
+      size = bucket2size[b] + sizeof (_cmalloc_entry);
+      rvc = (_cmalloc_entry *) _csbrk (size);
 
-  size = bucket2size[b] + sizeof (_cmalloc_entry);
-  rvc = (_cmalloc_entry *) _csbrk (size);
-
-  rvc->b = b;
-  rvc->prev = *cygheap_chain;
-  *cygheap_chain = rvc;
+      rvc->b = b;
+      rvc->prev = *cygheap_chain;
+      *cygheap_chain = rvc;
+    }
+  cygheap_protect->release ();
   return rvc->data;
 }
 
 static void __stdcall
 _cfree (void *ptr)
 {
+  cygheap_protect->acquire ();
   _cmalloc_entry *rvc = to_cmalloc (ptr);
   DWORD b = rvc->b;
   rvc->ptr = buckets[b];
   buckets[b] = (char *) rvc;
+  cygheap_protect->release ();
 }
 
 static void *__stdcall
@@ -226,6 +241,7 @@ creturn (cygheap_types x, cygheap_entry * c, int len)
   c->type = x;
   if (cygheap_max < ((char *) c + len))
     cygheap_max = (char *) c + len;
+  MALLOC_CHECK;
   return (void *) c->data;
 }
 
@@ -233,6 +249,7 @@ extern "C" void *__stdcall
 cmalloc (cygheap_types x, DWORD n)
 {
   cygheap_entry *c;
+  MALLOC_CHECK;
   c = (cygheap_entry *) _cmalloc (sizeof_cygheap (n));
   if (!c)
     system_printf ("cmalloc returned NULL");
@@ -242,6 +259,7 @@ cmalloc (cygheap_types x, DWORD n)
 extern "C" void *__stdcall
 crealloc (void *s, DWORD n)
 {
+  MALLOC_CHECK;
   if (s == NULL)
     return cmalloc (HEAP_STR, n);	// kludge
 
@@ -257,14 +275,17 @@ crealloc (void *s, DWORD n)
 extern "C" void __stdcall
 cfree (void *s)
 {
+  MALLOC_CHECK;
   assert (!inheap (s));
   (void) _cfree (tocygheap (s));
+  MALLOC_CHECK;
 }
 
 extern "C" void *__stdcall
 ccalloc (cygheap_types x, DWORD n, DWORD size)
 {
   cygheap_entry *c;
+  MALLOC_CHECK;
   c = (cygheap_entry *) _cmalloc (sizeof_cygheap (n * size));
   if (c)
     memset (c->data, 0, size);
@@ -276,19 +297,23 @@ ccalloc (cygheap_types x, DWORD n, DWORD size)
 extern "C" char *__stdcall
 cstrdup (const char *s)
 {
+  MALLOC_CHECK;
   char *p = (char *) cmalloc (HEAP_STR, strlen (s) + 1);
   if (!p)
     return NULL;
   strcpy (p, s);
+  MALLOC_CHECK;
   return p;
 }
 
 extern "C" char *__stdcall
 cstrdup1 (const char *s)
 {
+  MALLOC_CHECK;
   char *p = (char *) cmalloc (HEAP_1_STR, strlen (s) + 1);
   if (!p)
     return NULL;
   strcpy (p, s);
+  MALLOC_CHECK;
   return p;
 }

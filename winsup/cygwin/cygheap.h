@@ -29,7 +29,7 @@ enum cygheap_types
 extern HANDLE cygheap;
 extern HANDLE cygheap_max;
 
-#define incygheap(s) (cygheap && ((char *) (s) >= (char *) cygheap) && ((char *) (s) <= ((char *) cygheap) + CYGHEAPSIZE))
+#define incygheap(s) (cygheap && ((char *) (s) >= (char *) cygheap) && ((char *) (s) <= ((char *) cygheap_max)))
 
 extern "C" {
 void __stdcall cfree (void *);
@@ -39,4 +39,5 @@ void *__stdcall crealloc (void *, DWORD);
 void *__stdcall ccalloc (cygheap_types, DWORD, DWORD);
 char *__stdcall cstrdup (const char *);
 char *__stdcall cstrdup1 (const char *);
+void __stdcall cygheap_init ();
 }

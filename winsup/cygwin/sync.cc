@@ -116,7 +116,7 @@ muto::release ()
   if (!--visits)
     {
       tid = 0;		/* We were the last unlocker. */
-      InterlockedExchange (&sync, 0); /* Reset trigger. */
+      (void) InterlockedExchange (&sync, 0); /* Reset trigger. */
       /* This thread had incremented waiters but had never decremented it.
 	 Decrement it now.  If it is >= 0 then there are possibly other
 	 threads waiting for the lock, so trigger bruteforce. */

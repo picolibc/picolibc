@@ -654,6 +654,7 @@ dll_crt0_1 ()
 
   threadname_init ();
   debug_init ();
+  cygheap_init ();	/* Initialize cygheap muto */
 
   regthread ("main", GetCurrentThreadId ());
 

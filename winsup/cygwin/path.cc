@@ -2436,36 +2436,7 @@ hashit:
 char *
 getcwd (char *buf, size_t ulen)
 {
-  char *res;
-  char *usebuf, uselen;
-
-  if (buf != NULL)
-    {
-      usebuf = buf;
-      uselen = TRUE;
-    }
-  else
-    {
-      if (ulen >= 0)
-	uselen = TRUE;
-      else
-	{
-	  uselen = FALSE;
-	  ulen = MAX_PATH + 1;
-	}
-
-      usebuf = (char *) malloc (ulen);
-      usebuf [ulen - 1] = '\0';
-    }
-
-  res = cygcwd.get (usebuf, 1, 1, ulen);
-
-  if (res && !uselen)
-    usebuf = (char *) realloc (usebuf, strlen (usebuf) + 1);
-  else if (!res && buf == NULL)
-    free (usebuf);
-
-  return res;
+  return cygcwd.get (buf, 1, 1, ulen);
 }
 
 /* getwd: standards? */
@@ -2481,6 +2452,7 @@ extern "C"
 int
 chdir (const char *dir)
 {
+  MALLOC_CHECK;
   syscall_printf ("dir %s", dir);
   path_conv path (dir, PC_FULL | PC_SYM_FOLLOW);
 
@@ -2529,6 +2501,7 @@ chdir (const char *dir)
      it was worth locking just for strace. */
   syscall_printf ("%d = chdir() cygcwd.posix '%s' native '%s'", res,
 		  cygcwd.posix, native_dir);
+  MALLOC_CHECK;
   return res;
 }
 
@@ -2962,8 +2935,7 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd)
 char *
 cwdstuff::get (char *buf, int need_posix, int with_chroot, unsigned ulen)
 {
-  size_t len = ulen;
-
+  MALLOC_CHECK;
   if (!get_initial ())	/* Get initial cwd and set cwd lock */
     return NULL;
 
@@ -2982,6 +2954,8 @@ cwdstuff::get (char *buf, int need_posix, int with_chroot, unsigned ulen)
     }
   else
     {
+      if (need_posix && !buf)
+	buf = (char *) malloc (strlen (tocopy) + 1);
       strcpy (buf, tocopy);
       if (!buf[0])	/* Should only happen when chroot */
 	strcpy (buf, "/");
@@ -2989,7 +2963,8 @@ cwdstuff::get (char *buf, int need_posix, int with_chroot, unsigned ulen)
 
   lock->release ();
   syscall_printf ("(%s) = cwdstuff::get (%p, %d, %d, %d)",
-		  buf, buf, len, need_posix, with_chroot);
+		  buf, buf, ulen, need_posix, with_chroot);
+  MALLOC_CHECK;
   return buf;
 }
 
@@ -3002,5 +2977,6 @@ cwdstuff::copy (char * &posix_cwd, char * &win32_cwd, DWORD hash_cwd)
   posix_cwd = cstrdup (posix);
   win32_cwd = cstrdup (win32);
   hash_cwd = hash;
+  MALLOC_CHECK;
   lock->release ();
 }

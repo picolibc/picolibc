@@ -1,3 +1,15 @@
+Sun Oct  1 22:20:39 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* cygheap.cc (cygheap_init): Born again function.
+	(_cmalloc): Reorganize to accomodate muto locking.
+	(_cfree): Use muto lock to avoid multi-thread problems.
+	* cygheap.h (incygheap): Just use cygheap_max to find upper cygwin heap
+	bounds.
+	* dcrt0.cc (dll_crt0_1): Reinstitute cygheap_init call.
+	* path.cc (getcwd): Just return cwdstuff::get result, allowing correct
+	handling of negative length.
+	(cwdstuff::get): Malloc a buffer if one is not available.
+
 Sun Oct  1  2:56:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* Makefile.in: Add fhandler_mem.o to the dependencies.
@@ -115,7 +127,8 @@ Sun Sep 17 22:18:39 2000  Christopher Faylor <cgf@cygnus.com>
 
 Fri Sep 15 22:30:40 2000  Christopher Faylor <cgf@cygnus.com>
 
-	* exceptions.cc (handle_exceptions): Just "core dump" if SIGSEGV in signal thread.
+	* exceptions.cc (handle_exceptions): Just "core dump" if SIGSEGV in
+	signal thread.
 	* external.cc (fillout_pinfo): Fix compiler warning.
 	* sigproc.h: Eliminate special asm naming for sig_dispatch_pending.
 	* sigproc.cc (sig_send): Remove debugging statements.
