@@ -16,6 +16,7 @@ details. */
 /* Get wchar_t and wint_t from <stddef.h>.  */
 #define __need_wchar_t
 #define __need_wint_t
+#define __need_size_t
 #include <stddef.h>
 
 __BEGIN_DECLS

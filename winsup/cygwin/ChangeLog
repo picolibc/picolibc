@@ -1,3 +1,7 @@
+2002-06-08  Christopher Faylor  <cgf@redhat.com>
+
+	* include/wchar.h: Define __need_size_t.
+
 2002-06-07  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_socket.cc (fhandler_socket::fstat): Don't assume that socket
