@@ -1,5 +1,9 @@
 2003-07-25  Christopher Faylor  <cgf@redhat.com>
 
+	* Makefile.in (OBSOLETE_FUNCTION):  Add fdopen.
+
+2003-07-25  Christopher Faylor  <cgf@redhat.com>
+
 	* cygwin.din: Export _fdopen64
 	* Makefile.in (NEW_FUNCTIONS): Add _fdopen64 -> fdopen translation.
 	* include/cygwin/version.h: Bump api minor number.
