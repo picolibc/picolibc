@@ -1,3 +1,29 @@
+2002-06-18  Dave Brolley  <brolley@redhat.com>
+
+	From Catherine Moore, Michael Meissner, Richard Sandiford:
+	* configure.in: Support frv*-*-*.
+	* frv/Makefile.in: New file.
+	* frv/configure: New file.
+	* frv/configure.in: New file.
+	* frv/crt0.S: New file.
+	* frv/fstat.c: New file.
+	* frv/getpid.c: New file.
+	* frv/isatty.c: New file.
+	* frv/kill.c: New file.
+	* frv/print.c: New file.
+	* frv/putnum.c: New file.
+	* frv/sbrk.c: New file.
+	* frv/sim-close.S: New file.
+	* frv/sim-exit.S: New file.
+	* frv/sim-inbyte.c: New file.
+	* frv/sim-lseek.S: New file.
+	* frv/sim-open.S: New file.
+	* frv/sim-read.S: New file.
+	* frv/sim-time.c: New file.
+	* frv/sim-unlink.S: New file.
+	* frv/sim-write.S: New file.
+	* frv/stat.c: New file.
+
 2002-05-11  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* libnosys/acconfig.h (HAVE_SECTION_ATTRIBUTES): New macro.
