@@ -606,18 +606,20 @@ struct xcoff_ar_hdr_big
    `hdr' member has the same size and position in both formats.  
    <bigaf> is the default format, return true even when xcoff_ardata is 
    NULL. */
+#ifndef SMALL_ARCHIVE
+/* Creates big archives by default */
 #define xcoff_big_format_p(abfd) \
   ((NULL != bfd_ardata (abfd) && NULL == xcoff_ardata (abfd)) || \
    ((NULL != bfd_ardata (abfd)) && \
     (NULL != xcoff_ardata (abfd)) && \
     (xcoff_ardata (abfd)->magic[1] == 'b')))
-
-/* For testing old format * /
-#undef xcoff_big_format_p
+#else
+/* Creates small archives by default. */
 #define xcoff_big_format_p(abfd) \
   (((NULL != bfd_ardata (abfd)) && \
     (NULL != xcoff_ardata (abfd)) && \
-    (xcoff_ardata (abfd)->magic[1] == 'b'))) / **/
+    (xcoff_ardata (abfd)->magic[1] == 'b')))
+#endif
 
 /* We store a copy of the xcoff_ar_file_hdr in the tdata field of the
    artdata structure.  Similar for the big archive.  */

@@ -1,3 +1,7 @@
+2002-02-01  Tom Rix  <trix@redhat.com>
+
+	* xcoff.h: Conditionally support <aiaff> for pre AIX 4.3.
+ 
 2002-01-31  Ivan Guzvinec  <ivang@opencores.org>
 
 	* or32.h: New file.
