@@ -345,13 +345,8 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
   return 0;
 }
 
-fhandler_disk_file::fhandler_disk_file (DWORD devtype) :
-  fhandler_base (devtype)
-{
-}
-
 fhandler_disk_file::fhandler_disk_file () :
-  fhandler_base (FH_FS)
+  fhandler_base ()
 {
 }
 
@@ -718,7 +713,7 @@ fhandler_disk_file::closedir (DIR *dir)
 }
 
 fhandler_cygdrive::fhandler_cygdrive () :
-  fhandler_disk_file (FH_CYGDRIVE), ndrives (0), pdrive (NULL)
+  fhandler_disk_file (), ndrives (0), pdrive (NULL)
 {
 }
 
