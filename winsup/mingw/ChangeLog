@@ -1,6 +1,13 @@
 2002-09-27  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/settjmp.h: Use C++ c-header compatibility defines.
+	* include/wchar: #include sys/types.h in non-ANSI mode.
+	* Protect _Wint_t typedef with __STRICT_ANSI__.  Remove from std
+	namespace.
+	Fix comment about string functions.
+
+2002-09-27  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/setjmp.h: Use C++ c-header compatibility defines.
 	* include/time.h; Don't include non-ISO sys/types.h.
 	(struct tm): Define in __CSTD, if not already done.
 	(_wasctime): Qualify tm with __CSTD.

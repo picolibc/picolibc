@@ -152,7 +152,7 @@ __END_CGLOBAL_NAMESPACE
 #ifndef _WSTRING_DEFINED
 /*
  * Unicode versions of the standard calls.
- * Also in stdio.h, since MSDN puts them in both headers well */ 
+ * Also in string.h, since MSDN puts them in both headers.
  */
 __BEGIN_CSTD_NAMESPACE
 wchar_t* wcscat (wchar_t*, const wchar_t*);
@@ -219,6 +219,7 @@ __END_CGLOBAL_NAMESPACE
 #endif  /* _WSTRING_DEFINED */
 
 #ifndef __STRICT_ANSI__
+#include <sys/types.h>
 __BEGIN_CGLOBAL_NAMESPACE
 /*
  * non_ANSI wide char functions from io.h, direct.h, sys/stat.h
@@ -401,13 +402,17 @@ __END_CSTD_NAMESPACE
 #define  _WSTDLIB_DEFINED
 #endif
 
+#ifndef __STRICT_ANSI__
+typedef wchar_t _Wint_t; /* Used only by MSVC C++ headers?  */
+#endif
+
 __BEGIN_CSTD_NAMESPACE
+
+typedef int mbstate_t;
 
 /* These are resolved by -lmsvcp60 */
 /* If you don't have msvcp60.dll in your windows system directory, you can
    easily obtain it with a search from your favorite search engine. */
-typedef int mbstate_t;
-typedef wchar_t _Wint_t;
 
 wint_t  btowc(int);
 size_t  mbrlen(const char *, size_t, mbstate_t *);
