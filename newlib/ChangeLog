@@ -1,3 +1,9 @@
+Wed May  8 17:47:35 2002  J"orn Rennecke <joern.rennecke@superh.com>
+
+	* libc/machine/sh/memset.S (memset, __SHMEDIA__ code):
+	Also handle as single quad word when destination ends at last
+	byte of first quad word.  Fix byte selection in single quad code.
+
 2002-05-07  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* libc/include/sys/stdio.h: New file.
@@ -685,14 +691,14 @@ Tue Mar 26 17:17:10 2002  J"orn Rennecke <joern.rennecke@superh.com>
 
 Wed Mar  6 10:24:26 2002  J"orn Rennecke <joern.rennecke@superh.com>
 
-	* Makefile.am (lib_a_SOURCES, SH64 case): Add memcpy.S, memset.S
-	and strcpy.S.
-	* Makefile.in: Regenerate.
-	* asm.h (_ENTRY): Set SH5 alignment to 8 bytes.
+	* libc/machine/sh/Makefile.am (lib_a_SOURCES, SH64 case):
+	Add memcpy.S, memset.S and strcpy.S.
+	* libc/machine/sh/Makefile.in: Regenerate.
+	* libc/machine/sh/asm.h (_ENTRY): Set SH5 alignment to 8 bytes.
 	(SHHI, SHLO): Define.
-	* memcpy.S: Add code for SH5.
-	* memset.S: Likewise.
-	* strcpy.S: Likewise.
+	* libc/machine/sh/memset.S: Add code for SH5.
+	* libc/machine/sh/memset.S: Likewise.
+	* libc/machine/sh/strcpy.S: Likewise.
 
 2002-02-27  Jeff Johnston  <jjohnstn@redhat.com>
 

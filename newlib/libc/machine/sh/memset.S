@@ -12,33 +12,35 @@
 ENTRY(memset)
 #if __SHMEDIA__
 	pta/l multiquad, tr0
+	andi r2, 7, r22
 	ptabs r18, tr2
 	mshflo.b r3,r3,r3
-	mperm.w r3, r63, r3
-
-	andi r2, 7, r22
 	add r4, r22, r23
-	shlri r23, 3, r24
-	bnei/u r24, 0, tr0
+	mperm.w r3, r63, r3	// Fill pattern now in every byte of r3
+
+	movi 8, r9
+	bgtu/u r23, r9, tr0
 
 	ldlo.q r2, 0, r7
-	shlli r4, 3, r4
+	shlli r4, 2, r4
 	movi -1, r8
 	SHHI r8, r4, r8
-	mcmv r7, r8, r22
-	stlo.q r2, 0, r22
+	SHHI r8, r4, r8
+	mcmv r7, r8, r3
+	stlo.q r2, 0, r3
 	blink tr2, r63
 
 multiquad:
 	pta/l lastquad, tr0
 	stlo.q r2, 0, r3
+	shlri r23, 3, r24
 	add r2, r4, r5
 	beqi/u r24, 1, tr0 // lastquad
 	pta/l loop, tr1
 	sub r2, r22, r25
 	andi r5, -8, r20   // calculate end address and
 	addi r20, -7*8, r8 // loop end address; This might overflow, so we need
-	movi 8, r9         // to use a different test before we start the loop
+	                   // to use a different test before we start the loop
 	bge/u r24, r9, tr1 // loop
 	st.q r25, 8, r3
 	st.q r20, -8, r3
