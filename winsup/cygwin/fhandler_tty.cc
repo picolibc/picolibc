@@ -554,7 +554,11 @@ fhandler_tty_slave::open (path_conv *, int flags, mode_t)
   set_open_status ();
   if (!output_done_event)
     {
-      fhandler_console::open_fhs++;
+      if (fhandler_console::open_fhs++ == 0)
+	{
+	  BOOL b = AllocConsole ();
+	  termios_printf ("%d = AllocConsole ()", b);
+	}
       termios_printf ("incremented open_fhs %d", fhandler_console::open_fhs);
     }
   termios_printf ("tty%d opened", ttynum);

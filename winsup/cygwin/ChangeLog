@@ -1,5 +1,10 @@
 2003-04-18  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler_tty.cc (fhandler_tty_slave::open): Allocate a console
+	whenever a pty is allocated.
+
+2003-04-18  Christopher Faylor  <cgf@redhat.com>
+
 	* Makefile.in: Use ${nostdlib} variable.
 
 2003-04-18  Diego Biurrun  <diego@biurrun.de>
