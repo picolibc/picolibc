@@ -1,6 +1,10 @@
+Sun Feb 25 10:32:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* path.cc (symlink): Add a ".lnk" suffix regardless. Add a comment.
+
 Sun Feb 25 10:18:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
-	* shortcut.c: Change symlink condition.
+	* shortcut.c (check_shortcut): Change symlink condition.
 
 Fri Feb 23 10:42:00 2001  Corinna Vinschen <corinna@vinschen.de>
 

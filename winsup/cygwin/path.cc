@@ -2202,11 +2202,9 @@ symlink (const char *topath, const char *frompath)
 #if 0
   path_conv win32_path (frompath, PC_SYM_NOFOLLOW);
 #else
-  char from[MAX_PATH];
-  unsigned short len = strlen (frompath);
+  char from[MAX_PATH + 5];
   strcpy (from, frompath);
-  if (len <= 4 || strcasecmp (from + len - 4, ".lnk"))
-    strcpy (from + len, ".lnk");
+  strcat (from, ".lnk");
   path_conv win32_path (from, PC_SYM_NOFOLLOW);
   path_conv win32_topath;
   char cwd[MAX_PATH + 1], *cp = NULL, c = 0;
@@ -2296,7 +2294,9 @@ symlink (const char *topath, const char *frompath)
     {
       DWORD written;
       create_shortcut_header ();
-      len = strlen (topath);
+      /* Don't change the datatypes of `len' and `win_len' since
+         their sizeof is used later. */
+      unsigned short len = strlen (topath);
       unsigned short win_len = strlen (w32topath);
       if (WriteFile (h, shortcut_header, SHORTCUT_HDR_SIZE, &written, NULL)
           && written == SHORTCUT_HDR_SIZE
