@@ -640,8 +640,7 @@ normalize_win32_path (const char *cwd, const char *src, char *dst)
   const char *src_start = src;
   char *dst_start = dst;
 
-  if (!SLASH_P (src[0])
-      && strchr (src, ':') == NULL)
+  if (!SLASH_P (src[0]) && strchr (src, ':') == NULL)
     {
       if (strlen (cwd) + 1 + strlen (src) >= MAX_PATH)
 	{
@@ -650,7 +649,8 @@ normalize_win32_path (const char *cwd, const char *src, char *dst)
 	}
       strcpy (dst, cwd);
       dst += strlen (dst);
-      *dst++ = '\\';
+      if (!*cwd || !SLASH_P (dst[-1]))
+	*dst++ = '\\';
     }
   /* Two leading \'s?  If so, preserve them.  */
   else if (SLASH_P (src[0]) && SLASH_P (src[1]))
@@ -925,40 +925,32 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
   mount_item *mi = NULL;	/* initialized to avoid compiler warning */
   char pathbuf[MAX_PATH];
 
-  /* The rule is :'s can't appear in [our] POSIX path names so this is a safe
-     test; if ':' is present it already be in Win32 form.  */
-  /* Additional test: If the path has \'s in it, we assume that it's a Win32
-     path, either. */
-  if (strchr (src_path, ':') != NULL
-      || (strchr (src_path, '\\')/* && !strchr (src_path, '/')*/))
+  char cwd[MAX_PATH];
+  getcwd_inner (cwd, MAX_PATH, TRUE); /* FIXME: check rc */
+
+  /* Determine where the destination should be placed. */
+  if (full_win32_path != NULL)
+    dst = full_win32_path;
+  else if (win32_path != NULL)
+    dst = win32_path;
+
+  if (dst == NULL)
+    goto out;		/* Sanity check. */
+
+  /* An MS-DOS spec has either a : or a \.  If this is found, short
+     circuit most of the rest of this function. */
+  if (strpbrk (src_path, ":\\") != NULL)
     {
       debug_printf ("%s already win32", src_path);
-      rc = normalize_win32_path ("", src_path, pathbuf);
+      rc = normalize_win32_path (current_directory_name, src_path, dst);
       if (rc)
-	return rc;
-      /* FIXME: Do we have to worry about trailing_slash_p here? */
-      if (win32_path != NULL)
-        {
-          /* If src_path is a relativ win32 path, normalize_win32_path
-             adds a leading slash, nevertheless. So we have to test
-             that here */
-	  strcpy (win32_path, strchr("/\\", src_path[0]) || src_path[1] == ':'
-                              ? pathbuf : pathbuf + 1);
-        }
-      if (full_win32_path != NULL)
-        {
-          *full_win32_path = '\0';
-          /* Add drive if it's a local relative Win32 path */
-          if (! strchr(src_path, ':') && strncmp (src_path, "\\\\", 2))
-            {
-              GetCurrentDirectory (MAX_PATH, full_win32_path);
-              if (src_path[0] == '\\')     // drive relative absolute path
-                full_win32_path[2] = '\0';
-            }
-	  strcat (full_win32_path, pathbuf);
-        }
+	{
+	  debug_printf ("normalize_win32_path failed, rc %d", rc);
+	  return rc;
+	}
+      isrelpath = !isabspath (src_path);
       *flags = set_flags_from_win32_path (pathbuf);
-      goto out;
+      goto fillin;
     }
 
   /* Normalize the path, taking out ../../ stuff, we need to do this
@@ -977,13 +969,8 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
      converting it to a DOS-style path, looking up the appropriate drive
      in the mount table.  */
 
-  char cwd[MAX_PATH];
-
   /* No need to fetch cwd if path is absolute.  */
-  if ((isrelpath = !isslash (*src_path)))
-    getcwd_inner (cwd, MAX_PATH, TRUE); /* FIXME: check rc */
-  else
-    strcpy (cwd, "/"); /* some innocuous value */
+  isrelpath = !isslash (*src_path);
 
   rc = normalize_posix_path (cwd, src_path, pathbuf);
 
@@ -993,15 +980,6 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
       *flags = 0;
       return rc;
     }
-
-  /* Determine where the destination should be placed. */
-  if (full_win32_path != NULL)
-    dst = full_win32_path;
-  else if (win32_path != NULL)
-    dst = win32_path;
-
-  if (dst == NULL)
-    goto out;		/* Sanity check. */
 
   /* See if this is a cygwin "device" */
   if (win32_device_name (pathbuf, dst, devn, unit))

@@ -1,3 +1,10 @@
+Wed Apr 26 23:23:23 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (normalize_win32_path): Don't add a trailing slash when one
+	already exists.
+	(mount_info::conv_to_win32_path): Use existing code for dealing with
+	relative path names when input is already a win32 path.
+
 2000-04-26  DJ Delorie  <dj@cygnus.com>
 
 	* Makefile.in (install): install regexp.h
