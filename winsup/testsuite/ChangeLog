@@ -1,5 +1,11 @@
 2003-01-23  Christopher Faylor  <cgf@redhat.com>
 
+	* libltp/include/usctest.h: Add externs to some variables that need it.
+	* winsup.api/ltp/mmap05.c (main): Make file_content volatile to avoid
+	optimization glitch.
+
+2003-01-23  Christopher Faylor  <cgf@redhat.com>
+
 	* winsup.api/mmaptest03.c (main): Mark variables as volatile to avoid
 	optimization induced problems.
 

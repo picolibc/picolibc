@@ -104,7 +104,7 @@ main(int ac, char **av)
 {
 	int lc;			/* loop counter */
 	const char *msg;	/* message returned from parse_opts */
-	char file_content;	/* tempfile content */
+	volatile char file_content;	/* tempfile content */
 	
 	/* Parse standard options given to run the test. */
 	msg = parse_opts(ac, av, (option_t *) NULL, NULL);

@@ -167,19 +167,19 @@ extern int TEST_ERRNO;
  * Global array of bit masks to indicate errnos that are expected.
  * Bits set by TEST_EXP_ENOS() macro and used by TEST_CLEANUP() macro.
  ***********************************************************************/
-struct usc_errno_t TEST_VALID_ENO[USC_MAX_ERRNO];
+extern struct usc_errno_t TEST_VALID_ENO[USC_MAX_ERRNO];
 
 /***********************************************************************
  * Globals for returning the return code and errno from the system call
  * test macros.
  ***********************************************************************/
-int TEST_RETURN;
-int TEST_ERRNO;
+extern int TEST_RETURN;
+extern int TEST_ERRNO;
 
 /***********************************************************************
  * temporary variables for determining max and min times in TEST macro
  ***********************************************************************/
-long btime, etime, tmptime;	
+extern long btime, etime, tmptime;	
 
 #endif  /* _USC_LIB_ */
 
