@@ -1,6 +1,6 @@
 /* cygwin/mtio.h
 
-   Copyright 1999, 2001 Red Hat, Inc.
+   Copyright 1999, 2001, 2004 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna@vinschen.de>
 
@@ -86,7 +86,9 @@ struct	mtget {
 				 *	number of bytes ignored, or
 				 *	number of files not skipped, or
 				 *	number of records not skipped.
-				 *  Cygwin: remaining KB.
+				 *  Cygwin: remaining KB until 1.5.7.
+				 *          active partition since 1.5.8,
+				 *          same as on linux.
 				 */
 	/* the following registers are device dependent */
 	long	mt_dsreg;	/* status register, Contains blocksize and

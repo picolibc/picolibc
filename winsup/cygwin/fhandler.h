@@ -607,14 +607,16 @@ class fhandler_dev_tape: public fhandler_dev_raw
     }
   int tape_error (const char *txt);
   int tape_write_marks (int marktype, DWORD len);
-  int tape_get_pos (unsigned long *ret);
+  int tape_get_pos (unsigned long *block, unsigned long *partition = NULL);
   int tape_set_pos (int mode, long count, bool sfm_func = false);
-  int _tape_set_pos (int mode, long count);
+  int _tape_set_pos (int mode, long count, int partition = 0);
   int tape_erase (int mode);
   int tape_prepare (int action);
   int tape_set_blocksize (long count);
   int tape_status (struct mtget *get);
   int tape_compression (long count);
+  int tape_partition (long count);
+  int tape_set_partition (long count);
 };
 
 /* Standard disk file */

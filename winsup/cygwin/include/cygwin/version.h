@@ -237,12 +237,13 @@ details. */
       110: Export clock_gettime, sigwaitinfo, timer_create, timer_delete,
            timer_settime
       111: Export sigqueue, sighold.
+      112: Redefine some mtget fields.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 111
+#define CYGWIN_VERSION_API_MINOR 112
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

@@ -1,3 +1,32 @@
+2004-03-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_dev_tape::tape_get_pos): Declare with extra
+	parameter for partition number.
+	(fhandler_dev_tape::_tape_set_pos): Ditto.
+	(fhandler_dev_tape::tape_partition): New method.
+	(fhandler_dev_tape::tape_set_partition): New method.
+	* fhandler_tape.cc (fhandler_dev_tape::open): Call private methods
+	directly instead of ioctl.
+	(fhandler_dev_tape::ioctl): Use long erase on MTERASE by default.
+	Don't use absolute positioning on MTSEEK.  Call tape_set_partition
+	on MTSETPART, tape_partition on MTMKPART.
+	(fhandler_dev_tape::tape_get_pos): Add partition number parameter.
+	Prefer logical position information over absolute position information.
+	Return partition number.
+	(fhandler_dev_tape::_tape_set_pos): Add partition number parameter.
+	Use in SetTapePosition.
+	(fhandler_dev_tape::tape_set_pos): Remove special TAPE_ABSOLUTE_BLOCK
+	handling.
+	(fhandler_dev_tape::tape_erase): Rewind before erasing.
+	(fhandler_dev_tape::tape_status): Rearrange slightly. Try to get a
+	MediaType even if no tape is loaded. Store active partition in
+	mt_resid as on Linux.
+	(fhandler_dev_tape::tape_partition): New method.
+	(fhandler_dev_tape::tape_set_partition): New method.
+	* include/cygwin/mtio.h: Fix copyright. Add comment to explain
+	mt_resid content.
+	* include/cygwin/version.h: Bump API minor number.
+
 2004-03-14  Christopher Faylor  <cgf@redhat.com>
 
 	* cygtls.cc (_cygtls::remove): Call remove_wq even when we can't
@@ -8,7 +37,7 @@
 	(proc_terminate): Don't NULL sync_proc_subproc since other threads may
 	still try to access it.
 
-2004-03-12  Corinna Vinschen  <corinna@vinschen.de>
+2004-03-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* errno.cc (errmap): Map ERROR_BEGINNING_OF_MEDIA and
 	ERROR_SETMARK_DETECTED to EIO instead of ESPIPE.
@@ -46,7 +75,7 @@
 	* spawn.cc (spawn_guts): Return -1 when wait() fails for spawn types
 	that require waiting.
 
-2004-03-12  Corinna Vinschen  <corinna@vinschen.de>
+2004-03-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* errno.cc (errmap): Handle ERROR_BUS_RESET.
 	* fhandler.h (fhandler_dev_raw::write_file): New method, created

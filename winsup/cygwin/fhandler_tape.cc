@@ -124,15 +124,14 @@ fhandler_dev_tape::open (int flags, mode_t)
   ret = fhandler_dev_raw::open (flags);
   if (ret)
     {
-      struct mtget get;
-      struct mtop op;
-      struct mtpos pos;
       DWORD varlen;
+      struct mtget get;
+      unsigned long block;
 
       TAPE_FUNC (GetTapeParameters (get_handle (), GET_TAPE_DRIVE_INFORMATION,
 				    (varlen = sizeof dp, &varlen), &dp));
 
-      if (!ioctl (MTIOCGET, &get))
+      if (!tape_status (&get))
         {
 	  long blksize = (get.mt_dsreg & MT_ST_BLKSIZE_MASK)
 	  		 >> MT_ST_BLKSIZE_SHIFT;
@@ -152,19 +151,16 @@ fhandler_dev_tape::open (int flags, mode_t)
        * returns ERROR_NO_DATA_DETECTED. After media change, all subsequent
        * ReadFile calls return ERROR_NO_DATA_DETECTED, too.
        * The call to tape_set_pos seems to reset some internal flags. */
-      if ((!ioctl (MTIOCPOS, &pos)) && (!pos.mt_blkno))
+      if (!tape_get_pos (&block) && !block)
 	{
 	  debug_printf ("rewinding");
-	  op.mt_op = MTREW;
-	  ioctl (MTIOCTOP, &op);
+	  tape_set_pos (TAPE_REWIND, 0);
 	}
 
       if (flags & O_APPEND)
 	{
 	  /* In append mode, seek to beginning of next filemark */
-	  op.mt_op = MTFSFM;
-	  op.mt_count = 1;
-	  ioctl (MTIOCTOP, &op);
+	  tape_set_pos (TAPE_SPACE_FILEMARKS, 1, true);
 	}
     }
 
@@ -196,8 +192,7 @@ fhandler_dev_tape::close (void)
   if (is_rewind_device ())
     {
       debug_printf ("rewinding");
-      op.mt_op = MTREW;
-      ioctl (MTIOCTOP, &op);
+      tape_set_pos (TAPE_REWIND, 0);
     }
 
   if (ret)
@@ -354,7 +349,7 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 	      ret = tape_set_pos (TAPE_SPACE_FILEMARKS, 32767);
 	    break;
 	  case MTERASE:
-	    ret = tape_erase (TAPE_ERASE_SHORT);
+	    ret = tape_erase (TAPE_ERASE_LONG);
 	    break;
 	  case MTRAS1:
 	  case MTRAS2:
@@ -417,9 +412,8 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 	    reset_devbuf ();
 	    break;
 	  case MTSEEK:
-	    if (tape_get_feature (TAPE_DRIVE_ABSOLUTE_BLK)
-	        || tape_get_feature (TAPE_DRIVE_LOGICAL_BLK))
-	      ret = tape_set_pos (TAPE_ABSOLUTE_BLOCK, op->mt_count);
+	    if (tape_get_feature (TAPE_DRIVE_LOGICAL_BLK))
+	      ret = tape_set_pos (TAPE_LOGICAL_BLOCK, op->mt_count);
 	    else if (!(ret = tape_get_pos (&block)))
 	      ret = tape_set_pos (TAPE_SPACE_RELATIVE_BLOCKS,
 				  op->mt_count - block);
@@ -451,7 +445,13 @@ fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
 	    ret = tape_compression (op->mt_count);
 	    break;
 	  case MTSETPART:
+	    ret = tape_set_partition (op->mt_count);
+	    reset_devbuf ();
+	    break;
 	  case MTMKPART:
+	    ret = tape_partition (op->mt_count);
+	    reset_devbuf ();
+	    break;
 	  case MTSETDENSITY:
 	  case MTSETDRVBUFFER:
 	    reset_devbuf ();
@@ -502,37 +502,34 @@ fhandler_dev_tape::tape_write_marks (int marktype, DWORD len)
 }
 
 int
-fhandler_dev_tape::tape_get_pos (unsigned long *ret)
+fhandler_dev_tape::tape_get_pos (unsigned long *block,
+				 unsigned long *partition)
 {
   DWORD part, low, high;
 
   lasterr = ERROR_INVALID_PARAMETER;
-  if (tape_get_feature (TAPE_DRIVE_GET_ABSOLUTE_BLK))
-    {
-      TAPE_FUNC (GetTapePosition (get_handle (), TAPE_ABSOLUTE_POSITION,
-				  &part, &low, &high));
-      /* Workaround bug in Tandberg SLR device driver, which pretends
-         to support reporting of absolute blocks but instead returns
-	 ERROR_INVALID_FUNCTION. */
-      if (lasterr != ERROR_INVALID_FUNCTION)
-	goto out;
-      dp.FeaturesLow &= ~TAPE_DRIVE_GET_ABSOLUTE_BLK;
-    }
   if (tape_get_feature (TAPE_DRIVE_GET_LOGICAL_BLK))
     TAPE_FUNC (GetTapePosition (get_handle (), TAPE_LOGICAL_POSITION,
 				&part, &low, &high));
+  else if (tape_get_feature (TAPE_DRIVE_GET_ABSOLUTE_BLK))
+    TAPE_FUNC (GetTapePosition (get_handle (), TAPE_ABSOLUTE_POSITION,
+				&part, &low, &high));
 
-out:
-  if (!tape_error ("tape_get_pos") && ret)
-    *ret = low;
+  if (!tape_error ("tape_get_pos"))
+    {
+      if (block)
+	*block = low;
+      if (partition)
+        *partition = part > 0 ? part - 1 : part;
+    }
 
   return lasterr;
 }
 
 int
-fhandler_dev_tape::_tape_set_pos (int mode, long count)
+fhandler_dev_tape::_tape_set_pos (int mode, long count, int partition)
 {
-  TAPE_FUNC (SetTapePosition (get_handle (), mode, 0, count,
+  TAPE_FUNC (SetTapePosition (get_handle (), mode, partition, count,
 			      count < 0 ? -1 : 0, FALSE));
   /* Reset buffer after successful repositioning. */
   if (!lasterr || IS_EOF (lasterr) || IS_EOM (lasterr))
@@ -557,10 +554,6 @@ fhandler_dev_tape::tape_set_pos (int mode, long count, bool sfm_func)
 	    return tape_error ("tape_set_pos");
 	  }
 	break;
-      case TAPE_ABSOLUTE_BLOCK:
-        if (!tape_get_feature (TAPE_DRIVE_ABSOLUTE_BLK))
-	  mode = TAPE_LOGICAL_BLOCK;
-	break;
     }
   _tape_set_pos (mode, count);
   switch (mode)
@@ -569,17 +562,6 @@ fhandler_dev_tape::tape_set_pos (int mode, long count, bool sfm_func)
 	if (!lasterr && sfm_func)
 	  return tape_set_pos (mode, count > 0 ? -1 : 1, false);
 	break;
-      case TAPE_ABSOLUTE_BLOCK:
-	/* Workaround bug in Tandberg SLR device driver, which pretends
-	   to support absolute block positioning but instead returns
-	   ERROR_INVALID_FUNCTION. */
-	if (lasterr == ERROR_INVALID_FUNCTION && mode == TAPE_ABSOLUTE_BLOCK)
-	  {
-	    dp.FeaturesHigh &= TAPE_DRIVE_HIGH_FEATURES
-			       | ~TAPE_DRIVE_ABSOLUTE_BLK;
-	    _tape_set_pos (TAPE_LOGICAL_BLOCK, count);
-	  }
-	  break;
     }
   return tape_error ("tape_set_pos");
 }
@@ -587,6 +569,8 @@ fhandler_dev_tape::tape_set_pos (int mode, long count, bool sfm_func)
 int
 fhandler_dev_tape::tape_erase (int mode)
 {
+  if (tape_set_pos (TAPE_REWIND, 0))
+    return lasterr;
   switch (mode)
     {
       case TAPE_ERASE_SHORT:
@@ -648,18 +632,13 @@ fhandler_dev_tape::tape_status (struct mtget *get)
 
   get->mt_type = MT_ISUNKNOWN;
 
-  if (!notape && tape_get_feature (TAPE_DRIVE_TAPE_REMAINING))
-    {
-      get->mt_remaining = get_ll (mp.Remaining);
-      get->mt_resid = get->mt_remaining >> 10;
-    }
-
-  if (tape_get_feature (TAPE_DRIVE_SET_BLOCK_SIZE) && !notape)
+  if (!notape && tape_get_feature (TAPE_DRIVE_SET_BLOCK_SIZE))
     get->mt_dsreg = (mp.BlockSize << MT_ST_BLKSIZE_SHIFT)
 		    & MT_ST_BLKSIZE_MASK;
   else
     get->mt_dsreg = (dp.DefaultBlockSize << MT_ST_BLKSIZE_SHIFT)
 		    & MT_ST_BLKSIZE_MASK;
+
   if (wincap.has_ioctl_storage_get_media_types_ex ())
     {
       DWORD size = sizeof (GET_MEDIA_TYPES) + 10 * sizeof (DEVICE_MEDIA_INFO);
@@ -672,6 +651,7 @@ fhandler_dev_tape::tape_status (struct mtget *get)
 	  for (DWORD i = 0; i < gmt->MediaInfoCount; ++i)
 	    {
 	      PDEVICE_MEDIA_INFO dmi = &gmt->MediaInfo[i];
+	      get->mt_type = dmi->DeviceSpecific.TapeInfo.MediaType;
 #define TINFO DeviceSpecific.TapeInfo
 	      if (dmi->TINFO.MediaCharacteristics & MEDIA_CURRENTLY_MOUNTED)
 		{
@@ -681,6 +661,7 @@ fhandler_dev_tape::tape_status (struct mtget *get)
 		      (dmi->TINFO.BusSpecificData.ScsiInformation.DensityCode
 		       << MT_ST_DENSITY_SHIFT)
 		      & MT_ST_DENSITY_MASK;
+		  break;
 		}
 #undef TINFO
 	    }
@@ -691,9 +672,10 @@ fhandler_dev_tape::tape_status (struct mtget *get)
 
   if (!notape)
     {
-      if (tape_get_feature (TAPE_DRIVE_GET_ABSOLUTE_BLK)
-	  || tape_get_feature (TAPE_DRIVE_GET_LOGICAL_BLK))
-	tape_get_pos ((unsigned long *) &get->mt_blkno);
+      if (tape_get_feature (TAPE_DRIVE_GET_LOGICAL_BLK)
+          || tape_get_feature (TAPE_DRIVE_GET_ABSOLUTE_BLK))
+	tape_get_pos ((unsigned long *) &get->mt_blkno,
+		      (unsigned long *) &get->mt_resid);
 
       if (!get->mt_blkno)
 	get->mt_gstat |= GMT_BOT (-1);
@@ -705,6 +687,9 @@ fhandler_dev_tape::tape_status (struct mtget *get)
 
       if (tape_get_feature (TAPE_DRIVE_TAPE_CAPACITY))
 	get->mt_capacity = get_ll (mp.Capacity);
+
+      if (tape_get_feature (TAPE_DRIVE_TAPE_REMAINING))
+	  get->mt_remaining = get_ll (mp.Remaining);
     }
 
   if (tape_get_feature (TAPE_DRIVE_COMPRESSION) && dp.Compression)
@@ -751,3 +736,28 @@ fhandler_dev_tape::tape_compression (long count)
   return tape_error ("tape_compression");
 }
 
+int
+fhandler_dev_tape::tape_partition (long count)
+{
+  if (dp.MaximumPartitionCount <= 1)
+    return ERROR_INVALID_PARAMETER;
+  if (tape_set_pos (TAPE_REWIND, 0))
+    return lasterr;
+  if (count <= 0)
+    debug_printf ("Formatting tape with one partition");
+  else
+    debug_printf ("Formatting tape with two partitions");
+  TAPE_FUNC (CreateTapePartition (get_handle (), TAPE_SELECT_PARTITIONS,
+				   count <= 0 ? 1 : 2, 0));
+  return tape_error ("tape_partition");
+}
+
+int
+fhandler_dev_tape::tape_set_partition (long count)
+{
+  if (count < 0 || (unsigned long) count >= dp.MaximumPartitionCount)
+    lasterr = ERROR_INVALID_PARAMETER;
+  else
+    lasterr = _tape_set_pos (TAPE_LOGICAL_BLOCK, 0, count + 1);
+  return tape_error ("tape_set_partition");
+}
