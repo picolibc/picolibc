@@ -1,5 +1,10 @@
 2001-10-17  Chris Demetriou  <cgd@broadcom.com>
 
+	* mips.h: Sort coprocessor instruction argument characters
+	in comment, add a few more words of description for "H".
+
+2001-10-17  Chris Demetriou  <cgd@broadcom.com>
+
 	* mips.h (INSN_SB1): New cpu-specific instruction bit.
 	(OPCODE_IS_MEMBER): Allow instructions matching INSN_SB1
 	if cpu is CPU_SB1.

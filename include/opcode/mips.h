@@ -209,8 +209,8 @@ struct mips_opcode
    Coprocessor instructions:
    "E" 5 bit target register (OP_*_RT)
    "G" 5 bit destination register (OP_*_RD)
+   "H" 3 bit sel field for (d)mtc* and (d)mfc* (OP_*_SEL)
    "P" 5 bit performance-monitor register (OP_*_PERFREG)
-   "H" 3 bit sel field (OP_*_SEL)
 
    Macro instructions:
    "A" General 32 bit expression
