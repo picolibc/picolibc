@@ -1,5 +1,29 @@
 2002-10-20  Christopher Faylor  <cgf@redhat.com>
 
+	Change _function() to function() throughout.
+	* cygwin.din: Remove last vestiges (?) of newlib wrappers.
+
+2002-10-20  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::detach): Always wait for event or suffer an
+	apparently inavoidable race.
+	* dcrt0.cc (dll_crt0_1): Allocate threads after stack has been
+	relocated.
+	* debub.cc (lock_debug): Don't acquire lock on exit.
+	* fork.cc (fork_child): Recreate mmaps before doing anything else since
+	Windows has a habit of using blocks of memory in the child that could
+	previously have been occupied by shared memory in the parent.
+	* mmap.cc (fhandler_disk_file::fixup_mmap_after_fork): Issue error here
+	and provide some details about what went wrong.
+	(fixup_mmaps_after_fork): Remove error message.
+	* shared.cc (open_shared): Move warning message so that more detail is
+	possible.
+	* sigproc.cc (sigproc_init): Initialize sync_proc_subproc to avoid a
+	race.
+	(sigproc_terminate): Specifically wait for process thread to terminate.
+
+2002-10-20  Christopher Faylor  <cgf@redhat.com>
+
 	* cygthread.cc (cygthread::stub): Fix typo.
 	(cygthread::terminate): Don't zero thread handle prior to using it.
 
@@ -73,7 +97,7 @@
 	unneeded SEGV's during debugging.
 
 2002-10-17  Thomas Pfaff  <tpfaff@gmx.net>
- 
+
 	* thread.cc (verifyable_object_isvalid): Test for static object first.
 
 2002-10-16  Christopher Faylor  <cgf@redhat.com>

@@ -278,11 +278,11 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
 
   MALLOC_CHECK;
 
-  cygheap->fdtab.fixup_after_fork (hParent);
-  ProtectHandleINH (hParent);
-
   if (fixup_mmaps_after_fork (hParent))
     api_fatal ("recreate_mmaps_after_fork_failed");
+
+  cygheap->fdtab.fixup_after_fork (hParent);
+  ProtectHandleINH (hParent);
 
   MALLOC_CHECK;
 
@@ -305,7 +305,6 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   if (fixup_shms_after_fork ())
     api_fatal ("recreate_shm areas after fork failed");
 
-  cygthread::init ();
   pinfo_fixup_after_fork ();
   signal_fixup_after_fork ();
 
@@ -316,8 +315,8 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
     if ((*t)->clear_on_fork ())
       (*t)->set ();
 
-  wait_for_sigthread ();
   pthread::atforkchild ();
+  wait_for_sigthread ();
   cygbench ("fork-child");
   return 0;
 }

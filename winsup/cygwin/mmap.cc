@@ -868,6 +868,13 @@ fhandler_disk_file::fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
 {
   /* Re-create the MapViewOfFileEx call */
   void *base = MapViewOfFileEx (h, access, 0, offset, size, address);
+  if (base != address)
+    {
+      MEMORY_BASIC_INFORMATION m;
+      (void) VirtualQuery (address, &m, sizeof (m));
+      system_printf ("requested %p != %p mem alloc base %p, state %p, size %d, %E",
+		     address, base, m.AllocationBase, m.State, m.RegionSize);
+    }
   return base == address;
 }
 
@@ -961,11 +968,7 @@ fixup_mmaps_after_fork (HANDLE parent)
 	      rec->free_fh (fh);
 
 	      if (!ret)
-		{
-		  system_printf ("base address fails to match requested address %p",
-				 rec->get_address ());
-		  return -1;
-		}
+		return -1;
 	      if (rec->get_access () == FILE_MAP_COPY)
 		{
 		  for (char *address = rec->get_address ();

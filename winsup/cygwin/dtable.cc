@@ -476,7 +476,7 @@ dtable::dup2 (int oldfd, int newfd)
 		newfh->get_io_handle (), fds[oldfd]->get_io_handle ());
 
   if (!not_open (newfd))
-    _close (newfd);
+    close (newfd);
   else if ((size_t) newfd < size)
     /* nothing to do */;
   else if (find_unused_handle (newfd) < 0)

@@ -37,7 +37,8 @@ class lock_debug
  public:
   lock_debug () : acquired (0)
   {
-    if (locker)
+    extern int exit_state;
+    if (locker && !exit_state)
       acquired = !!locker->acquire (INFINITE);
   }
   void unlock ()

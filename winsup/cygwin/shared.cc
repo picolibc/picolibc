@@ -104,14 +104,14 @@ open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, shared_locat
 
   if (!shared)
     {
-#ifdef DEBUGGING
-      if (wincap.is_winnt ())
-	system_printf ("relocating shared object %s(%d) on Windows NT", name, n);
-#endif
       /* Probably win95, so try without specifying the address.  */
       shared = (shared_info *) MapViewOfFileEx (shared_h,
 				       FILE_MAP_READ|FILE_MAP_WRITE,
 				       0, 0, 0, 0);
+#ifdef DEBUGGING
+      if (wincap.is_winnt ())
+	system_printf ("relocating shared object %s(%d) from %p to %p on Windows NT", name, n, addr, shared);
+#endif
     }
 
   if (!shared)

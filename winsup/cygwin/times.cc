@@ -46,7 +46,7 @@ __to_clock_t (FILETIME * src, int flag)
 
 /* times: POSIX 4.5.2.1 */
 extern "C" clock_t
-_times (struct tms * buf)
+times (struct tms *buf)
 {
   FILETIME creation_time, exit_time, kernel_time, user_time;
 
@@ -85,6 +85,8 @@ _times (struct tms * buf)
 
    return tc;
 }
+
+extern "C" clock_t _times (struct tms *) __attribute__((alias ("times")));
 
 /* settimeofday: BSD */
 extern "C" int
@@ -168,11 +170,8 @@ gettimeofday (struct timeval *tv, struct timezone *tz)
   return 0;
 }
 
-extern "C" int
-_gettimeofday (struct timeval *p, struct timezone *z)
-{
-  return gettimeofday (p, z);
-}
+extern "C" int _gettimeofday (struct timeval *, struct timezone *)
+  __attribute__((alias ("gettimeofday")));
 
 /* Cygwin internal */
 void
@@ -266,8 +265,7 @@ time_as_timestruc_t (timestruc_t * out)
 
 /* time: POSIX 4.5.1.1, C 4.12.2.4 */
 /* Return number of seconds since 00:00 UTC on jan 1, 1970 */
-extern "C"
-time_t
+extern "C" time_t
 time (time_t * ptr)
 {
   time_t res;
@@ -409,8 +407,7 @@ corelocaltime (const time_t * tim_p)
  * localtime takes a time_t (which is in UTC)
  * and formats it into a struct tm as a local time.
  */
-extern "C"
-struct tm *
+extern "C" struct tm *
 localtime (const time_t *tim_p)
 {
   time_t tim = *tim_p;
@@ -434,8 +431,7 @@ localtime (const time_t *tim_p)
  * gmtime takes a time_t (which is already in UTC)
  * and just puts it into a struct tm.
  */
-extern "C"
-struct tm *
+extern "C" struct tm *
 gmtime (const time_t *tim_p)
 {
   time_t tim = *tim_p;
@@ -452,8 +448,7 @@ gmtime (const time_t *tim_p)
 #endif /* POSIX_LOCALTIME */
 
 /* utimes: standards? */
-extern "C"
-int
+extern "C" int
 utimes (const char *path, struct timeval *tvp)
 {
   int res = 0;
@@ -532,8 +527,7 @@ utimes (const char *path, struct timeval *tvp)
 }
 
 /* utime: POSIX 5.6.6.1 */
-extern "C"
-int
+extern "C" int
 utime (const char *path, struct utimbuf *buf)
 {
   struct timeval tmp[2];
@@ -549,8 +543,7 @@ utime (const char *path, struct utimbuf *buf)
 }
 
 /* ftime: standards? */
-extern "C"
-int
+extern "C" int
 ftime (struct timeb *tp)
 {
   struct timeval tv;

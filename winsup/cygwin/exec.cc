@@ -8,6 +8,7 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#define _execve __FOO_execve_
 #include "winsup.h"
 #include <unistd.h>
 #include <stdlib.h>
@@ -20,12 +21,13 @@ details. */
 #include "pinfo.h"
 #include "environ.h"
 #include "cygerrno.h"
+#undef _execve
 
 /* This is called _execve and not execve because the real execve is defined
    in libc/posix/execve.c.  It calls us.  */
 
 extern "C" int
-_execve (const char *path, char *const argv[], char *const envp[])
+execve (const char *path, char *const argv[], char *const envp[])
 {
   static char *const empty_env[] = { 0 };
   MALLOC_CHECK;
@@ -33,6 +35,9 @@ _execve (const char *path, char *const argv[], char *const envp[])
     envp = empty_env;
   return spawnve (_P_OVERLAY, path, argv, envp);
 }
+
+extern "C" int _execve (const char *, char *const [], char *const [])
+  __attribute__ ((alias ("execve")));
 
 extern "C" int
 execl (const char *path, const char *arg0, ...)
@@ -49,14 +54,14 @@ execl (const char *path, const char *arg0, ...)
   while (argv[i++] != NULL);
   va_end (args);
   MALLOC_CHECK;
-  return _execve (path, (char * const  *) argv, cur_environ ());
+  return execve (path, (char * const  *) argv, cur_environ ());
 }
 
 extern "C" int
 execv (const char *path, char * const *argv)
 {
   MALLOC_CHECK;
-  return _execve (path, (char * const *) argv, cur_environ ());
+  return execve (path, (char * const *) argv, cur_environ ());
 }
 
 extern "C" pid_t

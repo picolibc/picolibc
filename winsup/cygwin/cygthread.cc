@@ -64,7 +64,6 @@ cygthread::stub (VOID *arg)
       switch (WaitForSingleObject (info->thread_sync, INFINITE))
 	{
 	case WAIT_OBJECT_0:
-	  // ResetEvent (info->thread_sync);
 	  continue;
 	default:
 	  api_fatal ("WFSO failed, %E");
@@ -204,10 +203,10 @@ cygthread::cygthread (LPTHREAD_START_ROUTINE start, LPVOID param,
   __name = name;	/* Need to set after thread has woken up to
 			   ensure that it won't be cleared by exiting
 			   thread. */
-  if (thread_sync)
-    SetEvent (thread_sync);
-  else
+  if (!thread_sync)
     ResumeThread (h);
+  else
+    SetEvent (thread_sync);
 }
 
 /* Return the symbolic name of the current thread for debugging.
@@ -269,15 +268,9 @@ cygthread::detach ()
   else
     {
       DWORD avail = id;
-      /* Checking for __name here is just a minor optimization to avoid
-	 an OS call. */
-      if (!__name)
-	thread_printf ("thread id %p returned.  No need to wait.", id);
-      else
-	{
-	  DWORD res = WaitForSingleObject (*this, INFINITE);
-	  thread_printf ("WFSO returns %d, id %p", res, id);
-	}
+      DWORD res = WaitForSingleObject (*this, INFINITE);
+      thread_printf ("WFSO returns %d, id %p", res, id);
+
       if (is_freerange)
 	{
 	  CloseHandle (h);
@@ -285,9 +278,8 @@ cygthread::detach ()
 	}
       else
 	{
-	  ResetEvent (*this);
 	  id = 0;
-	  __name = NULL;
+	  ResetEvent (*this);
 	  /* Mark the thread as available by setting avail to non-zero */
 	  (void) InterlockedExchange ((LPLONG) &this->avail, avail);
 	}

@@ -86,7 +86,7 @@ heap_init ()
 /* FIXME: This function no longer handles "split heaps". */
 
 extern "C" void *
-_sbrk (int n)
+sbrk (int n)
 {
   sigframe thisframe (mainthread);
   char *newtop, *newbrk;

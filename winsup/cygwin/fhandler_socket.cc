@@ -20,7 +20,6 @@
 #include <asm/byteorder.h>
 
 #include <stdlib.h>
-#include <unistd.h>
 #define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>
 #include "cygerrno.h"
@@ -33,6 +32,7 @@
 #include "cygheap.h"
 #include "sigproc.h"
 #include "wsock_event.h"
+#include <unistd.h>
 
 #define SECRET_EVENT_NAME "cygwin.local_socket.secret.%d.%08x-%08x-%08x-%08x"
 #define ENTROPY_SOURCE_NAME "/dev/urandom"
@@ -61,7 +61,7 @@ get_inet_addr (const struct sockaddr *in, int inlen,
     }
   else if (in->sa_family == AF_LOCAL)
     {
-      int fd = _open (in->sa_data, O_RDONLY);
+      int fd = open (in->sa_data, O_RDONLY);
       if (fd == -1)
 	return 0;
 
@@ -81,7 +81,7 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 	  *outlen = sizeof sin;
 	  ret = 1;
 	}
-      _close (fd);
+      close (fd);
       return ret;
     }
   else
@@ -354,9 +354,7 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
 
       /* bind must fail if file system socket object already exists
 	 so _open () is called with O_EXCL flag. */
-      fd = _open (un_addr->sun_path,
-		  O_WRONLY | O_CREAT | O_EXCL | O_BINARY,
-		  0);
+      fd = ::open (un_addr->sun_path, O_WRONLY | O_CREAT | O_EXCL | O_BINARY, 0);
       if (fd < 0)
 	{
 	  if (get_errno () == EEXIST)
@@ -372,17 +370,17 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
       len = strlen (buf) + 1;
 
       /* Note that the terminating nul is written.  */
-      if (_write (fd, buf, len) != len)
+      if (::write (fd, buf, len) != len)
 	{
 	  save_errno here;
-	  _close (fd);
-	  _unlink (un_addr->sun_path);
+	  ::close (fd);
+	  unlink (un_addr->sun_path);
 	}
       else
 	{
-	  _close (fd);
+	  ::close (fd);
 	  chmod (un_addr->sun_path,
-	    (S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO) & ~cygheap->umask);
+		 (S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO) & ~cygheap->umask);
 	  set_sun_path (un_addr->sun_path);
 	  res = 0;
 	}

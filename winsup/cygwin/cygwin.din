@@ -110,8 +110,8 @@ clearerr
 _clearerr = clearerr
 clock
 _clock = clock
-_close
-close = _close
+close
+_close = close
 closedir
 _closedir = closedir
 copysign
@@ -217,8 +217,8 @@ fcloseall
 _fcloseall = fcloseall
 _fcloseall_r
 fcloseall_r = _fcloseall_r
-_fcntl
-fcntl = _fcntl
+fcntl
+_fcntl = fcntl
 fcvt
 _fcvt = fcvt
 fcvtbuf
@@ -534,8 +534,8 @@ login
 logout
 longjmp
 _longjmp = longjmp
-_lseek
-lseek = _lseek
+lseek
+_lseek = lseek
 lseek64
 lstat = cygwin_lstat
 _lstat = cygwin_lstat
@@ -593,8 +593,8 @@ nextafter
 _nextafter = nextafter
 nextafterf
 _nextafterf = nextafterf
-_open
-open = _open
+open
+_open = open
 opendir
 _opendir = opendir
 pathconf
@@ -632,8 +632,8 @@ _rand = rand
 random
 initstate
 setstate
-_read
-read = _read
+read
+_read = read
 readdir
 _readdir = readdir
 readlink
@@ -652,8 +652,8 @@ remainderf
 _remainderf = remainderf
 remove
 _remove = remove
-_rename
-rename = _rename
+rename
+_rename = rename
 rewind
 _rewind = rewind
 rewinddir
@@ -893,8 +893,8 @@ tempnam
 _tempnam = tempnam
 time
 _time = time
-_times
-times = _times
+times
+_times = times
 timezone
 tmpfile
 _tmpfile = tmpfile
@@ -921,8 +921,8 @@ uname
 _uname = uname
 ungetc
 _ungetc = ungetc
-_unlink
-unlink = _unlink
+unlink
+_unlink = unlink
 usleep
 _usleep = usleep
 utime
@@ -956,8 +956,8 @@ vsscanf
 _vsscanf = vsscanf
 _vsscanf_r
 vsscanf_r = _vsscanf_r
-_wait
-wait = _wait
+wait
+_wait = wait
 waitpid
 _waitpid = waitpid
 wait3
@@ -966,8 +966,8 @@ wcstombs
 _wcstombs = wcstombs
 wctomb
 _wctomb = wctomb
-_write
-write = _write
+write
+_write = write
 writev
 _writev = writev
 y0

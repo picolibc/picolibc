@@ -574,8 +574,8 @@ dll_crt0_1 ()
 
   if (!child_proc_info)
     {
-      memory_init ();
       cygthread::init ();
+      memory_init ();
     }
   else
     {
@@ -584,8 +584,9 @@ dll_crt0_1 ()
       switch (child_proc_info->type)
 	{
 	  case _PROC_FORK:
-	    cygheap_fixup_in_child (0);
 	    alloc_stack (fork_info);
+	    cygthread::init ();
+	    cygheap_fixup_in_child (0);
 	    close_ppid_handle = !!child_proc_info->pppid_handle;
 	    memory_init ();
 	    set_myself (mypid);
@@ -599,6 +600,7 @@ dll_crt0_1 ()
 	    hexec_proc = spawn_info->hexec_proc;
 	  around:
 	    HANDLE h;
+	    cygthread::init ();
 	    cygheap_fixup_in_child (1);
 	    memory_init ();
 	    if (!spawn_info->moreinfo->myself_pinfo ||
@@ -619,7 +621,7 @@ dll_crt0_1 ()
 		old_title = strcpy (title_buf, spawn_info->moreinfo->old_title);
 		cfree (spawn_info->moreinfo->old_title);
 	      }
-	    cygthread::init ();
+	    // cygthread::init ();
 	    break;
 	}
       if (close_hexec_proc)

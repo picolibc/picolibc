@@ -21,7 +21,7 @@ details. */
 
 extern "C"
 pid_t
-_wait (int *status)
+wait (int *status)
 {
   return wait4 (-1, status, 0, NULL);
 }

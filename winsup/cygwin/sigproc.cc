@@ -472,6 +472,7 @@ proc_terminate (void)
 	      ForceCloseHandle1 (zombies[i]->hProcess, childhProc);
 	      ForceCloseHandle1 (zombies[i]->pid_handle, pid_handle);
 	    }
+	  zombies[i]->ppid = 1;
 	  zombies[i]->process_state = PID_EXITED;	/* CGF FIXME - still needed? */
 	  zombies[i].release ();	// FIXME: this breaks older gccs for some reason
 	}
@@ -561,6 +562,11 @@ sigproc_init ()
   wait_sig_inited = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
   ProtectHandle (wait_sig_inited);
 
+  /* sync_proc_subproc is used by proc_subproc.  It serialises
+   * access to the children and zombie arrays.
+   */
+  new_muto (sync_proc_subproc);
+
   /* local event signaled when main thread has been dispatched
      to a signal handler function. */
   signal_arrived = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
@@ -568,11 +574,6 @@ sigproc_init ()
 
   hwait_sig = new cygthread (wait_sig, cygself, "sig");
   hwait_sig->zap_h ();
-
-  /* sync_proc_subproc is used by proc_subproc.  It serialises
-   * access to the children and zombie arrays.
-   */
-  new_muto (sync_proc_subproc);
 
   /* Initialize waitq structure for main thread.  A waitq structure is
    * allocated for each thread that executes a wait to allow multiple threads
@@ -598,6 +599,16 @@ sigproc_terminate (void)
 {
   hwait_sig = NULL;
 
+  if (!sig_loop_wait)
+    sigproc_printf ("sigproc_terminate: sigproc handling not active");
+  else
+    {
+      sigproc_printf ("entering");
+      sig_loop_wait = 0;	// Tell wait_sig to exit when it is
+				//  finished with anything it is doing
+      sig_dispatch_pending (1);
+    }
+
   if (GetCurrentThreadId () == sigtid)
     {
       ForceCloseHandle (sigcomplete_main);
@@ -609,22 +620,6 @@ sigproc_terminate (void)
       // ForceCloseHandle (sigcatch_nosync);
     }
   proc_terminate ();		// Terminate process handling thread
-
-  if (!sig_loop_wait)
-    sigproc_printf ("sigproc_terminate: sigproc handling not active");
-  else
-    {
-      sigproc_printf ("entering");
-      sig_loop_wait = 0;	// Tell wait_sig to exit when it is
-				//  finished with anything it is doing
-      sigproc_printf ("done");
-    }
-
-#if 0
-  /* Set this so that subsequent tests will succeed. */
-  if (!myself->dwProcessId)
-    myself->dwProcessId = GetCurrentProcessId ();
-#endif
 
   return;
 }

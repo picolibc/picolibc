@@ -8,6 +8,12 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#define _close __FOO_close__
+#define _lseek __FOO_lseek__
+#define _open __FOO_open__
+#define _read __FOO_read__
+#define _write __FOO_write__
+
 #include "winsup.h"
 #include <sys/stat.h>
 #include <sys/vfs.h> /* needed for statfs */
@@ -39,6 +45,12 @@ details. */
 #define NEED_VFORK
 #include <setjmp.h>
 #include "perthread.h"
+
+#undef _close
+#undef _lseek
+#undef _open
+#undef _read
+#undef _write
 
 SYSTEM_INFO system_info;
 
@@ -94,7 +106,7 @@ dup2 (int oldfd, int newfd)
 }
 
 extern "C" int
-_unlink (const char *ourname)
+unlink (const char *ourname)
 {
   int res = -1;
   DWORD devn;
@@ -248,7 +260,7 @@ remove (const char *ourname)
       return -1;
     }
 
-  return win32_name.isdir () ? rmdir (ourname) : _unlink (ourname);
+  return win32_name.isdir () ? rmdir (ourname) : unlink (ourname);
 }
 
 extern "C" pid_t
@@ -325,7 +337,7 @@ getsid (pid_t pid)
 }
 
 extern "C" ssize_t
-_read (int fd, void *ptr, size_t len)
+read (int fd, void *ptr, size_t len)
 {
   const struct iovec iov =
     {
@@ -336,8 +348,11 @@ _read (int fd, void *ptr, size_t len)
   return readv (fd, &iov, 1);
 }
 
+extern "C" ssize_t _read (int, void *, size_t)
+  __attribute__ ((alias ("read")));
+
 extern "C" ssize_t
-_write (int fd, const void *ptr, size_t len)
+write (int fd, const void *ptr, size_t len)
 {
   const struct iovec iov =
     {
@@ -347,6 +362,9 @@ _write (int fd, const void *ptr, size_t len)
 
   return writev (fd, &iov, 1);
 }
+
+extern "C" ssize_t _write (int fd, const void *ptr, size_t len)
+  __attribute__ ((alias ("write")));
 
 extern "C" ssize_t
 readv (int fd, const struct iovec *const iov, const int iovcnt)
@@ -487,7 +505,7 @@ done:
 /* newlib's fcntl.h defines _open as taking variable args so we must
    correspond.  The third arg if it exists is: mode_t mode. */
 extern "C" int
-_open (const char *unix_path, int flags, ...)
+open (const char *unix_path, int flags, ...)
 {
   int res = -1;
   va_list ap;
@@ -525,6 +543,9 @@ _open (const char *unix_path, int flags, ...)
   return res;
 }
 
+extern "C" int _open (const char *, int flags, ...)
+  __attribute__ ((alias ("open")));
+
 extern "C" __off64_t
 lseek64 (int fd, __off64_t pos, int dir)
 {
@@ -550,13 +571,16 @@ lseek64 (int fd, __off64_t pos, int dir)
 }
 
 extern "C" __off32_t
-_lseek (int fd, __off32_t pos, int dir)
+lseek (int fd, __off32_t pos, int dir)
 {
   return lseek64 (fd, (__off64_t) pos, dir);
 }
 
+extern "C" __off32_t _lseek (int, __off32_t, int)
+  __attribute__ ((alias ("lseek")));
+
 extern "C" int
-_close (int fd)
+close (int fd)
 {
   int res;
   sigframe thisframe (mainthread);
@@ -577,6 +601,8 @@ _close (int fd)
   MALLOC_CHECK;
   return res;
 }
+
+extern "C" int _close (int) __attribute__ ((alias ("close")));
 
 extern "C" int
 isatty (int fd)
@@ -601,7 +627,7 @@ isatty (int fd)
 */
 
 extern "C" int
-_link (const char *a, const char *b)
+link (const char *a, const char *b)
 {
   int res = -1;
   sigframe thisframe (mainthread);
@@ -1231,7 +1257,7 @@ done:
 }
 
 extern "C" int
-_rename (const char *oldpath, const char *newpath)
+rename (const char *oldpath, const char *newpath)
 {
   sigframe thisframe (mainthread);
   int res = 0;
@@ -2490,16 +2516,16 @@ setutent ()
   sigframe thisframe (mainthread);
   if (utmp_fd == -2)
     {
-      utmp_fd = _open (utmp_file, O_RDONLY);
+      utmp_fd = open (utmp_file, O_RDONLY);
     }
-  _lseek (utmp_fd, 0, SEEK_SET);
+  lseek (utmp_fd, 0, SEEK_SET);
 }
 
 extern "C" void
 endutent ()
 {
   sigframe thisframe (mainthread);
-  _close (utmp_fd);
+  close (utmp_fd);
   utmp_fd = -2;
 }
 
@@ -2522,7 +2548,7 @@ getutent ()
   sigframe thisframe (mainthread);
   if (utmp_fd == -2)
     setutent ();
-  if (_read (utmp_fd, &utmp_data, sizeof (utmp_data)) != sizeof (utmp_data))
+  if (read (utmp_fd, &utmp_data, sizeof (utmp_data)) != sizeof (utmp_data))
     return NULL;
   return &utmp_data;
 }
@@ -2533,7 +2559,7 @@ getutid (struct utmp *id)
   sigframe thisframe (mainthread);
   if (check_null_invalid_struct_errno (id))
     return NULL;
-  while (_read (utmp_fd, &utmp_data, sizeof (utmp_data)) == sizeof (utmp_data))
+  while (read (utmp_fd, &utmp_data, sizeof (utmp_data)) == sizeof (utmp_data))
     {
       switch (id->ut_type)
 	{
@@ -2566,7 +2592,7 @@ getutline (struct utmp *line)
   sigframe thisframe (mainthread);
   if (check_null_invalid_struct_errno (line))
     return NULL;
-  while (_read (utmp_fd, &utmp_data, sizeof (utmp_data)) == sizeof (utmp_data))
+  while (read (utmp_fd, &utmp_data, sizeof (utmp_data)) == sizeof (utmp_data))
     {
       if ((utmp_data.ut_type == LOGIN_PROCESS ||
 	   utmp_data.ut_type == USER_PROCESS) &&
