@@ -1474,6 +1474,12 @@ else
   USE_LIBTOOL_FALSE=
 fi
 
+# Hard-code OBJEXT.  Normally it is set by AC_OBJEXT, but we
+# use oext, which is set in configure.host based on the target platform.
+OBJEXT=${oext}
+
+
+
 
 
 
@@ -1664,6 +1670,7 @@ s%@EXEEXT@%$EXEEXT%g
 s%@NEWLIB_CFLAGS@%$NEWLIB_CFLAGS%g
 s%@USE_LIBTOOL_TRUE@%$USE_LIBTOOL_TRUE%g
 s%@USE_LIBTOOL_FALSE@%$USE_LIBTOOL_FALSE%g
+s%@OBJEXT@%$OBJEXT%g
 s%@oext@%$oext%g
 s%@aext@%$aext%g
 s%@libm_machine_dir@%$libm_machine_dir%g

@@ -24,7 +24,8 @@ src = 	k_standard.c k_rem_pio2.c \
 	s_frexp.c s_isnan.c s_ldexp.c \
 	s_signif.c s_sin.c \
 	s_tan.c s_tanh.c \
-	s_isinf.c s_infconst.c
+	s_isinf.c s_infconst.c \
+	w_exp2.c w_tgamma.c
 
 fsrc =	kf_rem_pio2.c \
 	kf_cos.c kf_sin.c kf_tan.c \
@@ -46,7 +47,8 @@ fsrc =	kf_rem_pio2.c \
 	sf_frexp.c sf_isnan.c sf_ldexp.c \
 	sf_signif.c sf_sin.c \
 	sf_tan.c sf_tanh.c \
-	sf_isinf.c
+	sf_isinf.c \
+	wf_exp2.c wf_tgamma.c
 
 libmath_la_LDFLAGS = -Xcompiler -nostdlib
 

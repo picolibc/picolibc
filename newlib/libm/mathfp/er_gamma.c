@@ -28,5 +28,5 @@
 	double x; int *signgamp;
 #endif
 {
-	return lgamma_r(x,signgamp);
+	return exp (lgamma_r(x,signgamp));
 }

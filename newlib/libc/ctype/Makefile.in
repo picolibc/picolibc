@@ -69,8 +69,12 @@ AS = @AS@
 CC = @CC@
 CPP = @CPP@
 CRT0 = @CRT0@
+CXX = @CXX@
+CXXCPP = @CXXCPP@
 DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
+GCJ = @GCJ@
+GCJFLAGS = @GCJFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBC_EXTRA_DEF = @LIBC_EXTRA_DEF@
 LIBC_EXTRA_LIB = @LIBC_EXTRA_LIB@
@@ -87,8 +91,10 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
 OBJDUMP = @OBJDUMP@
+OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
+STRIP = @STRIP@
 VERSION = @VERSION@
 aext = @aext@
 extra_dir = @extra_dir@
@@ -164,10 +170,15 @@ DEFS = @DEFS@ -I. -I$(srcdir)
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 lib_a_LIBADD = 
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  ctype_.o isalnum.o isalpha.o \
-@USE_LIBTOOL_FALSE@isascii.o iscntrl.o isdigit.o islower.o isupper.o \
-@USE_LIBTOOL_FALSE@isprint.o ispunct.o isspace.o isxdigit.o toascii.o \
-@USE_LIBTOOL_FALSE@tolower.o toupper.o _tolower.o _toupper.o
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  ctype_.$(OBJEXT) isalnum.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@isalpha.$(OBJEXT) isascii.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@iscntrl.$(OBJEXT) isdigit.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@islower.$(OBJEXT) isupper.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@isprint.$(OBJEXT) ispunct.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@isspace.$(OBJEXT) isxdigit.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@toascii.$(OBJEXT) tolower.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@toupper.$(OBJEXT) _tolower.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@_toupper.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 libctype_la_LIBADD = 
@@ -195,7 +206,7 @@ OBJECTS = $(lib_a_OBJECTS) $(libctype_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .def .lo .o .s
+.SUFFIXES: .S .c .def .lo .o .obj .s
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(srcdir)/../../Makefile.shared
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus ctype/Makefile
 
@@ -216,6 +227,11 @@ maintainer-clean-noinstLIBRARIES:
 .c.o:
 	$(COMPILE) -c $<
 
+# FIXME: We should only use cygpath when building on Windows,
+# and only if it is available.
+.c.obj:
+	$(COMPILE) -c `cygpath -w $<`
+
 .s.o:
 	$(COMPILE) -c $<
 
@@ -224,6 +240,7 @@ maintainer-clean-noinstLIBRARIES:
 
 mostlyclean-compile:
 	-rm -f *.o core *.core
+	-rm -f *.$(OBJEXT)
 
 clean-compile:
 

@@ -69,8 +69,12 @@ AS = @AS@
 CC = @CC@
 CPP = @CPP@
 CRT0 = @CRT0@
+CXX = @CXX@
+CXXCPP = @CXXCPP@
 DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
+GCJ = @GCJ@
+GCJFLAGS = @GCJFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBC_EXTRA_DEF = @LIBC_EXTRA_DEF@
 LIBC_EXTRA_LIB = @LIBC_EXTRA_LIB@
@@ -87,8 +91,10 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
 OBJDUMP = @OBJDUMP@
+OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
+STRIP = @STRIP@
 VERSION = @VERSION@
 aext = @aext@
 extra_dir = @extra_dir@
@@ -162,10 +168,14 @@ DEFS = @DEFS@ -I. -I$(srcdir)
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 lib_a_LIBADD = 
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  asctime.o asctime_r.o clock.o \
-@USE_LIBTOOL_FALSE@ctime.o ctime_r.o difftime.o gmtime.o gmtime_r.o \
-@USE_LIBTOOL_FALSE@lcltime.o lcltime_r.o mktime.o mktm_r.o strftime.o \
-@USE_LIBTOOL_FALSE@strptime.o time.o tzlock.o tzset.o tzset_r.o
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  asctime.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@asctime_r.$(OBJEXT) clock.$(OBJEXT) ctime.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@ctime_r.$(OBJEXT) difftime.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@gmtime.$(OBJEXT) gmtime_r.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@lcltime.$(OBJEXT) lcltime_r.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@mktime.$(OBJEXT) mktm_r.$(OBJEXT) strftime.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@strptime.$(OBJEXT) time.$(OBJEXT) tzlock.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@tzset.$(OBJEXT) tzset_r.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 libtime_la_LIBADD = 
@@ -193,7 +203,7 @@ OBJECTS = $(lib_a_OBJECTS) $(libtime_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .def .lo .o .s
+.SUFFIXES: .S .c .def .lo .o .obj .s
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(srcdir)/../../Makefile.shared
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus time/Makefile
 
@@ -214,6 +224,11 @@ maintainer-clean-noinstLIBRARIES:
 .c.o:
 	$(COMPILE) -c $<
 
+# FIXME: We should only use cygpath when building on Windows,
+# and only if it is available.
+.c.obj:
+	$(COMPILE) -c `cygpath -w $<`
+
 .s.o:
 	$(COMPILE) -c $<
 
@@ -222,6 +237,7 @@ maintainer-clean-noinstLIBRARIES:
 
 mostlyclean-compile:
 	-rm -f *.o core *.core
+	-rm -f *.$(OBJEXT)
 
 clean-compile:
 

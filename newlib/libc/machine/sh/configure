@@ -1474,6 +1474,12 @@ else
   USE_LIBTOOL_FALSE=
 fi
 
+# Hard-code OBJEXT.  Normally it is set by AC_OBJEXT, but we
+# use oext, which is set in configure.host based on the target platform.
+OBJEXT=${oext}
+
+
+
 
 
 
@@ -1482,7 +1488,7 @@ fi
 
 
 echo $ac_n "checking how to run the C preprocessor""... $ac_c" 1>&6
-echo "configure:1486: checking how to run the C preprocessor" >&5
+echo "configure:1492: checking how to run the C preprocessor" >&5
 # On Suns, sometimes $CPP names a directory.
 if test -n "$CPP" && test -d "$CPP"; then
   CPP=
@@ -1497,13 +1503,13 @@ else
   # On the NeXT, cc -E runs the code through the compiler's parser,
   # not just through cpp.
   cat > conftest.$ac_ext <<EOF
-#line 1501 "configure"
+#line 1507 "configure"
 #include "confdefs.h"
 #include <assert.h>
 Syntax Error
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1507: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1513: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   :
@@ -1514,13 +1520,13 @@ else
   rm -rf conftest*
   CPP="${CC-cc} -E -traditional-cpp"
   cat > conftest.$ac_ext <<EOF
-#line 1518 "configure"
+#line 1524 "configure"
 #include "confdefs.h"
 #include <assert.h>
 Syntax Error
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1524: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1530: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   :
@@ -1531,13 +1537,13 @@ else
   rm -rf conftest*
   CPP="${CC-cc} -nologo -E"
   cat > conftest.$ac_ext <<EOF
-#line 1535 "configure"
+#line 1541 "configure"
 #include "confdefs.h"
 #include <assert.h>
 Syntax Error
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:1541: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:1547: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   :
@@ -1562,7 +1568,7 @@ fi
 echo "$ac_t""$CPP" 1>&6
 
 cat > conftest.$ac_ext <<EOF
-#line 1566 "configure"
+#line 1572 "configure"
 #include "confdefs.h"
 
 #if __SH5__
@@ -1773,6 +1779,7 @@ s%@EXEEXT@%$EXEEXT%g
 s%@NEWLIB_CFLAGS@%$NEWLIB_CFLAGS%g
 s%@USE_LIBTOOL_TRUE@%$USE_LIBTOOL_TRUE%g
 s%@USE_LIBTOOL_FALSE@%$USE_LIBTOOL_FALSE%g
+s%@OBJEXT@%$OBJEXT%g
 s%@oext@%$oext%g
 s%@aext@%$aext%g
 s%@libm_machine_dir@%$libm_machine_dir%g

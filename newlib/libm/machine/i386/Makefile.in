@@ -68,8 +68,12 @@ AR = @AR@
 AS = @AS@
 CC = @CC@
 CPP = @CPP@
+CXX = @CXX@
+CXXCPP = @CXXCPP@
 DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
+GCJ = @GCJ@
+GCJFLAGS = @GCJFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
@@ -77,8 +81,10 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
 OBJDUMP = @OBJDUMP@
+OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
+STRIP = @STRIP@
 VERSION = @VERSION@
 aext = @aext@
 libm_machine_dir = @libm_machine_dir@
@@ -118,10 +124,12 @@ DEFS = @DEFS@ -I. -I$(srcdir)
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 lib_a_LIBADD = 
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  f_atan2.o f_atan2f.o f_exp.o \
-@USE_LIBTOOL_FALSE@f_expf.o f_frexp.o f_frexpf.o f_log.o f_logf.o \
-@USE_LIBTOOL_FALSE@f_log10.o f_log10f.o f_ldexp.o f_ldexpf.o f_pow.o \
-@USE_LIBTOOL_FALSE@f_powf.o f_tan.o f_tanf.o
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  f_atan2.$(OBJEXT) f_atan2f.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@f_exp.$(OBJEXT) f_expf.$(OBJEXT) f_frexp.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@f_frexpf.$(OBJEXT) f_log.$(OBJEXT) f_logf.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@f_log10.$(OBJEXT) f_log10f.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@f_ldexp.$(OBJEXT) f_ldexpf.$(OBJEXT) f_pow.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@f_powf.$(OBJEXT) f_tan.$(OBJEXT) f_tanf.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 libi386_la_LIBADD = 
@@ -148,7 +156,7 @@ OBJECTS = $(lib_a_OBJECTS) $(libi386_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .lo .o .s
+.SUFFIXES: .S .c .lo .o .obj .s
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(srcdir)/../../../Makefile.shared
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus Makefile
 
@@ -177,6 +185,11 @@ maintainer-clean-noinstLIBRARIES:
 .c.o:
 	$(COMPILE) -c $<
 
+# FIXME: We should only use cygpath when building on Windows,
+# and only if it is available.
+.c.obj:
+	$(COMPILE) -c `cygpath -w $<`
+
 .s.o:
 	$(COMPILE) -c $<
 
@@ -185,6 +198,7 @@ maintainer-clean-noinstLIBRARIES:
 
 mostlyclean-compile:
 	-rm -f *.o core *.core
+	-rm -f *.$(OBJEXT)
 
 clean-compile:
 

@@ -28,5 +28,5 @@
 	double x; int *signgamp;
 #endif
 {
-	return __ieee754_lgamma_r(x,signgamp);
+	return __ieee754_exp (__ieee754_lgamma_r(x,signgamp));
 }

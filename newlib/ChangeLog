@@ -1,3 +1,46 @@
+2002-06-06  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* libm/common/s_fdim.c: New file.
+	* libm/common/s_fma.c: Likewise.
+	* libm/common/s_fmax.c: Likewise.
+	* libm/common/s_fmin.c: Likewise.
+	* libm/common/s_fpclassify.c: Likewise.
+	* libm/common/s_lrint.c: Likewise.
+	* libm/common/s_lround.c: Likewise.
+	* libm/common/s_nearbyint.c: Likewise.
+	* libm/common/s_remquo.c: Likewise.
+	* libm/common/s_round.c: Likewise.
+	* libm/common/s_scalbln.c: Likewise.
+	* libm/common/s_signbit.c: Likewise.
+	* libm/common/s_trunc.c: Likewise.
+	* libm/common/sf_fdim.c: Likewise.
+	* libm/common/sf_fma.c: Likewise.
+	* libm/common/sf_fmax.c: Likewise.
+	* libm/common/sf_fmin.c: Likewise.
+	* libm/common/sf_lrint.c: Likewise.
+	* libm/common/sf_lround.c: Likewise.
+	* libm/common/sf_nearbyint.c: Likewise.
+	* libm/common/sf_remquo.c: Likewise.
+	* libm/common/sf_round.c: Likewise.
+	* libm/common/sf_scalbln.c: Likewise.
+	* libm/common/sf_trunc.c: Likewise.
+	* libm/math/w_exp2.c: Likewise.
+	* libm/math/w_tgamma.c: Likewise.
+	* libm/math/wf_exp2.c: Likewise.
+	* libm/math/wf_tgamma.c: Likewise.
+	* libm/mathfp/s_exp2.c: Likewise.
+	* libm/mathfp/s_tgamma.c: Likewise.
+	* libm/mathfp/sf_exp2.c: Likewise.
+	* libm/mathfp/sf_tgamma.c: Likewise.
+	* libm/math/er_gamma.c: Fix return value.
+	* libm/math/erf_gamma.c: Likewise.
+	* libm/mathfp/er_gamma.c: Likewise.
+	* libm/mathfp/erf_gamma.c: Likewise.
+	* libc/include/math.h (!__STRICT_ANSI__): Include ISOC99-specific
+	declarations and macros.
+	Regenerated all Makefile.in, aclocal.m4 and configure files to
+	use new libtool macros in top-level libtool.m4
+
 2002-06-05  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/include/string.h[__linux__]: Add strsignal prototype.

@@ -30,5 +30,5 @@
 	float x; int *signgamp;
 #endif
 {
-	return __ieee754_lgammaf_r(x,signgamp);
+	return __ieee754_expf (__ieee754_lgammaf_r(x,signgamp));
 }

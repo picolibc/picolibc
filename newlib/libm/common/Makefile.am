@@ -7,12 +7,18 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 src = 	s_finite.c s_copysign.c s_modf.c s_scalbn.c \
 	s_cbrt.c s_expm1.c s_ilogb.c \
 	s_infinity.c s_log1p.c s_nan.c s_nextafter.c \
-	s_rint.c s_logb.c s_matherr.c s_lib_ver.c
+	s_rint.c s_logb.c s_matherr.c s_lib_ver.c \
+	s_fdim.c s_fma.c s_fmax.c s_fmin.c s_fpclassify.c s_lrint.c \
+	s_lround.c s_nearbyint.c s_remquo.c s_round.c s_scalbln.c \
+	s_signbit.c s_trunc.c
 
 fsrc =	sf_finite.c sf_copysign.c sf_modf.c sf_scalbn.c \
 	sf_cbrt.c sf_expm1.c sf_ilogb.c \
 	sf_infinity.c sf_log1p.c sf_nan.c sf_nextafter.c \
-	sf_rint.c sf_logb.c
+	sf_rint.c sf_logb.c \
+	sf_fdim.c sf_fma.c sf_fmax.c sf_fmin.c sf_lrint.c \
+	sf_lround.c sf_nearbyint.c sf_remquo.c sf_round.c \
+	sf_scalbln.c sf_trunc.c
 
 libcommon_la_LDFLAGS = -Xcompiler -nostdlib
 

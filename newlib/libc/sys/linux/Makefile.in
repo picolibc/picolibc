@@ -69,8 +69,12 @@ AS = @AS@
 AWK = @AWK@
 CC = @CC@
 CPP = @CPP@
+CXX = @CXX@
+CXXCPP = @CXXCPP@
 DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
+GCJ = @GCJ@
+GCJFLAGS = @GCJFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBTOOL = @LIBTOOL@
 LINUX_MACH_LIB = @LINUX_MACH_LIB@
@@ -79,8 +83,10 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
 OBJDUMP = @OBJDUMP@
+OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
+STRIP = @STRIP@
 VERSION = @VERSION@
 aext = @aext@
 libm_machine_dir = @libm_machine_dir@
@@ -179,17 +185,26 @@ LIBRARIES =  $(noinst_LIBRARIES)
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  brk.o cfspeed.o flockfile.o \
-@USE_LIBTOOL_FALSE@funlockfile.o gethostname.o getoptlong.o getreent.o \
-@USE_LIBTOOL_FALSE@ids.o inode.o io.o io64.o linux.o mmap.o pread.o \
-@USE_LIBTOOL_FALSE@pread64.o process.o psignal.o pwrite.o pwrite64.o \
-@USE_LIBTOOL_FALSE@raise.o realpath.o rename.o resource.o sched.o \
-@USE_LIBTOOL_FALSE@select.o seteuid.o shm_open.o shm_unlink.o sig.o \
-@USE_LIBTOOL_FALSE@sigaction.o sigqueue.o signal.o siglongjmp.o \
-@USE_LIBTOOL_FALSE@sigset.o sigwait.o socket.o sleep.o stack.o \
-@USE_LIBTOOL_FALSE@strsignal.o sysconf.o sysctl.o systat.o system.o \
-@USE_LIBTOOL_FALSE@tcdrain.o tcsendbrk.o termios.o time.o usleep.o \
-@USE_LIBTOOL_FALSE@wait.o
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  brk.$(OBJEXT) cfspeed.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@flockfile.$(OBJEXT) funlockfile.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@gethostname.$(OBJEXT) getoptlong.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@getreent.$(OBJEXT) ids.$(OBJEXT) inode.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@io.$(OBJEXT) io64.$(OBJEXT) linux.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@mmap.$(OBJEXT) pread.$(OBJEXT) pread64.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@process.$(OBJEXT) psignal.$(OBJEXT) pwrite.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@pwrite64.$(OBJEXT) raise.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@realpath.$(OBJEXT) rename.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@resource.$(OBJEXT) sched.$(OBJEXT) select.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@seteuid.$(OBJEXT) shm_open.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@shm_unlink.$(OBJEXT) sig.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sigaction.$(OBJEXT) sigqueue.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@signal.$(OBJEXT) siglongjmp.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sigset.$(OBJEXT) sigwait.$(OBJEXT) socket.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sleep.$(OBJEXT) stack.$(OBJEXT) strsignal.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sysconf.$(OBJEXT) sysctl.$(OBJEXT) systat.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@system.$(OBJEXT) tcdrain.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@tcsendbrk.$(OBJEXT) termios.$(OBJEXT) time.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@usleep.$(OBJEXT) wait.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 @USE_LIBTOOL_TRUE@liblinux_la_DEPENDENCIES = 
@@ -223,7 +238,7 @@ OBJECTS = $(lib_a_OBJECTS) $(liblinux_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .lo .o .s
+.SUFFIXES: .S .c .lo .o .obj .s
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(srcdir)/../../../Makefile.shared
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus Makefile
 
@@ -252,6 +267,11 @@ maintainer-clean-noinstLIBRARIES:
 .c.o:
 	$(COMPILE) -c $<
 
+# FIXME: We should only use cygpath when building on Windows,
+# and only if it is available.
+.c.obj:
+	$(COMPILE) -c `cygpath -w $<`
+
 .s.o:
 	$(COMPILE) -c $<
 
@@ -260,6 +280,7 @@ maintainer-clean-noinstLIBRARIES:
 
 mostlyclean-compile:
 	-rm -f *.o core *.core
+	-rm -f *.$(OBJEXT)
 
 clean-compile:
 

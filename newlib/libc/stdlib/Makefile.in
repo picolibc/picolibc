@@ -69,8 +69,12 @@ AS = @AS@
 CC = @CC@
 CPP = @CPP@
 CRT0 = @CRT0@
+CXX = @CXX@
+CXXCPP = @CXXCPP@
 DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
+GCJ = @GCJ@
+GCJFLAGS = @GCJFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBC_EXTRA_DEF = @LIBC_EXTRA_DEF@
 LIBC_EXTRA_LIB = @LIBC_EXTRA_LIB@
@@ -87,8 +91,10 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
 OBJDUMP = @OBJDUMP@
+OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
+STRIP = @STRIP@
 VERSION = @VERSION@
 aext = @aext@
 extra_dir = @extra_dir@
@@ -261,22 +267,35 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@vallocr.$(oext) pvallocr.$(oext) mallinfor.$(oext) \
 @USE_LIBTOOL_FALSE@mallstatsr.$(oext) msizer.$(oext) malloptr.$(oext) \
 @USE_LIBTOOL_FALSE@mallocr.$(oext)
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  __adjust.o __exp10.o __ten_mu.o \
-@USE_LIBTOOL_FALSE@a64l.o abort.o abs.o assert.o atexit.o atof.o \
-@USE_LIBTOOL_FALSE@atoff.o atoi.o atol.o bsearch.o calloc.o div.o \
-@USE_LIBTOOL_FALSE@drand48.o dtoa.o dtoastub.o ecvtbuf.o efgcvt.o \
-@USE_LIBTOOL_FALSE@environ.o envlock.o eprintf.o erand48.o exit.o \
-@USE_LIBTOOL_FALSE@getenv.o getenv_r.o getopt.o jrand48.o l64a.o labs.o \
-@USE_LIBTOOL_FALSE@lcong48.o ldiv.o ldtoa.o lrand48.o malign.o malloc.o \
-@USE_LIBTOOL_FALSE@mblen.o mblen_r.o mbstowcs.o mbstowcs_r.o mbtowc.o \
-@USE_LIBTOOL_FALSE@mbtowc_r.o mlock.o mprec.o mrand48.o msize.o \
-@USE_LIBTOOL_FALSE@mstats.o mtrim.o nrand48.o on_exit.o putenv.o \
-@USE_LIBTOOL_FALSE@putenv_r.o qsort.o rand.o rand48.o rand_r.o \
-@USE_LIBTOOL_FALSE@realloc.o seed48.o setenv.o setenv_r.o srand48.o \
-@USE_LIBTOOL_FALSE@strdup.o strdup_r.o strtod.o strtol.o strtoll.o \
-@USE_LIBTOOL_FALSE@strtoll_r.o strtoul.o strtoull.o strtoull_r.o \
-@USE_LIBTOOL_FALSE@system.o valloc.o wcstombs.o wcstombs_r.o wctomb.o \
-@USE_LIBTOOL_FALSE@wctomb_r.o
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  __adjust.$(OBJEXT) __exp10.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@__ten_mu.$(OBJEXT) a64l.$(OBJEXT) abort.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@abs.$(OBJEXT) assert.$(OBJEXT) atexit.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@atof.$(OBJEXT) atoff.$(OBJEXT) atoi.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@atol.$(OBJEXT) bsearch.$(OBJEXT) calloc.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@div.$(OBJEXT) drand48.$(OBJEXT) dtoa.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@dtoastub.$(OBJEXT) ecvtbuf.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@efgcvt.$(OBJEXT) environ.$(OBJEXT) envlock.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@eprintf.$(OBJEXT) erand48.$(OBJEXT) exit.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@getenv.$(OBJEXT) getenv_r.$(OBJEXT) getopt.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@jrand48.$(OBJEXT) l64a.$(OBJEXT) labs.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@lcong48.$(OBJEXT) ldiv.$(OBJEXT) ldtoa.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@lrand48.$(OBJEXT) malign.$(OBJEXT) malloc.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@mblen.$(OBJEXT) mblen_r.$(OBJEXT) mbstowcs.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@mbstowcs_r.$(OBJEXT) mbtowc.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@mbtowc_r.$(OBJEXT) mlock.$(OBJEXT) mprec.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@mrand48.$(OBJEXT) msize.$(OBJEXT) mstats.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@mtrim.$(OBJEXT) nrand48.$(OBJEXT) on_exit.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@putenv.$(OBJEXT) putenv_r.$(OBJEXT) qsort.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@rand.$(OBJEXT) rand48.$(OBJEXT) rand_r.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@realloc.$(OBJEXT) seed48.$(OBJEXT) setenv.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@setenv_r.$(OBJEXT) srand48.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@strdup.$(OBJEXT) strdup_r.$(OBJEXT) strtod.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@strtol.$(OBJEXT) strtoll.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@strtoll_r.$(OBJEXT) strtoul.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@strtoull.$(OBJEXT) strtoull_r.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@system.$(OBJEXT) valloc.$(OBJEXT) wcstombs.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wcstombs_r.$(OBJEXT) wctomb.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wctomb_r.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 @USE_LIBTOOL_TRUE@libstdlib_la_DEPENDENCIES =  freer.$(oext) \
@@ -320,7 +339,7 @@ OBJECTS = $(lib_a_OBJECTS) $(libstdlib_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .def .lo .o .s
+.SUFFIXES: .S .c .def .lo .o .obj .s
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(srcdir)/../../Makefile.shared
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus stdlib/Makefile
 
@@ -341,6 +360,11 @@ maintainer-clean-noinstLIBRARIES:
 .c.o:
 	$(COMPILE) -c $<
 
+# FIXME: We should only use cygpath when building on Windows,
+# and only if it is available.
+.c.obj:
+	$(COMPILE) -c `cygpath -w $<`
+
 .s.o:
 	$(COMPILE) -c $<
 
@@ -349,6 +373,7 @@ maintainer-clean-noinstLIBRARIES:
 
 mostlyclean-compile:
 	-rm -f *.o core *.core
+	-rm -f *.$(OBJEXT)
 
 clean-compile:
 

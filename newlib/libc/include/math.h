@@ -66,6 +66,57 @@ extern double fmod _PARAMS((double, double));
 
 #ifndef __STRICT_ANSI__
 
+/* ISO C99 types and macros. */
+
+#ifndef FLT_EVAL_METHOD
+#define FLT_EVAL_METHOD 0
+typedef float float_t;
+typedef double double_t;
+#endif /* FLT_EVAL_METHOD */
+
+#define FP_NAN         0
+#define FP_INFINITE    1
+#define FP_ZERO        2
+#define FP_SUBNORMAL   3
+#define FP_NORMAL      4
+
+extern int __fpclassifyf (float x);
+extern int __fpclassifyd (double x);
+
+#define fpclassify(x) \
+          (__extension__ ({__typeof__(x) __x = (x); \
+                           (sizeof (__x) == sizeof (float))  ? __fpclassifyf(__x) : __fpclassifyd(__x);}))
+
+#define isfinite(x) \
+          (__extension__ ({__typeof__(x) __x = (x); \
+                           fpclassify(__x) != FP_INFINITE && fpclassify(__x) != FP_NAN;}))
+#define isnormal(x) \
+          (__extension__ ({__typeof__(x) __x = (x); \
+                           fpclassify(__x) == FP_NORMAL;}))
+#define signbit(x) \
+          (__extension__ ({__typeof__(x) __x = (x); \
+                           (sizeof(__x) == sizeof(float)) ? __signbitf(__x) : __signbitd(__x);}))
+
+#define isgreater(x,y) \
+          (__extension__ ({__typeof__(x) __x = (x); __typeof__(y) __y = (y); \
+                           !isunordered(__x,__y) && (__x > __y);}))
+#define isgreaterequal(x,y) \
+          (__extension__ ({__typeof__(x) __x = (x); __typeof__(y) __y = (y); \
+                           !isunordered(__x,__y) && (__x >= __y);}))
+#define isless(x,y) \
+          (__extension__ ({__typeof__(x) __x = (x); __typeof__(y) __y = (y); \
+                           !isunordered(__x,__y) && (__x < __y);}))
+#define islessequal(x,y) \
+          (__extension__ ({__typeof__(x) __x = (x); __typeof__(y) __y = (y); \
+                           !isunordered(__x,__y) && (__x <= __y);}))
+#define islessgreater(x,y) \
+          (__extension__ ({__typeof__(x) __x = (x); __typeof__(y) __y = (y); \
+                           !isunordered(__x,__y) && (__x < __y || __x > __y);}))
+
+#define isunordered(x,y) \
+          (__extension__ ({__typeof__(x) __x = (x); __typeof__(y) __y = (y); \
+                           fpclassify(__x) == FP_NAN || fpclassify(__y) == FP_NAN;}))
+
 /* Non ANSI double precision functions.  */
 
 extern double infinity _PARAMS((void));
@@ -81,6 +132,21 @@ extern double cbrt _PARAMS((double));
 extern double nextafter _PARAMS((double, double));
 extern double rint _PARAMS((double));
 extern double scalbn _PARAMS((double, int));
+
+extern double exp2 _PARAMS((double));
+extern double scalbln _PARAMS((double, long int));
+extern double tgamma _PARAMS((double));
+extern double nearbyint _PARAMS((double));
+extern long int lrint _PARAMS((double));
+extern double round _PARAMS((double));
+extern long int lround _PARAMS((double));
+extern double trunc _PARAMS((double));
+extern double remquo _PARAMS((double, double, int *));
+extern double copysign _PARAMS((double, double));
+extern double fdim _PARAMS((double, double));
+extern double fmax _PARAMS((double, double));
+extern double fmin _PARAMS((double, double));
+extern double fma _PARAMS((double, double, double));
 
 #ifndef __math_68881
 extern double log1p _PARAMS((double));
@@ -151,6 +217,21 @@ extern float fmodf _PARAMS((float, float));
 #ifndef __STRICT_ANSI__
 
 /* Other single precision functions.  */
+
+extern float exp2f _PARAMS((float));
+extern float scalblnf _PARAMS((float, long int));
+extern float tgammaf _PARAMS((float));
+extern float nearbyintf _PARAMS((float));
+extern long int lrintf _PARAMS((float));
+extern float roundf _PARAMS((float));
+extern long int lroundf _PARAMS((float));
+extern float truncf _PARAMS((float));
+extern float remquof _PARAMS((float, float, int *));
+extern float copysignf _PARAMS((float, float));
+extern float fdimf _PARAMS((float, float));
+extern float fmaxf _PARAMS((float, float));
+extern float fminf _PARAMS((float, float));
+extern float fmaf _PARAMS((float, float, float));
 
 extern float infinityf _PARAMS((void));
 extern float nanf _PARAMS((void));

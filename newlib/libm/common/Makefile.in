@@ -68,8 +68,12 @@ AR = @AR@
 AS = @AS@
 CC = @CC@
 CPP = @CPP@
+CXX = @CXX@
+CXXCPP = @CXXCPP@
 DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
+GCJ = @GCJ@
+GCJFLAGS = @GCJFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBM_MACHINE_LIB = @LIBM_MACHINE_LIB@
 LIBTOOL = @LIBTOOL@
@@ -78,8 +82,10 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
 OBJDUMP = @OBJDUMP@
+OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
+STRIP = @STRIP@
 VERSION = @VERSION@
 aext = @aext@
 libm_machine_dir = @libm_machine_dir@
@@ -95,13 +101,19 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 src = s_finite.c s_copysign.c s_modf.c s_scalbn.c \
 	s_cbrt.c s_expm1.c s_ilogb.c \
 	s_infinity.c s_log1p.c s_nan.c s_nextafter.c \
-	s_rint.c s_logb.c s_matherr.c s_lib_ver.c
+	s_rint.c s_logb.c s_matherr.c s_lib_ver.c \
+	s_fdim.c s_fma.c s_fmax.c s_fmin.c s_fpclassify.c s_lrint.c \
+	s_lround.c s_nearbyint.c s_remquo.c s_round.c s_scalbln.c \
+	s_signbit.c s_trunc.c
 
 
 fsrc = sf_finite.c sf_copysign.c sf_modf.c sf_scalbn.c \
 	sf_cbrt.c sf_expm1.c sf_ilogb.c \
 	sf_infinity.c sf_log1p.c sf_nan.c sf_nextafter.c \
-	sf_rint.c sf_logb.c
+	sf_rint.c sf_logb.c \
+	sf_fdim.c sf_fma.c sf_fmax.c sf_fmin.c sf_lrint.c \
+	sf_lround.c sf_nearbyint.c sf_remquo.c sf_round.c \
+	sf_scalbln.c sf_trunc.c
 
 
 libcommon_la_LDFLAGS = -Xcompiler -nostdlib
@@ -134,13 +146,32 @@ DEFS = @DEFS@ -I. -I$(srcdir)
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 lib_a_LIBADD = 
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  s_finite.o s_copysign.o s_modf.o \
-@USE_LIBTOOL_FALSE@s_scalbn.o s_cbrt.o s_expm1.o s_ilogb.o s_infinity.o \
-@USE_LIBTOOL_FALSE@s_log1p.o s_nan.o s_nextafter.o s_rint.o s_logb.o \
-@USE_LIBTOOL_FALSE@s_matherr.o s_lib_ver.o sf_finite.o sf_copysign.o \
-@USE_LIBTOOL_FALSE@sf_modf.o sf_scalbn.o sf_cbrt.o sf_expm1.o \
-@USE_LIBTOOL_FALSE@sf_ilogb.o sf_infinity.o sf_log1p.o sf_nan.o \
-@USE_LIBTOOL_FALSE@sf_nextafter.o sf_rint.o sf_logb.o
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  s_finite.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_copysign.$(OBJEXT) s_modf.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_scalbn.$(OBJEXT) s_cbrt.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_expm1.$(OBJEXT) s_ilogb.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_infinity.$(OBJEXT) s_log1p.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_nan.$(OBJEXT) s_nextafter.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_rint.$(OBJEXT) s_logb.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_matherr.$(OBJEXT) s_lib_ver.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_fdim.$(OBJEXT) s_fma.$(OBJEXT) s_fmax.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_fmin.$(OBJEXT) s_fpclassify.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_lrint.$(OBJEXT) s_lround.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_nearbyint.$(OBJEXT) s_remquo.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_round.$(OBJEXT) s_scalbln.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_signbit.$(OBJEXT) s_trunc.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_finite.$(OBJEXT) sf_copysign.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_modf.$(OBJEXT) sf_scalbn.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_cbrt.$(OBJEXT) sf_expm1.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_ilogb.$(OBJEXT) sf_infinity.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_log1p.$(OBJEXT) sf_nan.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_nextafter.$(OBJEXT) sf_rint.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_logb.$(OBJEXT) sf_fdim.$(OBJEXT) sf_fma.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_fmax.$(OBJEXT) sf_fmin.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_lrint.$(OBJEXT) sf_lround.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_nearbyint.$(OBJEXT) sf_remquo.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_round.$(OBJEXT) sf_scalbln.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_trunc.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 libcommon_la_LIBADD = 
@@ -148,10 +179,15 @@ libcommon_la_LIBADD =
 @USE_LIBTOOL_TRUE@s_modf.lo s_scalbn.lo s_cbrt.lo s_expm1.lo s_ilogb.lo \
 @USE_LIBTOOL_TRUE@s_infinity.lo s_log1p.lo s_nan.lo s_nextafter.lo \
 @USE_LIBTOOL_TRUE@s_rint.lo s_logb.lo s_matherr.lo s_lib_ver.lo \
-@USE_LIBTOOL_TRUE@sf_finite.lo sf_copysign.lo sf_modf.lo sf_scalbn.lo \
-@USE_LIBTOOL_TRUE@sf_cbrt.lo sf_expm1.lo sf_ilogb.lo sf_infinity.lo \
-@USE_LIBTOOL_TRUE@sf_log1p.lo sf_nan.lo sf_nextafter.lo sf_rint.lo \
-@USE_LIBTOOL_TRUE@sf_logb.lo
+@USE_LIBTOOL_TRUE@s_fdim.lo s_fma.lo s_fmax.lo s_fmin.lo \
+@USE_LIBTOOL_TRUE@s_fpclassify.lo s_lrint.lo s_lround.lo s_nearbyint.lo \
+@USE_LIBTOOL_TRUE@s_remquo.lo s_round.lo s_scalbln.lo s_signbit.lo \
+@USE_LIBTOOL_TRUE@s_trunc.lo sf_finite.lo sf_copysign.lo sf_modf.lo \
+@USE_LIBTOOL_TRUE@sf_scalbn.lo sf_cbrt.lo sf_expm1.lo sf_ilogb.lo \
+@USE_LIBTOOL_TRUE@sf_infinity.lo sf_log1p.lo sf_nan.lo sf_nextafter.lo \
+@USE_LIBTOOL_TRUE@sf_rint.lo sf_logb.lo sf_fdim.lo sf_fma.lo sf_fmax.lo \
+@USE_LIBTOOL_TRUE@sf_fmin.lo sf_lrint.lo sf_lround.lo sf_nearbyint.lo \
+@USE_LIBTOOL_TRUE@sf_remquo.lo sf_round.lo sf_scalbln.lo sf_trunc.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -171,7 +207,7 @@ OBJECTS = $(lib_a_OBJECTS) $(libcommon_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .def .lo .o .s
+.SUFFIXES: .S .c .def .lo .o .obj .s
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(srcdir)/../../Makefile.shared
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus common/Makefile
 
@@ -192,6 +228,11 @@ maintainer-clean-noinstLIBRARIES:
 .c.o:
 	$(COMPILE) -c $<
 
+# FIXME: We should only use cygpath when building on Windows,
+# and only if it is available.
+.c.obj:
+	$(COMPILE) -c `cygpath -w $<`
+
 .s.o:
 	$(COMPILE) -c $<
 
@@ -200,6 +241,7 @@ maintainer-clean-noinstLIBRARIES:
 
 mostlyclean-compile:
 	-rm -f *.o core *.core
+	-rm -f *.$(OBJEXT)
 
 clean-compile:
 

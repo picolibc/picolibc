@@ -74,8 +74,12 @@ CRT0 = @CRT0@
 CRT0_DIR = @CRT0_DIR@
 CRT1 = @CRT1@
 CRT1_DIR = @CRT1_DIR@
+CXX = @CXX@
+CXXCPP = @CXXCPP@
 DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
+GCJ = @GCJ@
+GCJFLAGS = @GCJFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBM_MACHINE_OBJECTLIST = @LIBM_MACHINE_OBJECTLIST@
 LIBTOOL = @LIBTOOL@
@@ -85,10 +89,12 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
 OBJDUMP = @OBJDUMP@
+OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 POSIX_OBJECTLIST = @POSIX_OBJECTLIST@
 RANLIB = @RANLIB@
 SIGNAL_OBJECTLIST = @SIGNAL_OBJECTLIST@
+STRIP = @STRIP@
 SYSCALL_OBJECTLIST = @SYSCALL_OBJECTLIST@
 SYS_MACH_OBJECTLIST = @SYS_MACH_OBJECTLIST@
 SYS_OBJECTLIST = @SYS_OBJECTLIST@
@@ -215,9 +221,9 @@ LIBM_OBJECTLISTS = \
 	$(LIBM_MACHINE_OBJECTLIST)
 
 
-libm_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/libc/sys/linux/shared.ld `cat libm-libtool-objectlist`
+libm_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/libc/sys/linux/shared.ld -objectlist libm-libtool-objectlist
 
-libc_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/libc/sys/linux/shared.ld `cat libc-libtool-objectlist`
+libc_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/libc/sys/linux/shared.ld -objectlist libc-libtool-objectlist
 
 @USE_LIBTOOL_TRUE@libm_la_SOURCES = 
 @USE_LIBTOOL_TRUE@libm_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@libm-libtool-objectlist
@@ -245,10 +251,10 @@ CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 libm_a_LIBADD = 
 libm_a_SOURCES = libm.a.c
-libm_a_OBJECTS =  libm.a.o
+libm_a_OBJECTS =  libm.a.$(OBJEXT)
 libc_a_LIBADD = 
 libc_a_SOURCES = libc.a.c
-libc_a_OBJECTS =  libc.a.o
+libc_a_OBJECTS =  libc.a.$(OBJEXT)
 LTLIBRARIES =  $(toollib_LTLIBRARIES)
 
 libm_la_LIBADD = 
@@ -274,11 +280,11 @@ DIST_SUBDIRS =  libc libm doc .
 EXPECT = `if test -f $(top_builddir)/../expect/expect; then echo $(top_builddir)/../expect/expect; else echo expect; fi`
 RUNTEST = `if test -f $(top_srcdir)/../dejagnu/runtest; then echo $(top_srcdir)/../dejagnu/runtest; else echo runtest; fi`
 SOURCES = libm.a.c libc.a.c $(libm_la_SOURCES) $(libc_la_SOURCES)
-OBJECTS = libm.a.o libc.a.o $(libm_la_OBJECTS) $(libc_la_OBJECTS)
+OBJECTS = libm.a.$(OBJEXT) libc.a.$(OBJEXT) $(libm_la_OBJECTS) $(libc_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .lo .o .s
+.SUFFIXES: .S .c .lo .o .obj .s
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus Makefile
 
@@ -329,6 +335,11 @@ uninstall-toollibLIBRARIES:
 .c.o:
 	$(COMPILE) -c $<
 
+# FIXME: We should only use cygpath when building on Windows,
+# and only if it is available.
+.c.obj:
+	$(COMPILE) -c `cygpath -w $<`
+
 .s.o:
 	$(COMPILE) -c $<
 
@@ -337,6 +348,7 @@ uninstall-toollibLIBRARIES:
 
 mostlyclean-compile:
 	-rm -f *.o core *.core
+	-rm -f *.$(OBJEXT)
 
 clean-compile:
 

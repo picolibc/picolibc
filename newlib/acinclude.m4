@@ -153,6 +153,12 @@ LDFLAGS=${ldflags}
 AC_SUBST(LDFLAGS)
 
 AM_CONDITIONAL(USE_LIBTOOL, test x[$]{use_libtool} = xyes)
+
+# Hard-code OBJEXT.  Normally it is set by AC_OBJEXT, but we
+# use oext, which is set in configure.host based on the target platform.
+OBJEXT=${oext}
+
+AC_SUBST(OBJEXT)
 AC_SUBST(oext)
 AC_SUBST(aext)
 

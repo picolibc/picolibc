@@ -68,8 +68,12 @@ AR = @AR@
 AS = @AS@
 CC = @CC@
 CPP = @CPP@
+CXX = @CXX@
+CXXCPP = @CXXCPP@
 DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
+GCJ = @GCJ@
+GCJFLAGS = @GCJFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBM_MACHINE_LIB = @LIBM_MACHINE_LIB@
 LIBTOOL = @LIBTOOL@
@@ -78,8 +82,10 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
 OBJDUMP = @OBJDUMP@
+OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
+STRIP = @STRIP@
 VERSION = @VERSION@
 aext = @aext@
 libm_machine_dir = @libm_machine_dir@
@@ -112,7 +118,8 @@ src = k_standard.c k_rem_pio2.c \
 	s_frexp.c s_isnan.c s_ldexp.c \
 	s_signif.c s_sin.c \
 	s_tan.c s_tanh.c \
-	s_isinf.c s_infconst.c
+	s_isinf.c s_infconst.c \
+	w_exp2.c w_tgamma.c
 
 
 fsrc = kf_rem_pio2.c \
@@ -135,7 +142,8 @@ fsrc = kf_rem_pio2.c \
 	sf_frexp.c sf_isnan.c sf_ldexp.c \
 	sf_signif.c sf_sin.c \
 	sf_tan.c sf_tanh.c \
-	sf_isinf.c
+	sf_isinf.c \
+	wf_exp2.c wf_tgamma.c
 
 
 libmath_la_LDFLAGS = -Xcompiler -nostdlib
@@ -174,34 +182,64 @@ DEFS = @DEFS@ -I. -I$(srcdir)
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 lib_a_LIBADD = 
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  k_standard.o k_rem_pio2.o k_cos.o \
-@USE_LIBTOOL_FALSE@k_sin.o k_tan.o e_acos.o e_acosh.o e_asin.o \
-@USE_LIBTOOL_FALSE@e_atan2.o e_atanh.o e_cosh.o e_exp.o e_fmod.o \
-@USE_LIBTOOL_FALSE@er_gamma.o e_hypot.o e_j0.o e_j1.o e_jn.o \
-@USE_LIBTOOL_FALSE@er_lgamma.o e_log.o e_log10.o e_pow.o e_rem_pio2.o \
-@USE_LIBTOOL_FALSE@e_remainder.o e_scalb.o e_sinh.o e_sqrt.o w_acos.o \
-@USE_LIBTOOL_FALSE@w_acosh.o w_asin.o w_atan2.o w_atanh.o w_cosh.o \
-@USE_LIBTOOL_FALSE@w_exp.o w_fmod.o w_gamma.o wr_gamma.o w_hypot.o \
-@USE_LIBTOOL_FALSE@w_j0.o w_j1.o w_jn.o w_lgamma.o wr_lgamma.o w_log.o \
-@USE_LIBTOOL_FALSE@w_log10.o w_pow.o w_remainder.o w_scalb.o w_sinh.o \
-@USE_LIBTOOL_FALSE@w_sqrt.o w_cabs.o w_drem.o s_asinh.o s_atan.o \
-@USE_LIBTOOL_FALSE@s_ceil.o s_cos.o s_erf.o s_fabs.o s_floor.o \
-@USE_LIBTOOL_FALSE@s_frexp.o s_isnan.o s_ldexp.o s_signif.o s_sin.o \
-@USE_LIBTOOL_FALSE@s_tan.o s_tanh.o s_isinf.o s_infconst.o \
-@USE_LIBTOOL_FALSE@kf_rem_pio2.o kf_cos.o kf_sin.o kf_tan.o ef_acos.o \
-@USE_LIBTOOL_FALSE@ef_acosh.o ef_asin.o ef_atan2.o ef_atanh.o ef_cosh.o \
-@USE_LIBTOOL_FALSE@ef_exp.o ef_fmod.o erf_gamma.o ef_hypot.o ef_j0.o \
-@USE_LIBTOOL_FALSE@ef_j1.o ef_jn.o erf_lgamma.o ef_log.o ef_log10.o \
-@USE_LIBTOOL_FALSE@ef_pow.o ef_rem_pio2.o ef_remainder.o ef_scalb.o \
-@USE_LIBTOOL_FALSE@ef_sinh.o ef_sqrt.o wf_acos.o wf_acosh.o wf_asin.o \
-@USE_LIBTOOL_FALSE@wf_atan2.o wf_atanh.o wf_cosh.o wf_exp.o wf_fmod.o \
-@USE_LIBTOOL_FALSE@wf_gamma.o wrf_gamma.o wf_hypot.o wf_j0.o wf_j1.o \
-@USE_LIBTOOL_FALSE@wf_jn.o wf_lgamma.o wrf_lgamma.o wf_log.o wf_log10.o \
-@USE_LIBTOOL_FALSE@wf_pow.o wf_remainder.o wf_scalb.o wf_sinh.o \
-@USE_LIBTOOL_FALSE@wf_sqrt.o wf_cabs.o wf_drem.o sf_asinh.o sf_atan.o \
-@USE_LIBTOOL_FALSE@sf_ceil.o sf_cos.o sf_erf.o sf_fabs.o sf_floor.o \
-@USE_LIBTOOL_FALSE@sf_frexp.o sf_isnan.o sf_ldexp.o sf_signif.o \
-@USE_LIBTOOL_FALSE@sf_sin.o sf_tan.o sf_tanh.o sf_isinf.o
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  k_standard.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@k_rem_pio2.$(OBJEXT) k_cos.$(OBJEXT) k_sin.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@k_tan.$(OBJEXT) e_acos.$(OBJEXT) e_acosh.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@e_asin.$(OBJEXT) e_atan2.$(OBJEXT) e_atanh.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@e_cosh.$(OBJEXT) e_exp.$(OBJEXT) e_fmod.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@er_gamma.$(OBJEXT) e_hypot.$(OBJEXT) e_j0.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@e_j1.$(OBJEXT) e_jn.$(OBJEXT) er_lgamma.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@e_log.$(OBJEXT) e_log10.$(OBJEXT) e_pow.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@e_rem_pio2.$(OBJEXT) e_remainder.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@e_scalb.$(OBJEXT) e_sinh.$(OBJEXT) e_sqrt.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@w_acos.$(OBJEXT) w_acosh.$(OBJEXT) w_asin.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@w_atan2.$(OBJEXT) w_atanh.$(OBJEXT) w_cosh.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@w_exp.$(OBJEXT) w_fmod.$(OBJEXT) w_gamma.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wr_gamma.$(OBJEXT) w_hypot.$(OBJEXT) w_j0.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@w_j1.$(OBJEXT) w_jn.$(OBJEXT) w_lgamma.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wr_lgamma.$(OBJEXT) w_log.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@w_log10.$(OBJEXT) w_pow.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@w_remainder.$(OBJEXT) w_scalb.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@w_sinh.$(OBJEXT) w_sqrt.$(OBJEXT) w_cabs.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@w_drem.$(OBJEXT) s_asinh.$(OBJEXT) s_atan.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_ceil.$(OBJEXT) s_cos.$(OBJEXT) s_erf.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_fabs.$(OBJEXT) s_floor.$(OBJEXT) s_frexp.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_isnan.$(OBJEXT) s_ldexp.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_signif.$(OBJEXT) s_sin.$(OBJEXT) s_tan.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_tanh.$(OBJEXT) s_isinf.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@s_infconst.$(OBJEXT) w_exp2.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@w_tgamma.$(OBJEXT) kf_rem_pio2.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@kf_cos.$(OBJEXT) kf_sin.$(OBJEXT) kf_tan.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@ef_acos.$(OBJEXT) ef_acosh.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@ef_asin.$(OBJEXT) ef_atan2.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@ef_atanh.$(OBJEXT) ef_cosh.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@ef_exp.$(OBJEXT) ef_fmod.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@erf_gamma.$(OBJEXT) ef_hypot.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@ef_j0.$(OBJEXT) ef_j1.$(OBJEXT) ef_jn.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@erf_lgamma.$(OBJEXT) ef_log.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@ef_log10.$(OBJEXT) ef_pow.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@ef_rem_pio2.$(OBJEXT) ef_remainder.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@ef_scalb.$(OBJEXT) ef_sinh.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@ef_sqrt.$(OBJEXT) wf_acos.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wf_acosh.$(OBJEXT) wf_asin.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wf_atan2.$(OBJEXT) wf_atanh.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wf_cosh.$(OBJEXT) wf_exp.$(OBJEXT) wf_fmod.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wf_gamma.$(OBJEXT) wrf_gamma.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wf_hypot.$(OBJEXT) wf_j0.$(OBJEXT) wf_j1.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wf_jn.$(OBJEXT) wf_lgamma.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wrf_lgamma.$(OBJEXT) wf_log.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wf_log10.$(OBJEXT) wf_pow.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wf_remainder.$(OBJEXT) wf_scalb.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wf_sinh.$(OBJEXT) wf_sqrt.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wf_cabs.$(OBJEXT) wf_drem.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_asinh.$(OBJEXT) sf_atan.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_ceil.$(OBJEXT) sf_cos.$(OBJEXT) sf_erf.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_fabs.$(OBJEXT) sf_floor.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_frexp.$(OBJEXT) sf_isnan.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_ldexp.$(OBJEXT) sf_signif.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_sin.$(OBJEXT) sf_tan.$(OBJEXT) sf_tanh.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sf_isinf.$(OBJEXT) wf_exp2.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wf_tgamma.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 libmath_la_LIBADD = 
@@ -219,23 +257,24 @@ libmath_la_LIBADD =
 @USE_LIBTOOL_TRUE@w_cabs.lo w_drem.lo s_asinh.lo s_atan.lo s_ceil.lo \
 @USE_LIBTOOL_TRUE@s_cos.lo s_erf.lo s_fabs.lo s_floor.lo s_frexp.lo \
 @USE_LIBTOOL_TRUE@s_isnan.lo s_ldexp.lo s_signif.lo s_sin.lo s_tan.lo \
-@USE_LIBTOOL_TRUE@s_tanh.lo s_isinf.lo s_infconst.lo kf_rem_pio2.lo \
-@USE_LIBTOOL_TRUE@kf_cos.lo kf_sin.lo kf_tan.lo ef_acos.lo ef_acosh.lo \
-@USE_LIBTOOL_TRUE@ef_asin.lo ef_atan2.lo ef_atanh.lo ef_cosh.lo \
-@USE_LIBTOOL_TRUE@ef_exp.lo ef_fmod.lo erf_gamma.lo ef_hypot.lo \
-@USE_LIBTOOL_TRUE@ef_j0.lo ef_j1.lo ef_jn.lo erf_lgamma.lo ef_log.lo \
-@USE_LIBTOOL_TRUE@ef_log10.lo ef_pow.lo ef_rem_pio2.lo ef_remainder.lo \
-@USE_LIBTOOL_TRUE@ef_scalb.lo ef_sinh.lo ef_sqrt.lo wf_acos.lo \
-@USE_LIBTOOL_TRUE@wf_acosh.lo wf_asin.lo wf_atan2.lo wf_atanh.lo \
-@USE_LIBTOOL_TRUE@wf_cosh.lo wf_exp.lo wf_fmod.lo wf_gamma.lo \
-@USE_LIBTOOL_TRUE@wrf_gamma.lo wf_hypot.lo wf_j0.lo wf_j1.lo wf_jn.lo \
-@USE_LIBTOOL_TRUE@wf_lgamma.lo wrf_lgamma.lo wf_log.lo wf_log10.lo \
-@USE_LIBTOOL_TRUE@wf_pow.lo wf_remainder.lo wf_scalb.lo wf_sinh.lo \
-@USE_LIBTOOL_TRUE@wf_sqrt.lo wf_cabs.lo wf_drem.lo sf_asinh.lo \
-@USE_LIBTOOL_TRUE@sf_atan.lo sf_ceil.lo sf_cos.lo sf_erf.lo sf_fabs.lo \
-@USE_LIBTOOL_TRUE@sf_floor.lo sf_frexp.lo sf_isnan.lo sf_ldexp.lo \
-@USE_LIBTOOL_TRUE@sf_signif.lo sf_sin.lo sf_tan.lo sf_tanh.lo \
-@USE_LIBTOOL_TRUE@sf_isinf.lo
+@USE_LIBTOOL_TRUE@s_tanh.lo s_isinf.lo s_infconst.lo w_exp2.lo \
+@USE_LIBTOOL_TRUE@w_tgamma.lo kf_rem_pio2.lo kf_cos.lo kf_sin.lo \
+@USE_LIBTOOL_TRUE@kf_tan.lo ef_acos.lo ef_acosh.lo ef_asin.lo \
+@USE_LIBTOOL_TRUE@ef_atan2.lo ef_atanh.lo ef_cosh.lo ef_exp.lo \
+@USE_LIBTOOL_TRUE@ef_fmod.lo erf_gamma.lo ef_hypot.lo ef_j0.lo ef_j1.lo \
+@USE_LIBTOOL_TRUE@ef_jn.lo erf_lgamma.lo ef_log.lo ef_log10.lo \
+@USE_LIBTOOL_TRUE@ef_pow.lo ef_rem_pio2.lo ef_remainder.lo ef_scalb.lo \
+@USE_LIBTOOL_TRUE@ef_sinh.lo ef_sqrt.lo wf_acos.lo wf_acosh.lo \
+@USE_LIBTOOL_TRUE@wf_asin.lo wf_atan2.lo wf_atanh.lo wf_cosh.lo \
+@USE_LIBTOOL_TRUE@wf_exp.lo wf_fmod.lo wf_gamma.lo wrf_gamma.lo \
+@USE_LIBTOOL_TRUE@wf_hypot.lo wf_j0.lo wf_j1.lo wf_jn.lo wf_lgamma.lo \
+@USE_LIBTOOL_TRUE@wrf_lgamma.lo wf_log.lo wf_log10.lo wf_pow.lo \
+@USE_LIBTOOL_TRUE@wf_remainder.lo wf_scalb.lo wf_sinh.lo wf_sqrt.lo \
+@USE_LIBTOOL_TRUE@wf_cabs.lo wf_drem.lo sf_asinh.lo sf_atan.lo \
+@USE_LIBTOOL_TRUE@sf_ceil.lo sf_cos.lo sf_erf.lo sf_fabs.lo sf_floor.lo \
+@USE_LIBTOOL_TRUE@sf_frexp.lo sf_isnan.lo sf_ldexp.lo sf_signif.lo \
+@USE_LIBTOOL_TRUE@sf_sin.lo sf_tan.lo sf_tanh.lo sf_isinf.lo wf_exp2.lo \
+@USE_LIBTOOL_TRUE@wf_tgamma.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -255,7 +294,7 @@ OBJECTS = $(lib_a_OBJECTS) $(libmath_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .def .lo .o .s
+.SUFFIXES: .S .c .def .lo .o .obj .s
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(srcdir)/../../Makefile.shared
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus math/Makefile
 
@@ -276,6 +315,11 @@ maintainer-clean-noinstLIBRARIES:
 .c.o:
 	$(COMPILE) -c $<
 
+# FIXME: We should only use cygpath when building on Windows,
+# and only if it is available.
+.c.obj:
+	$(COMPILE) -c `cygpath -w $<`
+
 .s.o:
 	$(COMPILE) -c $<
 
@@ -284,6 +328,7 @@ maintainer-clean-noinstLIBRARIES:
 
 mostlyclean-compile:
 	-rm -f *.o core *.core
+	-rm -f *.$(OBJEXT)
 
 clean-compile:
 

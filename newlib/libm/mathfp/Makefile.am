@@ -20,7 +20,8 @@ src =	s_acos.c s_frexp.c s_mathcnst.c \
 	er_gamma.c er_lgamma.c \
 	s_erf.c e_j0.c e_j1.c w_jn.c e_hypot.c \
 	w_cabs.c w_drem.c s_asinh.c s_fmod.c \
-	e_scalb.c s_infconst.c s_signif.c
+	e_scalb.c s_infconst.c s_signif.c \
+	s_exp2.c s_tgamma.c
 
 fsrc =	sf_ceil.c \
 	sf_acos.c sf_frexp.c \
@@ -38,7 +39,8 @@ fsrc =	sf_ceil.c \
 	erf_gamma.c erf_lgamma.c \
 	sf_erf.c ef_j0.c ef_j1.c wf_jn.c ef_hypot.c \
 	wf_cabs.c wf_drem.c sf_asinh.c sf_fmod.c \
-	ef_scalb.c sf_signif.c
+	ef_scalb.c sf_signif.c \
+	sf_exp2.c sf_tgamma.c
 
 libmathfp_la_LDFLAGS = -Xcompiler -nostdlib
 

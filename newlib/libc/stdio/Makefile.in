@@ -69,8 +69,12 @@ AS = @AS@
 CC = @CC@
 CPP = @CPP@
 CRT0 = @CRT0@
+CXX = @CXX@
+CXXCPP = @CXXCPP@
 DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
+GCJ = @GCJ@
+GCJFLAGS = @GCJFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBC_EXTRA_DEF = @LIBC_EXTRA_DEF@
 LIBC_EXTRA_LIB = @LIBC_EXTRA_LIB@
@@ -87,8 +91,10 @@ MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
 OBJDUMP = @OBJDUMP@
+OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
+STRIP = @STRIP@
 VERSION = @VERSION@
 aext = @aext@
 extra_dir = @extra_dir@
@@ -258,20 +264,31 @@ CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES =  vfiprintf.$(oext) \
 @USE_LIBTOOL_FALSE@vfprintf.$(oext)
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  clearerr.o fclose.o fdopen.o feof.o \
-@USE_LIBTOOL_FALSE@ferror.o fflush.o fgetc.o fgetpos.o fgets.o fileno.o \
-@USE_LIBTOOL_FALSE@findfp.o fiprintf.o flags.o fopen.o fprintf.o \
-@USE_LIBTOOL_FALSE@fputc.o fputs.o fread.o freopen.o fscanf.o fseek.o \
-@USE_LIBTOOL_FALSE@fsetpos.o ftell.o fvwrite.o fwalk.o fwrite.o getc.o \
-@USE_LIBTOOL_FALSE@getchar.o getc_u.o getchar_u.o gets.o getw.o \
-@USE_LIBTOOL_FALSE@iprintf.o makebuf.o mktemp.o perror.o printf.o \
-@USE_LIBTOOL_FALSE@putc.o putchar.o putc_u.o putchar_u.o puts.o putw.o \
-@USE_LIBTOOL_FALSE@refill.o remove.o rename.o rewind.o rget.o scanf.o \
-@USE_LIBTOOL_FALSE@setbuf.o setbuffer.o setlinebuf.o setvbuf.o \
-@USE_LIBTOOL_FALSE@siprintf.o snprintf.o sprintf.o sscanf.o stdio.o \
-@USE_LIBTOOL_FALSE@tmpfile.o tmpnam.o ungetc.o vfscanf.o vprintf.o \
-@USE_LIBTOOL_FALSE@vscanf.o vsnprintf.o vsprintf.o vsscanf.o wbuf.o \
-@USE_LIBTOOL_FALSE@wsetup.o
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  clearerr.$(OBJEXT) fclose.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@fdopen.$(OBJEXT) feof.$(OBJEXT) ferror.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@fflush.$(OBJEXT) fgetc.$(OBJEXT) fgetpos.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@fgets.$(OBJEXT) fileno.$(OBJEXT) findfp.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@fiprintf.$(OBJEXT) flags.$(OBJEXT) fopen.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@fprintf.$(OBJEXT) fputc.$(OBJEXT) fputs.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@fread.$(OBJEXT) freopen.$(OBJEXT) fscanf.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@fseek.$(OBJEXT) fsetpos.$(OBJEXT) ftell.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@fvwrite.$(OBJEXT) fwalk.$(OBJEXT) fwrite.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@getc.$(OBJEXT) getchar.$(OBJEXT) getc_u.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@getchar_u.$(OBJEXT) gets.$(OBJEXT) getw.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@iprintf.$(OBJEXT) makebuf.$(OBJEXT) mktemp.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@perror.$(OBJEXT) printf.$(OBJEXT) putc.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@putchar.$(OBJEXT) putc_u.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@putchar_u.$(OBJEXT) puts.$(OBJEXT) putw.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@refill.$(OBJEXT) remove.$(OBJEXT) rename.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@rewind.$(OBJEXT) rget.$(OBJEXT) scanf.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@setbuf.$(OBJEXT) setbuffer.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@setlinebuf.$(OBJEXT) setvbuf.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@siprintf.$(OBJEXT) snprintf.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sprintf.$(OBJEXT) sscanf.$(OBJEXT) stdio.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@tmpfile.$(OBJEXT) tmpnam.$(OBJEXT) ungetc.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@vfscanf.$(OBJEXT) vprintf.$(OBJEXT) vscanf.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@vsnprintf.$(OBJEXT) vsprintf.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@vsscanf.$(OBJEXT) wbuf.$(OBJEXT) wsetup.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 @USE_LIBTOOL_TRUE@libstdio_la_DEPENDENCIES =  vfiprintf.$(oext) \
@@ -310,7 +327,7 @@ OBJECTS = $(lib_a_OBJECTS) $(libstdio_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .def .lo .o .s
+.SUFFIXES: .S .c .def .lo .o .obj .s
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(srcdir)/../../Makefile.shared
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus stdio/Makefile
 
@@ -331,6 +348,11 @@ maintainer-clean-noinstLIBRARIES:
 .c.o:
 	$(COMPILE) -c $<
 
+# FIXME: We should only use cygpath when building on Windows,
+# and only if it is available.
+.c.obj:
+	$(COMPILE) -c `cygpath -w $<`
+
 .s.o:
 	$(COMPILE) -c $<
 
@@ -339,6 +361,7 @@ maintainer-clean-noinstLIBRARIES:
 
 mostlyclean-compile:
 	-rm -f *.o core *.core
+	-rm -f *.$(OBJEXT)
 
 clean-compile:
 
