@@ -31,9 +31,6 @@ http://cygwin.com/snapshots/
 
 @subsection How is the DOS/Unix CR/LF thing handled?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
 Let's start with some background.
 
 In UNIX, a file is a file and what the file contains is whatever the
