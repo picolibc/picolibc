@@ -1,3 +1,8 @@
+2004-08-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* errno.cc (errmap): Add ERROR_TOO_MANY_LINKS -> EMLINK mapping.
+	* syscalls.cc (link): Only copy files if FS doesn't support hard links.
+
 2004-07-26  Christopher January  <chris@atomice.net>
 
 	* fhandler_proc.cc (format_proc_cpuinfo): Remove Intel-specific flags

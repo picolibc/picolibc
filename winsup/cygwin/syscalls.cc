@@ -707,6 +707,24 @@ link (const char *a, const char *b)
       if (CreateHardLinkA (real_b, real_a, NULL))
 	goto success;
 
+      /* There are two cases to consider:
+	 - The FS doesn't support hard links ==> ERROR_INVALID_FUNCTION
+	   We copy the file.
+	 - CreateHardLinkA is not supported  ==> ERROR_PROC_NOT_FOUND
+	   In that case (<= NT4) we try the old-style method.
+	 Any other error should be taken seriously. */
+      if (GetLastError () == ERROR_INVALID_FUNCTION)
+	{
+	  syscall_printf ("FS doesn't support hard links: Copy file");
+	  goto docopy;
+	}
+      if (GetLastError () != ERROR_PROC_NOT_FOUND)
+        {
+	  syscall_printf ("CreateHardLinkA failed");
+	  __seterrno ();
+	  goto done;
+	}
+
       HANDLE hFileSource;
 
       WIN32_STREAM_ID StreamId;
@@ -717,6 +735,7 @@ link (const char *a, const char *b)
       WCHAR wbuf[CYG_MAX_PATH];
 
       BOOL bSuccess;
+      DWORD write_err;
 
       hFileSource = CreateFile (real_a, FILE_WRITE_ATTRIBUTES,
 				FILE_SHARE_READ | FILE_SHARE_WRITE /*| FILE_SHARE_DELETE*/,
@@ -767,7 +786,10 @@ link (const char *a, const char *b)
 		);
 
 	  if (!bSuccess)
-	    syscall_printf ("cannot write linkname, %E");
+	    {
+	      write_err = GetLastError ();
+	      syscall_printf ("cannot write linkname, %E");
+	    }
 
 	  /* Free context */
 	  BackupWrite (
@@ -780,12 +802,25 @@ link (const char *a, const char *b)
 	    &lpContext);
 	}
       else
-	syscall_printf ("cannot write streamId, %E");
+	{
+	  write_err = GetLastError ();
+	  syscall_printf ("cannot write streamId, %E");
+	}
 
       CloseHandle (hFileSource);
 
       if (!bSuccess)
-	goto docopy;
+        {
+	  /* Only copy file if FS doesn't support hard links */
+	  if (write_err == ERROR_INVALID_FUNCTION)
+	    {
+	      syscall_printf ("FS doesn't support hard links: Copy file");
+	      goto docopy;
+	    }
+
+	  __seterrno_from_win_error (write_err);
+	  goto done;
+	}
 
     success:
       res = 0;
