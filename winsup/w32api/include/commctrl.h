@@ -167,8 +167,10 @@ extern "C" {
 #define TTN_LAST	((UINT)-549)
 #define TCN_FIRST	((UINT)-550)
 #define TCN_LAST	((UINT)-580)
-#define CDN_FIRST	((UINT)-601)
+#ifndef CDN_FIRST
+#define CDN_FIRST	((UINT)-601) /* also in commdlg.h */
 #define CDN_LAST	((UINT)-699)
+#endif
 #define TBN_FIRST	((UINT)-700)
 #define TBN_LAST	((UINT)-720)
 #define UDN_FIRST	((UINT)-721)
