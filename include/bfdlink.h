@@ -81,6 +81,7 @@ struct bfd_link_hash_entry
 {
   /* Base hash table entry structure.  */
   struct bfd_hash_entry root;
+
   /* Type of this entry.  */
   enum bfd_link_hash_type type;
 
@@ -102,7 +103,8 @@ struct bfd_link_hash_entry
      symbol is undefined and becomes defined, this field will
      automatically be non-NULL since the symbol will have been on the
      undefined symbol list.  */
-  struct bfd_link_hash_entry *next;
+  struct bfd_link_hash_entry *und_next;
+
   /* A union of information depending upon the type.  */
   union
     {
@@ -283,8 +285,8 @@ struct bfd_link_info
   /* TRUE if global symbols in discarded sections should be stripped.  */
   unsigned int strip_discarded: 1;
 
-  /* TRUE if relaxation is being finalized.  */
-  unsigned int relax_finalizing: 1;
+  /* TRUE if the final relax pass is needed.  */
+  unsigned int need_relax_finalize: 1;
 
   /* TRUE if generating a position independent executable.  */
   unsigned int pie: 1;
@@ -365,11 +367,6 @@ struct bfd_link_info
   /* The function to call when the executable or shared object is
      unloaded.  */
   const char *fini_function;
-
-  /* If non-zero, specifies that branches which are problematic for the
-     MPC860 C0 (or earlier) should be checked for and modified.  It gives the
-     number of bytes that should be checked at the end of each text page.  */
-  int mpc860c0;
 
   /* Non-zero if auto-import thunks for DATA items in pei386 DLLs
      should be generated/linked against.  Set to 1 if this feature

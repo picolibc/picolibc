@@ -130,6 +130,12 @@ typedef struct disassemble_info {
   int (* symbol_at_address_func)
     (bfd_vma addr, struct disassemble_info * info);
 
+  /* Function called to check if a SYMBOL is can be displayed to the user.
+     This is used by some ports that want to hide special symbols when
+     displaying debugging outout.  */
+  bfd_boolean (* symbol_is_valid)
+    (asymbol *, struct disassemble_info * info);
+    
   /* These are for buffer_read_memory.  */
   bfd_byte *buffer;
   bfd_vma buffer_vma;
@@ -141,7 +147,7 @@ typedef struct disassemble_info {
       the same value in order to get reasonable looking output.  */
   int bytes_per_line;
 
-  /* the next two variables control the way objdump displays the raw data */
+  /* The next two variables control the way objdump displays the raw data.  */
   /* For example, if bytes_per_line is 8 and bytes_per_chunk is 4, the */
   /* output will look like this:
      00:   00000000 00000000
@@ -251,11 +257,15 @@ extern void print_arm_disassembler_options (FILE *);
 extern void parse_arm_disassembler_option (char *);
 extern int get_arm_regname_num_options (void);
 extern int set_arm_regname_option (int);
-extern int get_arm_regnames
-  (int, const char **, const char **, const char ***);
+extern int get_arm_regnames (int, const char **, const char **, const char ***);
+extern bfd_boolean arm_symbol_is_valid (asymbol *, struct disassemble_info *);
 
 /* Fetch the disassembler for a given BFD, if that support is available.  */
 extern disassembler_ftype disassembler (bfd *);
+
+/* Amend the disassemble_info structure as necessary for the target architecture.
+   Should only be called after initialising the info->arch field.  */
+extern void disassemble_init_for_target (struct disassemble_info * info);
 
 /* Document any target specific options available from the disassembler.  */
 extern void disassembler_usage (FILE *);
@@ -284,6 +294,10 @@ extern void generic_print_address
 extern int generic_symbol_at_address
   (bfd_vma, struct disassemble_info *);
 
+/* Also always true.  */  
+extern bfd_boolean generic_symbol_is_valid
+  (asymbol *, struct disassemble_info *);
+  
 /* Method to initialize a disassemble_info struct.  This should be
    called by all applications creating such a struct.  */
 extern void init_disassemble_info (struct disassemble_info *info, void *stream,

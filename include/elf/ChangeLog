@@ -1,3 +1,12 @@
+2003-12-06  Alan Modra  <amodra@bigpond.net.au>
+
+	From Jan Beulich <JBeulich@novell.com>
+	* common.h (DT_HIOS): Correct value.
+
+2003-12-03   Kazuhiro Inaoka  <inaoka.kazuhiro@renesas.com>
+
+	* elf/m32r.h: Add new machine type m32r2 and instruction modes.
+
 2003-11-06  Alan Modra  <amodra@bigpond.net.au>
 
 	* ppc.h (R_PPC_RELAX32PC): Define.
