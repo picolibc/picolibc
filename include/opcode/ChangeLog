@@ -1,3 +1,9 @@
+2000-03-27  Nick Clifton  <nickc@cygnus.com>
+
+	* d30v.h (SHORT_A1): Fix value.
+	(SHORT_AR): Renumber so that it is at the end of the list of short
+	instructions, not the end of the list of long instructions.
+
 2000-03-26  Alan Modra  <alan@linuxcare.com>
 
 	* i386.h: (UNIXWARE_COMPAT): Rename to SYSV386_COMPAT as the

@@ -101,7 +101,7 @@ struct d30v_opcode
 #define SHORT_A5      36      /* SHORT_A with a 5-bit immediate instead of 6 */
 #define SHORT_CMP     38      /* special form for CMPcc */
 #define SHORT_CMPU    40      /* special form for CMPUcc */
-#define SHORT_A1      48      /* special form of SHORT_A for MACa opcodes where a=1 */
+#define SHORT_A1      42      /* special form of SHORT_A for MACa opcodes where a=1 */
 #define SHORT_AA      44      /* SHORT_A with the first register an accumulator */
 #define SHORT_RA      46      /* SHORT_A with the second register an accumulator */
 #define SHORT_MODINC  48      
@@ -111,20 +111,20 @@ struct d30v_opcode
 #define SHORT_UF      52
 #define SHORT_A2      53
 #define SHORT_NONE    55      /* no operands */
-#define LONG          56
-#define LONG_U        57      /* unary LONG */
-#define LONG_Ur       58      /* LONG pc-relative */
-#define LONG_CMP      59      /* special form for CMPcc and CMPUcc */
-#define LONG_M        60      /* Memory long for ldb, stb */
-#define LONG_M2       61      /* Memory long for ld2w, st2w */
-#define LONG_2        62      /* LONG with 2 operands; jmptnz */
-#define LONG_2r       63      /* LONG with 2 operands; bratnz */
-#define LONG_2b       64      /* LONG_2 with modifier of 3 */
-#define LONG_2br      65      /* LONG_2r with modifier of 3 */
-#define LONG_D        66      /* for DJMPI*/
-#define LONG_Dr       67      /* for DBRAI*/
-#define LONG_Dbr      68      /* for repeati*/
-#define SHORT_AR	69	/* like SHORT_AA but only accept register as third parameter  */
+#define SHORT_AR      56      /* like SHORT_AA but only accept register as third parameter  */
+#define LONG          57
+#define LONG_U        58      /* unary LONG */
+#define LONG_Ur       59      /* LONG pc-relative */
+#define LONG_CMP      60      /* special form for CMPcc and CMPUcc */
+#define LONG_M        61      /* Memory long for ldb, stb */
+#define LONG_M2       62      /* Memory long for ld2w, st2w */
+#define LONG_2        63      /* LONG with 2 operands; jmptnz */
+#define LONG_2r       64      /* LONG with 2 operands; bratnz */
+#define LONG_2b       65      /* LONG_2 with modifier of 3 */
+#define LONG_2br      66      /* LONG_2r with modifier of 3 */
+#define LONG_D        67      /* for DJMPI */
+#define LONG_Dr       68      /* for DBRAI */
+#define LONG_Dbr      69      /* for repeati */
 
   /* the execution unit(s) used */
   int unit;
