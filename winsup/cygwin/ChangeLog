@@ -1,3 +1,7 @@
+Tue May 22 12:20:07 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* signal.cc (sleep): Protect with sigframe.
+
 Tue May 22 17:58:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* security.cc (get_file_attribute): Don't set errno.

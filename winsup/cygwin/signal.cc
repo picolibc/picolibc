@@ -68,6 +68,7 @@ sleep (unsigned int seconds)
   int rc;
   unsigned start_time;
   unsigned int res;
+  sigframe thisframe (mainthread);
 
   start_time = GetTickCount ();
 
