@@ -75,6 +75,7 @@ END_RELOC_NUMBERS(R_FRV_max)
 #define EF_FRV_CPU_SIMPLE	0x03000000	/* SIMPLE */
 #define EF_FRV_CPU_TOMCAT	0x04000000	/* Tomcat, FR500 prototype */
 #define EF_FRV_CPU_FR400	0x05000000	/* FRV400 */
+#define EF_FRV_CPU_FR550	0x06000000	/* FRV550 */
 
 						/* Mask of PIC related bits */
 #define	EF_FRV_PIC_FLAGS	(EF_FRV_PIC | EF_FRV_LIBPIC | EF_FRV_BIGPIC)

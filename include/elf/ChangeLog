@@ -1,3 +1,7 @@
+2003-10-06  Dave Brolley  <brolley@redhat.com>
+
+	* frv.h (EF_FRV_CPU_FR550): New macro.
+
 2003-09-30  Chris Demetriou  <cgd@broadcom.com>
 
 	* mips.h (E_MIPS_ARCH_64R2): New define.
