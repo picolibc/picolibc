@@ -238,11 +238,11 @@ cygsid::get_id (BOOL search_grp, int *type)
   return id;
 }
 
-static BOOL
+static inline BOOL
 legal_sid_type (SID_NAME_USE type)
 {
-  return type == SidTypeUser || type == SidTypeGroup
-		 || SidTypeAlias || SidTypeWellKnownGroup;
+  return type == SidTypeUser  || type == SidTypeGroup
+      || type == SidTypeAlias || type == SidTypeWellKnownGroup;
 }
 
 BOOL
