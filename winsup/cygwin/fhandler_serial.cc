@@ -497,21 +497,30 @@ fhandler_serial::ioctl (unsigned int cmd, void *buffer)
 int
 fhandler_serial::tcflush (int queue)
 {
-  if (queue == TCOFLUSH || queue == TCIOFLUSH)
-    PurgeComm (get_handle (), PURGE_TXABORT | PURGE_TXCLEAR);
+  DWORD flags;
 
-  if (queue == TCIFLUSH || queue == TCIOFLUSH)
-    /* Input flushing by polling until nothing turns up
-       (we stop after 1000 chars anyway) */
-    for (int max = 1000; max > 0; max--)
-      {
-	COMSTAT st;
-	if (!PurgeComm (get_handle (), PURGE_RXABORT | PURGE_RXCLEAR))
-	  break;
-	low_priority_sleep (100);
-	if (!ClearCommError (get_handle (), &ev, &st) || !st.cbInQue)
-	  break;
-      }
+  switch (queue)
+    {
+    case TCOFLUSH:
+      flags = PURGE_TXABORT | PURGE_TXCLEAR;
+      break;
+    case TCIFLUSH:
+      flags = PURGE_RXABORT | PURGE_RXCLEAR;
+      break;
+    case TCIOFLUSH:
+      flags = PURGE_TXABORT | PURGE_TXCLEAR | PURGE_RXABORT | PURGE_RXCLEAR;
+      break;
+    default:
+      termios_printf ("Invalid tcflush queue %d", queue);
+      set_errno (EINVAL);
+      return -1;
+    }
+	
+  if (!PurgeComm (get_handle (), flags))
+    {
+      __seterrno ();
+      return -1;
+    }
 
   return 0;
 }

@@ -1,3 +1,8 @@
+2003-12-11  Brian Ford  <ford@vss.fsi.com>
+
+	* fhandler_serial.cc (fhandler_serial::tcflush): Simplify.  Remove
+	read polling loop to avoid a hang with streaming devices.
+
 2003-12-11  Christopher Faylor  <cgf@redhat.com>
 
 	* pinfo.cc (_pinfo::set_ctty): Correct stupid typo.
