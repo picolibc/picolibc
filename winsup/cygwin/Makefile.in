@@ -340,7 +340,7 @@ maintainer-clean realclean: clean
 
 # Rule to build cygwin.dll
 $(TEST_DLL_NAME): $(LDSCRIPT) $(DLL_OFILES) $(DEF_FILE) $(DLL_IMPORTS) $(LIBC) $(LIBM) $(API_VER) Makefile winver_stamp
-	$(CXX) $(CXXFLAGS) -nostdlib -Wl,-T$(firstword $^) -Wl,--out-implib,cygdll.a -shared -o $@ \
+	$(CXX) $(CXXFLAGS) $(nostdlib) -Wl,-T$(firstword $^) -Wl,--out-implib,cygdll.a -shared -o $@ \
 	-e $(DLL_ENTRY) $(DEF_FILE) $(DLL_OFILES) version.o winver.o \
 	$(MALLOC_OBJ) $(LIBM) $(LIBC) \
 	-lgcc $(DLL_IMPORTS)

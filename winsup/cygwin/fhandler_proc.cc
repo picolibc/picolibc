@@ -606,7 +606,7 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 	{
 	  bufptr += __small_sprintf (bufptr, "processor       : %d\n", cpu_number);
 	  read_value ("VendorIdentifier", REG_SZ);
-	  bufptr += __small_sprintf (bufptr, "vendor id       : %s\n", szBuffer);
+	  bufptr += __small_sprintf (bufptr, "vendor_id       : %s\n", szBuffer);
 	  read_value ("Identifier", REG_SZ);
 	  bufptr += __small_sprintf (bufptr, "identifier      : %s\n", szBuffer);
           if (wincap.is_winnt ())
@@ -640,7 +640,7 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 	  cpuid (&maxf, &vendor_id[0], &vendor_id[2], &vendor_id[1], 0);
 	  maxf &= 0xffff;
 	  vendor_id[3] = 0;
-	  bufptr += __small_sprintf (bufptr, "vendor id       : %s\n", (char *)vendor_id);
+	  bufptr += __small_sprintf (bufptr, "vendor_id       : %s\n", (char *)vendor_id);
           unsigned cpu_mhz  = 0;
           if (wincap.is_winnt ())
             {
