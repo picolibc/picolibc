@@ -222,9 +222,11 @@ class stack_info
 {
   int walk ();			/* Uses the "old" method */
   char *next_offset () {return *((char **) sf.AddrFrame.Offset);}
+  bool needargs;
+  DWORD dummy_frame;
 public:
-  STACKFRAME sf;		/* For storing the stack information */
-  void init (DWORD);		/* Called the first time that stack info is needed */
+  STACKFRAME sf;		 /* For storing the stack information */
+  void init (DWORD, bool, bool); /* Called the first time that stack info is needed */
 
   /* Postfix ++ iterates over the stack, returning zero when nothing is left. */
   int operator ++(int) { return this->walk (); }
@@ -239,13 +241,20 @@ static signal_dispatch sigsave;
 
 /* Initialize everything needed to start iterating. */
 void
-stack_info::init (DWORD ebp)
+stack_info::init (DWORD ebp, bool wantargs, bool goodframe)
 {
 # define debp ((DWORD *) ebp)
   memset (&sf, 0, sizeof (sf));
-  sf.AddrFrame.Offset = ebp;
+  if (!goodframe)
+    sf.AddrFrame.Offset = ebp;
+  else
+    {
+      dummy_frame = ebp;
+      sf.AddrFrame.Offset = (DWORD) &dummy_frame;
+    }
   sf.AddrReturn.Offset = debp[1];
   sf.AddrFrame.Mode = AddrModeFlat;
+  needargs = wantargs;
 # undef debp
 }
 
@@ -255,13 +264,11 @@ int
 stack_info::walk ()
 {
   char **ebp;
-  if ((ebp = (char **) next_offset ()) != NULL)
-    {
-      sf.AddrFrame.Offset = (DWORD) ebp;
-      sf.AddrPC.Offset = sf.AddrReturn.Offset;
-    }
-  else
+  if ((ebp = (char **) next_offset ()) == NULL)
     return 0;
+
+  sf.AddrFrame.Offset = (DWORD) ebp;
+  sf.AddrPC.Offset = sf.AddrReturn.Offset;
 
   if (!sf.AddrPC.Offset)
     return 0;		/* stack frames are exhausted */
@@ -269,14 +276,16 @@ stack_info::walk ()
   /* The return address always follows the stack pointer */
   sf.AddrReturn.Offset = (DWORD) *++ebp;
 
-  /* The arguments follow the return address */
-  for (unsigned i = 0; i < NPARAMS; i++)
-    sf.Params[i] = (DWORD) *++ebp;
+  if (needargs)
+    /* The arguments follow the return address */
+    for (unsigned i = 0; i < NPARAMS; i++)
+      sf.Params[i] = (DWORD) *++ebp;
+
   return 1;
 }
 
 static void
-stackdump (DWORD ebp, int open_file)
+stackdump (DWORD ebp, int open_file, bool isexception)
 {
   extern unsigned long rlim_core;
 
@@ -288,7 +297,7 @@ stackdump (DWORD ebp, int open_file)
 
   int i;
 
-  thestack.init (ebp);		/* Initialize from the input CONTEXT */
+  thestack.init (ebp, 1, !isexception);	/* Initialize from the input CONTEXT */
   small_printf ("Stack trace:\r\nFrame     Function  Args\r\n");
   for (i = 0; i < 16 && thestack++; i++)
     {
@@ -309,7 +318,7 @@ cygwin_stackdump ()
   CONTEXT c;
   c.ContextFlags = CONTEXT_FULL;
   GetThreadContext (GetCurrentThread (), &c);
-  stackdump (c.Ebp, 0);
+  stackdump (c.Ebp, 0, 0);
 }
 
 #define TIME_TO_WAIT_FOR_DEBUGGER 10000
@@ -510,7 +519,7 @@ handle_exceptions (EXCEPTION_RECORD *e, void *, CONTEXT *in, void *)
 
 	  open_stackdumpfile ();
 	  exception (e, in);
-	  stackdump ((DWORD) ebp, 0);
+	  stackdump ((DWORD) ebp, 0, 1);
 	}
 
       signal_exit (0x80 | sig);	// Flag signal + core dump
@@ -717,7 +726,7 @@ interrupt_on_return (sigthread *th, int sig, void *handler, struct sigaction& si
   if (!ebp)
     return 0;
 
-  thestack.init (ebp);  /* Initialize from the input CONTEXT */
+  thestack.init (ebp, 0, 1);  /* Initialize from the input CONTEXT */
   for (i = 0; i < 32 && thestack++ ; i++)
     if (th->exception || interruptible (thestack.sf.AddrReturn.Offset))
       {
@@ -1024,7 +1033,7 @@ sig_handle (int sig)
       c.ContextFlags = CONTEXT_FULL;
       GetThreadContext (hMainThread, &c);
       if (!try_to_debug ())
-	stackdump (c.Ebp, 1);
+	stackdump (c.Ebp, 1, 1);
       sig |= 0x80;
     }
   sigproc_printf ("signal %d, about to call do_exit", sig);

@@ -1,3 +1,19 @@
+Fri May  4 22:23:33 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (stack_info): Add some controls.
+	(stack_info::init): Add extra arguments to control method of
+	initialization..  If we have a known good frame, set things up so that
+	this frame is not skipped the first time through.  Record whether
+	caller cares about arguments or not.
+	(stack_info::walk): Don't store arguments if they're unwanted.
+	(stackdump): Add isexception parameter for use when called by exception
+	handler.
+	(cygwin_stackdump): Accomodate extra argument to stackdump.
+	(handle_exceptions): Ditto.
+	(sig_handle): Ditto.
+	(interrupt_on_return): Accomodate extra arguments to stack walk
+	initialization.
+
 Fri May  4 21:05:20 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* localtime.c: Revert exclusion of windows.h.
