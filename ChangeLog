@@ -1,5 +1,8 @@
 2002-10-02  Nathanael Nerode  <neroden@gcc.gnu.org>
 
+	* Makefile.tpl: Eliminate reference to all-gui, all-libproc.
+	* Makefile.in: Regenerate.
+
 	* Makefile.def: Remove order dependency comments.
 	* Makefile.tpl: Add explicit install-install dependencies.
 	* Makefile.in: Regenerate.
