@@ -36,6 +36,7 @@ lib_a_SOURCES = \
 	getc.c 				\
 	getchar.c 			\
 	gets.c 				\
+	getw.c				\
 	iprintf.c 			\
 	makebuf.c			\
 	mktemp.c 			\
@@ -44,6 +45,7 @@ lib_a_SOURCES = \
 	putc.c 				\
 	putchar.c 			\
 	puts.c 				\
+	putw.c				\
 	refill.c 			\
 	remove.c 			\
 	rename.c 			\
@@ -97,12 +99,14 @@ CHEWOUT_FILES = \
 	getc.def		\
 	getchar.def		\
 	gets.def		\
+	getw.def		\
 	iprintf.def		\
 	mktemp.def		\
 	perror.def		\
 	putc.def		\
 	putchar.def		\
 	puts.def		\
+	putw.def		\
 	remove.def		\
 	rename.def		\
 	rewind.def		\

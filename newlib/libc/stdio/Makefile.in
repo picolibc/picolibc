@@ -118,6 +118,7 @@ lib_a_SOURCES = \
 	getc.c 				\
 	getchar.c 			\
 	gets.c 				\
+	getw.c 				\
 	iprintf.c 			\
 	makebuf.c			\
 	mktemp.c 			\
@@ -126,6 +127,7 @@ lib_a_SOURCES = \
 	putc.c 				\
 	putchar.c 			\
 	puts.c 				\
+	putw.c 				\
 	refill.c 			\
 	remove.c 			\
 	rename.c 			\
@@ -177,12 +179,14 @@ CHEWOUT_FILES = \
 	getc.def		\
 	getchar.def		\
 	gets.def		\
+	getw.def		\
 	iprintf.def		\
 	mktemp.def		\
 	perror.def		\
 	putc.def		\
 	putchar.def		\
 	puts.def		\
+	putw.def		\
 	remove.def		\
 	rename.def		\
 	rewind.def		\
@@ -216,8 +220,8 @@ lib_a_DEPENDENCIES =  vfiprintf.o
 lib_a_OBJECTS =  clearerr.o fclose.o fdopen.o feof.o ferror.o fflush.o \
 fgetc.o fgetpos.o fgets.o fileno.o findfp.o fiprintf.o flags.o fopen.o \
 fprintf.o fputc.o fputs.o fread.o freopen.o fscanf.o fseek.o fsetpos.o \
-ftell.o fvwrite.o fwalk.o fwrite.o getc.o getchar.o gets.o iprintf.o \
-makebuf.o mktemp.o perror.o printf.o putc.o putchar.o puts.o refill.o \
+ftell.o fvwrite.o fwalk.o fwrite.o getc.o getchar.o gets.o getw.o iprintf.o \
+makebuf.o mktemp.o perror.o printf.o putc.o putchar.o puts.o putw.o refill.o \
 remove.o rename.o rewind.o rget.o scanf.o setbuf.o setvbuf.o siprintf.o \
 snprintf.o sprintf.o sscanf.o stdio.o tmpfile.o tmpnam.o ungetc.o \
 vfprintf.o vfscanf.o vprintf.o vsnprintf.o vsprintf.o wbuf.o wsetup.o

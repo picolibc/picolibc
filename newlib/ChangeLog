@@ -1,3 +1,12 @@
+Wed Mar  8 00:38:35 2000  Alexandre Oliva  <oliva@lsd.ic.unicamp.br>
+
+	* libc/stdio/Makefile.am (lib_a_SOURCES): Added getw.c and putw.c.
+	(CHEWOUT_FILES): Added getw.def and putw.def.
+	* libc/stdio/Makefile.in: Rebuilt.
+	* libc/stdio/stdio.tex: Include getw.def and putw.def.
+	* libc/stdio/getw.c: New file.
+	* libc/stdio/putw.c: New file.
+
 Fri Feb 25 14:50:50 2000  Jeff Johnston <jjohnstn@cygnus.com>
 
 	* libc/stdio/flags.c (__sflags): Added check that mode[1]

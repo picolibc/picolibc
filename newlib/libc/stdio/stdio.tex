@@ -46,12 +46,14 @@ structure.
 * getc::        Get a character from a file or stream (macro)
 * getchar::     Get a character from standard input (macro)
 * gets::        Get character string from standard input (obsolete)
+* getw::        Get a word (int) from a file or stream
 * iprintf::     Write formatted output (integer only)
 * mktemp::      Generate unused file name
 * perror::      Print an error message on standard error
 * putc::        Write a character on a stream or file (macro)
 * putchar::     Write a character on standard output (macro)
 * puts::        Write a character string on standard output
+* putw::        Write a word (int) to a file or stream
 * remove::      Delete a file's name
 * rename::      Rename a file
 * rewind::      Reinitialize a file or stream
@@ -131,6 +133,9 @@ structure.
 @page 
 @include stdio/gets.def
 
+@page 
+@include stdio/getw.def 
+
 @page
 @include stdio/iprintf.def 
 
@@ -148,6 +153,9 @@ structure.
 
 @page
 @include stdio/puts.def
+
+@page 
+@include stdio/putw.def 
 
 @page
 @include stdio/remove.def
