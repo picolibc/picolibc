@@ -12,6 +12,7 @@
 #include <sys/time.h>
 #include <sys/poll.h>
 #include <errno.h>
+#include <stdlib.h>
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"

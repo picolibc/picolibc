@@ -355,17 +355,21 @@ _read (int fd, void *ptr, size_t len)
 extern "C" ssize_t
 _write (int fd, const void *ptr, size_t len)
 {
-  if (len == 0)
-    return 0;
-
-  if (__check_invalid_read_ptr_errno (ptr, len))
-    return -1;
-
   int res = -1;
 
   sigframe thisframe (mainthread);
   cygheap_fdget cfd (fd);
   if (cfd < 0)
+    goto done;
+
+  /* No further action required for len == 0 */
+  if (len == 0)
+    {
+      res = 0;
+      goto done;
+    }
+
+  if (len && __check_invalid_read_ptr_errno (ptr, len))
     goto done;
 
   /* Could block, so let user know we at least got here.  */

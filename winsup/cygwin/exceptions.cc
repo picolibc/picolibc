@@ -11,6 +11,7 @@ details. */
 #include "winsup.h"
 #include <imagehlp.h>
 #include <errno.h>
+#include <stdlib.h>
 
 #include "exceptions.h"
 #include "sync.h"

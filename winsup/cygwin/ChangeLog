@@ -1,7 +1,17 @@
+2001-11-14  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc: Add stdlib.h include for alloca declaration.
+	* poll.cc: Ditto.
+	* termios.cc: Ditto.
+
+2001-11-14  Christopher Faylor  <cgf@redhat.com>
+
+	* syscalls.cc (_write): Only allow zero length when fd is valid.
+
 2001-11-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_disk_file::fstat): Add setting access time
-	and creation time to last modification time for files on filesystems 
+	and creation time to last modification time for files on filesystems
 	not supporting multiple timestamps.
 	(fhandler_disk_file::fstat_helper): Set access time and creation
 	time in incoming Windows structure instead of in stat buf to avoid
