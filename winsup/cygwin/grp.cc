@@ -29,7 +29,6 @@ details. */
 /* Read /etc/group only once for better performance.  This is done
    on the first call that needs information from it. */
 
-static const char *etc_group NO_COPY = "/etc/group";
 static struct __group32 *group_buf;		/* group contents in memory */
 static int curr_lines;
 static int max_lines;
@@ -44,22 +43,19 @@ static int grp_pos = 0;
 static pwdgrp_check group_state;
 
 static int
-parse_grp (struct __group32 &grp, const char *line)
+parse_grp (struct __group32 &grp, char *line)
 {
   int len = strlen(line);
-  char *newline = (char *) malloc (len + 1);
-  (void) memcpy (newline, line, len + 1);
+  if (line[--len] == '\r')
+    line[len] = '\0';
 
-  if (newline[--len] == '\n')
-    newline[len] = '\0';
-
-  char *dp = strchr (newline, ':');
+  char *dp = strchr (line, ':');
 
   if (!dp)
     return 0;
 
   *dp++ = '\0';
-  grp.gr_name = newline;
+  grp.gr_name = line;
 
   grp.gr_passwd = dp;
   dp = strchr (grp.gr_passwd, ':');
@@ -104,7 +100,7 @@ parse_grp (struct __group32 &grp, const char *line)
 
 /* Read one line from /etc/group into the group cache */
 static void
-add_grp_line (const char *line)
+add_grp_line (char *line)
 {
     if (curr_lines == max_lines)
     {
@@ -143,11 +139,7 @@ pthread_mutex_t NO_COPY group_lock::mutex = (pthread_mutex_t) PTHREAD_MUTEX_INIT
 void
 read_etc_group ()
 {
-  char linebuf [200];
-  char group_name [UNLEN + 1];
-  DWORD group_name_len = UNLEN + 1;
-
-  strncpy (group_name, "Administrators", sizeof (group_name));
+  static pwdgrp_read gr;
 
   group_lock here (cygwin_finished_initializing);
 
@@ -158,49 +150,38 @@ read_etc_group ()
   if (group_state != initializing)
     {
       group_state = initializing;
-      if (max_lines) /* When rereading, free allocated memory first. */
+      if (gr.open ("/etc/group"))
 	{
-	  for (int i = 0; i < curr_lines; ++i)
-	    {
-	      free (group_buf[i].gr_name);
-	      free (group_buf[i].gr_mem);
-	    }
-	  curr_lines = 0;
-	}
+	  char *line;
+	  while ((line = gr.gets ()) != NULL)
+	    if (strlen (line))
+	      add_grp_line (line);
 
-      FILE *f = fopen (etc_group, "rt");
-
-      if (f)
-	{
-	  while (fgets (linebuf, sizeof (linebuf), f) != NULL)
-	    {
-	      if (strlen (linebuf))
-		add_grp_line (linebuf);
-	    }
-
-	  group_state.set_last_modified (f);
-	  fclose (f);
+	  group_state.set_last_modified (gr.get_fhandle(), gr.get_fname ());
 	  group_state = loaded;
+	  gr.close ();
+	  debug_printf ("Read /etc/group, %d lines", curr_lines);
 	}
       else /* /etc/group doesn't exist -- create default one in memory */
 	{
+	  char group_name [UNLEN + 1];
+	  DWORD group_name_len = UNLEN + 1;
 	  char domain_name [INTERNET_MAX_HOST_NAME_LENGTH + 1];
 	  DWORD domain_name_len = INTERNET_MAX_HOST_NAME_LENGTH + 1;
 	  SID_NAME_USE acType;
+	  static char linebuf [200];
+
 	  debug_printf ("Emulating /etc/group");
-	  if (! LookupAccountSidA (NULL ,
-				    well_known_admins_sid,
-				    group_name,
-				    &group_name_len,
-				    domain_name,
-				    &domain_name_len,
-				    &acType))
+	  strncpy (group_name, "Administrators", sizeof (group_name));
+	  if (! LookupAccountSidA (NULL, well_known_admins_sid, group_name,
+				   &group_name_len, domain_name,
+				   &domain_name_len, &acType))
 	    {
 	      strcpy (group_name, "unknown");
 	      debug_printf ("Failed to get local admins group name. %E");
 	    }
-
-	  snprintf (linebuf, sizeof (linebuf), "%s::%u:\n", group_name, (unsigned) DEFAULT_GID);
+	  snprintf (linebuf, sizeof (linebuf), "%s::%u:\n", group_name,
+		    (unsigned) DEFAULT_GID);
 	  add_grp_line (linebuf);
 	  group_state = emulated;
 	}

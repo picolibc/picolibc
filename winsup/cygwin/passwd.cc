@@ -80,19 +80,17 @@ parse_pwd (struct passwd &res, char *buf)
   /* Allocate enough room for the passwd struct and all the strings
      in it in one go */
   size_t len = strlen (buf);
-  char *mybuf = (char *) malloc (len + 1);
-  (void) memcpy (mybuf, buf, len + 1);
-  if (mybuf[--len] == '\n')
-    mybuf[len] = '\0';
+  if (buf[--len] == '\r')
+    buf[len] = '\0';
 
-  res.pw_name = grab_string (&mybuf);
-  res.pw_passwd = grab_string (&mybuf);
-  res.pw_uid = grab_int (&mybuf);
-  res.pw_gid = grab_int (&mybuf);
+  res.pw_name = grab_string (&buf);
+  res.pw_passwd = grab_string (&buf);
+  res.pw_uid = grab_int (&buf);
+  res.pw_gid = grab_int (&buf);
   res.pw_comment = 0;
-  res.pw_gecos = grab_string (&mybuf);
-  res.pw_dir =  grab_string (&mybuf);
-  res.pw_shell = grab_string (&mybuf);
+  res.pw_gecos = grab_string (&buf);
+  res.pw_dir =  grab_string (&buf);
+  res.pw_shell = grab_string (&buf);
 }
 
 /* Add one line from /etc/passwd into the password cache */
@@ -133,51 +131,46 @@ pthread_mutex_t NO_COPY passwd_lock::mutex = (pthread_mutex_t) PTHREAD_MUTEX_INI
 void
 read_etc_passwd ()
 {
-    char linebuf[1024];
-    /* A mutex is ok for speed here - pthreads will use critical sections not mutex's
-     * for non-shared mutexs in the future. Also, this function will at most be called
-     * once from each thread, after that the passwd_state test will succeed
-     */
-    passwd_lock here (cygwin_finished_initializing);
+  static pwdgrp_read pr;
 
-    /* if we got blocked by the mutex, then etc_passwd may have been processed */
-    if (passwd_state != uninitialized)
-      return;
+  /* A mutex is ok for speed here - pthreads will use critical sections not
+   * mutexes for non-shared mutexes in the future. Also, this function will
+   * at most be called once from each thread, after that the passwd_state
+   * test will succeed */
+  passwd_lock here (cygwin_finished_initializing);
 
-    if (passwd_state != initializing)
-      {
-	passwd_state = initializing;
-	if (max_lines) /* When rereading, free allocated memory first. */
-	  {
-	    for (int i = 0; i < curr_lines; ++i)
-	      free (passwd_buf[i].pw_name);
-	    curr_lines = 0;
-	  }
+  /* if we got blocked by the mutex, then etc_passwd may have been processed */
+  if (passwd_state != uninitialized)
+    return;
 
-	FILE *f = fopen ("/etc/passwd", "rt");
+  if (passwd_state != initializing)
+    {
+      passwd_state = initializing;
+      if (pr.open ("/etc/passwd"))
+	{
+	  char *line;
+	  while ((line = pr.gets ()) != NULL)
+	    if (strlen (line))
+	      add_pwd_line (line);
 
-	if (f)
-	  {
-	    while (fgets (linebuf, sizeof (linebuf), f) != NULL)
-	      {
-		if (strlen (linebuf))
-		  add_pwd_line (linebuf);
-	      }
+	  passwd_state.set_last_modified (pr.get_fhandle(), pr.get_fname ());
+	  passwd_state = loaded;
+	  pr.close ();
+	  debug_printf ("Read /etc/passwd, %d lines", curr_lines);
+	}
+      else
+	{
+	  static char linebuf[400];
 
-	    passwd_state.set_last_modified (f);
-	    fclose (f);
-	    passwd_state = loaded;
-	  }
-	else
-	  {
-	    debug_printf ("Emulating /etc/passwd");
-	    snprintf (linebuf, sizeof (linebuf), "%s::%u:%u::%s:/bin/sh", cygheap->user.name (),
-		      (unsigned) DEFAULT_UID, (unsigned) DEFAULT_GID, getenv ("HOME") ?: "/");
-	    add_pwd_line (linebuf);
-	    passwd_state = emulated;
-	  }
+	  debug_printf ("Emulating /etc/passwd");
+	  snprintf (linebuf, sizeof (linebuf), "%s::%u:%u::%s:/bin/sh",
+	  	    cygheap->user.name (), (unsigned) DEFAULT_UID,
+		    (unsigned) DEFAULT_GID, getenv ("HOME") ?: "/");
+	  add_pwd_line (linebuf);
+	  passwd_state = emulated;
+	}
 
-      }
+    }
 
   return;
 }

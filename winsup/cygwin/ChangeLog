@@ -1,3 +1,19 @@
+2002-06-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* grp.cc (etc_group): Removed.
+	(parse_grp): Make line parameter nonconst.  Don't copy data into new
+	allocated memory.  Check for CR instead of LF to accomodate new
+	read method.
+	(add_grp_line): Make line parameter nonconst.
+	(read_etc_group): Rearrange using new pwdgrp_read class.
+	* passwd.cc (parse_pwd): Don't copy data into new allocated memory.
+	Check for CR instead of LF to accomodate new read method.
+	(read_etc_passwd): Rearrange using new pwdgrp_read class.
+	* pwdgrp.h (pwdgrp_check::set_last_modified):  Use different
+	parameters.
+	(class pwdgrp_read): New class for opening and reading passwd and
+	group files.
+
 2002-06-04  Christopher Faylor  <cgf@redhat.com>
 
 	* dtable.cc (handle_to_fn): Attempt to handle "raw" accesses to remote
