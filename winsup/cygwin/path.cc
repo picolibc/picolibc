@@ -87,10 +87,6 @@ details. */
 #include "winsup.h"
 #include <ctype.h>
 
-static int symlink_check_one (const char *path, char *buf, int buflen,
-			      DWORD& fileattr, unsigned *pflags,
-			      const suffix_info *suffixes,
-			      char *&found_suffix);
 static int normalize_win32_path (const char *cwd, const char *src, char *dst);
 static char *getcwd_inner (char *buf, size_t ulen, int posix_p);
 static void slashify (const char *src, char *dst, int trailing_slash_p);
@@ -99,6 +95,19 @@ static int path_prefix_p_ (const char *path1, const char *path2, int len1);
 static int get_current_directory_name ();
 
 static NO_COPY const char escape_char = '^';
+
+struct symlink_info
+{
+  char buf[3 + MAX_PATH * 3];
+  char *known_suffix;
+  char *ext_here;
+  char *contents;
+  unsigned pflags;
+  DWORD fileattr;
+  int is_symlink;
+  symlink_info (): known_suffix (NULL), contents (buf + MAX_PATH + 1) {}
+  int check (const char *path, const suffix_info *suffixes);
+};
 
 /********************** Path Helper Functions *************************/
 
@@ -183,9 +192,9 @@ path_conv::path_conv (const char *src, symlink_follow follow_mode,
   /* This array is used when expanding symlinks.  It is MAX_PATH * 2
      in length so that we can hold the expanded symlink plus a
      trailer.  */
-  char work_buf[MAX_PATH * 3 + 3];
   char path_buf[MAX_PATH];
   char path_copy[MAX_PATH];
+  symlink_info sym;
 
   char *rel_path, *full_path;
 
@@ -197,7 +206,6 @@ path_conv::path_conv (const char *src, symlink_follow follow_mode,
   else
     rel_path = this->path, full_path = path_buf;
 
-  char *sym_buf = work_buf + MAX_PATH + 1;
   /* This loop handles symlink expansion.  */
   int loop = 0;
   path_flags = 0;
@@ -241,47 +249,46 @@ path_conv::path_conv (const char *src, symlink_follow follow_mode,
 
       tail = path_copy + 1 + (tail - full_path);   // Point to end of copy
 
-      *sym_buf = '\0';			// Paranoid
-
       /* Scan path_copy from right to left looking either for a symlink
 	 or an actual existing file.  If an existing file is found, just
 	 return.  If a symlink is found exit the for loop.
 	 Also: be careful to preserve the errno returned from
-	 symlink_check_one as the caller may need it. */
+	 symlink.check as the caller may need it. */
       /* FIXME: Do we have to worry about multiple \'s here? */
       int component = 0;		// Number of translated components
-      DWORD attr;
+      sym.contents[0] = '\0';
+
       for (;;)
 	{
 	  save_errno s (0);
-	  unsigned dummy_flags, *fp;
 	  const suffix_info *suff;
-
-	  /* Don't allow symlink_check_one to set anything in the path_conv
+	  
+	  /* Don't allow symlink.check to set anything in the path_conv
 	     class if we're working on an inner component of the path */
 	  if (component)
 	    {
-	      fp = &dummy_flags;
 	      suff = NULL;
+	      sym.pflags = 0;
 	    }
 	  else
 	    {
-	      fp = &path_flags;
 	      suff = suffixes;
+	      sym.pflags = path_flags;
 	    }
-	  MALLOC_CHECK;
-	  int len = symlink_check_one (path_copy, sym_buf, MAX_PATH, attr,
-				       fp, suff, known_suffix);
-	  MALLOC_CHECK;
 
-	  /* If symlink_check_one found an existing non-symlink file, then
+	  int len = sym.check (path_copy, suff);
+
+	  if (!component)
+	    path_flags = sym.pflags;
+
+	  /* If symlink.check found an existing non-symlink file, then
 	     it returns a length of 0 and sets errno to EINVAL.  It also sets
-	     any suffix found into `sym_buf'. */
-	  if (!len && get_errno () == EINVAL)
+	     any suffix found into `ext_here'. */
+	  if (!sym.is_symlink && sym.fileattr != (DWORD) -1)
 	    {
 	      if (component == 0)
 		{
-		  fileattr = attr;
+		  fileattr = sym.fileattr;
 		  goto fillin;
 		}
 	      goto out;	// file found
@@ -293,18 +300,19 @@ path_conv::path_conv (const char *src, symlink_follow follow_mode,
 	     these operations again on the newly derived path. */
 	  else if (len > 0)
 	    {
-	      if (component != 0 && follow_mode != SYMLINK_FOLLOW)
+	      if (component == 0 && follow_mode != SYMLINK_FOLLOW)
 		{
 		  set_symlink (); // last component of path is a symlink.
-		  fileattr = attr;
+		  fileattr = sym.fileattr;
 		  if (follow_mode == SYMLINK_CONTENTS)
-		      strcpy (path, sym_buf);
+		      strcpy (path, sym.contents);
 		  goto fillin;
 		}
 	      break;
 	    }
 
-	  s.reset ();      // remember errno from symlink_check_one
+	  /* No existing file found. */
+	  s.reset ();      // remember errno from symlink.check
 
 	  if (!(tail = strrchr (path_copy, '\\')) ||
 	      (tail > path_copy && tail[-1] == ':'))
@@ -326,7 +334,7 @@ path_conv::path_conv (const char *src, symlink_follow follow_mode,
 
       tail = full_path + (tail - path_copy);
       int taillen = strlen (tail);
-      int buflen = strlen (sym_buf);
+      int buflen = strlen (sym.contents);
       if (buflen + taillen > MAX_PATH)
 	  {
 	    error = ENAMETOOLONG;
@@ -336,23 +344,23 @@ path_conv::path_conv (const char *src, symlink_follow follow_mode,
 
       /* Copy tail of full_path to discovered symlink. */
       char *p;
-      for (p = sym_buf + buflen; *tail; tail++)
+      for (p = sym.contents + buflen; *tail; tail++)
 	*p++ = *tail == '\\' ? '/' : *tail;
       *p = '\0';
 
       /* If symlink referred to an absolute path, then we
-	 just use sym_buf and loop.  Otherwise tack the head of
-	 path_copy before sym_buf and translate it back from a
+	 just use sym.contents and loop.  Otherwise tack the head of
+	 path_copy before sym.contents and translate it back from a
 	 Win32-style path to a POSIX-style one. */
-      if (isabspath (sym_buf))
-	src = sym_buf;
+      if (isabspath (sym.contents))
+	src = sym.contents;
       else if (!(tail = strrchr (path_copy, '\\')))
 	system_printf ("problem parsing %s - '%s'", src, full_path);
       else
 	{
 	  char tmp_buf[MAX_PATH];
 	  int headlen = 1 + tail - path_copy;
-	  p = sym_buf - headlen;
+	  p = sym.contents - headlen;
 	  memcpy (p, path_copy, headlen);
 	  MALLOC_CHECK;
 	  error = cygwin_shared->mount.conv_to_posix_path (p, tmp_buf, 1);
@@ -364,13 +372,13 @@ path_conv::path_conv (const char *src, symlink_follow follow_mode,
     }
 
 fillin:
-  if (*sym_buf)
+  if (sym.known_suffix)
+    known_suffix = this->path + (sym.known_suffix - path_copy);
+  else if (sym.ext_here && follow_mode != SYMLINK_CONTENTS)
     {
       known_suffix = strchr (this->path, '\0');
-      strcpy (known_suffix, sym_buf);
+      strcpy (known_suffix, sym.ext_here);
     }
-  else if (known_suffix)
-    known_suffix = this->path + (known_suffix - path_copy);
 
 out:
   DWORD serial, volflags;
@@ -2126,14 +2134,12 @@ next_suffix (char *ext_here, const suffix_info *&suffixes)
    Return -1 on error, 0 if PATH is not a symlink, or the length
    stored into BUF if PATH is a symlink.  */
 
-static int
-symlink_check_one (const char *in_path, char *buf, int buflen, DWORD& fileattr,
-		   unsigned *pflags, const suffix_info *suffixes, char *&known_suffix)
+int
+symlink_info::check (const char *in_path, const suffix_info *suffixes)
 {
   HANDLE h;
   int res = 0;
-  char extbuf[buflen + 5];
-  char *ext_here;
+  char extbuf[MAX_PATH + 5];
   const char *path = in_path;
 
   if (!suffixes)
@@ -2149,7 +2155,8 @@ symlink_check_one (const char *in_path, char *buf, int buflen, DWORD& fileattr,
       ext_here = strchr (path, '\0');
     }
 
-  *buf = '\0';
+  is_symlink = TRUE;
+
   do
     {
       if (!next_suffix (ext_here, suffixes))
@@ -2178,7 +2185,7 @@ symlink_check_one (const char *in_path, char *buf, int buflen, DWORD& fileattr,
 
       /* A symlink will have the `system' file attribute. */
       /* Only files can be symlinks (which can be symlinks to directories). */
-      if (!(*pflags & PATH_SYMLINK) && !SYMLINKATTR (fileattr))
+      if (!(pflags & PATH_SYMLINK) && !SYMLINKATTR (fileattr))
 	goto file_not_symlink;
 
       /* Check the file's extended attributes, if it has any.  */
@@ -2189,7 +2196,7 @@ symlink_check_one (const char *in_path, char *buf, int buflen, DWORD& fileattr,
       if (!get_file_attribute (TRUE, path, &unixattr))
 	{
 	  if (unixattr & STD_XBITS)
-	    *pflags |= PATH_EXEC;
+	    pflags |= PATH_EXEC;
 	}
 
       /* Open the file.  */
@@ -2215,9 +2222,9 @@ syscall_printf ("ReadFile");
 			      sizeof (cookie_buf)) == 0)
 	    {
 	      /* It's a symlink.  */
-	      *pflags = PATH_SYMLINK;
+	      pflags = PATH_SYMLINK;
 
-	      res = ReadFile (h, buf, buflen, &got, 0);
+	      res = ReadFile (h, contents, MAX_PATH + 1, &got, 0);
 	      if (!res)
 		set_errno (EIO);
 	      else
@@ -2228,8 +2235,8 @@ syscall_printf ("ReadFile");
 		     NUL.  The length returned is the path without
 		     *any* trailing NULs.  We also have to handle (or
 		     at least not die from) corrupted paths.  */
-		  if (memchr (buf, 0, got) != NULL)
-		    res = strlen (buf);
+		  if (memchr (contents, 0, got) != NULL)
+		    res = strlen (contents);
 		  else
 		    res = got;
 		}
@@ -2238,16 +2245,16 @@ syscall_printf ("ReadFile");
 		   && memcmp (cookie_buf, SOCKET_COOKIE,
 			      sizeof (cookie_buf)) == 0)
 	    {
-	      *pflags |= PATH_SOCKET;
+	      pflags |= PATH_SOCKET;
 	      goto close_and_return;
 	    }
 	  else
 	    {
 	      /* Not a symlink, see if executable.  */
-	      if (!(*pflags & PATH_EXEC) && got >= 2 &&
+	      if (!(pflags & PATH_EXEC) && got >= 2 &&
 		  ((cookie_buf[0] == '#' && cookie_buf[1] == '!') ||
 		   (cookie_buf[0] == ':' && cookie_buf[1] == '\n')))
-		*pflags |= PATH_EXEC;
+		pflags |= PATH_EXEC;
 	    close_and_return:
 syscall_printf ("close_and_return");
 	      CloseHandle (h);
@@ -2264,14 +2271,13 @@ syscall_printf ("breaking from loop");
 
 file_not_symlink:
   set_errno (EINVAL);
+  is_symlink = FALSE;
   syscall_printf ("not a symlink");
-  if (ext_here)
-    strcpy (buf, ext_here);
   res = 0;
 
 out:
-  syscall_printf ("%d = symlink_check_one (%s, %p, %d) (%p)",
-		  res, path, buf, buflen, *pflags);
+  syscall_printf ("%d = symlink.check (%s, %p) (%p)",
+		  res, path, contents, pflags);
 
   return res;
 }
@@ -2282,7 +2288,9 @@ extern "C"
 int
 readlink (const char *path, char *buf, int buflen)
 {
-  path_conv pathbuf (path, SYMLINK_CONTENTS);
+  extern suffix_info stat_suffixes[];
+  path_conv pathbuf (path, SYMLINK_CONTENTS, 0, stat_suffixes);
+
   if (pathbuf.error)
     {
       set_errno (pathbuf.error);
@@ -2306,7 +2314,7 @@ readlink (const char *path, char *buf, int buflen)
   memcpy (buf, pathbuf.get_win32 (), len);
   buf[len] = '\0';
 
-  /* errno set by symlink_check_one if error */
+  /* errno set by symlink.check if error */
   return len;
 }
 

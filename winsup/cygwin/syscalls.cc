@@ -960,7 +960,7 @@ stat_dev (DWORD devn, int unit, unsigned long ino, struct stat *buf)
   return 0;
 }
 
-static suffix_info stat_suffixes[] = 
+suffix_info stat_suffixes[] = 
 {
   suffix_info ("", 1),
   suffix_info (".exe", 1),

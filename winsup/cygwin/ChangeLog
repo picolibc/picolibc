@@ -1,3 +1,15 @@
+Thu Apr 13 18:32:26 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dcrt0.cc (insert_file): Avoid freeing previously allocated argument
+	list.
+	* path.cc (symlink_info::check): Rename from symlink_check_one.  Use
+	new symlink_info struct for communication.
+	(path_conv::path_conv): Use symlink_info structure for communication
+	with symlink_info::check.  Fix typo which resulted in symbolic links
+	always being resolved.
+	(readlink): Use stat_suffixes array when resolving a link.
+	* syscalls.cc (stat_suffixes): Make global.
+
 Thu Apr 13 20:50:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* include/cygwin/version.h: Bump minor api to reflect export change.

@@ -185,7 +185,7 @@ host_dependent_constants::init ()
  * -@foo and not the contents of foo.
  */
 static int __stdcall
-insert_file (char *name, char *&cmd)
+insert_file (char *name, char *&cmd, int& alloc_cmd)
 {
   HANDLE f;
   DWORD size;
@@ -378,7 +378,7 @@ static void __stdcall
 build_argv (char *cmd, char **&argv, int &argc, int winshell)
 {
   int argvlen = 0;
-  char *alloc_cmd = NULL;	// command allocated by insert_file
+  int alloc_cmd = 0;	// command allocated by insert_file
   int nesting = 0;		// monitor "nesting" from insert_file
 
   argc = 0;
@@ -420,13 +420,8 @@ build_argv (char *cmd, char **&argv, int &argc, int winshell)
 	{
 	  if (++nesting > MAX_AT_FILE_LEVEL)
 	    api_fatal ("Too many levels of nesting for %s", word);
-	  if (insert_file (word, cmd))
-	    {
-	      if (alloc_cmd)
-		free (alloc_cmd);	// Free space from previous insert_file
-	      alloc_cmd = cmd;		//  and remember it for next time.
+	  if (insert_file (word, cmd, alloc_cmd))
 	      continue;			// There's new stuff in cmd now
-	    }
 	}
 
       /* See if we need to allocate more space for argv */

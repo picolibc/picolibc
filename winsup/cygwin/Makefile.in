@@ -338,4 +338,3 @@ uname.o: $(WINSUP_H)
 wait.o: $(WINSUP_H)
 window.o: $(WINSUP_H)
 thread.o: $(WINSUP_H)
-
