@@ -17,7 +17,6 @@ details. */
 #define PROTECT(x) x[sizeof(x)-1] = 0
 #define CHECK(x) if (x[sizeof(x)-1] != 0) { small_printf("array bound exceeded %d\n", __LINE__); ExitProcess(1); }
 
-
 class strace NO_COPY strace;
 
 /* 'twould be nice to declare this in winsup.h but winsup.h doesn't require
@@ -141,24 +140,30 @@ strace::write (unsigned category, const char *buf, int count)
    Warning: DO NOT SET ERRNO HERE! */
 
 void
-strace::prntf (unsigned category, const char *fmt,...)
+strace::prntf (unsigned category, const char *fmt, ...)
 {
   DWORD err = GetLastError ();
-  if (active)
+  int count;
+  char buf[10000];
+  va_list ap;
+
+  PROTECT(buf);
+  SetLastError (err);
+
+  va_start (ap, fmt);
+  count = this->vsprntf (buf, fmt, ap);
+  CHECK(buf);
+  if (category & _STRACE_SYSTEM)
     {
-      int count;
-      va_list ap;
-      char buf[10000];
-
-      PROTECT(buf);
-      va_start (ap, fmt);
-      SetLastError (err);
-      count = this->vsprntf (buf, fmt, ap);
-      va_end (ap);
-      CHECK(buf);
-
-      this->write (category, buf, count);
+      DWORD done;
+      WriteFile (GetStdHandle (STD_ERROR_HANDLE), buf, count, &done, 0);
+      FlushFileBuffers (GetStdHandle (STD_ERROR_HANDLE));
     }
+
+#ifndef NOSTRACE
+  if (active)
+    this->write (category, buf, count);
+#endif
   SetLastError (err);
 }
 
@@ -342,36 +347,5 @@ strace::wm (int message, int word, int lon)
 	}
       this->prntf (_STRACE_WM, "wndproc %d unknown  %d %d", message, word, lon);
     }
-}
-
-/* Print a message on stderr (bypassing anything that could prevent the
-   message from being printed, for example a buggy or corrupted stdio).
-   This is used, for example, to print diagnostics of fatal errors.  */
-
-void
-__system_printf (const char *fmt,...)
-{
-  char buf[6000];
-  va_list ap;
-  int count;
-
-  PROTECT (buf);
-  va_start (ap, fmt);
-  count = strace.vsprntf (buf, fmt, ap);
-  va_end (ap);
-  CHECK (buf);
-
-  DWORD done;
-  WriteFile (GetStdHandle (STD_ERROR_HANDLE), buf, count, &done, 0);
-  FlushFileBuffers (GetStdHandle (STD_ERROR_HANDLE));
-
-#ifndef NOSTRACE
-  if (strace.active)
-    strace.write (1, buf, count);
-#endif
-
-#ifdef DEBUGGING
-//  try_to_debug ();
-#endif
 }
 #endif /*NOSTRACE*/

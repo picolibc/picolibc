@@ -23,6 +23,10 @@ details. */
 # define memset __builtin_memset
 #endif
 
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ >= 199900L
+#define NEW_MACRO_VARARGS
+#endif
+
 #include <sys/types.h>
 #include <sys/strace.h>
 #include <sys/resource.h>
@@ -279,8 +283,11 @@ extern unsigned int signal_shift_subtract;
 #define MARK() mark (__FILE__,__LINE__)
 #endif
 
-#define api_fatal(fmt, args...) \
-  __api_fatal ("%P: *** " fmt,##args)
+#ifdef NEW_MACRO_VARARGS
+# define api_fatal(...) __api_fatal ("%P: *** " __VA_ARGS__)
+#else
+# define api_fatal(fmt, args...) __api_fatal ("%P: *** " fmt,## args)
+#endif
 
 #undef issep
 #define issep(ch) (strchr (" \t\n\r", (ch)) != NULL)
@@ -324,8 +331,6 @@ void events_init (void);
 void events_terminate (void);
 
 void __stdcall close_all_files (void);
-
-extern class strace strace;
 
 /* Invisible window initialization/termination. */
 HWND __stdcall gethwnd (void);

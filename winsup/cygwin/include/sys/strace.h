@@ -23,7 +23,6 @@
 
 class strace
 {
-  friend void __system_printf (const char *fmt, ...);
   int microseconds ();
   int vsprntf (char *buf, const char *infmt, va_list ap);
   void write (unsigned category, const char *buf, int count);
@@ -32,9 +31,11 @@ public:
   int active;
   int lmicrosec;
   strace() : version(1) {}
-  void prntf (unsigned category, const char *fmt,...);
+  void prntf (unsigned, const char *, ...);
   void wm (int message, int word, int lon);
 };
+
+extern strace strace;
 
 #define _STRACE_INTERFACE_ACTIVATE_ADDR  -1
 #define _STRACE_INTERFACE_ACTIVATE_ADDR1 -2
@@ -55,7 +56,7 @@ public:
 #define _STRACE_SIGP	 0x00800 // trace signal and process handling
 #define _STRACE_MINIMAL	 0x01000 // very minimal strace output
 #define _STRACE_EXITDUMP 0x04000 // dump strace cache on exit
-#define _STRACE_CACHE	 0x08000 // cache strace messages
+#define _STRACE_SYSTEM	 0x08000 // cache strace messages
 #define _STRACE_NOMUTEX	 0x10000 // don't use mutex for synchronization
 #define _STRACE_MALLOC	 0x20000 // trace malloc calls
 #define _STRACE_THREAD	 0x40000 // thread-locking calls
@@ -63,11 +64,35 @@ public:
 
 extern "C" void small_printf (const char *, ...);
 
-#ifndef NOSTRACE
+#ifdef NOSTRACE
+#define define_strace(c, f)
+#define define_strace1(c, f)
+#else
+#ifdef NEW_MACRO_VARARGS
 /* Output message to strace log */
-#define system_printf(fmt, args...) \
-  __system_printf("%F: " fmt, __PRETTY_FUNCTION__ , ## args)
 
+#define define_strace0(c,...) \
+  do { \
+      if (c & _STRACE_SYSTEM || strace.active) \
+	strace.prntf (c, "%F: " __VA_ARGS__); \
+    } \
+  while (0)
+
+#define define_strace(c, ...) define_strace0 (_STRACE_ ## c, __VA_ARGS__)
+#define define_strace1(c, ...) define_strace0 (_STRACE_ ## c | _STRACE_NOTALL, __VA_ARGS__)
+
+#define debug_printf(...)	define_strace (DEBUG, __VA_ARGS__)
+#define paranoid_printf(...)	define_strace (PARANOID, __VA_ARGS__)
+#define select_printf(...)	define_strace (SELECT, __VA_ARGS__)
+#define sigproc_printf(...)	define_strace (SIGP, __VA_ARGS__)
+#define syscall_printf(...)	define_strace (SYSCALL, __VA_ARGS__)
+#define system_printf(...)	define_strace (SYSTEM, __VA_ARGS__)
+#define termios_printf(...)	define_strace (TERMIOS, __VA_ARGS__)
+#define wm_printf(...)		define_strace (WM, __VA_ARGS__)
+#define minimal_printf(...)	define_strace1 (MINIMAL, __VA_ARGS__)
+#define malloc_printf(...)	define_strace1 (MALLOC, __VA_ARGS__)
+#define thread_printf(...)	define_strace1 (THREAD, __VA_ARGS__)
+#else
 #define strace_printf_wrap(what, fmt, args...) \
    ((void) ({\
 	if (strace.active) \
@@ -80,17 +105,18 @@ extern "C" void small_printf (const char *, ...);
 	  strace.prntf((_STRACE_ ## what) | _STRACE_NOTALL, "%F: " fmt, __PRETTY_FUNCTION__ , ## args); \
 	0; \
     }))
-#endif /*NOSTRACE*/
 
 #define debug_printf(fmt, args...) strace_printf_wrap(DEBUG, fmt , ## args)
-#define syscall_printf(fmt, args...) strace_printf_wrap(SYSCALL, fmt , ## args)
 #define paranoid_printf(fmt, args...) strace_printf_wrap(PARANOID, fmt , ## args)
-#define termios_printf(fmt, args...) strace_printf_wrap(TERMIOS, fmt , ## args)
 #define select_printf(fmt, args...) strace_printf_wrap(SELECT, fmt , ## args)
-#define wm_printf(fmt, args...) strace_printf_wrap(WM, fmt , ## args)
 #define sigproc_printf(fmt, args...) strace_printf_wrap(SIGP, fmt , ## args)
+#define syscall_printf(fmt, args...) strace_printf_wrap(SYSCALL, fmt , ## args)
+#define system_printf(fmt, args...) strace_printf_wrap(SYSTEM, fmt , ## args)
+#define termios_printf(fmt, args...) strace_printf_wrap(TERMIOS, fmt , ## args)
+#define wm_printf(fmt, args...) strace_printf_wrap(WM, fmt , ## args)
 #define minimal_printf(fmt, args...) strace_printf_wrap1(MINIMAL, fmt , ## args)
 #define malloc_printf(fmt, args...) strace_printf_wrap1(MALLOC, fmt , ## args)
 #define thread_printf(fmt, args...) strace_printf_wrap1(THREAD, fmt , ## args)
-
+#endif /*NEW_MACRO_VARARGS*/
+#endif /*NOSTRACE*/
 #endif /* _SYS_STRACE_H */

@@ -1,3 +1,14 @@
+Tue Aug  1 23:37:08 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* strace.h: Add kludgy workarounds to avoid using deprecated methods
+	for variable argument macros when possible.
+	* sigproc.cc: Throughout, use sigproc_printf rather than sip_printf.
+	* strace.cc (strace::prntf): Remove 'active' check, since callers are
+	supposed to ensure this.
+	(__system_printf): Remove.  Subsumed by strace::prntf.
+	* winsup.h: Define "NEW_MACRO_VARARGS" to indicate when to use new
+	macro varargs capability.
+
 Sun Jul 30 13:54:35 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler_console.cc: Remove VK_DIVIDE detection.
