@@ -1,7 +1,7 @@
 2004-10-28  Christopher Faylor  <cgf@timesys.com>
 
 	* libc/include/sys/signal.h: Move <signal.h> include to bottom of file
-	so that all relevant definitions have been handled for use in the
+	so that all relevant definitions have been performed for use in the
 	include.
 
 2004-10-26  Jason Tishler  <jason@tishler.net>
