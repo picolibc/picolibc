@@ -1,3 +1,9 @@
+2002-05-20  René Møller Fonseca  <fonseca@users.sourceforge.net>
+
+	* include/lmaccess.h: (NetAccess*, NetGroup*,
+	NetLocalGroup*, NetUser*, NetGet*, INetLogonControl[2],
+	NetQueryDisplayInfotmationIndex): Replace LPWSTR with LPCWSTR.
+
 2002-05-08  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/commctrl.h (ImageList_DragShowNolock): Remove
