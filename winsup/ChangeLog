@@ -1,3 +1,8 @@
+2003-05-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.common: Remove newlib_sys_include and
+	newlib_sys_include_include entirely.  Set CRT0 to cygwin/crt0.o.
+
 2003-04-18  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in: Reorganize to try to allow lack of mingw/w32api to work.

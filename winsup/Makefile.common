@@ -70,12 +70,6 @@ utils_source:=$(updir)/utils
 ifeq (,${findstring $(newlib_source)/libc/include,$(CFLAGS) $(CXXFLAGS) $(CXX) $(CC)})
 newlib_include:=-I$(newlib_source)/libc/include
 endif
-ifeq (,${findstring $(newlib_source)/libc/sys/cygwin,$(CFLAGS) $(CXXFLAGS) $(CXX) $(CC)})
-newlib_sys_include:=-I$(newlib_source)/libc/sys/cygwin
-endif
-ifeq (,${findstring $(newlib_source)/libc/sys/cygwin/include,$(CFLAGS) $(CXXFLAGS) $(CXX) $(CC)})
-newlib_sys_include_include:=-I$(newlib_source)/libc/sys/cygwin/include
-endif
 ifeq (,${findstring $(cygwin_source)/include,$(CFLAGS) $(CXXFLAGS) $(CXX) $(CC)})
 cygwin_include:=-I$(cygwin_source)/include
 endif
@@ -102,7 +96,7 @@ ifeq (,${nostdlib})
 nostdinc:=
 endif
 
-INCLUDES:=-I. $(cygwin_include) -I$(cygwin_source) $(newlib_sys_include) $(newlib_include)  $(newlib_sys_include_include) $(w32api_include)
+INCLUDES:=-I. $(cygwin_include) -I$(cygwin_source) $(newlib_include) $(w32api_include)
 ifdef CONFIG_DIR
 INCLUDES+=-I$(CONFIG_DIR)
 endif
@@ -118,7 +112,7 @@ GCC_DEFAULT_OPTIONS:=$(CFLAGS_COMMON) $(CFLAGS_CONFIG) $(INCLUDES)
 
 LIBC:=$(newlib_build)/libc/libc.a
 LIBM:=$(newlib_build)/libm/libm.a
-CRT0:=$(newlib_build)/libc/crt0.o
+CRT0:=$(cygwin_build)/crt0.o
 
 ALL_CFLAGS:=$(DEFS) $(MALLOC_DEBUG) $(CFLAGS) $(GCC_DEFAULT_OPTIONS)
 ALL_CXXFLAGS=$(DEFS) $(MALLOC_DEBUG) $(CXXFLAGS) $(GCC_DEFAULT_OPTIONS)
