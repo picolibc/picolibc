@@ -602,7 +602,7 @@ fhandler_base::open (int flags, mode_t mode)
   if ((flags & O_TRUNC) && ((flags & O_ACCMODE) != O_RDONLY))
     {
       if (flags & O_CREAT)
-	create_disposition = FILE_SUPERSEDE;
+	create_disposition = FILE_OVERWRITE_IF;
       else
 	create_disposition = FILE_OVERWRITE;
     }

@@ -1,3 +1,8 @@
+2004-06-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::open): Substitute FILE_SUPERSEDE with
+	FILE_OVERWRITE_IF.
+
 2004-06-09  Christopher Faylor  <cgf@alum.bu.edu>
 
 	* include/cygwin/version.h: REALLY bump dll minor version to 11.
