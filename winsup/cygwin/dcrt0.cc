@@ -723,8 +723,6 @@ dll_crt0_0 ()
   /* Initialize events */
   events_init ();
 
-  /* Init global well known SID objects */
-  cygsid::init ();
   cygheap->cwd.init ();
 }
 

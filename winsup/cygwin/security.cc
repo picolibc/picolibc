@@ -425,7 +425,7 @@ get_user_local_groups (cygsidlist &grp_list, PSID pusersid)
 }
 
 static bool
-sid_in_token_groups (PTOKEN_GROUPS grps, cygsid &sid)
+sid_in_token_groups (PTOKEN_GROUPS grps, cygpsid sid)
 {
   if (!grps)
     return false;

@@ -1,3 +1,14 @@
+2004-02-05  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* security.h (SID): New macro.
+	(well_known_*_sid): Change type to cygpsid.
+	(cygsid::init): Delete declaration.
+	* sec_helper.cc (well_known_*_sid): Define using above SID macro.
+	(cygsid::init): Delete.
+	* dcrt0.cc (dll_crt0_0): Do not call cygsid::init.
+	* security.cc (get_user_local_groups): Change the second argument type
+	to cygpsid.
+
 2004-02-03  Christopher Faylor  <cgf@redhat.com>
 
 	* cygtls.h (_local_storage::signamebuf): Increase size to prevent

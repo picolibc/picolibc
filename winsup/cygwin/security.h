@@ -23,6 +23,16 @@ details. */
 #define ACL_DEFAULT_SIZE 3072
 #define NO_SID ((PSID)NULL)
 
+/* Macro to define variable length SID structures */
+#define SID(name, comment, authority, count, rid...) \
+static NO_COPY struct  { \
+  BYTE  Revision; \
+  BYTE  SubAuthorityCount; \
+  SID_IDENTIFIER_AUTHORITY IdentifierAuthority; \
+  DWORD SubAuthority[count]; \
+} name##_struct = { SID_REVISION, count, {authority}, {rid}}; \
+cygpsid NO_COPY name = (PSID) &name##_struct;
+
 #define FILE_READ_BITS   (FILE_READ_DATA | GENERIC_READ | GENERIC_ALL)
 #define FILE_WRITE_BITS  (FILE_WRITE_DATA | GENERIC_WRITE | GENERIC_ALL)
 #define FILE_EXEC_BITS   (FILE_EXECUTE | GENERIC_EXECUTE | GENERIC_ALL)
@@ -79,7 +89,6 @@ class cygsid : public cygpsid {
     }
 
 public:
-  static void init();
   inline operator const PSID () { return psid; }
 
   inline const PSID operator= (cygsid &nsid)
@@ -213,19 +222,19 @@ public:
     }
 };
 
-extern cygsid well_known_null_sid;
-extern cygsid well_known_world_sid;
-extern cygsid well_known_local_sid;
-extern cygsid well_known_creator_owner_sid;
-extern cygsid well_known_creator_group_sid;
-extern cygsid well_known_dialup_sid;
-extern cygsid well_known_network_sid;
-extern cygsid well_known_batch_sid;
-extern cygsid well_known_interactive_sid;
-extern cygsid well_known_service_sid;
-extern cygsid well_known_authenticated_users_sid;
-extern cygsid well_known_system_sid;
-extern cygsid well_known_admins_sid;
+extern cygpsid well_known_null_sid;
+extern cygpsid well_known_world_sid;
+extern cygpsid well_known_local_sid;
+extern cygpsid well_known_creator_owner_sid;
+extern cygpsid well_known_creator_group_sid;
+extern cygpsid well_known_dialup_sid;
+extern cygpsid well_known_network_sid;
+extern cygpsid well_known_batch_sid;
+extern cygpsid well_known_interactive_sid;
+extern cygpsid well_known_service_sid;
+extern cygpsid well_known_authenticated_users_sid;
+extern cygpsid well_known_system_sid;
+extern cygpsid well_known_admins_sid;
 
 inline BOOL
 legal_sid_type (SID_NAME_USE type)
