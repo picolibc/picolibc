@@ -1,3 +1,15 @@
+2004-12-18  Christopher Faylor  <cgf@timesys.com>
+
+	* child_info.h (CURR_CHILD_INFO_MAGIC): Use updated value.
+
+2004-12-18  Christopher Faylor  <cgf@timesys.com>
+	    Pierre Humblet <pierre.humblet@ieee.org>
+
+	* path.cc (path_conv::check): Check the output Win32 path for trailing
+	spaces and dots, not the input path.  Disallow all use of foo./bar
+	since consistently getting this right is time consuming.  Remove
+	strange test for "unc\" since no one seems to know what it's for.
+
 2004-12-18  Chris January  <chris@atomice.net>
 
 	* fhandler_proc.cc (proc_listing): Add entry for "self".

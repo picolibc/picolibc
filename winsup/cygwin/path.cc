@@ -546,25 +546,12 @@ path_conv::check (const char *src, unsigned opt,
       /* Detect if the user was looking for a directory.  We have to strip the
 	 trailing slash initially while trying to add extensions but take it
 	 into account during processing */
-      if (tail > path_copy + 1)
+      if (tail > path_copy + 1 && isslash (tail[-1]))
 	{
-	  if (isslash (tail[-1]))
-	    {
-	       need_directory = 1;
-	       tail--;
-	    }
-	  /* Remove trailing dots and spaces which are ignored by Win32 functions but
-	     not by native NT functions. */
-	  while (tail[-1] == '.' || tail[-1] == ' ')
-	    tail--;
-	  if (tail > path_copy + 1 && isslash (tail[-1]))
-	    {
-	      error = ENOENT;
-	      return;
-	    }
+	  need_directory = 1;
+	  *--tail = '\0';
 	}
       path_end = tail;
-      *tail = '\0';
 
       /* Scan path_copy from right to left looking either for a symlink
 	 or an actual existing file.  If an existing file is found, just
@@ -835,6 +822,32 @@ out:
 
   if (dev.devn == FH_FS)
     {
+      if (strncmp (path, "\\\\.\\", 4))
+	{
+	  /* Windows ignores trailing dots and spaces */
+	  char *tail = NULL;
+	  for (char *p = path; *p; p++)
+	    if (*p != '.' && *p != ' ')
+	      tail = NULL;
+	    else if (p[1] == '\\')
+	      {
+		error = ENOENT;
+		return;
+	      }
+	    else if (!tail)
+	      tail = p;
+
+	  if (!tail)
+	    /* nothing */;
+	  else if (tail[-1] != '\\')
+	    *tail = '\0';
+	  else
+	    {
+	      error = ENOENT;
+	      return;
+	    }
+	}
+
       if (fs.update (path))
 	{
 	  debug_printf ("this->path(%s), has_acls(%d)", path, fs.has_acls ());
