@@ -33,6 +33,7 @@ details. */
 struct passwd *
 internal_getlogin (cygheap_user &user)
 {
+  char buf[512];
   char username[UNLEN + 1];
   DWORD username_len = UNLEN + 1;
   struct passwd *pw = NULL;
@@ -47,7 +48,6 @@ internal_getlogin (cygheap_user &user)
     {
       LPWKSTA_USER_INFO_1 wui;
       NET_API_STATUS ret;
-      char buf[512];
       char *env;
 
       user.set_logsrv (NULL);
@@ -212,7 +212,28 @@ internal_getlogin (cygheap_user &user)
 	}
     }
   debug_printf ("Cygwins Username: %s", user.name ());
-  return pw ?: getpwnam(user.name ());
+  if (!pw)
+    pw = getpwnam(user.name ());
+  if (!getenv ("HOME"))
+    {
+      const char *homedrive, *homepath;
+      if (pw && pw->pw_dir && *pw->pw_dir)
+        {
+	  setenv ("HOME", pw->pw_dir, 1);
+	  debug_printf ("Set HOME (from /etc/passwd) to %s", pw->pw_dir);
+	}
+      else if ((homedrive = getenv ("HOMEDRIVE"))
+	       && (homepath = getenv ("HOMEPATH")))
+	{
+	  char home[MAX_PATH];
+	  strcpy (buf, homedrive);
+	  strcat (buf, homepath);
+	  cygwin_conv_to_full_posix_path (buf, home);
+	  setenv ("HOME", home, 1);
+	  debug_printf ("Set HOME (from HOMEDRIVE/HOMEPATH) to %s", home);
+	}
+    }
+  return pw;
 }
 
 void

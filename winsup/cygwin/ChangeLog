@@ -1,3 +1,8 @@
+2001-10-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* uinfo.cc (internal_getlogin): Set environment variable $HOME
+	from either /etc/passwd or $HOMEDRIVE/$HOMEPATH if necessary.
+
 2001-10-29  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler.h (fhandler_serial::fhandler_serial): Change to only accept
