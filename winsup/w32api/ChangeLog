@@ -1,3 +1,39 @@
+2002-12-19  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/ddk/hidusage.h: Remove unneccessary #pragma pack's.
+	* include/ddk/miniport.h (EMULATOR_PORT_ACCESS_TYPE): Define
+	before using.
+	(VIDEO_ACCESS_RANGE): Guard against prior definition.
+	* include/ddk/minitape.h (INQUIRYDATA): Guard against prior
+	definition.
+	* include/ddk/ndis.h (DECLARE_UNKNOWN_PROTOTYPE): Correct macro.
+	* include/ddk/ndisguid.h: Remove unneccessary #pragma pack's.
+	* include/ddk/scsi.h (INQUIRYDATA): Guard against prior
+	definition.
+	* include/ddk/scsiwmi.h (GUID): Define if not already done.
+	(LPCGUID): Likewise.
+	* include/ddk/tdi.h: Close "Listen flags" comment.
+	* include/ddk/tdistat.h: Remove unneccessary #pragma pack's.
+	* include/ddk/video.h:	Add #pragma pack(push,4) to balance.
+	(VIDEO_ACCESS_RANGE): Guard against prior definition.
+	* include/ddk/videoagp.h:Add #pragma pack(push,4) to balance.
+	* include/ddk/win2k.h: Likewise.
+	* include/ddk/winddi.h: Likewise.
+	* include/ddk/winddk.h: Likewise.
+	* include/ddk/winnt4.h: Likewise.
+	* include/ddk/ws2san.h: Likewise.
+	* include/ddk/xfilter.h: Remove unbalanced #pragma pack(pop).
+	* include/ddk/video.h: Don't process rest of file ifdef
+	__WINDDI_H.
+	* include/ddk/winddi.h: Don't process rest of file ifdef
+	__VIDEO_H.
+	* include/ddk/usb.h: Don't process rest of file ifdef
+	__USBDI_H.
+	* include/ddk/usbdi.h: Don't process rest of file ifdef
+	__USB_H.
+	* include/ddk/usbcamdi.h: Don't process rest of file if
+	!defined(__USB_H) && !defined(__USBDI_H)
+
 2002-12-18  James E. Lucas  <xelloss@users.sourceforge.net>
 
 	* include/winnetwk.h (WNetResourceInformation[AW]): Correct

@@ -27,15 +27,15 @@
 #pragma GCC system_header
 #endif
 
+#ifdef __USB_H
+#error usb.h cannot be included with usbdi.h
+#else
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #pragma pack(push,4)
-
-#ifdef __USB_H
-#error usb.h cannot be included with usbdi.h
-#endif
 
 #include "ntddk.h"
 #include "usbioctl.h"
@@ -406,5 +406,7 @@ typedef struct _URB {
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* defined __USB_H */
 
 #endif /* __USBDI_H */

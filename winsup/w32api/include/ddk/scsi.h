@@ -892,6 +892,9 @@ typedef union _CDB {
     UCHAR  AsByte[16];
 } CDB, *PCDB;
 
+#ifndef _INQUIRYDATA_DEFINED /* also in minitape.h */
+#define _INQUIRYDATA_DEFINED
+
 #define INQUIRYDATABUFFERSIZE             36
 
 typedef struct _INQUIRYDATA {
@@ -936,6 +939,7 @@ typedef struct _INQUIRYDATA {
   UCHAR  VendorSpecific[20];
   UCHAR  Reserved3[40];
 } INQUIRYDATA, *PINQUIRYDATA;
+#endif
 
 /* INQUIRYDATA.DeviceType constants */
 #define DIRECT_ACCESS_DEVICE              0x00

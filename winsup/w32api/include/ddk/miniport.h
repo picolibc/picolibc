@@ -39,6 +39,13 @@ extern "C" {
 #define EMULATOR_READ_ACCESS              0x01
 #define EMULATOR_WRITE_ACCESS             0x02
 
+typedef enum _EMULATOR_PORT_ACCESS_TYPE {
+	Uchar,
+	Ushort,
+	Ulong
+} EMULATOR_PORT_ACCESS_TYPE, *PEMULATOR_PORT_ACCESS_TYPE;
+
+
 typedef struct _EMULATOR_ACCESS_ENTRY {
   ULONG  BasePort;
   ULONG  NumConsecutivePorts;
@@ -48,12 +55,8 @@ typedef struct _EMULATOR_ACCESS_ENTRY {
   PVOID  Routine;
 } EMULATOR_ACCESS_ENTRY, *PEMULATOR_ACCESS_ENTRY;
 
-typedef enum _EMULATOR_PORT_ACCESS_TYPE {
-	Uchar,
-	Ushort,
-	Ulong
-} EMULATOR_PORT_ACCESS_TYPE, *PEMULATOR_PORT_ACCESS_TYPE;
-
+#ifndef VIDEO_ACCESS_RANGE_DEFINED /* also in video.h */
+#define VIDEO_ACCESS_RANGE_DEFINED
 typedef struct _VIDEO_ACCESS_RANGE {
   PHYSICAL_ADDRESS  RangeStart;
   ULONG  RangeLength;
@@ -62,6 +65,7 @@ typedef struct _VIDEO_ACCESS_RANGE {
   UCHAR  RangeShareable;
   UCHAR  RangePassive;
 } VIDEO_ACCESS_RANGE, *PVIDEO_ACCESS_RANGE;
+#endif
 
 typedef VOID DDKAPI
 (*PBANKED_SECTION_ROUTINE)(

@@ -3989,7 +3989,7 @@ typedef struct _NDIS_BIND_PATHS {
   typedef struct _##BaseName BaseName, *P##BaseName;
 
 #define DECLARE_UNKNOWN_PROTOTYPE(Name) \
-  typedef VOID (*##Name)(VOID);
+  typedef VOID (*(Name))(VOID);
 
 #define ETH_LENGTH_OF_ADDRESS 6
 

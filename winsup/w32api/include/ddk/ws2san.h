@@ -31,6 +31,8 @@
 extern "C" {
 #endif
 
+#pragma pack(push,4)
+
 #include <winsock2.h>
 #include "ntddk.h"
 

@@ -232,8 +232,6 @@ typedef ULONG TR_GROUP_ADDRESS;
 	} \
 }
 
-#pragma pack(pop)
-
 #ifdef __cplusplus
 }
 #endif

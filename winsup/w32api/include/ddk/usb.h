@@ -27,15 +27,15 @@
 #pragma GCC system_header
 #endif
 
+#ifdef __USBDI_H
+#error usbdi.h cannot be included with usb.h
+#else
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #pragma pack(push,4)
-
-#ifdef __USBDI_H
-#error usbdi.h cannot be included with usb.h
-#endif
 
 #include "ntddk.h"
 #include "usb100.h"
@@ -470,4 +470,6 @@ typedef struct _OS_STRING {
 }
 #endif
 
+#endif /* defined __USBDI_H */
+ 
 #endif /* __USB_H */

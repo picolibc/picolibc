@@ -31,8 +31,6 @@
 extern "C" {
 #endif
 
-#pragma pack(push,4)
-
 #define TDI_SUCCESS                       STATUS_SUCCESS
 #define TDI_NO_RESOURCES                  STATUS_INSUFFICIENT_RESOURCES
 #define TDI_ADDR_IN_USE                   STATUS_ADDRESS_ALREADY_EXISTS
@@ -77,8 +75,6 @@ extern "C" {
 
 #define	TDI_ADDRESS_OPTION_REUSE          1
 #define	TDI_ADDRESS_OPTION_DHCP           2
-
-#pragma pack(pop)
 
 #ifdef __cplusplus
 }

@@ -23,17 +23,20 @@
 #ifndef __VIDEO_H
 #define __VIDEO_H
 
-#ifdef __WINDDI_H
-#error winddi.h cannot be included with video.h
-#endif
 
 #if __GNUC__ >=3
 #pragma GCC system_header
 #endif
 
+#ifdef __WINDDI_H
+#error winddi.h cannot be included with video.h
+#else
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#pragma pack(push,4)
 
 #include "ntddk.h"
 
@@ -247,6 +250,8 @@ typedef BOOLEAN DDKAPI
 #define VIDEO_RANGE_PASSIVE_DECODE        1
 #define VIDEO_RANGE_10_BIT_DECODE         2
 
+#ifndef VIDEO_ACCESS_RANGE_DEFINED /* also in miniport.h */
+#define VIDEO_ACCESS_RANGE_DEFINED
 typedef struct _VIDEO_ACCESS_RANGE {
   PHYSICAL_ADDRESS  RangeStart;
   ULONG  RangeLength;
@@ -255,6 +260,7 @@ typedef struct _VIDEO_ACCESS_RANGE {
   UCHAR  RangeShareable;
   UCHAR  RangePassive;
 } VIDEO_ACCESS_RANGE, *PVIDEO_ACCESS_RANGE;
+#endif
 
 typedef VOID DDKAPI
 (*PVIDEO_HW_LEGACYRESOURCES)(
@@ -1558,5 +1564,7 @@ VideoPortZeroMemory(
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* defined __WINDDI_H */
 
 #endif /* __VIDEO_H */

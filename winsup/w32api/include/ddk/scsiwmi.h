@@ -46,6 +46,21 @@ typedef struct _SCSIWMI_REQUEST_CONTEXT {
   ULONG  ReturnSize;
 } SCSIWMI_REQUEST_CONTEXT, *PSCSIWMI_REQUEST_CONTEXT;
 
+#ifndef _GUID_DEFINED
+#define _GUID_DEFINED
+typedef struct _GUID {
+    unsigned long  Data1;
+    unsigned short Data2;
+    unsigned short Data3;
+    unsigned char  Data4[ 8 ];
+} GUID;
+#endif
+
+#ifndef _LPCGUID_DEFINED
+#define _LPCGUID_DEFINED
+typedef const GUID *LPCGUID;
+#endif
+
 typedef struct _SCSIWMIGUIDREGINFO {
   LPCGUID  Guid;
   ULONG  InstanceCount;

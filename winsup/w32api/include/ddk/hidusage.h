@@ -31,8 +31,6 @@
 extern "C" {
 #endif
 
-#pragma pack(push,4)
-
 typedef USHORT USAGE, *PUSAGE;
 
 #define HID_USAGE_GENERIC_POINTER             ((USAGE) 0x01)
@@ -204,8 +202,6 @@ typedef USHORT USAGE, *PUSAGE;
 
 #define HID_USAGE_SIMULATION_RUDDER       ((USAGE) 0xBA)
 #define HID_USAGE_SIMULATION_THROTTLE     ((USAGE) 0xBB)
-
-#pragma pack(pop)
 
 #ifdef __cplusplus
 }

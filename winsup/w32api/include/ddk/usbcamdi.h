@@ -27,15 +27,15 @@
 #pragma GCC system_header
 #endif
 
+#if !defined(__USB_H) && !defined(__USBDI_H)
+#error include usb.h or usbdi.h before usbcamdi.h
+#else
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #pragma pack(push,4)
-
-#if !defined(__USB_H) && !defined(__USBDI_H)
-#error include usb.h or usbdi.h before usbcamdi.h
-#endif
 
 #include "ntddk.h"
 
@@ -397,5 +397,8 @@ USBCAMD_Debug_LogEntry(
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* !defined(__USB_H) && !defined(__USBDI_H) */
+
 
 #endif /* __USBCAMDI_H */

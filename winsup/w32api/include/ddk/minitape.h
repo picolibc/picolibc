@@ -76,7 +76,8 @@ typedef enum _TAPE_STATUS {
 } TAPE_STATUS, *PTAPE_STATUS;
 
 #define INQUIRYDATABUFFERSIZE 36
-
+#ifndef _INQUIRYDATA_DEFINED /* also in scsi.h */
+#define _INQUIRYDATA_DEFINED
 typedef struct _INQUIRYDATA {
 	UCHAR  DeviceType : 5;
 	UCHAR  DeviceTypeQualifier : 3;
@@ -119,6 +120,7 @@ typedef struct _INQUIRYDATA {
 	UCHAR  VendorSpecific[20];
 	UCHAR  Reserved3[40];
 } INQUIRYDATA, *PINQUIRYDATA;
+#endif
 
 typedef struct _MODE_CAPABILITIES_PAGE {
 	UCHAR PageCode : 6;

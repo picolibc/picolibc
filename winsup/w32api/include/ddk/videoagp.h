@@ -31,6 +31,8 @@
 extern "C" {
 #endif
 
+#pragma pack(push,4)
+
 #include "ntddk.h"
 #include "video.h"
 

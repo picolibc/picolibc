@@ -31,6 +31,8 @@
 extern "C" {
 #endif
 
+#pragma pack(push,4)
+
 /*
 ** Definitions specific to this Device Driver Kit
 */

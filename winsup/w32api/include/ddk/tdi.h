@@ -311,7 +311,7 @@ typedef struct _TDI_REQUEST_SET_EVENT {
 #define TDI_RECEIVE_AT_DISPATCH_LEVEL     0x00000800
 #define TDI_RECEIVE_CONTROL_INFO          0x00001000
 
-/* Listen flags *
+/* Listen flags */
 #define TDI_QUERY_ACCEPT                  0x00000001
 
 /* Options used for both SendOptions and ReceiveIndicators */

@@ -23,13 +23,13 @@
 #ifndef __WINDDI_H
 #define __WINDDI_H
 
-#ifdef __VIDEO_H
-#error video.h cannot be included with winddi.h
-#endif
-
 #if __GNUC__ >=3
 #pragma GCC system_header
 #endif
+
+#ifdef __VIDEO_H
+#error video.h cannot be included with winddi.h
+#else
 
 #ifdef __cplusplus
 extern "C" {
@@ -4140,5 +4140,7 @@ DrvGetDirectDrawInfo(
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* defined __VIDEO_H */
 
 #endif /* __WINDDI_H */
