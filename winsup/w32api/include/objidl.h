@@ -305,7 +305,9 @@ typedef struct tagPROPVARIANT {
 		short iVal;
 		USHORT uiVal;
 		VARIANT_BOOL boolVal;
-#ifndef __cplusplus
+#if 0
+/* bool is a standard type in C++, and a standard macro expanding
+   to the _Bool type in C99 (see stdbool.h) */   
 		_VARIANT_BOOL bool;
 #endif
 		long lVal;

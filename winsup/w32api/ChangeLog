@@ -1,5 +1,10 @@
 2002-06-24  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/objidl.h (struct tagPROPVARIANT): Kill obsolete
+	union member _VARIANT_BOOL bool.
+	
+2002-06-24  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/winioctl.h (FILE_SPECIAL_ACCESS): Add define.
 
 2002-06-24  Casper S. Hornstrup  <chorns@users.sourceforge.net>
