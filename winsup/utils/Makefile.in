@@ -31,7 +31,8 @@ CXX:=@CXX@
 CXX_FOR_TARGET:=$(CXX)
 
 CFLAGS:=@CFLAGS@
-CXXFLAGS:=@CXXFLAGS@ -fno-exceptions -fno-rtti -DHAVE_DECL_GETOPT=0
+CXXFLAGS:=@CXXFLAGS@
+CXXFLAGS+=-fno-exceptions -fno-rtti -DHAVE_DECL_GETOPT=0
 
 include $(srcdir)/../Makefile.common
 
