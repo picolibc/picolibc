@@ -112,7 +112,19 @@ of the software without specific, written prior permission.
 Hewlett-Packard Company makes no representations about the
 suitability of this software for any purpose.
 
-(9) Unless otherwise stated in each remaining newlib file, the remaining
+(9) Hans-Peter Nilsson
+
+Copyright (C) 2001 Hans-Peter Nilsson
+
+Permission to use, copy, modify, and distribute this software is
+freely granted, provided that this notice is preserved with no changes.
+
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE.
+
+(10) Unless otherwise stated in each remaining newlib file, the remaining
 files in the newlib subdirectory are governed by the following copyright.
 
 Copyright (c) 1994, 1997, 2001 Red Hat Incorporated.

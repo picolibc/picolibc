@@ -1,3 +1,7 @@
+2001-11-12  Hans-Peter Nilsson  <hp@bitrange.com>
+
+        * COPYING.NEWLIB: Add BSD-style license/copyright blurb for my work.
+
 2001-11-08  Phil Edwards  <pedwards@disaster.jaj.com>
 
 	* configure.in (--enable-languages): Be more permissive about
