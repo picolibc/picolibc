@@ -1,3 +1,8 @@
+2002-07-11  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_shm.cc (class server_shmmgr::segment_t): Add `_'
+	prefix to the names of all fields.
+
 2002-07-10  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* msg.cc: New file of stub functions, no functionality.

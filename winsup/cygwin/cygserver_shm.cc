@@ -86,27 +86,27 @@ private:
     // Bits for the _flg field.
     enum { REMOVED = 0x01 };
 
-    static long sequence;
+    static long _sequence;
 
-    const int intid;
-    const int shmid;
-    struct shmid_ds ds;
-    int flg;
-    const HANDLE hFileMap;
+    const int _intid;
+    const int _shmid;
+    struct shmid_ds _ds;
+    int _flg;
+    const HANDLE _hFileMap;
 
-    segment_t *next;
+    segment_t *_next;
 
     segment_t (const key_t key, const int intid, const HANDLE hFileMap)
-      : intid (intid),
-	shmid (ipc_int2ext (intid, IPC_SHMOP, sequence)),
-	flg (0),
-	hFileMap (hFileMap),
-	next (NULL)
+      : _intid (intid),
+	_shmid (ipc_int2ext (_intid, IPC_SHMOP, _sequence)),
+	_flg (0),
+	_hFileMap (hFileMap),
+	_next (NULL)
     {
-      assert (0 <= intid && intid < SHMMNI);
+      assert (0 <= _intid && _intid < SHMMNI);
 
-      memset (&ds, '\0', sizeof (ds));
-      ds.shm_perm.key = key;
+      memset (&_ds, '\0', sizeof (_ds));
+      _ds.shm_perm.key = key;
     }
   };
 
@@ -150,7 +150,7 @@ private:
   void delete_segment (segment_t *);
 };
 
-/* static */ long server_shmmgr::segment_t::sequence = 0;
+/* static */ long server_shmmgr::segment_t::_sequence = 0;
 
 /* static */ server_shmmgr *server_shmmgr::_instance = NULL;
 /* static */ pthread_once_t server_shmmgr::_instance_once = PTHREAD_ONCE_INIT;
@@ -201,7 +201,7 @@ server_shmmgr::shmat (HANDLE & hFileMap,
   if (!segptr)
     result = -EINVAL;
   else if (!DuplicateHandle (GetCurrentProcess (),
-			     segptr->hFileMap,
+			     segptr->_hFileMap,
 			     client->handle (),
 			     &hFileMap,
 			     0,
@@ -212,16 +212,16 @@ server_shmmgr::shmat (HANDLE & hFileMap,
 		   syscall_printf (("failed to duplicate handle for client "
 				    "[key = 0x%016llx, shmid = %d, handle = 0x%x]:"
 				    "%s"),
-				   segptr->ds.shm_perm.key, segptr->shmid,
-				   segptr->hFileMap, msg));
+				   segptr->_ds.shm_perm.key, segptr->_shmid,
+				   segptr->_hFileMap, msg));
 
       result = -EACCES;		// FIXME
     }
   else
     {
-      segptr->ds.shm_lpid  = cygpid;
-      segptr->ds.shm_nattch += 1;
-      segptr->ds.shm_atime = time (NULL); // FIXME: sub-second times.
+      segptr->_ds.shm_lpid  = cygpid;
+      segptr->_ds.shm_nattch += 1;
+      segptr->_ds.shm_atime = time (NULL); // FIXME: sub-second times.
     }
 
   LeaveCriticalSection (&_segments_lock);
@@ -279,31 +279,31 @@ server_shmmgr::shmctl (int & out_shmid,
 	  switch (cmd)
 	    {
 	    case IPC_STAT:
-	      out_ds = segptr->ds;
+	      out_ds = segptr->_ds;
 	      break;
 
 	    case IPC_SET:
-	      segptr->ds.shm_perm.uid = ds.shm_perm.uid;
-	      segptr->ds.shm_perm.gid = ds.shm_perm.gid;
-	      segptr->ds.shm_perm.mode = ds.shm_perm.mode & 0777;
-	      segptr->ds.shm_lpid = cygpid;
-	      segptr->ds.shm_ctime = time (NULL); // FIXME: sub-second times.
+	      segptr->_ds.shm_perm.uid = ds.shm_perm.uid;
+	      segptr->_ds.shm_perm.gid = ds.shm_perm.gid;
+	      segptr->_ds.shm_perm.mode = ds.shm_perm.mode & 0777;
+	      segptr->_ds.shm_lpid = cygpid;
+	      segptr->_ds.shm_ctime = time (NULL); // FIXME: sub-second times.
 	      break;
 
 	    case IPC_RMID:
-	      if (segptr->flg & segment_t::REMOVED)
+	      if (segptr->_flg & segment_t::REMOVED)
 		result = -EIDRM;
 	      else
 		{
-		  segptr->flg |= segment_t::REMOVED;
-		  if (!segptr->ds.shm_nattch)
+		  segptr->_flg |= segment_t::REMOVED;
+		  if (!segptr->_ds.shm_nattch)
 		    delete_segment (segptr);
 		}
 	      break;
 
 	    case SHM_STAT:	// ipcs(8) i'face.
-	      out_ds = segptr->ds;
-	      out_shmid = segptr->shmid;
+	      out_ds = segptr->_ds;
+	      out_shmid = segptr->_shmid;
 	      break;
 	    }
       }
@@ -365,13 +365,13 @@ server_shmmgr::shmdt (const int shmid, const pid_t cygpid)
     result = -EINVAL;
   else
     {
-      assert (segptr->ds.shm_nattch > 0);
+      assert (segptr->_ds.shm_nattch > 0);
 
-      segptr->ds.shm_lpid  = cygpid;
-      segptr->ds.shm_nattch -= 1;
-      segptr->ds.shm_dtime = time (NULL); // FIXME: sub-second times.
+      segptr->_ds.shm_lpid  = cygpid;
+      segptr->_ds.shm_nattch -= 1;
+      segptr->_ds.shm_dtime = time (NULL); // FIXME: sub-second times.
 
-      if (!segptr->ds.shm_nattch && (segptr->flg & segment_t::REMOVED))
+      if (!segptr->_ds.shm_nattch && (segptr->_flg & segment_t::REMOVED))
 	delete_segment (segptr);
     }
 
@@ -414,16 +414,16 @@ server_shmmgr::shmget (int & out_shmid,
 	  result = new_segment (key, size, shmflg, cygpid, uid, gid);
 	else
 	  result = -ENOENT;
-      else if (segptr->flg & segment_t::REMOVED)
+      else if (segptr->_flg & segment_t::REMOVED)
 	result = -EIDRM;
       else if ((shmflg & IPC_CREAT) && (shmflg & IPC_EXCL))
 	result = -EEXIST;
-      else if ((shmflg & ~(segptr->ds.shm_perm.mode)) & 0777)
+      else if ((shmflg & ~(segptr->_ds.shm_perm.mode)) & 0777)
 	result = -EACCES;
-      else if (size && segptr->ds.shm_segsz < size)
+      else if (size && segptr->_ds.shm_segsz < size)
 	result = -EINVAL;
       else
-	result = segptr->shmid;
+	result = segptr->_shmid;
     }
 
   LeaveCriticalSection (&_segments_lock);
@@ -493,8 +493,8 @@ server_shmmgr::~server_shmmgr ()
 server_shmmgr::segment_t *
 server_shmmgr::find_by_key (const key_t key)
 {
-  for (segment_t *segptr = _segments_head; segptr; segptr = segptr->next)
-    if (segptr->ds.shm_perm.key == key)
+  for (segment_t *segptr = _segments_head; segptr; segptr = segptr->_next)
+    if (segptr->_ds.shm_perm.key == key)
       return segptr;
 
   return NULL;
@@ -510,10 +510,10 @@ server_shmmgr::find (const int intid, segment_t **previous)
   if (previous)
     *previous = NULL;
 
-  for (segment_t *segptr = _segments_head; segptr; segptr = segptr->next)
-    if (segptr->intid == intid)
+  for (segment_t *segptr = _segments_head; segptr; segptr = segptr->_next)
+    if (segptr->_intid == intid)
       return segptr;
-    else if (segptr->intid > intid) // The list is sorted by intid.
+    else if (segptr->_intid > intid) // The list is sorted by intid.
       return NULL;
     else if (previous)
       *previous = segptr;
@@ -559,14 +559,14 @@ server_shmmgr::new_segment (const key_t key,
       return -ENOSPC;
     }
 
-  segptr->ds.shm_perm.cuid = segptr->ds.shm_perm.uid = uid;
-  segptr->ds.shm_perm.cgid = segptr->ds.shm_perm.gid = gid;
-  segptr->ds.shm_perm.mode = shmflg & 0777;
-  segptr->ds.shm_segsz = size;
-  segptr->ds.shm_cpid = cygpid;
-  segptr->ds.shm_ctime = time (NULL); // FIXME: sub-second times.
+  segptr->_ds.shm_perm.cuid = segptr->_ds.shm_perm.uid = uid;
+  segptr->_ds.shm_perm.cgid = segptr->_ds.shm_perm.gid = gid;
+  segptr->_ds.shm_perm.mode = shmflg & 0777;
+  segptr->_ds.shm_segsz = size;
+  segptr->_ds.shm_cpid = cygpid;
+  segptr->_ds.shm_ctime = time (NULL); // FIXME: sub-second times.
 
-  return segptr->shmid;
+  return segptr->_shmid;
 }
 
 /*---------------------------------------------------------------------------*
@@ -588,8 +588,8 @@ server_shmmgr::new_segment (const key_t key, const size_t size,
 
   // Find first unallocated intid.
   for (segment_t *segptr = _segments_head;
-       segptr && segptr->intid == intid;
-       segptr = segptr->next, intid++)
+       segptr && segptr->_intid == intid;
+       segptr = segptr->_next, intid++)
     {
       previous = segptr;
     }
@@ -607,12 +607,12 @@ server_shmmgr::new_segment (const key_t key, const size_t size,
 
   if (previous)
     {
-      segptr->next = previous->next;
-      previous->next = segptr;
+      segptr->_next = previous->_next;
+      previous->_next = segptr;
     }
   else
     {
-      segptr->next = _segments_head;
+      segptr->_next = _segments_head;
       _segments_head = segptr;
     }
 
@@ -632,30 +632,30 @@ void
 server_shmmgr::delete_segment (segment_t *const segptr)
 {
   assert (segptr);
-  assert (!segptr->ds.shm_nattch);
-  assert (segptr->flg & segment_t::REMOVED);
+  assert (!segptr->_ds.shm_nattch);
+  assert (segptr->_flg & segment_t::REMOVED);
 
   segment_t *previous = NULL;
 
-  const segment_t *const tmp = find (segptr->intid, &previous);
+  const segment_t *const tmp = find (segptr->_intid, &previous);
 
   assert (tmp == segptr);
-  assert (previous ? previous->next == segptr : _segments_head == segptr);
+  assert (previous ? previous->_next == segptr : _segments_head == segptr);
 
   if (previous)
-    previous->next = segptr->next;
+    previous->_next = segptr->_next;
   else
-    _segments_head = segptr->next;
+    _segments_head = segptr->_next;
 
-  if (!CloseHandle (segptr->hFileMap))
+  if (!CloseHandle (segptr->_hFileMap))
     with_strerr (msg,
 		 syscall_printf (("failed to close file map "
 				  "[handle = 0x%x]: %s"),
-				 segptr->hFileMap, msg));
+				 segptr->_hFileMap, msg));
 
   assert (_shm_ids > 0);
   _shm_ids -= 1;
-  _shm_tot -= segptr->ds.shm_segsz;
+  _shm_tot -= segptr->_ds.shm_segsz;
 
   safe_delete (segment_t, segptr);
 }
