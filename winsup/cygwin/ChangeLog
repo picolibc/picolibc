@@ -1,5 +1,11 @@
 2004-03-15  Christopher Faylor  <cgf@redhat.com>
 
+	* cygtls.cc (_cygtls::fixup_after_fork): Just manipulate the signal
+	stack if a signal occurred during the parent's fork.  Otherwise leave
+	it alone.
+
+2004-03-15  Christopher Faylor  <cgf@redhat.com>
+
 	* exceptions.cc (try_to_debug): Report on tid of caller.
 
 	* sync.cc (muto::acquire): Fix some races.

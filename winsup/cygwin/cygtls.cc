@@ -138,12 +138,13 @@ _cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
 void
 _cygtls::fixup_after_fork ()
 {
-  sig = stacklock = 0;
+  if (sig)
+    {
+      pop ();
+      sig = 0;
+    }
+  stacklock = 0;
   wq.thread_ev = NULL;
-  stackptr = stack + 1;	// FIXME?
-#ifdef DEBUGGING
-  memset (stackptr, 0, sizeof (stack) - sizeof (stack[0]));
-#endif
 }
 
 void
