@@ -21,6 +21,10 @@ cgen/, cgen parts of opcodes/, sim/, include/
 	May need separate opcodes/ or sim/ approval for
 		commits of regenerated files there.
 
+sid/, sid parts of cgen/, dejagnu/
+	sid: http://sources.redhat.com/sid/
+	Patches to sid@sources.redhat.com
+
 config.guess, config.sub
 	config: http://gnu.org
 	Patches to config-patches@gnu.org.
