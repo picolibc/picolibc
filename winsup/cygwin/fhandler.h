@@ -781,12 +781,12 @@ struct select_record
   void (*cleanup) (select_record *me, class select_stuff *stuff);
   struct select_record *next;
 
-  select_record (fhandler_base *in_fh = NULL) {memset (this, 0, sizeof(select_record)); fh = in_fh;}
-  select_record (int) : fd (0), h (NULL), fh (0), saw_error (0), windows_handle (0),
-		     read_ready (0), write_ready (0), except_ready (0),
-		     read_selected (0), write_selected (0), except_selected (0),
-		     startup (NULL), poll (NULL), verify (NULL), cleanup (NULL),
-		     next (NULL) {}
+  select_record (fhandler_base *in_fh = NULL) : fd (0), h (NULL),
+		 fh (in_fh), saw_error (0), windows_handle (0),
+		 read_ready (0), write_ready (0), except_ready (0),
+		 read_selected (0), write_selected (0), except_selected (0),
+		 startup (NULL), poll (NULL), verify (NULL), cleanup (NULL),
+		 next (NULL) {}
 };
 
 class select_stuff
