@@ -1,3 +1,30 @@
+
+2003-01-26  Christopher Faylor  <cgf@redhat.com>
+
+	* include/sys/strace.h (paranoid_printf): Define as not being part of
+	"all" output.
+
+2003-01-25  Christopher Faylor  <cgf@redhat.com>
+
+	* pwdgrp.h (pwdgrp::next_num): Rename from next_int.  Returns
+	true/false if parse operation succeeded.
+	(pwdgrp::reparse): Remove.
+	(pwdgrp::raw_ptr): New function.  Returns pointer in line.
+	(pwdgrp::next_num): New functions for parsing other than unsigned long.
+	* grp.cc (pwdgrp::parse_group): Reinstate previous parsing behavior.
+	Don't fill in fields with NULL and assign empty gr_mem to known pointer
+	rather than doing a pointless calloc.  Streamline gr_mem parsing.
+	Don't increment curr_lines here.
+	* passwd.cc (pwdgrp::parse_passwd): Use new behavior of next_num.
+	Don't increment curr_lines here.
+	* uinfo.cc (pwdgrp::next_str): Keep returning EOL if out of data.
+	(pwdgrp::reparse): Remove.
+	(pwdgrp::next_num): Rename from next_int.  Return bool indicating
+	success of parse, argument returns value parsed.
+	(pwdgrp::add_line): Increment curr_lines here on successful parse.
+	(pwdgrp::load): (from Pierre Humblet) Don't return status.  Just report
+	it here.
+
 2003-01-25  Christopher Faylor  <cgf@redhat.com>
 
 	* pwdgrp.cc (pwdgrp::reparse): Declare.

@@ -142,7 +142,7 @@ void strace_printf (unsigned, const char *func, const char *, ...);
     }))
 
 #define debug_printf(fmt, args...) strace_printf_wrap(DEBUG, fmt , ## args)
-#define paranoid_printf(fmt, args...) strace_printf_wrap(PARANOID, fmt , ## args)
+#define paranoid_printf(fmt, args...) strace_printf_wrap1(PARANOID, fmt , ## args)
 #define select_printf(fmt, args...) strace_printf_wrap(SELECT, fmt , ## args)
 #define sigproc_printf(fmt, args...) strace_printf_wrap(SIGP, fmt , ## args)
 #define syscall_printf(fmt, args...) strace_printf_wrap(SYSCALL, fmt , ## args)
