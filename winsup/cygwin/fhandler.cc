@@ -365,12 +365,13 @@ bool
 fhandler_base::device_access_denied (int flags)
 {
   int mode = 0;
-  if (flags & O_RDONLY)
-    mode |= R_OK;
   if (flags & O_RDWR)
     mode |= R_OK | W_OK;
-  if (flags & O_WRONLY)
+  if (flags & (O_WRONLY | O_APPEND))
     mode |= W_OK;
+  if (!mode)
+    mode |= R_OK;
+
   return ::access (get_win32_name (), mode);
 }
 
@@ -630,15 +631,15 @@ fhandler_base::write (const void *ptr, size_t len)
   int res;
 
   if (get_append_p ())
-    SetFilePointer (get_handle (), 0, 0, FILE_END);
+    SetFilePointer (get_output_handle (), 0, 0, FILE_END);
   else if (wincap.has_lseek_bug () && get_check_win95_lseek_bug ())
     {
       /* Note: this bug doesn't happen on NT4, even though the documentation
 	 for WriteFile() says that it *may* happen on any OS. */
       int actual_length, current_position;
       set_check_win95_lseek_bug (0); /* don't do it again */
-      actual_length = GetFileSize (get_handle (), NULL);
-      current_position = SetFilePointer (get_handle (), 0, 0, FILE_CURRENT);
+      actual_length = GetFileSize (get_output_handle (), NULL);
+      current_position = SetFilePointer (get_output_handle (), 0, 0, FILE_CURRENT);
       if (current_position > actual_length)
 	{
 	  /* Oops, this is the bug case - Win95 uses whatever is on the disk
@@ -647,20 +648,20 @@ fhandler_base::write (const void *ptr, size_t len)
 	  char zeros[512];
 	  int number_of_zeros_to_write = current_position - actual_length;
 	  memset (zeros, 0, 512);
-	  SetFilePointer (get_handle (), 0, 0, FILE_END);
+	  SetFilePointer (get_output_handle (), 0, 0, FILE_END);
 	  while (number_of_zeros_to_write > 0)
 	    {
 	      DWORD zeros_this_time = (number_of_zeros_to_write > 512
 				     ? 512 : number_of_zeros_to_write);
 	      DWORD written;
-	      if (!WriteFile (get_handle (), zeros, zeros_this_time, &written,
+	      if (!WriteFile (get_output_handle (), zeros, zeros_this_time, &written,
 			      NULL))
 		{
 		  __seterrno ();
 		  if (get_errno () == EPIPE)
 		    raise (SIGPIPE);
 		  /* This might fail, but it's the best we can hope for */
-		  SetFilePointer (get_handle (), current_position, 0, FILE_BEGIN);
+		  SetFilePointer (get_output_handle (), current_position, 0, FILE_BEGIN);
 		  return -1;
 
 		}
@@ -668,7 +669,7 @@ fhandler_base::write (const void *ptr, size_t len)
 		{
 		  set_errno (ENOSPC);
 		  /* This might fail, but it's the best we can hope for */
-		  SetFilePointer (get_handle (), current_position, 0, FILE_BEGIN);
+		  SetFilePointer (get_output_handle (), current_position, 0, FILE_BEGIN);
 		  return -1;
 		}
 	      number_of_zeros_to_write -= written;
@@ -984,7 +985,7 @@ fhandler_base::fstat (struct __stat64 *buf, path_conv *pc)
 {
   debug_printf ("here");
 
-  if (is_fs_device ())
+  if (is_fs_special ())
     return fstat_fs (buf, pc);
 
   switch (get_device ())
