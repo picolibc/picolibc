@@ -44,7 +44,7 @@ details. */
 
    Each DOS drive is defined to have a current directory.  Supporting
    this would complicate things so for now things are defined so that
-   c: means c:\.  FIXME: Is this still true?
+   c: means c:\.
 */
 
 #include "winsup.h"
