@@ -308,6 +308,9 @@ struct bfd_link_info
   /* TRUE if PT_GNU_RELRO segment should be created.  */
   unsigned int relro: 1;
 
+  /* TRUE if we should warn when adding a DT_TEXTREL to a shared object.  */
+  unsigned int warn_shared_textrel: 1;
+
   /* What to do with unresolved symbols in an object file.
      When producing executables the default is GENERATE_ERROR.
      When producing shared libraries the default is IGNORE.  The

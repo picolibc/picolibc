@@ -1,3 +1,7 @@
+2004-10-07  Jeff Baker  <jbaker@qnx.com>
+
+	* bfdlink.h (bfd_link_info): Add bitfield: warn_shared_textrel.
+
 2004-09-17  Paul Brook  <paul@codesourcery.com>
 
 	* elf/arm.h: Remove R_ARM_STKCHK and R_ARM_THM_STKCHK.
