@@ -1,3 +1,11 @@
+2001-11-04  Christopher Faylor  <cgf@redhat.com>
+
+	* select.cc: Add more comments throughout.  Use bool 'true' where
+	appropriate throughout.
+	(fhandler_socket::select_read): Remove duplicate setting for *_ready
+	which inadvertently overrode previous, correct setting.
+	(fhandler_socket::select_write): Ditto.
+
 2001-11-03  Christopher Faylor  <cgf@redhat.com>
 
 	* select.cc (verify_console): New function.

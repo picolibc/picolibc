@@ -285,6 +285,10 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       select_printf ("woke up.  wait_ret %d.  verifying", wait_ret);
       s = &start;
       int gotone = FALSE;
+      /* Some types of object (e.g., consoles) wake up on "inappropriate" events
+         like mouse movements.  The verify function will detect these situations.
+	 If it returns false, then this wakeup was a false alarm and we should go
+	 back to waiting. */
       while ((s = s->next))
 	if (s->saw_error)
 	  return -1;		/* Somebody detected an error */
@@ -392,7 +396,15 @@ peek_pipe (select_record *s, bool from_select)
   HANDLE h;
   set_handle_or_return_if_not_open (h, s);
 
+  /* pipes require a guard mutex to guard against the situation where multiple
+     readers are attempting to read from the same pipe.  In this scenario, it
+     is possible for PeekNamedPipe to report available data to two readers but
+     only one will actually get the data.  This will result in the other reader
+     entering fhandler_base::raw_read and blocking indefinitely in an interruptible
+     state.  This causes things like "make -j2" to hang.  So, for the non-select case
+     we use the pipe mutex, if it is available. */
   HANDLE guard_mutex = from_select ? NULL : fh->get_guard ();
+
   /* Don't perform complicated tests if we don't need to. */
   if (!s->read_selected && !s->except_selected)
     goto out;
@@ -412,7 +424,7 @@ peek_pipe (select_record *s, bool from_select)
 	case FH_TTYM:
 	  if (((fhandler_pty_master *)fh)->need_nl)
 	    {
-	      gotone = s->read_ready = 1;
+	      gotone = s->read_ready = true;
 	      goto out;
 	    }
 	  break;
@@ -420,14 +432,14 @@ peek_pipe (select_record *s, bool from_select)
 	  if (fh->get_readahead_valid ())
 	    {
 	      select_printf ("readahead");
-	      gotone = s->read_ready = 1;
+	      gotone = s->read_ready = true;
 	      goto out;
 	    }
 	}
 
       if (fh->bg_check (SIGTTIN) <= bg_eof)
 	{
-	  gotone = s->read_ready = 1;
+	  gotone = s->read_ready = true;
 	  goto out;
 	}
     }
@@ -440,7 +452,7 @@ peek_pipe (select_record *s, bool from_select)
       n = -1;
     }
   else if (!n || !guard_mutex)
-    /* nothing */;
+    /* no guard mutex or nothing to read fromt he pipe. */;
   else if (WaitForSingleObject (guard_mutex, 0) != WAIT_OBJECT_0)
     {
       select_printf ("%s, couldn't get mutex %p, %E", fh->get_name (),
@@ -462,7 +474,7 @@ peek_pipe (select_record *s, bool from_select)
 
   if (n < 0)
     {
-      fh->set_eof ();
+      fh->set_eof ();		/* Flag that other end of pipe is gone */
       select_printf ("%s, n %d", fh->get_name (), n);
       if (s->except_selected)
 	gotone += s->except_ready = true;
@@ -618,7 +630,7 @@ peek_console (select_record *me, bool)
   if (fh->get_readahead_valid ())
     {
       select_printf ("readahead");
-      return me->read_ready = 1;
+      return me->read_ready = true;
     }
 
   if (me->read_ready)
@@ -635,7 +647,7 @@ peek_console (select_record *me, bool)
 
   for (;;)
     if (fh->bg_check (SIGTTIN) <= bg_eof)
-      return me->read_ready = 1;
+      return me->read_ready = true;
     else if (!PeekConsoleInput (h, &irec, 1, &events_read) || !events_read)
       break;
     else
@@ -647,11 +659,11 @@ peek_console (select_record *me, bool)
 		  irec.Event.MouseEvent.dwEventFlags == DOUBLE_CLICK))
 	  {
 	    if (fh->mouse_aware ())
-	      return me->read_ready = 1;
+	      return me->read_ready = true;
 	  }
 	else if (irec.EventType == KEY_EVENT && irec.Event.KeyEvent.bKeyDown == true &&
 		 (irec.Event.KeyEvent.uChar.AsciiChar || get_nonascii_key (irec, tmpbuf)))
-	  return me->read_ready = 1;
+	  return me->read_ready = true;
 
 	/* Read and discard the event */
 	ReadConsoleInput (h, &irec, 1, &events_read);
@@ -743,7 +755,7 @@ verify_tty_slave (select_record *me, fd_set *readfds, fd_set *writefds,
 	   fd_set *exceptfds)
 {
   if (WaitForSingleObject (me->h, 0) == WAIT_OBJECT_0)
-    me->read_ready = 1;
+    me->read_ready = true;
   return set_bits (me, readfds, writefds, exceptfds);
 }
 
@@ -859,7 +871,7 @@ peek_serial (select_record *s, bool)
   fhandler_serial *fh = (fhandler_serial *)s->fh;
 
   if (fh->get_readahead_valid () || fh->overlapped_armed < 0)
-    return s->read_ready = 1;
+    return s->read_ready = true;
 
   select_printf ("fh->overlapped_armed %d", fh->overlapped_armed);
 
@@ -889,9 +901,9 @@ peek_serial (select_record *s, bool)
 	  goto err;
 	}
       else if (st.cbInQue)
-	return s->read_ready = 1;
+	return s->read_ready = true;
       else if (WaitCommEvent (h, &ev, &fh->io_status))
-	return s->read_ready = 1;
+	return s->read_ready = true;
       else if (GetLastError () == ERROR_IO_PENDING)
 	fh->overlapped_armed = 1;
       else
@@ -920,7 +932,7 @@ peek_serial (select_record *s, bool)
 	Sleep (to);
       else
 	{
-	  return s->read_ready = 1;
+	  return s->read_ready = true;
 	  select_printf ("got something");
 	}
       PurgeComm (h, PURGE_TXABORT | PURGE_RXABORT);
@@ -1069,7 +1081,6 @@ fhandler_base::ready_for_read (int fd, DWORD howlong)
 {
   int avail = 0;
   select_record me (this);
-  me.read_ready = false;
   me.fd = fd;
   while (!avail)
     {
@@ -1388,7 +1399,6 @@ fhandler_socket::select_read (select_record *s)
   s->peek = peek_socket;
   s->read_ready = saw_shutdown_read ();
   s->read_selected = true;
-  s->read_ready = false;
   return s;
 }
 
@@ -1405,7 +1415,6 @@ fhandler_socket::select_write (select_record *s)
   s->peek = peek_socket;
   s->write_ready = saw_shutdown_write ();
   s->write_selected = true;
-  s->write_ready = false;
   return s;
 }
 
