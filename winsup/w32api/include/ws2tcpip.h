@@ -12,6 +12,10 @@
 #pragma GCC system_header
 #endif
 
+#if (defined _WINSOCK_H && !defined _WINSOCK2_H)
+#error "ws2tcpip.h is not compatable with winsock.h. Include winsock2.h instead."
+#endif
+
 #include <winsock2.h>
 #ifdef  __cplusplus
 extern "C" {
@@ -336,7 +340,5 @@ typedef struct _OLD_INTERFACE_INFO {
 #ifdef  __cplusplus
 }
 #endif
+
 #endif	/* _WS2TCPIP_H */
-
-
-

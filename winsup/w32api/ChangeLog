@@ -1,4 +1,9 @@
-2002-09-24  Rene Moeller Fonseca  <fonseca@users.sourceforge.net>
+2002-09-24  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/ws2tcpip.h: Throw error if winsock.h, not winsock2.h
+	has been included first.
+
+2002-09-24  René Møller Fonseca  <fonseca@users.sourceforge.net>
 
         * include/winbase.h (FindFirstFileEx): Fixed ANSI mode.
         * include/wingdi.h (PFD_SWAP_LAYER_BUFFERS):Added define.
