@@ -123,12 +123,12 @@ mmap_record::alloc_map (_off64_t off, DWORD len)
       len = PAGE_CNT (len) * getpagesize ();
       if (off > 0 &&
 	  !VirtualProtect (base_address_, off, PAGE_NOACCESS, &old_prot))
-	syscall_printf ("VirtualProtect(%x,%d) failed: %E", base_address_, off);
+	syscall_printf ("VirtualProtect(%x,%D) failed: %E", base_address_, off);
       if (off + len < size_to_map_
 	  && !VirtualProtect (base_address_ + off + len,
 			      size_to_map_ - len - off,
 			      PAGE_NOACCESS, &old_prot))
-	syscall_printf ("VirtualProtect(%x,%d) failed: %E",
+	syscall_printf ("VirtualProtect(%x,%D) failed: %E",
 			base_address_ + off + len, size_to_map_ - len - off);
       off /= getpagesize ();
       len /= getpagesize ();
@@ -158,7 +158,7 @@ mmap_record::map_map (_off64_t off, DWORD len)
       break;
     }
 
-  debug_printf ("map_map (fd=%d, off=%D, len=%d)", fdesc_, off, len);
+  debug_printf ("map_map (fd=%d, off=%D, len=%u)", fdesc_, off, len);
   len = PAGE_CNT (len);
 
   if ((off = find_empty (len)) == (DWORD)-1)
@@ -435,7 +435,7 @@ static map *mmapped_areas;
 extern "C" caddr_t
 mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, _off64_t off)
 {
-  syscall_printf ("addr %x, len %d, prot %x, flags %x, fd %d, off %D",
+  syscall_printf ("addr %x, len %u, prot %x, flags %x, fd %d, off %D",
 		  addr, len, prot, flags, fd, off);
 
   static DWORD granularity;
@@ -618,7 +618,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, _off_t off)
 extern "C" int
 munmap (caddr_t addr, size_t len)
 {
-  syscall_printf ("munmap (addr %x, len %d)", addr, len);
+  syscall_printf ("munmap (addr %x, len %u)", addr, len);
 
   /* Error conditions according to SUSv3 */
   if (!addr || ((DWORD)addr % getpagesize ()) || !len
@@ -675,7 +675,7 @@ munmap (caddr_t addr, size_t len)
 extern "C" int
 msync (caddr_t addr, size_t len, int flags)
 {
-  syscall_printf ("addr = %x, len = %d, flags = %x",
+  syscall_printf ("addr = %x, len = %u, flags = %x",
 		  addr, len, flags);
 
   /* However, check flags for validity. */
@@ -843,7 +843,7 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
   if (!base && !(flags & MAP_FIXED))
     base = MapViewOfFileEx (h, access, high, low, len, NULL);
   debug_printf ("%x = MapViewOfFileEx (h:%x, access:%x, 0, off:%D, "
-  		"len:%d, addr:%x)", base, h, access, off, len, *addr);
+  		"len:%u, addr:%x)", base, h, access, off, len, *addr);
   if (!base || ((flags & MAP_FIXED) && base != *addr))
     {
       if (!base)
@@ -907,7 +907,7 @@ mprotect (caddr_t addr, size_t len, int prot)
   DWORD old_prot;
   DWORD new_prot = 0;
 
-  syscall_printf ("mprotect (addr %x, len %d, prot %x)", addr, len, prot);
+  syscall_printf ("mprotect (addr %x, len %u, prot %x)", addr, len, prot);
 
   if (!wincap.virtual_protect_works_on_shared_pages ()
       && addr >= (caddr_t)0x80000000 && addr <= (caddr_t)0xBFFFFFFF)
@@ -985,7 +985,7 @@ fixup_mmaps_after_fork (HANDLE parent)
 	    {
 	      mmap_record *rec = map_list->recs + li;
 
-	      debug_printf ("fd %d, h %x, access %x, offset %d, size %d, address %p",
+	      debug_printf ("fd %d, h %x, access %x, offset %D, size %u, address %p",
 		  rec->get_fd (), rec->get_handle (), rec->get_access (),
 		  rec->get_offset (), rec->get_size (), rec->get_address ());
 

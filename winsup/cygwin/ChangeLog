@@ -1,3 +1,9 @@
+2003-07-21  Pavel Tsekov  <ptsekov@gmx.net>
+
+	* mmap.cc: Use proper format specifiers for _off64_t and size_t in
+	format strings passed to syscall_printf () and debug_printf ()
+	throughout.
+
 2003-07-18  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* security.cc (verify_token): Fix white space and style.
