@@ -114,6 +114,9 @@ START_RELOC_NUMBERS (elf_arm_reloc_type)
   RELOC_NUMBER (R_ARM_THM_SWI8,        14)
   RELOC_NUMBER (R_ARM_XPC25,           15)
   RELOC_NUMBER (R_ARM_THM_XPC22,       16)
+  RELOC_NUMBER (R_ARM_TLS_DTPMOD32,    17)
+  RELOC_NUMBER (R_ARM_TLS_DTPOFF32,    18)
+  RELOC_NUMBER (R_ARM_TLS_TPOFF32,     19)
 #endif /* not OLD_ARM_ABI */
   RELOC_NUMBER (R_ARM_COPY,            20)   /* Copy symbol at runtime.  */
   RELOC_NUMBER (R_ARM_GLOB_DAT,        21)   /* Create GOT entry.  */
@@ -153,7 +156,12 @@ START_RELOC_NUMBERS (elf_arm_reloc_type)
   RELOC_NUMBER (R_ARM_GNU_VTINHERIT,  101)
   RELOC_NUMBER (R_ARM_THM_PC11,       102)   /* Cygnus extension to abi: Thumb unconditional branch.  */
   RELOC_NUMBER (R_ARM_THM_PC9,        103)   /* Cygnus extension to abi: Thumb conditional branch.  */
-  FAKE_RELOC   (FIRST_INVALID_RELOC3, 104)
+  RELOC_NUMBER (R_ARM_TLS_GD32,	      104)
+  RELOC_NUMBER (R_ARM_TLS_LDM32,      105)
+  RELOC_NUMBER (R_ARM_TLS_LDO32,      106)
+  RELOC_NUMBER (R_ARM_TLS_IE32,       107)
+  RELOC_NUMBER (R_ARM_TLS_LE32,	      108)
+  FAKE_RELOC   (FIRST_INVALID_RELOC3, 109)
   FAKE_RELOC   (LAST_INVALID_RELOC3,  248)
   RELOC_NUMBER (R_ARM_RXPC25,         249)
 #endif /* not OLD_ARM_ABI */

@@ -1,6 +1,62 @@
 2005-03-28  Daniel Jacobowitz  <dan@codesourcery.com>
+	    Phil Blundell  <philb@gnu.org>
 
-	* elf32-arm.c (elf32_arm_check_relocs): Increment count for all
+	* bfd/bfd-in2.h, libbfd.h: Regenerated.
+	* bfd/reloc.c: Add ARM TLS relocations.
+	* bfd/elf32-arm.c (elf32_arm_howto_table): Add dynamic TLS
+	relocations.
+	(elf32_arm_tls_gd32_howto, elf32_arm_tls_ldo32_howto)
+	(elf32_arm_tls_ldm32_howto, elf32_arm_tls_le32_howto)
+	(elf32_arm_tls_ie32_howto): New.
+	(elf32_arm_howto_from_type): Support TLS relocations.
+	(elf32_arm_reloc_map): Likewise.
+	(elf32_arm_reloc_type_lookup): Likewise.
+	(TCB_SIZE): Define.
+	(struct elf32_arm_obj_tdata): New.
+	(elf32_arm_tdata, elf32_arm_local_got_tls_type): Define.
+	(elf32_arm_mkobject): New function.
+	(struct elf32_arm_relocs_copied): Add pc_count.
+	(elf32_arm_hash_entry, GOT_UNKNOWN, GOT_NORMAL, GOT_TLS_GD)
+	(GOT_TLS_IE): Define.
+	(struct elf32_arm_link_hash_table): Add tls_ldm_got.
+	(elf32_arm_link_hash_newfunc): Initialize tls_type.
+	(elf32_arm_copy_indirect_symbol): Copy pc_count and tls_type.
+	(elf32_arm_link_hash_table_create): Initialize tls_ldm_got.
+	(dtpoff_base, tpoff): New functions.
+	(elf32_arm_final_link_relocate): Handle TLS relocations.
+	(IS_ARM_TLS_RELOC): Define.
+	(elf32_arm_relocate_section): Warn about TLS mismatches.
+	(elf32_arm_gc_sweep_hook): Handle TLS relocations and pc_count.
+	(elf32_arm_check_relocs): Detect invalid symbol indexes.  Handle
+	TLS relocations and pc_count.
+	(elf32_arm_adjust_dynamic_symbol): Check non_got_ref.
+	(allocate_dynrelocs): Handle TLS.  Bind REL32 relocs to local
+	calls.
+	(elf32_arm_size_dynamic_sections): Handle TLS.
+	(elf32_arm_finish_dynamic_symbol): Likewise.
+	(bfd_elf32_mkobject): Define.
+
+	* gas/config/tc-arm.c (arm_parse_reloc): Add TLS relocations.
+	(md_apply_fix3): Mark TLS symbols.
+	(tc_gen_reloc): Handle TLS relocations.
+	(arm_fix_adjustable): Ignore TLS relocations.
+	(s_arm_elf_cons): Support expressions after decorated symbols.
+
+	* gas/testsuite/gas/arm/tls.s, gas/testsuite/gas/arm/tls.d: New files.
+	* gas/testsuite/gas/arm/arm.exp: Run TLS test.
+
+	* include/elf/arm.h: Add TLS relocations.
+
+	* ld/testsuite/ld-arm/tls-lib.s, ld/testsuite/ld-arm/tls-lib.d,
+	ld/testsuite/ld-arm/tls-lib.r, ld/testsuite/ld-arm/tls-app.s,
+	ld/testsuite/ld-arm/tls-app.d, ld/testsuite/ld-arm/tls-app.r: New files.
+	* ld/testsuite/ld-arm/arm-lib.ld, ld/testsuite/ld-arm/arm-dyn.ld:
+	Increase data segment alignment.
+	* ld/testsuite/ld-arm/arm-elf.exp: Run TLS tests.
+
+2005-03-28  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* bfd/elf32-arm.c (elf32_arm_check_relocs): Increment count for all
 	relocation types.  Don't count relocations which will use a PLT.
 
 2005-03-23  Jim Blandy  <jimb@redhat.com>
