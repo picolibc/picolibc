@@ -63,7 +63,7 @@ set_std_handle (int fd)
 void
 dtable::init_lock ()
 {
-  new_muto (lock_cs);
+  lock_cs.init ("lock_cs");
 }
 
 int

@@ -12,7 +12,7 @@ class muto;
 class wininfo
 {
   HWND hwnd;
-  static muto *_lock;
+  static muto _lock;
 public:
   operator HWND ();
   int __stdcall wininfo::process (HWND, UINT, WPARAM, LPARAM)

@@ -104,6 +104,8 @@ struct symlink_info
   void set_error (int);
 };
 
+muto NO_COPY cwdstuff::cwd_lock;
+
 int pcheck_case = PCHECK_RELAXED; /* Determines the case check behaviour. */
 
 static const GUID GUID_shortcut
@@ -3728,9 +3730,9 @@ DWORD
 cwdstuff::get_hash ()
 {
   DWORD hashnow;
-  cwd_lock->acquire ();
+  cwd_lock.acquire ();
   hashnow = hash;
-  cwd_lock->release ();
+  cwd_lock.release ();
   return hashnow;
 }
 
@@ -3738,7 +3740,7 @@ cwdstuff::get_hash ()
 void
 cwdstuff::init ()
 {
-  new_muto (cwd_lock);
+  cwd_lock.init ("cwd_lock");
 }
 
 /* Get initial cwd.  Should only be called once in a
@@ -3746,7 +3748,7 @@ cwdstuff::init ()
 bool
 cwdstuff::get_initial ()
 {
-  cwd_lock->acquire ();
+  cwd_lock.acquire ();
 
   if (win32)
     return 1;
@@ -3766,7 +3768,7 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd, bool doit)
 
   if (win32_cwd)
     {
-       cwd_lock->acquire ();
+       cwd_lock.acquire ();
        if (doit && !SetCurrentDirectory (win32_cwd))
 	 {
 	    __seterrno ();
@@ -3823,7 +3825,7 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd, bool doit)
   res = 0;
 out:
   if (win32_cwd)
-    cwd_lock->release ();
+    cwd_lock.release ();
   return res;
 }
 
@@ -3867,7 +3869,7 @@ cwdstuff::get (char *buf, int need_posix, int with_chroot, unsigned ulen)
 	strcpy (buf, "/");
     }
 
-  cwd_lock->release ();
+  cwd_lock.release ();
 
 out:
   syscall_printf ("(%s) = cwdstuff::get (%p, %d, %d, %d), errno %d",

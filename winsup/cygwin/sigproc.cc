@@ -70,7 +70,7 @@ Static char cprocs[(NPROCS + 1) * sizeof (pinfo)];// All my children info
 					// constructor operation  at DLL startup
 Static waitq waitq_head = {0, 0, 0, 0, 0, 0, 0};// Start of queue for wait'ing threads
 
-muto NO_COPY *sync_proc_subproc = NULL;	// Control access to subproc stuff
+muto NO_COPY sync_proc_subproc;		// Control access to subproc stuff
 
 DWORD NO_COPY sigtid = 0;		// ID of the signal thread
 
@@ -150,7 +150,7 @@ get_proc_lock (DWORD what, DWORD val)
       sigproc_printf ("sync_proc_subproc is NULL (1)");
       return false;
     }
-  if (sync_proc_subproc->acquire (WPSP))
+  if (sync_proc_subproc.acquire (WPSP))
     {
       lastwhat = what;
       return true;
@@ -351,7 +351,7 @@ proc_subproc (DWORD what, DWORD val)
   }
 
 out:
-  sync_proc_subproc->release ();	// Release the lock
+  sync_proc_subproc.release ();	// Release the lock
 out1:
   sigproc_printf ("returning %d", rc);
   return rc;
@@ -363,7 +363,7 @@ out1:
 void
 _cygtls::remove_wq (DWORD wait)
 {
-  if (sync_proc_subproc && sync_proc_subproc->acquire (wait))
+  if (sync_proc_subproc && sync_proc_subproc.acquire (wait))
     {
       for (waitq *w = &waitq_head; w->next != NULL; w = w->next)
 	if (w->next == &wq)
@@ -372,7 +372,7 @@ _cygtls::remove_wq (DWORD wait)
 	    w->next = wq.next;
 	    break;
 	  }
-      sync_proc_subproc->release ();
+      sync_proc_subproc.release ();
     }
 }
 
@@ -389,7 +389,7 @@ proc_terminate (void)
   /* Signal processing is assumed to be blocked in this routine. */
   if (nprocs)
     {
-      sync_proc_subproc->acquire (WPSP);
+      sync_proc_subproc.acquire (WPSP);
 
       (void) proc_subproc (PROC_CLEARWAIT, 1);
 
@@ -406,7 +406,7 @@ proc_terminate (void)
 	  procs[i].release ();
 	}
       nprocs = 0;
-      sync_proc_subproc->release ();
+      sync_proc_subproc.release ();
     }
   sigproc_printf ("leaving");
 }
@@ -488,7 +488,7 @@ sigproc_init ()
   /* sync_proc_subproc is used by proc_subproc.  It serialises
    * access to the children and proc arrays.
    */
-  new_muto (sync_proc_subproc);
+  sync_proc_subproc.init ("sync_proc_subproc");
 
   create_signal_arrived ();
 

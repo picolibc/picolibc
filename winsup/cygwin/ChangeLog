@@ -1,3 +1,67 @@
+2005-04-05  Christopher Faylor  <cgf@timesys.com>
+
+	* sync.h (muto::operator int): New operator.
+	(locker): Remove unused class.
+	(new_muto): Delete.
+	(new_muto1): Ditto.
+	(new_muto_name): Ditto.
+	* cygheap.cc (cygheap_setup_for_child): Reflect use of static storage
+	for muto rather than pointer.
+	(_csbrk): Ditto.
+	(_cmalloc): Ditto.
+	(_cmalloc): Ditto.
+	(_cfree): Ditto.
+	* cygheap.h (cwdstuff::cwd_lock): Ditto.
+	(cwdstuff::get_drive): Ditto.
+	* cygmalloc.h (__malloc_lock): Ditto.
+	(__malloc_unlock): Ditto.
+	* cygtls.cc (sentry::lock): Ditto.
+	(sentry::sentry): Ditto.
+	(~sentry): Ditto.
+	(_cygtls::init): Ditto.
+	* dcrt0.cc: Ditto.
+	(cygwin_atexit): Ditto.
+	(cygwin_exit): Ditto.
+	* debug.cc (lock_debug::locker): Ditto.
+	(lock_debug::lock_debug): Ditto.
+	(lock_debug::unlock): Ditto.
+	(debug_init): Ditto.
+	* dtable.cc (dtable::init_lock): Ditto.
+	* dtable.h (dtable::lock_cs): Ditto.
+	(dtable::lock): Ditto.
+	(dtable::unlock): Ditto.
+	* exceptions.cc (mask_sync): Ditto.
+	(sighold): Ditto.
+	(set_process_mask_delta): Ditto.
+	(set_signal_mask): Ditto.
+	(events_init): Ditto.
+	* grp.cc (pwdgrp::pwdgrp): Ditto.
+	* malloc_wrapper.cc (mallock): Ditto.
+	(malloc_init): Ditto.
+	* path.cc (cwdstuff::cwd_lock): Ditto.
+	(cwdstuff::get_hash): Ditto.
+	(cwdstuff::get_hash): Ditto.
+	(cwdstuff::init): Ditto.
+	(cwdstuff::set): Ditto.
+	(cwdstuff::get): Ditto.
+	* pwdgrp.h (pwdgrp::pglock): Ditto.
+	(pwdgrp::refresh): Ditto.
+	* sigproc.cc (sync_proc_subproc): Ditto.
+	(get_proc_lock): Ditto.
+	(proc_subproc): Ditto.
+	(_cygtls::remove_wq): Ditto.
+	(proc_terminate): Ditto.
+	(sigproc_init): Ditto.
+	* timer.cc (lock_timer_tracker::protect): Ditto.
+	(lock_timer_tracker::lock_timer_tracker): Ditto.
+	(lock_timer_tracker::~lock_timer_tracker): Ditto.
+	* wininfo.cc (wininfo::_lock;): Ditto.
+	(wininfo::winthread): Ditto.
+	(operator HWND): Ditto.
+	(wininfo::lock): Ditto.
+	(wininfo::release): Ditto.
+	* wininfo.h (wininfo::_lock;): Ditto.
+
 2005-04-04  Christopher Faylor  <cgf@timesys.com>
 
 	* path.cc (path_conv::check): Only check for PC_NO_ACCESS_CHECK in end
@@ -10,13 +74,13 @@
 	* fhandler.h (enum change_state): Add.
 	(fhandler_base::status): Add a bit to has_changed flag.
 	(fhandler_base::has_changed): Implement with type change_state.
-	* fhandler.cc (fhandler_base::raw_write): Accomodate type change
+	* fhandler.cc (fhandler_base::raw_write): Accommodate type change
 	of has_changed.
 	* fhandler_disk_file.cc )fhandler_disk_file::touch_ctime): Also
 	touch modification time if has_changed == data_changed.
 	(fhandler_disk_file::fchmod): Also open on 9x, otherwise we can't
-	touch ctime.  Accomodate type change of has_changed.
-	(fhandler_disk_file::fchown): Accomodate type change of has_changed.
+	touch ctime.  Accommodate type change of has_changed.
+	(fhandler_disk_file::fchown): Accommodate type change of has_changed.
 	(fhandler_disk_file::facl): Ditto.
 	(fhandler_disk_file::ftruncate): Ditto.
 	(fhandler_disk_file::link): Ditto.
@@ -24,7 +88,7 @@
 
 2005-04-03  Corinna Vinschen  <corinna@vinschen.de>
 
-	* cygheap.cc (cygheap_init): Accomodate set_process_privilege change.
+	* cygheap.cc (cygheap_init): Accommodate set_process_privilege change.
 	* cygheap.h (cygheap_user::curr_primary_token): New member.
 	(cygheap_user::primary_token): New method.
 	(cygheap_user::deimpersonate): Always revert to processes'
@@ -881,7 +945,7 @@
 	(class fhandler_disk_file): Ditto.
 	(class fhandler_dev_mem): Ditto.
 	* fhandler_mem.cc (fhandler_dev_mem::fixup_mmap_after_fork):
-	Accomodate new parameters.
+	Accommodate new parameters.
 	* mmap.cc: Include ntdll.h.
 	(class mmap_record): Add flags member.
 	(mmap_record::mmap_record): Add flags parameter.
@@ -893,14 +957,14 @@
 	(mmap64): Don't align offset and length to granularity in case of
 	MAP_ANONYMOUS on NT.  Check for already existing mapping only on 9x.
 	Call mmap_record::mmap_record with additional flags argument.
-	(fhandler_base::fixup_mmap_after_fork): Accomodate new parameters.
+	(fhandler_base::fixup_mmap_after_fork): Accommodate new parameters.
 	(fhandler_disk_file::mmap): Use NtMapViewOfSection with
 	AT_ROUND_TO_PAGE flag for anonymous mappings on NT.  If addr is NULL,
 	try to map adjacent to previous mapping.
 	(fhandler_disk_file::fixup_mmap_after_fork): Add flags argument.
 	Change offset parameter to _off64_t.  Use NtMapViewOfSection to
 	re-create anonymous mappings on NT.
-	(fixup_mmaps_after_fork): Accomodate new parameters when calling
+	(fixup_mmaps_after_fork): Accommodate new parameters when calling
 	fhandler's fixup_mmaps_after_fork function.
 	* ntdll.h (AT_ROUND_TO_PAGE): New define.
 
@@ -1019,7 +1083,7 @@
 	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Pass
 	dwVolumeSerialNumber from GetFileInformationByHandle to fstat_helper.
 	(fhandler_base::fstat_by_name): Pass pc.volser () to fstat_helper.
-	Accomodate dropping default values for last three arguments of
+	Accommodate dropping default values for last three arguments of
 	fstat_helper.
 	(fhandler_base::fstat_helper): Add dwVolumeSerialNumber argument.
 	Use for st_dev member unless 0 in which case pc.volser () is used.

@@ -43,22 +43,22 @@ timer_tracker NO_COPY ttstart (CLOCK_REALTIME, NULL);
 
 class lock_timer_tracker
 {
-  static muto *protect;
+  static muto protect;
 public:
   lock_timer_tracker ();
   ~lock_timer_tracker ();
 };
 
-muto NO_COPY *lock_timer_tracker::protect;
+muto NO_COPY lock_timer_tracker::protect;
 
 lock_timer_tracker::lock_timer_tracker ()
 {
-  new_muto (protect)->acquire ();
+  protect.init ("timer_protect")->acquire ();
 }
 
 lock_timer_tracker::~lock_timer_tracker ()
 {
-  protect->release ();
+  protect.release ();
 }
 
 bool

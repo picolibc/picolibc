@@ -49,7 +49,7 @@ static size_t windows_system_directory_length;
 /* This is set to indicate that we have already exited.  */
 
 static NO_COPY int exit_already = 0;
-static NO_COPY muto *mask_sync = NULL;
+static NO_COPY muto mask_sync;
 
 NO_COPY static struct
 {
@@ -901,11 +901,11 @@ sighold (int sig)
       syscall_printf ("signal %d out of range", sig);
       return -1;
     }
-  mask_sync->acquire (INFINITE);
+  mask_sync.acquire (INFINITE);
   sigset_t mask = myself->getsigmask ();
   sigaddset (&mask, sig);
   set_signal_mask (mask);
-  mask_sync->release ();
+  mask_sync.release ();
   return 0;
 }
 
@@ -915,7 +915,7 @@ sighold (int sig)
 extern "C" sigset_t
 set_process_mask_delta ()
 {
-  mask_sync->acquire (INFINITE);
+  mask_sync.acquire (INFINITE);
   sigset_t newmask, oldmask;
 
   if (_my_tls.deltamask & SIG_NONMASKABLE)
@@ -926,7 +926,7 @@ set_process_mask_delta ()
   sigproc_printf ("oldmask %p, newmask %p, deltamask %p", oldmask, newmask,
 		  _my_tls.deltamask);
   myself->setsigmask (newmask);
-  mask_sync->release ();
+  mask_sync.release ();
   return oldmask;
 }
 
@@ -935,7 +935,7 @@ set_process_mask_delta ()
 extern "C" void __stdcall
 set_signal_mask (sigset_t newmask, sigset_t oldmask)
 {
-  mask_sync->acquire (INFINITE);
+  mask_sync.acquire (INFINITE);
   newmask &= ~SIG_NONMASKABLE;
   sigset_t mask_bits = oldmask & ~newmask;
   sigproc_printf ("oldmask %p, newmask %p, mask_bits %p", oldmask, newmask,
@@ -945,7 +945,7 @@ set_signal_mask (sigset_t newmask, sigset_t oldmask)
     sig_dispatch_pending (true);
   else
     sigproc_printf ("not calling sig_dispatch_pending");
-  mask_sync->release ();
+  mask_sync.release ();
   return;
 }
 
@@ -1142,7 +1142,7 @@ events_init (void)
     api_fatal ("can't create title mutex '%s', %E", name);
 
   ProtectHandle (tty_mutex);
-  new_muto (mask_sync);
+  mask_sync.init ("mask_sync");
   windows_system_directory[0] = '\0';
   (void) GetSystemDirectory (windows_system_directory, sizeof (windows_system_directory) - 2);
   char *end = strchr (windows_system_directory, '\0');

@@ -39,7 +39,7 @@ class pwdgrp
   char *buf, *lptr;
   int max_lines;
   bool initialized;
-  muto *pglock;
+  muto pglock;
 
   bool parse_passwd ();
   bool parse_group ();
@@ -72,10 +72,10 @@ public:
   {
     if (!check && initialized)
       return;
-    if (pglock->acquire () == 1 &&
+    if (pglock.acquire () == 1 &&
 	(!initialized || (check && etc::file_changed (etc_ix))))
 	(this->*read) ();
-    pglock->release ();
+    pglock.release ();
   }
 
   pwdgrp (passwd *&pbuf);

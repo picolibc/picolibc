@@ -26,7 +26,7 @@
 init_cygheap NO_COPY *cygheap;
 void NO_COPY *cygheap_max;
 
-static NO_COPY muto *cygheap_protect;
+static NO_COPY muto cygheap_protect;
 static NO_COPY DWORD reserve_sz;
 
 struct cygheap_entry
@@ -100,7 +100,7 @@ void *__stdcall
 cygheap_setup_for_child (child_info *ci, bool dup_later)
 {
   void *newcygheap;
-  cygheap_protect->acquire ();
+  cygheap_protect.acquire ();
   unsigned n = (char *) cygheap_max - (char *) cygheap;
   unsigned size = reserve_sz;
   if (size < n)
@@ -115,7 +115,7 @@ cygheap_setup_for_child (child_info *ci, bool dup_later)
   ProtectHandle1INH (ci->cygheap_h, passed_cygheap_h);
   if (!dup_later)
     dup_now (newcygheap, ci, n);
-  cygheap_protect->release ();
+  cygheap_protect.release ();
   ci->cygheap = cygheap;
   ci->cygheap_max = cygheap_max;
   ci->cygheap_reserve_sz = size;
@@ -131,9 +131,9 @@ cygheap_setup_for_child_cleanup (void *newcygheap, child_info *ci,
       /* NOTE: There is an assumption here that cygheap_max has not changed
 	 between the time that cygheap_setup_for_child was called and now.
 	 Make sure that this is a correct assumption.  */
-      cygheap_protect->acquire ();
+      cygheap_protect.acquire ();
       dup_now (newcygheap, ci, (char *) cygheap_max - (char *) cygheap);
-      cygheap_protect->release ();
+      cygheap_protect.release ();
     }
   UnmapViewOfFile (newcygheap);
   ForceCloseHandle1 (ci->cygheap_h, passed_cygheap_h);
@@ -254,7 +254,7 @@ _csbrk (int sbs)
 extern "C" void __stdcall
 cygheap_init ()
 {
-  new_muto (cygheap_protect);
+  cygheap_protect.init ("cygheap_protect");
   if (!cygheap)
     {
       init_cheap ();
@@ -288,7 +288,7 @@ _cmalloc (unsigned size)
   for (b = 3, sz = 8; sz && sz < size; b++, sz <<= 1)
     continue;
 
-  cygheap_protect->acquire ();
+  cygheap_protect.acquire ();
   if (cygheap->buckets[b])
     {
       rvc = (_cmalloc_entry *) cygheap->buckets[b];
@@ -300,7 +300,7 @@ _cmalloc (unsigned size)
       rvc = (_cmalloc_entry *) _csbrk (sz + sizeof (_cmalloc_entry));
       if (!rvc)
 	{
-	  cygheap_protect->release ();
+	  cygheap_protect.release ();
 	  return NULL;
 	}
 
@@ -308,19 +308,19 @@ _cmalloc (unsigned size)
       rvc->prev = cygheap->chain;
       cygheap->chain = rvc;
     }
-  cygheap_protect->release ();
+  cygheap_protect.release ();
   return rvc->data;
 }
 
 static void __stdcall
 _cfree (void *ptr)
 {
-  cygheap_protect->acquire ();
+  cygheap_protect.acquire ();
   _cmalloc_entry *rvc = to_cmalloc (ptr);
   DWORD b = rvc->b;
   rvc->ptr = cygheap->buckets[b];
   cygheap->buckets[b] = (char *) rvc;
-  cygheap_protect->release ();
+  cygheap_protect.release ();
 }
 
 static void *__stdcall

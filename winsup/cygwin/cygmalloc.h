@@ -25,9 +25,9 @@ void dlmalloc_stats ();
 #ifndef __INSIDE_CYGWIN__
 # define USE_DL_PREFIX 1
 #else
-# define __malloc_lock() mallock->acquire ()
-# define __malloc_unlock() mallock->release ()
-extern muto *mallock;
+# define __malloc_lock() mallock.acquire ()
+# define __malloc_unlock() mallock.release ()
+extern muto mallock;
 #endif
 #ifdef __cplusplus
 }

@@ -25,18 +25,18 @@ details. */
 
 class sentry
 {
-  static muto *lock;
+  static muto lock;
   int destroy;
 public:
   void init ();
-  bool acquired () {return lock->acquired ();}
+  bool acquired () {return lock.acquired ();}
   sentry () {destroy = 0;}
-  sentry (DWORD wait) {destroy = lock->acquire (wait);}
-  ~sentry () {if (destroy) lock->release ();}
+  sentry (DWORD wait) {destroy = lock.acquire (wait);}
+  ~sentry () {if (destroy) lock.release ();}
   friend void _cygtls::init ();
 };
 
-muto NO_COPY *sentry::lock;
+muto NO_COPY sentry::lock;
 
 static size_t NO_COPY nthreads;
 
@@ -53,7 +53,7 @@ _cygtls::init ()
       cygheap->threadlist = (_cygtls **) ccalloc (HEAP_TLS, cygheap->sthreads,
 						     sizeof (cygheap->threadlist[0]));
     }
-  new_muto1 (sentry::lock, sentry_lock);
+  sentry::lock.init ("sentry_lock");
 }
 
 void

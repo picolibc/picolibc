@@ -248,12 +248,12 @@ strdup (const char *s)
    newlib will call __malloc_lock and __malloc_unlock at appropriate
    times.  */
 
-NO_COPY muto *mallock = NULL;
+muto NO_COPY mallock;
 
 void
 malloc_init ()
 {
-  new_muto (mallock);
+  mallock.init ("mallock");
 
 #ifndef MALLOC_DEBUG
   /* Check if malloc is provided by application. If so, redirect all

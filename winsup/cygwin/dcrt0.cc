@@ -47,6 +47,8 @@ HANDLE NO_COPY hMainProc = (HANDLE) -1;
 HANDLE NO_COPY hMainThread;
 HANDLE NO_COPY hProcToken;
 HANDLE NO_COPY hProcImpToken;
+muto NO_COPY dtable::lock_cs;	/* This should be in dtable.cc but it causes inexplicable
+				   errors there. */
 
 bool display_title;
 bool strip_title_path;
@@ -1078,17 +1080,16 @@ do_exit (int status)
   myself.exit (n);
 }
 
-static muto *atexit_lock;
+static NO_COPY muto atexit_lock;
 
 extern "C" int
 cygwin_atexit (void (*function)(void))
 {
   int res;
-  if (!atexit_lock)
-    new_muto (atexit_lock);
-  atexit_lock->acquire ();
+  atexit_lock.init ("atexit_lock");
+  atexit_lock.acquire ();
   res = atexit (function);
-  atexit_lock->release ();
+  atexit_lock.release ();
   return res;
 }
 
@@ -1096,7 +1097,7 @@ extern "C" void
 cygwin_exit (int n)
 {
   if (atexit_lock)
-    atexit_lock->acquire ();
+    atexit_lock.acquire ();
   exit (n);
 }
 

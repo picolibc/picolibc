@@ -31,19 +31,19 @@ details. */
 
 class lock_debug
 {
-  static muto *locker;
+  static muto locker;
   bool acquired;
  public:
   lock_debug () : acquired (0)
   {
-    if (locker && !exit_state)
-      acquired = !!locker->acquire (INFINITE);
+    if (locker.name && !exit_state)
+      acquired = !!locker.acquire (INFINITE);
   }
   void unlock ()
   {
-    if (locker && acquired)
+    if (locker.name && acquired)
       {
-	locker->release ();
+	locker.release ();
 	acquired = false;
       }
   }
@@ -51,15 +51,14 @@ class lock_debug
   friend void debug_init ();
 };
 
-muto NO_COPY *lock_debug::locker = NULL;
+muto NO_COPY lock_debug::locker;
 
 static bool __stdcall mark_closed (const char *, int, HANDLE, const char *, bool);
 
 void
 debug_init ()
 {
-  muto *debug_lock_muto;
-  lock_debug::locker = new_muto (debug_lock_muto);
+  lock_debug::locker.init ("debug_lock");
 }
 
 /* Find a registered handle in the linked list of handles. */

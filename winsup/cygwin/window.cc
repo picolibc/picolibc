@@ -30,7 +30,7 @@ details. */
 
 wininfo NO_COPY winmsg;
 
-muto NO_COPY *wininfo::_lock;
+muto NO_COPY wininfo::_lock;
 
 int __stdcall
 wininfo::process (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -70,7 +70,7 @@ wininfo::winthread ()
   WNDCLASS wc;
   static NO_COPY char classname[] = "CygwinWndClass";
 
-  _lock->grab ();
+  _lock.grab ();
   /* Register the window class for the main window. */
 
   wc.style = 0;
@@ -117,7 +117,7 @@ HWND ()
   lock ();
   if (!hwnd)
     {
-      _lock->upforgrabs ();
+      _lock.upforgrabs ();
       cygthread *h = new cygthread (::winthread, this, "win");
       h->SetThreadPriority (THREAD_PRIORITY_HIGHEST);
       h->zap_h ();
@@ -130,11 +130,11 @@ HWND ()
 void
 wininfo::lock ()
 {
-  new_muto (_lock)->acquire ();
+  _lock.init ("wininfo_lock")->acquire ();
 }
 
 void
 wininfo::release ()
 {
-  _lock->release ();
+  _lock.release ();
 }
