@@ -1291,11 +1291,11 @@ wait_sig (VOID *)
 	{
 	case 0:
 	  SetEvent (sigcomplete_main);
-sigproc_printf ("signalled sigcomplete_main");
+sigproc_printf ("signalled sigcomplete_main %p", sigcomplete_main);
 	  break;
 	case 1:
 	  ReleaseSemaphore (sigcomplete_nonmain, 1, NULL);
-sigproc_printf ("signalled sigcomplete_nonmain");
+sigproc_printf ("signalled sigcomplete_nonmain %p", sigcomplete_nonmain);
 	  break;
 	default:
 sigproc_printf ("Did not signal anyone");
