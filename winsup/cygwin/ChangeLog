@@ -1,5 +1,10 @@
 2003-09-27  Christopher Faylor  <cgf@redhat.com>
 
+	* devices.shilka: Add /dev/sda disk devices.
+	* devices.cc: Regenerate.
+
+2003-09-27  Christopher Faylor  <cgf@redhat.com>
+
 	* cygwin-shilka: Remove '#line directives' or suffer debugging oddities.
 	Use -length option so that device prefixes are used.
 	* devices.cc: Regenerate.
