@@ -229,7 +229,7 @@ use the posix name of the device to be recognized by Cygwin.
 The naming convention is simple: The name has to begin with
 <filename>/dev/</filename> and the rest is as you like. The only
 exception are tape devices. To identify if the tape device is
-used as rewind or no-rewind device the name must not begin with
+used as a rewind or a no-rewind device the name must not begin with
 <literal>n</literal> (rewind) or has to begin with <literal>n</literal>
 (no-rewind).
 </para>
