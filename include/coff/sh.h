@@ -305,3 +305,6 @@ struct external_reloc {
 #define R_SH_LABEL	32		/* label */
 
 /* NB: R_SH_SWITCH8 is 33 */
+
+#define R_SH_LOOP_START	34
+#define R_SH_LOOP_END	35

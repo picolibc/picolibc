@@ -1,3 +1,7 @@
+Wed Apr  5 22:08:41 2000  J"orn Rennecke <amylaar@cygnus.co.uk>
+
+	* sh.h (R_SH_LOOP_START, R_SH_LOOP_END): Define.
+
 2000-03-15  Kazu Hirata  <kazu@hxi.com>
 
 	* internal.h: Fix a typo in the comment for R_MOVL2.
