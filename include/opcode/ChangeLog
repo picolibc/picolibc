@@ -1,3 +1,9 @@
+2005-01-21  Fred Fish  <fnf@specifixinc.com>
+
+	* mips.h: Change INSN_ALIAS to INSN2_ALIAS.
+	Change INSN_WRITE_MDMX_ACC to INSN2_WRITE_MDMX_ACC.
+	Change INSN_READ_MDMX_ACC to INSN2_READ_MDMX_ACC.
+
 2005-01-19  Fred Fish  <fnf@specifixinc.com>
 
 	* mips.h (struct mips_opcode): Add new pinfo2 member.

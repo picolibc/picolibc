@@ -383,11 +383,11 @@ struct mips_opcode
    instruction. */
 
 /* Instruction is a simple alias (I.E. "move" for daddu/addu/or) */
-#define	INSN_ALIAS		    0x00000001
+#define	INSN2_ALIAS		    0x00000001
 /* Instruction reads MDMX accumulator. */
-#define INSN_READ_MDMX_ACC	    0x00000002
+#define INSN2_READ_MDMX_ACC	    0x00000002
 /* Instruction writes MDMX accumulator. */
-#define INSN_WRITE_MDMX_ACC	    0x00000004
+#define INSN2_WRITE_MDMX_ACC	    0x00000004
 
 /* Instruction is actually a macro.  It should be ignored by the
    disassembler, and requires special treatment by the assembler.  */
