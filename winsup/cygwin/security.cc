@@ -90,15 +90,13 @@ extract_nt_dom_user (const struct passwd *pw, char *domain, char *user)
   if ((d = strstr (pw->pw_gecos, "U-")) != NULL &&
       (d == pw->pw_gecos || d[-1] == ','))
     {
-      c = strchr (d + 2, ',');
-      if ((u = strchr (d + 2, '\\')) == NULL || (c != NULL && u > c))
+      c = strechr (d + 2, ',');
+      if ((u = strechr (d + 2, '\\')) >= c)
 	u = d + 1;
       else if (u - d <= INTERNET_MAX_HOST_NAME_LENGTH + 2)
 	strlcpy (domain, d + 2, u - d - 1);
-      if (c == NULL)
-	c = u + UNLEN + 1;
       if (c - u <= UNLEN + 1)
-	strlcpy (user, u + 1, c - u);
+        strlcpy (user, u + 1, c - u);
     }
   if (domain[0])
     return;
@@ -329,7 +327,7 @@ get_user_groups (WCHAR *wlogonserver, cygsidlist &grp_list, char *user,
   for (DWORD i = 0; i < cnt; ++i)
     {
       cygsid gsid;
-      DWORD glen = sizeof (gsid);
+      DWORD glen = MAX_SID_LEN;
       char domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
       DWORD dlen = sizeof (domain);
       SID_NAME_USE use = SidTypeInvalid;
@@ -407,7 +405,7 @@ get_user_local_groups (cygsidlist &grp_list, PSID pusersid)
     if (is_group_member (buf[i].lgrpi0_name, pusersid, grp_list))
       {
 	cygsid gsid;
-	DWORD glen = sizeof (gsid);
+	DWORD glen = MAX_SID_LEN;
 	char domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
 	DWORD dlen = sizeof (domain);
 
@@ -1230,7 +1228,7 @@ get_attribute_from_acl (int * attribute, PACL acl, PSID owner_sid,
 	  continue;
 	}
 
-      cygsid ace_sid ((PSID) &ace->SidStart);
+      cygpsid ace_sid ((PSID) &ace->SidStart);
       if (ace_sid == well_known_world_sid)
 	{
 	  if (ace->Mask & FILE_READ_DATA)
@@ -1317,13 +1315,13 @@ get_nt_attribute (const char *file, int *attribute,
       return -1;
     }
 
-  PSID owner_sid;
-  PSID group_sid;
+  cygpsid owner_sid;
+  cygpsid group_sid;
   BOOL dummy;
 
-  if (!GetSecurityDescriptorOwner (psd, &owner_sid, &dummy))
+  if (!GetSecurityDescriptorOwner (psd, (PSID *) &owner_sid, &dummy))
     debug_printf ("GetSecurityDescriptorOwner %E");
-  if (!GetSecurityDescriptorGroup (psd, &group_sid, &dummy))
+  if (!GetSecurityDescriptorGroup (psd, (PSID *) &group_sid, &dummy))
     debug_printf ("GetSecurityDescriptorGroup %E");
 
   PACL acl;
@@ -1336,8 +1334,9 @@ get_nt_attribute (const char *file, int *attribute,
       return -1;
     }
 
-  __uid32_t uid = cygsid (owner_sid).get_uid ();
-  __gid32_t gid = cygsid (group_sid).get_gid ();
+  __uid32_t uid;
+  __gid32_t gid;
+  BOOL grp_member = get_sids_info (owner_sid, group_sid, &uid, &gid);
   if (uidret)
     *uidret = uid;
   if (gidret)
@@ -1348,8 +1347,6 @@ get_nt_attribute (const char *file, int *attribute,
       syscall_printf ("file: %s uid %d, gid %d", file, uid, gid);
       return 0;
     }
-
-  BOOL grp_member = is_grp_member (uid, gid);
 
   if (!acl_exists || !acl)
     {
@@ -1420,15 +1417,16 @@ get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
     return 0;
 
   PSECURITY_DESCRIPTOR psd = NULL;
-  PSID owner_sid;
-  PSID group_sid;
+  cygpsid owner_sid;
+  cygpsid group_sid;
   PACL acl;
 
   if (ERROR_SUCCESS != GetSecurityInfo (handle, object_type,
 					DACL_SECURITY_INFORMATION |
 					GROUP_SECURITY_INFORMATION |
 					OWNER_SECURITY_INFORMATION,
-					&owner_sid, &group_sid,
+					(PSID *) &owner_sid,
+					(PSID *) &group_sid,
 					&acl, NULL, &psd))
     {
       __seterrno ();
@@ -1436,8 +1434,10 @@ get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
       return -1;
     }
 
-  __uid32_t uid = cygsid (owner_sid).get_uid ();
-  __gid32_t gid = cygsid (group_sid).get_gid ();
+  __uid32_t uid;
+  __gid32_t gid;
+  BOOL grp_member = get_sids_info (owner_sid, group_sid, &uid, &gid);
+
   if (uidret)
     *uidret = uid;
   if (gidret)
@@ -1449,8 +1449,6 @@ get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
       LocalFree (psd);
       return 0;
     }
-
-  BOOL grp_member = is_grp_member (uid, gid);
 
   if (!acl)
     {
@@ -1749,7 +1747,8 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
     for (DWORD i = 0; i < oacl->AceCount; ++i)
       if (GetAce (oacl, i, (PVOID *) &ace))
 	{
-	  cygsid ace_sid ((PSID) &ace->SidStart);
+	  cygpsid ace_sid ((PSID) &ace->SidStart);
+
 	  /* Check for related ACEs. */
 	  if (ace_sid == well_known_null_sid)
 	    continue;

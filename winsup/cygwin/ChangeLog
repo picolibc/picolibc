@@ -1,3 +1,15 @@
+2003-02-05  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* sec_helper.cc (get_sids_info): New function.
+	* security.cc (extract_nt_dom_user): Simplify with strechr.
+	(get_user_groups): Initialize glen to MAX_SID_LEN.
+	(get_user_local_groups): Ditto.
+	(get_attribute_from_acl): Define ace_sid as cygpsid.
+	(get_nt_attribute): Define owner_sid and group_sid as cygpsid.
+	Call get_sids_info instead of cygsid.get_{u,g}id and is_grp_member.
+	(get_nt_object_attribute): Ditto.
+	(alloc_sd): Define ace_sid as cygpsid.
+
 2003-02-04  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* syscalls.cc (struct system_cleanup_args): New struct.

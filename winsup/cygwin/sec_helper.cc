@@ -186,6 +186,43 @@ cygsid::getfromgr (const struct __group32 *gr)
   return (*this = sp) != NULL;
 }
 
+bool
+get_sids_info (cygpsid owner_sid, cygpsid group_sid, __uid32_t * uidret, __gid32_t * gidret)
+{
+  struct passwd *pw;
+  struct __group32 *gr = NULL;
+  bool ret = false;
+
+  if (group_sid == cygheap->user.groups.pgsid)
+    *gidret = myself->gid;
+  else if ((gr = internal_getgrsid (group_sid)))
+    *gidret = gr->gr_gid;
+  else
+    *gidret = ILLEGAL_GID;
+
+  if (owner_sid == cygheap->user.sid ())
+    {
+      *uidret = myself->uid;
+      if (*gidret == myself->gid)
+	ret = true;
+      else
+	ret = (internal_getgroups (0, NULL, &group_sid) > 0);
+    }
+  else if ((pw = internal_getpwsid (owner_sid)))
+    {
+      *uidret = pw->pw_uid;
+      if (gr || (*gidret != ILLEGAL_GID
+		 && (gr = internal_getgrgid (*gidret))))
+	for (int idx = 0; gr->gr_mem[idx]; ++idx)
+	  if ((ret = strcasematch (pw->pw_name, gr->gr_mem[idx])))
+	    break;
+    }
+  else
+    *uidret = ILLEGAL_UID;
+
+  return ret;
+}
+
 BOOL
 is_grp_member (__uid32_t uid, __gid32_t gid)
 {
