@@ -96,6 +96,7 @@ libmon.a: $(MONLIBOBJS)
 	$(RANLIB) $@
 
 install:
+	mkdir -p $(tooldir)/lib${MULTISUBDIR}
 	$(INSTALL_DATA) $(CRT0) $(tooldir)/lib${MULTISUBDIR}/$(CRT0)
 	$(INSTALL_DATA) $(LIBGLOSS) $(tooldir)/lib${MULTISUBDIR}/$(LIBGLOSS)
 	$(INSTALL_DATA) $(MONLIBGLOSS) $(tooldir)/lib${MULTISUBDIR}/$(MONLIBGLOSS)

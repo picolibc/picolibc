@@ -1,3 +1,9 @@
+2003-04-17  Inaoka Kazuhiro  <inaoka.kazuhiro@renesas.com>
+
+	* m32r/Makefile.in: Add multilib support. 
+	* m32r/configure.in: Ditto.
+	* m32r/configure: Regenerated.
+
 2003-04-16  Nick Clifton  <nickc@redhat.com>
 
 	* xstormy16/sim_high.ld: Add .jcr section mapping.
