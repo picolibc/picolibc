@@ -1,3 +1,7 @@
+2004-01-01  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* lib/ddk/cfgmgr32.def: Remove duplicate symbol names.
+
 2004-01-01  Mattia Barbon  <mbarbon@users.sourceforge.net>
 
 	* include/commctrl.h (TVN_GETINFOTIP): Add UNICODE mappings.
