@@ -1864,6 +1864,11 @@ do-proto-toplev: $(DEVO_SUPPORT) $(SUPPORT_FILES) texinfo/texinfo.tex
 	else true; fi
 	chmod -R og=u . || chmod og=u `find . -print`
 	#
+	# Create .gmo files from .po files.
+	for f in `find . -name '*.po' -type f -print`; do \
+	     msgfmt -o `echo $$f | sed -e 's/\.po$$/.gmo/'` $$f ; \
+	done
+	#
 	-rm -f $(PACKAGE)-$(VER)
 	ln -s proto-toplev $(PACKAGE)-$(VER)
 
