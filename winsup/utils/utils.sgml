@@ -113,7 +113,7 @@ Use the <literal>-d</literal> to get DOS-style (8.3) file and path names.
 The <literal>-m</literal> option will output Windows-style format
 but with forward slashes instead of backslashes.  This option is 
 especially useful in shell scripts, which use backslashes as an escape 
-character.
+character.</para>
 
 <para> In combination with the <literal>-w</literal> option, you can use
 the <literal>-l</literal> and <literal>-s</literal> options to use normal
@@ -168,7 +168,7 @@ On Win9x systems with only a single user, <literal>-A</literal> has no
 effect; <literal>-D</literal> and <literal>-AD</literal> would have the
 same output.  By default the output is in UNIX (POSIX) format; 
 use the <literal>-w</literal> or <literal>-d</literal> options to get
-other formats.
+other formats.</para>
 
 </sect2>
 
@@ -263,7 +263,7 @@ The format for ACL output is as follows:
      default:mask:perm
      default:other:perm
 </screen>
-
+</para>
 </sect2>
 
 <sect2 id="kill"><title>kill</title>
@@ -491,7 +491,7 @@ use a prefix other than <literal>/home/</literal>. For example, this command:
 would put local users' home directories in the Windows 'Profiles' directory. 
 The <literal>-u</literal> option allows <command>mkpasswd</command> to 
 search for a specific username, greatly reducing the amount of time it 
-takes in a large domain. 
+takes in a large domain.</para>
 
 </sect2>
 
@@ -1260,7 +1260,7 @@ I usually use the <literal>-v</literal>, <literal>-s</literal>, and
 <screen>
 $ ssp <literal>-v</literal> <literal>-s</literal> <literal>-l</literal> <literal>-d</literal> 0x61001000 0x61080000 hello.exe
 </screen>
-
+</para>
 </sect2>
 
 <sect2 id="strace"><title>strace</title>
