@@ -259,6 +259,10 @@ Tue Sep 25 16:22:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	* include/sys/ipc.h: New file.
 	* include/sys/shm.h: New file.
 
+2002-01-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (fchdir): Call chdir with full windows path.
+
 2002-01-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dir.cc: Use INVALID_FILE_ATTRIBUTES instead of "(DWORD) -1"

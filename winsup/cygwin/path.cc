@@ -3275,7 +3275,7 @@ fchdir (int fd)
 
   cygheap_fdget cfd (fd);
   if (cfd >= 0)
-    res = chdir (cfd->get_name ());
+    res = chdir (cfd->get_win32_name ());
   else
     res = -1;
 
