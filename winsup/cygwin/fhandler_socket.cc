@@ -15,6 +15,7 @@
 #include "winsup.h"
 #include <errno.h>
 #include <sys/socket.h>
+#include <asm/byteorder.h>
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -291,7 +292,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	  return -1;
 	}
       ifr->ifr_flags = IFF_NOTRAILERS | IFF_UP | IFF_RUNNING;
-      if (((struct sockaddr_in *) &ifr->ifr_addr)->sin_addr.s_addr
+      if (ntohl (((struct sockaddr_in *) &ifr->ifr_addr)->sin_addr.s_addr)
           == INADDR_LOOPBACK)
         ifr->ifr_flags |= IFF_LOOPBACK;
       else

@@ -1,3 +1,8 @@
+Tue May 15 10:20:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::ioctl): Convert s_addr
+	field to host byte order before comparing with INADDR_LOOPBACK.
+
 Tue May 15  9:03:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* autoload.cc: Add autoload statements for ws2_32 functions
