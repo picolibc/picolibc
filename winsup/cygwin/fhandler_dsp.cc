@@ -475,7 +475,7 @@ fhandler_dev_dsp::Audio_out::init (unsigned blockSize)
   for (i = 0; i < MAX_BLOCKS; i++)
     {
       wavehdr_[i].lpData = &bigwavebuffer_[i * blockSize];
-      (int)wavehdr_[i].dwUser = blockSize;
+      wavehdr_[i].dwUser = (int) blockSize;
       if (!Qapp2app_->send (&wavehdr_[i]))
 	{
 	  debug_printf ("Internal Error i=%d", i);

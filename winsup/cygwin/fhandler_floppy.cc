@@ -69,7 +69,6 @@ fhandler_dev_floppy::open (int flags, mode_t)
 _off64_t
 fhandler_dev_floppy::lseek (_off64_t offset, int whence)
 {
-  int ret;
   char buf[512];
   _off64_t drive_size = 0;
   _off64_t lloffset = offset;

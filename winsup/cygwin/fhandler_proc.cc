@@ -392,7 +392,7 @@ format_proc_meminfo (char *destbuf, size_t maxsize)
   mem_free = memory_status.dwAvailPhys;
   PSYSTEM_PAGEFILE_INFORMATION spi = NULL;
   ULONG size = 512;
-  NTSTATUS ret;
+  NTSTATUS ret = STATUS_SUCCESS;
   spi = (PSYSTEM_PAGEFILE_INFORMATION) malloc (size);
   if (spi)
     {
