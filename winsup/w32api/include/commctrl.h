@@ -2074,7 +2074,6 @@ void WINAPI InitCommonControls(void);
 #if (_WIN32_IE >= 0x0300)
 BOOL WINAPI InitCommonControlsEx(LPINITCOMMONCONTROLSEX);
 #endif
-WINBOOL WINAPI ImageList_DragShowNolock(BOOL);
 int WINAPI LBItemFromPt(HWND,POINT,BOOL);
 #define ListView_GetBkColor(w) (COLORREF)SNDMSG((w),LVM_GETBKCOLOR,0,0)
 #define ListView_GetImageList(w,i) (HIMAGELIST)SNDMSG((w),LVM_GETIMAGELIST,(i),0)
