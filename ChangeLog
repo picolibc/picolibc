@@ -1,3 +1,9 @@
+2000-11-24  Nick Clifton  <nickc@redhat.com>
+
+	* configure.in (xscale-elf): Add target.
+	(xscale-coff): Add target.
+	(c4x, c5x, tic54x): Move after ARM targets.
+
 2000-11-23  Alexandre Oliva  <aoliva@redhat.com>
 
 	* ltcf-gcj.sh: Added file, required by 2000-11-18 merge.

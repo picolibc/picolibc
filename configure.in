@@ -628,12 +628,6 @@ case "${target}" in
   arm-*-oabi*)
     noconfigdirs="$noconfigdirs target-libgloss target-libffi"
     ;;
-  c4x-*-*)
-    noconfigdirs="$noconfigdirs ${libstdcxx_version} target-libgloss target-libffi"
-    ;;
-  c54x*-*-* | tic54x-*-*)
-    noconfigdirs="$noconfigdirs ${libstdcxx_version} target-libgloss target-libffi gcc gdb newlib"
-    ;;
   thumb-*-coff)
     noconfigdirs="$noconfigdirs target-libgloss target-libffi"
     ;;
@@ -655,11 +649,29 @@ case "${target}" in
 	   target_configdirs="${target_configdirs} target-bsp target-cygmon"
     fi
     ;;
+  xscale-*-elf)
+    noconfigdirs="$noconfigdirs target-libgloss target-libffi"
+    if [ x${is_cross_compiler} != xno ] ; then
+	   target_configdirs="${target_configdirs} target-bsp target-cygmon"
+    fi
+    ;;
+  xscale-*-coff)
+    noconfigdirs="$noconfigdirs target-libgloss target-libffi"
+    if [ x${is_cross_compiler} != xno ] ; then
+	   target_configdirs="${target_configdirs} target-bsp target-cygmon"
+    fi
+    ;;
   thumb-*-pe)
     noconfigdirs="$noconfigdirs target-libgloss target-libffi"
     ;;
   arm-*-riscix*)
     noconfigdirs="$noconfigdirs ld target-libgloss target-libffi"
+    ;;
+  c4x-*-*)
+    noconfigdirs="$noconfigdirs ${libstdcxx_version} target-libgloss target-libffi"
+    ;;
+  c54x*-*-* | tic54x-*-*)
+    noconfigdirs="$noconfigdirs ${libstdcxx_version} target-libgloss target-libffi gcc gdb newlib"
     ;;
   d10v-*-*)
     noconfigdirs="$noconfigdirs ${libstdcxx_version} target-libgloss target-libffi"
