@@ -1,12 +1,18 @@
-2002-08-20  Danny Smith  <dannysmith@users.sourceforge.net
+2002-08-21  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/math.h (asm): Change to __asm__ throughout.
+	Expose ISO C99 functions if __GLIPCPP__.
+	(hypotf): Use hypot, not _hypot in stub.
+
+2002-08-20  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/tchar.h: Ansi-fy another comment.
 
-2002-08-20  Danny Smith  <dannysmith@users.sourceforge.net
+2002-08-20  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/tchar.h: Ansi-fy comment.
 
-2002-08-20  Danny Smith  <dannysmith@users.sourceforge.net
+2002-08-20  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* test_headers.c : New file.
 	* Makefile.in (test_headers): New target, using it,

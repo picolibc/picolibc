@@ -147,7 +147,7 @@ double	sqrt (double);
 extern __inline__  double sqrt (double x)
 {
   double res;
-  asm ("fsqrt" : "=t" (res) : "0" (x));
+  __asm__ ("fsqrt;" : "=t" (res) : "0" (x));
   return res;
 }
 double	ceil (double);
@@ -156,7 +156,7 @@ double	fabs (double);
 extern __inline__  double fabs (double x)
 {
   double res;
-  asm ("fabs;" : "=t" (res) : "0" (x));
+  __asm__ ("fabs;" : "=t" (res) : "0" (x));
   return res;
 }
 double	ldexp (double, int);
@@ -232,7 +232,7 @@ int fpclass (double);
 
 #ifndef __NO_ISOCEXT
 #if (defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) \
-	|| !defined  __STRICT_ANSI__
+	|| !defined  __STRICT_ANSI__  || defined __GLIBCPP__
 
 #define NAN (0.0F/0.0F)
 #define HUGE_VALF (1.0F/0.0F)
@@ -437,7 +437,7 @@ extern long double logbl (long double);
 extern __inline__ double logb (double x)
 {
   double res;
-  asm ("fxtract\n\t"
+  __asm__ ("fxtract\n\t"
        "fstp	%%st" : "=t" (res) : "0" (x));
   return res;
 }
@@ -445,7 +445,7 @@ extern __inline__ double logb (double x)
 extern __inline__ float logbf (float x)
 {
   float res;
-  asm ("fxtract\n\t"
+  __asm__ ("fxtract\n\t"
        "fstp	%%st" : "=t" (res) : "0" (x));
   return res;
 }
@@ -453,7 +453,7 @@ extern __inline__ float logbf (float x)
 extern __inline__ long double logbl (long double x)
 {
   long double res;
-  asm ("fxtract\n\t"
+  __asm__ ("fxtract\n\t"
        "fstp	%%st" : "=t" (res) : "0" (x));
   return res;
 }
@@ -481,21 +481,21 @@ extern long double cbrtl (long double);
 extern __inline__ float fabsf (float x)
 {
   float res;
-  asm ("fabs;" : "=t" (res) : "0" (x));
+  __asm__ ("fabs;" : "=t" (res) : "0" (x));
   return res;
 }
 
 extern __inline__ long double fabsl (long double x)
 {
   long double res;
-  asm ("fabs;" : "=t" (res) : "0" (x));
+  __asm__ ("fabs;" : "=t" (res) : "0" (x));
   return res;
 }
 
 /* 7.12.7.3  */
 extern double hypot (double, double); /* in libmoldname.a */
 extern __inline__ float hypotf (float x, float y)
-  { return (float) _hypot (x, y);}
+  { return (float) hypot (x, y);}
 extern long double hypotl (long double, long double);
 
 /* 7.12.7.4 The pow functions. Double in C89 */
@@ -507,14 +507,14 @@ extern long double powl (long double, long double);
 extern __inline__ float sqrtf (float x)
 {
   float res;
-  asm ("fsqrt" : "=t" (res) : "0" (x));
+  __asm__ ("fsqrt" : "=t" (res) : "0" (x));
   return res;
 }
 
 extern __inline__ long double sqrtl (long double x)
 {
   long double res;
-  asm ("fsqrt" : "=t" (res) : "0" (x));
+  __asm__ ("fsqrt" : "=t" (res) : "0" (x));
   return res;
 }
 
