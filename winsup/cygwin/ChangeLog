@@ -1,3 +1,10 @@
+Sat Dec  9 16:29:45 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (normalize_win32_path): Check for explicit use of two slashes
+	at the beginning of a path.  These should be treated specially
+	regardless of whether they are UNC paths or old-style //a paths.  Avoid
+	adding cwd to a path if the path already begins with '/'.
+
 Fri Dec  8 22:21:01 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (normalize_win32_path): Reorganize logic to accomodate

@@ -712,9 +712,9 @@ normalize_win32_path (const char *src, char *dst)
   const char *src_start = src;
   char *dst_start = dst;
   char *dst_root_start = dst;
-  bool beg_src_slash;
+  bool beg_src_slash = isdirsep (src[0]);
 
-  if (slash_unc_prefix_p (src))
+  if (beg_src_slash && isdirsep (src[1]))
     {
       if (cygheap->root.length ())
 	{
@@ -725,7 +725,7 @@ normalize_win32_path (const char *src, char *dst)
       ++src;
     }
   /* If absolute path, care for chroot. */
-  else if ((beg_src_slash = SLASH_P (src[0])) && cygheap->root.length ())
+  else if (beg_src_slash  && cygheap->root.length ())
     {
       strcpy (dst, cygheap->root.path ());
       char *c;
@@ -735,7 +735,7 @@ normalize_win32_path (const char *src, char *dst)
       dst_root_start = dst;
       *dst++ = '\\';
     }
-  else if (strchr (src, ':') == NULL)
+  else if (strchr (src, ':') == NULL && *src != '/')
     {
       if (!cygcwd.get (dst, 0))
 	return get_errno ();
