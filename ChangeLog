@@ -1,3 +1,7 @@
+2001-08-30  Eric Christopher  <echristo@redhat.com>
+
+	* config.sub, config.guess: Import latest from subversions.
+
 2001-08-20  Alan Modra  <amodra@bigpond.net.au>
 
 	* config.sub, config.guess: Import latest from subversions.
@@ -50,7 +54,7 @@ Fri Jun  8 11:14:02 2001  Andrew Cagney  <cagney@b1.cygnus.com>
 2001-05-24  Tom Rix <trix@redhat.com>
 
 	* configure.in : enable ld for aix
-	
+
 2001-05-22  Alexandre Oliva  <aoliva@redhat.com>
 
 	* ltcf-cxx.sh (allow_undefined_flag, no_undefined_flag)
