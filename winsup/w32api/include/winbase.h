@@ -811,7 +811,7 @@ typedef struct _WIN32_STREAM_ID {
 	LARGE_INTEGER Size;
 	DWORD dwStreamNameSize;
 	WCHAR cStreamName[ANYSIZE_ARRAY];
-} WIN32_STREAM_ID;
+} WIN32_STREAM_ID, *LPWIN32_STREAM_ID;
 typedef enum _FINDEX_INFO_LEVELS {
 	FindExInfoStandard,
 	FindExInfoMaxInfoLevel

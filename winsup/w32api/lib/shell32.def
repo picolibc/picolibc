@@ -166,3 +166,17 @@ Control_FillCache_RunDLL@16
 CommandLineToArgvW@8
 CheckEscapesW@8
 CheckEscapesA@8
+ILAppendID@12
+ILClone@4
+ILCloneFirst@4
+ILCombine@8
+ILFindChild@8
+ILFindLastID@4
+ILFree@4
+ILGetNext@4
+ILGetSize@4
+ILIsEqual@8
+ILIsParent@12
+ILLoadFromStream@8
+ILRemoveLastID@4
+ILSaveToStream@8
