@@ -77,6 +77,8 @@
 extern "C" {
 #endif
 
+#if !defined (__STRICT_ANSI__)
+
 /*
  * This seems like a convenient place to declare these variables, which
  * give programs using WinMain (or main for that matter) access to main-ish
@@ -116,7 +118,7 @@ __MINGW_IMPORT char**  __argv_dll;
 #endif /* __DECLSPEC_SUPPORTED */
 
 #endif /* __MSVCRT */
-
+#endif /* __STRICT_ANSI__ */
 /*
  * Also defined in ctype.h.
  */
@@ -155,6 +157,7 @@ extern int errno;
  _CRTIMP int* __cdecl	__doserrno(void);
 #define	_doserrno	(*__doserrno())
 
+#if !defined (__STRICT_ANSI__)
 /*
  * Use environ from the DLL, not as a global. 
  */
@@ -216,7 +219,6 @@ __MINGW_IMPORT char*	_sys_errlist[];
 /*
  * OS version and such constants.
  */
-#ifndef __STRICT_ANSI__
 
 #ifdef	__MSVCRT__
 /* msvcrtxx.dll */
@@ -324,9 +326,10 @@ __MINGW_IMPORT  int _fmode_dll;
 _CRTIMP double __cdecl	atof	(const char*);
 _CRTIMP int __cdecl	atoi	(const char*);
 _CRTIMP long __cdecl 	atol	(const char*);
+#if !defined (__STRICT_ANSI__)
 _CRTIMP int __cdecl	_wtoi (const wchar_t *);
 _CRTIMP long __cdecl _wtol (const wchar_t *);
-
+#endif
 _CRTIMP double __cdecl	strtod	(const char*, char**);
 #if !defined __NO_ISOCEXT  /* extern stub in static libmingwex.a */
 __CRT_INLINE float __cdecl strtof (const char *nptr, char **endptr)
@@ -398,7 +401,7 @@ typedef struct { long quot, rem; } ldiv_t;
 _CRTIMP div_t __cdecl	div	(int, int);
 _CRTIMP ldiv_t __cdecl	ldiv	(long, long);
 
-#ifndef	__STRICT_ANSI__
+#if !defined (__STRICT_ANSI__)
 
 /*
  * NOTE: Officially the three following functions are obsolete. The Win32 API
