@@ -45,8 +45,6 @@
 host_libs="intl mmalloc libiberty opcodes bfd readline db tcl tk tclX itcl tix libgui zlib"
 
 libstdcxx_version="target-libstdc++-v3"
-# Don't use libstdc++-v3's flags to configure/build itself.
-libstdcxx_flags='`case $$dir in libstdc++-v3 | libjava) ;; *) test ! -f $$r/$(TARGET_SUBDIR)/libstdc++-v3/testsuite_flags || $(SHELL) $$r/$(TARGET_SUBDIR)/libstdc++-v3/testsuite_flags --build-includes;; esac` -L$$r/$(TARGET_SUBDIR)/libstdc++-v3/src -L$$r/$(TARGET_SUBDIR)/libstdc++-v3/src/.libs'
 
 # these tools are built for the host environment
 # Note, the powerpc-eabi build depends on sim occurring before gdb in order to
@@ -66,7 +64,6 @@ libgcj="target-libffi \
 target_libs="target-libiberty \
 		target-libgloss \
 		target-newlib \
-		target-librx \
 		${libstdcxx_version} \
 		target-libf2c \
 		${libgcj}
@@ -117,6 +114,18 @@ srcname="gnu development package"
 appdirs=""
 
 # per-host:
+
+# There is no longer anything interesting in the per-host section.
+
+# per-target:
+
+# Define is_cross_compiler to save on calls to 'test'.
+is_cross_compiler=
+if test x"${host}" = x"${target}" ; then
+  is_cross_compiler=no
+else
+  is_cross_compiler=yes
+fi	
 
 # Work in distributions that contain no compiler tools, like Autoconf.
 tentative_cc=""
@@ -351,8 +360,6 @@ if test -n "${host_makefile_frag}" ; then
   host_makefile_frag=mh-frag
 fi
 
-# per-target:
-
 case "${target}" in
   v810*)
     target_makefile_frag="${target_makefile_frag} config/mt-v810"
@@ -402,7 +409,6 @@ case "${enable_target_optspace}:${target}" in
 esac
 
 skipdirs=
-gasdir=gas
 use_gnu_ld=
 use_gnu_as=
 
@@ -425,19 +431,10 @@ esac
 # toolchains, we add some directories that should only be useful in a
 # cross-compiler.
 
-is_cross_compiler=
-
-if test x"${host}" = x"${target}" ; then
-	# when doing a native toolchain, don't build the targets
-	# that are in the 'cross only' list
-	skipdirs="${skipdirs} ${cross_only}"
-	is_cross_compiler=no
-else
-	# similarly, don't build the targets in the 'native only' 
-	# list when building a cross compiler
-	skipdirs="${skipdirs} ${native_only}"
-	is_cross_compiler=yes
-fi	
+case $is_cross_compiler in
+  no) skipdirs="${skipdirs} ${cross_only}" ;;
+  yes) skipdirs="${skipdirs} ${native_only}" ;;
+esac
 
 # We always want to use the same name for this directory, so that dejagnu
 # can reliably find it.
@@ -497,33 +494,6 @@ if test x"${with_libs}" != x ; then
   done
 fi
 
-# If both --with-headers and --with-libs are specified, default to
-# --without-newlib.
-if test x"${with_headers}" != x && test x"${with_libs}" != x ; then
-  if test x"${with_newlib}" = x ; then
-    with_newlib=no
-  fi
-fi
-
-# Recognize --with-newlib/--without-newlib.
-if test x${with_newlib} = xno ; then
-  skipdirs="${skipdirs} target-newlib"
-elif test x${with_newlib} = xyes ; then
-  skipdirs=`echo " ${skipdirs} " | sed -e 's/ target-newlib / /'`
-fi
-
-# Default to using --with-stabs for certain targets.
-if test x${with_stabs} = x ; then
-  case "${target}" in
-  mips*-*-irix6*)
-    ;;
-  mips*-*-* | alpha*-*-osf*)
-    with_stabs=yes;
-    withoptions="${withoptions} --with-stabs"
-    ;;
-  esac
-fi
-
 # Handle ${copy_dirs}
 set fnord ${copy_dirs}
 shift
@@ -554,6 +524,32 @@ while test $# != 0 ; do
   fi
   shift; shift
 done
+
+# If both --with-headers and --with-libs are specified, default to
+# --without-newlib.
+if test x"${with_headers}" != x && test x"${with_libs}" != x ; then
+  if test x"${with_newlib}" = x ; then
+    with_newlib=no
+  fi
+fi
+
+# Recognize --with-newlib/--without-newlib.
+case ${with_newlib} in
+  no) skipdirs="${skipdirs} target-newlib" ;;
+  yes) skipdirs=`echo " ${skipdirs} " | sed -e 's/ target-newlib / /'` ;;
+esac
+
+# Default to using --with-stabs for certain targets.
+if test x${with_stabs} = x ; then
+  case "${target}" in
+  mips*-*-irix6*)
+    ;;
+  mips*-*-* | alpha*-*-osf*)
+    with_stabs=yes;
+    withoptions="${withoptions} --with-stabs"
+    ;;
+  esac
+fi
 
 # Configure extra directories which are host specific
 
@@ -639,7 +635,7 @@ case "${target}" in
     esac
     ;;
   *-*-netware)
-    noconfigdirs="$noconfigdirs ${libstdcxx_version} target-librx target-newlib target-libiberty target-libgloss ${libgcj}"
+    noconfigdirs="$noconfigdirs ${libstdcxx_version} target-newlib target-libiberty target-libgloss ${libgcj}"
     ;;
   *-*-rtems*)
     noconfigdirs="$noconfigdirs target-libgloss ${libgcj}"
@@ -665,8 +661,6 @@ case "${target}" in
   alpha*-*-linux*)
     # newlib is not 64 bit ready
     noconfigdirs="$noconfigdirs target-newlib target-libgloss"
-    # linux has rx in libc
-    skipdirs="$skipdirs target-librx"
     ;;
   alpha*-*-freebsd*)
     noconfigdirs="$noconfigdirs target-newlib target-libgloss"
@@ -677,8 +671,6 @@ case "${target}" in
     ;;
   sh-*-linux*)
     noconfigdirs="$noconfigdirs ${libgcj} target-newlib target-libgloss"
-    # linux has rx in libc
-    skipdirs="$skipdirs target-librx"
     ;;    
   sh*-*-pe|mips*-*-pe|*arm-wince-pe)
     noconfigdirs="$noconfigdirs ${libgcj}"
@@ -735,7 +727,7 @@ case "${target}" in
     noconfigdirs="$noconfigdirs target-libiberty ${libstdcxx_version} ${libgcj}"
     ;;
   c4x-*-*)
-    noconfigdirs="$noconfigdirs ${libstdcxx_version} target-librx target-libgloss ${libgcj}"
+    noconfigdirs="$noconfigdirs ${libstdcxx_version} target-libgloss ${libgcj}"
     ;;
   c54x*-*-* | tic54x-*-*)
     noconfigdirs="$noconfigdirs ${libstdcxx_version} target-libgloss ${libgcj} gcc gdb newlib"
@@ -744,7 +736,7 @@ case "${target}" in
     noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
   d10v-*-*)
-    noconfigdirs="$noconfigdirs target-librx ${libstdcxx_version} target-libgloss ${libgcj}"
+    noconfigdirs="$noconfigdirs ${libstdcxx_version} target-libgloss ${libgcj}"
     ;;
   d30v-*-*)
     noconfigdirs="$noconfigdirs ${libgcj}"
@@ -755,11 +747,17 @@ case "${target}" in
 	   target_configdirs="${target_configdirs} target-bsp target-libstub target-cygmon"
     fi
     ;;
+  frv-*-*)
+    noconfigdirs="$noconfigdirs ${libgcj}"
+    if test x${is_cross_compiler} != xno ; then
+	   target_configdirs="${target_configdirs} target-bsp target-cygmon"
+    fi
+    ;;
   h8300*-*-*)
     noconfigdirs="$noconfigdirs target-libgloss"
     ;;
   h8500-*-*)
-    noconfigdirs="$noconfigdirs ${libstdcxx_version} target-librx target-libgloss ${libgcj} target-libf2c"
+    noconfigdirs="$noconfigdirs ${libstdcxx_version} target-libgloss ${libgcj} target-libf2c"
     ;;
   hppa*64*-*-linux* | parisc*64*-*-linux*)
     # In this case, it's because the hppa64-linux target is for
@@ -799,8 +797,6 @@ case "${target}" in
   s390*-*-linux*)
     # The libffi port is not yet in the GCC tree
     noconfigdirs="$noconfigdirs target-newlib target-libgloss ${libgcj}"
-    # linux has rx in libc
-    skipdirs="$skipdirs target-librx"
     ;;
   i[3456]86-*-linux*)
     # This section makes it possible to build newlib natively on linux.
@@ -813,13 +809,9 @@ case "${target}" in
     # Note however, that newlib will only be configured in this situation
     # if the --with-newlib option has been given, because otherwise
     # 'target-newlib' will appear in skipdirs.
-    # linux has rx in libc
-    skipdirs="$skipdirs target-librx"
     ;;
   *-*-linux*)
     noconfigdirs="$noconfigdirs target-newlib target-libgloss"
-    # linux has rx in libc
-    skipdirs="$skipdirs target-librx"
     ;;
   i[3456]86-*-mingw32*)
     target_configdirs="$target_configdirs target-mingw"
@@ -846,7 +838,7 @@ case "${target}" in
     esac
     ;;    
   i[3456]86-*-pe)
-    noconfigdirs="$noconfigdirs ${libstdcxx_version} target-librx target-libgloss ${libgcj}"
+    noconfigdirs="$noconfigdirs ${libstdcxx_version} target-libgloss ${libgcj}"
     ;;
   i[3456]86-*-sco3.2v5*)
     # The linker does not yet know about weak symbols in COFF,
@@ -1277,7 +1269,7 @@ fi
 # --without-gnu-ld options for the configure script.
 
 if test x${use_gnu_as} = x ; then
-  if test x${with_gnu_as} != xno && echo " ${configdirs} " | grep " ${gasdir} " > /dev/null 2>&1 && test -d ${srcdir}/${gasdir} ; then
+  if test x${with_gnu_as} != xno && echo " ${configdirs} " | grep " gas " > /dev/null 2>&1 && test -d ${srcdir}/gas ; then
     with_gnu_as=yes
     withoptions="$withoptions --with-gnu-as"
   fi
@@ -1454,7 +1446,7 @@ if test x${gxx_include_dir} = x; then
   if test x${enable_version_specific_runtime_libs} = xyes; then
     gxx_include_dir='${libsubdir}/include/g++'
   else
-    . ${topsrcdir}/config.if
+    . ${srcdir}/config.if
     gxx_include_dir='${prefix}/include/${libstdcxx_incdir}'
   fi
 else
@@ -1475,7 +1467,7 @@ case " $skipdirs " in
    esac
 
    # If we're not building GCC, don't discard standard headers.
-   if test -d ${topsrcdir}/gcc; then
+   if test -d ${srcdir}/gcc; then
      FLAGS_FOR_TARGET=$FLAGS_FOR_TARGET' -nostdinc'
 
      if test "${build}" != "${host}"; then
@@ -1521,7 +1513,7 @@ esac
 # the previously-installed cross compiler, so don't bother to add
 # flags for directories within the install tree of the compiler
 # being built; programs in there won't even run.
-if test "${build}" = "${host}" && test -d ${topsrcdir}/gcc; then
+if test "${build}" = "${host}" && test -d ${srcdir}/gcc; then
   # Search for pre-installed headers if nothing else fits.
   FLAGS_FOR_TARGET=$FLAGS_FOR_TARGET' -B$(build_tooldir)/bin/ -B$(build_tooldir)/lib/ -isystem $(build_tooldir)/include'
 fi
@@ -1535,7 +1527,7 @@ fi
 
 if test "x${CC_FOR_TARGET+set}" = xset; then
   :
-elif test -d ${topsrcdir}/gcc; then
+elif test -d ${srcdir}/gcc; then
   CC_FOR_TARGET='$$r/gcc/xgcc -B$$r/gcc/'
 elif test "$host" = "$target"; then
   CC_FOR_TARGET='$(CC)'
@@ -1551,7 +1543,7 @@ esac
 
 if test "x${GCJ_FOR_TARGET+set}" = xset; then
   :
-elif test -d ${topsrcdir}/gcc; then
+elif test -d ${srcdir}/gcc; then
   GCJ_FOR_TARGET='$$r/gcc/gcj -B$$r/gcc/'
 elif test "$host" = "$target"; then
   GCJ_FOR_TARGET='gcj'
@@ -1563,9 +1555,12 @@ case $GCJ_FOR_TARGET in
 *) GCJ_FOR_TARGET=$GCJ_FOR_TARGET' $(FLAGS_FOR_TARGET)' ;;
 esac
 
+# Don't use libstdc++-v3's flags to configure/build itself.
+libstdcxx_flags='`case $$dir in libstdc++-v3 | libjava) ;; *) test ! -f $$r/$(TARGET_SUBDIR)/libstdc++-v3/testsuite_flags || $(SHELL) $$r/$(TARGET_SUBDIR)/libstdc++-v3/testsuite_flags --build-includes;; esac` -L$$r/$(TARGET_SUBDIR)/libstdc++-v3/src -L$$r/$(TARGET_SUBDIR)/libstdc++-v3/src/.libs'
+
 if test "x${CXX_FOR_TARGET+set}" = xset; then
   :
-elif test -d ${topsrcdir}/gcc; then
+elif test -d ${srcdir}/gcc; then
   # We add -shared-libgcc to CXX_FOR_TARGET whenever we use xgcc instead
   # of g++ for linking C++ or Java, because g++ has -shared-libgcc by
   # default whereas gcc does not.
