@@ -168,6 +168,18 @@ do-proto-toplev: $(DEVO_SUPPORT) $(SUPPORT_FILES) texinfo/texinfo.tex
 	# again.  -- chastain 2003-08-15
 	rm -f dejagnu/example/calc/config.status
 	rm -f dejagnu/example/calc/config.log
+	# Kludge for pr gdb/857.  intl/Makefile.in lacks a couple
+	# of files in the distclean rule.  Zack W is planning to make
+	# the gcc version of intl/ the master version and then push
+	# that version to src soon.  See:
+	#   http://sources.redhat.com/ml/binutils/2003-07/msg00032.html
+	# After the src version of intl/ is upgraded, we can look at
+	# moving this logic into intl/Makefile.in distclean rule
+	# if it is still needed.  -- chastain 2003-09-12
+	rm -f intl/config.cache
+	rm -f intl/config.status
+	rm -f intl/config.h
+	rm -f intl/stamp-h
 	#
 	mkdir proto-toplev/etc
 	(cd proto-toplev/etc; \
