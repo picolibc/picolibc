@@ -899,7 +899,7 @@ getsem (_pinfo *p, const char *str, int init, int max)
       char sa_buf[1024];
 
       DWORD winpid = GetCurrentProcessId ();
-      h = CreateSemaphore (allow_ntsec ? sec_user (sa_buf) : &sec_none_nih,
+      h = CreateSemaphore (allow_ntsec ? sec_user_nih (sa_buf) : &sec_none_nih,
 			   init, max, str = shared_name (str, winpid));
       p = myself;
     }

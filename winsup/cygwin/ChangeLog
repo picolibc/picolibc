@@ -1,3 +1,7 @@
+2001-02-21  Egor Duda  <deo@logos-m.ru>
+
+	* sigproc.cc (getsem): Make semaphore always non-inheritable.
+
 Mon Feb 19 22:25:53 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* dcrt0.cc (locale_init): Remove.
