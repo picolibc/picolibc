@@ -1,3 +1,10 @@
+2001-01-09  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* cgen.h (CGEN_SYNTAX_CHAR_TYPE): New typedef based on max number
+	of operands (unsigned char or unsigned short).
+	(CGEN_SYNTAX): Changed to make array CGEN_SYNTAX_CHAR_TYPE.
+	(CGEN_SYNTAX_CHAR): Changed to cast to unsigned char.
+
 Fri Jan  5 13:22:23 MET 2001  Jan Hubicka  <jh@suse.cz>
 
 	* i386.h (i386_optab): Make [sml]fence template to use immext field.

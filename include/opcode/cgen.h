@@ -1,6 +1,6 @@
 /* Header file for targets using CGEN: Cpu tools GENerator.
 
-Copyright (C) 1996, 1997, 1998, 1999, 2000 Free Software Foundation, Inc.
+Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
 
 This file is part of GDB, the GNU debugger, and the GNU Binutils.
 
@@ -746,15 +746,20 @@ typedef struct
 #endif
 #endif
 
+#if !defined(MAX_OPERANDS) || MAX_OPERANDS <= 127
+typedef unsigned char CGEN_SYNTAX_CHAR_TYPE;
+#else
+typedef unsigned short CGEN_SYNTAX_CHAR_TYPE;
+#endif
 
 typedef struct
 {
-  unsigned char syntax[CGEN_MAX_SYNTAX_BYTES];
+  CGEN_SYNTAX_CHAR_TYPE syntax[CGEN_MAX_SYNTAX_BYTES];
 } CGEN_SYNTAX;
 
 #define CGEN_SYNTAX_STRING(syn) (syn->syntax)
 #define CGEN_SYNTAX_CHAR_P(c) ((c) < 128)
-#define CGEN_SYNTAX_CHAR(c) (c)
+#define CGEN_SYNTAX_CHAR(c) ((unsigned char)c)
 #define CGEN_SYNTAX_FIELD(c) ((c) - 128)
 #define CGEN_SYNTAX_MAKE_FIELD(c) ((c) + 128)
 
