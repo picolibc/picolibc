@@ -172,7 +172,8 @@ LIBS = libcrtdll.a \
 
 DLLS = $(THREAD_DLL_NAME)
 
-INSTDOCS = DISCLAIMER \
+INSTDOCS = CONTRIBUTORS \
+	   DISCLAIMER \
 	   README
 
 SRCDIST_FILES = CRT_noglob.c CRTfmode.c CRTglob.c CRTinit.c ChangeLog \
@@ -185,7 +186,7 @@ isascii.c iscsym.c iscsymf.c toascii.c \
 strcasecmp.c strncasecmp.c wcscmpi.c \
 CRT_fp8.c CRT_fp10.c test_headers.c txtmode.c binmode.c pseudo-reloc.c \
 pseudo-reloc-list.c \
-DISCLAIMER README
+DISCLAIMER CONTRIBUTORS
 
 
 all_dlls_host = @all_dlls_host@
