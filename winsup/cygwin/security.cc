@@ -772,8 +772,7 @@ get_nt_attribute (const char *file, int *attribute,
 	      *flags |= S_IXOTH
 			| ((!(*anti & S_IXGRP)) ? S_IXGRP : 0)
 			| ((!(*anti & S_IXUSR)) ? S_IXUSR : 0);
-	      // Sticky bit for directories according to linux rules.
-	      // No sense for files.
+	      /* Sticky bit for directories according to linux rules. */
 	      if (! (ace->Mask & FILE_DELETE_CHILD)
 		  && S_ISDIR(*attribute)
 		  && !(*anti & S_ISVTX))
@@ -806,7 +805,7 @@ get_file_attribute (int use_ntsec, const char *file,
   int res = NTReadEA (file, ".UNIXATTR",
 		      (char *) attribute, sizeof (*attribute));
 
-  // symlinks are anything for everyone!
+  /* symlinks are everything for everyone! */
   if ((*attribute & S_IFLNK) == S_IFLNK)
     *attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
 
@@ -862,7 +861,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
       return NULL;
     }
 
-  // Get SID and name of new owner
+  /* Get SID and name of new owner. */
   char owner[MAX_USER_NAME];
   char *owner_sid_buf[MAX_SID_LEN];
   PSID owner_sid = NULL;
@@ -876,7 +875,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
 		*GetSidSubAuthority((PSID) owner_sid,
 		*GetSidSubAuthorityCount((PSID) owner_sid) - 1));
 
-  // Get SID and name of new group
+  /* Get SID and name of new group. */
   char *group_sid_buf[MAX_SID_LEN];
   PSID group_sid = NULL;
   struct group *grp = getgrgid (gid);
@@ -890,7 +889,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
   else
     debug_printf ("no group");
 
-  // Initialize local security descriptor
+  /* Initialize local security descriptor. */
   SECURITY_DESCRIPTOR sd;
   PSECURITY_DESCRIPTOR psd = NULL;
   if (! InitializeSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION))
@@ -899,19 +898,21 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
       return NULL;
     }
 
+  /* Create owner for local security descriptor. */
   if (! SetSecurityDescriptorOwner(&sd, owner_sid, FALSE))
     {
       __seterrno ();
       return NULL;
     }
-  if (group_sid
-      && ! SetSecurityDescriptorGroup(&sd, group_sid, FALSE))
+
+  /* Create group for local security descriptor. */
+  if (group_sid && ! SetSecurityDescriptorGroup(&sd, group_sid, FALSE))
     {
       __seterrno ();
       return NULL;
     }
 
-  // Initialize local access control list
+  /* Initialize local access control list. */
   char acl_buf[3072];
   PACL acl = (PACL) acl_buf;
   if (! InitializeAcl (acl, 3072, ACL_REVISION))
@@ -920,19 +921,21 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
       return NULL;
     }
 
-  // VTX bit may only be set if executable for `other' is set.
-  // For correct handling under WinNT, FILE_DELETE_CHILD has to
-  // be (un)set in each ACE.
+  /*
+   * VTX bit may only be set if executable for `other' is set.
+   * For correct handling under WinNT, FILE_DELETE_CHILD has to
+   * be (un)set in each ACE.
+   */
   if (! (attribute & S_IXOTH))
     attribute &= ~S_ISVTX;
   if (! (attribute & S_IFDIR))
     attribute |= S_ISVTX;
 
-  // From here fill ACL
+  /* From here fill ACL. */
   size_t acl_len = sizeof (ACL);
   int ace_off = 0;
 
-  // Construct allow attribute for owner
+  /* Construct allow attribute for owner. */
   DWORD owner_allow = (STANDARD_RIGHTS_ALL & ~DELETE)
 		      | FILE_WRITE_ATTRIBUTES | FILE_WRITE_EA;
   if (attribute & S_IRUSR)
@@ -944,7 +947,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
   if (! (attribute & S_ISVTX))
     owner_allow |= FILE_DELETE_CHILD;
 
-  // Construct allow attribute for group
+  /* Construct allow attribute for group. */
   DWORD group_allow = STANDARD_RIGHTS_READ
 		      | FILE_READ_ATTRIBUTES | FILE_READ_EA;
   if (attribute & S_IRGRP)
@@ -956,7 +959,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
   if (! (attribute & S_ISVTX))
     group_allow |= FILE_DELETE_CHILD;
 
-  // Construct allow attribute for everyone
+  /* Construct allow attribute for everyone. */
   DWORD other_allow = STANDARD_RIGHTS_READ
 		      | FILE_READ_ATTRIBUTES | FILE_READ_EA;
   if (attribute & S_IROTH)
@@ -968,7 +971,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
   if (! (attribute & S_ISVTX))
     other_allow |= FILE_DELETE_CHILD;
   
-  // Construct deny attributes for owner and group
+  /* Construct deny attributes for owner and group. */
   DWORD owner_deny = 0;
   if (is_grp_member (uid, gid))
     owner_deny = ~owner_allow & (group_allow | other_allow);
@@ -980,29 +983,29 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
   DWORD group_deny = ~group_allow & other_allow;
   group_deny &= ~(STANDARD_RIGHTS_READ | FILE_READ_ATTRIBUTES | FILE_READ_EA);
 
-  // Construct appropriate inherit attribute
+  /* Construct appropriate inherit attribute. */
   DWORD inherit = (attribute & S_IFDIR) ? INHERIT_ALL : DONT_INHERIT;
 
-  // Set deny ACE for owner
+  /* Set deny ACE for owner. */
   if (owner_deny
       && ! add_access_denied_ace (acl, ace_off++, owner_deny,
 				  owner_sid, acl_len, inherit))
       return NULL;
-  // Set allow ACE for owner
+  /* Set allow ACE for owner. */
   if (! add_access_allowed_ace (acl, ace_off++, owner_allow,
 				owner_sid, acl_len, inherit))
     return NULL;
-  // Set deny ACE for group
+  /* Set deny ACE for group. */
   if (group_deny
       && ! add_access_denied_ace (acl, ace_off++, group_deny,
 				  group_sid, acl_len, inherit))
       return NULL;
-  // Set allow ACE for group
+  /* Set allow ACE for group. */
   if (! add_access_allowed_ace (acl, ace_off++, group_allow,
 				group_sid, acl_len, inherit))
     return NULL;
 
-  // Get owner and group from current security descriptor
+  /* Get owner and group from current security descriptor. */
   PSID cur_owner_sid = NULL;
   PSID cur_group_sid = NULL;
   if (! GetSecurityDescriptorOwner (sd_ret, &cur_owner_sid, &dummy))
@@ -1010,7 +1013,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
   if (! GetSecurityDescriptorGroup (sd_ret, &cur_group_sid, &dummy))
     debug_printf ("GetSecurityDescriptorGroup %E");
 
-  // Fill ACL with unrelated ACEs from current security descriptor
+  /* Fill ACL with unrelated ACEs from current security descriptor. */
   PACL oacl;
   BOOL acl_exists;
   ACCESS_ALLOWED_ACE *ace;
@@ -1020,16 +1023,18 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
       if (GetAce (oacl, i, (PVOID *) &ace))
 	{
 	  PSID ace_sid = (PSID) &ace->SidStart;
-	  // Check for related ACEs
+	  /* Check for related ACEs. */
 	  if ((cur_owner_sid && EqualSid (ace_sid, cur_owner_sid))
 	      || (owner_sid && EqualSid (ace_sid, owner_sid))
 	      || (cur_group_sid && EqualSid (ace_sid, cur_group_sid))
 	      || (group_sid && EqualSid (ace_sid, group_sid))
 	      || (EqualSid (ace_sid, get_world_sid ())))
 	    continue;
-	  // Add unrelated ACCESS_DENIED_ACE to the beginning but
-	  // behind the owner_deny, ACCESS_ALLOWED_ACE to the end
-	  // but in front of the `everyone' ACE.
+	  /*
+	   * Add unrelated ACCESS_DENIED_ACE to the beginning but
+	   * behind the owner_deny, ACCESS_ALLOWED_ACE to the end
+	   * but in front of the `everyone' ACE.
+	   */
 	  if (! AddAce(acl, ACL_REVISION,
 		       ace->Header.AceType == ACCESS_DENIED_ACE_TYPE ?
 		       (owner_deny ? 1 : 0) : MAXDWORD,
@@ -1042,23 +1047,23 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
 	  ++ace_off;
 	}
 
-  // Set allow ACE for everyone
+  /* Set allow ACE for everyone. */
   if (! add_access_allowed_ace (acl, ace_off++, other_allow,
 				get_world_sid (), acl_len, inherit))
     return NULL;
 
-  // Set AclSize to computed value
+  /* Set AclSize to computed value. */
   acl->AclSize = acl_len;
   debug_printf ("ACL-Size: %d", acl_len);
 
-  // Create DACL for local security descriptor
+  /* Create DACL for local security descriptor. */
   if (! SetSecurityDescriptorDacl (&sd, TRUE, acl, FALSE))
     {
       __seterrno ();
       return NULL;
     }
 
-  // Make self relative security descriptor
+  /* Make self relative security descriptor. */
   *sd_size_ret = 0;
   MakeSelfRelativeSD (&sd, sd_ret, sd_size_ret);
   if (*sd_size_ret <= 0)
@@ -1107,7 +1112,7 @@ set_file_attribute (int use_ntsec, const char *file,
 		    uid_t uid, gid_t gid,
 		    int attribute, const char *logsrv)
 {
-  // symlinks are anything for everyone!
+  /* symlinks are anything for everyone! */
   if ((attribute & S_IFLNK) == S_IFLNK)
     attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
 
@@ -1163,7 +1168,7 @@ setacl (const char *file, int nentries, aclent_t *aclbufp)
 
   BOOL dummy;
 
-  // Get owner SID
+  /* Get owner SID. */
   PSID owner_sid = NULL;
   if (! GetSecurityDescriptorOwner (psd, &owner_sid, &dummy))
     {
@@ -1178,7 +1183,7 @@ setacl (const char *file, int nentries, aclent_t *aclbufp)
     }
   owner_sid = (PSID) owner_buf;
 
-  // Get group SID
+  /* Get group SID. */
   PSID group_sid = NULL;
   if (! GetSecurityDescriptorGroup (psd, &group_sid, &dummy))
     {
@@ -1193,7 +1198,7 @@ setacl (const char *file, int nentries, aclent_t *aclbufp)
     }
   group_sid = (PSID) group_buf;
 
-  // Initialize local security descriptor
+  /* Initialize local security descriptor. */
   SECURITY_DESCRIPTOR sd;
   if (! InitializeSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION))
     {
@@ -1212,7 +1217,7 @@ setacl (const char *file, int nentries, aclent_t *aclbufp)
       return -1;
     }
 
-  // Fill access control list
+  /* Fill access control list. */
   char acl_buf[3072];
   PACL acl = (PACL) acl_buf;
   size_t acl_len = sizeof (ACL);
@@ -1240,12 +1245,14 @@ setacl (const char *file, int nentries, aclent_t *aclbufp)
 		 | DELETE | FILE_DELETE_CHILD;
       if (aclbufp[i].a_perm & S_IXOTH)
 	allow |= FILE_GENERIC_EXECUTE;
-      // Set inherit property
+      /* Set inherit property. */
       DWORD inheritance = (aclbufp[i].a_type & ACL_DEFAULT)
 			  ? INHERIT_ONLY : DONT_INHERIT;
-      // If a specific acl contains a corresponding default entry with
-      // identical permissions, only one Windows ACE with proper
-      // inheritance bits is created.
+      /*
+       * If a specific acl contains a corresponding default entry with
+       * identical permissions, only one Windows ACE with proper
+       * inheritance bits is created.
+       */
       if (!(aclbufp[i].a_type & ACL_DEFAULT)
 	  && (pos = searchace (aclbufp, nentries,
 			       aclbufp[i].a_type | ACL_DEFAULT,
@@ -1255,7 +1262,7 @@ setacl (const char *file, int nentries, aclent_t *aclbufp)
 	  && aclbufp[i].a_perm == aclbufp[pos].a_perm)
 	{
 	  inheritance = INHERIT_ALL;
-	  // This eliminates the corresponding default entry.
+	  /* This eliminates the corresponding default entry. */
 	  aclbufp[pos].a_type = 0;
 	}
       switch (aclbufp[i].a_type)
@@ -1297,16 +1304,16 @@ setacl (const char *file, int nentries, aclent_t *aclbufp)
 	  break;
 	}
     }
-  // Set AclSize to computed value
+  /* Set AclSize to computed value. */
   acl->AclSize = acl_len;
   debug_printf ("ACL-Size: %d", acl_len);
-  // Create DACL for local security descriptor
+  /* Create DACL for local security descriptor. */
   if (! SetSecurityDescriptorDacl (&sd, TRUE, acl, FALSE))
     {
       __seterrno ();
       return -1;
     }
-  // Make self relative security descriptor in psd
+  /* Make self relative security descriptor in psd. */
   sd_size = 0;
   MakeSelfRelativeSD (&sd, psd, &sd_size);
   if (sd_size <= 0)
@@ -1515,7 +1522,7 @@ acl_access (const char *path, int flags)
   if ((cnt = acl (path, GETACL, MAX_ACL_ENTRIES, acls)) < 1)
     return -1;
 
-  // Only check existance.
+  /* Only check existance. */
   if (!(flags & (R_OK|W_OK|X_OK)))
     return 0;
 
@@ -1527,8 +1534,10 @@ acl_access (const char *path, int flags)
 	case USER:
 	  if (acls[i].a_id != myself->uid)
 	    {
-	      // Check if user is a NT group:
-	      // Take SID from passwd, search SID in group, check is_grp_member
+	      /*
+	       * Check if user is a NT group:
+	       * Take SID from passwd, search SID in group, check is_grp_member.
+	       */
 	      char owner_sidbuf[MAX_SID_LEN];
 	      PSID owner_sid = (PSID) owner_sidbuf;
 	      char group_sidbuf[MAX_SID_LEN];
@@ -1830,7 +1839,7 @@ aclcheck (aclent_t *aclbufp, int nentries, int *which)
       || !has_group_obj
       || !has_other_obj
 #if 0
-      // These checks are not ok yet since CLASS_OBJ isn't fully implemented.
+      /* These checks are not ok yet since CLASS_OBJ isn't fully implemented. */
       || (has_ug_objs && !has_class_obj)
       || (has_def_ug_objs && !has_def_class_obj)
 #endif
