@@ -326,7 +326,10 @@ struct mips_opcode
 /* Test for membership in an ISA including chip specific ISAs.
    INSN is pointer to an element of the opcode table; ISA is the
    specified ISA to test against; and CPU is the CPU specific ISA
-   to test, or zero if no CPU specific ISA test is desired. */ 
+   to test, or zero if no CPU specific ISA test is desired.  
+   The gp32 arg is set when you need to force 32-bit register usage on
+   a machine with 64-bit registers; see the documentation under -mgp32
+   in the MIPS gas docs. */
 
 #define OPCODE_IS_MEMBER(insn,isa,cpu,gp32) 	       		\
     ((((insn)->membership & INSN_ISA) != 0			\
