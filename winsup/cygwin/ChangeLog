@@ -1,3 +1,7 @@
+Fri Sep  7 21:35:35 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* cygwin.din: Add gamm*_r function exports.
+
 Fri Sep  7 17:11:11 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* cygheap.h (init_cygheap): Move heap pointers here.

@@ -315,8 +315,12 @@ fwrite
 _fwrite = fwrite
 gamma
 _gamma = gamma
+gamma_r
+_gamma_r = gamma_r
 gammaf
 _gammaf = gammaf
+gammaf_r
+_gammaf_r = gammaf_r
 gcvt
 _gcvt = gcvt
 gcvtf
@@ -457,8 +461,12 @@ ldiv
 _ldiv = ldiv
 lgamma
 _lgamma = lgamma
+lgamma_r
+_lgamma_r = lgamma_r
 lgammaf
 _lgammaf = lgammaf
+lgammaf_r
+_lgammaf_r = lgammaf_r
 link
 _link = link
 localeconv
