@@ -576,7 +576,8 @@ handle_sigsuspend (sigset_t tempmask)
 				//  interested in through.
   sigproc_printf ("old mask %x, new mask %x", oldmask, tempmask);
 
-  WaitForSingleObject (signal_arrived, INFINITE);
+  pthread_testcancel ();
+  pthread::cancelable_wait (signal_arrived, INFINITE);
 
   set_sig_errno (EINTR);	// Per POSIX
 

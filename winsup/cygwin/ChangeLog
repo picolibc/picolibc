@@ -1,3 +1,9 @@
+2003-01-10  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* exceptions.cc (handle_sigsuspend): Add pthread_testcancel call.
+	Wait for signal and cancellation event.
+	* thread.cc: Update list of cancellation points.
+
 2003-01-14  David Huang  <davehzhr@hotmail.com>
 
 	* fhandler_dsp.cc (fhandler_dsp::ioctl): Add limited support for
@@ -107,7 +113,7 @@
 	(__pthread_mutex_unlock): Return pthread_mutex::UnLock
 	errorcode.
 	(__pthread_mutex_destroy): Call pthread_mutex::Destroy to
-	destroy	mutex.
+	destroy mutex.
 	(__pthread_mutexattr_settype): Allow errorchecking and recursive
 	types.
 	* thread.h (MUTEX_LOCK_COUNTER_INITIAL): New define.
