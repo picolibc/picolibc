@@ -79,7 +79,7 @@ open_shared (const char *name, int n, HANDLE &shared_h, DWORD size,
   void *shared;
 
   void *addr;
-  if (!wincap.needs_memory_protection ())
+  if (!wincap.needs_memory_protection () && offsets[0])
     addr = NULL;
   else
     {
@@ -116,12 +116,13 @@ open_shared (const char *name, int n, HANDLE &shared_h, DWORD size,
       if (wincap.is_winnt ())
 	system_printf ("relocating shared object %s(%d) from %p to %p on Windows NT", name, n, addr, shared);
 #endif
+      offsets[0] = NULL;
     }
 
   if (!shared)
     api_fatal ("MapViewOfFileEx '%s'(%p), %E.  Terminating.", name, shared_h);
 
-  if (m == SH_CYGWIN_SHARED && wincap.needs_memory_protection ())
+  if (m == SH_CYGWIN_SHARED && offsets[0] && wincap.needs_memory_protection ())
     {
       unsigned delta = (char *) shared - offsets[0];
       offsets[0] = (char *) shared;

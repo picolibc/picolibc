@@ -1,3 +1,8 @@
+2005-01-01  Christopher Faylor  <cgf@timesys.com>
+
+	* shared.cc (open_shared): Don't attempt VirtualAlloc magic if first
+	attempt to map memory fails.
+
 2004-12-30  Christopher Faylor  <cgf@timesys.com>
 
 	* devices.cc (device::isfs): Return true for the logical case of
