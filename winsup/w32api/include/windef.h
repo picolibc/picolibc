@@ -51,6 +51,12 @@ extern "C" {
 
 #ifdef __GNUC__
 #define PACKED __attribute__((packed))
+#ifndef _fastcall
+#define _fastcall __attribute__((fastcall))
+#endif
+#ifndef __fastcall
+#define __fastcall __attribute__((fastcall))
+#endif
 #ifndef _stdcall
 #define _stdcall __attribute__((stdcall))
 #endif
@@ -84,6 +90,7 @@ extern "C" {
 #define PASCAL _pascal
 #define CDECL _cdecl
 #define STDCALL __stdcall
+#define FASTCALL __fastcall
 #define WINAPI __stdcall
 #define WINAPIV __cdecl
 #define APIENTRY __stdcall
