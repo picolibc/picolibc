@@ -1,6 +1,6 @@
 /* sigproc.h
 
-   Copyright 1997, 1998, 2000, 2001, 2002, 2003 Red Hat, Inc.
+   Copyright 1997, 1998, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -23,7 +23,8 @@ enum
   __SIGSTRACE	    = -(NSIG + 2),
   __SIGCOMMUNE	    = -(NSIG + 3),
   __SIGPENDING	    = -(NSIG + 4),
-  __SIGDELETE	    = -(NSIG + 5)
+  __SIGDELETE	    = -(NSIG + 5),
+  __SIGFLUSHFAST    = -(NSIG + 6)
 };
 #endif
 
@@ -67,7 +68,7 @@ extern HANDLE signal_arrived;
 extern HANDLE sigCONT;
 
 bool __stdcall my_parent_is_alive ();
-int __stdcall sig_dispatch_pending ();
+void __stdcall sig_dispatch_pending (bool fast = false);
 #ifdef _PINFO_H
 extern "C" void __stdcall set_signal_mask (sigset_t newmask, sigset_t = myself->getsigmask ());
 #endif

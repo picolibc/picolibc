@@ -63,7 +63,7 @@ public:
   sigpacket *next ();
   sigpacket *save () const {return curr;}
   void restore (sigpacket *saved) {curr = saved;}
-  friend int __stdcall sig_dispatch_pending ();
+  friend void __stdcall sig_dispatch_pending (bool);
 };
 
 static pending_signals sigqueue;
@@ -431,8 +431,7 @@ proc_subproc (DWORD what, DWORD val)
 
     scan_wait:
       /* Scan the linked list of wait()ing threads.  If a wait's parameters
-       * match this pid, then activate it.
-       */
+         match this pid, then activate it.  */
       for (w = &waitq_head; w->next != NULL; w = w->next)
 	{
 	  if ((potential_match = checkstate (w)) > 0)
@@ -567,8 +566,8 @@ sigpending (sigset_t *mask)
 }
 
 /* Force the wait_sig thread to wake up and scan for pending signals */
-int __stdcall
-sig_dispatch_pending ()
+void __stdcall
+sig_dispatch_pending (bool fast)
 {
   if (exit_state || GetCurrentThreadId () == sigtid || !sigqueue.start.next)
     {
@@ -576,14 +575,13 @@ sig_dispatch_pending ()
       sigproc_printf ("exit_state %d, cur thread id %p, sigtid %p, sigqueue.start.next %p",
 		      exit_state, GetCurrentThreadId (), sigtid, sigqueue.start.next);
 #endif
-      return 0;
+      return;
     }
 
 #ifdef DEBUGGING
   sigproc_printf ("flushing");
 #endif
-  (void) sig_send (myself, __SIGFLUSH);
-  return call_signal_handler_now ();
+  (void) sig_send (myself, fast ? __SIGFLUSHFAST : __SIGFLUSH);
 }
 
 /* Message initialization.  Called from dll_crt0_1
@@ -800,6 +798,12 @@ sig_send (_pinfo *p, siginfo_t& si, _threadinfo *tls)
 	ForceCloseHandle (sendsig);
     }
 
+  if (pack.wakeup)
+    {
+      ForceCloseHandle (pack.wakeup);
+      pack.wakeup = NULL;
+    }
+
   if (rc == WAIT_OBJECT_0)
     rc = 0;		// Successful exit
   else
@@ -811,13 +815,12 @@ sig_send (_pinfo *p, siginfo_t& si, _threadinfo *tls)
       rc = -1;
     }
 
-  if (wait_for_completion)
+  if (wait_for_completion && si.si_signo != __SIGFLUSHFAST)
     call_signal_handler_now ();
 
 out:
   if (pack.wakeup)
     ForceCloseHandle (pack.wakeup);
-
   if (si.si_signo != __SIGPENDING)
     /* nothing */;
   else if (!rc)
@@ -1164,6 +1167,7 @@ wait_sig (VOID *self)
 	      *pack.mask |= bit;
 	  break;
 	case __SIGFLUSH:
+	case __SIGFLUSHFAST:
 	  sigqueue.reset ();
 	  while ((q = sigqueue.next ()))
 	    if (q->si.si_signo == __SIGDELETE || q->process () > 0)
@@ -1174,6 +1178,7 @@ wait_sig (VOID *self)
 	    sig_clear (-pack.si.si_signo);
 	  else
 	    {
+	      int sig = pack.si.si_signo;
 	      int sigres = pack.process ();
 	      if (sigres <= 0)
 		{
@@ -1183,7 +1188,7 @@ wait_sig (VOID *self)
 #endif
 		  sigqueue.add (pack);	// FIXME: Shouldn't add this in !sh condition
 		}
-	      if (pack.si.si_signo == SIGCHLD)
+	      if (sig == SIGCHLD)
 		proc_subproc (PROC_CLEARWAIT, 0);
 	    }
 	  break;

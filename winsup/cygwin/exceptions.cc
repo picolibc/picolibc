@@ -1,6 +1,6 @@
 /* exceptions.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -591,11 +591,10 @@ stack (void)
 int __stdcall
 handle_sigsuspend (sigset_t tempmask)
 {
-  sig_dispatch_pending ();
   sigset_t oldmask = myself->getsigmask ();	// Remember for restoration
 
-  set_signal_mask (tempmask &= ~SIG_NONMASKABLE, oldmask);// Let signals we're
-				//  interested in through.
+  // Let signals we're interested in through.
+  set_signal_mask (tempmask &= ~SIG_NONMASKABLE, oldmask);
   sigproc_printf ("oldmask %p, newmask %p", oldmask, tempmask);
 
   pthread_testcancel ();
@@ -925,11 +924,11 @@ set_signal_mask (sigset_t newmask, sigset_t oldmask)
   sigproc_printf ("oldmask %p, newmask %p, mask_bits %p", oldmask, newmask,
 		  mask_bits);
   myself->setsigmask (newmask);	// Set a new mask
-  mask_sync->release ();
   if (mask_bits)
-    sig_dispatch_pending ();
+    sig_dispatch_pending (true);
   else
     sigproc_printf ("not calling sig_dispatch_pending");
+  mask_sync->release ();
   return;
 }
 

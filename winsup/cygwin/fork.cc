@@ -698,6 +698,7 @@ extern "C" int
 vfork ()
 {
 #ifndef NEWVFORK
+  debug_printf ("stub called");
   return fork ();
 #else
   vfork_save *vf = get_vfork_val ();

@@ -1,3 +1,28 @@
+2004-02-01  Christopher Faylor  <cgf@redhat.com>
+
+	* cygerrno.h (set_errno): Set global errno whenever setting thread
+	specific version.
+	* debug.cc (__set_errno): Ditto.
+
+	* exceptions.cc (handle_sigsuspend): Remove spurious
+	sig_dispatch_pending call.
+	(set_signal_mask): When there seem to be pending signals to dispatch,
+	tell signal_dispatch_pending/sig_send not to specifically call any
+	handlers.
+	* sigproc.h (sig_dispatch_pending): Change declaration to void.
+	* sigproc.cc (sig_dispatch_pending): Change definition to void.  Take
+	an argument to determine whether to tell sig_send to wait for handler
+	to be called.
+	* sigproc.cc (sig_send): Don't call signal handler when sig ==
+	__SIGFLUSHFAST.
+	(wait_sig): Honor __SIGFLUSHFAST.  Guard against sigpacket::process
+	nuking si_signo.
+	* sigproc.h (__SIGFLUSHFAST): Define new special signal.
+	(sig_dispatch_pending): Change declaration to void.  Take optional
+	boolean argument.
+
+	* fork.cc (vfork): Add debugging output.
+
 2004-01-26  Christopher Faylor  <cgf@redhat.com>
 
 	* exceptions.cc (sig_handle_tty_stop): Avoid races by waiting for both
