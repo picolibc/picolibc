@@ -281,6 +281,9 @@ case "${host}" in
   h8300-*-elf*)
 	sys_dir=h8300hms
 	;;
+  h8300-*-coff*)
+	sys_dir=h8300hms
+	;;
   h8300-*-xray*)
 	sys_dir=h8300xray
 	;;

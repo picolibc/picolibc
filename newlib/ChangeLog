@@ -1,3 +1,7 @@
+2002-05-21 Dhananjay Deshpande <dhananjayd@kpit.com>
+
+	* configure.host: Specify sys_dir=h8300hms for h8300-*-coff* target.
+
 2002-05-17  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* Makefile.am: Copy and install headers from sys/machine/include
