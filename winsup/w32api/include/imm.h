@@ -344,10 +344,12 @@ BOOL WINAPI ImmGetConversionStatus(HIMC,LPDWORD,PDWORD);
 BOOL WINAPI ImmSetConversionStatus(HIMC,DWORD,DWORD);
 BOOL WINAPI ImmGetOpenStatus(HIMC);
 BOOL WINAPI ImmSetOpenStatus(HIMC,BOOL);
+#ifndef NOGDI
 BOOL WINAPI ImmGetCompositionFontA(HIMC,LPLOGFONTA);
 BOOL WINAPI ImmGetCompositionFontW(HIMC,LPLOGFONTW);
 BOOL WINAPI ImmSetCompositionFontA(HIMC,LPLOGFONTA);
 BOOL WINAPI ImmSetCompositionFontW(HIMC,LPLOGFONTW);
+#endif
 BOOL WINAPI ImmConfigureIMEA(HKL,HWND,DWORD,PVOID);
 BOOL WINAPI ImmConfigureIMEW(HKL,HWND,DWORD,PVOID);
 LRESULT WINAPI ImmEscapeA(HKL,HIMC,UINT,PVOID);
@@ -387,8 +389,10 @@ DWORD WINAPI ImmGetImeMenuItemsW(HIMC,DWORD,DWORD,LPIMEMENUITEMINFOW,LPIMEMENUIT
 #define ImmGetConversionList ImmGetConversionListW
 #define ImmEscape ImmEscapeW
 #define ImmConfigureIME ImmConfigureIMEW
+#ifndef NOGDI
 #define ImmSetCompositionFont ImmSetCompositionFontW
 #define ImmGetCompositionFont ImmGetCompositionFontW
+#endif
 #define ImmGetGuideLine ImmGetGuideLineW
 #define ImmGetCandidateList ImmGetCandidateListW
 #define ImmGetCandidateListCount ImmGetCandidateListCountW
@@ -407,8 +411,10 @@ DWORD WINAPI ImmGetImeMenuItemsW(HIMC,DWORD,DWORD,LPIMEMENUITEMINFOW,LPIMEMENUIT
 #define ImmGetConversionList ImmGetConversionListA
 #define ImmEscape ImmEscapeA
 #define ImmConfigureIME ImmConfigureIMEA
+#ifndef NOGDI
 #define ImmSetCompositionFont ImmSetCompositionFontA
 #define ImmGetCompositionFont ImmGetCompositionFontA
+#endif
 #define ImmGetGuideLine ImmGetGuideLineA
 #define ImmGetCandidateList ImmGetCandidateListA
 #define ImmGetCandidateListCount ImmGetCandidateListCountA
