@@ -17,7 +17,7 @@ details. */
 
 int NO_COPY dynamically_loaded;
 static char *search_for = (char *) cygthread::stub;
-static unsigned threadfunc_ix __attribute__((section ("cygwin_dll_common"), shared)) = 0;
+unsigned threadfunc_ix __attribute__((section ("cygwin_dll_common"), shared)) = 0;
 DWORD tls_func;
 
 HANDLE sync_startup;

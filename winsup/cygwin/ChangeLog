@@ -1,3 +1,7 @@
+2004-02-24  Christopher Faylor  <cgf@redhat.com>
+
+	* dcrt0.cc (_dll_crt0): Add some stern internal errors.
+
 2004-02-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* thread.cc (pthread::cancelable_wait): Rearrange slightly.

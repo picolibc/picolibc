@@ -910,11 +910,17 @@ extern "C" void __stdcall
 _dll_crt0 ()
 {
   extern HANDLE sync_startup;
-  if (sync_startup)
+  if (!sync_startup)
+    system_printf ("internal error: sync_startup not called at start.  Expect signal problems.");
+  else
     {
       (void) WaitForSingleObject (sync_startup, INFINITE);
       CloseHandle (sync_startup);
     }
+
+  extern unsigned threadfunc_ix;
+  if (!threadfunc_ix)
+    system_printf ("internal error: couldn't determine location of thread function on stack.  Expect signal problems.");
 
   main_environ = user_data->envptr;
   *main_environ = NULL;
