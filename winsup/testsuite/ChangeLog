@@ -1,3 +1,8 @@
+2002-07-06  Christopher Faylor  <cgf@redhat.com>
+
+	* testsuite/winsup.api/winsup.exp: Add -mwin32 to gcc flags so
+	windows.h will be found.
+
 2002-07-04  Egor Duda  <deo@logos-m.ru>
 
 	* winsup.api/pthread/cancel1.c: New test. Port from pthreads-win32 
