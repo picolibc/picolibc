@@ -244,3 +244,8 @@ static float zero=  0.0000000000e+00;
 	if(hx<0) r = nadj - r;
 	return r;
 }
+
+float lgammaf(float x)
+{
+  return lgammaf_r(x, &(_REENT_SIGNGAM(_REENT)));
+}

@@ -1,3 +1,10 @@
+2004-02-10  Christopher Faylor  <cgf@redhat.com>
+
+	* libm/mathfp/er_gamma.c (gamma): Add new non-reentrant function.
+	* libm/mathfp/er_lgamma.c (lgamma): Ditto.
+	* libm/mathfp/erf_gamma.c (gammaf): Ditto.
+	* libm/mathfp/erf_lgamma.c (lgammaf): Ditto.
+
 2004-02-09  Christopher Faylor  <cgf@redhat.com>
 
 	* libc/include/time.h (TIMER_RELTIME): New define.
