@@ -1,3 +1,7 @@
+2003-11-18  Maciej W. Rozycki  <macro@ds2.pg.gda.pl>
+
+	* opcode/mips.h: Define new enum members, M_LCA_AB and M_DLCA_AB.
+
 2003-11-14  Nick Clifton  <nickc@redhat.com>
 
 	* dis-asm.h (struct disassemble_info): Add new field
