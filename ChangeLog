@@ -1,3 +1,9 @@
+2003-08-23  Phil Edwards  <pme@gcc.gnu.org>
+
+	* configure.in:  Use newline instead of semicolon when assuming
+	shell arguments in a for loop.
+	* configure:  Regenerated.
+
 2003-08-20  Geoffrey Keating  <geoffk@apple.com>
 
 	PR 8180
