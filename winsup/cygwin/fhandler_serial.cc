@@ -268,6 +268,23 @@ fhandler_serial::open (path_conv *, int flags, mode_t mode)
 	system_printf ("couldn't set initial state for %s, %E", get_name ());
     }
 
+  /* setting rts and dtr to known state so that ioctl() function with
+  request TIOCMGET could return correct value of RTS and DTR lines. 
+  Important only for Win 9x systems */
+  
+  if (wincap.is_winnt() == false)
+  {
+    if (EscapeCommFunction (get_handle (), SETDTR) == 0)
+      system_printf ("couldn't set initial state of DTR for %s, %E", get_name ());
+    if (EscapeCommFunction (get_handle (), SETRTS) == 0)
+      system_printf ("couldn't set initial state of RTS for %s, %E", get_name ());
+      
+    /* even though one of above functions fail I have to set rts and dtr
+    variables to initial value. */
+    rts = TIOCM_RTS;
+    dtr = TIOCM_DTR;
+  }
+  
   SetCommMask (get_handle (), EV_RXCHAR);
   set_open_status ();
   syscall_printf ("%p = fhandler_serial::open (%s, %p, %p)",
@@ -324,7 +341,7 @@ fhandler_serial::tcflow (int action)
   DWORD win32action = 0;
   DCB dcb;
   char xchar;
-
+      
   termios_printf ("action %d", action);
 
   switch (action)
@@ -357,6 +374,107 @@ fhandler_serial::tcflow (int action)
 
   return 0;
 }
+
+
+/* ioctl: */
+int
+fhandler_serial::ioctl (unsigned int cmd, void *buffer)
+{
+
+  DWORD ev;
+  COMSTAT st;
+  DWORD action;
+  DWORD modemLines;
+  DWORD mcr;
+  DWORD cbReturned;
+  bool result;
+  int modemStatus;
+  int request;
+  
+  request = *(int *) buffer;
+  action = 0;
+  modemStatus = 0;
+  if (!ClearCommError (get_handle (), &ev, &st))
+    return -1;
+  switch (cmd)
+    {
+    case TIOCMGET:
+      if (GetCommModemStatus (get_handle (), &modemLines) == 0)
+        return -1;
+      if (modemLines & MS_CTS_ON)
+        modemStatus |= TIOCM_CTS;
+      if (modemLines & MS_DSR_ON)
+        modemStatus |= TIOCM_DSR;
+      if (modemLines & MS_RING_ON)
+        modemStatus |= TIOCM_RI;
+      if (modemLines & MS_RLSD_ON)
+        modemStatus |= TIOCM_CD;
+      if (wincap.is_winnt() == true)
+        {
+	
+	  /* here is Windows NT or Windows 2000 part */
+	  result = DeviceIoControl (get_handle (),
+                                    0x001B0078,
+				    NULL, 0, &mcr, 4, &cbReturned, 0);
+          if (!result)
+	    return -1;
+          if (cbReturned != 4)
+	    return -1;
+          if (mcr & 2)
+	    modemStatus |= TIOCM_RTS;
+          if (mcr & 1)
+	    modemStatus |= TIOCM_DTR;
+	    
+	}
+      else
+        {
+	
+	  /* here is Windows 9x part */
+	  modemStatus |= rts | dtr;
+	  
+	}
+      *(int *) buffer = modemStatus;
+      return 0;
+    case TIOCMSET:
+      if (request & TIOCM_RTS)
+        {
+	  if (EscapeCommFunction (get_handle (), SETRTS) == 0)
+	    return -1;
+          else
+	    rts = TIOCM_RTS;
+	}
+      else
+        {
+	  if (EscapeCommFunction (get_handle (), CLRRTS) == 0)
+	    return -1;
+          else
+	    rts = 0;
+	}
+      if (request & TIOCM_DTR)
+        {
+	  if (EscapeCommFunction (get_handle (), SETDTR) == 0)
+	    return -1;
+          else
+	    dtr = TIOCM_DTR;
+	}
+      else
+        {
+	  if (EscapeCommFunction (get_handle (), CLRDTR) == 0)
+	    return -1;
+          else
+	    dtr = 0;
+	}
+      return 0;
+   case TIOCINQ:
+     if (ev & CE_FRAME | ev & CE_IOE | ev & CE_OVERRUN |
+         ev & CE_RXOVER | ev & CE_RXPARITY)
+       return -1;
+     *(int *) buffer = st.cbInQue;
+     return 0;
+   default:
+     return -1;
+   }
+}    
 
 /* tcflush: POSIX 7.2.2.1 */
 int
@@ -395,6 +513,8 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
   COMMTIMEOUTS to;
   DCB ostate, state;
   unsigned int ovtime = vtime_, ovmin = vmin_;
+  int tmpDtr, tmpRts;
+  tmpDtr = tmpRts = 0;
 
   termios_printf ("action %d", action);
   if ((action == TCSADRAIN) || (action == TCSAFLUSH))
@@ -560,6 +680,7 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
     {							/* disable */
       state.fRtsControl = RTS_CONTROL_ENABLE;
       state.fOutxCtsFlow = FALSE;
+      tmpRts = TIOCM_RTS;
     }
 
   if (t->c_cflag & CRTSXOFF)
@@ -592,7 +713,10 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
   set_w_binary ((t->c_oflag & ONLCR) ? 0 : 1);
 
   if (dropDTR == TRUE)
-    EscapeCommFunction (get_handle (), CLRDTR);
+    {
+      EscapeCommFunction (get_handle (), CLRDTR);
+      tmpDtr = 0;
+    }
   else
     {
       /* FIXME: Sometimes when CLRDTR is set, setting
@@ -601,7 +725,11 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
       parameters while DTR is still down. */
 
       EscapeCommFunction (get_handle (), SETDTR);
+      tmpDtr = TIOCM_DTR;
     }
+    
+  rts = tmpRts;
+  dtr = tmpDtr;
 
   /*
   The following documentation on was taken from "Linux Serial Programming
