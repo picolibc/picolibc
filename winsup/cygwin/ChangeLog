@@ -1,3 +1,12 @@
+Tue Oct 17 14:50:31 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* sigproc.cc (proc_subproc): Remove unneeded test for correct process
+	in PROC_ADDCHILD.  Return 0 when terminated child has just been
+	reparented.
+	(wait_subproc): Only send SIGCHLD when proc_subproc returns != 0.
+	* strace.cc (strace::vsprntf): Only strip .exe extension from program
+	name.
+
 2000-10-16  Charles Wilson  <cwilson@ece.gatech.edu>
 
 	* fhandler_clipboard.cc: new file

@@ -248,14 +248,6 @@ proc_subproc (DWORD what, DWORD val)
     case PROC_ADDCHILD:
       if (nchildren >= PSIZE - 1)
 	system_printf ("nchildren too large %d", nchildren);
-      if (WaitForSingleObject (vchild->hProcess, 0) != WAIT_TIMEOUT)
-	{
-	  system_printf ("invalid process handle %p.  pid %d, win pid %d",
-			vchild->hProcess, vchild->pid, vchild->dwProcessId);
-	  rc = 0;
-	  break;
-	}
-
       pchildren[nchildren] = vchild;
       hchildren[nchildren] = vchild->hProcess;
       if (!DuplicateHandle (hMainProc, vchild->hProcess, hMainProc, &vchild->pid_handle,
@@ -278,7 +270,6 @@ proc_subproc (DWORD what, DWORD val)
      * (called from wait_subproc thread)
      */
     case PROC_CHILDTERMINATED:
-      rc = 0;
       if (hchildren[val] != pchildren[val]->hProcess)
 	{
 	  sigproc_printf ("pid %d[%d], reparented old hProcess %p, new %p",
@@ -286,6 +277,7 @@ proc_subproc (DWORD what, DWORD val)
 	  ForceCloseHandle1 (hchildren[val], childhProc);
 	  hchildren[val] = pchildren[val]->hProcess; /* Filled out by child */
 	  ProtectHandle1 (pchildren[val]->hProcess, childhProc);
+	  rc = 0;
 	  break;			// This was an exec()
 	}
 
@@ -1275,12 +1267,15 @@ wait_subproc (VOID *)
       rc -= WAIT_OBJECT_0;
       if (rc-- != 0)
 	{
-	  (void) proc_subproc (PROC_CHILDTERMINATED, rc);
+	  rc = proc_subproc (PROC_CHILDTERMINATED, rc);
 	  if (!proc_loop_wait)		// Don't bother if wait_subproc is
 	    break;			//  exiting
 
-	  /* Send a SIGCHLD to myself. */
-	  rc = sig_send (myself_nowait, SIGCHLD);
+	  /* Send a SIGCHLD to myself.   We do this here, rather than in proc_subproc
+	     to avoid the proc_subproc lock since the signal thread will eventually
+	     be calling proc_subproc and could unnecessarily block. */
+	  if (rc)
+	    sig_send (myself_nowait, SIGCHLD);
 	}
       sigproc_printf ("looping");
     }

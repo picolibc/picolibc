@@ -920,7 +920,7 @@ _fstat (int fd, struct stat *buf)
     {
       memset (buf, 0, sizeof (struct stat));
       r = fdtab[fd]->fstat (buf);
-      syscall_printf ("%d = fstat (%d, %x)", r,fd,buf);
+      syscall_printf ("%d = fstat (%d, %x)", r, fd, buf);
     }
 
   return r;

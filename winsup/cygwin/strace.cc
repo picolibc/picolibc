@@ -130,7 +130,7 @@ strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
       else
 	p = pn;
       strcpy (progname, p);
-      if ((p = strrchr (progname, '.')) != NULL)
+      if ((p = strrchr (progname, '.')) != NULL && strcasematch (p, ".exe"))
 	*p = '\000';
       p = progname;
       count = __small_sprintf (buf, fmt, p && *p ? p : "?",
