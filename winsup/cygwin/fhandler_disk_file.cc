@@ -29,6 +29,7 @@ details. */
 #include "ntdll.h"
 #include <assert.h>
 #include <ctype.h>
+#include <winioctl.h>
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>
@@ -586,6 +587,53 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
   if (oret)
     close_fs ();
 
+  return res;
+}
+
+int
+fhandler_disk_file::ftruncate (_off64_t length)
+{
+  int res = -1, res_bug = 0;
+
+  if (length < 0 || !get_output_handle ())
+    set_errno (EINVAL);
+  else if (pc.isdir ())
+    set_errno (EISDIR);
+  else if (!(get_access () & GENERIC_WRITE))
+    set_errno (EBADF);
+  else
+    {
+      _off64_t prev_loc = lseek (0, SEEK_CUR);
+      if (lseek (length, SEEK_SET) > 0)
+        {
+	  if (get_fs_flags (FILE_SUPPORTS_SPARSE_FILES))
+	    {
+	      _off64_t actual_length;
+	      DWORD size_high = 0;
+	      actual_length = GetFileSize (get_output_handle (), &size_high);
+	      actual_length += ((_off64_t) size_high) << 32;
+	      if (length >= actual_length + (128 * 1024))
+	        {
+		  DWORD dw;
+		  BOOL r = DeviceIoControl (get_output_handle (),
+					    FSCTL_SET_SPARSE, NULL, 0, NULL,
+					    0, &dw, NULL);
+		  syscall_printf ("%d = DeviceIoControl(%p, FSCTL_SET_SPARSE)",
+		  		  r, get_output_handle ());
+	        }
+	    }
+	  else if (wincap.has_lseek_bug ())
+	    res_bug = write (&res, 0);
+	  if (!SetEndOfFile (get_output_handle ()))
+	    __seterrno ();
+	  else
+	    res = res_bug;
+	  /* restore original file pointer location */
+	  lseek (prev_loc, SEEK_SET);
+	  if (!res)
+	    touch_ctime ();
+	}
+    }
   return res;
 }
 

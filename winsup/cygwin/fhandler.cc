@@ -1,6 +1,7 @@
 /* fhandler.cc.  See console.cc for fhandler_console functions.
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+   2005 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -814,8 +815,8 @@ fhandler_base::write (const void *ptr, size_t len)
 	      HANDLE h = get_output_handle ();
 	      BOOL r = DeviceIoControl (h, FSCTL_SET_SPARSE, NULL, 0, NULL,
 					0, &dw, NULL);
-	      syscall_printf ("%d = DeviceIoControl(%p, FSCTL_SET_SPARSE, "
-			      "NULL, 0, NULL, 0, &dw, NULL)", r, h);
+	      syscall_printf ("%d = DeviceIoControl(%p, FSCTL_SET_SPARSE)",
+			      r, h);
 	    }
 	  else if (wincap.has_lseek_bug ())
 	    {
@@ -1594,4 +1595,11 @@ fhandler_base::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 	break;
     }
   return res;
+}
+
+int
+fhandler_base::ftruncate (_off64_t length)
+{
+  set_errno (EINVAL);
+  return -1;
 }

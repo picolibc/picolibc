@@ -1,5 +1,14 @@
 2005-02-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (fhandler_base::ftruncate): Define new virtual method.
+	(fhandler_disk_file::ftruncate): Ditto.
+	* fhandler.cc (fhandler_base::ftruncate): New method.
+	* fhandler_disk_file.cc (fhandler_disk_file::ftruncate): Ditto.
+	* syscalls.cc (ftruncate64): Move functionality into fhandlers.
+	Call fhandler method from here.
+
+2005-02-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* pipe.cc (fhandler_pipe::dup): Fix conditionals in case of error.
 
 2005-02-02  Corinna Vinschen  <corinna@vinschen.de>
