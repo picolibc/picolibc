@@ -61,6 +61,7 @@ init_cheap ()
       api_fatal ("AllocationBase %p, BaseAddress %p, RegionSize %p, State %p\n",
 		 m.AllocationBase, m.BaseAddress, m.RegionSize, m.State);
     }
+  cygheap_max = cygheap;
 }
 
 static void dup_now (void *, child_info *, unsigned) __attribute__ ((regparm(3)));
@@ -189,7 +190,6 @@ cygheap_init ()
   if (!cygheap)
     {
       init_cheap ();
-      cygheap_max = cygheap;
       (void) _csbrk (sizeof (*cygheap));
     }
   if (!cygheap->fdtab)

@@ -2,6 +2,7 @@
 
 	* cygheap.cc (_csbrk): Avoid !cygheap considerations.
 	(cygheap_init): Deal with unintialized cygheap issues here.
+	(cheap_init): Move cygheap_max setting here.
 
 2002-08-06  Christopher Faylor  <cgf@redhat.com>
 	    Conrad Scott  <conrad.scott@dsl.pipex.com
