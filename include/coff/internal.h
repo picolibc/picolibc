@@ -100,7 +100,9 @@ typedef struct _IMAGE_DATA_DIRECTORY
 /* Extra stuff in a PE aouthdr */
 
 #define PE_DEF_SECTION_ALIGNMENT 0x1000
-#define PE_DEF_FILE_ALIGNMENT 0x200
+#ifndef PE_DEF_FILE_ALIGNMENT
+# define PE_DEF_FILE_ALIGNMENT 0x200
+#endif
 
 struct internal_extra_pe_aouthdr 
 {
