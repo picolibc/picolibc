@@ -1,3 +1,9 @@
+2002-05-23  Jakub Jelinek  <jakub@redhat.com>
+
+	* elf/common.h (PT_TLS, SHF_TLS, STT_TLS, DF_STATIC_TLS): Define.
+	* elf/ia64.h (R_IA64_LTOFF_TPREL22): Renamed from R_IA64_LTOFF_TP22.
+	* elf/i386.h: Add TLS relocs.
+
 2002-05-21  H.J. Lu  (hjl@gnu.org)
 
 	* bfdlink.h (bfd_link_info): Add allow_multiple_definition.
