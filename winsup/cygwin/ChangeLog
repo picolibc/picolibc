@@ -1,3 +1,16 @@
+Mon Nov  6 11:11:42 2000 Jason Tishler <jt@dothill.com>
+
+	* path.cc (mount_info::read_cygdrive_info_from_registry): Use
+	CYGWIN_INFO_CYGDRIVE_PREFIX, CYGWIN_INFO_CYGDRIVE_DEFAULT_PREFIX, and
+	CYGWIN_INFO_CYGDRIVE_FLAGS.
+	* path.cc (mount_info::write_cygdrive_info_to_registry): Use
+	CYGWIN_INFO_CYGDRIVE_PREFIX and CYGWIN_INFO_CYGDRIVE_FLAGS.
+	* path.cc (mount_info::remove_cygdrive_info_from_registry): Ditto.
+	* path.cc (mount_info::get_cygdrive_prefixes): Use
+	CYGWIN_INFO_CYGDRIVE_PREFIX.
+	* include/cygwin/version.h: Add CYGWIN_INFO_CYGDRIVE_FLAGS,
+	CYGWIN_INFO_CYGDRIVE_PREFIX, and CYGWIN_INFO_CYGDRIVE_DEFAULT_PREFIX.
+
 Mon Nov  6 11:10:44 2000  Jason Tishler <jt@dothill.com>
 
 	* errno.cc (strerror): Change EAGAIN case to return "Resource

@@ -1502,7 +1502,8 @@ mount_info::read_cygdrive_info_from_registry ()
   /* reg_key for user path prefix in HKEY_CURRENT_USER. */
   reg_key r;
 
-  if (r.get_string ("cygdrive prefix", cygdrive, sizeof (cygdrive), "") != 0)
+  if (r.get_string (CYGWIN_INFO_CYGDRIVE_PREFIX, cygdrive, sizeof (cygdrive),
+      "") != 0)
     {
       /* Didn't find the user path prefix so check the system path prefix. */
 
@@ -1513,17 +1514,19 @@ mount_info::read_cygdrive_info_from_registry ()
 		 CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME,
 		 NULL);
 
-    if (r2.get_string ("cygdrive prefix", cygdrive, sizeof (cygdrive), "") != 0)
+    if (r2.get_string (CYGWIN_INFO_CYGDRIVE_PREFIX, cygdrive, sizeof (cygdrive),
+	"") != 0)
       {
 	/* Didn't find either so write the default to the registry and use it.
 	   NOTE: We are writing and using the user path prefix.  */
-	write_cygdrive_info_to_registry ("/cygdrive", MOUNT_AUTO);
+	write_cygdrive_info_to_registry (CYGWIN_INFO_CYGDRIVE_DEFAULT_PREFIX,
+					 MOUNT_AUTO);
       }
     else
       {
 	/* Fetch system cygdrive_flags from registry; returns MOUNT_AUTO on
 	   error. */
-	cygdrive_flags = r2.get_int ("cygdrive flags", MOUNT_AUTO);
+	cygdrive_flags = r2.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_AUTO);
 	slashify (cygdrive, cygdrive, 1);
 	cygdrive_len = strlen(cygdrive);
       }
@@ -1532,7 +1535,7 @@ mount_info::read_cygdrive_info_from_registry ()
     {
       /* Fetch user cygdrive_flags from registry; returns MOUNT_AUTO on
 	 error. */
-      cygdrive_flags = r.get_int ("cygdrive flags", MOUNT_AUTO);
+      cygdrive_flags = r.get_int (CYGWIN_INFO_CYGDRIVE_FLAGS, MOUNT_AUTO);
       slashify (cygdrive, cygdrive, 1);
       cygdrive_len = strlen(cygdrive);
     }
@@ -1571,13 +1574,13 @@ mount_info::write_cygdrive_info_to_registry (const char *cygdrive_prefix, unsign
   nofinalslash (cygdrive_prefix, hold_cygdrive_prefix);
 
   int res;
-  res = r.set_string ("cygdrive prefix", hold_cygdrive_prefix);
+  res = r.set_string (CYGWIN_INFO_CYGDRIVE_PREFIX, hold_cygdrive_prefix);
   if (res != ERROR_SUCCESS)
     {
       __seterrno_from_win_error (res);
       return -1;
     }
-  r.set_int ("cygdrive flags", flags);
+  r.set_int (CYGWIN_INFO_CYGDRIVE_FLAGS, flags);
 
   /* This also needs to go in the in-memory copy of "cygdrive", but only if
      appropriate:
@@ -1609,8 +1612,8 @@ mount_info::remove_cygdrive_info_from_registry (const char *cygdrive_prefix, uns
 	     NULL);
 
   /* Delete cygdrive prefix and flags. */
-  int res = r.killvalue ("cygdrive prefix");
-  int res2 = r.killvalue ("cygdrive flags");
+  int res = r.killvalue (CYGWIN_INFO_CYGDRIVE_PREFIX);
+  int res2 = r.killvalue (CYGWIN_INFO_CYGDRIVE_FLAGS);
 
   /* Reinitialize the cygdrive path prefix to reflect to removal from the
      registry. */
@@ -1624,7 +1627,7 @@ mount_info::get_cygdrive_prefixes (char *user, char *system)
 {
   /* Get the user path prefix from HKEY_CURRENT_USER. */
   reg_key r;
-  int res = r.get_string ("cygdrive prefix", user, MAX_PATH, "");
+  int res = r.get_string (CYGWIN_INFO_CYGDRIVE_PREFIX, user, MAX_PATH, "");
 
   /* Get the system path prefix from HKEY_LOCAL_MACHINE. */
   reg_key r2 (HKEY_LOCAL_MACHINE, KEY_ALL_ACCESS, "SOFTWARE",
@@ -1632,7 +1635,7 @@ mount_info::get_cygdrive_prefixes (char *user, char *system)
 	      CYGWIN_INFO_CYGWIN_REGISTRY_NAME,
 	      CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME,
 	      NULL);
-  int res2 = r2.get_string ("cygdrive prefix", system, MAX_PATH, "");
+  int res2 = r2.get_string (CYGWIN_INFO_CYGDRIVE_PREFIX, system, MAX_PATH, "");
 
   return (res != ERROR_SUCCESS) ? res : res2;
 }

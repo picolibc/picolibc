@@ -156,6 +156,9 @@ details. */
 #define CYGWIN_INFO_CYGWIN_REGISTRY_NAME "Cygwin"
 #define CYGWIN_INFO_PROGRAM_OPTIONS_NAME "Program Options"
 #define CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME "mounts v2"
+#define CYGWIN_INFO_CYGDRIVE_FLAGS "cygdrive flags"
+#define CYGWIN_INFO_CYGDRIVE_PREFIX "cygdrive prefix"
+#define CYGWIN_INFO_CYGDRIVE_DEFAULT_PREFIX "/cygdrive"
 
      /* In addition to the above version number strings, the build
 	process adds some strings that may be useful in
