@@ -1,3 +1,7 @@
+Wed Feb  9 18:45:49 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* wait.h: Delete. No longer used by GDB.
+
 Tue Feb  8 17:01:13 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* remote-sim.h (sim_resume): Clarify use of SIGGNAL.
