@@ -28,7 +28,7 @@ else
 fi
 
 case "${target}" in
-  i386-*-elf*)
+  i[[3456]]86-*-elf*|i[[3456]]86-*-coff*)
 	configdirs="${configdirs} i386 testsuite";
 	;;
   m32r-*-*)
@@ -64,6 +64,9 @@ case "${target}" in
   *arm-wince-pe)
 	configdirs="wince"
 	;;
+  *arm-*-*)
+	configdirs="${configdirs} arm"
+	;;
   sh*-*-pe)
 	configdirs="wince"
 	;;
@@ -97,13 +100,13 @@ case "${target}" in
   xstormy16-*-*)
 	configdirs="${configdirs} xstormy16 testsuite"
 	;;
-  strongarm-*-*)
+  strongarm-*-elf | strongarm-*-coff)
 	configdirs="${configdirs} arm testsuite";
 	;;
-  arm*-*-*)
+  arm*-*-elf | arm*-*-coff)
 	configdirs="${configdirs} arm testsuite";
 	;;
-  xscale-*-*)
+  xscale-*-elf | xscale-*-coff)
 	configdirs="${configdirs} arm testsuite";
 	;;
 
