@@ -1,3 +1,18 @@
+Thu Oct  5 20:34:48 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* net.cc (set_socket_inheritance): Rename from duplicate_socket.  Use
+	NT specific call when appropriate.
+	(__set_winsock_errno): Rename from set_winsock_errno.  Accept function
+	and line as arguments.
+	* path.cc (path_conv::check): Continue the neverending battle to make
+	cygwin properly understand that path specs ending in a slash require
+	that the path refer to a directory.  Windows does not do this by
+	default.
+	(symlink_info::check): Remove ENOTDIR test.  Move it to
+	path_conv::check.
+	* path.h: Remove obsolete constant.
+	* winsup.h (set_winsock_errno): New macro.
+
 Thu Oct  5 14:58:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler.h: Add mmap(), munmap() and msync() to fhandler_base

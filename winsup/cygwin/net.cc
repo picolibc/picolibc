@@ -45,24 +45,23 @@ int sscanf (const char *, const char *, ...);
 } /* End of "C" section */
 
 /* Cygwin internal */
-static SOCKET
-duplicate_socket (SOCKET sock)
+static SOCKET __stdcall
+set_socket_inheritance (SOCKET sock)
 {
-  /* Do not duplicate socket on Windows NT because of problems with
-     MS winsock proxy server.
-  */
   if (os_being_run == winNT)
-    return sock;
-
-  SOCKET newsock;
-  if (DuplicateHandle (hMainProc, (HANDLE) sock, hMainProc, (HANDLE *) &newsock,
-		       0, TRUE, DUPLICATE_SAME_ACCESS))
-    {
-      closesocket (sock);
-      sock = newsock;
-    }
+    (void) SetHandleInformation ((HANDLE) sock, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
   else
-    small_printf ("DuplicateHandle failed %E");
+    {
+      SOCKET newsock;
+      if (!DuplicateHandle (hMainProc, (HANDLE) sock, hMainProc, (HANDLE *) &newsock,
+			    0, TRUE, DUPLICATE_SAME_ACCESS))
+	small_printf ("DuplicateHandle failed %E");
+      else
+	{
+	  closesocket (sock);
+	  sock = newsock;
+	}
+    }
   return sock;
 }
 
@@ -233,7 +232,7 @@ static struct tl errmap[] =
 
 /* Cygwin internal */
 void
-set_winsock_errno ()
+__set_winsock_errno (const char *fn, int ln)
 {
   int i;
   int why = WSAGetLastError ();
@@ -243,12 +242,12 @@ set_winsock_errno ()
 
   if (errmap[i].w != 0)
     {
-      syscall_printf ("%d (%s) -> %d", why, errmap[i].s, errmap[i].e);
+      syscall_printf ("%s:%d - %d (%s) -> %d", fn, ln, why, errmap[i].s, errmap[i].e);
       set_errno (errmap[i].e);
     }
   else
     {
-      syscall_printf ("unknown error %d", why);
+      syscall_printf ("%s:%d - unknown error %d", fn, ln, why);
       set_errno (EPERM);
     }
 }
@@ -337,7 +336,7 @@ cygwin_socket (int af, int type, int protocol)
 	  goto done;
 	}
 
-      soc = duplicate_socket (soc);
+      soc = set_socket_inheritance (soc);
 
       const char *name;
       if (af == AF_INET)
@@ -718,7 +717,7 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
 	set_winsock_errno ();
       else
 	{
-	  res = duplicate_socket (res);
+	  res = set_socket_inheritance (res);
 
 	  fdsock (res_fd, sock->get_name (), res);
 	  res = res_fd;
@@ -1553,14 +1552,14 @@ cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
     goto done;
   else
     {
-      res = duplicate_socket (res);
+      res = set_socket_inheritance (res);
 
       fdsock (res_fd, "/dev/tcp", res);
       res = res_fd;
     }
   if (fd2p)
     {
-      fd2s = duplicate_socket (fd2s);
+      fd2s = set_socket_inheritance (fd2s);
 
       fdsock (*fd2p, "/dev/tcp", fd2s);
     }
@@ -1585,7 +1584,7 @@ cygwin_rresvport (int *port)
     goto done;
   else
     {
-      res = duplicate_socket (res);
+      res = set_socket_inheritance (res);
 
       fdsock (res_fd, "/dev/tcp", res);
       res = res_fd;
@@ -1618,14 +1617,14 @@ cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
     goto done;
   else
     {
-      res = duplicate_socket (res);
+      res = set_socket_inheritance (res);
 
       fdsock (res_fd, "/dev/tcp", res);
       res = res_fd;
     }
   if (fd2p)
     {
-      fd2s = duplicate_socket (fd2s);
+      fd2s = set_socket_inheritance (fd2s);
       fdsock (*fd2p, "/dev/tcp", fd2s);
     }
 done:
@@ -1726,11 +1725,11 @@ socketpair (int, int type, int, int *sb)
   closesocket (newsock);
   res = 0;
 
-  insock = duplicate_socket (insock);
+  insock = set_socket_inheritance (insock);
 
   fdsock (sb[0], "/dev/tcp", insock);
 
-  outsock = duplicate_socket (outsock);
+  outsock = set_socket_inheritance (outsock);
   fdsock (sb[1], "/dev/tcp", outsock);
 
 done:

@@ -168,6 +168,7 @@ path_conv::check (const char *src, unsigned opt,
   char path_copy[MAX_PATH];
   char tmp_buf[MAX_PATH];
   symlink_info sym;
+  bool need_directory = 0;
 
   char *rel_path, *full_path;
 
@@ -189,16 +190,15 @@ path_conv::check (const char *src, unsigned opt,
   for (;;)
     {
       MALLOC_CHECK;
-      DWORD need_directory = 0;
       char *p = strrchr (src, '/');
       if (p)
 	{
-	  if (strcmp (p, "/") == 0 || strcmp (p, "/.") == 0)
-	    need_directory = PATH_NEEDDIR;
+	  if (p[1] == '\0' || strcmp (p, "/.") == 0)
+	    need_directory = 1;
 	}
       else if ((p = strrchr (src, '\\')) &&
-	       (strcmp (p, "\\") == 0 || strcmp (p, "\\.") == 0))
-	need_directory = PATH_NEEDDIR;
+	       (p[1] == '\0' || strcmp (p, "\\.") == 0))
+	need_directory = 1;
       /* Must look up path in mount table, etc.  */
       error = cygwin_shared->mount.conv_to_win32_path (src, rel_path,
 						       full_path,
@@ -285,7 +285,7 @@ path_conv::check (const char *src, unsigned opt,
 	     these operations again on the newly derived path. */
 	  else if (len > 0)
 	    {
-	      if (component == 0 && !(opt & PC_SYM_FOLLOW))
+	      if (component == 0 && !need_directory && !(opt & PC_SYM_FOLLOW))
 		{
 		  set_symlink (); // last component of path is a symlink.
 		  fileattr = sym.fileattr;
@@ -363,6 +363,18 @@ fillin:
     }
 
 out:
+  /* Deal with Windows stupidity which considers filename\. to be valid
+     even when "filename" is not a directory. */
+  if (!need_directory || error)
+    /* nothing to do */;
+  else if (fileattr & FILE_ATTRIBUTE_DIRECTORY)
+    path_flags &= ~PATH_SYMLINK;
+  else
+    {
+      debug_printf ("%s is a non-directory", path);
+      error = ENOTDIR;
+      return;
+    }
   DWORD serial, volflags;
 
   strcpy (tmp_buf, full_path);
@@ -2187,7 +2199,6 @@ symlink_info::check (const char *in_path, const suffix_info *suffixes)
   HANDLE h;
   int res = 0;
   char extbuf[MAX_PATH + 5];
-  int needdir;
   const char *path = in_path;
 
   if (!suffixes)
@@ -2206,13 +2217,6 @@ symlink_info::check (const char *in_path, const suffix_info *suffixes)
   is_symlink = TRUE;
 
   error = 0;
-  if (!(pflags & PATH_NEEDDIR))
-    needdir = 0;
-  else
-    {
-      pflags &= ~PATH_NEEDDIR;
-      needdir = 1;
-    }
   do
     {
       if (!next_suffix (ext_here, suffixes))
@@ -2227,22 +2231,6 @@ symlink_info::check (const char *in_path, const suffix_info *suffixes)
 	  debug_printf ("GetFileAttributesA (%s) failed", path);
 	  error = geterrno_from_win_error (GetLastError (), EACCES);
 	  continue;
-	}
-
-      /* Windows allows path\. even when `path' isn't a directory.
-	 Detect this scenario and disallow it, since it is non-UNIX like.
-	 FIXME: This code actually checks for things like foo/ and foo/..
-	 even though those usages have already been (erroneously?) eaten
-	 by cygwin_shared->mount.conv_to_win32_path in path_conv::check. */
-
-      char *p = strrchr (path, '\\');
-      if (p && !(fileattr & FILE_ATTRIBUTE_DIRECTORY) &&
-	  (needdir || *++p == '\0' ||
-	   (*p == '.' && (*++p == '\0' || (*p == '.' && p[1] == '\0')))))
-	{
-	  debug_printf ("%s is a non-directory", path);
-	  error = ENOTDIR;
-	  goto file_not_symlink;
 	}
 
       /* A symlink will have the `system' file attribute. */

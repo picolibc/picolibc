@@ -201,7 +201,8 @@ long __stdcall to_time_t (FILETIME * ptr);
 void __stdcall set_console_title (char *);
 void set_console_handler ();
 
-void set_winsock_errno ();
+#define set_winsock_errno() __set_winsock_errno (__FUNCTION__, __LINE__)
+void __set_winsock_errno (const char *fn, int ln);
 
 /* Printf type functions */
 extern "C" void __api_fatal (const char *, ...) __attribute__ ((noreturn));
