@@ -1,3 +1,10 @@
+2005-02-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/pwd.h (struct passwd): Change pw_uid and pw_gid
+	members to uid_t and gid_t according to SUSv3.
+	* libc/include/sys/time.h (utimes):  Change second parameter
+	to const according to SUSv3.
+
 2005-02-07  Antony King  <antony.king@st.com>
 
 	* libc/stdio/clearerr.c (clearerr): Ensure CHECK_INIT() is
