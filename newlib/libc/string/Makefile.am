@@ -39,13 +39,14 @@ lib_a_SOURCES = \
 	strupr.c \
 	strxfrm.c  \
 	strstr.c \
+	swab.c \
 	u_strerr.c
 
 CHEWOUT_FILES=\
 bcmp.def	memcpy.def	strcmp.def	strncat.def strstr.def \
 bcopy.def	memmove.def	strcoll.def	strncmp.def strtok.def \
 bzero.def	memset.def	strcpy.def	strncpy.def strxfrm.def \
-index.def	rindex.def	strcspn.def	strpbrk.def \
+index.def	rindex.def	strcspn.def	strpbrk.def swab.def \
 memchr.def	strcat.def	strerror.def	strrchr.def \
 memcmp.def	strchr.def	strlen.def	strspn.def \
 strcasecmp.def	strncasecmp.def strlwr.def	strupr.def
