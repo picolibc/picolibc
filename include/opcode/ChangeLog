@@ -1,5 +1,8 @@
 Fri Aug  6 09:46:35 1999  Jerry Quinn <jquinn@nortelnetworks.com>
 
+	* hppa.h (pa_opcodes): Add 64 bit versions of or, xor, and,
+	and andcm.  Add 32 and 64 bit version of cmpclr, cmpiclr.
+
 	* hppa.h:  Document 64 bit condition completers.
 
 Thu Aug  5 16:56:07 1999  Jerry Quinn <jquinn@nortelnetworks.com>

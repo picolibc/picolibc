@@ -307,10 +307,16 @@ static const struct pa_opcode pa_opcodes[] =
 
 /* Computation Instructions */
 
+{ "cmpclr",     0x080008a0, 0xfc000fe0, "?Sx,b,t", pa20, FLAG_STRICT},
+{ "cmpclr",     0x08000880, 0xfc000fe0, "?sx,b,t", pa10, FLAG_STRICT},
 { "comclr",     0x08000880, 0xfc000fe0, "?sx,b,t", pa10},
+{ "or",         0x08000260, 0xfc000fe0, "?Lx,b,t", pa20, FLAG_STRICT},
 { "or",         0x08000240, 0xfc000fe0, "?lx,b,t", pa10},
+{ "xor",        0x080002a0, 0xfc000fe0, "?Lx,b,t", pa20, FLAG_STRICT},
 { "xor",        0x08000280, 0xfc000fe0, "?lx,b,t", pa10},
+{ "and",        0x08000220, 0xfc000fe0, "?Lx,b,t", pa20, FLAG_STRICT},
 { "and",        0x08000200, 0xfc000fe0, "?lx,b,t", pa10},
+{ "andcm",      0x08000020, 0xfc000fe0, "?Lx,b,t", pa20, FLAG_STRICT},
 { "andcm",      0x08000000, 0xfc000fe0, "?lx,b,t", pa10},
 { "uxor",       0x08000380, 0xfc000fe0, "?ux,b,t", pa10},
 { "uaddcm",     0x08000980, 0xfc000fe0, "?ux,b,t", pa10},
@@ -335,6 +341,8 @@ static const struct pa_opcode pa_opcodes[] =
 { "ds",         0x08000440, 0xfc000fe0, "?sx,b,t", pa10},
 { "subi",       0x94000000, 0xfc000800, "?si,b,x", pa10},
 { "subio",      0x94000800, 0xfc000800, "?si,b,x", pa10},
+{ "cmpiclr",    0x90000800, 0xfc000800, "?Si,b,x", pa20, FLAG_STRICT},
+{ "cmpiclr",    0x90000000, 0xfc000800, "?si,b,x", pa10, FLAG_STRICT},
 { "comiclr",    0x90000000, 0xfc000800, "?si,b,x", pa10},
 { "sh1add",     0x08000640, 0xfc000fe0, "?ax,b,t", pa10},
 { "sh1addl",    0x08000a40, 0xfc000fe0, "?ax,b,t", pa10},
