@@ -21,7 +21,7 @@ int __small_vsprintf (char *dst, const char *fmt, va_list ap);
 #define LLMASK	(0xffffffffffffffffULL)
 #define LMASK	(0xffffffff)
 
-#define rnarg(dst, base, dosign, len, pad) __rn ((dst), (base), (dosign), va_arg (ap, unsigned), len, pad, LMASK)
+#define rnarg(dst, base, dosign, len, pad) __rn ((dst), (base), (dosign), va_arg (ap, long), len, pad, LMASK)
 #define rnargLL(dst, base, dosign, len, pad) __rn ((dst), (base), (dosign), va_arg (ap, unsigned long long), len, pad, LLMASK)
 
 static char * __rn (char *, int, int, long long, int, int,
@@ -59,13 +59,11 @@ __rn (char *dst, int base, int dosign, long long val, int len, int pad, unsigned
     }
   while (uval);
 
-  while (len -- > l)
+  while (len-- > l)
     *dst++ = pad;
 
   while (l > 0)
-    {
-      *dst++ = res[--l];
-    }
+    *dst++ = res[--l];
 
   return dst;
 }
