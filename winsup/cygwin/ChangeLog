@@ -1,5 +1,9 @@
 2004-03-21  Christopher Faylor  <cgf@redhat.com>
 
+	* cygheap.cc (init_cheap): Conditionalize debugging code.
+
+2004-03-21  Christopher Faylor  <cgf@redhat.com>
+
 	* cygheap.cc (init_cheap): Add ability to specify minimal cygwin heap
 	size when debugging.
 	(_csbrk): Report error in allocation to stderr.

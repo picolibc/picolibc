@@ -70,8 +70,10 @@ init_cheap ()
 						  PAGE_NOACCESS)))
       break;
   while ((alloc_sz -= 2 * (1024 * 1024)) >= CYGHEAPSIZE_MIN);
+#ifdef DEBUGGING
   if (alloc_sz != initial_sz)
     small_printf ("reset initial cygheap size to %u\n", alloc_sz);
+#endif
   if (!cygheap)
     {
       MEMORY_BASIC_INFORMATION m;
