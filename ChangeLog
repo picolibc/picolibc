@@ -1,3 +1,8 @@
+20000-05-19  H.J. Lu  (hjl@gnu.org)
+
+	* configure: Provide --disable-target-dir-sanity-checking to
+	disable the gcc directory checking for cross compiling.
+
 20000-05-18  H.J. Lu  (hjl@gnu.org)
 
 	* configure: Ask to create the gcc directory for cross
