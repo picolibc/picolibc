@@ -120,9 +120,10 @@ START_RELOC_NUMBERS (elf_ppc_reloc_type)
   RELOC_NUMBER (R_PPC_EMB_BIT_FLD,	115)
   RELOC_NUMBER (R_PPC_EMB_RELSDA,	116)
 
-/* Fake relocation for branch stubs. This will keep them
+/* Fake relocations for branch stubs. This will keep them
    together.  */
 #define R_PPC_RELAX32 251
+#define R_PPC_RELAX32PC 252
 
 /* These are GNU extensions to enable C++ vtable garbage collection.  */
   RELOC_NUMBER (R_PPC_GNU_VTINHERIT,	253)

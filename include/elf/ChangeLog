@@ -1,3 +1,7 @@
+2003-11-06  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc.h (R_PPC_RELAX32PC): Define.
+
 2003-10-22  Alexandre Oliva  <aoliva@redhat.com>,
 	    Michael Snyder  <msnyder@redhat.com>
 
@@ -40,9 +44,9 @@
 2003-08-21  James Cownie <jcownie@etnus.com>
 
 	* dwarf2.h: Add PGI dwarf extensions.
-	
+
 2003-08-08 Dmitry Diky <diwil@mail.ru>
-	
+
 	* msp430.h: Add xW42 and xE42 parts. Sort MPU list according to
 	gcc order.
 
@@ -104,7 +108,7 @@
 2003-06-03  Nick Clifton  <nickc@redhat.com>
 
 	* v850.h (R_V850_32): Rename to R_V850_ABS32.
-        Add R_V850_REL32.
+	Add R_V850_REL32.
 
 2003-05-15  Roland McGrath  <roland@redhat.com>
 
@@ -135,8 +139,8 @@
 
 2003-04-01  Bob Wilson  <bob.wilson@acm.org>
 
-        * elf/common.h (EM_XTENSA_OLD): Define.
-        * elf/xtensa.h: New file.
+	* elf/common.h (EM_XTENSA_OLD): Define.
+	* elf/xtensa.h: New file.
 
 2003-04-01  Nick Clifton  <nickc@redhat.com>
 
