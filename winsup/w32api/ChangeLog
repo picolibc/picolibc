@@ -1,5 +1,9 @@
 2000-03-30  Mumit Khan  <khan@xraylith.wisc.edu>
 
+	* include/winbase.h (CreateHardLink{A,W}): Add prototypes.
+	* include/winerror.h (ERROR_TOO_MANY_LINKS): Add macro.
+	* include/winnt.h (SEC_*): Add macros.
+	* lib/th32.def: Use Kernel32.dll instead of TH32.DLL.
 	* include/ole.h: Workaround for C++ parser bug.
 	* include/rpcdcep.h: Likewise.
 	* include/winsock.h: Likewise.

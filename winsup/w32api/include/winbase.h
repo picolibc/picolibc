@@ -1014,6 +1014,8 @@ HANDLE WINAPI CreateFileA(LPCSTR,DWORD,DWORD,LPSECURITY_ATTRIBUTES,DWORD,DWORD,H
 HANDLE WINAPI CreateFileW(LPCWSTR,DWORD,DWORD,LPSECURITY_ATTRIBUTES,DWORD,DWORD,HANDLE);
 HANDLE WINAPI CreateFileMappingA(HANDLE,LPSECURITY_ATTRIBUTES,DWORD,DWORD,DWORD,LPCSTR);
 HANDLE WINAPI CreateFileMappingW(HANDLE,LPSECURITY_ATTRIBUTES,DWORD,DWORD,DWORD,LPCWSTR);
+HANDLE WINAPI CreateHardLinkA(LPCSTR,LPCSTR,LPSECURITY_ATTRIBUTES);
+HANDLE WINAPI CreateHardLinkW(LPCWSTR,LPCWSTR,LPSECURITY_ATTRIBUTES);
 HANDLE WINAPI CreateIoCompletionPort(HANDLE,HANDLE,DWORD,DWORD);
 HANDLE WINAPI CreateMailslotA(LPCSTR,DWORD,DWORD,LPSECURITY_ATTRIBUTES);
 HANDLE WINAPI CreateMailslotW(LPCWSTR,DWORD,DWORD,LPSECURITY_ATTRIBUTES);
@@ -1583,6 +1585,7 @@ typedef OSVERSIONINFOW OSVERSIONINFO,*POSVERSIONINFO,*LPOSVERSIONINFO;
 #define CreateEvent CreateEventW
 #define CreateFile CreateFileW
 #define CreateFileMapping CreateFileMappingW
+#define CreateCreateHardLink CreateCreateHardLinkW
 #define CreateMailslot CreateMailslotW
 #define CreateMutex CreateMutexW
 #define CreateNamedPipe CreateNamedPipeW
@@ -1718,6 +1721,7 @@ typedef OSVERSIONINFOA OSVERSIONINFO,*POSVERSIONINFO,*LPOSVERSIONINFO;
 #define CreateEvent CreateEventA
 #define CreateFile CreateFileA
 #define CreateFileMapping CreateFileMappingA
+#define CreateCreateHardLink CreateCreateHardLinkA
 #define CreateMailslot CreateMailslotA
 #define CreateMutex CreateMutexA
 #define CreateNamedPipe CreateNamedPipeA
