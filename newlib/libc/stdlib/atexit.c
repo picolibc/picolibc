@@ -65,6 +65,8 @@ _DEFUN (atexit,
 {
   register struct _atexit *p;
 
+/* _REENT_SMALL atexit() doesn't allow more than the required 32 entries.  */
+#ifndef _REENT_SMALL
   if ((p = _REENT->_atexit) == NULL)
     _REENT->_atexit = p = &_REENT->_atexit0;
   if (p->_ind >= _ATEXIT_SIZE)
@@ -75,6 +77,11 @@ _DEFUN (atexit,
       p->_next = _REENT->_atexit;
       _REENT->_atexit = p;
     }
+#else
+  p = &_REENT->_atexit;
+  if (p->_ind >= _ATEXIT_SIZE)
+    return -1;
+#endif
   p->_fns[p->_ind++] = fn;
   return 0;
 }

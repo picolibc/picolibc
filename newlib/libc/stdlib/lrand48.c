@@ -17,6 +17,7 @@ long
 _DEFUN (_lrand48_r, (r),
        struct _reent *r)
 {
+  _REENT_CHECK_RAND48(r);
   __dorand48(r, __rand48_seed);
   return (long)((unsigned long) __rand48_seed[2] << 15) +
     ((unsigned long) __rand48_seed[1] >> 1);

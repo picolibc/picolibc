@@ -18,6 +18,7 @@ _DEFUN (_lcong48_r, (r, p),
        struct _reent *r _AND
        unsigned short p[7])
 {
+  _REENT_CHECK_RAND48(r);
   __rand48_seed[0] = p[0];
   __rand48_seed[1] = p[1];
   __rand48_seed[2] = p[2];

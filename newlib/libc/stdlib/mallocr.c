@@ -3462,6 +3462,7 @@ void malloc_stats(RONEARG) RDECL
   MALLOC_UNLOCK;
 
 #ifdef INTERNAL_NEWLIB
+  _REENT_SMALL_CHECK_INIT(_stderr_r (reent_ptr));
   fp = _stderr_r(reent_ptr);
 #define fprintf fiprintf
 #else

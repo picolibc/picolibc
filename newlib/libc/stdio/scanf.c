@@ -41,6 +41,7 @@ scanf (fmt, va_alist)
   int ret;
   va_list ap;
 
+  _REENT_SMALL_CHECK_INIT(_stdin_r (_REENT));
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
 #else
@@ -66,6 +67,7 @@ _scanf_r (ptr, fmt, va_alist)
   int ret;
   va_list ap;
 
+  _REENT_SMALL_CHECK_INIT(_stdin_r (ptr));
 #ifdef _HAVE_STDC
   va_start (ap, fmt);
 #else

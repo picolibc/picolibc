@@ -10,7 +10,7 @@
 int *
 __signgam ()
 {
-  return &_REENT->_new._reent._gamma_signgam;
+  return _REENT_SIGNGAM(_REENT);
 }
 
 #endif

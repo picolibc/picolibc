@@ -20,6 +20,7 @@ _DEFUN (_seed48_r, (r, xseed),
 {
   static unsigned short sseed[3];
 
+  _REENT_CHECK_RAND48(r);
   sseed[0] = __rand48_seed[0];
   sseed[1] = __rand48_seed[1];
   sseed[2] = __rand48_seed[2];

@@ -198,7 +198,7 @@ extern float dremf _PARAMS((float, float));
 extern int *__signgam _PARAMS((void));
 #endif /* ! defined (_REENT_ONLY) */
 
-#define __signgam_r(ptr) ((ptr)->_new._reent._gamma_signgam)
+#define __signgam_r(ptr) _REENT_SIGNGAM(ptr)
 
 /* The exception structure passed to the matherr routine.  */
 

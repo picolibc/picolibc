@@ -151,20 +151,29 @@ __sinit (s)
   s->__cleanup = _cleanup_r;	/* conservative */
   s->__sdidinit = 1;
 
-  std (s->__sf + 0, __SRD, 0, s);
+  s->__sglue._next = NULL;
+#ifndef _REENT_SMALL
+  s->__sglue._niobs = 3;
+  s->__sglue._iobs = &s->__sf[0];
+#else
+  s->__sglue._niobs = 0;
+  s->__sglue._iobs = NULL;
+  s->_stdin = __sfp(s);
+  s->_stdout = __sfp(s);
+  s->_stderr = __sfp(s);
+#endif
+
+  std (s->_stdin,  __SRD, 0, s);
 
   /* on platforms that have true file system I/O, we can verify whether stdout 
      is an interactive terminal or not.  For all other platforms, we will
      default to line buffered mode here.  */
 #ifdef HAVE_FCNTL
-  std (s->__sf + 1, __SWR, 1, s);
+  std (s->_stdout, __SWR, 1, s);
 #else
-  std (s->__sf + 1, __SWR | __SLBF, 1, s);
+  std (s->_stdout, __SWR | __SLBF, 1, s);
 #endif
 
-  std (s->__sf + 2, __SWR | __SNBF, 2, s);
+  std (s->_stderr, __SWR | __SNBF, 2, s);
 
-  s->__sglue._next = NULL;
-  s->__sglue._niobs = 3;
-  s->__sglue._iobs = &s->__sf[0];
 }

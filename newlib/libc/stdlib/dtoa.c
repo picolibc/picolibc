@@ -235,12 +235,13 @@ _DEFUN (_dtoa_r,
 
   d.d = _d;
 
-  if (ptr->_result)
+  _REENT_CHECK_MP(ptr);
+  if (_REENT_MP_RESULT(ptr))
     {
-      ptr->_result->_k = ptr->_result_k;
-      ptr->_result->_maxwds = 1 << ptr->_result_k;
-      Bfree (ptr, ptr->_result);
-      ptr->_result = 0;
+      _REENT_MP_RESULT(ptr)->_k = _REENT_MP_RESULT_K(ptr);
+      _REENT_MP_RESULT(ptr)->_maxwds = 1 << _REENT_MP_RESULT_K(ptr);
+      Bfree (ptr, _REENT_MP_RESULT(ptr));
+      _REENT_MP_RESULT(ptr) = 0;
     }
 
   if (word0 (d) & Sign_bit)
@@ -415,11 +416,11 @@ _DEFUN (_dtoa_r,
 	i = 1;
     }
   j = sizeof (__ULong);
-  for (ptr->_result_k = 0; sizeof (_Bigint) - sizeof (__ULong) + j <= i;
+  for (_REENT_MP_RESULT_K(ptr) = 0; sizeof (_Bigint) - sizeof (__ULong) + j <= i;
        j <<= 1)
-    ptr->_result_k++;
-  ptr->_result = Balloc (ptr, ptr->_result_k);
-  s = s0 = (char *) ptr->_result;
+    _REENT_MP_RESULT_K(ptr)++;
+  _REENT_MP_RESULT(ptr) = Balloc (ptr, _REENT_MP_RESULT_K(ptr));
+  s = s0 = (char *) _REENT_MP_RESULT(ptr);
 
   if (ilim >= 0 && ilim <= Quick_max && try_quick)
     {

@@ -48,14 +48,17 @@ _reclaim_reent (ptr)
   if (ptr != _impure_ptr)
     {
       /* used by mprec routines. */
-      if (ptr->_freelist)
+#ifdef _REENT_SMALL
+      if (ptr->_mp)	/* don't bother allocating it! */
+#endif
+      if (_REENT_MP_FREELIST(ptr))
 	{
 	  int i;
 	  for (i = 0; i < 15 /* _Kmax */; i++) 
 	    {
 	      struct _Bigint *thisone, *nextone;
 	
-	      nextone = ptr->_freelist[i];
+	      nextone = _REENT_MP_FREELIST(ptr)[i];
 	      while (nextone)
 		{
 		  thisone = nextone;
@@ -64,9 +67,21 @@ _reclaim_reent (ptr)
 		}
 	    }    
 
-	  _free_r (ptr, ptr->_freelist);
+	  _free_r (ptr, _REENT_MP_FREELIST(ptr));
 	}
 
+#ifdef _REENT_SMALL
+      if (ptr->_emergency)
+	_free_r (ptr, ptr->_emergency);
+      if (ptr->_mp)
+	_free_r (ptr, ptr->_mp);
+      if (ptr->_r48)
+	_free_r (ptr, ptr->_r48);
+      if (ptr->_localtime_buf)
+	_free_r (ptr, ptr->_localtime_buf);
+      if (ptr->_asctime_buf)
+	_free_r (ptr, ptr->_asctime_buf);
+#else
       /* atexit stuff */
       if ((ptr->_atexit) && (ptr->_atexit != &ptr->_atexit0))
 	{
@@ -78,6 +93,7 @@ _reclaim_reent (ptr)
 	      _free_r (ptr, q);
 	    }
 	}
+#endif
 
       if (ptr->_cvtbuf)
 	_free_r (ptr, ptr->_cvtbuf);
@@ -113,9 +129,14 @@ _wrapup_reent(struct _reent *ptr)
   if (ptr == 0)
       ptr = _REENT;
 
+#ifdef _REENT_SMALL
+  for (p = &ptr->_atexit, n = p->_ind; --n >= 0;)
+    (*p->_fns[n]) ();
+#else
   for (p = ptr->_atexit; p; p = p->_next)
     for (n = p->_ind; --n >= 0;)
       (*p->_fns[n]) ();
+#endif
   if (ptr->__cleanup)
     (*ptr->__cleanup) (ptr);
 }

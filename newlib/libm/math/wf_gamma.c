@@ -26,11 +26,11 @@
 #endif
 {
 #ifdef _IEEE_LIBM
-	return __ieee754_gammaf_r(x,&(_REENT->_new._reent._gamma_signgam));
+	return __ieee754_gammaf_r(x,&(_REENT_SIGNGAM(_REENT)));
 #else
         float y;
 	struct exception exc;
-        y = __ieee754_gammaf_r(x,&(_REENT->_new._reent._gamma_signgam));
+        y = __ieee754_gammaf_r(x,&(_REENT_SIGNGAM(_REENT)));
         if(_LIB_VERSION == _IEEE_) return y;
         if(!finitef(y)&&finitef(x)) {
 #ifndef HUGE_VAL 

@@ -146,7 +146,8 @@ _DEFUN (_tmpnam_r, (p, s),
   if (s == NULL)
     {
       /* ANSI states we must use an internal static buffer if s is NULL */
-      result = p->_emergency;
+      _REENT_CHECK_EMERGENCY(p);
+      result = _REENT_EMERGENCY(p);
     }
   else
     {

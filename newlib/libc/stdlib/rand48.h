@@ -18,9 +18,9 @@
 #include <stdlib.h>
 
 extern void _EXFUN(__dorand48,(struct _reent *r, unsigned short[3]));
-#define __rand48_seed (r->_new._reent._r48._seed)
-#define __rand48_mult (r->_new._reent._r48._mult)
-#define __rand48_add (r->_new._reent._r48._add)
+#define __rand48_seed	_REENT_RAND48_SEED(r)
+#define __rand48_mult	_REENT_RAND48_MULT(r)
+#define __rand48_add	_REENT_RAND48_ADD(r)
 
 #if 0
 /* following values are defined in <sys/reent.h> */

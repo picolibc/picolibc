@@ -28,6 +28,11 @@ typedef unsigned __Long __ULong;
 typedef __uint32_t __ULong;
 #endif
 
+/*
+ * If _REENT_SMALL is defined, we make struct _reent as small as possible,
+ * by having nearly everything possible allocated at first use.
+ */
+
 struct _glue 
 {
   struct _glue *_next;
@@ -57,16 +62,23 @@ struct __tm
 };
 
 /*
- * atexit() support
+ * atexit() support.  For _REENT_SMALL, we limit to 32 max.
  */
 
 #define	_ATEXIT_SIZE 32	/* must be at least 32 to guarantee ANSI conformance */
 
+#ifndef _REENT_SMALL
 struct _atexit {
 	struct	_atexit *_next;			/* next in list */
 	int	_ind;				/* next index in this table */
 	void	(*_fns[_ATEXIT_SIZE])(void);	/* the table itself */
 };
+#else
+struct _atexit {
+	int	_ind;				/* next index in this table */
+	void	(*_fns[_ATEXIT_SIZE])(void);	/* the table itself */
+};
+#endif
 
 /*
  * Stdio buffers.
@@ -113,6 +125,29 @@ typedef long _fpos_t;		/* XXX must match off_t in <sys/types.h> */
  * _ub._base!=NULL) and _up and _ur save the current values of _p and _r.
  */
 
+#ifdef _REENT_SMALL
+/*
+ * struct __sFILE_fake is the start of a struct __sFILE, with only the
+ * minimal fields allocated.  In __sinit() we really allocate the 3
+ * standard streams, etc., and point away from this fake.
+ */
+struct __sFILE_fake {
+  unsigned char *_p;	/* current position in (some) buffer */
+  int	_r;		/* read space left for getc() */
+  int	_w;		/* write space left for putc() */
+  short	_flags;		/* flags, below; this FILE is free if 0 */
+  short	_file;		/* fileno, if Unix descriptor, else -1 */
+  struct __sbuf _bf;	/* the buffer (at least 1 byte, if !NULL) */
+  int	_lbfsize;	/* 0 or -_bf._size, for inline putc */
+
+  struct _reent *_data;
+};
+/* CHECK_INIT() comes from stdio/local.h; be sure to include that.  */
+# define _REENT_SMALL_CHECK_INIT(fp) CHECK_INIT(fp)
+#else
+# define _REENT_SMALL_CHECK_INIT(fp) /* nothing */
+#endif
+
 struct __sFILE {
   unsigned char *_p;	/* current position in (some) buffer */
   int	_r;		/* read space left for getc() */
@@ -121,6 +156,10 @@ struct __sFILE {
   short	_file;		/* fileno, if Unix descriptor, else -1 */
   struct __sbuf _bf;	/* the buffer (at least 1 byte, if !NULL) */
   int	_lbfsize;	/* 0 or -_bf._size, for inline putc */
+
+#ifdef _REENT_SMALL
+  struct _reent *_data;
+#endif
 
   /* operations */
   _PTR	_cookie;	/* cookie passed to io functions */
@@ -147,7 +186,9 @@ struct __sFILE {
   int	_blksize;	/* stat.st_blksize (may be != _bf._size) */
   int	_offset;	/* current lseek offset */
 
-  struct _reent *_data;
+#ifndef _REENT_SMALL
+  struct _reent *_data;		/* Here for binary compatibility? Remove? */
+#endif
 };
 
 /*
@@ -175,7 +216,15 @@ struct _rand48 {
   unsigned short _seed[3];
   unsigned short _mult[3];
   unsigned short _add;
+#ifdef _REENT_SMALL
+  /* Put this in here as well, for good luck.  */
+  __extension__ unsigned long long _rand_next;
+#endif
 };
+
+/* How big the some arrays are.  */
+#define _REENT_EMERGENCY_SIZE 25
+#define _REENT_ASCTIME_SIZE 26
 
 /*
  * struct _reent
@@ -185,10 +234,137 @@ struct _rand48 {
  * reentrant.  IE: All state information is contained here.
  */
 
+#ifdef _REENT_SMALL
+
+struct _mprec
+{
+  /* used by mprec routines */
+  struct _Bigint *_result;
+  int _result_k;
+  struct _Bigint *_p5s;
+  struct _Bigint **_freelist;
+};
+
+/* This version of _reent is layed our with "int"s in pairs, to help
+ * ports with 16-bit int's but 32-bit pointers, align nicely.  */
 struct _reent
 {
-  /* local copy of errno */
-  int _errno;
+
+  /* FILE is a big struct and may change over time.  To try to achieve binary
+     compatibility with future versions, put stdin,stdout,stderr here.
+     These are pointers into member __sf defined below.  */
+  struct __sFILE *_stdin, *_stdout, *_stderr;	/* XXX */
+
+  int _errno;			/* local copy of errno */
+
+  int  _inc;			/* used by tmpnam */
+
+  char *_emergency;
+ 
+  int __sdidinit;		/* 1 means stdio has been init'd */
+
+  int _current_category;	/* used by setlocale */
+  _CONST char *_current_locale;
+
+  struct _mprec *_mp;
+
+  void _EXFUN((*__cleanup),(struct _reent *));
+
+  int _gamma_signgam;
+
+  /* used by some fp conversion routines */
+  int _cvtlen;			/* should be size_t */
+  char *_cvtbuf;
+
+  struct _rand48 *_r48;
+  struct __tm *_localtime_buf;
+  char *_asctime_buf;
+
+  /* signal info */
+  void (**(_sig_func))(int);
+
+  /* atexit stuff */
+  struct _atexit _atexit;
+
+  struct _glue __sglue;			/* root of glue chain */
+  struct __sFILE *__sf;			/* file descriptors */
+  struct __sFILE_fake __sf_fake;	/* fake initial stdin/out/err */
+};
+
+#define _REENT_INIT(var) \
+  { &var.__sf_fake, &var.__sf_fake, &var.__sf_fake, 0, 0, _NULL, 0, 0, \
+    "C", _NULL, _NULL, 0, 0, _NULL, _NULL, _NULL, _NULL, _NULL, \
+    { 0, _NULL }, { _NULL, 0, _NULL }, 0 }
+
+/* Only built the assert() calls if we are built with debugging.  */
+#if DEBUG 
+#include <assert.h>
+#else
+#define assert(x) ((void)0)
+#endif
+
+/* Generic _REENT check macro.  */
+#define _REENT_CHECK(var, what, type, size, init) do { \
+  struct _reent *_r = (var); \
+  if (_r->what == NULL) { \
+    _r->what = (type)malloc(size); \
+    assert(_r->what); \
+    init; \
+  } \
+} while (0)
+
+#define _REENT_CHECK_TM(var) \
+  _REENT_CHECK(var, _localtime_buf, struct __tm *, sizeof *((var)->_localtime_buf), \
+    /* nothing */)
+
+#define _REENT_CHECK_ASCTIME_BUF(var) \
+  _REENT_CHECK(var, _asctime_buf, char *, _REENT_ASCTIME_SIZE, \
+    memset((var)->_asctime_buf, 0, _REENT_ASCTIME_SIZE))
+
+/* Handle the dynamically allocated rand48 structure. */
+#define _REENT_INIT_RAND48(var) do { \
+  struct _reent *_r = (var); \
+  _r->_r48->_seed[0] = _RAND48_SEED_0; \
+  _r->_r48->_seed[1] = _RAND48_SEED_1; \
+  _r->_r48->_seed[2] = _RAND48_SEED_2; \
+  _r->_r48->_mult[0] = _RAND48_MULT_0; \
+  _r->_r48->_mult[1] = _RAND48_MULT_1; \
+  _r->_r48->_mult[2] = _RAND48_MULT_2; \
+  _r->_r48->_add = _RAND48_ADD; \
+} while (0)
+#define _REENT_CHECK_RAND48(var) \
+  _REENT_CHECK(var, _r48, struct _rand48 *, sizeof *((var)->_r48), _REENT_INIT_RAND48((var)))
+
+#define _REENT_INIT_MP(var) do { \
+  struct _reent *_r = (var); \
+  _r->_mp->_result_k = 0; \
+  _r->_mp->_result = _r->_mp->_p5s = _NULL; \
+  _r->_mp->_freelist = _NULL; \
+} while (0)
+#define _REENT_CHECK_MP(var) \
+  _REENT_CHECK(var, _mp, struct _mprec *, sizeof *((var)->_mp), _REENT_INIT_MP(var))
+
+#define _REENT_CHECK_EMERGENCY(var) \
+  _REENT_CHECK(var, _emergency, char *, sizeof *((var)->_emergency), /* nothing */)
+
+#define _REENT_SIGNGAM(ptr)	((ptr)->_gamma_signgam)
+#define _REENT_RAND_NEXT(ptr)	((ptr)->_r48->_rand_next)
+#define _REENT_RAND48_SEED(ptr)	((ptr)->_r48->_seed)
+#define _REENT_RAND48_MULT(ptr)	((ptr)->_r48->_mult)
+#define _REENT_RAND48_ADD(ptr)	((ptr)->_r48->_add)
+#define _REENT_MP_RESULT(ptr)	((ptr)->_mp->_result)
+#define _REENT_MP_RESULT_K(ptr)	((ptr)->_mp->_result_k)
+#define _REENT_MP_P5S(ptr)	((ptr)->_mp->_p5s)
+#define _REENT_MP_FREELIST(ptr)	((ptr)->_mp->_freelist)
+#define _REENT_ASCTIME_BUF(ptr)	((ptr)->_asctime_buf)
+#define _REENT_TM(ptr)		((ptr)->_localtime_buf)
+#define _REENT_EMERGENCY(ptr)	((ptr)->_emergency)
+
+#else /* !_REENT_SMALL */
+
+struct _reent
+{
+  int _errno;			/* local copy of errno */
 
   /* FILE is a big struct and may change over time.  To try to achieve binary
      compatibility with future versions, put stdin,stdout,stderr here.
@@ -196,7 +372,7 @@ struct _reent
   struct __sFILE *_stdin, *_stdout, *_stderr;
 
   int  _inc;			/* used by tmpnam */
-  char _emergency[25];
+  char _emergency[_REENT_EMERGENCY_SIZE];
  
   int _current_category;	/* used by setlocale */
   _CONST char *_current_locale;
@@ -220,7 +396,7 @@ struct _reent
       struct
         {
           unsigned int _unused_rand;
-          char * _strtok_last;
+          char * _unused_strtok_last;
           char _asctime_buf[26];
           struct __tm _localtime_buf;
           int _gamma_signgam;
@@ -252,14 +428,34 @@ struct _reent
   struct __sFILE __sf[3];		/* first three file descriptors */
 };
 
-#define _NULL 0
-
 #define _REENT_INIT(var) \
   { 0, &var.__sf[0], &var.__sf[1], &var.__sf[2], 0, "", 0, "C", \
     0, _NULL, _NULL, 0, _NULL, _NULL, 0, _NULL, { {0, _NULL, "", \
     { 0,0,0,0,0,0,0,0}, 0, 1, \
     {{_RAND48_SEED_0, _RAND48_SEED_1, _RAND48_SEED_2}, \
      {_RAND48_MULT_0, _RAND48_MULT_1, _RAND48_MULT_2}, _RAND48_ADD}} } }
+
+#define _REENT_CHECK_RAND48(ptr)	/* nothing */
+#define _REENT_CHECK_MP(ptr)		/* nothing */
+#define _REENT_CHECK_TM(ptr)		/* nothing */
+#define _REENT_CHECK_ASCTIME_BUF(ptr)	/* nothing */
+
+#define _REENT_SIGNGAM(ptr)	((ptr)->_new._reent._gamma_signgam)
+#define _REENT_RAND_NEXT(ptr)	((ptr)->_new._reent._rand_next)
+#define _REENT_RAND48_SEED(ptr)	((ptr)->_new._reent._r48._seed)
+#define _REENT_RAND48_MULT(ptr)	((ptr)->_new._reent._r48._mult)
+#define _REENT_RAND48_ADD(ptr)	((ptr)->_new._reent._r48._add)
+#define _REENT_MP_RESULT(ptr)	((ptr)->_result)
+#define _REENT_MP_RESULT_K(ptr)	((ptr)->_result_k)
+#define _REENT_MP_P5S(ptr)	((ptr)->_p5s)
+#define _REENT_MP_FREELIST(ptr)	((ptr)->_freelist)
+#define _REENT_ASCTIME_BUF(ptr)	(&(ptr)->_new._reent._asctime_buf)
+#define _REENT_TM(ptr)		(&(ptr)->_new._reent._localtime_buf)
+#define _REENT_EMERGENCY(ptr)	((ptr)->_emergency)
+
+#endif /* !_REENT_SMALL */
+
+#define _NULL 0
 
 /*
  * All references to struct _reent are via this pointer.

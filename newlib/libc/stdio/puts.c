@@ -63,7 +63,9 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 
 #include <stdio.h>
 #include <string.h>
+
 #include "fvwrite.h"
+#include "local.h"
 
 /*
  * Write the given string to stdout, appending a newline.
@@ -86,6 +88,7 @@ _DEFUN (_puts_r, (ptr, s),
   uio.uio_iov = &iov[0];
   uio.uio_iovcnt = 2;
 
+  _REENT_SMALL_CHECK_INIT(_stdout_r (ptr));
   return (__sfvwrite (_stdout_r (ptr), &uio) ? EOF : '\n');
 }
 

@@ -1,3 +1,87 @@
+2002-02-02  matthew green  <mrg@redhat.com>
+
+	* libc/include/sys/config.h (_REENT_SMALL): Define for Xstormy16.
+
+	* libc/reent/reent.c (_reclaim_reent): Clean for _REENT_SMALL case.
+	* libc/reent/reent.tex: Add blurb about _REENT_SMALL.
+	* libc/include/sys/reent.h (struct _reent): Completely new version
+	for _REENT_SMALL.
+	(_REENT_INIT): New defines, different defintion depending on _REENT_SMALL.
+	(_REENT_CHECK, _REENT_CHECK_TM): Likewise.
+	(_REENT_CHECK_ASCTIME_BUF, _REENT_INIT_RAND48): Likewise.
+	(_REENT_CHECK_RAND48, _REENT_INIT_MP, _REENT_CHECK_MP): Likewise.
+	(_REENT_CHECK_EMERGENCY, _REENT_SIGNGAM, _REENT_RAND_NEXT): Likewise.
+	(_REENT_RAND48_SEED, _REENT_RAND48_MULT, _REENT_RAND48_ADD): Likewise.
+	(_REENT_MP_RESULT, _REENT_MP_RESULT_K, _REENT_MP_P5S): Likewise.
+	(_REENT_MP_FREELIST, _REENT_ASCTIME_BUF, _REENT_TM): Likewise.
+	(_REENT_EMERGENCY): Likewise.
+
+	* libc/include/sys/reent.h (struct __sFILE_fake): New struct, same as
+	the start of the real __sFILE, used for stdin, stdout and stderr until
+	they are setup properly.
+	(struct __sFILE): Move location of _data in _REENT_SMALL case.
+	* libc/stdio/findfp.c (__sinit): Rearrange for _REENT_SMALL case by
+	allocated stdin, stdout and stderr.
+	* libc/stdio/getchar.c (_getchar_r): Call _REENT_SMALL_CHECK_INIT().
+	* libc/stdio/iprintf.c (iprintf, _iprintf_r): Likewise.
+	* libc/stdio/perror.c (_perror_r): Likewise.
+	* libc/stdio/printf.c (printf, _printf_r): Likewise.
+	* libc/stdio/putchar.c (_putchar_r): Likewise.
+	* libc/stdio/puts.c (_puts_r): Likewise.
+	* libc/stdio/scanf.c (scanf, _scanf_r): Likewise.
+	* libc/stdio/vprintf.c (vprintf): Likewise.
+	* libc/stdio/vscanf.c (vscanf, _vscanf_r): Likewise.
+
+	* libc/stdio/tmpnam.c (_tmpnam_r): Use _REENT_EMERGENCY().
+
+	* libc/reent/reent.c (_wrapup_reent): Adjust for _REENT_SMALL atexit.
+	* libc/include/sys/reent.h (_atexit): Limit atexit() entries to 32
+	for _REENT_SMALL.
+	* libc/stdlib/atexit.c (atexit): Rearrange for _REENT_SMALL case.
+	* libc/stdlib/exit.c (exit): Rearrange for _REENT_SMALL case.
+
+	* libc/include/sys/reent.h (struct _rand48): Keep _rand_next if
+	_REENT_SMALL.
+	* libc/stdlib/drand48.c (_drand48_r): Call _REENT_CHECK_RAND48().
+	* libc/stdlib/lcong48.c (_lcong48_r): Likewise.
+	* libc/stdlib/lrand48.c (_lrand48_r): Likewise.
+	* libc/stdlib/mrand48.c (_mrand48_r): Likewise.
+	* libc/stdlib/rand48.c (__dorand48): Likewise.
+	* libc/stdlib/seed48.c (_seed48_r): Likewise.
+	* libc/stdlib/srand48.c (_srand48_r): Likewise.
+	* libc/stdlib/rand48.h (__rand48_seed, __rand48_mult, __rand48_add): Define
+	as _REENT_RAND48_SEED(), _REENT_RAND48_MULT() and _REENT_RAND48_ADD().
+	* libc/stdlib/dtoa.c (_dtoa_r): Call _REENT_CHECK_MP().  Use
+	_REENT_MP_RESULT() and _REENT_MP_RESULT_K().
+	* libc/stdlib/ldtoa.c (_ldtoa_r): Likewise.
+	* libc/stdlib/rand.c (srand): Use _REENT_RAND_NEXT().
+	* libc/stdlib/rand.c (rand): Likewise.
+
+	* libc/stdlib/mallocr.c (malloc_stats): Call _REENT_SMALL_CHECK_INIT().
+	* libc/stdlib/mstats.c (_mstats_r): Call _REENT_SMALL_CHECK_INIT().
+
+	* libc/stdlib/mprec.c (Balloc): Call _REENT_CHECK_MP.  Use
+	_REENT_MP_FREELIST() and _REENT_MP_P5S.
+	* libc/include/sys/reent.h (struct _mprec): New structure.
+
+	* libc/include/sys/reent.h (struct _reent): Rename _strtok_last to
+	_unused_strtok_last.
+	* libc/string/strtok.c (strtok): Use a local static variable.
+
+	* libc/include/sys/reent.h (_REENT_ASCTIME_SIZE): New define.
+	(_REENT_EMERGENCY_SIZE): Likewise.
+	* libc/time/asctime.c (asctime): Call _REENT_CHECK_ASCTIME_BUF().  Use
+	_REENT_ASCTIME_BUF().
+	* libc/time/lcltime.c (localtime): Call _REENT_CHECK_TM().  Use
+	_REENT_TM().
+
+	* libc/include/math.h (__singam_r): Use _REENT_SIGNGAM().
+	* libc/reent/signgam.c (__signgam): Use _REENT_SIGNGAM().
+	* libm/math/w_gamma.c (gamma): Use _REENT_SIGNGAM().
+	* libm/math/w_lgamma.c (lgamma): Use _REENT_SIGNGAM().
+	* libm/math/wf_gamma.c (gammaf): Use _REENT_SIGNGAM().
+	* libm/math/wf_lgamma.c (lgammaf): Use _REENT_SIGNGAM().
+
 2002-02-01  Geoffrey Keating  <geoffk@redhat.com>
 
 	* configure.host (xstormy16): Don't use the generic malloc.

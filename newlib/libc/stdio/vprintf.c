@@ -26,12 +26,15 @@
 #include <varargs.h>
 #endif
 
+#include "local.h"
+
 int
 _DEFUN (vprintf, (fmt, ap),
      _CONST char *fmt _AND
      va_list ap)
 {
-  return vfprintf (stdout, fmt, ap);
+  _REENT_SMALL_CHECK_INIT(_stdout_r (_REENT));
+  return vfprintf (_stdout_r (_REENT), fmt, ap);
 }
 
 int
@@ -40,5 +43,6 @@ _DEFUN (_vprintf_r, (ptr, fmt, ap),
      _CONST char *fmt _AND
      va_list ap)
 {
+  _REENT_SMALL_CHECK_INIT(_stdout_r (ptr));
   return _vfprintf_r (ptr, _stdout_r (ptr), fmt, ap);
 }

@@ -2,6 +2,8 @@
 #include <_ansi.h>
 #include <stdio.h>
 
+#include "local.h"
+
 #ifdef _HAVE_STDC
 
 #include <stdarg.h>
@@ -12,6 +14,7 @@ _printf_r (struct _reent *ptr, const char *fmt, ...)
   int ret;
   va_list ap;
 
+  _REENT_SMALL_CHECK_INIT(_stdout_r (ptr));
   va_start (ap, fmt);
   ret = _vfprintf_r (ptr, _stdout_r (ptr), fmt, ap);
   va_end (ap);
@@ -31,6 +34,7 @@ _printf_r (ptr, fmt, va_alist)
   int ret;
   va_list ap;
 
+  _REENT_SMALL_CHECK_INIT(_stdout_r (ptr));
   va_start (ap);
   ret = _vfprintf_r (ptr, _stdout_r (ptr), fmt, ap);
   va_end (ap);
@@ -52,6 +56,7 @@ printf (const char *fmt, ...)
   int ret;
   va_list ap;
 
+  _REENT_SMALL_CHECK_INIT(_stdout_r (_REENT));
   va_start (ap, fmt);
   _stdout_r (_REENT)->_data = _REENT;
   ret = vfprintf (_stdout_r (_REENT), fmt, ap);
@@ -71,6 +76,7 @@ printf (fmt, va_alist)
   int ret;
   va_list ap;
 
+  _REENT_SMALL_CHECK_INIT(_stdout_r (_REENT));
   va_start (ap);
   _stdout_r (_REENT)->_data = _REENT;
   ret = vfprintf (_stdout_r (_REENT), fmt, ap);

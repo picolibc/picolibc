@@ -49,6 +49,8 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <stdio.h>
 #include <string.h>
 
+#include "local.h"
+
 void
 _DEFUN (_perror_r, (ptr, s),
 	struct _reent *ptr _AND
@@ -56,6 +58,7 @@ _DEFUN (_perror_r, (ptr, s),
 {
   char *error;
 
+  _REENT_SMALL_CHECK_INIT(_stderr_r (ptr));
   if (s != NULL && *s != '\0')
     {
       fputs (s, _stderr_r (ptr));

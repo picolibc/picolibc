@@ -62,9 +62,14 @@ _DEFUN (exit, (code),
   register struct _atexit *p;
   register int n;
 
+#ifdef _REENT_SMALL
+  for (p = &_REENT->_atexit, n = p->_ind; --n >= 0;)
+    (*p->_fns[n]) ();
+#else
   for (p = _REENT->_atexit; p; p = p->_next)
     for (n = p->_ind; --n >= 0;)
       (*p->_fns[n]) ();
+#endif
   if (_REENT->__cleanup)
     (*_REENT->__cleanup) (_REENT);
   _exit (code);

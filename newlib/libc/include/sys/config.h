@@ -123,6 +123,7 @@
 #define MALLOC_ALIGNMENT 8
 #define _POINTER_INT short
 #define __BUFSIZ__ 16
+#define _REENT_SMALL
 #endif
 
 #if INT_MAX == 32767

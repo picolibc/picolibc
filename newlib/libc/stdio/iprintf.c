@@ -38,6 +38,8 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <_ansi.h>
 #include <stdio.h>
 
+#include "local.h"
+
 #ifndef _REENT_ONLY
 
 #ifdef _HAVE_STDC
@@ -50,6 +52,7 @@ iprintf (const char *fmt,...)
   int ret;
   va_list ap;
 
+  _REENT_SMALL_CHECK_INIT(_stdout_r (_REENT));
   va_start (ap, fmt);
   _stdout_r (_REENT)->_data = _REENT;
   ret = vfiprintf (stdout, fmt, ap);
@@ -69,6 +72,7 @@ iprintf (fmt, va_alist)
   int ret;
   va_list ap;
 
+  _REENT_SMALL_CHECK_INIT(_stdout_r (_REENT));
   va_start (ap);
   _stdout_r (_REENT)->_data = _REENT;
   ret = vfiprintf (stdout, fmt, ap);
@@ -89,6 +93,7 @@ _iprintf_r (struct _reent *ptr, const char *fmt, ...)
   int ret;
   va_list ap;
 
+  _REENT_SMALL_CHECK_INIT(_stdout_r (ptr));
   va_start (ap, fmt);
   ret = vfiprintf (_stdout_r (ptr), fmt, ap);
   va_end (ap);
@@ -109,6 +114,7 @@ _iprintf_r (data, fmt, va_alist)
   struct _reent *ptr = data;
   va_list ap;
 
+  _REENT_SMALL_CHECK_INIT(_stdout_r (ptr));
   va_start (ap);
   ret = vfiprintf (_stdout_r (ptr), fmt, ap);
   va_end (ap);

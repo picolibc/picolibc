@@ -74,12 +74,15 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include <stdio.h>
 #include <reent.h>
 
+#include "local.h"
+
 #undef getchar
 
 int
 _getchar_r (f)
      struct _reent *f;
 {
+  _REENT_SMALL_CHECK_INIT(_stdin_r (f));
   return getc (_stdin_r (f));
 }
 

@@ -18,6 +18,7 @@ _DEFUN (_srand48_r, (r, seed),
        struct _reent *r _AND
        long seed)
 {
+  _REENT_CHECK_RAND48(r);
   __rand48_seed[0] = _RAND48_SEED_0;
   __rand48_seed[1] = (unsigned short) seed;
   __rand48_seed[2] = (unsigned short) ((unsigned long)seed >> 16);

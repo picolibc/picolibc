@@ -163,6 +163,7 @@ _DEFUN (__dorand48, (r, xseed),
   unsigned long accu;
   unsigned short temp[2];
 
+  _REENT_CHECK_RAND48(r);
   accu = (unsigned long) __rand48_mult[0] * (unsigned long) xseed[0] +
     (unsigned long) __rand48_add;
   temp[0] = (unsigned short) accu;     /* lower 16 bits */

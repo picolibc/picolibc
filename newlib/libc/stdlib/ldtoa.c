@@ -2711,13 +2711,15 @@ char *outstr;
 rnd.rlast = -1;
 rnd.rndprc = NBITS;
 
+  _REENT_CHECK_MP(ptr);
+
 /* reentrancy addition to use mprec storage pool */
-if (ptr->_result)
+if (_REENT_MP_RESULT(ptr))
   {
-    ptr->_result->_k = ptr->_result_k;
-    ptr->_result->_maxwds = 1 << ptr->_result_k;
-    Bfree (ptr, ptr->_result);
-    ptr->_result = 0;
+    _REENT_MP_RESULT(ptr)->_k = _REENT_MP_RESULT_K(ptr);
+    _REENT_MP_RESULT(ptr)->_maxwds = 1 << _REENT_MP_RESULT_K(ptr);
+    Bfree (ptr, _REENT_MP_RESULT(ptr));
+    _REENT_MP_RESULT(ptr) = 0;
   }
 
 #if LDBL_MANT_DIG == 24
@@ -2748,9 +2750,9 @@ if( ndigits > NDEC )
         ndigits = NDEC;
 
 /* reentrancy addition to use mprec storage pool */
-ptr->_result = Balloc (ptr, 3);
-ptr->_result_k = 3;
-outstr = (char *)ptr->_result;
+_REENT_MP_RESULT(ptr) = Balloc (ptr, 3);
+_REENT_MP_RESULT_K(ptr) = 3;
+outstr = (char *)_REENT_MP_RESULT(ptr);
 
 etoasc( e, outstr, ndigits, mode, ldp );
 s =  outstr;
