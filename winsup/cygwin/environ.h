@@ -9,7 +9,8 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 /* Initialize the environment */
-void environ_init (char **, int);
+void environ_init (char **, int)
+  __attribute__ ((regparm (2)));
 
 /* The structure below is used to control conversion to/from posix-style
    file specs.  Currently, only PATH and HOME are converted, but PATH
@@ -26,15 +27,18 @@ struct win_env
     int (*towin32) (const char *, char *);
     int (*posix_len) (const char *);
     int (*win32_len) (const char *);
-    void add_cache (const char *in_posix, const char *in_native = NULL);
+    void add_cache (const char *in_posix, const char *in_native = NULL)
+      __attribute__ ((regparm (3)));
     const char * get_native () const {return native ? native + namelen : NULL;}
     const char * get_posix () const {return posix ? posix : NULL;}
   };
 
-win_env * __stdcall getwinenv (const char *name, const char *posix = NULL);
+win_env * __stdcall getwinenv (const char *name, const char *posix = NULL)
+  __attribute__ ((regparm (3)));
 
 void __stdcall update_envptrs ();
 extern char **__cygwin_environ, ***main_environ;
 extern "C" char __stdcall **cur_environ ();
 char ** __stdcall build_env (const char * const *envp, char *&envblock,
-			     int &envc, bool need_envblock);
+			     int &envc, bool need_envblock)
+  __attribute__ ((regparm (3)));

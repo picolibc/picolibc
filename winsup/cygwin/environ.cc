@@ -754,7 +754,8 @@ struct spenv
 {
   const char *name;
   const char * (cygheap_user::*from_cygheap) ();
-  char *retrieve (bool, const char * const = NULL, int = 0);
+  char *retrieve (bool, const char * const = NULL, int = 0)
+    __attribute__ ((regparm (3)));
 };
 
 /* Keep this list in upper case and sorted */
