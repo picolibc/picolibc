@@ -189,6 +189,9 @@ case "${host_cpu}" in
   w65*)
 	machine_dir=w65
 	;;
+  xstormy16)
+	machine_dir=xstormy16
+        ;;
   z8k)
 	machine_dir=z8k
 	;;
@@ -530,6 +533,10 @@ case "${host}" in
 	syscall_dir=syscalls	
 	newlib_cflags="${newlib_cflags} -DSMALL_DTOA -DSMALL_MEMORY"
 	;;	
+  xstormy16-*-*)
+        newlib_cflags="${newlib_cflags} -DHAVE_GETTIMEOFDAY"
+        syscall_dir=syscalls
+        ;;
   z8k-*-*)
 	syscall_dir=syscalls
 	;;

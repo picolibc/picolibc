@@ -110,6 +110,19 @@
 #endif
 #endif
 
+#ifdef __xstormy16__
+#define __IEEE_LITTLE_ENDIAN
+#define __SMALL_BITFIELDS
+#undef INT_MAX
+#undef UINT_MAX
+#define INT_MAX __INT_MAX__
+#define UINT_MAX (__INT_MAX__ * 2U + 1)
+#define SIZE_T_SMALLER_THAN_LONG
+#define MALLOC_ALIGNMENT 8
+#define _POINTER_INT short
+#define __BUFSIZ__ 16
+#endif
+
 #if INT_MAX == 32767
 typedef long int __int32_t;
 typedef unsigned long int __uint32_t;

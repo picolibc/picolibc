@@ -88,6 +88,9 @@ case "${target}" in
   mcore-*-*)
 	configdirs="${configdirs} mcore testsuite"
 	;;
+  xstormy16-*-*)
+	configdirs="${configdirs} xstormy16 testsuite"
+	;;
 esac
 
 # temporarily strip out testsuite

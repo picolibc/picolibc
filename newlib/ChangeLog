@@ -1,3 +1,19 @@
+2001-12-22  Geoffrey Keating  <geoffk@redhat.com>
+	    Catherine Moore  <clm@redhat.com>
+	    Richard Henderson  <rth@redhat.com>
+	    Corinna Vinschen  <vinschen@redhat.com>
+
+	* configure.host: Add support for xstormy16.
+	* libc/include/machine/ieeefp.h: Add support for xstormy16.
+	* libc/include/machine/setjmp.h: Add support for xstormy16.
+	* libc/include/sys/config.h: Add support for xstormy16.
+	* libc/machine/xstormy16/Makefile.am: New file.
+	* libc/machine/xstormy16/Makefile.in: New file.
+	* libc/machine/xstormy16/aclocal.m4: New file.
+	* libc/machine/xstormy16/configure: New file.
+	* libc/machine/xstormy16/configure.in: New file.
+	* libc/machine/xstormy16/setjmp.S: New file.
+
 2001-12-19  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* libm/machine/configure.in (HAVE_LIBM_MACHINE_DIR): New conditional.

@@ -1,3 +1,36 @@
+2001-12-22  Geoffrey Keating  <geoffk@redhat.com>
+	    Mark Salter  <msalter@redhat.com>
+	    Catherine Moore  <clm@redhat.com>
+	    Richard Henderson  <rth@redhat.com>
+
+	* configure.in: Add xstormy16.
+	* libnosys/configure.in: Add xstormy16.
+	* configure: Regenerated.
+	* libnosys/configure: Regenerated.
+	* xstormy16/Makefile.in: New file.
+	* xstormy16/close.c: New file.
+	* xstormy16/configure: New file.
+	* xstormy16/configure.in: New file.
+	* xstormy16/crt0.s: New file.
+	* xstormy16/crt0_stub.s: New file.
+	* xstormy16/crti.s: New file.
+	* xstormy16/crtn.s: New file.
+	* xstormy16/eva_app.c: New file.
+	* xstormy16/eva_app.ld: New file.
+	* xstormy16/eva_stub.ld: New file.
+	* xstormy16/fstat.c: New file.
+	* xstormy16/getpid.c: New file.
+	* xstormy16/kill.c: New file.
+	* xstormy16/lseek.c: New file.
+	* xstormy16/open.c: New file.
+	* xstormy16/sbrk.c: New file.
+	* xstormy16/sim_high.ld: New file.
+	* xstormy16/stat.c: New file.
+	* xstormy16/syscalls.S: New file.
+	* xstormy16/syscalls.m4: New file.
+	* xstormy16/unlink.c: New file.
+	* xstormy16/xstormy16_stub.c: New file.
+
 2001-10-31  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* m32r/Makefile.in: Use gdb stub set by configure.

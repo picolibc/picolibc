@@ -151,6 +151,11 @@ typedef int jmp_buf[_JBLEN];
 #define _JBTYPE unsigned long
 #endif
 
+#ifdef __xstormy16__
+/* 4 GPRs plus SP plus PC. */
+#define _JBLEN 8
+#endif
+
 #ifdef _JBLEN
 #ifdef _JBTYPE
 typedef	_JBTYPE jmp_buf[_JBLEN];
