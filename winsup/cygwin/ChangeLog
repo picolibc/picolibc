@@ -1,5 +1,11 @@
 2003-11-08  Corinna Vinschen  <corinna@vinschen.de>
 
+	* syscalls.cc (ftruncate64): Log length as long long.
+	(logout): Erase ut_host.  Don't write wtmp entry.  Return 1 only
+	if matching utmp entry has been found, 0 otherwise.
+
+2003-11-08  Corinna Vinschen  <corinna@vinschen.de>
+
 	* external.cc (cygwin_internal): Add CW_GET_UID_FROM_SID and
 	CW_GET_GID_FROM_SID handling.
 	* include/cygwin/version.h: Bump API minor number.

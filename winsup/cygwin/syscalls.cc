@@ -1829,7 +1829,7 @@ ftruncate64 (int fd, _off64_t length)
 	}
     }
 
-  syscall_printf ("%d = ftruncate (%d, %d)", res, fd, length);
+  syscall_printf ("%d = ftruncate (%d, %D)", res, fd, length);
   return res;
 }
 
@@ -2657,15 +2657,14 @@ logout (char *line)
     {
       ut->ut_type = DEAD_PROCESS;
       memset (ut->ut_user, 0, sizeof ut->ut_user);
+      memset (ut->ut_host, 0, sizeof ut->ut_host);
       time (&ut->ut_time);
-      updwtmp (_PATH_WTMP, &ut_buf);
       debug_printf ("set logout time for %s", line);
-      memset (ut->ut_line, 0, sizeof ut_buf.ut_line);
-      ut->ut_time = 0;
       pututline (ut);
       endutent ();
+      return 1;
     }
-  return 1;
+  return 0;
 }
 
 static int utmp_fd = -1;
