@@ -15,7 +15,7 @@ enum
   __SIGFLUSH	    = -2,
   __SIGSTRACE	    = -1,
   __SIGUNUSED	    =  0,
-  __SIGOFFSET	    =  3
+  __SIGOFFSET	    =  2
 };
 
 #define PSIZE 63
