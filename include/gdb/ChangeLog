@@ -1,3 +1,8 @@
+2003-02-27  Andrew Cagney  <cagney@redhat.com>
+
+	* remote-sim.h (sim_open, sim_load, sim_create_inferior): Rename
+	_bfd to bfd.
+
 2003-02-20  Andrew Cagney  <ac131313@redhat.com>
 
 	* remote-sim.h (SIM_RC): Delete unused SIM_RC_UNKNOWN_BREAKPOINT,

@@ -64,7 +64,7 @@ typedef enum {
 
 /* The bfd struct, as an opaque type.  */
 
-struct _bfd;
+struct bfd;
 
 
 /* Main simulator entry points.  */
@@ -105,7 +105,7 @@ struct _bfd;
    sim_create_inferior.  FIXME: What should the state of the simulator
    be? */
 
-SIM_DESC sim_open PARAMS ((SIM_OPEN_KIND kind, struct host_callback_struct *callback, struct _bfd *abfd, char **argv));
+SIM_DESC sim_open PARAMS ((SIM_OPEN_KIND kind, struct host_callback_struct *callback, struct bfd *abfd, char **argv));
 
 
 /* Destory a simulator instance.
@@ -142,7 +142,7 @@ void sim_close PARAMS ((SIM_DESC sd, int quitting));
    Such manipulation should probably (?) occure in
    sim_create_inferior. */
 
-SIM_RC sim_load PARAMS ((SIM_DESC sd, char *prog, struct _bfd *abfd, int from_tty));
+SIM_RC sim_load PARAMS ((SIM_DESC sd, char *prog, struct bfd *abfd, int from_tty));
 
 
 /* Prepare to run the simulated program.
@@ -162,7 +162,7 @@ SIM_RC sim_load PARAMS ((SIM_DESC sd, char *prog, struct _bfd *abfd, int from_tt
    address space (according to the applicable ABI) and the program
    counter and stack pointer set accordingly. */
 
-SIM_RC sim_create_inferior PARAMS ((SIM_DESC sd, struct _bfd *abfd, char **argv, char **env));
+SIM_RC sim_create_inferior PARAMS ((SIM_DESC sd, struct bfd *abfd, char **argv, char **env));
 
 
 /* Fetch LENGTH bytes of the simulated program's memory.  Start fetch
