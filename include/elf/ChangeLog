@@ -1,3 +1,13 @@
+2000-04-06  Nick Clifton  <nickc@cygnus.com>
+
+	* arm.h (EF_ARM_SYMSARESORTED): Define.
+	(EF_ARM_EABIMASK): Define.
+	(EF_ARM_EABI_VERSION): Define.
+	(EF_ARM_EABI_UNKNOWN): Define.
+	(EF_ARM_EABI_VER1): Define.
+	(PF_ARM_PI): Define.
+	(PF_ARM_ABS): Define.
+	
 Wed Apr  5 22:08:59 2000  J"orn Rennecke <amylaar@cygnus.co.uk>
 
 	* sh.h (R_SH_LOOP_START, R_SH_LOOP_END): New RELOC_NUMBERs.

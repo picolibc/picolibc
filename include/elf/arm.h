@@ -34,6 +34,14 @@
 #define EF_OLD_ABI         0x100
 #define EF_SOFT_FLOAT      0x200
 
+/* Other constants defined in the ARM ELF spec. version A-08.  */
+#define EF_ARM_SYMSARESORTED 0x04	/* NB conflicts with EF_INTERWORK */
+#define EF_ARM_EABIMASK      0xFF000000
+
+#define EF_ARM_EABI_VERSION(flags) ((flags) & EF_ARM_EABIMASK)
+#define EF_ARM_EABI_UNKNOWN  0x00000000
+#define EF_ARM_EABI_VER1     0x01000000
+
 /* Local aliases for some flags to match names used by COFF port.  */
 #define F_INTERWORK	   EF_INTERWORK
 #define F_APCS26	   EF_APCS_26
@@ -51,6 +59,8 @@
 
 /* ARM-specific program header flags.  */
 #define PF_ARM_SB          0x10000000   /* Segment contains the location addressed by the static base.  */
+#define PF_ARM_PI          0x20000000   /* Segment is position-independent.  */
+#define PF_ARM_ABS         0x40000000   /* Segment must be loaded at its base address.  */
 
 /* Relocation types.  */
 START_RELOC_NUMBERS (elf_arm_reloc_type)
