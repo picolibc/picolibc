@@ -31,6 +31,10 @@ writable_directory (const char *file)
   char *slash = strrchr (dir, '\\');
   if (slash == NULL)
     usedir = ".";
+  else if (slash == dir)
+    {
+      usedir = "\\";
+    }
   else
     {
       *slash = '\0';

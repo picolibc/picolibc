@@ -1,3 +1,7 @@
+2000-05-23  DJ Delorie  <dj@cygnus.com>
+
+	* dir.cc (writable_directory): handle root directories
+
 Tue May 23 10:09:26 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* uname.cc (uname): Use a "s" to denote a snapshot to avoid confusion
