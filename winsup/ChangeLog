@@ -1,5 +1,9 @@
 2003-03-17  Christopher Faylor  <cgf@redhat.com>
 
+	* Makefile.common: Fix typo from previous checkin.
+
+2003-03-17  Christopher Faylor  <cgf@redhat.com>
+
 	* configure.in: w32api directory was already optional.  Semi-revert
 	2003-02-06 change.
 	* configure: Regenerate.
