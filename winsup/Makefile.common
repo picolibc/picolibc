@@ -11,8 +11,8 @@
 # This makefile requires GNU make.
 
 CFLAGS_COMMON:=-Wall -Wwrite-strings # -finline-functions
-MALLOC_DEBUG:=#-DMALLOC_DEBUG -I/cygnus/src/sourceware/winsup/dlmalloc
-MALLOC_OBJ:=#/cygnus/src/sourceware/winsup/dlmalloc/malloc.o
+MALLOC_DEBUG:=#-DMALLOC_DEBUG -I/cygnus/src/sourceware/winsup/cygwin/dlmalloc
+MALLOC_OBJ:=#/cygnus/src/sourceware/winsup/cygwin/dlmalloc/malloc.o
 
 override srcdir:=${shell cd $(srcdir); pwd}
 ifneq (,${filter-out /%,$(srcdir)})
@@ -31,12 +31,18 @@ pwd:=${shell pwd}
 ifneq (,${filter-out /%,$(pwd)})
     bupdir:=..
     bupdir1:=../..
+    bupdir2:=../../..
 else
     bupdir:=${patsubst %:::,%,${patsubst %/:::,%,$(dir $(pwd)):::}}
 ifneq (,${findstring /,$(bupdir)})
     bupdir1:=${patsubst %:::,%,${patsubst %/:::,%,$(dir $(bupdir)):::}}
 else
     bupdir1:=$(bupdir)/..
+endif
+ifneq (,${findstring /,$(bupdir1)})
+    bupdir2:=${patsubst %:::,%,${patsubst %/:::,%,$(dir $(bupdir1)):::}}
+else
+    bupdir2:=$(bupdir1)/..
 endif
 endif
 

@@ -1,3 +1,8 @@
+Thu Aug 24 15:02:26 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.common: Add bupdir2 to reference above the i686-pc-cygwin
+	directory.
+
 Thu Jun 22 18:28:06 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Add dummy info targets.
