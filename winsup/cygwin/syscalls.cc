@@ -89,15 +89,6 @@ close_all_files (void)
 {
   SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "close_all_files");
 
-  if (cygheap->ctty)
-    {
-      if (cygheap->ctty->usecount == 1)
-	cygheap->ctty->close ();
-      else
-	cygheap->ctty->usecount--;
-      debug_printf ("ctty usecount %d", cygheap->ctty->archetype->usecount);
-    }
-
   fhandler_base *fh;
   for (int i = 0; i < (int) cygheap->fdtab.size; i++)
     if ((fh = cygheap->fdtab[i]) != NULL)
@@ -108,6 +99,12 @@ close_all_files (void)
 	fh->close ();
 	cygheap->fdtab.release (i);
       }
+
+  if (cygheap->ctty)
+    {
+      debug_printf ("closing ctty");
+      cygheap->ctty->close ();
+    }
 
   ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "close_all_files");
   user_shared->delqueue.process_queue ();

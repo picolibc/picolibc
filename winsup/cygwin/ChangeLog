@@ -1,5 +1,9 @@
 2003-12-26  Christopher Faylor  <cgf@redhat.com>
 
+	* syscalls.cc (close_all_files): Simplify logic around closing ctty.
+
+2003-12-26  Christopher Faylor  <cgf@redhat.com>
+
 	* pinfo.cc (_pinfo::set_ctty): *Always* call close on opened ctty since
 	it counts as an opened handle.
 
