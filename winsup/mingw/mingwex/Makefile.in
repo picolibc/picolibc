@@ -53,7 +53,7 @@ MATH_DISTFILES = \
 	log2l.S logb.c logbf.c logbl.c logf.S logl.S lrint.c lrintf.c \
 	lrintl.c lround.c lroundf.c lroundl.c modff.c modfl.c \
 	nearbyint.S nearbyintf.S nearbyintl.S nextafterf.c \
-	pow.c powf.c powi.c powif.c powil.c powl.c \
+	powf.c powi.c powif.c powil.c powl.c \
 	remainder.S remainderf.S remainderl.S remquo.S \
 	remquof.S remquol.S rint.c rintf.c rintl.c round.c roundf.c \
 	roundl.c scalbn.S scalbnf.S scalbnl.S s_erf.c sf_erf.c \
@@ -135,7 +135,7 @@ MATH_OBJS = \
 	log2l.o logb.o logbf.o logbl.o logf.o logl.o lrint.o lrintf.o \
 	lrintl.o lround.o lroundf.o lroundl.o modff.o modfl.o \
 	nearbyint.o nearbyintf.o nearbyintl.o nextafterf.o \
-	pow.o powf.o powi.o powif.o powil.o powl.o \
+	powf.o powi.o powif.o powil.o powl.o \
 	remainder.o remainderf.o remainderl.o remquo.o \
 	remquof.o remquol.o rint.o rintf.o rintl.o round.o roundf.o \
 	roundl.o scalbn.o scalbnf.o scalbnl.o s_erf.o sf_erf.o \

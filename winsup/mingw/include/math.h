@@ -129,7 +129,6 @@ struct _exception
 	double	retval;
 };
 
-
 _CRTIMP double __cdecl sin (double);
 _CRTIMP double __cdecl cos (double);
 _CRTIMP double __cdecl tan (double);
@@ -143,10 +142,7 @@ _CRTIMP double __cdecl atan2 (double, double);
 _CRTIMP double __cdecl exp (double);
 _CRTIMP double __cdecl log (double);
 _CRTIMP double __cdecl log10 (double);
-#ifdef __NO_ISOCEXT
-_CRTIMP
-#endif
-	double __cdecl pow (double, double);
+_CRTIMP	double __cdecl pow (double, double);
 _CRTIMP double __cdecl sqrt (double);
 _CRTIMP double __cdecl ceil (double);
 _CRTIMP double __cdecl floor (double);
@@ -156,6 +152,44 @@ _CRTIMP double __cdecl frexp (double, int*);
 _CRTIMP double __cdecl modf (double, double*);
 _CRTIMP double __cdecl fmod (double, double);
 
+/* Excess precision when using a 64-bit mantissa for FPU math ops can
+   cause unexpected results with some of the MSVCRT math functions.  For
+   example, unless the function return value is stored (truncating to
+   53-bit mantissa), calls to pow with both x and y as integral values
+   sometimes produce a non-integral result.
+   One workaround is to reset the FPU env to 53-bit mantissa
+   by a call to fesetenv (FE_PC53_ENV).  Amother is to force storage
+   of the return value of individual math functions using wrappers.
+   NB, using these wrappers will disable builtin math functions and
+   hence disable the folding of function results at compile time when
+   arguments are constant.  */
+
+#if 0
+#define __DEFINE_FLOAT_STORE_MATHFN_D1(fn1)	\
+static __inline__ double			\
+__float_store_ ## fn1 (double x)		\
+{						\
+   __volatile__ double res = (fn1) (x);		\
+  return res;					\
+}
+
+#define __DEFINE_FLOAT_STORE_MATHFN_D2(fn2)	\
+static __inline__ double			\
+__float_store_ ## fn2 (double x, double y)	\
+{						\
+  __volatile__ double res = (fn2) (x, y);	\
+  return res;					\
+}
+#endif
+
+/* For example, here is how to force the result of the pow function
+   to be stored:   */
+#if 0
+#undef pow
+/* Define the ___float_store_pow function and use it instead of pow().  */
+__DEFINE_FLOAT_STORE_MATHFN_D2 (pow)
+#define pow __float_store_pow
+#endif
 
 #ifndef __STRICT_ANSI__
 
