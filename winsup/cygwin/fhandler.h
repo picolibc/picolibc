@@ -680,6 +680,7 @@ public:
 
   int ioctl (unsigned int cmd, void *);
   void init (HANDLE, DWORD, mode_t);
+  bool mouse_aware () {return use_mouse;}
 
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);

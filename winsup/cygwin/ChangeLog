@@ -1,3 +1,9 @@
+Thu Mar  1 20:48:11 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* select.cc (peek_console): Don't report read_ready on mouse events
+	unless we are looking for mouse events.
+	* fhandler.h (fhandler_console::mouse_aware): New method.
+
 Wed Feb 28 15:10:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* uinfo.cc: Eliminate `#include <wchar.h>'.
