@@ -1,5 +1,22 @@
-/* PE COFF header information */
+/* pe.h  -  PE COFF header information 
 
+   Copyright (C) 2000 Free Software Foundation, Inc.
+
+   This file is part of BFD, the Binary File Descriptor library.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software Foundation,
+   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #ifndef _PE_H
 #define _PE_H
 
@@ -99,53 +116,52 @@
 #define IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER	11
 #define IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER	12
   
-/* Magic values that are true for all dos/nt implementations */
+/* Magic values that are true for all dos/nt implementations.  */
 #define DOSMAGIC       0x5a4d  
 #define NT_SIGNATURE   0x00004550
 
-/* NT allows long filenames, we want to accommodate this.  This may break
-   some of the bfd functions */
+/* NT allows long filenames, we want to accommodate this.
+   This may break some of the bfd functions.  */
 #undef  FILNMLEN
-#define FILNMLEN	18	/* # characters in a file name		*/
+#define FILNMLEN	18	/* # characters in a file name.  */
 
 struct external_PEI_filehdr
 {
-  /* DOS header fields - always at offset zero in the EXE file */
-  char e_magic[2];		/* Magic number, 0x5a4d */
-  char e_cblp[2];		/* Bytes on last page of file, 0x90 */
-  char e_cp[2];			/* Pages in file, 0x3 */
-  char e_crlc[2];		/* Relocations, 0x0 */
-  char e_cparhdr[2];		/* Size of header in paragraphs, 0x4 */
-  char e_minalloc[2];		/* Minimum extra paragraphs needed, 0x0 */
-  char e_maxalloc[2];		/* Maximum extra paragraphs needed, 0xFFFF */
-  char e_ss[2];			/* Initial (relative) SS value, 0x0 */
-  char e_sp[2];			/* Initial SP value, 0xb8 */
-  char e_csum[2];		/* Checksum, 0x0 */
-  char e_ip[2];			/* Initial IP value, 0x0 */
-  char e_cs[2];			/* Initial (relative) CS value, 0x0 */
-  char e_lfarlc[2];		/* File address of relocation table, 0x40 */
-  char e_ovno[2];		/* Overlay number, 0x0 */
-  char e_res[4][2];		/* Reserved words, all 0x0 */
-  char e_oemid[2];		/* OEM identifier (for e_oeminfo), 0x0 */
-  char e_oeminfo[2];		/* OEM information; e_oemid specific, 0x0 */
-  char e_res2[10][2];		/* Reserved words, all 0x0 */
-  char e_lfanew[4];		/* File address of new exe header, usually 0x80 */
-  char dos_message[16][4];	/* other stuff, always follow DOS header */
+  /* DOS header fields - always at offset zero in the EXE file.  */
+  char e_magic[2];		/* Magic number, 0x5a4d.  */
+  char e_cblp[2];		/* Bytes on last page of file, 0x90.  */
+  char e_cp[2];			/* Pages in file, 0x3.  */
+  char e_crlc[2];		/* Relocations, 0x0.  */
+  char e_cparhdr[2];		/* Size of header in paragraphs, 0x4.  */
+  char e_minalloc[2];		/* Minimum extra paragraphs needed, 0x0.  */
+  char e_maxalloc[2];		/* Maximum extra paragraphs needed, 0xFFFF.  */
+  char e_ss[2];			/* Initial (relative) SS value, 0x0.  */
+  char e_sp[2];			/* Initial SP value, 0xb8.  */
+  char e_csum[2];		/* Checksum, 0x0.  */
+  char e_ip[2];			/* Initial IP value, 0x0.  */
+  char e_cs[2];			/* Initial (relative) CS value, 0x0.  */
+  char e_lfarlc[2];		/* File address of relocation table, 0x40.  */
+  char e_ovno[2];		/* Overlay number, 0x0.  */
+  char e_res[4][2];		/* Reserved words, all 0x0.  */
+  char e_oemid[2];		/* OEM identifier (for e_oeminfo), 0x0.  */
+  char e_oeminfo[2];		/* OEM information; e_oemid specific, 0x0.  */
+  char e_res2[10][2];		/* Reserved words, all 0x0.  */
+  char e_lfanew[4];		/* File address of new exe header, usually 0x80.  */
+  char dos_message[16][4];	/* Other stuff, always follow DOS header.  */
 
   /* Note: additional bytes may be inserted before the signature.  Use
-   the e_lfanew field to find the actual location of the NT signature */
+   the e_lfanew field to find the actual location of the NT signature.  */
 
-  char nt_signature[4];		/* required NT signature, 0x4550 */ 
+  char nt_signature[4];		/* required NT signature, 0x4550.  */
 
-  /* From standard header */  
-
-  char f_magic[2];		/* magic number			*/
-  char f_nscns[2];		/* number of sections		*/
-  char f_timdat[4];		/* time & date stamp		*/
-  char f_symptr[4];		/* file pointer to symtab	*/
-  char f_nsyms[4];		/* number of symtab entries	*/
-  char f_opthdr[2];		/* sizeof(optional hdr)		*/
-  char f_flags[2];		/* flags			*/
+  /* From standard header.  */
+  char f_magic[2];		/* Magic number.		*/
+  char f_nscns[2];		/* Number of sections.		*/
+  char f_timdat[4];		/* Time & date stamp.		*/
+  char f_symptr[4];		/* File pointer to symtab.	*/
+  char f_nsyms[4];		/* Number of symtab entries.	*/
+  char f_opthdr[2];		/* Sizeof(optional hdr).	*/
+  char f_flags[2];		/* Flags.			*/
 };
 
 #ifdef COFF_IMAGE_WITH_PE
@@ -165,7 +181,7 @@ typedef struct
 {
   AOUTHDR standard;
 
-  /* NT extra fields; see internal.h for descriptions */
+  /* NT extra fields; see internal.h for descriptions.  */
   char  ImageBase[4];
   char  SectionAlignment[4];
   char  FileAlignment[4];
@@ -187,8 +203,8 @@ typedef struct
   char  SizeOfHeapCommit[4];
   char  LoaderFlags[4];
   char  NumberOfRvaAndSizes[4];
-  /* IMAGE_DATA_DIRECTORY DataDirectory[IMAGE_NUMBEROF_DIRECTORY_ENTRIES]; */
-  char  DataDirectory[16][2][4]; /* 16 entries, 2 elements/entry, 4 chars */
+  /* IMAGE_DATA_DIRECTORY DataDirectory[IMAGE_NUMBEROF_DIRECTORY_ENTRIES];  */
+  char  DataDirectory[16][2][4]; /* 16 entries, 2 elements/entry, 4 chars.  */
 } PEAOUTHDR;
 #undef AOUTSZ
 #define AOUTSZ (AOUTHDRSZ + 196)
@@ -200,7 +216,7 @@ typedef struct
 {
   AOUTHDR standard;
 
-  /* NT extra fields; see internal.h for descriptions */
+  /* NT extra fields; see internal.h for descriptions.  */
   char  ImageBase[8];
   char  SectionAlignment[4];
   char  FileAlignment[4];
@@ -222,13 +238,13 @@ typedef struct
   char  SizeOfHeapCommit[8];
   char  LoaderFlags[4];
   char  NumberOfRvaAndSizes[4];
-  /* IMAGE_DATA_DIRECTORY DataDirectory[IMAGE_NUMBEROF_DIRECTORY_ENTRIES]; */
-  char  DataDirectory[16][2][4]; /* 16 entries, 2 elements/entry, 4 chars */
+  /* IMAGE_DATA_DIRECTORY DataDirectory[IMAGE_NUMBEROF_DIRECTORY_ENTRIES];  */
+  char  DataDirectory[16][2][4]; /* 16 entries, 2 elements/entry, 4 chars.  */
 } PEP64AOUTHDR;
 #define PEP64AOUTSZ	240
   
 #undef  E_FILNMLEN
-#define E_FILNMLEN	18	/* # characters in a file name		*/
+#define E_FILNMLEN	18	/* # characters in a file name.  */
 
 /* Import Tyoes fot ILF format object files..  */
 #define IMPORT_CODE	0

@@ -1,3 +1,7 @@
+2000-06-30  DJ Delorie  <dj@cygnus.com>
+
+	* pe.h: Clarify a comment.
+
 2000-04-17  Timothy Wall  <twall@cygnus.com>
 	
 	* ti.h: Load page cleanup.
