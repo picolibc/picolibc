@@ -23,11 +23,14 @@ cgen/; cgen parts of opcodes/, sim/ & include/
 
 config.guess; config.sub; dejagnu/config.guess;
 readline/support/config.sub; readline/support/config.guess
-	config: http://gnu.org
+	config: http://savannah.gnu.org/projects/config
 	Patches to config-patches@gnu.org.
 	Changes need to be done in tandem with the official CONFIG
 	sources or submitted to the master file maintainer and brought
 	in via a merge.
+	Please notify the following of any committed patches:
+		binutils@sources.redhat.com
+		gdb-patches@sources.redhat.com
 
 dejagnu/
 	Notify http://dejagnu.sourceforge.net/ of generic changes.
@@ -58,12 +61,16 @@ ltconfig; ltmain.sh
 	sources or submitted to the master file maintainer and brought
 	in via a merge.
 
-mkinstalldirs; move-if-change; symlink-tree
+mkinstalldirs; move-if-change
 	autoconf: http://gnu.org
 	Patches to autoconf-patches@gnu.org.
 	Changes need to be done in tandem with the official AUTOCONF
 	sources or submitted to the master file maintainer and brought
 	in via a merge.
+
+symlink-tree
+	gcc: http://gcc.gnu.org
+	See libiberty.
 
 newlib/; libgloss/
 	http://sources.redhat.com/newlib/
@@ -93,7 +100,7 @@ expect/; config-ml.in; mpw-README; mpw-build.in; mpw-config.in;
 mpw-configure; mpw-install; setup.com; missing; makefile.vms; utils/;
 config/; config.if; makefile.vms; missing; ylwrap; mkdep; etc/;
 install-sh; intl/
-	Ask.
+	Ask DJ Delorie <dj@redhat.com> after reading the libiberty entry.
 
 modules file
 	Obviously changes to this file should not go through

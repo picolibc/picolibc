@@ -1,6 +1,7 @@
 /* Internal format of XCOFF object file data structures for BFD.
 
-   Copyright 1995, 1996, 1997, 1998, 1999, 2000 Free Software Foundation, Inc.
+   Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001
+   Free Software Foundation, Inc.
    Written by Ian Lance Taylor <ian@cygnus.com>, Cygnus Support.
 
    This file is part of BFD, the Binary File Descriptor library.
@@ -22,18 +23,16 @@
 #ifndef _INTERNAL_XCOFF_H
 #define _INTERNAL_XCOFF_H
 
-/*
- * LINKER
- */
+/* Linker */
 
-/*
- * names of "special" sections
- */
+/* Names of "special" sections.  */
 #define _TEXT	".text"
 #define _DATA	".data"
 #define _BSS	".bss"
 #define _PAD	".pad"
 #define _LOADER	".loader"
+#define _EXCEPT ".except"
+#define _TYPCHK ".typchk"
 
 /* XCOFF uses a special .loader section with type STYP_LOADER.  */
 #define STYP_LOADER 0x1000
@@ -45,10 +44,18 @@
    another section header with STYP_OVRFLO set.  */
 #define STYP_OVRFLO 0x8000
 
+/* Specifies an exception section.  A section of this type provides 
+   information to identify the reason that a trap or ececptin occured within 
+   and executable object program */
+#define STYP_EXCEPT 0x0100
+
+/* Specifies a type check section.  A section of this type contains parameter 
+   argument type check strings used by the AIX binder.  */
+#define STYP_TYPCHK 0x4000
+
 #define	RS6K_AOUTHDR_OMAGIC 0x0107 /* old: text & data writeable */
 #define	RS6K_AOUTHDR_NMAGIC 0x0108 /* new: text r/o, data r/w */
 #define	RS6K_AOUTHDR_ZMAGIC 0x010B /* paged: text r/o, both page-aligned */
-
 
 /* XCOFF relocation types.  
    The relocations are described in the function  
@@ -77,22 +84,15 @@
 #define R_RBR   (0x1a)
 #define R_RBRC  (0x1b)
 
+/* Storage class #defines, from /usr/include/storclass.h that are not already 
+   defined in internal.h */
 
-/* 
- * Storage class #defines, from /usr/include/storclass.h 
- * That are not already defined in internal.h
- */
-#define	C_INFO		110	/* Comment string in .info section */
+/* Comment string in .info section */
+#define	C_INFO		110	
 
-
-/* 
- * AUXILLARY SYMBOL ENTRIES
- *
- * auxemt
- */
+/* Auxillary Symbol Entries  */
 
 /* x_smtyp values:  */
-
 #define	SMTYP_ALIGN(x)	((x) >> 3)	/* log2 of alignment */
 #define	SMTYP_SMTYP(x)	((x) & 0x7)	/* symbol type */
 /* Symbol type values:  */
@@ -104,7 +104,6 @@
 #define	XTY_US	5		/* "Reserved for internal use" */
 
 /* x_smclas values:  */
-
 #define	XMC_PR	0		/* Read-only program code */
 #define	XMC_RO	1		/* Read-only constant */
 #define	XMC_DB	2		/* Read-only debug dictionary table */
@@ -122,36 +121,45 @@
 /* 		14	??? */
 #define	XMC_TC0	15		/* Read-write TOC anchor */
 #define XMC_TD	16		/* Read-write data in TOC */
+#define	XMC_SV64   17		/* Read-only 64 bit supervisor call */
+#define	XMC_SV3264 18		/* Read-only 32 or 64 bit supervisor call */
 
 /* The ldhdr structure.  This appears at the start of the .loader
    section.  */
 
 struct internal_ldhdr
 {
-  /* 
-   * The version number: 
-   * 1 : 32 bit
-   * 2 : 64 bit
-   */
+  /* The version number: 
+     1 : 32 bit
+     2 : 64 bit */
   unsigned long l_version;
+
   /* The number of symbol table entries.  */
   bfd_size_type l_nsyms;
+
   /* The number of relocation table entries.  */
   bfd_size_type l_nreloc;
+
   /* The length of the import file string table.  */
   bfd_size_type l_istlen;
+
   /* The number of import files.  */
   bfd_size_type l_nimpid;
+
   /* The offset from the start of the .loader section to the first
      entry in the import file table.  */
   bfd_size_type l_impoff;
+
   /* The length of the string table.  */
   bfd_size_type l_stlen;
+
   /* The offset from the start of the .loader section to the first
      entry in the string table.  */
   bfd_size_type l_stoff;
+
   /* The offset to start of the symbol table, only in XCOFF64 */
   bfd_vma l_symoff;
+
   /* The offset to the start of the relocation table, only in XCOFF64 */
   bfd_vma l_rldoff;
 };
@@ -162,28 +170,37 @@ struct internal_ldhdr
 struct internal_ldsym
 {
   union
+  {
+    /* The symbol name if <= SYMNMLEN characters.  */
+    char _l_name[SYMNMLEN];
+    struct
     {
-      /* The symbol name if <= SYMNMLEN characters.  */
-      char _l_name[SYMNMLEN];
-      struct
-	{
-	  /* Zero if the symbol name is more than SYMNMLEN characters.  */
-	  long _l_zeroes;
-	  /* The offset in the string table if the symbol name is more
-             than SYMNMLEN characters.  */
-	  long _l_offset;
-	} _l_l;
-    } _l;
+      /* Zero if the symbol name is more than SYMNMLEN characters.  */
+	long _l_zeroes;
+      
+      /* The offset in the string table if the symbol name is more
+	 than SYMNMLEN characters.  */
+      long _l_offset;
+    } 
+    _l_l;
+  }
+  _l;
+
   /* The symbol value.  */
   bfd_vma l_value;
+
   /* The symbol section number.  */
   short l_scnum;
+
   /* The symbol type and flags.  */
   char l_smtype;
+
   /* The symbol storage class.  */
   char l_smclas;
+
   /* The import file ID.  */
   bfd_size_type l_ifile;
+
   /* Offset to the parameter type check string.  */
   bfd_size_type l_parm;
 };
@@ -205,10 +222,13 @@ struct internal_ldrel
 {
   /* The reloc address.  */
   bfd_vma l_vaddr;
+
   /* The symbol table index in the .loader section symbol table.  */
   bfd_size_type l_symndx;
+
   /* The relocation type and size.  */
   short l_rtype;
+
   /* The section number this relocation applies to.  */
   short l_rsecnm;
 };
@@ -227,14 +247,16 @@ struct xcoff_link_hash_entry
   asection *toc_section;
 
   union
-    {
-      /* If we have created a TOC entry (the XCOFF_SET_TOC flag is
-	 set), this is the offset in toc_section.  */
-      bfd_vma toc_offset;
-      /* If the TOC entry comes from an input file, this is set to the
-         symbol index of the C_HIDEXT XMC_TC or XMC_TD symbol.  */
-      long toc_indx;
-    } u;
+  {
+    /* If we have created a TOC entry (the XCOFF_SET_TOC flag is
+       set), this is the offset in toc_section.  */
+    bfd_vma toc_offset;
+    
+    /* If the TOC entry comes from an input file, this is set to the
+       symbol index of the C_HIDEXT XMC_TC or XMC_TD symbol.  */
+    long toc_indx;
+  } 
+  u;
 
   /* If this symbol is a function entry point which is called, this
      field holds a pointer to the function descriptor.  If this symbol
@@ -257,72 +279,42 @@ struct xcoff_link_hash_entry
   unsigned char smclas;
 };
 
-/*
- * #define for xcoff_link_hash_entry.flags
- *
- * XCOFF_REF_REGULAR
- * Symbol is referenced by a regular object. 
- *
- * XCOFF_DEF_REGULAR
- * Symbol is defined by a regular object. 
- *
- * XCOFF_DEF_DYNAMIC
- * Symbol is defined by a dynamic object. 
- *
- * XCOFF_LDREL
- * Symbol is used in a reloc being copied into the .loader section.
- *
- * XCOFF_ENTRY
- * Symbol is the entry point.
- *
- * XCOFF_CALLED
- * Symbol is called; this is, it appears in a R_BR reloc. 
- *
- * XCOFF_SET_TOC
- * Symbol needs the TOC entry filled in.
- *
- * XCOFF_IMPORT
- * Symbol is explicitly imported.
- *
- * XCOFF_EXPORT
- * Symbol is explicitly exported.
- *
- * XCOFF_BUILT_LDSYM
- * Symbol has been processed by xcoff_build_ldsyms.
- *
- * XCOFF_MARK
- * Symbol is mentioned by a section which was not garbage collected. 
- *
- * XCOFF_HAS_SIZE
- * Symbol size is recorded in size_list list from hash table. 
- *
- * XCOFF_DESCRIPTOR
- * Symbol is a function descriptor. 
- *
- * XCOFF_MULTIPLY_DEFINED
- * Multiple definitions have been for the symbol. 
- *
- * XCOFF_RTINIT 
- * Symbol is the __rtinit symbol 
- *
- */
+/*  Flags for xcoff_link_hash_entry.  */
 
+/* Symbol is referenced by a regular object. */
 #define XCOFF_REF_REGULAR      0x00000001
+/* Symbol is defined by a regular object. */
 #define XCOFF_DEF_REGULAR      0x00000002
+/* Symbol is defined by a dynamic object. */
 #define XCOFF_DEF_DYNAMIC      0x00000004
+/* Symbol is used in a reloc being copied into the .loader section.  */
 #define XCOFF_LDREL            0x00000008
+/* Symbol is the entry point.  */
 #define XCOFF_ENTRY            0x00000010
+/* Symbol is called; this is, it appears in a R_BR reloc.  */
 #define XCOFF_CALLED           0x00000020
+/* Symbol needs the TOC entry filled in.  */
 #define XCOFF_SET_TOC          0x00000040
+/* Symbol is explicitly imported.  */
 #define XCOFF_IMPORT           0x00000080
+/* Symbol is explicitly exported.  */
 #define XCOFF_EXPORT           0x00000100
+/* Symbol has been processed by xcoff_build_ldsyms.  */
 #define XCOFF_BUILT_LDSYM      0x00000200
+/* Symbol is mentioned by a section which was not garbage collected. */
 #define XCOFF_MARK             0x00000400
+/* Symbol size is recorded in size_list list from hash table.  */
 #define XCOFF_HAS_SIZE         0x00000800
+/* Symbol is a function descriptor.  */
 #define XCOFF_DESCRIPTOR       0x00001000
+/* Multiple definitions have been for the symbol. */
 #define XCOFF_MULTIPLY_DEFINED 0x00002000
+/* Symbol is the __rtinit symbol.  */
 #define XCOFF_RTINIT           0x00004000
-
+/* Symbol is an imported 32 bit syscall.  */
+#define XCOFF_SYSCALL32        0x00008000
+/* Symbol is an imported 64 bit syscall.  */
+#define XCOFF_SYSCALL64        0x00010000 
 
 /* The XCOFF linker hash table.  */
 
@@ -381,11 +373,12 @@ struct xcoff_link_hash_table
 
   /* A linked list of symbols for which we have size information.  */
   struct xcoff_link_size_list
-    {
-      struct xcoff_link_size_list *next;
-      struct xcoff_link_hash_entry *h;
-      bfd_size_type size;
-    } *size_list;
+  {
+    struct xcoff_link_size_list *next;
+    struct xcoff_link_hash_entry *h;
+    bfd_size_type size;
+  } 
+  *size_list;
 
   /* Magic sections: _text, _etext, _data, _edata, _end, end. */
   asection *special_sections[XCOFF_NUMBER_OF_SPECIAL_SECTIONS];
@@ -399,60 +392,76 @@ struct xcoff_loader_info
 {
   /* Set if a problem occurred.  */
   boolean failed;
+
   /* Output BFD.  */
   bfd *output_bfd;
+
   /* Link information structure.  */
   struct bfd_link_info *info;
+
   /* Whether all defined symbols should be exported.  */
   boolean export_defineds;
+
   /* Number of ldsym structures.  */
   size_t ldsym_count;
+
   /* Size of string table.  */
   size_t string_size;
+
   /* String table.  */
   bfd_byte *strings;
+
   /* Allocated size of string table.  */
   size_t string_alc;
 };
 
 /* In case we're on a 32-bit machine, construct a 64-bit "-1" value
    from smaller values.  Start with zero, widen, *then* decrement.  */
-#define MINUS_ONE       (((bfd_vma)0) - 1)
+#define MINUS_ONE       (((bfd_vma) 0) - 1)
 
+/* __rtinit, from /usr/include/rtinit.h.  */
+struct __rtinit 
+{
+  /* Pointer to runtime linker.     
+     XXX: Is the parameter really void?  */
+  int	(*rtl) PARAMS ((void));	
 
-/* 
- * __rtinit 
- * from /usr/include/rtinit.h
- */
-struct __rtinit {
-  int		(*rtl)();		/* Pointer to runtime linker */
-  int		init_offset;		/* Offset to array of init functions
-					   (0 if none). */
-  int		fini_offset;		/* Offset to array of fini functions
-					   (0 if none). */
-  int		__rtinit_descriptor_size; /* Size of __RTINIT_DESCRIPTOR.
-					     This value should be used instead
-					     of sizeof(__RTINIT_DESCRIPTOR). */
+  /* Offset to array of init functions, 0 if none. */
+  int	init_offset;
+
+  /* Offset to array of fini functions, 0 if none. */		   
+  int	fini_offset;		
+
+  /* Size of __RTINIT_DESCRIPTOR. This value should be used instead of 
+     sizeof(__RTINIT_DESCRIPTOR). */
+  int	__rtinit_descriptor_size; 
 };
 
 #define RTINIT_DESCRIPTOR_SIZE (12)
 
-struct __rtinit_descriptor {
-  int	f;		/* Init/fini function. */
-  int			name_offset;	/* Offset (within __rtinit symbol)
-					   to name of function. */
-  unsigned char	flags;		/* Flags */
+struct __rtinit_descriptor 
+{
+  /* Init/fini function. */
+  int	f;
+
+  /* Offset, relative to the start of the __rtinit symbol, to name of the 
+     function. */
+
+  int	name_offset;	
+
+  /* Flags */			   
+  unsigned char	flags;	
 };
 
-
-
-/* 
- * ARCHIVE
- */
+/* Archive */
 
 #define XCOFFARMAG    "<aiaff>\012"
 #define XCOFFARMAGBIG "<bigaf>\012"
 #define SXCOFFARMAG   8
+
+/* The size of the ascii archive elements */
+#define XCOFFARMAG_ELEMENT_SIZE 12
+#define XCOFFARMAGBIG_ELEMENT_SIZE 20
 
 /* This terminates an XCOFF archive member name.  */
 
@@ -467,23 +476,23 @@ struct xcoff_ar_file_hdr
   char magic[SXCOFFARMAG];
 
   /* Offset of the member table (decimal ASCII string).  */
-  char memoff[12];
+  char memoff[XCOFFARMAG_ELEMENT_SIZE];
 
   /* Offset of the global symbol table (decimal ASCII string).  */
-  char symoff[12];
+  char symoff[XCOFFARMAG_ELEMENT_SIZE];
 
   /* Offset of the first member in the archive (decimal ASCII string).  */
-  char firstmemoff[12];
+  char firstmemoff[XCOFFARMAG_ELEMENT_SIZE];
 
   /* Offset of the last member in the archive (decimal ASCII string).  */
-  char lastmemoff[12];
+  char lastmemoff[XCOFFARMAG_ELEMENT_SIZE];
 
   /* Offset of the first member on the free list (decimal ASCII
      string).  */
-  char freeoff[12];
+  char freeoff[XCOFFARMAG_ELEMENT_SIZE];
 };
 
-#define SIZEOF_AR_FILE_HDR (5 * 12 + SXCOFFARMAG)
+#define SIZEOF_AR_FILE_HDR (SXCOFFARMAG + 5 * XCOFFARMAG_ELEMENT_SIZE)
 
 /* This is the equivalent data structure for the big archive format.  */
 
@@ -493,42 +502,41 @@ struct xcoff_ar_file_hdr_big
   char magic[SXCOFFARMAG];
 
   /* Offset of the member table (decimal ASCII string).  */
-  char memoff[20];
+  char memoff[XCOFFARMAGBIG_ELEMENT_SIZE];
 
   /* Offset of the global symbol table for 32-bit objects (decimal ASCII
      string).  */
-  char symoff[20];
+  char symoff[XCOFFARMAGBIG_ELEMENT_SIZE];
 
   /* Offset of the global symbol table for 64-bit objects (decimal ASCII
      string).  */
-  char symoff64[20];
+  char symoff64[XCOFFARMAGBIG_ELEMENT_SIZE];
 
   /* Offset of the first member in the archive (decimal ASCII string).  */
-  char firstmemoff[20];
+  char firstmemoff[XCOFFARMAGBIG_ELEMENT_SIZE];
 
   /* Offset of the last member in the archive (decimal ASCII string).  */
-  char lastmemoff[20];
+  char lastmemoff[XCOFFARMAGBIG_ELEMENT_SIZE];
 
   /* Offset of the first member on the free list (decimal ASCII
      string).  */
-  char freeoff[20];
+  char freeoff[XCOFFARMAGBIG_ELEMENT_SIZE];
 };
 
-#define SIZEOF_AR_FILE_HDR_BIG (6 * 20 + SXCOFFARMAG)
-
+#define SIZEOF_AR_FILE_HDR_BIG (SXCOFFARMAG + 6 * XCOFFARMAGBIG_ELEMENT_SIZE)
 
 /* Each XCOFF archive member starts with this (printable) structure.  */
 
 struct xcoff_ar_hdr
 {
   /* File size not including the header (decimal ASCII string).  */
-  char size[12];
+  char size[XCOFFARMAG_ELEMENT_SIZE];
 
   /* File offset of next archive member (decimal ASCII string).  */
-  char nextoff[12];
+  char nextoff[XCOFFARMAG_ELEMENT_SIZE];
 
   /* File offset of previous archive member (decimal ASCII string).  */
-  char prevoff[12];
+  char prevoff[XCOFFARMAG_ELEMENT_SIZE];
 
   /* File mtime (decimal ASCII string).  */
   char date[12];
@@ -553,20 +561,20 @@ struct xcoff_ar_hdr
      bytes is given in the size field.  */
 };
 
-#define SIZEOF_AR_HDR (7 * 12 + 4)
+#define SIZEOF_AR_HDR (3 * XCOFFARMAG_ELEMENT_SIZE + 4 * 12 + 4)
 
 /* The equivalent for the big archive format.  */
 
 struct xcoff_ar_hdr_big
 {
   /* File size not including the header (decimal ASCII string).  */
-  char size[20];
+  char size[XCOFFARMAGBIG_ELEMENT_SIZE];
 
   /* File offset of next archive member (decimal ASCII string).  */
-  char nextoff[20];
+  char nextoff[XCOFFARMAGBIG_ELEMENT_SIZE];
 
   /* File offset of previous archive member (decimal ASCII string).  */
-  char prevoff[20];
+  char prevoff[XCOFFARMAGBIG_ELEMENT_SIZE];
 
   /* File mtime (decimal ASCII string).  */
   char date[12];
@@ -591,13 +599,27 @@ struct xcoff_ar_hdr_big
      bytes is given in the size field.  */
 };
 
-#define SIZEOF_AR_HDR_BIG (3 * 20 + 4 * 12 + 4)
+#define SIZEOF_AR_HDR_BIG (3 * XCOFFARMAGBIG_ELEMENT_SIZE + 4 * 12 + 4)
 
 /* We often have to distinguish between the old and big file format.
    Make it a bit cleaner.  We can use `xcoff_ardata' here because the
-   `hdr' member has the same size and position in both formats.  */
+   `hdr' member has the same size and position in both formats.  
+   <bigaf> is the default format, return true even when xcoff_ardata is 
+   NULL. */
+#ifndef SMALL_ARCHIVE
+/* Creates big archives by default */
 #define xcoff_big_format_p(abfd) \
-  (xcoff_ardata (abfd)->magic[1] == 'b')
+  ((NULL != bfd_ardata (abfd) && NULL == xcoff_ardata (abfd)) || \
+   ((NULL != bfd_ardata (abfd)) && \
+    (NULL != xcoff_ardata (abfd)) && \
+    (xcoff_ardata (abfd)->magic[1] == 'b')))
+#else
+/* Creates small archives by default. */
+#define xcoff_big_format_p(abfd) \
+  (((NULL != bfd_ardata (abfd)) && \
+    (NULL != xcoff_ardata (abfd)) && \
+    (xcoff_ardata (abfd)->magic[1] == 'b')))
+#endif
 
 /* We store a copy of the xcoff_ar_file_hdr in the tdata field of the
    artdata structure.  Similar for the big archive.  */

@@ -1,3 +1,11 @@
+2001-09-18  Alan Modra  <amodra@bigpond.net.au>
+
+	* aout64.h: Formatting fixes.
+	(N_TXTADDR): Evaluate to a bfd_vma.
+	(N_DATADDR): Avoid negative unsigned warning.
+	* hp300hpux.h: Formatting fixes.
+	(N_DATADDR): Avoid negative unsigned warning.
+
 Mon Apr  3 13:29:08 2000  Hans-Peter Nilsson  <hp@axis.com>
 
 	* aout64.h (RELOC_EXT_BITS_EXTERN_BIG): Wrap definition in #ifndef.

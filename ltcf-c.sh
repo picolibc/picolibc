@@ -58,9 +58,10 @@ if test "$with_gnu_ld" = yes; then
   # See if GNU ld supports shared libraries.
   case $host_os in
   aix3* | aix4* | aix5*)
-    # On AIX, the GNU linker is very broken
-    ld_shlibs=no
-    cat <<EOF 1>&2
+    # On AIX/PPC, the GNU linker is very broken
+    if test "$host_cpu" != ia64; then
+      ld_shlibs=no
+      cat <<EOF 1>&2
 
 *** Warning: the GNU linker, at least up to release 2.9.1, is reported
 *** to be unable to reliably create shared libraries on AIX.
@@ -69,6 +70,7 @@ if test "$with_gnu_ld" = yes; then
 *** so that a non-GNU linker is found, and then restart.
 
 EOF
+    fi
     ;;
 
   amigaos*)
@@ -311,8 +313,10 @@ else
       # On IA64, the linker does run time linking by default, so we don't
       # have to do anything special.
       aix_use_runtimelinking=no
-      exp_sym_flag='-Bexport'
-      no_entry_flag=""
+      if test $with_gnu_ld = no; then
+        exp_sym_flag='-Bexport'
+        no_entry_flag=""
+      fi
     else
       # Test if we are trying to use run time linking, or normal AIX style linking.
       # If -brtl is somewhere in LDFLAGS, we need to do run time linking.
@@ -336,9 +340,11 @@ else
       archive_expsym_cmds="\$CC $shared_flag"' -o $output_objdir/$soname $libobjs $deplibs $compiler_flags ${allow_undefined_flag} '"\${wl}$no_entry_flag \${wl}$exp_sym_flag:\$export_symbols"
     else
       if test "$host_cpu" = ia64; then
-        hardcode_libdir_flag_spec='${wl}-R $libdir:/usr/lib:/lib'
-        allow_undefined_flag="-z nodefs"
-        archive_expsym_cmds="\$CC $shared_flag"' -o $output_objdir/$soname $libobjs $deplibs $compiler_flags ${wl}${allow_undefined_flag} '"\${wl}$no_entry_flag \${wl}$exp_sym_flag:\$export_symbols"
+        if test $with_gnu_ld = no; then
+          hardcode_libdir_flag_spec='${wl}-R $libdir:/usr/lib:/lib'
+          allow_undefined_flag="-z nodefs"
+          archive_expsym_cmds="\$CC $shared_flag"' -o $output_objdir/$soname $libobjs $deplibs $compiler_flags ${wl}${allow_undefined_flag} '"\${wl}$no_entry_flag \${wl}$exp_sym_flag:\$export_symbols"
+        fi
       else
         allow_undefined_flag=' ${wl}-berok'
         # -bexpall does not export symbols beginning with underscore (_)
@@ -411,23 +417,32 @@ else
     ;;
 
   hpux9* | hpux10* | hpux11*)
-    if test $with_gcc = yes; then
-      case "$host_os" in
-      hpux9*) archive_cmds='$rm $output_objdir/$soname~$CC -shared -fPIC ${wl}+b ${wl}$install_libdir -o $output_objdir/$soname $libobjs $deplibs $compiler_flags~test $output_objdir/$soname = $lib || mv $output_objdir/$soname $lib' ;;
-      *) archive_cmds='$CC -shared -fPIC ${wl}+h ${wl}$soname ${wl}+b ${wl}$install_libdir -o $lib $libobjs $deplibs $compiler_flags' ;;
-      esac
-    else
-      case $host_os in
-      hpux9*) archive_cmds='$rm $output_objdir/$soname~$LD -b +b $install_libdir -o $output_objdir/$soname $libobjs $deplibs $linker_flags~test $output_objdir/$soname = $lib || mv $output_objdir/$soname $lib' ;;
-      *) archive_cmds='$LD -b +h $soname +b $install_libdir -o $lib $libobjs $deplibs $linker_flags' ;;
-      esac
-    fi
-    hardcode_libdir_flag_spec='${wl}+b ${wl}$libdir'
-    hardcode_libdir_separator=:
-    hardcode_direct=yes
-    hardcode_minus_L=yes # Not in the search PATH, but as the default
-			 # location of the library.
+    case "$host_cpu" in
+    ia64*)
+      hardcode_direct=no
+      hardcode_shlibpath_var=no
+      archive_cmds='$LD -b +h $soname -o $lib $libobjs $deplibs $linker_flags'
+      hardcode_libdir_flag_spec='-L$libdir' ;;
+    *)
+      if test $with_gcc = yes; then
+        case "$host_os" in
+        hpux9*) archive_cmds='$rm $output_objdir/$soname~$CC -shared -fPIC ${wl}+b ${wl}$install_libdir -o $output_objdir/$soname $libobjs $deplibs $compiler_flags~test $output_objdir/$soname = $lib || mv $output_objdir/$soname $lib' ;;
+        *) archive_cmds='$CC -shared -fPIC ${wl}+h ${wl}$soname ${wl}+b ${wl}$install_libdir -o $lib $libobjs $deplibs $compiler_flags' ;;
+        esac
+      else
+        case $host_os in
+        hpux9*) archive_cmds='$rm $output_objdir/$soname~$LD -b +b $install_libdir -o $output_objdir/$soname $libobjs $deplibs $linker_flags~test $output_objdir/$soname = $lib || mv $output_objdir/$soname $lib' ;;
+        *) archive_cmds='$LD -b +h $soname +b $install_libdir -o $lib $libobjs $deplibs $linker_flags' ;;
+        esac
+      fi
+      hardcode_libdir_flag_spec='${wl}+b ${wl}$libdir'
+      hardcode_libdir_separator=:
+      hardcode_minus_L=yes # Not in the search PATH, but as the default
+			   # location of the library.
+      ;;
+    esac
     export_dynamic_flag_spec='${wl}-E'
+    hardcode_direct=yes
     ;;
 
   irix5* | irix6*)
@@ -783,7 +798,7 @@ if test "$enable_shared" = yes && test "$with_gcc" = yes; then
 	cat conftest.err 1>&5
 	soname=conftest
 	lib=conftest
-	libobjs=conftest.$ac_objext
+	libobjs=conftest.$objext
 	deplibs=
 	wl=$ac_cv_prog_cc_wl
 	compiler_flags=-v

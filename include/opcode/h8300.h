@@ -1,5 +1,5 @@
 /* Opcode table for the H8/300
-   Copyright 1991, 1992, 1993, 1994, 1996, 1997, 1998, 2000
+   Copyright 1991, 1992, 1993, 1994, 1996, 1997, 1998, 2000, 2002
    Free Software Foundation, Inc.
    Written by Steve Chamberlain <sac@cygnus.com>.
    
@@ -21,7 +21,7 @@
    02111-1307, USA.  */
 
 /* Instructions are stored as a sequence of nibbles.
-   If the nibble has value 15 or less then the representation is complete.
+   If the nibble has value 15 or less than the representation is complete.
    Otherwise, we record what it contains with several flags.  */
 
 typedef int op_type;
@@ -594,7 +594,7 @@ struct h8_opcode h8_opcodes[] =
   NEW_SOP(O(O_STMAC,SL),1,2,"stmac"),{{MACREG,RD32,E}},{{0x0,0x2,MACREG,RD32,E}} EOP,
   NEW_SOP(O(O_LDM,SL),0,6,"ldm.l"),{{RSINC, RS32, E}},{{ 0x0,0x1,IGNORE,0x0,0x6,0xD,0x7,IGNORE,E}}EOP,
   NEW_SOP(O(O_STM,SL),0,6,"stm.l"),{{RS32, RDDEC, E}},{{0x0,0x1,IGNORE,0x0,0x6,0xD,0xF,IGNORE,E}}EOP,
-  { 0 }
+  {0, 0, 0, NULL, {{0,0,0}}, {{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}}, 0, 0, 0, 0}
 };
 #else
 extern struct h8_opcode h8_opcodes[];

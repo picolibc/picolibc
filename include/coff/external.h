@@ -113,12 +113,12 @@ struct external_lineno
 #define	LINESZ	(4 + L_LNNO_SIZE)
 
 #if L_LNNO_SIZE == 4
-#define GET_LINENO_LNNO(abfd, ext)      bfd_h_get_32 (abfd,      (bfd_byte *) (ext->l_lnno));
-#define PUT_LINENO_LNNO(abfd, val, ext) bfd_h_put_32 (abfd, val, (bfd_byte *) (ext->l_lnno));
+#define GET_LINENO_LNNO(abfd, ext)      H_GET_32 (abfd,      (ext->l_lnno))
+#define PUT_LINENO_LNNO(abfd, val, ext) H_PUT_32 (abfd, val, (ext->l_lnno))
 #endif
 #if L_LNNO_SIZE == 2
-#define GET_LINENO_LNNO(abfd, ext)     bfd_h_get_16 (abfd, (bfd_byte *) (ext->l_lnno));
-#define PUT_LINENO_LNNO(abfd,val, ext) bfd_h_put_16 (abfd,val,  (bfd_byte *) (ext->l_lnno));
+#define GET_LINENO_LNNO(abfd, ext)      H_GET_16 (abfd,      (ext->l_lnno))
+#define PUT_LINENO_LNNO(abfd, val, ext) H_PUT_16 (abfd, val, (ext->l_lnno))
 #endif
 
 #endif /* not DO_NOT_DEFINE_LINENO */

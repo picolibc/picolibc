@@ -1,5 +1,5 @@
 /* ARM COFF support for BFD.
-   Copyright 1998, 1999, 2000 Free Software Foundation, Inc.
+   Copyright 1998, 1999, 2000, 2002 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -50,6 +50,7 @@
 #define F_APCS_26	(0x0400)
 #define F_APCS_SET	(0x0800)
 #define F_SOFT_FLOAT	(0x2000)
+#define F_VFP_FLOAT	(0x4000)
 
 /* Bits stored in flags field of the internal_f structure */
 

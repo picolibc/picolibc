@@ -209,8 +209,8 @@ struct mips_opcode
    Coprocessor instructions:
    "E" 5 bit target register (OP_*_RT)
    "G" 5 bit destination register (OP_*_RD)
+   "H" 3 bit sel field for (d)mtc* and (d)mfc* (OP_*_SEL)
    "P" 5 bit performance-monitor register (OP_*_PERFREG)
-   "H" 3 bit sel field (OP_*_SEL)
 
    Macro instructions:
    "A" General 32 bit expression
@@ -307,7 +307,7 @@ struct mips_opcode
    ORs of these bits, indicatingthat they support the instructions
    defined at the given level.  */
 
-#define INSN_ISA_MASK		  0x0000ffff
+#define INSN_ISA_MASK		  0x00000fff
 #define INSN_ISA1                 0x00000010
 #define INSN_ISA2                 0x00000020
 #define INSN_ISA3                 0x00000040
@@ -326,8 +326,10 @@ struct mips_opcode
 #define INSN_4100                 0x00040000
 /* Toshiba R3900 instruction.  */
 #define INSN_3900                 0x00080000
-/* 32-bit code running on a ISA3+ CPU.  */
-#define INSN_GP32                 0x00100000
+/* MIPS R10000 instruction.  */
+#define INSN_10000                0x00100000
+/* Broadcom SB-1 instruction.  */
+#define INSN_SB1                  0x00200000
 
 /* MIPS ISA defines, use instead of hardcoding ISA level.  */
 
@@ -361,7 +363,6 @@ struct mips_opcode
 #define CPU_R12000	12000
 #define CPU_MIPS16	16
 #define CPU_MIPS32	32
-#define CPU_MIPS32_4K	3204113         /* 32, 04, octal 'K'.  */
 #define CPU_MIPS5       5
 #define CPU_MIPS64      64
 #define CPU_SB1         12310201        /* octal 'SB', 01.  */
@@ -369,20 +370,19 @@ struct mips_opcode
 /* Test for membership in an ISA including chip specific ISAs.
    INSN is pointer to an element of the opcode table; ISA is the
    specified ISA to test against; and CPU is the CPU specific ISA
-   to test, or zero if no CPU specific ISA test is desired.
-   The gp32 arg is set when you need to force 32-bit register usage on
-   a machine with 64-bit registers; see the documentation under -mgp32
-   in the MIPS gas docs.  */
+   to test, or zero if no CPU specific ISA test is desired.  */
 
-#define OPCODE_IS_MEMBER(insn, isa, cpu, gp32)				\
-    ((((insn)->membership & isa) != 0                           	\
-      && ((insn)->membership & INSN_GP32 ? gp32 : 1)			\
-     )									\
+#define OPCODE_IS_MEMBER(insn, isa, cpu)				\
+    (((insn)->membership & isa) != 0					\
      || (cpu == CPU_R4650 && ((insn)->membership & INSN_4650) != 0)	\
      || (cpu == CPU_R4010 && ((insn)->membership & INSN_4010) != 0)	\
      || ((cpu == CPU_VR4100 || cpu == CPU_R4111)			\
 	 && ((insn)->membership & INSN_4100) != 0)			\
-     || (cpu == CPU_R3900  && ((insn)->membership & INSN_3900) != 0))
+     || (cpu == CPU_R3900 && ((insn)->membership & INSN_3900) != 0)	\
+     || ((cpu == CPU_R10000 || cpu == CPU_R12000)			\
+	 && ((insn)->membership & INSN_10000) != 0)			\
+     || (cpu == CPU_SB1 && ((insn)->membership & INSN_SB1) != 0)	\
+     || 0)	/* Please keep this term for easier source merging.  */
 
 /* This is a list of macro expanded instructions.
 
@@ -508,6 +508,7 @@ enum
   M_LWR_A,
   M_LWR_AB,
   M_LWU_AB,
+  M_MOVE,
   M_MUL,
   M_MUL_I,
   M_MULO,

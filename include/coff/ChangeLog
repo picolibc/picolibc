@@ -1,3 +1,70 @@
+2002-02-01  Tom Rix  <trix@redhat.com>
+
+	* xcoff.h: Conditionally support <aiaff> for pre AIX 4.3.
+ 
+2002-01-31  Ivan Guzvinec  <ivang@opencores.org>
+
+	* or32.h: New file.
+
+2001-12-24  Tom Rix  <trix@redhat.com>
+
+	* xcoff.h (xcoff_big_format_p): Make <bigaf> the default archive 
+	format.
+	(XCOFFARMAG_ELEMENT_SIZE, XCOFFARMAGBIG_ELEMENT_SIZE): Define for 
+	archive header ascii elements.  
+
+2001-12-17  Tom Rix  <trix@redhat.com>
+
+	* xcoff.h :  Add .except and .typchk section string and styp flags.
+	Fix xcoff_big_format_p macro.  
+
+2001-12-16  Tom Rix  <trix@redhat.com>
+
+	* xcoff.h : Clean up formatting. 
+
+2002-01-15  Richard Earnshaw  <rearnsha@arm.com>
+
+	* arm.h (F_VFP_FLOAT): Define.
+
+2001-11-11  Timothy Wall  <twall@alum.mit.edu>
+
+	* ti.h: Move arch-specific stuff from here...
+	(COFF_ADJUST_SYM_IN/OUT): Optionally put page flag into symbol
+	value. 
+	* tic54x.h: ...to here.
+	
+2001-10-26  Christian Groessler  <cpg@aladdin.de>
+
+	* external.h (GET_LINENO_LNNO): Fix usage of H_GET_32/16.
+	(PUT_LINENO_LNNO): Likewise with H_PUT_32/16.
+
+2001-09-21  Nick Clifton  <nickc@cambridge.redhat.com>
+
+	* ti.h (GET_SCNHDR_PAGE): Fix compile time warning.
+
+2001-09-18  Alan Modra  <amodra@bigpond.net.au>
+
+	* external.h (GET_LINENO_LNNO): Use H_GET_32/16.
+	(PUT_LINENO_LNNO): Use H_PUT_32/16.
+	* m88k.h (GET_LNSZ_SIZE, GET_LNSZ_LNNO, GET_SCN_NRELOC,
+	GET_SCN_NLINNO): Use H_GET_32.
+	(PUT_LNSZ_LNNO, PUT_LNSZ_SIZE, PUT_SCN_NRELOC, PUT_SCN_NLINNO):
+	Use H_PUT_32.
+	* ti.h: Formatting fixes.  Make use of H_GET_* and H_PUT_* throughout.
+	* xcoff.h: White space changes.
+
+2001-09-05  Tom Rix <trix@redhat.com>
+
+	* xcoff.h : Add XCOFF_SYSCALL32 and XCOFF_SYSCALL64 hash table flags.
+	
+2001-08-27  Andreas Jaeger  <aj@suse.de>
+
+	* xcoff.h (struct __rtinit): Make proper prototype for rtl.
+
+Fri Aug 24 01:18:51 2001  J"orn Rennecke <amylaar@redhat.com>
+
+	* internal.h (R_JMP2, R_JMPL2, R_MOVL2): Comment spelling fix.
+
 2001-04-05  Tom Rix <trix@redhat.com>
 
 	* rs6000.h : move xcoff32 external structures from xcofflink. 

@@ -434,6 +434,18 @@ if [ ! -d ${target_subdir} ] ; then
   fi
 fi
 
+build_subdir=${build_alias}
+
+if [ x"${build_alias}" != x"${host}" ] ; then
+  if [ ! -d ${build_subdir} ] ; then
+    if mkdir ${build_subdir} ; then true
+    else
+      echo "'*** could not make ${PWD=`pwd`}/${build_subdir}" 1>&2
+      exit 1
+    fi
+  fi
+fi
+
 copy_dirs=
 
 # Handle --with-headers=XXX.  The contents of the named directory are
@@ -589,6 +601,17 @@ no)
 esac
 
 case "${target}" in
+  *-*-netbsd*)
+    # Skip some stuff on all NetBSD configurations.
+    skipdirs="$skipdirs target-newlib target-libiberty target-libgloss"
+
+    # Skip some stuff that's unsupported on some NetBSD configurations.
+    case "${target}" in
+      *)
+        noconfigdirs="$noconfigdirs ${libgcj}"
+	;;
+    esac
+    ;;
   *-*-netware)
     noconfigdirs="$noconfigdirs ${libstdcxx_version} target-newlib target-libiberty target-libgloss target-libffi"
     ;;
@@ -632,18 +655,6 @@ case "${target}" in
   arm-*-pe*)
     noconfigdirs="$noconfigdirs target-libgloss"
     ;;
-  arm-*-coff*)
-    noconfigdirs="$noconfigdirs target-libgloss"
-    if [ x${is_cross_compiler} != xno ] ; then
-	   target_configdirs="${target_configdirs} target-bsp target-cygmon"
-    fi
-    ;;
-  arm-*-elf*)
-    noconfigdirs="$noconfigdirs target-libgloss"
-    if [ x${is_cross_compiler} != xno ] ; then
-	   target_configdirs="${target_configdirs} target-bsp target-cygmon"
-    fi
-    ;;
   arm-*-oabi*)
     noconfigdirs="$noconfigdirs target-libgloss target-libffi"
     ;;
@@ -657,25 +668,25 @@ case "${target}" in
     noconfigdirs="$noconfigdirs target-libgloss target-libffi"
     ;;
   strongarm-*-elf)
-    noconfigdirs="$noconfigdirs target-libgloss target-libffi"
+    noconfigdirs="$noconfigdirs target-libffi"
     if [ x${is_cross_compiler} != xno ] ; then
 	   target_configdirs="${target_configdirs} target-bsp target-cygmon"
     fi
     ;;
   strongarm-*-coff)
-    noconfigdirs="$noconfigdirs target-libgloss target-libffi"
+    noconfigdirs="$noconfigdirs target-libffi"
     if [ x${is_cross_compiler} != xno ] ; then
 	   target_configdirs="${target_configdirs} target-bsp target-cygmon"
     fi
     ;;
   xscale-*-elf)
-    noconfigdirs="$noconfigdirs target-libgloss target-libffi"
+    noconfigdirs="$noconfigdirs target-libffi"
     if [ x${is_cross_compiler} != xno ] ; then
 	   target_configdirs="${target_configdirs} target-bsp target-cygmon"
     fi
     ;;
   xscale-*-coff)
-    noconfigdirs="$noconfigdirs target-libgloss target-libffi"
+    noconfigdirs="$noconfigdirs target-libffi"
     if [ x${is_cross_compiler} != xno ] ; then
 	   target_configdirs="${target_configdirs} target-bsp target-cygmon"
     fi
@@ -702,7 +713,9 @@ case "${target}" in
 	   target_configdirs="${target_configdirs} target-bsp target-libstub target-cygmon"
     fi
     ;;
-  h8300*-*-* | \
+  h8300*-*-*)
+    noconfigdirs="$noconfigdirs target-libgloss"
+    ;;
   h8500-*-*)
     noconfigdirs="$noconfigdirs ${libstdcxx_version} target-libgloss target-libffi"
     ;;
@@ -727,6 +740,10 @@ case "${target}" in
   ia64*-*-elf*)
     # No gdb support yet.
     noconfigdirs="$noconfigdirs tix readline mmalloc libgui itcl gdb"
+    ;;
+  ia64*-**-hpux*)
+    # No gdb or ld support yet.
+    noconfigdirs="$noconfigdirs tix readline mmalloc libgui itcl gdb ld"
     ;;
   i[3456]86-*-coff | i[3456]86-*-elf)
     if [ x${is_cross_compiler} != xno ] ; then
@@ -887,6 +904,9 @@ case "${target}" in
     esac
     noconfigdirs="$noconfigdirs target-libgloss target-libffi"
     ;;
+  sh64-*-*)
+    noconfigdirs="$noconfigdirs target-libgloss ${libgcj}"
+    ;;
   sparc-*-elf*)
     if [ x${is_cross_compiler} != xno ] ; then
 	   target_configdirs="${target_configdirs} target-libstub target-cygmon"
@@ -974,18 +994,24 @@ fi
 # Look if the user specified --enable-languages="..."; if not, use
 # the environment variable $LANGUAGES if defined. $LANGUAGES might
 # go away some day.
+# NB:  embedded tabs in this IF block -- do not untabify
 if test x"${enable_languages+set}" != xset; then
 	if test x"${LANGUAGES+set}" = xset; then
-		enable_languages="`echo ${LANGUAGES} | tr ' ' ','`"
+		enable_languages="${LANGUAGES}"
+		echo configure.in: warning: setting LANGUAGES is deprecated, use --enable-languages instead 1>&2
 	else
 		enable_languages=all
 	fi
 else
-	if test x"${enable_languages}" = x; then
-		echo configure.in: --enable-languages needs at least one argument 1>&2
+	if test x"${enable_languages}" = x ||
+	   test x"${enable_languages}" = xyes;
+	then
+		echo configure.in: --enable-languages needs at least one language argument 1>&2
 		exit 1
 	fi
 fi
+enable_languages=`echo "${enable_languages}" | sed -e 's/[ 	,][ 	,]*/,/g' -e 's/,$//'`
+
 subdirs=
 for lang in ${srcdir}/gcc/*/config-lang.in ..
 do
@@ -1210,7 +1236,7 @@ rm -f conftest*
 case "${host}" in
   sparc-sun-solaris2*)
       CCBASE="`echo ${CC-cc} | sed 's/ .*$//'`"
-      if [ "`/usr/bin/which $CCBASE`" = "/usr/ucb/cc" ] ; then
+      if [ "`type $CCBASE | sed 's/^[^/]*//'`" = "/usr/ucb/cc" ] ; then 
           could_use=
           [ -d /opt/SUNWspro/bin ] && could_use="/opt/SUNWspro/bin"
           if [ -d /opt/cygnus/bin ] ; then
@@ -1252,7 +1278,8 @@ if [ "${shared}" = "yes" ]; then
   esac
 fi
 
-# Record target_configdirs and the configure arguments in Makefile.
+# Record target_configdirs and the configure arguments for target and
+# build configuration in Makefile.
 target_configdirs=`echo "${target_configdirs}" | sed -e 's/target-//g'`
 targargs=`echo "${arguments}" | \
 	sed -e 's/--no[^ 	]*//' \
@@ -1260,6 +1287,11 @@ targargs=`echo "${arguments}" | \
 	    -e 's/--ho[a-z-]*=[^ 	]*//' \
 	    -e 's/--bu[a-z-]*=[^ 	]*//' \
 	    -e 's/--ta[a-z-]*=[^ 	]*//'`
+
+# For the build-side libraries, we just need to pretend we're native,
+# and not use the same cache file.  Multilibs are neither needed nor
+# desired.
+buildargs="--cache-file=../config.cache --build=${build_alias} --host=${build_alias} ${targargs}"
 
 # Passing a --with-cross-host argument lets the target libraries know
 # whether they are being built with a cross-compiler or being built
@@ -1280,6 +1312,9 @@ fi
 if [ x${with_newlib} != xno ] && echo " ${target_configdirs} " | grep " newlib " > /dev/null 2>&1 && [ -d ${srcdir}/newlib ] ; then
   targargs="--with-newlib ${targargs}"
 fi
+
+# Pass the appropriate --host, --build, and --cache-file arguments.
+targargs="--cache-file=../config.cache --host=${target_alias} --build=${build_alias} ${targargs}"
 
 # provide a proper gxx_include_dir.
 # Note, if you change the default, make sure to fix both here and in
@@ -1342,10 +1377,20 @@ case " $skipdirs " in
      fi
    fi
 
-   # If we're building newlib, use its generic headers last, but search
-   # for any libc-related directories first (so make it the last -B
-   # switch).
-   FLAGS_FOR_TARGET=$FLAGS_FOR_TARGET' -B$$r/$(TARGET_SUBDIR)/newlib/ -isystem $$r/$(TARGET_SUBDIR)/newlib/targ-include -isystem $$s/newlib/libc/include'
+   case "${target}-${is_cross_compiler}" in
+   i[3456]86-pc-linux*-no)
+      # Here host == target, so we don't need to build gcc,
+      # so we don't want to discard standard headers.
+      FLAGS_FOR_TARGET=`echo " $FLAGS_FOR_TARGET " | sed -e 's/ -nostdinc / /'`
+      FLAGS_FOR_TARGET=$FLAGS_FOR_TARGET' -B$$r/$(TARGET_SUBDIR)/newlib/'
+      ;;
+   *)
+      # If we're building newlib, use its generic headers last, but search
+      # for any libc-related directories first (so make it the last -B
+      # switch).
+      FLAGS_FOR_TARGET=$FLAGS_FOR_TARGET' -B$$r/$(TARGET_SUBDIR)/newlib/ -isystem $$r/$(TARGET_SUBDIR)/newlib/targ-include -isystem $$s/newlib/libc/include'
+      ;;
+   esac
    ;;
 esac
 
@@ -1418,15 +1463,16 @@ qCXX_FOR_TARGET=`echo "$CXX_FOR_TARGET" | sed 's,[&%],\\\&,g'`
 # macros.
 qqCXX_FOR_TARGET=`echo "$qCXX_FOR_TARGET" | sed -e 's,[$][$],$$$$,g'`
 
-targargs="--cache-file=../config.cache --host=${target_alias} --build=${build_alias} ${targargs}"
 sed -e "s:^TARGET_CONFIGDIRS[ 	]*=.*$:TARGET_CONFIGDIRS = ${target_configdirs}:" \
-    -e "s%^CONFIG_ARGUMENTS[ 	]*=.*$%CONFIG_ARGUMENTS = ${targargs}%" \
+    -e "s%^TARGET_CONFIGARGS[ 	]*=.*$%TARGET_CONFIGARGS = ${targargs}%" \
     -e "s%^FLAGS_FOR_TARGET[ 	]*=.*$%FLAGS_FOR_TARGET = ${FLAGS_FOR_TARGET}%" \
     -e "s%^CC_FOR_TARGET[ 	]*=.*$%CC_FOR_TARGET = ${CC_FOR_TARGET}%" \
     -e "s%^CHILL_FOR_TARGET[ 	]*=.*$%CHILL_FOR_TARGET = ${CHILL_FOR_TARGET}%" \
     -e "s%^CXX_FOR_TARGET[ 	]*=.*$%CXX_FOR_TARGET = ${qCXX_FOR_TARGET}%" \
     -e "s%^CXX_FOR_TARGET_FOR_RECURSIVE_MAKE[ 	]*=.*$%CXX_FOR_TARGET_FOR_RECURSIVE_MAKE = ${qqCXX_FOR_TARGET}%" \
     -e "s%^TARGET_SUBDIR[ 	]*=.*$%TARGET_SUBDIR = ${target_subdir}%" \
+    -e "s%^BUILD_SUBDIR[ 	]*=.*$%BUILD_SUBDIR = ${build_subdir}%" \
+    -e "s%^BUILD_CONFIGARGS[ 	]*=.*$%BUILD_CONFIGARGS = ${buildargs}%" \
     -e "s%^gxx_include_dir[ 	]*=.*$%gxx_include_dir=${gxx_include_dir}%" \
        Makefile > Makefile.tem
 rm -f Makefile
