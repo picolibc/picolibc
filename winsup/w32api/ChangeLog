@@ -1,3 +1,10 @@
+2004-04-29  Bart Oldeman  <bartoldeman@users.sourceforge.net>
+
+	* include/objbase.h (STGOPTIONS): Correct pwcsTemplateFile type.
+	* include/aclui.h: Remove '\r', throughout.
+	* include/msacm.h: Likewise.
+	* lib/aclui.def: Likewise.
+
 2004-04-28  Luke Dunstan  <infidel@users.sourceforge.net>
 
 	* lib/comctl32.def (SetWindowSubclass): Add stub.

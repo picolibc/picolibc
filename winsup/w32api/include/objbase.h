@@ -61,7 +61,7 @@ typedef struct tagSTGOPTIONS {
 	USHORT usVersion;
 	USHORT reserved;
 	ULONG ulSectorSize;
-	const WCHAR pwcsTemplateFile;
+	const WCHAR *pwcsTemplateFile;
 } STGOPTIONS;
 typedef enum tagREGCLS {
 	REGCLS_SINGLEUSE = 0,
