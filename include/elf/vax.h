@@ -44,8 +44,8 @@ START_RELOC_NUMBERS (elf_vax_reloc_type)
 END_RELOC_NUMBERS (R_VAX_max)   
 
 /* Processor specific flags for the ELF header e_flags field.  */
-#define EF_NONPIC		0x0001	/* Object contains non-PIC code */
-#define EF_DFLOAT		0x0100	/* Object contains D-Float insn.  */
-#define EF_GFLOAT		0x0200	/* Object contains G-Float insn.  */
+#define EF_VAX_NONPIC		0x0001	/* Object contains non-PIC code */
+#define EF_VAX_DFLOAT		0x0100	/* Object contains D-Float insn.  */
+#define EF_VAX_GFLOAT		0x0200	/* Object contains G-Float insn.  */
 
 #endif
