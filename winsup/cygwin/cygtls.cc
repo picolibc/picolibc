@@ -152,9 +152,11 @@ void
 _cygtls::remove (DWORD wait)
 {
   debug_printf ("wait %p\n", wait);
+  if (!locals.exitsock)
+    return;
   // FIXME: Need some sort of atthreadexit function to allow things like
   // select to control this themselves
-  if (locals.exitsock && locals.exitsock != INVALID_SOCKET)
+  if (locals.exitsock != INVALID_SOCKET)
     closesocket (locals.exitsock);
   do
     {
