@@ -233,12 +233,50 @@ prefer; but you may abbreviate option names if you use `--'.
      There is no convenient way to generate a list of all available
      hosts.
 
+Running the Testsuite
+=====================
+
+To run newlib's testsuite, you'll need a site.exp in your home
+directory which points dejagnu to the proper baseboards directory and
+the proper exp file for your target.
+
+Before running make check-target-newlib, set the DEJAGNU environment
+variable to point to ~/site.exp.
+
+Here is a sample site.exp:
+
+# Make sure we look in the right place for the board description files.
+if ![info exists boards_dir] {
+    set boards_dir {}
+}
+lappend boards_dir "your dejagnu/baseboards here"
+
+verbose "Global Config File: target_triplet is $target_triplet" 2
+
+global target_list
+case "$target_triplet" in {
+
+    { "mips-*elf*" } {
+	set target_list "mips-sim"
+    }
+
+    default {
+	set target_list { "unix" }
+    }
+}
+
+mips-sim refers to an exp file in the baseboards directory.  You'll
+need to add the other targets you're testing to the case statement.
+
+Now type make check-target-newlib in the top-level build directory to
+run the testsuite.
+
 Shared newlib
 =============
 
-newlib now uses libtool when it is being compiled natively (with
---target=i[3456]86-pc-linux-gnu) on an i[3456]86-pc-linux-gnu host. This
-allows newlib to be compiled as a shared library.
+newlib uses libtool when it is being compiled natively (with
+--target=i[3456]86-pc-linux-gnu) on an i[3456]86-pc-linux-gnu
+host. This allows newlib to be compiled as a shared library.
 
 To configure newlib, do the following from your build directory:
 
