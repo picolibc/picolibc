@@ -37,7 +37,7 @@ uname (struct utsname *name)
 		   cygwin_version.dll_major / 1000,
 		   cygwin_version.dll_major % 1000,
 		   cygwin_version.dll_minor,
-		   snp ? "S" : "",
+		   snp ? "s" : "",
 		   cygwin_version.api_major,
 		   cygwin_version.api_minor,
 		   cygwin_version.shared_data,
