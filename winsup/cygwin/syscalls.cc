@@ -194,24 +194,34 @@ setsid (void)
   return -1;
 }
 
-static int
-read_handler (int fd, void *ptr, size_t len)
+extern "C" int
+_read (int fd, void *ptr, size_t len)
 {
-  int res;
   sigframe thisframe (mainthread);
-  fhandler_base *fh = fdtab[fd];
-
   if (fdtab.not_open (fd))
     {
       set_errno (EBADF);
       return -1;
     }
 
-  if ((fh->get_flags() & (O_NONBLOCK | O_NDELAY)) && !fh->ready_for_read (fd, 0, 0))
+  set_sig_errno (0);
+  fhandler_base *fh = fdtab[fd];
+  DWORD wait = fh->get_flags () & (O_NONBLOCK | O_NDELAY) ? 0 : INFINITE;
+
+  /* Could block, so let user know we at least got here.  */
+  syscall_printf ("read (%d, %p, %d)", fd, ptr, len);
+
+  int res;
+  if (wait && (!fh->is_slow () || fh->get_r_no_interrupt ()))
+    debug_printf ("non-interruptible read\n");
+  else if (!fh->ready_for_read (fd, wait, 0))
     {
-      syscall_printf ("nothing to read");
-      set_errno (EAGAIN);
-      return -1;
+      if (!wait)
+	set_sig_errno (EAGAIN);
+      else
+	set_sig_errno (EINTR);
+      res = -1;
+      goto out;
     }
 
   /* Check to see if this is a background read from a "tty",
@@ -223,40 +233,13 @@ read_handler (int fd, void *ptr, size_t len)
       res = fh->read (ptr, len);
       myself->process_state &= ~PID_TTYIN;
     }
-  syscall_printf ("%d = read (%d<%s>, %p, %d)", res, fd, fh->get_name (), ptr, len);
-  return res;
-}
 
-extern "C" int
-_read (int fd, void *ptr, size_t len)
-{
-  if (fdtab.not_open (fd))
-    {
-      set_errno (EBADF);
-      return -1;
-    }
 
-  set_sig_errno (0);
-  fhandler_base *fh = fdtab[fd];
-
-  /* Could block, so let user know we at least got here.  */
-  syscall_printf ("read (%d, %p, %d)", fd, ptr, len);
-
-  if (!fh->is_slow () || (fh->get_flags () & (O_NONBLOCK | O_NDELAY)) ||
-      fh->get_r_no_interrupt ())
-    {
-      debug_printf ("non-interruptible read\n");
-      return read_handler (fd, ptr, len);
-    }
-
-  if (fh->ready_for_read (fd, INFINITE, 0))
-    return read_handler (fd, ptr, len);
-
-  set_sig_errno (EINTR);
+out:
   syscall_printf ("%d = read (%d<%s>, %p, %d), errno %d", -1, fd, fh->get_name (),
 		  ptr, len, get_errno ());
   MALLOC_CHECK;
-  return -1;
+  return res;
 }
 
 extern "C"

@@ -1,3 +1,13 @@
+2000-09-25  Christopher Faylor  <cgf@cygnus.com>
+
+	* spawn.cc (av::dup_maybe): Make function void rather than void *.
+	* environ.cc (environ_init): Remember to reparse CYGWIN if envp is
+	supplied.
+	* heap.cc (_sbrk): Remember frame for signal handling.
+	* syscalls.cc (read_handler): Eliminate.
+	(_read): Move read_handler code here.  Reorganize for one path through
+	'ready_for_read'.
+
 Tue Sep 19 09:46:36 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* spawn.cc (spawn_guts): Use actual program argument passed in for
@@ -639,7 +649,7 @@ Wed Aug  2 13:20:04 2000  Christopher Faylor <cgf@cygnus.com>
 	* localtime.c: ditto
 	* smallprint.c: ditto
 	* Makefile.in: don't __INSIDE_CYGWIN__ as it messes up profiling.
-	
+
 Wed Aug  2 11:22:53 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* include/sys/strace.h: Fix strace definition.
@@ -793,7 +803,7 @@ Thu Jul 27 23:33:32 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* testsuite/winsup.api/winsup.exp: ignore stdout by default
 	* testsuite/winsup.api/crlf.c: non-verbose by default
-	
+
 	* winsup.h: prune out windows headers we don't normally need
 	* assert.cc: add wingdi.h and winuser.h
 	* fhandler_console.cc: ditto
@@ -806,7 +816,7 @@ Thu Jul 27 23:33:32 2000  Christopher Faylor <cgf@cygnus.com>
 	* hinfo.cc: add winsock.h
 	* syscalls.cc: add winnls.h
 	* uinfo.cc: ditto
-	
+
 Thu Jul 27 10:24:36 2000  Egor Duda <deo@logos-m.ru>
 
 	* fhandler.cc (fhandler_disk_file::fstat): Allow block calculation to

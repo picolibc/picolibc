@@ -151,9 +151,9 @@ HANDLE win32_obj_id;
 UINT return_value;
 bool used;
 char joinable;       // for thread only
-bool HandleOke () {return win32_obj_id;};
+bool HandleOke () {return win32_obj_id;}
 virtual void Destroy ();
-virtual int Id () {return (int) win32_obj_id;};
+virtual int Id () {return (int) win32_obj_id;}
 };
 
 class ThreadItem:public MTitem
@@ -165,7 +165,7 @@ void *arg;
 void *return_ptr;
 bool suspended;
 DWORD thread_id;
-DWORD GetThreadId () {return thread_id;};
+DWORD GetThreadId () {return thread_id;}
 
 /* signal handling */
 struct sigaction *sigs;

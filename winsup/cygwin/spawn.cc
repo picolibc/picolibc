@@ -273,7 +273,7 @@ public:
 	calloced = 1;
       }
   }
-  void *dup_maybe (int i)
+  void dup_maybe (int i)
   {
     if (i >= calloced)
       argv[i] = cstrdup (argv[i]);

@@ -524,6 +524,7 @@ environ_init (char **envp)
   char *p;
   char *newp;
   int sawTERM = 0;
+  bool envp_passed_in;
   static char cygterm[] = "TERM=cygwin";
 
   regopt ("default");
@@ -536,13 +537,16 @@ environ_init (char **envp)
     allow_ntsec = TRUE;
 #endif
 
-  if (envp)
+  if (!envp)
+    envp_passed_in = 0;
+  else
     {
       sz = envsize (envp, 1);
       char **newenv = (char **) malloc (sz);
       memcpy (newenv, envp, sz);
       cfree (envp);
       envp = newenv;
+      envp_passed_in = 1;
       goto out;
     }
 
@@ -585,6 +589,12 @@ environ_init (char **envp)
 out:
   __cygwin_environ = envp;
   update_envptrs ();
+  if (envp_passed_in)
+    {
+      p = getenv ("CYGWIN");
+      if (p)
+	parse_options (p);
+    }
   parse_options (NULL);
   MALLOC_CHECK;
 }
