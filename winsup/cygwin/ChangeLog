@@ -1,3 +1,8 @@
+2002-06-29  Christopher Faylor  <cgf@redhat.com>
+
+	* environ.cc (spenv::from_cygheap): Still need to take setuid into
+	consideration.
+
 2002-06-28  Christopher Faylor  <cgf@redhat.com>
 
 	* uinfo.cc (cygheap_user::env_logsrv): Return "almost_null" in case
@@ -13,7 +18,7 @@
 	* cygheap.cc (cygheap_user::set_name): Reflect name "pwinname" name
 	change.
 	* environ.cc (getwinenveq): New function.
-	(spenv::from_cygheap): Change arguments.
+	(penv::from_cygheap): penv::from_cygheap): Change arguments.
 	(spenv::retrieve): Ditto for call.  Use getwinenveq to retrieve info
 	from environment.  Always return value from cygwin environment, if it
 	exists.

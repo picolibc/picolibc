@@ -817,7 +817,7 @@ spenv::retrieve (bool no_envblock, const char *const envname)
   if (from_cygheap)
     {
       const char *p;
-      if (envname)
+      if (envname && !cygheap->user.issetuid ())
 	{
 	  debug_printf ("duping existing value for '%s'", name);
 	  return cstrdup1 (envname);	/* Don't really care what it's set to
