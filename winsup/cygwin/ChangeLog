@@ -1,3 +1,8 @@
+Thu Aug  2 17:59:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* security.cc (set_file_attribute): Clean up. Don't call
+	`set_nt_attribute' when ntsec isn't set.
+
 Sat Jul 28 22:30:55 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* dcrt0.cc (alloc_stack_hard_way): Make half-hearted attempt to deal

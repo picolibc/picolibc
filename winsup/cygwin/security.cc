@@ -1587,18 +1587,16 @@ set_file_attribute (int use_ntsec, const char *file,
   if ((attribute & S_IFLNK) == S_IFLNK)
     attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
 
-  if (allow_ntea && (!use_ntsec || !allow_ntsec))
-    {
-      if (!NTWriteEA (file, ".UNIXATTR", (char *) &attribute,
-		      sizeof (attribute)))
-	{
-	  __seterrno ();
-	  return -1;
-	}
-      return 0;
-    }
+  int ret = 0;
 
-  int ret = set_nt_attribute (file, uid, gid, logsrv, attribute);
+  if (use_ntsec && allow_ntsec)
+    ret = set_nt_attribute (file, uid, gid, logsrv, attribute);
+  else if (allow_ntea && !NTWriteEA (file, ".UNIXATTR", (char *) &attribute,
+				     sizeof (attribute)))
+    {
+      __seterrno ();
+      ret = -1;
+    }
   syscall_printf ("%d = set_file_attribute (%s, %d, %d, %p)",
 		  ret, file, uid, gid, attribute);
   return ret;
