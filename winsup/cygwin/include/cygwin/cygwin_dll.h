@@ -1,11 +1,11 @@
 /* cygwin_dll.h
 
-   Copyright 1998 Cygnus Solutions
+   Copyright 1998, 1999, 2000 Cygnus Solutions
 
-This file is part of Cygwin32.
+This file is part of Cygwin.
 
 This software is a copyrighted work licensed under the terms of the
-Cygwin32 license.  Please consult the file "CYGWIN_LICENSE" for
+Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #ifndef __CYGWIN_CYGWIN_DLL_H__
