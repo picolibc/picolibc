@@ -8,13 +8,14 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-/* Change this if we use another size for devices */
-#define FHDEV(maj, min) ((((unsigned) (maj)) << 16) | (unsigned) (min))
-
 typedef unsigned short _major_t;
 typedef unsigned short _minor_t;
 typedef unsigned char _devtype_t;
 typedef __dev32_t _dev_t;
+
+#define FHDEV(maj, min) ((((unsigned) (maj)) << (sizeof (_major_t) * 8)) | (unsigned) (min))
+#define _minor(dev) ((dev) & ((1 << (sizeof (_minor_t) * 8)) - 1))
+#define _major(dev) ((dev) >> (sizeof (_major_t) * 8))
 
 enum fh_devices
 {
@@ -26,8 +27,8 @@ enum fh_devices
   FH_PTYM    = FHDEV (5, 2),	/* /dev/ptmx */
 
   DEV_TTYM_MAJOR = 128,
-  FH_TTYM    = FHDEV (128, 0),
-  FH_TTYM_MAX= FHDEV (128, 255),
+  FH_TTYM    = FHDEV (DEV_TTYM_MAJOR, 0),
+  FH_TTYM_MAX= FHDEV (DEV_TTYM_MAJOR, 255),
 
   DEV_TTYS_MAJOR = 136,
   FH_TTYS    = FHDEV (DEV_TTYS_MAJOR, 0),	/* FIXME: Should separate ttys and ptys */
@@ -102,8 +103,11 @@ struct device
   int adjust;
   unsigned mul;
   _devtype_t type;
+  bool dev_on_fs;
   static const device *lookup (const char *, unsigned int = 0xffffffff);
   void parse (const char *);
+  void parse (_major_t major, _minor_t minor);
+  void parse (_dev_t dev);
   inline bool setunit (unsigned n)
   {
     if (mul && n > mul)
@@ -112,7 +116,10 @@ struct device
     return true;
   }
   static void init ();
+  void tty_to_real_device ();
   inline operator int () const {return devn;}
+  inline void setfs (bool x) {dev_on_fs = x;}
+  inline bool isfs () const {return dev_on_fs;}
 };
 
 extern const device *console_dev;

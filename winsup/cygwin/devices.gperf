@@ -14,7 +14,7 @@ static unsigned int devhash (const char *, unsigned)
 %}
 struct device;
 %%
-"/dev/tty", FH_TTY, "\\dev\\tty", 0, 255, 0, 0
+"/dev/tty", FH_TTY, "\\dev\\tty", 0, 0, 0, 0
 "/dev/ttys", FH_TTYS, "\\dev\\tty%d", 0, 255, 0, 0
 "/dev/console", FH_CONSOLE, "\\dev\\console", 0, 0, 0, 0
 "/dev/ttym", FH_TTYM, "\\dev\\ttym", 0, 255, 0, 0
@@ -28,6 +28,7 @@ struct device;
 "/dev/random", FH_RANDOM, "\\dev\\random", 0, 0, 0, 0
 "/dev/urandom", FH_URANDOM, "\\dev\\urandom", 0, 0, 0, 0
 "/dev/mem", FH_MEM, "\\dev\\mem", 0, 0, 0, 0
+"/dev/kmem", FH_KMEM, "\\dev\\mem", 0, 0, 0, 0
 "/dev/clipboard", FH_CLIPBOARD, "\\dev\\clipboard", 0, 0, 0, 0
 "/dev/port", FH_PORT, "\\dev\\port", 0, 0, 0, 0
 "/dev/com", FH_SERIAL, "\\.\\com%d", 1, 99
@@ -35,6 +36,7 @@ struct device;
 "/dev/pipe", FH_PIPE, "\\dev\\pipe", 0, 0, 0, 0
 "/dev/piper", FH_PIPER, "\\dev\\piper", 0, 0, 0, 0
 "/dev/pipew", FH_PIPEW, "\\dev\\pipew", 0, 0, 0, 0
+"/dev/fifo", FH_FIFO, "\\dev\\fifo", 0, 0, 0, 0
 "/dev/streamsocket", FH_SOCKET, "\\dev\\socket", 0, 0, 0, 0
 "/dev/tcp", FH_SOCKET, "\\dev\\socket", 0, 0, 0, 0
 "/dev/udp", FH_SOCKET, "\\dev\\socket", 0, 0, 0, 0
@@ -49,6 +51,7 @@ struct device;
 "\\\\.\\tape", FH_TAPE, "\\Device\\Tape%d", 0, 127, 0, 0
 "\\\\.\\ntape", FH_NTAPE, "\\Device\\Tape%d", 0, 127, 128, 0
 "\\\\.\\physicaldrive", FH_SD, "\\Device\\Harddisk%d\\Partition%d", 0, 224, 0, 16
+"/dev/rawdrive", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
 "\\\\.\\a:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
 "\\\\.\\b:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
 "\\\\.\\c:", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
@@ -120,7 +123,7 @@ device::parse (const char *s)
       if (++len < prior_len)
 	{
 	  dev = lookup (s, len);
-	  if (!dev || !dev->upper)
+	  if (!dev || (!dev->upper && ! dev->devn == FH_TTY))
 	    dev = NULL;
 	  else
 	    {
@@ -135,41 +138,64 @@ device::parse (const char *s)
 
   if (!dev || !*dev)
     devn = 0;
+  else if (dev->devn == FH_TTY)
+    tty_to_real_device ();
   else
     {
-      if (dev->devn != FH_TTY)
-	*this = *dev;
-      else
-	{
-	  if (!real_tty_attached (myself))
-	    *this = *console_dev;
-	  else
-	    {
-	      unit = myself->ctty;
-	      *this = *ttys_dev;
-	    }
-	}
+      *this = *dev;
       if (!setunit (unit))
 	devn = 0;
     }
 }
 
-const device *console_dev;
-const device *piper_dev;
-const device *pipew_dev;
-const device *socket_dev;
-const device *ttym_dev;
-const device *ttys_dev;
-const device *urandom_dev;
-
 void
 device::init ()
 {
-  piper_dev = lookup ("/dev/piper", sizeof ("/dev/piper") - 1);
-  pipew_dev = lookup ("/dev/pipew", sizeof ("/dev/pipew") - 1);
-  console_dev = lookup ("/dev/console", sizeof ("/dev/console") - 1);
-  ttym_dev = lookup ("/dev/ttym", sizeof ("/dev/ttym") - 1);
-  ttys_dev = lookup ("/dev/ttys", sizeof ("/dev/ttys") - 1);
-  socket_dev = lookup ("/dev/tcp", sizeof ("/dev/tcp") - 1);
-  urandom_dev = lookup ("/dev/urandom", sizeof ("/dev/urandom") - 1);
+  /* nothing to do... yet */
+}
+
+void
+device::parse (_major_t major, _minor_t minor)
+{
+  _dev_t dev = FHDEV (major, 0);
+
+  devn = 0;
+
+  unsigned i;
+  for (i = 0; i < (sizeof (unit_devices) / sizeof (unit_devices[0])); i++)
+    if (unit_devices[i]->devn == dev)
+      {
+	*this = *unit_devices[i];
+	this->setunit (minor);
+	goto out;
+      }
+
+  dev = FHDEV (major, minor);
+  for (i = 0; i < (sizeof (uniq_devices) / sizeof (uniq_devices[0])); i++)
+    if (uniq_devices[i]->devn == dev)
+      {
+	*this = *uniq_devices[i];
+	break;
+      }
+  
+out:
+  return;
+}
+
+void
+device::parse (_dev_t dev)
+{
+  parse (_major (dev), _minor (dev));
+}
+
+void
+device::tty_to_real_device ()
+{
+  if (!real_tty_attached (myself))
+    *this = *console_dev;
+  else
+    {
+      *this = *ttys_dev;
+      setunit (myself->ctty);
+    }
 }
