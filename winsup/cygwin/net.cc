@@ -538,14 +538,14 @@ cygwin_getprotobyname (const char *p)
 {
   if (check_null_str_errno (p))
     return NULL;
-  __builtin_return (dup_ent (protoent_buf, getprotobyname (p), t_protoent));
+  return (protoent *) dup_ent (protoent_buf, getprotobyname (p), t_protoent);
 }
 
 /* exported as getprotobynumber: standards? */
 extern "C" struct protoent *
 cygwin_getprotobynumber (int number)
 {
-  __builtin_return (dup_ent (protoent_buf, getprotobynumber (number), t_protoent));
+  return (protoent *) dup_ent (protoent_buf, getprotobynumber (number), t_protoent);
 }
 
 bool
