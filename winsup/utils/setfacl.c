@@ -383,7 +383,7 @@ usage (FILE * stream)
             "account currently.\n", prog_name);
   }
   else
-    fprintf(stream, "Try `%s --help' for more information.", prog_name);
+    fprintf(stream, "Try `%s --help' for more information.\n", prog_name);
 }
 
 struct option longopts[] = {

@@ -1,3 +1,7 @@
+2002-11-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* setfacl.c (usage): Add missing LF.
+
 2002-10-30  Christopher Faylor  <cgf@redhat.com>
 
 	* cygpath.cc (get_long_path_name_w32impl): Define similarly to
