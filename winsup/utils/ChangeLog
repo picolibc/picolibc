@@ -1,3 +1,8 @@
+2002-05-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ps.cc (main): Change print format for uid to unsigned.  Use uid32
+	member of struct external_pinfo instead of uid.
+
 2002-05-28  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
 	* passwd.c (prog_name): New global variable.

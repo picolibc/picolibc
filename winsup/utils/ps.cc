@@ -248,7 +248,7 @@ main (int argc, char *argv[])
   const char *ftitle = "     UID     PID    PPID TTY     STIME COMMAND\n";
   const char *ffmt   = "%8.8s%8d%8d%4s%10s %s\n";
   const char *ltitle = "      PID    PPID    PGID     WINPID  TTY  UID    STIME COMMAND\n";
-  const char *lfmt   = "%c %7d %7d %7d %10u %4s %4d %8s %s\n";
+  const char *lfmt   = "%c %7d %7d %7d %10u %4s %4u %8s %s\n";
   char ch;
 
   aflag = lflag = fflag = sflag = 0;
@@ -325,7 +325,7 @@ main (int argc, char *argv[])
        (p = (external_pinfo *) cygwin_internal (query, pid | CW_NEXTPID));
        pid = p->pid)
     {
-      if (!aflag && p->uid != uid)
+      if (!aflag && p->uid32 != (__uid32_t) uid)
         continue;
       char status = ' ';
       if (p->process_state & PID_STOPPED)
@@ -370,10 +370,10 @@ main (int argc, char *argv[])
         {
           struct passwd *pw;
 
-          if ((pw = getpwuid (p->uid)))
+          if ((pw = getpwuid (p->uid32)))
             strcpy (uname, pw->pw_name);
           else
-            sprintf (uname, "%d", p->uid);
+            sprintf (uname, "%u", (unsigned) p->uid32);
         }
 
       if (sflag)
@@ -382,7 +382,7 @@ main (int argc, char *argv[])
         printf (ffmt, uname, p->pid, p->ppid, ttynam (p->ctty), start_time (p), pname);
       else if (lflag)
         printf (lfmt, status, p->pid, p->ppid, p->pgid,
-                p->dwProcessId, ttynam (p->ctty), p->uid, start_time (p), pname);
+                p->dwProcessId, ttynam (p->ctty), p->uid32, start_time (p), pname);
 
     }
   (void) cygwin_internal (CW_UNLOCK_PINFO);
