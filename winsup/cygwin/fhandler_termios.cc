@@ -87,6 +87,10 @@ tty_min::kill_pgrp (int sig)
 {
   int killself = 0;
   winpids pids ((DWORD) PID_MAP_RW);
+  siginfo_t si;
+  si.si_signo = sig;
+  si.si_code = SI_KERNEL;
+  si.si_pid = si.si_uid = si.si_errno = 0;
   for (unsigned i = 0; i < pids.npids; i++)
     {
       _pinfo *p = pids[i];
@@ -95,10 +99,10 @@ tty_min::kill_pgrp (int sig)
       if (p == myself)
 	killself++;
       else
-	(void) sig_send (p, sig);
+	(void) sig_send (p, si);
     }
   if (killself)
-    sig_send (myself, sig);
+    sig_send (myself, si);
 }
 
 bg_check_types
@@ -144,7 +148,13 @@ fhandler_termios::bg_check (int sig)
   /* Don't raise a SIGTT* signal if we have already been interrupted
      by another signal. */
   if (WaitForSingleObject (signal_arrived, 0) != WAIT_OBJECT_0)
-    kill_pgrp (myself->pgid, sig);
+    {
+      siginfo_t si;
+      si.si_signo = sig;
+      si.si_code = SI_KERNEL;
+      si.si_pid = si.si_uid = si.si_errno = 0;
+      kill_pgrp (myself->pgid, si);
+    }
   return bg_signalled;
 
 setEIO:

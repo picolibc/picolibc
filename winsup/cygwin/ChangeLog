@@ -1,3 +1,7 @@
+2004-01-15  Christopher Faylor  <cgf@redhat.com>
+
+	* gentls_offsets: Reinstate unlink of temp files.
+
 2004-01-14  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_console.cc (fhandler_console::close): Fix debugging output.

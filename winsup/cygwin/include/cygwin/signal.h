@@ -8,7 +8,7 @@ struct ucontext
   void *uc_link;
   stack_t uc_stack;
   struct sigcontext uc_mcontext;
-  sigset_t uc_sigmask;   
+  sigset_t uc_sigmask;
 };
 #endif
 
@@ -22,45 +22,41 @@ typedef union sigval
 typedef struct
 {
   int si_signo;				/* signal number */
-  int si_errno;				/* errno associated with signal */
   int si_code;				/* signal code */
+  pid_t si_pid;				/* sender's pid */
+  uid_t si_uid;				/* sender's uid */
+  int si_errno;				/* errno associated with signal */
 
   union
   {
-    int __pad[128];			/* plan for future growth */
-
+    __uint32_t __pad[120];		/* plan for future growth */
     union
     {
-    /* timers */
+      /* timers */
       struct
       {
-	unsigned int si_tid;		/* timer id */
-	unsigned int si_overrun;	/* overrun count */
+	union
+	{
+	  struct
+	  {
+	    unsigned int si_tid;	/* timer id */
+	    unsigned int si_overrun;	/* overrun count */
+	  };
+	};
+	sigval_t si_sigval;		/* signal value */
       };
-	  
-      /* POSIX signals or signals invoked by kill() */
-      struct
-      {
-	pid_t si_pid;            	/* sender's pid */
-	uid_t si_uid;            	/* sender's uid */
-      };
-      sigval_t si_sigval;		/* signal value */
     };
 
+    /* SIGCHLD */
     struct
     {
-      pid_t si_pid2;           		/* which child */
-      uid_t si_uid2;           		/* sender's uid */
-      int si_status;           		/* exit code */
+      int si_status;			/* exit code */
       clock_t si_utime;			/* user time */
       clock_t si_stime;			/* system time */
     };
 
     /* core dumping signals */
-    struct
-    {
-      void *si_addr;			/* faulting address */
-    };
+    void *si_addr;			/* faulting address */
   };
 } siginfo_t;
 #pragma pack(pop)
@@ -77,7 +73,7 @@ enum
 					   unimplemented) */
   SI_KERNEL,				/* sent by system */
 
-  ILL_ILLOP,				/* illegal opcode */
+  ILL_ILLOPC,				/* illegal opcode */
   ILL_ILLOPN,				/* illegal operand */
   ILL_ILLADR,				/* illegal addressing mode */
   ILL_ILLTRP,				/* illegal trap*/
@@ -113,7 +109,7 @@ enum
 typedef struct sigevent
 {
   sigval_t sigev_value;			/* signal value */
-  int sigev_signo;			/* signal number */ 
+  int sigev_signo;			/* signal number */
   int sigev_notify;			/* notification type */
   void (*sigev_notify_function) (sigval_t); /* notification function */
   pthread_attr_t *sigev_notify_attributes; /* notification attributes */
@@ -133,7 +129,7 @@ enum
 
 typedef void (*_sig_func_ptr)(int);
 
-struct sigaction 
+struct sigaction
 {
   union
   {

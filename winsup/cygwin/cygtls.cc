@@ -20,6 +20,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "cygthread.h"
+#include "sigproc.h"
 
 class sentry
 {
@@ -187,6 +188,12 @@ _threadinfo::find_tls (int sig)
       }
   threadlist_ix = BAD_IX;
   return res;
+}
+
+void
+_threadinfo::set_siginfo (sigpacket *pack)
+{
+  infodata = pack->si;
 }
 
 extern "C" DWORD __stdcall RtlUnwind (void *, void *, void *, DWORD);

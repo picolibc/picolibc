@@ -120,7 +120,7 @@ struct _threadinfo
   static void call2 (DWORD (*) (void *, void *), void *, void *) __attribute__ ((regparm (3)));
   static struct _threadinfo *find_tls (int sig);
   void remove (DWORD);
-  void push (__stack_t, bool = false);
+  void push (__stack_t, bool = false) __attribute__ ((regparm (3)));
   __stack_t pop ();
   bool isinitialized () {return initialized == CYGTLS_INITIALIZED || initialized == CYGTLS_EXCEPTION;}
   void set_state (bool);
@@ -131,6 +131,7 @@ struct _threadinfo
     __attribute__((regparm(3)));
   void init_threadlist_exceptions (struct _exception_list *);
   operator HANDLE () const {return tid->win32_obj_id;}
+  void set_siginfo (struct sigpacket *) __attribute__ ((regparm (3)));
   /*gentls_offsets*/
 };
 #pragma pack(pop)

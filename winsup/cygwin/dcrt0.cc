@@ -1042,9 +1042,13 @@ do_exit (int status)
       /* Kill orphaned children on group leader exit */
       if (myself->has_pgid_children && myself->pid == myself->pgid)
 	{
+	  siginfo_t si;
+	  si.si_signo = -SIGHUP;
+	  si.si_code = SI_KERNEL;
+	  si.si_pid = si.si_uid = si.si_errno = 0;
 	  sigproc_printf ("%d == pgrp %d, send SIG{HUP,CONT} to stopped children",
 			  myself->pid, myself->pgid);
-	  kill_pgrp (myself->pgid, -SIGHUP);
+	  kill_pgrp (myself->pgid, si);
 	}
     }
 

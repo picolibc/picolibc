@@ -419,30 +419,56 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
   RtlUnwind (frame, ret_here, e0, 0);
   __asm__ volatile (".equ _ret_here,.");
 
-  int sig;
+  siginfo_t si;
   /* Coerce win32 value to posix value.  */
   switch (e.ExceptionCode)
     {
     case STATUS_FLOAT_DENORMAL_OPERAND:
     case STATUS_FLOAT_DIVIDE_BY_ZERO:
-    case STATUS_FLOAT_INEXACT_RESULT:
     case STATUS_FLOAT_INVALID_OPERATION:
-    case STATUS_FLOAT_OVERFLOW:
     case STATUS_FLOAT_STACK_CHECK:
+      si.si_signo = SIGFPE;
+      si.si_sigval.sival_int = FPE_FLTSUB;
+      break;
+    case STATUS_FLOAT_INEXACT_RESULT:
+      si.si_signo = SIGFPE;
+      si.si_sigval.sival_int = FPE_FLTRES;
+      break;
+    case STATUS_FLOAT_OVERFLOW:
+      si.si_signo = SIGFPE;
+      si.si_sigval.sival_int = FPE_FLTOVF;
+      break;
     case STATUS_FLOAT_UNDERFLOW:
+      si.si_signo = SIGFPE;
+      si.si_sigval.sival_int = FPE_FLTUND;
+      break;
     case STATUS_INTEGER_DIVIDE_BY_ZERO:
+      si.si_signo = SIGFPE;
+      si.si_sigval.sival_int = FPE_INTDIV;
+      break;
     case STATUS_INTEGER_OVERFLOW:
-      sig = SIGFPE;
+      si.si_signo = SIGFPE;
+      si.si_sigval.sival_int = FPE_INTOVF;
       break;
 
     case STATUS_ILLEGAL_INSTRUCTION:
+      si.si_signo = SIGILL;
+      si.si_sigval.sival_int = ILL_ILLOPC;
+      break;
+
     case STATUS_PRIVILEGED_INSTRUCTION:
+      si.si_signo = SIGILL;
+      si.si_sigval.sival_int = ILL_PRVOPC;
+      break;
+
     case STATUS_NONCONTINUABLE_EXCEPTION:
-      sig = SIGILL;
+      si.si_signo = SIGILL;
+      si.si_sigval.sival_int = ILL_ILLADR;
       break;
 
     case STATUS_TIMEOUT:
-      sig = SIGALRM;
+      si.si_signo = SIGALRM;
+      si.si_sigval.sival_int = 0;
       break;
 
     case STATUS_ACCESS_VIOLATION:
@@ -453,11 +479,13 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
     case STATUS_NO_MEMORY:
     case STATUS_INVALID_DISPOSITION:
     case STATUS_STACK_OVERFLOW:
-      sig = SIGSEGV;
+      si.si_signo = SIGSEGV;
+      si.si_sigval.sival_int = SEGV_MAPERR;
       break;
 
     case STATUS_CONTROL_C_EXIT:
-      sig = SIGINT;
+      si.si_signo = SIGINT;
+      si.si_sigval.sival_int = 0;
       break;
 
     case STATUS_INVALID_HANDLE:
@@ -476,13 +504,14 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
     }
 
   debug_printf ("In cygwin_except_handler exc %p at %p sp %p", e.ExceptionCode, in.Eip, in.Esp);
-  debug_printf ("In cygwin_except_handler sig = %d at %p", sig, in.Eip);
+  debug_printf ("In cygwin_except_handler sig = %d at %p", si.si_signo, in.Eip);
 
-  if (global_sigs[sig].sa_mask & SIGTOMASK (sig))
-    syscall_printf ("signal %d, masked %p", sig, global_sigs[sig].sa_mask);
+  if (global_sigs[si.si_signo].sa_mask & SIGTOMASK (si.si_signo))
+    syscall_printf ("signal %d, masked %p", si.si_signo,
+		    global_sigs[si.si_signo].sa_mask);
 
   debug_printf ("In cygwin_except_handler calling %p",
-		 global_sigs[sig].sa_handler);
+		 global_sigs[si.si_signo].sa_handler);
 
   DWORD *ebp = (DWORD *)in.Esp;
   for (DWORD *bpend = (DWORD *) __builtin_frame_address (0); ebp > bpend; ebp--)
@@ -494,23 +523,18 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
 
   if (!myself->progname[0]
       || GetCurrentThreadId () == sigtid
-      || (void *) global_sigs[sig].sa_handler == (void *) SIG_DFL
-      || (void *) global_sigs[sig].sa_handler == (void *) SIG_IGN
-      || (void *) global_sigs[sig].sa_handler == (void *) SIG_ERR)
+      || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_DFL
+      || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_IGN
+      || (void *) global_sigs[si.si_signo].sa_handler == (void *) SIG_ERR)
     {
       /* Print the exception to the console */
-      if (1)
-	{
-	  for (int i = 0; status_info[i].name; i++)
-	    {
-	      if (status_info[i].code == e.ExceptionCode)
-		{
-		  if (!myself->ppid_handle)
-		    system_printf ("Exception: %s", status_info[i].name);
-		  break;
-		}
-	    }
-	}
+      for (int i = 0; status_info[i].name; i++)
+	if (status_info[i].code == e.ExceptionCode)
+	  {
+	    if (!myself->ppid_handle)
+	      system_printf ("Exception: %s", status_info[i].name);
+	    break;
+	  }
 
       /* Another exception could happen while tracing or while exiting.
 	 Only do this once.  */
@@ -529,11 +553,13 @@ handle_exceptions (EXCEPTION_RECORD *e0, void *frame, CONTEXT *in0, void *)
 	  stackdump ((DWORD) ebp, 0, 1);
 	}
 
-      signal_exit (0x80 | sig);	// Flag signal + core dump
+      signal_exit (0x80 | si.si_signo);	// Flag signal + core dump
     }
 
-  _my_tls.push ((__stack_t) ebp, true);
-  sig_send (NULL, sig, &_my_tls);	// Signal myself
+  si.si_addr = ebp;
+  si.si_code = SI_KERNEL;
+  si.si_errno = si.si_pid = si.si_uid = 0;
+  sig_send (NULL, si, &_my_tls);	// Signal myself
   return 1;
 }
 #endif /* __i386__ */
@@ -605,7 +631,14 @@ sig_handle_tty_stop (int sig)
     {
       pinfo parent (myself->ppid);
       if (ISSTATE (parent, PID_NOCLDSTOP))
-	sig_send (parent, SIGCHLD);
+	{
+	  siginfo_t si;
+	  si.si_signo = SIGCHLD;
+	  si.si_code = SI_KERNEL;
+	  si.si_sigval.sival_int = CLD_STOPPED;
+	  si.si_errno = si.si_pid = si.si_uid = si.si_errno = 0;
+	  sig_send (parent, si);
+	}
     }
   sigproc_printf ("process %d stopped by signal %d, myself->ppid_handle %p",
 		  myself->pid, sig, myself->ppid_handle);
@@ -814,8 +847,8 @@ ctrl_c_handler (DWORD type)
     {
       if (type == CTRL_CLOSE_EVENT)
         {
-	  saw_close = true;
 	  sig_send (NULL, SIGHUP);
+	  saw_close = true;
 	  return FALSE;
 	}
       if (!saw_close && type == CTRL_LOGOFF_EVENT)
@@ -849,7 +882,7 @@ ctrl_c_handler (DWORD type)
        a CTRL_C_EVENT or CTRL_BREAK_EVENT. */
     {
       t->last_ctrl_c = GetTickCount ();
-      kill (-myself->pid, SIGINT);
+      killsys (-myself->pid, SIGINT);
       t->last_ctrl_c = GetTickCount ();
       return TRUE;
     }
@@ -884,9 +917,9 @@ set_signal_mask (sigset_t newmask, sigset_t oldmask)
 }
 
 int __stdcall
-sig_handle (int sig, sigset_t mask, int pid, _threadinfo *tls)
+sigpacket::process ()
 {
-  if (sig == SIGCONT)
+  if (si.si_signo == SIGCONT)
     {
       DWORD stopped = myself->process_state & PID_STOPPED;
       myself->stopsig = 0;
@@ -901,41 +934,44 @@ sig_handle (int sig, sigset_t mask, int pid, _threadinfo *tls)
     }
 
   int rc = 1;
-  bool insigwait_mask = tls ? sigismember (&tls->sigwait_mask, sig) : false;
+  bool insigwait_mask = tls ? sigismember (&tls->sigwait_mask, si.si_signo) : false;
   bool special_case = ISSTATE (myself, PID_STOPPED) || main_vfork->pid;
-  bool masked = sigismember (&mask, sig);
-  if (sig != SIGKILL && sig != SIGSTOP
+  bool masked = sigismember (mask, si.si_signo);
+  if (si.si_signo != SIGKILL && si.si_signo != SIGSTOP
       && (special_case || main_vfork->pid || masked || insigwait_mask
-	  || (tls && sigismember (&tls->sigmask, sig))))
+	  || (tls && sigismember (&tls->sigmask, si.si_signo))))
     {
-      sigproc_printf ("signal %d blocked", sig);
+      sigproc_printf ("signal %d blocked", si.si_signo);
       if ((!special_case && !masked)
-	  && (insigwait_mask || (tls = _threadinfo::find_tls (sig)) != NULL))
+	  && (insigwait_mask || (tls = _threadinfo::find_tls (si.si_signo)) != NULL))
 	goto thread_specific;
       rc = -1;
       goto done;
     }
 
   /* Clear pending SIGCONT on stop signals */
-  if (sig == SIGSTOP || sig == SIGTSTP || sig == SIGTTIN || sig == SIGTTOU)
+  if (si.si_signo == SIGSTOP || si.si_signo == SIGTSTP || si.si_signo == SIGTTIN || si.si_signo == SIGTTOU)
     sig_clear (SIGCONT);
 
-  sigproc_printf ("signal %d processing", sig);
-  struct sigaction thissig = global_sigs[sig];
+  sigproc_printf ("signal %d processing", si.si_signo);
+  struct sigaction thissig = global_sigs[si.si_signo];
   void *handler;
   handler = (void *) thissig.sa_handler;
 
   myself->rusage_self.ru_nsignals++;
 
-  if (sig == SIGKILL)
+  if (si.si_signo == SIGKILL)
     goto exit_sig;
 
-  if (sig == SIGSTOP)
+  if (!tls)
+    tls = _main_tls;
+
+  if (si.si_signo == SIGSTOP)
     goto stop;
 
 #if 0
   char sigmsg[24];
-  __small_sprintf (sigmsg, "cygwin: signal %d\n", sig);
+  __small_sprintf (sigmsg, "cygwin: signal %d\n", si.si_signo);
   OutputDebugString (sigmsg);
 #endif
 
@@ -943,14 +979,14 @@ sig_handle (int sig, sigset_t mask, int pid, _threadinfo *tls)
     {
       if (insigwait_mask)
 	goto thread_specific;
-      if (sig == SIGCHLD || sig == SIGIO || sig == SIGCONT || sig == SIGWINCH
-	  || sig == SIGURG)
+      if (si.si_signo == SIGCHLD || si.si_signo == SIGIO || si.si_signo == SIGCONT || si.si_signo == SIGWINCH
+	  || si.si_signo == SIGURG)
 	{
-	  sigproc_printf ("default signal %d ignored", sig);
+	  sigproc_printf ("default signal %d ignored", si.si_signo);
 	  goto done;
 	}
 
-      if (sig == SIGTSTP || sig == SIGTTIN || sig == SIGTTOU)
+      if (si.si_signo == SIGTSTP || si.si_signo == SIGTTIN || si.si_signo == SIGTTOU)
 	goto stop;
 
       goto exit_sig;
@@ -958,7 +994,7 @@ sig_handle (int sig, sigset_t mask, int pid, _threadinfo *tls)
 
   if (handler == (void *) SIG_IGN)
     {
-      sigproc_printf ("signal %d ignored", sig);
+      sigproc_printf ("signal %d ignored", si.si_signo);
       goto done;
     }
 
@@ -973,34 +1009,37 @@ stop:
     goto done;
   handler = (void *) sig_handle_tty_stop;
   thissig = global_sigs[SIGSTOP];
+  goto dosig1;
 
 dosig:
+  tls->set_siginfo (this);
+dosig1:
   /* Dispatch to the appropriate function. */
-  sigproc_printf ("signal %d, about to call %p", sig, handler);
-  rc = setup_handler (sig, handler, thissig, tls ?: _main_tls);
+  sigproc_printf ("signal %d, about to call %p", si.si_signo, handler);
+  rc = setup_handler (si.si_signo, handler, thissig, tls);
 
 done:
   sigproc_printf ("returning %d", rc);
   return rc;
 
 thread_specific:
-  tls->sig = sig;
+  tls->sig = si.si_signo;
   sigproc_printf ("releasing sigwait for thread");
   SetEvent (tls->event);
   goto done;
 
 exit_sig:
-  if (sig == SIGQUIT || sig == SIGABRT)
+  if (si.si_signo == SIGQUIT || si.si_signo == SIGABRT)
     {
       CONTEXT c;
       c.ContextFlags = CONTEXT_FULL;
       GetThreadContext (hMainThread, &c);
       if (!try_to_debug ())
 	stackdump (c.Ebp, 1, 1);
-      sig |= 0x80;
+      si.si_signo |= 0x80;
     }
-  sigproc_printf ("signal %d, about to call do_exit", sig);
-  signal_exit (sig);
+  sigproc_printf ("signal %d, about to call do_exit", si.si_signo);
+  signal_exit (si.si_signo);
   /* Never returns */
 }
 
