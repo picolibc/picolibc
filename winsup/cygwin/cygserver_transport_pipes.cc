@@ -34,10 +34,10 @@ details. */
 #endif
 
 enum
-{
-  MAX_WAIT_NAMED_PIPE_RETRY = 64,
-  WAIT_NAMED_PIPE_TIMEOUT = 10	// milliseconds
-};
+  {
+    MAX_WAIT_NAMED_PIPE_RETRY = 64,
+    WAIT_NAMED_PIPE_TIMEOUT = 10 // milliseconds
+  };
 
 #ifndef __INSIDE_CYGWIN__
 
@@ -46,7 +46,7 @@ static CRITICAL_SECTION pipe_instance_lock;
 static long pipe_instance = 0;
 
 static void
-initialise_pipe_instance_lock()
+initialise_pipe_instance_lock ()
 {
   assert (pipe_instance == 0);
   InitializeCriticalSection (&pipe_instance_lock);
@@ -63,7 +63,7 @@ transport_layer_pipes::transport_layer_pipes (const HANDLE new_pipe)
 {
   assert (pipe && pipe != INVALID_HANDLE_VALUE);
 
-  init_security();
+  init_security ();
 }
 
 #endif /* !__INSIDE_CYGWIN__ */
@@ -73,11 +73,11 @@ transport_layer_pipes::transport_layer_pipes ()
     pipe (NULL),
     is_accepted_endpoint (false)
 {
-  init_security();
+  init_security ();
 }
 
 void
-transport_layer_pipes::init_security()
+transport_layer_pipes::init_security ()
 {
   assert (wincap.has_security ());
 
@@ -209,7 +209,7 @@ transport_layer_pipes::close ()
 }
 
 ssize_t
-transport_layer_pipes::read (void * const buf, const size_t len)
+transport_layer_pipes::read (void *const buf, const size_t len)
 {
   // verbose: debug_printf ("reading from pipe %p", pipe);
 
@@ -233,7 +233,7 @@ transport_layer_pipes::read (void * const buf, const size_t len)
 }
 
 ssize_t
-transport_layer_pipes::write (void * const buf, const size_t len)
+transport_layer_pipes::write (void *const buf, const size_t len)
 {
   // verbose: debug_printf ("writing to pipe %p", pipe);
 
@@ -284,12 +284,12 @@ transport_layer_pipes::connect ()
   while (rc)
     {
       pipe = CreateFile (pipe_name,
-			   GENERIC_READ | GENERIC_WRITE,
-			   FILE_SHARE_READ | FILE_SHARE_WRITE,
-			   &sec_all_nih,
-			   OPEN_EXISTING,
-			   SECURITY_IMPERSONATION,
-			   NULL);
+			 GENERIC_READ | GENERIC_WRITE,
+			 FILE_SHARE_READ | FILE_SHARE_WRITE,
+			 &sec_all_nih,
+			 OPEN_EXISTING,
+			 SECURITY_IMPERSONATION,
+			 NULL);
 
       if (pipe != INVALID_HANDLE_VALUE)
 	{
@@ -348,9 +348,10 @@ transport_layer_pipes::impersonate_client ()
       assert (pipe != INVALID_HANDLE_VALUE);
 
       if (!ImpersonateNamedPipeClient (pipe))
-	debug_printf ("Failed to Impersonate the client, (%lu)", GetLastError ());
+	debug_printf ("Failed to Impersonate the client, (%lu)",
+		      GetLastError ());
     }
-  // verbose: debug_printf("I am who you are");
+  // verbose: debug_printf ("I am who you are");
 }
 
 void
@@ -359,7 +360,7 @@ transport_layer_pipes::revert_to_self ()
   assert (is_accepted_endpoint);
 
   RevertToSelf ();
-  // verbose: debug_printf("I am who I yam");
+  // verbose: debug_printf ("I am who I yam");
 }
 
 #endif /* !__INSIDE_CYGWIN__ */
