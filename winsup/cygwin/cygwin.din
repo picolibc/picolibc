@@ -12,6 +12,7 @@ __rcmd_errstr DATA
 _check_for_executable DATA
 _ctype_ DATA
 _daylight DATA
+_impure_ptr DATA
 _sys_errlist DATA
 sys_errlist = _sys_errlist DATA
 _sys_nerr DATA

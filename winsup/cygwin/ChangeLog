@@ -1,3 +1,7 @@
+2004-09-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din (_impure_ptr): And export again. There are libs out there.
+
 2004-09-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din (_impure_ptr): Don't export.
