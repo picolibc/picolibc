@@ -27,13 +27,12 @@
 ** version 1.2.1 Specification.
 */
 
-/*
- * 2002-Apr-15, Marcus Geelnard:
- *   Changed GLAPIENTRY to APIENTRY.
- */
-
 #ifndef __glu_h__
 #define __glu_h__
+#define _GLU_H
+#if __GNUC__ >= 3
+#pragma GCC system_header
+#endif
 
 #include <GL/gl.h>
 
@@ -43,10 +42,6 @@ extern "C" {
 
 /*************************************************************/
 
-/* Extensions */
-#define GLU_EXT_object_space_tess          1
-#define GLU_EXT_nurbs_tessellator          1
-
 /* Boolean */
 #define GLU_FALSE                          0
 #define GLU_TRUE                           1
@@ -54,7 +49,6 @@ extern "C" {
 /* Version */
 #define GLU_VERSION_1_1                    1
 #define GLU_VERSION_1_2                    1
-#define GLU_VERSION_1_3                    1
 
 /* StringName */
 #define GLU_VERSION                        100800
@@ -70,34 +64,6 @@ extern "C" {
 /*      GLU_FILL */
 #define GLU_OUTLINE_POLYGON                100240
 #define GLU_OUTLINE_PATCH                  100241
-
-/* NurbsCallback */
-#define GLU_NURBS_ERROR                    100103
-#define GLU_ERROR                          100103
-#define GLU_NURBS_BEGIN                    100164
-#define GLU_NURBS_BEGIN_EXT                100164
-#define GLU_NURBS_VERTEX                   100165
-#define GLU_NURBS_VERTEX_EXT               100165
-#define GLU_NURBS_NORMAL                   100166
-#define GLU_NURBS_NORMAL_EXT               100166
-#define GLU_NURBS_COLOR                    100167
-#define GLU_NURBS_COLOR_EXT                100167
-#define GLU_NURBS_TEXTURE_COORD            100168
-#define GLU_NURBS_TEX_COORD_EXT            100168
-#define GLU_NURBS_END                      100169
-#define GLU_NURBS_END_EXT                  100169
-#define GLU_NURBS_BEGIN_DATA               100170
-#define GLU_NURBS_BEGIN_DATA_EXT           100170
-#define GLU_NURBS_VERTEX_DATA              100171
-#define GLU_NURBS_VERTEX_DATA_EXT          100171
-#define GLU_NURBS_NORMAL_DATA              100172
-#define GLU_NURBS_NORMAL_DATA_EXT          100172
-#define GLU_NURBS_COLOR_DATA               100173
-#define GLU_NURBS_COLOR_DATA_EXT           100173
-#define GLU_NURBS_TEXTURE_COORD_DATA       100174
-#define GLU_NURBS_TEX_COORD_DATA_EXT       100174
-#define GLU_NURBS_END_DATA                 100175
-#define GLU_NURBS_END_DATA_EXT             100175
 
 /* NurbsError */
 #define GLU_NURBS_ERROR1                   100251
@@ -138,27 +104,7 @@ extern "C" {
 #define GLU_NURBS_ERROR36                  100286
 #define GLU_NURBS_ERROR37                  100287
 
-/* NurbsProperty */
-#define GLU_AUTO_LOAD_MATRIX               100200
-#define GLU_CULLING                        100201
-#define GLU_SAMPLING_TOLERANCE             100203
-#define GLU_DISPLAY_MODE                   100204
-#define GLU_PARAMETRIC_TOLERANCE           100202
-#define GLU_SAMPLING_METHOD                100205
-#define GLU_U_STEP                         100206
-#define GLU_V_STEP                         100207
-#define GLU_NURBS_MODE                     100160
-#define GLU_NURBS_MODE_EXT                 100160
-#define GLU_NURBS_TESSELLATOR              100161
-#define GLU_NURBS_TESSELLATOR_EXT          100161
-#define GLU_NURBS_RENDERER                 100162
-#define GLU_NURBS_RENDERER_EXT             100162
-
 /* NurbsSampling */
-#define GLU_OBJECT_PARAMETRIC_ERROR        100208
-#define GLU_OBJECT_PARAMETRIC_ERROR_EXT    100208
-#define GLU_OBJECT_PATH_LENGTH             100209
-#define GLU_OBJECT_PATH_LENGTH_EXT         100209
 #define GLU_PATH_LENGTH                    100215
 #define GLU_PARAMETRIC_ERROR               100216
 #define GLU_DOMAIN_DISTANCE                100217
@@ -238,6 +184,10 @@ extern "C" {
 #define GLU_TESS_WINDING_NEGATIVE          100133
 #define GLU_TESS_WINDING_ABS_GEQ_TWO       100134
 
+/* Obsolete. For compatibility with previous Sun OpenGL versions */
+#define GLU_INCOMPATIBLE_GL_VERSION        100903
+
+
 /*************************************************************/
 
 
@@ -265,13 +215,8 @@ GLAPI void APIENTRY gluBeginCurve (GLUnurbs* nurb);
 GLAPI void APIENTRY gluBeginPolygon (GLUtesselator* tess);
 GLAPI void APIENTRY gluBeginSurface (GLUnurbs* nurb);
 GLAPI void APIENTRY gluBeginTrim (GLUnurbs* nurb);
-GLAPI GLint APIENTRY gluBuild1DMipmapLevels (GLenum target, GLint internalFormat, GLsizei width, GLenum format, GLenum type, GLint level, GLint base, GLint max, const void *data);
 GLAPI GLint APIENTRY gluBuild1DMipmaps (GLenum target, GLint internalFormat, GLsizei width, GLenum format, GLenum type, const void *data);
-GLAPI GLint APIENTRY gluBuild2DMipmapLevels (GLenum target, GLint internalFormat, GLsizei width, GLsizei height, GLenum format, GLenum type, GLint level, GLint base, GLint max, const void *data);
 GLAPI GLint APIENTRY gluBuild2DMipmaps (GLenum target, GLint internalFormat, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *data);
-GLAPI GLint APIENTRY gluBuild3DMipmapLevels (GLenum target, GLint internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, GLint level, GLint base, GLint max, const void *data);
-GLAPI GLint APIENTRY gluBuild3DMipmaps (GLenum target, GLint internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, const void *data);
-GLAPI GLboolean APIENTRY gluCheckExtension (const GLubyte *extName, const GLubyte *extString);
 GLAPI void APIENTRY gluCylinder (GLUquadric* quad, GLdouble base, GLdouble top, GLdouble height, GLint slices, GLint stacks);
 GLAPI void APIENTRY gluDeleteNurbsRenderer (GLUnurbs* nurb);
 GLAPI void APIENTRY gluDeleteQuadric (GLUquadric* quad);
@@ -292,8 +237,6 @@ GLAPI GLUquadric* APIENTRY gluNewQuadric (void);
 GLAPI GLUtesselator* APIENTRY gluNewTess (void);
 GLAPI void APIENTRY gluNextContour (GLUtesselator* tess, GLenum type);
 GLAPI void APIENTRY gluNurbsCallback (GLUnurbs* nurb, GLenum which, _GLUfuncptr CallBackFunc);
-GLAPI void APIENTRY gluNurbsCallbackData (GLUnurbs* nurb, GLvoid* userData);
-GLAPI void APIENTRY gluNurbsCallbackDataEXT (GLUnurbs* nurb, GLvoid* userData);
 GLAPI void APIENTRY gluNurbsCurve (GLUnurbs* nurb, GLint knotCount, GLfloat *knots, GLint stride, GLfloat *control, GLint order, GLenum type);
 GLAPI void APIENTRY gluNurbsProperty (GLUnurbs* nurb, GLenum property, GLfloat value);
 GLAPI void APIENTRY gluNurbsSurface (GLUnurbs* nurb, GLint sKnotCount, GLfloat* sKnots, GLint tKnotCount, GLfloat* tKnots, GLint sStride, GLint tStride, GLfloat* control, GLint sOrder, GLint tOrder, GLenum type);

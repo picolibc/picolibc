@@ -1,5 +1,13 @@
 2003-09-24  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/GL/glu.h: Rewritten from scratch. Started from GLU 1.3
+	headers from OpenGL Sample Implementation. Windows ships with
+	GLU 1.2 so some constants and functions were removed. Then some
+	typedef's and function declarations were reworked to look like
+	the previous GL/glu.h.
+
+2003-09-24  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/uxtheme.h (PROPERTYORIGIN): the documentation of
 	PROPERTYORIGIN suggests it's `PROPERTYORIGIN' but experimentation
 	suggests it's actually `enum PROPERTYORIGIN'. Keep both.
