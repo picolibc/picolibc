@@ -352,13 +352,21 @@ fhandler_socket::close ()
   setsockopt (get_socket (), SOL_SOCKET, SO_LINGER,
 	      (const char *)&linger, sizeof linger);
 
-  while ((res = closesocket (get_socket ()))
-	 && WSAGetLastError () == WSAEWOULDBLOCK)
-    continue;
-  if (res)
+  while ((res = closesocket (get_socket ())) != 0)
     {
-      set_winsock_errno ();
-      res = -1;
+      if (WSAGetLastError () != WSAEWOULDBLOCK)
+	{
+	  set_winsock_errno ();
+	  res = -1;
+	  break;
+	}
+      if (WaitForSingleObject (signal_arrived, 10) == WAIT_OBJECT_0)
+	{
+	  set_errno (EINTR);
+	  res = -1;
+	  break;
+	}
+      WSASetLastError (0);
     }
 
   close_secret_event ();

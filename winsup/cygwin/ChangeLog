@@ -1,3 +1,9 @@
+2002-03-05  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_socket.cc (fhandler_socket::close): Respond to signals while
+	looping, waiting for socket to close.  Superstitiously clear last error
+	when WSAEWOULDBLOCK.
+
 2002-03-05  Robert Collins  <rbtcollins@hotmail.com>
 
 	* cygserver_transport_pipes.cc (transport_layer_pipes::transport_layer_pipes): 
