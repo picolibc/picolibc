@@ -1,3 +1,8 @@
+2003-07-22  Alexandre Oliva  <aoliva@redhat.com>
+
+	* Makefile.tpl (all-make): Depend on intl.
+	* Makefile.in: Rebuilt.
+
 2003-07-16  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	* config.if: Remove unused libc_interface determination.
