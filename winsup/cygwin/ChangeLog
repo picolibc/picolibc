@@ -1,5 +1,12 @@
 2005-02-08  Corinna Vinschen  <corinna@vinschen.de>
 
+	* times.cc (timeval_to_filetime): Define first parameter const.
+	(utimes): Define second parameter to const according to SUSv3.
+	(utime): Ditto.
+	* include/sys/utime.h (utime) : Change declaration accordingly.
+
+2005-02-08  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygthread.cc (cygthread::detach): Just test thread handle after
 	signal arrived, don't wait infinitely for it.
 

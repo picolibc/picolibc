@@ -30,7 +30,7 @@ details. */
 #define FACTOR (0x19db1ded53e8000LL)
 #define NSPERSEC 10000000LL
 
-static void __stdcall timeval_to_filetime (timeval *time, FILETIME *out);
+static void __stdcall timeval_to_filetime (const struct timeval *time, FILETIME *out);
 
 /* Cygwin internal */
 static unsigned long long __stdcall
@@ -185,7 +185,7 @@ time_t_to_filetime (time_t time_in, FILETIME *out)
 
 /* Cygwin internal */
 static void __stdcall
-timeval_to_filetime (timeval *time_in, FILETIME *out)
+timeval_to_filetime (const struct timeval *time_in, FILETIME *out)
 {
   long long x = time_in->tv_sec * NSPERSEC +
 			time_in->tv_usec * (NSPERSEC/1000000) + FACTOR;
@@ -446,7 +446,7 @@ gmtime (const time_t *tim_p)
 
 /* utimes: standards? */
 extern "C" int
-utimes (const char *path, struct timeval *tvp)
+utimes (const char *path, const struct timeval *tvp)
 {
   int res = 0;
   struct timeval tmp[2];
@@ -528,7 +528,7 @@ utimes (const char *path, struct timeval *tvp)
 
 /* utime: POSIX 5.6.6.1 */
 extern "C" int
-utime (const char *path, struct utimbuf *buf)
+utime (const char *path, const struct utimbuf *buf)
 {
   struct timeval tmp[2];
 
