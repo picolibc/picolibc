@@ -1,3 +1,10 @@
+2003-04-04  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/_mingw.h:[__cplusplus] Include <bits/c++config.h>.
+	(__HAVE_STD_CXX): Rename to __MINGW_USE_NAMESPACES.
+	Depend on _GLIBCPP_USE_NAMESPACES, not __GNUC__ version.
+	* include/time.h (_wctime): Qualify time_t with __CSTD.
+
 2003-04-01  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* samples/dlltest/expexe.def (NAME): Add.

@@ -87,22 +87,24 @@
 #define __MINGW32_MINOR_VERSION 0
 
 /*  ISO C++.  */
-#ifndef __HAVE_STD_CXX
-#if  __GNUC__ >= 3 && __GNUC_MINOR__ >= 3
-#define __HAVE_STD_CXX 1
-#else
-#define __HAVE_STD_CXX 0
-#endif
-#endif
-
 #ifdef __cplusplus
+#include <bits/c++config.h>
+
+# ifndef __MINGW_USE_NAMESPACES
+#  if  _GLIBCPP_USE_NAMESPACES
+#   define __MINGW_USE_NAMESPACES 1
+#  else
+#   define __MINGW_USE_NAMESPACES 0
+#  endif
+# endif
+
 # if !(defined(__BEGIN_CSTD_NAMESPACE) \
        && defined(__END_CSTD_NAMESPACE))
-#  if  __HAVE_STD_CXX
+#  if  __MINGW_USE_NAMESPACES
 #   define __BEGIN_CSTD_NAMESPACE namespace std { extern "C" {
 #   define __END_CSTD_NAMESPACE  } }
 #   define __CSTD std::
-#  else
+#  else  /* __MINGW_USE_NAMESPACES */
 #   define __BEGIN_CSTD_NAMESPACE extern "C" {
 #   define __END_CSTD_NAMESPACE  }
 #   define __CSTD
@@ -114,13 +116,16 @@
 #  define __END_CGLOBAL_NAMESPACE  }
 #  define __CGLOBAL ::
 # endif /* !defined(__BEGIN_CGLOBAL_NAMESPACE) */ 
-#else /* !__cplusplus */
+
+#else /* __cplusplus */
+
 # define __BEGIN_CSTD_NAMESPACE
 # define __END_CSTD_NAMESPACE
 # define __CSTD 
 # define __BEGIN_CGLOBAL_NAMESPACE
 # define __END_CGLOBAL_NAMESPACE
 # define __CGLOBAL
-#endif
+
+#endif /* !__cplusplus */
 
 #endif /* __MINGW_H */

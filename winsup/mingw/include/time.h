@@ -183,7 +183,7 @@ __MINGW_IMPORT char 	*tzname[2];
 /* wide function prototypes, also declared in wchar.h */
 
 _CRTIMP wchar_t* __cdecl	_wasctime(const struct tm*);
-_CRTIMP wchar_t* __cdecl	_wctime(const time_t*);
+_CRTIMP wchar_t* __cdecl	_wctime(const __CSTD time_t*);
 _CRTIMP wchar_t* __cdecl	_wstrdate(wchar_t*);
 _CRTIMP wchar_t* __cdecl	_wstrtime(wchar_t*);
 
