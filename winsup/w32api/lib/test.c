@@ -74,6 +74,9 @@
 #include <winber.h>
 #include <winldap.h>
 #include <shlwapi.h>
+#include <snmp.h>
+#include <winsnmp.h>
+#include <mgmtapi.h>
 
 #ifndef __OBJC__  /* problems with BOOL */
 #include <ole2.h>
