@@ -199,6 +199,8 @@ typedef wchar_t _TCHAR;
 #define _tmkdir		_wmkdir
 #define _trmdir		_wrmdir
 #define _tstat		_wstat
+#define _tstati64	_wstati64
+#define _tstat64	_wstat64
 #endif  /* __MSVCRT__ */
 
 /* dirent structures and functions */
@@ -374,6 +376,8 @@ typedef char	_TCHAR;
 #define _tfindfirsti64  _findfirsti64
 #define _tfindnexti64   _findnexti64
 #define _tfinddatai64_t _finddatai64_t
+#define _tstati64   _stati64
+#define _tstat64    _stat64
 #endif  /* __MSVCRT__ */
 
 /* dirent structures and functions */

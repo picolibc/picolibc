@@ -1,5 +1,9 @@
 2005-02-11  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/tchar.h (_tstat64, _tstati64): Add Unicode/ANSI mappings.
+
+2005-02-11  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/assert.h; Remove header guard.  #undef assert macro.
 	(_assert): Use __MINGW_ATTRIB_NORETURN define.
 
