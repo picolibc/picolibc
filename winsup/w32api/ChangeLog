@@ -1,6 +1,13 @@
+2002-01-28  Mattia Barbon  <mbarbon@users.sourceforge.net>
+
+	* include/winuser.h (GWLP_*,DWLP_*): Add missing constants.
+	(GetWindowLongPtr[AW], SetWindowLongPtr[AW]): Map them to
+	{Get Set}WindowLong[AW], as in Win32 they are equivalent.
+	(GetWindowLongPtr, SetWindowLongPtr): Add Unicode mappings.
+
 2002-01-28  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* lib/test.c: Include wsnetbsd.h.
+	* lib/test.c: Include wsnetbs.h.
 
 2002-01-28  Kai Henningsen  <kai-henningsen@users.sourceforge.net>
 

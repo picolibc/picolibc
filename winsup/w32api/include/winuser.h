@@ -701,13 +701,21 @@ extern "C" {
 #define GWL_EXSTYLE (-20)
 #define GWL_STYLE (-16)
 #define GWL_WNDPROC (-4)
+#define GWLP_WNDPROC (-4)
 #define GWL_HINSTANCE (-6)
+#define GWLP_HINSTANCE (-6)
 #define GWL_HWNDPARENT (-8)
+#define GWLP_HWNDPARENT (-8)
 #define GWL_ID (-12)
+#define GWLP_ID (-12)
 #define GWL_USERDATA (-21)
+#define GWLP_USERDATA (-21)
 #define DWL_DLGPROC 4
+#define DWLP_DLGPROC 4
 #define DWL_MSGRESULT 0
+#define DWLP_MSGRESULT 0
 #define DWL_USER 8
+#define DWLP_USER 8
 #define QS_ALLEVENTS 191
 #define QS_ALLINPUT 255
 #define QS_HOTKEY 128
@@ -2846,6 +2854,8 @@ DWORD WINAPI GetTabbedTextExtentA(HDC,LPCSTR,int,int,LPINT);
 DWORD WINAPI GetTabbedTextExtentW(HDC,LPCWSTR,int,int,LPINT);
 LONG WINAPI GetWindowLongA(HWND,int);
 LONG WINAPI GetWindowLongW(HWND,int);
+#define GetWindowLongPtrA GetWindowLongA
+#define GetWindowLongPtrW GetWindowLongW
 HDESK WINAPI GetThreadDesktop(DWORD);
 HWND WINAPI GetTopWindow(HWND);
 BOOL WINAPI GetUpdateRect(HWND,LPRECT,BOOL);
@@ -3063,6 +3073,8 @@ BOOL WINAPI SetUserObjectSecurity(HANDLE,PSECURITY_INFORMATION,PSECURITY_DESCRIP
 BOOL WINAPI SetWindowContextHelpId(HWND,DWORD);
 LONG WINAPI SetWindowLongA(HWND,int,LONG);
 LONG WINAPI SetWindowLongW(HWND,int,LONG);
+#define SetWindowLongPtrA SetWindowLongA
+#define SetWindowLongPtrW SetWindowLongW
 BOOL WINAPI SetWindowPlacement(HWND hWnd,const WINDOWPLACEMENT*);
 BOOL WINAPI SetWindowPos(HWND,HWND,int,int,int,int,UINT);
 int WINAPI SetWindowRgn(HWND,HRGN,BOOL);
@@ -3210,6 +3222,7 @@ typedef MULTIKEYHELPW MULTIKEYHELP,*PMULTIKEYHELP,*LPMULTIKEYHELP;
 #define GetTabbedTextExtent GetTabbedTextExtentW
 #define GetUserObjectInformation GetUserObjectInformationW
 #define GetWindowLong GetWindowLongW
+#define GetWindowLongPtr GetWindowLongPtrW
 #define GetWindowText GetWindowTextW
 #define GetWindowTextLength GetWindowTextLengthW
 #define GetAltTabInfo GetAltTabInfoW
@@ -3262,6 +3275,7 @@ typedef MULTIKEYHELPW MULTIKEYHELP,*PMULTIKEYHELP,*LPMULTIKEYHELP;
 #define SetProp SetPropW
 #define SetUserObjectInformation SetUserObjectInformationW
 #define SetWindowLong SetWindowLongW
+#define SetWindowLongPtr SetWindowLongPtrW
 #define SetWindowsHook SetWindowsHookW
 #define SetWindowsHookEx SetWindowsHookExW
 #define SetWindowText SetWindowTextW
@@ -3361,6 +3375,7 @@ typedef MULTIKEYHELPA MULTIKEYHELP,*PMULTIKEYHELP,*LPMULTIKEYHELP;
 #define GetTabbedTextExtent GetTabbedTextExtentA
 #define GetUserObjectInformation GetUserObjectInformationA
 #define GetWindowLong GetWindowLongA
+#define GetWindowLongPtr GetWindowLongPtrA
 #define GetWindowText GetWindowTextA
 #define GetWindowTextLength GetWindowTextLengthA
 #define GetAltTabInfo GetAltTabInfoA
@@ -3413,6 +3428,7 @@ typedef MULTIKEYHELPA MULTIKEYHELP,*PMULTIKEYHELP,*LPMULTIKEYHELP;
 #define SetProp SetPropA
 #define SetUserObjectInformation SetUserObjectInformationA
 #define SetWindowLong SetWindowLongA
+#define SetWindowLongPtr SetWindowLongPtrA
 #define SetWindowsHook SetWindowsHookA
 #define SetWindowsHookEx SetWindowsHookExA
 #define SetWindowText SetWindowTextA
