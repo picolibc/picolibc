@@ -146,12 +146,12 @@ class fhandler_base
   /* Non-virtual simple accessor functions. */
   void set_io_handle (HANDLE x) { io_handle = x; }
 
-  DWORD get_device () { return dev.devn; }
-  DWORD get_major () { return dev.major; }
-  DWORD get_minor () { return dev.minor; }
-  virtual int get_unit () { return dev.minor; }
+  DWORD get_device () const { return dev.devn; }
+  DWORD get_major () const { return dev.major; }
+  DWORD get_minor () const { return dev.minor; }
+  virtual int get_unit () const { return dev.minor; }
 
-  int get_access () { return access; }
+  int get_access () const { return access; }
   void set_access (int x) { access = x; }
 
   bool get_async () { return FHISSETF (ASYNC); }
@@ -359,7 +359,7 @@ class fhandler_base
   virtual int closedir (DIR *);
   virtual bool is_slow () {return 0;}
   bool is_auto_device () {return isdevice () && !dev.isfs ();}
-  bool is_fs_device () {return dev.isfs ();}
+  bool is_fs_special () {return dev.isfs ();}
   bool device_access_denied (int) __attribute__ ((regparm (1)));
 };
 
@@ -442,12 +442,13 @@ class fhandler_socket: public fhandler_base
 
 class fhandler_pipe: public fhandler_base
 {
+protected:
   HANDLE guard;
   bool broken_pipe;
   HANDLE writepipe_exists;
   DWORD orig_pid;
   unsigned id;
- public:
+public:
   fhandler_pipe ();
   __off64_t lseek (__off64_t offset, int whence);
   select_record *select_read (select_record *s);
@@ -463,20 +464,32 @@ class fhandler_pipe: public fhandler_base
   void fixup_after_exec (HANDLE);
   bool hit_eof ();
   void set_eof () {broken_pipe = true;}
-  friend int make_pipe (int fildes[2], unsigned int psize, int mode);
   HANDLE get_guard () const {return guard;}
   int ready_for_read (int fd, DWORD howlong);
   static int create (fhandler_pipe *[2], unsigned, int, bool = false);
   bool is_slow () {return 1;}
+  friend class fhandler_fifo;
 };
 
 class fhandler_fifo: public fhandler_pipe
 {
+  HANDLE output_handle;
+  HANDLE owner;		// You can't have too many mutexes, now, can you?
+  ATOM upand;
+  long read_use;
+  long write_use;
 public:
   fhandler_fifo ();
   int open (path_conv *, int flags, mode_t mode = 0);
+  int open_not_mine (int flags) __attribute__ ((regparm (2)));
+  int close ();
+  void set_use (int flags) __attribute__ ((regparm (2)));
   bool isfifo () { return true; }
+  HANDLE& get_output_handle () { return output_handle; }
+  void set_output_handle (HANDLE h) { output_handle = h; }
+  void set_use ();
   bool is_slow () {return 1;}
+  ATOM& get_atom () {return upand;}
 };
 
 class fhandler_dev_raw: public fhandler_base
@@ -897,7 +910,9 @@ class fhandler_tty_slave: public fhandler_tty_common
 class fhandler_pty_master: public fhandler_tty_common
 {
   int pktmode;			// non-zero if pty in a packet mode.
- public:
+protected:
+  device slave;			// device type of slave
+public:
   int need_nl;			// Next read should start with \n
 
   /* Constructor */
@@ -921,6 +936,7 @@ class fhandler_pty_master: public fhandler_tty_common
 
   void set_close_on_exec (int val);
   bool hit_eof ();
+  int get_unit () const { return slave.minor; }
 };
 
 class fhandler_tty_master: public fhandler_pty_master
