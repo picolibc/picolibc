@@ -1,5 +1,14 @@
 2002-04-26  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/fenv.h: Change header guard macro to _FENV_H_.
+	(fenv_t, fexcept_t): Move into block protected by
+	#ifndef RC_INVOKED.
+	Cleanup some whitespace.
+	* include/inttypes.h: Change header guard macro to
+	_INTTYPES_H_.
+
+2002-04-26  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/math.h (copysignl): Declare.
 	* mingwex/Makefile.in (DISTFILES): Add copysignl.S.
 	(MATHOBJS):Add copysignl.o.

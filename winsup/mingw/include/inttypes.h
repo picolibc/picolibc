@@ -1,7 +1,7 @@
 /* 7.8 Format conversion of integer types <inttypes.h> */
 
-#ifndef _INTTYPES_H
-#define _INTTYPES_H
+#ifndef _INTTYPES_H_
+#define _INTTYPES_H_
 
 #include <stdint.h>
 #define __need_wchar_t
