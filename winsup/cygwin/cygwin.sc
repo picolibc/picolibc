@@ -107,5 +107,5 @@ SECTIONS
   {
     __system_dlls__ = ABSOLUTE(.) ;
     __cygheap_start = ABSOLUTE(.) ;
-  } 
+  }
 }

@@ -112,7 +112,7 @@
 #define	_SIOW(x,y,t)	((int)(SIOC_IN|((sizeof(t)&SIOCPARM_MASK)<<16)|(x<<8)|y))
 /* this should be _SIORW, but stdio got there first */
 #define	_SIOWR(x,y,t)	((int)(SIOC_INOUT|((sizeof(t)&SIOCPARM_MASK)<<16)|(x<<8)|y))
-#define _SIOC_SIZE(x)	((x>>16)&SIOCPARM_MASK)	
+#define _SIOC_SIZE(x)	((x>>16)&SIOCPARM_MASK)
 #define _SIOC_DIR(x)	(x & 0xf0000000)
 #define _SIOC_NONE	SIOC_VOID
 #define _SIOC_READ	SIOC_OUT
@@ -272,14 +272,14 @@ struct patch_info {
 		unsigned char	tremolo_sweep;
 		unsigned char	tremolo_rate;
 		unsigned char	tremolo_depth;
-	
+
 		unsigned char	vibrato_sweep;
 		unsigned char	vibrato_rate;
 		unsigned char	vibrato_depth;
 
 		int		scale_frequency;
 		unsigned int	scale_factor;		/* from 0 to 2048 or 0 to 2 */
-	
+
 		int		volume;
 		int		fractions;
 		int		reserved1;
@@ -408,7 +408,7 @@ struct sysex_info {
 #define    CTRL_EXPRESSION		253	/* Obsolete */
 #define    CTRL_MAIN_VOLUME		252	/* Obsolete */
 #define SEQ_BALANCE		11
-#define SEQ_VOLMODE             12
+#define SEQ_VOLMODE		12
 
 /*
  * Volume mode decides how volumes are used
@@ -438,7 +438,7 @@ struct sysex_info {
  *	When a SEQ_FULLSIZE message is written to the device, it must
  *	be written using exactly one write() call. Other events cannot
  *	be mixed to the same write.
- *	
+ *
  *	For FM synths (YM3812/OPL3) use struct sbi_instrument and write it to the
  *	/dev/sequencer. Don't write other data together with the instrument structure
  *	Set the key field of the structure to FM_PATCH. The device field is used to
@@ -480,13 +480,13 @@ struct synth_info {	/* Read only */
 
 #define SAMPLE_TYPE_BASIC		0x10
 #define SAMPLE_TYPE_GUS			SAMPLE_TYPE_BASIC
-#define SAMPLE_TYPE_WAVEFRONT           0x11
+#define SAMPLE_TYPE_WAVEFRONT		0x11
 
 		int	perc_mode;	/* No longer supported */
 		int	nr_voices;
 		int	nr_drums;	/* Obsolete field */
 		int	instr_bank_size;
-		unsigned int	capabilities;	
+		unsigned int	capabilities;
 #define SYNTH_CAP_PERCMODE		0x00000001 /* No longer used */
 #define SYNTH_CAP_OPL3			0x00000002 /* Set if OPL3 supported */
 #define SYNTH_CAP_INPUT			0x00000004 /* Input (MIDI) device */
@@ -687,7 +687,7 @@ typedef struct copr_debug_buf {
 		int command;	/* Used internally. Set to 0 */
 		int parm1;
 		int parm2;
-		int flags;	
+		int flags;
 		int len;	/* Length of data in bytes */
 	} copr_debug_buf;
 
@@ -696,7 +696,7 @@ typedef struct copr_msg {
 		unsigned char data[4000];
 	} copr_msg;
 
-#define SNDCTL_COPR_RESET             _SIO  ('C',  0)
+#define SNDCTL_COPR_RESET	      _SIO  ('C',  0)
 #define SNDCTL_COPR_LOAD	      _SIOWR('C',  1, copr_buffer)
 #define SNDCTL_COPR_RDATA	      _SIOWR('C',  2, copr_debug_buf)
 #define SNDCTL_COPR_RCODE	      _SIOWR('C',  3, copr_debug_buf)
@@ -710,7 +710,7 @@ typedef struct copr_msg {
 /*********************************************
  * IOCTL commands for /dev/mixer
  */
-	
+
 /*
  * Mixer devices
  *

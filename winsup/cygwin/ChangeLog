@@ -724,7 +724,7 @@ Sun Oct 21 19:04:37 2001 Alexander Gottwald <ago@informatik.tu-chemnitz.de>
 	* include/cygwin/mtio.h: Define DEFTAPE.
 	(struct mtget): Add member `mt_eotwarningzonesize'. Add a comment.
 	* include/cygwin/version.h: Bump API minor version to 47.
-	
+
 2001-10-16  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler.cc (fhandler_base::fork_fixup): Guard against compiler
@@ -1404,8 +1404,7 @@ Mon Sep 24 17:41:03 2001  Christopher Faylor <cgf@redhat.com>
 	* dtable.cc (dtable::build_fhandler): Fill out set_names here, if
 	appropriate.
 	* syscalls.cc (_open): Call set_names in build_fhandler.
-	
-	
+
 Sun Sep 23 16:55:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* syscalls.cc (_open): Set name in fhandler object after successful
@@ -2363,7 +2362,7 @@ Tue 24 Jul 2001 02:28:00 PM  Trevor Forbes <t4bs@hotmail.com>
 	* thread.cc (verifyable_object_isvalid): Don't validate
 	PTHREAD_MUTEX_INITIALIZER pointer as it will cause an exception
 	in IsBadWritePtr() when running GDB.
-			
+
 Wed 25 Jul 2001 23:46:00  Corinna Vinschen <corinna@vinschen.de>
 
 	* localtime.c: Changed whole file to become C++ clean. Rename to

@@ -53,7 +53,7 @@ rem to sleep for x milliseconds at startup
 set CYGWIN_SLEEP=20000
 c:\some\path\bad_program.exe some parameters
 ===================================
- 
+
   Now, run program_wrapper.cmd. It should print running program pid.
   After starting program_wrapper.cmd you've got 20 seconds to open another
   window, cd to c:\cygdeb in it, run gdb there and in gdb prompt type

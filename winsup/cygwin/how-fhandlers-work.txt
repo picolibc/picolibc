@@ -18,7 +18,7 @@ When a file is opened - not necesarily via open() a fd is assigned to it. The fd
 includes a pointer to the actual fhandler that operates this specific file. All
 file-oriented system calls then operate off this basic structure.
 
-For example, lets example lseek ().
+For example, lets examine lseek ().
 
 extern "C" off_t
 _lseek (int fd, off_t pos, int dir)
@@ -51,7 +51,7 @@ The sigframe thisframe (mainthread); is signal related - see
 The if, else if, else tests (in order)
 * the validity of the dir parameter,
 * is the fd being passed actually open? (cannot seek on a closed fd)
-* call the lseek virtual function in the associated fhandler. 
+* call the lseek virtual function in the associated fhandler.
 
 So as you can see, there is no code that attempts to understand the nature of
 the fhandler.
@@ -61,5 +61,5 @@ inheritable cross-process need to implement fixup-after-fork and recreate those
 objects. HANDLES can be inherited, but memory mapped regions (for example)
 cannot.
 
-For an example step-by-step to create a new fhandler, see 
+For an example step-by-step to create a new fhandler, see
 ../doc/fhandler-tut.txt
