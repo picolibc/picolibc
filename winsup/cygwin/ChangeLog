@@ -1,3 +1,7 @@
+Mon Jul 17 22:21:34 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dll_init.cc (dll_list::alloc): Fix debugging output.
+
 Mon Jul 17 14:57:53 2000  Christopher Faylor <cgf@cygnus.com>
 
 	Throughout, eliminate third argument to path_conv and use new PC_*

@@ -145,7 +145,7 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
   if (d == NULL)
     {			/* Nope. */
 #ifdef DEBUGGING
-      system_printf ("VirtualAlloc failed for %E");
+      system_printf ("VirtualAlloc failed, %E");
 #endif
       __seterrno ();
       return NULL;
