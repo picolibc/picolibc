@@ -1,3 +1,18 @@
+2002-07-05  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (suffix_scan::has): Reorganize to eliminate double scanning
+	for for .exe (in the typical case).
+
+2002-07-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::set_sun_path): Don't free memory
+	here.  Allow NULL parameter.
+
+2002-07-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::dup): Add missing copy operation
+	on sun_path.
+
 2002-07-03  Christopher Faylor  <cgf@redhat.com>
 
 	* include/sys/statfs.h: New header file.
