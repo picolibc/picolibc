@@ -71,7 +71,12 @@ popen(program, type)
 	FILE *iop;
 	int pdes[2], pid;
 
-       if ((*type != 'r' && *type != 'w') || type[1]) {
+       if ((*type != 'r' && *type != 'w')
+	   || (type[1]
+#ifdef __CYGWIN__
+	       && (type[2] || (type[1] != 'b' && type[1] != 't'))
+#endif
+			       )) {
 		errno = EINVAL;
 		return (NULL);
 	}
