@@ -1,3 +1,8 @@
+2004-08-09  Mark Mitchell  <mark@codesourcery.com>
+
+	* configure.in (arm*-*-eabi*): New target.
+	* configure: Regenerate.
+
 2004-08-01  Robert Millan  <robertmh@gnu.org>
 
 	* configure.in: Turn mt-linux into mt-gnu. Use mt-gnu and enable
@@ -19,6 +24,11 @@
 
 	* configure.in (arm*-*-symbianelf*): Add ${libgcj} and
 	target-libiberty to noconfigdirs.
+
+2004-08-03  Paul Brook  <paul@codesourcery.com>
+
+	* configure.in: Check for MPFR as well as GMP.
+	* configure: Regenerate.
 
 2004-08-03 Paolo Bonzini <bonzini@gnu.org>
 
