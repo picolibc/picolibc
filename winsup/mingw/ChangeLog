@@ -1,5 +1,10 @@
 2004-02-01  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* mingwex/math/ldexpl.c (ldexpl): Call __asm__("fscale")
+	directly, rather than via scabnl.
+
+2004-02-01  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* mingwex/math/powl.c (powl): Return infinity if
 	extended precision multiplication of x by log2(y)
 	overflows.
