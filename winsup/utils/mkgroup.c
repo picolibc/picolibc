@@ -40,17 +40,17 @@ load_netapi ()
   if (!h)
     return FALSE;
 
-  if (!(netapibufferfree = GetProcAddress (h, "NetApiBufferFree")))
+  if (!(netapibufferfree = (void *) GetProcAddress (h, "NetApiBufferFree")))
     return FALSE;
-  if (!(netgroupenum = GetProcAddress (h, "NetGroupEnum")))
+  if (!(netgroupenum = (void *) GetProcAddress (h, "NetGroupEnum")))
     return FALSE;
-  if (!(netgroupgetusers = GetProcAddress (h, "NetGroupGetUsers")))
+  if (!(netgroupgetusers = (void *) GetProcAddress (h, "NetGroupGetUsers")))
     return FALSE;
-  if (!(netlocalgroupenum = GetProcAddress (h, "NetLocalGroupEnum")))
+  if (!(netlocalgroupenum = (void *) GetProcAddress (h, "NetLocalGroupEnum")))
     return FALSE;
-  if (!(netlocalgroupgetmembers = GetProcAddress (h, "NetLocalGroupGetMembers")))
+  if (!(netlocalgroupgetmembers = (void *) GetProcAddress (h, "NetLocalGroupGetMembers")))
     return FALSE;
-  if (!(netgetdcname = GetProcAddress (h, "NetGetDCName")))
+  if (!(netgetdcname = (void *) GetProcAddress (h, "NetGetDCName")))
     return FALSE;
 
   return TRUE;
@@ -356,6 +356,49 @@ enum_groups (LPWSTR servername, int print_sids, int print_users, int id_offset)
     netapibufferfree (servername);
 }
 
+void
+print_special (int print_sids,
+	       PSID_IDENTIFIER_AUTHORITY auth, BYTE cnt,
+	       DWORD sub1, DWORD sub2, DWORD sub3, DWORD sub4,
+	       DWORD sub5, DWORD sub6, DWORD sub7, DWORD sub8)
+{
+  char name[256], dom[256];
+  DWORD len, len2, rid;
+  PSID sid;
+  SID_NAME_USE use;
+
+  if (AllocateAndInitializeSid (auth, cnt, sub1, sub2, sub3, sub4,
+  				sub5, sub6, sub7, sub8, &sid))
+    {
+      if (LookupAccountSid (NULL, sid,
+			    name, (len = 256, &len),
+			    dom, (len2 = 256, &len),
+			    &use))
+	{
+	  if (sub8)
+	    rid = sub8;
+	  else if (sub7)
+	    rid = sub7;
+	  else if (sub6)
+	    rid = sub6;
+	  else if (sub5)
+	    rid = sub5;
+	  else if (sub4)
+	    rid = sub4;
+	  else if (sub3)
+	    rid = sub3;
+	  else if (sub2)
+	    rid = sub2;
+	  else
+	    rid = sub1;
+	  printf ("%s:%s:%lu:\n", name,
+				 print_sids ? put_sid (sid) : "",
+				 rid);
+        }
+      FreeSid (sid);
+    }
+}
+
 int
 usage ()
 {
@@ -404,55 +447,57 @@ main (int argc, char **argv)
 
   char name[256], dom[256];
   DWORD len, len2;
-  PSID sid, csid;
+  PSID csid;
   SID_NAME_USE use;
 
   if (GetVersion () < 0x80000000)
-    if (argc == 1)
-      return usage ();
-    else
-      {
-        while ((i = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
-          switch (i)
+    {
+      if (argc == 1)
+	return usage ();
+      else
+	{
+	  while ((i = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
+	    switch (i)
+	      {
+	      case 'l':
+		print_local = 1;
+		break;
+	      case 'd':
+		print_domain = 1;
+		break;
+	      case 'o':
+		id_offset = strtol (optarg, NULL, 10);
+		break;
+	      case 's':
+		print_sids = 0;
+		break;
+	      case 'u':
+		print_users = 1;
+		break;
+	      case 'h':
+		return usage ();
+	      default:
+		fprintf (stderr, "Try `%s --help' for more information.\n", argv[0]);
+		return 1;
+	      }
+	  if (!print_local && !print_domain)
 	    {
-	    case 'l':
-	      print_local = 1;
-	      break;
-	    case 'd':
-	      print_domain = 1;
-	      break;
-	    case 'o':
-	      id_offset = strtol (optarg, NULL, 10);
-	      break;
-	    case 's':
-	      print_sids = 0;
-	      break;
-	    case 'u':
-	      print_users = 1;
-	      break;
-	    case 'h':
-	      return usage ();
-	    default:
-	      fprintf (stderr, "Try `%s --help' for more information.\n", argv[0]);
+	      fprintf (stderr, "%s: Specify one of `-l' or `-d'\n", argv[0]);
 	      return 1;
 	    }
-        if (!print_local && !print_domain)
-          {
-	    fprintf (stderr, "%s: Specify one of `-l' or `-d'\n", argv[0]);
-	    return 1;
-	  }
-        if (optind < argc)
-          {
-	    if (!print_domain)
-	      {
-	        fprintf (stderr, "%s: A domain name is only accepted "
-	      		         "when `-d' is given.\n", argv[0]);
-	        return 1;
-	      }
-	    mbstowcs (domain_name, argv[optind], (strlen (argv[optind]) + 1));
-	    domain_specified = 1;
-	  }
-      }
+	  if (optind < argc)
+	    {
+	      if (!print_domain)
+		{
+		  fprintf (stderr, "%s: A domain name is only accepted "
+				   "when `-d' is given.\n", argv[0]);
+		  return 1;
+		}
+	      mbstowcs (domain_name, argv[optind], (strlen (argv[optind]) + 1));
+	      domain_specified = 1;
+	    }
+	}
+    }
 
   /* This takes Windows 9x/ME into account. */
   if (GetVersion () >= 0x80000000)
@@ -471,35 +516,13 @@ main (int argc, char **argv)
   /*
    * Get `Everyone' group
   */
-  if (AllocateAndInitializeSid (&sid_world_auth, 1, SECURITY_WORLD_RID,
-				0, 0, 0, 0, 0, 0, 0, &sid))
-    {
-      if (LookupAccountSid (NULL, sid,
-			    name, (len = 256, &len),
-			    dom, (len2 = 256, &len),
-			    &use))
-	printf ("%s:%s:%d:\n", name,
-                               print_sids ? put_sid (sid) : "",
-                               SECURITY_WORLD_RID);
-      FreeSid (sid);
-    }
-
+  print_special (print_sids, &sid_world_auth, 1, SECURITY_WORLD_RID,
+			     0, 0, 0, 0, 0, 0, 0);
   /*
    * Get `system' group
   */
-  if (AllocateAndInitializeSid (&sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID,
-				0, 0, 0, 0, 0, 0, 0, &sid))
-    {
-      if (LookupAccountSid (NULL, sid,
-			    name, (len = 256, &len),
-			    dom, (len2 = 256, &len),
-			    &use))
-	printf ("%s:%s:%d:\n", name,
-                               print_sids ? put_sid (sid) : "",
-                               SECURITY_LOCAL_SYSTEM_RID);
-      FreeSid (sid);
-    }
-
+  print_special (print_sids, &sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID,
+			     0, 0, 0, 0, 0, 0, 0);
   if (print_local)
     {
       /*
@@ -511,26 +534,15 @@ main (int argc, char **argv)
 			 csid, (len = 1024, &len),
 			 dom, (len2 = 256, &len),
 			 &use);
-      if (AllocateAndInitializeSid (GetSidIdentifierAuthority (csid),
-				    5,
-				    *GetSidSubAuthority (csid, 0),
-				    *GetSidSubAuthority (csid, 1),
-				    *GetSidSubAuthority (csid, 2),
-				    *GetSidSubAuthority (csid, 3),
-				    513,
-				    0,
-				    0,
-				    0,
-				    &sid))
-	{
-	  if (LookupAccountSid (NULL, sid,
-				name, (len = 256, &len),
-				dom, (len2 = 256, &len),
-				&use))
-            printf ("%s:%s:513:\n", name,
-                                   print_sids ? put_sid (sid) : "");
-	  FreeSid (sid);
-	}
+      print_special (print_sids, GetSidIdentifierAuthority (csid), 5,
+				 *GetSidSubAuthority (csid, 0),
+				 *GetSidSubAuthority (csid, 1),
+				 *GetSidSubAuthority (csid, 2),
+				 *GetSidSubAuthority (csid, 3),
+				 513,
+				 0,
+				 0,
+				 0);
       free (csid);
     }
 

@@ -13,6 +13,7 @@
 #include <wchar.h>
 #include <stdio.h>
 #include <windows.h>
+#include <io.h>
 #include <sys/cygwin.h>
 #include <getopt.h>
 #include <lmaccess.h>
@@ -39,13 +40,13 @@ load_netapi ()
   if (!h)
     return FALSE;
 
-  if (!(netapibufferfree = GetProcAddress (h, "NetApiBufferFree")))
+  if (!(netapibufferfree = (void *) GetProcAddress (h, "NetApiBufferFree")))
     return FALSE;
-  if (!(netuserenum = GetProcAddress (h, "NetUserEnum")))
+  if (!(netuserenum = (void *) GetProcAddress (h, "NetUserEnum")))
     return FALSE;
-  if (!(netlocalgroupenum = GetProcAddress (h, "NetLocalGroupEnum")))
+  if (!(netlocalgroupenum = (void *) GetProcAddress (h, "NetLocalGroupEnum")))
     return FALSE;
-  if (!(netgetdcname = GetProcAddress (h, "NetGetDCName")))
+  if (!(netgetdcname = (void *) GetProcAddress (h, "NetGetDCName")))
     return FALSE;
 
   return TRUE;
@@ -206,10 +207,16 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
 		    }
 		}
 	    }
-	  printf ("%s:unused_by_nt/2000/xp:%d:%d:%s%s%s:%s:/bin/bash\n", username,
+	  printf ("%s:unused_by_nt/2000/xp:%d:%d:%s%s%s%s%s%s%s%s:%s:/bin/bash\n",
+	  	  username,
 		  uid + id_offset,
 		  gid + id_offset,
 		  fullname,
+		  print_sids && fullname[0] ? "," : "",
+		  print_sids ? "U-" : "",
+		  print_sids ? domain_name : "",
+		  print_sids && domain_name[0] ? "\\" : "",
+		  print_sids ? username : "",
 		  print_sids ? "," : "",
 		  print_sids ? put_sid (psid) : "",
 		  homedir_psx);
@@ -312,6 +319,50 @@ enum_local_groups (int print_sids)
   return 0;
 }
 
+void
+print_special (int print_sids,
+	       PSID_IDENTIFIER_AUTHORITY auth, BYTE cnt,
+	       DWORD sub1, DWORD sub2, DWORD sub3, DWORD sub4,
+	       DWORD sub5, DWORD sub6, DWORD sub7, DWORD sub8)
+{
+  char name[256], dom[256];
+  DWORD len, len2, rid;
+  PSID sid;
+  SID_NAME_USE use;
+
+  if (AllocateAndInitializeSid (auth, cnt, sub1, sub2, sub3, sub4,
+  				sub5, sub6, sub7, sub8, &sid))
+    {
+      if (LookupAccountSid (NULL, sid,
+			    name, (len = 256, &len),
+			    dom, (len2 = 256, &len),
+			    &use))
+	{
+	  if (sub8)
+	    rid = sub8;
+	  else if (sub7)
+	    rid = sub7;
+	  else if (sub6)
+	    rid = sub6;
+	  else if (sub5)
+	    rid = sub5;
+	  else if (sub4)
+	    rid = sub4;
+	  else if (sub3)
+	    rid = sub3;
+	  else if (sub2)
+	    rid = sub2;
+	  else
+	    rid = sub1;
+	  printf ("%s:*:%lu:%lu:%s%s::\n",
+		  name, rid, rid,
+		  print_sids ? "," : "",
+		  print_sids ? put_sid (sid) : "");
+        }
+      FreeSid (sid);
+    }
+}
+
 int
 usage ()
 {
@@ -364,74 +415,74 @@ main (int argc, char **argv)
   int id_offset = 10000;
   int i;
 
-  char name[256], dom[256], passed_home_path[MAX_PATH];
-  DWORD len, len2;
-  PSID sid;
-  SID_NAME_USE use;
+  char name[256], passed_home_path[MAX_PATH];
+  DWORD len;
 
   passed_home_path[0] = '\0';
   setmode (1, O_BINARY);
 
   if (GetVersion () < 0x80000000)
-    if (argc == 1)
-      return usage ();
-    else
-      {
-	while ((i = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
-	  switch (i)
-	    {
-	    case 'l':
-	      print_local = 1;
-	      break;
-	    case 'd':
-	      print_domain = 1;
-	      break;
-	    case 'o':
-	      id_offset = strtol (optarg, NULL, 10);
-	      break;
-	    case 'g':
-	      print_local_groups = 1;
-	      break;
-	    case 's':
-	      print_sids = 0;
-	      break;
-	    case 'm':
-	      print_cygpath = 0;
-	      break;
-            case 'p':
-              if (optarg[0] != '/')
-	        {
-                  fprintf (stderr, "%s: `%s' is not a fully qualified path.\n",
-                           argv[0], optarg);
-                  return 1;
-                }
-              strcpy (passed_home_path, optarg);
-              if (optarg[strlen (optarg)-1] != '/')
-                strcat (passed_home_path, "/");
-              break;
-	    case 'h':
-	      return usage ();
-	    default:
-	      fprintf (stderr, "Try `%s --help' for more information.\n", argv[0]);
-	      return 1;
-	    }
-	if (!print_local && !print_domain && !print_local_groups)
-	  {
-	    fprintf (stderr, "%s: Specify one of `-l', `-d' or `-g'\n", argv[0]);
-	    return 1;
-	  }
-	if (optind < argc)
-	  {
-	    if (!print_domain)
+    {
+      if (argc == 1)
+	return usage ();
+      else
+	{
+	  while ((i = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
+	    switch (i)
 	      {
-		fprintf (stderr, "%s: A domain name is only accepted "
-				 "when `-d' is given.\n", argv[0]);
+	      case 'l':
+		print_local = 1;
+		break;
+	      case 'd':
+		print_domain = 1;
+		break;
+	      case 'o':
+		id_offset = strtol (optarg, NULL, 10);
+		break;
+	      case 'g':
+		print_local_groups = 1;
+		break;
+	      case 's':
+		print_sids = 0;
+		break;
+	      case 'm':
+		print_cygpath = 0;
+		break;
+	      case 'p':
+		if (optarg[0] != '/')
+		  {
+		    fprintf (stderr, "%s: `%s' is not a fully qualified path.\n",
+			     argv[0], optarg);
+		    return 1;
+		  }
+		strcpy (passed_home_path, optarg);
+		if (optarg[strlen (optarg)-1] != '/')
+		  strcat (passed_home_path, "/");
+		break;
+	      case 'h':
+		return usage ();
+	      default:
+		fprintf (stderr, "Try `%s --help' for more information.\n", argv[0]);
 		return 1;
 	      }
-	    mbstowcs (domain_name, argv[optind], (strlen (argv[optind]) + 1));
-	    domain_name_specified = 1;
-	  }
-      }
+	  if (!print_local && !print_domain && !print_local_groups)
+	    {
+	      fprintf (stderr, "%s: Specify one of `-l', `-d' or `-g'\n", argv[0]);
+	      return 1;
+	    }
+	  if (optind < argc)
+	    {
+	      if (!print_domain)
+		{
+		  fprintf (stderr, "%s: A domain name is only accepted "
+				   "when `-d' is given.\n", argv[0]);
+		  return 1;
+		}
+	      mbstowcs (domain_name, argv[optind], (strlen (argv[optind]) + 1));
+	      domain_name_specified = 1;
+	    }
+	}
+    }
 
   if (passed_home_path[0] == '\0')
       strcpy (passed_home_path, "/home/");
@@ -462,59 +513,16 @@ main (int argc, char **argv)
   /*
    * Get `Everyone' group
   */
-  if (AllocateAndInitializeSid (&sid_world_auth, 1, SECURITY_WORLD_RID,
-				0, 0, 0, 0, 0, 0, 0, &sid))
-    {
-      if (LookupAccountSid (NULL, sid,
-			    name, (len = 256, &len),
-			    dom, (len2 = 256, &len),
-			    &use))
-	printf ("%s:*:%d:%d:%s%s::\n", name,
-					 SECURITY_WORLD_RID,
-					 SECURITY_WORLD_RID,
-					 print_sids ? "," : "",
-					 print_sids ? put_sid (sid) : "");
-      FreeSid (sid);
-    }
-
+  print_special (print_sids, &sid_world_auth, 1, SECURITY_WORLD_RID, 0, 0, 0, 0, 0, 0, 0);
   /*
    * Get `system' group
   */
-  if (AllocateAndInitializeSid (&sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID,
-				0, 0, 0, 0, 0, 0, 0, &sid))
-    {
-      if (LookupAccountSid (NULL, sid,
-			    name, (len = 256, &len),
-			    dom, (len2 = 256, &len),
-			    &use))
-	printf ("%s:*:%d:%d:%s%s::\n", name,
-					 SECURITY_LOCAL_SYSTEM_RID,
-					 SECURITY_LOCAL_SYSTEM_RID,
-					 print_sids ? "," : "",
-					 print_sids ? put_sid (sid) : "");
-      FreeSid (sid);
-    }
-
+  print_special (print_sids, &sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID, 0, 0, 0, 0, 0, 0, 0);
   /*
    * Get `administrators' group
   */
-  if (!print_local_groups
-      && AllocateAndInitializeSid (&sid_nt_auth, 2,
-				   SECURITY_BUILTIN_DOMAIN_RID,
-				   DOMAIN_ALIAS_RID_ADMINS,
-				   0, 0, 0, 0, 0, 0, &sid))
-    {
-      if (LookupAccountSid (NULL, sid,
-			    name, (len = 256, &len),
-			    dom, (len2 = 256, &len),
-			    &use))
-	printf ("%s:*:%ld:%ld:%s%s::\n", name,
-					 DOMAIN_ALIAS_RID_ADMINS,
-					 DOMAIN_ALIAS_RID_ADMINS,
-					 print_sids ? "," : "",
-					 print_sids ? put_sid (sid) : "");
-      FreeSid (sid);
-    }
+  if (!print_local_groups)
+    print_special (print_sids, &sid_nt_auth, 2, SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0);
 
   if (print_local_groups)
     enum_local_groups (print_sids);
