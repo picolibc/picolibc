@@ -1,10 +1,31 @@
+2003-06-17  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/shellapi.h (SHQUERYRBINFO): Add structure,
+	(SHQueryRecycleBin[AW]. SHEmptyRecycleBin[AW]):Add prototypes.
+	(SHERB_NOCONFIRMATION, SHERB_NOPROGRESSUI, SHERB_NOSOUND):
+	Add defines. Thanks to Brett Hart <brett at ncubedtech dot com>
+
+2003-06-17  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winbase.h (GlobalCompact, GlobalFix, GlobalFlags,
+	GlobalUnfix, GlobalUnWire, GlobalWire, LocalCompact,
+	LocalFlags, LocalShrink, LockSegment, UnlockSegment): Add comment
+	that these are obsolete no-ops.
+
+2003-06-17  Bang Jun-Young  <junyoung@netbsd.org>
+
+	* include/winbase.h (GetProcessWorkingSetSize,
+	GlobalCompact, LocalAlloc, LocalCompact, LocalReAlloc,
+	LocalShrink, SignalObjectAndWait, WriteProcessMemory):
+	Correct prototypes.
+
 2003-06-18  Steven Edwards  <Steven_Ed4153@yahoo.com>
 
 	* include/winuser.h (TPM_RECURSE): Add define.
 
 2003-06-06  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* lib/test.c: #include <powerprof.h>.
+	* lib/test.c: #include <powrprof.h>.
 
 2003-06-06  James E. Lucas  <xelloss@sourceforge.net>
 
