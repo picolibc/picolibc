@@ -1,3 +1,9 @@
+2002-11-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* poll.cc (poll): Don't set POLLERR if a listening socket has a
+	pending connect.  Don't use errno value from call to
+	fhandler_socket::recvfrom().
+
 2002-11-19  Christopher Faylor  <cgf@redhat.com>
 
 	* net.cc: Sprinkle sigframes throughout.

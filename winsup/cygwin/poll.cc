@@ -8,12 +8,16 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
+#define  __INSIDE_CYGWIN_NET__
+
 #include "winsup.h"
 #include <sys/time.h>
 #include <sys/poll.h>
 #include <sys/socket.h>
 #include <errno.h>
 #include <stdlib.h>
+#define USE_SYS_TYPES_FD_SET
+#include <winsock2.h>
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"
@@ -93,19 +97,33 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
 		    if (!sock)
 		      fds[i].revents |= POLLIN;
 		    else
-		      switch (sock->recvfrom (peek, sizeof (peek), MSG_PEEK,
-					      NULL, NULL))
-			{
-			  case -1: /* Something weird happened */
-			    fds[i].revents |= POLLERR;
-			    break;
-			  case 0:  /* Closed on the read side. */
-			    fds[i].revents |= POLLHUP;
-			    break;
-			  default:
-			    fds[i].revents |= POLLIN;
-			    break;
-			}
+		      {
+			/* The following action can change errno.  We have to
+			   reset it to it's old value. */
+			int old_errno = get_errno ();
+			switch (sock->recvfrom (peek, sizeof (peek), MSG_PEEK,
+						NULL, NULL))
+			  {
+			    case -1: /* Something weird happened */
+			      /* When select returns that data is available,
+			         that could mean that the socket is in
+				 listen mode and a client tries to connect.
+				 Unfortunately, recvfrom() doesn't make much
+				 sense then.  It returns WSAENOTCONN in that
+				 case.  Since that's not actually an error,
+				 we must not set POLLERR. */
+			      if (WSAGetLastError () != WSAENOTCONN)
+				fds[i].revents |= POLLERR;
+			      break;
+			    case 0:  /* Closed on the read side. */
+			      fds[i].revents |= POLLHUP;
+			      break;
+			    default:
+			      fds[i].revents |= POLLIN;
+			      break;
+			  }
+			set_errno (old_errno);
+		      }
 		  }
 		if (FD_ISSET(fds[i].fd, write_fds))
 		  fds[i].revents |= POLLOUT;
