@@ -1,3 +1,7 @@
+2001-09-27  Nick Clifton  <nickc@cambridge.redhat.com>
+
+	* v850.h: Remove spurious comment.
+
 2001-09-21  Nick Clifton  <nickc@cambridge.redhat.com>
 
 	* h8300.h: Fix compile time warning messages
