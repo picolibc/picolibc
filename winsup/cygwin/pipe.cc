@@ -183,7 +183,7 @@ fhandler_pipe::dup (fhandler_base *child)
 			     &ftp->read_state, 0, 1,
 			     DUPLICATE_SAME_ACCESS))
     {
-      debug_printf ("couldn't duplicate read_state %p, %E", writepipe_exists);
+      debug_printf ("couldn't duplicate read_state %p, %E", read_state);
       goto err;
     }
 

@@ -1,3 +1,7 @@
+2004-03-17  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number to 9.
+
 2004-03-16  Christopher Faylor  <cgf@redhat.com>
 
 	* sigproc.cc (proc_terminate): Release sync_proc_subproc when done
