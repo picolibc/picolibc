@@ -1,3 +1,8 @@
+2002-06-06  Lars Brinkhoff  <lars@nocrew.org>
+
+	* common.h: Change registry@sco.com to registry@caldera.com.
+	(EM_PDP10, EM_PDP11): Define.
+
 2002-06-04  Jason Thorpe  <thorpej@wasabisystems.com>
 
 	* sh.h (_bfd_sh64_crange_qsort_cmpb, _bfd_sh64_crange_qsort_cmpl)

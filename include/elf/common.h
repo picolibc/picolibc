@@ -92,7 +92,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define ET_HIPROC	0xFFFF	/* Processor-specific */
 
 /* Values for e_machine, which identifies the architecture.  These numbers
-   are officially assigned by registry@sco.com.  See below for a list of
+   are officially assigned by registry@caldera.com.  See below for a list of
    ad-hoc numbers used during initial development.  */
 
 #define EM_NONE		0	/* No machine */
@@ -145,6 +145,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define EM_TINYJ       61	/* Advanced Logic Corp. TinyJ embedded processor */
 #define EM_X86_64      62       /* Advanced Micro Devices X86-64 processor */
 
+#define EM_PDP10       64	/* Digital Equipment Corp. PDP-10 */
+#define EM_PDP11       65	/* Digital Equipment Corp. PDP-11 */
 #define EM_FX66	       66	/* Siemens FX66 microcontroller */
 #define EM_ST9PLUS     67	/* STMicroelectronics ST9+ 8/16 bit microcontroller */
 #define EM_ST7	       68	/* STMicroelectronics ST7 8-bit microcontroller */
@@ -184,7 +186,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    will have a collision.  Instead, pick a random number.
 
    Normally, each entity or maintainer responsible for a machine with an
-   unofficial e_machine number should eventually ask registry@sco.com for
+   unofficial e_machine number should eventually ask registry@caldera.com for
    an officially blessed number to be added to the list above.  */
 
 #define EM_PJ_OLD      99       /* picoJava */
