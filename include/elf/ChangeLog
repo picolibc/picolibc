@@ -1,3 +1,8 @@
+2002-12-16  Andrew MacLeod  <amacleod@redhat.com>
+
+	* xstormy16.h (START_RELOC_NUMBERS) Add relocation numbers
+	for R_XSTORMY16_LO16 and R_XSTORMY16_HI16.
+
 2002-12-10  James Cownie <jcownie@etnus.com>
 
 	* dwarf2.h (DW_TAG_upc_shared_type, DW_TAG_upc_strict_type,
