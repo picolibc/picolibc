@@ -514,7 +514,7 @@ case "${host}" in
 	syscall_dir=syscalls
 	;;
   crx-*-*)
-  	newlib_cflags="${newlib_cflags} -DHAVE_RENAME -DMISSING_SYSCALL_NAMES"
+	newlib_cflags="${newlib_cflags} -DHAVE_RENAME -DMISSING_SYSCALL_NAMES"
 	syscall_dir=
 	;;
   d10v*)
