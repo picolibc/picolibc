@@ -1,3 +1,8 @@
+2002-07-14  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (cygserver.exe): Add -lstdc++.
+	(cygrun.exe): Move -lgcc last.
+
 2002-07-13  Christopher Faylor  <cgf@redhat.com>
 
 	* dcrt0.cc (dll_crt0_1): Delay closing of some handles until cygheap
