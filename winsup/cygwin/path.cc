@@ -75,9 +75,9 @@ details. */
 #include "cygtls.h"
 #include <assert.h>
 
-static int normalize_win32_path (const char *src, char *dst, char ** tail);
-static void slashify (const char *src, char *dst, int trailing_slash_p);
-static void backslashify (const char *src, char *dst, int trailing_slash_p);
+static int normalize_win32_path (const char *, char *, char *&);
+static void slashify (const char *, char *, int);
+static void backslashify (const char *, char *, int);
 
 struct symlink_info
 {
@@ -190,38 +190,34 @@ pathmatch (const char *path1, const char *path2)
    The result is 0 for success, or an errno error value.  */
 
 static int
-normalize_posix_path (const char *src, char *dst, char **tail)
+normalize_posix_path (const char *src, char *dst, char *&tail)
 {
-  const char *src_start = src;
-  char *dst_start = dst;
-
-  syscall_printf ("src %s", src);
-
   const char *in_src = src;
-  char *in_dst = dst;
+  syscall_printf ("src %s", src);
 
   if (isdrive (src) || *src == '\\')
     goto win32_path;
 
+  tail = dst;
   if (!isslash (src[0]))
     {
       if (!cygheap->cwd.get (dst))
 	return get_errno ();
-      dst = strchr (dst, '\0');
+      tail = strchr (tail, '\0');
       if (*src == '.')
 	{
-	  if (dst == dst_start + 1 && *dst_start == '/')
-	     --dst;
+	  if (tail == dst + 1 && *dst == '/')
+	     tail--;
 	  goto sawdot;
 	}
-      if (dst > dst_start && !isslash (dst[-1]))
-	*dst++ = '/';
+      if (tail > dst && !isslash (tail[-1]))
+	*tail++ = '/';
     }
   /* Two leading /'s?  If so, preserve them.  */
   else if (isslash (src[1]) && !isslash (src[2]))
     {
-      *dst++ = '/';
-      *dst++ = '/';
+      *tail++ = '/';
+      *tail++ = '/';
       src += 2;
     }
 
@@ -231,7 +227,7 @@ normalize_posix_path (const char *src, char *dst, char **tail)
 	goto win32_path;
       /* Strip runs of /'s.  */
       if (!isslash (*src))
-	*dst++ = *src++;
+	*tail++ = *src++;
       else
 	{
 	  while (*++src)
@@ -247,7 +243,7 @@ normalize_posix_path (const char *src, char *dst, char **tail)
 		{
 		  if (!src[1])
 		    {
-		      *dst++ = '/';
+		      *tail++ = '/';
 		      goto done;
 		    }
 		  if (!isslash (src[1]))
@@ -268,15 +264,15 @@ normalize_posix_path (const char *src, char *dst, char **tail)
 		}
 	      else
 		{
-		  while (dst > dst_start && !isslash (*--dst))
+		  while (tail > dst && !isslash (*--tail))
 		    continue;
 		  src++;
 		}
 	    }
 
-	  *dst++ = '/';
+	  *tail++ = '/';
 	}
-	if ((dst - dst_start) >= CYG_MAX_PATH)
+	if ((tail - dst) >= CYG_MAX_PATH)
 	  {
 	    debug_printf ("ENAMETOOLONG = normalize_posix_path (%s)", src);
 	    return ENAMETOOLONG;
@@ -284,16 +280,15 @@ normalize_posix_path (const char *src, char *dst, char **tail)
     }
 
 done:
-  *dst = '\0';
-  *tail = dst;
+  *tail = '\0';
 
-  debug_printf ("%s = normalize_posix_path (%s)", dst_start, src_start);
+  debug_printf ("%s = normalize_posix_path (%s)", dst, in_src);
   return 0;
 
 win32_path:
-  int err = normalize_win32_path (in_src, in_dst, tail);
+  int err = normalize_win32_path (in_src, dst, tail);
   if (!err)
-    for (char *p = in_dst; (p = strchr (p, '\\')); p++)
+    for (char *p = dst; (p = strchr (p, '\\')); p++)
       *p = '/';
   return err;
 }
@@ -539,7 +534,7 @@ path_conv::check (const char *src, unsigned opt,
       assert (src);
 
       is_relpath = !isabspath (src);
-      error = normalize_posix_path (src, path_copy, &tail);
+      error = normalize_posix_path (src, path_copy, tail);
       if (error)
 	return;
 
@@ -878,8 +873,7 @@ out:
 	  size_t n = strlen (this->path);
 	  /* Do not add trailing \ to UNC device names like \\.\a: */
 	  if (this->path[n - 1] != '\\' &&
-	      (strncmp (this->path, "\\\\.\\", 4) != 0 ||
-	       !strncasematch (this->path + 4, "unc\\", 4)))
+	      (strncmp (this->path, "\\\\.\\", 4) != 0))
 	    {
 	      this->path[n] = '\\';
 	      this->path[n + 1] = '\0';
@@ -970,34 +964,33 @@ is_unc_share (const char *path)
    The result is 0 for success, or an errno error value.
    FIXME: A lot of this should be mergeable with the POSIX critter.  */
 static int
-normalize_win32_path (const char *src, char *dst, char **tail)
+normalize_win32_path (const char *src, char *dst, char *&tail)
 {
   const char *src_start = src;
-  char *dst_start = dst;
-  char *dst_root_start = dst;
   bool beg_src_slash = isdirsep (src[0]);
 
+  tail = dst;
   if (beg_src_slash && isdirsep (src[1]))
     {
-      *dst++ = '\\';
+      *tail++ = '\\';
       src++;
       if (src[1] == '.' && isdirsep (src[2]))
 	{
-	  *dst++ = '\\';
-	  *dst++ = '.';
+	  *tail++ = '\\';
+	  *tail++ = '.';
 	  src += 2;
 	}
     }
   else if (!isdrive(src) && *src != '/')
     {
       if (beg_src_slash)
-	dst += cygheap->cwd.get_drive (dst);
+	tail += cygheap->cwd.get_drive (dst);
       else if (!cygheap->cwd.get (dst, 0))
 	return get_errno ();
       else
 	{
-	  dst += strlen (dst);
-	  *dst++ = '\\';
+	  tail = strchr (tail, '\0');
+	  *tail++ = '\\';
 	}
     }
 
@@ -1014,16 +1007,16 @@ normalize_win32_path (const char *src, char *dst, char **tail)
       /* Backup if "..".  */
       else if (src[0] == '.' && src[1] == '.'
 	       /* dst must be greater than dst_start */
-	       && dst[-1] == '\\')
+	       && tail[-1] == '\\')
 	{
 	  if (isdirsep (src[2]) || src[2] == 0)
 	    {
 	      /* Back up over /, but not if it's the first one.  */
-	      if (dst > dst_root_start + 1)
-		dst--;
+	      if (tail > dst + 1)
+		tail--;
 	      /* Now back up to the next /.  */
-	      while (dst > dst_root_start + 1 && dst[-1] != '\\' && dst[-2] != ':')
-		dst--;
+	      while (tail > dst + 1 && tail[-1] != '\\' && tail[-2] != ':')
+		tail--;
 	      src += 2;
 	      if (isdirsep (*src))
 		src++;
@@ -1033,26 +1026,25 @@ normalize_win32_path (const char *src, char *dst, char **tail)
 	      int n = strspn (src, ".");
 	      if (!src[n] || isdirsep (src[n])) /* just dots... */
 		return ENOENT;
-	      *dst++ = *src++;
+	      *tail++ = *src++;
 	    }
 	}
       /* Otherwise, add char to result.  */
       else
 	{
 	  if (*src == '/')
-	    *dst++ = '\\';
+	    *tail++ = '\\';
 	  else
-	    *dst++ = *src;
-	  ++src;
+	    *tail++ = *src;
+	  src++;
 	}
-      if ((dst - dst_start) >= CYG_MAX_PATH)
+      if ((tail - dst) >= CYG_MAX_PATH)
 	return ENAMETOOLONG;
     }
-   if (dst > dst_start + 1 && dst[-1] == '.' && dst[-2] == '\\')
-     dst--;
-  *dst = '\0';
-  *tail = dst;
-  debug_printf ("%s = normalize_win32_path (%s)", dst_start, src_start);
+   if (tail > dst + 1 && tail[-1] == '.' && tail[-2] == '\\')
+     tail--;
+  *tail = '\0';
+  debug_printf ("%s = normalize_win32_path (%s)", dst, src_start);
   return 0;
 }
 
@@ -1640,8 +1632,8 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
     }
 
   char pathbuf[CYG_MAX_PATH];
-  char * tail;
-  int rc = normalize_win32_path (src_path, pathbuf, &tail);
+  char *tail;
+  int rc = normalize_win32_path (src_path, pathbuf, tail);
   if (rc != 0)
     {
       debug_printf ("%d = conv_to_posix_path (%s)", rc, src_path);
@@ -1914,9 +1906,9 @@ mount_info::read_cygdrive_info_from_registry ()
 				  MOUNT_CYGDRIVE | MOUNT_BINARY);
       /* Sanitize */
       if (i == 0)
-        cygdrive_flags &= ~MOUNT_SYSTEM;
+	cygdrive_flags &= ~MOUNT_SYSTEM;
       else
-        cygdrive_flags |= MOUNT_SYSTEM;	
+	cygdrive_flags |= MOUNT_SYSTEM;	
       slashify (cygdrive, cygdrive, 1);
       cygdrive_len = strlen (cygdrive);
     }
@@ -2134,13 +2126,13 @@ mount_info::add_item (const char *native, const char *posix, unsigned mountflags
       !(is_unc_share (native) || isdrive (native)))
     nativeerr = EINVAL;
   else
-    nativeerr = normalize_win32_path (native, nativetmp, &nativetail);
+    nativeerr = normalize_win32_path (native, nativetmp, nativetail);
 
   if (posix == NULL || !isabspath (posix) ||
       is_unc_share (posix) || isdrive (posix))
     posixerr = EINVAL;
   else
-    posixerr = normalize_posix_path (posix, posixtmp, &posixtail);
+    posixerr = normalize_posix_path (posix, posixtmp, posixtail);
 
   debug_printf ("%s[%s], %s[%s], %p",
 		native, nativeerr ? error : nativetmp,
