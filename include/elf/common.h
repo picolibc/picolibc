@@ -405,7 +405,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define SHN_HIOS        0xFF3F		/* OS specific semantics, hi */
 #define SHN_ABS	        0xFFF1		/* Associated symbol is absolute */
 #define SHN_COMMON      0xFFF2		/* Associated symbol is in common */
-#define SHN_XINDEX      0xFFFF		/* Section index it held elsewhere */
+#define SHN_XINDEX      0xFFFF		/* Section index is held elsewhere */
 #define SHN_HIRESERVE   0xFFFF		/* End range of reserved indices */
 
 /* The following constants control how a symbol may be accessed once it has

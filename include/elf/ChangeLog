@@ -1,3 +1,9 @@
+2001-12-11  Alan Modra  <amodra@bigpond.net.au>
+
+	* common.h (SHN_XINDEX): Comment typo fix.
+	* internal.h (Elf_Internal_Ehdr): Change existing "unsigned short"
+	size, count and index fields to "unsigned int".
+
 2001-12-07  Geoffrey Keating  <geoffk@redhat.com>
 	    Richard Henderson  <rth@redhat.com>
 

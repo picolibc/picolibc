@@ -50,12 +50,12 @@ typedef struct elf_internal_ehdr {
   unsigned long		e_flags;	/* Processor-specific flags */
   unsigned short	e_type;		/* Identifies object file type */
   unsigned short	e_machine;	/* Specifies required architecture */
-  unsigned short	e_ehsize;	/* ELF header size in bytes */
-  unsigned short	e_phentsize;	/* Program header table entry size */
-  unsigned short	e_phnum;	/* Program header table entry count */
-  unsigned short	e_shentsize;	/* Section header table entry size */
-  unsigned short	e_shnum;	/* Section header table entry count */
-  unsigned short	e_shstrndx;	/* Section header string table index */
+  unsigned int		e_ehsize;	/* ELF header size in bytes */
+  unsigned int		e_phentsize;	/* Program header table entry size */
+  unsigned int		e_phnum;	/* Program header table entry count */
+  unsigned int		e_shentsize;	/* Section header table entry size */
+  unsigned int		e_shnum;	/* Section header table entry count */
+  unsigned int		e_shstrndx;	/* Section header string table index */
 } Elf_Internal_Ehdr;
 
 #define elf32_internal_ehdr elf_internal_ehdr
