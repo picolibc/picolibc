@@ -409,7 +409,7 @@ wincapc::init ()
 		}
 	      else
 	        {
-		  os = "XP";
+		  os = "NT";
 		  caps = &wincap_xp;
 		}
 	      break;
