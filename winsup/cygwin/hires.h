@@ -41,6 +41,5 @@ class hires_ms : hires_base
   void prime ();
  public:
   LONGLONG usecs (bool justdelta);
-  ~hires_ms ();
 };
 #endif /*__HIRES_H__*/

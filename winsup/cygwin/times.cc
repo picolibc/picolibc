@@ -657,8 +657,3 @@ hires_ms::usecs (bool justdelta)
   LONGLONG res = initime_us.QuadPart + ((LONGLONG) (now - initime_ms) * 1000);
   return res;
 }
-
-hires_ms::~hires_ms ()
-{
-  timeEndPeriod (minperiod);
-}
