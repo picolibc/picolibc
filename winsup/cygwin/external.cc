@@ -252,7 +252,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  return check_ntsec (filename);
 	}
       case CW_GET_ERRNO_FROM_WINERROR:
-        {
+	{
 	  int error = va_arg (arg, int);
 	  int deferrno = va_arg (arg, int);
 	  return geterrno_from_win_error (error, deferrno);
@@ -270,20 +270,20 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  memcpy (sd_buf, sd, sd.size ());
 	  psa->lpSecurityDescriptor = sd_buf;
 	  return 0;
-        }
+	}
       case CW_GET_SHMLBA:
-        {
+	{
 	  return getshmlba ();
 	}
       case CW_GET_UID_FROM_SID:
-        {
+	{
 	  PSID psid = va_arg (arg, PSID);
 	  cygsid sid (psid);
 	  struct passwd *pw = internal_getpwsid (sid);
 	  return pw ? pw->pw_uid : (__uid32_t)-1;
 	}
       case CW_GET_GID_FROM_SID:
-        {
+	{
 	  PSID psid = va_arg (arg, PSID);
 	  cygsid sid (psid);
 	  struct __group32 *gr = internal_getgrsid (sid);

@@ -399,7 +399,7 @@ format_proc_meminfo (char *destbuf, size_t maxsize)
       ret = NtQuerySystemInformation (SystemPagefileInformation, (PVOID) spi,
 				      size, &size);
       if (ret == STATUS_INFO_LENGTH_MISMATCH)
-        {
+	{
 	  free (spi);
 	  spi = (PSYSTEM_PAGEFILE_INFORMATION) malloc (size);
 	  if (spi)
@@ -416,7 +416,7 @@ format_proc_meminfo (char *destbuf, size_t maxsize)
     {
       PSYSTEM_PAGEFILE_INFORMATION spp = spi;
       do
-        {
+	{
 	  swap_total += spp->CurrentSize * getpagesize ();
 	  swap_free += (spp->CurrentSize - spp->TotalUsed) * getpagesize ();
 	}
@@ -711,13 +711,13 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 	      cpuid (&cpuid_sig, &extra_info, &features2, &features1, 1);
 	      /* unsigned extended_family = (cpuid_sig & 0x0ff00000) >> 20,
 			  extended_model  = (cpuid_sig & 0x000f0000) >> 16; */
-	      unsigned type            = (cpuid_sig & 0x00003000) >> 12,
-		       family          = (cpuid_sig & 0x00000f00) >> 8,
-		       model           = (cpuid_sig & 0x000000f0) >> 4,
-		       stepping        = cpuid_sig & 0x0000000f;
-	      unsigned brand_id        = extra_info & 0x0000000f,
-		       cpu_count       = (extra_info & 0x00ff0000) >> 16,
-		       apic_id         = (extra_info & 0xff000000) >> 24;
+	      unsigned type		= (cpuid_sig & 0x00003000) >> 12,
+		       family		= (cpuid_sig & 0x00000f00) >> 8,
+		       model		= (cpuid_sig & 0x000000f0) >> 4,
+		       stepping		= cpuid_sig & 0x0000000f;
+	      unsigned brand_id		= extra_info & 0x0000000f,
+		       cpu_count	= (extra_info & 0x00ff0000) >> 16,
+		       apic_id		= (extra_info & 0xff000000) >> 24;
 	      const char *type_str;
 	      switch (type)
 		{
@@ -964,7 +964,7 @@ format_proc_partitions (char *destbuf, size_t maxsize)
 			continue;
 		      char devname[16];
 		      __small_sprintf (devname, "/dev/sd%c%d",
-		      				drive_number + 'a',
+						drive_number + 'a',
 						partition + 1);
 		      device dev;
 		      dev.parse (devname);

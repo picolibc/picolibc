@@ -631,7 +631,7 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
     {
       cygheap_fdnew res_fd;
       if (res_fd >= 0 && fdsock (res_fd, &dev (), res))
-        {
+	{
 	  if (get_addr_family () == AF_LOCAL)
 	    ((fhandler_socket *) res_fd)->set_sun_path (get_sun_path ());
 	  ((fhandler_socket *) res_fd)->set_addr_family (get_addr_family ());
@@ -724,14 +724,14 @@ fhandler_socket::wait (HANDLE event, int flags)
   switch (WSAWaitForMultipleEvents (2, ev, FALSE, 10, FALSE))
     {
       case WSA_WAIT_TIMEOUT:
-        ret = 0;
+	ret = 0;
 	break;
       case WSA_WAIT_EVENT_0:
 	if (!WSAEnumNetworkEvents (get_socket (), event, &evts))
 	  {
 	    if (!evts.lNetworkEvents)
 	      {
-	        ret = 0;
+		ret = 0;
 		break;
 	      }
 	    if (evts.lNetworkEvents & FD_OOB)
@@ -777,7 +777,7 @@ fhandler_socket::wait (HANDLE event, int flags)
 	  }
 	break;
       case WSA_WAIT_EVENT_0 + 1:
-        WSASetLastError (WSAEINTR);
+	WSASetLastError (WSAEINTR);
 	break;
       default:
 	WSASetLastError (WSAEFAULT);
@@ -841,14 +841,14 @@ fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
 	  HANDLE evt;
 	  if (prepare (evt, FD_CLOSE | FD_READ | (owner () ? FD_OOB : 0)))
 	    {
-              do
-                {
+	      do
+		{
 		  DWORD lflags = (DWORD) flags;
 		  res = WSARecvFrom (get_socket (), &wsabuf, 1, &ret, &lflags,
 				     from, fromlen, NULL, NULL);
-                }
-              while (res == SOCKET_ERROR
-                     && WSAGetLastError () == WSAEWOULDBLOCK
+		}
+	      while (res == SOCKET_ERROR
+		     && WSAGetLastError () == WSAEWOULDBLOCK
 		     && !closed ()
 		     && !(res = wait (evt, flags)));
 	      release (evt);
@@ -963,13 +963,13 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
 	  HANDLE evt;
 	  if (prepare (evt, FD_CLOSE | FD_READ | (owner () ? FD_OOB : 0)))
 	    {
-              do
-                {
+	      do
+		{
 		  DWORD lflags = (DWORD) flags;
 		  res = WSARecvFrom (get_socket (), wsabuf, iovcnt, &ret,
 				     &lflags, from, fromlen, NULL, NULL);
-                }
-              while (res == SOCKET_ERROR
+		}
+	      while (res == SOCKET_ERROR
 		     && WSAGetLastError () == WSAEWOULDBLOCK
 		     && !closed ()
 		     && !(res = wait (evt, flags)));
@@ -1040,7 +1040,7 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
 	  HANDLE evt;
 	  if (prepare (evt, FD_CLOSE | FD_WRITE | (owner () ? FD_OOB : 0)))
 	    {
-	      do 
+	      do
 		{
 		  res = WSASendTo (get_socket (), &wsabuf, 1, &ret,
 				   flags & MSG_WINMASK,
@@ -1048,7 +1048,7 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
 				   tolen, NULL, NULL);
 		}
 	      while (res == SOCKET_ERROR
-	             && WSAGetLastError () == WSAEWOULDBLOCK
+		     && WSAGetLastError () == WSAEWOULDBLOCK
 		     && !(res = wait (evt, 0))
 		     && !closed ());
 	      release (evt);
@@ -1170,17 +1170,17 @@ fhandler_socket::sendmsg (const struct msghdr *msg, int flags, ssize_t tot)
 	  HANDLE evt;
 	  if (prepare (evt, FD_CLOSE | FD_WRITE | (owner () ? FD_OOB : 0)))
 	    {
-              do
-                {
+	      do
+		{
 		  res = WSASendTo (get_socket (), wsabuf, iovcnt,
-		  		   &ret, flags,
+				   &ret, flags,
 				   (struct sockaddr *) msg->msg_name,
 				   msg->msg_namelen, NULL, NULL);
-                }
-              while (res == SOCKET_ERROR
-	             && WSAGetLastError () == WSAEWOULDBLOCK
+		}
+	      while (res == SOCKET_ERROR
+		     && WSAGetLastError () == WSAEWOULDBLOCK
 		     && !(res = wait (evt, 0))
-	             && !closed ());
+		     && !closed ());
 	      release (evt);
 	    }
 	}
@@ -1381,7 +1381,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
     case FIONREAD:
       res = ioctlsocket (get_socket (), FIONREAD, (unsigned long *) p);
       if (res == SOCKET_ERROR)
-        set_winsock_errno ();
+	set_winsock_errno ();
       break;
     default:
       /* We must cancel WSAAsyncSelect (if any) before setting socket to

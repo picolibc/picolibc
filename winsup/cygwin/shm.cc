@@ -133,9 +133,9 @@ fixup_shms_after_fork ()
   SLIST_FOREACH (sph_entry, &sph_list, sph_next)
     {
       vm_object_t ptr = MapViewOfFileEx(sph_entry->hdl, sph_entry->access,
-      					0, 0, sph_entry->size, sph_entry->ptr);
+					0, 0, sph_entry->size, sph_entry->ptr);
       if (ptr != sph_entry->ptr)
-        api_fatal ("MapViewOfFileEx (%p), %E.  Terminating.", sph_entry->ptr);
+	api_fatal ("MapViewOfFileEx (%p), %E.  Terminating.", sph_entry->ptr);
     }
   return 0;
 }
@@ -161,13 +161,13 @@ shmat (int shmid, const void *shmaddr, int shmflg)
   if (!ssh_entry)
     {
       /* The shmid is unknown to this process so far.  Try to get it from
-         the server if it exists.  Use special internal call to shmget,
+	 the server if it exists.  Use special internal call to shmget,
 	 which interprets the key as a shmid and only returns a valid
 	 shmid if one exists.  Since shmctl inserts a new entry for this
 	 shmid into ssh_list automatically, we just have to go through
 	 that list again.  If that still fails, well, bad luck. */
       if (shmid && shmget ((key_t) shmid, 0, IPC_KEY_IS_SHMID) != -1)
-        {
+	{
 	  SLIST_FOREACH (ssh_entry, &ssh_list, ssh_next)
 	    {
 	      if (ssh_entry->shmid == shmid)
@@ -175,7 +175,7 @@ shmat (int shmid, const void *shmaddr, int shmflg)
 	    }
 	}
       if (!ssh_entry)
-        {
+	{
 	  /* Invalid shmid */
 	  set_errno (EINVAL);
 	  return (void *) -1;
@@ -185,11 +185,11 @@ shmat (int shmid, const void *shmaddr, int shmflg)
   if (shmaddr)
     {
       if (shmflg & SHM_RND)
-        attach_va = (vm_object_t)((vm_offset_t)shmaddr & ~(SHMLBA-1));
+	attach_va = (vm_object_t)((vm_offset_t)shmaddr & ~(SHMLBA-1));
       else
 	attach_va = (vm_object_t)shmaddr;
       /* Don't even bother to call anything if shmaddr is NULL or
-         not aligned. */
+	 not aligned. */
       if (!attach_va || (vm_offset_t)attach_va % SHMLBA)
 	{
 	  set_errno (EINVAL);
@@ -222,7 +222,7 @@ shmat (int shmid, const void *shmaddr, int shmflg)
       delete sph_entry;
       set_errno (request.error_code ());
       if (request.error_code () == ENOSYS)
-        raise (SIGSYS);
+	raise (SIGSYS);
       return (void *) -1;
     }
   sph_entry->ptr = ptr;
@@ -250,7 +250,7 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
       case IPC_SET:
 	if (__check_null_invalid_struct_errno (buf, sizeof (struct shmid_ds)))
 	  return -1;
-        break;
+	break;
       case IPC_INFO:
 	/* shmid == 0: Request for shminfo struct. */
 	if (!shmid
@@ -260,11 +260,11 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
 	if (shmid)
 	  if (__check_null_invalid_struct_errno (buf, shmid * sizeof (struct shmid_ds)))
 	    return -1;
-        break;
+	break;
       case SHM_INFO:
-        if (__check_null_invalid_struct_errno (buf, sizeof (struct shm_info)))
+	if (__check_null_invalid_struct_errno (buf, sizeof (struct shm_info)))
 	  return -1;
-        break;
+	break;
     }
   client_request_shm request (shmid, cmd, buf);
   if (request.make_request () == -1 || request.retval () == -1)
@@ -272,7 +272,7 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
       syscall_printf ("-1 [%d] = shmctl ()", request.error_code ());
       set_errno (request.error_code ());
       if (request.error_code () == ENOSYS)
-        raise (SIGSYS);
+	raise (SIGSYS);
       return -1;
     }
   if (cmd == IPC_RMID)
@@ -280,7 +280,7 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
       /* The process must cleanup its own storage... */
       shm_shmid_list *ssh_entry, *ssh_next_entry;
       SLIST_FOREACH_SAFE (ssh_entry, &ssh_list, ssh_next, ssh_next_entry)
-        {
+	{
 	  if (ssh_entry->shmid == shmid)
 	    {
 	      SLIST_REMOVE (&ssh_list, ssh_entry, shm_shmid_list, ssh_next);
@@ -310,7 +310,7 @@ shmdt (const void *shmaddr)
       syscall_printf ("-1 [%d] = shmdt ()", request.error_code ());
       set_errno (request.error_code ());
       if (request.error_code () == ENOSYS)
-        raise (SIGSYS);
+	raise (SIGSYS);
       return -1;
     }
   shm_attached_list *sph_entry, *sph_next_entry;
@@ -318,7 +318,7 @@ shmdt (const void *shmaddr)
   SLIST_FOREACH_SAFE (sph_entry, &sph_list, sph_next, sph_next_entry)
     {
       if (sph_entry->ptr == shmaddr)
-        {
+	{
 	  SLIST_REMOVE (&sph_list, sph_entry, shm_attached_list, sph_next);
 	  /* ...and unmap view. */
 	  UnmapViewOfFile (sph_entry->ptr);
@@ -354,7 +354,7 @@ shmget (key_t key, size_t size, int shmflg)
       delete ssh_new_entry;
       set_errno (request.error_code ());
       if (request.error_code () == ENOSYS)
-        raise (SIGSYS);
+	raise (SIGSYS);
       return -1;
     }
   int shmid = request.retval ();	/* Shared mem ID */
@@ -363,7 +363,7 @@ shmget (key_t key, size_t size, int shmflg)
   SLIST_FOREACH (ssh_entry, &ssh_list, ssh_next)
     {
       if (ssh_entry->shmid == shmid)
-        {
+	{
 	  /* We already maintain an entry for this shmid.  That means,
 	     the hdl returned by cygserver is a superfluous duplicate
 	     of the original hdl maintained by cygserver.  We can safely

@@ -904,7 +904,7 @@ initialize_main_tls (char *padding)
 
    UPTR is a pointer to global data that lives on the libc side of the
    line [if one distinguishes the application from the dll].  */
-  
+
 extern "C" void __stdcall
 _dll_crt0 ()
 {

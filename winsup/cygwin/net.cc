@@ -1953,7 +1953,7 @@ cygwin_rresvport (int *port)
       cygheap_fdnew res_fd;
 
       if (res_fd >= 0 && fdsock (res_fd, tcp_dev, res))
-        res = res_fd;
+	res = res_fd;
       else
 	res = -1;
     }

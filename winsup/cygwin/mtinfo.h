@@ -84,7 +84,7 @@ class mtinfo_drive
   inline int error (const char *str)
     {
       if (lasterr)
-        debug_printf ("%s: Win32 error %d", lasterr);
+	debug_printf ("%s: Win32 error %d", lasterr);
       return lasterr;
     }
   inline bool get_feature (DWORD parm)

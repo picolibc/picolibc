@@ -426,7 +426,7 @@ proc_subproc (DWORD what, DWORD val)
 
     scan_wait:
       /* Scan the linked list of wait()ing threads.  If a wait's parameters
-         match this pid, then activate it.  */
+	 match this pid, then activate it.  */
       for (w = &waitq_head; w->next != NULL; w = w->next)
 	{
 	  if ((potential_match = checkstate (w)) > 0)
@@ -759,7 +759,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
   if (!WriteFile (sendsig, &pack, sizeof (pack), &nb, NULL) || nb != sizeof (pack))
     {
       /* Couldn't send to the pipe.  This probably means that the
-         process is exiting.  */
+	 process is exiting.  */
       if (!its_me)
 	{
 	  sigproc_printf ("WriteFile for pipe %p failed, %E", sendsig);

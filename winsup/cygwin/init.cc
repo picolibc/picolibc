@@ -81,7 +81,7 @@ munge_threadfunc ()
     /* no need for the overhead */;
   else
     {
-      for (i = 0; threadfunc_ix[i]; i++)		
+      for (i = 0; threadfunc_ix[i]; i++)
 	ebp[threadfunc_ix[i]] = (char *) threadfunc_fe;
       ((char **) _tlsbase)[OLDFUNC_OFFSET] = threadfunc;
     }

@@ -179,7 +179,7 @@ fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
       if (is_eom (ret))
 	set_errno (ENOSPC);
       else
-        __seterrno ();
+	__seterrno ();
       goto err;
     }
 

@@ -1077,7 +1077,7 @@ out:
    of the SD on success. Unfortunately NT returns
    0 in `len' on success, while W2K returns the
    correct size!
-   
+
    2003-11-26: Now the function allocates the space needed by itself so
    it knows the real size and returns it in the security_descriptor object.
 */
@@ -1142,7 +1142,7 @@ write_sd (HANDLE fh, const char *file, security_descriptor &sd)
 				     NULL)) == INVALID_HANDLE_VALUE)
 	break;
       if (fh && (ret = NtSetSecurityObject (fh,
-					    DACL_SECURITY_INFORMATION 
+					    DACL_SECURITY_INFORMATION
 					    | GROUP_SECURITY_INFORMATION
 					    | OWNER_SECURITY_INFORMATION,
 					    sd)) == STATUS_SUCCESS)
@@ -1768,7 +1768,7 @@ set_security_attribute (int attribute, PSECURITY_ATTRIBUTES psa,
   InitializeSecurityDescriptor ((PSECURITY_DESCRIPTOR)psa->lpSecurityDescriptor,
 				SECURITY_DESCRIPTOR_REVISION);
   psa->lpSecurityDescriptor = alloc_sd (geteuid32 (), getegid32 (),
-  					attribute, sd);
+					attribute, sd);
 }
 
 static int

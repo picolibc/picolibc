@@ -173,7 +173,7 @@ pthread::init_mainthread ()
     {
       thread = new pthread ();
       if (!thread)
-        api_fatal ("failed to create mainthread object");
+	api_fatal ("failed to create mainthread object");
     }
 
   set_tls_self_pointer (thread);
@@ -1436,9 +1436,9 @@ bool
 pthread_mutex::is_good_initializer (pthread_mutex_t const *mutex)
 {
   if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC,
-                                 PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP,
-                                 PTHREAD_NORMAL_MUTEX_INITIALIZER_NP,
-                                 PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP) != VALID_STATIC_OBJECT)
+				 PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP,
+				 PTHREAD_NORMAL_MUTEX_INITIALIZER_NP,
+				 PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP) != VALID_STATIC_OBJECT)
     return false;
   return true;
 }
@@ -1447,9 +1447,9 @@ bool
 pthread_mutex::is_good_initializer_or_object (pthread_mutex_t const *mutex)
 {
   if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC,
-                                 PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP,
-                                 PTHREAD_NORMAL_MUTEX_INITIALIZER_NP,
-                                 PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP) == INVALID_OBJECT)
+				 PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP,
+				 PTHREAD_NORMAL_MUTEX_INITIALIZER_NP,
+				 PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP) == INVALID_OBJECT)
     return false;
   return true;
 }
@@ -1458,9 +1458,9 @@ bool
 pthread_mutex::is_good_initializer_or_bad_object (pthread_mutex_t const *mutex)
 {
   if (verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC,
-                                 PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP,
-                                 PTHREAD_NORMAL_MUTEX_INITIALIZER_NP,
-                                 PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP) == VALID_OBJECT)
+				 PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP,
+				 PTHREAD_NORMAL_MUTEX_INITIALIZER_NP,
+				 PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP) == VALID_OBJECT)
     return false;
   return true;
 }
@@ -1662,7 +1662,7 @@ semaphore::semaphore (const char *sem_name, int oflag, mode_t mode,
 				  unsigned int value)
 : verifyable_object (SEM_MAGIC),
   shared (PTHREAD_PROCESS_SHARED),
-  currentvalue (value), 		/* Unused for named semaphores. */
+  currentvalue (value),		/* Unused for named semaphores. */
   name (NULL)
 {
   if (oflag & O_CREAT)
@@ -1853,7 +1853,7 @@ check_valid_pointer (void const *pointer)
 
 verifyable_object_state
 verifyable_object_isvalid (void const * objectptr, long magic, void *static_ptr1,
-                           void *static_ptr2, void *static_ptr3)
+			   void *static_ptr2, void *static_ptr3)
 {
   verifyable_object **object = (verifyable_object **)objectptr;
   if (check_valid_pointer (object))
@@ -2880,8 +2880,8 @@ pthread_equal (pthread_t t1, pthread_t t2)
 
 int
 pthread_mutex::init (pthread_mutex_t *mutex,
-                     const pthread_mutexattr_t *attr,
-                     const pthread_mutex_t initializer)
+		     const pthread_mutexattr_t *attr,
+		     const pthread_mutex_t initializer)
 {
   pthread_mutex_t new_mutex;
 
@@ -2907,11 +2907,11 @@ pthread_mutex::init (pthread_mutex_t *mutex,
   if (!attr && initializer)
     {
       if (initializer == PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP)
-        new_mutex->type = PTHREAD_MUTEX_RECURSIVE;
+	new_mutex->type = PTHREAD_MUTEX_RECURSIVE;
       else if (initializer == PTHREAD_NORMAL_MUTEX_INITIALIZER_NP)
-        new_mutex->type = PTHREAD_MUTEX_NORMAL;
+	new_mutex->type = PTHREAD_MUTEX_NORMAL;
       else if (initializer == PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP)
-        new_mutex->type = PTHREAD_MUTEX_ERRORCHECK;
+	new_mutex->type = PTHREAD_MUTEX_ERRORCHECK;
     }
 
   *mutex = new_mutex;

@@ -461,20 +461,20 @@ path_conv::set_normalized_path (const char *path_copy)
 PUNICODE_STRING
 path_conv::get_nt_native_path (UNICODE_STRING &upath, WCHAR *wpath)
 {
-  if (path[0] != '\\')             /* X:\...  or NUL, etc. */
+  if (path[0] != '\\')			/* X:\...  or NUL, etc. */
     {
       str2buf2uni (upath, wpath, "\\??\\");
       str2buf2uni_cat (upath, path);
     }
-  else if (path[1] != '\\')        /* \Device\... */
+  else if (path[1] != '\\')		/* \Device\... */
     str2buf2uni (upath, wpath, path);
-  else if (path[2] != '.' 
-	   || path[3] != '\\')     /* \\server\share\... */
+  else if (path[2] != '.'
+	   || path[3] != '\\')		/* \\server\share\... */
     {
       str2buf2uni (upath, wpath, "\\??\\UNC\\");
       str2buf2uni_cat (upath, path + 2);
-    }        
-  else                                          /* \\.\device */
+    }
+  else					/* \\.\device */
     {
       str2buf2uni (upath, wpath, "\\??\\");
       str2buf2uni_cat (upath, path + 4);
@@ -550,21 +550,21 @@ path_conv::check (const char *src, unsigned opt,
 	 into account during processing */
       if (tail > path_copy + 1)
 	{
-          if (isslash (tail[-1]))
-            {
+	  if (isslash (tail[-1]))
+	    {
 	       need_directory = 1;
 	       tail--;
 	    }
-          /* Remove trailing dots and spaces which are ignored by Win32 functions but
+	  /* Remove trailing dots and spaces which are ignored by Win32 functions but
 	     not by native NT functions. */
-          while (tail[-1] == '.' || tail[-1] == ' ') 
+	  while (tail[-1] == '.' || tail[-1] == ' ')
 	    tail--;
-          if (tail > path_copy + 1 && isslash (tail[-1]))
-            {
+	  if (tail > path_copy + 1 && isslash (tail[-1]))
+	    {
 	      error = ENOENT;
-              return;
+	      return;
 	    }
-        }
+	}
       path_end = tail;
       *tail = '\0';
 
@@ -1017,7 +1017,7 @@ normalize_win32_path (const char *src, char *dst, char **tail)
       else if (src[0] == '.' && src[1] == '.'
 	       /* dst must be greater than dst_start */
 	       && dst[-1] == '\\')
-        {
+	{
 	  if (isdirsep (src[2]) || src[2] == 0)
 	    {
 	      /* Back up over /, but not if it's the first one.  */
@@ -3316,7 +3316,7 @@ chdir (const char *in_dir)
 	 defeat the Windows 95 (i.e. MS-DOS) tendency of returning to
 	 the last directory visited on the given drive. */
       if (isdrive (native_dir) && !native_dir[2])
-        {
+	{
 	  path.get_win32 ()[2] = '\\';
 	  path.get_win32 ()[3] = '\0';
 	}
@@ -3325,7 +3325,7 @@ chdir (const char *in_dir)
 	 The posix_cwd is just path.normalized_path.
 	 In other cases we let cwd.set obtain the Posix path through
 	 the mount table. */
-      if (!path.has_symlinks () && !isabspath (in_dir))
+      if (!isdrive(path.normalized_path))
 	posix_cwd = path.normalized_path;
       res = 0;
       doit = true;
@@ -3674,10 +3674,10 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd, bool doit)
     {
        cwd_lock->acquire ();
        if (doit && !SetCurrentDirectory (win32_cwd))
-         {
-            __seterrno ();
-            goto out;
-         }
+	 {
+	    __seterrno ();
+	    goto out;
+	 }
     }
   /* If there is no win32 path or it has the form c:xxx, get the value */
   if (!win32_cwd || (isdrive (win32_cwd) && win32_cwd[2] != '\\'))
@@ -3685,13 +3685,13 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd, bool doit)
       int i;
       DWORD len, dlen;
       for (i = 0, dlen = CYG_MAX_PATH/3; i < 2; i++, dlen = len)
-        {
+	{
 	  win32 = (char *) crealloc (win32, dlen);
 	  if ((len = GetCurrentDirectoryA (dlen, win32)) < dlen)
 	    break;
 	}
       if (len == 0)
-        {
+	{
 	  __seterrno ();
 	  debug_printf ("GetCurrentDirectory, %E");
 	  win32_cwd = pathbuf; /* Force lock release */

@@ -385,7 +385,7 @@ enable_restore_privilege ()
     {
       int res = 2 + set_process_privilege (SE_RESTORE_NAME, true, issetuid);
       if (!issetuid)
-        saved_res = res;
+	saved_res = res;
     }
 }
 

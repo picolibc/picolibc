@@ -562,19 +562,19 @@ fhandler_base::open (int flags, mode_t mode)
   switch (query_open ())
     {
       case query_read_control:
-        access = READ_CONTROL;
-        create_options = FILE_OPEN_FOR_BACKUP_INTENT;
-        break;
+	access = READ_CONTROL;
+	create_options = FILE_OPEN_FOR_BACKUP_INTENT;
+	break;
       case query_stat_control:
-        access = READ_CONTROL | FILE_READ_ATTRIBUTES;
-        create_options = FILE_OPEN_FOR_BACKUP_INTENT;
-        break;
+	access = READ_CONTROL | FILE_READ_ATTRIBUTES;
+	create_options = FILE_OPEN_FOR_BACKUP_INTENT;
+	break;
       case query_write_control:
-        access = READ_CONTROL | WRITE_OWNER | WRITE_DAC;
-        create_options = FILE_OPEN_FOR_BACKUP_INTENT | FILE_OPEN_FOR_RECOVERY;
-        break;
+	access = READ_CONTROL | WRITE_OWNER | WRITE_DAC;
+	create_options = FILE_OPEN_FOR_BACKUP_INTENT | FILE_OPEN_FOR_RECOVERY;
+	break;
       default:
-        create_options = 0;
+	create_options = 0;
 	if (get_major () == DEV_TAPE_MAJOR && (flags & O_TEXT))
 	  {
 	    /* O_TEXT is used to indicate write-through on tape devices */
@@ -636,7 +636,7 @@ fhandler_base::open (int flags, mode_t mode)
     }
 
   status = NtCreateFile (&x, access, &attr, &io, NULL, file_attributes, shared,
-  			 create_disposition, create_options, NULL, 0);
+			 create_disposition, create_options, NULL, 0);
   if (!NT_SUCCESS (status))
     {
       if (!wincap.can_open_directories () && pc.isdir ())
@@ -654,7 +654,7 @@ fhandler_base::open (int flags, mode_t mode)
    }
 
   syscall_printf ("%x = NtCreateFile "
-  		  "(%p, %x, %s, io, NULL, %x, %x, %x, %x, NULL, 0)",
+		  "(%p, %x, %s, io, NULL, %x, %x, %x, %x, NULL, 0)",
 		  status, x, access, get_win32_name (), file_attributes, shared,
 		  create_disposition, create_options);
 
@@ -810,22 +810,22 @@ fhandler_base::write (const void *ptr, size_t len)
 	      && current_position >= actual_length + (128 * 1024))
 	    {
 	      /* If the file systemn supports sparse files and the application
-	         is writing after a long seek beyond EOF, convert the file to
+		 is writing after a long seek beyond EOF, convert the file to
 		 a sparse file. */
 	      DWORD dw;
 	      HANDLE h = get_output_handle ();
 	      BOOL r = DeviceIoControl (h, FSCTL_SET_SPARSE, NULL, 0, NULL,
-	      				0, &dw, NULL);
+					0, &dw, NULL);
 	      syscall_printf ("%d = DeviceIoControl(%p, FSCTL_SET_SPARSE, "
 			      "NULL, 0, NULL, 0, &dw, NULL)", r, h);
 	    }
 	  else if (wincap.has_lseek_bug ())
 	    {
 	      /* Oops, this is the bug case - Win95 uses whatever is on the
-	         disk instead of some known (safe) value, so we must seek
+		 disk instead of some known (safe) value, so we must seek
 		 back and fill in the gap with zeros. - DJ
-	         Note: this bug doesn't happen on NT4, even though the
-	         documentation for WriteFile() says that it *may* happen
+		 Note: this bug doesn't happen on NT4, even though the
+		 documentation for WriteFile() says that it *may* happen
 		 on any OS. */
 	      char zeros[512];
 	      int number_of_zeros_to_write = current_position - actual_length;
@@ -1084,7 +1084,7 @@ fhandler_base::lseek (_off64_t offset, int whence)
   else
     {
       if (poff_high)
-        res += (_off64_t) *poff_high << 32;
+	res += (_off64_t) *poff_high << 32;
 
       /* When next we write(), we will check to see if *this* seek went beyond
 	 the end of the file, and back-seek and fill with zeros if so - DJ */

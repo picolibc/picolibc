@@ -916,7 +916,7 @@ chmod (const char *path, mode_t mode)
   fhandler_base *fh;
   if (!(fh = build_fh_name (path, NULL, PC_SYM_FOLLOW, stat_suffixes)))
     goto error;
-      
+
   if (fh->error ())
     {
       debug_printf ("got %d error from build_fh_name", fh->error ());
@@ -1058,10 +1058,10 @@ stat_worker (const char *name, struct __stat64 *buf, int nofollow)
   if (check_null_invalid_struct_errno (buf))
     goto error;
 
-  if (!(fh = build_fh_name (name, NULL, nofollow ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW, 
+  if (!(fh = build_fh_name (name, NULL, nofollow ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW,
 			    stat_suffixes)))
     goto error;
-  
+
   if (fh->error ())
     {
       debug_printf ("got %d error from build_fh_name", fh->error ());
@@ -1162,7 +1162,7 @@ access (const char *fn, int flags)
     {
       fhandler_base *fh = build_fh_name (fn, NULL, PC_SYM_FOLLOW, stat_suffixes);
       if (fh)
-        {
+	{
 	  res =  fh->fhaccess (flags);
 	  delete fh;
 	}
@@ -1492,7 +1492,7 @@ ttyname_r (int fd, char *buf, size_t buflen)
       else if (buflen < strlen (cfd->ttyname ()) + 1)
 	ret = ERANGE;
       else
-        strcpy (buf, cfd->ttyname ());
+	strcpy (buf, cfd->ttyname ());
     }
   debug_printf ("returning %d tty: %s", ret, ret ? "NULL" : buf);
   return ret;

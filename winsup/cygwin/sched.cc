@@ -284,7 +284,7 @@ sched_rr_get_interval (pid_t pid, struct timespec *interval)
     forprocid = 0;
 
   reg_key reg (HKEY_LOCAL_MACHINE, KEY_READ, "SYSTEM", "CurrentControlSet",
-               "Control", "PriorityControl", NULL);
+	       "Control", "PriorityControl", NULL);
   if (reg.error ())
     {
       set_errno (ESRCH);

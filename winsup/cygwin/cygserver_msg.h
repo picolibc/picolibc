@@ -48,7 +48,7 @@ private:
       proc ipcblk;
       union
       {
-        struct msgctl_args ctlargs;
+	struct msgctl_args ctlargs;
 	struct msgget_args getargs;
 	struct msgrcv_args rcvargs;
 	struct msgsnd_args sndargs;

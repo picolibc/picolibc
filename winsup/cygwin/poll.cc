@@ -104,7 +104,7 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
 			  {
 			    case -1: /* Something weird happened */
 			      /* When select returns that data is available,
-			         that could mean that the socket is in
+				 that could mean that the socket is in
 				 listen mode and a client tries to connect.
 				 Unfortunately, recvfrom() doesn't make much
 				 sense then.  It returns WSAENOTCONN in that

@@ -190,7 +190,7 @@ fhandler_base::fstat_fs (struct __stat64 *buf)
   if (oret)
     {
       /* We now have a valid handle, regardless of the "nohandle" state.
-         Since fhandler_base::open only calls CloseHandle if !nohandle,
+	 Since fhandler_base::open only calls CloseHandle if !nohandle,
 	 we have to set it to false before calling close_fs and restore
 	 the state afterwards. */
       res = fstat_by_handle (buf);
@@ -270,7 +270,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
   if (pc.has_attribute (FILE_ATTRIBUTE_COMPRESSED | FILE_ATTRIBUTE_SPARSE_FILE)
       && get_io_handle ()
       && !NtQueryInformationFile (get_io_handle (), &st, (PVOID) &fci,
-      				  sizeof fci, FileCompressionInformation))
+				  sizeof fci, FileCompressionInformation))
     buf->st_blocks = (fci.CompressedSize.QuadPart + S_BLKSIZE - 1) / S_BLKSIZE;
   else
     /* Just compute no. of blocks from file size. */
@@ -287,14 +287,14 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
       /* symlinks are everything for everyone! */
       buf->st_mode = S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO;
       get_file_attribute (pc.has_acls (), get_io_handle (), get_win32_name (),
-      			  NULL, &buf->st_uid, &buf->st_gid);
+			  NULL, &buf->st_uid, &buf->st_gid);
       goto done;
     }
   else if (pc.issocket ())
     buf->st_mode = S_IFSOCK;
 
   if (!get_file_attribute (pc.has_acls (), get_io_handle (), get_win32_name (),
-  			   &buf->st_mode, &buf->st_uid, &buf->st_gid))
+			   &buf->st_mode, &buf->st_uid, &buf->st_gid))
     {
       /* If read-only attribute is set, modify ntsec return value */
       if (pc.has_attribute (FILE_ATTRIBUTE_READONLY) && !pc.issymlink ())
@@ -396,7 +396,7 @@ fhandler_disk_file::fchmod (mode_t mode)
 			       ILLEGAL_UID, ILLEGAL_GID, mode)
 	  && allow_ntsec)
 	res = 0;
-      
+
       if (oret)
 	close_fs ();
     }
@@ -424,7 +424,7 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
   if (!pc.has_acls () || !allow_ntsec)
     {
       /* fake - if not supported, pretend we're like win95
-         where it just works */
+	 where it just works */
       return 0;
     }
 
@@ -459,7 +459,7 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
   if (!pc.has_acls () || !allow_ntsec)
     {
       switch (cmd)
-        {
+	{
 	  struct __stat64 st;
 
 	  case SETACL:
@@ -478,7 +478,7 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 		    if (!(oret = open_fs (O_BINARY, 0)))
 		      return -1;
 		  }
-	        if (!fstat_by_handle (&st))
+		if (!fstat_by_handle (&st))
 		  {
 		    aclbufp[0].a_type = USER_OBJ;
 		    aclbufp[0].a_id = st.st_uid;
@@ -489,7 +489,7 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 		    aclbufp[2].a_type = OTHER_OBJ;
 		    aclbufp[2].a_id = ILLEGAL_GID;
 		    aclbufp[2].a_perm = st.st_mode & S_IRWXO;
-		    aclbufp[3].a_type = CLASS_OBJ; 
+		    aclbufp[3].a_type = CLASS_OBJ;
 		    aclbufp[3].a_id = ILLEGAL_GID;
 		    aclbufp[3].a_perm = S_IRWXU | S_IRWXG | S_IRWXO;
 		    res = MIN_ACL_ENTRIES;
@@ -701,7 +701,7 @@ fhandler_disk_file::lock (int cmd, struct __flock64 *fl)
   if (win32_len == 0)
     {
       /* Special case if len == 0 for POSIX means lock to the end of
-         the entire file (and all future extensions).  */
+	 the entire file (and all future extensions).  */
       /* CV, 2003-12-03: And yet another Win 9x bugginess.  For some reason
 	 offset + length must be <= 0x100000000.  I'm using 0xffffffff as
 	 upper border here, this should be sufficient. */

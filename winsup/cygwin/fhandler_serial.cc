@@ -534,7 +534,7 @@ fhandler_serial::tcflush (int queue)
       set_errno (EINVAL);
       return -1;
     }
-	
+
   if (!PurgeComm (get_handle (), flags))
     {
       __seterrno ();

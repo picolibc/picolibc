@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  *
  * CV 2003-09-10: Cygwin specific changes applied.  Code simplified just
- *                for Cygwin alone.
+ *		  for Cygwin alone.
  */
 
 #include "winsup.h"
@@ -96,11 +96,11 @@ login_tty (int fd)
   if ((fdname = ttyname (fd)))
     {
       if (fd != STDIN_FILENO)
-        close (STDIN_FILENO);
+	close (STDIN_FILENO);
       if (fd != STDOUT_FILENO)
-        close (STDOUT_FILENO);
+	close (STDOUT_FILENO);
       if (fd != STDERR_FILENO)
-        close (STDERR_FILENO);
+	close (STDERR_FILENO);
       newfd = open (fdname, O_RDWR);
       close (newfd);
     }
@@ -126,7 +126,7 @@ openpty (int *amaster, int *aslave, char *name, struct termios *termp,
       strcpy (pts, ptsname (master));
       revoke (pts);
       if ((slave = open (pts, O_RDWR | O_NOCTTY)) >= 0)
-        {
+	{
 	  if (amaster)
 	    *amaster = master;
 	  if (aslave)
@@ -251,11 +251,11 @@ setprogname (const char *newprogname)
   if (!check_null_str_errno (newprogname))
     {
       /* Per BSD man page, setprogname keeps a pointer to the last
-         path component of the argument.  It does *not* copy the
+	 path component of the argument.  It does *not* copy the
 	 argument before. */
       __progname = strrchr (newprogname, '/');
       if (__progname)
-        ++__progname;
+	++__progname;
       else
 	__progname = (char *)newprogname;
     }

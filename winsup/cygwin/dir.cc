@@ -292,7 +292,7 @@ rmdir (const char *dir)
 			   (DWORD) real_dir & ~FILE_ATTRIBUTE_READONLY);
 
       for (bool is_cwd = false; ; is_cwd = true)
-        {
+	{
 	  DWORD err;
 	  int rc = RemoveDirectory (real_dir);
 	  DWORD att = GetFileAttributes (real_dir);
@@ -304,8 +304,8 @@ rmdir (const char *dir)
 	      /* RemoveDirectory on a samba drive doesn't return an error if the
 		 directory can't be removed because it's not empty. Checking for
 		 existence afterwards keeps us informed about success. */
-	      if (att == INVALID_FILE_ATTRIBUTES) 
-	        {
+	      if (att == INVALID_FILE_ATTRIBUTES)
+		{
 		  res = 0;
 		  break;
 		}
@@ -327,19 +327,19 @@ rmdir (const char *dir)
 	     SetCurrentDirectory. */
 
 	  if (strcasematch (real_dir, cygheap->cwd.win32)
-	      && !strcasematch ("c:\\", cygheap->cwd.win32) 
+	      && !strcasematch ("c:\\", cygheap->cwd.win32)
 	      && !is_cwd
 	      && SetCurrentDirectory ("c:\\"))
 	    continue;
-	  
-	  /* On 9X ERROR_ACCESS_DENIED is returned 
+
+	  /* On 9X ERROR_ACCESS_DENIED is returned
 	     if you try to remove a non-empty directory. */
 	  if (err == ERROR_ACCESS_DENIED
 	      && wincap.access_denied_on_delete ())
 	    err = ERROR_DIR_NOT_EMPTY;
-	  
+
 	  __seterrno_from_win_error (err);
-	  
+
 	  /* Directory still exists, restore its characteristics. */
 	  if (real_dir.has_attribute (FILE_ATTRIBUTE_READONLY))
 	    SetFileAttributes (real_dir, real_dir);

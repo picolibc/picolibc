@@ -299,7 +299,7 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 		goto out;
 	      /* DISCARD (FLUSHO) and tcflush can finish here. */
 	      if (n == 0 && (get_ttyp ()->ti.c_lflag & FLUSHO || !buf))
-	        goto out;
+		goto out;
 	      if (n == 0 && is_nonblocking ())
 		{
 		  set_errno (EAGAIN);
@@ -587,7 +587,7 @@ fhandler_tty_slave::open (int flags, mode_t)
 	  termios_printf ("SetProcessWindowStation %d, %E", b);
 	}
       b = AllocConsole ();	// will cause flashing if workstation
-			    	// stuff fails
+				// stuff fails
       termios_printf ("%d = AllocConsole (), %E", b);
       if (b)
 	init_console_handler ();
@@ -809,7 +809,7 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
 
       /* On first peek determine no. of bytes to flush. */
       if (!ptr && len == UINT_MAX)
-        len = (size_t) bytes_in_pipe;
+	len = (size_t) bytes_in_pipe;
 
       if (ptr && !vmin && !time_to_wait)
 	{
@@ -847,7 +847,7 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
 	      len -= n;
 	      totalread += n;
 	      if (ptr)
-	        {
+		{
 		  memcpy (ptr, buf, n);
 		  ptr = (char *) ptr + n;
 		}
@@ -864,7 +864,7 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
 	  if (!bytes_in_pipe)
 	    break;
 	  continue;
-        }
+	}
 
       if (get_ttyp ()->read_retval < 0)	// read error
 	{
@@ -1414,7 +1414,7 @@ fhandler_tty_master::init_console ()
     return -1;
 
   console->init (INVALID_HANDLE_VALUE, GENERIC_READ | GENERIC_WRITE, O_BINARY);
-  cygheap->open_fhs--;  	/* handled when individual fds are opened */
+  cygheap->open_fhs--;		/* handled when individual fds are opened */
   console->uninterruptible_io (true);
   return 0;
 }

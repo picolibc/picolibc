@@ -581,7 +581,7 @@ wincapc::init ()
 	      if (strcmp (version.szCSDVersion, "Service Pack 4") < 0)
 		caps = &wincap_nt4;
 	      else
-	        {
+		{
 		  caps = &wincap_nt4sp4;
 		  if (strcmp (version.szCSDVersion, "Service Pack 6") >= 0)
 		    has_osversioninfoex = true;
@@ -591,7 +591,7 @@ wincapc::init ()
 	      os = "NT";
 	      has_osversioninfoex = true;
 	      switch (version.dwMinorVersion)
-	        {
+		{
 		  case 0:
 		    caps = &wincap_2000;
 		    break;

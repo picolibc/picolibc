@@ -182,7 +182,7 @@ public:
   }
   bool has_impersonation_tokens ()
     { return external_token != INVALID_HANDLE_VALUE
-             || internal_token != INVALID_HANDLE_VALUE
+	     || internal_token != INVALID_HANDLE_VALUE
 	     || current_token != INVALID_HANDLE_VALUE; }
   void close_impersonation_tokens ()
   {

@@ -75,7 +75,7 @@ cygheap_user::init ()
 
   BOOL acl_exists, dummy;
   TOKEN_DEFAULT_DACL dacl;
-  if (GetSecurityDescriptorDacl (psd, &acl_exists, 
+  if (GetSecurityDescriptorDacl (psd, &acl_exists,
 				 &dacl.DefaultDacl, &dummy)
       && acl_exists && dacl.DefaultDacl)
     {
@@ -118,7 +118,7 @@ internal_getlogin (cygheap_user &user)
 	      HANDLE ptok;
 	      if (gsid != user.groups.pgsid
 		  && OpenProcessToken (hMainProc, TOKEN_ADJUST_DEFAULT, &ptok))
-	        {
+		{
 		  /* Set primary group to the group in /etc/passwd. */
 		  if (!SetTokenInformation (ptok, TokenPrimaryGroup,
 					    &gsid, sizeof gsid))
@@ -148,7 +148,7 @@ uinfo_init ()
   /* Conditions must match those in spawn to allow starting child
      processes with ruid != euid and rgid != egid. */
   else if (cygheap->user.issetuid ()
-  	   && cygheap->user.saved_uid == cygheap->user.real_uid
+	   && cygheap->user.saved_uid == cygheap->user.real_uid
 	   && cygheap->user.saved_gid == cygheap->user.real_gid
 	   && !cygheap->user.groups.issetgroups ())
     {

@@ -97,7 +97,7 @@ open_shared (const char *name, int n, HANDLE &shared_h, DWORD size,
       if (!name)
 	mapname = NULL;
       else
-        mapname = shared_name (map_buf, name, n);
+	mapname = shared_name (map_buf, name, n);
       if (!(shared_h = CreateFileMapping (INVALID_HANDLE_VALUE, psa,
 					  PAGE_READWRITE, 0, size, mapname)))
 	api_fatal ("CreateFileMapping %s, %E.  Terminating.", mapname);
@@ -163,7 +163,7 @@ user_shared_initialize (bool reinit)
   if (!cygwin_user_h)
     {
       if (wincap.has_security ())
-        {
+	{
 	  cygpsid tu (cygheap->user.sid ());
 	  tu.string (name);
 	}

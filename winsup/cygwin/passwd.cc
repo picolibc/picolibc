@@ -78,7 +78,7 @@ pwdgrp::read_passwd ()
 	!internal_getpwuid (myself->uid))))
     {
       static char linebuf[1024];	// must be static and
-      					// should not be NO_COPY
+					// should not be NO_COPY
       (void) cygheap->user.ontherange (CH_HOME, NULL);
       snprintf (linebuf, sizeof (linebuf), "%s:*:%lu:%lu:,%s:%s:/bin/sh",
 		cygheap->user.name (),

@@ -1112,11 +1112,11 @@ fhandler_console::char_command (char c)
 	     case 9:    /* dim */
 	       dev_state->intensity = INTENSITY_DIM;
 	       break;
-             case 10:   /* end alternate charset */
-               dev_state->alternate_charset_active = false;
+	     case 10:   /* end alternate charset */
+	       dev_state->alternate_charset_active = false;
 	       break;
-             case 11:   /* start alternate charset */
-               dev_state->alternate_charset_active = true;
+	     case 11:   /* start alternate charset */
+	       dev_state->alternate_charset_active = true;
 	       break;
 	     case 24:
 	       dev_state->underline = false;

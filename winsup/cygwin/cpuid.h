@@ -6,9 +6,9 @@ cpuid (unsigned *a, unsigned *b, unsigned *c, unsigned *d, unsigned in)
 {
   asm ("cpuid"
        : "=a" (*a),
-         "=b" (*b),
-         "=c" (*c),
-         "=d" (*d)
+	 "=b" (*b),
+	 "=c" (*c),
+	 "=d" (*d)
        : "a" (in));
 }
 

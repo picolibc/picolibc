@@ -105,29 +105,29 @@ msgctl (int msqid, int cmd, struct msqid_ds *buf)
       case IPC_STAT:
 	if (__check_null_invalid_struct_errno (buf, sizeof *buf))
 	  return -1;
-        break;
+	break;
       case IPC_SET:
 	if (__check_invalid_read_ptr_errno (buf, sizeof *buf))
 	  return -1;
-        break;
+	break;
       case IPC_RMID:
-        break;
+	break;
       case IPC_INFO:
 	/* msqid == 0: Request for msginfo struct. */
 	if (!msqid
 	    && __check_null_invalid_struct_errno (buf, sizeof (struct msginfo)))
 	    return -1;
 	/* Otherwise, request msqid entries from internal msqid_ds array. */
-        if (msqid)
+	if (msqid)
 	  if (__check_null_invalid_struct_errno (buf, msqid * sizeof (struct msqid_ds)))
 	    return -1;
-        break;
+	break;
       case MSG_INFO:
-        if (__check_null_invalid_struct_errno (buf, sizeof (struct msg_info)))
+	if (__check_null_invalid_struct_errno (buf, sizeof (struct msg_info)))
 	  return -1;
-        break;
+	break;
       default:
-        syscall_printf ("-1 [%d] = msgctl ()", EINVAL);
+	syscall_printf ("-1 [%d] = msgctl ()", EINVAL);
 	set_errno (EINVAL);
 	return -1;
     }
@@ -137,7 +137,7 @@ msgctl (int msqid, int cmd, struct msqid_ds *buf)
       syscall_printf ("-1 [%d] = msgctl ()", request.error_code ());
       set_errno (request.error_code ());
       if (request.error_code () == ENOSYS)
-        raise (SIGSYS);
+	raise (SIGSYS);
       return -1;
     }
   return request.retval ();
@@ -159,7 +159,7 @@ msgget (key_t key, int msgflg)
       syscall_printf ("-1 [%d] = msgget ()", request.error_code ());
       set_errno (request.error_code ());
       if (request.error_code () == ENOSYS)
-        raise (SIGSYS);
+	raise (SIGSYS);
       return -1;
     }
   return request.retval ();
@@ -175,7 +175,7 @@ msgrcv (int msqid, void *msgp, size_t msgsz, long msgtyp, int msgflg)
 {
 #ifdef USE_SERVER
   syscall_printf ("msgrcv (msqid = %d, msgp = %p, msgsz = %d, "
-  		  "msgtyp = %d, msgflg = 0x%x)",
+		  "msgtyp = %d, msgflg = 0x%x)",
 		  msqid, msgp, msgsz, msgtyp, msgflg);
   if (__check_null_invalid_struct_errno (msgp, msgsz))
     return -1;
@@ -185,7 +185,7 @@ msgrcv (int msqid, void *msgp, size_t msgsz, long msgtyp, int msgflg)
       syscall_printf ("-1 [%d] = msgrcv ()", request.error_code ());
       set_errno (request.error_code ());
       if (request.error_code () == ENOSYS)
-        raise (SIGSYS);
+	raise (SIGSYS);
       return -1;
     }
   return request.rcvval ();
@@ -210,7 +210,7 @@ msgsnd (int msqid, const void *msgp, size_t msgsz, int msgflg)
       syscall_printf ("-1 [%d] = msgsnd ()", request.error_code ());
       set_errno (request.error_code ());
       if (request.error_code () == ENOSYS)
-        raise (SIGSYS);
+	raise (SIGSYS);
       return -1;
     }
   return request.retval ();

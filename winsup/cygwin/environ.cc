@@ -913,7 +913,7 @@ build_env (const char * const *envp, char *&envblock, int &envc,
   if (cygheap->user.issetuid ())
     for (unsigned i = 0; i < SPENVS_SIZE; i++)
       if (!saw_spenv[i])
-        {
+      {
 	  *dstp = spenvs[i].retrieve (no_envblock);
 	  if (*dstp && !no_envblock && *dstp != env_dontadd)
 	    {
@@ -921,7 +921,7 @@ build_env (const char * const *envp, char *&envblock, int &envc,
 	      dstp++;
 	    }
 	}
-  
+
   envc = dstp - newenv;		/* Number of entries in newenv */
   assert ((size_t) envc <= (n + SPENVS_SIZE));
   *dstp = NULL;			/* Terminate */

@@ -52,7 +52,7 @@ sysconf (int in)
       case _SC_SAVED_IDS:
 	return _POSIX_SAVED_IDS;
       case _SC_LOGIN_NAME_MAX:
-        return LOGIN_NAME_MAX;
+	return LOGIN_NAME_MAX;
       case _SC_GETPW_R_SIZE_MAX:
       case _SC_GETGR_R_SIZE_MAX:
 	return 16*1024;
@@ -104,7 +104,7 @@ sysconf (int in)
 	  }
 	break;
       case _SC_AVPHYS_PAGES:
-        if (wincap.supports_smp ())
+	if (wincap.supports_smp ())
 	  {
 	    NTSTATUS ret;
 	    SYSTEM_PERFORMANCE_INFORMATION spi;
@@ -124,7 +124,7 @@ sysconf (int in)
       case _SC_RTSIG_MAX:
 	return RTSIG_MAX;
       case _SC_TTY_NAME_MAX:
-        return TTY_NAME_MAX;
+	return TTY_NAME_MAX;
     }
 
   /* Invalid input or unimplemented sysconf name */

@@ -43,7 +43,7 @@ details. */
      to the device fails with EBUSY.
      If different processes open the audio device simultaneously,
      the results are unpredictable - usually the first one wins.
-    
+
   3. The wave device is reserved within a process from the time that
      the first read or write call has been successful until /dev/dsp
      has been closed by that process. During this reservation period
@@ -93,7 +93,7 @@ class fhandler_dev_dsp::Audio::queue
 
   bool send (WAVEHDR *);  // queue an item, returns true if successful
   bool recv (WAVEHDR **); // retrieve an item, returns true if successful
-  int query ();           // return number of items queued
+  int query ();		  // return number of items queued
 
  private:
   int head_;
@@ -131,7 +131,7 @@ class fhandler_dev_dsp::Audio_out: public Audio
   queue *Qapp2app_;  // empty and unprepared blocks
   HWAVEOUT dev_;     // The wave device
   int bufferIndex_;  // offset into pHdr_->lpData
-  WAVEHDR *pHdr_;    // data to be filled by write  
+  WAVEHDR *pHdr_;    // data to be filled by write
   WAVEHDR wavehdr_[MAX_BLOCKS];
   char *bigwavebuffer_; // audio samples only
 
@@ -356,7 +356,7 @@ fhandler_dev_dsp::Audio::blockSize (int rate, int bits, int channels)
   blockSize = ((bits / 8) * channels * rate) / 8; // approx 125ms per block
   // round up to multiple of 64
   blockSize +=  0x3f;
-  blockSize &= ~0x3f; 
+  blockSize &= ~0x3f;
   return blockSize;
 }
 
@@ -414,7 +414,7 @@ fhandler_dev_dsp::Audio_out::start (int rate, int bits, int channels)
 
   debug_printf ("freq=%d bits=%d channels=%d %s", rate, bits, channels,
 		(rc != MMSYSERR_NOERROR) ? "FAIL" : "OK");
-  
+
   return (rc == MMSYSERR_NOERROR);
 }
 
@@ -431,8 +431,8 @@ fhandler_dev_dsp::Audio_out::stop (bool immediately)
     {
       if (!immediately)
 	{
-	  sendcurrent ();           // force out last block whatever size..
-	  waitforallsent ();        // block till finished..
+	  sendcurrent ();	// force out last block whatever size..
+	  waitforallsent ();	// block till finished..
 	}
 
       rc = waveOutReset (dev_);
@@ -817,7 +817,7 @@ fhandler_dev_dsp::Audio_in::start (int rate, int bits, int channels)
 
   debug_printf ("freq=%d bits=%d channels=%d %s", rate, bits, channels,
 		(rc != MMSYSERR_NOERROR) ? "FAIL" : "OK");
-  
+
   return (rc == MMSYSERR_NOERROR);
 }
 
@@ -920,7 +920,7 @@ fhandler_dev_dsp::Audio_in::read (char *pSampleData, int &nBytes)
 	  (this->*convert_) ((unsigned char *)pSampleData, bytes_to_read);
 	  nBytes += bytes_to_read;
 	  bufferIndex_ += bytes_to_read;
-	  debug_printf ("got %d", bytes_to_read); 
+	  debug_printf ("got %d", bytes_to_read);
 	  break; // done; use remaining data in next call to read
 	}
       else
@@ -972,7 +972,7 @@ fhandler_dev_dsp::Audio_in::waitfordata ()
 	}
     }
   pHdr_ = pHdr;
-  bufferIndex_ = 0; 
+  bufferIndex_ = 0;
 }
 
 void
@@ -1069,7 +1069,7 @@ fhandler_dev_dsp::open (int flags, mode_t mode)
       break;
     case O_RDONLY:
       audio_in_ = new Audio_in;
-      if (!audio_in_->query (audiofreq_, audiobits_, audiochannels_)) 
+      if (!audio_in_->query (audiofreq_, audiobits_, audiochannels_))
 	{
 	  delete audio_in_;
 	  audio_in_ = NULL;
@@ -1113,7 +1113,7 @@ fhandler_dev_dsp::open (int flags, mode_t mode)
       set_errno (EIO);
     }
   debug_printf ("ACCMODE=0x%08x audio_in=%08x audio_out=%08x, rc=%d",
-                flags & O_ACCMODE, (int)audio_in_, (int)audio_out_, rc);
+		flags & O_ACCMODE, (int)audio_in_, (int)audio_out_, rc);
   return rc;
 }
 
@@ -1209,8 +1209,8 @@ fhandler_dev_dsp::close (void)
     {
       if (exit_state != ES_NOT_EXITING)
        { // emergency close due to call to exit() or Ctrl-C:
-         // do not wait for all pending audio to be played
-         audio_out_->stop (true);
+	 // do not wait for all pending audio to be played
+	 audio_out_->stop (true);
        }
       delete audio_out_;
       audio_out_ = NULL;
@@ -1335,7 +1335,7 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
       CASE (SNDCTL_DSP_SPEED)
       {
 	if (audio_out_)
-	  {	    
+	  {
 	    RETURN_ERROR_WHEN_BUSY (audio_out_);
 	    audio_out_->stop ();
 	    if (audio_out_->query (*intptr, audiobits_, audiochannels_))
@@ -1367,7 +1367,7 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
 	int nChannels = *intptr + 1;
 
 	if (audio_out_)
-	  {	    
+	  {
 	    RETURN_ERROR_WHEN_BUSY (audio_out_);
 	    audio_out_->stop ();
 	    if (audio_out_->query (audiofreq_, audiobits_, nChannels))
@@ -1399,7 +1399,7 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
 	int nChannels = *intptr;
 
 	if (audio_out_)
-	  {	    
+	  {
 	    RETURN_ERROR_WHEN_BUSY (audio_out_);
 	    audio_out_->stop ();
 	    if (audio_out_->query (audiofreq_, audiobits_, nChannels))

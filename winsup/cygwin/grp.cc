@@ -185,7 +185,7 @@ getgrgid_r (__gid32_t gid, struct __group32 *grp, char *buffer, size_t bufsize,
     return ERANGE;
 
   struct __group32 *tempgr = internal_getgrgid (gid, true);
-  pthread_testcancel (); 
+  pthread_testcancel ();
   if (!tempgr)
     return 0;
 
@@ -242,7 +242,7 @@ getgrnam_r (const char *nam, struct __group32 *grp, char *buffer,
     return ERANGE;
 
   struct __group32 *tempgr = internal_getgrnam (nam, true);
-  pthread_testcancel (); 
+  pthread_testcancel ();
   if (!tempgr)
     return 0;
 
@@ -373,7 +373,7 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygpsid * srchsid)
 		    for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
 		      if (sid == groups->Groups[pg].Sid &&
 			  sid != well_known_world_sid)
-		        {
+			{
 			  if (cnt < gidsetsize)
 			    grouplist[cnt] = gr->gr_gid;
 			  ++cnt;

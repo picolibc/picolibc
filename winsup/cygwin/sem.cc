@@ -116,7 +116,7 @@ semctl (int semid, int semnum, int cmd, ...)
       syscall_printf ("-1 [%d] = semctl ()", request.error_code ());
       set_errno (request.error_code ());
       if (request.error_code () == ENOSYS)
-        raise (SIGSYS);
+	raise (SIGSYS);
       return -1;
     }
   return request.retval ();
@@ -139,7 +139,7 @@ semget (key_t key, int nsems, int semflg)
       syscall_printf ("-1 [%d] = semget ()", request.error_code ());
       set_errno (request.error_code ());
       if (request.error_code () == ENOSYS)
-        raise (SIGSYS);
+	raise (SIGSYS);
       return -1;
     }
   return request.retval ();
@@ -164,7 +164,7 @@ semop (int semid, struct sembuf *sops, size_t nsops)
       syscall_printf ("-1 [%d] = semop ()", request.error_code ());
       set_errno (request.error_code ());
       if (request.error_code () == ENOSYS)
-        raise (SIGSYS);
+	raise (SIGSYS);
       return -1;
     }
   return request.retval ();

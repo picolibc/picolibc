@@ -325,19 +325,19 @@ tty::alive (const char *fmt)
   return ev != NULL;
 }
 
-HANDLE 
+HANDLE
 tty::open_output_mutex ()
 {
   return open_mutex (OUTPUT_MUTEX);
-} 
+}
 
 HANDLE
 tty::open_input_mutex ()
 {
   return open_mutex (INPUT_MUTEX);
-} 
+}
 
-HANDLE 
+HANDLE
 tty::open_mutex (const char *mutex)
 {
   char buf[CYG_MAX_PATH];

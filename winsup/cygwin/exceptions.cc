@@ -830,13 +830,13 @@ ctrl_c_handler (DWORD type)
   if (myself->ctty != -1)
     {
       if (type == CTRL_CLOSE_EVENT)
-        {
+	{
 	  sig_send (NULL, SIGHUP);
 	  saw_close = true;
 	  return FALSE;
 	}
       if (!saw_close && type == CTRL_LOGOFF_EVENT)
-        {
+	{
 	  /* Check if the process is actually associated with a visible
 	     window station, one which actually represents a visible desktop.
 	     If not, the CTRL_LOGOFF_EVENT doesn't concern this process. */

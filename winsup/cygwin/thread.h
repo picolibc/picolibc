@@ -121,9 +121,9 @@ typedef enum
 } verifyable_object_state;
 
 verifyable_object_state verifyable_object_isvalid (void const * objectptr, long magic,
-                                                   void *static_ptr1 = NULL,
-                                                   void *static_ptr2 = NULL,
-                                                   void *static_ptr3 = NULL);
+						   void *static_ptr1 = NULL,
+						   void *static_ptr2 = NULL,
+						   void *static_ptr3 = NULL);
 
 template <class list_node> inline void
 List_insert (list_node *&head, list_node *node)
@@ -279,7 +279,7 @@ public:
   static bool can_be_unlocked (pthread_mutex_t const *mutex);
   static void init_mutex ();
   static int init (pthread_mutex_t *mutex, const pthread_mutexattr_t *attr,
-                   const pthread_mutex_t initializer = NULL);
+		   const pthread_mutex_t initializer = NULL);
 
   unsigned long lock_counter;
   HANDLE win32_obj_id;

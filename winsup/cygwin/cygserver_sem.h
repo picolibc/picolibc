@@ -47,7 +47,7 @@ private:
       proc ipcblk;
       union
       {
-        struct semctl_args ctlargs;
+	struct semctl_args ctlargs;
 	struct semget_args getargs;
 	struct semop_args  opargs;
       };

@@ -142,7 +142,7 @@ mtinfo_drive::close (HANDLE mt, bool rewind)
       if (dirty == async_write_pending)
 	lasterr = async_wait (mt, NULL);
       if (!lasterr)
-        {
+	{
 	  /* if last operation was writing, write a filemark */
 	  debug_printf ("writing filemark");
 	  write_marks (mt, TAPE_FILEMARKS, two_fm () ? 2 : 1);
@@ -157,7 +157,7 @@ mtinfo_drive::close (HANDLE mt, bool rewind)
   else if (dirty == has_read && !rewind)
     {
       if (sysv ())
-        {
+	{
 	  /* Under SYSV semantics, the tape is moved past the next file mark
 	     after read. */
 	  if (part (partition)->emark == no_eof)
@@ -166,7 +166,7 @@ mtinfo_drive::close (HANDLE mt, bool rewind)
 	    part (partition)->emark = eof;
 	}
       else
-        {
+	{
 	  /* Under BSD semantics, we must check if the filemark has been
 	     inadvertendly crossed.  If so cross the filemark backwards
 	     and position the tape right before EOF. */
@@ -265,9 +265,9 @@ mtinfo_drive::read (HANDLE mt, HANDLE mt_evt, void *ptr, size_t &ulen)
   else if (IS_EOD (lasterr))
     {
       if (part (partition)->emark == eof)
-        part (partition)->emark = IS_EOM (lasterr) ? eom : eod;
+	part (partition)->emark = IS_EOM (lasterr) ? eom : eod;
       else
-        {
+	{
 	  part (partition)->emark = IS_EOM (lasterr) ? eom_hit : eod_hit;
 	  lasterr = 0;
 	}
@@ -278,7 +278,7 @@ mtinfo_drive::read (HANDLE mt, HANDLE mt_evt, void *ptr, size_t &ulen)
       /* This happens if the buffer is too small when in variable block
 	 size mode.  Linux returns ENOMEM here.  We're doing the same. */
       if (lasterr == ERROR_MORE_DATA)
-        lasterr = ERROR_NOT_ENOUGH_MEMORY;
+	lasterr = ERROR_NOT_ENOUGH_MEMORY;
     }
   if (!lasterr)
     dirty = has_read;
@@ -324,7 +324,7 @@ mtinfo_drive::write (HANDLE mt, HANDLE mt_evt, const void *ptr, size_t &len)
   if (lasterr == ERROR_IO_PENDING)
     {
       if (async_writes () && mp ()->BlockSize == 0)
-        dirty = async_write_pending;
+	dirty = async_write_pending;
       else
 	/* Wait for completion if a non-async write. */
 	lasterr = async_wait (mt, &bytes_written);
@@ -349,9 +349,9 @@ mtinfo_drive::write (HANDLE mt, HANDLE mt_evt, const void *ptr, size_t &len)
     {
       part (partition)->emark = no_eof;
       if (!lasterr)
-        dirty = has_written;
+	dirty = has_written;
       else if (lasterr == ERROR_IO_PENDING)
-        dirty = async_write_pending;
+	dirty = async_write_pending;
     }
   return error ("write");
 }
@@ -370,9 +370,9 @@ mtinfo_drive::get_pos (HANDLE mt, long *ppartition, long *pblock)
 	partition = (long) p - 1;
       block = (long) low;
       if (ppartition)
-        *ppartition= partition;
+	*ppartition= partition;
       if (pblock)
-        *pblock = block;
+	*pblock = block;
     }
   else
     {
@@ -408,7 +408,7 @@ mtinfo_drive::set_pos (HANDLE mt, int mode, long count,
       case TAPE_SPACE_RELATIVE_BLOCKS:
       case TAPE_SPACE_FILEMARKS:
       case TAPE_SPACE_SETMARKS:
-        if (!count)
+	if (!count)
 	  {
 	    lasterr = 0;
 	    goto out;
@@ -417,7 +417,7 @@ mtinfo_drive::set_pos (HANDLE mt, int mode, long count,
       case TAPE_ABSOLUTE_BLOCK:
       case TAPE_LOGICAL_BLOCK:
       case TAPE_REWIND:
-        dont_wait = nowait () ? TRUE : FALSE;
+	dont_wait = nowait () ? TRUE : FALSE;
 	break;
     }
   if (mode == TAPE_SPACE_FILEMARKS)
@@ -437,9 +437,9 @@ mtinfo_drive::set_pos (HANDLE mt, int mode, long count,
       case TAPE_LOGICAL_BLOCK:
 	get_pos (mt);
 	part (partition)->initialize (block);
-        break;
+	break;
       case TAPE_REWIND:
-        if (!err)
+	if (!err)
 	  {
 	    block = 0;
 	    part (partition)->initialize (0);
@@ -454,7 +454,7 @@ mtinfo_drive::set_pos (HANDLE mt, int mode, long count,
 	get_pos (mt);
 	part (partition)->initialize (block);
 	part (partition)->emark = IS_EOM (err) ? eom : eod;
-        break;
+	break;
       case TAPE_SPACE_FILEMARKS:
 	if (!err || IS_SM (err))
 	  {
@@ -469,7 +469,7 @@ mtinfo_drive::set_pos (HANDLE mt, int mode, long count,
 	      }
 	    else
 	      {
-	        if (part (partition)->file >= 0)
+		if (part (partition)->file >= 0)
 		  part (partition)->file += count - undone;
 		part (partition)->fblock = -1;
 		part (partition)->smark = false;
@@ -533,17 +533,17 @@ mtinfo_drive::set_pos (HANDLE mt, int mode, long count,
 	    block = 0;
 	    part (partition)->initialize (0);
 	  }
-        break;
+	break;
       case TAPE_SPACE_SETMARKS:
 	get_pos (mt);
 	part (partition)->block = block;
-        if (!err)
+	if (!err)
 	  {
 	    part (partition)->file = -1;
 	    part (partition)->fblock = -1;
 	    part (partition)->smark = true;
 	  }
-        break;
+	break;
     }
   lasterr = err;
 out:
@@ -563,13 +563,13 @@ mtinfo_drive::create_partitions (HANDLE mt, long count)
   if (get_feature (TAPE_DRIVE_INITIATOR))
     {
       if (count <= 0)
-        TAPE_FUNC (CreateTapePartition (mt, TAPE_INITIATOR_PARTITIONS,
+	TAPE_FUNC (CreateTapePartition (mt, TAPE_INITIATOR_PARTITIONS,
 					count <= 0 ? 0 : 2, (DWORD) count));
     }
   else if (get_feature (TAPE_DRIVE_FIXED))
     {
       /* This is supposed to work for Tandberg SLR drivers up to version
-         1.6 which missed to set the TAPE_DRIVE_INITIATOR flag.  According
+	 1.6 which missed to set the TAPE_DRIVE_INITIATOR flag.  According
 	 to Tandberg, CreateTapePartition(TAPE_FIXED_PARTITIONS) apparently
 	 does not ignore the dwCount parameter.  Go figure! */
       TAPE_FUNC (CreateTapePartition (mt, TAPE_FIXED_PARTITIONS,
@@ -600,7 +600,7 @@ mtinfo_drive::set_partition (HANDLE mt, long count)
 	  if (sav_partition != partition)
 	    {
 	      if (partition < MAX_PARTITION_NUM
-	          && part (partition)->block != block)
+		  && part (partition)->block != block)
 		part (partition)->initialize (block);
 	    }
 	  else if (sav_block != block && partition < MAX_PARTITION_NUM)
@@ -608,7 +608,7 @@ mtinfo_drive::set_partition (HANDLE mt, long count)
 	  lasterr = err;
 	}
       else
-        {
+	{
 	  partition = count;
 	  if (part (partition)->block == -1)
 	    part (partition)->initialize (0);
@@ -710,9 +710,9 @@ mtinfo_drive::prepare (HANDLE mt, int action, bool is_auto)
 	break;
       case TAPE_LOCK:
 	lock = lasterr ? lock_error : is_auto ? auto_locked : locked;
-        break;
+	break;
       case TAPE_UNLOCK:
-        lock = lasterr ? lock_error : unlocked;
+	lock = lasterr ? lock_error : unlocked;
 	break;
     }
   return error ("prepare");
@@ -813,12 +813,12 @@ mtinfo_drive::get_status (HANDLE mt, struct mtget *get)
 	else
 	  get->mt_gstat |= GMT_EOF (-1);
       if (part (partition)->emark >= eod_hit)
-        get->mt_gstat |= GMT_EOD (-1);
+	get->mt_gstat |= GMT_EOD (-1);
       if (part (partition)->emark >= eom_hit)
-        get->mt_gstat |= GMT_EOT (-1);
+	get->mt_gstat |= GMT_EOT (-1);
 
       if (part (partition)->smark)
-        get->mt_gstat |= GMT_SM (-1);
+	get->mt_gstat |= GMT_SM (-1);
 
       get->mt_gstat |= GMT_ONLINE (-1);
 
@@ -895,7 +895,7 @@ mtinfo_drive::set_options (HANDLE mt, long options)
 	  {
 	    buffer_writes ((options == 1));
 	  }
-        break;
+	break;
       case MT_ST_BOOLEANS:
 	buffer_writes (!!(options & MT_ST_BUFFER_WRITES));
 	async_writes (!!(options & MT_ST_ASYNC_WRITES));
@@ -913,10 +913,10 @@ mtinfo_drive::set_options (HANDLE mt, long options)
 	if (sdp.ECC != dp ()->ECC || sdp.DataPadding != dp ()->DataPadding
 	    || sdp.ReportSetmarks != dp ()->ReportSetmarks)
 	  call_setparams = true;
-        break;
+	break;
       case MT_ST_SETBOOLEANS:
       case MT_ST_CLEARBOOLEANS:
-        set = (what == MT_ST_SETBOOLEANS);
+	set = (what == MT_ST_SETBOOLEANS);
 	if (options & MT_ST_BUFFER_WRITES)
 	  buffer_writes (set);
 	if (options & MT_ST_ASYNC_WRITES)
@@ -940,7 +940,7 @@ mtinfo_drive::set_options (HANDLE mt, long options)
 	if (sdp.ECC != dp ()->ECC || sdp.DataPadding != dp ()->DataPadding
 	    || sdp.ReportSetmarks != dp ()->ReportSetmarks)
 	  call_setparams = true;
-        break;
+	break;
       case MT_ST_EOT_WZ_SIZE:
 	if (get_feature (TAPE_DRIVE_SET_EOT_WZ_SIZE))
 	  {
@@ -948,14 +948,14 @@ mtinfo_drive::set_options (HANDLE mt, long options)
 	    if (sdp.EOTWarningZoneSize != dp ()->EOTWarningZoneSize)
 	      call_setparams = true;
 	  }
-        break;
+	break;
     }
   if (call_setparams)
     {
       TAPE_FUNC (SetTapeParameters (mt, SET_TAPE_DRIVE_INFORMATION, &sdp));
       int err = lasterr;
       if (!err)
-        {
+	{
 	  dp ()->ECC = sdp.ECC;
 	  dp ()->DataPadding = sdp.DataPadding;
 	  dp ()->ReportSetmarks = sdp.ReportSetmarks;
@@ -973,10 +973,10 @@ mtinfo_drive::ioctl (HANDLE mt, unsigned int cmd, void *buf)
   if (cmd == MTIOCTOP)
     {
       if (__check_invalid_read_ptr (buf, sizeof (struct mtop)))
-        return ERROR_NOACCESS;
+	return ERROR_NOACCESS;
       struct mtop *op = (struct mtop *) buf;
       if (lasterr == ERROR_BUS_RESET)
-        {
+	{
 	  /* If a bus reset occurs, block further access to this device
 	     until the user rewinds, unloads or in any other way tries
 	     to maintain a well-known tape position. */
@@ -990,7 +990,7 @@ mtinfo_drive::ioctl (HANDLE mt, unsigned int cmd, void *buf)
 	      debug_printf ("Couldn't relock drive after bus reset.");
 	      lock = unlocked;
 	    }
-        }
+	}
       switch (op->mt_op)
 	{
 	  case MTRESET:
@@ -1120,13 +1120,13 @@ mtinfo_drive::ioctl (HANDLE mt, unsigned int cmd, void *buf)
   else if (cmd == MTIOCGET)
     {
       if (__check_null_invalid_struct (buf, sizeof (struct mtget)))
-        return ERROR_NOACCESS;
+	return ERROR_NOACCESS;
       get_status (mt, (struct mtget *) buf);
     }
   else if (cmd == MTIOCPOS)
     {
       if (__check_null_invalid_struct (buf, sizeof (struct mtpos)))
-        return ERROR_NOACCESS;
+	return ERROR_NOACCESS;
       if (!get_pos (mt))
 	((struct mtpos *) buf)->mt_blkno = block;
     }
@@ -1152,7 +1152,7 @@ mtinfo::initialize (void)
       magic = MTINFO_MAGIC;
       version = MTINFO_VERSION;
       for (unsigned i = 0; i < MAX_DRIVE_NUM; ++i)
-        drive (i)->initialize (i, true);
+	drive (i)->initialize (i, true);
       ReleaseMutex (mtx);
       CloseHandle (mtx);
     }
@@ -1164,7 +1164,7 @@ mtinfo::initialize (void)
 	api_fatal ("MT magic number screwed up: %lu, should be %lu",
 		   magic, MTINFO_MAGIC);
       if (version != MTINFO_VERSION)
-        system_printf ("MT version number mismatch: %lu, should be %lu",
+	system_printf ("MT version number mismatch: %lu, should be %lu",
 		       version, MTINFO_VERSION);
     }
 }
@@ -1297,12 +1297,12 @@ fhandler_dev_tape::raw_read (void *ptr, size_t &ulen)
       buf += bytes_to_read;
       devbufstart += bytes_to_read;
       if (devbufstart == devbufend)
-        devbufstart = devbufend = 0;
+	devbufstart = devbufend = 0;
       /* If a switch to variable block_size occured, just return the buffer
-         remains until the buffer is empty, then proceed with usual variable
+	 remains until the buffer is empty, then proceed with usual variable
 	 block size handling (one block per read call). */
       if (!block_size)
-        len = 0;
+	len = 0;
     }
   if (len > 0)
     {
@@ -1310,7 +1310,7 @@ fhandler_dev_tape::raw_read (void *ptr, size_t &ulen)
 	debug_printf ("Creating event failed: %E");
       size_t block_fit = !block_size ? len : rounddown(len,  block_size);
       if (block_fit)
-        {
+	{
 	  debug_printf ("read %d bytes from tape (rest %d)",
 			block_fit, len - block_fit);
 	  ret = mt->drive (driveno ())->read (get_handle (), mt_evt, buf,
@@ -1324,7 +1324,7 @@ fhandler_dev_tape::raw_read (void *ptr, size_t &ulen)
 	      buf += block_fit;
 	      /* Only one block in each read call, please. */
 	      if (!block_size)
-	        len = 0;
+		len = 0;
 	    }
 	  else {
 	    len = 0;
@@ -1333,7 +1333,7 @@ fhandler_dev_tape::raw_read (void *ptr, size_t &ulen)
 	  }
 	}
       if (!ret && len > 0)
-        {
+	{
 	  debug_printf ("read %d bytes from tape (one block)", block_size);
 	  ret = mt->drive (driveno ())->read (get_handle (), mt_evt, devbuf,
 					      block_size);
