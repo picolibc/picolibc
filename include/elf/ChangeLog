@@ -1,8 +1,15 @@
+2001-01-11  Peter Targett  <peter.targett@arccores.com>
+
+	* arc.h (E_ARC_MACH_ARC5, E_ARC_MACH_ARC6, E_ARC_MACH_ARC7,
+	E_ARC_MACH_ARC8): New definitions for cpu types.
+
+	* common.h (EM_ARC): Change comment.
+
 2000-12-12  Nick Clifton  <nickc@redhat.com>
 
 	* mips.h: Fix formatting.
 
-Mon Dec 11 10:56:58 2000  Jeffrey A Law  (law@cygnus.com)
+2000-12-11  Jeffrey A Law  (law@cygnus.com)
 
 	* hppa.h (DT_HP_*): Define relative to OLD_DT_LOOS for hpux
 	compatibility.

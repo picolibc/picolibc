@@ -125,7 +125,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define EM_SH	       42	/* Hitachi SH */
 #define EM_SPARCV9     43	/* SPARC v9 64-bit */
 #define EM_TRICORE     44       /* Siemens Tricore embedded processor */
-#define EM_ARC         45       /* Argonaut RISC Core, Argonaut Technologies Inc. */
+#define EM_ARC         45       /* ARC Cores */
 #define EM_H8_300      46       /* Hitachi H8/300 */
 #define EM_H8_300H     47       /* Hitachi H8/300H */
 #define EM_H8S         48       /* Hitachi H8S */

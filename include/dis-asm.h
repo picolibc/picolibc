@@ -174,7 +174,7 @@ extern int print_insn_h8300h		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_h8300s		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_h8500		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_alpha		PARAMS ((bfd_vma, disassemble_info*));
-extern disassembler_ftype arc_get_disassembler PARAMS ((int, int));
+extern disassembler_ftype arc_get_disassembler PARAMS ((void *));
 extern int print_insn_big_arm		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_little_arm	PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_sparc		PARAMS ((bfd_vma, disassemble_info*));
