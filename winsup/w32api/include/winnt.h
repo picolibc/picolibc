@@ -75,8 +75,10 @@ typedef CONST CHAR *LPCCH,*PCSTR,*LPCSTR;
  *       used to differentiate standard C runtime calls.
  */
 typedef WCHAR TCHAR;
+typedef WCHAR _TCHAR;
 #else
 typedef CHAR TCHAR;
+typedef CHAR _TCHAR;
 #endif
 #endif
 typedef TCHAR TBYTE,*PTCH,*PTBYTE;

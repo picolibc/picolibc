@@ -11,6 +11,7 @@ extern "C" {
 #define FVIRTKEY	1
 #define ATF_TIMEOUTON	1
 #define ATF_ONOFFFEEDBACK	2
+#define ATF_AVAILABLE	4 /* May be obsolete. Not in recent MS docs. */
 #define WH_MIN	(-1)
 #define WH_MSGFILTER	(-1)
 #define WH_JOURNALRECORD	0
@@ -1500,6 +1501,7 @@ extern "C" {
 #define MKF_MOUSEKEYSON 1
 #define MKF_MODIFIERS 64
 #define MKF_REPLACENUMBERS 128
+#define SERKF_ACTIVE 8 /* May be obsolete. Not in recent MS docs. */
 #define SERKF_AVAILABLE 2
 #define SERKF_INDICATOR 4
 #define SERKF_SERIALKEYSON 1
@@ -1908,7 +1910,7 @@ typedef struct tagACCESSTIMEOUT {
 	UINT cbSize;
 	DWORD dwFlags;
 	DWORD iTimeOutMSec;
-} ACCESSTIMEOUT;
+} ACCESSTIMEOUT, *LPACCESSTIMEOUT;
 typedef struct tagANIMATIONINFO {
 	UINT cbSize;
 	int iMinAnimate;

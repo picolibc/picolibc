@@ -1,3 +1,18 @@
+2002-01-25  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winnt.h (_TCHAR): Add typedefs.
+
+2002-01-25  Tim Hughes  <tjh@delcam.com>
+
+	* include/wininet.h (SECURITY_FLAG_IGNORE_*): Add missing
+	defines.
+
+2002-01-25  Andriy Palamarchuk  <apa3a@yahoo.com>
+
+	* include/winsuser.h (ATF_AVAILABLE, SERKF_ACTIVE):
+	Add defines.
+	(LPACCESSTIMEOUT): Add typedef.
+
 2002-01-24  Phillip Susi  <psusi@cfl.rr.com> 
 
 	* include/commctrl.h: Add missing HDM_*,HDN_*,LVSICF_* defines.
