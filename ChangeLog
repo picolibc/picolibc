@@ -1,3 +1,9 @@
+2005-03-16  Manfred Hollstein  <manfred.h@gmx.net>
+	    Andrew Pinski <pinskia@physics.uc.edu>
+
+	* Makefile.tpl (check-[+module+]): Fix shell statement inside if ... fi.
+	* Makefile.in: Regenerate.
+
 2005-03-01  Alexandre Oliva  <aoliva@redhat.com>
 
 	PR libgcj/20160
