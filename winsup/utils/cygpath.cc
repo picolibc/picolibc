@@ -1,5 +1,5 @@
 /* cygpath.cc -- convert pathnames between Windows and Unix format
-   Copyright 1998-2002 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
