@@ -1,3 +1,8 @@
+2003-01-24  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_console.cc (fhandler_console::send_winch_maybe): Reset
+	scroll region if size changes.
+
 2003-01-24  Pierre Humblet <pierre.humblet@ieee.org>
 	    Jason Tishler  <jason@tishler.net>
 

@@ -215,6 +215,8 @@ fhandler_console::send_winch_maybe ()
   if (y != dev_state->info.dwWinSize.Y || x != dev_state->info.dwWinSize.X)
     {
       extern fhandler_tty_master *tty_master;
+      dev_state->scroll_region.Top = 0;
+      dev_state->scroll_region.Bottom = -1;
       if (tty_master)
 	tty_master->set_winsize (true);
       else
