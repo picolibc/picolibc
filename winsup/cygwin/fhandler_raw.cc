@@ -19,8 +19,8 @@
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "ntdll.h"
@@ -131,12 +131,12 @@ fhandler_dev_raw::~fhandler_dev_raw (void)
 }
 
 int
-fhandler_dev_raw::open (path_conv *real_path, int flags, mode_t)
+fhandler_dev_raw::open (int flags, mode_t)
 {
   if (!wincap.has_raw_devices ())
     {
       set_errno (ENOENT);
-      debug_printf ("%s is accessible under NT/W2K only",real_path->get_win32());
+      debug_printf ("%s is accessible under NT/W2K only", get_win32_name ());
       return 0;
     }
 
@@ -160,7 +160,7 @@ fhandler_dev_raw::open (path_conv *real_path, int flags, mode_t)
   extern void str2buf2uni (UNICODE_STRING &, WCHAR *, const char *);
   UNICODE_STRING dev;
   WCHAR devname[MAX_PATH + 1];
-  str2buf2uni (dev, devname, real_path->get_win32 ());
+  str2buf2uni (dev, devname, get_win32_name ());
   OBJECT_ATTRIBUTES attr;
   InitializeObjectAttributes (&attr, &dev, OBJ_CASE_INSENSITIVE, NULL, NULL);
 

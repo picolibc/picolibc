@@ -22,8 +22,8 @@ details. */
 #include <sys/cygwin.h>
 #include "cygerrno.h"
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "sigproc.h"
@@ -581,7 +581,7 @@ fhandler_console::scroll_screen (int x1, int y1, int x2, int y2, int xn, int yn)
 }
 
 int
-fhandler_console::open (path_conv *, int flags, mode_t)
+fhandler_console::open (int flags, mode_t)
 {
   HANDLE h;
 
@@ -656,7 +656,7 @@ fhandler_console::dup (fhandler_base *child)
 {
   fhandler_console *fhc = (fhandler_console *) child;
 
-  if (!fhc->open (NULL, get_flags () & ~O_NOCTTY, 0))
+  if (!fhc->open (get_flags () & ~O_NOCTTY, 0))
     system_printf ("error opening console, %E");
 
   return 0;
@@ -1406,7 +1406,7 @@ fhandler_console::write_normal (const unsigned char *src,
       switch (base_chars[*src])
 	{
 	case BEL:
-	  Beep (412, 100);
+	  MessageBeep (0xFFFFFFFF);
 	  break;
 	case ESC:
 	  dev_state->state_ = gotesc;
@@ -1673,7 +1673,7 @@ fhandler_console::init (HANDLE f, DWORD a, mode_t bin)
     flags = O_WRONLY;
   if (a == (GENERIC_READ | GENERIC_WRITE))
     flags = O_RDWR;
-  open ((path_conv *) NULL, flags | O_BINARY);
+  open (flags | O_BINARY);
   if (f != INVALID_HANDLE_VALUE)
     CloseHandle (f);	/* Reopened by open */
 
@@ -1702,7 +1702,7 @@ fhandler_console::fixup_after_fork (HANDLE)
   /* Windows does not allow duplication of console handles between processes
      so open the console explicitly. */
 
-  if (!open (NULL, O_NOCTTY | get_flags (), 0))
+  if (!open (O_NOCTTY | get_flags (), 0))
     system_printf ("error opening console after fork, %E");
 
   if (!get_close_on_exec ())
@@ -1732,7 +1732,7 @@ fhandler_console::fixup_after_exec (HANDLE)
   HANDLE h = get_handle ();
   HANDLE oh = get_output_handle ();
 
-  if (!open (NULL, O_NOCTTY | get_flags (), 0))
+  if (!open (O_NOCTTY | get_flags (), 0))
     {
       int sawerr = 0;
       if (!get_io_handle ())

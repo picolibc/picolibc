@@ -19,8 +19,8 @@ details. */
 #include <errno.h>
 #include "pinfo.h"
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygerrno.h"
 #include "cygheap.h"

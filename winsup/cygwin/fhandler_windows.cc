@@ -17,6 +17,7 @@ details. */
 #include <winuser.h>
 #include "cygerrno.h"
 #include "security.h"
+#include "path.h"
 #include "fhandler.h"
 
 /*
@@ -52,7 +53,7 @@ fhandler_windows::fhandler_windows ()
 }
 
 int
-fhandler_windows::open (path_conv *, int flags, mode_t)
+fhandler_windows::open (int flags, mode_t)
 {
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_close_on_exec_flag (1);

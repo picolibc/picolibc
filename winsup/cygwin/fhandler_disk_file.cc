@@ -18,8 +18,8 @@ details. */
 #include "perprocess.h"
 #include "security.h"
 #include "cygwin/version.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "shared_info.h"
@@ -65,7 +65,7 @@ num_entries (const char *win32_name)
 }
 
 int __stdcall
-fhandler_base::fstat_by_handle (struct __stat64 *buf, path_conv *pc)
+fhandler_base::fstat_by_handle (struct __stat64 *buf)
 {
   int res = 0;
   BY_HANDLE_FILE_INFORMATION local;
@@ -90,7 +90,7 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf, path_conv *pc)
       local.nFileSizeLow = GetFileSize (get_handle (), &local.nFileSizeHigh);
     }
 
-  return fstat_helper (buf, pc,
+  return fstat_helper (buf,
 		       local.ftCreationTime,
 		       local.ftLastAccessTime,
 		       local.ftLastWriteTime,
@@ -102,11 +102,11 @@ fhandler_base::fstat_by_handle (struct __stat64 *buf, path_conv *pc)
 }
 
 int __stdcall
-fhandler_base::fstat_by_name (struct __stat64 *buf, path_conv *pc)
+fhandler_base::fstat_by_name (struct __stat64 *buf)
 {
   int res;
 
-  if (!pc->exists ())
+  if (!pc.exists ())
     {
       debug_printf ("already determined that pc does not exist");
       set_errno (ENOENT);
@@ -116,14 +116,14 @@ fhandler_base::fstat_by_name (struct __stat64 *buf, path_conv *pc)
     {
       char drivebuf[5];
       char *name;
-      if ((*pc)[3] != '\0' || !isalpha ((*pc)[0]) || (*pc)[1] != ':' || (*pc)[2] != '\\')
-	name = *pc;
+      if ((pc)[3] != '\0' || !isalpha ((pc)[0]) || (pc)[1] != ':' || (pc)[2] != '\\')
+	name = pc;
       else
 	{
 	  /* FIXME: Does this work on empty disks? */
-	  drivebuf[0] = (*pc)[0];
-	  drivebuf[1] = (*pc)[1];
-	  drivebuf[2] = (*pc)[2];
+	  drivebuf[0] = pc[0];
+	  drivebuf[1] = pc[1];
+	  drivebuf[2] = pc[2];
 	  drivebuf[3] = '*';
 	  drivebuf[4] = '\0';
 	  name = drivebuf;
@@ -140,7 +140,7 @@ fhandler_base::fstat_by_name (struct __stat64 *buf, path_conv *pc)
       else
 	{
 	  FindClose (h);
-	  res = fstat_helper (buf, pc,
+	  res = fstat_helper (buf,
 			      local.ftCreationTime,
 			      local.ftLastAccessTime,
 			      local.ftLastWriteTime,
@@ -152,7 +152,7 @@ fhandler_base::fstat_by_name (struct __stat64 *buf, path_conv *pc)
 }
 
 int __stdcall
-fhandler_base::fstat_fs (struct __stat64 *buf, path_conv *pc)
+fhandler_base::fstat_fs (struct __stat64 *buf)
 {
   int res = -1;
   int oret;
@@ -164,29 +164,29 @@ fhandler_base::fstat_fs (struct __stat64 *buf, path_conv *pc)
   if (get_io_handle ())
     {
       if (get_nohandle ())
-	return fstat_by_name (buf, pc);
+	return fstat_by_name (buf);
       else
-	return fstat_by_handle (buf, pc);
+	return fstat_by_handle (buf);
     }
   /* If we don't care if the file is executable or we already know if it is,
      then just do a "query open" as it is apparently much faster. */
-  if (pc->exec_state () != dont_know_if_executable)
+  if (pc.exec_state () != dont_know_if_executable)
     set_query_open (query_open_already = true);
   else
     query_open_already = false;
 
-  if (query_open_already && strncasematch (pc->volname (), "FAT", 3)
+  if (query_open_already && strncasematch (pc.volname (), "FAT", 3)
       && !strpbrk (get_win32_name (), "?*|<>"))
     oret = 0;
-  else if (!(oret = open_fs (pc, open_flags, 0)))
+  else if (!(oret = open_fs (open_flags, 0)))
     {
       mode_t ntsec_atts = 0;
       /* If we couldn't open the file, try a "query open" with no permissions.
 	 This will allow us to determine *some* things about the file, at least. */
       set_query_open (true);
-      if (!query_open_already && (oret = open (pc, open_flags, 0)))
+      if (!query_open_already && (oret = open (open_flags, 0)))
 	/* ok */;
-      else if (allow_ntsec && pc->has_acls () && get_errno () == EACCES
+      else if (allow_ntsec && pc.has_acls () && get_errno () == EACCES
 		&& !get_file_attribute (TRUE, get_win32_name (), &ntsec_atts, &uid, &gid)
 		&& !ntsec_atts && uid == myself->uid && gid == myself->gid)
 	{
@@ -196,16 +196,16 @@ fhandler_base::fstat_fs (struct __stat64 *buf, path_conv *pc)
 	     in a failing open call in the same process. Check that
 	     case. */
 	  set_file_attribute (TRUE, get_win32_name (), 0400);
-	  oret = open (pc, open_flags, 0);
+	  oret = open (open_flags, 0);
 	  set_file_attribute (TRUE, get_win32_name (), ntsec_atts);
 	}
     }
 
   if (!oret || get_nohandle ())
-    res = fstat_by_name (buf, pc);
+    res = fstat_by_name (buf);
   else
     {
-      res = fstat_by_handle (buf, pc);
+      res = fstat_by_handle (buf);
       close_fs ();
     }
 
@@ -213,7 +213,7 @@ fhandler_base::fstat_fs (struct __stat64 *buf, path_conv *pc)
 }
 
 int __stdcall
-fhandler_base::fstat_helper (struct __stat64 *buf, path_conv *pc,
+fhandler_base::fstat_helper (struct __stat64 *buf,
 			     FILETIME ftCreationTime,
 			     FILETIME ftLastAccessTime,
 			     FILETIME ftLastWriteTime,
@@ -234,20 +234,20 @@ fhandler_base::fstat_helper (struct __stat64 *buf, path_conv *pc,
   to_timestruc_t (&ftLastAccessTime, &buf->st_atim);
   to_timestruc_t (&ftLastWriteTime, &buf->st_mtim);
   to_timestruc_t (&ftCreationTime, &buf->st_ctim);
-  buf->st_dev = pc->volser ();
+  buf->st_dev = pc.volser ();
   buf->st_size = ((__off64_t)nFileSizeHigh << 32) + nFileSizeLow;
   /* Unfortunately the count of 2 confuses `find (1)' command. So
      let's try it with `1' as link count. */
-  if (pc->isdir () && !pc->isremote () && nNumberOfLinks == 1)
-    buf->st_nlink = num_entries (pc->get_win32 ());
+  if (pc.isdir () && !pc.isremote () && nNumberOfLinks == 1)
+    buf->st_nlink = num_entries (pc.get_win32 ());
   else
     buf->st_nlink = nNumberOfLinks;
 
   /* Assume that if a drive has ACL support it MAY have valid "inodes".
      It definitely does not have valid inodes if it does not have ACL
      support. */
-  switch (pc->has_acls () && (nFileIndexHigh || nFileIndexLow)
-	  ? pc->drive_type () : DRIVE_UNKNOWN)
+  switch (pc.has_acls () && (nFileIndexHigh || nFileIndexLow)
+	  ? pc.drive_type () : DRIVE_UNKNOWN)
     {
     case DRIVE_FIXED:
     case DRIVE_REMOVABLE:
@@ -270,20 +270,20 @@ fhandler_base::fstat_helper (struct __stat64 *buf, path_conv *pc,
   buf->st_mode = 0;
   /* Using a side effect: get_file_attibutes checks for
      directory. This is used, to set S_ISVTX, if needed.  */
-  if (pc->isdir ())
+  if (pc.isdir ())
     buf->st_mode = S_IFDIR;
-  else if (pc->issymlink ())
+  else if (pc.issymlink ())
     buf->st_mode = S_IFLNK;
-  else if (pc->issocket ())
+  else if (pc.issocket ())
     buf->st_mode = S_IFSOCK;
 
   __uid32_t uid;
   __gid32_t gid;
-  if (get_file_attribute (pc->has_acls (), get_win32_name (), &buf->st_mode,
+  if (get_file_attribute (pc.has_acls (), get_win32_name (), &buf->st_mode,
 			  &uid, &gid) == 0)
     {
       /* If read-only attribute is set, modify ntsec return value */
-      if (pc->has_attribute (FILE_ATTRIBUTE_READONLY) && !get_symlink_p ())
+      if (pc.has_attribute (FILE_ATTRIBUTE_READONLY) && !get_symlink_p ())
 	buf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
 
       if (!(buf->st_mode & S_IFMT))
@@ -293,7 +293,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf, path_conv *pc,
     {
       buf->st_mode |= STD_RBITS;
 
-      if (!pc->has_attribute (FILE_ATTRIBUTE_READONLY))
+      if (!pc.has_attribute (FILE_ATTRIBUTE_READONLY))
 	buf->st_mode |= STD_WBITS;
       /* | S_IWGRP | S_IWOTH; we don't give write to group etc */
 
@@ -301,17 +301,17 @@ fhandler_base::fstat_helper (struct __stat64 *buf, path_conv *pc,
 	buf->st_mode |= S_IFDIR | STD_XBITS;
       else if (buf->st_mode & S_IFMT)
 	/* nothing */;
-      else if (pc->issocket ())
+      else if (pc.issocket ())
 	buf->st_mode |= S_IFSOCK;
       else if (is_fs_special ())
 	{
-	  buf->st_dev = dev;
-	  buf->st_mode = dev.mode;
+	  buf->st_dev = dev ();
+	  buf->st_mode = dev ().mode;
 	}
       else
 	{
 	  buf->st_mode |= S_IFREG;
-	  if (pc->exec_state () == dont_know_if_executable)
+	  if (pc.exec_state () == dont_know_if_executable)
 	    {
 	      DWORD cur, done;
 	      char magic[3];
@@ -329,7 +329,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf, path_conv *pc,
 		      && has_exec_chars (magic, done))
 		    {
 		      set_execable_p ();
-		      pc->set_exec ();
+		      pc.set_exec ();
 		      buf->st_mode |= STD_XBITS;
 		    }
 		  (void) SetFilePointer (get_handle (), cur, NULL, FILE_BEGIN);
@@ -337,7 +337,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf, path_conv *pc,
 	    }
 	}
 
-      if (pc->exec_state () == is_executable)
+      if (pc.exec_state () == is_executable)
 	buf->st_mode |= STD_XBITS;
     }
 
@@ -357,9 +357,9 @@ fhandler_base::fstat_helper (struct __stat64 *buf, path_conv *pc,
 }
 
 int __stdcall
-fhandler_disk_file::fstat (struct __stat64 *buf, path_conv *pc)
+fhandler_disk_file::fstat (struct __stat64 *buf)
 {
-  return fstat_fs (buf, pc);
+  return fstat_fs (buf);
 }
 
 fhandler_disk_file::fhandler_disk_file () :
@@ -368,25 +368,25 @@ fhandler_disk_file::fhandler_disk_file () :
 }
 
 int
-fhandler_disk_file::open (path_conv *real_path, int flags, mode_t mode)
+fhandler_disk_file::open (int flags, mode_t mode)
 {
-  return open_fs (real_path, flags, mode);
+  return open_fs (flags, mode);
 }
 
 int
-fhandler_base::open_fs (path_conv *real_path, int flags, mode_t mode)
+fhandler_base::open_fs (int flags, mode_t mode)
 {
-  if (real_path->case_clash && flags & O_CREAT)
+  if (pc.case_clash && flags & O_CREAT)
     {
       debug_printf ("case clash detected");
       set_errno (ECASECLASH);
       return 0;
     }
 
-  set_has_acls (real_path->has_acls ());
-  set_isremote (real_path->isremote ());
+  set_has_acls (pc.has_acls ());
+  set_isremote (pc.isremote ());
 
-  int res = fhandler_base::open (real_path, flags | O_DIROPEN, mode);
+  int res = fhandler_base::open (flags | O_DIROPEN, mode);
   if (!res)
     goto out;
 
@@ -396,7 +396,7 @@ fhandler_base::open_fs (path_conv *real_path, int flags, mode_t mode)
      The only known file system to date is the SUN NFS Solstice Client 3.1
      which returns a valid handle when trying to open a file in a nonexistent
      directory. */
-  if (real_path->has_buggy_open () && !real_path->exists ())
+  if (pc.has_buggy_open () && !pc.exists ())
     {
       debug_printf ("Buggy open detected.");
       close_fs ();
@@ -404,9 +404,9 @@ fhandler_base::open_fs (path_conv *real_path, int flags, mode_t mode)
       return 0;
     }
 
-  set_symlink_p (real_path->issymlink ());
-  set_execable_p (real_path->exec_state ());
-  set_socket_p (real_path->issocket ());
+  set_symlink_p (pc.issymlink ());
+  set_execable_p (pc.exec_state ());
+  set_socket_p (pc.issocket ());
 
 out:
   syscall_printf ("%d = fhandler_disk_file::open (%s, %p)", res,
@@ -582,15 +582,15 @@ fhandler_disk_file::lock (int cmd, struct flock *fl)
 }
 
 DIR *
-fhandler_disk_file::opendir (path_conv& real_name)
+fhandler_disk_file::opendir ()
 {
   DIR *dir;
   DIR *res = NULL;
   size_t len;
 
-  if (!real_name.isdir ())
+  if (!pc.isdir ())
     set_errno (ENOTDIR);
-  else if ((len = strlen (real_name))> MAX_PATH - 3)
+  else if ((len = strlen (pc))> MAX_PATH - 3)
     set_errno (ENAMETOOLONG);
   else if ((dir = (DIR *) malloc (sizeof (DIR))) == NULL)
     set_errno (ENOMEM);
@@ -608,7 +608,7 @@ fhandler_disk_file::opendir (path_conv& real_name)
     }
   else
     {
-      strcpy (dir->__d_dirname, real_name.get_win32 ());
+      strcpy (dir->__d_dirname, get_win32_name ());
       dir->__d_dirent->d_version = __DIRENT_VERSION;
       cygheap_fdnew fd;
       fd = this;
@@ -746,10 +746,8 @@ void
 fhandler_cygdrive::set_drives ()
 {
   const int len = 1 + 26 * DRVSZ;
-  char *p = (char *) crealloc ((void *) win32_path_name,
-				sizeof (".") + sizeof ("..") + len);
-
-  win32_path_name = pdrive = p;
+  char *p = const_cast<char *> (get_win32_name ());
+  pdrive = p;
   strcpy (p, ".");
   strcpy (p + sizeof ("."), "..");
   p += sizeof (".") + sizeof ("..");
@@ -757,10 +755,10 @@ fhandler_cygdrive::set_drives ()
 }
 
 int
-fhandler_cygdrive::fstat (struct __stat64 *buf, path_conv *pc)
+fhandler_cygdrive::fstat (struct __stat64 *buf)
 {
   if (!iscygdrive_root ())
-    return fhandler_disk_file::fstat (buf, pc);
+    return fhandler_disk_file::fstat (buf);
   buf->st_mode = S_IFDIR | 0555;
   if (!ndrives)
     set_drives ();
@@ -769,11 +767,11 @@ fhandler_cygdrive::fstat (struct __stat64 *buf, path_conv *pc)
 }
 
 DIR *
-fhandler_cygdrive::opendir (path_conv& real_name)
+fhandler_cygdrive::opendir ()
 {
   DIR *dir;
 
-  dir = fhandler_disk_file::opendir (real_name);
+  dir = fhandler_disk_file::opendir ();
   if (dir && iscygdrive_root () && !ndrives)
     set_drives ();
 
@@ -822,7 +820,7 @@ fhandler_cygdrive::seekdir (DIR *dir, __off64_t loc)
   if (!iscygdrive_root ())
     return fhandler_disk_file::seekdir (dir, loc);
 
-  for (pdrive = win32_path_name, dir->__d_position = -1; *pdrive;
+  for (pdrive = get_win32_name (), dir->__d_position = -1; *pdrive;
        pdrive = strchr (pdrive, '\0') + 1)
     if (++dir->__d_position >= loc)
       break;
@@ -835,7 +833,7 @@ fhandler_cygdrive::rewinddir (DIR *dir)
 {
   if (!iscygdrive_root ())
     return fhandler_disk_file::rewinddir (dir);
-  pdrive = win32_path_name;
+  pdrive = get_win32_name ();
   dir->__d_position = 0;
   return;
 }
@@ -845,6 +843,6 @@ fhandler_cygdrive::closedir (DIR *dir)
 {
   if (!iscygdrive_root ())
     return fhandler_disk_file::closedir (dir);
-  pdrive = win32_path_name;
+  pdrive = get_win32_name ();
   return -1;
 }

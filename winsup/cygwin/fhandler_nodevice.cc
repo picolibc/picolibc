@@ -19,8 +19,8 @@ details. */
 #include "perprocess.h"
 #include "security.h"
 #include "cygwin/version.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "shared_info.h"
@@ -29,7 +29,7 @@ details. */
 #include <limits.h>
 
 int
-fhandler_nodevice::open (path_conv *, int, mode_t)
+fhandler_nodevice::open (int, mode_t)
 {
   set_errno (ENODEV);
   return 0;

@@ -18,6 +18,7 @@ details. */
 #include <cygwin/hdreg.h>
 #include <cygwin/fs.h>
 #include "security.h"
+#include "path.h"
 #include "fhandler.h"
 #include "cygerrno.h"
 
@@ -48,7 +49,7 @@ fhandler_dev_floppy::fhandler_dev_floppy ()
 }
 
 int
-fhandler_dev_floppy::open (path_conv *real_path, int flags, mode_t)
+fhandler_dev_floppy::open (int flags, mode_t)
 {
   /* The correct size of the buffer would be 512 bytes,
    * which is the atomic size, supported by WinNT.
@@ -63,7 +64,7 @@ fhandler_dev_floppy::open (path_conv *real_path, int flags, mode_t)
    * and cpio buffer sizes by default!
   */
   devbufsiz = 61440L; /* 512L; */
-  return fhandler_dev_raw::open (real_path, flags);
+  return fhandler_dev_raw::open (flags);
 }
 
 int

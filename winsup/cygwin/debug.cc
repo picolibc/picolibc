@@ -16,8 +16,8 @@ details. */
 #include "cygerrno.h"
 #ifdef DEBUGGING
 #include <errno.h>
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
 #endif

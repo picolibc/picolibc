@@ -17,8 +17,8 @@ details. */
 #include <limits.h>
 #include "cygerrno.h"
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "sigproc.h"
 #include "pinfo.h"
@@ -43,7 +43,7 @@ fhandler_tty_master::fhandler_tty_master ()
 int
 fhandler_tty_slave::get_unit ()
 {
-  return dev == FH_TTY ? myself->ctty : dev.minor;
+  return dev () == FH_TTY ? myself->ctty : dev ().minor;
 }
 
 void
@@ -61,7 +61,7 @@ fhandler_tty_master::init ()
 {
   termios_printf ("Creating master for tty%d", get_unit ());
 
-  slave = dev;
+  slave = dev ();
 
   if (init_console ())
     {
@@ -441,7 +441,7 @@ fhandler_tty_slave::fhandler_tty_slave ()
 /* FIXME: This function needs to close handles when it has
    a failing condition. */
 int
-fhandler_tty_slave::open (path_conv *, int flags, mode_t)
+fhandler_tty_slave::open (int flags, mode_t)
 {
   tcinit (cygwin_shared->tty[get_unit ()]);
 
@@ -1010,7 +1010,7 @@ fhandler_pty_master::fhandler_pty_master ()
 }
 
 int
-fhandler_pty_master::open (path_conv *, int flags, mode_t)
+fhandler_pty_master::open (int flags, mode_t)
 {
   int ntty = cygwin_shared->tty.allocate_tty (0);
   if (ntty < 0)
@@ -1252,8 +1252,7 @@ fhandler_tty_master::fixup_after_exec (HANDLE)
 int
 fhandler_tty_master::init_console ()
 {
-  console = (fhandler_console *)
-    cygheap->fdtab.build_fhandler (-1, *console_dev, "/dev/ttym");
+  console = (fhandler_console *) build_fh_dev (*console_dev, "/dev/ttym");
   if (console == NULL)
     return -1;
 

@@ -15,6 +15,7 @@ details. */
 #include <limits.h>
 #include "cygerrno.h"
 #include "security.h"
+#include "path.h"
 #include "fhandler.h"
 
 #define RANDOM   8
@@ -29,7 +30,7 @@ fhandler_dev_random::fhandler_dev_random ()
 }
 
 int
-fhandler_dev_random::open (path_conv *, int flags, mode_t)
+fhandler_dev_random::open (int flags, mode_t)
 {
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_nohandle (true);
@@ -85,7 +86,7 @@ fhandler_dev_random::write (const void *ptr, size_t len)
   memcpy (buf, ptr, limited_len);
 
   /* Mess up system entropy source. Return error if device is /dev/random. */
-  if (!crypt_gen_random (buf, limited_len) && dev == FH_RANDOM)
+  if (!crypt_gen_random (buf, limited_len) && dev () == FH_RANDOM)
     {
       __seterrno ();
       return -1;
@@ -129,7 +130,7 @@ fhandler_dev_random::read (void *ptr, size_t& len)
   /* If device is /dev/urandom, use pseudo number generator as fallback.
      Don't do this for /dev/random since it's intended for uses that need
      very high quality randomness. */
-  if (dev == FH_URANDOM)
+  if (dev () == FH_URANDOM)
     {
       len = pseudo_read (ptr, len);
       return;

@@ -18,6 +18,7 @@ details. */
 #include <mmsystem.h>
 #include "cygerrno.h"
 #include "security.h"
+#include "path.h"
 #include "fhandler.h"
 
 //------------------------------------------------------------------------
@@ -429,7 +430,7 @@ fhandler_dev_dsp::~fhandler_dev_dsp ()
 }
 
 int
-fhandler_dev_dsp::open (path_conv *, int flags, mode_t mode)
+fhandler_dev_dsp::open (int flags, mode_t mode)
 {
   // currently we only support writing
   if ((flags & (O_WRONLY | O_RDONLY | O_RDWR)) != O_WRONLY)

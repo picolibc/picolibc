@@ -27,8 +27,8 @@ details. */
 #include <winsock2.h>
 #include "cygerrno.h"
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "sigproc.h"
@@ -521,10 +521,10 @@ fdsock (int &fd, const char *name, SOCKET soc)
   else
     debug_printf ("not setting socket inheritance since winsock2_active %d",
 		  winsock2_active);
-  fhandler_socket *fh =
-    (fhandler_socket *) cygheap->fdtab.build_fhandler (fd, *socket_dev, name);
+  fhandler_socket *fh = (fhandler_socket *) build_fh_dev (*socket_dev, name);
   if (!fh)
     return NULL;
+  cygheap->fdtab[fd] = fh;
   fh->set_io_handle ((HANDLE) soc);
   fh->set_flags (O_RDWR | O_BINARY);
   fh->set_r_no_interrupt (winsock2_active);

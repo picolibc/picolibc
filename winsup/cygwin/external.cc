@@ -13,7 +13,6 @@ details. */
 #include "winsup.h"
 #include <errno.h>
 #include "security.h"
-#include "fhandler.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include <exceptions.h>
@@ -21,8 +20,8 @@ details. */
 #include "cygwin_version.h"
 #include "perprocess.h"
 #include "cygerrno.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "wincap.h"

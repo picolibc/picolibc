@@ -14,6 +14,7 @@ details. */
 #include <stdlib.h>
 #include "cygerrno.h"
 #include "security.h"
+#include "path.h"
 #include "fhandler.h"
 #include "sigproc.h"
 #include "pinfo.h"
@@ -201,11 +202,11 @@ fhandler_serial::dump (void)
 void
 fhandler_serial::init (HANDLE f, DWORD flags, mode_t bin)
 {
-  (void) open (NULL, flags, bin & (O_BINARY | O_TEXT));
+  (void) open (flags, bin & (O_BINARY | O_TEXT));
 }
 
 int
-fhandler_serial::open (path_conv *, int flags, mode_t mode)
+fhandler_serial::open (int flags, mode_t mode)
 {
   int res;
   COMMTIMEOUTS to;
@@ -214,7 +215,7 @@ fhandler_serial::open (path_conv *, int flags, mode_t mode)
   syscall_printf ("fhandler_serial::open (%s, %p, %p)",
 			get_name (), flags, mode);
 
-  if (!fhandler_base::open (NULL, flags, mode))
+  if (!fhandler_base::open (flags, mode))
     return 0;
 
   res = 1;

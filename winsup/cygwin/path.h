@@ -8,6 +8,19 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "devices.h"
+
+#include <sys/ioctl.h>
+#include <fcntl.h>
+
+enum executable_states
+{
+  is_executable,
+  dont_care_if_executable,
+  not_executable = dont_care_if_executable,
+  dont_know_if_executable
+};
+
 struct suffix_info
 {
   const char *name;
@@ -129,6 +142,9 @@ class path_conv
   void check (const char *src, unsigned opt = PC_SYM_FOLLOW,
 	      const suffix_info *suffixes = NULL)  __attribute__ ((regparm(3)));
 
+  path_conv (const device& in_dev): fileattr (INVALID_FILE_ATTRIBUTES),
+     path_flags (0), known_suffix (NULL), error (0), dev (in_dev) {}
+
   path_conv (int, const char *src, unsigned opt = PC_SYM_FOLLOW,
 	     const suffix_info *suffixes = NULL)
   {
@@ -162,6 +178,11 @@ class path_conv
   DWORD volser () { return fs.serial; }
   const char *volname () {return fs.name; }
   void fillin (HANDLE h);
+  inline size_t size ()
+  {
+    return (sizeof (*this) - sizeof (path)) + strlen (path) + 1;
+  }
+
   char *normalized_path;
  private:
   char path[MAX_PATH];
@@ -217,6 +238,7 @@ int path_prefix_p (const char *path1, const char *path2, int len1) __attribute__
 #define MAX_ETC_FILES 2
 class etc
 {
+  friend class dtable;
   static int curr_ix;
   static bool change_possible[MAX_ETC_FILES + 1];
   static const char *fn[MAX_ETC_FILES + 1];

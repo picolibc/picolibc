@@ -15,8 +15,8 @@ details. */
 #include <sys/cygwin.h>
 #include "cygerrno.h"
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "shared_info.h"
 #include "cygheap.h"
@@ -46,7 +46,7 @@ fhandler_virtual::fixup_after_exec (HANDLE)
 }
 
 DIR *
-fhandler_virtual::opendir (path_conv& pc)
+fhandler_virtual::opendir ()
 {
   DIR *dir;
   DIR *res = NULL;
@@ -204,7 +204,7 @@ fhandler_virtual::write (const void *ptr, size_t len)
 
 /* low-level open for all proc files */
 int
-fhandler_virtual::open (path_conv *, int flags, mode_t mode)
+fhandler_virtual::open (int flags, mode_t mode)
 {
   set_r_binary (1);
   set_w_binary (1);

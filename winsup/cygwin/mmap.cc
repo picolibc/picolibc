@@ -15,8 +15,8 @@ details. */
 #include <sys/mman.h>
 #include <errno.h>
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygerrno.h"
 #include "cygheap.h"
@@ -62,7 +62,7 @@ class mmap_record
       {
 	dev.devn = 0;
 	if (fd >= 0 && !cygheap->fdtab.not_open (fd))
-	  dev = cygheap->fdtab[fd]->dev;
+	  dev = cygheap->fdtab[fd]->dev ();
       }
 
     /* Default Copy constructor/operator=/destructor are ok */
@@ -244,12 +244,13 @@ mmap_record::alloc_fh ()
       return &fh_paging_file;
     }
 
+  static path_conv pc; // should be thread safe - CGF
   /* The file descriptor could have been closed or, even
      worse, could have been reused for another file before
      the call to fork(). This requires creating a fhandler
      of the correct type to be sure to call the method of the
      correct class. */
-  return cygheap->fdtab.build_fhandler (-1, get_device ());
+  return build_fh_dev (get_device ());
 }
 
 void

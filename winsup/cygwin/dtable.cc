@@ -27,8 +27,8 @@ details. */
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "ntdll.h"
@@ -107,12 +107,12 @@ dtable::get_debugger_info ()
       for (int i = 0; i < 3; i++)
 	if (std[i][0])
 	  {
-	    path_conv pc;
 	    HANDLE h = GetStdHandle (std_consts[i]);
-	    fhandler_base *fh = build_fhandler_from_name (i, std[i], NULL, pc);
+	    fhandler_base *fh = build_fh_name (std[i]);
 	    if (!fh)
 	      continue;
-	    if (!fh->open (&pc, (i ? O_WRONLY : O_RDONLY) | O_BINARY, 0777))
+	    fds[i] = fh;
+	    if (!fh->open ((i ? O_WRONLY : O_RDONLY) | O_BINARY, 0777))
 	      release (i);
 	    else
 	      CloseHandle (h);
@@ -206,9 +206,9 @@ cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
   if (fd == -1)
     fd = cygheap->fdtab.find_unused_handle ();
   path_conv pc;
-  fhandler_base *res = cygheap->fdtab.build_fhandler_from_name (fd, name, handle,
-								pc);
-  res->init (handle, myaccess, bin ?: pc.binmode ());
+  fhandler_base *fh = build_fh_name (name);
+  cygheap->fdtab[fd] = fh;
+  fh->init (handle, myaccess, bin ?: fh->pc_binmode ());
   return fd;
 }
 
@@ -270,13 +270,15 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
     fds[fd] = NULL;
   else
     {
-      path_conv pc;
       fhandler_base *fh;
 
       if (dev)
-	fh = build_fhandler (fd, dev);
+	fh = build_fh_dev (dev);
       else
-	fh = build_fhandler_from_name (fd, name, handle, pc);
+	fh = build_fh_name (name);
+
+      if (fh)
+	cygheap->fdtab[fd] = fh;
 
       if (!bin)
 	{
@@ -286,7 +288,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 	  else if (dev)
 	    bin = O_BINARY;
 	  else if (name != unknown_file)
-	    bin = pc.binmode ();
+	    bin = fh->pc_binmode ();
 	}
 
       fh->init (handle, GENERIC_READ | GENERIC_WRITE, bin);
@@ -296,41 +298,51 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 }
 
 fhandler_base *
-dtable::build_fhandler_from_name (int fd, const char *name, HANDLE handle,
-				  path_conv& pc, unsigned opt, suffix_info *si)
+build_fh_name (const char *name, HANDLE h, unsigned opt, suffix_info *si)
 {
-  pc.check (name, opt | PC_NULLEMPTY | PC_FULL | PC_POSIX, si);
+  path_conv pc (name, opt | PC_NULLEMPTY | PC_FULL | PC_POSIX, si);
   if (pc.error)
     {
       set_errno (pc.error);
       return NULL;
     }
 
-  if (!pc.exists () && handle)
-    pc.fillin (handle);
+  if (!pc.exists () && h)
+    pc.fillin (h);
 
-  fhandler_base *fh = build_fhandler (fd, pc.dev,
-				      pc.return_and_clear_normalized_path (),
-				      pc);
-  return fh;
+  return build_fh_pc (pc);
 }
 
 fhandler_base *
-dtable::build_fhandler (int fd, const device& dev, const char *unix_name,
-			const char *win32_name)
+build_fh_dev (const device& dev, const char *unix_name)
 {
-  return build_fhandler (fd, dev, cstrdup (unix_name), win32_name);
+  path_conv pc (dev);
+  char *w32buf = const_cast<char *> (pc.get_win32 ());
+
+  __small_sprintf (w32buf, dev.fmt, dev.minor);
+  if (unix_name)
+    pc.normalized_path = cstrdup (unix_name);
+  else if (!dev.upper)
+    pc.normalized_path = cstrdup (dev.name);
+  else
+    {
+      pc.normalized_path = cstrdup (w32buf);
+      for (char *p = strchr (pc.normalized_path, '\\');
+	   p;
+	   p = strchr (p + 1, '\\'))
+	*p = '/';
+    }
+  return build_fh_pc (pc);
 }
 
 #define cnew(name) new ((void *) ccalloc (HEAP_FHANDLER, 1, sizeof (name))) name
 fhandler_base *
-dtable::build_fhandler (int fd, const device& dev, char *unix_name,
-			const char *win32_name)
+build_fh_pc (path_conv& pc)
 {
   fhandler_base *fh = NULL;
 
-  if (dev.upper)
-    switch (dev.major)
+  if (pc.dev.upper)
+    switch (pc.dev.major)
       {
       case DEV_TTYS_MAJOR:
 	fh = cnew (fhandler_tty_slave) ();
@@ -352,13 +364,16 @@ dtable::build_fhandler (int fd, const device& dev, char *unix_name,
 	break;
       }
   else
-    switch (dev)
+    switch (pc.dev)
       {
       case FH_CONSOLE:
       case FH_CONIN:
       case FH_CONOUT:
 	if ((fh = cnew (fhandler_console) ()))
-	  inc_console_fds ();
+	  cygheap->fdtab.inc_console_fds ();
+	break;
+      case FH_CYGDRIVE:
+	fh = cnew (fhandler_cygdrive) ();
 	break;
       case FH_PTYM:
 	fh = cnew (fhandler_pty_master) ();
@@ -379,7 +394,7 @@ dtable::build_fhandler (int fd, const device& dev, char *unix_name,
 	break;
       case FH_SOCKET:
 	if ((fh = cnew (fhandler_socket) ()))
-	  inc_need_fixup_before ();
+	  cygheap->fdtab.inc_need_fixup_before ();
 	break;
       case FH_FS:
 	fh = cnew (fhandler_disk_file) ();
@@ -415,13 +430,13 @@ dtable::build_fhandler (int fd, const device& dev, char *unix_name,
 	break;
       case FH_TTY:
 	{
-	  device newdev = dev;
+	  device newdev = pc.dev;
 	  newdev.tty_to_real_device ();
 	  switch (newdev)
 	    {
 	    case FH_CONSOLE:
 	      if ((fh = cnew (fhandler_console) ()))
-		inc_console_fds ();
+		cygheap->fdtab.inc_console_fds ();
 	      break;
 	    case FH_TTYS:
 	      fh = cnew (fhandler_tty_slave) ();
@@ -433,44 +448,15 @@ dtable::build_fhandler (int fd, const device& dev, char *unix_name,
   if (!fh)
     fh = cnew (fhandler_nodevice) ();
 
-  char w32buf[MAX_PATH + 1];
-  if (!unix_name || !*unix_name)
-    {
-      if (!win32_name && dev.fmt && *dev.fmt)
-	{
-	  sprintf (w32buf, dev.fmt, dev.minor);
-	  win32_name = w32buf;
-	}
-      if (win32_name)
-	{
-	  unix_name = cstrdup (w32buf);
-	  for (char *p = strchr (unix_name, '\\'); p; p = strchr (p + 1, '\\'))
-	    *p = '/';
-	}
-    }
-
-  fh->dev = dev;
-  if (unix_name)
-    {
-      if (!win32_name)
-	{
-	  /* FIXME: ? Should we call win32_device_name here?
-	     It seems like overkill, but... */
-	  win32_name = strcpy (w32buf, unix_name);
-	  for (char *p = w32buf; (p = strchr (p, '/')); p++)
-	    *p = '\\';
-	}
-      fh->set_name (unix_name, win32_name);
-    }
-
-  debug_printf ("fd %d, fh %p", fd, fh);
-  return fd >= 0 ? (fds[fd] = fh) : fh;
+  fh->set_name (pc);
+  debug_printf ("fh %p", fh);
+  return fh;
 }
 
 fhandler_base *
 dtable::dup_worker (fhandler_base *oldfh)
 {
-  fhandler_base *newfh = build_fhandler (-1, oldfh->dev);
+  fhandler_base *newfh = build_fh_pc (oldfh->pc);
   *newfh = *oldfh;
   newfh->set_io_handle (NULL);
   if (oldfh->dup (newfh))
@@ -817,9 +803,7 @@ handle_to_fn (HANDLE h, char *posix_fn)
       || !QueryDosDevice (NULL, fnbuf, sizeof (fnbuf)))
     return strcpy (posix_fn, win32_fn);
 
-  char *p = strchr (win32_fn + DEVICE_PREFIX_LEN, '\\');
-  if (!p)
-    p = strchr (win32_fn + DEVICE_PREFIX_LEN, '\0');
+  char *p = strechr (win32_fn + DEVICE_PREFIX_LEN, '\\');
 
   int n = p - win32_fn;
   int maxmatchlen = 0;

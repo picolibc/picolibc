@@ -22,8 +22,8 @@ details. */
 #include "cygerrno.h"
 #include <sys/cygwin.h>
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "sigproc.h"
 #include "cygheap.h"

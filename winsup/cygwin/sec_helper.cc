@@ -26,8 +26,8 @@ details. */
 #include <wininet.h>
 #include "cygerrno.h"
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "pinfo.h"
 #include "cygheap.h"

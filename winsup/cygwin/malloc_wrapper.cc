@@ -15,8 +15,8 @@ details. */
 #include <stdlib.h>
 #include <assert.h>
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include <errno.h>
 #include "cygerrno.h"

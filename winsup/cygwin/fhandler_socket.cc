@@ -26,8 +26,8 @@
 #include "security.h"
 #include "cygwin/version.h"
 #include "perprocess.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "sigproc.h"
@@ -116,10 +116,10 @@ fhandler_socket::set_connect_secret ()
     {
       void *buf = malloc (sizeof (fhandler_dev_random));
       entropy_source = new (buf) fhandler_dev_random ();
-      entropy_source->dev = *urandom_dev;
+      entropy_source->dev () = *urandom_dev;
     }
   if (entropy_source &&
-      !entropy_source->open (NULL, O_RDONLY))
+      !entropy_source->open (O_RDONLY))
     {
       delete entropy_source;
       entropy_source = NULL;
@@ -307,9 +307,9 @@ fhandler_socket::dup (fhandler_base *child)
 }
 
 int __stdcall
-fhandler_socket::fstat (struct __stat64 *buf, path_conv *pc)
+fhandler_socket::fstat (struct __stat64 *buf)
 {
-  int res = fhandler_base::fstat (buf, pc);
+  int res = fhandler_base::fstat (buf);
   if (!res)
     {
       buf->st_mode &= ~_IFMT;

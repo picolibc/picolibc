@@ -1,6 +1,6 @@
 /* fhandler_dev_clipboard: code to access /dev/clipboard
 
-   Copyright 2000, 2001, 2002 Red Hat, Inc
+   Copyright 2000, 2001, 2002, 2003 Red Hat, Inc
 
    Written by Charles Wilson (cwilson@ece.gatech.edu)
 
@@ -20,6 +20,7 @@ details. */
 #include <winuser.h>
 #include "cygerrno.h"
 #include "security.h"
+#include "path.h"
 #include "fhandler.h"
 
 /*
@@ -52,7 +53,7 @@ fhandler_dev_clipboard::dup (fhandler_base * child)
 {
   fhandler_dev_clipboard *fhc = (fhandler_dev_clipboard *) child;
 
-  if (!fhc->open (NULL, get_flags (), 0))
+  if (!fhc->open (get_flags (), 0))
     system_printf ("error opening clipboard, %E");
 
   fhc->membuffer = membuffer;
@@ -63,7 +64,7 @@ fhandler_dev_clipboard::dup (fhandler_base * child)
 }
 
 int
-fhandler_dev_clipboard::open (path_conv *, int flags, mode_t)
+fhandler_dev_clipboard::open (int flags, mode_t)
 {
   set_flags (flags | O_TEXT);
   eof = false;

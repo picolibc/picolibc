@@ -1,3 +1,27 @@
+2003-02-13  Christopher Faylor  <cgf@redhat.com>
+
+	Reorganize includes throughout so that path.h comes before fhandler.h.
+	Eliminate path_conv arguments from fhandler functions which take them,
+	throughout.
+	Use get_name() and get_win32_name() consistently throughout for
+	fhandler objects.
+	Use build_fh_* functions throughout, where appropriate.
+	* fhandler.h (fhandler_base): Store path_conv struct here.  Remove dev.
+	* dtable.h (dtable::build_fhandler_*): Remove.
+	(build_fh_dev): New.
+	(build_fh_pc): New.
+	(build_fh_name): New.
+	* dtable.cc (build_fh_dev): New.
+	(build_fh_pc): New.
+	(build_fh_name): New.
+	* fhandler.h (fhandler_base::set_name): Change argument.
+	* fhandler.cc (fhandler_base::set_name): Just accept a path_conv
+	argument.
+	(executable_states): Move.
+	* path.h (executable_state): Accept.
+	* syscalls.cc (stat_worker): Make static.
+	* winsup.h (stat_worker): Remove definition.
+
 2003-01-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* devices.gperf: Remove obsolete win32 device names.

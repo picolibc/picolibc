@@ -14,9 +14,9 @@ details. */
 #include <unistd.h>
 #include <ctype.h>
 #include "security.h"
+#include "path.h"
 #include "fhandler.h"
 #include "perprocess.h"
-#include "path.h"
 #include "thread.h"
 #include "dlfcn.h"
 #include "dll_init.h"

@@ -17,8 +17,8 @@ details. */
 #include <sys/cygwin.h>
 #include "cygerrno.h"
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "pinfo.h"
@@ -75,8 +75,7 @@ create_tty_master (int ttynum)
 {
   device ttym = *ttym_dev;
   ttym.setunit (ttynum); /* CGF FIXME device */
-  tty_master = (fhandler_tty_master *)
-    cygheap->fdtab.build_fhandler (-1, ttym, "/dev/ttym", NULL);
+  tty_master = (fhandler_tty_master *) build_fh_dev (ttym);
   if (tty_master->init ())
     api_fatal ("Can't create master tty");
   else

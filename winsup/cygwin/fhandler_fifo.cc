@@ -16,8 +16,8 @@
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "pinfo.h"
@@ -133,12 +133,12 @@ out:
 }
 
 int
-fhandler_fifo::open (path_conv *pc, int flags, mode_t)
+fhandler_fifo::open (int flags, mode_t)
 {
   int res = 1;
   char buf[24];
 
-  upand = GlobalAddAtom (*pc);
+  upand = GlobalAddAtom (pc);
   __small_sprintf (buf, "%x.owner", upand);
   debug_printf ("mutex %s", buf);
 

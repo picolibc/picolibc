@@ -16,6 +16,7 @@ details. */
 class suffix_info;
 class fhandler_fifo;
 
+#define BFH_OPTS (PC_NULLEMPTY | PC_FULL | PC_POSIX)
 class dtable
 {
   fhandler_base **fds;
@@ -50,14 +51,6 @@ public:
   void fixup_before_exec (DWORD win_proc_id);
   void fixup_before_fork (DWORD win_proc_id);
   void fixup_after_fork (HANDLE);
-  fhandler_base *build_fhandler (int fd, const device& dev, const char *unix_name,
-				 const char *win32_name = NULL);
-  fhandler_base *build_fhandler (int fd, const device& dev, char *unix_name = NULL,
-				 const char *win32_name = NULL);
-  fhandler_base *build_fhandler_from_name (int fd, const char *name, HANDLE h,
-					   path_conv& pc,
-					   unsigned opts = PC_SYM_FOLLOW,
-					   suffix_info *si = NULL);
   inline int not_open (int fd)
   {
     SetResourceLock (LOCK_FD_LIST, READ_LOCK, "not_open");
@@ -73,7 +66,7 @@ public:
   void init_std_file_from_handle (int fd, HANDLE handle);
   int dup2 (int oldfd, int newfd);
   void fixup_after_exec (HANDLE);
-  inline fhandler_base *operator [](int fd) const { return fds[fd]; }
+  inline fhandler_base *&operator [](int fd) const { return fds[fd]; }
   select_record *select_read (int fd, select_record *s);
   select_record *select_write (int fd, select_record *s);
   select_record *select_except (int fd, select_record *s);
@@ -84,6 +77,10 @@ public:
   bool in_vfork_cleanup () {return fds_on_hold == fds;}
   fhandler_fifo *find_fifo (ATOM);
 };
+
+fhandler_base *build_fh_dev (const device&, const char * = NULL);
+fhandler_base *build_fh_name (const char *unix_name, HANDLE = NULL, unsigned = 0, suffix_info * = NULL);
+fhandler_base *build_fh_pc (path_conv& pc);
 
 void dtable_init (void);
 void stdio_init (void);

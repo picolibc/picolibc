@@ -34,8 +34,8 @@ details. */
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "sigproc.h"
 #include "pinfo.h"
@@ -57,6 +57,9 @@ SYSTEM_INFO system_info;
 
 static int __stdcall mknod_worker (const char *, mode_t, mode_t, _major_t,
 				   _minor_t);
+
+static int __stdcall stat_worker (const char *name, struct __stat64 *buf,
+				  int nofollow) __attribute__ ((regparm (3)));
 
 /* Close all files and process any queued deletions.
    Lots of unix style applications will open a tmp file, unlink it,
@@ -532,22 +535,24 @@ open (const char *unix_path, int flags, ...)
 
       if (fd >= 0)
 	{
-	  path_conv pc;
-	  if (!(fh = cygheap->fdtab.build_fhandler_from_name (fd, unix_path,
-							      NULL, pc)))
+	  if (!(fh = build_fh_name (unix_path)))
 	    res = -1;		// errno already set
 	  else if (fh->is_fs_special () && fh->device_access_denied (flags))
 	    {
-	      fd.release ();
+	      delete fh;
 	      res = -1;
 	    }
-	  else if (!fh->open (&pc, flags, (mode & 07777) & ~cygheap->umask))
+	  else if (!fh->open (flags, (mode & 07777) & ~cygheap->umask))
 	    {
-	      fd.release ();
+	      delete fh;
 	      res = -1;
 	    }
-	  else if ((res = fd) <= 2)
-	    set_std_handle (res);
+	  else
+	    {
+	      cygheap->fdtab[fd] = fh;
+	      if ((res = fd) <= 2)
+		set_std_handle (res);
+	    }
 	}
     }
 
@@ -1032,9 +1037,8 @@ fstat64 (int fd, struct __stat64 *buf)
     res = -1;
   else
     {
-      path_conv pc (cfd->get_win32_name (), PC_SYM_NOFOLLOW);
       memset (buf, 0, sizeof (struct __stat64));
-      res = cfd->fstat (buf, &pc);
+      res = cfd->fstat (buf);
       if (!res)
 	{
 	  if (!buf->st_ino)
@@ -1095,36 +1099,29 @@ suffix_info stat_suffixes[] =
 };
 
 /* Cygwin internal */
-int __stdcall
-stat_worker (const char *name, struct __stat64 *buf, int nofollow,
-	     path_conv *pc)
+static int __stdcall
+stat_worker (const char *name, struct __stat64 *buf, int nofollow)
 {
   int res = -1;
-  path_conv real_path;
   fhandler_base *fh = NULL;
 
   if (check_null_invalid_struct_errno (buf))
     goto done;
 
-  if (!pc)
-    pc = &real_path;
+  fh = build_fh_name (name, NULL, (nofollow ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW)
+		      		  | PC_FULL, stat_suffixes);
 
-  fh = cygheap->fdtab.build_fhandler_from_name (-1, name, NULL, *pc,
-						(nofollow ? PC_SYM_NOFOLLOW
-							  : PC_SYM_FOLLOW)
-						| PC_FULL, stat_suffixes);
-
-  if (pc->error)
+  if (fh->error ())
     {
-      debug_printf ("got %d error from build_fhandler_from_name", pc->error);
-      set_errno (pc->error);
+      debug_printf ("got %d error from build_fh_name", fh->error ());
+      set_errno (fh->error ());
     }
   else
     {
       debug_printf ("(%s, %p, %d, %p), file_attributes %d", name, buf, nofollow,
-		    pc, (DWORD) real_path);
+		    fh, (DWORD) *fh);
       memset (buf, 0, sizeof (*buf));
-      res = fh->fstat (buf, pc);
+      res = fh->fstat (buf);
       if (!res)
 	{
 	  if (!buf->st_ino)

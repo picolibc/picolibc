@@ -24,8 +24,8 @@ details. */
 #define NEED_VFORK
 #include "perprocess.h"
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "child_info_magic.h"

@@ -64,8 +64,8 @@ details. */
 #include <cygwin/version.h>
 #include "cygerrno.h"
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
@@ -553,9 +553,9 @@ path_conv::check (const char *src, unsigned opt,
 	  else if (isvirtual_dev (dev.devn))
 	    {
 	      /* FIXME: Calling build_fhandler here is not the right way to handle this. */
-	      fhandler_virtual *fh =
-		(fhandler_virtual *) cygheap->fdtab.build_fhandler (-1, dev, (const char *) path_copy, NULL);
+	      fhandler_virtual *fh = (fhandler_virtual *) build_fh_dev (dev, path_copy);
 	      int file_type = fh->exists ();
+	      delete fh;
 	      switch (file_type)
 		{
 		  case 1:
@@ -569,7 +569,6 @@ path_conv::check (const char *src, unsigned opt,
 		    fileattr = INVALID_FILE_ATTRIBUTES;
 		    break;
 		}
-	      delete fh;
 	      goto out;
 	    }
 	  /* devn should not be a device.  If it is, then stop parsing now. */

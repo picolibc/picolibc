@@ -19,8 +19,8 @@ details. */
 #include "perprocess.h"
 #include "security.h"
 #include "cygwin/version.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "shared_info.h"
@@ -38,8 +38,7 @@ inline fhandler_base&
 fhandler_base::operator =(fhandler_base &x)
 {
   memcpy (this, &x, sizeof *this);
-  unix_path_name = x.unix_path_name ? cstrdup (x.unix_path_name) : NULL;
-  win32_path_name = x.win32_path_name ? cstrdup (x.win32_path_name) : NULL;
+  pc.normalized_path = cstrdup (pc.normalized_path);
   rabuf = NULL;
   ralen = 0;
   raixget = 0;
@@ -144,57 +143,12 @@ fhandler_base::get_readahead_into_buffer (char *buf, size_t buflen)
   return copied_chars;
 }
 
-/* Record the file name.
-   Filenames are used mostly for debugging messages, and it's hoped that
-   in cases where the name is really required, the filename wouldn't ever
-   be too long (e.g. devices or some such).
-   The unix_path_name is also used by virtual fhandlers.  */
+/* Record the file name. and name hash */
 void
-fhandler_base::set_name (const char *unix_path, const char *win32_path)
+fhandler_base::set_name (path_conv &in_pc)
 {
-  if (unix_path == NULL || !*unix_path)
-    return;
-
-  if (win32_path)
-    win32_path_name = cstrdup (win32_path);
-  else
-    {
-      const char *fmt = get_native_name ();
-      char *w =  (char *) cmalloc (HEAP_STR, strlen (fmt) + 16);
-      __small_sprintf (w, fmt, get_unit ());
-      win32_path_name = w;
-    }
-
-  if (win32_path_name == NULL)
-    {
-      system_printf ("fatal error. strdup failed");
-      exit (ENOMEM);
-    }
-
-  assert (unix_path_name == NULL);
-  /* FIXME: This isn't really right.  It ignores the first argument if we're
-     building names for a device and just converts the device name from the
-     win32 name since it has theoretically been previously detected by
-     path_conv. Ideally, we should pass in a format string and build the
-     unix_path, too. */
-  if (!is_auto_device () || *win32_path_name != '\\')
-    unix_path_name = unix_path;
-  else
-    {
-      char *p = cstrdup (win32_path_name);
-      unix_path_name = p;
-      while ((p = strchr (p, '\\')) != NULL)
-	*p++ = '/';
-      if (unix_path)
-	cfree ((void *) unix_path);
-    }
-
-  if (unix_path_name == NULL)
-    {
-      system_printf ("fatal error. strdup failed");
-      exit (ENOMEM);
-    }
-  namehash = hash_path_name (0, win32_path_name);
+  memcpy (&pc, &in_pc, in_pc.size ());
+  namehash = hash_path_name (0, get_win32_name ());
 }
 
 /* Detect if we are sitting at EOF for conditions where Windows
@@ -302,7 +256,7 @@ fhandler_base::raw_read (void *ptr, size_t& ulen)
 	      break;
 	    }
 	default:
-	  syscall_printf ("ReadFile %s failed, %E", unix_path_name);
+	  syscall_printf ("ReadFile %s failed, %E", get_name ());
 	  __seterrno_from_win_error (errcode);
 	  bytes_read = -1;
 	  break;
@@ -377,7 +331,7 @@ fhandler_base::device_access_denied (int flags)
 
 /* Open system call handler function. */
 int
-fhandler_base::open (path_conv *pc, int flags, mode_t mode)
+fhandler_base::open (int flags, mode_t mode)
 {
   int res = 0;
   HANDLE x;
@@ -451,7 +405,7 @@ fhandler_base::open (path_conv *pc, int flags, mode_t mode)
      share returns some handle, even if file doesn't exist. This code
      works around this bug. */
   if (get_query_open () && isremote () &&
-      creation_distribution == OPEN_EXISTING && pc && !pc->exists ())
+      creation_distribution == OPEN_EXISTING && !pc.exists ())
     {
       set_errno (ENOENT);
       goto done;
@@ -475,7 +429,7 @@ fhandler_base::open (path_conv *pc, int flags, mode_t mode)
 
   if (x == INVALID_HANDLE_VALUE)
     {
-      if (!wincap.can_open_directories () && pc && pc->isdir ())
+      if (!wincap.can_open_directories () && pc.isdir ())
 	{
 	  if (flags & (O_CREAT | O_EXCL) == (O_CREAT | O_EXCL))
 	    set_errno (EEXIST);
@@ -501,7 +455,7 @@ fhandler_base::open (path_conv *pc, int flags, mode_t mode)
     set_file_attribute (has_acls (), get_win32_name (), mode);
 
   set_io_handle (x);
-  set_flags (flags, pc ? pc->binmode () : 0);
+  set_flags (flags, pc.binmode ());
 
   res = 1;
   set_open_status ();
@@ -873,7 +827,7 @@ fhandler_base::lseek (__off64_t offset, int whence)
       set_readahead_valid (0);
     }
 
-  debug_printf ("lseek (%s, %D, %d)", unix_path_name, offset, whence);
+  debug_printf ("lseek (%s, %D, %d)", get_name (), offset, whence);
 
   DWORD win32_whence = whence == SEEK_SET ? FILE_BEGIN
 		       : (whence == SEEK_CUR ? FILE_CURRENT : FILE_END);
@@ -981,12 +935,12 @@ rootdir (char *full_path)
 }
 
 int __stdcall
-fhandler_base::fstat (struct __stat64 *buf, path_conv *pc)
+fhandler_base::fstat (struct __stat64 *buf)
 {
   debug_printf ("here");
 
   if (is_fs_special ())
-    return fstat_fs (buf, pc);
+    return fstat_fs (buf);
 
   switch (get_device ())
     {
@@ -1186,8 +1140,6 @@ fhandler_base::fhandler_base ():
   raixget (0),
   raixput (0),
   rabuflen (0),
-  unix_path_name (NULL),
-  win32_path_name (NULL),
   open_status (0),
   read_state (NULL)
 {
@@ -1196,13 +1148,10 @@ fhandler_base::fhandler_base ():
 /* Normal I/O destructor */
 fhandler_base::~fhandler_base (void)
 {
-  if (unix_path_name != NULL)
-    cfree ((void *) unix_path_name);
-  if (win32_path_name != NULL)
-    cfree ((void *) win32_path_name);
+  if (pc.normalized_path)
+    cfree (pc.normalized_path);
   if (rabuf)
     free (rabuf);
-  unix_path_name = win32_path_name = NULL;
 }
 
 /**********************************************************************/
@@ -1287,7 +1236,7 @@ fhandler_base::set_nonblocking (int yes)
 }
 
 DIR *
-fhandler_base::opendir (path_conv&)
+fhandler_base::opendir ()
 {
   set_errno (ENOTDIR);
   return NULL;

@@ -16,8 +16,8 @@ details. */
 #include <sys/socket.h>
 #include "cygerrno.h"
 #include "security.h"
-#include "fhandler.h"
 #include "path.h"
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "thread.h"
@@ -189,8 +189,8 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode, bool fif
     __seterrno ();
   else
     {
-      fhs[0] = (fhandler_pipe *) cygheap->fdtab.build_fhandler (-1, *piper_dev, "/dev/piper");
-      fhs[1] = (fhandler_pipe *) cygheap->fdtab.build_fhandler (-1, *pipew_dev, "/dev/pipew");
+      fhs[0] = (fhandler_pipe *) build_fh_dev (*piper_dev);
+      fhs[1] = (fhandler_pipe *) build_fh_dev (*pipew_dev);
 
       int binmode = mode & O_TEXT ?: O_BINARY;
       fhs[0]->init (r, GENERIC_READ, binmode);
