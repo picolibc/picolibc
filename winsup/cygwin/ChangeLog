@@ -1,3 +1,8 @@
+Tue Sep  4 22:42:13 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (ctrl_c_handler): Only send SIGINT when we have a
+	controlling terminal and we are the head of the process group.
+
 Tue Sep  4 16:48:14 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* thread.cc (InterlockedExchangePointer): Don't define if it already
