@@ -7,8 +7,8 @@ extern void *_sbrk_r (struct _reent *, ptrdiff_t);
 extern void *_sbrk (ptrdiff_t);
 
 void *
-sbrk (incr)
-     ptrdiff_t incr;
+_DEFUN (sbrk, (incr),
+     ptrdiff_t incr)
 {
 #ifdef REENTRANT_SYSCALLS_PROVIDED
   return _sbrk_r (_REENT, incr);

@@ -48,11 +48,11 @@ DESCRIPTION
 */
 
 int
-_fcntl_r (ptr, fd, cmd, arg)
-     struct _reent *ptr;
-     int fd;
-     int cmd;
-     int arg;
+_DEFUN (_fcntl_r, (ptr, fd, cmd, arg),
+     struct _reent *ptr _AND
+     int fd _AND
+     int cmd _AND
+     int arg)
 {
   int ret;
 

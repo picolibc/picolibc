@@ -4,8 +4,8 @@
 #include <sys/times.h>
 
 clock_t
-times (buf)
-     struct tms *buf;
+_DEFUN (times, (buf),
+     struct tms *buf)
 {
 #ifdef REENTRANT_SYSCALLS_PROVIDED
   return _times_r (_REENT, buf);

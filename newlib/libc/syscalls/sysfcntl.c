@@ -5,10 +5,10 @@
 #include <errno.h>
 
 int
-fcntl (fd, flag, arg)
-     int fd;
-     int flag;
-     int arg;
+_DEFUN (fcntl, (fd, flag, arg),
+     int fd _AND
+     int flag _AND
+     int arg)
 {
 #ifdef HAVE_FCNTL
 # ifdef REENTRANT_SYSCALLS_PROVIDED

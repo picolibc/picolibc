@@ -3,8 +3,8 @@
 #include <reent.h>
 
 int
-wait (status)
-     int *status;
+_DEFUN (wait, (status),
+        int *status)
 {
 #ifdef REENTRANT_SYSCALLS_PROVIDED
   return _wait_r (_REENT, status);

@@ -3,10 +3,10 @@
 #include <reent.h>
 
 int
-execve (name, argv, env)
-     char *name;
-     char **argv;
-     char **env;
+_DEFUN (execve, (name, argv, env),
+     char *name _AND
+     char **argv _AND
+     char **env)
 {
 #ifdef REENTRANT_SYSCALLS_PROVIDED
   return _execve_r (_REENT, name, argv, env);

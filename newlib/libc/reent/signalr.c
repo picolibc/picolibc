@@ -50,10 +50,10 @@ DESCRIPTION
 */
 
 int
-_kill_r (ptr, pid, sig)
-     struct _reent *ptr;
-     int pid;
-     int sig;
+_DEFUN (_kill_r, (ptr, pid, sig),
+     struct _reent *ptr _AND
+     int pid _AND
+     int sig)
 {
   int ret;
 
@@ -89,8 +89,8 @@ DESCRIPTION
 */
 
 int
-_getpid_r (ptr)
-     struct _reent *ptr;
+_DEFUN (_getpid_r, (ptr),
+     struct _reent *ptr)
 {
   int ret;
   ret = _getpid ();

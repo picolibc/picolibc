@@ -4,9 +4,9 @@
 #include <unistd.h>
 
 int
-stat (file, pstat)
-     char *file;
-     struct stat *pstat;
+_DEFUN (stat, (file, pstat),
+     char *file _AND
+     struct stat *pstat)
 {
 #ifdef REENTRANT_SYSCALLS_PROVIDED
   return _stat_r (_REENT, file, pstat);

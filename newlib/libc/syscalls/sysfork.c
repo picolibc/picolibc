@@ -7,7 +7,7 @@
 #include <reent.h>
 
 int
-fork ()
+_DEFUN_VOID (fork)
 {
 #ifdef REENTRANT_SYSCALLS_PROVIDED
   return _fork_r (_REENT);

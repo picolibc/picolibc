@@ -49,9 +49,9 @@ DESCRIPTION
 */
 
 void *
-_sbrk_r (ptr, incr)
-     struct _reent *ptr;
-     ptrdiff_t incr;
+_DEFUN (_sbrk_r, (ptr, incr),
+     struct _reent *ptr _AND
+     ptrdiff_t incr)
 {
   char *ret;
   void *_sbrk(ptrdiff_t);

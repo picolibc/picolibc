@@ -8,7 +8,7 @@
 #ifndef _REENT_ONLY
 
 int *
-__signgam ()
+_DEFUN_VOID (__signgam)
 {
   return &_REENT_SIGNGAM(_REENT);
 }

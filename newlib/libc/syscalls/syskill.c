@@ -3,9 +3,9 @@
 #include <reent.h>
 
 int
-kill (pid, sig)
-     int pid;
-     int sig;
+_DEFUN (kill, (pid, sig),
+     int pid _AND
+     int sig)
 {
 #ifdef REENTRANT_SYSCALLS_PROVIDED
   return _kill_r (_REENT, pid, sig);

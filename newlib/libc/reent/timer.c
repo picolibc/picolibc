@@ -55,9 +55,9 @@ DESCRIPTION
 */
 
 clock_t
-_times_r (ptr, ptms)
-     struct _reent *ptr;
-     struct tms *ptms;
+_DEFUN (_times_r, (ptr, ptms),
+     struct _reent *ptr _AND
+     struct tms *ptms)
 {
   clock_t ret;
 
@@ -97,10 +97,10 @@ DESCRIPTION
 */
 
 int
-_gettimeofday_r (ptr, ptimeval, ptimezone)
-     struct _reent *ptr;
-     struct timeval *ptimeval;
-     struct timezone *ptimezone;
+_DEFUN (_gettimeofday_r, (ptr, ptimeval, ptimezone),
+     struct _reent *ptr _AND
+     struct timeval *ptimeval _AND
+     struct timezone *ptimezone)
 {
   int ret;
 

@@ -4,10 +4,10 @@
 #include <unistd.h>
 
 _READ_WRITE_RETURN_TYPE
-write (fd, buf, cnt)
-     int fd;
-     const void *buf;
-     size_t cnt;
+_DEFUN (write, (fd, buf, cnt),
+     int fd _AND
+     const void *buf _AND
+     size_t cnt)
 {
 #ifdef REENTRANT_SYSCALLS_PROVIDED
   return _write_r (_REENT, fd, buf, cnt);

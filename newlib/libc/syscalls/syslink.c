@@ -3,9 +3,9 @@
 #include <reent.h>
 
 int
-link (old, new)
-     char *old;
-     char *new;
+_DEFUN (link, (old, new),
+     char *old _AND
+     char *new)
 {
 #ifdef REENTRANT_SYSCALLS_PROVIDED
   return _link_r (_REENT, old, new);
