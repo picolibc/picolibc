@@ -1,3 +1,7 @@
+2001-11-13  Christopher Faylor  <cgf@redhat.com>
+
+	* syscalls.cc (_write): Allow zero length as per SUSv2.
+
 2001-11-12  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_console.cc (fhandler_console::read): Revert 2001-10-23
