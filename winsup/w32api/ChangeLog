@@ -1,3 +1,12 @@
+2004-02-13  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* include/ddk/winddk.h (DIRECTORY_QUERY): Add define.
+	(DIRECTORY_TRAVERSE): Ditto.
+	(DIRECTORY_CREATE_OBJECT): Ditto.
+	(DIRECTORY_CREATE_SUBDIRECTORY): Ditto.
+	(DIRECTORY_ALL_ACCESS): Ditto.
+	Thanks to Konstantin Stepaniuk <skostia@users.sourceforge.net>
+
 2004-02-12  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/basetypes.h (_REFIID_DEFINED): Correct typo.
