@@ -735,13 +735,13 @@ signal_fixup_after_fork ()
 }
 
 void __stdcall
-signal_fixup_after_exec (bool isspawn)
+signal_fixup_after_exec ()
 {
   /* Set up child's signal handlers */
   for (int i = 0; i < NSIG; i++)
     {
       myself->getsig (i).sa_mask = 0;
-      if (myself->getsig (i).sa_handler != SIG_IGN || isspawn)
+      if (myself->getsig (i).sa_handler != SIG_IGN)
 	myself->getsig (i).sa_handler = SIG_DFL;
     }
 }

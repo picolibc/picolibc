@@ -84,6 +84,10 @@ details. */
 #define CYGWIN_VERSION_CHECK_FOR_OLD_O_NONBLOCK \
   (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) <= \
   28)
+
+#define CYGWIN_VERSION_CHECK_FOR_USING_BIG_TYPES \
+  (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) >= \
+  79)
      /* We used to use the DLL major/minor to track
 	non-backward-compatible interface changes to the API.  Now we
 	use an API major/minor number for this purpose. */

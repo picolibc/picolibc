@@ -311,7 +311,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 	buf->st_mode |= STD_WBITS;
       /* | S_IWGRP | S_IWOTH; we don't give write to group etc */
 
-      if (buf->st_mode & S_IFDIR)
+      if (S_ISDIR (buf->st_mode))
 	buf->st_mode |= S_IFDIR | STD_XBITS;
       else if (buf->st_mode & S_IFMT)
 	/* nothing */;

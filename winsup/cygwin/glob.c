@@ -81,6 +81,7 @@
 #include <windows.h>
 
 #include "perprocess.h"
+#include "cygwin/version.h"
 
 #ifdef __weak_alias
 #ifdef __LIBC12_SOURCE__
@@ -96,11 +97,7 @@ __weak_alias(__globfree13,___globfree13);
 #ifdef __LIBC12_SOURCE__
 #define	STAT	stat12
 #else
-#if defined (__INSIDE_CYGWIN__)
 #define STAT	__stat64
-#else
-#define	STAT	stat
-#endif
 #endif
 
 #define	DOLLAR		'$'
@@ -840,17 +837,13 @@ g_lstat(fn, sb, pglob)
 		struct __stat32 lsb;
 		int ret;
 
-		if (user_data->api_major > 0 || user_data->api_minor > 78)
+		if (CYGWIN_VERSION_CHECK_FOR_USING_BIG_TYPES)
 		  ret = (*pglob->gl_lstat)(buf, &sb);
 		else if (!(ret = (*pglob->gl_lstat)(buf, &lsb)))
 			stat32_to_STAT (&lsb, sb);
 		return ret;
 	}
-#ifdef __INSIDE_CYGWIN__
 	return(lstat64(buf, sb));
-#else
-	return(lstat(buf, sb));
-#endif
 }
 
 static int
@@ -866,17 +859,13 @@ g_stat(fn, sb, pglob)
 		struct __stat32 lsb;
 		int ret;
 
-		if (user_data->api_major > 0 || user_data->api_minor > 78)
+		if (CYGWIN_VERSION_CHECK_FOR_USING_BIG_TYPES)
 		  ret = (*pglob->gl_stat)(buf, &sb);
 		if (!(ret = (*pglob->gl_stat)(buf, &lsb)))
 			stat32_to_STAT (&lsb, sb);
 		return ret;
 	}
-#ifdef __INSIDE_CYGWIN__
 	return(stat64(buf, sb));
-#else
-	return(stat(buf, sb));
-#endif
 }
 
 static Char *
