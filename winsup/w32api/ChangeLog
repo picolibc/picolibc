@@ -1,3 +1,8 @@
+2003-02-22  Bang Jun-Young  <junyoung@netbsd.org>
+
+	* lib/ntdll.def (NT*, RTL*, ZW*): Add missing exports.
+	(NtCurrentTeb): Remove.
+
 2003-02-22  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wsahelp.h: Remove ';' after closing
