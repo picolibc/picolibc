@@ -1,3 +1,7 @@
+Thu Feb 15 01:39:51 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* libc/include/sys/signal.h: Always include sys/types.h under Cygwin.
+
 2001-02-14  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
         * libc/include/stdlib.h: Add declarations of rand48 functions and
