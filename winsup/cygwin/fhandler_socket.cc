@@ -664,12 +664,12 @@ fhandler_socket::readv (const struct iovec *const iov, const int iovcnt,
 {
   struct msghdr msg =
     {
-      .msg_name:		NULL,
-      .msg_namelen:	0,
-      .msg_iov:		(struct iovec *) iov, // const_cast
-      .msg_iovlen:	iovcnt,
-      .msg_accrights:	NULL,
-      .msg_accrightslen:	0
+      msg_name:		NULL,
+      msg_namelen:	0,
+      msg_iov:		(struct iovec *) iov, // const_cast
+      msg_iovlen:	iovcnt,
+      msg_accrights:	NULL,
+      msg_accrightslen:	0
     };
 
   return recvmsg (&msg, 0, tot);
