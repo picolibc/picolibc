@@ -1,3 +1,15 @@
+2004-09-05  Hosaka Yuji  <hos@tamanegi.org>
+ 
+	* lib/ddk/hid.def (HidD_FlushQueue, HidD_FreePreparsedData,
+	HidD_GetAttributes, HidD_GetConfiguration, HidD_GetFeature,
+	HidD_GetHidGuid, HidD_GetIndexedString, HidD_GetInputReport,
+	HidD_GetManufacturerString, HidD_GetMsGenreDescriptor,
+	HidD_GetNumInputBuffers, HidD_GetPhysicalDescriptor,
+	HidD_GetPreparsedData, HidD_GetProductString,
+	HidD_GetSerialNumberString, HidD_SetConfiguration,
+	HidD_SetFeature, HidD_SetNumInputBuffers, HidD_SetOutputReport,
+	HidP_GetButtonCaps, HidP_GetValueCaps): Add exports.
+
 2004-08-25  Lars Rune Nøstdal  <daysleper@users.sourceforge.net>
 
 	* include/wincon.h (CONSOLE_FULLSCREEN_MODE, CONSOLE_WINDOWED_MODE):
