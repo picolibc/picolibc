@@ -64,6 +64,9 @@ A string representing the complete date and time, in the form
 o %d
 The day of the month, formatted with two digits.
 
+o %e
+The day of the month, formatted with leading space if single digit.
+
 o %H
 The hour (on a 24-hour clock), formatted with two digits.
 
@@ -251,6 +254,16 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 	  if (count < maxsize - 2)
 	    {
 	      sprintf (&s[count], "%.2d",
+		       tim_p->tm_mday);
+	      count += 2;
+	    }
+	  else
+	    return 0;
+	  break;
+	case 'e':
+	  if (count < maxsize - 2)
+	    {
+	      sprintf (&s[count], "%2d",
 		       tim_p->tm_mday);
 	      count += 2;
 	    }

@@ -1,3 +1,7 @@
+2002-06-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/time/strftime.c (strftime): Add %e format specifier.
+
 2002-06-21  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* libc/search/hash.h (LITTLE_ENDIAN, BIG_ENDIAN): Define if not
