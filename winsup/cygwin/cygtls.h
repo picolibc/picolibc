@@ -154,7 +154,7 @@ struct _cygtls
   void set_threadkill () {threadkill = true;}
   void reset_threadkill () {threadkill = false;}
   int call_signal_handler () __attribute__ ((regparm (1)));
-  void remove_wq () __attribute__ ((regparm (1)));
+  void remove_wq (DWORD) __attribute__ ((regparm (1)));
   void fixup_after_fork () __attribute__ ((regparm (1)));
   void lock () __attribute__ ((regparm (1)));
   void unlock () __attribute__ ((regparm (1)));

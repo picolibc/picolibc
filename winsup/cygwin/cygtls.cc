@@ -150,19 +150,22 @@ void
 _cygtls::remove (DWORD wait)
 {
   debug_printf ("wait %p\n", wait);
-  sentry here (wait);
-  if (here.acquired ())
+  do
     {
-      for (size_t i = 0; i < nthreads; i++)
-	if (this == cygheap->threadlist[i])
-	  {
-	    if (i < --nthreads)
-	      cygheap->threadlist[i] = cygheap->threadlist[nthreads];
-	    debug_printf ("removed %p element %d", this, i);
-	    remove_wq ();
-	    break;
-	  }
-    }
+      sentry here (wait);
+      if (here.acquired ())
+	{
+	  for (size_t i = 0; i < nthreads; i++)
+	    if (this == cygheap->threadlist[i])
+	      {
+		if (i < --nthreads)
+		  cygheap->threadlist[i] = cygheap->threadlist[nthreads];
+		debug_printf ("removed %p element %d", this, i);
+		break;
+	      }
+	}
+    } while (0);
+  remove_wq (wait);
 }
 
 void

@@ -471,17 +471,19 @@ out1:
 
 // FIXME: This is inelegant
 void
-_cygtls::remove_wq ()
+_cygtls::remove_wq (DWORD wait)
 {
-  sync_proc_subproc->acquire ();
-  for (waitq *w = &waitq_head; w->next != NULL; w = w->next)
-    if (w->next == &wq)
-      {
-	ForceCloseHandle1 (wq.thread_ev, wq_ev);
-	w->next = wq.next;
-	break;
-      }
-  sync_proc_subproc->release ();
+  if (sync_proc_subproc && sync_proc_subproc->acquire (wait))
+    {
+      for (waitq *w = &waitq_head; w->next != NULL; w = w->next)
+	if (w->next == &wq)
+	  {
+	    ForceCloseHandle1 (wq.thread_ev, wq_ev);
+	    w->next = wq.next;
+	    break;
+	  }
+      sync_proc_subproc->release ();
+    }
 }
 
 /* Terminate the wait_subproc thread.
@@ -536,7 +538,6 @@ proc_terminate (void)
 	  pchildren[i].release ();
 	}
       nchildren = nzombies = 0;
-      sync_proc_subproc = NULL;
     }
   sigproc_printf ("leaving");
 }
