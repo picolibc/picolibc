@@ -1,3 +1,16 @@
+2001-10-31  David Howells  <dhowells@redhat.com>
+
+	* syscall.h: Added SYS_times, SYS_gettimeofday, SYS_link values.
+        * mn10300/times.c: Renamed "times" to "_times" so that it can be
+        referenced by newlib.
+        * mn10300/cygmon.c: New file.
+        * mn10300/crt0_redboot.S: Ditto.
+        * mn10300/crt0_cygmon.S: Ditto.
+        * mn10300/Makefile.in: Added RedBoot and Cygmon support.
+	* mn10300/configure.in: Changed to allow for future
+	evaluation boards to be added.
+	* mn10300/configure: Regenerated.
+
 2001-10-17  Michael Meissner  <meissner@redhat.com>
 
 	* regs.S (K0BASE_ADDR,K1BASE_ADDR): Define as addresses to

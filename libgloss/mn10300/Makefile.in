@@ -1,4 +1,4 @@
-# Copyright (c) 1998 Cygnus Support
+# Copyright (c) 1998, 2000 Cygnus Support
 #
 # The authors hereby grant permission to use, copy, modify, distribute,
 # and license this software and its documentation for any purpose, provided
@@ -63,24 +63,26 @@ OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
 	then echo ${objroot}/../binutils/objcopy ; \
 	else t='$(program_transform_name)'; echo objcopy | sed -e $$t ; fi`
 
-CRT0 = crt0.o
+CRT0 = crt0.o crt0_cygmon.o crt0_redboot.o
 
 # Generic object files common to all targets.
-GENOBJS = _exit.o access.o chmod.o close.o crt1.o \
+GENOBJS_NO_TRAP = _exit.o access.o chmod.o close.o crt1.o \
 	fstat.o getpid.o isatty.o \
 	kill.o lseek.o open.o read.o \
-	sbrk.o stat.o time.o trap.o unlink.o utime.o write.o
+	sbrk.o stat.o time.o times.o unlink.o utime.o write.o
+GENOBJS = ${GENOBJS_NO_TRAP} trap.o
 
 # Object files specific to particular targets.
 EVALOBJS = ${GENOBJS}
+CYGMONOBJS = cygmon.o ${GENOBJS_NO_TRAP}
 
 CFLAGS = -g 
 
 GCC_LDFLAGS = `if [ -d ${objroot}/../gcc ] ; \
 	then echo -L${objroot}/../gcc ; fi`
 
-SCRIPTS = eval sim
-BSP = libeval.a
+SCRIPTS = @script_list@
+BSP = @bsp_list@
 
 # Host specific makefile fragment comes in here.
 @host_makefile_frag@
@@ -100,13 +102,17 @@ libeval.a: $(EVALOBJS)
 	${AR} ${ARFLAGS} $@ $(EVALOBJS)
 	${RANLIB} $@
 
+libcygmon.a: $(CYGMONOBJS)
+	${AR} ${ARFLAGS} $@ $(CYGMONOBJS)
+	${RANLIB} $@
+
 
 # compile a fully linked binary. The -Wl,-T*.ld is for the linker
 # script. By using -Wl, the linker script is put on the proper place
 # in the comand line for ld, and all the symbols will get fully
 # resolved.
 
-test: $(CRT0) test.o
+test: ${CRT0} test.o
 	${CC} $(CFLAGS_FOR_TARGET) -L${srcdir} -L${objdir} \
 	test.o -o $@ $(NEWLIB_LDFLAGS) -Wl,-Teval.ld
 	@echo Done...
@@ -121,7 +127,9 @@ distclean maintainer-clean realclean: clean
 
 .PHONY: install info install-info clean-info
 install:
-	$(INSTALL_PROGRAM) $(CRT0) $(tooldir)/lib${MULTISUBDIR}/$(CRT0)
+	@for crt in ${CRT0}; do\
+	$(INSTALL_PROGRAM) $${crt} $(tooldir)/lib${MULTISUBDIR}/$${crt}; \
+	done
 	@for bsp in ${BSP}; do\
 	 $(INSTALL_PROGRAM) $${bsp} $(tooldir)/lib${MULTISUBDIR}; \
 	done
@@ -136,7 +144,8 @@ clean-info:
 test.o:	${srcdir}/test.c
 
 # these are for the BSPs
-${CRT0}: ${srcdir}/crt0.S
+crt0.o: ${srcdir}/crt0.S
+crt0_cygmon.o: ${srcdir}/crt0_cygmon.S
 
 # target specific makefile fragment comes in here.
 @target_makefile_frag@

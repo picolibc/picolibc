@@ -6,7 +6,7 @@
 
 
 clock_t
-times (struct tms *buffer)
+_times (struct tms *buffer)
 {
   return TRAP0 (SYS_times, buffer, 0, 0);
 }

@@ -38,10 +38,12 @@
 #define SYS_argv	13
 
 /* These are extras added for one reason or another.  */
-#define SYS_chdir	14
-#define SYS_stat	15
-#define SYS_chmod 	16
-#define SYS_utime 	17
-#define SYS_time 	18
-
+#define SYS_chdir	 14
+#define SYS_stat	 15
+#define SYS_chmod 	 16
+#define SYS_utime 	 17
+#define SYS_time 	 18
+#define SYS_gettimeofday 19
+#define SYS_times	 20
+#define SYS_link	 21
 #endif
