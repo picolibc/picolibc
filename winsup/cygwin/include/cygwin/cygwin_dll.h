@@ -24,13 +24,13 @@ details. */
 #define DECLARE_CYGWIN_DLL(Entry)					      \
 									      \
 CDECL_BEGIN								      \
-  int WINAPI Entry (HANDLE h, DWORD reason, void *ptr);		              \
+  int WINAPI Entry (HINSTANCE h, DWORD reason, void *ptr);	              \
   typedef int (*mainfunc) (int, char **, char **);			      \
   extern int cygwin_attach_dll (HMODULE, mainfunc);			      \
   extern void cygwin_detach_dll (DWORD);	               		      \
 CDECL_END								      \
 									      \
-static HANDLE storedHandle;						      \
+static HINSTANCE storedHandle;						      \
 static DWORD storedReason;						      \
 static void* storedPtr;							      \
 									      \
@@ -41,7 +41,7 @@ static int __dllMain (int a, char **b, char **c)			      \
 									      \
 static DWORD dll_index;							      \
 									      \
-int WINAPI _cygwin_dll_entry (HANDLE h, DWORD reason, void *ptr)	      \
+int WINAPI _cygwin_dll_entry (HINSTANCE h, DWORD reason, void *ptr)	      \
 {									      \
   int ret;								      \
   ret = 1;								      \
@@ -86,7 +86,7 @@ int WINAPI _cygwin_dll_entry (HANDLE h, DWORD reason, void *ptr)	      \
 }									      \
 									      \
 /* OBSOLETE: This is only provided for source level compatibility. */         \
-int WINAPI _cygwin_noncygwin_dll_entry (HANDLE h, DWORD reason, void *ptr)    \
+int WINAPI _cygwin_noncygwin_dll_entry (HINSTANCE h, DWORD reason, void *ptr) \
 {									      \
   return _cygwin_dll_entry (h, reason, ptr);				      \
 }									      \

@@ -1,7 +1,7 @@
 2000-08-21  DJ Delorie  <dj@redhat.com>
 
-	* include/cygwin/cygwin_dll.h (DECLARE_CYGWIN_DLL): handle,
-	not hinstance.
+	* include/cygwin/cygwin_dll.h (DECLARE_CYGWIN_DLL): hinstance,
+	not handle.
 
 Fri Aug 18 11:11:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
