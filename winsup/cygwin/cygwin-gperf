@@ -1,0 +1,116 @@
+#!/usr/bin/perl
+use strict;
+sub read_devices($%);
+my $infile = shift;
+my $incfile = shift;
+open(GPERF, "gperf  -c --key-positions='1-2,5-7,9-10' -r -t -C -E " .
+            "-T -L 'ANSI-C' -Hdevhash -N'device::lookup' -Z devstring " .
+	    "-7 -G $infile |");
+my @lines = <GPERF>;
+my $ix = 0;
+my $i = 0;
+my $n = -1;
+my $findclose = 0;
+my $add_device = '';
+my %fh_static;
+my %fh_declare = (
+    'cygdrive_dev' => '&cygdrive_dev_storage',
+    'fs_dev' => '&fs_dev_storage',
+    'proc_dev' => '&proc_dev_storage',
+    'registry_dev' => '&registry_dev_storage',
+    'process_dev' => '&process_dev_storage'
+);
+
+foreach (@lines) {
+    $i++;
+    s/\[(str\[[^\]]*\])\]/[(unsigned) cyg_tolower ($1)]/o and next;
+    s/static (.* )wordlist/static NO_COPY $1wordlist/o and do {
+	$findclose = 1;
+    };
+    s/([   ]*)if \(\*str.*$/$1if (strncasematch (str, s, len))/o and next;
+    $findclose and /};/o and do {
+        $_ .= "\n";
+	$_ .=<<'EOF';
+static const device cygdrive_dev_storage =
+  {"/cygdrive", FH_CYGDRIVE, "/cygdrive", 0, 0, 0, 0};
+
+static const device fs_dev_storage =
+  {"", FH_CYGDRIVE, "", 0, 0, 0, 0};
+
+static const device proc_dev_storage =
+  {"", FH_PROC, "", 0, 0, 0, 0};
+
+static const device registry_dev_storage =
+  {"", FH_REGISTRY, "", 0, 0, 0, 0};
+
+static const device process_dev_storage =
+  {"", FH_PROCESS, "", 0, 0, 0, 0};
+
+EOF
+        for my $f (sort keys %fh_declare) {
+	    $_ .= "const device *$f = $fh_declare{$f};\n";
+	}
+	$_ .= "\n";
+	$_ .= read_devices($incfile, %fh_declare);
+	$findclose = 0;
+    };
+    /^(\s+)(\{".*)/ or next;
+    my $indent = $1;
+    my $rest = $2;
+    for my $f ($rest =~ /\{([^}]+)\}/g) {
+	$f eq '""' and do {
+	    $ix++;
+	    next;
+	};
+	my ($str, $fh) = (split(/, /, $f))[0..1];
+	if ($str !~ "/dev") {
+	    $ix++;
+	} else {
+	    my $what = lc(($fh =~ /FH_(.+)/o)[0]) . '_dev' ;
+	    my $addon = '';
+	    while (defined $fh_static{$what . $addon} &&
+		   $fh_static{$what . $addon} ne $f) {
+		$addon++;
+	    }
+	    $what .= $addon;
+	    $fh_static{$what} = $f;
+	    $fh_declare{$what} = "wordlist + $ix";
+	    $ix++;
+	}
+    }
+}
+
+print @lines;
+
+sub read_devices($%) {
+    my $fn = shift;
+    my %fh_declare = @_;
+    open(F, "$fn") or die "$0: couldn't open $fn - $!\n";
+    my (%dev, %fh);
+    local $_;
+    while (<F>) {
+	/^\s*DEV_([A-Z_0-9]+)_MAJOR\s*=\s*(\d+)/ and do {
+	    my $a = sprintf "%08d", $2;
+	    $dev{$2} = $fh_declare{lc($1) . '_dev'} . " /* \L$1 */";
+	    next;
+	};
+	/^\s*FH_([A-Z_0-9]+)\s*=\s*FHDEV\s*\((\d+),\s*(\d+)\)/ and do {
+	      my $a = sprintf "%08d.%08d", $2, $3;
+	      $fh{$a} = $fh_declare{lc($1) . '_dev'} . " /* \L$1 */";
+	};
+    };
+    close F;
+    my $toprint = '';
+    $toprint = "const device *unit_devices[] =\n{";
+    for my $f (sort keys %dev) {
+	$toprint .= "\n  $dev{$f},";
+    }
+    chop $toprint;
+    $toprint .= "\n};\n\nconst device *uniq_devices[] = \n{";
+    for my $f (sort keys %fh) {
+	$toprint .= "\n  $fh{$f},";
+    }
+    chop $toprint;
+    $toprint .= "\n};\n";
+    return $toprint;
+}
