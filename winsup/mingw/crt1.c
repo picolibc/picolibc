@@ -68,7 +68,9 @@ __MINGW_IMPORT void __set_app_type(int);
 /* Override the dllimport'd declarations in stdlib.h */
 #undef _fmode 
 extern int _fmode; 
+#ifdef __MSVCRT__
 extern int* __p__fmode(void); /* To access the dll _fmode */
+#endif
 
 /*
  * Setup the default file handles to have the _CRT_fmode mode, as well as
@@ -106,7 +108,11 @@ _mingw32_init_fmode ()
     }
 
     /*  Now sync  the dll _fmode to the  one for this .exe.  */
+#ifdef __MSVCRT__
     *__p__fmode() = _fmode;	
+#else
+    *_imp___fmode_dll = _fmode;
+#endif
 
 }
 

@@ -1,3 +1,8 @@
+2004-04-01  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* crt1.c (_mingw32_init_fmode): Set *_imp___fmode_dll to
+	_fmode if not __MSVCRT__.
+
 2004-03-30  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/io.h: (_findfirst): Correct prototype.
