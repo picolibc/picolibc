@@ -176,8 +176,8 @@ grp32togrp16 (struct __group16 *gp16, struct __group32 *gp32)
 }
 
 extern "C" int
-getgrgid_r (__gid32_t gid, struct group *grp, char *buffer, size_t bufsize,
-	    struct group **result)
+getgrgid_r (__gid32_t gid, struct __group32 *grp, char *buffer, size_t bufsize,
+	    struct __group32 **result)
 {
   *result = NULL;
 
@@ -233,8 +233,8 @@ getgrgid (__gid16_t gid)
 }
 
 extern "C" int
-getgrnam_r (const char *nam, struct group *grp, char *buffer, size_t bufsize,
-	    struct group **result)
+getgrnam_r (const char *nam, struct __group32 *grp, char *buffer,
+	    size_t bufsize, struct __group32 **result)
 {
   *result = NULL;
 

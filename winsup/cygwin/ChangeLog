@@ -1,5 +1,11 @@
 2004-05-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* grp.cc (getgrgid_r): Replace struct group by struct __group32 in
+	argument definition.
+	(getgrnam_r): Ditto.
+
+2004-05-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwin.din: Add symbols flockfile, ftrylockfile, funlockfile,
 	getgrgid_r, getgrnam_r and getlogin_r.
 	* grp.cc (getgrgid_r): New function.
