@@ -1,3 +1,10 @@
+2002-06-02  Christopher Faylor  <cgf@redhat.com>
+
+	* strace.cc (forkdebug): Make true by default.
+	(attach_process): Use window pid if cygwin pid isn't available (yet).
+	(create_child): Use either DEBUG_ONLY_THIS_PROCESS or DEBUG_PROCESS,
+	exclusively. (Suggested by Conrad.Scott@dsl.pipex.com)
+
 2002-05-30  Christopher Faylor  <cgf@redhat.com>
 
 	* mkpasswd.cc (main): Don't reset to binmode if stdout is a terminal.

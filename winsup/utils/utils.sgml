@@ -645,7 +645,7 @@ Usage strace [options] program [args...]
 
   -b, --buffer-size=SIZE       set size of output file buffer
   -d, --no-delta               don't display the delta-t microsecond timestamp
-  -f, --trace-children         also trace forked child processes
+  -f, --trace-children         trace child processes (toggle -- default is "true")
   -h, --help                   display help info
   -m, --mask=MASK              set message filter mask
   -n, --crack-error-numbers    output descriptive text instead of error

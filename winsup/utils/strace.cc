@@ -38,7 +38,7 @@ int _impure_ptr;
 static const char *version_string = "@(#)strace V1.0, Copyright (C) 2001, 2002 Red Hat Inc., " __DATE__ "\n";
 
 static const char *pgm;
-static int forkdebug = 0;
+static int forkdebug = 1;
 static int numerror = 1;
 static int usecs = 1;
 static int delta = 1;
@@ -286,7 +286,10 @@ attach_process (pid_t pid)
   load_cygwin ();
   child_pid = (DWORD) cygwin_internal (CW_CYGWIN_PID_TO_WINPID, pid);
   if (!child_pid)
-    error (0, "no such pid - %d", pid);
+    {
+      warn (0, "no such cygwin pid - %d", pid);
+      child_pid = pid;
+    }
 
   if (!DebugActiveProcess (child_pid))
     error (0, "couldn't attach to pid %d<%d> for debugging", pid, child_pid);
@@ -312,11 +315,10 @@ create_child (char **argv)
   memset (&si, 0, sizeof (si));
   si.cb = sizeof (si);
 
-  /* cygwin32_conv_to_win32_path (exec_file, real_path); */
-
-  flags = forkdebug ? 0 : DEBUG_ONLY_THIS_PROCESS;
-  flags |= CREATE_DEFAULT_ERROR_MODE | DEBUG_PROCESS;
-  flags |= (new_window ? CREATE_NEW_CONSOLE | CREATE_NEW_PROCESS_GROUP : 0);
+  flags = CREATE_DEFAULT_ERROR_MODE
+          | (forkdebug ? DEBUG_PROCESS : DEBUG_ONLY_THIS_PROCESS);
+  if (new_window)
+    flags |= CREATE_NEW_CONSOLE | CREATE_NEW_PROCESS_GROUP;
 
   make_command_line (one_line, argv);
 
@@ -786,7 +788,7 @@ usage ()
 Usage: strace [OPTIONS] <command-line>\n\
   -b, --buffer-size=SIZE       set size of output file buffer\n\
   -d, --no-delta               don't display the delta-t microsecond timestamp\n\
-  -f, --trace-children         also trace forked child processes\n\
+  -f, --trace-children         trace child processes (toggle - default true)\n\
   -h, --help                   display this help info\n\
   -m, --mask=MASK              set message filter mask\n\
   -o, --output=FILENAME        set output file to FILENAME\n\
