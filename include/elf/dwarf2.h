@@ -177,6 +177,15 @@ enum dwarf_tag
     DW_TAG_variant_part = 0x33,
     DW_TAG_variable = 0x34,
     DW_TAG_volatile_type = 0x35,
+    /* DWARF 2.1.  */
+    DW_TAG_dwarf_procedure = 0x36,
+    DW_TAG_restrict_type = 0x37,
+    DW_TAG_interface_type = 0x38,
+    DW_TAG_namespace = 0x39,
+    DW_TAG_imported_module = 0x3a,
+    DW_TAG_unspecified_type = 0x3b,
+    DW_TAG_partial_unit = 0x3c,
+    DW_TAG_imported_unit = 0x3d,
     /* SGI/MIPS Extensions.  */
     DW_TAG_MIPS_loop = 0x4081,
     /* GNU extensions.  */
@@ -286,7 +295,7 @@ enum dwarf_attribute
     DW_AT_variable_parameter = 0x4b,
     DW_AT_virtuality = 0x4c,
     DW_AT_vtable_elem_location = 0x4d,
-   /* DWARF 2.1 values.  */
+    /* DWARF 2.1 values.  */
     DW_AT_allocated     = 0x4e,
     DW_AT_associated    = 0x4f,
     DW_AT_data_location = 0x50,
@@ -492,7 +501,9 @@ enum dwarf_type
     DW_ATE_signed = 0x5,
     DW_ATE_signed_char = 0x6,
     DW_ATE_unsigned = 0x7,
-    DW_ATE_unsigned_char = 0x8
+    DW_ATE_unsigned_char = 0x8,
+    /* DWARF 2.1.  */
+    DW_ATE_imaginary_float = 0x9
   };
 
 #define	DW_ATE_lo_user 0x80
@@ -651,12 +662,17 @@ enum dwarf_source_language
     DW_LANG_Pascal83 = 0x0009,
     DW_LANG_Modula2 = 0x000a,
     DW_LANG_Java = 0x000b,
+    /* DWARF 2.1.  */
+    DW_LANG_C99 = 0x000c,
+    DW_LANG_Ada95 = 0x000d,
+    DW_LANG_Fortran95 = 0x000e,
+    /* MIPS.  */
     DW_LANG_Mips_Assembler = 0x8001
   };
 
 
-#define DW_LANG_lo_user 0x8000	/* implementation-defined range start.  */
-#define DW_LANG_hi_user 0xffff	/* implementation-defined range start.  */
+#define DW_LANG_lo_user 0x8000	/* Implementation-defined range start.  */
+#define DW_LANG_hi_user 0xffff	/* Implementation-defined range start.  */
 
 /* Names and codes for macro information.  */
 enum dwarf_macinfo_record_type
@@ -667,7 +683,6 @@ enum dwarf_macinfo_record_type
     DW_MACINFO_end_file = 4,
     DW_MACINFO_vendor_ext = 255
   };
-
 
 /* @@@ For use with GNU frame unwind information.  */
 

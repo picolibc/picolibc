@@ -1,3 +1,8 @@
+2001-06-30  Daniel Berlin  <dan@cgsoftware.com>
+
+	* dwarf2.h: Remerge with gcc version, 
+	including all new DWARF 2.1 extensions.
+
 2001-06-29  James Cownie <jcownie@etnus.com>
 
 	* dwarf2.h: Add DWARF 2.1 attribues.
