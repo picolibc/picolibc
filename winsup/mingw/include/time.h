@@ -125,7 +125,6 @@ extern _CRTIMP void __cdecl	_tzset (void);
 extern _CRTIMP void __cdecl	tzset (void);
 #endif
 
-_CRTIMP size_t __cdecl	strftime(char*, size_t, const char*, const struct tm*);
 _CRTIMP char* __cdecl	_strdate(char*);
 _CRTIMP char* __cdecl	_strtime(char*);
 
