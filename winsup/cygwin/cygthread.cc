@@ -149,9 +149,10 @@ new (size_t)
 	goto out;
       }
     else if (info->id)
-      InterlockedExchange ((LPLONG) &info->avail, 0);
+      InterlockedExchange ((LPLONG) &info->avail, 0);	/* Not available yet */
     else
       {
+	/* Available as soon as thread is created */
 	info->h = CreateThread (&sec_none_nih, 0, cygthread::stub, info,
 				CREATE_SUSPENDED, &info->id);
 	goto out;
