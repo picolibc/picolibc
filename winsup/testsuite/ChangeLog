@@ -1,3 +1,7 @@
+2003-01-21  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Find tcl library in the right place.
+
 2003-01-21  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* winsup.api/pthread/cancel9.c: Make child pid static global.

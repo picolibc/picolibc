@@ -176,7 +176,7 @@ check: $(TESTSUP_LIB_NAME) $(RUNTIME) testsuite/site.exp
 	cd testsuite; \
 	EXPECT=${EXPECT} ; export EXPECT ; \
 	if [ -f $(bupdir2)/expect/expect ] ; then  \
-	   TCL_LIBRARY=`cd .. ; cd ${srcdir}/../tcl/library ; pwd` ; \
+	   TCL_LIBRARY=`cd .. ; cd ${srcdir}/../../tcl/library ; pwd` ; \
 	    export TCL_LIBRARY ; fi ; \
 	PATH=$(bupdir)/cygwin:$${PATH} ;\
 	$(RUNTEST) --tool winsup $(RUNTESTFLAGS)
