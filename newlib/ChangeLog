@@ -1,3 +1,10 @@
+2001-02-21  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdio/fdopen.c (fdopen): Protect calls to _fcntl() with
+	HAVE_FCNTL flag check.
+	* configure.host: Define HAVE_FCNTL for Cygwin, go32, RTEMS, sparc64,
+	powerpcle, x86 netware, x86 sco, x86 Linux and Vxworks.
+
 Thu Feb 15 01:39:51 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* libc/include/sys/signal.h: Always include sys/types.h under Cygwin.

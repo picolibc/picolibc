@@ -252,7 +252,7 @@ case "${host}" in
 	#newlib_cflags="${newlib_cflags} -Werror" # DEBUGGING ONLY;BREAKS BUILD
 	newlib_cflags="${newlib_cflags} -Wall"
 	newlib_cflags="${newlib_cflags} -D_I386MACH_ALLOW_HW_INTERRUPTS"
-	newlib_cflags="${newlib_cflags} -D_LOOSE_KERNEL_NAMES"
+	newlib_cflags="${newlib_cflags} -D_LOOSE_KERNEL_NAMES -DHAVE_FCNTL"
 	# --- Required when building a shared library ------------------------ 
 	newlib_cflags="${newlib_cflags} -fPIC -D_I386MACH_NEED_SOTYPE_FUNCTION"
 	# --- The three lines below are optional ------------------------------
@@ -326,7 +326,7 @@ esac
 
 case "${host}" in
   *-*-cygwin*)
-	newlib_cflags="${newlib_cflags} -DHAVE_OPENDIR -DHAVE_RENAME -DSIGNAL_PROVIDED -DWANT_IO_LONG_DBL -DWANT_PRINTF_LONG_LONG -D_COMPILING_NEWLIB"
+	newlib_cflags="${newlib_cflags} -DHAVE_OPENDIR -DHAVE_RENAME -DSIGNAL_PROVIDED -DWANT_IO_LONG_DBL -DWANT_PRINTF_LONG_LONG -D_COMPILING_NEWLIB -DHAVE_FCNTL"
 	syscall_dir=syscalls
 	;;
 # RTEMS supplies its own versions of some routines:
@@ -337,12 +337,12 @@ case "${host}" in
 #
 #  NOTE: When newlib malloc uses a semaphore, RTEMS will switch to that.
   *-*-rtems*)
-	newlib_cflags="${newlib_cflags} -DHAVE_GETTIMEOFDAY -DMALLOC_PROVIDED -DEXIT_PROVIDED -DMISSING_SYSCALL_NAMES -DSIGNAL_PROVIDED -DREENTRANT_SYSCALLS_PROVIDED -DHAVE_OPENDIR -DNO_EXEC -DWANT_PRINTF_LONG_LONG"
+	newlib_cflags="${newlib_cflags} -DHAVE_GETTIMEOFDAY -DMALLOC_PROVIDED -DEXIT_PROVIDED -DMISSING_SYSCALL_NAMES -DSIGNAL_PROVIDED -DREENTRANT_SYSCALLS_PROVIDED -DHAVE_OPENDIR -DNO_EXEC -DWANT_PRINTF_LONG_LONG -DHAVE_FCNTL"
 	;;
 # VxWorks supplies its own version of malloc, and the newlib one
 # doesn't work because VxWorks does not have sbrk.
   *-wrs-vxworks*)
-	newlib_cflags="${newlib_cflags} -DMALLOC_PROVIDED -DMISSING_SYSCALL_NAMES"
+	newlib_cflags="${newlib_cflags} -DMALLOC_PROVIDED -DMISSING_SYSCALL_NAMES -DHAVE_FCNTL"
 	;;
 # UDI doesn't have exec, so system() should fail the right way
   a29k-amd-udi)
@@ -393,13 +393,13 @@ case "${host}" in
 	newlib_cflags="${newlib_cflags} -DSMALL_DTOA -DSMALL_MEMORY"
 	;;	
   i[3456]86-*-sco*)
-	newlib_cflags="${newlib_cflags} -DSIGNAL_PROVIDED"
+	newlib_cflags="${newlib_cflags} -DSIGNAL_PROVIDED -DHAVE_FCNTL"
 	;;
   i[3456]86-*-netware*)
-	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES -DNO_EXEC -DABORT_PROVIDED -DCLOCK_PROVIDED -DMALLOC_PROVIDED"
+	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES -DNO_EXEC -DABORT_PROVIDED -DCLOCK_PROVIDED -DMALLOC_PROVIDED -DHAVE_FCNTL"
 	;;
   i[3456]86-*-go32)
-	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES -DNO_EXEC"
+	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES -DNO_EXEC -DHAVE_FCNTL"
 	;;
   m32r-*-*)
 	# Pass -msdata=sdata so _impure_ptr goes in .sdata.
@@ -425,7 +425,7 @@ case "${host}" in
 	newlib_cflags="${newlib_cflags} -mrelocatable-lib -mno-eabi -mstrict-align -DMISSING_SYSCALL_NAMES"
 	;;
   powerpcle-*-pe)
-	newlib_cflags="${newlib_cflags} -DHAVE_OPENDIR -DHAVE_RENAME"
+	newlib_cflags="${newlib_cflags} -DHAVE_OPENDIR -DHAVE_RENAME -DHAVE_FCNTL"
 	syscall_dir=syscalls
 	;;
   sh*-*-*)
@@ -436,7 +436,7 @@ case "${host}" in
 	newlib_cflags="${newlib_cflags} -DSIGNAL_PROVIDED"
 	;;
   sparc64-*-*)
-	newlib_cflags="${newlib_cflags} -DREENTRANT_SYSCALLS_PROVIDED -DHAVE_BLKSIZE -DHAVE_GETTIMEOFDAY"
+	newlib_cflags="${newlib_cflags} -DREENTRANT_SYSCALLS_PROVIDED -DHAVE_BLKSIZE -DHAVE_GETTIMEOFDAY -DHAVE_FCNTL"
 	# This either belongs elsewhere or nowhere. But I need *something*,
 	# so for now it's here ...
 	case "${host_os}" in

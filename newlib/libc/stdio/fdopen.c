@@ -55,7 +55,7 @@ _DEFUN (_fdopen_r, (ptr, fd, mode),
 {
   register FILE *fp;
   int flags, oflags;
-#ifdef F_GETFL
+#ifdef HAVE_FCNTL
   int fdflags, fdmode;
 #endif
 
@@ -63,7 +63,7 @@ _DEFUN (_fdopen_r, (ptr, fd, mode),
     return 0;
 
   /* make sure the mode the user wants is a subset of the actual mode */
-#ifdef F_GETFL
+#ifdef HAVE_FCNTL
   if ((fdflags = _fcntl (fd, F_GETFL, 0)) < 0)
     return 0;
   fdmode = fdflags & O_ACCMODE;
@@ -83,7 +83,7 @@ _DEFUN (_fdopen_r, (ptr, fd, mode),
    * __swrite() will lseek to end before each write.
    */
   if ((oflags & O_APPEND)
-#ifdef F_GETFL
+#ifdef HAVE_FCNTL
        && !(fdflags & O_APPEND)
 #endif
       )
