@@ -1,5 +1,16 @@
 2004-08-15  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* mingwex/fopen64.c: Move.
+	* mingwex/fseeko64.c: Move.
+	* mingwex/ftello64.c: Move.
+	* mingwex/lseek64.c: Move.
+	* mingwex/stdio/fopen64.c: To here.
+	* mingwex/stdio/fseeko64.c: To here.
+	* mingwex/stdio/ftello64.c: To here.
+	* mingwex/stdio/lseek64.c: To here.
+
+2004-08-15  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* profile/gmon.c [__MINGW32__]: Include  string.h for
 	memset prototype.
 
@@ -21,7 +32,7 @@
 
 	* include/string.h (memchr, memcmp, strchr, strcmp, strcspn)
 	(strlen, strncmp, strpbrk, strrchr, strspn, strstr): Add pure
-        attribute.
+	attribute.
 
 2004-07-30  Danny Smith  <dannysmith@users.sourceforge.net>
 
@@ -183,7 +194,7 @@
 	(__mingw_fwrite): Handle huge files.
 
 2004-06-30  Kees Zeelenberg  <kzlg@users.sourceforge.net>
-            Danny Smith  <dannysmith@users.sourceforge.net>
+	    Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/stdio.h (fopen64): Add inline function.
 	(fseeko64): Add prototype.
@@ -191,10 +202,10 @@
 	* include/io.h (lseek64): Add inline function.
 	* include/sys/types (off64_t): Add typedef.
 	(fpos64_t): Add typedef.
-        * mingwex/fopen64.c: New file.
-        * mingwex/fseeko64.c: New file.
-        * mingwex/ftello64.c: New file.
-        * mingwex/lseek64.c: New file.
+	* mingwex/fopen64.c: New file.
+	* mingwex/fseeko64.c: New file.
+	* mingwex/ftello64.c: New file.
+	* mingwex/lseek64.c: New file.
 	* mingwex/Makefile.in (STDIO_DISTFILES): Add fopen64.c,
 	fseeko.64.c, ftello64.c, lseek64.c. 
 	(STDIO_OBJS): Add fopen64.o, fseeko.64.o, ftello64.o, lseek64.o.
@@ -1018,8 +1029,8 @@
 
 2002-10-30  Guido Serassio  <serassio@libero.it>
 
-        * include/stdio.h (_getmaxstdio): Add prototype.
-         (_setmaxstdio): Likewise.
+	* include/stdio.h (_getmaxstdio): Add prototype.
+	 (_setmaxstdio): Likewise.
 
 2002-10-19  Kang Li  <rubylith@users.sourceforge.net>
 
@@ -1372,7 +1383,7 @@
 	* include/excpt.h (): Include windef.h not windows.h.
 	* include/fcntl.h (_O_SHORT_LIVED): Add define.
 	(_chmod): Add prototype.
-        (_creat): Correct prototype.
+	(_creat): Correct prototype.
 	(SH_DENY*): Rename defines to _SH_DENY*.
 	(SH_DENY*): Add Non-ANSI names for _SH_DENY*.
 	include/stdio.h (_IOMYBUF, _IOEOF, _IOERR, _IOSTRG,
