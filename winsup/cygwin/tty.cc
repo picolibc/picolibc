@@ -218,12 +218,12 @@ tty_list::allocate_tty (int with_console)
       SetConsoleTitle (buf);
       for (int times = 0; times < 25; times++)
 	{
-	  low_priority_sleep (10);
+	  Sleep (10);
 	  if ((console = FindWindow (NULL, buf)))
 	    break;
 	}
       SetConsoleTitle (oldtitle);
-      low_priority_sleep (40);
+      Sleep (40);
       ReleaseMutex (title_mutex);
       if (console == NULL)
 	{

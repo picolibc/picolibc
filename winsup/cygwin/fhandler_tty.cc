@@ -175,7 +175,7 @@ fhandler_pty_master::accept_input ()
 	      debug_printf ("to_slave pipe is full");
 	      SetEvent (input_available_event);
 	      ReleaseMutex (input_mutex);
-	      low_priority_sleep (10);
+	      Sleep (10);
 	      rc = WaitForSingleObject (input_mutex, INFINITE);
 	    }
 	}
@@ -279,7 +279,7 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 		  break;
 		}
 
-	      low_priority_sleep (10);
+	      Sleep (10);
 	    }
 
 	  if (ReadFile (handle, outbuf, rlen, &n, NULL) == FALSE)

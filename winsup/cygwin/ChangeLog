@@ -1,3 +1,9 @@
+2002-11-26  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_tty.cc (fhandler_pty_master::accept_input): Just use a
+	normal Sleep or suffer amazing pauses when other tty apps are running.
+	(fhandler_pty_master::process_slave_output): Ditto.
+
 2002-11-25  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* passwd.cc (read_etc_passwd): Never add an entry when starting
