@@ -171,8 +171,8 @@ Cygwin now' link on the Cygwin Home Page at @file{http://cygwin.com/}.
 If you are downloading from the Internet, setup will fail if it cannot
 download the list of mirrors at
 @file{http://cygwin.com/mirrors.html}.  It could be that
-the network is too busy.  Similarly for an ftp download site that isn't
-working.  Try another mirror, or try again later.
+the network is too busy.  Something similar could be the cause of a
+download site not working.  Try another mirror, or try again later.
 
 If setup refuses to download a package that you know needs to be
 upgraded, try deleting that package's entry from /etc/setup.  If you are
@@ -320,3 +320,25 @@ this purpose.  See @file{http://rsync.samba.org/},
 For more information on setting up a custom Cygwin package server, see
 the Cygwin Setup homepage at
 @file{http://sources.redhat.com/cygwin-apps/setup.html}.
+
+@subsection How can I make my own portable Cygwin on CD?
+
+While some users have successfully done this, for example Indiana
+University's XLiveCD @file{http://xlivecd.indiana.edu/}, there is no
+easy way to do it. Full instructions for constructing a porttable Cygwin
+on CD by hand can be found on the mailing list at
+@file{http://www.cygwin.com/ml/cygwin/2003-07/msg01117.html}.  (Thanks
+to fergus at bonhard dot uklinux dot net for these instructions.)
+
+@subsection How do I save, restore, delete, or modify the Cygwin information stored in the registry?
+
+Currently Cygwin stores its mount table information in the registry.  It
+is recommended that you use the @samp{mount} and @samp{umount} commands
+to manipulate the mount information instead of directly modifying the
+registry.
+
+To save the mount information to a file for later restoration, use
+@samp{mount -m > mounts.bat} To remove all mount information use
+@samp{umount -A}.  To reincorporate saved mount information just run the
+batch file. For more information on using @samp{mount}, see
+@file{http://cygwin.com/cygwin-ug-net/using-utils.html#mount}.
