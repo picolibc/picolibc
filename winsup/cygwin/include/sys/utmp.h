@@ -60,7 +60,8 @@ extern void utmpname (const char *);
 void login (struct utmp *);
 int logout (char *);
 int login_tty (int);
-void logwtmp (char *, char *, char *);
+void updwtmp (const char *, const struct utmp *);
+void logwtmp (const char *, const char *, const char *);
 
 #ifdef __cplusplus
 }

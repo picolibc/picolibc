@@ -2540,21 +2540,18 @@ ffs (int i)
 }
 
 extern "C" void
-login (struct utmp *ut)
+updwtmp (const char *wtmp_file, const struct utmp *ut)
 {
-  sigframe thisframe (mainthread);
-  register int fd;
-
-  pututline (ut);
-  endutent ();
   /* Writing to wtmp must be atomic to prevent mixed up data. */
   char mutex_name[MAX_PATH];
-  HANDLE mutex = CreateMutex (NULL, FALSE,
-			      shared_name (mutex_name, "wtmp_mutex", 0));
+  HANDLE mutex;
+  int fd;
+
+  mutex = CreateMutex (NULL, FALSE, shared_name (mutex_name, "wtmp_mutex", 0));
   if (mutex)
     while (WaitForSingleObject (mutex, INFINITE) == WAIT_ABANDONED)
       ;
-  if ((fd = open (_PATH_WTMP, O_WRONLY | O_APPEND | O_BINARY, 0)) >= 0)
+  if ((fd = open (wtmp_file, O_WRONLY | O_APPEND | O_BINARY, 0)) >= 0)
     {
       write (fd, ut, sizeof *ut);
       close (fd);
@@ -2564,6 +2561,33 @@ login (struct utmp *ut)
       ReleaseMutex (mutex);
       CloseHandle (mutex);
     }
+}
+
+extern "C" void
+logwtmp (const char *line, const char *user, const char *host)
+{
+  sigframe thisframe (mainthread);
+  struct utmp ut;
+  memset (&ut, 0, sizeof ut);
+  ut.ut_type = USER_PROCESS;
+  ut.ut_pid = getpid ();
+  if (line)
+    strncpy (ut.ut_line, line, sizeof ut.ut_line);
+  time (&ut.ut_time);
+  if (user)
+    strncpy (ut.ut_user, user, sizeof ut.ut_user);
+  if (host)
+    strncpy (ut.ut_host, host, sizeof ut.ut_host);
+  updwtmp (_PATH_WTMP, &ut);
+}
+
+extern "C" void
+login (struct utmp *ut)
+{
+  sigframe thisframe (mainthread);
+  pututline (ut);
+  endutent ();
+  updwtmp (_PATH_WTMP, ut);
 }
 
 extern "C" int
@@ -2579,29 +2603,11 @@ logout (char *line)
 
   if (ut)
     {
-      int fd;
-
       ut->ut_type = DEAD_PROCESS;
       memset (ut->ut_user, 0, sizeof ut->ut_user);
       time (&ut->ut_time);
-      /* Writing to wtmp must be atomic to prevent mixed up data. */
-      char mutex_name[MAX_PATH];
-      HANDLE mutex = CreateMutex (NULL, FALSE,
-				  shared_name (mutex_name, "wtmp_mutex", 0));
-      if (mutex)
-	while (WaitForSingleObject (mutex, INFINITE) == WAIT_ABANDONED)
-	  ;
-      if ((fd = open (_PATH_WTMP, O_WRONLY | O_APPEND | O_BINARY, 0)) >= 0)
-	{
-	  write (fd, &ut_buf, sizeof ut_buf);
-	  debug_printf ("set logout time for %s", line);
-	  close (fd);
-	}
-      if (mutex)
-	{
-	  ReleaseMutex (mutex);
-	  CloseHandle (mutex);
-	}
+      updwtmp (_PATH_WTMP, &ut_buf);
+      debug_printf ("set logout time for %s", line);
       memset (ut->ut_line, 0, sizeof ut_buf.ut_line);
       ut->ut_time = 0;
       pututline (ut);

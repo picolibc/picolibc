@@ -1,5 +1,32 @@
 2003-09-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (DLL_OFILES): Add bsdlib.o.
+	* autoload.cc (RegisterServiceProcess): Add.
+	* bsdlib.cc: New file.
+	(daemon): New function.
+	(login_tty): Ditto.
+	(openpty): Ditto.
+	(forkpty): Ditto.
+	* cygwin.din: Export daemon, forkpty, login_tty, logwtmp, updwtmp,
+	openpty and revoke.
+	* syscalls.cc (updwtmp): New function, writing to wtmp exclusively.
+	(logwtmp): Ditto.
+	(login): Call updwtmp instead of writing to wtmp by itself.
+	(logout): Ditto.
+	* tty.cc (revoke): New funtion.
+	* include/paths.h: Define _PATH_DEVNULL.
+	* include/pty.h: New header.
+	* include/cygwin/version.h: Bump API minor number.
+	* include/sys/utmp.h: Declare logwtmp with const arguments.
+	Declare updwtmp.
+	* lib/iruserok.c: New file.
+	(ruserok): New function.
+	(iruserok): Ditto.
+	(__ivaliduser): Ditto.
+	(__icheckhost): Ditto.
+
+2003-09-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (fhandler_socket::fstat): Don't use PC_POSIX.
 
 2003-09-09  Pierre Humblet <pierre.humblet@ieee.org>

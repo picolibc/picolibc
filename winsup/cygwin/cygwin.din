@@ -350,6 +350,7 @@ cygwin_win32_to_posix_path_list_buf_size
 cygwin32_win32_to_posix_path_list_buf_size = cygwin_win32_to_posix_path_list_buf_size
 cygwin_winpid_to_pid
 cygwin32_winpid_to_pid = cygwin_winpid_to_pid
+daemon
 difftime
 _difftime = difftime
 dirfd
@@ -509,6 +510,7 @@ _fopen = fopen
 _fopen64 = fopen64
 fork
 _fork = fork
+forkpty
 fpathconf
 fprintf
 _fprintf = fprintf
@@ -816,7 +818,10 @@ _logbf = logbf
 logf
 _logf = logf
 login
+login_tty
 logout
+logwtmp
+updwtmp
 longjmp
 _longjmp = longjmp
 lrand48
@@ -918,6 +923,7 @@ opendir
 _opendir = opendir
 openlog
 _openlog = openlog
+openpty
 pathconf
 _pathconf = pathconf
 pause
@@ -1062,6 +1068,7 @@ remquo
 remquof
 rename
 _rename = rename
+revoke
 rewind
 _rewind = rewind
 rewinddir
