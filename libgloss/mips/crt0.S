@@ -43,7 +43,6 @@
 
 	.comm	__memsize, 12
 	.comm	__lstack, STARTUP_STACK_SIZE
-	.comm   __stackbase,4
 
 	.text
 	.align	2
@@ -164,7 +163,6 @@ zerobss:
 	subu	t0,t0,64
 4:
 	move	sp,t0				# set stack pointer
-	sw	sp,__stackbase			# keep this for future ref
 	.end	zerobss
 
 /*
