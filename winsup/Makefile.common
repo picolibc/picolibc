@@ -130,7 +130,7 @@ ifeq (,${findstring $(gcc_libdir),$(CFLAGS) $(CXXFLAGS) $(CXX) $(CC)})
 GCC_INCLUDE:=${subst //,/,-I$(gcc_libdir)/include}
 endif
 
-COMPILE_CXX=$(CXX) $c $(nostdincxx) $(ALL_CXXFLAGS) $(GCC_INCLUDE) \
+COMPILE_CXX=$(CXX) $c $(nostdincxx) $(nostdinc} $(ALL_CXXFLAGS) $(GCC_INCLUDE) \
 	     -fno-rtti -fno-exceptions
 COMPILE_CC=$(CC) $c $(nostdinc) $(ALL_CFLAGS) $(GCC_INCLUDE)
 

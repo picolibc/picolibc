@@ -1,5 +1,9 @@
 2003-08-05  Christopher Faylor  <cgf@redhat.com>
 
+	* Makefile.common: Hmm.  Older compilers seem to need -nostdinc.
+
+2003-08-05  Christopher Faylor  <cgf@redhat.com>
+
 	* Makefile.common: Don't send -nostdinc++ with g++.
 
 2003-07-25  Christopher Faylor  <cgf@redhat.com>
