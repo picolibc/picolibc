@@ -80,13 +80,15 @@ procedure should be a fairly safe way to do that:
 
 @item Run setup to download and extract all the tar files.
 
-@item Re-activate your anti-virus software and scan everything 
-in C:\cygwin (or wherever you chose to install).
+@item Re-activate your anti-virus software and scan everything
+in C:\cygwin (or wherever you chose to install).  If you're concerned
+about a malicious package, say if a mirror is compromised, then you
+should scan your entire hard disk after running setup.
 
 @end enumerate
 
-This should be safe, as long as nobody substitutes a malicious
-@code{setup.exe}!
+This should be safe provided setup.exe is not substituted by something
+malicious.
 
 @subsection What packages should I download?
 
