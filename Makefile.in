@@ -220,12 +220,16 @@ BUILD_CONFIGDIRS = libiberty
 BUILD_SUBDIR = @build_subdir@
 
 # This is set by the configure script to the arguments to use when configuring
-# directories built for the target.
-TARGET_CONFIGARGS = @target_configargs@
-
-# This is set by the configure script to the arguments to use when configuring
 # directories built for the build system.
 BUILD_CONFIGARGS = @build_configargs@
+
+# This is set by the configure script to the arguments to use when configuring
+# directories built for the host system.
+HOST_CONFIGARGS = @host_configargs@
+
+# This is set by the configure script to the arguments to use when configuring
+# directories built for the target.
+TARGET_CONFIGARGS = @target_configargs@
 
 # This is set by configure to REALLY_SET_LIB_PATH if --enable-shared
 # was used.
@@ -252,6 +256,7 @@ REALLY_SET_LIB_PATH = \
 # Should be substed by configure.in
 FLAGS_FOR_TARGET = @FLAGS_FOR_TARGET@
 CC_FOR_TARGET = @CC_FOR_TARGET@
+BASE_CC_FOR_TARGET = @BASE_CC_FOR_TARGET@
 CXX_FOR_TARGET = @CXX_FOR_TARGET@
 RAW_CXX_FOR_TARGET = @RAW_CXX_FOR_TARGET@
 CXX_FOR_TARGET_FOR_RECURSIVE_MAKE = @CXX_FOR_TARGET_FOR_RECURSIVE_MAKE@
@@ -1211,51 +1216,46 @@ install.all: install-no-fixedincludes
 install-no-fixedincludes: installdirs @install_host_modules_nogcc@ \
 	@install_target_modules@ gcc-no-fixedincludes
 
-# Install the gcc headers files, but not the fixed include files,
-# which Cygnus is not allowed to distribute.  This rule is very
-# dependent on the workings of the gcc Makefile.in.
-.PHONY: gcc-no-fixedincludes
-gcc-no-fixedincludes:
-	@if [ -f ./gcc/Makefile ]; then \
-	  rm -rf gcc/tmp-include; \
-	  mv gcc/include gcc/tmp-include 2>/dev/null; \
-	  mkdir gcc/include; \
-	  cp $(srcdir)/gcc/gsyslimits.h gcc/include/syslimits.h; \
-	  touch gcc/stmp-fixinc gcc/include/fixed; \
-	  rm -f gcc/stmp-headers gcc/stmp-int-hdrs; \
-	  r=`${PWD}`; export r; \
-	  s=`cd $(srcdir); ${PWD}` ; export s; \
-	  $(SET_LIB_PATH) \
-	  (cd ./gcc; \
-	   $(MAKE) $(GCC_FLAGS_TO_PASS) install); \
-	  rm -rf gcc/include; \
-	  mv gcc/tmp-include gcc/include 2>/dev/null; \
-	else true; fi
+### other supporting targets
 
-# These rules are used to build the modules which are built with the
-# build machine's native compiler.
+MAKEDIRS= \
+	$(DESTDIR)$(prefix) \
+	$(DESTDIR)$(exec_prefix)
+.PHONY: installdirs
+installdirs: mkinstalldirs
+	$(SHELL) $(srcdir)/mkinstalldirs $(MAKEDIRS)
 
-.PHONY: all-build-libiberty maybe-all-build-libiberty
-maybe-all-build-libiberty:
-all-build-libiberty:
-	@if [ -f ./libiberty/Makefile ] ; then \
-	  r=`${PWD}`; export r; \
-	  s=`cd $(srcdir); ${PWD}`; export s; \
-	  (cd $(BUILD_SUBDIR)/libiberty && $(MAKE) all); \
-	else \
-	  true; \
+dir.info: do-install-info
+	if [ -f $(srcdir)/texinfo/gen-info-dir ] ; then \
+	  $(srcdir)/texinfo/gen-info-dir $(infodir) $(srcdir)/texinfo/dir.info-template > dir.info.new ; \
+	  mv -f dir.info.new dir.info ; \
+	else true ; \
 	fi
+
+dist:
+	@echo "Building a full distribution of this tree isn't done"
+	@echo "via 'make dist'.  Check out the etc/ subdirectory" 
+
+etags tags: TAGS
+
+# Right now this just builds TAGS in each subdirectory.  emacs19 has the
+# ability to use several tags files at once, so there is probably no need
+# to combine them into one big TAGS file (like CVS 1.3 does).  We could
+# (if we felt like it) have this Makefile write a piece of elisp which
+# the user could load to tell emacs19 where all the TAGS files we just
+# built are.
+TAGS: do-TAGS
+
+
+# --------------------------------------
+# Modules which run on the build machine
+# --------------------------------------
 
 .PHONY: configure-build-libiberty maybe-configure-build-libiberty
 maybe-configure-build-libiberty:
-configure-build-libiberty:
-	@if [ ! -d $(BUILD_SUBDIR) ]; then \
-	  true; \
-	elif [ -f $(BUILD_SUBDIR)/libiberty/Makefile ] ; then \
-	  true; \
-	elif echo " $(BUILD_CONFIGDIRS) " | grep " libiberty " >/dev/null 2>&1; then \
-	  if [ -d $(srcdir)/libiberty ]; then \
-	    [ -d $(BUILD_SUBDIR)/libiberty ] || mkdir $(BUILD_SUBDIR)/libiberty;\
+configure-build-libiberty: $(BUILD_SUBDIR)/libiberty/Makefile
+$(BUILD_SUBDIR)/libiberty/Makefile: config.status
+	@[ -d $(BUILD_SUBDIR)/libiberty ] || mkdir $(BUILD_SUBDIR)/libiberty;\
 	    r=`${PWD}`; export r; \
 	    s=`cd $(srcdir); ${PWD}`; export s; \
 	    AR="$(AR_FOR_BUILD)"; export AR; \
@@ -1310,17 +1310,19 @@ configure-build-libiberty:
 	    CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
 	      $(BUILD_CONFIGARGS) $${srcdiroption} \
 	      --with-build-subdir="$(BUILD_SUBDIR)" \
-	      || exit 1; \
-	  else \
-	    true; \
-	  fi; \
-	else \
-	  true; \
-	fi
+	      || exit 1
+
+.PHONY: all-build-libiberty maybe-all-build-libiberty
+maybe-all-build-libiberty:
+all-build-libiberty: configure-build-libiberty
+	@r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  (cd $(BUILD_SUBDIR)/libiberty && $(MAKE) all)
 
 
-# These rules are used to build the modules which use FLAGS_TO_PASS.  To
-# build a target all-X means to cd to X and make all.
+# --------------------------------------
+# Modules which run on the host machine
+# --------------------------------------
 
 .PHONY: all-ash maybe-all-ash
 maybe-all-ash:
@@ -3138,29 +3140,22 @@ install-utils: installdirs
 
 
 
-# These rules are used to build the modules which are built with the target
-# tools.  To make foo-X means to cd to X and make foo.
+# ---------------------------------------
+# Modules which run on the target machine
+# ---------------------------------------
 
 .PHONY: configure-target-libstdc++-v3 maybe-configure-target-libstdc++-v3
 maybe-configure-target-libstdc++-v3:
-configure-target-libstdc++-v3:
-	@r=`${PWD}`; export r; \
-	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libstdc++-v3/tmpmulti.out 2> /dev/null; \
-	  if [ -s $(TARGET_SUBDIR)/libstdc++-v3/tmpmulti.out ]; then \
-	    if [ -f $(TARGET_SUBDIR)/libstdc++-v3/multilib.out ]; then \
-	      if cmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out $(TARGET_SUBDIR)/libstdc++-v3/tmpmulti.out > /dev/null; then \
-		rm -f $(TARGET_SUBDIR)/libstdc++-v3/tmpmulti.out; \
-	      else \
-		echo "Multilibs changed for libstdc++-v3, reconfiguring"; \
-		rm -f $(TARGET_SUBDIR)/libstdc++-v3/multilib.out $(TARGET_SUBDIR)/libstdc++-v3/Makefile; \
-		mv $(TARGET_SUBDIR)/libstdc++-v3/tmpmulti.out $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; \
-	      fi; \
-	    else \
-	      mv $(TARGET_SUBDIR)/libstdc++-v3/tmpmulti.out $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; \
-	    fi; \
-	fi; exit 0	# break command into two pieces
-	@if [ -d $(srcdir)/libstdc++-v3 ]; then \
-	    [ -d $(TARGET_SUBDIR)/libstdc++-v3 ] || mkdir $(TARGET_SUBDIR)/libstdc++-v3;\
+configure-target-libstdc++-v3: $(TARGET_SUBDIR)/libstdc++-v3/Makefile
+
+$(TARGET_SUBDIR)/libstdc++-v3/multilib.out: $(BASE_CC_FOR_TARGET)
+	@[ -d $(TARGET_SUBDIR)/libstdc++-v3 ] || mkdir $(TARGET_SUBDIR)/libstdc++-v3;\
+	r=`${PWD}`; export r; \
+	echo "Configuring multilibs for libstdc++-v3"; \
+	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libstdc++-v3/multilib.out 2> /dev/null
+
+$(TARGET_SUBDIR)/libstdc++-v3/Makefile: config.status $(TARGET_SUBDIR)/libstdc++-v3/multilib.out
+	@[ -d $(TARGET_SUBDIR)/libstdc++-v3 ] || mkdir $(TARGET_SUBDIR)/libstdc++-v3;\
 	    r=`${PWD}`; export r; \
 	    s=`cd $(srcdir); ${PWD}`; export s; \
 	    $(SET_LIB_PATH) \
@@ -3217,14 +3212,11 @@ configure-target-libstdc++-v3:
 	    CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
 	      $(TARGET_CONFIGARGS) $${srcdiroption} \
 	      --with-target-subdir="$(TARGET_SUBDIR)" \
-	      || exit 1; \
-	  else \
-	    true; \
-	  fi
+	      || exit 1
 
 .PHONY: all-target-libstdc++-v3 maybe-all-target-libstdc++-v3
 maybe-all-target-libstdc++-v3:
-all-target-libstdc++-v3:
+all-target-libstdc++-v3: configure-target-libstdc++-v3
 	@r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
@@ -3252,24 +3244,16 @@ install-target-libstdc++-v3: installdirs
 
 .PHONY: configure-target-newlib maybe-configure-target-newlib
 maybe-configure-target-newlib:
-configure-target-newlib:
-	@r=`${PWD}`; export r; \
-	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/newlib/tmpmulti.out 2> /dev/null; \
-	  if [ -s $(TARGET_SUBDIR)/newlib/tmpmulti.out ]; then \
-	    if [ -f $(TARGET_SUBDIR)/newlib/multilib.out ]; then \
-	      if cmp $(TARGET_SUBDIR)/newlib/multilib.out $(TARGET_SUBDIR)/newlib/tmpmulti.out > /dev/null; then \
-		rm -f $(TARGET_SUBDIR)/newlib/tmpmulti.out; \
-	      else \
-		echo "Multilibs changed for newlib, reconfiguring"; \
-		rm -f $(TARGET_SUBDIR)/newlib/multilib.out $(TARGET_SUBDIR)/newlib/Makefile; \
-		mv $(TARGET_SUBDIR)/newlib/tmpmulti.out $(TARGET_SUBDIR)/newlib/multilib.out; \
-	      fi; \
-	    else \
-	      mv $(TARGET_SUBDIR)/newlib/tmpmulti.out $(TARGET_SUBDIR)/newlib/multilib.out; \
-	    fi; \
-	fi; exit 0	# break command into two pieces
-	@if [ -d $(srcdir)/newlib ]; then \
-	    [ -d $(TARGET_SUBDIR)/newlib ] || mkdir $(TARGET_SUBDIR)/newlib;\
+configure-target-newlib: $(TARGET_SUBDIR)/newlib/Makefile
+
+$(TARGET_SUBDIR)/newlib/multilib.out: $(BASE_CC_FOR_TARGET)
+	@[ -d $(TARGET_SUBDIR)/newlib ] || mkdir $(TARGET_SUBDIR)/newlib;\
+	r=`${PWD}`; export r; \
+	echo "Configuring multilibs for newlib"; \
+	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/newlib/multilib.out 2> /dev/null
+
+$(TARGET_SUBDIR)/newlib/Makefile: config.status $(TARGET_SUBDIR)/newlib/multilib.out
+	@[ -d $(TARGET_SUBDIR)/newlib ] || mkdir $(TARGET_SUBDIR)/newlib;\
 	    r=`${PWD}`; export r; \
 	    s=`cd $(srcdir); ${PWD}`; export s; \
 	    $(SET_LIB_PATH) \
@@ -3325,14 +3309,11 @@ configure-target-newlib:
 	    CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
 	      $(TARGET_CONFIGARGS) $${srcdiroption} \
 	      --with-target-subdir="$(TARGET_SUBDIR)" \
-	      || exit 1; \
-	  else \
-	    true; \
-	  fi
+	      || exit 1
 
 .PHONY: all-target-newlib maybe-all-target-newlib
 maybe-all-target-newlib:
-all-target-newlib:
+all-target-newlib: configure-target-newlib
 	@r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
@@ -3360,24 +3341,16 @@ install-target-newlib: installdirs
 
 .PHONY: configure-target-libf2c maybe-configure-target-libf2c
 maybe-configure-target-libf2c:
-configure-target-libf2c:
-	@r=`${PWD}`; export r; \
-	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libf2c/tmpmulti.out 2> /dev/null; \
-	  if [ -s $(TARGET_SUBDIR)/libf2c/tmpmulti.out ]; then \
-	    if [ -f $(TARGET_SUBDIR)/libf2c/multilib.out ]; then \
-	      if cmp $(TARGET_SUBDIR)/libf2c/multilib.out $(TARGET_SUBDIR)/libf2c/tmpmulti.out > /dev/null; then \
-		rm -f $(TARGET_SUBDIR)/libf2c/tmpmulti.out; \
-	      else \
-		echo "Multilibs changed for libf2c, reconfiguring"; \
-		rm -f $(TARGET_SUBDIR)/libf2c/multilib.out $(TARGET_SUBDIR)/libf2c/Makefile; \
-		mv $(TARGET_SUBDIR)/libf2c/tmpmulti.out $(TARGET_SUBDIR)/libf2c/multilib.out; \
-	      fi; \
-	    else \
-	      mv $(TARGET_SUBDIR)/libf2c/tmpmulti.out $(TARGET_SUBDIR)/libf2c/multilib.out; \
-	    fi; \
-	fi; exit 0	# break command into two pieces
-	@if [ -d $(srcdir)/libf2c ]; then \
-	    [ -d $(TARGET_SUBDIR)/libf2c ] || mkdir $(TARGET_SUBDIR)/libf2c;\
+configure-target-libf2c: $(TARGET_SUBDIR)/libf2c/Makefile
+
+$(TARGET_SUBDIR)/libf2c/multilib.out: $(BASE_CC_FOR_TARGET)
+	@[ -d $(TARGET_SUBDIR)/libf2c ] || mkdir $(TARGET_SUBDIR)/libf2c;\
+	r=`${PWD}`; export r; \
+	echo "Configuring multilibs for libf2c"; \
+	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libf2c/multilib.out 2> /dev/null
+
+$(TARGET_SUBDIR)/libf2c/Makefile: config.status $(TARGET_SUBDIR)/libf2c/multilib.out
+	@[ -d $(TARGET_SUBDIR)/libf2c ] || mkdir $(TARGET_SUBDIR)/libf2c;\
 	    r=`${PWD}`; export r; \
 	    s=`cd $(srcdir); ${PWD}`; export s; \
 	    $(SET_LIB_PATH) \
@@ -3433,14 +3406,11 @@ configure-target-libf2c:
 	    CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
 	      $(TARGET_CONFIGARGS) $${srcdiroption} \
 	      --with-target-subdir="$(TARGET_SUBDIR)" \
-	      || exit 1; \
-	  else \
-	    true; \
-	  fi
+	      || exit 1
 
 .PHONY: all-target-libf2c maybe-all-target-libf2c
 maybe-all-target-libf2c:
-all-target-libf2c:
+all-target-libf2c: configure-target-libf2c
 	@r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
@@ -3468,24 +3438,16 @@ install-target-libf2c: installdirs
 
 .PHONY: configure-target-libobjc maybe-configure-target-libobjc
 maybe-configure-target-libobjc:
-configure-target-libobjc:
-	@r=`${PWD}`; export r; \
-	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libobjc/tmpmulti.out 2> /dev/null; \
-	  if [ -s $(TARGET_SUBDIR)/libobjc/tmpmulti.out ]; then \
-	    if [ -f $(TARGET_SUBDIR)/libobjc/multilib.out ]; then \
-	      if cmp $(TARGET_SUBDIR)/libobjc/multilib.out $(TARGET_SUBDIR)/libobjc/tmpmulti.out > /dev/null; then \
-		rm -f $(TARGET_SUBDIR)/libobjc/tmpmulti.out; \
-	      else \
-		echo "Multilibs changed for libobjc, reconfiguring"; \
-		rm -f $(TARGET_SUBDIR)/libobjc/multilib.out $(TARGET_SUBDIR)/libobjc/Makefile; \
-		mv $(TARGET_SUBDIR)/libobjc/tmpmulti.out $(TARGET_SUBDIR)/libobjc/multilib.out; \
-	      fi; \
-	    else \
-	      mv $(TARGET_SUBDIR)/libobjc/tmpmulti.out $(TARGET_SUBDIR)/libobjc/multilib.out; \
-	    fi; \
-	fi; exit 0	# break command into two pieces
-	@if [ -d $(srcdir)/libobjc ]; then \
-	    [ -d $(TARGET_SUBDIR)/libobjc ] || mkdir $(TARGET_SUBDIR)/libobjc;\
+configure-target-libobjc: $(TARGET_SUBDIR)/libobjc/Makefile
+
+$(TARGET_SUBDIR)/libobjc/multilib.out: $(BASE_CC_FOR_TARGET)
+	@[ -d $(TARGET_SUBDIR)/libobjc ] || mkdir $(TARGET_SUBDIR)/libobjc;\
+	r=`${PWD}`; export r; \
+	echo "Configuring multilibs for libobjc"; \
+	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libobjc/multilib.out 2> /dev/null
+
+$(TARGET_SUBDIR)/libobjc/Makefile: config.status $(TARGET_SUBDIR)/libobjc/multilib.out
+	@[ -d $(TARGET_SUBDIR)/libobjc ] || mkdir $(TARGET_SUBDIR)/libobjc;\
 	    r=`${PWD}`; export r; \
 	    s=`cd $(srcdir); ${PWD}`; export s; \
 	    $(SET_LIB_PATH) \
@@ -3541,14 +3503,11 @@ configure-target-libobjc:
 	    CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
 	      $(TARGET_CONFIGARGS) $${srcdiroption} \
 	      --with-target-subdir="$(TARGET_SUBDIR)" \
-	      || exit 1; \
-	  else \
-	    true; \
-	  fi
+	      || exit 1
 
 .PHONY: all-target-libobjc maybe-all-target-libobjc
 maybe-all-target-libobjc:
-all-target-libobjc:
+all-target-libobjc: configure-target-libobjc
 	@r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
@@ -3576,24 +3535,16 @@ install-target-libobjc: installdirs
 
 .PHONY: configure-target-libtermcap maybe-configure-target-libtermcap
 maybe-configure-target-libtermcap:
-configure-target-libtermcap:
-	@r=`${PWD}`; export r; \
-	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libtermcap/tmpmulti.out 2> /dev/null; \
-	  if [ -s $(TARGET_SUBDIR)/libtermcap/tmpmulti.out ]; then \
-	    if [ -f $(TARGET_SUBDIR)/libtermcap/multilib.out ]; then \
-	      if cmp $(TARGET_SUBDIR)/libtermcap/multilib.out $(TARGET_SUBDIR)/libtermcap/tmpmulti.out > /dev/null; then \
-		rm -f $(TARGET_SUBDIR)/libtermcap/tmpmulti.out; \
-	      else \
-		echo "Multilibs changed for libtermcap, reconfiguring"; \
-		rm -f $(TARGET_SUBDIR)/libtermcap/multilib.out $(TARGET_SUBDIR)/libtermcap/Makefile; \
-		mv $(TARGET_SUBDIR)/libtermcap/tmpmulti.out $(TARGET_SUBDIR)/libtermcap/multilib.out; \
-	      fi; \
-	    else \
-	      mv $(TARGET_SUBDIR)/libtermcap/tmpmulti.out $(TARGET_SUBDIR)/libtermcap/multilib.out; \
-	    fi; \
-	fi; exit 0	# break command into two pieces
-	@if [ -d $(srcdir)/libtermcap ]; then \
-	    [ -d $(TARGET_SUBDIR)/libtermcap ] || mkdir $(TARGET_SUBDIR)/libtermcap;\
+configure-target-libtermcap: $(TARGET_SUBDIR)/libtermcap/Makefile
+
+$(TARGET_SUBDIR)/libtermcap/multilib.out: $(BASE_CC_FOR_TARGET)
+	@[ -d $(TARGET_SUBDIR)/libtermcap ] || mkdir $(TARGET_SUBDIR)/libtermcap;\
+	r=`${PWD}`; export r; \
+	echo "Configuring multilibs for libtermcap"; \
+	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libtermcap/multilib.out 2> /dev/null
+
+$(TARGET_SUBDIR)/libtermcap/Makefile: config.status $(TARGET_SUBDIR)/libtermcap/multilib.out
+	@[ -d $(TARGET_SUBDIR)/libtermcap ] || mkdir $(TARGET_SUBDIR)/libtermcap;\
 	    r=`${PWD}`; export r; \
 	    s=`cd $(srcdir); ${PWD}`; export s; \
 	    $(SET_LIB_PATH) \
@@ -3649,14 +3600,11 @@ configure-target-libtermcap:
 	    CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
 	      $(TARGET_CONFIGARGS) $${srcdiroption} \
 	      --with-target-subdir="$(TARGET_SUBDIR)" \
-	      || exit 1; \
-	  else \
-	    true; \
-	  fi
+	      || exit 1
 
 .PHONY: all-target-libtermcap maybe-all-target-libtermcap
 maybe-all-target-libtermcap:
-all-target-libtermcap:
+all-target-libtermcap: configure-target-libtermcap
 	@r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
@@ -3680,24 +3628,16 @@ install-target-libtermcap: installdirs
 
 .PHONY: configure-target-winsup maybe-configure-target-winsup
 maybe-configure-target-winsup:
-configure-target-winsup:
-	@r=`${PWD}`; export r; \
-	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/winsup/tmpmulti.out 2> /dev/null; \
-	  if [ -s $(TARGET_SUBDIR)/winsup/tmpmulti.out ]; then \
-	    if [ -f $(TARGET_SUBDIR)/winsup/multilib.out ]; then \
-	      if cmp $(TARGET_SUBDIR)/winsup/multilib.out $(TARGET_SUBDIR)/winsup/tmpmulti.out > /dev/null; then \
-		rm -f $(TARGET_SUBDIR)/winsup/tmpmulti.out; \
-	      else \
-		echo "Multilibs changed for winsup, reconfiguring"; \
-		rm -f $(TARGET_SUBDIR)/winsup/multilib.out $(TARGET_SUBDIR)/winsup/Makefile; \
-		mv $(TARGET_SUBDIR)/winsup/tmpmulti.out $(TARGET_SUBDIR)/winsup/multilib.out; \
-	      fi; \
-	    else \
-	      mv $(TARGET_SUBDIR)/winsup/tmpmulti.out $(TARGET_SUBDIR)/winsup/multilib.out; \
-	    fi; \
-	fi; exit 0	# break command into two pieces
-	@if [ -d $(srcdir)/winsup ]; then \
-	    [ -d $(TARGET_SUBDIR)/winsup ] || mkdir $(TARGET_SUBDIR)/winsup;\
+configure-target-winsup: $(TARGET_SUBDIR)/winsup/Makefile
+
+$(TARGET_SUBDIR)/winsup/multilib.out: $(BASE_CC_FOR_TARGET)
+	@[ -d $(TARGET_SUBDIR)/winsup ] || mkdir $(TARGET_SUBDIR)/winsup;\
+	r=`${PWD}`; export r; \
+	echo "Configuring multilibs for winsup"; \
+	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/winsup/multilib.out 2> /dev/null
+
+$(TARGET_SUBDIR)/winsup/Makefile: config.status $(TARGET_SUBDIR)/winsup/multilib.out
+	@[ -d $(TARGET_SUBDIR)/winsup ] || mkdir $(TARGET_SUBDIR)/winsup;\
 	    r=`${PWD}`; export r; \
 	    s=`cd $(srcdir); ${PWD}`; export s; \
 	    $(SET_LIB_PATH) \
@@ -3753,14 +3693,11 @@ configure-target-winsup:
 	    CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
 	      $(TARGET_CONFIGARGS) $${srcdiroption} \
 	      --with-target-subdir="$(TARGET_SUBDIR)" \
-	      || exit 1; \
-	  else \
-	    true; \
-	  fi
+	      || exit 1
 
 .PHONY: all-target-winsup maybe-all-target-winsup
 maybe-all-target-winsup:
-all-target-winsup:
+all-target-winsup: configure-target-winsup
 	@r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
@@ -3788,24 +3725,16 @@ install-target-winsup: installdirs
 
 .PHONY: configure-target-libgloss maybe-configure-target-libgloss
 maybe-configure-target-libgloss:
-configure-target-libgloss:
-	@r=`${PWD}`; export r; \
-	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libgloss/tmpmulti.out 2> /dev/null; \
-	  if [ -s $(TARGET_SUBDIR)/libgloss/tmpmulti.out ]; then \
-	    if [ -f $(TARGET_SUBDIR)/libgloss/multilib.out ]; then \
-	      if cmp $(TARGET_SUBDIR)/libgloss/multilib.out $(TARGET_SUBDIR)/libgloss/tmpmulti.out > /dev/null; then \
-		rm -f $(TARGET_SUBDIR)/libgloss/tmpmulti.out; \
-	      else \
-		echo "Multilibs changed for libgloss, reconfiguring"; \
-		rm -f $(TARGET_SUBDIR)/libgloss/multilib.out $(TARGET_SUBDIR)/libgloss/Makefile; \
-		mv $(TARGET_SUBDIR)/libgloss/tmpmulti.out $(TARGET_SUBDIR)/libgloss/multilib.out; \
-	      fi; \
-	    else \
-	      mv $(TARGET_SUBDIR)/libgloss/tmpmulti.out $(TARGET_SUBDIR)/libgloss/multilib.out; \
-	    fi; \
-	fi; exit 0	# break command into two pieces
-	@if [ -d $(srcdir)/libgloss ]; then \
-	    [ -d $(TARGET_SUBDIR)/libgloss ] || mkdir $(TARGET_SUBDIR)/libgloss;\
+configure-target-libgloss: $(TARGET_SUBDIR)/libgloss/Makefile
+
+$(TARGET_SUBDIR)/libgloss/multilib.out: $(BASE_CC_FOR_TARGET)
+	@[ -d $(TARGET_SUBDIR)/libgloss ] || mkdir $(TARGET_SUBDIR)/libgloss;\
+	r=`${PWD}`; export r; \
+	echo "Configuring multilibs for libgloss"; \
+	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libgloss/multilib.out 2> /dev/null
+
+$(TARGET_SUBDIR)/libgloss/Makefile: config.status $(TARGET_SUBDIR)/libgloss/multilib.out
+	@[ -d $(TARGET_SUBDIR)/libgloss ] || mkdir $(TARGET_SUBDIR)/libgloss;\
 	    r=`${PWD}`; export r; \
 	    s=`cd $(srcdir); ${PWD}`; export s; \
 	    $(SET_LIB_PATH) \
@@ -3861,14 +3790,11 @@ configure-target-libgloss:
 	    CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
 	      $(TARGET_CONFIGARGS) $${srcdiroption} \
 	      --with-target-subdir="$(TARGET_SUBDIR)" \
-	      || exit 1; \
-	  else \
-	    true; \
-	  fi
+	      || exit 1
 
 .PHONY: all-target-libgloss maybe-all-target-libgloss
 maybe-all-target-libgloss:
-all-target-libgloss:
+all-target-libgloss: configure-target-libgloss
 	@r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
@@ -3892,24 +3818,16 @@ install-target-libgloss: installdirs
 
 .PHONY: configure-target-libiberty maybe-configure-target-libiberty
 maybe-configure-target-libiberty:
-configure-target-libiberty:
-	@r=`${PWD}`; export r; \
-	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libiberty/tmpmulti.out 2> /dev/null; \
-	  if [ -s $(TARGET_SUBDIR)/libiberty/tmpmulti.out ]; then \
-	    if [ -f $(TARGET_SUBDIR)/libiberty/multilib.out ]; then \
-	      if cmp $(TARGET_SUBDIR)/libiberty/multilib.out $(TARGET_SUBDIR)/libiberty/tmpmulti.out > /dev/null; then \
-		rm -f $(TARGET_SUBDIR)/libiberty/tmpmulti.out; \
-	      else \
-		echo "Multilibs changed for libiberty, reconfiguring"; \
-		rm -f $(TARGET_SUBDIR)/libiberty/multilib.out $(TARGET_SUBDIR)/libiberty/Makefile; \
-		mv $(TARGET_SUBDIR)/libiberty/tmpmulti.out $(TARGET_SUBDIR)/libiberty/multilib.out; \
-	      fi; \
-	    else \
-	      mv $(TARGET_SUBDIR)/libiberty/tmpmulti.out $(TARGET_SUBDIR)/libiberty/multilib.out; \
-	    fi; \
-	fi; exit 0	# break command into two pieces
-	@if [ -d $(srcdir)/libiberty ]; then \
-	    [ -d $(TARGET_SUBDIR)/libiberty ] || mkdir $(TARGET_SUBDIR)/libiberty;\
+configure-target-libiberty: $(TARGET_SUBDIR)/libiberty/Makefile
+
+$(TARGET_SUBDIR)/libiberty/multilib.out: $(BASE_CC_FOR_TARGET)
+	@[ -d $(TARGET_SUBDIR)/libiberty ] || mkdir $(TARGET_SUBDIR)/libiberty;\
+	r=`${PWD}`; export r; \
+	echo "Configuring multilibs for libiberty"; \
+	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libiberty/multilib.out 2> /dev/null
+
+$(TARGET_SUBDIR)/libiberty/Makefile: config.status $(TARGET_SUBDIR)/libiberty/multilib.out
+	@[ -d $(TARGET_SUBDIR)/libiberty ] || mkdir $(TARGET_SUBDIR)/libiberty;\
 	    r=`${PWD}`; export r; \
 	    s=`cd $(srcdir); ${PWD}`; export s; \
 	    $(SET_LIB_PATH) \
@@ -3965,14 +3883,11 @@ configure-target-libiberty:
 	    CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
 	      $(TARGET_CONFIGARGS) $${srcdiroption} \
 	      --with-target-subdir="$(TARGET_SUBDIR)" \
-	      || exit 1; \
-	  else \
-	    true; \
-	  fi
+	      || exit 1
 
 .PHONY: all-target-libiberty maybe-all-target-libiberty
 maybe-all-target-libiberty:
-all-target-libiberty:
+all-target-libiberty: configure-target-libiberty
 	@r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
@@ -4000,24 +3915,16 @@ install-target-libiberty: installdirs
 
 .PHONY: configure-target-gperf maybe-configure-target-gperf
 maybe-configure-target-gperf:
-configure-target-gperf:
-	@r=`${PWD}`; export r; \
-	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/gperf/tmpmulti.out 2> /dev/null; \
-	  if [ -s $(TARGET_SUBDIR)/gperf/tmpmulti.out ]; then \
-	    if [ -f $(TARGET_SUBDIR)/gperf/multilib.out ]; then \
-	      if cmp $(TARGET_SUBDIR)/gperf/multilib.out $(TARGET_SUBDIR)/gperf/tmpmulti.out > /dev/null; then \
-		rm -f $(TARGET_SUBDIR)/gperf/tmpmulti.out; \
-	      else \
-		echo "Multilibs changed for gperf, reconfiguring"; \
-		rm -f $(TARGET_SUBDIR)/gperf/multilib.out $(TARGET_SUBDIR)/gperf/Makefile; \
-		mv $(TARGET_SUBDIR)/gperf/tmpmulti.out $(TARGET_SUBDIR)/gperf/multilib.out; \
-	      fi; \
-	    else \
-	      mv $(TARGET_SUBDIR)/gperf/tmpmulti.out $(TARGET_SUBDIR)/gperf/multilib.out; \
-	    fi; \
-	fi; exit 0	# break command into two pieces
-	@if [ -d $(srcdir)/gperf ]; then \
-	    [ -d $(TARGET_SUBDIR)/gperf ] || mkdir $(TARGET_SUBDIR)/gperf;\
+configure-target-gperf: $(TARGET_SUBDIR)/gperf/Makefile
+
+$(TARGET_SUBDIR)/gperf/multilib.out: $(BASE_CC_FOR_TARGET)
+	@[ -d $(TARGET_SUBDIR)/gperf ] || mkdir $(TARGET_SUBDIR)/gperf;\
+	r=`${PWD}`; export r; \
+	echo "Configuring multilibs for gperf"; \
+	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/gperf/multilib.out 2> /dev/null
+
+$(TARGET_SUBDIR)/gperf/Makefile: config.status $(TARGET_SUBDIR)/gperf/multilib.out
+	@[ -d $(TARGET_SUBDIR)/gperf ] || mkdir $(TARGET_SUBDIR)/gperf;\
 	    r=`${PWD}`; export r; \
 	    s=`cd $(srcdir); ${PWD}`; export s; \
 	    $(SET_LIB_PATH) \
@@ -4073,14 +3980,11 @@ configure-target-gperf:
 	    CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
 	      $(TARGET_CONFIGARGS) $${srcdiroption} \
 	      --with-target-subdir="$(TARGET_SUBDIR)" \
-	      || exit 1; \
-	  else \
-	    true; \
-	  fi
+	      || exit 1
 
 .PHONY: all-target-gperf maybe-all-target-gperf
 maybe-all-target-gperf:
-all-target-gperf:
+all-target-gperf: configure-target-gperf
 	@r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
@@ -4108,24 +4012,16 @@ install-target-gperf: installdirs
 
 .PHONY: configure-target-examples maybe-configure-target-examples
 maybe-configure-target-examples:
-configure-target-examples:
-	@r=`${PWD}`; export r; \
-	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/examples/tmpmulti.out 2> /dev/null; \
-	  if [ -s $(TARGET_SUBDIR)/examples/tmpmulti.out ]; then \
-	    if [ -f $(TARGET_SUBDIR)/examples/multilib.out ]; then \
-	      if cmp $(TARGET_SUBDIR)/examples/multilib.out $(TARGET_SUBDIR)/examples/tmpmulti.out > /dev/null; then \
-		rm -f $(TARGET_SUBDIR)/examples/tmpmulti.out; \
-	      else \
-		echo "Multilibs changed for examples, reconfiguring"; \
-		rm -f $(TARGET_SUBDIR)/examples/multilib.out $(TARGET_SUBDIR)/examples/Makefile; \
-		mv $(TARGET_SUBDIR)/examples/tmpmulti.out $(TARGET_SUBDIR)/examples/multilib.out; \
-	      fi; \
-	    else \
-	      mv $(TARGET_SUBDIR)/examples/tmpmulti.out $(TARGET_SUBDIR)/examples/multilib.out; \
-	    fi; \
-	fi; exit 0	# break command into two pieces
-	@if [ -d $(srcdir)/examples ]; then \
-	    [ -d $(TARGET_SUBDIR)/examples ] || mkdir $(TARGET_SUBDIR)/examples;\
+configure-target-examples: $(TARGET_SUBDIR)/examples/Makefile
+
+$(TARGET_SUBDIR)/examples/multilib.out: $(BASE_CC_FOR_TARGET)
+	@[ -d $(TARGET_SUBDIR)/examples ] || mkdir $(TARGET_SUBDIR)/examples;\
+	r=`${PWD}`; export r; \
+	echo "Configuring multilibs for examples"; \
+	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/examples/multilib.out 2> /dev/null
+
+$(TARGET_SUBDIR)/examples/Makefile: config.status $(TARGET_SUBDIR)/examples/multilib.out
+	@[ -d $(TARGET_SUBDIR)/examples ] || mkdir $(TARGET_SUBDIR)/examples;\
 	    r=`${PWD}`; export r; \
 	    s=`cd $(srcdir); ${PWD}`; export s; \
 	    $(SET_LIB_PATH) \
@@ -4181,14 +4077,11 @@ configure-target-examples:
 	    CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
 	      $(TARGET_CONFIGARGS) $${srcdiroption} \
 	      --with-target-subdir="$(TARGET_SUBDIR)" \
-	      || exit 1; \
-	  else \
-	    true; \
-	  fi
+	      || exit 1
 
 .PHONY: all-target-examples maybe-all-target-examples
 maybe-all-target-examples:
-all-target-examples:
+all-target-examples: configure-target-examples
 	@r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
@@ -4208,24 +4101,16 @@ install-target-examples:
 
 .PHONY: configure-target-libffi maybe-configure-target-libffi
 maybe-configure-target-libffi:
-configure-target-libffi:
-	@r=`${PWD}`; export r; \
-	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libffi/tmpmulti.out 2> /dev/null; \
-	  if [ -s $(TARGET_SUBDIR)/libffi/tmpmulti.out ]; then \
-	    if [ -f $(TARGET_SUBDIR)/libffi/multilib.out ]; then \
-	      if cmp $(TARGET_SUBDIR)/libffi/multilib.out $(TARGET_SUBDIR)/libffi/tmpmulti.out > /dev/null; then \
-		rm -f $(TARGET_SUBDIR)/libffi/tmpmulti.out; \
-	      else \
-		echo "Multilibs changed for libffi, reconfiguring"; \
-		rm -f $(TARGET_SUBDIR)/libffi/multilib.out $(TARGET_SUBDIR)/libffi/Makefile; \
-		mv $(TARGET_SUBDIR)/libffi/tmpmulti.out $(TARGET_SUBDIR)/libffi/multilib.out; \
-	      fi; \
-	    else \
-	      mv $(TARGET_SUBDIR)/libffi/tmpmulti.out $(TARGET_SUBDIR)/libffi/multilib.out; \
-	    fi; \
-	fi; exit 0	# break command into two pieces
-	@if [ -d $(srcdir)/libffi ]; then \
-	    [ -d $(TARGET_SUBDIR)/libffi ] || mkdir $(TARGET_SUBDIR)/libffi;\
+configure-target-libffi: $(TARGET_SUBDIR)/libffi/Makefile
+
+$(TARGET_SUBDIR)/libffi/multilib.out: $(BASE_CC_FOR_TARGET)
+	@[ -d $(TARGET_SUBDIR)/libffi ] || mkdir $(TARGET_SUBDIR)/libffi;\
+	r=`${PWD}`; export r; \
+	echo "Configuring multilibs for libffi"; \
+	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libffi/multilib.out 2> /dev/null
+
+$(TARGET_SUBDIR)/libffi/Makefile: config.status $(TARGET_SUBDIR)/libffi/multilib.out
+	@[ -d $(TARGET_SUBDIR)/libffi ] || mkdir $(TARGET_SUBDIR)/libffi;\
 	    r=`${PWD}`; export r; \
 	    s=`cd $(srcdir); ${PWD}`; export s; \
 	    $(SET_LIB_PATH) \
@@ -4281,14 +4166,11 @@ configure-target-libffi:
 	    CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
 	      $(TARGET_CONFIGARGS) $${srcdiroption} \
 	      --with-target-subdir="$(TARGET_SUBDIR)" \
-	      || exit 1; \
-	  else \
-	    true; \
-	  fi
+	      || exit 1
 
 .PHONY: all-target-libffi maybe-all-target-libffi
 maybe-all-target-libffi:
-all-target-libffi:
+all-target-libffi: configure-target-libffi
 	@r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
@@ -4312,24 +4194,16 @@ install-target-libffi:
 
 .PHONY: configure-target-libjava maybe-configure-target-libjava
 maybe-configure-target-libjava:
-configure-target-libjava:
-	@r=`${PWD}`; export r; \
-	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libjava/tmpmulti.out 2> /dev/null; \
-	  if [ -s $(TARGET_SUBDIR)/libjava/tmpmulti.out ]; then \
-	    if [ -f $(TARGET_SUBDIR)/libjava/multilib.out ]; then \
-	      if cmp $(TARGET_SUBDIR)/libjava/multilib.out $(TARGET_SUBDIR)/libjava/tmpmulti.out > /dev/null; then \
-		rm -f $(TARGET_SUBDIR)/libjava/tmpmulti.out; \
-	      else \
-		echo "Multilibs changed for libjava, reconfiguring"; \
-		rm -f $(TARGET_SUBDIR)/libjava/multilib.out $(TARGET_SUBDIR)/libjava/Makefile; \
-		mv $(TARGET_SUBDIR)/libjava/tmpmulti.out $(TARGET_SUBDIR)/libjava/multilib.out; \
-	      fi; \
-	    else \
-	      mv $(TARGET_SUBDIR)/libjava/tmpmulti.out $(TARGET_SUBDIR)/libjava/multilib.out; \
-	    fi; \
-	fi; exit 0	# break command into two pieces
-	@if [ -d $(srcdir)/libjava ]; then \
-	    [ -d $(TARGET_SUBDIR)/libjava ] || mkdir $(TARGET_SUBDIR)/libjava;\
+configure-target-libjava: $(TARGET_SUBDIR)/libjava/Makefile
+
+$(TARGET_SUBDIR)/libjava/multilib.out: $(BASE_CC_FOR_TARGET)
+	@[ -d $(TARGET_SUBDIR)/libjava ] || mkdir $(TARGET_SUBDIR)/libjava;\
+	r=`${PWD}`; export r; \
+	echo "Configuring multilibs for libjava"; \
+	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libjava/multilib.out 2> /dev/null
+
+$(TARGET_SUBDIR)/libjava/Makefile: config.status $(TARGET_SUBDIR)/libjava/multilib.out
+	@[ -d $(TARGET_SUBDIR)/libjava ] || mkdir $(TARGET_SUBDIR)/libjava;\
 	    r=`${PWD}`; export r; \
 	    s=`cd $(srcdir); ${PWD}`; export s; \
 	    $(SET_LIB_PATH) \
@@ -4386,14 +4260,11 @@ configure-target-libjava:
 	    CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
 	      $(TARGET_CONFIGARGS) $${srcdiroption} \
 	      --with-target-subdir="$(TARGET_SUBDIR)" \
-	      || exit 1; \
-	  else \
-	    true; \
-	  fi
+	      || exit 1
 
 .PHONY: all-target-libjava maybe-all-target-libjava
 maybe-all-target-libjava:
-all-target-libjava:
+all-target-libjava: configure-target-libjava
 	@r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
@@ -4421,24 +4292,16 @@ install-target-libjava: installdirs
 
 .PHONY: configure-target-zlib maybe-configure-target-zlib
 maybe-configure-target-zlib:
-configure-target-zlib:
-	@r=`${PWD}`; export r; \
-	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/zlib/tmpmulti.out 2> /dev/null; \
-	  if [ -s $(TARGET_SUBDIR)/zlib/tmpmulti.out ]; then \
-	    if [ -f $(TARGET_SUBDIR)/zlib/multilib.out ]; then \
-	      if cmp $(TARGET_SUBDIR)/zlib/multilib.out $(TARGET_SUBDIR)/zlib/tmpmulti.out > /dev/null; then \
-		rm -f $(TARGET_SUBDIR)/zlib/tmpmulti.out; \
-	      else \
-		echo "Multilibs changed for zlib, reconfiguring"; \
-		rm -f $(TARGET_SUBDIR)/zlib/multilib.out $(TARGET_SUBDIR)/zlib/Makefile; \
-		mv $(TARGET_SUBDIR)/zlib/tmpmulti.out $(TARGET_SUBDIR)/zlib/multilib.out; \
-	      fi; \
-	    else \
-	      mv $(TARGET_SUBDIR)/zlib/tmpmulti.out $(TARGET_SUBDIR)/zlib/multilib.out; \
-	    fi; \
-	fi; exit 0	# break command into two pieces
-	@if [ -d $(srcdir)/zlib ]; then \
-	    [ -d $(TARGET_SUBDIR)/zlib ] || mkdir $(TARGET_SUBDIR)/zlib;\
+configure-target-zlib: $(TARGET_SUBDIR)/zlib/Makefile
+
+$(TARGET_SUBDIR)/zlib/multilib.out: $(BASE_CC_FOR_TARGET)
+	@[ -d $(TARGET_SUBDIR)/zlib ] || mkdir $(TARGET_SUBDIR)/zlib;\
+	r=`${PWD}`; export r; \
+	echo "Configuring multilibs for zlib"; \
+	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/zlib/multilib.out 2> /dev/null
+
+$(TARGET_SUBDIR)/zlib/Makefile: config.status $(TARGET_SUBDIR)/zlib/multilib.out
+	@[ -d $(TARGET_SUBDIR)/zlib ] || mkdir $(TARGET_SUBDIR)/zlib;\
 	    r=`${PWD}`; export r; \
 	    s=`cd $(srcdir); ${PWD}`; export s; \
 	    $(SET_LIB_PATH) \
@@ -4494,14 +4357,11 @@ configure-target-zlib:
 	    CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
 	      $(TARGET_CONFIGARGS) $${srcdiroption} \
 	      --with-target-subdir="$(TARGET_SUBDIR)" \
-	      || exit 1; \
-	  else \
-	    true; \
-	  fi
+	      || exit 1
 
 .PHONY: all-target-zlib maybe-all-target-zlib
 maybe-all-target-zlib:
-all-target-zlib:
+all-target-zlib: configure-target-zlib
 	@r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
@@ -4529,24 +4389,16 @@ install-target-zlib: installdirs
 
 .PHONY: configure-target-boehm-gc maybe-configure-target-boehm-gc
 maybe-configure-target-boehm-gc:
-configure-target-boehm-gc:
-	@r=`${PWD}`; export r; \
-	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/boehm-gc/tmpmulti.out 2> /dev/null; \
-	  if [ -s $(TARGET_SUBDIR)/boehm-gc/tmpmulti.out ]; then \
-	    if [ -f $(TARGET_SUBDIR)/boehm-gc/multilib.out ]; then \
-	      if cmp $(TARGET_SUBDIR)/boehm-gc/multilib.out $(TARGET_SUBDIR)/boehm-gc/tmpmulti.out > /dev/null; then \
-		rm -f $(TARGET_SUBDIR)/boehm-gc/tmpmulti.out; \
-	      else \
-		echo "Multilibs changed for boehm-gc, reconfiguring"; \
-		rm -f $(TARGET_SUBDIR)/boehm-gc/multilib.out $(TARGET_SUBDIR)/boehm-gc/Makefile; \
-		mv $(TARGET_SUBDIR)/boehm-gc/tmpmulti.out $(TARGET_SUBDIR)/boehm-gc/multilib.out; \
-	      fi; \
-	    else \
-	      mv $(TARGET_SUBDIR)/boehm-gc/tmpmulti.out $(TARGET_SUBDIR)/boehm-gc/multilib.out; \
-	    fi; \
-	fi; exit 0	# break command into two pieces
-	@if [ -d $(srcdir)/boehm-gc ]; then \
-	    [ -d $(TARGET_SUBDIR)/boehm-gc ] || mkdir $(TARGET_SUBDIR)/boehm-gc;\
+configure-target-boehm-gc: $(TARGET_SUBDIR)/boehm-gc/Makefile
+
+$(TARGET_SUBDIR)/boehm-gc/multilib.out: $(BASE_CC_FOR_TARGET)
+	@[ -d $(TARGET_SUBDIR)/boehm-gc ] || mkdir $(TARGET_SUBDIR)/boehm-gc;\
+	r=`${PWD}`; export r; \
+	echo "Configuring multilibs for boehm-gc"; \
+	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/boehm-gc/multilib.out 2> /dev/null
+
+$(TARGET_SUBDIR)/boehm-gc/Makefile: config.status $(TARGET_SUBDIR)/boehm-gc/multilib.out
+	@[ -d $(TARGET_SUBDIR)/boehm-gc ] || mkdir $(TARGET_SUBDIR)/boehm-gc;\
 	    r=`${PWD}`; export r; \
 	    s=`cd $(srcdir); ${PWD}`; export s; \
 	    $(SET_LIB_PATH) \
@@ -4602,14 +4454,11 @@ configure-target-boehm-gc:
 	    CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
 	      $(TARGET_CONFIGARGS) $${srcdiroption} \
 	      --with-target-subdir="$(TARGET_SUBDIR)" \
-	      || exit 1; \
-	  else \
-	    true; \
-	  fi
+	      || exit 1
 
 .PHONY: all-target-boehm-gc maybe-all-target-boehm-gc
 maybe-all-target-boehm-gc:
-all-target-boehm-gc:
+all-target-boehm-gc: configure-target-boehm-gc
 	@r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
@@ -4637,24 +4486,16 @@ install-target-boehm-gc: installdirs
 
 .PHONY: configure-target-qthreads maybe-configure-target-qthreads
 maybe-configure-target-qthreads:
-configure-target-qthreads:
-	@r=`${PWD}`; export r; \
-	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/qthreads/tmpmulti.out 2> /dev/null; \
-	  if [ -s $(TARGET_SUBDIR)/qthreads/tmpmulti.out ]; then \
-	    if [ -f $(TARGET_SUBDIR)/qthreads/multilib.out ]; then \
-	      if cmp $(TARGET_SUBDIR)/qthreads/multilib.out $(TARGET_SUBDIR)/qthreads/tmpmulti.out > /dev/null; then \
-		rm -f $(TARGET_SUBDIR)/qthreads/tmpmulti.out; \
-	      else \
-		echo "Multilibs changed for qthreads, reconfiguring"; \
-		rm -f $(TARGET_SUBDIR)/qthreads/multilib.out $(TARGET_SUBDIR)/qthreads/Makefile; \
-		mv $(TARGET_SUBDIR)/qthreads/tmpmulti.out $(TARGET_SUBDIR)/qthreads/multilib.out; \
-	      fi; \
-	    else \
-	      mv $(TARGET_SUBDIR)/qthreads/tmpmulti.out $(TARGET_SUBDIR)/qthreads/multilib.out; \
-	    fi; \
-	fi; exit 0	# break command into two pieces
-	@if [ -d $(srcdir)/qthreads ]; then \
-	    [ -d $(TARGET_SUBDIR)/qthreads ] || mkdir $(TARGET_SUBDIR)/qthreads;\
+configure-target-qthreads: $(TARGET_SUBDIR)/qthreads/Makefile
+
+$(TARGET_SUBDIR)/qthreads/multilib.out: $(BASE_CC_FOR_TARGET)
+	@[ -d $(TARGET_SUBDIR)/qthreads ] || mkdir $(TARGET_SUBDIR)/qthreads;\
+	r=`${PWD}`; export r; \
+	echo "Configuring multilibs for qthreads"; \
+	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/qthreads/multilib.out 2> /dev/null
+
+$(TARGET_SUBDIR)/qthreads/Makefile: config.status $(TARGET_SUBDIR)/qthreads/multilib.out
+	@[ -d $(TARGET_SUBDIR)/qthreads ] || mkdir $(TARGET_SUBDIR)/qthreads;\
 	    r=`${PWD}`; export r; \
 	    s=`cd $(srcdir); ${PWD}`; export s; \
 	    $(SET_LIB_PATH) \
@@ -4710,14 +4551,11 @@ configure-target-qthreads:
 	    CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
 	      $(TARGET_CONFIGARGS) $${srcdiroption} \
 	      --with-target-subdir="$(TARGET_SUBDIR)" \
-	      || exit 1; \
-	  else \
-	    true; \
-	  fi
+	      || exit 1
 
 .PHONY: all-target-qthreads maybe-all-target-qthreads
 maybe-all-target-qthreads:
-all-target-qthreads:
+all-target-qthreads: configure-target-qthreads
 	@r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
@@ -4745,24 +4583,16 @@ install-target-qthreads: installdirs
 
 .PHONY: configure-target-rda maybe-configure-target-rda
 maybe-configure-target-rda:
-configure-target-rda:
-	@r=`${PWD}`; export r; \
-	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/rda/tmpmulti.out 2> /dev/null; \
-	  if [ -s $(TARGET_SUBDIR)/rda/tmpmulti.out ]; then \
-	    if [ -f $(TARGET_SUBDIR)/rda/multilib.out ]; then \
-	      if cmp $(TARGET_SUBDIR)/rda/multilib.out $(TARGET_SUBDIR)/rda/tmpmulti.out > /dev/null; then \
-		rm -f $(TARGET_SUBDIR)/rda/tmpmulti.out; \
-	      else \
-		echo "Multilibs changed for rda, reconfiguring"; \
-		rm -f $(TARGET_SUBDIR)/rda/multilib.out $(TARGET_SUBDIR)/rda/Makefile; \
-		mv $(TARGET_SUBDIR)/rda/tmpmulti.out $(TARGET_SUBDIR)/rda/multilib.out; \
-	      fi; \
-	    else \
-	      mv $(TARGET_SUBDIR)/rda/tmpmulti.out $(TARGET_SUBDIR)/rda/multilib.out; \
-	    fi; \
-	fi; exit 0	# break command into two pieces
-	@if [ -d $(srcdir)/rda ]; then \
-	    [ -d $(TARGET_SUBDIR)/rda ] || mkdir $(TARGET_SUBDIR)/rda;\
+configure-target-rda: $(TARGET_SUBDIR)/rda/Makefile
+
+$(TARGET_SUBDIR)/rda/multilib.out: $(BASE_CC_FOR_TARGET)
+	@[ -d $(TARGET_SUBDIR)/rda ] || mkdir $(TARGET_SUBDIR)/rda;\
+	r=`${PWD}`; export r; \
+	echo "Configuring multilibs for rda"; \
+	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/rda/multilib.out 2> /dev/null
+
+$(TARGET_SUBDIR)/rda/Makefile: config.status $(TARGET_SUBDIR)/rda/multilib.out
+	@[ -d $(TARGET_SUBDIR)/rda ] || mkdir $(TARGET_SUBDIR)/rda;\
 	    r=`${PWD}`; export r; \
 	    s=`cd $(srcdir); ${PWD}`; export s; \
 	    $(SET_LIB_PATH) \
@@ -4818,14 +4648,11 @@ configure-target-rda:
 	    CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
 	      $(TARGET_CONFIGARGS) $${srcdiroption} \
 	      --with-target-subdir="$(TARGET_SUBDIR)" \
-	      || exit 1; \
-	  else \
-	    true; \
-	  fi
+	      || exit 1
 
 .PHONY: all-target-rda maybe-all-target-rda
 maybe-all-target-rda:
-all-target-rda:
+all-target-rda: configure-target-rda
 	@r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
@@ -4851,6 +4678,14 @@ install-target-rda: installdirs
 	    $(MAKE) $(TARGET_FLAGS_TO_PASS) install)
 
 
+
+# ----------
+# GCC module
+# ----------
+
+# Unfortunately, while gcc _should_ be a host module,
+# libgcc is a target module, and gen* programs are
+# build modules.  So GCC is a sort of hybrid.
 
 # gcc is the only module which uses GCC_FLAGS_TO_PASS.
 .PHONY: all-gcc maybe-all-gcc
@@ -4953,6 +4788,27 @@ install-gcc:
 	  true; \
 	fi
 
+# Install the gcc headers files, but not the fixed include files,
+# which Cygnus is not allowed to distribute.  This rule is very
+# dependent on the workings of the gcc Makefile.in.
+.PHONY: gcc-no-fixedincludes
+gcc-no-fixedincludes:
+	@if [ -f ./gcc/Makefile ]; then \
+	  rm -rf gcc/tmp-include; \
+	  mv gcc/include gcc/tmp-include 2>/dev/null; \
+	  mkdir gcc/include; \
+	  cp $(srcdir)/gcc/gsyslimits.h gcc/include/syslimits.h; \
+	  touch gcc/stmp-fixinc gcc/include/fixed; \
+	  rm -f gcc/stmp-headers gcc/stmp-int-hdrs; \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}` ; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd ./gcc; \
+	   $(MAKE) $(GCC_FLAGS_TO_PASS) install); \
+	  rm -rf gcc/include; \
+	  mv gcc/tmp-include gcc/include 2>/dev/null; \
+	else true; fi
+
 # --------------------------------------
 # Dependencies between different modules
 # --------------------------------------
@@ -5031,91 +4887,42 @@ ALL_GCC_C = $(ALL_GCC) maybe-all-target-newlib maybe-all-target-libgloss
 ALL_GCC_CXX = $(ALL_GCC_C) maybe-all-target-libstdc++-v3
 
 # Target modules specific to gcc.
-configure-target-boehm-gc: $(ALL_GCC_C) maybe-configure-target-qthreads
-configure-target-fastjar: maybe-configure-target-zlib
+$(TARGET_SUBDIR)/boehm-gc/Makefile: $(ALL_GCC_C) maybe-configure-target-qthreads
+$(TARGET_SUBDIR)/fastjar/Makefile: maybe-configure-target-zlib
 all-target-fastjar: maybe-all-target-zlib maybe-all-target-libiberty
-configure-target-libf2c: $(ALL_GCC_C)
+$(TARGET_SUBDIR)/libf2c/Makefile: $(ALL_GCC_C)
 all-target-libf2c: maybe-all-target-libiberty
-configure-target-libffi: $(ALL_GCC_C) 
-configure-target-libjava: $(ALL_GCC_C) maybe-configure-target-zlib maybe-configure-target-boehm-gc maybe-configure-target-qthreads maybe-configure-target-libffi
+$(TARGET_SUBDIR)/libffi/Makefile: $(ALL_GCC_C) 
+$(TARGET_SUBDIR)/libjava/Makefile: $(ALL_GCC_C) maybe-configure-target-zlib maybe-configure-target-boehm-gc maybe-configure-target-qthreads maybe-configure-target-libffi
 all-target-libjava: maybe-all-fastjar maybe-all-target-zlib maybe-all-target-boehm-gc maybe-all-target-qthreads maybe-all-target-libffi
-configure-target-libobjc: $(ALL_GCC_C)
+$(TARGET_SUBDIR)/libobjc/Makefile: $(ALL_GCC_C)
 all-target-libobjc: maybe-all-target-libiberty
-configure-target-libstdc++-v3: $(ALL_GCC_C)
+$(TARGET_SUBDIR)/libstdc++-v3/Makefile: $(ALL_GCC_C)
 all-target-libstdc++-v3: maybe-all-target-libiberty
-configure-target-zlib: $(ALL_GCC_C)
+$(TARGET_SUBDIR)/zlib/Makefile: $(ALL_GCC_C)
 
 # Target modules in the 'src' repository.
-configure-target-examples: $(ALL_GCC_C)
-configure-target-libgloss: $(ALL_GCC)
+$(TARGET_SUBDIR)/examples/Makefile: $(ALL_GCC_C)
+$(TARGET_SUBDIR)/libgloss/Makefile: $(ALL_GCC)
 all-target-libgloss: maybe-configure-target-newlib
-configure-target-libiberty: $(ALL_GCC_C)
-configure-target-libtermcap: $(ALL_GCC_C)
-configure-target-newlib: $(ALL_GCC)
-configure-target-winsup: $(ALL_GCC_C)
+$(TARGET_SUBDIR)/libiberty/Makefile: $(ALL_GCC_C)
+$(TARGET_SUBDIR)/libtermcap/Makefile: $(ALL_GCC_C)
+$(TARGET_SUBDIR)/newlib/Makefile: $(ALL_GCC)
+$(TARGET_SUBDIR)/winsup/Makefile: $(ALL_GCC_C)
 all-target-winsup: maybe-all-target-libiberty maybe-all-target-libtermcap
 
 # Other target modules.  Warning, these are not well tested.
-configure-target-gperf: $(ALL_GCC_CXX)
+$(TARGET_SUBDIR)/gperf/Makefile: $(ALL_GCC_CXX)
 all-target-gperf: maybe-all-target-libiberty maybe-all-target-libstdc++-v3
-configure-target-qthreads: $(ALL_GCC_C)
-
-# Dependencies of all-build-foo on configure-build-foo.
-all-build-libiberty: configure-build-libiberty
-
-
-# Dependencies of all-target-foo on configure-target-foo.
-all-target-libstdc++-v3: configure-target-libstdc++-v3
-all-target-newlib: configure-target-newlib
-all-target-libf2c: configure-target-libf2c
-all-target-libobjc: configure-target-libobjc
-all-target-libtermcap: configure-target-libtermcap
-all-target-winsup: configure-target-winsup
-all-target-libgloss: configure-target-libgloss
-all-target-libiberty: configure-target-libiberty
-all-target-gperf: configure-target-gperf
-all-target-examples: configure-target-examples
-all-target-libffi: configure-target-libffi
-all-target-libjava: configure-target-libjava
-all-target-zlib: configure-target-zlib
-all-target-boehm-gc: configure-target-boehm-gc
-all-target-qthreads: configure-target-qthreads
-all-target-rda: configure-target-rda
-
+$(TARGET_SUBDIR)/qthreads/Makefile: $(ALL_GCC_C)
 
 # Dependencies of maybe-foo on foo.  These are used because, for example,
 # all-gcc only depends on all-gas if gas is present and being configured.
 @maybe_dependencies@
 
-### other supporting targets
-
-MAKEDIRS= \
-	$(DESTDIR)$(prefix) \
-	$(DESTDIR)$(exec_prefix)
-.PHONY: installdirs
-installdirs: mkinstalldirs
-	$(SHELL) $(srcdir)/mkinstalldirs $(MAKEDIRS)
-
-dir.info: do-install-info
-	if [ -f $(srcdir)/texinfo/gen-info-dir ] ; then \
-	  $(srcdir)/texinfo/gen-info-dir $(infodir) $(srcdir)/texinfo/dir.info-template > dir.info.new ; \
-	  mv -f dir.info.new dir.info ; \
-	else true ; \
-	fi
-
-dist:
-	@echo "Building a full distribution of this tree isn't done"
-	@echo "via 'make dist'.  Check out the etc/ subdirectory" 
-
-etags tags: TAGS
-
-# Right now this just builds TAGS in each subdirectory.  emacs19 has the
-# ability to use several tags files at once, so there is probably no need
-# to combine them into one big TAGS file (like CVS 1.3 does).  We could
-# (if we felt like it) have this Makefile write a piece of elisp which
-# the user could load to tell emacs19 where all the TAGS files we just
-# built are.
-TAGS: do-TAGS
+# --------------------------------
+# Regenerating top level configury
+# --------------------------------
 
 # Rebuilding Makefile.in, using autogen.
 $(srcdir)/Makefile.in: # $(srcdir)/Makefile.tpl $(srcdir)/Makefile.def

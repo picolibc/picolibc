@@ -223,12 +223,16 @@ BUILD_CONFIGDIRS = libiberty
 BUILD_SUBDIR = @build_subdir@
 
 # This is set by the configure script to the arguments to use when configuring
-# directories built for the target.
-TARGET_CONFIGARGS = @target_configargs@
-
-# This is set by the configure script to the arguments to use when configuring
 # directories built for the build system.
 BUILD_CONFIGARGS = @build_configargs@
+
+# This is set by the configure script to the arguments to use when configuring
+# directories built for the host system.
+HOST_CONFIGARGS = @host_configargs@
+
+# This is set by the configure script to the arguments to use when configuring
+# directories built for the target.
+TARGET_CONFIGARGS = @target_configargs@
 
 # This is set by configure to REALLY_SET_LIB_PATH if --enable-shared
 # was used.
@@ -255,6 +259,7 @@ REALLY_SET_LIB_PATH = \
 # Should be substed by configure.in
 FLAGS_FOR_TARGET = @FLAGS_FOR_TARGET@
 CC_FOR_TARGET = @CC_FOR_TARGET@
+BASE_CC_FOR_TARGET = @BASE_CC_FOR_TARGET@
 CXX_FOR_TARGET = @CXX_FOR_TARGET@
 RAW_CXX_FOR_TARGET = @RAW_CXX_FOR_TARGET@
 CXX_FOR_TARGET_FOR_RECURSIVE_MAKE = @CXX_FOR_TARGET_FOR_RECURSIVE_MAKE@
@@ -754,51 +759,46 @@ install.all: install-no-fixedincludes
 install-no-fixedincludes: installdirs @install_host_modules_nogcc@ \
 	@install_target_modules@ gcc-no-fixedincludes
 
-# Install the gcc headers files, but not the fixed include files,
-# which Cygnus is not allowed to distribute.  This rule is very
-# dependent on the workings of the gcc Makefile.in.
-.PHONY: gcc-no-fixedincludes
-gcc-no-fixedincludes:
-	@if [ -f ./gcc/Makefile ]; then \
-	  rm -rf gcc/tmp-include; \
-	  mv gcc/include gcc/tmp-include 2>/dev/null; \
-	  mkdir gcc/include; \
-	  cp $(srcdir)/gcc/gsyslimits.h gcc/include/syslimits.h; \
-	  touch gcc/stmp-fixinc gcc/include/fixed; \
-	  rm -f gcc/stmp-headers gcc/stmp-int-hdrs; \
-	  r=`${PWD}`; export r; \
-	  s=`cd $(srcdir); ${PWD}` ; export s; \
-	  $(SET_LIB_PATH) \
-	  (cd ./gcc; \
-	   $(MAKE) $(GCC_FLAGS_TO_PASS) install); \
-	  rm -rf gcc/include; \
-	  mv gcc/tmp-include gcc/include 2>/dev/null; \
-	else true; fi
+### other supporting targets
 
-# These rules are used to build the modules which are built with the
-# build machine's native compiler.
-[+ FOR build_modules +]
-.PHONY: all-build-[+module+] maybe-all-build-[+module+]
-maybe-all-build-[+module+]:
-all-build-[+module+]:
-	@if [ -f ./[+module+]/Makefile ] ; then \
-	  r=`${PWD}`; export r; \
-	  s=`cd $(srcdir); ${PWD}`; export s; \
-	  (cd $(BUILD_SUBDIR)/[+module+] && $(MAKE) all); \
-	else \
-	  true; \
+MAKEDIRS= \
+	$(DESTDIR)$(prefix) \
+	$(DESTDIR)$(exec_prefix)
+.PHONY: installdirs
+installdirs: mkinstalldirs
+	$(SHELL) $(srcdir)/mkinstalldirs $(MAKEDIRS)
+
+dir.info: do-install-info
+	if [ -f $(srcdir)/texinfo/gen-info-dir ] ; then \
+	  $(srcdir)/texinfo/gen-info-dir $(infodir) $(srcdir)/texinfo/dir.info-template > dir.info.new ; \
+	  mv -f dir.info.new dir.info ; \
+	else true ; \
 	fi
 
+dist:
+	@echo "Building a full distribution of this tree isn't done"
+	@echo "via 'make dist'.  Check out the etc/ subdirectory" 
+
+etags tags: TAGS
+
+# Right now this just builds TAGS in each subdirectory.  emacs19 has the
+# ability to use several tags files at once, so there is probably no need
+# to combine them into one big TAGS file (like CVS 1.3 does).  We could
+# (if we felt like it) have this Makefile write a piece of elisp which
+# the user could load to tell emacs19 where all the TAGS files we just
+# built are.
+TAGS: do-TAGS
+
+
+# --------------------------------------
+# Modules which run on the build machine
+# --------------------------------------
+[+ FOR build_modules +]
 .PHONY: configure-build-[+module+] maybe-configure-build-[+module+]
 maybe-configure-build-[+module+]:
-configure-build-[+module+]:
-	@if [ ! -d $(BUILD_SUBDIR) ]; then \
-	  true; \
-	elif [ -f $(BUILD_SUBDIR)/[+module+]/Makefile ] ; then \
-	  true; \
-	elif echo " $(BUILD_CONFIGDIRS) " | grep " [+module+] " >/dev/null 2>&1; then \
-	  if [ -d $(srcdir)/[+module+] ]; then \
-	    [ -d $(BUILD_SUBDIR)/[+module+] ] || mkdir $(BUILD_SUBDIR)/[+module+];\
+configure-build-[+module+]: $(BUILD_SUBDIR)/[+module+]/Makefile
+$(BUILD_SUBDIR)/[+module+]/Makefile: config.status
+	@[ -d $(BUILD_SUBDIR)/[+module+] ] || mkdir $(BUILD_SUBDIR)/[+module+];\
 	    r=`${PWD}`; export r; \
 	    s=`cd $(srcdir); ${PWD}`; export s; \
 	    AR="$(AR_FOR_BUILD)"; export AR; \
@@ -853,17 +853,19 @@ configure-build-[+module+]:
 	    CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
 	      $(BUILD_CONFIGARGS) $${srcdiroption} \
 	      --with-build-subdir="$(BUILD_SUBDIR)" \
-	      || exit 1; \
-	  else \
-	    true; \
-	  fi; \
-	else \
-	  true; \
-	fi
+	      || exit 1
+
+.PHONY: all-build-[+module+] maybe-all-build-[+module+]
+maybe-all-build-[+module+]:
+all-build-[+module+]: configure-build-[+module+]
+	@r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  (cd $(BUILD_SUBDIR)/[+module+] && $(MAKE) all)
 [+ ENDFOR build_modules +]
 
-# These rules are used to build the modules which use FLAGS_TO_PASS.  To
-# build a target all-X means to cd to X and make all.
+# --------------------------------------
+# Modules which run on the host machine
+# --------------------------------------
 [+ FOR host_modules +]
 .PHONY: all-[+module+] maybe-all-[+module+]
 maybe-all-[+module+]:
@@ -922,29 +924,22 @@ install-[+module+]: installdirs
 [+ ENDIF no_install +]
 [+ ENDFOR host_modules +]
 
-# These rules are used to build the modules which are built with the target
-# tools.  To make foo-X means to cd to X and make foo.
+# ---------------------------------------
+# Modules which run on the target machine
+# ---------------------------------------
 [+ FOR target_modules +]
 .PHONY: configure-target-[+module+] maybe-configure-target-[+module+]
 maybe-configure-target-[+module+]:
-configure-target-[+module+]:
-	@r=`${PWD}`; export r; \
-	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/[+module+]/tmpmulti.out 2> /dev/null; \
-	  if [ -s $(TARGET_SUBDIR)/[+module+]/tmpmulti.out ]; then \
-	    if [ -f $(TARGET_SUBDIR)/[+module+]/multilib.out ]; then \
-	      if cmp $(TARGET_SUBDIR)/[+module+]/multilib.out $(TARGET_SUBDIR)/[+module+]/tmpmulti.out > /dev/null; then \
-		rm -f $(TARGET_SUBDIR)/[+module+]/tmpmulti.out; \
-	      else \
-		echo "Multilibs changed for [+module+], reconfiguring"; \
-		rm -f $(TARGET_SUBDIR)/[+module+]/multilib.out $(TARGET_SUBDIR)/[+module+]/Makefile; \
-		mv $(TARGET_SUBDIR)/[+module+]/tmpmulti.out $(TARGET_SUBDIR)/[+module+]/multilib.out; \
-	      fi; \
-	    else \
-	      mv $(TARGET_SUBDIR)/[+module+]/tmpmulti.out $(TARGET_SUBDIR)/[+module+]/multilib.out; \
-	    fi; \
-	fi; exit 0	# break command into two pieces
-	@if [ -d $(srcdir)/[+module+] ]; then \
-	    [ -d $(TARGET_SUBDIR)/[+module+] ] || mkdir $(TARGET_SUBDIR)/[+module+];\
+configure-target-[+module+]: $(TARGET_SUBDIR)/[+module+]/Makefile
+
+$(TARGET_SUBDIR)/[+module+]/multilib.out: $(BASE_CC_FOR_TARGET)
+	@[ -d $(TARGET_SUBDIR)/[+module+] ] || mkdir $(TARGET_SUBDIR)/[+module+];\
+	r=`${PWD}`; export r; \
+	echo "Configuring multilibs for [+module+]"; \
+	$(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/[+module+]/multilib.out 2> /dev/null
+
+$(TARGET_SUBDIR)/[+module+]/Makefile: config.status $(TARGET_SUBDIR)/[+module+]/multilib.out
+	@[ -d $(TARGET_SUBDIR)/[+module+] ] || mkdir $(TARGET_SUBDIR)/[+module+];\
 	    r=`${PWD}`; export r; \
 	    s=`cd $(srcdir); ${PWD}`; export s; \
 	    $(SET_LIB_PATH) \
@@ -1005,14 +1000,11 @@ configure-target-[+module+]:
 	    CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
 	      $(TARGET_CONFIGARGS) $${srcdiroption} \
 	      --with-target-subdir="$(TARGET_SUBDIR)" \
-	      || exit 1; \
-	  else \
-	    true; \
-	  fi
+	      || exit 1
 
 .PHONY: all-target-[+module+] maybe-all-target-[+module+]
 maybe-all-target-[+module+]:
-all-target-[+module+]:
+all-target-[+module+]: configure-target-[+module+]
 	@r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
@@ -1055,6 +1047,14 @@ install-target-[+module+]: installdirs
 	    $(MAKE) $(TARGET_FLAGS_TO_PASS) install)
 [+ ENDIF no_install +]
 [+ ENDFOR target_modules +]
+
+# ----------
+# GCC module
+# ----------
+
+# Unfortunately, while gcc _should_ be a host module,
+# libgcc is a target module, and gen* programs are
+# build modules.  So GCC is a sort of hybrid.
 
 # gcc is the only module which uses GCC_FLAGS_TO_PASS.
 .PHONY: all-gcc maybe-all-gcc
@@ -1157,6 +1157,27 @@ install-gcc:
 	  true; \
 	fi
 
+# Install the gcc headers files, but not the fixed include files,
+# which Cygnus is not allowed to distribute.  This rule is very
+# dependent on the workings of the gcc Makefile.in.
+.PHONY: gcc-no-fixedincludes
+gcc-no-fixedincludes:
+	@if [ -f ./gcc/Makefile ]; then \
+	  rm -rf gcc/tmp-include; \
+	  mv gcc/include gcc/tmp-include 2>/dev/null; \
+	  mkdir gcc/include; \
+	  cp $(srcdir)/gcc/gsyslimits.h gcc/include/syslimits.h; \
+	  touch gcc/stmp-fixinc gcc/include/fixed; \
+	  rm -f gcc/stmp-headers gcc/stmp-int-hdrs; \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}` ; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd ./gcc; \
+	   $(MAKE) $(GCC_FLAGS_TO_PASS) install); \
+	  rm -rf gcc/include; \
+	  mv gcc/tmp-include gcc/include 2>/dev/null; \
+	else true; fi
+
 # --------------------------------------
 # Dependencies between different modules
 # --------------------------------------
@@ -1235,76 +1256,42 @@ ALL_GCC_C = $(ALL_GCC) maybe-all-target-newlib maybe-all-target-libgloss
 ALL_GCC_CXX = $(ALL_GCC_C) maybe-all-target-libstdc++-v3
 
 # Target modules specific to gcc.
-configure-target-boehm-gc: $(ALL_GCC_C) maybe-configure-target-qthreads
-configure-target-fastjar: maybe-configure-target-zlib
+$(TARGET_SUBDIR)/boehm-gc/Makefile: $(ALL_GCC_C) maybe-configure-target-qthreads
+$(TARGET_SUBDIR)/fastjar/Makefile: maybe-configure-target-zlib
 all-target-fastjar: maybe-all-target-zlib maybe-all-target-libiberty
-configure-target-libf2c: $(ALL_GCC_C)
+$(TARGET_SUBDIR)/libf2c/Makefile: $(ALL_GCC_C)
 all-target-libf2c: maybe-all-target-libiberty
-configure-target-libffi: $(ALL_GCC_C) 
-configure-target-libjava: $(ALL_GCC_C) maybe-configure-target-zlib maybe-configure-target-boehm-gc maybe-configure-target-qthreads maybe-configure-target-libffi
+$(TARGET_SUBDIR)/libffi/Makefile: $(ALL_GCC_C) 
+$(TARGET_SUBDIR)/libjava/Makefile: $(ALL_GCC_C) maybe-configure-target-zlib maybe-configure-target-boehm-gc maybe-configure-target-qthreads maybe-configure-target-libffi
 all-target-libjava: maybe-all-fastjar maybe-all-target-zlib maybe-all-target-boehm-gc maybe-all-target-qthreads maybe-all-target-libffi
-configure-target-libobjc: $(ALL_GCC_C)
+$(TARGET_SUBDIR)/libobjc/Makefile: $(ALL_GCC_C)
 all-target-libobjc: maybe-all-target-libiberty
-configure-target-libstdc++-v3: $(ALL_GCC_C)
+$(TARGET_SUBDIR)/libstdc++-v3/Makefile: $(ALL_GCC_C)
 all-target-libstdc++-v3: maybe-all-target-libiberty
-configure-target-zlib: $(ALL_GCC_C)
+$(TARGET_SUBDIR)/zlib/Makefile: $(ALL_GCC_C)
 
 # Target modules in the 'src' repository.
-configure-target-examples: $(ALL_GCC_C)
-configure-target-libgloss: $(ALL_GCC)
+$(TARGET_SUBDIR)/examples/Makefile: $(ALL_GCC_C)
+$(TARGET_SUBDIR)/libgloss/Makefile: $(ALL_GCC)
 all-target-libgloss: maybe-configure-target-newlib
-configure-target-libiberty: $(ALL_GCC_C)
-configure-target-libtermcap: $(ALL_GCC_C)
-configure-target-newlib: $(ALL_GCC)
-configure-target-winsup: $(ALL_GCC_C)
+$(TARGET_SUBDIR)/libiberty/Makefile: $(ALL_GCC_C)
+$(TARGET_SUBDIR)/libtermcap/Makefile: $(ALL_GCC_C)
+$(TARGET_SUBDIR)/newlib/Makefile: $(ALL_GCC)
+$(TARGET_SUBDIR)/winsup/Makefile: $(ALL_GCC_C)
 all-target-winsup: maybe-all-target-libiberty maybe-all-target-libtermcap
 
 # Other target modules.  Warning, these are not well tested.
-configure-target-gperf: $(ALL_GCC_CXX)
+$(TARGET_SUBDIR)/gperf/Makefile: $(ALL_GCC_CXX)
 all-target-gperf: maybe-all-target-libiberty maybe-all-target-libstdc++-v3
-configure-target-qthreads: $(ALL_GCC_C)
-
-# Dependencies of all-build-foo on configure-build-foo.
-[+ FOR build_modules +]all-build-[+module+]: configure-build-[+module+]
-[+ ENDFOR build_modules +]
-
-# Dependencies of all-target-foo on configure-target-foo.
-[+ FOR target_modules +]all-target-[+module+]: configure-target-[+module+]
-[+ ENDFOR target_modules +]
+$(TARGET_SUBDIR)/qthreads/Makefile: $(ALL_GCC_C)
 
 # Dependencies of maybe-foo on foo.  These are used because, for example,
 # all-gcc only depends on all-gas if gas is present and being configured.
 @maybe_dependencies@
 
-### other supporting targets
-
-MAKEDIRS= \
-	$(DESTDIR)$(prefix) \
-	$(DESTDIR)$(exec_prefix)
-.PHONY: installdirs
-installdirs: mkinstalldirs
-	$(SHELL) $(srcdir)/mkinstalldirs $(MAKEDIRS)
-
-dir.info: do-install-info
-	if [ -f $(srcdir)/texinfo/gen-info-dir ] ; then \
-	  $(srcdir)/texinfo/gen-info-dir $(infodir) $(srcdir)/texinfo/dir.info-template > dir.info.new ; \
-	  mv -f dir.info.new dir.info ; \
-	else true ; \
-	fi
-
-dist:
-	@echo "Building a full distribution of this tree isn't done"
-	@echo "via 'make dist'.  Check out the etc/ subdirectory" 
-
-etags tags: TAGS
-
-# Right now this just builds TAGS in each subdirectory.  emacs19 has the
-# ability to use several tags files at once, so there is probably no need
-# to combine them into one big TAGS file (like CVS 1.3 does).  We could
-# (if we felt like it) have this Makefile write a piece of elisp which
-# the user could load to tell emacs19 where all the TAGS files we just
-# built are.
-TAGS: do-TAGS
+# --------------------------------
+# Regenerating top level configury
+# --------------------------------
 
 # Rebuilding Makefile.in, using autogen.
 $(srcdir)/Makefile.in: # $(srcdir)/Makefile.tpl $(srcdir)/Makefile.def
