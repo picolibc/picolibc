@@ -22,6 +22,9 @@ extern "C" {
 #define TIME_MIDI 16
 #define TIME_TICKS 32
 #define MAKEFOURCC(c0,c1,c2,c3) ((DWORD)(BYTE)(c0)|((DWORD)(BYTE)(c1)<<8)|((DWORD)(BYTE)(c2)<<16)|((DWORD)(BYTE)(c3)<<24))
+#ifndef mmioFOURCC
+#define mmioFOURCC(c0,c1,c2,c3) MAKEFOURCC(c0,c1,c2,c3)
+#endif
 #define MM_JOY1MOVE 0x3A0
 #define MM_JOY2MOVE 0x3A1
 #define MM_JOY1ZMOVE 0x3A2
@@ -525,7 +528,6 @@ extern "C" {
 #define FOURCC_DOS mmioFOURCC('D', 'O', 'S', ' ')
 #define FOURCC_MEM mmioFOURCC('M', 'E', 'M', ' ')
 #define MMIO_DEFAULTBUFFER 8192
-#define mmioFOURCC(c0,c1,c2,c3) MAKEFOURCC(c0,c1,c2,c3)
 #define MCIERR_INVALID_DEVICE_ID (MCIERR_BASE+1)
 #define MCIERR_UNRECOGNIZED_KEYWORD (MCIERR_BASE+3)
 #define MCIERR_UNRECOGNIZED_COMMAND (MCIERR_BASE+5)

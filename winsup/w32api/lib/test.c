@@ -77,6 +77,7 @@
 #include <snmp.h>
 #include <winsnmp.h>
 #include <mgmtapi.h>
+#include <vfw.h>
 
 #ifndef __OBJC__  /* problems with BOOL */
 #include <ole2.h>
