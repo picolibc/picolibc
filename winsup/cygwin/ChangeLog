@@ -1,5 +1,11 @@
 2002-06-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygheap.cc (cygheap_user::set_name): Revert previous change.
+	* environ.cc (spenv::retrieve): Check return value of call to
+	cygheap->user.*from_cygheap().
+
+2002-06-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygheap.cc (cygheap_user::set_name): Remove setting homedrive and
 	homepath to NULL.
 	(cygheap_user::set_logsrv):  Fix free'ing of plogsrv.

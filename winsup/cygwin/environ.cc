@@ -786,7 +786,8 @@ spenv::retrieve (bool no_envblock, const char *const envname, int len)
 
       /* Make a FOO=BAR entry from the value returned by the cygheap_user
          method. */
-      p = (cygheap->user.*from_cygheap) ();
+      if (!(p = (cygheap->user.*from_cygheap) ()))
+        return NULL;
       int namelen = strlen (name);
       char *s = (char *) cmalloc (HEAP_1_STR, namelen + strlen (p) + 1);
       strcpy (s, name);

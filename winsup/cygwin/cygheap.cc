@@ -443,6 +443,8 @@ cygheap_user::set_name (const char *new_name)
   if (pname)
     cfree (pname);
   pname = cstrdup (new_name ? new_name : "");
+  homedrive = NULL;
+  homepath = NULL;
 }
 
 void
