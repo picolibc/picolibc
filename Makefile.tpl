@@ -983,7 +983,7 @@ ENDIF raw_cxx +]
 	      .) topdir="../$(srcdir)" ;; \
 	      *) topdir="../../$(srcdir)" ;; \
 	    esac ;; \
-	esac; \[+ IF stage +]
+	esac; \
 	if [ "$(srcdir)" = "." ] ; then \
 	  if [ "$(TARGET_SUBDIR)" != "." ] ; then \
 	    if $(SHELL) $$s/symlink-tree $${topdir}/[+module+] "no-such-file" ; then \
@@ -1004,10 +1004,10 @@ ENDIF raw_cxx +]
 	  fi; \
 	  srcdiroption="--srcdir=."; \
 	  libsrcdir="."; \
-	else \[+ ENDIF stage +]
+	else \
 	  srcdiroption="--srcdir=$${topdir}/[+module+]"; \
-	  libsrcdir="$$s/[+module+]"; \[+ IF stage +]
-	fi; \[+ ENDIF stage +]
+	  libsrcdir="$$s/[+module+]"; \
+	fi; \
 	rm -f no-such-file || : ; \
 	CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
 	  $(TARGET_CONFIGARGS) $${srcdiroption} \
@@ -1069,9 +1069,6 @@ install-target-[+module+]: installdirs
 # build modules.  So GCC is a sort of hybrid.
 
 # gcc is the only module which uses GCC_FLAGS_TO_PASS.
-# Don't use shared host config.cache, as it will confuse later
-# directories; GCC wants slightly different values for some
-# precious variables.  *sigh*
 .PHONY: configure-gcc maybe-configure-gcc
 maybe-configure-gcc:
 configure-gcc:
