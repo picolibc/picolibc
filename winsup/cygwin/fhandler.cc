@@ -1624,9 +1624,16 @@ fhandler_base::fork_fixup (HANDLE parent, HANDLE &h, const char *name)
 {
   if (!get_close_on_exec ())
     debug_printf ("handle %p already opened", h);
-  else if (!DuplicateHandle (parent, h, hMainProc, &h, 0, !get_close_on_exec (),
-			DUPLICATE_SAME_ACCESS))
+  else if (!DuplicateHandle (parent, h, hMainProc, &h, 0, 0,
+			     DUPLICATE_SAME_ACCESS))
     system_printf ("%s - %E, handle %s<%p>", get_name (), name, h);
+#ifdef DEBUG
+  else
+    {
+      ProtectHandle1 (h, name);
+      setclexec_pid (h, 0);
+    }
+#endif
 }
 
 void

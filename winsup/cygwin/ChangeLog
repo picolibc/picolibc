@@ -1,3 +1,11 @@
+Fri Oct  5 21:01:14 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler.cc (fhandler_base::fork_fixup): Protect dup'ed handle and
+	record it as non-inheritable for debugging purposes in case there is a
+	subsequent fork or exec.
+	* fhandler_tty.cc (fhandler_tty_common::fixup_after_fork): Allow
+	fork_fixup to call ProtecHandle.
+
 Fri Oct  5 14:22:47 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (get_raw_device_number): Correct length arguments for

@@ -1143,15 +1143,9 @@ fhandler_tty_common::fixup_after_fork (HANDLE parent)
   if (ioctl_done_event)
     fork_fixup (parent, ioctl_done_event, "ioctl_done_event");
   if (output_mutex)
-    {
-      fork_fixup (parent, output_mutex, "output_mutex");
-      ProtectHandle (output_mutex);
-    }
+    fork_fixup (parent, output_mutex, "output_mutex");
   if (input_mutex)
-    {
-      fork_fixup (parent, input_mutex, "input_mutex");
-      ProtectHandle (input_mutex);
-    }
+    fork_fixup (parent, input_mutex, "input_mutex");
   if (input_available_event)
     fork_fixup (parent, input_available_event, "input_available_event");
   fork_fixup (parent, inuse, "inuse");
