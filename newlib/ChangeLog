@@ -1,3 +1,10 @@
+2002-11-14  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * testsuite/lib/passfail.exp (newlib_pass_fail): Changed to
+        only issue one pass/fail message for a compile/link/execute.
+        * testsuite/newlib.elix/elix.exp: New file.
+        * testsuite/newlib.elix/tmmap.c: Ditto.
+
 2002-11-06  Christopher Faylor  <cgf@redhat.com>
 
 	* libc/stdlib/malign.c: Don't compile if MALLOC_PROVIDED.

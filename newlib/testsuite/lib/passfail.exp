@@ -42,9 +42,7 @@ proc newlib_pass_fail { srcfile } {
 
     if { $comp_output != "" } {
 	fail "Failed to compile $fullsrcfile.\n"
-	fail "$fullsrcfile"
     } else {
-	pass "Compiled $fullsrcfile.\n"
 	set result [newlib_load $test_driver ""]
 	set status [lindex $result 0]
 	$status "$fullsrcfile"
