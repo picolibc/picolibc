@@ -223,7 +223,7 @@ process_input (void *)
     }
 }
 
-BOOL
+bool
 fhandler_pty_master::hit_eof ()
 {
   if (get_ttyp ()->was_opened && !get_ttyp ()->slave_alive ())

@@ -368,7 +368,7 @@ public:
   virtual HANDLE& get_handle () { return io_handle; }
   virtual HANDLE& get_io_handle () { return io_handle; }
   virtual HANDLE& get_output_handle () { return io_handle; }
-  virtual BOOL hit_eof () {return FALSE;}
+  virtual bool hit_eof () {return FALSE;}
   virtual select_record *select_read (select_record *s);
   virtual select_record *select_write (select_record *s);
   virtual select_record *select_except (select_record *s);
@@ -437,10 +437,12 @@ public:
 class fhandler_pipe: public fhandler_base
 {
   HANDLE guard;
+  HANDLE writepipe_exists;
+  DWORD orig_pid;
+  unsigned id;
 public:
   fhandler_pipe (const char *name = 0, DWORD devtype = FH_PIPE);
   off_t lseek (off_t offset, int whence);
-  BOOL is_slow () {return !wincap.has_unreliable_pipes ();}
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
@@ -450,6 +452,8 @@ public:
   int close ();
   void create_guard (SECURITY_ATTRIBUTES *sa) {guard = CreateMutex (sa, FALSE, NULL);}
   int dup (fhandler_base *child);
+  bool hit_eof ();
+  friend int make_pipe (int fildes[2], unsigned int psize, int mode);
 };
 
 class fhandler_dev_raw: public fhandler_base
@@ -863,7 +867,7 @@ public:
   char *ptsname ();
 
   void set_close_on_exec (int val);
-  BOOL hit_eof ();
+  bool hit_eof ();
 };
 
 class fhandler_tty_master: public fhandler_pty_master

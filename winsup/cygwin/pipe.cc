@@ -18,9 +18,15 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "thread.h"
+#include "sigproc.h"
+#include "pinfo.h"
+
+static unsigned pipecount;
+static const NO_COPY char pipeid_fmt[] = "stupid_pipe.%u.%u";
 
 fhandler_pipe::fhandler_pipe (const char *name, DWORD devtype) :
-	fhandler_base (devtype, name), guard (0)
+	fhandler_base (devtype, name),
+	guard (0), writepipe_exists(0), orig_pid (0), id (0)
 {
   set_cb (sizeof *this);
 }
@@ -37,7 +43,10 @@ void
 fhandler_pipe::set_close_on_exec (int val)
 {
   this->fhandler_base::set_close_on_exec (val);
-  set_inheritance (guard, val);
+  if (guard)
+    set_inheritance (guard, val);
+  if (writepipe_exists)
+    set_inheritance (writepipe_exists, val);
 }
 
 int
@@ -53,7 +62,25 @@ int fhandler_pipe::close ()
   int res = this->fhandler_base::close ();
   if (guard)
     CloseHandle (guard);
+  if (writepipe_exists)
+{debug_printf ("writepipe_exists closed");
+    CloseHandle (writepipe_exists);
+}
   return res;
+}
+
+bool
+fhandler_pipe::hit_eof ()
+{
+  char buf[80];
+  HANDLE ev;
+  if (!orig_pid)
+    return bg_ok;
+  __small_sprintf (buf, pipeid_fmt, orig_pid, id);
+  if ((ev = OpenEvent (EVENT_ALL_ACCESS, FALSE, buf)))
+    CloseHandle (ev);
+  debug_printf ("%s %p", buf, ev);
+  return ev == NULL;
 }
 
 int
@@ -70,10 +97,21 @@ fhandler_pipe::dup (fhandler_base *child)
   else if (!DuplicateHandle (hMainProc, guard, hMainProc, &ftp->guard, 0, 1,
 			     DUPLICATE_SAME_ACCESS))
     return -1;
+
+  if (writepipe_exists == NULL)
+    ftp->writepipe_exists = NULL;
+  else if (!DuplicateHandle (hMainProc, writepipe_exists, hMainProc,
+			     &ftp->writepipe_exists, 0, 1,
+			     DUPLICATE_SAME_ACCESS))
+    return -1;
+
+  ftp->id = id;
+  ftp->orig_pid = orig_pid;
   return 0;
 }
 
-static int
+
+int
 make_pipe (int fildes[2], unsigned int psize, int mode)
 {
   SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "make_pipe");
@@ -108,6 +146,15 @@ make_pipe (int fildes[2], unsigned int psize, int mode)
 
       res = 0;
       fhr->create_guard (sa);
+      if (wincap.has_unreliable_pipes ())
+	{
+	  char buf[80];
+	  int count = pipecount++;	/* FIXME: Should this be InterlockedIncrement? */
+	  __small_sprintf (buf, pipeid_fmt, myself->pid, count);
+	  fhw->writepipe_exists = CreateEvent (sa, TRUE, FALSE, buf);
+	  fhr->orig_pid = myself->pid;
+	  fhr->id = count;
+	}
     }
 
   syscall_printf ("%d = make_pipe ([%d, %d], %d, %p)", res, fdr, fdw, psize, mode);
@@ -130,23 +177,4 @@ _pipe (int filedes[2], unsigned int psize, int mode)
   if (!res)
     cygheap->fdtab[filedes[0]]->set_r_no_interrupt (1);
   return res;
-}
-
-int
-dup (int fd)
-{
-  int res;
-  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
-
-  res = dup2 (fd, cygheap->fdtab.find_unused_handle ());
-
-  ReleaseResourceLock(LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
-
-  return res;
-}
-
-int
-dup2 (int oldfd, int newfd)
-{
-  return cygheap->fdtab.dup2 (oldfd, newfd);
 }

@@ -28,8 +28,8 @@ the result of a vfork and closes the extra file handles.
 
 This all relies on the fact that the child in a vfork call can affect
 just about everything in the parent except for the parent's fds.
-The assumption is that you don't return from the call that invoked the
-vfork.
+The assumption is that a vfork is always just used as a method for
+starting a program.
 
 The assumption is also that all of this is much faster than the
 slow method that cygwin uses to implement fork().

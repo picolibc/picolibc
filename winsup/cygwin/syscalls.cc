@@ -81,6 +81,25 @@ check_ttys_fds (void)
   return res;
 }
 
+int
+dup (int fd)
+{
+  int res;
+  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
+
+  res = dup2 (fd, cygheap->fdtab.find_unused_handle ());
+
+  ReleaseResourceLock(LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
+
+  return res;
+}
+
+int
+dup2 (int oldfd, int newfd)
+{
+  return cygheap->fdtab.dup2 (oldfd, newfd);
+}
+
 extern "C" int
 _unlink (const char *ourname)
 {
@@ -489,17 +508,13 @@ _open (const char *unix_path, int flags, ...)
 	  path_conv pc;
 	  if (!(fh = cygheap->fdtab.build_fhandler (fd, unix_path, NULL, &pc)))
 	    res = -1;		// errno already set
-	  else 
+	  else if (!fh->open (pc, flags, (mode & 07777) & ~cygheap->umask))
 	    {
-	      fh->set_name (unix_path, pc.get_win32 ());
-	      if (!fh->open (pc, flags, (mode & 07777) & ~cygheap->umask))
-		{
-		  cygheap->fdtab.release (fd);
-		  res = -1;
-		}
-	      else if ((res = fd) <= 2)
-		set_std_handle (res);
+	      cygheap->fdtab.release (fd);
+	      res = -1;
 	    }
+	  else if ((res = fd) <= 2)
+	    set_std_handle (res);
 	}
       ReleaseResourceLock (LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," open");
     }

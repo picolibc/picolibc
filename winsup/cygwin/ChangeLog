@@ -1,3 +1,25 @@
+Mon Sep 24 17:41:03 2001  Christopher Faylor <cgf@redhat.com>
+
+	* fhandler.h (fhandler_pipe::hit_eof): New method.
+	(writepipe_exists): New class element.
+	(orig_pid): Ditto.
+	(id): Ditto.
+	(is_slow): Eliminate.
+	* pipe.cc (fhandler_pipe::set_close_on_exec): Set inheritance on
+	writepipe_exists, if it exists.
+	(fhandler_pipe::hit_eof): New method, modelled after tty.
+	(fhandler_pipe::dup): Duplicate writepipe_exists, if it exists.
+	(make_pipe): Set up a dummy event for pipes on windows 9x.  The
+	nonexistence of this event means that the write side of the
+	pipe has closed.
+	(_dup): Move to syscalls.cc
+	(_dup2): Ditto.
+
+	* dtable.cc (dtable::build_fhandler): Fill out set_names here, if
+	appropriate.
+	* syscalls.cc (_open): Call set_names in build_fhandler.
+	
+	
 Sun Sep 23 16:55:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* syscalls.cc (_open): Set name in fhandler object after successful

@@ -232,6 +232,7 @@ dtable::build_fhandler (int fd, const char *name, HANDLE handle, path_conv *pc)
 {
   int unit;
   DWORD devn;
+  fhandler_base *fh;
 
   if (!pc)
     devn = get_device_number (name, unit);
@@ -265,7 +266,10 @@ dtable::build_fhandler (int fd, const char *name, HANDLE handle, path_conv *pc)
 	devn = FH_DISK;
     }
 
-  return build_fhandler (fd, devn, name, unit);
+  fh = build_fhandler (fd, devn, name, unit);
+  if (pc)
+    fh->set_name (name, *pc);
+  return fh;
 }
 
 fhandler_base *

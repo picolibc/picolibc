@@ -420,11 +420,6 @@ peek_pipe (select_record *s, int ignra, HANDLE guard_mutex = NULL)
 	  gotone = 1;
 	  goto out;
 	}
-      if (fh->bg_check (SIGTTIN) <= bg_eof)
-	{
-	  gotone = s->read_ready = 1;
-	  goto out;
-	}
 
       switch (fh->get_device ())
 	{
@@ -443,6 +438,12 @@ peek_pipe (select_record *s, int ignra, HANDLE guard_mutex = NULL)
 	      gotone = s->read_ready = 1;
 	      goto out;
 	    }
+	}
+
+      if (fh->bg_check (SIGTTIN) <= bg_eof)
+	{
+	  gotone = s->read_ready = 1;
+	  goto out;
 	}
     }
 
