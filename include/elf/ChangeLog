@@ -1,3 +1,7 @@
+999-05-05  Catherine Moore  <clm@cygnus.com>
+ 
+        * m68k.h (EF_CPU32): Define.
+ 
 1999-04-21  Nick Clifton  <nickc@cygnus.com>
 
 	* reloc-macros.h (START_RELOC_NUMBERS): Prepend an underscore to
