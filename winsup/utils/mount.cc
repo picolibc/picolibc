@@ -188,17 +188,11 @@ show_mounts (void)
 {
   FILE *m = setmntent ("/-not-used-", "r");
   struct mntent *p;
-  const char *format = "%-18s  %-18s  %-11s  %s\n";
+  const char *format = "%s on %s type %s (%s)\n";
 
-  printf (format, "Device", "Directory", "Type", "Flags");
+  // printf (format, "Device", "Directory", "Type", "Flags");
   while ((p = getmntent (m)) != NULL)
-    {
-      printf (format,
-	      p->mnt_fsname,
-	      p->mnt_dir,
-	      p->mnt_type,
-	      p->mnt_opts);
-    }
+    printf (format, p->mnt_fsname, p->mnt_dir, p->mnt_type, p->mnt_opts);
   endmntent (m);
 }
 

@@ -1,3 +1,8 @@
+Mon Apr  2 10:58:26 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* mount.cc (show_mounts): Change format string to more closely resemble
+	UNIX when displaying mount table.
+
 Sat Mar 17 21:46:06 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* kill.cc (forcekill): Use dwProcessId when opening a process, not the
