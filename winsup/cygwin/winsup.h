@@ -25,13 +25,6 @@ details. */
 
 #define NO_COPY __attribute__((nocommon)) __attribute__((section(".data_cygwin_nocopy")))
 
-#ifdef EXPCGF
-#define DECLARE_TLS_STORAGE char **tls[4096] __attribute__ ((unused))
-#else
-#define DECLARE_TLS_STORAGE do {} while (0)
-#define _WINBASE2_H
-#endif
-
 #ifdef __cplusplus
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ >= 199900L

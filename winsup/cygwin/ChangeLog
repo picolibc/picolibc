@@ -1,3 +1,12 @@
+2002-06-23  Christopher Faylor  <cgf@redhat.com>
+
+	* cygwin.sc: Add recent changes from ld sources.
+
+2002-06-23  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* winsup.h: Move #ifdef EXPCGF code into "winbase.h".
+	* winbase.h: #ifdef EXPCGF code moved here from "winsup.h".
+
 2002-06-12  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* thread.h (pthread::cleanup_stack): Renamed cleanup_handlers to
