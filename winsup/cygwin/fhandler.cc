@@ -1238,6 +1238,21 @@ fhandler_disk_file::open (path_conv& real_path, int flags, mode_t mode)
   if (!res)
     goto out;
 
+  /* This is for file systems known for having a buggy CreateFile call
+     which might return a valid HANDLE without having actually opened
+     the file.
+     The only known file system to date is the SUN NFS Solstice Client 3.1
+     which returns a valid handle when trying to open a file in a non
+     existant directory. */
+  if (real_path.has_buggy_open ()
+      && GetFileAttributes (win32_path_name_) == (DWORD) -1)
+    {
+      debug_printf ("Buggy open detected.");
+      close ();
+      set_errno (ENOENT);
+      return 0;
+    }
+
   extern BOOL allow_ntea;
   extern BOOL allow_ntsec;
 

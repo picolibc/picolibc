@@ -1,3 +1,13 @@
+Tue Nov 28 18:08:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_disk_file::open): Check for buggy CreateFile
+	condition.
+	* path.cc (path_conv::check): Get file system type in call to
+	GetVolumeInformation to check for file systems with buggy CreateFile.
+	* path.h (enum path_types): Add PATH_HASBUGGYOPEN.
+	(class path_conv): Add methods `has_buggy_open' and
+	`set_has_buggy_open'.
+
 Sun Nov 26 16:26:14 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler.cc (is_at_eof): New function.

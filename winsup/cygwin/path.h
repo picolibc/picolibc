@@ -37,8 +37,9 @@ enum path_types
   PATH_EXEC = MOUNT_EXEC,
   PATH_CYGWIN_EXEC = MOUNT_CYGWIN_EXEC,
   PATH_ALL_EXEC = PATH_CYGWIN_EXEC | PATH_EXEC,
-  PATH_SOCKET =  0x40000000,
-  PATH_HASACLS = 0x80000000
+  PATH_HASBUGGYOPEN = 0x20000000,
+  PATH_SOCKET =       0x40000000,
+  PATH_HASACLS =      0x80000000
 };
 
 class path_conv
@@ -50,6 +51,7 @@ class path_conv
 
   int has_acls () {return path_flags & PATH_HASACLS;}
   int hasgood_inode () {return path_flags & PATH_HASACLS;}  // Not strictly correct
+  int has_buggy_open () {return path_flags & PATH_HASBUGGYOPEN;}
   int isbinary () {return path_flags & PATH_BINARY;}
   int issymlink () {return path_flags & PATH_SYMLINK;}
   int issocket () {return path_flags & PATH_SOCKET;}
@@ -60,6 +62,7 @@ class path_conv
   void set_symlink () {path_flags |= PATH_SYMLINK;}
   void set_exec (int x = 1) {path_flags |= x ? PATH_EXEC : PATH_NOTHING;}
   void set_has_acls (int x = 1) {path_flags |= x ? PATH_HASACLS : PATH_NOTHING;}
+  void set_has_buggy_open (int x = 1) {path_flags |= x ? PATH_HASBUGGYOPEN : PATH_NOTHING;}
 
   char *known_suffix;
 

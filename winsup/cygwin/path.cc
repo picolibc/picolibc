@@ -389,20 +389,26 @@ out:
       return;
     }
   DWORD serial, volflags;
+  char fs_name[16];
 
   strcpy (tmp_buf, full_path);
   if (!rootdir (tmp_buf) ||
-      !GetVolumeInformation (tmp_buf, NULL, 0, &serial, NULL, &volflags, NULL, 0))
+      !GetVolumeInformation (tmp_buf, NULL, 0, &serial, NULL,
+      			     &volflags, fs_name, 16))
     {
       debug_printf ("GetVolumeInformation(%s) = ERR, full_path(%s), set_has_acls(FALSE)",
 		    tmp_buf, full_path, GetLastError ());
       set_has_acls (FALSE);
+      set_has_buggy_open (FALSE);
     }
   else
     {
       debug_printf ("GetVolumeInformation(%s) = OK, full_path(%s), set_has_acls(%d)",
 		    tmp_buf, full_path, volflags & FS_PERSISTENT_ACLS);
       set_has_acls (volflags & FS_PERSISTENT_ACLS);
+      /* Known file systems with buggy open calls. Further explanation
+         in fhandler.cc (fhandler_disk_file::open). */
+      set_has_buggy_open (strcmp (fs_name, "SUNWNFS") == 0);
     }
 
 #if 0
