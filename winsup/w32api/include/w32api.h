@@ -6,6 +6,6 @@
 
 #define __W32API_VERSION 2.0
 #define __W32API_MAJOR_VERSION 2
-#define __W32API_MINOR_VERSION 0
+#define __W32API_MINOR_VERSION 1
 
 #endif /* ndef _W32API_H_ */
