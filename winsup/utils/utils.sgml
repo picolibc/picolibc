@@ -1,0 +1,657 @@
+<sect1 id="using-utils"><title>Cygwin Utilities</title>
+
+<para>Cygwin comes with a number of command-line utilities that are
+used to manage the UNIX emulation portion of the Cygwin environment.
+While many of these reflect their UNIX counterparts, each was written
+specifically for Cygwin.</para>
+
+<sect2 id="cygcheck"><title>cygcheck</title>
+
+<screen>
+Usage: cygcheck [-s] [-v] [-r] [-h] [program ...]
+  -s = system information
+  -v = verbose output (indented) (for -s or programs)
+  -r = registry search (requires -s)
+  -h = give help about the info
+You must at least give either -s or a program name
+</screen>
+
+<para>The <command>cygcheck</command> program is a diagnostic utility
+that examines your system and reports the information that is
+significant to the proper operation of Cygwin programs.  It can give
+information about a specific program (or program) you are trying to
+run, general system information, or both.  If you list one or more
+programs on the command line, it will diagnose the runtime environment
+of that program or programs.  If you specify the <literal>-s</literal>
+option, it will give general system information.  If you specify
+<literal>-s</literal> and list one or more programs on the command line,
+it reports on both.</para>
+
+<para>The <command>cygcheck</command> program should be used to send
+information about your system to Cygnus for troubleshooting (if your
+support representative requests it).  When asked to run this command,
+include all the options plus any commands you are having trouble with,
+and save the output so that you can mail it to Cygnus, like
+this:</para>
+
+<screen>
+<prompt>C:\Cygnus&gt;</prompt> <userinput>cygcheck -s -v -r -h &gt; tocygnus.txt</userinput>
+</screen>
+
+<para>The <literal>-v</literal> option causes the output to be more
+verbose.  What this means is that additional information will be
+reported which is usually not interesting, such as the internal
+version numbers of DLLs, additional information about recursive DLL
+usage, and if a file in one directory in the PATH also occurs in other
+directories on the PATH.  </para>
+
+<para>The <literal>-r</literal> option causes
+<command>cygcheck</command> to search your registry for information
+that is relevent to Cygnus programs.  These registry entries are the
+ones that have "Cygnus" in the name.  If you are paranoid about
+privacy, you may remove information from this report, but please keep
+in mind that doing so makes it harder for Cygnus to diagnose your
+problems.</para>
+
+<para>The <literal>-h</literal> option prints additional helpful
+messages in the report, at the beginning of each section.  It also
+adds table column headings.  While this is useful information, it also
+adds some to the size of the report, so if you want a compact report
+or if you know what everything is already, just leave this out.</para>
+
+</sect2>
+
+<sect2 id="cygpath"><title>cygpath</title>
+
+<screen>
+Usage: cygpath [-p|--path] (-u|--unix)|(-w|--windows) filename
+       cygpath [-v|--version]
+  -u|--unix     print UNIX form of filename
+  -w|--windows  print Windows form of filename
+  -p|--path     filename argument is a path
+  -v|--version  print program version
+</screen>
+
+<para>The <command>cygpath</command> program is a utility that
+converts Windows native filenames to Cygwin POSIX-style pathnames and
+back.  It can be used when a Cygwin program needs to pass a file name
+to a native Windows program, or expects to get a file name from a
+native Windows program.  You may use the long or short option names
+interchangeably, even though only the short ones are described
+here.</para>
+
+<para>The <literal>-u</literal> and <literal>-w</literal> options
+indicate whether you want a conversion from Windows to UNIX (POSIX)
+format (<literal>-u</literal>) or a conversion from UNIX (POSIX) to
+Windows format (<literal>-w</literal>).  You must give exactly
+one of these.  To give neither or both is an error.</para>
+
+<para>The <literal>-p</literal> option means that you want to convert
+a path-style string rather than a single filename.  For example, the
+PATH environment variable is semicolon-delimited in Windows, but
+colon-delimited in UNIX.  By giving <literal>-p</literal> you are
+instructing <command>cygpath</command> to convert between these
+formats.</para>
+
+<example><title>Example cygpath usage</title>
+<screen>
+#!/bin/sh
+for i in `echo *.exe | sed 's/\.exe/cc/'`
+do
+  notepad `cygpath -w $i`
+done
+</screen>
+</example>
+
+</sect2>
+
+<sect2 id="kill"><title>kill</title>
+
+<screen>
+Usage: kill [-sigN] pid1 [pid2 ...]
+</screen>
+
+<para>The <command>kill</command> program allows you to send arbitrary
+signals to other Cygwin programs.  The usual purpose is to end a
+running program from some other window when ^C won't work, but you can
+also send program-specified signals such as SIGUSR1 to trigger actions
+within the program, like enabling debugging or re-opening log files.
+Each program defines the signals they understand.</para>
+
+<para>Note that the "pid" values are the Cygwin pids, not the Windows
+pids.  To get a list of running programs and their Cygwin pids, use
+the Cygwin <command>ps</command> program.</para>
+
+<para>To send a specific signal, use the
+<literal>-signN</literal> option, either
+with a signal number or a signal name (minus the "SIG" part), like
+these examples:</para>
+
+<example><title>Specifying signals with the kill command</title>
+<screen>
+<prompt>$</prompt> <userinput>kill 123</userinput>
+<prompt>$</prompt> <userinput>kill -1 123</userinput>
+<prompt>$</prompt> <userinput>kill -HUP 123</userinput>
+</screen>
+</example>
+
+<para>Here is a list of available signals, their numbers, and some
+commentary on them, from the file
+<literal>&lt;sys/signal.h&gt;</literal>, which should be considered
+the official source of this information.</para>
+
+<screen>
+SIGHUP       1    hangup
+SIGINT       2    interrupt
+SIGQUIT      3    quit
+SIGILL       4    illegal instruction (not reset when caught)
+SIGTRAP      5    trace trap (not reset when caught)
+SIGABRT      6    used by abort
+SIGEMT       7    EMT instruction
+SIGFPE       8    floating point exception
+SIGKILL      9    kill (cannot be caught or ignored)
+SIGBUS      10    bus error
+SIGSEGV     11    segmentation violation
+SIGSYS      12    bad argument to system call
+SIGPIPE     13    write on a pipe with no one to read it
+SIGALRM     14    alarm clock
+SIGTERM     15    software termination signal from kill
+SIGURG      16    urgent condition on IO channel
+SIGSTOP     17    sendable stop signal not from tty
+SIGTSTP     18    stop signal from tty
+SIGCONT     19    continue a stopped process
+SIGCHLD     20    to parent on child stop or exit
+SIGCLD      20    System V name for SIGCHLD
+SIGTTIN     21    to readers pgrp upon background tty read
+SIGTTOU     22    like TTIN for output if (tp-&gt;t_local&amp;LTOSTOP)
+SIGIO       23    input/output possible signal
+SIGPOLL     23    System V name for SIGIO
+SIGXCPU     24    exceeded CPU time limit
+SIGXFSZ     25    exceeded file size limit
+SIGVTALRM   26    virtual time alarm
+SIGPROF     27    profiling time alarm
+SIGWINCH    28    window changed
+SIGLOST     29    resource lost (eg, record-lock lost)
+SIGUSR1     30    user defined signal 1
+SIGUSR2     31    user defined signal 2
+</screen>
+
+</sect2>
+
+<sect2 id="mkgroup"><title>mkgroup</title>
+
+<screen>
+usage: mkgroup &lt;options&gt; [domain]
+This program prints group information to stdout
+Options:\n");
+    -l,--local           print pseudo group information if there is
+                         no domain
+    -d,--domain          print global group information from the domain
+                         specified (or from the current domain if there is
+                         no domain specified)
+    -?,--help            print this message
+</screen>
+
+<para>The <command>mkgroup</command> program can be used to help
+configure your Windows system to be more UNIX-like by creating an
+initial <filename>/etc/group</filename> substitute (some commands need this
+file) from your system information. It only works on NT.
+To initially set up your machine,
+you'd do something like this:</para>
+
+<example><title>Setting up the groups file</title>
+<screen>
+<prompt>$</prompt> <userinput>mkdir /etc</userinput>
+<prompt>$</prompt> <userinput>mkgroup -l &gt; /etc/group</userinput>
+</screen>
+</example>
+
+<para>Note that this information is static.  If you change the group
+information in your system, you'll need to regenerate the group file
+for it to have the new information.</para>
+
+<para>The <literal>-d</literal> and <literal>-l</literal> options
+allow you to specify where the information comes from, either the
+local machine or the default (or given) domain.</para>
+
+</sect2>
+
+<sect2 id="mkpasswd"><title>mkpasswd</title>
+
+<screen>
+Usage: mkpasswd [options] [domain]
+This program prints a /etc/passwd file to stdout
+Options are
+   -l,--local              print local accounts
+   -d,--domain             print domain accounts (from current domain
+                           if no domain specified
+   -g,--local-groups       print local group information too
+   -?,--help               displays this message
+This program does only work on Windows NT
+</screen>
+
+<para>The <command>mkpasswd</command> program can be used to help
+configure your Windows system to be more UNIX-like by creating an
+initial <filename>/etc/passwd</filename> substitute (some commands
+need this file) from your system information. It only works on NT.
+To initially set up your machine, you'd do something like this:</para>
+
+<example><title>Setting up the passwd file</title>
+<screen>
+<prompt>$</prompt> <userinput>mkdir /etc</userinput>
+<prompt>$</prompt> <userinput>mkpasswd -l &gt; /etc/passwd</userinput>
+</screen>
+</example>
+
+<para>Note that this information is static.  If you change the user
+information in your system, you'll need to regenerate the passwd file
+for it to have the new information.</para>
+
+<para>The <literal>-d</literal> and <literal>-l</literal> options
+allow you to specify where the information comes from, either the
+local machine or the default (or given) domain.</para>
+
+</sect2>
+
+<sect2 id="passwd"><title>passwd</title>
+
+<screen>
+Usage passwd [name]
+      passwd [-x max] [-n min] [-i inact] [-L len] 
+      passwd {-l|-u|-S} name
+  -x max   set max age of passwords
+  -n min   set min age of passwords
+  -i inact disables account after inact days of expiry
+  -L len   set min password length
+  -l       lock an account
+  -u       unlock an account
+  -S       show account information
+</screen>
+
+<para> <command>passwd</command> changes passwords for user accounts.
+A normal user may only change the password for their own account,
+the administrators may change the password for any account.
+<command>passwd</command> also changes account information, such as
+password expiry dates and intervals.</para>
+
+<para>Password changes: The user is first prompted for their old
+password, if one is present.  This password is then encrypted and
+compared against the stored password.  The user has only one chance to
+enter the correct password.  The administrators are permitted to
+bypass this step so that forgotten passwords may be changed.</para>
+
+<para>The user is then prompted for a replacement password.
+<command>passwd</command> will prompt again and compare the second entry
+against the first.  Both entries are require to match in order for the
+password to be changed.</para>
+
+<para>After the password has been entered, password aging information
+is checked to see if the user is permitted to change their password
+at this time.  If not, <command>passwd</command> refuses to change the
+password and exits.</para>
+
+<para>Password expiry and length: The password aging information may be
+changed by the administrators with the <literal>-x</literal>, 
+<literal>-n</literal> and <literal>-i</literal> options.  The 
+<literal>-x</literal> option is used to set the maximum number of days
+a password remains valid.  After <emphasis>max</emphasis> days, the
+password is required to be changed.  The <literal>-n</literal> option is
+used to set the minimum number of days before a password may be changed.  
+The user will not be permitted to change the password until
+<emphasis>min</emphasis> days have elapsed.  The <literal>-i</literal>
+option is used to disable an account after the password has been expired
+for a number of days.  After a user account has had an expired password
+for <emphasis>inact</emphasis> days, the user may no longer sign on to
+the account. Allowed values for the above options are 0 to 999.  The
+<literal>-L</literal> option sets the minimum length of allowed passwords
+for users, which doesn't belong to the administrators group, to
+<emphasis>len</emphasis> characters.  Allowed values for the minimum
+password length are 0 to 14.  In any of the above cases, a value of 0
+means `no restrictions'.</para>
+
+<para>Account maintenance: User accounts may be locked and unlocked with the 
+<literal>-l</literal> and <literal>-u</literal> flags.  The 
+<literal>-l</literal> option disables an account.  The <literal>-u</literal>
+option re-enables an account.</para>
+
+<para>The account status may be given with the <literal>-S</literal>
+option.  The status information is self explanatory.</para>
+
+<para>Limitations: Users may not be able to change their password on
+some systems.</para>
+
+</sect2>
+
+<sect2 id="mount"><title>mount</title>
+
+<screen>
+Usage mount
+      mount [-bfs] &lt;win32path&gt; &lt;posixpath&gt;
+      mount [-bs] --change-cygdrive-prefix&lt;posixpath&gt;
+      mount --import-old-mounts
+
+  -b = text files are equivalent to binary files (newline = \n)
+  -x = files in the mounted directory are automatically given execute permission.
+  -f = force mount, don't warn about missing mount point directories
+  -s = add mount point to system-wide registry location
+  --change-automount-prefix = change path prefix used for automatic mount points
+  --import-old-mounts = copy old registry mount table mounts into the current mount areas
+
+  When invoked without any arguments, mount displays the current mount table.
+</screen>
+
+<para>The <command>mount</command> program is used to map your drives
+and shares onto Cygwin's simulated POSIX directory tree, much like as is
+done by mount commands on typical UNIX systems.  Please see
+<Xref Linkend="mount-table"> for more information on the concepts
+behind the Cygwin POSIX file system and strategies for using
+mounts.</para>
+
+<sect3><title>Using mount</title>
+
+<para>If you just type <command>mount</command> with no parameters, it
+will display the current mount table for you.</para>
+
+<example>
+<title>Displaying the current set of mount points</title>
+<screen>
+<prompt>c:\cygnus\&gt;</prompt> <userinput>mount</userinput>
+Device           Directory           Type        Flags
+D:               /d                  user        textmode
+C:               /                   system      textmode
+</screen>
+</example>
+
+<para>In this example, the C
+drive is the POSIX root and D drive is mapped to
+<filename>/d</filename>.  Note that in this case, the root mount is a
+system-wide mount point that is visible to all users running Cygwin
+programs, whereas the <filename>/d</filename> mount is only visible
+to the current user.</para>
+
+<para>The <command>mount</command> utility is also the mechanism for
+adding new mounts to the mount table.  The following example
+demonstrates how to mount the directory 
+<filename>C:\cygnus\cygwin-b20\H-i586-cygwin32\bin</filename>
+to <filename>/bin</filename> and the network directory 
+<filename>\\pollux\home\joe\data</filename> to <filename>/data</filename>.
+<filename>/bin</filename> is assumed to already exist.</para>
+
+<example>
+<title>Adding mount points</title>
+<screen>
+<prompt>c:\cygnus\&gt;</prompt> <userinput>ls /bin /data</userinput>
+ls: /data: No such file or directory
+<prompt>c:\cygnus\&gt;</prompt> <userinput>mount C:\cygnus\cygwin-b20\H-i586-cygwin32\bin /bin</userinput>
+<prompt>c:\cygnus\&gt;</prompt> <userinput>mount \\pollux\home\joe\data /data</userinput>
+Warning: /data does not exist!
+<prompt>c:\cygnus\&gt;</prompt> <userinput>mount</userinput>
+Device           Directory           Type        Flags
+\\pollux\home\joe\data   /data       user        textmode
+C:\cygnus\cygwin-b20\H-i586-cygwin32\bin   /bin   user   textmode
+D:               /d                  user        textmode
+\\.\tape1:       /dev/st1            user        textmode
+\\.\tape0:       /dev/st0            user        textmode
+\\.\b:           /dev/fd1            user        textmode
+\\.\a:           /dev/fd0            user        textmode
+C:               /                   system      textmode
+<prompt>c:\cygnus\&gt;</prompt> <userinput>ls /bin/sh</userinput>
+/bin/sh
+</screen>
+</example>
+
+<para>Note that <command>mount</command> was invoked from the Windows
+command shell in the previous example.  In many Unix shells, including
+bash, it is legal and convenient to use the forward "/" in Win32
+pathnames since the "\" is the shell's escape character. </para>
+
+<para>The "-s" flag to <command>mount</command> is used to add a mount
+in the system-wide mount table used by all Cygwin users on the system,
+instead of the user-specific one.  System-wide mounts are displayed
+by <command>mount</command> as being of the "system" type, as is the
+case for the <filename>/</filename> partition in the last example.
+Under Windows NT, only those users with Administrator priviledges are
+permitted to modify the system-wide mount table.</para> 
+
+<para>Note that a given POSIX path may only exist once in the user
+table and once in the global, system-wide table.  Attempts to replace
+the mount will fail with a busy error.  The "-f" (force) flag causes
+the old mount to be silently replaced with the new one.  It will also
+silence warnings about the non-existence of directories at the Win32
+path location.</para>
+
+<para>The "-b" flag is used to instruct Cygwin to treat binary and
+text files in the same manner by default.  Binary mode mounts are
+marked as "binmode" in the Flags column of <command>mount</command>
+output.  By default, mounts are in text mode ("textmode" in the Flags
+column).
+
+<para>The "-x" flag is used to instruct Cygwin that the mounted file
+is "executable".  If the "-x" flag is used with a directory then
+all files in the directory are executable.  Files ending in certain
+extensions (.exe, .com, .bat, .cmd) are assumed to be executable
+by default.  Files whose first two characters begin with '#!' are
+also considered to be executable.  This option allows other files
+to be marked as executable and avoids the overhead of opening each
+file to check for a '#!'.
+
+</sect3>
+
+<sect3><title>Cygdrive mount points</title>
+
+<para>Whenever Cygwin cannot use any of the existing mounts to convert
+from a particular Win32 path to a POSIX one, Cygwin will, instead,
+convert to a POSIX path using a default mount point:
+<filename>/cygdrive</filename>.  For example, if Cygwin accesses
+<filename>Z:\foo</filename> and the Z drive is not currently in the
+mount table, then <filename>Z:\</filename> will be accessible as
+<filename>/cygdrive/Z</filename>.  The default prefix of
+<filename>/cygdrive</filename> may be changed via the
+<Xref Linkend="mount"> command.</para>
+
+<para>The <command>mount</command> utility can be used to change this
+default automount prefix through the use of the
+"--change-cygdrive-prefix" flag.  In the following example, we will
+set the automount prefix to <filename>/</filename>:</para>
+
+<example>
+<title>Changing the default prefix</title>
+<screen>
+<prompt>c:\cygnus\&gt;</prompt> <userinput>mount --change-cygdrive-prefix /</userinput>
+</screen>
+</example>
+
+<para>Note that you if you set a new prefix in this manner, you can
+specify the "-s" flag to make this the system-wide default prefix.  By
+default, the cygdrive-prefix applies only to the current user.  In the
+same way, you can specify the "-b" flag such that all new automounted
+filesystems default to binary mode file accesses.</para>
+
+<sect3><title>Limitations</title>
+
+<para>Limitations: there is a hard-coded limit of 30 mount
+points.  Also, although you can mount to pathnames that do not start
+with "/", there is no way to make use of such mount points.</para>
+
+<para>Normally the POSIX mount point in Cygwin is an existing empty
+directory, as in standard UNIX. If this is the case, or if there is a
+place-holder for the mount point (such as a file, a symbolic link
+pointing anywhere, or a non-empty directory), you will get the expected
+behavior. Files present in a mount point directory before the mount
+become invisible to Cygwin programs.
+</para>
+
+<para>It is sometimes desirable to mount to a non-existent directory,
+for example to avoid cluttering the root directory with names
+such as
+<filename>a</filename>, <filename>b</filename>, <filename>c</filename>
+pointing to disks.
+Although <command>mount</command> will give you a warning, most
+everything will work properly when you refer to the mount point
+explicitly.  Some strange effects can occur however.
+For example if your current working directory is
+<filename>/dir</filename>,
+say, and <filename>/dir/mtpt</filename> is a mount point, then
+<filename>mtpt</filename> will not show up in an <command>ls</command>
+or
+<command>echo *</command> command and <command>find .</command> will
+not
+find <filename>mtpt</filename>.
+</para>
+
+</sect3>
+
+</sect2>
+
+<sect2 id="ps"><title>ps</title>
+
+<screen>
+Usage ps [-aefl] [-u uid]
+  -f       show process uids, ppids
+  -l       show process uids, ppids, pgids, winpids
+  -u uid   list processes owned by uid
+  -a, -e   show processes of all users
+</screen>
+
+<para>The <command>ps</command> program gives the status of all the
+Cygwin processes running on the system (ps = "process status").  Due
+to the limitations of simulating a POSIX environment under Windows,
+there is little information to give.  The PID column is the process ID
+you need to give to the <command>kill</command> command.  The WINPID
+column is the process ID that's displayed by NT's Task Manager
+program.</para>
+
+</sect2>
+
+<sect2 id="umount"><title>umount</title>
+
+<screen>
+Usage umount [-s] &lt;posixpath&gt;
+-s = remove mount point from system-wide registry location
+
+--remove-all-mounts = remove all mounts
+--remove-auto-mounts = remove all automatically mounted mounts
+--remove-user-mounts = remove all mounts in the current user mount registry area, including auto mounts
+--remove-system-mounts = Remove all mounts in the system-wide mount registry area
+</screen>
+
+<para>The <command>umount</command> program removes mounts from the
+mount table.  If you specify a POSIX path that corresponds to a
+current mount point, <command>umount</command> will remove it from the
+user-specific registry area.  The -s flag may be used to specify
+removing the mount from the system-wide registry area instead
+(Administrator priviledges are required).</para>
+
+<para>The <command>umount</command> utility may also be used to remove
+all mounts of a particular type.  With the extended options it is
+possible to remove all mounts, all automatically-mounted mounts, all
+mounts in the current user's registry area, or all mounts in the
+system-wide registry area (with Administrator priviledges).</para>
+
+<para>See <Xref Linkend="mount">) for more information on the mount
+table.</para>
+</sect2>
+
+<sect2 id="strace"><title>strace</title>
+
+<screen>
+Usage strace [-m mask] [-o output-file] [ft] program [args...]
+
+-m mask		  mask for reporting cygwin events (default 1)
+-o output-file	  output file to hold strace events (default stderr)
+-f		  follow forked subprocesses
+-t		  convert Win32 error messages to text
+-s		  remove mount point from system-wide registry location
+</screen>
+
+<para>The <command>strace</command> program executes a program, and
+optionally the children of the program, reporting any Cygwin DLL output
+from the program(s) to file.  This program is mainly useful for debugging
+the Cygwin DLL itself.
+
+The mask argument is a hexadecimal string signifying which events should be
+reported.  The valid bits to set are as follows:
+</para>
+
+<screen>
+  Bit			Explanation
+0x00000001		All strace output is collected
+0x00000002		Unusual or weird phenomenon
+0x00000010		System calls
+0x00000020		argv/envp printout at startup
+0x00000040		Information useful for DLL debugging
+0x00000080		Paranoid information
+0x00000100		Termios debbugging
+0x00000200		Select() function debugging
+0x00000400		Window message debugging
+0x00000800		Signal and process handling
+0x00001000		Very minimal strace output
+0x00020000		Malloc calls
+0x00040000		Thread locking calls
+</screen>
+</sect2>
+
+<sect2 id="regtool"><title>regtool</title>
+
+<screen>
+regtool -h  - print this message
+regtool [-v] list [key]  - list subkeys and values
+regtool [-v] add [key\subkey]  - add new subkey
+regtool [-v] remove [key]  - remove key
+regtool [-v|-q] check [key]  - exit 0 if key exists, 1 if not
+regtool [-i|-s|-e|-m] set [key\value] [data ...]  - set value
+     -i=integer -s=string -e=expand-string -m=multi-string
+regtool [-v] unset [key\value]  - removes value from key
+regtool [-q] get [key\value]  - prints value to stdout
+     -q=quiet, no error msg, just return nonzero exit if key/value missing
+keys are like \prefix\key\key\key\value, where prefix is any of:
+   root     HKCR  HKEY_CLASSES_ROOT
+   config   HKCC  HKEY_CURRENT_CONFIG
+   user     HKCU  HKEY_CURRENT_USER
+   machine  HKLM  HKEY_LOCAL_MACHINE
+   users    HKU   HKEY_USERS
+example: \user\software\Microsoft\Clock\iFormat
+</screen>
+
+<para>The <command>regtool</command> program allows shell scripts
+to access and modify the Windows registry.  Note that modifying the
+Windows registry is dangerous, and carelessness here can result
+in an unusable system.  Be careful.</para>
+
+<para>The <literal>-v</literal> option means "verbose".  For most
+commands, this causes additional or lengthier messages to be printed.
+Conversely, the <literal>-q</literal> option supresses error messages,
+so you can use the exit status of the program to detect if a key
+exists or not (for example).</para>
+
+<para>The <literal>list</literal> command lists the subkeys and values
+belonging to the given key.  The <literal>add</literal> command adds a
+new key.  The <literal>remove</literal> command removes a key.  Note
+that you may need to remove everything in the key before you may
+remove it, but don't rely on this stopping you from accidentally
+removing too much.  The <literal>check</literal> command checks to see
+if a key exists (the exit code of the program is zero if it does,
+nonzero if it does not).</para>
+
+<para>The <literal>set</literal> command sets a value within a key.
+<literal>-i</literal> means the value is an integer (DWORD).
+<literal>-s</literal> means the value is a string.
+<literal>-e</literal> means it's an expanding string (it contains
+embedded environment variables).  <literal>-m</literal> means it's a
+multi-string (list).  If you don't specify one of these, it tries to
+guess the type based on the value you give.  If it looks like a
+number, it's a number.  If it starts with a percent, it's an expanding
+string.  If you give multiple values, it's a multi-string.  Else, it's
+a regular string.</para>
+
+<para>The <literal>unset</literal> command removes a value from a key.
+The <literal>get</literal> command gets the value of a value of a key,
+and prints it (and nothing else) to stdout.  Note: if the value
+doesn't exist, an error message is printed and the program returns a
+non-zero exit code.  If you give <literal>-q</literal>, it doesn't
+print the message but does return the non-zero exit code.</para>
+
+</sect2>
+
+</sect1>
+

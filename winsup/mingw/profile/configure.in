@@ -1,0 +1,77 @@
+dnl Process this file with autoconf to produce a configure script.
+
+dnl This file is part of Mingw runtime.
+dnl
+dnl This program is free software; you can redistribute it and/or modify
+dnl it under the terms of the GNU General Public License as published by
+dnl the Free Software Foundation; either version 2 of the License, or
+dnl (at your option) any later version.
+dnl
+dnl This program is distributed in the hope that it will be useful,
+dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+dnl GNU General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU General Public License
+dnl along with this program; if not, write to the Free Software
+dnl Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+AC_PREREQ(2.12)
+AC_INIT(gcrt0.c)
+
+CC=${CC-cc}
+AC_SUBST(CC)
+AS=${AS-as}
+AC_SUBST(AS)
+AR=${AR-ar}
+AC_SUBST(AR)
+LD=${LD-ld}
+AC_SUBST(LD)
+RANLIB=${RANLIB-ranlib}
+AC_SUBST(RANLIB)
+DLLTOOL=${DLLTOOL-dlltool}
+AC_SUBST(DLLTOOL)
+DLLWRAP=${DLLWRAP-dllwrap}
+AC_SUBST(DLLWRAP)
+AC_CANONICAL_SYSTEM
+
+case "$target_os" in
+*mingw32msvc*)
+  CRT_ID=2
+  MNO_CYGWIN=
+  RUNTIME=msvcrt
+  THREAD_DLL=mingwm
+  LIBM_A=libm.a
+  LIBGMON_A=libgmon.a
+  ;;
+*cygwin*)
+  CRT_ID=1
+  MNO_CYGWIN=-mno-cygwin
+  RUNTIME=crtdll
+  THREAD_DLL=mingwc
+  # Do not build libm.a when building under Cygwin winsup. Otherwise, it'll
+  # overwrite Cygwin's one. Likewise for libgmon.a.
+  LIBM_A=
+  LIBGMON_A=
+  ;;
+*)
+  # Build it for CRTDLL by default.
+  CRT_ID=1
+  MNO_CYGWIN=
+  RUNTIME=crtdll
+  THREAD_DLL=mingwc
+  LIBM_A=libm.a
+  LIBGMON_A=libgmon.a
+  ;;
+esac
+
+AC_SUBST(CRT_ID)
+AC_SUBST(RUNTIME)
+AC_SUBST(MNO_CYGWIN)
+AC_SUBST(THREAD_DLL)
+AC_SUBST(LIBM_A)
+AC_SUBST(LIBGMON_A)
+
+AC_PROG_INSTALL
+AC_OUTPUT(Makefile)
+

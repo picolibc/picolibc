@@ -1,0 +1,36 @@
+Sun Feb  6 18:15:44 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* configure.in: Do the standard CC/CFLAGS stuff for propagation to
+	sub-configures.
+	* configure: Regenerate.
+
+2000-01-26  DJ Delorie  <dj@cygnus.com>
+
+	* doc/Makefile.in: fix doctool -d options
+
+Fri Jan 21 12:51:32 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.common: No need to rerun Makefile if config.status changes.
+	That should happen automatically.
+	* Makefile.in: Ditto.
+
+Sat Jan  8 14:40:01 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.common: Remove cygwin DLL specific stuff.  Make Makefile
+	target PRECIOUS.
+	* Makefile.in: Make Makefile target PRECIOUS.
+
+Fri Jan  7 21:00:49 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.common: Remove cygwin DLL specific stuff.  Correctly deal
+	with updir stuff when building in the same directory as the source.
+
+Thu Jan  6 19:04:35 2000  Christopher Faylor <cgf@cygnus.com>
+
+	Create new directory structure
+	* Makefile.in: New file.
+	* configure.in: New file.
+	* configure: New file.
+	* Makefile.common: New file.
+	* cygwin: New directory.
+	* w32api: New directory.

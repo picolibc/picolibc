@@ -1,0 +1,21 @@
+Fri Jan 21 02:10:26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* utils/regtool.cc (translate): Added unix like backslash
+	processing.
+
+2000-01-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* regtool.cc: allow forward slashes as key separators
+
+2000-01-19  DJ Delorie  <dj@redhat.com>
+
+	* regtool.cc: New file.
+	* Makefile.in: add regtool
+	* utils.sgml: add regtool
+
+Sat Jan  8 17:13:51 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* getfacl.c: New file.
+	* setfacl.c: New file.
+	* Makefile.in: Add getfacl.exe and setfacl.exe to list of PROGS.
+	Fix link flags in MINGW case.

@@ -1,0 +1,109 @@
+# Makefile for Cygwin utilities
+# Copyright 1996, 1997, 1998 Cygnus Solutions.
+
+# This file is part of Cygwin.
+
+# This software is a copyrighted work licensed under the terms of the
+# Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+# details.
+
+SHELL:=@SHELL@
+
+srcdir:=@srcdir@
+VPATH:=@srcdir@
+prefix:=@prefix@
+exec_prefix:=@exec_prefix@
+
+bindir:=@bindir@
+etcdir:=$(exec_prefix)/etc
+program_transform_name:=@program_transform_name@
+
+INSTALL:=@INSTALL@
+INSTALL_PROGRAM:=@INSTALL_PROGRAM@
+INSTALL_DATA:=@INSTALL_DATA@
+
+EXEEXT:=@EXEEXT@
+EXEEXT_FOR_BUILD:=@EXEEXT_FOR_BUILD@
+
+CC:=@CC@
+CC_FOR_TARGET:=$(CC)
+
+CFLAGS:=@CFLAGS@
+CXXFLAGS:=@CXXFLAGS@
+
+include $(srcdir)/../Makefile.common
+
+MINGW_INCLUDES:=-I$(updir)/mingw/include
+
+MINGW_CXXFLAGS:=-mno-cygwin $(CXXFLAGS) $(MINGW_INCLUDES)
+MINGW_CFLAGS:=-mno-cygwin $(CFLAGS) $(MINGW_INCLUDES)
+
+libcygwin:=$(cygwin_build)/libcygwin.a
+libuser32:=$(w32api_lib)/libuser32.a
+libkernel32:=$(w32api_lib)/libkernel32.a
+ALL_DEP_LDLIBS:=$(libcygwin) $(w32api_lib)/libnetapi32.a \
+		$(w32api_lib)/libadvapi32.a $(w32api_lib)/libkernel32.a \
+		$(w32api_lib)/libuser32.a
+
+ALL_LDLIBS:=${patsubst $(w32api_lib)/lib%.a,-l%,\
+	      ${filter-out $(libuser32),\
+	       ${filter-out $(libkernel32),\
+		${filter-out $(libcygwin), $(ALL_DEP_LDLIBS)}}}}
+
+MINGW_LIB:=$(mingw_build)/libmingw32.a
+MINGW_LDLIBS:=$(ALL_LDLIBS) $(MINGW_LIB)
+ALL_LDFLAGS:=-B$(newlib_build)/libc/ -B$(newlib_build)/libm/ -B$(w32api_lib)/ \
+	     $(LDFLAGS) $(ALL_LDLIBS)
+MINGW_LDFLAGS:=$(ALL_LDFLAGS) $(MINGW_LIB)
+
+PROGS:=mount$(EXEEXT) umount$(EXEEXT) ps$(EXEEXT) kill$(EXEEXT) \
+       mkpasswd$(EXEEXT) mkgroup$(EXEEXT) cygpath$(EXEEXT) cygcheck$(EXEEXT) \
+       passwd$(EXEEXT) getfacl$(EXEEXT) setfacl$(EXEEXT) strace$(EXEEXT) \
+       regtool$(EXEEXT)
+
+WINSUP_DEPS:=$(cygwin_source)/winsup.h
+
+.SUFFIXES:
+.NOEXPORT:
+
+.PHONY: all install clean realclean
+
+all: Makefile $(PROGS)
+
+strace.exe: strace.cc mingw_getopt.o $(MINGW_LDLIBS)
+ifdef VERBOSE
+	$(CC) $(MINGW_CFLAGS) -o $@ ${wordlist 1,2,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
+else
+	@echo $(CC) -mno-cygwin -o $@ ${wordlist 1,2,$^} ${filter-out -B%, $(MINGW_LDFLAGS)};\
+	$(CC) $(MINGW_CFLAGS) -o $@ ${wordlist 1,2,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
+endif
+
+mingw_getopt.o: $(cygwin_source)/getopt.c
+	$(CC) -c -o $@ $(MINGW_CFLAGS) $^
+
+clean:
+	rm -f *.o $(PROGS)
+
+realclean: clean
+	rm -f  Makefile config.cache
+
+install: all
+	$(SHELL) $(updir1)/mkinstalldirs $(bindir) $(etcdir)
+	for i in $(PROGS) ; do \
+	  n=`echo $$i | sed '$(program_transform_name)'`; \
+	  $(INSTALL_PROGRAM) $$i $(bindir)/$$n; \
+	done
+
+$(cygwin_build)/libcygwin.a: $(cygwin_build)/Makefile
+	@$(MAKE) -C $(@D) $(@F)
+
+$(mingw_build)/libmingw32.a: $(mingw_build)/Makefile
+	@$(MAKE) -C $(@D) $(@F)
+
+%.exe: %.o $(ALL_DEP_LDLIBS)
+ifdef VERBOSE
+	$(CC) -o $@ ${firstword $^} -B$(cygwin_build)/ $(ALL_LDFLAGS)
+else
+	@echo $(CC) -o $@ ${firstword $^} ${filter-out -B%, $(ALL_LDFLAGS)};\
+	$(CC) -o $@ ${firstword $^} -B$(cygwin_build)/ $(ALL_LDFLAGS)
+endif

@@ -1,0 +1,71 @@
+# Makefile.in for windows stuff
+# Copyright 1995, 1996, 1997, 1998, 1999 Cygnus Solutions.
+#
+# This file is part of Cygwin.
+#
+# This software is a copyrighted work licensed under the terms of the
+# Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+# details.
+
+# This makefile requires GNU make.
+
+SHELL:=@SHELL@
+VPATH:=@srcdir@
+srcdir:=@srcdir@
+objdir:=.
+
+target_alias:=@target_alias@
+build_alias:=@build_alias@
+host_alias:=@host_alias@
+prefix:=@prefix@
+
+program_transform_name:=@program_transform_name@
+exec_prefix:=@exec_prefix@
+bindir:=@bindir@
+libdir:=@libdir@
+ifeq ($(target_alias),$(host_alias))
+ifeq ($(build_alias),$(host_alias))
+tooldir:=$(exec_prefix)
+else
+tooldir:=$(exec_prefix)/$(target_alias)
+endif
+else
+tooldir:=$(exec_prefix)/$(target_alias)
+endif
+datadir:=@datadir@
+infodir:=@infodir@
+includedir:=@includedir@
+
+SUBDIRS=@SUBDIRS@
+INSTALL_SUBDIRS=${patsubst %,install_%,$(SUBDIRS)}
+CLEAN_SUBDIRS=${patsubst %,clean_%,$(SUBDIRS)}
+
+.PHONY: all install clean $(SUBDIRS) $(INSTALL_SUBDIRS) \
+	$(CLEAN_SUBDIRS)
+
+.SUFFIXES:
+
+unexport MAKEOVERRIDES
+
+all: Makefile $(SUBDIRS)
+
+install: Makefile $(INSTALL_SUBDIRS)
+
+clean: $(CLEAN_SUBDIRS)
+
+$(SUBDIRS):
+	@$(MAKE) -C $@ $(MAKEOVERRIDES) all
+
+$(INSTALL_SUBDIRS):
+	@$(MAKE) -C ${patsubst install_%,%,$@} $(MAKEOVERRIDES) install
+
+$(CLEAN_SUBDIRS):
+	@$(MAKE) -C ${patsubst clean_%,%,$@} $(MAKEOVERRIDES) clean
+
+.PRECIOUS: Makefile
+
+Makefile: Makefile.in $(srcdir)/configure.in config.status
+	$(SHELL) config.status
+
+config.status: configure
+	$(SHELL) config.status --recheck

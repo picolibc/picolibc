@@ -1,0 +1,91 @@
+<sect1 id="using-cygwinenv"><title>The <EnVar>CYGWIN</EnVar> environment
+variable</title>
+
+<para>The <EnVar>CYGWIN</EnVar> environment variable is used to configure
+many global settings for the Cygwin runtime system. It contains the options
+listed below, separated by blank characters. Many options can be turned off
+by prefixing with <literal>no </literal>.</para>
+
+<itemizedlist Mark="bullet">
+<listitem>
+<para><FirstTerm>(no)binmode</FirstTerm> - if set, non-disk 
+(e.g. pipe and COM ports) file opens default to binary mode 
+(no CR/LF/Ctrl-Z translations) instead of text mode.
+Defaults to set (binary mode). This option must be set
+before starting a Cygwin shell to have an effect on redirection.
+</para>
+<warning><title>Warning!</title><para>If set in 12/98 b20.1, all files 
+always open in binary mode.</para> </warning>
+</listitem>
+<listitem>
+<para><FirstTerm>(no)envcache</FirstTerm> - If set, environment variable
+conversions (between Win32 and POSIX) are cached.  Note that this is may
+cause problems if the mount table changes, as the cache is not invalidated
+and may contain values that depend on the previous mount table
+contents. Defaults to set.</para>
+</listitem>
+<listitem>
+<para><FirstTerm>(no)export</FirstTerm> - if set, the final values of these
+settings are re-exported to the environment as $CYGWIN again.</para>
+</listitem>
+<listitem>
+<para><FirstTerm>(no)glob</FirstTerm> - if set, command line arguments
+containing UNIX-style file wildcard characters (brackets, question mark,
+asterisk, escaped with \) are expanded into lists of files that match 
+those wildcards.
+This is applicable only to programs running from a DOS command line prompt.
+Default is set.</para>
+</listitem>
+<listitem>
+<para><FirstTerm>(no)ntea</FirstTerm> - if set, use the full NT Extended
+Attributes to store UNIX-like inode information.
+This option only operates under Windows NT. Defaults to not set. </para>
+<Warning><Title>Warning!</Title> <para>This may create additional
+<emphasis>large</emphasis> files on non-NTFS partitions.</para></Warning>
+</listitem>
+<listitem>
+<para><FirstTerm>(no)ntsec</FirstTerm> - if set, use the NT security
+model to set UNIX-like permissions on files and processes. The
+file permissions can only be set on NTFS partitions. FAT and SAMBA doesn't
+support the NT file security. For more information, read the documentation
+in <citation>ntsec.sgml</citation>.</para>
+</listitem>
+<listitem>
+<para><FirstTerm>(no)reset_com</FirstTerm> - if set, serial ports are reset
+to 9600-8-N-1 with no flow control when used. This is done at open
+time and when handles are inherited.  Defaults to set.</para>
+</listitem>
+<listitem>
+<para><FirstTerm>strace=n[:cache][,filename]</FirstTerm> - configures system
+tracing.  Off by default, setting various bits in <literal>n</literal> (a
+bit flag) enables various types of system messages.  Setting
+<literal>n</literal> to 1 enables most messages.  Other values can be found
+in <filename>sys/strace.h</filename>.  The <literal>:cache</literal> option
+lets you specify how many lines to cache before flushing the output
+(example: <literal>strace=1:20</literal>).  The <literal>filename</literal>
+option lets you send the messages to a file instead of the screen. </para>
+</listitem>
+<listitem>
+<para><FirstTerm>(no)strip_title</FirstTerm> - if set, strips the directory
+part off the window title, if any.  Default is not set.</para>
+</listitem>
+<listitem>
+<para><FirstTerm>(no)title</FirstTerm> - if set, the title bar
+reflects the name of the program currently running.  Default is not
+set.  Note that under Win9x the title bar is always enabled and it is
+stripped by default, but this is because of the way Win9x works.  In
+order not to strip, specify <literal>title</literal> or <literal>title
+nostrip_title</literal>.</para>
+</listitem>
+<listitem>
+<para><FirstTerm>(no)tty</FirstTerm> - if set, Cygwin enables extra support
+(i.e., termios) for UNIX-like ttys. 
+It is not compatible with some Windows programs.
+Defaults to not set, in which case the tty is opened in text mode 
+with ^Z as EOF. Note that this has been changed such that ^D works as
+expected instead of ^Z, and is settable via stty.
+This option must be specified before starting a Cygwin shell 
+and it cannot be changed in the shell.</para>
+</listitem>
+</itemizedlist>
+</sect1>

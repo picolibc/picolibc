@@ -1,0 +1,341 @@
+# Makefile.in for Cygwin.
+# Copyright 1995, 1996, 1997, 1998, 1999, 2000 Cygnus Solutions.
+#
+# This file is part of Cygwin.
+#
+# This software is a copyrighted work licensed under the terms of the
+# Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+# details.
+
+# This makefile requires GNU make.
+
+CONFIG_DIR:=@srcdir@/config/@CONFIG_DIR@
+SHELL:=@SHELL@
+VPATH:=@srcdir@:$(CONFIG_DIR):@srcdir@/regexp
+srcdir:=@srcdir@
+objdir:=.
+
+target_alias:=@target_alias@
+build_alias:=@build_alias@
+host_alias:=@host_alias@
+prefix:=@prefix@
+
+program_transform_name:=@program_transform_name@
+exec_prefix:=@exec_prefix@
+bindir:=@bindir@
+libdir:=@libdir@
+ifeq ($(target_alias),$(host_alias))
+ifeq ($(build_alias),$(host_alias))
+tooldir:=$(exec_prefix)
+else
+tooldir:=$(exec_prefix)/$(target_alias)
+endif
+else
+tooldir:=$(exec_prefix)/$(target_alias)
+endif
+datadir:=@datadir@
+infodir:=@infodir@
+includedir:=@includedir@
+
+INSTALL:=@INSTALL@
+INSTALL_PROGRAM:=@INSTALL_PROGRAM@
+
+#
+# --enable options from configure
+#
+MT_SAFE = @MT_SAFE@
+DEFS = @DEFS@
+
+CC:=@CC@
+# FIXME: Which is it, CC or CC_FOR_TARGET?
+CC_FOR_TARGET:=$(CC)
+CFLAGS:=@CFLAGS@
+CXXFLAGS:=@CXXFLAGS@
+
+# For linking mount, etc. crt0.o isn't accessable in a fresh build.
+EXE_LDFLAGS:=@EXE_LDFLAGS@
+
+AR:=@AR@
+AR_FLAGS:=qv
+RANLIB:=@RANLIB@
+LD:=@LD@
+DLLTOOL:=@DLLTOOL@
+WINDRES:=@WINDRES@
+AS:=@AS@
+
+#
+# Include common definitions for winsup directory
+#
+include $(srcdir)/../Makefile.common
+
+INSTALL_DATA:=$(SHELL) $(updir1)/install-sh -c
+
+COMPILE_CC+=-D__INSIDE_CYGWIN__
+
+@SET_MAKE@
+
+# Setup the testing framework, if you have one
+EXPECT = `if [ -f $${rootme}/../../expect/expect$(EXEEXT) ] ; then \
+            echo $${rootme}/../../expect/expect$(EXEEXT) ; \
+          else echo expect ; fi`
+
+RUNTEST = `if [ -f $${srcdir}/../dejagnu/runtest ] ; then \
+	       echo $${srcdir}/../dejagnu/runtest ; \
+	    else echo runtest; fi`
+RUNTESTFLAGS =
+
+ifdef MT_SAFE
+MT_SAFE_HEADERS:=thread.h
+MT_SAFE_OBJECTS:=pthread.o thread.o
+endif
+
+# Parameters used in building the cygwin.dll.
+# We build as new-cygwin.dll and rename at install time to overcome
+# native rebuilding issues (we don't want the build tools to see a partially
+# built cygwin.dll and attempt to use it instead of the old one).
+
+DLL_NAME:=cygwin1.dll
+LIB_NAME:=libcygwin.a
+DEF_FILE:=cygwin.def
+DLL_ENTRY:=@DLL_ENTRY@
+
+LIBGMON_A:=libgmon.a
+GMON_START:=gcrt0.o
+
+# Some things want these from libc, but they have their own static
+# data which apps can get to, which is a pain in the dll, so we
+# include them directly into the library.
+
+LIBCOS:=libccrt0.o libcmain.o getopt.o dll_entry.o dll_main.o
+
+# Build all source files in the config directory
+
+EXTRA_DLL_OFILES:=${addsuffix .o,${basename ${notdir ${wildcard $(CONFIG_DIR)/*.c}}}}
+
+EXTRA_OFILES=$(bupdir1)/libiberty/random.o $(bupdir1)/libiberty/strsignal.o
+
+DLL_IMPORTS:=$(w32api_lib)/libkernel32.a $(w32api_lib)/libadvapi32.a
+
+DLL_OFILES:=assert.o dcrt0.o debug.o delqueue.o dir.o dlfcn.o dll_init.o \
+	environ.o  errno.o exceptions.o exec.o external.o fcntl.o fhandler.o \
+	fhandler_console.o fhandler_serial.o fhandler_termios.o fhandler_tty.o \
+	fhandler_windows.o fhandler_raw.o fhandler_floppy.o fhandler_tape.o fhandler_zero.o \
+	fork.o glob.o grp.o heap.o hinfo.o init.o ioctl.o localtime.o malloc.o \
+	mmap.o net.o ntea.o passwd.o path.o pinfo.o pipe.o regexp.o regerror.o \
+	regsub.o registry.o resource.o scandir.o security.o select.o shared.o \
+	signal.o sigproc.o smallprint.o spawn.o strace.o strsep.o sync.o \
+	syscalls.o sysconf.o syslog.o termios.o times.o tty.o uinfo.o uname.o \
+	wait.o window.o \
+	$(EXTRA_DLL_OFILES) $(EXTRA_OFILES) $(MT_SAFE_OBJECTS)
+
+GMON_OFILES:= gmon.o mcount.o profil.o
+
+LD_STUFF=--dll $(DLL_OFILES) version.o winver.o $(DLL_IMPORTS) $(LIBM) $(LIBC) $(LIBGCC) -e $(DLL_ENTRY) --image-base=0x61000000
+
+.PHONY: all force dll_ofiles install
+
+.SUFFIXES:
+.SUFFIXES: .c .cc .def .a .o
+
+all: new-$(DLL_NAME) $(LIBGMON_A) $(LIB_NAME) cygrun.exe force
+
+force:
+
+install: all
+	$(INSTALL_DATA) new-$(DLL_NAME) $(bindir)/$(DLL_NAME) ; \
+	$(INSTALL_DATA) $(LIB_NAME) $(tooldir)/lib/$(LIB_NAME); \
+	cd $(srcdir); \
+	for sub in `find include -name '[a-z]*' -type d -print | sort`; do \
+	    for i in $$sub/*.h ; do \
+	      $(INSTALL_DATA) $$i $(tooldir)/$$sub/`basename $$i` ; \
+	    done ; \
+	done
+
+clean:
+	-rm -f *.o *.dll *.a *.exp junk *.base version.cc regexp/*.o winver_stamp
+
+maintainer-clean realclean: clean
+	@echo "This command is intended for maintainers to use;"
+	@echo "it deletes files that may require special tools to rebuild."
+	-rm -fr configure
+
+# Rule to build libcygwin.a
+
+$(LIB_NAME): $(DEF_FILE) $(LIBCOS)
+	$(DLLTOOL) --as=$(AS) --dllname $(DLL_NAME) --def $(DEF_FILE) --output-lib temp.a
+	$(AR) rcv temp.a $(LIBCOS)
+	mv temp.a $(LIB_NAME)
+
+# Rule to make stub library used by "make check"
+
+new-$(LIB_NAME): $(DEF_FILE) $(LIBCOS)
+	$(DLLTOOL) --as=$(AS) --dllname new-$(DLL_NAME) --def $(DEF_FILE) --output-lib temp.a
+	$(AR) rcv temp.a $(LIBCOS)
+	mv temp.a new-$(LIB_NAME)
+
+# Rule to build cygwin.dll
+
+new-$(DLL_NAME): $(DLL_OFILES) $(DEF_FILE) $(DLL_IMPORTS) $(LIBC) $(LIBM) Makefile winver_stamp
+	$(LD) -shared -o $@ -e $(DLL_ENTRY) cygwin.def $(DLL_OFILES) version.o \
+	winver.o $(DLL_IMPORTS) $(LIBM) $(LIBGCC) $(MALLOC_OBJ) $(LIBC) $(LIBGCC)
+
+dll_ofiles: $(DLL_OFILES)
+
+$(LIBGMON_A): $(GMON_OFILES) $(GMON_START)
+	$(AR) rcv $(LIBGMON_A) $(GMON_OFILES)
+
+version.cc winver.o: winver_stamp
+	@ :
+
+winver_stamp: mkvers.sh include/cygwin/version.h winver.rc $(DLL_OFILES)
+	@echo "Making version.o and winver.o";\
+	$(SHELL) ${word 1,$^} ${word 2,$^} ${word 3,$^} $(WINDRES); \
+	touch $@; \
+	$(COMPILE_CXX) -o version.o version.cc
+
+cygrun.exe : $(srcdir)/cygrun.c $(DLL_IMPORTS) $(w32api_lib)/libuser32.a \
+	     $(w32api_lib)/libshell32.a
+	$(CC) -o $@ $^
+
+#
+
+# These targets are for the dejagnu testsuites. The file site.exp
+# contains global variables that all the testsuites will use.
+
+# Set to $(target_alias)/ for cross.
+target_subdir = @target_subdir@
+
+site.exp: ./config.status Makefile
+	@echo "Making a new config file..."
+	-@rm -f ./tmp?
+	@touch site.exp
+	-@mv site.exp site.bak
+	@echo "## these variables are automatically generated by make ##" > ./tmp0
+	@echo "# Do not edit here. If you wish to override these values" >> ./tmp0
+	@echo "# add them to the last section" >> ./tmp0
+	@echo "set rootme \"`pwd`\"" >> ./tmp0
+	@echo "set srcdir \"`cd ${srcdir}; pwd`\"" >> ./tmp0
+	@echo "set host_triplet $(host_canonical)" >> ./tmp0
+	@echo "set build_triplet $(build_canonical)" >> ./tmp0
+	@echo "set target_triplet $(target)" >> ./tmp0
+	@echo "set target_alias $(target_alias)" >> ./tmp0
+	@echo "set CC \"$(CC)\"" >> ./tmp0
+# CFLAGS is set even though it's empty to show we reserve the right to set it.
+	@echo "set CFLAGS \"\"" >> ./tmp0
+	echo "set tmpdir $(objdir)/testsuite" >> ./tmp0
+	@echo "set srcdir \"\$${srcdir}/testsuite\"" >> ./tmp0
+	@echo "## All variables above are generated by configure. Do Not Edit ##" >> ./tmp0
+	@cat ./tmp0 > site.exp
+	@cat site.bak | sed \
+		-e '1,/^## All variables above are.*##/ d' >> site.exp
+	-@rm -f ./tmp?
+
+testsuite/site.exp: site.exp
+	if [ -d testsuite ]; then \
+	  true; \
+	else \
+	  mkdir testsuite; \
+	fi
+	rm -rf testsuite/site.exp
+	cp site.exp testsuite/site.exp
+
+# Note: we set the PATH so that we can pick up new-cygwin1.dll
+
+check: testsuite/site.exp
+	-rootme=`pwd`; export rootme; \
+	srcdir=`cd ${srcdir}; pwd` ; export srcdir ; \
+	cd testsuite; \
+	EXPECT=${EXPECT} ; export EXPECT ; \
+	if [ -f $${rootme}/../expect/expect ] ; then  \
+	   TCL_LIBRARY=`cd .. ; cd ${srcdir}/../tcl/library ; pwd` ; \
+	    export TCL_LIBRARY ; fi ; \
+	PATH=$${rootme}:$${PATH} ;\
+	$(RUNTEST) --tool winsup $(RUNTESTFLAGS)
+
+#
+
+Makefile: cygwin.din
+
+# .h file dependencies
+# This may be overkill, but it's better than the previous situation.
+# As files/dependencies are added and removed from Cygwin, please keep
+# this list up to date.
+
+WINSUP_H:=winsup.h fhandler.h path.h shared.h \
+	  sigproc.h include/cygwin/version.h \
+	  $(MT_SAFE_HEADERS)
+
+winsup.h: config.h
+assert.o: $(WINSUP_H)
+dcrt0.o: $(WINSUP_H) include/exceptions.h include/glob.h dll_init.h autoload.h
+debug.o: $(WINSUP_H) debug.h sync.h
+delqueue.o: $(WINSUP_H)
+dir.o: $(WINSUP_H)
+dlfcn.o: $(WINSUP_H) dll_init.h
+dll_entry.o: $(WINSUP_H) include/cygwin/cygwin_dll.h
+dll_init.o: $(WINSUP_H) include/exceptions.h dll_init.h
+dll_main.o:
+environ.o: $(WINSUP_H)
+errno.o: $(WINSUP_H)
+exceptions.o: $(WINSUP_H) include/exceptions.h sync.h autoload.h
+exec.o: $(WINSUP_H)
+external.o: $(WINSUP_H) external.h
+fcntl.o: $(WINSUP_H)
+fhandler.o: $(WINSUP_H)
+fhandler_console.o: $(WINSUP_H)
+fhandler_serial.o: $(WINSUP_H)
+fhandler_termios.o: $(WINSUP_H)
+fhandler_tty.o: $(WINSUP_H)
+fhandler_windows.o: $(WINSUP_H)
+fhandler_raw.o: $(WINSUP_H)
+fhandler_floppy.o: $(WINSUP_H)
+fhandler_tape.o: $(WINSUP_H)
+fhandler_zero.o: $(WINSUP_H)
+fork.o: $(WINSUP_H) dll_init.h
+glob.o: include/glob.h
+gmon.o: profil.h gmon.h
+grp.o: $(WINSUP_H)
+heap.o: $(WINSUP_H)
+hinfo.o: $(WINSUP_H)
+init.o: $(WINSUP_H)
+ioctl.o: $(WINSUP_H)
+libccrt0.o: $(WINSUP_H)
+libcmain.o: $(WINSUP_H)
+localtime.o: tz_posixrules.h
+malloc.o: $(WINSUP_H)
+mcount.o: gmon.h
+mmap.o: $(WINSUP_H)
+net.o: $(WINSUP_H) autoload.h
+ntea.o:
+passwd.o: $(WINSUP_H)
+path.o: $(WINSUP_H)
+pinfo.o: $(WINSUP_H)
+pipe.o: $(WINSUP_H)
+profile.o: profil.h
+pthread.o: $(WINSUP_H)
+registry.o: $(WINSUP_H)
+resource.o: $(WINSUP_H)
+scandir.o:
+security.o: $(WINSUP_H)
+select.o: $(WINSUP_H) select.h
+shared.o: $(WINSUP_H)
+signal.o: $(WINSUP_H)
+sigproc.o: $(WINSUP_H) sync.h
+smallprint.o: $(WINSUP_H)
+spawn.o: $(WINSUP_H)
+strace.o: $(WINSUP_H)
+strsep.o:
+sync.o: $(WINSUP_H) sync.h
+syscalls.o: $(WINSUP_H)
+sysconf.o: $(WINSUP_H)
+syslog.o: $(WINSUP_H)
+termios.o: $(WINSUP_H)
+test.o: $(WINSUP_H)
+times.o: $(WINSUP_H)
+tty.o: $(WINSUP_H)
+uinfo.o: $(WINSUP_H)
+uname.o: $(WINSUP_H)
+wait.o: $(WINSUP_H)
+window.o: $(WINSUP_H)
+thread.o: $(WINSUP_H)
+

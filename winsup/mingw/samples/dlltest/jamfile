@@ -1,0 +1,46 @@
+
+# This option is required to successfully return doubles via STDCALL as in
+# Sub function in dll.c.
+CCFLAGS = -mno-fp-ret-in-387 ;
+
+Main exe.exe : exe.c ;
+
+LinkLibraries exe.exe : libdll.a ;
+
+DEPENDS exe.exe : dll.dll ;
+
+LINKFLAGS on exe.exe = $(LINKFLAGS) -L. ;
+
+
+Main loaddll.exe : loaddll.c ;
+
+DEPENDS loaddll.exe : dll.dll ;
+
+
+Dll dll.dll : dll.c ;
+
+ImportLib libdll.a : dll.def ;
+
+
+Main expexe.exe : expexe.c ;
+
+# Force the executable to include the expexe.def file.
+Exports expexe.exe : expexe.def ;
+
+Main loadexe.exe : loadexe.c ;
+
+DEPENDS loadexe.exe : expexe.exe ;
+
+
+Main silly.exe : silly.cpp ;
+
+LinkLibraries silly.exe : libsilly.a ;
+
+DEPENDS silly.exe : silly.dll ;
+
+LINKFLAGS on silly.exe += -L. ;
+
+Dll silly.dll : sillydll.cpp ;
+
+ImportLib libsilly.a : silly.def ;
+

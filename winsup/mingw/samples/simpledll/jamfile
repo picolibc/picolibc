@@ -1,0 +1,14 @@
+
+Dll dll.dll : dll.c ;
+
+ImportLib libdll.a : dll.def ;
+
+
+Main exe.exe : exe.c ;
+
+LinkLibraries exe.exe : libdll.a ;
+
+DEPENDS exe.exe : dll.dll ;
+
+LINKFLAGS on exe.exe = $(LINKFLAGS) -L. ;
+

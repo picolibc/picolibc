@@ -1,0 +1,205 @@
+<sect1 id="func-cygwin-posix-to-win32-path-list">
+<title>cygwin_posix_to_win32_path_list</title>
+
+<funcsynopsis>
+<funcdef>extern "C" void
+<function>cygwin_posix_to_win32_path_list</function></funcdef>
+<paramdef>const char *<parameter>posix</parameter></paramdef>
+<paramdef>char *<parameter>win32</parameter></paramdef>
+</funcsynopsis>
+
+<para>Given a POSIX path-style string (i.e. /foo:/bar) convert it to
+the equivalent Win32 path-style string (i.e. d:\;e:\bar).
+<parameter>win32</parameter> must point to a sufficiently large
+buffer.</para>
+
+<example>
+<title>Example use of cygwin_posix_to_win32_path_list</title>
+<programlisting>
+char *_epath;
+char *_win32epath;
+_epath = _win32epath = getenv (NAME);
+/* If we have a POSIX path list, convert to win32 path list */
+if (_epath != NULL && *_epath != 0
+    && cygwin_posix_path_list_p (_epath))
+  {
+    _win32epath = (char *) xmalloc
+      (cygwin_posix_to_win32_path_list_buf_size (_epath));
+    cygwin_posix_to_win32_path_list (_epath, _win32epath);
+    }
+</programlisting>
+</example>
+
+<para>See also <link linkend="func-cygwin-posix-to-win32-path-list-buf-size">
+cygwin_posix_to_win32_path_list_buf_size</link></para>
+
+</sect1>
+
+<sect1 id="func-cygwin-win32-to-posix-path-list">
+<title>cygwin_win32_to_posix_path_list</title>
+
+<funcsynopsis>
+<funcdef>extern "C" void
+<function>cygwin_win32_to_posix_path_list</function></funcdef>
+<paramdef>const char *<parameter>win32</parameter></paramdef>
+<paramdef>char *<parameter>posix</parameter></paramdef>
+</funcsynopsis>
+
+<para>Given a Win32 path-style string (i.e. d:\;e:\bar) convert it to
+the equivalent POSIX path-style string (i.e. /foo:/bar).
+<parameter>posix</parameter> must point to a sufficiently large
+buffer.  See also <link
+linkend="func-cygwin-win32-to-posix-path-list-buf-size">
+cygwin_win32_to_posix_path_list_buf_size</link></para>
+
+</sect1>
+
+<sect1 id="func-cygwin-posix-to-win32-path-list-buf-size">
+<title>cygwin_posix_to_win32_path_list_buf_size</title>
+
+<funcsynopsis>
+<funcdef>extern "C" int
+<function>cygwin_posix_to_win32_path_list_buf_size</function></funcdef>
+<paramdef>const char *<parameter>path_list</parameter></paramdef>
+</funcsynopsis>
+
+<para>Returns the number of bytes needed to hold the result of calling
+<link linkend="func-cygwin-posix-to-win32-path-list">
+cygwin_posix_to_win32_path_list</link>.</para>
+
+</sect1>
+
+<sect1 id="func-cygwin-win32-to-posix-path-list-buf-size">
+<title>cygwin_win32_to_posix_path_list_buf_size</title>
+
+<funcsynopsis>
+<funcdef>extern "C" int
+<function>cygwin_win32_to_posix_path_list_buf_size</function></funcdef>
+<paramdef>const char *<parameter>path_list</parameter></paramdef>
+</funcsynopsis>
+
+<para>Tells you how many bytes are needed for the results of <link
+linkend="func-cygwin-win32-to-posix-path-list">
+cygwin_win32_to_posix_path_list</link>.</para>
+
+</sect1>
+
+<sect1 id="func-cygwin-conv-to-posix-path">
+<title>cygwin_conv_to_posix_path</title>
+
+<funcsynopsis>
+<funcdef>extern "C" void
+<function>cygwin_conv_to_posix_path</function></funcdef>
+<paramdef>const char *<parameter>path</parameter></paramdef>
+<paramdef>char *<parameter>posix_path</parameter></paramdef>
+</funcsynopsis>
+
+<para>Converts a Win32 path to a POSIX path.  If
+<parameter>path</parameter> is already a POSIX path, leaves it alone.
+If <parameter>path</parameter> is relative, then
+<parameter>posix_path</parameter> will also be relative.  Note that
+<parameter>posix_path</parameter> must point to a buffer of sufficient
+size; use MAX_PATH if needed.</para>
+
+</sect1>
+
+<sect1 id="func-cygwin-conv-to-win32-path">
+<title>cygwin_conv_to_win32_path</title>
+
+<funcsynopsis>
+<funcdef>extern "C" void
+<function>cygwin_conv_to_win32_path</function></funcdef>
+<paramdef>const char *<parameter>path</parameter></paramdef>
+<paramdef>char *<parameter>win32_path</parameter></paramdef>
+</funcsynopsis>
+
+<para>Converts a POSIX path to a Win32 path.  If
+<parameter>path</parameter> is already a Win32 path, leaves it alone.
+If <parameter>path</parameter> is relative, then
+<parameter>win32_path</parameter> will also be relative.  Note that
+<parameter>win32_path</parameter> must point to a buffer of sufficient
+size; use MAX_PATH if needed.</para>
+
+</sect1>
+<sect1 id="func-cygwin-conv-to-full-posix-path">
+<title>cygwin_conv_to_full_posix_path</title>
+
+<funcsynopsis>
+<funcdef>extern "C" void
+<function>cygwin_conv_to_full_posix_path</function></funcdef>
+<paramdef>const char *<parameter>path</parameter></paramdef>
+<paramdef>char *<parameter>posix_path</parameter></paramdef>
+</funcsynopsis>
+
+<para>Converts a Win32 path to a POSIX path.  If
+<parameter>path</parameter> is already a POSIX path, leaves it alone.
+If <parameter>path</parameter> is relative, then
+<parameter>posix_path</parameter> will be converted to an absolute
+path.  Note that <parameter>posix_path</parameter> must point to a
+buffer of sufficient size; use MAX_PATH if needed.</para>
+
+</sect1>
+
+<sect1 id="func-cygwin-conv-to-full-win32-path">
+<title>cygwin_conv_to_full_win32_path</title>
+
+<funcsynopsis>
+<funcdef>extern "C" void
+<function>cygwin_conv_to_full_win32_path</function></funcdef>
+<paramdef>const char *<parameter>path</parameter></paramdef>
+<paramdef>char *<parameter>win32_path</parameter></paramdef>
+</funcsynopsis>
+
+<para>Converts a POSIX path to a Win32 path.  If
+<parameter>path</parameter> is already a Win32 path, leaves it alone.
+If <parameter>path</parameter> is relative, then
+<parameter>win32_path</parameter> will be converted to an absolute
+path.  Note that <parameter>win32_path</parameter> must point to a
+buffer of sufficient size; use MAX_PATH if needed.</para>
+
+</sect1>
+
+<sect1 id="func-cygwin-posix-path-list-p">
+<title>cygwin_posix_path_list_p</title>
+
+<funcsynopsis>
+<funcdef>extern "C" int
+<function>posix_path_list_p</function></funcdef>
+<paramdef>const char *<parameter>path</parameter></paramdef>
+</funcsynopsis>
+
+<para>This function tells you if the supplied
+<parameter>path</parameter> is a POSIX-style path (i.e. posix names,
+forward slashes, colon delimiters) or a Win32-style path (drive
+letters, reverse slashes, semicolon delimiters.  The return value is
+true if the path is a POSIX path.  Note that "_p" means "predicate", a
+lisp term meaning that the function tells you something about the
+parameter.</para>
+
+</sect1>
+
+<sect1 id="func-cygwin-split-path">
+<title>cygwin_split_path</title>
+
+<funcsynopsis>
+<funcdef>extern "C" void
+<function>cygwin_split_path</function>
+</funcdef>
+<paramdef>const char * <parameter>path</parameter></paramdef>
+<paramdef>char * <parameter>dir</parameter></paramdef>
+<paramdef>char * <parameter>file</parameter></paramdef>
+</funcsynopsis>
+
+<para>Split a path into the directory and the file portions.  Both
+<parameter>dir</parameter> and <parameter>file</parameter> are
+expected to point to buffers of sufficient size.  </para>
+
+<example>
+<title>Example use of cygwin_split_path</title>
+<programlisting>
+char dir[200], file[100];
+cygwin_split_path("c:/foo/bar.c", dir, file);
+printf("dir=%s, file=%s\n", dir, file);
+</programlisting>
+</example>
+</sect1>

@@ -1,0 +1,430 @@
+2000-02-03  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* Snapshot 2000-02-03.
+
+	* include/{assert.h, conio.h, ctype.h, direct.h, dirent.h, fcntl.h, 
+	float.h, io.h, locale.h, malloc.h, math.h, process.h, signal.h, 
+	stdio.h, stdlib.h, string.h, time.h, wctype.h, sys/stat.h, 
+	sys/timeb.h, sys/utime.h}: Remove parameter names to avoid namespace
+	pollution.
+
+	* Makefile.in (all): Build CRT0S first.
+	(libmingwthrd.a): Remove thread support DLL from dependency.
+
+2000-01-21  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* Snapshot 2000-01-21.
+
+2000-01-20  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	Merge in changes from Cygwin:
+	* configure.in (HEADER_SUBDIRS): New variable. Substitute.
+	(SUBDIRS): Likewise.
+	* Makefile.in (HEADER_SUBDIRS): New variable.
+	(install): Use to install Mingw headers to a subdirectory if building
+	under Cygwin.
+	(DLL_CC_STUFF): Add DLL entry point.
+	* configure: Regenerate.
+
+2000-01-19  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* include/stdio.h (fsetpos): Fix prototype.
+	(fpos_t): Fix for MSVCRT.
+	* include/float.h (fpreset): Add prototype.
+	* include/limits.h: Define UINT_MAX, USHRT_MAX and ULONG_MAX with
+	constant values.
+	* include/time.h: Don't define tzname as a macro for CRTDLL, and
+	export using libmoldname.a.
+	* crtdll.def: Add DATA tags.
+	* msvcrt.def: Likewise.
+	* moldname.def.in: Likewise. Add fpreset. Export tzname for
+	both MSVCRT and CRTDLL.
+	* moldname-crtdll.def: Regenerate.
+	* moldname-msvcrt.def: Regenerate.
+
+Tue Dec 21 02:22:14 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+	
+	* Snapshot 1999-12-21.
+
+	* include/wctype.h: New file.
+	* include/ctype.h (MB_CUR_MAX): Define.
+	(wctype_t): Guard.
+	* include/stdlib.h (MB_CUR_MAX): Define.
+	* include/wchar.h: Define stat, _stat structures here as well.
+	* include/float.h: Add invalid subconditions (_SW) and floating
+	point error (_FPE) macros.
+	* include/time.h (_CLOCK_T): Rename macro to _CLOCK_T_DEFINED.
+	(_TIME_T): Rename macro to _TIME_T_DEFINED.
+	* include/sys/types.h: Likewise.
+
+Thu Nov 18 00:22:26 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* Snapshot 1999-11-18.
+
+Sun Nov  7 02:50:09 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	Released 1999-11-07.
+
+	* Makefile.in (CRT0S): Add crtst.o.
+	(install): Install in subdirs as well.
+	* dirent.h (struct _stat): Rename from struct stat.
+	* include/tchar.h: Add some new macros. Thanks to
+	Eric Kohl <ekohl@abo.rhein-zeitung.de>.
+
+Thu Nov  4 14:32:58 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* Makefile.in: Add support for profile directory.
+	* configure.in: Likewise.
+	* configure: Regenerate.
+
+Wed Nov  3 16:26:44 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* include/stdlib.h: Add wide character version of argv/environ.
+	Formatting changes.
+	* include/wchar.h: More wide character prototypes.
+	* include/sys/stat.h: Likewise. Add struct stat as well as _stat.
+
+	* dllcrt1.c (init.c): Don't include.
+	(DllMainCRTStartup): Don't call _mingw32_init_mainargs().
+	* Makefile.in: Remove init.c from dllcrt{1,2}.c dependency lists.
+
+Sat Oct 30 03:06:26 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* moldname.def: Remove file.
+	* moldname.def.in: And add this.
+	* moldname-msvcrt.def: Generate from moldname.def.in.
+	* moldname-crtdll.def: Likewise.
+
+	* mthr.c: New file for -mthread (thread-safe C++ EH) support.
+	* mthr_init.c: New file for -mthread (thread-safe C++ EH) support.
+	* mthr_stub.c: New file for -mthread (thread-safe C++ EH) support.
+
+	* Makefile.in: Update.
+	* configure.in: Likewise. Also add *cygwin* target for building
+	under Cygwin winsup.
+	* configure: Regenerate.
+
+Fri Oct  1 11:10:30 1999 Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* include/_mingw.h: Add version macros.
+	* include/direct.h (_diskfree_t, getdiskfree, getdrives):  Add.
+	Also add wide character versions shared with wchar.h.
+	* include/dos.h (_diskfree_t, getdiskfree, getdrives):  Add.
+	* include/io.h (sopen, _sopen): Fix prototype.
+	Add wide character prototypes.
+	* include/wchar.h: Likewise.
+	* include/stdlib.h (beep, seterrormode, sleep): Remove non-
+	underscored versions. Potential incompatibility.
+	* include/time.h (daylight, timezone, tzname): Fix MSVCRT cases.
+	Add wide character prototypes.
+	* include/sys/timeb.h (struct _timeb): Don't use macro, but real
+	definition.
+
+Wed Aug 18 18:38:39 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* configure.in (RUNTIME, CRT_ID): Add to differentiate between
+	crtdll and msvcrt runtimes. Remove DLL_ENTRY and DEF_DLL_ENTRY
+	macros.
+	* configure: Rengerate.
+	* Makefile.in (RUNTIME, CRT_ID): Use to generate the correct
+	dll name and crt's. CRTDLL and MSVCRT are meant to created
+	separately, so remove all the *-msvcrt* targets.
+	(libmingwthr.a): New target. Dummy thread support archive.
+	(LIBS): Add libmingwthr.a.
+	(CRT0S): Use CRT_ID. Add crtmt.o.
+	(MINGW_OBJS): Add crtst.o.
+	* main.c (WinMain): Fix prototype.
+	* crtmt.c: New file.
+	* crtst.c: New file.
+
+	* include/process.h (_beginthreadex): Fix prototype.
+	* include/_mingw.h (__int64): Define for __GNUC__.
+	* include/tchar.h (_ttol): Add macro.
+	* include/stdlib.h (_wtoi, _wtol, _i64toa, _ui64toa, _atoi64,
+	_i64tow, _ui64tow, _wtoi64): Add prototypes.
+
+	Reported by Emanuele Aliberti <ea@iol.it>:
+	* include/tchar.h (_ttoi): Add macro.
+
+	Reported by Ulf Moeller <3umoelle@informatik.uni-hamburg.de>:
+	* include/stdio.h (_snprintf): Add prototype.
+	(_vsnprintf): Likewise.
+
+Sat Aug  7 18:00:00 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	Reported by Tor Lillqvist <tml@iki.fi>:
+	* include/stdlib.h (__p___argv): Fix return type.
+
+Fri Jul 30 22:07:06 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+	
+	Add UWIN support.
+	* include/errno.h (errno): It's linked in from startup, not imported.
+	* include/stdlib.h (errno): Likewise.
+	* include/io.h: Guard against conflicting macros and prototypes in 
+	system headers.
+	* include/stdlib.h: Likewise.
+	* include/string.h: Likewise.
+	* include/time.h: Likewise.
+
+Fri Jul 30 13:47:34 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* include/io.h (X_OK): Fix definition. Thanks to Jan Nijtmans.
+	* include/dos.h: Fix typo __MINGW_EXPORT->__MINGW_IMPORT.
+	* Makefile.in (INCLUDES): Remove old windows32 include directory.
+
+	* crt1.c (_gnu_exception_handler): Fix prototype.
+	(__mingw_CRTStartup): New function based on mainCRTStartup.
+	(mainCRTStartup): Set the app type for MSVCRT and call
+	__mingw_CRTStartup.
+	(WinMainCRTStartup): Likewise.
+	* init.c (_startupinfo): Define.
+	(_getmainargs): Add 5th parameter.
+	(_mingw32_init_mainargs): Use.
+
+	* ALL *.c files: Reformat according to GNU coding style.
+
+Fri Jul 16 00:46:04 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* Makefile.in (INCLUDES): Add w32api include directory.
+
+	* include/_mingw.h: New file.
+	* include/{assert.h,conio.h,ctype.h,direct.h,dirent.h,dos.h,
+	  errno.h,excpt.h,fcntl.h,float.h,io.h,limits.h,locale.h,malloc.h,
+	  math.h,process.h,setjmp.h,share.h,signal.h,stdarg.h,stdio.h,
+	  stdlib.h,string.h,tchar.h,time.h,varargs.h,sys/locking.h,
+	  sys/stat.h,sys/timeb.h,sys/types.h,sys/utime.h}: Include and
+	  use the macros __DECLSPEC_SUPPORTED  and __MINGW_IMPORT.
+	
+	* include/stdlib.h (atexit): Fix prototype.
+
+Mon Jun 14 18:38:49 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* include/stdio.h (_tempnam): Fix prototype.
+	(tempnam): Likewise.
+	* include/stdlib.h: Replace with GCC's version, and guard
+	with RC_INVOKED.
+
+	From Anders Norlander <anorland@hem2.passagen.se>:
+	* include/stdlib.h (__argc): Declare.
+	(__argv): Likewise.
+
+Mon Apr  5 13:49:17 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* crt1.c (_gnu_exception_handler): Acknowledge Jacob Navia's
+	contribution.
+	* Makefile.in (_libm_dummy.o): New target.
+	(libm.a): Use. 
+
+Tue Mar 16 18:15:26 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* Released 1999-03-16 along with egcs-1.1.2.
+
+Wed Feb 17 17:15:56 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* Makefile.in (LIBS): Add libm.a.
+	(libm.a): Dummy libm.a.
+
+	* Makefile.in: Update from winsup 1999-02-08 snapshot.
+	Preserve local changes.
+	(mkinstalldirs): In ../, not ../../.
+	(INCLUDES): Point to local windows32api headers and use -nostdinc.
+	(LIBGCC): Delete.
+	(LIBS): Add libmoldname-msvc.a.
+	(libmoldname-msvc.a): Add target.
+	(distclean): Add target.
+
+Tue Feb  9 00:26:05 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* include/dir.h: Reintroduce as an obsolescent header.
+	* crt1.c (signal.h): Include.
+	(_gnu_exception_handler): New function to properly handle win32
+	asynchronous signals.
+	(mainCRTStartup): Use.
+
+Sun Jan  3 23:52:25 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+	
+	* include/direct.h: Include io.h instead of dir.h
+	* include/dirent.h: Likewise.
+	* include/dos.h: Likewise.
+	* include/stdio.h: Replace reference to dir.h with io.h.
+
+Thu Dec 31 16:04:55 1998  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* 1999-01-01 release bundled with egcs-1.1.1.
+
+	* include/io.h: Incorporate dir.h.
+	* include/dir.h: Remove.
+	* include/signal.h: Move RC_INVOKED up a bit.
+
+Tue Dec 29 15:04:38 1998  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* include/signal.h (sig_atomic_t): Define.
+	(NSIG): Define.
+	* include/malloc.h: Import defs from deprecated alloc.h.
+	* include/alloc.h: Remove.
+
+	From "Daniel J. Rodriksson" <djr@dit.upm.es>:
+	* include/sys/types.h (_dev_t): Should be unsigned int for MSVCRT.
+	* include/sys/stat.h (struct stat): st_uid is of type short. Use
+	_off_t instead of long for st_size.
+
+Thu Sep 10 22:28:49 1998  Mumit Khan  <khan@xraylith.wisc.edu>
+	
+	* include/errno.h (sys_errlist, sys_nerr): Move from here ...
+	* include/stdlib.h: Here.
+
+	* include/netdb.h: Remove.
+	* include/arpa/inet.h: Remove.
+	* include/netinet/in.h: Remove.
+	* include/sys/socket.h: Remove.
+
+Fri Sep  4 15:09:11 1998  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* Release egcs-1.1.
+
+	* include/{ctype.h,dos.h,io.h,string.h,time.h,sys/types.h,
+	sys/utime.h}: Protect stddef.h in RC_INVOKED macro.
+
+Thu Sep  3 10:43:29 1998  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* setjmp.h (_JBTYPE, _JBLEN): Define correctly.
+	(jmpbuf): typedef using above. 
+	(setjmp, longjmp): Prototype using jmpbuf.
+
+	Merge with Colin Peters' 980701 snapshot. I've ignored changes to
+	obsolescent imported names, ie., from __imp__ to _imp___. 
+
+	Also ignored empty include/sys/param.h and incorrect
+	include/sys/times.h.
+
+	* CRTinit.c: New file.
+	* include/{errno.h,fcntl.h,math.h,process.h} (__MSVCRT__): Use #ifdef 
+	instead of #if.
+	* include/io.h (umask): Fix prototype.
+	* include/stdlib.h (OS constants): Replace with Colin's.
+	* include/time.h (tzset, daylight, timezone): Replace with Colin's.
+	* include/sys/state.h: Merge.
+
+Thu Sep  3 09:49:07 1998  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* include/assert.h (assert): Lose the trailing semicolon.
+
+Thu Jul 30 21:18:49 1998  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* include/math.h (matherr): Declare.
+	* include/stdio.h (fileno, _fileno): Declare.
+	* include/stdlib.h (environ, _environ): Fix to use runtime DLL.
+
+	From Earnie Boyd:
+	* include/stdio.h (fdopen, _fdopen): Add const.
+	(getw, putw): Declare.
+	* include/stdlib.h (MAX_{DRIVE,DIR,FNAME,EXT}): Fix. 
+
+Sat Jun 13 18:19:41 1998  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* include/time.h (_timezone): Undefine.
+	* include/sys/timeb.h (struct timeb): Rename _timezone to timezone.
+
+	* include/time.h (_daylight, _timezone, _tzname, _tzset): Remove
+	__cdecl for MSVCRT.
+	* include/stdlib.h (environ): Use DLL version.
+	* init.c (environ): Undefine it before use.
+
+Sun Mar 22 19:59:30 1998  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* Update to 980309 snapshot from Colin Peters.
+
+	* include/utime.h: remove
+	* include/stdlib.h (__imp__osver_dll, __imp__winver_dll,
+	__imp__winmajor_dll, __imp__winminor_dll): Apply Jan-Jaap's 
+	patches to define these.
+	* include/time.h (CLK_TCK): Renamed from CLK_TICK.
+	(_daylight, _timezone, _tzname, _tzset): Define.
+
+	* include/netdb.h: Add from Colin's windows32api changes.
+	* include/sys/socket.h: Likewise.
+	* include/arpa/inet.h: Likewise.
+	* include/netinet/in.h: Likewise.
+
+Wed Feb  4 14:16:44 1998  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* Update to 980128 snapshot from Colin Peters. 
+
+Sat Dec  6 21:30:35 1997  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* configure.in (AC_INIT): Use dllmain.c instead of defunct
+	oldnames.c
+	* configure: Regenerate.
+
+Fri Dec  5 15:57:36 1997  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* Update to 971205 snapshot from Colin Peters. Lots of changes.
+	Files renamed and include hierarchy loses directories named
+	nonansi.
+
+	* include/dos.h: from Jan-Jaap.
+
+Thu Dec  4 21:48:13 1997  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	Changes to conform to FSF tree.
+
+	* crt1.c: Renamed from mcrt0.c.
+	* dllcrt1.c: Renamed from dllcrt0.c.
+	* Makefile.in: Update above. Also renamed libmoldnames.a to
+	libmoldname.a.
+
+Mon Dec  1 16:51:30 1997  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* crtdll.def: Export all functions but the ones with funny names.
+	* moldnames.def: Add fdopen since fileno is already there.
+	* include/nonansi/dos.h: New file from Jan-Jaap.
+	* include/errno.h: Add extern decl + various additions from JJ.
+	* include/stdio.h: Likewise.
+	* include/stdlib.h: Likewise.
+	* include/nonansi/io.h: Likewise.
+	* include/nonansi/process.h: Likewise.
+	* include/sys/types.h: Likewise.
+
+Tue Nov  4 14:51:01 1997  Mumit Khan  <khan@xraylith.wisc.edu>
+	
+	* include/time.h (CLK_TCK): Renamed from CLK_TICK.
+	(CLK_TICK): Delete.
+	* include/stdlib.h (free): Fix prototype to return void, not void*.
+	* include/nonansi/process.h: Add P_* and WAIT_* defs.
+
+	* dllcrt0.c: Delete now-unneeded '.section .idata$3' asm hack.
+	* mcrt0.c: Likewise.
+
+	* Makefile.in (LIBS): Delete moldnames.dll from target libs.
+	(libmoldnames.a): Add explicit rule to create it.
+
+Fri Aug 15 18:23:43 1997  Rob Savoye  <rob@cygnus.com>
+
+	New directory for the minimalist cygwin environment.
+	
+	* crtglob.c: New file. Turn on file globbing support. 
+	* crt_noglob.c: New file. Turn off file globbing support. 
+	* ctype_old.c: New file. Wrappers for functions that don't
+	have an underscore.
+	* dirent.c: New file. Directory routines readdir, opendir, closedir.
+	* dllcrt0.c: New file. Initialization code to use crtdll.dll.
+	* dllmain.c: New file. A stub DllMain function.
+	* hugeval.c: New file. A gross hack to define HUGE_VAL.
+	* init.c: New file. Common code to initialize standard file
+	handles and command line arguments.
+	* main.c: New file. A main for programs that only call WinMain.
+	* mcrt0.c: New file. Default crt0 for mingw32.
+	* oldnames.c: New File. Wrappers for functions that don't
+	have an underscore.
+	* string_old.c:  New File.
+	* include/{assert.h,ctype.h,errno.h,float.h,limits.h,locale.h
+	math.h,nonansi,setjmp.h,signal.h,stdarg.h,stddef.h,stdio.h,stdlib.h
+	string.h,tchar.h,time.h,wchar.h}: New header files for mingw.
+	* include/sys/types.h: New header file for mingw.
+	* include/nonansi/{alloc.h,conio.h,dir.h,direct.h,dirent.h
+	fcntl.h,io.h,malloc.h,mem.h,memory.h,process.h,share.h,unistd.h
+	utime.h,values.h,varargs.h}: New header files for mingw.
+	* include/nonansi/sys/{fcntl.h,locking.h,stat.h,time.h
+	timeb.h,unistd.h}: New header files for mingw.
+	* Makefile.in,configure.in: Build and configure support.
+	* configure: Generated from autoconf 2.12 with Cygnus patches.

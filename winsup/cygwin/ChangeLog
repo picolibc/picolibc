@@ -1,0 +1,229 @@
+Mon Feb  7 16:50:44 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: cygrun needs libshell32.a.
+
+Sun Feb  6 22:17:58 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* sigproc.cc (proc_subproc): Simplify case for when a child process is
+	stopped since new signal handler ensures the desired behavior.
+
+Sun Feb  6 21:52:33 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Fix install target so that directories will be created
+	when necessary.
+
+Sun Feb  6 18:12:17 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: exceptions.cc should depend on autoload.h.
+	* exceptions.cc: Undef DECLSPEC_IMPORT prior to including imagehlp.h to
+	avoid defining StackWalk as "import".
+	(call_handler): Minor optimizations.
+	(sig_handle_tty_stop): Fix typo in previous checkin.
+	* sigproc.cc (sigproc_init): Ditto, for signal_arrived initialization.
+
+Sat Feb  5 15:37:37 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dcrt0.cc (isquote): Convert to inline function.
+
+Sat Feb  5 00:26:01 2000  Christopher Faylor <cgf@cygnus.com>
+
+	Throughout, rename global_signal_arrived to signal_arrived.
+	Throughout, eliminate use of arm_signals and __signal_arrived.
+	Throughout, revert to use of simple call to WaitForSingleObject or
+	WaitForMultipleObjects.
+	* debug.h: Eliminate obsolete function declaration.
+	* exceptions.cc (sigWaitForSingleObject): Eliminate obsolete function
+	definition.
+	* fhandler.h: Reflect change to select_stuff wait method.
+	* fhandler_tape.cc (get_ll): Accomodate new w32api LARGE_INTEGER
+	definition.
+	* ntea.c (NTReadEARaw): Ditto.
+	(NTWriteEA): Ditto.
+	* security.cc (ReadSD): Ditto.
+	(WriteSD): Ditto.
+	* syscalls.cc (_link): Ditto.
+	* uname.cc (uname): Eliminate PPC switch.
+
+2000-02-01  Salvador Eduardo Tropea  <salvador@inti.gov.ar>
+
+	* include/io.h: add return type to setmode()
+
+2000-01-27  DJ Delorie  <dj@cygnus.com>
+
+	* include/netdb.h (h_errno): change __imp_ to dllimport
+	* cygwin.din (reent_data): add DATA
+
+Thu Jan 27 01:07:14 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (call_handler): Add debugging output.
+	* select.cc (MAKEready): Arm signals earlier.
+	* sigproc.cc (__signal_arrived:arm): Move debugging version of this
+	method here.
+	(__signal_arrived::release): Ditto.
+	* sigproc.h: Recognize debugging versions of above two methods.
+	(arm_signals::WaitForMultipleObjects): Don't release signal lock unless
+	signal arrived.
+	(arm_signals::WaitForMultipleSingleObject): Ditto.
+	(arm_signals::MsgWaitForMultipleObjects): Ditto.
+
+Thu Jan 27 00:19:26 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* sync.h (new_muto): Workaround change in gcc behavior.
+
+Wed Jan 26 12:57:13 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Ensure that all required libraries are built prior
+	to linking cygrun.exe.
+
+Tue Jan 25 21:26:57 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (sig_handle): Crudely work around potential problem
+	when main thread has a lock but is killed by a fatal signal.
+	* fhandler_tty.cc (fhandler_pty_master::write): Don't perform line
+	editing on the pty master (so why do we need the second argument to
+	line_edit, then?)
+	* thread.cc: Reformat to GNU standards.
+
+2000-01-11  DJ Delorie  <dj@cygnus.com>
+
+	* ROADMAP: new
+
+2000-01-11  DJ Delorie  <dj@cygnus.com>
+
+	* fhandler_zero.cc: new, emulate /dev/zero
+	* testsuite/winsup.api/devzero.c: new, test /dev/zero
+	* Makefile.in: build fhandler_zero.o
+	* fhandler.h: add support for /dev/zero
+	* hinfo.cc: ditto
+	* path.cc: ditto
+
+2000-01-11  DJ Delorie  <dj@cygnus.com>
+
+	* mmap.cc (mmap): MSDN says *one* of FILE_MAP_*, fix flags for
+	MAP_PRIVATE.
+
+Mon Jan 10 01:11:00 2000  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (acl_access): New function.
+	* syscalls.cc (access): Call acl_access if ntsec is on.
+
+Mon Jan 10 01:11:00 2000  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (get_file_owner): Use of ReadSD() instead of
+	GetFileSecurity().
+	(get_file_group): Ditto.
+
+Sun Jan  9 15:43:07 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* debug.cc (struct thread_start): Add a flag to determine whether a
+	field is in use.  Eliminate thread_start_ix since it was not
+	thread-safe.
+	(thread_stub): Use notavail flag to control whether the entry in
+	start_buf can be reused.
+	(makethread): Ditto.
+
+Sun Jan  9 20:18:00 2000  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (alloc_sd): Rearrange order of ACE creation.
+	(setacl): Optimize creation of ACEs related to inheritance.  Code
+	cleanup.
+	(aclcheck): Disable check for existance of DEF_)CLASS_OBJ.
+
+Sat Jan  8 18:42:32 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* mkvers.h: Reorg fix.
+
+Sat Jan  8 20:00:00 2000  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din: Add new acl API calls.
+	* grp.cc (getgroups): Change to work for any username.
+	* security.cc (get_id_from_sid): Change to work with acl API.
+	(is_grp_member): New function.
+	(get_nt_attribute): Rewritten.
+	(add_access_allowed_ace): New function.
+	(add_access_denied_ace): Ditto.
+	(alloc_sd): Rewritten.
+	(setacl): New function.
+	(getace): Ditto.
+	(searchace): Ditto.
+	(getacl): Ditto.
+	(acl): Ditto.
+	(facl): Ditto.
+	(aclcheck): Ditto.
+	(acecmp): Ditto.
+	(aclsort): Ditto.
+	(acltomode): Ditto.
+	(aclfrommode): Ditto.
+	(acltopbits): Ditto.
+	(aclfrompbits): Ditto.
+	(permtostr): Ditto.
+	(acltotext): Ditto.
+	(permfromstr): Ditto.
+	(aclfromtext): Ditto.
+	* syscalls.cc (access): Set errno again when needed.
+	* include/cygwin/acl.h: New file.
+	* include/sys/acl.h: Ditto.
+
+Sat Jan  8 14:46:19 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Add cygwin DLL specific CFLAGS define.
+
+Fri Jan  7 21:01:57 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (interrupt_on_return): Properly coerce assignment of
+	sigsave.func.
+
+2000-01-07  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* acconfig.h: New file.
+	* configure.in Add check for memset builtin.
+	(AC_CONFIG_HEADER): Use.
+	(STRACE_HHMMSS): Define instead of substituting.
+	(_MT_SAFE): Likewise.
+	(_CYG_THREAD_FAILSAFE): Likewise.
+	(DEBUGGING): Likewise.
+	(MT_SAFE): Substitute as a yes/no variable.
+	* Makefile.in: Remove DEBUGGING, STRACE_HHMMSS, and THREAD_FAILSAFE
+	variables and add DEFS. Update usage of MT_SAFE to reflect yes/no
+	values. Add config.h to winsup.h dependency.
+	(CFLAGS_CONFIG): Update.
+	(INCLUDES): Prepend `-I.'.
+	* utils/Makefile.in (INCLUDES): Likewise.
+	* winsup.h: Conditionally include config.h.
+	* thread.cc: Likewise.
+	* config.h.in: Generate new file.
+	* configure: Regenerate.
+
+
+Fri Jan  7 16:21:01 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dcrt0.cc (dll_crt0): Allow signal handling for dynamically loaded
+	case.
+
+Thu Jan  6 00:30:12 2000  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink_check_one): Initialize local variable `unixattr'
+	before calling `get_file_attribute'.
+	* syscalls.cc (chown): Ditto.
+	* security.cc (get_nt_attribute): Eliminate attribute copying from
+	world to user/group in case of missing ACEs.
+	(alloc_sd): Set special rights for administrators group only if it's
+	neither owner nor group.
+	* utils/mkpasswd.c: Create entry for local group administrators (SID
+	544).
+
+Thu Jan 6 00:21:31 2000 Christopher Faylor <cgf@cygnus.com>
+
+	Change function calls to __stdcall throughout.
+	* exceptions.cc (handle_exceptions): Probe stack for return address to
+	use with new signal method.  Fill out sigsave.cx with this information.
+	(call_handler): Use sigsave.cx if it is available, rather than trying
+	to find the context of the main thread.
+	(interrupt_on_return): Use address of context rather than
+	pass-by-reference.
+	(interrupt_now): Ditto.
+
+Thu Jan  6 00:21:31 2000  Corinna Vinschen  <corinna@vinschen.de>
+
+	* grp.cc (getgroups): Return supplementary groups now.
+	* include/limits.h: Define NGROUP_MAX as 16 now.

@@ -1,0 +1,2031 @@
+Mon Dec 23 13:35:27 1996  Jeremy Allison <jra@cygnus.com>
+
+	* Makefile.in: Added $(srcdir)/../libstdc++/stl -I$(srcdir)/../libio
+	to the include path. As mmap uses STL then this is needed
+	to build the cross compiler. Also added mmap.o file.
+	* cygwin.din: Added mmap, mprotect, msync, munmap.
+	* dcrt0.cc: Added code to get the module pathname from
+	a previously unused field in the u area so fork() calls
+	don't have to search the path. Forwards compatible with 
+	earlier releases as they set this field to zero.
+	* fork.cc: Added call to recreate_mmaps_after_fork() in
+	child code. Ensures child has same view of mmap'ed areas
+	as parent.
+	* libccrt0.cc: (See dcrt0.cc change). Setup the module 
+	handle so fork can get the path name.
+	* mmap.cc: New file. Implements mmap, mprotect, msync, munmap,
+	recreate_mmaps_after_fork. Uses STL.
+	* select.cc: Added code to set errno to EINVAL if select done
+	on handles and sockets. Must fix this soon.
+	* spawn.cc: Set new variable hmodule in u area to zero for child.
+	* syscalls.cc: Added fsync functionality. No longer a dummy call.
+	* winsup.h: Decremented internal_reserved array by one to add
+	hmodule in u area. Added prototype for recreate_mmaps_after_fork().
+	* include/sys/mman.h: Fixed include file for mmap calls.
+	
+Tue Dec 17 16:20:52 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* syscalls.cc (_rename): fix code so we really do
+	return -1 if _rename fails.
+
+Tue Dec 17 12:12:29 1996  Jeremy Allison <jra@cygnus.com>
+
+	* fhandler.cc: Added Sergeys patch for FakeReadFile.
+	* cygwin.din: Re-ordered network calls.
+
+Mon Dec 16 16:47:26 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* configure.in: remove AC_C_CROSS (now part of AC_PROG_CC)
+	* utils/configure.in: ditto
+	* configure: regenerate
+	* utils/configure: regenerate
+
+Mon Dec 16 14:50:46 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* cygwin.din: export cygwin32_getsockopt
+
+	patch from sos@prospect.com.ru (Sergey Okhapkin):
+	* spawn.cc: don't assume all scripts should be run in
+	bash -- run the shell specified after the #!
+
+Fri Dec 13 16:18:22 1996  Jeremy Allison <jra@cygnus.com>
+
+	* path.cc: Added support for UNC paths.
+
+Fri Dec 13 10:56:21 1996  Jeremy Allison <jra@cygnus.com>
+
+        * cygwin.din: Added h_errno, seteuid, _seteuid.
+        * exceptions.cc: Made init_exceptions extern "C".
+        * exceptions.h: Added cplusplus wrappers to enable this to
+        be used from C.
+        * net.cc: Added error numbers, fixed gethostbyaddr, added h_errno
+        fixes.
+        * stubs.cc: Added seteuid.
+        * include/mywinsock.h: Added HOST error entries for DNS lookups.
+
+Tue Dec 10 15:38:46 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* version.h: bump CYGWIN_DLL_VERSION_MINOR to 4
+
+	patch from Marcus Daniels <marcus@sysc.pdx.edu>:
+	* fhandler.cc: add fhandler_dev_null::dup (fhandler_base *child)
+	* fhandler.h: add matching header
+
+	gnu-win32 beta 17.1 release made
+
+Thu Dec  5 14:03:08 1996  Geoffrey Noer  <noer@cygnus.com>
+
+        * select.cc: add missing end comment at about line 933.
+	gnu-win32 beta 17 release made
+
+Wed Dec  4 15:53:11 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* version.h: increment minor dll number in conjunction
+	with gnu-win32 beta 17 release
+
+Tue Dec  3 15:05:57 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* strsep.cc: new file containing Berkeley-copyrighted strsep
+	code previously in misc.cc.
+	* misc.cc: strsep moved to strsep.cc, stop including
+	unistd.h, strings.h, sys/types.h, stddef.h, and stdarg.h
+	* Makefile.in: appropriate adjustments to add strsep.cc
+
+Tue Dec  3 13:50:59 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* include/sys/copying.dj: new file whose presence is
+	required by include/sys/file.h
+
+Tue Dec  3 13:37:27 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	Throughout all Cygnus-developped source files: put all
+	code under GPL
+
+Tue Dec  3 10:54:01 1996  Jeremy Allison <jra@cygnus.com>
+
+	* fork.cc: Changed code to delete [] saved child_hinfo
+	after allocate_pid called. Needed as child changes this
+	value in the shared area when it de-linearizes fd array.
+	Needed to stop race condition with earlier fix.
+	* winsup.h: Changed definition of item in hinfo to be
+	a char array rather than fhandler_console. Stops
+	destructor being called when fork delete [] of
+	hinfo array called.
+	* hinfo.cc: Changes (casts) to support winsup.h changes.
+
+Mon Dec  2 17:22:13 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* include/utime.h: add ifdef _UTIME_U wrapper around header
+
+Mon Dec  2 15:45:46 1996  Jeremy Allison <jra@cygnus.com>
+
+	* fork.cc: Fixed file descriptor resource leak in parent.
+	* registry.cc: Removed fatal error if registry key cannot
+	be opened. Causes errors in service code.
+
+Wed Nov 27 15:40:15 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* cygwin.din: for MS compatibility, also export functions
+	as _funcname = funcname
+	* include/netdb:
+	* include/sys/socket.h:
+	Do the equivalent thing for functions exported as cygwin32_funcname
+
+Wed Nov 27 15:14:30 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* cygwin.din: remove exported helper functions that shouldn't
+	need to be exported (_read et al)
+	* glob/Makefile.in: add SHELL definition
+	* utils/Makefile.in: add SHELL definition
+
+Mon Nov 25 14:24:52 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* include/commdlg.h, ddeml.h, winadvapi.h, winbase.h, wincon.h,
+	windef.h, windowsx.h, winerror.h, wingdi.h, winkernel.h, winnt.h,
+	wintypes.h, winuser.h, winversion.h:
+	Add MS-style header files back, each of which now includes our
+	windows.h.  This should allow compilation of Windows code
+	that expects normal MS-named headers as long as the information
+	is in our windows.h somewhere.  The appropriate wrappers have
+	been added to each file so windows.h isn't included more than
+	once.
+	* include/windows.h: add paranoia wrapper so it can be included
+	more than once.
+
+Mon Nov 18 22:19:40 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* Makefile.in: change rules around so new-cygwin.dll is
+	only rebuilt when necessary 
+	* spawn.cc: include <stdlib.h>
+
+Mon Nov 18 21:08:15 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* net.cc: remove extern "C"s that shouldn't be there
+	(get_win95_ifconf, get_winnt_ifconf, get_if_flags)
+	* syscalls.cc: remove extern "C"s from num_entries, _stat_worker
+	* winsup.h: add extern "C"s for syscalls protos
+
+Mon Nov 18 20:35:39 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* winsup.h: include version.h
+	* Makefile.in: remove dependencies involving version.h, but add
+	version.h to winsup.h dependency line and also add others that
+	should also be there.
+	* dcrt0.cc:
+	* libccrt0.cc:
+	* registry.cc:
+	* shared.cc: delete includes of version.h
+
+Mon Nov 18 20:16:37 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* stubs.c -> stubs.cc, add extern "C"s
+	* uname.c -> uname.cc, add extern "C"s
+	* console.cc: add extern "C"s, remove include windows.h
+	since its already included in winsup.h
+	* dirsearch.cc: add extern "C"s
+	* fcntl.cc: add extern "C"s
+	* winsup.h: remove LEAN_AND_MEAN define since that's no longer
+	relevant with new windows headers, include version.h
+	* malloc.cc: fix typos
+
+Mon Nov 18 18:02:31 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* grp.c renamed to grp.cc, add extern "C"s
+	* misc.c renamed to misc.cc, add extern "C"s
+
+Mon Nov 18 16:08:26 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* syscalls.cc: extern "C"'d function calls
+	* net.cc: extern "C"'d function calls, some respacing
+	* hinfo.cc: extern "C"'d function calls, some respacing
+	* syscalls.h: removed defines for MIN, errno, alloca(x),
+	DEFAULT_GID/UID, NOT_OPEN_FD(fd), STD_RBITS et al,
+	O_NOSYMLINK
+	* winsup.h: added what was just deleted from syscalls.h
+
+Mon Nov 18 15:56:22 1996  Jeremy Allison <jra@cygnus.com>
+
+	* cygwin.din: Added readv
+	* syscalls.cc: Added readv code.
+	* syscalls.h: Added readv prototype.
+
+Wed Nov 13 15:55:14 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* cygwin.din: added C++-related exports for stuff in
+	libgcc.a (from new.o, tinfo.o, tinfo2.o, exception.o).
+
+Mon Nov 11 15:50:26 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* dcrt0.cc
+	* dirsearch.cc
+	* malloc.cc
+	* passwd.cc
+	* path.cc,
+	* pinfo.cc
+	* syslog.cc
+	* utils/kill.cc
+	* utils/cygwin.cc:
+	need to #include <stdlib.h> which used to be included
+	automatically in windows.h included by winsup.h.
+	* shared.cc: UnmapViewOfFile takes a void *, not a 
+	const void *
+	* malloc.cc: formatting fixes
+
+Fri Nov  8 17:31:55 1996  Jeremy Allison <jra@cygnus.com>
+
+	* select.cc: Added fix for HANDLE select sent by
+	Sergey Okhapkin.
+	* fhandler.h: Changed dup to return int. Can now
+	return error to dup2.
+	* fhandler.cc: Changed dup to return error code.
+	Corrected fhandler_console::close to return
+	error code.
+	* hinfo.cc (dup2): Check return code from
+	fhandler->dup.
+	* times.cc: Changed DST calculation as tm struct
+	month starts at zero, NT wMonth starts at 1.
+	* TODO: Added the things i'd like to do.
+
+Wed Nov  6 17:42:31 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* Makefile.in: Changed name of base file for cygwin.dll from
+	base to cygwin.base.  Changed name of exp file for cygwin.dll 
+	from win.exp to cygwin.exp.  Updated dependency list, removing
+	recently removed files like libcfork.cc, added missing files,
+	and added all missing header dependencies.  Small formatting
+	fixes.
+
+Fri Nov  1 16:38:48 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* TODO: deleted old stuff from a long time ago, added some
+	new stuff
+
+	* added public domain disclaimers to all files missing them,
+	reformatting of non-imported code to conform to GNU standards.
+	Changes to:
+	delqueue.h, exceptions.h, fcntl.cc, fhandler.h, grp.c,
+	init.cc, ioctl.cc, key.cc, libcctype.c, libcerr.cc, libcmain.cc,
+	misc.c, path.h, pold.c, resource.cc, smallprint.c, strerror.cc,
+	syslog.cc, termios.cc, test.c, version.h, wait.cc
+
+Fri Nov  1 14:44:29 1996 Jeremy Allison <jra@cygnus.com>
+
+	* fhandler.h: Added is_console() method needed by
+	new select code.
+	* fhandler.cc (fhandler_console::init): Added c_oflag setting
+	dependent on bin parameter.
+	* select.cc: Added code to implement select from console
+	handles. Ignores keyup events and still blocks.
+
+Wed Oct 30 16:35:41 1996 Jeremy Allison <jra@cygnus.com>
+
+	* fhandler.h: Removed fhandler_console_in, fhandler_console_out
+	and integrated them both into fhandler_console. Added output_handle_
+	so fhandler console has two handles. 
+	* fhandler.cc: Updated to support changes in fhandler.h. It is now
+	possible to open("/dev/tty") and read/write to the same fd.
+	* hinfo.cc(build_fhandler): Removed references to obsolete classes.
+	* spawn.cc: Changed to get correct reference to output_handle_ for
+	fhandler_console class.
+	* console.cc: Changed to get output handle rather than input handle.
+	* winsup.h: Changed definition of prototypes for functions changed
+	in console.cc
+
+Wed Oct 30 13:05:33 1996  Geoffrey Noer  <noer@cygnus.com>
+
+        * include/custcntl.h
+        * include/features.h
+        * include/icmp.h
+        * include/wchar.h
+        * include/cygwin32/icmp.h
+        * include/cygwin32/ip.h
+        * include/cygwin32/sockios.h
+        * include/cygwin32/types.h
+        * include/cygwin32/uio.h
+        * include/sys/ttychars.h
+        Added comment with name of header to each so that these are no
+        longer empty files (some unzip programs won't create
+        zero-length files which is a problem for headers)
+
+Sun Oct 27 17:30:03 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* cygwin.din: also export "_execl = execl" and the same
+	for _execle and _execlp
+
+Thu Oct 24 01:43:29 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* include/windows.h: rewritten to include headers from
+	the include/Windows32 subdirectory
+	* winsup.h: no longer define MAX_PATH here since it's defined
+	in header files dragged in by windows.h
+	* dirsearch.cc (readdir): change WIN32_FIND_DATAA to WIN32_FIND_DATA
+	* libccrt0.cc: #include <stdlib.h>
+	* syscalls.cc (_unlink): chmod file to be unlinked to be
+	writable and try to delete it again if first delete failed
+	with permission denied error (rm will now work on read-only files)
+	(num_entries): change WIN32_FIND_DATAA to WIN32_FIND_DATA
+	* include/commdlg.h: delete
+	* include/ddeml.h: delete
+	* include/winadvapi.h: delete
+	* include/winbase.h: delete
+	* include/wincon.h: delete
+	* include/windef.h: delete
+	* include/windowsx.h: delete
+	* include/winerror.h: delete
+	* include/wingdi.h: delete
+	* include/winkernel.h: delete
+	* include/winnt.h: delete
+	* include/wintypes.h: delete
+	* include/winuser.h: delete
+	* include/winversion.h: delete
+
+Wed Oct 23 10:43:05 1996  Jeremy Allison <jra@cygnus.com>
+
+	* dcrt0.cc (api_fatal): Changed locking clear of
+	process table to unlocking clear. Needed as lock code calls
+	api_fatal.
+	* exceptions.cc: Added debug_printfs to follow exceptions in
+	strace mode.
+	* pinfo.cc: Added code to ensure fd table is cleared when new
+	pid entry allocated. Fixed bug when process is terminated
+	violently by TerminateProcess and leaves fd table non-zero.
+	* termios.cc: Changed stubbed out syscalls to syscall_printf
+	rather than small_printf. Stops annoying tcdrain message.
+	* winsup.h: Made get_empty_pinfo call private to pinfo_list.
+	Should never be called external to this class.
+
+Tue Oct 22 16:14:23 1996  Jeremy Allison <jra@cygnus.com>
+
+	* hinfo.cc: Removed previous change. This is not the
+	correct place to flush input events.
+
+Tue Oct 22 09:25:32 1996  Jeremy Allison <jra@cygnus.com>
+
+	* dcrt0.cc: Fixed up exit code to clean up pinfo array.
+	* exceptions.cc: Fixed up exit code to clean up pinfo array.
+	* fork.cc: Tidied up access to inuse_p entry. Added flags
+	to allow different states to be represented.
+	* hinfo.cc: Added code to flush pending events if
+	stdin is a console.
+	* pinfo.cc (pinfo::record_death): Added code to clean
+	the pinfo array if we are an exiting parent.
+	* spawn.cc: Removed erroneous code to clean childs
+	pinfo entry.
+	* wait.cc: Changed WAIT_ERROR_RC to Win32 WAIT_FAILED.
+	Tidied up access to pinfo array.
+	* winsup.h: Added record_death_nolock to pinfo class.
+	Added PID_XXX types for inuse_p.
+
+Tue Oct 22 01:26:52 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* include/Windows32/Base.h:
+	* include/Windows32/Functions.h:
+	* include/Windows32/Structures.h:
+	* include/Windows32/UnicodeFunctions.h:
+	Fixes to just commited changes
+
+Mon Oct 21 19:58:50 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* include/Windows32/ASCIIFunctions.h:
+	* include/Windows32/Base.h:
+	* include/Windows32/Defines.h:
+	* include/Windows32/Functions.h:
+	* include/Windows32/Structures.h:
+	* include/Windows32/UnicodeFunctions.h:
+
+	Add back items in old include files (commdlg.h, ddeml.h,
+	shellapi.h, winadvapi.h, winbase.h, wincon.h, windef.h,
+	windowsx.h, winerror.h, wingdi.h, winkernel.h, winnt.h,
+	wintypes.h, winuser.h, winversion.h) which should now be able
+	to be erased and windows.h modified to point to the new headers
+	without anything nasty happening. 
+
+	* include/WINREADME: deleted
+	* include/mywinsock.h: removed many blank lines
+
+Mon Oct 21 09:48:00 1996  Jeremy Allison <jra@cygnus.com>
+
+	* select.cc: Re-written from scratch. Take account of
+	the following cases. (1). All sockets [written&works]
+        (2). Handles, sockets and always readies [written,not tested]
+        (3). All handles [written,not tested]. (4). Handles & sockets
+        with timeout [not yet written,returns -1]. Correctly blocks
+	and doesn't spin cpu.
+        * pinfo.cc: Changed to add global lock around pinfo array.
+	* fork.cc: Changed to use global pinfo lock.
+	* shared.cc: Fixed bug with fork()->exec()->exec() code.
+	* net.cc: Removed select_init() call (no longer used).
+	* spawn.cc: Implemented suggestion that spawn creates
+	process suspended, then sets up it's dwProcessId entry
+	in the shared pinfo array.
+	* wait.cc: Changed to use global pinfo lock.
+	* winsup.h: Added missing windows_95() call.
+	* fhandler.h: Changed ifdefs to select new always_ready
+	methods.
+	* fhandler.cc (fhandler_console::write): Fixed bug
+	where return of write_normal was being ignored.
+	* dcrt0.cc: Added code to use global pinfo lock.
+	Ensure that process records it's own death.
+	* exceptions.cc: Added code to clear our entry in pinfo
+	array when we are exiting. Should reduce dead processes in
+	pinfo array.
+	* include/winbase.h: Added MAXIMUM_WAIT_OBJECTS define.
+
+Mon Oct 21 00:52:17 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* Makefile.in: install headers from new Windows32 dir
+
+Sat Oct 19 00:47:58 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* include/Windows32/Base.h: change DWORD to unsigned int from
+	unsigned long, change __WIN32__ checks to _WIN32, change
+	// comments to /* */
+
+Fri Oct 18 17:33:07 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* include/Windows32/Defines.h: change INFINITE to 0xFFFFFFFF,
+	add back definitions present in old winsup headers missing from
+	this file (STATUS_WAIT_0 et al, CONTEXT stuff, FAR, PACKED,
+	ASCIICHAR)
+	* include/Windows32/Functions.h: change // comments to /* */
+	* include/Windows32/Messages.h: add definitions for WM_NULL,
+	WM_PENWINFIRST, WM_PENWINLAST
+	* include/Windows32/Sockets.h: change __WIN32__ checks to _WIN32
+	* include/Windows32/Structures.h: add ppc case for CONTEXT
+	structure, change // comments to /* */
+
+Fri Oct 18 17:25:09 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* include/Windows32: new directory for Windows headers
+	* include/Windows32/ASCIIFunctions.h:
+	* include/Windows32/Base.h:
+	* include/Windows32/Defines.h:
+	* include/Windows32/Errors.h:
+	* include/Windows32/Functions.h:
+	* include/Windows32/Messages.h:
+	* include/Windows32/Sockets.h:
+	* include/Windows32/Structures.h:
+	* include/Windows32/UnicodeFunctions.h:
+	New Win32 headers from Scott Christley's windows32api-0.1.2 package
+	with no local modifications.
+
+Wed Oct 16 17:16:33 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* key.cc: remove extra blank lines, change ASCIICHAR to AsciiChar
+	* registry.cc: remove #include <winbase.h> since it's already
+	included in windows.h
+
+Tue Oct 15 09:51:48 1996  Jeremy Allison <jra@cygnus.com>
+
+	* fhandler.h: Many changes to support moving fhandler array out of
+        shared area into locally allocated memory. Removed fhandler class,
+        fhandler_base is now root of class tree. Re-arranged class definitions
+        to make it clear what functions are virtual and can be overridden.
+	Inlined may accessor functions.
+        * fhandler.cc: Many changes to support moving fhandler array out of
+        shared area into locally allocated memory. unix_path_name_ is now
+	always set (all fhandler_base classes have a name).
+	* hinfo.cc: Many changes to support moving fhandler array out of
+        shared area into locally allocated memory. Added linearization and
+	de-linearization functions.
+	* net.cc(socket): Added code to keep name for fhandler_socket.
+	* pinfo.cc : Changed allocation of fhandler_base array to be in local
+        memory rather than in shared area. (modified functions are pinfo_init,
+	pinfo_list::get_empty_pinfo, pinfo_list::allocate_pid,
+	pinfo::record_death).
+	* shared.cc: Added functions to copy fd area for spawned process.
+	Changed name of shared area to include master version number of
+	Cygwin32.
+	* spawn.cc (spawn_guts): Added code to initialize new shared area
+	for fds.
+	* syscalls.cc: Changed all code depending on NOFILE to use
+	getdtablesize(). Added internal setdtablesize() call for exec'ed 
+	processes.
+	* syscalls.h: Added getdtablesize().
+	* sysconf.cc (sysconf): Changed SC_OPEN_MAX to return getdtablesize().
+	* winsup.h: Moved fhandler array out of shared area. Changed from
+	fhandler to fhandler_base (new root of class tree).
+	* include/mywinsock.h: Updated #endif to make end of
+	__INSIDE_CYGWIN32__ clear.
+	* include/winkernel.h: Added UnmapViewOfFile call.
+
+Mon Oct 14 14:59:16 1996  Geoffrey Noer  <noer@cygnus.com>
+
+        * sysdef/i386: replace all files with ones from Scott
+	Christley's windows32api-0.1.2 package.  Still need to
+	integrate new headers.
+
+Mon Oct 14 13:41:14 1996  Geoffrey Noer  <noer@cygnus.com>
+
+        * syscalls.cc (_unlink): need to fchmod file to writable
+	before attempting to delete.  This change still needs more
+	work (fchmod isn't written yet).
+	* (fchmod): change comment
+
+Fri Oct 11 22:27:17 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* fhandler.cc, fhandler.h: minor fixes to console
+	support functions (remove missed reference to gotarg2,
+	definition in fhandler.h)
+
+Wed Oct  9 17:55:00 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* delqueue.cc: added copyright notice, reformatted file
+
+	from sos@prospect.com.ru (Sergey Okhapkin):
+	* fhandler.cc, fhandler.h: add/fix ansi/vt100 console support,
+	and fix a tab bug
+	(modified functions are fhandler_console_out::clear_screen,
+	fhandler_console_out::clear_to_eol,
+	fhandler_console_out::char_command,
+	fhandler_console_out::write,
+	FakeReadFile)
+
+Wed Oct  9 17:32:17 1996  Jeremy Allison <jra@cygnus.com>
+
+	* times.cc: Swapped gmtime and localtime (they were
+	incorrectly reversed).
+	Added is_dst determination to them both.
+	* misc.c: Added swab, ffs.
+	* fcntl.cc(fcntl): Added capability for lock calls.
+	* fhandler.h: Added lock method into fhandler class.
+	* fhandler.cc: Added NT/Win95 semantics locks into ::lock
+	made them pretend they are POSIX locks.
+	* syscalls.cc (writev): Fixed return value bug.
+	* net.cc: Added WSAEOPNOTSUPP error.
+	* cygwin.din: Added ffs and swab.
+	* include/strings.h: Added file (just include string.h).
+	* include/winbase.h: Added defines LOCKFILE_FAIL_IMMEDIATELY
+	and LOCKFILE_EXCLUSIVE_LOCK.
+	* include/winerror.h: Added define ERROR_LOCK_FAILED.
+
+Thu Oct  3 16:19:23 1996  Jeremy Allison <jra@cygnus.com>
+
+	* fhandler.h: Many changes - removed all public variables
+	from classes, replaced with accessor functions. Renamed all
+	class variables to add a trailing '_'. This makes reading
+	and understanding which variables are class variables much simpler.
+	Changed name member to unix_path_name_ and made dynamic rather
+	than a fixed 31 byte buffer per entry.
+        * fhandler.cc: Updated varable access for above.
+	* fcntl.cc: Updated varable access for above.
+	* hinfo.cc: Updated varable access for above.
+	* spawn.cc: Updated varable access for above.
+	* syscalls.cc: Added fsync (null call) and fchmod(null
+	call at present).
+	* net.cc: Added ioctls for SIOCGIFCONF and SIOCGIFFLAGS.
+	Added ntohs, ntohl, static functions get_winnt_ifconf,
+	get_win95_ifconf and get_if_flags.
+	* include/cygwin32/if.h: Added structs for new ioctls.
+	* include/cygwin32/socket.h: Added iovec include.
+	* include/asm/socket.h: Added defines for above ioctls.
+	* cygwin.din: Added ntohs, ntohl, fsync, fchmod.
+
+Wed Oct  2 17:34:21 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* utils/configure.in: add call to AC_CANONICAL_SYSTEM
+	* utils/configure: regenerate
+	* Makefile.in: build cygwin.dll as new-cygwin.dll and install as
+	cygwin.dll to prevent confusion when building winsup natively
+
+Tue Oct 1 17:27:34 1996  Jeremy Allison (jra@cygnus.com)
+
+	* include/regex.h: Added.
+	* net.cc: Added WSAECONNRESET, WSAEPFNOSUPPORT to
+	errmap array.
+
+Tue Oct 1 15:40:39 1996  Jeremy Allison (jra@cygnus.com)
+
+	* fork.cc (cygwin_fork_helper1): Fixed resource leak of process
+	handles, added cleanup code. Also fixed timout problem when child
+	cannot be initialized.
+	* dirsearch.cc (readdir): Changed comparison to explicitly check for
+	INVALID_HANDLE_VALUE. Test < 0 fails with void *.
+	* syscalls.cc (num_entries): Changed comparison to explicitly check for
+	INVALID_HANDLE_VALUE. Test < 0 fails with void *.
+	* cygwin.din: Added regcomp, regexec, regerror, regfree.
+	* Makefile.in: Added EXTRA_OFILES containing ../librx/rx.o. Added
+	comment to explain makefrag. Added ../newlib/libc/include to include
+	path.
+
+Mon Sep 30 16:10:56 1996  Stu Grossman  (grossman@critters.cygnus.com)
+
+	* cygwin.din:  Remove getopt and friends.
+
+Fri Sep 27 18:31:28 1996  Jeremy Allison <jra@cygnus.com>
+
+	* dcrt0.cc (dll_crt_1): Moved initialization of _reent to correct
+	position.
+
+Fri Sep 27 14:24:05 1996  Jeremy Allison <jra@cygnus.com>
+
+	* dcrt0.cc (dll_crt_1): Fixed fork bug with _impure_ptr not being
+	initialized correctly in a forked child. This should fix
+	the bash echo in a sub-shell bug.
+	* include/sys/uio.h: Created file. Contains definitions for writev
+	* include/limits.h: Added IOV_MAX and SSIZE_MAX.
+	* syscalls.cc: Added writev, changed read and write to return ssize_t.
+	* syscalls.h: Added writev, changed read and write to return ssize_t.
+	* cygwin.din: Added writev call.
+
+Wed Sep 20 13:09:00 1996  Jeremy Allison <jra@cygnus.com>
+
+	* include/mntent.h: Added MOUNTED definition, needed by
+	some code.
+	* dcrt0.cc : Added __progname for getopt code.
+	* misc.c: Added getw code.
+	* cygwin.din: Added getopt, optarg, opterr, optind
+	optopt, putw, getw calls.
+
+Fri Sep 20 03:03:17 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* select.cc: change long millisec to unsigned int,
+	respaced file
+
+	patch from Sergey Okhapkin <sos@prospect.com.ru>:
+	* select.cc (polled): fix for select to get keyboard input
+	working properly (check EventType != KEY_EVENT instead
+	of checking for KeyEvent.AsciiChar == 0)
+	* select.cc (cygwin32_select): make int i unsigned int so NULL is
+	a valid timeout argument for loop 
+
+Fri Sep 13 18:21:52 1996  Jeremy Allison <jra@cygnus.com>
+
+	* fhandler.cc (fhandler_base::read): rewrite text mode read
+
+Fri Sep 13 14:58:17 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* exceptions.cc (call_handler): fix control-C not working
+	problem by setting rethere variable before the old value is
+	clobbered.
+
+Thu Sep 12 16:27:00 1996  Jeremy Allison <jra@cygnus.com>
+
+	* syslog.cc (pass_handler) : Removed duplicate code
+	in pass_handler::print(). Added get_win95_event_log_path()
+	to facilitate moving to registry configuration.
+
+Thu Sep 12 12:56:00 1996  Jeremy Allison <jra@cygnus.com>
+
+	* syslog.cc : Added real openlog, syslog, logmask, closelog
+	calls. syslog logs to event log on NT, file on Win95.
+	* include/winnt.h : added EVENTLOG_xx_TYPE definitions.
+	* include/winadvapi.h : added ReportEventA, RegisterEventSourceA
+	DeregisterEventSourceA declarations.
+	* include/winkernel.h : added LockFile, UnlockFile, LockFileEx,
+	UnlockFileEx declarations.
+	* include/wintypes.h : added PSID typedef.
+	* include/sys/syslog.h : added options flag definitions for openlog.
+
+Wed Sep 11 15:34:09 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* fhandler.cc (popen): delete stub in favor of newlib's
+	(pclose): delete stub in favor of newlib's
+
+Tue Sep 10 17:20:56 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* configure.in: don't transform names (the only time this might
+	be a good idea is for unix x cygwin32)
+	* configure: regenerated with autoconf
+
+Tue Sep 10 17:20:56 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	patch from Sergey Okhapkin <sos@prospect.com.ru>:
+	* fhandler.cc (FakeReadFile): support arrow keys, stop treating
+	bringing window to front as a key down (resulting in random
+	characters being printed in bash).
+
+Mon Sep  9 19:09:36 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* syscalls.cc (system): fix system call
+
+Fri Sep  6 09:33:13 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* fhandler.h (fhandler_base): Make execable_p public char, not
+	private signed char.  Delete get_execable.
+	* fhandler.cc (fhandler_base::get_execable): Renamed to
+	check_execable_p.
+	(fhandler_base::open): Restore symlink support.
+	Set execable_p, symlink_p.
+	(fhandler_base::fstat): Replace call to get_execable with reference
+	to execable_p.
+	(fhandler_base::fhandler_base): Set execable_p to 0.
+	* path.h (symlink_check): Declare it.
+	* path.cc (symlink_check): New function.
+	(readlink): Call it.
+	(symlink_follow): Likewise.  New arg EXEC, callers updated.
+	* syscalls.cc (_stat_worker): New arg CALLER, callers updated.
+
+	* syscalls.cc: Delete all occurences of in/out and MARK.
+
+Thu Sep  5 18:51:01 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* fork.cc: Don't include <ctype.h>.  Delete find_exec and support.
+	* spawn.cc: Include <ctype.h>.  Move find_exec and support here.
+	(perhaps_suffix): New argument report_failure_p, callers updated.
+	(find_exec_1): Use perhaps_suffix when scanning PATH.
+	(spawn_guts): Replace code to translate posix to win32 path lists
+	with calls to utility fns that do the job.
+
+Wed Sep  4 13:30:57 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* path.cc (readlink): Make more bulletproof.
+
+Wed Aug 28 16:44:24 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* syscalls.cc (system): use execlp
+	* public release beta 16 made
+
+Tue Aug 27 09:58:14 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* version.h (CYGWIN_DLL_VERSION_MINOR): Bump up to 2.
+
+Mon Aug 26 15:12:44 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* syscalls.cc (system): added basic system() call.
+
+Mon Aug 26 13:46:30 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* cygwin.din (cygwin_fork_helper__FPvN30): Delete.
+	(vfork,select): Add.
+	* fork.cc (prepare_child): Delete, contents moved into
+	cygwin_fork_helper1.
+	(cygwin_fork_helper): Delete, contents moved into __fork.
+	* winsup.h (cygwin_fork_helper): Delete.
+
+	* path.cc: #include <fcntl.h>.
+	(symlink,readlink): Reenable, rewrite.
+	(symlink_follow): New function.
+	* path.h (symlink): Delete.
+	(SYMLINK_COOKIE, MAX_LINK_DEPTH): Define.
+	(symlink_follow): Declare.
+	* spawn.cc (spawn_guts): Rewrite symlink support.
+
+	* syscalls.cc (_unlink): Make arg a const char *.
+	* winsup.h (_unlink): Likewise.
+
+	* spawn.cc (spawn_guts): Fix allocation of stack space for sh.exe path.
+
+	* include/sys/errno.h: Deleted.  Use newlib's.
+
+Fri Aug 23 16:00:00 1996  Jeremy Allison <jra@cygnus.com>
+
+	* net.cc (getdomainname): Changed win95 code to open
+	"System" key rather than "SYSTEM". I think the registry
+	is case-sensitive.
+ 
+Thu Aug 22 17:04:09 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	move fork into the dll:
+	* libcfork.cc: deleted
+	* fork.cc (vfork): used to be in libcfork.cc
+	* (__fork): used to be in libcfork.cc
+	* (fork): used to be in libcfork.cc	
+	* Makefile.in: don't build libcfork.cc any more
+	* libccrt0.cc: set data_start, etc. from dll structure
+	* winsup.h: add data_start, etc. to public vars in dll
+	* cygwin.din: list fork
+
+Thu Aug 22 01:36:53 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* registry.cc: fix new registry code
+	* syscalls.cc: make Windows95 check function extern "C"
+
+Wed Aug 21 16:15:47 1996  Geoffrey Noer  <noer@cygnus.com>
+
+        * cygwin.din: list vfork
+        * dirsearch.cc: fix errno setting in readdir that caused
+        diff to not function on directories
+        * pipe.cc: reformatted
+
+Wed Aug 21 15:12:47 1996  Jeremy Allison <jra@cygnus.com>
+
+	* net.cc (domainname): Changed getdomainname to get the 
+	information from the registry.
+	* registry.h:  Modified interface to reg_key.
+	* registry.cc: Added open(),close() calls, made 
+	get/set string values return error indication, added trailing 
+	underscore to hkey member so it can be seen to 
+	be a class member.
+	* include/winadvapi.h: Added KEY_READ and KEY write
+	defines for registry access.
+
+Mon Aug 19 09:22:35 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* path.cc (split_path): New function.
+	* path.h (split_path): Declare it.
+	* cygwin.din (cygwin32_split_path): Export it.
+
+	* include/winkernel.h (FILE_SHARE_DELETE): Define.
+
+	* syscalls.cc (__do_global_[cd]tors], __main): Move from here.
+	* dcrt0.cc: To here.
+
+	* dcrt0.cc (recur): Restore (now that we know WHY it was needed).
+	(dll_crt0_1): Probe forked child's stack out.
+
+	* fork.cc (FORK_WAIT_TIMEOUT): Bump up to two minutes.
+	
+	* fork.cc (dump_jmp_buf): New function.
+	(cygwin_fork_helper1): Call it.
+	* dcrt0.cc (dll_crt0:1): Call it.
+	* winsup.h (dump_jmp_buf): Declare it.
+
+	* fork.cc (cygwin_fork_helper1): Reenable child suspend before
+	stack copy code.
+
+Sat Aug 17 04:06:36 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* dirsearch.cc: reformatted, removed a couple of gotos
+
+Thu Aug 15 17:56:08 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* cygwin.din: added __eprintf, a newlib function needed by assert.
+	* times.cc: swap gmtime and localtime (gmtime really was localtime
+	and vice versa).
+
+Tue Aug 13 03:46:22 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* signal.cc: renamed all signal variables "sig",
+	fixed signal range error checking in all relevant functions,
+	(sigaddset): new
+	(sigismember): new
+	(sigfillset): new
+	(sigemptyset): new
+	* cygwin.din: added corresponding entries for new signal functions.
+	* cygwin.h: added protos for them 
+	* fhandler.cc, fhandler.h: major reformat of code
+	* net.cc (cygwin32_socket): call checkinit() at start to
+	initialize WinSock in case it isn't already.
+	* syscalls.cc (access): set errno appropriately when no
+	write access
+	* fcntl.cc: reformatting
+
+Sat Aug 10 16:30:14 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* signal.cc (_raise): rewrite to shorten code, corrected
+	return values.  
+	* fcntl.cc, net.cc, signal.cc, stubs.c: reformatted, added
+	public domain notice at the tops if they were missing.   
+
+Fri Aug  9 18:19:12 1996  Geoffrey Noer  <noer@cygnus.com>
+
+        * syscalls.cc (_rename): return -1 if file to be renamed
+        doesn't exist.  Reformatted whole file.
+	* fork.cc: increase timeout value to 60 sec from 30 sec
+
+Thu Aug  8 17:44:39 1996  Jim Wilson  <wilson@cygnus.com>
+
+	* config/i386/longjmp.c: Increment %eax if it is zero.
+
+Wed Aug  7 15:51:04 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* include/sys/mman.h: fixed defines for PROT_READ et al to
+	match what's more normally there in unix
+	* sysdef/i386/*: removed the extra underscores present in most
+	of these files that shouldn't have been there
+	* net.cc: cleaned up whitespace, formatting
+
+Tue Jul 16 12:43:16 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* libccrt0.cc (__version): Deleted, unused.
+
+	* uname.c (uname): Print CYGWIN_DLL_VERSION is version field.
+
+Mon Jul 15 16:48:29 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* version.h (CYGWIN_DLL_VERSION_MINOR): Bump up to 1.
+
+	Path handling clean up, pass 2 (use //<letter>, not /.<letter>.).
+	* path.cc (SLASH_DRIVE_PREFIX_LEN): Delete.
+	(slash_drive_to_win32_path): New function.
+	(mount_info::posix_path_p): Delete support for $CYGWIN,
+	always return 1.
+	(path_conv::path_conv): Call slash_drive_to_win32_path.
+	(mount_info::conv_to_win32_path): Renamed from
+	posix_path_to_win32_path.  All callers updated.
+	(mount_info::conv_to_posix_path): Renamed from
+	win32_path_to_posix_path.  All callers updated.
+	(normalize_posix_path): Keep two leading /'s (or \'s).
+	(normalize_win32_path): Likewise.
+	(conv_to_{win32,posix}_path): Renamed from
+	{posix,win32}_path_to_{win32,posix}_path_keep_rel.
+	(conv_to_full_{win32,posix}_path): Renamed from
+	{posix,win32}_path_to_full_{win32,posix}_path.
+	(posix_path_list_p): New function.
+	(cygwin32_{unix,dos}_path_to_{dos,unix}_path_keep_rel): Delete.
+	({unix,dos}_path_to_{dos,unix}_path): Delete.
+	({win32,posix}_to_{posix,win32}_path_list_buf_size): Renamed from
+	cygwin32_{win32,posix}_to_{posix,win32}_path_list_buf_size.
+	({win32,posix}_to_{posix,win32}_path_list): Renamed from
+	cygwin32_{win32,posix}_to_{posix,win32}_path_list.
+	(slash_drive_prefix_p): Recognize //<letter>, not /.<letter>.
+	(build_slash_drive_prefix): Update.
+	* path.h: Update.
+	* cygwin.din ({dos,unix}_path_to_{unix,dos}_path): Delete.
+	(cygwin32_{dos,unix}_path_to_{unix,dos}_path_keep_rel): Delete.
+	(cygwin32_conv_to_{posix,win32}_path): Renamed from
+	(cygwin32_{win32,posix}_path_to_{posix,win32}_path_keep_rel.
+	(cygwin32_conv_to_full_{posix,win32}): New exports.
+	(cygwin32_posix_path_list_p): New export.
+	* dcrt0.cc (path_len): Delete.
+	(PATH_ENV_BUF_SIZE): Delete.
+	(conv_path_names): Delete all but PATH.
+	(dll_crt0_1): Rewrite environment variable conversion code.
+	* fork.cc (find_exec_1): Delete _SC_PATH_RULES support.  Determine
+	path delimiter by calling posix_path_list_p.
+	* shared.cc (shared_info::initialize): Delete `path_rules'.
+	* sysconf.cc (sysconf): Delete _SC_PATH_RULES.
+	* winsup.h (shared_info): Delete `path_rules'.
+
+	* fork.cc (cygwin_fork_helper1): Reset u->forkee after child has
+	started.
+
+	* pinfo.cc (pinfo::init_from_fork): Delete.  Empty function.
+	* fork.cc (cygwin_fork_helper1): Delete call to it.
+
+	* utils/kill.cc (usage): New function.
+	(main): Allow multiple pids to be passed.  Call usage.
+
+Mon Jul 15 13:07:23 1996  Michael Meissner  <meissner@tiktok.cygnus.com>
+
+	* Makefile.in (install): If cross compiling, install the
+	cygwin.dll file as $target_alias-cygwin.dll in the bin directory,
+	instead of plain cygin.dll.
+	Install the cygwin.dll file in the library directory as well.
+
+	* configure.in: Test for cross compiling, and if cross compiling,
+	transform name of cygwin.dll file in the binary directory.
+
+	* configure: Regenerate.
+
+	* utils/Makefile.in (Makefile): Rebuild Makefile if configure.in
+	changes.
+	(install): Use the toplevel install.sh to install the utilities,
+	and transform the name if cross compiling.
+
+	* utils/configure.in: Test for cross compiling, and if cross
+	compiling, tranform mount, umount, ps, etc.  Do not call
+	AC_PROG_INSTALL anymore.
+
+	* utils/configure: Regenerate.
+
+Fri Jul 12 16:25:09 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	*  Makefile.in: also make install in utils subdir so "mount"
+	et al gets installed.
+
+Thu Jul 11 17:53:31 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* include/sys/param.h: fixed value of HZ (now 1000 instead of 100).
+	caused bug that showed up as "time sleep 5" returning 50.
+
+Thu Jul 11 14:08:09 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* fhandler.cc: correct typo in comment
+	* exceptions.cc: remove definition of sig_func_ptr, replace
+	occurances with newlib-defined _sig_func_ptr.
+
+Wed Jul 10 19:12:18 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* version.h (CYGWIN_DLL_VERSION_{MAJOR,MINOR}): Bump up to 17.0.
+	* winsup.h (class per_process): New members {public,internal}_reserved.
+	(SIZEOF_PER_PROCESS): Define.
+	* dcrt0.cc (dll_crt0_1): Add sanity check of per_process size.
+	Don't call checkout for forkee.
+	* libccrt0.cc (cygwin_crt0): Set magic_biscuit to sizeof per_process
+	again.
+
+	* utils/ps.cc (main): Print uid.
+
+	* hinfo.h: Deleted.  Contents moved to winsup.h.
+	* Makefile.in (WINSUP_H): Update.
+
+	* dcrt0.cc (u, environ): Moved here.
+	* shared.cc: From here.
+
+	* pinfo.cc (pinfo_init): Renamed from pinfo_init_per_process.
+	All callers updated.
+	* hinfo.cc (hmap_init): Renamed from hmap_init_per_process.
+	All callers updated.
+	* winsup.h (cygwin_parent_p): Renamed from invoked_by_cygwin_p.
+	All uses updated.
+
+	* fork.cc (prepare_child): Add debug message.
+
+	* uinfo.cc (uinfo_init): Renamed from uinfo::init.
+	All callers updated.  Call getlogin instead of GetUserName.
+	(getlogin): Call GetUserName.
+	* winsup.h (class uinfo): Delete.  Members uid,gid moved ...
+	(class pinfo): To here.  All uses updated.
+	(class shared_info): Delete member `u'.
+	* fork.cc (cygwin_fork_helper1): Set child's uid,gid.
+
+	* pinfo.cc (pinfo::clearout): Reset strace_mask_ptr.
+
+	* shared.cc (open_shared_file_map): Add debugging message.
+
+Fri Jul  5 15:36:48 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* exceptions.cc (sig_func_ptr): New typedef.
+	(__stack_trace): Make i386 and ppc formats the same.
+	(sigfunc): Use sig_func_ptr.
+	(call_handler): Likewise.  All callers updated.
+	(__cygwin_exception_handler): Handle exceptions before dll has
+	fully initialized.  Only call dump_status once, like __stack_trace.
+	(really_exit): Call _exit, not exit.
+
+	* hinfo.cc: Add copyright.
+	* uinfo.cc: Likewise.
+
+	* passwd.c: Whitespace cleanup.
+	(search_for): Make static.
+
+	* pinfo.cc (pinfo_list::init): Delete call to clearout vec[0].
+	(pinfo::clearout): Reset more fields.
+	(pinfo_list::get_empty_pinfo): Delete printing of error messages
+	if table is full.
+
+	* shared.cc (open_shared_file_map): Mark shared map as not inherited.
+
+	* signal.cc (signal): Delete (void *) coersion of result.
+	(usleep): Convert microseconds to milliseconds.  Delete second copy.
+	(_raise): Use _sig_func_ptr.
+
+	* syscalls.h: Delete #include mntent.h, sys/types.h, string.h,
+	stdio.h, setjmp.h, stdlib.h, signal.h, sys/strace.h, unistd.h,
+	ctype.h, fcntl.h.
+	* winsup.h: #include sys/types.h, sys/strace.h, setjmp.h, signal.h,
+	string.h, windows.h.
+	* All necessary files updated.
+
+	* winsup.h (class pinfo): Delete member localtime_buf.
+	* times.cc (corelocaltime): Use static local for localtime_buf.
+
+	* winsup.h (class pinfo): Rename the_pid to pid.  All uses updated.
+	Delete handle_valid_p, unused. Rename __sig_mask to sig_mask.
+
+Thu Jul  4 14:36:01 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* shared.h: Deleted.  All files updated.
+	* winsup.h: shared.h contents moved here.
+	* Makefile.in (WINSUP_H): Update.
+
+	* heap.cc: Renamed from pproc.cc.
+	(heap_init): Renamed from per_process::init.
+	In forkee initialization, ensure memory being reserved is at same
+	address as parent's.  Commit forkee memory in one chunk.
+	(_sbrk): Moved here,
+	* syscalls.cc (_sbrk): From here.
+	* Makefile.in (DLL_OFILES): Update.
+	* dcrt0.cc (dll_crt0_1): Call heap_init instead of u->init.
+	* winsup.h (class per_process): Delete member `init'.
+
+	* dcrt0.cc (recur): Delete.
+	(dos_argv_to_unix_argv): Delete.
+
+	* delqueue.cc: Delete #include of delqueue.h, winerror.h
+	* winsup.h: #include delqueue.h.
+
+	* exceptions.cc (ctrl_c_handler): Only require 13 ^c's to quit task.
+
+	* fork.cc (fork_mutex,forkee_stopped,forker_stopped): New static
+	globals, were in class_shared info.
+	(fork_init,fork_terminate): New functions.
+	(prepare_child,cygwin_fork_helper1): Update.
+	(cygwin_fork_helper1): If fork disabled, return EAGAIN.
+	Delete unnecessary resetting of forkee_stopped event.
+	* winsup.h (fork_init,fork_terminate): Declare them.
+	* dcrt0.cc (dll_crt0_1): Call fork_init.
+	(_exit): Call fork_terminate.
+	* shared.c (shared_info::initialize): Delete init of fork stuff.
+
+	* shared.c (h): New static global, was in class shared_info.
+	(shared_info::terminate): Delete, move contents into shared_terminate.
+
+	* strace.cc (flush_p): New static global.
+	(strace_init): Don't clobber u->strace_mask if _STRACE_INHERIT set.
+	(__sys_printf): Only flush buffers if _STRACE_FLUSH.
+	* include/sys/strace.h (_STRACE_FLUSH,_STRACE_INHERIT): Define.
+	Reorganize bitmasks.
+
+	* utils/ps.cc (main): Make output prettier.
+
+Wed Jul  3 12:30:24 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* utils/Makefile.in (mount,umount,ps,kill): Rewrite rules.
+	(PROGS): Add cygwin.
+	(cygwin): New target.
+	(install): Install all of $(PROGS).
+	* utils/cygwin.cc: New file.
+
+	* pinfo.cc (pinfo_init_per_process): PID environment variable handling
+	moved here.  Delete setting of u->parent.  Set strace_mask_ptr.
+	Set invoked_by_cygwin_p appropriately.
+	(vfork_init): Delete, unused.
+	(pinfo::init_self): Delete setting of root_p.
+	(pinfo::terminate): root_p renamed to invoked_by_cygwin_p.
+	* winsup.h (class per_process): Delete initial_pid, no longer used.
+	(class pinfo): Add strace_mask_ptr.
+	* fork.cc (cygwin_fork_helper1): Update.
+
+	* winsup.h (class per_process): Delete trace_file, trace_mutex.
+	Rename estrace to strace_mask.
+	(system_printf): Declare.
+	* strace.cc (strace_init): Renamed from per_process::strace_init.
+	Don't open trace file unless strace environment variable set.
+	Open trace file with FILE_SHARE_READ so others can read trace file
+	while tracing in progress.  Print error if $strace too big.
+	(strace_file, strace_mutex): New static globals.
+	(__sys_printf): Don't do anything if strace file not opened.
+	(system_printf): New function.
+	* pproc.cc (per_process::init): Delete call to strace_init.
+	* dcrt0 (dll_crt0_1): Call strace_init as soon as possible.
+	
+	* dcrt0 (dll_crt0_1): Delete local can_glob, use
+	u->self->invoked_by_cygwin_p instead.
+	Move PID environment variable handling into pinfo_init_per_process.
+	Delete setting of u->self->in_bash.
+	Delete watching for bash.
+	* winsup.h (class pinfo): Delete in_bash.
+
+	* exceptions.cc (*): Call system_printf, not __sys_printf.
+
+	* shared.h (class shared_info): Delete pp, unused.
+
+	* syscalls.cc (isatty): Replace ttyname with is_tty.
+
+	* winsup.h (registry_init_once_only): Delete, unused.
+	(stdout_handle,file_handle_from_fd): Likewise.
+	(CHILD_P,child_p,ALL_FS,loadup_dll,cygwin_s): Likewise.
+	(unmixedcaseify): Prototype moved to path.h.
+	* path.h (unmixedcaseify): Declare.
+
+	* fork.cc (FORK_WAIT_TIMEOUT, WAIT_ERROR_RC): Define.
+	(find_exec_1): Don't search PATH if directory present (not only if
+	absolute path).  Search "." before searching PATH.
+	(copy): Return boolean indicating success.  All callers updated.
+	(prepare_child): Simplify.  Check return code of WaitForSingleObject.
+	Don't wait an infinite amount of time.
+	(cygwin_fork_helper1): Simplify.
+	Check return code of WaitForSingleObject.
+	Don't wait an infinite amount of time.
+	Check return code of copy.
+	Disable code to Suspend/Resume child thread a second time.
+
+	* winsup.h (class per_process): Make initial_sp a char *.
+	* libccrt0.cc (cygwin_crt0): Update.
+
+	* path.cc (path_conv): If name too long, set path to bogus value.
+
+	* include/winkernel.h (WriteProcessMemory): Fix prototype.
+
+	* include/sys/strace.h: Add extern "C" ifdef __cplusplus.
+	(_STRACE): Delete.
+	* dirsearch.cc (rewinddir): Use syscall_printf.
+
+Tue Jul  2 14:44:18 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* wait.cc (WAIT_ERROR_RC): Use it instead of ALL_FS.
+	(wait_found): New argument `options'.  If GetExitCodeProcess fails,
+	ensure `result' contains something reasonable.
+	(wait_for_single): Check whether `c' is NULL before dereferencing it.
+	(wait_for_any): Add some comments.  Delete unnecessary gotos.
+	(waitpid): Print message if called with intpid == 0.
+
+Sat Jun 29 10:49:28 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* dirsearch.cc (readdir): Clean up syscall tracing.
+	Mixed case handling temporarily disabled.
+
+Wed Jun 26 11:54:27 1996  Jason Molenda  (crash@godzilla.cygnus.co.jp)
+
+	* Makefile.in (bindir, libdir, datadir, infodir, includedir):
+	Use autoconf-set values.
+	(docdir): Removed.
+	(install-info): Add.
+	* configure.in (AC_PREREQ): autoconf 2.5 or higher.
+	* configure: Rebuilt.
+	* glob/configure.in (AC_PREREQ): autoconf 2.5 or higher.
+	* glob/configure: Rebuilt.
+	* utils/Makefile.in (bindir, exec_prefix): Use autoconf-set values.
+	* utils/configure.in (AC_PREREQ): autoconf 2.5 or higher.
+	* utils/configure: Rebuilt.
+
+Tue Jun 25 17:48:56 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* include/sys/param.h (PATH_MAX,MAXPATHLEN): Change from 1024 to 259.
+	(BIG_ENDIAN,LITTLE_ENDIAN,BYTE_ORDER): Define.
+
+Mon Jun 24 16:35:48 1996  Mark Eichin  <eichin@cygnus.com>
+
+	* fhandler.cc (read): Replace the old broken igncr code (which has
+	been disabled for a while anyway) with code that checks for
+	ENABLE_LINE_INPUT and replace only \r\n with \n.
+
+Mon Jun 24 00:12:22 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* dcrt0.cc (dll_crt0_1): Convert argv[0] to posix style if necessary.
+
+Sun Jun 23 17:21:41 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* version.h (CYGWIN_DLL_VERSION_MINOR): Bump up to 2.
+
+	* fork.cc (perhaps_suffix): Simplify.
+	(find_exec_1): Likewise.  Always try appending .exe first.
+	(cygwin_fork_helper1): Clean up (lots more needed still).
+	Test for split heap before calling CreateProcess.
+	No longer call find_exec, now done at start up.
+	* dcrt0.cc (dll_crt0_1): Call find_exec to expand argv[0].
+
+	* path.cc (conv_path_list_buf_size): New function.
+	(cygwin32_{win32,posix}_to_{posix,win32}_path_list_buf_size): Ditto.
+	(conv_path_list): Ditto.
+	(cygwin32_{win32,posix}_to_{posix,win32}_path_list): Ditto.
+	* cygwin.din: Export them.
+
+	* misc.c (small_printf): Delete.
+	(vhangup): Set errno.
+
+	* syscalls.cc (isatty): Print syscall trace message even if error.
+
+	* console.cc (*): Check return codes of win32 api calls.
+
+	* syscalls.cc (chmod): Set errno of SetFileAttributes fails.
+	Fix call to syscall_printf.
+
+Thu Jun 20 00:43:52 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* dcrt0.cc (dll_crt0_1): Save full program name.
+	* fork.cc (cygwin_fork_helper1): Always call find_exec.
+
+	* path.cc (normalize_{posix,win32}_path): Fix edge case handling.
+	(path_conv::path_conv): Ensure path is \-ified if win32 path rules.
+
+	* spawn.cc (spawn_guts): Set errno if CreateProcess fails.
+
+Wed Jun 19 00:18:03 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* path.h (PATH_RULES macros): Delete.  Use ones in unistd.h.
+	(enum path_rules_enum): Deleted.  All uses updated.
+	(path_conv): Rename member get_native to get_win32.  All uses updated.
+	(*win32_path*): Renamed from *native_path*.
+	* path.cc (*win32_path*): Renamed from *native_path*.
+	(mount_info::posix_path_p): Prepend '_' to PATH_RULES.
+	Fix returning of cached value.
+	(slash_drive_prefix_p, build_slash_drive_prefix): New functions.
+	(mount_info::posix_path_to_win32_path): /.<letter>. is a drive spec.
+	(path_conv::path_conv): Likewise.
+	(mount_info::win32_path_to_posix_path): Convert unknown drives to
+	/.<letter>.  Normalize win32_path.
+	(normalize_win32_path): New functions.
+	(getcwd_inner): New arg `posix_p'.  All callers updated.
+	* shared.cc (shared_info::initialize): Prepend '_' to PATH_RULES.
+	_PATH_RULES_NATIVE -> _PATH_RULES_WIN32.
+	* spawn.cc (*win32_path*): Renamed from *native_path*.
+	* dcrt0.cc: Likewise.
+	* cygwin.din: Likewise.
+
+	* Makefile.in (WINSUP_H): Add shared.h
+
+	* smallprint.c (rn): Make static.
+
+	* sysconf.cc: Renamed from sysconf.c.
+	(sysconf): Support _SC_PATH_RULES.
+
+	* screen.c: Deleted.
+	* Makefile.in (DLL_OFILES): Delete screen.o.
+
+	* fork.cc (cygwin_fork_helper): Don't pass 0 from longjmp to setjmp.
+
+	* path.h (class mount_info): Update posix_path_to_native_path member.
+	* path.cc (path_prefix_p): Rewrite.
+	New arg `len'.  All callers updated.
+	(mount_info::binary_native_path_p): Call path_prefix_p.
+	(path_conv::path_conv): Pass full_path to binary_native_path_p.
+	(mount_info::posix_path_to_native_path): Delete arg keep_rel_p.
+	New arg full_native_path.  All callers updated.  Don't call
+	getcwd_inner if unnecessary.  Rewrite relative path handling.
+	(mount_info::native_path_to_posix_path): Call path_prefix_p.
+	Call slashify on `pathbuf', not original argument.
+
+	* syscalls.cc (chdir): Fix lifetime of converted path.
+
+Tue Jun 18 11:48:51 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* configure.in (EXE_LDFLAGS): Explicitly link with newlib if necessary.
+	* configure: Regenerated.
+	* Makefile.in (EXE_LDFLAGS): Define.
+	(FLAGS_TO_PASS): Add EXE_LDFLAGS.
+	(config.status): New target.
+	(utils-all): Depend on $(LIBNAME).
+	* utils/Makefile.in (EXE_LDFLAGS): Define.
+	(mount,umount,ps,kill): Link with $(EXE_LDFLAGS).
+
+	* version.h (CYGWIN_DLL_VERSION_MINOR): Bump up to 1.
+
+Mon Jun 17 18:29:54 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	Improve pathname handling, first pass.
+	* path.h (symlink): Renamed from link_cookie.
+	(class path_conv): New member error.
+	(path_conv::get_native): Renamed from get_dos, all uses updated.
+	(path_conv::get_binary): Delete.
+	(mount_info::{mangle,reverse_mangle}): Delete.
+	(mount_item::posix_path_to_native_path): Renamed from mangle.
+	(mount_info::native_path_to_posix_path): Renamed from reverse_mangle.
+	(path_rules_enum): Define.
+	* path.cc: Temporarily disable mixed-case and symlink handling.
+	(mount_info::posix_path_p): New function.
+	(mount_info::binary_native_path_p): Renamed from binary_dos_path_p.
+	(path_conv::path_conv): Handle native path rules.
+	(mount_item::{mangle,reverse_mangle}): Delete.
+	(mount_info::posix_path_to_native_path): Renamed from mangle.
+	(mount_info::native_path_to_posix_path): Renamed from reverse_mangle.
+	(mount_info::from_registry): Set nmounts.  Use MAX_PATH.
+	(mount_info::{add,del}_item): Rewrite.
+	(slashify): Renamed from flip_slash.
+	(getcwd_inner): Make static.  Don't convert to posix path if using
+	native path rules.
+	(file_exists): Delete.
+	(addmntent,hasmntopt): Delete.
+	(mount): Only update registry if mount succeeded.
+	(umount): Only update registry if umount succeeded.
+	(normalize_posix_path): Renamed from normalize_path.  Pass in cwd.
+	(cygwin32_{posix,native}_path_to_{native,posix}_path_keep_rel): Renamed
+	from ...{unix/dos}....
+	* dcrt0.cc (dos_argv_to_unix_argv): #ifdef out.
+	(dll_crt0_1): Don't call it.
+	* fhandler.cc (fhandler_base::open): Temporarily disable symlinks.
+	* shared.cc (open_shared_file_map): New function.
+	(shared_init): Call it.
+	(shared_info::initialize): Fetch `path_rules' from registry.
+	* shared.h (inited): Make private.
+	(path_rules): New member.
+	* spawn.cc: #include "shared.h".
+	(spawn_guts, env var translation): Don't translate path names if
+	using native path rules.
+	* syscalls.cc (symlink): Delete (moved to path.cc).
+	* cygwin.din (dump__5pinfo): Delete.
+	(cygwin32_{posix,native}_path_to_{native,posix}_path_keep_rel): Renamed
+	from ...{unix/dos}....
+
+	* smallout.cc: Delete.
+	* sdata.cc: Delete.
+	* shared.cc (u,s,environ): Define here.
+	* Makefile.in (glob/libglob.a): Depend on glob/glob.c, glob/fnmatch.c.
+	(utils-all): New target.
+	(DLL_OFILES): Delete smallout.o, sdata.o.
+	(Makefile): Depend on cygwin.din.
+	(WINSUP_H): Depend on syscalls.h.
+
+	* configure.in (AC_CONFIG_SUBDIRS): Add bin.
+	(AC_PROG_INSTALL): Call.
+	* configure: Regenerated.
+	* utils/{Makefile.in,configure.in,configure}: New files.
+	* utils/{kill.cc,mount.cc,ps.cc,umount.cc,termcap}: New files.
+	* Makefile.in (UTILS_ALL): Define.
+	(all): Depend on $(UTILS_ALL).
+	(utils-all): New target.
+
+	* dcrt0.cc (recur): Make no-op to see what happens.
+	(globify): Don't call glob if unnecessary.
+	Check return code from glob.
+	(api_fatal): New function.
+	* fhandler.cc (fhandler_base::read): Dump first few chars read.
+	(fhandler_base::get_execable): New function.
+	(fhandler_base::fstat): Use it.
+	(fhandler_base::fhandler_base): Init execable_p.
+	(fhandler_disk_file::fhandler_disk_file): Delete execable_p.
+	(fhandler::{get,set}_execable_bit): Delete.
+	(fhandler_disk_file::{get,set}_execable_bit): Delete.
+	* fhandler.h (class fhandler): Delete {get,set}_execable_bit.
+	(class fhandler_base): New member execable_p.
+	New member fn get_execable.
+	* fork.cc: Simplify/cleanup.
+	(cygwin_fork_helper1): Use MAX_PATH, not MAXPATHLEN.
+	* pinfo.cc (pinfo::dump): Delete.
+	* pproc.cc (per_process::set_envname): Delete.
+	* strace.cc (smallout::do_pline): Delete.
+	* syscalls.h (readlink): Third arg is an int.
+	* winsup.h (class pinfo, member progname): Use MAX_PATH.
+	(class pinfo, member dump): Delete.
+	(class smallout): Delete.
+	(smallout): Delete.
+	(class per_process, member set_envname): Delete.
+	(file_exists): Delete.
+	(api_fatal): Declare.
+	* Makefile.in (LIB{C,CXX}FLAGS_FOR_TARGET): Delete, use {C,CXX}FLAGS.
+	(FLAGS_TO_PASS): Define.
+	(glob/libglob.a): Delete duplicate entry.
+
+	* syscalls.cc (_sbrk): Update u->size when heap is grown.
+
+	* hinfo.cc (hmap_init_per_process): Ensure stdout's handle != stderr's.
+
+Fri Jun 14 06:32:13 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* register.h, registry.cc: Whitespace cleanup.
+
+Thu Jun 13 20:57:28 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* Makefile.in (install): Install cygwin.dll in $(bindir).
+
+Tue Jun 11 13:46:17 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* fhandler.cc: lseek is now only binary mode, interpret control
+	z characters as EOF when reading from a file.  Reformatted some
+	of the code (cleaned up line spacing, etc.)
+
+Tue Jun 11 09:50:09 1996  Jason Molenda  (crash@kyriath.cygnus.com)
+
+	* path.cc (nofinalslash): move it so it is next to its friends
+	flip_slash and backslashify.
+
+Mon Jun 10 18:57:03 1996  Jason Molenda  (crash@kyriath.cygnus.com)
+
+	* path.cc (*): Pretty printing.
+	(unix_path_to_dos_path_with_rel): use "dosnamein" and "unixnameout"
+	instead of "path" & "real_path".
+	(dos_path_to_unix_path_keep_rel): delete obsolete code.
+	(mount_item::mangle): use "unixnamein" and "dosnameout" instead of
+	"unixname" and "dosname".
+	(mount_info::mangle): use "unixnamein" and "dosnameout".  Remove
+	obsolete code.
+	* path.h (mount_item): Update prototypes, add comment.
+	(mount_info): Update prototypes.
+
+Mon Jun 10 17:05:23 1996  Jason Molenda  (crash@kyriath.cygnus.com)
+
+	* path.cc (mount_item::reverse_mangle): Pretty printing,
+	add a bit to the comment.
+	(getcwd_inner): use MAX_PATH not MAXPATHLEN.
+	(normalize_path): use MAX_PATH not MAXPATHLEN.
+	(link_cookie::follow): use MAX_PATH not MAXPATHLEN.
+
+Mon Jun 10 15:36:32 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* Makefile.in: changed $(DOC) so it doesn't include html
+	files; made a new info-html target that does the html
+	versions of the docs.  Since most customers don't have texi2html
+	installed, the make shouldn't fail because of this.
+	* configure: regenerated with autoconf 2.8
+
+Sun Jun  9 17:10:37 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* version.c: Deleted.
+	* version.h: New file.
+	* winsup.h (VERSION): Deleted.
+	(class per_process): Add version_major, version_minor.  Delete version.
+	* registry.cc: #include "version.h".
+	(reg_session::reg_session): Update.
+	* libccrt0.cc: #include "version.h"
+	(cygwin_crt0): Delete setting of version, set magic_biscuit to 0.
+	Set version_major, version_minor.
+	* dcrt0.cc: #include "version.h".
+	(cygwin_dll_version_{major,minor}): New static locals.
+	(dll_crt0_1): Rewrite app/dll compatibility test.
+	* Makefile.in (LIBCOS): Delete version.o.
+	(DLL_OFILES): Delete version.o.
+	(dcrt0.o,libccrt0.o,registry.o): Depend on version.h.
+
+	* exceptions.h: New file.
+	* exceptions.cc: Massive cleanups (still lots more to go).
+	#include "exceptions.h".
+	(init_exceptions): Renamed from __init_exceptions.  New argument of
+	pointer to exception handler list entry.
+	(init_exception_handler): Renamed from init_thread_exceptions.
+	Rewrite based on info from Onno Hovers <onno@stack.urc.tue.nl>.
+	(ppc descriptor_to_{function,gotattr}): Make static.
+	(i386 __stack_trace): Fix test for top of stack.
+	* dcrt0.cc: #include "exceptions.h".
+	(dll_crt0_1): Exception handler list entry must live on stack.
+	* winsup.h (class pinfo): Delete member myp.
+	* syscalls.h (struct exception_list): Delete.
+	(__really_exit, __init_exceptions): Delete.
+	* Makefile.in (dcrt0.o,exceptions.o): Depend on exceptions.h.
+
+Fri Jun  7 17:49:28 1996  Jason Molenda  (crash@phydeaux.cygnus.com)
+
+	* dcrt0.cc (conv_path_names): Add GCC_EXEC_PREFIX.
+
+Fri Jun  7 14:38:05 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* Makefile.in (CC_FOR_TARGET,LD,DLLTOOL): Define.
+	(AR,RANLIB): Set via configure.
+	* configure.in (AR,LD,DLLTOOL): Set.
+	(AC_PROG_RANLIB): Call.
+	* configure: Regenerated.
+
+Thu Jun  6 12:11:23 1996  Kim Knuttila  <krk@cygnus.com>
+
+	* dcrt0.cc (dll_crt0_1): Removed reference to reent_data._next.
+
+Tue Jun  4 15:52:29 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	* include/winkernel.h: fixed typo
+
+Tue May 28 13:08:25 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* syscalls.cc (_sbrk): Fix test of return value from VirtualAlloc.
+	Delete lincr, make incr signed, and use only it.  Misc. minor cleanup.
+
+Thu May 23 17:31:57 1996  Geoffrey Noer  <noer@cygnus.com>
+
+	sac diffs applied:
+	* path.h: change MAXMOUNTS to 30 instead of 20
+	* sysdef/i386/rpcndr.def: add "none" to end of file
+	* fhandler.cc: fix memset call to say sizeof (*buf) instead
+	of sizeof (buf).
+	* include/winuser.h: define MDIS_ALLCHILDSTYLES
+	* Makefile.in: entry to build glob/libglob.a:
+
+Thu May 23 10:38:43 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* fhandler.h (class fhandler_base): Make `name' private and shrink
+	to 32 bytes.
+	(set_name): Declare.
+	* fhandler.cc (fhandler::set_name): New function.
+	(fhander_base::open): Call it.
+	(fhander_base::init): Call it.
+	(fhandler_tty::ttyname): Call get_name instead of accessing `name'
+	directly.
+
+	* dcrt0.cc (dll_crt0_1): Call ExitProcess instead of exit if
+	DLL and APP are out of sync.
+
+Thu May 16 03:07:18 1996  Mark Eichin  <eichin@cygnus.com>
+
+	* fhandler.cc (FakeReadFile): new function. Interface like
+	ReadFile, only called from fhandler_console_in::read, calls
+	ReadFile unless we're really reading from STD_INPUT_HANDLE and
+	with ENABLE_LINE_INPUT turned off, in which case we use
+	ReadConsoleInput instead. When using ReadConsoleInput, always read
+	all available events, but only block if we don't get at least one
+	actual character. This would be the place to implement FIONBIO on
+	the console tty, which doesn't actually exist yet.
+	(dbg_input_event): copied from select.cc, debugging code to show
+	detail of what events we're actually getting.
+	(ioctl): off-by-one on window size.
+
+Wed May 15 18:11:16 1996  Jim Wilson  <wilson@chestnut.cygnus.com>
+
+	* fhandler.h (class fhandler_base): Use MAXPATHLEN not 100 for size
+	of array name.
+
+Wed May 15 11:14:46 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* fork.cc (cygwin_fork_helper1): More debugging printf's.
+
+	* dcrt0.cc (num_ms_env_vars): Renamed from ms_env_arity.
+	(build_argv): Renamed from fill.
+	(compute_argc): Renamed from prepare.
+	* libccrt0.cc (cygwin_statu): Make static.
+	* pproc.cc (per_process::init): Move strace initialization from here,
+	* strace.cc (per_process::strace_init): To here.
+	Pass FILE_SHARE_WRITE to CreateFileA.  Print error message if open
+	of log file fails.  Create mutex for trace messages.
+	(__sys_printf): Always write to end of disk files.  Use mutex.
+	(d): Delete.
+	* winsup.h (class per_process): Add strace_init.  Reorganize.
+	`run_ctors' renamed to `run_ctors_p'.  New member `trace_mutex'.
+	(d): Delete.
+	(PATH_MAX): Delete.
+
+	* Makefile.in: Add header file dependencies.
+
+	* dcrt0.cc (_exit): Add debugging printf.
+	* shared.h (class shared_info): Rename member mutex_a to fork_mutex.
+	* fork.cc (cygwin_fork_helper1): Update.
+	Return with error if process slot unavailable.
+	Set errno and release fork_mutex if failed because of split heap.
+	* shared.cc (shared_info::terminate): Update.
+	(shared_info::initialize): Update.
+
+Tue May 14 14:59:32 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* fork.cc (cygwin_fork_helper1): Avoid SIGSEGV if allocate_pid fails.
+
+	* pproc.cc (per_process::init): Fix test.
+
+	* winsup.h (): Rename member `parent' to `ppid'.
+	* fork.cc (prepare_child): Update.
+	(cygwin_fork_helper1): Likewise.
+	* hinfo.cc (hmap_init_per_process): Likewise.
+	(hinfo_vec::dup_for_fork): Fix message.
+	(hinfo_vec::dup2): Fix args to debug_printf.  Delete extra printf's.
+	* pinfo.cc (pinfo_init_per_process): Update.
+	(pinfo::dump): Likewise.
+	(pinfo::init_self): Likewise.
+	* pproc.cc (per_process::init): Open strace file in append mode.
+	* smallprintf.c (__small_vsprintf): Support %p.
+	* syscalls.cc (getppid): Update.
+	* wait.cc (wait_for_any): Likewise.
+	
+Mon May 13 13:45:36 1996  Mark Eichin  <eichin@cygnus.com>
+
+	* fhandler.cc (ioctl): fix TIOCGWINSZ handling: (1) check the
+	error return (2) if we're trying on STD_INPUT_HANDLE, substitute
+	STD_OUTPUT_HANDLE since GetConsoleScreenBufferInfo only works on
+	console output (3) check srWindow for the *screen* size, instead
+	of checking dwSize for the scroll buffer size.
+
+	* include/sys/errno.h (ECONNABORTED): add another errno value.
+	* net.cc (errmap): add ECONNABORTED case.
+
+	* fhandler.cc (fstat): clear the *entire* stat buf, not just the
+	first four bytes.
+
+Fri May 10 17:59:09 1996  Mark Eichin  <eichin@cygnus.com>
+
+	* select.cc: change most debugging statements to select_printf.
+ 	(dbg_input_event): new function, prints an INPUT_RECORD via select
+ 	printf.
+	(polled): Don't sleep around WaitForMultipleObjects; let it have a
+ 	10ms timeout until we have time to test it with 0.  If
+ 	WaitForMultipleObjects says that STD_INPUT_HANDLE has data, use
+ 	PeekConsoleInput to scan the available events. If the first one is
+ 	not a *bKeyDown* with a non-zero *AsciiChar* then use
+ 	ReadConsoleInput to rip it off the queue, and pretend it wasn't
+ 	there, so that later calls to read (and thus ReadFile) don't block
+ 	because they can't find any *real* input. (This could be optimized
+	later to check the whole queue, and if there are *no* real input
+	events, nuke them all.)
+
+	* include/sys/strace.h (_STRACE_SELECT, select_printf): new printf
+	category, because select needs a *lot* of work. STRACE=256 to use it.
+
+	* fhandler.cc (fhandler_console_in::init): IGNCR can't work
+ 	without major changes to deal with the interaction with select
+ 	(which shouldn't wake up if IGNCR causes the whole input to be
+ 	deleted...) so don't make it the default.
+	(fhandler_console_out::tcgetattr, fhandler_tty::tcgetattr): don't
+ 	set IGNCR based on get_r_binary either.
+
+Wed May  8 20:20:05 1996  Mark Eichin  <eichin@cygnus.com>
+
+	* times.cc (__to_clock_t): must cast dwLowDateTime to *unsigned*
+	before adding it -- otherwise we may subtract it!
+	(to_time_t): same.
+
+Wed May  8 18:21:28 1996  Mark Eichin  <eichin@cygnus.com>
+
+	* times.cc (corelocaltime): new function. Basic localtime from
+	newlib, with no conversions.
+	(gmtime): just calls corelocaltime.
+	(localtime): uses GetTimeZoneInformation, biases to standard time
+	first, then uses DaylightDate and StandardDate to figure out if
+	we're in DST -- and calls corelocaltime a second time with the
+	rebiased seconds, if we are.
+	(times): add debug_printf statements which work around apparent
+	compiler bug and 7+ minute error.
+
+	* select.cc: revert to <sac>'s changes of 4/20 which were
+	accidentally backed out on 4/24.
+
+Tue May  7 05:29:42 1996  Mark Eichin  <eichin@cygnus.com>
+
+	* times.cc (__to_clock_t): subtract out FACTOR, the difference
+	between 1601 and 1970, just like to_time_t() does.
+
+Tue May  7 01:55:06 1996  Mark Eichin  <eichin@cygnus.com>
+
+	* times.cc (gmtime): new function. Use GetTimeZoneInformation to
+	compensate ahead before calling localtime (since the newlib
+	version doesn't know what timezone we're in.)
+	(localtime): use SECSPERMIN, not 60, to show that we know what
+	we're talking about.
+
+	* net.cc (errmap): add WSAEADDRINUSE, WSAECONNREFUSED mappings.
+
+Sun May  5 00:45:59 1996  Mark Eichin  <eichin@cygnus.com>
+
+	* include/sys/socket.h: add recvfrom macro and cygwin32_recvfrom
+	declaration. Remove htons/htonl misdeclarations as they collide
+	with the macros in asm/byteorder.h.
+
+	* include/asm/byteorder.h: enable the ntohl/ntohs declarations so
+	we at least get the macro versions when we optimize, even if the
+	library hooks aren't there.
+
+Wed Apr 24 23:42:49 1996  Steve Chamberlain  <sac@dilithium.transmeta.com>
+
+	* winsup.h (pinfo, pinfo_list): Remove dummy item.	
+	* fork.cc (*): Revert changes of Apr 2.
+
+Sun Apr 21 17:00:14 1996  Steve Chamberlain  <sac@slash.cygnus.com>
+
+	* wait.cc (wait_for_any): Fix the wait heuristic.
+
+Sat Apr 20 13:22:03 1996  Steve Chamberlain  <sac@slash.cygnus.com>
+
+	* Makefile.in (.cc.o): Pass -fno-rtti.
+	* dcrt0.cc (globify): A single match is ok.
+	* exceptions.cc (i386 call_handler): optimize.
+	* fhandler.cc (fhandler_console_in::read): Handle ICRNL right.
+	(*:get_name *:always_ready): New.
+	* select.cc: Understand that console output doesn't signal when it's
+	ready.
+
+Fri Apr 12 14:49:34 1996  Doug Evans  <dje@canuck.cygnus.com>
+
+	* Makefile.in (glob/libglob.a): Pass -I so glob.c finds right dirent.h.
+
+Wed Apr 10 16:13:30 1996  steve chamberlain  <sac@slash.cygnus.com>
+
+	* Makefile.in (glob/libglob.a): Call glob makefile correctly.
+	* winsup.h (pinfo, pinfo_list): Reorder elements to avoid
+	alignment bug in PPC gcc.
+	
+Tue Apr  9 17:23:57 1996  steve chamberlain  <sac@slash.cygnus.com>
+
+	* dcrt0.cc (globify): Expand command line wildcards if
+	run from dos prompt.
+
+	* exceptions.cc (386 call_handler): More fumblings.
+	* fhandler.cc (fhandler_base::stat): Initialize ino.
+	(fhandler_console::open): Fix test for RDONLY.
+	(fhandler_tty::stat): Set ino.
+	(fhandler_console_out::vt100 stuff): More.
+	* fork.cc: Lint.
+	* pinfo.cc (pinfo::init_self): Don't bother to DuplicateHandles
+	to get process info.
+	* signal.cc (usleep): Get correct order of magnitude.
+	* spawn.cc (spawn_guts): Turn of exception handling in 
+	parent of thing which execs.
+	* syscalls.cc (stat): Look for <file> and <file.exe>.
+	* wait.cc (wait_for_any): Keep waiting if WaitForMultipleObject
+	returns invalid result.
+
+Tue Apr  2 12:45:35 1996  steve chamberlain  <sac@slash.cygnus.com>
+
+	* dcrt0.cc (conv_path_names): Add HOME.
+	(dll_crt0_1): Use u->self->head_sp.
+	* exceptions.cc (i386 call_handler): Rewritten, now almost works
+	on win95.
+	* fhandler.cc (fhandler_base::open): Calculate namehash.
+	(fhandler_base::fstat): ^ name hash with file index low.
+	* fork.cc (*): forkee/forkerr events moved from sinfo
+	into pinfo.
+
+Fri Mar 29 16:35:02 1996  steve chamberlain  <sac@slash.cygnus.com>
+
+	* libcmain.cc: New.
+	* winsup.h: restore and myp moved from per_process to pinfo class.
+	* dcrt0.cc (dll_crt0_1): Cope with move.
+	* exceptions.cc (init_thread_exceptions): Ditto.
+	* signal.cc (sigprocmask): Ditto.
+	* fork.cc (cygwin_fork_helper1): Don't fork if split_heap_p.
+	* pinfo.cc (pinfo::clearout): Zero split_heap_p.
+	* syscalls.cc (_sbrk): Cope with not being able to
+	allocate contiguous chunks.
+	
+
+Tue Mar 26 09:14:32 1996  steve chamberlain  <sac@slash.cygnus.com>
+
+	* exceptions.cc (__cygwin_exception_handler): re-export.
+
+Fri Mar 22 16:49:29 1996  Michael Meissner  <meissner@tiktok.cygnus.com>
+
+	* cygwin.din (__stack_trace): Export.
+	(__cygwin_exception_handler): Ditto.
+
+	* exceptions.cc (i386 exception handling): Move under appropriate
+	x86 #ifdefs.  Use the macro HAVE_INIT_THREAD_EXCEPTIONS to be
+	whatever a machine needs to do to initialize exceptions in this
+	thread.  Nop for the PowerPC right now.
+	(__stack_trace): Make it a "C" function so there is no name
+	mangling, and export it.
+	(call_handler): Split by architecture before the function, rather
+	than inside it.  First stab at PowerPC exception handling.
+	(__cygwin_exception_handler): Rename from ehandler3, and export
+	it.  Add more status -> signal mappings.
+	(ctrl_c_handler, CTRL_LOGOFF_EVENT): Map to SIGHUP, not SIGQUIT.
+	(__stack_trace): Split into separate machine dependent functions,
+	rather than #ifdef'ing inside of a common function.  Make the
+	PowerPC messages clearer.
+
+Mon Mar 18 13:27:05 1996  Michael Meissner  <meissner@tiktok.cygnus.com>
+
+	* include/winkernel.h (CreateThread): Correctly declare function
+	pointer argument.
+
+	* misc.c (wprintf): Convert to use vprintf and fix warnings.
+	(tgetent): Declare to return int to fix warnings.
+	(vhangup): Declare to return int to fix warnings.  Return -1 also.
+
+	* include/winbase.h (UnhandledExceptionFilter): Declare.
+
+Tue Mar 12 12:56:28 1996  Doug Evans  <dje@charmed.cygnus.com>
+
+	* include/winkernel.h (FlushFileBuffers): Declare.
+
+Tue Mar 12 11:16:32 1996  Michael Meissner  <meissner@tiktok.cygnus.com>
+
+	* exceptions.cc (dump_status): Make columns line up for PowerPC.
+	(call_handler): Right now, call exit(255) for the PowerPC.
+
+	* strace.cc (__sys_printf): Call FlushFileBuffers after writing
+	out the file to make sure it really gets flushed.
+
+	* include/winkernel.h (PowerPC CONTEXT): Add fields returned if
+	CONTEXT_DEBUG_REGISTERS is set.
+
+Sun Mar 10 15:31:17 1996  Steve Chamberlain  <sac@slash.cygnus.com>
+
+	* strerror.cc, syslog.cc, net.cc: New files.
+	* cygwin.din: Add new net functions.
+	* dcrt0.cc (dll_crt0_1): Fix call to build argv[0].
+	* fhandler.cc (fhandler_base::open): Tidy.
+	* fhandler.h: Add net classes.
+	* hinfo.cc (hinfo_vec::build_fhandler): Add tape stuff.
+	* path.cc (*::mangle, *::reverse_mangle): Fix.
+	(mount_info::init): No trailing / now.
+	* select.cc (*): Rewrite.
+	* spawn.cc (spawn_guts): Fix leak.
+	* syscalls.cc (_sbrk): Keep working until memory really fills up.
+
+Tue Feb 20 16:53:24 1996  Steve Chamberlain  <sac@slash.cygnus.com>
+
+	* dcrt0.cc (dll_crt0_1): Get version from the header.
+	* fhandler.cc (CHUNK_SIZE): New.
+	(fhandler_base::read, fhandler_base::write): CRLF conversion
+	rewritten.
+	path.cc (path_conv::path_conv): Initialize mixed, binary and silent.
+	* smallprint.c (__small_vsprintf): Add 'c' option.
+	* wait.cc (wait_found): Close child handles.
+	
+Mon Feb 19 09:11:57 1996  Michael Meissner  <meissner@tiktok.cygnus.com>
+
+	* Makefile.in (real-headers): Eliminate real-headers dependency on
+	mspatches/*.patch, since you can't be guaranteed that it exists.
+
+Fri Feb 16 14:24:47 1996  Michael Meissner  <meissner@tiktok.cygnus.com>
+
+	* exceptions.cc (dump_status): On the PowerPC, dump all of the
+	integer registers.
+
+	* uname.c (uname): Don't assume that the only two NT systems are
+	i386 and PowerPC.
+	* exceptions.cc (call_handler): Ditto.
+	(dump_status): Ditto.
+
+Thu Feb 15 18:20:33 1996  Steve Chamberlain  <sac@slash.cygnus.com>
+
+	* cygwin.din (__empty): Add.
+	* dcrt0.cc (dos_argv_to_unix_argv): New.
+	(check, onetimecheck): New.
+	* exceptions.cc (ehandler3): Always show backtrace
+	if exception failed.
+	* fhandler.cc (*::open): Removed dos_path argument.  
+	(fhandler_base::fstat): Use nFileIndexLow as the inode
+	value.
+	* hinfo.cc (init_std_file_from_handle): Don't default
+	to binary.
+	* paths.cc (*): Use new registry classes.
+	* registry.cc (*): Rewritten.
+	* syscalls.cc (open): Call fhandler->open without
+	the dos filename arg.
+
+Sat Feb 10 08:18:45 1996  Michael Meissner  <meissner@tiktok.cygnus.com>
+
+	* configure.in (ALLOCA for powerpc): Add __allocate_stack.
+
+Wed Feb  7 16:41:18 1996  Steve Chamberlain  <sac@slash.cygnus.com>
+
+	Release-B13
+
+	* malloc.cc (export_*): New.  Changed the way that malloc
+	stubs are used.
+	* cygwin.din: Export the export_* stuff as malloc, realloc and free.
+	* path.cc (link_cookie::create): Keep cookie filenames in unix
+	format.
+	(reverse_mangle): Clean up.
+	(readlink): Ditto.
+	(qfunc): Sort by name too.
+	* spawn.cc (spawn_guts): Handle zero length arg.
+	Only set errno when it's not 0.
+	* Makefile.in: Build new doc.
+	* fhandler.cc (fhandler_base::fstat): Round up block used.
+	* path.cc (escape_char): Now it's ^.
+	* syscalls.cc (errmap): ERROR_INVALID_NAME yields ENOENT.
+	(chown): Returns 0.
+	(sbrk): Clean up.
+	(_unlink): Only try and DeleteFile once.
+	
+Mon Feb  5 19:15:44 1996  Steve Chamberlain  <sac@slash.cygnus.com>
+
+	* dcrt0.cc  (dll_crt0_1): Build env string into static buffer.
+	* dirsearch.c (opendir): Stat on unix pathname.
+	* paths.cc (*): Support for mixed case filenames.
+
+Sun Feb  4 15:55:58 1996  Steve Chamberlain  <sac@slash.cygnus.com>
+
+	* *.cc: Lint.
+	(conv_path_names): New.
+	(dll_crt0_1): Use conv_path_names list.
+	* fctnl.cc (F_DUPFD): Look from the fd forward.
+	* fhandler.cc (fhandler_base::open): Understand binary modes.
+	(fhandler_console_in::init): Call tcsetattr with reasonable start
+	values.
+	* spawn.cc (spawn_guts): Use conv_path_names.
+	(queue_file_deletion): Deleted.
+	(unlink): Use new queue file stuff.
+	* delqueue.cc, delqueue.h: New files.
+	* shared.h: New file.
+
+Wed Jan 31 11:12:24 1996  Steve Chamberlain  <sac@slash.cygnus.com>
+
+	* crt0.cc: Hacks to probe out ppc stack.
+	* exceptions.cc (ehander3): Don't use 386 context info on the ppc.
+	* path.cc (mount_info::mangle): Turn /usi or /usp into /usr.
+	* uname.c (uname): Change sysname and get ppc name right.
+
+Fri Jan 26 15:47:31 1996  Steve Chamberlain  <sac@slash.cygnus.com>
+
+	* pproc.cc (per_process::init): Cope when no memory is needed.
+	* Makefile.in, configure.in: Cope with config directory.
+	* setjmp.c, longjmp.c: Moved into config/i386.
+	* config/ppc/setjmp.S, config/ppc/longjmp.S: New.
+	
+Fri Jan 26 14:57:33 1996  Jason Molenda  (crash@phydeaux.cygnus.com)
+
+	* Makefile.in (DLL_OFILES): removed ppc-stub.o
+	ppc-stub.c: Removed.
+	configure: regenerated with autoconf 2.7.
+
+Fri Jan 26 11:18:07 1996  Kim Knuttila  <krk@cygnus.com>
+
+	* Makefile.in (DLL_OFILES): added ppc-stub.o
+
+Thu Jan 25 09:33:24 1996  Steve Chamberlain  <sac@slash.cygnus.com>
+
+	* malloc.cc (malloc, free, realloc): Hack for ppc.
+
+Wed Jan 24 20:22:42 1996  Steve Chamberlain  <sac@slash.cygnus.com>
+
+	* cygwin.dll (loadup_dll): Remove.
+	* dcrt0.cc: lint.
+	* fhandler.* (*): Move to new class structure.
+	* hinfo.cc: Use new fhandler glue.
+	* libcfork.cc: Cope with ppc naming convention.
+
+Mon Jan 22 10:33:53 1996  Steve Chamberlain  <sac@slash.cygnus.com>
+
+	* fhandler.h, hinfo.h: New files.
+	* winsup.h: Split from here.
+	* configure.in: Set i386 entry point correctly.
+	* fhandler.cc (fhandler_normal:open): .com files
+	are executable too.
+	* hinfo.cc (init_std_file_from_handle): Inspect
+	master_fmode_binary.
+	* misc.cc (wcscmp,  wcslen): New.
+	* dcrt0.cc (probe): Change way a forkee's stack is allocated.
+	* pproc.cc (per_process::init): Initialize using heap chunk.
+	* shared.cc (shared_info::initialize): Initialize heap chunk.
+	* syscalls.cc (_sbrk): If current chunk is used, allocate another.
+	* wait.cc (wait_found): Fix exit code.
+	
+Thu Jan 18 10:09:45 1996  Steve Chamberlain  <sac@slash.cygnus.com>
+
+	* fhandler.cc (fhandler_normal::open) Don't test a
+	com port to see if it's executable.
+	* configure.in, cygwin.din: More powerpc configury.
+
+Wed Jan 17 16:25:36 1996  Steve Chamberlain  <sac@slash.cygnus.com>
+
+	* configure.in, Makefile.in: Build powerpc stuff.
+	* hinfo.cc (build_fhandler): Use new with placement.
+	(fhandler::operator new): New.
+
+Wed Jan  3 18:18:57 1996  steve chamberlain  <sac@slash.cygnus.com>
+
+	* select.cc: New file.
+	* Makefile.in: Cope with it.
+
+Tue Jan  2 08:58:58 1996  steve chamberlain  <sac@slash.cygnus.com>
+
+	* version.c: New file.
+	* Makefile.in: Cope with it.
+	* cygwin.def (setgrent, cuserid, setpgrp, mount, setmntent, endmntent, umount): New.
+	* dcrt0.cc:  Remove obsolete vfork stuff.
+	(dll_crt0): Change way environ is built.  Check that app is built
+	with correct version of dll.
+	* dirsearch.cc, exceptions.cc: Lint.
+	* fhandler.cc: Lint. Most of termios.c moved into here.
+	(fhandler_console:*): New.
+	* hinfo.cc (hinfo_vec::init_std_file_from_handle):  Open stdfiles as consoles
+	if possible.
+	* libccrt0.cc: Lint.
+	* malloc.cc: More comments.
+	* path.cc (*):  Cope with mount handling.
+	* registry.cc: Lint. 
+	(reg_session): New.
+	* shared.cc: Lint.
+	* signal.cc (usleep): New.
+	* spawn.cc: Lint.  Removed vfork stuff.
+	* stubs.c (getmntent, endgrent): Deleted.
+	* syscalls.c (__seterrno): Now takes arguments.
+	* termios.c: Much moved info fhandler.c	
+	* times.cc (utime, utimes): New.
+	* uinfo.c (cuserid): New.

@@ -1,0 +1,1006 @@
+2000-02-11  Axel Riese  <ariese@andromeda.risc.uni-linz.ac.at>
+
+	* oaidl.h (LPTYPECOMP): Remove multiple definition.
+
+2000-02-03  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* Snapshot 2000-02-03.
+
+2000-01-21  Chris Faylor  <cgf@cygnus.com>
+
+	* include/winnt.h: Add ARM support.
+
+2000-01-19  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	From Greg Primes <gregory.l.priem@intel.com>:
+	* include/oaidl.h (DESCKIND): Define macro.
+	(ITypeComp): Define interface.
+	(ITypeComp): Likewise.
+	* rpcndr.h (DECLSPEC_UUID): Define macro.
+	(MIDL_INTERFACE): Likewise.
+
+	* include/psapi.h: New file.
+	* include/imagehlp.h: New file.
+	* lib/imagehlp.def: New file.
+
+	* include/oaidl.h (tagVARIANT): Update fields.
+
+	From Craig Lanning <CraigL@DyCon.com>:
+	* include/commctrl.h: Add some TCS_* macros.
+	* include/winnls.h (IsValidLocale): Add prototype.
+
+2000-01-18  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* include/oaidl.h: OLE Patches from "Fifer, Eric"
+	<EFifer@sanwaint.com> needed to build Win32::OLE perl module.
+	* include/objbase.h: Likewise.
+	* include/objidl.h: Likewise.
+	* include/ocidl.h: New file.
+	* include/oleauto.h: Likewise.
+	* include/wtypes.h: Likewise.
+	* lib/oleaut32.def: Likewise.
+
+	* include/lmserver.h (NetServerTransportAddEx): Fix prototype.
+	Thanks to "Jon Leichter" <jon@symas.com>.
+	* include/commctrl.h (LVM_FINDITEM): Fix typo in macro.
+	* include/winbase.h: Add GetLongPathName{A,W} prototypes.
+	* include/shellapi.h (SHGetFileInfo): Add macro. Thanks to
+	"Axel Riese" <ariese@andromeda.risc.uni-linz.ac.at>.
+	(CommandLineToArgvW): Fix prototype. Thanks to "Frans E. van
+	Dorsselaer" <frans@bia-bv.demon.nl>.
+	* include/httpext.h: New file. Thanks to Jan Nijtmans
+	<j.nijtmans@chello.nl>.
+	* include/mmsystem.h (WAVEFORMATEX): Guard definition to avoid
+	redefinition of LPCWAVEFORMATEX in DirectX headers.
+	(CALLBACK_NULL): Define to be 0. Thanks to Krzysztof Nikiel
+	<krzych00@priv7.onet.pl>.
+	* include/sqlext.h (SQLDriverConnnect): Fix prototype.
+	* include/windef.h (HRESULT): Guard definition to avoid
+	redefinition in DirectX headers.
+	* include/winnt.h: Add target macros from windows.h.
+	* include/windows.h: Update synch comment for target macros.
+	(_ANONYMOUS_STRUCT): Define for GCC 2.95 and newer.
+	(_ANONYMOUS_UNION): Likewise.
+	* include/wingdi.h (AbortPrinter): Move from here ...
+	* include/winspool.h (AbortPrinter): to here and fix linkage.
+	(MONITOR_INFO_2{A,W}): Define.
+	* include/winsock.h (htons): Fix argument.
+	(htonl): Likewise.
+	* include/winsock2.h (SO_*, MAX_*, WSA_*): Add macros.
+	(GROUP): Define.
+	(GUID): Define conditionally.
+	(WSAPROTOCOLCHAIN, WSAPROTOCOL_INFO): Define.
+	(WSASocket*): Declare.
+	* include/basetyps.h (GUID): Guard REGUID and LPGUID as well.
+
+	* lib/dsetup.def: Remove leading underscore.
+	* lib/dsound.def: Likewise.
+	* lib/ws2_32.def: Likewise.
+
+Wed Dec 22 02:53:22 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* include/windef.h (HMONITOR, HTERMINAL, HWINEVENTHOOK): Define
+	handles.
+
+	* lib/Makefile.in (EXTRA_OBJS): Add dinput.o.
+	* lib/dinput.c: Include windows.h for GCC.
+	* lib/dxguid.c: Likewise.
+	(INITGUID): Define macro.
+
+	* include/objidl.h (ISequentialStream): Define interface.
+	(IStream): Derive from ISequentialStream.
+
+	* include/objidl.h (IStream::{LockRegion, UnlockRegion, Stat,
+	Clone}): Mark as PURE.
+	(IDataObject::EnumDAdvise): Likewise.
+	* include/oleidl.h (IDropSource::GiveFeedback): Likewise.
+	(IViewObject::Unfreeze): Likewise.
+	(IViewObject2::Unfreeze): Likewise.
+
+	* include/objidl.h: Add various IID_ declarations.
+	* include/olectl.h: Likewise.
+	* include/oleidl.h: Likewise.
+
+Tue Dec 21 02:22:14 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* Snapshot 1999-12-21.
+
+	* include/winbase.h (CancelIO): Rename to CancelIo.
+	* include/winsvc.h (LPHANDLER_FUNCTION): Fix prototype.
+	* include/winuser.h (PEVENTMSG, LPEVENTMSG): Declare.
+
+	* Merge with winsup-19991218.
+	* include/winnt.h: Add defines for W2K ACL control flags.
+
+	* Merge with Anders Norlander's 19991130 snapshot.
+
+	* include/windows.h: #include mmsystem.h ifndef WIN32_LEAN_AND_MEAN.
+	* include/winbase.h (EXCEPTION_INVALID_HANDLE): Define.
+
+	Patch from Harold Weissfield
+	* include/shellapi.h: Added some ABN_* defines.
+
+	* include/commctrl.h (_TrackMouseEvent): Add prototype.
+	* lib/comctl32.def (_TrackMouseEvent): Import.
+	* include/winuser.h: Misc. fixes from Sang Cho
+	<sangcho@alpha94.chongju.ac.kr>.
+	* include/winuser.h (SM_CMETRICS): Define to 76 or 83 depending on
+	value of _WIN32_WINNT.
+	* include/winuser.h: Reorganize SM_* defines in numerical order.
+
+Tue Dec 14 21:58:03 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* include/windef.h: Make RECTL a distinct type from RECT.
+	* include/windows.h: Define upto 8 DUMMYUNIONNAMEs for DirectX.
+	* include/winuser.h (CDS_): Update (Franco Bez <franco.bez@gmx.de>).
+	(COMPAREITEMSTRUCT): Fix fields.
+	(SERIALKEYSA): Likewise.
+	(SERIALKEYSW): Likewise..
+	* include/winbase.h (CRITICAL_SECTION_DEBUG): Likewise.
+	(WIN32_FIND_DATAA): Likewise.
+	(WIN32_FIND_DATAW): Likewise.
+	* include/commdlg.h (SNDMSG): Define.
+	* include/winsock.h (SO_UPDATE_ACCEPT_CONTEXT): Define.
+	(SO_CONNECT_TIME): Likewise.
+	(AcceptEx): Declare.
+	(GetAcceptExSockaddrs): Likewise.
+	* include/winsock2.h: Fix typo in #ifdef __cplusplus.
+	* include/winspool.h: Add RC_INVOKED guard.
+	* lib/wsock32.def (AcceptEx@32): Export.
+	(GetAcceptExSockaddrs@32): Likewise.
+
+Thu Nov 18 00:12:43 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* Snapshot 1999-11-18.
+
+	* include/oaidl.h (tagVARIANT): Rename pbool to pboolVal needed by
+	Octopod C++ IDE (and MSVC compatibility).
+	* include/oleauto.h (V_BOOLREF(X)): Likewise.
+	* include/shellapi.h (ShellAbout*): Fix typo.
+	* wingdi.h (FW_ULTRABOLD): Likewise.
+	* include/winnt.h (_TAPE_ERASE, _TAPE_PREPARE, _TAPE_SET_POSITION,
+	_TAPE_WRITE_MARKS): Add missing fields and fix existing ones.
+	Add packing directives for various structures. All structure
+	sizes now conform to MSVC.
+
+Sun Nov  7 02:50:09 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	Released 1999-11-07.
+
+Sat Nov  6 21:25:48 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* include/winsock2.h: New file. Mostly a stub for now.
+	* include/winbase.h (DllMain): Delete prototype.
+	* include/commctrl.h (Header_SetItem): Fix macro.
+	* include/{isguids.h, lmerrlog.h, mcx.h, objfwd.h, olectl.h,
+	regstr.h, richole.h, rpcdce.h, rpcdcep.h, rpcnsi.h, rpcproxy.h,
+	shlguid.h, sqltypes.h, winperf.h}: Enclose in extern "C" if c++.
+
+	Merge in changes from wxWindows.
+	* include/basetyps.h (GUID_DEFINED, UUID_DEFINED): Add guards.
+	* include/oaidl.h (DISPID_*): Add macros.
+	(IID_ITypeLib, IID_ICreateTypeInfo, IID_ICreateTypeInfo2,
+	IID_ICreateTypeLib, IID_ICreateTypeLib2, IID_ITypeInfo,
+	IID_IErrorInfo, IID_IDispatch, IID_ICreateErrorInfo): Declare.
+	* include/objidl.h (IDataObject): Fix EnumFormatEtc parameter.
+
+	Merge in changes from Octopod C++ IDE group.
+	* include/commctrl.h (NMHEADERA, NMHEADERW): Define.
+	(Header_InsertItem): Fix macro.
+	* include/oaidl.h (IID_IDispatch): Declare.
+	(IID_ISupportErrorInfo): Likewise.
+	(IDispatch): Rename Invoked to Invoke.
+	* include/objidl.h (IPersist): Fix GetClassID.
+	* include/oleauto.h (VectorFromBstr): Declare.
+	(BstrFromVector): Likewise.
+	* include/olectl.h (OLEMISC_*): Update.
+	* include/olectlid.h (IID_IDispatch): Declare.
+	* include/oleidl.h (IOleObject): Fix GetExtent and SetExtent.
+	(IOleInPlaceFrame): Fix.
+	(ISupportErrorInfo): Define.
+	(IErrorInfo): Define.
+	* include/winuser.h (SIF_TRACKPOS): Define.
+
+Wed Nov  3 19:34:12 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	Fix Merge errors:
+	* include/winnt.h (PSID): Uncomment definition.
+	(PISID): Rename from PSID.
+	(struct _TAPE_GET_MEDIA_PARAMETER): Remove reserved field.
+	(struct _SECURITY_ATTRIBUTES): Remove multiple definition.
+
+	* include/lmalert.h, include/lmbrowsr.h, include/lmchdev.h,
+	include/lmconfig.h, include/lmerrlog.h, include/lmmsg.h,
+	include/lmremutl.h, include/lmrepl.h, include/lmserver.h,
+	include/lmsvc.h, include/lmwksta.h, include/oaidl.h,
+	include/shellapi.h, include/winbase.h, include/wingdi.h,
+	include/winnt.h, include/winsock.h: Merged with winsup-19991026.
+
+Sun Oct 31 00:23:50 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* include/wingdi.h (PHYSICAL*, SCALINGFACTOR*): New. From
+	Marius Kjeldahl <kjeldahl@hotmail.com>.
+
+Sun Aug 29 18:07:42 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* include/winnt.h (APPLICATION_ERROR_MASK): Add macros.
+	(ERROR_SEVERITY_*): Likewise.
+
+Tue Aug 17 21:05:21 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* include/winbase.h (TLS_OUT_OF_INDEXES): Add macro.
+	(DllMain): Fix prototype.
+
+Mon Aug  2 23:31:30 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* include/commdlg.h: Enclose within pack(push,1) and pack(pop).
+	(cderr.h): Don't include.
+	* include/winuser.h: Fix macro definitions.
+
+Mon Aug 02 14:31:37 1999  Anders Norlander  <anorland@hem2.passagen.se>
+
+	Merge with winsup 1999-07-29:
+	* include/wincon.h (MOUSE_WHEELED): Define.
+	* include/winnt.h (PSECURITY_ATTRIBUTES): Add type.
+	(SECURITY_DESCRIPTOR): Add struct type.
+	(PSECURITY_DESCRIPTOR): Pointer to above type. BEWARE: this type
+	is equal to PVOID in the Platform SDK! So don't depend on accessing
+	members through ->.
+
+Mon Aug 02 13:58:52 1999  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* lib/Makefile.in (install-headers): Don't @ commands.
+	(install-libraries): Ditto.
+
+Mon Aug 02 13:49:01 1999  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/sqlext.h: Use #include <sql.h> instead of "sql.h".
+
+Mon Aug 02 13:47:15 1999  Anders Norlander  <anorland@hem2.passagen.se>
+
+	Patch from Mumit Khan:
+	* include/windows.h: Fix typo in winsock.h include guard and add
+	_UWIN to the list.
+	* include/winnt.h (__int64): Undefine first.
+	(struct _SID): Declare.
+
+Mon Aug 02 13:40:28 1999  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/winnt.h: Add some REG_* defines reported by Boris Lantrewitz.
+
+Mon Aug 02 13:33:11 1999  Anders Norlander  <anorland@hem2.passagen.se>
+
+	Patch from Mumit Khan:
+	* Makefile.in: Do the right thing when cross-compiling.
+	* include/windef.h: Don't define _export and __export if already
+	defined.
+
+Mon Aug 02 13:24:43 1999  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/basetyps.h (DECLARE_INTERFACE): Use com_interface attribute.
+	(DECLARE_INTERFACE_): Ditto.
+
+Mon Aug 02 13:17:26 1999  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/mmsystem.h (HWAVEOUT): Fix missing ')'
+
+	Reported by Brad Porter
+	* include/wingdi.h (FW_ULTRALIGHT): Add.
+	(FW_DEMIBOLD): Add.
+	(FW_ULTRABOLD): Add.
+	(FW_BLACK): Add.
+	(JOHAB_CHARSET): Add.
+	(VIETNAMESE_CHARSET): Add.
+	
+
+1999-05-15  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* lib/scrnsave.c (WinMain): Remove dependencies on C library.
+	* lib/Makefile.in (Makefile): Regenerate.
+	* include/pshpack[1248].h: New files, if a program would use any of
+	them.
+	* include/poppack.h: Ditto.
+	* include/windef.h (_WIN32_WINNT): Define
+	* include/windows.h: Remove DUMMYUNIONNAME[45].
+	* include/windows.h: Correctly define _M_IX86 to reflect the target
+	processor.
+	* include/windows.h: Add preliminary support for other architectures.
+	* include/winnt.h: Add CONTEXT structure for PPC and ALPHA.
+	* include/winnt.h: Remove PACKED from U/LARGE_INTEGER
+	* include/winnt.h (LUID_AND_ATTRIBUTES): Use pack(4) to solve alignment
+	issue with LARGE_INTEGER.
+	(ANSI_NULL): Define.
+	(PSZ): Define.
+	(ACL_REVISION[1234]): Define.
+	(MIN/MAX_ACL_REVISION): Define.
+	(PTCHAR): Define.
+	(LANG_USER_DEFAULT): Define.
+	(LANG_SYSTEM_DEFAULT): Define.
+	(LOCALE_NEUTRAL): Define.
+	(SORTVERSIONFROMLCID): Define.
+	* include/windef.h (UNREFERENCED_PARAMETER): Define.
+	(UNREFERENCED_LOCAL_VARIABLE): Define.
+	(DBG_UNREFERENCED_PARAMETER): Define.
+	(DBG_UNREFERENCED_LOCAL_VARIABLE): Define.
+	* lib/mswsock.def: New file. Imports for mswsock.dll.
+	* include/custcntl.h: New file. Necessary to compile some SDK
+	samples.
+	* include/winuser.h (SM_MOUSEWHEELPRESENT): Define.
+	(WM_MOUSEWHEEL): Define.
+	(WHEEL_DELTA): Define.
+	(WM_MOUSELAST): Redefine to reflect WM_MOUSEWHEEL.
+	(WM_NEXTMENU): Define.
+	(CharNextA): Fix prototype.
+	(CharNextW): Ditto.
+
+1999-05-14  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/winsock.h: Enclose in extern "C" if C++, huh?
+	* include/winuser.h(WM_SYNCPAINT): Define. From fltk.
+
+1999-05-13  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/windef.h (NULL): Define only ifndef
+	(TRUE): Ditto, was previously only defined ifndef FALSE
+	(PASCAL): Define as _pascal
+	(__pascal): Define
+	(WINAPIV): Define
+	(min,max): Define only ifndef NOMINMAX
+
+1999-05-10  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/commctrl.h: Support for Date/Calendar controls + IE controls.
+	You must define _WIN32_IE if you want support for it.
+	Modified patch from Nirmal Prasad  <nprasad@truept.com>.
+
+1999-05-10  Ron Aaron   <v-ronaar@Exchange.Microsoft.com>
+
+	* include/wincon.h: Add some ButtonState flags and EventFlags.
+
+1999-05-10  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/basetyps.h: Don't support COM when __OBJC__ defined because
+	interface define causes mayhem.
+	(DEFINE_INTERFACE): Use comobject attribute only if HAVE_COMOBJECT is
+	defined.
+	* include/windows.h: Undefine BOOL if __OBJC__ defined
+
+1999-05-09  Chris Faylor  <cgf@cygnus.com>
+
+	* include/winnls.h: Define additional code pages.
+
+1999-05-09  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/winbase.h(RtlFillMemory): Parameters got passed in wrong
+	order, corrected.
+	(RtlZeroMemory): Use RtlFillMemory
+
+1999-05-04  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/winnt.h: Add PACKED to LARGE_INTEGER and ULARGE_INTEGER
+	to get the correct size when used in some structs.
+	(ULARGE_INTEGER): Ditto.
+	* include/winnt.h (TAPE_CREATE_PARTITION): Add struct.
+	* include/winnt.h: Add TAPE_* pointer types PTAPE_*
+
+1999-05-02  Nirmal Prasad  <nprasad@truept.com>
+
+	* include/wininet.h: Enclose in extern "C" if c++
+	(INTERNET_BUFFERSA/W): Define struct
+	* include/wininet.h: Add some HSR_* defines
+	
+1999-05-02  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/winnt.h (IMAGE_FIRST_SECTION): Prepend missing paren
+	* include/winnt.h (UNALIGNED): Define
+	* include/windef.h (DECLSPEC_NORETURN): Define
+
+	* include/wininet.h (INTERNET_MAX_NAME): Remove
+	(INTERNET_MAX_SCHEME_LENGTH): Define
+	(INTERNET_MAX_URL_LENGTH): Use INTERNET_MAX_SCHEME_LENGTH
+	* include/wininet.def: Completely redone, it was losing badly.
+
+1999-05-01  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* lib/dplayx.def: Remove '_' prefixes
+	* lib/shell32.def: Remove imports for IID_ContextMenu
+
+1999-04-29  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* Makefile.in (dist): Support dist target
+	* lib/Makefile.in (dist): Likewise
+	* lib/Makefile.in (uninstall-headers): Fix command
+	* Makefile.in (bindist): Target to build a prebuilt dist
+
+	* lib/ws2_32.def: Winsock2 implib
+
+	* include/largeint.h: New header
+	* include/largeint.c: Large integer support library
+	* lib/Makefile.in(EXTRA_LIBS): Add liblargeint.a
+	(EXTRA_OBJS): Add largeint.o
+
+	* include/Makefile: Remove
+	* lib/Makefile: Remove
+	* Makefile: Remove
+	* configure.in: New autoconf script
+	* configure: generated configure script
+	* Makefile.in: autoconf makefile template
+	* lib/Makefile.in: Ditto
+	* include/test.c: mv to lib/test.c
+	* include/res.rc: mv to lib/res.rc
+	* include/TODO: mv to .
+	* include/Notes: mv to ./NOTES
+
+1999-04-28  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/zmouse.h (WHEEL_DELTA): Define
+
+Mon Apr 26 16:36:49 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* include/ddeml.h (HSZPAIR): Declare.
+	* include/zmouse.h: New file.
+	
+1999-04-27  Daniel Guerrero Miralles  <daniel.guerrero@upcnet.upc.es>
+
+	* lib/d3dim.def: New implib
+	* lib/d3drm.def: Ditto
+	* lib/d3dxof.def: Ditto
+	* lib/ddraw.def: Ditto
+	* lib/dinput.def: Ditto
+	* lib/dplayx.def: Ditto
+	* lib/dsetup.def: Ditto
+	* lib/dsound.def: Ditto
+	* lib/dinput.c: Guid library for DirectInput
+	* lib/dxguid.c: Guid library for DirectX
+	
+1999-04-21  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/windowsx.h (GET_X_LPARAM): Missing macro added (reported
+	by Ron Aaron).
+	* include/windowsx.h (GET_Y_LPARAM): Also missing
+	* include/winnls.h (IsValidCodePage): Missing prototype added (reported
+	by Mumit Khan).
+
+1999-04-18  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/scrnsave.h: New header file for screen saver library
+	* lib/scrnsave.c: New file: screen saver library
+
+1999-04-17  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/regstr.h: Enclosed all strings in TEXT() macros so it
+	works well in when UNICODE is defined
+
+1999-04-17  Nirmal Prasad  <nprasad@truept.com>
+
+	* include/winuser.h(STYLESTRUCT): New struct
+	* include/wingdi.h:(GOBJENUMPROC): This function type should
+	return void.
+
+1999-04-17  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/basetyps.h (LPGUID): New typedef
+	* lib/glut.def: Import library defintions for glut.dll
+	* lib/glu32.def: Ditto for glut32.dll
+	* include/winnt.h: Fixed handling of wchar_t typedef
+	* include/sql.h(SQL_NO_DATA_FOUND): Replace with SQL_NO_DATA
+	* include/sqlext.h(SQL_NO_DATA_FOUND): Define as SQL_NO_DATA
+
+1999-03-20  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/winbase.h(AbnormalTermination): Define as FALSE
+	* include/commctrl.h: Support for new progress bar messages/styles
+
+1999-03-20  Geoffrey Noer  <noer@cygnus.com>
+
+	* include/commdlg.h(PageSetupDlg): New define
+	* include/richedit.h: Missing SCF_* defines
+	* include/winnt.h: Lots o' defines
+	* include/winbase.h(AllocateAndInitializeSid): Corrected prototype
+
+1999-03-09  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/commdlg.h: Removed pack pragma
+	* lib/comctl32.def(InitCommonControlsEx@4): Added import
+
+1999-03-08  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* Makefile: Set version to 0.1.5
+	* lib/Makefile (clean): Fix typo
+
+	* include/commctrl.h: Removed pack pragma
+	* include/cpl.h: Likewise
+	* include/dbt.h: Likewise
+	* include/dde.h: Likewise
+	* include/nddeapi.h: Likewise
+	* include/shellapi.h: Likewise
+	* include/wincrypt.h: Likewise
+	* include/lmaccess.h: Fixed USER_PRIV_ADMIN typo
+
+	* include/winsock.h (netent): Define only ifndef __INSIDE_CYGWIN__
+	(servent): Likewise
+	(protoent): Likewise
+
+	* include/windows.h: Prevent inclusion of winsock.h if we are
+	using or compiling cygwin. Define Win32_Winsock to force inclusion.
+
+1999-01-08  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/winbase.h (CREATE_FORCEDOS): New define
+
+1999-01-07  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/wincon.h(KEY_EVENT_RECORD): Fixed packing problem on
+	(COORD): Likewise
+	* include/wingdi.h (BITMAPFILEHEADER): Fixed packing
+	* include/windows.h: Added DUMMYUNIONNAME4 and 5
+	* include/winnt.h (LUID_AND_ATTRIBUTES_ARRAY): New type
+	(PLUID_AND_ATTRIBUTES_ARRAY): New type
+	
+	* include/ddeml.h: Removed unnecessary `#pragma pack'
+	* include/imm.h: Likewise
+	* include/nddeapi.h: Likewise
+	* include/nspapi.h: Likewise
+	* include/regstr.h: Likewise
+	* include/wincon.h: Likewise
+	* include/windef.h: Likewise
+	* include/winioctl.h: Likewise
+	* include/winnls.h: Likewise
+	* include/winsvc.h: Likewise
+	* include/winuser.h: Likewise
+	* include/winver.h: Likewise
+	* include/wtypes.h: Likewise
+
+1999-01-05  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* Makefile (VERSION): Set to 0.1.4
+	* include/basetyps.h: Check for NOCOMOBJECT
+	* include/Makefile: Pass -DNOCOMOBJECT to g++ to avoid warnings
+	on comobject attribute.
+	* lib/kernel32.def: Added a few functions
+	* include/windef.h (DWORD): Changed back to unsigned long
+
+	* include/windows.h: Include only winresrc.h if RC_INVOKED is defined,
+	winresrc.h in turn includes the necessary headers. This makes things
+	much simpler, no need to protect blocks of code in headers that
+	should not be seen by the resource compiler.
+
+1999-01-05  Geoffrey Noer  <noer@cygnus.com>
+
+	* include/winbase.h (STATUS_INVALID_HANDLE): Added define
+	* include/wincon.h: Added console event type flags
+	* include/winnt.h (FILE_SHARE_DELETE): Added
+	  (SECURITY_DESCRIPTOR): typedef as DWORD
+	
+	* include/winuser.h (WM_PENWINFIRST): Fixed typo
+	* include/winsock.h: Protect some blocks with __INSIDE_CYGWIN_ and
+	define u_* types only if _SYS_TYPES_H is not defined.
+
+1999-01-02  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* COPYING.LIB: Deleted
+	* README: Updated to reflect license changes
+	* include/shlobj.h: Remove extra comma on some enums
+	* include/windef.h: Changed DWORD typedef from unsigned long to
+	unsigned int in order to avoid warnings on bit fields that
+	use DWORD.
+	* include/Makefile (test): Compile with all warnings
+	* include/unknwn.h: Include objfwd.h
+	* include/winsock.h: Added missing copyright notices.
+
+1999-01-01  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* lib/winmm.def: Corrected LIBRARY statement
+	* include/mmsystem.h: Define mmioSeek codes if not already defined
+	* include/commctrl.h (CreateStatusWindowA): Corrected prototype
+	(CreateStatusWindowW): Likewise
+
+	* include/winresrc.h: Include only files necessary instead of windows.h
+	* include/dde.h: Allow inclusion in resource scripts.
+	* include/winnt.h: Likewise
+	* include/commctrl.h: Likewise
+	* include/prsht.h: Likewise
+	* README: Updated
+
+1998-12-10  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/sqltypes.h (SQLHANDLE): Added this type
+	(SQLHDESC): Likewise
+	* include/sql.h (SQLFreeHandle): Added this prototype
+	(SQLAllocHandle): Likewise
+
+1998-12-08  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/winsock.h: Define _GNU_H_WINDOWS32_SOCKETS to avoid
+	conflicts with cygwin headers.
+
+1998-12-06  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* Makefile: Changed VERSION to 0.1.3
+	* Makefile (dist-lib): New target to make import library only
+	distribution
+	* Makefile (dist-hdr): New target to make headers only distribution
+	* Makefile (dist): Now depends on dist-lib and dist-hdr instead of
+	building one single distribution file.
+	* dist.mak: Deleted
+
+	* include/lm.h: New file
+	* include/lmcons.h: New file
+	* include/lmalert.h: New file
+	* include/lmaudit.h: New file
+	* include/lmconfig.h: New file
+	* include/lmapibuf.h: New file
+	* include/lmaccess.h: New file
+	* include/lmchdev.h: New file
+	* include/lmremutl.h: New file
+	* include/lmrepl.h: New file
+	* include/lmerrlog.h: New file
+	* include/lmat.h: New file
+	* include/lmuse.h: New file
+	* include/lmuseflg.h: New file
+	* include/lmserver.h: New file
+	* include/lmerr.h: New file
+	* include/lmsname.h: New file
+	* include/lmstats.h: New file
+	* include/lmsvc.h: New file
+	* include/lmwksta.h: New file
+	* include/lmbrowsr.h: New file
+
+1998-12-05  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/unknwn.h: Fixed IClassFactory declaration; INTERFACE was missing
+	* include/unknwn.h: Added extern declaration for IID_IClassFactory
+
+	* include/initguid.h: New file
+
+	* include/rpcndr.h: Defined hyper and MIDL_hyper as double if 64 bit
+	int not supported
+
+	* include/winnt.h: Added USN
+	* include/winnt.h: Changed handling of 64 bit int support
+
+	* include/windows.h: Added support for BC,LCC and MSVC
+
+	* include/windows.h: Changed handling machine architecture defines
+
+	* include/olectl.h: New file
+
+1998-12-04  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/oleidl.h: Added IViewObject and IViewObject2
+
+	* include/objidl: Corrected prototype for IStorage::DestroyElement and
+	IStorage::MoveElement
+
+	* include/oledlg.h: New file
+
+	* include/winresrc.h: New file
+
+	* include/wingdi.h: Added LPDOCINFO
+
+	* include/commctrl.h: Added SBARS_SIZEGRIP and TVM_SETINDENT
+	* include/commctrl.h: Added TCM_SETITEM to UNICODE/ANSI block
+	* include/commctrl.h: Added ListView_GetSelectedCount, ListView_GetItemSpacing,
+	TabCtrl_SetImageList and TabCtrl_GetItemCount
+	* include/commctrl.h: Added TVM_FIRST, HDM_FIRST and TV_FIRST
+
+	* include/windowsx.h: Added missing ListBox_xx ComboBox_xx etc. macros
+
+	* include/wingdi.h: Added (L)PBITMAP,(L)PBITMAPCOREHEADER,
+	PBITMAPINFOHEADER, (L)PBITMAPCOREINFO and (L)PBITMAPFILEHEADER.
+
+	* include/commdlg.h: Added LPDEVNAMES
+
+	* include/windows.h: Include excpt.h
+
+	* include/excpt.h: New file. This file just contains some
+	stubs for SEH that do nothing.
+	
+	* include/commctrl.h: Added general WM_NOTIFY codes
+
+	* include/winuser.h: Added ICON_SMALL and ICON_BIG
+	* include/winuser.h: Removed VK_0-VK_9 VK_A-VK_Z; they should obviously
+	not be in the headers.
+	* include/winuser.h: Added LPCBTACTIVATESTRUCT and LPCLIENTCREATESTRUCT
+	* include/winuser.h: Added old WM_SIZE parameter names so
+	wxWindows compiles.
+	* include/winuser.h: Added IDC_SIZE and IDC_ICON
+	* include/winuser.h: Added LPDLGITEMTEMPLATE
+	* include/winuser.h: HTCAPTION was missing value
+	* include/winuser.h: Added WM_ACTIVE flags
+
+	* include/windowsx.h: Added _fmemcpy so V compiles; also added
+	_fxx defines for memmove, memset and memcmp
+
+	* include/windef.h: Changed _export and __export to empty defines
+
+	* include/shellapi.h: Corrected prototypes for ExtractIcon functions.
+	String parameters were not const and ExtractAssociatedIcon takes
+	a WORD pointer not DWORD pointer as last parameter.
+
+	* Makefile: Changed VERSION to 0.1.2
+
+	* include/ole2ver.h: New file
+
+	* Makefile: Removed all dependencies on GLUT
+	
+	* include/GL/glut.h: Removed file because of decision to remove
+	files that are not part of the library.
+	* lib/glut.def: Likewise
+	* lib/glut32.def: Likewise
+	
+	* include/windows.h: Include winperf.h
+	
+	* include/winperf.h: New file
+
+	* lib/gdi32.def: Added GetEnhMetaFilePixelFormat
+
+	* include/winnls.h: Added calendar types
+	* include/winnls.h: Added country codes
+
+1998-12-03  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/windef.h: Added PROC and NEARPROC
+
+	* include/wingdi.h: Added ChoosePixelFormat, DescribePixelFormat
+	* include/wingdi.h: Added OpenGL types and prototypes
+	* include/wingdi.h: Added ENHMETA_STOCK_OBJECT
+	* include/wingdi.h: Added DCTT_DOWNLOAD_OUTLINE
+	* include/wingdi.h: Added POINTFX, TTPOLYCURVE and TTPOLYGONHEADER
+	* include/wingdi.h: Added truetype character outline types
+	* include/wingdi.h: Added DEVMODE initialization flags
+	* include/wingdi.h: Added panose codes
+	* include/wingdi.h: Added missing character sets
+	* include/wingdi.h: Added ANTIALIASED_QUALITY and
+	NONANTIALIASED_QUALITY
+	* include/wingdi.h: Added ENUMLOGFONTA/W and ENUMLOGFONTEXA/W
+	* include/wingdi.h: Added pointer types for EXTLOGPEN
+	* include/wingdi.h: Added PATTERN type
+	* include/wingdi.h: Added NEWTEXTMETRICA/W and NEWTEXTMETRICEXA/W
+	* include/wingdi.h: Added new text metric flags
+	* include/wingdi.h: Added pitch and family flags
+	* include/wingdi.h: Moved BCHAR defintion from winnt.h here
+	* include/wingdi.h: Added METAHEADER
+	* include/wingdi.h: Fixed packing of RGBTRIPLE and BITMAPFILEHEADER
+	* include/wingdi.h: Added TA_MASK
+	* include/wingdi.h: Added MAXSTRETCHBLTMODE
+	* include/wingdi.h: Added error codes
+
+	* include/winuser.h: Added missing winhelp structures
+	* include/winuser.h: Added dialog flags/styles/messages
+	* include/winuser.h: Added EM_SETMARGIN codes
+	* include/winuser.h: Made it possiblie to use IDI_XX values
+	in resource files.
+	* include/winuser.h: Added missing LoadImage load flags
+	* include/winuser.h: Added missing message box flags
+	* include/winuser.h: Added ScrollWindow codes
+	* include/winuser.h: Added DT_WORD_ELLIPSIS
+	* include/winuser.h: Added drag and drop support
+	* include/winuser.h: Added WM_MENUCHAR return codes
+	* include/winuser.h: Added DLGWINDOWEXTRA
+	* include/winuser.h: Added missing SetWindowPos flags.
+	* include/winuser.h: Added BSF_NOTIMEOUTIFNOTHUNG
+	* include/winuser.h: Added IDHOT_xx defines
+	* include/winuser.h: Added MOD_WIN
+	* include/winuser.h: Added missing defines and structs for owner draw
+	controls.
+	* include/winuser.h: Added WPF_RESTORETOMAXIMIZED and
+	WPF_SETMINPOSITION
+	* include/winuser.h: Added DrawAnimatedRects flags
+	* include/winuser.h: Added WM_PRINT codes
+	* include/winuser.h: Added CS_IME class style
+	* include/winuser.h: Added WM_SIZE codes
+	* include/winuser.h: Added WM_MOUSEACTIVATE return codes
+	* include/winuser.h: Added WM_NCHITTEST return codes
+	* include/winuser.h: Added WM_SIZING parameters
+	* include/winuser.h: Added WM_NEXTMENU and MDINEXTMENU
+	* include/winuser.h: Added menu loop codes.
+	* include/winuser.h: Added NFR_ANSI, NFR_UNICODE, NF_QUERY and
+	NF_REQUERY
+	* include/winuser.h: Added WM_POWER flags
+	* include/winuser.h: Added KL_NAMELENGTH, WSF_VISIBLE
+	* include/winuser.h: Added missing message filter codes
+	* include/winuser.h: Added WM_KEYXX message flags
+	* include/winuser.h: Added WM_SHOWMESSAGE flags
+	* include/winuser.h: Added old ShowWindow commands
+	* include/winuser.h: Fixed packing of DLGITEMTEMPLATE and DLGTEMPLATE
+	structures.
+
+	* include/mciavi.h: New file for the MCI AVI driver that for some
+	reason is not in mmsystem.h.
+
+	* include/winbase.h: Added PIPE_UNLIMITED_INSTANCES and INVALID_FILE_SIZE
+	* include/winbase.h: Added SECURITY_xx for CreateFile
+	* include/winbase.h: Added RTS and DTS control values
+	* include/winbase.h: Fixed SYSTEM_INFO structure
+	* include/winbase.h: Added CREATE_NO_WINDOW, CREATE_SHARED_WOW_VDM
+	* include/winbase.h: Added FILE_TYPE_REMOTE
+	* include/winbase.h: Added modem status flags
+	* include/winbase.h: Added HINSTANCE_ERROR
+	* include/winbase.h: Added DefineDosDevice defines
+	* include/winbase.h: Added power management flags AC_xx BATTERY_xx
+	* include/winbase.h: Added STARTF_XX flags
+	* include/winbase.h: Fixed typo on _lcreat prototype.
+	* include/winbase.h: Moved DBG_XX to winnt.h
+	* include/winbase.h: Moved TOKEN_XX, DLL_PROCESS_XX and DLL_THREAD_XX to
+	winnt.h
+
+	* include/unknwn.h: Added extern declaration of IID_IUnknown
+
+	* include/windowsx.h: Added hmemcpy.
+
+	* include/winnt.h: Added dummy member to DECLARE_HANDLE struct
+	* include/winnt.h: Added PACCESS_TOKEN
+	* include/winnt.h: Added TAPE_XX defines and moved some from winbase.h
+	* include/winnt.h: Added SE_IMPERSONATION_STATE and TOKEN_SOURCE_LENGTH
+	* include/winnt.h: Added SE_PRIVILEGE_ENABLED_BY_DEFAULT, SE_PRIVILEGE_ENABLED,
+	SE_PRIVILEGE_USED_FOR_ACCESS, PRIVILEGE_SET_ALL_NECESSARY,
+	SECURITY_MAX_IMPERSONATION_LEVEL, DEFAULT_IMPERSONATION_LEVEL,
+	SECURITY_DYNAMIC_TRACKING and SECURITY_STATIC_TRACKING.
+
+	* include/winnt.h: Added SE_OWNER_DEFAULTED, SE_GROUP_DEFAULTED, SE_DACL_XX,
+	SE_SACL_XX, SE_SELF_RELATIVE, SECURITY_DESCRIPTOR_MIN_LENGTH,
+	SECURITY_DESCRIPTOR_REVISION and SECURITY_DESCRIPTOR_REVISION1.
+
+	* include/winsvc.h: Removed conflicting defines which were supposed
+	to be in winnt.h
+	
+	* include/winnt.h: Added SERVICE_NODE_TYPE, SERVICE_LOAD_TYPE
+	and SERVICE_ERROR_TYPE.
+	
+	* include/winnt.h: Added SERVICE_XX defines.
+	* include/winsvc.h: Added SERVICES_ACTIVE_DATABASEA/W,
+	SERVICES_FAILED_DATABASEA/W and SC_GROUP_IDENTIFIERA/W.
+
+	* include/winsvc.h: Added SERVICE_STATE_ALL, SERVICE_QUERY_CONFIG,
+	SERVICE_CHANGE_CONFIG, SERVICE_QUERY_STATUS, SERVICE_ENUMERATE_DEPENDENTS,
+	SERVICE_START, SERVICE_STOP, SERVICE_PAUSE_CONTINUE,
+	SERVICE_USER_DEFINED_CONTROL and SERVICE_ALL_ACCESS
+
+1998-12-02  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/winbase.h: Corrected prototype for CreateProcessA
+
+	* include/mmsystem.h: Added CAPS1 and C1_TRANSPARENT for display
+	driver extensions.
+
+	* include/shlobj.h: Corrected prototype for SHGetDesktopFolder, should
+	be LPSHELLFOLDER* not LPSHELLFOLDER.	
+
+	* include/windows.h: Include commdlg.h
+
+	* include/winuser.h: Added MDICREATESTRUCT
+
+	* include/winuser.h: Added LB_ERR, LB_ERRSPACE, LB_OKAY, CB_ERR,
+	CB_ERRSPACE, and CB_OKAY
+
+	* include/wingdi.h: Added LPBITMAPINFOHEADER
+
+	* include/rpcproxy.h: Removed IN, OUT and OPTIONAL since they
+	are meaningless.
+	* include/rpcdce2.h: Likewise.
+
+	* lib/shell32.c: Moved GUID defintions from shlguid.h to this file.
+
+	* include/richole.h: Replaced DEFINE_GUID with extern const GUID
+	* include/olectlid.h: Likewise
+	* include/shlguid.h: Likewise
+
+	* include/coguid.h: Delete file since it was for 16 bit windows only.
+
+	* lib/*.def: Appended .dll to library name where needed.
+
+	* include/windef.h: Define _stdcall and __stdcall only if not
+	previously defined instead of undefining first.
+
+	* include/dlgs.h: Put RC_INVOKED around structure defs
+
+	* include/intshcut.h: New file
+	* include/isguids.h: New file
+
+	* lib/uuid.c: Added all COM/OLE GUIDS I know and do not know about.
+
+1998-12-01  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/winnt.h: Added check if _T is defined before defining it
+
+	* include/windows.h: Include dlgs.h if WIN32_LEAN_AND_MEAN not defined
+
+	* include/dlgs.h: New file
+
+	* include/winbase.h: Removed DllEntryPoint define
+
+	* include/winbase.h: Added SetupComm prototype
+
+	* include/rpc.h: SEH RPC functions no longer defined since they weren't
+	supported anyway.
+
+	* include/basetyps.h: Removed use of COMOBJECT define, instead
+	DECLARE_INTERFACE directly uses comobject attribute when GCC
+	is used.
+
+	* include/wtypes.h: STGC enum was missing typedef
+
+	* include/objidl.h: ADVC enum was missing typedef
+
+	* include/winnt.h: Moved CHAR, SHORT and LONG definitions so
+	they are nested within the VOID definition.
+
+	* include/winbase.h: Added stream ids and attributes
+
+	* include/winbase.h: Changed WIN32_STREAM_ID member cStreamName
+	to an ANYSIZE_ARRAY array.
+
+1998-11-26  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/windef.h: defined _declspec as __declspec since
+	some programs (like VWCL) use _declspec instead of __declspec
+
+	* include/winnt.h: added COMPRESS_FORMAT defines
+
+	* include/winbase.h: moved IS_TEXT_XXX defines to winnt.h
+
+	* include/winnt.h: added HEAP_XXXX defines
+
+	* include/winbase.h: moved HEAP_XXXX defines to winnt.h
+
+	* include/winnt.h: added defintions for PE/COFF from the PE and COFF
+	specification.
+
+	* include/winnt.h: added NTAPI define
+
+1998-11-25  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/winnt.h: defined TBYTE,LPTSTR etc in terms of TCHAR
+	instead of CHAR or WCHAR.
+
+	* include/winnt.h: added _T define
+
+	* include/winnt.h: added test for _TCHAR_DEFINED
+
+	* include/winnt.h: included string.h for memory macros
+
+	* include/prsht.h: added PSM_SETFINISHTEXT to UNICODE/ANSI test
+
+	* include/prsht.h: moved PSM_SETTITLEA/W to UNICODE test at end of file
+
+	* include/prsht.h: added PropSheet_XXX macros
+
+
+1998-11-24  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* include/winspool.h: Changed DeletePrinterProcessor and
+	DeletePrinterProvidor to DeletePrintXX.
+
+	* include/wingdi.h: Changed EMRCREATECOLORSPACE lcs member type to
+	LOGCOLORSPACEW.
+
+	* include/wingdi.h: Changed prototype for CreateColorSpace to A and W
+	variants
+
+	* include/wingdi.h: Likewise for GetLogColorSpace
+	
+	* include/wingdi.h: Changed LOGCOLORSPACE to LOGCOLORSPACEA/W.
+
+	* include/richedit.h: Added missing defines and structures
+
+	* include/winuser.h: Moved EDITWORDBREAKPROCEX to include/richedit.h
+
+	* include/winuser.h: Added HWND_DESKTOP
+
+1998-11-23  Anders Norlander  <anorland@hem2.passagen.se>
+
+	* Makefile: Include ChangeLog when building source
+	distribution (srcdist)
+
+	* include/oleauto.h: Changed WINOLEAUTAPI and WINOLEAUTAPI_ so they
+	are always defined as STDAPI and STDAPI_
+
+	* include/objbase.h: Changed WINOLEAPI and WINOLEAPI_ so they
+	are always defined as STDAPI and STDAPI_
+
+	* include/objidl.h: Removed extra ';' on IStorage SetClass method
+
+	* include/rpcndr.h: Removed all IN and OUT from function prototypes
+
+	* ChangeLog started

@@ -1,0 +1,5 @@
+
+Main test.exe : test.c ;
+
+Main all.exe : all.c ;
+

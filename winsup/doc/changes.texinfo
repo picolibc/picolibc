@@ -1,0 +1,202 @@
+@section Release Beta 20.1 (Dec 4 1998)
+
+This is a bug fix update to the Beta 20 release.
+
+The main change is an improved version of the Cygwin library although
+there are also a couple of other minor changes to the tools.
+
+@subsection Changes in specific tools:
+
+The "-mno-cygwin" flag to gcc now include the correct headers.  In 20.0,
+it included the Cygwin headers which was incorrect.
+
+The "-pipe" flag to gcc works correctly now.
+
+The cygcheck program now reassures users that not finding cpp is the
+correct behavior.
+
+The "-b" flag to md5sum can now be used to generate correct checksums
+of binary files.
+
+The libtermcap library has been added to the compiler tools sources.
+It is the new source of the termcap library and /etc/termcap file.
+
+The less pager (using libtermcap) has been added to the binary
+distribution.
+
+@subsection Changes in the Cygwin API (cygwin.dll):
+
+This version of Cygwin is backwards-compatible with the beta 20 and 19
+releases.  The library is now much more stable under Windows 9x and the
+bugs affecting configures under 9x (and NT to a lesser extent) have
+also been fixed.
+
+The bug that made it necessary to start the value of the CYGWIN
+environment variable with two leading spaces has been fixed.
+
+The serial support in the select call has been fixed.
+
+Handling of DLLs loaded by non-cygwin apps has been improved.  Bugs in
+dlopen have been fixed.
+
+Passing _SC_CHILD_MAX to the sysconf function now yields CHILD_MAX (63)
+instead of _POSIX_CHILD_MAX (3).
+
+Several minor path bugs have been fixed.  Including the one that
+caused "mkdir a/" to fail.
+
+The include file sys/sysmacros.h has been added.  Added missing protos
+for wcslen and wcscmp to wchar.h.
+
+__P is now defined in include/sys/cdefs.h.  To support that last change,
+the top-level Makefile.in now sets CC_FOR_TARGET and CXX_FOR_TARGET
+differently.
+
+Cygwin now exports the following newlib bessel functions: j1, jn, y1,
+yn.
+
+Several tty ioctl options have been added: TCGETA, TCSETA, TCSETAW, and
+TCSETAF.
+
+Several functions cope with NULL pointer references more gracefully.
+
+Problems with execution of relative paths via #! should be fixed.
+
+@section Release Beta 20 (Oct 30 1998)
+
+This is a significant update to the Beta 19 release.  In addition to an
+EGCS-based compiler and updated tools, this release includes a new
+version of the Cygwin library that contains many improvements and
+bugfixes over the last one.
+
+@subsection The project has a new name!
+
+Starting with this release, we are retiring the "GNU-Win32" name for the
+releases.  We have also dropped the "32" from Cygwin32.  This means that
+you should now refer to the tools as "the Cygwin toolset", the library
+as "the Cygwin library" or "the Cygwin DLL", and the library's interface
+as "the Cygwin API".
+
+Because of this name change, we have changed any aspects of the library
+that involved the name "Cygwin32".  For example, the CYGWIN32
+environment variable is now the CYGWIN environment variable.  API
+functions starting with cygwin32_ are still available under that form
+for backwards-compatibility as well as under the new cygwin_-prefixed
+names.  The same goes for the change of preprocessor define from
+__CYGWIN32__ to __CYGWIN__.  We will remove the old names in a future
+release so please take the minute or two that it will take to remove
+those "32"s.  Thanks and I apologize for the hassle this may cause
+people.  We would have changed the name to "Bob" but that name's already
+taken by Microsoft...  :-)
+
+Why change it?  For one thing, not all of the software included in the
+distributions is GNU software, including the Cygwin library itself.  So
+calling the project "GNU-Win32" has always been a bit of a misnomer.  In
+addition, we think that calling the tools the "Cygwin tools" that use
+the "Cygwin library" will be less confusing to people.
+
+Also notice that we are now on the spiffy new sourceware.cygnus.com
+web/ftp site.  The old address will work for some unknown period of
+time (hopefully at least until we get all of the mirrors adjusted).
+
+@subsection Changes in specific tools:
+
+The latest public EGCS release is now the basis for the compiler used
+in Cygwin distributions.  As a result, EGCS 1.1 is the compiler in this
+release, with a few additional x86/Cygwin-related patches.
+
+Those of you who are more interested in native Windows development than
+in porting Unix programs will be glad to know that a new gcc flag
+"-mno-cygwin" will link in the latest Mingw32 libs and produce an
+executable that does not use Cygwin.
+
+All of the other development tools have been updated to their latest
+versions.  The linker (ld) includes many important bug fixes.  It is now
+possible to safely strip a DLL with a .reloc section.  The windres
+resource compiler is significantly improved.
+
+Beta 20 also includes upgrades to a number of packages: ash-0.3.2-4,
+bash 2.02.1, grep-2.2, ncurses 4.2, and less 332.  We have added bzip2
+0.9.0 to the distribution.  And you'll now find that the df utility
+has joined its other friends from the fileutils package.
+
+The sh executable is still ash from the Debian Linux distribution but no
+longer has the problematic quoting bug that was present in the Beta 19
+release.  Control-Cs in the bash shell no longer kill background tasks.
+
+Tcl/tk are upgraded to version 8.1a2 (with additional patches).
+Compatible versions of tix and itcl are included.  These all include
+Cygwin-compatible configury files so you can do a Unix-style build of
+the Win32 ports of tcl/tk.  expect has been upgraded to 5.26 with some
+additional Cygwin patches.
+
+In response to customer requests and feedback, Cygnus has developed a
+better graphical front end to GDB than GDBtk or WinGDB.  This tcl-based
+GUI is shipping today to customers of the GNUPro Toolkit.  The
+instrumentation changes to GDB and the tcl interpreter that was built
+into GDB are part of the GPL'd source base.  But the tcl scripts are not
+being made available to the net at this time.  For this reason, you will
+only find a command-line version of gdb in this Cygwin release.
+
+DJ Delorie has written a new "cygcheck" program that will print out
+useful information about how your Cygwin environment is set up, what
+DLLs a named executable is loading from where, etc.  We hope this will
+make it easier to help diagnose common setup problems.
+
+The ps utility has been upgraded.  It now has several options including
+shorter and longer output formats.
+
+@subsection Changes in the Cygwin API (cygwin.dll):
+
+This version of Cygwin is backwards-compatible with the beta 19 release.
+You can use the new "cygwin1.dll" with your old B19-compiled executables
+if you move the old "cygwinb19.dll" out of the way and install a copy
+of "cygwin1.dll" as "cygwinb19.dll".
+
+Quite a lot of the Cygwin internals have been rewritten or modified to
+address various issues.  If you have a question about specific changes,
+the winsup/ChangeLog file in the development tools sources lists all
+changes made to the DLL over the last three years.  Following are a few
+highlights:
+
+We are now using a new versioning scheme for Cygwin.  There is now a
+separate version number for the DLL, the API, the shared memory region
+interfaces, and the registry interface.  This will hopefully make it
+easier for multiple Cygwin toolsets to coexist in one user environment.
+
+Windows 98 is now supported (it is like Windows 95 from Cygwin's
+perspective).  We still recommend upgrading to Windows NT.
+
+While there is still a lot left to do in improving Cygwin's runtime
+performance, we have put some effort into this prior to the B20 release.
+Hopefully you will find that the latest version of Cygwin is faster than
+ever.  In addition, we have plugged several nasty handle leaks
+associated with opening/closing files and with using ttys.
+
+The lseek call now uses WriteFile to fill gaps with zeros whenever a
+write is done past an EOF, rather than leaving "undefined" data as Win32
+specifies.
+
+Significant work has been done to improve the Cygwin header files.
+
+The Cygwin Support for Unix-style serial I/O is much improved.
+
+Path handling has had another round of fixes/rewrites.  We no longer use
+NT Extended Attributes by default for storing Unix permissions/execute
+status because the file NT creates on FAT partitions is not scalable to
+thousands of files (everything slows to a crawl).
+
+Signal handling has also gotten a fair amount of attention.
+Unfortunately, there are still some problems combining itimers and
+Windows 9x.
+
+The number of ttys has been upped from 16 to 128.
+
+New API calls included in the DLL: sethostent, endhostent.
+
+As mentioned earlier, all cygwin32_-prefixed functions are now exported
+with a cygwin_ prefix instead.  Please adjust your code to call the
+newly named functions.
+
+reads of `slow' devices are now correctly interrupted by signals, i.e.
+a read will receive an EINTR.

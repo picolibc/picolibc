@@ -1,0 +1,11 @@
+<chapter id="programming"><title>Programming with Cygwin</title>
+
+DOCTOOL-INSERT-gcc
+
+DOCTOOL-INSERT-gdb
+
+DOCTOOL-INSERT-dll
+
+DOCTOOL-INSERT-windres
+
+</chapter>

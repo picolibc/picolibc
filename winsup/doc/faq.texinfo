@@ -1,0 +1,13 @@
+\input texinfo 
+@title The Cygwin Project FAQ 20.2 for Release B20.1.
+@setfilename faq.txt
+
+@include what.texinfo
+@include sites.texinfo
+@include install.texinfo
+@include calls.texinfo
+@include how.texinfo
+@include relnotes.texinfo
+@include history.texinfo
+@include who.texinfo
+@include copy.texinfo

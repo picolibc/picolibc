@@ -1,0 +1,166 @@
+@chapter Installation Instructions
+@section Contents
+
+The following packages are included in the full release:
+
+Development tools:
+binutils, bison, byacc, dejagnu, diff, expect, flex, gas, gcc, gdb,
+itcl, ld, libstdc++, make, patch, tcl, tix, tk
+
+User tools:
+ash, bash, bzip2, diff, fileutils, findutils, gawk, grep, gzip, m4,
+sed, shellutils, tar, textutils, time
+
+The user tools release only contains the user tools.
+
+Full source code is available for these tools.  It is split into
+these two units.
+
+@section Installing the binary release:
+
+Important!  Be sure to remove any older versions of the Cygwin tools
+from your PATH environment variable so you do not execute them by
+mistake.
+
+To download the cygwin files, you may use whatever ftp, browser, or
+other transfer program you are familiar with.  To download multiple
+files without interaction, you may wish to try the @code{wget}
+program.  Visit the cygwin home page's software listings to find a
+pre-built copy of it.
+
+Connect to one of the ftp servers listed above and cd to the directory
+containing the latest release.  A list of mirror sites is at:
+
+@file{http://sourceware.cygnus.com/cygwin/mirrors.html}.
+
+If you want the development tools and the programs necessary to run
+the GNU configure mechanism, you should download the full binary release
+called @file{full.exe}.  If you only care about the user tools
+listed above, download @file{usertools.exe} instead.
+
+If you have an unreliable connection, download the appropriate binary in
+smaller chunks instead.  For the split cdk installer, get the files in
+the @file{full-split} subdirectory.  Once downloaded, combine the
+split files at the command prompt by doing a:
+
+@smallexample
+copy /b xaa + xab + xac + ... + xak + xal full.exe
+del xa*.*
+@end smallexample
+
+A similar process can be used for the user tools.
+
+Once you have an install executable on your system, run it.  If
+a previous version of the software is detected, it will offer to
+uninstall it for you.
+
+Next it will ask you to choose an install location.  The default is
+@file{<system-drive>:\cygnus\cygwin-b20}.  Feel free to choose another
+location if you would prefer.
+
+Finally, it will ask you for the name of the Program Files folder
+shortcut to add.  By default, the installer will create
+a @file{Cygwin B20} entry in a
+folder called @file{Cygnus Solutions}.  When this step is completed, it
+will install the tools and exit.
+
+At this point, you should be able to look under the start menu and
+select "Cygwin B20".  This will pop up a bash shell with all special
+environment variables set up for you.  If you are running Windows 95 or
+98 and are faced with the error message "Out of environment space", you
+need to increase the amount of environment space in your config.sys and
+try again.  Adding the line @code{shell=C:\command.com /e:4096 /p}
+should do the trick if @code{C:} is your system drive letter.
+
+There are two remaining thing you should do from this prompt.
+First, you need to type @code{mkdir -p /tmp} to ensure that a directory
+for temporary files exists for programs that expect to find one there.
+
+Second, if you are installing the full distribution
+(@file{full.exe}), various programs will need to be able to find
+@file{/bin/sh}.  You should @file{mkdir -p /bin} and put a copy of
+@file{sh.exe} there, removing the older version, if present.  You can
+use the @file{mount} utility to select which drive letter is mounted as
+@file{/}. See the Frequently Asked Questions (FAQ) file for more
+information on @file{mount}.
+
+If you should ever want to uninstall the tools, you may do so
+via the "Add/Remove Programs" control panel.
+
+@section Installing the source code
+
+Before downloading the source code corresponding to the release,
+you should install the latest release of the tools (either the full
+release or just the user tools).
+
+Create the directory that will house the source code.  @file{cd}
+there.
+
+Connect to one of the ftp servers listed above and cd to the directory
+containing the latest release.  A list of mirror sites is at:
+
+@file{http://sourceware.cygnus.com/cygwin/mirrors.html}.
+
+If you want the user tools source code, @file{cd} into the
+@file{user-src-split} subdirectory.  Download the files there.  If you
+want the development tools sources, @file{cd} into the
+@file{dev-src-split} subdirectory.  Download the files there.
+
+Back in the Windows command shell, for the user tools source:
+
+@smallexample
+copy /b xba + xbb + xbc + xbd + xbe + xbf + xbg user-src.tar.bz2
+del xb*.*
+bunzip2 user-src.tar.bz2
+tar xvf user-src.tar
+@end smallexample
+
+For the development tools source:
+
+@smallexample
+copy /b xca + xcb + xcc + xcd + ... + xck + xcl dev-src.tar.bz2
+del xc*.*
+bunzip2 dev-src.tar.bz2
+tar xvf dev-src.tar
+@end smallexample
+
+Both expand into a directory called @file{src}.
+
+Note: if you want the sources corresponding to everything in the
+full.exe binary installer, you will need to download and expand both
+the user-src.tar.bz2 and dev-src.tar.bz2 source archives!
+
+And you should be done...
+
+@section Upgrading to B20.1
+
+If you downloaded the original B20.0 release, you should definitely at
+least upgrade the Cygwin library to the version present in B20.1.  To do
+this, download the file
+@file{cygwin-b20/cygwin1-20.1.dll.bz2} from one of our mirror sites,
+decompress it with bunzip2, and then install the dll, replacing
+the file cygwin-b20/H-i586-cygwin32/bin/cygwin1.dll in your original
+installation of 20.0.
+
+There are some additional patches in a few of the other tools
+(including a gcc change that makes -mno-cygwin find the correct header
+files).  In addition, the tools have been built with a compiled-in path
+of /cygnus/cygwin-b20/ which will make some tools such as bison find
+their library files without help from environment variables.
+To install the full 20.1 release, you will need to download the
+correct installer from scratch.  It will offer to uninstall the existing
+release and replace it with 20.1 (You should choose to uninstall b20 and
+proceed).
+
+We have diff files on the ftp site that can be used to upgrade the
+original B20.0 sources.  20.0-20.1-dev-src.diff.bz2 upgrades the
+development tools sources.  20.0-20.1-user-src.diff.bz2 upgrades the
+user tools sources.  They come compressed so you'll need to bunzip2 them
+before proceeding.  As an example, if the development tools are in the
+directory called "src" and the patch is in the directory above it, apply
+the patch as follows:
+
+@smallexample
+cd src
+patch -p1 -E < ../20.0-20.1-dev-src.diff
+@end smallexample

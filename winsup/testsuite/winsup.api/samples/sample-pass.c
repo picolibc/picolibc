@@ -1,0 +1,4 @@
+main()
+{
+  return 0;
+}

@@ -1,0 +1,265 @@
+# Makefile.in for the winsup/mingw directory.
+# Copyright (c) 1995, 1996, 1997, 1998 Cygnus Solutions
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+# This makefile requires GNU make.
+
+VPATH = @srcdir@
+srcdir = @srcdir@
+objdir = .
+
+target_alias = @target_alias@
+prefix = @prefix@
+
+program_transform_name = @program_transform_name@
+exec_prefix = @exec_prefix@
+bindir = @bindir@
+libdir = @libdir@
+tooldir = $(exec_prefix)/$(target_alias)
+datadir = @datadir@
+infodir = @infodir@
+includedir = @includedir@
+
+# The Mingw headers are installed under a subdirectory of 
+# $(tooldir)/include when configuring in Cygwin.
+HEADER_SUBDIR = @HEADER_SUBDIR@
+
+SHELL = /bin/sh
+
+INSTALL = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+mkinstalldirs = $(SHELL) @MKINSTALLDIRS@
+
+CC = @CC@
+# FIXME: Which is it, CC or CC_FOR_TARGET?
+CC_FOR_TARGET = $(CC)
+AS_FOR_TARGET = $(AS)
+CFLAGS = @CFLAGS@
+CXXFLAGS = @CXXFLAGS@
+
+# compiling with Cygwin?
+MNO_CYGWIN = @MNO_CYGWIN@
+
+# Either crtdll (CRT_ID 1) or msvcrt (CRT_ID 2).
+RUNTIME = @RUNTIME@
+CRT_ID = @CRT_ID@
+
+# Needed for threading dll.
+THREAD_DLL = @THREAD_DLL@
+THREAD_DLL_VERSION = 10
+THREAD_DLL_NAME = $(THREAD_DLL)$(THREAD_DLL_VERSION).dll
+
+# Various libraries.
+LIBM_A=@LIBM_A@
+
+INCLUDES = -I$(srcdir)/include -I$(srcdir)/../w32api/include \
+  -I$(srcdir)/../include \
+  -nostdinc -nostdinc++
+ALL_CFLAGS = $(CFLAGS) $(INCLUDES) $(MNO_CYGWIN)
+ALL_CXXFLAGS = $(CXXFLAGS) $(INCLUDES) $(MNO_CYGWIN)
+
+AS = @AS@
+AR = @AR@
+LD = @LD@
+AR_FLAGS = rcv
+RANLIB = @RANLIB@
+DLLTOOL = @DLLTOOL@
+DLLTOOLFLAGS = 
+DLLTOOL_FOR_TARGET = $(DLLTOOL)
+DLLTOOL_FLAGS = --as $(AS_FOR_TARGET)
+DLLWRAP = @DLLWRAP@
+DLLWRAP_FOR_TARGET = $(DLLWRAP)
+DLLWRAP_FLAGS = --dlltool $(DLLTOOL) --as $(AS) --driver-name $(CC)
+
+SUBDIRS := @SUBDIRS@
+
+FLAGS_TO_PASS:=\
+	AS="$(AS)" \
+	CC="$(CC)" \
+	CFLAGS="$(CFLAGS) $(CFLAGS_COMMON) $(CFLAGS_CONFIG)" \
+	CXXFLAGS="$(CXXFLAGS) $(CFLAGS_COMMON) $(CFLAGS_CONFIG)" \
+	EXE_LDFLAGS="$(EXE_LDFLAGS)" \
+	AR="$(AR)" \
+	RANLIB="$(RANLIB)" \
+	LD="$(LD)" \
+	DLLTOOL="$(DLLTOOL)"
+
+CRT0S = crt$(CRT_ID).o dllcrt$(CRT_ID).o CRT_noglob.o crtmt.o crtst.o
+MINGW_OBJS = CRTglob.o CRTfmode.o CRTinit.o dirent.o dllmain.o gccmain.o \
+	     main.o crtst.o mthr_stub.o
+MOLD_OBJS = ctype_old.o string_old.o
+
+LIBS = libcrtdll.a libmsvcrt.a libmsvcrt20.a libmsvcrt40.a libmingw32.a \
+       libmoldname.a $(LIBM_A) libmingwthrd.a
+
+DLLS = $(THREAD_DLL_NAME)
+
+all : $(CRT0S) $(LIBS) $(DLLS)
+	@$(MAKE) subdirs DO=$@ $(FLAGS_TO_PASS)
+
+_libm_dummy.o:
+	rm -f _libm_dummy.c
+	echo "static int __mingw_libm_dummy;" > _libm_dummy.c
+	$(CC) -c $(ALL_CFLAGS) _libm_dummy.c
+	rm -f _libm_dummy.c
+
+libm.a: _libm_dummy.o
+	$(AR) rc $@ _libm_dummy.o
+	$(RANLIB) $@
+
+libmingwthrd.a: crtmt.o mingwthrd.def 
+	$(DLLTOOL) $(DLLTOOL_FLAGS) --dllname $(THREAD_DLL_NAME) \
+	  --def mingwthrd.def --output-lib $@
+	$(AR) $(ARFLAGS) $@ crtmt.o
+	$(RANLIB) $@
+
+# Using dllwrap would be so much easier, but Cygnus top-level configure
+# Makefile.in etc don't pass the right variables yet.
+xx_$(THREAD_DLL_NAME) xx_mingwthrd.def: mthr.o mthr_init.o
+	$(DLLWRAP) $(DLLWRAP_FLAGS) -o $(THREAD_DLL_NAME) \
+		--output-def mingwthrd.def \
+		mthr.o mthr_init.o
+
+DLL_OFILES        = mthr.o mthr_init.o
+DLL_CC_STUFF      = -B./ -mdll $(MNO_CYGWIN) -Wl,--image-base,0x6FBC0000 \
+		    -Wl,--entry,_DllMainCRTStartup@12 \
+                    $(DLL_OFILES)
+DLL_DLLTOOL_STUFF = --as=$(AS) --dllname $(THREAD_DLL_NAME) \
+                    --def mingwthrd.def \
+                    --base-file mingwthrd.base --output-exp mingwthrd.exp
+
+$(THREAD_DLL_NAME) mingwthrd.def: $(DLL_OFILES) Makefile
+	$(DLLTOOL) --as $(AS) --output-def mingwthrd.def $(DLL_OFILES)
+	$(CC) -Wl,--base-file=mingwthrd.base $(DLL_CC_STUFF)
+	$(DLLTOOL) $(DLL_DLLTOOL_STUFF)
+	$(CC) -Wl,--base-file=mingwthrd.base mingwthrd.exp $(DLL_CC_STUFF)
+	$(DLLTOOL) $(DLL_DLLTOOL_STUFF) 
+	$(CC) mingwthrd.exp -o $(THREAD_DLL_NAME) $(DLL_CC_STUFF)
+
+libmingw32.a: $(MINGW_OBJS)
+	$(AR) rc $@ $(MINGW_OBJS)
+	$(RANLIB) $@
+
+$(srcdir)/moldname-$(RUNTIME).def: moldname.def.in
+	$(CC) -DRUNTIME=$(RUNTIME) \
+		-D__FILENAME__=moldname-${RUNTIME}.def \
+		-D__`echo $(RUNTIME) | tr '[a-z]' '[A-Z]'`__  -c -E -P \
+		-xc-header $? > $@
+
+libmoldname.a: $(srcdir)/moldname-$(RUNTIME).def $(MOLD_OBJS)
+	$(DLLTOOL) --as $(AS) -k -U	\
+		--dllname $(RUNTIME).dll	\
+		--def $(srcdir)/moldname-$(RUNTIME).def	\
+		--output-lib $@
+	$(AR) rc $@ $(MOLD_OBJS)
+	$(RANLIB) $@
+
+# The special rule is necessary.
+crt2.o dllcrt2.o:
+	$(CC) -c -D__MSVCRT__ $(ALL_CFLAGS) $< -o $@
+
+clean:
+	-rm -f *.o *.a *~ core a.out mingwthrd.def mingwthrd.base mingwthrd.exp
+	-rm -f $(THREAD_DLL_NAME)
+	@$(MAKE) subdirs DO=$@ $(FLAGS_TO_PASS)
+
+distclean:
+	@$(MAKE) subdirs DO=$@ $(FLAGS_TO_PASS)
+	-rm -f *.o *.a *~ core a.out mingwthrd.def mingwthrd.base mingwthrd.exp
+	-rm -f $(THREAD_DLL_NAME)
+	-rm -f config.cache config.status config.log 
+	-rm -f Makefile
+
+info:
+
+info-html:
+
+install-info: info
+
+install: all
+	$(mkinstalldirs) $(bindir)
+	for i in $(DLLS); do \
+		$(INSTALL_PROGRAM) $$i $(bindir)/$$i ; \
+	done
+	$(mkinstalldirs) $(tooldir)/lib 
+	for i in $(LIBS); do \
+		$(INSTALL_DATA) $$i $(tooldir)/lib/$$i ; \
+	done
+	for i in $(CRT0S); do \
+		$(INSTALL_DATA) $$i $(tooldir)/lib/$$i ; \
+	done
+	for sub in . sys ; do \
+		dstdir=$(tooldir)/include/$(HEADER_SUBDIR)/$$sub ; \
+		$(mkinstalldirs) $$dstdir ; \
+		for i in $(srcdir)/include/$$sub/*.h ; do \
+		  $(INSTALL_DATA) $$i $$dstdir/`basename $$i` ; \
+		done ; \
+	done
+	@$(MAKE) subdirs DO=$@ $(FLAGS_TO_PASS)
+
+subdirs: force
+	@for i in $(SUBDIRS); do \
+	   echo "Making $(DO) in $${i}..." ; \
+	   if [ -d ./$$i ] ; then \
+	     if (rootme=`pwd`/ ; export rootme ; \
+	       rootsrc=`cd $(srcdir); pwd`/ ; export rootsrc ; \
+	       cd ./$$i; \
+	       $(MAKE) $(FLAGS_TO_PASS) $(DO)) ; then true ; \
+	     else exit 1 ; fi ; \
+	   else true ; fi ; \
+	done
+
+force:
+
+#
+# Dependancies
+#
+libcrtdll.a: $(srcdir)/crtdll.def
+libmsvcrt.a: $(srcdir)/msvcrt.def
+libmsvcrt20.a: $(srcdir)/msvcrt20.def
+libmsvcrt40.a: $(srcdir)/msvcrt40.def
+CRT_noglob.o: $(srcdir)/CRT_noglob.c
+CRTfmode.o: $(srcdir)/CRTfmode.c
+CRTglob.o: $(srcdir)/CRTglob.c
+CRTinit.o: $(srcdir)/CRTinit.c
+crt1.o: $(srcdir)/crt1.c $(srcdir)/init.c
+crt2.o: $(srcdir)/crt1.c $(srcdir)/init.c
+crtmt.o: $(srcdir)/crtmt.c
+crtst.o: $(srcdir)/crtst.c
+ctype_old.o: $(srcdir)/ctype_old.c
+dllcrt1.o: $(srcdir)/dllcrt1.c 
+dllcrt2.o: $(srcdir)/dllcrt1.c 
+dirent.o: $(srcdir)/dirent.c
+dllmain.o: $(srcdir)/dllmain.c
+main.o: $(srcdir)/main.c
+oldnames.o: $(srcdir)/oldnames.c
+string_old.o: $(srcdir)/string_old.c
+
+Makefile: Makefile.in config.status configure
+	$(SHELL) config.status
+
+config.status: configure
+	$(SHELL) config.status --recheck
+
+.SUFFIXES: .y $(SUFFIXES) .cc .def .a
+
+lib%.a:%.def
+	$(DLLTOOL) --as=$(AS) -k --dllname $*.dll --output-lib lib$*.a --def $<
+
+.c.o:
+	$(CC) -c $(ALL_CFLAGS) $< -o $@
+

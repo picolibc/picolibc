@@ -1,0 +1,17 @@
+The following people are responsible for maintaining various pieces of
+the winsup directory.  Their approval is required before committing any
+changes to the repository.
+
+Makefile.*			Chris Faylor <cgf@cygnus.com>
+configure.*			Chris Faylor <cgf@cygnus.com>
+MAINTAINERS			Chris Faylor <cgf@cygnus.com>
+cygwin/security.cc and
+ntsec stuff			Corinna Vinschen <corinna@vinschen.de>
+cygwin/fhandler_tape.cc		Corinna Vinschen <corinna@vinschen.de>
+cygwin/{everything else}	Chris Faylor <cgf@cygnus.com>,
+				DJ Delorie <cgf@cygnus.com>
+doc/*				DJ Delorie <cgf@cygnus.com>
+mingw/*				Mumit Khan <xraylith.wisc.edu>
+utils/*				Chris Faylor <cgf@cygnus.com>,
+				DJ Delorie <dj@cygnus.com>
+w32api/*			Mumit Khan <xraylith.wisc.edu>

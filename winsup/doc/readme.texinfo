@@ -1,0 +1,12 @@
+\input texinfo 
+@title README 20.2 for Cygwin B20.1 Release.
+
+@setfilename readme.txt
+
+@include sites.texinfo
+@include install.texinfo
+
+@chapter Release Information
+@include changes.texinfo
+
+@include relnotes.texinfo

@@ -1,0 +1,85 @@
+@chapter What is it?
+
+The Cygwin tools are ports of the popular GNU development tools
+for Windows NT, 95, and 98.  They run thanks to the Cygwin library which
+provides the UNIX system calls and environment these programs expect.
+
+With these tools installed, it is possible to write Win32 console or
+GUI applications that make use of the standard Microsoft Win32 API
+and/or the Cygwin API.  As a result, it is possible to easily
+port many significant Unix programs without the need
+for extensive changes to the source code.  This includes configuring
+and building most of the available GNU software (including the packages
+included with the Cygwin development tools themselves).  Even if
+the development tools are of little to no use to you, you may have
+interest in the many standard Unix utilities provided with the package.
+They can be used both from the bash shell (provided) or from the
+standard Windows command shell.
+
+@section Is it free software?
+
+Yes.  Parts are GNU software (gcc, gas, ld, etc...), parts are covered
+by the standard X11 license, some of it is public domain, some of
+it was written by Cygnus and placed under the GPL.  None of it is
+shareware.  You don't have to pay anyone to use it but you should be
+sure to read the copyright section of the FAQ more more information on
+how the GNU General Public License may affect your use of these tools.
+
+In particular, if you intend to port a proprietary (non-GPL'd)
+application using Cygwin, you will need the proprietary-use license 
+for the Cygwin library.  This is available for purchase; please
+contact sales@@cygnus.com for more information.
+All other questions should be sent to the project
+mailing list cygwin@@sourceware.cygnus.com.
+
+Note that when we say "free" we mean freedom, not price.  The goal of
+such freedom is that the people who use a given piece of software
+should be able to change it to fit their needs, learn from it, share
+it with their friends, etc.  The Cygwin license allows you those
+freedoms, so it is free software.
+
+The Cygwin 1.0 product is a "commercial" distribution of cygwin.  As
+such, it includes such non-software things as printed manuals,
+support, and aggregation of useful utilities.  There is nothing
+(software-wise) in there that you can't already get off the net
+already, if you take the time to find and download everything (and
+usually, build it yourself).  We test it all to make sure it works
+together, and package it in a convenient form.  We consider such
+testing and packaging to be a valuable service and thus charge a fee
+for it.  Plus, it provides income for the cygwin project so we can
+continue working on it :-)
+
+@section A brief history of the project
+
+The first thing done was to enhance the development tools (gcc, gdb,
+gas, et al) so that they could generate/interpret Win32 native object
+files.
+
+The next task was to port the tools to Win NT/95.  We could have done
+this by rewriting large portions of the source to work within the
+context of the Win32 API.  But this would have meant spending a huge
+amount of time on each and every tool.  Instead, we took a substantially
+different approach by writing a shared library (cygwin.dll) that adds
+the necessary unix-like functionality missing from the Win32 API (fork,
+spawn, signals, select, sockets, etc.).  We call this new interface the
+Cygwin API.  Once written, it was possible to build working Win32
+tools using unix-hosted cross-compilers, linking against this library.
+
+From this point, we pursued the goal of producing native tools capable of
+rebuilding themselves under Windows 95 and NT (this is often
+called self-hosting).  Since neither OS ships with standard UNIX
+user tools (fileutils, textutils, bash, etc...), we had to get the
+GNU equivalents working with the Cygwin API.  Most of these tools were
+previously only built natively so we had to modify their configure
+scripts to be compatible with cross-compilation.  Other than the
+configuration changes, very few source-level changes had to be made.
+Running bash with the development tools and user tools in place,
+Windows 95 and NT look like a flavor of UNIX from the perspective of the
+GNU configure mechanism.  Self hosting was achieved as of the beta 17.1
+release.
+
+After adding Windows 98 support to Cygwin in mid-1998, we added support
+for the native Microsoft libraries in the compiler which allows
+compilation of executables that do not use Cygwin.  This is important to
+those people who want to use the tools to develop Win32 applications
+that do not need the UNIX emulation layer.

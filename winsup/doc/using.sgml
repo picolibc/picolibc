@@ -1,0 +1,19 @@
+<chapter id="using"><title>Using Cygwin</title>
+
+<para>This chapter explains some key differences between the Cygwin
+environment and traditional UNIX systems. It assumes a working
+knowledge of standard UNIX commands.</para>
+
+DOCTOOL-INSERT-using-pathnames
+
+DOCTOOL-INSERT-using-textbinary
+
+DOCTOOL-INSERT-using-filemodes
+
+DOCTOOL-INSERT-using-specialnames
+
+DOCTOOL-INSERT-using-cygwinenv
+
+DOCTOOL-INSERT-using-utils
+
+</chapter>

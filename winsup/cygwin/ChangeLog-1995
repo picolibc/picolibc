@@ -1,0 +1,177 @@
+Mon Dec 18 16:44:38 1995  Jason Molenda  (crash@phydeaux.cygnus.com)
+
+	* configure.in (target_cpu): specify valid Intel x86 architectures
+	explicitly.
+
+Mon Dec 18 15:04:29 1995  Jason Molenda  (crash@phydeaux.cygnus.com)
+
+	* sysdef/*.def: moved to sysdef/i386/.
+
+Mon Dec 18 15:00:56 1995  Jason Molenda  (crash@phydeaux.cygnus.com)
+
+	* configure.in: Set DLL_ENTRY and SYSDEF_DIR for i386 and powerpc.
+	* configure: Regenerated with autoconf 2.7.
+
+	* Makefile.in: Use DLL_ENTRY and SYSDEF_DIR.
+
+Sat Dec 16 18:36:44 1995  steve chamberlain  <sac@slash.cygnus.com>
+
+	Changed the way that file handles are inherited.  Now
+	all files are opened with the inheriting turned on, and they're
+	closed when necessary.  
+
+	Changed the way that children are waited for.  Now
+	you can exec a non-gnuwin32 program and wait for its
+	result.
+	
+	* Makefile.in: Turn off frame-pointer.
+	* dcrt0.cc (environ_init): Lint.
+	* dirsearch.cc (opendir): Use new path_conv mechanism.
+	* exceptions.cc (ctrl_c_handler): Exit with correct status
+	* exec.cc (file_exists): Moved to paths.cc
+	(_execve): Moved most of the work into spawn.cc.
+	* fhandler.cc (*): Much.
+	* libccrt0.c (foo): Deleted.
+	(cygwin_crt0): Lint.
+	* path.cc (readlink): Initialize the SECURITY_ATTRIBUTES struct.
+	* pipe.cc (pipe, dup*): Reorganized.
+	* registry.cc (read_in): Create the key in CURRENT_USER.
+	* wait.cc, spawn.cc (*): Much.
+	* sysconf.cc (sysconf): Understand SC_PAGESIZE.
+	* times.cc (utime): New function.
+	* uname.cc (uname): Dig out more info.
+	
+Wed Dec 13 05:54:55 1995  Michael Meissner  <meissner@tiktok.cygnus.com>
+
+	* dcrt0.cc (environ_init): Cast alloca return to appropriate type.
+	* spawn.cc (spawn_guts): Ditto.
+
+	* strace.cc (__small_{v,}sprintf): Add appropriate prototypes.
+
+	* exceptions.cc (_except_list): Only use segments for 386 systems.
+	(__stack_trace): Add PowerPC support, and do nothing for systems
+	that are not supported except print stack tracing is not yet
+	support.
+
+	* sdata.cc (import_term): Only use __attribute__((section)) on 386
+	systems.
+
+	* shared.cc (shared_init): Use MARK macro instead of calling mark
+	directly with incorrect type arguments.
+
+	* fhandler.cc (fhandler_dev_null::{read,write}): Use size_t in
+	prototype, not unsigned int.
+
+	* fork.cc (find_exec): Fix type errors.
+	* path.cc (path_to_real_path_keep_rel): Ditto.
+	* syscalls.h (PATH_TO_REAL_PATH): Ditto.
+
+	* {longjmp,setjmp}.c: #ifdef i386 code.
+
+	* include/wintypes.h (ExitProcess): Add
+	__attribute__((__noreturn__)) so exit compiles without warnings.
+
+Tue Dec 12 18:25:05 1995  Jason Molenda  (crash@phydeaux.cygnus.com)
+
+	* include/wintypes.h (WINAPI): Only define WINAPI for x86 systems.
+
+Tue Dec  5 16:00:05 1995  Jason Molenda  (crash@phydeaux.cygnus.com)
+
+	* Makefile.in (all): Only build documentation for info target.
+	Expect texi2html to not be found most of the time.
+
+Tue Dec  5 08:08:08 1995  steve chamberlain  <sac@slash.cygnus.com>
+
+	Release-B10
+	
+	* cygwin.dll (__assert, wait, spawnv, spawnvp): Deleted.
+	* dcrt0.c: Quoting rewritten.
+	* exec.cc (file_exists): Use new path_conv mechanism.
+	(_execve): Close open child process handles.
+	* fhandler.cc (fhandler_normal::open): Follow symlinks.
+	(fhandler_normal::read): Keep track of logical file posision.
+	(fhandler_normal::lseek): Seek in text files correctly.
+	(fhandler_normal::fstat): Set IFLNK bit if its a symlink.
+	(fhandler_normal::init): Maintain is_pipe.
+	(fhandler_dev_null::fstat): New.
+	(fhandler_dev_null::get_handle): Return INVALID_HANDLE.
+	* fork.cc: Use new event mechanism.
+	* libccrt0.cc: Keep track of _fmode variable.
+	* misc.c (readlink): Delete.
+	* path.cc (__path_to_real_path_1): Allow /d<letter> mechanism.
+	(path_to_real_path_keep_rel): New
+	(link_cookie:*): Support for symbolic links.
+	* spawn.cc (spawn_guts): Quoting rewritten.
+	* times.cc: New.
+	* syscalls.cc (_stat_worker): New.
+	(_stat, _lstat): Use _stat_worker.
+	* sysconf.cc (sysconf): Support _SC_CLK_TCK.
+
+Tue Nov 28 15:29:38 1995  steve chamberlain  <sac@slash.cygnus.com>
+
+	* loads of stuff. When I make < 100k of diffs in a day, 
+	the ChangeLog will be usefull.
+
+Tue Nov 21 18:01:39 1995  steve chamberlain  <sac@slash.cygnus.com>
+
+	* Makefile.in: Build the doc.
+	* exceptions.cc: lint.
+	* fork.cc: lint.
+	* shared.cc (shared_init): If MapViewOfFileEx fails, then try
+	again, but get the OS to select the address (for win95)
+	* strace.cc (__sysprintf): Print pid and state in hex.
+	* syscalls.cc (_unlink): Translate path to realpath.
+
+Wed Nov 15 23:47:43 1995  Jason Molenda  (crash@phydeaux.cygnus.com)
+
+	* spawn.cc (_exit): set return value's lower byte to 0 by default.
+
+	Tue Oct 3 10:23:14 1995 Anders Blomdell (anders.blomdell@control.lth.se)
+
+	* spawn.cc (spawn_guts): quote doublequotes correctly 
+	
+Tue Nov 14 15:05:33 1995  Jason Molenda  (crash@phydeaux.cygnus.com)
+
+	* configure.in: comment out call to cfg-ml-com.in.
+
+Tue Oct 31 11:19:18 1995  steve chamberlain  <sac@slash.cygnus.com>
+
+	* libcerr.cc: New file.
+	* dcrt0.cc (environ_init): Initialize PATH and friends nicely.
+	* exceptions.cc (ctrl_c_handler): Default case is to exit.
+	* fork.cc (__suffixy, find_exec): translate between paths and
+	real_paths.
+	* shared.cc (shared_init): Hard wire shared memory at 0xa0000000.
+	* syscalls.c (__path_to_real_path, real_path_to_path): Always
+	translate '/' <> '\'
+
+Mon Oct 30 17:36:10 1995  steve chamberlain  <sac@slash.cygnus.com>
+
+	* syscalls.cc (_rename): Fix for win95.
+
+Fri Oct 27 20:53:47 1995  steve chamberlain  <sac@slash.cygnus.com>
+
+	* Everything changed.
+
+Thu Oct 19 10:47:52 1995  steve chamberlain  <sac@slash.cygnus.com>
+
+	* registry.cc, uinfo.cc: New files.
+	* crt0.c (*uinfo*, *_exe_suffix*): Delete.
+	(dll_crt0): Call shared_init.
+	* getlogin.c: deleted.
+	* shared.cc: Fill in.
+	* spawn.c (_spawn): Use __exe_suffix function.
+	* syscalls.c (getuid, getgid): Moved into uinfo.cc
+	* syscalls.h (*uinfo, __exe_suffix): Deleted
+	* Makefile.in: Cope with target configury.
+	* termios.c: Fix stub prototypes.
+	* win.h: Deleted.
+	* include/winadvapi.h: Fill in some REG prototypes.
+
+Thu Oct 19 10:47:52 1995  steve chamberlain  <sac@slash.cygnus.com>
+
+	* Makefile.in: Cope with target configury.
+
+Wed Oct 18 15:34:49 1995  steve chamberlain  <sac@slash.cygnus.com>
+
+	* Moved from newlib.

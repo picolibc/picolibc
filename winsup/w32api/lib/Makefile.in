@@ -1,0 +1,181 @@
+#
+#	Makefile.in
+#
+#	This file is part of a free library for the Win32 API.
+# 
+#	This library is distributed in the hope that it will be useful,
+#	but WITHOUT ANY WARANTY; without even the implied warranty of
+#	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+
+# start config section
+
+SHELL = @SHELL@
+
+srcdir = @srcdir@
+VPATH = @srcdir@
+
+target_alias = @target_alias@
+prefix = @prefix@
+
+program_transform_name = @program_transform_name@
+exec_prefix = @exec_prefix@
+bindir = @bindir@
+libdir = @libdir@
+tooldir = $(exec_prefix)/$(target_alias)
+datadir = @datadir@
+infodir = @infodir@
+includedir = @includedir@
+
+INSTALL = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+mkinstalldirs = mkdir -p
+
+CC = @CC@
+CC_FOR_TARGET = $(CC)
+
+DLLTOOL = @DLLTOOL@
+DLLTOOL_FLAGS = --as=$(AS) -k
+AS = @AS@
+AS_FOR_TARGET = $(AS_FOR_TARGET)
+WINDRES = @WINDRES@
+
+# Depending on if we build as part of winsup or mingw we need to
+# add additional include paths in order to get the correct headers
+# from the C library.
+BUILDENV = @BUILDENV@
+
+ifeq ($(BUILDENV), cygwin)
+# winsup/include
+# winsup/../newlib/libc/include
+# winsup/../newlib/libc/sys/cygwin
+EXTRA_INCLUDES = -I$(srcdir)/../../include -I$(srcdir)/../../../newlib/libc/include -I$(srcdir)/../../../newlib/libc/sys/cygwin
+endif
+ifeq ($(BUILDENV), mingw)
+EXTRA_INCLUDES = -I$(srcdir)/../../mingw/include
+endif
+
+INCLUDES = -I$(srcdir)/../include $(EXTRA_INCLUDES)
+
+CFLAGS = @CFLAGS@
+ALL_CFLAGS = $(CFLAGS) $(INCLUDES)
+
+RANLIB = @RANLIB@
+AR = @AR@
+LD = @LD@
+
+# end config section
+
+# headers
+
+HEADERS = $(notdir $(wildcard $(srcdir)/../include/*.h))
+
+# libraries
+
+DEF_FILES = $(notdir $(wildcard $(srcdir)/*.def))
+IMPLIBS = $(addprefix lib,$(subst .def,.a,$(DEF_FILES)))
+EXTRA_LIBS=libuuid.a libscrnsave.a libscrnsavw.a libdxguid.a liblargeint.a
+LIBS = $(IMPLIBS) $(EXTRA_LIBS)
+EXTRA_OBJS=uuid.o shell32.o dxguid.o scrnsave.o scrnsavw.o largeint.o $(UUID_OBJS) dinput.o
+SOURCES = scrnsave.c shell32.c uuid.c largeint.c dinput.c dxguid.c \
+res.rc test.c
+
+DISTFILES = Makefile.in $(DEF_FILES) $(SOURCES)
+
+# targets
+all: $(LIBS) $(EXTRA_OBJS)
+
+TEST_OPTIONS = $(ALL_CFLAGS) -Wall -c $(srcdir)/test.c -o test.o
+.PHONY: test
+test:
+	@echo "Testing w32api..."
+	@for lang in c c++ objective-c ; do \
+		echo "$$lang..."; \
+		$(CC) -x$$lang $(TEST_OPTIONS) ; \
+		echo "$$lang UNICODE..."; \
+		$(CC) -x$$lang -DUNICODE $(TEST_OPTIONS) ; \
+	done
+	@echo "windres..."
+	@$(WINDRES) --include-dir $(INCDIR) -i $(srcdir)/res.rc -o test.o
+	@echo "windres UNICODE..."
+	@$(WINDRES) --define UNICODE --include-dir $(INCDIR) -i $(srcdir)/res.rc -o test.o
+	@rm -f test.o
+
+scrnsavw.o: scrnsave.c
+	$(CC) -c $(ALL_CFLAGS) -DUNICODE -o $@ $<
+
+# make rules
+
+.SUFFIXES: .c .o .def .a
+
+.c.o:
+	$(CC) -c $(ALL_CFLAGS) -o $@ $<
+
+lib%.a : %.def %.o
+	$(DLLTOOL) $(DLLTOOL_FLAGS) --output-lib $@ --def $(srcdir)/$*.def
+	$(AR) r $@ $*.o
+	$(RANLIB) $@
+
+lib%.a: %.def
+	$(DLLTOOL) $(DLLTOOL_FLAGS) --output-lib $@ --def $<
+
+lib%.a: %.o
+	$(AR) rc $@ $*.o
+	$(RANLIB) $@
+
+# install headers and libraries
+install: install-libraries install-headers
+
+install-libraries: all
+	$(mkinstalldirs) $(tooldir)/lib
+	for i in $(LIBS); do \
+		$(INSTALL_DATA) $$i $(tooldir)/lib/$$i ; \
+	done
+
+install-headers:
+	$(mkinstalldirs) $(tooldir)/include
+	for i in $(HEADERS); do \
+		$(INSTALL_DATA) $(srcdir)/../include/$$i $(tooldir)/include/$$i ; \
+	done
+
+# uninstall headers and libraries
+uninstall: uninstall-libraries uninstall-headers
+
+uninstall-libraries:
+	@for i in $(LIBS); do \
+		rm -f $(tooldir)/lib/$$i ; \
+	done
+
+uninstall-headers:
+	@for i in $(HEADERS); do \
+		rm -f $(tooldir)/include/$$i ; \
+	done
+
+dist:
+	mkdir $(distdir)/include
+	chmod 755 $(distdir)/include
+	@for i in $(HEADERS); do \
+		cp -p $(srcdir)/../include/$$i $(distdir)/include/$$i ; \
+	done
+	mkdir $(distdir)/lib
+	chmod 755 $(distdir)/lib
+	@for i in $(DISTFILES); do \
+		cp -p $(srcdir)/$$i $(distdir)/lib/$$i ; \
+	done
+
+Makefile: Makefile.in ../config.status ../configure
+	cd ..; $(SHELL) config.status
+
+# clean
+
+mostlyclean:
+	rm -f *~ *.o *.s
+
+clean:
+	rm -f *.o *.a *.s *~
+
+distclean: clean
+	rm -f config.cache config.status config.log Makefile
+
+maintainer-clean: distclean

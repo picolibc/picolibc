@@ -1,0 +1,78 @@
+<sect1 id="gcc"><title>Using GCC with Cygwin</title>
+
+<sect2 id="gcc-cons"><title>Console Mode Applications</title>
+
+<para>Use gcc to compile, just like under UNIX.
+Refer to the GCC User's Guide for information on standard usage and
+options.  Here's a simple example:</para>
+
+<example>
+<title>Building Hello World with GCC</title>
+<screen>
+<prompt>C:\cygnus\&gt;</prompt> <userinput>gcc hello.c -o hello.exe</userinput>
+<prompt>C:\cygnus\&gt;</prompt> <userinput>hello.exe</userinput>
+Hello, World
+
+<prompt>C:\cygnus\&gt;</prompt>
+</screen>
+</example>
+
+</sect2>
+
+<sect2 id="gcc-gui"><title>GUI Mode Applications</title>
+
+<para>Cygwin allows you to build programs with full access to the
+standard Windows 32-bit API, including the GUI functions as defined in
+any Microsoft or off-the-shelf publication.  However, the process of
+building those applications is slightly different, as you'll be using
+the GNU tools instead of the Microsoft tools.</para>
+
+<para>For the most part, your sources won't need to change at all.
+However, you should remove all __export attributes from functions
+and replace them like this:</para>
+
+<screen>
+int foo (int) __attribute__ ((__dllexport__));
+
+int
+foo (int i)
+</screen>
+
+<para>For most cases, you can just remove the __export and leave it at
+that.  For convenience sake, you might want to include the following
+code snippet when compiling GUI programs.  If you don't, you will want
+to add "-e _mainCRTStartup" to your link line in your Makefile.</para>
+
+<screen>
+#ifdef __CYGWIN__
+WinMainCRTStartup() { mainCRTStartup(); }
+#endif
+</screen>
+
+<para>The Makefile is similar to any other UNIX-like Makefile,
+and like any other Cygwin makefile.  The only difference is that you use
+<command>gcc -mwindows</command> to link your program into a GUI
+application instead of a command-line application.  Here's an example:</para>
+
+<screen>
+myapp.exe : myapp.o myapp.res
+	gcc -mwindows myapp.o myapp.res -o $@
+
+myapp.res : myapp.rc resource.h
+	windres $< -O coff -o $@
+</screen>
+
+<para>Note the use of <filename>windres</filename> to compile the
+Windows resources into a COFF-format <filename>.res</filename> file.
+That will include all the bitmaps, icons, and other resources you
+need, into one handy object file.  Normally, if you omitted the "-O
+coff" it would create a Windows <filename>.res</filename> format file,
+but we can only link COFF objects.  So, we tell
+<filename>windres</filename> to produce a COFF object, but for
+compatibility with the many examples that assume your linker can
+handle Windows resource files directly, we maintain the
+<filename>.res</filename> naming convention.  For more information on
+<filename>windres</filename>, consult the Binutils manual.  </para>
+
+</sect2>
+</sect1>

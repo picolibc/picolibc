@@ -1,0 +1,16 @@
+
+<sect1 id="func-cygwin-internal">
+<title>cygwin_internal</title>
+
+<funcsynopsis>
+<funcdef>extern "C" DWORD
+<function>cygwin_internal</function></funcdef>
+<paramdef>cygwin_getinfo_types <parameter>t</parameter></paramdef>
+<paramdef><parameter>...</parameter></paramdef>
+</funcsynopsis>
+
+<para>This function gives you access to various internal data and functions.
+Stay away unless you know what you're doing.</para>
+
+</sect1>
+

@@ -1,0 +1,71 @@
+@chapter Who's behind the project?
+
+Chris Faylor (cgf@@cygnus.com) is behind many of the recent
+changes in Cygwin.  Prior to joining Cygnus, he contributed significant
+fixes to the process control and environ code, reworked the strace
+mechanism, and rewrote the signal-related code from scratch as a Net
+contributor.  In addition to continuing to make technical contributions,
+Chris is also currently the group's manager.
+
+Geoffrey Noer (noer@@cygnus.com) took over the Cygwin project from its'
+initial author Steve Chamberlain in mid-1996.  As maintainer, he
+produced Net releases beta 16 through 20; made the development
+snapshots; worked with Net contributors to fix bugs; made many various
+code improvements himself; wrote a paper on Cygwin for the
+1998 Usenix NT Symposium; authored the project WWW pages, FAQ, README;
+etc.
+
+DJ Delorie (dj@@cygnus.com) has done important work in profiling Cygwin,
+worked on the Dejagnu automated testing framework, merged the dlltool
+functionality into ld, wrote a good deal of the Cygwin Users' Guide,
+authored the cygcheck utility, and made automated snapshots available
+from our project WWW page.
+
+Steve Chamberlain (sac@@transmeta.com) designed and implemented
+Cygwin in 1995-1996 while working for Cygnus.  He worked with the Net
+to improve the technology, ported/integrated many of the user tools
+for the first time to Cygwin, and produced all of the releases up to
+beta 14.
+
+Marco Fuykschot (marco@@ddi.nl) and Peter Boncz (boncz@@ddi.nl) of
+Data Distilleries contributed nearly all of the changes required to
+make Cygwin thread-safe.  They also provided the pthreads interface.
+
+Sergey Okhapkin (sos@@prospect.com.ru) has been an invaluable Net
+contributor.  He implemented the tty/pty support, has played a
+significant role in revamping signal and exception handling, and has
+made countless contributions throughout the library.  He also provided
+binaries of the development snapshots to the Net after the beta 19
+release.
+
+Mumit Khan (khan@@xraylith.wisc.edu) has been most helpful on the EGCS
+end of things, providing quite a large number of stabilizing patches to
+the compiler tools for the B20 release.
+
+Corinna Vinschen <corinna@@vinschen.de> has contributed several
+useful fixes to the path handling code, console support, improved security
+handling, and raw device support.
+
+Philippe Giacinti (giac@@dalim.de) contributed the implementation of
+dlopen, dlclose, dlsym, dlfork, and dlerror in Cygwin.
+
+Many other people at Cygnus have made important contributions to Cygwin.
+Tobin Brockett wrote the InstallShield-based installer for the beta 19
+and 20 releases.  Ian Lance Taylor did a much-needed rework of the path
+handling code for beta 18, and has made many assorted fixes throughout
+the code.  Jeremy Allison made significant contributions in the area of
+file handling and process control, and rewrote select from scratch.
+Doug Evans rewrote the path-handling code in beta 16, among other
+things.  Kim Knuttila and Michael Meissner put in many long hours
+working on the now-defunct PowerPC port.  Jason Molenda and Mark Eichin
+have also made important contributions.
+
+Please note that those of us here at Cygnus that work on Cygwin try to
+be as responsive as possible and deal with patches and questions as we
+get them, but realistically we don't have time to answer all of the
+email that is sent to the main mailing list.  Making Net releases of the
+Win32 tools and helping people on the Net out is not our primary job
+function, so some email will have to go unanswered.
+
+Many thanks to everyone using the tools for their many contributions in
+the form of advice, bug reports, and code fixes.  Keep them coming!
