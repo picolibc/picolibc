@@ -32,6 +32,8 @@
 #define ARM_EXT_V5E	 0x00000400	/* DSP Double transfers.   */
 #define ARM_EXT_V5J	 0x00000800	/* Jazelle extension.	   */
 #define ARM_EXT_V6       0x00001000     /* ARM V6.                 */
+#define ARM_EXT_V6K      0x00002000     /* ARM V6K.                */
+#define ARM_EXT_V6Z      0x00004000     /* ARM V6Z.                */
 
 /* Co-processor space extensions.  */
 #define ARM_CEXT_XSCALE   0x00800000	/* Allow MIA etc.          */
@@ -60,6 +62,9 @@
 #define ARM_ARCH_V5TE	(ARM_ARCH_V5TExP | ARM_EXT_V5E)
 #define ARM_ARCH_V5TEJ	(ARM_ARCH_V5TE	| ARM_EXT_V5J)
 #define ARM_ARCH_V6     (ARM_ARCH_V5TEJ | ARM_EXT_V6)
+#define ARM_ARCH_V6K    (ARM_ARCH_V6    | ARM_EXT_V6K)
+#define ARM_ARCH_V6Z    (ARM_ARCH_V6    | ARM_EXT_V6Z)
+#define ARM_ARCH_V6ZK   (ARM_ARCH_V6    | ARM_EXT_V6K | ARM_EXT_V6Z)
 
 /* Processors with specific extensions in the co-processor space.  */
 #define ARM_ARCH_XSCALE	(ARM_ARCH_V5TE	| ARM_CEXT_XSCALE)

@@ -1,3 +1,8 @@
+2004-09-30  Paul Brook  <paul@codesourcery.com>
+
+	* arm.h (ARM_EXT_V6K, ARM_EXT_V6Z): Define.
+	(ARM_ARCH_V6K, ARM_ARCH_V6Z, ARM_ARCH_V6ZK): Define.
+
 2004-09-11  Theodore A. Roth  <troth@openavr.org>
 
 	* avr.h: Add support for
