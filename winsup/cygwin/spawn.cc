@@ -774,7 +774,8 @@ skip_arg_parsing:
 	case WAIT_OBJECT_0 + 2:
 	  if (mode == _P_OVERLAY)
 	    {
-	      res |= EXIT_REPARENTING;
+	      if (myself->ppid_handle)
+		res |= EXIT_REPARENTING;
 	      if (!my_parent_is_alive ())
 		{
 		  nwait = 1;

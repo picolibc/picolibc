@@ -1004,16 +1004,15 @@ stat_dev (DWORD devn, int unit, unsigned long ino, struct stat *buf)
   sigframe thisframe (mainthread);
   switch (devn)
     {
-    case FH_CONOUT:
     case FH_PIPEW:
       buf->st_mode = STD_WBITS;
       break;
-    case FH_CONIN:
     case FH_PIPER:
       buf->st_mode = STD_RBITS;
       break;
-    default:
-      buf->st_mode = STD_RBITS | S_IWUSR | S_IWGRP | S_IWOTH;
+    case FH_CONIN:
+    case FH_CONOUT:
+      buf->st_mode = STD_RBITS | STD_WBITS;
       break;
     }
 
