@@ -404,7 +404,6 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	int width;		/* width from format (%8d), or 0 */
 	int prec;		/* precision from format (%.3d), or -1 */
 	char sign;		/* sign prefix (' ', '+', '-', or \0) */
-	wchar_t wc;
 #ifdef FLOATING_POINT
 	char *decimal_point = localeconv()->decimal_point;
 	char softsign;		/* temporary negative sign for floats */
@@ -421,10 +420,7 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	int ndig;		/* actual number of digits returned by cvt */
 	char expstr[7];		/* buffer for exponent string */
 #endif
-
-
 	u_quad_t _uquad;	/* integer arguments %[diouxX] */
-
 	enum { OCT, DEC, HEX } base;/* base for [diouxX] conversion */
 	int dprec;		/* a copy of prec if [diouxX], 0 otherwise */
 	int realsz;		/* field size expanded by dprec */
@@ -435,7 +431,10 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	struct __siov iov[NIOV];/* ... and individual io vectors */
 	char buf[BUF];		/* space for %c, %[diouxX], %[eEfgG] */
 	char ox[2];		/* space for 0x hex-prefix */
+#ifdef MB_CAPABLE
+	wchar_t wc;
 	mbstate_t state;        /* mbtowc calls from library must not change state */
+#endif
 	char *malloc_buf = NULL;/* handy pointer for malloced buffers */
 
 	/*
@@ -449,7 +448,9 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	static _CONST char zeroes[PADSIZE] =
 	 {'0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'};
 
+#ifdef MB_CAPABLE
         memset (&state, '\0', sizeof (state));
+#endif
 	/*
 	 * BEWARE, these `goto error' on error, and PAD uses `n'.
 	 */
@@ -550,20 +551,27 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	 */
 	for (;;) {
 	        cp = fmt;
+#ifdef MB_CAPABLE
 	        while ((n = _mbtowc_r(data, &wc, fmt, MB_CUR_MAX, &state)) > 0) {
-			fmt += n;
-			if (wc == '%') {
-				fmt--;
-				break;
-			}
+                    if (wc == '%')
+                        break;
+                    fmt += n;
 		}
+#else
+                while (*fmt != '\0' && *fmt != '%')
+                    fmt += 1;
+#endif
 		if ((m = fmt - cp) != 0) {
 			PRINT(cp, m);
 			ret += m;
 		}
+#ifdef MB_CAPABLE
 		if (n <= 0)
-			goto done;
-
+                    goto done;
+#else
+                if (*fmt == '\0')
+                    goto done;
+#endif
 		fmt_anchor = fmt;
 		fmt++;		/* skip over '%' */
 
@@ -1445,38 +1453,50 @@ get_arg (struct _reent *data, int n, char *fmt, va_list *ap,
 	 int *arg_type, char **last_fmt) 
 {
   int ch;
-  wchar_t wc;
-  int nbytes, number, flags;
+  int number, flags;
   int spec_type;
   int numargs = *numargs_p;
   CH_CLASS chtype;
   STATE state, next_state;
   ACTION action;
   int pos, last_arg;
-  mbstate_t wc_state;
   int max_pos_arg = n;
   enum types { INT, LONG_INT, SHORT_INT, QUAD_INT, CHAR, CHAR_PTR, DOUBLE, LONG_DOUBLE, WIDE_CHAR };
-  
+#ifdef MB_CAPABLE
+  wchar_t wc;
+  mbstate_t wc_state;
+  int nbytes; 
+#endif
+    
   /* if this isn't the first call, pick up where we left off last time */
   if (*last_fmt != NULL)
     fmt = *last_fmt;
 
+#ifdef MB_CAPABLE
   memset (&wc_state, '\0', sizeof (wc_state));
+#endif
 
   /* we need to process either to end of fmt string or until we have actually
      read the desired parameter from the vararg list. */
   while (*fmt && n >= numargs)
     {
+#ifdef MB_CAPABLE
       while ((nbytes = _mbtowc_r(data, &wc, fmt, MB_CUR_MAX, &wc_state)) > 0) 
 	{
 	  fmt += nbytes;
 	  if (wc == '%') 
 	    break;
 	}
-      
+
       if (nbytes <= 0)
 	break;
+#else
+      while (*fmt != '\0' && *fmt != '%')
+	fmt += 1;
 
+      if (*fmt == '\0')
+	break;
+#endif
       state = START;
       flags = 0;
       pos = -1;

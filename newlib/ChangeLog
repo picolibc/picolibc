@@ -1,3 +1,9 @@
+2003-11-21  Artem B. Bityuckiy  <mail_lists@mail.ru>
+
+	* libc/stdio/vfprintf.c (_VFPRINTF_R, get_arg): Move mb-specific
+	code within checks for MB_CAPABLE.  For non-mb-capable platforms,
+	use simple byte logic.
+
 2003-11-21  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/vfscanf.c (__svfscanf_r)[!_NO_LONGDBL]: Don't use
