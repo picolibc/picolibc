@@ -199,13 +199,14 @@ Subsection 2.d.f of the `Microsoft Open Tools License agreement' looks
 like it says that one may not "permit further redistribution of the
 Redistributables to their end users".  We take this to mean that we can
 give them to you, but you can't give them to anyone else, which is
-something that Cygnus (err... Red Hat) can't agree to.  Fortunately, we
+something that Red Hat can't agree to.  Fortunately, we
 have our own Win32 headers which are pretty complete.
 
-@subsection How do I link against .lib files?
+@subsection How do I link against a @samp{.lib} file?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
+If your @samp{.lib} file is a normal static or import library with
+C-callable entry points, you can list @samp{foo.lib} as an object file for
+gcc/g++, just like any @samp{*.o} file. Otherwise, here are some steps:
 
 1. Build a C file with a function table.  Put all functions you intend
 to use in that table.  This forces the linker to include all the object
@@ -263,22 +264,23 @@ make > make.log 2>&1
 make install > install.log 2>&1
 @end example
 
-Normally, this procedure will also attempt to build the documentation,
-which additionally requires db2html, and possibly other tools, which are
-not included in the Cygwin distribution.  You can get db2html as part of
-docbook, from @file{http://sources.redhat.com/docbook-tools/}.
+Normally, this procedure ignore errors in building the documentation,
+which requires tools which are not included in the Cygwin distribution.
+If you want to build the documentation on Linux, on most distributions a
+package named docbook-utils should get you most of what you need. For
+more information on building the documentation, see the README included
+in the cygwin-doc package.
 
 To check a cygwin1.dll, run "make check" in the winsup/cygwin directory.
 If that works, install everything @emph{except} the dll (if you can).
 Then, close down all cygwin programs (including bash windows, inetd,
-etc.), save your old dll, and copy the new dll to @emph{all} the
-places where the old dll was (if there is more than one on your
-machine).  Then start up a bash window and see what happens.  (Or better,
-run a cygwin program from the Windows command prompt.)
+etc.), save your old dll, and copy the new dll to the correct place.
+Then start up a bash window, or  run a cygwin program from the Windows
+command prompt, and see what happens.
 
 If you get the error "shared region is corrupted" it means that two
 different versions of cygwin1.dll are running on your machine at the
-same time.
+same time. Remove all but one. 
 
 @subsection How can I compile a powerpc NT toolchain?
 

@@ -159,6 +159,11 @@ default printer with the command <command>cat filename > PRN</command>
 directory as Cygwin automatically simulates it internally. 
 These devices cannot be seen with the command <command>ls /dev/</command>
 although commands such as <command>ls /dev/tty</command> work fine.
+If you want to be able to see all devices in
+<filename>/dev/</filename>, you can use Igor Pechtchanski's
+<ulink
+url="http://cygwin.com/ml/cygwin/2004-03/txt00028.txt">create_devices.sh</ulink>
+script.
 </para>
 <para>
 Cygwin supports the following devices commonly found on POSIX systems:
@@ -167,7 +172,8 @@ Cygwin supports the following devices commonly found on POSIX systems:
 <filename>/dev/tty</filename>, <filename>/dev/ttym</filename>, 
 <filename>/dev/ttyX</filename>, <filename>/dev/ttySX</filename>, 
 <filename>/dev/pipe</filename>, <filename>/dev/port</filename>, 
-<filename>/dev/ptmx</filename>, <filename>/dev/mem</filename>,
+<filename>/dev/ptmx</filename>, <filename>/dev/kmem</filename>,
+<filename>/dev/mem</filename>,
 <filename>/dev/random</filename>, and <filename>/dev/urandom</filename>.
 Cygwin also has several Windows-specific devices:
 <filename>/dev/comX</filename> (the serial ports, starting with 
@@ -175,8 +181,8 @@ Cygwin also has several Windows-specific devices:
 <filename>/dev/conin</filename> (Windows <filename>CONIN$</filename>),
 <filename>/dev/conout</filename> (Windows <filename>CONOUT$</filename>),
 <filename>/dev/clipboard</filename> (the Windows clipboard, currently
-text only), and
-<filename>/dev/windows</filename> (the Windows message queue).
+text only), and <filename>/dev/windows</filename> (the Windows message
+queue).
 </para>
 
 <para>Windows NT/W2K/XP additionally support raw devices like floppies,
@@ -254,9 +260,9 @@ The following three examples will not work as expected:
 </para>
 
 <screen>
-mount -f -b /dev/nst0 /dev/tape 
-mount -f -b /device/tape0 /dev/tape
-ln -s /device/tape0 /dev/tape
+mount -f -b /dev/nst0 /dev/tape     # DOES NOT WORK
+mount -f -b /device/tape0 /dev/tape # DOES NOT WORK
+ln -s /device/tape0 /dev/tape       # DOES NOT WORK
 </screen>
 </warning>
 
@@ -264,11 +270,11 @@ ln -s /device/tape0 /dev/tape
 
 <sect2><title>The .exe extension</title>
 
-<para> Executable program filenames end with .exe but the .exe need
-not be included in the command, so that traditional UNIX names can be
-used.  However, for programs that end in ".bat" and ".com", you cannot
-omit the extension.
-</para>
+<para> Executable program filenames end with <filename>.exe</filename>
+but the <filename>.exe</filename> need not be included in the command,
+so that traditional UNIX names can be used.  However, for programs that
+end in <filename>.bat</filename> and <filename>.com</filename>, you
+cannot omit the extension.  </para>
 
 <para>As a side effect, the <command> ls filename</command> gives
 information about <filename>filename.exe</filename> if
