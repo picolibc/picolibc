@@ -1,3 +1,8 @@
+2004-04-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::open): Add FILE_READ_ATTRIBUTES when
+	only GENERIC_WRITE access is requested.
+
 2004-04-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/mtio.h (GMT_ASYNC): New define.

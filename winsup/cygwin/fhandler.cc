@@ -604,7 +604,7 @@ fhandler_base::open (int flags, mode_t mode)
 	if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDONLY)
 	  access = GENERIC_READ;
 	else if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_WRONLY)
-	  access = GENERIC_WRITE;
+	  access = GENERIC_WRITE | FILE_READ_ATTRIBUTES;
 	else
 	  access = GENERIC_READ | GENERIC_WRITE;
 	/* Allow reliable lseek on disk devices. */
