@@ -47,6 +47,7 @@ ANSI C requires <<mktime>>.
 
 #include <stdlib.h>
 #include <time.h>
+#include "local.h"
 
 #define _SEC_IN_MINUTE 60L
 #define _SEC_IN_HOUR 3600L
@@ -156,7 +157,7 @@ mktime (tim_p)
 {
   time_t tim = 0;
   long days = 0;
-  int year;
+  int year, isdst;
 
   /* validate structure */
   validate_structure (tim_p);
@@ -199,6 +200,51 @@ mktime (tim_p)
 
   /* compute total seconds */
   tim += (days * _SEC_IN_DAY);
+
+  isdst = tim_p->tm_isdst;
+
+  if (_daylight)
+    {
+      int y = tim_p->tm_year + YEAR_BASE;
+      if (y == __tzyear || __tzcalc_limits (y))
+	{
+	  /* calculate start of dst in dst local time and 
+	     start of std in both std local time and dst local time */
+          time_t startdst_dst = __tzrule[0].change - __tzrule[1].offset;
+	  time_t startstd_dst = __tzrule[1].change - __tzrule[1].offset;
+	  time_t startstd_std = __tzrule[1].change - __tzrule[0].offset;
+	  /* if the time is in the overlap between dst and std local times */
+	  if (tim >= startstd_std && tim < startstd_dst)
+	    ; /* we let user decide or leave as -1 */
+          else
+	    {
+	      isdst = (__tznorth
+		       ? (tim >= startdst_dst && tim < startstd_std)
+		       : (tim >= startdst_dst || tim < startstd_std));
+	      /* if user committed and was wrong, perform correction */
+	      if ((isdst ^ tim_p->tm_isdst) == 1)
+		{
+		  /* we either subtract or add the difference between
+		     time zone offsets, depending on which way the user got it wrong */
+		  int diff = __tzrule[0].offset - __tzrule[1].offset;
+		  if (!isdst)
+		    diff = -diff;
+		  tim_p->tm_sec += diff;
+		  validate_structure (tim_p);
+		  tim += diff;  /* we also need to correct our current time calculation */
+		}
+	    }
+	}
+    }
+
+  /* add appropriate offset to put time in gmt format */
+  if (isdst == 1)
+    tim += __tzrule[1].offset;
+  else /* otherwise assume std time */
+    tim += __tzrule[0].offset;
+
+  /* reset isdst flag to what we have calculated */
+  tim_p->tm_isdst = isdst;
 
   return tim;
 }

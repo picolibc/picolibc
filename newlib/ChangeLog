@@ -1,3 +1,30 @@
+2002-04-17  Jeff Johnston  <jjohnstn@redhat.com>
+
+	*  libc/include/time.h (tzset, _tzset_r): Added prototypes.
+	(strptime): Moved prototype to be within !__STRICT_ANSI__.
+	(_tzname, _daylight, _timezone): No long __CYGWIN__ only.
+	(tzname): Defined for all platforms.
+	(daylight, timezone): Defined only for CYGWIN.
+	*  libc/sys/linux/machine/i386/crt0.c: Add call to tzset() after
+	environment set up.
+	* libc/stdlib/setenv_r.c (_setenv_r): Call tzset() if the TZ
+	environment variable is set.
+	*  libc/time/Makefile.am: Add support for tzset.c, tzlock.c, and
+	tzset_r.c.
+	*  libc/time/Makefile.in: Regenerated.
+	*  libc/time/gmtime.c (gmtime): Changed to call gmtime_r.
+	*  libc/time/gmtime_r.c (gmtime_r): Changed to call _mktm_r.
+	*  libc/time/lcltime_r.c (lcltime_r): Ditto.
+	*  libc/time/local.h: New local header file.
+	*  libc/time/mktime.c (mktime): Add timezone support.
+	*  libc/time/mktm_r.c: New file which is the common engine
+	for gmtime_r and lcltime_r.  This code has timezone support.
+	*  libc/time/strftime.c (strftime): Add %Z timezone support.
+	*  libc/time/tzlock.c: New file containing timezone lock stubs.
+	*  libc/time/tzset.c: New file containing tzset() routine.
+	*  libc/time/tzset_r.c: New file containing _tzset_r and
+	internal routine for calculating timezone changes for specified year.
+
 2002-04-17  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* configure.in (CRT0_DIR): Set to libc/.

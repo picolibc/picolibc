@@ -8,6 +8,7 @@
 
 
 #include <stdlib.h>
+#include <time.h>
 
 
 extern char **environ;
@@ -28,5 +29,6 @@ void _start(int args)
     char **argv = (char **) (params+1);
 
     environ = argv+argc+1;
+    tzset(); /* initialize timezone info */
     exit(main(argc,argv,environ));
 }

@@ -107,9 +107,13 @@ LIB_SOURCES = \
 	lcltime.c	\
 	lcltime_r.c	\
 	mktime.c	\
+	mktm_r.c	\
 	strftime.c  	\
-	strptime.c  	\
-	time.c
+	strptime.c	\
+	time.c		\
+	tzlock.c	\
+	tzset.c		\
+	tzset_r.c
 
 
 libtime_la_LDFLAGS = -Xcompiler -nostdlib
@@ -130,7 +134,9 @@ CHEWOUT_FILES = \
 	lcltime.def	\
 	mktime.def	\
 	strftime.def	\
-	time.def
+	time.def	\
+	tzlock.def	\
+	tzset.def
 
 
 SUFFIXES = .def
@@ -151,15 +157,16 @@ LIBS = @LIBS@
 lib_a_LIBADD = 
 @USE_LIBTOOL_FALSE@lib_a_OBJECTS =  asctime.o asctime_r.o clock.o \
 @USE_LIBTOOL_FALSE@ctime.o ctime_r.o difftime.o gmtime.o gmtime_r.o \
-@USE_LIBTOOL_FALSE@lcltime.o lcltime_r.o mktime.o strftime.o strptime.o \
-@USE_LIBTOOL_FALSE@time.o
+@USE_LIBTOOL_FALSE@lcltime.o lcltime_r.o mktime.o mktm_r.o strftime.o \
+@USE_LIBTOOL_FALSE@strptime.o time.o tzlock.o tzset.o tzset_r.o
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 libtime_la_LIBADD = 
 @USE_LIBTOOL_TRUE@libtime_la_OBJECTS =  asctime.lo asctime_r.lo clock.lo \
 @USE_LIBTOOL_TRUE@ctime.lo ctime_r.lo difftime.lo gmtime.lo gmtime_r.lo \
-@USE_LIBTOOL_TRUE@lcltime.lo lcltime_r.lo mktime.lo strftime.lo \
-@USE_LIBTOOL_TRUE@strptime.lo time.lo
+@USE_LIBTOOL_TRUE@lcltime.lo lcltime_r.lo mktime.lo mktm_r.lo \
+@USE_LIBTOOL_TRUE@strftime.lo strptime.lo time.lo tzlock.lo tzset.lo \
+@USE_LIBTOOL_TRUE@tzset_r.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

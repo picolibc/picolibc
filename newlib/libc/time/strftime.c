@@ -115,9 +115,9 @@ o %Y
 The full year, formatted with four digits to include the century.
 
 o %Z
-Defined by ANSI C as eliciting the time zone if available; it is not
-available in this implementation (which accepts `<<%Z>>' but generates
-no output for it).
+The time zone name.  If tm_isdst is -1, no output is generated.
+Otherwise, the time zone name based on the TZ environment variable
+is used.
 
 o %%
 A single character, `<<%>>'.
@@ -142,6 +142,7 @@ ANSI C requires <<strftime>>, but does not specify the contents of
 #include <stddef.h>
 #include <stdio.h>
 #include <time.h>
+#include "local.h"
 
 static _CONST int dname_len[7] =
 {6, 6, 7, 9, 8, 6, 8};
@@ -426,6 +427,23 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 	    return 0;
 	  break;
 	case 'Z':
+	  if (tim_p->tm_isdst >= 0)
+	    {
+	      int size;
+	      TZ_LOCK;
+	      size = strlen(_tzname[tim_p->tm_isdst]);
+	      for (i = 0; i < size; i++)
+		{
+		  if (count < maxsize - 1)
+		    s[count++] = _tzname[tim_p->tm_isdst][i];
+		  else
+		    {
+		      TZ_UNLOCK;
+		      return 0;
+		    }
+		}
+	      TZ_UNLOCK;
+	    }
 	  break;
 	case '%':
 	  if (count < maxsize - 1)

@@ -16,9 +16,13 @@ LIB_SOURCES = \
 	lcltime.c	\
 	lcltime_r.c	\
 	mktime.c	\
+	mktm_r.c	\
 	strftime.c  	\
-	strptime.c  	\
-	time.c
+	strptime.c	\
+	time.c		\
+	tzlock.c	\
+	tzset.c		\
+	tzset_r.c
 
 libtime_la_LDFLAGS = -Xcompiler -nostdlib
 
@@ -43,7 +47,9 @@ CHEWOUT_FILES = \
 	lcltime.def	\
 	mktime.def	\
 	strftime.def	\
-	time.def
+	time.def	\
+	tzlock.def	\
+	tzset.def
 
 SUFFIXES = .def
 

@@ -8,6 +8,7 @@
 #define _TIME_H_
 
 #include "_ansi.h"
+#include <sys/reent.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,22 +56,29 @@ struct tm *_EXFUN(gmtime,   (const time_t *_timer));
 struct tm *_EXFUN(localtime,(const time_t *_timer));
 #endif
 size_t	   _EXFUN(strftime, (char *_s, size_t _maxsize, const char *_fmt, const struct tm *_t));
-char      *_EXFUN(strptime,     (const char *, const char *, struct tm *));
 
 char	  *_EXFUN(asctime_r,	(const struct tm *, char *));
 char	  *_EXFUN(ctime_r,	(const time_t *, char *));
 struct tm *_EXFUN(gmtime_r,	(const time_t *, struct tm *));
 struct tm *_EXFUN(localtime_r,	(const time_t *, struct tm *));
 
-#ifdef __CYGWIN__
 #ifndef __STRICT_ANSI__
+char      *_EXFUN(strptime,     (const char *, const char *, struct tm *));
+_VOID      _EXFUN(tzset,	(_VOID));
+_VOID      _EXFUN(_tzset_r,	(struct _reent *));
+
+/* defines for the opengroup specifications Derived from Issue 1 of the SVID.  */
 extern __IMPORT time_t _timezone;
 extern __IMPORT int _daylight;
 extern __IMPORT char *_tzname[2];
-/* defines for the opengroup specifications Derived from Issue 1 of the SVID.  */
+
+/* POSIX defines the external tzname being defined in time.h */
 #ifndef tzname
 #define tzname _tzname
 #endif
+
+/* CYGWIN also exposes daylight and timezone in the name space */
+#ifdef __CYGWIN__
 #ifndef daylight
 #define daylight _daylight
 #endif
@@ -81,12 +89,10 @@ extern __IMPORT char *_tzname[2];
 #else
 char *_EXFUN(timezone, (void));
 #endif
-void _EXFUN(tzset, (void));
-#endif
 #endif /* __CYGWIN__ */
+#endif /* !__STRICT_ANSI__ */
 
 #include <sys/features.h>
-
 
 #if defined(_POSIX_TIMERS)
 
