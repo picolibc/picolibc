@@ -1,3 +1,7 @@
+2005-02-23  Eric Blake  <ebb9@byu.net>
+
+	* devices.in (parsedisk): Fix typo.
+
 2005-02-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygwin.din (getpeereid): Export.
