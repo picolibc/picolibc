@@ -36,7 +36,7 @@ of whitespace, or if the first non-whitespace character is
 something other than <<+>>, <<->>, <<.>>, or a digit.
 
 <<atof(<[s]>)>> is implemented as <<strtod(<[s]>, NULL)>>.
-<<atoff(<[s]>)>> is implemented as <<strtodf(<[s]>, NULL)>>.
+<<atoff(<[s]>)>> is implemented as <<strtof(<[s]>, NULL)>>.
 
 RETURNS
 <<atof>> returns the converted substring value, if any, as a

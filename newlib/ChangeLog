@@ -1,3 +1,17 @@
+2002-12-06  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/stdlib.h (strtof): New prototype (from C99).
+	(strtodf): Changed from prototype to macro which redefines
+	to strtof.
+	* libc/stdlib/atof.c: Change documentation to refer to strtof
+	instead of strtodf.
+	* libc/stdlib/atoff.c (atoff): Change to call strtof instead of
+	strtodf.
+	* libc/stdlib/strtod.c (strtodf): Renamed to strtof.
+	(strtof): New function.
+	* libm/test/convert.c (test_strtodf): Renamed to test_strtof which
+	calls strtof.
+
 2002-11-27  Christopher Faylor  <cgf@redhat.com>
 
 	* libc/string/memset.c (memset): Fix comment.

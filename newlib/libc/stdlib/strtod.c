@@ -1,18 +1,18 @@
 /*
 FUNCTION
-        <<strtod>>, <<strtodf>>---string to double or float
+        <<strtod>>, <<strtof>>---string to double or float
 
 INDEX
 	strtod
 INDEX
 	_strtod_r
 INDEX
-	strtodf
+	strtof
 
 ANSI_SYNOPSIS
         #include <stdlib.h>
         double strtod(const char *<[str]>, char **<[tail]>);
-        float strtodf(const char *<[str]>, char **<[tail]>);
+        float strtof(const char *<[str]>, char **<[tail]>);
 
         double _strtod_r(void *<[reent]>, 
                          const char *<[str]>, char **<[tail]>);
@@ -23,7 +23,7 @@ TRAD_SYNOPSIS
         char *<[str]>;
         char **<[tail]>;
 
-        float strtodf(<[str]>,<[tail]>)
+        float strtof(<[str]>,<[tail]>)
         char *<[str]>;
         char **<[tail]>;
 
@@ -48,7 +48,7 @@ DESCRIPTION
 	(which will contain at least the terminating null character of
 	<[str]>) is stored in <<*<[tail]>>>.  If you want no
 	assignment to <<*<[tail]>>>, pass a null pointer as <[tail]>.
-	<<strtodf>> is identical to <<strtod>> except for its return type.
+	<<strtof>> is identical to <<strtod>> except for its return type.
 
 	This implementation returns the nearest machine number to the
 	input decimal string.  Ties are broken by using the IEEE
@@ -721,11 +721,11 @@ _DEFUN (strtod, (s00, se),
 }
 
 float
-_DEFUN (strtodf, (s00, se),
+_DEFUN (strtof, (s00, se),
 	_CONST char *s00 _AND
 	char **se)
 {
-  return _strtod_r (_REENT, s00, se);
+  return (float)_strtod_r (_REENT, s00, se);
 }
 
 #endif

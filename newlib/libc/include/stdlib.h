@@ -93,8 +93,12 @@ _PTR	_EXFUN(realloc,(_PTR __r, size_t __size));
 _VOID	_EXFUN(srand,(unsigned __seed));
 double	_EXFUN(strtod,(const char *__n, char **__end_PTR));
 double	_EXFUN(_strtod_r,(struct _reent *,const char *__n, char **__end_PTR));
+float	_EXFUN(strtof,(const char *__n, char **__end_PTR));
 #ifndef __STRICT_ANSI__
-float	_EXFUN(strtodf,(const char *__n, char **__end_PTR));
+/* the following strtodf interface is deprecated...use strtof instead */
+# ifndef strtodf 
+#  define strtodf strtof
+# endif
 #endif
 long	_EXFUN(strtol,(const char *__n, char **__end_PTR, int __base));
 long	_EXFUN(_strtol_r,(struct _reent *,const char *__n, char **__end_PTR, int __base));
