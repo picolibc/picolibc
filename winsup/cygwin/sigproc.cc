@@ -462,13 +462,23 @@ sig_dispatch_pending (bool fast)
   (void) sig_send (myself, fast ? __SIGFLUSHFAST : __SIGFLUSH);
 }
 
+void __stdcall
+create_signal_arrived ()
+{
+  if (signal_arrived)
+    return;
+  /* local event signaled when main thread has been dispatched
+     to a signal handler function. */
+  signal_arrived = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
+  ProtectHandle (signal_arrived);
+}
+
 /* Message initialization.  Called from dll_crt0_1
- *
- * This routine starts the signal handling thread.  The wait_sig_inited
- * event is used to signal that the thread is ready to handle signals.
- * We don't wait for this during initialization but instead detect it
- * in sig_send to gain a little concurrency.
- */
+  
+   This routine starts the signal handling thread.  The wait_sig_inited
+   event is used to signal that the thread is ready to handle signals.
+   We don't wait for this during initialization but instead detect it
+   in sig_send to gain a little concurrency.  */
 void __stdcall
 sigproc_init ()
 {
@@ -480,10 +490,7 @@ sigproc_init ()
    */
   new_muto (sync_proc_subproc);
 
-  /* local event signaled when main thread has been dispatched
-     to a signal handler function. */
-  signal_arrived = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
-  ProtectHandle (signal_arrived);
+  create_signal_arrived ();
 
   hwait_sig = new cygthread (wait_sig, cygself, "sig");
   hwait_sig->zap_h ();

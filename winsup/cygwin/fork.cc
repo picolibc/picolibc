@@ -156,6 +156,7 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
 {
   extern void fixup_hooks_after_fork ();
   extern void fixup_timers_after_fork ();
+  extern void create_signal_arrived ();
   debug_printf ("child is running.  pid %d, ppid %d, stack here %p",
 		myself->pid, myself->ppid, __builtin_frame_address (0));
 
@@ -198,6 +199,8 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
 
   if (fixup_mmaps_after_fork (hParent))
     api_fatal ("recreate_mmaps_after_fork_failed");
+
+  create_signal_arrived ();
 
 #ifdef USE_SERVER
   /* Incredible but true:  If we use sockets and SYSV IPC shared memory,
