@@ -1,3 +1,10 @@
+2003-03-09  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Use "cygwin0" rather than "new-cygwin" to denote
+	in-build-tree version of library or dll.
+	* config/default.exp: Ditto.
+	* winsup.api/winsup.exp: Ditto.
+
 2003-03-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* winsup.api/known_bugs.tcl: Remove fsync01, setregid01 and setreuid01

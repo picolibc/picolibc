@@ -86,7 +86,7 @@ ifdef VERBOSE
     RUNTESTFLAGS = -v
 endif
 
-RUNTIME=$(cygwin_build)/new-cygwin1.dll $(cygwin_build)/new-libcygwin.a
+RUNTIME=$(cygwin_build)/cygwin0.dll $(cygwin_build)/libcygwin0.a
 
 TESTSUP_LIB_NAME:=libltp.a
 TESTSUP_OFILES:=${sort ${addsuffix .o,${basename ${notdir ${wildcard $(libltp_srcdir)/lib/*.c}}}}}
@@ -173,7 +173,7 @@ testsuite/site.exp: site.exp
 	rm -rf testsuite/site.exp
 	cp site.exp testsuite/site.exp
 
-# Note: we set the PATH so that we can pick up new-cygwin1.dll
+# Note: we set the PATH so that we can pick up cygwin0.dll
 
 check: $(TESTSUP_LIB_NAME) $(RUNTIME) cygrun.exe testsuite/site.exp
 	cd testsuite; \
