@@ -1,3 +1,8 @@
+Wed Aug  8 11:46:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* security.cc (alloc_sd): Revert to setting inheritance attribute for
+	permissions given to directories. Never set inheritance on NULL ACE.
+
 Tue Aug  7 18:11:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* security.cc (alloc_sd): Don't set FILE_DELETE_CHILD for group
