@@ -964,11 +964,14 @@ sync ()
     }
   else if (wincap.is_winnt ())	/* 9x has no concept for opening volumes */
     {
-      DWORD drives = GetLogicalDrives ();
+      extern FILE *setmntent (const char *, const char *);
+      setmntent ("", "");
+      DWORD drives = _my_tls.locals.available_drives;
       DWORD mask = 1;
       strcpy (vol, "\\\\.\\A:");
       do
         {
+	  /* Geeh.  Try to sync only non-floppy drives. */
 	  if (drives & mask)
 	    {
 	      debug_printf ("Try volume %s", vol);

@@ -2472,11 +2472,26 @@ cygwin_umount (const char *path, unsigned flags)
   return res;
 }
 
+static bool
+is_floppy (const char *dos)
+{
+  char dev[256];
+  if (!QueryDosDevice (dos, dev, 256))
+    return false;
+  return strncasematch (dev, "\\Device\\Floppy", 14)
+  	 || strcasematch (dev, "A:");
+}
+
 extern "C" FILE *
 setmntent (const char *filep, const char *)
 {
   _my_tls.locals.iteration = 0;
   _my_tls.locals.available_drives = GetLogicalDrives ();
+  /* Filter floppy drives on A: and B: */
+  if ((_my_tls.locals.available_drives & 1) && is_floppy ("A:"))
+    _my_tls.locals.available_drives &= ~1;
+  if ((_my_tls.locals.available_drives & 2) && is_floppy ("B:"))
+    _my_tls.locals.available_drives &= ~2;
   return (FILE *) filep;
 }
 

@@ -1,3 +1,9 @@
+2005-03-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (is_floppy): New function.
+	(setmntent): Drop floppy drives on A: and B: from logical drive DWORD.
+	* syscalls.cc (sync): Don't sync floppies on A: and B:.
+
 2005-03-10  Christopher Faylor  <cgf@timesys.com>
 
 	* autoload.cc (LoadDLLprime): Use nocopy segment or forked processes
