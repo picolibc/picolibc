@@ -3756,7 +3756,7 @@ out:
 
 int etc::curr_ix = 0;
 /* Note that the first elements of the below arrays are unused */
-signed char etc::change_possible[MAX_ETC_FILES + 1];
+bool etc::change_possible[MAX_ETC_FILES + 1];
 const char *etc::fn[MAX_ETC_FILES + 1];
 FILETIME etc::last_modified[MAX_ETC_FILES + 1];
 
@@ -3784,12 +3784,7 @@ etc::test_file_change (int n)
   WIN32_FIND_DATA data;
   bool res;
 
-  if (change_possible[n] < 0)
-    {
-      res = true;
-      paranoid_printf ("fn[%d] %s, already marked changed", n, fn[n]);
-    }
-  else if ((h = FindFirstFile (fn[n], &data)) == INVALID_HANDLE_VALUE)
+  if ((h = FindFirstFile (fn[n], &data)) == INVALID_HANDLE_VALUE)
     {
       res = true;
       memset (last_modified + n, 0, sizeof (last_modified[n]));
@@ -3800,7 +3795,6 @@ etc::test_file_change (int n)
       FindClose (h);
       res = CompareFileTime (&data.ftLastWriteTime, last_modified + n) > 0;
       last_modified[n] = data.ftLastWriteTime;
-      change_possible[n] = -res;
       debug_printf ("FindFirstFile succeeded");
     }
 
@@ -3825,16 +3819,15 @@ etc::dir_changed (int n)
 	    system_printf ("Can't open /etc for checking, %E", (char *) pwd,
 			   changed_h);
 #endif
-	  for (int i = 1; i <= curr_ix; i++)
-	    (void) test_file_change (i);
+	  memset (change_possible, true, sizeof (change_possible));
 	}
 
       if (changed_h == INVALID_HANDLE_VALUE)
-	(void) test_file_change (n);	/* semi-brute-force way */
+	change_possible[n] = true;
       else if (WaitForSingleObject (changed_h, 0) == WAIT_OBJECT_0)
 	{
 	  (void) FindNextChangeNotification (changed_h);
-	  memset (change_possible, 1, sizeof change_possible);
+	  memset (change_possible, true, sizeof change_possible);
 	}
     }
 
@@ -3846,11 +3839,9 @@ bool
 etc::file_changed (int n)
 {
   bool res = false;
-  if (!fn[n])
+  if (dir_changed (n) && test_file_change (n))
     res = true;
-  else if (dir_changed (n) && test_file_change (n))
-    res = true;
-  change_possible[n] = 0;
+  change_possible[n] = false;	/* Change is no longer possible */
   paranoid_printf ("fn[%d] %s res %d", n, fn[n], res);
   return res;
 }

@@ -213,13 +213,12 @@ int path_prefix_p (const char *path1, const char *path2, int len1) __attribute__
 class etc
 {
   static int curr_ix;
-  static signed char change_possible[MAX_ETC_FILES + 1];
+  static bool change_possible[MAX_ETC_FILES + 1];
   static const char *fn[MAX_ETC_FILES + 1];
   static FILETIME last_modified[MAX_ETC_FILES + 1];
   static bool dir_changed (int);
   static int init (int, const char *);
   static bool file_changed (int);
-  static void set_last_modified (int, FILETIME&);
   static bool test_file_change (int);
   friend class pwdgrp;
 };

@@ -452,7 +452,6 @@ pwdgrp::load (const char *posix_fname)
 	      if (buf)
 		free (buf);
 	      buf = NULL;
-	      fh = NULL;
 	      res = false;
 	    }
 	  else

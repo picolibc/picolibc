@@ -59,7 +59,6 @@ public:
       state = initializing;
     return state == initializing;
   }
-  void operator = (pwdgrp_state nstate) { state = nstate; }
   bool isuninitialized () const { return state == uninitialized; }
 
   bool load (const char *);

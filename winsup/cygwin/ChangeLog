@@ -1,3 +1,14 @@
+2003-01-21  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* path.h (etc::change_possible): Revert the type to bool.
+	(etc::set_last_modified): Remove obsolete function.
+	* path.cc (etc::change_possible): Revert type to bool.
+	(etc::test_file_change): Do not test for negative values of
+	change_possible and do not set it to -res.
+	(etc::dir_changed): When the handle is NULL, call memset instead of
+	test_file_changed.  When the handle is invalid, return true.
+	(etc::file_changed): Remove unneeded check for !fn[n].
+
 2003-01-19  Christopher Faylor  <cgf@redhat.com>
 
 	* pwdgrp.h (etc): Move to path.h.
@@ -41,7 +52,6 @@
 	(etc::file_changed): Use test_file_change to detect if file needs to be
 	updated.
 	* path.h (etc): Move class here from pwdgrp.h.
-
 	* uinfo.cc: Move etc:: functions to path.cc.  Move pwdgrp functions
 	here.
 	(pwdgrp::gets): Eliminate buf checks.  Just check eptr and set lptr.
@@ -78,7 +88,7 @@
 	* uinfo.cc (etc::dir_changed): Don't print a warning if can't open
 	/etc, unless debugging.
 
-2003-01-17   Pierre Humblet  <pierre.humblet@ieee.org>
+2003-01-17  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* grp.cc (read_etc_group): On NT, add a line for gid = -1.  Change name
 	"unknown" to "mkgroup".
