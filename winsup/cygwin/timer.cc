@@ -35,12 +35,11 @@ struct timer_tracker
   int settime (int, const itimerspec *, itimerspec *);
   void gettime (itimerspec *);
   timer_tracker (clockid_t, const sigevent *);
-  timer_tracker () {};
   ~timer_tracker ();
   friend void fixup_timers_after_fork ();
 };
 
-timer_tracker NO_COPY ttstart;
+timer_tracker NO_COPY ttstart (CLOCK_REALTIME, NULL);
 
 class lock_timer_tracker
 {

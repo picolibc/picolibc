@@ -1,3 +1,11 @@
+2005-03-28  Christopher Faylor  <cgf@timesys.com>
+
+	* timer.cc (timer_tracker::timer_tracker): Eliminate simple
+	constructor.
+	(ttstart): Fully initialize.
+
+	* errno.cc: Fix typo introduced in previous change.
+
 2005-03-28  Eric Blake  <ebb9@byu.net>
 
 	* errno.cc (FILENAME_EXCED_RANGE): Map to ENAMETOOLONG.
