@@ -9,13 +9,13 @@ better than that. You can debug the problem yourself, and even if you can't
 fix it, your analysis may be very helpful. Here's the (incoplete) howto on 
 cygwin debugging.
 
-1. The first thing you'll need to do is to build cygwin1.dll and crashed your
+1. The first thing you'll need to do is to build cygwin1.dll and your crashed
 application from sources. To debug them you'll need debug information, which
 is normally stripped from executables. 
 
 2. Create known-working cygwin debugging environment.
 - create a separate directory, say, c:\cygdeb, and put known-working
-  cygwin1.dll, gdb.exe in it.
+  cygwin1.dll and gdb.exe in it.
 - create a wrapper c:\cygdeb\debug_wrapper.cmd:
 
 ========= debug_wrapper.cmd =========
@@ -33,7 +33,7 @@ c:\cygdeb\gdb.exe -nw %1 %2
 
 4. Strace.
   You can run your program under 'strace' utility, described if user's manual.
-  If you know, where the problem approximately is, you can add a bunch of 
+  If you know where the problem approximately is, you can add a bunch of 
   additional debug_printf()s in the source code and see what they print in 
   strace log. There's one common problem with this method, that some bugs
   may misteriously disappear once the program is run under strace. Then the
