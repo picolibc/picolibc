@@ -26,6 +26,7 @@ details. */
 #include "wincap.h"
 #include "heap.h"
 #include "cygthread.h"
+#include "pwdgrp.h"
 
 static external_pinfo *
 fillout_pinfo (pid_t pid, int winpid)
@@ -277,6 +278,20 @@ cygwin_internal (cygwin_getinfo_types t, ...)
       case CW_GET_SHMLBA:
         {
 	  return getshmlba ();
+	}
+      case CW_GET_UID_FROM_SID:
+        {
+	  PSID psid = va_arg (arg, PSID);
+	  cygsid sid (psid);
+	  struct passwd *pw = internal_getpwsid (sid);
+	  return pw ? pw->pw_uid : (__uid32_t)-1;
+	}
+      case CW_GET_GID_FROM_SID:
+        {
+	  PSID psid = va_arg (arg, PSID);
+	  cygsid sid (psid);
+	  struct __group32 *gr = internal_getgrsid (sid);
+	  return gr ? gr->gr_gid : (__gid32_t)-1;
 	}
       default:
 	return (DWORD) -1;

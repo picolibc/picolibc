@@ -1,3 +1,11 @@
+2003-11-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* external.cc (cygwin_internal): Add CW_GET_UID_FROM_SID and
+	CW_GET_GID_FROM_SID handling.
+	* include/cygwin/version.h: Bump API minor number.
+	* include/sys/cygwin.h (cygwin_getinfo_types): Add
+	CW_GET_UID_FROM_SID and CW_GET_GID_FROM_SID.
+
 2003-11-07  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Reorganize to
