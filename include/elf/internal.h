@@ -98,7 +98,7 @@ typedef struct elf_internal_shdr {
 
   /* The internal rep also has some cached info associated with it. */
   asection *	bfd_section;		/* Associated BFD section.  */
-  PTR		contents;		/* Section contents.  */
+  unsigned char *contents;		/* Section contents.  */
 } Elf_Internal_Shdr;
 
 #define elf32_internal_shdr elf_internal_shdr

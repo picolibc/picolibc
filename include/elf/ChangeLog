@@ -1,3 +1,7 @@
+2001-10-16  Jeff Holcomb  <jeffh@redhat.com>
+
+	* internal.h (elf_internal_shdr): Make contents a unsigned char *.
+
 2001-09-18  Alan Modra  <amodra@bigpond.net.au>
 
 	* internal.h (elf_internal_rela): Make r_addend a bfd_vma.
