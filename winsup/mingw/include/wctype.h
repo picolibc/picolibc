@@ -128,6 +128,14 @@ __CRT_INLINE int __cdecl isleadbyte(int c) {return (_pctype[(unsigned char)(c)] 
 
 
 typedef wchar_t wctrans_t;
+
+/* These are resolved by libmingwex.a.  Note, that they are also exported
+   by the MS C++ runtime lib (msvcp60.dll).  The msvcp60.dll implementations
+   of wctrans and towctrans are not C99 compliant in that wctrans("tolower")
+   returns 0, while std specifies that a non-zero value should be returned
+   for a valid string descriptor.  If you want the MS behaviour (and you have
+   msvcp60.dll in your path) add -lmsvcp60 to your command line.  */ 	
+
 _CRTIMP wint_t __cdecl		towctrans(wint_t, wctrans_t);
 _CRTIMP wctrans_t __cdecl	wctrans(const char*);
 _CRTIMP wctype_t __cdecl	wctype(const char*);
