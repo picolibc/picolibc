@@ -1,5 +1,10 @@
 2003-09-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mmap.cc (munmap): Use correct address and length parameters when
+	calling fhandler's munmap.
+
+2003-09-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* spawn.cc (spawn_guts): Set errno to E2BIG if command line is
 	longer than CreateProcess allows (32K).
 

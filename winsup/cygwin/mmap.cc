@@ -679,12 +679,15 @@ munmap (void *addr, size_t len)
 	  mmap_record *rec = map_list->get_record (record_idx);
 	  if (rec->unmap_pages (u_addr, u_len))
 	    {
-	      /* The whole record has been unmapped, so... */
+	      /* The whole record has been unmapped, so we now actually
+	         unmap it from the system in full length... */
 	      fhandler_base *fh = rec->alloc_fh ();
-	      fh->munmap (rec->get_handle (), (caddr_t)addr, len);
+	      fh->munmap (rec->get_handle (),
+	      		  rec->get_address (),
+			  rec->get_size ());
 	      rec->free_fh (fh);
 
-	      /* ...delete the record. */
+	      /* ...and delete the record. */
 	      if (map_list->del_record (record_idx--))
 		{
 		  /* Yay, the last record has been removed from the list,
