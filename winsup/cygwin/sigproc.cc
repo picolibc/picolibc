@@ -798,13 +798,6 @@ child_info::sync (pinfo& vchild, DWORD howlong)
     case WAIT_OBJECT_0 + 1:
       if (WaitForSingleObject (subproc_ready, 0) == WAIT_OBJECT_0)
 	sigproc_printf ("should never happen.  noticed subproc_ready after process exit");
-      else
-	{
-	  DWORD exitcode = 0;
-	  (void) GetExitCodeProcess (vchild.hProcess, &exitcode);
-	  vchild->exitcode = (exitcode & 0xff) << 8;
-	  sigproc_printf ("non-cygwin exit value is %p", exitcode);
-	}
       res = false;
       break;
     default:

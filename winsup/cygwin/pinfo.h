@@ -26,6 +26,8 @@ enum picom
   PICOM_FIFO = 2
 };
 
+#define EXITCODE_UNSET 0x80000000
+
 class _pinfo
 {
 public:

@@ -13,7 +13,6 @@ details. */
 #include "thread.h"
 #include "perprocess.h"
 #include "cygtls.h"
-#include "pinfo.h"
 
 int NO_COPY dynamically_loaded;
 static char *search_for = (char *) cygthread::stub;
@@ -127,8 +126,6 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
       dll_crt0_0 ();
       break;
     case DLL_PROCESS_DETACH:
-      if (myself)
-	myself->exitcode = 1 << 8;
       break;
     case DLL_THREAD_ATTACH:
       munge_threadfunc ();

@@ -265,7 +265,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
       else if (!(flag & PID_EXECED))
 	{
 	  procinfo->pid = n;
-	  procinfo->exitcode = SIGTERM;
+	  procinfo->exitcode = EXITCODE_UNSET;
 	}
       else
 	{
@@ -702,6 +702,12 @@ proc_waiter (void *arg)
 	  /* Child exited.  Do some cleanup and signal myself.  */
 	  CloseHandle (vchild.rd_proc_pipe);
 	  vchild.rd_proc_pipe = NULL;
+	  if (vchild->exitcode == EXITCODE_UNSET)
+	    {
+	      DWORD x;
+	      GetExitCodeProcess (vchild.hProcess, &x);
+	      vchild->exitcode = (x & 0xff) << 8;
+	    }
 	  if (WIFEXITED (vchild->exitcode))
 	    si.si_sigval.sival_int = CLD_EXITED;
 	  else if (WCOREDUMP (vchild->exitcode))

@@ -1,3 +1,13 @@
+2004-12-26  Christopher Faylor  <cgf@timesys.com>
+
+	* init.cc (dll_entry): Remove exit code setting.
+	* pinfo.cc (pinfo::init): Initialize exitcode to unset state rather
+	than SIGTERM.
+	(proc_waiter): Detect if exit code is unset and use status from
+	GetExitCodeProcess.
+	* sigproc.cc (child_info::sync): Remove exit code detection here since
+	proc_waiter now (again) detects it.
+
 2004-12-25  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler.cc (fhandler_base::fchmod): Do the right thing when changing
