@@ -1,3 +1,8 @@
+2001-10-31  Christopher Faylor  <cgf@redhat.com>
+
+	* environ.cc: Set reset_com to false to mimic linux behavior more
+	closely.
+
 2001-10-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dtable.cc (dtable::vfork_child_dup): Revert impersonation

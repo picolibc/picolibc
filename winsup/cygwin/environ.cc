@@ -36,7 +36,7 @@ extern BOOL allow_winsymlinks;
 extern BOOL strip_title_path;
 extern int pcheck_case;
 extern int subauth_id;
-BOOL reset_com = TRUE;
+BOOL reset_com = FALSE;
 static BOOL envcache = TRUE;
 
 static char **lastenviron;

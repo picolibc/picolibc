@@ -1068,6 +1068,7 @@ signal_exit (int rc)
      causes random, inexplicable hangs.  So, instead, we set up the priority
      of this thread really high so that it should do its thing and then exit. */
   (void) SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
+  (void) SetThreadPriority (hMainThread, THREAD_PRIORITY_IDLE);
 
   /* Unlock any main thread mutos since we're executing with prejudice. */
   muto *m;
