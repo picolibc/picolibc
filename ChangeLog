@@ -1,3 +1,7 @@
+2001-11-06  Hans-Peter Nilsson  <hp@bitrange.com>
+
+	* Makefile.in (MAKEINFO): Use "missing" for makeinfo older than 4.0.
+
 2001-10-24  Jeff Holcomb  <jeffh@redhat.com>
 
 	Makefile.in (all-bison): Don't depend on texinfo.
