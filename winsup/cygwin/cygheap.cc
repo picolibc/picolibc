@@ -70,35 +70,6 @@ _csbrk (int sbs)
 
 #define NBUCKETS 32
 char *buckets[NBUCKETS] = {0};
-int bucket2size[NBUCKETS] = {0};
-
-static inline int
-size2bucket (int size)
-{
-  int rv = 0x1f;
-  int bit = ~0x10;
-  int i;
-
-  if (size < 4)
-    size = 4;
-  size = (size + 3) & ~3;
-
-  for (i = 0; i < 5; i++)
-    {
-      if (bucket2size[rv & bit] >= size)
-	rv &= bit;
-      bit >>= 1;
-    }
-  return rv;
-}
-
-static inline void
-init_buckets ()
-{
-  unsigned b;
-  for (b = 0; b < NBUCKETS; b++)
-    bucket2size[b] = (1 << b);
-}
 
 struct _cmalloc_entry
 {
@@ -116,16 +87,19 @@ struct _cmalloc_entry
 #define to_cmalloc(s) ((_cmalloc_entry *) (((char *) (s)) - (int) (N0->data)))
 #define cygheap_chain ((_cmalloc_entry **)cygheap)
 
+static void *_cmalloc (int size) __attribute ((regparm(1)));
+static void *__stdcall _crealloc (void *ptr, int size) __attribute ((regparm(2)));
+
 static void *__stdcall
 _cmalloc (int size)
 {
   _cmalloc_entry *rvc;
-  int b;
+  int b, sz;
 
-  if (bucket2size[0] == 0)
-    init_buckets ();
+  /* Calculate "bit bucket" and size as a power of two. */
+  for (b = 3, sz = 8; sz && sz < (size + 4); b++, sz <<= 1)
+    continue;
 
-  b = size2bucket (size);
   cygheap_protect->acquire ();
   if (buckets[b])
     {
@@ -135,7 +109,7 @@ _cmalloc (int size)
     }
   else
     {
-      size = bucket2size[b] + sizeof (_cmalloc_entry);
+      size = sz + sizeof (_cmalloc_entry);
       rvc = (_cmalloc_entry *) _csbrk (size);
 
       rvc->b = b;
@@ -165,7 +139,7 @@ _crealloc (void *ptr, int size)
     newptr = _cmalloc (size);
   else
     {
-      int oldsize = bucket2size[to_cmalloc (ptr)->b];
+      int oldsize = 1 << to_cmalloc (ptr)->b;
       if (size <= oldsize)
 	return ptr;
       newptr = _cmalloc (size);
@@ -228,7 +202,7 @@ cygheap_fixup_in_child (HANDLE parent, bool execed)
     }
 }
 
-static void *__stdcall
+inline static void *
 creturn (cygheap_types x, cygheap_entry * c, int len)
 {
   if (!c)

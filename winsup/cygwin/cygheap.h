@@ -32,12 +32,12 @@ extern HANDLE cygheap_max;
 #define incygheap(s) (cygheap && ((char *) (s) >= (char *) cygheap) && ((char *) (s) <= ((char *) cygheap_max)))
 
 extern "C" {
-void __stdcall cfree (void *);
+void __stdcall cfree (void *) __attribute__ ((regparm(1)));
 void __stdcall cygheap_fixup_in_child (HANDLE, bool);
-void *__stdcall cmalloc (cygheap_types, DWORD);
-void *__stdcall crealloc (void *, DWORD);
-void *__stdcall ccalloc (cygheap_types, DWORD, DWORD);
-char *__stdcall cstrdup (const char *);
-char *__stdcall cstrdup1 (const char *);
+void *__stdcall cmalloc (cygheap_types, DWORD) __attribute__ ((regparm(2)));
+void *__stdcall crealloc (void *, DWORD) __attribute__ ((regparm(2)));
+void *__stdcall ccalloc (cygheap_types, DWORD, DWORD) __attribute__ ((regparm(3)));
+char *__stdcall cstrdup (const char *) __attribute__ ((regparm(1)));
+char *__stdcall cstrdup1 (const char *) __attribute__ ((regparm(1)));
 void __stdcall cygheap_init ();
 }

@@ -301,6 +301,7 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
 
   /* Initialize signal/process handling */
   sigproc_init ();
+  cygbench ("fork-child");
   return 0;
 }
 

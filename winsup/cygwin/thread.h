@@ -110,8 +110,8 @@ struct __reent_t
 
 _reent *_reent_clib ();
 _winsup_t *_reent_winsup ();
-void SetResourceLock (int, int, const char *);
-void ReleaseResourceLock (int, int, const char *);
+void SetResourceLock (int, int, const char *) __attribute__ ((regparm(3)));
+void ReleaseResourceLock (int, int, const char *) __attribute__ ((regparm(3)));
 
 #ifdef _CYG_THREAD_FAILSAFE
 void AssertResourceOwner (int, int);
@@ -209,9 +209,7 @@ public:
   struct _winsup_t winsup_reent;
   ThreadItem mainthread;
 
-  void Init0 ();
-  void Init1 ();
-  void ClearReent ();
+  void Init (int);
 
   void ReleaseItem (MTitem *);
 

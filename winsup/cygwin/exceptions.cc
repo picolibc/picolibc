@@ -18,7 +18,6 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include "cygerrno.h"
-#include "thread.h"
 #include "perthread.h"
 #include "shared_info.h"
 #include "perprocess.h"
@@ -639,7 +638,7 @@ interrupt_now (CONTEXT *ctx, int sig, struct sigaction& siga, void *handler)
   SetThreadContext (myself->getthread2signal (), ctx); /* Restart the thread */
 }
 
-void __cdecl
+void __stdcall
 signal_fixup_after_fork ()
 {
   if (!sigsave.sig)
@@ -650,6 +649,18 @@ signal_fixup_after_fork ()
     {
       *sigsave.retaddr_on_stack = sigsave.retaddr;
       set_process_mask (sigsave.oldmask);
+    }
+}
+
+void __stdcall
+signal_fixup_after_exec (bool isspawn)
+{
+  /* Set up child's signal handlers */
+  for (int i = 0; i < NSIG; i++)
+    {
+      myself->getsig(i).sa_mask = 0;
+      if (myself->getsig(i).sa_handler != SIG_IGN || isspawn)
+	myself->getsig(i).sa_handler = SIG_DFL;
     }
 }
 
@@ -775,7 +786,7 @@ call_handler (int sig, struct sigaction& siga, void *handler)
     }
 
 next:
-  if (hExeced != NULL || (!using_mainthread_frame && interruptible (cx.Eip)))
+  if (!using_mainthread_frame && interruptible (cx.Eip))
     interrupt_now (&cx, sig, siga, handler);
   else if (!interrupt_on_return (ebp, sig, siga, handler))
     {

@@ -184,15 +184,15 @@ int __stdcall writable_directory (const char *file);
 int __stdcall stat_dev (DWORD, int, unsigned long, struct stat *);
 extern BOOL allow_ntsec;
 
-unsigned long __stdcall hash_path_name (unsigned long hash, const char *name);
-void __stdcall nofinalslash (const char *src, char *dst);
-extern "C" char *__stdcall rootdir (char *full_path);
+unsigned long __stdcall hash_path_name (unsigned long hash, const char *name) __attribute__ ((regparm(2)));
+void __stdcall nofinalslash (const char *src, char *dst) __attribute__ ((regparm(2)));
+extern "C" char *__stdcall rootdir (char *full_path) __attribute__ ((regparm(1)));
 
 /* String manipulation */
-char *__stdcall strccpy (char *s1, const char **s2, char c);
-int __stdcall strcasematch (const char *s1, const char *s2);
-int __stdcall strncasematch (const char *s1, const char *s2, size_t n);
-char *__stdcall strcasestr (const char *searchee, const char *lookfor);
+extern "C" char *__stdcall strccpy (char *s1, const char **s2, char c);
+extern "C" int __stdcall strcasematch (const char *s1, const char *s2) __attribute__ ((regparm(2)));
+extern "C" int __stdcall strncasematch (const char *s1, const char *s2, size_t n) __attribute__ ((regparm(3)));
+extern "C" char *__stdcall strcasestr (const char *searchee, const char *lookfor) __attribute__ ((regparm(2)));
 
 /* Time related */
 void __stdcall totimeval (struct timeval *dst, FILETIME * src, int sub, int flag);

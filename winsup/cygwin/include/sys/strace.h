@@ -23,10 +23,10 @@
 
 class strace
 {
-  int microseconds ();
   int vsprntf (char *buf, const char *func, const char *infmt, va_list ap);
   void write (unsigned category, const char *buf, int count);
 public:
+  int microseconds ();
   int version;
   int active;
   int lmicrosec;

@@ -62,7 +62,6 @@ details. */
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "path.h"
-#include "thread.h"
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
@@ -574,15 +573,13 @@ normalize_posix_path (const char *src, char *dst)
     }
   if (!isslash (src[0]))
     {
-      char cwd[MAX_PATH];
-      if (!cygcwd.get (cwd))
+      if (!cygcwd.get (dst))
 	return get_errno ();
-      if (strlen (cwd) + 1 + strlen (src) >= MAX_PATH)
+      if (strlen (dst) + 1 + strlen (src) >= MAX_PATH)
 	{
 	  debug_printf ("ENAMETOOLONG = normalize_posix_path (%s)", src);
 	  return ENAMETOOLONG;
 	}
-      strcpy (dst, cwd);
       dst = strchr (dst, '\0');
       if (*src == '.')
 	goto sawdot;
@@ -681,17 +678,15 @@ normalize_win32_path (const char *src, char *dst)
 
   if (!SLASH_P (src[0]) && strchr (src, ':') == NULL)
     {
-      char cwd[MAX_PATH];
-      if (!cygcwd.get (cwd, 0))
+      if (!cygcwd.get (dst, 0))
 	return get_errno ();
-      if (strlen (cwd) + 1 + strlen (src) >= MAX_PATH)
+      if (strlen (dst) + 1 + strlen (src) >= MAX_PATH)
 	{
 	  debug_printf ("ENAMETOOLONG = normalize_win32_path (%s)", src);
 	  return ENAMETOOLONG;
 	}
-      strcpy (dst, cwd);
       dst += strlen (dst);
-      if (!*cwd || !SLASH_P (dst[-1]))
+      if (!SLASH_P (dst[-1]))
 	*dst++ = '\\';
     }
   /* Two leading \'s?  If so, preserve them.  */
@@ -2775,7 +2770,7 @@ cygwin_split_path (const char *path, char *dir, char *file)
     })
 
 /* Return TRUE if two strings match up to length n */
-int __stdcall
+extern "C" int __stdcall
 strncasematch (const char *s1, const char *s2, size_t n)
 {
   if (s1 == s2)
@@ -2792,7 +2787,7 @@ strncasematch (const char *s1, const char *s2, size_t n)
 }
 
 /* Return TRUE if two strings match */
-int __stdcall
+extern "C" int __stdcall
 strcasematch (const char *s1, const char *s2)
 {
   if (s1 == s2)
@@ -2807,7 +2802,7 @@ strcasematch (const char *s1, const char *s2)
   return *s2 == '\0';
 }
 
-char * __stdcall
+extern "C" char * __stdcall
 strcasestr (const char *searchee, const char *lookfor)
 {
   if (*searchee == 0)
@@ -2881,10 +2876,11 @@ cwdstuff::fixup_after_exec (char *win32_cwd, char *posix_cwd, DWORD hash_cwd)
 bool
 cwdstuff::get_initial ()
 {
+  lock->acquire ();
+
   if (win32)
     return 1;
 
-  lock->acquire ();
   int i;
   DWORD len, dlen;
   for (i = 0, dlen = MAX_PATH, len = 0; i < 3; dlen *= 2, i++)
@@ -2899,6 +2895,7 @@ cwdstuff::get_initial ()
       __seterrno ();
       lock->release ();
       debug_printf ("get_initial_cwd failed, %E");
+      lock->release ();
       return 0;
     }
   set (NULL);

@@ -16,7 +16,6 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygerrno.h"
-#include "thread.h"
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"

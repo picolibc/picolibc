@@ -27,14 +27,14 @@ public:
   fhandler_base *build_fhandler (int fd, DWORD dev, const char *name,
 				 int unit = -1);
   fhandler_base *build_fhandler (int fd, const char *name, HANDLE h);
-  int not_open (int n);
+  int not_open (int n) __attribute__ ((regparm(1)));
   int find_unused_handle (int start);
   int find_unused_handle () { return find_unused_handle (first_fd_for_open);}
   void release (int fd);
   void init_std_file_from_handle (int fd, HANDLE handle, DWORD access, const char *name);
   int dup2 (int oldfd, int newfd);
   void fixup_after_exec (HANDLE, size_t, fhandler_base **);
-  fhandler_base *operator [](int fd) { return fds[fd]; }
+  inline fhandler_base *operator [](int fd) { return fds[fd]; }
   select_record *select_read (int fd, select_record *s);
   select_record *select_write (int fd, select_record *s);
   select_record *select_except (int fd, select_record *s);

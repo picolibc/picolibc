@@ -60,12 +60,14 @@ class fhandler_base;
 class cygheap_exec_info
 {
 public:
+  uid_t uid;
   char *old_title;
   fhandler_base **fds;
   size_t nfds;
   int argc;
   char **argv;
-  char **environ;
+  int envc;
+  char **envp;
   HANDLE myself_pinfo;
   char *cwd_posix;
   char *cwd_win32;
@@ -76,6 +78,7 @@ class child_info_spawn: public child_info
 {
 public:
   cygheap_exec_info *moreinfo;
+  HANDLE hexec_proc;
 
   child_info_spawn (): moreinfo (NULL) {}
   ~child_info_spawn ()
@@ -90,11 +93,11 @@ public:
 	  cfree (moreinfo->cwd_posix);
 	if (moreinfo->cwd_win32)
 	  cfree (moreinfo->cwd_win32);
-	if (moreinfo->environ)
+	if (moreinfo->envp)
 	  {
-	    for (char **e = moreinfo->environ; *e; e++)
+	    for (char **e = moreinfo->envp; *e; e++)
 	      cfree (*e);
-	    cfree (moreinfo->environ);
+	    cfree (moreinfo->envp);
 	  }
 	CloseHandle (moreinfo->myself_pinfo);
 	cfree (moreinfo);

@@ -101,11 +101,10 @@ BOOL __stdcall proc_exists (_pinfo *);
 BOOL __stdcall pid_exists (pid_t);
 int __stdcall sig_send (_pinfo *, int, DWORD ebp = (DWORD) __builtin_frame_address (0));
 void __stdcall signal_fixup_after_fork ();
+void __stdcall signal_fixup_after_exec (bool);
 
 extern char myself_nowait_dummy[];
 extern char myself_nowait_nonmain_dummy[];
-extern HANDLE hExeced;		// Process handle of new window
-				//  process created by spawn_guts()
 
 #define WAIT_SIG_EXITING (WAIT_OBJECT_0 + 1)
 

@@ -16,22 +16,12 @@ details. */
 #endif
 
 extern "C" {
-#ifndef DEBUGGING0
-DWORD __stdcall WFSO (HANDLE, DWORD);
-DWORD __stdcall WFMO (DWORD, CONST HANDLE *, BOOL, DWORD);
-#else
-DWORD __stdcall WFSO (const char *fn, int ln, HANDLE, DWORD);
-DWORD __stdcall WFMO (const char *fn, int ln, DWORD, CONST HANDLE *, BOOL, DWORD);
-#endif
+DWORD __stdcall WFSO (HANDLE, DWORD) __attribute__ ((regparm(2)));
+DWORD __stdcall WFMO (DWORD, CONST HANDLE *, BOOL, DWORD) __attribute__ ((regparm(3)));
 }
 
-#ifndef DEBUGGING0
 #define WaitForSingleObject WFSO
 #define WaitForMultipleObject WFMO
-#else
-#define WaitForSingleObject(a, b) WFSO (__FUNCTION__, __LINE__, a, b)
-#define WaitForMultipleObject(a, b, c, d) WFMO (__FUNCTION__, __LINE__, a, b, c, d)
-#endif
 
 #if !defined(_DEBUG_H_)
 #define _DEBUG_H_
@@ -43,6 +33,7 @@ void __stdcall regthread (const char *, DWORD);
 int __stdcall iscygthread ();
 
 #ifndef DEBUGGING
+# define cygbench(s)
 # define ForceCloseHandle CloseHandle
 # define ForceCloseHandle1(h, n) CloseHandle (h)
 # define ForceCloseHandle2(h, n) CloseHandle (h)
@@ -75,6 +66,7 @@ void debug_init ();
 void __stdcall add_handle (const char *, int, HANDLE, const char *);
 BOOL __stdcall close_handle (const char *, int, HANDLE, const char *, BOOL);
 int __stdcall lpfu (const char *, int, DWORD timeout);
+void __stdcall cygbench (const char *s);
 
 #endif /*DEBUGGING*/
 #endif /*_DEBUG_H_*/

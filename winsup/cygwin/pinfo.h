@@ -20,8 +20,8 @@ enum
 
 #define PSIZE 1024
 
-class ThreadItem;
 #include <sys/resource.h>
+#include "thread.h"
 
 class _pinfo
 {
@@ -104,20 +104,41 @@ public:
   /* Non-zero if process was stopped by a signal. */
   char stopsig;
 
-  struct sigaction& getsig (int);
-  void copysigs (_pinfo* );
-  sigset_t& getsigmask ();
-  void setsigmask (sigset_t);
-  LONG* getsigtodo (int);
-  HANDLE getthread2signal ();
-  void setthread2signal (void *);
-  void exit (UINT n) __attribute__ ((noreturn));
+  void exit (UINT n, bool norecord = 0) __attribute__ ((noreturn, regparm(2)));
+
+  inline struct sigaction& getsig (int sig)
+  {
+    return thread2signal ? thread2signal->sigs[sig] : sigs[sig];
+  }
+
+  inline void copysigs (_pinfo *p) {sigs = p->sigs;}
+
+  inline sigset_t& getsigmask ()
+  {
+    return thread2signal ? *thread2signal->sigmask : sig_mask;
+  }
+
+  inline void setsigmask (sigset_t mask)
+  {
+    if (thread2signal)
+      *(thread2signal->sigmask) = mask;
+    sig_mask = mask;
+  }
+
+  inline LONG* getsigtodo (int sig) {return _sigtodo + __SIGOFFSET + sig;}
+
+  inline HANDLE getthread2signal ()
+  {
+    return thread2signal ? thread2signal->win32_obj_id : hMainThread;
+  }
+
+  inline void setthread2signal (void *thr) {thread2signal = (ThreadItem *) thr;}
 
 private:
   struct sigaction sigs[NSIG];
   sigset_t sig_mask;		/* one set for everything to ignore. */
   LONG _sigtodo[NSIG + __SIGOFFSET];
-  ThreadItem* thread2signal;  // NULL means means thread any other means a pthread
+  ThreadItem *thread2signal;  // NULL means means thread any other means a pthread
 };
 
 class pinfo
@@ -172,7 +193,7 @@ cygwin_pid (pid_t pid)
   return (pid_t) (os_being_run == winNT) ? pid : -(int) pid;
 }
 
-void __stdcall pinfo_init (char **);
+void __stdcall pinfo_init (char **, int);
 void __stdcall set_myself (pid_t pid, HANDLE h = NULL);
 extern pinfo myself;
 
@@ -181,7 +202,7 @@ extern "C" int _spawnve (HANDLE hToken, int mode, const char *path,
 			 const char *const *argv, const char *const *envp);
 
 extern void __stdcall pinfo_fixup_after_fork ();
-extern void __stdcall pinfo_fixup_in_spawned_child (HANDLE hchild);
+extern HANDLE hexec_proc;
 
 /* For mmaps across fork(). */
 int __stdcall recreate_mmaps_after_fork (void *);

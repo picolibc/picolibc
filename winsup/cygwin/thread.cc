@@ -20,7 +20,6 @@ details. */
 #include <assert.h>
 #include <stdlib.h>
 #include <syslog.h>
-#include "thread.h"
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
@@ -81,7 +80,7 @@ _reent_clib ()
 
   SetLastError (tmp);
   return _r->_clib;
-};
+}
 
 struct _winsup_t *
 _reent_winsup ()
@@ -95,7 +94,7 @@ _reent_winsup ()
 #endif
   SetLastError (tmp);
   return _r->_winsup;
-};
+}
 
 inline LPCRITICAL_SECTION
 ResourceLocks::Lock (int _resid)
@@ -108,7 +107,7 @@ ResourceLocks::Lock (int _resid)
 		 _resid, &lock, user_data, myself->pid, GetCurrentThreadId ());
 #endif
   return &lock;
-};
+}
 
 void
 SetResourceLock (int _res_id, int _mode, const char *_function)
@@ -138,7 +137,7 @@ ReleaseResourceLock (int _res_id, int _mode, const char *_function)
 #endif
 
   LeaveCriticalSection (user_data->resourcelocks->Lock (_res_id));
-};
+}
 
 #ifdef _CYG_THREAD_FAILSAFE
 void
@@ -157,8 +156,6 @@ AssertResourceOwner (int _res_id, int _mode)
 void
 ResourceLocks::Init ()
 {
-  thread_printf ("Init resource lock %p -> %p", this, &lock);
-
   InitializeCriticalSection (&lock);
   inited = true;
 
@@ -167,8 +164,8 @@ ResourceLocks::Init ()
   count = 0;
 #endif
 
-  thread_printf ("Resource lock %p inited by %p , %d", &lock, user_data, myself->pid);
-};
+  thread_printf ("lock %p inited by %p , %d", &lock, user_data, myself->pid);
+}
 
 void
 ResourceLocks::Delete ()
@@ -179,7 +176,7 @@ ResourceLocks::Delete ()
       DeleteCriticalSection (&lock);
       inited = false;
     }
-};
+}
 
 
 // Thread interface
@@ -188,7 +185,7 @@ void
 MTinterface::ReleaseItem (MTitem * _item)
 {
   _item->used = false;
-};
+}
 
 MTitem *
 MTinterface::Find (void *_value, int (*comp) (void *, void *), register int &_index, MTList * _list)
@@ -202,7 +199,7 @@ MTinterface::Find (void *_value, int (*comp) (void *, void *), register int &_in
       current = NULL;
     }
   return current;
-};
+}
 
 int
 MTinterface::Find (MTitem & _item, MTList * _list)
@@ -216,21 +213,22 @@ MTinterface::Find (MTitem & _item, MTList * _list)
 	break;
     }
   return (_index == _list->index ? -1 : _index);
-};
+}
 
 int
 MTinterface::FindNextUnused (MTList * _list)
 {
   register int i = 0;
-  for (; i < _list->index && _list->items[i] != NULL && _list->items[i]->used && _list->items[i]->joinable != 'Y';  i++);
+  for (; i < _list->index && _list->items[i] != NULL && _list->items[i]->used && _list->items[i]->joinable != 'Y';  i++)
+    continue;
   return i;
-};
+}
 
 MTitem *
 MTinterface::GetItem (int _index, MTList * _list)
 {
   return (_index < _list->index ? _list->items[_index] : NULL);
-};
+}
 
 MTitem *
 MTinterface::SetItem (int _index, MTitem * _item, MTList * _list)
@@ -238,23 +236,24 @@ MTinterface::SetItem (int _index, MTitem * _item, MTList * _list)
   if (_index == _list->index && _list->index < MT_MAX_ITEMS)
     _list->index++;
   return (_index < _list->index ? _list->items[_index] = _item : NULL);
-};
+}
 
 int
 CmpPthreadObj (void *_i, void *_value)
 {
   return ((MTitem *) _i)->Id () == *(int *) _value;
-};
+}
 
 int
 CmpThreadId (void *_i, void *_id)
 {
   return ((ThreadItem *) _i)->thread_id == * (DWORD *) _id;
-};
+}
 
 void
-MTinterface::Init0 ()
+MTinterface::Init (int forked)
 {
+#if 0
   for (int i = 0; i < MT_MAX_ITEMS; i++)
     {
       threadlist.items[i] = NULL;
@@ -265,6 +264,7 @@ MTinterface::Init0 ()
   threadlist.index = 0;
   mutexlist.index = 0;
   semalist.index = 0;
+#endif
 
   reent_index = TlsAlloc ();
 
@@ -272,39 +272,35 @@ MTinterface::Init0 ()
   reents._winsup = &winsup_reent;
 
   winsup_reent._process_logmask = LOG_UPTO (LOG_DEBUG);
+#if 0
   winsup_reent._grp_pos = 0;
   winsup_reent._process_ident = 0;
   winsup_reent._process_logopt = 0;
   winsup_reent._process_facility = 0;
+#endif
 
   TlsSetValue (reent_index, &reents);
   // the static reent_data will be used in the main thread
 
-};
+  if (forked)
+    return;
 
-void
-MTinterface::Init1 ()
-{
   // create entry for main thread
 
-  int i = FindNextUnused (&threadlist);
-  assert (i == 0);
-  ThreadItem *item = (ThreadItem *) GetItem (i, &threadlist);
+  ThreadItem *item = (ThreadItem *) GetItem (0, &threadlist);
 
-  item = (ThreadItem *) SetItem (i, &mainthread, &threadlist);
+  item = (ThreadItem *) SetItem (0, &mainthread, &threadlist);
   item->used = true;
   item->win32_obj_id = myself->hProcess;
   item->thread_id = GetCurrentThreadId ();
+#if 0
   item->function = NULL;
 
   item->sigs = NULL;
   item->sigmask = NULL;
   item->sigtodo = NULL;
-};
+#endif
 
-void
-MTinterface::ClearReent ()
-{
   struct _reent *r = _REENT;
   memset (r, 0, sizeof (struct _reent));
 
@@ -312,9 +308,7 @@ MTinterface::ClearReent ()
   r->_stdin = &r->__sf[0];
   r->_stdout = &r->__sf[1];
   r->_stderr = &r->__sf[2];
-
-};
-
+}
 
 ThreadItem *
 MTinterface::CreateThread (pthread_t * t, TFD (func), void *arg, pthread_attr_t a)
@@ -342,8 +336,7 @@ MTinterface::CreateThread (pthread_t * t, TFD (func), void *arg, pthread_attr_t 
   *t = (pthread_t) item->win32_obj_id;
 
   return item;
-};
-
+}
 
 MutexItem *
 MTinterface::CreateMutex (pthread_mutex_t * mutex)
@@ -375,7 +368,7 @@ MTinterface::GetCallingThread ()
   DWORD id = GetCurrentThreadId ();
   int index = 0;
   return (ThreadItem *) Find (&id, &CmpThreadId, index, &threadlist);
-};
+}
 
 ThreadItem *
 MTinterface::GetThread (pthread_t * _t)
@@ -383,7 +376,7 @@ MTinterface::GetThread (pthread_t * _t)
   AssertResourceOwner (LOCK_THREAD_LIST, READ_LOCK);
   int index = 0;
   return (ThreadItem *) Find (_t, &CmpPthreadObj, index, &threadlist);
-};
+}
 
 MutexItem *
 MTinterface::GetMutex (pthread_mutex_t * mp)
@@ -406,19 +399,19 @@ void
 MTitem::Destroy ()
 {
   CloseHandle (win32_obj_id);
-};
+}
 
 int
 MutexItem::Lock ()
 {
   return WaitForSingleObject (win32_obj_id, INFINITE);
-};
+}
 
 int
 MutexItem::TryLock ()
 {
   return WaitForSingleObject (win32_obj_id, 0);
-};
+}
 
 int
 MutexItem::UnLock ()
@@ -448,26 +441,26 @@ MTinterface::CreateSemaphore (sem_t * _s, int pshared, int _v)
   *_s = (sem_t) item->win32_obj_id;
 
   return item;
-};
+}
 
 int
 SemaphoreItem::Wait ()
 {
   return WaitForSingleObject (win32_obj_id, INFINITE);
-};
+}
 
 int
 SemaphoreItem::Post ()
 {
   long pc;
   return ReleaseSemaphore (win32_obj_id, 1, &pc);
-};
+}
 
 int
 SemaphoreItem::TryWait ()
 {
   return WaitForSingleObject (win32_obj_id, 0);
-};
+}
 
 
 //////////////////////////  Pthreads
@@ -547,34 +540,34 @@ __pthread_create (pthread_t * thread, const pthread_attr_t * attr, TFD (start_ro
 
   ReleaseResourceLock (LOCK_THREAD_LIST, WRITE_LOCK | READ_LOCK, "__pthread_create");
   return 0;
-};
+}
 
 int
 __pthread_attr_init (pthread_attr_t * attr)
 {
   attr->stacksize = 0;
   return 0;
-};
+}
 
 int
 __pthread_attr_setstacksize (pthread_attr_t * attr, size_t size)
 {
   attr->stacksize = size;
   return 0;
-};
+}
 
 int
 __pthread_attr_getstacksize (pthread_attr_t * attr, size_t * size)
 {
   *size = attr->stacksize;
   return 0;
-};
+}
 
 int
 __pthread_attr_destroy (pthread_attr_t * /*attr*/)
 {
   return 0;
-};
+}
 
 int
 __pthread_exit (void *value_ptr)
@@ -609,7 +602,7 @@ __pthread_join (pthread_t * thread, void **return_val)
   }/* End if*/
 
   return 0;
-};
+}
 
 int
 __pthread_detach (pthread_t * thread)
@@ -667,30 +660,30 @@ __pthread_getsequence_np (pthread_t * thread)
 {
   GETTHREAD ("__pthread_getsequence_np");
   return item->GetThreadId ();
-};
+}
 
 /* Thread SpecificData */
 int
 __pthread_key_create (pthread_key_t */*key*/)
 {
   NOT_IMP ("_p_key_create\n");
-};
+}
 
 int
 __pthread_key_delete (pthread_key_t */*key*/)
 {
   NOT_IMP ("_p_key_delete\n");
-};
+}
 int
 __pthread_setspecific (pthread_key_t */*key*/, const void */*value*/)
 {
   NOT_IMP ("_p_key_setsp\n");
-};
+}
 void *
 __pthread_getspecific (pthread_key_t */*key*/)
 {
   NOT_IMP ("_p_key_getsp\n");
-};
+}
 
 /* Thread signal */
 int
@@ -708,7 +701,7 @@ __pthread_kill (pthread_t * thread, int sig)
 // unlock myself
   return rval;
 
-};
+}
 
 int
 __pthread_sigmask (int operation, const sigset_t * set, sigset_t * old_set)
@@ -728,7 +721,7 @@ __pthread_sigmask (int operation, const sigset_t * set, sigset_t * old_set)
 // unlock this myself
 
   return rval;
-};
+}
 
 /*  ID */
 pthread_t
@@ -741,13 +734,13 @@ __pthread_self ()
   ReleaseResourceLock (LOCK_THREAD_LIST, READ_LOCK, "__pthread_self");
   return (pthread_t) item->Id ();
 
-};
+}
 
 int
 __pthread_equal (pthread_t * t1, pthread_t * t2)
 {
   return (*t1 - *t2);
-};
+}
 
 /* Mutexes  */
 
@@ -762,7 +755,7 @@ __pthread_mutex_init (pthread_mutex_t * mutex, const pthread_mutexattr_t */*_att
 
   ReleaseResourceLock (LOCK_MUTEX_LIST, WRITE_LOCK | READ_LOCK, "__pthread_mutex_init");
   return 0;
-};
+}
 
 int
 __pthread_mutex_lock (pthread_mutex_t * mutex)
@@ -772,7 +765,7 @@ __pthread_mutex_lock (pthread_mutex_t * mutex)
   item->Lock ();
 
   return 0;
-};
+}
 
 int
 __pthread_mutex_trylock (pthread_mutex_t * mutex)
@@ -783,7 +776,7 @@ __pthread_mutex_trylock (pthread_mutex_t * mutex)
     return EBUSY;
 
   return 0;
-};
+}
 
 int
 __pthread_mutex_unlock (pthread_mutex_t * mutex)
@@ -793,7 +786,7 @@ __pthread_mutex_unlock (pthread_mutex_t * mutex)
   item->UnLock ();
 
   return 0;
-};
+}
 
 int
 __pthread_mutex_destroy (pthread_mutex_t * mutex)
@@ -810,7 +803,7 @@ __pthread_mutex_destroy (pthread_mutex_t * mutex)
 
   ReleaseResourceLock (LOCK_MUTEX_LIST, READ_LOCK | WRITE_LOCK, "__pthread_mutex_destroy");
   return 0;
-};
+}
 
 /* Semaphores */
 int
@@ -824,7 +817,7 @@ __sem_init (sem_t * sem, int pshared, unsigned int value)
 
   ReleaseResourceLock (LOCK_SEM_LIST, READ_LOCK | WRITE_LOCK, "__sem_init");
   return 0;
-};
+}
 
 int
 __sem_destroy (sem_t * sem)
@@ -841,7 +834,7 @@ __sem_destroy (sem_t * sem)
 
   ReleaseResourceLock (LOCK_SEM_LIST, READ_LOCK | WRITE_LOCK, "__sem_destroy");
   return 0;
-};
+}
 
 int
 __sem_wait (sem_t * sem)
@@ -851,7 +844,7 @@ __sem_wait (sem_t * sem)
   item->Wait ();
 
   return 0;
-};
+}
 
 int
 __sem_trywait (sem_t * sem)
@@ -862,7 +855,7 @@ __sem_trywait (sem_t * sem)
     return EAGAIN;
 
   return 0;
-};
+}
 
 int
 __sem_post (sem_t * sem)
@@ -872,7 +865,7 @@ __sem_post (sem_t * sem)
   item->Post ();
 
   return 0;
-};
+}
 
 
 #else

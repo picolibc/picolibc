@@ -19,7 +19,6 @@ details. */
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "path.h"
-#include "thread.h"
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"

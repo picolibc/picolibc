@@ -15,6 +15,7 @@ details. */
 #include "exceptions.h"
 #include "autoload.h"
 #include <ctype.h>
+#include <limits.h>
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
@@ -27,7 +28,6 @@ details. */
 #include "perthread.h"
 #include "path.h"
 #include "dtable.h"
-#include "thread.h"
 #include "shared_info.h"
 #include "cygwin_version.h"
 #include "perprocess.h"
@@ -650,7 +650,7 @@ dll_crt0_1 ()
   _impure_ptr = &reent_data;
 
   user_data->resourcelocks->Init ();
-  user_data->threadinterface->Init0 ();
+  user_data->threadinterface->Init (user_data->forkee);
 
   threadname_init ();
   debug_init ();
@@ -658,6 +658,7 @@ dll_crt0_1 ()
 
   regthread ("main", GetCurrentThreadId ());
 
+  int envc = 0;
   char **envp = NULL;
 
   if (child_proc_info)
@@ -671,14 +672,17 @@ dll_crt0_1 ()
 	    cygheap_fixup_in_child (child_proc_info->parent, 0);
 	    alloc_stack (fork_info);
 	    set_myself (mypid);
-	    user_data->forkee = child_proc_info->cygpid;
 	    user_data->heaptop = child_proc_info->heaptop;
 	    user_data->heapbase = child_proc_info->heapbase;
 	    user_data->heapptr = child_proc_info->heapptr;
 	    ProtectHandle (child_proc_info->forker_finished);
 	    break;
-	  case PROC_EXEC:
 	  case PROC_SPAWN:
+	    CloseHandle (spawn_info->hexec_proc);
+	    goto around;
+	  case PROC_EXEC:
+	    hexec_proc = spawn_info->hexec_proc;
+	  around:
 	    HANDLE h;
 	    cygheap_fixup_in_child (spawn_info->parent, 1);
 	    if (!spawn_info->moreinfo->myself_pinfo ||
@@ -689,12 +693,14 @@ dll_crt0_1 ()
 	    set_myself (mypid, h);
 	    __argc = spawn_info->moreinfo->argc;
 	    __argv = spawn_info->moreinfo->argv;
-	    envp = spawn_info->moreinfo->environ;
+	    envp = spawn_info->moreinfo->envp;
+	    envc = spawn_info->moreinfo->envc;
 	    cygcwd.fixup_after_exec (spawn_info->moreinfo->cwd_win32,
 				     spawn_info->moreinfo->cwd_posix,
 				     spawn_info->moreinfo->cwd_hash);
 	    fdtab.fixup_after_exec (spawn_info->parent, spawn_info->moreinfo->nfds,
 				    spawn_info->moreinfo->fds);
+	    signal_fixup_after_exec (child_proc_info->type == PROC_SPAWN);
 	    CloseHandle (spawn_info->parent);
 	    if (spawn_info->moreinfo->old_title)
 	      {
@@ -702,6 +708,9 @@ dll_crt0_1 ()
 		cfree (spawn_info->moreinfo->old_title);
 	      }
 	    ProtectHandle (child_proc_info->subproc_ready);
+	    myself->uid = spawn_info->moreinfo->uid;
+	    if (myself->uid == USHRT_MAX)
+	      myself->use_psid = 0;
 	    break;
 	}
     }
@@ -730,6 +739,8 @@ dll_crt0_1 ()
      instead of each time a file is opened. */
   set_process_privileges ();
 
+  cygbench ("pre-forkee");
+
   if (user_data->forkee)
     {
       /* If we've played with the stack, stacksize != 0.  That means that
@@ -751,23 +762,10 @@ dll_crt0_1 ()
   cygcwd.init ();
 
   /* Initialize our process table entry. */
-  pinfo_init (envp);
+  pinfo_init (envp, envc);
 
   if (!old_title && GetConsoleTitle (title_buf, TITLESIZE))
       old_title = title_buf;
-
-  /* Nasty static stuff needed by newlib - initialize it.
-     Note that impure_ptr has already been set up to point to this above
-     NB. This *MUST* be done here, just after the forkee code as some
-     of the calls below (eg. uinfo_init) do stdio calls - this area must
-     be set to zero before then. */
-
-  user_data->threadinterface->ClearReent();
-  user_data->threadinterface->Init1();
-
-  char *line = GetCommandLineA ();
-
-  line = strcpy ((char *) alloca (strlen (line) + 1), line);
 
   /* Allocate fdtab */
   dtable_init ();
@@ -786,6 +784,9 @@ dll_crt0_1 ()
 
   if (!__argc)
     {
+      char *line = GetCommandLineA ();
+      line = strcpy ((char *) alloca (strlen (line) + 1), line);
+
       /* Scan the command line and build argv.  Expand wildcards if not
 	 called from another cygwin process. */
       build_argv (line, __argv, __argc,
@@ -848,6 +849,7 @@ dll_crt0_1 ()
   set_errno (0);
 
   MALLOC_CHECK;
+  cygbench (__progname);
   if (user_data->main)
     exit (user_data->main (__argc, __argv, *user_data->envptr));
 }
@@ -862,6 +864,9 @@ extern "C" void __stdcall
 _dll_crt0 ()
 {
   char zeros[sizeof (fork_info->zero)] = {0};
+#ifdef DEBUGGING
+  strace.microseconds ();
+#endif
 
   /* Set the os_being_run global. */
   set_os_type ();
@@ -893,10 +898,11 @@ _dll_crt0 ()
     {
       switch (fork_info->type)
 	{
-	  case PROC_EXEC:
-	  case PROC_SPAWN:
 	  case PROC_FORK:
 	  case PROC_FORK1:
+	    user_data->forkee = fork_info->cygpid;
+	  case PROC_EXEC:
+	  case PROC_SPAWN:
 	    {
 	      child_proc_info = fork_info;
 	      mypid = child_proc_info->cygpid;
@@ -997,9 +1003,7 @@ do_exit (int status)
 	}
     }
 
-  if ((hExeced && hExeced != INVALID_HANDLE_VALUE) || (n & EXIT_NOCLOSEALL))
-    n &= ~EXIT_NOCLOSEALL;
-  else if (exit_state < ES_CLOSEALL)
+  if (exit_state < ES_CLOSEALL)
     {
       exit_state = ES_CLOSEALL;
       close_all_files ();
@@ -1024,6 +1028,8 @@ do_exit (int status)
       /* Kill orphaned children on group leader exit */
       if (myself->pid == myself->pgid)
 	{
+	  system_printf ("%d == pgrp %d, send SIG{HUP,CONT} to stopped children",
+			  myself->pid, myself->pgid);
 	  sigproc_printf ("%d == pgrp %d, send SIG{HUP,CONT} to stopped children",
 			  myself->pid, myself->pgid);
 	  kill_pgrp (myself->pgid, -SIGHUP);
@@ -1044,17 +1050,7 @@ do_exit (int status)
     }
 
   window_terminate ();
-  fill_rusage (&myself->rusage_self, hMainProc);
-
   events_terminate ();
-
-  if (hExeced && hExeced != INVALID_HANDLE_VALUE)
-    {
-      debug_printf ("Killing(%d) non-cygwin process, handle %p", n, hExeced);
-      TerminateProcess (hExeced, n);
-      ForceCloseHandle1 (hExeced, childhProc);
-    }
-
   shared_terminate ();
 
   minimal_printf ("winpid %d, exit %d", GetCurrentProcessId (), n);
@@ -1100,6 +1096,16 @@ __api_fatal (const char *fmt, ...)
 #endif
   myself->exit (1);
 }
+
+#ifdef DEBUGGING
+void __stdcall
+cygbench (const char *s)
+{
+  char buf[1024];
+  if (GetEnvironmentVariable ("CYGWIN_BENCH", buf, sizeof (buf)))
+    small_printf ("%05d ***** %s : %10d\n", GetCurrentProcessId (), s, strace.microseconds ());
+}
+#endif
 
 extern "C" {
 

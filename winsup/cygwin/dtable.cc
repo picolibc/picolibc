@@ -29,7 +29,6 @@ details. */
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
-#include "thread.h"
 
 dtable fdtab;
 
@@ -154,7 +153,7 @@ dtable::release (int fd)
 {
   if (!not_open (fd))
     {
-      delete fds[fd];	/* CGF FIXME */
+      delete fds[fd];
       fds[fd] = NULL;
     }
 }

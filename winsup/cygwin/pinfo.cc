@@ -16,7 +16,6 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygerrno.h"
-#include "thread.h"
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
@@ -30,7 +29,7 @@ static char NO_COPY pinfo_dummy[sizeof(pinfo)] = {0};
 
 pinfo NO_COPY myself ((_pinfo *)&pinfo_dummy);	// Avoid myself != NULL checks
 
-static HANDLE hexec_proc = NULL;
+HANDLE hexec_proc = NULL;
 
 void __stdcall
 pinfo_fixup_after_fork ()
@@ -44,19 +43,6 @@ pinfo_fixup_after_fork ()
       system_printf ("couldn't save current process handle %p, %E", hMainProc);
       hexec_proc = NULL;
     }
-}
-
-void __stdcall
-pinfo_fixup_in_spawned_child (HANDLE hchild)
-{
-  HANDLE h;
-  if (!hexec_proc)
-    return;
-  if (!DuplicateHandle (hchild, hexec_proc, hMainProc, &h, 0, TRUE,
-			DUPLICATE_CLOSE_SOURCE))
-    system_printf ("couldn't close handle %p in child, %E", hexec_proc);
-  else
-    CloseHandle (h);
 }
 
 /* Initialize the process table.
@@ -102,11 +88,11 @@ set_myself (pid_t pid, HANDLE h)
 /* Initialize the process table entry for the current task.
    This is not called for fork'd tasks, only exec'd ones.  */
 void __stdcall
-pinfo_init (char **envp)
+pinfo_init (char **envp, int envc)
 {
   if (envp)
     {
-      environ_init (envp);
+      environ_init (envp, envc);
       /* spawn has already set up a pid structure for us so we'll use that */
       myself->process_state |= PID_CYGPARENT;
     }
@@ -120,96 +106,26 @@ pinfo_init (char **envp)
       myself->ctty = -1;
       myself->uid = USHRT_MAX;
 
-      environ_init (NULL);	/* call after myself has been set up */
+      environ_init (NULL, 0);	/* call after myself has been set up */
     }
 
   debug_printf ("pid %d, pgid %d", myself->pid, myself->pgid);
 }
 
 void
-_pinfo::exit (UINT n)
+_pinfo::exit (UINT n, bool norecord)
 {
-  process_state = PID_EXITED;
+  if (!norecord)
+    process_state = PID_EXITED;
+
+  /* FIXME:  There is a potential race between an execed process and its
+     parent here.  I hated to add a mutex just for this, though.  */
+  struct rusage r;
+  fill_rusage (&r, hMainProc);
+  add_rusage (&rusage_self, &r);
+
   sigproc_printf ("Calling ExitProcess %d", n);
   ExitProcess (n);
-}
-
-struct sigaction&
-_pinfo::getsig(int sig)
-{
-#ifdef _MT_SAFE
-  if (thread2signal)
-    return thread2signal->sigs[sig];
-  return sigs[sig];
-#else
-  return sigs[sig];
-#endif
-};
-
-sigset_t&
-_pinfo::getsigmask ()
-{
-#ifdef _MT_SAFE
-  if (thread2signal)
-    return *thread2signal->sigmask;
-  return sig_mask;
-#else
-  return sig_mask;
-#endif
-};
-
-void
-_pinfo::setsigmask (sigset_t _mask)
-{
-#ifdef _MT_SAFE
-  if (thread2signal)
-	*(thread2signal->sigmask) = _mask;
-  sig_mask=_mask;
-#else
-  sig_mask=_mask;
-#endif
-}
-
-LONG *
-_pinfo::getsigtodo(int sig)
-{
-#ifdef _MT_SAFE
-  if (thread2signal)
-    return thread2signal->sigtodo + __SIGOFFSET + sig;
-  return _sigtodo + __SIGOFFSET + sig;
-#else
-  return _sigtodo + __SIGOFFSET + sig;
-#endif
-}
-
-extern HANDLE hMainThread;
-
-HANDLE
-_pinfo::getthread2signal()
-{
-#ifdef _MT_SAFE
-  if (thread2signal)
-    return thread2signal->win32_obj_id;
-  return hMainThread;
-#else
-  return hMainThread;
-#endif
-}
-
-void
-_pinfo::setthread2signal(void *_thr)
-{
-#ifdef _MT_SAFE
-   // assert has myself lock
-   thread2signal=(ThreadItem*)_thr;
-#else
-#endif
-}
-
-void
-_pinfo::copysigs(_pinfo *_other)
-{
-  sigs = _other->sigs;
 }
 
 void

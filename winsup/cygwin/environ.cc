@@ -517,10 +517,10 @@ regopt (const char *name)
  * environment variable and set appropriate options from it.
  */
 void
-environ_init (char **envp)
+environ_init (char **envp, int envc)
 {
   char *rawenv;
-  int sz, i;
+  int i;
   char *p;
   char *newp;
   int sawTERM = 0;
@@ -541,9 +541,8 @@ environ_init (char **envp)
     envp_passed_in = 0;
   else
     {
-      sz = envsize (envp, 1);
-      char **newenv = (char **) malloc (sz);
-      memcpy (newenv, envp, sz);
+      char **newenv = (char **) malloc (envc);
+      memcpy (newenv, envp, envc);
       cfree (envp);
       envp = newenv;
       envp_passed_in = 1;
@@ -551,7 +550,7 @@ environ_init (char **envp)
     }
 
   /* Allocate space for environment + trailing NULL + CYGWIN env. */
-  lastenviron = envp = (char **) malloc ((4 + (sz = 100)) * sizeof (char *));
+  lastenviron = envp = (char **) malloc ((4 + (envc = 100)) * sizeof (char *));
   rawenv = GetEnvironmentStrings ();
 
   /* Current directory information is recorded as variables of the
@@ -561,9 +560,8 @@ environ_init (char **envp)
   for (i = 0, p = rawenv; *p != '\0'; p = strchr (p, '\0') + 1, i++)
     {
       newp = strdup (p);
-      if (i >= sz)
-	envp = (char **) realloc (envp, (4 + (sz += 100)) *
-					    sizeof (char *));
+      if (i >= envc)
+	envp = (char **) realloc (envp, (4 + (envc += 100)) * sizeof (char *));
       envp[i] = newp;
       if (*newp == '=')
 	*newp = '!';

@@ -1,3 +1,49 @@
+Mon Oct 16 18:37:22 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Remove some obsolete stuff.
+	* dcrt0.cc (dll_crt0_1): Call signal_fixup_after_exec where appropriate.
+	Set myself->uid from parent version.
+	Just use ThreadItem Init method.  Close or store hexec_proc as appropriate.
+	(_dll_crt0): Store user_data->forkee here so that proper tests can be made
+	subsequently.
+	(do_exit): Remove hExeced stuff.
+	* environ.cc (environ_init): Accept environ count as well as environ pointer.
+	* environ.h: Reflect above change.
+	* pinfo.cc (pinfo_init): Ditto.  Accept environ count.
+	(fixup_in_spawned_child): Remove.
+	* spawn.cc (spawn_guts): Move signal code to dll_crt0_1.  Don't suspend
+	execing process since it is no longer necessary.  Store envc.
+	* exceptions.cc (signal_fixup_after_exec): New function.
+	(call_handler): Remove hExeced test.
+	* child_info.h (cygheap_exec_info): Store envc as well as envp.
+	(child_info_spawn): Store hexec_proc so that it can be closed in child.
+	* path.cc (normalize_posix_path): Avoid intermediate use of temporary cwd buf.
+	(normalize_win32_path): Ditto.
+	(cwdstuff::get_initial): Always set lock.
+	* sigproc.h: Remove hExeced.
+	* strace.cc (strace::vsprntf): Modify to accomodate for lack of hExeced.
+	* thread.cc (MTinterface::Init): Merge Init1 and ClearReent into this method.
+	(MTinterface::Init1): Eliminate.
+	(MTinterface::ClearReent): Eliminate.
+	* thread.h: Reflect above changes.
+	* include/sys/strace.h (strace): Make microseconds() public.
+
+Sun Oct 15 21:54:52 2000  Christopher Faylor <cgf@cygnus.com>
+
+	Make various functions 'regparm', throughout.
+	* pinfo.h (_pinfo): Inline simple signal manipulation functions.
+	Requires inclusion of thread.h which was removed from .cc files, where
+	appropriate.  throughout.
+	* pinfo.cc: Eliminate signal manipulation functions.
+	(_pinfo::exit): Calculate total rusage for exiting process here.
+	* cygheap.cc (size2bucket): Eliminate.
+	(init_buckets): Ditto.
+	(_cmalloc): Calculate size and bits in a loop rather than going through
+	a function call.
+	(_crealloc): Use stored array index to calculate allocated size.
+	* spawn.cc (spawn_guts): Use _pinfo exit method to exit, calculating
+	cpu usage.
+
 Sat Oct 14 21:24:16 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (set_console_handler): Don't allocate

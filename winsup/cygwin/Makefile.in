@@ -51,7 +51,7 @@ CC:=@CC@
 # FIXME: Which is it, CC or CC_FOR_TARGET?
 CC_FOR_TARGET:=$(CC)
 CFLAGS:=@CFLAGS@
-CFLAGS+=-MD
+CFLAGS+=-MD -fbuiltin
 CXXFLAGS:=@CXXFLAGS@
 
 # For linking mount, etc. crt0.o isn't accessable in a fresh build.
@@ -83,11 +83,6 @@ RUNTEST = `if [ -f $${srcdir}/../dejagnu/runtest ] ; then \
 	       echo $${srcdir}/../dejagnu/runtest ; \
 	    else echo runtest; fi`
 RUNTESTFLAGS =
-
-ifdef MT_SAFE
-MT_SAFE_HEADERS:=thread.h
-MT_SAFE_OBJECTS:=pthread.o thread.o
-endif
 
 # Parameters used in building the cygwin.dll.
 # We build as new-cygwin.dll and rename at install time to overcome
@@ -123,11 +118,11 @@ DLL_OFILES:=assert.o cygheap.o dcrt0.o debug.o delqueue.o dir.o dlfcn.o \
 	fhandler_random.o fhandler_raw.o fhandler_serial.o fhandler_tape.o \
 	fhandler_termios.o fhandler_tty.o fhandler_windows.o fhandler_zero.o \
 	fork.o glob.o grp.o heap.o init.o ioctl.o localtime.o malloc.o mmap.o \
-	net.o ntea.o passwd.o path.o pinfo.o pipe.o poll.o regexp.o regerror.o \
-	regsub.o registry.o resource.o scandir.o security.o select.o shared.o \
-	signal.o sigproc.o smallprint.o spawn.o strace.o strsep.o sync.o \
-	syscalls.o sysconf.o syslog.o termios.o times.o tty.o uinfo.o uname.o \
-	wait.o window.o \
+	net.o ntea.o passwd.o path.o pinfo.o pipe.o poll.o pthread.o regexp.o \
+	regerror.o regsub.o registry.o resource.o scandir.o security.o select.o \
+	shared.o signal.o sigproc.o smallprint.o spawn.o strace.o strsep.o \
+	sync.o syscalls.o sysconf.o syslog.o termios.o thread.o times.o tty.o \
+	uinfo.o uname.o wait.o window.o \
 	$(EXTRA_DLL_OFILES) $(EXTRA_OFILES) $(MT_SAFE_OBJECTS)
 
 GMON_OFILES:= gmon.o mcount.o profil.o
@@ -218,15 +213,6 @@ Makefile: cygwin.din
 
 $(DEF_FILE): cygwin.din config.status
 	$(SHELL) config.status
-
-# .h file dependencies
-# This may be overkill, but it's better than the previous situation.
-# As files/dependencies are added and removed from Cygwin, please keep
-# this list up to date.
-
-WINSUP_H:=winsup.h fhandler.h path.h shared.h \
-	  sigproc.h include/cygwin/version.h \
-	  $(MT_SAFE_HEADERS)
 
 winsup.h: config.h
 

@@ -158,8 +158,6 @@ handle (int n, int direction)
   return fh->get_output_handle ();
 }
 
-HANDLE NO_COPY hExeced = NULL;
-
 int
 iscmd (const char *argv0, const char *what)
 {
@@ -289,11 +287,8 @@ static int __stdcall
 spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 	    const char *const envp[], int mode)
 {
-  int i;
   BOOL rc;
   pid_t cygpid;
-
-  hExeced = NULL;
 
   MALLOC_CHECK;
 
@@ -507,10 +502,12 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
   cygcwd.copy (ciresrv.moreinfo->cwd_posix, ciresrv.moreinfo->cwd_win32,
 	       ciresrv.moreinfo->cwd_hash);
 
-  ciresrv.moreinfo->environ = (char **) cmalloc (HEAP_1_ARGV, envsize (envp, 1));
+  ciresrv.moreinfo->envc = envsize (envp, 0);
+  ciresrv.moreinfo->envp = (char **) cmalloc (HEAP_1_ARGV, ciresrv.moreinfo->envc);
+  ciresrv.hexec_proc = hexec_proc;
   char **c;
   const char * const *e;
-  for (c = ciresrv.moreinfo->environ, e = envp; *e;)
+  for (c = ciresrv.moreinfo->envp, e = envp; *e;)
     *c++ = cstrdup1 (*e++);
   *c = NULL;
   if (mode != _P_OVERLAY ||
@@ -530,11 +527,12 @@ skip_arg_parsing:
 
   syscall_printf ("spawn_guts (%s, %.132s)", (char *) real_path, one_line.buf);
 
-  int flags = CREATE_DEFAULT_ERROR_MODE | CREATE_SUSPENDED |
-	      GetPriorityClass (hMainProc);
+  int flags = CREATE_DEFAULT_ERROR_MODE | GetPriorityClass (hMainProc);
 
   if (mode == _P_DETACH || !set_console_state_for_spawn ())
     flags |= DETACHED_PROCESS;
+  if (mode != _P_OVERLAY)
+    flags |= CREATE_SUSPENDED;
 
   /* Build windows style environment list */
   char *envblock;
@@ -552,7 +550,24 @@ skip_arg_parsing:
   if (!hToken && myself->token != INVALID_HANDLE_VALUE)
     hToken = myself->token;
 
-  if (hToken)
+cygbench ("spawn-guts");
+  if (!hToken)
+    {
+      ciresrv.moreinfo->uid = getuid ();
+      rc = CreateProcess (real_path,	/* image name - with full path */
+			  one_line.buf,	/* what was passed to exec */
+					  /* process security attrs */
+			  allow_ntsec ? sec_user (sa_buf) : &sec_all_nih,
+					  /* thread security attrs */
+			  allow_ntsec ? sec_user (sa_buf) : &sec_all_nih,
+			  TRUE,	/* inherit handles from parent */
+			  flags,
+			  envblock,/* environment */
+			  0,	/* use current drive/directory */
+			  &si,
+			  &pi);
+    }
+  else
     {
       /* allow the child to interact with our window station/desktop */
       HANDLE hwst, hdsk;
@@ -561,6 +576,7 @@ skip_arg_parsing:
       char wstname[1024];
       char dskname[1024];
 
+      ciresrv.moreinfo->uid = USHRT_MAX;
       hwst = GetProcessWindowStation();
       SetUserObjectSecurity(hwst, &dsi, get_null_sd ());
       GetUserObjectInformation(hwst, UOI_NAME, wstname, 1024, &n);
@@ -612,19 +628,6 @@ skip_arg_parsing:
 	  && myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
 	seteuid (uid);
     }
-  else
-    rc = CreateProcess (real_path,	/* image name - with full path */
-		        one_line.buf,	/* what was passed to exec */
-					/* process security attrs */
-		        allow_ntsec ? sec_user (sa_buf) : &sec_all_nih,
-					/* thread security attrs */
-		        allow_ntsec ? sec_user (sa_buf) : &sec_all_nih,
-		        TRUE,	/* inherit handles from parent */
-		        flags,
-		        envblock,/* environment */
-		        0,	/* use current drive/directory */
-		        &si,
-		        &pi);
 
   MALLOC_CHECK;
   if (envblock)
@@ -654,26 +657,17 @@ skip_arg_parsing:
 
   /* Name the handle similarly to proc_subproc. */
   ProtectHandle1 (pi.hProcess, childhProc);
-  ProtectHandle (pi.hThread);
 
   if (mode == _P_OVERLAY)
     {
+      /* These are both duplicated in the child code.  We do this here,
+	 primarily for strace. */
       strcpy (myself->progname, real_path);
-      hExeced = pi.hProcess;
       myself->dwProcessId = pi.dwProcessId;
-
-      /* Set up child's signal handlers */
-      /* CGF FIXME - consolidate with signal stuff below */
-      for (i = 0; i < NSIG; i++)
-	{
-	  myself->getsig(i).sa_mask = 0;
-	  if (myself->getsig(i).sa_handler != SIG_IGN || (mode != _P_OVERLAY))
-	    myself->getsig(i).sa_handler = SIG_DFL;
-	}
     }
   else
     {
-      pinfo_fixup_in_spawned_child (pi.hProcess);
+      ProtectHandle (pi.hThread);
       pinfo child (cygpid, 1);
       if (!child)
 	{
@@ -684,7 +678,6 @@ skip_arg_parsing:
       child->username[0] = '\0';
       child->progname[0] = '\0';
       child->ppid = myself->pid;
-      child->uid = myself->uid;
       child->gid = myself->gid;
       child->pgid = myself->pgid;
       child->sid = myself->sid;
@@ -702,26 +695,14 @@ skip_arg_parsing:
       child->rootlen = myself->rootlen;
       child->dwProcessId = pi.dwProcessId;
       child->hProcess = pi.hProcess;
-      for (i = 0; i < NSIG; i++)
-	{
-	  child->getsig(i).sa_mask = 0;
-	  if (child->getsig(i).sa_handler != SIG_IGN || (mode != _P_OVERLAY))
-	    child->getsig(i).sa_handler = SIG_DFL;
-	}
-      if (hToken)
-	{
-	  /* Set child->uid to USHRT_MAX to force calling internal_getlogin()
-	     from child process. Clear username and psid to play it safe. */
-	  child->uid = USHRT_MAX;
-	  child->use_psid = 0;
-	}
       child.remember ();
+      /* Start the child running */
+      ResumeThread (pi.hThread);
     }
 
-  sigproc_printf ("spawned windows pid %d", pi.dwProcessId);
-  /* Start the child running */
-  ResumeThread (pi.hThread);
   ForceCloseHandle (pi.hThread);
+
+  sigproc_printf ("spawned windows pid %d", pi.dwProcessId);
 
   if (hToken && hToken != myself->token)
     CloseHandle (hToken);
@@ -824,16 +805,6 @@ skip_arg_parsing:
 	      system_printf ("old hProcess %p, hProcess %p", oldh, myself->hProcess);
 	    }
 	}
-      if (hExeced)
-	{
-	  ForceCloseHandle1 (hExeced, childhProc);
-	  hExeced = INVALID_HANDLE_VALUE;
-	}
-    }
-  else if (exited)
-    {
-      ForceCloseHandle1 (hExeced, childhProc);
-      hExeced = INVALID_HANDLE_VALUE; // stop do_exit from attempting to terminate child
     }
 
   MALLOC_CHECK;
@@ -841,11 +812,9 @@ skip_arg_parsing:
   switch (mode)
     {
     case _P_OVERLAY:
+      ForceCloseHandle1 (pi.hProcess, childhProc);
       proc_terminate ();
-      struct rusage r;
-      fill_rusage (&r, hMainProc);
-      add_rusage (&myself->rusage_self, &r);
-      ExitProcess (0);
+      myself->exit (0, 1);
       break;
     case _P_WAIT:
       waitpid (cygpid, (int *) &res, 0);

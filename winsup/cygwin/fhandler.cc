@@ -463,7 +463,7 @@ fhandler_base::read (void *in_ptr, size_t in_len)
     }
 
   /* Scan buffer and turn \r\n into \n */
-  register char *src= (char *) ptr;
+  register char *src = (char *) ptr;
   register char *dst = (char *) ptr;
   register char *end = src + copied_chars - 1;
 
@@ -772,7 +772,7 @@ rootdir(char *full_path)
    * \\server\share... -> \\server\share\
    * else current drive.
    */
-  char *root=full_path;
+  char *root = full_path;
 
   if (full_path[1] == ':')
     strcpy (full_path + 2, "\\");

@@ -18,7 +18,6 @@ details. */
 #include <stdlib.h>
 #include <wchar.h>
 #include <lm.h>
-#include "thread.h"
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"

@@ -9,7 +9,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 /* Initialize the environment */
-void environ_init (char **);
+void environ_init (char **, int);
 
 /* The structure below is used to control conversion to/from posix-style
  * file specs.  Currently, only PATH and HOME are converted, but PATH

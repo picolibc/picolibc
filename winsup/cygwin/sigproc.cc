@@ -456,22 +456,9 @@ proc_terminate (void)
 	  pchildren[i].release ();
 	}
       nchildren = nzombies = 0;
-
       /* Just zero sync_proc_subproc as the delete below seems to cause
 	 problems for older gccs. */
-      #if 1
 	sync_proc_subproc = NULL;
-      #else
-      /* Attempt to close and release sync_proc_subproc in a
-       * non-raceable manner.
-       */
-      muto *m = sync_proc_subproc;
-      if (m)
-	{
-	  sync_proc_subproc = NULL;
-	  // delete m;
-	}
-      #endif
     }
   sigproc_printf ("leaving");
 }
