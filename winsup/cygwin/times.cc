@@ -646,14 +646,18 @@ hires_ms::prime ()
     minperiod = 0;
   else
     {
-      minperiod = min (max(tc.wPeriodMin, 1), tc.wPeriodMax);
+      minperiod = min (max (tc.wPeriodMin, 1), tc.wPeriodMax);
       timeBeginPeriod (minperiod);
     }
+
   initime_ms = timeGetTime ();
   GetSystemTimeAsFileTime (&f);
   SetThreadPriority (GetCurrentThread (), priority);
+
+  inited = 1;
   initime_us.HighPart = f.dwHighDateTime;
   initime_us.LowPart = f.dwLowDateTime;
+  initime_us.QuadPart -= FACTOR;
   initime_us.QuadPart /= 10;
 }
 

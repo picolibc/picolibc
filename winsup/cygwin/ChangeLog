@@ -1,3 +1,17 @@
+2002-06-07  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_socket.cc (fhandler_socket::fstat): Don't assume that socket
+	is unix-domain socket.
+
+2002-06-07  Christopher Faylor  <cgf@redhat.com>
+
+	* times.cc (hires_ms::prime): Set init flag.
+
+2002-06-07  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* times.cc (hires_ms::prime): Adjust epoch of initime_us from 1601 to
+	1970.
+
 2002-06-06  Christopher Faylor  <cgf@redhat.com>
 
 	* autoload.cc (timeGetDevCaps): Define new autoload function.

@@ -256,9 +256,10 @@ fhandler_socket::dup (fhandler_base *child)
 int __stdcall
 fhandler_socket::fstat (struct __stat64 *buf, path_conv *pc)
 {
-  fhandler_disk_file fh;
-  fh.set_name (cstrdup (get_name ()), get_win32_name ());
-  return fh.fstat (buf, pc);
+  int res = fhandler_base::fstat (buf, pc);
+  if (!res)
+    buf->st_ino = get_handle ();
+  return res;
 }
 
 int
