@@ -263,18 +263,6 @@ int	fseek (FILE*, long, int);
 long	ftell (FILE*);
 void	rewind (FILE*);
 
-#ifdef __USE_MINGW_FSEEK  /* These are in libmingwex.a */
-/*
- * Workaround for limitations on win9x where a file contents are
- * not zero'd out if you seek past the end and then write.
- */
-
-int __mingw_fseek (FILE *, long, int);
-int __mingw_fwrite (const void*, size_t, size_t, FILE*);
-#define fseek(fp, offset, whence)  __mingw_fseek(fp, offset, whence)
-#define fwrite(buffer, size, count, fp)  __mingw_fwrite(buffer, size, count, fp)
-#endif /* __USE_MINGW_FSEEK */
-
 /*
  * An opaque data type used for storing file positions... The contents of
  * this type are unknown, but we (the compiler) need to know the size
@@ -357,10 +345,12 @@ wchar_t* fgetws (wchar_t*, int, FILE*);
 int	fputws (const wchar_t*, FILE*);
 wint_t	getwc (FILE*);
 wint_t	getwchar (void);
-wchar_t* _getws (wchar_t*);
 wint_t	putwc (wint_t, FILE*);
-int	_putws (const wchar_t*);
 wint_t	putwchar (wint_t);
+
+#ifndef __STRICT_ANSI__
+wchar_t* _getws (wchar_t*);
+int	_putws (const wchar_t*);
 FILE*	_wfdopen(int, wchar_t *);
 FILE*	_wfopen (const wchar_t*, const wchar_t*);
 FILE*	_wfreopen (const wchar_t*, const wchar_t*, FILE*);
@@ -371,6 +361,7 @@ int	_wrename (const wchar_t*, const wchar_t*);
 int	_wremove (const wchar_t*);
 void	_wperror (const wchar_t*);
 FILE*	_wpopen (const wchar_t*, const wchar_t*);
+#endif	/* Not __STRICT_ANSI__ */
 #endif	/* __MSVCRT__ */
 
 #ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
@@ -404,6 +395,17 @@ wint_t	fputwchar (wint_t);
 int	getw (FILE*);
 int	putw (int, FILE*);
 #endif	/* Not _NO_OLDNAMES */
+
+#ifdef __USE_MINGW_FSEEK  /* These are in libmingwex.a */
+/*
+ * Workaround for limitations on win9x where a file contents are
+ * not zero'd out if you seek past the end and then write.
+ */
+int __mingw_fseek (FILE *, long, int);
+int __mingw_fwrite (const void*, size_t, size_t, FILE*);
+#define fseek(fp, offset, whence)  __mingw_fseek(fp, offset, whence)
+#define fwrite(buffer, size, count, fp)  __mingw_fwrite(buffer, size, count, fp)
+#endif /* __USE_MINGW_FSEEK */
 
 #endif /* __STRICT_ANSI */
 

@@ -31,15 +31,13 @@
 #include <_mingw.h>
 
 #include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <sys/types.h>
+#include <stdio.h> /* for FILE, FILENAME_MAX */
+#include <time.h> /* for struct tm */
 
 #define __need_size_t
 #define __need_wint_t
 #define __need_wchar_t
+#define __need_NULL
 #ifndef RC_INVOKED
 #include <stddef.h>
 #endif /* Not RC_INVOKED */
@@ -99,6 +97,7 @@ int 	_wfindnexti64 (long, struct _wfinddatai64_t*);
 #endif /* defined (__MSVCRT__) */
 #define _WIO_DEFINED
 #endif /* _WIO_DEFINED */
+#endif /* __STRICT_ANSI__ */
 
 #ifndef _WSTDIO_DEFINED
 /* also in stdio.h - keep in sync */
@@ -129,10 +128,12 @@ wchar_t* fgetws (wchar_t*, int, FILE*);
 int	fputws (const wchar_t*, FILE*);
 wint_t	getwc (FILE*);
 wint_t  getwchar (void);
-wchar_t* _getws (wchar_t*);
 wint_t	putwc (wint_t, FILE*);
-int	_putws (const wchar_t*);
 wint_t	putwchar (wint_t);
+
+#ifndef __STRICT_ANSI__
+wchar_t* _getws (wchar_t*);
+int	_putws (const wchar_t*);
 FILE*	_wfdopen(int, wchar_t *);
 FILE*	_wfopen (const wchar_t*, const wchar_t*);
 FILE*	_wfreopen (const wchar_t*, const wchar_t*, FILE*);
@@ -141,13 +142,14 @@ wchar_t* _wtmpnam (wchar_t*);
 wchar_t* _wtempnam (const wchar_t*, const wchar_t*);
 int 	_wrename (const wchar_t*, const wchar_t*);
 int	_wremove (const wchar_t*)
-
 FILE*	  _wpopen (const wchar_t*, const wchar_t*)
 void	  _wperror (const wchar_t*);
+#endif /* __STRICT_ANSI__ */
 #endif	/* __MSVCRT__ */
 #define _WSTDIO_DEFINED
 #endif /* _WSTDIO_DEFINED */
 
+#ifndef __STRICT_ANSI__
 #ifndef _WDIRECT_DEFINED
 /* Also in direct.h */
 #ifdef __MSVCRT__ 
@@ -199,7 +201,7 @@ struct stat
 	time_t	st_mtime;	/* Modified time */
 	time_t	st_ctime;	/* Creation time */
 };
-#if defined (__MSVCRT__)
+#if defined (__MSVCRT__) 
 struct _stati64 {
     _dev_t st_dev;
     _ino_t st_ino;
@@ -214,6 +216,7 @@ struct _stati64 {
     time_t st_ctime;
     };
 #endif  /* __MSVCRT__ */
+
 #define _STAT_DEFINED
 #endif /* _STAT_DEFINED */
 
@@ -226,22 +229,28 @@ int	_wstati64 (const wchar_t*, struct _stati64*);
 #define _WSTAT_DEFINED
 #endif /* ! _WSTAT_DEFIND  */
 
+#endif /*  __STRICT_ANSI__ */
+
 #ifndef _WTIME_DEFINED
 #ifdef __MSVCRT__
+#ifndef __STRICT_ANSI__
 /* wide function prototypes, also declared in time.h */
 wchar_t*	_wasctime (const struct tm*);
 wchar_t*	_wctime (const time_t*);
 wchar_t*	_wstrdate (wchar_t*);
 wchar_t*	_wstrtime (wchar_t*);
 #endif /* __MSVCRT__ */
+#endif /* __STRICT_ANSI__ */
 size_t		wcsftime (wchar_t*, size_t, const wchar_t*, const struct tm*);
 #define _WTIME_DEFINED
 #endif /* _WTIME_DEFINED */ 
 
+#ifndef __STRICT_ANSI__
 #ifndef _WLOCALE_DEFINED  /* also declared in locale.h */
 wchar_t* _wsetlocale (int, const wchar_t*);
 #define _WLOCALE_DEFINED
 #endif
+#endif /* __STRICT_ANSI__ */
 
 #ifndef _WSTDLIB_DEFINED /* also declared in stdlib.h */
 long	wcstol	(const wchar_t*, wchar_t**, int);
@@ -254,7 +263,7 @@ extern __inline__ float wcstof( const wchar_t *nptr, wchar_t **endptr)
 #define  _WSTDLIB_DEFINED
 #endif
 
-
+#ifndef __STRICT_ANSI__
 #ifndef	_NO_OLDNAMES
 
 /* Wide character versions. Also declared in io.h. */
@@ -273,7 +282,6 @@ int		wsopen (const wchar_t *, int, int, ...);
 wchar_t*	wmktemp (wchar_t *);
 #endif
 #endif /* _NO_OLDNAMES */
-
 #endif /* not __STRICT_ANSI__ */
 
 /* These are resolved by -lmsvcp60 */
@@ -306,7 +314,6 @@ unsigned long long wcstoull(const wchar_t* __restrict__ nptr,
 			    wchar_t ** __restrict__ endptr, int base);
 
 #endif /* __NO_ISOCEXT */
-
 
 #ifdef __cplusplus
 }	/* end of extern "C" */

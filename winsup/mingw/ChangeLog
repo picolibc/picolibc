@@ -1,3 +1,12 @@
+2002-09-19  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/wchar.h: Don't #include sys/types.h, stdlib.h,
+	string.h.
+	Guard only non-ANSI names with #ifndef __STRICT_ANSI__,
+	* include/stdio.h: Add __STRICT_ANSI__ guard for underscored
+	wide char functions and oldnames.
+	(__mingw_fseek, __mingw_fwrite): __STRICT_ANSI__ guard.
+
 2002-09-18  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/math/files.txt: Remove inadvertantly added file.
