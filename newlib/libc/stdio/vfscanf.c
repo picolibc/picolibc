@@ -130,6 +130,11 @@ Supporting OS subroutines required:
 extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
 #endif
 
+#define _NO_LONGLONG
+#if defined WANT_PRINTF_LONG_LONG && defined __GNUC__
+# undef _NO_LONGLONG
+#endif
+
 #include "floatio.h"
 #define	BUF	(MAXEXP+MAXFRACT+3)	/* 3 = sign + decimal point + NUL */
 /* An upper bound for how long a long prints in decimal.  4 / 13 approximates
@@ -144,7 +149,7 @@ extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
  */
 
 #define	LONG		0x01	/* l: long or double */
-#define	LONGDBL		0x02	/* L: long double */
+#define	LONGDBL		0x02	/* L: long double or long long */
 #define	SHORT		0x04	/* h: short */
 #define	SUPPRESS	0x08	/* suppress assignment */
 #define	POINTER		0x10	/* weird %p pointer (`fake hex') */
@@ -180,6 +185,10 @@ extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
 #endif
 #define u_char char
 #define u_long unsigned long
+
+#ifndef _NO_LONGLONG
+typedef unsigned long long u_long_long;
+#endif
 
 /*static*/ u_char *__sccl ();
 
@@ -257,6 +266,11 @@ __svfscanf_r (rptr, fp, fmt0, ap)
   _LONG_DOUBLE *ldp;
   double *dp;
   long *lp;
+#ifndef _NO_LONGLONG
+  long long *llp;
+#else
+	u_long _uquad;
+#endif
 
   /* `basefix' is used to avoid `if' tests in the integer scanner */
   static _CONST short basefix[17] =
@@ -435,6 +449,13 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	      lp = va_arg (ap, long *);
 	      *lp = nread;
 	    }
+#ifndef _NO_LONGLONG
+	  else if (flags & LONGDBL)
+	    {
+	      llp = va_arg (ap, long long*);
+	      *llp = nread;
+	    }
+#endif
 	  else
 	    {
 	      ip = va_arg (ap, int *);
@@ -796,6 +817,18 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 		  lp = va_arg (ap, long *);
 		  *lp = res;
 		}
+#ifndef _NO_LONGLONG
+	      else if (flags & LONGDBL)
+		{
+		  u_long_long resll;
+		  if (ccfn == _strtoul_r)
+		    resll = __strtoull_r (rptr, buf, (char **) NULL, base);
+		  else
+		    resll = __strtoll_r (rptr, buf, (char **) NULL, base);
+		  llp = va_arg (ap, long long*);
+		  *llp = resll;
+		}
+#endif
 	      else
 		{
 		  ip = va_arg (ap, int *);

@@ -70,7 +70,9 @@ lib_a_SOURCES = \
 	strdup_r.c	\
 	strtod.c	\
 	strtol.c	\
+	strtoll_r.c	\
 	strtoul.c	\
+	strtoull_r.c	\
 	system.c	\
 	valloc.c	\
 	wcstombs.c	\

@@ -1,3 +1,15 @@
+2001-09-13  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdlib/Makefile.am: Add support to build strtoll_r.c
+	and strtoull_r.c.
+	* libc/stdlib/Makefile.in: Regenerated.
+	* libc/stdlib/strtoll_r.c: New file.
+	* libc/stdlib/strtoull_r.c: New file.
+	* libc/stdio/local.h: Add prototypes for long long string
+	conversion routines.
+	* libc/stdio/vfscanf.c (__svfscanf_r): Add optional long long support
+	tied to %L integer conversion specifier.
+
 Thu Sep 13 08:49:49 2001  Jason Tishler <jason@tishler.net>
 
         * strftime.c (strftime): Fix "%W" implementation to properly handle
