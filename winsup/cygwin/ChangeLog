@@ -1,3 +1,9 @@
+2003-05-24  Joe Buehler  <jhpb@draco.hekimian.com>
+
+	* fhandler_process.cc (format_process_stat): use PagefileUsage
+	instead of VirtualSize.
+	(get_mem_values): Ditto.
+
 2003-05-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* shared_info.h: Match shared_name declaration with below change.

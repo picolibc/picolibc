@@ -475,7 +475,7 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
 	 start_time = (spt.KernelTime.QuadPart + spt.UserTime.QuadPart) * HZ / 10000000ULL;
        priority = pbi.BasePriority;
        unsigned page_size = getpagesize ();
-       vmsize = vmc.VirtualSize;
+       vmsize = vmc.PagefileUsage;
        vmrss = vmc.WorkingSetSize / page_size;
        vmmaxrss = ql.MaximumWorkingSetSize / page_size;
     }
@@ -740,7 +740,7 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
       res = false;
       goto out;
     }
-  *vmsize = vmc.VirtualSize / page_size;
+  *vmsize = vmc.PagefileUsage / page_size;
 out:
   delete [] p;
   CloseHandle (hProcess);
