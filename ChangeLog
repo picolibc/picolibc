@@ -1,3 +1,40 @@
+2004-02-05  Rainer Orth  <ro@TechFak.Uni-Bielefeld.DE>
+
+	* configure.in: Don't pass --with-stabs on IRIX 5 either.
+	* configure: Regenerate.
+
+2004-02-02  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* COPYING.NEWLIB: Update Red Hat license to 2004.
+	
+2004-01-23  DJ Delorie  <dj@redhat.com>
+
+	* Makefile.def (target_modules) [libiberty]: Don't stage.
+	* Makefile.in: Rebuilt.
+
+2004-01-23  Jeff Johnston  <jjohnstn@redhat.com>
+	
+	* COPYING.NEWLIB: Update to include copyrights for new
+	iconv code.
+
+2004-01-15  Andrew Cagney  <cagney@redhat.com>
+
+	* src-release: Update copyright year.
+	(do-proto-toplev): Configure using i686-pc-linux-gnu.
+	(NEWLIB_SUPPORT_DIRS): Delete macro.
+	(newlib.tar.bz2): Delete rule.
+
+2004-01-14  Loren J. Rittle <ljrittle@acm.org>
+
+	* Makefile.def (target_modules) [libtermcap, libiberty, zlib]: Stage.
+	* Makefile.tpl (configure-target-[+module+]): Support stage.
+	* Makefile.in: Rebuilt.
+
+2003-01-14  Maciej W. Rozycki  <macro@ds2.pg.gda.pl>
+
+	* gettext.m4: Quote names of macros to be defined by AC_DEFUN
+	throughout.
+
 2004-01-04  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	* configure.in: Use ./config.cache, not config.cache.
