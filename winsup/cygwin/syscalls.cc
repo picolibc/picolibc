@@ -1943,8 +1943,6 @@ mkfifo (const char *_path, mode_t mode)
   return -1;
 }
 
-extern struct passwd *internal_getlogin (cygheap_user &user);
-
 /* seteuid: standards? */
 extern "C" int
 seteuid32 (__uid32_t uid)
@@ -1958,17 +1956,11 @@ seteuid32 (__uid32_t uid)
     }
 
   sigframe thisframe (mainthread);
-  DWORD ulen = UNLEN + 1;
-  DWORD dlen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
-  char orig_username[UNLEN + 1];
-  char orig_domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
-  char username[UNLEN + 1];
-  char domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
   cygsid usersid, pgrpsid;
   HANDLE ptok, sav_token;
   BOOL sav_impersonated, sav_token_is_internal_token;
   BOOL process_ok, explicitly_created_token = FALSE;
-  struct passwd * pw_new, * pw_cur;
+  struct passwd * pw_new;
   cygheap_user user;
   PSID origpsid, psid2 = NO_SID;
 
@@ -1984,12 +1976,6 @@ seteuid32 (__uid32_t uid)
   /* Save current information */
   sav_token = cygheap->user.token;
   sav_impersonated = cygheap->user.impersonated;
-  char *env;
-  orig_username[0] = orig_domain[0] = '\0';
-  if ((env = getenv ("USERNAME")))
-    strlcpy (orig_username, env, sizeof(orig_username));
-  if ((env = getenv ("USERDOMAIN")))
-    strlcpy (orig_domain, env, sizeof(orig_domain));
 
   RevertToSelf();
   if (!OpenProcessToken (GetCurrentProcess (),
@@ -2065,16 +2051,6 @@ seteuid32 (__uid32_t uid)
 	}
     }
 
-  /* Lookup username and domain before impersonating,
-     LookupAccountSid() returns a different answer afterwards. */
-  SID_NAME_USE use;
-  if (!LookupAccountSid (NULL, usersid, username, &ulen,
-			 domain, &dlen, &use))
-    {
-      debug_printf ("LookupAccountSid (): %E");
-      __seterrno ();
-      goto failed;
-    }
   /* If using the token, set info and impersonate */
   if (!process_ok)
     {
@@ -2104,38 +2080,17 @@ seteuid32 (__uid32_t uid)
       cygheap->user.impersonated = TRUE;
     }
 
-  /* user.token is used in internal_getlogin () to determine if
-     impersonation is active. If so, the token is used for
-     retrieving user's SID. */
-  user.token = cygheap->user.impersonated ? cygheap->user.token
-					  : INVALID_HANDLE_VALUE;
-  /* Unsetting these two env vars is necessary to get NetUserGetInfo()
-     called in internal_getlogin ().  Otherwise the wrong path is used
-     after a user switch, probably. */
-  unsetenv ("HOMEDRIVE");
-  unsetenv ("HOMEPATH");
-  setenv ("USERDOMAIN", domain, 1);
-  setenv ("USERNAME", username, 1);
-  pw_cur = internal_getlogin (user);
-  if (pw_cur == pw_new)
-    {
-      /* If sav_token was internally created and is replaced, destroy it. */
-      if (sav_token != INVALID_HANDLE_VALUE &&
-	  sav_token != cygheap->user.token &&
-	  sav_token_is_internal_token)
-	CloseHandle (sav_token);
-      myself->uid = uid;
-      cygheap->user = user;
-      return 0;
-    }
-  debug_printf ("Diffs!!! token: %d, cur: %d, new: %d, orig: %d",
-		cygheap->user.token, pw_cur->pw_uid,
-		pw_new->pw_uid, cygheap->user.orig_uid);
-  set_errno (EPERM);
+  /* If sav_token was internally created and is replaced, destroy it. */
+  if (sav_token != INVALID_HANDLE_VALUE &&
+      sav_token != cygheap->user.token &&
+      sav_token_is_internal_token)
+      CloseHandle (sav_token);
+  cygheap->user.set_name (pw_new->pw_name);
+  cygheap->user.set_sid (usersid);
+  myself->uid = uid;
+  return 0;
 
  failed:
-  setenv ("USERNAME", orig_username, 1);
-  setenv ("USERDOMAIN", orig_domain, 1);
   cygheap->user.token = sav_token;
   cygheap->user.impersonated = sav_impersonated;
   if ( cygheap->user.token != INVALID_HANDLE_VALUE &&

@@ -765,6 +765,8 @@ static NO_COPY spenv spenvs[] =
   {"LOGONSERVER=", &cygheap_user::env_logsrv},
   {"SYSTEMDRIVE=", NULL},
   {"SYSTEMROOT=", NULL},
+  {"USERDOMAIN=", &cygheap_user::env_name},
+  {"USERNAME=", &cygheap_user::env_domain},
   {"USERPROFILE=", &cygheap_user::env_userprofile},
 };
 

@@ -124,28 +124,17 @@ public:
   void set_name (const char *new_name);
   const char *name () const { return pname; }
 
-  void set_logsrv (const char *new_logsrv);
-  const char *logsrv () const { return plogsrv; }
-
   const char *env_logsrv ();
   const char *env_homepath ();
   const char *env_homedrive ();
   const char *env_userprofile ();
-
-  void set_domain (const char *new_domain);
-  const char *domain () const { return pdomain; }
+  const char *env_domain ();
+  const char *env_name ();
 
   BOOL set_sid (PSID new_sid);
+  BOOL set_orig_sid ();
   PSID sid () const { return psid; }
   PSID orig_sid () const { return orig_psid; }
-
-  void operator =(cygheap_user &user)
-  {
-    set_name (user.name ());
-    set_logsrv (user.logsrv ());
-    set_domain (user.domain ());
-    set_sid (user.sid ());
-  }
   const char *ontherange (homebodies what, struct passwd * = NULL);
 };
 
