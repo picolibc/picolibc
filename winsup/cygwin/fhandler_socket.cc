@@ -446,7 +446,6 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
 #define un_addr ((struct sockaddr_un *) name)
       struct sockaddr_in sin;
       int len = sizeof sin;
-      int fd;
 
       if (strlen (un_addr->sun_path) >= UNIX_PATH_LEN)
 	{
@@ -472,14 +471,31 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
       sin.sin_port = ntohs (sin.sin_port);
       debug_printf ("AF_LOCAL: socket bound to port %u", sin.sin_port);
 
-      /* bind must fail if file system socket object already exists
-	 so _open () is called with O_EXCL flag. */
-      fd = ::open (un_addr->sun_path, O_WRONLY | O_CREAT | O_EXCL | O_BINARY, 0);
-      if (fd < 0)
-	{
-	  if (get_errno () == EEXIST)
-	    set_errno (EADDRINUSE);
+      path_conv pc (un_addr->sun_path, PC_SYM_FOLLOW);
+      if (pc.error)
+        {
+          set_errno (pc.error);
 	  goto out;
+	}
+      if (pc.exists ())
+        {
+	  set_errno (EADDRINUSE);
+	  goto out;
+	}
+      mode_t mode = (S_IRWXU | S_IRWXG | S_IRWXO) & ~cygheap->umask;
+      DWORD attr = FILE_ATTRIBUTE_SYSTEM;
+      if (!(mode & (S_IWUSR | S_IWGRP | S_IWOTH)))
+        attr |= FILE_ATTRIBUTE_READONLY;
+      SECURITY_ATTRIBUTES sa = sec_none;
+      if (allow_ntsec && pc.has_acls ())
+        set_security_attribute (mode, &sa, alloca (4096), 4096);
+      HANDLE fh = CreateFile (pc, GENERIC_WRITE, 0, &sa, CREATE_NEW, attr, 0);
+      if (fh == INVALID_HANDLE_VALUE)
+        {
+	  if (GetLastError () == ERROR_ALREADY_EXISTS)
+	    set_errno (EADDRINUSE);
+	  else
+	    __seterrno ();
 	}
 
       set_connect_secret ();
@@ -487,20 +503,16 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
       char buf[sizeof (SOCKET_COOKIE) + 80];
       __small_sprintf (buf, "%s%u ", SOCKET_COOKIE, sin.sin_port);
       get_connect_secret (strchr (buf, '\0'));
-      len = strlen (buf) + 1;
-
-      /* Note that the terminating nul is written.  */
-      if (::write (fd, buf, len) != len)
-	{
-	  save_errno here;
-	  ::close (fd);
-	  unlink (un_addr->sun_path);
+      DWORD blen = strlen (buf) + 1;
+      if (!WriteFile (fh, buf, blen, &blen, 0))
+        {
+	  __seterrno ();
+	  CloseHandle (fh);
+	  DeleteFile (pc);
 	}
       else
-	{
-	  ::close (fd);
-	  chmod (un_addr->sun_path,
-		 (S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO) & ~cygheap->umask);
+        {
+	  CloseHandle (fh);
 	  set_sun_path (un_addr->sun_path);
 	  res = 0;
 	}
