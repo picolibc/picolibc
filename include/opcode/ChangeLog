@@ -1,3 +1,17 @@
+2002-11-18  Svein E. Seldal  <Svein.Seldal@solidas.com>
+
+	* tic4x.h: File reordering. Added enhanced opcodes.
+
+2002-11-16  Svein E. Seldal  <Svein.Seldal@solidas.com>
+
+	* tic4x.h: Major rewrite of entire file. Define instruction
+	  classes, and put each instruction into a class.
+
+2002-11-11  Svein E. Seldal  <Svein.Seldal@solidas.com>
+
+	* tic4x.h: Added new opcodes and corrected some bugs.  Add support
+	for new DSP types.
+
 2002-10-14  Alan Modra  <amodra@bigpond.net.au>
 
 	* cgen.h: Test __BFD_H_SEEN__ rather than BFD_VERSION_DATE.
