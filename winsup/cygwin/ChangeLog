@@ -1,3 +1,8 @@
+2005-01-03  Christopher Faylor  <cgf@timesys.com>
+
+	* pinfo.cc (_pinfo::dup_proc_pipe): Can't close proc pipe when execing
+	or we will suffer an exit code race.
+
 2005-01-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* signal.cc (abort): Call _GLOBAL_REENT's __cleanup.

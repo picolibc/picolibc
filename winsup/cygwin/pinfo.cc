@@ -764,9 +764,14 @@ proc_waiter (void *arg)
 bool
 _pinfo::dup_proc_pipe (HANDLE hProcess)
 {
+  DWORD flags = DUPLICATE_SAME_ACCESS;
+  /* Grr.  Can't set DUPLICATE_CLOSE_SOURCE for exec case because we could be
+     execing a non-cygwin process and we need to set the exit value before the
+     parent sees it.  */
+  if (this != myself)
+    flags |= DUPLICATE_CLOSE_SOURCE;
   bool res = DuplicateHandle (hMainProc, wr_proc_pipe, hProcess, &wr_proc_pipe,
-			      0, FALSE,
-			      DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE);
+			      0, FALSE, flags);
   if (!res)
     sigproc_printf ("DuplicateHandle failed, pid %d, hProcess %p, %E", pid, hProcess);
   else
