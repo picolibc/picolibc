@@ -1,3 +1,15 @@
+Wed May  3 21:54:11 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* configure.in: Use -gstabs+ as compile debug option.  This seems to
+	promote better handling of symbols.
+	* configure: Regenerate.
+	* delqueue.cc (delqueue_list::process_queue): Allow ERROR_ACCESS_DENIED
+	to indicate that a file is being shared under Windows 95.
+	* syscalls.cc (_unlink): Use full path name.  Take special action for
+	Windows 95.  Assume that an ERROR_ACCESS_DENIED indicates a sharing
+	violation unless it's on a remote drive.  Punt if there is an
+	ERROR_ACCESS_DENIED on a remote drive.
+
 Wed May  3 18:07:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
         * errno.cc (errmap): Map ERROR_BAD_NETPATH to new errno ENOSHARE.

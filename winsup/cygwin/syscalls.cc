@@ -47,7 +47,7 @@ _unlink (const char *ourname)
 {
   int res = -1;
 
-  path_conv win32_name (ourname, SYMLINK_NOFOLLOW);
+  path_conv win32_name (ourname, SYMLINK_NOFOLLOW, 1);
 
   if (win32_name.error)
     {
@@ -82,6 +82,9 @@ _unlink (const char *ourname)
 	  break;
 	}
 
+      DWORD lasterr;
+      lasterr = GetLastError ();
+
       /* FIXME: There's a race here. */
       HANDLE h = CreateFile (win32_name, GENERIC_READ,
 			    FILE_SHARE_READ,
@@ -91,7 +94,7 @@ _unlink (const char *ourname)
 	{
 	  CloseHandle (h);
 	  syscall_printf ("CreateFile/CloseHandle succeeded");
-	  if (i > 0 || GetFileAttributes (win32_name) == (DWORD) -1)
+	  if (os_being_run == winNT || GetFileAttributes (win32_name) == (DWORD) -1)
 	    {
 	      res = 0;
 	      break;
@@ -99,32 +102,39 @@ _unlink (const char *ourname)
 	}
 
       if (i > 0)
-	goto err;
-
-      res = GetLastError ();
-      syscall_printf ("couldn't delete file, %E");
-
-      /* if access denied, chmod to be writable in case it is not
-	 and try again */
-      /* FIXME!!! Should check whether ourname is directory or file
-	 and only try again if permissions are not sufficient */
-      if (res == ERROR_ACCESS_DENIED)
 	{
-	  /* chmod file to be writable here */
-	  if (chmod (win32_name, 0777) == 0)
-	    continue;
-	  else
+	  DWORD dtype;
+	  if (os_being_run == winNT || lasterr != ERROR_ACCESS_DENIED)
 	    goto err;
+
+	  char root[MAX_PATH];
+	  strcpy (root, win32_name);
+	  dtype = GetDriveType (rootdir (root));
+	  if (dtype & DRIVE_REMOTE)
+	    {
+	      syscall_printf ("access denied on remote drive");
+	      goto err;  /* Can't detect this, unfortunately */
+	    }
+	  lasterr = ERROR_SHARING_VIOLATION;
 	}
+
+      syscall_printf ("i %d, couldn't delete file, %E", i);
 
       /* If we get ERROR_SHARING_VIOLATION, the file may still be open -
 	 Windows NT doesn't support deleting a file while it's open.  */
-      if (res == ERROR_SHARING_VIOLATION)
+      if (lasterr == ERROR_SHARING_VIOLATION)
 	{
 	  cygwin_shared->delqueue.queue_file (win32_name);
 	  res = 0;
 	  break;
 	}
+
+      /* if access denied, chmod to be writable in case it is not
+	 and try again */
+      /* FIXME: Should check whether ourname is directory or file
+	 and only try again if permissions are not sufficient */
+      if (lasterr == ERROR_ACCESS_DENIED && chmod (win32_name, 0777) == 0)
+	continue;
 
     err:
       __seterrno ();
@@ -965,7 +975,7 @@ stat_dev (DWORD devn, int unit, unsigned long ino, struct stat *buf)
   return 0;
 }
 
-suffix_info stat_suffixes[] = 
+suffix_info stat_suffixes[] =
 {
   suffix_info ("", 1),
   suffix_info (".exe", 1),

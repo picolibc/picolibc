@@ -45,12 +45,6 @@ details. */
    paths.  Win32 paths in mount table entries may be UNC paths or
    standard Win32 paths starting with <drive-letter>:
 
-   In converting from a Win32 to a POSIX pathname, if there is no
-   mount point that will allow the conversion to take place, a user
-   mount point will be automatically created under
-   cygdrive/<drive> and the translation will be redone, this
-   time successfully.
-
    Text vs Binary issues are not considered here in path style
    decisions.
 
