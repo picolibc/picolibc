@@ -182,8 +182,3 @@ check: $(TESTSUP_LIB_NAME) $(RUNTIME) testsuite/site.exp
 	    export TCL_LIBRARY ; fi ; \
 	PATH=$${rootme}/../cygwin:$${PATH} ;\
 	$(RUNTEST) --tool winsup $(RUNTESTFLAGS)
-
-Makefile: Makefile.in $(srcdir)/configure.in config.status
-	$(SHELL) config.status
-#
-

@@ -1,3 +1,7 @@
+2002-07-03  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Eliminate unneeded Makefile recreation rule.
+
 2002-02-27  Christopher Faylor  <cgf@redhat.com>
 
 	* winsup.api/systemcall.c (main): Ensure that stdin is redirected.
