@@ -148,7 +148,7 @@ open_shared (const char *name, int n, HANDLE &shared_h, DWORD size,
 void
 user_shared_initialize ()
 {
-  char name[UNLEN > 127 ? UNLEN + 1 : 128] = "";
+  char name[UNLEN + 1] = "";
 
   if (wincap.has_security ())
     {
