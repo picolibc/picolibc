@@ -1,3 +1,7 @@
+2003-07-03  Earnie Boyd  <earnie@users.sf.net>
+
+	* config.guess, config.sub: Update with new versions from ftp.gnu.org.
+
 2003-07-03  Luke Dunstan  <infidel@users.sf.net>
 
 	* include/commdlg.h (CommDlg_OpenSave_*): Add parentheses around
