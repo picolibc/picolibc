@@ -522,17 +522,17 @@ get_device_number (const char *name, int &unit, BOOL from_conv)
 	  unit = 8 + (deveqn ("u", 1) ? 1 : 0); /* Keep unit Linux conformant */
 	}
       else if (deveq ("mem"))
-        {
-          devn = FH_MEM;
-          unit = 1;
-        }
+	{
+	  devn = FH_MEM;
+	  unit = 1;
+	}
       else if (deveq ("clipboard"))
-        devn = FH_CLIPBOARD;
+	devn = FH_CLIPBOARD;
       else if (deveq ("port"))
-        {
-          devn = FH_MEM;
-          unit = 4;
-        }
+	{
+	  devn = FH_MEM;
+	  unit = 4;
+	}
       else if (deveqn ("com", 3) && (unit = digits (name + 3)) >= 0)
 	devn = FH_SERIAL;
       else if (deveqn ("ttyS", 4) && (unit = digits (name + 4)) >= 0)
@@ -609,11 +609,11 @@ normalize_posix_path (const char *src, char *dst)
 	}
       dst = strchr (dst, '\0');
       if (*src == '.')
-        {
+	{
 	  if (dst == dst_start + 1 && *dst_start == '/')
 	     --dst;
 	  goto sawdot;
-        }
+	}
       if (dst > dst_start && !isslash (dst[-1]))
 	*dst++ = '/';
     }
@@ -1517,7 +1517,7 @@ mount_info::read_cygdrive_info_from_registry ()
       /* Didn't find the user path prefix so check the system path prefix. */
 
       /* reg_key for system path prefix in HKEY_LOCAL_MACHINE.  */
-      reg_key r2 (HKEY_LOCAL_MACHINE, KEY_ALL_ACCESS, "SOFTWARE",
+      reg_key r2 (HKEY_LOCAL_MACHINE, KEY_READ, "SOFTWARE",
 		 CYGWIN_INFO_CYGNUS_REGISTRY_NAME,
 		 CYGWIN_INFO_CYGWIN_REGISTRY_NAME,
 		 CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME,
@@ -1647,7 +1647,7 @@ mount_info::get_cygdrive_info (char *user, char *system, char* user_flags,
     }
 
   /* Get the system path prefix from HKEY_LOCAL_MACHINE. */
-  reg_key r2 (HKEY_LOCAL_MACHINE, KEY_ALL_ACCESS, "SOFTWARE",
+  reg_key r2 (HKEY_LOCAL_MACHINE, KEY_READ, "SOFTWARE",
 	      CYGWIN_INFO_CYGNUS_REGISTRY_NAME,
 	      CYGWIN_INFO_CYGWIN_REGISTRY_NAME,
 	      CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME,
@@ -2947,7 +2947,7 @@ cwdstuff::get (char *buf, int need_posix, int with_chroot, unsigned ulen)
 	     posix + cygheap->root.length () : posix;
 
   debug_printf("cygheap->root: %s, posix: %s",
-  	       (const char *) cygheap->root.path (), posix);
+	       (const char *) cygheap->root.path (), posix);
   if (strlen (tocopy) >= ulen)
     {
       set_errno (ERANGE);
