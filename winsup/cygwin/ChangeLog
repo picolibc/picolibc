@@ -1,5 +1,10 @@
 Thu May  9  0:47:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
+	Patch suggested by Eric Fifer <EFifer@sanwaint.com>
+	* errno.cc: Change mapping of ERROR_BAD_PATHNAME to ENOENT.
+
+Thu May  9  0:47:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
 	* path.cc (symlink::info): Treat non readable files
 	as normal non symlink files.
 
