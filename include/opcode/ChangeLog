@@ -1,3 +1,14 @@
+1999-05-12  Alan Modra  <alan@apri.levels.unisa.edu.au>
+
+	* i386.h (ReverseModrm): Remove all occurences.
+	(InvMem): Add to control/debug/test mov insns, movhlps, movlhps,
+	movmskps, pextrw, pmovmskb, maskmovq.
+	Change NoSuf to FP on all MMX, XMM and AMD insns as these all
+	ignore the data size prefix.
+
+	* i386.h (i386_optab, i386_regtab): Add support for PIII SIMD.
+	Mostly stolen from Doug Ledford <dledford@redhat.com>
+
 Sat May  8 23:27:35 1999  Richard Henderson  <rth@cygnus.com>
 
 	* ppc.h (PPC_OPCODE_64_BRIDGE): New.
