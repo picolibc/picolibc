@@ -1346,12 +1346,7 @@ start_thread_socket (select_record *me, select_stuff *stuff)
       }
 
   if (_my_tls.locals.exitsock != INVALID_SOCKET)
-    {
-      char buf[1];
-      si->exitsock = _my_tls.locals.exitsock;
-      select_printf ("read a byte from %p", si->exitsock);
-      recv (si->exitsock, buf, 1, 0);
-    }
+    si->exitsock = _my_tls.locals.exitsock;
   else 
     {
       si->exitsock = _my_tls.locals.exitsock = socket (AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -1408,6 +1403,10 @@ socket_cleanup (select_record *, select_stuff *stuff)
       select_printf ("sent a byte to the exit sock %p, res %d", _my_tls.locals.exitsock, res);
       /* Wait for thread to go away */
       si->thread->detach ();
+      /* empty the socket */
+      select_printf ("reading a byte from %p", si->exitsock);
+      res = recv (si->exitsock, buf, 1, 0);
+      select_printf ("recv returned %d", res);
       stuff->device_specific_socket = NULL;
       delete si;
     }

@@ -1,3 +1,10 @@
+2004-10-20  Christopher Faylor  <cgf@timesys.com>
+
+	* select.cc (start_thread_socket): Remove attempt to delay reading of
+	exitsock or suffer occasional mysterious 60 second hangs.
+	(socket_cleanup): Empty the exitsock here after the thread has
+	terminated.
+
 2004-10-19  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_console.cc (fhandler_console::fixup_after_exec): Fix error
