@@ -1,3 +1,8 @@
+2000-10-20  DJ Delorie  <dj@redhat.com>
+
+	* times.cc (to_time_t): pass zero time as epoch
+	* fhandler.cc (fstat): copy atime/ctime from mtime if they're zero
+
 Thu Oct 19 23:31:41 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* external.cc (fillout_pinfo): Pass PID_NOREDIR flag to pinfo init to

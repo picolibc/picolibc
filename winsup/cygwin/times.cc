@@ -221,6 +221,11 @@ to_time_t (FILETIME *ptr)
 
   long rem;
   long long x = ((long long) ptr->dwHighDateTime << 32) + ((unsigned)ptr->dwLowDateTime);
+
+  /* pass "no time" as epoch */
+  if (x == 0)
+    return 0;
+
   x -= FACTOR;			/* number of 100ns between 1601 and 1970 */
   rem = x % ((long long)NSPERSEC);
   rem += (NSPERSEC / 2);

@@ -855,6 +855,12 @@ fhandler_disk_file::fstat (struct stat *buf)
   buf->st_dev     = local.dwVolumeSerialNumber;
   buf->st_size    = local.nFileSizeLow;
 
+  /* This is for FAT filesystems, which don't support atime/ctime */
+  if (buf->st_atime == 0)
+    buf->st_atime = buf->st_mtime;
+  if (buf->st_ctime == 0)
+    buf->st_ctime = buf->st_mtime;
+
   /* Allocate some place to determine the root directory. Need to allocate
      enough so that rootdir can add a trailing slash if path starts with \\. */
   char root[strlen (get_win32_name ()) + 3];
