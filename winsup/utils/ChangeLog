@@ -1,3 +1,7 @@
+2002-09-17  Christopher Faylor  <cgf@redhat.com>
+
+	* cygcheck.cc: Reorder includes to avoid compiler error.
+
 2002-09-15  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 	* cygcheck.cc (print_version) Add final newline.
 	* getfacl.c (print_version) Add final newline.
