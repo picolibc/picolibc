@@ -122,10 +122,10 @@ noload:									\n\
 	jz	1f		# Nope.					\n\
 	decl	%eax		# Yes.  This is the # of bytes + 1	\n\
 	popl	%edx		# Caller's caller			\n\
-	movl	%eax,%ebx	# For manipulation			\n\
-	andl	$0xffff,%eax	# Only want lower word			\n\
 	addl	%eax,%esp	# Pop off bytes				\n\
-	pushl	%ebx		# Save for later			\n\
+	andl	$0xffff0000,%eax# upper word				\n\
+	subl	%eax,%esp	# adjust for possible return value	\n\
+	pushl	%eax		# Save for later			\n\
 	movl	$127,%eax	# ERROR_PROC_NOT_FOUND			\n\
 	pushl	%eax		# First argument			\n\
 	call	_SetLastError@4	# Set it				\n\

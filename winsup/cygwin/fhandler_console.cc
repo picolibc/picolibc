@@ -17,7 +17,7 @@ details. */
 #include <wingdi.h>
 #include <winuser.h>
 #include <wincon.h>
-#include <winnls.h>	// MultiByteToWideChar () and friends
+#include <winnls.h>
 #include <ctype.h>
 #include <sys/cygwin.h>
 #include "cygerrno.h"
@@ -32,16 +32,8 @@ details. */
 
 #define CONVERT_LIMIT 4096
 
-/* The codepages are resolved here instead of using CP_ACP and
-   CP_OEMCP, so that they can later be compared for equality. */
-inline UINT
-cp_get_internal ()
-{
-  return current_codepage == ansi_cp ? GetACP() : GetOEMCP();
-}
-
 static BOOL
-cp_convert (UINT destcp, char * dest, UINT srccp, const char * src, DWORD size)
+cp_convert (UINT destcp, char *dest, UINT srccp, const char *src, DWORD size)
 {
   if (!size)
     /* no action */;
@@ -68,13 +60,13 @@ cp_convert (UINT destcp, char * dest, UINT srccp, const char * src, DWORD size)
 inline BOOL
 con_to_str (char *d, const char *s, DWORD sz)
 {
-  return cp_convert (cp_get_internal (), d, GetConsoleCP (), s, sz);
+  return cp_convert (get_cp (), d, GetConsoleCP (), s, sz);
 }
 
 inline BOOL
 str_to_con (char *d, const char *s, DWORD sz)
 {
-  return cp_convert (GetConsoleOutputCP (), d, cp_get_internal (), s, sz);
+  return cp_convert (GetConsoleOutputCP (), d, get_cp (), s, sz);
 }
 
 /*

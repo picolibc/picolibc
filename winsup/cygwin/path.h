@@ -147,6 +147,7 @@ class path_conv
   operator const char *() {return path;}
   operator DWORD &() {return fileattr;}
   operator int &() {return (int) fileattr; }
+  char operator [](int i) const {return path[i];}
   BOOL is_device () {return devn != FH_BAD && devn != FH_DISK;}
   DWORD get_devn () {return devn == FH_BAD ? (DWORD) FH_DISK : devn;}
   short get_unitn () {return devn == FH_BAD ? 0 : unit;}

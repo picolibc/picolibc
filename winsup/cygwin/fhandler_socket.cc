@@ -15,6 +15,8 @@
 #include "winsup.h"
 #include <errno.h>
 #include <sys/socket.h>
+#include <sys/un.h>
+#include <sys/uio.h>
 #include <asm/byteorder.h>
 
 #include <stdlib.h>
@@ -36,7 +38,58 @@
 #define ENTROPY_SOURCE_NAME "/dev/urandom"
 #define ENTROPY_SOURCE_DEV_UNIT 9
 
+extern fhandler_socket *fdsock (int& fd, const char *name, SOCKET soc);
+extern "C" {
+int sscanf (const char *, const char *, ...);
+} /* End of "C" section */
+
 fhandler_dev_random* entropy_source;
+
+/* cygwin internal: map sockaddr into internet domain address */
+static int
+get_inet_addr (const struct sockaddr *in, int inlen,
+               struct sockaddr_in *out, int *outlen, int* secret = 0)
+{
+  int secret_buf [4];
+  int* secret_ptr = (secret ? : secret_buf);
+
+  if (in->sa_family == AF_INET)
+    {
+      *out = * (sockaddr_in *)in;
+      *outlen = inlen;
+      return 1;
+    }
+  else if (in->sa_family == AF_LOCAL)
+    {
+      int fd = _open (in->sa_data, O_RDONLY);
+      if (fd == -1)
+        return 0;
+
+      int ret = 0;
+      char buf[128];
+      memset (buf, 0, sizeof buf);
+      if (read (fd, buf, sizeof buf) != -1)
+        {
+          sockaddr_in sin;
+          sin.sin_family = AF_INET;
+          sscanf (buf + strlen (SOCKET_COOKIE), "%hu %08x-%08x-%08x-%08x",
+                  &sin.sin_port,
+                  secret_ptr, secret_ptr + 1, secret_ptr + 2, secret_ptr + 3);
+          sin.sin_port = htons (sin.sin_port);
+          sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
+          *out = sin;
+          *outlen = sizeof sin;
+          ret = 1;
+        }
+      _close (fd);
+      return ret;
+    }
+  else
+    {
+      set_errno (EAFNOSUPPORT);
+      return 0;
+    }
+}
 
 /**********************************************************************/
 /* fhandler_socket */
@@ -93,7 +146,7 @@ fhandler_socket::create_secret_event (int* secret)
   struct sockaddr_in sin;
   int sin_len = sizeof (sin);
 
-  if (getsockname (get_socket (), (struct sockaddr*) &sin, &sin_len))
+  if (::getsockname (get_socket (), (struct sockaddr*) &sin, &sin_len))
     {
       debug_printf ("error getting local socket name (%d)", WSAGetLastError ());
       return NULL;
@@ -257,6 +310,293 @@ fhandler_socket::fstat (struct __stat64 *buf, path_conv *pc)
 }
 
 int
+fhandler_socket::bind (const struct sockaddr *name, int namelen)
+{
+  int res = -1;
+
+  if (name->sa_family == AF_LOCAL)
+    {
+#define un_addr ((struct sockaddr_un *) name)
+      struct sockaddr_in sin;
+      int len = sizeof sin; 
+      int fd;
+
+      if (strlen (un_addr->sun_path) >= UNIX_PATH_LEN)
+	{
+	  set_errno (ENAMETOOLONG);
+	  goto out;
+	}
+      sin.sin_family = AF_INET;
+      sin.sin_port = 0;
+      sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
+      if (::bind (get_socket (), (sockaddr *) &sin, len))
+	{
+	  syscall_printf ("AF_LOCAL: bind failed %d", get_errno ());
+	  set_winsock_errno ();
+	  goto out;
+	}
+      if (::getsockname (get_socket (), (sockaddr *) &sin, &len))
+	{
+	  syscall_printf ("AF_LOCAL: getsockname failed %d", get_errno ());
+	  set_winsock_errno ();
+	  goto out;
+	}
+
+      sin.sin_port = ntohs (sin.sin_port);
+      debug_printf ("AF_LOCAL: socket bound to port %u", sin.sin_port);
+
+      /* bind must fail if file system socket object already exists
+	 so _open () is called with O_EXCL flag. */
+      fd = _open (un_addr->sun_path,
+		  O_WRONLY | O_CREAT | O_EXCL | O_BINARY,
+		  0);
+      if (fd < 0)
+	{
+	  if (get_errno () == EEXIST)
+	    set_errno (EADDRINUSE);
+	  goto out;
+	}
+
+      set_connect_secret ();
+
+      char buf[sizeof (SOCKET_COOKIE) + 80];
+      __small_sprintf (buf, "%s%u ", SOCKET_COOKIE, sin.sin_port);
+      get_connect_secret (strchr (buf, '\0'));
+      len = strlen (buf) + 1;
+
+      /* Note that the terminating nul is written.  */
+      if (_write (fd, buf, len) != len)
+	{
+	  save_errno here;
+	  _close (fd);
+	  _unlink (un_addr->sun_path);
+	}
+      else
+	{
+	  _close (fd);
+	  chmod (un_addr->sun_path,
+	    (S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO) & ~cygheap->umask);
+	  set_sun_path (un_addr->sun_path);
+	  res = 0;
+	}
+#undef un_addr
+    }
+  else if (::bind (get_socket (), name, namelen))
+    set_winsock_errno ();
+  else
+    res = 0;
+
+out:
+  return res;
+}
+
+int
+fhandler_socket::connect (const struct sockaddr *name, int namelen)
+{
+  int res = -1;
+  BOOL secret_check_failed = FALSE;
+  BOOL in_progress = FALSE;
+  sockaddr_in sin;
+  int secret [4];
+
+  sigframe thisframe (mainthread);
+
+  if (!get_inet_addr (name, namelen, &sin, &namelen, secret))
+    return -1;
+
+  res = ::connect (get_socket (), (sockaddr *) &sin, namelen);
+  if (res)
+    {
+      /* Special handling for connect to return the correct error code
+	 when called on a non-blocking socket. */
+      if (is_nonblocking ())
+	{
+	  DWORD err = WSAGetLastError ();
+	  if (err == WSAEWOULDBLOCK || err == WSAEALREADY)
+	    {
+	      WSASetLastError (WSAEINPROGRESS);
+	      in_progress = TRUE;
+	    }
+	  else if (err == WSAEINVAL)
+	    WSASetLastError (WSAEISCONN);
+	}
+      set_winsock_errno ();
+    }
+  if (get_addr_family () == AF_LOCAL && get_socket_type () == SOCK_STREAM)
+    {
+      if (!res || in_progress)
+	{
+	  if (!create_secret_event (secret))
+	    {
+	      secret_check_failed = TRUE;
+	    }
+	  else if (in_progress)
+	    signal_secret_event ();
+	}
+
+      if (!secret_check_failed && !res)
+	{
+	  if (!check_peer_secret_event (&sin, secret))
+	    {
+	      debug_printf ( "accept from unauthorized server" );
+	      secret_check_failed = TRUE;
+	    }
+       }
+
+      if (secret_check_failed)
+	{
+	  close_secret_event ();
+	  if (res)
+	    closesocket (res);
+	  set_errno (ECONNREFUSED);
+	  res = -1;
+	}
+    }
+
+  return res;
+}
+
+int
+fhandler_socket::listen (int backlog)
+{
+  int res = ::listen (get_socket (), backlog);
+  if (res)
+    set_winsock_errno ();
+  return res;
+}
+
+int
+fhandler_socket::accept (struct sockaddr *peer, int *len)
+{
+  int res = -1;
+  BOOL secret_check_failed = FALSE;
+  BOOL in_progress = FALSE;
+
+  sigframe thisframe (mainthread);
+
+  /* Allows NULL peer and len parameters. */
+  struct sockaddr_in peer_dummy;
+  int len_dummy;
+  if (!peer)
+    peer = (struct sockaddr *) &peer_dummy;
+  if (!len)
+    {
+      len_dummy = sizeof (struct sockaddr_in);
+      len = &len_dummy;
+    }
+
+  /* accept on NT fails if len < sizeof (sockaddr_in)
+   * some programs set len to
+   * sizeof (name.sun_family) + strlen (name.sun_path) for UNIX domain
+   */
+  if (len && ((unsigned) *len < sizeof (struct sockaddr_in)))
+    *len = sizeof (struct sockaddr_in);
+
+  res = ::accept (get_socket (), peer, len);  // can't use a blocking call inside a lock
+
+  if ((SOCKET) res == (SOCKET) INVALID_SOCKET &&
+      WSAGetLastError () == WSAEWOULDBLOCK)
+    in_progress = TRUE;
+
+  if (get_addr_family () == AF_LOCAL && get_socket_type () == SOCK_STREAM)
+    {
+      if ((SOCKET) res != (SOCKET) INVALID_SOCKET || in_progress)
+	{
+	  if (!create_secret_event ())
+	    secret_check_failed = TRUE;
+	  else if (in_progress) 
+	    signal_secret_event ();
+	}
+
+      if (!secret_check_failed &&
+	  (SOCKET) res != (SOCKET) INVALID_SOCKET)
+	{
+	  if (!check_peer_secret_event ((struct sockaddr_in*) peer))
+	    {
+	      debug_printf ("connect from unauthorized client");
+	      secret_check_failed = TRUE;
+	    }
+	}
+
+      if (secret_check_failed)
+	{
+	  close_secret_event ();
+	  if ((SOCKET) res != (SOCKET) INVALID_SOCKET)
+	    closesocket (res);
+	  set_errno (ECONNABORTED);
+	  res = -1;
+	  return res;
+	}
+    }
+
+  cygheap_fdnew res_fd;
+  if (res_fd < 0)
+    /* FIXME: what is correct errno? */;
+  else if ((SOCKET) res == (SOCKET) INVALID_SOCKET)
+    set_winsock_errno ();
+  else
+    {
+      fhandler_socket* res_fh = fdsock (res_fd, get_name (), res);
+      if (get_addr_family () == AF_LOCAL)
+	res_fh->set_sun_path (get_sun_path ());
+      res_fh->set_addr_family (get_addr_family ());
+      res_fh->set_socket_type (get_socket_type ());
+      res = res_fd;
+    }
+
+  return res;
+}
+
+int
+fhandler_socket::getsockname (struct sockaddr *name, int *namelen)
+{
+  int res = -1;
+
+  sigframe thisframe (mainthread);
+
+  if (get_addr_family () == AF_LOCAL)
+    {
+      struct sockaddr_un *sun = (struct sockaddr_un *) name;
+      memset (sun, 0, *namelen);
+      sun->sun_family = AF_LOCAL;
+
+      if (!get_sun_path ())
+	sun->sun_path[0] = '\0';
+      else
+	/* According to SUSv2 "If the actual length of the address is
+	   greater than the length of the supplied sockaddr structure, the
+	   stored address will be truncated."  We play it save here so
+	   that the path always has a trailing 0 even if it's truncated. */
+	strncpy (sun->sun_path, get_sun_path (),
+		 *namelen - sizeof *sun + sizeof sun->sun_path - 1);
+
+      *namelen = sizeof *sun - sizeof sun->sun_path
+		 + strlen (sun->sun_path) + 1;
+      res = 0;
+    }
+  else
+    {
+      res = ::getsockname (get_socket (), name, namelen);
+      if (res)
+	set_winsock_errno ();
+    }
+
+  return res;
+}
+
+int
+fhandler_socket::getpeername (struct sockaddr *name, int *namelen)
+{
+  sigframe thisframe (mainthread);
+
+  int res = ::getpeername (get_socket (), name, namelen);
+  if (res)
+    set_winsock_errno ();
+
+  return res;
+}
+
+int
 fhandler_socket::recv (void *ptr, size_t len, unsigned int flags)
 {
   int res = -1;
@@ -264,6 +604,7 @@ fhandler_socket::recv (void *ptr, size_t len, unsigned int flags)
   LPWSAOVERLAPPED ovr;
 
   sigframe thisframe (mainthread);
+
   if (is_nonblocking () || !(ovr = wsock_evt.prepare ()))
     {
       debug_printf ("Fallback to winsock 1 recv call");
@@ -299,6 +640,88 @@ fhandler_socket::read (void *ptr, size_t len)
 }
 
 int
+fhandler_socket::recvfrom (void *ptr, size_t len, unsigned int flags,
+			   struct sockaddr *from, int *fromlen)
+{
+  int res = -1;
+  wsock_event wsock_evt;
+  LPWSAOVERLAPPED ovr;
+
+  sigframe thisframe (mainthread);
+
+  if (is_nonblocking () || !(ovr = wsock_evt.prepare ()))
+    {
+      debug_printf ("Fallback to winsock 1 recvfrom call");
+      if ((res = ::recvfrom (get_socket (), (char *) ptr, len, flags, from,
+			     fromlen))
+	  == SOCKET_ERROR)
+	{
+	  set_winsock_errno ();
+	  res = -1;
+	}
+    }
+  else
+    {
+      WSABUF wsabuf = { len, (char *) ptr };
+      DWORD ret = 0;
+      if (WSARecvFrom (get_socket (), &wsabuf, 1, &ret, (DWORD *)&flags,
+		       from, fromlen, ovr, NULL) != SOCKET_ERROR)
+	res = ret;
+      else if ((res = WSAGetLastError ()) != WSA_IO_PENDING)
+	{
+	  set_winsock_errno ();
+	  res = -1;
+	}
+      else if ((res = wsock_evt.wait (get_socket (), (DWORD *)&flags)) == -1)
+	set_winsock_errno ();
+    }
+
+  return res;
+}
+
+int
+fhandler_socket::recvmsg (struct msghdr *msg, int flags)
+{
+  int res = -1;
+  int nb;
+  size_t tot = 0;
+  char *buf, *p;
+  struct iovec *iov = msg->msg_iov;
+
+  sigframe thisframe (mainthread);
+
+  if (get_addr_family () == AF_LOCAL)
+    {
+      /* On AF_LOCAL sockets the (fixed-size) name of the shared memory
+	 area used for descriptor passing is transmitted first.
+	 If this string is empty, no descriptors are passed and we can
+	 go ahead recv'ing the normal data blocks.  Otherwise start
+	 special handling for descriptor passing. */
+      /*TODO*/
+    }
+  for (int i = 0; i < msg->msg_iovlen; ++i)
+    tot += iov[i].iov_len;
+  buf = (char *) alloca (tot);
+  if (tot != 0 && buf == NULL)
+    {
+      set_errno (ENOMEM);
+      return -1;
+    }
+  nb = res = recvfrom (buf, tot, flags, (struct sockaddr *) msg->msg_name,
+		       (int *) &msg->msg_namelen);
+  p = buf;
+  while (nb > 0)
+    {
+      ssize_t cnt = min(nb, iov->iov_len);
+      memcpy (iov->iov_base, p, cnt);
+      p += cnt;
+      nb -= cnt;
+      ++iov;
+    }
+  return res;
+}
+
+int
 fhandler_socket::send (const void *ptr, size_t len, unsigned int flags)
 {
   int res = -1;
@@ -306,6 +729,7 @@ fhandler_socket::send (const void *ptr, size_t len, unsigned int flags)
   LPWSAOVERLAPPED ovr;
 
   sigframe thisframe (mainthread);
+
   if (is_nonblocking () || !(ovr = wsock_evt.prepare ()))
     {
       debug_printf ("Fallback to winsock 1 send call");
@@ -340,11 +764,111 @@ fhandler_socket::write (const void *ptr, size_t len)
   return send (ptr, len, 0);
 }
 
-/* Cygwin internal */
+int
+fhandler_socket::sendto (const void *ptr, size_t len, unsigned int flags,
+			 const struct sockaddr *to, int tolen)
+{
+  int res = -1;
+  wsock_event wsock_evt;
+  LPWSAOVERLAPPED ovr;
+  sockaddr_in sin;
+
+  sigframe thisframe (mainthread);
+
+  if (!get_inet_addr (to, tolen, &sin, &tolen))
+    return -1;
+
+  if (is_nonblocking () || !(ovr = wsock_evt.prepare ()))
+    {
+      debug_printf ("Fallback to winsock 1 sendto call");
+      if ((res = ::sendto (get_socket (), (const char *) ptr, len, flags,
+			   (sockaddr *) &sin, tolen)) == SOCKET_ERROR)
+	{
+	  set_winsock_errno ();
+	  res = -1;
+	}
+    }
+  else
+    {
+      WSABUF wsabuf = { len, (char *) ptr };
+      DWORD ret = 0;
+      if (WSASendTo (get_socket (), &wsabuf, 1, &ret, (DWORD)flags,
+		     (sockaddr *) &sin, tolen, ovr, NULL) != SOCKET_ERROR)
+	res = ret;
+      else if ((res = WSAGetLastError ()) != WSA_IO_PENDING)
+	{
+	  set_winsock_errno ();
+	  res = -1;
+	}
+      else if ((res = wsock_evt.wait (get_socket (), (DWORD *)&flags)) == -1)
+	set_winsock_errno ();
+    }
+
+  return res;
+}
+
+int
+fhandler_socket::sendmsg (const struct msghdr *msg, int flags)
+{
+    size_t tot = 0;
+    char *buf, *p;
+    struct iovec *iov = msg->msg_iov;
+
+    if (get_addr_family () == AF_LOCAL)
+      {
+        /* For AF_LOCAL/AF_UNIX sockets, if descriptors are given, start
+           the special handling for descriptor passing.  Otherwise just
+           transmit an empty string to tell the receiver that no
+           descriptor passing is done. */
+      /*TODO*/
+      }
+    for(int i = 0; i < msg->msg_iovlen; ++i)
+        tot += iov[i].iov_len;
+    buf = (char *) alloca (tot);
+    if (tot != 0 && buf == NULL)
+      {
+        set_errno (ENOMEM);
+        return -1;
+      }
+    p = buf;
+    for (int i = 0; i < msg->msg_iovlen; ++i)
+      {
+        memcpy (p, iov[i].iov_base, iov[i].iov_len);
+        p += iov[i].iov_len;
+      }
+    return sendto (buf, tot, flags, (struct sockaddr *) msg->msg_name,
+		   msg->msg_namelen);
+}
+
+int
+fhandler_socket::shutdown (int how)
+{
+  int res = ::shutdown (get_socket (), how);
+
+  if (res)
+    set_winsock_errno ();
+  else
+    switch (how)
+      {
+      case SHUT_RD:
+	set_shutdown_read ();
+	break;
+      case SHUT_WR:
+	set_shutdown_write ();
+	break;
+      case SHUT_RDWR:
+	set_shutdown_read ();
+	set_shutdown_write ();
+	break;
+      }
+  return res;
+}
+
 int
 fhandler_socket::close ()
 {
   int res = 0;
+
   sigframe thisframe (mainthread);
 
   /* HACK to allow a graceful shutdown even if shutdown() hasn't been
@@ -381,7 +905,6 @@ fhandler_socket::close ()
 
 #define ASYNC_MASK (FD_READ|FD_WRITE|FD_OOB|FD_ACCEPT|FD_CONNECT)
 
-/* Cygwin internal */
 int
 fhandler_socket::ioctl (unsigned int cmd, void *p)
 {
@@ -389,6 +912,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
   int res;
   struct ifconf ifc, *ifcp;
   struct ifreq *ifr, *ifrp;
+
   sigframe thisframe (mainthread);
 
   switch (cmd)

@@ -11,6 +11,8 @@ details. */
 #include "winsup.h"
 #include "cygerrno.h"
 #include <sys/errno.h>
+#include <winbase.h>
+#include <winnls.h>
 
 long tls_ix = -1;
 
@@ -175,4 +177,22 @@ __check_invalid_read_ptr_errno (const void *s, unsigned sz)
   if (s && !IsBadReadPtr ((void *) s, sz))
     return 0;
   return set_errno (EFAULT);
+}
+
+UINT
+get_cp ()
+{
+  return current_codepage == ansi_cp ? GetACP() : GetOEMCP();
+}
+
+int __stdcall
+sys_wcstombs (char *tgt, const WCHAR *src, int len)
+{
+  return WideCharToMultiByte (get_cp (), 0, src, -1, tgt, len, NULL, NULL);
+}
+
+int __stdcall
+sys_mbstowcs (WCHAR *tgt, const char *src, int len)
+{
+  return MultiByteToWideChar (get_cp (), 0, src, -1, tgt, len);
 }

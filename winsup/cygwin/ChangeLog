@@ -1,3 +1,97 @@
+2002-06-26  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat_by_name): Force
+	FindFirstFile on first file of directory when asking for x:\ .
+
+2002-06-26  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.cc (cygheap_user::set_name): Correct thinko in below change.
+
+2002-06-26  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.cc (cygheap_user::set_name): Avoid clearing things when just
+	setting name to itself or during first time initialization.
+
+	* environ.cc (check_case_init): Make case insensitive.
+
+2002-06-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_socket::bind): Add method definition.
+	(fhandler_socket::connect): Ditto.
+	(fhandler_socket::listen): Ditto.
+	(fhandler_socket::accept): Ditto.
+	(fhandler_socket::getsockname): Ditto.
+	(fhandler_socket::getpeername): Ditto.
+	(fhandler_socket::recvfrom): Ditto.
+	(fhandler_socket::recvmsg): Ditto.
+	(fhandler_socket::sendto): Ditto.
+	(fhandler_socket::sendmsg): Ditto.
+	(fhandler_socket::shutdown): Ditto.
+	* fhandler_socket.cc (get_inet_addr): Move here from net.cc.
+	(fhandler_socket::bind): New method.
+	(fhandler_socket::connect): Ditto.
+	(fhandler_socket::listen): Ditto.
+	(fhandler_socket::accept): Ditto.
+	(fhandler_socket::getsockname): Ditto.
+	(fhandler_socket::getpeername): Ditto.
+	(fhandler_socket::recvfrom): Ditto.
+	(fhandler_socket::recvmsg): Ditto.
+	(fhandler_socket::sendto): Ditto.
+	(fhandler_socket::sendmsg): Ditto.
+	(fhandler_socket::shutdown): Ditto.
+	* net.cc: Various formatting cleanups throughout.
+	(get_inet_addr): Move to fhandler_socket.cc.
+	(cygwin_bind): Move base functionality to appropriate fhandler_socket
+	method.
+	(cygwin_connect): Ditto.
+	(cygwin_listen): Ditto.
+	(cygwin_accept): Ditto.
+	(cygwin_getsockname): Ditto.
+	(cygwin_getpeername): Ditto.
+	(cygwin_recvfrom): Ditto.
+	(cygwin_recvmsg): Ditto.
+	(cygwin_sendto): Ditto.
+	(cygwin_sendmsg): Ditto.
+	(cygwin_shutdown): Ditto.
+
+2002-06-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pwdgrp.h (pwdgrp_read::~pwdgrp_read): Avoid compiler warning.
+
+2002-06-26  Christopher Faylor  <cgf@redhat.com>
+
+	* dcrt0.cc (_dcrt0): Be more defensive when reserved block is used and
+	it's not cygwin info.
+
+2002-06-26  Christopher Faylor  <cgf@redhat.com>
+
+	* autoload (noload): Avoid clobbering bx register.
+
+	* environ.cc (codepage_init): Use case insensitive match.
+
+	* fhandler_console.cc (cp_get_internal): Delete.
+	(con_to_str): Use get_cp to derive code page.
+	(str_to_con): Ditto.
+	* miscfuncs.cc (get_cp): New function.
+	(sys_wcstombs): New function.  Converted from macro.
+	(sys_mbstowcs): Ditto.
+	* winsup.h: Reflect above changes.
+
+2002-06-26  Christopher Faylor  <cgf@redhat.com>
+
+	* winsup.h: Minor cleanup.
+	* path.h (path_conv::[]): New operator.
+	* syscalls.cc (_link): Use path_conv operators rather than methods,
+	where appropriate.  Minor white space cleanup.
+
+2002-06-26  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number.
+
+2002-06-25  Christopher Faylor  <cgf@redhat.com>
+
+	* dcrt0.cc (sm): Make NO_COPY.
+
 2002-06-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (chown): Convert uid to 32 bit.
