@@ -711,7 +711,7 @@ dll_crt0_1 ()
 	    ProtectHandle (child_proc_info->subproc_ready);
 	    myself->uid = spawn_info->moreinfo->uid;
 	    if (myself->uid == USHRT_MAX)
-	      myself->use_psid = 0;
+	      cygheap->user.set_sid (NULL);
 	    break;
 	}
     }

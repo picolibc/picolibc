@@ -704,7 +704,7 @@ chown_worker (const char *name, unsigned fmode, uid_t uid, gid_t gid)
 	  res = set_file_attribute (win32_path.has_acls (),
 				    win32_path.get_win32 (),
 				    uid, gid, attrib,
-				    myself->logsrv);
+				    cygheap->user.logsrv ());
 	}
       if (res != 0 && get_errno () == ENOSYS)
       {
@@ -815,7 +815,7 @@ chmod (const char *path, mode_t mode)
       if (! set_file_attribute (win32_path.has_acls (),
 				win32_path.get_win32 (),
 				uid, gid,
-				mode, myself->logsrv)
+				mode, cygheap->user.logsrv ())
 	  && allow_ntsec)
 	res = 0;
 
@@ -1796,7 +1796,7 @@ setgid (gid_t gid)
 {
   int ret = setegid (gid);
   if (!ret)
-    myself->real_gid = myself->gid;
+    cygheap->user.real_gid = myself->gid;
   return ret;
 }
 
@@ -1806,12 +1806,12 @@ setuid (uid_t uid)
 {
   int ret = seteuid (uid);
   if (!ret)
-    myself->real_uid = myself->uid;
-  debug_printf ("real: %d, effective: %d", myself->real_uid, myself->uid);
+    cygheap->user.real_uid = myself->uid;
+  debug_printf ("real: %d, effective: %d", cygheap->user.real_uid, myself->uid);
   return ret;
 }
 
-extern char *internal_getlogin (_pinfo *pi);
+extern const char *internal_getlogin (cygheap_user &user, HANDLE token);
 
 /* seteuid: standards? */
 extern "C" int
@@ -1830,7 +1830,7 @@ seteuid (uid_t uid)
 	    }
 
 	  if (uid != myself->uid)
-	    if (uid == myself->orig_uid)
+	    if (uid == cygheap->user.orig_uid)
 	      {
 		debug_printf ("RevertToSelf() (uid == orig_uid, token=%d)",
 			      myself->token);
@@ -1850,32 +1850,28 @@ seteuid (uid_t uid)
 		    myself->impersonated = TRUE;
 	      }
 
-	  struct _pinfo pi;
-	  /* pi.token is used in internal_getlogin() to determine if
+	  cygheap_user user;
+	  /* token is used in internal_getlogin() to determine if
 	     impersonation is active. If so, the token is used for
 	     retrieving user's SID. */
-	  pi.token = myself->impersonated ? myself->token
-					  : INVALID_HANDLE_VALUE;
-	  struct passwd *pw_cur = getpwnam (internal_getlogin (&pi));
+	  HANDLE token = myself->impersonated ? myself->token
+					      : INVALID_HANDLE_VALUE;
+	  struct passwd *pw_cur = getpwnam (internal_getlogin (user, token));
 	  if (pw_cur != pw_new)
 	    {
 	      debug_printf ("Diffs!!! token: %d, cur: %d, new: %d, orig: %d",
 			    myself->token, pw_cur->pw_uid,
-			    pw_new->pw_uid, myself->orig_uid);
+			    pw_new->pw_uid, cygheap->user.orig_uid);
 	      set_errno (EPERM);
 	      return -1;
 	    }
 	  myself->uid = uid;
-	  strcpy (myself->username, pi.username);
-	  strcpy (myself->logsrv, pi.logsrv);
-	  strcpy (myself->domain, pi.domain);
-	  memcpy (myself->psid, pi.psid, MAX_SID_LEN);
-	  myself->use_psid = 1;
+	  cygheap->user = user;
 	}
     }
   else
     set_errno (ENOSYS);
-  debug_printf ("real: %d, effective: %d", myself->real_uid, myself->uid);
+  debug_printf ("real: %d, effective: %d", cygheap->user.real_uid, myself->uid);
   return 0;
 }
 
@@ -1930,11 +1926,7 @@ chroot (const char *newroot)
       set_errno (ret);
       goto done;
     }
-  cygheap->rootlen = strlen (cygheap->root);
-  if (cygheap->rootlen > 1 && buf[cygheap->rootlen - 1] == '/')
-    buf[--cygheap->rootlen] = '\0';
-  cygheap->root = (char *) crealloc (cygheap->root, cygheap->rootlen + 1);
-  strcpy (cygheap->root, buf);
+  cygheap->root = buf;
   ret = 0;
 
 done:

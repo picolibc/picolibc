@@ -17,6 +17,7 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "cygheap.h"
 #include "shared_info.h"
 #include "registry.h"
 #include "cygwin_version.h"
@@ -219,9 +220,9 @@ sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
   char sid_buf[MAX_SID_LEN];
   PSID sid = (PSID) sid_buf;
 
-  if (myself->use_psid)
-    CopySid (MAX_SID_LEN, sid, myself->psid);
-  else if (! lookup_name (getlogin (), myself->logsrv, sid))
+  if (cygheap->user.sid ())
+    CopySid (MAX_SID_LEN, sid, (void *) cygheap->user.sid ());
+  else if (! lookup_name (getlogin (), cygheap->user.logsrv (), sid))
     return inherit ? &sec_none_nih : &sec_none;
 
   size_t acl_len = sizeof (ACL)

@@ -29,6 +29,7 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "cygheap.h"
 #include "security.h"
 
 extern BOOL allow_ntea;
@@ -326,7 +327,7 @@ is_grp_member (uid_t uid, gid_t gid)
       gid_t grps[NGROUPS_MAX];
       int cnt = getgroups (NGROUPS_MAX, grps,
 			   pw ? pw->pw_gid : myself->gid,
-			   pw ? pw->pw_name : myself->username);
+			   pw ? pw->pw_name : cygheap->user.name ());
       int i;
       for (i = 0; i < cnt; ++i)
 	if (grps[i] == gid)
@@ -352,9 +353,9 @@ lookup_name (const char *name, const char *logsrv, PSID ret_sid)
   if (! name)
     return FALSE;
 
-  if (*myself->domain)
+  if (cygheap->user.domain ())
     {
-      strcat (strcat (strcpy (domuser, myself->domain), "\\"), name);
+      strcat (strcat (strcpy (domuser, cygheap->user.domain ()), "\\"), name);
       if (LookupAccountName (NULL, domuser,
 			     sid, (sidlen = MAX_SID_LEN, &sidlen),
 			     dom, (domlen = MAX_COMPUTERNAME_LENGTH, &domlen),
@@ -1138,7 +1139,7 @@ set_file_attribute (int use_ntsec, const char *file, int attribute)
 {
   return set_file_attribute (use_ntsec, file,
 			     myself->uid, myself->gid,
-			     attribute, myself->logsrv);
+			     attribute, cygheap->user.logsrv ());
 }
 
 static int

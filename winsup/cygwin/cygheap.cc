@@ -279,3 +279,93 @@ cstrdup1 (const char *s)
   MALLOC_CHECK;
   return p;
 }
+
+cygheap_root::cygheap_root (cygheap_root &nroot)
+{
+  rootlen = nroot.rootlen;
+  root = nroot.root ? cstrdup (nroot.root) : NULL;
+}
+
+cygheap_root::~cygheap_root ()
+{
+  if (root)
+    cfree (root);
+}
+
+char *
+cygheap_root::operator =(const char *new_root)
+{
+  if (root)
+    {
+      cfree (root);
+      root = NULL;
+    }
+  rootlen = 0;
+  if (new_root && *new_root)
+    {
+      root = cstrdup (new_root);
+      rootlen = strlen (root);
+      if (rootlen > 1 && root[rootlen - 1] == '/')
+	root[--rootlen] = '\0';
+      if (!rootlen)
+	{
+	  cfree (root);
+	  root = NULL;
+	}
+    }
+  return root;
+}
+
+cygheap_user::~cygheap_user ()
+{
+  if (pname)
+    cfree (pname);
+  if (plogsrv)
+    cfree (plogsrv);
+  if (pdomain)
+    cfree (pdomain);
+  if (psid)
+    cfree (psid);
+}
+
+void
+cygheap_user::set_name (const char *new_name)
+{
+  if (pname)
+    cfree (pname);
+  pname = cstrdup (new_name ? new_name : "");
+}
+
+void
+cygheap_user::set_logsrv (const char *new_logsrv)
+{
+  if (plogsrv)
+    cfree (plogsrv);
+  plogsrv = (new_logsrv && *new_logsrv) ? cstrdup (new_logsrv) : NULL;
+}
+
+void
+cygheap_user::set_domain (const char *new_domain)
+{
+  if (pdomain)
+    cfree (pdomain);
+  pdomain = (new_domain && *new_domain) ? cstrdup (new_domain) : NULL;
+}
+
+BOOL
+cygheap_user::set_sid (PSID new_sid)
+{
+  if (!new_sid)
+    {
+      if (psid)
+        cfree (psid);
+      psid = NULL;
+      return TRUE;
+    }
+  else
+    {
+      if (!psid)
+	psid = cmalloc (HEAP_STR, MAX_SID_LEN);
+      return CopySid (MAX_SID_LEN, psid, new_sid);
+    }
+}

@@ -19,6 +19,7 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "cygheap.h"
 #include "cygerrno.h"
 
 /* Read /etc/group only once for better performance.  This is done
@@ -273,14 +274,7 @@ extern "C"
 int
 getgroups (int gidsetsize, gid_t *grouplist)
 {
-#if 0
-  if (gidsetsize <= 0)
-      return 0;
-  grouplist[0] = myself->gid;
-  return 1;
-#else
-  return getgroups (gidsetsize, grouplist, myself->gid, myself->username);
-#endif
+  return getgroups (gidsetsize, grouplist, myself->gid, cygheap->user.name ());
 }
 
 extern "C"

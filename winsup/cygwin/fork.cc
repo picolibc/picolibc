@@ -402,7 +402,7 @@ fork_parent (void *stack_here, HANDLE& hParent, dll *&first_dll, bool& load_dlls
   uid_t uid;
   uid = geteuid();
   if (myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
-    seteuid (myself->orig_uid);
+    seteuid (cygheap->user.orig_uid);
 
   ch.parent = hParent;
   ch.cygheap = cygheap;
@@ -474,7 +474,6 @@ fork_parent (void *stack_here, HANDLE& hParent, dll *&first_dll, bool& load_dlls
   forked->hProcess = pi.hProcess;
   forked->dwProcessId = pi.dwProcessId;
   forked->copysigs(myself);
-  memcpy (forked->username, myself->username, MAX_USER_NAME);
   set_child_mmap_ptr (forked);
   forked.remember ();
 

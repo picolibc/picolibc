@@ -1,3 +1,37 @@
+Wed Nov 15  0:51:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* cygheap.cc (cygheap_root::cygheap_root): New function.
+	(cygheap_root::~cygheap_root): Ditto.
+	(cygheap_root::operator=): Ditto.
+	(cygheap_user::~cygheap_user): Ditto.
+	(cygheap_user::set_name): Ditto.
+	(cygheap_user::set_logsrv): Ditto.
+	(cygheap_user::set_domain): Ditto.
+	(cygheap_user::set_sid): Ditto.
+	* cygheap.h (cygheap_root): New class.
+	(cygheap_user): Ditto.
+	(init_cygheap): Change type of `root' member to cygheap_root.
+	Add `user' member.
+	* dir.cc (opendir): Use new `cygheap_root' class.
+	* dcrt0.cc (dll_crt0_1): Use new `cygheap_user' class.
+	* fork.cc (fork_parent): Ditto.
+	* grp.cc (getgroups): Ditto.
+	* passwd.cc (search_for): Ditto.
+	* path.cc: Use new `cygheap_root' class throughout.
+	* pinfo.h (_pinfo): Remove `use_psid'. Move `username', `psid',
+	`logsrv', `domain', `orig_{uid,gid}' and `real_{uid,gid}' to
+	cygheap_user class.
+	* security.cc: Use new `cygheap_user' class throughout.
+	* shared.cc (sec_user): Ditto.
+	* sigproc.cc (proc_subproc): Remove copy statements for user
+	related information moved to `cygheap_user' class.
+	* spawn.cc (spawn_guts): Invalidate current chroot settings
+	when creating Windows environment. Use new `cygheap_user' class.
+	* syscalls.cc: Use new `cygheap_user' class throughout.
+	* uinfo.cc: Ditto.
+	* uinfo.cc (internal_getlogin): Change parameters to reflect the
+	move of user information to cygheap.
+
 Tue Nov 14 17:05:00 2000  Eric Fifer <efifer@dircon.co.uk>
 
 	* dir.cc (rewinddir): Always set __d_position = 0, so next

@@ -73,24 +73,11 @@ public:
   pid_t sid;		/* Session ID */
   int ctty;		/* Control tty */
   bool has_pgid_children;/* True if we've forked or spawned children with our GID. */
-  char username[MAX_USER_NAME]; /* user's name */
-
-  /* Extendend user information.
-     The information is derived from the internal_getlogin call
-     when on a NT system. */
-  int use_psid;		/* TRUE if psid contains valid data */
-  char psid[MAX_SID_LEN];  /* buffer for user's SID */
-  char logsrv[MAX_HOST_NAME]; /* Logon server, may be FQDN */
-  char domain[MAX_COMPUTERNAME_LENGTH+1]; /* Logon domain of the user */
 
   /* token is needed if sexec should be called. It can be set by a call
      to `set_impersonation_token()'. */
   HANDLE token;
   BOOL impersonated;
-  uid_t orig_uid;	/* Remains intact also after impersonation */
-  uid_t orig_gid;	/* Ditto */
-  uid_t real_uid;	/* Remains intact on seteuid, replaced by setuid */
-  gid_t real_gid;	/* Ditto */
 
   /* Resources used by process. */
   long start_time;

@@ -109,10 +109,11 @@ cwdstuff cygcwd;	/* The current working directory. */
    (isdirsep(path[cygwin_shared->mount.cygdrive_len + 1]) || \
     !path[cygwin_shared->mount.cygdrive_len + 1]))
 
-#define ischrootpath(path) \
-	(cygheap->rootlen && \
-	 strncasematch (cygheap->root, path, cygheap->rootlen) && \
-	 (path[cygheap->rootlen] == '/' || path[cygheap->rootlen] == '\0'))
+#define ischrootpath(p) \
+	(cygheap->root.length () && \
+	 strncasematch (cygheap->root.path (), p, cygheap->root.length ()) && \
+	 (p[cygheap->root.length ()] == '/' \
+	  || p[cygheap->root.length ()] == '\0'))
 
 /* Return non-zero if PATH1 is a prefix of PATH2.
    Both are assumed to be of the same path style and / vs \ usage.
@@ -615,7 +616,7 @@ normalize_posix_path (const char *src, char *dst)
   /* Two leading /'s?  If so, preserve them.  */
   else if (isslash (src[1]))
     {
-      if (cygheap->rootlen)
+      if (cygheap->root.length ())
 	{
 	  debug_printf ("ENOENT = normalize_posix_path (%s)", src);
 	  return ENOENT;
@@ -631,10 +632,10 @@ normalize_posix_path (const char *src, char *dst)
 	}
     }
   /* Exactly one leading slash. Absolute path. Check for chroot. */
-  else if (cygheap->rootlen)
+  else if (cygheap->root.length ())
     {
-      strcpy (dst, cygheap->root);
-      dst += cygheap->rootlen;
+      strcpy (dst, cygheap->root.path ());
+      dst += cygheap->root.length ();
     }
 
   while (*src)
@@ -669,7 +670,7 @@ normalize_posix_path (const char *src, char *dst)
 	      else
 		{
 		  if (!ischrootpath (dst_start) ||
-		      dst - dst_start != (int) cygheap->rootlen)
+		      dst - dst_start != (int) cygheap->root.length ())
 		    while (dst > dst_start && !isslash (*--dst))
 		      continue;
 		  src++;
@@ -718,7 +719,7 @@ normalize_win32_path (const char *src, char *dst)
   /* Two leading \'s?  If so, preserve them.  */
   else if (SLASH_P (src[0]) && SLASH_P (src[1]))
     {
-      if (cygheap->rootlen)
+      if (cygheap->root.length ())
 	{
 	  debug_printf ("ENOENT = normalize_win32_path (%s)", src);
 	  return ENOENT;
@@ -727,13 +728,13 @@ normalize_win32_path (const char *src, char *dst)
       ++src;
     }
   /* If absolute path, care for chroot. */
-  else if (SLASH_P (src[0]) && !SLASH_P (src[1]) && cygheap->rootlen)
+  else if (SLASH_P (src[0]) && !SLASH_P (src[1]) && cygheap->root.length ())
     {
-      strcpy (dst, cygheap->root);
+      strcpy (dst, cygheap->root.path ());
       char *c;
       while ((c = strchr (dst, '/')) != NULL)
 	*c = '\\';
-      dst += cygheap->rootlen;
+      dst += cygheap->root.length ();
       dst_root_start = dst;
       *dst++ = '\\';
     }
@@ -997,7 +998,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
 	}
       isrelpath = !isabspath (src_path);
       *flags = set_flags_from_win32_path (dst);
-      if (cygheap->rootlen && dst[0] && dst[1] == ':')
+      if (cygheap->root.length () && dst[0] && dst[1] == ':')
 	{
 	  char posix_path[MAX_PATH + 1];
 
@@ -2939,9 +2940,10 @@ cwdstuff::get (char *buf, int need_posix, int with_chroot, unsigned ulen)
     tocopy = win32;
   else
     tocopy = with_chroot && ischrootpath(posix) ?
-	     posix + cygheap->rootlen : posix;
+	     posix + cygheap->root.length () : posix;
 
-  debug_printf("cygheap->root: %s, posix: %s", cygheap->root, posix);
+  debug_printf("cygheap->root: %s, posix: %s",
+  	       (const char *) cygheap->root.path (), posix);
   if (strlen (tocopy) >= ulen)
     {
       set_errno (ERANGE);

@@ -76,7 +76,7 @@ opendir (const char *dirname)
       goto failed;
     }
 
-  if (stat (cygheap->rootlen ? dirname : real_dirname.get_win32 (),
+  if (stat (cygheap->root.length () ? dirname : real_dirname.get_win32 (),
 	    &statbuf) == -1)
     goto failed;
 

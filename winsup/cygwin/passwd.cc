@@ -19,6 +19,7 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "cygheap.h"
 #include <sys/termios.h>
 
 /* Read /etc/passwd only once for better performance.  This is done
@@ -179,7 +180,7 @@ search_for (uid_t uid, const char *name)
      request for the current user. */
   if (passwd_state != loaded
       || (!name && uid == myself->uid)
-      || (name && strcasematch(name, myself->username)))
+      || (name && strcasematch(name, cygheap->user.name ())))
     return default_pw;
 
   return NULL;

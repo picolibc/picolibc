@@ -20,18 +20,20 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "cygheap.h"
 #include "registry.h"
 #include "security.h"
 
-char *
-internal_getlogin (_pinfo *pi)
+const char *
+internal_getlogin (cygheap_user &user, HANDLE token)
 {
-  if (! pi)
-    api_fatal ("pinfo pointer is NULL!\n");
-
+  char username[MAX_USER_NAME];
   DWORD username_len = MAX_USER_NAME;
-  if (! GetUserName (pi->username, &username_len))
-    strcpy (pi->username, "unknown");
+
+  if (! GetUserName (username, &username_len))
+    user.set_name ("unknown");
+  else
+    user.set_name (username);
   if (os_being_run == winNT)
     {
       LPWKSTA_USER_INFO_1 wui;
@@ -42,31 +44,37 @@ internal_getlogin (_pinfo *pi)
       if ((env = getenv ("USERNAME")) != NULL)
 	un = env;
       if ((env = getenv ("LOGONSERVER")) != NULL)
-	strcpy (pi->logsrv, env + 2); /* filter leading double backslashes */
+	user.set_logsrv (env + 2); /* filter leading double backslashes */
       if ((env = getenv ("USERDOMAIN")) != NULL)
-	strcpy (pi->domain, env);
+	user.set_domain (env);
       /* Trust only if usernames are identical */
-      if (un && strcasematch (pi->username, un)
-	  && pi->domain[0] && pi->logsrv[0])
-	debug_printf ("Domain: %s, Logon Server: %s", pi->domain, pi->logsrv);
+      if (un && strcasematch (user.name (), un)
+	  && user.domain () && user.logsrv ())
+	debug_printf ("Domain: %s, Logon Server: %s",
+		      user.domain (), user.logsrv ());
       /* If that failed, try to get that info from NetBIOS */
       else if (!NetWkstaUserGetInfo (NULL, 1, (LPBYTE *)&wui))
 	{
-	  sys_wcstombs (pi->username, wui->wkui1_username, MAX_USER_NAME);
-	  sys_wcstombs (pi->logsrv, wui->wkui1_logon_server, MAX_HOST_NAME);
-	  sys_wcstombs (pi->domain, wui->wkui1_logon_domain,
+	  char buf[512];
+
+	  sys_wcstombs (buf, wui->wkui1_username, MAX_USER_NAME);
+	  user.set_name (buf);
+	  sys_wcstombs (buf, wui->wkui1_logon_server, MAX_HOST_NAME);
+	  user.set_logsrv (buf);
+	  sys_wcstombs (buf, wui->wkui1_logon_domain,
 			MAX_COMPUTERNAME_LENGTH + 1);
+	  user.set_domain (buf);
 	  /* Save values in environment */
-	  if (!strcasematch (pi->username, "SYSTEM")
-	      && pi->domain[0] && pi->logsrv[0])
+	  if (!strcasematch (user.name (), "SYSTEM")
+	      && user.domain () && user.logsrv ())
 	    {
 	      LPUSER_INFO_3 ui = NULL;
 	      WCHAR wbuf[MAX_HOST_NAME + 2];
 
-	      strcat (strcpy (buf, "\\\\"), pi->logsrv);
-	      setenv ("USERNAME", pi->username, 1);
+	      strcat (strcpy (buf, "\\\\"), user.logsrv ());
+	      setenv ("USERNAME", user.name (), 1);
 	      setenv ("LOGONSERVER", buf, 1);
-	      setenv ("USERDOMAIN", pi->domain, 1);
+	      setenv ("USERDOMAIN", user.domain (), 1);
 	      /* HOMEDRIVE and HOMEPATH are wrong most of the time, too,
 		 after changing user context! */
 	      sys_mbstowcs (wbuf, buf, MAX_HOST_NAME + 2);
@@ -95,12 +103,12 @@ internal_getlogin (_pinfo *pi)
 		}
 	    }
 	  debug_printf ("Domain: %s, Logon Server: %s, Windows Username: %s",
-			pi->domain, pi->logsrv, pi->username);
+			user.domain (), user.logsrv (), user.name ());
 	  NetApiBufferFree (wui);
 	}
       if (allow_ntsec)
 	{
-	  HANDLE ptok = pi->token; /* Which is INVALID_HANDLE_VALUE if no
+	  HANDLE ptok = token; /* Which is INVALID_HANDLE_VALUE if no
 				      impersonation took place. */
 	  DWORD siz;
 	  char tu[1024];
@@ -116,29 +124,28 @@ internal_getlogin (_pinfo *pi)
 	  else if (!GetTokenInformation (ptok, TokenUser, (LPVOID) &tu,
 					 sizeof tu, &siz))
 	    debug_printf ("GetTokenInformation(): %E");
-	  else if (!(ret = CopySid (MAX_SID_LEN, (PSID) pi->psid,
-				    ((TOKEN_USER *) &tu)->User.Sid)))
+	  else if (!(ret = user.set_sid (((TOKEN_USER *) &tu)->User.Sid)))
 	    debug_printf ("Couldn't retrieve SID from access token!");
 	  /* Close token only if it's a result from OpenProcessToken(). */
-	  if (ptok != INVALID_HANDLE_VALUE && pi->token == INVALID_HANDLE_VALUE)
+	  if (ptok != INVALID_HANDLE_VALUE && token == INVALID_HANDLE_VALUE)
 	    CloseHandle (ptok);
 
 	  /* If that failes, try to get the SID from localhost. This can only
 	     be done if a domain is given because there's a chance that a local
 	     and a domain user may have the same name. */
-	  if (!ret && pi->domain[0])
+	  if (!ret && user.domain ())
 	    {
 	      /* Concat DOMAIN\USERNAME for the next lookup */
-	      strcat (strcat (strcpy (buf, pi->domain), "\\"), pi->username);
-	      if (!(ret = lookup_name (buf, NULL, (PSID) pi->psid)))
+	      strcat (strcat (strcpy (buf, user.domain ()), "\\"), user.name ());
+	      if (!(ret = lookup_name (buf, NULL, user.sid ())))
 		debug_printf ("Couldn't retrieve SID locally!");
 	    }
 
 	  /* If that failes, too, as a last resort try to get the SID from
 	     the logon server. */
-	  if (!ret && !(ret = lookup_name(pi->username, pi->logsrv,
-					  (PSID)pi->psid)))
-	    debug_printf ("Couldn't retrieve SID from '%s'!", pi->logsrv);
+	  if (!ret && !(ret = lookup_name(user.name (), user.logsrv (),
+					  user.sid ())))
+	    debug_printf ("Couldn't retrieve SID from '%s'!", user.logsrv ());
 
 	  /* If we have a SID, try to get the corresponding Cygwin user name
 	     which can be different from the Windows user name. */
@@ -148,31 +155,29 @@ internal_getlogin (_pinfo *pi)
 	      char psidbuf[MAX_SID_LEN];
 	      PSID psid = (PSID) psidbuf;
 
-	      pi->use_psid = 1;
-	      if (!strcasematch (pi->username, "SYSTEM")
-		  && pi->domain[0] && pi->logsrv[0])
+	      if (!strcasematch (user.name (), "SYSTEM")
+		  && user.domain () && user.logsrv ())
 		{
-		  if (get_registry_hive_path (pi->psid, buf))
+		  if (get_registry_hive_path (user.sid (), buf))
 		    setenv ("USERPROFILE", buf, 1);
 		}
 	      while ((pw = getpwent ()) != NULL)
-		if (get_pw_sid (psid, pw) && EqualSid (pi->psid, psid))
+		if (get_pw_sid (psid, pw) && EqualSid (user.sid (), psid))
 		  {
-		    strcpy (pi->username, pw->pw_name);
+		    user.set_name (pw->pw_name);
 		    break;
 		  }
 	      endpwent ();
 	    }
 	}
     }
-  debug_printf ("Cygwins Username: %s", pi->username);
-  return pi->username;
+  debug_printf ("Cygwins Username: %s", user.name ());
+  return user.name ();
 }
 
 void
 uinfo_init ()
 {
-  char *username;
   struct passwd *p;
 
   /* Initialize to non impersonated values.
@@ -185,7 +190,8 @@ uinfo_init ()
   /* If uid is USHRT_MAX, the process is started from a non cygwin
      process or the user context was changed in spawn.cc */
   if (myself->uid == USHRT_MAX)
-    if ((p = getpwnam (username = internal_getlogin (myself))) != NULL)
+    if ((p = getpwnam (internal_getlogin (cygheap->user,
+  					  INVALID_HANDLE_VALUE))) != NULL)
       {
 	myself->uid = p->pw_uid;
 	myself->gid = p->pw_gid;
@@ -197,8 +203,8 @@ uinfo_init ()
       }
   /* Real and effective uid/gid are always identical on process start up.
      This is at least true for NT/W2K. */
-  myself->orig_uid = myself->real_uid = myself->uid;
-  myself->orig_gid = myself->real_gid = myself->gid;
+  cygheap->user.orig_uid = cygheap->user.real_uid = myself->uid;
+  cygheap->user.orig_gid = cygheap->user.real_gid = myself->gid;
 }
 
 extern "C" char *
@@ -210,19 +216,19 @@ getlogin (void)
   static NO_COPY char this_username[MAX_USER_NAME];
 #endif
 
-  return strcpy (this_username, myself->username);
+  return strcpy (this_username, cygheap->user.name ());
 }
 
 extern "C" uid_t
 getuid (void)
 {
-  return myself->real_uid;
+  return cygheap->user.real_uid;
 }
 
 extern "C" gid_t
 getgid (void)
 {
-  return myself->real_gid;
+  return cygheap->user.real_gid;
 }
 
 extern "C" uid_t

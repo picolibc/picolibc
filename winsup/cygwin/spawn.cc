@@ -554,7 +554,12 @@ skip_arg_parsing:
   if (real_path.iscygexec ())
     envblock = NULL;
   else
-    envblock = winenv (envp, 0);
+    {
+      cygheap_root sav_root (cygheap->root);
+      cygheap->root = NULL;
+      envblock = winenv (envp, 0);
+      cygheap->root = sav_root;
+    }
 
   ciresrv.cygheap = cygheap;
   ciresrv.cygheap_max = cygheap_max;
@@ -625,7 +630,7 @@ skip_arg_parsing:
       /* Remove impersonation */
       uid_t uid = geteuid();
       if (myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
-	seteuid (myself->orig_uid);
+	seteuid (cygheap->user.orig_uid);
 
       /* Load users registry hive. */
       load_registry_hive (sid);
@@ -705,7 +710,6 @@ skip_arg_parsing:
 	  syscall_printf ("-1 = spawnve (), process table full");
 	  return -1;
 	}
-      child->username[0] = '\0';
       child->progname[0] = '\0';
       child->dwProcessId = pi.dwProcessId;
       child->hProcess = pi.hProcess;
