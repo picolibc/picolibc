@@ -1882,23 +1882,24 @@ fi
 # Check whether --enable-vfork or --disable-vfork was given.
 if test "${enable_vfork+set}" = set; then
   enableval="$enable_vfork"
-  case "${enableval}" in
-yes)	 cat >> confdefs.h <<\EOF
-#define NEWVFORK 1
-EOF
- ;;
-no)	 ;;
-esac
-
+  vfork="${enableval}"
+]
 fi
 
 
+case "$vfork" in
+no)	 ;;
+yes|*)	 cat >> confdefs.h <<EOF
+#define NEWVFORK 1
+EOF
+ ;;
+esac
 
 
 
 
 echo $ac_n "checking if newlib is part of the build tree""... $ac_c" 1>&6
-echo "configure:1902: checking if newlib is part of the build tree" >&5
+echo "configure:1903: checking if newlib is part of the build tree" >&5
 
 EXE_LDFLAGS=
 if test -d ../newlib
@@ -1913,9 +1914,9 @@ fi
 if test x"$EXE_LDFLAGS" = x
 then
   echo $ac_n "checking if installed newlib needed""... $ac_c" 1>&6
-echo "configure:1917: checking if installed newlib needed" >&5
+echo "configure:1918: checking if installed newlib needed" >&5
   cat > conftest.$ac_ext <<EOF
-#line 1919 "configure"
+#line 1920 "configure"
 #include "confdefs.h"
 
 int main() {
@@ -1923,7 +1924,7 @@ int main() {
     
 ; return 0; }
 EOF
-if { (eval echo configure:1927: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:1928: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   echo "$ac_t""no" 1>&6
     

@@ -1,3 +1,8 @@
+Mon May 21 15:08:00 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* configure.in: Allow --enable-newvfork to turn NEWVFORK on and off.
+	* configure: Regenerate.
+
 Mon May 21 11:46:01 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* include/cygwin/version.h: Bump minor version number.
