@@ -328,7 +328,92 @@ fhandler_base::device_access_denied (int flags)
   if (!mode)
     mode |= R_OK;
 
-  return access_worker (pc, mode, this);
+  return fhaccess (mode);
+}
+
+bool
+fhandler_base::fhaccess (int flags)
+{
+  if (error ())
+    {
+      set_errno (error ());
+      return -1;
+    }
+
+  if (!exists ())
+    {
+      set_errno (ENOENT);
+      return -1;
+    }
+
+  if (!(flags & (R_OK | W_OK | X_OK)))
+    return 0;
+
+  if (is_fs_special ())
+    /* short circuit */;
+  else if (has_attribute (FILE_ATTRIBUTE_READONLY) && (flags & W_OK))
+    {
+      set_errno (EACCES);
+      return -1;
+    }
+  else if (has_acls () && allow_ntsec)
+    return check_file_access (get_win32_name (), flags);
+
+  struct __stat64 st;
+  int r = fstat (&st);
+  if (r)
+    return -1;
+  r = -1;
+  if (flags & R_OK)
+    {
+      if (st.st_uid == myself->uid)
+	{
+	  if (!(st.st_mode & S_IRUSR))
+	    goto done;
+	}
+      else if (st.st_gid == myself->gid)
+	{
+	  if (!(st.st_mode & S_IRGRP))
+	    goto done;
+	}
+      else if (!(st.st_mode & S_IROTH))
+	goto done;
+    }
+  if (flags & W_OK)
+    {
+      if (st.st_uid == myself->uid)
+	{
+	  if (!(st.st_mode & S_IWUSR))
+	    goto done;
+	}
+      else if (st.st_gid == myself->gid)
+	{
+	  if (!(st.st_mode & S_IWGRP))
+	    goto done;
+	}
+      else if (!(st.st_mode & S_IWOTH))
+	goto done;
+    }
+  if (flags & X_OK)
+    {
+      if (st.st_uid == myself->uid)
+	{
+	  if (!(st.st_mode & S_IXUSR))
+	    goto done;
+	}
+      else if (st.st_gid == myself->gid)
+	{
+	  if (!(st.st_mode & S_IXGRP))
+	    goto done;
+	}
+      else if (!(st.st_mode & S_IXOTH))
+	goto done;
+    }
+  r = 0;
+done:
+  if (r)
+    set_errno (EACCES);
+  return r;
 }
 
 /* Open system call handler function. */

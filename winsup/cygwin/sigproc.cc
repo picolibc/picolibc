@@ -593,7 +593,7 @@ sig_dispatch_pending ()
   if (exit_state || GetCurrentThreadId () == sigtid || !sigqueue.start.next)
     {
 #ifdef DEBUGGING
-      sigproc_printf ("exit_state %d, GetCurrentThreadId () %p, sigtid %p, sigqueue.start.next %p",
+      sigproc_printf ("exit_state %d, cur thread id %p, sigtid %p, sigqueue.start.next %p",
 		      exit_state, GetCurrentThreadId (), sigtid, sigqueue.start.next);
 #endif
       return 0;

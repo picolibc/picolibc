@@ -395,9 +395,6 @@ fhandler_base::open_fs (int flags, mode_t mode)
       return 0;
     }
 
-  set_has_acls (pc.has_acls ());
-  set_isremote (pc.isremote ());
-
   int res = fhandler_base::open (flags | O_DIROPEN, mode);
   if (!res)
     goto out;
@@ -632,7 +629,7 @@ fhandler_disk_file::opendir ()
       set_errno (ENOMEM);
       goto free_dirname;
     }
-  else if (access_worker (pc, R_OK, this) != 0)
+  else if (fhaccess (R_OK) != 0)
     goto free_dirent;
   else
     {

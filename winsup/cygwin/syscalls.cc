@@ -327,10 +327,10 @@ setsid (void)
       myself->ctty = -1;
       myself->sid = getpid ();
       myself->pgid = getpid ();
-      syscall_printf ("sid %d, pgid %d, ctty %d, open_fhs %d", myself->sid,
-		      myself->pgid, myself->ctty, cygheap->open_fhs);
       if (cygheap->ctty)
 	cygheap->close_ctty ();
+      syscall_printf ("sid %d, pgid %d, ctty %d, open_fhs %d", myself->sid,
+		      myself->pgid, myself->ctty, cygheap->open_fhs);
       return myself->sid;
     }
 
@@ -1239,103 +1239,21 @@ lstat (const char *name, struct __stat32 *buf)
   return ret;
 }
 
-int
-access_worker (path_conv& real_path, int flags, fhandler_base *fh)
-{
-  if (real_path.error)
-    {
-      set_errno (real_path.error);
-      return -1;
-    }
-
-  if (!real_path.exists ())
-    {
-      set_errno (ENOENT);
-      return -1;
-    }
-
-  if (!(flags & (R_OK | W_OK | X_OK)))
-    return 0;
-
-  if (real_path.is_fs_special ())
-    /* short circuit */;
-  else if (real_path.has_attribute (FILE_ATTRIBUTE_READONLY) && (flags & W_OK))
-    {
-      set_errno (EACCES);
-      return -1;
-    }
-  else if (real_path.has_acls () && allow_ntsec)
-    return check_file_access (real_path, flags);
-
-  struct __stat64 st;
-  int r = fh ? fh->fstat (&st) : stat_worker (real_path, &st, 0);
-  if (r)
-    return -1;
-  r = -1;
-  if (flags & R_OK)
-    {
-      if (st.st_uid == myself->uid)
-	{
-	  if (!(st.st_mode & S_IRUSR))
-	    goto done;
-	}
-      else if (st.st_gid == myself->gid)
-	{
-	  if (!(st.st_mode & S_IRGRP))
-	    goto done;
-	}
-      else if (!(st.st_mode & S_IROTH))
-	goto done;
-    }
-  if (flags & W_OK)
-    {
-      if (st.st_uid == myself->uid)
-	{
-	  if (!(st.st_mode & S_IWUSR))
-	    goto done;
-	}
-      else if (st.st_gid == myself->gid)
-	{
-	  if (!(st.st_mode & S_IWGRP))
-	    goto done;
-	}
-      else if (!(st.st_mode & S_IWOTH))
-	goto done;
-    }
-  if (flags & X_OK)
-    {
-      if (st.st_uid == myself->uid)
-	{
-	  if (!(st.st_mode & S_IXUSR))
-	    goto done;
-	}
-      else if (st.st_gid == myself->gid)
-	{
-	  if (!(st.st_mode & S_IXGRP))
-	    goto done;
-	}
-      else if (!(st.st_mode & S_IXOTH))
-	goto done;
-    }
-  r = 0;
-done:
-  if (r)
-    set_errno (EACCES);
-  return r;
-}
-
 extern "C" int
 access (const char *fn, int flags)
 {
   // flags were incorrectly specified
+  int res = -1;
   if (flags & ~(F_OK|R_OK|W_OK|X_OK))
+    set_errno (EINVAL);
+  else
     {
-      set_errno (EINVAL);
-      return -1;
+      fhandler_base *fh = build_fh_name (fn, NULL, PC_SYM_FOLLOW | PC_FULL, stat_suffixes);
+      res =  fh->fhaccess (flags);
+      delete fh;
     }
-
-  path_conv pc (fn, PC_SYM_FOLLOW | PC_FULL, stat_suffixes);
-  return access_worker (pc, flags);
+  debug_printf ("returning %d", res);
+  return res;
 }
 
 extern "C" int

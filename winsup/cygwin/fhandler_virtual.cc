@@ -210,9 +210,6 @@ fhandler_virtual::open (int flags, mode_t mode)
   set_r_binary (1);
   set_w_binary (1);
 
-  set_has_acls (false);
-  set_isremote (false);
-
   /* what to do about symlinks? */
   set_symlink_p (false);
   set_execable_p (not_executable);
