@@ -520,33 +520,33 @@ fhandler_tty_slave::open (path_conv *, int flags, mode_t)
       termios_printf ("cannot dup handles via server. using old method.");
 
       HANDLE tty_owner = OpenProcess (PROCESS_DUP_HANDLE, FALSE,
-				         get_ttyp ()->master_pid);
+				      get_ttyp ()->master_pid);
       termios_printf ("tty own handle %p",tty_owner);
       if (tty_owner == NULL)
-        {
-          termios_printf ("can't open tty (%d) handle process %d",
-	 	          ttynum, get_ttyp ()->master_pid);
-          __seterrno ();
-          return 0;
-        }
+	{
+	  termios_printf ("can't open tty (%d) handle process %d",
+			  ttynum, get_ttyp ()->master_pid);
+	  __seterrno ();
+	  return 0;
+	}
 
-      if (!DuplicateHandle (tty_owner, get_ttyp ()->from_master, 
-			  hMainProc, &from_master_local, 0, TRUE,
+      if (!DuplicateHandle (tty_owner, get_ttyp ()->from_master,
+			    hMainProc, &from_master_local, 0, TRUE,
 			    DUPLICATE_SAME_ACCESS))
-        {
-          termios_printf ("can't duplicate input, %E");
-          __seterrno ();
-          return 0;
-        }
+	{
+	  termios_printf ("can't duplicate input, %E");
+	  __seterrno ();
+	  return 0;
+	}
 
-      if (!DuplicateHandle (tty_owner, get_ttyp ()->to_master, 
+      if (!DuplicateHandle (tty_owner, get_ttyp ()->to_master,
 			  hMainProc, &to_master_local, 0, TRUE,
 			  DUPLICATE_SAME_ACCESS))
-        {
-          termios_printf ("can't duplicate output, %E");
-          __seterrno ();
-          return 0;
-        }
+	{
+	  termios_printf ("can't duplicate output, %E");
+	  __seterrno ();
+	  return 0;
+	}
       CloseHandle (tty_owner);
     }
 
@@ -568,12 +568,12 @@ fhandler_tty_slave::open (path_conv *, int flags, mode_t)
 
 int
 fhandler_tty_slave::cygserver_attach_tty (LPHANDLE from_master_ptr,
-                                        LPHANDLE to_master_ptr)
+					  LPHANDLE to_master_ptr)
 {
   if (!from_master_ptr || !to_master_ptr)
     return 0;
 
-  client_request_attach_tty *request = 
+  client_request_attach_tty *request =
 	new client_request_attach_tty ((DWORD) GetCurrentProcessId (),
 				      (DWORD) get_ttyp ()->master_pid,
 				      (HANDLE) get_ttyp ()->from_master,

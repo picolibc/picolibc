@@ -143,10 +143,14 @@ class path_conv
   DWORD get_devn () {return devn == FH_BAD ? (DWORD) FH_DISK : devn;}
   short get_unitn () {return devn == FH_BAD ? 0 : unit;}
   DWORD file_attributes () {return fileattr;}
-  DWORD get_drive_type () {return fs.drive_type;}
+  DWORD drive_type () {return fs.drive_type;}
   BOOL fs_fast_ea () {return fs.sym_opt & PC_CHECK_EA;}
   void set_path (const char *p) {strcpy (path, p);}
   char *return_and_clear_normalized_path ();
+  const char * root_dir () { return fs.root_dir; }
+  DWORD volser () { return fs.serial; }
+  const char *volname () {return fs.name; }
+  void fillin (HANDLE h);
 };
 
 /* Symlink marker */

@@ -1194,7 +1194,7 @@ fhandler_console::char_command (char c)
 	      ReadConsoleOutputA (get_output_handle (), savebuf,
 				  savebufsiz, cob, &now.srWindow);
 	    }
-	  else          /* restore */
+	  else		/* restore */
 	    {
 	      CONSOLE_SCREEN_BUFFER_INFO now;
 	      COORD cob = { 0, 0 };

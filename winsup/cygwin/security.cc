@@ -861,18 +861,18 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
     {
       /* Set security descriptor and primary group */
       psa = __sec_user (sa_buf, usersid, TRUE);
-      if (psa->lpSecurityDescriptor && 
+      if (psa->lpSecurityDescriptor &&
 	  !SetSecurityDescriptorGroup (
 	      (PSECURITY_DESCRIPTOR) psa->lpSecurityDescriptor,
 	      special_pgrp?pgrpsid:well_known_null_sid, FALSE))
-          debug_printf ("SetSecurityDescriptorGroup %E");
+	  debug_printf ("SetSecurityDescriptorGroup %E");
       /* Convert to primary token. */
       if (!DuplicateTokenEx (token, MAXIMUM_ALLOWED, psa,
-                             SecurityImpersonation, TokenPrimary, &primary_token))
-        {
-          __seterrno ();
-          debug_printf ("DuplicateTokenEx %E");
-        }
+			     SecurityImpersonation, TokenPrimary, &primary_token))
+	{
+	  __seterrno ();
+	  debug_printf ("DuplicateTokenEx %E");
+	}
     }
 
 out:

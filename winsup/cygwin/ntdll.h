@@ -336,10 +336,30 @@ typedef enum _MEMORY_INFORMATION_CLASS
   MemoryBaiscVlmInformation
 } MEMORY_INFORMATION_CLASS;
 
-typedef struct _MEMORY_WORKING_SET_LIST {
+typedef struct _MEMORY_WORKING_SET_LIST
+{
   ULONG NumberOfPages;
   ULONG WorkingSetList[1];
 } MEMORY_WORKING_SET_LIST, *PMEMORY_WORKING_SET_LIST;
+
+typedef struct _FILE_NAME_INFORMATION
+{
+  DWORD FileNameLength;
+  WCHAR FileName[MAX_PATH + 100];
+} FILE_NAME_INFORMATION;
+
+typedef enum _OBJECT_INFORMATION_CLASS
+{
+   ObjectBasicInformation = 0,
+   ObjectNameInformation = 1,
+   ObjectHandleInformation = 4
+   // and many more
+} OBJECT_INFORMATION_CLASS;
+
+typedef struct _OBJECT_NAME_INFORMATION
+{
+  UNICODE_STRING Name;
+} OBJECT_NAME_INFORMATION;
 
 /* Function declarations for ntdll.dll.  These don't appear in any
    standard Win32 header.  */
@@ -368,4 +388,7 @@ extern "C"
                                             OUT PVOID, IN ULONG, OUT PULONG);
   NTSTATUS NTAPI ZwQueryVirtualMemory (IN HANDLE, IN PVOID, IN MEMORY_INFORMATION_CLASS,
                                        OUT PVOID, IN ULONG, OUT PULONG);
+  NTSTATUS NTAPI NtQueryInformationFile (HANDLE, IO_STATUS_BLOCK *, VOID *,
+					 DWORD, DWORD);
+  NTSTATUS NTAPI NtQueryObject (HANDLE, OBJECT_INFORMATION_CLASS, VOID *, ULONG, ULONG *);
 }

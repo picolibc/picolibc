@@ -100,7 +100,7 @@ tty_min::kill_pgrp (int sig)
   if (killself)
     sig_send (myself, sig);
 }
-       
+
 void
 tty_min::set_ctty (int ttynum, int flags)
 {
@@ -346,8 +346,8 @@ fhandler_termios::fixup_after_fork (HANDLE parent)
 }
 
 __off64_t
-fhandler_termios::lseek (__off64_t, int) 
+fhandler_termios::lseek (__off64_t, int)
 {
   set_errno (ESPIPE);
-  return -1; 
+  return -1;
 }

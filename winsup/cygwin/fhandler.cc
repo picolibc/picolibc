@@ -309,7 +309,7 @@ fhandler_base::get_default_fmode (int flags)
 
 /* Open system call handler function. */
 int
-fhandler_base::open (path_conv *, int flags, mode_t mode)
+fhandler_base::open (path_conv *pc, int flags, mode_t mode)
 {
   int res = 0;
   HANDLE x;
@@ -318,7 +318,7 @@ fhandler_base::open (path_conv *, int flags, mode_t mode)
   int creation_distribution;
   SECURITY_ATTRIBUTES sa = sec_none;
 
-  syscall_printf ("(%s, %p)", get_win32_name (), flags);
+  syscall_printf ("(%s, %p) query_open %d", get_win32_name (), flags, get_query_open ());
 
   if (get_win32_name () == NULL)
     {
@@ -375,7 +375,7 @@ fhandler_base::open (path_conv *, int flags, mode_t mode)
     {
       char *c = strrchr (get_win32_name (), '\\');
       if ((c && c[1] == '.') || *get_win32_name () == '.')
-        file_attributes |= FILE_ATTRIBUTE_HIDDEN;
+	file_attributes |= FILE_ATTRIBUTE_HIDDEN;
     }
 #endif
 
@@ -385,7 +385,7 @@ fhandler_base::open (path_conv *, int flags, mode_t mode)
   if (get_query_open () &&
       isremote () &&
       creation_distribution == OPEN_EXISTING &&
-      GetFileAttributes (get_win32_name ()) == INVALID_FILE_ATTRIBUTES)
+      !pc->exists ())
     {
       set_errno (ENOENT);
       goto done;
@@ -446,16 +446,6 @@ fhandler_base::open (path_conv *, int flags, mode_t mode)
   set_r_binary (bin);
   set_w_binary (bin);
   syscall_printf ("filemode set to %s", bin ? "binary" : "text");
-
-  if (get_device () != FH_TAPE
-      && get_device () != FH_FLOPPY
-      && get_device () != FH_SERIAL)
-    {
-      if (flags & O_APPEND)
-	SetFilePointer (get_handle(), 0, 0, FILE_END);
-      else
-	SetFilePointer (get_handle(), 0, 0, FILE_BEGIN);
-    }
 
   res = 1;
   set_open_status ();

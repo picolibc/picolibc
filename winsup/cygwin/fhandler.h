@@ -246,13 +246,14 @@ class fhandler_base
   }
   void set_execable_p () { FHSETF (EXECABL); }
   bool dont_care_if_execable () { return FHISSETF (DCEXEC); }
+  bool exec_state_isknown () { return FHISSETF (DCEXEC) || FHISSETF (EXECABL); }
 
   bool get_append_p () { return FHISSETF (APPEND); }
   void set_append_p (int val) { FHCONDSETF (val, APPEND); }
   void set_append_p () { FHSETF (APPEND); }
 
   bool get_query_open () { return FHISSETF (QUERYOPEN); }
-  void set_query_open (int val) { FHCONDSETF (val, QUERYOPEN); }
+  void set_query_open (bool val) { FHCONDSETF (val, QUERYOPEN); }
 
   bool get_readahead_valid () { return raixget < ralen; }
   int puts_readahead (const char *s, size_t len = (size_t) -1);
@@ -552,7 +553,18 @@ class fhandler_disk_file: public fhandler_base
   int lock (int, struct flock *);
   BOOL is_device () { return FALSE; }
   int __stdcall fstat (struct __stat64 *buf, path_conv *pc) __attribute__ ((regparm (3)));
-  int __stdcall fstat_helper (struct __stat64 *buf) __attribute__ ((regparm (2)));
+  int __stdcall fstat_helper (struct __stat64 *buf, path_conv *pc,
+			      FILETIME ftCreateionTime,
+			      FILETIME ftLastAccessTime,
+			      FILETIME ftLastWriteTime,
+			      DWORD nFileSizeHigh,
+			      DWORD nFileSizeLow,
+			      DWORD nFileIndexHigh = 0,
+			      DWORD nFileIndexLow = 0,
+			      DWORD nNumberOfLinks = 1)
+    __attribute__ ((regparm (3)));
+  int __stdcall fstat_by_handle (struct __stat64 *buf, path_conv *pc) __attribute__ ((regparm (3)));
+  int __stdcall fstat_by_name (struct __stat64 *buf, path_conv *pc) __attribute__ ((regparm (3)));
 
   HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, __off64_t off);
   int munmap (HANDLE h, caddr_t addr, size_t len);

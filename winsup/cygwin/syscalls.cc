@@ -195,7 +195,7 @@ _unlink (const char *ourname)
       /* Everything is fine if the file has disappeared or if we know that the
 	 FILE_FLAG_DELETE_ON_CLOSE will eventually work. */
       if (GetFileAttributes (win32_name) == INVALID_FILE_ATTRIBUTES
-          || delete_on_close_ok)
+	  || delete_on_close_ok)
 	goto ok;	/* The file is either gone already or will eventually be
 			   deleted by the OS. */
     }
@@ -991,8 +991,9 @@ fstat64 (int fd, struct __stat64 *buf)
     res = -1;
   else
     {
+      path_conv pc (cfd->get_win32_name ());
       memset (buf, 0, sizeof (struct __stat64));
-      res = cfd->fstat (buf, NULL);
+      res = cfd->fstat (buf, &pc);
     }
 
   syscall_printf ("%d = fstat (%d, %p)", res, fd, buf);
@@ -1308,10 +1309,10 @@ done:
 #ifdef HIDDEN_DOT_FILES
       char *c = strrchr (real_old.get_win32 (), '\\');
       if ((c && c[1] == '.') || *real_old.get_win32 () == '.')
-        attr &= ~FILE_ATTRIBUTE_HIDDEN;
+	attr &= ~FILE_ATTRIBUTE_HIDDEN;
       c = strrchr (real_new.get_win32 (), '\\');
       if ((c && c[1] == '.') || *real_new.get_win32 () == '.')
-        attr |= FILE_ATTRIBUTE_HIDDEN;
+	attr |= FILE_ATTRIBUTE_HIDDEN;
 #endif
       SetFileAttributes (real_new, attr);
 
@@ -1482,7 +1483,7 @@ pathconf (const char *file, int v)
     {
     case _PC_PATH_MAX:
       if (check_null_empty_str_errno (file))
-          return -1;
+	  return -1;
       return PATH_MAX - strlen (file);
     case _PC_NAME_MAX:
       return PATH_MAX;
@@ -1996,7 +1997,7 @@ seteuid (__uid16_t uid)
     {
       if (cygheap->user.token == INVALID_HANDLE_VALUE ||
 	  ! cygheap->user.impersonated )
-        {
+	{
 	  CloseHandle (ptok);
 	  return 0; /* No change */
 	}
@@ -2011,7 +2012,7 @@ seteuid (__uid16_t uid)
       debug_printf("Thread token %d %sverified",
 		   cygheap->user.token, token_ok?"":"not ");
       if (token_ok)
-        {
+	{
 	  /* Return if current token is valid */
 	  if (cygheap->user.impersonated)
 	  {
@@ -2046,7 +2047,7 @@ seteuid (__uid16_t uid)
       if (cygheap->user.token != INVALID_HANDLE_VALUE)
 	explicitly_created_token = TRUE;
       else
-        {
+	{
 	  /* create_token failed. Try subauthentication. */
 	  debug_printf ("create token failed, try subauthentication.");
 	  cygheap->user.token = subauth (pw_new);
@@ -2070,7 +2071,7 @@ seteuid (__uid16_t uid)
       /* If the token was explicitly created, all information has
 	 already been set correctly. */
       if (!explicitly_created_token)
-        {
+	{
 	  /* Try setting owner to same value as user. */
 	  if (!SetTokenInformation (cygheap->user.token, TokenOwner,
 				    &usersid, sizeof usersid))
@@ -2085,7 +2086,7 @@ seteuid (__uid16_t uid)
 	}
       /* Now try to impersonate. */
       if (!ImpersonateLoggedOnUser (cygheap->user.token))
-        {
+	{
 	  debug_printf ("ImpersonateLoggedOnUser %E");
 	  __seterrno ();
 	  goto failed;
@@ -2097,7 +2098,7 @@ seteuid (__uid16_t uid)
      impersonation is active. If so, the token is used for
      retrieving user's SID. */
   user.token = cygheap->user.impersonated ? cygheap->user.token
-                                          : INVALID_HANDLE_VALUE;
+					  : INVALID_HANDLE_VALUE;
   /* Unsetting these two env vars is necessary to get NetUserGetInfo()
      called in internal_getlogin ().  Otherwise the wrong path is used
      after a user switch, probably. */

@@ -19,6 +19,8 @@ details. */
 #include <fcntl.h>
 #include <sys/cygwin.h>
 #include <assert.h>
+#include <ntdef.h>
+#include <winnls.h>
 
 #define USE_SYS_TYPES_FD_SET
 #include <winsock.h>
@@ -31,9 +33,12 @@ details. */
 #include "path.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "ntdll.h"
 
 static const NO_COPY DWORD std_consts[] = {STD_INPUT_HANDLE, STD_OUTPUT_HANDLE,
 					   STD_ERROR_HANDLE};
+
+static char *handle_to_fn (HANDLE, char *);
 
 /* Set aside space for the table of fds */
 void
@@ -267,7 +272,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle, DWORD myaccess)
   else if (GetCommState (handle, &dcb))
     name = "/dev/ttyS0"; // FIXME - determine correct device
   else
-    name = "unknown disk file";
+    name = handle_to_fn (handle, (char *) alloca (MAX_PATH + 100));
 
   path_conv pc;
   build_fhandler_from_name (fd, name, handle, pc)->init (handle, myaccess, bin);
@@ -285,6 +290,9 @@ dtable::build_fhandler_from_name (int fd, const char *name, HANDLE handle,
       set_errno (pc.error);
       return NULL;
     }
+
+  if (!pc.exists () && handle)
+    pc.fillin (handle);
 
   fhandler_base *fh = build_fhandler (fd, pc.get_devn (),
 				      pc.return_and_clear_normalized_path (),
@@ -373,14 +381,14 @@ dtable::build_fhandler (int fd, DWORD dev, char *unix_name,
 	fh = cnew (fhandler_dev_dsp) ();
 	break;
       case FH_PROC:
-        fh = cnew (fhandler_proc) ();
-        break;
+	fh = cnew (fhandler_proc) ();
+	break;
       case FH_REGISTRY:
-        fh = cnew (fhandler_registry) ();
-        break;
+	fh = cnew (fhandler_registry) ();
+	break;
       case FH_PROCESS:
-        fh = cnew (fhandler_process) ();
-        break;
+	fh = cnew (fhandler_process) ();
+	break;
       default:
 	system_printf ("internal error -- unknown device - %p", dev);
 	fh = NULL;
@@ -688,3 +696,84 @@ dtable::vfork_child_fixup ()
 
   return;
 }
+
+#if 0
+static char *
+handle_to_fn (HANDLE h, char *posix_fn)
+{
+  IO_STATUS_BLOCK io;
+  FILE_NAME_INFORMATION ntfn;
+
+  io.Status = 0;
+  io.Information = 0;
+
+  SetLastError (0);
+  DWORD res = NtQueryInformationFile (h, &io, &ntfn, sizeof (ntfn), 9);
+  if (res || GetLastError () == ERROR_PROC_NOT_FOUND)
+    {
+      strcpy (posix_fn, "some disk file");
+      return posix_fn;
+    }
+  ntfn.FileName[ntfn.FileNameLength / sizeof (WCHAR)] = 0;
+
+  char win32_fn[MAX_PATH + 100];
+  sys_wcstombs (win32_fn, ntfn.FileName, ntfn.FileNameLength);
+  cygwin_conv_to_full_posix_path (win32_fn, posix_fn);
+  return posix_fn;
+}
+#else
+#define DEVICE_PREFIX "\\device\\"
+#define DEVICE_PREFIX_LEN sizeof(DEVICE_PREFIX) - 1
+static char *
+handle_to_fn (HANDLE h, char *posix_fn)
+{
+  OBJECT_NAME_INFORMATION *ntfn;
+  char fnbuf[32768];
+
+  memset (fnbuf, 0, sizeof (fnbuf));
+  ntfn = (OBJECT_NAME_INFORMATION *) fnbuf;
+  ntfn->Name.MaximumLength = sizeof (fnbuf);
+  ntfn->Name.Buffer = (WCHAR *) ntfn + 1;
+
+  DWORD res = NtQueryObject (h, ObjectNameInformation, ntfn, sizeof (fnbuf), NULL);
+  if (res)
+    {
+      strcpy (posix_fn, "some disk file");
+      return posix_fn;
+    }
+  ntfn->Name.Buffer[ntfn->Name.Length / sizeof (WCHAR)] = 0;
+
+  char win32_fn[MAX_PATH + 100];
+  sys_wcstombs (win32_fn, ntfn->Name.Buffer, ntfn->Name.Length);
+  if (!strncasematch (win32_fn, DEVICE_PREFIX, DEVICE_PREFIX_LEN)
+      || !QueryDosDevice (NULL, fnbuf, sizeof (fnbuf)))
+    return strcpy (posix_fn, win32_fn);
+  
+  char *p = strchr (win32_fn + DEVICE_PREFIX_LEN, '\\');
+  if (!p)
+    p = strchr (win32_fn + DEVICE_PREFIX_LEN, '\0');
+
+  int n = p - win32_fn;
+  char *w32 = win32_fn;
+  for (char *s = fnbuf; *s; s = strchr (s, '\0') + 1)
+    {
+      char device[MAX_PATH + 10];
+      device[MAX_PATH + 9] = '\0';
+      if (strchr (s, ':') == NULL)
+	continue;
+      if (!QueryDosDevice (s, device, sizeof (device) - 1))
+	continue;
+      if (!strncasematch (device, win32_fn, n) ||
+	  (device[n] != '\0' && (device[n] != '\\' || device[n + 1] != ';')))
+	continue;
+      n = strlen (s);
+      w32 = p - (n + 1);
+      memcpy (w32, s, n);
+      p[-1] = '\\';
+      break;
+    }
+
+  cygwin_conv_to_full_posix_path (w32, posix_fn);
+  return posix_fn;
+}
+#endif

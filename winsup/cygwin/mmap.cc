@@ -967,19 +967,19 @@ fixup_mmaps_after_fork (HANDLE parent)
 		  return -1;
 		}
 	      if (rec->get_access () == FILE_MAP_COPY)
-	        {
+		{
 		  for (char *address = rec->get_address ();
 		       address < rec->get_address () + rec->get_size ();
 		       address += getpagesize ())
 		    if (rec->access (address)
-		        && !ReadProcessMemory (parent, address, address,
+			&& !ReadProcessMemory (parent, address, address,
 					       getpagesize (), NULL))
 		      {
 			system_printf ("ReadProcessMemory failed for MAP_PRIVATE address %p, %E",
 				       rec->get_address ());
 			return -1;
 		      }
-	        }
+		}
 	      rec->fixup_map ();
 	    }
 	}

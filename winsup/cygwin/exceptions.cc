@@ -1013,7 +1013,7 @@ sig_handle (int sig, bool thisproc)
   if (handler == (void *) SIG_DFL)
     {
       if (sig == SIGCHLD || sig == SIGIO || sig == SIGCONT || sig == SIGWINCH
-          || sig == SIGURG || (thisproc && hExeced && sig == SIGINT))
+	  || sig == SIGURG || (thisproc && hExeced && sig == SIGINT))
 	{
 	  sigproc_printf ("default signal %d ignored", sig);
 	  goto done;

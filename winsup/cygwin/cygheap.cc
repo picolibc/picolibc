@@ -469,7 +469,7 @@ cygheap_user::set_sid (PSID new_sid)
       if (psid)
 	cfree (psid);
       if (orig_psid)
-        cfree (orig_psid);
+	cfree (orig_psid);
       psid = NULL;
       orig_psid = NULL;
       return TRUE;
@@ -477,7 +477,7 @@ cygheap_user::set_sid (PSID new_sid)
   else
     {
       if (!psid)
-        {
+	{
 	  if (!orig_psid)
 	    {
 	      orig_psid = cmalloc (HEAP_STR, MAX_SID_LEN);

@@ -1,14 +1,14 @@
 /* shm.cc: Single unix specification IPC interface for Cygwin
 
-   Copyright 2001 Red Hat, Inc.
+Copyright 2001 Red Hat, Inc.
 
-   Originally written by Robert Collins <robert.collins@hotmail.com>
+Originally written by Robert Collins <robert.collins@hotmail.com>
 
-   This file is part of Cygwin.
+This file is part of Cygwin.
 
-   This software is a copyrighted work licensed under the terms of the
-   Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
-   details. */
+This software is a copyrighted work licensed under the terms of the
+Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+details. */
 
 #include "winsup.h"
 #include <sys/stat.h>
@@ -63,9 +63,9 @@ client_request (CYGSERVER_REQUEST_SHM_GET, sizeof (parameters))
 }
 
 client_request_shm::client_request_shm (key_t nkey, size_t nsize,
-                                                int nshmflg,
-                                                char psdbuf[4096],
-                                                pid_t npid):
+						int nshmflg,
+						char psdbuf[4096],
+						pid_t npid):
 client_request (CYGSERVER_REQUEST_SHM_GET, sizeof (parameters))
 {
   buffer = (char *) &parameters;
@@ -145,12 +145,12 @@ delete_inprocess_shmds (shmnode **nodeptr)
     {
       shmnode *tempnode = shm_head;
       while (tempnode && tempnode->next != node)
-        tempnode = tempnode->next;
+	tempnode = tempnode->next;
       if (tempnode)
 	tempnode->next = node->next;
       // else log the unexpected !
     }
-  
+
   // release the shared data view
   UnmapViewOfFile (node->shmds);
   CloseHandle (node->filemap);
@@ -221,7 +221,7 @@ shmat (int shmid, const void *shmaddr, int shmflg)
   if (!tempnode)
     {
       /* couldn't find a currently open shm control area for the key - probably because
-       * shmget hasn't been called. 
+       * shmget hasn't been called.
        * Allocate a new control block - this has to be handled by the daemon */
       client_request_shm *req =
 	new client_request_shm (SHM_REATTACH, shmid, GetCurrentProcessId ());
@@ -333,11 +333,11 @@ shmdt (const void *shmaddr)
       debug_printf ("failed to tell deaemon that we have detached\n");
     }
   delete req;
-  
+
   return 0;
 }
 
-//FIXME: who is allowed to perform STAT? 
+//FIXME: who is allowed to perform STAT?
 extern "C" int
 shmctl (int shmid, int cmd, struct shmid_ds *buf)
 {
@@ -395,17 +395,17 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
       break;
     case IPC_RMID:
       {
-	/* TODO: check permissions. Or possibly, the daemon gets to be the only 
+	/* TODO: check permissions. Or possibly, the daemon gets to be the only
 	 * one with write access to the memory area?
 	 */
 	if (tempnode->shmds->shm_nattch)
 	  system_printf
 	    ("call to shmctl with cmd= IPC_RMID when memory area still has"
 	     " attachees\n");
-	/* how does this work? 
+	/* how does this work?
 	   * we mark the ds area as "deleted", and the at and get calls all fail from now on
 	   * on, when nattch becomes 0, the mapped data area is destroyed.
-	   * and each process, as they touch this area detaches. eventually only the 
+	   * and each process, as they touch this area detaches. eventually only the
 	   * daemon has an attach. The daemon gets asked to detach immediately.
 	 */
 	//waiting for the daemon to handle terminating process's
@@ -431,7 +431,7 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
 
 	// FIXME: create a destructor
 	delete_inprocess_shmds (&tempnode);
-	
+
       }
       break;
     case IPC_SET:
@@ -460,7 +460,7 @@ shmget (key_t key, size_t size, int shmflg)
   PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) sd_buf;
   /* create a sd for our open requests based on shmflag & 0x01ff */
   InitializeSecurityDescriptor (psd,
-                                    SECURITY_DESCRIPTOR_REVISION);
+				    SECURITY_DESCRIPTOR_REVISION);
   psd = alloc_sd (getuid (), getgid (), cygheap->user.logsrv (),
 		  shmflg & 0x01ff, psd, &sd_size);
 

@@ -72,9 +72,10 @@ details. */
 /* Standard DLL load macro.  Invokes a fatal warning if the function isn't
    found. */
 #define LoadDLLfunc(name, n, dllname) LoadDLLfuncEx (name, n, dllname, 0)
+#define LoadDLLfuncEx(name, n, dllname, notimp) LoadDLLfuncEx2(name, n, dllname, notimp, 0)
 
 /* Main DLL setup stuff. */
-#define LoadDLLfuncEx(name, n, dllname, notimp) \
+#define LoadDLLfuncEx2(name, n, dllname, notimp, err) \
   LoadDLLprime (dllname, dll_func_load)			\
   __asm__ ("						\n\
   .section	." #dllname "_text,\"wx\"		\n\
@@ -86,7 +87,7 @@ _win32_" mangle (name, n) ":				\n\
   movl		(1f),%eax				\n\
   call		*(%eax)					\n\
 1:.long		." #dllname "_info			\n\
-  .long		" #n "+" #notimp "			\n\
+  .long		(" #n "+" #notimp ") | " #err "<<16	\n\
   .asciz	\"" #name "\"				\n\
   .text							\n\
 ");
@@ -121,11 +122,14 @@ noload:									\n\
 	jz	1f		# Nope.					\n\
 	decl	%eax		# Yes.  This is the # of bytes + 1	\n\
 	popl	%edx		# Caller's caller			\n\
+	pushl	%eax		# Save for later			\n\
+	xorl	$0xffff,%eax	# Only want lower word			\n\
 	addl	%eax,%esp	# Pop off bytes				\n\
 	movl	$127,%eax	# ERROR_PROC_NOT_FOUND			\n\
 	pushl	%eax		# First argument			\n\
 	call	_SetLastError@4	# Set it				\n\
-	xor	%eax,%eax	# Zero functional return		\n\
+	popl	%eax		# Get back argument			\n\
+	shrl	$16,%eax	# return value in high order word	\n\
 	jmp	*%edx		# Return				\n\
 1:									\n\
 	movl	(%edx),%eax	# Handle value				\n\
@@ -373,6 +377,8 @@ LoadDLLfunc (NetUserGetGroups, 28, netapi32)
 LoadDLLfunc (NetUserGetInfo, 16, netapi32)
 LoadDLLfunc (NetWkstaUserGetInfo, 12, netapi32)
 
+LoadDLLfuncEx (NtQueryInformationFile, 20, ntdll, 1)
+LoadDLLfuncEx2 (NtQueryObject, 20, ntdll, 1, 1)
 LoadDLLfuncEx (NtCreateToken, 52, ntdll, 1)
 LoadDLLfuncEx (NtMapViewOfSection, 40, ntdll, 1)
 LoadDLLfuncEx (NtOpenFile, 24, ntdll, 1)
@@ -483,7 +489,7 @@ LoadDLLfunc (CoCreateInstance, 20, ole32)
 LoadDLLfuncEx (CancelIo, 4, kernel32, 1)
 LoadDLLfuncEx (CreateHardLinkA, 12, kernel32, 1)
 LoadDLLfuncEx (CreateToolhelp32Snapshot, 8, kernel32, 1)
-LoadDLLfuncEx (IsDebuggerPresent, 0, kernel32, 1)
+LoadDLLfuncEx2 (IsDebuggerPresent, 0, kernel32, 1, 1)
 LoadDLLfuncEx (Process32First, 8, kernel32, 1)
 LoadDLLfuncEx (Process32Next, 8, kernel32, 1)
 LoadDLLfuncEx (SignalObjectAndWait, 16, kernel32, 1)

@@ -98,7 +98,7 @@ fhandler_proc::get_proc_fhandler (const char *path)
   for (int i = 0; proc_listing[i]; i++)
     {
       if (path_prefix_p (proc_listing[i], path, strlen (proc_listing[i])))
-        return proc_fhandlers[i];
+	return proc_fhandlers[i];
     }
 
   int pid = atoi (path);
@@ -108,10 +108,10 @@ fhandler_proc::get_proc_fhandler (const char *path)
       _pinfo *p = pids[i];
 
       if (!proc_exists (p))
-        continue;
+	continue;
 
       if (p->pid == pid)
-        return FH_PROCESS;
+	return FH_PROCESS;
     }
 
     bool has_subdir = false;
@@ -178,8 +178,8 @@ fhandler_proc::fstat (struct __stat64 *buf, path_conv *pc)
     {
       path++;
       for (int i = 0; proc_listing[i]; i++)
-        if (pathmatch (path, proc_listing[i]))
-          {
+	if (pathmatch (path, proc_listing[i]))
+	  {
 	    if (proc_fhandlers[i] != FH_PROC)
 	      buf->st_mode |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
 	    else
@@ -187,8 +187,8 @@ fhandler_proc::fstat (struct __stat64 *buf, path_conv *pc)
 		buf->st_mode &= NO_X;
 		buf->st_mode |= S_IFREG;
 	      }
-            return 0;
-          }
+	    return 0;
+	  }
     }
   set_errno (ENOENT);
   return -1;
@@ -202,26 +202,26 @@ fhandler_proc::readdir (DIR * dir)
       winpids pids;
       int found = 0;
       for (unsigned i = 0; i < pids.npids; i++)
-        {
-          _pinfo *p = pids[i];
+	{
+	  _pinfo *p = pids[i];
 
-          if (!proc_exists (p))
-            continue;
+	  if (!proc_exists (p))
+	    continue;
 
-          if (found == dir->__d_position - PROC_LINK_COUNT)
-            {
-              __small_sprintf (dir->__d_dirent->d_name, "%d", p->pid);
-              dir->__d_position++;
-              return dir->__d_dirent;
-            }
-          found++;
-        }
+	  if (found == dir->__d_position - PROC_LINK_COUNT)
+	    {
+	      __small_sprintf (dir->__d_dirent->d_name, "%d", p->pid);
+	      dir->__d_position++;
+	      return dir->__d_dirent;
+	    }
+	  found++;
+	}
       return NULL;
     }
 
   strcpy (dir->__d_dirent->d_name, proc_listing[dir->__d_position++]);
   syscall_printf ("%p = readdir (%p) (%s)", &dir->__d_dirent, dir,
-                  dir->__d_dirent->d_name);
+		  dir->__d_dirent->d_name);
   return dir->__d_dirent;
 }
 
@@ -241,65 +241,65 @@ fhandler_proc::open (path_conv *pc, int flags, mode_t mode)
   if (!*path)
     {
       if ((flags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
-        {
-          set_errno (EEXIST);
-          res = 0;
-          goto out;
-        }
+	{
+	  set_errno (EEXIST);
+	  res = 0;
+	  goto out;
+	}
       else if (flags & O_WRONLY)
-        {
-          set_errno (EISDIR);
-          res = 0;
-          goto out;
-        }
+	{
+	  set_errno (EISDIR);
+	  res = 0;
+	  goto out;
+	}
       else
-        {
-          flags |= O_DIROPEN;
-          goto success;
-        }
+	{
+	  flags |= O_DIROPEN;
+	  goto success;
+	}
     }
 
   proc_file_no = -1;
   for (int i = 0; proc_listing[i]; i++)
     if (path_prefix_p (proc_listing[i], path + 1, strlen (proc_listing[i])))
       {
-        proc_file_no = i;
-        if (proc_fhandlers[i] != FH_PROC)
-          {
-            if ((flags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
-              {
-                set_errno (EEXIST);
-                res = 0;
-                goto out;
-              }
-            else if (flags & O_WRONLY)
-              {
-                set_errno (EISDIR);
-                res = 0;
-                goto out;
-              }
-            else
-              {
-                flags |= O_DIROPEN;
-                goto success;
-              }
-          }
+	proc_file_no = i;
+	if (proc_fhandlers[i] != FH_PROC)
+	  {
+	    if ((flags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
+	      {
+		set_errno (EEXIST);
+		res = 0;
+		goto out;
+	      }
+	    else if (flags & O_WRONLY)
+	      {
+		set_errno (EISDIR);
+		res = 0;
+		goto out;
+	      }
+	    else
+	      {
+		flags |= O_DIROPEN;
+		goto success;
+	      }
+	  }
       }
 
   if (proc_file_no == -1)
     {
       if (flags & O_CREAT)
-        {
-          set_errno (EROFS);
-          res = 0;
-          goto out;
-        }
+	{
+	  set_errno (EROFS);
+	  res = 0;
+	  goto out;
+	}
       else
-        {
-          set_errno (ENOENT);
-          res = 0;
-          goto out;
-        }
+	{
+	  set_errno (ENOENT);
+	  res = 0;
+	  goto out;
+	}
     }
   if (flags & O_WRONLY)
     {
@@ -332,51 +332,51 @@ fhandler_proc::fill_filebuf ()
     {
     case PROC_VERSION:
       {
-        if (!filebuf)
-          {
-        struct utsname uts_name;
-        uname (&uts_name);
-            bufalloc = strlen (uts_name.sysname) + 1 + strlen (uts_name.release) +
-                      1 + strlen (uts_name.version) + 2;
-        filebuf = (char *) cmalloc (HEAP_BUF, bufalloc);
-            filesize = __small_sprintf (filebuf, "%s %s %s\n", uts_name.sysname,
-                         uts_name.release, uts_name.version);
-          }
-        break;
+	if (!filebuf)
+	  {
+	struct utsname uts_name;
+	uname (&uts_name);
+	    bufalloc = strlen (uts_name.sysname) + 1 + strlen (uts_name.release) +
+		      1 + strlen (uts_name.version) + 2;
+	filebuf = (char *) cmalloc (HEAP_BUF, bufalloc);
+	    filesize = __small_sprintf (filebuf, "%s %s %s\n", uts_name.sysname,
+			 uts_name.release, uts_name.version);
+	  }
+	break;
       }
     case PROC_UPTIME:
       {
-        if (!filebuf)
-          filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 80);
-        filesize = format_proc_uptime (filebuf, bufalloc);
-        break;
+	if (!filebuf)
+	  filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 80);
+	filesize = format_proc_uptime (filebuf, bufalloc);
+	break;
       }
     case PROC_STAT:
       {
-        if (!filebuf)
-          filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 2048);
-        filesize = format_proc_stat (filebuf, bufalloc);
-        break;
+	if (!filebuf)
+	  filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 2048);
+	filesize = format_proc_stat (filebuf, bufalloc);
+	break;
       }
     case PROC_LOADAVG:
       {
-        /*
-         * not really supported - Windows doesn't keep track of these values
-         * Windows 95/98/me does have the KERNEL/CPUUsage performance counter
-         * which is similar.
-         */
-        if (!filebuf)
-          filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 16);
-        filesize = __small_sprintf (filebuf, "%u.%02u %u.%02u %u.%02u\n",
-                                    0, 0, 0, 0, 0, 0);
-        break;
+	/*
+	 * not really supported - Windows doesn't keep track of these values
+	 * Windows 95/98/me does have the KERNEL/CPUUsage performance counter
+	 * which is similar.
+	 */
+	if (!filebuf)
+	  filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 16);
+	filesize = __small_sprintf (filebuf, "%u.%02u %u.%02u %u.%02u\n",
+				    0, 0, 0, 0, 0, 0);
+	break;
       }
     case PROC_MEMINFO:
       {
-        if (!filebuf)
-          filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 2048);
-        filesize = format_proc_meminfo (filebuf, bufalloc);
-        break;
+	if (!filebuf)
+	  filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 2048);
+	filesize = format_proc_meminfo (filebuf, bufalloc);
+	break;
       }
     }
 }
@@ -386,7 +386,7 @@ off_t
 format_proc_meminfo (char *destbuf, size_t maxsize)
 {
   unsigned long mem_total = 0UL, mem_free = 0UL, swap_total = 0UL,
-                swap_free = 0UL;
+		swap_free = 0UL;
   MEMORYSTATUS memory_status;
   GlobalMemoryStatus (&memory_status);
   mem_total = memory_status.dwTotalPhys;
@@ -394,22 +394,22 @@ format_proc_meminfo (char *destbuf, size_t maxsize)
   swap_total = memory_status.dwTotalPageFile;
   swap_free = memory_status.dwAvailPageFile;
   return __small_sprintf (destbuf, "         total:      used:      free:\n"
-                                   "Mem:  %10lu %10lu %10lu\n"
-                                   "Swap: %10lu %10lu %10lu\n"
-                                   "MemTotal:     %10lu kB\n"
-                                   "MemFree:      %10lu kB\n"
-                                   "MemShared:             0 kB\n"
-                                   "HighTotal:             0 kB\n"
-                                   "HighFree:              0 kB\n"
-                                   "LowTotal:     %10lu kB\n"
-                                   "LowFree:      %10lu kB\n"
-                                   "SwapTotal:    %10lu kB\n"
-                                   "SwapFree:     %10lu kB\n",
-                                   mem_total, mem_total - mem_free, mem_free,
-                                   swap_total, swap_total - swap_free, swap_free,
-                                   mem_total >> 10, mem_free >> 10,
-                                   mem_total >> 10, mem_free >> 10,
-                                   swap_total >> 10, swap_free >> 10);
+				   "Mem:  %10lu %10lu %10lu\n"
+				   "Swap: %10lu %10lu %10lu\n"
+				   "MemTotal:     %10lu kB\n"
+				   "MemFree:      %10lu kB\n"
+				   "MemShared:             0 kB\n"
+				   "HighTotal:             0 kB\n"
+				   "HighFree:              0 kB\n"
+				   "LowTotal:     %10lu kB\n"
+				   "LowFree:      %10lu kB\n"
+				   "SwapTotal:    %10lu kB\n"
+				   "SwapFree:     %10lu kB\n",
+				   mem_total, mem_total - mem_free, mem_free,
+				   swap_total, swap_total - swap_free, swap_free,
+				   mem_total >> 10, mem_free >> 10,
+				   mem_total >> 10, mem_free >> 10,
+				   swap_total >> 10, swap_free >> 10);
 }
 
 static
@@ -435,13 +435,13 @@ format_proc_uptime (char *destbuf, size_t maxsize)
     {
       idle_time = spt.IdleTime.QuadPart / 100000ULL;
       uptime = (spt.InterruptTime.QuadPart + spt.KernelTime.QuadPart +
-                spt.IdleTime.QuadPart + spt.UserTime.QuadPart +
-                spt.DpcTime.QuadPart) / 100000ULL;
+		spt.IdleTime.QuadPart + spt.UserTime.QuadPart +
+		spt.DpcTime.QuadPart) / 100000ULL;
     }
 
   return __small_sprintf (destbuf, "%U.%02u %U.%02u\n",
-                          uptime / 100, long (uptime % 100),
-                          idle_time / 100, long (idle_time % 100));
+			  uptime / 100, long (uptime % 100),
+			  idle_time / 100, long (idle_time % 100));
 }
 
 static
@@ -450,7 +450,7 @@ format_proc_stat (char *destbuf, size_t maxsize)
 {
   unsigned long long user_time = 0ULL, kernel_time = 0ULL, idle_time = 0ULL;
   unsigned long pages_in = 0UL, pages_out = 0UL, interrupt_count = 0UL,
-                context_switches = 0UL, swap_in = 0UL, swap_out = 0UL;
+		context_switches = 0UL, swap_in = 0UL, swap_out = 0UL;
   time_t boot_time = 0;
 
   if (wincap.is_winnt ())
@@ -460,24 +460,24 @@ format_proc_stat (char *destbuf, size_t maxsize)
       SYSTEM_PERFORMANCE_INFORMATION spi;
       SYSTEM_TIME_OF_DAY_INFORMATION stodi;
       ret = ZwQuerySystemInformation (SystemProcessorTimes,
-                                      (PVOID) &spt,
-                                      sizeof spt, NULL);
+				      (PVOID) &spt,
+				      sizeof spt, NULL);
       if (ret == STATUS_SUCCESS)
-        ret = ZwQuerySystemInformation (SystemPerformanceInformation,
-                                        (PVOID) &spi,
-                                        sizeof spi, NULL);
+	ret = ZwQuerySystemInformation (SystemPerformanceInformation,
+					(PVOID) &spi,
+					sizeof spi, NULL);
       if (ret == STATUS_SUCCESS)
-        ret = ZwQuerySystemInformation (SystemTimeOfDayInformation,
-                                        (PVOID) &stodi,
-                                        sizeof stodi, NULL);
+	ret = ZwQuerySystemInformation (SystemTimeOfDayInformation,
+					(PVOID) &stodi,
+					sizeof stodi, NULL);
       if (ret != STATUS_SUCCESS)
-        {
-          __seterrno_from_win_error (RtlNtStatusToDosError (ret));
-          debug_printf("NtQuerySystemInformation: ret = %d, "
-                       "Dos(ret) = %d",
-                       ret, RtlNtStatusToDosError (ret));
-          return 0;
-        }
+	{
+	  __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+	  debug_printf("NtQuerySystemInformation: ret = %d, "
+		       "Dos(ret) = %d",
+		       ret, RtlNtStatusToDosError (ret));
+	  return 0;
+	}
       kernel_time = (spt.KernelTime.QuadPart + spt.InterruptTime.QuadPart + spt.DpcTime.QuadPart) / 100000ULL;
       user_time = spt.UserTime.QuadPart / 100000ULL;
       idle_time = spt.IdleTime.QuadPart / 100000ULL;
@@ -505,16 +505,16 @@ format_proc_stat (char *destbuf, size_t maxsize)
    *   }
    */
   return __small_sprintf (destbuf, "cpu %U %U %U %U\n"
-                                   "page %u %u\n"
-                                   "swap %u %u\n"
-                                   "intr %u\n"
-                                   "ctxt %u\n"
-                                   "btime %u\n",
-                          user_time, 0ULL,
-                          kernel_time, idle_time,
-                          pages_in, pages_out,
-                          swap_in, swap_out,
-                          interrupt_count,
-                          context_switches,
-                          boot_time);
+				   "page %u %u\n"
+				   "swap %u %u\n"
+				   "intr %u\n"
+				   "ctxt %u\n"
+				   "btime %u\n",
+			  user_time, 0ULL,
+			  kernel_time, idle_time,
+			  pages_in, pages_out,
+			  swap_in, swap_out,
+			  interrupt_count,
+			  context_switches,
+			  boot_time);
 }

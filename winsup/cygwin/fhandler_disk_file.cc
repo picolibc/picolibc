@@ -31,7 +31,7 @@ details. */
 #define _COMPILING_NEWLIB
 #include <dirent.h>
 
-static int
+static int __stdcall
 num_entries (const char *win32_name)
 {
   WIN32_FIND_DATA buf;
@@ -60,7 +60,68 @@ num_entries (const char *win32_name)
   return count;
 }
 
-int
+int __stdcall
+fhandler_disk_file::fstat_by_handle (struct __stat64 *buf, path_conv *pc)
+{
+  int res;
+  BY_HANDLE_FILE_INFORMATION local;
+
+  /* NT 3.51 seems to have a bug when attempting to get vol serial
+     numbers.  This loop gets around this. */
+  for (int i = 0; i < 2; i++)
+    {
+      if (!(res = GetFileInformationByHandle (get_handle (), &local)))
+	break;
+      if (local.dwVolumeSerialNumber && (long) local.dwVolumeSerialNumber != -1)
+	break;
+    }
+  debug_printf ("%d = GetFileInformationByHandle (%s, %d)",
+		res, get_win32_name (), get_handle ());
+  if (res == 0)
+    /* GetFileInformationByHandle will fail if it's given stdin/out/err
+       or a pipe*/
+    {
+      memset (&local, 0, sizeof (local));
+      local.nFileSizeLow = GetFileSize (get_handle (), &local.nFileSizeHigh);
+    }
+
+  return fstat_helper (buf, pc,
+		       local.ftCreationTime,
+		       local.ftLastAccessTime,
+		       local.ftLastWriteTime,
+		       local.nFileSizeHigh,
+		       local.nFileSizeLow,
+		       local.nFileIndexHigh,
+		       local.nFileIndexLow,
+		       local.nNumberOfLinks);
+}
+
+int __stdcall
+fhandler_disk_file::fstat_by_name (struct __stat64 *buf, path_conv *pc)
+{
+  int res;
+  HANDLE handle;
+  WIN32_FIND_DATA local;
+
+  if ((handle = FindFirstFile (pc->get_win32 (), &local)) == INVALID_HANDLE_VALUE)
+    {
+      __seterrno ();
+      res = -1;
+    }
+  else
+    {
+      FindClose (handle);
+      res = fstat_helper (buf, pc,
+			  local.ftCreationTime,
+			  local.ftLastAccessTime,
+			  local.ftLastWriteTime,
+			  local.nFileSizeHigh,
+			  local.nFileSizeLow);
+    }
+  return res;
+}
+
+int __stdcall
 fhandler_disk_file::fstat (struct __stat64 *buf, path_conv *pc)
 {
   int res = -1;
@@ -68,19 +129,29 @@ fhandler_disk_file::fstat (struct __stat64 *buf, path_conv *pc)
   __uid16_t uid;
   __gid16_t gid;
   int open_flags = O_RDONLY | O_BINARY | O_DIROPEN;
+  bool query_open_already;
 
-  if (!pc)
-    return fstat_helper (buf);
+  if (get_io_handle ())
+    return fstat_by_handle (buf, pc);
 
-  if ((oret = open (pc, open_flags, 0)))
+  /* If we don't care if the file is executable or we already know if it is,
+     then just do a "query open" as it is apparently much faster. */
+  if (pc->exec_state () != dont_know_if_executable)
+    set_query_open (query_open_already = true);
+  else
+    query_open_already = false;
+
+  if (query_open_already && strncasematch (pc->volname (), "FAT", 3))
+    oret = 0;
+  else if ((oret = open (pc, open_flags, 0)))
     /* ok */;
   else
     {
       int ntsec_atts = 0;
       /* If we couldn't open the file, try a "query open" with no permissions.
 	 This will allow us to determine *some* things about the file, at least. */
-      set_query_open (TRUE);
-      if ((oret = open (pc, open_flags, 0)))
+      set_query_open (true);
+      if (!query_open_already && (oret = open (pc, open_flags, 0)))
 	/* ok */;
       else if (allow_ntsec && pc->has_acls () && get_errno () == EACCES
 		&& !get_file_attribute (TRUE, get_win32_name (), &ntsec_atts, &uid, &gid)
@@ -96,150 +167,49 @@ fhandler_disk_file::fstat (struct __stat64 *buf, path_conv *pc)
 	  set_file_attribute (TRUE, get_win32_name (), ntsec_atts);
 	}
     }
+
   if (oret)
     {
-      res = fstat_helper (buf);
-      /* The number of links to a directory includes the
-	 number of subdirectories in the directory, since all
-	 those subdirectories point to it.
-	 This is too slow on remote drives, so we do without it and
-	 set the number of links to 2. */
-      /* Unfortunately the count of 2 confuses `find (1)' command. So
-	 let's try it with `1' as link count. */
-      if (pc->isdir ())
-	buf->st_nlink = pc->isremote () ? 1 : num_entries (pc->get_win32 ());
+      res = fstat_by_handle (buf, pc);
       close ();
     }
   else if (pc->exists ())
-    {
-      /* Unfortunately, the above open may fail if the file exists, though.
-	 So we have to care for this case here, too. */
-      WIN32_FIND_DATA wfd;
-      HANDLE handle;
-      buf->st_nlink = 1;
-      if (pc->isdir ())
-	buf->st_nlink = pc->isremote () ? 1 : num_entries (pc->get_win32 ());
-      buf->st_dev = FHDEVN (FH_DISK) << 8;
-      buf->st_ino = hash_path_name (0, pc->get_win32 ());
-      if (pc->isdir ())
-	buf->st_mode = S_IFDIR;
-      else if (pc->issymlink ())
-	buf->st_mode = S_IFLNK;
-      else if (pc->issocket ())
-	buf->st_mode = S_IFSOCK;
-      else
-	buf->st_mode = S_IFREG;
-      if (!pc->has_acls ()
-	  || get_file_attribute (TRUE, pc->get_win32 (),
-				 &buf->st_mode, &uid, &gid))
-	{
-	  buf->st_mode |= STD_RBITS | STD_XBITS;
-	  if (!(pc->has_attribute (FILE_ATTRIBUTE_READONLY)))
-	    buf->st_mode |= STD_WBITS;
-	  if (pc->issymlink ())
-	    buf->st_mode |= S_IRWXU | S_IRWXG | S_IRWXO;
-	  get_file_attribute (FALSE, pc->get_win32 (), NULL, &uid, &gid);
-	}
-      buf->st_uid = uid;
-      buf->st_gid = gid;
-      if ((handle = FindFirstFile (pc->get_win32 (), &wfd))
-	  != INVALID_HANDLE_VALUE)
-	{
-	  /* This is for FAT filesystems, which don't support atime/ctime */
-	  if (wfd.ftLastAccessTime.dwLowDateTime == 0
-	      && wfd.ftLastAccessTime.dwHighDateTime == 0)
-	    wfd.ftLastAccessTime = wfd.ftLastWriteTime;
-	  if (wfd.ftCreationTime.dwLowDateTime == 0
-	      && wfd.ftCreationTime.dwHighDateTime == 0)
-	    wfd.ftCreationTime = wfd.ftLastWriteTime;
-
-	  buf->st_atime   = to_time_t (&wfd.ftLastAccessTime);
-	  buf->st_mtime   = to_time_t (&wfd.ftLastWriteTime);
-	  buf->st_ctime   = to_time_t (&wfd.ftCreationTime);
-	  buf->st_size    = wfd.nFileSizeLow;
-	  buf->st_size    = ((__off64_t)wfd.nFileSizeHigh << 32)
-			    + wfd.nFileSizeLow;
-	  buf->st_blksize = S_BLKSIZE;
-	  buf->st_blocks  = (buf->st_size + S_BLKSIZE-1) / S_BLKSIZE;
-	  FindClose (handle);
-	}
-      res = 0;
-    }
+    res = fstat_by_name (buf, pc);
 
   return res;
 }
 
-int
-fhandler_disk_file::fstat_helper (struct __stat64 *buf)
+int __stdcall
+fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
+				  FILETIME ftCreationTime,
+				  FILETIME ftLastAccessTime,
+				  FILETIME ftLastWriteTime,
+				  DWORD nFileSizeHigh,
+				  DWORD nFileSizeLow,
+				  DWORD nFileIndexHigh,
+				  DWORD nFileIndexLow,
+				  DWORD nNumberOfLinks)
 {
-  int res = 0;	// avoid a compiler warning
-  BY_HANDLE_FILE_INFORMATION local;
-  save_errno saved_errno;
-
-  /* NT 3.51 seems to have a bug when attempting to get vol serial
-     numbers.  This loop gets around this. */
-  for (int i = 0; i < 2; i++)
-    {
-      if (!(res = GetFileInformationByHandle (get_handle (), &local)))
-	break;
-      if (local.dwVolumeSerialNumber && (long) local.dwVolumeSerialNumber != -1)
-	break;
-    }
-  debug_printf ("%d = GetFileInformationByHandle (%s, %d)",
-		res, get_win32_name (), get_handle ());
-  if (res == 0)
-    {
-      /* GetFileInformationByHandle will fail if it's given stdin/out/err
-	 or a pipe*/
-      DWORD lsize, hsize;
-
-      if (GetFileType (get_handle ()) != FILE_TYPE_DISK)
-	buf->st_mode = S_IFCHR;
-
-      lsize = GetFileSize (get_handle (), &hsize);
-      if (lsize == 0xffffffff && GetLastError () != NO_ERROR)
-	buf->st_mode = S_IFCHR;
-      else
-	buf->st_size = ((__off64_t)hsize << 32) + lsize;
-      /* We expect these to fail! */
-      buf->st_mode |= STD_RBITS | STD_WBITS;
-      buf->st_blksize = S_BLKSIZE;
-      buf->st_ino = get_namehash ();
-      syscall_printf ("0 = fstat (, %p)",  buf);
-      return 0;
-    }
-
-  if (!get_win32_name ())
-    {
-      saved_errno.set (ENOENT);
-      return -1;
-    }
-
   /* This is for FAT filesystems, which don't support atime/ctime */
-  if (local.ftLastAccessTime.dwLowDateTime == 0
-      && local.ftLastAccessTime.dwHighDateTime == 0)
-    local.ftLastAccessTime = local.ftLastWriteTime;
-  if (local.ftCreationTime.dwLowDateTime == 0
-      && local.ftCreationTime.dwHighDateTime == 0)
-    local.ftCreationTime = local.ftLastWriteTime;
+  if (ftLastAccessTime.dwLowDateTime == 0
+      && ftLastAccessTime.dwHighDateTime == 0)
+    ftLastAccessTime = ftLastWriteTime;
+  if (ftCreationTime.dwLowDateTime == 0
+      && ftCreationTime.dwHighDateTime == 0)
+    ftCreationTime = ftLastWriteTime;
 
-  buf->st_atime   = to_time_t (&local.ftLastAccessTime);
-  buf->st_mtime   = to_time_t (&local.ftLastWriteTime);
-  buf->st_ctime   = to_time_t (&local.ftCreationTime);
-  buf->st_nlink   = local.nNumberOfLinks;
-  buf->st_dev     = local.dwVolumeSerialNumber;
-  buf->st_size    = ((__off64_t)local.nFileSizeHigh << 32)
-		    + local.nFileSizeLow;
-
-  /* Allocate some place to determine the root directory. Need to allocate
-     enough so that rootdir can add a trailing slash if path starts with \\. */
-  char root[strlen (get_win32_name ()) + 3];
-  strcpy (root, get_win32_name ());
+  buf->st_atime   = to_time_t (&ftLastAccessTime);
+  buf->st_mtime   = to_time_t (&ftLastWriteTime);
+  buf->st_ctime   = to_time_t (&ftCreationTime);
+  buf->st_nlink   = nNumberOfLinks;
+  buf->st_dev     = pc->volser ();
+  buf->st_size    = ((__off64_t)nFileSizeHigh << 32) + nFileSizeLow;
 
   /* Assume that if a drive has ACL support it MAY have valid "inodes".
      It definitely does not have valid inodes if it does not have ACL
      support. */
-  switch (has_acls () ? GetDriveType (rootdir (root)) : DRIVE_UNKNOWN)
+  switch (pc->has_acls () && (nFileIndexHigh || nFileIndexLow)
+	  ? pc->drive_type () : DRIVE_UNKNOWN)
     {
     case DRIVE_FIXED:
     case DRIVE_REMOVABLE:
@@ -247,7 +217,7 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf)
     case DRIVE_RAMDISK:
       /* Although the documentation indicates otherwise, it seems like
 	 "inodes" on these devices are persistent, at least across reboots. */
-      buf->st_ino = local.nFileIndexHigh | local.nFileIndexLow;
+      buf->st_ino = nFileIndexHigh | nFileIndexLow;
       break;
     default:
       /* Either the nFileIndex* fields are unreliable or unavailable.  Use the
@@ -257,25 +227,25 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf)
     }
 
   buf->st_blksize = S_BLKSIZE;
-  buf->st_blocks  = (buf->st_size + S_BLKSIZE-1) / S_BLKSIZE;
+  buf->st_blocks  = (buf->st_size + S_BLKSIZE - 1) / S_BLKSIZE;
 
   buf->st_mode = 0;
   /* Using a side effect: get_file_attibutes checks for
      directory. This is used, to set S_ISVTX, if needed.  */
-  if (local.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+  if (pc->fileattr & FILE_ATTRIBUTE_DIRECTORY)
     buf->st_mode = S_IFDIR;
-  else if (get_symlink_p ())
+  else if (pc->issymlink ())
     buf->st_mode = S_IFLNK;
-  else if (get_socket_p ())
+  else if (pc->issocket ())
     buf->st_mode = S_IFSOCK;
+
   __uid16_t uid;
   __gid16_t gid;
-  if (get_file_attribute (has_acls (), get_win32_name (), &buf->st_mode,
+  if (get_file_attribute (pc->has_acls (), get_win32_name (), &buf->st_mode,
 			  &uid, &gid) == 0)
     {
       /* If read-only attribute is set, modify ntsec return value */
-      if ((local.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
-	  && !get_symlink_p ())
+      if ((pc->fileattr & FILE_ATTRIBUTE_READONLY) && !get_symlink_p ())
 	buf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
 
       if (!(buf->st_mode & S_IFMT))
@@ -285,7 +255,7 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf)
     {
       buf->st_mode |= STD_RBITS;
 
-      if (!(local.dwFileAttributes & FILE_ATTRIBUTE_READONLY))
+      if (!(pc->fileattr & FILE_ATTRIBUTE_READONLY))
 	buf->st_mode |= STD_WBITS;
       /* | S_IWGRP | S_IWOTH; we don't give write to group etc */
 
@@ -293,54 +263,53 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf)
 	buf->st_mode |= S_IFDIR | STD_XBITS;
       else if (buf->st_mode & S_IFMT)
 	/* nothing */;
-      else if (get_socket_p ())
+      else if (pc->issocket ())
 	buf->st_mode |= S_IFSOCK;
       else
-	switch (GetFileType (get_handle ()))
-	  {
-	  case FILE_TYPE_CHAR:
-	  case FILE_TYPE_UNKNOWN:
-	    buf->st_mode |= S_IFCHR;
-	    break;
-	  case FILE_TYPE_DISK:
-	    buf->st_mode |= S_IFREG;
-	    if (!dont_care_if_execable () && !get_execable_p ())
-	      {
-		DWORD cur, done;
-		char magic[3];
+	{
+	  buf->st_mode |= S_IFREG;
+	  if (!pc->exec_state () == dont_know_if_executable)
+	    {
+	      DWORD cur, done;
+	      char magic[3];
 
-		/* First retrieve current position, set to beginning
-		   of file if not already there. */
-		cur = SetFilePointer (get_handle(), 0, NULL, FILE_CURRENT);
-		if (cur != INVALID_SET_FILE_POINTER &&
-		    (!cur ||
-		     SetFilePointer (get_handle(), 0, NULL, FILE_BEGIN)
-		     != INVALID_SET_FILE_POINTER))
-		  {
-		    /* FIXME should we use /etc/magic ? */
-		    magic[0] = magic[1] = magic[2] = '\0';
-		    if (ReadFile (get_handle (), magic, 3, &done, NULL) &&
-			has_exec_chars (magic, done))
-			set_execable_p ();
-		    SetFilePointer (get_handle(), cur, NULL, FILE_BEGIN);
-		  }
-	      }
-	    if (get_execable_p ())
-	      buf->st_mode |= STD_XBITS;
-	    break;
-	  case FILE_TYPE_PIPE:
-	    buf->st_mode |= S_IFSOCK;
-	    break;
-	  }
+	      /* First retrieve current position, set to beginning
+		 of file if not already there. */
+	      cur = SetFilePointer (get_handle(), 0, NULL, FILE_CURRENT);
+	      if (cur != INVALID_SET_FILE_POINTER &&
+		  (!cur ||
+		   SetFilePointer (get_handle(), 0, NULL, FILE_BEGIN)
+		   != INVALID_SET_FILE_POINTER))
+		{
+		  /* FIXME should we use /etc/magic ? */
+		  magic[0] = magic[1] = magic[2] = '\0';
+		  if (ReadFile (get_handle (), magic, 3, &done, NULL) &&
+		      has_exec_chars (magic, done))
+		      set_execable_p ();
+		  SetFilePointer (get_handle(), cur, NULL, FILE_BEGIN);
+		}
+	    }
+	  if (pc->exec_state () == is_executable)
+	    buf->st_mode |= STD_XBITS;
+	}
     }
 
   buf->st_uid = uid;
   buf->st_gid = gid;
 
-  syscall_printf ("0 = fstat (, %p) st_atime=%x st_size=%D, st_mode=%p, st_ino=%d, sizeof=%d",
-		 buf, buf->st_atime, buf->st_size, buf->st_mode,
-		 (int) buf->st_ino, sizeof (*buf));
+  /* The number of links to a directory includes the
+     number of subdirectories in the directory, since all
+     those subdirectories point to it.
+     This is too slow on remote drives, so we do without it and
+     set the number of links to 2. */
+  /* Unfortunately the count of 2 confuses `find (1)' command. So
+     let's try it with `1' as link count. */
+  if (pc->isdir () && !buf->st_nlink)
+    buf->st_nlink = pc->isremote () ? 1 : num_entries (pc->get_win32 ());
 
+  syscall_printf ("0 = fstat (, %p) st_atime=%x st_size=%D, st_mode=%p, st_ino=%d, sizeof=%d",
+		  buf, buf->st_atime, buf->st_size, buf->st_mode,
+		  (int) buf->st_ino, sizeof (*buf));
   return 0;
 }
 
@@ -391,8 +360,7 @@ fhandler_disk_file::open (path_conv *real_path, int flags, mode_t mode)
      The only known file system to date is the SUN NFS Solstice Client 3.1
      which returns a valid handle when trying to open a file in a nonexistent
      directory. */
-  if (real_path->has_buggy_open ()
-      && GetFileAttributes (win32_path_name) == INVALID_FILE_ATTRIBUTES)
+  if (real_path->has_buggy_open () && !real_path->exists ())
     {
       debug_printf ("Buggy open detected.");
       close ();

@@ -373,6 +373,23 @@ path_conv::return_and_clear_normalized_path ()
   return s;
 }
 
+void
+path_conv::fillin (HANDLE h)
+{
+  BY_HANDLE_FILE_INFORMATION local;
+  if (!GetFileInformationByHandle (h, &local))
+    {
+      fileattr = INVALID_FILE_ATTRIBUTES;
+      fs.serial = 0;
+    }
+  else
+    {
+      fileattr = local.dwFileAttributes;
+      fs.serial = local.dwVolumeSerialNumber;
+    }
+    fs.drive_type = DRIVE_UNKNOWN;
+} 
+
 /* Convert an arbitrary path SRC to a pure Win32 path, suitable for
    passing to Win32 API routines.
 
@@ -507,25 +524,25 @@ path_conv::check (const char *src, unsigned opt,
 		}
 	      goto out;
 	    }
-          else if (isvirtual_dev (devn))
-            {
+	  else if (isvirtual_dev (devn))
+	    {
 	      /* FIXME: Calling build_fhandler here is not the right way to handle this. */
-              fhandler_virtual *fh =
-                (fhandler_virtual *) cygheap->fdtab.build_fhandler (-1, devn, (const char *) path_copy, NULL, unit);
-              int file_type = fh->exists ();
-              switch (file_type)
-                {
-                  case 1:
-                  case 2:
-                    fileattr = FILE_ATTRIBUTE_DIRECTORY;
+	      fhandler_virtual *fh =
+		(fhandler_virtual *) cygheap->fdtab.build_fhandler (-1, devn, (const char *) path_copy, NULL, unit);
+	      int file_type = fh->exists ();
+	      switch (file_type)
+		{
+		  case 1:
+		  case 2:
+		    fileattr = FILE_ATTRIBUTE_DIRECTORY;
 		    break;
-                  default:
-                  case -1:
-                    fileattr = 0;
-                }
-              delete fh;
+		  default:
+		  case -1:
+		    fileattr = 0;
+		}
+	      delete fh;
 	      goto out;
-            }
+	    }
 	  /* devn should not be a device.  If it is, then stop parsing now. */
 	  else if (devn != FH_BAD)
 	    {
@@ -1434,7 +1451,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
     {
       devn = fhandler_proc::get_proc_fhandler (pathbuf);
       if (devn == FH_BAD)
-        return ENOENT;
+	return ENOENT;
     }
   else if (iscygdrive (pathbuf))
     {
@@ -2679,7 +2696,7 @@ symlink (const char *topath, const char *frompath)
 			    &sa, alloca (4096), 4096);
 
   h = CreateFileA(win32_path, GENERIC_WRITE, 0, &sa,
-  		  CREATE_NEW, FILE_ATTRIBUTE_NORMAL, 0);
+		  CREATE_NEW, FILE_ATTRIBUTE_NORMAL, 0);
   if (h == INVALID_HANDLE_VALUE)
     __seterrno ();
   else
@@ -2727,7 +2744,7 @@ symlink (const char *topath, const char *frompath)
 				S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO);
 
 	  DWORD attr = allow_winsymlinks ? FILE_ATTRIBUTE_READONLY
-	  				 : FILE_ATTRIBUTE_SYSTEM;
+					 : FILE_ATTRIBUTE_SYSTEM;
 #ifdef HIDDEN_DOT_FILES
 	  cp = strrchr (win32_path, '\\');
 	  if ((cp && cp[1] == '.') || *win32_path == '.')
@@ -3306,7 +3323,7 @@ chdir (const char *in_dir)
   if (res == -1)
     __seterrno ();
   else if ((!path.has_symlinks () && strpbrk (dir, ":\\") == NULL
-            && pcheck_case == PCHECK_RELAXED) || isvirtual_dev (devn))
+	    && pcheck_case == PCHECK_RELAXED) || isvirtual_dev (devn))
     cygheap->cwd.set (native_dir, dir);
   else
     cygheap->cwd.set (native_dir, NULL);

@@ -1,15 +1,14 @@
 /* cygserver_shm.cc: Single unix specification IPC interface for Cygwin
 
-   Copyright 2001, 2002 Red Hat, Inc.
+Copyright 2001, 2002 Red Hat, Inc.
 
-   Originally written by Robert Collins <robert.collins@hotmail.com>
+Originally written by Robert Collins <robert.collins@hotmail.com>
 
-   This file is part of Cygwin.
+This file is part of Cygwin.
 
-   This software is a copyrighted work licensed under the terms of the
-   Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
-   details. */
-
+This software is a copyrighted work licensed under the terms of the
+Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+details. */
 
 #ifdef __OUTSIDE_CYGWIN__
 #undef __INSIDE_CYGWIN__
@@ -363,7 +362,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 		  {
 		    delete_shmnode (&temp2);
 		  }
-		
+
 		header.error_code = 0;
 		CloseHandle (token_handle);
 		return;

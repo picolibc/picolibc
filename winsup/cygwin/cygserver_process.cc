@@ -137,7 +137,7 @@ process_cache::remove_process (class process *theprocess)
   /* Process any cleanup tasks */
   add_task (theprocess);
 }
-	
+
 /* copy <= max_copy HANDLEs to dest[], starting at an offset into _our list_ of
  * begin_at. (Ie begin_at = 5, the first copied handle is still written to dest[0]
  * NOTE: Thread safe, but not thread guaranteed - a newly added process may be missed.

@@ -543,7 +543,7 @@ cygwin_socket (int af, int type, int protocol)
       if (fh)
 	{
 	  fh->set_addr_family (af);
-          fh->set_socket_type (type);
+	  fh->set_socket_type (type);
 	}
       res = fd;
     }
@@ -1623,7 +1623,7 @@ get_2k_ifconf (struct ifconf *ifc, int what)
 		  switch (ift->table[if_cnt].dwType)
 		    {
 		      case MIB_IF_TYPE_TOKENRING:
-		        ++*tok;
+			++*tok;
 			strcpy (ifr->ifr_name, "tok");
 			strcat (ifr->ifr_name, tok);
 			break;
@@ -2443,7 +2443,7 @@ socketpair (int family, int type, int protocol, int *sb)
   else
     {
       fh = fdsock (sb[0], type == SOCK_STREAM ? "/dev/tcp" : "/dev/udp",
-      		   insock);
+		   insock);
       fh->set_addr_family (AF_INET);
       fh->set_socket_type (type);
       fh = fdsock (sb[1], type == SOCK_STREAM ? "/dev/tcp" : "/dev/udp",

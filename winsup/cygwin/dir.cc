@@ -223,7 +223,7 @@ mkdir (const char *dir, mode_t mode)
 #ifdef HIDDEN_DOT_FILES
       char *c = strrchr (real_dir.get_win32 (), '\\');
       if ((c && c[1] == '.') || *real_dir.get_win32 () == '.')
-        SetFileAttributes (real_dir.get_win32 (), FILE_ATTRIBUTE_HIDDEN);
+	SetFileAttributes (real_dir.get_win32 (), FILE_ATTRIBUTE_HIDDEN);
 #endif
       res = 0;
     }

@@ -69,7 +69,7 @@ uname (struct utsname *name)
 	else
 	  {
 	    if (sysinfo.dwProcessorType == PROCESSOR_INTEL_386 ||
-	        sysinfo.dwProcessorType == PROCESSOR_INTEL_486)
+		sysinfo.dwProcessorType == PROCESSOR_INTEL_486)
 	      ptype = sysinfo.dwProcessorType / 100;
 	    else
 	      ptype = PROCESSOR_INTEL_PENTIUM / 100;

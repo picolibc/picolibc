@@ -1,3 +1,48 @@
+2002-05-27  Christopher Faylor  <cgf@redhat.com>
+
+	* autoload.cc (LoadFuncEx): Define via new LoadFuncEx2 macro.
+	(LoadFuncEx2): Adapted from LoadFuncEx.  Provides control of return
+	value for nonexistent function.
+	(NtQueryObject): Declare.
+	(IsDebuggerPresent): Declare via LoadFuncEx2 and always return true if
+	not available.
+	* debug.h (being_debugged): Just rely on IsDebuggerPresent return
+	value.
+	* dtable.cc (handle_to_fn): New function.
+	(dtable::init_std_file_from_handle): Attempt to derive std handle's
+	name via handle_to_fn.
+	(dtable::build_fhandler_from_name): Fill in what we can in path_conv
+	structure when given a handle and path doesn't exist.
+	* fhandler.cc (fhandler_base::open): Don't set the file pointer here.
+	Use pc->exists () to determine if file exists rather than calling
+	GetFileAttributes again.
+	* fhandler.h (fhandler_base::exec_state_isknown): New method.
+	(fhandler_base::fstat_helper): Add extra arguments to declaration.
+	(fhandler_base::fstat_by_handle): Declare new method.
+	(fhandler_base::fstat_by_name): Declare new method.
+	* fhandler_disk_file (num_entries): Make __stdcall.
+	(fhandler_base::fstat_by_handle): Define new method.
+	(fhandler_base::fstat_by_name): Define new method.
+	(fhandler_base:fstat): Call fstat_by_{handle,name} as appropriate.
+	(fhandler_disk_file::fstat_helper): Accept extra arguments for filling
+	out stat structure.  Move handle or name specific stuff to new methods
+	above.
+	(fhandler_disk_file::open): Use real_path->exists rather than calling
+	GetFileAttributes again.
+	* ntdll.h (FILE_NAME_INFORMATION): Define new structure.
+	(OBJECT_INFORMATION_CLASS): Partially define new enum.
+	(OBJECT_NAME_INFORMATION): Define new structure.
+	(NtQueryInformationFile): New declaration.
+	(NtQueryObject): New declaration.
+	* path.cc (path_conv::fillin): Define new method.
+	* path.h (path_conv::fillin): Declare new method.
+	(path_conv::drive_thpe): Rename from 'get_drive_type'.
+	(path_conv::volser): Declare new method.
+	(path_conv::volname): Declare new method.
+	(path_conv::root_dir): Declare new method.
+	* syscalls.cc (fstat64): Send real path_conv to fstat as second
+	argument.
+
 2002-05-24  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* security.cc (lsa2str): New function.

@@ -29,7 +29,7 @@ DWORD __stdcall WFMO (DWORD, CONST HANDLE *, BOOL, DWORD) __attribute__ ((regpar
 #define _DEBUG_H_
 
 #define being_debugged() \
-  (IsDebuggerPresent () || GetLastError () == ERROR_PROC_NOT_FOUND)
+  (IsDebuggerPresent () /* || GetLastError () == ERROR_PROC_NOT_FOUND*/)
 
 void threadname_init ();
 HANDLE __stdcall makethread (LPTHREAD_START_ROUTINE, LPVOID, DWORD, const char *) __attribute__ ((regparm(3)));
