@@ -181,7 +181,7 @@ fhandler_dev_raw::open (int flags, mode_t)
   HANDLE h;
   IO_STATUS_BLOCK io;
   NTSTATUS status = NtOpenFile (&h, access, &attr, &io, 0 /* excl. access */,
-				FILE_SYNCHRONOUS_IO_NONALERT);
+				options);
   if (!NT_SUCCESS (status))
     {
       __seterrno_from_win_error (RtlNtStatusToDosError (status));
