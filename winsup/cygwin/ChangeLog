@@ -1,3 +1,14 @@
+2003-04-08  Bob Cassels <bcassels@abinitio.com>
+
+	* fhandler_console.cc (fhandler_console::read) Handle certain key up
+	events, to allow pasting accented characters and typing them using the
+	"alt + numerics" sequences.
+
+2003-04-07  Christopher Faylor  <cgf@redhat.com>
+
+	* include/limits.h (IOV_MAX): Set to a number which is small enough to
+	use in an array.
+
 2003-04-04  Christopher Faylor  <cgf@redhat.com>
 
 	* cygthread.h (cygthread::avail): Make LONG for easier use with
