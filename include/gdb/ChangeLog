@@ -1,3 +1,12 @@
+2003-02-20  Andrew Cagney  <ac131313@redhat.com>
+
+	* remote-sim.h (SIM_RC): Delete unused SIM_RC_UNKNOWN_BREAKPOINT,
+	SIM_RC_INSUFFICIENT_RESOURCES and SIM_RC_DUPLICATE_BREAKPOINT.
+	(sim_set_breakpoint, sim_clear_breakpoint): Delete declarations.
+	(sim_clear_all_breakpoints, sim_enable_breakpoint): Ditto.
+	(sim_enable_all_breakpoints, sim_disable_breakpoint): Ditto.
+	(sim_disable_all_breakpoints): Ditto.
+
 2002-12-26  Kazu Hirata  <kazu@cs.umass.edu>
 
 	* sim-h8300.h: Remove ^M.

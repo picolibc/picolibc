@@ -58,10 +58,7 @@ typedef enum {
 
 typedef enum {
   SIM_RC_FAIL = 0,
-  SIM_RC_OK = 1,
-  SIM_RC_UNKNOWN_BREAKPOINT = 2,
-  SIM_RC_INSUFFICIENT_RESOURCES = 3,
-  SIM_RC_DUPLICATE_BREAKPOINT = 4
+  SIM_RC_OK = 1
 } SIM_RC;
 
 
@@ -277,19 +274,6 @@ void sim_stop_reason PARAMS ((SIM_DESC sd, enum sim_stop *reason, int *sigrc));
    or empty CMD. */
 
 void sim_do_command PARAMS ((SIM_DESC sd, char *cmd));
-
-/* Call these functions to set and clear breakpoints at ADDR. */
-
-SIM_RC sim_set_breakpoint PARAMS ((SIM_DESC sd, SIM_ADDR addr));
-SIM_RC sim_clear_breakpoint PARAMS ((SIM_DESC sd, SIM_ADDR addr));
-SIM_RC sim_clear_all_breakpoints PARAMS ((SIM_DESC sd));
-
-/* These functions are used to enable and disable breakpoints. */
-
-SIM_RC sim_enable_breakpoint PARAMS ((SIM_DESC sd, SIM_ADDR addr));
-SIM_RC sim_disable_breakpoint PARAMS ((SIM_DESC sd, SIM_ADDR addr));
-SIM_RC sim_enable_all_breakpoints PARAMS ((SIM_DESC sd));
-SIM_RC sim_disable_all_breakpoints PARAMS ((SIM_DESC sd));
 
 #ifdef __cplusplus
 }
