@@ -48,8 +48,8 @@ include $(srcdir)/../Makefile.common
 
 MINGW_INCLUDES:=-I. -I$(srcdir) -I$(mingw_source)/include -I$(w32api_include) -I$(updir)/bz2lib
 
-MINGW_CXXFLAGS:=-MMD $(CXXFLAGS) -mno-cygwin $(MINGW_INCLUDES) -mwindows
-MINGW_CFLAGS:=-MMD $(CFLAGS) -mno-cygwin $(MINGW_INCLUDES) -mwindows
+MINGW_CXXFLAGS:=-MMD $(CXXFLAGS) -mno-cygwin $(MINGW_INCLUDES) -mwindows -U_WIN32
+MINGW_CFLAGS:=-MMD $(CFLAGS) -mno-cygwin $(MINGW_INCLUDES) -mwindows -U_WIN32
 
 ZLIB:=zlib/libzcygw.a
 BZ2LIB:=$(bupdir)/bz2lib/libbz2.a
