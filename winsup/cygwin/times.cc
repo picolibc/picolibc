@@ -1,6 +1,6 @@
 /* times.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
 
 This file is part of Cygwin.
 
