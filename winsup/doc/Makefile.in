@@ -29,7 +29,7 @@ TEXI2HTML:=texi2html
 
 include $(srcdir)/../Makefile.common
 
-TOCLEAN:=faq.txt *.html readme.txt doctool.o doctool \
+TOCLEAN:=faq.txt ./*.html readme.txt doctool.o doctool \
 	 cygwin-ug.sgml cygwin-ug-net.sgml
 
 .SUFFIXES:
@@ -87,25 +87,26 @@ cygwin-api-int.sgml : cygwin-api.in.sgml ./doctool Makefile
 	-ps2pdf $< $@
 
 %.info: %.texinfo
-	-$(MAKEINFO) -I$(srcdir) $<
+	-$(MAKEINFO) -I $(srcdir) $<
 
 %.txt: %.texinfo
-	-$(MAKEINFO) -I$(srcdir) $<
+	-$(MAKEINFO) -I $(srcdir) $<
 
 %.html: %.texinfo
-	-$(TEXI2HTML) -I$(srcdir) $<
+	-$(TEXI2HTML) -I $(srcdir) $<
 
 readme.txt: $(srcdir)/readme.texinfo $(srcdir)/*.texinfo
 	-$(MAKEINFO) -I$(srcdir) --no-split --no-headers $< -o - |\
 	sed '/^Concept Index/,$$d' > $@
 
 faq.html: $(srcdir)/faq.texinfo $(srcdir)/*.texinfo
-	-for i in $(srcdir)/*.texinfo ; do \
+	-rm -f faq_toc.html; \
+	for i in $(srcdir)/*.texinfo ; do \
 		sed < $$i -e 's?@file{\([fth]*p://[^}]*\)}?@strong{<A HREF="\1">\1</A>}?' \
 	    -e 's?\([.+a-zA-Z0-9-]*@@[.a-zA-Z0-9-]*[a-zA-Z0-9]\)?<A HREF="mailto:\1">\1</A>?' >./`basename $$i` ; done; \
-	$(TEXI2HTML) -split_chapter  -v ./faq.texinfo; \
+	$(TEXI2HTML) --split -v ./faq.texinfo; \
 	rm -f *.texinfo; \
-	cp faq_toc.html faq.html
+	[ -r faq_toc.html ] && mv faq_toc.html faq.html; exit 0
 
 TBFILES = cygwin-ug-net.dvi cygwin-ug-net.rtf cygwin-ug-net.ps \
 	  cygwin-ug-net.pdf cygwin-ug-net.sgml \

@@ -5,7 +5,6 @@
 
 @setfilename readme.txt
 
-@include sites.texinfo
 @include install.texinfo
 
 @chapter Release Information
