@@ -1,3 +1,10 @@
+2002-07-03  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* autoload.cc (WSAEventSelect): Define new autoload function.
+	(WSAEnumNetworkEvents): Ditto.
+	* fhandler_socket.cc (fhandler_socket::accept): If socket is
+	in blocking mode wait for incoming connection and signal.
+
 2002-07-02  Christopher Faylor  <cgf@redhat.com>
 
 	* cygheap.cc (init_cheap): Rearrange error message.

@@ -480,6 +480,8 @@ LoadDLLfuncEx (WSASendTo, 36, ws2_32, 1)
 LoadDLLfuncEx (WSASetEvent, 4, ws2_32, 1)
 LoadDLLfuncEx (WSASocketA, 24, ws2_32, 1)
 LoadDLLfuncEx (WSAWaitForMultipleEvents, 20, ws2_32, 1)
+LoadDLLfuncEx (WSAEventSelect, 12, ws2_32, 1)
+LoadDLLfuncEx (WSAEnumNetworkEvents, 12, ws2_32, 1)
 
 LoadDLLfuncEx (GetIfTable, 12, iphlpapi, 1)
 LoadDLLfuncEx (GetIpAddrTable, 12, iphlpapi, 1)

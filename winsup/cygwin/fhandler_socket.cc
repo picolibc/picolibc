@@ -469,6 +469,7 @@ int
 fhandler_socket::accept (struct sockaddr *peer, int *len)
 {
   int res = -1;
+  WSAEVENT ev[2] = { WSA_INVALID_EVENT, signal_arrived };
   BOOL secret_check_failed = FALSE;
   BOOL in_progress = FALSE;
 
@@ -492,7 +493,58 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
   if (len && ((unsigned) *len < sizeof (struct sockaddr_in)))
     *len = sizeof (struct sockaddr_in);
 
-  res = ::accept (get_socket (), peer, len);  // can't use a blocking call inside a lock
+  if (!is_nonblocking())
+    {
+      ev[0] = WSACreateEvent ();
+
+      if (ev[0] != WSA_INVALID_EVENT &&
+          !WSAEventSelect (get_socket (), ev[0], FD_ACCEPT))
+        {
+          WSANETWORKEVENTS sock_event;
+          int wait_result;
+
+          wait_result = WSAWaitForMultipleEvents (2, ev, FALSE, WSA_INFINITE,
+	  					  FALSE);
+          if (wait_result == WSA_WAIT_EVENT_0)
+            WSAEnumNetworkEvents (get_socket (), ev[0], &sock_event);
+
+          /* Unset events for listening socket and
+             switch back to blocking mode */
+          WSAEventSelect (get_socket (), ev[0], 0 );
+          ioctlsocket (get_socket (), FIONBIO, 0);
+
+          switch (wait_result)
+            {
+            case WSA_WAIT_EVENT_0:
+              if (sock_event.lNetworkEvents & FD_ACCEPT)
+                {
+                  if (sock_event.iErrorCode[FD_ACCEPT_BIT])
+                    {
+                      WSASetLastError (sock_event.iErrorCode[FD_ACCEPT_BIT]);
+                      set_winsock_errno ();
+                      res = -1;
+                      goto done;
+                    }
+                }
+              /* else; : Should never happen since FD_ACCEPT is the only event
+                 that has been selected */
+              break;
+            case WSA_WAIT_EVENT_0 + 1:
+              debug_printf ("signal received during accept");
+              set_errno (EINTR);
+              res = -1;
+              goto done;
+            case WSA_WAIT_FAILED:
+            default: /* Should never happen */
+              WSASetLastError (WSAEFAULT);
+              set_winsock_errno ();
+              res = -1;
+              goto done;
+            }
+        }
+    }
+
+  res = ::accept (get_socket (), peer, len);
 
   if ((SOCKET) res == (SOCKET) INVALID_SOCKET &&
       WSAGetLastError () == WSAEWOULDBLOCK)
@@ -525,24 +577,30 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 	    closesocket (res);
 	  set_errno (ECONNABORTED);
 	  res = -1;
-	  return res;
+	  goto done;
 	}
     }
 
-  cygheap_fdnew res_fd;
-  if (res_fd < 0)
-    /* FIXME: what is correct errno? */;
-  else if ((SOCKET) res == (SOCKET) INVALID_SOCKET)
-    set_winsock_errno ();
-  else
-    {
-      fhandler_socket* res_fh = fdsock (res_fd, get_name (), res);
-      if (get_addr_family () == AF_LOCAL)
-	res_fh->set_sun_path (get_sun_path ());
-      res_fh->set_addr_family (get_addr_family ());
-      res_fh->set_socket_type (get_socket_type ());
-      res = res_fd;
-    }
+  {
+    cygheap_fdnew res_fd;
+    if (res_fd < 0)
+      /* FIXME: what is correct errno? */;
+    else if ((SOCKET) res == (SOCKET) INVALID_SOCKET)
+      set_winsock_errno ();
+    else
+      {
+        fhandler_socket* res_fh = fdsock (res_fd, get_name (), res);
+        if (get_addr_family () == AF_LOCAL)
+          res_fh->set_sun_path (get_sun_path ());
+        res_fh->set_addr_family (get_addr_family ());
+        res_fh->set_socket_type (get_socket_type ());
+        res = res_fd;
+      }
+  }
+
+done:
+  if (ev[0] != WSA_INVALID_EVENT)
+    WSACloseEvent (ev[0]);
 
   return res;
 }
