@@ -1,3 +1,7 @@
+Wed Sep 19 18:07:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* lib/getopt.c (getopt_long): Avoid compiler warning.
+
 Wed Sep 19 11:52:42 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* lib/getopt.c: Use __progname==__argv[0] when not compiling for cygwin.

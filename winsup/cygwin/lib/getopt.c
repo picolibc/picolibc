@@ -381,7 +381,7 @@ getopt_long(int nargc, char * const *nargv, const char *options,
 		size_t current_argv_len;
 		int i, match;
 
-		current_argv = place;
+		current_argv = (char *) place;
 		match = -1;
 
 		optind++;
