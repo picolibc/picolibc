@@ -954,6 +954,15 @@ sync ()
 	      else
 		debug_printf ("Try volume %s", vol);
 
+	      /* Check pvol for being a floppy on A: or B:.  Skip them. */
+	      if (strncasematch (pvol, "A:", 2)
+	          || strncasematch (pvol, "B:", 2))
+	        {
+		  pvol[2] = '\0';
+		  if (is_floppy (pvol))
+		    continue;
+		}
+
 	      /* Eliminate trailing backslash. */
 	      vol[strlen (vol) - 1] = '\0';
 	      sync_worker (vol);
@@ -964,10 +973,13 @@ sync ()
     }
   else if (wincap.is_winnt ())	/* 9x has no concept for opening volumes */
     {
-      extern FILE *setmntent (const char *, const char *);
-      setmntent ("", "");
-      DWORD drives = _my_tls.locals.available_drives;
+      DWORD drives = GetLogicalDrives ();
       DWORD mask = 1;
+      /* Skip floppies on A: and B: as in setmntent. */
+      if ((drives & 1) && is_floppy ("A:"))
+	drives &= ~1;
+      if ((drives & 2) && is_floppy ("B:"))
+	drives &= ~2;
       strcpy (vol, "\\\\.\\A:");
       do
         {

@@ -2478,7 +2478,7 @@ cygwin_umount (const char *path, unsigned flags)
   return res;
 }
 
-static bool
+bool
 is_floppy (const char *dos)
 {
   char dev[256];
