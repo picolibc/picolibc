@@ -1,3 +1,16 @@
+2003-04-10  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* mkpasswd.c (current_user): print uid and gid as unsigned.
+	(enum_users): Ditto. Do not free servername.
+	(usage): Update to allow several domains and improve -p.
+	(main): On Win9x limit uids to 1000. Only print specials
+	when -l is specified. Add a loop to allow several domains
+	and free servername in the loop.
+	* mkgroup.c (enum_groups): Do not free servername.
+	(usage): Update to allow several domains. Change uid to gid.
+	(main): Only print specials when -l is specified. Add a 
+	loop to allow several domains and free servername in the loop.
+
 2003-03-24  Christopher Faylor  <cgf@redhat.com>
 
 	* cygcheck.cc (dump_sysinfo): Ensure that CYGWIN environment variable

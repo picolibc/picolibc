@@ -199,7 +199,7 @@ current_user (int print_sids, int print_cygpath,
       strlcat (homedir_psx, envname, sizeof (homedir_psx));
     }
 
-  printf ("%s:unused_by_nt/2000/xp:%d:%d:%s%s%s%s%s%s%s%s:%s:/bin/bash\n",
+  printf ("%s:unused_by_nt/2000/xp:%u:%u:%s%s%s%s%s%s%s%s:%s:/bin/bash\n",
 	  envname,
 	  uid + id_offset,
 	  gid + id_offset,
@@ -331,7 +331,7 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
 		    }
 		}
 	    }
-	  printf ("%s:unused_by_nt/2000/xp:%d:%d:%s%s%s%s%s%s%s%s:%s:/bin/bash\n",
+	  printf ("%s:unused_by_nt/2000/xp:%u:%u:%s%s%s%s%s%s%s%s:%s:/bin/bash\n",
 	  	  username,
 		  uid + id_offset,
 		  gid + id_offset,
@@ -350,9 +350,6 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
 
     }
   while (rc == ERROR_MORE_DATA);
-
-  if (servername)
-    netapibufferfree (servername);
 
   return 0;
 }
@@ -487,14 +484,14 @@ print_special (int print_sids,
 int
 usage (FILE * stream, int isNT)
 {
-  fprintf (stream, "Usage: mkpasswd [OPTION]... [domain]\n\n"
+  fprintf (stream, "Usage: mkpasswd [OPTION]... [domain]...\n\n"
 	           "This program prints a /etc/passwd file to stdout\n\n"
 	           "Options:\n");
   if (isNT)
     fprintf (stream, "   -l,--local              print local user accounts\n"
 	             "   -c,--current            print current account, if a domain account\n"
                      "   -d,--domain             print domain accounts (from current domain\n"
-                     "                           if no domain specified)\n"
+                     "                           if no domains specified)\n"
                      "   -o,--id-offset offset   change the default offset (10000) added to uids\n"
                      "                           in domain accounts.\n"
                      "   -g,--local-groups       print local group information too\n"
@@ -502,7 +499,7 @@ usage (FILE * stream, int isNT)
                      "   -m,--no-mount           don't use mount points for home dir\n"
                      "   -s,--no-sids            don't print SIDs in GCOS field\n"
 	             "                           (this affects ntsec)\n");
-  fprintf (stream, "   -p,--path-to-home path  use specified path instead of user account home dir\n"
+  fprintf (stream, "   -p,--path-to-home path  use specified path and not user account home dir or /home\n"
                    "   -u,--username username  only return information for the specified user\n"
                    "   -h,--help               displays this message\n"
 	           "   -v,--version            version information and exit\n\n");
@@ -649,7 +646,7 @@ main (int argc, char **argv)
 	  unsigned long uid = 0, i;
 	  for (i = 0; disp_username[i]; i++)
 	    uid += toupper (disp_username[i]) << ((6 * i) % 25);
-	  uid = (uid % (65535 - DOMAIN_USER_RID_ADMIN - 1)) 
+	  uid = (uid % (1000 - DOMAIN_USER_RID_ADMIN - 1)) 
 	    + DOMAIN_USER_RID_ADMIN + 1;
     	  
 	  printf ("%s:use_crypt:%lu:%lu:%s:%s%s:/bin/bash\n", 
@@ -675,7 +672,6 @@ main (int argc, char **argv)
 		   "when `-d' is given.\n", argv[0]);
 	  return 1;
 	}
-      mbstowcs (domain_name, argv[optind], (strlen (argv[optind]) + 1));
       domain_name_specified = 1;
     }
   if (!load_netapi ())
@@ -686,57 +682,62 @@ main (int argc, char **argv)
 
   if (disp_username == NULL)
     {
+      if (print_local)
+        {
 #if 0
-      /*
-       * Get `Everyone' group
-      */
-      print_special (print_sids, &sid_world_auth, 1, SECURITY_WORLD_RID,
-		     0, 0, 0, 0, 0, 0, 0);
+	  /*
+	   * Get `Everyone' group
+	   */
+	  print_special (print_sids, &sid_world_auth, 1, SECURITY_WORLD_RID,
+			 0, 0, 0, 0, 0, 0, 0);
 #endif
-      /*
-       * Get `system' group
-      */
-      print_special (print_sids, &sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID,
-		     0, 0, 0, 0, 0, 0, 0);
-      /*
-       * Get `administrators' group
-      */
-      if (!print_local_groups)
-	print_special (print_sids, &sid_nt_auth, 2, SECURITY_BUILTIN_DOMAIN_RID,
-		       DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0);
-
+	  /*
+	   * Get `system' group
+	   */
+	  print_special (print_sids, &sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID,
+			 0, 0, 0, 0, 0, 0, 0);
+	  /*
+	   * Get `administrators' group
+	   */
+	  if (!print_local_groups)
+	    print_special (print_sids, &sid_nt_auth, 2, SECURITY_BUILTIN_DOMAIN_RID,
+			   DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0);
+	}
       if (print_local_groups)
 	enum_local_groups (print_sids);
-    }
-
-  if (print_domain)
-    {
-      if (domain_name_specified)
-	rc = netgetdcname (NULL, domain_name, (LPBYTE *) & servername);
-
-      else
-	rc = netgetdcname (NULL, NULL, (LPBYTE *) & servername);
-
-      if (rc != ERROR_SUCCESS)
-	{
-	  print_win_error(rc);
-	  return 1;
-	}
-
-      enum_users (servername, print_sids, print_cygpath, passed_home_path,
-		  id_offset, disp_username);
     }
 
   if (print_local)
     enum_users (NULL, print_sids, print_cygpath, passed_home_path, 0,
     		disp_username);
 
+  i = 1;
+  if (print_domain) 
+    do 
+      {
+	if (domain_name_specified)
+	  {
+	    mbstowcs (domain_name, argv[optind], (strlen (argv[optind]) + 1));
+	    rc = netgetdcname (NULL, domain_name, (LPBYTE *) & servername);
+	  }
+	else
+	  rc = netgetdcname (NULL, NULL, (LPBYTE *) & servername);
+	
+	if (rc != ERROR_SUCCESS)
+	  {
+	    print_win_error(rc);
+	    return 1;
+	  }
+
+	enum_users (servername, print_sids, print_cygpath, passed_home_path,
+		    id_offset * i++, disp_username);
+	netapibufferfree (servername);
+      }
+    while (++optind < argc);
+
   if (print_current && !print_domain)
     current_user(print_sids, print_cygpath, passed_home_path,
 		 id_offset, disp_username);
-
-  if (servername)
-    netapibufferfree (servername);
 
   return 0;
 }

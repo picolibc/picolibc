@@ -372,9 +372,6 @@ enum_groups (LPWSTR servername, int print_sids, int print_users, int id_offset)
 
     }
   while (rc == ERROR_MORE_DATA);
-
-  if (servername)
-    netapibufferfree (servername);
 }
 
 void
@@ -484,16 +481,15 @@ current_group (int print_sids, int print_users, int id_offset)
 int
 usage (FILE * stream, int isNT)
 {
-  fprintf (stream, "Usage: mkgroup [OPTION]... [domain]\n\n"
+  fprintf (stream, "Usage: mkgroup [OPTION]... [domain]...\n\n"
 	           "This program prints a /etc/group file to stdout\n\n"
 	           "Options:\n");
   if (isNT)
     fprintf (stream, "   -l,--local             print local group information\n"
 	             "   -c,--current           print current group, if a domain account\n"
-		     "   -d,--domain            print global group information from the domain\n"
-		     "                          specified (or from the current domain if there is\n"
-		     "                          no domain specified)\n"
-		     "   -o,--id-offset offset  change the default offset (10000) added to uids\n"
+		     "   -d,--domain            print global group information (from current\n"
+	             "                          domain if no domains specified)\n"
+		     "   -o,--id-offset offset  change the default offset (10000) added to gids\n"
 		     "                          in domain accounts.\n"
 		     "   -s,--no-sids           don't print SIDs in pwd field\n"
 		     "                          (this affects ntsec)\n"
@@ -629,7 +625,6 @@ main (int argc, char **argv)
 		   "when `-d' is given.\n", argv[0]);
 	  return 1;
 	}
-      mbstowcs (domain_name, argv[optind], (strlen (argv[optind]) + 1));
       domain_specified = 1;
     }
   if (!load_netapi ())
@@ -639,21 +634,13 @@ main (int argc, char **argv)
       return 1;
     }
 
-#if 0
-  /*
-   * Get `Everyone' group
-  */
-  print_special (print_sids, &sid_world_auth, 1, SECURITY_WORLD_RID,
-			     0, 0, 0, 0, 0, 0, 0);
-#endif
-
-  /*
-   * Get `system' group
-  */
-  print_special (print_sids, &sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID,
-			     0, 0, 0, 0, 0, 0, 0);
   if (print_local)
     {
+      /*
+       * Get `system' group
+       */
+      print_special (print_sids, &sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID,
+		     0, 0, 0, 0, 0, 0, 0);
       /*
        * Get `None' group
       */
@@ -696,27 +683,32 @@ main (int argc, char **argv)
 				   0,
 				   0,
 				   0);
+
+      enum_local_groups (print_sids, print_users);
     }
 
-  if (print_domain)
-    {
-      if (domain_specified)
-	rc = netgetdcname (NULL, domain_name, (LPBYTE *) & servername);
+  i = 1;
+  if (print_domain) 
+    do
+      {
+	if (domain_specified)
+          {
+	    mbstowcs (domain_name, argv[optind], (strlen (argv[optind]) + 1));
+	    rc = netgetdcname (NULL, domain_name, (LPBYTE *) & servername);
+	  }
+	else
+	  rc = netgetdcname (NULL, NULL, (LPBYTE *) & servername);
+	
+	if (rc != ERROR_SUCCESS)
+	  {
+	    fprintf (stderr, "Cannot get PDC, code = %ld\n", rc);
+	    return 1;
+	  }
 
-      else
-	rc = netgetdcname (NULL, NULL, (LPBYTE *) & servername);
-
-      if (rc != ERROR_SUCCESS)
-	{
-	  fprintf (stderr, "Cannot get PDC, code = %ld\n", rc);
-	  return 1;
-	}
-
-      enum_groups (servername, print_sids, print_users, id_offset);
-    }
-
-  if (print_local)
-    enum_local_groups (print_sids, print_users);
+	enum_groups (servername, print_sids, print_users, id_offset * i++);
+	netapibufferfree (servername);	
+      }
+    while (++optind < argc);
 
   if (print_current && !print_domain)
     current_group (print_sids, print_users, id_offset);
