@@ -1,3 +1,10 @@
+1999-07-08  Richard Henderson  <rth@cygnus.com>
+
+	* sparc.h (ELF64_R_TYPE_DATA): Sign extend the value.
+	(ELF64_R_TYPE_INFO): Mask out all but low 24 bits of data.
+	(DT_SPARC_PLTFMT): Delete.
+	Based on a patch from Jakub Jelinek.
+
 Mon Jun 21 16:36:02 1999  Jeffrey A Law  (law@cygnus.com)
 
 	* hppa.h (elf_hppa_reloc_type): Renamed from elf32_hppa_reloc_type.
