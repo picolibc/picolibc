@@ -1,3 +1,12 @@
+2002-04-11  Danny Smith  <dannysmith@sourceforge.users.net>
+
+	* include/_mingw.h: Increment version to 2.0.
+	* Makefile.in: Ditto.
+
+	Merge from trunk:
+	2002-04-09  Earnie Boyd  <earnie@users.sf.net>
+	* Makefile.in: Use bzip2 compression for Cygwin target.
+
 2002-04-10  Danny Smith  <dannysmith@sourceforge.users.net>
 
 	* mingwex/mingw-fseek.c: New file, based on Mumit Khan
