@@ -189,14 +189,50 @@ typedef enum
 verifyable_object_state verifyable_object_isvalid (void const *, long);
 verifyable_object_state verifyable_object_isvalid (void const *, long, void *);
 
-/* interface */
 template <class ListNode> class List {
 public:
-  List();
-  void Insert (ListNode *aNode);
-  ListNode *Remove ( ListNode *aNode);
-  ListNode *Pop ();
-  void forEach (void (*)(ListNode *aNode));
+  List() : head(NULL)
+  {
+  }
+
+  void Insert (ListNode *aNode)
+  {
+    if (!aNode)
+      return;
+    aNode->next = (ListNode *) InterlockedExchangePointer (&head, aNode);
+  }
+
+  ListNode *Remove ( ListNode *aNode)
+  {
+    if (!aNode || !head)
+      return NULL;
+    if (aNode == head)
+      return Pop ();
+
+    ListNode *resultPrev = head;
+    while (resultPrev && resultPrev->next && !(aNode == resultPrev->next))
+      resultPrev = resultPrev->next;
+    if (resultPrev)
+      return (ListNode *)InterlockedExchangePointer (&resultPrev->next, resultPrev->next->next);
+    return NULL;
+  }
+
+  ListNode *Pop ()
+  {
+    return (ListNode *) InterlockedExchangePointer (&head, head->next);
+  }
+
+  /* poor mans generic programming. */
+  void forEach (void (ListNode::*callback) ())
+  {
+    ListNode *aNode = head;
+    while (aNode)
+      {
+        (aNode->*callback) ();
+        aNode = aNode->next;
+      }
+  }
+
 protected:
   ListNode *head;
 };
@@ -205,8 +241,6 @@ class pthread_key:public verifyable_object
 {
 public:
   static bool isGoodObject (pthread_key_t const *);
-  static void runAllDestructors ();
-
   DWORD dwTlsIndex;
 
   int set (const void *);
@@ -214,68 +248,31 @@ public:
 
   pthread_key (void (*)(void *));
   ~pthread_key ();
-  static void fixup_before_fork();
-  static void fixup_after_fork();
+  static void fixup_before_fork()
+  {
+    keys.forEach (&pthread_key::saveKeyToBuffer);
+  }
+
+  static void fixup_after_fork()
+  {
+    keys.forEach (&pthread_key::recreateKeyFromBuffer);
+  }
+
+  static void runAllDestructors ()
+  {
+    keys.forEach (&pthread_key::runDestructor);
+  }
 
   /* List support calls */
   class pthread_key *next;
 private:
-  // lists of objects. USE THREADSAFE INSERTS AND DELETES.
   static List<pthread_key> keys;
-  static void saveAKey (pthread_key *);
-  static void restoreAKey (pthread_key *);
-  static void destroyAKey (pthread_key *);
   void saveKeyToBuffer ();
   void recreateKeyFromBuffer ();
   void (*destructor) (void *);
-  void run_destructor ();
+  void runDestructor ();
   void *fork_buf;
 };
-
-/* implementation */
-template <class ListNode>
-List<ListNode>::List<ListNode> () : head(NULL)
-{
-}
-template <class ListNode> void
-List<ListNode>::Insert (ListNode *aNode)
-{
-  if (!aNode)
-  return;
-  aNode->next = (ListNode *) InterlockedExchangePointer (&head, aNode);
-}
-template <class ListNode> ListNode *
-List<ListNode>::Remove ( ListNode *aNode)
-{
-  if (!aNode)
-  return NULL;
-  if (!head)
-  return NULL;
-  if (aNode == head)
-  return Pop ();
-  ListNode *resultPrev = head;
-  while (resultPrev && resultPrev->next && !(aNode == resultPrev->next))
-  resultPrev = resultPrev->next;
-  if (resultPrev)
-  return (ListNode *)InterlockedExchangePointer (&resultPrev->next, resultPrev->next->next);
-  return NULL;
-}
-template <class ListNode> ListNode *
-List<ListNode>::Pop ()
-{
-  return (ListNode *) InterlockedExchangePointer (&head, head->next);
-}
-/* poor mans generic programming. */
-template <class ListNode> void
-List<ListNode>::forEach (void (*callback)(ListNode *))
-{
-  ListNode *aNode = head;
-  while (aNode)
-  {
-    callback (aNode);
-    aNode = aNode->next;
-  }
-}
 
 class pthread_attr:public verifyable_object
 {
@@ -319,7 +316,6 @@ public:
   pthread_t owner;
   int type;
   int pshared;
-  class pthread_mutex * next;
 
   pthread_t GetPthreadSelf () const
   {
@@ -358,11 +354,17 @@ public:
     return 0;
   }
 
-  void fixup_after_fork ();
-
   pthread_mutex (pthread_mutexattr * = NULL);
   pthread_mutex (pthread_mutex_t *, pthread_mutexattr *);
   ~pthread_mutex ();
+
+  class pthread_mutex * next;
+  static void fixup_after_fork ()
+  {
+    mutexes.forEach (&pthread_mutex::FixupAfterFork);
+  }
+
+  void FixupAfterFork ();
 
 private:
   int _Lock (pthread_t self);
@@ -370,6 +372,7 @@ private:
   int _UnLock (pthread_t self);
   int _Destroy (pthread_t self);
 
+  static List<pthread_mutex> mutexes;
   static nativeMutex mutexInitializationLock;
 };
 
@@ -506,16 +509,22 @@ public:
 
   pthread_mutex_t mtxCond;
 
-  class pthread_cond * next;
-
   void UnBlock (const bool all);
   int Wait (pthread_mutex_t mutex, DWORD dwMilliseconds = INFINITE);
-  void fixup_after_fork ();
 
   pthread_cond (pthread_condattr *);
   ~pthread_cond ();
 
+  class pthread_cond * next;
+  static void fixup_after_fork ()
+  {
+    conds.forEach (&pthread_cond::FixupAfterFork);
+  }
+
+  void FixupAfterFork ();
+
 private:
+  static List<pthread_cond> conds;
   static nativeMutex condInitializationLock;
 };
 
@@ -562,14 +571,20 @@ public:
   pthread_cond condReaders;
   pthread_cond condWriters;
 
-  class pthread_rwlock * next;
-
-  void fixup_after_fork ();
-
   pthread_rwlock (pthread_rwlockattr *);
   ~pthread_rwlock ();
 
+  class pthread_rwlock * next;
+  static void fixup_after_fork ()
+  {
+    rwlocks.forEach (&pthread_rwlock::FixupAfterFork);
+  }
+
+  void FixupAfterFork ();
+
 private:
+  static List<pthread_rwlock> rwlocks;
+
   void addReader (struct RWLOCK_READER *rd);
   void removeReader (struct RWLOCK_READER *rd);
   struct RWLOCK_READER *lookupReader (pthread_t thread);
@@ -600,16 +615,25 @@ public:
   static int post (sem_t * sem);
 
   HANDLE win32_obj_id;
-  class semaphore * next;
   int shared;
   long currentvalue;
   void Wait ();
   void Post ();
   int TryWait ();
-  void fixup_after_fork ();
 
   semaphore (int, unsigned int);
   ~semaphore ();
+
+  class semaphore * next;
+  static void fixup_after_fork ()
+  {
+    semaphores.forEach (&semaphore::FixupAfterFork);
+  }
+
+  void FixupAfterFork ();
+
+private:
+  static List<semaphore> semaphores;
 };
 
 class callback
@@ -634,12 +658,6 @@ public:
   callback *pthread_child;
   callback *pthread_parent;
 
-  // lists of pthread objects. USE THREADSAFE INSERTS AND DELETES.
-  class pthread_mutex * mutexs;
-  class pthread_cond  * conds;
-  class pthread_rwlock * rwlocks;
-  class semaphore     * semaphores;
-
   pthread_key reent_key;
   pthread_key thread_self_key;
 
@@ -650,7 +668,6 @@ public:
   MTinterface () :
     concurrency (0), threadcount (1),
     pthread_prepare (NULL), pthread_child (NULL), pthread_parent (NULL),
-    mutexs (NULL), conds (NULL), rwlocks (NULL), semaphores (NULL),
     reent_key (NULL), thread_self_key (NULL)
   {
   }

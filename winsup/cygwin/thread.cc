@@ -217,34 +217,10 @@ MTinterface::fixup_after_fork (void)
   threadcount = 1;
   pthread::initMainThread (true);
 
-  pthread_mutex *mutex = mutexs;
-  debug_printf ("mutexs is %x",mutexs);
-  while (mutex)
-    {
-      mutex->fixup_after_fork ();
-      mutex = mutex->next;
-    }
-  pthread_cond *cond = conds;
-  debug_printf ("conds is %x",conds);
-  while (cond)
-    {
-      cond->fixup_after_fork ();
-      cond = cond->next;
-    }
-  pthread_rwlock *rwlock = rwlocks;
-  debug_printf ("rwlocks is %x",rwlocks);
-  while (rwlock)
-    {
-      rwlock->fixup_after_fork ();
-      rwlock = rwlock->next;
-    }
-  semaphore *sem = semaphores;
-  debug_printf ("semaphores is %x",semaphores);
-  while (sem)
-    {
-      sem->fixup_after_fork ();
-      sem = sem->next;
-    }
+  pthread_mutex::fixup_after_fork ();
+  pthread_cond::fixup_after_fork ();
+  pthread_rwlock::fixup_after_fork ();
+  semaphore::fixup_after_fork ();
 }
 
 /* pthread calls */
@@ -807,6 +783,8 @@ pthread_condattr::~pthread_condattr ()
 {
 }
 
+List<pthread_cond> pthread_cond::conds;
+
 /* This is used for cond creation protection within a single process only */
 nativeMutex NO_COPY pthread_cond::condInitializationLock;
 
@@ -862,8 +840,7 @@ pthread_cond::pthread_cond (pthread_condattr *attr) :
       return;
     }
 
-  /* threadsafe addition is easy */
-  next = (pthread_cond *) InterlockedExchangePointer (&MT_INTERFACE->conds, this);
+  conds.Insert (this);
 }
 
 pthread_cond::~pthread_cond ()
@@ -871,17 +848,7 @@ pthread_cond::~pthread_cond ()
   if (semWait)
     CloseHandle (semWait);
 
-  /* I'm not 100% sure the next bit is threadsafe. I think it is... */
-  if (MT_INTERFACE->conds == this)
-    InterlockedExchangePointer (&MT_INTERFACE->conds, this->next);
-  else
-    {
-      pthread_cond *tempcond = MT_INTERFACE->conds;
-      while (tempcond->next && tempcond->next != this)
-	tempcond = tempcond->next;
-      /* but there may be a race between the loop above and this statement */
-      InterlockedExchangePointer (&tempcond->next, this->next);
-    }
+  conds.Remove (this);
 }
 
 void
@@ -992,7 +959,7 @@ pthread_cond::Wait (pthread_mutex_t mutex, DWORD dwMilliseconds)
 }
 
 void
-pthread_cond::fixup_after_fork ()
+pthread_cond::FixupAfterFork ()
 {
   waiting = pending = 0;
   mtxCond = NULL;
@@ -1003,7 +970,7 @@ pthread_cond::fixup_after_fork ()
 
   semWait = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
   if (!semWait)
-    api_fatal ("pthread_cond::fixup_after_fork () failed to recreate win32 semaphore");
+    api_fatal ("pthread_cond::FixupAfterFork () failed to recreate win32 semaphore");
 }
 
 bool
@@ -1022,6 +989,8 @@ pthread_rwlockattr::pthread_rwlockattr ():verifyable_object
 pthread_rwlockattr::~pthread_rwlockattr ()
 {
 }
+
+List<pthread_rwlock> pthread_rwlock::rwlocks;
 
 /* This is used for rwlock creation protection within a single process only */
 nativeMutex NO_COPY pthread_rwlock::rwlockInitializationLock;
@@ -1078,23 +1047,12 @@ pthread_rwlock::pthread_rwlock (pthread_rwlockattr *attr) :
     }
 
 
-  /* threadsafe addition is easy */
-  next = (pthread_rwlock *) InterlockedExchangePointer (&MT_INTERFACE->rwlocks, this);
+  rwlocks.Insert (this);
 }
 
 pthread_rwlock::~pthread_rwlock ()
 {
-  /* I'm not 100% sure the next bit is threadsafe. I think it is... */
-  if (MT_INTERFACE->rwlocks == this)
-    InterlockedExchangePointer (&MT_INTERFACE->rwlocks, this->next);
-  else
-    {
-      pthread_rwlock *temprwlock = MT_INTERFACE->rwlocks;
-      while (temprwlock->next && temprwlock->next != this)
-	temprwlock = temprwlock->next;
-      /* but there may be a race between the loop above and this statement */
-      InterlockedExchangePointer (&temprwlock->next, this->next);
-    }
+  rwlocks.Remove (this);
 }
 
 int
@@ -1315,7 +1273,7 @@ pthread_rwlock::WrLockCleanup (void *arg)
 }
 
 void
-pthread_rwlock::fixup_after_fork ()
+pthread_rwlock::FixupAfterFork ()
 {
   pthread_t self = pthread::self ();
   struct RWLOCK_READER **temp = &readers;
@@ -1345,42 +1303,6 @@ pthread_rwlock::fixup_after_fork ()
 /* static members */
 /* This stores pthread_key information across fork() boundaries */
 List<pthread_key> pthread_key::keys;
-
-void
-pthread_key::saveAKey (pthread_key *key)
-{
-  key->saveKeyToBuffer ();
-}
-
-void
-pthread_key::fixup_before_fork ()
-{
-  keys.forEach (saveAKey);
-}
-
-void
-pthread_key::restoreAKey (pthread_key *key)
-{
-  key->recreateKeyFromBuffer ();
-}
-
-void
-pthread_key::fixup_after_fork ()
-{
-  keys.forEach (restoreAKey);
-}
-
-void
-pthread_key::destroyAKey (pthread_key *key)
-{
-  key->run_destructor ();
-}
-
-void
-pthread_key::runAllDestructors ()
-{
-  keys.forEach (destroyAKey);
-}
 
 bool
 pthread_key::isGoodObject (pthread_key_t const *key)
@@ -1445,7 +1367,7 @@ pthread_key::recreateKeyFromBuffer ()
 }
 
 void
-pthread_key::run_destructor ()
+pthread_key::runDestructor ()
 {
   if (destructor)
     {
@@ -1528,6 +1450,8 @@ pthread_mutex::canBeUnlocked (pthread_mutex_t const *mutex)
   return (pthread_equal ((*mutex)->owner, self)) && 1 == (*mutex)->recursion_counter;
 }
 
+List<pthread_mutex> pthread_mutex::mutexes;
+
 /* This is used for mutex creation protection within a single process only */
 nativeMutex NO_COPY pthread_mutex::mutexInitializationLock;
 
@@ -1567,8 +1491,7 @@ pthread_mutex::pthread_mutex (pthread_mutexattr *attr) :
       type = attr->mutextype;
     }
 
-  /* threadsafe addition is easy */
-  next = (pthread_mutex *) InterlockedExchangePointer (&MT_INTERFACE->mutexs, this);
+  mutexes.Insert (this);
 }
 
 pthread_mutex::~pthread_mutex ()
@@ -1576,19 +1499,7 @@ pthread_mutex::~pthread_mutex ()
   if (win32_obj_id)
     CloseHandle (win32_obj_id);
 
-  /* I'm not 100% sure the next bit is threadsafe. I think it is... */
-  if (MT_INTERFACE->mutexs == this)
-    /* TODO: printf an error if the return value != this */
-    InterlockedExchangePointer (&MT_INTERFACE->mutexs, next);
-  else
-    {
-      pthread_mutex *tempmutex = MT_INTERFACE->mutexs;
-      while (tempmutex->next && tempmutex->next != this)
-	tempmutex = tempmutex->next;
-      /* but there may be a race between the loop above and this statement */
-      /* TODO: printf an error if the return value != this */
-      InterlockedExchangePointer (&tempmutex->next, this->next);
-    }
+  mutexes.Remove (this);
 }
 
 int
@@ -1665,11 +1576,11 @@ pthread_mutex::_Destroy (pthread_t self)
 }
 
 void
-pthread_mutex::fixup_after_fork ()
+pthread_mutex::FixupAfterFork ()
 {
-  debug_printf ("mutex %x in fixup_after_fork", this);
+  debug_printf ("mutex %x in FixupAfterFork", this);
   if (pshared != PTHREAD_PROCESS_PRIVATE)
-    api_fatal ("pthread_mutex::fixup_after_fork () doesn'tunderstand PROCESS_SHARED mutex's");
+    api_fatal ("pthread_mutex::FixupAfterFork () doesn'tunderstand PROCESS_SHARED mutex's");
 
   if (NULL == owner)
     /* mutex has no owner, reset to initial */
@@ -1680,7 +1591,7 @@ pthread_mutex::fixup_after_fork ()
 
   win32_obj_id = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
   if (!win32_obj_id)
-    api_fatal ("pthread_mutex::fixup_after_fork () failed to recreate win32 semaphore for mutex");
+    api_fatal ("pthread_mutex::FixupAfterFork () failed to recreate win32 semaphore for mutex");
 
   condwaits = 0;
 }
@@ -1702,6 +1613,8 @@ pthread_mutexattr::~pthread_mutexattr ()
 {
 }
 
+List<semaphore> semaphore::semaphores;
+
 semaphore::semaphore (int pshared, unsigned int value):verifyable_object (SEM_MAGIC)
 {
   this->win32_obj_id = ::CreateSemaphore (&sec_none_nih, value, LONG_MAX,
@@ -1710,25 +1623,16 @@ semaphore::semaphore (int pshared, unsigned int value):verifyable_object (SEM_MA
     magic = 0;
   this->shared = pshared;
   currentvalue = value;
-  /* threadsafe addition is easy */
-  next = (semaphore *) InterlockedExchangePointer (&MT_INTERFACE->semaphores, this);
+
+  semaphores.Insert (this);
 }
 
 semaphore::~semaphore ()
 {
   if (win32_obj_id)
     CloseHandle (win32_obj_id);
-  /* I'm not 100% sure the next bit is threadsafe. I think it is... */
-  if (MT_INTERFACE->semaphores == this)
-    InterlockedExchangePointer (&MT_INTERFACE->semaphores, this->next);
-  else
-    {
-      semaphore *tempsem = MT_INTERFACE->semaphores;
-      while (tempsem->next && tempsem->next != this)
-	tempsem = tempsem->next;
-      /* but there may be a race between the loop above and this statement */
-      InterlockedExchangePointer (&tempsem->next, this->next);
-    }
+
+  semaphores.Remove (this);
 }
 
 void
@@ -1769,9 +1673,9 @@ semaphore::Wait ()
 }
 
 void
-semaphore::fixup_after_fork ()
+semaphore::FixupAfterFork ()
 {
-  debug_printf ("sem %x in fixup_after_fork", this);
+  debug_printf ("sem %x in FixupAfterFork", this);
   if (shared != PTHREAD_PROCESS_PRIVATE)
     api_fatal ("doesn't understand PROCESS_SHARED semaphores variables");
   /* FIXME: duplicate code here and in the constructor. */
@@ -2859,7 +2763,7 @@ pthread_sigmask (int operation, const sigset_t *set, sigset_t *old_set)
 
 /* ID */
 
-int
+extern "C" int
 pthread_equal (pthread_t t1, pthread_t t2)
 {
   return t1 == t2;
@@ -2921,7 +2825,7 @@ pthread_mutex_getprioceiling (const pthread_mutex_t *mutex,
   return ENOSYS;
 }
 
-int
+extern "C" int
 pthread_mutex_lock (pthread_mutex_t *mutex)
 {
   pthread_mutex_t *themutex = mutex;
