@@ -1,3 +1,10 @@
+2005-01-20  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/time/strftime.c (strftime): Change %r and %x to be compliant
+	to POSIX standard for "C" locale.  Allow %E and %O modifiers
+	to be ignored as long as they precede valid specifiers according
+	to POSIX.
+
 2005-01-19  Shaun Jackman  <sjackman@gmail.com>
 
 	* libc/stdlib/setenv_r.c (_setenv_r): Call tzset() if the TZ

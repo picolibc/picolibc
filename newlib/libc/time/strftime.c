@@ -86,6 +86,9 @@ The minute, formatted with two digits.
 o %p
 Either `<<AM>>' or `<<PM>>' as appropriate.
 
+o %r
+Equivalent to "%I:%M:%S %p".
+
 o %S
 The second, formatted with two digits.
 
@@ -103,13 +106,11 @@ as beginning with the first Monday in a year.
 
 o
 o %x
-A string representing the complete date, in a format like
-. Mon Apr 01 1992
+A string representing the complete date, equivalent to "%m/%d/%y".
 
 o %X
 A string representing the full time of day (hours, minutes, and
-seconds), in a format like
-. 13:13:13
+seconds), equivalent to "%T".
 
 o %y
 The last two digits of the year.
@@ -145,6 +146,7 @@ ANSI C requires <<strftime>>, but does not specify the contents of
 #include <stddef.h>
 #include <stdio.h>
 #include <time.h>
+#include <string.h>
 #include "local.h"
 
 static _CONST int dname_len[7] =
@@ -186,6 +188,9 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 	break;
 
       format++;
+
+check_format:
+
       switch (*format)
 	{
 	case 'a':
@@ -261,6 +266,22 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 	  else
 	    return 0;
 	  break;
+	case 'E':
+	  ++format;
+	  switch (*format)
+            {
+              case 'c':
+              case 'C':
+              case 'x':
+              case 'X':
+              case 'y':
+              case 'Y':
+	        /* Ignore.  */
+	        goto check_format;
+	      default:
+		--format;
+            }
+          break;
 	case 'e':
 	  if (count < maxsize - 2)
 	    {
@@ -332,9 +353,65 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 	  else
 	    return 0;
 	  break;
+	case 'O':
+	  ++format;
+	  switch (*format)
+            {
+              case 'd':
+              case 'e':
+              case 'H':
+              case 'I':
+              case 'm':
+              case 'M':
+              case 'S':
+              case 'u':
+              case 'U':
+              case 'V':
+              case 'w':
+              case 'W':
+              case 'y':
+	        /* Ignore.  */
+	        goto check_format;
+	      default:
+		--format;
+            }
+          break;
 	case 'p':
 	  if (count < maxsize - 2)
 	    {
+	      if (tim_p->tm_hour < 12)
+		s[count++] = 'A';
+	      else
+		s[count++] = 'P';
+
+	      s[count++] = 'M';
+	    }
+	  else
+	    return 0;
+	  break;
+	case 'r':
+	  if (count < maxsize - 11)
+	    {
+	      if (tim_p->tm_hour == 0 ||
+		  tim_p->tm_hour == 12)
+		{
+		  s[count++] = '1';
+		  s[count++] = '2';
+		}
+	      else
+		{
+		  sprintf (&s[count], "%.2d", tim_p->tm_hour % 12);
+		  count += 2;
+		}
+	      s[count++] = ':';
+	      sprintf (&s[count], "%2.2d",
+		       tim_p->tm_min);
+	      count += 2;
+	      s[count++] = ':';
+	      sprintf (&s[count], "%2.2d",
+		       tim_p->tm_sec);
+	      count += 2;
+	      s[count++] = ' ';
 	      if (tim_p->tm_hour < 12)
 		s[count++] = 'A';
 	      else
@@ -389,20 +466,22 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 	    return 0;
 	  break;
 	case 'x':
-	  if (count < maxsize - 15)
+	  if (count < maxsize - 8)
 	    {
-	      for (i = 0; i < 3; i++)
-		s[count++] =
-		  dname[tim_p->tm_wday][i];
-	      s[count++] = ' ';
-	      for (i = 0; i < 3; i++)
-		s[count++] =
-		  mname[tim_p->tm_mon][i];
-
-	      sprintf (&s[count],
-		       " %.2d %.4d", tim_p->tm_mday,
-		       1900 + tim_p->tm_year);
-	      count += 8;
+	      sprintf (&s[count], "%.2d",
+		       tim_p->tm_mon + 1);
+	      count += 2;
+	      s[count++] = '/';
+	      sprintf (&s[count], "%.2d",
+		       tim_p->tm_mday);
+	      count += 2;
+	      s[count++] = '/';
+	      /* The year could be greater than 100, so we need the value
+		 modulo 100.  The year could be negative, so we need to
+		 correct for a possible negative remainder.  */
+	      sprintf (&s[count], "%2.2d",
+		       (tim_p->tm_year % 100 + 100) % 100);
+	      count += 2;
 	    }
 	  else
 	    return 0;
