@@ -376,7 +376,7 @@ sigaction (int sig, const struct sigaction *newact, struct sigaction *oldact)
       if (sig == SIGCHLD)
 	{
 	  myself->process_state &= ~PID_NOCLDSTOP;
-	  if (newact->sa_flags & SA_NOCLDSTOP);
+	  if (newact->sa_flags & SA_NOCLDSTOP)
 	    myself->process_state |= PID_NOCLDSTOP;
 	}
     }
