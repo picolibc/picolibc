@@ -1,3 +1,16 @@
+2003-11-27  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* lib/vfw32.def: Remove, replacing with ...
+	* lib/msvfw32.def: New file.
+	* lib/avicap32.def: New file.
+	* lib/avifil32.def: New file.
+	* lib/vfw32.mri: New file.
+	* Makefile.in: (MRI_FILES, MIMPLIBS): New vars for
+	import libs with multiple dll's.
+	(LIBS): Add MIMPLIBS.
+	(DISTFILES): Add MRI_FILES.
+	(libvfw32.a): Build using mri script.
+
 2003-11-23  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winnt.h (PAGE_*): Group defines together. Change

@@ -110,9 +110,11 @@ GL_HEADERS = $(notdir $(wildcard $(srcdir)/../include/GL/*.h))
 # libraries
 
 DEF_FILES = $(notdir $(wildcard $(srcdir)/*.def))
+MRI_FILES = $(notdir $(wildcard $(srcdir)/*.mri))
 IMPLIBS = $(addprefix lib,$(subst .def,.a,$(DEF_FILES)))
+MIMPLIBS = $(addprefix lib,$(subst .mri,.a,$(MRI_FILES)))
 EXTRA_LIBS=libuuid.a libscrnsave.a libscrnsavw.a libdxguid.a liblargeint.a
-LIBS = $(IMPLIBS) $(EXTRA_LIBS)
+LIBS = $(IMPLIBS) $(MIMPLIBS) $(EXTRA_LIBS)
 UUID_OBJS = uuid.o mshtml-uuid.o
 EXTRA_OBJS = shell32.o dxguid.o scrnsave.o scrnsavw.o largeint.o \
 	$(UUID_OBJS) dinput.o kernel32.o
@@ -120,7 +122,7 @@ UUID_SOURCES = uuid.c mshtml-uuid.c
 SOURCES = scrnsave.c shell32.c  largeint.c dinput.c $(UUID_SOURCES)\
 dxguid.c res.rc test.c kernel32.c
 
-DISTFILES = Makefile.in $(DEF_FILES) $(SOURCES)
+DISTFILES = Makefile.in $(DEF_FILES) $(MRI_FILES) $(SOURCES)
 
 .NOTPARALLEL:
 
@@ -164,6 +166,15 @@ scrnsavw.o: scrnsave.c
 
 libuuid.a : $(UUID_OBJS)
 	$(AR) rc $@ $(UUID_OBJS)
+	$(RANLIB) $@
+
+# libvfw32.a contains import stubs for 3 dll's.  Using an MRI script
+# seems to be the simplest way to combine them into one archive.
+# NB: With older dlltool, the object file members will not have unique
+# names.
+libvfw32.a : libmsvfw32.a libavifil32.a libavicap32.a vfw32.mri
+	rm -f $@
+	$(AR) -M < vfw32.mri
 	$(RANLIB) $@
 
 lib%.a : %.def %.o
