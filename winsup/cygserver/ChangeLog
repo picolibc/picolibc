@@ -1,5 +1,10 @@
 2004-07-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* transport.cc (transport_layer_base::~transport_layer_base): Remove.
+	* transport.h (transport_layer_base::~transport_layer_base): Ditto.
+
+2004-07-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* bsd_mutex.cc (win_priority): Actually calculate p from priority.
 
 2004-06-03  Corinna Vinschen  <corinna@vinschen.de>
