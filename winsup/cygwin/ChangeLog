@@ -1,6 +1,6 @@
 2003-01-22  Thomas Pfaff  <tpfaff@gmx.net>
 
-	* include/pthread.h (PTHREAD_MUTEX_RECURSIVE):	Revert changes from
+	* include/pthread.h (PTHREAD_MUTEX_RECURSIVE): Revert changes from
 	2003-01-09 mutex patch.
 	(PTHREAD_MUTEX_ERRORCHECK): Ditto.
 
