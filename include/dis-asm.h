@@ -159,6 +159,18 @@ typedef struct disassemble_info {
      Normally one, but some DSPs have byte sizes of 16 or 32 bits.  */
   unsigned int octets_per_byte;
 
+  /* The number of zeroes we want to see at the end of a section before we
+     start skipping them.  */
+  unsigned int skip_zeroes;
+
+  /* The number of zeroes to skip at the end of a section.  If the number
+     of zeroes at the end is between SKIP_ZEROES_AT_END and SKIP_ZEROES,
+     they will be disassembled.  If there are fewer than
+     SKIP_ZEROES_AT_END, they will be skipped.  This is a heuristic
+     attempt to avoid disassembling zeroes inserted by section
+     alignment.  */
+  unsigned int skip_zeroes_at_end;
+
   /* Results from instruction decoders.  Not all decoders yet support
      this information.  This info is set each time an instruction is
      decoded, and is only valid for the last such instruction.

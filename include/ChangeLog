@@ -1,3 +1,8 @@
+2005-01-10  Andreas Schwab  <schwab@suse.de>
+
+	* dis-asm.h (struct disassemble_info): Add skip_zeroes and
+	skip_zeroes_at_end.
+
 2004-12-11  Ben Elliston  <bje@au.ibm.com>
 
 	* fibheap.h (struct fibnode): Only use unsigned long bitfields
