@@ -161,12 +161,16 @@ typedef int sigjmp_buf[_JBLEN+2];
 #define _SAVEMASK	_JBLEN
 #define _SIGMASK	(_JBLEN+1)
 
-#define sigsetjmp(env, savemask) (env[_SAVEMASK] = savemask,\
-               sigprocmask (SIG_SETMASK, 0, (sigset_t *) &env[_SIGMASK]),\
+#ifdef __CYGWIN__
+# define _CYGWIN_WORKING_SIGSETJMP
+#endif
+
+#define sigsetjmp(env, savemask) ((env)[_SAVEMASK] = savemask,\
+               sigprocmask (SIG_SETMASK, 0, (sigset_t *) ((env) + _SIGMASK)),\
                setjmp (env))
 
-#define siglongjmp(env, val) (((env[_SAVEMASK])?\
-               sigprocmask (SIG_SETMASK, (sigset_t *) &env[_SIGMASK], 0):0),\
+#define siglongjmp(env, val) ((((env)[_SAVEMASK])?\
+               sigprocmask (SIG_SETMASK, (sigset_t *) ((env) + _SIGMASK), 0):0),\
                longjmp (env, val))
 
 #endif /* __CYGWIN__ or __rtems__ */

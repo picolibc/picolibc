@@ -1,3 +1,11 @@
+Mon Aug 13 22:26:01 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* libc/include/machine/setjmp.h: Protect sigsetjmp/siglongjmp macro
+	arguments.
+
+	* libc/include/sys/errno.h: Declare sys_errlist and sys_nerr, under
+	Cygwin.
+
 2001-08-13  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/malloc.h (M_MXFAST, M_NLBLKS, M_GRAIN, M_KEEP): New
