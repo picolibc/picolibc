@@ -51,9 +51,9 @@ size_t	 _EXFUN(strxfrm,(char *, const char *, size_t));
 #ifndef __STRICT_ANSI__
 char 	*_EXFUN(strtok_r,(char *, const char *, char **));
 
-int	 _EXFUN(bcmp,(const char *, const char *, size_t));
-void	 _EXFUN(bcopy,(const char *, char *, size_t));
-void	 _EXFUN(bzero,(char *, size_t));
+int	 _EXFUN(bcmp,(const void *, const void *, size_t));
+void	 _EXFUN(bcopy,(const void *, void *, size_t));
+void	 _EXFUN(bzero,(void *, size_t));
 int	 _EXFUN(ffs,(int));
 char 	*_EXFUN(index,(const char *, int));
 _PTR	 _EXFUN(memccpy,(_PTR, const _PTR, int, size_t));

@@ -7,17 +7,17 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <string.h>
-	int bcmp(const char *<[s1]>, const char *<[s2]>, size_t <[n]>);
+	int bcmp(const void *<[s1]>, const void *<[s2]>, size_t <[n]>);
 
 TRAD_SYNOPSIS
 	#include <string.h>
 	int bcmp(<[s1]>, <[s2]>, <[n]>)
-	char *<[s1]>;
-	char *<[s2]>;
+	const void *<[s1]>;
+	const void *<[s2]>;
 	size_t <[n]>;
 
 DESCRIPTION
-	This function compares not more than <[n]> characters of the
+	This function compares not more than <[n]> bytes of the
 	object pointed to by <[s1]> with the object pointed to by <[s2]>.
 
 	This function is identical to <<memcmp>>.
@@ -41,8 +41,8 @@ QUICKREF
 
 int
 _DEFUN (bcmp, (m1, m2, n),
-	_CONST char *m1 _AND
-	_CONST char *m2 _AND
+	_CONST void *m1 _AND
+	_CONST void *m2 _AND
 	size_t n)
 
 {

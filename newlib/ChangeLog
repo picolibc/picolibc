@@ -1,3 +1,11 @@
+2002-05-23  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/include/string.h (bcmp, bcopy, bzero): Change prototypes
+        to use void * pointers and comply with Single Unix spec.
+        * libc/string/bcmp.c: Change to use void * instead of char *.
+        * libc/string/bcopy.c: Ditto.
+        * libc/string/bzero.c: Ditto.
+
 2002-05-22  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/linux/shm_open.c: New file.
