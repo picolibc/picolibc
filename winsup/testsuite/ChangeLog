@@ -1,3 +1,9 @@
+2004-03-04  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* winsup.api/pthread/mutex8e.c: New testcase.
+	* winsup.api/pthread/mutex8n.c: Ditto.
+	* winsup.api/pthread/mutex8r.c: Ditto.
+
 2003-12-23  Christopher Faylor  <cgf@redhat.com>
 
 	* winsup.api/pthread/rwlock7.c (main): Don't assume that result of rand
