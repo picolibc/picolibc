@@ -27,57 +27,51 @@
 #define EF_SH1		   1
 #define EF_SH2		   2
 #define EF_SH3		   3
-#define EF_SH_HAS_DSP(flags) (((flags) & EF_SH_MACH_MASK & ~3) == 4)
 #define EF_SH_DSP	   4
 #define EF_SH3_DSP	   5
 #define EF_SH4AL_DSP	   6
-#define EF_SH_HAS_FP(flags) ((flags) & 8)
 #define EF_SH3E		   8
 #define EF_SH4		   9
 #define EF_SH2E            11
 #define EF_SH4A		   12
 
-#define EF_SH4_NOFPU	   0x10
-#define EF_SH4A_NOFPU	   0x11
-#define EF_SH4_NOMMU_NOFPU 0x12
+#define EF_SH4_NOFPU	   16
+#define EF_SH4A_NOFPU	   17
+#define EF_SH4_NOMMU_NOFPU 18
+#define EF_SH3_NOMMU       20
 
 /* This one can only mix in objects from other EF_SH5 objects.  */
 #define EF_SH5		  10
 
-#define EF_SH_MERGE_MACH(mach1, mach2) \
-  (((((mach1) == EF_SH3 || (mach1) == EF_SH_UNKNOWN) && (mach2) == EF_SH_DSP) \
-    || ((mach1) == EF_SH_DSP \
-	&& ((mach2) == EF_SH3 || (mach2) == EF_SH_UNKNOWN))) \
-   ? EF_SH3_DSP \
-   : (((mach1) < EF_SH3 && (mach2) == EF_SH_UNKNOWN) \
-      || ((mach2) < EF_SH3 && (mach1) == EF_SH_UNKNOWN)) \
-   ? EF_SH3 \
-   : ((mach1) == EF_SH2E && EF_SH_HAS_FP (mach2)) \
-   ? (mach2) \
-   : ((mach2) == EF_SH2E && EF_SH_HAS_FP (mach1)) \
-   ? (mach1) \
-   : (((mach1) == EF_SH2E && (mach2) == EF_SH_UNKNOWN) \
-      || ((mach2) == EF_SH2E && (mach1) == EF_SH_UNKNOWN)) \
-   ? EF_SH2E \
-   : (((mach1) == EF_SH3E && (mach2) == EF_SH_UNKNOWN) \
-      || ((mach2) == EF_SH3E && (mach1) == EF_SH_UNKNOWN)) \
-   ? EF_SH4 \
-   /* ??? SH4?  Why not SH3E?  */ \
-   : ((((mach1) == EF_SH4_NOFPU || (mach1) == EF_SH4A_NOFPU) \
-       && EF_SH_HAS_DSP (mach2)) \
-      || (((mach2) == EF_SH4_NOFPU || (mach2) == EF_SH4A_NOFPU) \
-	  && EF_SH_HAS_DSP (mach1))) \
-   ? EF_SH4AL_DSP \
-   : ((mach1) == EF_SH4_NOFPU && EF_SH_HAS_FP (mach2)) \
-   ? ((mach2) < EF_SH4A) ? EF_SH4 : (mach2) \
-   : ((mach2) == EF_SH4_NOFPU && EF_SH_HAS_FP (mach1)) \
-   ? ((mach1) < EF_SH4A) ? EF_SH4 : (mach1) \
-   : ((mach1) == EF_SH4A_NOFPU && EF_SH_HAS_FP (mach2)) \
-   ? ((mach2) <= EF_SH4A) ? EF_SH4A : (mach2) \
-   : ((mach2) == EF_SH4A_NOFPU && EF_SH_HAS_FP (mach1)) \
-   ? ((mach1) <= EF_SH4A) ? EF_SH4A : (mach1) \
-   : (((mach1) == EF_SH2E ? 7 : (mach1)) > ((mach2) == EF_SH2E ? 7 : (mach2)) \
-      ? (mach1) : (mach2)))
+/* Define the mapping from ELF to bfd mach numbers.
+   bfd_mach_* are defined in bfd_in2.h (generated from
+   archures.c).  */
+#define EF_SH_BFD_TABLE \
+/* EF_SH_UNKNOWN	*/ bfd_mach_sh3		, \
+/* EF_SH1		*/ bfd_mach_sh		, \
+/* EF_SH2		*/ bfd_mach_sh2		, \
+/* EF_SH3		*/ bfd_mach_sh3		, \
+/* EF_SH_DSP		*/ bfd_mach_sh_dsp	, \
+/* EF_SH3_DSP		*/ bfd_mach_sh3_dsp	, \
+/* EF_SHAL_DSP		*/ bfd_mach_sh4al_dsp	, \
+/* 7			*/ 0, \
+/* EF_SH3E		*/ bfd_mach_sh3e	, \
+/* EF_SH4		*/ bfd_mach_sh4		, \
+/* EF_SH5		*/ 0, \
+/* EF_SH2E		*/ bfd_mach_sh2e	, \
+/* EF_SH4A		*/ bfd_mach_sh4a	, \
+/* 13, 14, 15		*/ 0, 0, 0, \
+/* EF_SH4_NOFPU		*/ bfd_mach_sh4_nofpu	, \
+/* EF_SH4A_NOFPU	*/ bfd_mach_sh4a_nofpu	, \
+/* EF_SH4_NOMMU_NOFPU	*/ bfd_mach_sh4_nommu_nofpu, \
+/* 19			*/ 0, \
+/* EF_SH3_NOMMU		*/ bfd_mach_sh3_nommu
+
+/* Convert arch_sh* into EF_SH*.  */
+int sh_find_elf_flags (unsigned int arch_set);
+
+/* Convert bfd_mach_* into EF_SH*.  */
+int sh_elf_get_flags_from_mach (unsigned long mach);
 
 /* Flags for the st_other symbol field.
    Keep away from the STV_ visibility flags (bit 0..1).  */
