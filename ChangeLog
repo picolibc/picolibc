@@ -1,3 +1,8 @@
+2003-04-26  Daniel Jacobowitz  <drow@mvista.com>
+
+	* src-release (BINUTILS_SUPPORT_DIRS): Remove "cpu", since it is
+	still unused.
+
 2003-04-18  Gerald Pfeifer  <pfeifer@dbai.tuwien.ac.at>
 
 	* Makefile.tpl (MAKEINFOFLAGS): Default to --split-size=5000000.
