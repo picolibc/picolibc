@@ -542,7 +542,7 @@ path_conv::check (const char *src, unsigned opt,
       /* Detect if the user was looking for a directory.  We have to strip the
 	 trailing slash initially while trying to add extensions but take it
 	 into account during processing */
-      if (tail > path_copy + 1 && isslash (tail[-1]))
+      if (tail > path_copy + 2 && isslash (tail[-1]))
 	{
 	  need_directory = 1;
 	  *--tail = '\0';
