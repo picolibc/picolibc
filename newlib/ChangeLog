@@ -1,5 +1,10 @@
 2001-01-23  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/include/math.h (signgam): Regress previous fix as
+	it does not handle programs with extern int signgam in them.
+
+2001-01-23  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/include/math.h (signgam): Changed to a macro refering to
 	its location in the reentrant structure.
 
