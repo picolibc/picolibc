@@ -41,7 +41,6 @@ details. */
 #define TM_OCTOBER	9
 #define TM_NOVEMBER	10
 #define TM_DECEMBER	11
-#define TM_SUNDAY	0
 
 #define TM_YEAR_BASE	1900
 

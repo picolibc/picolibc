@@ -303,7 +303,7 @@ static char	tzfilehid[] = "@(#)tzfile.h	7.14";
 */
 
 #ifndef TZDIR
-#define TZDIR	"/usr/local/etc/zoneinfo" /* Time zone object file directory */
+#define TZDIR	"/usr/share/zoneinfo" /* Time zone object file directory */
 #endif /* !defined TZDIR */
 
 #ifndef TZDEFAULT

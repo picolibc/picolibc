@@ -1,3 +1,9 @@
+2003-12-01  Dr. Volker Zell  <Dr.Volker.Zell@oracle.com>
+
+	* include/tzfile.h: Remove duplicate definition of TM_SUNDAY.
+	* localtime.cc: Point TZDIR to the /usr/share/zoneinfo directory used
+	by the tzcode package.
+
 2003-11-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* flock.cc: Renamed from flock.c.
