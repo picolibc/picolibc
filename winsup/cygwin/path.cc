@@ -179,10 +179,19 @@ pathmatch (const char *path1, const char *path2)
   				      : strcasematch (path1, path2);
 }
 
-#define add_ext_from_sym(sym) \
-  (void)(sym.ext_here && *sym.ext_here && \
-  	  ( known_suffix = this->path + sym.extn, \
-	    (sym.ext_tacked_on && strcpy (known_suffix, sym.ext_here))))
+#define add_ext_from_sym(s) \
+		(add_ext_from_sym_ (this->path, this->known_suffix, s))
+
+inline void
+add_ext_from_sym_ (char *path, char *known_suffix, symlink_info &sym)
+{
+  if (sym.ext_here && *sym.ext_here)
+    {
+      known_suffix = path + sym.extn;
+      if (sym.ext_tacked_on)
+        strcpy (known_suffix, sym.ext_here);
+    }
+}
 
 /* Convert an arbitrary path SRC to a pure Win32 path, suitable for
    passing to Win32 API routines.
