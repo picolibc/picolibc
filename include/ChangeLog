@@ -1,3 +1,7 @@
+2004-07-07  Tomer Levi  <Tomer.Levi@nsc.com>
+
+	* dis-asm.h (print_insn_crx): Declare.
+
 2004-06-24  Alan Modra  <amodra@bigpond.net.au>
 
 	* bfdlink.h (struct bfd_link_order): Update comment.

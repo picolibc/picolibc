@@ -1,3 +1,8 @@
+2004-07-06  Tomer Levi  <Tomer.Levi@nsc.com>
+
+	* common.h (EM_CRX): Define.
+	* crx.h: New file.
+
 2004-06-25  Kazuhiro Inaoka  <inaoka.kazuhiro@renesas.com>
 
 	* m32r.h: Add defintions of R_M32R_GOTOFF_HI_ULO,
