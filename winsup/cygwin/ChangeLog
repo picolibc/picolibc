@@ -1,3 +1,8 @@
+2003-03-30  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/fs.h: Remove unneeded include.
+	* include/cygwin/in.h: Include sys/types.h rather than cygwin/types.h.
+
 2003-03-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (login): Fix comment.
@@ -514,7 +519,7 @@
 
 2003-03-17  Corinna Vinschen  <corinna@vinschen.de>
 
-	* glob.c (g_lstat): Change API minor test to match API minor number 
+	* glob.c (g_lstat): Change API minor test to match API minor number
 	change in previous patch.
 	(g_stat): Ditto.
 

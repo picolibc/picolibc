@@ -1,6 +1,6 @@
 /* cygwin/fs.h
 
-   Copyright 2002 Red Hat Inc.
+   Copyright 2002, 2003 Red Hat Inc.
    Written by Chris January <chris@atomice.net>
 
 This file is part of Cygwin.
@@ -11,8 +11,6 @@ details. */
 
 #ifndef _CYGWIN_FS_H_
 #define _CYGWIN_FS_H_
-
-#include <cygwin/types.h>
 
 #define BLKRRPART  0x0000125f
 #define BLKGETSIZE 0x00001260
