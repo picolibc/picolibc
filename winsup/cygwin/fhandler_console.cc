@@ -680,8 +680,7 @@ fhandler_console::close (void)
   if (!cygheap->fdtab.in_vfork_cleanup () && --(cygheap->open_fhs) <= 0
       && myself->ctty != TTY_CONSOLE)
     {
-      syscall_printf ("open_fhs %d, freeing console %p", cygheap->open_fhs,
-		      myself->ctty);
+      syscall_printf ("open_fhs %d", cygheap->open_fhs);
       FreeConsole ();
     }
   debug_printf ("decremented open_fhs, now %d", cygheap->open_fhs);
@@ -1761,6 +1760,7 @@ fhandler_console::fixup_after_fork (HANDLE)
   /* Windows does not allow duplication of console handles between processes
      so open the console explicitly. */
 
+  cygheap->open_fhs--;		/* The downside of storing this in cygheap. */
   if (!open (O_NOCTTY | get_flags (), 0))
     system_printf ("error opening console after fork, %E");
 
@@ -1791,6 +1791,7 @@ fhandler_console::fixup_after_exec (HANDLE)
   HANDLE h = get_handle ();
   HANDLE oh = get_output_handle ();
 
+  cygheap->open_fhs--;		/* The downside of storing this in cygheap. */
   if (!open (O_NOCTTY | get_flags (), 0))
     {
       int sawerr = 0;
