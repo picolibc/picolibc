@@ -1,3 +1,7 @@
+Thu Oct  4 22:19:39 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* winsup.api/systemcall.c: New file.  Check for system call problems.
+
 2001-09-20  Egor Duda  <deo@logos-m.ru>
 
 	* libltp/lib/get_high_address.c (get_high_address): Get inaccessible
