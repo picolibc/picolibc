@@ -1,7 +1,7 @@
 Mon Nov  6 01:04:35 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* child_info.h (child_info): Add pppid_handle for closing the parent's
-	of the parent handle.
+	parent handle.
 	* dcrt0.cc (_dll_crt0): Close parent's parent handle when spawned or
 	forked.
 	* debug.cc (add_handle): Correct erroneous reference to handle
@@ -17,7 +17,7 @@ Mon Nov  6 01:04:35 2000  Christopher Faylor <cgf@cygnus.com>
 	* fork.cc (fork_parent): Move a lot of the setup of the child process
 	into proc_subproc.
 	* spawn.cc (spawn_guts): Ditto.  Use ppid_handle to contact logical
-	parent when reparenting.
+	parent when reparenting execed process.
 	* pinfo.h (_pinfo): Remember the logical handle of the parent process.
 	* sigproc.cc (proc_subproc): Record most stuff necessary for the _pinfo
 	structure that is inferrable from myself when adding children.
