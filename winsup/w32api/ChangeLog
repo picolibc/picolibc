@@ -1,3 +1,11 @@
+2002-11-15  Weiqi Gao  <weiqigao@users.sourceforge.net>
+
+	* lib/uuid.c (CLSID_PSClassObject, CLSID_PSEnumerators,
+	IID_IClassActivator, IID_IClientSecurity, IID_ICreateTypeInfo,
+	IID_ICreateTypeLib2, IID_IOleInPlaceSite, IID_IPersistStorage,
+	IID_IRunnableObject, IID_IServerSecurity, IID_IStdMarshalInfo):
+	Correct definitions.
+
 2002-11-15  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/ddk/(atm.h, batclass.h, cfg.h, cfgmgr32.h, d4drvif.h,
