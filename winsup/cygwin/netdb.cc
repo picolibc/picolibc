@@ -133,15 +133,7 @@ delimit tokens.  */
 static const NO_COPY char *SPACE = " \t\n\r\f";
 
 /* Parse a list aliases from a network database file.  Returns a
-char** structure terminated by a NULL.
-
-N.B. This routine relies on side effects due to the nature of
-strtok_r().  strtok_r() initially takes a char * pointing to the start of
-a line, and then NULL to indicate continued processing.  strtok_r() does
-not provide a mechanism for getting pointer to the unprocessed portion
-of a line.  Alias processing is done part way through a line after
-strtok_r().  This routine relies on further calls to strtok_r(), passing
-NULL as the first parameter, returning alias names from the line. */
+char** structure terminated by a NULL. */
 static void
 parse_alias_list (char ***aliases, char **lasts)
 {

@@ -1,3 +1,7 @@
+2002-12-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* netdb.cc: Remove strtok_r comment.
+
 2002-12-14  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* security.cc (get_user_local_groups): Use LookupAccountSid to find the
