@@ -1,3 +1,17 @@
+2004-04-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (class fhandler_socket): Remove has_been_closed member.
+	* fhandler_socket.cc (fhandler_socket::recvfrom): Revert to
+	overlapped I/O.
+	(fhandler_socket::recvmsg): Ditto.
+	(fhandler_socket::sendto): Ditto.
+	(fhandler_socket::sendmsg): Ditto.
+	* net.cc (wsock_event::prepare): Ditto.
+	(wsock_event::wait): Ditto.  Evaluate overlapped result also after
+	calling CancelIo (thanks to Patrick Samson <p_samson@yahoo.com>).
+	(wsock_event::release): Remove.
+	* wsock_event.h: Revert to overlapped I/O.
+
 2004-04-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (wsock_event::release): Use NULL handle in call to

@@ -14,13 +14,19 @@ details. */
 class wsock_event
 {
   WSAEVENT		event;
+  WSAOVERLAPPED		ovr;
 public:
   wsock_event () : event (NULL) {};
+  ~wsock_event ()
+    {
+      if (event)
+	WSACloseEvent (event);
+      event = NULL;
+    };
 
   /* The methods are implemented in net.cc */
-  bool prepare (int sock, long event_mask);
-  int wait (int sock, int &closed);
-  void release (int sock);
+  LPWSAOVERLAPPED prepare ();
+  int wait (int socket, LPDWORD flags);
 };
 
 #endif /* __WSOCK_EVENT_H__ */

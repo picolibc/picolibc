@@ -377,7 +377,6 @@ class fhandler_socket: public fhandler_base
   struct _WSAPROTOCOL_INFOA *prot_info_ptr;
   char *sun_path;
   int had_connect_or_listen;
-  int has_been_closed;
 
  public:
   fhandler_socket ();

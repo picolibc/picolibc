@@ -50,83 +50,59 @@ extern "C"
   int sscanf (const char *, const char *, ...);
 }				/* End of "C" section */
 
-bool
-wsock_event::prepare (int sock, long event_mask)
+LPWSAOVERLAPPED
+wsock_event::prepare ()
 {
-  WSASetLastError (0);
-  if ((event = WSACreateEvent ()) == WSA_INVALID_EVENT)
-    debug_printf ("WSACreateEvent: %E");
-  else if (WSAEventSelect (sock, event, event_mask) == SOCKET_ERROR)
-    {
-      debug_printf ("WSAEventSelect: %E");
-      WSACloseEvent (event);
-      event = WSA_INVALID_EVENT;
-    }
-  return event != WSA_INVALID_EVENT;
-}
+  LPWSAOVERLAPPED ret = NULL;
 
-int
-wsock_event::wait (int sock, int &closed)
-{
-  int ret = SOCKET_ERROR;
-  int wsa_err = 0;
-  WSAEVENT ev[2] = { event, signal_arrived };
-  switch (WSAWaitForMultipleEvents (2, ev, FALSE, WSA_INFINITE, FALSE))
+  SetLastError (0);
+  if ((event = WSACreateEvent ()) != WSA_INVALID_EVENT)
     {
-      case WSA_WAIT_EVENT_0:
-        WSANETWORKEVENTS evts;
-	if (!WSAEnumNetworkEvents (sock, event, &evts))
-	  {
-	    if (evts.lNetworkEvents & FD_READ)
-	      {
-		if (evts.iErrorCode[FD_READ_BIT])
-		  wsa_err = evts.iErrorCode[FD_READ_BIT];
-		else
-		  ret = 0;
-	      }
-	    else if (evts.lNetworkEvents & FD_WRITE)
-	      {
-		if (evts.iErrorCode[FD_WRITE_BIT])
-		  wsa_err = evts.iErrorCode[FD_WRITE_BIT];
-		else
-		  ret = 0;
-	      }
-	    if (evts.lNetworkEvents & FD_CLOSE)
-	      {
-		closed = 1;
-		if (!wsa_err)
-		  {
-		    if (evts.iErrorCode[FD_CLOSE_BIT])
-		      wsa_err = evts.iErrorCode[FD_CLOSE_BIT];
-		    else
-		      ret = 0;
-		  }
-	      }
-	    if (wsa_err)
-	      WSASetLastError (wsa_err);
-	  }
-	break;
-      case WSA_WAIT_EVENT_0 + 1:
-        WSASetLastError (WSAEINTR);
-	break;
-      default:
-	WSASetLastError (WSAEFAULT);
+      memset (&ovr, 0, sizeof ovr);
+      ovr.hEvent = event;
+      ret = &ovr;
     }
+  else if (GetLastError () == ERROR_PROC_NOT_FOUND) /* winsock2 not available */
+    WSASetLastError (0);
+
+  debug_printf ("%d = wsock_event::prepare ()", ret);
   return ret;
 }
 
-void
-wsock_event::release (int sock)
+int
+wsock_event::wait (int socket, LPDWORD flags)
 {
-  int last_err = WSAGetLastError ();
-  /* KB 168349: NT4 fails if the event parameter is not NULL. */
-  WSAEventSelect (sock, NULL, 0);
+  int ret = SOCKET_ERROR;
+  WSAEVENT ev[2] = { event, signal_arrived };
+  DWORD len;
+
+  switch (WSAWaitForMultipleEvents (2, ev, FALSE, WSA_INFINITE, FALSE))
+    {
+      case WSA_WAIT_EVENT_0:
+	if (WSAGetOverlappedResult (socket, &ovr, &len, FALSE, flags))
+	  ret = (int) len;
+	break;
+      case WSA_WAIT_EVENT_0 + 1:
+	if (!CancelIo ((HANDLE) socket))
+	  {
+	    debug_printf ("CancelIo() %E, fallback to blocking io");
+	    WSAGetOverlappedResult (socket, &ovr, &len, TRUE, flags);
+	  }
+	else if (WSAGetOverlappedResult (socket, &ovr, &len, FALSE, flags)
+	         && len > 0)
+	  ret = (int) len;
+	else
+	  WSASetLastError (WSAEINTR);
+	break;
+      case WSA_WAIT_FAILED:
+	break;
+      default:			/* Should be impossible. *LOL* */
+	WSASetLastError (WSAEFAULT);
+	break;
+    }
   WSACloseEvent (event);
-  unsigned long non_block = 0;
-  if (ioctlsocket (sock, FIONBIO, &non_block))
-    debug_printf ("return to blocking failed: %d", WSAGetLastError ());
-  else
-    WSASetLastError (last_err);
+  event = NULL;
+  return ret;
 }
 
 WSADATA wsadata;
