@@ -1,5 +1,27 @@
 2003-10-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/winbase.h (CancelDeviceWakeupRequest): Add function.
+
+	* include/winbase.h [_WIN32_WINNT >= 0x0501]
+	(CreateMemoryResourceNotification, DeactivateActCtx): Add functions.
+
+	* include/winbase.h [_WIN32_WINNT >= 0x0500] (CreateTimerQueue,
+	CreateTimerQueueTimer): Add function.
+
+	* include/winbase.h [_WIN32_WINNT >= 0x0501]
+	(MEMORY_RESOURCE_NOTIFICATION_TYPE): Add enumeration.
+
+	* include/winbase.h [_WIN32_WINNT >= 0x0501]
+	(DEACTIVATE_ACTCTX_FLAG_FORCE_EARLY_DEACTIVATION): Add constant.
+
+	* include/winnt.h (WT_*): Add constants.
+
+	* lib/user32.def (CancelDeviceWakeupRequest,
+	CreateMemoryResourceNotification, CreateTimerQueueTimer,
+	DeactivateActCtx): Add functions.
+
+2003-10-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winbase.h [_WIN32_WINNT >= 0x0400] (ConvertFiberToThread):
 	Add function. Sometimes I don't understand MSDN. This function is
 	available on Windows XP and Server 2003, but the SDK is supposed to

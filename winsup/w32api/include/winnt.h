@@ -1264,6 +1264,14 @@ typedef DWORD FLONG;
 #define VER_SUITE_DATACENTER 128
 #define VER_SUITE_PERSONAL 512
 #define VER_SUITE_BLADE 1024
+#define WT_EXECUTEDEFAULT 0x00000000                           
+#define WT_EXECUTEINIOTHREAD 0x00000001                           
+#define WT_EXECUTEINWAITTHREAD 0x00000004                           
+#define WT_EXECUTEONLYONCE 0x00000008                           
+#define WT_EXECUTELONGFUNCTION 0x00000010                           
+#define WT_EXECUTEINTIMERTHREAD 0x00000020                           
+#define WT_EXECUTEINPERSISTENTTHREAD 0x00000080                      
+#define WT_TRANSFER_IMPERSONATION 0x00000100                         
 #define BTYPE(x) ((x)&N_BTMASK)
 #define ISPTR(x) (((x)&N_TMASK)==(IMAGE_SYM_DTYPE_POINTER<<N_BTSHFT))
 #define ISFCN(x) (((x)&N_TMASK)==(IMAGE_SYM_DTYPE_FUNCTION<<N_BTSHFT))

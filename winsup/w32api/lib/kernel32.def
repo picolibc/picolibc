@@ -25,6 +25,7 @@ BuildCommDCBAndTimeoutsW@12
 BuildCommDCBW@8
 CallNamedPipeA@28
 CallNamedPipeW@28
+CancelDeviceWakeupRequest@4
 CancelIo@4
 CancelTimerQueueTimer@8
 CancelWaitableTimer@4
@@ -86,10 +87,12 @@ CreateSemaphoreW@16
 CreateTapePartition@16
 CreateThread@24
 CreateTimerQueue@0
+CreateTimerQueueTimer@28
 CreateToolhelp32Snapshot@8
 CreateVirtualBuffer@12
 CreateWaitableTimerA@12
 CreateWaitableTimerW@12
+DeactivateActCtx@8
 DebugActiveProcess@4
 DebugBreak@0
 DefineDosDeviceA@12
