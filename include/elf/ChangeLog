@@ -1,3 +1,7 @@
+2003-09-30  Chris Demetriou  <cgd@broadcom.com>
+
+	* mips.h (E_MIPS_ARCH_64R2): New define.
+
 2003-09-23  DJ Delorie  <dj@redhat.com>
 
 	* sh.h (R_SH_SWITCH8, R_SH_GNU_VTINHERIT, R_SH_GNU_VTENTRY,
