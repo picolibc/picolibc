@@ -1,3 +1,9 @@
+2003-06-03  Till Straumann  <strauman@SLAC.Stanford.EDU>
+
+	* libc/time/tzset_r.c: Change local variables that are
+	set via sscanf using the %h format specifier to be unsigned short
+	instead of int.
+
 2003-05-30  Kelley Cook  <kelleycook@wideopenwest.com>
 
 	* configure.host:  Allow i[34567]86 variant.

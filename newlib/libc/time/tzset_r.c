@@ -28,7 +28,8 @@ _DEFUN (_tzset_r, (reent_ptr),
         struct _reent *reent_ptr)
 {
   char *tzenv;
-  int hh, mm, ss, sign, m, w, d, n;
+  unsigned short hh, mm, ss, m, w, d;
+  int sign, n;
   int i, ch;
 
   if ((tzenv = _getenv_r (reent_ptr, "TZ")) == NULL)
