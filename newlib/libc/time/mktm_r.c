@@ -2,6 +2,8 @@
  * mktm_r.c
  * Original Author:	Adapted from tzcode maintained by Arthur David Olson.
  * Modifications:       Changed to mktm_r and added __tzcalc_limits - 04/10/02, Jeff Johnston
+ *                      Fixed bug in mday computations - 08/12/04, Alex Mogilnikov <alx@intellectronika.ru>
+ *                      Fixed bug in __tzcalc_limits - 08/12/04, Alex Mogilnikov <alx@intellectronika.ru>
  *
  * Converts the calendar time pointed to by tim_p into a broken-down time
  * expressed as local time. Returns a pointer to a structure containing the
@@ -149,9 +151,9 @@ _DEFUN (_mktm_r, (tim_p, res, is_gmtime),
 	    res->tm_wday = 0;
 	  ++res->tm_mday;
 	  res->tm_hour -= HOURSPERDAY;
-	  if (res->tm_mday >= ip[res->tm_mon])
+	  if (res->tm_mday > ip[res->tm_mon])
 	    {
-	      res->tm_mday -= ip[res->tm_mon] - 1;
+	      res->tm_mday -= ip[res->tm_mon];
 	      res->tm_mon += 1;
 	      if (res->tm_mon == 12)
 		{
@@ -231,7 +233,7 @@ _DEFUN (__tzcalc_limits, (year),
 	    wday_diff += DAYSPERWEEK;
 	  m_day = (__tzrule[i].n - 1) * DAYSPERWEEK + wday_diff;
 
-	  while (m_day >= ip[j])
+	  while (m_day >= ip[j-1])
 	    m_day -= DAYSPERWEEK;
 
 	  days += m_day;

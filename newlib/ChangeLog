@@ -1,3 +1,9 @@
+2004-12-08  Alex Mogilnikov  <alx@intellectronika.ru>
+
+	* libc/time/mktm_r (_mktm_r): Fix overflow calculation for
+	m_day.
+	(__tzcalc_limits): Fix reference to month array to be zero-based.
+
 2004-12-07  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/linux/sys/unistd.h: Add prototypes for ftruncate, truncate,
