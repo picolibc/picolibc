@@ -601,6 +601,17 @@ no)
 esac
 
 case "${target}" in
+  *-*-netbsd*)
+    # Skip some stuff on all NetBSD configurations.
+    skipdirs="$skipdirs target-newlib target-libiberty target-libgloss"
+
+    # Skip some stuff that's unsupported on some NetBSD configurations.
+    case "${target}" in
+      *)
+        noconfigdirs="$noconfigdirs ${libgcj}"
+	;;
+    esac
+    ;;
   *-*-netware)
     noconfigdirs="$noconfigdirs ${libstdcxx_version} target-newlib target-libiberty target-libgloss target-libffi"
     ;;
