@@ -1,6 +1,6 @@
 2003-09-15  Christopher Faylor  <cgf@redhat.com>
 
-	* getopt.cc (opterr): Reinstate initialization.
+	* getopt.c (opterr): Reinstate initialization.
 	(optind): Ditto.
 	(optopt): Ditto.
 	* pinfo.cc: Include cygheap.h or suffer compile error.
