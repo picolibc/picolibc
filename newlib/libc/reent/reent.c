@@ -82,7 +82,7 @@ _DEFUN (_reclaim_reent, (ptr),
       if (ptr->_asctime_buf)
 	_free_r (ptr, ptr->_asctime_buf);
       if (ptr->_atexit._on_exit_args_ptr)
-	_free_r (ptr->_atexit._on_exit_args_ptr);
+	_free_r (ptr, ptr->_atexit._on_exit_args_ptr);
 #else
       /* atexit stuff */
       if ((ptr->_atexit) && (ptr->_atexit != &ptr->_atexit0))

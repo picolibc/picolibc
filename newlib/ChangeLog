@@ -1,3 +1,8 @@
+2003-06-11  Nick Clifton  <nickc@redhat.com>
+
+	* libc/reent/reent.c (reclaim_reent): Fix typo in code to free
+	_on_exit_args_ptr.
+
 2003-06-10  Stan Cox  <scox@redhat.com>
             Anthony Green  <green@redhat.com>
 	
