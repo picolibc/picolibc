@@ -46,6 +46,8 @@ by-approval lists.
 There is a searchable archive of the main mailing list at
 @file{http://cygwin.com/ml/cygwin/}.  There is an alternate
 archive, also searchable, at @file{http://www.delorie.com/archives/}.
+You can also search at @file{http://www.google.com/} and include
+"cygwin" in the list of search terms.
 
 Cygwin mailing lists are not gatewayed to USENET, so anti-spam measures
 in your email address are neither required nor appreciated.  Also, avoid
