@@ -114,8 +114,8 @@ usage (void)
   -c, --change-cygdrive-prefix  change the cygdrive path prefix to <posixpath>\n\
   -f, --force                   force mount, don't warn about missing mount\n\
 				point directories\n\
-  -i, --import-old-mounts copy  old registry mount table mounts into the current\n\
-				mount areas\n\
+  -i, --import-old-mounts       copy old registry mount table mounts into the\n\
+                                current mount areas\n\
   -p, --show-cygdrive-prefix    show user and/or system cygdrive path prefix\n\
   -s, --system                  add mount point to system-wide registry location\n\
   -t, --text       (default)    text files get \\r\\n line endings\n\
