@@ -1,3 +1,9 @@
+2003-03-18  Christopher January  <chris@atomice.net>
+
+	* fhandler_proc.cc (format_proc_cpuinfo): Use IsProcessorFeaturePresent
+	only on Windows NT. Read CPU Mhz value only on NT. Revert previous
+	change so cpuid instruction is called even on non-NT systems.
+
 2003-03-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* glob.c (g_lstat): Change API minor test to match API minor number 
