@@ -145,7 +145,6 @@ xinstall-headers:
 	$(mkinstalldirs) $(tooldir)/include/w32api
 	for i in $(HEADERS); do \
 		$(INSTALL_DATA) $(srcdir)/../include/$$i $(tooldir)/include/w32api/$$i ; \
-		echo "#include <w32api/$$i>" > $(tooldir)/include/$$i ; \
 	done
 
 # uninstall headers and libraries from a target specified directory

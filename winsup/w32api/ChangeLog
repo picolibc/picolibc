@@ -1,3 +1,7 @@
+Mon Dec 25 12:22:19 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* lib/Makefile.in: Don't make "links" to include/w32api directory.
+
 Wed Dec 20 13:34:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* include/winbase.h: Add prototype for SetSecurityDescriptorControl.
