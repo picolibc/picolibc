@@ -1,3 +1,8 @@
+2003-04-24 Dhananjay Deshpande <dhananjayd@kpitcummins.com> 
+
+	* coff/h8300.h (H8300HNMAGIC, H8300SNMAGIC): New.
+	(H8300HNBADMAG, H8300SNBADMAG): New.
+
 2003-04-15  Rohit Kumar Srivastava <rohits@kpitcummins.com>
 
 	* sh.h: Replace occurrances of 'Hitachi' with 'Renesas'.

@@ -1,3 +1,16 @@
+2003-04-24 Dhananjay Deshpande <dhananjayd@kpitcummins.com> 
+
+	* elf/h8.h (E_H8_MACH_H8300HN, E_H8_MACH_H8300SN): New
+
+2003-04-23  J"orn Rennecke <joern.rennecke@superh.com>
+
+	* common.h (EM_SH): Amend comment to refer to SuperH.
+
+2003-04-22  Kazuhiro Inaoka  <inaoka.kazuhiro@renesas.com>
+
+	* common.h: Replace references to Mitsubishi M32R with
+	references to Renesas M32R.
+
 2003-04-15  Rohit Kumar Srivastava <rohits@kpitcummins.com>
 
 	* common.h: Replace occurrances of 'Hitachi' with 'Renesas'.
