@@ -54,7 +54,8 @@ itcl/, tcl/, tix/, tk/, libgui/
 
 winsup/
 	cygwin: http://sourceware.cygnus.com/cygwin
-	Contact cygwin@sourceware.cygnus.com.
+	Patches to cygwin-patches@sourceware.cygnus.com.
+	General discussion cygwin@sourceware.cygnus.com.
 	See also winsup/MAINTAINERS.
 
 expect/, dejagnu/, config-ml.in, mpw-README, mpw-build.in,
