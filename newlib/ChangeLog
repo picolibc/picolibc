@@ -1,3 +1,8 @@
+2002-09-27  Jim Wilson  <wilson@redhat.com>
+
+	* libc/sys/sysnecv850/crt0.S (start): Delete v850 code for initializing
+	the ctbp register.
+
 2002-09-27  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/ctype/jp2uc.c: Change to use multiple arrays in jp2uc.h.

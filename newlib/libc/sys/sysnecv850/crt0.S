@@ -42,16 +42,6 @@ _start:
 	movhi   hi(__gp),	r0,	gp
 	movea   lo(__gp),	gp,	gp
 
-	/* Initialise the call table base pointer.
-	We do this even though we are supposedly 
-	assembling this file for the v850 as this
-	allows us to use the same binary for all
-	versions of the v850 architecture.  */
-	
-	movhi   hi(__ctbp),	r0,     r6
-	movea   lo(__ctbp),	r6,     r6
-	ldsr    r6,             ctbp
-
 	movhi   hi(_edata),	r0,	r6
 	movea   lo(_edata),	r6,	r6
 	movhi   hi(_end),	r0,	r7
