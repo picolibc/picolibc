@@ -1,3 +1,8 @@
+2003-11-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (dup_ent): Move Win 95 misalignment recogition before
+	trying to evaluate string length.
+
 2003-10-31  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* thread.cc (pthread::thread_init_wrapper): Initialize exception
