@@ -608,11 +608,6 @@ normalize_posix_path (const char *src, char *dst)
     {
       if (!cygcwd.get (dst))
 	return get_errno ();
-      if (strlen (dst) + 1 + strlen (src) >= MAX_PATH)
-	{
-	  debug_printf ("ENAMETOOLONG = normalize_posix_path (%s)", src);
-	  return ENAMETOOLONG;
-	}
       dst = strchr (dst, '\0');
       if (*src == '.')
 	{
@@ -647,6 +642,8 @@ normalize_posix_path (const char *src, char *dst)
       strcpy (dst, cygheap->root.path ());
       dst += cygheap->root.length ();
     }
+  else
+    *dst = '\0';
 
   while (*src)
     {
@@ -689,6 +686,11 @@ normalize_posix_path (const char *src, char *dst)
 
 	  *dst++ = '/';
 	}
+	if ((dst - dst_start) >= MAX_PATH)
+	  {
+	    debug_printf ("ENAMETOOLONG = normalize_posix_path (%s)", src);
+	    return ENAMETOOLONG;
+	  }
     }
 
 done:
@@ -768,9 +770,7 @@ normalize_win32_path (const char *src, char *dst)
       /* Ignore "./".  */
       else if (src[0] == '.' && SLASH_P (src[1])
 	       && (src == src_start || SLASH_P (src[-1])))
-	{
-	  src += 2;
-	}
+	src += 2;
 
       /* Backup if "..".  */
       else if (src[0] == '.' && src[1] == '.'
@@ -797,6 +797,8 @@ normalize_win32_path (const char *src, char *dst)
 	    *dst++ = *src;
 	  ++src;
 	}
+      if ((dst - dst_start) >= MAX_PATH)
+	return ENAMETOOLONG;
     }
   *dst = 0;
   debug_printf ("%s = normalize_win32_path (%s)", dst_start, src_start);

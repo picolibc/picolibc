@@ -219,6 +219,7 @@ $(DEF_FILE): cygwin.din config.status
 
 winsup.h: config.h
 
-ifneq (,${wildcard *.d})
-include *.d
+deps:=${wildcard *.d}
+ifneq (,$(deps))
+include $(deps)
 endif

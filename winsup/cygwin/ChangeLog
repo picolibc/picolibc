@@ -1,3 +1,10 @@
+Fri Dec 15 17:23:17 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (normalize_posix_path): Calculate path name length overruns
+	more dynamically.
+	(normalize_win32_path): Ditto.
+	* Makefile.in: Avoid scanning the directory twice for *.d files.
+
 Thu Dec 14 23:37:51 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler.h (fhandler_console): Add additional argument to
