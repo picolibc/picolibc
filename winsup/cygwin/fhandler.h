@@ -919,6 +919,7 @@ class fhandler_tty_slave: public fhandler_tty_common
   select_record *select_read (select_record *s);
   int cygserver_attach_tty (HANDLE*, HANDLE*);
   int get_unit () __attribute__ ((regparm (1)));
+  virtual char const *ttyname () { return pc.dev.name; }
 };
 
 class fhandler_pty_master: public fhandler_tty_common

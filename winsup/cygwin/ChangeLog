@@ -1,3 +1,15 @@
+2003-12-08  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.h (fhandler_tty_slave::ttyname): Use name from pc since it
+	is guaranteed to be accurate.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Increment open_fhs
+	appropriate when copying ctty.
+	(fhandler_tty_slave::close): Remove special case handling for
+	exit_state.  Use ctty < 0 check instead.
+	(fhandler_tty_common::close): Set io_handle to NULL after closing.
+	* syscalls.cc (close_all_files): Specifically close cygheap->ctty, if
+	appropriate.
+
 2003-12-07  Christopher Faylor  <cgf@redhat.com>
 
 	* spawn.cc (spawn_guts): Change type back to 'int' after erroneous

@@ -454,6 +454,7 @@ fhandler_tty_slave::open (int flags, mode_t)
   else
     {
       *this = cygheap->ctty;
+      fhandler_console::open_fhs++;
       termios_printf ("copied tty fhandler from cygheap");
       return 1;
     }
@@ -601,7 +602,7 @@ fhandler_tty_slave::close ()
   if (!--fhandler_console::open_fhs && myself->ctty == -1)
     FreeConsole ();
   termios_printf ("decremented open_fhs %d", fhandler_console::open_fhs);
-  if (!exit_state && get_io_handle () == cygheap->ctty.get_io_handle ())
+  if (myself->ctty >= 0 && get_io_handle () == cygheap->ctty.get_io_handle ())
     return 1;
   return fhandler_tty_common::close ();
 }
@@ -1172,6 +1173,8 @@ fhandler_tty_common::close ()
     termios_printf ("CloseHandle (get_handle ()<%p>), %E", get_handle ());
   if (!ForceCloseHandle1 (get_output_handle (), to_pty))
     termios_printf ("CloseHandle (get_output_handle ()<%p>), %E", get_output_handle ());
+
+  set_io_handle (NULL);
 
   inuse = NULL;
   termios_printf ("tty%d <%p,%p> closed", get_unit (), get_handle (), get_output_handle ());

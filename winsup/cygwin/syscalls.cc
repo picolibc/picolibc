@@ -97,6 +97,12 @@ close_all_files (void)
 	cygheap->fdtab.release (i);
       }
 
+  if (cygheap->ctty.get_io_handle ())
+    {
+      myself->ctty = -1;
+      cygheap->ctty.close ();
+    }
+
   ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "close_all_files");
   user_shared->delqueue.process_queue ();
 }
