@@ -334,6 +334,7 @@ sarg: .equ	sr1	; argument
 ; Software Architecture Pseudo Registers
 previous_sp: .equ	64	; old stack pointer (locates previous frame)
 
+#if 0
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ;~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ; Standard space and subspace definitions.  version A.08.06
@@ -385,5 +386,8 @@ previous_sp: .equ	64	; old stack pointer (locates previous frame)
 ; message to be brought in from libgloss/hp-milli.s
         .space $PRIVATE$
         .subspa $DATA$
+#else
+	.data
+#endif
         .import ___hp_free_copyright,data
 L$copyright .word ___hp_free_copyright

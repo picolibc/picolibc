@@ -1,3 +1,9 @@
+2002-10-07	Joel Sherrill <joel@OARcorp.com>
+
+	* libc/machine/hppa/DEFS.h, libc/machine/hppa/pcc_prefix.s,
+	libc/machine/hppa/setjmp.S, libc/machine/hppa/DEFS.h: Make this
+	compile with current GNU tools.
+
 2002-10-07  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* Makefile.am: Add EXTRA_DIRS to allow future dependencies on

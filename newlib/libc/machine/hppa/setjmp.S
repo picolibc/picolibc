@@ -18,6 +18,9 @@
    library.  Maybe we'll have to have -msoft-float trigger something
    like -DSOFT_FLOAT if this issue ever arises.  */
 
+#include "DEFS.h"
+
+#if 0
 	.SPACE $PRIVATE$
 	.SUBSPA $DATA$,QUAD=1,ALIGN=8,ACCESS=31
 	.SUBSPA $BSS$,QUAD=1,ALIGN=8,ACCESS=31,ZERO,SORT=82
@@ -27,8 +30,8 @@
 	.IMPORT $global$,DATA
 	.IMPORT $$dyncall,MILLICODE
 ; gcc_compiled.:
-	.SPACE $TEXT$
-	.SUBSPA $CODE$
+#endif
+	TEXT_SEGMENT
 
 	.align 4
 	.EXPORT setjmp,ENTRY,PRIV_LEV=3,ARGW0=GR,RTNVAL=GR

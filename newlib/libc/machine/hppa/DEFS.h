@@ -24,6 +24,29 @@
 #define	EXIT(Name)	BLANK	M_EXIT	(Name,PROF_/**/Name)
 #define	EXITC(Name)	BLANK	M_EXITC	(Name,PROF_/**/Name)
 
+#if 0
+#define TEXT_SEGMENT \
+        .SPACE  $TEXT$          !\
+        .SUBSPA $CODE$
+#define RO_SEGMENT \
+        .SPACE  $TEXT$          !\
+        .SUBSPA $lit$
+#define DATA_SEGMENT \
+        .SPACE  $PRIVATE$          !\
+        .SUBSPA $data$
+#define BSS_SEGMENT \
+        .SPACE  $PRIVATE$          !\
+        .SUBSPA $bss$
+#else
+#define TEXT_SEGMENT .text
+#define RO_SEGMENT .rodata
+#define DATA_SEGMENT .data
+#define BSS_SEGMENT .bss
+#endif
+
+
+
+
 #ifdef PROF
 
 ;
@@ -36,8 +59,7 @@
 ; profile data).
 ;
 #define M_ENTRY(name,prof)	\
-	.SPACE	$TEXT$		!\
-	.SUBSPA	$CODE$		!\
+	TEXT_SEGMENT		!\
         .label name		!\
         .PROC			!\
 	.CALLINFO CALLER,SAVE_RP !\
@@ -63,8 +85,7 @@
 
 
 #define M_ENTRYC(name,prof)	\
-	.SPACE	$TEXT$		!\
-	.SUBSPA	$CODE$		!\
+	TEXT_SEGMENT		!\
         .label name		!\
         .PROC			!\
 	.CALLINFO CALLER,SAVE_RP !\
@@ -97,8 +118,7 @@
 	.EXIT			!\
         .PROCEND		!\
         .EXPORT	name,ENTRY	!\
-	.SPACE	$PRIVATE$	!\
-	.SUBSPA	$DATA$		!\
+	DATA_SEGMENT		!\
 	.label prof		!\
 	.WORD	0		!\
 	.IMPORT	$global$,DATA	!\
@@ -110,8 +130,7 @@
 	.EXIT			!\
         .PROCEND		!\
         .EXPORT	name,ENTRY	!\
-	.SPACE	$PRIVATE$	!\
-	.SUBSPA	$DATA$		!\
+	DATA_SEGMENT		!\
 	.label prof		!\
 	.WORD	0		!\
 	.IMPORT	$global$,DATA	!\
@@ -120,16 +139,14 @@
 #else	/* NOT profiling */
 
 #define M_ENTRY(name,prof)	\
-        .SPACE $TEXT$	!\
-        .SUBSPA $CODE$	!\
+	TEXT_SEGMENT		!\
         .label name	!\
         .PROC		!\
         .CALLINFO	!\
 	.ENTRY
 
 #define M_ENTRYC(name,prof)	\
-        .SPACE	$TEXT$	!\
-        .SUBSPA	$CODE$	!\
+	TEXT_SEGMENT		!\
         .label name	!\
         .PROC		!\
         .CALLINFO CALLER,SAVE_RP	!\
@@ -158,3 +175,4 @@
 
 
 #endif
+
