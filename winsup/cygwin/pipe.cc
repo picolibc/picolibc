@@ -186,7 +186,6 @@ fhandler_pipe::read (void *in_ptr, size_t& in_len)
   else
     {
       pipeargs pi = {dynamic_cast<fhandler_base *>(this), in_ptr, &in_len};
-      ResetEvent (read_state);
       cygthread *th = new cygthread (read_pipe, &pi, "read_pipe");
       if (th->detach (read_state) && !in_len)
 	in_len = (size_t) -1;	/* received a signal */

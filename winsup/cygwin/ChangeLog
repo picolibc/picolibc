@@ -1,3 +1,8 @@
+2005-02-08  Christopher Faylor  <cgf@timesys.com>
+
+	* pipe.cc (fhandler_pipe::read): Remove hold over from old read_state
+	implementation.
+
 2005-02-06  Yitzchak Scott-Thoennes <sthoenna@efn.org>
 
 	* net.cc (cygwin_gethostbyname): Be more picky about what's a numeric
