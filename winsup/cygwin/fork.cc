@@ -500,6 +500,13 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 #else
   pinfo forked (cygwin_pid (pi.dwProcessId), 1);
 #endif
+  if (!forked)
+    {
+      syscall_printf ("pinfo failed");
+      if (get_errno () != ENOMEM)
+	set_errno (EAGAIN);
+      goto cleanup;
+    }
 
   /* Initialize things that are done later in dll_crt0_1 that aren't done
      for the forkee.  */

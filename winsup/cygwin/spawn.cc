@@ -792,7 +792,8 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       if (!child)
 	{
 	  syscall_printf ("pinfo failed");
-	  set_errno (EAGAIN);
+	  if (get_errno () != ENOMEM)
+	    set_errno (EAGAIN);
 	  res = -1;
 	  goto out;
 	}

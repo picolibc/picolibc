@@ -1,5 +1,11 @@
 2003-09-25  Christopher Faylor  <cgf@redhat.com>
 
+	* fork.cc (fork_parent): Detect failed pinfo constructor.
+	* spawn.cc (spawn_guts): Don't overwrite ENOMEM errno on failed pinfo
+	constructor.
+
+2003-09-25  Christopher Faylor  <cgf@redhat.com>
+
 	* spawn.cc (spawnve): Remove vfork short circuit and let caller deal
 	with error return.
 
