@@ -549,7 +549,7 @@ normalize_posix_path (const char *cwd, const char *src, char *dst)
   const char *src_start = src;
   char *dst_start = dst;
 
-  if (! SLASH_P (src[0]))
+  if (!SLASH_P (src[0]))
     {
       if (strlen (cwd) + 1 + strlen (src) >= MAX_PATH)
 	{
@@ -619,6 +619,8 @@ normalize_posix_path (const char *cwd, const char *src, char *dst)
 	  ++src;
 	}
     }
+  if (dst > (dst_start + 1) && dst[-1] == '.' && SLASH_P (dst[-2]))
+    dst -= 2;
   *dst = 0;
   debug_printf ("%s = normalize_posix_path (%s)", dst_start, src_start);
   return 0;

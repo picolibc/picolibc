@@ -1,15 +1,24 @@
+Thu Apr 20 00:32:03 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler.h (fhandler_base::hclose): New virtual method.
+	(fhandler_base::set_inheritance): Make this a method so that we can use
+	the appropriate close methods.
+	* fhandler.cc (fhandler_base::set_inheritance): Ditto.
+	* path.cc (normalize_posix_path): Eliminate /.  trailing path
+	component.
+
 Wed Apr 20  0:19:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * syscalls.cc (setuid): Allow switching user context after
-        successful call to ImpersonateLogedOnUser (NT only).
-        (setgid): Ditto.
-        (seteuid): Call setuid.
-        (setegid): Call setgid.
+	* syscalls.cc (setuid): Allow switching user context after
+	successful call to ImpersonateLogedOnUser (NT only).
+	(setgid): Ditto.
+	(seteuid): Call setuid.
+	(setegid): Call setgid.
 
 Wed Apr 19 22:00:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * uinfo.cc (internal_getlogin): Use NetGetDCName() instead
-        of NetGetAnyDCName().
+	* uinfo.cc (internal_getlogin): Use NetGetDCName() instead
+	of NetGetAnyDCName().
 
 Mon Apr 17 12:08:47 2000  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
@@ -55,12 +64,12 @@ Thu Apr 13  8:48:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* path.cc (conv_to_win32_path): Detect a win32 path
 	if path contains backslashes.
-        * cygwin.din: Add symbol for `lacl'.
-        * security.cc (ReadSD): Add debug output.
-        (acl_worker):  New static function.
-        (acl): Call acl_worker now.
-        (lacl): New function.
-        (facl): Call acl_worker now.
+	* cygwin.din: Add symbol for `lacl'.
+	* security.cc (ReadSD): Add debug output.
+	(acl_worker):  New static function.
+	(acl): Call acl_worker now.
+	(lacl): New function.
+	(facl): Call acl_worker now.
 	* include/cygwin/acl.h: Add prototype for `lacl'.
 
 Wed Apr 12 18:48:33 2000  Christopher Faylor <cgf@cygnus.com>
@@ -386,7 +395,7 @@ Fri Feb 25 19:26:42 2000  Christopher Faylor <cgf@cygnus.com>
 2000-02-25  DJ Delorie  <dj@cygnus.com>
 
 	* Makefile.in: fix "make check" support and cygrun.
-	
+
 Thu Feb 24 15:56:00 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* syscalls.c (_read): Clear errno before doing any read operation.

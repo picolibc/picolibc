@@ -235,6 +235,8 @@ public:
   const char *get_win32_name () { return win32_path_name_; }
   unsigned long get_namehash () { return namehash_; }
 
+  virtual void hclose (HANDLE h) {CloseHandle (h);}
+  virtual void set_inheritance (HANDLE &h, int not_inheriting, const char *name = NULL);
 
   /* fixup fd possibly non-inherited handles after fork */
   void fork_fixup (HANDLE parent, HANDLE &h, const char *name);
@@ -315,6 +317,7 @@ public:
   int ioctl (unsigned int cmd, void *);
   off_t lseek (off_t, int) { return 0; }
   int close ();
+  void hclose (HANDLE) {close ();}
 
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
@@ -809,7 +812,5 @@ public:
 
 uid_t __stdcall get_file_owner (int, const char *);
 gid_t __stdcall get_file_group (int, const char *);
-
-void __stdcall set_inheritance (HANDLE &h, int val, const char *name = NULL);
 
 #endif /* _FHANDLER_H_ */

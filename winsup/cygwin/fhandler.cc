@@ -1427,8 +1427,8 @@ fhandler_pipe::lseek (off_t offset, int whence)
   return -1;
 }
 
-void __stdcall
-set_inheritance (HANDLE &h, int not_inheriting, const char *name)
+void
+fhandler_base::set_inheritance (HANDLE &h, int not_inheriting, const char *name)
 {
   HANDLE newh;
 
@@ -1438,16 +1438,17 @@ set_inheritance (HANDLE &h, int not_inheriting, const char *name)
 #ifndef DEBUGGING
   else
     {
-      CloseHandle (h);
+      hclose (h);
       h = newh;
     }
 #else
   else if (!name)
     {
-      CloseHandle (h);
+      hclose (h);
       h = newh;
     }
   else
+  /* FIXME: This won't work with sockets */
     {
       ForceCloseHandle2 (h, name);
       h = newh;
