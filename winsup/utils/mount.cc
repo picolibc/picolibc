@@ -109,7 +109,7 @@ do_mount (const char *dev, const char *where, int flags)
   exit (0);
 }
 
-struct option longopts[] =
+static struct option longopts[] =
 {
   {"help", no_argument, NULL, 'h' },
   {"binary", no_argument, NULL, 'b'},
@@ -127,7 +127,7 @@ struct option longopts[] =
   {NULL, 0, NULL, 0}
 };
 
-char opts[] = "hbfstuxXEpicm";
+static char opts[] = "hbfstuxXEpicm";
 
 static void
 usage (void)

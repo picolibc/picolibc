@@ -111,7 +111,6 @@ else
 	${filter-out -nostdinc,$(COMPILE_CXX)} $c -o $(@D)/$(basename $@)$o $(DUMPER_INCLUDES) $<
 endif
 
-
 module_info.o: module_info.cc
 ifdef VERBOSE
 	${filter-out -nostdinc,$(COMPILE_CXX)} $c -o $@ $(DUMPER_INCLUDES) ${firstword $^}
@@ -166,6 +165,14 @@ ifdef VERBOSE
 else
 	@echo $(CXX) $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) ... $^;\
 	${filter-out -I$(newlib_source)/%,$(COMPILE_CXX)} $c -o $(@D)/$(basename $@)$o $(MINGW_CXXFLAGS) $<
+endif
+
+kill.exe: kill.o $(bupdir1)/libiberty/strsignal.o
+ifdef VERBOSE
+	$(CXX) -o $@ $^ -B$(cygwin_build)/ $(ALL_LDFLAGS) $(KILL_LIB)
+else
+	@echo $(CXX) -o $@ $^ ${filter-out -B%, $(ALL_LDFLAGS)};\
+	$(CXX) -o $@ $^ -B$(cygwin_build)/ $(ALL_LDFLAGS) $(KILL_LIB)
 endif
 
 clean:

@@ -1,3 +1,14 @@
+2002-05-13  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (kill.exe): Add as a specific target.
+	* kill.cc (longopts): New.
+	(opts): Ditto.
+	(get_sig): Accept const char * parameter.  Return -1 on unknown signal.
+	(test_for_unknown_sig): New function.
+	(listsig): New function.
+	(main): Use getopt_long for option parsing.  Implement -l, and -s
+	options.  Use test_for_unknown_sig() to test for signal validity.
+
 2002-05-12  Christopher Faylor  <cgf@redhat.com>
 
 	* mount.cc (do_mount): Default to non-exec option for remote drives.

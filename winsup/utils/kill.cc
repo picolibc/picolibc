@@ -16,6 +16,20 @@ details. */
 #include <errno.h>
 #include <windows.h>
 #include <sys/cygwin.h>
+#include <getopt.h>
+
+static struct option longopts[] =
+{
+  {"help", no_argument, NULL, 'h' },
+  {"list", optional_argument, NULL, 'l'},
+  {"force", no_argument, NULL, 'f'},
+  {"signal", required_argument, NULL, 's'},
+  {NULL, 0, NULL, 0}
+};
+
+static char opts[] = "hl::fs:";
+
+extern "C" const char *strsigno (int);
 
 static void
 usage (void)
@@ -25,10 +39,11 @@ usage (void)
 }
 
 static int
-getsig (char *in_sig)
+getsig (const char *in_sig)
 {
-  char *sig;
+  const char *sig;
   char buf[80];
+  int intsig;
 
   if (strncmp (in_sig, "SIG", 3) == 0)
     sig = in_sig;
@@ -37,7 +52,37 @@ getsig (char *in_sig)
       sprintf (buf, "SIG%s", in_sig);
       sig = buf;
     }
-  return (strtosigno (sig) ?: atoi (in_sig));
+  intsig = strtosigno (sig) ?: atoi (in_sig);
+  char *p;
+  if (!intsig && (strcmp (buf, "SIG0") != 0 && (strtol (in_sig, &p, 10) != 0 || *p)))
+    intsig = -1;
+  return intsig;
+}
+
+static void
+test_for_unknown_sig (int sig, const char *sigstr)
+{
+  if (sig < 0 || sig > NSIG)
+    {
+      fprintf (stderr, "kill: unknown signal: %s\n", sigstr);
+      usage ();
+      exit (1);
+    }
+}
+
+static void
+listsig (const char *in_sig)
+{
+  int sig;
+  if (!in_sig)
+    for (sig = 1; sig < NSIG; sig++)
+      printf ("%s%c", strsigno (sig) + 3, (sig < NSIG - 1) ? ' ' : '\n');
+  else
+    {
+      sig = getsig (in_sig);
+      test_for_unknown_sig (sig, in_sig);
+      puts (strsigno (sig) + 3);
+    }
 }
 
 static void __stdcall
@@ -59,36 +104,59 @@ main (int argc, char **argv)
 {
   int sig = SIGTERM;
   int force = 0;
-  int gotsig = 0;
+  char *gotsig = NULL;
   int ret = 0;
 
   if (argc == 1)
     usage ();
 
-  while (*++argv && **argv == '-')
-    if (strcmp (*argv + 1, "f") == 0)
-      force = 1;
-    else if (gotsig)
-      break;
-    else if (strcmp(*argv + 1, "0") != 0)
-      {
-	sig = getsig (*argv + 1);
-	gotsig = 1;
-      }
-    else
-      {
-	argv++;
-	sig = 0;
-	goto sig0;
-      }
-
-  if (sig <= 0 || sig > NSIG)
+  opterr = 0;
+  for (;;)
     {
-      fprintf (stderr, "kill: unknown signal: %s\n", argv[-1]);
-      exit (1);
+      int ch;
+      char **av = argv + optind;
+      if ((ch = getopt_long (argc, argv, opts, longopts, NULL)) == EOF)
+	break;
+      switch (ch)
+	{
+	case 's':
+	  gotsig = optarg;
+	  sig = getsig (gotsig);
+	  break;
+	case 'l':
+	  if (!optarg)
+	    {
+	      optarg = argv[optind];
+	      if (optarg)
+		{
+		  optind++;
+		  optreset = 1;
+		}
+	    }
+	  if (argv[optind])
+	    usage ();
+	  listsig (optarg);
+	  break;
+	case 'f':
+	  force = 1;
+	  break;
+	case '?':
+	  if (gotsig)
+	    usage ();
+	  optreset = 1;
+	  optind = 1 + av - argv;
+	  gotsig = *av + 1;
+	  sig = getsig (gotsig);
+	  break;
+	default:
+	  usage ();
+	  break;
+	}
     }
 
-sig0:
+  test_for_unknown_sig (sig, gotsig);
+
+  argv += optind;
   while (*argv != NULL)
     {
       char *p;
