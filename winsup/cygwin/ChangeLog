@@ -1,5 +1,9 @@
 2003-03-02  Christopher Faylor  <cgf@redhat.com>
 
+	* lib/getopt.c: Refresh from NetBSD sources.
+
+2003-03-02  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler_console.cc (fhandler_console::close): Don't decrement
 	in use counter if in vfork fixup stage.
 

@@ -1,4 +1,4 @@
-/*	$NetBSD: getopt_long.c,v 1.12 2001/04/24 09:07:43 joda Exp $	*/
+/*	$NetBSD: getopt_long.c,v 1.15 2002/01/31 22:43:40 tv Exp $	*/
 
 /*-
  * Copyright (c) 2000 The NetBSD Foundation, Inc.
@@ -85,13 +85,13 @@ extern char __declspec(dllimport) *__progname;
 			 || (*options == ':') ? (int)':' : (int)'?')
 #define INORDER (int)1
 
-#define	EMSG	""
+static char EMSG[1];
 
 static int getopt_internal (int, char * const *, const char *);
 static int gcd (int, int);
 static void permute_args (int, int, int, char * const *);
 
-static const char *place = EMSG; /* option letter processing */
+static char *place = EMSG; /* option letter processing */
 
 /* XXX: set optreset to 1 rather than these two */
 static int nonopt_start = -1; /* first non option argument (for permute) */
@@ -149,9 +149,9 @@ gcd(a, b)
  * in each block).
  */
 static void
-permute_args(nonopt_start, nonopt_end, opt_end, nargv)
-	int nonopt_start;
-	int nonopt_end;
+permute_args(panonopt_start, panonopt_end, opt_end, nargv)
+	int panonopt_start;
+	int panonopt_end;
 	int opt_end;
 	char * const *nargv;
 {
@@ -163,16 +163,16 @@ permute_args(nonopt_start, nonopt_end, opt_end, nargv)
 	/*
 	 * compute lengths of blocks and number and size of cycles
 	 */
-	nnonopts = nonopt_end - nonopt_start;
-	nopts = opt_end - nonopt_end;
+	nnonopts = panonopt_end - panonopt_start;
+	nopts = opt_end - panonopt_end;
 	ncycle = gcd(nnonopts, nopts);
-	cyclelen = (opt_end - nonopt_start) / ncycle;
+	cyclelen = (opt_end - panonopt_start) / ncycle;
 
 	for (i = 0; i < ncycle; i++) {
-		cstart = nonopt_end+i;
+		cstart = panonopt_end+i;
 		pos = cstart;
 		for (j = 0; j < cyclelen; j++) {
-			if (pos >= nonopt_end)
+			if (pos >= panonopt_end)
 				pos -= nnonopts;
 			else
 				pos += nopts;
@@ -191,7 +191,10 @@ permute_args(nonopt_start, nonopt_end, opt_end, nargv)
  *  Returns -2 if -- is found (can be long option or end of options marker).
  */
 static int
-getopt_internal(int nargc, char *const * nargv, const char *options)
+getopt_internal(nargc, nargv, options)
+	int nargc;
+	char * const *nargv;
+	const char *options;
 {
 	char *oli;				/* option letter list index */
 	int optchar;
@@ -206,7 +209,7 @@ getopt_internal(int nargc, char *const * nargv, const char *options)
 	 * XXX re-initialize optind to 0 and have getopt_long(3)
 	 * XXX properly function again.  Work around this braindamage.
 	 */
-	if (optind == 0 && optreset == 0)
+	if (optind == 0)
 		optind = 1;
 
 	if (optreset)
@@ -306,7 +309,7 @@ start:
 	} else {				/* takes (optional) argument */
 		optarg = NULL;
 		if (*place)			/* no white space */
-			optarg = (char *) place;
+			optarg = place;
 		/* XXX: disable test for :: if PC? (GNU doesn't) */
 		else if (oli[1] != ':') {	/* arg not optional */
 			if (++optind >= nargc) {	/* no arg */
@@ -333,7 +336,10 @@ start:
  * [eventually this will replace the real getopt]
  */
 int
-getopt(int nargc, char * const *nargv, const char *options)
+getopt(nargc, nargv, options)
+	int nargc;
+	char * const *nargv;
+	const char *options;
 {
 	int retval;
 
@@ -363,8 +369,12 @@ getopt(int nargc, char * const *nargv, const char *options)
  *	Parse argc/argv argument vector.
  */
 int
-getopt_long(int nargc, char * const *nargv, const char *options,
-	    const struct option *long_options, int *idx)
+getopt_long(nargc, nargv, options, long_options, idx)
+	int nargc;
+	char * const *nargv;
+	const char *options;
+	const struct option *long_options;
+	int *idx;
 {
 	int retval;
 
@@ -378,7 +388,7 @@ getopt_long(int nargc, char * const *nargv, const char *options,
 		size_t current_argv_len;
 		int i, match;
 
-		current_argv = (char *) place;
+		current_argv = place;
 		match = -1;
 
 		optind++;
