@@ -8,6 +8,7 @@
 	(etc::dir_changed): When the handle is NULL, call memset instead of
 	test_file_changed.  When the handle is invalid, return true.
 	(etc::file_changed): Remove unneeded check for !fn[n].
+	* uinfo.cc (pwdgrp::load): Eliminate spurious setting of fh to NULL.
 
 2003-01-19  Christopher Faylor  <cgf@redhat.com>
 
