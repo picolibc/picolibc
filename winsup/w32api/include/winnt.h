@@ -1701,21 +1701,31 @@ typedef struct _EXCEPTION_POINTERS {
 	PCONTEXT ContextRecord;
 } EXCEPTION_POINTERS,*PEXCEPTION_POINTERS,*LPEXCEPTION_POINTERS;
 typedef union _LARGE_INTEGER {
-	_ANONYMOUS_STRUCT struct {
-		DWORD LowPart;
-		LONG HighPart;
-	}_STRUCT_NAME(u);
-	LONGLONG QuadPart;
-} LARGE_INTEGER;
-typedef LARGE_INTEGER *PLARGE_INTEGER;
+  struct {
+    DWORD LowPart;
+    LONG  HighPart;
+  } u;
+#if _ANONYMOUS_STRUCT
+  struct {
+    DWORD LowPart;
+    LONG  HighPart;
+  };
+#endif /* _ANONYMOUS_STRUCT */
+  LONGLONG QuadPart;
+} LARGE_INTEGER, *PLARGE_INTEGER;
 typedef union _ULARGE_INTEGER {
-	_ANONYMOUS_STRUCT struct {
-		DWORD LowPart;
-		DWORD HighPart;
-	}_STRUCT_NAME(u);
-	DWORDLONG QuadPart;
-} ULARGE_INTEGER;
-typedef ULARGE_INTEGER *PULARGE_INTEGER;
+  struct {
+    DWORD LowPart;
+    DWORD HighPart;
+  } u;
+#if _ANONYMOUS_STRUCT
+  struct {
+    DWORD LowPart;
+    DWORD HighPart;
+  };
+#endif /* _ANONYMOUS_STRUCT */
+  ULONGLONG QuadPart;
+} ULARGE_INTEGER, *PULARGE_INTEGER;
 typedef LARGE_INTEGER LUID,*PLUID;
 #pragma pack(push,4)
 typedef struct _LUID_AND_ATTRIBUTES {
