@@ -816,34 +816,39 @@ fhandler_base::write (const void *ptr, size_t len)
 		 Note: this bug doesn't happen on NT4, even though the
 		 documentation for WriteFile() says that it *may* happen
 		 on any OS. */
+	      /* Check there is enough space */
+	      if (!SetEndOfFile (get_output_handle ()))
+	        {
+		  __seterrno ();
+		  return -1;
+		}
 	      char zeros[512];
 	      int number_of_zeros_to_write = current_position - actual_length;
 	      memset (zeros, 0, 512);
-	      SetFilePointer (get_output_handle (), 0, NULL, FILE_END);
+	      SetFilePointer (get_output_handle (), actual_length, NULL,
+			      FILE_BEGIN);
 	      while (number_of_zeros_to_write > 0)
 		{
 		  DWORD zeros_this_time = (number_of_zeros_to_write > 512
 					 ? 512 : number_of_zeros_to_write);
 		  DWORD written;
-		  if (!WriteFile (get_output_handle (), zeros, zeros_this_time,
-				  &written, NULL))
+		  DWORD ret = WriteFile (get_output_handle (), zeros,
+					 zeros_this_time, &written, NULL);
+		  if (!ret || written < zeros_this_time)
 		    {
-		      __seterrno ();
-		      if (get_errno () == EPIPE)
-			raise (SIGPIPE);
+		      if (!ret)
+		        {
+			  __seterrno ();
+			  if (get_errno () == EPIPE)
+			    raise (SIGPIPE);
+			}
+		      else
+			set_errno (ENOSPC);
 		      /* This might fail, but it's the best we can hope for */
-		      SetFilePointer (get_output_handle (), current_position, NULL,
-				      FILE_BEGIN);
+		      SetFilePointer (get_output_handle (), current_position,
+				      NULL, FILE_BEGIN);
 		      return -1;
 
-		    }
-		  if (written < zeros_this_time) /* just in case */
-		    {
-		      set_errno (ENOSPC);
-		      /* This might fail, but it's the best we can hope for */
-		      SetFilePointer (get_output_handle (), current_position, NULL,
-				      FILE_BEGIN);
-		      return -1;
 		    }
 		  number_of_zeros_to_write -= written;
 		}
