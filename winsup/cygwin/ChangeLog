@@ -1,3 +1,8 @@
+Thu May  9  23:53:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::puts_readahead): Change
+	while condition to disallow wild runs.
+
 Thu May  9  15:24:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	Patch suggested by <lha@stacken.kth.se>

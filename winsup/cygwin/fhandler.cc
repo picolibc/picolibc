@@ -22,8 +22,8 @@ int
 fhandler_base::puts_readahead (const char *s, size_t len = (size_t) -1)
 {
   int success = 1;
-  while ((((len == (size_t) -1) && *s) || len--) &&
-	 (success = put_readahead (*s++) > 0))
+  while ((*s || (len != (size_t) -1 && len--))
+         && (success = put_readahead (*s++) > 0))
     continue;
   return success;
 }
