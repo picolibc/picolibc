@@ -386,11 +386,8 @@ getitimer (int which, struct itimerval *ovalue)
       set_errno (EINVAL);
       return -1;
     }
-  if (ovalue == NULL)
-    {
-      set_errno (EFAULT);
-      return -1;
-    }
+  if (check_null_invalid_struct_errno (ovalue))
+    return -1;
   struct itimerspec spec_ovalue;
   int ret = timer_gettime ((timer_t) &ttstart, &spec_ovalue);
   if (!ret)
