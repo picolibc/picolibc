@@ -1,3 +1,10 @@
+2001-10-22  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+
+	* libiberty.h (hex_init): Revert delete.
+
+	* libiberty.h (_hex_value): Const-ify.
+	(hex_init): Delete.
+
 2001-10-16  Christopher Faylor  <cgf@redhat.com>
 
 	* filenames.h: Add cygwin to the list of dosish style path systems.
