@@ -1,6 +1,6 @@
 /* fhandler_termios.cc
 
-   Copyright 1996, 1997, 1998 Cygnus Solutions.
+   Copyright 1999, 2000, 2001 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -107,13 +107,13 @@ fhandler_termios::set_ctty (int ttynum, int flags)
     }
 }
 
-int
+bg_check_types
 fhandler_termios::bg_check (int sig)
 {
   if (!myself->pgid || tc->getpgid () == myself->pgid ||
 	myself->ctty != tc->ntty ||
 	((sig == SIGTTOU) && !(tc->ti.c_lflag & TOSTOP)))
-    return 1;
+    return bg_ok;
 
   if (sig < 0)
     sig = -sig;
@@ -128,7 +128,7 @@ fhandler_termios::bg_check (int sig)
 	 from reallocating this pty.  I think this is the case
 	 which is handled by unlockpt on a Unix system.  */
       termios_printf ("closed by master");
-      return 0;
+      return bg_eof;
     }
 
   /* If the process group is no more or if process is ignoring or blocks 'sig',
@@ -143,16 +143,19 @@ fhandler_termios::bg_check (int sig)
   else if (!sigs_ignored)
     /* nothing */;
   else if (sig == SIGTTOU)
-    return 1;		/* Just allow the output */
+    return bg_ok;		/* Just allow the output */
   else
     goto setEIO;	/* This is an output error */
 
-  _raise (sig);
-  return 1;
+  /* Don't raise a SIGTT* signal if we have already been interrupted
+     by another signal. */
+  if (WaitForSingleObject (signal_arrived, 0) != WAIT_OBJECT_0)
+    _raise (sig);
+  return bg_signalled;
 
 setEIO:
   set_errno (EIO);
-  return -1;
+  return bg_error;
 }
 
 #define set_input_done(x) input_done = input_done || (x)

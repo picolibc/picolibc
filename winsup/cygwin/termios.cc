@@ -1,6 +1,6 @@
 /* termios.cc: termios for WIN32.
 
-   Copyright 1996, 1997, 1998, 2000 Cygnus Solutions.
+   Copyright 1996, 1997, 1998, 2000, 2001 Red Hat, Inc.
 
    Written by Doug Evans and Steve Chamberlain of Cygnus Support
    dje@cygnus.com, sac@cygnus.com
@@ -40,7 +40,7 @@ tcsendbreak (int fd, int duration)
     set_errno (ENOTTY);
   else
     {
-      if ((res = fh->bg_check (-SIGTTOU)) > 0)
+      if ((res = fh->bg_check (-SIGTTOU)) > bg_eof)
 	res = fh->tcsendbreak (duration);
     }
 
@@ -70,7 +70,7 @@ tcdrain (int fd)
     set_errno (ENOTTY);
   else
     {
-      if ((res = fh->bg_check (-SIGTTOU)) > 0)
+      if ((res = fh->bg_check (-SIGTTOU)) > bg_eof)
 	res = fh->tcdrain ();
     }
 
@@ -98,7 +98,7 @@ tcflush (int fd, int queue)
     set_errno (ENOTTY);
   else
     {
-      if ((res = fh->bg_check (-SIGTTOU)) > 0)
+      if ((res = fh->bg_check (-SIGTTOU)) > bg_eof)
 	res = fh->tcflush (queue);
     }
 
@@ -126,7 +126,7 @@ tcflow (int fd, int action)
     set_errno (ENOTTY);
   else
     {
-      if ((res = fh->bg_check (-SIGTTOU)) > 0)
+      if ((res = fh->bg_check (-SIGTTOU)) > bg_eof)
 	res = fh->tcflow (action);
     }
 
@@ -155,7 +155,7 @@ tcsetattr (int fd, int a, const struct termios *t)
     set_errno (ENOTTY);
   else
     {
-      if ((res = fh->bg_check (-SIGTTOU)) > 0)
+      if ((res = fh->bg_check (-SIGTTOU)) > bg_eof)
 	res = fh->tcsetattr (a, t);
     }
 

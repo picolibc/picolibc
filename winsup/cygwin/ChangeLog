@@ -1,3 +1,24 @@
+Wed Jan 17 09:47:13 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* autoload.cc (LoadDLLinitfunc): Remove debugging statement.
+
+	* exceptions.cc (sig_handle_tty_stop): Move setting of PID_STOPPED to
+	earlier in interrupt.
+	((interrupt_setup): i.e., here.
+	(sig_handle): Don't queue multiple SIGSTOPS.
+	* fhandler.h (bg_check_types): Enumerate return value of bg_check for
+	clarity.
+	* signal.cc (kill_pgrp): Minor cleanup.
+	* fhandler_termios.cc (fhandler_termios::bg_check): Use enumerated type
+	for function return.  Don't raise signal if a signal is already queued.
+	* fhandler_console.cc (fhandler_console::read): Use enumerated return
+	type for bg_check.
+	* select.cc: Ditto, throughout.
+	* read.cc: Ditto, throughout.
+	* termios.cc: Ditto, throughout.
+	(_read): YA interrupt detect simplification.
+	* wait.cc (wait4): Ditto.
+
 Wed Jan 17 10:56:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* cygheap.cc (cygheap_user::~cygheap_user): Temporarily

@@ -213,11 +213,9 @@ kill_pgrp (pid_t pid, int sig)
 	continue;
 
       /* Is it a process we want to kill?  */
-      if (pid == 0 && (p->pgid != myself->pgid || p->ctty != myself->ctty))
-	continue;
-      if (pid > 1 && p->pgid != pid)
-	continue;
-      if (sig < 0 && NOTSTATE(p, PID_STOPPED))
+      if ((pid == 0 && (p->pgid != myself->pgid || p->ctty != myself->ctty)) ||
+          (pid > 1 && p->pgid != pid) ||
+          (sig < 0 && NOTSTATE(p, PID_STOPPED)))
 	continue;
       sigproc_printf ("killing pid %d, pgrp %d, p->ctty %d, myself->ctty %d",
 		      p->pid, p->pgid, p->ctty, myself->ctty);

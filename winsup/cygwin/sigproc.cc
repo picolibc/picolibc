@@ -1150,8 +1150,8 @@ wait_sig (VOID *)
 		saw_sigchld = 1;
 
 	      if (sig > 0 && sig != SIGKILL && sig != SIGSTOP &&
-		  (sigismember (& myself->getsigmask (), sig) ||
-		  (sig != SIGCONT && myself->process_state & PID_STOPPED)))
+		  (sigismember (&myself->getsigmask (), sig) ||
+		  (sig != SIGCONT && ISSTATE (myself, PID_STOPPED))))
 		{
 		  sigproc_printf ("sig %d blocked", sig);
 		  break;

@@ -106,7 +106,6 @@ LoadDLLinitfunc (ntdll)
   while (InterlockedIncrement (&here))
     {
       InterlockedDecrement (&here);
-small_printf ("Multiple tries to read ntdll.dll\n");
       Sleep (0);
     }
 

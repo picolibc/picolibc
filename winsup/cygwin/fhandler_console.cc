@@ -168,7 +168,7 @@ fhandler_console::read (void *pv, size_t buflen)
   for (;;)
     {
       int bgres;
-      if ((bgres = bg_check (SIGTTIN)) <= 0)
+      if ((bgres = bg_check (SIGTTIN)) <= bg_eof)
 	return bgres;
 
       set_cursor_maybe ();	/* to make cursor appear on the screen immediately */

@@ -1,6 +1,6 @@
 /* syscalls.cc: syscalls
 
-   Copyright 1996, 1997, 1998, 1999, 2000 Cygnus Solutions.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -220,8 +220,10 @@ _read (int fd, void *ptr, size_t len)
 {
   sigframe thisframe (mainthread);
   extern int sigcatchers;
+  bool sawsig;
 
 beg:
+  sawsig = 0;
   if (fdtab.not_open (fd))
     {
       set_errno (EBADF);
@@ -243,7 +245,10 @@ beg:
       if (!wait)
 	set_sig_errno (EAGAIN);	/* Don't really need 'set_sig_errno' here, but... */
       else
-	set_sig_errno (EINTR);
+	{
+	  set_sig_errno (EINTR);
+	  sawsig = 1;
+	}
       res = -1;
       goto out;
     }
@@ -251,7 +256,7 @@ beg:
   /* Check to see if this is a background read from a "tty",
      sending a SIGTTIN, if appropriate */
   res = fh->bg_check (SIGTTIN);
-  if (res > 0)
+  if (res > bg_eof)
     {
       myself->process_state |= PID_TTYIN;
       res = fh->read (ptr, len);
@@ -259,7 +264,7 @@ beg:
     }
 
 out:
-  if (res < 0 && get_errno () == EINTR && call_signal_handler ())
+  if (sawsig && call_signal_handler ())
     goto beg;
   syscall_printf ("%d = read (%d<%s>, %p, %d), bin %d, errno %d", res, fd, fh->get_name (),
 		  ptr, len, fh->get_r_binary (), get_errno ());
@@ -289,7 +294,7 @@ _write (int fd, const void *ptr, size_t len)
   fh = fdtab[fd];
 
   res = fh->bg_check (SIGTTOU);
-  if (res > 0)
+  if (res > bg_eof)
     {
       myself->process_state |= PID_TTYOU;
       res = fh->write (ptr, len);

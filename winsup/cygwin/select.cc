@@ -412,7 +412,7 @@ peek_pipe (select_record *s, int ignra)
 	  gotone = 1;
 	  goto out;
 	}
-      if (fh->bg_check (SIGTTIN) <= 0)
+      if (fh->bg_check (SIGTTIN) <= bg_eof)
 	{
 	  gotone = s->read_ready = 1;
 	  goto out;
@@ -627,7 +627,7 @@ peek_console (select_record *me, int ignra)
   set_handle_or_return_if_not_open (h, me);
 
   for (;;)
-    if (fh->bg_check (SIGTTIN) <= 0)
+    if (fh->bg_check (SIGTTIN) <= bg_eof)
       return me->read_ready = 1;
     else if (!PeekConsoleInput (h, &irec, 1, &events_read) || !events_read)
       break;

@@ -585,6 +585,27 @@ handle_sigsuspend (sigset_t tempmask)
 extern DWORD exec_exit;		// Possible exit value for exec
 extern int pending_signals;
 
+extern "C" {
+static void
+sig_handle_tty_stop (int sig)
+{
+  myself->stopsig = sig;
+  /* See if we have a living parent.  If so, send it a special signal.
+   * It will figure out exactly which pid has stopped by scanning
+   * its list of subprocesses.
+   */
+  if (my_parent_is_alive ())
+    {
+      pinfo parent (myself->ppid);
+      sig_send (parent, __SIGCHILDSTOPPED);
+    }
+  sigproc_printf ("process %d stopped by signal %d, myself->ppid_handle %p",
+		  myself->pid, sig, myself->ppid_handle);
+  SuspendThread (hMainThread);
+  return;
+}
+}
+
 int
 interruptible (DWORD pc, int testvalid = 0)
 {
@@ -639,6 +660,11 @@ interrupt_setup (int sig, void *handler, DWORD retaddr, DWORD *retaddr_on_stack,
   sigsave.func = (void (*)(int)) handler;
   sigsave.sig = sig;
   sigsave.saved_errno = -1;		// Flag: no errno to save
+  if (handler == sig_handle_tty_stop)
+    {
+      myself->stopsig = 0;
+      myself->process_state |= PID_STOPPED;
+    }
 }
 
 static bool interrupt_now (CONTEXT *, int, void *, struct sigaction&) __attribute__((regparm(3)));
@@ -890,29 +916,6 @@ set_process_mask (sigset_t newmask)
   return;
 }
 
-extern "C" {
-static void
-sig_handle_tty_stop (int sig)
-{
-  myself->stopsig = sig;
-  myself->process_state |= PID_STOPPED;
-  /* See if we have a living parent.  If so, send it a special signal.
-   * It will figure out exactly which pid has stopped by scanning
-   * its list of subprocesses.
-   */
-  if (my_parent_is_alive ())
-    {
-      pinfo parent (myself->ppid);
-      sig_send (parent, __SIGCHILDSTOPPED);
-    }
-  sigproc_printf ("process %d stopped by signal %d, myself->ppid_handle %p",
-		  myself->pid, sig, myself->ppid_handle);
-  /* There is a small race here with the above two mutexes */
-  SuspendThread (hMainThread);
-  return;
-}
-}
-
 int __stdcall
 sig_handle (int sig)
 {
@@ -988,12 +991,15 @@ sig_handle (int sig)
   goto dosig;
 
 stop:
+  /* Eat multiple attempts to STOP */
+  if (ISSTATE (myself, PID_STOPPED))
+    goto done;
   handler = (void *) sig_handle_tty_stop;
   thissig = myself->getsig (SIGSTOP);
 
 dosig:
   /* Dispatch to the appropriate function. */
-  sigproc_printf ("signal %d, about to call %p", sig, thissig.sa_handler);
+  sigproc_printf ("signal %d, about to call %p", sig, handler);
   rc = call_handler (sig, handler, thissig);
 
 done:

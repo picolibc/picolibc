@@ -53,7 +53,8 @@ public:
   const char *path () const { return root; }
 };
 
-class cygheap_user {
+class cygheap_user
+{
   /* Extendend user information.
      The information is derived from the internal_getlogin call
      when on a NT system. */
@@ -88,12 +89,12 @@ public:
   PSID sid () const { return psid; }
 
   void operator =(cygheap_user &user)
-    {
-      set_name (user.name ());
-      set_logsrv (user.logsrv ());
-      set_domain (user.domain ());
-      set_sid (user.sid ());
-    }
+  {
+    set_name (user.name ());
+    set_logsrv (user.logsrv ());
+    set_domain (user.domain ());
+    set_sid (user.sid ());
+  }
 };
 
 struct init_cygheap

@@ -51,9 +51,11 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
   waitq *w;
   HANDLE waitfor;
   sigframe thisframe (mainthread);
+  bool sawsig;
 
 beg:
- if (options & ~(WNOHANG | WUNTRACED))
+  sawsig = 0;
+  if (options & ~(WNOHANG | WUNTRACED))
     {
       set_errno (EINVAL);
       return -1;
@@ -97,6 +99,7 @@ beg:
   if (w->status == -1)
     {
       set_sig_errno (EINTR);
+      sawsig = 1;
       res = -1;
     }
   else if (res != WAIT_OBJECT_0)
@@ -110,7 +113,7 @@ beg:
     *status = w->status;
 
 done:
-  if (res < 0 && get_errno () == EINTR && call_signal_handler ())
+  if (sawsig && call_signal_handler ())
     goto beg;
   sigproc_printf ("intpid %d, status %p, w->status %d, options %d, res %d",
 		  intpid, status, w->status, options, res);

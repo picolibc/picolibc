@@ -122,6 +122,14 @@ class select_record;
 class path_conv;
 class fhandler_disk_file;
 
+enum bg_check_types
+{
+  bg_error = -1,
+  bg_eof = 0,
+  bg_ok = 1,
+  bg_signalled = 2
+};
+
 class fhandler_base
 {
 private:
@@ -310,7 +318,7 @@ public:
   {
     return windows_device_names[FHDEVN (status)];
   }
-  virtual int bg_check (int) {return 1;}
+  virtual bg_check_types bg_check (int) {return bg_ok;}
   void clear_readahead ()
   {
     raixput = raixget = ralen = rabuflen = 0;
@@ -562,7 +570,7 @@ public:
   int tcgetpgrp ();
   int tcsetpgrp (int pid);
   void set_ctty (int ttynum, int flags);
-  int bg_check (int sig);
+  bg_check_types bg_check (int sig);
   virtual DWORD __acquire_output_mutex (const char *fn, int ln, DWORD ms) {return 1;}
   virtual void __release_output_mutex (const char *fn, int ln) {}
 };
