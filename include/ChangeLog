@@ -1,3 +1,9 @@
+2002-06-07  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* bfdlink.h (struct bfd_link_info): Change type of
+	pei386_auto_import field to int so that -1 can mean enabled by
+	default and 1 can mean enabled by command line switch.
+
 2002-06-06  DJ Delorie  <dj@redhat.com>
 
 	* hashtab.h (htab): Rearrange new members for backward
