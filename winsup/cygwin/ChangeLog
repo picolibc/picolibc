@@ -1,3 +1,9 @@
+2005-03-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* signal.cc (sigprocmask): Rename first parameter to "how".
+	(handle_sigprocmask): Ditto.  Check "how" for being a valid "how" value.
+	Fix call order in case of wrong "how" value.
+
 2005-03-09  Christopher Faylor  <cgf@timesys.com>
 
 	* net.cc (dup_ent): Avoid dereferencing a null pointer in a debug_printf.

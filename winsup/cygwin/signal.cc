@@ -130,20 +130,20 @@ usleep (unsigned int useconds)
 }
 
 extern "C" int
-sigprocmask (int sig, const sigset_t *set, sigset_t *oldset)
+sigprocmask (int how, const sigset_t *set, sigset_t *oldset)
 {
-  return handle_sigprocmask (sig, set, oldset, myself->getsigmask ());
+  return handle_sigprocmask (how, set, oldset, myself->getsigmask ());
 }
 
 int __stdcall
-handle_sigprocmask (int sig, const sigset_t *set, sigset_t *oldset, sigset_t& opmask)
+handle_sigprocmask (int how, const sigset_t *set, sigset_t *oldset, sigset_t& opmask)
 {
   sig_dispatch_pending ();
-  /* check that sig is in right range */
-  if (sig < 0 || sig >= NSIG)
+  /* check that how is in right range */
+  if (how != SIG_BLOCK && how != SIG_UNBLOCK && how != SIG_SETMASK)
     {
+      syscall_printf ("Invalid how value %d", how);
       set_errno (EINVAL);
-      syscall_printf ("signal %d out of range", sig);
       return -1;
     }
 
@@ -159,7 +159,7 @@ handle_sigprocmask (int sig, const sigset_t *set, sigset_t *oldset, sigset_t& op
       if (check_invalid_read_struct_errno (set))
 	return -1;
       sigset_t newmask = opmask;
-      switch (sig)
+      switch (how)
 	{
 	case SIG_BLOCK:
 	  /* add set to current mask */
@@ -173,9 +173,6 @@ handle_sigprocmask (int sig, const sigset_t *set, sigset_t *oldset, sigset_t& op
 	  /* just set it */
 	  newmask = *set;
 	  break;
-	default:
-	  set_errno (EINVAL);
-	  return -1;
 	}
       (void) set_signal_mask (newmask, opmask);
     }
