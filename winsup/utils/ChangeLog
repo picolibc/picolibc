@@ -1,3 +1,9 @@
+Sun Dec  3 00:40:47 2000  Christopher Faylor <cgf@cygnus.com>
+
+        * Makefile.in: Use CXX to build the DLL.
+        * configure.in: Find correct c++ compiler.
+        * configure: Regenerate.
+
 Sat Nov 18 23:53:59 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* utils.sgml: Document new options for ps and strace.

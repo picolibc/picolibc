@@ -51,9 +51,22 @@ else
 fi
 ])
 
-LIB_AC_PROG_CC
+AC_DEFUN(LIB_AC_PROG_CXX,
+[AC_BEFORE([$0], [AC_PROG_CPP])dnl
+AC_CHECK_TOOL(CXX, g++, g++)
+if test -z "$CXX"; then
+  AC_CHECK_PROG(CXX, c++, c++, , , )
+  test -z "$CC" && AC_MSG_ERROR([no acceptable cc found in \$PATH])
+fi
+
+CXXFLAGS='$(CFLAGS)'
+])
 
 AC_CANONICAL_SYSTEM
+
+LIB_AC_PROG_CC
+LIB_AC_PROG_CXX
+
 AC_ARG_PROGRAM
 
 if test "x$cross_compiling" = "xyes"; then
