@@ -212,7 +212,8 @@ install: all
 	@$(MAKE) subdirs DO=$@ $(FLAGS_TO_PASS)
 
 subdirs: force
-	@for i in $(SUBDIRS); do \
+	@test -z "$(SUBDIRS)" && exit 0; \
+	for i in $(SUBDIRS); do \
 	   echo "Making $(DO) in $${i}..." ; \
 	   if [ -d ./$$i ] ; then \
 	     if (rootme=`pwd`/ ; export rootme ; \

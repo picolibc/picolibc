@@ -1,3 +1,7 @@
+2000-03-30  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* Makefile.in (subdirs): Workaround for broken shells.
+
 2000-02-03  Mumit Khan  <khan@xraylith.wisc.edu>
 
 	* Snapshot 2000-02-03.
