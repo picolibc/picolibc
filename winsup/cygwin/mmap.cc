@@ -910,6 +910,7 @@ mprotect (caddr_t addr, size_t len, int prot)
 	break;
       case PROT_READ:
 	new_prot = PAGE_READONLY;
+	break;
       case PROT_EXEC:
 	new_prot = PAGE_EXECUTE;
 	break;
