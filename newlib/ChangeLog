@@ -1,3 +1,7 @@
+2002-07-26  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/string/strings.tex: Fix typo for memccpy.
+
 2002-07-25  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/linux/io64.c (truncate64, ftruncate64): Added.
