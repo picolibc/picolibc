@@ -1,3 +1,9 @@
+Tue 24 Jul 2001 02:28:00 PM  Trevor Forbes <t4bs@hotmail.com>
+
+	* thread.cc (verifyable_object_isvalid): Don't validate
+	PTHREAD_MUTEX_INITIALIZER pointer as it will cause an exception
+	in IsBadWritePtr() when running GDB.
+			
 Wed 25 Jul 2001 23:46:00  Corinna Vinschen <corinna@vinschen.de>
 
 	* localtime.c: Changed whole file to become C++ clean. Rename to

@@ -747,7 +747,7 @@ check_valid_pointer (void *pointer)
 int
 verifyable_object_isvalid (verifyable_object * object, long magic)
 {
-  if (!object)
+  if (!object || object == PTHREAD_MUTEX_INITIALIZER)
     return 0;
   if (check_valid_pointer (object))
     return 0;
