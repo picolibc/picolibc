@@ -228,6 +228,7 @@ extern "C" {
 #define szOID_SERVER_GATED_CRYPTO "4235658"
 #define szOID_SGC_NETSCAPE "2.16.840.1.113730.4.1"
 #define szOID_PKIX_KP_CLIENT_AUTH "1.3.6.1.5.5.7.3.2"
+#define CRYPT_NOHASHOID 0x00000001
 
 typedef UINT ALG_ID;
 typedef struct _VTableProvStruc {FARPROC FuncVerifyImage;} VTableProvStruc,*PVTableProvStruc;
