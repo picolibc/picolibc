@@ -1,5 +1,10 @@
 2002-10-13  Christopher Faylor  <cgf@redhat.com>
 
+	* cygthread.cc (cygthread::stub): Don't zero __name here.  That
+	introduces a race.
+
+2002-10-13  Christopher Faylor  <cgf@redhat.com>
+
 	* include/cygwin/version.h: Bump DLL minor number.
 
 2002-10-13  Christopher Faylor  <cgf@redhat.com>

@@ -44,21 +44,26 @@ cygthread::stub (VOID *arg)
     }
   while (1)
     {
-      if (!info->func || initialized < 0)
-	ExitThread (0);
+      if (!info->__name)
+	system_printf ("errnoneous thread activation");
+      else
+	{
+	  if (!info->func || initialized < 0)
+	    ExitThread (0);
 
-      /* Cygwin threads should not call ExitThread directly */
-      info->func (info->arg == cygself ? info : info->arg);
-      /* ...so the above should always return */
+	  /* Cygwin threads should not call ExitThread directly */
+	  info->func (info->arg == cygself ? info : info->arg);
+	  /* ...so the above should always return */
 
 #ifdef DEBUGGING
-      info->func = NULL;	// catch erroneous activation
+	  info->func = NULL;	// catch erroneous activation
 #endif
-      SetEvent (info->ev);
-      info->__name = NULL;
+	  SetEvent (info->ev);
+	}
       switch (WaitForSingleObject (info->thread_sync, INFINITE))
 	{
 	case WAIT_OBJECT_0:
+	  // ResetEvent (info->thread_sync);
 	  continue;
 	default:
 	  api_fatal ("WFSO failed, %E");
