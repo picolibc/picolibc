@@ -11,6 +11,3 @@ int  snwprintf(wchar_t* buffer, size_t n, const wchar_t* format, ...)
     va_end( argptr );
     return retval;
 }
-
-int  vsnwprintf(wchar_t *buffer,  size_t n, const wchar_t * format, va_list argptr)
-{ return _vsnwprintf( buffer, n, format, argptr );}

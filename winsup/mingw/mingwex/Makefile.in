@@ -88,6 +88,8 @@ DISTFILES = Makefile.in configure configure.in \
 	trunc.c \
 	ulltoa.c \
 	ulltow.c \
+	vsnprintf.c \
+	vsnwprintf.c \
 	wcstof.c \
 	wcstoimax.c \
 	wcstoumax.c \
@@ -141,7 +143,7 @@ STDLIB_STUB_OBJS = \
 	strtof.o wcstof.o \
 	_Exit.o
 STDIO_STUB_OBJS = \
-	snprintf.o snwprintf.o
+	snprintf.o  vsnprintf.o snwprintf.o vsnwprintf.o
 MATH_OBJS = \
 	fpclassify.o fpclassifyf.o fpclassifyl.o \
 	fucom.o \
@@ -156,7 +158,6 @@ MATH_OBJS = \
 	fma.o  fmaf.o fmal.o \
 	log2.o log2f.o log2l.o  \
 	copysignl.o
-
 MATH_STUB_OBJS = \
 	math_stubs.o
 FENV_OBJS = fesetround.o  fegetround.o \

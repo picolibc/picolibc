@@ -11,6 +11,3 @@ int snprintf(char* buffer, size_t n, const char* format, ...)
   va_end( argptr );
   return retval;
 }
-
-int vsnprintf (char* s, size_t n, const char* format, va_list arg)
-  { return _vsnprintf ( s, n, format, arg); }
