@@ -1,6 +1,0 @@
-/*
- *  $Id$
- */
-
-/* intentionally empty file */
-
