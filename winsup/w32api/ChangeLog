@@ -1,4 +1,10 @@
 
+Tue Jan 16 13:36:45  2001  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* lib/odbccp32.def: Apply Danny Smith patch 102442
+	2000-11-20  Danny Smith  <danny_r_smith_2001@yahoo.co.nz>
+	New file.
+
 Tue Jan 16 12:45:20  2001  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* include/odbcinst.h: Apply Danny Smith patch 102441
