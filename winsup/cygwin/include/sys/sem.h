@@ -1,6 +1,6 @@
 /* sys/sem.h
 
-   Copyright 2002 Red Hat Inc. 
+   Copyright 2002 Red Hat Inc.
    Written by Conrad Scott <conrad.scott@dsl.pipex.com>
 
 This file is part of Cygwin.

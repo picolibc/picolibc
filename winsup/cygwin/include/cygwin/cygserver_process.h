@@ -96,7 +96,7 @@ private:
   /* used to prevent races-on-delete */
   CRITICAL_SECTION _access;
   class process *_next;
-  
+
   DWORD check_exit_code ();
   void cleanup ();
 };
