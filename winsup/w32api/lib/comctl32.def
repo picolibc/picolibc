@@ -100,6 +100,7 @@ PropertySheetW@4
 ReAlloc@8
 SendNotify@16
 SendNotifyEx@20
+SetWindowSubclass@16
 ShowHideMenuCtl@12
 StrCSpnA@8
 StrCSpnIA@8

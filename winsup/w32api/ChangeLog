@@ -1,3 +1,15 @@
+2004-04-28  Luke Dunstan  <infidel@users.sourceforge.net>
+
+	* lib/comctl32.def (SetWindowSubclass): Add stub.
+	Thanks to Eugene <egladysh@users.sourceforge.net>.
+
+2004-04-24  Luke Dunstan  <infidel@users.sourceforge.net>
+
+	* include/winbase.h (EXECUTION_STATE): Add typedef.
+	(SetThreadExecutionState): Declare.
+	* include/wingdi.h (_WINGDI_): Define.
+	* include/objbase.h (_OBJBASE_H_): Define.
+
 2004-04-24  Luke Dunstan  <infidel@users.sourceforge.net>
 
 	* include/winuser.h (SM_IMMENABLED, SM_CXFOCUSBORDER,
