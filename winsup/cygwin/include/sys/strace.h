@@ -95,13 +95,13 @@ extern "C" void small_printf (const char *, ...);
 #else
 #define strace_printf_wrap(what, fmt, args...) \
    ((void) ({\
-	if (strace.active) \
+	if ((_STRACE_ ## what & _STRACE_SYSTEM) || strace.active) \
 	  strace.prntf(_STRACE_ ## what, __PRETTY_FUNCTION__, fmt, ## args); \
 	0; \
     }))
 #define strace_printf_wrap1(what, fmt, args...) \
     ((void) ({\
-	if (strace.active) \
+	if ((_STRACE_ ## what & _STRACE_SYSTEM) || strace.active) \
 	  strace.prntf((_STRACE_ ## what) | _STRACE_NOTALL, __PRETTY_FUNCTION__, fmt, ## args); \
 	0; \
     }))

@@ -1,3 +1,9 @@
+Thu Aug 24 13:21:09 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* include/sys/cygwin.h (strace_printf_wrap): Force printing when
+	_STRACE_SYSTEM.
+	(strace_printf_wrap1): Ditto.
+
 Thu Aug 24 12:30:17 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* debug.h: Allow some debug defines for use in header files.
