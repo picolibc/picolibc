@@ -202,7 +202,7 @@ struct in_addr {
 #define s_impno S_un.S_un_b.s_b4
 #define s_lh    S_un.S_un_b.s_b3
 };
-#define IN_CLASSA(i)	((long)(i)&0x80000000)
+#define IN_CLASSA(i)	(((long)(i)&0x80000000) == 0)
 #define IN_CLASSA_NET	0xff000000
 #define IN_CLASSA_NSHIFT	24
 #define IN_CLASSA_HOST	0x00ffffff

@@ -1,3 +1,8 @@
+2004-05-07  Pascal Obry  <obry@act-europe.fr>
+
+	* include/winsock.h (IN_CLASSA): Fix macro.
+	* include/winsock2.h (IN_CLASSA): Fix macro.
+
 2004-04-29  Bart Oldeman  <bartoldeman@users.sourceforge.net>
 
 	* include/objbase.h (STGOPTIONS): Correct pwcsTemplateFile type.
