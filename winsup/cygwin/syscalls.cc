@@ -952,36 +952,6 @@ fchmod (int fd, mode_t mode)
   return chmod (path, mode);
 }
 
-/* Cygwin internal */
-static int
-num_entries (const char *win32_name)
-{
-  WIN32_FIND_DATA buf;
-  HANDLE handle;
-  char buf1[MAX_PATH];
-  int count = 0;
-
-  strcpy (buf1, win32_name);
-  int len = strlen (buf1);
-  if (len == 0 || isdirsep (buf1[len - 1]))
-    strcat (buf1, "*");
-  else
-    strcat (buf1, "/*");	/* */
-
-  handle = FindFirstFileA (buf1, &buf);
-
-  if (handle == INVALID_HANDLE_VALUE)
-    return 0;
-  count ++;
-  while (FindNextFileA (handle, &buf))
-    {
-      if ((buf.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-	count ++;
-    }
-  FindClose (handle);
-  return count;
-}
-
 extern "C" int
 _fstat (int fd, struct stat *buf)
 {
@@ -997,7 +967,7 @@ _fstat (int fd, struct stat *buf)
   else
     {
       memset (buf, 0, sizeof (struct stat));
-      r = cygheap->fdtab[fd]->fstat (buf);
+      r = cygheap->fdtab[fd]->fstat (buf, NULL);
       syscall_printf ("%d = fstat (%d, %x)", r, fd, buf);
     }
 
@@ -1033,32 +1003,6 @@ sync ()
   return 0;
 }
 
-int __stdcall
-stat_dev (DWORD devn, int unit, unsigned long ino, struct stat *buf)
-{
-  sigframe thisframe (mainthread);
-  switch (devn)
-    {
-    case FH_PIPEW:
-      buf->st_mode = STD_WBITS | S_IWGRP | S_IWOTH;
-      break;
-    case FH_PIPER:
-      buf->st_mode = STD_RBITS;
-      break;
-    default:
-      buf->st_mode = STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
-      break;
-    }
-
-  buf->st_mode |= devn == FH_FLOPPY ? S_IFBLK : S_IFCHR;
-  buf->st_blksize = S_BLKSIZE;
-  buf->st_nlink = 1;
-  buf->st_dev = buf->st_rdev = FHDEVN (devn) << 8 | (unit & 0xff);
-  buf->st_ino = ino;
-  buf->st_atime = buf->st_mtime = buf->st_ctime = time (NULL);
-  return 0;
-}
-
 suffix_info stat_suffixes[] =
 {
   suffix_info ("", 1),
@@ -1071,18 +1015,13 @@ int __stdcall
 stat_worker (const char *name, struct stat *buf, int nofollow, path_conv *pc)
 {
   int res = -1;
-  int oret;
-  uid_t uid;
-  gid_t gid;
   path_conv real_path;
   fhandler_base *fh = NULL;
 
   if (!pc)
     pc = &real_path;
-  MALLOC_CHECK;
-  int open_flags = O_RDONLY | O_BINARY | O_DIROPEN
-    		   | (nofollow ? O_NOSYMLINK : 0);
 
+  MALLOC_CHECK;
   if (check_null_invalid_struct_errno (buf))
     goto done;
 
@@ -1093,110 +1032,19 @@ stat_worker (const char *name, struct stat *buf, int nofollow, path_conv *pc)
 						| PC_FULL, stat_suffixes);
   if (pc->error)
     {
+      debug_printf ("got %d error from build_fhandler_from_name", pc->error);
       set_errno (pc->error);
-      goto done;
     }
-
-  debug_printf ("(%s, %p, %d, %p)", name, buf, nofollow, pc);
-
-  memset (buf, 0, sizeof (struct stat));
-
-  if (pc->is_device ())
-    return stat_dev (pc->get_devn (), pc->get_unitn (),
-		     hash_path_name (0, pc->get_win32 ()), buf);
-
-  debug_printf ("%d = file_attributes for '%s'", (DWORD) real_path,
-		(char *) real_path);
-
-  if ((oret = fh->open (pc, open_flags, 0)))
-    /* ok */;
   else
     {
-      int ntsec_atts = 0;
-      /* If we couldn't open the file, try a "query open" with no permissions.
-	 This will allow us to determine *some* things about the file, at least. */
-      fh->set_query_open (TRUE);
-      if ((oret = fh->open (pc, open_flags, 0)))
-        /* ok */;
-      else if (allow_ntsec && pc->has_acls () && get_errno () == EACCES
-		&& !get_file_attribute (TRUE, real_path, &ntsec_atts, &uid, &gid)
-		&& !ntsec_atts && uid == myself->uid && gid == myself->gid)
-        {
-	  /* Check a special case here. If ntsec is ON it happens
-	     that a process creates a file using mode 000 to disallow
-	     other processes access. In contrast to UNIX, this results
-	     in a failing open call in the same process. Check that
-	     case. */
-	  set_file_attribute (TRUE, real_path, 0400);
-	  oret = fh->open (pc, open_flags, 0);
-	  set_file_attribute (TRUE, real_path, ntsec_atts);
-        }
-    }
-  if (oret)
-    {
-      res = fh->fstat (buf);
-      /* The number of links to a directory includes the
-	 number of subdirectories in the directory, since all
-	 those subdirectories point to it.
-	 This is too slow on remote drives, so we do without it and
-	 set the number of links to 2. */
-      /* Unfortunately the count of 2 confuses `find (1)' command. So
-	 let's try it with `1' as link count. */
-      if (pc->isdir ())
-	buf->st_nlink = (pc->isremote ()
-			 ? 1 : num_entries (pc->get_win32 ()));
-      fh->close ();
-    }
-  else if (pc->exists ())
-    {
-      /* Unfortunately, the above open may fail if the file exists, though.
-	 So we have to care for this case here, too. */
-      WIN32_FIND_DATA wfd;
-      HANDLE handle;
-      buf->st_nlink = 1;
-      if (pc->isdir () && pc->isremote ())
-	buf->st_nlink = num_entries (pc->get_win32 ());
-      buf->st_dev = FHDEVN (FH_DISK) << 8;
-      buf->st_ino = hash_path_name (0, pc->get_win32 ());
-      if (pc->isdir ())
-	buf->st_mode = S_IFDIR;
-      else if (pc->issymlink ())
-	buf->st_mode = S_IFLNK;
-      else if (pc->issocket ())
-	buf->st_mode = S_IFSOCK;
-      else
-	buf->st_mode = S_IFREG;
-      if (!pc->has_acls ()
-	  || get_file_attribute (TRUE, pc->get_win32 (),
-				 &buf->st_mode,
-				 &buf->st_uid, &buf->st_gid))
-	{
-	  buf->st_mode |= STD_RBITS | STD_XBITS;
-	  if (!(pc->has_attribute (FILE_ATTRIBUTE_READONLY)))
-	    buf->st_mode |= STD_WBITS;
-	  if (pc->issymlink ())
-	    buf->st_mode |= S_IRWXU | S_IRWXG | S_IRWXO;
-	  get_file_attribute (FALSE, pc->get_win32 (),
-			      NULL, &buf->st_uid, &buf->st_gid);
-	}
-      if ((handle = FindFirstFile (pc->get_win32 (), &wfd))
-	  != INVALID_HANDLE_VALUE)
-	{
-	  buf->st_atime   = to_time_t (&wfd.ftLastAccessTime);
-	  buf->st_mtime   = to_time_t (&wfd.ftLastWriteTime);
-	  buf->st_ctime   = to_time_t (&wfd.ftCreationTime);
-	  buf->st_size    = wfd.nFileSizeLow;
-	  buf->st_blksize = S_BLKSIZE;
-	  buf->st_blocks  = ((unsigned long) buf->st_size +
-			    S_BLKSIZE-1) / S_BLKSIZE;
-	  FindClose (handle);
-	}
-      res = 0;
+      debug_printf ("(%s, %p, %d, %p), file_attributes %d", name, buf, nofollow,
+	  	    pc, (DWORD) real_path);
+      memset (buf, 0, sizeof (struct stat));
+      res = fh->fstat (buf, pc);
+      delete fh;
     }
 
  done:
-  if (fh)
-    delete fh;
   MALLOC_CHECK;
   syscall_printf ("%d = (%s, %p)", res, name, buf);
   return res;

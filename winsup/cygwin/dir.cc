@@ -85,7 +85,7 @@ opendir (const char *dirname)
 
   path_conv real_dirname;
 
-  if (stat_worker (dirname, &statbuf, 1, &real_dirname) == -1)
+  if (stat_worker (dirname, &statbuf, 0, &real_dirname) == -1)
     goto failed;
 
   if (!(statbuf.st_mode & S_IFDIR))

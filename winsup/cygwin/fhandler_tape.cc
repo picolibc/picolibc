@@ -148,11 +148,11 @@ fhandler_dev_tape::close (void)
 }
 
 int
-fhandler_dev_tape::fstat (struct stat *buf)
+fhandler_dev_tape::fstat (struct stat *buf, path_conv *pc)
 {
   int ret;
 
-  if (! (ret = fhandler_dev_raw::fstat (buf)))
+  if (!(ret = fhandler_dev_raw::fstat (buf, pc)))
     {
       struct mtget get;
 

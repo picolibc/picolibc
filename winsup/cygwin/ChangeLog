@@ -1,3 +1,29 @@
+Thu Oct  4 23:17:49 2001  Christopher Faylor <cgf@cygnus.com>
+
+	Add second path_conv * argument to fstat()s throughout.
+	* fhandler.h: Change read and fstat to regparm/stdcall throughout.
+	(fhandler_base::fstat): Just declare.  Don't define.
+	(fhandler_disk_file::fstat_helper): Declare.
+	* fhandler.cc (fhandler_base::fstat): Move here from fhandler.h, adapt
+	from former stat_dev().
+	(fhandler_disk_file::fstat): Move most of the disk-file-specific logic
+	from stat_worker to here.  Use fstat_helper to derive final fstat
+	output.
+	(fhandler_disk_file::fstat_helper): New method, renamed from former
+	fstat method.
+	(num_entries): Moved here from syscalls.cc.
+	* fhandler_mem.cc (fhandler_dev_mem::fstat): Use base class to
+	initialize most stuff.  Invert has_physical_mem_access test for
+	establishing permissions.
+	* fhandler_raw.cc (fhandler_dev_raw::fstat): Eliminate unneed test and
+	memory clearing.  Use base class to initialize most stuff.
+	* syscalls.cc (stat_dev): Eliminate.
+	(stat_worker): Simply call fstat method to generate fstat output.  Move
+	all device specific code to appropriate fstats.
+
+	* dir.cc (opendir): Pass correct arg to stat_worker to allow following
+	symlinks.
+
 Thu Oct  4 21:37:57 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* spawn.cc (perhaps_suffix): Return NULL on non-existence of file as

@@ -156,22 +156,10 @@ fhandler_dev_raw::close (void)
 }
 
 int
-fhandler_dev_raw::fstat (struct stat *buf)
+fhandler_dev_raw::fstat (struct stat *buf, path_conv *pc)
 {
-  if (!buf)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-
-  memset (buf, 0, sizeof *buf);
-  buf->st_mode = S_IFCHR |
-		 S_IRUSR | S_IWUSR |
-		 S_IRGRP | S_IWGRP |
-		 S_IROTH | S_IWOTH;
-  buf->st_nlink = 1;
+  this->fhandler_base::fstat (buf, pc);
   buf->st_blksize = devbuf ? devbufsiz : 1;
-  buf->st_dev = buf->st_rdev = get_device () << 8 | (unit & 0xff);
 
   return 0;
 }
