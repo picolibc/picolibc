@@ -1,5 +1,10 @@
 2005-02-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* select.cc (peek_pipe): Disable new pipe code until there's
+	a working substitute.
+
+2005-02-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwin.din (fdatasync): Export.
 	* fhandler.cc (fhandler_base::fsync): Return with EINVAL if no
 	handle is available.

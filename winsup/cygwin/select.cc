@@ -517,6 +517,10 @@ out:
 		       fh->get_name ());
       else
 	{
+#if 0
+/* FIXME: This code is not quite correct.  There's no better solution
+   so far but to always treat the write side of the pipe as writable. */
+
 	  /* We don't worry about the guard mutex, because that only applies
 	     when from_select is false, and peek_pipe is never called that
 	     way for writes.  */
@@ -563,6 +567,9 @@ out:
 			     fpli.WriteQuotaAvailable);
 	      gotone += s->write_ready = true;
 	    }
+#else
+          gotone += s->write_ready = true;
+#endif
 	}
     }
 
