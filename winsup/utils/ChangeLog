@@ -1,3 +1,8 @@
+2004-10-20  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
+
+	* cygcheck.cc (dump_sysinfo): Allow for larger drives in drive-list.
+	Change ``Used'' to ``Free'' in helptext-title for drive-list.
+
 2004-10-18  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>  
 
 	* cygcheck.cc (pretty_id): Don't let i become negative. Fix
