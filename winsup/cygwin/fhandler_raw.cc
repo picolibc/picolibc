@@ -310,10 +310,7 @@ int
 fhandler_dev_raw::raw_write (const void *ptr, size_t len)
 {
   DWORD bytes_written = 0;
-  DWORD bytes_to_write;
-  DWORD written;
   char *p = (char *) ptr;
-  char *tgt;
   int ret;
 
   /* Checking a previous end of media on tape */
@@ -327,73 +324,7 @@ fhandler_dev_raw::raw_write (const void *ptr, size_t len)
     devbufstart = devbufend = 0;
   is_writing (true);
 
-  if (devbuf)
-    {
-      while (len > 0)
-	{
-	  if ((len < devbufsiz || devbufend > 0) && devbufend < devbufsiz)
-	    {
-	      bytes_to_write = min (len, devbufsiz - devbufend);
-	      memcpy (devbuf + devbufend, p, bytes_to_write);
-	      bytes_written += bytes_to_write;
-	      devbufend += bytes_to_write;
-	      p += bytes_to_write;
-	      len -= bytes_to_write;
-	    }
-	  else
-	    {
-	      if (devbufend == devbufsiz)
-		{
-		  bytes_to_write = devbufsiz;
-		  tgt = devbuf;
-		}
-	      else
-		{
-		  bytes_to_write = (len / devbufsiz) * devbufsiz;
-		  tgt = p;
-		}
-
-	      ret = 0;
-	      write_file (tgt, bytes_to_write, &written, &ret);
-
-	      if (ret)
-		{
-		  if (!is_eom (ret))
-		    {
-		      __seterrno ();
-		      return -1;
-		    }
-
-		  eom_detected (true);
-
-		  if (!written && !bytes_written)
-		    {
-		      set_errno (ENOSPC);
-		      return -1;
-		    }
-
-		  if (tgt == p)
-		    bytes_written += written;
-
-		  break;	// from while (len > 0)
-		}
-
-	      if (tgt == devbuf)
-		{
-		  if (written != devbufsiz)
-		    memmove (devbuf, devbuf + written, devbufsiz - written);
-		  devbufend = devbufsiz - written;
-		}
-	      else
-		{
-		  len -= written;
-		  p += written;
-		  bytes_written += written;
-		}
-	    }
-	}
-    }
-  else if (len > 0)
+  if (len > 0)
     {
       if (!write_file (p, len, &bytes_written, &ret))
 	{

@@ -1,3 +1,8 @@
+2004-07-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_raw.cc (fhandler_dev_raw::raw_write): Remove buffered
+	write entirely.
+
 2004-07-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* spawn.cc (spawn_guts): Check if script is executable.
