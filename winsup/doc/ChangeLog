@@ -1,3 +1,8 @@
+2005-03-25  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* how-programming.texinfo: Mention generic-build-script in
+	packaging FAQ.
+
 2005-03-19  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* how-programming.texinfo: Remove incorrect libm.a note.

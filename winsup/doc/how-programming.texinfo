@@ -2,22 +2,26 @@
 
 @subsection How do I contribute a package?
 
-If you are willing to be a package maintainer, great.  We urgently need
+If you are willing to be a package maintainer, great!  We urgently need
 volunteers to prepare and maintain packages, because the priority of the
 Cygwin Team is Cygwin itself.
 
-The Cygwin Package Contributor's Guide is at
-@file{http://cygwin.com/setup.html}, which details everything you need
-to know about being a package maintainer.  Use the cygwin-apps mailing
-list (start at @file{http://cygwin.com/lists.html}) for
-questions about package maintenance, @emph{after} searching and browsing the
-cygwin-apps list archives, of course.  Charles Wilson posted a short
-recipe of what is involved, using texinfo as an example, available at
-@file{http://cygwin.com/ml/cygwin-apps/2000-11/msg00055.html}.  This
-should give you an idea of what is required.
+The Cygwin Package Contributor's Guide at
+@file{http://cygwin.com/setup.html} details everything you need to know
+about being a package maintainer. The quickest way to get started is to
+read the @emph{Initial packaging procedure, script-based} section on
+that page.  The @samp{generic-build-script} found there works well for
+most packages. 
 
-You should announce your intentions to the general cygwin list, in case
-others were thinking the same thing.
+For questions about package maintenance, use the cygwin-apps mailing
+list (start at @file{http://cygwin.com/lists.html}) @emph{after}
+searching and browsing the cygwin-apps list archives, of course.  Be
+sure to look at the @emph{Submitting a package} checklist at
+@file{http://cygwin.com/setup.html} before sending an ITP (Intent To
+Package) email to cygwin-apps.
+
+You should also announce your intentions to the general cygwin list, in
+case others were thinking the same thing.
 
 @subsection How do I contribute to Cygwin?
 
