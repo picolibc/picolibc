@@ -19,6 +19,25 @@
 
 2003-01-21  Christopher Faylor  <cgf@redhat.com>
 
+	* grp.cc (pwdgrp::parse_group): Eliminate arg and use class member
+	instead.  Use next_str and next_int to parse arguments.
+	* passwd.cc (pwdgrp::parse_passwd): Ditto.
+	(grab_string): Eliminate.
+	(grab_int): Ditto.
+	* pwdgrp.h (pwdgrp::parse): Eliminate input arg.
+	(pwdgrp::parse_passwd): Reflect above change.
+	(pwdgrp::parse_group): Reflect above change.
+	(pwdgrp::next_str): New function.
+	(pwdgrp::next_int): Ditto.
+	(pwdgrp::gets): Eliminate.
+	* uinfo.cc (pwdgrp::next_str): New function.
+	(pwdgrp::next_int): Ditto.
+	(pwdgrp::add_line): Subsume gets.
+	(pwdgrp::gets): Eliminate.
+	(pwdgrp::load): Just call add_line to parse input buffer.
+
+2003-01-21  Christopher Faylor  <cgf@redhat.com>
+
 	* grp.cc: Call gr.refresh() rather than doing isunitialized tests
 	throughout.
 	(gr): Use constructor (sigh).
@@ -55,7 +74,8 @@
 	(etc::test_file_change): Do not test for negative values of
 	change_possible and do not set it to -res.
 	(etc::dir_changed): When the handle is NULL, call memset instead of
-	test_file_changed.  When the handle is invalid, return true.
+	test_file_changed.  When the handle is invalid, return true.  Detect
+	filename change in /etc.
 	(etc::file_changed): Remove unneeded check for !fn[n].
 	* uinfo.cc (pwdgrp::load): Eliminate spurious setting of fh to NULL.
 	* pwdgrp.h (pwdgrp::operator =): Eliminate.
