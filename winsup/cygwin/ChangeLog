@@ -56,11 +56,9 @@ Thursday Mar 22 2001  Robert Collins <rbtcollins@hotmail.com>
 	(fhandler_dev_clipboard::write): Truly implement clipboard writing.
 	(fhandler_dev_clipboard::read): Reimplement to allow successive reads.
 	(fhandler_dev_clipboard::lseek): Truly implement seeks in clipboard.
-	(fhandler_dev_clipboard::close): Clear out new fields.
-
- Support sequential
-	reads and sequential writes.  Support for binary data via a native
-	clipboard format.
+	(fhandler_dev_clipboard::close): Clear out new fields.  Support
+	sequential reads and sequential writes.  Support for binary data via a
+	native clipboard format.
 
 2001-03-22  Egor Duda  <deo@logos-m.ru>
   
