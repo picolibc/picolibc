@@ -20,17 +20,17 @@ details. */
 #define  __INSIDE_CYGWIN_NET__
 #define Win32_Winsock
 
+#include "winsup.h"
 #include <errno.h>
 #include <sys/socket.h>
 #include <stdlib.h>
 #include <sys/time.h>
 
+#include <wingdi.h>
+#include <winuser.h>
 #include <netdb.h>
 #include <unistd.h>
 #include <stdio.h>
-#include "winsup.h"
-#include <wingdi.h>
-#include <winuser.h>
 #include <winsock.h>
 #include "select.h"
 

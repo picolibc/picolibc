@@ -8,6 +8,7 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "winsup.h"
 #include <sys/stat.h>
 #include <sys/vfs.h> /* needed for statfs */
 #include <fcntl.h>
@@ -20,7 +21,6 @@ details. */
 #include <sys/uio.h>
 #include <errno.h>
 #include <limits.h>
-#include "winsup.h"
 #include <unistd.h>
 #include <winnls.h>
 #include <lmcons.h> /* for UNLEN */

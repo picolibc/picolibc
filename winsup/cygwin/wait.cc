@@ -8,10 +8,10 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "winsup.h"
 #include <sys/wait.h>
 #include <stdlib.h>
 #include <errno.h>
-#include "winsup.h"
 
 /* This is called _wait and not wait because the real wait is defined
    in libc/syscalls/syswait.c.  It calls us.  */

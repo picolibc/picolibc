@@ -8,12 +8,12 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "winsup.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <grp.h>
 #include <pwd.h>
-#include "winsup.h"
 
 #define SHAREDVER (unsigned)(cygwin_version.api_major << 16 | \
 		   cygwin_version.api_minor)

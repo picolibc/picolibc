@@ -8,8 +8,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#include <errno.h>
 #include "winsup.h"
+#include <errno.h>
 
 #define brksize ((char *) user_data->heaptop - (char *) user_data->heapbase)
 #define brk (user_data->heapptr)

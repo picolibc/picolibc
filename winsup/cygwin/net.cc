@@ -12,14 +12,13 @@ details. */
 
 #define  __INSIDE_CYGWIN_NET__
 
+#define Win32_Winsock
+#include "winsup.h"
 #include <errno.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 
 #include <unistd.h>
-
-#define Win32_Winsock
-#include "winsup.h"
 #include <netdb.h>
 #include <fcntl.h>
 #include "autoload.h"

@@ -8,6 +8,7 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "winsup.h"
 #include <stdlib.h>
 #include <stdarg.h>
 #include <unistd.h>
@@ -15,7 +16,6 @@ details. */
 #include <sys/wait.h>
 #include <errno.h>
 #include <limits.h>
-#include "winsup.h"
 #include <wingdi.h>
 #include <winuser.h>
 #include <ctype.h>
@@ -921,7 +921,7 @@ spawnl (int mode, const char *path, const char *arg0, ...)
 
   va_end (args);
 
-  return _spawnve (NULL, mode, path, (char * const  *) argv, environ);
+  return _spawnve (NULL, mode, path, (char * const  *) argv, cur_environ ());
 }
 
 extern "C"
@@ -966,7 +966,7 @@ spawnlp (int mode, const char *path, const char *arg0, ...)
 
   va_end (args);
 
-  return spawnvpe (mode, path, (char * const *) argv, environ);
+  return spawnvpe (mode, path, (char * const *) argv, cur_environ ());
 }
 
 extern "C"
@@ -996,7 +996,7 @@ extern "C"
 int
 spawnv (int mode, const char *path, const char * const *argv)
 {
-  return _spawnve (NULL, mode, path, argv, environ);
+  return _spawnve (NULL, mode, path, argv, cur_environ ());
 }
 
 extern "C"
@@ -1011,7 +1011,7 @@ extern "C"
 int
 spawnvp (int mode, const char *path, const char * const *argv)
 {
-  return spawnvpe (mode, path, argv, environ);
+  return spawnvpe (mode, path, argv, cur_environ ());
 }
 
 extern "C"

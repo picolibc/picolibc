@@ -8,11 +8,11 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "winsup.h"
 #include <stdlib.h>
 #include <pwd.h>
 #include <stdio.h>
 #include <errno.h>
-#include "winsup.h"
 
 /* Read /etc/passwd only once for better performance.  This is done
    on the first call that needs information from it. */

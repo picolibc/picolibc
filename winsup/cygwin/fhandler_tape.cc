@@ -9,11 +9,11 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "winsup.h"
 #include <sys/termios.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
-#include "winsup.h"
 
 #include <sys/mtio.h>
 

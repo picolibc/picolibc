@@ -10,8 +10,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#include <errno.h>
 #include "winsup.h"
+#include <errno.h>
 
 fhandler_dev_zero::fhandler_dev_zero (const char *name)
   : fhandler_base (FH_ZERO, name)

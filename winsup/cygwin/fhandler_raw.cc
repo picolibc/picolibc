@@ -8,11 +8,11 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
+#include "winsup.h"
 #include <sys/termios.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
-#include "winsup.h"
 
 #include <cygwin/rdevio.h>
 #include <sys/mtio.h>

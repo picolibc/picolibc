@@ -8,11 +8,11 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "winsup.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <process.h>
-#include "winsup.h"
 
 /* This is called _execve and not execve because the real execve is defined
    in libc/posix/execve.c.  It calls us.  */
@@ -44,7 +44,7 @@ execl (const char *path, const char *arg0, ...)
   while (argv[i++] != NULL);
   va_end (args);
   MALLOC_CHECK;
-  return _execve (path, (char * const  *) argv, environ);
+  return _execve (path, (char * const  *) argv, cur_environ ());
 }
 
 extern "C"
@@ -52,7 +52,7 @@ int
 execv (const char *path, char * const *argv)
 {
   MALLOC_CHECK;
-  return _execve (path, (char * const *) argv, environ);
+  return _execve (path, (char * const *) argv, cur_environ ());
 }
 
 /* the same as a standard exec() calls family, but with NT security support */
@@ -85,7 +85,7 @@ sexecl (HANDLE hToken, const char *path, const char *arg0, ...)
   va_end (args);
 
   MALLOC_CHECK;
-  return sexecve (hToken, path, (char * const *) argv, environ);
+  return sexecve (hToken, path, (char * const *) argv, cur_environ ());
 }
 
 extern "C"
@@ -131,7 +131,7 @@ sexeclp (HANDLE hToken, const char *path, const char *arg0, ...)
   va_end (args);
 
   MALLOC_CHECK;
-  return sexecvpe (hToken, path, (const char * const *) argv, environ);
+  return sexecvpe (hToken, path, (const char * const *) argv, cur_environ ());
 }
 
 extern "C"
@@ -163,7 +163,7 @@ int
 sexecv (HANDLE hToken, const char *path, const char * const *argv)
 {
   MALLOC_CHECK;
-  return sexecve (hToken, path, argv, environ);
+  return sexecve (hToken, path, argv, cur_environ ());
 }
 
 extern "C"
@@ -171,7 +171,7 @@ int
 sexecp (HANDLE hToken, const char *path, const char * const *argv)
 {
   MALLOC_CHECK;
-  return sexecvpe (hToken, path, argv, environ);
+  return sexecvpe (hToken, path, argv, cur_environ ());
 }
 
 /*

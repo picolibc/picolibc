@@ -8,8 +8,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#include <pwd.h>
 #include "winsup.h"
+#include <pwd.h>
 #include <unistd.h>
 #include <winnls.h>
 #include <utmp.h>

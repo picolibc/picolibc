@@ -8,10 +8,10 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "winsup.h"
 #include <unistd.h>
 #include <sys/fcntl.h>
 #include <errno.h>
-#include "winsup.h"
 
 static int
 make_pipe (int fildes[2], unsigned int psize, int mode)

@@ -10,9 +10,9 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "winsup.h"
 #include <errno.h>
 #include <limits.h>
-#include "winsup.h"
 
 #define RANDOM   8
 #define URANDOM  9

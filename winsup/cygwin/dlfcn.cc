@@ -8,10 +8,10 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "winsup.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "winsup.h"
 #include <ctype.h>
 #include "dlfcn.h"
 #include "dll_init.h"

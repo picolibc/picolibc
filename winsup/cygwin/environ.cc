@@ -7,9 +7,9 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "winsup.h"
 #include <errno.h>
 #include <stdlib.h>
-#include "winsup.h"
 #include <stddef.h>
 #include <ctype.h>
 #include <fcntl.h>
@@ -83,7 +83,7 @@ getwinenv (const char *env, const char *in_posix)
       {
 	win_env *we = conv_envvars + i;
 	const char *val;
-	if (!environ || !(val = in_posix ?: getenv(we->name)))
+	if (!cur_environ () || !(val = in_posix ?: getenv(we->name)))
 	  debug_printf ("can't set native for %s since no environ yet",
 			we->name);
 	else if (!envcache || !we->posix || strcmp (val, we->posix))
@@ -146,11 +146,11 @@ my_findenv (const char *name, int *offset)
       len++;
     }
 
-  for (p = environ; *p; ++p)
+  for (p = cur_environ (); *p; ++p)
     if (!strncmp (*p, name, len))
       if (*(c = *p + len) == '=')
 	{
-	  *offset = p - environ;
+	  *offset = p - cur_environ ();
 	  return (char *) (++c);
 	}
   return NULL;
@@ -199,13 +199,13 @@ _addenv (const char *name, const char *value, int overwrite)
       char **env;
 
       /* Search for the end of the environment. */
-      for (env = environ; *env; env++)
+      for (env = cur_environ (); *env; env++)
 	continue;
 
-      offset = env - environ;	/* Number of elements currently in environ. */
+      offset = env - cur_environ ();	/* Number of elements currently in environ. */
 
       /* Allocate space for additional element plus terminating NULL. */
-      __cygwin_environ = (char **) realloc (environ, (sizeof (char *) *
+      __cygwin_environ = (char **) realloc (cur_environ (), (sizeof (char *) *
 						     (offset + 2)));
       if (!__cygwin_environ)
 	return -1;		/* Oops.  No more memory. */
@@ -216,7 +216,7 @@ _addenv (const char *name, const char *value, int overwrite)
 
   char *envhere;
   if (!issetenv)
-    envhere = environ[offset] = (char *) name;	/* Not setenv. Just
+    envhere = cur_environ ()[offset] = (char *) name;	/* Not setenv. Just
 						   overwrite existing. */
   else
     {				/* setenv */
@@ -226,7 +226,7 @@ _addenv (const char *name, const char *value, int overwrite)
 
       int namelen = p - name;	/* Length of name. */
       /* Allocate enough space for name + '=' + value + '\0' */
-      envhere = environ[offset] = (char *) malloc (namelen + valuelen + 2);
+      envhere = cur_environ ()[offset] = (char *) malloc (namelen + valuelen + 2);
       if (!envhere)
 	return -1;		/* Oops.  No more memory. */
 
@@ -308,7 +308,7 @@ unsetenv (const char *name)
 
   while (my_findenv (name, &offset))	/* if set multiple times */
     /* Move up the rest of the array */
-    for (e = environ + offset; ; e++)
+    for (e = cur_environ () + offset; ; e++)
       if (!(*e = *(e + 1)))
 	break;
 }

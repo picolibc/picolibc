@@ -71,6 +71,7 @@ details. */
    c: means c:\.
 */
 
+#include "winsup.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/mount.h>
@@ -78,7 +79,6 @@ details. */
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
-#include "winsup.h"
 #include <ctype.h>
 #include <winioctl.h>
 

@@ -8,8 +8,8 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
-#include <sys/poll.h>
 #include "winsup.h"
+#include <sys/poll.h>
 
 extern "C"
 int

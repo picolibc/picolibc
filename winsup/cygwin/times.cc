@@ -8,10 +8,7 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-/* Hide definitions from the library since they contain the
-   "dllimport" attribute. */
-#define _timezone dummy_timezone
-#define _daylight dummy_daylight
+#include "winsup.h"
 #include <time.h>
 #include <sys/times.h>
 #include <sys/timeb.h>
@@ -19,12 +16,7 @@ details. */
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-#include "winsup.h"
 
-#undef _timezone
-#undef _daylight
-extern time_t _timezone;
-extern int _daylight;
 
 #define FACTOR (0x19db1ded53ea710LL)
 #define NSPERSEC 10000000LL

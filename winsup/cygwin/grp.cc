@@ -11,10 +11,10 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "winsup.h"
 #include <grp.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "winsup.h"
 
 /* Read /etc/group only once for better performance.  This is done
    on the first call that needs information from it. */

@@ -14,6 +14,8 @@ details. */
 
 #define __INSIDE_CYGWIN__
 
+#ifdef __cplusplus
+
 #define alloca(x) __builtin_alloca (x)
 #define strlen __builtin_strlen
 #define strcpy __builtin_strcpy
@@ -502,7 +504,6 @@ void __stdcall update_envptrs ();
 char * __stdcall winenv (const char * const *, int);
 extern char **__cygwin_environ, ***main_environ;
 extern "C" char __stdcall **cur_environ ();
-#define environ (cur_environ ())
 
 /* The title on program start. */
 extern char *old_title;
@@ -516,8 +517,7 @@ void seterrno (const char *, int line);
 
 #define __seterrno() seterrno (__FILE__, __LINE__)
 #define __seterrno_from_win_error(val) seterrno_from_win_error (__FILE__, __LINE__, val)
-#undef errno
-#define errno dont_use_this_since_were_in_a_shared library
+
 #define set_errno(val) (_impure_ptr->_errno = (val))
 #define get_errno()  (_impure_ptr->_errno)
 extern "C" void __stdcall set_sig_errno (int e);
@@ -535,3 +535,5 @@ class save_errno
 
 extern const char *__sp_fn;
 extern int __sp_ln;
+
+#endif /* defined __cplusplus */

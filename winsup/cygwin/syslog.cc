@@ -8,12 +8,12 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "winsup.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <syslog.h>
 #include <stdarg.h>
 #include <unistd.h>
-#include "winsup.h"
 
 /* FIXME: These should probably be in the registry. */
 /* FIXME: The Win95 path should be whatever slash is */

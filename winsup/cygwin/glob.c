@@ -67,6 +67,8 @@
 /* #include "namespace.h" */
 /* end CYGNUS LOCAL */
 
+#include "winsup.h"
+
 #include <sys/param.h>
 #include <sys/stat.h>
 

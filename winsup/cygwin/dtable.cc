@@ -10,6 +10,8 @@ details. */
 
 #define  __INSIDE_CYGWIN_NET__
 
+#define Win32_Winsock
+#include "winsup.h"
 #include <errno.h>
 #include <sys/socket.h>
 #include <stdlib.h>
@@ -17,8 +19,6 @@ details. */
 #include <unistd.h>
 #include <fcntl.h>
 
-#define Win32_Winsock
-#include "winsup.h"
 #include <winsock.h>
 
 hinfo dtable;

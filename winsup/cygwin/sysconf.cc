@@ -8,11 +8,11 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "winsup.h"
 #include <unistd.h>
 #include <errno.h>
 #include <time.h>
 #include <limits.h>
-#include "winsup.h"
 
 /* sysconf: POSIX 4.8.1.1 */
 /* Allows a portable app to determine quantities of resources or

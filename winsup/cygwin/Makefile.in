@@ -71,8 +71,6 @@ include $(srcdir)/../Makefile.common
 
 INSTALL_DATA:=$(SHELL) $(updir1)/install-sh -c
 
-COMPILE_CC+=-D__INSIDE_CYGWIN__
-
 @SET_MAKE@
 
 # Setup the testing framework, if you have one

@@ -5,6 +5,7 @@
 /* Temporarily merged private.h and tzfile.h for ease of management - DJ */
 
 /* CYGNUS LOCAL */
+#include "winsup.h"
 #define lint
 #include <windows.h>
 

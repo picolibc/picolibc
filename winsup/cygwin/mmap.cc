@@ -8,12 +8,12 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "winsup.h"
 #include <stdlib.h>
 #include <stddef.h>
 #include <sys/mman.h>
 #include <errno.h>
 
-#include "winsup.h"
 
 /*
  * Simple class used to keep a record of all current

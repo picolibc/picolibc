@@ -10,10 +10,10 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
+#include "winsup.h"
 #include <dirent.h>
 #include <stdlib.h>
 #include <errno.h>
-#include "winsup.h"
 
 extern "C"
 int

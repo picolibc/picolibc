@@ -10,9 +10,9 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "winsup.h"
 #include <stdio.h>
 #include <sys/utsname.h>
-#include "winsup.h"
 
 /* uname: POSIX 4.4.1.1 */
 extern "C" int

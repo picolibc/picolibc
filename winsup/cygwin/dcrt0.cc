@@ -8,9 +8,9 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "winsup.h"
 #include <unistd.h>
 #include <stdlib.h>
-#include "winsup.h"
 #include "glob.h"
 #include "exceptions.h"
 #include "dll_init.h"

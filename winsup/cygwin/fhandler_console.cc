@@ -12,13 +12,13 @@ details. */
    Should the constructor call tcinit() explicitly rather than having
    it sprinkled throughout here? */
 
+#include "winsup.h"
 #include <sys/termios.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
-#include "winsup.h"
 #include <wingdi.h>
 #include <winuser.h>
 #include <ctype.h>

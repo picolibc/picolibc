@@ -8,11 +8,11 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#include "winsup.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <errno.h>
-#include "winsup.h"
 
 #define _COMPILING_NEWLIB
 #include "dirent.h"
