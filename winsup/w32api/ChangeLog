@@ -1,3 +1,36 @@
+
+Fri Jan 26 15:59:31  2001  Earnie Boyd  <earnie@users.sourceforge.net
+
+	* Apply Danny Smith patch 102275
+	2000-11-05  Danny Smith  <danny_r_smith_2001@yahoo.co.nz>
+	* include/objbase.h: (COM_RIGHTS): Add definition.
+	(tagSTDMSHLFLAGS): add enumeration. 
+	(CoInitializeEx): Add prototypes.
+	(CoGetStdMarshalEx): ditto.
+	(CoCreateInstanceEx): ditto.
+	(CoInitializeSecurity): ditto.
+	(CoGetCallContext): ditto.
+	(CoQueryProxyBlanket): ditto.
+	(CoSetProxyBlanket): ditto.
+	(CoCopyProxy): ditto.
+	(CoQueryClientBlanket): ditto.
+	(CoImpersonateClient): ditto.
+	(CoRevertToSelf): ditto.
+	(CoQueryAuthenticationServices): ditto.
+	(CoSwitchCallContext): ditto.
+	(CoGetInstanceFromFile): ditto.
+	(CoGetInstanceFromIStorage): ditto.
+	* include/objidl.h: (SOLE_AUTHENTICATION_SERVICE): Add structure.
+	(SOLE_AUTHENTICATION_INFO): ditto.
+	(EOLE_AUTHENTICATION_CAPABILITIES): Add enumeration.
+	(COLE_DEFAULT_PRINCIPAL): Add definition.
+	(COLE_DEFAULT_AUTHINFO): Ditto.
+	* include/rpcdce.h: (RPC_C_AUTHZ_DEFAULT): Add definition.
+	(RPC_PROTSEQ_VECTOR) Fix typo.
+	(RpcRaiseException): add DECLSPEC_NORETURN attribute.
+	* include/winbase.h: (FreeLibraryAndExitThread): add DECLSPEC_NORETURN 
+	attribute.
+
 Fri Jan 26 13:34:55  2001  Earnie Boyde  <earnie@users.sourceforge.net>
 
 	* lib/msvcp60.def: Apply Danny Smith patch 103321.

@@ -1111,7 +1111,7 @@ DWORD WINAPI FormatMessageW(DWORD,PCVOID,DWORD,DWORD,LPWSTR,DWORD,va_list*);
 BOOL WINAPI FreeEnvironmentStringsA(LPSTR);
 BOOL WINAPI FreeEnvironmentStringsW(LPWSTR);
 BOOL WINAPI FreeLibrary(HMODULE);
-void WINAPI FreeLibraryAndExitThread(HMODULE,DWORD);
+DECLSPEC_NORETURN void WINAPI FreeLibraryAndExitThread(HMODULE,DWORD);
 #define FreeModule(m) FreeLibrary(m)
 #define FreeProcInstance(p) (void)(p)
 BOOL WINAPI FreeResource(HGLOBAL);

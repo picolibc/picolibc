@@ -83,6 +83,7 @@ extern "C" {
 #define RPC_C_AUTHZ_NONE 0
 #define RPC_C_AUTHZ_NAME 1
 #define RPC_C_AUTHZ_DCE 2
+#define RPC_C_AUTHZ_DEFAULT 0xFFFFFFFF
 
 typedef I_RPC_HANDLE RPC_BINDING_HANDLE;
 typedef RPC_BINDING_HANDLE handle_t;
@@ -290,7 +291,7 @@ RPC_STATUS RPC_ENTRY RpcMgmtEpEltInqNextW(RPC_EP_INQ_HANDLE,RPC_IF_ID*,RPC_BINDI
 #else /* RPC_UNICODE_SUPPORTED */
 typedef struct _RPC_PROTSEQ_VECTOR {
 	unsigned int Count;
-	unsigned char*Protseq[1];
+	unsigned char* Protseq[1];
 } RPC_PROTSEQ_VECTOR;
 RPC_STATUS RPC_ENTRY RpcBindingFromStringBinding(unsigned char *,RPC_BINDING_HANDLE *);
 RPC_STATUS RPC_ENTRY RpcBindingToStringBinding(RPC_BINDING_HANDLE,unsigned char **);
@@ -358,7 +359,7 @@ RPC_STATUS RPC_ENTRY RpcMgmtInqIfIds(RPC_BINDING_HANDLE,RPC_IF_ID_VECTOR**);
 RPC_STATUS RPC_ENTRY RpcIfIdVectorFree(RPC_IF_ID_VECTOR**);
 RPC_STATUS RPC_ENTRY RpcEpResolveBinding(RPC_BINDING_HANDLE,RPC_IF_HANDLE);
 RPC_STATUS RPC_ENTRY RpcBindingServerFromClient(RPC_BINDING_HANDLE,RPC_BINDING_HANDLE*);
-void RPC_ENTRY RpcRaiseException(RPC_STATUS);
+DECLSPEC_NORETURN void  RPC_ENTRY RpcRaiseException(RPC_STATUS);
 RPC_STATUS RPC_ENTRY RpcTestCancel();
 RPC_STATUS RPC_ENTRY RpcCancelThread(void*);
 RPC_STATUS RPC_ENTRY UuidCreate(UUID*);
