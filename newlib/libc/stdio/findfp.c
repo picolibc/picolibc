@@ -86,6 +86,12 @@ __sfp (d)
   int n;
   struct _glue *g;
 
+#ifndef __SINGLE_THREAD__
+  __LOCK_INIT(static, lock);
+
+  __lock_acquire(lock); 
+#endif
+
   if (!_GLOBAL_REENT->__sdidinit)
     __sinit (_GLOBAL_REENT);
   for (g = &_GLOBAL_REENT->__sglue;; g = g->_next)
@@ -97,11 +103,17 @@ __sfp (d)
 	  (g->_next = __sfmoreglue (d, NDYNAMIC)) == NULL)
 	break;
     }
+#ifndef __SINGLE_THREAD__
+  __lock_release(lock); 
+#endif
   d->_errno = ENOMEM;
   return NULL;
 
 found:
   fp->_flags = 1;		/* reserve this slot; caller sets real flags */
+#ifndef __SINGLE_THREAD__
+  __lock_release(lock); 
+#endif
   fp->_p = NULL;		/* no current pointer */
   fp->_w = 0;			/* nothing to read or write */
   fp->_r = 0;

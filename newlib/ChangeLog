@@ -1,3 +1,8 @@
+2004-01-22  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* libc/stdio/findfp.c (__sfp): Protect global FILE pointer list
+	by a lock when newlib is multithreaded. 
+
 2004-01-21  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdlib/mbrtowc.c (_mbrtowc_r): Fix case where s is null
