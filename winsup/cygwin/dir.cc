@@ -82,13 +82,18 @@ opendir (const char *name)
 {
   fhandler_base *fh;
   path_conv pc;
-  DIR *res = NULL;
+  DIR *res;
 
   fh = cygheap->fdtab.build_fhandler_from_name (-1, name, NULL, pc,
 						PC_SYM_FOLLOW | PC_FULL, NULL);
-  res = fh->opendir (pc);
-  if (!res)
-    delete fh;
+  if (!fh)
+    res = NULL;
+  else
+    {
+      res = fh->opendir (pc);
+      if (!res)
+	delete fh;
+    }
   return res;
 }
 
