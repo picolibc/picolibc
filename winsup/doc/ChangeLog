@@ -1,3 +1,7 @@
+2005-01-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwinenv.sgml: Add words for (no)traverse option.
+
 2005-01-29  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* install.texinfo: Update setup.exe snapshot URL.

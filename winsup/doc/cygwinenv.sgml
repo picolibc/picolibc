@@ -159,6 +159,16 @@ order not to strip, specify <literal>title</literal> or <literal>title
 nostrip_title</literal>.</para>
 </listitem>
 <listitem>
+<para><envar>(no)traverse</envar> - This option only affects NT systems.
+If set, Cygwin handles file permissions so that the parent directories'
+permissions are checked, as it's default on POSIX systems.  If not set,
+only the file's own permissions are taken into account.  This is the
+default on Windows and called "bypass traverse checking".  Beginning with
+version 1.5.13, traverse checking (as on POSIX) is enabled by default.
+If you want to switch off traverse checking for Cygwin processes and child
+processes started from Cygwin processes, you have to set "notraverse".</para>
+</listitem>
+<listitem>
 <para><envar>(no)tty</envar> - if set, Cygwin enables extra support
 (i.e., termios) for UNIX-like ttys. 
 It is not compatible with some Windows programs.
