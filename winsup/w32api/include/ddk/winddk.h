@@ -2997,6 +2997,13 @@ typedef NTSTATUS DDKAPI
   IN PVOID  Context,
   IN PVOID  EntryContext);
 
+#define RTL_REGISTRY_ABSOLUTE             0
+#define RTL_REGISTRY_SERVICES             1
+#define RTL_REGISTRY_CONTROL              2
+#define RTL_REGISTRY_WINDOWS_NT           3
+#define RTL_REGISTRY_DEVICEMAP            4
+#define RTL_REGISTRY_USER                 5
+
 /* RTL_QUERY_REGISTRY_TABLE.Flags */
 #define RTL_QUERY_REGISTRY_SUBKEY         0x00000001
 #define RTL_QUERY_REGISTRY_TOPKEY         0x00000002
@@ -6746,7 +6753,7 @@ IoReuseIrp(
   assert(_InvokeOnSuccess || _InvokeOnError || _InvokeOnCancel ? \
     _CompletionRoutine != NULL : TRUE); \
   _IrpSp = IoGetNextIrpStackLocation(_Irp); \
-  _IrpSp->CompletionRoutine = (_CompletionRoutine); \
+  _IrpSp->CompletionRoutine = (PIO_COMPLETION_ROUTINE)(_CompletionRoutine); \
 	_IrpSp->Context = (_Context); \
   _IrpSp->Control = 0; \
   if (_InvokeOnSuccess) _IrpSp->Control = SL_INVOKE_ON_SUCCESS; \

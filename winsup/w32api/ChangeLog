@@ -1,3 +1,9 @@
+2003-08-26  Filip Navara  <xnavara@volny.cz>
+
+	* include/ddk/winddk.h (RTL_REGISTRY_*): Add defines.
+	(IoSetCompletionRoutine): Cast _CompletionRoutine arg to
+	PIO_COMPLETION_ROUTINE.
+
 2003-08-26  Danny Smith <dannysmith@users.sourceforge.net>
 
 	* lib/test.c: Add snmp.h, winsnmp.h amd mgmtapi.h to
