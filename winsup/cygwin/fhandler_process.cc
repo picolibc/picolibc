@@ -45,10 +45,11 @@ static const int PROCESS_STATM = 12;
 static const int PROCESS_CMDLINE = 13;
 static const int PROCESS_MAPS = 14;
 static const int PROCESS_FD = 15;
+static const int PROCESS_EXENAME = 16;
 /* Keep symlinks always the last entries. */
-static const int PROCESS_ROOT = 16;
-static const int PROCESS_EXE = 17;
-static const int PROCESS_CWD = 18;
+static const int PROCESS_ROOT = 17;
+static const int PROCESS_EXE = 18;
+static const int PROCESS_CWD = 19;
 
 /* The position of "root" defines the beginning of symlik entries. */
 #define is_symlink(nr) ((nr) >= PROCESS_ROOT)
@@ -71,6 +72,7 @@ static const char * const process_listing[] =
   "cmdline",
   "maps",
   "fd",
+  "exename",
   /* Keep symlinks always the last entries. */
   "root",
   "exe",
@@ -435,6 +437,7 @@ fhandler_process::fill_filebuf ()
 	  }
 	break;
       }
+    case PROCESS_EXENAME:
     case PROCESS_EXE:
       {
 	filebuf = (char *) realloc (filebuf, bufalloc = CYG_MAX_PATH);
