@@ -2515,7 +2515,7 @@ __inline PVOID GetFiberData(void)
     void* ret;
     __asm__ volatile ("
 	      movl	%%fs:0x10,%0
-	      " : "-r" (ret) /* allow use of reg eax,ebx,ecx,edx,esi,edi */
+	      " : "=r" (ret) /* allow use of reg eax,ebx,ecx,edx,esi,edi */
 	        :
 		);
     return ret;

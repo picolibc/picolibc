@@ -1,6 +1,10 @@
 
 2001-04-08  Earnie Boyd  <earnie@users.sourceforge.net>
 
+	* include/winnt.h (GetCurrentFiber): Fix typo.
+
+2001-04-08  Earnie Boyd  <earnie@users.sourceforge.net>
+
 	* include/shellapi.h: (CommandLineToArgvW): Add WINAPI declaration.
 	* include/winbase.h: (GetFileAttributesExW): Fix typo.
 	* include/wingdi.h: (StartDocA): Change LPDOCINFOA to DOCINFOA*.
