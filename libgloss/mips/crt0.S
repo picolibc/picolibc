@@ -1,7 +1,7 @@
 /*
  * crt0.S -- startup file for MIPS.
  *
- * Copyright (c) 1995, 1996, 1997 Cygnus Support
+ * Copyright (c) 1995, 1996, 1997, 2001 Cygnus Support
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -64,7 +64,7 @@ _start:
 	nop
 	move	s0,$31
 #endif
-#if __mips < 3
+#if (__mips < 3) || (__mips_fpr==32)
 #define STATUS_MASK (SR_CU1|SR_PE)
 #else
 # For mips3 or mips4, turn on 64-bit addressing and additional float regs

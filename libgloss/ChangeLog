@@ -1,3 +1,8 @@
+2001-09-11  Michael Meissner  <meissner@redhat.com>
+
+	* mips/crt0.S (_start): If -mfp32, don't enable 64-bit floating
+	point registers, even if we are compiling for a mips3 or greater.
+
 2001-09-10  Jim Blandy  <jimb@redhat.com>
 
 	Add support for GDB monitor-style I/O.
