@@ -188,6 +188,7 @@ subauth (struct passwd *pw)
 
   /* Register as logon process. */
   str2lsa (name, "Cygwin");
+  SetLastError (0);
   ret = LsaRegisterLogonProcess(&name, &lsa_hdl, &sec_mode);
   if (ret != STATUS_SUCCESS)
     {

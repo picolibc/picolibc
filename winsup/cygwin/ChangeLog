@@ -1,3 +1,18 @@
+Tue May 15  9:03:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* autoload.cc: Add autoload statements for ws2_32 functions
+	`WSACloseEvent', `WSACreateEvent', `WSAGetOverlappedResult',
+	`WSARecv', `WSARecvFrom', `WSASend', `WSASendTo' and `WSASetEvent',
+	`WSAWaitForMultipleEvents'.
+	* net.cc: Define wsock_evt.
+	(wsock_event): New class.
+	(cygwin_sendto): Use overlapped socket io if available.
+	(cygwin_recvfrom): Ditto.
+	(cygwin_recv): Ditto.
+	(cygwin_send): Ditto.
+	* security.cc (subauth): Set Win32 error to 0 to safely ask for the
+	error code of dynamically loaded function `LsaRegisterLogonProcess'.
+
 Mon May 14 15:37:29 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* errno.cc (_sys_errlist): Add missing commas.

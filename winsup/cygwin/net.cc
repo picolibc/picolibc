@@ -46,6 +46,63 @@ int __stdcall rresvport (int *);
 int sscanf (const char *, const char *, ...);
 } /* End of "C" section */
 
+class wsock_event
+{
+  WSAEVENT		event;
+  WSAOVERLAPPED		ovr;
+public:
+  wsock_event () : event (NULL) {};
+
+  LPWSAOVERLAPPED prepare ();
+  int wait (int socket, LPDWORD flags);
+};
+
+LPWSAOVERLAPPED
+wsock_event::prepare ()
+{
+  LPWSAOVERLAPPED ret = NULL;
+
+  SetLastError (0);
+  if ((event = WSACreateEvent ()))
+    {
+      memset (&ovr, 0, sizeof ovr);
+      ovr.hEvent = event;
+      ret = &ovr;
+    }
+  else if (GetLastError () == ERROR_PROC_NOT_FOUND) /* winsock2 not available */
+    WSASetLastError (0);
+  
+  debug_printf ("%d = wsock_event::prepare ()", ret);
+  return ret;
+}
+
+int
+wsock_event::wait (int socket, LPDWORD flags)
+{
+  int ret = -1;
+  WSAEVENT ev[2] = { event, signal_arrived };
+
+  switch (WSAWaitForMultipleEvents(2, ev, FALSE, WSA_INFINITE, FALSE))
+    {
+    case WSA_WAIT_EVENT_0:
+      DWORD len;
+      if (WSAGetOverlappedResult(socket, &ovr, &len, FALSE, flags))
+	ret = (int) len;
+      break;
+    case WSA_WAIT_EVENT_0 + 1:
+      WSASetLastError (WSAEINTR);
+      break;
+    case WSA_WAIT_FAILED:
+      break;
+    default: /* Should be impossible. *LOL* */
+      WSASetLastError (WSAEFAULT);
+      break;
+    }
+  WSACloseEvent (event);
+  event = NULL;
+  return ret;
+}
+
 static WSADATA wsadata;
 
 /* Cygwin internal */
@@ -431,6 +488,9 @@ cygwin_sendto (int fd,
 		 const struct sockaddr *to,
 		 int tolen)
 {
+  int res;
+  wsock_event wsock_evt;
+  LPWSAOVERLAPPED ovr;
   fhandler_socket *h = (fhandler_socket *) cygheap->fdtab[fd];
   sockaddr_in sin;
   sigframe thisframe (mainthread);
@@ -438,13 +498,34 @@ cygwin_sendto (int fd,
   if (get_inet_addr (to, tolen, &sin, &tolen) == 0)
     return -1;
 
-  int res = sendto (h->get_socket (), (const char *) buf, len,
-		    flags, to, tolen);
-  if (res == SOCKET_ERROR)
+  if (!(ovr = wsock_evt.prepare ()))
     {
-      set_winsock_errno ();
-      res = -1;
+      debug_printf ("Fallback to winsock 1 sendto call");
+      if ((res = sendto (h->get_socket (), (const char *) buf, len, flags,
+			 to, tolen)) == SOCKET_ERROR)
+	{
+	  set_winsock_errno ();
+	  res = -1;
+	}
     }
+  else
+    {
+      WSABUF wsabuf = { len, (char *) buf };
+      DWORD ret = 0;
+      if (WSASendTo (h->get_socket (), &wsabuf, 1, &ret, (DWORD)flags,
+                     to, tolen, ovr, NULL) != SOCKET_ERROR)
+        res = ret;
+      else if ((res = WSAGetLastError ()) != WSA_IO_PENDING)
+        {
+          set_winsock_errno ();
+          res = -1;
+        }
+      else if ((res = wsock_evt.wait (h->get_socket (), (DWORD *)&flags)) == -1)
+        set_winsock_errno ();
+    }
+
+  syscall_printf ("%d = sendto (%d, %x, %x, %x)", res, fd, buf, len, flags);
+
   return res;
 }
 
@@ -457,17 +538,39 @@ cygwin_recvfrom (int fd,
 		   struct sockaddr *from,
 		   int *fromlen)
 {
+  int res;
+  wsock_event wsock_evt;
+  LPWSAOVERLAPPED ovr;
   fhandler_socket *h = (fhandler_socket *) cygheap->fdtab[fd];
   sigframe thisframe (mainthread);
 
-  debug_printf ("recvfrom %d", h->get_socket ());
-
-  int res = recvfrom (h->get_socket (), buf, len, flags, from, fromlen);
-  if (res == SOCKET_ERROR)
+  if (!(ovr = wsock_evt.prepare ()))
     {
-      set_winsock_errno ();
-      res = -1;
+      debug_printf ("Fallback to winsock 1 recvfrom call");
+      if ((res = recvfrom (h->get_socket (), buf, len, flags, from, fromlen))
+      	  == SOCKET_ERROR)
+	{
+	  set_winsock_errno ();
+	  res = -1;
+	}
     }
+  else
+    {
+      WSABUF wsabuf = { len, (char *) buf };
+      DWORD ret = 0;
+      if (WSARecvFrom (h->get_socket (), &wsabuf, 1, &ret, (DWORD *)&flags,
+                       from, fromlen, ovr, NULL) != SOCKET_ERROR)
+        res = ret;
+      else if ((res = WSAGetLastError ()) != WSA_IO_PENDING)
+        {
+          set_winsock_errno ();
+          res = -1;
+        }
+      else if ((res = wsock_evt.wait (h->get_socket (), (DWORD *)&flags)) == -1)
+        set_winsock_errno ();
+    }
+
+  syscall_printf ("%d = recvfrom (%d, %x, %x, %x)", res, fd, buf, len, flags);
 
   return res;
 }
@@ -1064,21 +1167,37 @@ cygwin_getpeername (int fd, struct sockaddr *name, int *len)
 extern "C" int
 cygwin_recv (int fd, void *buf, int len, unsigned int flags)
 {
+  int res;
+  wsock_event wsock_evt;
+  LPWSAOVERLAPPED ovr;
   fhandler_socket *h = (fhandler_socket *) cygheap->fdtab[fd];
   sigframe thisframe (mainthread);
 
-  int res = recv (h->get_socket (), (char *) buf, len, flags);
-  if (res == SOCKET_ERROR)
+  if (!(ovr = wsock_evt.prepare ()))
     {
-      set_winsock_errno ();
-      res = -1;
+      debug_printf ("Fallback to winsock 1 recv call");
+      if ((res = recv (h->get_socket (), (char *) buf, len, flags))
+      	  == SOCKET_ERROR)
+	{
+	  set_winsock_errno ();
+	  res = -1;
+	}
     }
-
-#if 0
-  if (res > 0 && res < 200)
-    for (int i=0; i < res; i++)
-      system_printf ("%d %x %c", i, ((char *) buf)[i], ((char *) buf)[i]);
-#endif
+  else
+    {
+      WSABUF wsabuf = { len, (char *) buf };
+      DWORD ret = 0;
+      if (WSARecv (h->get_socket (), &wsabuf, 1, &ret, (DWORD *)&flags,
+		   ovr, NULL) != SOCKET_ERROR)
+	res = ret;
+      else if ((res = WSAGetLastError ()) != WSA_IO_PENDING)
+	{
+	  set_winsock_errno ();
+	  res = -1;
+	}
+      else if ((res = wsock_evt.wait (h->get_socket (), (DWORD *)&flags)) == -1)
+	set_winsock_errno ();
+    }
 
   syscall_printf ("%d = recv (%d, %x, %x, %x)", res, fd, buf, len, flags);
 
@@ -1089,14 +1208,36 @@ cygwin_recv (int fd, void *buf, int len, unsigned int flags)
 extern "C" int
 cygwin_send (int fd, const void *buf, int len, unsigned int flags)
 {
+  int res;
+  wsock_event wsock_evt;
+  LPWSAOVERLAPPED ovr;
   fhandler_socket *h = (fhandler_socket *) cygheap->fdtab[fd];
   sigframe thisframe (mainthread);
 
-  int res = send (h->get_socket (), (const char *) buf, len, flags);
-  if (res == SOCKET_ERROR)
+  if (!(ovr = wsock_evt.prepare ()))
     {
-      set_winsock_errno ();
-      res = -1;
+      debug_printf ("Fallback to winsock 1 send call");
+      if ((res = send (h->get_socket (), (const char *) buf, len, flags))
+	  == SOCKET_ERROR)
+	{
+	  set_winsock_errno ();
+	  res = -1;
+	}
+    }
+  else
+    {
+      WSABUF wsabuf = { len, (char *) buf };
+      DWORD ret = 0;
+      if (WSASend (h->get_socket (), &wsabuf, 1, &ret, (DWORD)flags,
+                   ovr, NULL) != SOCKET_ERROR)
+        res = ret;
+      else if ((res = WSAGetLastError ()) != WSA_IO_PENDING)
+        {
+          set_winsock_errno ();
+          res = -1;
+        }
+      else if ((res = wsock_evt.wait (h->get_socket (), (DWORD *)&flags)) == -1)
+        set_winsock_errno ();
     }
 
   syscall_printf ("%d = send (%d, %x, %d, %x)", res, fd, buf, len, flags);
