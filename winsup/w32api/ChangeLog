@@ -1,3 +1,9 @@
+2004-09-30  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winbase.h (WINBASEAPI): Define as DECLSPEC_IMPORT only
+	 if __W32API_USE_DLLIMPORT__ is defined.
+	* include/winuser.h (WINUSERAPI): Likewise.
+
 2004-09-29  Filip Navara  <xnavara@volny.cz>
 
 	* include/ddk/(atm.h, batclass.h, cfg.h, cfgmgr32.h, d4drvif.h,

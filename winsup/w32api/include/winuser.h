@@ -9,13 +9,12 @@ extern "C" {
 #endif
 
 #ifndef WINUSERAPI
-#ifndef __INSIDE_CYGWIN__
+#ifdef __W32API_USE_DLLIMPORT__
 #define WINUSERAPI DECLSPEC_IMPORT
 #else
 #define WINUSERAPI
 #endif
 #endif
-
 
 #define WC_DIALOG MAKEINTATOM(0x8002)
 #define FALT	16

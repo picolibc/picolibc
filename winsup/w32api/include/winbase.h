@@ -5,13 +5,13 @@
 #endif
 
 #ifndef WINBASEAPI
-#ifdef __INSIDE_CYGWIN__
-#define WINBASEAPI
-#else
+#ifdef __W32API_USE_DLLIMPORT__
 #define WINBASEAPI DECLSPEC_IMPORT
+#else
+#define WINBASEAPI
+#endif
 #endif
 
-#endif
 #ifdef __cplusplus
 extern "C" {
 #endif
