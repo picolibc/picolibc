@@ -342,6 +342,7 @@ getgroups32 (int gidsetsize, __gid32_t *grouplist, __gid32_t gid,
     read_etc_group ();
 
   if (allow_ntsec &&
+      strcasematch (username, cygheap->user.name ()) &&
       OpenProcessToken (hMainProc, TOKEN_QUERY, &hToken))
     {
       if (GetTokenInformation (hToken, TokenGroups, NULL, 0, &size)
