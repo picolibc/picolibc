@@ -1,5 +1,9 @@
 2005-03-28  Christopher Faylor  <cgf@timesys.com>
 
+	* include/ctype.h: Accommodate building in newlib.
+
+2005-03-28  Christopher Faylor  <cgf@timesys.com>
+
 	* timer.cc (getitimer): Check that ovalue is a valid pointer, not just
 	NULL.
 

@@ -38,7 +38,7 @@ int __cdecl _toupper(int);
 #define _X	0100
 #define	_B	0200
 
-#ifdef __INSIDE_CYGWIN__
+#if defined (__INSIDE_CYGWIN__) || defined (_COMPILING_NEWLIB)
 extern const char _ctype_[];
 #else
 extern const __declspec(dllimport) char _ctype_[];
