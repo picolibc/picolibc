@@ -804,7 +804,6 @@ fhandler_console::fhandler_console (const char *name) :
   if (PRIMARYLANGID (LOWORD (GetKeyboardLayout (0))) == LANG_ENGLISH)
     meta_mask |= RIGHT_ALT_PRESSED;
 
-  set_need_fork_fixup ();
 }
 
 #define FOREGROUND_ATTR_MASK (FOREGROUND_RED | FOREGROUND_GREEN | \

@@ -568,7 +568,7 @@ public:
   fhandler_termios (DWORD dev, const char *name = 0, int unit = 0) :
   fhandler_base (dev, name, unit)
   {
-    // nothing to do
+    set_need_fork_fixup ();
   }
   HANDLE& get_output_handle () { return output_handle; }
   int line_edit (const char *rptr, int nread, int always_accept = 0);

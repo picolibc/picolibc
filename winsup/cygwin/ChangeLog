@@ -1,3 +1,10 @@
+2001-03-12  Egor Duda  <deo@logos-m.ru>
+
+	* fhandler.h (fhandler_termios::fhandler_termios): Enable fixup
+	after fork.
+	* fhandler_console.cc (fhandler_console::fhandler_console): Fixup
+	after fork is now enabled in the base class constructor.
+
 Mon Mar 12 11:19:41 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* mkvers.sh: Include config.h so that DEBUGGING is correctly defined.
