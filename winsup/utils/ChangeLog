@@ -1,3 +1,8 @@
+2004-10-22  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
+
+	* cygcheck.cc (dump_sysinfo): In legend for drive-list: Add ``ram'' and
+	``unk''. Use single puts. Add leading newline. Line up equal-signs.
+
 2004-10-20  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
 
 	* cygcheck.cc (dump_sysinfo): Allow for larger drives in drive-list.

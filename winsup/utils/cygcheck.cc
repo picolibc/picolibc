@@ -1160,10 +1160,11 @@ dump_sysinfo ()
   SetErrorMode (prev_mode);
   if (givehelp)
     {
-      printf ("fd=floppy, hd=hard drive, cd=CD-ROM, net=Network Share\n");
-      printf ("CP=Case Preserving, CS=Case Sensitive, UN=Unicode\n");
-      printf
-	("PA=Persistent ACLS, FC=File Compression, VC=Volume Compression\n");
+      puts (
+	  "fd = floppy,          hd = hard drive,       cd = CD-ROM\n"
+	  "net= Network Share,   ram= RAM drive,        unk= Unknown\n"
+	  "CP = Case Preserving, CS = Case Sensitive,   UN = Unicode\n"
+	  "PA = Persistent ACLS, FC = File Compression, VC = Volume Compression");
     }
   printf ("\n");
 
