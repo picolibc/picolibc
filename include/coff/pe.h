@@ -183,4 +183,16 @@ typedef struct
 
 #undef  E_FILNMLEN
 #define E_FILNMLEN	18	/* # characters in a file name		*/
-#endif
+
+/* Import Tyoes fot ILF format object files..  */
+#define IMPORT_CODE	0
+#define IMPORT_DATA	1
+#define IMPORT_CONST	2
+
+/* Import Name Tyoes for ILF format object files.  */
+#define IMPORT_ORDINAL		0
+#define IMPORT_NAME		1
+#define IMPORT_NAME_NOPREFIX	2
+#define IMPORT_NAME_UNDECORATE	3
+
+#endif /* _PE_H */

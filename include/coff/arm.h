@@ -85,9 +85,15 @@ struct external_filehdr
  * XXX - NC 5/6/97
  */
 
-#define	ARMMAGIC	0xa00  /* I just made this up */ 
+#define	ARMMAGIC	0xa00  /* I just made this up */
 
 #define ARMBADMAG(x) (((x).f_magic != ARMMAGIC))
+
+#define	ARMPEMAGIC	0x1c0
+#define	THUMBPEMAGIC	0x1c2
+
+#undef  ARMBADMAG
+#define ARMBADMAG(x) (((x).f_magic != ARMMAGIC) && ((x).f_magic != ARMPEMAGIC) && ((x).f_magic != THUMBPEMAGIC))
 
 #define	FILHDR	struct external_filehdr
 #define	FILHSZ	20
@@ -272,6 +278,18 @@ union external_auxent
 #define _ETEXT	"etext"
 
 /********************** RELOCATION DIRECTIVES **********************/
+#ifdef ARM_WINCE
+struct external_reloc
+{
+  char r_vaddr[4];
+  char r_symndx[4];
+  char r_type[2];
+};
+
+#define RELOC struct external_reloc
+#define RELSZ 10
+
+#else
 struct external_reloc
 {
   char r_vaddr[4];
@@ -282,3 +300,4 @@ struct external_reloc
 
 #define RELOC struct external_reloc
 #define RELSZ 14
+#endif
