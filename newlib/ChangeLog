@@ -1,3 +1,8 @@
+2003-11-10  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/machine/powerpc/ufix64toa.c (_ufix64to_r): Fix shifts
+	to use (Ebits + 1) which accounts for the sign-bit.
+
 2003-11-07  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* configure.host: Remove -DLOOSE_KERNEL_NAMES flag for linux 

@@ -74,13 +74,13 @@ _DEFUN (_ufix64toa_r, (rptr, value, mode, ndigits, decpt, sign, rve),
       /* build long double */
       exp = -negexp + Bias;
       word0(ldbl) = (exp << Exp_shift);
-      word1(ldbl) = hiword(fix64) << (32-Ebits);
-      word2(ldbl) = loword(fix64) << (32-Ebits);
+      word1(ldbl) = hiword(fix64) << (32-Ebits-1);
+      word2(ldbl) = loword(fix64) << (32-Ebits-1);
       word3(ldbl) = 0;
-      if (Ebits < 32)
+      if (Ebits+1 < 32)
 	{
-	  word0(ldbl) |= hiword(fix64) >> Ebits;
-	  word1(ldbl) |= loword(fix64) >> Ebits;
+	  word0(ldbl) |= hiword(fix64) >> (Ebits + 1);
+	  word1(ldbl) |= loword(fix64) >> (Ebits + 1);
 	}
     }
 
