@@ -204,6 +204,7 @@ public:
   mmap_record *recs;
   int nrecs, maxrecs;
   int fd;
+  DWORD hash;
   list ();
   ~list ();
   mmap_record *add_record (mmap_record r);
@@ -213,11 +214,9 @@ public:
 };
 
 list::list ()
+: nrecs (0), maxrecs (10), fd (0), hash (0)
 {
   recs = (mmap_record *) malloc (10 * sizeof(mmap_record));
-  nrecs = 0;
-  maxrecs = 10;
-  fd = 0;
 }
 
 list::~list ()
@@ -309,7 +308,13 @@ map::get_list_by_fd (int fd)
 {
   int i;
   for (i=0; i<nlists; i++)
-    if (lists[i]->fd == fd)
+#if 0 /* The fd isn't sufficient since it could already be another file. */
+    if (lists[i]->fd == fd
+#else /* so we use the name hash value to identify the file unless
+         it's not an anonymous mapping. */
+    if ((fd == -1 && lists[i]->fd == -1)
+        || lists[i]->hash == fdtab[fd]->get_namehash ())
+#endif
       return lists[i];
   return 0;
 }
@@ -318,6 +323,8 @@ list *
 map::add_list (list *l, int fd)
 {
   l->fd = fd;
+  if (fd != -1)
+    l->hash = fdtab[fd]->get_namehash ();
   if (nlists == maxlists)
     {
       maxlists += 5;
@@ -445,14 +452,15 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
       fh = &fh_paging_file;
     }
 
-  /* First check if this mapping matches into the chunk of another
-     already performed mapping. */
   list *l = mmapped_areas->get_list_by_fd (fd);
-  if (l)
+
+  /* First check if this mapping matches into the chunk of another
+     already performed mapping. Only for MAP_SHARED mapping. */
+  if (l && (flags & MAP_SHARED))
     {
       mmap_record *rec;
       if ((rec = l->match (off, len)) != NULL)
-        {
+	{
 	  off = rec->map_map (off, len);
 	  caddr_t ret = rec->get_address () + off;
 	  syscall_printf ("%x = mmap() succeeded", ret);

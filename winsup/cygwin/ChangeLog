@@ -1,3 +1,12 @@
+Thu Feb  8 21:57:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* mmap.cc (class list): Add member `hash'.
+	(list::list): Initialize `hash'.
+	(list::get_list_by_fd): Use filepath hash value to get the correct
+	mapping list if it's not an anonymous mapping.
+	(map::add_list): Initialize `hash' with filepath hash value.
+	(mmap): Check for reusing a mapping only on MAP_SHARED.
+
 Wed Feb  7 18:47:36 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* signal.cc (killpg): Correct first argument.
