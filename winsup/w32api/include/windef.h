@@ -120,6 +120,7 @@ extern "C" {
 typedef unsigned long DWORD;
 typedef int WINBOOL,*PWINBOOL,*LPWINBOOL;
 /* FIXME: Is there a good solution to this? */
+#ifndef XFree86Server
 #ifndef __OBJC__
 typedef WINBOOL BOOL;
 #else
@@ -127,6 +128,7 @@ typedef WINBOOL BOOL;
 #endif
 typedef BOOL *PBOOL,*LPBOOL;
 typedef unsigned char BYTE;
+#endif /* ndef XFree86Server */
 typedef unsigned short WORD;
 typedef float FLOAT;
 typedef FLOAT *PFLOAT;
@@ -149,7 +151,9 @@ typedef LONG LRESULT;
 typedef LONG HRESULT;
 #define _HRESULT_DEFINED
 #endif
+#ifndef XFree86Server
 typedef WORD ATOM;
+#endif /* XFree86Server */
 typedef HANDLE HGLOBAL;
 typedef HANDLE HLOCAL;
 typedef HANDLE GLOBALHANDLE;

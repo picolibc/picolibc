@@ -1,3 +1,19 @@
+
+2001-03-30  Earnie Boyd  <earnie@users.sourceforge.net>
+	* include/winuser.h (VK_KANA): New definition.
+	Thanks to: "Harold Hunt" <huntharo@msu.edu>
+
+2001-03-29  Earnie Boyd  <earnie@users.sourceforge.net
+
+	* include/winuser.h (RT_CURSOR): Add protection for XFree86Server.
+	(RT_FONT): Ditto.
+	* include/basetsd.h (INT32): Ditto.
+	* include/windef.h (ATOM): Ditto.
+	(BOOL): Ditto.
+	(BYTE): Ditto.
+	* include/winbase.h (FreeResource): Ditto.
+	Thanks to: "Harold Hunt" <huntharo@msu.edu>
+
 2001-03-20  Danny Smith <dannysmith@users.sourceforge.net>
 
 	* include/winsock.h (_SYS_TYPES_H macro guard for int types): Remove;

@@ -1114,7 +1114,9 @@ BOOL WINAPI FreeLibrary(HMODULE);
 DECLSPEC_NORETURN void WINAPI FreeLibraryAndExitThread(HMODULE,DWORD);
 #define FreeModule(m) FreeLibrary(m)
 #define FreeProcInstance(p) (void)(p)
+#ifndef XFree86Server
 BOOL WINAPI FreeResource(HGLOBAL);
+#endif /* ndef XFree86Server */
 PVOID WINAPI FreeSid(PSID);
 BOOL WINAPI GetAce(PACL,DWORD,PVOID);
 BOOL WINAPI GetAclInformation(PACL,PVOID,DWORD,ACL_INFORMATION_CLASS);
