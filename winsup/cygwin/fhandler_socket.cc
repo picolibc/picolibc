@@ -734,14 +734,16 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
   struct iovec *const iov = msg->msg_iov;
   const int iovcnt = msg->msg_iovlen;
 
+  struct sockaddr *from = (struct sockaddr *) msg->msg_name;
+  int *fromlen = from ? &msg->msg_namelen : NULL;
+
   int res;
 
   if (!winsock2_active)
     {
       if (iovcnt == 1)
 	res = recvfrom (iov->iov_base, iov->iov_len, flags,
-			(struct sockaddr *) msg->msg_name,
-			&msg->msg_namelen);
+			from, fromlen);
       else
 	{
 	  if (tot == -1)	// i.e. if not pre-calculated by the caller.
@@ -766,8 +768,7 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
 	  else
 	    {
 	      res = recvfrom (buf, tot, flags,
-			      (struct sockaddr *) msg->msg_name,
-			      &msg->msg_namelen);
+			      from, fromlen);
 
 	      const struct iovec *iovptr = iov;
 	      int nbytes = res;
@@ -805,16 +806,14 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
       if (is_nonblocking ())
 	res = WSARecvFrom (get_socket (),
 			   wsabuf, iovcnt, &ret, (DWORD *) &flags,
-			   (struct sockaddr *) msg->msg_name,
-			   &msg->msg_namelen,
+			   from, fromlen,
 			   NULL, NULL);
       else
 	{
 	  wsock_event wsock_evt;
 	  res = WSARecvFrom (get_socket (),
 			     wsabuf, iovcnt, &ret, (DWORD *) &flags,
-			     (struct sockaddr *) msg->msg_name,
-			     &msg->msg_namelen,
+			     from, fromlen,
 			     wsock_evt.prepare (), NULL);
 
 	  if (res == SOCKET_ERROR && WSAGetLastError () == WSA_IO_PENDING)
