@@ -206,7 +206,7 @@ cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
   path_conv pc;
   fhandler_base *res = cygheap->fdtab.build_fhandler_from_name (fd, name, handle,
 								pc);
-  res->init (handle, myaccess, bin);
+  res->init (handle, myaccess, bin ?: pc.binmode ());
   return fd;
 }
 

@@ -355,7 +355,8 @@ pthread::self ()
 
 /* member methods */
 pthread::pthread ():verifyable_object (PTHREAD_MAGIC), win32_obj_id (0),
-                    cancelstate (0), canceltype (0), joiner (NULL), cleanup_stack(NULL) 
+                    cancelstate (0), canceltype (0), cancel_event(0),
+                    joiner (NULL), cleanup_stack(NULL) 
 {
 }
 
@@ -363,6 +364,8 @@ pthread::~pthread ()
 {
   if (win32_obj_id)
     CloseHandle (win32_obj_id);
+  if (cancel_event)
+    CloseHandle (cancel_event);
 }
 
 
@@ -394,6 +397,15 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
       return;
     }
 
+  cancel_event = ::CreateEvent (NULL,TRUE,FALSE,NULL);
+  if (!cancel_event)
+    {
+      system_printf ("couldn't create cancel event, this %p LastError %d", this, GetLastError () );
+      /*we need the event for correct behaviour */
+      magic = 0;
+      return;
+    }
+
   win32_obj_id = ::CreateThread (&sec_none_nih, attr.stacksize,
 				(LPTHREAD_START_ROUTINE) thread_init_wrapper,
 				this, CREATE_SUSPENDED, &thread_id);
@@ -417,6 +429,304 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
 }
 
 void
+pthread::exit (void *value_ptr)
+{
+  class pthread *thread = this;
+
+  // run cleanup handlers
+  pop_all_cleanup_handlers ();
+
+  MT_INTERFACE->destructors.IterateNull ();
+
+  mutex.Lock ();
+  // cleanup if thread is in detached state and not joined
+  if( __pthread_equal(&joiner, &thread ) )
+    delete this;
+  else
+    {  
+      return_ptr = value_ptr;
+      mutex.UnLock ();
+    }
+
+  if (InterlockedDecrement (&MT_INTERFACE->threadcount) == 0)
+    ::exit (0);
+  else
+    ExitThread (0);
+}
+
+int
+pthread::cancel (void)
+{
+  class pthread *thread = this;
+  class pthread *self = pthread::self ();
+
+  mutex.Lock ();
+
+  if (canceltype == PTHREAD_CANCEL_DEFERRED ||
+      cancelstate == PTHREAD_CANCEL_DISABLE)
+    {
+      // cancel deferred
+      mutex.UnLock ();
+      SetEvent (cancel_event);
+      return 0;
+    }
+
+  else if (__pthread_equal(&thread, &self))
+    {
+      mutex.UnLock ();
+      cancel_self ();
+      return 0; // Never reached
+    }
+
+  // cancel asynchronous
+  SuspendThread (win32_obj_id);
+  if (WaitForSingleObject (win32_obj_id, 0) == WAIT_TIMEOUT)
+    {
+      CONTEXT context;
+      context.ContextFlags = CONTEXT_CONTROL;
+      GetThreadContext (win32_obj_id, &context);
+      context.Eip = (DWORD) pthread::static_cancel_self;
+      SetThreadContext (win32_obj_id, &context);
+    }
+  mutex.UnLock ();
+  ResumeThread (win32_obj_id);
+
+  return 0;
+/*
+  TODO: insert  pthread_testcancel into the required functions
+  the required function list is: *indicates done, X indicates not present in cygwin.
+aio_suspend ()
+*close ()
+*creat ()
+fcntl ()
+fsync ()
+getmsg ()
+getpmsg ()
+lockf ()
+mq_receive ()
+mq_send ()
+msgrcv ()
+msgsnd ()
+msync ()
+nanosleep ()
+open ()
+pause ()
+poll ()
+pread ()
+pthread_cond_timedwait ()
+pthread_cond_wait ()
+*pthread_join ()
+pthread_testcancel ()
+putmsg ()
+putpmsg ()
+pwrite ()
+read ()
+readv ()
+select ()
+sem_wait ()
+sigpause ()
+sigsuspend ()
+sigtimedwait ()
+sigwait ()
+sigwaitinfo ()
+*sleep ()
+system ()
+tcdrain ()
+*usleep ()
+wait ()
+wait3()
+waitid ()
+waitpid ()
+write ()
+writev ()
+
+the optional list is:
+catclose ()
+catgets ()
+catopen ()
+closedir ()
+closelog ()
+ctermid ()
+dbm_close ()
+dbm_delete ()
+dbm_fetch ()
+dbm_nextkey ()
+dbm_open ()
+dbm_store ()
+dlclose ()
+dlopen ()
+endgrent ()
+endpwent ()
+endutxent ()
+fclose ()
+fcntl ()
+fflush ()
+fgetc ()
+fgetpos ()
+fgets ()
+fgetwc ()
+fgetws ()
+fopen ()
+fprintf ()
+fputc ()
+fputs ()
+fputwc ()
+fputws ()
+fread ()
+freopen ()
+fscanf ()
+fseek ()
+fseeko ()
+fsetpos ()
+ftell ()
+ftello ()
+ftw ()
+fwprintf ()
+fwrite ()
+fwscanf ()
+getc ()
+getc_unlocked ()
+getchar ()
+getchar_unlocked ()
+getcwd ()
+getdate ()
+getgrent ()
+getgrgid ()
+getgrgid_r ()
+getgrnam ()
+getgrnam_r ()
+getlogin ()
+getlogin_r ()
+getpwent ()
+*getpwnam ()
+*getpwnam_r ()
+*getpwuid ()
+*getpwuid_r ()
+gets ()
+getutxent ()
+getutxid ()
+getutxline ()
+getw ()
+getwc ()
+getwchar ()
+getwd ()
+glob ()
+iconv_close ()
+iconv_open ()
+ioctl ()
+lseek ()
+mkstemp ()
+nftw ()
+opendir ()
+openlog ()
+pclose ()
+perror ()
+popen ()
+printf ()
+putc ()
+putc_unlocked ()
+putchar ()
+putchar_unlocked ()
+puts ()
+pututxline ()
+putw ()
+putwc ()
+putwchar ()
+readdir ()
+readdir_r ()
+remove ()
+rename ()
+rewind ()
+rewinddir ()
+scanf ()
+seekdir ()
+semop ()
+setgrent ()
+setpwent ()
+setutxent ()
+strerror ()
+syslog ()
+tmpfile ()
+tmpnam ()
+ttyname ()
+ttyname_r ()
+ungetc ()
+ungetwc ()
+unlink ()
+vfprintf ()
+vfwprintf ()
+vprintf ()
+vwprintf ()
+wprintf ()
+wscanf ()
+
+Note, that for fcntl (), for any value of the cmd argument.
+
+And we must not introduce cancellation points anywhere else that's part of the posix or
+opengroup specs.
+ */
+}
+
+void
+pthread::testcancel (void)
+{
+  if (cancelstate == PTHREAD_CANCEL_DISABLE)
+    return;
+
+  if( WAIT_OBJECT_0 == WaitForSingleObject (cancel_event, 0 ) )
+    cancel_self ();
+}
+
+void
+pthread::static_cancel_self (void)
+{
+  pthread::self()->cancel_self ();
+}
+
+
+int
+pthread::setcancelstate (int state, int *oldstate)
+{
+  int result = 0;
+
+  mutex.Lock ();
+
+  if (state != PTHREAD_CANCEL_ENABLE && state != PTHREAD_CANCEL_DISABLE)
+    result = EINVAL;
+  else
+    {
+      if (oldstate)
+        *oldstate = cancelstate;
+      cancelstate = state;
+    }
+
+  mutex.UnLock ();
+
+  return result;
+}
+
+int
+pthread::setcanceltype (int type, int *oldtype)
+{
+  int result = 0;
+
+  mutex.Lock ();
+
+  if (type != PTHREAD_CANCEL_DEFERRED && type != PTHREAD_CANCEL_ASYNCHRONOUS)
+    result = EINVAL;
+  else
+    {
+      if (oldtype)
+        *oldtype = canceltype;
+      canceltype = type;
+    }
+
+  mutex.UnLock ();
+
+  return result;
+}
+
+void
 pthread::push_cleanup_handler (__pthread_cleanup_handler *handler)
 {
   if (this != self ())
@@ -433,6 +743,8 @@ pthread::pop_cleanup_handler (int const execute)
     // TODO: send a signal or something to the thread ?
     api_fatal ("Attempt to execute a cleanup handler across threads");
   
+  mutex.Lock ();
+
   if (cleanup_stack != NULL)
     {
       __pthread_cleanup_handler *handler = cleanup_stack;
@@ -441,6 +753,8 @@ pthread::pop_cleanup_handler (int const execute)
         (*handler->function) (handler->arg);
       cleanup_stack = handler->next;
     }
+
+  mutex.UnLock ();
 }
 
 void
@@ -967,11 +1281,11 @@ pthread::thread_init_wrapper (void *_arg)
   /*the OS doesn't check this for <= 64 Tls entries (pre win2k) */
   TlsSetValue (MT_INTERFACE->thread_self_dwTlsIndex, thread);
 
-  thread->mutex.Lock();
+  thread->mutex.Lock ();
   // if thread is detached force cleanup on exit
   if (thread->attr.joinable == PTHREAD_CREATE_DETACHED && thread->joiner == NULL)
     thread->joiner = pthread::self ();
-  thread->mutex.UnLock();
+  thread->mutex.UnLock ();
 
 #ifdef _CYG_THREAD_FAILSAFE
   if (_REENT == _impure_ptr)
@@ -984,7 +1298,7 @@ pthread::thread_init_wrapper (void *_arg)
   // call the user's thread
   void *ret = thread->function (thread->arg);
 
-  __pthread_exit (ret);
+  thread->exit (ret);
 
 #if 0
 // ??? This code only runs if the thread exits by returning.
@@ -1038,251 +1352,13 @@ __pthread_once (pthread_once_t *once_control, void (*init_routine) (void))
   return 0;
 }
 
-/*Cancelability states */
-
-
-/*Perform the actual cancel */
-void
-__pthread_cleanup (pthread_t thread)
-{
-}
-
-
 int
 __pthread_cancel (pthread_t thread)
 {
   if (verifyable_object_isvalid (&thread, PTHREAD_MAGIC) != VALID_OBJECT)
     return ESRCH;
-  if (thread->cancelstate == PTHREAD_CANCEL_ENABLE)
-    {
-#if 0
-      /*once all the functions call testcancel (), we will do this */
-      if (thread->canceltype == PTHREAD_CANCEL_DEFERRED)
-	{
-	}
-      else
-	{
-	  /*possible FIXME: this function is meant to return asynchronously
-	   *from the cancellation routine actually firing. So we may need some sort
-	   *of signal to be sent that is immediately recieved and acted on.
-	   */
-	  __pthread_cleanup (thread);
-	}
-#endif
-    }
-/* return 0;
-*/
 
-  return ESRCH;
-/*
-  we return ESRCH until all the required functions call testcancel ();
-  this will give applications predictable behaviour.
-
-  the required function list is: *indicates done, X indicates not present in cygwin.
-aio_suspend ()
-*close ()
-*creat ()
-fcntl ()
-fsync ()
-getmsg ()
-getpmsg ()
-lockf ()
-mq_receive ()
-mq_send ()
-msgrcv ()
-msgsnd ()
-msync ()
-nanosleep ()
-open ()
-pause ()
-poll ()
-pread ()
-pthread_cond_timedwait ()
-pthread_cond_wait ()
-*pthread_join ()
-pthread_testcancel ()
-putmsg ()
-putpmsg ()
-pwrite ()
-read ()
-readv ()
-select ()
-sem_wait ()
-sigpause ()
-sigsuspend ()
-sigtimedwait ()
-sigwait ()
-sigwaitinfo ()
-*sleep ()
-system ()
-tcdrain ()
-*usleep ()
-wait ()
-wait3()
-waitid ()
-waitpid ()
-write ()
-writev ()
-
-the optional list is:
-catclose ()
-catgets ()
-catopen ()
-closedir ()
-closelog ()
-ctermid ()
-dbm_close ()
-dbm_delete ()
-dbm_fetch ()
-dbm_nextkey ()
-dbm_open ()
-dbm_store ()
-dlclose ()
-dlopen ()
-endgrent ()
-endpwent ()
-endutxent ()
-fclose ()
-fcntl ()
-fflush ()
-fgetc ()
-fgetpos ()
-fgets ()
-fgetwc ()
-fgetws ()
-fopen ()
-fprintf ()
-fputc ()
-fputs ()
-fputwc ()
-fputws ()
-fread ()
-freopen ()
-fscanf ()
-fseek ()
-fseeko ()
-fsetpos ()
-ftell ()
-ftello ()
-ftw ()
-fwprintf ()
-fwrite ()
-fwscanf ()
-getc ()
-getc_unlocked ()
-getchar ()
-getchar_unlocked ()
-getcwd ()
-getdate ()
-getgrent ()
-getgrgid ()
-getgrgid_r ()
-getgrnam ()
-getgrnam_r ()
-getlogin ()
-getlogin_r ()
-getpwent ()
-*getpwnam ()
-*getpwnam_r ()
-*getpwuid ()
-*getpwuid_r ()
-gets ()
-getutxent ()
-getutxid ()
-getutxline ()
-getw ()
-getwc ()
-getwchar ()
-getwd ()
-glob ()
-iconv_close ()
-iconv_open ()
-ioctl ()
-lseek ()
-mkstemp ()
-nftw ()
-opendir ()
-openlog ()
-pclose ()
-perror ()
-popen ()
-printf ()
-putc ()
-putc_unlocked ()
-putchar ()
-putchar_unlocked ()
-puts ()
-pututxline ()
-putw ()
-putwc ()
-putwchar ()
-readdir ()
-readdir_r ()
-remove ()
-rename ()
-rewind ()
-rewinddir ()
-scanf ()
-seekdir ()
-semop ()
-setgrent ()
-setpwent ()
-setutxent ()
-strerror ()
-syslog ()
-tmpfile ()
-tmpnam ()
-ttyname ()
-ttyname_r ()
-ungetc ()
-ungetwc ()
-unlink ()
-vfprintf ()
-vfwprintf ()
-vprintf ()
-vwprintf ()
-wprintf ()
-wscanf ()
-
-Note, that for fcntl (), for any value of the cmd argument.
-
-And we must not introduce cancellation points anywhere else that's part of the posix or
-opengroup specs.
- */
-}
-
-/*no races in these three functions: they are all current-thread-only */
-int
-__pthread_setcancelstate (int state, int *oldstate)
-{
-  class pthread *thread = pthread::self ();
-  if (state != PTHREAD_CANCEL_ENABLE && state != PTHREAD_CANCEL_DISABLE)
-    return EINVAL;
-  *oldstate = thread->cancelstate;
-  thread->cancelstate = state;
-  return 0;
-}
-
-int
-__pthread_setcanceltype (int type, int *oldtype)
-{
-  class pthread *thread = pthread::self ();
-  if (type != PTHREAD_CANCEL_DEFERRED && type != PTHREAD_CANCEL_ASYNCHRONOUS)
-    return EINVAL;
-  *oldtype = thread->canceltype;
-  thread->canceltype = type;
-  return 0;
-}
-
-/*deferred cancellation request handler */
-void
-__pthread_testcancel (void)
-{
-  class pthread *thread = pthread::self ();
-  if (thread->cancelstate == PTHREAD_CANCEL_DISABLE)
-    return;
-  /*check the cancellation event object here - not neededuntil pthread_cancel actually
-   *does something*/
+  return thread->cancel ();
 }
 
 /*
@@ -1554,32 +1630,6 @@ __pthread_attr_destroy (pthread_attr_t *attr)
   delete (*attr);
   *attr = NULL;
   return 0;
-}
-
-void
-__pthread_exit (void *value_ptr)
-{
-  pthread * thread = pthread::self ();
-
-  // run cleanup handlers
-  thread->pop_all_cleanup_handlers ();
-
-  MT_INTERFACE->destructors.IterateNull ();
-  
-  thread->mutex.Lock();
-  // cleanup if thread is in detached state and not joined
-  if( __pthread_equal(&thread->joiner, &thread ) )
-    delete thread;
-  else
-    {  
-      thread->return_ptr = value_ptr;
-      thread->mutex.UnLock();
-    }
-
-  if (InterlockedDecrement (&MT_INTERFACE->threadcount) == 0)
-    exit (0);
-  else
-    ExitThread (0);
 }
 
 int

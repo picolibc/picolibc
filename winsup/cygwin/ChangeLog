@@ -1,3 +1,30 @@
+2002-07-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::set_sun_path): Don't free
+	memory here.  Allow NULL parameter.
+
+2002-07-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::dup): Add missing copy operation
+	on sun_path.
+
+2002-07-03  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number.
+
+2002-07-03  Christopher Faylor  <cgf@redhat.com>
+
+	* include/sys/statfs.h: New header file.
+
+2002-07-03  Christopher Faylor  <cgf@redhat.com>
+
+	* dtable.cc (cygwin_attach_handle_to_fd): Default to implicit bin mode
+	if none specified.
+	* fhandler.cc (fhandler_base::init): Make bin argument a guarantee
+	rather than a suggestion.
+	* path.cc (path_conv::check): Load flag returned from
+	cygwin_conv_to_win32_path into path_flags.
+
 2002-07-03  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* tty.cc (tty::common_init): Reverse logic of cygserver check in

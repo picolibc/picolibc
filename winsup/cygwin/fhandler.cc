@@ -866,7 +866,7 @@ fhandler_base::init (HANDLE f, DWORD a, mode_t bin)
     flags = O_WRONLY;
   else if (a == (GENERIC_READ | GENERIC_WRITE))
     flags = O_RDWR;
-  set_flags (flags, bin);
+  set_flags (flags | bin);
   set_open_status ();
   debug_printf ("created new fhandler_base for handle %p, bin %d", f, get_r_binary ());
 }
