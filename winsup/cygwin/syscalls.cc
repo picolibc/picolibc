@@ -998,7 +998,7 @@ stat64_to_stat32 (struct __stat64 *src, struct __stat32 *dst)
   dst->st_nlink = src->st_nlink;
   dst->st_uid = src->st_uid;
   dst->st_gid = src->st_gid;
-  dst->st_rdev = src->st_rdev;
+  dst->st_rdev = ((src->st_rdev >> 8) & 0xff00) | (src->st_rdev & 0xff);
   dst->st_size = src->st_size;
   dst->st_atim = src->st_atim;
   dst->st_mtim = src->st_mtim;
@@ -1027,6 +1027,8 @@ fstat64 (int fd, struct __stat64 *buf)
 	    buf->st_ino = hash_path_name (0, cfd->get_win32_name ());
 	  if (!buf->st_dev)
 	    buf->st_dev = (cfd->get_device () << 16) | cfd->get_unit ();
+	  if (!buf->st_rdev)
+	    buf->st_rdev = buf->st_dev;
 	}
     }
 
@@ -1115,6 +1117,8 @@ stat_worker (const char *name, struct __stat64 *buf, int nofollow,
 	    buf->st_ino = hash_path_name (0, fh->get_win32_name ());
 	  if (!buf->st_dev)
 	    buf->st_dev = (fh->get_device () << 16) | fh->get_unit ();
+	  if (!buf->st_rdev)
+	    buf->st_rdev = buf->st_dev;
 	}
     }
 
