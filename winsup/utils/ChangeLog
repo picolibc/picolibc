@@ -1,3 +1,29 @@
+Fri Dec 15 23:41:48 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* cygcheck.cc (cygwin_info): Add some more bounds checking.
+
+Fri Dec 15 23:41:34 2000  Christopher Faylor <cgf@cygnus.com>
+
+	From Matt Harget <matt@use.net>:
+	* utils/cygcheck.cc (keyeprint): Move declaration before other
+	functions so it could be used by all functions to report error
+	messages. Add comment.
+	(add_path): Check for NULL return from malloc.
+	(find_on_path): Check initial uses of pointers for NULL.
+	(rva_to_offset): Ditto.
+	(init_paths): Add checking for return values of Win32 calls.
+	(get_dword): Ditto.
+	(get_word): Ditto.
+	(dll_info): Ditto, also add NULL pointer checks.
+	(scan_registry): Ditto.
+	(check_keys): Ditto.
+	(dump_sysinfo): Ditto. Add default case to switch. Add error
+	reporting if GetVolumeInformation fails, except when it
+	returns ERROR_NOT_READY.
+	(track_down): Add checking for NULL pointers and
+	return values of Win32 calls.
+	(cygwin_info): Ditto.  Correct small memory leak.
+
 Sun Dec 10 19:08:58 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Compile/link dumper.exe with c++.
@@ -16,9 +42,9 @@ Tue Dec  7 11:15:00 2000  Chris Abbey <cabbey@bresnanlink.net>
 
 Sun Dec  3 00:40:47 2000  Christopher Faylor <cgf@cygnus.com>
 
-        * Makefile.in: Use CXX to build the DLL.
-        * configure.in: Find correct c++ compiler.
-        * configure: Regenerate.
+	* Makefile.in: Use CXX to build the DLL.
+	* configure.in: Find correct c++ compiler.
+	* configure: Regenerate.
 
 Sat Nov 18 23:53:59 2000  Christopher Faylor <cgf@cygnus.com>
 
