@@ -1,3 +1,11 @@
+2003-04-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/inttypes.h: New file.
+	* include/stdint.h: New file.
+	* include/cygwin/in.h: Include stdint.h instead of sys/types.h.
+	* include/cygwin/types.h: Include stdint.h.  Remove typedefs for
+	intN_t and uintN_t since these are defined in stdint.h now.
+
 2003-04-21  Christopher Faylor  <cgf@redhat.com>
 
 	* include/cygwin/version.h: Bump DLL major number to 1005.  Change DLL

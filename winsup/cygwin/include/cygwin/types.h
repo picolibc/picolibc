@@ -18,6 +18,7 @@ extern "C"
 #define _CYGWIN_TYPES_H
 
 #include <sys/sysmacros.h>
+#include <stdint.h>
 
 #ifndef __timespec_t_defined
 #define __timespec_t_defined
@@ -109,40 +110,6 @@ typedef unsigned long vm_offset_t;
 typedef unsigned long vm_size_t;
 #endif /*__vm_size_t_defined*/
 
-#ifndef __int8_t_defined
-#define __int8_t_defined
-typedef char int8_t;
-#endif
-#ifndef __int16_t_defined
-#define __int16_t_defined
-typedef __int16_t int16_t;
-#endif
-#ifndef __int32_t_defined
-#define __int32_t_defined
-typedef __int32_t int32_t;
-#endif
-#ifndef __int64_t_defined
-#define __int64_t_defined
-typedef __int64_t int64_t;
-#endif
-
-#ifndef __uint8_t_defined
-#define __uint8_t_defined
-typedef unsigned char uint8_t;
-#endif
-#ifndef __uint16_t_defined
-#define __uint16_t_defined
-typedef __uint16_t uint16_t;
-#endif
-#ifndef __uint32_t_defined
-#define __uint32_t_defined
-typedef __uint32_t uint32_t;
-#endif
-#ifndef __uint64_t_defined
-#define __uint64_t_defined
-typedef __uint64_t uint64_t;
-#endif
-
 #ifndef __u_int8_t_defined
 #define __u_int8_t_defined
 typedef unsigned char u_int8_t;
@@ -158,16 +125,6 @@ typedef __uint32_t u_int32_t;
 #ifndef __u_int64_t_defined
 #define __u_int64_t_defined
 typedef __uint64_t u_int64_t;
-#endif
-
-#ifndef __uintptr_t_defined
-#define __uintptr_t_defined
-typedef unsigned long uintptr_t;
-#endif
-
-#ifndef __intptr_t_defined
-#define __intptr_t_defined
-typedef long intptr_t;
 #endif
 
 #ifndef __register_t_defined
