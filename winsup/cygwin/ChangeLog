@@ -1,4 +1,13 @@
-2005-03-08  Corinna Vinschen  <corinna@vinschen.de>
+2005-03-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::eid_pipe_name): Fix format
+	string.
+	(fhandler_socket::connect): Set sun_path before running eid credential
+	transaction.  Run transaction only if OS connect was successful.
+	(fhandler_socket::accept): Run transaction only if OS accept was
+	successful.
+
+2005-03-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* signal.cc (sigprocmask): Rename first parameter to "how".
 	(handle_sigprocmask): Ditto.  Check "how" for being a valid "how" value.

@@ -56,7 +56,8 @@ secret_event_name (char *buf, short port, int *secret_ptr)
 char *
 fhandler_socket::eid_pipe_name (char *buf)
 {
-  __small_sprintf (buf, "\\\\.\\pipe\\cygwin-unix-$s", get_sun_path ());
+  __small_sprintf (buf, "\\\\.\\pipe\\cygwin-unix-%s", get_sun_path ());
+  debug_printf ("%s", buf);
   return buf;
 }
 
@@ -666,30 +667,34 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 	  res = -1;
 	}
 
-      /* eid credential transaction. */
-      if (wincap.has_named_pipes ())
+      if (!res || in_progress)
         {
-	  struct ucred in = { getpid (), geteuid32 (), getegid32 () };
-	  struct ucred out = { (pid_t) 0, (__uid32_t) -1, (__gid32_t) -1 };
-	  DWORD bytes = 0;
-	  if (CallNamedPipe(eid_pipe_name ((char *) alloca (CYG_MAX_PATH + 1)),
-			    &in, sizeof in, &out, sizeof out, &bytes, 1000))
+	  /* eid credential transaction. */
+	  set_sun_path (name->sa_data);
+	  if (wincap.has_named_pipes ())
 	    {
-	      debug_printf ("Received eid credentials: pid: %d, uid: %d, gid: %d",
-			    out.pid, out.uid, out.gid);
-	      sec_peer_pid = out.pid;
-	      sec_peer_uid = out.uid;
-	      sec_peer_gid = out.gid;
+	      struct ucred in = { getpid (), geteuid32 (), getegid32 () };
+	      struct ucred out = { (pid_t) 0, (__uid32_t) -1, (__gid32_t) -1 };
+	      DWORD bytes = 0;
+	      if (CallNamedPipe(eid_pipe_name ((char *) alloca (CYG_MAX_PATH + 1)),
+				&in, sizeof in, &out, sizeof out, &bytes, 1000))
+		{
+		  debug_printf ("Received eid credentials: pid: %d, uid: %d"
+		  		", gid: %d", out.pid, out.uid, out.gid);
+		  sec_peer_pid = out.pid;
+		  sec_peer_uid = out.uid;
+		  sec_peer_gid = out.gid;
+		}
+	      else
+		debug_printf ("Receiving eid credentials failed: %E");
 	    }
-	  else
-	    debug_printf ("Receiving eid credentials failed: %E");
-	}
-      else /* 9x */
-        {
-	  /* Incorrect but wrong pid at least doesn't break getpeereid. */
-	  sec_peer_pid = getpid ();
-	  sec_peer_uid = geteuid32 ();
-	  sec_peer_gid = getegid32 ();
+	  else /* 9x */
+	    {
+	      /* Incorrect but wrong pid at least doesn't break getpeereid. */
+	      sec_peer_pid = getpid ();
+	      sec_peer_uid = geteuid32 ();
+	      sec_peer_gid = getegid32 ();
+	    }
 	}
     }
 
@@ -796,31 +801,34 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 	  return -1;
 	}
 
-      /* eid credential transaction. */
-      if (wincap.has_named_pipes ())
+      if ((SOCKET) res != INVALID_SOCKET || in_progress)
         {
-	  DWORD bytes = 0;
-	  bool ret = ConnectNamedPipe (sec_pipe, NULL);
-	  if (ret || GetLastError () == ERROR_PIPE_CONNECTED)
+	  /* eid credential transaction. */
+	  if (wincap.has_named_pipes ())
 	    {
-	      if (!ReadFile (sec_pipe, &out, sizeof out, &bytes, NULL))
-		debug_printf ("Receiving eid credentials failed: %E");
+	      DWORD bytes = 0;
+	      bool ret = ConnectNamedPipe (sec_pipe, NULL);
+	      if (ret || GetLastError () == ERROR_PIPE_CONNECTED)
+		{
+		  if (!ReadFile (sec_pipe, &out, sizeof out, &bytes, NULL))
+		    debug_printf ("Receiving eid credentials failed: %E");
+		  else
+		    debug_printf ("Received eid credentials: pid: %d, uid: %d"
+		    		  ", gid: %d", out.pid, out.uid, out.gid);
+		  if (!WriteFile (sec_pipe, &in, sizeof in, &bytes, NULL))
+		    debug_printf ("Sending eid credentials failed: %E");
+		  DisconnectNamedPipe (sec_pipe);
+		}
 	      else
-		 debug_printf ("Received eid credentials: pid: %d, uid: %d, gid: %d",
-			       out.pid, out.uid, out.gid);
-	      if (!WriteFile (sec_pipe, &in, sizeof in, &bytes, NULL))
-		debug_printf ("Sending eid credentials failed: %E");
-	      DisconnectNamedPipe (sec_pipe);
+		debug_printf ("Connecting the eid credential pipe failed: %E");
 	    }
-	  else
-	    debug_printf ("Connecting the eid credential pipe failed: %E");
-	}
-      else /* 9x */
-	{
-	  /* Incorrect but wrong pid at least doesn't break getpeereid. */
-	  out.pid = sec_pid;
-	  out.uid = sec_uid;
-	  out.gid = sec_gid;
+	  else /* 9x */
+	    {
+	      /* Incorrect but wrong pid at least doesn't break getpeereid. */
+	      out.pid = sec_pid;
+	      out.uid = sec_uid;
+	      out.gid = sec_gid;
+	    }
 	}
     }
 
