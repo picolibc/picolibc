@@ -270,6 +270,7 @@ new-$(LIB_NAME): $(LIB_NAME)
 	$(DLLTOOL) --as=$(AS) --dllname new-$(DLL_NAME) --def $(DEF_FILE) --output-lib new-templib.a
 	$(AR) rcv new-templib.a $(LIBCOS)
 	mv new-templib.a new-$(LIB_NAME)
+	$(RANLIB) $@
 
 dll_ofiles: $(DLL_OFILES)
 
@@ -314,9 +315,12 @@ winver_stamp: mkvers.sh include/cygwin/version.h winver.rc $(DLL_OFILES)
 malloc.o: malloc.cc
 	$(COMPILE_CXX) -fomit-frame-pointer -o $@ $<
 
-cygrun.exe : cygrun.o -lgcc $(LIB_NAME) $(w32api_lib)/libuser32.a \
+cygrun.o: cygrun.c
+	$(CC) $(MINGW_CFLAGS) -o $@ -c $<
+
+cygrun.exe : cygrun.o -lgcc $(w32api_lib)/libuser32.a \
 	     $(w32api_lib)/libshell32.a $(w32api_lib)/libkernel32.a
-	$(CC) -nodefaultlibs -o $@ $^
+	$(CC) -mno-cygwin -o $@ $^
 
 cygserver_transport_outside.o: cygserver_transport.cc
 	$(COMPILE_CXX) -D__OUTSIDE_CYGWIN__ -o $@ $<
@@ -343,6 +347,7 @@ cygserver.exe: cygserver.o cygserver_shm.o cygserver_transport_outside.o cygserv
 #endif
 
 -lgcc:
+	:
 
 #
 
