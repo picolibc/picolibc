@@ -1682,10 +1682,8 @@ cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
       res = res_fd;
     }
   if (fd2p)
-    {
-      fd2s = set_socket_inheritance (fd2s);
-      fdsock (*fd2p, "/dev/tcp", fd2s);
-    }
+    fdsock (*fd2p, "/dev/tcp", fd2s);
+
 done:
   syscall_printf ("%d = rexec (...)", res);
   return res;

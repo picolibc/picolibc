@@ -1,3 +1,9 @@
+Tue Dec  5 17:06:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* net.cc (cygwin_rexec): Eliminate superfluous call to
+	`set_socket_inheritance'.
+	* include/sys/socket.h: Add SUS defines for option values to `shutdown'.
+
 Sun Dec 10 17:19:04 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* include/sysexits: New file.

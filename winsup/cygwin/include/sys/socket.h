@@ -10,6 +10,11 @@ extern "C"
 {
 #endif
 
+/* SUS symbolic values for the second parm to shutdown(2) */
+#define SHUT_RD   0		/* == Win32 SD_RECEIVE */
+#define SHUT_WR   1		/* == Win32 SD_SEND    */
+#define SHUT_RDWR 2		/* == Win32 SD_BOTH    */
+
 #ifndef __INSIDE_CYGWIN_NET__
   int accept (int, struct sockaddr *__peer, int *);
   int bind (int, struct sockaddr *__my_addr, int __addrlen);
