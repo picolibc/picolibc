@@ -3,7 +3,7 @@
 #   Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001
 #   Free Software Foundation, Inc.
 
-timestamp='2001-01-01'
+timestamp='2001-01-17'
 
 # This file is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by
@@ -93,7 +93,7 @@ fi
 
 
 dummy=dummy-$$
-trap 'rm -f $dummy.c $dummy.o $dummy; exit 1' 1 2 15
+trap 'rm -f $dummy.c $dummy.o $dummy.rel $dummy; exit 1' 1 2 15
 
 # CC_FOR_BUILD -- compiler used by this script.
 # Historically, `CC_FOR_BUILD' used to be named `HOST_CC'. We still
@@ -107,7 +107,7 @@ case $CC_FOR_BUILD,$HOST_CC,$CC in
 	     CC_FOR_BUILD="$c"; break
 	  fi
 	done
-	rm -f $dummy.c $dummy.o
+	rm -f $dummy.c $dummy.o $dummy.rel
 	if test x"$CC_FOR_BUILD" = x ; then
 	  CC_FOR_BUILD=no_compiler_found
 	fi
@@ -276,7 +276,7 @@ EOF
     arm:RISC*:1.[012]*:*|arm:riscix:1.[012]*:*)
 	echo arm-acorn-riscix${UNAME_RELEASE}
 	exit 0;;
-    SR2?01:HI-UX/MPP:*:*)
+    SR2?01:HI-UX/MPP:*:* | SR8000:HI-UX/MPP:*:*)
 	echo hppa1.1-hitachi-hiuxmpp
 	exit 0;;
     Pyramid*:OSx*:*:* | MIS*:OSx*:*:* | MIS*:SMP_DC-OSx*:*:*)
@@ -1090,8 +1090,11 @@ EOF
     TSUNAMI:LynxOS:2.*:*)
 	echo sparc-unknown-lynxos${UNAME_RELEASE}
 	exit 0 ;;
-    rs6000:LynxOS:2.*:* | PowerPC:LynxOS:2.*:*)
+    rs6000:LynxOS:2.*:*)
 	echo rs6000-unknown-lynxos${UNAME_RELEASE}
+	exit 0 ;;
+    PowerPC:LynxOS:2.*:* | PowerPC:LynxOS:3.[01]*:*)
+	echo powerpc-unknown-lynxos${UNAME_RELEASE}
 	exit 0 ;;
     SM[BE]S:UNIX_SV:*:*)
 	echo mips-dde-sysv${UNAME_RELEASE}
@@ -1197,6 +1200,24 @@ EOF
 	# is probably installed.
 	echo ${UNAME_MACHINE}-pc-os2-emx
 	exit 0 ;;
+    *:TOPS-10:*:*)
+	echo pdp10-unknown-tops10
+	exit 0 ;;
+    *:TENEX:*:*)
+	echo pdp10-unknown-tenex
+	exit 0 ;;
+    KS10:TOPS-20:*:* | KL10:TOPS-20:*:* | TYPE4:TOPS-20:*:*)
+	echo pdp10-dec-tops20
+	exit 0 ;;
+    XKL-1:TOPS-20:*:* | TYPE5:TOPS-20:*:*)
+	echo pdp10-xkl-tops20
+	exit 0 ;;
+    *:TOPS-20:*:*)
+	echo pdp10-unknown-tops20
+	exit 0 ;;
+    *:ITS:*:*)
+	echo pdp10-unknown-its
+	exit 0 ;;
 esac
 
 #echo '(No uname command or uname output not recognized.)' 1>&2
@@ -1288,11 +1309,24 @@ main ()
 #endif
 
 #if defined (vax)
-#if !defined (ultrix)
-  printf ("vax-dec-bsd\n"); exit (0);
-#else
-  printf ("vax-dec-ultrix\n"); exit (0);
-#endif
+# if !defined (ultrix)
+#  include <sys/param.h>
+#  if defined (BSD)
+#   if BSD == 43
+      printf ("vax-dec-bsd4.3\n"); exit (0);
+#   else
+#    if BSD == 199006
+      printf ("vax-dec-bsd4.3reno\n"); exit (0);
+#    else
+      printf ("vax-dec-bsd\n"); exit (0);
+#    endif
+#   endif
+#  else
+    printf ("vax-dec-bsd\n"); exit (0);
+#  endif
+# else
+    printf ("vax-dec-ultrix\n"); exit (0);
+# endif
 #endif
 
 #if defined (alliant) && defined (i860)
@@ -1339,8 +1373,9 @@ fi
 cat >&2 <<EOF
 $0: unable to guess system type
 
-The $version version of this script cannot recognize your system type.
-Please download the most up to date version of the config scripts:
+This script, last modified $timestamp, has failed to recognize
+the operating system you are using. It is advised that you
+download the most up to date version of the config scripts from
 
     ftp://ftp.gnu.org/pub/gnu/config/
 
@@ -1349,7 +1384,7 @@ send the following data and any information you think might be
 pertinent to <config-patches@gnu.org> in order to provide the needed
 information to handle your system.
 
-config.guess version = $version
+config.guess timestamp = $timestamp
 
 uname -m = `(uname -m) 2>/dev/null || echo unknown`
 uname -r = `(uname -r) 2>/dev/null || echo unknown`

@@ -1,3 +1,8 @@
+2001-02-04  Michael Sokolov  <msokolov@ivan.Harhan.ORG>
+
+	* config.guess: Import from subversions.gnu.org (revision 1.181).
+	* config.sub: Import from subversions.gnu.org (revision 1.199).
+
 2001-01-30  Alan Modra  <alan@linuxcare.com.au>
 
 	* config.guess: Handle hppa64-linux systems.

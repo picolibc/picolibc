@@ -3,7 +3,7 @@
 #   Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001
 #   Free Software Foundation, Inc.
 
-timestamp='2001-01-07'
+timestamp='2001-01-12'
 
 # This file is (in principle) common to ALL GNU software.
 # The presence of a machine in this file suggests that SOME GNU software
@@ -69,7 +69,7 @@ Report bugs and patches to <config-patches@gnu.org>."
 version="\
 GNU config.sub ($timestamp)
 
-Copyright (C) 1992, 93, 94, 95, 96, 97, 98, 99, 2000
+Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001
 Free Software Foundation, Inc.
 
 This is free software; see the source for copying conditions.  There is NO
@@ -117,7 +117,7 @@ esac
 # Here we must recognize all the valid KERNEL-OS combinations.
 maybe_os=`echo $1 | sed 's/^\(.*\)-\([^-]*-[^-]*\)$/\2/'`
 case $maybe_os in
-  nto-qnx* | linux-gnu* | storm-chaos*)
+  nto-qnx* | linux-gnu* | storm-chaos* | os2-emx*)
     os=-$maybe_os
     basic_machine=`echo $1 | sed 's/^\(.*\)-\([^-]*-[^-]*\)$/\1/'`
     ;;
@@ -226,7 +226,8 @@ case $basic_machine in
 		| alphaev6[78] \
 		| we32k | ns16k | clipper | i370 | sh | sh[34] \
 		| powerpc | powerpcle \
-		| 1750a | dsp16xx | pdp11 | mips16 | mips64 | mipsel | mips64el \
+		| 1750a | dsp16xx | pdp10 | pdp11 \
+		| mips16 | mips64 | mipsel | mips64el \
 		| mips64orion | mips64orionel | mipstx39 | mipstx39el \
 		| mips64vr4300 | mips64vr4300el | mips64vr4100 | mips64vr4100el \
 		| mips64vr5000 | miprs64vr5000el | mcore \
@@ -268,7 +269,7 @@ case $basic_machine in
 	      | alphaev6[78]-* \
 	      | we32k-* | cydra-* | ns16k-* | pn-* | np1-* | xps100-* \
 	      | clipper-* | orion-* \
-	      | sparclite-* | pdp11-* | sh-* | powerpc-* | powerpcle-* \
+	      | sparclite-* | pdp10-* | pdp11-* | sh-* | powerpc-* | powerpcle-* \
 	      | sparc64-* | sparcv9-* | sparc86x-* | mips16-* | mips64-* | mipsel-* \
 	      | mips64el-* | mips64orion-* | mips64orionel-* \
 	      | mips64vr4100-* | mips64vr4100el-* | mips64vr4300-* | mips64vr4300el-* \
@@ -424,6 +425,10 @@ case $basic_machine in
 		basic_machine=tron-gmicro
 		os=-sysv
 		;;
+	go32)
+		basic_machine=i386-pc
+		os=-go32
+		;;
 	h3050r* | hiux*)
 		basic_machine=hppa1.1-hitachi
 		os=-hiuxwe2
@@ -523,18 +528,6 @@ case $basic_machine in
 		basic_machine=i386-unknown
 		os=-vsta
 		;;
-	i386-go32 | go32)
-		basic_machine=i386-unknown
-		os=-go32
-		;;
-	i386-mingw32 | mingw32)
-		basic_machine=i386-unknown
-		os=-mingw32
-		;;
-	i[34567]86-pw32 | pw32)
-		basic_machine=i586-unknown
-		os=-pw32
-		;;
 	iris | iris4d)
 		basic_machine=mips-sgi
 		case $os in
@@ -559,6 +552,10 @@ case $basic_machine in
 	merlin)
 		basic_machine=ns32k-utek
 		os=-sysv
+		;;
+	mingw32)
+		basic_machine=i386-pc
+		os=-mingw32
 		;;
 	miniframe)
 		basic_machine=m68000-convergent
@@ -590,7 +587,7 @@ case $basic_machine in
 		os=-coff
 		;;
 	msdos)
-		basic_machine=i386-unknown
+		basic_machine=i386-pc
 		os=-msdos
 		;;
 	mvs)
@@ -728,6 +725,10 @@ case $basic_machine in
 		;;
 	ps2)
 		basic_machine=i386-ibm
+		;;
+	pw32)
+		basic_machine=i586-unknown
+		os=-pw32
 		;;
 	rom68k)
 		basic_machine=m68k-rom68k
@@ -919,6 +920,10 @@ case $basic_machine in
 	vax)
 		basic_machine=vax-dec
 		;;
+	pdp10)
+		# there are many clones, so DEC is not a safe bet
+		basic_machine=pdp10-unknown
+		;;
 	pdp11)
 		basic_machine=pdp11-dec
 		;;
@@ -1009,7 +1014,8 @@ case $os in
 	      | -cygwin* | -pe* | -psos* | -moss* | -proelf* | -rtems* \
 	      | -mingw32* | -linux-gnu* | -uxpv* | -beos* | -mpeix* | -udk* \
 	      | -interix* | -uwin* | -rhapsody* | -darwin* | -opened* \
-	      | -openstep* | -oskit* | -conix* | -pw32* | -nonstopux* | -storm-chaos*)
+	      | -openstep* | -oskit* | -conix* | -pw32* | -nonstopux* \
+	      | -storm-chaos* | -tops10* | -tenex* | -tops20* | -its* | -os2*)
 	# Remember, each alternative MUST END IN *, to match a version number.
 		;;
 	-qnx*)
@@ -1140,6 +1146,9 @@ case $basic_machine in
 		;;
 	arm*-semi)
 		os=-aout
+		;;
+	pdp10-*)
+		os=-tops20
 		;;
         pdp11-*)
 		os=-none
