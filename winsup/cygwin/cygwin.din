@@ -988,6 +988,8 @@ cygwin32_posix_to_win32_path_list = cygwin_posix_to_win32_path_list
 cygwin32_split_path = cygwin_split_path
 cygwin_winpid_to_pid
 cygwin32_winpid_to_pid = cygwin_winpid_to_pid
+cygwin_logon_user
+cygwin_set_impersonation_token
 realpath
 reent_data DATA
 getenv

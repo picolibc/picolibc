@@ -31,6 +31,9 @@ extern int cygwin_conv_to_full_posix_path (const char *, char *);
 extern int cygwin_posix_path_list_p (const char *);
 extern void cygwin_split_path (const char *, char *, char *);
 
+extern HANDLE cygwin_logon_user (const struct passwd *, const char *);
+extern void cygwin_set_impersonation_token (const HANDLE);
+
 #ifdef _GNU_H_WINDOWS32_BASE
 /* included if <windows.h> is included */
 extern int cygwin32_attach_handle_to_fd (char *, int, HANDLE, int, int);

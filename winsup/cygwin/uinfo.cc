@@ -126,6 +126,11 @@ uinfo_init ()
       myself->uid = DEFAULT_UID;
       myself->gid = DEFAULT_GID;
     }
+  /* Set to non impersonated value. */
+  myself->token = INVALID_HANDLE_VALUE;
+  myself->impersonated = TRUE;
+  myself->orig_uid = myself->real_uid = myself->uid;
+  myself->orig_gid = myself->real_gid = myself->gid;
 }
 
 extern "C" char *
@@ -143,25 +148,25 @@ getlogin (void)
 extern "C" uid_t
 getuid (void)
 {
-  return myself->uid;
+  return myself->real_uid;
 }
 
 extern "C" gid_t
 getgid (void)
 {
-  return myself->gid;
+  return myself->real_gid;
 }
 
 extern "C" uid_t
 geteuid (void)
 {
-  return getuid ();
+  return myself->uid;
 }
 
 extern "C" gid_t
 getegid (void)
 {
-  return getgid ();
+  return myself->gid;
 }
 
 /* Not quite right - cuserid can change, getlogin can't */

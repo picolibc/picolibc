@@ -763,10 +763,9 @@ dll_crt0_1 ()
   /* Flush signals and ensure that signal thread is up and running. Can't
      do this for noncygwin case since the signal thread is blocked due to
      LoadLibrary serialization. */
-  if (!dynamically_loaded)
-    sig_send (NULL, __SIGFLUSH);	/* also initializes uid, gid */
+  sig_send (NULL, __SIGFLUSH);	/* also initializes uid, gid */
 
-  if (user_data->main && !dynamically_loaded)
+  if (user_data->main)
     exit (user_data->main (argc, argv, *user_data->envptr));
 }
 
@@ -1157,10 +1156,12 @@ LoadDLLfunc (GetSidSubAuthority, 8, advapi32)
 LoadDLLfunc (GetSidSubAuthorityCount, 4, advapi32)
 LoadDLLfunc (GetTokenInformation, 20, advapi32)
 LoadDLLfunc (GetUserNameA, 8, advapi32)
+LoadDLLfunc (ImpersonateLoggedOnUser, 4, advapi32)
 LoadDLLfunc (InitializeAcl, 12, advapi32)
 LoadDLLfunc (InitializeSecurityDescriptor, 8, advapi32)
 LoadDLLfunc (InitializeSid, 12, advapi32)
 LoadDLLfunc (IsValidSid, 4, advapi32)
+LoadDLLfunc (LogonUserA, 24, advapi32)
 LoadDLLfunc (LookupAccountNameA, 28, advapi32)
 LoadDLLfunc (LookupAccountSidA, 28, advapi32)
 LoadDLLfunc (LookupPrivilegeValueA, 12, advapi32)
@@ -1175,6 +1176,7 @@ LoadDLLfunc (RegQueryValueExA, 24, advapi32)
 LoadDLLfunc (RegSetValueExA, 24, advapi32)
 LoadDLLfunc (RegisterEventSourceA, 8, advapi32)
 LoadDLLfunc (ReportEventA, 36, advapi32)
+LoadDLLfunc (RevertToSelf, 0, advapi32)
 LoadDLLfunc (SetKernelObjectSecurity, 12, advapi32)
 LoadDLLfunc (SetSecurityDescriptorDacl, 16, advapi32)
 LoadDLLfunc (SetSecurityDescriptorGroup, 12, advapi32)

@@ -503,6 +503,9 @@ skip_arg_parsing:
   /* Preallocated buffer for `sec_user' call */
   char sa_buf[1024];
 
+  if (!hToken && myself->token != INVALID_HANDLE_VALUE)
+    hToken = myself->token;
+
   if (hToken)
     {
       /* allow the child to interact with our window station/desktop */
@@ -535,6 +538,11 @@ skip_arg_parsing:
       else
         system_printf ("GetTokenInformation: %E");
 
+      /* Remove impersonation */
+      uid_t uid = geteuid();
+      if (myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
+        seteuid (myself->orig_uid);
+
       rc = CreateProcessAsUser (hToken,
 		       real_path,	/* image name - with full path */
 		       one_line.buf,	/* what was passed to exec */
@@ -550,6 +558,9 @@ skip_arg_parsing:
 		       0,	/* use current drive/directory */
 		       &si,
 		       &pi);
+      /* Restore impersonation */
+      if (myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
+        seteuid (uid);
     }
   else
     rc = CreateProcessA (real_path,	/* image name - with full path */

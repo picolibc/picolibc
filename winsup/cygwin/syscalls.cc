@@ -1797,6 +1797,92 @@ extern "C"
 int
 setgid (gid_t gid)
 {
+  int ret = setegid (gid);
+  if (!ret)
+    myself->real_gid = myself->gid;
+  return ret;
+}
+
+/* setuid: POSIX 4.2.2.1 */
+extern "C"
+int
+setuid (uid_t uid)
+{
+  int ret = seteuid (uid);
+  if (!ret)
+    myself->real_uid = myself->uid;
+  debug_printf ("real: %d, effective: %d", myself->real_uid, myself->uid);
+  return ret;
+}
+
+extern char *internal_getlogin (struct pinfo *pi);
+
+/* seteuid: standards? */
+extern "C"
+int
+seteuid (uid_t uid)
+{
+  if (os_being_run == winNT)
+    {
+      if (uid != (uid_t) -1)
+        {
+          struct passwd *pw_new = getpwuid (uid);
+          if (!pw_new)
+            {
+              set_errno (EINVAL);
+              return -1;
+            }
+
+          if (uid != myself->uid)
+            if (uid == myself->orig_uid)
+              {
+                debug_printf ("RevertToSelf() (uid == orig_uid, token=%d)",
+                              myself->token);
+                RevertToSelf();
+                if (myself->token != INVALID_HANDLE_VALUE)
+                  myself->impersonated = FALSE;
+              }
+            else if (!myself->impersonated)
+              {
+                debug_printf ("Impersonate(uid == %d)", uid);
+                RevertToSelf();
+                if (myself->token != INVALID_HANDLE_VALUE)
+                  if (!ImpersonateLoggedOnUser (myself->token))
+                    system_printf ("Impersonate(%d) in set(e)uid failed: %E",
+                                   myself->token);
+                  else
+                    myself->impersonated = TRUE;
+              }
+
+          struct pinfo pi;
+          pi.psid = (PSID) pi.sidbuf;
+          struct passwd *pw_cur = getpwnam (internal_getlogin (&pi));
+          if (pw_cur != pw_new)
+            {
+              debug_printf ("Diffs!!! token: %d, cur: %d, new: %d, orig: %d",
+                            myself->token, pw_cur->pw_uid,
+                            pw_new->pw_uid, myself->orig_uid);
+              set_errno (EPERM);
+              return -1;
+            }
+          myself->uid = uid;
+          strcpy (myself->username, pi.username);
+          CopySid (40, myself->psid, pi.psid);
+          strcpy (myself->logsrv, pi.logsrv);
+          strcpy (myself->domain, pi.domain);
+        }
+    }
+  else
+    set_errno (ENOSYS);
+  debug_printf ("real: %d, effective: %d", myself->real_uid, myself->uid);
+  return 0;
+}
+
+/* setegid: from System V.  */
+extern "C"
+int
+setegid (gid_t gid)
+{
   if (os_being_run == winNT)
     {
       if (gid != (gid_t) -1)
@@ -1812,60 +1898,6 @@ setgid (gid_t gid)
   else
     set_errno (ENOSYS);
   return 0;
-}
-
-extern char *internal_getlogin (struct pinfo *pi);
-
-/* setuid: POSIX 4.2.2.1 */
-extern "C"
-int
-setuid (uid_t uid)
-{
-  if (os_being_run == winNT)
-    {
-      if (uid != (uid_t) -1)
-        {
-          struct passwd *pw_new = getpwuid (uid);
-          if (!pw_new)
-            {
-              set_errno (EINVAL);
-              return -1;
-            }
-
-          struct pinfo pi;
-          pi.psid = (PSID) pi.sidbuf;
-          struct passwd *pw_cur = getpwnam (internal_getlogin (&pi));
-          if (pw_cur != pw_new)
-            {
-              set_errno (EPERM);
-              return -1;
-            }
-          myself->uid = uid;
-          strcpy (myself->username, pi.username);
-          CopySid (40, myself->psid, pi.psid);
-          strcpy (myself->logsrv, pi.logsrv);
-          strcpy (myself->domain, pi.domain);
-        }
-    }
-  else
-    set_errno (ENOSYS);
-  return 0;
-}
-
-/* seteuid: standards? */
-extern "C"
-int
-seteuid (uid_t uid)
-{
-  return setuid (uid);
-}
-
-/* setegid: from System V.  */
-extern "C"
-int
-setegid (gid_t gid)
-{
-  return setgid (gid);
 }
 
 /* chroot: privileged Unix system call.  */

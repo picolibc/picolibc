@@ -93,6 +93,15 @@ class pinfo
   char logsrv[256]; /* Logon server, may be fully qualified DNS name */
   char domain[MAX_COMPUTERNAME_LENGTH+1]; /* Logon domain of the user */
 
+  /* token is needed if sexec should be called. It can be set by a call
+     to `set_impersonation_token()'. */
+  HANDLE token;
+  BOOL impersonated;
+  uid_t orig_uid;        /* Remains intact also after impersonation */
+  uid_t orig_gid;        /* Ditto */
+  uid_t real_uid;        /* Remains intact on seteuid, replaced by setuid */
+  gid_t real_gid;	 /* Ditto */
+
   /* Non-zero if process was stopped by a signal. */
   char stopsig;
 

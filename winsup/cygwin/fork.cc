@@ -363,10 +363,16 @@ fork ()
 	  goto cleanup;
 	}
 
+      /* Remove impersonation */
+      uid_t uid = geteuid();
+      if (myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
+        seteuid (myself->orig_uid);
+
+      char sa_buf[1024];
       rc = CreateProcessA (myself->progname, /* image to run */
 			   myself->progname, /* what we send in arg0 */
-			   &sec_none_nih,  /* process security attrs */
-			   &sec_none_nih,  /* thread security attrs */
+                           allow_ntsec ? sec_user (sa_buf) : &sec_none_nih,
+                           allow_ntsec ? sec_user (sa_buf) : &sec_none_nih,
 			   TRUE,	  /* inherit handles from parent */
 			   c_flags,
 			   NULL,	  /* environment filled in later */
@@ -384,8 +390,15 @@ fork ()
 	  ForceCloseHandle(subproc_ready);
 	  ForceCloseHandle(forker_finished);
 	  subproc_ready = forker_finished = NULL;
+          /* Restore impersonation */
+          if (myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
+            seteuid (uid);
 	  return -1;
 	}
+
+      /* Restore impersonation */
+      if (myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
+        seteuid (uid);
 
       ProtectHandle (pi.hThread);
       /* Protect the handle but name it similarly to the way it will
@@ -410,6 +423,12 @@ fork ()
       memcpy (child->sidbuf, myself->sidbuf, 40);
       memcpy (child->logsrv, myself->logsrv, 256);
       memcpy (child->domain, myself->domain, MAX_COMPUTERNAME_LENGTH+1);
+      child->token = myself->token;
+      child->impersonated = myself->impersonated;
+      child->orig_uid = myself->orig_uid;
+      child->orig_gid = myself->orig_gid;
+      child->real_uid = myself->real_uid;
+      child->real_gid = myself->real_gid;
       set_child_mmap_ptr (child);
 
       /* Wait for subproc to initialize itself. */
@@ -493,6 +512,17 @@ fork ()
 
       debug_printf ("self %p, pid %d, ppid %d",
 		    myself, x, myself ? myself->ppid : -1);
+
+      /* Restore the inheritance state as in parent
+         Don't call setuid here! The flags are already set. */
+      if (myself->impersonated)
+        {
+          debug_printf ("Impersonation of child, token: %d", myself->token);
+          if (myself->token == INVALID_HANDLE_VALUE)
+            RevertToSelf (); // probably not needed
+          else if (!ImpersonateLoggedOnUser (myself->token))
+            system_printf ("Impersonate for forked child failed: %E");
+        }
 
       sync_with_parent ("after longjmp.", TRUE);
       ProtectHandle (hParent);

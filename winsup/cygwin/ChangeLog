@@ -1,3 +1,34 @@
+Thu Jun 16 20:55:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* cygwin.din: Define symbols for `cygwin_logon_user' and
+	`cygwin_set_impersonation_token'.
+	* dcrt0.cc (dll_crt0_1): Eliminate superfluous conditional
+	statements.
+	Add load statements for `ImpersonateLoggedOnUser', `LogonUserA'
+	and `RevertToSelf'.
+	* fork.cc (fork): Care for correct impersonation of parent
+	and child process.
+	* security.cc (cygwin_set_impersonation_token): New function.
+	(cygwin_logon_user): Ditto.
+	shared.h (class pinfo): New members `orig_uid', `orig_gid',
+	`real_uid' nad `real_gid'.
+	spawn.cc (spawn_guts): Care for impersonation when starting
+	child process in a different user context.
+	* syscalls.cc (setgid): Call `setegid' now. Set real_gid.
+	(setuid): Call `seteuid' now. Set real_uid.
+	(seteuid): Functionality moved from setuid to here. Care for
+	correct impersonation.
+	(setegid): Functionality moved from setgid to here.
+	* uinfo.cc (uinfo_init): Initialization of additional pinfo
+	members.
+	(getuid): Return real uid.
+	(getgid): Return real gid.
+	(geteuid): Return effective uid.
+	(getegid): Return effective gid.
+	include/sys/cygwin.h: Add prototypes for `cygwin_logon_user' and
+	`cygwin_set_impersonation_token'.
+	include/cygwin/version.h: Bumb API minor version to 22.
+
 Thu Jun 15 18:12:36 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (chdir): Don't set cache to offending chdir.  Change comment

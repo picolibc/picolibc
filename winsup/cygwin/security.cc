@@ -374,6 +374,73 @@ got_it:
   return TRUE;
 }
 
+extern "C"
+void
+cygwin_set_impersonation_token (const HANDLE hToken)
+{
+  debug_printf ("set_impersonation_token (%d)", hToken);
+  if (myself->token != hToken)
+    {
+      if (myself->token != INVALID_HANDLE_VALUE)
+        CloseHandle (myself->token);
+      myself->token = hToken;
+      myself->impersonated = FALSE;
+    }
+}
+
+extern "C"
+HANDLE
+cygwin_logon_user (const struct passwd *pw, const char *password)
+{
+  if (os_being_run != winNT)
+    {
+      set_errno (ENOSYS);
+      return INVALID_HANDLE_VALUE;
+    }
+  if (!pw)
+    {
+      set_errno (EINVAL);
+      return INVALID_HANDLE_VALUE;
+    }
+
+  char *c, *nt_user, *nt_domain = NULL;
+  char usernamebuf[256];
+  HANDLE hToken;
+
+  strcpy (usernamebuf, pw->pw_name);
+  if (pw->pw_gecos)
+    {
+      if ((c = strstr (pw->pw_gecos, "U-")) != NULL &&
+          (c == pw->pw_gecos || c[-1] == ','))
+        {
+          usernamebuf[0] = '\0';
+          strncat (usernamebuf, c + 2, 255);
+          if ((c = strchr (usernamebuf, ',')) != NULL)
+            *c = '\0';
+        }
+    }
+  nt_user = usernamebuf;
+  if ((c = strchr (nt_user, '\\')) != NULL)
+    {
+      nt_domain = nt_user;
+      *c = '\0';
+      nt_user = c + 1;
+    }
+  if (! LogonUserA (nt_user, nt_domain, (char *) password,
+                    LOGON32_LOGON_INTERACTIVE,
+                    LOGON32_PROVIDER_DEFAULT,
+                    &hToken)
+      || !SetHandleInformation (hToken,
+                                HANDLE_FLAG_INHERIT,
+                                HANDLE_FLAG_INHERIT))
+    {
+      __seterrno ();
+      return INVALID_HANDLE_VALUE;
+    }
+  debug_printf ("%d = logon_user(%s,...)", hToken, pw->pw_name);
+  return hToken;
+}
+
 /* read_sd reads a security descriptor from a file.
    In case of error, -1 is returned and errno is set.
    If sd_buf is too small, 0 is returned and sd_size

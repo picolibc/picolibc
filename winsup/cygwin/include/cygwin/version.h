@@ -106,10 +106,15 @@ details. */
        19: Export fchown, lchown, lacl
        20: regsub, inet_network
        21: incompatible change to stdio cr/lf and buffering
+       22: Export cygwin_logon_user, cygwin_set_impersonation_token.
+           geteuid, getegid return effective uid/gid.
+           getuid, getgid return real uid/gid.
+           seteuid, setegid set only effective uid/gid.
+           setuid, setgid set effective and real uid/gid.
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 21
+#define CYGWIN_VERSION_API_MINOR 22
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
