@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -89,66 +89,7 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 noinst_LIBRARIES = lib.a
 
-COPYOFILES = \
-	Ovfork.o \
-	_exit.o \
-	_sigvec.o \
-	abort.o \
-	access.o \
-	cerror.o \
-	chmod.o \
-	chown.o \
-	close.o \
-	creat.o \
-	dup.o \
-	dup2.o \
-	errlst.o \
-	execl.o \
-	execle.o \
-	execv.o \
-	execve.o \
-	execvp.o \
-	fork.o \
-	fstat.o \
-	getdtablesize.o \
-	getpid.o \
-	getrusage.o  \
-	gettimeofday.o \
-	ieee_globals.o \
-	ioctl.o \
-	isatty.o \
-	kill.o \
-	link.o \
-	lseek.o \
-	open.o \
-	pipe.o \
-	popen.o \
-	read.o \
-	sbrk.o \
-	setitimer.o \
-	sigblock.o \
-	signal.o \
-	sigpause.o \
-	sigsetjmp.o \
-	sigsetmask.o \
-	sigtramp.o \
-	sigvec.o \
-	sleep.o \
-	start_float.o \
-	stat.o \
-	time.o \
-	times.o \
-	umask.o \
-	unlink.o \
-	utime.o \
-	utimes.o \
-	wait.o \
-	wait3.o \
-	wait4.o \
-	write.o \
-	rem.o \
-	multiply.o \
-	umultiply.o
+COPYOFILES =  	Ovfork.o 	_exit.o 	_sigvec.o 	abort.o 	access.o 	cerror.o 	chmod.o 	chown.o 	close.o 	creat.o 	dup.o 	dup2.o 	errlst.o 	execl.o 	execle.o 	execv.o 	execve.o 	execvp.o 	fork.o 	fstat.o 	getdtablesize.o 	getpid.o 	getrusage.o  	gettimeofday.o 	ieee_globals.o 	ioctl.o 	isatty.o 	kill.o 	link.o 	lseek.o 	open.o 	pipe.o 	popen.o 	read.o 	sbrk.o 	setitimer.o 	sigblock.o 	signal.o 	sigpause.o 	sigsetjmp.o 	sigsetmask.o 	sigtramp.o 	sigvec.o 	sleep.o 	start_float.o 	stat.o 	time.o 	times.o 	umask.o 	unlink.o 	utime.o 	utimes.o 	wait.o 	wait3.o 	wait4.o 	write.o 	rem.o 	multiply.o 	umultiply.o
 
 
 # These files are from Sun's libc.a, but the must be renamed because they

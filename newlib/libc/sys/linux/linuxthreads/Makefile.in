@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -102,44 +102,21 @@ INCLUDES = -I$(srcdir)/../include -I$(srcdir)/machine/$(machine_dir) -I$(srcdir)
 
 LIBTOOL_VERSION_INFO = 0:0:0
 
-LIB_SOURCES = \
-	attr.c barrier.c condvar.c \
-	events.c getcpuclockid.c getreent.c join.c lockfile.c manager.c \
-	mq_notify.c oldsemaphore.c prio.c ptclock_gettime.c ptclock_settime.c \
-	ptlongjmp.c pt-machine.c reent.c rwlock.c semaphore.c \
-	signals.c spinlock.c sysctl.c \
-	timer_create.c timer_getoverr.c timer_routines.c \
-	timer_delete.c timer_gettime.c timer_settime.c \
-	wrapsyscall.c
+LIB_SOURCES =  	attr.c barrier.c condvar.c 	events.c getcpuclockid.c getreent.c join.c lockfile.c manager.c 	mq_notify.c oldsemaphore.c prio.c ptclock_gettime.c ptclock_settime.c 	ptlongjmp.c pt-machine.c reent.c rwlock.c semaphore.c 	signals.c spinlock.c sysctl.c 	timer_create.c timer_getoverr.c timer_routines.c 	timer_delete.c timer_gettime.c timer_settime.c 	wrapsyscall.c
 
 
-LIB_DB_SOURCES = td_init.c td_log.c td_ta_delete.c td_ta_get_nthreads.c      \
-	td_ta_get_ph.c td_ta_map_id2thr.c td_ta_map_lwp2thr.c     \
-	td_ta_new.c td_ta_thr_iter.c td_ta_tsd_iter.c		  \
-	td_thr_get_info.c td_thr_getfpregs.c td_thr_getgregs.c    \
-	td_thr_getxregs.c td_thr_getxregsize.c td_thr_setfpregs.c \
-	td_thr_setgregs.c td_thr_setprio.c td_thr_setsigpending.c \
-	td_thr_setxregs.c td_thr_sigsetmask.c td_thr_tsd.c	  \
-	td_thr_validate.c td_thr_dbsuspend.c td_thr_dbresume.c    \
-	td_ta_setconcurrency.c td_ta_enable_stats.c       	  \
-	td_ta_reset_stats.c td_ta_get_stats.c td_ta_event_addr.c  \
-	td_thr_event_enable.c td_thr_set_event.c 	          \
-	td_thr_clear_event.c td_thr_event_getmsg.c		  \
-	td_ta_set_event.c td_ta_event_getmsg.c		          \
-	td_ta_clear_event.c td_symbol_list.c
+LIB_DB_SOURCES = td_init.c td_log.c td_ta_delete.c td_ta_get_nthreads.c      	td_ta_get_ph.c td_ta_map_id2thr.c td_ta_map_lwp2thr.c     	td_ta_new.c td_ta_thr_iter.c td_ta_tsd_iter.c		  	td_thr_get_info.c td_thr_getfpregs.c td_thr_getgregs.c    	td_thr_getxregs.c td_thr_getxregsize.c td_thr_setfpregs.c 	td_thr_setgregs.c td_thr_setprio.c td_thr_setsigpending.c 	td_thr_setxregs.c td_thr_sigsetmask.c td_thr_tsd.c	  	td_thr_validate.c td_thr_dbsuspend.c td_thr_dbresume.c    	td_ta_setconcurrency.c td_ta_enable_stats.c       	  	td_ta_reset_stats.c td_ta_get_stats.c td_ta_event_addr.c  	td_thr_event_enable.c td_thr_set_event.c 	          	td_thr_clear_event.c td_thr_event_getmsg.c		  	td_ta_set_event.c td_ta_event_getmsg.c		          	td_ta_clear_event.c td_symbol_list.c
 
 
 # Because of how libtool moves objects around, these files must be built last.
-LIBADD_OBJS = mutex.$(oext) specific.$(oext) pthread.$(oext) \
-	cancel.$(oext) 
+LIBADD_OBJS = mutex.$(oext) specific.$(oext) pthread.$(oext) 	cancel.$(oext) 
 
 
-ELIX_3_OBJS = \
-	ptfork.$(oext)
+ELIX_3_OBJS =  	ptfork.$(oext)
 
-@ELIX_LEVEL_1_TRUE@EXTRA_OBJS = @ELIX_LEVEL_1_TRUE@reqsyscalls.$(oext)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@EXTRA_OBJS = @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@reqsyscalls.$(oext)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@EXTRA_OBJS = @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@$(ELIX_3_OBJS)
+@ELIX_LEVEL_1_TRUE@EXTRA_OBJS = reqsyscalls.$(oext)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@EXTRA_OBJS = reqsyscalls.$(oext)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@EXTRA_OBJS = $(ELIX_3_OBJS)
 
 SUBDIRS = machine .
 
@@ -149,22 +126,22 @@ toollibdir = $(top_toollibdir)
 libpthread_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/../shared.ld `cat extra-libtool-objlist`
 libthread_db_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/../shared.ld 
 
-@USE_LIBTOOL_TRUE@toollib_LTLIBRARIES = @USE_LIBTOOL_TRUE@libpthread.la libthread_db.la
-@USE_LIBTOOL_TRUE@libpthread_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_SOURCES)
-@USE_LIBTOOL_TRUE@libpthread_la_LIBADD = @USE_LIBTOOL_TRUE@$(LIBADD_OBJS) $(EXTRA_OBJS)
-@USE_LIBTOOL_TRUE@libpthread_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@$(LIBADD_OBJS) $(EXTRA_OBJS) extra-libtool-objlist
-@USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
-@USE_LIBTOOL_TRUE@LIB_COMPILE = @USE_LIBTOOL_TRUE@$(LTCOMPILE)
-@USE_LIBTOOL_FALSE@LIB_COMPILE = @USE_LIBTOOL_FALSE@$(COMPILE)
+@USE_LIBTOOL_TRUE@toollib_LTLIBRARIES = libpthread.la libthread_db.la
+@USE_LIBTOOL_TRUE@libpthread_la_SOURCES = $(LIB_SOURCES)
+@USE_LIBTOOL_TRUE@libpthread_la_LIBADD = $(LIBADD_OBJS) $(EXTRA_OBJS)
+@USE_LIBTOOL_TRUE@libpthread_la_DEPENDENCIES = $(LIBADD_OBJS) $(EXTRA_OBJS) extra-libtool-objlist
+@USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
+@USE_LIBTOOL_TRUE@LIB_COMPILE = $(LTCOMPILE)
+@USE_LIBTOOL_FALSE@LIB_COMPILE = $(COMPILE)
 
-@USE_LIBTOOL_TRUE@libthread_db_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_DB_SOURCES)
+@USE_LIBTOOL_TRUE@libthread_db_la_SOURCES = $(LIB_DB_SOURCES)
 
-@USE_LIBTOOL_FALSE@toollib_LIBRARIES = @USE_LIBTOOL_FALSE@libpthread.a libthread_db.a
-@USE_LIBTOOL_FALSE@libpthread_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_SOURCES)
-@USE_LIBTOOL_FALSE@libpthread_a_LIBADD = @USE_LIBTOOL_FALSE@$(LIBADD_OBJS) $(EXTRA_OBJS) $(MACHINE_LIB)
-@USE_LIBTOOL_FALSE@libpthread_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(LIBADD_OBJS) $(EXTRA_OBJS) $(MACHINE_LIB)
+@USE_LIBTOOL_FALSE@toollib_LIBRARIES = libpthread.a libthread_db.a
+@USE_LIBTOOL_FALSE@libpthread_a_SOURCES = $(LIB_SOURCES)
+@USE_LIBTOOL_FALSE@libpthread_a_LIBADD = $(LIBADD_OBJS) $(EXTRA_OBJS) $(MACHINE_LIB)
+@USE_LIBTOOL_FALSE@libpthread_a_DEPENDENCIES = $(LIBADD_OBJS) $(EXTRA_OBJS) $(MACHINE_LIB)
 
-@USE_LIBTOOL_FALSE@libthread_db_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_DB_SOURCES)
+@USE_LIBTOOL_FALSE@libthread_db_a_SOURCES = $(LIB_DB_SOURCES)
 
 AM_CFLAGS = -D_XOPEN_SOURCE=600 -D_GNU_SOURCE=1
 ACLOCAL_AMFLAGS = -I ../../../..
@@ -445,7 +422,7 @@ maintainer-clean-recursive:
 	dot_seen=no; \
 	rev=''; list='$(SUBDIRS)'; for subdir in $$list; do \
 	  rev="$$subdir $$rev"; \
-	  test "$$subdir" = "." && dot_seen=yes; \
+	  test "$$subdir" != "." || dot_seen=yes; \
 	done; \
 	test "$$dot_seen" = "no" && rev=". $$rev"; \
 	target=`echo $@ | sed s/-recursive//`; \

@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -88,7 +88,7 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 noinst_LIBRARIES = lib.a
-@MAY_SUPPLY_SYSCALLS_TRUE@extra_objs = @MAY_SUPPLY_SYSCALLS_TRUE@syscalls.o
+@MAY_SUPPLY_SYSCALLS_TRUE@extra_objs = syscalls.o
 @MAY_SUPPLY_SYSCALLS_FALSE@extra_objs = 
 
 lib_a_SOURCES = access.c libcfunc.c trap.S setjmp.S

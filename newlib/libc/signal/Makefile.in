@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -92,6 +92,7 @@ LN_S = @LN_S@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
+NEWLIB_ICONV_CFLAGS = @NEWLIB_ICONV_CFLAGS@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
@@ -114,12 +115,12 @@ LIB_SOURCES = raise.c signal.c
 
 libsignal_la_LDFLAGS = -Xcompiler -nostdlib
 
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libsignal.la
-@USE_LIBTOOL_TRUE@libsignal_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_SOURCES)
-@USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libsignal.la
+@USE_LIBTOOL_TRUE@libsignal_la_SOURCES = $(LIB_SOURCES)
+@USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
-@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_SOURCES)
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(LIB_SOURCES)
 
 CHEWOUT_FILES = raise.def signal.def
 

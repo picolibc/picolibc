@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -73,6 +73,8 @@ CXX = @CXX@
 CXXCPP = @CXXCPP@
 DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
+EXTRA_SUBDIRS = @EXTRA_SUBDIRS@
+EXTRA_SUBLIBS = @EXTRA_SUBLIBS@
 GCJ = @GCJ@
 GCJFLAGS = @GCJFLAGS@
 LDFLAGS = @LDFLAGS@
@@ -99,32 +101,27 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-GENERAL_SOURCES = \
-	fnmatch.c glob.c regcomp.c regerror.c regex2.h \
-	regexec.c regfree.c collate.h collate.c collcmp.c \
-	reallocf.c
+GENERAL_SOURCES =  	fnmatch.c glob.c regcomp.c regerror.c regex2.h 	regexec.c regfree.c collate.h collate.c collcmp.c 	reallocf.c
 
 
-ELIX_3_OBJS = \
-	wordexp.$(oext) \
-	wordfree.$(oext)
+ELIX_3_OBJS =  	wordexp.$(oext) 	wordfree.$(oext)
 
 @ELIX_LEVEL_1_TRUE@LIB_OBJS = 
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@LIB_OBJS = 
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@$(ELIX_3_OBJS)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@LIB_OBJS = $(ELIX_3_OBJS)
 
 libstdlib_la_LDFLAGS = -Xcompiler -nostdlib
 
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libstdlib.la
-@USE_LIBTOOL_TRUE@libstdlib_la_SOURCES = @USE_LIBTOOL_TRUE@$(GENERAL_SOURCES)
-@USE_LIBTOOL_TRUE@libstdlib_la_LIBADD = @USE_LIBTOOL_TRUE@$(LIB_OBJS) 
-@USE_LIBTOOL_TRUE@libstdlib_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@$(LIB_OBJS) 
-@USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libstdlib.la
+@USE_LIBTOOL_TRUE@libstdlib_la_SOURCES = $(GENERAL_SOURCES)
+@USE_LIBTOOL_TRUE@libstdlib_la_LIBADD = $(LIB_OBJS) 
+@USE_LIBTOOL_TRUE@libstdlib_la_DEPENDENCIES = $(LIB_OBJS) 
+@USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
-@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(GENERAL_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(LIB_OBJS) 
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(LIB_OBJS) 
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIB_OBJS) 
+@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIB_OBJS) 
 
 AM_CFLAGS = -D_GNU_SOURCE
 mkinstalldirs = $(SHELL) $(top_srcdir)/../../../../mkinstalldirs

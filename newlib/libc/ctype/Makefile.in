@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -92,6 +92,7 @@ LN_S = @LN_S@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
+NEWLIB_ICONV_CFLAGS = @NEWLIB_ICONV_CFLAGS@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
@@ -110,94 +111,25 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-GENERAL_SOURCES = \
-	ctype_.c \
-	isalnum.c \
-	isalpha.c \
-	iscntrl.c \
-	isdigit.c \
-	islower.c \
-	isupper.c \
-	isprint.c \
-	ispunct.c \
-	isspace.c \
-	isxdigit.c \
-	tolower.c \
-	toupper.c
+GENERAL_SOURCES =  	ctype_.c 	isalnum.c 	isalpha.c 	iscntrl.c 	isdigit.c 	islower.c 	isupper.c 	isprint.c 	ispunct.c 	isspace.c 	isxdigit.c 	tolower.c 	toupper.c
 
 @ELIX_LEVEL_1_TRUE@LIB_OBJS = 
-@ELIX_LEVEL_1_FALSE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@\
-@ELIX_LEVEL_1_FALSE@	isascii.$(oext) \
-@ELIX_LEVEL_1_FALSE@	isblank.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswalnum.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswalpha.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswblank.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswcntrl.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswctype.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswdigit.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswgraph.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswlower.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswprint.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswpunct.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswspace.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswupper.$(oext) \
-@ELIX_LEVEL_1_FALSE@	iswxdigit.$(oext) \
-@ELIX_LEVEL_1_FALSE@	jp2uc.$(oext) \
-@ELIX_LEVEL_1_FALSE@	toascii.$(oext) \
-@ELIX_LEVEL_1_FALSE@	_tolower.$(oext) \
-@ELIX_LEVEL_1_FALSE@	_toupper.$(oext) \
-@ELIX_LEVEL_1_FALSE@	towctrans.$(oext) \
-@ELIX_LEVEL_1_FALSE@	towlower.$(oext) \
-@ELIX_LEVEL_1_FALSE@	towupper.$(oext) \
-@ELIX_LEVEL_1_FALSE@	wctrans.$(oext)	\
-@ELIX_LEVEL_1_FALSE@	wctype.$(oext)
+@ELIX_LEVEL_1_FALSE@LIB_OBJS = 	isascii.$(oext) 	isblank.$(oext) 	iswalnum.$(oext) 	iswalpha.$(oext) 	iswblank.$(oext) 	iswcntrl.$(oext) 	iswctype.$(oext) 	iswdigit.$(oext) 	iswgraph.$(oext) 	iswlower.$(oext) 	iswprint.$(oext) 	iswpunct.$(oext) 	iswspace.$(oext) 	iswupper.$(oext) 	iswxdigit.$(oext) 	jp2uc.$(oext) 	toascii.$(oext) 	_tolower.$(oext) 	_toupper.$(oext) 	towctrans.$(oext) 	towlower.$(oext) 	towupper.$(oext) 	wctrans.$(oext)		wctype.$(oext)
 
 libctype_la_LDFLAGS = -Xcompiler -nostdlib
 
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libctype.la
-@USE_LIBTOOL_TRUE@libctype_la_SOURCES = @USE_LIBTOOL_TRUE@$(GENERAL_SOURCES)
-@USE_LIBTOOL_TRUE@libctype_la_LIBADD = @USE_LIBTOOL_TRUE@$(LIB_OBJS)
-@USE_LIBTOOL_TRUE@libctype_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@$(LIB_OBJS)
-@USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libctype.la
+@USE_LIBTOOL_TRUE@libctype_la_SOURCES = $(GENERAL_SOURCES)
+@USE_LIBTOOL_TRUE@libctype_la_LIBADD = $(LIB_OBJS)
+@USE_LIBTOOL_TRUE@libctype_la_DEPENDENCIES = $(LIB_OBJS)
+@USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
-@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(GENERAL_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(LIB_OBJS)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(LIB_OBJS)
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIB_OBJS)
 
-CHEWOUT_FILES = \
-	isalnum.def	\
-	isalpha.def	\
-	isascii.def	\
-	iscntrl.def	\
-	isdigit.def	\
-	islower.def	\
-	isprint.def	\
-	ispunct.def	\
-	isspace.def	\
-	isupper.def	\
-	iswalnum.def	\
-	iswalpha.def	\
-	iswblank.def 	\
-	iswcntrl.def 	\
-	iswctype.def 	\
-	iswdigit.def 	\
-	iswgraph.def 	\
-	iswlower.def 	\
-	iswprint.def 	\
-	iswpunct.def 	\
-	iswspace.def 	\
-	iswupper.def 	\
-	iswxdigit.def 	\
-	isxdigit.def	\
-	toascii.def	\
-	tolower.def	\
-	toupper.def	\
-	towctrans.def	\
-	towlower.def	\
-	towupper.def	\
-	wctrans.def	\
-	wctype.def	
+CHEWOUT_FILES =  	isalnum.def		isalpha.def		isascii.def		iscntrl.def		isdigit.def		islower.def		isprint.def		ispunct.def		isspace.def		isupper.def		iswalnum.def		iswalpha.def		iswblank.def 		iswcntrl.def 		iswctype.def 		iswdigit.def 		iswgraph.def 		iswlower.def 		iswprint.def 		iswpunct.def 		iswspace.def 		iswupper.def 		iswxdigit.def 		isxdigit.def		toascii.def		tolower.def		toupper.def		towctrans.def		towlower.def		towupper.def		wctrans.def		wctype.def	
 
 
 SUFFIXES = .def

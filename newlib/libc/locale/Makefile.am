@@ -4,7 +4,7 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-GENERAL_SOURCES = timelocal.h ldpart.h locale.c lnumeric.h lmonetary.h lmessages.h
+GENERAL_SOURCES = timelocal.h ldpart.h locale.c lnumeric.h lmonetary.h lmessages.h 
 
 ## The following interfaces are EL/IX level 2
 if ELIX_LEVEL_1
@@ -54,3 +54,4 @@ doc: $(CHEWOUT_FILES)
 	cat $(srcdir)/locale.tex >> $(TARGETDOC)
 
 CLEANFILES = $(CHEWOUT_FILES) *.ref
+

@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -98,74 +98,22 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = -I$(srcdir)/../common $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-src = k_standard.c k_rem_pio2.c \
-	k_cos.c k_sin.c k_tan.c \
-	e_acos.c e_acosh.c e_asin.c e_atan2.c \
-	e_atanh.c e_cosh.c e_exp.c e_fmod.c \
-	er_gamma.c e_hypot.c e_j0.c \
-	e_j1.c e_jn.c er_lgamma.c \
-	e_log.c e_log10.c e_pow.c e_rem_pio2.c e_remainder.c \
-	e_scalb.c e_sinh.c e_sqrt.c \
-	w_acos.c w_acosh.c w_asin.c w_atan2.c \
-	w_atanh.c w_cosh.c w_exp.c w_fmod.c \
-	w_gamma.c wr_gamma.c w_hypot.c w_j0.c \
-	w_j1.c w_jn.c w_lgamma.c wr_lgamma.c \
-	w_log.c w_log10.c w_pow.c w_remainder.c \
-	w_scalb.c w_sinh.c w_sqrt.c \
-	w_sincos.c \
-	w_cabs.c w_drem.c \
-	s_asinh.c s_atan.c s_ceil.c \
-	s_cos.c s_erf.c s_fabs.c s_floor.c \
-	s_frexp.c s_isnan.c s_ldexp.c \
-	s_signif.c s_sin.c \
-	s_tan.c s_tanh.c \
-	s_isinf.c s_infconst.c \
-	w_exp2.c w_tgamma.c
+src = k_standard.c k_rem_pio2.c 	k_cos.c k_sin.c k_tan.c 	e_acos.c e_acosh.c e_asin.c e_atan2.c 	e_atanh.c e_cosh.c e_exp.c e_fmod.c 	er_gamma.c e_hypot.c e_j0.c 	e_j1.c e_jn.c er_lgamma.c 	e_log.c e_log10.c e_pow.c e_rem_pio2.c e_remainder.c 	e_scalb.c e_sinh.c e_sqrt.c 	w_acos.c w_acosh.c w_asin.c w_atan2.c 	w_atanh.c w_cosh.c w_exp.c w_fmod.c 	w_gamma.c wr_gamma.c w_hypot.c w_j0.c 	w_j1.c w_jn.c w_lgamma.c wr_lgamma.c 	w_log.c w_log10.c w_pow.c w_remainder.c 	w_scalb.c w_sinh.c w_sqrt.c 	w_sincos.c 	w_cabs.c w_drem.c 	s_asinh.c s_atan.c s_ceil.c 	s_cos.c s_erf.c s_fabs.c s_floor.c 	s_frexp.c s_isnan.c s_ldexp.c 	s_signif.c s_sin.c 	s_tan.c s_tanh.c 	s_isinf.c s_infconst.c 	w_exp2.c w_tgamma.c
 
 
-fsrc = kf_rem_pio2.c \
-	kf_cos.c kf_sin.c kf_tan.c \
-	ef_acos.c ef_acosh.c ef_asin.c ef_atan2.c \
-	ef_atanh.c ef_cosh.c ef_exp.c ef_fmod.c \
-	erf_gamma.c ef_hypot.c ef_j0.c \
-	ef_j1.c ef_jn.c erf_lgamma.c \
-	ef_log.c ef_log10.c ef_pow.c ef_rem_pio2.c ef_remainder.c \
-	ef_scalb.c ef_sinh.c ef_sqrt.c \
-	wf_acos.c wf_acosh.c wf_asin.c wf_atan2.c \
-	wf_atanh.c wf_cosh.c wf_exp.c wf_fmod.c \
-	wf_gamma.c wrf_gamma.c wf_hypot.c wf_j0.c \
-	wf_j1.c wf_jn.c wf_lgamma.c wrf_lgamma.c \
-	wf_log.c wf_log10.c wf_pow.c wf_remainder.c \
-	wf_scalb.c wf_sinh.c wf_sqrt.c \
-	wf_sincos.c \
-	wf_cabs.c wf_drem.c \
-	sf_asinh.c sf_atan.c sf_ceil.c \
-	sf_cos.c sf_erf.c sf_fabs.c sf_floor.c \
-	sf_frexp.c sf_isnan.c sf_ldexp.c \
-	sf_signif.c sf_sin.c \
-	sf_tan.c sf_tanh.c \
-	sf_isinf.c \
-	wf_exp2.c wf_tgamma.c
+fsrc = kf_rem_pio2.c 	kf_cos.c kf_sin.c kf_tan.c 	ef_acos.c ef_acosh.c ef_asin.c ef_atan2.c 	ef_atanh.c ef_cosh.c ef_exp.c ef_fmod.c 	erf_gamma.c ef_hypot.c ef_j0.c 	ef_j1.c ef_jn.c erf_lgamma.c 	ef_log.c ef_log10.c ef_pow.c ef_rem_pio2.c ef_remainder.c 	ef_scalb.c ef_sinh.c ef_sqrt.c 	wf_acos.c wf_acosh.c wf_asin.c wf_atan2.c 	wf_atanh.c wf_cosh.c wf_exp.c wf_fmod.c 	wf_gamma.c wrf_gamma.c wf_hypot.c wf_j0.c 	wf_j1.c wf_jn.c wf_lgamma.c wrf_lgamma.c 	wf_log.c wf_log10.c wf_pow.c wf_remainder.c 	wf_scalb.c wf_sinh.c wf_sqrt.c 	wf_sincos.c 	wf_cabs.c wf_drem.c 	sf_asinh.c sf_atan.c sf_ceil.c 	sf_cos.c sf_erf.c sf_fabs.c sf_floor.c 	sf_frexp.c sf_isnan.c sf_ldexp.c 	sf_signif.c sf_sin.c 	sf_tan.c sf_tanh.c 	sf_isinf.c 	wf_exp2.c wf_tgamma.c
 
 
 libmath_la_LDFLAGS = -Xcompiler -nostdlib
 
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libmath.la
-@USE_LIBTOOL_TRUE@libmath_la_SOURCES = @USE_LIBTOOL_TRUE@$(src) $(fsrc)
-@USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libmath.la
+@USE_LIBTOOL_TRUE@libmath_la_SOURCES = $(src) $(fsrc)
+@USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
-@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(src) $(fsrc)
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(src) $(fsrc)
 
-chobj = wacos.def wacosh.def wasin.def sasinh.def \
-	satan.def watan2.def watanh.def wj0.def \
-	wcosh.def serf.def wexp.def \
-	sfabs.def sfloor.def wfmod.def sfrexp.def \
-	wgamma.def whypot.def sldexp.def wlog.def \
-	wlog10.def \
-	wpow.def wremainder.def ssin.def wsinh.def \
-	wsqrt.def stan.def stanh.def \
-	sisnan.def
+chobj = wacos.def wacosh.def wasin.def sasinh.def 	satan.def watan2.def watanh.def wj0.def 	wcosh.def serf.def wexp.def 	sfabs.def sfloor.def wfmod.def sfrexp.def 	wgamma.def whypot.def sldexp.def wlog.def 	wlog10.def 	wpow.def wremainder.def ssin.def wsinh.def 	wsqrt.def stan.def stanh.def 	sisnan.def
 
 
 SUFFIXES = .def

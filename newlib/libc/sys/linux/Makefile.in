@@ -1,4 +1,4 @@
-# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -100,157 +100,30 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = -I$(srcdir)/include $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS) $(INCLTDL)
 @ELIX_LEVEL_1_TRUE@argp_dir = 
-@ELIX_LEVEL_1_FALSE@argp_dir = @ELIX_LEVEL_1_FALSE@argp
+@ELIX_LEVEL_1_FALSE@argp_dir = argp
 @ELIX_LEVEL_1_TRUE@ARGP_LIB = 
-@ELIX_LEVEL_1_FALSE@ARGP_LIB = @ELIX_LEVEL_1_FALSE@argp/libargp.la
+@ELIX_LEVEL_1_FALSE@ARGP_LIB = argp/libargp.la
 
-SUBDIRS = machine \
-	$(argp_dir) \
-	cmath \
-	$(EXTRA_SUBDIRS)\
-	.
+SUBDIRS = machine 	$(argp_dir) 	cmath 	$(EXTRA_SUBDIRS) 	.
 
-SUBLIBS = \
-	$(ARGP_LIB) \
-	cmath/libcmath.la \
-	$(EXTRA_SUBLIBS) \
-	$(LINUX_MACH_LIB)
+SUBLIBS =  	$(ARGP_LIB) 	cmath/libcmath.la 	$(EXTRA_SUBLIBS) 	$(LINUX_MACH_LIB)
 
 
-GENERAL_SOURCES = \
-	aio.c \
-	brk.c \
-	calloc.c \
-	callocr.c \
-	cfreer.c \
-	cfspeed.c \
-	clock_getres.c \
-	clock_gettime.c \
-	clock_settime.c \
-	flockfile.c \
-	free.c \
-	freer.c \
-	ftok.c \
-	funlockfile.c \
-	getdate.c \
-	getdate_err.c \
-	gethostname.c \
-	getreent.c \
-	ids.c \
-	inode.c \
-	io.c \
-	ipc.c \
-	linux.c \
-	mallinfor.c \
-	mallocr.c \
-	mallstatsr.c \
-	mmap.c \
-	mq_close.c \
-	mq_getattr.c \
-	mq_notify.c \
-	mq_open.c \
-	mq_receive.c \
-	mq_send.c \
-	mq_setattr.c \
-	mq_unlink.c \
-	msize.c \
-	msizer.c \
-	mstats.c \
-	mtrim.c \
-	mtrimr.c \
-	ntp_gettime.c \
-	pread.c \
-	process.c \
-	prof-freq.c \
-	profile.c \
-	psignal.c \
-	pwrite.c \
-	raise.c \
-	realloc.c \
-	reallocr.c \
-	rename.c \
-	resource.c \
-	sched.c \
-	select.c \
-	seteuid.c \
-	sethostname.c \
-	shm_open.c \
-	shm_unlink.c \
-	sig.c \
-	sigaction.c \
-	sigqueue.c \
-	signal.c \
-	siglongjmp.c \
-	sigset.c \
-	sigwait.c \
-	socket.c \
-	sleep.c \
-	strsignal.c \
-	strverscmp.c \
-	sysconf.c \
-	sysctl.c \
-	systat.c \
-	tcdrain.c \
-	tcsendbrk.c \
-	termios.c \
-	time.c \
-	usleep.c \
-	versionsort.c 
+GENERAL_SOURCES =  	aio.c 	brk.c 	calloc.c 	callocr.c 	cfreer.c 	cfspeed.c 	clock_getres.c 	clock_gettime.c 	clock_settime.c 	flockfile.c 	free.c 	freer.c 	ftok.c 	funlockfile.c 	getdate.c 	getdate_err.c 	gethostname.c 	getreent.c 	ids.c 	inode.c 	io.c 	ipc.c 	linux.c 	mallinfor.c 	mallocr.c 	mallstatsr.c 	mmap.c 	mq_close.c 	mq_getattr.c 	mq_notify.c 	mq_open.c 	mq_receive.c 	mq_send.c 	mq_setattr.c 	mq_unlink.c 	msize.c 	msizer.c 	mstats.c 	mtrim.c 	mtrimr.c 	ntp_gettime.c 	pread.c 	process.c 	prof-freq.c 	profile.c 	psignal.c 	pwrite.c 	raise.c 	realloc.c 	reallocr.c 	rename.c 	resource.c 	sched.c 	select.c 	seteuid.c 	sethostname.c 	shm_open.c 	shm_unlink.c 	sig.c 	sigaction.c 	sigqueue.c 	signal.c 	siglongjmp.c 	sigset.c 	sigwait.c 	socket.c 	sleep.c 	strsignal.c 	strverscmp.c 	sysconf.c 	sysctl.c 	systat.c 	tcdrain.c 	tcsendbrk.c 	termios.c 	time.c 	usleep.c 	versionsort.c 
 
 
-ELIX_2_OBJS = \
-	aio64.$(oext) \
-	confstr.$(oext) \
-	ctermid.$(oext) \
-	fclean.$(oext) \
-	fpathconf.$(oext) \
-	fstab.$(oext) \
-	fstatvfs.$(oext) \
-	fstatvfs64.$(oext) \
-	ftw.$(oext) \
-	ftw64.$(oext) \
-	getopt.$(oext) \
-	getopt1.$(oext) \
-	getrlimit64.$(oext) \
-	getwd.$(oext) \
-	io64.$(oext) \
-	malign.$(oext) \
-	malignr.$(oext) \
-	malloptr.$(oext) \
-	mcheck.$(oext) \
-	mntent.$(oext) \
-	mntent_r.$(oext) \
-	pathconf.$(oext) \
-	pread64.$(oext) \
-	pvallocr.$(oext) \
-	pwrite64.$(oext) \
-	readdir64.$(oext) \
-	realpath.$(oext) \
-	scandir64.$(oext) \
-	setrlimit64.$(oext) \
-	statvfs.$(oext) \
-	statvfs64.$(oext) \
-	ttyname_r.$(oext) \
-	utimes.$(oext) \
-	vallocr.$(oext) \
-	versionsort64.$(oext)
+ELIX_2_OBJS =  	aio64.$(oext) 	confstr.$(oext) 	ctermid.$(oext) 	fclean.$(oext) 	fpathconf.$(oext) 	fstab.$(oext) 	fstatvfs.$(oext) 	fstatvfs64.$(oext) 	ftw.$(oext) 	ftw64.$(oext) 	getopt.$(oext) 	getopt1.$(oext) 	getrlimit64.$(oext) 	getwd.$(oext) 	io64.$(oext) 	malign.$(oext) 	malignr.$(oext) 	malloptr.$(oext) 	mcheck.$(oext) 	mntent.$(oext) 	mntent_r.$(oext) 	pathconf.$(oext) 	pread64.$(oext) 	pvallocr.$(oext) 	pwrite64.$(oext) 	readdir64.$(oext) 	realpath.$(oext) 	scandir64.$(oext) 	setrlimit64.$(oext) 	statvfs.$(oext) 	statvfs64.$(oext) 	ttyname_r.$(oext) 	utimes.$(oext) 	vallocr.$(oext) 	versionsort64.$(oext)
 
 
-ELIX_3_OBJS = \
-	system.$(oext) \
-	wait.$(oext)
+ELIX_3_OBJS =  	system.$(oext) 	wait.$(oext)
 
 
-ELIX_4_OBJS = \
-	getlogin.$(oext) \
-	getpwnam.$(oext) \
-	getpwuid.$(oext) \
-	stack.$(oext)
+ELIX_4_OBJS =  	getlogin.$(oext) 	getpwnam.$(oext) 	getpwuid.$(oext) 	stack.$(oext)
 
 @ELIX_LEVEL_1_TRUE@LIB_OBJS = 
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@$(ELIX_2_OBJS)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@$(ELIX_2_OBJS) $(ELIX_3_OBJS)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@$(ELIX_2_OBJS) $(ELIX_3_OBJS) $(ELIX_4_OBJS)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@LIB_OBJS = $(ELIX_2_OBJS)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_3_OBJS)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_3_OBJS) $(ELIX_4_OBJS)
 
 # This will handle both /usr/src/linux-2.4/include/asm/signal.h (in Red Hat Linux 7.1)
 # and also /usr/src/linux/include/asm/signal.h in older versions of Red Hat Linux
@@ -258,25 +131,21 @@ SIGNAL_H = /usr/src/$(shell ls /usr/src/ | grep ^linux | head -n 1)/include/asm/
 
 liblinux_la_LDFLAGS = -Xcompiler -nostdlib
 
-ADD_OBJS = \
-	malloc.$(oext) \
-	gethostid.$(oext) \
-	sethostid.$(oext) \
-	$(LINUX_MACH_LIB)
+ADD_OBJS =  	malloc.$(oext) 	gethostid.$(oext) 	sethostid.$(oext) 	$(LINUX_MACH_LIB)
 
 
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@liblinux.la
-@USE_LIBTOOL_TRUE@liblinux_la_SOURCES = @USE_LIBTOOL_TRUE@$(GENERAL_SOURCES)
-@USE_LIBTOOL_TRUE@liblinux_la_LIBADD = @USE_LIBTOOL_TRUE@$(ADD_OBJS) $(LIB_OBJS)
-@USE_LIBTOOL_TRUE@liblinux_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@$(ADD_OBJS) $(LIB_OBJS)
-@USE_LIBTOOL_TRUE@LIBC_COMPILE = @USE_LIBTOOL_TRUE@$(LTCOMPILE)
-@USE_LIBTOOL_FALSE@LIBC_COMPILE = @USE_LIBTOOL_FALSE@$(COMPILE)
-@USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = liblinux.la
+@USE_LIBTOOL_TRUE@liblinux_la_SOURCES = $(GENERAL_SOURCES)
+@USE_LIBTOOL_TRUE@liblinux_la_LIBADD = $(ADD_OBJS) $(LIB_OBJS)
+@USE_LIBTOOL_TRUE@liblinux_la_DEPENDENCIES = $(ADD_OBJS) $(LIB_OBJS)
+@USE_LIBTOOL_TRUE@LIBC_COMPILE = $(LTCOMPILE)
+@USE_LIBTOOL_FALSE@LIBC_COMPILE = $(COMPILE)
+@USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
-@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(GENERAL_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(ADD_OBJS) $(LIB_OBJS)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(ADD_OBJS) $(LIB_OBJS)
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_LIBADD = $(ADD_OBJS) $(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(ADD_OBJS) $(LIB_OBJS)
 
 AM_CFLAGS = -I $(srcdir)/../../stdio
 ACLOCAL_AMFLAGS = -I ../../..

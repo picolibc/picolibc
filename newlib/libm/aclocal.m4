@@ -69,6 +69,24 @@ AC_ARG_ENABLE(newlib-mb,
   *)   AC_MSG_ERROR(bad value ${enableval} for newlib-mb option) ;;
  esac], [newlib_mb=])dnl
 
+dnl Support --enable-newlib-iconv
+AC_ARG_ENABLE(newlib-iconv,
+[  --enable-newlib-iconv     enable iconv library support],
+[case "${enableval}" in
+  yes) newlib_iconv=yes ;;
+  no)  newlib_iconv=no ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-iconv option) ;;
+ esac], [newlib_iconv=])dnl
+
+dnl Support --enable-newlib-builtin-converters
+AC_ARG_ENABLE(newlib-builtin-converters,
+[  --enable-newlib-builtin-converters   enable specific comma-separated list of iconv converters to be built-in],
+[if test x${enableval} = x; then
+   AC_MSG_ERROR(bad value ${enableval} for newlib-builtin-converters option - use comma-separated list)
+ fi
+ builtin_converters=${enableval}
+ ], [builtin_converters=])dnl
+
 dnl Support --enable-newlib-multithread
 AC_ARG_ENABLE(newlib-multithread,
 [  --enable-newlib-multithread        enable support for multiple threads],

@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -98,36 +98,22 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-src = s_finite.c s_copysign.c s_modf.c s_scalbn.c \
-	s_cbrt.c s_expm1.c s_ilogb.c \
-	s_infinity.c s_log1p.c s_nan.c s_nextafter.c \
-	s_rint.c s_logb.c s_matherr.c s_lib_ver.c \
-	s_fdim.c s_fma.c s_fmax.c s_fmin.c s_fpclassify.c s_lrint.c \
-	s_lround.c s_nearbyint.c s_remquo.c s_round.c s_scalbln.c \
-	s_signbit.c s_trunc.c
+src = s_finite.c s_copysign.c s_modf.c s_scalbn.c 	s_cbrt.c s_expm1.c s_ilogb.c 	s_infinity.c s_log1p.c s_nan.c s_nextafter.c 	s_rint.c s_logb.c s_matherr.c s_lib_ver.c 	s_fdim.c s_fma.c s_fmax.c s_fmin.c s_fpclassify.c s_lrint.c 	s_lround.c s_nearbyint.c s_remquo.c s_round.c s_scalbln.c 	s_signbit.c s_trunc.c
 
 
-fsrc = sf_finite.c sf_copysign.c sf_modf.c sf_scalbn.c \
-	sf_cbrt.c sf_expm1.c sf_ilogb.c \
-	sf_infinity.c sf_log1p.c sf_nan.c sf_nextafter.c \
-	sf_rint.c sf_logb.c \
-	sf_fdim.c sf_fma.c sf_fmax.c sf_fmin.c sf_lrint.c \
-	sf_lround.c sf_nearbyint.c sf_remquo.c sf_round.c \
-	sf_scalbln.c sf_trunc.c
+fsrc = sf_finite.c sf_copysign.c sf_modf.c sf_scalbn.c 	sf_cbrt.c sf_expm1.c sf_ilogb.c 	sf_infinity.c sf_log1p.c sf_nan.c sf_nextafter.c 	sf_rint.c sf_logb.c 	sf_fdim.c sf_fma.c sf_fmax.c sf_fmin.c sf_lrint.c 	sf_lround.c sf_nearbyint.c sf_remquo.c sf_round.c 	sf_scalbln.c sf_trunc.c
 
 
 libcommon_la_LDFLAGS = -Xcompiler -nostdlib
 
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libcommon.la
-@USE_LIBTOOL_TRUE@libcommon_la_SOURCES = @USE_LIBTOOL_TRUE@$(src) $(fsrc)
-@USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libcommon.la
+@USE_LIBTOOL_TRUE@libcommon_la_SOURCES = $(src) $(fsrc)
+@USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
-@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(src) $(fsrc)
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(src) $(fsrc)
 
-chobj = scbrt.def scopysign.def sexpm1.def silogb.def \
-	sinfinity.def slog1p.def smatherr.def smodf.def \
-	snan.def snextafter.def sscalbn.def
+chobj = scbrt.def scopysign.def sexpm1.def silogb.def 	sinfinity.def slog1p.def smatherr.def smodf.def 	snan.def snextafter.def sscalbn.def
 
 
 SUFFIXES = .def

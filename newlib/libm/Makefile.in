@@ -1,4 +1,4 @@
-# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -94,18 +94,18 @@ oext = @oext@
 sys_dir = @sys_dir@
 
 AUTOMAKE_OPTIONS = cygnus
-@NEWLIB_HW_FP_TRUE@MATHDIR = @NEWLIB_HW_FP_TRUE@mathfp
-@NEWLIB_HW_FP_FALSE@MATHDIR = @NEWLIB_HW_FP_FALSE@math
+@NEWLIB_HW_FP_TRUE@MATHDIR = mathfp
+@NEWLIB_HW_FP_FALSE@MATHDIR = math
 
 SUBDIRS = $(MATHDIR) common machine
 
 libm_la_LDFLAGS = -Xcompiler -nostdlib
-@USE_LIBTOOL_TRUE@SUBLIBS = @USE_LIBTOOL_TRUE@$(MATHDIR)/lib$(MATHDIR).$(aext) common/libcommon.$(aext) $(LIBM_MACHINE_LIB)
-@USE_LIBTOOL_FALSE@SUBLIBS = @USE_LIBTOOL_FALSE@$(MATHDIR)/lib.$(aext) common/lib.$(aext) $(LIBM_MACHINE_LIB)
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libm.la
+@USE_LIBTOOL_TRUE@SUBLIBS = $(MATHDIR)/lib$(MATHDIR).$(aext) common/libcommon.$(aext) $(LIBM_MACHINE_LIB)
+@USE_LIBTOOL_FALSE@SUBLIBS = $(MATHDIR)/lib.$(aext) common/lib.$(aext) $(LIBM_MACHINE_LIB)
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libm.la
 @USE_LIBTOOL_TRUE@libm_la_SOURCES = 
-@USE_LIBTOOL_TRUE@libm_la_LIBADD = @USE_LIBTOOL_TRUE@$(SUBLIBS)
-@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@libm.a
+@USE_LIBTOOL_TRUE@libm_la_LIBADD = $(SUBLIBS)
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = libm.a
 
 info_TEXINFOS = libm.texinfo
 

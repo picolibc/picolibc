@@ -1,4 +1,4 @@
-# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
 # Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
@@ -92,6 +92,7 @@ LN_S = @LN_S@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
+NEWLIB_ICONV_CFLAGS = @NEWLIB_ICONV_CFLAGS@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
@@ -110,176 +111,47 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-GENERAL_SOURCES = \
-	__adjust.c 	\
-	__exp10.c 	\
-	__ten_mu.c 	\
-	_Exit.c		\
-	abort.c  	\
-	abs.c 		\
-	assert.c  	\
-	atexit.c	\
-	atof.c 		\
-	atoff.c		\
-	atoi.c  	\
-	atol.c		\
-	calloc.c	\
-	div.c  		\
-	dtoa.c 		\
-	dtoastub.c 	\
-	environ.c	\
-	envlock.c	\
-	eprintf.c	\
-	exit.c 		\
-	getenv.c  	\
-	getenv_r.c	\
-	labs.c 		\
-	ldiv.c  	\
-	ldtoa.c		\
-	malloc.c  	\
-	mblen.c		\
-	mblen_r.c	\
-	mbstowcs.c	\
-	mbstowcs_r.c	\
-	mbtowc.c	\
-	mbtowc_r.c	\
-	mlock.c		\
-	mprec.c		\
-	mstats.c	\
-	rand.c		\
-	rand_r.c	\
-	realloc.c	\
-	strtod.c	\
-	strtol.c	\
-	strtoul.c	\
-	wcstombs.c	\
-	wcstombs_r.c	\
-	wctomb.c	\
-	wctomb_r.c
+GENERAL_SOURCES =  	__adjust.c 		__exp10.c 		__ten_mu.c 		_Exit.c			abort.c  		abs.c 			assert.c  		atexit.c		atof.c 			atoff.c			atoi.c  		atol.c			calloc.c		div.c  			dtoa.c 			dtoastub.c 		environ.c		envlock.c		eprintf.c		exit.c 			getenv.c  		getenv_r.c		labs.c 			ldiv.c  		ldtoa.c			malloc.c  		mblen.c			mblen_r.c		mbstowcs.c		mbstowcs_r.c		mbtowc.c		mbtowc_r.c		mlock.c			mprec.c			mstats.c		rand.c			rand_r.c		realloc.c		strtod.c		strtol.c		strtoul.c		wcstombs.c		wcstombs_r.c		wctomb.c		wctomb_r.c
 
 
-EXTENDED_SOURCES = \
-	drand48.c	\
-	ecvtbuf.c 	\
-	efgcvt.c 	\
-	erand48.c	\
-	jrand48.c	\
-	lcong48.c	\
-	lrand48.c	\
-	mrand48.c	\
-	msize.c		\
-	mtrim.c		\
-	nrand48.c	\
-	rand48.c	\
-	seed48.c	\
-	srand48.c	\
-	strtoll.c	\
-	strtoll_r.c	\
-	strtoull.c	\
-	strtoull_r.c	\
-	atoll.c		\
-	llabs.c		\
-	lldiv.c
+EXTENDED_SOURCES =  	drand48.c		ecvtbuf.c 		efgcvt.c 		erand48.c		jrand48.c		lcong48.c		lrand48.c		mrand48.c		msize.c			mtrim.c			nrand48.c		rand48.c		seed48.c		srand48.c		strtoll.c		strtoll_r.c		strtoull.c		strtoull_r.c		atoll.c			llabs.c			lldiv.c
 
 
-ELIX_2_OBJS = \
-	a64l.$(oext)		\
-	btowc.$(oext)		\
-	getopt.$(oext)		\
-	getsubopt.$(oext)	\
-	l64a.$(oext)		\
-	malign.$(oext)		\
-	malignr.$(oext)		\
-	malloptr.$(oext)	\
-	mbrlen.$(oext)		\
-	mbrtowc.$(oext)		\
-	mbsinit.$(oext)		\
-	mbsrtowcs.$(oext)	\
-	on_exit.$(oext)		\
-	pvallocr.$(oext)	\
-	valloc.$(oext)		\
-	vallocr.$(oext)		\
-	wcrtomb.$(oext)		\
-	wcsrtombs.$(oext)	\
-	wctob.$(oext)
+ELIX_2_OBJS =  	a64l.$(oext)			btowc.$(oext)			getopt.$(oext)			getsubopt.$(oext)		l64a.$(oext)			malign.$(oext)			malignr.$(oext)			malloptr.$(oext)		mbrlen.$(oext)			mbrtowc.$(oext)			mbsinit.$(oext)			mbsrtowcs.$(oext)		on_exit.$(oext)			pvallocr.$(oext)		valloc.$(oext)			vallocr.$(oext)			wcrtomb.$(oext)			wcsrtombs.$(oext)		wctob.$(oext)
 
 
-ELIX_3_OBJS = \
-	putenv.$(oext)		\
-	putenv_r.$(oext)	\
-	setenv.$(oext)		\
-	setenv_r.$(oext)
+ELIX_3_OBJS =  	putenv.$(oext)			putenv_r.$(oext)		setenv.$(oext)			setenv_r.$(oext)
 
 
-ELIX_4_OBJS = \
-	system.$(oext)
+ELIX_4_OBJS =  	system.$(oext)
 
 @ELIX_LEVEL_1_TRUE@LIB_OBJS = 
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@$(ELIX_2_OBJS)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@$(ELIX_2_OBJS) $(ELIX_3_OBJS)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@$(ELIX_2_OBJS) $(ELIX_3_OBJS) $(ELIX_4_OBJS)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@LIB_OBJS = $(ELIX_2_OBJS)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_3_OBJS)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_3_OBJS) $(ELIX_4_OBJS)
 
 # Because of how libtool moves objects around, mallocr must be built last.
-LIBADD_OBJS = freer.$(oext) reallocr.$(oext) callocr.$(oext) cfreer.$(oext) \
-	mallinfor.$(oext) msizer.$(oext) mallocr.$(oext)
+LIBADD_OBJS = freer.$(oext) reallocr.$(oext) callocr.$(oext) cfreer.$(oext) 	mallinfor.$(oext) msizer.$(oext) mallocr.$(oext)
 
 
 libstdlib_la_LDFLAGS = -Xcompiler -nostdlib
 
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libstdlib.la
-@USE_LIBTOOL_TRUE@libstdlib_la_SOURCES = @USE_LIBTOOL_TRUE@$(GENERAL_SOURCES) $(EXTENDED_SOURCES)
-@USE_LIBTOOL_TRUE@libstdlib_la_LIBADD = @USE_LIBTOOL_TRUE@$(LIB_OBJS) $(LIBADD_OBJS)
-@USE_LIBTOOL_TRUE@libstdlib_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@$(LIB_OBJS) $(LIBADD_OBJS)
-@USE_LIBTOOL_TRUE@LIB_COMPILE = @USE_LIBTOOL_TRUE@$(LTCOMPILE)
-@USE_LIBTOOL_FALSE@LIB_COMPILE = @USE_LIBTOOL_FALSE@$(COMPILE)
-@USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libstdlib.la
+@USE_LIBTOOL_TRUE@libstdlib_la_SOURCES = $(GENERAL_SOURCES) $(EXTENDED_SOURCES)
+@USE_LIBTOOL_TRUE@libstdlib_la_LIBADD = $(LIB_OBJS) $(LIBADD_OBJS)
+@USE_LIBTOOL_TRUE@libstdlib_la_DEPENDENCIES = $(LIB_OBJS) $(LIBADD_OBJS)
+@USE_LIBTOOL_TRUE@LIB_COMPILE = $(LTCOMPILE)
+@USE_LIBTOOL_FALSE@LIB_COMPILE = $(COMPILE)
+@USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
-@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(GENERAL_SOURCES) $(EXTENDED_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(LIBADD_OBJS) $(LIB_OBJS)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(LIBADD_OBJS) $(LIB_OBJS)
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES) $(EXTENDED_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIBADD_OBJS) $(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIBADD_OBJS) $(LIB_OBJS)
 
 MALLOC_COMPILE = $(LIB_COMPILE) -DINTERNAL_NEWLIB
 
-CHEWOUT_FILES = \
-	_Exit.def	\
-	a64l.def	\
-	abort.def	\
-	abs.def		\
-	assert.def	\
-	atexit.def	\
-	atof.def 	\
-	atoi.def 	\
-	atoll.def 	\
-	calloc.def	\
-	div.def		\
-	ecvtbuf.def	\
-	efgcvt.def 	\
-	envlock.def	\
-	exit.def	\
-	getenv.def	\
-	labs.def	\
-	ldiv.def	\
-	llabs.def	\
-	lldiv.def	\
-	malloc.def	\
-	mallocr.def	\
-	mblen.def	\
-	mbstowcs.def	\
-	mbtowc.def	\
-	mlock.def	\
-	mstats.def	\
-	on_exit.def	\
-	rand.def	\
-	rand48.def	\
-	strtod.def 	\
-	strtol.def 	\
-	strtoll.def 	\
-	strtoul.def 	\
-	strtoull.def 	\
-	system.def	\
-	wcstombs.def	\
-	wctomb.def	
+CHEWOUT_FILES =  	_Exit.def		a64l.def		abort.def		abs.def			assert.def		atexit.def		atof.def 		atoi.def 		atoll.def 		calloc.def		div.def			ecvtbuf.def		efgcvt.def 		envlock.def		exit.def		getenv.def		labs.def		ldiv.def		llabs.def		lldiv.def		malloc.def		mallocr.def		mblen.def		mbstowcs.def		mbtowc.def		mlock.def		mstats.def		on_exit.def		rand.def		rand48.def		strtod.def 		strtol.def 		strtoll.def 		strtoul.def 		strtoull.def 		system.def		wcstombs.def		wctomb.def	
 
 
 SUFFIXES = .def

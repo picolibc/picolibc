@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -98,86 +98,22 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = -I$(srcdir)/../common $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-src = s_acos.c s_frexp.c s_mathcnst.c \
-	s_cos.c s_sinh.c \
-	s_asin.c\
-	s_asine.c s_cosh.c s_ispos.c s_numtest.c s_sqrt.c \
-	s_exp.c s_ldexp.c s_pow.c s_tan.c \
-	s_atan.c \
-	s_atan2.c s_fabs.c s_log.c s_tanh.c \
-	s_log10.c s_sin.c \
-	s_floor.c s_sine.c \
-	s_sincos.c \
-	s_atangent.c s_logarithm.c \
-	s_sineh.c \
-	s_ceil.c s_isnan.c s_isinf.c \
-	e_acosh.c e_atanh.c e_remainder.c \
-	er_gamma.c er_lgamma.c \
-	s_erf.c e_j0.c e_j1.c w_jn.c e_hypot.c \
-	w_cabs.c w_drem.c s_asinh.c s_fmod.c \
-	e_scalb.c s_infconst.c s_signif.c \
-	s_exp2.c s_tgamma.c
+src = s_acos.c s_frexp.c s_mathcnst.c 	s_cos.c s_sinh.c 	s_asin.c 	s_asine.c s_cosh.c s_ispos.c s_numtest.c s_sqrt.c 	s_exp.c s_ldexp.c s_pow.c s_tan.c 	s_atan.c 	s_atan2.c s_fabs.c s_log.c s_tanh.c 	s_log10.c s_sin.c 	s_floor.c s_sine.c 	s_sincos.c 	s_atangent.c s_logarithm.c 	s_sineh.c 	s_ceil.c s_isnan.c s_isinf.c 	e_acosh.c e_atanh.c e_remainder.c 	er_gamma.c er_lgamma.c 	s_erf.c e_j0.c e_j1.c w_jn.c e_hypot.c 	w_cabs.c w_drem.c s_asinh.c s_fmod.c 	e_scalb.c s_infconst.c s_signif.c 	s_exp2.c s_tgamma.c
 
 
-fsrc = sf_ceil.c \
-	sf_acos.c sf_frexp.c \
-	sf_cos.c sf_sinh.c \
-	sf_asine.c sf_cosh.c sf_ispos.c sf_numtest.c sf_sqrt.c \
-	sf_asin.c \
-	sf_exp.c sf_ldexp.c sf_pow.c sf_tan.c \
-	sf_atan2.c sf_fabs.c sf_tanh.c \
-	sf_atan.c sf_log10.c sf_sin.c\
-	sf_floor.c sf_sine.c \
-	sf_sincos.c \
-	sf_atangent.c sf_logarithm.c sf_sineh.c \
-	sf_log.c sf_sineh.c \
-	sf_isnan.c sf_isinf.c \
-	ef_acosh.c ef_atanh.c ef_remainder.c \
-	erf_gamma.c erf_lgamma.c \
-	sf_erf.c ef_j0.c ef_j1.c wf_jn.c ef_hypot.c \
-	wf_cabs.c wf_drem.c sf_asinh.c sf_fmod.c \
-	ef_scalb.c sf_signif.c \
-	sf_exp2.c sf_tgamma.c
+fsrc = sf_ceil.c 	sf_acos.c sf_frexp.c 	sf_cos.c sf_sinh.c 	sf_asine.c sf_cosh.c sf_ispos.c sf_numtest.c sf_sqrt.c 	sf_asin.c 	sf_exp.c sf_ldexp.c sf_pow.c sf_tan.c 	sf_atan2.c sf_fabs.c sf_tanh.c 	sf_atan.c sf_log10.c sf_sin.c 	sf_floor.c sf_sine.c 	sf_sincos.c 	sf_atangent.c sf_logarithm.c sf_sineh.c 	sf_log.c sf_sineh.c 	sf_isnan.c sf_isinf.c 	ef_acosh.c ef_atanh.c ef_remainder.c 	erf_gamma.c erf_lgamma.c 	sf_erf.c ef_j0.c ef_j1.c wf_jn.c ef_hypot.c 	wf_cabs.c wf_drem.c sf_asinh.c sf_fmod.c 	ef_scalb.c sf_signif.c 	sf_exp2.c sf_tgamma.c
 
 
 libmathfp_la_LDFLAGS = -Xcompiler -nostdlib
 
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libmathfp.la
-@USE_LIBTOOL_TRUE@libmathfp_la_SOURCES = @USE_LIBTOOL_TRUE@$(src) $(fsrc)
-@USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libmathfp.la
+@USE_LIBTOOL_TRUE@libmathfp_la_SOURCES = $(src) $(fsrc)
+@USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
-@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(src) $(fsrc)
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(src) $(fsrc)
 
-chobj = eacosh.def \
-	eatanh.def \
-	ehypot.def \
-	eremainder.def \
-	erlgamma.def \
-	sacos.def \
-	sasine.def \
-	sasinh.def \
-	satan.def \
-	satan2.def \
-	satangent.def \
-	scosh.def \
-	serf.def \
-	sexp.def \
-	sfabs.def \
-	sfloor.def \
-	sfmod.def \
-	sfrexp.def \
-	sisnan.def \
-	sldexp.def \
-	slog10.def \
-	slogarithm.def \
-	spow.def \
-	ssine.def \
-	ssineh.def \
-	ssqrt.def \
-	stan.def \
-	stanh.def \
-	wjn.def
+chobj = eacosh.def 	eatanh.def 	ehypot.def 	eremainder.def 	erlgamma.def 	sacos.def 	sasine.def 	sasinh.def 	satan.def 	satan2.def 	satangent.def 	scosh.def 	serf.def 	sexp.def 	sfabs.def 	sfloor.def 	sfmod.def 	sfrexp.def 	sisnan.def 	sldexp.def 	slog10.def 	slogarithm.def 	spow.def 	ssine.def 	ssineh.def 	ssqrt.def 	stan.def 	stanh.def 	wjn.def
 
 
 SUFFIXES = .def

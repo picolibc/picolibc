@@ -34,4 +34,7 @@ typedef struct
 
 typedef int _flock_t;
 
+/* Iconv descriptor type */
+typedef void *_iconv_t;
+
 #endif	/* _SYS__TYPES_H */

@@ -1,3 +1,86 @@
+2004-01-23  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
+
+	* acinclude.m4 (--enable-newlib-iconv): New configuration option.
+	(--enable-newlib-builtin-converters): Ditto.
+	* configure.in: Add code to set _ICONV_ENABLED flag.
+	Set _MB_LEN_MAX to 1 if not mb enabled.
+	* configure: Regenerated.
+	* aclocal.m4: Ditto.
+	* Makefile.in: Ditto.
+	* newlib.hin: Add _ICONV_ENABLED flag.
+	* libc/Makefile.am: Add support for iconv.
+	* libc/configure.in: Ditto.
+	* libc/Makefile.in: Regenerated.
+	* libc/aclocal.m4: Ditto.
+	* libc/configure: Ditto.
+	* libc/libc.texinfo: Add iconv documentation.
+	* libc/iconv/AUTHORS, libc/iconv/COPYING, libc/iconv/Makefile.am,
+	libc/iconv/Makefile.in, libc/iconv/README.ORIGINAL,
+	libc/iconv/README.TODO, libc/iconv/charset.aliases,
+	libc/iconv/iconv.tex, libc/iconv/ccs/Makefile.am,
+	libc/iconv/ccs/Makefile.in, libc/iconv/ccs/README.CCS.SOURCES,
+	libc/iconv/ccs/big5.c, libc/iconv/ccs/cns11643_plane1.c,
+	libc/iconv/ccs/cns11643_plane14.c, libc/iconv/ccs/cns11643_plane2.c,
+	libc/iconv/ccs/cp775.c, libc/iconv/ccs/cp850.c,
+	libc/iconv/ccs/cp852.c, libc/iconv/ccs/cp855.c,
+	libc/iconv/ccs/cp866.c, libc/iconv/ccs/gb_2312_80.c,
+	libc/iconv/ccs/iconv_mktbl, libc/iconv/ccs/iso_8859_1.c,
+	libc/iconv/ccs/iso_8859_15.c, libc/iconv/ccs/iso_8859_2.c,
+	libc/iconv/ccs/iso_8859_4.c, libc/iconv/ccs/iso_8859_5.c,
+	libc/iconv/ccs/jis_x0201.c, libc/iconv/ccs/jis_x0208_1983.c,
+	libc/iconv/ccs/jis_x0212_1990.c, libc/iconv/ccs/koi8_r.c,
+	libc/iconv/ccs/koi8_u.c, libc/iconv/ccs/ksx1001.c,
+	libc/iconv/ccs/shift_jis.c, libc/iconv/ccs/us_ascii.c,
+	libc/iconv/ccs/binary/Makefile.am, libc/iconv/ccs/binary/Makefile.in,
+	libc/iconv/ccs/binary/big5.cct,
+	libc/iconv/ccs/binary/cns11643_plane1.cct,
+	libc/iconv/ccs/binary/cns11643_plane14.cct,
+	libc/iconv/ccs/binary/cns11643_plane2.cct,
+	libc/iconv/ccs/binary/cp775.cct, libc/iconv/ccs/binary/cp850.cct,
+	libc/iconv/ccs/binary/cp852.cct, libc/iconv/ccs/binary/cp855.cct,
+	libc/iconv/ccs/binary/cp866.cct, libc/iconv/ccs/binary/gb_2312_80.cct,
+	libc/iconv/ccs/binary/iso_8859_1.cct,
+	libc/iconv/ccs/binary/iso_8859_15.cct,
+	libc/iconv/ccs/binary/iso_8859_2.cct,
+	libc/iconv/ccs/binary/iso_8859_4.cct,
+	libc/iconv/ccs/binary/iso_8859_5.cct,
+	libc/iconv/ccs/binary/jis_x0201.cct,
+	libc/iconv/ccs/binary/jis_x0208_1983.cct,
+	libc/iconv/ccs/binary/jis_x0212_1990.cct,
+	libc/iconv/ccs/binary/koi8_r.cct, libc/iconv/ccs/binary/koi8_u.cct,
+	libc/iconv/ccs/binary/ksx1001.cct,
+	libc/iconv/ccs/binary/shift_jis.cct,
+	libc/iconv/ccs/binary/us_ascii.cct,
+	libc/iconv/ces/Makefile.am, libc/iconv/ces/Makefile.in,
+	libc/iconv/ces/euc-jp.c, libc/iconv/ces/euc-kr.c,
+	libc/iconv/ces/euc-tw.c, libc/iconv/ces/gb2312.c,
+	libc/iconv/ces/iso-10646-ucs-2.c, libc/iconv/ces/iso-10646-ucs-4.c,
+	libc/iconv/ces/ucs-2-internal.c, libc/iconv/ces/ucs-4-internal.c,
+	libc/iconv/ces/utf-16.c, libc/iconv/ces/utf-8.c,
+	libc/iconv/lib/Makefile.am, libc/iconv/lib/Makefile.in,
+	libc/iconv/lib/aliases.c, libc/iconv/lib/bialiasesi.c,
+	libc/iconv/lib/biccs.c, libc/iconv/lib/bices.c,
+	libc/iconv/lib/ccs.c, libc/iconv/lib/ces.c,
+	libc/iconv/lib/ces_euc.c, libc/iconv/lib/ces_iso2022.c,
+	libc/iconv/lib/ces_table.c, libc/iconv/lib/converter.c,
+	libc/iconv/lib/deps.h, libc/iconv/lib/endian.h,
+	libc/iconv/lib/iconv.c, libc/iconv/lib/loaddata.c,
+	libc/iconv/lib/local.h, libc/include/iconv.h: New files.
+	* libc/sys/linux/include/iconv.h: Ditto.
+	* libc/include/sys/_types.h (_iconv_t): Added.
+	* doc/aclocal.m4: Regenerated.
+	* doc/configure: Ditto.
+	* doc/Makefile.in: Ditto.
+	* iconvdata/Makefile.in: Ditto.
+	* iconvdata/aclocal.m4: Ditto.
+	* iconvdata/configure: Ditto.
+	* libc/*aclocal.m4: Ditto.
+	* libc/*Makefile.in: Ditto.
+	* libc/*configure: Ditto.
+	* libm/*aclocal.m4: Ditto.
+	* libm/*Makefile.in: Ditto.
+	* libm/*configure: Ditto.
+
 2004-01-22  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* libc/stdio/findfp.c (__sfp): Protect global FILE pointer list

@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -89,29 +89,7 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 noinst_LIBRARIES = lib.a
 
-COPYOFILES = \
-	read.o \
-	open.o \
-	_exit.o \
-	write.o \
-	lseek.o \
-	close.o \
-	sbrk.o \
-	cerror.o \
-	fork.o \
-	isatty.o \
-	ioctl.o \
-	getpid.o \
-	time.o \
-	kill.o \
-	wait.o \
-	execve.o \
-	gettimeofday.o \
-	link.o \
-	unlink.o \
-	fstat.o \
-	times.o  \
-	getrusage.o  
+COPYOFILES =  	read.o 	open.o 	_exit.o 	write.o 	lseek.o 	close.o 	sbrk.o 	cerror.o 	fork.o 	isatty.o 	ioctl.o 	getpid.o 	time.o 	kill.o 	wait.o 	execve.o 	gettimeofday.o 	link.o 	unlink.o 	fstat.o 	times.o  	getrusage.o  
 
 
 lib_a_SOURCES = _main.c

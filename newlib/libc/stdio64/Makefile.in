@@ -92,6 +92,7 @@ LN_S = @LN_S@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
+NEWLIB_ICONV_CFLAGS = @NEWLIB_ICONV_CFLAGS@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
@@ -113,42 +114,26 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 # need a dummy object so objectlist.awk.in will build every time
 GENERAL_SOURCES = dummy.c local64.h
 @ELIX_LEVEL_1_TRUE@LIB_OBJS = 
-@ELIX_LEVEL_1_FALSE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@\
-@ELIX_LEVEL_1_FALSE@	fdopen64.$(oext) 	\
-@ELIX_LEVEL_1_FALSE@	fgetpos64.$(oext)	\
-@ELIX_LEVEL_1_FALSE@	fopen64.$(oext) 	\
-@ELIX_LEVEL_1_FALSE@	freopen64.$(oext) 	\
-@ELIX_LEVEL_1_FALSE@	fseeko64.$(oext) 	\
-@ELIX_LEVEL_1_FALSE@	fsetpos64.$(oext) 	\
-@ELIX_LEVEL_1_FALSE@	ftello64.$(oext)	\
-@ELIX_LEVEL_1_FALSE@	stdio64.$(oext)		\
-@ELIX_LEVEL_1_FALSE@	tmpfile64.$(oext)
+@ELIX_LEVEL_1_FALSE@LIB_OBJS = 	fdopen64.$(oext) 		fgetpos64.$(oext)		fopen64.$(oext) 		freopen64.$(oext) 		fseeko64.$(oext) 		fsetpos64.$(oext) 		ftello64.$(oext)		stdio64.$(oext)			tmpfile64.$(oext)
 
 libstdio64_la_LDFLAGS = -Xcompiler -nostdlib
 
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libstdio64.la
-@USE_LIBTOOL_TRUE@libstdio64_la_SOURCES = @USE_LIBTOOL_TRUE@$(GENERAL_SOURCES)
-@USE_LIBTOOL_TRUE@libstdio64_la_LIBADD = @USE_LIBTOOL_TRUE@$(LIB_OBJS)
-@USE_LIBTOOL_TRUE@libstdio64_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@$(LIB_OBJS)
-@USE_LIBTOOL_TRUE@LIB_COMPILE = @USE_LIBTOOL_TRUE@$(LTCOMPILE)
-@USE_LIBTOOL_FALSE@LIB_COMPILE = @USE_LIBTOOL_FALSE@$(COMPILE)
-@USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libstdio64.la
+@USE_LIBTOOL_TRUE@libstdio64_la_SOURCES = $(GENERAL_SOURCES)
+@USE_LIBTOOL_TRUE@libstdio64_la_LIBADD = $(LIB_OBJS)
+@USE_LIBTOOL_TRUE@libstdio64_la_DEPENDENCIES = $(LIB_OBJS)
+@USE_LIBTOOL_TRUE@LIB_COMPILE = $(LTCOMPILE)
+@USE_LIBTOOL_FALSE@LIB_COMPILE = $(COMPILE)
+@USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
-@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(GENERAL_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(LIB_OBJS)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(LIB_OBJS)
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIB_OBJS)
 
 AM_CFLAGS = -I $(srcdir)/../stdio
 
-CHEWOUT_FILES = \
-	fgetpos64.def		\
-	fopen64.def		\
-	freopen64.def		\
-	fseeko64.def		\
-	fsetpos64.def		\
-	ftello64.def		\
-	tmpfile64.def
+CHEWOUT_FILES =  	fgetpos64.def			fopen64.def			freopen64.def			fseeko64.def			fsetpos64.def			ftello64.def			tmpfile64.def
 
 
 SUFFIXES = .def

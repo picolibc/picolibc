@@ -155,6 +155,7 @@ into another language, under the above conditions for modified versions.
 @include sigset.texi
 @include extra.texi
 @include stdio64.texi
+@include iconvset.texi
 
 @menu
 * Stdlib::
@@ -177,6 +178,10 @@ into another language, under the above conditions for modified versions.
 * Misc::
 * Arglists::
 * Reentrancy::
+@ifset ICONV
+* Iconv::
+@end ifset
+
 * Library Index::
 @end menu
 @end ifinfo

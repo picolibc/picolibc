@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -91,6 +91,7 @@ LN_S = @LN_S@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
+NEWLIB_ICONV_CFLAGS = @NEWLIB_ICONV_CFLAGS@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
@@ -107,72 +108,37 @@ sys_dir = @sys_dir@
 
 AUTOMAKE_OPTIONS = cygnus
 
-@HAVE_POSIX_DIR_TRUE@POSIX_SUBDIR = @HAVE_POSIX_DIR_TRUE@posix
+@HAVE_POSIX_DIR_TRUE@POSIX_SUBDIR = posix
 
-@HAVE_SIGNAL_DIR_TRUE@SIGNAL_SUBDIR = @HAVE_SIGNAL_DIR_TRUE@signal
+@HAVE_SIGNAL_DIR_TRUE@SIGNAL_SUBDIR = signal
 
-@HAVE_SYSCALL_DIR_TRUE@SYSCALLS_SUBDIR = @HAVE_SYSCALL_DIR_TRUE@syscalls
+@HAVE_SYSCALL_DIR_TRUE@SYSCALLS_SUBDIR = syscalls
 
-@HAVE_UNIX_DIR_TRUE@UNIX_SUBDIR = @HAVE_UNIX_DIR_TRUE@unix
+@HAVE_UNIX_DIR_TRUE@UNIX_SUBDIR = unix
 
-@HAVE_STDIO64_DIR_TRUE@STDIO64_SUBDIR = @HAVE_STDIO64_DIR_TRUE@stdio64
+@HAVE_STDIO64_DIR_TRUE@STDIO64_SUBDIR = stdio64
+@ENABLE_NEWLIB_ICONV_TRUE@NEWLIB_ICONV_DIRS = iconv
+@ENABLE_NEWLIB_ICONV_FALSE@NEWLIB_ICONV_DIRS = 
+@ENABLE_NEWLIB_ICONV_TRUE@NEWLIB_ICONV_LIBS = iconv/ces/lib.$(aext) iconv/ccs/lib.$(aext) iconv/lib/lib.$(aext)
+@ENABLE_NEWLIB_ICONV_FALSE@NEWLIB_ICONV_LIBS = 
 
 # The order of SUBDIRS is important for the integrated documentation.
 # Do not change the order without considering the doc impact.
-SUBDIRS = argz stdlib ctype search stdio $(STDIO64_SUBDIR) string $(SIGNAL_SUBDIR) time locale sys reent \
-	$(extra_dir) errno misc machine $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) .
+SUBDIRS = argz stdlib ctype search stdio $(STDIO64_SUBDIR) string $(SIGNAL_SUBDIR) time locale sys reent 	$(extra_dir) errno misc machine $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) $(NEWLIB_ICONV_DIRS) .
 
 
 noinst_DATA = $(CRT0)
 
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libc.la
-@USE_LIBTOOL_TRUE@SUBLIBS = @USE_LIBTOOL_TRUE@\
-@USE_LIBTOOL_TRUE@	argz/libargz.$(aext) \
-@USE_LIBTOOL_TRUE@	stdlib/libstdlib.$(aext) \
-@USE_LIBTOOL_TRUE@	ctype/libctype.$(aext) \
-@USE_LIBTOOL_TRUE@	search/libsearch.$(aext) \
-@USE_LIBTOOL_TRUE@	stdio/libstdio.$(aext) \
-@USE_LIBTOOL_TRUE@	$(LIBC_STDIO64_LIB) \
-@USE_LIBTOOL_TRUE@	string/libstring.$(aext) \
-@USE_LIBTOOL_TRUE@	$(LIBC_SIGNAL_LIB) \
-@USE_LIBTOOL_TRUE@	time/libtime.$(aext) \
-@USE_LIBTOOL_TRUE@	locale/liblocale.$(aext) \
-@USE_LIBTOOL_TRUE@	$(LIBC_SYS_LIB) \
-@USE_LIBTOOL_TRUE@	reent/libreent.$(aext) \
-@USE_LIBTOOL_TRUE@	$(LIBC_EXTRA_LIB) \
-@USE_LIBTOOL_TRUE@	errno/liberrno.$(aext) \
-@USE_LIBTOOL_TRUE@	misc/libmisc.$(aext) \
-@USE_LIBTOOL_TRUE@	$(LIBC_MACHINE_LIB) \
-@USE_LIBTOOL_TRUE@	$(LIBC_UNIX_LIB) \
-@USE_LIBTOOL_TRUE@	$(LIBC_POSIX_LIB) \
-@USE_LIBTOOL_TRUE@	$(LIBC_SYSCALL_LIB)
-@USE_LIBTOOL_FALSE@SUBLIBS = @USE_LIBTOOL_FALSE@\
-@USE_LIBTOOL_FALSE@	argz/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	stdlib/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	ctype/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	search/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	stdio/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	$(LIBC_STDIO64_LIB) \
-@USE_LIBTOOL_FALSE@	string/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	$(LIBC_SIGNAL_LIB) \
-@USE_LIBTOOL_FALSE@	time/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	locale/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	$(LIBC_SYS_LIB) \
-@USE_LIBTOOL_FALSE@	reent/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	$(LIBC_EXTRA_LIB) \
-@USE_LIBTOOL_FALSE@	errno/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	misc/lib.$(aext) \
-@USE_LIBTOOL_FALSE@	$(LIBC_MACHINE_LIB) \
-@USE_LIBTOOL_FALSE@	$(LIBC_UNIX_LIB) \
-@USE_LIBTOOL_FALSE@	$(LIBC_POSIX_LIB) \
-@USE_LIBTOOL_FALSE@	$(LIBC_SYSCALL_LIB)
-@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@libc.a
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libc.la
+@USE_LIBTOOL_TRUE@SUBLIBS = 	argz/libargz.$(aext) 	stdlib/libstdlib.$(aext) 	ctype/libctype.$(aext) 	search/libsearch.$(aext) 	stdio/libstdio.$(aext) 	$(LIBC_STDIO64_LIB) 	string/libstring.$(aext) 	$(LIBC_SIGNAL_LIB) 	time/libtime.$(aext) 	locale/liblocale.$(aext) 	$(LIBC_SYS_LIB) 	reent/libreent.$(aext) 	$(LIBC_EXTRA_LIB) 	errno/liberrno.$(aext) 	misc/libmisc.$(aext) 	$(LIBC_MACHINE_LIB) 	$(LIBC_UNIX_LIB) 	$(LIBC_POSIX_LIB) 	$(LIBC_SYSCALL_LIB)
+@USE_LIBTOOL_FALSE@SUBLIBS = 	argz/lib.$(aext) 	stdlib/lib.$(aext) 	ctype/lib.$(aext) 	search/lib.$(aext) 	stdio/lib.$(aext) 	$(LIBC_STDIO64_LIB) 	string/lib.$(aext) 	$(LIBC_SIGNAL_LIB) 	time/lib.$(aext) 	locale/lib.$(aext) 	$(LIBC_SYS_LIB) 	reent/lib.$(aext) 	$(LIBC_EXTRA_LIB) 	errno/lib.$(aext) 	misc/lib.$(aext) 	$(LIBC_MACHINE_LIB) 	$(LIBC_UNIX_LIB) 	$(LIBC_POSIX_LIB) 	$(LIBC_SYSCALL_LIB)         $(NEWLIB_ICONV_LIBS)
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = libc.a
 
 libc_la_LDFLAGS = -Xcompiler -nostdlib
 
 @USE_LIBTOOL_TRUE@libc_la_SOURCES = 
-@USE_LIBTOOL_TRUE@libc_la_LIBADD = @USE_LIBTOOL_TRUE@$(SUBLIBS)
-@USE_LIBTOOL_TRUE@libc_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@$(SUBLIBS)
+@USE_LIBTOOL_TRUE@libc_la_LIBADD = $(SUBLIBS)
+@USE_LIBTOOL_TRUE@libc_la_DEPENDENCIES = $(SUBLIBS)
 
 info_TEXINFOS = libc.texinfo
 
@@ -180,23 +146,10 @@ info_TEXINFOS = libc.texinfo
 # builds .def files.  We don't list subdirectories which don't build
 # .def files; if the list of subdirectories changes, we must change
 # this as well.
-SUBDEFS = \
-	stdlib/stmp-def \
-	ctype/stmp-def \
-	stdio/stmp-def \
-	$(LIBC_STDIO64_DEF) \
-	string/stmp-def \
-	$(LIBC_SIGNAL_DEF) \
-	time/stmp-def \
-	locale/stmp-def \
-	reent/stmp-def \
-	$(LIBC_EXTRA_DEF) \
-	misc/stmp-def
+SUBDEFS =  	stdlib/stmp-def 	ctype/stmp-def 	stdio/stmp-def 	$(LIBC_STDIO64_DEF) 	string/stmp-def 	$(LIBC_SIGNAL_DEF) 	time/stmp-def 	locale/stmp-def 	reent/stmp-def 	$(LIBC_EXTRA_DEF) 	misc/stmp-def
 
 
-CLEANFILES = $(CRT0) \
-	sigset.texi stmp-sigset extra.texi stmp-extra \
-	stdio64.texi stmp-stdio64 tmp.texi targetdep.tex stmp-targetdep
+CLEANFILES = $(CRT0) 	sigset.texi stmp-sigset extra.texi stmp-extra 	stdio64.texi stmp-stdio64 tmp.texi targetdep.tex stmp-targetdep
 
 
 ACLOCAL_AMFLAGS = -I ..
@@ -237,7 +190,7 @@ TAR = gtar
 GZIP_ENV = --best
 DIST_SUBDIRS =  argz stdlib ctype search stdio stdio64 string signal \
 time locale sys reent @extra_dir@ errno misc machine unix posix \
-syscalls .
+syscalls iconv .
 SOURCES = libc.a.c $(libc_la_SOURCES)
 OBJECTS = libc.a.$(OBJEXT) $(libc_la_OBJECTS)
 
@@ -398,7 +351,7 @@ uninstall-info:
 	else ii=; fi; \
 	list='$(INFO_DEPS)'; \
 	for file in $$list; do \
-	  test -z "$ii" \
+	  test -z "$$ii" \
 	    || install-info --info-dir=$(DESTDIR)$(infodir) --remove $$file; \
 	done
 	@$(NORMAL_UNINSTALL)
@@ -472,7 +425,7 @@ maintainer-clean-recursive:
 	dot_seen=no; \
 	rev=''; list='$(SUBDIRS)'; for subdir in $$list; do \
 	  rev="$$subdir $$rev"; \
-	  test "$$subdir" = "." && dot_seen=yes; \
+	  test "$$subdir" != "." || dot_seen=yes; \
 	done; \
 	test "$$dot_seen" = "no" && rev=". $$rev"; \
 	target=`echo $@ | sed s/-recursive//`; \
@@ -697,7 +650,8 @@ crt0.o: sys/crt0.o
 
 sys/crt0.o: ; @true
 
-libc.info: sigset.texi extra.texi stdio64.texi targetdep.tex $(SUBDEFS)
+libc.info: sigset.texi extra.texi stdio64.texi iconvset.texi \
+	targetdep.tex $(SUBDEFS)
 
 stmp-sigset: config.status
 	if test -n "$(LIBC_SIGNAL_LIB)"; then \
@@ -709,6 +663,17 @@ stmp-sigset: config.status
 	touch $@
 
 sigset.texi: stmp-sigset ; @true
+
+stmp-iconvset: config.status
+	if test -n "$(NEWLIB_ICONV_LIBS)"; then \
+	  echo "@set ICONV" >tmp.texi; \
+	else \
+	  echo "@clear ICONV" >tmp.texi; \
+	fi
+	$(SHELL) $(newlib_basedir)/../move-if-change tmp.texi iconvset.texi
+	touch $@
+
+iconvset.texi: stmp-iconvset ; @true
 
 stmp-extra: config.status
 	if test -n "$(LIBC_EXTRA_LIB)"; then \

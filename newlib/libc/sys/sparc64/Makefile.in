@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -118,10 +118,7 @@ COPYOMFILES =
 # needed by the ANSI C part of newlib (and thus we must provide namespace
 # clean versions of them because we define REENTRANT_SYSCALLS_PROVIDED).
 
-CFILES = _main.c ieee.c \
-	closedir.c opendir.c readdir.c rewinddir.c scandir.c seekdir.c \
-	telldir.c \
-	creat.c isatty.c utime2.c
+CFILES = _main.c ieee.c 	closedir.c opendir.c readdir.c rewinddir.c scandir.c seekdir.c 	telldir.c 	creat.c isatty.c utime2.c
 
 
 CFILES_R = 
@@ -132,26 +129,17 @@ SFILES_R = sbrk.S wait.S
 
 # List of files built from template.S (with an '_' suffix).
 
-TEMPLATE_SFILES = access_ chdir_ chmod_ chown_ dup_ fcntl_ \
-	lstat_ mkdir_ pipe_ rmdir_ times_ umask_ utimes_
+TEMPLATE_SFILES = access_ chdir_ chmod_ chown_ dup_ fcntl_ 	lstat_ mkdir_ pipe_ rmdir_ times_ umask_ utimes_
 
 
-TEMPLATE_SFILES_R = close_ fork_ fstat_ getpid_ gettimeofday_ kill_ \
-	link_ lseek_ open_ read_ stat_ times_ unlink_ wait4_ write_
+TEMPLATE_SFILES_R = close_ fork_ fstat_ getpid_ gettimeofday_ kill_ 	link_ lseek_ open_ read_ stat_ times_ unlink_ wait4_ write_
 
 
-OFILES = $(COPYOFILES) $(COPYRENAMEOFILES) $(COPYOMFILES) \
-	$(SFILES:.S=.o) $(SFILES_R:.S=.o) $(SFILES_R:.S=_r.o) \
-	$(TEMPLATE_SFILES:_=.o) $(TEMPLATE_SFILES_R:_=.o) $(TEMPLATE_SFILES_R:_=_r.o) \
-	$(CFILES:.c=.o) $(CFILES_R:.c=.o) $(CFILES_R:.c=_r.o)
+OFILES = $(COPYOFILES) $(COPYRENAMEOFILES) $(COPYOMFILES) 	$(SFILES:.S=.o) $(SFILES_R:.S=.o) $(SFILES_R:.S=_r.o) 	$(TEMPLATE_SFILES:_=.o) $(TEMPLATE_SFILES_R:_=.o) $(TEMPLATE_SFILES_R:_=_r.o) 	$(CFILES:.c=.o) $(CFILES_R:.c=.o) $(CFILES_R:.c=_r.o)
 
 
 lib_a_SOURCES = $(SFILES) $(SFILES_R) $(CFILES) $(CFILES_R)
-lib_a_LIBADD = $(COPYOFILES) $(COPYRENAMEOFILES) $(COPYOMFILES) \
-	$(SFILES_R:.S=_r.o) \
-	$(TEMPLATE_SFILES:_=.o) $(TEMPLATE_SFILES_R:_=.o) \
-	$(TEMPLATE_SFILES_R:_=_r.o) \
-	$(CFILES_R:.c=_r.o)
+lib_a_LIBADD = $(COPYOFILES) $(COPYRENAMEOFILES) $(COPYOMFILES) 	$(SFILES_R:.S=_r.o) 	$(TEMPLATE_SFILES:_=.o) $(TEMPLATE_SFILES_R:_=.o) 	$(TEMPLATE_SFILES_R:_=_r.o) 	$(CFILES_R:.c=_r.o)
 
 
 ACLOCAL_AMFLAGS = -I ../../..

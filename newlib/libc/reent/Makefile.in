@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -92,6 +92,7 @@ LN_S = @LN_S@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
+NEWLIB_ICONV_CFLAGS = @NEWLIB_ICONV_CFLAGS@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
@@ -110,72 +111,33 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-@HAVE_STDIO64_DIR_TRUE@STDIO64_OBJECTS = @HAVE_STDIO64_DIR_TRUE@\
-@HAVE_STDIO64_DIR_TRUE@	fstat64r.$(oext) \
-@HAVE_STDIO64_DIR_TRUE@	lseek64r.$(oext) \
-@HAVE_STDIO64_DIR_TRUE@	open64r.$(oext)
+@HAVE_STDIO64_DIR_TRUE@STDIO64_OBJECTS = 	fstat64r.$(oext) 	lseek64r.$(oext) 	open64r.$(oext)
 
-@HAVE_STDIO64_DIR_TRUE@STDIO64_DEFS = @HAVE_STDIO64_DIR_TRUE@\
-@HAVE_STDIO64_DIR_TRUE@	fstat64r.def \
-@HAVE_STDIO64_DIR_TRUE@	lseek64r.def \
-@HAVE_STDIO64_DIR_TRUE@	open64r.def
+@HAVE_STDIO64_DIR_TRUE@STDIO64_DEFS = 	fstat64r.def 	lseek64r.def 	open64r.def
 
 ELIX_2_OBJS = $(STDIO64_OBJECTS)
 ELIX_3_OBJS = execr.$(oext)
 @ELIX_LEVEL_1_TRUE@LIB_OBJS = 
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@$(ELIX_2_OBJS)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@$(ELIX_2_OBJS) $(ELIX_3_OBJS)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@LIB_OBJS = $(ELIX_2_OBJS)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@LIB_OBJS = $(ELIX_2_OBJS) $(ELIX_3_OBJS)
 
-GENERAL_SOURCES = \
-	closer.c \
-	reent.c \
-	impure.c \
-	fcntlr.c \
-	fstatr.c \
-	getreent.c \
-	linkr.c \
-	lseekr.c \
-	openr.c \
-	readr.c \
-	signalr.c \
-	signgam.c \
-	sbrkr.c \
-	statr.c \
-	timer.c \
-	unlinkr.c \
-	writer.c
+GENERAL_SOURCES =  	closer.c 	reent.c 	impure.c 	fcntlr.c 	fstatr.c 	getreent.c 	linkr.c 	lseekr.c 	openr.c 	readr.c 	signalr.c 	signgam.c 	sbrkr.c 	statr.c 	timer.c 	unlinkr.c 	writer.c
 
 
 libreent_la_LDFLAGS = -Xcompiler -nostdlib
 
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libreent.la
-@USE_LIBTOOL_TRUE@libreent_la_SOURCES = @USE_LIBTOOL_TRUE@$(GENERAL_SOURCES)
-@USE_LIBTOOL_TRUE@libreent_la_LIBADD = @USE_LIBTOOL_TRUE@$(LIB_OBJS)
-@USE_LIBTOOL_TRUE@libreent_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@$(LIB_OBJS)
-@USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libreent.la
+@USE_LIBTOOL_TRUE@libreent_la_SOURCES = $(GENERAL_SOURCES)
+@USE_LIBTOOL_TRUE@libreent_la_LIBADD = $(LIB_OBJS)
+@USE_LIBTOOL_TRUE@libreent_la_DEPENDENCIES = $(LIB_OBJS)
+@USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
-@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(GENERAL_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(LIB_OBJS)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(LIB_OBJS)
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIB_OBJS)
 
-CHEWOUT_FILES = \
-	closer.def \
-	reent.def \
-	execr.def \
-	fcntlr.def \
-	fstatr.def \
-	linkr.def \
-	lseekr.def \
-	openr.def \
-	readr.def \
-	signalr.def \
-	sbrkr.def \
-	statr.def \
-	timer.def \
-	unlinkr.def \
-	$(STDIO64_DEFS) \
-	writer.def
+CHEWOUT_FILES =  	closer.def 	reent.def 	execr.def 	fcntlr.def 	fstatr.def 	linkr.def 	lseekr.def 	openr.def 	readr.def 	signalr.def 	sbrkr.def 	statr.def 	timer.def 	unlinkr.def 	$(STDIO64_DEFS) 	writer.def
 
 
 SUFFIXES = .def .h

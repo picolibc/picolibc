@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -89,12 +89,7 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 noinst_LIBRARIES = lib.a
 
-lib_a_SOURCES = \
-	_exit.c access.c chmod.c chown.c close.c creat.c crt1.c \
-	execv.c execve.c fork.c fstat.c getpid.c isatty.c \
-	kill.c lseek.c open.c pipe.c read.c link.c \
-	sbrk.c stat.c time.c trap.S unlink.c utime.c wait.c write.c \
-	times.c gettime.c
+lib_a_SOURCES =  	_exit.c access.c chmod.c chown.c close.c creat.c crt1.c 	execv.c execve.c fork.c fstat.c getpid.c isatty.c 	kill.c lseek.c open.c pipe.c read.c link.c 	sbrk.c stat.c time.c trap.S unlink.c utime.c wait.c write.c 	times.c gettime.c
 
 
 ACLOCAL_AMFLAGS = -I ../../..

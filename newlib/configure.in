@@ -1,7 +1,7 @@
 dnl This is the newlib configure.in file.
 dnl Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.5)
+AC_PREREQ(2.13)
 AC_INIT(libc)
 AM_CONFIG_HEADER(newlib.h:newlib.hin)
 
@@ -146,6 +146,12 @@ fi
 
 if test "${newlib_mb}" = "yes"; then
 AC_DEFINE_UNQUOTED(_MB_LEN_MAX,8)
+else
+AC_DEFINE_UNQUOTED(_MB_LEN_MAX,1)
+fi
+
+if test "${newlib_iconv}" = "yes"; then
+AC_DEFINE_UNQUOTED(_ICONV_ENABLED,1)
 fi
 
 AC_DEFINE_UNQUOTED(_NEWLIB_VERSION,"$VERSION")

@@ -22,10 +22,18 @@ if HAVE_STDIO64_DIR
 STDIO64_SUBDIR = stdio64
 endif
 
+if ENABLE_NEWLIB_ICONV
+NEWLIB_ICONV_DIRS = iconv
+NEWLIB_ICONV_LIBS = iconv/ces/lib.$(aext) iconv/ccs/lib.$(aext) iconv/lib/lib.$(aext)
+else
+NEWLIB_ICONV_DIRS =
+NEWLIB_ICONV_LIBS =
+endif
+
 # The order of SUBDIRS is important for the integrated documentation.
 # Do not change the order without considering the doc impact.
 SUBDIRS = argz stdlib ctype search stdio $(STDIO64_SUBDIR) string $(SIGNAL_SUBDIR) time locale sys reent \
-	$(extra_dir) errno misc machine $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) .
+	$(extra_dir) errno misc machine $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) $(NEWLIB_ICONV_DIRS) .
 
 noinst_DATA = $(CRT0)
 
@@ -72,7 +80,8 @@ SUBLIBS = \
 	$(LIBC_MACHINE_LIB) \
 	$(LIBC_UNIX_LIB) \
 	$(LIBC_POSIX_LIB) \
-	$(LIBC_SYSCALL_LIB)
+	$(LIBC_SYSCALL_LIB) \
+        $(NEWLIB_ICONV_LIBS)
 endif
 
 libc_la_LDFLAGS = -Xcompiler -nostdlib
@@ -122,7 +131,8 @@ SUBDEFS = \
 	$(LIBC_EXTRA_DEF) \
 	misc/stmp-def
 
-libc.info: sigset.texi extra.texi stdio64.texi targetdep.tex $(SUBDEFS)
+libc.info: sigset.texi extra.texi stdio64.texi iconvset.texi \
+	targetdep.tex $(SUBDEFS)
 
 stmp-sigset: config.status
 	if test -n "$(LIBC_SIGNAL_LIB)"; then \
@@ -134,6 +144,17 @@ stmp-sigset: config.status
 	touch $@
 
 sigset.texi: stmp-sigset ; @true
+
+stmp-iconvset: config.status
+	if test -n "$(NEWLIB_ICONV_LIBS)"; then \
+	  echo "@set ICONV" >tmp.texi; \
+	else \
+	  echo "@clear ICONV" >tmp.texi; \
+	fi
+	$(SHELL) $(newlib_basedir)/../move-if-change tmp.texi iconvset.texi
+	touch $@
+
+iconvset.texi: stmp-iconvset ; @true
 
 stmp-extra: config.status
 	if test -n "$(LIBC_EXTRA_LIB)"; then \

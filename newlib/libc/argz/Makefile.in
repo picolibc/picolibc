@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -92,6 +92,7 @@ LN_S = @LN_S@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
+NEWLIB_ICONV_CFLAGS = @NEWLIB_ICONV_CFLAGS@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
@@ -110,39 +111,20 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 @ELIX_LEVEL_1_TRUE@LIB_OBJS = 
-@ELIX_LEVEL_1_FALSE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@\
-@ELIX_LEVEL_1_FALSE@	argz_add.$(oext) \
-@ELIX_LEVEL_1_FALSE@	argz_add_sep.$(oext) \
-@ELIX_LEVEL_1_FALSE@	argz_append.$(oext) \
-@ELIX_LEVEL_1_FALSE@	argz_count.$(oext) \
-@ELIX_LEVEL_1_FALSE@	argz_create.$(oext) \
-@ELIX_LEVEL_1_FALSE@	argz_create_sep.$(oext) \
-@ELIX_LEVEL_1_FALSE@	argz_delete.$(oext) \
-@ELIX_LEVEL_1_FALSE@	argz_extract.$(oext) \
-@ELIX_LEVEL_1_FALSE@	argz_insert.$(oext) \
-@ELIX_LEVEL_1_FALSE@	argz_next.$(oext) \
-@ELIX_LEVEL_1_FALSE@	argz_replace.$(oext) \
-@ELIX_LEVEL_1_FALSE@	argz_stringify.$(oext) \
-@ELIX_LEVEL_1_FALSE@	buf_findstr.$(oext) \
-@ELIX_LEVEL_1_FALSE@	envz_entry.$(oext) \
-@ELIX_LEVEL_1_FALSE@	envz_get.$(oext) \
-@ELIX_LEVEL_1_FALSE@	envz_add.$(oext) \
-@ELIX_LEVEL_1_FALSE@	envz_remove.$(oext) \
-@ELIX_LEVEL_1_FALSE@	envz_merge.$(oext) \
-@ELIX_LEVEL_1_FALSE@	envz_strip.$(oext)
+@ELIX_LEVEL_1_FALSE@LIB_OBJS = 	argz_add.$(oext) 	argz_add_sep.$(oext) 	argz_append.$(oext) 	argz_count.$(oext) 	argz_create.$(oext) 	argz_create_sep.$(oext) 	argz_delete.$(oext) 	argz_extract.$(oext) 	argz_insert.$(oext) 	argz_next.$(oext) 	argz_replace.$(oext) 	argz_stringify.$(oext) 	buf_findstr.$(oext) 	envz_entry.$(oext) 	envz_get.$(oext) 	envz_add.$(oext) 	envz_remove.$(oext) 	envz_merge.$(oext) 	envz_strip.$(oext)
 
 libargz_la_LDFLAGS = -Xcompiler -nostdlib
 
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libargz.la
-@USE_LIBTOOL_TRUE@libargz_la_SOURCES = @USE_LIBTOOL_TRUE@dummy.c
-@USE_LIBTOOL_TRUE@libargz_la_LIBADD = @USE_LIBTOOL_TRUE@$(LIB_OBJS)
-@USE_LIBTOOL_TRUE@libargz_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@$(LIB_OBJS)
-@USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libargz.la
+@USE_LIBTOOL_TRUE@libargz_la_SOURCES = dummy.c
+@USE_LIBTOOL_TRUE@libargz_la_LIBADD = $(LIB_OBJS)
+@USE_LIBTOOL_TRUE@libargz_la_DEPENDENCIES = $(LIB_OBJS)
+@USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
-@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@dummy.c
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(LIB_OBJS)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(LIB_OBJS)
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = dummy.c
+@USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIB_OBJS)
 
 SUFFIXES = .def
 

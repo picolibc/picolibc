@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -96,9 +96,7 @@ lib_a_SOURCES = setjmp.S
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 
-lib_a_LIBADD = malloc.o free.o realloc.o calloc.o cfree.o malign.o \
-	valloc.o pvalloc.o mallinfo.o mallstats.o msize.o mallopt.o \
-	mallocr.o freer.o reallocr.o callocr.o
+lib_a_LIBADD = malloc.o free.o realloc.o calloc.o cfree.o malign.o 	valloc.o pvalloc.o mallinfo.o mallstats.o msize.o mallopt.o 	mallocr.o freer.o reallocr.o callocr.o
 
 
 MALLOC_COMPILE = $(COMPILE)

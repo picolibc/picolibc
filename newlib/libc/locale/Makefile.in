@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -92,6 +92,7 @@ LN_S = @LN_S@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
+NEWLIB_ICONV_CFLAGS = @NEWLIB_ICONV_CFLAGS@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
@@ -110,29 +111,22 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-GENERAL_SOURCES = timelocal.h ldpart.h locale.c lnumeric.h lmonetary.h lmessages.h
+GENERAL_SOURCES = timelocal.h ldpart.h locale.c lnumeric.h lmonetary.h lmessages.h 
 @ELIX_LEVEL_1_TRUE@LIB_OBJS = 
-@ELIX_LEVEL_1_FALSE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@\
-@ELIX_LEVEL_1_FALSE@	fix_grouping.$(oext) \
-@ELIX_LEVEL_1_FALSE@	ldpart.$(oext) \
-@ELIX_LEVEL_1_FALSE@	lmessages.$(oext) \
-@ELIX_LEVEL_1_FALSE@	lnumeric.$(oext) \
-@ELIX_LEVEL_1_FALSE@	lmonetary.$(oext) \
-@ELIX_LEVEL_1_FALSE@	nl_langinfo.$(oext) \
-@ELIX_LEVEL_1_FALSE@	timelocal.$(oext)
+@ELIX_LEVEL_1_FALSE@LIB_OBJS = 	fix_grouping.$(oext) 	ldpart.$(oext) 	lmessages.$(oext) 	lnumeric.$(oext) 	lmonetary.$(oext) 	nl_langinfo.$(oext) 	timelocal.$(oext)
 
 liblocale_la_LDFLAGS = -Xcompiler -nostdlib
 
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@liblocale.la
-@USE_LIBTOOL_TRUE@liblocale_la_SOURCES = @USE_LIBTOOL_TRUE@$(GENERAL_SOURCES)
-@USE_LIBTOOL_TRUE@liblocale_la_LIBADD = @USE_LIBTOOL_TRUE@$(LIB_OBJS)
-@USE_LIBTOOL_TRUE@liblocale_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@$(LIB_OBJS)
-@USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = liblocale.la
+@USE_LIBTOOL_TRUE@liblocale_la_SOURCES = $(GENERAL_SOURCES)
+@USE_LIBTOOL_TRUE@liblocale_la_LIBADD = $(LIB_OBJS)
+@USE_LIBTOOL_TRUE@liblocale_la_DEPENDENCIES = $(LIB_OBJS)
+@USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
-@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(GENERAL_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(LIB_OBJS)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(LIB_OBJS)
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIB_OBJS)
 
 CHEWOUT_FILES = locale.def
 

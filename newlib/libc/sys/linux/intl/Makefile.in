@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -101,23 +101,19 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = -I$(srcdir)/.. $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = \
-	bindtextdom.c catgets.c dcgettext.c dgettext.c gettext.c       \
-	dcigettext.c dcngettext.c dngettext.c ngettext.c open_catalog.c \
-	finddomain.c loadmsgcat.c localealias.c textdomain.c \
-	l10nflist.c explodename.c plural.c stpcpy.c
+LIB_SOURCES =  	bindtextdom.c catgets.c dcgettext.c dgettext.c gettext.c       	dcigettext.c dcngettext.c dngettext.c ngettext.c open_catalog.c 	finddomain.c loadmsgcat.c localealias.c textdomain.c 	l10nflist.c explodename.c plural.c stpcpy.c
 
 
 libintl_la_LDFLAGS = -Xcompiler -nostdlib
 
 msgcatdir = /usr/share/locale
 
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libintl.la
-@USE_LIBTOOL_TRUE@libintl_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_SOURCES)
-@USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libintl.la
+@USE_LIBTOOL_TRUE@libintl_la_SOURCES = $(LIB_SOURCES)
+@USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
-@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_SOURCES)
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(LIB_SOURCES)
 
 AM_CFLAGS = -DNOT_IN_libc -DHAVE_CONFIG_H -D_GNU_SOURCE -D__libc_enable_secure=1 -D'LOCALEDIR="$(msgcatdir)"' -D'LOCALE_ALIAS_PATH="$(msgcatdir)"' -DNLSPATH='"$(msgcatdir)/%L/%N:$(msgcatdir)/%L/LC_MESSAGES/%N:$(msgcatdir)/%l/%N:$(msgcatdir)/%l/LC_MESSAGES/%N:"'
 

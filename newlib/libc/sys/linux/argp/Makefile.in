@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -73,6 +73,8 @@ CXX = @CXX@
 CXXCPP = @CXXCPP@
 DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
+EXTRA_SUBDIRS = @EXTRA_SUBDIRS@
+EXTRA_SUBLIBS = @EXTRA_SUBLIBS@
 GCJ = @GCJ@
 GCJFLAGS = @GCJFLAGS@
 LDFLAGS = @LDFLAGS@
@@ -99,19 +101,17 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = -I$(srcdir)/../include $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = \
-	argp-ba.c  argp-eexst.c  argp-fmtstream.c  argp-fs-xinl.c \
-	argp-help.c  argp-parse.c  argp-pv.c  argp-pvh.c  argp-xinl.c
+LIB_SOURCES =  	argp-ba.c  argp-eexst.c  argp-fmtstream.c  argp-fs-xinl.c 	argp-help.c  argp-parse.c  argp-pv.c  argp-pvh.c  argp-xinl.c
 
 
 libargp_la_LDFLAGS = -Xcompiler -nostdlib
 
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libargp.la
-@USE_LIBTOOL_TRUE@libargp_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_SOURCES)
-@USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libargp.la
+@USE_LIBTOOL_TRUE@libargp_la_SOURCES = $(LIB_SOURCES)
+@USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
-@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_SOURCES)
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(LIB_SOURCES)
 mkinstalldirs = $(SHELL) $(top_srcdir)/../../../../mkinstalldirs
 CONFIG_CLEAN_FILES = 
 LIBRARIES =  $(noinst_LIBRARIES)

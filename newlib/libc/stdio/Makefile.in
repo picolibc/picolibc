@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -92,6 +92,7 @@ LN_S = @LN_S@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
+NEWLIB_ICONV_CFLAGS = @NEWLIB_ICONV_CFLAGS@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
 PACKAGE = @PACKAGE@
@@ -110,157 +111,29 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-GENERAL_SOURCES = \
-	clearerr.c 			\
-	fclose.c 			\
-	fdopen.c 			\
-	feof.c 				\
-	ferror.c 			\
-	fflush.c 			\
-	fgetc.c 			\
-	fgetpos.c 			\
-	fgets.c 			\
-	fileno.c			\
-	findfp.c 			\
-	fiprintf.c 			\
-	flags.c 			\
-	fopen.c 			\
-	fprintf.c 			\
-	fputc.c 			\
-	fputs.c 			\
-	fread.c 			\
-	freopen.c 			\
-	fscanf.c 			\
-	fseek.c 			\
-	fsetpos.c 			\
-	ftell.c 			\
-	fvwrite.c 			\
-	fwalk.c 			\
-	fwrite.c 			\
-	getc.c 				\
-	getchar.c 			\
-	getc_u.c			\
-	getchar_u.c			\
-	getdelim.c			\
-	getline.c			\
-	gets.c 				\
-	iprintf.c 			\
-	makebuf.c			\
-	perror.c 			\
-	printf.c 			\
-	putc.c 				\
-	putchar.c 			\
-	putc_u.c			\
-	putchar_u.c			\
-	puts.c 				\
-	refill.c 			\
-	remove.c 			\
-	rename.c 			\
-	rewind.c 			\
-	rget.c 				\
-	scanf.c 			\
-	setbuf.c 			\
-	setbuffer.c 			\
-	setlinebuf.c 			\
-	setvbuf.c 			\
-	siprintf.c 			\
-	snprintf.c			\
-	sprintf.c 			\
-	sscanf.c 			\
-	stdio.c 			\
-	tmpfile.c 			\
-	tmpnam.c 			\
-	ungetc.c 			\
-	vfscanf.c 			\
-	vprintf.c 			\
-	vscanf.c			\
-	vsnprintf.c			\
-	vsprintf.c 			\
-	vsscanf.c			\
-	wbuf.c 				\
-	wsetup.c 
+GENERAL_SOURCES =  	clearerr.c 				fclose.c 				fdopen.c 				feof.c 					ferror.c 				fflush.c 				fgetc.c 				fgetpos.c 				fgets.c 				fileno.c				findfp.c 				fiprintf.c 				flags.c 				fopen.c 				fprintf.c 				fputc.c 				fputs.c 				fread.c 				freopen.c 				fscanf.c 				fseek.c 				fsetpos.c 				ftell.c 				fvwrite.c 				fwalk.c 				fwrite.c 				getc.c 					getchar.c 				getc_u.c				getchar_u.c				getdelim.c				getline.c				gets.c 					iprintf.c 				makebuf.c				perror.c 				printf.c 				putc.c 					putchar.c 				putc_u.c				putchar_u.c				puts.c 					refill.c 				remove.c 				rename.c 				rewind.c 				rget.c 					scanf.c 				setbuf.c 				setbuffer.c 				setlinebuf.c 				setvbuf.c 				siprintf.c 				snprintf.c				sprintf.c 				sscanf.c 				stdio.c 				tmpfile.c 				tmpnam.c 				ungetc.c 				vfscanf.c 				vprintf.c 				vscanf.c				vsnprintf.c				vsprintf.c 				vsscanf.c				wbuf.c 					wsetup.c 
 
 @ELIX_LEVEL_1_TRUE@LIB_OBJS = 
-@ELIX_LEVEL_1_FALSE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@\
-@ELIX_LEVEL_1_FALSE@	asprintf.$(oext)		\
-@ELIX_LEVEL_1_FALSE@	fcloseall.$(oext)		\
-@ELIX_LEVEL_1_FALSE@	fseeko.$(oext) 			\
-@ELIX_LEVEL_1_FALSE@	ftello.$(oext) 			\
-@ELIX_LEVEL_1_FALSE@	getw.$(oext)			\
-@ELIX_LEVEL_1_FALSE@	mktemp.$(oext) 			\
-@ELIX_LEVEL_1_FALSE@	putw.$(oext) 			\
-@ELIX_LEVEL_1_FALSE@	vasprintf.$(oext)
+@ELIX_LEVEL_1_FALSE@LIB_OBJS = 	asprintf.$(oext)			fcloseall.$(oext)			fseeko.$(oext) 				ftello.$(oext) 				getw.$(oext)				mktemp.$(oext) 				putw.$(oext) 				vasprintf.$(oext)
 
 LIBADD_OBJS = vfiprintf.$(oext) vfprintf.$(oext)
 
 libstdio_la_LDFLAGS = -Xcompiler -nostdlib
 
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libstdio.la
-@USE_LIBTOOL_TRUE@libstdio_la_SOURCES = @USE_LIBTOOL_TRUE@$(GENERAL_SOURCES)
-@USE_LIBTOOL_TRUE@libstdio_la_LIBADD = @USE_LIBTOOL_TRUE@$(LIBADD_OBJS) $(LIB_OBJS)
-@USE_LIBTOOL_TRUE@libstdio_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@$(LIBADD_OBJS) $(LIB_OBJS)
-@USE_LIBTOOL_TRUE@LIB_COMPILE = @USE_LIBTOOL_TRUE@$(LTCOMPILE)
-@USE_LIBTOOL_FALSE@LIB_COMPILE = @USE_LIBTOOL_FALSE@$(COMPILE)
-@USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libstdio.la
+@USE_LIBTOOL_TRUE@libstdio_la_SOURCES = $(GENERAL_SOURCES)
+@USE_LIBTOOL_TRUE@libstdio_la_LIBADD = $(LIBADD_OBJS) $(LIB_OBJS)
+@USE_LIBTOOL_TRUE@libstdio_la_DEPENDENCIES = $(LIBADD_OBJS) $(LIB_OBJS)
+@USE_LIBTOOL_TRUE@LIB_COMPILE = $(LTCOMPILE)
+@USE_LIBTOOL_FALSE@LIB_COMPILE = $(COMPILE)
+@USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
-@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(GENERAL_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(LIBADD_OBJS) $(LIB_OBJS)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(LIBADD_OBJS) $(LIB_OBJS)
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIBADD_OBJS) $(LIB_OBJS)
+@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIBADD_OBJS) $(LIB_OBJS)
 
-CHEWOUT_FILES = \
-	clearerr.def		\
-	fclose.def		\
-	fcloseall.def		\
-	fdopen.def		\
-	feof.def		\
-	ferror.def		\
-	fflush.def		\
-	fgetc.def		\
-	fgetpos.def		\
-	fgets.def		\
-	fileno.def		\
-	fiprintf.def		\
-	fopen.def		\
-	fputc.def		\
-	fputs.def		\
-	fread.def		\
-	freopen.def		\
-	fseek.def		\
-	fsetpos.def		\
-	ftell.def		\
-	fwrite.def		\
-	getc.def		\
-	getchar.def		\
-	getc_u.def		\
-	getchar_u.def		\
-	getdelim.def		\
-	getline.def		\
-	gets.def		\
-	getw.def		\
-	iprintf.def		\
-	mktemp.def		\
-	perror.def		\
-	putc.def		\
-	putchar.def		\
-	putc_u.def		\
-	putchar_u.def		\
-	puts.def		\
-	putw.def		\
-	remove.def		\
-	rename.def		\
-	rewind.def		\
-	setbuf.def		\
-	setbuffer.def		\
-	setlinebuf.def		\
-	setvbuf.def		\
-	siprintf.def		\
-	sprintf.def		\
-	sscanf.def		\
-	tmpfile.def		\
-	tmpnam.def		\
-	vfprintf.def		\
-	vfscanf.def
+CHEWOUT_FILES =  	clearerr.def			fclose.def			fcloseall.def			fdopen.def			feof.def			ferror.def			fflush.def			fgetc.def			fgetpos.def			fgets.def			fileno.def			fiprintf.def			fopen.def			fputc.def			fputs.def			fread.def			freopen.def			fseek.def			fsetpos.def			ftell.def			fwrite.def			getc.def			getchar.def			getc_u.def			getchar_u.def			getdelim.def			getline.def			gets.def			getw.def			iprintf.def			mktemp.def			perror.def			putc.def			putchar.def			putc_u.def			putchar_u.def			puts.def			putw.def			remove.def			rename.def			rewind.def			setbuf.def			setbuffer.def			setlinebuf.def			setvbuf.def			siprintf.def			sprintf.def			sscanf.def			tmpfile.def			tmpnam.def			vfprintf.def			vfscanf.def
 
 
 SUFFIXES = .def

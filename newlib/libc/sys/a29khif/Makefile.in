@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p6 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -89,41 +89,7 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 noinst_LIBRARIES = lib.a
 
-lib_a_SOURCES = \
-	_alloc.s	\
-	_close.s	\
-	_cycles.s	\
-	_exit.s		\
-	_getpsiz.s	\
-	_gettz.s	\
-	_ioctl.s	\
-	_iostat.s	\
-	_iowait.s	\
-	_lseek.s	\
-	_open.s		\
-	_query.s	\
-	_read.s		\
-	_setim.s	\
-	_settrap.s	\
-	_setvec.s	\
-	_tmpnam.s	\
-	_write.s	\
-	alloc.s		\
-	clock.s		\
-	getargs.s	\
-	getenv.s	\
-	read.s		\
-	remove.s	\
-	rename.s	\
-	signal.s	\
-	_sbrk.s 	\
-	_fstat.s 	\
-	_isatty.s 	\
-	systime.s	\
-	vec.s		\
-	kill.c		\
-	getpid.c	\
-	stubs.s
+lib_a_SOURCES =  	_alloc.s		_close.s		_cycles.s		_exit.s			_getpsiz.s		_gettz.s		_ioctl.s		_iostat.s		_iowait.s		_lseek.s		_open.s			_query.s		_read.s			_setim.s		_settrap.s		_setvec.s		_tmpnam.s		_write.s		alloc.s			clock.s			getargs.s		getenv.s		read.s			remove.s		rename.s		signal.s		_sbrk.s 		_fstat.s 		_isatty.s 		systime.s		vec.s			kill.c			getpid.c		stubs.s
 
 
 ACLOCAL_AMFLAGS = -I ../../..

@@ -56,6 +56,24 @@ AC_ARG_ENABLE(newlib-mb,
   *)   AC_MSG_ERROR(bad value ${enableval} for newlib-mb option) ;;
  esac], [newlib_mb=])dnl
 
+dnl Support --enable-newlib-iconv
+AC_ARG_ENABLE(newlib-iconv,
+[  --enable-newlib-iconv     enable iconv library support],
+[case "${enableval}" in
+  yes) newlib_iconv=yes ;;
+  no)  newlib_iconv=no ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-iconv option) ;;
+ esac], [newlib_iconv=])dnl
+
+dnl Support --enable-newlib-builtin-converters
+AC_ARG_ENABLE(newlib-builtin-converters,
+[  --enable-newlib-builtin-converters   enable specific comma-separated list of iconv converters to be built-in],
+[if test x${enableval} = x; then
+   AC_MSG_ERROR(bad value ${enableval} for newlib-builtin-converters option - use comma-separated list)
+ fi
+ builtin_converters=${enableval}
+ ], [builtin_converters=])dnl
+
 dnl Support --enable-newlib-multithread
 AC_ARG_ENABLE(newlib-multithread,
 [  --enable-newlib-multithread        enable support for multiple threads],
@@ -86,6 +104,16 @@ AC_ARG_ENABLE(newlib-io-float,
   *)   AC_MSG_ERROR(bad value ${enableval} for newlib-io-float option) ;;
  esac], [newlib_io_float=yes])dnl
 
+dnl Support --disable-newlib-supplied-syscalls
+AC_ARG_ENABLE(newlib-supplied-syscalls,
+[  --disable-newlib-supplied-syscalls disable newlib from supplying syscalls],
+[case "${enableval}" in
+  yes) newlib_may_supply_syscalls=yes ;;
+  no)  newlib_may_supply_syscalls=no ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-supplied-syscalls option) ;;
+ esac], [newlib_may_supply_syscalls=yes])dnl
+
+AM_CONDITIONAL(MAY_SUPPLY_SYSCALLS, test x[$]{newlib_may_supply_syscalls} = xyes)
 
 dnl We may get other options which we don't document:
 dnl --with-target-subdir, --with-multisrctop, --with-multisubdir
@@ -289,6 +317,19 @@ else
 fi
 AC_SUBST($1)])
 
+# Define a conditional.
+
+AC_DEFUN(AM_CONDITIONAL,
+[AC_SUBST($1_TRUE)
+AC_SUBST($1_FALSE)
+if $2; then
+  $1_TRUE=
+  $1_FALSE='#'
+else
+  $1_TRUE='#'
+  $1_FALSE=
+fi])
+
 # Add --enable-maintainer-mode option to configure.
 # From Jim Meyering
 
@@ -308,19 +349,6 @@ AC_DEFUN(AM_MAINTAINER_MODE,
   AC_SUBST(MAINT)dnl
 ]
 )
-
-# Define a conditional.
-
-AC_DEFUN(AM_CONDITIONAL,
-[AC_SUBST($1_TRUE)
-AC_SUBST($1_FALSE)
-if $2; then
-  $1_TRUE=
-  $1_FALSE='#'
-else
-  $1_TRUE='#'
-  $1_FALSE=
-fi])
 
 
 # serial 46 AC_PROG_LIBTOOL
