@@ -1,3 +1,8 @@
+2005-03-17  Hans-Peter Nilsson  <hp@axis.com>
+
+	* configure.host (newlib_cflags) <cris-*-*, crisv32-*-*>: Add
+	-DCOMPACT_CTYPE.
+
 2005-03-06  Ralf Corsepious  <ralf.corsepius@rtems.org>
 
 	* libc/sys/rtems/include/inttypes.h: New file.

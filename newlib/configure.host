@@ -506,7 +506,7 @@ case "${host}" in
 	newlib_cflags="${newlib_cflags} -DNO_EXEC -DSMALL_MEMORY -DMISSING_SYSCALL_NAMES"
 	;;
   cris-*-* | crisv32-*-*)
-	newlib_cflags="${newlib_cflags} -DHAVE_RENAME -DHAVE_GETTIMEOFDAY -D_USE_WRITE"
+	newlib_cflags="${newlib_cflags} -DHAVE_RENAME -DHAVE_GETTIMEOFDAY -D_USE_WRITE -DCOMPACT_CTYPE"
 	syscall_dir=syscalls
 	;;
   crx-*-*)
