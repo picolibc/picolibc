@@ -1,3 +1,8 @@
+2000-02-23  Linas Vepstas <linas@linas.org>
+
+	* config.sub: Add support for Linux/IBM 370.
+	* configure.in: Likewise.
+
 2000-02-22  Nick Clifton  <nickc@cygnus.com>
 
 	* configure.in: Add mips-pe, sh-pe and arm-wince-pe targets.

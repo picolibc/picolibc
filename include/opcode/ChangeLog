@@ -1,3 +1,7 @@
+2000-02-23  Linas Vepstas <linas@linas.org>
+
+	* i370.h: New file.
+
 2000-02-22  Andrew Haley  <aph@cygnus.com>
 
 	* mips.h: (OPCODE_IS_MEMBER): Add comment.

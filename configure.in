@@ -288,6 +288,9 @@ if [ x${shared} = xyes ]; then
     i[3456]86-*-*)
       host_makefile_frag="${host_makefile_frag} config/mh-x86pic"
       ;;
+    i370-*-*)
+      host_makefile_frag="${host_makefile_frag} config/mh-i370pic"
+      ;;
     sparc64-*-*)
       host_makefile_frag="${host_makefile_frag} config/mh-sparcpic"
       ;;

@@ -1,3 +1,7 @@
+2000-02-23  Linas Vepstas <linas@linas.org>
+
+	* i370.h: New file.
+
 2000-02-22  Nick Clifton  <nickc@cygnus.com>
 
 	* common.h (ELF_ST_OTHER): Remove definition.

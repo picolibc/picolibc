@@ -1,7 +1,11 @@
+2000-02-23  Linas Vepstas <linas@linas.org>
+
+	* dis-asm.h (print_insn_i370): Declare.
+
 2000-02-22  Chandra Chavva  <cchavva@cygnus.com>
 
-	* opcode/d30v.h (FLAG_NOT_WITH_ADDSUBppp): Redefined as operation cannot
-	be combined in parallel with ADD/SUBppp.
+	* opcode/d30v.h (FLAG_NOT_WITH_ADDSUBppp): Redefined as operation
+	cannot be combined in parallel with ADD/SUBppp.
 
 Tue Feb 22 15:19:54 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 
