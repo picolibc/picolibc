@@ -134,7 +134,7 @@
 2002-12-13  Christopher Faylor  <cgf@redhat.com>
 
 	Throughout, change fhandler_*::read and fhandler_*::raw_read to void
-	functions whose second arguments are both the lenght and the return
+	functions whose second arguments are both the length and the return
 	value.
 	* fhandler.cc (fhandler_base::read): Rework slightly to use second
 	argument as input/output.  Tweak CRLF stuff.
