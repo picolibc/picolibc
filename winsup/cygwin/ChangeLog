@@ -1,3 +1,7 @@
+Wed Nov 15 01:44:37 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* fork.cc (slow_pid_reuse): Off-by-one.
+
 Wed Nov 15 01:20:24 2000  Christopher Faylor <cgf@cygnus.com>
 
 	Throughout use myself->ppid_handle rather than parent_alive.

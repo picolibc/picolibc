@@ -314,19 +314,21 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
 static void
 slow_pid_reuse (HANDLE h)
 {
-  static NO_COPY HANDLE last_fork_procs[64];
+  static NO_COPY HANDLE last_fork_procs[64] = {0};
   static NO_COPY unsigned nfork_procs = 0;
 
-  if (nfork_procs > (sizeof (last_fork_procs) / sizeof (last_fork_procs [0])))
+  if (nfork_procs >= (sizeof (last_fork_procs) / sizeof (last_fork_procs [0])))
     nfork_procs = 0;
   /* Keep a list of handles to forked processes sitting around to prevent
      Windows from reusing the same pid n times in a row.  Having the same pids
      close in succesion confuses bash.  Keeping a handle open will stop
      windows from reusing the same pid.  */
   if (last_fork_procs[nfork_procs])
-    CloseHandle (last_fork_procs[nfork_procs]);
-  if (!DuplicateHandle (hMainProc, h, hMainProc, &last_fork_procs[nfork_procs],
+    ForceCloseHandle1 (last_fork_procs[nfork_procs], fork_stupidity);
+  if (DuplicateHandle (hMainProc, h, hMainProc, &last_fork_procs[nfork_procs],
 			0, FALSE, DUPLICATE_SAME_ACCESS))
+    ProtectHandle1 (last_fork_procs[nfork_procs], fork_stupidity);
+  else
     {
       last_fork_procs[nfork_procs] = NULL;
       system_printf ("couldn't create last_fork_proc, %E");
