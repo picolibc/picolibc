@@ -4,11 +4,11 @@
 
    Written by Robert Collins <rbtcollins@hotmail.com>
 
-   This file is part of Cygwin.
+This file is part of Cygwin.
 
-   This software is a copyrighted work licensed under the terms of the
-   Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
-   details. */
+This software is a copyrighted work licensed under the terms of the
+Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+details. */
 
 /* to allow this to link into cygwin and the .dll, a little magic is needed. */
 #ifdef __OUTSIDE_CYGWIN__
