@@ -1,3 +1,9 @@
+Thu Feb 22 12:04:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_disk_file::open): Use `inner_suffixes' when
+	resolving real_path.
+	* path.cc (symlink): Ditto for win32_topath.
+
 Wed Feb 21 22:41:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* Makefile.in: Add `-lshell32 -luuid' to link pass for new-cygwin1.dll.

@@ -2297,7 +2297,7 @@ symlink (const char *topath, const char *frompath)
 	}
 #else
       create_shortcut_header ();
-      path_conv win32_topath (topath, PC_SYM_NOFOLLOW);
+      path_conv win32_topath (topath, PC_SYM_NOFOLLOW, inner_suffixes);
       len = strlen (topath);
       unsigned short win_len = strlen (win32_topath.get_win32 ());
       if (WriteFile (h, shortcut_header, SHORTCUT_HDR_SIZE, &written, NULL)
