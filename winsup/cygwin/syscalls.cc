@@ -2175,7 +2175,8 @@ setegid32 (__gid32_t gid)
   cygsid gsid;
   HANDLE ptok;
 
-  if (!(gsid.getfromgr (getgrgid32 (gid))))
+  struct __group32 * gr = getgrgid32 (gid);
+  if (!gr || gr->gr_gid != gid || !gsid.getfromgr (gr))
     {
       set_errno (EINVAL);
       return -1;

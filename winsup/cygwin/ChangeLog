@@ -1,5 +1,10 @@
 2002-06-03  Pierre Humblet <pierre.humblet@ieee.org>
 
+	* syscalls.cc (setegid32): Verify the correctness of the gid
+	of the group returned by getgrgid32.
+
+2002-06-03  Pierre Humblet <pierre.humblet@ieee.org>
+
 	* security.cc (lsa2wchar): Suppressed.
 	(get_lsa_srv_inf): Suppressed.
 	(get_logon_server_and_user_domain): Suppressed.
