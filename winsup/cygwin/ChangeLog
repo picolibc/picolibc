@@ -1,3 +1,14 @@
+Sun Jul 16 13:23:04 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* acconfig.h: Add support for NEWVFORK.
+	* config.h.in: Ditto.
+	* configure.in: Add --enable-vfork option.
+	* configure: Regenerate.
+	* dcrt0.cc (quoted): Detect and fix up quoted backslashes.
+	* sigproc.cc (proc_subproc): Correctly name handle of newly added child
+	process to avoid erroneous debugging messages about closing the wrong
+	handle.
+
 Sun Jul 16 02:30:09 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* spawn.cc (spawn_guts): Use \ for quoting '"'.

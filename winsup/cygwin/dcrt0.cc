@@ -313,7 +313,12 @@ quoted (char *cmd, int winshell)
   p = cmd + 1;
   while (*p)
     {
-      if (*p != quote)
+      if (*p == '\\' && p[1] == '\\')
+	{
+	  strcpy (p, p + 1);
+	  p++;
+	}
+      else if (*p != quote)
 	p++;
       else if (p[-1] == '\\')
 	strcpy (p - 1, p);

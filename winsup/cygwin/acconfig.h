@@ -9,3 +9,6 @@
 
 /* Define if building thread-safe Cygwin DLL.  */
 #undef _MT_SAFE
+
+/* Define if using new vfork functionality. */
+#undef NEWVFORK

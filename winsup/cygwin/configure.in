@@ -161,6 +161,14 @@ no)	 ;;
 esac
 ])
 
+AC_ARG_ENABLE(vfork,
+[ --enable-vfork		Build a cygwin DLL which uses experimental vfork code],
+[case "${enableval}" in
+yes)	 AC_DEFINE(NEWVFORK) ;;
+no)	 ;;
+esac
+])
+
 
 dnl The only time we might want to transform the install names
 dnl is for unix x cygwin.  Otherwise we don't.  For now we don't

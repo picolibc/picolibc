@@ -274,7 +274,7 @@ proc_subproc (DWORD what, DWORD val)
 
       pchildren[nchildren] = vchild;
       hchildren[nchildren] = vchild->hProcess;
-      ProtectHandle (vchild->hProcess);
+      ProtectHandle1 (vchild->hProcess, childhProc);
       sip_printf ("added pid %d to wait list, slot %d, winpid %p, handle %p",
 		  vchild->pid, nchildren, vchild->dwProcessId,
 		  vchild->hProcess);
