@@ -1,3 +1,21 @@
+Mon Jan 15 20:34:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* mmap.cc: include <unistd.h>. Define some bit operations for
+	the new page map.
+	(mmap_record): Change type of base_address_ to caddr_t.
+	Add map_map_ member. Add several methods to manipulate map_map_.
+	(mmap_record::alloc_map): New method.
+	(mmap_record::free_map): Ditto.
+	(mmap_record::find_empty): Ditto.
+	(mmap_record::map_map): Ditto.
+	(mmap_record::unmap_map): Ditto.
+	(list::add_record): Change return type to `mmap_record *'.
+	Allocate page map.
+	(list::match): New method.
+	(mmap): Partly rewritten to take care for the new page map. Add some
+	parameter checking.
+	(munmap): Ditto.
+
 Mon Jan 15 13:50:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* heap.cc (heap_init): Fix extern declaration of getpagesize.

@@ -9,6 +9,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include <unistd.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <sys/mman.h>
@@ -20,6 +21,15 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include "security.h"
+
+#define PAGE_CNT(bytes) howmany(bytes,getpagesize())
+
+#define PGBITS		(sizeof(DWORD)*8)
+#define MAPSIZE(pages)	howmany(pages,PGBITS)
+
+#define MAP_SET(n)	(map_map_[(n)/PGBITS] |= (1L << ((n) % PGBITS)))
+#define MAP_CLR(n)	(map_map_[(n)/PGBITS] &= ~(1L << ((n) % PGBITS)))
+#define MAP_ISSET(n)	(map_map_[(n)/PGBITS] & (1L << ((n) % PGBITS)))
 
 /*
  * Simple class used to keep a record of all current
@@ -35,12 +45,13 @@ class mmap_record
     DWORD access_mode_;
     DWORD offset_;
     DWORD size_to_map_;
-    void *base_address_;
+    caddr_t base_address_;
+    DWORD *map_map_;
 
   public:
-    mmap_record (int fd, HANDLE h, DWORD ac, DWORD o, DWORD s, void *b) :
+    mmap_record (int fd, HANDLE h, DWORD ac, DWORD o, DWORD s, caddr_t b) :
        fdesc_ (fd), mapping_handle_ (h), access_mode_ (ac), offset_ (o),
-       size_to_map_ (s), base_address_ (b) { ; }
+       size_to_map_ (s), base_address_ (b) , map_map_ (NULL) { ; }
 
     /* Default Copy constructor/operator=/destructor are ok */
 
@@ -50,8 +61,115 @@ class mmap_record
     DWORD get_access () const { return access_mode_; }
     DWORD get_offset () const { return offset_; }
     DWORD get_size () const { return size_to_map_; }
-    void *get_address () const { return base_address_; }
+    caddr_t get_address () const { return base_address_; }
+    DWORD *get_map () const { return map_map_; }
+
+    void alloc_map ()
+      {
+        /* Allocate one bit per page */
+        map_map_ = (DWORD *) calloc (MAPSIZE(PAGE_CNT (size_to_map_)),
+				     sizeof (DWORD));
+	if (os_being_run == winNT)
+	  {
+	    DWORD old_prot;
+	    if (!VirtualProtect (base_address_, size_to_map_,
+	                         PAGE_NOACCESS, &old_prot))
+	      syscall_printf ("-1 = alloc_map (): %E");
+          }
+      }
+    void free_map () { if (map_map_) free (map_map_); }
+
+    DWORD find_empty (DWORD pages);
+    DWORD map_map (DWORD off, DWORD len);
+    BOOL unmap_map (caddr_t addr, DWORD len);
 };
+
+DWORD
+mmap_record::find_empty (DWORD pages)
+{
+  DWORD mapped_pages = PAGE_CNT (size_to_map_);
+  DWORD start;
+
+  for (start = 0; start < mapped_pages - pages; ++start)
+    if (!MAP_ISSET (start))
+      {
+        DWORD cnt;
+        for (cnt = 0; cnt < pages; ++cnt)
+	  if (MAP_ISSET (start + cnt))
+	    break;
+        if (cnt >= pages)
+	  return start;
+      }
+  return (DWORD)-1;
+}
+
+DWORD
+mmap_record::map_map (DWORD off, DWORD len)
+{
+  DWORD prot, old_prot;
+  switch (access_mode_)
+    {
+    case FILE_MAP_WRITE:
+      prot = PAGE_READWRITE;
+      break;
+    case FILE_MAP_READ:
+      prot = PAGE_READONLY;
+      break;
+    default:
+      prot = PAGE_WRITECOPY;
+      break;
+    }
+
+  len = PAGE_CNT (len);
+  if (fdesc_ == -1 && !off)
+    {
+      off = find_empty (len);
+      if (off != (DWORD)-1)
+        {
+	  if (os_being_run == winNT
+              && !VirtualProtect (base_address_ + off * getpagesize (),
+	                          len * getpagesize (), prot, &old_prot))
+	    syscall_printf ("-1 = map_map (): %E");
+
+	  while (len-- > 0)
+	    MAP_SET (off + len);
+	  return off * getpagesize ();
+	}
+      return 0L;
+    }
+  off -= offset_;
+  DWORD start = off / getpagesize ();
+  if (os_being_run == winNT
+      && !VirtualProtect (base_address_ + start * getpagesize (),
+		          len * getpagesize (), prot, &old_prot))
+    syscall_printf ("-1 = map_map (): %E");
+
+  for (; len-- > 0; ++start)
+    MAP_SET (start);
+  return off;
+}
+
+BOOL
+mmap_record::unmap_map (caddr_t addr, DWORD len)
+{
+  DWORD old_prot;
+  DWORD off = addr - base_address_;
+  off /= getpagesize ();
+  len = PAGE_CNT (len);
+  if (os_being_run == winNT
+      && !VirtualProtect (base_address_ + off * getpagesize (),
+		          len * getpagesize (), PAGE_NOACCESS, &old_prot))
+    syscall_printf ("-1 = unmap_map (): %E");
+
+  for (; len-- > 0; ++off)
+    MAP_CLR (off);
+  /* Return TRUE if all pages are free'd which may result in unmapping
+     the whole chunk. */
+  for (len = MAPSIZE(PAGE_CNT (size_to_map_)); len > 0; )
+    if (map_map_[--len])
+      return FALSE;
+  return TRUE;
+}
 
 class list {
 public:
@@ -60,8 +178,10 @@ public:
   int fd;
   list ();
   ~list ();
-  void add_record (mmap_record r);
+  mmap_record *add_record (mmap_record r);
   void erase (int i);
+  mmap_record *match (DWORD off, DWORD len);
+  off_t match (caddr_t addr, DWORD len, off_t start);
 };
 
 list::list ()
@@ -74,10 +194,12 @@ list::list ()
 
 list::~list ()
 {
+  for (mmap_record *rec = recs; nrecs-- > 0; ++rec)
+    rec->free_map ();
   free (recs);
 }
 
-void
+mmap_record *
 list::add_record (mmap_record r)
 {
   if (nrecs == maxrecs)
@@ -85,12 +207,47 @@ list::add_record (mmap_record r)
       maxrecs += 5;
       recs = (mmap_record *) realloc (recs, maxrecs * sizeof (mmap_record));
     }
-  recs[nrecs++] = r;
+  recs[nrecs] = r;
+  recs[nrecs].alloc_map ();
+  return recs + nrecs++;
+}
+
+/* Used in mmap() */
+mmap_record *
+list::match (DWORD off, DWORD len)
+{
+  if (fd == -1 && !off)
+    {
+      len = PAGE_CNT (len);
+      for (int i = 0; i < nrecs; ++i)
+	if (recs[i].find_empty (len) != (DWORD)-1)
+	  return recs + i;
+    }
+  else
+    {
+      for (int i = 0; i < nrecs; ++i)
+	if (off >= recs[i].get_offset ()
+	    && off + len <= recs[i].get_offset () + recs[i].get_size ())
+	  return recs + i;
+    }
+  return NULL;
+}
+
+/* Used in munmap() */
+off_t
+list::match (caddr_t addr, DWORD len, off_t start)
+{
+  for (int i = start + 1; i < nrecs; ++i)
+    if (addr >= recs[i].get_address ()
+        && addr + len <= recs[i].get_address () + recs[i].get_size ())
+      return i;
+  return (off_t)-1;
 }
 
 void
 list::erase (int i)
 {
+  recs[i].free_map ();
   for (; i < nrecs-1; i++)
     recs[i] = recs[i+1];
   nrecs--;
@@ -167,9 +324,27 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
   syscall_printf ("addr %x, len %d, prot %x, flags %x, fd %d, off %d",
 		  addr, len, prot, flags, fd, off);
 
+  static DWORD granularity;
+  if (!granularity)
+    {
+      SYSTEM_INFO si;
+      GetSystemInfo (&si);
+      granularity = si.dwAllocationGranularity;
+    }
+
   DWORD access = (prot & PROT_WRITE) ? FILE_MAP_WRITE : FILE_MAP_READ;
   if (flags & MAP_PRIVATE)
     access = FILE_MAP_COPY;
+
+  /* Error conditions according to SUSv2 */
+  if (off % getpagesize ()
+      || ((flags & MAP_FIXED) && ((DWORD)addr % granularity))
+      || !len)
+    {
+      set_errno (EINVAL);
+      syscall_printf ("-1 = mmap(): Invalid parameters");
+      return MAP_FAILED;
+    }
 
   SetResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
 
@@ -183,7 +358,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
     {
       set_errno (EINVAL);
       syscall_printf ("-1 = mmap(): win95 and MAP_FIXED");
-      return (caddr_t) -1;
+      return MAP_FAILED;
     }
 #endif
 
@@ -195,21 +370,43 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
 	{
 	  set_errno (ENOMEM);
 	  syscall_printf ("-1 = mmap(): ENOMEM");
-	  return (caddr_t) -1;
+	  ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
+	  return MAP_FAILED;
 	}
     }
+
+  if (flags & MAP_ANONYMOUS)
+    fd = -1;
+
+  /* First check if this mapping matches into the chunk of another
+     already performed mapping. */
+  list *l = mmapped_areas->get_list_by_fd (fd);
+  if (l)
+    {
+      mmap_record *rec;
+      if ((rec = l->match (off, len)) != NULL)
+        {
+	  off = rec->map_map (off, len);
+	  caddr_t ret = rec->get_address () + off;
+	  syscall_printf ("%x = mmap() succeeded", ret);
+	  ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
+	  return ret;
+	}
+    }
+
+  /* Map always in multipliers of `granularity'-sized chunks. */
+  DWORD gran_off = off & ~(granularity - 1);
+  DWORD gran_len = howmany (len, granularity) * granularity;
 
   fhandler_disk_file fh_paging_file (NULL);
   fhandler_base *fh;
   caddr_t base = addr;
   HANDLE h;
 
-  if ((flags & MAP_ANONYMOUS) || fd == -1)
+  if (fd == -1)
     {
       fh_paging_file.set_io_handle (INVALID_HANDLE_VALUE);
       fh = &fh_paging_file;
-      /* Ensure that fd is recorded as -1 */
-      fd = -1;
     }
   else
     {
@@ -219,12 +416,19 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
 	  set_errno (EBADF);
 	  syscall_printf ("-1 = mmap(): EBADF");
 	  ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
-	  return (caddr_t) -1;
+	  return MAP_FAILED;
 	}
       fh = fdtab[fd];
+      if (fh->get_device () == FH_DISK)
+        {
+	  DWORD fsiz = GetFileSize (fh->get_handle (), NULL);
+	  fsiz -= gran_off;
+	  if (gran_len > fsiz)
+	    gran_len = fsiz;
+	}
     }
 
-  h = fh->mmap (&base, len, access, flags, off);
+  h = fh->mmap (&base, gran_len, access, flags, gran_off);
 
   if (h == INVALID_HANDLE_VALUE)
     {
@@ -232,22 +436,22 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
       return MAP_FAILED;
     }
 
-  /* Now we should have a successfully mmaped area.
+  /* Now we should have a successfully mmapped area.
      Need to save it so forked children can reproduce it.
   */
-  mmap_record mmap_rec (fd, h, access, off, len, base);
+  gran_len = PAGE_CNT (gran_len) * getpagesize ();
+  mmap_record mmap_rec (fd, h, access, gran_off, gran_len, base);
 
   /* Get list of mmapped areas for this fd, create a new one if
      one does not exist yet.
   */
-  list *l = mmapped_areas->get_list_by_fd (fd);
   if (l == 0)
     {
       /* Create a new one */
       l = new list;
       if (l == 0)
         {
-          fh->munmap (h, base, len);
+          fh->munmap (h, base, gran_len);
           set_errno (ENOMEM);
           syscall_printf ("-1 = mmap(): ENOMEM");
           ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
@@ -257,11 +461,12 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
   }
 
   /* Insert into the list */
-  l->add_record (mmap_rec);
-
-  syscall_printf ("%x = mmap() succeeded", base);
+  mmap_record *rec = l->add_record (mmap_rec);
+  off = rec->map_map (off, len);
+  caddr_t ret = rec->get_address () + off;
+  syscall_printf ("%x = mmap() succeeded", ret);
   ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
-  return base;
+  return ret;
 }
 
 /* munmap () removes an mmapped area.  It insists that base area
@@ -272,6 +477,14 @@ int
 munmap (caddr_t addr, size_t len)
 {
   syscall_printf ("munmap (addr %x, len %d)", addr, len);
+
+  /* Error conditions according to SUSv2 */
+  if (((DWORD)addr % getpagesize ()) || !len)
+    {
+      set_errno (EINVAL);
+      syscall_printf ("-1 = munmap(): Invalid parameters");
+      return -1;
+    }
 
   SetResourceLock(LOCK_MMAP_LIST,WRITE_LOCK|READ_LOCK," munmap");
   /* Check if a mmap'ed area was ever created */
@@ -292,11 +505,12 @@ munmap (caddr_t addr, size_t len)
       list *l = mmapped_areas->lists[it];
       if (l != 0)
 	{
-	  for (int li = 0; li < l->nrecs; ++li)
+	  off_t li = -1;
+	  while ((li = l->match(addr, len, li)) >= 0)
 	    {
-	      mmap_record rec = l->recs[li];
-	      if (rec.get_address () == addr && rec.get_size () == len)
-		{
+	      mmap_record *rec = l->recs + li;
+	      if (rec->unmap_map (addr, len))
+	        {
                   int fd = l->fd;
                   fhandler_disk_file fh_paging_file (NULL);
                   fhandler_base *fh;
@@ -308,17 +522,17 @@ munmap (caddr_t addr, size_t len)
                     }
                   else
                     fh = fdtab[fd];
-                  fh->munmap (rec.get_handle (), addr, len);
+                  fh->munmap (rec->get_handle (), addr, len);
 
 		  /* Delete the entry. */
 		  l->erase (li);
-		  syscall_printf ("0 = munmap(): %x", addr);
-		  ReleaseResourceLock(LOCK_MMAP_LIST,WRITE_LOCK|READ_LOCK," munmap");
-		  return 0;
 		}
-	     }
-	 }
-     }
+	      syscall_printf ("0 = munmap(): %x", addr);
+	      ReleaseResourceLock(LOCK_MMAP_LIST,WRITE_LOCK|READ_LOCK," munmap");
+	      return 0;
+	    }
+	}
+    }
 
   set_errno (EINVAL);
   syscall_printf ("-1 = munmap(): EINVAL");
