@@ -70,9 +70,9 @@ struct pa_opcode
 
    In the args field, the following characters are unused:
 
-	'  "#  &     -  /   34 6789:;< > @'
-	'  C      JK            XY [\]  '
-	'   de                   y   } '
+	'  "   &     -  /   34 6789:;< > @'
+	'  C      JK             Y [\]  '
+	'    e                   y   } '
 
    Here are all the characters:
 
@@ -151,11 +151,15 @@ Also these:
    _    Destination format completer for fcnv
    h    cbit for fcmp
    =    gfx tests for ftest
+   d    14bit offset for single precision FP long load/store.
+   #    14bit offset for double precision FP load long/store.
 
 Completer operands all have 'c' as the prefix:
 
    cx   indexed load completer.
    cm   short load and store completer.
+   cq   short load and store completer (like cm, but inserted into a
+	different location in the target instruction).
    cs   store bytes short completer.
 
    cw	read/write completer for PROBE
@@ -282,6 +286,8 @@ static const struct pa_opcode pa_opcodes[] =
 { "ldd",        0x0c0000c0, 0xfc001fc0, "cxx(b),t", pa20, FLAG_STRICT},
 { "ldd",	0x0c0010c0, 0xfc001fc0, "cm5(s,b),t", pa20, FLAG_STRICT},
 { "ldd",	0x0c0010c0, 0xfc001fc0, "cm5(b),t", pa20, FLAG_STRICT},
+{ "ldd",        0x50000000, 0xfc000002, "cq#(s,b),x", pa20, FLAG_STRICT},
+{ "ldd",        0x50000000, 0xfc000002, "cq#(b),x", pa20, FLAG_STRICT},
 { "ldw",        0x0c000080, 0xfc001fc0, "cxx(s,b),t", pa10, FLAG_STRICT},
 { "ldw",        0x0c000080, 0xfc001fc0, "cxx(b),t", pa10, FLAG_STRICT},
 { "ldw",	0x0c001080, 0xfc001fc0, "cm5(s,b),t", pa10, FLAG_STRICT},
@@ -302,6 +308,8 @@ static const struct pa_opcode pa_opcodes[] =
 { "ldb",        0x40000000, 0xfc000000, "j(b),x", pa10},
 { "std",	0x0c0012c0, 0xfc001fc0, "cmx,V(s,b)", pa20, FLAG_STRICT},
 { "std",	0x0c0012c0, 0xfc001fc0, "cmx,V(b)", pa20, FLAG_STRICT},
+{ "std",        0x70000000, 0xfc000002, "cqx,#(s,b)", pa20, FLAG_STRICT},
+{ "std",        0x70000000, 0xfc000002, "cqx,#(b)", pa20, FLAG_STRICT},
 { "stw",	0x0c001280, 0xfc001fc0, "cmx,V(s,b)", pa10, FLAG_STRICT},
 { "stw",	0x0c001280, 0xfc001fc0, "cmx,V(b)", pa10, FLAG_STRICT},
 { "stw",        0x68000000, 0xfc000000, "x,j(s,b)", pa10},
@@ -622,6 +630,8 @@ static const struct pa_opcode pa_opcodes[] =
 { "fldd",       0x2c000000, 0xfc001fc0, "cxx(b),ft", pa10, FLAG_STRICT},
 { "fldd",       0x2c001000, 0xfc001fc0, "cm5(s,b),ft", pa10, FLAG_STRICT},
 { "fldd",       0x2c001000, 0xfc001fc0, "cm5(b),ft", pa10, FLAG_STRICT},
+{ "fldd",       0x50000002, 0xfc000002, "cq#(s,b),x", pa20, FLAG_STRICT},
+{ "fldd",       0x50000002, 0xfc000002, "cq#(b),x", pa20, FLAG_STRICT},
 { "fstw",       0x24000200, 0xfc001f80, "cxfT,x(s,b)", pa10, FLAG_STRICT},
 { "fstw",       0x24000200, 0xfc001f80, "cxfT,x(b)", pa10, FLAG_STRICT},
 { "fstw",       0x24001200, 0xfc001f80, "cmfT,5(s,b)", pa10, FLAG_STRICT},
@@ -630,6 +640,8 @@ static const struct pa_opcode pa_opcodes[] =
 { "fstd",       0x2c000200, 0xfc001fc0, "cxft,x(b)", pa10, FLAG_STRICT},
 { "fstd",       0x2c001200, 0xfc001fc0, "cmft,5(s,b)", pa10, FLAG_STRICT},
 { "fstd",       0x2c001200, 0xfc001fc0, "cmft,5(b)", pa10, FLAG_STRICT},
+{ "fstd",       0x70000002, 0xfc000002, "cqx,#(s,b)", pa20, FLAG_STRICT},
+{ "fstd",       0x70000002, 0xfc000002, "cqx,#(b)", pa20, FLAG_STRICT},
 { "fldwx",      0x24000000, 0xfc001f80, "cxx(s,b),fT", pa10},
 { "fldwx",      0x24000000, 0xfc001f80, "cxx(b),fT", pa10},
 { "flddx",      0x2c000000, 0xfc001fc0, "cxx(s,b),ft", pa10},
