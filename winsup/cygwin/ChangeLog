@@ -1,3 +1,16 @@
+2001-10-24  Christopher Faylor  <cgf@redhat.com>
+
+	* shared_info.h (MOUNT_VERSION): Change to a smaller, still arbitrary
+	number.
+	* shared.cc (open_shared): Accept a number to denote the shared memory
+	region.
+	(memory_init): Use shared memory version as part of the object name of
+	the shared region.  Ditto for the mount table.
+	* path.cc (CYGWIN_REGNAME): New define used in place of
+	CYGWIN_INFO_CYGWIN_REGISTRY_NAME throughout.
+	* external.cc (cygwin_internal): Implement CW_[GS]ET_CYGWIN_REGISTRY_NAME.
+	* cygheap.h (init_cygheap::cygwin_regname): New element.
+
 2001-10-23  Christopher Faylor  <cgf@redhat.com>
 
 	Ensure that all fhandler_*::read definitions are __stdcall throughout.
