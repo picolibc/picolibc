@@ -686,7 +686,8 @@ interrupt_setup (int sig, void *handler, DWORD retaddr, DWORD *retaddr_on_stack,
   sigsave.retaddr = retaddr;
   sigsave.retaddr_on_stack = retaddr_on_stack;
   /* FIXME: Not multi-thread aware */
-  sigsave.newmask = myself->getsigmask () | siga.sa_mask | SIGTOMASK (sig);
+  sigsave.oldmask = myself->getsigmask ();
+  sigsave.newmask = sigsave.oldmask | siga.sa_mask | SIGTOMASK (sig);
   sigsave.sa_flags = siga.sa_flags;
   sigsave.func = (void (*)(int)) handler;
   sigsave.sig = sig;
