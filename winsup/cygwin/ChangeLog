@@ -1,5 +1,10 @@
 2003-05-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (is_at_eof): Fix conditional.  Use INVALID_FILE_SIZE
+	instead of numeric constant.
+
+2003-05-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc (fhandler_socket::connect): Guard calls to
 	sock_event methods by a check for WinSock2 availability.
 	(fhandler_socket::accept): Ditto.

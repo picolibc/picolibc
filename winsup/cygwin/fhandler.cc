@@ -206,7 +206,7 @@ is_at_eof (HANDLE h, DWORD err)
   DWORD size, upper1, curr;
 
   size = GetFileSize (h, &upper1);
-  if (upper1 != 0xffffffff || GetLastError () == NO_ERROR)
+  if (size != INVALID_FILE_SIZE || GetLastError () == NO_ERROR)
     {
       LONG upper2 = 0;
       curr = SetFilePointer (h, 0, &upper2, FILE_CURRENT);
