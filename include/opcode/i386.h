@@ -154,7 +154,7 @@ static const template i386_optab[] = {
 {"push",   1,	0x06, X, Cpu64,	q_Suf|Seg2ShortForm|DefaultSize|NoRex64, { SReg2, 0, 0 } },
 {"push",   1, 0x0fa0, X, Cpu386|Cpu64, q_Suf|Seg3ShortForm|DefaultSize|NoRex64, { SReg3, 0, 0 } },
 
-{"pusha",  0,	0x60, X, Cpu186|Cpu64, wl_Suf|DefaultSize,	{ 0, 0, 0 } },
+{"pusha",  0,	0x60, X, Cpu186|CpuNo64, wl_Suf|DefaultSize,	{ 0, 0, 0 } },
 
 /* Pop instructions.  */
 {"pop",	   1,	0x58, X, CpuNo64,	 wl_Suf|ShortForm|DefaultSize,	{ WordReg, 0, 0 } },
@@ -389,8 +389,10 @@ static const template i386_optab[] = {
 {"ljmp",   1,	0xff, 5, CpuNo64,	 wl_Suf|Modrm,		{ WordMem|JumpAbsolute, 0, 0} },
 {"ljmp",   1,	0xff, 5, Cpu64,	 q_Suf|Modrm|NoRex64,	{ WordMem|JumpAbsolute, 0, 0} },
 
-{"ret",	   0,	0xc3, X, 0,	 wlq_Suf|DefaultSize,	{ 0, 0, 0} },
-{"ret",	   1,	0xc2, X, 0,	 wlq_Suf|DefaultSize,	{ Imm16, 0, 0} },
+{"ret",	   0,	0xc3, X, CpuNo64,wlq_Suf|DefaultSize,	{ 0, 0, 0} },
+{"ret",	   1,	0xc2, X, CpuNo64,wlq_Suf|DefaultSize,	{ Imm16, 0, 0} },
+{"ret",	   0,	0xc3, X, Cpu64,  q_Suf|DefaultSize|NoRex64,{ 0, 0, 0} },
+{"ret",	   1,	0xc2, X, Cpu64,  q_Suf|DefaultSize|NoRex64,{ Imm16, 0, 0} },
 {"lret",   0,	0xcb, X, 0,	 wlq_Suf|DefaultSize,	{ 0, 0, 0} },
 {"lret",   1,	0xca, X, 0,	 wlq_Suf|DefaultSize,	{ Imm16, 0, 0} },
 {"enter",  2,	0xc8, X, Cpu186, wlq_Suf|DefaultSize,	{ Imm16, Imm8, 0} },

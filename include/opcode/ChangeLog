@@ -1,3 +1,7 @@
+Sat Jan 13 09:56:32 MET 2001  Jan Hubicka  <jh@suse.cz>
+
+	* i386.h (i386_optab): Fix pusha and ret templates.
+
 2001-01-11  Peter Targett  <peter.targett@arccores.com>
 
 	* arc.h (ARC_MACH_5, ARC_MACH_6, ARC_MACH_7, ARC_MACH_8): New
