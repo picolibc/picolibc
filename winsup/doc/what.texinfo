@@ -67,19 +67,19 @@ it with their friends, etc.  The Cygwin license allows you those
 freedoms, so it is free software.
 
 The Cygwin 1.0 product was a "commercial" distribution of cygwin.  As
-such, it included such non-software things as printed manuals, support,
-and aggregation of useful utilities.  There was nothing (software-wise)
-in there that you couldn't get off the net already, if you took the time
-to find and download everything (and usually, build it yourself),
-although the @emph{versions} available for download may have been
-different than those distributed with the commercial product.  We tested
-it all to make sure it worked together, and packaged it in a convenient
-form.  We considered such testing and packaging to be a valuable service
-and thus charged a fee for it.  Plus, it provided income for the Cygwin
-project so we could continue working on it.  However, Red Hat is no
-longer offering Cygwin 1.0 on CD, and there are no plans to
-do so again.  The latest news about this can be found at
-@file{http://cygwin.com/cygwin-cd.html}.
+such, it included such non-software things as printed manuals,
+support, and aggregation of useful utilities.  There was nothing
+(software-wise) in there that you couldn't get off the net already, if
+you took the time to find and download everything (and usually, build
+it yourself), although the @emph{versions} available for download may
+have been different than those distributed with the commercial
+product.  We tested it all to make sure it worked together, and
+packaged it in a convenient form.  We considered such testing and
+packaging to be a valuable service and thus charged a fee for it.
+Plus, it provided income for the Cygwin project so we could continue
+working on it.  However, Red Hat is no longer offering Cygwin 1.0 on
+CD, and there are no plans to do so again.  The latest news about this
+can be found at @file{http://cygwin.com/cygwin-cd.html}.
 
 
 @section Recent history of the project: What version @emph{is} this, anyway?
