@@ -190,7 +190,7 @@ MTinterface::Init (int forked)
   threadcount = 1; /* 1 current thread when Init occurs.*/
 
   pthread::initMainThread (&mainthread, myself->hProcess);
-  pthread_mutex::initMutex ();  
+  pthread_mutex::initMutex ();
 
   if (forked)
     return;
