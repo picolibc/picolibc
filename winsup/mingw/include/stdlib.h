@@ -282,7 +282,7 @@ wchar_t**  __p__wpgmptr(void);
  * This variable determines the default file mode.
  * TODO: Which flags work?
  */
-#ifndef __DECLSPEC_SUPPORTED
+#if !defined (__DECLSPEC_SUPPORTED) || defined (__IN_MINGW_RUNTIME)
 
 #ifdef __MSVCRT__
 extern int* _imp___fmode;

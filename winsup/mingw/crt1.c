@@ -26,12 +26,17 @@
  *
  */
 
+/* Hide the declaration of _fmode with dllimport attribute in stdlib.h.
+   This is not necessary with Mumit Khan's patches to gcc's winnt.c,
+   but those patches are still unofficial.  */
+
+#define __IN_MINGW_RUNTIME 
 #include <stdlib.h>
 #include <stdio.h>
 #include <io.h>
-#include <fcntl.h>
 #include <process.h>
 #include <float.h>
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <signal.h>
 
@@ -55,6 +60,13 @@ extern int main (int, char **, char **);
 __MINGW_IMPORT void __set_app_type(int);
 #endif /* __MSVCRT__ */
 
+/*  Global _fmode for this .exe, not the one in msvcrt.dll,
+    The default is set in txtmode.o in libmingw32.a */
+/* Override the dllimport'd declarations in stdlib.h */
+#undef _fmode 
+extern int _fmode; 
+extern int* __p__fmode(void); /* To access the dll _fmode */
+
 /*
  * Setup the default file handles to have the _CRT_fmode mode, as well as
  * any new files created by the user.
@@ -64,7 +76,7 @@ extern int _CRT_fmode;
 static void
 _mingw32_init_fmode ()
 {
-  /* Don't set the file mode if the user hasn't set any value for it. */
+  /* Don't set the std file mode if the user hasn't set any value for it. */
   if (_CRT_fmode)
     {
       _fmode = _CRT_fmode;
@@ -89,6 +101,10 @@ _mingw32_init_fmode ()
 	  _setmode (_fileno (stderr), _CRT_fmode);
 	}
     }
+
+    /*  Now sync  the dll _fmode to the  one for this .exe.  */
+    *__p__fmode() = _fmode;	
+
 }
 
 /* This function will be called when a trap occurs. Thanks to Jacob
@@ -180,8 +196,9 @@ __mingw_CRTStartup ()
   _mingw32_init_mainargs ();
 
   /*
-   * Sets the default file mode for stdin, stdout and stderr, as well
-   * as files later opened by the user, to _CRT_fmode.
+   * Sets the default file mode.
+   * If _CRT_fmode is set, also set mode for stdin, stdout
+   * and stderr, as well
    * NOTE: DLLs don't do this because that would be rude!
    */
   _mingw32_init_fmode ();
@@ -230,6 +247,7 @@ WinMainCRTStartup ()
   __set_app_type (__GUI_APP);
 #endif
   __mingw_CRTStartup ();
+return 0;
 }
 
 /*

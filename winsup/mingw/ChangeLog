@@ -1,3 +1,86 @@
+2002-11-19  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	Merge from mingw trunk, .
+
+	2002-11-09  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/math.h (sqrt): Remove inline definition.
+	(sqrtf): Replace inline definition with prototype.
+	(sqrtl): Likewise.
+	* mingwex/math/sqrtf.c (sqrtf): Set domain error if
+	argument less than zero.
+	* mingwex/math/sqrtf.c (sqrtl): Likewise.
+
+	2002-10-30  Guido Serassio  <serassio@libero.it>
+
+         * include/stdio.h (_getmaxstdio): Add prototype.
+         (_setmaxstdio): Likewise.
+
+	2002-10-19  Kang Li  <rubylith@users.sourceforge.net>
+
+	* include/fcntl.h (O_SEQUENTIAL): Correct typo.
+
+	2002-10-19  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* crt1.c: Define new macro __IN_MINGW_RUNTIME before including
+	stdlib.h.
+	Define WIN32_MEAN_AND_LEAN before including windows.h
+	* include/stdlib.h (_fmode): Protect declaration as dllimported
+	variable with __IN_MINGW_RUNTIME.
+
+	2002-10-19  Igor Pechtchanski  <pechtcha@cs.nyu.edu>
+
+	* crt1.c: Include stdlib.h.
+	
+	2002-10-19  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* Makefile.in (CRT0S): Add txtmode.o binmode.o.
+	(MINGW_OBJS): Add txtmode.o.
+	(SRCDIST_FILES): Add txtmode.c binmode.c.
+	crt1.c: Don't include fcntrl.h, stdlib.h.
+	(_fmode): Declare, without dllimport attribute.
+	(__p__fmode): Declare access function for dll's _fmode.
+	(_mingw32_init_fmode): Sync dll _fmode with staticly linked
+	_fmode for app.
+	* txtmode.c: New file.
+	* binmode.c: New file.
+	* samples/fmode/test2.c: New file.
+	* samples/fmode/jamfile: Add test2.exe target.
+
+	2002-10-11  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/stdint.h (INT64_C, UINT64_C ): Append suffix to let
+	macros work with C89.
+	(INTMAX_C, UINTMAX_C): Likewise.
+
+	2002-10-11  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/string.h (strcasecmp): Make extern __inline__.
+	(strncasecmp): Likewise.
+	(wcscmpi): Likewise.
+
+	2002-10-08  Heiko Gerdau  <hg@technosis.de>
+
+	* include/tchar.h (_tchdir. _tgetcwd, _tgetdcwd.
+	_tmkdir, _trmdir, _tstat): Add ASCII and UNICODE
+	mappings.
+
+	2002-10-07  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/math/powil.c: Rename powil to __powil.
+	* mingwex/math/powl.c: Adjust declaration and call
+	to __powil. Remove comment on powil.
+	* mingwex/math/powi.c: New file.
+	* mingwex/math/powif.c: New file.
+	* mingwex/math/pow.c: New file.
+	* mingwex/math/cephes_mconf.h. Add double and float
+	versions of constants.
+	(polevl): Add double precision function.
+	(p1evl): Likewise.
+	* mingwex/Makefile.in (MATH_DISTFILES): Add pow.c,
+	powi.c, powif.c.
+	(MATH_OBJS): Add pow.o,	powi.o, powif.o.
+
 2002-10-16  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/stdio.h: Qualify another size_t with __CSTD.
@@ -56,7 +139,7 @@
 
 2002-10-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/cytpe.h: Prefix identifiers used as args of inlines
+	* include/ctype.h: Prefix identifiers used as args of inlines
 	with '__', throughout.
 	* include/inttypes.h: Likewise.
 	* include/math.h: Likewise.
@@ -80,7 +163,7 @@
 
 2002-09-28  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/io.h: #include stddef.h with __need_wchat_t.
+	* include/io.h: #include stddef.h with __need_wchar_t.
 	* include/wchar.h (__VA_LIST): Define as __builtin_va_list
 	or char*.
 

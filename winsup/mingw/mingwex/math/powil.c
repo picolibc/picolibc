@@ -1,4 +1,4 @@
-/*							powil.c
+/*							__powil.c
  *
  *	Real raised to integer power, long double precision
  *
@@ -6,10 +6,10 @@
  *
  * SYNOPSIS:
  *
- * long double x, y, powil();
+ * long double x, y, __powil();
  * int n;
  *
- * y = powil( x, n );
+ * y = __powil( x, n );
  *
  *
  *
@@ -36,7 +36,7 @@
  *
  */
 
-/*							powil.c	*/
+/*							__powil.c	*/
 
 /*
 Cephes Math Library Release 2.2:  December, 1990
@@ -66,7 +66,7 @@ long double frexpl();
 #define _SET_ERRNO(x)
 #endif
 
-long double powil( x, nn )
+long double __powil( x, nn )
 long double x;
 int nn;
 {
@@ -126,7 +126,7 @@ else
 
 if( s > MAXLOGL )
 	{
-	mtherr( "powil", OVERFLOW );
+	mtherr( "__powil", OVERFLOW );
 	_SET_ERRNO(ERANGE);
 	y = INFINITYL;
 	goto done;
@@ -134,7 +134,7 @@ if( s > MAXLOGL )
 
 if( s < MINLOGL )
 	{
-	mtherr( "powil", UNDERFLOW );
+	mtherr( "__powil", UNDERFLOW );
 	_SET_ERRNO(ERANGE);
 	return(0.0L);
 	}
