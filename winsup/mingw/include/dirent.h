@@ -73,7 +73,6 @@ struct _wdirent
 	unsigned short	d_reclen;	/* Always zero. */
 	unsigned short	d_namlen;	/* Length of name in d_name. */
 	wchar_t		d_name[FILENAME_MAX]; /* File name. */
-	/* NOTE: The name in the dirent structure points to the name in the	 *       wfinddata_t structure in the _WDIR. */
 };
 
 /*

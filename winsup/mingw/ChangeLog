@@ -1,5 +1,9 @@
 2004-07-30  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/dirent.h (struct _wdirent): Remove obsolete comment.
+
+2004-07-30  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/string.h: Revert 2004-07-26 additions of
 	__ATTRIBUTE_PURE.
 
