@@ -20,6 +20,7 @@ class muto
   HANDLE bruteforce; /* event handle used to control waiting for lock. */
   DWORD tid;	/* Thread Id of lock owner. */
 public:
+  class muto *next;
   void *operator new (size_t, void *p) {return p;}
   void *operator new (size_t) {return ::new muto; }
   void operator delete (void *) {;} /* can't handle allocated mutos
@@ -27,7 +28,7 @@ public:
 
   /* This simple constructor is used for cases where no bruteforce
      event handling is required. */
-  muto(): sync(0), visits(0), waiters(-1), bruteforce(0), tid(0) {;}
+  muto(): sync(0), visits(0), waiters(-1), bruteforce(0), tid(0), next (0) {;}
   /* A more complicated constructor. */
   muto(int inh, const char *name);
   ~muto ();
@@ -40,11 +41,14 @@ public:
   int unstable () {return !tid && (sync || waiters >= 0);}
 };
 
+extern muto muto_start;
+
 /* Use a statically allocated buffer as the storage for a muto */
 #define new_muto(__inh, __name) \
 ({ \
   static NO_COPY char __mbuf[sizeof(class muto) + 100] = {0}; \
-  muto *m; \
-  m = new (__mbuf) muto ((__inh), (__name)); \
-  m; \
+  muto *m = muto_start.next; \
+  muto_start.next = new (__mbuf) muto ((__inh), (__name)); \
+  muto_start.next->next = m; \
+  muto_start.next; \
 })

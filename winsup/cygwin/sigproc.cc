@@ -333,7 +333,10 @@ proc_subproc (DWORD what, DWORD val)
      */
     case PROC_CLEARWAIT:
       /* Clear all "wait"ing threads. */
-      sip_printf ("clear waiting threads");
+      if (val)
+	sip_printf ("clear waiting threads");
+      else
+	sip_printf ("looking for processes to reap");
       clearing = val;
 
     scan_wait:

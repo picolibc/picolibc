@@ -21,8 +21,10 @@ details. */
 #include <stdlib.h>
 #include "winsup.h"
 
+muto muto_start (0, 0);
+
 /* Constructor */
-muto::muto(int inh, const char *name) : sync (0), visits(0), waiters(-1), tid (0)
+muto::muto(int inh, const char *name) : sync (0), visits(0), waiters(-1), tid (0), next (0)
 {
   /* Create event which is used in the fallback case when blocking is necessary */
   if (!(bruteforce = CreateEvent (inh ? &sec_all_nih : &sec_none_nih, FALSE, FALSE, name)))

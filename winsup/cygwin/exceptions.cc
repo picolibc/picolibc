@@ -713,7 +713,6 @@ call_handler (int sig, struct sigaction& siga, void *handler)
   CONTEXT *cx, orig;
   int interrupted = 1;
   int res;
-  extern muto *sync_proc_subproc;
 
   if (hExeced != NULL && hExeced != INVALID_HANDLE_VALUE)
     {
@@ -743,10 +742,13 @@ call_handler (int sig, struct sigaction& siga, void *handler)
 	goto set_pending;
 
       /* FIXME: Make multi-thread aware */
-      if (!sync_proc_subproc->unstable () && sync_proc_subproc->owner () != maintid &&
-	  !mask_sync->unstable () && mask_sync->owner () != maintid)
-	break;
+      for (muto *m = muto_start.next;  m != NULL; m = m->next)
+	if (m->unstable () || m->owner () == maintid)
+	  goto keep_looping;
 
+      break;
+
+    keep_looping:
       ResumeThread (hth);
       Sleep (0);
     }
@@ -781,12 +783,16 @@ call_handler (int sig, struct sigaction& siga, void *handler)
       interrupted = 0;
     }
 
-  (void) ResumeThread (hth);
-
   if (interrupted)
     {
       /* Clear any waiting threads prior to dispatching to handler function */
       proc_subproc(PROC_CLEARWAIT, 1);
+    }
+
+  (void) ResumeThread (hth);
+
+  if (interrupted)
+    {
       /* Apparently we have to set signal_arrived after resuming the thread or it
 	 is possible that the event will be ignored. */
       (void) SetEvent (signal_arrived);	// For an EINTR case

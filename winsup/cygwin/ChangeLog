@@ -1,3 +1,12 @@
+Thu Feb 24 14:45:06 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (call_handler): Use new muto linked list to look for
+	all potential mutos owned by suspended thread.  Clear waiting threads
+	while thread is stopped.
+	(proc_subproc): Clarify debugging output.
+	* sync.h (class muto): Add 'next' field.
+	(new_muto): Keep linked list alive.
+
 Thu Feb 24 00:59:15 2000  Christopher Faylor <cgf@cygnus.com>
 
 	Fix final round of gcc warnings relating to unused parameters. 
