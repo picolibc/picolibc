@@ -247,6 +247,9 @@ struct bfd_link_info
      unloaded.  */
   const char *fini_function;
 
+  /* true if the new ELF dynamic tags are enabled. */ 
+  boolean new_dtags;
+
   /* May be used to set DT_FLAGS for ELF. */
   bfd_vma flags;
 

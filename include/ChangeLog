@@ -1,3 +1,7 @@
+2000-07-20  H.J. Lu  <hjl@gnu.org>
+
+	* bfdlink.h (bfd_link_info): Add new_dtags.
+
 2000-07-20  Hans-Peter Nilsson  <hp@axis.com>
 
 	* dis-asm.h (print_insn_cris): Declare.
