@@ -92,39 +92,46 @@ malicious.
 
 @subsection What packages should I download?
 
-Just get everything, if you have room for it.  But if you must be
-selective:
+When using @samp{setup.exe} for the first time, the default is to
+install a minimal subset of packages.  If you want anything beyond
+that, you will have to select it explicitly.  See
+@file{http://cygwin.com/packages/} for a searchable list of packages available.
 
-@table @samp
+If you want to build programs, of course you'll need @samp{gcc},
+@samp{binutils}, @samp{make} and probably other packages from the
+``Devel'' category.
 
-@item cygwin
-This is the minimum core, consisting of the cygwin1.dll and a few
-commands (like @code{mount}).  Not much else, and no shell!
+@subsection How do I just get everything?
 
-@item bash
-This is the default interactive command shell for cygwin.  If you don't
-install @samp{bash}, then the "Cygwin Bash Shell" shortcut that setup
-creates for you won't actually do anything.
+In the past, the default was to install everything, much to the
+irritation of many users.  Now the default is to install only a basic
+core of packages.  At the moment, there is no easy way to get
+everything.  You must do the following:
 
-@item ash
-This is often forgotten because it's not obvious that @samp{ash}
-contains @code{/bin/sh}, which is essential for running scripts (and
-@samp{make} and ...).
+@enumerate
 
-@end table
+@item When the GUI says ``Select packages to install'', click on the
+``View'' button until it says ``Full''.
 
-If you want to build programs, of course you'll need @samp{gcc}, but
-you'll also need @samp{binutils}, probably @samp{make} and
-@samp{fileutils}, and possibly lots more.  (Again, consider just getting
-everything!)
+@item Wherever it says ``Skip'', click twice until it gives the
+version number of the package.  That means it will be downloaded and
+installed.
+
+@end enumerate
+
+If a package you've selected for installation has prerequisites, those
+will automatically be installed too.  It's a lot of clicking but you
+only the first time.  Once you install a package, any subsequent
+updates to that package will be installed by default.  Note that new
+packages are added rather frequently, so you'll have to regularly
+check the list for any ``Skip'' entries if you want to stay up to date
+with a complete installation.
 
 @subsection How much disk space does Cygwin require?
 
-All the packages listed above comprise about 55MB when downloaded.
-This expands to about 230MB in your ``install root directory''
-(@code{C:\cygwin} by default).  If you download source archives for
-all packages, that's an additional 110MB.  These estimates are based
-on measurements taken 22 Sep 2001.
+That depends, obviously, on what you've chosen to download and install.
+A full installation is probably 250-300MB installed, not including the
+package archives themselves or the source code.
 
 After installation, the package archives remain in your ``Local Package
 Directory'', by default the location of @code{setup.exe}.  You may
@@ -165,9 +172,9 @@ what happened that wasn't supposed to happen, etc.
 
 @subsection What's the difference between packages in @samp{latest} and @samp{contrib}?
 
-There is no difference as far as @code{setup.exe} is concerned, and you
-should not worry about this either.  The distinction is more historical
-than practical.
+There is no difference as far as @code{setup.exe} is concerned, and
+you should not worry about this either.  The distinction is
+historical, not practical.
 
 @subsection My Windows logon name has a space in it, will this cause problems?
 
@@ -188,10 +195,9 @@ README file for that package.)
 @subsection How do I uninstall individual packages?
 
 Run @code{setup.exe} as you would to install packages.  In the list of
-packages to install, click on the @samp{Full/Part} button to get a
-full listing, if the package you want to uninstall is not already
-listed.  Click on the cycle glyph until the action reads
-@samp{Uninstall}.  Proceed with @samp{Next}.
+packages to install, browse the relevant category or click on the
+``View'' button to get a full listing.  Click on the cycle glyph until
+the action reads ``Uninstall''.  Proceed by clicking ``Next''.
 
 @subsection How do I uninstall @strong{all} of Cygwin?
 
