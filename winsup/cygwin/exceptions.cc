@@ -1005,11 +1005,7 @@ signal_exit (int rc)
 {
   rc = EXIT_SIGNAL | (rc << 8);
   if (exit_already++)
-    {
-      /* We are going down - reset our process_state without locking. */
-      myself->record_death ();
-      ExitProcess (rc);
-    }
+    ExitProcess (rc);
 
   /* We'd like to stop the main thread from executing but when we do that it
      causes random, inexplicable hangs.  So, instead, we set up the priority

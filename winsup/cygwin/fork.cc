@@ -308,10 +308,9 @@ debug_printf ("hParent %p", hParent);
 }
 
 static int __stdcall
-fork_parent (HANDLE& hParent, dll *&first_dll, bool& load_dlls, child_info_fork &ch)
+fork_parent (void *stack_here, HANDLE& hParent, dll *&first_dll, bool& load_dlls, child_info_fork &ch)
 {
   HANDLE subproc_ready, forker_finished;
-  void *stack_here = &hParent;
   DWORD rc;
   PROCESS_INFORMATION pi = {0, NULL, 0, 0};
   static NO_COPY HANDLE last_fork_proc = NULL;
@@ -339,8 +338,6 @@ fork_parent (HANDLE& hParent, dll *&first_dll, bool& load_dlls, child_info_fork 
 				       OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
 				       NULL);
 
-  syscall_printf ("CreateProcessA (%s, %s,0,0,1,%x, 0,0,%p,%p)",
-		  myself->progname, myself->progname, c_flags, &si, &pi);
   if (console_handle != INVALID_HANDLE_VALUE && console_handle != 0)
     CloseHandle (console_handle);
   else
@@ -407,16 +404,18 @@ fork_parent (HANDLE& hParent, dll *&first_dll, bool& load_dlls, child_info_fork 
   ch.cygheap_max = cygheap_max;
 
   char sa_buf[1024];
-  rc = CreateProcessA (myself->progname, /* image to run */
-		       myself->progname, /* what we send in arg0 */
-		       allow_ntsec ? sec_user (sa_buf) : &sec_none_nih,
-		       allow_ntsec ? sec_user (sa_buf) : &sec_none_nih,
-		       TRUE,	  /* inherit handles from parent */
-		       c_flags,
-		       NULL,	  /* environment filled in later */
-		       0,		  /* use current drive/directory */
-		       &si,
-		       &pi);
+  syscall_printf ("CreateProcess (%s, %s, 0, 0, 1, %x, 0, 0, %p, %p)",
+		  myself->progname, myself->progname, c_flags, &si, &pi);
+  rc = CreateProcess (myself->progname, /* image to run */
+		      myself->progname, /* what we send in arg0 */
+		      allow_ntsec ? sec_user (sa_buf) : &sec_none_nih,
+		      allow_ntsec ? sec_user (sa_buf) : &sec_none_nih,
+		      TRUE,	  /* inherit handles from parent */
+		      c_flags,
+		      NULL,	  /* environment filled in later */
+		      0,		  /* use current drive/directory */
+		      &si,
+		      &pi);
 
   CloseHandle (hParent);
 
@@ -579,14 +578,11 @@ fork ()
     bool load_dlls;
   } grouped;
 
-  int res;
-  int x;
-
   MALLOC_CHECK;
 
-  // grow_stack_slack ();
-
   debug_printf ("entering");
+  grouped.hParent = grouped.first_dll = NULL;
+  grouped.load_dlls = 0;
 
   if (ISSTATE(myself, PID_SPLIT_HEAP))
     {
@@ -597,13 +593,17 @@ fork ()
       return -1;
     }
 
-  child_info_fork ch;
-  x = setjmp (ch.jmp);
+  void *esp;
+  __asm ("movl %%esp,%0": "=r" (esp));
 
-  if (x != 0)
+  child_info_fork ch;
+
+  int res = setjmp (ch.jmp);
+
+  if (res)
     res = fork_child (grouped.hParent, grouped.first_dll, grouped.load_dlls);
   else
-    res = fork_parent (grouped.hParent, grouped.first_dll, grouped.load_dlls, ch);
+    res = fork_parent (esp, grouped.hParent, grouped.first_dll, grouped.load_dlls, ch);
 
   MALLOC_CHECK;
   syscall_printf ("%d = fork()", res);

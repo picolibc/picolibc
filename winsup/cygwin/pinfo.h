@@ -119,8 +119,6 @@ private:
 public:
   /* Pointer to mmap'ed areas for this process.  Set up by fork. */
   void *mmap_ptr;
-
-  void record_death ();
 };
 
 class pinfo

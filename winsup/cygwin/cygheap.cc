@@ -207,9 +207,7 @@ cygheap_fixup_in_child (HANDLE parent, bool execed)
 
   /* Copy memory from the parent */
   m = 0;
-  n = (DWORD) pagetrunc (n + 4095);
-  if (!ReadProcessMemory (parent, cygheap, cygheap, n, &m) ||
-      m != n)
+  if (!ReadProcessMemory (parent, cygheap, cygheap, n, &m) || m != n)
     api_fatal ("Couldn't read parent's cygwin heap %d bytes != %d, %E",
 	       n, m);
 

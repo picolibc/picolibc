@@ -205,48 +205,8 @@ proc_exists (_pinfo *p)
 
   if (p == NULL)
     return FALSE;
-
-  if (p == myself || p == myself_nowait_nonmain || p == myself_nowait)
+  else
     return TRUE;
-
-  if (p->process_state == PID_NOT_IN_USE || !p->dwProcessId)
-    return FALSE;
-
-  sigproc_printf ("checking for existence of pid %d, window pid %d", p->pid,
-	      p->dwProcessId);
-  if (p->ppid == myself->pid && p->hProcess != NULL)
-    {
-      sigproc_printf ("it's mine, process_state %x", p->process_state);
-      return proc_can_be_signalled (p);
-    }
-
-  /* Note: Process is alive if OpenProcess() call fails due to permissions */
-  if (((h = OpenProcess (STANDARD_RIGHTS_REQUIRED, FALSE, p->dwProcessId))
-      != NULL) || (GetLastError () == ERROR_ACCESS_DENIED))
-    {
-      sigproc_printf ("it exists, %p", h);
-      if (h)
-	{
-	  DWORD rc = WaitForSingleObject (h, 0);
-	  CloseHandle (h);
-	  if (rc == WAIT_OBJECT_0)
-	    return 0;
-	}
-      return proc_can_be_signalled (p);
-    }
-
-  sigproc_printf ("it doesn't exist");
-#if 0
-  /* If the parent pid does not exist, clean this process out of the pinfo
-   * table.  It must have died abnormally.
-   */
-  if ((p->pid == p->ppid) || (p->ppid == 1) || !pid_exists (p->ppid))
-    {
-      p->hProcess = NULL;
-      p->process_state = PID_NOT_IN_USE;
-    }
-#endif
-  return FALSE;
 }
 
 /* Return 1 if this is one of our children, zero otherwise.
@@ -500,22 +460,13 @@ proc_terminate (void)
 	  else
 	    {
 	      ForceCloseHandle1 (pchildren[i]->hProcess, childhProc);
-	      if (!proc_exists (pchildren[i]))
-		{
-		  sigproc_printf ("%d(%d) doesn't exist", pchildren[i]->pid,
+	      sigproc_printf ("%d(%d) closed child handle", pchildren[i]->pid,
 			      pchildren[i]->dwProcessId);
-		  pchildren[i]->process_state = PID_NOT_IN_USE;	/* a reaped child  CGF FIXME -- still needed? */
-		}
-	      else
-		{
-		  sigproc_printf ("%d(%d) closing active child handle", pchildren[i]->pid,
-			      pchildren[i]->dwProcessId);
-		  pchildren[i]->ppid = 1;
-		  if (pchildren[i]->pgid == myself->pid)
-		    pchildren[i]->process_state |= PID_ORPHANED;
-		}
+	      pchildren[i]->ppid = 1;
+	      if (pchildren[i]->pgid == myself->pid)
+		pchildren[i]->process_state |= PID_ORPHANED;
 	    }
-	  pchildren[i].release (); // FIXME: this breaks older gccs for some reason
+	  pchildren[i].release ();
 	}
       nchildren = nzombies = 0;
 
@@ -601,6 +552,7 @@ sigproc_init ()
   /* local event signaled when main thread has been dispatched
      to a signal handler function. */
   signal_arrived = CreateEvent(&sec_none_nih, TRUE, FALSE, NULL);
+  ProtectHandle (signal_arrived);
 
   if (!(hwait_sig = makethread (wait_sig, NULL, 0, "sig")))
     {
@@ -668,14 +620,6 @@ sigproc_terminate (void)
 	  if (GetCurrentThreadId () != sigtid)
 	    WaitForSingleObject (h, 10000);
 	  ForceCloseHandle1 (h, hwait_sig);
-
-	  /* Exiting thread.  Cleanup.  Don't set to inactive if a child has been
-	     execed with the same pid. */
-	  if (!myself->dwProcessId || myself->dwProcessId == GetCurrentProcessId ())
-	    myself->process_state &= ~PID_ACTIVE;
-	  else
-	    sigproc_printf ("Did not clear PID_ACTIVE since %d != %d",
-			myself->dwProcessId, GetCurrentProcessId ());
 
 	  /* In case of a sigsuspend */
 	  SetEvent (signal_arrived);
@@ -1052,7 +996,6 @@ remove_zombie (int ci)
     {
       ForceCloseHandle1 (zombies[ci]->hProcess, childhProc);
       ForceCloseHandle1 (zombies[ci]->pid_handle, pid_handle);
-      zombies[ci]->process_state = PID_NOT_IN_USE;	/* a reaped child */
       zombies[ci].release ();
     }
 
@@ -1184,7 +1127,8 @@ wait_sig (VOID *)
    * windows process waiting to see if it's started a cygwin process or not.
    * Signalling subproc_ready indicates that we are a cygwin process.
    */
-  if (child_proc_info && child_proc_info->type == PROC_EXEC)
+  if (child_proc_info &&
+      (child_proc_info->type == PROC_FORK || child_proc_info->type == PROC_SPAWN))
     {
       debug_printf ("subproc_ready %p", child_proc_info->subproc_ready);
       if (!SetEvent (child_proc_info->subproc_ready))
@@ -1383,6 +1327,7 @@ WFSO (HANDLE hHandle, DWORD dwMilliseconds)
   DWORD ret;
   sigframe thisframe (mainthread);
   ret = WaitForSingleObject (hHandle, dwMilliseconds);
+if (dwMilliseconds > 10 && ret == WAIT_TIMEOUT) system_printf ("TIMED OUT %d\n", dwMilliseconds);
   return ret;
 }
 
@@ -1394,6 +1339,7 @@ WFMO (DWORD nCount, CONST HANDLE *lpHandles, BOOL fWaitAll, DWORD dwMilliseconds
   DWORD ret;
   sigframe thisframe (mainthread);
   ret = WaitForMultipleObjects (nCount, lpHandles, fWaitAll, dwMilliseconds);
+if (dwMilliseconds > 10 && ret == WAIT_TIMEOUT) system_printf ("TIMED OUT %d\n", dwMilliseconds);
   return ret;
 }
 }

@@ -973,7 +973,6 @@ enum
 extern "C" void __stdcall
 do_exit (int status)
 {
-  BOOL cleanup_pinfo;
   UINT n = (UINT) status;
   static int NO_COPY exit_state = 0;
 
@@ -1013,10 +1012,7 @@ do_exit (int status)
     }
 
   if (n & EXIT_REPARENTING)
-    {
-      n &= ~EXIT_REPARENTING;
-      cleanup_pinfo = FALSE;
-    }
+    n &= ~EXIT_REPARENTING;
   else
     {
       myself->stopsig = 0;
@@ -1045,7 +1041,6 @@ do_exit (int status)
 	}
 
       tty_terminate ();
-      cleanup_pinfo = TRUE;
     }
 
   window_terminate ();
@@ -1059,11 +1054,6 @@ do_exit (int status)
       TerminateProcess (hExeced, n);
       ForceCloseHandle1 (hExeced, childhProc);
     }
-
-  if (cleanup_pinfo)
-    myself->record_death ();
-  else
-    sigproc_printf ("not cleanup_pinfo");
 
   shared_terminate ();
 
@@ -1106,7 +1096,6 @@ __api_fatal (const char *fmt, ...)
   /* We are going down without mercy.  Make sure we reset
      our process_state. */
   sigproc_terminate ();
-  myself->record_death ();
 #ifdef DEBUGGING
   (void) try_to_debug ();
 #endif

@@ -1,3 +1,22 @@
+Sat Oct 14 01:45:25 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* cygheap.cc (cygheap_fixup_in_child): Don't page round cygheap copied
+	from parent.
+	* dcrt0.cc (do_exit): Don't cleanup pinfo on exit.  That happens
+	automatically now.
+	* exceptions.cc (signal_exit): Ditto.
+	* fork.cc (fork_parent): Use stack_here value passed in from fork().
+	(fork): Figure out top of stack here and pass it to fork_parent.
+	* pinfo.cc (_pinfo::record_death): Eliminate.
+	* pinfo.h (_pinfo): Ditto.
+	* sigproc.cc (proc_exists): Simplify.
+	(proc_terminate): Ditto.
+	(remove_zombie): Don't cleanup pinfo stuff.
+	(wait_sig): Send subproc_ready signal whether execed or spawned.
+	* spawn.cc (spawn_guts): Always create subproc_ready event.  Use it for
+	both exec and spawn.
+	(_spawnve): Send proper mode to spawn_guts when mode != _P_OVERLAY.
+
 Thu Oct 12 23:11:05 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dtable.cc (dtable::fixup_after_fork): Revert thinko below.

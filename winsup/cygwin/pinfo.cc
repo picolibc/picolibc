@@ -175,17 +175,6 @@ _pinfo::copysigs(_pinfo *_other)
 }
 
 void
-_pinfo::record_death ()
-{
-  /* CGF FIXME - needed? */
-  if (dwProcessId == GetCurrentProcessId () && !my_parent_is_alive ())
-    {
-      process_state = PID_NOT_IN_USE;
-      hProcess = NULL;
-    }
-}
-
-void
 pinfo::init (pid_t n, DWORD create, HANDLE in_h)
 {
   if (n == myself->pid)

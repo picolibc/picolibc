@@ -158,21 +158,6 @@ handle (int n, int direction)
   return fh->get_output_handle ();
 }
 
-/* Cover function for CreateProcess.
-
-   This function is used by both the routines that search $PATH and those
-   that do not.  This should work out ok as according to the documentation,
-   CreateProcess only searches $PATH if PROG has no directory elements.
-
-   Spawning doesn't fit well with Posix's fork/exec (one can argue the merits
-   of either but that's beside the point).  If we're exec'ing we want to
-   record the child pid for fork.  If we're spawn'ing we don't want to do
-   this.  It is up to the caller to handle both cases.
-
-   The result is the process id.  The handle of the created process is
-   stored in H.
-*/
-
 HANDLE NO_COPY hExeced = NULL;
 
 int
@@ -252,7 +237,7 @@ public:
   int argc;
   av (int ac, const char * const *av) : calloced (0), argc (ac)
   {
-    argv = (char **) cmalloc (HEAP_1_ARGV, (argc + 1) * sizeof (char *));
+    argv = (char **) cmalloc (HEAP_1_ARGV, (argc + 5) * sizeof (char *));
     memcpy (argv, av, (argc + 1) * sizeof (char *));
   }
   ~av ()
@@ -348,16 +333,14 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
   si.lpReserved2 = (LPBYTE) &ciresrv;
   si.cbReserved2 = sizeof (ciresrv);
 
-  HANDLE spr = NULL;
   DWORD chtype;
   if (mode != _P_OVERLAY && mode != _P_VFORK)
     chtype = PROC_SPAWN;
   else
-    {
-      spr = CreateEvent(&sec_all, TRUE, FALSE, NULL);
-      ProtectHandle (spr);
-      chtype = PROC_EXEC;
-    }
+    chtype = PROC_EXEC;
+
+  HANDLE spr = CreateEvent(&sec_all, TRUE, FALSE, NULL);
+  ProtectHandle (spr);
 
   init_child_info (chtype, &ciresrv, (mode == _P_OVERLAY) ? myself->pid : 1, spr);
   if (!DuplicateHandle (hMainProc, hMainProc, hMainProc, &ciresrv.parent, 0, 1,
@@ -555,8 +538,6 @@ skip_arg_parsing:
   si.hStdError = handle (2, 1); /* Get output handle */
   si.cb = sizeof (si);
 
-  /* Pass fd table to a child */
-
   syscall_printf ("spawn_guts (%s, %.132s)", (char *) real_path, one_line.buf);
 
   int flags = CREATE_DEFAULT_ERROR_MODE | CREATE_SUSPENDED |
@@ -696,8 +677,6 @@ skip_arg_parsing:
   if (mode == _P_OVERLAY)
     {
       strcpy (myself->progname, real_path);
-      // close_all_files ();
-      proc_terminate ();
       hExeced = pi.hProcess;
       myself->dwProcessId = pi.dwProcessId;
 
@@ -765,127 +744,123 @@ skip_arg_parsing:
     CloseHandle (hToken);
 
   DWORD res;
+  BOOL exited;
 
-  if (mode == _P_OVERLAY || mode == _P_VFORK)
+  HANDLE waitbuf[3] = {pi.hProcess, signal_arrived, spr};
+  int nwait = 3;
+
+  res = 0;
+  exited = FALSE;
+  MALLOC_CHECK;
+  for (int i = 0; i < 100; i++)
     {
-      BOOL exited;
-
-      HANDLE waitbuf[3] = {pi.hProcess, signal_arrived, spr};
-      int nwait = 3;
-
-      SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_HIGHEST);
-      res = 0;
-      exited = FALSE;
-      MALLOC_CHECK;
-      for (int i = 0; i < 100; i++)
+      switch (WaitForMultipleObjects (nwait, waitbuf, FALSE, INFINITE))
 	{
-	  switch (WaitForMultipleObjects (nwait, waitbuf, FALSE, INFINITE))
-	    {
-	    case WAIT_OBJECT_0:
-	      sigproc_printf ("subprocess exited");
-	      DWORD exitcode;
-	      if (!GetExitCodeProcess (pi.hProcess, &exitcode))
-		exitcode = 1;
-	      res |= exitcode;
-	      exited = TRUE;
+	case WAIT_OBJECT_0:
+	  sigproc_printf ("subprocess exited");
+	  DWORD exitcode;
+	  if (!GetExitCodeProcess (pi.hProcess, &exitcode))
+	    exitcode = 1;
+	  res |= exitcode;
+	  exited = TRUE;
 
-	      if (nwait <= 2 || (res & EXIT_REPARENTING) || (mode != _P_OVERLAY && mode != _P_VFORK))
-		/* nothing to do */;
-	      else if (WaitForSingleObject (spr, 1) == WAIT_OBJECT_0)
-		goto reparent;
-	      break;
-	    case WAIT_OBJECT_0 + 1:
-	      sigproc_printf ("signal arrived");
-	      ResetEvent (signal_arrived);
-	      continue;
-	    case WAIT_OBJECT_0 + 2:
-	      if (mode == _P_OVERLAY)
+	  if (nwait > 2 && !(res & EXIT_REPARENTING) &&
+	      (mode == _P_OVERLAY || mode == _P_VFORK))
+	    res |= EXIT_REPARENTING;
+	  break;
+	case WAIT_OBJECT_0 + 1:
+	  sigproc_printf ("signal arrived");
+	  ResetEvent (signal_arrived);
+	  continue;
+	case WAIT_OBJECT_0 + 2:
+	  if (mode == _P_OVERLAY)
+	    {
+	      res |= EXIT_REPARENTING;
+	      if (!parent_alive)
 		{
-	      reparent:
-		  res |= EXIT_REPARENTING;
-		  if (!parent_alive)
-		    {
-		      nwait = 1;
-		      sigproc_terminate ();
-		      continue;
-		    }
+		  nwait = 1;
+		  sigproc_terminate ();
+		  continue;
 		}
-	      break;
-	    case WAIT_FAILED:
-	      DWORD r;
-	      system_printf ("wait failed: nwait %d, pid %d, winpid %d, %E",
-			     nwait, myself->pid, myself->dwProcessId);
-	      system_printf ("waitbuf[0] %p %d", waitbuf[0],
-			     GetHandleInformation (waitbuf[0], &r));
-	      system_printf ("waitbuf[1] %p = %d", waitbuf[1],
-			     GetHandleInformation (waitbuf[1], &r));
-	      set_errno (ECHILD);
-	      return -1;
 	    }
 	  break;
+	case WAIT_FAILED:
+	  system_printf ("wait failed: nwait %d, pid %d, winpid %d, %E",
+			 nwait, myself->pid, myself->dwProcessId);
+	  system_printf ("waitbuf[0] %p %d", waitbuf[0],
+			 WaitForSingleObject (waitbuf[0], 0));
+	  system_printf ("waitbuf[1] %p = %d", waitbuf[1],
+			 WaitForSingleObject (waitbuf[1], 0));
+	  system_printf ("waitbuf[w] %p = %d", waitbuf[2],
+			 WaitForSingleObject (waitbuf[2], 0));
+	  set_errno (ECHILD);
+	  try_to_debug ();
+	  return -1;
 	}
+      break;
+    }
 
-      ForceCloseHandle (spr);
+  ForceCloseHandle (spr);
 
-      sigproc_printf ("res = %x", res);
+  sigproc_printf ("res = %x", res);
 
-      if (res & EXIT_REPARENTING)
+  if (mode == _P_OVERLAY && (res & EXIT_REPARENTING))
+    {
+      /* Try to reparent child process.
+       * Make handles to child available to parent process and exit with
+       * EXIT_REPARENTING status. Wait() syscall in parent will then wait
+       * for newly created child.
+       */
+      pinfo parent (myself->ppid);
+      if (!parent)
+	/* nothing */;
+      else
 	{
-	  /* Try to reparent child process.
-	   * Make handles to child available to parent process and exit with
-	   * EXIT_REPARENTING status. Wait() syscall in parent will then wait
-	   * for newly created child.
-	   */
-	  pinfo parent (myself->ppid);
-	  if (!parent)
-	    /* nothing */;
-	  else
+	  int rc = 0;
+	  HANDLE oldh = myself->hProcess;
+	  HANDLE h = OpenProcess (PROCESS_ALL_ACCESS, FALSE,
+				  parent->dwProcessId);
+	  sigproc_printf ("parent handle %p, pid %d", h, parent->dwProcessId);
+	  if (h == NULL && GetLastError () == ERROR_INVALID_PARAMETER)
+	    rc = 1;
+	  else if (h)
 	    {
-	      int rc = 0;
-	      HANDLE oldh = myself->hProcess;
-	      HANDLE h = OpenProcess (PROCESS_ALL_ACCESS, FALSE,
-				      parent->dwProcessId);
-	      sigproc_printf ("parent handle %p, pid %d", h, parent->dwProcessId);
-	      if (h == NULL && GetLastError () == ERROR_INVALID_PARAMETER)
-		rc = 1;
-	      else if (h)
-		{
-		  ProtectHandle (h);
-		  rc = DuplicateHandle (hMainProc, pi.hProcess,
-					h, &myself->hProcess, 0, FALSE,
-					DUPLICATE_SAME_ACCESS);
-		  sigproc_printf ("%d = DuplicateHandle, oldh %p, newh %p",
-				  rc, oldh, myself->hProcess);
-		  ForceCloseHandle (h);
-		}
-	      if (!rc)
-		{
-		  system_printf ("Reparent failed, parent handle %p, %E", h);
-		  system_printf ("my dwProcessId %d, myself->dwProcessId %d",
-				 GetCurrentProcessId(), myself->dwProcessId);
-		  system_printf ("old hProcess %p, hProcess %p", oldh, myself->hProcess);
-		}
+	      ProtectHandle (h);
+	      rc = DuplicateHandle (hMainProc, pi.hProcess,
+				    h, &myself->hProcess, 0, FALSE,
+				    DUPLICATE_SAME_ACCESS);
+	      sigproc_printf ("%d = DuplicateHandle, oldh %p, newh %p",
+			      rc, oldh, myself->hProcess);
+	      ForceCloseHandle (h);
 	    }
-	  if (hExeced)
+	  if (!rc)
 	    {
-	      ForceCloseHandle1 (hExeced, childhProc);
-	      hExeced = INVALID_HANDLE_VALUE;
-	      close_all_files ();
+	      system_printf ("Reparent failed, parent handle %p, %E", h);
+	      system_printf ("my dwProcessId %d, myself->dwProcessId %d",
+			     GetCurrentProcessId(), myself->dwProcessId);
+	      system_printf ("old hProcess %p, hProcess %p", oldh, myself->hProcess);
 	    }
 	}
-      else if (exited)
+      if (hExeced)
 	{
 	  ForceCloseHandle1 (hExeced, childhProc);
-	  hExeced = INVALID_HANDLE_VALUE; // stop do_exit from attempting to terminate child
+	  hExeced = INVALID_HANDLE_VALUE;
 	}
-
-      MALLOC_CHECK;
-      if (mode == _P_OVERLAY)
-	ExitProcess (res);
     }
+  else if (exited)
+    {
+      ForceCloseHandle1 (hExeced, childhProc);
+      hExeced = INVALID_HANDLE_VALUE; // stop do_exit from attempting to terminate child
+    }
+
+  MALLOC_CHECK;
 
   switch (mode)
     {
+    case _P_OVERLAY:
+      proc_terminate ();
+      ExitProcess (0);
+      break;
     case _P_WAIT:
       waitpid (cygpid, (int *) &res, 0);
       break;
@@ -945,7 +920,7 @@ _spawnve (HANDLE hToken, int mode, const char *path, const char *const *argv,
     case _P_WAIT:
     case _P_DETACH:
       subproc_init ();
-      ret = spawn_guts (hToken, path, argv, envp, 0);
+      ret = spawn_guts (hToken, path, argv, envp, mode);
       if (vf && ret > 0)
 	{
 	  vf->pid = ret;
