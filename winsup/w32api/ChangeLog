@@ -1,6 +1,11 @@
+2001-09-04  Earnie Boyd  <earnie@SF.Net>
+
+	* lib/Makefile.in: Move the setting of variable libdir to after the
+	setting of exec_prefix since the value of libdir is dependant on it.
+
 Tue Sep  4 14:15:59 2001  Christopher Faylor <cgf@cygnus.com>
 
-	* winbase.h: Add missing closing parentheses to
+	* include/winbase.h: Add missing closing parentheses to
 	InterlockedExchangePointer declaration.
 
 2001-09-01  Danny Smith  <dannysmith@users.sourceforge.net>

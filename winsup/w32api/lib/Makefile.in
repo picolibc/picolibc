@@ -20,10 +20,10 @@ build_alias = @build_alias@
 target_alias = @target_alias@
 prefix = @prefix@
 includedir:=@includedir@
-libdir:=@libdir@
 
 program_transform_name = @program_transform_name@
 exec_prefix = @exec_prefix@
+libdir:=@libdir@
 bindir = @bindir@
 ifeq ($(target_alias),$(host_alias))
 ifeq ($(build_alias),$(host_alias))
