@@ -1,4 +1,10 @@
 
+2001-06-11 Danny Smith <dannysmith@users.sourceforge.net>
+
+	* include/shlobj.h (REGSTR_PATH_EXPLORER): Unicode it. 
+	(REGSTR_PATH_SPECIAL_FOLDERS): Ditto.
+	* include/regstr.h (REGSTR_PATH_EXPLORER): Add #ifndef guard. 
+
 2001-06-11  Mattia Barbon  <mbarbon@dsi.unive.it>
 
 	* include/shlobj.h (struct _browseinfo): UNICODE it.

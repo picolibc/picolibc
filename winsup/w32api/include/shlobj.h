@@ -106,9 +106,9 @@ extern "C" {
 #define SHDID_NET_RESTOFNET	16
 #define SHDID_NET_OTHER	17
 #ifndef REGSTR_PATH_EXPLORER
-#define REGSTR_PATH_EXPLORER	"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer"
+#define REGSTR_PATH_EXPLORER	TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer")
 #endif
-#define REGSTR_PATH_SPECIAL_FOLDERS	REGSTR_PATH_EXPLORER "\\Shell Folders"
+#define REGSTR_PATH_SPECIAL_FOLDERS	REGSTR_PATH_EXPLORER TEXT("\\Shell Folders")
 #define CSIDL_DESKTOP	0
 #define CSIDL_PROGRAMS	2
 #define CSIDL_CONTROLS	3

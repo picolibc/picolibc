@@ -28,7 +28,9 @@ extern "C" {
 #define REGSTR_PATH_RUN	TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\Run")
 #define REGSTR_PATH_RUNSERVICESONCE	TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\RunServicesOnce")
 #define REGSTR_PATH_RUNSERVICES	TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\RunServices")
+#ifndef REGSTR_PATH_EXPLORER /* also in shlobj.h */
 #define REGSTR_PATH_EXPLORER	TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer")
+#endif
 #define REGSTR_PATH_DETECT	TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\Detect")
 #define REGSTR_PATH_APPPATHS	TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\App Paths")
 #define REGSTR_PATH_UNINSTALL TEXT("Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall")
