@@ -1305,9 +1305,6 @@ Include stdlib.h instead of malloc.h.
 
 @subsection Can I use my own malloc?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
 If you define a function called @code{malloc} in your own code, and link
 with the DLL, the DLL @emph{will} call your @code{malloc}.  Needless to
 say, you will run into serious problems if your malloc is buggy.
@@ -1317,6 +1314,14 @@ bash, the DLL will try and expand the wildcards on the command line.
 This process uses @code{malloc} @emph{before} your main line is started.
 If you have written your own @code{malloc} to need some initialization
 to occur after @code{main} is called, then this will surely break.
+
+Moreover, there is an outstanding issue with @code{_malloc_r} in
+@code{newlib}.  This re-entrant version of @code{malloc} will be called
+directly from within @code{newlib}, by-passing your custom version, and
+is probably incompatible with it.  But it may not be possible to replace
+@code{_malloc_r} too, because @code{cygwin1.dll} does not export it and
+Cygwin does not expect your program to replace it.  This is really a
+newlib issue, but we are open to suggestions on how to deal with it.
 
 @subsection Can I mix objects compiled with msvc++ and gcc?
 
