@@ -186,11 +186,14 @@ typedef	wchar_t	TCHAR;
 #define _tcreat     _wcreat
 #define _tfindfirst _wfindfirst
 #define _tfindnext  _wfindnext
+#define _tfopen     _wfopen
+#define _tgetenv    _wgetenv
 #define _tmktemp    _wmktemp
 #define _topen      _wopen
 #define _tremove    _wremove
 #define _trename    _wrename
 #define _tsopen     _wsopen
+#define _tsetlocale _wsetlocale
 #define _tunlink    _wunlink
 #define _tfinddata_t    _wfinddata_t
 #define _tfindfirsti64  _wfindfirsti64
@@ -245,6 +248,8 @@ typedef char	TCHAR;
 #define	_fputtc		fputc
 #define	_fputtchar	_fputchar
 #define	_fputts		fputs
+#define	_tfopen		fopen
+#define	_tgetenv	getenv
 #define	_gettc		getc
 #define	_getts		gets
 #define	_puttc		putc
@@ -328,6 +333,7 @@ typedef char	TCHAR;
 #define _tremove    remove
 #define _trename    rename
 #define _tsopen     _sopen
+#define _tsetlocale setlocale
 #define _tunlink    _unlink
 #define _tfinddata_t    _finddata_t
 

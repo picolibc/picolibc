@@ -110,7 +110,7 @@ int	vwprintf (const wchar_t*, va_list);
 int	vswprintf (wchar_t*, const wchar_t*, va_list);
 int	fwscanf (FILE*, const wchar_t*, ...);
 int	wscanf (const wchar_t*, ...);
-int	swscanf (wchar_t*, const wchar_t*, ...);
+int	swscanf (const wchar_t*, const wchar_t*, ...);
 wint_t	fgetwc (FILE*);
 wint_t	fputwc (wchar_t, FILE*);
 wint_t	ungetwc (wchar_t, FILE*);
