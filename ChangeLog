@@ -1,19 +1,10 @@
-2002-12-27  Christopher Faylor  <cgf@redhat.com>
+2002-12-27  Nathanael Nerode  <neroden@gcc.gnu.org>
 
-	* fhandler.h (fhandler_tty_master::set_winsize): Declare new function.
-	* fhandler_console.cc (fhandler_console::send_winch_maybe): If
-	appropriate, call tty master function to handle screen size change.
-	* fhandler_tty.cc (fhandler_tty_master::set_winsize): New function.
-	(fhandler_tty_master::init): Call set_winsize to set initial screen
-	size.
+	* configure: Remove unneeded 'export's.  Make CC_FOR_TARGET, 
+	CXX_FOR_TARGET, GCJ_FOR_TARGET substituted in configure.in only.
 
-2002-12-26  Christopher Faylor  <cgf@redhat.com>
-
-	* fhandler_tty.cc (fhandler_tty_master::init): Set initial size of tty
-	to that of console in which tty is operating.
-	(process_input): Semi-revert previous change.  Need to just use current
-	terminfo settings since this function is running in a thread, blocked
-	when the terminfo changes.
+	* ChangeLog: Move a couple of entries from here to winsup/cygwin, 
+	where they belong.
 
 2002-12-24  Andreas Schwab  <schwab@suse.de>
 
