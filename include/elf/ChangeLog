@@ -1,3 +1,7 @@
+2001-04-23  Bo Thorsen  <bo@suse.de>
+
+	* x86-64.h: Add vtable support.
+
 2001-03-23  Nick Clifton  <nickc@redhat.com>
 
 	* mips.h: Remove extraneous whitespace.
@@ -40,14 +44,14 @@
 
         * mips.h (E_MIPS_ARCH_32): New constant.
         (E_MIPS_MACH_MIPS32, E_MIPS_MACH_MIPS32_4K): Replace the
-        former with the latter. 
+        former with the latter.
 
         * mips.h (E_MIPS_ARCH_5, E_MIPS_ARCH_64): New definitions.
 
         * mips.h (E_MIPS_MACH_SB1): New constant.
 
 2000-11-30  Jan Hubicka  <jh@suse.cz>
-	
+
         * common.h (EM_X86_64): New macro.
         * x86-64.h: New file.
 
@@ -107,7 +111,7 @@
 
 2000-09-13  Anders Norlander  <anorland@acc.umu.se>
 
- 	* mips.h (E_MIPS_MACH_4K): New define.
+	* mips.h (E_MIPS_MACH_4K): New define.
 
 2000-09-05  Alan Modra  <alan@linuxcare.com.au>
 
@@ -170,7 +174,7 @@
 
 2000-07-10  Alan Modra  <alan@linuxcare.com.au>
 
-	* hppa.h: Add comments to all the relocs. 
+	* hppa.h: Add comments to all the relocs.
 
 2000-06-26  Marek Michalkiewicz  <marekm@linux.org.pl>
 
