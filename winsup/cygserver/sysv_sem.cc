@@ -147,6 +147,15 @@ struct sem_undo {
 #define SEMAEM	16384		/* adjust on exit max value */
 #endif
 
+#ifdef __CYGWIN__
+/* gcc 3.4 defines a new offsetof which is different for C++.  Since this
+   file is just a derived plain-C file, we need to revert to the plain-C
+   definition of offsetof. */
+#ifdef offsetof
+#undef offsetof
+#endif
+#define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
+#endif /* __CYGWIN__ */
 /*
  * Due to the way semaphore memory is allocated, we have to ensure that
  * SEMUSZ is properly aligned.

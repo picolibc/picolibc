@@ -1,3 +1,8 @@
+2004-10-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysv_sem.cc: Redefine offsetof to circumvent build problems with
+	gcc 3.4.
+
 2004-10-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* bsd_mutex.cc (_msleep): Simplify event creation.  Revert change from
