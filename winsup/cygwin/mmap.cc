@@ -530,6 +530,10 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
   if (flags & MAP_ANONYMOUS)
     fd = -1;
 
+  /* If MAP_FIXED is requested on a non-granularity boundary, change request
+     so that this looks like a request with offset addr % granularity. */
+  if (fd == -1 && (flags & MAP_FIXED) && ((DWORD)addr % granularity) && !off)
+    off = (DWORD)addr % granularity;
   /* Map always in multipliers of `granularity'-sized chunks. */
   _off64_t gran_off = off & ~(granularity - 1);
   DWORD gran_len = howmany (off + len, granularity) * granularity - gran_off;
@@ -615,7 +619,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 	  return ret;
 	}
     }
-  if (map_list && fd == -1 && off == 0 && (flags & MAP_FIXED))
+  if (map_list && fd == -1 && (flags & MAP_FIXED))
     {
       caddr_t u_addr;
       DWORD u_len;

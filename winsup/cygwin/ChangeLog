@@ -1,5 +1,10 @@
 2005-02-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* mmap.cc (mmap64): Handle MAP_FIXED request on non-granulation
+	boundary.
+
+2005-02-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mmap.cc (class mmap_record): Declare new map_pages method with
 	address parameter.
 	(mmap_record::map_pages): New method with address parameter.
