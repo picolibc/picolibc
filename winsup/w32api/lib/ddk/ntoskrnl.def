@@ -483,9 +483,9 @@ KdEnableDebugger@0
 ;KdPollBreakIn
 ;KdPowerTransition
 ;Ke386CallBios
-;Ke386IoSetAccessProcess
-;Ke386QueryIoAccessMap
-;Ke386SetIoAccessMap
+Ke386IoSetAccessProcess@8
+Ke386QueryIoAccessMap@8
+Ke386SetIoAccessMap@8
 @KeAcquireInStackQueuedSpinLockAtDpcLevel@8
 KeAcquireInterruptSpinLock@4
 ;KeAcquireSpinLockAtDpcLevel

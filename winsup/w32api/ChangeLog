@@ -1,3 +1,10 @@
+2003-02-09  Earnie Boyd  <earnie@users.sf.net>
+
+	* lib/ddk/ntoskrnl.def (Ke386IoSetAccessProcess): Activate export.
+	(Ke386QueryToAccessMap): Ditto.
+	(Ke386SetIoAccessMap): Ditto.
+	Thanks to Marcel Telka <telka@users.sf.net>
+
 2003-02-05  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/basetypes.h (_GUID_DEFINED): Add deprecation warning, start
