@@ -1,5 +1,20 @@
 2003-11-06  Corinna Vinschen  <corinna@vinschen.de>
 
+	* bsdlib.cc (_vwarnx): New function.
+	(vwarn): Ditto.
+	(vwarnx): Ditto.
+	(warn): Ditto.
+	(warnx): Ditto.
+	(verr): Ditto.
+	(verrx): Ditto.
+	(err): Ditto.
+	(errx): Ditto.
+	* cygwin.din: Export above functions.
+	* include/err.h: New file.
+	* include/cygwin/version.h: Bump API minor number.
+
+2003-11-06  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc (getshmlba): New function.
 	* external.cc (cygwin_internal): Add CW_GET_SHMLBA handling.
 	* mmap.cc (mmap64): Call getshmlba to evaluate granularity.

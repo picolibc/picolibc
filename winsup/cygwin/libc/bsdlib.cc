@@ -31,7 +31,9 @@
  */
 
 #include "winsup.h"
+#include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <utmp.h>
 #include <unistd.h>
 #include <sys/termios.h>
@@ -163,3 +165,74 @@ forkpty (int *amaster, char *name, struct termios *termp, struct winsize *winp)
   return pid;
 }
 
+extern "C" char *__progname;
+
+static void
+_vwarnx (const char *fmt, va_list ap)
+{
+  fprintf (stderr, "%s: ", __progname);
+  vfprintf (stderr, fmt, ap);
+}
+
+extern "C" void
+vwarn (const char *fmt, va_list ap)
+{
+  _vwarnx (fmt, ap);
+  fprintf (stderr, ": %s", strerror (get_errno ()));
+  fputc ('\n', stderr);
+}
+
+extern "C" void
+vwarnx (const char *fmt, va_list ap)
+{
+  _vwarnx (fmt, ap);
+  fputc ('\n', stderr);
+}
+
+extern "C" void
+warn (const char *fmt, ...)
+{
+  va_list ap;
+  va_start (ap, fmt);
+  vwarn (fmt, ap);
+}
+
+extern "C" void
+warnx (const char *fmt, ...)
+{
+  va_list ap;
+  va_start (ap, fmt);
+  vwarnx (fmt, ap);
+}
+
+extern "C" void
+verr (int eval, const char *fmt, va_list ap)
+{
+  vwarn (fmt, ap);
+  exit (eval);
+}
+
+extern "C" void
+verrx (int eval, const char *fmt, va_list ap)
+{
+  vwarnx (fmt, ap);
+  exit (eval);
+}
+
+extern "C" void
+err (int eval, const char *fmt, ...)
+{
+  va_list ap;
+  va_start (ap, fmt);
+  vwarn (fmt, ap);
+  exit (eval);
+}
+
+extern "C" void
+errx (int eval, const char *fmt, ...)
+{
+  va_list ap;
+  va_start (ap, fmt);
+  vwarnx (fmt, ap);
+  exit (eval);
+}

@@ -225,13 +225,14 @@ details. */
        98: Export _tmpfile64.
        99: CW_GET_POSIX_SECURITY_ATTRIBUTE addition to external.cc.
       100: CW_GET_SHMLBA addition to external.cc.
+      101: Export err, errx, verr, verrx, warn, warnx, vwarn, vwarnx.
 
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 100
+#define CYGWIN_VERSION_API_MINOR 101
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
