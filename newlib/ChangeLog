@@ -1,3 +1,8 @@
+2002-06-10  Christopher Faylor  <cgf@redhat.com>
+
+	* libc/include/process.h: Remove cygwin-only sexec* declarations.  Fix
+	spawnve declaration.
+
 2002-06-06  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* libm/common/s_fdim.c: New file.

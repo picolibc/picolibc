@@ -23,26 +23,9 @@ int spawnlp(int mode, const char *path, const char *argv0, ...);
 int spawnlpe(int mode, const char *path, const char *argv0, ... /*, char * const *envp */);
 
 int spawnv(int mode, const char *path, const char * const *argv);
-int spawnve(int mode, const char *path, char * const *argv, const char * const *envp);
+int spawnve(int mode, const char *path, const char * const *argv, const char * const *envp);
 int spawnvp(int mode, const char *path, const char * const *argv);
 int spawnvpe(int mode, const char *path, const char * const *argv, const char * const *envp);
-
-#ifdef __CYGWIN__
-/* Secure exec() functions family */
-/* The first arg should really be a HANDLE which is a void *.  But we
-   can't include windows.h here so... */
-#include <sys/types.h>
-pid_t sexecl(void *, const char *path, const char *argv0, ...);
-pid_t sexecle(void *, const char *path, const char *argv0, ... /*, char * const *envp */);
-pid_t sexeclp(void *, const char *path, const char *argv0, ...);
-pid_t sexeclpe(void *, const char *path, const char *argv0, ... /*, char * const *envp */);
-
-pid_t sexecv(void *, const char *path, const char * const *argv);
-pid_t sexecve(void *, const char *path, const char * const *argv, const char * const *envp);
-pid_t sexecvp(void *, const char *path, const char * const *argv);
-pid_t sexecvpe(void *, const char *path, const char * const *argv, const char * const *envp);
-pid_t  getpid(void);
-#endif
 
 int cwait(int *, int, int);
 
