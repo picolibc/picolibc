@@ -101,7 +101,7 @@ int pthread_cancel (pthread_t);
 void pthread_cleanup_push (void (*routine)(void*), void *arg);
 void pthread_cleanup_pop (int execute);
 */
-typedef void __cleanup_routine_type (void *);
+typedef void (*__cleanup_routine_type) (void *);
 
 #define pthread_cleanup_push(fn, arg) { __cleanup_routine_type __cleanup_routine=fn; \
 void *__cleanup_param=arg;
