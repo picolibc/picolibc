@@ -1,3 +1,10 @@
+Wed May  3 18:07:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * errno.cc (errmap): Map ERROR_BAD_NETPATH to new errno ENOSHARE.
+        (_sys_errlist): Add entry for ENOSHARE.
+        (strerror): Add case for ENOSHARE.
+        * syscalls.cc (stat_worker): Check for errno ENOSHARE.
+
 Wed May  3 17:28:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
         * Makefile.in: Add dependencies for fhandler_random.o

@@ -1030,7 +1030,8 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
         buf->st_nlink =
             (dtype == DRIVE_REMOTE ? 1 : num_entries (real_path.get_win32 ()));
     }
-  else if (atts != -1 || (!oret && get_errno () != ENOENT))
+  else if (atts != -1 || (!oret && get_errno () != ENOENT
+                                && get_errno () != ENOSHARE))
     {
       /* Unfortunately, the above open may fail if the file exists, though.
          So we have to care for this case here, too. */

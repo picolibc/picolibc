@@ -50,7 +50,7 @@ errmap[] =
   X (NOT_SUPPORTED,		ENOSYS),
   X (REM_NOT_LIST,		ENONET),
   X (DUP_NAME,			ENOTUNIQ),
-  X (BAD_NETPATH,		ENXIO),
+  X (BAD_NETPATH,		ENOSHARE),
   X (FILE_EXISTS,		EEXIST),
   X (CANNOT_MAKE,		EPERM),
   X (INVALID_PARAMETER,		EINVAL),
@@ -279,7 +279,8 @@ extern const char __declspec(dllexport) * const _sys_errlist[]=
 /* EDQUOT 132 */ "Quota exceeded",
 /* ESTALE 133 */ "Stale NFS file handle",
 /* ENOTSUP 134 */   "134",
-/* ENOMEDIUM 135 */ "no medium"
+/* ENOMEDIUM 135 */ "no medium",
+/* ENOSHARE 136 */   "No such host or network path"
 };
 
 int __declspec(dllexport) _sys_nerr =
@@ -651,6 +652,9 @@ strerror (int errnum)
       break;
     case ENOMEDIUM:
       error = "no medium";
+      break;
+    case ENOSHARE:
+      error = "No such host or network path";
       break;
     default:
 #ifdef _MT_SAFE
