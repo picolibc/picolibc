@@ -2407,3 +2407,101 @@ logout (char *line)
 
   return res;
 }
+
+static int utmp_fd = -2;
+static char *utmp_file = (char *) _PATH_UTMP;
+
+static struct utmp utmp_data;
+
+extern "C" void
+setutent ()
+{
+  sigframe thisframe (mainthread);
+  if (utmp_fd == -2)
+    {
+      utmp_fd = _open (utmp_file, O_RDONLY);
+    }
+  _lseek (utmp_fd, 0, SEEK_SET);
+}
+
+extern "C" void
+endutent ()
+{
+  sigframe thisframe (mainthread);
+  _close (utmp_fd);
+  utmp_fd = -2;
+}
+
+extern "C" void
+utmpname (_CONST char *file)
+{
+  sigframe thisframe (mainthread);
+  if (check_null_empty_str (file))
+    {
+      debug_printf ("Invalid file");
+      return;
+    }
+  utmp_file = strdup (file);
+  debug_printf ("New UTMP file: %s", utmp_file);
+}
+
+extern "C" struct utmp *
+getutent ()
+{
+  sigframe thisframe (mainthread);
+  if (utmp_fd == -2)
+    setutent ();
+  if (_read (utmp_fd, &utmp_data, sizeof (utmp_data)) != sizeof (utmp_data))
+    return NULL;
+  return &utmp_data;
+}
+
+extern "C" struct utmp *
+getutid (struct utmp *id)
+{
+  sigframe thisframe (mainthread);
+  if (check_null_invalid_struct_errno (id))
+    return NULL;
+  while (_read (utmp_fd, &utmp_data, sizeof (utmp_data)) == sizeof (utmp_data))
+    {
+      switch (id->ut_type)
+	{
+#if 0 /* Not available in Cygwin. */
+	case RUN_LVL:
+	case BOOT_TIME:
+	case OLD_TIME:
+	case NEW_TIME:
+	  if (id->ut_type == utmp_data.ut_type)
+	    return &utmp_data;
+	  break;
+#endif
+	case INIT_PROCESS:
+	case LOGIN_PROCESS:
+	case USER_PROCESS:
+	case DEAD_PROCESS:
+	  if (id->ut_id == utmp_data.ut_id)
+	    return &utmp_data;
+	  break;
+	default:
+	  return NULL;
+	}
+    }
+  return NULL;
+}
+
+extern "C" struct utmp *
+getutline (struct utmp *line)
+{
+  sigframe thisframe (mainthread);
+  if (check_null_invalid_struct_errno (line))
+    return NULL;
+  while (_read (utmp_fd, &utmp_data, sizeof (utmp_data)) == sizeof (utmp_data))
+    {
+      if ((utmp_data.ut_type == LOGIN_PROCESS ||
+	   utmp_data.ut_type == USER_PROCESS) &&
+	  !strncmp (utmp_data.ut_line, line->ut_line,
+		    sizeof (utmp_data.ut_line)))
+	return &utmp_data;
+    }
+  return NULL;
+}

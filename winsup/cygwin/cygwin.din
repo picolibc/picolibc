@@ -159,6 +159,8 @@ ecvtf
 _ecvtf = ecvtf
 endgrent
 _endgrent = endgrent
+endutent
+_endutent = endutent
 erf
 _erf = erf
 erfc
@@ -376,6 +378,12 @@ gettimeofday
 _gettimeofday = gettimeofday
 getuid
 _getuid = getuid
+getutent
+_getutent = getutent
+getutid
+_getutid = getutid
+getutline
+_getutline = getutline
 glob
 _glob = glob
 globfree
@@ -660,6 +668,8 @@ setegid
 _setegid = setegid
 setuid
 _setuid = setuid
+setutent
+_setutent = setutent
 chroot
 _chroot = chroot
 setvbuf
@@ -868,6 +878,8 @@ utime
 _utime = utime
 utimes
 _utimes = utimes
+utmpname
+_utmpname = utmpname
 vfiprintf
 _vfiprintf = vfiprintf
 vfork

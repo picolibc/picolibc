@@ -1,3 +1,15 @@
+2001-12-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din: Add symbols for endutent(), getutent(), getutid(),
+	getutline(), setutent() and utmpname().
+	* syscalls.cc (setutent): New function.
+	(endutent): Ditto.
+	(utmpname): Ditto.
+	(getutent): Ditto.
+	(getutid): Ditto.
+	(getutline): Ditto.
+	* include/cygwin/version.h: Bump API minor version.
+
 2001-12-26  Christopher Faylor  <cgf@redhat.com>
 
 	* cygmagic: Add define name to warning.
