@@ -1,3 +1,7 @@
+2000-07-20  Hans-Peter Nilsson  <hp@axis.com>
+
+	* dis-asm.h (print_insn_cris): Declare.
+
 2000-07-19  H.J. Lu  (hjl@gnu.org)
 
 	* bfdlink.h (bfd_link_info): Add flags and flags_1.
