@@ -254,6 +254,8 @@ shared_info::heap_chunk_size ()
 	heap_chunk = 4 * 1024 * 1024;
       else
 	heap_chunk <<= 20;
+      if (!heap_chunk)
+	heap_chunk = 384 * 1024 * 1024;
       debug_printf ("fixed heap size is %u", heap_chunk);
     }
 
