@@ -1,5 +1,19 @@
 2002-07-11  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* cygserver.cc (client_request_shutdown::serve): Don't set the
+	shutdown flag directly, but send a SIGINT, as the signal handler
+	sets the flag and the signal breaks the pause(2) in the main loop.
+	(print_usage): Add new options.
+	(main): Add new --cleanup-threads and --request-threads options to
+	set the number of threads used by the daemon.  Use pause(2) rather
+	the win32 Sleep in the main loop.
+	* shm.cc (shmat): Add sigframe.
+	(shmctl): Ditto.
+	(shmdt): Ditto.
+	(shmget): Ditto.
+
+2002-07-11  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* cygserver_shm.cc: Automatically detach processes from any
 	segments they are attached to at exit.
 	(class server_shmmgr::attach_t): New class.

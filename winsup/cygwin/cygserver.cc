@@ -465,8 +465,6 @@ client_request_shutdown::client_request_shutdown ()
   syscall_printf ("created");
 }
 
-static volatile sig_atomic_t shutdown_server = false;
-
 void
 client_request_shutdown::serve (transport_layer_base *, process_cache *)
 {
@@ -479,10 +477,12 @@ client_request_shutdown::serve (transport_layer_base *, process_cache *)
    * only shutdown _this queue_
    */
 
-  shutdown_server = true;
+  kill (getpid (), SIGINT);
 
   msglen (0);
 }
+
+static sig_atomic_t shutdown_server = false;
 
 static void
 handle_signal (const int signum)
@@ -500,9 +500,11 @@ static void
 print_usage (const char *const pgm)
 {
   printf ("Usage: %s [OPTIONS]\n", pgm);
-  printf ("  -h, --help       output usage information and exit\n");
-  printf ("  -s, --shutdown   shutdown the current instance of the daemon\n");
-  printf ("  -v, --version    output version information and exit\n");
+  printf ("  -c, --cleanup-threads   number of cleanup threads to use\n");
+  printf ("  -h, --help              output usage information and exit\n");
+  printf ("  -r, --request-threads   number of request threads to use\n");
+  printf ("  -s, --shutdown          shutdown the daemon\n");
+  printf ("  -v, --version           output version information and exit\n");
 }
 
 /*
@@ -561,14 +563,18 @@ int
 main (const int argc, char *argv[])
 {
   const struct option longopts[] = {
+    {"cleanup-threads", required_argument, NULL, 'c'},
     {"help", no_argument, NULL, 'h'},
+    {"request-threads", required_argument, NULL, 'r'},
     {"shutdown", no_argument, NULL, 's'},
     {"version", no_argument, NULL, 'v'},
     {0, no_argument, NULL, 0}
   };
 
-  const char opts[] = "hsv";
+  const char opts[] = "c:hr:sv";
 
+  int cleanup_threads = 2;
+  int request_threads = 10;
   bool shutdown = false;
 
   const char *pgm = NULL;
@@ -587,9 +593,31 @@ main (const int argc, char *argv[])
   while ((opt = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (opt)
       {
+      case 'c':
+	cleanup_threads = atoi (optarg);
+	if (cleanup_threads <= 0)
+	  {
+	    fprintf (stderr,
+		     "%s: number of cleanup threads must be positive\n",
+		     pgm);
+	    exit (1);
+	  }
+	break;
+
       case 'h':
 	print_usage (pgm);
 	return 0;
+
+      case 'r':
+	request_threads = atoi (optarg);
+	if (request_threads <= 0)
+	  {
+	    fprintf (stderr,
+		     "%s: number of request threads must be positive\n",
+		     pgm);
+	    exit (1);
+	  }
+	break;
 
       case 's':
 	shutdown = true;
@@ -642,14 +670,14 @@ main (const int argc, char *argv[])
   setbuf (stdout, NULL);
   printf ("daemon starting up");
 
-  threaded_queue request_queue (10);
+  threaded_queue request_queue (request_threads);
   printf (".");
 
   transport_layer_base *const transport = create_server_transport ();
   assert (transport);
   printf (".");
 
-  process_cache cache (2);
+  process_cache cache (cleanup_threads);
   printf (".");
 
   server_submission_loop submission_loop (&request_queue, transport, &cache);
@@ -682,7 +710,7 @@ main (const int argc, char *argv[])
      -- if signal event then retrigger it
   */
   while (!shutdown_server && request_queue.running () && cache.running ())
-    Sleep (1000);
+    pause ();
 
   printf ("\nShutdown request received - new requests will be denied\n");
   request_queue.stop ();

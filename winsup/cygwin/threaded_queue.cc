@@ -214,6 +214,8 @@ threaded_queue::start_routine (const LPVOID lpParam)
 void
 threaded_queue::create_workers (const size_t initial_workers)
 {
+  assert (initial_workers > 0);
+
   for (unsigned int i = 0; i != initial_workers; i++)
     {
       const long count = InterlockedIncrement (&_workers_count);

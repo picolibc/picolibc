@@ -21,6 +21,7 @@ details. */
 #include <unistd.h>
 
 #include "cygerrno.h"
+#include "sigproc.h"
 
 #include "cygserver_ipc.h"
 #include "cygserver_shm.h"
@@ -609,6 +610,7 @@ client_shmmgr::new_segment (const int shmid,
 extern "C" void *
 shmat (const int shmid, const void *const shmaddr, const int shmflg)
 {
+  sigframe thisframe (mainthread);
   return shmmgr.shmat (shmid, shmaddr, shmflg);
 }
 
@@ -619,6 +621,7 @@ shmat (const int shmid, const void *const shmaddr, const int shmflg)
 extern "C" int
 shmctl (const int shmid, const int cmd, struct shmid_ds *const buf)
 {
+  sigframe thisframe (mainthread);
   return shmmgr.shmctl (shmid, cmd, buf);
 }
 
@@ -629,6 +632,7 @@ shmctl (const int shmid, const int cmd, struct shmid_ds *const buf)
 extern "C" int
 shmdt (const void *const shmaddr)
 {
+  sigframe thisframe (mainthread);
   return shmmgr.shmdt (shmaddr);
 }
 
@@ -639,6 +643,7 @@ shmdt (const void *const shmaddr)
 extern "C" int
 shmget (const key_t key, const size_t size, const int shmflg)
 {
+  sigframe thisframe (mainthread);
   return shmmgr.shmget (key, size, shmflg);
 }
 
