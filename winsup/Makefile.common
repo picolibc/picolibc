@@ -28,7 +28,13 @@ endif
 endif
 
 pwd:=${shell pwd}
-here:=${word 1,${subst winsup/,winsup ,$(pwd)}}/cygwin
+ifneq "${filter winsup%,${notdir $(pwd)}}" ""
+a:=${shell ${filter winsup%,${notdir $(pwd)}} >/dev/tty}
+    here:=${pwd}/cygwin
+else
+a:=${shell ${filter winsup%,${notdir $(pwd)}} >/dev/tty}
+    here:=${dir $(pwd)}cygwin
+endif
 bupdir:=${shell cd $(here)/..; pwd}
 ifneq (,${filter-out /%,$(bupdir)})
     bupdir1:=../..

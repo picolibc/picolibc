@@ -1,3 +1,7 @@
+Tue May 15 01:09:56 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.common: Change method for finding current directory.
+
 Sat May  5 00:14:03 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* configure.in: Fix typo.
