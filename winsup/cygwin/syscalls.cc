@@ -38,6 +38,11 @@ details. */
 #include "perprocess.h"
 #include "security.h"
 
+/* newlib used to define O_NDELAY differently from O_NONBLOCK.  Now it
+   properly defines both to be the same.  Unfortunately, we have to
+   behave properly the old version, too, to accomodate older executables. */
+#define OLD_O_NDELAY	4
+
 extern BOOL allow_ntsec;
 
 /* Close all files and process any queued deletions.
@@ -202,10 +207,10 @@ _read (int fd, void *ptr, size_t len)
 
   set_sig_errno (0);
   fhandler_base *fh = fdtab[fd];
-  DWORD wait = fh->get_flags () & (O_NONBLOCK | O_NDELAY) ? 0 : INFINITE;
+  DWORD wait = (fh->get_flags () & (O_NONBLOCK | OLD_O_NDELAY)) ? 0 : INFINITE;
 
   /* Could block, so let user know we at least got here.  */
-  syscall_printf ("read (%d, %p, %d)", fd, ptr, len);
+  syscall_printf ("read (%d, %p, %d) %sblocking", fd, ptr, len, wait ? "" : "non");
 
   int res;
   if (wait && (!fh->is_slow () || fh->get_r_no_interrupt ()))
@@ -232,7 +237,7 @@ _read (int fd, void *ptr, size_t len)
 
 
 out:
-  syscall_printf ("%d = read (%d<%s>, %p, %d), errno %d", -1, fd, fh->get_name (),
+  syscall_printf ("%d = read (%d<%s>, %p, %d), errno %d", res, fd, fh->get_name (),
 		  ptr, len, get_errno ());
   MALLOC_CHECK;
   return res;

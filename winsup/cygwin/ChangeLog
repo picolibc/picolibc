@@ -1,3 +1,8 @@
+Fri Oct  6 23:21:29 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* syscalls.cc (_read): Behave properly when passed previous version of
+	O_NDELAY.  Fix up debugging output.
+
 Thu Oct  5 20:34:48 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* net.cc (set_socket_inheritance): Rename from duplicate_socket.  Use
