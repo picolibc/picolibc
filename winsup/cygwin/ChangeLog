@@ -1,5 +1,10 @@
 2002-05-27  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat): Minor logic
+	cleanup.
+
+2002-05-27  Christopher Faylor  <cgf@redhat.com>
+
 	* autoload.cc (LoadFuncEx): Define via new LoadFuncEx2 macro.
 	(LoadFuncEx2): Adapted from LoadFuncEx.  Provides control of return
 	value for nonexistent function.

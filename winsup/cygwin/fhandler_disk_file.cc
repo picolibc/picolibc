@@ -143,9 +143,7 @@ fhandler_disk_file::fstat (struct __stat64 *buf, path_conv *pc)
 
   if (query_open_already && strncasematch (pc->volname (), "FAT", 3))
     oret = 0;
-  else if ((oret = open (pc, open_flags, 0)))
-    /* ok */;
-  else
+  else if (!(oret = open (pc, open_flags, 0)))
     {
       int ntsec_atts = 0;
       /* If we couldn't open the file, try a "query open" with no permissions.
