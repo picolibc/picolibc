@@ -212,7 +212,7 @@ manually:
 @itemize @bullet
 @item Cygwin shortcuts on the Desktop and Start Menu
 
-@item The registry tree @samp{Software\Red Hat, Inc.} under
+@item The registry tree @samp{Software\Cygnus Solutions} under
 @code{HKEY_LOCAL_MACHINE} and/or @code{HKEY_CURRENT_USER}.
 
 @item Anything under the Cygwin root folder, @samp{C:\cygwin} by
