@@ -1,3 +1,10 @@
+2002-07-17  Andrew Cagney  <cagney@redhat.com>
+
+	* remote-sim.h: Update copyright.
+	(sim_set_callbacks, sim_size, sim_trace)
+	(sim_set_trace, sim_set_profile_size, sim_kill): Delete.  Moved to
+	"sim/common/run-sim.h".
+
 Wed Jul 17 19:36:38 2002  J"orn Rennecke <joern.rennecke@superh.com>
 
 	* sim-sh.h: Add enum constants for sh[1-4], sh3e, sh3?-dsp,
