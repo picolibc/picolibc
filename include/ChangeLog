@@ -1,3 +1,8 @@
+2000-02-03  Timothy Wall <twall@redhat.com>
+
+	* dis-asm.h (struct disassemble_info): Added octets_per_byte
+	field and initialize it to one (1).
+	
 2000-01-27  Nick Clifton  <nickc@redhat.com>
 
 	* dis-asm.h: Add prototype for disassembler_usage().

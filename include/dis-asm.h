@@ -121,6 +121,11 @@ typedef struct disassemble_info {
   int bytes_per_chunk;
   enum bfd_endian display_endian;
 
+  /* Number of octets per incremented target address 
+     Normally one, but some DSPs have byte sizes of 16 or 32 bits
+   */
+  int octets_per_byte;
+
   /* Results from instruction decoders.  Not all decoders yet support
      this information.  This info is set each time an instruction is
      decoded, and is only valid for the last such instruction.
@@ -229,6 +234,7 @@ extern int generic_symbol_at_address
   (INFO).arch = bfd_arch_unknown, \
   (INFO).mach = 0, \
   (INFO).endian = BFD_ENDIAN_UNKNOWN, \
+  (INFO).octets_per_byte = 1, \
   INIT_DISASSEMBLE_INFO_NO_ARCH(INFO, STREAM, FPRINTF_FUNC)
 
 /* Call this macro to initialize only the internal variables for the
