@@ -11,8 +11,8 @@
 # This makefile requires GNU make.
 
 CFLAGS_COMMON:=-Wall -Wwrite-strings # -finline-functions
-MALLOC_DEBUG:=#-DMALLOC_DEBUG -I/gotham/src/comp-tools/winsup/dlmalloc
-MALLOC_OBJ:=#/gotham/src/comp-tools/winsup/dlmalloc/malloc.o
+MALLOC_DEBUG:=#-DMALLOC_DEBUG -I/cygnus/src/sourceware/winsup/dlmalloc
+MALLOC_OBJ:=#/cygnus/src/sourceware/winsup/dlmalloc/malloc.o
 
 override srcdir:=${shell cd $(srcdir); pwd}
 ifneq (,${filter-out /%,$(srcdir)})
