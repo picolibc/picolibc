@@ -1,6 +1,21 @@
+2002-10-03  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/fcntl.h (_fmode): Remove declarations and
+	compatibility defines.
+	(_setmode, setmode): Remove prototypes.
+	* include/stdlib (_fmode): Add declarations and
+	compatibility defines.  Change type to int.
+	* include/io.h (_setmode, setmode): Add prototypes.
+	* samples/fmode/all.c: Adjust includes.
+	* samples/fmode/test.c: Likewise.
+	* crt1.c (_CRT_fmode): Declare as int.
+	* CRTfmode.c (_CRT_fmode): Likewise.
+
+	* include/stdlib: Remove comment about MB_CUR_MAX.
+
 2002-10-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/stdlib.h (_imp____mbcur_max): add missing ';'.
+	* include/stdlib.h (_imp____mbcur_max): Add missing ';'.
 	(_imp____mbcur_max_dll): Likewise.
 
 2002-09-18  Danny Smith  <dannysmith@users.sourceforge.net>

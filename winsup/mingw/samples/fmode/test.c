@@ -9,7 +9,8 @@
  */
 
 #include <stdio.h>
-#include <fcntl.h>	/* Required to get _fmode and _O_BINARY */
+#include <stdlib.h>	/*  _fmode */
+#include <fcntl.h>	/*  _O_BINARY */
 
 main ()
 {

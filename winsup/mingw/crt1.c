@@ -59,7 +59,7 @@ __MINGW_IMPORT void __set_app_type(int);
  * Setup the default file handles to have the _CRT_fmode mode, as well as
  * any new files created by the user.
  */
-extern unsigned int _CRT_fmode;
+extern int _CRT_fmode;
 
 static void
 _mingw32_init_fmode ()
