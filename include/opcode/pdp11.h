@@ -1,5 +1,5 @@
 /* PDP-11 opcde list.
-   Copyright (C) 2001 Free Software Foundation, Inc.
+   Copyright 2001 Free Software Foundation, Inc.
 
 This file is part of GDB and GAS.
 

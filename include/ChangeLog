@@ -1,7 +1,7 @@
 2001-03-10  Neil Booth  <neil@daikokuya.demon.co.uk>
 
 	John David Anglin  <dave@hiauly1.hia.nrc.ca>
-	* include/libiberty.h: Add lbasename.
+	* libiberty.h: Add lbasename.
 	
 2001-03-06  Zack Weinberg  <zackw@stanford.edu>
 
@@ -113,40 +113,12 @@
 
 	* libiberty.h (ARRAY_SIZE): New macro.
 
-2000-08-08  Jason Eckhardt  <jle@cygnus.com>
-
-	* opcode/i860.h: Small formatting adjustments.
-
 2000-07-29  Nick Clifton  <nickc@cygnus.com>
 
 	* os9k.h: Add copyright notice.
 	Fix formatting.
 
 2000-07-22  Jason Eckhardt  <jle@cygnus.com>
-
-	* opcode/i860.h (btne, bte, bla): Changed these opcodes
-	to use sbroff ('r') instead of split16 ('s').
-	(J, K, L, M): New operand types for 16-bit aligned fields.
-	(ld.x, {p}fld.x, fst.x, pst.d): Changed these opcodes to
-	use I, J, K, L, M instead of just I.
-	(T, U): New operand types for split 16-bit aligned fields.
-	(st.x): Changed these opcodes to use S, T, U instead of just S.
-	(andh, andnoth, orh, xorh): Deleted 3-register forms as they do not
-	exist on the i860.
-	(pfgt.sd, pfle.sd): Deleted these as they do not exist on the i860.
-	(pfeq.ss, pfeq.dd): New opcodes.
-	(st.s): Fixed incorrect mask bits.
-	(fmlow): Fixed incorrect mask bits.
-	(fzchkl, pfzchkl): Fixed incorrect mask bits.
-	(faddz, pfaddz): Fixed incorrect mask bits.
-	(form, pform): Fixed incorrect mask bits.
-	(pfld.l): Fixed incorrect mask bits.
-	(fst.q): Fixed incorrect mask bits.
-	(all floating point opcodes): Fixed incorrect mask bits for
-	handling of dual bit.
-
-	* elf/i860.h: New file.
-	(elf_i860_reloc_type): Defined ELF32 i860 relocations.
 
 	* dis-asm.h (print_insn_i860): Add prototype.
 
@@ -165,10 +137,6 @@
 2000-06-05  DJ Delorie  <dj@redhat.com>
 
 	* MAINTAINERS: new
-
-2000-06-30  DJ Delorie  <dj@cygnus.com>
-
-	* coff/pe.h: clarify a comment
 
 2000-06-21  Alex Samuel  <samuel@codesourcery.com>
 
@@ -243,10 +211,6 @@ Tue May 30 16:53:34 2000  Andrew Cagney  <cagney@b1.cygnus.com>
  	* ansidecl.h: #define __extension__ to nothing if
  	GCC_VERSION < 2008.
 
-Fri May  5 16:51:03 2000  Clinton Popetz  <cpopetz@cygnus.com>
-
-	* coff/rs6k64.h (U802TOC64MAGIC): Change to U803XTOCMAGIC.
-
 2000-05-04  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
 	* demangle.h (demangler_engine): Constify.
@@ -266,10 +230,6 @@ Thu May  4 17:15:26 2000  Philippe De Muyter  <phdm@macqel.be>
         * demangle.h (libiberty_demanglers): new table for different styles.
         (cplus_demangle_set_style): New function for setting style.
         (cplus_demangle_name_to_style): New function to translate name.
-
-Mon Apr 24 15:20:51 2000  Clinton Popetz  <cpopetz@cygnus.com>
-
-	* include/coff/rs6k64.h: New file.
 
 2000-04-24  Mark Mitchell  <mark@codesourcery.com>
 
@@ -352,11 +312,6 @@ Tue Apr 18 16:22:30 2000  Richard Kenner  <kenner@vlsi1.ultra.nyu.edu>
 2000-02-23  Linas Vepstas <linas@linas.org>
 
 	* dis-asm.h (print_insn_i370): Declare.
-
-2000-02-22  Chandra Chavva  <cchavva@cygnus.com>
-
-	* opcode/d30v.h (FLAG_NOT_WITH_ADDSUBppp): Redefined as operation
-	cannot be combined in parallel with ADD/SUBppp.
 
 Tue Feb 22 15:19:54 2000  Andrew Cagney  <cagney@b1.cygnus.com>
 
@@ -598,11 +553,6 @@ Tue Dec  8 00:30:31 1998  Elena Zannoni  <ezannoni@kwikemart.cygnus.com>
 	(struct dntt_type_svar): add field thread_specific.
 	(hp_language): add languages modcal and dmpascal.
 
-Mon Nov 30 15:25:58 1998  J"orn Rennecke <amylaar@cygnus.co.uk>
-
-	* elf/sh.h (elf_sh_reloc_type): Add R_SH_FIRST_INVALID_RELOC,
-	R_SH_LAST_INVALID_RELOC, R_SH_SWITCH8 and R_SH_max.
-
 Fri Nov 20 13:14:00 1998  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* libiberty.h (basename): Add prototype for FreeBSD.
@@ -657,10 +607,6 @@ Mon Jun  1 13:48:32 1998  Jason Molenda  (crash@bugshack.cygnus.com)
 
 	* obstack.h: Update to latest FSF version.
 
-Tue May 26 20:57:43 1998  Stan Cox  <scox@equinox.cygnus.com>
-
-	* elf/sparc.h (EF_SPARC_LEDATA, R_SPARC_32LE): Added.
-
 Tue Feb 24 13:05:02 1998  Doug Evans  <devans@canuck.cygnus.com>
 
 	* dis-asm.h (disassemble_info): Member `symbol' renamed to `symbols'
@@ -698,10 +644,6 @@ Mon Dec  8 11:22:23 1997  Nick Clifton  <nickc@cygnus.com>
 Tue Dec  2 10:20:53 1997  Nick Clifton  <nickc@cygnus.com>
 
 	* dis-asm.h (disasm_symaddr): New prototype.
-
-Mon Dec  1 20:24:18 1997  J"orn Rennecke <amylaar@cygnus.co.uk>
-
-	* coff/sh.h (R_SH_SWITCH8): New.
 
 Mon Dec  1 11:29:35 1997  Doug Evans  <devans@canuck.cygnus.com>
 
@@ -830,14 +772,6 @@ Thu May 15 01:24:16 1997  Mark Alexander  <marka@cygnus.com>
 
 	* obstack.h (obstack_specify_allocation_with_arg, obstack_chunkfun,
 	obstack_freefun): Eliminate compile warnings in gdb.
-
-Tue May 13 10:21:14 1997  Nick Clifton  <nickc@cygnus.com>
-
-	* coff/arm.h (constants):   Added new flag bits F_APCS_26 and
-	F_APCS_SET for the f_flags field of the filehdr structure.  Added new
-	flags: F_APCS26, F_ARM_2, F_ARM_3, F_ARM_7, F_ARM_7T to store
-	information in the flags field of the internal_f structure used by BFD
-	routines.
 
 Tue Apr 22 10:24:34 1997  Fred Fish  <fnf@cygnus.com>
 
@@ -1187,13 +1121,7 @@ Thu May 18 04:25:50 1995  Ken Raeburn  <raeburn@kr-laptop.cygnus.com>
 
 Sat May 13 10:14:08 1995  Steve Chamberlain  <sac@slash.cygnus.com>
 
-	* coff/pe.h: New file.
 	* bfdlink.h (subsytem, stack_heap_parameters): New.
-	* coff/i386.h (NT_SECTION_ALIGNMENT, NT_FILE_ALIGNMENT,
-	NT_DEF_RESERVE, NT_DEF_COMMIT): New.
-	* coff/internal.h (internal_filehdr):  New fields for PE.
-	(IMAGE_DATA_DIRECTORY): New.
-	(internal_aouthdr): New fields for PE.
 
 Thu May  4 14:36:42 1995  Jason Merrill  <jason@phydeaux.cygnus.com>
 
@@ -1267,8 +1195,6 @@ Tue Oct 25 11:38:02 1994  Ian Lance Taylor  <ian@sanguine.cygnus.com>
 	multiple_common field.
 
 Sun Sep 04 17:58:10 1994  Richard Earnshaw (rwe@pegasus.esprit.ec.org)
-
-	* aout/aout64.h: Only define QMAGIC if it isn't already defined.
 
 	* dis-asm.h: Add support for the ARM.
 
@@ -1415,10 +1341,6 @@ Fri Aug  6 17:05:47 1993  David J. Mackenzie  (djm@thepub.cygnus.com)
 
 	* getopt.h, obstack.h: Update to latest FSF version.
 
-Mon Aug  2 16:37:14 1993  Stu Grossman  (grossman at cygnus.com)
-
-	* coff/i386.h:  Add Lynx magic number.
-
 Mon Aug  2 14:45:29 1993  John Gilmore  (gnu@cygnus.com)
 
 	* dis-asm.h:  Move enum outside of struct defn to avoid warnings.
@@ -1448,10 +1370,6 @@ Thu Jul 15 12:41:15 1993  Ian Lance Taylor  (ian@tweedledumb.cygnus.com)
 
 	* dis-asm.h: Added declaration of print_insn_m88k.
 
-Thu Jul  8 09:05:26 1993  Doug Evans  (dje@canuck.cygnus.com)
-
-	* opcode/h8300.h: Lots of little fixes for the h8/300h.
-
 Fri Jul  2 10:31:59 1993  Ian Lance Taylor  (ian@cygnus.com)
 
 	* ansidecl.h: Use ANSI macros if __mips and _SYSTYPE_SVR4 are
@@ -1476,9 +1394,6 @@ Tue Jun  8 12:16:03 1993  Steve Chamberlain  (sac@phydeaux.cygnus.com)
 
 	 Support for H8/300-H
 	* dis-asm.h (print_insn_h8300, print_insn_h8300h): Declare it.
-	* coff/h8300.h: New magic number.
-	* coff/internal.h: New relocations.
-	* opcode/h8300.h: Lots of new opcodes.
 
 Tue Jun  1 07:35:03 1993  Ken Raeburn  (raeburn@kr-pc.cygnus.com)
 
@@ -1757,7 +1672,7 @@ Mon Jan 27 22:01:13 1992  Steve Chamberlain  (sac at cygnus.com)
 
 Wed Dec 18 17:19:44 1991  Stu Grossman  (grossman at cygnus.com)
 
-	* bfd.h, ieee.h, opcode/m68k.h, opcode/sparc.h:  ANSIfy enums.
+	* bfd.h, ieee.h:  ANSIfy enums.
 
 Thu Dec 12 20:59:56 1991  John Gilmore  (gnu at cygnus.com)
 

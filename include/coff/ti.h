@@ -1,21 +1,40 @@
 /* COFF information for TI COFF support.  Definitions in this file should be
    customized in a target-specific file, and then this file included (see
-   tic54x.h for an example). */
+   tic54x.h for an example).
+   
+   Copyright 2001 Free Software Foundation, Inc.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+   
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #ifndef COFF_TI_H
 #define COFF_TI_H
 
+/* Note "coff/external.h is not used because TI adds extra fields to the structures.  */
+
 /********************** FILE HEADER **********************/
 
-struct external_filehdr {
-	char f_magic[2];	/* magic number			*/
-	char f_nscns[2];	/* number of sections		*/
-	char f_timdat[4];	/* time & date stamp		*/
-	char f_symptr[4];	/* file pointer to symtab	*/
-	char f_nsyms[4];	/* number of symtab entries	*/
-	char f_opthdr[2];	/* sizeof(optional hdr)		*/
-	char f_flags[2];	/* flags			*/
-        char f_target_id[2];    /* magic no. (TI COFF-specific) */
-};
+struct external_filehdr
+  {
+    char f_magic[2];	/* magic number			*/
+    char f_nscns[2];	/* number of sections		*/
+    char f_timdat[4];	/* time & date stamp		*/
+    char f_symptr[4];	/* file pointer to symtab	*/
+    char f_nsyms[4];	/* number of symtab entries	*/
+    char f_opthdr[2];	/* sizeof(optional hdr)		*/
+    char f_flags[2];	/* flags			*/
+    char f_target_id[2];    /* magic no. (TI COFF-specific) */
+  };
 
 /* COFF0 has magic number in f_magic, and omits f_target_id from the file
    header; for later versions, f_magic is 0xC1 for COFF1 and 0xC2 for COFF2
@@ -404,14 +423,16 @@ bfd_h_put_32(abfd,src->n_value * 8,(bfd_byte *)dst->e_value); \
 
 /********************** RELOCATION DIRECTIVES **********************/
 
-struct external_reloc_v0 {
+struct external_reloc_v0
+{
   char r_vaddr[4];
   char r_symndx[2];
   char r_reserved[2];
   char r_type[2];
 };
 
-struct external_reloc {
+struct external_reloc
+{
   char r_vaddr[4];
   char r_symndx[4];
   char r_reserved[2]; /* extended pmad byte for COFF2 */

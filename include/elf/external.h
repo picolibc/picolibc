@@ -1,5 +1,6 @@
 /* ELF support for BFD.
-   Copyright (C) 1991, 92, 93, 95, 97, 98, 1999 Free Software Foundation, Inc.
+   Copyright 1991, 1992, 1993, 1995, 1997, 1998, 1999
+   Free Software Foundation, Inc.
 
    Written by Fred Fish @ Cygnus Support, from information published
    in "UNIX System V Release 4, Programmers Guide: ANSI C and

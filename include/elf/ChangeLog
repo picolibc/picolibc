@@ -112,8 +112,13 @@
 
 2000-08-14  Jim Wilson  <wilson@cygnus.com>
 
-	* elf/ia64.h (EF_IA_64_REDUCEDFP, EF_IA_64_CONS_GP,
+	* ia64.h (EF_IA_64_REDUCEDFP, EF_IA_64_CONS_GP,
 	EF_IA_64_NOFUNCDESC_CONS_GP, EF_IA_64_ABSOLUTE): Define.
+
+2000-07-22  Jason Eckhardt  <jle@cygnus.com>
+
+	* i860.h: New file.
+	(elf_i860_reloc_type): Defined ELF32 i860 relocations.
 
 2000-07-20  Hans-Peter Nilsson  <hp@axis.com>
 
@@ -540,7 +545,7 @@ Thu Feb 18 18:58:26 1999  Ian Lance Taylor  <ian@cygnus.com>
 
 	Patch submitted by: Scott Bambrough <scottb@corelcomputer.com>
 
-	* elf/external.h: struct Elf_External_Versym must be packed on
+	* external.h: struct Elf_External_Versym must be packed on
 	ARM.  Code uses sizeof(Elf_External_Versym) and assumes it is
 	equal to sizeof(char[2]).  Reported by Jim Pick <jim@jimpick.com>
 
@@ -584,6 +589,11 @@ Mon Feb  1 11:33:56 1999  Catherine Moore  <clm@cygnus.com>
 	* mips.h: Add more LL_* options from Irix 6.5.
 
 	* mips.h: Add R_MIPS_JALR and adjust R_MIPS_max appropriately.
+
+Mon Nov 30 15:25:58 1998  J"orn Rennecke <amylaar@cygnus.co.uk>
+
+	* sh.h (elf_sh_reloc_type): Add R_SH_FIRST_INVALID_RELOC,
+	R_SH_LAST_INVALID_RELOC, R_SH_SWITCH8 and R_SH_max.
 
 Tue Nov 10 15:12:28 1998  Nick Clifton  <nickc@cygnus.com>
 

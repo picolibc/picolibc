@@ -1,5 +1,6 @@
 /* Opcode table header for m680[01234]0/m6888[12]/m68851.
-   Copyright 1989, 91, 92, 93, 94, 95, 96, 97, 1999, 2001 Free Software Foundation.
+   Copyright 1989, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1999, 2001
+   Free Software Foundation, Inc.
 
 This file is part of GDB, GAS, and the GNU binutils.
 

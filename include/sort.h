@@ -1,5 +1,5 @@
 /* Sorting algorithms.
-   Copyright (C) 2000 Free Software Foundation, Inc.
+   Copyright 2000 Free Software Foundation, Inc.
    Contributed by Mark Mitchell <mark@codesourcery.com>.
 
 This file is part of GNU CC.

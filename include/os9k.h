@@ -1,5 +1,5 @@
 /* os9k.h  -  OS-9000 i386 module header definitions
-   Copyright (C) 2000 Free Software Foundation, Inc.
+   Copyright 2000 Free Software Foundation, Inc.
 
 This file is part of GNU CC.
    

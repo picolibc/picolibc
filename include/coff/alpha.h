@@ -1,9 +1,26 @@
 /* ECOFF support on Alpha machines.
-   coff/ecoff.h must be included before this file.  */
+   coff/ecoff.h must be included before this file.
 
+   Copyright 2001 Free Software Foundation, Inc.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+   
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   
 /********************** FILE HEADER **********************/
 
-struct external_filehdr {
+struct external_filehdr
+{
   unsigned char f_magic[2];	/* magic number			*/
   unsigned char f_nscns[2];	/* number of sections		*/
   unsigned char f_timdat[4];	/* time & date stamp		*/
@@ -27,7 +44,6 @@ struct external_filehdr {
 #define	FILHSZ	24
 
 /********************** AOUT "OPTIONAL HEADER" **********************/
-
 
 typedef struct external_aouthdr
 {
@@ -54,7 +70,8 @@ typedef struct external_aouthdr
 
 /********************** SECTION HEADER **********************/
 
-struct external_scnhdr {
+struct external_scnhdr
+{
   unsigned char	s_name[8];	/* section name			*/
   unsigned char	s_paddr[8];	/* physical address, aliased s_nlib */
   unsigned char	s_vaddr[8];	/* virtual address		*/
@@ -72,7 +89,8 @@ struct external_scnhdr {
 
 /********************** RELOCATION DIRECTIVES **********************/
 
-struct external_reloc {
+struct external_reloc 
+{
   unsigned char r_vaddr[8];
   unsigned char r_symndx[4];
   unsigned char r_bits[4];
@@ -150,7 +168,8 @@ struct external_reloc {
 
 /* File header as a set of bytes */
 
-struct hdr_ext {
+struct hdr_ext
+{
 	unsigned char 	h_magic[2];
 	unsigned char	h_vstamp[2];
 	unsigned char	h_ilineMax[4];
@@ -180,7 +199,8 @@ struct hdr_ext {
 
 /* File descriptor external record */
 
-struct fdr_ext {
+struct fdr_ext
+{
 	unsigned char	f_adr[8];
 	unsigned char	f_cbLineOffset[8];
 	unsigned char	f_cbLine[8];

@@ -1,5 +1,21 @@
 /* Internal format of COFF object file data structures, for GNU BFD.
-   This file is part of BFD, the Binary File Descriptor library.  */
+   This file is part of BFD, the Binary File Descriptor library.
+   
+   Copyright 2001 Free Software Foundation, Inc.
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+   
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+   
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 #ifndef GNU_COFF_INTERNAL_H
 #define GNU_COFF_INTERNAL_H 1
@@ -45,7 +61,7 @@ struct internal_filehdr
 {
   struct internal_extra_pe_filehdr pe;
 
-  /* standard coff  internal info */
+  /* Standard coff internal info.  */
   unsigned short f_magic;	/* magic number			*/
   unsigned short f_nscns;	/* number of sections		*/
   long f_timdat;		/* time & date stamp		*/
@@ -58,17 +74,16 @@ struct internal_filehdr
 
 
 /* Bits for f_flags:
- *	F_RELFLG	relocation info stripped from file
- *	F_EXEC		file is executable (no unresolved external references)
- *	F_LNNO		line numbers stripped from file
- *	F_LSYMS		local symbols stripped from file
- *	F_AR16WR	file is 16-bit little-endian
- *	F_AR32WR	file is 32-bit little-endian
- *	F_AR32W		file is 32-bit big-endian
- *	F_DYNLOAD	rs/6000 aix: dynamically loadable w/imports & exports
- *	F_SHROBJ	rs/6000 aix: file is a shared object
- *      F_DLL           PE format DLL
- */
+ 	F_RELFLG	relocation info stripped from file
+ 	F_EXEC		file is executable (no unresolved external references)
+ 	F_LNNO		line numbers stripped from file
+ 	F_LSYMS		local symbols stripped from file
+ 	F_AR16WR	file is 16-bit little-endian
+ 	F_AR32WR	file is 32-bit little-endian
+ 	F_AR32W		file is 32-bit big-endian
+ 	F_DYNLOAD	rs/6000 aix: dynamically loadable w/imports & exports
+ 	F_SHROBJ	rs/6000 aix: file is a shared object
+        F_DLL           PE format DLL.  */
 
 #define	F_RELFLG	(0x0001)
 #define	F_EXEC		(0x0002)
@@ -81,7 +96,7 @@ struct internal_filehdr
 #define	F_SHROBJ	(0x2000)
 #define F_DLL           (0x2000)
 
-/* extra structure which is used in the optional header */
+/* Extra structure which is used in the optional header.  */
 typedef struct _IMAGE_DATA_DIRECTORY 
 {
   bfd_vma VirtualAddress;
@@ -184,9 +199,7 @@ struct internal_aouthdr
   long o_sri;			/* Static Resource Information */
   long vid[2];			/* Version id */
 
-
   struct internal_extra_pe_aouthdr pe;
-
 };
 
 /********************** STORAGE CLASSES **********************/
@@ -306,9 +319,7 @@ struct internal_scnhdr
   unsigned char s_page;         /* TI COFF load page            */
 };
 
-/*
- * s_flags "type"
- */
+/* s_flags "type".  */
 #define STYP_REG	 (0x0000)	/* "regular": allocated, relocated, loaded */
 #define STYP_DSECT	 (0x0001)	/* "dummy":  relocated only*/
 #define STYP_NOLOAD	 (0x0002)	/* "noload": allocated, relocated, not loaded */
@@ -327,22 +338,20 @@ struct internal_scnhdr
 #define STYP_OVER	 (0x0400)	/* overlay: relocated not allocated or loaded */
 #define STYP_LIB	 (0x0800)	/* for .lib: same as INFO */
 #define STYP_MERGE	 (0x2000)	/* merge section -- combines with text, data or bss sections only */
-#define STYP_REVERSE_PAD (0x4000)	/* section will be padded with no-op instructions wherever padding is necessary and there is a
-					
-									     word of contiguous bytes
-									     beginning on a word boundary. */
+#define STYP_REVERSE_PAD (0x4000)	/* section will be padded with no-op instructions
+					   wherever padding is necessary and there is a
+					   word of contiguous bytes beginning on a word
+					   boundary. */
 
 #define STYP_LIT	0x8020	/* Literal data (like STYP_TEXT) */
-
 
 
 /********************** LINE NUMBERS **********************/
 
 /* 1 line number entry for every "breakpointable" source line in a section.
- * Line numbers are grouped on a per function basis; first entry in a function
- * grouping will have l_lnno = 0 and in place of physical address will be the
- * symbol table index of the function name.
- */
+   Line numbers are grouped on a per function basis; first entry in a function
+   grouping will have l_lnno = 0 and in place of physical address will be the
+   symbol table index of the function name.  */
 
 struct internal_lineno
 {
@@ -384,9 +393,8 @@ struct internal_syment
 #define n_zeroes	_n._n_n._n_zeroes
 #define n_offset	_n._n_n._n_offset
 
-
 /* Relocatable symbols have number of the section in which they are defined,
-   or one of the following: */
+   or one of the following:  */
 
 #define N_UNDEF	((short)0)	/* undefined symbol */
 #define N_ABS	((short)-1)	/* value of symbol is absolute */
@@ -394,9 +402,8 @@ struct internal_syment
 #define N_TV	((short)-3)	/* indicates symbol needs preload transfer vector */
 #define P_TV	((short)-4)	/* indicates symbol needs postload transfer vector*/
 
-/*
- * Type of a symbol, in low N bits of the word
- */
+/* Type of a symbol, in low N bits of the word.  */
+
 #define T_NULL		0
 #define T_VOID		1	/* function argument (only used by compiler) */
 #define T_CHAR		2	/* character		*/
@@ -415,9 +422,8 @@ struct internal_syment
 #define T_ULONG		15	/* unsigned long	*/
 #define T_LNGDBL	16	/* long double		*/
 
-/*
- * derived types, in n_type
-*/
+/* Derived types, in n_type.  */
+
 #define DT_NON		(0)	/* no derived type */
 #define DT_PTR		(1)	/* pointer */
 #define DT_FCN		(2)	/* function */
