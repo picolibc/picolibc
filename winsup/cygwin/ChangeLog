@@ -1,5 +1,10 @@
 2004-01-22  Christopher Faylor  <cgf@redhat.com>
 
+	* dcrt0.cc (reent_data): Make global.
+	* cygwin.din: Reexport reent_data.
+
+2004-01-22  Christopher Faylor  <cgf@redhat.com>
+
 	* cygtls.cc (_threadinfo::remove): Don't assume that we are removing
 	_my_tls.
 	* exceptions.cc (setup_handler): Improve debugging output.
