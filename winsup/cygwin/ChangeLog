@@ -1,3 +1,8 @@
+2001-12-17  Christopher Faylor  <cgf@redhat.com>
+
+	* dtable.cc (dtable::init_std_file_from_handle): Avoid initializing
+	using an invalid handle.
+
 2001-12-16  David Billinghurst <David.Billinghurst@riotinto.com>
 
 	* include/limits.h: Define LLONG_MIN, LLONG_MAX, ULLONG_MAX.
