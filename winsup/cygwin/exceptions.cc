@@ -10,13 +10,16 @@ details. */
 
 #define Win32_Winsock
 #include "winsup.h"
-#include <stdio.h>
+#include <imagehlp.h>
 #include <errno.h>
 
 #include "exceptions.h"
-#include <imagehlp.h>
+#include "sync.h"
+#include "sigproc.h"
 #include "pinfo.h"
 #include "cygerrno.h"
+#include "thread.h"
+#include "perthread.h"
 
 char debugger_command[2 * MAX_PATH + 20];
 

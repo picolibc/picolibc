@@ -12,8 +12,10 @@ details. */
 #include <unistd.h>
 #include <sys/fcntl.h>
 #include <errno.h>
-#include "dtable.h"
 #include "cygerrno.h"
+#include "fhandler.h"
+#include "dtable.h"
+#include "thread.h"
 
 static int
 make_pipe (int fildes[2], unsigned int psize, int mode)

@@ -13,8 +13,9 @@ details. */
 
 #include "winsup.h"
 #include <errno.h>
-#include "dtable.h"
 #include "cygerrno.h"
+#include "fhandler.h"
+#include "dtable.h"
 
 /* tcsendbreak: POSIX 7.2.2.1 */
 extern "C"

@@ -1,3 +1,9 @@
+Tue Aug 22 01:08:01 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* winsup.h: Eliminate inclusion of most of the cygwin .h files.  Use .h
+	files only in sources which require them.
+	* Makefile.in: Generate dependencies with -MD option.
+
 Mon Aug 21 23:49:05 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* cygerrno.h: New file.  Use this throughout whenever errno

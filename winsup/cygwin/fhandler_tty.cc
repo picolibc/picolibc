@@ -16,9 +16,12 @@ details. */
 #include <errno.h>
 #include <ctype.h>
 #include <limits.h>
-#include "dtable.h"
-#include "pinfo.h"
 #include "cygerrno.h"
+#include "fhandler.h"
+#include "dtable.h"
+#include "sync.h"
+#include "sigproc.h"
+#include "pinfo.h"
 
 /* Tty master stuff */
 

@@ -22,9 +22,13 @@ details. */
 #include <sys/stat.h>
 #include <sys/acl.h>
 #include <ctype.h>
-#include "dtable.h"
-#include "pinfo.h"
 #include "cygerrno.h"
+#include "fhandler.h"
+#include "path.h"
+#include "dtable.h"
+#include "sync.h"
+#include "sigproc.h"
+#include "pinfo.h"
 
 extern BOOL allow_ntea;
 BOOL allow_ntsec = FALSE;
@@ -51,11 +55,11 @@ convert_sid_to_string_sid (PSID psid, char *sid_str)
   if (!psid || !sid_str)
     return NULL;
   strcpy (sid_str, "S-1-");
-  sprintf(t, "%u", GetSidIdentifierAuthority (psid)->Value[5]);
+  __small_sprintf(t, "%u", GetSidIdentifierAuthority (psid)->Value[5]);
   strcat (sid_str, t);
   for (i = 0; i < *GetSidSubAuthorityCount (psid); ++i)
     {
-      sprintf(t, "-%lu", *GetSidSubAuthority (psid, i));
+      __small_sprintf(t, "-%lu", *GetSidSubAuthority (psid, i));
       strcat (sid_str, t);
     }
   return sid_str;
@@ -2005,27 +2009,27 @@ acltotext (aclent_t *aclbufp, int aclcnt)
       switch (aclbufp[pos].a_type)
         {
         case USER_OBJ:
-          sprintf (buf + strlen (buf), "user::%s",
+          __small_sprintf (buf + strlen (buf), "user::%s",
                    permtostr (aclbufp[pos].a_perm));
           break;
         case USER:
-          sprintf (buf + strlen (buf), "user:%d:%s",
+          __small_sprintf (buf + strlen (buf), "user:%d:%s",
                    aclbufp[pos].a_id, permtostr (aclbufp[pos].a_perm));
           break;
         case GROUP_OBJ:
-          sprintf (buf + strlen (buf), "group::%s",
+          __small_sprintf (buf + strlen (buf), "group::%s",
                    permtostr (aclbufp[pos].a_perm));
           break;
         case GROUP:
-          sprintf (buf + strlen (buf), "group:%d:%s",
+          __small_sprintf (buf + strlen (buf), "group:%d:%s",
                    aclbufp[pos].a_id, permtostr (aclbufp[pos].a_perm));
           break;
         case CLASS_OBJ:
-          sprintf (buf + strlen (buf), "mask::%s",
+          __small_sprintf (buf + strlen (buf), "mask::%s",
                    permtostr (aclbufp[pos].a_perm));
           break;
         case OTHER_OBJ:
-          sprintf (buf + strlen (buf), "other::%s",
+          __small_sprintf (buf + strlen (buf), "other::%s",
                    permtostr (aclbufp[pos].a_perm));
           break;
         default:

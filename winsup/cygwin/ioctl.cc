@@ -14,11 +14,11 @@ details. */
 #include "winsup.h"
 #include <sys/ioctl.h>
 #include <errno.h>
-#include "dtable.h"
 #include "cygerrno.h"
+#include "fhandler.h"
+#include "dtable.h"
 
-extern "C"
-int
+extern "C" int
 ioctl (int fd, int cmd, void *buf)
 {
   if (fdtab.not_open (fd))

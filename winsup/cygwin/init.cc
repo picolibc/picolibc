@@ -10,6 +10,7 @@ details. */
 
 #include "winsup.h"
 #include <stdlib.h>
+#include "thread.h"
 
 extern HMODULE cygwin_hmodule;
 

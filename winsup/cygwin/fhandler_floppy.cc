@@ -14,6 +14,7 @@ details. */
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
+#include "fhandler.h"
 
 /**********************************************************************/
 /* fhandler_dev_floppy */

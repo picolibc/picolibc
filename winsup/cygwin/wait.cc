@@ -13,6 +13,9 @@ details. */
 #include <stdlib.h>
 #include <errno.h>
 #include "cygerrno.h"
+#include "sync.h"
+#include "sigproc.h"
+#include "perthread.h"
 
 /* This is called _wait and not wait because the real wait is defined
    in libc/syscalls/syswait.c.  It calls us.  */

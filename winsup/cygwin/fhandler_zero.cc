@@ -12,6 +12,7 @@ details. */
 
 #include "winsup.h"
 #include <errno.h>
+#include "fhandler.h"
 
 fhandler_dev_zero::fhandler_dev_zero (const char *name)
   : fhandler_base (FH_ZERO, name)

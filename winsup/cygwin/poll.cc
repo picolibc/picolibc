@@ -11,6 +11,7 @@
 #include "winsup.h"
 #include <sys/poll.h>
 #include <errno.h>
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygerrno.h"
 

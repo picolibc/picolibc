@@ -14,8 +14,10 @@ details. */
 
 #include "winsup.h"
 #include <errno.h>
-#include "pinfo.h"
 #include "cygerrno.h"
+#include "sync.h"
+#include "sigproc.h"
+#include "pinfo.h"
 
 /* add timeval values */
 static void

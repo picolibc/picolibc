@@ -22,8 +22,11 @@ details. */
 #include <wingdi.h>
 #include <winuser.h>
 #include <ctype.h>
-#include "pinfo.h"
 #include "cygerrno.h"
+#include "fhandler.h"
+#include "sync.h"
+#include "sigproc.h"
+#include "pinfo.h"
 
 /*
  * Scroll the screen context.

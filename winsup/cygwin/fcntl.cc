@@ -13,8 +13,10 @@ details. */
 #include <stdarg.h>
 #include <errno.h>
 #include <unistd.h>
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygerrno.h"
+#include "thread.h"
 
 extern "C"
 int

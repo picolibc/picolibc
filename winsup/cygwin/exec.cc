@@ -13,6 +13,8 @@ details. */
 #include <stdlib.h>
 #include <errno.h>
 #include <process.h>
+#include "fhandler.h"
+#include "path.h"
 
 /* This is called _execve and not execve because the real execve is defined
    in libc/posix/execve.c.  It calls us.  */

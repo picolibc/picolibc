@@ -13,7 +13,11 @@ details. */
 #include <stddef.h>
 #include <ctype.h>
 #include <fcntl.h>
+#include "sync.h"
+#include "sigproc.h"
 #include "pinfo.h"
+#include "fhandler.h"
+#include "path.h"
 #include "cygerrno.h"
 
 extern BOOL allow_glob;

@@ -13,6 +13,7 @@ details. */
 
 #include "winsup.h"
 #include <stdlib.h>
+#include "sync.h"
 
 /* we provide these stubs to call into a user's
    provided malloc if there is one - otherwise

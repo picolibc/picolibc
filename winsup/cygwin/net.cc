@@ -23,9 +23,14 @@ details. */
 #include <fcntl.h>
 #include "autoload.h"
 #include <winsock.h>
-#include "dtable.h"
-#include "pinfo.h"
 #include "cygerrno.h"
+#include "fhandler.h"
+#include "path.h"
+#include "dtable.h"
+#include "thread.h"
+#include "sync.h"
+#include "sigproc.h"
+#include "pinfo.h"
 
 /* We only want to initialize WinSock in a child process if socket
    handles are inheritted. This global allows us to know whether this

@@ -13,9 +13,13 @@ details. */
 #include <time.h>
 #include <errno.h>
 #include <limits.h>
+#include "fhandler.h"
 #include "dtable.h"
-#include "pinfo.h"
 #include "cygerrno.h"
+#include "thread.h"
+#include "sync.h"
+#include "sigproc.h"
+#include "pinfo.h"
 
 static char NO_COPY pinfo_dummy[sizeof(pinfo)] = {0};
 

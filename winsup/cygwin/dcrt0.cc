@@ -16,9 +16,15 @@ details. */
 #include "dll_init.h"
 #include "autoload.h"
 #include <ctype.h>
-#include "dtable.h"
+#include "sync.h"
+#include "sigproc.h"
+#include "perthread.h"
 #include "pinfo.h"
 #include "cygerrno.h"
+#include "fhandler.h"
+#include "path.h"
+#include "dtable.h"
+#include "thread.h"
 
 #define MAX_AT_FILE_LEVEL 10
 

@@ -11,6 +11,7 @@
    details. */
 
 #include "winsup.h"
+#include "thread.h"
 
 extern "C" {
 /*  ThreadCreation */

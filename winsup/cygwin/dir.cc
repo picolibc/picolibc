@@ -13,11 +13,16 @@ details. */
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <errno.h>
-#include "pinfo.h"
-#include "cygerrno.h"
 
 #define _COMPILING_NEWLIB
-#include "dirent.h"
+#include <dirent.h>
+
+#include "sync.h"
+#include "sigproc.h"
+#include "pinfo.h"
+#include "cygerrno.h"
+#include "fhandler.h"
+#include "path.h"
 
 /* Cygwin internal */
 /* Return whether the directory of a file is writable.  Return 1 if it

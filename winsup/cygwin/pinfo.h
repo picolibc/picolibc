@@ -11,6 +11,9 @@ enum
 };
 
 #define PSIZE 1024
+
+class ThreadItem;
+
 class _pinfo
 {
 public:
@@ -166,3 +169,4 @@ cygwin_pid (pid_t pid)
   return (pid_t) (os_being_run == winNT) ? pid : -(int) pid;
 }
 void __stdcall pinfo_init (PBYTE);
+extern pinfo myself;

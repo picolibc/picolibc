@@ -14,6 +14,8 @@ details. */
 #include <stdlib.h>
 #include <grp.h>
 #include <pwd.h>
+#include "sync.h"
+#include "sigproc.h"
 #include "pinfo.h"
 
 #define SHAREDVER (unsigned)(cygwin_version.api_major << 16 | \

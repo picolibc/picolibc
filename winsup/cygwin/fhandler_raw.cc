@@ -17,6 +17,8 @@
 #include <cygwin/rdevio.h>
 #include <sys/mtio.h>
 #include "cygerrno.h"
+#include "fhandler.h"
+#include "path.h"
 
 /* static wrapper functions to hide the effect of media changes and
    bus resets which occurs after a new media is inserted. This is

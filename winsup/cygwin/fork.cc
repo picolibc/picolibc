@@ -16,9 +16,13 @@ details. */
 #include <stdarg.h>
 #include <errno.h>
 #include "dll_init.h"
+#include "fhandler.h"
 #include "dtable.h"
-#include "pinfo.h"
 #include "cygerrno.h"
+#include "sync.h"
+#include "sigproc.h"
+#include "pinfo.h"
+#include "perthread.h"
 
 DWORD NO_COPY chunksize = 0;
 /* Timeout to wait for child to start, parent to init child, etc.  */

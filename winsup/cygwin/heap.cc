@@ -10,8 +10,10 @@ details. */
 
 #include "winsup.h"
 #include <errno.h>
-#include "pinfo.h"
 #include "cygerrno.h"
+#include "sync.h"
+#include "sigproc.h"
+#include "pinfo.h"
 
 #define brksize ((char *) user_data->heaptop - (char *) user_data->heapbase)
 #define brk (user_data->heapptr)

@@ -13,8 +13,11 @@ details. */
 #include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include "pinfo.h"
 #include "cygerrno.h"
+#include "fhandler.h"
+#include "sync.h"
+#include "sigproc.h"
+#include "pinfo.h"
 
 /**********************************************************************/
 /* fhandler_serial */

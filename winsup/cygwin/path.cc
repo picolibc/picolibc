@@ -81,8 +81,13 @@ details. */
 #include <errno.h>
 #include <ctype.h>
 #include <winioctl.h>
-#include "pinfo.h"
 #include "cygerrno.h"
+#include "fhandler.h"
+#include "path.h"
+#include "thread.h"
+#include "sync.h"
+#include "sigproc.h"
+#include "pinfo.h"
 
 static int normalize_win32_path (const char *cwd, const char *src, char *dst);
 static char *getcwd_inner (char *buf, size_t ulen, int posix_p, int with_chroot);

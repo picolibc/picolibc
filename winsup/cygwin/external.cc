@@ -11,6 +11,9 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include "fhandler.h"
+#include "sync.h"
+#include "sigproc.h"
 #include "pinfo.h"
 
 static external_pinfo *

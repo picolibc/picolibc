@@ -14,6 +14,8 @@ details. */
 #include <wingdi.h>
 #include <winuser.h>
 #include <ctype.h>
+#include "sync.h"
+#include "sigproc.h"
 #include "pinfo.h"
 
 #define PROTECT(x) x[sizeof(x)-1] = 0

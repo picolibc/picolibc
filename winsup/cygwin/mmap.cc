@@ -13,9 +13,13 @@ details. */
 #include <stddef.h>
 #include <sys/mman.h>
 #include <errno.h>
+#include "fhandler.h"
 #include "dtable.h"
-#include "pinfo.h"
 #include "cygerrno.h"
+#include "thread.h"
+#include "sync.h"
+#include "sigproc.h"
+#include "pinfo.h"
 
 /*
  * Simple class used to keep a record of all current

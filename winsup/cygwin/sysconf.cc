@@ -13,6 +13,7 @@ details. */
 #include <errno.h>
 #include <time.h>
 #include <limits.h>
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygerrno.h"
 

@@ -47,7 +47,7 @@ INSTALL_PROGRAM:=@INSTALL_PROGRAM@
 MT_SAFE = @MT_SAFE@
 DEFS = @DEFS@
 
-CC:=@CC@
+CC:=@CC@ -MD
 # FIXME: Which is it, CC or CC_FOR_TARGET?
 CC_FOR_TARGET:=$(CC)
 CFLAGS:=@CFLAGS@
@@ -282,77 +282,5 @@ WINSUP_H:=winsup.h fhandler.h path.h shared.h \
 	  $(MT_SAFE_HEADERS)
 
 winsup.h: config.h
-assert.o: $(WINSUP_H)
-dcrt0.o: $(WINSUP_H) include/exceptions.h include/glob.h dll_init.h autoload.h
-debug.o: $(WINSUP_H) debug.h sync.h
-delqueue.o: $(WINSUP_H)
-dir.o: $(WINSUP_H)
-dlfcn.o: $(WINSUP_H) dll_init.h
-dll_entry.o: $(WINSUP_H) include/cygwin/cygwin_dll.h
-dll_init.o: $(WINSUP_H) include/exceptions.h dll_init.h
-dll_main.o:
-environ.o: $(WINSUP_H)
-errno.o: $(WINSUP_H)
-exceptions.o: $(WINSUP_H) include/exceptions.h sync.h
-exec.o: $(WINSUP_H)
-external.o: $(WINSUP_H)
-fcntl.o: $(WINSUP_H)
-fhandler.o: $(WINSUP_H)
-fhandler_console.o: $(WINSUP_H)
-fhandler_serial.o: $(WINSUP_H)
-fhandler_termios.o: $(WINSUP_H)
-fhandler_tty.o: $(WINSUP_H)
-fhandler_windows.o: $(WINSUP_H)
-fhandler_raw.o: $(WINSUP_H)
-fhandler_floppy.o: $(WINSUP_H)
-fhandler_tape.o: $(WINSUP_H)
-fhandler_zero.o: $(WINSUP_H)
-fhandler_random.o: $(WINSUP_H)
-fork.o: $(WINSUP_H) dll_init.h
-glob.o: include/glob.h
-gmon.o: profil.h gmon.h
-grp.o: $(WINSUP_H)
-heap.o: $(WINSUP_H)
-dtable.o: $(WINSUP_H)
-init.o: $(WINSUP_H)
-ioctl.o: $(WINSUP_H)
-libccrt0.o: $(WINSUP_H)
-libcmain.o: $(WINSUP_H)
-localtime.o: tz_posixrules.h
-malloc.o: $(WINSUP_H) sync.h
-mcount.o: gmon.h
-mmap.o: $(WINSUP_H)
-net.o: $(WINSUP_H) autoload.h
-ntea.o:
-passwd.o: $(WINSUP_H)
-path.o: $(WINSUP_H)
-pinfo.o: $(WINSUP_H)
-pipe.o: $(WINSUP_H)
-poll.o: $(WINSUP_H)
-profile.o: profil.h
-pthread.o: $(WINSUP_H)
-registry.o: $(WINSUP_H)
-resource.o: $(WINSUP_H)
-scandir.o:
-security.o: $(WINSUP_H)
-select.o: $(WINSUP_H) select.h
-shared.o: $(WINSUP_H)
-signal.o: $(WINSUP_H)
-sigproc.o: $(WINSUP_H) sync.h
-smallprint.o: $(WINSUP_H)
-spawn.o: $(WINSUP_H)
-strace.o: $(WINSUP_H)
-strsep.o:
-sync.o: $(WINSUP_H) sync.h
-syscalls.o: $(WINSUP_H)
-sysconf.o: $(WINSUP_H)
-syslog.o: $(WINSUP_H)
-termios.o: $(WINSUP_H)
-test.o: $(WINSUP_H)
-times.o: $(WINSUP_H)
-tty.o: $(WINSUP_H)
-uinfo.o: $(WINSUP_H) autoload.h
-uname.o: $(WINSUP_H)
-wait.o: $(WINSUP_H)
-window.o: $(WINSUP_H)
-thread.o: $(WINSUP_H)
+
+include *.d

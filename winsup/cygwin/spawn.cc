@@ -20,9 +20,14 @@ details. */
 #include <winuser.h>
 #include <ctype.h>
 #include <paths.h>
-#include "dtable.h"
-#include "pinfo.h"
 #include "cygerrno.h"
+#include "fhandler.h"
+#include "path.h"
+#include "dtable.h"
+#include "sync.h"
+#include "sigproc.h"
+#include "pinfo.h"
+#include "perthread.h"
 
 extern BOOL allow_ntsec;
 

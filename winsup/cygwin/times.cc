@@ -16,8 +16,13 @@ details. */
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-#include "pinfo.h"
 #include "cygerrno.h"
+#include "fhandler.h"
+#include "path.h"
+#include "thread.h"
+#include "sync.h"
+#include "sigproc.h"
+#include "pinfo.h"
 
 #define FACTOR (0x19db1ded53ea710LL)
 #define NSPERSEC 10000000LL

@@ -16,8 +16,11 @@ details. */
 #include <sys/wait.h>
 #include <errno.h>
 #include <stdlib.h>
-#include "pinfo.h"
 #include "cygerrno.h"
+#include "sync.h"
+#include "sigproc.h"
+#include "pinfo.h"
+#include "perthread.h"
 
 extern BOOL allow_ntsec;
 

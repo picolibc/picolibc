@@ -14,8 +14,11 @@ details. */
 #include <unistd.h>
 #include <errno.h>
 #include <ctype.h>
-#include "pinfo.h"
 #include "cygerrno.h"
+#include "fhandler.h"
+#include "sync.h"
+#include "sigproc.h"
+#include "pinfo.h"
 
 /* Common functions shared by tty/console */
 

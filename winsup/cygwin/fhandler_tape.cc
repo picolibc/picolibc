@@ -17,6 +17,8 @@ details. */
 
 #include <sys/mtio.h>
 #include "cygerrno.h"
+#include "fhandler.h"
+#include "path.h"
 
 /**********************************************************************/
 /* fhandler_dev_tape */

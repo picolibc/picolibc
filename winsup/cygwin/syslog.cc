@@ -14,8 +14,10 @@ details. */
 #include <syslog.h>
 #include <stdarg.h>
 #include <unistd.h>
+#include "fhandler.h"
 #include "dtable.h"
 #include "cygerrno.h"
+#include "thread.h"
 
 /* FIXME: These should probably be in the registry. */
 /* FIXME: The Win95 path should be whatever slash is */

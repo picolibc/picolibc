@@ -86,9 +86,6 @@ void __stdcall init_child_info (DWORD, child_info *, int, HANDLE);
 
 extern child_info_fork *child_proc_info;
 
-/* Process info for this process */
-extern pinfo myself;
-
 /* non-NULL if this process is a child of a cygwin process */
 extern HANDLE parent_alive;
 

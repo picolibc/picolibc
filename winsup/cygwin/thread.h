@@ -43,9 +43,8 @@ extern "C"
 #include <pthread.h>
 #include <pwd.h>
 #include <grp.h>
-#include <stdio.h>
+#define _NOMNTENT_FUNCS
 #include <mntent.h>
-#include <time.h>
 
 extern "C" {
 

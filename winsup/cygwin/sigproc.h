@@ -32,8 +32,6 @@ typedef struct struct_waitq
   HANDLE thread_ev;
 } waitq;
 
-class muto;
-
 struct sigthread
 {
   DWORD id;

@@ -15,6 +15,9 @@ details. */
 #include <grp.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "thread.h"
+#include "sync.h"
+#include "sigproc.h"
 #include "pinfo.h"
 
 /* Read /etc/group only once for better performance.  This is done

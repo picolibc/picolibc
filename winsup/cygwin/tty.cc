@@ -14,9 +14,12 @@ details. */
 #include <utmp.h>
 #include <wingdi.h>
 #include <winuser.h>
-#include "dtable.h"
-#include "pinfo.h"
 #include "cygerrno.h"
+#include "fhandler.h"
+#include "dtable.h"
+#include "sync.h"
+#include "sigproc.h"
+#include "pinfo.h"
 
 extern fhandler_tty_master *tty_master;
 

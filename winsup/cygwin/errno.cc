@@ -13,6 +13,7 @@ details. */
 #include <stdio.h>
 #include <errno.h>
 #include "cygerrno.h"
+#include "thread.h"
 
 /* Table to map Windows error codes to Errno values.  */
 /* FIXME: Doing things this way is a little slow.  It's trivial to change

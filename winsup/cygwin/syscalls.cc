@@ -24,9 +24,14 @@ details. */
 #include <unistd.h>
 #include <winnls.h>
 #include <lmcons.h> /* for UNLEN */
-#include "dtable.h"
-#include "pinfo.h"
 #include "cygerrno.h"
+#include "fhandler.h"
+#include "path.h"
+#include "dtable.h"
+#include "thread.h"
+#include "sync.h"
+#include "sigproc.h"
+#include "pinfo.h"
 
 extern BOOL allow_ntsec;
 

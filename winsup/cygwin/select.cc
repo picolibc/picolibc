@@ -33,8 +33,12 @@ details. */
 #include <stdio.h>
 #include <winsock.h>
 #include "select.h"
-#include "dtable.h"
 #include "cygerrno.h"
+#include "fhandler.h"
+#include "dtable.h"
+#include "sync.h"
+#include "sigproc.h"
+#include "perthread.h"
 
 /*
  * All these defines below should be in sys/types.h

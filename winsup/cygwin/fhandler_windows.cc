@@ -16,6 +16,7 @@ details. */
 #include <wingdi.h>
 #include <winuser.h>
 #include "cygerrno.h"
+#include "fhandler.h"
 
 /*
 The following unix-style calls are supported:

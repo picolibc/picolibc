@@ -20,6 +20,7 @@ details. */
 #include <sys/wait.h>
 #include <errno.h>
 #include <stdlib.h>
+#include "sync.h"
 
 muto NO_COPY muto_start;
 
