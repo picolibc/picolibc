@@ -9,18 +9,18 @@ The following packages are available with the current release:
 
 @example
 
-ash autoconf automake bash binutils bison byacc bzip2 clear cpio crypt
-cvs cygrunsrv cygwin dejagnu diff expect file fileutils findutils flex
-gawk gcc gdb gdbm gettext ghostscript gperf grep groff gzip inetutils
-irc jbigkit jpeg less libpng login lynx m4 make man mingw mt mutt ncftp
-ncurses newlib-man opengl openssh openssl patch pcre perl popt
-postgresql python readline regex rxvt sed sh-utils squid ssmtp tar tcltk
-tcsh termcap tetex-beta texinfo textutils tiff time unzip vim w32api
-wget which xpm xpm-nox zip zlib
+ash autoconf automake bash binutils bison byacc bzip2 clear cpio cron
+crypt ctags cvs cygrunsrv cygwin dejagnu diff expect file fileutils
+findutils flex gawk gcc gdb gdbm gettext ghostscript gperf grep groff
+gzip inetutils irc jbigkit jpeg less libpng login lynx m4 make man
+mingw mingw-runtime mt mutt ncftp ncurses opengl openssh openssl patch
+pcre perl popt postgresql psutils python readline regex rsync rxvt sed
+sh-utils squid ssmtp tar tcltk tcsh termcap tetex texinfo textutils
+tiff time unzip vim w32api wget which xpm-nox zip zlib
 
 @end example
 
-(This list is almost certainly out of date as new packages are added.)
+(This list becomes out of date as new packages are added.)
 
 Full source code is available for all packages and tools.
 
@@ -76,22 +76,36 @@ overwritten during the new setup.
 Once you've installed the latest net release, the new setup will update
 just the individual packages that need it.
 
-@subsection The README says I should turn off anti-virus software.  Isn't that dangerous?
+@subsection Is @code{setup.exe}, or one of the packages, infected with a virus?
 
-Only Network Associates (formerly McAfee) products have been reported to
-"hang" when extracting Cygwin tar archives.  Other products have been
-reported to detect false positives in Cygwin files.  Depending on how
-your anti-virus software is configured, it may then delete the file(s)
-without prompting you.  Any problems will depend on the particular
-engine and/or signature file in use, and possibly other factors.  If you
-don't mind @emph{this} risk, then just leave your anti-virus software
-running.
+Unlikely.  Unless you can confirm it, please don't report it to the
+mailing list.  Anti-virus products have been known to detect false
+positives when extracting compressed tar archives.  If this causes
+problems for you, consider disabling your anti-virus software when
+running @code{setup}.  Read the next entry for a fairly safe way to do
+this.
 
-Otherwise, you can download @code{setup.exe} and scan it.  Then turn off
-the anti-virus software, then run setup to download and extract all the
-tar files.  Then re-activate your anti-virus software and scan
-everything in C:\cygwin (or wherever you chose to install).  This should
-be safe, as long as nobody substitutes a malicious @code{setup.exe}!
+@subsection My computer hangs when I try to run @code{setup.exe}!
+
+Network Associates (formerly McAfee) products have been reported to
+"hang" when extracting Cygwin tar archives.  Consider disabling your
+anti-virus software when running @code{setup}.  The following
+procedure should be a fairly safe way to do that:
+
+@enumerate
+@item Download @code{setup.exe} and scan it explicitly.
+
+@item Turn off the anti-virus software.
+
+@item Run setup to download and extract all the tar files.
+
+@item Re-activate your anti-virus software and scan everything 
+in C:\cygwin (or wherever you chose to install).
+
+@end itemize
+
+This should be safe, as long as nobody substitutes a malicious
+@code{setup.exe}!
 
 @subsection What packages should I download?
 
@@ -175,7 +189,15 @@ without spaces.
 /etc/passwd, you may need to make corresponding changes there.  See the
 README file for that package.)
 
-@subsection How do I uninstall Cygwin?
+@subsection How do I uninstall individual packages?
+
+Run @code{setup.exe} as you would to install packages.  In the list of
+packages to install, click on the @samp{Full/Part} button to get a
+full listing, if the package you want to uninstall is not already
+listed.  Click on the cycle glyph until the action reads
+@samp{Uninstall}.  Proceed with @samp{Next}.
+
+@subsection How do I uninstall @strong{all} of Cygwin?
 
 Setup has no automatic uninstall facility.  Just delete everything
 manually:
@@ -233,9 +255,9 @@ snapshots apply:
 (e.g. inetd), before updating @code{cygwin1.dll}.  You may have to
 restart Windows to clear the DLL from memory.
 
-@item Snapshots are risky.  They have not been tested.  Use them @strong{only} if
-there is a feature or bugfix that you need to try, and you are willing
-to deal with any problems.
+@item Snapshots are risky.  They have not been tested.  Use them
+@strong{only} if there is a feature or bugfix that you need to try,
+and you are willing to deal with any problems.
 
 @item If you cannot download a snapshot from the main ftp distribution
 site, use a mirror, and look in the @samp{snapshots} directory.  You may
