@@ -55,7 +55,8 @@ AC_SUBST(EXTRA_DIRS)
 
 # These get added in the top-level configure.in, except in the case where
 # newlib is being built natively.
-if test -z `echo ${CC} | grep \/libc\/include`; then
+LIBC_INCLUDE_GREP=`echo ${CC} | grep \/libc\/include`
+if test -z "${LIBC_INCLUDE_GREP}"; then
   CC_FOR_NEWLIB="${CC} -I$PWD/targ-include -I${newlib_basedir}/libc/include"
 else
   CC_FOR_NEWLIB="${CC}"

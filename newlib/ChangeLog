@@ -1,3 +1,10 @@
+2002-11-22  Joe Buehler  <jbuehler@hekimian.com>
+
+	* configure.in: Change check for libc/include in ${CC} to
+	use an intermediate value so as to work with different shells.
+	* configure: Regenerated.
+	* Makefile.in: Ditto.
+
 2002-11-22  Vijay L. Khuspe  <vijayk1@kpit.com>
 
 	* libc/sys/h8300hms/read.c: Add support for normal mode
