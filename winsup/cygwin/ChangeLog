@@ -1,3 +1,8 @@
+2002-05-29  Christopher Faylor  <cgf@redhat.com>
+
+	* include/sys/cygwin.h (EXTERNAL_PINFO_VERSION): Reinstate.
+	* external.cc (fillout_pinfo): Use it.
+
 2002-05-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* external.cc (fillout_pinfo): Use new version define.

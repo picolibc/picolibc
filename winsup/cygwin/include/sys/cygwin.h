@@ -210,6 +210,7 @@ extern int cygwin_attach_handle_to_fd (char *, int, HANDLE, mode_t, DWORD);
 
 #define EXTERNAL_PINFO_VERSION_16_BIT 0
 #define EXTERNAL_PINFO_VERSION_32_BIT 1
+#define EXTERNAL_PINFO_VERSION EXTERNAL_PINFO_VERSION_32_BIT
 
 #ifndef _SYS_TYPES_H
 typedef unsigned short __uid16_t;
