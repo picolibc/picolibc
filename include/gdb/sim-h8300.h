@@ -26,46 +26,49 @@ extern "C" { //}
   
 /* The simulator makes use of the following register information. */ 
   
-/* Registers common to all the H8 variants. */
   enum sim_h8300_regs
   {
-    H8300_R0_REGNUM = 0,
-    H8300_R1_REGNUM,
-    H8300_R2_REGNUM,
-    H8300_R3_REGNUM,
-    H8300_R4_REGNUM,
-    H8300_R5_REGNUM,
-    H8300_R6_REGNUM,
-    H8300_R7_REGNUM,
+    /* Registers common to all the H8 variants. */
+    /* Start here: */
+    SIM_H8300_R0_REGNUM,    
+    SIM_H8300_R1_REGNUM,
+    SIM_H8300_R2_REGNUM,
+    SIM_H8300_R3_REGNUM,
+    SIM_H8300_R4_REGNUM,
+    SIM_H8300_R5_REGNUM,
+    SIM_H8300_R6_REGNUM,
+    SIM_H8300_R7_REGNUM,
 
-    H8300_PC_REGNUM,	/* Contains program counter */
-    H8300_CCR_REGNUM,	/* Contains processor status */
+    SIM_H8300_CCR_REGNUM,  /* Contains processor status */
+    SIM_H8300_PC_REGNUM,   /* Contains program counter */
+    /* End here */
+    
+    SIM_H8300_EXR_REGNUM,  /* Contains extended processor status 
+                              H8S and higher */
+    SIM_H8300_MACL_REGNUM, /* Lower part of MAC register (26xx only)*/
+    SIM_H8300_MACH_REGNUM, /* High part of MAC register (26xx only) */
 
-    H8300_S_EXR_REGNUM,	/* Contains extended processor status */
-    H8300_S_MACL_REGNUM,/* Lower part of MAC register */
-    H8300_S_MACH_REGNUM,/* High part of MAC register */
-
-    H8300_SIM_CYCLE_REGNUM,
-    H8300_SIM_INST_REGNUM,
-    H8300_SIM_TICK_REGNUM
+    SIM_H8300_CYCLE_REGNUM,
+    SIM_H8300_INST_REGNUM,
+    SIM_H8300_TICK_REGNUM
   };
 
   enum
   {
-    ARG_FIRST_REGNUM = H8300_R0_REGNUM,	/* first reg in which an arg 
-					   may be passed */
-    ARG_LAST_REGNUM = H8300_R3_REGNUM,	/* last  reg in which an arg 
-					   may be passed */
-    H8300_FP_REGNUM = H8300_R6_REGNUM,	/* Contain address of executing 
-					   stack frame */
-    H8300_SP_REGNUM = H8300_R7_REGNUM	/* Contains address of top of stack */
+    SIM_H8300_ARG_FIRST_REGNUM = SIM_H8300_R0_REGNUM, /* first reg in which an arg 
+                                                         may be passed */    
+    SIM_H8300_ARG_LAST_REGNUM = SIM_H8300_R3_REGNUM,  /* last  reg in which an arg 
+                                                         may be passed */
+    SIM_H8300_FP_REGNUM = SIM_H8300_R6_REGNUM, /* Contain address of executing 
+                                                  stack frame */
+    SIM_H8300_SP_REGNUM = SIM_H8300_R7_REGNUM  /* Contains address of top of stack */
   };
 
   enum
   {
-    H8300_NUM_COMMON_REGS = 10,
-    H8300_S_NUM_REGS = 13,
-    H8300_NUM_SIM_REGS = 16
+    SIM_H8300_NUM_COMMON_REGS = 10,
+    SIM_H8300_S_NUM_REGS = 13,
+    SIM_H8300_NUM_REGS = 16
   };
 
 #ifdef __cplusplus

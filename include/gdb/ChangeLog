@@ -1,3 +1,8 @@
+2002-07-29  Andrey Volkov  <avolkov@transas.com>
+
+	* sim-h8300.h: Rename all enums from H8300_ to SIM_H8300_
+	 prefix.
+
 2002-07-23  Andrey Volkov  <avolkov@transas.com>
 
 	* sim-h8300.h: New file.
