@@ -1,3 +1,7 @@
+2003-02-17  Andrew Cagney  <ac131313@redhat.com>
+
+	* configure: Regenerate using autoconf 000227.
+
 2003-02-15  Geoffrey Keating  <geoffk@apple.com>
 
 	* configure.in (*-*-darwin*): Rename from powerpc*-*-darwin*,
