@@ -1,3 +1,8 @@
+2002-01-23  Nick Clifton  <nickc@cambridge.redhat.com>
+
+	* configure.in: Import StrongARM and XScale target_configdirs from
+	FSF GCC version.
+
 2002-01-16  H.J. Lu  (hjl@gnu.org)
 
 	* config.guess: Import from master sources, rev 1.225.
