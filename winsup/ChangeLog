@@ -1,6 +1,5 @@
 Fri Apr  7 17:04:02  Ron Parker <rdparker@sourceware.cygnus.com>
 
-	* Makefile.in: Kludge to force cinstall to use proper errno.
 	* configure.in: Added cinstall to the list of subdirs.
 	* configure: Regenerate.
 	
