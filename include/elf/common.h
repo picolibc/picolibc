@@ -261,6 +261,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 /* Vitesse IQ2000.  */
 #define EM_IQ2000		0xFEBA
+
+/* Old, unofficial value for Xtensa.  */
+#define EM_XTENSA_OLD		0xabc7
+
 /* See the above comment before you add a new EM_* value here.  */
 
 /* Values for e_version.  */
