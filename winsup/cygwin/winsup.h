@@ -357,7 +357,7 @@ extern unsigned int signal_shift_subtract;
 
 #define isdirsep SLASH_P
 #define isabspath(p) \
-  (isdirsep (*(p)) || (isalpha (*(p)) && (p)[1] == ':'))
+  (isdirsep (*(p)) || (isalpha (*(p)) && (p)[1] == ':' && (!(p)[2] || isdirsep ((p)[2]))))
 
 /******************** Initialization/Termination **********************/
 
