@@ -1187,8 +1187,9 @@ fhandler_disk_file::open (path_conv& real_path, int flags, mode_t mode)
     goto out;
 
   extern BOOL allow_ntea;
+  extern BOOL allow_ntsec;
 
-  if (!real_path.isexec () && !allow_ntea &&
+  if (!real_path.isexec () && !allow_ntea && !allow_ntsec &&
       GetFileType (get_handle ()) == FILE_TYPE_DISK)
     {
       DWORD done;

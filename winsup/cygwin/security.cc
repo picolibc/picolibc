@@ -374,116 +374,67 @@ got_it:
   return TRUE;
 }
 
-/* ReadSD reads a security descriptor from a file.
+/* read_sd reads a security descriptor from a file.
    In case of error, -1 is returned and errno is set.
    If the file doesn't have a SD, 0 is returned.
    Otherwise, the size of the SD is returned and
-   the SD is copied to the buffer, pointed to by sdBuf.
-   sdBufSize contains the size of the buffer. If
+   the SD is copied to the buffer, pointed to by sd_buf.
+   sd_size contains the size of the buffer. If
    it's too small, to contain the complete SD, 0 is
-   returned and sdBufSize is set to the needed size
+   returned and sd_size is set to the needed size
    of the buffer.
 */
 
 LONG
-ReadSD(const char *file, PSECURITY_DESCRIPTOR sdBuf, LPDWORD sdBufSize)
+read_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd_size)
 {
   /* Check parameters */
-  if (! sdBufSize)
+  if (! sd_size)
     {
       set_errno (EINVAL);
       return -1;
     }
 
-  /* Open file for read */
   debug_printf("file = %s", file);
-  HANDLE hFile = CreateFile (file, GENERIC_READ,
-			     FILE_SHARE_READ | FILE_SHARE_WRITE,
-			     &sec_none_nih, OPEN_EXISTING,
-			     FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
-			     NULL);
 
-  if (hFile == INVALID_HANDLE_VALUE)
+  DWORD len = 0;
+  if (! GetFileSecurity (file,
+                         OWNER_SECURITY_INFORMATION
+                         | GROUP_SECURITY_INFORMATION
+                         | DACL_SECURITY_INFORMATION,
+                         sd_buf, *sd_size, &len))
     {
       __seterrno ();
       return -1;
     }
-
-  /* step through the backup streams and search for the security data */
-  WIN32_STREAM_ID header;
-  DWORD bytes_read = 0;
-  LPVOID context = NULL;
-  PSECURITY_DESCRIPTOR psd = NULL;
-  DWORD datasize;
-  LONG ret = 0;
-
-  while (BackupRead (hFile, (LPBYTE) &header,
-		     3 * sizeof (DWORD) + sizeof (LARGE_INTEGER),
-		     &bytes_read, FALSE, TRUE, &context))
+  if (len > *sd_size)
     {
-      if (header.dwStreamId != BACKUP_SECURITY_DATA)
-	continue;
-
-      /* security data found */
-      datasize = header.Size.LowPart + header.dwStreamNameSize;
-      char b[datasize];
-
-      if (! BackupRead (hFile, (LPBYTE) b, datasize, &bytes_read,
-			FALSE, TRUE, &context))
-	{
-	  __seterrno ();
-	  ret = -1;
-	  break;
-	}
-
-      /* Check validity of the SD */
-      psd = (PSECURITY_DESCRIPTOR) &b[header.dwStreamNameSize];
-      if (! IsValidSecurityDescriptor (psd))
-	continue;
-
-      /* It's a valid SD */
-      datasize -= header.dwStreamNameSize;
-      debug_printf ("SD-Size: %d", datasize);
-
-      /* buffer to small? */
-      if (*sdBufSize < datasize)
-	{
-	  *sdBufSize = datasize;
-	  ret = 0;
-	  break;
-	}
-
-      if (sdBuf)
-	memcpy (sdBuf, psd, datasize);
-
-      ret = *sdBufSize = datasize;
-      break;
-
+      *sd_size = len;
+      return 0;
     }
-  BackupRead (hFile, NULL, 0, &bytes_read, TRUE, TRUE, &context);
-  CloseHandle (hFile);
-  return ret;
+  return len;
 }
 
 LONG
-WriteSD(const char *file, PSECURITY_DESCRIPTOR sdBuf, DWORD sdBufSize)
+write_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size)
 {
   /* Check parameters */
-  if (! sdBuf || ! sdBufSize)
+  if (! sd_buf || ! sd_size)
     {
       set_errno (EINVAL);
       return -1;
     }
 
-  HANDLE hFile = CreateFile (file,
-			     WRITE_OWNER | WRITE_DAC,
-                             FILE_SHARE_READ | FILE_SHARE_WRITE,
-                             &sec_none_nih,
-                             OPEN_EXISTING,
-                             FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
-                             NULL);
+  HANDLE fh;
+  fh = CreateFile (file,
+                   WRITE_OWNER | WRITE_DAC,
+                   FILE_SHARE_READ | FILE_SHARE_WRITE,
+                   &sec_none_nih,
+                   OPEN_EXISTING,
+                   FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
+                   NULL);
 
-  if (hFile == INVALID_HANDLE_VALUE)
+  if (fh == INVALID_HANDLE_VALUE)
     {
       __seterrno ();
       return -1;
@@ -498,19 +449,19 @@ WriteSD(const char *file, PSECURITY_DESCRIPTOR sdBuf, DWORD sdBufSize)
   header.dwStreamId = BACKUP_SECURITY_DATA;
   header.dwStreamAttributes = STREAM_CONTAINS_SECURITY;
   header.Size.HighPart = 0;
-  header.Size.LowPart = sdBufSize;
+  header.Size.LowPart = sd_size;
   header.dwStreamNameSize = 0;
-  if (!BackupWrite (hFile, (LPBYTE) &header,
+  if (!BackupWrite (fh, (LPBYTE) &header,
 		    3 * sizeof (DWORD) + sizeof (LARGE_INTEGER),
 		    &bytes_written, FALSE, TRUE, &context))
     {
       __seterrno ();
-      CloseHandle (hFile);
+      CloseHandle (fh);
       return -1;
     }
 
   /* write new security descriptor */
-  if (!BackupWrite (hFile, (LPBYTE) sdBuf,
+  if (!BackupWrite (fh, (LPBYTE) sd_buf,
 		    header.Size.LowPart + header.dwStreamNameSize,
 		    &bytes_written, FALSE, TRUE, &context))
     {
@@ -521,15 +472,15 @@ WriteSD(const char *file, PSECURITY_DESCRIPTOR sdBuf, DWORD sdBufSize)
       if (ret != ERROR_NOT_SUPPORTED && ret != ERROR_INVALID_SECURITY_DESCR)
 	{
 	  __seterrno ();
-	  BackupWrite (hFile, NULL, 0, &bytes_written, TRUE, TRUE, &context);
-	  CloseHandle (hFile);
+	  BackupWrite (fh, NULL, 0, &bytes_written, TRUE, TRUE, &context);
+	  CloseHandle (fh);
 	  return -1;
 	}
     }
 
   /* terminate the restore process */
-  BackupWrite (hFile, NULL, 0, &bytes_written, TRUE, TRUE, &context);
-  CloseHandle (hFile);
+  BackupWrite (fh, NULL, 0, &bytes_written, TRUE, TRUE, &context);
+  CloseHandle (fh);
   return 0;
 }
 
@@ -612,9 +563,9 @@ get_nt_attribute (const char *file, int *attribute,
   PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) sd_buf;
 
   int ret;
-  if ((ret = ReadSD (file, psd, &sd_size)) <= 0)
+  if ((ret = read_sd (file, psd, &sd_size)) <= 0)
     {
-      debug_printf ("ReadSD %E");
+      debug_printf ("read_sd %E");
       return ret;
     }
 
@@ -739,8 +690,8 @@ get_nt_attribute (const char *file, int *attribute,
 }
 
 int
-get_file_attribute (int use_ntsec, const char *file, int *attribute,
-                    uid_t *uidret, gid_t *gidret)
+get_file_attribute (int use_ntsec, const char *file,
+                    int *attribute, uid_t *uidret, gid_t *gidret)
 {
   if (use_ntsec && allow_ntsec)
     return get_nt_attribute (file, attribute, uidret, gidret);
@@ -898,7 +849,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
   if (attribute & S_IRGRP)
     group_allow |= FILE_GENERIC_READ;
   if (attribute & S_IWGRP)
-    group_allow |= STANDARD_RIGHTS_ALL | FILE_GENERIC_WRITE | DELETE;
+    group_allow |= STANDARD_RIGHTS_WRITE | FILE_GENERIC_WRITE | DELETE;
   if (attribute & S_IXGRP)
     group_allow |= FILE_GENERIC_EXECUTE;
   if (! (attribute & S_ISVTX))
@@ -910,7 +861,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
   if (attribute & S_IROTH)
     other_allow |= FILE_GENERIC_READ;
   if (attribute & S_IWOTH)
-    other_allow |= STANDARD_RIGHTS_ALL | FILE_GENERIC_WRITE | DELETE;
+    other_allow |= STANDARD_RIGHTS_WRITE | FILE_GENERIC_WRITE | DELETE;
   if (attribute & S_IXOTH)
     other_allow |= FILE_GENERIC_EXECUTE;
   if (! (attribute & S_ISVTX))
@@ -1034,9 +985,9 @@ set_nt_attribute (const char *file, uid_t uid, gid_t gid,
   PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) sd_buf;
 
   int ret;
-  if ((ret = ReadSD (file, psd, &sd_size)) <= 0)
+  if ((ret = read_sd (file, psd, &sd_size)) <= 0)
     {
-      debug_printf ("ReadSD %E");
+      debug_printf ("read_sd %E");
       return ret;
     }
 
@@ -1044,7 +995,7 @@ set_nt_attribute (const char *file, uid_t uid, gid_t gid,
   if (! (psd = alloc_sd (uid, gid, logsrv, attribute, psd, &sd_size)))
     return -1;
 
-  return WriteSD (file, psd, sd_size);
+  return write_sd (file, psd, sd_size);
 }
 
 int
@@ -1100,9 +1051,9 @@ setacl (const char *file, int nentries, aclent_t *aclbufp)
   char sd_buf[4096];
   PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) sd_buf;
 
-  if (ReadSD (file, psd, &sd_size) <= 0)
+  if (read_sd (file, psd, &sd_size) <= 0)
     {
-      debug_printf ("ReadSD %E");
+      debug_printf ("read_sd %E");
       return -1;
     }
 
@@ -1265,7 +1216,7 @@ setacl (const char *file, int nentries, aclent_t *aclbufp)
       return -1;
     }
   debug_printf ("Created SD-Size: %d", sd_size);
-  return WriteSD (file, psd, sd_size);
+  return write_sd (file, psd, sd_size);
 }
 
 static void
@@ -1301,9 +1252,9 @@ getacl (const char *file, DWORD attr, int nentries, aclent_t *aclbufp)
   PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) sd_buf;
 
   int ret;
-  if ((ret = ReadSD (file, psd, &sd_size)) <= 0)
+  if ((ret = read_sd (file, psd, &sd_size)) <= 0)
     {
-      debug_printf ("ReadSD %E");
+      debug_printf ("read_sd %E");
       return ret;
     }
 

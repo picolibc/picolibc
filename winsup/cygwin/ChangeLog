@@ -1,3 +1,17 @@
+Thu Apr 25 16:37:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * fhandler.cc (fhandler_disk_file::open): Check for allow_ntsec
+        when determining exec flag.
+        * path.cc (symlink_info::check): Remove call to get_file_attribute().
+        * security.cc (read_sd): Rename, ditto for variables to conform
+        to common naming convention. Use GetFileSecurity() instead of
+        BackupRead() to avoid permission problems when reading ACLs.
+        (write_sd): Same renaming as for read_sd().
+        (alloc_sd): Change default permissions according to Linux permissions
+        for group and world when write permission is set.
+        * syscalls.cc (stat_worker): Avoid different permission problems
+        when requesting file informations.
+
 Thu Apr 25 10:50:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
         * net.cc: Avoid a warning in declaration inet_network.

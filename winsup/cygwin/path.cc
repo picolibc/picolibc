@@ -2186,17 +2186,6 @@ symlink_info::check (const char *in_path, const suffix_info *suffixes)
       if (!(pflags & PATH_SYMLINK) && !SYMLINKATTR (fileattr))
 	goto file_not_symlink;
 
-      /* Check the file's extended attributes, if it has any.  */
-      int unixattr = 0;
-      if (fileattr & FILE_ATTRIBUTE_DIRECTORY)
-        unixattr |= S_IFDIR;
-
-      if (!get_file_attribute (TRUE, path, &unixattr))
-	{
-	  if (unixattr & STD_XBITS)
-	    pflags |= PATH_EXEC;
-	}
-
       /* Open the file.  */
 
       h = CreateFileA (path, GENERIC_READ, FILE_SHARE_READ, &sec_none_nih, OPEN_EXISTING,

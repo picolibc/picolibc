@@ -982,6 +982,8 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
   char *win32_name;
   char root[MAX_PATH];
   UINT dtype;
+  fhandler_disk_file fh (NULL);
+
   MALLOC_CHECK;
 
   debug_printf ("%s (%s, %p)", caller, name, buf);
@@ -1009,28 +1011,15 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
   strcpy (root, win32_name);
   dtype = GetDriveType (rootdir (root));
 
-  if (atts == -1 || !(atts & FILE_ATTRIBUTE_DIRECTORY) ||
-      (os_being_run == winNT
-       && dtype != DRIVE_NO_ROOT_DIR
-       && dtype != DRIVE_UNKNOWN))
+  if ((atts == -1 || !(atts & FILE_ATTRIBUTE_DIRECTORY) ||
+       (os_being_run == winNT
+        && dtype != DRIVE_NO_ROOT_DIR
+        && dtype != DRIVE_UNKNOWN))
+      && fh.open (real_path, O_RDONLY | O_BINARY | O_DIROPEN |
+			     (nofollow ? O_NOSYMLINK : 0), 0))
     {
-      fhandler_disk_file fh (NULL);
-
-      if (fh.open (real_path, O_RDONLY | O_BINARY | O_DIROPEN |
-			      (nofollow ? O_NOSYMLINK : 0), 0))
-	{
-	  res = fh.fstat (buf);
-	  fh.close ();
-          /* See the comment 10 lines below */
-	  if (atts != -1 && (atts & FILE_ATTRIBUTE_DIRECTORY))
-            buf->st_nlink =
-                (dtype == DRIVE_REMOTE ? 1 : num_entries (win32_name));
-	}
-    }
-  else
-    {
-      WIN32_FIND_DATA wfd;
-      HANDLE handle;
+      res = fh.fstat (buf);
+      fh.close ();
       /* The number of links to a directory includes the
 	 number of subdirectories in the directory, since all
          those subdirectories point to it.
@@ -1038,26 +1027,54 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
          set the number of links to 2. */
       /* Unfortunately the count of 2 confuses `find(1)' command. So
          let's try it with `1' as link count. */
-      buf->st_nlink = (dtype == DRIVE_REMOTE ? 1 : num_entries (win32_name));
+      if (atts != -1 && (atts & FILE_ATTRIBUTE_DIRECTORY))
+        buf->st_nlink =
+            (dtype == DRIVE_REMOTE ? 1 : num_entries (win32_name));
+    }
+  else if (atts != -1 || GetLastError () != ERROR_FILE_NOT_FOUND)
+    {
+      /* Unfortunately, the above open may fail. So we have
+         to care for this case here, too. */
+      WIN32_FIND_DATA wfd;
+      HANDLE handle;
+      buf->st_nlink = 1;
+      if (atts != -1
+          && (atts & FILE_ATTRIBUTE_DIRECTORY)
+          && dtype != DRIVE_REMOTE)
+        buf->st_nlink = num_entries (win32_name);
       buf->st_dev = FHDEVN(FH_DISK) << 8;
       buf->st_ino = hash_path_name (0, real_path.get_win32 ());
-      buf->st_mode = S_IFDIR | STD_RBITS | STD_XBITS;
-      if ((atts & FILE_ATTRIBUTE_READONLY) == 0)
-	buf->st_mode |= STD_WBITS;
-
-      get_file_attribute (real_path.has_acls (), real_path.get_win32 (),
-                          NULL, &buf->st_uid, &buf->st_gid);
-
-      if ((handle = FindFirstFile (real_path.get_win32(), &wfd)) != INVALID_HANDLE_VALUE)
-	{
-	  buf->st_atime   = to_time_t (&wfd.ftLastAccessTime);
-	  buf->st_mtime   = to_time_t (&wfd.ftLastWriteTime);
-	  buf->st_ctime   = to_time_t (&wfd.ftCreationTime);
-	  buf->st_size    = wfd.nFileSizeLow;
-	  buf->st_blksize = S_BLKSIZE;
-	  buf->st_blocks  = (buf->st_size + S_BLKSIZE-1) / S_BLKSIZE;
-	  FindClose (handle);
-	}
+      if (atts != -1 && (atts & FILE_ATTRIBUTE_DIRECTORY))
+        buf->st_mode = S_IFDIR;
+      else if (real_path.issymlink ())
+        buf->st_mode = S_IFLNK;
+      else if (real_path.issocket ())
+        buf->st_mode = S_IFSOCK;
+      else
+        buf->st_mode = S_IFREG;
+      if (!real_path.has_acls ()
+          || get_file_attribute (real_path.has_acls (), real_path.get_win32 (),
+                                 &buf->st_mode, &buf->st_uid, &buf->st_gid))
+        {
+          buf->st_mode |= STD_RBITS | STD_XBITS;
+          if ((atts & FILE_ATTRIBUTE_READONLY) == 0)
+            buf->st_mode |= STD_WBITS;
+          get_file_attribute (FALSE, real_path.get_win32 (),
+                              NULL, &buf->st_uid, &buf->st_gid);
+        }
+      if ((handle = FindFirstFile (real_path.get_win32(), &wfd))
+          == INVALID_HANDLE_VALUE)
+        {
+          __seterrno ();
+          goto done;
+        }
+      buf->st_atime   = to_time_t (&wfd.ftLastAccessTime);
+      buf->st_mtime   = to_time_t (&wfd.ftLastWriteTime);
+      buf->st_ctime   = to_time_t (&wfd.ftCreationTime);
+      buf->st_size    = wfd.nFileSizeLow;
+      buf->st_blksize = S_BLKSIZE;
+      buf->st_blocks  = (buf->st_size + S_BLKSIZE-1) / S_BLKSIZE;
+      FindClose (handle);
       res = 0;
     }
 
