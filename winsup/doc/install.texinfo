@@ -5,22 +5,20 @@ Unlike previous net releases such as B20.1 and earlier, there is no
 monolithic "full" or "usertools" installation.  Rather, you can pick and
 choose the packages you wish to install, and update them individually.
 
-The following packages are available with the current release, in their
-respective directories:
+The following packages are available with the current release:
 
-@table @samp
+@example
 
-@item latest
-ash autoconf bash binutils bison byacc bzip2 clear common crypt cygwin
-dejagnu diff expect fileutils findutils flex gawk gcc gdb gperf grep
-groff gzip inetutils less login m4 make man mt opengl openssh openssl
-patch regex sed shellutils tar tcltk termcap texinfo textutils time vim
-w32api
+ash autoconf automake bash binutils bison byacc bzip2 clear cpio crypt
+cvs cygrunsrv cygwin dejagnu diff expect file fileutils findutils flex
+gawk gcc gdb gdbm gettext ghostscript gperf grep groff gzip inetutils
+irc jbigkit jpeg less libpng login lynx m4 make man mingw mt mutt ncftp
+ncurses newlib-man opengl openssh openssl patch pcre perl popt
+postgresql python readline regex rxvt sed sh-utils squid ssmtp tar tcltk
+tcsh termcap tetex-beta texinfo textutils tiff time unzip vim w32api
+wget which xpm xpm-nox zip zlib
 
-@item contrib
-cvs gdbm gettext jbigkit jpeg libpng ncurses readline tiff xpm zlib
-
-@end table
+@end example
 
 Full source code is available for all packages and tools.
 
@@ -155,13 +153,9 @@ what happened that wasn't supposed to happen, etc.
 
 @subsection What's the difference between packages in @samp{latest} and @samp{contrib}?
 
-Good question!  That very issue has been debated on the
-@samp{cygwin-apps} mailing list.  Check the list archives if you want to
-know more.  Start at @file{http://cygwin.com/lists.html}.
-
-But it really doesn't matter, and there is no distinction as far as
-@code{setup.exe} is concerned.  By default, it will install all packages
-from both @code{latest} and @code{contrib} directories.
+There is no difference as far as @code{setup.exe} is concerned, and you
+should not worry about this either.  The distinction is more historical
+than practical.
 
 @subsection My Windows logon name has a space in it, will this cause problems?
 
