@@ -342,6 +342,8 @@ class fhandler_socket: public fhandler_base
 {
 private:
   int addr_family;
+  int connect_secret [4];
+  HANDLE secret_event;
   struct _WSAPROTOCOL_INFOA *prot_info_ptr;
 
 public:
@@ -368,6 +370,11 @@ public:
   int ready_for_read (int fd, DWORD howlong, int ignra);
   int get_addr_family () {return addr_family;}
   void set_addr_family (int af) {addr_family = af;}
+  void set_connect_secret ();
+  void get_connect_secret (char*);
+  HANDLE create_secret_event (int *secret = NULL);
+  int check_peer_secret_event (struct sockaddr_in *peer, int *secret = NULL);
+  void close_secret_event ();
 };
 
 class fhandler_pipe: public fhandler_base

@@ -18,6 +18,7 @@ details. */
 #include <sys/un.h>
 #include <iphlpapi.h>
 
+#include <stdlib.h>
 #include <unistd.h>
 #include <netdb.h>
 #include <fcntl.h>
@@ -377,8 +378,11 @@ done:
 /* cygwin internal: map sockaddr into internet domain address */
 
 static int get_inet_addr (const struct sockaddr *in, int inlen,
-			   struct sockaddr_in *out, int *outlen)
+			   struct sockaddr_in *out, int *outlen, int* secret = 0)
 {
+  int secret_buf [4];
+  int* secret_ptr = (secret ? : secret_buf);
+
   if (in->sa_family == AF_INET)
     {
       *out = * (sockaddr_in *)in;
@@ -392,13 +396,15 @@ static int get_inet_addr (const struct sockaddr *in, int inlen,
 	return 0;
 
       int ret = 0;
-      char buf[32];
+      char buf[128];
       memset (buf, 0, sizeof buf);
       if (read (fd, buf, sizeof buf) != -1)
         {
 	  sockaddr_in sin;
 	  sin.sin_family = AF_INET;
-	  sscanf (buf + strlen (SOCKET_COOKIE), "%hu", &sin.sin_port);
+	  sscanf (buf + strlen (SOCKET_COOKIE), "%hu %08x-%08x-%08x-%08x",
+		  &sin.sin_port,
+		  secret_ptr, secret_ptr + 1, secret_ptr + 2, secret_ptr + 3);
 	  sin.sin_port = htons (sin.sin_port);
 	  sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
 	  *out = sin;
@@ -615,11 +621,13 @@ cygwin_connect (int fd,
 		  int namelen)
 {
   int res;
+  BOOL secret_check_failed = FALSE;
   fhandler_socket *sock = get (fd);
   sockaddr_in sin;
+  int secret [4];
   sigframe thisframe (mainthread);
 
-  if (get_inet_addr (name, namelen, &sin, &namelen) == 0)
+  if (get_inet_addr (name, namelen, &sin, &namelen, secret) == 0)
     return -1;
 
   if (!sock)
@@ -637,6 +645,34 @@ cygwin_connect (int fd,
  	    WSASetLastError (WSAEINPROGRESS);
 
 	  set_winsock_errno ();
+        }
+      if (sock->get_addr_family () == AF_UNIX)
+        {
+          if (!res || errno == EINPROGRESS)
+            {
+              if (!sock->create_secret_event (secret))
+                {   
+		  secret_check_failed = TRUE;
+		}
+            }
+
+          if (!secret_check_failed && !res)
+            {
+	      if (!sock->check_peer_secret_event (&sin, secret))
+		{
+		  debug_printf ( "accept from unauthorized server" );
+		  secret_check_failed = TRUE;
+		}
+           }
+
+          if (secret_check_failed)
+            {
+	      sock->close_secret_event ();
+              if (res)
+                closesocket (res);
+	      set_errno (ECONNREFUSED);
+	      res = -1;
+            }
         }
     }
   return res;
@@ -733,6 +769,7 @@ extern "C" int
 cygwin_accept (int fd, struct sockaddr *peer, int *len)
 {
   int res = -1;
+  BOOL secret_check_failed = FALSE;
   sigframe thisframe (mainthread);
 
   fhandler_socket *sock = get (fd);
@@ -747,6 +784,38 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
 
       res = accept (sock->get_socket (), peer, len);  // can't use a blocking call inside a lock
 
+      if (sock->get_addr_family () == AF_UNIX)
+        {
+          if (((SOCKET) res != (SOCKET) INVALID_SOCKET ||
+               WSAGetLastError () == WSAEWOULDBLOCK))
+            {
+              if (!sock->create_secret_event ())
+		{
+		  secret_check_failed = TRUE;
+                }
+            }
+
+          if (!secret_check_failed &&
+              (SOCKET) res != (SOCKET) INVALID_SOCKET)
+            {
+	      if (!sock->check_peer_secret_event ((struct sockaddr_in*) peer))
+		{
+		  debug_printf ("connect from unauthorized client");
+		  secret_check_failed = TRUE;
+                }
+            }
+
+          if (secret_check_failed)
+            {
+              sock->close_secret_event ();
+              if ((SOCKET) res != (SOCKET) INVALID_SOCKET)
+                closesocket (res);
+	      set_errno (ECONNABORTED);
+              res = -1;
+              goto done;
+            }
+        }
+
       SetResourceLock (LOCK_FD_LIST, WRITE_LOCK|READ_LOCK, "accept");
 
       int res_fd = fdtab.find_unused_handle ();
@@ -754,19 +823,21 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
 	{
 	  /* FIXME: what is correct errno? */
 	  set_errno (EMFILE);
-	  goto done;
+	  goto lock_done;
 	}
       if ((SOCKET) res == (SOCKET) INVALID_SOCKET)
 	set_winsock_errno ();
       else
 	{
-	  fdsock (res_fd, sock->get_name (), res);
+	  fhandler_socket* res_fh = fdsock (res_fd, sock->get_name (), res);
+	  res_fh->set_addr_family (sock->get_addr_family ());
 	  res = res_fd;
 	}
     }
+lock_done:
+  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK|READ_LOCK, "accept");
 done:
   syscall_printf ("%d = accept (%d, %x, %x)", res, fd, peer, len);
-  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK|READ_LOCK, "accept");
   return res;
 }
 
@@ -822,8 +893,11 @@ cygwin_bind (int fd, const struct sockaddr *my_addr, int addrlen)
 	      goto out;
 	    }
 
-	  char buf[sizeof (SOCKET_COOKIE) + 10];
-	  __small_sprintf (buf, "%s%u", SOCKET_COOKIE, sin.sin_port);
+          sock->set_connect_secret ();
+
+	  char buf[sizeof (SOCKET_COOKIE) + 80];
+	  __small_sprintf (buf, "%s%u ", SOCKET_COOKIE, sin.sin_port);
+          sock->get_connect_secret (strchr (buf, '\0'));
 	  len = strlen (buf) + 1;
 
 	  /* Note that the terminating nul is written.  */
@@ -1866,5 +1940,8 @@ wsock_init ()
 
   if (FIONBIO  != REAL_FIONBIO)
     debug_printf ("****************  FIONBIO  != REAL_FIONBIO");
+
+  /* FIXME: will resulting random sequence be unpredictable enough? */
+  srandom (GetTickCount ());
 }
 

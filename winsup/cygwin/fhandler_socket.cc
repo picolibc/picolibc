@@ -16,6 +16,7 @@
 #include <errno.h>
 #include <sys/socket.h>
 
+#include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
 #define USE_SYS_TYPES_FD_SET
@@ -25,6 +26,8 @@
 #include "fhandler.h"
 #include "dtable.h"
 #include "sigproc.h"
+
+#define SECRET_EVENT_NAME "cygwin.local_socket.secret.%d.%08x-%08x-%08x-%08x"
 
 /**********************************************************************/
 /* fhandler_socket */
@@ -42,6 +45,87 @@ fhandler_socket::~fhandler_socket ()
 {
   if (prot_info_ptr)
     cfree (prot_info_ptr);
+}
+
+void
+fhandler_socket::set_connect_secret ()
+{
+  for (int i = 0; i < 4; i++)
+    connect_secret [i] = random ();
+}
+
+void
+fhandler_socket::get_connect_secret (char* buf)
+{
+  __small_sprintf (buf, "%08x-%08x-%08x-%08x",
+		   connect_secret [0], connect_secret [1],
+		   connect_secret [2], connect_secret [3]);
+}
+
+HANDLE
+fhandler_socket::create_secret_event (int* secret)
+{
+  char buf [128];
+  int* secret_ptr = (secret ? : connect_secret);
+  struct sockaddr_in sin;
+  int sin_len = sizeof (sin);
+
+  if (getsockname (get_socket (), (struct sockaddr*) &sin, &sin_len))
+    {
+      debug_printf ("error getting local socket name (%d)", WSAGetLastError ());
+      return NULL;
+    }
+
+  __small_sprintf (buf, SECRET_EVENT_NAME, sin.sin_port,
+		   secret_ptr [0], secret_ptr [1],
+		   secret_ptr [2], secret_ptr [3]);
+  secret_event = CreateEvent ( NULL, FALSE, FALSE, buf);
+  if (!secret_event && GetLastError () == ERROR_ALREADY_EXISTS)
+    secret_event = OpenEvent (EVENT_ALL_ACCESS, FALSE, buf);
+
+  if (secret_event)
+    {
+      ProtectHandle (secret_event);
+      SetEvent (secret_event);
+    }
+
+  return secret_event;
+}
+
+void
+fhandler_socket::close_secret_event ()
+{
+  if (secret_event)
+    ForceCloseHandle (secret_event);
+  secret_event = NULL;
+}
+
+int
+fhandler_socket::check_peer_secret_event (struct sockaddr_in* peer, int* secret)
+{
+  char buf [128];
+  HANDLE ev;
+  int* secret_ptr = (secret ? : connect_secret);
+
+  __small_sprintf (buf, SECRET_EVENT_NAME, peer->sin_port,
+                  secret_ptr [0], secret_ptr [1],
+                  secret_ptr [2], secret_ptr [3]);
+  ev = CreateEvent (NULL, FALSE, FALSE, buf);
+  if (!ev && GetLastError () == ERROR_ALREADY_EXISTS)
+    {
+      debug_printf ("%s event already exist");
+      ev = OpenEvent (EVENT_ALL_ACCESS, FALSE, buf);
+    }
+
+  if (ev)
+    {
+      DWORD rc = WaitForSingleObject (ev, 10000);
+      debug_printf ("WFSO rc=%d", rc);
+      CloseHandle (ev);
+      return (rc == WAIT_OBJECT_0 ? 1 : 0 );
+    }
+  else
+    return 0;
 }
 
 void
@@ -93,12 +177,15 @@ fhandler_socket::fixup_after_fork (HANDLE parent)
       fhandler_base::fixup_after_fork (parent);
       debug_printf ("Without Winsock 2.0");
     }
+  if (secret_event)
+    fork_fixup (parent, secret_event, "secret_event");
 }
 
 int
 fhandler_socket::dup (fhandler_base *child)
 {
   fhandler_socket *fhs = (fhandler_socket *) child;
+  fhs->addr_family = addr_family;
   fhs->set_io_handle (get_io_handle ());
   fhs->fixup_before_fork_exec (GetCurrentProcessId ());
   if (ws2_32_handle)
@@ -147,6 +234,8 @@ fhandler_socket::close ()
       set_winsock_errno ();
       res = -1;
     }
+
+  close_secret_event ();
 
   return res;
 }

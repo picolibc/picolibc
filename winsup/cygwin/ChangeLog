@@ -1,3 +1,21 @@
+2001-04-09  Egor Duda  <deo@logos-m.ru>
+
+	* fhandler.h (class fhandler_socket): Add members and methods to
+	support secure connections on AF_UNIX sockets.
+	* fhandler_socket.cc (fhandler_socket::set_connect_secret): New method.
+	(fhandler_socket::get_connect_secret): Ditto.
+	(fhandler_socket::create_secret_event): Ditto.
+	(fhandler_socket::close_secret_event): Ditto.
+	(fhandler_socket::check_peer_secret_event): Ditto.
+	(fhandler_socket::fixup_after_fork): Duplicate secret event to child.
+	(fhandler_socket::dup): Copy address family.
+	(fhandler_socket::close): Close secret event.
+	* net.cc (get_inet_addr): Read secret cookie.
+	(cygwin_connect): Check if peer knows secret cookie value.
+	(cygwin_accept): Ditto. Copy address family to newly created socket.
+	(cygwin_bind): Generate and write secret cookie.
+	(wsock_init): Initialize random number generator.
+
 Sun Apr  8 20:40:58 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Put -lgcc last in list of libraries, since stdc++
