@@ -1,3 +1,7 @@
+2000-02-25  DJ Delorie  <dj@cygnus.com>
+
+	* Makefile.in: fix "make check" support and cygrun.
+	
 Thu Feb 24 15:56:00 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* syscalls.c (_read): Clear errno before doing any read operation.
