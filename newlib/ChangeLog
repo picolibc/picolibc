@@ -1,3 +1,13 @@
+2002-05-24  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* libc/sys/linux/sys/cdefs.h: Add __weak_reference macros.
+	* libc/sys/linux/sys/time.h: Add conversion macros.
+	* libc/sys/linux/sys/types.h: Add FD_ macros.  Include <bits/types.h>.
+	* libc/sys/linux/ids.c: Add setresuid and syslog syscalls.
+	* libc/sys/linux/gethostname.c: New file.
+	* libc/sys/linux/seteuid.c: New file.
+	* libc/sys/linux/sysctl.c: New file.
+	
 2002-05-23  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/string/Makefile.am: Add support for strsep.c.
