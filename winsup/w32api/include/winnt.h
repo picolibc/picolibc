@@ -125,6 +125,16 @@ typedef LONGLONG USN;
 #define UNICODE_NULL L'\0'
 typedef BYTE BOOLEAN,*PBOOLEAN;
 #endif
+#ifndef GUID_DEFINED
+#define GUID_DEFINED
+typedef struct _GUID
+{
+    unsigned long Data1;
+    unsigned short Data2;
+    unsigned short Data3;
+    unsigned char Data4[8];
+} GUID,*REFGUID,*LPGUID;
+#endif /* GUID_DEFINED */
 
 #define NTAPI __stdcall
 #define APPLICATION_ERROR_MASK       0x20000000
@@ -194,10 +204,14 @@ typedef BYTE BOOLEAN,*PBOOLEAN;
 #define FILE_ATTRIBUTE_SYSTEM	4
 #define FILE_ATTRIBUTE_DIRECTORY	16
 #define FILE_ATTRIBUTE_ARCHIVE	32
+#define FILE_ATTRIBUTE_ENCRYPTED	64
 #define FILE_ATTRIBUTE_NORMAL	128
 #define FILE_ATTRIBUTE_TEMPORARY	256
+#define FILE_ATTRIBUTE_SPARSE_FILE	512
+#define FILE_ATTRIBUTE_REPARSE_POINT	1024
 #define FILE_ATTRIBUTE_COMPRESSED	2048
 #define FILE_ATTRIBUTE_OFFLINE	0x1000
+#define FILE_ATTRIBUTE_NOT_CONTENT_INDEXED	0x2000
 #define FILE_NOTIFY_CHANGE_FILE_NAME	1
 #define FILE_NOTIFY_CHANGE_DIR_NAME	2
 #define FILE_NOTIFY_CHANGE_ATTRIBUTES	4
@@ -213,7 +227,13 @@ typedef BYTE BOOLEAN,*PBOOLEAN;
 #define FILE_UNICODE_ON_DISK	4
 #define FILE_PERSISTENT_ACLS	8
 #define FILE_FILE_COMPRESSION	16
+#define FILE_VOLUME_QUOTAS      32
+#define FILE_SUPPORTS_SPARSE_FILES      64
+#define FILE_SUPPORTS_REPARSE_POINTS    128
+#define FILE_SUPPORTS_REMOTE_STORAGE    256
 #define FILE_VOLUME_IS_COMPRESSED	0x8000
+#define FILE_SUPPORTS_OBJECT_IDS        0x10000  
+#define FILE_SUPPORTS_ENCRYPTION        0x20000  
 #define IO_COMPLETION_MODIFY_STATE	2
 #define IO_COMPLETION_ALL_ACCESS (STANDARD_RIGHTS_REQUIRED|SYNCHRONIZE|3)
 #define DUPLICATE_CLOSE_SOURCE	1
@@ -1018,7 +1038,19 @@ typedef BYTE BOOLEAN,*PBOOLEAN;
 #define INCREF(x) ((((x)&~N_BTMASK)<<N_TSHIFT)|(IMAGE_SYM_DTYPE_POINTER<<N_BTSHFT)|((x)&N_BTMASK))
 #define DECREF(x) ((((x)>>N_TSHIFT)&~N_BTMASK)|((x)&N_BTMASK))
 #define TLS_MINIMUM_AVAILABLE 64
-
+#define REPARSE_DATA_BUFFER_HEADER_SIZE   FIELD_OFFSET(REPARSE_DATA_BUFFER, GenericReparseBuffer)
+#define REPARSE_GUID_DATA_BUFFER_HEADER_SIZE   FIELD_OFFSET(REPARSE_GUID_DATA_BUFFER, GenericReparseBuffer)
+#define MAXIMUM_REPARSE_DATA_BUFFER_SIZE 16384
+#define IO_REPARSE_TAG_RESERVED_ZERO 0
+#define IO_REPARSE_TAG_RESERVED_ONE 1
+#define IO_REPARSE_TAG_RESERVED_RANGE IO_REPARSE_TAG_RESERVED_ONE
+#define IsReparseTagMicrosoft(x) ((x)&0x80000000)
+#define IsReparseTagHighLatency(x) ((x)&0x40000000)
+#define IsReparseTagNameSurrogate(x) ((x)&0x20000000)
+#define IO_REPARSE_TAG_VALID_VALUES 0xE000FFFF
+#define IsReparseTagValid(x) (!((x)&~IO_REPARSE_TAG_VALID_VALUES)&&((x)>IO_REPARSE_TAG_RESERVED_RANGE))
+#define IO_REPARSE_TAG_SYMBOLIC_LINK IO_REPARSE_TAG_RESERVED_ZERO
+#define IO_REPARSE_TAG_MOUNT_POINT 0xA0000003
 #ifndef RC_INVOKED
 typedef DWORD ACCESS_MASK;
 typedef struct _GENERIC_MAPPING {
@@ -2356,6 +2388,43 @@ typedef struct _NT_TIB {
 	PVOID ArbitraryUserPointer;
 	struct _NT_TIB *Self;
 } NT_TIB,*PNT_TIB;
+typedef struct _REPARSE_DATA_BUFFER {
+	DWORD  ReparseTag;
+	WORD   ReparseDataLength;
+	WORD   Reserved;
+	union {
+		struct {
+			WORD   SubstituteNameOffset;
+			WORD   SubstituteNameLength;
+			WORD   PrintNameOffset;
+			WORD   PrintNameLength;
+			WCHAR PathBuffer[1];
+		} SymbolicLinkReparseBuffer;
+		struct {
+			WORD   SubstituteNameOffset;
+			WORD   SubstituteNameLength;
+			WORD   PrintNameOffset;
+			WORD   PrintNameLength;
+			WCHAR PathBuffer[1];
+		} MountPointReparseBuffer;
+		struct {
+			BYTE   DataBuffer[1];
+		} GenericReparseBuffer;
+	};
+} REPARSE_DATA_BUFFER, *PREPARSE_DATA_BUFFER;
+typedef struct _REPARSE_GUID_DATA_BUFFER {
+	DWORD  ReparseTag;
+	WORD   ReparseDataLength;
+	WORD   Reserved;
+	GUID   ReparseGuid;
+	struct {
+		BYTE   DataBuffer[1];
+	} GenericReparseBuffer;
+} REPARSE_GUID_DATA_BUFFER, *PREPARSE_GUID_DATA_BUFFER;
+typedef struct _REPARSE_POINT_INFORMATION {
+	WORD   ReparseDataLength;
+	WORD   UnparsedNameLength;
+} REPARSE_POINT_INFORMATION, *PREPARSE_POINT_INFORMATION;
 PVOID GetCurrentFiber(void);
 PVOID GetFiberData(void);
 #endif
