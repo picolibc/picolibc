@@ -1,9 +1,273 @@
+2003-07-02  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.h (FH_ENC): New enum.
+	(fhandler_base::get_encoded): New function.
+	(fhandler_base::set_encoded): Ditto.
+	* fhandler_disk_file.cc (fhandler_disk_file::readdir): Unmunge filename
+	as appropriate based on new encoding flag.
+	* path.cc (normalize_posix_path): Change drive check short-circuit.
+	(special_char): New function.
+	(mount_item::fnmunge): Ditto.
+	(fnunmunge): Ditto.
+	(special_name): Ditto.
+	(mount_info::conv_to_win32_path): Handle encoded filenames.
+	(fillout_mntent): Add posix string when directory is encoded.
+	* path.h (fnunmunge): Declare.
+
+2003-07-03  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_tty.cc (fhandler_tty_slave::open): Conditionalize a little
+	more of the cygserver stuff so that ttys actually work.
+
+2003-07-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (mmap64): Allow MAP_FIXED with pagesize granularity (4K).
+	If a non-zero addr is given, align it to the next lower 64K boundary.
+	(fhandler_disk_file::mmap): If a non-zero address is given, try
+	mapping using the given address first.  If it fails and flags is not
+	MAP_FIXED, try again with NULL address.
+
+2003-07-01  Christopher Faylor  <cgf@redhat.com>
+
+	* thread.cc: Remove _MT_SAFE conditional.
+
+2003-07-01  Christopher Faylor  <cgf@redhat.com>
+
+	* configure.in: Fix --enable-server option.
+	* configure: Regenerate.
+
+2003-07-01  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Remove cygserver stuff.
+	* acconfig.h: Add USE_CYGSERVER define.
+	* config.h.in: Regenerate.
+	* configure.in: Add --enable-server setting.
+	* configure: Regenerate.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Conditionalize
+	compilation of cygserver stuff.
+	* fork.cc (fork_child): Ditto.
+	* shm.cc: Ditto.
+	* tty.cc (tty::common_init): Ditto.
+
+	* dcrt0.cc: Use bool rather than BOOL for CYGWIN environment variable
+	definitions.
+	* environ.cc: Ditto.
+	* ntea.cc: Ditto.
+	* security.cc: Ditto.
+	* security.h: Ditto.
+	* syscalls.cc (check_posix_perm): Remove externs that were already
+	declared in a header.
+	* winsup.h: Ditto.  Declare _MT_SAFE here.  Delete it someday since
+	cygwin should always be _MT_SAFE.
+
+2003-07-01  Christopher Faylor  <cgf@redhat.com>
+
+	* thread.cc: Remove _MT_SAFE conditional.
+
+2003-07-01  Christopher Faylor  <cgf@redhat.com>
+
+	* configure.in: Fix --enable-server option.
+	* configure: Regenerate.
+
+2003-07-01  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Remove cygserver stuff.
+	* acconfig.h: Add USE_CYGSERVER define.
+	* config.h.in: Regenerate.
+	* configure.in: Add --enable-server setting.
+	* configure: Regenerate.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Conditionalize
+	compilation of cygserver stuff.
+	* fork.cc (fork_child): Ditto.
+	* shm.cc: Ditto.
+	* tty.cc (tty::common_init): Ditto.
+
+	* dcrt0.cc: Use bool rather than BOOL for CYGWIN environment variable
+	definitions.
+	* environ.cc: Ditto.
+	* ntea.cc: Ditto.
+	* security.cc: Ditto.
+	* security.h: Ditto.
+	* syscalls.cc (check_posix_perm): Remove externs that were already
+	declared in a header.
+	* winsup.h: Ditto.  Declare _MT_SAFE here.  Delete it someday since
+	cygwin should always be _MT_SAFE.
+
+2003-06-30  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* cygheap.h (enum impersonation): New enum.
+	(cygheap_user::token): Delete.
+	(cygheap_user::impersonated): Delete.
+	(cygheap_user::external_token): New member.
+	(cygheap_user::internal_token): New member.
+	(cygheap_user::impersonation_state): New member.
+	(cygheap_user::issetuid): Modify.
+	(cygheap_user::token): New method.   
+	(cygheap_user::deimpersonate): New method.
+	(cygheap_user::reimpersonate): New method.
+	(cygheap_user::has_impersonation_tokens): New method.
+	(cygheap_user::close_impersonation_tokens): New method.
+	* dtable.cc (dtable::vfork_child_dup): Use new cygheap_user methods.
+	* fhandler_socket.cc (fhandler_socket::dup): Ditto.
+	* fork.cc (fork_child): Ditto.
+	(fork_parent): Ditto.
+	* grp.cc (internal_getgroups): Ditto.
+	* security.cc (verify_token): Ditto.
+	(check_file_access): Ditto.
+	(cygwin_set_impersonation_token): Detect conflicts. Set
+	user.external_token.
+	* spawn.cc (spawn_guts): Use new cygheap_user methods.
+	* syscalls.cc (seteuid32): Rearrange to use the two tokens
+	in cygheap_user.
+	(setegid32): Use new cygheap_user methods.
+	* uinfo.cc: (internal_getlogin): Ditto.
+
+2003-06-25  Doru Carastan  <doru.carastan@mvista.com>
+
+	* Makefile.in: Use INSTALL_PROGRAM to install the cygwin DLL.
+
+2003-06-24  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.cc (MTinterface::fixup_after_fork): Fix thread list after
+	fork.
+	(pthread::threads): Instantiate.
+	(pthread::pthread): Initialize running and suspendend.
+	Initialize next with NULL.
+	Add thread to thread list if it is not the null_pthread.
+	(pthread::~pthread): Remove thread from thread list if it is
+	not the null_pthread.
+	(pthread::postcreate): Set running flag.
+	(pthread::exit): Reset running flag.
+	(pthread::cancel): Try to cancel thread only if still running.
+	(pthread::_fixup_after_fork): Implement.
+	(pthread::detach): Check if thread is still running before detach.
+	* thread.h (pthread::running): New member.
+	(pthread::next): Ditto.
+	(pthread::fixup_after_fork): New static method.
+	(pthread::threads): New static method.
+	(pthread::_fixup_after_fork): New method.
+
+2003-06-20  Christopher Faylor  <cgf@redhat.com>
+
+	* pinfo.cc (_pinfo::commune_send): Don't attempt to communicate with a
+	pure windows process.
+
+2003-06-18  Pierre Humblet  <pierre.humblet@ieee.org>
+
+        * autoload.cc (GetNetworkParams): Add.
+        * net.cc (getdomainname): Call GetNetworkParams and read the
+        DhcpDomain registry value if warranted.
+
+2003-06-17  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (mount): Do more strict checking on posix path arguments.
+
+2003-06-15  Christopher Faylor  <cgf@redhat.com>
+
+	Throughout, remove "include <errno.h>" from files which already include
+	cygerrno.h.
+
+2003-06-15  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* include/cygwin/config.h (__DYNAMIC_REENT__): Define.
+	* include/cygwin/version.h: Bump API minor version.
+	* cygwin.din: Export __getreent
+	* cygerrno.h: Include errno.h.  Fix places where _impure_ptr is used
+	directly to store the errno value.
+	* debug.cc (__set_errno): Ditto.
+	* errno.cc: Remove _RRENT_ONLY define to get errno.cc compiled.
+	* signal.cc: Rename _reent_clib to _REENT throughout.
+	* thread.h (reent_clib): Remove prototype.
+	* thread.cc (reent_clib): Rename reent_clib to __getreent.  Return
+	_impure_ptr until MTinterface is initialized.
+	(reent_winsup): Fix a possible SEGV when _r == NULL.  Return NULL
+	instead.
+	* MTinterface::fixup_after_fork: Switch reent back to _impure_ptr to
+	keep signal handling running when fork is called from a thread other
+	than the mainthread.
+
+2003-06-12  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.cc (pthread_attr_init): Revert change from 2003-06-11
+	to return 0 if attribute is already initialized back to EBUSY.
+	(pthread_condattr_init): Ditto.
+	(pthread_rwlockattr_init): Ditto.
+	(pthread_mutexattr_init): Ditto.
+
+2003-06-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (ctrl_c_handler): Don't send a signal on
+	CTRL_SHUTDOWN_EVENT.  Add a comment to rationalize the patch.
+
+2003-06-11  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.cc (pthread_attr_init): Return 0 if attribute is already
+	initialized.
+	Fix return code if out of memory.
+	(pthread_condattr_init): Ditto.
+	(pthread_rwlockattr_init): Ditto.
+	(pthread_mutexattr_init): Return 0 if attribute is already
+	initialized.
+
+2003-06-09  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* spawn.cc (spawn_guts): Call CreateProcess while impersonated,
+	when the real {u,g}ids and the groups are original.
+	Move RevertToSelf and ImpersonateLoggedOnUser to the main line.
+	* uinfo.cc (uinfo_init): Reorganize. If CreateProcess was called
+	while impersonated, preserve the uids and gids and call
+	ImpersonateLoggedOnUser. Preserve the uids and gids on Win9X.
+
+	* exceptions.cc (error_start_init): Quote the pgm in the command.
+
+2003-06-07  Christopher Faylor  <cgf@redhat.com>
+
+	* poll.cc: Define FD_SETSIZE to ridiculously large number so that there
+	will be no artificially small limits.
+
+2003-06-07  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_tty.cc (fhandler_tty_slave::close): Free the console when
+	last tty closes.
+
+2003-06-07  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* fhandler_socket.cc (fhandler_socket::connect): Change error
+	handling for nonblocking connects to return EALREADY when
+	connect is called more than once for the same socket.
+
+2003-06-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din: Add vsyslog.
+	* fhandler.cc (fhandler_base::write): Only make file sparse if the
+	seeked area is >= 128K.
+	* syslog.cc (vsyslog): New function, overtaking functionality from
+	syslog.
+	(syslog): Just call vsyslog.
+	* include/cygwin/version.h: Bump API minor.
+	* include/sys/syslog.h: Add vsyslog declaration.
+
+2003-06-05  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::terminate_thread): Change system_printf to
+	debug_printf.
+
+2003-06-04  Christopher Faylor  <cgf@redhat.com>
+
+	* shared.cc (shared_info::heap_chunk_size): Be really defensive about
+	making sure that heap_chunk is set.
+
+2003-06-04  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (conv_path_list): Use correct value when calculating length
+	to avoid a potential SEGV.
+
 2003-06-03  Pierre Humblet  <pierre.humblet@ieee.org>
 
-        * fhandler_disk_file.cc (fhandler_disk_file::fstat): Mark the pc
-        as non-executable if the file cannot be opened for read. Retry query
-        open only if errno is EACCES. Never change the mode, even if it is 000
-        when query open() fails.
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat): Mark the pc
+	as non-executable if the file cannot be opened for read. Retry query
+	open only if errno is EACCES. Never change the mode, even if it is 000
+	when query open() fails.
 
 2003-06-03  Christopher Faylor  <cgf@redhat.com>
 
