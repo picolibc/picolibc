@@ -1314,20 +1314,18 @@ rename (const char *oldpath, const char *newpath)
       && (lnk_suffix = strrchr (real_new.get_win32 (), '.')))
      *lnk_suffix = '\0';
 
-  if (!MoveFile (real_old, real_new))
-    res = -1;
-
-  if (res == 0 || (GetLastError () != ERROR_ALREADY_EXISTS
-		   && GetLastError () != ERROR_FILE_EXISTS))
+  if (MoveFile (real_old, real_new))
     goto done;
 
+  res = -1;
   if (wincap.has_move_file_ex ())
     {
       if (MoveFileEx (real_old.get_win32 (), real_new.get_win32 (),
 		      MOVEFILE_REPLACE_EXISTING))
 	res = 0;
     }
-  else
+  else if (GetLastError () == ERROR_ALREADY_EXISTS
+	   || GetLastError () == ERROR_FILE_EXISTS)
     {
       syscall_printf ("try win95 hack");
       for (int i = 0; i < 2; i++)
