@@ -26,12 +26,6 @@ details. */
 #include "path.h"
 #undef cygwin_internal
 
-/*  GCC runtime library's C++ EH code unfortunately pulls in stdio, and we
-   get undefine references to __impure_ptr, and hence the following
-   hack. It should be reasonably safe however as long as this file
-   is built using -mno-cygwin as is intended.  */
-int _impure_ptr;
-
 /* we *know* we're being built with GCC */
 #define alloca __builtin_alloca
 
