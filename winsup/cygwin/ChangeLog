@@ -1,5 +1,11 @@
 2003-09-12  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler_disk_file.cc (path_conv::ndisk_links): Fix problem where
+	search characters overwrote the path instead of being tacked on the
+	end.
+
+2003-09-12  Christopher Faylor  <cgf@redhat.com>
+
 	* dcrt0.cc (_dll_crt0): Accommodate breaking apart of early_stuff_init.
 	* exceptions.cc (early_stuff_init): Delete.
 	(init_console_handler): New function - top half of early_stuff_init.

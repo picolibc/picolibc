@@ -53,9 +53,9 @@ path_conv::ndisk_links (DWORD nNumberOfLinks)
     }
 
   if (len == 0 || isdirsep (fn[len - 1]))
-    strcpy (fn, s + 1);
+    strcpy (fn + len, s + 1);
   else
-    strcat (fn, s);
+    strcpy (fn + len, s);
 
   WIN32_FIND_DATA buf;
   HANDLE h = FindFirstFile (fn, &buf);
