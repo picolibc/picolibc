@@ -1,3 +1,10 @@
+2003-07-12  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winnt.h (PVOID): Move to before HANDLE typedef.
+
+	* include/winuser.h (mouse_event): Correct type of fifth param,
+	Thanks to: Andrew Jones <guln at users dot sourceforge dot net>
+
 2003-07-11  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/winnt.h (HANDLE): Define based on STRICT filter.

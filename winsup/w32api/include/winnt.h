@@ -116,7 +116,6 @@ typedef const TCHAR *LPCTSTR;
 #define TEXT(q) __TEXT(q)    
 typedef SHORT *PSHORT;
 typedef LONG *PLONG;
-typedef HANDLE *PHANDLE,*LPHANDLE;
 #ifdef STRICT
 typedef void *HANDLE;
 #define DECLARE_HANDLE(n) typedef struct n##__{int i;}*n
@@ -124,6 +123,7 @@ typedef void *HANDLE;
 typedef PVOID HANDLE;
 #define DECLARE_HANDLE(n) typedef HANDLE n
 #endif
+typedef HANDLE *PHANDLE,*LPHANDLE;
 typedef DWORD LCID;
 typedef PDWORD PLCID;
 typedef WORD LANGID;
