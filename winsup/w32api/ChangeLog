@@ -1,3 +1,11 @@
+2003-01-05  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winuser.h (SPI_SETWHEELSCROLLLINES) Add define.
+	* include/zmouse.h (WHEEL_DELTA): Guard against prior
+	definition.
+	(WHEEL_PAGESCROLL): Likewise.
+	(SPI_SETWHEELSCROLLLINES): Define, if not already done.
+
 2003-01-04  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winuser.h (SPI_GETWHEELSCROLLLINES) Add define.
