@@ -374,6 +374,8 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 int __stdcall
 fhandler_disk_file::fstat (struct __stat64 *buf)
 {
+  if (has_changed ())
+    touch_ctime ();
   return fstat_fs (buf);
 }
 
@@ -387,6 +389,8 @@ fhandler_disk_file::touch_ctime (void)
   SystemTimeToFileTime (&st, &ft);
   if (!SetFileTime (get_io_handle (), &ft, NULL, NULL))
     debug_printf ("SetFileTime (%s) failed, %E", get_win32_name ());
+  else
+    has_changed (false);
 }
 
 int __stdcall

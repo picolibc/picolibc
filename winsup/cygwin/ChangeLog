@@ -1,5 +1,11 @@
 2005-02-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat): Set st_ctime if
+	has_changed flag is set.
+	(fhandler_disk_file::touch_ctime): Reset has_changed flag on success.
+
+2005-02-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* times.cc (utimes): Open files with FILE_WRITE_ATTRIBUTES first,
 	if that fails, try opeing with GENERIC_WRITE.  Fix comments.
 
