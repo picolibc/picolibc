@@ -905,6 +905,10 @@ mount SIGFE
 _mount = mount SIGFE
 mprotect SIGFE
 mrand48 NOSIGFE
+msgctl SIGFE
+msgget SIGFE
+msgrcv SIGFE
+msgsnd SIGFE
 msync SIGFE
 munmap SIGFE
 nan NOSIGFE
@@ -1126,11 +1130,18 @@ _seed48 = seed48 NOSIGFE
 seekdir SIGFE
 _seekdir = seekdir SIGFE
 _seekdir64 = seekdir64 SIGFE
+sem_close SIGFE
 sem_destroy NOSIGFE
+sem_getvalue SIGFE
 sem_init SIGFE
+sem_open SIGFE
 sem_post SIGFE
+sem_timedwait SIGFE
 sem_trywait SIGFE
 sem_wait SIGFE
+semctl SIGFE
+semget SIGFE
+semop SIGFE
 setbuf SIGFE
 _setbuf = setbuf SIGFE
 setbuffer SIGFE
