@@ -285,8 +285,9 @@ class fhandler_base
 		       int flags, _off64_t off);
   virtual int munmap (HANDLE h, caddr_t addr, size_t len);
   virtual int msync (HANDLE h, caddr_t addr, size_t len, int flags);
-  virtual bool fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
-				      DWORD size, void *address);
+  virtual bool fixup_mmap_after_fork (HANDLE h, DWORD access, int flags,
+				      _off64_t offset, DWORD size,
+				      void *address);
 
   void *operator new (size_t, void *p) {return p;}
 
@@ -633,8 +634,8 @@ class fhandler_disk_file: public fhandler_base
   HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, _off64_t off);
   int munmap (HANDLE h, caddr_t addr, size_t len);
   int msync (HANDLE h, caddr_t addr, size_t len, int flags);
-  bool fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
-			      DWORD size, void *address);
+  bool fixup_mmap_after_fork (HANDLE h, DWORD access, int flags,
+			      _off64_t offset, DWORD size, void *address);
   DIR *opendir ();
   struct dirent *readdir (DIR *);
   _off64_t telldir (DIR *);
@@ -1055,8 +1056,8 @@ class fhandler_dev_mem: public fhandler_base
   HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, _off64_t off);
   int munmap (HANDLE h, caddr_t addr, size_t len);
   int msync (HANDLE h, caddr_t addr, size_t len, int flags);
-  bool fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
-			      DWORD size, void *address);
+  bool fixup_mmap_after_fork (HANDLE h, DWORD access, int flags,
+			      _off64_t offset, DWORD size, void *address);
 
   void dump ();
 } ;

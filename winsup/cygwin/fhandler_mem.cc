@@ -361,8 +361,9 @@ fhandler_dev_mem::msync (HANDLE h, caddr_t addr, size_t len, int flags)
 }
 
 bool
-fhandler_dev_mem::fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
-					 DWORD size, void *address)
+fhandler_dev_mem::fixup_mmap_after_fork (HANDLE h, DWORD access, int flags,
+					 _off64_t offset, DWORD size,
+					 void *address)
 {
   DWORD ret;
   PHYSICAL_ADDRESS phys;

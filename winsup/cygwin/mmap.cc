@@ -22,6 +22,7 @@ details. */
 #include "cygheap.h"
 #include "pinfo.h"
 #include "sys/cygwin.h"
+#include "ntdll.h"
 
 #define PAGE_CNT(bytes) howmany((bytes),getpagesize())
 
@@ -58,6 +59,7 @@ class mmap_record
     int fdesc_;
     HANDLE mapping_handle_;
     DWORD access_mode_;
+    int flags_;
     _off64_t offset_;
     DWORD size_to_map_;
     caddr_t base_address_;
@@ -65,10 +67,12 @@ class mmap_record
     device dev;
 
   public:
-    mmap_record (int fd, HANDLE h, DWORD ac, _off64_t o, DWORD s, caddr_t b) :
+    mmap_record (int fd, HANDLE h, DWORD ac, int f, _off64_t o, DWORD s,
+    		 caddr_t b) :
        fdesc_ (fd),
        mapping_handle_ (h),
        access_mode_ (ac),
+       flags_ (f),
        offset_ (o),
        size_to_map_ (s),
        base_address_ (b),
@@ -83,6 +87,7 @@ class mmap_record
     HANDLE get_handle () const { return mapping_handle_; }
     device& get_device () { return dev; }
     DWORD get_access () const { return access_mode_; }
+    DWORD get_flags () const { return flags_; }
     _off64_t get_offset () const { return offset_; }
     DWORD get_size () const { return size_to_map_; }
     caddr_t get_address () const { return base_address_; }
@@ -128,12 +133,15 @@ class map
   private:
     list *lists;
     int nlists, maxlists;
+    caddr_t next_anon_addr;
 
   public:
     list *get_list (int i) { return i >= nlists ? NULL : lists + i; }
     list *get_list_by_fd (int fd);
     list *add_list (int fd);
     void del_list (int i);
+    caddr_t get_next_anon_addr () { return next_anon_addr; }
+    void set_next_anon_addr (caddr_t addr) { next_anon_addr = addr; }
 };
 
 /* This is the global map structure pointer.  It's allocated once on the
@@ -530,13 +538,21 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
   if (flags & MAP_ANONYMOUS)
     fd = -1;
 
-  /* If MAP_FIXED is requested on a non-granularity boundary, change request
-     so that this looks like a request with offset addr % granularity. */
-  if (fd == -1 && (flags & MAP_FIXED) && ((DWORD)addr % granularity) && !off)
+  /* 9x only: If MAP_FIXED is requested on a non-granularity boundary,
+     change request so that this looks like a request with offset
+     addr % granularity. */
+  if (wincap.share_mmaps_only_by_name () && fd == -1 && (flags & MAP_FIXED)
+      && ((DWORD)addr % granularity) && !off)
     off = (DWORD)addr % granularity;
-  /* Map always in multipliers of `granularity'-sized chunks. */
-  _off64_t gran_off = off & ~(granularity - 1);
-  DWORD gran_len = howmany (off + len, granularity) * granularity - gran_off;
+  /* Map always in multipliers of `granularity'-sized chunks.
+     Not necessary for anonymous maps on NT. */
+  _off64_t gran_off = off;
+  DWORD gran_len = len;
+  if (wincap.share_mmaps_only_by_name () || fd != -1)
+    {
+      gran_off = off & ~(granularity - 1);
+      gran_len = howmany (off + len, granularity) * granularity - gran_off;
+    }
 
   fhandler_base *fh;
 
@@ -571,8 +587,11 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 	    gran_len = fsiz;
 	}
       else if (fh->get_device () == FH_ZERO)
-	/* mmap /dev/zero is like MAP_ANONYMOUS. */
-	fd = -1;
+	{
+	  /* mmap /dev/zero is like MAP_ANONYMOUS. */
+	  fd = -1;
+	  flags |= MAP_ANONYMOUS;
+	}
     }
   if (fd == -1)
     {
@@ -597,60 +616,67 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
 
   list *map_list = mmapped_areas->get_list_by_fd (fd);
 
-  /* First check if this mapping matches into the chunk of another
-     already performed mapping. Only valid for MAP_ANON in a special
-     case of MAP_PRIVATE. */
-  if (map_list && fd == -1 && off == 0 && !(flags & MAP_FIXED))
+  /* A bit of memory munging on 9x. */
+  if (map_list && fd == -1 && wincap.share_mmaps_only_by_name ())
     {
-      mmap_record *rec;
-      if ((rec = map_list->search_record (off, len)) != NULL
-          && rec->get_access () == access)
+      /* First check if this mapping matches into the chunk of another
+	 already performed mapping. Only valid for MAP_ANON in a special
+	 case of MAP_PRIVATE. */
+      if (off == 0 && !(flags & MAP_FIXED))
 	{
-	  if ((off = rec->map_pages (off, len)) == (_off64_t)-1)
+	  mmap_record *rec;
+	  if ((rec = map_list->search_record (off, len)) != NULL
+	      && rec->get_access () == access)
 	    {
-	      syscall_printf ("-1 = mmap()");
-	      ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK|WRITE_LOCK,
-	      			   "mmap");
-	      return MAP_FAILED;
+	      if ((off = rec->map_pages (off, len)) == (_off64_t)-1)
+		{
+		  syscall_printf ("-1 = mmap()");
+		  ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK|WRITE_LOCK,
+				       "mmap");
+		  return MAP_FAILED;
+		}
+	      caddr_t ret = rec->get_address () + off;
+	      syscall_printf ("%x = mmap() succeeded", ret);
+	      ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK,
+				   "mmap");
+	      return ret;
 	    }
-	  caddr_t ret = rec->get_address () + off;
-	  syscall_printf ("%x = mmap() succeeded", ret);
-	  ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
-	  return ret;
 	}
-    }
-  if (map_list && fd == -1 && (flags & MAP_FIXED))
-    {
-      caddr_t u_addr;
-      DWORD u_len;
-      long record_idx = -1;
-      if ((record_idx = map_list->search_record ((caddr_t)addr, len, u_addr,
-      						 u_len, record_idx)) >= 0)
+      if ((flags & MAP_FIXED))
 	{
-	  mmap_record *rec = map_list->get_record (record_idx);
-	  if (u_addr > (caddr_t)addr || u_addr + len < (caddr_t)addr + len
-	      || rec->get_access () != access)
+	  caddr_t u_addr;
+	  DWORD u_len;
+	  long record_idx = -1;
+	  if ((record_idx = map_list->search_record ((caddr_t)addr, len,
+	  					     u_addr, u_len,
+						     record_idx)) >= 0)
 	    {
-	      /* Partial match only, or access mode doesn't match. */
-	      /* FIXME: Handle partial mappings gracefully if adjacent
-	         memory is available. */
-	      set_errno (EINVAL);
-	      syscall_printf ("-1 = mmap()");
+	      mmap_record *rec = map_list->get_record (record_idx);
+	      if (u_addr > (caddr_t)addr || u_addr + len < (caddr_t)addr + len
+		  || rec->get_access () != access)
+		{
+		  /* Partial match only, or access mode doesn't match. */
+		  /* FIXME: Handle partial mappings gracefully if adjacent
+		     memory is available. */
+		  set_errno (EINVAL);
+		  syscall_printf ("-1 = mmap()");
+		  ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK,
+				       "mmap");
+		  return MAP_FAILED;
+		}
+	      if (!rec->map_pages ((caddr_t)addr, len))
+		{
+		  syscall_printf ("-1 = mmap()");
+		  ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK,
+				       "mmap");
+		  return MAP_FAILED;
+		}
+	      caddr_t ret = (caddr_t)addr;
+	      syscall_printf ("%x = mmap() succeeded", ret);
 	      ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK,
 				   "mmap");
-	      return MAP_FAILED;
+	      return ret;
 	    }
-	  if (!rec->map_pages ((caddr_t)addr, len))
-	    {
-	      syscall_printf ("-1 = mmap()");
-	      ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK,
-				   "mmap");
-	      return MAP_FAILED;
-	    }
-	  caddr_t ret = (caddr_t)addr;
-	  syscall_printf ("%x = mmap() succeeded", ret);
-	  ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
-	  return ret;
 	}
     }
 
@@ -672,7 +698,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
      Now it's time for bookkeeping stuff. */
   if (fd == -1)
     gran_len = PAGE_CNT (gran_len) * getpagesize ();
-  mmap_record mmap_rec (fd, h, access, gran_off, gran_len, base);
+  mmap_record mmap_rec (fd, h, access, flags, gran_off, gran_len, base);
 
   /* Get list of mmapped areas for this fd, create a new one if
      one does not exist yet.
@@ -959,8 +985,9 @@ fhandler_base::msync (HANDLE h, caddr_t addr, size_t len, int flags)
 }
 
 bool
-fhandler_base::fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
-				      DWORD size, void *address)
+fhandler_base::fixup_mmap_after_fork (HANDLE h, DWORD access, int flags,
+				      _off64_t offset, DWORD size,
+				      void *address)
 {
   set_errno (ENODEV);
   return -1;
@@ -1022,7 +1049,25 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
   void *base = NULL;
   /* If a non-zero address is given, try mapping using the given address first.
      If it fails and flags is not MAP_FIXED, try again with NULL address. */
-  if (*addr)
+  if (!wincap.share_mmaps_only_by_name ()
+      && get_handle () == INVALID_HANDLE_VALUE)
+    {
+      PHYSICAL_ADDRESS phys;
+      phys.QuadPart = (ULONGLONG) off;
+      ULONG ulen = len;
+      base = *addr ?: (void *) mmapped_areas->get_next_anon_addr ();
+      NTSTATUS ret = NtMapViewOfSection (h, INVALID_HANDLE_VALUE, &base, 0L, 
+					 ulen, &phys, &ulen, ViewShare,
+					 base ? AT_ROUND_TO_PAGE : 0, protect);
+      if (ret != STATUS_SUCCESS)
+        {
+	  __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+	  base = NULL;
+	}
+      else
+	mmapped_areas->set_next_anon_addr ((caddr_t) base + len);
+    }
+  else if (*addr)
     base = MapViewOfFileEx (h, access, high, low, len, *addr);
   if (!base && !(flags & MAP_FIXED))
     base = MapViewOfFileEx (h, access, high, low, len, NULL);
@@ -1068,11 +1113,39 @@ fhandler_disk_file::msync (HANDLE h, caddr_t addr, size_t len, int flags)
 }
 
 bool
-fhandler_disk_file::fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
-					   DWORD size, void *address)
+fhandler_disk_file::fixup_mmap_after_fork (HANDLE h, DWORD access, int flags,
+					   _off64_t offset, DWORD size,
+					   void *address)
 {
   /* Re-create the MapViewOfFileEx call */
-  void *base = MapViewOfFileEx (h, access, 0, offset, size, address);
+  void *base;
+  if (!wincap.share_mmaps_only_by_name () && (flags & MAP_ANONYMOUS))
+    {
+      PHYSICAL_ADDRESS phys;
+      phys.QuadPart = (ULONGLONG) offset;
+      ULONG ulen = size;
+      base = address;
+      DWORD protect;
+      switch (access)
+	{
+	  case FILE_MAP_WRITE:
+	    protect = PAGE_READWRITE;
+	    break;
+	  case FILE_MAP_READ:
+	    protect = PAGE_READONLY;
+	    break;
+	  default:
+	    protect = PAGE_WRITECOPY;
+	    break;
+	}
+      NTSTATUS ret = NtMapViewOfSection (h, INVALID_HANDLE_VALUE, &base, 0L, 
+					 ulen, &phys, &ulen, ViewShare,
+					 AT_ROUND_TO_PAGE, protect);
+      if (ret != STATUS_SUCCESS)
+        __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+    }
+  else
+    base = MapViewOfFileEx (h, access, 0, offset, size, address);
   if (base != address)
     {
       MEMORY_BASIC_INFORMATION m;
@@ -1121,6 +1194,7 @@ fixup_mmaps_after_fork (HANDLE parent)
 	  fhandler_base *fh = rec->alloc_fh ();
 	  bool ret = fh->fixup_mmap_after_fork (rec->get_handle (),
 						rec->get_access (),
+						rec->get_flags (),
 						rec->get_offset (),
 						rec->get_size (),
 						rec->get_address ());

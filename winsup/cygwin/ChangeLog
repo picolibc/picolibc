@@ -1,5 +1,35 @@
 2005-02-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (class fhandler_base): Declare fixup_mmap_after_fork
+	with additional flags parameter.  Change offset parameter to _off64_t.
+	(class fhandler_disk_file): Ditto.
+	(class fhandler_dev_mem): Ditto.
+	* fhandler_mem.cc (fhandler_dev_mem::fixup_mmap_after_fork):
+	Accomodate new parameters.
+	* mmap.cc: Include ntdll.h.
+	(class mmap_record): Add flags member.
+	(mmap_record::mmap_record): Add flags parameter.
+	(mmap_record::get_flags): New method.
+	(class map): Add next_anon_addr member to store next anonymous mapping
+	address suggestion.
+	(map::get_next_anon_addr): New method.
+	(map::set_next_anon_addr): New method.
+	(mmap64): Don't align offset and length to granularity in case of
+	MAP_ANONYMOUS on NT.  Check for already existing mapping only on 9x.
+	Call mmap_record::mmap_record with additional flags argument.
+	(fhandler_base::fixup_mmap_after_fork): Accomodate new parameters.
+	(fhandler_disk_file::mmap): Use NtMapViewOfSection with
+	AT_ROUND_TO_PAGE flag for anonymous mappings on NT.  If addr is NULL,
+	try to map adjacent to previous mapping.
+	(fhandler_disk_file::fixup_mmap_after_fork): Add flags argument.
+	Change offset parameter to _off64_t.  Use NtMapViewOfSection to
+	re-create anonymous mappings on NT.
+	(fixup_mmaps_after_fork): Accomodate new parameters when calling
+	fhandler's fixup_mmaps_after_fork function.
+	* ntdll.h (AT_ROUND_TO_PAGE): New define.
+
+2005-02-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mmap.cc (mmap64): Handle anonymous MAP_FIXED request on
 	non-granulation boundary.
 
