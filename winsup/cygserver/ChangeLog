@@ -1,5 +1,11 @@
 2003-11-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* Makefile.in (install): Explicitely create directories.  Install
+	README to $(prefix)/share/doc/Cygwin.
+	* README: New file.
+
+2003-11-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygserver.cc (print_usage): Fix scrambled output.
 
 2003-11-20  Corinna Vinschen  <corinna@vinschen.de>
