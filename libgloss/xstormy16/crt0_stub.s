@@ -79,33 +79,6 @@ _int_reset:
 	.hword 0x0006
 	br  0b
 
-1:	.size _int_reset,1b-_int_reset
-		
-# Stub interrupt routines.
-	.globl _int_timer0
-	.weak _int_timer0
-	.globl _int_timer1
-	.weak _int_timer1
-	.globl _int_sio0
-	.weak _int_sio0
-	.globl _int_sio1
-	.weak _int_sio1
-	.globl _int_port0
-	.weak _int_port0
-	.globl _int_port1
-	.weak _int_port1
-	.globl _int_basetimer
-	.weak _int_basetimer
-_int_timer0:
-_int_timer1:
-_int_sio0:
-_int_sio1:
-_int_port0:
-_int_port1:
-_int_basetimer:
-	iret
-1:	.size _int_timer0,1b-_int_timer0
-
 _int_sys:
 	push  r13
 	mov   r13,#registers
