@@ -1,3 +1,29 @@
+2001-10-07  Joseph S. Myers  <jsm28@cam.ac.uk>
+
+	* acinclude.m4: Fix spelling error of "separate" as "seperate".
+
+2001-05-22  Jason Merrill  <jason_merrill@redhat.com>
+
+	* mt-linux (CXXFLAGS_FOR_TARGET): Lose -fvtable-thunks.
+
+2001-01-27  Richard Henderson  <rth@redhat.com>
+
+	* mt-alphaieee: New file.
+
+2001-01-02  Laurynas Biveinis  <lauras@softhome.net>
+
+	* mh-djgpp: do not set CFLAGS.
+
+2000-08-04  Mark Elbrecht  <snowball3@bigfoot.com>
+
+	* mh-djgpp: Conditionally set 'target_alias' to djgpp. Conditionally
+	modify 'gcc_version'.
+
+2000-07-21  Andrew Haley  <aph@cygnus.com>
+
+	* mh-ia64pic: New file.
+	* mt-ia64pic: New file.	
+
 2001-02-09  Martin Schwidefsky  <schwidefsky@de.ibm.com>
 
 	* mh-s390pic: New file.
