@@ -2371,6 +2371,12 @@ readlink (const char *path, char *buf, int buflen)
       return -1;
     }
 
+  if (pathbuf.file_attributes () == (DWORD) -1)
+    {
+      set_errno (ENOENT);
+      return -1;
+    }
+
   if (!pathbuf.issymlink ())
     {
       if (pathbuf.fileattr != (DWORD) -1)
