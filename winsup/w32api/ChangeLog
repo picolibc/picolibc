@@ -1,3 +1,7 @@
+2002-05-20  Philip Aston  <philipa@mail.com>
+
+	* include/pbt.h (PBT_APMRESUMESUSPEND): Correct value is 7.
+
 2002-05-20  René Møller Fonseca  <fonseca@users.sourceforge.net>
 
 	* include/lmaccess.h: (NetAccess*, NetGroup*,
