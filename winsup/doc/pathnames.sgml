@@ -170,62 +170,17 @@ although commands such as <command>ls /dev/tty</command> work fine.
 <para>Windows NT/W2K/XP additionally support raw devices like floppies,
 disks, partitions and tapes.  These are accessed from Cygwin applications
 using POSIX device names which are supported in two different ways.
-Up to 1.3.3, Cygwin only uses Win32 device names, since 1.3.4
-it additionally uses NT internal device names.
 </para>
 
-<para>Up to Cygwin 1.3.3 the only way to access those devices is
-to mount the Win32 device names to a POSIX device name.
-</para>
-
-<para>
-The Win32 device name for a partition is the drive letter
-with leading <filename>\\.\</filename>, so the floppy would be
-<filename>\\.\A:</filename>, the first partition typically
-<filename>\\.\C:</filename>. Complete drives (except floppies and CD-ROMS
-which are supported as partitions only) are named
-<filename>\\.\PHYSICALDRIVEx</filename>. The <literal>x</literal>
-is the drive number which you can check in the disk manager.
-Each drive line has prepended the text "Disk x".
-</para>
-
-<para>To access tape drives the Win32 file name <filename>\\.\TAPEx</filename>
-is used. For example the first installed tape device is named
-<filename>\\.\tape0</filename>.
+<para>Up to Cygwin 1.3.3 the only way to access those devices was
+to mount the Win32 device names to a POSIX device name but this usage
+is discouraged since Cygwin 1.3.4 and only kept for backward compatibility.
 </para>
 
 <para>
-The naming convention is simple: The name of the POSIX device has to begin with
-<filename>/dev/</filename> and the rest is as you like. The only
-exception are tape devices. To identify if the tape device is
-used as a rewind or a no-rewind device the name must not begin with
-<literal>n</literal> (rewind) or has to begin with <literal>n</literal>
-(no-rewind).
-</para>
-
-<para>Some examples:</para>
-
-<screen>
-mount -b //./A: /dev/fd0              # mount floppy as raw block special
-mount -b //./physicaldrive1 /dev/hdb  # mount "Disk 1"
-mount -b //./tape0 /dev/st0           # mount first tape as the rewind device...
-mount -b //./tape0 /dev/nst0          # ...and as the no-rewind device
-</screen>
-
-<para>Note the usage of the <literal>-b</literal> option. It is best to
-include the -b option when mounting these devices to ensure that all
-file I/O is in "binary mode".
-</para>
-
-<para>
-Since Cygwin 1.3.4 raw devices are accessible from inside of Cygwin processes
-using fixed POSIX device names.  That means, you don't have to mount the devices
-anymore which results in a more cleaner mount table.
-</para>
-
-<para>
-These new fixed POSIX device names are generated using a direct conversion
-from the POSIX namespace to the internal NT namespace.
+Beginning with Cygwin 1.3.4, raw devices are accessible by Cygwin processes
+using fixed POSIX device names.  These fixed POSIX device names are generated
+using a direct conversion from the POSIX namespace to the internal NT namespace.
 E.g. the first harddisk is the NT internal device \device\harddisk0\partition0
 or the first partition on the third harddisk is \device\harddisk2\partition1.
 The first floppy in the system is \device\floppy0, the first CD-ROM is
@@ -272,19 +227,23 @@ links as they are created on Linux systems for convenience:
 
 <screen>
 ln -s /dev/scd0 /dev/cdrom
-ln -s /dev/st0  /dev/tape
+ln -s /dev/scd2 /dev/sr2      # actually srX are real device nodes on Linux but who cares.
+ln -s /dev/nst0  /dev/tape
 ...
 </screen>
 
 <para>
 Note that you can't use the mount table to map from fixed device name
 to your own device name or to map from internal NT device name to
-your own device name.  The following two examples will not work:
+your own device name.  Also using symbolic links to map from the internal
+NT device name to your own device name will not do what you want.
+The following three examples will not work as expected:
 </para>
 
 <screen>
-mount -s -f -b /dev/st0 /dev/tape
-mount -s -f -b /device/tape0 /dev/tape
+mount -f -b /dev/nst0 /dev/tape
+mount -f -b /device/tape0 /dev/tape
+ln -s /device/tape0 /dev/tape
 </screen>
 
 </sect2>
