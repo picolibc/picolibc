@@ -13,6 +13,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
+#include <sys/mman.h>
 #include <ntdef.h>
 
 #include "autoload.h"
@@ -34,9 +35,10 @@ ULONG NTAPI RtlNtStatusToDosError(NTSTATUS);
 /**********************************************************************/
 /* fhandler_dev_mem */
 
-fhandler_dev_mem::fhandler_dev_mem (const char *name, int)
+fhandler_dev_mem::fhandler_dev_mem (const char *name, int nunit)
 : fhandler_base (FH_MEM, name),
-  init_phase(false)
+  unit (nunit),
+  init_phase (false)
 {
 }
 
@@ -47,24 +49,41 @@ fhandler_dev_mem::~fhandler_dev_mem (void)
 void
 fhandler_dev_mem::init ()
 {
-  long page_size = getpagesize ();
-  char buf[1];
-
-  init_phase = true;
-  mem_size = pos = 1 << 30;
-  for (off_t afct = 1 << 29; afct >= page_size; afct >>= 1)
+  if (unit == 1) /* /dev/mem */
     {
-      if (read (buf, 1) > 0)
-        pos += afct;
-      else
+      long page_size = getpagesize ();
+      char buf[1];
+
+      init_phase = true;
+      mem_size = pos = 1 << 30;
+      for (off_t afct = 1 << 29; afct >= page_size; afct >>= 1)
         {
-          if (pos < mem_size)
-            mem_size = pos;
-          pos -= afct;
+          if (read (buf, 1) > 0)
+            pos += afct;
+          else
+            {
+              if (pos < mem_size)
+                mem_size = pos;
+              pos -= afct;
+            }
         }
+      pos = 0;
+      debug_printf ("MemSize: %d MB", mem_size >>= 20);
     }
-  pos = 0;
-  debug_printf ("MemSize: %d MB", mem_size >>= 20);
+  else if (unit == 2) /* /dev/kmem - Not yet supported */
+    {
+      mem_size = 0;
+      debug_printf ("KMemSize: %d MB", mem_size >>= 20);
+    }
+  else if (unit == 4) /* /dev/port == First 64K of /dev/mem */
+    {
+      mem_size = 65536;
+      debug_printf ("PortSize: 64 KB");
+    }
+  else
+    {
+      debug_printf ("Illegal unit!!!");
+    }
   init_phase = false;
 }
 
@@ -74,7 +93,10 @@ fhandler_dev_mem::open (const char *, int flags, mode_t)
   if (os_being_run != winNT)
     {
       set_errno (ENOENT);
-      debug_printf ("/dev/mem is accessible under NT/W2K only");
+      debug_printf ("%s is accessible under NT/W2K only",
+                    unit == 1 ? "/dev/mem" :
+                    unit == 2 ? "/dev/kmem" :
+                                "/dev/port" );
       return 0;
     }
 
@@ -167,7 +189,6 @@ fhandler_dev_mem::write (const void *ptr, size_t ulen)
     }
 
   pos += ulen;
-
   return ulen;
 }
 
@@ -217,7 +238,6 @@ fhandler_dev_mem::read (void *ptr, size_t ulen)
     }
 
   pos += ulen;
-
   return ulen;
 }
 
@@ -259,6 +279,105 @@ fhandler_dev_mem::lseek (off_t offset, int whence)
   return pos;
 }
 
+HANDLE
+fhandler_dev_mem::mmap (caddr_t *addr, size_t len, DWORD access,
+			int flags, off_t off)
+{
+  if ((DWORD) off >= mem_size
+      || (DWORD) len >= mem_size
+      || (DWORD) off + len >= mem_size)
+    {
+      set_errno (EINVAL);
+      syscall_printf ("-1 = mmap(): illegal parameter, set EINVAL");
+      return INVALID_HANDLE_VALUE;
+    }
+
+  UNICODE_STRING memstr;
+  RtlInitUnicodeString (&memstr, L"\\device\\physicalmemory");
+
+  OBJECT_ATTRIBUTES attr;
+  InitializeObjectAttributes(&attr, &memstr, OBJ_CASE_INSENSITIVE, NULL, NULL);
+
+  ACCESS_MASK section_access;
+  ULONG protect;
+
+  if (access & FILE_MAP_COPY)
+    {
+      section_access = SECTION_MAP_READ | SECTION_MAP_WRITE;
+      protect = PAGE_WRITECOPY;
+    }
+  else if (access & FILE_MAP_WRITE)
+    {
+      section_access = SECTION_MAP_READ | SECTION_MAP_WRITE;
+      protect = PAGE_READWRITE;
+    }
+  else
+    {
+      section_access = SECTION_MAP_READ;
+      protect = PAGE_READONLY;
+    }
+
+  HANDLE h;
+  NTSTATUS ret = NtOpenSection (&h, section_access, &attr);
+  if (!NT_SUCCESS(ret))
+    {
+      __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+      syscall_printf ("-1 = mmap(): NtOpenSection failed with %E");
+      return INVALID_HANDLE_VALUE;
+    }
+
+  PHYSICAL_ADDRESS phys;
+  void *base = *addr;
+  DWORD dlen = len;
+
+  phys.QuadPart = (ULONGLONG) off;
+
+  if ((ret = NtMapViewOfSection (h,
+  				 INVALID_HANDLE_VALUE,
+				 &base,
+				 0L,
+				 dlen,
+				 &phys,
+				 &dlen,
+				 ViewShare /*??*/,
+				 0,
+				 protect)) != STATUS_SUCCESS)
+    {
+      __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+      syscall_printf ("-1 = mmap(): NtMapViewOfSection failed with %E");
+      return INVALID_HANDLE_VALUE;
+    }
+  if ((flags & MAP_FIXED) && base != addr)
+    {
+      set_errno (EINVAL);
+      syscall_printf ("-1 = mmap(): address shift with MAP_FIXED given");
+      NtUnmapViewOfSection (INVALID_HANDLE_VALUE, base);
+      return INVALID_HANDLE_VALUE;
+    }
+
+  *addr = (caddr_t) base;
+  return h;
+}
+
+int
+fhandler_dev_mem::munmap (HANDLE h, caddr_t addr, size_t len)
+{
+  NTSTATUS ret;
+  if (!NT_SUCCESS(ret = NtUnmapViewOfSection (INVALID_HANDLE_VALUE, addr)))
+    {
+      __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+      return -1;
+    }
+  CloseHandle (h);
+  return 0;
+}
+
+int
+fhandler_dev_mem::msync (HANDLE h, caddr_t addr, size_t len, int flags)
+{
+  return 0;
+}
+
 int
 fhandler_dev_mem::fstat (struct stat *buf)
 {
@@ -276,7 +395,7 @@ fhandler_dev_mem::fstat (struct stat *buf)
 		    S_IROTH | S_IWOTH;
   buf->st_nlink = 1;
   buf->st_blksize = getpagesize ();
-  buf->st_dev = buf->st_rdev = get_device () << 8;
+  buf->st_dev = buf->st_rdev = get_device () << 8 | (unit & 0xff);
 
   return 0;
 }

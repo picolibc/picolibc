@@ -1,3 +1,19 @@
+Sat Oct  7 19:25:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_dev_mem): Add methods mmap, munmap and msync.
+	Add `unit' member.
+	* fhandler_mem.cc (fhandler_dev_mem): Initialize `unit' as well.
+	(init): Care for differences between /dev/mem, /dev/kmem (not
+	implemented yet) and /dev/port.
+	(open): Change debug message to reflect the device.
+	(mmap): New function.
+	(munmap): Ditto.
+	(msync): Ditto.
+	(fstat): Use unit when setting st_dev in stat structure.
+	* mmap.cc (mmap): Handle MAP_ANONYMOUS flag.
+	Change error handling slightly.
+	* path.cc (get_device_number): Handle /dev/port.
+
 Fri Oct  6 23:21:29 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* syscalls.cc (_read): Behave properly when passed previous version of

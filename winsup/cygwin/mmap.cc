@@ -203,7 +203,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
   caddr_t base = addr;
   HANDLE h;
 
-  if (fd == -1)
+  if ((flags & MAP_ANONYMOUS) || fd == -1)
     {
       fh_paging_file.set_io_handle (INVALID_HANDLE_VALUE);
       fh = &fh_paging_file;
@@ -463,8 +463,16 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
 
   if (!base || ((flags & MAP_FIXED) && base != addr))
     {
-      __seterrno ();
-      syscall_printf ("-1 = mmap(): MapViewOfFileEx failed with %E");
+      if (!base)
+        {
+          __seterrno ();
+          syscall_printf ("-1 = mmap(): MapViewOfFileEx failed with %E");
+        }
+      else
+        {
+	  set_errno (EINVAL);
+          syscall_printf ("-1 = mmap(): address shift with MAP_FIXED given");
+        }
       CloseHandle (h);
       return INVALID_HANDLE_VALUE;
     }

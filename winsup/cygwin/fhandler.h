@@ -467,10 +467,9 @@ public:
   BOOL is_device () { return FALSE; }
   int fstat (struct stat *buf);
 
-  virtual HANDLE mmap (caddr_t *addr, size_t len, DWORD access,
-                       int flags, off_t off);
-  virtual int munmap (HANDLE h, caddr_t addr, size_t len);
-  virtual int msync (HANDLE h, caddr_t addr, size_t len, int flags);
+  HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, off_t off);
+  int munmap (HANDLE h, caddr_t addr, size_t len);
+  int msync (HANDLE h, caddr_t addr, size_t len, int flags);
 };
 
 class fhandler_serial: public fhandler_base
@@ -777,8 +776,9 @@ public:
 class fhandler_dev_mem: public fhandler_base
 {
 protected:
-  unsigned long mem_size;
-  unsigned long pos;
+  int unit;
+  DWORD mem_size;
+  DWORD pos;
   bool init_phase;
 
   void init (void);
@@ -794,6 +794,10 @@ public:
   int close (void);
   int fstat (struct stat *buf);
   int dup (fhandler_base *child);
+
+  HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, off_t off);
+  int munmap (HANDLE h, caddr_t addr, size_t len);
+  int msync (HANDLE h, caddr_t addr, size_t len, int flags);
 
   void dump ();
 };

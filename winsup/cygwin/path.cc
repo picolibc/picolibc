@@ -500,7 +500,15 @@ get_device_number (const char *name, int &unit, BOOL from_conv)
 	  unit = 8 + (deveqn ("u", 1) ? 1 : 0); /* Keep unit Linux conformant */
 	}
       else if (deveq ("mem"))
-        devn = FH_MEM;
+        {
+          devn = FH_MEM;
+          unit = 1;
+        }
+      else if (deveq ("port"))
+        {
+          devn = FH_MEM;
+          unit = 4;
+        }
       else if (deveqn ("com", 3) && (unit = digits (name + 3)) >= 0)
 	devn = FH_SERIAL;
       else if (deveq ("pipe") || deveq ("piper") || deveq ("pipew"))
