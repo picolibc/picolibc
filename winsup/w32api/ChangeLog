@@ -1,3 +1,8 @@
+2004-05-25  Al Slater  <al.slater@scluk.com>
+
+	* include/httpext.h (HSE_SEND_HEADER_EX_INFO,
+	HSE_REQ_SEND_RESPONSE_HEADER_EX): Define.
+
 2004-05-15  Filip Navara  <xnavara@volny.cz>
 
 	* include/ddk/kbdmou.h: New file.
