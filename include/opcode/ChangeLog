@@ -1,3 +1,7 @@
+2002-07-09  Thiemo Seufer <seufer@csv.ica.uni-stuttgart.de>
+
+	* mips.h (INSN_MIPS16): New define.
+
 2002-07-08  Alan Modra  <amodra@bigpond.net.au>
 
 	* i386.h: Remove IgnoreSize from movsx and movzx.
