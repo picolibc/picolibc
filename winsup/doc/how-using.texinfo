@@ -325,7 +325,15 @@ add the following lines to your @code{~/.inputrc} file:
 @end example
 
 These are options to the @code{readline} library, which you can read
-about in the @code{bash(1)} man page.
+about in the @code{bash(1)} and @code{readline(3)} man pages. Other
+tools that do not use @code{readline} for display, such as
+less and ls, require additional settings, which could be put in your
+@code{~/.bashrc}:
+@example
+alias less='/bin/less -r'
+alias ls='/bin/ls -F --color=tty --show-control-chars'
+@end example
+
 
 @subsection Why don't cursor keys work under Win95/Win98?
 

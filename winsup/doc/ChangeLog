@@ -1,3 +1,12 @@
+2004-01-20  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
+
+	* Makefile.in: Remove unused cygwin-ug and cygwin-api-int 
+	targets from default build.
+	* how-using.texinfo: Add information about 8-bit character 
+	display to FAQ.
+	* setup2.sgml: Add information about 8-bit character display
+	to "Setting up Cygwin".
+
 2004-01-15  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
 	* setup-net.sgml: Add "internet-setup" id anchor.

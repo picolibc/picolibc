@@ -145,8 +145,8 @@ be read if <envar>HOME</envar> is defined before starting bash.
 <para>
 <filename>.profile</filename> (other names are also valid, see the bash man
 page) contains bash commands.  It is executed when bash is started as login
-shell, e.g. from the command <command>bash --login</command> (the provided
-.bat file does not set the switch).  This is a useful place to define and
+shell, e.g. from the command <command>bash --login</command>.
+This is a useful place to define and
 export environment variables and bash functions that will be used by bash
 and the programs invoked by bash.  It is a good place to redefine
 <envar>PATH</envar> if needed.  We recommend adding a ":." to the end of
@@ -177,24 +177,29 @@ shells. You can source it from <filename>.profile</filename>.
 
 <para>
 <filename>.inputrc</filename> controls how programs using the readline
-library (including bash) behave.  It is loaded automatically.  The
-full details are in the <filename>readline.info</filename>. 
-Due to a bug in the current readline version, 
-<filename>.inputrc</filename> cannot contain \r,
-even on text mounted systems.
+library (including <command>bash</command>) behave.  It is loaded
+automatically.  For full details see the <literal>Function and Variable
+Index</literal> section of the GNU <systemitem>readline</systemitem> manual.
 Consider the following settings:
 <screen>
+# Ignore case while completing
+set completion-ignore-case on
 # Make Bash 8bit clean
 set meta-flag on
 set convert-meta off
 set output-meta on
-# Ignore case while completing
-set completion-ignore-case on
 </screen>
-The first three commands allow bash to display 8-bit characters,
-useful for languages with accented characters.  The last line makes
-filename completion case insensitive, which can be convenient in a
-Windows environment.
+The first command makes filename completion case insensitive, which can
+be convenient in a Windows environment.  The next three commands allow
+<command>bash</command> to display 8-bit characters, useful for
+languages with accented characters.  Note that tools that do not use
+<systemitem>readline</systemitem> for display, such as
+<command>less</command> and <command>ls</command>, require additional
+settings, which could be put in your <filename>.bashrc</filename>:
+<screen>
+alias less='/bin/less -r'
+alias ls='/bin/ls -F --color=tty --show-control-chars'
+</screen>
 </para>
 
 </sect1>
