@@ -648,9 +648,6 @@ have to add their entries to @code{/usr/info/dir} by hand.
 
 @subsection Why do I get a message saying Out of Queue slots?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
 "Out of queue slots!" generally occurs when you're trying to remove
 many files that you do not have permission to remove (either because
 you don't have permission, they are opened exclusively, etc).  What
@@ -678,9 +675,6 @@ file:
 Note that the 0775 can be anything as long as the 0010 bit is set.
 
 @subsection Why does df report sizes incorrectly.
-
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
 
 There is a bug in the Win32 API function GetFreeDiskSpace that
 makes it return incorrect values for disks larger than 2 GB in size.
