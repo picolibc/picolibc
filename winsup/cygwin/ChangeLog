@@ -1,3 +1,10 @@
+Thu Nov 16 15:59:58 2000 Bradley A. Town <townba@pobox.com>
+
+	* fhandler_console.cc: New member variable `dwBufferSize' for `info'.
+	(fillin_info): Set `dwBufferSize' to the size of the console buffer.
+	(clear_screen): Use width of console buffer to calculate how many
+	spaces to clear.
+
 Thu Nov 16 15:24:45 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Make import library creation 'make -j2' friendly.

@@ -264,6 +264,7 @@ static struct
     SHORT winTop;
     SHORT winBottom;
     COORD dwWinSize;
+    COORD dwBufferSize;
     COORD dwCursorPosition;
     WORD wAttributes;
   } info;
@@ -280,6 +281,7 @@ fhandler_console::fillin_info (void)
       info.winBottom = linfo.srWindow.Bottom;
       info.dwWinSize.Y = 1 + linfo.srWindow.Bottom - linfo.srWindow.Top;
       info.dwWinSize.X = 1 + linfo.srWindow.Right - linfo.srWindow.Left;
+      info.dwBufferSize = linfo.dwSize;
       info.dwCursorPosition = linfo.dwCursorPosition;
       info.wAttributes = linfo.wAttributes;
     }
@@ -648,9 +650,9 @@ fhandler_console::clear_screen (int x1, int y1, int x2, int y2)
   if (y2 < 0)
     y2 = info.winBottom;
 
-  num = abs (y1 - y2) * info.dwWinSize.X + abs (x1 - x2) + 1;
+  num = abs (y1 - y2) * info.dwBufferSize.X + abs (x1 - x2) + 1;
 
-  if ((y2 * info.dwWinSize.X + x2) > (y1 * info.dwWinSize.X + x1))
+  if ((y2 * info.dwBufferSize.X + x2) > (y1 * info.dwBufferSize.X + x1))
     {
       tlc.X = x1;
       tlc.Y = y1;
