@@ -1,3 +1,8 @@
+Tue Feb 22 14:37:00 2000  Ran Cabell <rcabell@norfolk.infi.net>
+
+	* libm/mathfp/sf_exp.c: Corrected _DOUBLE_IS_32_BITS to be
+	_DOUBLE_IS_32BITS.
+
 Mon Feb 21 11:43:50 2000  Jeff Johnston <jjohnstn@cygnus.com>
 
 	* libc/stdio/vfprintf.c (VFPRINTF): Added CHECK_INIT
