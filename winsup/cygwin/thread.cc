@@ -444,14 +444,14 @@ pthread_cond::~pthread_cond ()
   pthread_mutex_destroy (&cond_access);
   /* I'm not 100% sure the next bit is threadsafe. I think it is... */
   if (MT_INTERFACE->conds == this)
-    MT_INTERFACE->conds = (pthread_cond *)InterlockedExchangePointer (&MT_INTERFACE->conds, this->next);
+    InterlockedExchangePointer (&MT_INTERFACE->conds, this->next);
   else
     {
       pthread_cond *tempcond = MT_INTERFACE->conds;
       while (tempcond->next && tempcond->next != this)
         tempcond = tempcond->next;
       /* but there may be a race between the loop above and this statement */
-      tempcond->next = (pthread_cond *)InterlockedExchangePointer (&tempcond->next, this->next);
+      InterlockedExchangePointer (&tempcond->next, this->next);
     }
 }
 
@@ -595,13 +595,6 @@ pthread_key::get ()
  *Isn't duplicated, it's reopened.
  */
 
-/*FIXME: implement InterlockExchangePointer and get rid of the silly typecasts in pthread_atfork
- */
-#ifndef InterlockedExchangePointer
-#define InterlockedExchangePointer InterlockedExchange
-#endif
- 
-
 pthread_mutex::pthread_mutex (pthread_mutexattr *attr):verifyable_object (PTHREAD_MUTEX_MAGIC)
 {
   /*attr checked in the C call */
@@ -629,14 +622,14 @@ pthread_mutex::~pthread_mutex ()
   win32_obj_id = NULL;
   /* I'm not 100% sure the next bit is threadsafe. I think it is... */
   if (MT_INTERFACE->mutexs == this)
-    MT_INTERFACE->mutexs = (pthread_mutex *)InterlockedExchangePointer (&MT_INTERFACE->mutexs, this->next);
+    InterlockedExchangePointer (&MT_INTERFACE->mutexs, this->next);
   else
     {
       pthread_mutex *tempmutex = MT_INTERFACE->mutexs;
       while (tempmutex->next && tempmutex->next != this)
 	tempmutex = tempmutex->next;
       /* but there may be a race between the loop above and this statement */
-      tempmutex->next = (pthread_mutex *)InterlockedExchangePointer (&tempmutex->next, this->next);
+      InterlockedExchangePointer (&tempmutex->next, this->next);
     }
 }
 
@@ -700,14 +693,14 @@ semaphore::~semaphore ()
     CloseHandle (win32_obj_id);
   /* I'm not 100% sure the next bit is threadsafe. I think it is... */
   if (MT_INTERFACE->semaphores == this)
-    MT_INTERFACE->semaphores = (semaphore *)InterlockedExchangePointer (&MT_INTERFACE->semaphores, this->next);
+    InterlockedExchangePointer (&MT_INTERFACE->semaphores, this->next);
   else
     {
       semaphore *tempsem = MT_INTERFACE->semaphores;
       while (tempsem->next && tempsem->next != this)
         tempsem = tempsem->next;
       /* but there may be a race between the loop above and this statement */
-      tempsem->next = (semaphore *)InterlockedExchangePointer (&tempsem->next, this->next);
+      InterlockedExchangePointer (&tempsem->next, this->next);
     }
 }
 

@@ -1,3 +1,9 @@
+Tue Sep 11 21:22:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* thread.cc (pthread_cond::~pthread_cond): Bugfix: Incorrect use of InterlockExchangePointer.
+	(pthread_mutex::~pthread_mutex): Ditto.
+	(semaphore::~semaphore): Ditto.
+
 Tue Sep 11 18:15:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
 	* dcrt0.cc (cygwin_finished_initializing): Copy _mtinterf on fork;
