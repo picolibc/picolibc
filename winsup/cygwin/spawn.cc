@@ -252,7 +252,7 @@ public:
   int argc;
   av (int ac, const char * const *av) : calloced (0), argc (ac)
   {
-    argv = (char **) cmalloc (HEAP_ARGV, (argc + 1) * sizeof (char *));
+    argv = (char **) cmalloc (HEAP_1_ARGV, (argc + 1) * sizeof (char *));
     memcpy (argv, av, (argc + 1) * sizeof (char *));
   }
   ~av ()
@@ -269,19 +269,19 @@ public:
     /* Note: Assumes that argv array has not yet been "unshifted" */
     if (!calloced)
       {
-	argv[0] = cstrdup (arg0);
+	argv[0] = cstrdup1 (arg0);
 	calloced = 1;
       }
   }
   void dup_maybe (int i)
   {
     if (i >= calloced)
-      argv[i] = cstrdup (argv[i]);
+      argv[i] = cstrdup1 (argv[i]);
   }
   void dup_all ()
   {
     for (int i = calloced; i < argc; i++)
-      argv[i] = cstrdup (argv[i]);
+      argv[i] = cstrdup1 (argv[i]);
   }
 };
 
@@ -304,7 +304,7 @@ av::unshift (const char *what, int conv)
 	*p = '\0';
       what = buf;
     }
-  *argv = cstrdup (what);
+  *argv = cstrdup1 (what);
   argc++;
   calloced++;
   return 1;
@@ -367,7 +367,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
        return -1;
      }
 
-  ciresrv.moreinfo = (cygheap_exec_info *) ccalloc (HEAP_EXEC, 1, sizeof (cygheap_exec_info));
+  ciresrv.moreinfo = (cygheap_exec_info *) ccalloc (HEAP_1_EXEC, 1, sizeof (cygheap_exec_info));
   ciresrv.moreinfo->old_title = old_title ? cstrdup (old_title) : NULL;
   ciresrv.moreinfo->fds = fdtab;
   ciresrv.moreinfo->nfds = fdtab.size;
@@ -506,7 +506,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 	      for (; (p = strpbrk (a, "\"\\")); a = ++p)
 		{
 		  one_line.add (a, p - a);
-		  if (*p == '\\' || *p == '"')
+		  if ((*p == '\\' && p[1] == '"') || *p == '"')
 		    one_line.add ("\\", 1);
 		  one_line.add (p, 1);
 		}
@@ -534,11 +534,11 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
   cygcwd.copy (ciresrv.moreinfo->cwd_posix, ciresrv.moreinfo->cwd_win32,
 	       ciresrv.moreinfo->cwd_hash);
 
-  ciresrv.moreinfo->environ = (char **) cmalloc (HEAP_ARGV, envsize (envp, 1));
+  ciresrv.moreinfo->environ = (char **) cmalloc (HEAP_1_ARGV, envsize (envp, 1));
   char **c;
   const char * const *e;
   for (c = ciresrv.moreinfo->environ, e = envp; *e;)
-    *c++ = cstrdup (*e++);
+    *c++ = cstrdup1 (*e++);
   *c = NULL;
   if (mode != _P_OVERLAY ||
       !DuplicateHandle (hMainProc, myself.shared_handle (), hMainProc, &ciresrv.moreinfo->myself_pinfo, 0,

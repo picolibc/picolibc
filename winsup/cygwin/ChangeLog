@@ -1,3 +1,8 @@
+Wed Sep 27 01:10:07 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* spawn.cc (spawn_guts): Attempt to accomodate archaic windows quoting
+	mechanism when dealing with '\' and '"'.
+
 Mon Sep 25 20:47:04 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dcrt0.cc (quoted): Fix problem where ' quoted strings were skipped.

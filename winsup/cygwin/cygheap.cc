@@ -235,3 +235,13 @@ cstrdup (const char *s)
   strcpy (p, s);
   return p;
 }
+
+extern "C" char *__stdcall
+cstrdup1 (const char *s)
+{
+  char *p = (char *) cmalloc (HEAP_1_STR, strlen (s) + 1);
+  if (!p)
+    return NULL;
+  strcpy (p, s);
+  return p;
+}

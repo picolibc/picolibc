@@ -15,8 +15,12 @@ enum cygheap_types
   HEAP_FHANDLER,
   HEAP_STR,
   HEAP_ARGV,
-  HEAP_EXEC,
-  HEAP_BUF
+  HEAP_BUF,
+  HEAP_1_START,
+  HEAP_1_STR,
+  HEAP_1_ARGV,
+  HEAP_1_BUF,
+  HEAP_1_EXEC
 };
 
 #define CYGHEAPSIZE ((1000 * sizeof (fhandler_union)) + (2 * 65536))
@@ -34,4 +38,5 @@ void *__stdcall cmalloc (cygheap_types, DWORD);
 void *__stdcall crealloc (void *, DWORD);
 void *__stdcall ccalloc (cygheap_types, DWORD, DWORD);
 char *__stdcall cstrdup (const char *);
+char *__stdcall cstrdup1 (const char *);
 }
