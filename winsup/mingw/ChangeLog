@@ -1,3 +1,8 @@
+2003-10-10  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/_mingw.h: Increment version to 3.2.
+	* Makefile.in: Ditto.
+
 2003-10-10  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* include/sys/types.h: Revert last change.

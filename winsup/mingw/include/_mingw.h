@@ -106,8 +106,8 @@
 #define __CRT_INLINE extern __inline__
 #endif
 
-#define __MINGW32_VERSION 3.2
-#define __MINGW32_MAJOR_VERSION 3
-#define __MINGW32_MINOR_VERSION 2
+#define __MINGW32_VERSION 4.0
+#define __MINGW32_MAJOR_VERSION 4
+#define __MINGW32_MINOR_VERSION 0
 
 #endif /* __MINGW_H */
