@@ -967,9 +967,13 @@ rootdir (char *full_path)
 }
 
 int __stdcall
-fhandler_base::fstat (struct __stat64 *buf, path_conv *)
+fhandler_base::fstat (struct __stat64 *buf, path_conv *pc)
 {
   debug_printf ("here");
+
+  if (is_fs_device ())
+    return fstat_fs (buf, pc);
+
   switch (get_device ())
     {
     case FH_PIPE:
