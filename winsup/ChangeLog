@@ -1,3 +1,9 @@
+Fri May  4 15:06:00  Corinna Vinschen <corinna@vinschen.de>
+
+	* subauth: New subdirectory.
+	* configure.in: Add subauth to the list of subdirectories.
+	* configure: Regenerated from configure.in.
+
 Wed Apr 18 18:45:07 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* configure.in: Add bz2lib.
