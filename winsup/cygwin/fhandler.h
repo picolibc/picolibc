@@ -626,7 +626,7 @@ class fhandler_cygdrive: public fhandler_disk_file
 class fhandler_serial: public fhandler_base
 {
  private:
-  unsigned int vmin_;			/* from termios */
+  size_t vmin_;				/* from termios */
   unsigned int vtime_;			/* from termios */
   pid_t pgrp_;
   int rts;				/* for Windows 9x purposes only */

@@ -43,7 +43,7 @@ fhandler_serial::raw_read (void *ptr, size_t ulen)
   int tot;
   DWORD n;
   HANDLE w4[2];
-  DWORD minchars = vmin_ ?: ulen;
+  size_t minchars = vmin_ ?: ulen;
 
   w4[0] = io_status.hEvent;
   w4[1] = signal_arrived;
@@ -81,7 +81,7 @@ fhandler_serial::raw_read (void *ptr, size_t ulen)
 	inq = st.cbInQue;
       else if (!overlapped_armed)
 	{
-	  if ((size_t)tot >= minchars)
+	  if ((size_t) tot >= minchars)
 	    break;
 	  else if (WaitCommEvent (get_handle (), &ev, &io_status))
 	    {
@@ -388,7 +388,10 @@ fhandler_serial::ioctl (unsigned int cmd, void *buffer)
   DWORD ev;
   COMSTAT st;
   if (ClearCommError (get_handle (), &ev, &st))
-    res = -1;
+    {
+      __seterrno ();
+      res = -1;
+    }
   else
     switch (cmd)
       {
@@ -397,7 +400,7 @@ fhandler_serial::ioctl (unsigned int cmd, void *buffer)
 	break;
       case TIOCMGET:
 	DWORD modem_lines;
-	if (GetCommModemStatus (get_handle (), &modem_lines) == 0)
+	if (!GetCommModemStatus (get_handle (), &modem_lines))
 	  {
 	    __seterrno ();
 	    res = -1;
@@ -794,7 +797,7 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
 
   if (t->c_lflag & ICANON)
     {
-      vmin_ = MAXDWORD;
+      vmin_ = 0;
       vtime_ = 0;
     }
   else
@@ -999,7 +1002,7 @@ fhandler_serial::tcgetattr (struct termios *t)
     t->c_oflag |= ONLCR;
 
   debug_printf ("vmin_ %d, vtime_ %d", vmin_, vtime_);
-  if (vmin_ == MAXDWORD)
+  if (vmin_ == 0)
     {
       t->c_lflag |= ICANON;
       t->c_cc[VTIME] = t->c_cc[VMIN] = 0;
