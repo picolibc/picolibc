@@ -1,3 +1,9 @@
+2005-03-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/machine/setjmp.h (sigsetjmp): Use GCC extension to
+	evaluate first parameter only once.
+	(siglongjmp): Ditto.
+
 2005-03-17  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* configure.in: Add new check to see if compiler supports

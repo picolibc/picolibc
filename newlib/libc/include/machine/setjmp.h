@@ -236,6 +236,27 @@ typedef int sigjmp_buf[_JBLEN+2];
 # define _CYGWIN_WORKING_SIGSETJMP
 #endif
 
+#if defined(__GNUC__)
+
+#define sigsetjmp(env, savemask) \
+            ({ \
+              sigjmp_buf *_sjbuf = &(env); \
+              ((*_sjbuf)[_SAVEMASK] = savemask,\
+              sigprocmask (SIG_SETMASK, 0, (sigset_t *)((*_sjbuf) + _SIGMASK)),\
+              setjmp (*_sjbuf)); \
+            })
+
+#define siglongjmp(env, val) \
+            ({ \
+              sigjmp_buf *_sjbuf = &(env); \
+              ((((*_sjbuf)[_SAVEMASK]) ? \
+               sigprocmask (SIG_SETMASK, (sigset_t *)((*_sjbuf) + _SIGMASK), 0)\
+               : 0), \
+               longjmp (*_sjbuf, val)); \
+            })
+
+#else /* !__GNUC__ */
+
 #define sigsetjmp(env, savemask) ((env)[_SAVEMASK] = savemask,\
                sigprocmask (SIG_SETMASK, 0, (sigset_t *) ((env) + _SIGMASK)),\
                setjmp (env))
@@ -243,6 +264,8 @@ typedef int sigjmp_buf[_JBLEN+2];
 #define siglongjmp(env, val) ((((env)[_SAVEMASK])?\
                sigprocmask (SIG_SETMASK, (sigset_t *) ((env) + _SIGMASK), 0):0),\
                longjmp (env, val))
+
+#endif
 
 #ifdef __cplusplus
 }
