@@ -1,3 +1,8 @@
+2002-01-28  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* libc/include/sys/signal.h [__CYGWIN__]: Issue error message
+	when _CYGWIN_TYPES_H is not defined.
+
 2002-01-24  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* libc/include/sys/signal.h: Revert 2002-01-23 change.
