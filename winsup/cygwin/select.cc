@@ -586,11 +586,15 @@ pipe_cleanup (select_record *, select_stuff *stuff)
 int
 fhandler_pipe::ready_for_read (int fd, DWORD howlong)
 {
-  if (!howlong)
-    return fhandler_base::ready_for_read (fd, howlong);
+  int res;
+  if (howlong)
+    res = true;
+  else
+    res = fhandler_base::ready_for_read (fd, howlong);
 
-  get_guard ();
-  return true;
+  if (res)
+    get_guard ();
+  return res;
 }
 
 select_record *
