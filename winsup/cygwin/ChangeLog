@@ -1,3 +1,9 @@
+2003-06-18  Pierre Humblet  <pierre.humblet@ieee.org>
+
+        * autoload.cc (GetNetworkParams): Add.
+        * net.cc (getdomainname): Call GetNetworkParams and read the
+        DhcpDomain registry value if warranted.
+
 2003-06-17  Christopher Faylor  <cgf@redhat.com>
 
 	* path.cc (mount): Do more strict checking on posix path arguments.

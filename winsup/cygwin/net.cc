@@ -1291,20 +1291,39 @@ getdomainname (char *domain, size_t len)
   if (__check_null_invalid_struct_errno (domain, len))
     return -1;
 
+  PFIXED_INFO info = NULL;
+  ULONG size = 0;
+
+  if (GetNetworkParams(info, &size) == ERROR_BUFFER_OVERFLOW
+      && (info = (PFIXED_INFO) alloca(size))
+      && GetNetworkParams(info, &size) == ERROR_SUCCESS)
+    {
+      strncpy(domain, info->DomainName, len);
+      return 0;
+    }
+
+  /* This is only used by Win95 and NT <=  4.0.
+     The registry names are language independent.
+     FIXME: Handle DHCP on Win95. The DhcpDomain(s) may be available 
+     in ..VxD\DHCP\DhcpInfoXX\OptionInfo, RFC 1533 format */
+
   reg_key r (HKEY_LOCAL_MACHINE, KEY_READ,
 	     (!wincap.is_winnt ()) ? "System" : "SYSTEM",
 	     "CurrentControlSet", "Services",
 	     (!wincap.is_winnt ()) ? "VxD" : "Tcpip",
 	     (!wincap.is_winnt ()) ? "MSTCP" : "Parameters", NULL);
 
-  /* FIXME: Are registry keys case sensitive? */
-  if (r.error () || r.get_string ("Domain", domain, len, "") != ERROR_SUCCESS)
+  if (!r.error ())
     {
-      __seterrno ();
-      return -1;
+      int res1, res2 = 0; /* Suppress compiler warning */
+      res1 = r.get_string ("Domain", domain, len, "");
+      if (res1 != ERROR_SUCCESS || !domain[0])
+	res2 = r.get_string ("DhcpDomain", domain, len, "");
+      if (res1 == ERROR_SUCCESS || res2 == ERROR_SUCCESS)
+	return 0;
     }
-
-  return 0;
+  __seterrno ();
+  return -1;
 }
 
 /* Fill out an ifconf struct. */
