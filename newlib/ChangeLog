@@ -1,3 +1,8 @@
+Thu Jun 15  0:21:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * libc/stdio/fdopen.c: Take explicit given bin/textmode into
+        account for Cygwin.
+
 Fri Jun  9 14:28:00 2000  Jeff Johnston  <jjohnstn@cygnus.com>
 
         * libc/include/sys/reent.h (_rand_next): Changed to
