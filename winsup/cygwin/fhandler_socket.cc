@@ -203,7 +203,7 @@ fhandler_socket::check_peer_secret_event (struct sockaddr_in* peer, int* secret)
   ev = CreateEvent (&sec_all_nih, FALSE, FALSE, buf);
   if (!ev && GetLastError () == ERROR_ALREADY_EXISTS)
     {
-      debug_printf ("%s event already exist");
+      debug_printf ("event \"%s\" already exists", buf);
       ev = OpenEvent (EVENT_ALL_ACCESS, FALSE, buf);
     }
 
@@ -406,8 +406,6 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
   sockaddr_in sin;
   int secret [4];
 
-  sigframe thisframe (mainthread);
-
   if (!get_inet_addr (name, namelen, &sin, &namelen, secret))
     return -1;
 
@@ -485,8 +483,6 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
   WSAEVENT ev[2] = { WSA_INVALID_EVENT, signal_arrived };
   BOOL secret_check_failed = FALSE;
   BOOL in_progress = FALSE;
-
-  sigframe thisframe (mainthread);
 
   /* Allows NULL peer and len parameters. */
   struct sockaddr_in peer_dummy;
@@ -624,8 +620,6 @@ fhandler_socket::getsockname (struct sockaddr *name, int *namelen)
 {
   int res = -1;
 
-  sigframe thisframe (mainthread);
-
   if (get_addr_family () == AF_LOCAL)
     {
       struct sockaddr_un *sun = (struct sockaddr_un *) name;
@@ -659,8 +653,6 @@ fhandler_socket::getsockname (struct sockaddr *name, int *namelen)
 int
 fhandler_socket::getpeername (struct sockaddr *name, int *namelen)
 {
-  sigframe thisframe (mainthread);
-
   int res = ::getpeername (get_socket (), name, namelen);
   if (res)
     set_winsock_errno ();
@@ -681,8 +673,6 @@ fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
   int res = -1;
   wsock_event wsock_evt;
   LPWSAOVERLAPPED ovr;
-
-  sigframe thisframe (mainthread);
 
   if (is_nonblocking () || !(ovr = wsock_evt.prepare ()))
     {
@@ -722,8 +712,6 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags)
   size_t tot = 0;
   char *buf, *p;
   struct iovec *iov = msg->msg_iov;
-
-  sigframe thisframe (mainthread);
 
   if (get_addr_family () == AF_LOCAL)
     {
@@ -770,8 +758,6 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
   wsock_event wsock_evt;
   LPWSAOVERLAPPED ovr;
   sockaddr_in sin;
-
-  sigframe thisframe (mainthread);
 
   if (to && !get_inet_addr (to, tolen, &sin, &tolen))
     return -1;
@@ -844,8 +830,6 @@ fhandler_socket::sendmsg (const struct msghdr *msg, int flags)
 int
 fhandler_socket::shutdown (int how)
 {
-  sigframe thisframe (mainthread);
-
   int res = ::shutdown (get_socket (), how);
 
   if (res)
@@ -871,8 +855,6 @@ int
 fhandler_socket::close ()
 {
   int res = 0;
-
-  sigframe thisframe (mainthread);
 
   /* HACK to allow a graceful shutdown even if shutdown() hasn't been
      called by the application. Note that this isn't the ultimate
@@ -915,8 +897,6 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
   int res;
   struct ifconf ifc, *ifcp;
   struct ifreq *ifr, *ifrp;
-
-  sigframe thisframe (mainthread);
 
   switch (cmd)
     {

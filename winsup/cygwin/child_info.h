@@ -1,6 +1,6 @@
-/* childinfo.h: shared child info for cygwin
+/* child_info.h: shared child info for cygwin
 
-   Copyright 2000, 2002 Red Hat, Inc.
+   Copyright 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -14,7 +14,8 @@ enum
 {
   _PROC_EXEC,
   _PROC_SPAWN,
-  _PROC_FORK
+  _PROC_FORK,
+  _PROC_WHOOPS
 };
 
 #define OPROC_MAGIC_MASK 0xff00ff00
@@ -28,7 +29,7 @@ enum
 
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
-#define CURR_CHILD_INFO_MAGIC 0x8b3c
+#define CURR_CHILD_INFO_MAGIC 0xb3836013U
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -39,7 +40,7 @@ public:
   DWORD zero[4];	// must be zeroed
   DWORD cb;		// size of this record
   DWORD intro;		// improbable string
-  unsigned short magic;	// magic number unique to child_info
+  unsigned long magic;	// magic number unique to child_info
   unsigned short type;	// type of record, exec, spawn, fork
   int cygpid;		// cygwin pid of child process
   HANDLE subproc_ready;	// used for synchronization with parent
