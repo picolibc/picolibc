@@ -227,7 +227,7 @@ GLAPI void APIENTRY gluEndPolygon (GLUtesselator* tess);
 GLAPI void APIENTRY gluEndSurface (GLUnurbs* nurb);
 GLAPI void APIENTRY gluEndTrim (GLUnurbs* nurb);
 GLAPI const GLubyte * APIENTRY gluErrorString (GLenum error);
-GLAPI wchar_t* APIENTRY gluErrorUnicodeStringEXT (GLenum errCode);
+GLAPI const wchar_t * APIENTRY gluErrorUnicodeStringEXT (GLenum error);
 GLAPI void APIENTRY gluGetNurbsProperty (GLUnurbs* nurb, GLenum property, GLfloat* data);
 GLAPI const GLubyte * APIENTRY gluGetString (GLenum name);
 GLAPI void APIENTRY gluGetTessProperty (GLUtesselator* tess, GLenum which, GLdouble* data);
@@ -264,6 +264,12 @@ GLAPI void APIENTRY gluTessProperty (GLUtesselator* tess, GLenum which, GLdouble
 GLAPI void APIENTRY gluTessVertex (GLUtesselator* tess, GLdouble *location, GLvoid* data);
 GLAPI GLint APIENTRY gluUnProject (GLdouble winX, GLdouble winY, GLdouble winZ, const GLdouble *model, const GLdouble *proj, const GLint *view, GLdouble* objX, GLdouble* objY, GLdouble* objZ);
 GLAPI GLint APIENTRY gluUnProject4 (GLdouble winX, GLdouble winY, GLdouble winZ, GLdouble clipW, const GLdouble *model, const GLdouble *proj, const GLint *view, GLdouble nearVal, GLdouble farVal, GLdouble* objX, GLdouble* objY, GLdouble* objZ, GLdouble* objW);
+
+#ifdef UNICODE
+#define gluErrorStringWIN gluErrorUnicodeStringEXT
+#else
+#define gluErrorStringWIN gluErrorString
+#endif
 
 #ifdef __cplusplus
 }

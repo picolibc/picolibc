@@ -1,5 +1,15 @@
 2003-09-24  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/GL/glu.h (gluErrorUnicodeStringWIN): Add macro
+	function. MSDN suggests using gluErrorUnicodeStringWIN
+	instead of gluErrorString, as it allows both ANSI and Unicode
+	error strings.
+
+	* include/GL/glu.h (gluErrorUnicodeStringEXT): Make the
+	returned pointer const for consistency reasons.
+
+2003-09-24  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/GL/glu.h (gluErrorUnicodeStringEXT): Add function.
 	Function exists in glu32.def but is undocumented on MSDN.
 	A Google search came up with this declaration.
