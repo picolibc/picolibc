@@ -1,3 +1,10 @@
+2003-04-10  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::stub): Initialize stack pointer earlier.
+	(cygthread::simplestub): Initialize stack pointer.
+	(cygthread::terminate_thread): Account for possibility that stack
+	pointer has not been set.  Issue warnings for unusual conditions.
+
 2003-04-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* regex/regex.h: Define regoff_t as _off_t.

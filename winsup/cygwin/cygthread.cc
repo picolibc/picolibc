@@ -50,12 +50,12 @@ cygthread::stub (VOID *arg)
     }
   else
     {
+      info->stack_ptr = &arg;
       if (!info->ev)
 	{
 	  info->ev = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
 	  info->thread_sync = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
 	}
-      info->stack_ptr = &arg;
     }
   while (1)
     {
@@ -100,6 +100,7 @@ cygthread::simplestub (VOID *arg)
   init_exceptions (&except_entry);
 
   cygthread *info = (cygthread *) arg;
+  info->stack_ptr = &arg;
   info->func (info->arg == cygself ? info : info->arg);
   ExitThread (0);
 }
@@ -175,6 +176,7 @@ cygthread::cygthread (LPTHREAD_START_ROUTINE start, LPVOID param,
     }
   else
     {
+      stack_ptr = NULL;
       h = CreateThread (&sec_none_nih, 0, is_freerange ? simplestub : stub,
 			this, 0, &id);
       if (!h)
@@ -243,13 +245,18 @@ cygthread::terminate_thread ()
   (void) WaitForSingleObject (h, INFINITE);
   CloseHandle (h);
 
+  while (!stack_ptr)
+    low_priority_sleep (0);
 
   MEMORY_BASIC_INFORMATION m;
   memset (&m, 0, sizeof (m));
   (void) VirtualQuery (stack_ptr, &m, sizeof m);
 
-  if (m.RegionSize)
-    (void) VirtualFree (m.AllocationBase, 0, MEM_RELEASE);
+  if (!m.RegionSize)
+    system_printf ("m.RegionSize 0?  stack_ptr %p", stack_ptr);
+  else if (!VirtualFree (m.AllocationBase, 0, MEM_RELEASE))
+    system_printf ("VirtualFree of allocation base %p<%p> failed, %E",
+		   stack_ptr, m.AllocationBase);
 
   h = NULL;
   __name = NULL;
