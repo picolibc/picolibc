@@ -50,7 +50,7 @@ _start:
 	cmp.l	er1,er0
 	blo	.Loop
 #ifdef __ELF__
-	mov.l   #__fini,r0
+	mov.l   #__fini,er0
 	jsr     @_atexit
 #ifdef __SIMULATOR__
         jsr     @0xcc
@@ -84,7 +84,7 @@ _start:
 	cmp.l	er1,er0
 	blo	.Loop
 #ifdef __ELF__
-	mov.l   #__fini,r0
+	mov.l   #__fini,er0
 	jsr     @_atexit
 #ifdef __SIMULATOR__
         jsr     @0xcc
