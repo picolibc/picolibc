@@ -4,7 +4,7 @@
 <funcsynopsis><funcprototype>
 <funcdef>extern "C" void
 <function>cygwin_stackdump</function></funcdef>
-<void>
+<void />
 </funcprototype></funcsynopsis>
 
 <para> Outputs a stackdump to stderr from the called location.

@@ -40,7 +40,6 @@ all : \
 	cygwin-ug-net/cygwin-ug-net.html \
 	cygwin-ug-net.html \
 	cygwin-api/cygwin-api.html \
-	$(DOC) \
 	$(HTMLDOC)
 
 clean:
@@ -48,33 +47,24 @@ clean:
 
 install:	all
 
-# jw -d $(srcdir)/cygwin.dsl#html cygwin-ug-net.sgml
-cygwin-ug/cygwin-ug.html : cygwin-ug.sgml doctool
-	-db2html -d $(srcdir)/cygwin.dsl#html $<
-
-cygwin-ug.sgml : cygwin-ug.in.sgml ./doctool Makefile
-	-./doctool -m $(SGMLDIRS) -s $(srcdir) -o $@ $<
-
 cygwin-ug-net.html : cygwin-ug-net.sgml doctool
-	-jw -d $(srcdir)/cygwin.dsl#html -u $<
+	-xmlto html-nochunks -m $(srcdir)/cygwin.dsl $<
+	-cp cygwin-ug-net.html cygwin-ug-net/cygwin-ug-net-nochunks.html
+	-gzip cygwin-ug-net/cygwin-ug-net-nochunks.html
 
 cygwin-ug-net/cygwin-ug-net.html : cygwin-ug-net.sgml doctool
-	-db2html -d $(srcdir)/cygwin.dsl#html $<
+	-xmlto html -o cygwin-ug-net/ -m $(srcdir)/cygwin.dsl $<
+	-mv cygwin-ug-net/index.html cygwin-ug-net/cygwin-ug-net.html
 
 cygwin-ug-net.sgml : cygwin-ug-net.in.sgml ./doctool Makefile
 	-./doctool -m $(SGMLDIRS) -s $(srcdir) -o $@ $<
 
 cygwin-api/cygwin-api.html : cygwin-api.sgml
-	-db2html -d $(srcdir)/cygwin.dsl#html $<
+	-xmlto html -o cygwin-api/ -m $(srcdir)/cygwin.dsl $<
+	-mv cygwin-api/index.html cygwin-api/cygwin-api.html
 
 cygwin-api.sgml : cygwin-api.in.sgml ./doctool Makefile
 	-./doctool -m $(SGMLDIRS) -s $(srcdir) -o $@ $<
-
-cygwin-api-int/cygwin-api-int.html : cygwin-api-int.sgml
-	-db2html -d $(srcdir)/cygwin.dsl#html $<
-
-cygwin-api-int.sgml : cygwin-api.in.sgml ./doctool Makefile
-	-./doctool -i -m $(SGMLDIRS) -s $(srcdir) -b cygwin-api-int -o $@ $<
 
 ./doctool : doctool.c
 	gcc -g $< -o $@

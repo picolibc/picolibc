@@ -1,3 +1,9 @@
+2004-12-27  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
+	* Makefile.in: Update to use xmlto. 
+	* cygwin.dsl: Change into DocBook XSL stylesheet for xmlto.
+	* pathnames.sgml: Correct documentation of mount behavior.
+
 2004-12-24  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* cygserver.sgml: Cleanup markup for XML validity.

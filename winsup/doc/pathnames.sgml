@@ -49,11 +49,15 @@ the Cygwin library (this version is not the same as the release
 number).  The system-wide table is located under the same subkeys
 under HKEY_LOCAL_SYSTEM.</para>
 
-<para>By default, the POSIX root <filename>/</filename> points to the
-system partition but it can be relocated to any directory in the
-Windows file system using the <command>mount</command> command.
-Whenever Cygwin generates a POSIX path from a Win32 one, it uses the
-longest matching prefix in the mount table.  Thus, if
+<para>Since Windows uses drive letters instead of a single filesystem
+root, the POSIX root <filename>/</filename> must be set to a directory
+in the Windows file system using the <command>mount</command> command.
+Without a <filename>/</filename> mount, Cygwin processes cannot
+distinguish between the Windows CurrentDrive and SystemDrive.
+</para>
+
+<para>Whenever Cygwin generates a POSIX path from a Win32 one, it uses
+the longest matching prefix in the mount table.  Thus, if
 <filename>C:</filename> is mounted as <filename>/c</filename> and also
 as <filename>/</filename>, then Cygwin would translate
 <filename>C:/foo/bar</filename> to <filename>/c/foo/bar</filename>.</para>
