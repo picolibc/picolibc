@@ -33,8 +33,12 @@ void _start(int args)
 
     environ = argv+argc+1;
 
-    /* clear bss */
-    memset(&__bss_start,0,(&_end - &__bss_start));
+    /* Note: do not clear the .bss section.  When running with shared
+     *       libraries, certain data items such __mb_cur_max or environ
+     *       may get placed in the .bss, even though they are initialized
+     *       to non-zero values.  Clearing the .bss will end up zeroing
+     *       out their initial values.  The .bss is already initialized
+     *       by this time by Linux.  */
 
     tzset(); /* initialize timezone info */
     exit(main(argc,argv,environ));

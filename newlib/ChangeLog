@@ -1,5 +1,10 @@
 2002-09-09  Jeff Johnston  <jjohnstn@redhat.com>
 
+        * libc/sys/linux/machine/i386/crt0.c (_start): Remove
+        code that clears the .bss section.
+
+2002-09-09  Jeff Johnston  <jjohnstn@redhat.com>
+
         * libc/include/sys/_types.h (_mbstate_t): Changed to use
         unsigned char internally.
         * libc/sys/linux/sys/_types.h: Ditto.
