@@ -1,3 +1,7 @@
+2004-05-24  Peter Barada  <peter@the-baradas.com>
+
+	* m68k.h: Add 'size' to m68k_opcode.
+
 2004-05-05  Peter Barada  <peter@the-baradas.com>
 
 	* m68k.h: Switch from ColdFire chip name to core variant.

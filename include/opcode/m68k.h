@@ -73,6 +73,9 @@ struct m68k_opcode
 {
   /* The opcode name.  */
   const char *name;
+  /* The pseudo-size of the instruction(in bytes).  Used to determine
+     number of bytes necessary to disassemble the instruction.  */
+  unsigned int size;
   /* The opcode itself.  */
   unsigned long opcode;
   /* The mask used by the disassembler.  */
