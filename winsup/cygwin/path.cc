@@ -2822,8 +2822,43 @@ suffix_scan::has (const char *in_path, const suffix_info *in_suffixes)
 int
 suffix_scan::next ()
 {
-  if (suffixes)
+  for (;;)
     {
+      if (!suffixes)
+	switch (nextstate)
+	  {
+	  case SCAN_BEG:
+	    suffixes = suffixes_start;
+	    if (!suffixes)
+	      {
+		nextstate = SCAN_LNK;
+		return 1;
+	      }
+	    if (!*suffixes->name)
+	      suffixes++;
+	    nextstate = SCAN_EXTRALNK;
+	    /* fall through to suffix checking below */
+	    break;
+	  case SCAN_HASLNK:
+	    nextstate = SCAN_EXTRALNK;	/* Skip SCAN_BEG */
+	    return 1;
+	  case SCAN_LNK:
+	  case SCAN_EXTRALNK:
+	    strcpy (eopath, ".lnk");
+	    nextstate = SCAN_DONE;
+	    return 1;
+	  case SCAN_JUSTCHECK:
+	    nextstate = SCAN_APPENDLNK;
+	    return 1;
+	  case SCAN_APPENDLNK:
+	    strcat (eopath, ".lnk");
+	    nextstate = SCAN_DONE;
+	    return 1;
+	  default:
+	    *eopath = '\0';
+	    return 0;
+	  }
+
       while (suffixes && suffixes->name)
 	if (!suffixes->addon)
 	  suffixes++;
@@ -2836,39 +2871,6 @@ suffix_scan::next ()
 	    return 1;
 	  }
       suffixes = NULL;
-    }
-
-  switch (nextstate)
-    {
-    case SCAN_BEG:
-      suffixes = suffixes_start;
-      if (!suffixes)
-	nextstate = SCAN_LNK;
-      else
-	{
-	  if (!*suffixes->name)
-	    suffixes++;
-	  nextstate = SCAN_EXTRALNK;
-	}
-      return 1;
-    case SCAN_HASLNK:
-      nextstate = SCAN_EXTRALNK;	/* Skip SCAN_BEG */
-      return 1;
-    case SCAN_LNK:
-    case SCAN_EXTRALNK:
-      strcpy (eopath, ".lnk");
-      nextstate = SCAN_DONE;
-      return 1;
-    case SCAN_JUSTCHECK:
-      nextstate = SCAN_APPENDLNK;
-      return 1;
-    case SCAN_APPENDLNK:
-      strcat (eopath, ".lnk");
-      nextstate = SCAN_DONE;
-      return 1;
-    default:
-      *eopath = '\0';
-      return 0;
     }
 }
 

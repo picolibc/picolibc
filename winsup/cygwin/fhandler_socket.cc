@@ -455,6 +455,10 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 	}
     }
 
+  if (WSAGetLastError () == WSAEINPROGRESS)
+    set_connect_state (CONNECT_PENDING);
+  else
+    set_connect_state (CONNECTED);
   return res;
 }
 
@@ -464,6 +468,8 @@ fhandler_socket::listen (int backlog)
   int res = ::listen (get_socket (), backlog);
   if (res)
     set_winsock_errno ();
+  else
+    set_connect_state (CONNECTED);
   return res;
 }
 

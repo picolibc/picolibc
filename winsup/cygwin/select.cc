@@ -336,11 +336,20 @@ set_bits (select_record *me, fd_set *readfds, fd_set *writefds,
   if (me->write_selected && me->write_ready)
     {
       UNIX_FD_SET (me->fd, writefds);
+      if (me->except_on_write && me->fh->get_device () == FH_SOCKET)
+        ((fhandler_socket *) me->fh)->set_connect_state (CONNECTED);
       ready++;
     }
-  if (me->except_selected && me->except_ready)
+  if ((me->except_selected || me->except_on_write) && me->except_ready)
     {
-      UNIX_FD_SET (me->fd, exceptfds);
+      if (me->except_on_write) /* Only on sockets */
+        {
+	  UNIX_FD_SET (me->fd, writefds);
+	  if (me->fh->get_device () == FH_SOCKET)
+	    ((fhandler_socket *) me->fh)->set_connect_state (CONNECTED);
+        }
+      if (me->except_selected)
+	UNIX_FD_SET (me->fd, exceptfds);
       ready++;
     }
   select_printf ("ready %d", ready);
@@ -1180,39 +1189,44 @@ peek_socket (select_record *me, bool)
   set_handle_or_return_if_not_open (h, me);
   select_printf ("considering handle %p", h);
 
-  if (me->read_selected)
+  if (me->read_selected && !me->read_ready)
     {
       select_printf ("adding read fd_set %s, fd %d", me->fh->get_name (),
 		     me->fd);
       WINSOCK_FD_SET (h, &ws_readfds);
     }
-  if (me->write_selected)
+  if (me->write_selected && !me->write_ready)
     {
       select_printf ("adding write fd_set %s, fd %d", me->fh->get_name (),
 		     me->fd);
       WINSOCK_FD_SET (h, &ws_writefds);
     }
-  if (me->except_selected)
+  if ((me->except_selected || me->except_on_write) && !me->except_ready)
     {
       select_printf ("adding except fd_set %s, fd %d", me->fh->get_name (),
 		     me->fd);
       WINSOCK_FD_SET (h, &ws_exceptfds);
     }
-  int r = WINSOCK_SELECT (0, &ws_readfds, &ws_writefds, &ws_exceptfds, &tv);
-  select_printf ("WINSOCK_SELECT returned %d", r);
-  if (r == -1)
+  int r;
+  if ((me->read_selected && !me->read_ready)
+      || (me->write_selected && !me->write_ready)
+      || ((me->except_selected || me->except_on_write) && !me->except_ready))
     {
-      select_printf ("error %d", WSAGetLastError ());
-      set_winsock_errno ();
-      return 0;
+      r = WINSOCK_SELECT (0, &ws_readfds, &ws_writefds, &ws_exceptfds, &tv);
+      select_printf ("WINSOCK_SELECT returned %d", r);
+      if (r == -1)
+	{
+	  select_printf ("error %d", WSAGetLastError ());
+	  set_winsock_errno ();
+	  return 0;
+	}
+      if (WINSOCK_FD_ISSET (h, &ws_readfds) || (me->read_selected && me->read_ready))
+	me->read_ready = true;
+      if (WINSOCK_FD_ISSET (h, &ws_writefds) || (me->write_selected && me->write_ready))
+	me->write_ready = true;
+      if (WINSOCK_FD_ISSET (h, &ws_exceptfds) || ((me->except_selected || me->except_on_write) && me->except_ready))
+	me->except_ready = true;
     }
-
-  if (WINSOCK_FD_ISSET (h, &ws_readfds) || (me->read_selected && me->read_ready))
-    me->read_ready = true;
-  if (WINSOCK_FD_ISSET (h, &ws_writefds) || (me->write_selected && me->write_ready))
-    me->write_ready = true;
-  if (WINSOCK_FD_ISSET (h, &ws_exceptfds) || (me->except_selected && me->except_ready))
-    me->except_ready = true;
   return me->read_ready || me->write_ready || me->except_ready;
 }
 
@@ -1280,17 +1294,17 @@ start_thread_socket (select_record *me, select_stuff *stuff)
       {
 	HANDLE h = s->fh->get_handle ();
 	select_printf ("Handle %p", h);
-	if (s->read_selected)
+	if (s->read_selected && !s->read_ready)
 	  {
 	    WINSOCK_FD_SET (h, &si->readfds);
 	    select_printf ("Added to readfds");
 	  }
-	if (s->write_selected)
+	if (s->write_selected && !s->write_ready)
 	  {
 	    WINSOCK_FD_SET (h, &si->writefds);
 	    select_printf ("Added to writefds");
 	  }
-	if (s->except_selected)
+	if ((s->except_selected || s->except_on_write) && !s->except_ready)
 	  {
 	    WINSOCK_FD_SET (h, &si->exceptfds);
 	    select_printf ("Added to exceptfds");
@@ -1410,8 +1424,13 @@ fhandler_socket::select_write (select_record *s)
       s->cleanup = socket_cleanup;
     }
   s->peek = peek_socket;
-  s->write_ready = saw_shutdown_write ();
+  s->write_ready = saw_shutdown_write () || is_unconnected ();
   s->write_selected = true;
+  if (is_connect_pending ())
+    {
+      s->except_ready = saw_shutdown_write () || saw_shutdown_read ();
+      s->except_on_write = true;
+    }
   return s;
 }
 
