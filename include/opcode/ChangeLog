@@ -1,3 +1,8 @@
+2003-07-15  Richard Sandiford  <rsandifo@redhat.com>
+
+	* mips.h (CPU_RM7000): New macro.
+	(OPCODE_IS_MEMBER): Match CPU_RM7000 against 4650 insns.
+
 2003-07-09  Alexandre Oliva  <aoliva@redhat.com>
 
 	2000-04-01  Alexandre Oliva  <aoliva@cygnus.com>
