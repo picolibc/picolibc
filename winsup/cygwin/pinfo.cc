@@ -541,22 +541,31 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
       pinfolist = (pinfo *) realloc (pinfolist, size_pinfolist (npidlist + 1));
     }
 
-  pinfolist[nelem].init (cygpid, PID_NOREDIR | (winpid ? PID_ALLPIDS : 0));
+  pinfolist[nelem].init (cygpid, PID_NOREDIR | (winpid ? PID_ALLPIDS : 0)
+			 | pinfo_access);
   if (winpid)
-    /* nothing to do */;
-  else if (!pinfolist[nelem])
-    return;
-  else
-    /* Scan list of previously recorded pids to make sure that this pid hasn't
-       shown up before.  This can happen when a process execs. */
-    for (unsigned i = 0; i < nelem; i++)
-      if (pinfolist[i]->pid == pinfolist[nelem]->pid)
-	{
-	  if ((_pinfo *) pinfolist[nelem] != (_pinfo *) myself)
-	    pinfolist[nelem].release ();
-	  return;
-	}
+    goto out;
 
+  if (!pinfolist[nelem])
+    {
+      if (!pinfo_access)
+	return;
+      pinfolist[nelem].init (cygpid, PID_NOREDIR | (winpid ? PID_ALLPIDS : 0));
+      if (!pinfolist[nelem])
+	return;
+      }
+
+  /* Scan list of previously recorded pids to make sure that this pid hasn't
+     shown up before.  This can happen when a process execs. */
+  for (unsigned i = 0; i < nelem; i++)
+    if (pinfolist[i]->pid == pinfolist[nelem]->pid)
+      {
+	if ((_pinfo *) pinfolist[nelem] != (_pinfo *) myself)
+	  pinfolist[nelem].release ();
+	return;
+      }
+
+out:
   pidlist[nelem++] = pid;
 }
 

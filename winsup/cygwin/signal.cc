@@ -247,7 +247,7 @@ kill_pgrp (pid_t pid, int sig)
 
   sigproc_printf ("pid %d, signal %d", pid, sig);
 
-  winpids pids;
+  winpids pids ((DWORD) PID_MAP_RW);
   for (unsigned i = 0; i < pids.npids; i++)
     {
       _pinfo *p = pids[i];

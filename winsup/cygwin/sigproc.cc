@@ -725,6 +725,11 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
   else if ((thiscatch = getevent (p, "sigcatch")))
     {
       todo = p->getsigtodo (sig);
+      if (IsBadWritePtr (todo, sizeof (*todo)))
+	{
+	  set_errno (EACCES);
+	  goto out;
+	}
       issem = false;
     }
   else

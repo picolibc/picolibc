@@ -49,7 +49,7 @@ struct __cygwin_perfile
 
 /* External interface stuff */
 
-typedef enum
+typedef
   {
     CW_LOCK_PINFO,
     CW_UNLOCK_PINFO,

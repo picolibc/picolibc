@@ -1,3 +1,15 @@
+2003-09-16  Christopher Faylor  <cgf@redhat.com>
+
+	* pinfo.h (winpids::pid_access): New element.
+	(winpids::winpids): Rejigger to set pinfo_access.
+	* pinfo.cc (winpids::add): Try to open shared memory region with
+	supplied pinfo_access first, then default to readonly.
+	* fhandler_termios.cc (tty_min::kill_pgrp): When getting list of pids
+	to work with, suggest opening with PID_MAP_RW.
+	* signal.cc (kill_pgrp): Ditto.
+	* sigproc.cc (sig_send): Perform a write check on todo prior to
+	attempting to increment it.  Return EACCES if we can't write to it.
+
 2003-09-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.cc (cygheap_user::set_saved_sid): Rename from set_orig_sid.

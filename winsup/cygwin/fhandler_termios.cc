@@ -19,6 +19,7 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 #include "tty.h"
+#include "sys/cygwin.h"
 
 /* Common functions shared by tty/console */
 
@@ -84,7 +85,7 @@ void
 tty_min::kill_pgrp (int sig)
 {
   int killself = 0;
-  winpids pids;
+  winpids pids ((DWORD) PID_MAP_RW);
   for (unsigned i = 0; i < pids.npids; i++)
     {
       _pinfo *p = pids[i];
