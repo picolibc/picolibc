@@ -19,6 +19,8 @@ details. */
 #include <errno.h>
 #include <unistd.h>
 #include "winsup.h"
+#include <wingdi.h>
+#include <winuser.h>
 #include <ctype.h>
 
 /*

@@ -26,6 +26,8 @@ details. */
 #include <sys/time.h>
 
 #include "winsup.h"
+#include <wingdi.h>
+#include <winuser.h>
 #include <netdb.h>
 #include <unistd.h>
 #include <stdio.h>

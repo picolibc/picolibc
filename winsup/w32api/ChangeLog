@@ -1,3 +1,7 @@
+2000-07-27  DJ Delorie  <dj@redhat.com>
+
+	* include/windows.h: optimize non-inclusion of repeat headers
+	
 2000-07-11  DJ Delorie  <dj@cygnus.com>
 
 	* include/shlobj.h: add CSIDL_COMMON_*

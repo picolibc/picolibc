@@ -1,3 +1,21 @@
+2000-07-27  DJ Delorie  <dj@redhat.com>
+
+	* testsuite/winsup.api/winsup.exp: ignore stdout by default
+	* testsuite/winsup.api/crlf.c: non-verbose by default
+	
+	* winsup.h: prune out windows headers we don't normally need
+	* assert.cc: add wingdi.h and winuser.h
+	* fhandler_console.cc: ditto
+	* fhandler_windows.cc: ditto
+	* select.cc: ditto
+	* spawn.cc: ditto
+	* strace.cc: ditto
+	* tty.cc: ditto
+	* window.cc: ditto
+	* hinfo.cc: add winsock.h
+	* syscalls.cc: add winnls.h
+	* uinfo.cc: ditto
+	
 Thu Jul 27 10:24:36 2000  Egor Duda <deo@logos-m.ru>
 
 	* fhandler.cc (fhandler_disk_file::fstat): Allow block calculation to

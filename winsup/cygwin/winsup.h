@@ -50,8 +50,24 @@ __asm__ __volatile__(
 return __res;
 }
 
+#define WIN32_LEAN_AND_MEAN 1
+#define _WINGDI_H
+#define _WINUSER_H
+#define _WINNLS_H
+#define _WINVER_H
+#define _WINNETWK_H
+#define _WINSVC_H
 #include <windows.h>
 #include <wincrypt.h>
+#undef _WINGDI_H
+#undef _WINUSER_H
+#undef _WINNLS_H
+#undef _WINVER_H
+#undef _WINNETWK_H
+#undef _WINSVC_H
+
+/* The one function we use from winuser.h most of the time */
+extern "C" DWORD WINAPI GetLastError (void);
 
 /* Used for runtime OS check/decisions. */
 enum os_type {winNT = 1, win95, win98, win32s, unknown};

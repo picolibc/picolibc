@@ -12,6 +12,8 @@ details. */
 #include <unistd.h>
 #include <utmp.h>
 #include "winsup.h"
+#include <wingdi.h>
+#include <winuser.h>
 
 extern fhandler_tty_master *tty_master;
 

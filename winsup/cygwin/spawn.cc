@@ -16,6 +16,8 @@ details. */
 #include <errno.h>
 #include <limits.h>
 #include "winsup.h"
+#include <wingdi.h>
+#include <winuser.h>
 #include <ctype.h>
 #include "paths.h"
 

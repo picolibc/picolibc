@@ -21,6 +21,7 @@ details. */
 #include <errno.h>
 #include <limits.h>
 #include "winsup.h"
+#include <winnls.h>
 #include <lmcons.h> /* for UNLEN */
 #include <unistd.h>
 

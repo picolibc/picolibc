@@ -98,13 +98,27 @@
 #include <basetyps.h>
 #include <excpt.h>
 #include <winbase.h>
+#ifndef _WINGDI_H
 #include <wingdi.h>
+#endif
+#ifndef _WINUSER_H
 #include <winuser.h>
+#endif
+#ifndef _WINNLS_H
 #include <winnls.h>
+#endif
+#ifndef _WINVER_H
 #include <winver.h>
+#endif
+#ifndef _WINNETWK_H
 #include <winnetwk.h>
+#endif
+#ifndef _WINREG_H
 #include <winreg.h>
+#endif
+#ifndef _WINSVC_H
 #include <winsvc.h>
+#endif
 
 #ifndef WIN32_LEAN_AND_MEAN
 #include <commdlg.h>

@@ -19,6 +19,7 @@ details. */
 
 #define Win32_Winsock
 #include "winsup.h"
+#include <winsock.h>
 
 hinfo dtable;
 

@@ -237,7 +237,7 @@ get_bytestream(Buffer *buf)
 
 char dataname[] = "crlf.dat";
 
-int verbose=1;
+int verbose=0;
 void
 v(char *fmt, ...)
 {

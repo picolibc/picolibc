@@ -10,6 +10,7 @@ details. */
 
 #include <pwd.h>
 #include "winsup.h"
+#include <winnls.h>
 #include <utmp.h>
 #include <limits.h>
 #include <unistd.h>

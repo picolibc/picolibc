@@ -15,6 +15,8 @@ details. */
 #include <errno.h>
 #include <limits.h>
 #include "winsup.h"
+#include <wingdi.h>
+#include <winuser.h>
 
 static NO_COPY UINT timer_active = 0;
 static NO_COPY struct itimerval itv;
