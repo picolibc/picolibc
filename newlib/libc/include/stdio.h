@@ -90,9 +90,24 @@ typedef struct __sFILE FILE;
 #define	BUFSIZ	1024
 #define	EOF	(-1)
 
-#define	FOPEN_MAX	20	/* must be <= OPEN_MAX <sys/syslimits.h> */
-#define	FILENAME_MAX	1024	/* must be <= PATH_MAX <sys/syslimits.h> */
-#define	L_tmpnam	1024	/* XXX must be == PATH_MAX */
+#ifdef __FOPEN_MAX__
+#define FOPEN_MAX	__FOPEN_MAX__
+#else
+#define	FOPEN_MAX	20
+#endif
+
+#ifdef __FILENAME_MAX__
+#define FILENAME_MAX    __FILENAME_MAX__
+#else
+#define	FILENAME_MAX	1024
+#endif
+
+#ifdef __L_tmpnam__
+#define L_tmpnam	__L_tmpnam__
+#else
+#define	L_tmpnam	FILENAME_MAX
+#endif
+
 #ifndef __STRICT_ANSI__
 #define P_tmpdir        "/tmp"
 #endif

@@ -127,11 +127,16 @@ typedef unsigned int __uint32_t;
 
 
 #if defined(__CYGWIN32__) || defined(__CYGWIN__)
+#define __FILENAME_MAX__ (260 - 1 /* NUL */)
 #if defined(__INSIDE_CYGWIN__) || defined(_COMPILING_NEWLIB)
 #define __IMPORT
 #else
 #define __IMPORT __declspec(dllimport)
 #endif
+#endif
+
+#if defined(__rtems__)
+#define __FILENAME_MAX__ 255
 #endif
 
 #ifndef __IMPORT

@@ -1,3 +1,12 @@
+2001-01-31  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/stdio.h (FILENAME_MAX): Changed to use __FILENAME_MAX__
+	if defined.
+	(FOPEN_MAX): Changed to use __FOPEN_MAX__ if defined.
+	(L_tmpnam): Changed to use __L_tmpnam__ if defined.
+	* libc/include/sys/config.h: Changed to set __FILENAME_MAX__
+	appropriately for Cygwin and RTEMS so not to exceed PATH_MAX.
+
 Mon Jan 29 23:03:06 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* libc/stdlib/mallocr.c: Undefine windows preprocessor variables when
