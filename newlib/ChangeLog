@@ -1,3 +1,10 @@
+2004-01-30  Thomas Pfaff  <tpfaff@gmx.net>
+            Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdio/fwalk.c (_fwalk): Traverse the given reentrancy
+	struct for std streams and traverse the global reeentrancy
+	struct for all other streams.
+
 2004-01-27  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdlib/atexit.c: Protect global atexit list with a
