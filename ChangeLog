@@ -1,3 +1,7 @@
+2003-05-28  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * COPYING.NEWLIB: Add license info for newlib/libc/sys/linux/stdlib.
+
 2003-05-21  DJ Delorie  <dj@redhat.com>
 	
 	* Makefile.tpl (configure-target-libiberty): Depend only on gcc, not

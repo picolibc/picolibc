@@ -542,7 +542,7 @@ duplicated in all such forms.
 This file is distributed WITHOUT ANY WARRANTY; without even the implied
 warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-(21) Free Software Foundation LGPL License (i[3456]86-*-linux* targets only)
+(21) Free Software Foundation LGPL License (*-linux* targets only)
 
    Copyright (C) 1990-1999, 2000, 2001 
    Free Software Foundation, Inc.
@@ -621,7 +621,30 @@ of the software without specific, written prior permission.
 Hewlett-Packard Company makes no representations about the
 suitability of this software for any purpose.
 
-(25) Red Hat Incorporated
+(25) Henry Spencer (only *-linux targets)
+
+Copyright 1992, 1993, 1994 Henry Spencer.  All rights reserved.
+This software is not subject to any license of the American Telephone
+and Telegraph Company or of the Regents of the University of California.
+
+Permission is granted to anyone to use this software for any purpose on
+any computer system, and to alter it and redistribute it, subject
+to the following restrictions:
+
+1. The author is not responsible for the consequences of use of this
+   software, no matter how awful, even if they arise from flaws in it.
+
+2. The origin of this software must not be misrepresented, either by
+   explicit claim or by omission.  Since few users ever read sources,
+   credits must appear in the documentation.
+
+3. Altered versions must be plainly marked as such, and must not be
+   misrepresented as being the original software.  Since few users
+   ever read sources, credits must appear in the documentation.
+
+4. This notice may not be removed or altered.
+
+(26) Red Hat Incorporated
 
 Unless otherwise stated in each remaining newlib file, the remaining
 files in the newlib subdirectory default to the following copyright.
