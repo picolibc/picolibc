@@ -1,3 +1,9 @@
+2005-02-26  Christopher Faylor  <cgf@timesys.com>
+
+	* kill (getsig): Avoid buffer overflow when generating a signal name.
+
+	* strace.cc (handle_output_debug_string): Make error a little more specific.
+
 2005-02-23  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
 	* cygpath.cc (usage): Clarify help output to indicate acceptance

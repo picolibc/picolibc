@@ -446,8 +446,8 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
       if (!WriteProcessMemory (hchild, (LPVOID) n, &new_flag,
 			       sizeof (new_flag), &nbytes))
 	error (0,
-	       "couldn't write strace flag to subprocess, windows error %d",
-	       GetLastError ());
+	       "couldn't write strace flag to subprocess at %p, windows error %d",
+	       n, GetLastError ());
       return;
     }
 
