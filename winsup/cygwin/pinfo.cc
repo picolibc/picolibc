@@ -147,7 +147,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
     {
       int created;
       char mapname[CYG_MAX_PATH]; /* XXX Not a path */
-      __small_sprintf (mapname, "cygpid.%x", n);
+      shared_name (mapname, "cygpid", n);
 
       int mapsize;
       if (flag & PID_EXECED)

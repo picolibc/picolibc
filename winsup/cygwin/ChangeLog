@@ -1,3 +1,7 @@
+2003-12-02  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* pinfo.cc (pinfo::init): Use shared_name to construct the mapname.
+
 2003-12-01  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* thread.cc (pthread_rwlock::add_reader): Remove mx parameter for
@@ -39,7 +43,7 @@
 	* shared.cc (shared_name): Take into account the SE_CREATE_GLOBAL_NAME
 	privilege when building the name string.
 	(open_shared): Remove the call to OpenFileMapping.
-	(shared_info::initialize): Move cygheap initialization to ...   
+	(shared_info::initialize): Move cygheap initialization to ...
 	(memory_init): ... here. Suppress now useless shared_h variable.
 	(user_shared_initialize): Make tu a cygpsid.
 
