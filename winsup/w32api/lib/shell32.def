@@ -59,9 +59,11 @@ SHGetMalloc@4
 SHGetInstanceExplorer@4
 SHGetIconOverlayIndexW@8
 SHGetIconOverlayIndexA@8
-SHGetFolderPathW@20
 SHGetFolderPathAndSubDirW@24
 SHGetFolderPathAndSubDirA@24
+; SHGetFolder is in shell32.dll on W2K up,
+; but in redistributable shfolder.dll for earlier OS versions.
+SHGetFolderPathW@20
 SHGetFolderPathA@20
 SHGetFolderLocation@20
 SHGetFileInfoW@20
