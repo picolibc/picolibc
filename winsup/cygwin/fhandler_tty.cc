@@ -1306,15 +1306,6 @@ fhandler_pty_master::ptsname ()
 void
 fhandler_tty_common::set_close_on_exec (int val)
 {
-#ifndef DEBUGGING
-  fhandler_base::set_close_on_exec (val);
-#else
-  /* FIXME: This is a duplication from fhandler_base::set_close_on_exec.
-     It is here because we need to specify the "from_pty" stuff here or
-     we'll get warnings from ForceCloseHandle when debugging. */
-  set_inheritance (get_io_handle (), val);
-  set_close_on_exec_flag (val);
-#endif
   if (get_major () == DEV_TTYS_MAJOR
       && get_io_handle () == cygheap->ctty.get_io_handle ())
     set_close_on_exec_flag (val);
@@ -1332,6 +1323,15 @@ fhandler_tty_common::set_close_on_exec (int val)
       set_inheritance (input_mutex, val);
       set_inheritance (input_available_event, val);
       set_inheritance (output_handle, val);
+#ifndef DEBUGGING
+      fhandler_base::set_close_on_exec (val);
+#else
+      /* FIXME: This is a duplication from fhandler_base::set_close_on_exec.
+	 It is here because we need to specify the "from_pty" stuff here or
+	 we'll get warnings from ForceCloseHandle when debugging. */
+      set_inheritance (get_io_handle (), val);
+      set_close_on_exec_flag (val);
+#endif
     }
 }
 

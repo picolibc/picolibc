@@ -345,7 +345,7 @@ do_cleanup (void *args)
 }
 
 
-static bool __stdcall
+static int __stdcall
 spawn_guts (const char * prog_arg, const char *const *argv,
 	    const char *const envp[], int mode)
 {

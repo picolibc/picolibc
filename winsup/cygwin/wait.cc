@@ -48,14 +48,13 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
   int res;
   waitq *w;
   HANDLE waitfor;
-  bool sawsig;
 
   pthread_testcancel ();
 
   while (1)
     {
       sig_dispatch_pending ();
-      sawsig = 0;
+      bool sawsig = false;
       if (options & ~(WNOHANG | WUNTRACED))
 	{
 	  set_errno (EINVAL);
@@ -73,7 +72,7 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
       w->rusage = r;
       sigproc_printf ("calling proc_subproc, pid %d, options %d",
 		     w->pid, w->options);
-      if (!proc_subproc (PROC_WAIT, (DWORD)w))
+      if (!proc_subproc (PROC_WAIT, (DWORD) w))
 	{
 	  set_errno (ENOSYS);
 	  paranoid_printf ("proc_subproc returned 0");
@@ -101,7 +100,7 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
 	{
 	  call_signal_handler_now ();
 	  set_sig_errno (EINTR);
-	  sawsig = 1;
+	  sawsig = true;
 	  res = -1;
 	}
       else if (res != WAIT_OBJECT_0)

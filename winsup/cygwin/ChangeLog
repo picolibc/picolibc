@@ -1,5 +1,10 @@
 2003-12-07  Christopher Faylor  <cgf@redhat.com>
 
+	* spawn.cc (spawn_guts): Change type back to 'int' after erroneous
+	change below.
+
+2003-12-07  Christopher Faylor  <cgf@redhat.com>
+
 	Change use of BOOL, TRUE, FALSE to bool, true, false, as appropriate,
 	throughout.
 
