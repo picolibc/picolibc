@@ -1,3 +1,14 @@
+2001-09-15  Egor Duda  <deo@logos-m.ru>
+
+	* winsup.api/ltp/sbrk01.c (main): Force output at startup to
+	make sure that stdio file buffer get allocated.
+	* winsup.api/ltp/stat06.c (high_address_setup): On cygwin, area
+	after sbrk(0) may be available, use 0xffff0000 as "high address".
+	* winsup.api/ltp/symlink01.c: Perform all tests. Mark those tests that
+	don't work on cygwin with '-1'. Close open files so that temporary
+	directory can be deleted on exit.
+	* winsup.api/ltp/vfork01.c: New test.
+
 2001-09-13  Egor Duda  <deo@logos-m.ru>
 
 	* winsup.api/winsup.exp: Run only selected test if environment

@@ -317,6 +317,7 @@ void do_open();
 #define BIG_STRING "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
 
 #define DEFAULT_TCID  "symlink01"
+#define ALL 1
 
 #define SYMLINK "symlink01"
 #define READLINK "readlink01"
@@ -420,7 +421,7 @@ struct all_test_cases
     {LINK, 0, 0, 15, creat_symlink, ck_symlink, {O_FILE, S_FILE, NULL}},
     /* The following link test case is invalid - leaving it defined so */
     /* I don't have to change all the entries in the all_tcses array after link */
-    {LINK, 1, -1, -1, creat_symlink, ck_symlink, {NULL, NULL, NULL}},
+    {LINK, -1, -1, -1, creat_symlink, ck_symlink, {NULL, NULL, NULL}},
     {UNLINK, 0, 0, 16, creat_both, ck_both, {O_FILE, S_FILE, O_FILE}},
     {CHMOD, 0, 0, 17, creat_both, ck_both, {O_FILE, S_FILE, O_FILE}},
     {CHMOD, 1, ENOENT, 18, creat_symlink, ck_symlink, {O_FILE, S_FILE, NULL}},
@@ -430,10 +431,10 @@ struct all_test_cases
     {UTIME, 1, ELOOP, 28, creat_symlink, ck_symlink, {S_FILE, S_FILE, NULL}},
     {RENAME, 0, 0, 21, creat_symlink, ck_symlink, {O_FILE, S_FILE, NULL}},
     {RENAME, 0, 0, 22, creat_both, ck_both, {O_FILE, S_FILE, O_FILE}},
-    {RENAME, 1, EXDEV, 23, creat_both, ck_both, {O_FILE, S_FILE, O_FILE}},
+    {RENAME, -1, EXDEV, 23, creat_both, ck_both, {O_FILE, S_FILE, O_FILE}},
     {OPEN, 0, 0, 24, creat_symlink, ck_symlink, {O_FILE, S_FILE, NULL}},
     {OPEN, 0, 0, 25, creat_both, ck_both, {O_FILE, S_FILE, O_FILE}},
-    {OPEN, 1, EEXIST, 26, creat_symlink, ck_symlink, {O_FILE, S_FILE, O_FILE}},
+    {OPEN, -1, EEXIST, 26, creat_symlink, ck_symlink, {O_FILE, S_FILE, O_FILE}},
     {OPEN, 1, ENOENT, 27, creat_symlink, ck_symlink, {O_FILE, S_FILE, NULL}},
     {OPEN, 1, ELOOP, 28, creat_symlink, ck_symlink, {S_FILE, S_FILE, NULL}}
 };
@@ -485,7 +486,7 @@ struct tcses
 int TST_TOTAL;
 int TEST_RESULT;
 time_t a_time_value = 100;
-char  *TCID;
+char  *TCID = NULL;
 char  *Selectedtests = NULL;		/* Name (tcid) of selected test cases */
 char test_msg[BUFMAX];
 char full_path[PATH_MAX+1];
@@ -534,12 +535,14 @@ main(int argc, char *argv[])
        Selectedtests=Tcid;
 
    }
-#ifndef ALL
    else {
        TCID = DEFAULT_TCID;
+#ifndef ALL
        Selectedtests = DEFAULT_TCID;
-    }
+#else
+       Selectedtests = NULL;
 #endif
+    }
 
    /*
     * Get test case specification information and assign TST_TOTAL
@@ -932,13 +935,15 @@ struct tcses *tcs;
     */
    for (ctr=0, tc_ptr=tcs->tc_ptr; ctr < TST_TOTAL; ctr++, tc_ptr++) {
 
+       if (tc_ptr->test_fail < 0) continue;
+
        Buffer[0]='\0';
 
        /*
 	* If running all test cases for all tcid, set the TCID if needed.
         */
        if ( Selectedtests == NULL ) {
-	   if ( strcmp(tcs->tcid, tc_ptr->tcid) != 0 ) {
+	   if ( !TCID || strcmp(TCID, tc_ptr->tcid) != 0 ) {
                TCID = tc_ptr->tcid;
                Tst_count=0;
 	   }
@@ -946,9 +951,9 @@ struct tcses *tcs;
        /*
         * Insure that we are executing the correct tcs test case
         */
-       if (strcmp(tcs->tcid, tc_ptr->tcid) != 0) {
+       if (strcmp(TCID, tc_ptr->tcid) != 0) {
           tst_resm(TBROK, "%s TCID attempted to execute %s %d %d test case",
-	     tcs->tcid, tc_ptr->tcid, tc_ptr->test_fail, tc_ptr->errno_val);
+	     TCID, tc_ptr->tcid, tc_ptr->test_fail, tc_ptr->errno_val);
           continue;
        }
        TEST_RESULT=TPASS;
@@ -1091,6 +1096,7 @@ struct all_test_cases *tc_ptr;
 	        "Expected EEXIST error for exclusively opening an object file",
 		"through a symbolic link file was not received:",
 		errno, strerror(errno));
+        close (TEST_RETURN);
      }
      else
         tst_resm(TBROK, "Unknown test case processing actions declared");
@@ -1185,6 +1191,7 @@ struct all_test_cases *tc_ptr;
 		"Expected ENOENT error for opening a non-existent object",
 		" file through a symbolic link file was not received,",
 		errno, strerror(errno));
+        close (TEST_RETURN);
      }
      else
         tst_resm(TBROK, "Unknown test case processing actions declared");
@@ -1294,6 +1301,7 @@ struct all_test_cases *tc_ptr;
            tst_resm(TFAIL, "%s errno:%d %s",
 		"Expected ELOOP error condition when open(2) a nested symbolic link:",
 		errno, strerror(errno));
+	close (fd);
      }
      else
         tst_resm(TBROK, "Unknown test case processing actions declared");
@@ -1583,7 +1591,7 @@ struct all_test_cases *tc_ptr;
 		Buffer, "symbolic link which which pointed at object");
         else {
 
-           char buf [PATH_MAX];
+	   char buf [PATH_MAX];
            char *cwd;
            char expected_location[PATH_MAX];
            /*

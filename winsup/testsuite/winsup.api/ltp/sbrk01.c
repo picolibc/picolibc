@@ -149,6 +149,13 @@ main(int ac, char **av)
      ***************************************************************/
     setup();
 
+#ifdef __CYGWIN__
+    /* we need to initialize output buffer before first sbrk.
+       otherwise, when memory is freed bu second sbrk, fwrite will
+       fail */
+    tst_resm(TINFO, "Entering test");
+#endif
+
     /***************************************************************
      * check looping state if -c option given
      ***************************************************************/
@@ -242,8 +249,6 @@ setup()
 
     /* make a temp dir and cd to it */
     tst_tmpdir();
-
-     
 
     /* Pause if that option was specified */
     TEST_PAUSE;
