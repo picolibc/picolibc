@@ -139,7 +139,7 @@ END_RELOC_NUMBERS
 /* Relocation macros.  */
 
 #define ELF64_R_TYPE_DATA(info) \
-  (((bfd_signed_vma)((info) >> 8) ^ 0x800000) - 0x800000)
+  (((bfd_signed_vma)(ELF64_R_TYPE(info) >> 8) ^ 0x800000) - 0x800000)
 #define ELF64_R_TYPE_ID(info) \
   ((info) & 0xff)
 #define ELF64_R_TYPE_INFO(data, type) \
