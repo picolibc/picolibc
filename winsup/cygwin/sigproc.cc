@@ -344,7 +344,6 @@ proc_subproc (DWORD what, DWORD val)
 			  pchildren[val]->pid, val, hchildren[val], pchildren[val]->hProcess);
 	  HANDLE h = hchildren[val];
 	  hchildren[val] = pchildren[val]->hProcess; /* Filled out by child */
-	  sync_proc_subproc->release ();	// Release the lock ASAP
 	  ForceCloseHandle1 (h, childhProc);
 	  ProtectHandle1 (pchildren[val]->hProcess, childhProc);
 	  rc = 0;

@@ -111,9 +111,9 @@ struct _cygtls
   struct _cygtls *prev, *next;
   __stack_t *stackptr;
   int sig;
-  unsigned stacklock;
-  unsigned spinning;
   unsigned incyg;
+  unsigned spinning;
+  unsigned stacklock;
   __stack_t stack[TLS_STACK_SIZE];
   unsigned padding[0];
 

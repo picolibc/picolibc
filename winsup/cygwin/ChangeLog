@@ -1,3 +1,19 @@
+2004-03-08  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (setup_handler): Avoid suspending a thread if it in a
+	cygwin function, in an exception, spinning, or locked.
+	* gendef (_sigfe): Move incyg setting earlier.
+	(sigreturn): Set incyg flag to avoid interrupting called cygwin
+	functions.
+	(sigdelayed): Ditto.
+	(stabilize_sig_stack): Ditto.
+
+	* sigproc.cc (proc_subproc): Don't restore process lock early in exec
+	case.
+
+	* cygtls.h: Reorganize fields in _cygtls slightly.
+	* tlsoffsets.h: Regenerate.
+
 2004-03-06  Christopher Faylor  <cgf@redhat.com>
 
 	* fork.cc (fork_parent): Save parent pid in a temporary variable since
@@ -148,7 +164,7 @@
 	feedback.
 	(semaphore::wait): Return return value from semaphore::_wait.
 	* thread.h (WAIT_SIGNALED): New definition.
-	(pthread::cancelable_wait): Change declaration.  Define do_sig_wait   
+	(pthread::cancelable_wait): Change declaration.  Define do_sig_wait
 	as false by default to not interfere with existing calls accidentally.
 	(semaphore::_wait): Declare int.
 

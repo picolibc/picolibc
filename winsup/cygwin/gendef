@@ -92,6 +92,7 @@ __sigfe:
 	pushl	%ebx
 	pushl	%edx
 1:	movl	%fs:4,%edx				# location of bottom of stack
+	incl	$tls::incyg(%edx)
 	movl	\$1,%eax				# potential lock value
 	lock	xchgl %eax,$tls::stacklock(%edx)	# see if we can grab it
 	movl	%eax,$tls::spinning(%edx)		# flag if we are waiting for lock
@@ -100,8 +101,7 @@ __sigfe:
 	xorl	%eax,%eax				# nope.  It was not zero
 	call	_low_priority_sleep			# should be a short-time thing, so
 	jmp	1b					# sleep and loop
-2:	incl	$tls::incyg(%edx)
-	movl	\$4,%eax				# have the lock, now increment the
+2:	movl	\$4,%eax				# have the lock, now increment the
 	xadd	%eax,$tls::stackptr(%edx)		#  stack pointer and get pointer
 	leal	__sigbe,%ebx				# new place to return to
 	xchgl	%ebx,12(%esp)				# exchange with real return value
@@ -140,29 +140,31 @@ __sigbe:
 	.global	_sigreturn
 	.stabs	"sigreturn:F(0,1)",36,0,0,_sigreturn
 _sigreturn:
+	movl	%fs:4,%ebx
+	incl	$tls::incyg(%ebx)
 	addl	\$4,%esp				# Remove argument
 	call	_set_process_mask\@4
 
-1:	movl	%fs:4,%edx
-	movl	\$1,%eax				# potential lock value
-	lock	xchgl %eax,$tls::stacklock(%edx)	# see if we can grab it
-	movl	%eax,$tls::spinning(%edx)		# flag if we are waiting for lock
+1:	movl	\$1,%eax				# potential lock value
+	lock	xchgl %eax,$tls::stacklock(%ebx)	# see if we can grab it
+	movl	%eax,$tls::spinning(%ebx)		# flag if we are waiting for lock
 	testl	%eax,%eax				# it will be zero
 	jz	2f					#  if so
 	xorl	%eax,%eax				# nope.  not zero
 	call	_low_priority_sleep			# sleep
 	jmp	1b					#  and loop
-2:	popl	%ebx					# saved errno
-	testl	%ebx,%ebx				# Is it < 0
+2:	popl	%edx					# saved errno
+	testl	%edx,%edx				# Is it < 0
 	jl	3f					# yup.  ignore it
-	movl	$tls::errno_addr(%edx),%eax
-	movl	%ebx,(%eax)
+	movl	$tls::errno_addr(%ebx),%eax
+	movl	%edx,(%eax)
 3:	movl	\$-4,%eax				# now decrement aux stack
-	xadd	%eax,$tls::stackptr(%edx)		#  and get pointer
+	xadd	%eax,$tls::stackptr(%ebx)		#  and get pointer
 	xorl	%ebp,%ebp
 	xchgl	%ebp,-4(%eax)				# get return address from signal stack
 	xchgl	%ebp,28(%esp)				# store real return address
-	decl	$tls::stacklock(%edx)			# unlock
+	decl	$tls::incyg(%ebx)
+	decl	$tls::stacklock(%ebx)			# unlock
 
 	popl	%eax
 	popl	%ebx
@@ -186,6 +188,7 @@ _sigdelayed:
 	pushl	%ebx
 	pushl	%eax
 	movl	%fs:4,%ebx
+	incl	$tls::incyg(%ebx)
 	pushl	$tls::saved_errno(%ebx)	# saved errno
 3:	pushl	$tls::oldmask(%ebx)	# oldmask
 	pushl	$tls::sig(%ebx)		# signal argument
@@ -201,7 +204,8 @@ _sigdelayed:
 	movl	\$0,$tls::sig(%ebx)	# zero the signal number as a
 					# flag to the signal handler thread
 					# that it is ok to set up sigsave
-4:	ret
+4:	decl	$tls::incyg(%ebx)
+	ret
 
 	.global	__ZN7_cygtls3popEv
 __ZN7_cygtls3popEv:
@@ -243,6 +247,7 @@ __ZN7_cygtls6lockedEv:
 	.extern	__ZN7_cygtls19call_signal_handlerEv
 stabilize_sig_stack:
 1:	movl	%fs:4,%edx
+	incl	$tls::incyg(%edx)
 	movl	\$1,%eax
 	lock	xchgl %eax,$tls::stacklock(%edx)
 	movl	%eax,$tls::spinning(%edx)		# flag if we are waiting for lock
@@ -258,7 +263,8 @@ stabilize_sig_stack:
 	addl	%edx,%eax				#  of tls block
 	call	__ZN7_cygtls19call_signal_handlerEv
 	jmp	1b
-3:	ret
+3:	decl	$tls::incyg(%edx)
+	ret
 EOF
     }
     return $res;
