@@ -3,6 +3,10 @@
 #include <sys/mman.h>
 #include <errno.h>
 
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
+
 int
 main ()
 {
@@ -21,7 +25,7 @@ main ()
   for (i = 0; i < pagesize; ++i)
     *(data + i) = rand ();
   umask (0);
-  fd = creat ("conftestmmap", 0600);
+  fd = open ("conftestmmap", O_CREAT | O_TRUNC | O_WRONLY | O_BINARY, 0600);
   if (fd < 0)
     {
       printf ("creat: %d\n", errno);
@@ -37,7 +41,7 @@ main ()
   /*
    * Next, try to mmap the file.
    */
-  fd = open ("conftestmmap", O_RDWR);
+  fd = open ("conftestmmap", O_RDWR | O_BINARY);
   if (fd < 0)
     {
       printf ("write: %d\n", errno);

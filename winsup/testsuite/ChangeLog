@@ -1,3 +1,7 @@
+2001-04-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winsup.api/mmaptest04.c: Take care for binmode explicitely.
+
 2001-04-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* winsup.api/mmaptest02.c: New test.
