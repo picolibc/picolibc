@@ -1,3 +1,10 @@
+2003-07-10  Alexandre Oliva  <aoliva@redhat.com>
+
+	2000-04-27  Alexandre Oliva  <aoliva@cygnus.com>
+	* libc/include/machine/setjmp.h (_JBLEN, AM33/2.0): Set to 26.
+	* libc/machine/mn10300/setjmp.S (setjmp, longjmp): Save and
+	restore callee-saved FP registers.
+
 2003-07-10  J"orn Rennecke <joern.rennecke@superh.com>
 
 	* libc/include/sys/unistd.h (ftruncate, truncate): Also declare

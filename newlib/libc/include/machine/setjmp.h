@@ -135,8 +135,12 @@ typedef int jmp_buf[_JBLEN];
 #endif
 
 #if defined(__mn10300__) || defined(__mn10200__)
+#ifdef __AM33_2__
+#define _JBLEN 26
+#else
 /* A guess */
 #define _JBLEN 10
+#endif
 #endif
 
 #ifdef __v850
