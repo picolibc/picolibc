@@ -31,7 +31,7 @@ details. */
 #include "cygmalloc.h"
 #include "cygthread.h"
 
-#define NPIDS_HELD 8
+#define NPIDS_HELD 4
 
 /* Timeout to wait for child to start, parent to init child, etc.  */
 /* FIXME: Once things stabilize, bump up to a few minutes.  */

@@ -1,3 +1,8 @@
+2004-10-28  Christopher Faylor  <cgf@timesys.com>
+
+	* fork.cc (NPIDS_HELD): Reduce to former number now that bash problem
+	has been identified.
+
 2004-10-28  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* path.cc (mount_info::from_registry): Deimpersonate while
