@@ -234,6 +234,10 @@
 #define _DOUBLE_IS_32BITS
 #endif
 
+#ifdef __iq2000__
+#define __IEEE_BIG_ENDIAN
+#endif
+
 #ifdef __MAVERICK__
 #ifdef __ARMEL__
 #  define __IEEE_LITTLE_ENDIAN

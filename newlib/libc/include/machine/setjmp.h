@@ -167,6 +167,10 @@ typedef int jmp_buf[_JBLEN];
 #define _JBLEN 10
 #endif
 
+#ifdef __iq2000__
+#define _JBLEN 32
+#endif
+
 #ifdef __mcore__
 #define _JBLEN 16
 #endif

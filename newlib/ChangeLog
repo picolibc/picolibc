@@ -1,3 +1,14 @@
+2003-06-10  Stan Cox  <scox@redhat.com>
+            Anthony Green  <green@redhat.com>
+	
+	* configure.host: Add iq2000 support.
+	* newlib/libc/include/machine/ieeefp.h: Ditto.
+	* newlib/libc/include/machine/setjmp.h: Ditto.
+	* libc/machine/iq2000, libc/machine/iq2000/setjmp.S,
+	libc/machine/iq2000/aclocal.m4, libc/machine/iq2000/configure,
+	libc/machine/iq2000/configure.in, libc/machine/iq2000/Makefile.am,
+	libc/machine/iq2000/Makefile.in: New files.
+
 2003-06-10  Richard Sandiford  <rsandifo@redhat.com>
 
 	* libc/sys/h8300hms/setarch.h: New file.

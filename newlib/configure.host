@@ -131,6 +131,9 @@ case "${host_cpu}" in
 	;;
   ia64*)
 	;;
+  iq2000)
+	machine_dir=iq2000
+	;;
   m32r*)
 	machine_dir=m32r
 	;;
@@ -515,6 +518,10 @@ case "${host}" in
   i[34567]86-*-netware*)
 	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES -DNO_EXEC -DABORT_PROVIDED -DCLOCK_PROVIDED -DMALLOC_PROVIDED -DHAVE_FCNTL"
 	;;
+  iq2000*)
+        syscall_dir=syscalls
+        newlib_cflags="${newlib_cflags} -DWANT_PRINTF_LONG_LONG"
+        ;;
   m32r-*-*)
 	# Pass -msdata=sdata so _impure_ptr goes in .sdata.
 	# We don't generate sda relocs however for upward compatibility.
