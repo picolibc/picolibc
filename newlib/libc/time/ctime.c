@@ -12,15 +12,16 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <time.h>
-	char *ctime(time_t <[clock]>);
-	char *ctime_r(time_t <[clock]>, char *<[buf]>);
+	char *ctime(const time_t *<[clock]>);
+	char *ctime_r(const time_t *<[clock]>, char *<[buf]>);
 
 TRAD_SYNOPSIS
 	#include <time.h>
 	char *ctime(<[clock]>)
-	time_t <[clock]>;
+	time_t *<[clock]>;
+
 	char *ctime_r(<[clock]>, <[buf]>)
-	time_t <[clock]>;
+	time_t *<[clock]>;
 	char *<[buf]>;
 
 DESCRIPTION
