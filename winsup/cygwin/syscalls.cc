@@ -9,6 +9,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #define fstat __FOOfstat__
+#define lstat __FOOlstat__
 #define stat __FOOstat__
 #define _close __FOO_close__
 #define _lseek __FOO_lseek__
@@ -38,6 +39,7 @@ details. */
 #include <rpc.h>
 
 #undef fstat
+#undef lstat
 #undef stat
 
 #include <cygwin/version.h>
@@ -1199,7 +1201,7 @@ lstat64 (const char *name, struct __stat64 *buf)
 
 /* lstat: Provided by SVR4 and 4.3+BSD, POSIX? */
 extern "C" int
-cygwin_lstat (const char *name, struct __stat32 *buf)
+lstat (const char *name, struct __stat32 *buf)
 {
   struct __stat64 buf64;
   int ret = lstat64 (name, &buf64);

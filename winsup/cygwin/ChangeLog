@@ -1,3 +1,10 @@
+2003-08-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din: Accomodate change from cygwin_lstat to lstat.
+	* syscalls.cc: Add defines to avoid declaration issues when
+	renaming cygwin_lstat back to lstat.
+	(lstat): Reverted name change from cygwin_lstat.
+
 2003-08-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/sys/param.h (NBBY): Define if not defined.
