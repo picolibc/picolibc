@@ -1,3 +1,16 @@
+*** Major changes in newlib version 1.13.0:
+
+* optimized iconv support
+* new configuration option to disable syscalls in newlib (e.g. sys/arm)
+* new configuration options controlling long long, long double support
+* ability of configuration options to override platform defaults
+* improved locking protection for file I/O functions
+* new reentrant functions
+* various fixes to allow building under FC3 and Debian Linux
+* cxa exit support
+* new platforms (e.g. crx)
+* new iprintf and iscanf family functions
+
 *** Major changes in newlib version 1.12.0:
 
 * general iconv support added

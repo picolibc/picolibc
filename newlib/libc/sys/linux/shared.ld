@@ -9,3 +9,7 @@ VERS_1.11 {
 VERS_1.12 {
 	global: *;
 };
+
+VERS_1.13 {
+	global: *;
+};
