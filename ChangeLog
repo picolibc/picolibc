@@ -1,3 +1,8 @@
+2003-02-19  Alan Modra  <amodra@bigpond.net.au>
+
+	* config.guess: Import latest version.
+	* config.sub: Import latest version.
+
 2003-02-18  Jason Merrill  <jason@redhat.com>
 
 	* Makefile.tpl (check-c++): Allow parallelism.
