@@ -1,3 +1,9 @@
+Mon Feb 21 11:43:50 2000  Jeff Johnston <jjohnstn@cygnus.com>
+
+	* libc/stdio/vfprintf.c (VFPRINTF): Added CHECK_INIT
+	call prior to calling _VFPRINTF_R so reentrant data area is set.
+	(_VFPRINTF_R): Removed now extraneous CHECK_INIT call.
+
 Thu Feb 17 01:42:50 2000  J"orn Rennecke <amylaar@cygnus.co.uk>
 
 	* libc/stdio/vfscanf.c (limits.h): #include.

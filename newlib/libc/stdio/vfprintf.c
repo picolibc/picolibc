@@ -276,6 +276,7 @@ _DEFUN (VFPRINTF, (fp, fmt0, ap),
 	_CONST char *fmt0 _AND
 	va_list ap)
 {
+  CHECK_INIT (fp);
   return _VFPRINTF_R (fp->_data, fp, fmt0, ap);
 }
 
@@ -395,8 +396,6 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	    flags&SHORTINT ? (u_long)(u_short)va_arg(ap, int) : \
 	    (u_long)va_arg(ap, u_int))
 #endif
-
-	CHECK_INIT (fp);
 
 	/* sorry, fprintf(read_only_file, "") returns EOF, not 0 */
 	if (cantwrite(fp))
