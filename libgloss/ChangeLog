@@ -1,5 +1,10 @@
 2002-01-15  Mark Salter  <msalter@redhat.com>
 
+	* xstormy16/eva_stub.ld: Provide interrupt routine symbols which
+	forward interrupts to user application vectors.
+
+	* xstormy16/crt0_stub.s: Remove default interrupt routines.
+
 	* xstormy16/Makefile.in: Rename stub app to eva_stub.elf and
 	add it to install list.
 
