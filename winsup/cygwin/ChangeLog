@@ -1,3 +1,11 @@
+2003-09-10  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Add some more -fomit-frame-pointer files.
+
+	* path.cc (conv_path_list_buf_size): Free normalized_path or suffer
+	memory leak.
+	* syscalls.cc (chroot): Ditto.
+
 2003-09-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (DLL_OFILES): Add bsdlib.o.
@@ -48,7 +56,7 @@
 
 	* mmap.cc (mmap64): Change address types from caddr_t to void *
 	according to SUSv3.
-	(mmap): Ditto.  
+	(mmap): Ditto.
 	(munmap): Ditto.
 	(msync): Ditto.
 	(mprotect): Ditto.  Move to before the fhandler methods.
