@@ -1,3 +1,9 @@
+Thu May 17 15:29:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* security.cc (cygwin_set_impersonation_token): Never destroy
+	previous token object.
+	(subauth): Create token source with well defined identifier.
+
 Wed May 16 23:27:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* uinfo.cc (uinfo_init): Just set user token to INVALID_HANDLE_VALUE.

@@ -52,8 +52,6 @@ cygwin_set_impersonation_token (const HANDLE hToken)
   debug_printf ("set_impersonation_token (%d)", hToken);
   if (cygheap->user.token != hToken)
     {
-      if (cygheap->user.token != INVALID_HANDLE_VALUE)
-	CloseHandle (cygheap->user.token);
       cygheap->user.token = hToken;
       cygheap->user.impersonated = FALSE;
     }
@@ -215,7 +213,8 @@ subauth (struct passwd *pw)
   str2buf2lsa (origin.str, origin.buf, "Cygwin");
   /* Create token source. */
   memcpy(ts.SourceName, "Cygwin.1", 8);
-  AllocateLocallyUniqueId(&ts.SourceIdentifier);
+  ts.SourceIdentifier.HighPart = 0;
+  ts.SourceIdentifier.LowPart = 0x0100;
   /* Get user information. */
   extract_nt_dom_user (pw, nt_domain, nt_user);
   /* Fill subauth with values. */
