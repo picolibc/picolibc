@@ -17,8 +17,7 @@ utils/passwd.c			Corinna Vinschen <vinschen@cygnus.com>
 utils/setfacl.c			Corinna Vinschen <vinschen@cygnus.com>
 mingw/*				Mumit Khan <xraylith.wisc.edu>
 w32api/*			Mumit Khan <xraylith.wisc.edu>
-cinstall/*			Ron Parker <rparker1@kc.rr.com>
-				Chris Faylor <cgf@cygnus.com>
+cinstall/*			DJ Delorie <dj@cygnus.com>
 cygwin/{everything else}	Chris Faylor <cgf@cygnus.com>,
 				DJ Delorie <dj@cygnus.com>
 				Corinna Vinschen <vinschen@cygnus.com>
