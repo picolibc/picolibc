@@ -268,9 +268,10 @@ cygthread::terminate_thread ()
    theory is that cygthreads are only associated with one thread.
    So, there should be no problems with multiple threads doing waits
    on the one cygthread. */
-void
-cygthread::detach (bool wait_for_sig)
+bool
+cygthread::detach (HANDLE sigwait)
 {
+  bool signalled = false;
   if (avail)
     system_printf ("called detach on available thread %d?", avail);
   else
@@ -278,24 +279,32 @@ cygthread::detach (bool wait_for_sig)
       DWORD avail = id;
       DWORD res;
 
-      if (!wait_for_sig)
+      if (!sigwait)
 	res = WaitForSingleObject (*this, INFINITE);
       else
 	{
 	  HANDLE w4[2];
 	  w4[0] = signal_arrived;
 	  w4[1] = *this;
+	  res = WaitForSingleObject (sigwait, INFINITE);
+	  if (res != WAIT_OBJECT_0)
+	    system_printf ("WFSO sigwait failed, res %u", res);
 	  res = WaitForMultipleObjects (2, w4, FALSE, INFINITE);
-	  if (res == WAIT_OBJECT_0)
+	  if (res != WAIT_OBJECT_0)
+	    /* nothing */;
+	  else if (WaitForSingleObject (sigwait, 5) == WAIT_OBJECT_0)
+	    res = WaitForSingleObject (*this, INFINITE);
+	  else
 	    {
 	      terminate_thread ();
 	      set_errno (EINTR);	/* caller should be dealing with return
 					   values. */
 	      avail = 0;
+	      signalled = true;
 	    }
 	}
 
-      thread_printf ("%s returns %d, id %p", wait_for_sig ? "WFMO" : "WFSO",
+      thread_printf ("%s returns %d, id %p", sigwait ? "WFMO" : "WFSO",
 		     res, id);
 
       if (!avail)
@@ -312,6 +321,7 @@ cygthread::detach (bool wait_for_sig)
 	  (void) InterlockedExchange ((LPLONG) &this->avail, avail);
 	}
     }
+  return signalled;
 }
 
 void

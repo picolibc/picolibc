@@ -185,19 +185,30 @@ fhandler_dev_clipboard::write (const void *buf, size_t len)
     }
 }
 
-int __stdcall
-fhandler_dev_clipboard::read (void *ptr, size_t len)
+void __stdcall
+fhandler_dev_clipboard::read (void *ptr, size_t& len)
 {
   HGLOBAL hglb;
   size_t ret;
   UINT formatlist[2];
   UINT format;
-  if (!eof)
+  if (eof)
+    len = 0;
+  else
     {
       formatlist[0] = cygnativeformat;
       formatlist[1] = current_codepage == ansi_cp ? CF_TEXT : CF_OEMTEXT;
       OpenClipboard (0);
-      if ((format = GetPriorityClipboardFormat (formatlist, 2)) > 0)
+      if ((format = GetPriorityClipboardFormat (formatlist, 2)) <= 0)
+	{
+	  CloseClipboard ();
+#if 0
+	  system_printf ("a non-accepted format! %d", format);
+#endif
+	  set_errno (0);
+	  len = 0;
+	}
+      else
 	{
 	  hglb = GetClipboardData (format);
 	  if (format == cygnativeformat)
@@ -216,9 +227,8 @@ fhandler_dev_clipboard::read (void *ptr, size_t len)
 	      LPSTR lpstr;
 	      lpstr = (LPSTR) GlobalLock (hglb);
 
-	      ret =
-		((len > (strlen (lpstr) - pos)) ? (strlen (lpstr) - pos) :
-		 len);
+	      ret = ((len > (strlen (lpstr) - pos)) ? (strlen (lpstr) - pos)
+		     : len);
 
 	      memcpy (ptr, lpstr + pos, ret);
 	      //ret = snprintf((char *) ptr, len, "%s", lpstr);//+pos);
@@ -229,21 +239,8 @@ fhandler_dev_clipboard::read (void *ptr, size_t len)
 	    }
 	  CloseClipboard ();
 	  set_errno (0);
-	  return ret;
+	  len = ret;
 	}
-      else
-	{
-	  CloseClipboard ();
-#if 0
-	  system_printf ("a non-accepted format! %d", format);
-#endif
-	  set_errno (0);
-	  return 0;
-	}
-    }
-  else
-    {
-      return 0;
     }
 }
 

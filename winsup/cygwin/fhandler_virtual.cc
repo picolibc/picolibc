@@ -170,27 +170,29 @@ fhandler_virtual::close ()
   return 0;
 }
 
-int
-fhandler_virtual::read (void *ptr, size_t len)
+void
+fhandler_virtual::read (void *ptr, size_t& len)
 {
   if (len == 0)
-    return 0;
+    return;
   if (openflags & O_DIROPEN)
     {
       set_errno (EISDIR);
-      return -1;
+      (ssize_t) len = -1;
+      return;
     }
   if (!filebuf)
-    return 0;
-  int read = len;
-  if (read > filesize - position)
-    read = filesize - position;
-  if (read < 0)
-    read = 0;
+    {
+      (ssize_t) len = 0;
+      return;
+    }
+  if ((ssize_t) len > filesize - position)
+    (ssize_t) len = filesize - position;
+  if ((ssize_t) len < 0)
+    (ssize_t) len = 0;
   else
-    memcpy (ptr, filebuf + position, read);
-  position += read;
-  return read;
+    memcpy (ptr, filebuf + position, len);
+  position += len;
 }
 
 int

@@ -27,7 +27,7 @@ class cygthread
   cygthread (LPTHREAD_START_ROUTINE, LPVOID, const char *);
   cygthread () {};
   static void init ();
-  void detach (bool = false);
+  bool detach (HANDLE = NULL);
   operator HANDLE ();
   static bool is ();
   void * operator new (size_t);

@@ -249,18 +249,23 @@ fhandler_base::set_flags (int flags, int supplied_bin)
 
 /* Cover function to ReadFile to achieve (as much as possible) Posix style
    semantics and use of errno.  */
-int
-fhandler_base::raw_read (void *ptr, size_t ulen)
+void
+fhandler_base::raw_read (void *ptr, size_t& ulen)
 {
-  DWORD bytes_read;
+#define bytes_read ((ssize_t) ulen)
 
-  if (!ReadFile (get_handle (), ptr, ulen, &bytes_read, 0))
+  DWORD len = ulen;
+  (ssize_t) ulen = -1;
+  if (read_state)
+    SetEvent (read_state);
+  BOOL res = ReadFile (get_handle (), ptr, len, (DWORD *) &ulen, 0);
+  if (read_state)
+    SetEvent (read_state);
+  if (!res)
     {
-      int errcode;
-
       /* Some errors are not really errors.  Detect such cases here.  */
 
-      errcode = GetLastError ();
+      DWORD  errcode = GetLastError ();
       switch (errcode)
 	{
 	case ERROR_BROKEN_PIPE:
@@ -272,24 +277,27 @@ fhandler_base::raw_read (void *ptr, size_t ulen)
 	  break;
 	case ERROR_NOACCESS:
 	  if (is_at_eof (get_handle (), errcode))
-	    return 0;
+	    {
+	      bytes_read = 0;
+	      break;
+	    }
 	case ERROR_INVALID_FUNCTION:
 	case ERROR_INVALID_PARAMETER:
 	case ERROR_INVALID_HANDLE:
 	  if (openflags & O_DIROPEN)
 	    {
 	      set_errno (EISDIR);
-	      return -1;
+	      bytes_read = -1;
+	      break;
 	    }
 	default:
 	  syscall_printf ("ReadFile %s failed, %E", unix_path_name);
 	  __seterrno_from_win_error (errcode);
-	  return -1;
+	  bytes_read = -1;
 	  break;
 	}
     }
-
-  return bytes_read;
+#undef bytes_read
 }
 
 /* Cover function to WriteFile to provide Posix interface and semantics
@@ -486,14 +494,13 @@ done:
    an \n.  If last char is an \r, look ahead one more char, if \n then
    modify \r, if not, remember char.
 */
-int
-fhandler_base::read (void *in_ptr, size_t in_len)
+void
+fhandler_base::read (void *in_ptr, size_t& len)
 {
-  int len = (int) in_len;
+  size_t in_len = len;
   char *ptr = (char *) in_ptr;
-
+  ssize_t copied_chars = 0;
   int c;
-  int copied_chars = 0;
 
   while (len)
     if ((c = get_readahead ()) < 0)
@@ -505,23 +512,31 @@ fhandler_base::read (void *in_ptr, size_t in_len)
       }
 
   if (copied_chars && is_slow ())
-    return copied_chars;
+    {
+      len = (size_t) copied_chars;
+      return;
+    }
 
   if (len)
     {
-      int readlen = raw_read (ptr + copied_chars, len);
-      if (copied_chars == 0)
-	copied_chars = readlen;		/* Propagate error or EOF */
-      else if (readlen > 0)		/* FIXME: should flag EOF for next read */
-	copied_chars += readlen;
+      raw_read (ptr + copied_chars, len);
+      if (!copied_chars)
+	/* nothing */;
+      else if ((ssize_t) len > 0)
+	len += copied_chars;
+      else
+	len = copied_chars;
+    }
+  else if (copied_chars <= 0)
+    {
+      len = (size_t) copied_chars;
+      return;
     }
 
-  if (copied_chars <= 0)
-    return copied_chars;
   if (get_r_binary ())
     {
-      debug_printf ("returning %d chars, binary mode", copied_chars);
-      return copied_chars;
+      debug_printf ("returning %d chars, binary mode", len);
+      return;
     }
 
 #if 0
@@ -543,35 +558,37 @@ fhandler_base::read (void *in_ptr, size_t in_len)
 #endif
 
   /* Scan buffer and turn \r\n into \n */
-  register char *src = (char *) ptr;
-  register char *dst = (char *) ptr;
-  register char *end = src + copied_chars - 1;
+  char *src = (char *) ptr;
+  char *dst = (char *) ptr;
+  char *end = src + len - 1;
 
   /* Read up to the last but one char - the last char needs special handling */
   while (src < end)
     {
-      *dst = *src++;
-      if (*dst != '\r' || *src != '\n')
-	dst++;
+      if (*src == '\r' && src[1] == '\n')
+	src++;
+      *dst++ = *src++;
     }
 
-  c = *src;
+  len = dst - (char *) ptr;
+
   /* if last char is a '\r' then read one more to see if we should
      translate this one too */
-  if (c == '\r')
+  if (len < in_len && *src == '\r')
     {
-      char c1 = 0;
-      len = raw_read (&c1, 1);
-      if (len <= 0)
+      size_t clen = 1;
+      raw_read (&c, clen);
+      if (clen <= 0)
 	/* nothing */;
-      else if (c1 == '\n')
-	c = '\n';
+      else if (c != '\n')
+	set_readahead_valid (1, c);
       else
-	set_readahead_valid (1, c1);
+	{
+	  *dst++ = '\n';
+	  len++;
+	}
     }
 
-  *dst++ = c;
-  copied_chars = dst - (char *) ptr;
 
 #ifndef NOSTRACE
   if (strace.active)
@@ -591,8 +608,8 @@ fhandler_base::read (void *in_ptr, size_t in_len)
     }
 #endif
 
-  debug_printf ("returning %d chars, text mode", copied_chars);
-  return copied_chars;
+  debug_printf ("returning %d chars, text mode", len);
+  return;
 }
 
 int
@@ -717,7 +734,11 @@ fhandler_base::readv (const struct iovec *const iov, const int iovcnt,
   assert (iovcnt >= 1);
 
   if (iovcnt == 1)
-    return read (iov->iov_base, iov->iov_len);
+    {
+      size_t len = iov->iov_len;
+      read (iov->iov_base, len);
+      return len;
+    }
 
   if (tot == -1)		// i.e. if not pre-calculated by the caller.
     {
@@ -744,10 +765,10 @@ fhandler_base::readv (const struct iovec *const iov, const int iovcnt,
       return -1;
     }
 
-  const ssize_t res = read (buf, tot);
+  read (buf, (size_t) tot);
 
   const struct iovec *iovptr = iov;
-  int nbytes = res;
+  int nbytes = tot;
 
   while (nbytes > 0)
     {
@@ -758,7 +779,7 @@ fhandler_base::readv (const struct iovec *const iov, const int iovcnt,
       nbytes -= frag;
     }
 
-  return res;
+  return tot;
 }
 
 ssize_t
@@ -1150,7 +1171,8 @@ fhandler_base::fhandler_base (DWORD devtype, int unit):
   rabuflen (0),
   unix_path_name (NULL),
   win32_path_name (NULL),
-  open_status (0)
+  open_status (0),
+  read_state (NULL)
 {
 }
 

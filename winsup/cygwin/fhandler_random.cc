@@ -110,27 +110,33 @@ fhandler_dev_random::pseudo_read (void *ptr, size_t len)
   return len;
 }
 
-int __stdcall
-fhandler_dev_random::read (void *ptr, size_t len)
+void __stdcall
+fhandler_dev_random::read (void *ptr, size_t& len)
 {
   if (!len)
-    return 0;
+    return;
+
   if (!ptr)
     {
       set_errno (EINVAL);
-      return -1;
+      (ssize_t) len = -1;
+      return;
     }
 
   if (crypt_gen_random (ptr, len))
-    return len;
+    return;
+
   /* If device is /dev/urandom, use pseudo number generator as fallback.
      Don't do this for /dev/random since it's intended for uses that need
      very high quality randomness. */
   if (unit == URANDOM)
-    return pseudo_read (ptr, len);
+    {
+      len = pseudo_read (ptr, len);
+      return;
+    }
 
   __seterrno ();
-  return -1;
+  (ssize_t) len = -1;
 }
 
 __off64_t

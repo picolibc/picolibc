@@ -79,26 +79,25 @@ fhandler_windows::write (const void *buf, size_t)
     return SendMessage (ptr->hwnd, ptr->message, ptr->wParam, ptr->lParam);
 }
 
-int __stdcall
-fhandler_windows::read (void *buf, size_t len)
+void __stdcall
+fhandler_windows::read (void *buf, size_t& len)
 {
   MSG *ptr = (MSG *) buf;
-  int ret;
 
   if (len < sizeof (MSG))
     {
       set_errno (EINVAL);
-      return -1;
+      (ssize_t) len = -1;
+      return;
     }
 
-  ret = GetMessage (ptr, hWnd_, 0, 0);
+  (ssize_t) len = GetMessage (ptr, hWnd_, 0, 0);
 
-  if (ret == -1)
-    {
-      __seterrno ();
-    }
-  set_errno (0);
-  return ret;
+  if ((ssize_t) len == -1)
+    __seterrno ();
+  else
+    set_errno (0);
+  return;
 }
 
 int

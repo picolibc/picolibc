@@ -1,3 +1,17 @@
+2002-12-13  Christopher Faylor  <cgf@redhat.com>
+
+	Throughout, change fhandler_*::read and fhandler_*::raw_read to void
+	functions whose second arguments are both the lenght and the return
+	value.
+	* fhandler.cc (fhandler_base::read): Rework slightly to use second
+	argument as input/output.  Tweak CRLF stuff.
+	(fhandler_base::readv): Accommodate fhandler_*::read changes.
+	* cygthread.h (cygthread::detach): Declare as taking optional handle
+	argument.
+	(cygthread::detach): When given a handle argument, wait for the handle
+	to be signalled before waiting for thread to detach.  Return true when
+	signal detected.
+
 2002-12-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in: Add MINGW_LDFLAGS when linking cygrun.exe.

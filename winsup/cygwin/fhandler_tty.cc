@@ -199,8 +199,8 @@ process_input (void *)
 
   while (1)
     {
-      int nraw = tty_master->console->read ((void *) rawbuf,
-				      (size_t) INP_BUFFER_SIZE);
+      size_t nraw = INP_BUFFER_SIZE;
+      tty_master->console->read ((void *) rawbuf, nraw);
       (void) tty_master->line_edit (rawbuf, nraw);
     }
 }
@@ -634,8 +634,8 @@ fhandler_tty_slave::write (const void *ptr, size_t len)
   return towrite;
 }
 
-int __stdcall
-fhandler_tty_slave::read (void *ptr, size_t len)
+void __stdcall
+fhandler_tty_slave::read (void *ptr, size_t& len)
 {
   int totalread = 0;
   int vmin = 0;
@@ -692,7 +692,8 @@ fhandler_tty_slave::read (void *ptr, size_t len)
 	  if (totalread > 0)
 	    break;
 	  set_sig_errno (EINTR);
-	  return -1;
+	  (ssize_t) len = -1;
+	  return;
 	}
 
       rc = WaitForSingleObject (input_mutex, 1000);
@@ -716,7 +717,8 @@ fhandler_tty_slave::read (void *ptr, size_t len)
       if (!vmin && !time_to_wait)
 	{
 	  ReleaseMutex (input_mutex);
-	  return bytes_in_pipe;
+	  (ssize_t) len = bytes_in_pipe;
+	  return;
 	}
 
       readlen = min (bytes_in_pipe, min (len, sizeof (buf)));
@@ -795,7 +797,8 @@ fhandler_tty_slave::read (void *ptr, size_t len)
 	waiter = time_to_wait;
     }
   termios_printf ("%d=read(%x, %d)", totalread, ptr, len);
-  return totalread;
+  (ssize_t) len = totalread;
+  return;
 }
 
 int
@@ -1085,10 +1088,11 @@ fhandler_pty_master::write (const void *ptr, size_t len)
   return i;
 }
 
-int __stdcall
-fhandler_pty_master::read (void *ptr, size_t len)
+void __stdcall
+fhandler_pty_master::read (void *ptr, size_t& len)
 {
-  return process_slave_output ((char *) ptr, len, pktmode);
+  (ssize_t) len = process_slave_output ((char *) ptr, len, pktmode);
+  return;
 }
 
 int

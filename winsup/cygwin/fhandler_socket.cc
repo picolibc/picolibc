@@ -124,10 +124,13 @@ fhandler_socket::set_connect_secret ()
       delete entropy_source;
       entropy_source = NULL;
     }
-  if (!entropy_source ||
-      (entropy_source->read (connect_secret, sizeof (connect_secret)) !=
-					     sizeof (connect_secret)))
-    bzero ((char*) connect_secret, sizeof (connect_secret));
+  if (!entropy_source)
+    {
+      size_t len = sizeof (connect_secret);
+      entropy_source->read (connect_secret, len);
+      if (len != sizeof (connect_secret))
+	bzero ((char*) connect_secret, sizeof (connect_secret));
+    }
 }
 
 void

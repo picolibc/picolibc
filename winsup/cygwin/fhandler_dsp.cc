@@ -481,10 +481,10 @@ fhandler_dev_dsp::write (const void *ptr, size_t len)
   return len;
 }
 
-int __stdcall
-fhandler_dev_dsp::read (void *ptr, size_t len)
+void __stdcall
+fhandler_dev_dsp::read (void *ptr, size_t& len)
 {
-  return len;
+  return;
 }
 
 __off64_t

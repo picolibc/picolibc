@@ -176,16 +176,20 @@ fhandler_dev_mem::write (const void *ptr, size_t ulen)
   return ulen;
 }
 
-int __stdcall
-fhandler_dev_mem::read (void *ptr, size_t ulen)
+void __stdcall
+fhandler_dev_mem::read (void *ptr, size_t& ulen)
 {
   if (!ulen || pos >= mem_size)
-    return 0;
+    {
+      ulen = 0;
+      return;
+    }
 
   if (!(get_access () & GENERIC_READ))
     {
       set_errno (EINVAL);
-      return -1;
+      (ssize_t) ulen = -1;
+      return;
     }
 
   if (pos + ulen > mem_size)
@@ -209,7 +213,8 @@ fhandler_dev_mem::read (void *ptr, size_t ulen)
 				 PAGE_READONLY)) != STATUS_SUCCESS)
     {
       __seterrno_from_win_error (RtlNtStatusToDosError (ret));
-      return -1;
+      (ssize_t) ulen = -1;
+      return;
     }
 
   memcpy (ptr, (char *) viewmem + (pos - phys.QuadPart), ulen);
@@ -217,11 +222,12 @@ fhandler_dev_mem::read (void *ptr, size_t ulen)
   if (!NT_SUCCESS (ret = NtUnmapViewOfSection (INVALID_HANDLE_VALUE, viewmem)))
     {
       __seterrno_from_win_error (RtlNtStatusToDosError (ret));
-      return -1;
+      (ssize_t) ulen = -1;
+      return;
     }
 
   pos += ulen;
-  return ulen;
+  return;
 }
 
 int

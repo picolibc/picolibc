@@ -216,8 +216,8 @@ fhandler_console::send_winch_maybe ()
     tc->kill_pgrp (SIGWINCH);
 }
 
-int __stdcall
-fhandler_console::read (void *pv, size_t buflen)
+void __stdcall
+fhandler_console::read (void *pv, size_t& buflen)
 {
   HANDLE h = get_io_handle ();
 
@@ -229,7 +229,10 @@ fhandler_console::read (void *pv, size_t buflen)
   int copied_chars = get_readahead_into_buffer (buf, buflen);
 
   if (copied_chars)
-    return copied_chars;
+    {
+      buflen = copied_chars;
+      return;
+    }
 
   HANDLE w4[2];
   DWORD nwait;
@@ -248,7 +251,10 @@ fhandler_console::read (void *pv, size_t buflen)
     {
       int bgres;
       if ((bgres = bg_check (SIGTTIN)) <= bg_eof)
-	return bgres;
+	{
+	  buflen = bgres;
+	  return;
+	}
 
       set_cursor_maybe ();	/* to make cursor appear on the screen immediately */
       switch (WaitForMultipleObjects (nwait, w4, FALSE, INFINITE))
@@ -258,8 +264,7 @@ fhandler_console::read (void *pv, size_t buflen)
 	case WAIT_OBJECT_0 + 1:
 	  goto sig_exit;
 	default:
-	  __seterrno ();
-	  return -1;
+	  goto err;
 	}
 
       DWORD nread;
@@ -268,9 +273,8 @@ fhandler_console::read (void *pv, size_t buflen)
 
       if (!ReadConsoleInput (h, &input_rec, 1, &nread))
 	{
-	  __seterrno ();
 	  syscall_printf ("ReadConsoleInput failed, %E");
-	  return -1;		/* seems to be failure */
+	  goto err;		/* seems to be failure */
 	}
 
       /* check the event that occurred */
@@ -476,11 +480,18 @@ fhandler_console::read (void *pv, size_t buflen)
       }
 #undef buf
 
-  return copied_chars;
+  buflen = copied_chars;
+  return;
+
+err:
+  __seterrno ();
+  (ssize_t) buflen = -1;
+  return;
 
  sig_exit:
   set_sig_errno (EINTR);
-  return -1;
+  (ssize_t) buflen = -1;
+  return;
 }
 
 void

@@ -179,7 +179,10 @@ fhandler_dev_floppy::lseek (__off64_t offset, int whence)
 	  __seterrno ();
 	  return -1;
 	}
-      return sector_aligned_offset + raw_read (buf, bytes_left);
+
+      size_t len = bytes_left;
+      raw_read (buf, len);
+      return sector_aligned_offset + bytes_left;
     }
 
   set_errno (EINVAL);

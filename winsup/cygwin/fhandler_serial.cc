@@ -38,8 +38,8 @@ fhandler_serial::overlapped_setup ()
   overlapped_armed = 0;
 }
 
-int
-fhandler_serial::raw_read (void *ptr, size_t ulen)
+void
+fhandler_serial::raw_read (void *ptr, size_t& ulen)
 {
   int tot;
   DWORD n;
@@ -146,7 +146,7 @@ fhandler_serial::raw_read (void *ptr, size_t ulen)
     }
 
 out:
-  return tot;
+  ulen = tot;
 }
 
 /* Cover function to WriteFile to provide Posix interface and semantics

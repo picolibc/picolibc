@@ -55,32 +55,32 @@ struct pipeargs
 {
   fhandler_base *fh;
   void *ptr;
-  size_t len;
-  int res;
+  size_t *len;
 };
 
 static DWORD WINAPI
 read_pipe (void *arg)
 {
   pipeargs *pi = (pipeargs *) arg;
-  pi->res = pi->fh->fhandler_base::read (pi->ptr, pi->len);
+  pi->fh->fhandler_base::read (pi->ptr, *pi->len);
   return 0;
 }
 
-int __stdcall
-fhandler_pipe::read (void *in_ptr, size_t in_len)
+void __stdcall
+fhandler_pipe::read (void *in_ptr, size_t& in_len)
 {
   if (broken_pipe)
-    return 0;
-  pipeargs pi;
-  pi.fh = this;
-  pi.ptr = in_ptr;
-  pi.len = in_len;
-  pi.res = -1;
-  cygthread *th = new cygthread (read_pipe, &pi, "read_pipe");
-  th->detach (1);
+    in_len = 0;
+  else
+    {
+      pipeargs pi = {this, in_ptr, &in_len};
+      ResetEvent (read_state);
+      cygthread *th = new cygthread (read_pipe, &pi, "read_pipe");
+      if (th->detach (read_state) && !in_len)
+	(ssize_t) in_len = -1;	/* received a signal */
+    }
   (void) ReleaseMutex (guard);
-  return pi.res;
+  return;
 }
 
 int fhandler_pipe::close ()
@@ -90,6 +90,8 @@ int fhandler_pipe::close ()
     CloseHandle (guard);
   if (writepipe_exists)
     CloseHandle (writepipe_exists);
+  if (read_state)
+    CloseHandle (read_state);
   return res;
 }
 
@@ -110,6 +112,13 @@ fhandler_pipe::hit_eof ()
 }
 
 void
+fhandler_pipe::fixup_after_exec (HANDLE parent)
+{
+  if (read_state)
+    read_state = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+}
+
+void
 fhandler_pipe::fixup_after_fork (HANDLE parent)
 {
   this->fhandler_base::fixup_after_fork (parent);
@@ -117,6 +126,7 @@ fhandler_pipe::fixup_after_fork (HANDLE parent)
     fork_fixup (parent, guard, "guard");
   if (writepipe_exists)
     fork_fixup (parent, writepipe_exists, "guard");
+  fixup_after_exec (parent);
 }
 
 int
@@ -144,6 +154,16 @@ fhandler_pipe::dup (fhandler_base *child)
 			     DUPLICATE_SAME_ACCESS))
     {
       debug_printf ("couldn't duplicate writepipe_exists %p, %E", writepipe_exists);
+      return -1;
+    }
+
+  if (read_state == NULL)
+    ftp->read_state = NULL;
+  else if (!DuplicateHandle (hMainProc, read_state, hMainProc,
+			     &ftp->read_state, 0, 1,
+			     DUPLICATE_SAME_ACCESS))
+    {
+      debug_printf ("couldn't duplicate read_state %p, %E", writepipe_exists);
       return -1;
     }
 
@@ -183,6 +203,7 @@ make_pipe (int fildes[2], unsigned int psize, int mode)
 
 	  fildes[0] = fdr;
 	  fildes[1] = fdw;
+	  fhr->read_state = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
 
 	  res = 0;
 	  fhr->create_guard (sa);

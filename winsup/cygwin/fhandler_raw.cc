@@ -189,8 +189,8 @@ fhandler_dev_raw::close (void)
   return fhandler_base::close ();
 }
 
-int
-fhandler_dev_raw::raw_read (void *ptr, size_t ulen)
+void
+fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
 {
   DWORD bytes_read = 0;
   DWORD read2;
@@ -204,21 +204,22 @@ fhandler_dev_raw::raw_read (void *ptr, size_t ulen)
   if (ret)
     {
       set_errno (is_eom (ret) ? ENOSPC : EACCES);
-      return -1;
+      goto err;
     }
 
   /* Checking a previous end of file */
   if (eof_detected && !lastblk_to_read)
     {
       eof_detected = 0;
-      return 0;
+      ulen = 0;
+      return;
     }
 
   /* Checking a previous end of media */
   if (eom_detected && !lastblk_to_read)
     {
       set_errno (ENOSPC);
-      return -1;
+      goto err;
     }
 
   if (devbuf)
@@ -269,7 +270,7 @@ fhandler_dev_raw::raw_read (void *ptr, size_t ulen)
 		    {
 		      debug_printf ("return -1, set errno to EACCES");
 		      set_errno (EACCES);
-		      return -1;
+		      goto err;
 		    }
 
 		  if (is_eof (ret))
@@ -283,7 +284,7 @@ fhandler_dev_raw::raw_read (void *ptr, size_t ulen)
 			{
 			  debug_printf ("return -1, set errno to ENOSPC");
 			  set_errno (ENOSPC);
-			  return -1;
+			  goto err;
 			}
 		      break;
 		    }
@@ -311,7 +312,7 @@ fhandler_dev_raw::raw_read (void *ptr, size_t ulen)
 	{
 	  debug_printf ("return -1, set errno to EACCES");
 	  set_errno (EACCES);
-	  return -1;
+	  goto err;
 	}
       if (bytes_read)
 	{
@@ -324,11 +325,16 @@ fhandler_dev_raw::raw_read (void *ptr, size_t ulen)
 	{
 	  debug_printf ("return -1, set errno to ENOSPC");
 	  set_errno (ENOSPC);
-	  return -1;
+	  goto err;
 	}
     }
 
-  return bytes_read;
+  (ssize_t) ulen = bytes_read;
+  return;
+
+err:
+  (ssize_t) ulen = -1;
+  return;
 }
 
 int

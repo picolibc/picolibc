@@ -166,6 +166,7 @@ class fhandler_base
   const char *unix_path_name;
   const char *win32_path_name;
   DWORD open_status;
+  HANDLE read_state;
 
  public:
   void set_name (const char * unix_path, const char *win32_path = NULL, int unit = 0);
@@ -304,7 +305,7 @@ class fhandler_base
   virtual int ioctl (unsigned int cmd, void *);
   virtual int fcntl (int cmd, void *);
   virtual char const * ttyname () { return get_name(); }
-  virtual int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
+  virtual void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   virtual int write (const void *ptr, size_t len);
   virtual ssize_t readv (const struct iovec *, int iovcnt, ssize_t tot = -1);
   virtual ssize_t writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
@@ -339,7 +340,7 @@ class fhandler_base
   virtual class fhandler_console *is_console () { return 0; }
   virtual int is_windows () {return 0; }
 
-  virtual int raw_read (void *ptr, size_t ulen);
+  virtual void raw_read (void *ptr, size_t& ulen);
   virtual int raw_write (const void *ptr, size_t ulen);
 
   /* Virtual accessor functions to hide the fact
@@ -463,12 +464,13 @@ class fhandler_pipe: public fhandler_base
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
   void set_close_on_exec (int val);
-  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
+  void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   int close ();
   void create_guard (SECURITY_ATTRIBUTES *sa) {guard = CreateMutex (sa, FALSE, NULL);}
   int dup (fhandler_base *child);
   int ioctl (unsigned int cmd, void *);
   void fixup_after_fork (HANDLE);
+  void fixup_after_exec (HANDLE);
   bool hit_eof ();
   void set_eof () {broken_pipe = true;}
   friend int make_pipe (int fildes[2], unsigned int psize, int mode);
@@ -509,7 +511,7 @@ class fhandler_dev_raw: public fhandler_base
   int open (path_conv *, int flags, mode_t mode = 0);
   int close (void);
 
-  int raw_read (void *ptr, size_t ulen);
+  void raw_read (void *ptr, size_t& ulen);
   int raw_write (const void *ptr, size_t ulen);
 
   int dup (fhandler_base *child);
@@ -655,7 +657,7 @@ class fhandler_serial: public fhandler_base
   void init (HANDLE h, DWORD a, mode_t flags);
   void overlapped_setup ();
   int dup (fhandler_base *child);
-  int raw_read (void *ptr, size_t ulen);
+  void raw_read (void *ptr, size_t& ulen);
   int raw_write (const void *ptr, size_t ulen);
   int tcsendbreak (int);
   int tcdrain ();
@@ -823,7 +825,7 @@ class fhandler_console: public fhandler_termios
 
   int write (const void *ptr, size_t len);
   void doecho (const void *str, DWORD len) { (void) write (str, len); }
-  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
+  void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   int close ();
 
   int tcflush (int);
@@ -894,7 +896,7 @@ class fhandler_tty_slave: public fhandler_tty_common
 
   int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
-  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
+  void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   void init (HANDLE, DWORD, mode_t);
 
   int tcsetattr (int a, const struct termios *t);
@@ -921,7 +923,7 @@ class fhandler_pty_master: public fhandler_tty_common
   int accept_input ();
   int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
-  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
+  void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   int close ();
 
   int tcsetattr (int a, const struct termios *t);
@@ -966,7 +968,7 @@ class fhandler_dev_zero: public fhandler_base
   fhandler_dev_zero ();
   int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
-  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
+  void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   __off64_t lseek (__off64_t offset, int whence);
 
   void dump ();
@@ -988,7 +990,7 @@ class fhandler_dev_random: public fhandler_base
   int get_unit () { return unit; }
   int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
-  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
+  void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   __off64_t lseek (__off64_t offset, int whence);
   int close (void);
   int dup (fhandler_base *child);
@@ -1009,7 +1011,7 @@ class fhandler_dev_mem: public fhandler_base
 
   int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t ulen);
-  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
+  void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   __off64_t lseek (__off64_t offset, int whence);
   int close (void);
   int __stdcall fstat (struct __stat64 *buf, path_conv *) __attribute__ ((regparm (3)));
@@ -1031,7 +1033,7 @@ class fhandler_dev_clipboard: public fhandler_base
   int is_windows (void) { return 1; }
   int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
-  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
+  void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   __off64_t lseek (__off64_t offset, int whence);
   int close (void);
 
@@ -1056,7 +1058,7 @@ class fhandler_windows: public fhandler_base
   int is_windows (void) { return 1; }
   int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
-  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
+  void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   int ioctl (unsigned int cmd, void *);
   __off64_t lseek (__off64_t, int) { return 0; }
   int close (void) { return 0; }
@@ -1082,7 +1084,7 @@ class fhandler_dev_dsp : public fhandler_base
 
   int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
-  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
+  void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   int ioctl (unsigned int cmd, void *);
   __off64_t lseek (__off64_t, int);
   int close (void);
@@ -1110,7 +1112,7 @@ class fhandler_virtual : public fhandler_base
   void rewinddir (DIR *);
   int closedir (DIR *);
   int write (const void *ptr, size_t len);
-  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
+  void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   __off64_t lseek (__off64_t, int);
   int dup (fhandler_base * child);
   int open (path_conv *, int flags, mode_t mode = 0);
