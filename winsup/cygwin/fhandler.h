@@ -125,6 +125,7 @@ class fhandler_base
  public:
   void set_name (path_conv &pc);
   int error () const {return pc.error;}
+  void set_error (int error) {pc.error = error;}
   bool exists () const {return pc.exists ();}
   int pc_binmode () const {return pc.binmode ();}
   device& dev () {return pc.dev;}

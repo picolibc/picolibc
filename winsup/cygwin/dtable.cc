@@ -294,8 +294,10 @@ build_fh_name (const char *name, HANDLE h, unsigned opt, suffix_info *si)
   path_conv pc (name, opt | PC_NULLEMPTY | PC_FULL | PC_POSIX, si);
   if (pc.error)
     {
+      fhandler_base *fh = cnew (fhandler_nodevice) ();
+      fh->set_error (pc.error);
       set_errno (pc.error);
-      return cnew (fhandler_nodevice) ();
+      return fh;
     }
 
   if (!pc.exists () && h)

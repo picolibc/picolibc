@@ -1,5 +1,11 @@
 2003-11-24  Christopher Faylor  <cgf@redhat.com>
 
+	* dtable.cc (build_fh_name): Set error in dummy fhandler when one is
+	noted during path_conv.
+	* fhandler.h (fhandler_base::set_error): New method.
+
+2003-11-24  Christopher Faylor  <cgf@redhat.com>
+
 	* configure.in: Avoid using cygserver unless hosting on cygwin.
 
 2003-11-23  Christopher Faylor  <cgf@redhat.com>
