@@ -205,7 +205,10 @@ normalize_posix_path (const char *src, char *dst)
   syscall_printf ("src %s", src);
 
   if (isdrive (src) || strpbrk (src, "\\:"))
-    return normalize_win32_path (src, dst);
+    {
+      cygwin_conv_to_full_posix_path (src, dst);
+      return 0;
+    }
 
   if (!isslash (src[0]))
     {
@@ -1704,7 +1707,7 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
 
       if (!*p || !p[1])
 	nextchar = 0;
-      else if (*p == '/')
+      else if (isdirsep (*p))
 	nextchar = -1;
       else
 	nextchar = 1;
@@ -1755,8 +1758,7 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
     {
       /* The use of src_path and not pathbuf here is intentional.
 	 We couldn't translate the path, so just ensure no \'s are present. */
-      strcpy (posix_path, src_path);
-      // slashify (src_path, posix_path, trailing_slash_p);
+      slashify (src_path, posix_path, trailing_slash_p);
     }
 
 out:

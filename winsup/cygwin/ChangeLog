@@ -1,5 +1,10 @@
 2003-01-10  Corinna Vinschen <corinna@vinschen.de>
 
+	* path.cc: Revert patch from 2003-01-09 to normalize a windows path
+	rather than converting to posix.
+
+2003-01-10  Corinna Vinschen <corinna@vinschen.de>
+
 	* autoload.cc (gethostname): Make call optional, return 1 if function
 	can't get loaded.
 	* net.cc (cygwin_gethostname): Call GetComputerName if return value
