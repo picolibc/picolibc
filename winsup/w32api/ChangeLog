@@ -1,6 +1,15 @@
 2003-01-04  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/commctrl.h (TOOLINFO[AW]: Update structures.
+	* include/commctrl.h (tagNMTOOLBAR[AW]): Replace obsolete struct
+	names tagTBNOTIFY[AW] and typedefs. Add defines for backward
+	compatability. Add RECT field. Add UNICODE mappings for new
+	names.
+	(tagNMREBARCHEVRON): Add struct and typedefs for
+	_WIN32_IE >= 0x0500.
+
+2003-01-04  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/commctrl.h (TOOLINFO[AW]): Update structures.
 	(LVHITTESTINFO): Likewise.
 
 	* include/wingdi.h (GRADIENT_TRIANGLE): Add structure.
