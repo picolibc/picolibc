@@ -1550,7 +1550,7 @@ cygwin_send (int fd, const void *buf, int len, unsigned int flags)
 
 /* getdomainname: standards? */
 extern "C" int
-getdomainname (char *domain, int len)
+getdomainname (char *domain, size_t len)
 {
   /*
    * This works for Win95 only if the machine is configured to use MS-TCP.

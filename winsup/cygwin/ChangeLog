@@ -1,3 +1,44 @@
+2002-05-03  Christopher Faylor  <cgf@redhat.com>
+
+	* net.cc (getdomainname): Change second argument of getdomainname to
+	size_t.
+
+2002-05-03  Christopher January <chris@atomice.net>
+
+	* fhandler_proc.cc (proc_listing): Add '.' and '..' to directory
+	listing.
+	(fhandler_proc::open): Change use of mode to flags.  If the file does
+	not exist already, fail with EROFS if O_CREAT flag is set.  Change
+	EROFS error to EACCES error when writing to a file.  Use cmalloc to
+	allocate memory for filebuf.
+	(fhandler_proc::close): Use cfree to free filebuf.
+	(fhandler_proc::get_proc_fhandler): Properly detect attempts to access
+	unknown subdir.
+	* fhandler_process.cc (process_listing): Add '.' and '..' to directory
+	listing.
+	(fhandler_process::open): Use cmalloc to allocate memory for filebuf.
+	(fhandler_process::close): Use cfree to free filebuf.
+	* fhandler_registry.cc (registry_listing): Add .  and '..' to directory
+	listing.
+	(fhandler_registry::open): Move check for open for writing before
+	open_key.  Use cmalloc to allocate memory for filebuf.
+	(fhandler_registry::close): Use cfree to free filebuf.
+	(fhandler_registry::telldir): Use lower 16 bits of __d_position as
+	position in directory.
+	(fhandler_registry::seekdir): Ditto.
+	* fhandler_virtual.cc (fhandler_virtual::write): Change EROFS error to
+	EACCES error.
+	(fhandler_virtual::open): Set the NOHANDLE flag.
+	(fhandler_virtual::dup): Add call to fhandler_base::dup.  Allocate
+	child's filebuf using cmalloc.  Copy filebuf from parent to child.
+	(fhandler_virtual::close): Use cfree to free filebuf.
+	(fhandler_virtual::~fhandler_virtual): Ditto.
+	(from Chris Faylor <cgf@redhat.com>).
+	(fhandler_registry::readdir): Add support for '.' and '..' files in
+	subdirectories of /proc/registry.
+	* path.cc (path_conv::check): Do not return ENOENT if a file is not
+	found in /proc.
+
 2002-05-02  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_proc.cc (fhandler_proc::fstat): Use fhandler name rather
@@ -65,15 +106,15 @@
 	fhandler_process.
 	* fhandler_registry.cc: New file.  Add implementation for
 	fhandler_registry.
-	* path.cc: Add isproc and isvirtual_dev macros.
+	* path.cc (isproc): New macro.
+	(isvirtual_dev): Ditto.
 	* path.cc (path_conv::check): Add check for virtual devices.
 	* path.cc (mount_info::conv_to_win32_path): Convert paths in /proc to
 	empty Win32 paths.
 	* path.cc (chdir): Replace check for FH_CYGDRIVE with more generic
 	isvirtual_dev macro.  Force setting of posix path for virtual
 	fhandlers.
-	* path.h: Add externally visible path_prefix_p and
-	normalized_posix_path prototypes.
+	* path.h (path_prefix_p): Declare.
 
 
 Wed May  1 16:06:02 2002  Jason Tishler <jason@tishler.net>

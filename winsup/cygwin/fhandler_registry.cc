@@ -20,6 +20,8 @@ details. */
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"
+#include "dtable.h"
+#include "cygheap.h"
 #include <assert.h>
 
 #define _COMPILING_NEWLIB
@@ -32,12 +34,16 @@ static const int registry_len = sizeof ("registry") - 1;
  * make up the value index if we are enuerating values.
  */
 static const __off32_t REG_ENUM_VALUES_MASK = 0x8000000;
+static const __off32_t REG_POSITION_MASK    = 0xffff;
 
 /* List of root keys in /proc/registry.
  * Possibly we should filter out those not relevant to the flavour of Windows
  * Cygwin is running on.
  */
-static const char *registry_listing[] = {
+static const char *registry_listing[] =
+{
+  ".",
+  "..",
   "HKEY_CLASSES_ROOT",
   "HKEY_CURRENT_CONFIG",
   "HKEY_CURRENT_USER",
@@ -48,7 +54,10 @@ static const char *registry_listing[] = {
   NULL
 };
 
-static const HKEY registry_keys[] = {
+static const HKEY registry_keys[] =
+{
+  (HKEY) INVALID_HANDLE_VALUE,
+  (HKEY) INVALID_HANDLE_VALUE,
   HKEY_CLASSES_ROOT,
   HKEY_CURRENT_CONFIG,
   HKEY_CURRENT_USER,
@@ -59,6 +68,19 @@ static const HKEY registry_keys[] = {
 };
 
 static const int ROOT_KEY_COUNT = sizeof(registry_keys) / sizeof(HKEY);
+
+/* These get added to each subdirectory in /proc/registry.
+ * If we wanted to implement writing, we could maybe add a '.writable' entry or
+ * suchlike.
+ */
+static const char *special_dot_files[] =
+{
+  ".",
+  "..",
+  NULL
+};
+
+static const int SPECIAL_DOT_FILE_COUNT = (sizeof(special_dot_files) / sizeof(const char *)) - 1;
 
 /* Name given to default values */
 static const char *DEFAULT_VALUE_NAME = "@";
@@ -213,6 +235,12 @@ fhandler_registry::readdir (DIR * dir)
     }
   if (dir->__d_u.__d_data.__handle == INVALID_HANDLE_VALUE)
     goto out;
+  if (dir->__d_position < SPECIAL_DOT_FILE_COUNT)
+    {
+      strcpy (dir->__d_dirent->d_name, special_dot_files[dir->__d_position++]);
+      res = dir->__d_dirent;
+      goto out;
+    }
 retry:
   if (dir->__d_position & REG_ENUM_VALUES_MASK)
     /* For the moment, the type of key is ignored here. when write access is added,
@@ -223,8 +251,8 @@ retry:
                           buf, &buf_size, NULL, NULL, NULL, NULL);
   else
     error =
-      RegEnumKeyEx ((HKEY) dir->__d_u.__d_data.__handle, dir->__d_position,
-                    buf, &buf_size, NULL, NULL, NULL, NULL);
+      RegEnumKeyEx ((HKEY) dir->__d_u.__d_data.__handle, dir->__d_position -
+                    SPECIAL_DOT_FILE_COUNT, buf, &buf_size, NULL, NULL, NULL, NULL);
   if (error == ERROR_NO_MORE_ITEMS
       && (dir->__d_position & REG_ENUM_VALUES_MASK) == 0)
     {
@@ -260,7 +288,7 @@ out:
 __off64_t
 fhandler_registry::telldir (DIR * dir)
 {
-  return dir->__d_position & REG_ENUM_VALUES_MASK;
+  return dir->__d_position & REG_POSITION_MASK;
 }
 
 void
@@ -270,7 +298,7 @@ fhandler_registry::seekdir (DIR * dir, __off32_t loc)
    * values.
    */
   rewinddir (dir);
-  while (loc > dir->__d_position)
+  while (loc > (dir->__d_position & REG_POSITION_MASK))
     if (!readdir (dir))
       break;
 }
@@ -318,13 +346,13 @@ fhandler_registry::open (path_conv *pc, int flags, mode_t mode)
   path = get_name () + proc_len + 1 + registry_len;
   if (!*path)
     {
-      if ((mode & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
+      if ((flags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
         {
           set_errno (EEXIST);
           res = 0;
           goto out;
         }
-      else if (mode & O_WRONLY)
+      else if (flags & O_WRONLY)
         {
           set_errno (EISDIR);
           res = 0;
@@ -351,13 +379,13 @@ fhandler_registry::open (path_conv *pc, int flags, mode_t mode)
         if (path_prefix_p
             (registry_listing[i], path, strlen (registry_listing[i])))
           {
-            if ((mode & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
+            if ((flags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
               {
                 set_errno (EEXIST);
                 res = 0;
                 goto out;
               }
-            else if (mode & O_WRONLY)
+            else if (flags & O_WRONLY)
               {
                 set_errno (EISDIR);
                 res = 0;
@@ -370,7 +398,7 @@ fhandler_registry::open (path_conv *pc, int flags, mode_t mode)
               }
           }
 
-      if ((mode & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
+      if (flags & O_CREAT)
         {
           set_errno (EROFS);
           res = 0;
@@ -384,15 +412,16 @@ fhandler_registry::open (path_conv *pc, int flags, mode_t mode)
         }
     }
 
-  hKey = open_key (path, KEY_READ, true);
-  if (hKey == (HKEY) INVALID_HANDLE_VALUE)
+  if (flags & O_WRONLY)
     {
+      set_errno (EROFS);
       res = 0;
       goto out;
     }
-  if (mode & O_WRONLY)
+
+  hKey = open_key (path, KEY_READ, true);
+  if (hKey == (HKEY) INVALID_HANDLE_VALUE)
     {
-      set_errno (EROFS);
       res = 0;
       goto out;
     }
@@ -409,7 +438,7 @@ fhandler_registry::open (path_conv *pc, int flags, mode_t mode)
           goto out;
         }
       bufalloc = size;
-      filebuf = new char[bufalloc];
+      filebuf = (char *) cmalloc (HEAP_BUF, bufalloc);
       error =
         RegQueryValueEx (hKey, file, NULL, NULL, (BYTE *) filebuf, &size);
       if (error != ERROR_SUCCESS)
@@ -428,8 +457,8 @@ fhandler_registry::open (path_conv *pc, int flags, mode_t mode)
           bufalloc += 1000;
           if (filebuf)
             {
-              delete filebuf;
-              filebuf = new char[bufalloc];
+              cfree (filebuf);
+              filebuf = (char *) cmalloc (HEAP_BUF, bufalloc);
             }
           error =
             RegQueryValueEx (hKey, file, NULL, &type, (BYTE *) filebuf,

@@ -19,8 +19,8 @@ details. */
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
-#include "cygheap.h"
 #include "shared_info.h"
+#include "cygheap.h"
 #include <assert.h>
 
 #define _COMPILING_NEWLIB
@@ -34,7 +34,7 @@ fhandler_virtual::fhandler_virtual (DWORD devtype):
 fhandler_virtual::~fhandler_virtual ()
 {
   if (filebuf)
-    delete filebuf;
+    cfree (filebuf);
   filebuf = NULL;
 }
 
@@ -132,18 +132,25 @@ fhandler_virtual::lseek (__off32_t offset, int whence)
 int
 fhandler_virtual::dup (fhandler_base * child)
 {
-  fhandler_virtual *fhproc_child = (fhandler_virtual *) child;
-  fhproc_child->filebuf = new char[filesize];
-  fhproc_child->bufalloc = fhproc_child->filesize = filesize;
-  fhproc_child->position = position;
-  return 0;
+  int ret = fhandler_base::dup (child);
+
+  if (!ret)
+    {
+      fhandler_virtual *fhproc_child = (fhandler_virtual *) child;
+      fhproc_child->filebuf = (char *) cmalloc (HEAP_BUF, filesize);
+      fhproc_child->bufalloc = fhproc_child->filesize = filesize;
+      fhproc_child->position = position;
+      memcpy (fhproc_child->filebuf, filebuf, filesize);
+      fhproc_child->set_flags (get_flags ());
+    }
+  return ret;
 }
 
 int
 fhandler_virtual::close ()
 {
   if (filebuf)
-    delete[]filebuf;
+    cfree (filebuf);
   filebuf = NULL;
   bufalloc = -1;
   cygwin_shared->delqueue.process_queue ();
@@ -176,7 +183,7 @@ fhandler_virtual::read (void *ptr, size_t len)
 int
 fhandler_virtual::write (const void *ptr, size_t len)
 {
-  set_errno (EROFS);
+  set_errno (EACCES);
   return -1;
 }
 
@@ -196,6 +203,8 @@ fhandler_virtual::open (path_conv *, int flags, mode_t mode)
   set_socket_p (false);
 
   set_flags (flags);
+
+  set_nohandle (true);
 
   return 1;
 }

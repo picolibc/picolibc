@@ -21,23 +21,27 @@ details. */
 #include "pinfo.h"
 #include "path.h"
 #include "shared_info.h"
+#include "dtable.h"
+#include "cygheap.h"
 #include <assert.h>
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>
 
-static const int PROCESS_PPID = 0;
-static const int PROCESS_EXENAME = 1;
-static const int PROCESS_WINPID = 2;
-static const int PROCESS_WINEXENAME = 3;
-static const int PROCESS_STATUS = 4;
-static const int PROCESS_UID = 5;
-static const int PROCESS_GID = 6;
-static const int PROCESS_PGID = 7;
-static const int PROCESS_SID = 8;
-static const int PROCESS_CTTY = 9;
+static const int PROCESS_PPID = 2;
+static const int PROCESS_EXENAME = 3;
+static const int PROCESS_WINPID = 4;
+static const int PROCESS_WINEXENAME = 5;
+static const int PROCESS_STATUS = 6;
+static const int PROCESS_UID = 7;
+static const int PROCESS_GID = 8;
+static const int PROCESS_PGID = 9;
+static const int PROCESS_SID = 10;
+static const int PROCESS_CTTY = 11;
 
 static const char *process_listing[] = {
+  ".",
+  "..",
   "ppid",
   "exename",
   "winpid",
@@ -133,13 +137,13 @@ fhandler_process::open (path_conv *pc, int flags, mode_t mode)
 
   if (*path == 0)
     {
-      if ((mode & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
+      if ((flags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
         {
           set_errno (EEXIST);
           res = 0;
           goto out;
         }
-      else if (mode & O_WRONLY)
+      else if (flags & O_WRONLY)
         {
           set_errno (EISDIR);
           res = 0;
@@ -161,7 +165,7 @@ fhandler_process::open (path_conv *pc, int flags, mode_t mode)
     }
   if (process_file_no == -1)
     {
-      if ((mode & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
+      if (flags & O_CREAT)
         {
           set_errno (EROFS);
           res = 0;
@@ -174,7 +178,7 @@ fhandler_process::open (path_conv *pc, int flags, mode_t mode)
           goto out;
         }
     }
-  if (mode & O_WRONLY)
+  if (flags & O_WRONLY)
     {
       set_errno (EROFS);
       res = 0;
@@ -203,7 +207,7 @@ found:
     case PROCESS_CTTY:
     case PROCESS_PPID:
       {
-        filebuf = new char[bufalloc = 40];
+        filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 40);
         int num;
         switch (process_file_no)
           {
@@ -230,7 +234,7 @@ found:
       }
     case PROCESS_EXENAME:
       {
-        filebuf = new char[bufalloc = MAX_PATH];
+        filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = MAX_PATH);
         if (p->process_state & (PID_ZOMBIE | PID_EXITED))
           strcpy (filebuf, "<defunct>");
         else
@@ -249,7 +253,7 @@ found:
       }
     case PROCESS_WINPID:
       {
-        filebuf = new char[bufalloc = 40];
+        filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 40);
         __small_sprintf (filebuf, "%d\n", p->dwProcessId);
         filesize = strlen (filebuf);
         break;
@@ -257,7 +261,7 @@ found:
     case PROCESS_WINEXENAME:
       {
         int len = strlen (p->progname);
-        filebuf = new char[len + 2];
+        filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = (len + 2));
         strcpy (filebuf, p->progname);
         filebuf[len] = '\n';
         filesize = len + 1;
@@ -265,7 +269,7 @@ found:
       }
     case PROCESS_STATUS:
       {
-        filebuf = new char[bufalloc = 3];
+        filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 3);
         filebuf[0] = ' ';
         filebuf[1] = '\n';
         filebuf[2] = 0;

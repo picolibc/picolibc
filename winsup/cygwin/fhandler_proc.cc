@@ -20,6 +20,8 @@ details. */
 #include "path.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "dtable.h"
+#include "cygheap.h"
 #include <assert.h>
 #include <sys/utsname.h>
 
@@ -27,12 +29,14 @@ details. */
 #include <dirent.h>
 
 /* offsets in proc_listing */
-static const int PROC_REGISTRY = 0;     // /proc/registry
-static const int PROC_VERSION = 1;      // /proc/version
-static const int PROC_UPTIME = 2;       // /proc/uptime
+static const int PROC_REGISTRY = 2;     // /proc/registry
+static const int PROC_VERSION  = 3;     // /proc/version
+static const int PROC_UPTIME   = 4;     // /proc/uptime
 
 /* names of objects in /proc */
 static const char *proc_listing[] = {
+  ".",
+  "..",
   "registry",
   "version",
   "uptime",
@@ -45,6 +49,8 @@ static const int PROC_LINK_COUNT = (sizeof(proc_listing) / sizeof(const char *))
  * fhandler_proc.
  */
 static const DWORD proc_fhandlers[] = {
+  FH_PROC,
+  FH_PROC,
   FH_REGISTRY,
   FH_PROC,
   FH_PROC
@@ -92,7 +98,22 @@ fhandler_proc::get_proc_fhandler (const char *path)
       if (p->pid == pid)
         return FH_PROCESS;
     }
-  return FH_BAD;
+
+    bool has_subdir = false;
+    while (*path)
+      if (SLASH_P (*path++))
+	{
+	  has_subdir = true;
+	  break;
+	}
+
+    if (has_subdir)
+      /* The user is trying to access a non-existent subdirectory of /proc. */
+      return FH_BAD;
+    else
+      /* Return FH_PROC so that we can return EROFS if the user is trying to create
+	 a file. */
+      return FH_PROC;
 }
 
 /* Returns 0 if path doesn't exist, >0 if path is a directory,
@@ -203,13 +224,13 @@ fhandler_proc::open (path_conv *pc, int flags, mode_t mode)
 
   if (!*path)
     {
-      if ((mode & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
+      if ((flags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
         {
           set_errno (EEXIST);
           res = 0;
           goto out;
         }
-      else if (mode & O_WRONLY)
+      else if (flags & O_WRONLY)
         {
           set_errno (EISDIR);
           res = 0;
@@ -229,13 +250,13 @@ fhandler_proc::open (path_conv *pc, int flags, mode_t mode)
         proc_file_no = i;
         if (proc_fhandlers[i] != FH_PROC)
           {
-            if ((mode & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
+            if ((flags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
               {
                 set_errno (EEXIST);
                 res = 0;
                 goto out;
               }
-            else if (mode & O_WRONLY)
+            else if (flags & O_WRONLY)
               {
                 set_errno (EISDIR);
                 res = 0;
@@ -251,7 +272,7 @@ fhandler_proc::open (path_conv *pc, int flags, mode_t mode)
 
   if (proc_file_no == -1)
     {
-      if ((mode & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
+      if (flags & O_CREAT)
         {
           set_errno (EROFS);
           res = 0;
@@ -264,7 +285,7 @@ fhandler_proc::open (path_conv *pc, int flags, mode_t mode)
           goto out;
         }
     }
-  if (mode & O_WRONLY)
+  if (flags & O_WRONLY)
     {
       set_errno (EROFS);
       res = 0;
@@ -278,7 +299,7 @@ fhandler_proc::open (path_conv *pc, int flags, mode_t mode)
         uname (&uts_name);
         filesize = bufalloc = strlen (uts_name.sysname) + 1 +
           strlen (uts_name.release) + 1 + strlen (uts_name.version) + 2;
-        filebuf = new char[bufalloc];
+        filebuf = (char *) cmalloc (HEAP_BUF, bufalloc);
         __small_sprintf (filebuf, "%s %s %s\n", uts_name.sysname,
                          uts_name.release, uts_name.version);
         break;
@@ -290,7 +311,7 @@ fhandler_proc::open (path_conv *pc, int flags, mode_t mode)
          * NT only dependancies.
          */
         DWORD ticks = GetTickCount ();
-        filebuf = new char[bufalloc = 40];
+        filebuf = (char *) cmalloc (HEAP_BUF, bufalloc = 40);
         __small_sprintf (filebuf, "%d.%02d\n", ticks / 1000,
                          (ticks / 10) % 100);
         filesize = strlen (filebuf);

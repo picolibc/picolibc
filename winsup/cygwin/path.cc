@@ -525,13 +525,11 @@ path_conv::check (const char *src, unsigned opt,
               int file_type = fh->exists (path_copy);
               switch (file_type)
                 {
-                  case 0:
-                    error = ENOENT;
-		    break;
                   case 1:
                   case 2:
                     fileattr = FILE_ATTRIBUTE_DIRECTORY;
 		    break;
+                  default:
                   case -1:
                     fileattr = 0;
                 }
