@@ -1,8 +1,6 @@
 2003-09-09  Christopher Faylor  <cgf@redhat.com>
 
-	* exceptions.cc (sig_handle_tty_stop): Check parent PID_NOCLDSTOP
-	rather than erroneously checking *my own* sigtodo.
-	(set_process_mask): Remove pending_signals setting.
+	* exceptions.cc (set_process_mask): Remove pending_signals setting.
 	(sig_handle): Per SUSv3 allow any SIGCONT to clear stopped signals and
 	continue execution.  Accept a mask argument.
 	* pinfo.h: Remove signal enums.
