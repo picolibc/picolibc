@@ -26,8 +26,8 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include <errno.h>
 #include "local.h"
 
-int
-_fwalk (ptr, function)
+static int
+__fwalk (ptr, function)
      struct _reent *ptr;
      register int (*function) ();
 {
@@ -35,20 +35,36 @@ _fwalk (ptr, function)
   register int n, ret = 0;
   register struct _glue *g;
 
-  /* Must traverse given list for std streams.  */
-  if (ptr != _GLOBAL_REENT)
-    {
-      for (g = &ptr->__sglue; g != NULL; g = g->_next)
-        for (fp = g->_iobs, n = g->_niobs; --n >= 0; fp++)
-          if (fp->_flags != 0)
-	    ret |= (*function) (fp);
-    }
-
-  /* Must traverse global list for all other streams.  */
-  for (g = &_GLOBAL_REENT->__sglue; g != NULL; g = g->_next)
+  for (g = &ptr->__sglue; g != NULL; g = g->_next)
     for (fp = g->_iobs, n = g->_niobs; --n >= 0; fp++)
       if (fp->_flags != 0)
-	ret |= (*function) (fp);
+        {
+          _flockfile (fp);
+          if (fp->_flags != 0 && fp->_file != -1)
+            ret |= (*function) (fp);
+          _funlockfile (fp);
+        }
+
+  return ret;
+}
+
+int
+_fwalk (ptr, function)
+     struct _reent *ptr;
+     register int (*function) ();
+{
+  register int ret = 0;
+
+  __sfp_lock_acquire ();
+
+  /* Must traverse given list for std streams.  */
+  if (ptr != _GLOBAL_REENT)
+    ret |= __fwalk (ptr, function);
+
+  /* Must traverse global list for all other streams.  */
+  ret |= __fwalk (_GLOBAL_REENT, function);
+
+  __sfp_lock_release ();
 
   return ret;
 }

@@ -25,10 +25,6 @@
 #include <sys/lock.h>
 #include "local.h"
 
-#ifndef __SINGLE_THREAD__
-__LOCK_INIT(static, __sfp_lock);
-#endif
-
 static void
 std (ptr, flags, file, data)
      FILE *ptr;
@@ -49,8 +45,12 @@ std (ptr, flags, file, data)
   ptr->_write = __swrite;
   ptr->_seek = __sseek;
   ptr->_close = __sclose;
-#ifndef __SINGLE_THREAD__
+#if !defined(__SINGLE_THREAD__) && !defined(_REENT_SMALL)
   __lock_init_recursive (*(_LOCK_RECURSIVE_T *)&ptr->_lock);
+  /*
+   * #else
+   * lock is already initialized in __sfp
+   */
 #endif
 
 #ifdef __SCLE
@@ -90,9 +90,7 @@ __sfp (d)
   int n;
   struct _glue *g;
 
-#ifndef __SINGLE_THREAD__
-  __lock_acquire(__sfp_lock); 
-#endif
+  __sfp_lock_acquire (); 
 
   if (!_GLOBAL_REENT->__sdidinit)
     __sinit (_GLOBAL_REENT);
@@ -105,24 +103,24 @@ __sfp (d)
 	  (g->_next = __sfmoreglue (d, NDYNAMIC)) == NULL)
 	break;
     }
-#ifndef __SINGLE_THREAD__
-  __lock_release(__sfp_lock); 
-#endif
+  __sfp_lock_release (); 
   d->_errno = ENOMEM;
   return NULL;
 
 found:
+  fp->_file = -1;		/* no file */
   fp->_flags = 1;		/* reserve this slot; caller sets real flags */
 #ifndef __SINGLE_THREAD__
-  __lock_release(__sfp_lock); 
+  __lock_init_recursive (*(_LOCK_RECURSIVE_T *)&fp->_lock);
 #endif
+  __sfp_lock_release (); 
+
   fp->_p = NULL;		/* no current pointer */
   fp->_w = 0;			/* nothing to read or write */
   fp->_r = 0;
   fp->_bf._base = NULL;		/* no buffer */
   fp->_bf._size = 0;
   fp->_lbfsize = 0;		/* not line buffered */
-  fp->_file = -1;		/* no file */
   /* fp->_cookie = <any>; */	/* caller sets cookie, _read/_write etc */
   fp->_ub._base = NULL;		/* no ungetc buffer */
   fp->_ub._size = 0;
@@ -197,6 +195,20 @@ __sinit (s)
 
 #ifndef __SINGLE_THREAD__
 
+__LOCK_INIT_RECURSIVE(static, __sfp_lock);
+
+void
+__sfp_lock_acquire ()
+{
+  __lock_acquire(__sfp_lock); 
+}
+
+void
+__sfp_lock_release ()
+{
+  __lock_release(__sfp_lock); 
+}
+
 /* Walkable file locking routine.  */
 static int
 __fp_lock (ptr)
@@ -220,8 +232,6 @@ __fp_unlock (ptr)
 void
 __fp_lock_all ()
 {
-  __lock_acquire(__sfp_lock); 
-
   (void) _fwalk (_REENT, __fp_lock);
 }
 
@@ -229,7 +239,5 @@ void
 __fp_unlock_all ()
 {
   (void) _fwalk (_REENT, __fp_unlock);
-
-  __lock_release(__sfp_lock); 
 }
 #endif

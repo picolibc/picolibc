@@ -76,6 +76,9 @@ _DEFUN (_fdopen_r, (ptr, fd, mode),
 
   if ((fp = __sfp (ptr)) == 0)
     return 0;
+
+  _flockfile(fp);
+
   fp->_flags = flags;
   /*
    * If opened for appending, but underlying descriptor
@@ -111,6 +114,7 @@ _DEFUN (_fdopen_r, (ptr, fd, mode),
     fp->_flags |= __SCLE;
 #endif
 
+  _funlockfile(fp);
   return fp;
 }
 

@@ -87,3 +87,11 @@ char *_EXFUN(_llicvt,(char *, long long, char));
 #define CVT_BUF_SIZE 128
 
 #define	NDYNAMIC 4	/* add four more whenever necessary */
+
+#ifdef __SINGLE_THREAD__
+#define __sfp_lock_acquire()
+#define __sfp_lock_release()
+#else
+void _EXFUN(__sfp_lock_acquire,(void));
+void _EXFUN(__sfp_lock_release,(void));
+#endif

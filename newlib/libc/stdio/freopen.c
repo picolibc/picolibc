@@ -87,14 +87,17 @@ _DEFUN (_freopen_r, (ptr, file, mode, fp),
   register int f;
   int flags, oflags, e;
 
+  __sfp_lock_acquire ();
+
   _flockfile(fp);
 
   CHECK_INIT (fp);
 
   if ((flags = __sflags (ptr, mode, &oflags)) == 0)
     {
-      (void) fclose (fp);
       _funlockfile(fp);
+      (void) fclose (fp);
+      __sfp_lock_release ();
       return NULL;
     }
 
@@ -148,12 +151,13 @@ _DEFUN (_freopen_r, (ptr, file, mode, fp),
 
   if (f < 0)
     {				/* did not get it after all */
+      fp->_flags = 0;		/* set it free */
       ptr->_errno = e;		/* restore in case _close clobbered */
       _funlockfile(fp);
 #ifndef __SINGLE_THREAD__
       __lock_close_recursive (*(_LOCK_RECURSIVE_T *)&fp->_lock);
 #endif
-      fp->_flags = 0;		/* set it free */
+      __sfp_lock_release ();
       return NULL;
     }
 
@@ -171,6 +175,7 @@ _DEFUN (_freopen_r, (ptr, file, mode, fp),
 #endif
 
   _funlockfile(fp);
+  __sfp_lock_release ();
   return fp;
 }
 

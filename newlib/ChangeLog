@@ -1,3 +1,39 @@
+2004-03-25  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* libc/stdio/fclose.c (fclose): Protect file pointer list when
+	releasing a file.
+	 * libc/stdio/fcloseall.c (_fcloseall_r): Close all files via
+	fwalk.
+	* libc/stdio/fdopen.c (_fdopen_r): Add calls to
+	_flockfile/_funlockfile.
+	* libc/stdio/findfp.c: Move __sfp_lock. Change __sfp_lock type
+	to recursive.
+	Change __lock_acquire/__lock_release calls for __sfp_lock to
+	__sfp_lock_acquire/__sfp_lock_release throughout.
+	(std): Make sure that file lock is only initialized once.
+	(__sfp): Move _file initialization. Initialize file lock.
+	(__sfp_lock_acquire): New function.
+	(__sfp_lock_release): Ditto.
+	(__fp_lock_all): Remove __sfp_lock_acquire call.
+	(__fp_unlock_all): Remove __sfp_lock_release call.
+	* libc/stdio/fopen.c (_fopen_r): Protect file pointer list.
+	Add calls to _flockfile/_funlockfile. Remove
+	__lock_init_recursive call.
+	* libc/stdio/freopen.c (_freopen_r): Protect file pointer list.
+	* libc/stdio/fwalk.c (__fwalk): New static function.
+	(_fwalk): Protect file pointer list. Use __fwalk to walk through
+	file pointers.
+	* libc/stdio/local.h: Add defines for
+	__sfp_lock_acquire/__sfp_lock_release when
+	single threaded. Add function prototypes otherwise.
+	* libc/stdio64/fdopen64.c (_fdopen64_r): Add calls to
+	_flockfile/_funlockfile.
+	* libc/stdio/fopen64.c (_fopen64_r): Protect file pointer list.
+	Add calls to _flockfile/_funlockfile. Remove
+	 __lock_init_recursive call.
+	* libc/stdio/freopen64.c (_freopen64_r): Protect file pointer
+	list. 
+
 2004-03-25  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/linux/sys/lock.h: Turn on __USE_GNU flag if not already

@@ -138,9 +138,16 @@ _DEFUN (_fopen_r, (ptr, file, mode),
 
   if ((f = _open_r (ptr, file, oflags, 0666)) < 0)
     {
+      __sfp_lock_acquire (); 
       fp->_flags = 0;		/* release */
+#ifndef __SINGLE_THREAD__
+      __lock_close_recursive (*(_LOCK_RECURSIVE_T *)&fp->_lock);
+#endif
+      __sfp_lock_release (); 
       return NULL;
     }
+
+  _flockfile(fp);
 
   fp->_file = f;
   fp->_flags = flags;
@@ -158,10 +165,7 @@ _DEFUN (_fopen_r, (ptr, file, mode),
     fp->_flags |= __SCLE;
 #endif
 
-#ifndef __SINGLE_THREAD__
-  __lock_init_recursive (*(_LOCK_RECURSIVE_T *)&fp->_lock);
-#endif
-
+  _funlockfile(fp);
   return fp;
 }
 

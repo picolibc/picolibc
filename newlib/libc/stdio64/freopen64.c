@@ -70,6 +70,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <stdio.h>
 #include <fcntl.h>
 #include <stdlib.h>
+#include <sys/lock.h>
 #include "local64.h"
 
 /*
@@ -88,14 +89,17 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
   register int f;
   int flags, oflags, e;
 
+  __sfp_lock_acquire ();
+
   _flockfile(fp);
 
   CHECK_INIT (fp);
 
   if ((flags = __sflags (ptr, mode, &oflags)) == 0)
     {
-      (void) fclose (fp);
       _funlockfile(fp);
+      (void) fclose (fp);
+      __sfp_lock_release ();
       return NULL;
     }
 
@@ -152,6 +156,10 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
       fp->_flags = 0;		/* set it free */
       ptr->_errno = e;		/* restore in case _close clobbered */
       _funlockfile(fp);
+#ifndef __SINGLE_THREAD__
+      __lock_close_recursive (*(_LOCK_RECURSIVE_T *)&fp->_lock);
+#endif
+      __sfp_lock_release ();
       return NULL;
     }
 
@@ -172,6 +180,7 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
   fp->_flags |= __SL64;
 
   _funlockfile(fp);
+  __sfp_lock_release ();
   return fp;
 }
 

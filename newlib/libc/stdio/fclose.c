@@ -65,6 +65,8 @@ _DEFUN (fclose, (fp),
   if (fp == NULL)
     return (0);			/* on NULL */
 
+  __sfp_lock_acquire ();
+
   _flockfile(fp);
   
   CHECK_INIT (fp);
@@ -72,6 +74,7 @@ _DEFUN (fclose, (fp),
   if (fp->_flags == 0)		/* not open! */
     {
       _funlockfile(fp);
+      __sfp_lock_release ();
       return (0);
     }
   r = fp->_flags & __SWR ? fflush (fp) : 0;
@@ -83,11 +86,13 @@ _DEFUN (fclose, (fp),
     FREEUB (fp);
   if (HASLB (fp))
     FREELB (fp);
+  fp->_flags = 0;		/* release this FILE for reuse */
   _funlockfile(fp);
 #ifndef __SINGLE_THREAD__
   __lock_close_recursive (*(_LOCK_RECURSIVE_T *)&fp->_lock);
 #endif
-  fp->_flags = 0;		/* release this FILE for reuse */
+
+  __sfp_lock_release ();
 
   return (r);
 }

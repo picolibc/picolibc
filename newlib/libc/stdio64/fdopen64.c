@@ -63,6 +63,9 @@ _DEFUN (_fdopen64_r, (ptr, fd, mode),
 
   if ((fp = __sfp (ptr)) == 0)
     return 0;
+
+  _flockfile(fp);
+
   fp->_flags = flags;
   /*
    * If opened for appending, but underlying descriptor
@@ -99,12 +102,9 @@ _DEFUN (_fdopen64_r, (ptr, fd, mode),
     fp->_flags |= __SCLE;
 #endif
 
-#ifndef __SINGLE_THREAD__
-  __lock_init_recursive (*(_LOCK_RECURSIVE_T *)&fp->_lock);
-#endif
-
   fp->_flags |= __SL64;
 
+  _funlockfile(fp);
   return fp;
 }
 
