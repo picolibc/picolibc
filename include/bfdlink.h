@@ -556,7 +556,7 @@ struct bfd_link_order
 	  /* Section to include.  If this is used, then
 	     section->output_section must be the section the
 	     link_order is attached to, section->output_offset must
-	     equal the link_order offset field, and section->_raw_size
+	     equal the link_order offset field, and section->size
 	     must equal the link_order size field.  Maybe these
 	     restrictions should be relaxed someday.  */
 	  asection *section;
