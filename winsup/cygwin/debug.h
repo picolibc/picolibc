@@ -43,6 +43,8 @@ int __stdcall iscygthread ();
 # define ProtectHandle1(h,n) do {} while (0)
 # define ProtectHandle2(h,n) do {} while (0)
 # define debug_init() do {} while (0)
+# define MarkCLosed(h) do {} while (0)
+# define debug_mark_closed(func, ln, h, name, force) (1)
 
 #else
 
@@ -57,6 +59,8 @@ int __stdcall iscygthread ();
 	close_handle (__PRETTY_FUNCTION__, __LINE__, (h), #n, TRUE)
 #   define ForceCloseHandle2(h,n) \
 	close_handle (__PRETTY_FUNCTION__, __LINE__, (h), n, TRUE)
+#   define MarkClosed(h) \
+	debug_mark_closed (__PRETTY_FUNCTION__, __LINE__, (h), #h, TRUE)
 #   define lock_pinfo_for_update(n) lpfu(__PRETTY_FUNCTION__, __LINE__, n)
 # endif
 
@@ -70,6 +74,8 @@ BOOL __stdcall close_handle (const char *, int, HANDLE, const char *, BOOL);
 int __stdcall lpfu (const char *, int, DWORD timeout);
 void __stdcall cygbench (const char *s);
 extern int pinger;
+extern "C" void console_printf (const char *fmt,...);
+bool debug_mark_closed (const char *, int, HANDLE, const char *, BOOL);
 
 #endif /*DEBUGGING*/
 #endif /*_DEBUG_H_*/

@@ -876,7 +876,7 @@ _dll_crt0 ()
   char buf[80];
   if (GetEnvironmentVariable ("CYGWIN_SLEEP", buf, sizeof (buf)))
     {
-      small_printf ("Sleeping %d, pid %u\n", atoi (buf), GetCurrentProcessId ());
+      console_printf ("Sleeping %d, pid %u\n", atoi (buf), GetCurrentProcessId ());
       Sleep (atoi (buf));
     }
 #endif

@@ -1,3 +1,14 @@
+Wed Aug 22 13:41:09 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* smallprint.c (console_printf): New function.
+	* dcrt0.cc (dll_crt0_1): Use console_printf for debugging output.
+	* debug.cc (debug_mark_closed): New function.
+	(close_handle): Use debug_mark_closed.
+	* debug.h: Declare new functions.
+	* dtable.cc (dtable::build_fhandler): Remove unneeded extern.
+	* spawn.cc: Cosmetic changes.
+	* winsup.h: Define NO_COPY for C files, too.  Declare a global.
+
 Wed Aug 22 17:31:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* net.cc (free_char_list): New static function.

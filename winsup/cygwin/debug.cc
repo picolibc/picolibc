@@ -275,15 +275,11 @@ out:
   unlock_debug ();
 }
 
-/* Close a known handle.  Complain if !force and closing a known handle or
-   if the name of the handle being closed does not match the registered name. */
-BOOL __stdcall
-close_handle (const char *func, int ln, HANDLE h, const char *name, BOOL force)
+bool __stdcall
+debug_mark_closed (const char *func, int ln, HANDLE h, const char *name, BOOL force)
 {
-  BOOL ret;
   handle_list *hl;
   lock_debug ();
-
   if ((hl = find_handle (h)) && !force)
     {
       hl = hl->next;
@@ -301,7 +297,7 @@ close_handle (const char *func, int ln, HANDLE h, const char *name, BOOL force)
 		     hln->func, hln->ln, hln->name, hln->h);
       system_printf (" by %s:%d(%s<%p>)", func, ln, name, h);
     }
-  ret = CloseHandle (h);
+
   if (hl)
     {
       handle_list *hnuke = hl->next;
@@ -311,6 +307,23 @@ close_handle (const char *func, int ln, HANDLE h, const char *name, BOOL force)
       else
 	memset (hnuke, 0, sizeof (*hnuke));
     }
+
+  unlock_debug ();
+  return TRUE;
+}
+
+/* Close a known handle.  Complain if !force and closing a known handle or
+   if the name of the handle being closed does not match the registered name. */
+BOOL __stdcall
+close_handle (const char *func, int ln, HANDLE h, const char *name, BOOL force)
+{
+  BOOL ret;
+  lock_debug ();
+
+  if (!debug_mark_closed (func, ln, h, name, force))
+    return FALSE;
+
+  ret = CloseHandle (h);
 
   unlock_debug ();
 #if 0 /* Uncomment to see CloseHandle failures */

@@ -131,7 +131,7 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
     }
   while (*path && *++path);
 
-errout:
+ errout:
   /* Couldn't find anything in the given path.
      Take the appropriate action based on null_if_not_found. */
   if (null_if_notfound)
@@ -139,7 +139,7 @@ errout:
   else
     buf.check (name);
 
-out:
+ out:
   debug_printf ("%s = find_exec (%s)", (char *) buf, name);
   if (known_suffix)
     *known_suffix = suffix ?: strchr (buf, '\0');
@@ -175,7 +175,7 @@ iscmd (const char *argv0, const char *what)
 
 class linebuf
 {
-public:
+ public:
   size_t ix;
   char *buf;
   size_t alloced;
@@ -223,7 +223,7 @@ class av
 {
   char **argv;
   int calloced;
-public:
+ public:
   int argc;
   av (int ac, const char * const *av) : calloced (0), argc (ac)
   {
@@ -547,7 +547,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 			TRUE, DUPLICATE_SAME_ACCESS))
     ciresrv.moreinfo->myself_pinfo = NULL;
 
-skip_arg_parsing:
+ skip_arg_parsing:
   PROCESS_INFORMATION pi = {NULL, 0, 0, 0};
   si.lpReserved = NULL;
   si.lpDesktop = NULL;
@@ -861,8 +861,7 @@ skip_arg_parsing:
   return (int) res;
 }
 
-extern "C"
-int
+extern "C" int
 cwait (int *result, int pid, int)
 {
   return waitpid (pid, result, 0);
@@ -923,8 +922,7 @@ _spawnve (HANDLE hToken, int mode, const char *path, const char *const *argv,
  * Most of these based on (and copied from) newlib/libc/posix/execXX.c
  */
 
-extern "C"
-int
+extern "C" int
 spawnl (int mode, const char *path, const char *arg0, ...)
 {
   int i;
@@ -944,8 +942,7 @@ spawnl (int mode, const char *path, const char *arg0, ...)
   return _spawnve (NULL, mode, path, (char * const  *) argv, cur_environ ());
 }
 
-extern "C"
-int
+extern "C" int
 spawnle (int mode, const char *path, const char *arg0, ...)
 {
   int i;
@@ -968,8 +965,7 @@ spawnle (int mode, const char *path, const char *arg0, ...)
 		   (char * const *) envp);
 }
 
-extern "C"
-int
+extern "C" int
 spawnlp (int mode, const char *path, const char *arg0, ...)
 {
   int i;
@@ -989,8 +985,7 @@ spawnlp (int mode, const char *path, const char *arg0, ...)
   return spawnvpe (mode, path, (char * const *) argv, cur_environ ());
 }
 
-extern "C"
-int
+extern "C" int
 spawnlpe (int mode, const char *path, const char *arg0, ...)
 {
   int i;
@@ -1012,30 +1007,26 @@ spawnlpe (int mode, const char *path, const char *arg0, ...)
   return spawnvpe (mode, path, (char * const *) argv, envp);
 }
 
-extern "C"
-int
+extern "C" int
 spawnv (int mode, const char *path, const char * const *argv)
 {
   return _spawnve (NULL, mode, path, argv, cur_environ ());
 }
 
-extern "C"
-int
+extern "C" int
 spawnve (int mode, const char *path, char * const *argv,
 					     const char * const *envp)
 {
   return _spawnve (NULL, mode, path, argv, envp);
 }
 
-extern "C"
-int
+extern "C" int
 spawnvp (int mode, const char *path, const char * const *argv)
 {
   return spawnvpe (mode, path, argv, cur_environ ());
 }
 
-extern "C"
-int
+extern "C" int
 spawnvpe (int mode, const char *file, const char * const *argv,
 					     const char * const *envp)
 {

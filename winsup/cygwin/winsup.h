@@ -24,6 +24,8 @@ details. */
 # define memset __builtin_memset
 #endif
 
+#define NO_COPY __attribute__((section(".data_cygwin_nocopy")))
+
 #ifdef __cplusplus
 
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ >= 199900L
@@ -96,8 +98,6 @@ extern int dynamically_loaded;
 extern HANDLE title_mutex;
 
 /**************************** Convenience ******************************/
-
-#define NO_COPY __attribute__((section(".data_cygwin_nocopy")))
 
 /* Used when treating / and \ as equivalent. */
 #define SLASH_P(ch) \
@@ -203,6 +203,8 @@ int __stdcall __check_null_invalid_struct_errno (const void *s, unsigned sz) __a
 
 #define set_winsock_errno() __set_winsock_errno (__FUNCTION__, __LINE__)
 void __set_winsock_errno (const char *fn, int ln) __attribute__ ((regparm(2)));
+
+extern bool wsock_started;
 
 /* Printf type functions */
 extern "C" void __api_fatal (const char *, ...) __attribute__ ((noreturn));
