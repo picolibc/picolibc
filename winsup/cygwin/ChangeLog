@@ -1,3 +1,7 @@
+2002-06-13  Nicholas S. Wourms  <nwourms@netscape.net>
+
+	* winver.rc: Add more words to copyright.
+
 2002-06-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.cc (cygheap_user::set_name): Revert previous change.
