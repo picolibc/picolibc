@@ -1,3 +1,8 @@
+2001-02-16  Nick Clifton  <nickc@redhat.com>
+
+	* configure.in (noconfigdirs): Allow configuration of texinfo
+	for Cygwin hosts.
+
 2001-02-09  Martin Schwidefsky  <schwidefsky@de.ibm.com>
 
 	* config.guess: Add linux target for S/390.
