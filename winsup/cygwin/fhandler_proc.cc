@@ -135,8 +135,9 @@ fhandler_proc::get_proc_fhandler (const char *path)
  * <0 if path is a file.
  */
 int
-fhandler_proc::exists (const char *path)
+fhandler_proc::exists ()
 {
+  const char *path = get_name ();
   debug_printf ("exists (%s)", path);
   path += proc_len;
   if (*path == 0)

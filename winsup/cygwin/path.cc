@@ -520,7 +520,7 @@ path_conv::check (const char *src, unsigned opt,
 	      /* FIXME: Calling build_fhandler here is not the right way to handle this. */
               fhandler_virtual *fh =
                 (fhandler_virtual *) cygheap->fdtab.build_fhandler (-1, devn, path_copy, NULL, unit);
-              int file_type = fh->exists (path_copy);
+              int file_type = fh->exists ();
               switch (file_type)
                 {
                   case 1:
@@ -725,7 +725,10 @@ path_conv::check (const char *src, unsigned opt,
 
 out:
   if (opt & PC_POSIX)
-    normalized_path = cstrdup (path_copy);
+    {
+      normalized_path = cstrdup (path_copy);
+      debug_printf ("path_copy %s", path_copy);
+    }
   /* Deal with Windows stupidity which considers filename\. to be valid
      even when "filename" is not a directory. */
   if (!need_directory || error)

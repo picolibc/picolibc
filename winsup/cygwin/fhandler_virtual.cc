@@ -46,7 +46,7 @@ fhandler_virtual::opendir (path_conv& pc)
   DIR *res = NULL;
   size_t len;
 
-  if (exists (get_name ()) <= 0)
+  if (exists () <= 0)
     set_errno (ENOTDIR);
   else if ((len = strlen (get_name ())) > MAX_PATH - 3)
     set_errno (ENAMETOOLONG);
@@ -216,7 +216,7 @@ fhandler_virtual::open (path_conv *, int flags, mode_t mode)
 }
 
 int
-fhandler_virtual::exists (const char *path)
+fhandler_virtual::exists ()
 {
   return 0;
 }

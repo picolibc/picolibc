@@ -83,15 +83,7 @@ check_pty_fds (void)
 int
 dup (int fd)
 {
-  int res;
-  cygheap_fdnew newfd;
-
-  if (newfd < 0)
-    res = -1;
-  else
-    res = dup2 (fd, newfd);
-
-  return res;
+  return cygheap->fdtab.dup2 (fd, cygheap_fdnew ());
 }
 
 int

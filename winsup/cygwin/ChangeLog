@@ -1,3 +1,21 @@
+2002-05-22  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.h (fhandler_virtual::exists): Eliminate path argument.
+	(fhandler_proc::exists): Ditto.
+	(fhandler_registry::exists): Ditto.
+	(fhandler_process::exists): Ditto.
+	* fhandler_proc.cc (fhandler_proc::exists): Ditto.  Use built-in name.
+	* fhandler_process.cc (fhandler_process::exists): Ditto.
+	(fstat): Ditto.
+	* fhandler_registry.cc (fhandler_registry::exists): Ditto.
+	(fhandler_registry::fstat): Ditto.
+	* fhandler_virtual.cc (fhandler_virtual::opendir): Ditto.
+	* path.cc (path_conv::check): Ditto.  Add debugging.
+
+2002-05-22  Christopher Faylor  <cgf@redhat.com>
+
+	* syscalls.cc (dup): Always call dup2 for error handling.
+
 2002-05-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/types.h: Revert previous patch.
@@ -9,7 +27,7 @@
 
 2002-05-19  Pierre Humblet <pierre.humblet@ieee.org>
 
-        * security.cc (open_local_policy): Initialize lsa to
+	* security.cc (open_local_policy): Initialize lsa to
 	INVALID_HANDLE_VALUE instead of NULL.
 	(get_logon_server_and_user_domain): Test for INVALID_HANDLE_VALUE
 	instead of NULL.
@@ -70,7 +88,7 @@
 	* cygwin.din: Add strlcat and strlcpy.
 	* include/cygwin/version.h: Increment API minor version number.
 
-2002-05-09  Pierre Humblet <pierre.humblet@ieee.org>  
+2002-05-09  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* shared.cc (__sec_user): Split into sec_acl() and call orig_sid().
 	(sec_acl): Create from part of __sec_user(), except creator/owner.

@@ -74,8 +74,9 @@ static bool get_mem_values(DWORD dwProcessId, unsigned long *vmsize, unsigned lo
  * <0 if path is a file.
  */
 int
-fhandler_process::exists (const char *path)
+fhandler_process::exists ()
 {
+  const char *path = get_name ();
   debug_printf ("exists (%s)", path);
   path += proc_len + 1;
   while (*path != 0 && !SLASH_P (*path))
@@ -98,7 +99,7 @@ int
 fhandler_process::fstat (struct __stat64 *buf, path_conv *pc)
 {
   const char *path = get_name ();
-  int file_type = exists (path);
+  int file_type = exists ();
   (void) fhandler_base::fstat (buf, pc);
   path += proc_len + 1;
   int pid = atoi (path);

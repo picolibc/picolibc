@@ -1051,7 +1051,7 @@ class fhandler_virtual : public fhandler_base
   fhandler_virtual (DWORD devtype);
   virtual ~fhandler_virtual();
 
-  virtual int exists(const char *path);
+  virtual int exists();
   DIR *opendir (path_conv& pc);
   __off64_t telldir (DIR *);
   void seekdir (DIR *, __off64_t);
@@ -1072,7 +1072,7 @@ class fhandler_proc: public fhandler_virtual
  public:
   fhandler_proc ();
   fhandler_proc (DWORD devtype);
-  int exists(const char *path);
+  int exists();
   struct dirent *readdir (DIR *);
   static DWORD get_proc_fhandler(const char *path);
 
@@ -1085,7 +1085,7 @@ class fhandler_registry: public fhandler_proc
 {
  public:
   fhandler_registry ();
-  int exists(const char *path);
+  int exists();
   struct dirent *readdir (DIR *);
   __off64_t telldir (DIR *);
   void seekdir (DIR *, __off64_t);
@@ -1106,7 +1106,7 @@ class fhandler_process: public fhandler_proc
   _pinfo *saved_p;
  public:
   fhandler_process ();
-  int exists(const char *path);
+  int exists();
   struct dirent *readdir (DIR *);
   int open (path_conv *real_path, int flags, mode_t mode = 0);
   int __stdcall fstat (struct __stat64 *buf, path_conv *) __attribute__ ((regparm (3)));

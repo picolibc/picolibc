@@ -93,7 +93,7 @@ static const char *DEFAULT_VALUE_NAME = "@";
  * to the final key in the path.
  */
 int
-fhandler_registry::exists (const char *path)
+fhandler_registry::exists ()
 {
   int file_type = 0, index = 0, pathlen;
   DWORD buf_size = MAX_PATH;
@@ -102,6 +102,7 @@ fhandler_registry::exists (const char *path)
   const char *file;
   HKEY hKey = (HKEY) INVALID_HANDLE_VALUE;
 
+  const char *path = get_name ();
   debug_printf ("exists (%s)", path);
   path += proc_len + 1 + registry_len;
 
@@ -187,7 +188,7 @@ fhandler_registry::fstat (struct __stat64 *buf, path_conv *pc)
 {
   this->fhandler_base::fstat (buf, pc);
   buf->st_mode &= ~_IFMT & NO_W;
-  int file_type = exists (get_name ());
+  int file_type = exists ();
   switch (file_type)
     {
     case 0:
