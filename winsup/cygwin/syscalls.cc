@@ -146,8 +146,15 @@ unlink (const char *ourname)
       goto done;
     }
 
-  /* Allow us to delete even if read-only */
-  SetFileAttributes (win32_name, (DWORD) win32_name & ~(FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM));
+  bool setattrs;
+  if (!((DWORD) win32_name & (FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM)))
+    setattrs = false;
+  else
+    {
+      /* Allow us to delete even if read-only */
+      SetFileAttributes (win32_name, (DWORD) win32_name & ~(FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM));
+      setattrs = true;
+    }
   /* Attempt to use "delete on close" semantics to handle removing
      a file which may be open. */
   HANDLE h;
@@ -155,12 +162,12 @@ unlink (const char *ourname)
 		  OPEN_EXISTING, FILE_FLAG_DELETE_ON_CLOSE, 0);
   if (h != INVALID_HANDLE_VALUE)
     {
-      (void) SetFileAttributes (win32_name, (DWORD) win32_name);
+      if (wincap.has_hard_links () && setattrs)
+	(void) SetFileAttributes (win32_name, (DWORD) win32_name);
       BOOL res = CloseHandle (h);
       syscall_printf ("%d = CloseHandle (%p)", res, h);
-      if (!win32_name.isremote ()
-	  || (GetFileAttributes (win32_name) == INVALID_FILE_ATTRIBUTES
-	      || wincap.has_delete_on_close ()))
+      if (GetFileAttributes (win32_name) == INVALID_FILE_ATTRIBUTES
+	  || !win32_name.isremote ())
 	{
 	  syscall_printf ("CreateFile (FILE_FLAG_DELETE_ON_CLOSE) succeeded");
 	  goto ok;
@@ -168,7 +175,8 @@ unlink (const char *ourname)
       else
 	{
 	  syscall_printf ("CreateFile (FILE_FLAG_DELETE_ON_CLOSE) failed");
-	  SetFileAttributes (win32_name, (DWORD) win32_name & ~(FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM));
+	  if (setattrs)
+	    SetFileAttributes (win32_name, (DWORD) win32_name & ~(FILE_ATTRIBUTE_READONLY | FILE_ATTRIBUTE_SYSTEM));
 	}
     }
 

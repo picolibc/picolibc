@@ -612,7 +612,7 @@ dll_crt0_1 ()
 	    envp = spawn_info->moreinfo->envp;
 	    envc = spawn_info->moreinfo->envc;
 	    cygheap->fdtab.fixup_after_exec (spawn_info->parent);
-	    signal_fixup_after_exec (child_proc_info->type == PROC_SPAWN);
+	    signal_fixup_after_exec ();
 	    CloseHandle (spawn_info->parent);
 	    if (spawn_info->moreinfo->old_title)
 	      {

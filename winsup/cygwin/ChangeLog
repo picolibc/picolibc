@@ -1,3 +1,14 @@
+2003-03-19  Christopher Faylor  <cgf@redhat.com>
+
+	* sigproc.h (signal_fixup_after_exec): Eliminate argument in declaration.
+	* exceptions.cc (signal_fixup_after_exec): Eliminate argument in
+	definition.  Don't reset signal handlers after spawm.  Just treat like
+	fork/exec.
+	* dcrt0.cc (dll_crt0_1): Don't pass PROC_SPAWN argument to
+	signal_fixup_after_exec.
+	* syscalls.cc (unlink): Don't change attributes of file if not readonly/system.
+	Ditto for resetting of arguments.
+
 2003-03-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* glob.c: Eliminate __INSIDE_CYGWIN__ preprocessor conditionals
