@@ -288,9 +288,6 @@ if [ x${shared} = xyes ]; then
     i[3456]86-*-*)
       host_makefile_frag="${host_makefile_frag} config/mh-x86pic"
       ;;
-    i370-*-*)
-      host_makefile_frag="${host_makefile_frag} config/mh-i370pic"
-      ;;
     sparc64-*-*)
       host_makefile_frag="${host_makefile_frag} config/mh-sparcpic"
       ;;
@@ -329,14 +326,11 @@ case "${target}" in
   powerpc-*-netware*)
     target_makefile_frag="${target_makefile_frag} config/mt-netware"
     ;;
-  *-*-linux-gnu*)
+  *-*-linux-gnu)
     target_makefile_frag="${target_makefile_frag} config/mt-linux"
     ;;
   *-*-aix4.[3456789]* | *-*-aix[56789].*)
     target_makefile_frag="${target_makefile_frag} config/mt-aix43"
-    ;;
-  mips*-*-pe | sh*-*-pe | *arm-wince-pe)
-    target_makefile_frag="${target_makefile_frag} config/mt-wince"
     ;;
 esac
 
@@ -347,6 +341,7 @@ case "${enable_target_optspace}:${target}" in
   yes:*)
     target_makefile_frag="${target_makefile_frag} config/mt-ospace"
     ;;
+  # CYGNUS LOCAL d10v, d30v, fr30
   :d30v-*)
     target_makefile_frag="${target_makefile_frag} config/mt-d30v"
     ;;
@@ -574,21 +569,6 @@ case "${target}" in
     # newlib is not 64 bit ready
     noconfigdirs="$noconfigdirs target-newlib target-libgloss"
     ;;
-  sh*-*-pe|mips*-*-pe|*arm-wince-pe)
-    noconfigdirs="$noconfigdirs target-libjava target-libffi target-zlib"
-    noconfigdirs="$noconfigdirs target-boehm-gc target-qthreads target-examples"
-    noconfigdirs="$noconfigdirs target-librx target-libiberty texinfo send-pr"
-    noconfigdirs="$noconfigdirs tcl tix tk itcl libgui sim"
-    noconfigdirs="$noconfigdirs expect dejagnu"
-    # the C++ libraries don't build on top of CE's C libraries
-    noconfigdirs="$noconfigdirs target-libg++ target-libstdc++ target-libio"
-    skipdirs="$skipdirs target-newlib"
-    case "${host}" in
-      *-*-cygwin*) ;; # keep gdb and readline
-      *) noconfigdirs="$noconfigdirs gdb readline target-libio target-libstdc++ target-libg++"
-	 ;;
-    esac
-    ;;
   arc-*-*)
     noconfigdirs="$noconfigdirs target-libgloss"
     ;;
@@ -616,12 +596,15 @@ case "${target}" in
   thumb-*-coff)
     noconfigdirs="$noconfigdirs target-libgloss"
     ;;
+# CYGNUS LOCAL clm/arm-elf
   thumb-*-elf)
     noconfigdirs="$noconfigdirs target-libgloss"
     ;;
   thumb-*-oabi)
     noconfigdirs="$noconfigdirs target-libgloss"
     ;;
+# END CYGNUS LOCAL
+# CYGNUS LOCAL nickc/strongarm
   strongarm-*-elf)
     noconfigdirs="$noconfigdirs target-libgloss"
     if [ x${is_cross_compiler} != xno ] ; then
@@ -634,7 +617,8 @@ case "${target}" in
 	   target_configdirs="${target_configdirs} target-bsp target-cygmon"
     fi
     ;;
-  thumb-*-pe)
+# END CYGNUS LOCAL
+  thumb-*-pe) # CYGNUS LOCAL nickc/thumb
     noconfigdirs="$noconfigdirs target-libgloss"
     ;;
   arm-*-riscix*)
@@ -643,13 +627,17 @@ case "${target}" in
   d10v-*-*)
     noconfigdirs="$noconfigdirs target-librx target-libg++ target-libstdc++ target-libio"
     ;;
+# CYGNUS LOCAL d30v
   d30v-*-*)
     ;;
+# END CYGNUS LOCAL
+# CYGNUS LOCAL fr30
   fr30-*-elf*)
     if [ x${is_cross_compiler} != xno ] ; then
 	   target_configdirs="${target_configdirs} target-bsp target-libstub target-cygmon"
     fi
     ;;
+# END CYGNUS LOCAL
   h8300*-*-* | \
   h8500-*-*)
     noconfigdirs="$noconfigdirs target-libg++ target-libstdc++ target-libio target-librx target-libgloss"
@@ -677,6 +665,10 @@ case "${target}" in
   i[3456]86-*-go32* | i[3456]-*-msdosdjgpp*)
     # but don't build gdb
     noconfigdirs="$noconfigdirs gdb target-libg++ target-libstdc++ target-libio target-librx"
+    ;;
+  *-*-linux*)
+    # linux has rx in libc
+    skipdirs="$skipdirs target-librx"
     ;;
   i[3456]86-*-mingw32*)
     target_configdirs="$target_configdirs target-mingw"
@@ -803,11 +795,6 @@ case "${target}" in
     # emacs is emacs 18, which does not work on Irix 5 (emacs19 does work)
     noconfigdirs="$noconfigdirs gas gprof emacs target-libgloss"
     ;;
-  mips*-*-linux*)
-    noconfigdirs="$noconfigdirs gprof"
-    # linux has rx in libc
-    skipdirs="$skipdirs target-librx"
-    ;;
   mips*-dec-bsd*)
     noconfigdirs="$noconfigdirs gprof target-libgloss"
     ;;
@@ -861,21 +848,17 @@ case "${target}" in
   v850-*-*)
     noconfigdirs="$noconfigdirs target-libgloss"
     ;;
-  v850e-*-*)
+  v850e-*-*) # CYGNUS LOCAL v850e
     noconfigdirs="$noconfigdirs target-libgloss"
     ;;
   v850ea-*-*)
     noconfigdirs="$noconfigdirs target-libgloss"
-    ;;
+    ;;       # END CYGNUS LOCAL
   vax-*-vms)
     noconfigdirs="$noconfigdirs bfd binutils gdb ld target-newlib opcodes target-libgloss"
     ;;
   vax-*-*)
     noconfigdirs="$noconfigdirs target-newlib target-libgloss"
-    ;;
-  *-*-linux*)
-    # linux has rx in libc
-    skipdirs="$skipdirs target-librx"
     ;;
   *-*-lynxos*)
     # Newlib makes problems for libg++ in crosses.

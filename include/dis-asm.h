@@ -78,7 +78,7 @@ typedef struct disassemble_info {
      INFO is a pointer to this struct.
      Returns an errno value or 0 for success.  */
   int (*read_memory_func)
-    PARAMS ((bfd_vma memaddr, bfd_byte *myaddr, unsigned int length,
+    PARAMS ((bfd_vma memaddr, bfd_byte *myaddr, int length,
 	     struct disassemble_info *info));
 
   /* Function which should be called if we get an error that we can't
@@ -105,7 +105,7 @@ typedef struct disassemble_info {
   /* These are for buffer_read_memory.  */
   bfd_byte *buffer;
   bfd_vma buffer_vma;
-  unsigned int buffer_length;
+  int buffer_length;
 
   /* This variable may be set by the instruction decoder.  It suggests
       the number of bytes objdump should display on a single line.  If
@@ -124,7 +124,7 @@ typedef struct disassemble_info {
   /* Number of octets per incremented target address 
      Normally one, but some DSPs have byte sizes of 16 or 32 bits
    */
-  unsigned int octets_per_byte;
+  int octets_per_byte;
 
   /* Results from instruction decoders.  Not all decoders yet support
      this information.  This info is set each time an instruction is
@@ -157,7 +157,6 @@ extern int print_insn_big_mips		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_little_mips	PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_i386_att		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_i386_intel	PARAMS ((bfd_vma, disassemble_info*));
-extern int print_insn_i370		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_m68k		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_z8001		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_z8002		PARAMS ((bfd_vma, disassemble_info*));
@@ -194,13 +193,9 @@ extern int print_insn_tic30		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_vax		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_tic80		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_pj		PARAMS ((bfd_vma, disassemble_info*));
-extern int print_insn_avr		PARAMS ((bfd_vma, disassemble_info*));
 
 extern void print_arm_disassembler_options PARAMS ((FILE *));
 extern void parse_arm_disassembler_option  PARAMS ((char *));
-extern int  get_arm_regname_num_options    PARAMS ((void));
-extern int  set_arm_regname_option         PARAMS ((int));
-extern int  get_arm_regnames               PARAMS ((int, const char **, const char **, const char ***));
 
 /* Fetch the disassembler for a given BFD, if that support is available.  */
 extern disassembler_ftype disassembler	PARAMS ((bfd *));
@@ -215,7 +210,7 @@ extern void disassembler_usage          PARAMS ((FILE *));
 /* Here is a function which callers may wish to use for read_memory_func.
    It gets bytes from a buffer.  */
 extern int buffer_read_memory
-  PARAMS ((bfd_vma, bfd_byte *, unsigned int, struct disassemble_info *));
+  PARAMS ((bfd_vma, bfd_byte *, int, struct disassemble_info *));
 
 /* This function goes with buffer_read_memory.
    It prints a message using info->fprintf_func and info->stream.  */

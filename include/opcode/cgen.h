@@ -1,6 +1,6 @@
 /* Header file for targets using CGEN: Cpu tools GENerator.
 
-Copyright (C) 1996, 1997, 1998, 1999, 2000 Free Software Foundation, Inc.
+Copyright (C) 1996, 1997, 1998, 1999 Free Software Foundation, Inc.
 
 This file is part of GDB, the GNU debugger, and the GNU Binutils.
 
@@ -1281,10 +1281,6 @@ typedef struct cgen_cpu_desc
   /* Disassembler instruction hash table.  */
   CGEN_INSN_LIST **dis_hash_table;
   CGEN_INSN_LIST *dis_hash_table_entries;
-
-  /* This field could be turned into a bitfield if room for other flags is needed.  */
-  unsigned int signed_overflow_ok_p;
-       
 } CGEN_CPU_TABLE;
 
 /* wip */
@@ -1386,14 +1382,5 @@ extern void cgen_put_insn_value
 
 extern const char * cgen_read_cpu_file
      PARAMS ((CGEN_CPU_DESC, const char * filename_));
-
-/* Allow signed overflow of instruction fields.  */
-extern void cgen_set_signed_overflow_ok PARAMS ((CGEN_CPU_DESC));
-
-/* Generate an error message if a signed field in an instruction overflows.  */
-extern void cgen_clear_signed_overflow_ok PARAMS ((CGEN_CPU_DESC));
-
-/* Will an error message be generated if a signed field in an instruction overflows ? */
-extern unsigned int cgen_signed_overflow_ok_p PARAMS ((CGEN_CPU_DESC));
 
 #endif /* CGEN_H */

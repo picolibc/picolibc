@@ -1,5 +1,5 @@
 /* d30v.h -- Header file for D30V opcode table
-   Copyright (C) 1997, 2000 Free Software Foundation, Inc.
+   Copyright 1997 Free Software Foundation, Inc.
    Written by Martin Hunt (hunt@cygnus.com), Cygnus Solutions
 
 This file is part of GDB, GAS, and the GNU binutils.
@@ -85,46 +85,40 @@ struct d30v_opcode
 #define SHORT_A		9
 #define SHORT_B1	11
 #define SHORT_B2	12
-#define SHORT_B2r     13
-#define SHORT_B3      14
-#define SHORT_B3r     16
-#define SHORT_B3b     18
-#define SHORT_B3br    20
-#define SHORT_D1r     22
-#define SHORT_D2      24
-#define SHORT_D2r     26
-#define SHORT_D2Br    28
-#define SHORT_U       30      /* unary SHORT_A.  ABS for example */
-#define SHORT_F       31      /* SHORT_A with flag registers */
-#define SHORT_AF      33      /* SHORT_A with only the first register a flag register */
-#define SHORT_T       35      /* for trap instruction */
-#define SHORT_A5      36      /* SHORT_A with a 5-bit immediate instead of 6 */
-#define SHORT_CMP     38      /* special form for CMPcc */
-#define SHORT_CMPU    40      /* special form for CMPUcc */
-#define SHORT_A1      42      /* special form of SHORT_A for MACa opcodes where a=1 */
-#define SHORT_AA      44      /* SHORT_A with the first register an accumulator */
-#define SHORT_RA      46      /* SHORT_A with the second register an accumulator */
-#define SHORT_MODINC  48      
-#define SHORT_MODDEC  49
-#define SHORT_C1      50
-#define SHORT_C2      51
-#define SHORT_UF      52
-#define SHORT_A2      53
-#define SHORT_NONE    55      /* no operands */
-#define SHORT_AR      56      /* like SHORT_AA but only accept register as third parameter  */
-#define LONG          57
-#define LONG_U        58      /* unary LONG */
-#define LONG_Ur       59      /* LONG pc-relative */
-#define LONG_CMP      60      /* special form for CMPcc and CMPUcc */
-#define LONG_M        61      /* Memory long for ldb, stb */
-#define LONG_M2       62      /* Memory long for ld2w, st2w */
-#define LONG_2        63      /* LONG with 2 operands; jmptnz */
-#define LONG_2r       64      /* LONG with 2 operands; bratnz */
-#define LONG_2b       65      /* LONG_2 with modifier of 3 */
-#define LONG_2br      66      /* LONG_2r with modifier of 3 */
-#define LONG_D        67      /* for DJMPI */
-#define LONG_Dr       68      /* for DBRAI */
-#define LONG_Dbr      69      /* for repeati */
+#define SHORT_B3	13
+#define SHORT_B3b	15
+#define SHORT_D1	17
+#define SHORT_D2	19
+#define SHORT_D2B	21
+#define SHORT_U		23	/* unary SHORT_A.  ABS for example */
+#define SHORT_F		25	/* SHORT_A with flag registers */
+#define SHORT_AF	27	/* SHORT_A with only the first register a flag register */
+#define SHORT_T		29	/* for trap instruction */
+#define SHORT_A5	30	/* SHORT_A with a 5-bit immediate instead of 6 */
+#define SHORT_CMP	32	/* special form for CMPcc */
+#define SHORT_CMPU	34	/* special form for CMPUcc */
+#define SHORT_A1	36	/* special form of SHORT_A for MACa opcodes where a=1 */
+#define SHORT_AA	38	/* SHORT_A with the first register an accumulator */
+#define SHORT_RA	40	/* SHORT_A with the second register an accumulator */
+#define SHORT_MODINC	42	
+#define SHORT_MODDEC	43
+#define SHORT_C1	44
+#define SHORT_C2	45
+#define SHORT_UF	46
+#define SHORT_A2	47
+#define SHORT_A5S	49
+#define SHORT_NONE	51	/* no operands */
+#define LONG		52
+#define LONG_U		53	/* unary LONG */
+#define LONG_AF		54	/* LONG with the first register a flag register */
+#define LONG_CMP	55	/* special form for CMPcc and CMPUcc */
+#define LONG_M		56	/* Memory long for ldb, stb */
+#define LONG_M2		57	/* Memory long for ld2w, st2w */
+#define LONG_2		58	/* LONG with 2 operands; bratnz */
+#define LONG_2b		59	/* LONG_2 with modifier of 3 */
+#define LONG_D		60	/* for DBRAI*/
+#define LONG_Db		61	/* for repeati*/
+#define SHORT_AR	62	/* like SHORT_AA but only accept register as third parameter  */
 
   /* the execution unit(s) used */
   int unit;
@@ -153,9 +147,7 @@ struct d30v_opcode
 #define FLAG_JMP	(1L<<13)	/* instruction is a branch */
 #define FLAG_JSR	(1L<<14)	/* subroutine call.  must be aligned */
 #define FLAG_MEM	(1L<<15)	/* reads/writes memory */
-#define FLAG_NOT_WITH_ADDSUBppp	 (1L<<16) /* Old meaning: a 2 word 4 byter operation
-					   New meaning: operation cannot be 
-					   combined in parallel with ADD/SUBppp. */
+#define FLAG_2WORD	(1L<<16)	/* 2 word/4 byte operation */
 #define FLAG_MUL16	(1L<<17)	/* 16 bit multiply */
 #define FLAG_MUL32	(1L<<18)	/* 32 bit multiply */
 #define FLAG_ADDSUBppp	(1L<<19)	/* ADDppp or SUBppp */
@@ -254,10 +246,6 @@ extern const struct d30v_operand d30v_operand_table[];
 
 /* let the optimizer know that two registers are affected */
 #define OPERAND_2REG	(0x10000)
-
-/* This operand is pc-relative.  Note that repeati can have two immediate
-   operands, one of which is pcrel, the other (the IMM6U one) is not.  */
-#define OPERAND_PCREL	(0x20000)
 
 /* The format table is an array of struct d30v_format.  */
 struct d30v_format

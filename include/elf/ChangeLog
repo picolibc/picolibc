@@ -1,34 +1,3 @@
-2000-03-27  Denis Chertykov  <denisc@overta.ru>
-
-	* avr.h: New file.  AVR ELF support for BFD.
-	* common.h: Add AVR magic number.
-
-2000-03-10  Geoffrey Keating  <geoffk@cygnus.com>
-
-	* mips.h: Add R_MIPS_GNU_REL_HI16, R_MIPS_GNU_REL_LO16,
- 	R_MIPS_GNU_REL16_S2, R_MIPS_PC64 and R_MIPS_PC32 relocation
- 	numbers.
-
-2000-02-23  Linas Vepstas <linas@linas.org>
-
-	* i370.h: New file.
-
-2000-02-22  Nick Clifton  <nickc@cygnus.com>
-
-	* common.h (ELF_ST_OTHER): Remove definition.
-	(ELF32_ST_OTHER): Remove definition.
-	(ELF64_ST_OTHER): Remove definition.
-
-2000-02-22  H.J. Lu  <hjl@gnu.org>
-
-	* common.h (ELFOSABI_LINUX): Define.
-
-Thu Feb 17 00:18:33 2000  J"orn Rennecke <amylaar@cygnus.co.uk>
-
-	* sh.h: (EF_SH_MACH_MASK, EF_SH_UNKNOWN, EF_SH1, EF_SH2): New macros.
-	(EF_SH3, EF_SH_HAS_DSP, EF_SH_DSP, EF_SH3_DSP): Likewise.
-	(EF_SH_HAS_FP, EF_SH3E, EF_SH4, EF_SH_MERGE_MACH): Likewise.
-
 2000-02-03  H.J. Lu  <hjl@gnu.org>
 
 	* arm-oabi.h: Duplicate changes made to arm.h on Jan. 27,

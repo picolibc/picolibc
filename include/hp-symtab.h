@@ -88,8 +88,7 @@ enum hp_language
 {
   HP_LANGUAGE_UNKNOWN,
   HP_LANGUAGE_C,
-  HP_LANGUAGE_FORTRAN,
-  HP_LANGUAGE_F77 = HP_LANGUAGE_FORTRAN,
+  HP_LANGUAGE_F77,
   HP_LANGUAGE_PASCAL,
   HP_LANGUAGE_MODCAL,
   HP_LANGUAGE_COBOL,
@@ -486,11 +485,9 @@ struct dntt_type_fparam
   unsigned int longaddr:	1;
   unsigned int copyparam:	1;
   unsigned int dflt:		1;
-  unsigned int doc_ranges:	1;
-  unsigned int misc_kind:       1;
-  unsigned int unused:		14;
+  unsigned int unused:		16;
   vtpointer name;
-  CORE_ADDR location;
+  int location;
   dnttpointer type;
   dnttpointer nextparam;
   int misc;
@@ -598,7 +595,7 @@ struct dntt_type_const
   unsigned int kind:		10;
   unsigned int global:		1;
   unsigned int indirect:	1;
-  unsigned int location_type:	3;
+  unsigned int:			3;
   unsigned int classmem:	1;
   unsigned int unused:		15;
   vtpointer name;

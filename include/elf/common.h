@@ -1,6 +1,5 @@
 /* ELF support for BFD.
-   Copyright (C) 1991, 92, 93, 94, 95, 96, 97, 98, 99, 2000
-   Free Software Foundation, Inc.
+   Copyright (C) 1991,92,93,94,95,96,97,98,1999 Free Software Foundation, Inc.
 
    Written by Fred Fish @ Cygnus Support, from information published
    in "UNIX System V Release 4, Programmers Guide: ANSI C and
@@ -60,7 +59,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define EI_OSABI        7       /* Operating System/ABI indication */
 #define ELFOSABI_SYSV   0       /* UNIX System V ABI */
 #define ELFOSABI_HPUX   1       /* HP-UX operating system */
-#define ELFOSABI_LINUX  3       /* GNU/Linux */
 #define ELFOSABI_STANDALONE 255 /* Standalone (embedded) application */
 #define ELFOSABI_ARM   97		/* ARM */
 
@@ -189,10 +187,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* FR30 magic number - no EABI available.  */
 #define EM_CYGNUS_FR30		0x3330
 
-/* AVR magic number
-   Written in the absense of an ABI.  */
-#define EM_AVR			0x1057
-
 /* See the above comment before you add a new EM_* value here.  */
 
 /* Values for e_version */
@@ -317,15 +311,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define ELF64_ST_TYPE  ELF_ST_TYPE
 #define ELF64_ST_INFO  ELF_ST_INFO
 
-/* This macro disassembles and assembles a symbol's visibility into
+/* These two macros disassemble and assemble a symbol's visibility into
    the st_other field.  The STV_ defines specificy the actual visibility.  */
 
 #define ELF_ST_VISIBILITY(v)		((v) & 0x3)
-/* The remaining bits in the st_other field are not currently used.
-   They should be set to zero.  */
+#define ELF_ST_OTHER(o)			((o) & ~0x3)
 
 #define ELF32_ST_VISIBILITY  ELF_ST_VISIBILITY
+#define ELF32_ST_OTHER       ELF_ST_OTHER
 #define ELF64_ST_VISIBILITY  ELF_ST_VISIBILITY
+#define ELF64_ST_OTHER       ELF_ST_OTHER
 
 
 #define STN_UNDEF	0		/* undefined symbol index */
