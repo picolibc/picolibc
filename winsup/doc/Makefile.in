@@ -13,7 +13,10 @@ VPATH = @srcdir@
 
 SGMLDIRS =  -d $(srcdir) -d $(utils_source) -d $(cygwin_source)
 
-DOC=faq.txt faq.info readme.txt readme.info
+# These *.info targets don't actually work, so remove them for now.
+# Put them back when we figure out what to do with them. (davisb)
+#DOC=faq.txt faq.info readme.txt readme.info
+DOC=faq.txt readme.txt
 HTMLDOC=faq.html readme.html
 
 CC:=@CC@
