@@ -1,3 +1,11 @@
+2002-07-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_shm.cc (with_strerr): Fix use of %p format.
+	* shm.cc (client_shmmgr::shmat): Ditto.
+	(client_shmmgr::shmctl): Ditto.
+	(client_shmmgr::shmdt): Ditto.
+	(client_shmmgr::attach): Ditto.
+
 2002-07-25  Christopher Faylor  <cgf@redhat.com>
 
 	* security.cc (allow_ntsec): Default to on.

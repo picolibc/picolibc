@@ -162,7 +162,7 @@ client_shmmgr::shmat (const int shmid,
 		      const void *const shmaddr,
 		      const int shmflg)
 {
-  syscall_printf ("shmat (shmid = %d, shmaddr = 0x%p, shmflg = 0%o)",
+  syscall_printf ("shmat (shmid = %d, shmaddr = %p, shmflg = 0%o)",
 		  shmid, shmaddr, shmflg);
 
   EnterCriticalSection (&_segments_lock);
@@ -177,7 +177,7 @@ client_shmmgr::shmat (const int shmid,
   LeaveCriticalSection (&_segments_lock);
 
   if (ptr)
-    syscall_printf ("0x%p = shmat (shmid = %d, shmaddr = 0x%p, shmflg = 0%o)",
+    syscall_printf ("%p = shmat (shmid = %d, shmaddr = %p, shmflg = 0%o)",
 		    ptr, shmid, shmaddr, shmflg);
   // else
     // See the syscall_printf in client_shmmgr::attach ().
@@ -194,7 +194,7 @@ client_shmmgr::shmctl (const int shmid,
 		       const int cmd,
 		       struct shmid_ds *const buf)
 {
-  syscall_printf ("shmctl (shmid = %d, cmd = 0x%x, buf = 0x%p)",
+  syscall_printf ("shmctl (shmid = %d, cmd = 0x%x, buf = %p)",
 		  shmid, cmd, buf);
 
   // Check parameters and set up in parameters as required.
@@ -207,7 +207,7 @@ client_shmmgr::shmctl (const int shmid,
       if (__check_invalid_read_ptr_errno (buf, sizeof (struct shmid_ds)))
 	{
 	  syscall_printf (("-1 [EFAULT] = "
-			   "shmctl (shmid = %d, cmd = 0x%x, buf = 0x%p)"),
+			   "shmctl (shmid = %d, cmd = 0x%x, buf = %p)"),
 			  shmid, cmd, buf);
 	  set_errno (EFAULT);
 	  return -1;
@@ -220,7 +220,7 @@ client_shmmgr::shmctl (const int shmid,
       if (__check_null_invalid_struct_errno (buf, sizeof (struct shmid_ds)))
 	{
 	  syscall_printf (("-1 [EFAULT] = "
-			   "shmctl (shmid = %d, cmd = 0x%x, buf = 0x%p)"),
+			   "shmctl (shmid = %d, cmd = 0x%x, buf = %p)"),
 			  shmid, cmd, buf);
 	  set_errno (EFAULT);
 	  return -1;
@@ -231,7 +231,7 @@ client_shmmgr::shmctl (const int shmid,
       if (__check_null_invalid_struct_errno (buf, sizeof (struct shminfo)))
 	{
 	  syscall_printf (("-1 [EFAULT] = "
-			   "shmctl (shmid = %d, cmd = 0x%x, buf = 0x%p)"),
+			   "shmctl (shmid = %d, cmd = 0x%x, buf = %p)"),
 			  shmid, cmd, buf);
 	  set_errno (EFAULT);
 	  return -1;
@@ -242,7 +242,7 @@ client_shmmgr::shmctl (const int shmid,
       if (__check_null_invalid_struct_errno (buf, sizeof (struct shm_info)))
 	{
 	  syscall_printf (("-1 [EFAULT] = "
-			   "shmctl (shmid = %d, cmd = 0x%x, buf = 0x%p)"),
+			   "shmctl (shmid = %d, cmd = 0x%x, buf = %p)"),
 			  shmid, cmd, buf);
 	  set_errno (EFAULT);
 	  return -1;
@@ -257,7 +257,7 @@ client_shmmgr::shmctl (const int shmid,
   if (request.make_request () == -1 || request.error_code ())
     {
       syscall_printf (("-1 [%d] = "
-		       "shmctl (shmid = %d, cmd = 0x%x, buf = 0x%p)"),
+		       "shmctl (shmid = %d, cmd = 0x%x, buf = %p)"),
 		      request.error_code (), shmid, cmd, buf);
       set_errno (request.error_code ());
       return -1;
@@ -288,7 +288,7 @@ client_shmmgr::shmctl (const int shmid,
       break;
     }
 
-  syscall_printf ("%d = shmctl (shmid = %d, cmd = 0x%x, buf = 0x%p)",
+  syscall_printf ("%d = shmctl (shmid = %d, cmd = 0x%x, buf = %p)",
 		  result, shmid, cmd, buf);
 
   return result;
@@ -306,7 +306,7 @@ client_shmmgr::shmctl (const int shmid,
 int
 client_shmmgr::shmdt (const void *const shmaddr)
 {
-  syscall_printf ("shmdt (shmaddr = 0x%p)", shmaddr);
+  syscall_printf ("shmdt (shmaddr = %p)", shmaddr);
 
   EnterCriticalSection (&_segments_lock);
 
@@ -317,7 +317,7 @@ client_shmmgr::shmdt (const void *const shmaddr)
   if (!segptr)
     {
       LeaveCriticalSection (&_segments_lock);
-      syscall_printf ("-1 [EINVAL] = shmdt (shmaddr = 0x%p)", shmaddr);
+      syscall_printf ("-1 [EINVAL] = shmdt (shmaddr = %p)", shmaddr);
       set_errno (EINVAL);
       return -1;
     }
@@ -361,7 +361,7 @@ client_shmmgr::shmdt (const void *const shmaddr)
 
   safe_delete (segment_t, segptr);
 
-  syscall_printf ("0 = shmdt (shmaddr = 0x%p)", shmaddr);
+  syscall_printf ("0 = shmdt (shmaddr = %p)", shmaddr);
 
   return 0;
 }
@@ -496,7 +496,7 @@ client_shmmgr::attach (const int shmid,
   if (request.make_request () == -1 || request.error_code ())
     {
       syscall_printf (("-1 [%d] = "
-		       "shmat (shmid = %d, shmaddr = 0x%p, shmflg = 0%o)"),
+		       "shmat (shmid = %d, shmaddr = %p, shmflg = 0%o)"),
 		      request.error_code (), shmid, shmaddr, shmflg);
       set_errno (request.error_code ());
       return NULL;

@@ -63,7 +63,7 @@ details. */
       { ACTION; }							\
       if (MSG && !LocalFree (MSG))					\
 	{								\
-	  system_printf ("failed to free memory at 0x%p, error = %lu",	\
+	  system_printf ("failed to free memory at %p, error = %lu",	\
 			 MSG, GetLastError ());				\
 	}								\
       SetLastError (lasterr);						\
