@@ -949,18 +949,29 @@ fhandler_tty_slave::ioctl (unsigned int cmd, void *arg)
       get_ttyp ()->arg.winsize = get_ttyp ()->winsize;
       if (ioctl_request_event)
 	SetEvent (ioctl_request_event);
-      * (struct winsize *) arg = get_ttyp ()->arg.winsize;
+      *(struct winsize *) arg = get_ttyp ()->arg.winsize;
       if (ioctl_done_event)
 	WaitForSingleObject (ioctl_done_event, INFINITE);
       get_ttyp ()->winsize = get_ttyp ()->arg.winsize;
       break;
     case TIOCSWINSZ:
-      get_ttyp ()->ioctl_retval = -1;
-      get_ttyp ()->arg.winsize = * (struct winsize *) arg;
-      if (ioctl_request_event)
-	SetEvent (ioctl_request_event);
-      if (ioctl_done_event)
-	WaitForSingleObject (ioctl_done_event, INFINITE);
+      if (get_ttyp ()->winsize.ws_row != ((struct winsize *) arg)->ws_row
+	  || get_ttyp ()->winsize.ws_col != ((struct winsize *) arg)->ws_col)
+	{
+	  get_ttyp ()->arg.winsize = *(struct winsize *) arg;
+	  if (ioctl_request_event)
+	    {
+	      get_ttyp ()->ioctl_retval = -1;
+	      SetEvent (ioctl_request_event);
+	    }
+	  else
+	    {
+	      get_ttyp ()->winsize = *(struct winsize *) arg;
+	      kill (-get_ttyp ()->getpgid (), SIGWINCH);
+	    }
+	  if (ioctl_done_event)
+	    WaitForSingleObject (ioctl_done_event, INFINITE);
+	}
       break;
     }
 
@@ -1103,8 +1114,12 @@ fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
 	* (struct winsize *) arg = get_ttyp ()->winsize;
 	break;
       case TIOCSWINSZ:
-	get_ttyp ()->winsize = * (struct winsize *) arg;
-	kill (-get_ttyp ()->getpgid (), SIGWINCH);
+	if (get_ttyp ()->winsize.ws_row != ((struct winsize *) arg)->ws_row
+	    || get_ttyp ()->winsize.ws_col != ((struct winsize *) arg)->ws_col)
+	  {
+	    get_ttyp ()->winsize = * (struct winsize *) arg;
+	    kill (-get_ttyp ()->getpgid (), SIGWINCH);
+	  }
 	break;
       case FIONBIO:
 	set_nonblocking (*(int *) arg);

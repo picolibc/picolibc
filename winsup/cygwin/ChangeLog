@@ -1,3 +1,11 @@
+2002-11-03  Sergey Okhapkin  <sos@prospect.com.ru>
+
+	* fhandler_tty.cc (fhandler_tty_slave::ioctl): Do nothing if the new
+	window size is equal to the old one.  Send SIGWINCH if slave connected
+	to a pseudo tty.
+	(fhandler_pty_master::ioctl): Do nothing if the new window size is
+	equal to the old one.
+
 2002-10-31  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* fhandler.cc (fhandler_base::open): Verify pc isn't NULL.
