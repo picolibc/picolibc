@@ -20,8 +20,6 @@ details. */
 #include "cygtls.h"
 #include "sigproc.h"
 #include "cygerrno.h"
-#define NEED_VFORK
-#include "perthread.h"
 #include "shared_info.h"
 #include "perprocess.h"
 #include "security.h"
@@ -989,7 +987,7 @@ sigpacket::process ()
   bool special_case;
   bool insigwait_mask;
   insigwait_mask = masked = false;
-  if (special_case = (VFORKPID || ISSTATE (myself, PID_STOPPED)))
+  if (special_case = (/*VFORKPID || */ISSTATE (myself, PID_STOPPED)))
     /* nothing to do */;
   else if (tls && sigismember (&tls->sigwait_mask, si.si_signo))
     insigwait_mask = true;

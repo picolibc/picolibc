@@ -771,7 +771,10 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
       rc = WaitForMultipleObjects (2, w4, FALSE, waiter);
 
       if (rc == WAIT_TIMEOUT)
-	break;
+	{
+	  termios_printf ("wait timed out, waiter %u", waiter);
+	  break;
+	}
 
       if (rc == WAIT_FAILED)
 	{

@@ -22,8 +22,7 @@ details. */
 #include "pinfo.h"
 #include "cygheap.h"
 #include "child_info.h"
-#define NEED_VFORK
-#include "perthread.h"
+#include "cygtls.h"
 #include "perprocess.h"
 #include "dll_init.h"
 #include "sync.h"
@@ -41,17 +40,6 @@ details. */
 #define dll_data_end &_data_end__
 #define dll_bss_start &_bss_start__
 #define dll_bss_end &_bss_end__
-
-void
-per_thread::set (void *s)
-{
-  if (s == PER_THREAD_FORK_CLEAR)
-    {
-      tls = TlsAlloc ();
-      s = NULL;
-    }
-  TlsSetValue (get_tls (), s);
-}
 
 static void
 stack_base (child_info_fork &ch)
@@ -304,13 +292,6 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   if (fixup_shms_after_fork ())
     api_fatal ("recreate_shm areas after fork failed");
 #endif
-
-  /* Set thread local stuff to zero.  Under Windows 95/98 this is sometimes
-     non-zero, for some reason.
-     FIXME:  There is a memory leak here after a fork. */
-  for (per_thread **t = threadstuff; *t; t++)
-    if ((*t)->clear_on_fork ())
-      (*t)->set ();
 
   pthread::atforkchild ();
   fixup_timers_after_fork ();

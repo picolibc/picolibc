@@ -29,7 +29,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "child_info_magic.h"
-#include "perthread.h"
+#include "cygtls.h"
 #include "shared_info.h"
 #include "cygwin_version.h"
 #include "dll_init.h"
@@ -42,16 +42,6 @@ details. */
 
 HANDLE NO_COPY hMainProc = (HANDLE) -1;
 HANDLE NO_COPY hMainThread;
-
-#ifdef NEWVFORK
-per_thread_vfork NO_COPY vfork_storage;
-#endif
-
-per_thread NO_COPY *threadstuff[] = {
-#ifdef NEWVFORK
-				     &vfork_storage,
-#endif
-				     NULL};
 
 bool display_title;
 bool strip_title_path;

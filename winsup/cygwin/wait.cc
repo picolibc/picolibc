@@ -13,7 +13,6 @@ details. */
 #include <stdlib.h>
 #include "cygerrno.h"
 #include "sigproc.h"
-#include "perthread.h"
 #include "thread.h"
 #include "cygtls.h"
 

@@ -136,7 +136,7 @@ public:
   pinfo (pid_t n) {init (n, 0);}
   pinfo (pid_t n, DWORD flag) {init (n, flag);}
   void release ();
-  int wait ();
+  int wait () __attribute__ ((regparm (1)));
   ~pinfo ()
   {
     if (destroy && procinfo)

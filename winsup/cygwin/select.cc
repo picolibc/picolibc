@@ -36,7 +36,6 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "sigproc.h"
-#include "perthread.h"
 #include "tty.h"
 #include "ntdll.h"
 #include "cygtls.h"

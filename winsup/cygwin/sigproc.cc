@@ -30,7 +30,6 @@ details. */
 #include "shared_info.h"
 #include "cygtls.h"
 #include "sigproc.h"
-#include "perthread.h"
 #include "exceptions.h"
 
 /*
@@ -361,7 +360,6 @@ proc_subproc (DWORD what, DWORD val)
 	  sigproc_printf ("finished clearing");
 	}
 
-      // FIXMENOW: What is supposed to happen here?
       if (global_sigs[SIGCHLD].sa_handler == (void *) SIG_IGN)
 	for (int i = 0; i < nprocs; i += remove_proc (i))
 	  continue;
@@ -526,7 +524,7 @@ sigproc_terminate (void)
 	  CloseHandle (sendsig);
 	}
     }
-  proc_terminate ();		// Terminate process handling thread
+  proc_terminate ();		// clean up process stuff
 
   return;
 }
@@ -904,29 +902,10 @@ wait_sig (VOID *self)
      signals.  Prior to this, dwProcessId was set to the windows pid of
      of the original windows process which spawned us unless this was a
      "toplevel" process.  */
-  myself->dwProcessId = GetCurrentProcessId ();
   myself->process_state |= PID_ACTIVE;
   myself->process_state &= ~PID_INITIALIZING;
 
   sigproc_printf ("myself->dwProcessId %u", myself->dwProcessId);
-#if 0
-  /* If we've been execed, then there is still a stub left in the previous
-     windows process waiting to see if it's started a cygwin process or not.
-     Signalling subproc_ready indicates that we are a cygwin process.  */
-  if (child_proc_info && child_proc_info->type == PROC_EXEC)
-    {
-      debug_printf ("subproc_ready %p", child_proc_info->subproc_ready);
-      if (!SetEvent (child_proc_info->subproc_ready))
-	system_printf ("SetEvent (subproc_ready) failed, %E");
-      ForceCloseHandle1 (child_proc_info->subproc_ready, subproc_ready);
-      /* Initialize an "indirect" pid block so that if someone looks up this
-	 process via its Windows PID it will be redirected to the appropriate
-	 Cygwin PID shared memory block. */
-      static pinfo NO_COPY myself_identity;
-      myself_identity.init (cygwin_pid (myself->dwProcessId), PID_EXECED);
-    }
-#endif
-
   SetEvent (wait_sig_inited);
   sigtid = GetCurrentThreadId ();
 

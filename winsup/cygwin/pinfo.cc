@@ -39,21 +39,6 @@ pinfo NO_COPY myself ((_pinfo *)&pinfo_dummy);	// Avoid myself != NULL checks
 
 HANDLE hexec_proc;
 
-void __stdcall
-pinfo_fixup_after_fork ()
-{
-  if (hexec_proc)
-    CloseHandle (hexec_proc);
-  /* Keeps the cygpid from being reused.  No rights required */
-  if (!DuplicateHandle (hMainProc, hMainProc, hMainProc, &hexec_proc, 0,
-			TRUE, 0))
-    {
-      system_printf ("couldn't save current process handle %p, %E", hMainProc);
-      hexec_proc = NULL;
-    }
-  VerifyHandle (hexec_proc);
-}
-
 /* Initialize the process table.
    This is done once when the dll is first loaded.  */
 
@@ -71,7 +56,13 @@ set_myself (HANDLE h)
     strace.hello ();
   debug_printf ("myself->dwProcessId %u", myself->dwProcessId);
   InitializeCriticalSection (&myself.lock);
-  if (!h && myself->ppid)
+  myself->dwProcessId = GetCurrentProcessId ();
+  if (h)
+    {
+      static pinfo NO_COPY myself_identity;
+      myself_identity.init (cygwin_pid (myself->dwProcessId), PID_EXECED);
+    }
+  else if (myself->ppid)
     {
       pinfo parent (myself->ppid);
       if (parent && parent->wr_proc_pipe)
@@ -105,6 +96,21 @@ pinfo_init (char **envp, int envc)
     }
 
   debug_printf ("pid %d, pgid %d", myself->pid, myself->pgid);
+}
+
+void __stdcall
+pinfo_fixup_after_fork ()
+{
+  if (hexec_proc)
+    CloseHandle (hexec_proc);
+  /* Keeps the cygpid from being reused.  No rights required */
+  if (!DuplicateHandle (hMainProc, hMainProc, hMainProc, &hexec_proc, 0,
+			TRUE, 0))
+    {
+      system_printf ("couldn't save current process handle %p, %E", hMainProc);
+      hexec_proc = NULL;
+    }
+  VerifyHandle (hexec_proc);
 }
 
 void
@@ -655,7 +661,6 @@ static DWORD WINAPI
 proc_waiter (void *arg)
 {
   pinfo vchild = *(pinfo *) arg;
-  vchild.preserve ();
 
   siginfo_t si;
   si.si_signo = SIGCHLD;
@@ -696,7 +701,6 @@ proc_waiter (void *arg)
 	  CloseHandle (vchild.rd_proc_pipe);
 	  vchild.rd_proc_pipe = NULL;
 	  si.si_status = vchild->exitcode;
-	  // proc_todo = PROC_CHILDTERMINATED;
 	  vchild->process_state = PID_ZOMBIE;
 	  break;
 	case SIGTTIN:
@@ -704,10 +708,8 @@ proc_waiter (void *arg)
 	case SIGTSTP:
 	case SIGSTOP:
 	  si.si_sigval.sival_int = CLD_STOPPED;
-	  // proc_todo = PROC_CHILDSTOPPED;
 	  break;
 	case SIGCONT:
-	  // proc_todo = PROC_CHILDCONTINUED;
 	  continue;
 	default:
 	  system_printf ("unknown value %d on proc pipe", buf);
@@ -752,6 +754,7 @@ pinfo::wait ()
     }
   CloseHandle (out);
 
+  preserve ();
 
 #if 0
   DWORD tid;

@@ -56,8 +56,6 @@ details. */
 #include "pinfo.h"
 #include "shared_info.h"
 #include "cygheap.h"
-#define NEED_VFORK
-#include "perthread.h"
 #include "pwdgrp.h"
 #include "cpuid.h"
 #include "registry.h"

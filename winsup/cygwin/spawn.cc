@@ -29,8 +29,6 @@ details. */
 #include "child_info.h"
 #include "shared_info.h"
 #include "pinfo.h"
-#define NEED_VFORK
-#include "perthread.h"
 #include "registry.h"
 #include "environ.h"
 #include "cygthread.h"
@@ -384,16 +382,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   else
     chtype = PROC_EXEC;
 
-  HANDLE subproc_ready;
-  if (1 || chtype != PROC_EXEC)
-    subproc_ready = NULL;
-  else
-    {
-      subproc_ready = CreateEvent (&sec_all, TRUE, FALSE, NULL);
-      ProtectHandleINH (subproc_ready);
-    }
-
-  init_child_info (chtype, &ciresrv, subproc_ready);
+  init_child_info (chtype, &ciresrv, NULL);
 
   ciresrv.moreinfo = (cygheap_exec_info *) ccalloc (HEAP_1_EXEC, 1, sizeof (cygheap_exec_info));
   ciresrv.moreinfo->old_title = NULL;
@@ -627,12 +616,18 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   if (mode == _P_DETACH || !set_console_state_for_spawn ())
     flags |= DETACHED_PROCESS;
-  if (mode != _P_OVERLAY)
-    flags |= CREATE_SUSPENDED;
-#if 0 //someday
+
+  HANDLE saved_sendsig;
+  if (mode == _P_OVERLAY)
+    {
+      saved_sendsig = myself->sendsig;
+      myself->sendsig = INVALID_HANDLE_VALUE;
+    }
   else
-    myself->dwProcessId = 0;
-#endif
+    {
+      flags |= CREATE_SUSPENDED;
+      saved_sendsig = NULL;
+    }
 
   /* Some file types (currently only sockets) need extra effort in the
      parent after CreateProcess and before copying the datastructures
@@ -718,7 +713,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   /* Restore impersonation. In case of _P_OVERLAY this isn't
      allowed since it would overwrite child data. */
   if (mode != _P_OVERLAY || !rc)
-      cygheap->user.reimpersonate ();
+    cygheap->user.reimpersonate ();
 
   MALLOC_CHECK;
   if (envblock)
@@ -732,12 +727,8 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     {
       __seterrno ();
       syscall_printf ("CreateProcess failed, %E");
-#if 0 // someday
-      if (mode == _P_OVERLAY)
-	myself->dwProcessId = GetCurrentProcessId ();
-#endif
-      if (subproc_ready)
-	ForceCloseHandle (subproc_ready);
+      if (saved_sendsig)
+	myself->sendsig = saved_sendsig;
       cygheap_setup_for_child_cleanup (newheap, &ciresrv, 0);
       return -1;
     }
@@ -837,56 +828,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   res = 0;
   exited = false;
-#if 0
-  if (mode == _P_OVERLAY)
-    {
-      int nwait = 3;
-      HANDLE waitbuf[3] = {pi.hProcess, signal_arrived, subproc_ready};
-      for (int i = 0; i < 100; i++)
-	{
-	  switch (WaitForMultipleObjects (nwait, waitbuf, FALSE, INFINITE))
-	    {
-	    case WAIT_OBJECT_0:
-	      sigproc_printf ("subprocess exited");
-	      DWORD exitcode;
-	      if (!GetExitCodeProcess (pi.hProcess, &exitcode))
-		exitcode = 1;
-	      res |= exitcode;
-	      exited = true;
-	      break;
-	    case WAIT_OBJECT_0 + 1:
-	      sigproc_printf ("signal arrived");
-	      reset_signal_arrived ();
-	      continue;
-	    case WAIT_OBJECT_0 + 2:
-	      if (!myself->cygstarted)
-		{
-		  nwait = 2;
-		  sigproc_terminate ();
-		  continue;
-		}
-	      break;
-	    case WAIT_FAILED:
-	      system_printf ("wait failed: nwait %d, pid %d, winpid %d, %E",
-			     nwait, myself->pid, myself->dwProcessId);
-	      system_printf ("waitbuf[0] %p %d", waitbuf[0],
-			     WaitForSingleObject (waitbuf[0], 0));
-	      system_printf ("waitbuf[1] %p %d", waitbuf[1],
-			     WaitForSingleObject (waitbuf[1], 0));
-	      system_printf ("waitbuf[w] %p %d", waitbuf[2],
-			     WaitForSingleObject (waitbuf[2], 0));
-	      set_errno (ECHILD);
-	      try_to_debug ();
-	      return -1;
-	    }
-	  break;
-	}
-
-      ForceCloseHandle (subproc_ready);
-      sigproc_printf ("P_OVERLAY res %p", res);
-    }
-#endif
-
   ForceCloseHandle1 (pi.hProcess, childhProc);
 
   switch (mode)

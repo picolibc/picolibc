@@ -11,7 +11,6 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
-#include "perthread.h"
 #include "perprocess.h"
 #include "security.h"
 #include "cygerrno.h"
