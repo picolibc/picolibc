@@ -1,3 +1,7 @@
+2004-03-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* shm.cc (shmat): Return (void *) -1 on error instead of NULL.
+
 2004-03-27  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_nodevice.cc (fhandler_nodevice::open): Assume that errno has

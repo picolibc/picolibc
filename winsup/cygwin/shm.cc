@@ -162,7 +162,7 @@ shmat (int shmid, const void *shmaddr, int shmflg)
     {
       /* Invalid shmid */
       set_errno (EINVAL);
-      return NULL;
+      return (void *) -1;
     }
   vm_object_t attach_va = NULL;
   if (shmaddr)
@@ -176,7 +176,7 @@ shmat (int shmid, const void *shmaddr, int shmflg)
       if (!attach_va || (vm_offset_t)attach_va % SHMLBA)
 	{
 	  set_errno (EINVAL);
-	  return NULL;
+	  return (void *) -1;
 	}
     }
   /* Try allocating memory before calling cygserver. */
@@ -184,7 +184,7 @@ shmat (int shmid, const void *shmaddr, int shmflg)
   if (!sph_entry)
     {
       set_errno (ENOMEM);
-      return NULL;
+      return (void *) -1;
     }
   DWORD access = (shmflg & SHM_RDONLY) ? FILE_MAP_READ : FILE_MAP_WRITE;
   vm_object_t ptr = MapViewOfFileEx(ssh_entry->hdl, access, 0, 0,
@@ -193,7 +193,7 @@ shmat (int shmid, const void *shmaddr, int shmflg)
     {
       __seterrno ();
       delete sph_entry;
-      return NULL;
+      return (void *) -1;
     }
   /* Use returned ptr address as is, so it's stored using the exact value
      in cygserver. */
@@ -206,7 +206,7 @@ shmat (int shmid, const void *shmaddr, int shmflg)
       set_errno (request.error_code ());
       if (request.error_code () == ENOSYS)
         raise (SIGSYS);
-      return NULL;
+      return (void *) -1;
     }
   sph_entry->ptr = ptr;
   sph_entry->hdl = ssh_entry->hdl;
@@ -217,7 +217,7 @@ shmat (int shmid, const void *shmaddr, int shmflg)
 #else
   set_errno (ENOSYS);
   raise (SIGSYS);
-  return NULL;
+  return (void *) -1;
 #endif
 }
 
