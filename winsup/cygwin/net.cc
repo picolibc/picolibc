@@ -33,8 +33,7 @@ details. */
 #include "pinfo.h"
 #include "registry.h"
 
-extern "C"
-{
+extern "C" {
 int h_errno;
 
 int __stdcall rcmd (char **ahost, unsigned short inport, char *locuser,
@@ -68,8 +67,7 @@ duplicate_socket (SOCKET sock)
 }
 
 /* htonl: standards? */
-extern "C"
-unsigned long int
+extern "C" unsigned long int
 htonl (unsigned long int x)
 {
   return ((((x & 0x000000ffU) << 24) |
@@ -79,16 +77,14 @@ htonl (unsigned long int x)
 }
 
 /* ntohl: standards? */
-extern "C"
-unsigned long int
+extern "C" unsigned long int
 ntohl (unsigned long int x)
 {
   return htonl (x);
 }
 
 /* htons: standards? */
-extern "C"
-unsigned short
+extern "C" unsigned short
 htons (unsigned short x)
 {
   return ((((x & 0x000000ffU) << 8) |
@@ -96,8 +92,7 @@ htons (unsigned short x)
 }
 
 /* ntohs: standards? */
-extern "C"
-unsigned short
+extern "C" unsigned short
 ntohs (unsigned short x)
 {
   return htons (x);
@@ -112,8 +107,7 @@ dump_protoent (struct protoent *p)
 }
 
 /* exported as inet_ntoa: standards? */
-extern "C"
-char *
+extern "C" char *
 cygwin_inet_ntoa (struct in_addr in)
 {
   char *res = inet_ntoa (in);
@@ -121,8 +115,7 @@ cygwin_inet_ntoa (struct in_addr in)
 }
 
 /* exported as inet_addr: standards? */
-extern "C"
-unsigned long
+extern "C" unsigned long
 cygwin_inet_addr (const char *cp)
 {
   unsigned long res = inet_addr (cp);
@@ -132,8 +125,7 @@ cygwin_inet_addr (const char *cp)
 /* undocumented in wsock32.dll */
 extern "C" unsigned int	WINAPI inet_network (const char *);
 
-extern "C"
-unsigned int 
+extern "C" unsigned int 
 cygwin_inet_network (const char *cp)
 {
   unsigned int res = inet_network (cp);
@@ -144,8 +136,7 @@ cygwin_inet_network (const char *cp)
    for modern networks, since it assumes network values which are no
    longer meaningful, but some existing code calls it.  */
 
-extern "C"
-unsigned long
+extern "C" unsigned long
 inet_netof (struct in_addr in)
 {
   unsigned long i, res;
@@ -167,8 +158,7 @@ inet_netof (struct in_addr in)
    useless for modern networks, since it assumes network values which
    are no longer meaningful, but some existing code calls it.  */
 
-extern "C"
-struct in_addr
+extern "C" struct in_addr
 inet_makeaddr (int net, int lna)
 {
   unsigned long i;
@@ -290,11 +280,9 @@ set_host_errno ()
 }
 
 /* exported as getprotobyname: standards? */
-extern "C"
-struct protoent *
+extern "C" struct protoent *
 cygwin_getprotobyname (const char *p)
 {
-
   struct protoent *res = getprotobyname (p);
   if (!res)
     set_winsock_errno ();
@@ -304,11 +292,9 @@ cygwin_getprotobyname (const char *p)
 }
 
 /* exported as getprotobynumber: standards? */
-extern "C"
-struct protoent *
+extern "C" struct protoent *
 cygwin_getprotobynumber (int number)
 {
-
   struct protoent *res = getprotobynumber (number);
   if (!res)
     set_winsock_errno ();
@@ -317,30 +303,28 @@ cygwin_getprotobynumber (int number)
   return res;
 }
 
-void
+fhandler_socket *
 fdsock (int fd, const char *name, SOCKET soc)
 {
-  fhandler_base *fh = fdtab.build_fhandler(fd, FH_SOCKET, name);
+  fhandler_socket *fh = (fhandler_socket *) fdtab.build_fhandler (fd, FH_SOCKET, name);
   fh->set_io_handle ((HANDLE) soc);
   fh->set_flags (O_RDWR);
+  return fh;
 }
 
 /* exported as socket: standards? */
-extern "C"
-int
+extern "C" int
 cygwin_socket (int af, int type, int protocol)
 {
   int res = -1;
-  SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," socket");
+  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK|READ_LOCK, "socket");
 
   SOCKET soc;
 
   int fd = fdtab.find_unused_handle ();
 
   if (fd < 0)
-    {
-      set_errno (ENMFILE);
-    }
+    set_errno (EMFILE);
   else
     {
       debug_printf ("socket (%d, %d, %d)", af, type, protocol);
@@ -361,16 +345,13 @@ cygwin_socket (int af, int type, int protocol)
       else
 	name = (type == SOCK_STREAM ? "/dev/streamsocket" : "/dev/dgsocket");
 
-      fdsock (fd, name, soc);
+      fdsock (fd, name, soc)->set_addr_family (af);
       res = fd;
-      fhandler_socket *h = (fhandler_socket *) fdtab[fd];
-
-      h->set_addr_family (af);
     }
 
 done:
   syscall_printf ("%d = socket (%d, %d, %d)", res, af, type, protocol);
-  ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," socket");
+  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK|READ_LOCK, "socket");
   return res;
 }
 
@@ -399,7 +380,7 @@ static int get_inet_addr (const struct sockaddr *in, int inlen,
       sin.sin_family = AF_INET;
       sscanf (buf + strlen (SOCKET_COOKIE), "%hu", &sin.sin_port);
       sin.sin_port = htons (sin.sin_port);
-      sin.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+      sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
       *out = sin;
       *outlen = sizeof sin;
       return 1;
@@ -412,8 +393,7 @@ static int get_inet_addr (const struct sockaddr *in, int inlen,
 }
 
 /* exported as sendto: standards? */
-extern "C"
-int
+extern "C" int
 cygwin_sendto (int fd,
 		 const void *buf,
 		 int len,
@@ -439,8 +419,7 @@ cygwin_sendto (int fd,
 }
 
 /* exported as recvfrom: standards? */
-extern "C"
-int
+extern "C" int
 cygwin_recvfrom (int fd,
 		   char *buf,
 		   int len,
@@ -477,8 +456,7 @@ get (int fd)
 }
 
 /* exported as setsockopt: standards? */
-extern "C"
-int
+extern "C" int
 cygwin_setsockopt (int fd,
 		     int level,
 		     int optname,
@@ -539,8 +517,7 @@ cygwin_setsockopt (int fd,
 }
 
 /* exported as getsockopt: standards? */
-extern "C"
-int
+extern "C" int
 cygwin_getsockopt (int fd,
 		     int level,
 		     int optname,
@@ -597,8 +574,7 @@ cygwin_getsockopt (int fd,
 }
 
 /* exported as connect: standards? */
-extern "C"
-int
+extern "C" int
 cygwin_connect (int fd,
 		  const struct sockaddr *name,
 		  int namelen)
@@ -625,8 +601,7 @@ cygwin_connect (int fd,
 }
 
 /* exported as getservbyname: standards? */
-extern "C"
-struct servent *
+extern "C" struct servent *
 cygwin_getservbyname (const char *name, const char *proto)
 {
   struct servent *p = getservbyname (name, proto);
@@ -638,8 +613,7 @@ cygwin_getservbyname (const char *name, const char *proto)
 }
 
 /* exported as getservbyport: standards? */
-extern "C"
-struct servent *
+extern "C" struct servent *
 cygwin_getservbyport (int port, const char *proto)
 {
   struct servent *p = getservbyport (port, proto);
@@ -650,11 +624,10 @@ cygwin_getservbyport (int port, const char *proto)
   return p;
 }
 
-extern "C"
-int
+extern "C" int
 cygwin_gethostname (char *name, size_t len)
 {
-  int PASCAL win32_gethostname(char*,int);
+  int PASCAL win32_gethostname (char*, int);
 
   if (wsock32_handle == NULL ||
       win32_gethostname (name, len) == SOCKET_ERROR)
@@ -673,19 +646,19 @@ cygwin_gethostname (char *name, size_t len)
 }
 
 /* exported as gethostbyname: standards? */
-extern "C"
-struct hostent *
+extern "C" struct hostent *
 cygwin_gethostbyname (const char *name)
 {
   static unsigned char tmp_addr[4];
   static struct hostent tmp;
   static char *tmp_aliases[1] = {0};
-  static char *tmp_addr_list[2] = {0,0};
+  static char *tmp_addr_list[2] = {0, 0};
   static int a, b, c, d;
-  if (sscanf(name, "%d.%d.%d.%d", &a, &b, &c, &d) == 4)
+
+  if (sscanf (name, "%d.%d.%d.%d", &a, &b, &c, &d) == 4)
     {
       /* In case you don't have DNS, at least x.x.x.x still works */
-      memset(&tmp, 0, sizeof(tmp));
+      memset (&tmp, 0, sizeof (tmp));
       tmp_addr[0] = a;
       tmp_addr[1] = b;
       tmp_addr[2] = c;
@@ -714,8 +687,7 @@ cygwin_gethostbyname (const char *name)
 }
 
 /* exported as accept: standards? */
-extern "C"
-int
+extern "C" int
 cygwin_accept (int fd, struct sockaddr *peer, int *len)
 {
   int res = -1;
@@ -726,14 +698,14 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
     {
       /* accept on NT fails if len < sizeof (sockaddr_in)
        * some programs set len to
-       * sizeof(name.sun_family) + strlen(name.sun_path) for UNIX domain
+       * sizeof (name.sun_family) + strlen (name.sun_path) for UNIX domain
        */
       if (len && ((unsigned) *len < sizeof (struct sockaddr_in)))
 	*len = sizeof (struct sockaddr_in);
 
       res = accept (sock->get_socket (), peer, len);  // can't use a blocking call inside a lock
 
-      SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," accept");
+      SetResourceLock (LOCK_FD_LIST, WRITE_LOCK|READ_LOCK, "accept");
 
       int res_fd = fdtab.find_unused_handle ();
       if (res_fd == -1)
@@ -754,13 +726,12 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
     }
 done:
   syscall_printf ("%d = accept (%d, %x, %x)", res, fd, peer, len);
-  ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," accept");
+  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK|READ_LOCK, "accept");
   return res;
 }
 
 /* exported as bind: standards? */
-extern "C"
-int
+extern "C" int
 cygwin_bind (int fd, struct sockaddr *my_addr, int addrlen)
 {
   int res = -1;
@@ -800,7 +771,7 @@ cygwin_bind (int fd, struct sockaddr *my_addr, int addrlen)
 	  debug_printf ("AF_UNIX: socket bound to port %u", sin.sin_port);
 
 	  /* bind must fail if file system socket object already exists
-	     so _open() is called with O_EXCL flag. */
+	     so _open () is called with O_EXCL flag. */
 	  fd = _open (un_addr->sun_path,
 		      O_WRONLY | O_CREAT | O_EXCL | O_BINARY,
 		      0);
@@ -843,8 +814,7 @@ out:
 }
 
 /* exported as getsockname: standards? */
-extern "C"
-int
+extern "C" int
 cygwin_getsockname (int fd, struct sockaddr *addr, int *namelen)
 {
   int res = -1;
@@ -862,8 +832,7 @@ cygwin_getsockname (int fd, struct sockaddr *addr, int *namelen)
 }
 
 /* exported as gethostbyaddr: standards? */
-extern "C"
-struct hostent *
+extern "C" struct hostent *
 cygwin_gethostbyaddr (const char *addr, int len, int type)
 {
   struct hostent *ptr = gethostbyaddr (addr, len, type);
@@ -881,8 +850,7 @@ cygwin_gethostbyaddr (const char *addr, int len, int type)
 }
 
 /* exported as listen: standards? */
-extern "C"
-int
+extern "C" int
 cygwin_listen (int fd, int backlog)
 {
   int res = -1;
@@ -900,8 +868,7 @@ cygwin_listen (int fd, int backlog)
 }
 
 /* exported as shutdown: standards? */
-extern "C"
-int
+extern "C" int
 cygwin_shutdown (int fd, int how)
 {
   int res = -1;
@@ -919,16 +886,14 @@ cygwin_shutdown (int fd, int how)
 }
 
 /* exported as herror: standards? */
-extern "C"
-void
+extern "C" void
 cygwin_herror (const char *)
 {
   debug_printf ("********%d*************", __LINE__);
 }
 
 /* exported as getpeername: standards? */
-extern "C"
-int
+extern "C" int
 cygwin_getpeername (int fd, struct sockaddr *name, int *len)
 {
   fhandler_socket *h = (fhandler_socket *) fdtab[fd];
@@ -943,8 +908,7 @@ cygwin_getpeername (int fd, struct sockaddr *name, int *len)
 }
 
 /* exported as recv: standards? */
-extern "C"
-int
+extern "C" int
 cygwin_recv (int fd, void *buf, int len, unsigned int flags)
 {
   fhandler_socket *h = (fhandler_socket *) fdtab[fd];
@@ -969,8 +933,7 @@ cygwin_recv (int fd, void *buf, int len, unsigned int flags)
 }
 
 /* exported as send: standards? */
-extern "C"
-int
+extern "C" int
 cygwin_send (int fd, const void *buf, int len, unsigned int flags)
 {
   fhandler_socket *h = (fhandler_socket *) fdtab[fd];
@@ -989,8 +952,7 @@ cygwin_send (int fd, const void *buf, int len, unsigned int flags)
 }
 
 /* getdomainname: standards? */
-extern "C"
-int
+extern "C" int
 getdomainname (char *domain, int len)
 {
   /*
@@ -1225,7 +1187,7 @@ get_nt_ifconf (struct ifconf *ifc, int what)
       char *bp, eth[2] = "/";
       char cardkey[256], ipaddress[256], netmask[256];
 
-      for (bp = binding; *bp; bp += strlen(bp) + 1)
+      for (bp = binding; *bp; bp += strlen (bp) + 1)
         {
           bp += strlen ("\\Device\\");
           strcpy (cardkey, "SYSTEM\\CurrentControlSet\\Services\\");
@@ -1418,7 +1380,7 @@ get_9x_ifconf (struct ifconf *ifc, int what)
         {
           if ((caddr_t)++ifr > ifc->ifc_buf
               + ifc->ifc_len
-              - sizeof(struct ifreq))
+              - sizeof (struct ifreq))
             goto out;
 
           switch (what)
@@ -1567,8 +1529,7 @@ get_ifconf (struct ifconf *ifc, int what)
 }
 
 /* exported as rcmd: standards? */
-extern "C"
-int
+extern "C" int
 cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
 	       char *remuser, char *cmd, int *fd2p)
 {
@@ -1609,8 +1570,7 @@ done:
 }
 
 /* exported as rresvport: standards? */
-extern "C"
-int
+extern "C" int
 cygwin_rresvport (int *port)
 {
   int res = -1;
@@ -1636,8 +1596,7 @@ done:
 }
 
 /* exported as rexec: standards? */
-extern "C"
-int
+extern "C" int
 cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
 	       char *password, char *cmd, int *fd2p)
 {
@@ -1667,13 +1626,7 @@ cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
   if (fd2p)
     {
       fd2s = duplicate_socket (fd2s);
-
       fdsock (*fd2p, "/dev/tcp", fd2s);
-#if 0 /* ??? */
-      fhandler_socket *h;
-      p->hmap.vec[*fd2p].h = h =
-	  new (&p->hmap.vec[*fd2p].item) fhandler_socket (fd2s, "/dev/tcp");
-#endif
     }
 done:
   syscall_printf ("%d = rexec (...)", res);
@@ -1682,8 +1635,7 @@ done:
 
 /* socketpair: standards? */
 /* Win32 supports AF_INET only, so ignore domain and protocol arguments */
-extern "C"
-int
+extern "C" int
 socketpair (int, int type, int, int *sb)
 {
   int res = -1;
@@ -1691,7 +1643,7 @@ socketpair (int, int type, int, int *sb)
   struct sockaddr_in sock_in;
   int len = sizeof (sock_in);
 
-  SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," socketpair");
+  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK|READ_LOCK, "socketpair");
 
   sb[0] = fdtab.find_unused_handle ();
   if (sb[0] == -1)
@@ -1710,6 +1662,7 @@ socketpair (int, int type, int, int *sb)
   newsock = socket (AF_INET, type, 0);
   if (newsock == INVALID_SOCKET)
     {
+      debug_printf ("first socket call failed");
       set_winsock_errno ();
       goto done;
     }
@@ -1721,6 +1674,7 @@ socketpair (int, int type, int, int *sb)
 
   if (bind (newsock, (struct sockaddr *) &sock_in, sizeof (sock_in)) < 0)
     {
+      debug_printf ("bind failed");
       set_winsock_errno ();
       closesocket (newsock);
       goto done;
@@ -1740,7 +1694,7 @@ socketpair (int, int type, int, int *sb)
   outsock = socket (AF_INET, type, 0);
   if (outsock == INVALID_SOCKET)
     {
-      debug_printf ("can't create outsock");
+      debug_printf ("second socket call failed");
       set_winsock_errno ();
       closesocket (newsock);
       goto done;
@@ -1781,7 +1735,7 @@ socketpair (int, int type, int, int *sb)
 
 done:
   syscall_printf ("%d = socketpair (...)", res);
-  ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," socketpair");
+  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK|READ_LOCK, "socketpair");
   return res;
 }
 
@@ -1795,15 +1749,13 @@ fhandler_socket::fhandler_socket (const char *name) :
 }
 
 /* sethostent: standards? */
-extern "C"
-void
+extern "C" void
 sethostent (int)
 {
 }
 
 /* endhostent: standards? */
-extern "C"
-void
+extern "C" void
 endhostent (void)
 {
 }
@@ -1908,14 +1860,14 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
       {
 	char buf[2048];
 	struct ifconf ifc;
-	ifc.ifc_len = sizeof(buf);
+	ifc.ifc_len = sizeof (buf);
 	ifc.ifc_buf = buf;
 	struct ifreq *ifrp;
 
 	struct ifreq *ifr = (struct ifreq *) p;
 	if (ifr == 0)
 	  {
-	    debug_printf("ifr == NULL\n");
+	    debug_printf ("ifr == NULL\n");
 	    set_errno (EINVAL);
 	    return -1;
 	  }
@@ -1927,12 +1879,12 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	    break;
 	  }
 
-	debug_printf("    name: %s\n", ifr->ifr_name);
+	debug_printf ("    name: %s\n", ifr->ifr_name);
 	for (ifrp = ifc.ifc_req;
 	     (caddr_t) ifrp < ifc.ifc_buf + ifc.ifc_len;
 	     ++ifrp)
 	  {
-	    debug_printf("testname: %s\n", ifrp->ifr_name);
+	    debug_printf ("testname: %s\n", ifrp->ifr_name);
 	    if (! strcmp (ifrp->ifr_name, ifr->ifr_name))
 	      {
 		switch (cmd)
@@ -2007,8 +1959,8 @@ LoadDLLinitfunc (wsock32)
   debug_printf ("res %d", res);
   debug_printf ("wVersion %d", p.wVersion);
   debug_printf ("wHighVersion %d", p.wHighVersion);
-  debug_printf ("szDescription %s",p.szDescription);
-  debug_printf ("szSystemStatus %s",p.szSystemStatus);
+  debug_printf ("szDescription %s", p.szDescription);
+  debug_printf ("szSystemStatus %s", p.szSystemStatus);
   debug_printf ("iMaxSockets %d", p.iMaxSockets);
   debug_printf ("iMaxUdpDg %d", p.iMaxUdpDg);
   debug_printf ("lpVendorInfo %d", p.lpVendorInfo);

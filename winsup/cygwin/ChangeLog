@@ -1,3 +1,10 @@
+Thu Oct  5 01:52:43 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* net.cc: General cleanup.
+	(fdsock): Return pointer to created fhandler_socket.
+	(cygwin_socket): Use pointer returned by fdsock.  Return correct errno
+	when fd < 0.
+
 Thu Oct  5 00:48:40 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (interruptible): Add extra debugging.
