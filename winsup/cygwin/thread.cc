@@ -1150,7 +1150,9 @@ __pthread_atforkchild (void)
 
 /*FIXME: implement InterlockExchangePointer and get rid of the silly typecasts below
  */
+#ifndef InterlockedExchangePointer
 #define InterlockedExchangePointer InterlockedExchange
+#endif
 
 /*Register a set of functions to run before and after fork.
  *prepare calls are called in LI-FC order.

@@ -1,3 +1,8 @@
+Tue Sep  4 16:48:14 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* thread.cc (InterlockedExchangePointer): Don't define if it already
+	exists.
+
 Tue Sep  4 22:14:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* uname.cc (uname): Eliminate os specific retrieving of x86
