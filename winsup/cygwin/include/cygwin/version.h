@@ -117,6 +117,7 @@ details. */
        25: Export getmode and _getmode.
        26: CW_GET_CYGDRIVE_PREFIXES addition to external.cc
        27: CW_GETPINFO_FULL addition to external.cc
+       28: Accidentally bumped by cgf
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0
