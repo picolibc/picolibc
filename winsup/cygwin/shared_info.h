@@ -85,7 +85,7 @@ class mount_info
 
   unsigned set_flags_from_win32_path (const char *path);
   int conv_to_win32_path (const char *src_path, char *dst, device&,
-			  unsigned *flags = NULL, bool no_normalize = 0);
+			  unsigned *flags = NULL);
   int conv_to_posix_path (const char *src_path, char *posix_path,
 			  int keep_rel_p);
   struct mntent *getmntent (int x);
