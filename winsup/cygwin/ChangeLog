@@ -1,3 +1,11 @@
+2005-03-10  Christopher Faylor  <cgf@timesys.com>
+
+	* autoload.cc (LoadDllprime): Scrap use of .linkonce and just use an
+	ifdef guard to load .foo_init into data segment.
+
+	* dcrt0.cc (initial_env): Allow colon or space as CYGWIN_DEBUG
+	separator for consistency.
+
 2005-03-09  Christopher Faylor  <cgf@timesys.com>
 
 	* pinfo.h (pinfo::pinfo): Clear more elements in the constructor.

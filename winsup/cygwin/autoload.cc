@@ -56,14 +56,18 @@ details. */
    additional initialization routine to call prior to calling the first
    function.  */
 #define LoadDLLprime(dllname, init_also) __asm__ ("	\n\
-  .section	." #dllname "_info,\"w\"		\n\
-  .linkonce						\n\
+.ifndef " #dllname "_primed				\n\
+  .data							\n\
+  .align	4					\n\
+."#dllname "_info:					\n\
   .long		_std_dll_init				\n\
   .long		0					\n\
   .long		-1					\n\
   .long		" #init_also "				\n\
   .asciz	\"" #dllname "\"			\n\
   .text							\n\
+  .set		" #dllname "_primed, 1			\n\
+.endif							\n\
 ");
 
 /* Create a "decorated" name */
