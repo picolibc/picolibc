@@ -2,6 +2,22 @@
 
 #include "defines.h"
 
+#if defined (__H8300SX__)
+	.global _strcmp
+_strcmp:
+	mov.l	er0,er2
+loop:
+	mov.b	@er2+,r0l
+	beq	eos
+	sub.b	@er1+,r0l
+	beq	loop
+	exts.l	#2,er0
+	rts
+eos:
+	sub.b	@er1,r0l
+	exts.l	#2,er0
+	rts
+#else
 	.section .text
 	.align 2
 	.global _strcmp
@@ -41,3 +57,4 @@ _strcmp:
 #endif
 	rts
 	.end
+#endif

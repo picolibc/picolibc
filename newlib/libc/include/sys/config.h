@@ -20,7 +20,7 @@
 #define UINT_MAX 65535
 #endif
 
-#if defined (__H8300__) || defined (__H8300H__) || defined(__H8300S__)
+#if defined (__H8300__) || defined (__H8300H__) || defined(__H8300S__) || defined (__H8300SX__)
 #define __SMALL_BITFIELDS
 #define H8300 1
 #undef INT_MAX

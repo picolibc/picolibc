@@ -7,7 +7,7 @@
 	.align 2
 	.global __read
 __read:
-#if defined(__H8300H__) || defined(__H8300S__)
+#if defined(__H8300H__) || defined(__H8300S__) || defined (__H8300SX__)
 #if __INT_MAX__ == 32767
 	extu.l  er0
 #endif

@@ -88,7 +88,7 @@
 
 #endif /* __H8300H__ */
 
-#ifdef __H8300S__
+#if defined (__H8300S__) || defined (__H8300SX__)
 
 #ifdef __NORMAL_MODE__
 
@@ -129,4 +129,10 @@
 #define A2E	e2
 #define A3E	e3
 
+
+#ifdef __NORMAL_MODE__
+#define LEN(X) X
+#else
+#define LEN(X) e##X
+#endif
 #endif /* __H8300S__ */

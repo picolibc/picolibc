@@ -6,7 +6,14 @@
 	.align	2
 	.global	_setjmp
 _setjmp:
-#if defined(__H8300H__) || defined(__H8300S__)
+#if defined(__H8300SX__)
+	mov.l	er7,@er0+
+	mov.l	er6,@er0+
+	mov.l	er5,@er0+
+	mov.l	er4,@er0+
+	mov.l	@sp,@er0
+	sub.l   er0,er0
+#elif defined(__H8300H__) || defined(__H8300S__)
 	mov.l	er7,@er0
 	mov.l	er6,@(4,er0)
 	mov.l	er5,@(8,er0)
@@ -27,13 +34,17 @@ _setjmp:
 
 	.global	_longjmp
 _longjmp:
-#if defined(__H8300H__) || defined (__H8300S__)
+#if defined(__H8300H__) || defined (__H8300S__) || defined (__H8300SX__)
 	mov.l	@er0+,er7
 	mov.l	@er0+,er6
 	mov.l	@er0+,er5
 	mov.l	@er0+,er4
+#if defined(__H8300SX__)
+	mov.l	@er0,@sp
+#else
 	mov.l	@er0,er2
 	mov.l	er2,@sp
+#endif
 #if (__INT_MAX__ <= 32767)
 	mov.w	r1,r0
 #else

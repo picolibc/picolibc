@@ -1,3 +1,31 @@
+2004-06-22  Alexandre Oliva  <aoliva@redhat.com>
+
+	2003-07-02  Richard Sandiford  <rsandifo@redhat.com>
+	* libc/machine/h8300/Makefile.am (lib_a_SOURCES): Add h8sx_strcpy.S.
+	* libc/machine/h8300/defines.h (LEN): New macro.
+	* libc/machine/h8300/memcpy.S: Add h8sx version.
+	* libc/machine/h8300/memset.S: Likewise.
+	* libc/machine/h8300/strcmp.S: Likewise.
+	* libc/machine/h8300/setjmp.S: Use h8sx move instructions.
+	* libc/machine/h8300/h8sx_strcpy.S: New file.
+	2003-06-30  Richard Sandiford  <rsandifo@redhat.com>
+	* libc/include/machine/ieeefp.h: Extend __H8300S__ handling to
+	__H8300SX__.
+	* libc/include/machine/setjmp.h: Likewise.
+	* libc/include/sys/config.h: Likewise.
+	* libc/machine/h8300/defines.h: Likewise.
+	* libc/machine/h8300/setjmp.S: Likewise.
+	* libc/machine/h8300/strcmp.S: Likewise.
+	* libc/sys/h8300hms/close.S: Likewise.
+	* libc/sys/h8300hms/fstat.S: Likewise.
+	* libc/sys/h8300hms/lseek.S: Likewise.
+	* libc/sys/h8300hms/read.S: Likewise.
+	* libc/sys/h8300hms/write.S: Likewise.
+	* libc/sys/h8300hms/crt0.S: Likewise.
+	* libc/machine/h8300/setarch.h: Use .h8300sx or .h8300sxn if
+	__H8300SX__ is defined.
+	* libc/sys/h8300hms/setarch.h: Likewise.
+
 2004-06-17  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/reent.h (_GLOBAL_REENT): Back

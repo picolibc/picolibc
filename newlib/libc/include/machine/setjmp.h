@@ -95,7 +95,7 @@ typedef int jmp_buf[_JBLEN];
 #define _JBTYPE long
 #endif
 
-#ifdef __H8300S__
+#if defined (__H8300S__) || defined (__H8300SX__)
 /* same as H8/300 but registers are twice as big */
 #define _JBLEN 5
 #define _JBTYPE long

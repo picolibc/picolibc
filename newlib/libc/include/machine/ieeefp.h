@@ -92,7 +92,7 @@
 #endif
 #endif
 
-#if defined (__H8300__) || defined (__H8300H__) || defined (__H8300S__) || defined (__H8500__)
+#if defined (__H8300__) || defined (__H8300H__) || defined (__H8300S__) || defined (__H8500__) || defined (__H8300SX__)
 #define __IEEE_BIG_ENDIAN
 #define _FLOAT_ARG float
 #define _DOUBLE_IS_32BITS
