@@ -30,7 +30,6 @@ static int handle_exceptions (EXCEPTION_RECORD *, void *, CONTEXT *, void *);
 extern void sigreturn ();
 extern void sigdelayed ();
 extern void siglast ();
-extern DWORD __sigfirst, __siglast;
 };
 
 extern DWORD sigtid;
@@ -580,37 +579,34 @@ int
 interruptible (DWORD pc, int testvalid = 0)
 {
   int res;
-  if ((pc >= (DWORD) &__sigfirst) && (pc <= (DWORD) &__siglast))
+  MEMORY_BASIC_INFORMATION m;
+
+  memset (&m, 0, sizeof m);
+  if (!VirtualQuery ((LPCVOID) pc, &m, sizeof m))
+    sigproc_printf ("couldn't get memory info, pc %p, %E", pc);
+
+  char *checkdir = (char *) alloca (windows_system_directory_length + 4);
+  memset (checkdir, 0, sizeof (checkdir));
+
+# define h ((HMODULE) m.AllocationBase)
+  /* Apparently Windows 95 can sometimes return bogus addresses from
+     GetThreadContext.  These resolve to an allocation base == 0.
+     These should *never* be treated as interruptible. */
+  if (!h || m.State != MEM_COMMIT)
+    res = 0;
+  else if (testvalid)
+    res = 1;	/* All we wanted to know was if this was a valid module. */
+  else if (h == user_data->hmodule)
+    res = 1;
+  else if (h == cygwin_hmodule)
+    res = 0;
+  else if (!GetModuleFileName (h, checkdir, windows_system_directory_length + 2))
     res = 0;
   else
-    {
-      MEMORY_BASIC_INFORMATION m;
-      memset (&m, 0, sizeof m);
-      if (!VirtualQuery ((LPCVOID) pc, &m, sizeof m))
-	sigproc_printf ("couldn't get memory info, pc %p, %E", pc);
-
-      char *checkdir = (char *) alloca (windows_system_directory_length + 4);
-      memset (checkdir, 0, sizeof (checkdir));
-#     define h ((HMODULE) m.AllocationBase)
-      /* Apparently Windows 95 can sometimes return bogus addresses from
-	 GetThreadContext.  These resolve to an allocation base == 0.
-	 These should *never* be treated as interruptible. */
-      if (!h || m.State != MEM_COMMIT)
-	res = 0;
-      else if (testvalid)
-	res = 1;	/* All we wanted to know was if this was a valid module. */
-      else if (h == user_data->hmodule)
-	res = 1;
-      else if (h == cygwin_hmodule)
-	res = 0;
-      else if (!GetModuleFileName (h, checkdir, windows_system_directory_length + 2))
-	res = 0;
-      else
-	res = !strncasematch (windows_system_directory, checkdir,
-			      windows_system_directory_length);
-      minimal_printf ("h %p", h);
-#     undef h
-    }
+    res = !strncasematch (windows_system_directory, checkdir,
+			  windows_system_directory_length);
+  minimal_printf ("h %p", h);
+# undef h
 
   minimal_printf ("interruptible %d", res);
   return res;
@@ -1040,6 +1036,7 @@ signal_exit (int rc)
   if (hExeced)
     TerminateProcess (hExeced, rc);
 
+  sigproc_printf ("about to call do_exit (%x)", rc);
   do_exit (rc);
 }
 
@@ -1082,8 +1079,7 @@ events_terminate (void)
 
 #define pid_offset (unsigned)(((_pinfo *)NULL)->pid)
 extern "C" {
-static void __stdcall
-reset_signal_arrived () __attribute__ ((unused));
+static void __stdcall reset_signal_arrived () __attribute__ ((unused));
 static void __stdcall
 reset_signal_arrived ()
 {
@@ -1102,6 +1098,8 @@ __asm__ volatile ("
 
 _sigreturn:
 	addl	$4,%%esp
+	movl	%%esp,%%ebp
+	addl	$36,%%ebp
 	call	_set_process_mask@4
 	popl	%%eax		# saved errno
 	testl	%%eax,%%eax	# Is it < 0
@@ -1114,12 +1112,14 @@ _sigreturn:
 	popl	%%edx
 	popl	%%edi
 	popl	%%esi
+	popl	%%ebp
 	popf
 	ret
 
 _sigdelayed:
 	pushl	%2	# original return address
 	pushf
+	pushl	%%ebp
 	pushl	%%esi
 	pushl	%%edi
 	pushl	%%edx
@@ -1136,10 +1136,8 @@ _sigdelayed:
 
 	cmpl	$0,_pending_signals
 	je	2f
-___sigfirst:
 	pushl	$0
 	call	_sig_dispatch_pending@4
-___siglast:
 
 2:	jmp	*%5
 

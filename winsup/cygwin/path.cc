@@ -2899,7 +2899,11 @@ cwdstuff::get (char *buf, int need_posix, int with_chroot, unsigned ulen)
 {
   MALLOC_CHECK;
 
-  if (ulen == 0)
+  if (ulen)
+    /* nothing */;
+  else if (buf == NULL)
+    ulen = (unsigned) -1;
+  else
     {
       set_errno (EINVAL);
       goto out;

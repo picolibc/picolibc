@@ -1,3 +1,12 @@
+Wed Nov  1 21:08:23 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (interruptible): Remove obsolete tests.
+	(sigreturn): Construct pseudo-frame-pointer so that signal handler can
+	figure out where to put return address when signals are coming in
+	quickly.
+	* path.cc (cwdstuff::get): Allow length 0 buffer length when buffer
+	when NULL.
+
 Tue Oct 31 18:12:56 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* path.h (has_exec_chars): Standard function for checking for
