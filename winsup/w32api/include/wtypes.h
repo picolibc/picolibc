@@ -14,7 +14,7 @@ extern "C" {
 typedef struct _BLOB {
 	ULONG	cbSize;
 	BYTE	*pBlobData;
-} BLOB;
+} BLOB,*PBLOB,*LPBLOB;
 typedef enum tagDVASPECT {
 	DVASPECT_CONTENT=1,
 	DVASPECT_THUMBNAIL=2,

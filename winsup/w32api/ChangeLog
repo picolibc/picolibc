@@ -1,6 +1,11 @@
 2000-02-28  Mumit Khan  <khan@xraylith.wisc.edu>
 
 	Patches from Jan Nijtmans <j.nijtmans@chello.nl>:
+	* include/wtypes.h (PBLOB, LPBLOB): Define.
+	* include/winsock2.h: Much more complete version.
+	(FD_SET, SOMAXCONN): Protect common macros defined by winsock.h.
+
+	Patches from Jan Nijtmans <j.nijtmans@chello.nl>:
 	* include/winsock.h (FD_CLR): Add missing ')'.
 	(timercmp): Fix macro to handle all 6 comparison operators.
 	(AF_FIREFOX, AF_UNKNOWN1, AF_BAN, AF_ATM, AF_INET6): Define.
