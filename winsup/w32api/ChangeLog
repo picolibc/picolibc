@@ -1,3 +1,19 @@
+2004-01-04  Filip Navara  <xnavara@volny.cz>
+
+	* include/shlguid.h (IID_IPersistFolder2, IID_IPersistFolder3,
+	IID_IShellFolder2, IID_IFileSystemBindData): Add declarations.
+	* include/shlobj.h (EXTRASEARCH, SHCOLSTATEF, SHELLDETAILS,
+	PERSIST_FOLDER_TARGET_INFO): Define structures.
+	(IEnumExtraSearch, IShellFolder2, IFileSystemBindData,
+	IPersistFolder2, IPersistFolder3): Add COM interface
+	definitions.
+	(IExtractIcon[AW], IShellLink[AW], IPersistFolder, IShellView,
+	ICommDlgBrowser, IShellFolder2, IPersistFolder2, IPersistFolder3):
+	Add COBJMACROS.
+	(SHCreateDirectoryEx[AW], SHBindToParent): Add prototypes.
+        * lib/shell32.c	(IID_IPersistFolder2, IID_IPersistFolder3,
+	IID_IShellFolder2, IID_IFileSystemBindData): Add definitions.
+
 2004-01-03  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/mshtml.h (IHTMLDocument2): Correct write, writeln

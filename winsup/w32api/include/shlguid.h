@@ -63,6 +63,14 @@ extern const GUID IID_IUniformResourceLocator;
 extern const GUID CLSID_DragDropHelper;
 extern const GUID IID_IDropTargetHelper;
 extern const GUID IID_IDragSourceHelper;
+#if (_WIN32_IE >= 0x400 || _WIN32_WINNT >= 0x500)
+extern const GUID IID_IPersistFolder2;
+#endif
+#if (_WIN32_WINNT >= 0x500)
+extern const GUID IID_IPersistFolder3;
+extern const GUID IID_IShellFolder2;
+extern const GUID IID_IFileSystemBindData;
+#endif
 #ifdef UNICODE
 #define IID_IFileViewer	IID_IFileViewerW
 #define IID_IShellLink	IID_IShellLinkW
