@@ -95,8 +95,7 @@ typedef long fd_mask;
 
 /* The main select code.
  */
-extern "C"
-int
+extern "C" int
 cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	       struct timeval *to)
 {

@@ -8,6 +8,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#define _WIN32_WINNT 0x0501
+
 #include "winsup.h"
 #include <errno.h>
 #include <unistd.h>
@@ -25,6 +27,7 @@ details. */
 #include <sys/utsname.h>
 #include <sys/param.h>
 #include "ntdll.h"
+#include <winioctl.h>
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>
@@ -36,6 +39,8 @@ static const int PROC_REGISTRY = 4;     // /proc/registry
 static const int PROC_STAT     = 5;     // /proc/stat
 static const int PROC_VERSION  = 6;     // /proc/version
 static const int PROC_UPTIME   = 7;     // /proc/uptime
+static const int PROC_CPUINFO  = 8;     // /proc/cpuinfo
+static const int PROC_PARTITIONS = 9;   // /proc/partitions
 
 /* names of objects in /proc */
 static const char *proc_listing[] = {
@@ -47,6 +52,8 @@ static const char *proc_listing[] = {
   "stat",
   "version",
   "uptime",
+  "cpuinfo",
+  "partitions",
   NULL
 };
 
@@ -63,7 +70,9 @@ static const DWORD proc_fhandlers[PROC_LINK_COUNT] = {
   FH_REGISTRY,
   FH_PROC,
   FH_PROC,
-  FH_PROC
+  FH_PROC,
+  FH_PROC,
+  FH_PROC,
 };
 
 /* name of the /proc filesystem */
@@ -73,20 +82,20 @@ const int proc_len = sizeof (proc) - 1;
 static __off64_t format_proc_meminfo (char *destbuf, size_t maxsize);
 static __off64_t format_proc_stat (char *destbuf, size_t maxsize);
 static __off64_t format_proc_uptime (char *destbuf, size_t maxsize);
+static __off64_t format_proc_cpuinfo (char *destbuf, size_t maxsize);
+static __off64_t format_proc_partitions (char *destbuf, size_t maxsize);
 
-/* auxillary function that returns the fhandler associated with the given path
- * this is where it would be nice to have pattern matching in C - polymorphism
- * just doesn't cut it
- */
+/* Auxillary function that returns the fhandler associated with the given path
+   this is where it would be nice to have pattern matching in C - polymorphism
+   just doesn't cut it. */
 DWORD
 fhandler_proc::get_proc_fhandler (const char *path)
 {
   debug_printf ("get_proc_fhandler(%s)", path);
   path += proc_len;
   /* Since this method is called from path_conv::check we can't rely on
-   * it being normalised and therefore the path may have runs of slashes
-   * in it.
-   */
+     it being normalised and therefore the path may have runs of slashes
+     in it.  */
   while (isdirsep (*path))
     path++;
 
@@ -121,8 +130,7 @@ fhandler_proc::get_proc_fhandler (const char *path)
 }
 
 /* Returns 0 if path doesn't exist, >0 if path is a directory,
- * <0 if path is a file.
- */
+   <0 if path is a file.  */
 int
 fhandler_proc::exists ()
 {
@@ -363,6 +371,18 @@ fhandler_proc::fill_filebuf ()
 	filesize = format_proc_meminfo (filebuf, bufalloc);
 	break;
       }
+    case PROC_CPUINFO:
+      {
+	filebuf = (char *) realloc (filebuf, bufalloc = 16384);
+	filesize = format_proc_cpuinfo (filebuf, bufalloc);
+	break;
+      }
+    case PROC_PARTITIONS:
+      {
+	filebuf = (char *) realloc (filebuf, bufalloc = 4096);
+	filesize = format_proc_partitions (filebuf, bufalloc);
+	break;
+      }
     }
     return true;
 }
@@ -403,24 +423,30 @@ format_proc_uptime (char *destbuf, size_t maxsize)
   unsigned long long uptime = 0ULL, idle_time = 0ULL;
   SYSTEM_PROCESSOR_TIMES spt;
 
-  NTSTATUS ret = NtQuerySystemInformation (SystemProcessorTimes, (PVOID) &spt,
-					   sizeof spt, NULL);
-  if (!ret && GetLastError () == ERROR_PROC_NOT_FOUND)
-    uptime = GetTickCount () / 10;
-  else if (ret != STATUS_SUCCESS)
+  if (!GetSystemTimes ((FILETIME *) &spt.IdleTime, (FILETIME *) &spt.KernelTime,
+		       (FILETIME *) &spt.UserTime)
+      && GetLastError () == ERROR_PROC_NOT_FOUND)
     {
-      __seterrno_from_win_error (RtlNtStatusToDosError (ret));
-      debug_printf("NtQuerySystemInformation: ret = %d, "
-		   "Dos(ret) = %d",
-		   ret, RtlNtStatusToDosError (ret));
-      return 0;
+      NTSTATUS ret = NtQuerySystemInformation (SystemProcessorTimes, (PVOID) &spt,
+					       sizeof spt, NULL);
+      if (!ret && GetLastError () == ERROR_PROC_NOT_FOUND)
+	{
+	  uptime = GetTickCount () / 10;
+	  goto out;
+	}
+      else if (ret != STATUS_SUCCESS)
+	{
+	  __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+	  debug_printf("NtQuerySystemInformation: ret = %d, "
+		       "Dos(ret) = %d",
+		       ret, RtlNtStatusToDosError (ret));
+	  return 0;
+	}
     }
-  else
-    {
-      idle_time = spt.IdleTime.QuadPart / 100000ULL;
-      uptime = (spt.KernelTime.QuadPart +
-			spt.UserTime.QuadPart) / 100000ULL;
-    }
+  idle_time = spt.IdleTime.QuadPart / 100000ULL;
+  uptime = (spt.KernelTime.QuadPart +
+	    spt.UserTime.QuadPart) / 100000ULL;
+out:
 
   return __small_sprintf (destbuf, "%U.%02u %U.%02u\n",
 			  uptime / 100, long (uptime % 100),
@@ -500,3 +526,398 @@ format_proc_stat (char *destbuf, size_t maxsize)
 			  context_switches,
 			  boot_time);
 }
+
+#define read_value(x,y) \
+      do {\
+	dwCount = BUFSIZE; \
+	if ((dwError = RegQueryValueEx (hKey, x, NULL, &dwType, (BYTE *) szBuffer, &dwCount)), \
+	    (dwError != ERROR_SUCCESS && dwError != ERROR_MORE_DATA)) \
+	  { \
+	    __seterrno_from_win_error (dwError); \
+	    debug_printf ("RegQueryValueEx failed retcode %d", dwError); \
+	    return 0; \
+	  } \
+	if (dwType != y) \
+	  { \
+	    debug_printf ("Value %s had an unexpected type (expected %d, found %d)", y, dwType); \
+	    return 0; \
+	  }\
+      } while (0)
+
+#define print(x) \
+	do { \
+	  strcpy (bufptr, x), \
+	  bufptr += sizeof (x) - 1; \
+	} while (0)
+
+static inline void
+cpuid (unsigned *a, unsigned *b, unsigned *c, unsigned *d, unsigned in)
+{
+  asm ("cpuid"
+       : "=a" (*a),
+	 "=b" (*b),
+	 "=c" (*c),
+	 "=d" (*d)
+       : "a" (in));
+}
+
+static inline bool
+can_set_flag (unsigned flag)
+{
+  unsigned r1, r2;
+  asm("pushfl\n"
+      "popl %0\n"
+      "movl %0, %1\n"
+      "xorl %2, %0\n"
+      "pushl %0\n"
+      "popfl\n"
+      "pushfl\n"
+      "popl %0\n"
+      "pushl %1\n"
+      "popfl\n"
+      : "=&r" (r1), "=&r" (r2)
+      : "ir" (flag)
+  );
+  return ((r1 ^ r2) & flag) != 0;
+}
+
+static __off64_t
+format_proc_cpuinfo (char *destbuf, size_t maxsize)
+{
+  SYSTEM_INFO siSystemInfo;
+  HKEY hKey;
+  DWORD dwError, dwCount, dwType;
+  DWORD dwOldThreadAffinityMask;
+  int cpu_number;
+  const int BUFSIZE = 256;
+  CHAR szBuffer[BUFSIZE];
+  char *bufptr = destbuf;
+
+  GetSystemInfo (&siSystemInfo);
+
+  for (cpu_number = 0;;cpu_number++)
+    {
+      __small_sprintf (szBuffer, "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\%d", cpu_number);
+
+      if ((dwError = RegOpenKeyEx (HKEY_LOCAL_MACHINE, szBuffer, 0, KEY_QUERY_VALUE, &hKey)) != ERROR_SUCCESS)
+	{
+	  if (dwError == ERROR_FILE_NOT_FOUND)
+	    break;
+	  __seterrno_from_win_error (dwError);
+	  debug_printf ("RegOpenKeyEx failed retcode %d", dwError);
+	  return 0;
+	}
+
+      dwOldThreadAffinityMask = SetThreadAffinityMask (GetCurrentThread (), 1 << cpu_number);
+      if (dwOldThreadAffinityMask == 0)
+	debug_printf ("SetThreadAffinityMask failed %E");
+      // I'm not sure whether the thread changes processor immediately
+      // and I'm not sure whether this function will cause the thread to be rescheduled
+      low_priority_sleep (0);
+
+      bool has_cpuid = false;
+
+      if (!can_set_flag (0x00040000))
+	debug_printf ("386 processor - no cpuid");
+      else
+	{
+	  debug_printf ("486 processor");
+	  if (can_set_flag (0x00200000))
+	    {
+	      debug_printf ("processor supports CPUID instruction");
+	      has_cpuid = true;
+	    }
+	  else
+	    debug_printf ("processor does not support CPUID instruction");
+	}
+
+      if (!has_cpuid)
+	{
+	  bufptr += __small_sprintf (bufptr, "processor       : %d\n", cpu_number);
+	  read_value ("VendorIdentifier", REG_SZ);
+	  bufptr += __small_sprintf (bufptr, "vendor id       : %s\n", szBuffer);
+	  read_value ("Identifier", REG_SZ);
+	  bufptr += __small_sprintf (bufptr, "identifier      : %s\n", szBuffer);
+	  read_value ("~Mhz", REG_DWORD);
+	  bufptr += __small_sprintf (bufptr, "cpu MHz         : %u\n", *(DWORD *) szBuffer);
+
+	  print ("flags           :");
+	  if (IsProcessorFeaturePresent (PF_3DNOW_INSTRUCTIONS_AVAILABLE))
+	    print (" 3dnow");
+	  if (IsProcessorFeaturePresent (PF_COMPARE_EXCHANGE_DOUBLE))
+	    print (" cx8");
+	  if (!IsProcessorFeaturePresent (PF_FLOATING_POINT_EMULATED))
+	    print (" fpu");
+	  if (IsProcessorFeaturePresent (PF_MMX_INSTRUCTIONS_AVAILABLE))
+	    print (" mmx");
+	  if (IsProcessorFeaturePresent (PF_PAE_ENABLED))
+	    print (" pae");
+	  if (IsProcessorFeaturePresent (PF_RDTSC_INSTRUCTION_AVAILABLE))
+	    print (" tsc");
+	  if (IsProcessorFeaturePresent (PF_XMMI_INSTRUCTIONS_AVAILABLE))
+	    print (" sse");
+	  if (IsProcessorFeaturePresent (PF_XMMI64_INSTRUCTIONS_AVAILABLE))
+	    print (" sse2");
+	}
+      else
+	{
+	  bufptr += __small_sprintf (bufptr, "processor       : %d\n", cpu_number);
+	  unsigned maxf, vendor_id[4], unused;
+	  cpuid (&maxf, &vendor_id[0], &vendor_id[1], &vendor_id[2], 0);
+	  maxf &= 0xffff;
+	  vendor_id[3] = 0;
+	  bufptr += __small_sprintf (bufptr, "vendor id       : %s\n", (char *)vendor_id);
+	  read_value ("~Mhz", REG_DWORD);
+	  unsigned cpu_mhz = *(DWORD *)szBuffer;
+	  if (maxf >= 1)
+	    {
+	      unsigned features2, features1, extra_info, cpuid_sig;
+	      cpuid (&cpuid_sig, &extra_info, &features2, &features1, 1);
+	      /* unsigned extended_family = (cpuid_sig & 0x0ff00000) >> 20,
+			  extended_model  = (cpuid_sig & 0x000f0000) >> 16; */
+	      unsigned type            = (cpuid_sig & 0x00003000) >> 12,
+		       family          = (cpuid_sig & 0x00000f00) >> 8,
+		       model           = (cpuid_sig & 0x000000f0) >> 4,
+		       stepping        = cpuid_sig & 0x0000000f;
+	      unsigned brand_id        = extra_info & 0x0000000f,
+		       cpu_count       = (extra_info & 0x00ff0000) >> 16,
+		       apic_id         = (extra_info & 0xff000000) >> 24;
+	      const char *type_str;
+	      switch (type)
+		{
+		case 0:
+		  type_str = "primary processor";
+		  break;
+		case 1:
+		  type_str = "overdrive processor";
+		  break;
+		case 2:
+		  type_str = "secondary processor";
+		  break;
+		case 3:
+		default:
+		  type_str = "reserved";
+		  break;
+		}
+	      unsigned maxe = 0;
+	      cpuid (&maxe, &unused, &unused, &unused, 0x80000000);
+	      if (maxe >= 0x80000004)
+		{
+		  unsigned *model_name = (unsigned *) szBuffer;
+		  cpuid (&model_name[0], &model_name[1], &model_name[2], &model_name[3], 0x80000002);
+		  cpuid (&model_name[4], &model_name[5], &model_name[6], &model_name[7], 0x80000003);
+		  cpuid (&model_name[8], &model_name[9], &model_name[10], &model_name[11], 0x80000004);
+		  model_name[12] = 0;
+		}
+	      else
+		{
+		  // could implement a lookup table here if someone needs it
+		  strcpy (szBuffer, "unknown");
+		}
+	      bufptr += __small_sprintf (bufptr, "type            : %s\n"
+						 "cpu family      : %d\n"
+						 "model           : %d\n"
+						 "model name      : %s\n"
+						 "stepping        : %d\n"
+						 "brand id        : %d\n"
+						 "cpu count       : %d\n"
+						 "apic id         : %d\n"
+						 "cpu MHz         : %d\n"
+						 "fpu             : %s\n",
+					 type_str,
+					 family,
+					 model,
+					 szBuffer,
+					 stepping,
+					 brand_id,
+					 cpu_count,
+					 apic_id,
+					 cpu_mhz,
+					 IsProcessorFeaturePresent (PF_FLOATING_POINT_EMULATED) ? "no" : "yes");
+	      print ("flags           :");
+	      if (features1 & (1 << 0))
+		print (" fpu");
+	      if (features1 & (1 << 1))
+		print (" vme");
+	      if (features1 & (1 << 2))
+		print (" de");
+	      if (features1 & (1 << 3))
+		print (" pse");
+	      if (features1 & (1 << 4))
+		print (" tsc");
+	      if (features1 & (1 << 5))
+		print (" msr");
+	      if (features1 & (1 << 6))
+		print (" pae");
+	      if (features1 & (1 << 7))
+		print (" mce");
+	      if (features1 & (1 << 8))
+		print (" cx8");
+	      if (features1 & (1 << 9))
+		print (" apic");
+	      if (features1 & (1 << 11))
+		print (" sep");
+	      if (features1 & (1 << 12))
+		print (" mtrr");
+	      if (features1 & (1 << 13))
+		print (" pge");
+	      if (features1 & (1 << 14))
+		print (" mca");
+	      if (features1 & (1 << 15))
+		print (" cmov");
+	      if (features1 & (1 << 16))
+		print (" pat");
+	      if (features1 & (1 << 17))
+		print (" pse36");
+	      if (features1 & (1 << 18))
+		print (" psn");
+	      if (features1 & (1 << 19))
+		print (" clfl");
+	      if (features1 & (1 << 21))
+		print (" dtes");
+	      if (features1 & (1 << 22))
+		print (" acpi");
+	      if (features1 & (1 << 23))
+		print (" mmx");
+	      if (features1 & (1 << 24))
+		print (" fxsr");
+	      if (features1 & (1 << 25))
+		print (" sse");
+	      if (features1 & (1 << 26))
+		print (" sse2");
+	      if (features1 & (1 << 27))
+		print (" ss");
+	      if (features1 & (1 << 28))
+		print (" htt");
+	      if (features1 & (1 << 29))
+		print (" tmi");
+	      if (features1 & (1 << 30))
+		print (" ia-64");
+	      if (features1 & (1 << 31))
+		print (" pbe");
+	      if (features2 & (1 << 0))
+		print (" sse3");
+	      if (features2 & (1 << 3))
+		print (" mon");
+	      if (features2 & (1 << 4))
+		print (" dscpl");
+	      if (features2 & (1 << 8))
+		print (" tm2");
+	      if (features2 & (1 << 10))
+		print (" cid");
+	    }
+	  else
+	    {
+	      bufptr += __small_sprintf (bufptr, "cpu MHz         : %d\n"
+						 "fpu             : %s\n",
+						 cpu_mhz,
+						 IsProcessorFeaturePresent (PF_FLOATING_POINT_EMULATED) ? "no" : "yes");
+	    }
+	}
+      if (dwOldThreadAffinityMask != 0)
+	SetThreadAffinityMask (GetCurrentThread (), dwOldThreadAffinityMask);
+
+      RegCloseKey (hKey);
+      bufptr += __small_sprintf (bufptr, "\n");
+  }
+
+  return bufptr - destbuf;
+}
+
+#undef read_value
+
+static __off64_t
+format_proc_partitions (char *destbuf, size_t maxsize)
+{
+  char *bufptr = destbuf;
+  print ("major minor  #blocks  name\n\n");
+
+  if (wincap.is_winnt ())
+    {
+      for (int drive_number=0;;drive_number++)
+	{
+	  CHAR szDriveName[MAX_PATH];
+	  __small_sprintf (szDriveName, "\\\\.\\PHYSICALDRIVE%d", drive_number);
+	  HANDLE hDevice;
+	  hDevice = CreateFile (szDriveName,
+				GENERIC_READ,
+				FILE_SHARE_READ | FILE_SHARE_WRITE,
+				NULL,
+				OPEN_EXISTING,
+				0,
+				NULL);
+	  if (hDevice == INVALID_HANDLE_VALUE)
+	    {
+	      if (GetLastError () == ERROR_PATH_NOT_FOUND)
+		  break;
+	      __seterrno ();
+	      debug_printf ("CreateFile %d %E", GetLastError ());
+	      break;
+	    }
+	  else
+	    {
+	      DWORD dwBytesReturned, dwRetCode;
+	      DISK_GEOMETRY dg;
+	      int buf_size = 4096;
+	      char buf[buf_size];
+	      dwRetCode = DeviceIoControl (hDevice,
+					   IOCTL_DISK_GET_DRIVE_GEOMETRY,
+					   NULL,
+					   0,
+					   &dg,
+					   sizeof (dg),
+					   &dwBytesReturned,
+					   NULL);
+	      if (!dwRetCode)
+		debug_printf ("DeviceIoControl %E");
+	      else
+		{
+		  bufptr += __small_sprintf (bufptr, "%5d %5d %9U sd%c\n",
+					     FH_FLOPPY,
+					     drive_number * 16 + 32,
+					     (long long)((dg.Cylinders.QuadPart * dg.TracksPerCylinder *
+					      dg.SectorsPerTrack * dg.BytesPerSector) >> 6),
+					     drive_number + 'a');
+		}
+	      while (dwRetCode = DeviceIoControl (hDevice,
+						  IOCTL_DISK_GET_DRIVE_LAYOUT,
+						  NULL,
+						  0,
+						  (DRIVE_LAYOUT_INFORMATION *) buf,
+						  buf_size,
+						  &dwBytesReturned,
+						  NULL),
+		     !dwRetCode && GetLastError () == ERROR_INSUFFICIENT_BUFFER)
+	      buf_size *= 2;
+	      if (!dwRetCode)
+		debug_printf ("DeviceIoControl %E");
+	      else
+		{
+		  DRIVE_LAYOUT_INFORMATION *dli = (DRIVE_LAYOUT_INFORMATION *) buf;
+		  for (unsigned partition = 0; partition < dli->PartitionCount; partition++)
+		    {
+		      if (dli->PartitionEntry[partition].PartitionLength.QuadPart == 0)
+			continue;
+		      bufptr += __small_sprintf (bufptr, "%5d %5d %9U sd%c%d\n",
+						 FH_FLOPPY,
+						 drive_number * 16 + partition + 33,
+						 (long long)(dli->PartitionEntry[partition].PartitionLength.QuadPart >> 6),
+						 drive_number + 'a',
+						 partition + 1);
+		    }
+		}
+
+	      CloseHandle (hDevice);
+	    }
+	}
+    }
+  else
+    {
+      // not worth the effort
+      // you need a 16 bit thunk DLL to access the partition table on Win9x
+      // and then you have to decode it yourself
+    }
+  return bufptr - destbuf;
+}
+
+#undef print

@@ -20,20 +20,19 @@ details. */
 /* This is called _wait and not wait because the real wait is defined
    in libc/syscalls/syswait.c.  It calls us.  */
 
-extern "C"
-pid_t
+extern "C" pid_t
 wait (int *status)
 {
   return wait4 (-1, status, 0, NULL);
 }
 
-pid_t
+extern "C" pid_t
 waitpid (pid_t intpid, int *status, int options)
 {
   return wait4 (intpid, status, options, NULL);
 }
 
-pid_t
+extern "C" pid_t
 wait3 (int *status, int options, struct rusage *r)
 {
   return wait4 (-1, status, options, r);
@@ -44,7 +43,7 @@ wait3 (int *status, int options, struct rusage *r)
  * not work correctly.
  */
 
-pid_t
+extern "C" pid_t
 wait4 (int intpid, int *status, int options, struct rusage *r)
 {
   int res;

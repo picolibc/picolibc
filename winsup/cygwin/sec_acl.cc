@@ -413,8 +413,7 @@ getacl (const char *file, DWORD attr, int nentries, __aclent32_t *aclbufp)
   return pos;
 }
 
-static
-int
+static int
 acl_worker (const char *path, int cmd, int nentries, __aclent32_t *aclbufp,
 	    int nofollow)
 {
@@ -493,22 +492,19 @@ acl_worker (const char *path, int cmd, int nentries, __aclent32_t *aclbufp,
   return -1;
 }
 
-extern "C"
-int
+extern "C" int
 acl32 (const char *path, int cmd, int nentries, __aclent32_t *aclbufp)
 {
   return acl_worker (path, cmd, nentries, aclbufp, 0);
 }
 
-extern "C"
-int
+extern "C" int
 lacl32 (const char *path, int cmd, int nentries, __aclent32_t *aclbufp)
 {
   return acl_worker (path, cmd, nentries, aclbufp, 1);
 }
 
-extern "C"
-int
+extern "C" int
 facl32 (int fd, int cmd, int nentries, __aclent32_t *aclbufp)
 {
   cygheap_fdget cfd (fd);
@@ -528,8 +524,7 @@ facl32 (int fd, int cmd, int nentries, __aclent32_t *aclbufp)
   return acl_worker (path, cmd, nentries, aclbufp, 0);
 }
 
-extern "C"
-int
+extern "C" int
 aclcheck32 (__aclent32_t *aclbufp, int nentries, int *which)
 {
   BOOL has_user_obj = FALSE;
@@ -661,8 +656,8 @@ aclcheck32 (__aclent32_t *aclbufp, int nentries, int *which)
   return 0;
 }
 
-static
-int acecmp (const void *a1, const void *a2)
+static int
+acecmp (const void *a1, const void *a2)
 {
 #define ace(i) ((const __aclent32_t *) a##i)
   int ret = ace (1)->a_type - ace (2)->a_type;
@@ -672,8 +667,7 @@ int acecmp (const void *a1, const void *a2)
 #undef ace
 }
 
-extern "C"
-int
+extern "C" int
 aclsort32 (int nentries, int, __aclent32_t *aclbufp)
 {
   if (aclcheck32 (aclbufp, nentries, NULL))
@@ -687,8 +681,7 @@ aclsort32 (int nentries, int, __aclent32_t *aclbufp)
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 acltomode32 (__aclent32_t *aclbufp, int nentries, mode_t *modep)
 {
   int pos;
@@ -727,8 +720,7 @@ acltomode32 (__aclent32_t *aclbufp, int nentries, mode_t *modep)
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 aclfrommode32 (__aclent32_t *aclbufp, int nentries, mode_t *modep)
 {
   int pos;
@@ -765,15 +757,13 @@ aclfrommode32 (__aclent32_t *aclbufp, int nentries, mode_t *modep)
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 acltopbits32 (__aclent32_t *aclbufp, int nentries, mode_t *pbitsp)
 {
   return acltomode32 (aclbufp, nentries, pbitsp);
 }
 
-extern "C"
-int
+extern "C" int
 aclfrompbits32 (__aclent32_t *aclbufp, int nentries, mode_t *pbitsp)
 {
   return aclfrommode32 (aclbufp, nentries, pbitsp);
@@ -791,8 +781,7 @@ permtostr (mode_t perm)
   return pbuf;
 }
 
-extern "C"
-char *
+extern "C" char *
 acltotext32 (__aclent32_t *aclbufp, int aclcnt)
 {
   if (!aclbufp || aclcnt < 1 || aclcnt > MAX_ACL_ENTRIES
@@ -868,8 +857,7 @@ permfromstr (char *perm)
   return mode;
 }
 
-extern "C"
-__aclent32_t *
+extern "C" __aclent32_t *
 aclfromtext32 (char *acltextp, int *)
 {
   if (!acltextp)
@@ -992,79 +980,68 @@ acl16to32 (__aclent16_t *aclbufp, int nentries)
   return aclbufp32;
 }
 
-extern "C"
-int
+extern "C" int
 acl (const char *path, int cmd, int nentries, __aclent16_t *aclbufp)
 {
   return acl32 (path, cmd, nentries, acl16to32 (aclbufp, nentries));
 }
 
-extern "C"
-int
+extern "C" int
 facl (int fd, int cmd, int nentries, __aclent16_t *aclbufp)
 {
   return facl32 (fd, cmd, nentries, acl16to32 (aclbufp, nentries));
 }
 
-extern "C"
-int
+extern "C" int
 lacl (const char *path, int cmd, int nentries, __aclent16_t *aclbufp)
 {
   return lacl32 (path, cmd, nentries, acl16to32 (aclbufp, nentries));
 }
 
-extern "C"
-int
+extern "C" int
 aclcheck (__aclent16_t *aclbufp, int nentries, int *which)
 {
   return aclcheck32 (acl16to32 (aclbufp, nentries), nentries, which);
 }
 
-extern "C"
-int
+extern "C" int
 aclsort (int nentries, int i, __aclent16_t *aclbufp)
 {
   return aclsort32 (nentries, i, acl16to32 (aclbufp, nentries));
 }
 
 
-extern "C"
-int
+extern "C" int
 acltomode (__aclent16_t *aclbufp, int nentries, mode_t *modep)
 {
   return acltomode32 (acl16to32 (aclbufp, nentries), nentries, modep);
 }
 
-extern "C"
-int
+extern "C" int
 aclfrommode (__aclent16_t *aclbufp, int nentries, mode_t *modep)
 {
   return aclfrommode32 ((__aclent32_t *)aclbufp, nentries, modep);
 }
 
-extern "C"
-int
+extern "C" int
 acltopbits (__aclent16_t *aclbufp, int nentries, mode_t *pbitsp)
 {
   return acltopbits32 (acl16to32 (aclbufp, nentries), nentries, pbitsp);
 }
 
-extern "C"
-int
+extern "C" int
 aclfrompbits (__aclent16_t *aclbufp, int nentries, mode_t *pbitsp)
 {
   return aclfrompbits32 ((__aclent32_t *)aclbufp, nentries, pbitsp);
 }
 
-extern "C"
-char *
+extern "C" char *
 acltotext (__aclent16_t *aclbufp, int aclcnt)
 {
   return acltotext32 (acl16to32 (aclbufp, aclcnt), aclcnt);
 }
 
-extern "C"
-__aclent16_t *
+extern "C" __aclent16_t *
 aclfromtext (char *acltextp, int * aclcnt)
 {
   return (__aclent16_t *) aclfromtext32 (acltextp, aclcnt);

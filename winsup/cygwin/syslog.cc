@@ -60,8 +60,7 @@ static int process_logmask = LOG_UPTO (LOG_DEBUG);
  * openlog: save the passed args. Don't open the
  * system log (NT) or log file (95) yet.
  */
-extern "C"
-void
+extern "C" void
 openlog (const char *ident, int logopt, int facility)
 {
     debug_printf ("openlog called with (%s, %d, %d)",
@@ -208,8 +207,7 @@ pass_handler::print_va (const char *fmt, va_list list)
  * always point to that.
  */
 
-extern "C"
-void
+extern "C" void
 syslog (int priority, const char *message, ...)
 {
     debug_printf ("%x %s", priority, message);
@@ -410,8 +408,7 @@ syslog (int priority, const char *message, ...)
       }
 }
 
-extern "C"
-void
+extern "C" void
 closelog (void)
 {
   ;
