@@ -1,3 +1,7 @@
+2001-02-07  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/rtems/sys/types.h: Removed.
+
 2001-02-05  Charles Wilson  <cwilson@ece.gatech.edu>
 
         * libc/include/locale.h: add LC_MESSAGES definition
