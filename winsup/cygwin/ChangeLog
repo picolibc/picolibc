@@ -22,7 +22,7 @@ Fri Mar 16 20:25:40 2001  Christopher Faylor <cgf@cygnus.com>
 	(suffix_scan::next): Don't increment next state.  Set it specifically.
 	Recognize new .lnk states.
 
-aturday Mar 17 01:19 2001 Robert Collins rbtcollins@hotmail.com
+Saturday Mar 17 01:19 2001 Robert Collins rbtcollins@hotmail.com
    
 	* cygwin.din: Export the new functions.
 	* pthread.cc (pthread_cond_*): Add wrapper functions that call
