@@ -88,13 +88,13 @@ internal_getlogin (cygheap_user &user)
 
   if (pw)
     {
-      user.real_uid = pw->pw_uid;
-      user.real_gid = pw->pw_gid;
+      myself->uid = pw->pw_uid;
+      myself->gid = pw->pw_gid;
     }
   else
     {
-      user.real_uid = DEFAULT_UID;
-      user.real_gid = DEFAULT_GID;
+      myself->uid = DEFAULT_UID;
+      myself->gid = DEFAULT_GID;
     }
 
   (void) cygheap->user.ontherange (CH_HOME, pw);
@@ -109,8 +109,8 @@ uinfo_init ()
     internal_getlogin (cygheap->user); /* Set the cygheap->user. */
 
   /* Real and effective uid/gid are identical on process start up. */
-  myself->uid = cygheap->user.orig_uid = cygheap->user.real_uid;
-  myself->gid = cygheap->user.orig_gid = cygheap->user.real_gid;
+  cygheap->user.orig_uid = cygheap->user.real_uid = myself->uid;
+  cygheap->user.orig_gid = cygheap->user.real_gid = myself->gid;
   cygheap->user.set_orig_sid();      /* Update the original sid */
 
   cygheap->user.token = INVALID_HANDLE_VALUE; /* No token present */

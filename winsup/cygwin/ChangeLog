@@ -1,3 +1,10 @@
+2002-06-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* uinfo.cc (internal_getlogin): Set myself->uid and myself->gid instead
+	of user.real_uid and user.real_gid.
+	(uinfo_init): Evaluate orig_uid and real_uid from myself->uid.  Ditto
+	for gid.
+
 2002-06-23  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* security.cc (get_group_sidlist): Add pw argument and use pw->pw_name
