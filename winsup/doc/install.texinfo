@@ -135,6 +135,19 @@ you'll also need @samp{binutils}, probably @samp{make} and
 @samp{fileutils}, and possibly lots more.  (Again, consider just getting
 everything!)
 
+@subsection How much disk space does Cygwin require?
+
+All the packages listed above comprise about 55MB when downloaded.
+This expands to about 230MB in your ``install root directory''
+(@code{C:\cygwin} by default).  If you download source archives for
+all packages, that's an additional 110MB.  These estimates are based
+on measurements taken 22 Sep 2001.
+
+After installation, the package archives remain in your ``Local Package
+Directory'', by default the location of @code{setup.exe}.  You may
+conserve disk space by deleting the @code{contrib} and @code{latest}
+subdirectories there.
+
 @subsection What if setup fails?
 
 First, make sure that you are using the latest version of
