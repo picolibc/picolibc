@@ -65,7 +65,7 @@
 	(wait_for_sigthread): Rename from "wait_for_me".  Assume that
 	wait_sig_inited has been set and that this function is only called from
 	the main thread.
-	* winsup.h (wait_for_sigthread): Declare new function.
+	* sigproc.h (wait_for_sigthread): Declare new function.
 
 2002-08-08  Christopher Faylor  <cgf@redhat.com>
 
