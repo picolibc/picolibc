@@ -728,6 +728,16 @@ env_sort (const void *a, const void *b)
   return strcmp (*p, *q);
 }
 
+/* Keep this list in upper case and sorted */
+const char* forced_winenv_vars [] =
+  {
+    "SYSTEMDRIVE",
+    "SYSTEMROOT",
+    NULL
+  };
+
+#define FORCED_WINENV_SIZE (sizeof (forced_winenv_vars) / sizeof (forced_winenv_vars[0])) 
+
 /* Create a Windows-style environment block, i.e. a typical character buffer
    filled with null terminated strings, terminated by double null characters.
    Converts environment variables noted in conv_envvars into win32 form
@@ -737,37 +747,61 @@ winenv (const char * const *envp, int keep_posix)
 {
   int len, n, tl;
   const char * const *srcp;
-  const char * *dstp;
+  const char **dstp;
+  bool saw_forced_winenv[FORCED_WINENV_SIZE] = {0};
+  char *p;
+
+  debug_printf ("envp %p, keep_posix %d", envp, keep_posix);
+
+  tl = 0;
 
   for (n = 0; envp[n]; n++)
     continue;
 
-  const char *newenvp[n + 1];
+  const char *newenvp[n + 1 + FORCED_WINENV_SIZE];
 
-  debug_printf ("envp %p, keep_posix %d", envp, keep_posix);
-
-  for (tl = 0, srcp = envp, dstp = newenvp; *srcp; srcp++, dstp++)
+  for (srcp = envp, dstp = newenvp; *srcp; srcp++, dstp++)
     {
-      len = strcspn (*srcp, "=") + 1;
+      len = strcspn (*srcp, "=");
       win_env *conv;
 
-      if (keep_posix || !(conv = getwinenv (*srcp, *srcp + len)))
+      if (keep_posix || !(conv = getwinenv (*srcp, *srcp + len + 1)))
 	*dstp = *srcp;
       else
 	{
-	  char *p = (char *) alloca (strlen (conv->native) + 1);
+	  p = (char *) alloca (strlen (conv->native) + 1);
 	  strcpy (p, conv->native);
 	  *dstp = p;
 	}
       tl += strlen (*dstp) + 1;
       if ((*dstp)[0] == '!' && isdrive ((*dstp) + 1) && (*dstp)[3] == '=')
 	{
-	  char *p = (char *) alloca (strlen (*dstp) + 1);
+	  p = (char *) alloca (strlen (*dstp) + 1);
 	  strcpy (p, *dstp);
 	  *p = '=';
 	  *dstp = p;
 	}
+
+      for (int i = 0; forced_winenv_vars[i]; i++)
+	if (!saw_forced_winenv[i])
+	  saw_forced_winenv[i] = strncasematch (forced_winenv_vars[i], *srcp, len);
     }
+
+  for (int i = 0; forced_winenv_vars[i]; i++)
+    if (!saw_forced_winenv[i])
+      {
+	len = strlen (forced_winenv_vars[i]);
+	p = (char *) alloca (len + MAX_PATH + 1);
+	strcpy (p, forced_winenv_vars[i]);
+	strcat (p, "=");
+	if (!GetEnvironmentVariable (forced_winenv_vars[i], p + len + 1, MAX_PATH))
+	  debug_printf ("warning: %s not present in environment", *srcp);
+	else
+	  {
+	    *dstp++ = p;
+	    tl += strlen (p) + 1;
+	  }
+      }
 
   *dstp = NULL;		/* Terminate */
 
