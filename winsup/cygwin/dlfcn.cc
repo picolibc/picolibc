@@ -144,8 +144,13 @@ dlclose (void *handle)
 char *
 dlerror ()
 {
-  char *ret = 0;
-  if (_dl_error)
-    ret = _dl_buffer;
-  return ret;
+  char *res;
+  if (!_dl_error)
+    res = NULL;
+  else
+    {
+      _dl_error = 0;
+      res = _dl_buffer;
+    }
+  return res;
 }
