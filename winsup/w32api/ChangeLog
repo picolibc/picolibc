@@ -1,3 +1,7 @@
+2003-05-14  Bang Jun-Young  <junyoung@netbsd.org>
+
+	* include/winbase.h (GMEM_VALID_FLAGS): Add.
+
 2003-05-13  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/prsht.h (PROPSHEETHEADER[AW]: Mark
