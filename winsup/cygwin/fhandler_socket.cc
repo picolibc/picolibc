@@ -1115,7 +1115,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	}
       ifr->ifr_flags = IFF_NOTRAILERS | IFF_UP | IFF_RUNNING;
       if (!strncmp(ifr->ifr_name, "lo", 2)
-          || ntohl (((struct sockaddr_in *) &ifr->ifr_addr)->sin_addr.s_addr)
+	  || ntohl (((struct sockaddr_in *) &ifr->ifr_addr)->sin_addr.s_addr)
 	  == INADDR_LOOPBACK)
 	ifr->ifr_flags |= IFF_LOOPBACK;
       else

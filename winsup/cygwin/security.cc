@@ -1243,8 +1243,8 @@ get_attribute_from_acl (int * attribute, PACL acl, PSID owner_sid,
 		      | ((!(*anti & S_IWUSR)) ? S_IWUSR : 0);
 	  if (ace->Mask & FILE_EXECUTE)
 	    *flags |= ((!(*anti & S_IXOTH)) ? S_IXOTH : 0)
-	              | ((!(*anti & S_IXGRP)) ? S_IXGRP : 0)
-	              | ((!(*anti & S_IXUSR)) ? S_IXUSR : 0);
+		      | ((!(*anti & S_IXGRP)) ? S_IXGRP : 0)
+		      | ((!(*anti & S_IXUSR)) ? S_IXUSR : 0);
 	  if ((*attribute & S_IFDIR) &&
 	      (ace->Mask & (FILE_WRITE_DATA | FILE_EXECUTE | FILE_DELETE_CHILD))
 	      == (FILE_WRITE_DATA | FILE_EXECUTE))
@@ -1374,7 +1374,7 @@ get_file_attribute (int use_ntsec, const char *file,
     {
       res = get_nt_attribute (file, attribute, uidret, gidret);
       if (res)
-        {
+	{
 	  /* If reading the security descriptor failed, treat the file
 	     as unreadable. */
 	  *attribute &= ~(S_IRWXU | S_IRWXG | S_IRWXO);

@@ -124,7 +124,7 @@ set_socket_inheritance (SOCKET sock)
   SOCKET osock = sock;
 
   if (!DuplicateHandle (hMainProc, (HANDLE) sock, hMainProc, (HANDLE *) &sock,
-                        0, TRUE, DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
+			0, TRUE, DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
     system_printf ("DuplicateHandle failed %E");
   else
     debug_printf ("DuplicateHandle succeeded osock %p, sock %p", osock, sock);
@@ -153,7 +153,7 @@ extern "C" unsigned short
 htons (unsigned short x)
 {
   return ((((x & 0x000000ffU) << 8) |
-           ((x & 0x0000ff00U) >> 8)));
+	   ((x & 0x0000ff00U) >> 8)));
 }
 
 /* ntohs: standards? */

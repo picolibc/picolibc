@@ -810,7 +810,7 @@ chown_worker (const char *name, unsigned fmode, __uid32_t uid, __gid32_t gid)
 				win32_path.get_win32 (),
 				(int *) &attrib);
       if (!res)
-         res = set_file_attribute (win32_path.has_acls (), win32_path, uid,
+	 res = set_file_attribute (win32_path.has_acls (), win32_path, uid,
 				   gid, attrib);
       if (res != 0 && (!win32_path.has_acls () || !allow_ntsec))
 	{

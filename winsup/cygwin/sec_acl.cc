@@ -138,15 +138,15 @@ setacl (const char *file, int nentries, __aclent16_t *aclbufp)
        */
       if (!(aclbufp[i].a_type & ACL_DEFAULT)
 	  && aclbufp[i].a_type & (USER|GROUP|OTHER_OBJ)
-          && (pos = searchace (aclbufp + i + 1, nentries - i - 1,
+	  && (pos = searchace (aclbufp + i + 1, nentries - i - 1,
 			       aclbufp[i].a_type | ACL_DEFAULT,
 			       (aclbufp[i].a_type & (USER|GROUP))
 			       ? aclbufp[i].a_id : -1)) >= 0
 	  && aclbufp[i].a_perm == aclbufp[pos].a_perm)
 	{
 	  inheritance = SUB_CONTAINERS_AND_OBJECTS_INHERIT;
-          /* This invalidates the corresponding default entry. */
-          aclbufp[pos].a_type = USER|GROUP|ACL_DEFAULT;
+	  /* This invalidates the corresponding default entry. */
+	  aclbufp[pos].a_type = USER|GROUP|ACL_DEFAULT;
 	}
       switch (aclbufp[i].a_type)
 	{
@@ -230,7 +230,7 @@ setacl (const char *file, int nentries, __aclent16_t *aclbufp)
 
 static void
 getace (__aclent16_t &acl, int type, int id, DWORD win_ace_mask,
-        DWORD win_ace_type)
+	DWORD win_ace_type)
 {
   acl.a_type = type;
   acl.a_id = id;
@@ -405,7 +405,7 @@ getacl (const char *file, DWORD attr, int nentries, __aclent16_t *aclbufp)
       lacl[0].a_perm = lacl[1].a_perm;
     if (pos > nentries)
       {
-        set_errno (ENOSPC);
+	set_errno (ENOSPC);
 	return -1;
       }
     memcpy (aclbufp, lacl, pos * sizeof (__aclent16_t));

@@ -116,7 +116,7 @@ internal_getgrsid (cygsid &sid)
   if (sid.string (sid_string))
     for (int i = 0; i < gr.curr_lines; i++)
       if (!strcmp (sid_string, group_buf[i].gr_passwd))
-        return group_buf + i;
+	return group_buf + i;
   return NULL;
 }
 
@@ -244,9 +244,9 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygsid * srchsid)
     {
       /* If impersonated, use impersonation token. */
       if (cygheap->user.issetuid ())
-        hToken = cygheap->user.token;
+	hToken = cygheap->user.token;
       else if (!OpenProcessToken (hMainProc, TOKEN_QUERY, &hToken))
-        hToken = NULL;
+	hToken = NULL;
     }
   if (hToken)
     {
@@ -261,7 +261,7 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygsid * srchsid)
 	      cygsid sid;
 
 	      if (srchsid)
-	        {
+		{
 		  for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
 		    if (*srchsid == groups->Groups[pg].Sid)
 		      return 1;
@@ -289,7 +289,7 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygsid * srchsid)
       else
 	debug_printf ("%d = GetTokenInformation(NULL) %E", size);
       if (hToken != cygheap->user.token)
-        CloseHandle (hToken);
+	CloseHandle (hToken);
       if (cnt)
 	return cnt;
     }
