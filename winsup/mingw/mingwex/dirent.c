@@ -76,8 +76,8 @@ _topendir (const _TCHAR *szPath)
 
   /* Allocate enough space to store DIR structure and the complete
    * directory path given. */
-  nd = (_TDIR *) malloc (sizeof (_TDIR) + _tcslen (szFullPath) + _tcslen (SLASH) +
-		       _tcslen (SUFFIX));
+  nd = (_TDIR *) malloc (sizeof (_TDIR) + (_tcslen(szFullPath) + _tcslen (SLASH) +
+			 _tcslen(SUFFIX) + 1) * sizeof(_TCHAR));
 
   if (!nd)
     {

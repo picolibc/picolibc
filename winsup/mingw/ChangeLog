@@ -1,3 +1,8 @@
+2003-09-22  Roland Schwingel  <rolandschwingel@users.sourceforge.net>
+
+	* mingwex/dirent.c (_topendir): Allocate enough memory for
+	DIR struct in UNICODE case too.
+
 2003-09-15  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/_mingw.h: Increment version to 3.2.
@@ -888,10 +893,10 @@
 	(atexit): Force use of private atexit table via _dllonexit,
 	(_onexit): New function. Force use of private atexit table via
 	_dllonexit,
-	* mscvrt.def (atexit, _onexit): Add DATA keyword so that only 
+	* msvcrt.def (atexit, _onexit): Add DATA keyword so that only
 	_imp_<_symbol> is visible in import lib.
-	* mscvrt20.def: Likewise.
-	* mscvrt40.def: Likewise.
+	* msvcrt20.def: Likewise.
+	* msvcrt40.def: Likewise.
 	* crtdll.def: Likewise.
 
 	2002-04-26  Danny Smith  <dannysmith@users.sourceforge.net>
