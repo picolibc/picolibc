@@ -226,7 +226,7 @@ already_did (char *file)
   for (d = did; d; d = d->next)
     if (strcasecmp (d->file, file) == 0)
       return d;
-  d = new Did;
+  d = (Did *) malloc (sizeof (Did));
   d->file = strdup (file);
   d->next = did;
   d->state = DID_NEW;

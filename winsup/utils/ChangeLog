@@ -1,3 +1,8 @@
+2002-01-17  DJ Delorie  <dj@redhat.com>
+
+	* cygcheck.cc (already_did): Avoid default constructors, which may
+	require exception support.
+
 2001-01-16  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* cygpath.cc (main): Add options to show Desktop and Start
