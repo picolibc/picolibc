@@ -1,3 +1,9 @@
+2004-11-08  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winnt.h (GetCurrentFiber): Support -masm=intel.
+	(GetFiberData): Likewise.
+	(NtCurrentTeb): Likewise.
+
 2004-11-04  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wingdi.h (NIF_INFO): Add define.
