@@ -20,7 +20,7 @@ endif
 
 # The order of SUBDIRS is important for the integrated documentation.
 # Do not change the order without considering the doc impact.
-SUBDIRS = argz stdlib ctype stdio string $(SIGNAL_SUBDIR) time locale sys reent \
+SUBDIRS = argz stdlib ctype search stdio string $(SIGNAL_SUBDIR) time locale sys reent \
 	$(extra_dir) errno misc machine $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) .
 
 noinst_DATA = $(CRT0)
@@ -31,6 +31,7 @@ SUBLIBS = \
 	argz/libargz.$(aext) \
 	stdlib/libstdlib.$(aext) \
 	ctype/libctype.$(aext) \
+	search/libsearch.$(aext) \
 	stdio/libstdio.$(aext) \
 	string/libstring.$(aext) \
 	$(LIBC_SIGNAL_LIB) \
@@ -51,6 +52,7 @@ SUBLIBS = \
 	argz/lib.$(aext) \
 	stdlib/lib.$(aext) \
 	ctype/lib.$(aext) \
+	search/lib.$(aext) \
 	stdio/lib.$(aext) \
 	string/lib.$(aext) \
 	$(LIBC_SIGNAL_LIB) \

@@ -18,7 +18,6 @@ LIB_SOURCES = \
 	atoff.c		\
 	atoi.c  	\
 	atol.c		\
-	bsearch.c	\
 	calloc.c	\
 	div.c  		\
 	drand48.c	\
@@ -59,7 +58,6 @@ LIB_SOURCES = \
 	on_exit.c	\
 	putenv.c	\
 	putenv_r.c	\
-	qsort.c		\
 	rand.c		\
 	rand48.c	\
 	rand_r.c	\
@@ -154,7 +152,6 @@ CHEWOUT_FILES= \
 	atof.def 	\
 	ecvtbuf.def	\
 	atoi.def 	\
-	bsearch.def	\
 	calloc.def	\
 	div.def		\
 	efgcvt.def 	\
@@ -171,7 +168,6 @@ CHEWOUT_FILES= \
 	mlock.def	\
 	mstats.def	\
 	on_exit.def	\
-	qsort.def	\
 	rand.def	\
 	rand48.def	\
 	strtod.def 	\

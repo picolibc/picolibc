@@ -205,6 +205,7 @@ LIBC_OBJECTLISTS = \
 	libc/stdlib/objectlist.awk.in \
 	libc/time/objectlist.awk.in \
 	libc/ctype/objectlist.awk.in \
+	libc/search/objectlist.awk.in \
 	libc/string/objectlist.awk.in \
 	libc/locale/objectlist.awk.in \
 	libc/misc/objectlist.awk.in \

@@ -115,7 +115,7 @@ AUTOMAKE_OPTIONS = cygnus
 
 # The order of SUBDIRS is important for the integrated documentation.
 # Do not change the order without considering the doc impact.
-SUBDIRS = argz stdlib ctype stdio string $(SIGNAL_SUBDIR) time locale sys reent \
+SUBDIRS = argz stdlib ctype search stdio string $(SIGNAL_SUBDIR) time locale sys reent \
 	$(extra_dir) errno misc machine $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) .
 
 
@@ -126,6 +126,7 @@ noinst_DATA = $(CRT0)
 @USE_LIBTOOL_TRUE@	argz/libargz.$(aext) \
 @USE_LIBTOOL_TRUE@	stdlib/libstdlib.$(aext) \
 @USE_LIBTOOL_TRUE@	ctype/libctype.$(aext) \
+@USE_LIBTOOL_TRUE@	search/libsearch.$(aext) \
 @USE_LIBTOOL_TRUE@	stdio/libstdio.$(aext) \
 @USE_LIBTOOL_TRUE@	string/libstring.$(aext) \
 @USE_LIBTOOL_TRUE@	$(LIBC_SIGNAL_LIB) \
@@ -144,6 +145,7 @@ noinst_DATA = $(CRT0)
 @USE_LIBTOOL_FALSE@	argz/lib.$(aext) \
 @USE_LIBTOOL_FALSE@	stdlib/lib.$(aext) \
 @USE_LIBTOOL_FALSE@	ctype/lib.$(aext) \
+@USE_LIBTOOL_FALSE@	search/lib.$(aext) \
 @USE_LIBTOOL_FALSE@	stdio/lib.$(aext) \
 @USE_LIBTOOL_FALSE@	string/lib.$(aext) \
 @USE_LIBTOOL_FALSE@	$(LIBC_SIGNAL_LIB) \
@@ -206,10 +208,10 @@ LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 @USE_LIBTOOL_TRUE@libc_la_DEPENDENCIES =  argz/libargz.$(aext) \
 @USE_LIBTOOL_TRUE@stdlib/libstdlib.$(aext) ctype/libctype.$(aext) \
-@USE_LIBTOOL_TRUE@stdio/libstdio.$(aext) string/libstring.$(aext) \
-@USE_LIBTOOL_TRUE@time/libtime.$(aext) locale/liblocale.$(aext) \
-@USE_LIBTOOL_TRUE@reent/libreent.$(aext) errno/liberrno.$(aext) \
-@USE_LIBTOOL_TRUE@misc/libmisc.$(aext)
+@USE_LIBTOOL_TRUE@search/libsearch.$(aext) stdio/libstdio.$(aext) \
+@USE_LIBTOOL_TRUE@string/libstring.$(aext) time/libtime.$(aext) \
+@USE_LIBTOOL_TRUE@locale/liblocale.$(aext) reent/libreent.$(aext) \
+@USE_LIBTOOL_TRUE@errno/liberrno.$(aext) misc/libmisc.$(aext)
 @USE_LIBTOOL_TRUE@libc_la_OBJECTS = 
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -230,8 +232,8 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-DIST_SUBDIRS =  argz stdlib ctype stdio string signal time locale sys \
-reent @extra_dir@ errno misc machine unix posix syscalls .
+DIST_SUBDIRS =  argz stdlib ctype search stdio string signal time locale \
+sys reent @extra_dir@ errno misc machine unix posix syscalls .
 SOURCES = libc.a.c $(libc_la_SOURCES)
 OBJECTS = libc.a.$(OBJEXT) $(libc_la_OBJECTS)
 

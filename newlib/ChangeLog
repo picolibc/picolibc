@@ -1,3 +1,48 @@
+2002-06-20  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* Makefile.am (LIB_OBJECTLISTS): Add
+	libc/search/objectlist.awk.in.
+	* libc/Makefile.am (SUBDIRS): Add search.
+	(SUBLIBS): Add search/libsearch.la.
+	* libc/configure.in (AC_OUTPUT): Add search/Makefile.
+	* libc/search: New directory.
+	* libc/search/Makefile.am: New file.
+	* libc/search/extern.h: New file.
+	* libc/search/hash.c: New file.
+	* libc/search/hash.h: New file.
+	* libc/search/hash_bigkey.c: New file.
+	* libc/search/hash_buf.c: New file.
+	* libc/search/hash_func.c: New file.
+	* libc/search/hash_log2.c: New file.
+	* libc/search/hash_page.c: New file.
+	* libc/search/hcreate.3: New file.
+	* libc/search/hcreate.c: New file.
+	* libc/search/hcreate.c~: New file.
+	* libc/search/hcreate_r.c: New file.
+	* libc/search/ndbm.c: New file.
+	* libc/search/page.h: New file.
+	* libc/search/tdelete.c: New file.
+	* libc/search/tdestroy.c: New file.
+	* libc/search/tfind.c: New file.
+	* libc/search/tsearch.3: New file.
+	* libc/search/tsearch.c: New file.
+	* libc/search/twalk.c: New file.
+	* libc/include/db.h: New file.
+	* libc/include/ndbm.h: New file.
+	* libc/include/search.h: New file.
+	* libc/include/sys/queue.h: New file.
+	* libc/include/sys/cdefs.h: New file.
+	* libc/include/sys/param.h
+	[__IEEE_LITTLE_ENDIAN,__IEEE_BIG_ENDIAN]: Set BYTE_ORDER to
+	LITTLE_ENDIAN or BIG_ENDIAN.
+	* libc/include/sys/errno.h (EFTYPE): New macro.
+	* libc/search/bsearch.c: Move from libc/stdlib.
+	* libc/search/qsort.c: Likewise.
+	* libc/stdlib/Makefile.am (LIB_SOURCES): Remove bsearch.c and
+	qsort.c.
+	(CHEWOUT_FILES): Remove bsearch.def and qsort.def.
+	* libc/stdlib/stdlib.tex: Remove references to bsearch and qsort.
+
 2002-06-19  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/sys/linux/Makefile.am: Add support for message queue routines,
