@@ -73,8 +73,6 @@ static console_state NO_COPY *shared_console_info;
 
 dev_console NO_COPY *fhandler_console::dev_state;
 
-int NO_COPY fhandler_console::open_fhs;
-
 /* Allocate and initialize the shared record for the current console.
    Returns a pointer to shared_console_info. */
 tty_min *
@@ -664,10 +662,10 @@ fhandler_console::open (int flags, mode_t)
 
   TTYCLEARF (RSTCONS);
   set_open_status ();
-  open_fhs++;
-  debug_printf ("incremented open_fhs, now %d", open_fhs);
-  debug_printf ("opened conin$ %p, conout$ %p",
-		get_io_handle (), get_output_handle ());
+  cygheap->open_fhs++;
+  debug_printf ("incremented open_fhs, now %d", cygheap->open_fhs);
+  debug_printf ("opened conin$ %p, conout$ %p", get_io_handle (),
+		get_output_handle ());
 
   return 1;
 }
@@ -679,14 +677,14 @@ fhandler_console::close (void)
   CloseHandle (get_output_handle ());
   set_io_handle (NULL);
   set_output_handle (NULL);
-  if (!cygheap->fdtab.in_vfork_cleanup () && --open_fhs <= 0
+  if (!cygheap->fdtab.in_vfork_cleanup () && --(cygheap->open_fhs) <= 0
       && myself->ctty != TTY_CONSOLE)
     {
-      syscall_printf ("open_fhs %d, freeing console %p",
-		      fhandler_console::open_fhs, myself->ctty);
+      syscall_printf ("open_fhs %d, freeing console %p", cygheap->open_fhs,
+		      myself->ctty);
       FreeConsole ();
     }
-  debug_printf ("decremented open_fhs, now %d", open_fhs);
+  debug_printf ("decremented open_fhs, now %d", cygheap->open_fhs);
   return 0;
 }
 

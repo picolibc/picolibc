@@ -257,7 +257,7 @@ pinfo::set_acl()
 void
 _pinfo::set_ctty (tty_min *tc, int flags, fhandler_tty_slave *arch)
 {
-  debug_printf ("ctty %d", ctty);
+  debug_printf ("checking if /dev/tty%d differs from input", ctty);
   if ((ctty < 0 || ctty == tc->ntty) && !(flags & O_NOCTTY))
     {
       ctty = tc->ntty;
@@ -292,7 +292,7 @@ _pinfo::set_ctty (tty_min *tc, int flags, fhandler_tty_slave *arch)
 	  if (arch)
 	    {
 	      arch->usecount++;
-	      fhandler_console::open_fhs++;
+	      cygheap->open_fhs++;
 	      report_tty_counts (cygheap->ctty, "ctty", "incremented ", "");
 	    }
 	}

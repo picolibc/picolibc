@@ -262,6 +262,7 @@ struct init_cygheap
   struct sigaction *sigs;
 
   fhandler_tty_slave *ctty;	/* Current tty */
+  int open_fhs;
 };
 
 #define CYGHEAPSIZE (sizeof (init_cygheap) + (20000 * sizeof (fhandler_union)) + (5 * 65536))

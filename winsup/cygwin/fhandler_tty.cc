@@ -455,8 +455,8 @@ fhandler_tty_slave::open (int flags, mode_t)
   if (arch)
     {
       *this = *(fhandler_tty_slave *) arch;
-      termios_printf ("copied tty fhandler from cygheap");
-      fhandler_console::open_fhs++;
+      termios_printf ("copied tty fhandler archetype");
+      cygheap->open_fhs++;
       goto out;
     }
 
@@ -573,9 +573,8 @@ fhandler_tty_slave::open (int flags, mode_t)
   set_output_handle (to_master_local);
 
   set_open_status ();
-  if (fhandler_console::open_fhs++ == 0 && !GetConsoleCP ()
-      && !output_done_event && wincap.pty_needs_alloc_console ()
-      && !GetProcessWindowStation ())
+  if (cygheap->open_fhs++ == 0 && !GetConsoleCP () && !output_done_event
+      && wincap.pty_needs_alloc_console () && !GetProcessWindowStation ())
     {
       BOOL b;
       HWINSTA h = CreateWindowStation (NULL, 0, GENERIC_READ | GENERIC_WRITE, &sec_none_nih);
@@ -610,7 +609,7 @@ out:
 int
 fhandler_tty_slave::close ()
 {
-  if (!--fhandler_console::open_fhs && myself->ctty == -1)
+  if (!--cygheap->open_fhs && myself->ctty == -1)
     FreeConsole ();
 
   archetype->usecount--;
@@ -620,13 +619,13 @@ fhandler_tty_slave::close ()
     {
 #ifdef DEBUGGING
       if (archetype->usecount < 0)
-	system_printf ("usecount %d", archetype->usecount);
+	system_printf ("error: usecount %d", archetype->usecount);
 #endif
-      termios_printf ("just returning because archetype usecount is > 0");
+      termios_printf ("just returning because archetype usecount is != 0");
       return 0;
     }
 
-  termios_printf ("closing last open %s handle", pc.dev.name);
+  termios_printf ("closing last open %s handle", ttyname ());
   return fhandler_tty_common::close ();
 }
 
@@ -914,7 +913,7 @@ fhandler_tty_slave::dup (fhandler_base *child)
   *(fhandler_tty_slave *) child = *arch;
   child->usecount = 0;
   arch->usecount++;
-  fhandler_console::open_fhs++;
+  cygheap->open_fhs++;
   report_tty_counts (child, "duped", "incremented ", "");
   myself->set_ctty (get_ttyp (), openflags, arch);
   return 0;
@@ -1364,9 +1363,8 @@ fhandler_tty_common::set_close_on_exec (int val)
 void
 fhandler_tty_slave::fixup_after_fork (HANDLE parent)
 {
-  fhandler_console::open_fhs++;
-  termios_printf ("incremented open_fhs %d", fhandler_console::open_fhs);
-  fhandler_tty_common::fixup_after_fork (parent);
+  // fhandler_tty_common::fixup_after_fork (parent);
+  report_tty_counts (this, "inherited", "", "");
 }
 
 void
@@ -1411,7 +1409,7 @@ fhandler_tty_master::init_console ()
     return -1;
 
   console->init (INVALID_HANDLE_VALUE, GENERIC_READ | GENERIC_WRITE, O_BINARY);
-  fhandler_console::open_fhs--;  /* handled when individual fds are opened */
+  cygheap->open_fhs--;  	/* handled when individual fds are opened */
   console->set_r_no_interrupt (1);
   return 0;
 }

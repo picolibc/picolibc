@@ -829,8 +829,6 @@ class fhandler_console: public fhandler_termios
   void set_cursor_maybe ();
 
  public:
-  static int open_fhs;
-
   fhandler_console ();
 
   fhandler_console* is_console () { return this; }
@@ -1197,7 +1195,7 @@ struct fhandler_nodevice: public fhandler_base
 #define report_tty_counts(fh, call, fhs_op, use_op) \
   termios_printf ("%s %s, %sopen_fhs %d, %susecount %d",\
 		  fh->ttyname (), call,\
-		  fhs_op, fhandler_console::open_fhs,\
+		  fhs_op, cygheap->open_fhs,\
 		  use_op, ((fhandler_tty_slave *) fh)->archetype->usecount);
 
 typedef union

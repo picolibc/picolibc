@@ -1,3 +1,26 @@
+2003-12-29  Christopher Faylor  <cgf@redhat.com>
+
+	Move open_fhs from fhandler.h to cygheap.h for easier tracking.
+	Accommodate this change throughout.
+	* dtable.cc (dtable::add_archetype): Use correct count when iterating
+	through *active* archetypes.
+	* dtable.cc (dtable::fixup_after_exec): Close handle if close_on_exec
+	and archetype exists since archetype currently does not set windows
+	close-on-exec flag (FIXME).
+	* fhandler_tty.cc (fhandler_tty_slave::open): Change debugging output
+	slightly.
+	(fhandler_tty_slave::close): Ditto.
+	(fhandler_tty_slave::fixup_after_fork): Just report on inherited use
+	counts since since archetype currently does not set windows
+	close-on-exec flag (FIXME).
+	* pinfo.cc (_pinfo::set_ctty): Change debugging output slightly.
+	* cygheap.cc (cygheap_init): Remove open_fhs accommodation and use
+	count reporting.
+	* perthread.h (vfork_save::fhctty): New element.
+	* perthread.h (vfork_save::open_fhs): New element.
+	* fork.cc (vfork): Muck around with ctty and open_fhs stuff, both of
+	which are now saved in the vfork_save structure.
+
 2003-12-27  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler.h (fhandler_tty_slave::archetype): Make public.

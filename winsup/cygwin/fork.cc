@@ -719,9 +719,11 @@ vfork ()
       vf->ctty = myself->ctty;
       vf->sid = myself->sid;
       vf->pgid = myself->pgid;
+      vf->fhctty = cygheap->ctty;
+      vf->open_fhs = cygheap->open_fhs;
       int res = cygheap->fdtab.vfork_child_dup () ? 0 : -1;
       debug_printf ("%d = vfork()", res);
-      call_signal_handler_now (); // FIXME: racy
+      call_signal_handler_now ();	// FIXME: racy
       vf->tls = _my_tls;
       return res;
     }
@@ -737,6 +739,20 @@ vfork ()
   myself->ctty = vf->ctty;
   myself->sid = vf->sid;
   myself->pgid = vf->pgid;
+  termios_printf ("cygheap->ctty %p, vf->fhctty %p", cygheap->ctty, vf->fhctty);
+  if (cygheap->ctty != vf->fhctty)
+    {
+      vf->fhctty->close ();
+      if (vf->pid <= 0)
+	{
+	  if (vf->ctty)
+	    vf->fhctty->close ();
+	  cygheap->ctty = vf->fhctty;
+	}
+    }
+
+  if (vf->pid <= 0)
+    cygheap->open_fhs = vf->open_fhs;
 
   if (vf->pid < 0)
     {

@@ -186,10 +186,10 @@ dtable::add_archetype ()
 void
 dtable::delete_archetype (fhandler_base *fh)
 {
-  for (unsigned i = 0; i < narchetypes; i++)
+  for (unsigned i = 0; i < farchetype; i++)
     if (fh == archetypes[i])
       {
-	debug_printf ("deleting archive element %d for %s", i, fh->get_name ());
+	debug_printf ("deleting element %d for %s", i, fh->get_name ());
 	if (i < --farchetype)
 	  archetypes[i] = archetypes[farchetype];
 	break;
@@ -660,7 +660,11 @@ dtable::fixup_after_exec (HANDLE parent)
       {
 	fh->clear_readahead ();
 	if (fh->get_close_on_exec ())
-	  release (i);
+	  {
+	    if (fh->archetype)
+	      fh->close ();
+	    release (i);
+	  }
 	else
 	  {
 	    fh->fixup_after_exec (parent);
@@ -704,7 +708,7 @@ dtable::vfork_child_dup ()
   if (cygheap->ctty)
     {
       cygheap->ctty->usecount++;
-      fhandler_console::open_fhs++;
+      cygheap->open_fhs++;
       report_tty_counts (cygheap->ctty, "vfork dup", "incremented ", "");
     }
 
@@ -742,9 +746,6 @@ dtable::vfork_parent_restore ()
   fds_on_hold = NULL;
   cfree (deleteme);
 
-  if (cygheap->ctty)
-    cygheap->ctty->close ();
-
   ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "restore");
   return;
 }
@@ -758,7 +759,6 @@ dtable::vfork_child_fixup ()
   fhandler_base **saveme = fds;
   fds = fds_on_hold;
 
-  int old_open_fhs = fhandler_console::open_fhs;
   fhandler_base *fh;
   for (int i = 0; i < (int) size; i++)
     if ((fh = fds[i]) != NULL)
@@ -772,10 +772,6 @@ dtable::vfork_child_fixup ()
 	    release (i);
 	  }
       }
-
-  fhandler_console::open_fhs = old_open_fhs;
-  if (cygheap->ctty)
-    cygheap->ctty->close ();
 
   fds = saveme;
   cfree (fds_on_hold);
