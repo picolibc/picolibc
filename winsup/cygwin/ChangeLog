@@ -1,3 +1,9 @@
+2003-02-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::recvfrom): Return buffer
+	length and don't set errno in case of WSAEMSGSIZE error.
+	(fhandler_socket::recvmsg): Ditto.
+
 2003-02-01  Christopher Faylor  <cgf@redhat.com>
 
 	* grp.cc (getgrent32): Only refresh group entries when at beginning.
