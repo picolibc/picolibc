@@ -1,3 +1,7 @@
+Sun Oct  1 16:36:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * fhandler_mem.cc (load_ntdll_funcs): Add missing __stdcall qualifiers.
+
 Sun Oct  1 22:20:39 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* cygheap.cc (cygheap_init): Born again function.

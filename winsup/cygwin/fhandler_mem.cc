@@ -55,37 +55,39 @@ load_ntdll_funcs ()
       goto out;
     }
 
-  if (!(NtMapViewOfSection = (NTSTATUS (*)(HANDLE,HANDLE,PVOID*,ULONG,ULONG,
-                                           PLARGE_INTEGER,PULONG,
-                                           SECTION_INHERIT,ULONG,ULONG))
+  if (!(NtMapViewOfSection = (NTSTATUS (__stdcall *)(HANDLE,HANDLE,PVOID*,ULONG,
+                                                     ULONG,PLARGE_INTEGER,
+                                                     PULONG,SECTION_INHERIT,
+                                                     ULONG,ULONG))
                              GetProcAddress (ntdll, "NtMapViewOfSection")))
     {
       __seterrno ();
       goto out;
     }
 
-  if (!(NtOpenSection = (NTSTATUS (*)(PHANDLE,ACCESS_MASK,POBJECT_ATTRIBUTES))
+  if (!(NtOpenSection = (NTSTATUS (__stdcall *)(PHANDLE,ACCESS_MASK,
+                                                POBJECT_ATTRIBUTES))
                         GetProcAddress (ntdll, "NtOpenSection")))
     {
       __seterrno ();
       goto out;
     }
 
-  if (!(NtUnmapViewOfSection = (NTSTATUS (*)(HANDLE,PVOID))
+  if (!(NtUnmapViewOfSection = (NTSTATUS (__stdcall *)(HANDLE,PVOID))
                                GetProcAddress (ntdll, "NtUnmapViewOfSection")))
     {
       __seterrno ();
       goto out;
     }
 
-  if (!(RtlInitUnicodeString = (VOID (*)(PUNICODE_STRING,PCWSTR))
+  if (!(RtlInitUnicodeString = (VOID (__stdcall *)(PUNICODE_STRING,PCWSTR))
                                GetProcAddress (ntdll, "RtlInitUnicodeString")))
     {
       __seterrno ();
       goto out;
     }
 
-  if (!(RtlNtStatusToDosError = (ULONG (*)(NTSTATUS))
+  if (!(RtlNtStatusToDosError = (ULONG (__stdcall *)(NTSTATUS))
                                GetProcAddress (ntdll, "RtlNtStatusToDosError")))
     {
       __seterrno ();
