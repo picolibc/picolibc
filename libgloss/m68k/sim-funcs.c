@@ -13,6 +13,7 @@
  * they apply.
  */
 
+#define _XOPEN_SOURCE
 #include <unistd.h>
 
 int

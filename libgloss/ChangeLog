@@ -1,3 +1,8 @@
+2003-10-15  Bernardo Innocenti  <bernie@develer.com>
+
+	* m68k/sim-funcs.c (_XOPEN_SOURCE): Define to get the pid_t
+	typedef from <unistd.h>.
+
 2003-08-26  Jason Merrill  <jason@redhat.com>
 
 	* sparc/elfsim.ld: Fix __EH_FRAME_BEGIN__ definition.
