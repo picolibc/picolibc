@@ -193,6 +193,7 @@ extern int print_insn_d30v		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_v850		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_tic30		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_vax		PARAMS ((bfd_vma, disassemble_info*));
+extern int print_insn_tic54x		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_tic80		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_pj		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_avr		PARAMS ((bfd_vma, disassemble_info*));

@@ -1,3 +1,7 @@
+2000-05-08  Alan Modra  <alan@linuxcare.com.au>
+
+	* dis-asm.h (print_insn_tic54x): Declare.
+
 Fri May  5 16:51:03 2000  Clinton Popetz  <cpopetz@cygnus.com>
 
 	* coff/rs6k64.h (U802TOC64MAGIC): Change to U803XTOCMAGIC.
