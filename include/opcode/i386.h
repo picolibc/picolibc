@@ -1061,6 +1061,8 @@ static const template i386_optab[] = {
 /* 386 register table */
 
 static const reg_entry i386_regtab[] = {
+  /* make %st first as we test for it */
+  {"st", FloatReg|FloatAcc, 0},
   /* 8 bit regs */
   {"al", Reg8|Acc, 0},
   {"cl", Reg8|ShiftCount, 1},
@@ -1130,16 +1132,7 @@ static const reg_entry i386_regtab[] = {
   {"tr5", Test, 5},
   {"tr6", Test, 6},
   {"tr7", Test, 7},
-  /* float registers */
-  {"st(0)", FloatReg|FloatAcc, 0},
-  {"st", FloatReg|FloatAcc, 0},
-  {"st(1)", FloatReg, 1},
-  {"st(2)", FloatReg, 2},
-  {"st(3)", FloatReg, 3},
-  {"st(4)", FloatReg, 4},
-  {"st(5)", FloatReg, 5},
-  {"st(6)", FloatReg, 6},
-  {"st(7)", FloatReg, 7},
+  /* mmx and simd registers */
   {"mm0", RegMMX, 0},
   {"mm1", RegMMX, 1},
   {"mm2", RegMMX, 2},
@@ -1156,6 +1149,17 @@ static const reg_entry i386_regtab[] = {
   {"xmm5", RegXMM, 5},
   {"xmm6", RegXMM, 6},
   {"xmm7", RegXMM, 7}
+};
+
+static const reg_entry i386_float_regtab[] = {
+  {"st(0)", FloatReg|FloatAcc, 0},
+  {"st(1)", FloatReg, 1},
+  {"st(2)", FloatReg, 2},
+  {"st(3)", FloatReg, 3},
+  {"st(4)", FloatReg, 4},
+  {"st(5)", FloatReg, 5},
+  {"st(6)", FloatReg, 6},
+  {"st(7)", FloatReg, 7}
 };
 
 #define MAX_REG_NAME_SIZE 8	/* for parsing register names from input */

@@ -1,3 +1,9 @@
+1999-08-29  Alan Modra  <alan@spri.levels.unisa.edu.au>
+
+	* i386.h (i386_regtab): Move %st to top of table, and split off
+	other fp reg entries.
+	(i386_float_regtab): To here.
+
 Sat Aug 28 00:25:25 1999  Jerry Quinn <jquinn@nortelnetworks.com>
 
 	* hppa.h (pa_opcodes): Replace 'f' by 'v'.  Prefix float register args
