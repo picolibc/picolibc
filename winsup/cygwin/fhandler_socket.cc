@@ -534,21 +534,11 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
     {
       sock_thread_data cd = { get_socket (), (sockaddr *) &sin, &namelen, -1 };
       cygthread *thread = new cygthread (connect_thread, &cd, "connect");
-      HANDLE wait_events[2] = { *thread, signal_arrived };
-      if (WaitForMultipleObjects(2, wait_events, FALSE, INFINITE)
-      	  != WAIT_OBJECT_0)
-	{
-	  /* Signal arrived */
-	  thread->terminate_thread ();
-	  interrupted = TRUE;
-	}
-      else
-	{
-	  /* connect returned normally */
-	  res = cd.ret;
-	  thread->detach ();
-	}
-      delete thread;
+      HANDLE waitevt = CreateEvent(&sec_none_nih, FALSE, TRUE, NULL);
+      interrupted = thread->detach (waitevt);
+      CloseHandle (waitevt);
+      if (!interrupted)
+        res = cd.ret;
     }
   else
     res = ::connect (get_socket (), (sockaddr *) &sin, namelen);
@@ -652,20 +642,12 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
     {
       sock_thread_data ad = { get_socket (), peer, len, -1 };
       cygthread *thread = new cygthread (accept_thread, &ad, "accept");
-      HANDLE wait_events[2] = { *thread, signal_arrived };
-      if (WaitForMultipleObjects(2, wait_events, FALSE, INFINITE)
-          != WAIT_OBJECT_0)
-        {
-	  /* Signal arrived */
-	  thread->terminate_thread ();
-	  delete thread;
-	  set_errno (EINTR);
-	  return -1;
-	}
-      /* accept returned normally */
+      HANDLE waitevt = CreateEvent(&sec_none_nih, FALSE, TRUE, NULL);
+      bool signalled = thread->detach (waitevt);
+      CloseHandle (waitevt);
+      if (signalled)
+	return -1;
       res = ad.ret;
-      thread->detach ();
-      delete thread;
     }
   else
     res = ::accept (get_socket (), peer, len);

@@ -1,5 +1,11 @@
 2003-06-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc (fhandler_socket::connect): Simplify previous
+	patch.
+	(fhandler_socket::accept): Ditto.
+
+2003-06-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_socket.cc: Include cygthread.h.
 	(class sock_event): Remove.
 	(thread_connect): New function.
