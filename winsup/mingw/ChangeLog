@@ -1,5 +1,10 @@
 2002-04-09  Earnie Boyd  <earnie@users.sf.net>
 
+	* include/_mingw.h: Increment version.
+	* Makefile.in: Ditto.
+
+2002-04-09  Earnie Boyd  <earnie@users.sf.net>
+
 	* moldname-crtdll.def: Remove CR from end of line.
 	* moldname-msvcrt.def: Ditto.
 	* Makefile.in: Use bzip2 compression for Cygwin target.

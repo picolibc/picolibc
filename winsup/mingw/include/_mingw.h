@@ -60,9 +60,9 @@
 # define __int64 long long
 #endif /* __GNUC__ */
 
-#define __MINGW32_VERSION 1.3
+#define __MINGW32_VERSION 1.4
 #define __MINGW32_MAJOR_VERSION 1
-#define __MINGW32_MINOR_VERSION 3
+#define __MINGW32_MINOR_VERSION 4
 
 #endif /* __MINGW_H */
 
