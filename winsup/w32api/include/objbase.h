@@ -1,11 +1,14 @@
+/* Include here to prevent circular dependencies if windows.h
+   not already included */
+#include <rpc.h>
+#include <rpcndr.h>
+
 #ifndef _OBJBASE_H
 #define _OBJBASE_H
 #if __GNUC__ >=3
 #pragma GCC system_header
 #endif
 
-#include <rpc.h>
-#include <rpcndr.h>
 #include <stdlib.h>
 #pragma pack(push,8)
 #include <basetyps.h>
