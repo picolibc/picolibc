@@ -34,7 +34,7 @@ int vfscanf(FILE * __restrict__ stream, const char * __restrict__ format, va_lis
     : "=a"(ret), "=c"(stream), "=d"(format)
     : "1"(stream), "2"(format), "S"(arg),
       "a"(&ret)
-    : "ebx");
+    : "ebx", "edi");
 
   return ret;
 }

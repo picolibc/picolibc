@@ -36,7 +36,7 @@ int vfwscanf(FILE * __restrict__ stream, const wchar_t * __restrict__ format,
     : "=a"(ret), "=c"(stream), "=d"(format)
     : "1"(stream), "2"(format), "S"(arg),
       "a"(&ret)
-    : "ebx");
+    : "ebx", "edi");
 
   return ret;
 }

@@ -1,5 +1,12 @@
 2004-07-26  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* mingwex/stdio/vsscanf: Add "edi" to registers-modified field
+	* mingwex/stdio/vfscanf: Likewise.
+	* mingwex/stdio/vswscanf: Likewise.
+	* mingwex/stdio/vfwscanf: Likewise.
+
+2004-07-26  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/_mingw.h: Use only two underscores to uglify
 	__MINGW_ATTRIB_* macros.
 	* include/stdlib.h: Adjust __MINGW_ATTRIB_* tokens.
@@ -19,7 +26,7 @@
 	* include/_mingw.h (__MINGW_ATTR_*):  Replace with
 	__MINGW_ATTRIB_*.
 	* include/stdlib.h (_ATTRIB_NORETURN): Replace with
-	__MINGW_ATTRIB_NOREURN, throughout.
+	__MINGW_ATTRIB_NORETURN, throughout.
 	(malloc): Declare with __MINGW_ATTRIB_MALLOC.
 	(calloc): Likewise.
 	(abs): Declare with __MINGW_ATTRIB_CONST.
