@@ -50,6 +50,10 @@ asinh
 _asinh = asinh
 asinhf
 _asinhf = asinhf
+asprintf
+_asprintf = asprintf
+_asprintf_r
+asprintf_r = _asprintf_r
 atan
 _atan = atan
 atan2
@@ -943,6 +947,10 @@ _utimes = utimes
 utmpname
 _utmpname = utmpname
 valloc
+vasprintf
+_vasprintf = vasprintf
+_vasprintf_r
+vasprintf_r = _vasprintf_r
 vfiprintf
 _vfiprintf = vfiprintf
 vfork

@@ -1,3 +1,9 @@
+2003-01-10  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* cygwin.din: add asprintf and vasprintf, as well as the reentrant
+	versions and underscore variants.
+	* include/cygwin/version.h: bump CYGWIN_VERSION_API_MINOR.
+
 2003-01-10  Corinna Vinschen <corinna@vinschen.de>
 
 	* net.cc (cygwin_gethostname): Fix call to wsock function gethostname.
