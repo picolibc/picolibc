@@ -209,7 +209,7 @@ class fhandler_base
 
   int get_default_fmode (int flags);
 
-  bool get_r_no_interrupt () { return FHISSETF (NOEINTR); }
+  virtual bool get_r_no_interrupt () { return FHISSETF (NOEINTR); }
   void set_r_no_interrupt (int b) { FHCONDSETF (b, NOEINTR); }
 
   bool get_close_on_exec () { return FHISSETF (CLOEXEC); }

@@ -1,5 +1,9 @@
 2002-07-30  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler.h (fhandler_base::get_r_no_interrupt): Make virtual.
+
+2002-07-30  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler_disk_file.cc (fhandler_cygdrive::set_drives): Incorporate .
 	and ..  processing here.
 	(fhandler_cygdrive::readdir): Assume . and .. are already in pdrive.
