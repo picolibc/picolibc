@@ -1,3 +1,8 @@
+2001-04-22  Earnie Boyd  <earnie@users.sourceforge.net>
+  
+	* libc/include/sys/unistd.h [X_OK]: Use better protection against
+	Cygwin X_OK definitions in sys/file.h.
+
 Fri Apr 20 23:17:51 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* libc/include/sys/time.h: Define timercmp and other macros for
