@@ -87,8 +87,13 @@ typedef struct __sFILE FILE;
 #define	NULL	0
 #endif
 
-#define	BUFSIZ	1024
 #define	EOF	(-1)
+
+#ifdef __BUFSIZ__
+#define	BUFSIZ		__BUFSIZ__
+#else
+#define	BUFSIZ		1024
+#endif
 
 #ifdef __FOPEN_MAX__
 #define FOPEN_MAX	__FOPEN_MAX__
