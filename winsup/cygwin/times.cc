@@ -471,13 +471,11 @@ utimes (const char *path, struct timeval *tvp)
      the times of directories.  */
   /* Note: It's not documented in MSDN that FILE_WRITE_ATTRIBUTES is
      sufficient to change the timestamps... */
-  HANDLE h = CreateFileA (win32.get_win32 (),
-			  FILE_WRITE_ATTRIBUTES,
-			  FILE_SHARE_READ | FILE_SHARE_WRITE,
-			  &sec_none_nih,
-			  OPEN_EXISTING,
-			  FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
-			  0);
+  HANDLE h = CreateFile (win32, FILE_WRITE_ATTRIBUTES,
+			 FILE_SHARE_READ | FILE_SHARE_WRITE,
+			 &sec_none_nih, OPEN_EXISTING,
+			 FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
+			 0);
 
   if (h == INVALID_HANDLE_VALUE)
     {

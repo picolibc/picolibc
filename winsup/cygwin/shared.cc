@@ -60,13 +60,9 @@ open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, void *addr)
 				       TRUE, mapname);
 	}
       if (!shared_h &&
-	  !(shared_h = CreateFileMappingA (INVALID_HANDLE_VALUE,
-					   &sec_all,
-					   PAGE_READWRITE,
-					   0,
-					   size,
-					   mapname)))
-	api_fatal ("CreateFileMappingA, %E.  Terminating.");
+	  !(shared_h = CreateFileMapping (INVALID_HANDLE_VALUE, &sec_all,
+					  PAGE_READWRITE, 0, size, mapname)))
+	api_fatal ("CreateFileMapping, %E.  Terminating.");
     }
 
   shared = (shared_info *) MapViewOfFileEx (shared_h,

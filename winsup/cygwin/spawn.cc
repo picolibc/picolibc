@@ -420,13 +420,10 @@ spawn_guts (const char * prog_arg, const char *const *argv,
      that it is NOT a script file */
   while (*ext == '\0')
     {
-      HANDLE hnd = CreateFileA (real_path,
-				GENERIC_READ,
-				FILE_SHARE_READ | FILE_SHARE_WRITE,
-				&sec_none_nih,
-				OPEN_EXISTING,
-				FILE_ATTRIBUTE_NORMAL,
-				0);
+      HANDLE hnd = CreateFile (real_path, GENERIC_READ,
+			       FILE_SHARE_READ | FILE_SHARE_WRITE,
+			       &sec_none_nih, OPEN_EXISTING,
+			       FILE_ATTRIBUTE_NORMAL, 0);
       if (hnd == INVALID_HANDLE_VALUE)
 	{
 	  __seterrno ();

@@ -436,7 +436,7 @@ fhandler_base::open (path_conv *pc, int flags, mode_t mode)
   x = CreateFile (get_win32_name (), access, shared, &sa, creation_distribution,
 		  file_attributes, 0);
 
-  syscall_printf ("%p = CreateFileA (%s, %p, %p, %p, %p, %p, 0)",
+  syscall_printf ("%p = CreateFile (%s, %p, %p, %p, %p, %p, 0)",
 		  x, get_win32_name (), access, shared, &sa,
 		  creation_distribution, file_attributes);
 

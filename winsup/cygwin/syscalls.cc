@@ -648,15 +648,10 @@ _link (const char *a, const char *b)
 
       BOOL bSuccess;
 
-      hFileSource = CreateFile (
-	real_a,
-	FILE_WRITE_ATTRIBUTES,
-	FILE_SHARE_READ | FILE_SHARE_WRITE /*| FILE_SHARE_DELETE*/,
-	&sec_none_nih, // sa
-	OPEN_EXISTING,
-	0,
-	NULL
-	);
+      hFileSource = CreateFile (real_a, FILE_WRITE_ATTRIBUTES,
+				FILE_SHARE_READ | FILE_SHARE_WRITE /*| FILE_SHARE_DELETE*/,
+				&sec_none_nih, // sa
+				OPEN_EXISTING, 0, NULL);
 
       if (hFileSource == INVALID_HANDLE_VALUE)
 	{
@@ -2433,12 +2428,10 @@ logout (char *line)
     return 0;
 
   ut_fd = CreateFile (win32_path.get_win32 (),
-			GENERIC_READ | GENERIC_WRITE,
-			FILE_SHARE_READ | FILE_SHARE_WRITE,
-			&sec_none_nih,
-			OPEN_EXISTING,
-			FILE_ATTRIBUTE_NORMAL,
-			NULL);
+		      GENERIC_READ | GENERIC_WRITE,
+		      FILE_SHARE_READ | FILE_SHARE_WRITE,
+		      &sec_none_nih, OPEN_EXISTING,
+		      FILE_ATTRIBUTE_NORMAL, NULL);
   if (ut_fd != INVALID_HANDLE_VALUE)
     {
       struct utmp *ut;
