@@ -495,6 +495,14 @@ set_ntsec (const char *buf)
 }
 
 static void
+set_traverse (const char *buf)
+{
+  if (wincap.has_security ())
+    set_process_privilege (SE_CHANGE_NOTIFY_NAME,
+			   !buf || !strcasematch (buf, "yes"));
+}
+
+static void
 set_smbntsec (const char *buf)
 {
   allow_smbntsec = (buf && strcasematch (buf, "yes") && wincap.has_security ());
@@ -526,9 +534,6 @@ static struct parse_thing
   {"binmode", {x: &binmode}, justset, NULL, {{O_TEXT}, {O_BINARY}}},
   {"check_case", {func: &check_case_init}, isfunc, NULL, {{0}, {0}}},
   {"codepage", {func: &codepage_init}, isfunc, NULL, {{0}, {0}}},
-#ifdef USE_SERVER
-  {"server", {&allow_server}, justset, NULL, {{false}, {true}}},
-#endif
   {"envcache", {&envcache}, justset, NULL, {{true}, {false}}},
   {"error_start", {func: &error_start_init}, isfunc, NULL, {{0}, {0}}},
   {"export", {&export_settings}, justset, NULL, {{false}, {true}}},
@@ -536,8 +541,12 @@ static struct parse_thing
   {"glob", {func: &glob_init}, isfunc, NULL, {{0}, {s: "normal"}}},
   {"ntea", {func: set_ntea}, isfunc, NULL, {{0}, {s: "yes"}}},
   {"ntsec", {func: set_ntsec}, isfunc, NULL, {{0}, {s: "yes"}}},
-  {"smbntsec", {func: set_smbntsec}, isfunc, NULL, {{0}, {s: "yes"}}},
+  {"traverse", {func: set_traverse}, isfunc, NULL, {{0}, {s: "yes"}}},
   {"reset_com", {&reset_com}, justset, NULL, {{false}, {true}}},
+#ifdef USE_SERVER
+  {"server", {&allow_server}, justset, NULL, {{false}, {true}}},
+#endif
+  {"smbntsec", {func: set_smbntsec}, isfunc, NULL, {{0}, {s: "yes"}}},
   {"strip_title", {&strip_title_path}, justset, NULL, {{false}, {true}}},
   {"subauth_id", {func: &subauth_id_init}, isfunc, NULL, {{0}, {0}}},
   {"title", {&display_title}, justset, NULL, {{false}, {true}}},
@@ -689,9 +698,12 @@ environ_init (char **envp, int envc)
   if (myself->progname[0])
     got_something_from_registry = regopt (myself->progname) || got_something_from_registry;
 
-  /* Set ntsec explicit as default, if NT is running */
+  /* Set ntsec and traverse checking explicit as default, if NT is running */
   if (wincap.has_security ())
-    allow_ntsec = true;
+    {
+      allow_ntsec = true;
+      set_process_privilege (SE_CHANGE_NOTIFY_NAME, false);
+    }
 
   if (!envp)
     envp_passed_in = 0;
