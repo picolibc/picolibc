@@ -853,7 +853,7 @@ number:			if ((dprec = prec) >= 0)
 					}
 				} else if (expt <= 0) {
 					PRINT("0", 1);
-					if(ndig) {
+					if(expt || ndig) {
 						PRINT(decimal_point, 1);
 						PAD(-expt, zeroes);
 						PRINT(cp, ndig);

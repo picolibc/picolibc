@@ -1,3 +1,10 @@
+2001-01-23  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Modification to fix
+	that suppressed . for %.0f, 0.1.  Check now looks if there
+	are padding zeroes (expt) in addition to any digits (ndig) to
+	print.
+
 2001-01-18  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/arc/Makefile.am: New file.
