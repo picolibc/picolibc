@@ -1,3 +1,14 @@
+Sun Mar 25 20:12:21 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* dlfcn.cc (check_access): Eliminate.
+	(check_path_access): Use passed in path_conv buf.
+	(get_full_path_of_dll): Use passed in name buf to avoid a static.  Rip
+	out most of the path checking since LoadLibrary will do all of this
+	automatically.
+	(dlopen): Set errno when appropriate (may not be compliant?).
+	* environ.cc (posify): Don't pass in "native" path if it seems to
+	actually be posix.
+
 Thursday Mar 22 2001  Robert Collins <rbtcollins@hotmail.com>
 
 	* fhandler.h (fhandler_dev_clipboard): Extend to support writing.

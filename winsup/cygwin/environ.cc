@@ -137,7 +137,7 @@ posify (char **here, const char *value)
   char *outenv = (char *) malloc (1 + len + conv->posix_len (value));
   memcpy (outenv, src, len);
   conv->toposix (value, outenv + len);
-  conv->add_cache (outenv + len, value);
+  conv->add_cache (outenv + len, *value != '/' ? value : NULL);
 
   debug_printf ("env var converted to %s", outenv);
   *here = outenv;
