@@ -40,8 +40,9 @@ int __cdecl _toupper(int);
 
 extern const char _ctype_[];
 
-#ifndef __cplusplus
+#if !defined(__cplusplus) || defined(__INSIDE_CYGWIN__)
 #define	isalpha(c)	((_ctype_+1)[(unsigned)(c)]&(_U|_L))
+#define isblank(c)	((c) == ' ' || (c) == '\t')
 #define	isupper(c)	((_ctype_+1)[(unsigned)(c)]&_U)
 #define	islower(c)	((_ctype_+1)[(unsigned)(c)]&_L)
 #define	isdigit(c)	((_ctype_+1)[(unsigned)(c)]&_N)
@@ -60,7 +61,7 @@ extern const char _ctype_[];
 	__extension__ ({ int __x = (c); isupper(__x) ? (__x - 'A' + 'a') : __x;})
 #endif /* !__cplusplus */
 
-#ifndef __STRICT_ANSI__
+#if !defined(__STRICT_ANSI__) || defined(__INSIDE_CYGWIN__)
 #define isascii(c)	((unsigned)(c)<=0177)
 #define toascii(c)	((c)&0177)
 #endif
