@@ -1,3 +1,14 @@
+Sat Jun 16 13:06:49 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (sig_handle_tty_stop): Reset PID_STOPPED if not
+	actually stopping.
+	* fhandler_console.cc (fhandler_console::fixup_after_fork): Don't set
+	controlling terminal if just inheriting a handle.
+	(fhandler_console::fixup_after_exec): Ditto.
+	* fhandler_tty.cc (fhandler_tty_slave::init): Ditto.
+	* signal.cc (kill_worker): Set appropriate errno if proc_exists
+	determines that process does not really exist.
+
 Fri Jun 15 14:34:19 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (path_conv::check): Deal more robustly with foo/ behavior.
@@ -2422,7 +2433,7 @@ Wed Jan 17 09:47:13 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (sig_handle_tty_stop): Move setting of PID_STOPPED to
 	earlier in interrupt.
-	((interrupt_setup): i.e., here.
+	(interrupt_setup): i.e., here.
 	(sig_handle): Don't queue multiple SIGSTOPS.
 	* fhandler.h (bg_check_types): Enumerate return value of bg_check for
 	clarity.

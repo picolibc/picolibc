@@ -1728,7 +1728,7 @@ fhandler_console::fixup_after_fork (HANDLE)
   /* Windows does not allow duplication of console handles between processes
      so open the console explicitly. */
 
-  if (!open (get_name (), get_flags (), 0))
+  if (!open (get_name (), O_NOCTTY | get_flags (), 0))
     system_printf ("error opening console after fork, %E");
 
   if (!get_close_on_exec ())
@@ -1758,7 +1758,7 @@ fhandler_console::fixup_after_exec (HANDLE)
   HANDLE h = get_handle ();
   HANDLE oh = get_output_handle ();
 
-  if (!open (get_name (), get_flags (), 0))
+  if (!open (get_name (), O_NOCTTY | get_flags (), 0))
     {
       int sawerr = 0;
       if (!get_io_handle ())

@@ -587,7 +587,10 @@ sig_handle_tty_stop (int sig)
   /* Silently ignore attempts to suspend if there is no accomodating
      cygwin parent to deal with this behavior. */
   if (!myself->ppid_handle)
-    return;
+    {
+      myself->process_state &= ~PID_STOPPED;
+      return;
+    }
   myself->stopsig = sig;
   /* See if we have a living parent.  If so, send it a special signal.
    * It will figure out exactly which pid has stopped by scanning

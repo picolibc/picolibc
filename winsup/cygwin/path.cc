@@ -2987,8 +2987,7 @@ getwd (char *buf)
 }
 
 /* chdir: POSIX 5.2.1.1 */
-extern "C"
-int
+extern "C" int
 chdir (const char *in_dir)
 {
   int dir_error = check_null_empty_path (in_dir);

@@ -160,7 +160,11 @@ kill_worker (pid_t pid, int sig)
     dest = myself_nowait_nonmain;
 #endif
   if (sig == 0)
-    res = proc_exists (dest) ? 0 : -1;
+    {
+      res = proc_exists (dest) ? 0 : -1;
+      if (res < 0)
+	set_errno (ESRCH);
+    }
   else if ((res = sig_send (dest, sig)))
     {
       sigproc_printf ("%d = sig_send, %E ", res);

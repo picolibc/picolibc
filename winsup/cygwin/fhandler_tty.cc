@@ -574,7 +574,7 @@ fhandler_tty_slave::init (HANDLE, DWORD a, mode_t)
   if (a == (GENERIC_READ | GENERIC_WRITE))
     mode = O_RDWR;
 
-  open (0, mode);
+  open (0, mode | O_NOCTTY);
 }
 
 int
