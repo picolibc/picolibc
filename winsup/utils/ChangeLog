@@ -1,3 +1,7 @@
+2003-09-05  Igor Pechtchanski  <pechtcha@cs.nyu.edu>
+
+	* dump_setup.cc (check_package_files): Don't fail on empty package.
+
 2003-09-01  AJ Reins  <reinsaj@yahoo.com>
 
 	* mount.cc (mount_commands): Ensure user mode is actually user mode and

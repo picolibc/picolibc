@@ -266,9 +266,8 @@ check_package_files (int verbose, char *package)
   if (!fp)
     {
       if (verbose)
-	printf ("Can't open file list /etc/setup/%s.lst.gz for package %s\n",
-                package, package);
-      return false;
+	printf ("Empty package %s\n", package);
+      return true;
     }
 
   bool result = true;
