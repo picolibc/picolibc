@@ -1,3 +1,7 @@
+2005-01-18  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* lib/user32.def (MonitorFromPoint}: Correct suffix.
+
 2005-01-13  Benoit Blanchon  <bblanchon@users.sourceforge.net>
 
 	* include/wininet.h (InternetCheckConnectionA,
