@@ -1,3 +1,10 @@
+2000-08-07  DJ Delorie  <dj@redhat.com>
+
+	* configure.in (FLAGS_FOR_TARGET): invert test for xgcc, should mean
+	"if we're also building gcc, and it's a gcc that will run on the
+	build machine, we want to use its includes instead of the system's
+	default includes".
+
 2000-08-03  Alexandre Oliva  <aoliva@redhat.com>
 
 	* configure.in (libstdcxx_flags): Don't use `"'.
