@@ -30,6 +30,9 @@ enum
 
 #define CURR_CHILD_INFO_MAGIC 0xba17
 
+/* NOTE: Do not make gratuitous changes to the names or organization of the
+   below class.  The layout is checksummed to determine compatibility between
+   different cygwin versions. */
 class child_info
 {
 public:

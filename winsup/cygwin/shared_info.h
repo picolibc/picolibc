@@ -45,6 +45,10 @@ class mount_item
 #define CURR_MOUNT_MAGIC 0xfe35
 
 class reg_key;
+
+/* NOTE: Do not make gratuitous changes to the names or organization of the
+   below class.  The layout is checksummed to determine compatibility between
+   different cygwin versions. */
 class mount_info
 {
  public:
@@ -136,6 +140,9 @@ public:
 
 #define CURR_SHARED_MAGIC 0x6f6e
 
+/* NOTE: Do not make gratuitous changes to the names or organization of the
+   below class.  The layout is checksummed to determine compatibility between
+   different cygwin versions. */
 class shared_info
 {
   DWORD inited;
