@@ -674,8 +674,12 @@ msync (caddr_t addr, size_t len, int flags)
 	  for (int li = 0; li < l->nrecs; ++li)
 	    {
 	      mmap_record *rec = l->recs + li;
-	      if (rec->get_address () == addr)
+	      if (rec->access (addr))
 		{
+		  /* Check whole area given by len. */
+		  for (DWORD i = getpagesize (); i < len; ++i)
+		    if (!rec->access (addr + i))
+		      goto invalid_address_range;
 		  fhandler_base *fh = rec->alloc_fh ();
 		  int ret = fh->msync (rec->get_handle (), addr, len, flags);
 		  rec->free_fh (fh);
@@ -688,10 +692,11 @@ msync (caddr_t addr, size_t len, int flags)
 		  ReleaseResourceLock(LOCK_MMAP_LIST, WRITE_LOCK | READ_LOCK, "msync");
 		  return 0;
 		}
-	     }
-	 }
-     }
+	    }
+	}
+    }
 
+invalid_address_range:
   /* SUSv2: Return code if indicated memory was not mapped is ENOMEM. */
   set_errno (ENOMEM);
   syscall_printf ("-1 = msync(): ENOMEM");

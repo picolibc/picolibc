@@ -1,5 +1,10 @@
 2002-03-11  Corinna Vinschen  <corina@vinschen.de>
 
+	* mmap.cc (msync): Check area given by addr and len for being a
+	contigeous mmap'd region.
+
+2002-03-11  Corinna Vinschen  <corina@vinschen.de>
+
 	* fork.cc (fork_child): Call fixup_mmaps_after_fork() before
 	closing parent process handle.  Call fixup_mmaps_after_fork()
 	with parent process handle as parameter.
