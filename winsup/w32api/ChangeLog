@@ -1,3 +1,19 @@
+Mon Oct 19 13:55:00 2000  Earnie Boyd <earnie_boyd@yahoo.com>
+
+        * Makefile.in: increment VERSION.  Change tar file name for dist and
+	bindist targets to be more standard.
+	* config.guess: Update with the currently published file.
+	* config.sub: ditto.
+	* configure.in: Use value of build_alias instead of testing for
+	directory names to set BUILDENV.
+	* configure: ditto.
+	* lib/Makefile.in: Change the name of the targets install,
+	install-headers and install-libraries to xinstall, xinstall-headers
+	and xinstall-libraries for system target specified installation.  
+	Recreate targets install, install-headers and install-libraries for
+	exec-prefix specified installation.  Ditto for the uninstall targets of
+	the same name.
+
 Mon Oct  9 11:49:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* include/iprtrmib.h: Further layout changes according to standard.

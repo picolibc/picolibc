@@ -58,7 +58,7 @@ FLAGS_TO_PASS = \
 SUBDIRS = lib
 
 PACKAGE = w32api
-VERSION = 0.2
+VERSION = 0.3
 
 DIST_FILES = Makefile.in configure.in configure config.guess config.sub \
 install-sh README ChangeLog TODO
@@ -93,15 +93,16 @@ dist:
 	for i in $(SUBDIRS); do \
 		(cd $$i; $(MAKE) distdir=../$(distdir) dist); \
 	done
-	rm -f $(distdir).tar.gz
-	$(TAR) czf $(distdir).tar.gz $(distdir)
+	rm -f $(distdir)-src.tar.gz
+	$(TAR) czf $(distdir)-src.tar.gz $(distdir)
 
 bindist:
 	rm -rf $(distdir)
 	mkdir $(distdir)
 	chmod 755 $(distdir)
 	$(MAKE) install prefix=../$(distdir)
-	cd $(distdir); $(TAR) czf ../$(distdir)b.tar.gz .
+	rm -f $(distdir).tar.gz
+	cd $(distdir); $(TAR) czf ../$(distdir).tar.gz .
 
 Makefile: Makefile.in config.status configure
 	$(SHELL) config.status
