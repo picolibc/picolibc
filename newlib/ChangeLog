@@ -1,3 +1,7 @@
+2004-09-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/stdio/fread.c (fread): Include <malloc.h>.
+
 2004-09-22  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/fread.c (fread):  For non-space-optimized case,
