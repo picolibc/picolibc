@@ -1,3 +1,34 @@
+2005-03-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_socket::eid_connect): Make private.
+	(fhandler_socket::set_connect_secret): Ditto.
+	(fhandler_socket::get_connect_secret): Ditto.
+	(fhandler_socket::create_secret_event): Ditto. Remove secret argument.
+	(fhandler_socket::check_peer_secret_event): Ditto.
+	(fhandler_socket::signal_secret_event): Make private.
+	(fhandler_socket::close_secret_event): Ditto.
+	(fhandler_socket::sec_event_accept): New private method.
+	(fhandler_socket::sec_event_connect): Ditto.
+	(fhandler_socket::af_local_connect): New public method.
+	* fhandler_socket.cc: Use 'struct sockaddr' and 'struct sockaddr_in'
+	rather than just 'sockaddr' and 'sockaddr_in' throughout.
+	(fhandler_socket::eid_connect): Drop AF_LOCAL/SOCK_STREAM test.
+	(fhandler_socket::create_secret_event): Remove secret argument.
+	Always use connect_secret instead.
+	(fhandler_socket::check_peer_secret_event): Ditto.
+	(fhandler_socket::sec_event_connect): New method, combining entire
+	secret event handshake on connect side.
+	(fhandler_socket::af_local_connect): New method, combining secret
+	event handshake and eid credential transaction on connect side, to
+	be called from select.
+	(fhandler_socket::sec_event_accept): New method, combining entire
+	secret event handshake on accept side.
+	(fhandler_socket::connect): Drop secret, use connect_secret instead.
+	Move entire secret event handshake to sec_event_connect.
+	(fhandler_socket::accept): Move entire secret event handshake to
+	sec_event_accept.
+	* select.cc (set_bits): Just call af_local_connect here.
+
 2005-03-23  Christopher Faylor  <cgf@timesys.com>
 
 	* include/cygwin/version.h: Change coment for most recent API version

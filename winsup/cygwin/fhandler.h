@@ -376,8 +376,8 @@ class fhandler_socket: public fhandler_base
   bool eid_recv (void);
   bool eid_send (void);
   void eid_accept (void);
- public:
   void eid_connect (void);
+ public:
   void set_socketpair_eids (void);
 
  private:
@@ -458,12 +458,19 @@ class fhandler_socket: public fhandler_base
   int get_socket_type () {return type;}
   void set_sun_path (const char *path);
   char *get_sun_path () {return sun_path;}
+
+ private:
   void set_connect_secret ();
   void get_connect_secret (char*);
-  HANDLE create_secret_event (int *secret = NULL);
-  int check_peer_secret_event (struct sockaddr_in *peer, int *secret = NULL);
+  HANDLE create_secret_event ();
+  int check_peer_secret_event (struct sockaddr_in *peer);
   void signal_secret_event ();
   void close_secret_event ();
+  int sec_event_accept (int, struct sockaddr_in *);
+  int sec_event_connect (struct sockaddr_in *peer);
+ public:
+  int af_local_connect (void);
+
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
   int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));

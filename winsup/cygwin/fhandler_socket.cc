@@ -65,7 +65,7 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 
   if (in->sa_family == AF_INET)
     {
-      *out = * (sockaddr_in *)in;
+      *out = * (struct sockaddr_in *)in;
       *outlen = inlen;
       return 1;
     }
@@ -100,7 +100,7 @@ get_inet_addr (const struct sockaddr *in, int inlen,
       memset (buf, 0, sizeof buf);
       if (ReadFile (fh, buf, 128, &len, 0))
 	{
-	  sockaddr_in sin;
+	  struct sockaddr_in sin;
 	  sin.sin_family = AF_INET;
 	  sscanf (buf + strlen (SOCKET_COOKIE), "%hu %08x-%08x-%08x-%08x",
 		  &sin.sin_port,
@@ -238,10 +238,6 @@ fhandler_socket::eid_send (void)
 void
 fhandler_socket::eid_connect (void)
 {
-  /* This test allows to keep select.cc clean from boring implementation
-     details. */
-  if (get_addr_family () != AF_LOCAL || get_socket_type () != SOCK_STREAM)
-    return;
   debug_printf ("eid_connect called");
   bool orig_async_io, orig_is_nonblocking;
   eid_setblocking (orig_async_io, orig_is_nonblocking);
@@ -306,7 +302,7 @@ fhandler_socket::get_connect_secret (char* buf)
 }
 
 HANDLE
-fhandler_socket::create_secret_event (int* secret)
+fhandler_socket::create_secret_event ()
 {
   struct sockaddr_in sin;
   int sin_len = sizeof (sin);
@@ -321,7 +317,7 @@ fhandler_socket::create_secret_event (int* secret)
     }
 
   char event_name[CYG_MAX_PATH];
-  secret_event_name (event_name, sin.sin_port, secret ?: connect_secret);
+  secret_event_name (event_name, sin.sin_port, connect_secret);
   secret_event = CreateEvent (&sec_all, FALSE, FALSE, event_name);
 
   if (!secret_event)
@@ -354,12 +350,12 @@ fhandler_socket::close_secret_event ()
 }
 
 int
-fhandler_socket::check_peer_secret_event (struct sockaddr_in* peer, int* secret)
+fhandler_socket::check_peer_secret_event (struct sockaddr_in *peer)
 {
 
   char event_name[CYG_MAX_PATH];
 
-  secret_event_name (event_name, peer->sin_port, secret ?: connect_secret);
+  secret_event_name (event_name, peer->sin_port, connect_secret);
   HANDLE ev = CreateEvent (&sec_all_nih, FALSE, FALSE, event_name);
   if (!ev)
     debug_printf("create event %E");
@@ -375,6 +371,78 @@ fhandler_socket::check_peer_secret_event (struct sockaddr_in* peer, int* secret)
     }
   else
     return 0;
+}
+
+int
+fhandler_socket::sec_event_connect (struct sockaddr_in *peer)
+{
+  bool secret_check_failed = false;
+  struct sockaddr_in sin;
+  int siz = sizeof sin;
+
+  debug_printf ("sec_event_connect called");
+  if (!peer)
+    {
+      if (::getpeername (get_socket (), (struct sockaddr *) &sin, &siz))
+        goto err;
+      peer = &sin;
+    }
+  if (!create_secret_event ())
+    secret_check_failed = true;
+  if (!secret_check_failed && !check_peer_secret_event (peer))
+    {
+      debug_printf ("accept from unauthorized server");
+      secret_check_failed = true;
+    }
+  if (!secret_check_failed)
+    return 0;
+
+err:
+  close_secret_event ();
+  closesocket (get_socket ());
+  WSASetLastError (WSAECONNREFUSED);
+  set_winsock_errno ();
+  return -1;
+}
+
+/* Called from select().  It combines the secret event handshake and
+   the eid credential transaction into one call.  This keeps implementation
+   details from select. */
+int
+fhandler_socket::af_local_connect (void)
+{
+  if (get_addr_family () != AF_LOCAL || get_socket_type () != SOCK_STREAM)
+    return 0;
+  int ret = sec_event_connect (NULL);
+  if (!ret)
+    eid_connect ();
+  return ret;
+}
+
+int
+fhandler_socket::sec_event_accept (int sock, struct sockaddr_in *peer)
+{
+  bool secret_check_failed = false;
+
+  debug_printf ("sec_event_accept called");
+
+  if (!create_secret_event ())
+    secret_check_failed = true;
+
+  if (!secret_check_failed
+      && !check_peer_secret_event (peer))
+    {
+      debug_printf ("connect from unauthorized client");
+      secret_check_failed = true;
+    }
+  if (secret_check_failed)
+    {
+      close_secret_event ();
+      closesocket (sock);
+      set_errno (ECONNABORTED);
+      return -1;
+    }
+  return sock;
 }
 
 void
@@ -687,16 +755,14 @@ int
 fhandler_socket::connect (const struct sockaddr *name, int namelen)
 {
   int res = -1;
-  bool secret_check_failed = false;
   bool in_progress = false;
-  sockaddr_in sin;
-  int secret [4];
+  struct sockaddr_in sin;
   DWORD err;
 
-  if (!get_inet_addr (name, namelen, &sin, &namelen, secret))
+  if (!get_inet_addr (name, namelen, &sin, &namelen, connect_secret))
     return -1;
 
-  res = ::connect (get_socket (), (sockaddr *) &sin, namelen);
+  res = ::connect (get_socket (), (struct sockaddr *) &sin, namelen);
 
   if (!res)
     err = 0;
@@ -723,34 +789,6 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 
   if (get_addr_family () == AF_LOCAL && get_socket_type () == SOCK_STREAM)
     {
-      if (!res || in_progress)
-	{
-	  if (!create_secret_event (secret))
-	    {
-	      secret_check_failed = true;
-	    }
-	  else if (in_progress)
-	    signal_secret_event ();
-	}
-
-      if (!secret_check_failed && !res)
-	{
-	  if (!check_peer_secret_event (&sin, secret))
-	    {
-	      debug_printf ("accept from unauthorized server");
-	      secret_check_failed = true;
-	    }
-       }
-
-      if (secret_check_failed)
-	{
-	  close_secret_event ();
-	  if (res)
-	    closesocket (res);
-	  set_errno (ECONNREFUSED);
-	  res = -1;
-	}
-
       /* Prepare eid credential transaction. */
       sec_pid = getpid ();
       sec_uid = geteuid32 ();
@@ -758,6 +796,9 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
       sec_peer_pid = (pid_t) 0;
       sec_peer_uid = (__uid32_t) -1;
       sec_peer_gid = (__gid32_t) -1;
+
+      if (!res)
+	res = sec_event_connect (&sin);
 
       if (!res)
         {
@@ -803,7 +844,6 @@ int
 fhandler_socket::accept (struct sockaddr *peer, int *len)
 {
   int res = -1;
-  bool secret_check_failed = false;
 
   /* Allows NULL peer and len parameters. */
   struct sockaddr_in peer_dummy;
@@ -827,27 +867,7 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 
   if ((SOCKET) res != INVALID_SOCKET && get_addr_family () == AF_LOCAL
       && get_socket_type () == SOCK_STREAM)
-    {
-	if (!create_secret_event ())
-	  secret_check_failed = true;
-
-      if (!secret_check_failed)
-	{
-	  if (!check_peer_secret_event ((struct sockaddr_in*) peer))
-	    {
-	      debug_printf ("connect from unauthorized client");
-	      secret_check_failed = true;
-	    }
-	}
-
-      if (secret_check_failed)
-	{
-	  close_secret_event ();
-	  closesocket (res);
-	  set_errno (ECONNABORTED);
-	  return -1;
-	}
-    }
+    res = sec_event_accept (res, (struct sockaddr_in *) peer);
 
   if ((SOCKET) res == INVALID_SOCKET)
     set_winsock_errno ();
@@ -1256,7 +1276,7 @@ int
 fhandler_socket::sendto (const void *ptr, size_t len, int flags,
 			 const struct sockaddr *to, int tolen)
 {
-  sockaddr_in sin;
+  struct sockaddr_in sin;
 
   if (to && !get_inet_addr (to, tolen, &sin, &tolen))
     return SOCKET_ERROR;
