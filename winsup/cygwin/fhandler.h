@@ -573,6 +573,7 @@ private:
 /* Input calls */
   int igncr_enabled ();
   int input_tcsetattr (int a, const struct termios *t);
+  void set_cursor_maybe ();
 
 public:
 

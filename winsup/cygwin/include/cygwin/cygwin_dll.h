@@ -28,8 +28,9 @@ CDECL_BEGIN								      \
   int WINAPI _cygwin_noncygwin_dll_entry (HANDLE h, DWORD reason, void *ptr); \
 									      \
   int WINAPI Entry (HANDLE h, DWORD reason, void *ptr);		              \
-  extern int cygwin_attach_dll ();					      \
-  extern void cygwin_detach_dll ();	                      		      \
+  typedef int (*mainfunc) (int, char **, char **);			      \
+  extern int cygwin_attach_dll (HMODULE, mainfunc);			      \
+  extern void cygwin_detach_dll (DWORD);	               		      \
 CDECL_END								      \
 									      \
 static HANDLE storedHandle;						      \
@@ -41,9 +42,9 @@ static int __dllMain (int a, char **b, char **c)			      \
   return Entry (storedHandle, storedReason, storedPtr);		              \
 }									      \
 									      \
-static int dll_index;							      \
+static DWORD dll_index;							      \
 									      \
-int WINAPI _cygwin_dll_entry (HANDLE h, DWORD reason, void *ptr)	      \
+int WINAPI _cygwin_dll_entry (HINSTANCE h, DWORD reason, void *ptr)	      \
 {									      \
   int ret;								      \
   ret = 1;								      \
@@ -56,7 +57,7 @@ int WINAPI _cygwin_dll_entry (HANDLE h, DWORD reason, void *ptr)	      \
       storedReason = reason;						      \
       storedPtr = ptr;							      \
       dll_index = cygwin_attach_dll (h, &__dllMain);	      		      \
-      if (dll_index == -1)						      \
+      if (dll_index == (DWORD) -1)					      \
 	ret = 0;							      \
     }									      \
     break;								      \
@@ -67,7 +68,7 @@ int WINAPI _cygwin_dll_entry (HANDLE h, DWORD reason, void *ptr)	      \
       if (ret)								      \
       {									      \
 	cygwin_detach_dll (dll_index);				      	      \
-	dll_index = -1;							      \
+	dll_index = (DWORD) -1;						      \
       }									      \
     }									      \
     break;								      \
