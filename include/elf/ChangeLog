@@ -1,3 +1,13 @@
+2000-11-16  Richard Henderson  <rth@redhat.com>
+
+	Update relocations per August psABI docs.
+	* ia64.h (R_IA64_SEGBASE): Remove.
+	(R_IA64_LTV*): Renumber to 0x74 to 0x77.
+	(R_IA64_EPLTMSB, R_IA64_EPLTLSB): Remove.
+	(R_IA64_TPREL14, R_IA64_TPREL64I): New.
+	(R_IA64_DTPMOD*): New.
+	(R_IA64_DTPREL*): New.
+
 2000-09-29  Hans-Peter Nilsson  <hp@axis.com>
 
 	* cris.h (EF_CRIS_UNDERSCORE): New.
