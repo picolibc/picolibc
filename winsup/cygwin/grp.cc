@@ -152,8 +152,7 @@ read_etc_group ()
 	      free (group_buf[i].gr_name);
 	      free (group_buf[i].gr_mem);
 	    }
-	  free (group_buf);
-	  curr_lines = max_lines = 0;
+	  curr_lines = 0;
 	}
 
       FILE *f = fopen (etc_group, "rt");

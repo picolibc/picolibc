@@ -1,3 +1,10 @@
+Thu Sep 13 23:01:00 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* grp.cc (read_etc_group): Just reuse group_buf storage for subsequent
+	reread of /etc/group.
+	* passwd.cc (read_etc_passwd): Just reuse passwd_buf storage for
+	subsequent reread of /etc/passwd.
+
 Thu Sep 13 20:46:05 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* cygheap.cc (dup_now): New function.

@@ -137,8 +137,7 @@ read_etc_passwd ()
 	  {
 	    for (int i = 0; i < curr_lines; ++i)
 	      free (passwd_buf[i].pw_name);
-	    free (passwd_buf);
-	    curr_lines = max_lines = 0;
+	    curr_lines = 0;
 	  }
 
 	FILE *f = fopen ("/etc/passwd", "rt");
