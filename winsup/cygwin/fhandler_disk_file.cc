@@ -301,36 +301,36 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
 	{
 	  buf->st_mode |= S_IFREG;
 	}
+      if (pc->exec_state () == is_executable)
+	buf->st_mode |= STD_XBITS;
     }
 
-    if (buf->st_mode & STD_XBITS)
-      /* already derived */;
-    else if (pc->exec_state () == is_executable)
-      buf->st_mode |= STD_XBITS;
-    else if (pc->exec_state () == dont_know_if_executable)
-      {
-	DWORD cur, done;
-	char magic[3];
+  if (buf->st_mode & STD_XBITS)
+    /* already derived */;
+  else if (pc->exec_state () == dont_know_if_executable)
+    {
+      DWORD cur, done;
+      char magic[3];
 
-	/* First retrieve current position, set to beginning
-	   of file if not already there. */
-	cur = SetFilePointer (get_handle (), 0, NULL, FILE_CURRENT);
-	if (cur != INVALID_SET_FILE_POINTER
-	    && (!cur || SetFilePointer (get_handle (), 0, NULL, FILE_BEGIN)
-		!= INVALID_SET_FILE_POINTER))
-	  {
-	    /* FIXME should we use /etc/magic ? */
-	    magic[0] = magic[1] = magic[2] = '\0';
-	    if (ReadFile (get_handle (), magic, 3, &done, NULL) &&
-		has_exec_chars (magic, done))
-	      {
-		set_execable_p ();
-		pc->set_exec ();
-		buf->st_mode |= STD_XBITS;
-	      }
-	    SetFilePointer (get_handle (), cur, NULL, FILE_BEGIN);
-	  }
-      }
+      /* First retrieve current position, set to beginning
+	 of file if not already there. */
+      cur = SetFilePointer (get_handle (), 0, NULL, FILE_CURRENT);
+      if (cur != INVALID_SET_FILE_POINTER
+	  && (!cur || SetFilePointer (get_handle (), 0, NULL, FILE_BEGIN)
+	      != INVALID_SET_FILE_POINTER))
+	{
+	  /* FIXME should we use /etc/magic ? */
+	  magic[0] = magic[1] = magic[2] = '\0';
+	  if (ReadFile (get_handle (), magic, 3, &done, NULL) &&
+	      has_exec_chars (magic, done))
+	    {
+	      set_execable_p ();
+	      pc->set_exec ();
+	      buf->st_mode |= STD_XBITS;
+	    }
+	  SetFilePointer (get_handle (), cur, NULL, FILE_BEGIN);
+	}
+    }
 
   buf->st_uid = uid;
   buf->st_gid = gid;

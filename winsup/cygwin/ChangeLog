@@ -1,5 +1,11 @@
 2002-10-22  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat_helper): Oops.  Only
+	do the executable thing for #! scripts since .exe files wouldn't be
+	executable in ntsec case regardless.
+
+2002-10-22  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::fstat_helper): Always
 	consider .exe files and '#!' shell scripts to be executable.
 
