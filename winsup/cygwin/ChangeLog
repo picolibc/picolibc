@@ -1,3 +1,12 @@
+2002-07-24  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (path_conv::check): Always set fileattr when component == 0.
+	(readlink): Use path_conv method rather than field.
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat_helper): Ditto,
+	throughout.
+	* path.h (path_conv): Make fileattr private.
+	* exceptions.cc (try_to_debug): Default to idle priority when looping.
+
 2002-07-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_serial.cc: Use must_init_serial_line capability throughout.
