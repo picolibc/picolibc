@@ -1,3 +1,7 @@
+2004-09-13  Paul Brook  <paul@codesourcery.com>
+
+	* elf/arm.h: Rename RELABS to TARGET1.
+
 2004-09-04  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
 	* ansidecl.h (ATTRIBUTE_SENTINEL): Define.
