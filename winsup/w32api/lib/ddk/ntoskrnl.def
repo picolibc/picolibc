@@ -1390,8 +1390,8 @@ ZwYieldExecution@0
 ;_itow
 ;_local_unwind2
 ;_purecall
-;_snprintf
-;_snwprintf
+_snprintf
+_snwprintf
 _stricmp
 _strlwr
 _strnicmp
@@ -1399,8 +1399,8 @@ _strnset
 _strrev
 _strset
 _strupr
-;_vsnprintf
-;_vsnwprintf
+_vsnprintf
+_vsnwprintf
 _wcsicmp@8
 _wcslwr@4
 _wcsnicmp@12
@@ -1423,7 +1423,7 @@ memmove
 memset
 ;qsort
 ;rand
-;sprintf
+sprintf
 ;srand
 strcat
 strchr
@@ -1436,7 +1436,7 @@ strncpy
 strrchr
 strspn
 strstr
-;swprintf
+swprintf
 ;tolower
 ;toupper
 ;towlower

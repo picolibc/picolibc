@@ -53,9 +53,9 @@ VideoPortInt10@8
 VideoPortLockBuffer@16
 VideoPortLockPages@20
 VideoPortLogError@16
-VideoPortMapBankedMemory@36
-VideoPortMapDmaMemory@32
-VideoPortMapMemory@20
+VideoPortMapBankedMemory@40
+VideoPortMapDmaMemory@36
+VideoPortMapMemory@24
 VideoPortMoveMemory@12
 VideoPortPutDmaAdapter@8
 VideoPortQueryPerformanceCounter@8

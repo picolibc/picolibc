@@ -1,5 +1,13 @@
 2004-05-15  Filip Navara  <xnavara@volny.cz>
 
+	* include/ddk/kbdmou.h: New file.
+	* lib/ddk/videoprt.def (VideoPortMapBankedMemory,
+	VideoPortMapDmaMemory, VideoPortMapMemory): Correct suffix.
+	* lib/ddk/ntoskrnl.def (_snprintf, _snwprintf, _vsnprintf,
+	_vsnwprintf, sprintf, swprintf): Export.
+
+2004-05-15  Filip Navara  <xnavara@volny.cz>
+
 	* include/ddk/ntddk.h: Don't set 4-byte alignment on included
 	headers.
 
