@@ -1,3 +1,11 @@
+2003-09-11  Igor Pechtchanski  <pechtcha@cs.nyu.edu>
+
+	* cygcheck.cc (dump_only): New global variable.
+	(usage): Add "--dump-only" option, fix "--verbose" line.
+	(longopts, opts): Add "--dump-only" option.
+	(main): Process the "--dump-only" flag.  Add new semantic check.
+	Pass dump_only information to dump_setup().
+
 2003-09-11  Corinna Vinschen  <corinna@vinschen.de>
 
 	* getfacl (main): Remove extern declaration of optind.
