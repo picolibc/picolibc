@@ -201,33 +201,35 @@ These devices cannot be seen with the command <command>ls /dev</command>
 although commands such as <command>ls /dev/tty</command> work fine.
 </para>
 
-<para>However, on Windows NT/W2K there are different devices which are
-supported but have to be created as mount points. These are the raw block
-special devices and tape devices. These devices need a special handling
-which is enabled through the mount points. The usage of the native Windows
-device names is not sufficent.
+<para>Windows NT/W2K/XP additionally support raw devices like floppies,
+disks, partitions and tapes.  These are accessed from Cygwin applications
+using POSIX device names which are supported in two different ways.
+Up to 1.3.3, Cygwin only uses Win32 device names, since 1.3.4
+it additionally uses NT internal device names.
 </para>
 
-<para>NT/W2K supports raw block special device support for partitions
-and drives. The Win32 device name for a partition is the drive letter
+<para>Up to Cygwin 1.3.3 the only way to access those devices is
+to mount the Win32 device names to a POSIX device name.
+</para>
+
+<para>
+The Win32 device name for a partition is the drive letter
 with leading <filename>\\.\</filename>, so the floppy would be
 <filename>\\.\A:</filename>, the first partition typically
-<filename>\\.\C:</filename>. Complete drives (except floppies
+<filename>\\.\C:</filename>. Complete drives (except floppies and CD-ROMS
 which are supported as partitions only) are named
 <filename>\\.\PHYSICALDRIVEx</filename>. The <literal>x</literal>
 is the drive number which you can check in the disk manager.
 Each drive line has prepended the text "Disk x".
 </para>
 
-<para>To access tape drives, NT/W2K uses the Win32 file name
-<filename>\\.\TAPEx</filename>. For example the first installed tape device
-is named <filename>\\.\tape0</filename>.
+<para>To access tape drives the Win32 file name <filename>\\.\TAPEx</filename>
+is used. For example the first installed tape device is named
+<filename>\\.\tape0</filename>.
 </para>
 
-<para>Up to Cygwin 1.3.3 this is the only way to use those devices.
-To access them you have to mount them and you have to use the posix
-name of the device to be recognized by Cygwin.
-The naming convention is simple: The name has to begin with
+<para>
+The naming convention is simple: The name of the POSIX device has to begin with
 <filename>/dev/</filename> and the rest is as you like. The only
 exception are tape devices. To identify if the tape device is
 used as a rewind or a no-rewind device the name must not begin with
@@ -250,19 +252,18 @@ file I/O is in "binary mode".
 </para>
 
 <para>
-NT knows another way of accessing these devices. In the internal NT
-namespace the devices are using different names.  The Win32 names are
-only a sort of symbolic link to the NT internal device name.
+Since Cygwin 1.3.4 raw devices are accessible from inside of Cygwin processes
+using fixed POSIX device names.  That means, you don't have to mount the devices
+anymore which results in a more cleaner mount table.
+</para>
+
+<para>
+These new fixed POSIX device names are generated using a direct conversion
+from the POSIX namespace to the internal NT namespace.
 E.g. the first harddisk is the NT internal device \device\harddisk0\partition0
 or the first partition on the third harddisk is \device\harddisk2\partition1.
 The first floppy in the system is \device\floppy0, the first CD-ROM is
 \device\cdrom0 and the first tape drive is \device\tape0.
-</para>
-
-<para>
-Since Cygwin 1.3.4 these devices are accessible from inside of Cygwin processes
-using fixed device names.  That means, you don't have to mount the devices
-anymore which results in a more cleaner mount table.
 </para>
 
 <para>The new fixed POSIX names are mapped to NT internal devices as

@@ -1,3 +1,7 @@
+Tue Oct 16 18:02:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* pathnames.sgml: Cleanup raw device text to be more coherent.
+
 Tue Oct 16 17:14:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* pathnames.sgml: Add description for new fixed device paths.
