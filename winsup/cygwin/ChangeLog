@@ -1,3 +1,15 @@
+2004-04-20  Christopher Faylor  <cgf@alum.bu.edu>
+
+	* path.cc (is_unc_share): Rename from slash_unc_prefix_p throughout.
+
+2004-04-20  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* path.cc (normalize_posix_path): Process all Posix paths and map three
+	or more initial slashes to a single one.  Simplify processing following
+	two initial slashes.
+	(normalize_win32_path): Make last argument non-optional and do not
+	check for NULL value.
+
 2004-04-20  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* fhandler_disk_file.cc (fhandler_base::open_fs): Change

@@ -75,7 +75,7 @@ details. */
 #include "cygtls.h"
 #include <assert.h>
 
-static int normalize_win32_path (const char *src, char *dst, char ** tail = 0);
+static int normalize_win32_path (const char *src, char *dst, char ** tail);
 static void slashify (const char *src, char *dst, int trailing_slash_p);
 static void backslashify (const char *src, char *dst, int trailing_slash_p);
 
@@ -202,7 +202,7 @@ normalize_posix_path (const char *src, char *dst, char **tail)
   const char *in_src = src;
   char *in_dst = dst;
 
-  if (isdrive (src) || slash_unc_prefix_p (src))
+  if (isdrive (src) || *src == '\\')
     goto win32_path;
 
   if (!isslash (src[0]))
@@ -220,26 +220,12 @@ normalize_posix_path (const char *src, char *dst, char **tail)
 	*dst++ = '/';
     }
   /* Two leading /'s?  If so, preserve them.  */
-  else if (isslash (src[1]))
+  else if (isslash (src[1]) && !isslash (src[2]))
     {
       *dst++ = '/';
       *dst++ = '/';
       src += 2;
-      if (isslash (*src))
-	{ /* Starts with three or more slashes - reset. */
-	  dst = dst_start;
-	  *dst++ = '/';
-	  src = src_start + 1;
-	}
-      else if (src[0] == '.' && isslash (src[1]))
-	{
-	  *dst++ = '.';
-	  *dst++ = '/';
-	  src += 2;
-	}
     }
-  else
-    *dst = '\0';
 
   while (*src)
     {
@@ -394,7 +380,7 @@ fs_info::update (const char *win32_path)
     is_remote_drive (false);
 
   if (!GetVolumeInformation (root_dir, NULL, 0, &status.serial, NULL,
-  			     &status.flags, fsname, sizeof (fsname)))
+			     &status.flags, fsname, sizeof (fsname)))
     {
       debug_printf ("Cannot get volume information (%s), %E", root_dir);
       has_buggy_open (false);
@@ -917,6 +903,21 @@ win32_device_name (const char *src_path, char *win32_path, device& dev)
   return true;
 }
 
+/* is_unc_share: Return non-zero if PATH begins with //UNC/SHARE */
+
+static bool __stdcall
+is_unc_share (const char *path)
+{
+  char *p = NULL;
+  int ret = (isdirsep (path[0])
+	     && isdirsep (path[1])
+	     && (isalnum (path[2]) || path[2] == '.')
+	     && ((p = strpbrk (path + 3, "\\/")) != NULL));
+  if (!ret || p == NULL)
+    return false;
+  return ret && isalnum (p[1]);
+}
+
 /* Normalize a Win32 path.
    /'s are converted to \'s in the process.
    All duplicate \'s, except for 2 leading \'s, are deleted.
@@ -950,7 +951,7 @@ normalize_win32_path (const char *src, char *dst, char **tail)
 	{
 	  if (dst[1] == ':')
 	    dst[2] = '\0';
-	  else if (slash_unc_prefix_p (dst))
+	  else if (is_unc_share (dst))
 	    {
 	      char *p = strpbrk (dst + 2, "\\/");
 	      if (p && (p = strpbrk (p + 1, "\\/")))
@@ -1005,9 +1006,8 @@ normalize_win32_path (const char *src, char *dst, char **tail)
       if ((dst - dst_start) >= CYG_MAX_PATH)
 	return ENAMETOOLONG;
     }
-  *dst = 0;
-  if (tail)
-    *tail = dst;
+  *dst = '\0';
+  *tail = dst;
   debug_printf ("%s = normalize_win32_path (%s)", dst_start, src_start);
   return 0;
 }
@@ -1073,21 +1073,6 @@ nofinalslash (const char *src, char *dst)
     memcpy (dst, src, len + 1);
   while (len > 1 && isdirsep (dst[--len]))
     dst[len] = '\0';
-}
-
-/* slash_unc_prefix_p: Return non-zero if PATH begins with //UNC/SHARE */
-
-int __stdcall
-slash_unc_prefix_p (const char *path)
-{
-  char *p = NULL;
-  int ret = (isdirsep (path[0])
-	     && isdirsep (path[1])
-	     && (isalnum (path[2]) || path[2] == '.')
-	     && ((p = strpbrk (path + 3, "\\/")) != NULL));
-  if (!ret || p == NULL)
-    return ret;
-  return ret && isalnum (p[1]);
 }
 
 /* conv_path_list: Convert a list of path names to/from Win32/POSIX. */
@@ -1492,7 +1477,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
     }
   else
     {
-      if (strchr (src_path, ':') == NULL && !slash_unc_prefix_p (src_path))
+      if (strchr (src_path, ':') == NULL && !is_unc_share (src_path))
 	set_flags (flags, PATH_BINARY);
       backslashify (src_path, dst, 0);
     }
@@ -2155,7 +2140,7 @@ mount_info::add_item (const char *native, const char *posix, unsigned mountflags
   if ((native == NULL) || (*native == 0) ||
       (posix == NULL) || (*posix == 0) ||
       !isabspath (native) || !isabspath (posix) ||
-      slash_unc_prefix_p (posix) || isdrive (posix))
+      is_unc_share (posix) || isdrive (posix))
     {
       set_errno (EINVAL);
       return -1;
@@ -2232,7 +2217,7 @@ mount_info::del_item (const char *path, unsigned flags, int reg_p)
       return -1;
     }
 
-  if (slash_unc_prefix_p (path) || strpbrk (path, ":\\"))
+  if (is_unc_share (path) || strpbrk (path, ":\\"))
     backslashify (path, pathtmp, 0);
   else
     {
