@@ -1,3 +1,8 @@
+2003-05-15  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/ddk/ndis.h (NDIS30_MINIPORT_CHARACTERISTICS_S):
+	Unname anonymous unions if NONAMELESSUNION not defined.
+
 2003-05-14  Bang Jun-Young  <junyoung@netbsd.org>
 
 	* include/winbase.h (GMEM_VALID_FLAGS): Add.

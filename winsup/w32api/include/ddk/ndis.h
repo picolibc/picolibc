@@ -3720,15 +3720,15 @@ typedef NDIS_STATUS DDKAPI
   W_QUERY_INFORMATION_HANDLER  QueryInformationHandler; \
   W_RECONFIGURE_HANDLER  ReconfigureHandler; \
   W_RESET_HANDLER  ResetHandler; \
-  union { \
+  _ANONYMOUS_UNION union { \
     W_SEND_HANDLER  SendHandler; \
     WM_SEND_HANDLER  WanSendHandler; \
-  } u1; \
+  } _UNION_NAME(u1); \
   W_SET_INFORMATION_HANDLER  SetInformationHandler; \
-  union { \
+  _ANONYMOUS_UNION union { \
     W_TRANSFER_DATA_HANDLER  TransferDataHandler; \
     WM_TRANSFER_DATA_HANDLER  WanTransferDataHandler; \
-  } u2;
+  } _UNION_NAME(u2);
 
 typedef struct _NDIS30_MINIPORT_CHARACTERISTICS {
   NDIS30_MINIPORT_CHARACTERISTICS_S;
