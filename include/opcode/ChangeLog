@@ -1,3 +1,10 @@
+2002-03-15  Chris G. Demetriou  <cgd@broadcom.com>
+
+	* mips.h (INSN_MIPS3D): New definition used to mark MIPS-3D
+	instructions.
+	(OPCODE_IS_MEMBER): Adjust comments to indicate that ASE bit masks
+	may be passed along with the ISA bitmask.
+
 2002-03-05  Paul Koning  <pkoning@equallogic.com>
 
 	* pdp11.h: Add format codes for float instruction formats.
