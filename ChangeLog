@@ -1,5 +1,30 @@
 2002-12-01  Nathanael Nerode  <neroden@gcc.gnu.org>
 
+	(continuing slow-motion replay)
+	* Makefile.tpl: Make all-target, install-target behave similarly
+	to all, install (only hitting configured targets).  Eliminate
+	unused macro defintions.
+
+	* Makefile.tpl: Add all-gcc: all-build-libiberty dependency when
+	build != host.
+
+	* Makefile.tpl: Add all-gcc: all-libiberty dependency.
+
+	* ltcf-c.sh, ltcf-gcj.sh, Makefile.tpl: Correct BUILD/HOST confusion.
+
+	* configure.in: Produce lists of subdir targets we're actually 
+	configuring.  Remove references to "dosrel".
+	* Makefile.tpl: Let configure set which subdir targets are hit.
+	Remove install-cross; clean up install; remove ALL.  Remove 
+	references to "dosrel".  Remove "EXTRA_TARGET_HOST" hackery.
+	Autogenerate host module targets.  Remove empty dependency lines 
+	and redundant dependency; rearrange slightly.
+	* Makefile.def: Add host-side libtermcap, utils.
+
+	* Makefile.in: Regenerate.
+
+2002-12-01  Nathanael Nerode  <neroden@gcc.gnu.org>
+
 	(Continuing slow-motion replay)
 	* Makefile.def: Add list of recursive targets to autogenerate.
 	Add build_modules.

@@ -69,7 +69,8 @@ host_modules= { module= guile; with_x=true; };
 host_modules= { module= tclX; with_x=true; };
 host_modules= { module= tk; with_x=true; };
 host_modules= { module= tix; with_x=true; };
-
+host_modules= { module= libtermcap; no_check=true; no_clean=true; };
+host_modules= { module= utils; no_check=true; };
 
 target_modules = { module= libstdc++-v3; };
 target_modules = { module= newlib; };

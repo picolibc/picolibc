@@ -109,8 +109,6 @@ INSTALL_PROGRAM = $(INSTALL) $(INSTALL_PROGRAM_ARGS)
 INSTALL_SCRIPT = $(INSTALL)
 INSTALL_DATA = $(INSTALL) -m 644
 
-INSTALL_DOSREL = install-dosrel-fake
-
 AS = @AS@
 AR = @AR@
 AR_FLAGS = rc
@@ -118,7 +116,7 @@ CC = cc
 
 # Special variables passed down in EXTRA_GCC_FLAGS.  They are defined
 # here so that they can be overridden by Makefile fragments.
-HOST_CC = $(CC_FOR_BUILD)
+BUILD_CC = $(CC_FOR_BUILD)
 BUILD_PREFIX = @BUILD_PREFIX@
 BUILD_PREFIX_1 = @BUILD_PREFIX_1@
 
@@ -254,21 +252,6 @@ TARGET_LIB_PATH = $$r/$(TARGET_SUBDIR)/libstdc++-v3/src/.libs:
 REALLY_SET_LIB_PATH = \
   $(RPATH_ENVVAR)=`echo "$(HOST_LIB_PATH):$(TARGET_LIB_PATH):$$$(RPATH_ENVVAR)" | sed 's,::*,:,g;s,^:*,,;s,:*$$,,'`; export $(RPATH_ENVVAR);
 
-ALL = all.normal
-INSTALL_TARGET = installdirs \
-	install-gcc \
-	$(INSTALL_MODULES) \
-	$(INSTALL_TARGET_MODULES) \
-	$(INSTALL_X11_MODULES) \
-	$(INSTALL_DOSREL)
-
-INSTALL_TARGET_CROSS = installdirs \
-	install-gcc-cross \
-	$(INSTALL_MODULES) \
-	$(INSTALL_TARGET_MODULES) \
-	$(INSTALL_X11_MODULES) \
-	$(INSTALL_DOSREL)
-
 # Should be substed by configure.in
 FLAGS_FOR_TARGET = @FLAGS_FOR_TARGET@
 CC_FOR_TARGET = @CC_FOR_TARGET@
@@ -381,13 +364,6 @@ USUAL_NM_FOR_TARGET = ` \
 # This lives here to allow makefile fragments to contain dependencies.
 all: all.normal
 .PHONY: all
-
-# These can be overridden by config/mt-*.
-# The _TARGET_ is because they're specified in mt-foo.
-# The _HOST_ is because they're programs that run on the host.
-EXTRA_TARGET_HOST_ALL_MODULES =
-EXTRA_TARGET_HOST_INSTALL_MODULES =
-EXTRA_TARGET_HOST_CHECK_MODULES =
 
 #### host and target specific makefile fragments come in here.
 ###
@@ -526,7 +502,7 @@ EXTRA_GCC_FLAGS = \
 	'CC=$(CC)' \
 	'CXX=$(CXX)' \
 	'DLLTOOL=$$(DLLTOOL_FOR_TARGET)' \
-	'HOST_CC=$(CC_FOR_BUILD)' \
+	'BUILD_CC=$(CC_FOR_BUILD)' \
 	'BUILD_PREFIX=$(BUILD_PREFIX)' \
 	'BUILD_PREFIX_1=$(BUILD_PREFIX_1)' \
 	'NM=$(NM)' \
@@ -558,71 +534,12 @@ ALL_BUILD_MODULES = @all_build_modules@
 CONFIGURE_BUILD_MODULES = \
 	configure-build-libiberty
 
-# This is a list of the targets for all of the modules which are compiled
-# using $(FLAGS_TO_PASS).
-ALL_MODULES = [+ FOR host_modules +][+ IF with_x +][+ ELSE with_x +]\
-	all-[+module+] [+ ENDIF with_x +][+ ENDFOR host_modules +]\
-	$(EXTRA_TARGET_HOST_ALL_MODULES)
-
-# This is a list of the check targets for all of the modules which are
-# compiled using $(FLAGS_TO_PASS).
-#
-# The list is in two parts.  The first lists those tools which
-# are tested as part of the host's native tool-chain, and not
-# tested in a cross configuration.
-NATIVE_CHECK_MODULES = \
-	check-bison \
-	check-byacc \
-	check-fastjar \
-	check-flex \
-	check-zip
-
-CROSS_CHECK_MODULES = [+ FOR host_modules +][+ IF no_check  +][+ ELIF no_check_cross +][+ ELIF with_x +][+ ELSE check +]\
-	check-[+module+] [+ ENDIF no_check +][+ ENDFOR host_modules +]\
-	$(EXTRA_TARGET_HOST_CHECK_MODULES)
-
-CHECK_MODULES=$(NATIVE_CHECK_MODULES) $(CROSS_CHECK_MODULES)
-
-# This is a list of the install targets for all of the modules which are
-# compiled using $(FLAGS_TO_PASS).
-INSTALL_MODULES = [+ FOR host_modules+][+ IF no_install +][+ ELIF with_x +][+ ELSE install +]\
-	install-[+module+] [+ ENDIF no_install +][+ ENDFOR host_modules +]\
-	$(EXTRA_TARGET_HOST_INSTALL_MODULES)
-
-# This is a list of the targets for all of the modules which are compiled
-# using $(X11_FLAGS_TO_PASS).
-ALL_X11_MODULES = [+ FOR host_modules +][+ IF with_x +]\
-	all-[+module+] [+ ENDIF with_x +][+ ENDFOR host_modules +]
-
-# This is a list of the check targets for all of the modules which are
-# compiled using $(X11_FLAGS_TO_PASS).
-CHECK_X11_MODULES = [+ FOR host_modules +][+ IF with_x +]\
-	check-[+module+] [+ ENDIF with_x +][+ ENDFOR host_modules +]
-
-# This is a list of the install targets for all the modules which are
-# compiled using $(X11_FLAGS_TO_PASS).
-INSTALL_X11_MODULES = [+ FOR host_modules +][+ IF with_x +]\
-	install-[+module+] [+ ENDIF with_x +][+ ENDFOR host_modules +]
-
-# This is a list of the targets for all of the modules which are compiled
-# using $(TARGET_FLAGS_TO_PASS).
-ALL_TARGET_MODULES = [+ FOR target_modules +]\
-	all-target-[+module+] [+ ENDFOR target_modules +]
-
 # This is a list of the configure targets for all of the modules which
 # are compiled using the target tools.
 CONFIGURE_TARGET_MODULES = [+ FOR target_modules +]\
 	configure-target-[+module+] [+ ENDFOR target_modules +]
 
-# This is a list of the check targets for all of the modules which are
-# compiled using $(TARGET_FLAGS_TO_PASS).
-CHECK_TARGET_MODULES = [+ FOR target_modules +][+ IF no_check +][+ ELSE check +]\
-	check-target-[+module+] [+ ENDIF no_check +][+ ENDFOR target_modules +]
-
-# This is a list of the install targets for all of the modules which are
-# compiled using $(TARGET_FLAGS_TO_PASS).
-INSTALL_TARGET_MODULES = [+ FOR target_modules +][+ IF no_install +][+ ELSE install +]\
-	install-target-[+module+] [+ ENDIF no_install +][+ ENDFOR target_modules +]
+configure-target: $(CONFIGURE_TARGET_MODULES)
 
 # This is a list of the targets for which we can do a clean-{target}.
 CLEAN_MODULES = [+ FOR host_modules +][+ IF no_clean +][+ ELIF with_x +][+ ELSE clean +]\
@@ -637,13 +554,13 @@ CLEAN_X11_MODULES = [+ FOR host_modules +][+ IF with_x +]\
 	clean-[+module+] [+ ENDIF with_x +][+ ENDFOR host_modules +]
 
 # The target built for a native build.
+# This list only includes modules actually being configured and built.
 .PHONY: all.normal
-all.normal: \
-	$(ALL_BUILD_MODULES) \
-	$(ALL_MODULES) \
-	$(ALL_X11_MODULES) \
-	$(ALL_TARGET_MODULES) \
-	all-gcc
+all.normal: @all_build_modules@ \
+	@all_host_modules@ \
+	@all_target_modules@
+
+all-target: @all_target_modules@
 
 # Do a target for all the subdirectories.  A ``make do-X'' will do a
 # ``make X'' in all subdirectories (because, in general, there is a
@@ -784,10 +701,9 @@ clean-target-libgcc:
 check:
 	$(MAKE) do-check NOTPARALLEL=parallel-ok
 
-do-check: $(CHECK_MODULES) \
-	$(CHECK_TARGET_MODULES) \
-	$(CHECK_X11_MODULES) \
-	check-gcc
+# Only include modules actually being configured and built.
+do-check: @check_host_modules@ \
+	@check_target_modules@
 
 # Automated reporting of test results.
 
@@ -812,9 +728,10 @@ mail-report-with-warnings.log: warning.log
 
 # Installation targets.
 
-.PHONY: install install-cross uninstall source-vault binary-vault vault-install
-install: $(INSTALL_TARGET) 
-install-cross: $(INSTALL_TARGET_CROSS) 
+.PHONY: install uninstall source-vault binary-vault vault-install
+install: installdirs @install_host_modules@ @install_target_modules@
+
+install-target: @install_target_modules@
 
 uninstall:
 	@echo "the uninstall target is not supported in this tree"
@@ -848,12 +765,8 @@ install.all: install-no-fixedincludes
 # install-no-fixedincludes is used because Cygnus can not distribute
 # the fixed header files.
 .PHONY: install-no-fixedincludes
-install-no-fixedincludes: \
-	installdirs \
-	$(INSTALL_MODULES) \
-	$(INSTALL_TARGET_MODULES) \
-	$(INSTALL_X11_MODULES) \
-	gcc-no-fixedincludes 
+install-no-fixedincludes: installdirs @install_host_modules_nogcc@ \
+	@install_target_modules@ gcc-no-fixedincludes
 
 # Install the gcc headers files, but not the fixed include files,
 # which Cygnus is not allowed to distribute.  This rule is very
@@ -974,62 +887,82 @@ configure-build-[+module+]:
 	fi
 [+ ENDFOR build_modules +]
 
-# This rule is used to build the modules which use FLAGS_TO_PASS.  To
+# These rules are used to build the modules which use FLAGS_TO_PASS.  To
 # build a target all-X means to cd to X and make all.
-.PHONY: $(ALL_MODULES)
-$(ALL_MODULES):
-	@dir=`echo $@ | sed -e 's/all-//'`; \
-	if [ -f ./$${dir}/Makefile ] ; then \
+[+ FOR host_modules +]
+.PHONY: all-[+module+]
+all-[+module+]:
+	@dir=[+module+]; \
+	if [ -f ./[+module+]/Makefile ] ; then \
 	  r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
-	  (cd $${dir}; $(MAKE) $(FLAGS_TO_PASS) all); \
+	  (cd [+module+]; $(MAKE) $(FLAGS_TO_PASS)[+ 
+	    IF with_x 
+	      +] $(X11_FLAGS_TO_PASS)[+ 
+	    ENDIF with_x +] all); \
 	else \
 	  true; \
 	fi
 
-# These rules are used to check the modules which use FLAGS_TO_PASS.
-# To build a target check-X means to cd to X and make check.  Some
-# modules are only tested in a native toolchain.
-
-.PHONY: $(CHECK_MODULES) $(NATIVE_CHECK_MODULES) $(CROSS_CHECK_MODULES)
-$(NATIVE_CHECK_MODULES):
+[+ IF no_check +]
+.PHONY: check-[+module+]
+check-[+module+]:
+[+ ELIF no_check_cross +]
+.PHONY: check-[+module+]
+# This module is only tested in a native toolchain.
+check-[+module+]:
 	@if [ '$(host_canonical)' = '$(target_canonical)' ] ; then \
-	  dir=`echo $@ | sed -e 's/check-//'`; \
-	  if [ -f ./$${dir}/Makefile ] ; then \
+	  dir=[+module+]; \
+	  if [ -f ./[+module+]/Makefile ] ; then \
 	    r=`${PWD}`; export r; \
 	    s=`cd $(srcdir); ${PWD}`; export s; \
 	    $(SET_LIB_PATH) \
-	    (cd $${dir}; $(MAKE) $(FLAGS_TO_PASS) check); \
+	    (cd [+module+]; $(MAKE) $(FLAGS_TO_PASS)[+ 
+	      IF with_x 
+	        +] $(X11_FLAGS_TO_PASS)[+ 
+	      ENDIF with_x +] check); \
 	  else \
 	    true; \
 	  fi; \
 	fi
-
-$(CROSS_CHECK_MODULES):
-	@dir=`echo $@ | sed -e 's/check-//'`; \
-	if [ -f ./$${dir}/Makefile ] ; then \
+[+ ELSE check +]
+.PHONY: check-[+module+]
+check-[+module+]:
+	@dir=[+module+]; \
+	if [ -f ./[+module+]/Makefile ] ; then \
 	  r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
-	  (cd $${dir}; $(MAKE) $(FLAGS_TO_PASS) check); \
+	  (cd [+module+]; $(MAKE) $(FLAGS_TO_PASS)[+ 
+	    IF with_x 
+	      +] $(X11_FLAGS_TO_PASS)[+ 
+	    ENDIF with_x +] check); \
 	else \
 	  true; \
 	fi
+[+ ENDIF no_check +]
 
-# This rule is used to install the modules which use FLAGS_TO_PASS.
-# To build a target install-X means to cd to X and make install.
-.PHONY: $(INSTALL_MODULES)
-$(INSTALL_MODULES): installdirs
-	@dir=`echo $@ | sed -e 's/install-//'`; \
-	if [ -f ./$${dir}/Makefile ] ; then \
+[+ IF no_install +]
+.PHONY: install-[+module+]
+install-[+module+]:
+[+ ELSE install +]
+.PHONY: install-[+module+]
+install-[+module+]: installdirs
+	@dir=[+module+]; \
+	if [ -f ./[+module+]/Makefile ] ; then \
 	  r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
-	  (cd $${dir}; $(MAKE) $(FLAGS_TO_PASS) install); \
+	  (cd [+module+]; $(MAKE) $(FLAGS_TO_PASS)[+ 
+	    IF with_x 
+	      +] $(X11_FLAGS_TO_PASS)[+ 
+	    ENDIF with_x +] install); \
 	else \
 	  true; \
 	fi
+[+ ENDIF no_install +]
+[+ ENDFOR host_modules +]
 
 # These rules are used to build the modules which are built with the target
 # tools.  To make foo-X means to cd to X and make foo.
@@ -1149,7 +1082,11 @@ all-target-[+module+]:
 	else \
 	  true; \
 	fi
-[+ IF no_check +][+ ELSE check +]
+[+ IF no_check +]
+# Dummy target for uncheckable module.
+.PHONY: check-target-[+module+]
+check-target-[+module+]:
+[+ ELSE check +]
 .PHONY: check-target-[+module+]
 check-target-[+module+]:
 	@dir=[+module+] ; \
@@ -1178,51 +1115,6 @@ install-target-[+module+]: installdirs
 	fi
 [+ ENDIF no_install +]
 [+ ENDFOR target_modules +]
-
-# This rule is used to build the modules which use X11_FLAGS_TO_PASS.
-# To build a target all-X means to cd to X and make all.
-.PHONY: $(ALL_X11_MODULES)
-$(ALL_X11_MODULES):
-	@dir=`echo $@ | sed -e 's/all-//'`; \
-	if [ -f ./$${dir}/Makefile ] ; then \
-	  r=`${PWD}`; export r; \
-	  s=`cd $(srcdir); ${PWD}`; export s; \
-	  $(SET_LIB_PATH) \
-	  (cd $${dir}; \
-	   $(MAKE) $(FLAGS_TO_PASS) $(X11_FLAGS_TO_PASS) all); \
-	else \
-	  true; \
-	fi
-
-# This rule is used to check the modules which use X11_FLAGS_TO_PASS.
-# To build a target check-X means to cd to X and make all.
-.PHONY: $(CHECK_X11_MODULES)
-$(CHECK_X11_MODULES):
-	@dir=`echo $@ | sed -e 's/check-//'`; \
-	if [ -f ./$${dir}/Makefile ] ; then \
-	  r=`${PWD}`; export r; \
-	  s=`cd $(srcdir); ${PWD}`; export s; \
-	  $(SET_LIB_PATH) \
-	  (cd $${dir}; \
-	   $(MAKE) $(FLAGS_TO_PASS) $(X11_FLAGS_TO_PASS) check); \
-	else \
-	  true; \
-	fi
-
-# This rule is used to install the modules which use X11_FLAGS_TO_PASS.
-# To build a target install-X means to cd to X and make install.
-.PHONY: $(INSTALL_X11_MODULES)
-$(INSTALL_X11_MODULES): installdirs
-	@dir=`echo $@ | sed -e 's/install-//'`; \
-	if [ -f ./$${dir}/Makefile ] ; then \
-	  r=`${PWD}`; export r; \
-	  s=`cd $(srcdir); ${PWD}`; export s; \
-	  $(SET_LIB_PATH) \
-	  (cd $${dir}; \
-	   $(MAKE) $(FLAGS_TO_PASS) $(X11_FLAGS_TO_PASS) install); \
-	else \
-	  true; \
-	fi
 
 # gcc is the only module which uses GCC_FLAGS_TO_PASS.
 .PHONY: all-gcc
@@ -1323,135 +1215,75 @@ install-gcc:
 	  true; \
 	fi
 
-.PHONY: install-gcc-cross
-install-gcc-cross:
-	@if [ -f ./gcc/Makefile ] ; then \
-	  r=`${PWD}`; export r; \
-	  s=`cd $(srcdir); ${PWD}`; export s; \
-	  $(SET_LIB_PATH) \
-	  (cd gcc; $(MAKE) $(GCC_FLAGS_TO_PASS) LANGUAGES="c c++" install); \
-	else \
-	  true; \
-	fi
-# EXPERIMENTAL STUFF
-# This rule is used to install the modules which use FLAGS_TO_PASS.
-# To build a target install-X means to cd to X and make install.
-.PHONY: install-dosrel
-install-dosrel: installdirs info
-	@dir=`echo $@ | sed -e 's/install-//'`; \
-	if [ -f ./$${dir}/Makefile ] ; then \
-	  r=`${PWD}`; export r; \
-	  s=`cd $(srcdir); ${PWD}`; export s; \
-	  $(SET_LIB_PATH) \
-	  (cd $${dir}; $(MAKE) $(FLAGS_TO_PASS) install); \
-	else \
-	  true; \
-	fi
-
-install-dosrel-fake:
-
 ALL_GCC = all-gcc
 ALL_GCC_C = $(ALL_GCC) all-target-newlib all-target-libgloss
 ALL_GCC_CXX = $(ALL_GCC_C) all-target-libstdc++-v3
 
 # This is a list of inter-dependencies among modules.
-all-ash:
 all-autoconf: all-m4 all-texinfo
 all-automake: all-m4 all-texinfo
-all-bash:
 all-bfd: all-libiberty all-intl
 all-binutils: all-libiberty all-opcodes all-bfd all-flex all-bison all-byacc all-intl
 all-bison: all-texinfo
 configure-target-boehm-gc: $(ALL_GCC_C) configure-target-qthreads
-all-byacc:
-all-bzip2:
-all-db:
 all-dejagnu: all-tcl all-expect all-tk
 all-diff: all-libiberty
-all-etc:
 configure-target-examples: $(ALL_GCC_C)
 all-expect: all-tcl all-tk
 all-fileutils: all-libiberty
-all-findutils:
-all-find:
 all-flex: all-libiberty all-bison all-byacc
 all-gas: all-libiberty all-opcodes all-bfd all-intl
-all-gawk:
-all-gcc: all-bison all-byacc all-binutils all-gas all-ld all-zlib
+all-gcc: all-libiberty all-bison all-byacc all-binutils all-gas all-ld all-zlib
 all-bootstrap: all-libiberty all-texinfo all-bison all-byacc all-binutils all-gas all-ld all-zlib
 GDB_TK = @GDB_TK@
 all-gdb: all-libiberty all-opcodes all-bfd all-mmalloc all-readline all-bison all-byacc all-sim $(gdbnlmrequirements) $(GDB_TK)
-all-gettext:
-all-gnuserv:
 configure-target-gperf: $(ALL_GCC_CXX)
 all-target-gperf: all-target-libiberty all-target-libstdc++-v3
 all-gprof: all-libiberty all-bfd all-opcodes all-intl
 all-grep: all-libiberty
-all-guile:
 all-gzip: all-libiberty
 all-hello: all-libiberty
-all-indent:
-all-intl:
 all-itcl: all-tcl all-tk
 all-ld: all-libiberty all-bfd all-opcodes all-bison all-byacc all-flex all-intl
 configure-target-libgloss: $(ALL_GCC)
 all-target-libgloss: configure-target-newlib
 all-libgui: all-tcl all-tk all-itcl
-all-libiberty:
-
-all-build-libiberty: configure-build-libiberty
-
 configure-target-libffi: $(ALL_GCC_C) 
 configure-target-libjava: $(ALL_GCC_C) configure-target-zlib configure-target-boehm-gc configure-target-qthreads configure-target-libffi
 all-target-libjava: all-fastjar all-target-zlib all-target-boehm-gc all-target-qthreads all-target-libffi
 configure-target-libstdc++-v3: $(ALL_GCC_C)
 all-target-libstdc++-v3: all-target-libiberty
-all-libtool:
 configure-target-libf2c: $(ALL_GCC_C)
 all-target-libf2c: all-target-libiberty
 configure-target-libobjc: $(ALL_GCC_C)
 all-target-libobjc: all-target-libiberty
 all-m4: all-libiberty all-texinfo
 all-make: all-libiberty
-all-mmalloc:
 configure-target-newlib: $(ALL_GCC)
 configure-target-libtermcap: $(ALL_GCC_C)
 all-opcodes: all-bfd all-libiberty
 all-patch: all-libiberty
-all-perl:
 all-prms: all-libiberty
 configure-target-qthreads: $(ALL_GCC_C)
-all-rcs:
-all-readline:
 all-recode: all-libiberty
 all-sed: all-libiberty
 all-send-pr: all-prms
-all-shellutils:
 all-sid: all-tcl all-tk
 all-sim: all-libiberty all-bfd all-opcodes all-readline
 all-snavigator: all-tcl all-tk all-itcl all-tix all-db all-grep all-libgui
 all-tar: all-libiberty
-all-tcl:
 all-tclX: all-tcl all-tk
 all-tk: all-tcl
 all-texinfo: all-libiberty
-all-textutils:
-all-time:
 all-tix: all-tcl all-tk
-all-wdiff:
 configure-target-winsup: $(ALL_GCC_C)
 all-target-winsup: all-target-libiberty all-target-libtermcap
 all-uudecode: all-libiberty
-all-zip:
-all-zlib:
 configure-target-zlib: $(ALL_GCC_C)
 all-fastjar: all-zlib all-libiberty
 configure-target-fastjar: configure-target-zlib
-all-target-fastjar: configure-target-fastjar all-target-zlib all-target-libiberty
+all-target-fastjar: all-target-zlib all-target-libiberty
 configure-target-libiberty: $(ALL_GCC_C)
-configure-target: $(CONFIGURE_TARGET_MODULES)
-all-target: $(ALL_TARGET_MODULES)
-install-target: $(INSTALL_TARGET_MODULES)
 install-gdb: install-tcl install-tk install-itcl install-tix install-libgui
 install-sid: install-tcl install-tk
 
@@ -1464,6 +1296,12 @@ install-binutils: install-opcodes
 # program on installation which uses the Tcl libraries.
 install-itcl: install-tcl
 
+# This is a slightly kludgy method of getting dependencies on 
+# all-build-libiberty correct; it would be better to build it every time.
+all-gcc: @all_build_modules@
+
+# Dependencies of all-build-foo on configure-build-foo.
+all-build-libiberty: configure-build-libiberty
 
 # Dependencies of all-target-foo on configure-target-foo.
 [+ FOR target_modules +]all-target-[+module+]: configure-target-[+module+]
