@@ -97,6 +97,9 @@ class path_conv
     return 0;
   }
   int issymlink () const {return path_flags & PATH_SYMLINK;}
+  int isdevice () const {return dev.devn && dev.devn != FH_FS;}
+  int is_auto_device () const {return isdevice ()  && !is_fs_device ();}
+  int is_fs_device () const {return isdevice () && dev.isfs ();}
   int issocket () const {return path_flags & PATH_SOCKET;}
   int iscygexec () const {return path_flags & PATH_CYGWIN_EXEC;}
   bool exists () const {return fileattr != INVALID_FILE_ATTRIBUTES;}
@@ -147,7 +150,6 @@ class path_conv
   operator DWORD &() {return fileattr;}
   operator int () {return fileattr; }
   char operator [](int i) const {return path[i];}
-  BOOL is_device () {return dev.devn != FH_BAD && dev.devn != FH_FS;}
   DWORD get_devn () {return dev.devn == FH_BAD ? (DWORD) FH_FS : dev.devn;}
   short get_unitn () {return dev.minor;}
   DWORD file_attributes () {return fileattr;}
