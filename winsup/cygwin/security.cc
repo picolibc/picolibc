@@ -252,7 +252,7 @@ get_logon_server (const char *domain, char *server, WCHAR *wserver)
 {
   WCHAR wdomain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
   NET_API_STATUS ret;
-  WCHAR * buf;
+  WCHAR *buf;
   DWORD size = INTERNET_MAX_HOST_NAME_LENGTH + 1;
 
   /* Empty domain is interpreted as local system */
@@ -271,7 +271,7 @@ get_logon_server (const char *domain, char *server, WCHAR *wserver)
     {
       sys_wcstombs (server, buf, INTERNET_MAX_HOST_NAME_LENGTH + 1);
       if (wserver)
-	for (WCHAR * ptr1 = buf; (*wserver++ = *ptr1++); ) {}
+	for (WCHAR *ptr1 = buf; (*wserver++ = *ptr1++); ) {}
       NetApiBufferFree (buf);
       return TRUE;
     }
@@ -280,7 +280,7 @@ get_logon_server (const char *domain, char *server, WCHAR *wserver)
 }
 
 static BOOL
-get_user_groups (WCHAR *wlogonserver, cygsidlist &grp_list, char *user, char * domain)
+get_user_groups (WCHAR *wlogonserver, cygsidlist &grp_list, char *user, char *domain)
 {
   char dgroup[INTERNET_MAX_HOST_NAME_LENGTH + GNLEN + 2];
   WCHAR wuser[UNLEN + 1];
@@ -452,7 +452,7 @@ get_user_primary_group (WCHAR *wlogonserver, const char *user,
 #endif
 
 static void
-get_unix_group_sidlist (struct passwd * pw, cygsidlist &grp_list)
+get_unix_group_sidlist (struct passwd *pw, cygsidlist &grp_list)
 {
   struct __group32 *gr;
   cygsid gsid;
@@ -475,9 +475,9 @@ get_unix_group_sidlist (struct passwd * pw, cygsidlist &grp_list)
 
 static BOOL
 get_group_sidlist (cygsidlist &grp_list,
-		   cygsid &usersid, cygsid &pgrpsid, struct passwd * pw,
+		   cygsid &usersid, cygsid &pgrpsid, struct passwd *pw,
 		   PTOKEN_GROUPS my_grps, LUID auth_luid, int &auth_pos,
-		   BOOL * special_pgrp)
+		   BOOL *special_pgrp)
 {
   char user[UNLEN + 1];
   char domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
@@ -657,7 +657,7 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list)
 }
 
 BOOL
-verify_token (HANDLE token, cygsid &usersid, cygsid &pgrpsid, BOOL * pintern)
+verify_token (HANDLE token, cygsid &usersid, cygsid &pgrpsid, BOOL *pintern)
 {
   DWORD size;
   BOOL intern = FALSE;
@@ -713,7 +713,7 @@ verify_token (HANDLE token, cygsid &usersid, cygsid &pgrpsid, BOOL * pintern)
 }
 
 HANDLE
-create_token (cygsid &usersid, cygsid &pgrpsid, struct passwd * pw)
+create_token (cygsid &usersid, cygsid &pgrpsid, struct passwd *pw)
 {
   NTSTATUS ret;
   LSA_HANDLE lsa = INVALID_HANDLE_VALUE;
