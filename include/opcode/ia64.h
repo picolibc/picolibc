@@ -152,6 +152,7 @@ enum ia64_dependency_semantics
   IA64_DVS_DATA,
   IA64_DVS_INSTR,
   IA64_DVS_SPECIFIC,
+  IA64_DVS_STOP,
   IA64_DVS_OTHER,
 };
 
@@ -179,7 +180,8 @@ enum ia64_resource_specifier
   IA64_RS_PKR,
   IA64_RS_PMC,
   IA64_RS_PMD,
-  IA64_RS_PR,
+  IA64_RS_PR,  /* non-rotating, 1-15 */
+  IA64_RS_PRr, /* rotating, 16-62 */
   IA64_RS_PR63,
   IA64_RS_RR,
 
