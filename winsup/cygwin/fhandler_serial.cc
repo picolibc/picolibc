@@ -23,8 +23,8 @@ details. */
 /**********************************************************************/
 /* fhandler_serial */
 
-fhandler_serial::fhandler_serial (int unit)
-  : fhandler_base (FH_SERIAL, unit), vmin_ (0), vtime_ (0), pgrp_ (myself->pgid)
+fhandler_serial::fhandler_serial ()
+  : fhandler_base (FH_SERIAL), vmin_ (0), vtime_ (0), pgrp_ (myself->pgid)
 {
   set_need_fork_fixup ();
 }
