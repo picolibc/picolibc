@@ -1119,7 +1119,6 @@ wait_sig (VOID *self)
       pending_signals = -1;
       int saw_pending_signals = 0;
       int saw_sigchld = 0;
-      int dispatched_sigchld = 0;
       for (int sig = -__SIGOFFSET; sig < NSIG; sig++)
 	{
 	  while (InterlockedDecrement (myself->getsigtodo (sig)) >= 0)
@@ -1152,9 +1151,7 @@ wait_sig (VOID *self)
 		/* A normal UNIX signal */
 		default:
 		  sigproc_printf ("Got signal %d", sig);
-		  int wasdispatched = sig_handle (sig, rc != 2);
-		  if (sig == SIGCHLD && wasdispatched)
-		    dispatched_sigchld = 1;
+		  sig_handle (sig, rc != 2);
 		  /* Need to decrement again to offset increment below since
 		     we really do want to decrement in this case. */
 		  InterlockedDecrement (myself->getsigtodo (sig));

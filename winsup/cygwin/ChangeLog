@@ -1,5 +1,9 @@
 2002-10-20  Christopher Faylor  <cgf@redhat.com>
 
+	* sigproc.cc (wait_sig): Remove obsolete sigchld logic.
+
+2002-10-20  Christopher Faylor  <cgf@redhat.com>
+
 	Rename _kill() to kill() throughout.  Rename _raise() to raise()
 	throughout.  Rename _pid() to pid() throughout.
 	* Makefile.in: Compile some objects with -fomit-frame-pointer.
