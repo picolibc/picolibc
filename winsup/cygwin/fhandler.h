@@ -98,6 +98,7 @@ enum bg_check_types
 class fhandler_base
 {
   friend class dtable;
+  friend void close_all_files ();
  protected:
   DWORD status;
  private:

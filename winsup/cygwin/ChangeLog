@@ -1,3 +1,19 @@
+2003-12-16  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (set_signal_mask): Report on input argument rather than
+	getsigmask.
+
+	* fhandler.h (fhandler_base): Make friends with close_all_files.
+	* pinfo.cc (_pinfo::set_ctty): Add more debugging.
+	* sigproc.cc (proc_can_be_signalled): Detect state when signal handler
+	thread is gone in target process as an EPERM situation.  Set errno to
+	ESRCH if process doesn't exist.
+	(sigproc_terminate): Set sendsig to illegal value when closed.
+	(sig_send): Rely on proc_can_be_signalled setting the proper errno.
+	* syscalls.cc (close_all_files): Detect when all ttys are closed prior
+	to calling close_all_files.  The ctty needs to be closed explicitly in
+	this case.
+
 2003-12-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/ipc.h: Include sys/types.h.

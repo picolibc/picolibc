@@ -278,6 +278,7 @@ _pinfo::set_ctty (tty_min *tc, int flags, fhandler_tty_slave *arch)
 	tc->setpgid (pgid);
       if (cygheap->ctty != arch)
 	{
+	  debug_printf ("cygheap->ctty %p, arch %p", cygheap->ctty, arch);
 	  if (!cygheap->ctty)
 	    syscall_printf ("ctty NULL");
 	  else
@@ -289,7 +290,10 @@ _pinfo::set_ctty (tty_min *tc, int flags, fhandler_tty_slave *arch)
 	    }
 	  cygheap->ctty = arch;
 	  if (arch)
-	    arch->usecount++;
+	    {
+	      arch->usecount++;
+	      debug_printf ("arch usecount for tty%d is %d", tc->ntty, arch->usecount);
+	    }
 	}
     }
 }

@@ -91,14 +91,20 @@ close_all_files (void)
 
   if (cygheap->ctty)
     {
-      debug_printf ("decrementing ctty usecount");
-      cygheap->ctty->usecount--;
+      if (cygheap->ctty->usecount == 1)
+	cygheap->ctty->close ();
+      else
+	cygheap->ctty->usecount--;
+      debug_printf ("ctty usecount %d", cygheap->ctty->archetype->usecount);
     }
 
   fhandler_base *fh;
   for (int i = 0; i < (int) cygheap->fdtab.size; i++)
     if ((fh = cygheap->fdtab[i]) != NULL)
       {
+#ifdef DEBUGGING
+	debug_printf ("closing fd %d", i);
+#endif
 	fh->close ();
 	cygheap->fdtab.release (i);
       }

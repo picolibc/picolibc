@@ -978,7 +978,7 @@ set_signal_mask (sigset_t newmask, sigset_t& oldmask)
 {
   mask_sync->acquire (INFINITE);
   newmask &= ~SIG_NONMASKABLE;
-  sigproc_printf ("old mask = %x, new mask = %x", myself->getsigmask (), newmask);
+  sigproc_printf ("old mask %p, new mask %p", oldmask, newmask);
   myself->setsigmask (newmask);	// Set a new mask
   mask_sync->release ();
   if (oldmask & ~newmask)

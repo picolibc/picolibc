@@ -248,9 +248,19 @@ proc_can_be_signalled (_pinfo *p)
       return true;
     }
 
-  return ISSTATE (p, PID_INITIALIZING) ||
-	 (((p)->process_state & (PID_ACTIVE | PID_IN_USE)) ==
-	  (PID_ACTIVE | PID_IN_USE));
+  if (p->sendsig == INVALID_HANDLE_VALUE)
+    {
+      set_errno (EPERM);
+      return false;
+    }
+
+  if (ISSTATE (p, PID_INITIALIZING) ||
+      (((p)->process_state & (PID_ACTIVE | PID_IN_USE)) ==
+       (PID_ACTIVE | PID_IN_USE)))
+    return true;
+
+  set_errno (ESRCH);
+  return false;
 }
 
 bool __stdcall
@@ -638,7 +648,9 @@ sigproc_terminate (void)
       sig_loop_wait = 0;	// Tell wait_sig to exit when it is
 				//  finished with anything it is doing
       ForceCloseHandle (sigcomplete_main);
-      CloseHandle (myself->sendsig);
+      HANDLE sendsig = myself->sendsig;
+      myself->sendsig = INVALID_HANDLE_VALUE;
+      CloseHandle (sendsig);
     }
   proc_terminate ();		// Terminate process handling thread
 
@@ -679,7 +691,6 @@ sig_send (_pinfo *p, int sig, void *tls)
     {
       sigproc_printf ("invalid pid %d(%x), signal %d",
 		  p->pid, p->process_state, sig);
-      set_errno (ESRCH);
       goto out;
     }
 
