@@ -1,8 +1,7 @@
-#include <wchar.h>
+#include <reent.h>
 #include <wchar.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <reent.h>
 
 int
 wctob (wint_t c)

@@ -16,7 +16,7 @@
 
 /* gammaf_r(x, signgamp)
  * Reentrant version of the logarithm of the Gamma function 
- * with user provide pointer for the sign of Gamma(x). 
+ * with user provided pointer for the sign of Gamma(x). 
  *
  * Method: See lgammaf_r
  */
@@ -31,4 +31,9 @@
 #endif
 {
 	return expf (lgammaf_r(x,signgamp));
+}
+
+float gammaf(float x)
+{
+  return gammaf_r(x, &(_REENT_SIGNGAM(_REENT)));
 }

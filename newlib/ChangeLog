@@ -1,5 +1,22 @@
 2003-12-05  Christopher Faylor  <cgf@redhat.com>
 
+	* libc/stdlib/mbrlen.c: Change include order to prevent compiler errors
+	when defining _mbrtowc.
+	* libc/stdlib/mbsinit.c: Ditto.
+	* libc/stdlib/mbsrtowcs.c: Ditto.
+	* libc/stdlib/wcrtomb.c: Ditto.
+	* libc/stdlib/wcsrtombs.c: Ditto.
+	* libc/stdlib/wctob.c: Ditto.
+
+2003-12-05  Christopher Faylor  <cgf@redhat.com>
+
+	* libc/stdlib/mbrlen.c: Change include order to prevent compiler
+	errors when defining _mbrtowc.
+	* libc/stdlib/mbsinit.c: Ditto.
+	* libc/stdlib/mbsrtowcs.c: Ditto.
+
+2003-12-05  Christopher Faylor  <cgf@redhat.com>
+
 	* libc/stdlib/mbrtowc.c: Change include order to prevent compiler
 	errors when defining _mbrtowc.
 
