@@ -1,5 +1,9 @@
 2000-12-04  Joel Sherrill <joel@OARcorp.com>
 
+        * libc/include/sys/times.h: Add reference to POSIX standard.
+
+2000-12-04  Joel Sherrill <joel@OARcorp.com>
+
         * libc/include/sys/time.h: Added BSD timer manipulation macros
         used by RTEMS code.
 
