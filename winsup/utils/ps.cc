@@ -175,8 +175,8 @@ main (int argc, char *argv[])
   const char *dfmt   = "%5d%4d%10s %s\n";
   const char *ftitle = "     UID   PID  PPID TTY     STIME COMMAND\n";
   const char *ffmt   = "%8.8s%6d%6d%4d%10s %s\n";
-  const char *ltitle = "    PID  PPID  PGID   WINPID  UID TTY    STIME COMMAND\n";
-  const char *lfmt   = "%c %5d %5d %5d %8u %4d %3d %8s %s\n";
+  const char *ltitle = "    PID  PPID  PGID   WINPID TTY  UID    STIME COMMAND\n";
+  const char *lfmt   = "%c %5d %5d %5d %8u %3d %4d %8s %s\n";
   char ch;
 
   aflag = lflag = fflag = sflag = 0;
@@ -305,7 +305,7 @@ main (int argc, char *argv[])
         printf (ffmt, uname, p->pid, p->ppid, p->ctty, start_time (p), pname);
       else if (lflag)
         printf (lfmt, status, p->pid, p->ppid, p->pgid,
-              p->dwProcessId, p->uid, p->ctty, start_time (p), pname);
+                p->dwProcessId, p->ctty, p->uid, start_time (p), pname);
 
     }
   (void) cygwin_internal (CW_UNLOCK_PINFO);

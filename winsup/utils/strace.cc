@@ -93,10 +93,7 @@ add_child (DWORD id, HANDLE hproc)
   children.next->next = c;
   lastid = children.next->id = id;
   HANDLE me = GetCurrentProcess ();
-  if (!DuplicateHandle (me, hproc, me, &children.next->hproc, PROCFLAGS,
-			FALSE, DUPLICATE_CLOSE_SOURCE))
-    error (0, "couldn't duplicate %p,%p", me, hproc);
-  lasth = children.next->hproc;
+  lasth = children.next->hproc = hproc;
 }
 
 static child_list *
@@ -120,7 +117,6 @@ remove_child (DWORD id)
     if (c->next->id == id)
       {
 	child_list *c1 = c->next;
-	close_handle (c1->hproc, id);
 	c->next = c1->next;
 	delete c1;
 	return;
@@ -516,15 +512,11 @@ proc_child (unsigned mask, FILE *ofile)
 	case CREATE_PROCESS_DEBUG_EVENT:
 	  if (ev.u.CreateProcessInfo.hFile)
 	    CloseHandle (ev.u.CreateProcessInfo.hFile);
-	  if (ev.u.CreateProcessInfo.hThread)
-	    CloseHandle (ev.u.CreateProcessInfo.hThread);
 	  add_child (ev.dwProcessId, ev.u.CreateProcessInfo.hProcess);
 	  processes++;
 	  break;
 
 	case CREATE_THREAD_DEBUG_EVENT:
-	  if (ev.u.CreateThread.hThread)
-	    CloseHandle (ev.u.CreateThread.hThread);
 	  break;
 
 	case LOAD_DLL_DEBUG_EVENT:

@@ -1,3 +1,12 @@
+Sun Oct  8 23:11:17 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* ps.cc (main): Change order of reporting slightly so that windows pids
+	are more obvious.
+	* strace.cc (add_child): Just add child's pid directly.
+	(remove_child): No need to close the child process pid since
+	ContinueDebugEvent does that automatically.
+	(proc_child): Ditto for child thread.
+
 Fri Sep 29 13:12:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* cygcheck.cc (keyeprint): New function.

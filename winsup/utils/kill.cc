@@ -74,7 +74,7 @@ sig0:
 	    }
 	  else
 	    {
-	      if (errno == ESRCH && force && sig != 0)
+	      if (force && sig != 0)
 		forcekill (pid, sig, 0);
 	      else
 		{
