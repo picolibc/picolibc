@@ -177,7 +177,7 @@ read_etc_group ()
 	      cygsid tg;
 	      DWORD siz;
 
-	      if (OpenProcessToken (GetCurrentProcess (), TOKEN_QUERY, &ptok))
+	      if (OpenProcessToken (hMainProc, TOKEN_QUERY, &ptok))
 	        {
 		  if (GetTokenInformation (ptok, TokenPrimaryGroup, &tg,
 					   sizeof tg, &siz)

@@ -22,7 +22,7 @@ details. */
 #define PROTECT(x) x[sizeof(x)-1] = 0
 #define CHECK(x) if (x[sizeof(x)-1] != 0) { small_printf("array bound exceeded %d\n", __LINE__); ExitProcess(1); }
 
-class NO_COPY strace strace;
+class strace NO_COPY strace;
 
 #ifndef NOSTRACE
 

@@ -148,14 +148,14 @@ str2buf2lsa (LSA_STRING &tgt, char *buf, const char *srcstr)
   tgt.Length = strlen (srcstr);
   tgt.MaximumLength = tgt.Length + 1;
   tgt.Buffer = (PCHAR) buf;
-  memcpy(buf, srcstr, tgt.MaximumLength);
+  memcpy (buf, srcstr, tgt.MaximumLength);
 }
 
 void
 str2buf2uni (UNICODE_STRING &tgt, WCHAR *buf, const char *srcstr)
 {
   tgt.Length = strlen (srcstr) * sizeof (WCHAR);
-  tgt.MaximumLength = tgt.Length + sizeof(WCHAR);
+  tgt.MaximumLength = tgt.Length + sizeof (WCHAR);
   tgt.Buffer = (PWCHAR) buf;
   sys_mbstowcs (buf, srcstr, tgt.MaximumLength);
 }
@@ -188,7 +188,7 @@ open_local_policy ()
   LSA_OBJECT_ATTRIBUTES oa = { 0, 0, 0, 0, 0, 0 };
   LSA_HANDLE lsa = INVALID_HANDLE_VALUE;
 
-  NTSTATUS ret = LsaOpenPolicy(NULL, &oa, POLICY_EXECUTE, &lsa);
+  NTSTATUS ret = LsaOpenPolicy (NULL, &oa, POLICY_EXECUTE, &lsa);
   if (ret != STATUS_SUCCESS)
     __seterrno_from_win_error (LsaNtStatusToWinError (ret));
   return lsa;
@@ -217,7 +217,7 @@ get_lsa_srv_inf (LSA_HANDLE lsa, char *logonserver, char *domain)
   if ((ret = LsaQueryInformationPolicy (lsa, PolicyAccountDomainInformation,
 					(PVOID *) &adi)) != STATUS_SUCCESS)
     {
-      __seterrno_from_win_error (LsaNtStatusToWinError(ret));
+      __seterrno_from_win_error (LsaNtStatusToWinError (ret));
       return FALSE;
     }
   lsa2wchar (account, adi->DomainName, INTERNET_MAX_HOST_NAME_LENGTH + 1);
@@ -225,7 +225,7 @@ get_lsa_srv_inf (LSA_HANDLE lsa, char *logonserver, char *domain)
   if ((ret = LsaQueryInformationPolicy (lsa, PolicyPrimaryDomainInformation,
 					(PVOID *) &pdi)) != STATUS_SUCCESS)
     {
-      __seterrno_from_win_error (LsaNtStatusToWinError(ret));
+      __seterrno_from_win_error (LsaNtStatusToWinError (ret));
       return FALSE;
     }
   lsa2wchar (primary, pdi->Name, INTERNET_MAX_HOST_NAME_LENGTH + 1);
@@ -234,7 +234,7 @@ get_lsa_srv_inf (LSA_HANDLE lsa, char *logonserver, char *domain)
      not member of a domain.  The name in the primary domain info is the
      name of the workgroup then. */
   if (pdi->Sid &&
-      (ret = NetGetDCName(NULL, primary, (LPBYTE *) &buf)) == STATUS_SUCCESS)
+      (ret = NetGetDCName (NULL, primary, (LPBYTE *) &buf)) == STATUS_SUCCESS)
     {
       sys_wcstombs (name, buf, INTERNET_MAX_HOST_NAME_LENGTH + 1);
       strcpy (logonserver, name);
@@ -306,8 +306,8 @@ get_user_groups (WCHAR *wlogonserver, cygsidlist &grp_list, char *user, char * d
       return ret == NERR_UserNotFound;
     }
 
-  len = strlen(domain);
-  strcpy(dgroup, domain);
+  len = strlen (domain);
+  strcpy (dgroup, domain);
   dgroup[len++] = '\\';
 
   for (DWORD i = 0; i < cnt; ++i)
@@ -323,7 +323,7 @@ get_user_groups (WCHAR *wlogonserver, cygsidlist &grp_list, char *user, char * d
 	  debug_printf ("LookupAccountName(%s): %E", dgroup);
       else if (legal_sid_type (use))
 	  grp_list += gsid;
-      else debug_printf("Global group %s invalid. Domain: %s Use: %d",
+      else debug_printf ("Global group %s invalid. Domain: %s Use: %d",
 			dgroup, domain, use);
     }
 
@@ -378,7 +378,7 @@ get_user_local_groups (cygsidlist &grp_list, PSID pusersid)
   DWORD llen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
   if (!GetComputerNameA(lgroup, & llen))
     {
-       __seterrno();
+       __seterrno ();
        return FALSE;
     }
   lgroup[llen++] = '\\';
@@ -397,14 +397,14 @@ get_user_local_groups (cygsidlist &grp_list, PSID pusersid)
 	  {
 	     if (GetLastError () != ERROR_NONE_MAPPED)
 		 debug_printf ("LookupAccountName(%s): %E", bgroup);
-	     strcpy(lgroup + llen, bgroup + blen);
+	     strcpy (lgroup + llen, bgroup + blen);
 	     if (!LookupAccountName (NULL, lgroup, gsid, &glen,
 				     domain, &dlen, &use))
 		 debug_printf ("LookupAccountName(%s): %E", lgroup);
 	  }
 	if (legal_sid_type (use))
 	  grp_list += gsid;
-	else debug_printf("Rejecting local %s. use: %d", bgroup + blen, use);
+	else debug_printf ("Rejecting local %s. use: %d", bgroup + blen, use);
       }
 
   NetApiBufferFree (buf);
@@ -644,7 +644,7 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list)
 	  PTOKEN_PRIVILEGES tmp;
 	  DWORD tmp_count;
 
-	  lsa2str (buf, privstrs[i], sizeof(buf) - 1);
+	  lsa2str (buf, privstrs[i], sizeof (buf) - 1);
 	  if (!LookupPrivilegeValue (NULL, buf, &priv))
 	    continue;
 
@@ -706,11 +706,11 @@ verify_token (HANDLE token, cygsid &usersid, cygsid &pgrpsid, BOOL * pintern)
     {
        char sd_buf[MAX_SID_LEN + sizeof (SECURITY_DESCRIPTOR)];
        PSID gsid = NO_SID;
-       if (!GetKernelObjectSecurity(token, GROUP_SECURITY_INFORMATION,
+       if (!GetKernelObjectSecurity (token, GROUP_SECURITY_INFORMATION,
 				    (PSECURITY_DESCRIPTOR) sd_buf,
 				    sizeof sd_buf, &size))
 	   debug_printf ("GetKernelObjectSecurity(): %E");
-       else if (!GetSecurityDescriptorGroup((PSECURITY_DESCRIPTOR) sd_buf,
+       else if (!GetSecurityDescriptorGroup ((PSECURITY_DESCRIPTOR) sd_buf,
 					    &gsid, (BOOL *) &size))
 	   debug_printf ("GetSecurityDescriptorGroup(): %E");
        if (well_known_null_sid != gsid) return pgrpsid == gsid;
@@ -720,14 +720,16 @@ verify_token (HANDLE token, cygsid &usersid, cygsid &pgrpsid, BOOL * pintern)
   BOOL ret = FALSE;
 
   if (!GetTokenInformation (token, TokenGroups, NULL, 0, &size) &&
-	  GetLastError () != ERROR_INSUFFICIENT_BUFFER)
-	debug_printf ("GetTokenInformation(token, TokenGroups): %E\n");
+      GetLastError () != ERROR_INSUFFICIENT_BUFFER)
+    debug_printf ("GetTokenInformation(token, TokenGroups): %E\n");
   else if (!(my_grps = (PTOKEN_GROUPS) malloc (size)))
-	debug_printf ("malloc (my_grps) failed.");
+    debug_printf ("malloc (my_grps) failed.");
   else if (!GetTokenInformation (token, TokenGroups, my_grps, size, &size))
-	debug_printf ("GetTokenInformation(my_token, TokenGroups): %E\n");
-  else 	ret = sid_in_token_groups (my_grps, pgrpsid);
-  if (my_grps) free (my_grps);
+    debug_printf ("GetTokenInformation(my_token, TokenGroups): %E\n");
+  else
+    ret = sid_in_token_groups (my_grps, pgrpsid);
+  if (my_grps)
+    free (my_grps);
   return ret;
 }
 
@@ -759,7 +761,7 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
   TOKEN_DEFAULT_DACL dacl;
   TOKEN_SOURCE source;
   TOKEN_STATISTICS stats;
-  memcpy(source.SourceName, "Cygwin.1", 8);
+  memcpy (source.SourceName, "Cygwin.1", 8);
   source.SourceIdentifier.HighPart = 0;
   source.SourceIdentifier.LowPart = 0x0101;
 
@@ -784,7 +786,7 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
   owner.Owner = usersid;
 
   /* Retrieve authentication id and group list from own process. */
-  if (!OpenProcessToken (GetCurrentProcess (), TOKEN_QUERY, &my_token))
+  if (!OpenProcessToken (hMainProc, TOKEN_QUERY, &my_token))
     debug_printf ("OpenProcessToken(my_token): %E\n");
   else
     {
@@ -842,7 +844,7 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
     goto out;
 
   /* Create default dacl. */
-  if (!sec_acl((PACL) acl_buf, FALSE,
+  if (!sec_acl ((PACL) acl_buf, FALSE,
 		grpsids.contains (well_known_admins_sid)?well_known_admins_sid:usersid))
     goto out;
   dacl.DefaultDacl = (PACL) acl_buf;
@@ -924,17 +926,17 @@ subauth (struct passwd *pw)
   HANDLE primary_token = INVALID_HANDLE_VALUE;
   int old_tcb_state;
 
-  if ((old_tcb_state = set_process_privilege(SE_TCB_NAME)) < 0)
+  if ((old_tcb_state = set_process_privilege (SE_TCB_NAME)) < 0)
     return INVALID_HANDLE_VALUE;
 
   /* Register as logon process. */
   str2lsa (name, "Cygwin");
   SetLastError (0);
-  ret = LsaRegisterLogonProcess(&name, &lsa_hdl, &sec_mode);
+  ret = LsaRegisterLogonProcess (&name, &lsa_hdl, &sec_mode);
   if (ret != STATUS_SUCCESS)
     {
       debug_printf ("LsaRegisterLogonProcess: %d", ret);
-      __seterrno_from_win_error (LsaNtStatusToWinError(ret));
+      __seterrno_from_win_error (LsaNtStatusToWinError (ret));
       goto out;
     }
   else if (GetLastError () == ERROR_PROC_NOT_FOUND)
@@ -944,44 +946,44 @@ subauth (struct passwd *pw)
     }
   /* Get handle to MSV1_0 package. */
   str2lsa (name, MSV1_0_PACKAGE_NAME);
-  ret = LsaLookupAuthenticationPackage(lsa_hdl, &name, &package_id);
+  ret = LsaLookupAuthenticationPackage (lsa_hdl, &name, &package_id);
   if (ret != STATUS_SUCCESS)
     {
       debug_printf ("LsaLookupAuthenticationPackage: %d", ret);
-      __seterrno_from_win_error (LsaNtStatusToWinError(ret));
-      LsaDeregisterLogonProcess(lsa_hdl);
+      __seterrno_from_win_error (LsaNtStatusToWinError (ret));
+      LsaDeregisterLogonProcess (lsa_hdl);
       goto out;
     }
   /* Create origin. */
   str2buf2lsa (origin.str, origin.buf, "Cygwin");
   /* Create token source. */
-  memcpy(ts.SourceName, "Cygwin.1", 8);
+  memcpy (ts.SourceName, "Cygwin.1", 8);
   ts.SourceIdentifier.HighPart = 0;
   ts.SourceIdentifier.LowPart = 0x0100;
   /* Get user information. */
   extract_nt_dom_user (pw, nt_domain, nt_user);
   /* Fill subauth with values. */
   subbuf.auth.MessageType = MsV1_0NetworkLogon;
-  str2buf2uni(subbuf.auth.LogonDomainName, subbuf.dombuf, nt_domain);
-  str2buf2uni(subbuf.auth.UserName, subbuf.usrbuf, nt_user);
-  str2buf2uni(subbuf.auth.Workstation, subbuf.wkstbuf, "");
-  memcpy(subbuf.auth.ChallengeToClient, "12345678", MSV1_0_CHALLENGE_LENGTH);
-  str2buf2lsa(subbuf.auth.CaseSensitiveChallengeResponse, subbuf.authinf1, "");
-  str2buf2lsa(subbuf.auth.CaseInsensitiveChallengeResponse, subbuf.authinf2,"");
+  str2buf2uni (subbuf.auth.LogonDomainName, subbuf.dombuf, nt_domain);
+  str2buf2uni (subbuf.auth.UserName, subbuf.usrbuf, nt_user);
+  str2buf2uni (subbuf.auth.Workstation, subbuf.wkstbuf, "");
+  memcpy (subbuf.auth.ChallengeToClient, "12345678", MSV1_0_CHALLENGE_LENGTH);
+  str2buf2lsa (subbuf.auth.CaseSensitiveChallengeResponse, subbuf.authinf1, "");
+  str2buf2lsa (subbuf.auth.CaseInsensitiveChallengeResponse, subbuf.authinf2,"");
   subbuf.auth.ParameterControl = 0 | (subauth_id << 24);
   /* Try to logon... */
-  ret = LsaLogonUser(lsa_hdl, (PLSA_STRING) &origin, Network,
+  ret = LsaLogonUser (lsa_hdl, (PLSA_STRING) &origin, Network,
 		     package_id, &subbuf, sizeof subbuf,
 		     NULL, &ts, (PVOID *)&profile, &size,
 		     &luid, &user_token, &quota, &ret2);
   if (ret != STATUS_SUCCESS)
     {
       debug_printf ("LsaLogonUser: %d", ret);
-      __seterrno_from_win_error (LsaNtStatusToWinError(ret));
-      LsaDeregisterLogonProcess(lsa_hdl);
+      __seterrno_from_win_error (LsaNtStatusToWinError (ret));
+      LsaDeregisterLogonProcess (lsa_hdl);
       goto out;
     }
-  LsaFreeReturnBuffer(profile);
+  LsaFreeReturnBuffer (profile);
   /* Convert to primary token. */
   if (!DuplicateTokenEx (user_token, TOKEN_ALL_ACCESS, &sa,
 			 SecurityImpersonation, TokenPrimary,
@@ -989,7 +991,7 @@ subauth (struct passwd *pw)
     __seterrno ();
 
 out:
-  set_process_privilege(SE_TCB_NAME, old_tcb_state);
+  set_process_privilege (SE_TCB_NAME, old_tcb_state);
   if (user_token != INVALID_HANDLE_VALUE)
     CloseHandle (user_token);
   return primary_token;
@@ -1012,7 +1014,7 @@ out:
 */
 
 LONG
-read_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd_size)
+read_sd (const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd_size)
 {
   /* Check parameters */
   if (!sd_size)
@@ -1021,7 +1023,7 @@ read_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd_size)
       return -1;
     }
 
-  debug_printf("file = %s", file);
+  debug_printf ("file = %s", file);
 
   DWORD len = 0;
   const char *pfile = file;
@@ -1030,7 +1032,7 @@ read_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd_size)
     {
       DWORD fname_len = min (sizeof (fbuf) - 1, strlen (file));
       bzero (fbuf, sizeof (fbuf));
-      OemToCharBuff(file, fbuf, fname_len);
+      OemToCharBuff (file, fbuf, fname_len);
       pfile = fbuf;
     }
 
@@ -1043,7 +1045,7 @@ read_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd_size)
       __seterrno ();
       return -1;
     }
-  debug_printf("file = %s: len=%d", file, len);
+  debug_printf ("file = %s: len=%d", file, len);
   if (len > *sd_size)
     {
       *sd_size = len;
@@ -1053,7 +1055,7 @@ read_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd_size)
 }
 
 LONG
-write_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size)
+write_sd (const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size)
 {
   /* Check parameters */
   if (!sd_buf || !sd_size)
@@ -1169,8 +1171,8 @@ get_nt_attribute (const char *file, int *attribute,
       return -1;
     }
 
-  __uid32_t uid = cygsid(owner_sid).get_uid ();
-  __gid32_t gid = cygsid(group_sid).get_gid ();
+  __uid32_t uid = cygsid (owner_sid).get_uid ();
+  __gid32_t gid = cygsid (group_sid).get_gid ();
   if (uidret)
     *uidret = uid;
   if (gidret)
@@ -1326,7 +1328,7 @@ add_access_allowed_ace (PACL acl, int offset, DWORD attributes,
       return FALSE;
     }
   ACCESS_ALLOWED_ACE *ace;
-  if (GetAce(acl, offset, (PVOID *) &ace))
+  if (GetAce (acl, offset, (PVOID *) &ace))
     ace->Header.AceFlags |= inherit;
   len_add += sizeof (ACCESS_DENIED_ACE) - sizeof (DWORD)
 	     + GetLengthSid (sid);
@@ -1343,7 +1345,7 @@ add_access_denied_ace (PACL acl, int offset, DWORD attributes,
       return FALSE;
     }
   ACCESS_DENIED_ACE *ace;
-  if (GetAce(acl, offset, (PVOID *) &ace))
+  if (GetAce (acl, offset, (PVOID *) &ace))
     ace->Header.AceFlags |= inherit;
   len_add += sizeof (ACCESS_DENIED_ACE) - sizeof (DWORD)
 	     + GetLengthSid (sid);
@@ -1373,8 +1375,8 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
   if (!pw || !owner_sid.getfrompw (pw))
     return NULL;
   debug_printf ("owner: %s [%d]", owner,
-		*GetSidSubAuthority(owner_sid,
-		*GetSidSubAuthorityCount(owner_sid) - 1));
+		*GetSidSubAuthority (owner_sid,
+		*GetSidSubAuthorityCount (owner_sid) - 1));
 
   /* Get SID and name of new group. */
   cygsid group_sid (NO_SID);
@@ -1406,14 +1408,14 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
     SetSecurityDescriptorControl (&sd, SE_DACL_PROTECTED, SE_DACL_PROTECTED);
 
   /* Create owner for local security descriptor. */
-  if (!SetSecurityDescriptorOwner(&sd, owner_sid, FALSE))
+  if (!SetSecurityDescriptorOwner (&sd, owner_sid, FALSE))
     {
       __seterrno ();
       return NULL;
     }
 
   /* Create group for local security descriptor. */
-  if (group_sid && !SetSecurityDescriptorGroup(&sd, group_sid, FALSE))
+  if (group_sid && !SetSecurityDescriptorGroup (&sd, group_sid, FALSE))
     {
       __seterrno ();
       return NULL;
@@ -1559,7 +1561,7 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
 	   * Add unrelated ACCESS_DENIED_ACE to the beginning but
 	   * behind the owner_deny, ACCESS_ALLOWED_ACE to the end.
 	   */
-	  if (!AddAce(acl, ACL_REVISION,
+	  if (!AddAce (acl, ACL_REVISION,
 		       ace->Header.AceType == ACCESS_DENIED_ACE_TYPE ?
 		       (owner_deny ? 1 : 0) : MAXDWORD,
 		       (LPVOID) ace, ace->Header.AceSize))

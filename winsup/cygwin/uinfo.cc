@@ -43,8 +43,7 @@ internal_getlogin (cygheap_user &user)
 
       /* Try to get the SID either from current process and
 	 store it in user.psid */
-      if (!OpenProcessToken (GetCurrentProcess (),
-			     TOKEN_ADJUST_DEFAULT | TOKEN_QUERY,
+      if (!OpenProcessToken (hMainProc, TOKEN_ADJUST_DEFAULT | TOKEN_QUERY,
 			     &ptok))
 	system_printf ("OpenProcessToken(): %E\n");
       else if (!GetTokenInformation (ptok, TokenUser, &tu, sizeof tu, &siz))
