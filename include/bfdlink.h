@@ -203,47 +203,44 @@ struct bfd_sym_chain
 
 struct bfd_link_info
 {
-  /* Function callbacks.  */
-  const struct bfd_link_callbacks *callbacks;
-
-  /* TRUE if BFD should generate a relocateable object file.  */
-  bfd_boolean relocateable;
+  /* TRUE if BFD should generate a relocatable object file.  */
+  unsigned int relocateable: 1;
 
   /* TRUE if BFD should generate relocation information in the final
      executable.  */
-  bfd_boolean emitrelocations;
+  unsigned int emitrelocations: 1;
 
   /* TRUE if BFD should generate a "task linked" object file,
      similar to relocatable but also with globals converted to
      statics.  */
-  bfd_boolean task_link;
+  unsigned int task_link: 1;
 
   /* TRUE if BFD should generate a shared object.  */
-  bfd_boolean shared;
+  unsigned int shared: 1;
 
   /* TRUE if BFD should pre-bind symbols in a shared object.  */
-  bfd_boolean symbolic;
+  unsigned int symbolic: 1;
 
   /* TRUE if BFD should export all symbols in the dynamic symbol table
      of an executable, rather than only those used.  */
-  bfd_boolean export_dynamic;
+  unsigned int export_dynamic: 1;
 
   /* TRUE if shared objects should be linked directly, not shared.  */
-  bfd_boolean static_link;
+  unsigned int static_link: 1;
 
   /* TRUE if the output file should be in a traditional format.  This
      is equivalent to the setting of the BFD_TRADITIONAL_FORMAT flag
      on the output file, but may be checked when reading the input
      files.  */
-  bfd_boolean traditional_format;
+  unsigned int traditional_format: 1;
 
   /* TRUE if we want to produced optimized output files.  This might
      need much more time and therefore must be explicitly selected.  */
-  bfd_boolean optimize;
+  unsigned int optimize: 1;
 
   /* TRUE if BFD should generate errors for undefined symbols
      even if generating a shared object.  */
-  bfd_boolean no_undefined;
+  unsigned int no_undefined: 1;
 
   /* TRUE if BFD should allow undefined symbols in shared objects even
      when no_undefined is set to disallow undefined symbols.  The net
@@ -257,13 +254,36 @@ struct bfd_link_info
      appropriate for the current architecture.  I.E. dynamically
      select an appropriate memset function.  Apparently it is also
      normal for HPPA shared libraries to have undefined symbols.  */
-  bfd_boolean allow_shlib_undefined;
+  unsigned int allow_shlib_undefined: 1;
 
   /* TRUE if ok to have multiple definition.  */
-  bfd_boolean allow_multiple_definition;
+  unsigned int allow_multiple_definition: 1;
 
   /* TRUE if ok to have version with no definition.  */
-  bfd_boolean allow_undefined_version;
+  unsigned int allow_undefined_version: 1;
+
+  /* TRUE if symbols should be retained in memory, FALSE if they
+     should be freed and reread.  */
+  unsigned int keep_memory: 1;
+
+  /* TRUE if every symbol should be reported back via the notice
+     callback.  */
+  unsigned int notice_all: 1;
+
+  /* TRUE if executable should not contain copy relocs.
+     Setting this true may result in a non-sharable text segment.  */
+  unsigned int nocopyreloc: 1;
+
+  /* TRUE if the new ELF dynamic tags are enabled. */
+  unsigned int new_dtags: 1;
+
+  /* TRUE if non-PLT relocs should be merged into one reloc section
+     and sorted so that relocs against the same symbol come together.  */
+  unsigned int combreloc: 1;
+
+  /* TRUE if .eh_frame_hdr section and PT_GNU_EH_FRAME ELF segment
+     should be created.  */
+  unsigned int eh_frame_hdr: 1;
 
   /* Which symbols to strip.  */
   enum bfd_link_strip strip;
@@ -271,9 +291,28 @@ struct bfd_link_info
   /* Which local symbols to discard.  */
   enum bfd_link_discard discard;
 
-  /* TRUE if symbols should be retained in memory, FALSE if they
-     should be freed and reread.  */
-  bfd_boolean keep_memory;
+  /* Criteria for skipping symbols when detemining
+     whether to include an object from an archive. */
+  enum bfd_link_common_skip_ar_aymbols common_skip_ar_aymbols;
+
+  /* Function callbacks.  */
+  const struct bfd_link_callbacks *callbacks;
+
+  /* Hash table handled by BFD.  */
+  struct bfd_link_hash_table *hash;
+
+  /* Hash table of symbols to keep.  This is NULL unless strip is
+     strip_some.  */
+  struct bfd_hash_table *keep_hash;
+
+  /* Hash table of symbols to report back via the notice callback.  If
+     this is NULL, and notice_all is FALSE, then no symbols are
+     reported back.  */
+  struct bfd_hash_table *notice_hash;
+
+  /* Hash table of symbols which are being wrapped (the --wrap linker
+     option).  If this is NULL, no symbols are being wrapped.  */
+  struct bfd_hash_table *wrap_hash;
 
   /* The list of input BFD's involved in the link.  These are chained
      together via the link_next field.  */
@@ -290,33 +329,8 @@ struct bfd_link_info
      sections against garbage collection.  */
   struct bfd_sym_chain *gc_sym_list;
 
-  /* Hash table handled by BFD.  */
-  struct bfd_link_hash_table *hash;
-
-  /* Hash table of symbols to keep.  This is NULL unless strip is
-     strip_some.  */
-  struct bfd_hash_table *keep_hash;
-
-  /* TRUE if every symbol should be reported back via the notice
-     callback.  */
-  bfd_boolean notice_all;
-
-  /* Hash table of symbols to report back via the notice callback.  If
-     this is NULL, and notice_all is FALSE, then no symbols are
-     reported back.  */
-  struct bfd_hash_table *notice_hash;
-
-  /* Hash table of symbols which are being wrapped (the --wrap linker
-     option).  If this is NULL, no symbols are being wrapped.  */
-  struct bfd_hash_table *wrap_hash;
-
   /* If a base output file is wanted, then this points to it */
   PTR base_file;
-
-  /* If non-zero, specifies that branches which are problematic for the
-  MPC860 C0 (or earlier) should be checked for and modified.  It gives the
-  number of bytes that should be checked at the end of each text page. */
-  int mpc860c0;
 
   /* The function to call when the executable or shared object is
      loaded.  */
@@ -326,14 +340,10 @@ struct bfd_link_info
      unloaded.  */
   const char *fini_function;
 
-  /* TRUE if the new ELF dynamic tags are enabled. */
-  bfd_boolean new_dtags;
-
-  /* May be used to set DT_FLAGS for ELF. */
-  bfd_vma flags;
-
-  /* May be used to set DT_FLAGS_1 for ELF. */
-  bfd_vma flags_1;
+  /* If non-zero, specifies that branches which are problematic for the
+     MPC860 C0 (or earlier) should be checked for and modified.  It gives the
+     number of bytes that should be checked at the end of each text page.  */
+  int mpc860c0;
 
   /* Non-zero if auto-import thunks for DATA items in pei386 DLLs
      should be generated/linked against.  Set to 1 if this feature
@@ -345,24 +355,14 @@ struct bfd_link_info
      is explicitly requested by the user, -1 if enabled by default.  */
   int pei386_runtime_pseudo_reloc;
 
-  /* TRUE if non-PLT relocs should be merged into one reloc section
-     and sorted so that relocs against the same symbol come together.  */
-  bfd_boolean combreloc;
-
-  /* TRUE if executable should not contain copy relocs.
-     Setting this true may result in a non-sharable text segment.  */
-  bfd_boolean nocopyreloc;
-
-  /* TRUE if .eh_frame_hdr section and PT_GNU_EH_FRAME ELF segment
-     should be created.  */
-  bfd_boolean eh_frame_hdr;
-
   /* How many spare .dynamic DT_NULL entries should be added?  */
   unsigned int spare_dynamic_tags;
 
-  /* Criteria for skipping symbols when detemining
-     whether to include an object from an archive. */
-  enum bfd_link_common_skip_ar_aymbols common_skip_ar_aymbols;
+  /* May be used to set DT_FLAGS for ELF. */
+  bfd_vma flags;
+
+  /* May be used to set DT_FLAGS_1 for ELF. */
+  bfd_vma flags_1;
 };
 
 /* This structures holds a set of callback functions.  These are

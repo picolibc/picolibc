@@ -1,3 +1,8 @@
+2002-12-20  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h (struct bfd_link_info): Replace bfd_boolean fields with
+	bit-fields.  Rearrange to put all like types together.
+
 2002-11-30  Alan Modra  <amodra@bigpond.net.au>
 
 	* bfdlink.h: Replace boolean with bfd_boolean.  Formatting.
