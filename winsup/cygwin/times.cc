@@ -573,6 +573,7 @@ hires::prime ()
   SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
   if (!QueryPerformanceCounter (&primed_pc))
     {
+      SetThreadPriority (GetCurrentThread (), priority);
       inited = -1;
       return;
     }

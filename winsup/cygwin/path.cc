@@ -3546,7 +3546,7 @@ cwdstuff::get_hash ()
 void
 cwdstuff::init ()
 {
-  lock = new_muto (false, "cwd");
+  lock = new_muto ("cwd");
 }
 
 /* Get initial cwd.  Should only be called once in a

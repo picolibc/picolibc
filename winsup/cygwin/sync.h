@@ -24,7 +24,7 @@ public:
   const char *name;
 
   /* The real constructor. */
-  muto *init(int inh, const char *name) __attribute__ ((regparm (3)));
+  muto *init(const char *name) __attribute__ ((regparm (3)));
 
 #if 0	/* FIXME: See comment in sync.cc */
   ~muto ()
@@ -42,8 +42,8 @@ public:
 extern muto muto_start;
 
 /* Use a statically allocated buffer as the storage for a muto */
-#define new_muto(__inh, __name) \
+#define new_muto(__name) \
 ({ \
-  static muto __mbuf NO_COPY; \
-  __mbuf.init (__inh, __name); \
+  static muto __mbuf __attribute__((nocommon)) __attribute__((section(".data_cygwin_nocopy"))); \
+  __mbuf.init (__name); \
 })

@@ -587,7 +587,7 @@ sigproc_init ()
   /* sync_proc_subproc is used by proc_subproc.  It serialises
    * access to the children and zombie arrays.
    */
-  sync_proc_subproc = new_muto (FALSE, "sync_proc_subproc");
+  sync_proc_subproc = new_muto ("sync_proc_subproc");
 
   /* Initialize waitq structure for main thread.  A waitq structure is
    * allocated for each thread that executes a wait to allow multiple threads

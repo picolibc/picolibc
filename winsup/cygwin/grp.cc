@@ -31,7 +31,7 @@ details. */
 /* Read /etc/group only once for better performance.  This is done
    on the first call that needs information from it. */
 
-static NO_COPY const char *etc_group = "/etc/group";
+static const char *etc_group NO_COPY = "/etc/group";
 static struct __group16 *group_buf;		/* group contents in memory */
 static int curr_lines;
 static int max_lines;
@@ -119,16 +119,22 @@ add_grp_line (const char *line)
 
 class group_lock
 {
-  pthread_mutex_t mutex;
+  bool armed;
+  static NO_COPY pthread_mutex_t mutex;
  public:
-  group_lock (): mutex ((pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER) {}
-  void arm () {pthread_mutex_lock (&mutex); }
+  group_lock (bool doit)
+  {
+    if (armed = doit)
+      pthread_mutex_lock (&mutex);
+  }
   ~group_lock ()
   {
-    if (mutex != (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER)
+    if (armed)
       pthread_mutex_unlock (&mutex);
   }
 };
+
+pthread_mutex_t NO_COPY group_lock::mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
 
 /* Cygwin internal */
 /* Read in /etc/group and save contents in the group cache */
@@ -145,9 +151,7 @@ read_etc_group ()
 
   strncpy (group_name, "Administrators", sizeof (group_name));
 
-  static NO_COPY group_lock here = group_lock();
-  if (cygwin_finished_initializing)
-    here.arm ();
+  group_lock here (cygwin_finished_initializing);
 
   /* if we got blocked by the mutex, then etc_group may have been processed */
   if (group_state != uninitialized)

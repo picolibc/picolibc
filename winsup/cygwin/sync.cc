@@ -29,11 +29,11 @@ muto NO_COPY muto_start;
 
 /* Constructor */
 muto *
-muto::init (int inh, const char *s)
+muto::init (const char *s)
 {
   waiters = -1;
   /* Create event which is used in the fallback case when blocking is necessary */
-  if (!(bruteforce = CreateEvent (inh ? &sec_all_nih : &sec_none_nih, FALSE, FALSE, NULL)))
+  if (!(bruteforce = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL)))
     {
       DWORD oerr = GetLastError ();
       SetLastError (oerr);

@@ -240,7 +240,7 @@ PSECURITY_ATTRIBUTES __stdcall
 sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
 {
   if (!sa_buf)
-    return inherit ? &sec_none_nih : &sec_none;
+    return inherit ? &sec_none : &sec_none_nih;
 
   PSECURITY_ATTRIBUTES psa = (PSECURITY_ATTRIBUTES) sa_buf;
   PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR)
@@ -252,7 +252,7 @@ sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
   if (cygheap->user.sid ())
     sid = cygheap->user.sid ();
   else if (!lookup_name (getlogin (), cygheap->user.logsrv (), sid))
-    return inherit ? &sec_none_nih : &sec_none;
+    return inherit ? &sec_none : &sec_none_nih;
 
   size_t acl_len = sizeof (ACL)
 		   + 4 * (sizeof (ACCESS_ALLOWED_ACE) - sizeof (DWORD))

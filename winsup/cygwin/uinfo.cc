@@ -257,7 +257,7 @@ uinfo_init ()
 	myself->uid = p->pw_uid;
 	/* Set primary group only if process has been started from a
 	   non cygwin process. */
-	if (myself->ppid == 1)
+	if (!myself->ppid_handle)
 	  myself->gid = p->pw_gid;
       }
     else
@@ -277,7 +277,7 @@ getlogin (void)
 #ifdef _MT_SAFE
   char *this_username=_reent_winsup ()->_username;
 #else
-  static NO_COPY char this_username[UNLEN + 1];
+  static char this_username[UNLEN + 1] NO_COPY;
 #endif
 
   return strcpy (this_username, cygheap->user.name ());

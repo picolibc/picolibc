@@ -111,16 +111,23 @@ add_pwd_line (char *line)
 
 class passwd_lock
 {
-  pthread_mutex_t mutex;
+  bool armed;
+  static NO_COPY pthread_mutex_t mutex;
  public:
-  passwd_lock (): mutex ((pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER) {}
-  void arm () {pthread_mutex_lock (&mutex); }
+  passwd_lock (bool doit)
+  {
+    if (doit)
+      pthread_mutex_lock (&mutex);
+    armed = doit;
+  }
   ~passwd_lock ()
   {
-    if (mutex != (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER)
+    if (armed)
       pthread_mutex_unlock (&mutex);
   }
 };
+
+pthread_mutex_t NO_COPY passwd_lock::mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
 
 /* Read in /etc/passwd and save contents in the password cache.
    This sets passwd_state to loaded or emulated so functions in this file can
@@ -133,10 +140,7 @@ read_etc_passwd ()
      * for non-shared mutexs in the future. Also, this function will at most be called
      * once from each thread, after that the passwd_state test will succeed
      */
-    static NO_COPY passwd_lock here;
-
-    if (cygwin_finished_initializing)
-      here.arm ();
+    passwd_lock here (cygwin_finished_initializing);
 
     /* if we got blocked by the mutex, then etc_passwd may have been processed */
     if (passwd_state != uninitialized)

@@ -1,3 +1,28 @@
+2002-02-16  Christopher Faylor  <cgf@redhat.com>
+
+	* times.cc (hires::prime): Restore thread priority on failure
+	condition.
+
+	* uinfo.cc (uinfo_init): Use more robust method for determining if
+	process was invoked from a non-cygwin process.
+
+	* sync.h (muto::init): Eliminate "inheritance" parameter.
+	(new_muto): Reflect removal of parameter.
+	* sync.cc (muto::init): Ditto.
+	* cygheap.cc (cygheap_init): Ditto.
+	* debug.cc (threadname_init): Ditto.
+	* exceptions.cc (events_init): Ditto.
+	* malloc.cc (malloc_init): Ditto.
+	* path.cc (cwdstuff::init): Ditto.
+	* sigproc.cc (sigproc_init): Ditto.
+
+	* grp.cc (group_lock): Use different method for locking with static member.
+	(read_etc_group): REALLY ensure that read lock mutex is released.
+	* passwd.cc (passwd_lock): Use different method for locking with static member.
+        (read_etc_passwd): REALLY ensure that read lock mutex is released.
+
+	* shared.cc (sec_user): Correct reversed inheritance test.
+
 2002-02-15  Christopher Faylor  <cgf@redhat.com>
 
 	* hires.h (hires::usecs): Rename from utime.  Accept an argument.

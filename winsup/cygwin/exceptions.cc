@@ -1112,7 +1112,7 @@ events_init (void)
     api_fatal ("can't create title mutex, %E");
 
   ProtectHandle (title_mutex);
-  mask_sync = new_muto (FALSE, "mask_sync");
+  mask_sync = new_muto ("mask_sync");
   windows_system_directory[0] = '\0';
   (void) GetSystemDirectory (windows_system_directory, sizeof (windows_system_directory) - 2);
   char *end = strchr (windows_system_directory, '\0');
