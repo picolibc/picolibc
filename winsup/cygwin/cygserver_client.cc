@@ -41,7 +41,7 @@ client_request_get_version::client_request_get_version ()
 {
   msglen (0);			// No parameters for request.
 
-  syscall_printf ("created");
+  // verbose: syscall_printf ("created");
 }
 
 /*
@@ -97,7 +97,7 @@ client_request_attach_tty::client_request_attach_tty (DWORD nmaster_pid,
 client_request_attach_tty::client_request_attach_tty ()
   : client_request (CYGSERVER_REQUEST_ATTACH_TTY, &req, sizeof (req))
 {
-  syscall_printf ("created");
+  // verbose: syscall_printf ("created");
 }
 
 #endif /* __INSIDE_CYGWIN__ */

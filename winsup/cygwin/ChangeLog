@@ -1,5 +1,15 @@
 2002-07-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* cygserver.cc (client_request_shutdown::client_request_shutdown):
+	Comment out verbose tracing statement.
+	* cygserver_client.cc
+	(client_request_get_version::client_request_get_version): Ditto.
+	(client_request_attach_tty::client_request_attach_tty): Ditto.
+	* cygserver_shm.cc (client_request_shm::client_request_shm):
+	Ditto.
+
+2002-07-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* cygserver_transport_pipes.cc (transport_layer_pipes::listen):
 	Set `_is_listening_endpoint' appropriately.
 

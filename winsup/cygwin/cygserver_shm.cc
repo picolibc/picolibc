@@ -855,7 +855,7 @@ client_request_shm::client_request_shm ()
   : client_request (CYGSERVER_REQUEST_SHM,
 		    &_parameters, sizeof (_parameters))
 {
-  syscall_printf ("created");
+  // verbose: syscall_printf ("created");
 }
 
 /*---------------------------------------------------------------------------*

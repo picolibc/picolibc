@@ -494,7 +494,7 @@ server_submission_loop::request_loop ()
 client_request_shutdown::client_request_shutdown ()
   : client_request (CYGSERVER_REQUEST_SHUTDOWN)
 {
-  syscall_printf ("created");
+  // verbose: syscall_printf ("created");
 }
 
 void
