@@ -912,19 +912,15 @@ peek_serial (select_record *s, bool)
 	  return s->read_ready = true;
 	  select_printf ("got something");
 	}
-      PurgeComm (h, PURGE_TXABORT | PURGE_RXABORT);
       break;
     case WAIT_OBJECT_0 + 1:
-      PurgeComm (h, PURGE_TXABORT | PURGE_RXABORT);
       select_printf ("interrupt");
       set_sig_errno (EINTR);
       ready = -1;
       break;
     case WAIT_TIMEOUT:
-      PurgeComm (h, PURGE_TXABORT | PURGE_RXABORT);
       break;
     default:
-      PurgeComm (h, PURGE_TXABORT | PURGE_RXABORT);
       debug_printf ("WaitForMultipleObjects");
       goto err;
     }

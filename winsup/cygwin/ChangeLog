@@ -1,3 +1,8 @@
+2002-11-15  Sergey Okhapkin  <sos@prospect.com.ru>
+
+	* select.cc (peek_serial): Don't call PurgeComm() to avoid characters
+	loss.
+
 2002-11-14  Christopher Faylor  <cgf@redhat.com>
 
 	* exceptions.cc (setup_handler): Add debugging output.  Set thread
@@ -59,9 +64,9 @@
 	* sec_helper (cygsid::getfromstr): Reorganize to remove
 	calls to strcpy and strtok_r.
 	(cygsid::getfromgr): Change type to __uid32_t instead of int.
-	Keep only the allow_ntsec branch. Never call LookupAccountSid 
+	Keep only the allow_ntsec branch. Never call LookupAccountSid
 	which calls PDCs, simply return -1 in case of failure.
-	Use cygsid == instead of calling EqualSid and remove test 
+	Use cygsid == instead of calling EqualSid and remove test
 	for NULL psid.
 	* security.h: Declare cygsid::getfromgr as __uid32_t.
 
