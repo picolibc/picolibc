@@ -1,6 +1,6 @@
 /* strace.cc
 
-   Copyright 2000, 2001, 2002 Red Hat Inc.
+   Copyright 2000, 2001, 2002, 2003 Red Hat Inc.
 
    Written by Chris Faylor <cgf@redhat.com>
 
@@ -23,6 +23,7 @@ details. */
 #include <errno.h>
 #include "cygwin/include/sys/strace.h"
 #include "cygwin/include/sys/cygwin.h"
+#include "path.h"
 #undef cygwin_internal
 
 /*  GCC runtime library's C++ EH code unfortunately pulls in stdio, and we
@@ -309,6 +310,7 @@ create_child (char **argv)
   BOOL ret;
   DWORD flags;
 
+  *argv = cygpath (*argv, NULL);
   memset (&si, 0, sizeof (si));
   si.cb = sizeof (si);
 
@@ -886,7 +888,7 @@ print_version ()
   printf ("\
 %s (cygwin) %.*s\n\
 System Trace\n\
-Copyright 2000, 2001, 2002 Red Hat, Inc.\n\
+Copyright 2000, 2001, 2002, 2003 Red Hat, Inc.\n\
 Compiled on %s\n\
 ", pgm, len, v, __DATE__);
 }
@@ -937,7 +939,7 @@ character #%d.\n", optarg, (int) (endptr - optarg), endptr);
 	numerror ^= 1;
 	break;
       case 'o':
-	if ((ofile = fopen (optarg, "w")) == NULL)
+	if ((ofile = fopen (cygpath (optarg, NULL), "w")) == NULL)
 	  error (1, "can't open %s", optarg);
 #ifdef F_SETFD
 	(void) fcntl (fileno (ofile), F_SETFD, 0);

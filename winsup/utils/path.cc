@@ -245,7 +245,7 @@ vconcat (const char *s, va_list v)
       else if (*p == '/' || *p == '\\')
 	{
 	  if (p == rv && unc)
-	    p++;
+	    *d++ = *p++;
 	  while (p[1] == '/')
 	    p++;
 	}

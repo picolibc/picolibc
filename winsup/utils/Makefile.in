@@ -81,12 +81,12 @@ endif
 
 all: Makefile $(PROGS)
 
-strace.exe: strace.o mingw_getopt.o $(MINGW_DEP_LDLIBS)
+strace.exe: strace.o path.o mingw_getopt.o $(MINGW_DEP_LDLIBS)
 ifdef VERBOSE
-	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,2,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
+	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,3,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
 else
 	@echo $(CXX) -o $@ ${wordlist 1,2,$^} ${filter-out -B%, $(MINGW_CXXFLAGS) $(MINGW_LDFLAGS)};\
-	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,2,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
+	$(CXX) $(MINGW_CXXFLAGS) -o $@ ${wordlist 1,3,$^} -B$(mingw_build)/ $(MINGW_LDFLAGS)
 endif
 
 cygcheck.exe: cygcheck.o mingw_getopt.o path.o dump_setup.o $(MINGW_DEP_LDLIBS)
