@@ -60,7 +60,7 @@ static const char * const process_listing[] =
   "ctty",
   "stat",
   "statm",
-  "qmdline",
+  "cmdline",
   NULL
 };
 
