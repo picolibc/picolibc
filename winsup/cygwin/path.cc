@@ -386,14 +386,12 @@ out:
       debug_printf ("GetVolumeInformation(%s) = ERR, full_path(%s), set_has_acls(FALSE)",
                     tmp_buf, full_path, GetLastError ());
       set_has_acls (FALSE);
-      set_has_reparse_points (FALSE);
     }
   else
     {
       debug_printf ("GetVolumeInformation(%s) = OK, full_path(%s), set_has_acls(%d)",
                     tmp_buf, full_path, volflags & FS_PERSISTENT_ACLS);
       set_has_acls (volflags & FS_PERSISTENT_ACLS);
-      set_has_reparse_points (volflags & FILE_SUPPORTS_REPARSE_POINTS);
     }
 }
 

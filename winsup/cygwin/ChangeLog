@@ -1,3 +1,8 @@
+Thu Jun  8 22:49:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* path.cc (path_conv::check): Erase two lines checked in
+        by mistake.
+
 Thu Jun  8 15:53:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_disk_file::open): Check for directory
