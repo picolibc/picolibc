@@ -1,3 +1,8 @@
+Sat Oct 21 15:27:55 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* pinfo.cc (pinfo::init): Make PID_EXECED signal creation as well as
+	PID_IN_USE.
+
 Sat Oct 21 01:52:54 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* spawn.cc (spawn_guts): Don't do the reparenting step if we notice
