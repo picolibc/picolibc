@@ -416,7 +416,7 @@ cygheap_user::set_sid (PSID new_sid)
   if (!new_sid)
     {
       if (psid)
-        cfree (psid);
+	cfree (psid);
       psid = NULL;
       return TRUE;
     }
