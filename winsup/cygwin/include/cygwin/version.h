@@ -123,10 +123,11 @@ details. */
        30: CW_GET_CYGDRIVE_INFO addition to external.cc
        31: Export inet_aton
        32: Export getrlimit/setrlimit
+       33: Export setlogmask
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 32
+#define CYGWIN_VERSION_API_MINOR 33
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

@@ -1,3 +1,7 @@
+Mon Jan 22 15:27:12 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* include/cygwin/version.h: Bump API to reflect setlogmask.
+
 Sun Jan 21 22:40:25 2001  Jason Tishler <jt@dothill.com>
 
 	* cygwin.din: Add export for setlogmask().

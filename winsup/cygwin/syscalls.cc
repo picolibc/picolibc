@@ -245,10 +245,7 @@ beg:
       if (!wait)
 	set_sig_errno (EAGAIN);	/* Don't really need 'set_sig_errno' here, but... */
       else
-	{
-	  set_sig_errno (EINTR);
-	  sawsig = 1;
-	}
+	set_sig_errno (EINTR);
       res = -1;
       goto out;
     }
@@ -264,7 +261,7 @@ beg:
     }
 
 out:
-  if (sawsig && call_signal_handler ())
+  if (res < 0 && get_errno () == EINTR && call_signal_handler ())
     goto beg;
   syscall_printf ("%d = read (%d<%s>, %p, %d), bin %d, errno %d", res, fd, fh->get_name (),
 		  ptr, len, fh->get_r_binary (), get_errno ());

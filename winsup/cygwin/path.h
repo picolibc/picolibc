@@ -37,6 +37,7 @@ enum path_types
   PATH_EXEC = MOUNT_EXEC,
   PATH_CYGWIN_EXEC = MOUNT_CYGWIN_EXEC,
   PATH_ALL_EXEC = PATH_CYGWIN_EXEC | PATH_EXEC,
+  PATH_HAS_SYMLINKS = 0x10000000,
   PATH_HASBUGGYOPEN = 0x20000000,
   PATH_SOCKET =       0x40000000,
   PATH_HASACLS =      0x80000000
@@ -50,6 +51,7 @@ class path_conv
   unsigned path_flags;
 
   int has_acls () {return path_flags & PATH_HASACLS;}
+  int has_symlinks () {return path_flags & PATH_HAS_SYMLINKS;}
   int hasgood_inode () {return path_flags & PATH_HASACLS;}  // Not strictly correct
   int has_buggy_open () {return path_flags & PATH_HASBUGGYOPEN;}
   int isbinary () {return path_flags & PATH_BINARY;}
@@ -60,6 +62,7 @@ class path_conv
 
   void set_binary () {path_flags |= PATH_BINARY;}
   void set_symlink () {path_flags |= PATH_SYMLINK;}
+  void set_has_symlinks () {path_flags |= PATH_HAS_SYMLINKS;}
   void set_exec (int x = 1) {path_flags |= x ? PATH_EXEC : PATH_NOTHING;}
   void set_has_acls (int x = 1) {path_flags |= x ? PATH_HASACLS : PATH_NOTHING;}
   void set_has_buggy_open (int x = 1) {path_flags |= x ? PATH_HASBUGGYOPEN : PATH_NOTHING;}

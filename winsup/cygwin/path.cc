@@ -298,6 +298,7 @@ path_conv::check (const char *src, unsigned opt,
 	     these operations again on the newly derived path. */
 	  else if (len > 0)
 	    {
+	      set_has_symlinks ();
 	      if (component == 0 && !need_directory && !(opt & PC_SYM_FOLLOW))
 		{
 		  set_symlink (); // last component of path is a symlink.
@@ -315,7 +316,7 @@ path_conv::check (const char *src, unsigned opt,
 	      (tail > path_copy && tail[-1] == ':'))
 	    goto out;	// all done
 
-	  /* Haven't found a valid pathname component yet.
+	  /* Haven't found an existing pathname component yet.
 	     Pinch off the tail and try again. */
 	  *tail = '\0';
 	  component++;
@@ -2372,10 +2373,7 @@ symlink_info::check (const char *in_path, const suffix_info *suffixes)
 	      /* Not a symlink, see if executable.  */
 	      if (!(pflags & PATH_ALL_EXEC) &&
 		  has_exec_chars (cookie_buf, got))
-{
-debug_printf ("setting exec flag");
 		pflags |= PATH_EXEC;
-}
 	    close_and_return:
 	      CloseHandle (h);
 	      goto file_not_symlink;
@@ -2572,10 +2570,41 @@ chdir (const char *dir)
       native_dir[3] = '\0';
     }
   int res = SetCurrentDirectoryA (native_dir) ? 0 : -1;
+
   if (res == -1)
     __seterrno ();
+  else if (!path.has_symlinks ())
+    cygcwd.set (path, dir);
   else
-    cygcwd.set (path, strpbrk (dir, ":\\") != NULL ? NULL : dir);
+    {
+      char curcwd[MAX_PATH];
+      char fulldir[MAX_PATH];
+      char *p;
+      char **tail[MAX_PATH / 2];
+      int len = strlen (dir) + 1;
+
+      if (isabspath (dir))
+	p = fulldir;
+      else
+	{
+	  p = strchr (strcpy (fulldir, cygcwd.get (curcwd)), '\0');
+	  if (p > fulldir + 1)
+	    strcpy (p++, "/");
+	 }
+      strcpy (p, dir);
+      dir = fulldir;
+      for (;;)
+	{
+	  path_conv resolved (dir, PC_SYM_NOFOLLOW | PC_FULL);
+	  if (resolved.get_attributes () & FILE_ATTRIBUTE_DIRECTORY)
+	    {
+	      cygcwd.set (path, dir);
+	      break;
+	    }
+	  char *p = strrchr (dir)
+	  tail[i] = 
+	}
+    }
 
   /* Note that we're accessing cwd.posix without a lock here.  I didn't think
      it was worth locking just for strace. */
