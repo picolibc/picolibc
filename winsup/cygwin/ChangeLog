@@ -1,3 +1,8 @@
+Mon Jan 15 11:56:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* sysconf.cc (sysconf): return `getpagesize ()' on _SC_PAGESIZE
+	request to avoid implementing the same twice.
+
 Sun Jan 14 14:07:50 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* syscalls.cc (_read): Use more lightweight method for determining if

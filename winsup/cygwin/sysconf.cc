@@ -36,11 +36,7 @@ sysconf (int in)
 	   we should return NOFILE or OPEN_MAX instead? */
 	return fdtab.size;
       case _SC_PAGESIZE:
-	{
-	  SYSTEM_INFO b;
-	  GetSystemInfo (&b);
-	  return b.dwPageSize;
-	}
+	return getpagesize ();
       case _SC_CLK_TCK:
 	return CLOCKS_PER_SEC;
       case _SC_JOB_CONTROL:
