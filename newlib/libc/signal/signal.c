@@ -167,7 +167,6 @@ _raise_r (ptr, sig)
      int sig;
 {
   _sig_func_ptr func;
-  int result = 0;
 
   if (sig < 0 || sig >= NSIG)
     {
@@ -178,27 +177,22 @@ _raise_r (ptr, sig)
   if (ptr->_sig_func == NULL && _init_signal_r (ptr) != 0)
     return -1;
   
-  switch ((_POINTER_INT) ptr->_sig_func[sig])
+  func = ptr->_sig_func[sig];
+  if (func == SIG_DFL)
+    return _kill_r (ptr, _getpid_r (ptr), sig);
+  else if (func == SIG_IGN)
+    return 0;
+  else if (func == SIG_ERR)
     {
-    case SIG_DFL:
-      return _kill_r (ptr, _getpid_r (ptr), sig);
-
-    case SIG_IGN:
-      break;
-
-    case SIG_ERR:
       ptr->_errno = EINVAL;
-      result = 1;
-      break;
-
-    default:
-      func = ptr->_sig_func[sig];
+      return 1;
+    }
+  else
+    {
       ptr->_sig_func[sig] = SIG_DFL;
       func (sig);
-      break;
+      return 0;
     }
-
-  return result;
 }
 
 int
@@ -215,20 +209,16 @@ __sigtramp_r (ptr, sig)
 
   if (ptr->_sig_func == NULL && _init_signal_r (ptr) != 0)
     return -1;
-  
-  switch ((_POINTER_INT) ptr->_sig_func[sig])
+
+  func = ptr->_sig_func[sig];
+  if (func == SIG_DFL)
+    return 1;
+  else if (func == SIG_ERR)
+    return 2;
+  else if (func == SIG_IGN)
+    return 3;
+  else
     {
-    case SIG_DFL:
-      return 1;
-
-    case SIG_ERR:
-      return 2;
-
-    case SIG_IGN:
-      return 3;
-
-    default:
-      func = ptr->_sig_func[sig];
       ptr->_sig_func[sig] = SIG_DFL;
       func (sig);
       return 0;

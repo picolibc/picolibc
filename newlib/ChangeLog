@@ -1,3 +1,10 @@
+2000-09-19  Geoffrey Keating  <geoffk@cygnus.com>
+
+	* libc/signal/signal.c (__sigtramp_r): ISO C requires
+	case labels to be integral constant expressions, so
+	use an if/else tree instead.
+	(_raise_r): Likewise.
+
 2000-09-13  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/machine/v850/setjmp.S: Fixed tab problems caused by
