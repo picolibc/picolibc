@@ -373,7 +373,7 @@ struct parse_thing
       } values[2];
   } known[] =
 {
-  {"binmode", {x: &binmode}, justset, NULL, {{0}, {O_BINARY}}},
+  {"binmode", {x: &binmode}, justset, NULL, {{O_TEXT}, {O_BINARY}}},
   {"envcache", {&envcache}, justset, NULL, {{TRUE}, {FALSE}}},
   {"error_start", {func: &error_start_init}, isfunc, NULL, {{0}, {0}}},
   {"export", {&export_settings}, justset, NULL, {{FALSE}, {TRUE}}},
@@ -489,7 +489,10 @@ regopt (const char *name)
     parse_options (buf);
   else
     {
-      reg_key r1 (HKEY_LOCAL_MACHINE, KEY_READ, CYGWIN_INFO_PROGRAM_OPTIONS_NAME, NULL);
+      reg_key r1 (HKEY_LOCAL_MACHINE, KEY_READ, "SOFTWARE",
+		  CYGWIN_INFO_CYGNUS_REGISTRY_NAME,
+		  CYGWIN_INFO_CYGWIN_REGISTRY_NAME,
+		  CYGWIN_INFO_PROGRAM_OPTIONS_NAME, NULL);
       if (r1.get_string (lname, buf, sizeof (buf) - 1, "") == ERROR_SUCCESS)
 	parse_options (buf);
     }

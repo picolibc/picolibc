@@ -1,3 +1,12 @@
+Thu Aug 24 13:50:15 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* environ.cc (parse_thing): nobinmode should force O_TEXT.
+	(regopt): Use correct path to find LOCAL_MACHINE registry options.
+	* fhandler.cc (fhandler_base::open): Set binary mode only when binmode
+	== O_BINARY.
+	* pipe.cc (pipe): Pipe handling should rely on binmode not _fmode now
+	that the two are different.
+
 Thu Aug 24 13:21:09 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* include/sys/cygwin.h (strace_printf_wrap): Force printing when

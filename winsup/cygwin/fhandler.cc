@@ -24,7 +24,7 @@ static char fhandler_disk_dummy_name[] = "some disk file";
 
 struct __cygwin_perfile *perfile_table = NULL;
 
-DWORD binmode;
+DWORD binmode = 0;
 
 int
 fhandler_base::puts_readahead (const char *s, size_t len = (size_t) -1)
@@ -387,7 +387,7 @@ fhandler_base::open (int flags, mode_t mode)
   else if (get_device () == FH_DISK)
     bin = get_w_binary () || get_r_binary ();
   else
-    bin = binmode || get_w_binary () || get_r_binary ();
+    bin = (binmode == O_BINARY) || get_w_binary () || get_r_binary ();
 
   if (bin & O_TEXT)
     bin = 0;

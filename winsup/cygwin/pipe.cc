@@ -64,7 +64,8 @@ make_pipe (int fildes[2], unsigned int psize, int mode)
 extern "C" int
 pipe (int filedes[2])
 {
-  return make_pipe (filedes, 16384, (!__fmode || __fmode == O_BINARY) ? O_BINARY : O_TEXT);
+  extern DWORD binmode;
+  return make_pipe (filedes, 16384, (!binmode || binmode == O_BINARY) ? O_BINARY : O_TEXT);
 }
 
 extern "C" int
