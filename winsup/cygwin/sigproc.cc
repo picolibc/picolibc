@@ -1261,9 +1261,12 @@ wait_subproc (VOID *)
 		rc == WAIT_TIMEOUT)
 	      continue;
 	    else
-	      system_printf ("event[%d] %p, pid %d, dwProcessId %u, progname '%s', %E", i,
-			     events[0], pchildren[i]->pid, pchildren[i]->dwProcessId,
-			     pchildren[i]->progname);
+	      {
+		system_printf ("event[%d] %p, pchildren[%d] %p, %E", i, i, pchildren[i]);
+		system_printf ("pid %d, dwProcessId %u, progname '%s'", i,
+			       events[0], pchildren[i]->pid, pchildren[i]->dwProcessId,
+			       pchildren[i]->progname);
+	      }
 	  break;
 	}
 
