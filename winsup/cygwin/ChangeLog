@@ -1,31 +1,37 @@
+2003-03-25  Christopher Faylor  <cgf@redhat.com>
+	    Joe Buehler  <jhpb@draco.hekimian.com>
+
+	* fork.cc (fork_parent): Don't copy signals from parent to child here.
+	* sigproc.cc (proc_subproc): Copy signals from parent to child pinfo
+	here.
+
 2003-03-23  Thomas Pfaff  <tpfaff@gmx.net>
 
-	* thread.h (class List): Move inline code inside class
-	declaration.
-	(List::forEach): Change callback parameter to template class
-	member function pointer.
-	(pthread_keys::fixup_before_fork): Change to inline. Use
-	List::forEach to fixup keys.
+	* thread.h (class List): Move inline code inside class declaration.
+	(List::forEach): Change callback parameter to template class member
+	function pointer.
+	(pthread_keys::fixup_before_fork): Change to inline.  Use List::forEach
+	to fixup keys.
 	(pthread_keys::fixup_after_fork): Ditto.
 	(pthread_keys::runAllDestructors): Ditto.
 	(pthread_key::saveAKey): Remove.
 	(pthread_key::restoreAKey): Ditto.
 	(pthread_key::destroyAKey): Ditto.
 	(pthread_key::run_destructor): Rename to runDestructor.
-	(pthread_mutex::fixup_after_fork): Change to inline. Use
-	List::forEach to fixup mutexes after a fork.
+	(pthread_mutex::fixup_after_fork): Change to inline.  Use List::forEach
+	to fixup mutexes after a fork.
 	(pthread_mutex::FixupAfterFork): New method.
 	(pthread_mutex::mutexes): New member.
-	(pthread_cond::fixup_after_fork): Change to inline. Use
-	List::forEach to fixup conds after a fork.
+	(pthread_cond::fixup_after_fork): Change to inline.  Use List::forEach
+	to fixup conds after a fork.
 	(pthread_cond::FixupAfterFork): New method.
 	(pthread_cond::conds): New member.
-	(pthread_rwlock::fixup_after_fork): Change to inline. Use
+	(pthread_rwlock::fixup_after_fork): Change to inline.  Use
 	List::forEach to fixup rwlocks after a fork.
 	(pthread_rwlock::FixupAfterFork): New method.
 	(pthread_rwlock::rwlocks): New member.
-	(semaphore::fixup_after_fork): Change to inline. Use
-	List::forEach to fixup mutexes after a fork.
+	(semaphore::fixup_after_fork): Change to inline.  Use List::forEach to
+	fixup mutexes after a fork.
 	(semaphore::FixupAfterFork): New method.
 	(semaphore::semaphores): New member.
 	(MTinterface::mutexs): Remove.
@@ -34,20 +40,20 @@
 	(MTinterface::semaphores): Ditto.
 	(pthread_equal): Add extern "C".
 	(pthread_mutex_lock): Ditto.
-	
-	* thread.cc (MTinterface::fixup_after_fork): Change
-	fixup_after_fork calls for pthread objects.
+
+	* thread.cc (MTinterface::fixup_after_fork): Change fixup_after_fork
+	calls for pthread objects.
 	(semaphore::conds): Instantiate.
-	(pthread_cond::pthread_cond): Use List::Insert rather than
-	custom list code.
-	(pthread_cond::~pthread_cond): Use List::Remove rather than
-	custom list code.
+	(pthread_cond::pthread_cond): Use List::Insert rather than custom list
+	code.
+	(pthread_cond::~pthread_cond): Use List::Remove rather than custom list
+	code.
 	(pthread_cond::fixup_after_fork): Rename to FixupAfterFork.
 	(pthread_rwlock::rwlocks): Instantiate.
-	(pthread_rwlock::pthread_crwlock): Use List::Insert rather than
-	custom list code.
-	(pthread_rwlock::~pthread_rwlock): Use List::Remove rather than
-	custom list code.
+	(pthread_rwlock::pthread_crwlock): Use List::Insert rather than custom
+	list code.
+	(pthread_rwlock::~pthread_rwlock): Use List::Remove rather than custom
+	list code.
 	(pthread_rwlock::fixup_after_fork): Rename to FixupAfterFork.
 	(pthread_key::saveAKey): Remove.
 	(pthread_key::fixup_before_fork): Ditto.
@@ -57,16 +63,15 @@
 	(pthread_key::runAllDestructors): Ditto.
 	(pthread_key::run_destructor): Rename to runDestructor.
 	(pthread_mutex::mutexes): Instantiate.
-	(pthread_mutex::pthread_mutex): Use List::Insert rather than
-	custom list code.
-	(pthread_mutex::~pthread_mutex): Use List::Remove rather than
-	custom list code.
+	(pthread_mutex::pthread_mutex): Use List::Insert rather than custom
+	list code.
+	(pthread_mutex::~pthread_mutex): Use List::Remove rather than custom
+	list code.
 	(pthread_mutex::fixup_after_fork): Rename to FixupAfterFork.
 	(semaphore::conds): Instantiate.
-	(semaphore::semaphore): Use List::Insert rather than custom list
+	(semaphore::semaphore): Use List::Insert rather than custom list code.
+	(semaphores::~semaphore): Use List::Remove rather than custom list
 	code.
-	(semaphores::~semaphore): Use List::Remove rather than custom
-	list code.
 	(semaphore::fixup_after_fork): Rename to FixupAfterFork.
 
 2003-03-22  Christopher Faylor  <cgf@redhat.com>

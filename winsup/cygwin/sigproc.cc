@@ -295,6 +295,7 @@ proc_subproc (DWORD what, DWORD val)
       vchild->sid = myself->sid;
       vchild->ctty = myself->ctty;
       vchild->process_state |= PID_INITIALIZING | (myself->process_state & PID_USETTY);
+      vchild->copysigs (myself);
 
       sigproc_printf ("added pid %d to wait list, slot %d, winpid %p, handle %p",
 		  vchild->pid, nchildren, vchild->dwProcessId,
