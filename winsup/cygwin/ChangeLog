@@ -1,3 +1,15 @@
+2004-04-09  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.h (pthread::init_mainthread): Remove parameter forked.
+	(pthread::set_tls_self_pointer): New static function.
+	* thread.cc (MTinterface::fixup_after_fork): Change call to
+	pthread::init_mainthread.
+	(pthread::init_mainthread): Remove parameter forked.  Simplify thread
+	self pointer handling.
+	(pthread::self): Set thread self pointer to null_pthread if thread has
+	not been initialized.
+	(pthread::set_tls_self_pointer): New static function.
+
 2004-04-05  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* path.cc (path_conv::check): Optimize symlink replacements.

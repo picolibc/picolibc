@@ -153,7 +153,7 @@ MTinterface::fixup_after_fork (void)
   pthread_key::fixup_after_fork ();
 
   threadcount = 0;
-  pthread::init_mainthread (true);
+  pthread::init_mainthread ();
 
   pthread::fixup_after_fork ();
   pthread_mutex::fixup_after_fork ();
@@ -166,23 +166,17 @@ MTinterface::fixup_after_fork (void)
 
 /* static methods */
 void
-pthread::init_mainthread (const bool forked)
+pthread::init_mainthread ()
 {
   pthread *thread = get_tls_self_pointer ();
   if (!thread)
     {
-      if (forked)
-        thread = pthread_null::get_null_pthread ();
-      else
-        {
-          thread = new pthread ();
-          if (!thread)
-            api_fatal ("failed to create mainthread object");
-        }
+      thread = new pthread ();
+      if (!thread)
+        api_fatal ("failed to create mainthread object");
     }
 
-  thread->cygtls = &_my_tls;
-  _my_tls.tid = thread;
+  set_tls_self_pointer (thread);
   thread->thread_id = GetCurrentThreadId ();
   if (!DuplicateHandle (GetCurrentProcess (), GetCurrentThread (),
 			GetCurrentProcess (), &thread->win32_obj_id,
@@ -198,15 +192,25 @@ pthread *
 pthread::self ()
 {
   pthread *thread = get_tls_self_pointer ();
-  if (thread)
-    return thread;
-  return pthread_null::get_null_pthread ();
+  if (!thread)
+    {
+      thread = pthread_null::get_null_pthread ();
+      set_tls_self_pointer (thread);
+    }
+  return thread;
 }
 
 pthread *
 pthread::get_tls_self_pointer ()
 {
   return _my_tls.tid;
+}
+
+void
+pthread::set_tls_self_pointer (pthread *thread)
+{
+  thread->cygtls = &_my_tls;
+  _my_tls.tid = thread;
 }
 
 List<pthread> pthread::threads;

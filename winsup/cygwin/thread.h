@@ -373,7 +373,7 @@ public:
   pthread ();
   virtual ~pthread ();
 
-  static void init_mainthread (const bool forked = false);
+  static void init_mainthread ();
   static bool is_good_object(pthread_t const *);
   static void atforkprepare();
   static void atforkparent();
@@ -447,9 +447,9 @@ private:
   void pop_all_cleanup_handlers (void);
   void precreate (pthread_attr *);
   void postcreate ();
-  void set_tls_self_pointer ();
   bool create_cancel_event ();
   static pthread *get_tls_self_pointer ();
+  static void set_tls_self_pointer (pthread *);
   void cancel_self ();
   DWORD get_thread_id ();
 };
