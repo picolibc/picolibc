@@ -1,3 +1,7 @@
+2005-03-01  Christopher Faylor  <cgf@timesys.com>
+
+	* include/cygwin/version.h: Bump DLL minor number to 14.
+
 2005-03-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_clipboard.cc (fhandler_dev_clipboard::write): Never set
