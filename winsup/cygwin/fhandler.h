@@ -776,9 +776,6 @@ protected:
   int unit;
   DWORD mem_size;
   DWORD pos;
-  bool init_phase;
-
-  void init (void);
 
 public:
   fhandler_dev_mem (const char *name, int unit);

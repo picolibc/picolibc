@@ -22,10 +22,36 @@
 #include "fhandler.h"
 #include "path.h"
 
+/*
+ * The following both data structures aren't defined anywhere in the Microsoft
+ * header files. Taken from the book "Windows NT/2000 Native API Reference"
+ * by Gary Nebbett.
+ */
+typedef enum _SYSTEM_INFORMATION_CLASS {
+  SystemBasicInformation = 0
+  /* Dropped each other since not used here. */
+} SYSTEM_INFORMATION_CLASS;
+
+typedef struct _SYSTEM_BASIC_INFORMATION {
+  ULONG Unknown;
+  ULONG MaximumIncrement;
+  ULONG PhysicalPageSize;
+  ULONG NumberOfPhysicalPages;
+  ULONG LowestPhysicalPage;
+  ULONG HighestPhysicalPage;
+  ULONG AllocationGranularity;
+  ULONG LowestUserAddress;
+  ULONG HighestUserAddress;
+  ULONG ActiveProcessors;
+  ULONG NumberProcessors;
+} SYSTEM_BASIC_INFORMATION, *PSYSTEM_BASIC_INFORMATION;
+
 extern "C" {
 NTSTATUS NTAPI NtMapViewOfSection(HANDLE,HANDLE,PVOID*,ULONG,ULONG,
-                                      PLARGE_INTEGER,PULONG,SECTION_INHERIT,
-                                      ULONG,ULONG);
+                                  PLARGE_INTEGER,PULONG,SECTION_INHERIT,
+                                  ULONG,ULONG);
+NTSTATUS NTAPI NtQuerySystemInformation(SYSTEM_INFORMATION_CLASS,
+                                        PVOID,ULONG,PULONG);
 NTSTATUS NTAPI NtOpenSection(PHANDLE,ACCESS_MASK,POBJECT_ATTRIBUTES);
 NTSTATUS NTAPI NtUnmapViewOfSection(HANDLE,PVOID);
 VOID NTAPI RtlInitUnicodeString(PUNICODE_STRING,PCWSTR);
@@ -37,37 +63,22 @@ ULONG NTAPI RtlNtStatusToDosError(NTSTATUS);
 
 fhandler_dev_mem::fhandler_dev_mem (const char *name, int nunit)
 : fhandler_base (FH_MEM, name),
-  unit (nunit),
-  init_phase (false)
-{
-}
-
-fhandler_dev_mem::~fhandler_dev_mem (void)
-{
-}
-
-void
-fhandler_dev_mem::init ()
+  unit (nunit)
 {
   if (unit == 1) /* /dev/mem */
     {
-      long page_size = getpagesize ();
-      char buf[1];
-
-      init_phase = true;
-      mem_size = pos = 1 << 30;
-      for (off_t afct = 1 << 29; afct >= page_size; afct >>= 1)
+      NTSTATUS ret;
+      SYSTEM_BASIC_INFORMATION sbi;
+      if ((ret = NtQuerySystemInformation (SystemBasicInformation, (PVOID) &sbi,
+                                           sizeof sbi, NULL)) != STATUS_SUCCESS)
         {
-          if (read (buf, 1) > 0)
-            pos += afct;
-          else
-            {
-              if (pos < mem_size)
-                mem_size = pos;
-              pos -= afct;
-            }
+          __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+          debug_printf("NtQuerySystemInformation: ret = %d, Dos(ret) = %d",
+                       ret, RtlNtStatusToDosError (ret));
+          mem_size = 0;
         }
-      pos = 0;
+      else
+        mem_size = sbi.PhysicalPageSize * sbi.NumberOfPhysicalPages;
       debug_printf ("MemSize: %d MB", mem_size >>= 20);
     }
   else if (unit == 2) /* /dev/kmem - Not yet supported */
@@ -82,9 +93,13 @@ fhandler_dev_mem::init ()
     }
   else
     {
-      debug_printf ("Illegal unit!!!");
+      mem_size = 0;
+      debug_printf ("Illegal minor number!!!");
     }
-  init_phase = false;
+}
+
+fhandler_dev_mem::~fhandler_dev_mem (void)
+{
 }
 
 int
@@ -140,7 +155,6 @@ fhandler_dev_mem::open (const char *, int flags, mode_t)
     }
 
   set_io_handle (mem);
-  init ();
   return 1;
 }
 
@@ -224,8 +238,7 @@ fhandler_dev_mem::read (void *ptr, size_t ulen)
                                  0,
                                  PAGE_READONLY)) != STATUS_SUCCESS)
     {
-      if (!init_phase) /* Don't want to flood debug output with init crap. */
-        __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+      __seterrno_from_win_error (RtlNtStatusToDosError (ret));
       return -1;
     }
 
@@ -453,6 +466,7 @@ dummy_autoload (void)
 LoadDLLinit (ntdll)
 LoadDLLfuncEx (NtMapViewOfSection, 40, ntdll, 1)
 LoadDLLfuncEx (NtOpenSection, 12, ntdll, 1)
+LoadDLLfuncEx (NtQuerySystemInformation, 16, ntdll, 1)
 LoadDLLfuncEx (NtUnmapViewOfSection, 8, ntdll, 1)
 LoadDLLfuncEx (RtlInitUnicodeString, 8, ntdll, 1)
 LoadDLLfuncEx (RtlNtStatusToDosError, 4, ntdll, 1)

@@ -1,3 +1,18 @@
+Mon Oct  9 15:11:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_dev_mem): Erase member `init_phase' and
+	member function `init'.
+	* fhandler_mem.cc: Add typedefs for NT internal data types
+	`SYSTEM_INFORMATION_CLASS' and `SYSTEM_BASIC_INFORMATION'.
+	Add prototype for `NtQuerySystemInformation' function.
+	(fhandler_dev_mem::fhandler_dev_mem): Takes over initialization task
+	from `init'. Use `NtQuerySystemInformation' function to evaluate the
+	size of physical memory instead of interval search.
+	(fhandler_dev_mem::init): Eliminated.
+	(fhandler_dev_mem::open): Don't call `init'.
+	(fhandler_dev_mem::read): Eliminate check for `init_phase'.
+	(dummy_autoload): Add load statement for `NtQuerySystemInformation'.
+
 Sun Oct  8 22:38:40 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dtable.cc (set_std_handle): Use std_consts array to control
