@@ -25,6 +25,7 @@ details. */
 #include <winsock.h>
 #include "dtable.h"
 #include "pinfo.h"
+#include "cygerrno.h"
 
 /* We only want to initialize WinSock in a child process if socket
    handles are inheritted. This global allows us to know whether this

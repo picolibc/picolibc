@@ -16,6 +16,7 @@ details. */
 #include <winuser.h>
 #include "dtable.h"
 #include "pinfo.h"
+#include "cygerrno.h"
 
 extern fhandler_tty_master *tty_master;
 

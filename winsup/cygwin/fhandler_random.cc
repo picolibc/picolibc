@@ -13,6 +13,7 @@ details. */
 #include "winsup.h"
 #include <errno.h>
 #include <limits.h>
+#include "cygerrno.h"
 
 #define RANDOM   8
 #define URANDOM  9

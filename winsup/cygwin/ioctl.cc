@@ -15,6 +15,7 @@ details. */
 #include <sys/ioctl.h>
 #include <errno.h>
 #include "dtable.h"
+#include "cygerrno.h"
 
 extern "C"
 int

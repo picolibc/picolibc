@@ -24,6 +24,7 @@ details. */
 #include <ctype.h>
 #include "dtable.h"
 #include "pinfo.h"
+#include "cygerrno.h"
 
 extern BOOL allow_ntea;
 BOOL allow_ntsec = FALSE;

@@ -18,6 +18,7 @@ details. */
 #include <ctype.h>
 #include "dtable.h"
 #include "pinfo.h"
+#include "cygerrno.h"
 
 #define MAX_AT_FILE_LEVEL 10
 

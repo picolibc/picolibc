@@ -22,6 +22,7 @@ details. */
 #include <winsock.h>
 #include "dtable.h"
 #include "pinfo.h"
+#include "cygerrno.h"
 
 dtable fdtab;
 

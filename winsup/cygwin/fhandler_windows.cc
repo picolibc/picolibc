@@ -15,6 +15,7 @@ details. */
 #include <errno.h>
 #include <wingdi.h>
 #include <winuser.h>
+#include "cygerrno.h"
 
 /*
 The following unix-style calls are supported:

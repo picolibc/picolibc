@@ -14,6 +14,7 @@ details. */
 #include <unistd.h>
 #include <stdlib.h>
 #include "pinfo.h"
+#include "cygerrno.h"
 
 /**********************************************************************/
 /* fhandler_serial */

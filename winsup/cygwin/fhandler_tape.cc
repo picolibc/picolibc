@@ -16,6 +16,7 @@ details. */
 #include <unistd.h>
 
 #include <sys/mtio.h>
+#include "cygerrno.h"
 
 /**********************************************************************/
 /* fhandler_dev_tape */

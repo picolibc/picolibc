@@ -12,6 +12,7 @@ details. */
 #include <sys/wait.h>
 #include <stdlib.h>
 #include <errno.h>
+#include "cygerrno.h"
 
 /* This is called _wait and not wait because the real wait is defined
    in libc/syscalls/syswait.c.  It calls us.  */

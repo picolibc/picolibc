@@ -15,6 +15,7 @@ details. */
 #include <errno.h>
 #include "dtable.h"
 #include "pinfo.h"
+#include "cygerrno.h"
 
 /*
  * Simple class used to keep a record of all current

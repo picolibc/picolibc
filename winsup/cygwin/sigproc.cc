@@ -17,6 +17,7 @@ details. */
 #include <errno.h>
 #include <stdlib.h>
 #include "pinfo.h"
+#include "cygerrno.h"
 
 extern BOOL allow_ntsec;
 

@@ -34,6 +34,7 @@ details. */
 #include <winsock.h>
 #include "select.h"
 #include "dtable.h"
+#include "cygerrno.h"
 
 /*
  * All these defines below should be in sys/types.h

@@ -14,6 +14,7 @@ details. */
 #include <ctype.h>
 #include <fcntl.h>
 #include "pinfo.h"
+#include "cygerrno.h"
 
 extern BOOL allow_glob;
 extern BOOL allow_ntea;

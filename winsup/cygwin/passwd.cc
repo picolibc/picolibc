@@ -15,6 +15,7 @@ details. */
 #include <errno.h>
 #include "dtable.h"
 #include "pinfo.h"
+#include "cygerrno.h"
 
 /* Read /etc/passwd only once for better performance.  This is done
    on the first call that needs information from it. */

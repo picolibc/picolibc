@@ -15,6 +15,7 @@ details. */
 #include <limits.h>
 #include "dtable.h"
 #include "pinfo.h"
+#include "cygerrno.h"
 
 static char NO_COPY pinfo_dummy[sizeof(pinfo)] = {0};
 

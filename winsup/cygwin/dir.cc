@@ -14,6 +14,7 @@ details. */
 #include <sys/stat.h>
 #include <errno.h>
 #include "pinfo.h"
+#include "cygerrno.h"
 
 #define _COMPILING_NEWLIB
 #include "dirent.h"

@@ -18,6 +18,7 @@ details. */
 #include <limits.h>
 #include "dtable.h"
 #include "pinfo.h"
+#include "cygerrno.h"
 
 /* Tty master stuff */
 

@@ -15,6 +15,7 @@ details. */
 #include "winsup.h"
 #include <errno.h>
 #include "pinfo.h"
+#include "cygerrno.h"
 
 /* add timeval values */
 static void

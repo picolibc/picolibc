@@ -14,6 +14,7 @@ details. */
 #include <errno.h>
 #include <unistd.h>
 #include "dtable.h"
+#include "cygerrno.h"
 
 extern "C"
 int

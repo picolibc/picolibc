@@ -12,6 +12,7 @@ details. */
 #define _REENT_ONLY
 #include <stdio.h>
 #include <errno.h>
+#include "cygerrno.h"
 
 /* Table to map Windows error codes to Errno values.  */
 /* FIXME: Doing things this way is a little slow.  It's trivial to change
@@ -21,7 +22,7 @@ details. */
 
 static const struct
   {
-    int w;		 /* windows version of error */
+    DWORD w;		 /* windows version of error */
     const char *s;	 /* text of windows version */
     int e;		 /* errno version of error */
   }
@@ -108,34 +109,33 @@ errmap[] =
   { 0, NULL, 0}
 };
 
+int __stdcall
+geterrno_from_win_error (DWORD code, int deferrno)
+{
+  for (int i = 0; errmap[i].w != 0; ++i)
+    if (code == errmap[i].w)
+      {
+	syscall_printf ("windows error %u == errno %d", code, errmap[i].e);
+	return errmap[i].e;
+      }
+
+  syscall_printf ("unknown windows error %u, setting errno to %d", code,
+		  deferrno);
+  return deferrno;	/* FIXME: what's so special about EACCESS? */
+}
+
 /* seterrno_from_win_error: Given a Windows error code, set errno
    as appropriate. */
-void
-seterrno_from_win_error (const char *file, int line, int code)
+void __stdcall
+seterrno_from_win_error (const char *file, int line, DWORD code)
 {
-  int i;
-
-  for (i = 0; errmap[i].w != 0; ++i)
-    if (code == errmap[i].w)
-      break;
-
-  if (errmap[i].w != 0)
-    {
-      if (strace.active)
-	strace.prntf (_STRACE_SYSCALL, NULL, "%s:%d seterrno: %d (%s) -> %d",
-		      file, line, code, errmap[i].s, errmap[i].e);
-      set_errno (errmap[i].e);
-    }
-  else
-    {
-      if (strace.active)
-	strace.prntf (_STRACE_SYSCALL, NULL, "%s:%d seterrno: unknown error %d", file, line, code);
-      set_errno (EACCES);
-    }
+  syscall_printf ("%s:%d \b");
+  set_errno (geterrno_from_win_error (code, EACCES));
+  return;
 }
 
 /* seterrno: Set `errno' based on GetLastError (). */
-void
+void __stdcall
 seterrno (const char *file, int line)
 {
   seterrno_from_win_error (file, line, GetLastError ());
@@ -672,4 +672,3 @@ strerror (int errnum)
      include files. */
   return (char *) error;
 }
-

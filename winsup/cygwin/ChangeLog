@@ -1,3 +1,22 @@
+Mon Aug 21 23:49:05 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* cygerrno.h: New file.  Use this throughout whenever errno
+	manipulation is required.
+	* errno.cc: Use DWORD to hold Windows errors.
+	(geterrno_from_win_error): New function.
+	(seterrno_from_win_error): Use geterrno_from_win_error to convert
+	supplied windows error (suggested by Corinna Vinschen).
+	* path.cc (symlink_info): Add error element.
+	* path.cc (path_conv::check): Remove errno setting.  Use new
+	symlink_info errno element to set path_conv error, where appropriate.
+	(symlink_info::check): Set error element rather than attempting to
+	manipulate errno.  Add more checks for trailing / and /..  even though
+	they are currently useless.  Avoid setting EINVAL.
+
+Mon Aug 21 23:49:05 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* path.cc (normalize_posix_path): Correct check for trailing /.
+
 2000-08-21  DJ Delorie  <dj@redhat.com>
 
 	* include/cygwin/cygwin_dll.h (DECLARE_CYGWIN_DLL): hinstance,

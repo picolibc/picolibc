@@ -14,6 +14,7 @@ details. */
 #include <time.h>
 #include <limits.h>
 #include "dtable.h"
+#include "cygerrno.h"
 
 /* sysconf: POSIX 4.8.1.1 */
 /* Allows a portable app to determine quantities of resources or

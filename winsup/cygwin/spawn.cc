@@ -22,6 +22,7 @@ details. */
 #include <paths.h>
 #include "dtable.h"
 #include "pinfo.h"
+#include "cygerrno.h"
 
 extern BOOL allow_ntsec;
 

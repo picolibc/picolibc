@@ -18,6 +18,7 @@ details. */
 #include "dll_init.h"
 #include "dtable.h"
 #include "pinfo.h"
+#include "cygerrno.h"
 
 DWORD NO_COPY chunksize = 0;
 /* Timeout to wait for child to start, parent to init child, etc.  */

@@ -14,6 +14,7 @@
 #include <dirent.h>
 #include <stdlib.h>
 #include <errno.h>
+#include "cygerrno.h"
 
 extern "C"
 int

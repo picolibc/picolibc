@@ -15,6 +15,7 @@ details. */
 #include <errno.h>
 #include <ctype.h>
 #include "pinfo.h"
+#include "cygerrno.h"
 
 /* Common functions shared by tty/console */
 

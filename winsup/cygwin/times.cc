@@ -17,6 +17,7 @@ details. */
 #include <stdlib.h>
 #include <errno.h>
 #include "pinfo.h"
+#include "cygerrno.h"
 
 #define FACTOR (0x19db1ded53ea710LL)
 #define NSPERSEC 10000000LL

@@ -10,6 +10,7 @@ details. */
 #include <stdlib.h>
 #include "exceptions.h"
 #include "dll_init.h"
+#include "cygerrno.h"
 
 extern void __stdcall check_sanity_and_sync (per_process *);
 

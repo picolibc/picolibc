@@ -23,6 +23,7 @@ details. */
 #include <winuser.h>
 #include <ctype.h>
 #include "pinfo.h"
+#include "cygerrno.h"
 
 /*
  * Scroll the screen context.
