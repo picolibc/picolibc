@@ -1,3 +1,7 @@
+2003-04-28  H.J. Lu <hjl@gnu.org>
+
+	* bfdlink.h (bfd_link_info): Add relax_finalizing.
+
 2003-04-23  H.J. Lu <hjl@gnu.org>
 
 	* bfdlink.h (bfd_link_callbacks): Add error_handler.
