@@ -27,8 +27,6 @@
  *
  */
 
-#ifndef	__STRICT_ANSI__
-
 #ifndef _MALLOC_H_
 #define _MALLOC_H_
 
@@ -88,6 +86,3 @@ _CRTIMP void* __cdecl _expand (void*, size_t);
 #endif	/* RC_INVOKED */
 
 #endif /* Not _MALLOC_H_ */
-
-#endif /* Not __STRICT_ANSI__ */
-
