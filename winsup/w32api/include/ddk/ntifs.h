@@ -24,7 +24,7 @@
 #define _NTIFS_
 #define _GNU_NTIFS_
 
-#if __GNUC__ >=3
+#if __GNUC__ > =3
 #pragma GCC system_header
 #endif
 
@@ -54,11 +54,6 @@ extern PSE_EXPORTS                  SeExports;
 extern PACL                         SePublicDefaultDacl;
 extern PACL                         SeSystemDefaultDacl;
 
-#define ACCESS_ALLOWED_ACE_TYPE         (0x0)
-#define ACCESS_DENIED_ACE_TYPE          (0x1)
-#define SYSTEM_AUDIT_ACE_TYPE           (0x2)
-#define SYSTEM_ALARM_ACE_TYPE           (0x3)
-
 #define ANSI_DOS_STAR                   ('<')
 #define ANSI_DOS_QM                     ('>')
 #define ANSI_DOS_DOT                    ('"')
@@ -67,6 +62,12 @@ extern PACL                         SeSystemDefaultDacl;
 #define DOS_QM                          (L'>')
 #define DOS_DOT                         (L'"')
 
+/* also in winnt.h */
+#define ACCESS_ALLOWED_ACE_TYPE         (0x0)
+#define ACCESS_DENIED_ACE_TYPE          (0x1)
+#define SYSTEM_AUDIT_ACE_TYPE           (0x2)
+#define SYSTEM_ALARM_ACE_TYPE           (0x3)
+ 
 #define COMPRESSION_FORMAT_NONE         (0x0000)
 #define COMPRESSION_FORMAT_DEFAULT      (0x0001)
 #define COMPRESSION_FORMAT_LZNT1        (0x0002)
@@ -85,6 +86,7 @@ extern PACL                         SeSystemDefaultDacl;
 #define FILE_ACTION_REMOVED_BY_DELETE       0x00000009
 #define FILE_ACTION_ID_NOT_TUNNELLED        0x0000000A
 #define FILE_ACTION_TUNNELLED_ID_COLLISION  0x0000000B
+/* end  winnt.h */
 
 #define FILE_EA_TYPE_BINARY             0xfffe
 #define FILE_EA_TYPE_ASCII              0xfffd
@@ -99,6 +101,7 @@ extern PACL                         SeSystemDefaultDacl;
 
 #define FILE_NEED_EA                    0x00000080
 
+/* also in winnt.h */
 #define FILE_NOTIFY_CHANGE_FILE_NAME    0x00000001
 #define FILE_NOTIFY_CHANGE_DIR_NAME     0x00000002
 #define FILE_NOTIFY_CHANGE_NAME         0x00000003
@@ -113,6 +116,7 @@ extern PACL                         SeSystemDefaultDacl;
 #define FILE_NOTIFY_CHANGE_STREAM_SIZE  0x00000400
 #define FILE_NOTIFY_CHANGE_STREAM_WRITE 0x00000800
 #define FILE_NOTIFY_VALID_MASK          0x00000fff
+/* end winnt.h */
 
 #define FILE_OPLOCK_BROKEN_TO_LEVEL_2   0x00000007
 #define FILE_OPLOCK_BROKEN_TO_NONE      0x00000008
@@ -228,11 +232,11 @@ extern PACL                         SeSystemDefaultDacl;
 #define IO_ATTACH_DEVICE                0x0400
 
 #define IO_ATTACH_DEVICE_API            0x80000000
-
+/* also in winnt.h */
 #define IO_COMPLETION_QUERY_STATE       0x0001
 #define IO_COMPLETION_MODIFY_STATE      0x0002
 #define IO_COMPLETION_ALL_ACCESS        (STANDARD_RIGHTS_REQUIRED|SYNCHRONIZE|0x3)
-
+/* end winnt.h */
 #define IO_FILE_OBJECT_NON_PAGED_POOL_CHARGE    64
 #define IO_FILE_OBJECT_PAGED_POOL_CHARGE        1024
 
@@ -252,10 +256,10 @@ extern PACL                         SeSystemDefaultDacl;
 
 #define MAP_PROCESS                     1L
 #define MAP_SYSTEM                      2L
-
 #define MEM_DOS_LIM                     0x40000000
+/* also in winnt.h */
 #define MEM_IMAGE                       SEC_IMAGE
-
+/* end winnt.h */ 
 #define OB_TYPE_TYPE                    1
 #define OB_TYPE_DIRECTORY               2
 #define OB_TYPE_SYMBOLIC_LINK           3
@@ -288,13 +292,15 @@ extern PACL                         SeSystemDefaultDacl;
 #define PORT_CONNECT                    0x0001
 #define PORT_ALL_ACCESS                 (STANDARD_RIGHTS_ALL |\
                                          PORT_CONNECT)
-
-#define SEC_BASED                       0x00200000
-#define SEC_NO_CHANGE                   0x00400000
-#define SEC_FILE                        0x00800000
-#define SEC_IMAGE                       0x01000000
-#define SEC_COMMIT                      0x08000000
-#define SEC_NOCACHE                     0x10000000
+/* also in winnt.h */
+#define SEC_BASED	0x00200000
+#define SEC_NO_CHANGE	0x00400000
+#define SEC_FILE	0x00800000
+#define SEC_IMAGE	0x01000000
+#define SEC_VLM		0x02000000
+#define SEC_RESERVE	0x04000000
+#define SEC_COMMIT	0x08000000
+#define SEC_NOCACHE	0x10000000
 
 #define SECURITY_WORLD_SID_AUTHORITY    {0,0,0,0,0,1}
 #define SECURITY_WORLD_RID              (0x00000000L)
@@ -331,6 +337,7 @@ extern PACL                         SeSystemDefaultDacl;
 #define TOKEN_EXECUTE    (STANDARD_RIGHTS_EXECUTE)
 
 #define TOKEN_SOURCE_LENGTH 8
+/* end winnt.h */
 
 #define TOKEN_HAS_TRAVERSE_PRIVILEGE    0x01
 #define TOKEN_HAS_BACKUP_PRIVILEGE      0x02

@@ -733,9 +733,11 @@ typedef VOID DDKAPI
 #define SYMBOLIC_LINK_QUERY               0x0001
 #define SYMBOLIC_LINK_ALL_ACCESS          (STANDARD_RIGHTS_REQUIRED | 0x1)
 
+/* also in winnt,h */
 #define DUPLICATE_CLOSE_SOURCE            0x00000001
 #define DUPLICATE_SAME_ACCESS             0x00000002
 #define DUPLICATE_SAME_ATTRIBUTES         0x00000004
+/* end winnt.h */
 
 typedef struct _OBJECT_NAME_INFORMATION {               
   UNICODE_STRING  Name;                                

@@ -754,8 +754,10 @@ ZwSetInformationObject(
 	IN ULONG  ObjectInformationLength);
 
 /* OBJECT_BASIC_INFORMATION.Attributes constants */
+/* also in winbase.h */
 #define HANDLE_FLAG_INHERIT               0x01
 #define HANDLE_FLAG_PROTECT_FROM_CLOSE    0x02
+/* end winbase.h */
 #define PERMANENT                         0x10
 #define EXCLUSIVE                         0x20
 
@@ -1404,11 +1406,12 @@ typedef struct _PROCESS_ACCESS_TOKEN {
 } PROCESS_ACCESS_TOKEN, *PPROCESS_ACCESS_TOKEN;
 
 /* DefaultHardErrorMode constants */
+/* also in winbase.h */
 #define SEM_FAILCRITICALERRORS            0x0001
 #define SEM_NOGPFAULTERRORBOX             0x0002
 #define SEM_NOALIGNMENTFAULTEXCEPT        0x0004
 #define SEM_NOOPENFILEERRORBOX            0x8000
-
+/* end winbase.h */
 typedef struct _POOLED_USAGE_AND_LIMITS {
 	ULONG  PeakPagedPoolUsage;
 	ULONG  PagedPoolUsage;

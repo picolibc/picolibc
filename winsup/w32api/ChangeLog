@@ -1,3 +1,24 @@
+2003-07-22  Danny Smith <dannysmith@users.sourceforge.net>
+
+	* include/winbase.h (DUPLICATE_CLOSE_SOURCE,
+	DUPLICATE_SAME_ACCESS): Remove defines.
+	(HANDLE_FLAG_INHERIT, HANDLE_FLAG_PROTECT_FROM_CLOSE): Sync with
+	ddk/ntapi.h defines.
+	(SEM_*) : Likewise.
+	* include/winnt.h (COMPRESSION_*, ACCESS_*, SYSTEM_*): Sync with 
+	ddk/ntifs.h defines.
+	(FILE_*): Likewise.
+	(MEM_IMAGE, SEC_*): Likewise. 
+	(DUPLICATE_CLOSE_SOURCE, DUPLICATE_SAME_ACCESS, 
+	DUPLICATE_SAME_ATTRIBUTES): Sync with ddk/winddk.h defines.
+	(TOKEN_*): Sync with ddk/ntifs.h defines. 
+	* include/ddk/ntapi.h: Add comments noting definitions in
+	winbase.h.
+	* include/ddk/ntifs.h: Add comments noting definitions in
+	winnt.h.
+	* include/ddk/winddk.h: Add comments noting definitions in
+	winnt.h.
+ 
 2003-07-18  Danny Smith <dannysmith@users.sourceforge.net>
 
 	* include/winnt.h (FILE_*): Sync with ddk/winddk.h.
