@@ -1,3 +1,7 @@
+2001-12-05  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/strings.h: New File.
+
 2001-11-08  Robert Collins  <rbtcollins@hotmail.com>
 
 	* include/errno.h: Fix "errno is not a prototype" warning.
