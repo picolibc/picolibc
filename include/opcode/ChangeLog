@@ -1,3 +1,7 @@
+2002-12-13  Alan Modra  <amodra@bigpond.net.au>
+
+	* pj.h (pj_opc_info_t): Add union.
+
 2002-12-04  David Mosberger  <davidm@hpl.hp.com>
 
 	* ia64.h: Fix copyright message.
