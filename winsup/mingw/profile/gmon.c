@@ -55,6 +55,10 @@ static char rcsid[] = "$OpenBSD: gmon.c,v 1.8 1997/07/23 21:11:27 kstailey Exp $
 /* XXX needed? */
 //extern char *minbrk __asm ("minbrk");
 
+#ifdef __MINGW32__
+#define bzero(ptr,size) memset (ptr, 0, size);
+#endif
+
 struct gmonparam _gmonparam = { GMON_PROF_OFF };
 
 static int	s_scale;
@@ -102,9 +106,10 @@ monstartup(lowpc, highpc)
 		ERR("monstartup: out of memory\n");
 		return;
 	}
-#ifdef notdef
+
+	/* zero out cp as value will be added there */
 	bzero(cp, p->kcountsize + p->fromssize + p->tossize);
-#endif
+
 	p->tos = (struct tostruct *)cp;
 	cp += p->tossize;
 	p->kcount = (u_short *)cp;
