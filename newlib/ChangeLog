@@ -1,5 +1,9 @@
 2000-12-06  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/stdio/vfscanf.c: Fix typo for _NO_LONGDBL macro.
+
+2000-12-06  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/stdlib/Makefile.am: Added ldtoa.c to list of sources.
 	* libc/stdlib/Makefile.in: Regenerated.
 	* libc/stdio/floatio.h: Added suitable MAXEXP for long double.

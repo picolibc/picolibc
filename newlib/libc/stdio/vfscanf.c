@@ -845,11 +845,11 @@ __svfscanf (fp, fmt0, ap)
 		    exp_start = buf + sizeof (buf) - MAX_LONG_LEN - 1;
                  sprintf (exp_start, "e%ld", new_exp);
 		}
-#ifdef _NO_LONG_DBL
+#ifdef _NO_LONGDBL
 	      res = atof (buf);
-#else  /* !_NO_LONG_DBL */
+#else  /* !_NO_LONGDBL */
 	      res = _strtold (buf, NULL);
-#endif /* !_NO_LONG_DBL */
+#endif /* !_NO_LONGDBL */
 	      if (flags & LONG)
 		{
 		  dp = va_arg (ap, double *);
