@@ -5,7 +5,8 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 LIB_SOURCES = \
-	getpass.c sigset.c getpwent.c ttyname.c getut.c getlogin.c getcwd.c
+	getcwd.c getlogin.c getpass.c getpwent.c getut.c \
+	pread.c pwrite.c sigset.c ttyname.c
 
 libunix_la_LDFLAGS = -Xcompiler -nostdlib
 

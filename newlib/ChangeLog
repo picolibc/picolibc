@@ -1,3 +1,15 @@
+2002-04-29  Jeff Johnston  <jjohnstn@redhat.com>
+
+        *  libc/include/sys/unistd.h (pread, pwrite): Added prototypes.
+        *  libc/unix/Makefile.am: Add pread.c and pwrite.c.
+        *  libc/sys/linux/Makefile.am: Add pread64.c and pwrite64.c.
+        *  libc/sys/linux/Makefile.in: Regenerated.
+        *  libc/unix/Makefile.in: Ditto.
+        *  libc/sys/linux/pread64.c: New file.
+        *  libc/sys/linux/pwrite64.c: Ditto.
+        *  libc/unix/pread.c: Ditto.
+        *  libc/unix/pwrite.c: Ditto.
+
 2002-04-26  Jeff Johnston  <jjohnstn@redhat.com>
 
 	*  libc/sys/linux/Makefile.am: Add io64.c.

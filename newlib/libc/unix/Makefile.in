@@ -100,7 +100,8 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 LIB_SOURCES = \
-	getpass.c sigset.c getpwent.c ttyname.c getut.c getlogin.c getcwd.c
+	getcwd.c getlogin.c getpass.c getpwent.c getut.c \
+	pread.c pwrite.c sigset.c ttyname.c
 
 
 libunix_la_LDFLAGS = -Xcompiler -nostdlib
@@ -130,13 +131,15 @@ DEFS = @DEFS@ -I. -I$(srcdir)
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 lib_a_LIBADD = 
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  getpass.o sigset.o getpwent.o \
-@USE_LIBTOOL_FALSE@ttyname.o getut.o getlogin.o getcwd.o
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  getcwd.o getlogin.o getpass.o \
+@USE_LIBTOOL_FALSE@getpwent.o getut.o pread.o pwrite.o sigset.o \
+@USE_LIBTOOL_FALSE@ttyname.o
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 libunix_la_LIBADD = 
-@USE_LIBTOOL_TRUE@libunix_la_OBJECTS =  getpass.lo sigset.lo getpwent.lo \
-@USE_LIBTOOL_TRUE@ttyname.lo getut.lo getlogin.lo getcwd.lo
+@USE_LIBTOOL_TRUE@libunix_la_OBJECTS =  getcwd.lo getlogin.lo getpass.lo \
+@USE_LIBTOOL_TRUE@getpwent.lo getut.lo pread.lo pwrite.lo sigset.lo \
+@USE_LIBTOOL_TRUE@ttyname.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
