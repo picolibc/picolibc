@@ -232,12 +232,12 @@ PUT_SCNHDR_PAGE(ABFD,((struct internal_scnhdr *)(INT))->s_page, \
 /* Page macros
 
    The first GDB port requires flags in its remote memory access commands to
-   distinguish between data/prog space.  hopefully we can make this go away
-   eventually.  stuff the page in the upper bits of a 32-bit address, since
+   distinguish between data/prog space.  Hopefully we can make this go away
+   eventually.  Stuff the page in the upper bits of a 32-bit address, since
    the c5x family only uses 16 or 23 bits.
 
    c2x, c5x and most c54x devices have 16-bit addresses, but the c548 has
-   23-bit program addresses.  make sure the page flags don't interfere 
+   23-bit program addresses.  Make sure the page flags don't interfere.
    These flags are used by GDB to identify the destination page for
    addresses. 
 */
