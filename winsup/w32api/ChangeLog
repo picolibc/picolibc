@@ -1,9 +1,15 @@
 2003-08-10  Danny Smith <dannysmith@users.sourceforge.net>
 
+	* lib/uuid.c (CGID_Explorer, CGID_ShellDocView,
+	CGID_ShellServiceObject): Remove definitions.
+	* lib/shell32.c (CGID_ShellServiceObject): Add definition.
+
+2003-08-10  Danny Smith <dannysmith@users.sourceforge.net>
+
 	* include/shlobj.h (SHELLSTATE): Add structure.
 	(SHGetSetSettings): Add prototype.
 	(SHGetSettings): Add prototype.
-	* lib/user32.def (SHGetSetSettings): Add stub.
+	* lib/shell32.def (SHGetSetSettings): Add stub.
 
 2003-08-10  Phil Krylov  <likewolf@users.sourceforge.net>
 
