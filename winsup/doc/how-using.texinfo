@@ -1,12 +1,39 @@
 @section Using Cygwin
 
+@subsection My application cannot locate cygncurses5.dll!!!
+
+If you upgraded recently, and suddenly vim (or some other Cygwin
+application) fails with this message, it means that you did not follow
+these instructions properly:
+@file{http://cygwin.com/ml/cygwin-announce/2001/msg00124.html}.  To
+repair the damage, you must run setup.exe again, and re-install the
+@samp{libncurses5} package.
+
+Note that setup won't show this option by default.  In the ``Select
+packages to install'' dialogue, click on the @samp{Full/Part}
+button.  This lists all packages, even those that are already
+installed.  Scroll down to locate the @samp{libncurses5} package.
+Click on the ``cycle'' glyph until it says ``Reinstall''.  Continue
+with setup.
+
+@subsection Why is Cygwin suddenly @emph{so} slow?
+
+If you recently upgraded the @samp{cygwin} package and suddenly
+@emph{every} command takes a @emph{very} long time, then you probably
+have the obsolete @code{//c} notation in your PATH.  This now means
+the @emph{network share} @code{c}, which will slow things down
+tremendously if it does not exist.  See then next FAQ entry.
+
 @subsection Why doesn't //c (for C:) work anymore?
 
 (Similarly for any drive letter, e.g. @code{//z} for @code{Z:})
 
 This ``feature'' has long been deprecated, and no longer works at all
-in the latest release.  For a detailed discussion of why this change
-was made, and how deal with it now, refer to
+in the latest release.  As of release 1.3.3, @code{//c} now means the
+@emph{network share} @code{c}.
+
+For a detailed discussion of why this change was made, and how deal
+with it now, refer to
 @file{http://sources.redhat.com/ml/cygwin/2001-09/msg00014.html}.
 
 @subsection How should I set my PATH?
