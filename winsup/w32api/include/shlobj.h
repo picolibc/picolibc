@@ -667,23 +667,30 @@ typedef IShellIcon *LPSHELLICON;
 void WINAPI SHAddToRecentDocs(UINT,PCVOID);
 LPITEMIDLIST WINAPI SHBrowseForFolder(PBROWSEINFO);
 void WINAPI SHChangeNotify(LONG,UINT,PCVOID,PCVOID);
-HRESULT WINAPI ShGetDataFromIDListA(LPSHELLFOLDER,LPCITEMIDLIST,int,PVOID,int);
-HRESULT WINAPI ShGetDataFromIDListW(LPSHELLFOLDER,LPCITEMIDLIST,int,PVOID,int);
+HRESULT WINAPI SHGetDataFromIDListA(LPSHELLFOLDER,LPCITEMIDLIST,int,PVOID,int);
+HRESULT WINAPI SHGetDataFromIDListW(LPSHELLFOLDER,LPCITEMIDLIST,int,PVOID,int);
 HRESULT WINAPI SHGetDesktopFolder(LPSHELLFOLDER*);
 HRESULT WINAPI SHGetInstanceExplorer(LPUNKNOWN);
 HRESULT WINAPI SHGetMalloc(LPMALLOC*);
 BOOL WINAPI SHGetPathFromIDList(LPCITEMIDLIST,LPSTR);
 HRESULT WINAPI SHGetSpecialFolderLocation(HWND,int,LPITEMIDLIST*);
 HRESULT WINAPI SHLoadInProc(REFCLSID);
+/* FIXME/TODO: Only valid for _WIN32_IE >= 400? */
+BOOL WINAPI SHGetSpecialFolderPathA(HWND,LPSTR,int,BOOL);
+BOOL WINAPI SHGetSpecialFolderPathW(HWND,LPSTR,int,BOOL);
 
 #ifdef UNICODE
 typedef IShellExecuteHookW IShellExecuteHook;
 typedef IShellLinkW IShellLink;
-#define ShGetDataFromIDList ShGetDataFromIDListW
+#define SHGetDataFromIDList SHGetDataFromIDListW
+/* FIXME/TODO: Only valid for _WIN32_IE >= 400? */
+#define SHGetSpecialFolderPath SHGetSpecialFolderPathW
 #else
 typedef IShellExecuteHookA IShellExecuteHook;
 typedef IShellLinkA IShellLink;
-#define ShGetDataFromIDList ShGetDataFromIDListA
+#define SHGetDataFromIDList SHGetDataFromIDListA
+/* FIXME/TODO: Only valid for _WIN32_IE >= 400? */
+#define SHGetSpecialFolderPath SHGetSpecialFolderPathA
 #endif
 
 #pragma pack(pop)
