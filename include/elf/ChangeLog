@@ -1,3 +1,7 @@
+2001-06-29  James Cownie <jcownie@etnus.com>
+
+	* dwarf2.h: Add DWARF 2.1 attribues.
+
 2001-06-15  Per Bothner  <per@bothner.com>
 
 	* dwarf2.h:  Partial merge with gcc version.
