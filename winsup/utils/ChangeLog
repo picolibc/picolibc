@@ -1,3 +1,8 @@
+Wed Sep 27 16:24:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* cygkeycheck.cc: New file. Utility to retrieve keycodes.
+	* Makefile.in: Add cygkeycheck to the dependencies.
+
 2000-09-15  Joerg Schaible <joerg.schaible@gmx.de>
 
 	* cygpath.cc: Add new options: -s and -i.
