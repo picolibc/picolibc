@@ -336,7 +336,6 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
   if (off % getpagesize ()
       || (!(flags & MAP_SHARED) && !(flags & MAP_PRIVATE))
       || ((flags & MAP_SHARED) && (flags & MAP_PRIVATE))
-      || ((flags & MAP_SHARED) && (flags & MAP_ANONYMOUS))
       || ((flags & MAP_FIXED) && ((DWORD)addr % granularity))
       || !len)
     {
@@ -409,17 +408,8 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
 	    gran_len = fsiz;
 	}
       else if (fh->get_device () == FH_ZERO)
-        {
-	  /* mmap /dev/zero is like MAP_ANONYMOUS. */
-	  if (flags & MAP_SHARED)
-	    {
-	      set_errno (EINVAL);
-	      syscall_printf ("-1 = mmap(): EINVAL");
-	      ReleaseResourceLock(LOCK_MMAP_LIST,READ_LOCK|WRITE_LOCK," mmap");
-	      return MAP_FAILED;
-	    }
-          fd = -1;
-	}
+	/* mmap /dev/zero is like MAP_ANONYMOUS. */
+        fd = -1;
     }
   if (fd == -1)
     {
