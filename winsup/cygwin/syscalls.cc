@@ -2008,13 +2008,16 @@ seteuid32 (__uid32_t uid)
   user_groups &groups = cygheap->user.groups;
   HANDLE ptok, new_token = INVALID_HANDLE_VALUE;
   struct passwd * pw_new;
-  bool token_is_internal, issamesid;
+  bool token_is_internal, issamesid = false;
   char dacl_buf[MAX_DACL_LEN (5)];
   TOKEN_DEFAULT_DACL tdacl = {};
 
   pw_new = internal_getpwuid (uid);
   if (!wincap.has_security () && pw_new)
+    {
+      load_registry_hive (pw_new->pw_name);
     goto success_9x;
+    }
   if (!usersid.getfrompw (pw_new))
     {
       set_errno (EINVAL);
@@ -2082,7 +2085,8 @@ seteuid32 (__uid32_t uid)
   if (new_token != ptok)
     {
       /* Avoid having HKCU use default user */
-      load_registry_hive (usersid);
+      char name[128];
+      load_registry_hive (usersid.string (name));
 
       /* Try setting owner to same value as user. */
       if (!SetTokenInformation (new_token, TokenOwner,
@@ -2106,16 +2110,17 @@ seteuid32 (__uid32_t uid)
   cygheap->user.set_sid (usersid);
   cygheap->user.current_token = new_token == ptok ? NO_IMPERSONATION
 						  : new_token;
-  if (!issamesid) /* MS KB 199190 */
-    RegCloseKey (HKEY_CURRENT_USER);
   cygheap->user.reimpersonate ();
-  if (!issamesid)
-    user_shared_initialize (true);
 
 success_9x:
   cygheap->user.set_name (pw_new->pw_name);
   myself->uid = uid;
   groups.ischanged = FALSE;
+  if (!issamesid) /* MS KB 199190 */
+    {
+      RegCloseKey (HKEY_CURRENT_USER);
+      user_shared_initialize (true);
+    }
   return 0;
 
 failed:

@@ -206,6 +206,14 @@ public:
 	internal_token = NO_IMPERSONATION;
       }
   }
+  char * get_windows_id (char * buf)
+  {
+    if (wincap.is_winnt ())
+      return effec_cygsid.string (buf);
+    else
+      return strcpy (buf, name ());
+  }
+	  
   const char *cygheap_user::test_uid (char *&, const char *, size_t)
     __attribute__ ((regparm (3)));
 };

@@ -419,11 +419,10 @@ cygheap_user::env_userprofile (const char *name, size_t namelen)
     return puserprof;
 
   char userprofile_env_buf[CYG_MAX_PATH + 1];
+  char win_id[UNLEN + 1]; /* Large enough for SID */
+
   cfree_and_set (puserprof, almost_null);
-  /* FIXME: Should this just be setting a puserprofile like everything else? */
-  const char *myname = winname ();
-  if (myname && strcasematch (myname, "SYSTEM")
-      && get_registry_hive_path (sid (), userprofile_env_buf))
+  if (get_registry_hive_path (get_windows_id (win_id), userprofile_env_buf))
     puserprof = cstrdup (userprofile_env_buf);
 
   return puserprof;

@@ -1,3 +1,17 @@
+2004-11-20  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* cygheap.h (cygheap_user::get_windows_id): New method.
+	* registry.h (get_registry_hive_path): Change argument type.
+	(load_registry_hive): Ditto.
+	* registry.cc (get_registry_hive_path): Change argument type and take
+	Win9x keys into account.
+	(load_registry_hive): Ditto.
+	* uinfo.cc (cygheap_user::env_userprofile): Use get_windows_id, even
+	for SYSTEM.
+	* shared.cc (user_shared_initialize): Use get_windows_id.
+	* syscalls.cc (seteuid32): Load the registry hive and reload the user
+	shared also on Win9x.
+
 2004-11-11  Christopher Faylor  <cgf@timesys.com>
 
 	* include/cygwin/version.h: Bump DLL minor number to 13.

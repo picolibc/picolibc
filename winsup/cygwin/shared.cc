@@ -161,15 +161,7 @@ user_shared_initialize (bool reinit)
     }
 
   if (!cygwin_user_h)
-    {
-      if (wincap.has_security ())
-	{
-	  cygpsid tu (cygheap->user.sid ());
-	  tu.string (name);
-	}
-      else
-	strcpy (name, cygheap->user.name ());
-    }
+    cygheap->user.get_windows_id (name);
 
   user_shared = (user_info *) open_shared (name, USER_VERSION,
 					    cygwin_user_h, sizeof (user_info),

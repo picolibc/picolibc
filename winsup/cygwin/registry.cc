@@ -194,18 +194,16 @@ reg_key::~reg_key ()
 }
 
 char *
-get_registry_hive_path (const PSID psid, char *path)
+get_registry_hive_path (const char *name, char *path)
 {
-  char sid[256];
   char key[256];
   HKEY hkey;
 
-  if (!psid || !path)
+  if (!name || !path)
     return NULL;
-  cygpsid csid (psid);
-  csid.string (sid);
-  strcpy (key,"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\ProfileList\\");
-  strcat (key, sid);
+  __small_sprintf (key, "SOFTWARE\\Microsoft\\Windows%s\\CurrentVersion\\ProfileList\\",
+		   wincap.is_winnt ()?" NT":""); 
+  strcat (key, name);
   if (!RegOpenKeyExA (HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hkey))
     {
       char buf[256];
@@ -224,31 +222,31 @@ get_registry_hive_path (const PSID psid, char *path)
 }
 
 void
-load_registry_hive (PSID psid)
+load_registry_hive (const char * name)
 {
-  char sid[256];
   char path[CYG_MAX_PATH + 1];
   HKEY hkey;
   LONG ret;
 
-  if (!psid)
+  if (!name)
     return;
   /* Check if user hive is already loaded. */
-  cygpsid csid (psid);
-  csid.string (sid);
-  if (!RegOpenKeyExA (HKEY_USERS, sid, 0, KEY_READ, &hkey))
+  if (!RegOpenKeyExA (HKEY_USERS, name, 0, KEY_READ, &hkey))
     {
-      debug_printf ("User registry hive for %s already exists", sid);
+      debug_printf ("User registry hive for %s already exists", name);
       RegCloseKey (hkey);
       return;
     }
   /* This is only called while deimpersonated */
   set_process_privilege (SE_RESTORE_NAME);
-  if (get_registry_hive_path (psid, path))
+  if (get_registry_hive_path (name, path))
     {
-      strcat (path, "\\NTUSER.DAT");
-      if ((ret = RegLoadKeyA (HKEY_USERS, sid, path)) != ERROR_SUCCESS)
-	debug_printf ("Loading user registry hive for %s failed: %d", sid, ret);
+      if (wincap.is_winnt ())
+	strcat (path, "\\NTUSER.DAT");
+      else
+	strcat (path, "\\USER.DAT");	
+      if ((ret = RegLoadKeyA (HKEY_USERS, name, path)) != ERROR_SUCCESS)
+	debug_printf ("Loading user registry hive for %s failed: %d", name, ret);
     }
 }
 
