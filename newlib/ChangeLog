@@ -1,3 +1,8 @@
+Wed May 03 17:57:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * libc/include/sys/errno.h: Add define for ENOSHARE ("No such
+        host or network path") used by cygwin. Add some comments.
+
 Tue May 02 23:45:48 2000  DJ Delorie  <dj@cygnus.com>
 
 	* libc/include/stdio.h (FILE): define __SCLE for "convert line

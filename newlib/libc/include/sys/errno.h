@@ -141,7 +141,8 @@ extern int _sys_nerr __declspec(dllimport);
 #define EDQUOT 132
 #define ESTALE 133
 #define ENOTSUP 134
-#define ENOMEDIUM 135
+#define ENOMEDIUM 135   /* No medium (in tape drive) */
+#define ENOSHARE 136    /* No such host or network path */
 
 /* From cygwin32.  */
 #define EWOULDBLOCK EAGAIN	/* Operation would block */
