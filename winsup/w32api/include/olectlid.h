@@ -68,6 +68,7 @@ extern const GUID IID_IEnumMoniker;
 extern const GUID IID_IEnumFORMATETC;
 extern const GUID IID_IEnumOLEVERB;
 extern const GUID IID_IEnumSTATDATA;
+extern const GUID IID_IEnumSTATSTG;
 extern const GUID IID_IEnumGeneric;
 extern const GUID IID_IEnumHolder;
 extern const GUID IID_IEnumCallback;

@@ -592,7 +592,7 @@ DECLARE_INTERFACE_(IBindCtx,IUnknown)
 	STDMETHOD(RevokeObjectParam)(THIS_ LPOLESTR) PURE;
 };
 
-EXTERN_C const IID IID_IPersistStream;
+EXTERN_C const IID IID_IMoniker;
 #undef INTERFACE
 #define INTERFACE IMoniker
 DECLARE_INTERFACE_(IMoniker,IPersistStream)

@@ -1,3 +1,28 @@
+2002-07-26  Mattia Barbon  <mbarbon@dsi.unive.it>
+
+	* include/exdisp.h: New file.
+	* include/exdispid.h: New file.
+	* include/mshtml.h: New file.
+	* lib/test.c: #include exdisp.h and mshtml.h
+	* lib/uuid.c (CLSID_WebBrowser, DIID_DWebBrowserEvents,
+	DIID_DWebBrowserEvents2, IID_IHTMLDocument, IID_IHTMLDocument2,
+	IID_IHTMLElement, IID_IHTMLSelectionObject, IID_IHTMLTxtRange,
+	IID_IWebBrowser, IID_IWebBrowser2, IID_IWebBrowserApp):
+	New GUIDs.
+
+2002-07-26  Mattia Barbon  <mbarbon@dsi.unive.it>
+
+	* include/docobj.h: New file.
+	* include/idispids.h: New file.
+	* include/objidl.h (IID_IMoniker): Declare.
+	* include/ocidl.h (READYSTATE): New enum.
+	(IOleInPlaceSiteEx): New interface.
+	* include/olectlid.h (IID_IEnumSTATSTG): New interface
+	identifier.
+	* include/oleidl.h (IOleItemContainer, IOleInPlaceObject,
+	IOleInPlaceSite): New interfaces.
+	* lib/test.c: #include docobj.h,idispids.h,
+
 2002-07-25  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/shlobj.h (BFFM_VALIDATEFAILED[AW]): Add defines.

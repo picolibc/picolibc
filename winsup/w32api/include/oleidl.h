@@ -101,6 +101,22 @@ DECLARE_INTERFACE_(IOleContainer,IParseDisplayName)
 	STDMETHOD(LockContainer)(THIS_ BOOL) PURE;
 };
 
+EXTERN_C const IID IID_IOleItemContainer;
+#undef INTERFACE
+#define INTERFACE IOleItemContainer
+DECLARE_INTERFACE_(IOleItemContainer,IOleContainer)
+{
+	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG,Release)(THIS) PURE;
+	STDMETHOD(ParseDisplayName)(THIS_ IBindCtx*,LPOLESTR,ULONG*,IMoniker**) PURE;
+	STDMETHOD(EnumObjects)(THIS_ DWORD,IEnumUnknown**) PURE;
+	STDMETHOD(LockContainer)(THIS_ BOOL) PURE;
+	STDMETHOD(GetObject)(THIS_ LPOLESTR,DWORD,IBindCtx*,REFIID,void**) PURE;
+	STDMETHOD(GetObjectStorage)(THIS_ LPOLESTR,IBindCtx*,REFIID,void**) PURE;
+	STDMETHOD(IsRunning)(THIS_ LPOLESTR) PURE;
+};
+
 EXTERN_C const IID IID_IOleClientSite;
 #undef INTERFACE
 #define INTERFACE IOleClientSite
@@ -176,6 +192,22 @@ DECLARE_INTERFACE_(IOleInPlaceUIWindow,IOleWindow)
 	STDMETHOD(SetActiveObject)(THIS_ LPOLEINPLACEACTIVEOBJECT,LPCOLESTR) PURE;
 };
 
+EXTERN_C const IID IID_IOleInPlaceObject;
+#undef INTERFACE
+#define INTERFACE IOleInPlaceObject
+DECLARE_INTERFACE_(IOleInPlaceObject,IOleWindow)
+{
+	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG,Release)(THIS) PURE;
+	STDMETHOD(GetWindow)(THIS_ HWND*) PURE;
+	STDMETHOD(ContextSensitiveHelp)(THIS_ BOOL) PURE;
+	STDMETHOD(InPlaceDeactivate)(THIS) PURE;
+	STDMETHOD(UIDeactivate)(THIS) PURE;
+	STDMETHOD(SetObjectRects)(THIS_ LPCRECT,LPCRECT) PURE;
+	STDMETHOD(ReactivateAndUndo)(THIS) PURE;
+};
+
 EXTERN_C const IID IID_IOleInPlaceActiveObject;
 #undef INTERFACE
 #define INTERFACE IOleInPlaceActiveObject
@@ -213,6 +245,28 @@ DECLARE_INTERFACE_(IOleInPlaceFrame,IOleInPlaceUIWindow)
 	STDMETHOD(SetStatusText)(THIS_ LPCOLESTR) PURE;
 	STDMETHOD(EnableModeless)(THIS_ BOOL) PURE;
 	STDMETHOD(TranslateAccelerator)(THIS_ LPMSG,WORD) PURE;
+};
+
+EXTERN_C const IID IID_IOleInPlaceSite;
+#undef INTERFACE
+#define INTERFACE IOleInPlaceSite
+DECLARE_INTERFACE_(IOleInPlaceSite,IOleWindow)
+{
+	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
+	STDMETHOD_(ULONG,AddRef)(THIS) PURE;
+	STDMETHOD_(ULONG,Release)(THIS) PURE;
+	STDMETHOD(GetWindow)(THIS_ HWND*) PURE;
+	STDMETHOD(ContextSensitiveHelp)(THIS_ BOOL) PURE;
+	STDMETHOD(CanInPlaceActivate)(THIS) PURE;
+	STDMETHOD(OnInPlaceActivate)(THIS) PURE;
+	STDMETHOD(OnUIActivate)(THIS) PURE;
+	STDMETHOD(GetWindowContext)(THIS_ IOleInPlaceFrame**,IOleInPlaceUIWindow**,LPRECT,LPRECT,LPOLEINPLACEFRAMEINFO) PURE;
+	STDMETHOD(Scroll)(THIS_ SIZE) PURE;
+	STDMETHOD(OnUIDeactivate)(THIS_ BOOL) PURE;
+	STDMETHOD(OnInPlaceDeactivate)(THIS) PURE;
+	STDMETHOD(DiscardUndoState)(THIS) PURE;
+	STDMETHOD(DeactivateAndUndo)(THIS) PURE;
+	STDMETHOD(OnPosRectChange)(THIS_ LPCRECT) PURE;
 };
 
 EXTERN_C const IID IID_IOleAdviseHolder;
