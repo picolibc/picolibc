@@ -1,17 +1,3 @@
-2003-08-20  Nick Clifton  <nickc@redhat.com>
-
-	* bfdlink.h (enum report_method): New enum.  Describes how to
-	report something.
-        (struct bfd_link_info): Delete fields 'no_undefined' and
-	'allow_shlib_undefined'.  Replace with
-	'unresolved_symbols_in_objects' and
-	'unresolved_symbols_in_shared_libs'.
-        
-2003-08-07  Alan Modra  <amodra@bigpond.net.au>
-
-	* bfdlink.h: Remove PARAMS macro.  Replace PTR with void *.
-	* dis-asm.h: Likewise.
-
 2003-07-09  Bob Wilson  <bob.wilson@acm.org>
 
 	* xtensa-config.h: Undef all macros before defining them.

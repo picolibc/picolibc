@@ -59,80 +59,77 @@ extern const int powerpc_num_opcodes;
 /* Values defined for the flags field of a struct powerpc_opcode.  */
 
 /* Opcode is defined for the PowerPC architecture.  */
-#define PPC_OPCODE_PPC			 1
+#define PPC_OPCODE_PPC (01)
 
 /* Opcode is defined for the POWER (RS/6000) architecture.  */
-#define PPC_OPCODE_POWER		 2
+#define PPC_OPCODE_POWER (02)
 
 /* Opcode is defined for the POWER2 (Rios 2) architecture.  */
-#define PPC_OPCODE_POWER2		 4
+#define PPC_OPCODE_POWER2 (04)
 
 /* Opcode is only defined on 32 bit architectures.  */
-#define PPC_OPCODE_32			 8
+#define PPC_OPCODE_32 (010)
 
 /* Opcode is only defined on 64 bit architectures.  */
-#define PPC_OPCODE_64		      0x10
+#define PPC_OPCODE_64 (020)
 
 /* Opcode is supported by the Motorola PowerPC 601 processor.  The 601
    is assumed to support all PowerPC (PPC_OPCODE_PPC) instructions,
    but it also supports many additional POWER instructions.  */
-#define PPC_OPCODE_601		      0x20
+#define PPC_OPCODE_601 (040)
 
 /* Opcode is supported in both the Power and PowerPC architectures
    (ie, compiler's -mcpu=common or assembler's -mcom).  */
-#define PPC_OPCODE_COMMON	      0x40
+#define PPC_OPCODE_COMMON (0100)
 
 /* Opcode is supported for any Power or PowerPC platform (this is
    for the assembler's -many option, and it eliminates duplicates).  */
-#define PPC_OPCODE_ANY		      0x80
+#define PPC_OPCODE_ANY (0200)
 
 /* Opcode is supported as part of the 64-bit bridge.  */
-#define PPC_OPCODE_64_BRIDGE	     0x100
+#define PPC_OPCODE_64_BRIDGE (0400)
 
 /* Opcode is supported by Altivec Vector Unit */
-#define PPC_OPCODE_ALTIVEC	     0x200
+#define PPC_OPCODE_ALTIVEC (01000)
 
 /* Opcode is supported by PowerPC 403 processor.  */
-#define PPC_OPCODE_403		     0x400
+#define PPC_OPCODE_403 (02000)
 
 /* Opcode is supported by PowerPC BookE processor.  */
-#define PPC_OPCODE_BOOKE	     0x800
+#define PPC_OPCODE_BOOKE (04000)
 
 /* Opcode is only supported by 64-bit PowerPC BookE processor.  */
-#define PPC_OPCODE_BOOKE64	    0x1000
-
-/* Opcode is supported by PowerPC 440 processor.  */
-#define PPC_OPCODE_440		    0x2000
+#define PPC_OPCODE_BOOKE64 (010000)
 
 /* Opcode is only supported by Power4 architecture.  */
-#define PPC_OPCODE_POWER4	    0x4000
+#define PPC_OPCODE_POWER4 (020000)
 
 /* Opcode isn't supported by Power4 architecture.  */
-#define PPC_OPCODE_NOPOWER4	    0x8000
+#define PPC_OPCODE_NOPOWER4 (040000)
 
 /* Opcode is only supported by POWERPC Classic architecture.  */
-#define PPC_OPCODE_CLASSIC	   0x10000
+#define PPC_OPCODE_CLASSIC (0100000)
 
 /* Opcode is only supported by e500x2 Core.  */
-#define PPC_OPCODE_SPE		   0x20000
+#define PPC_OPCODE_SPE     (0200000)
 
 /* Opcode is supported by e500x2 Integer select APU.  */
-#define PPC_OPCODE_ISEL		   0x40000
+#define PPC_OPCODE_ISEL     (0400000)
 
 /* Opcode is an e500 SPE floating point instruction.  */
-#define PPC_OPCODE_EFS		   0x80000
+#define PPC_OPCODE_EFS      (01000000)
 
 /* Opcode is supported by branch locking APU.  */
-#define PPC_OPCODE_BRLOCK	  0x100000
+#define PPC_OPCODE_BRLOCK   (02000000)
 
 /* Opcode is supported by performance monitor APU.  */
-#define PPC_OPCODE_PMR		  0x200000
+#define PPC_OPCODE_PMR      (04000000)
 
 /* Opcode is supported by cache locking APU.  */
-#define PPC_OPCODE_CACHELCK	  0x400000
+#define PPC_OPCODE_CACHELCK (010000000)
 
 /* Opcode is supported by machine check APU.  */
-#define PPC_OPCODE_RFMCI	  0x800000
+#define PPC_OPCODE_RFMCI    (020000000)
 
 /* A macro to extract the major opcode from an instruction.  */
 #define PPC_OP(i) (((i) >> 26) & 0x3f)
@@ -163,8 +160,9 @@ struct powerpc_operand
      string (the operand will be inserted in any case).  If the
      operand value is legal, *ERRMSG will be unchanged (most operands
      can accept any value).  */
-  unsigned long (*insert)
-    (unsigned long instruction, long op, int dialect, const char **errmsg);
+  unsigned long (*insert) PARAMS ((unsigned long instruction, long op,
+				   int dialect,
+				   const char **errmsg));
 
   /* Extraction function.  This is used by the disassembler.  To
      extract this operand type from an instruction, check this field.
@@ -183,7 +181,8 @@ struct powerpc_operand
      non-zero if this operand type can not actually be extracted from
      this operand (i.e., the instruction does not match).  If the
      operand is valid, *INVALID will not be changed.  */
-  long (*extract) (unsigned long instruction, int dialect, int *invalid);
+  long (*extract) PARAMS ((unsigned long instruction, int dialect,
+			   int *invalid));
 
   /* One bit syntax flags.  */
   unsigned long flags;
