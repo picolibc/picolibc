@@ -1,4 +1,4 @@
-2001-10-25  Ralf Corsepius <corsepiu@faw.uni-ulm.de>
+2004-10-25  Ralf Corsepius <corsepiu@faw.uni-ulm.de>
 
 	* libc/include/machine/setjmp.h: Add AVR support.
 	* libc/sys/rtems/crt0.S [__AVR__]: Add __stack.
