@@ -282,7 +282,14 @@ normalize_posix_path (const char *src, char *dst)
 	      else if (src[2] && !isslash (src[2]))
 		{
 		  if (src[2] == '.')
-		    return ENOENT;
+		    {
+		      /* Is this a run of dots? That would be an invalid
+		         filename.  A bunch of leading dots would be ok,
+			 though. */
+		      int n = strspn (src, ".");
+		      if (!src[n] || isslash (src[n])) /* just dots... */
+			return ENOENT;
+		    }
 		  break;
 		}
 	      else

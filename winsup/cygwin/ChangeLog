@@ -1,3 +1,8 @@
+2003-10-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (normalize_posix_path): Test runs of more than two
+	dots for being a run of only dots.  Let it pass if not.
+
 2003-10-25  Brian Ford  <ford@vss.fsi.com>
 
 	* fhandler.cc (fhandler_base::ioctl): Handle FIONBIO.
