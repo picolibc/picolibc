@@ -1,3 +1,18 @@
+2002-08-09  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configure.host: Add check for --enable-newlib-io-pos-args
+	and define WANT_IO_POS_ARGS flag if enabled.  Define
+	the flag by default for x86-linux configurations.
+	* configure.in: Add support for --enable-newlib-io-pos-args.
+	* libc/configure.in: Ditto.
+	* configure: Regenerated.
+	* libc/configure: Ditto.
+	* libc/stdio/Makefile.am: Specify -fshort-enums for compiling
+	vfprintf.c and vfiprintf.c.
+	* libc/stdio/Makefile.in: Regenerated.
+	* libc/stdio/vfprintf.c: Add positional argument support that
+	is enabled by compiling with -DWANT_IO_POS_ARGS.
+
 2002-08-07  Richard Sandiford  <rsandifo@redhat.com>
 
 	* libc/include/machine/setjmp.h: For mips, define _JBLEN based

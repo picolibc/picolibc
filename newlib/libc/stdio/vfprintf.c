@@ -111,7 +111,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.
 */
 
-/*-
+/*
  * Copyright (c) 1990 The Regents of the University of California.
  * All rights reserved.
  *
@@ -172,6 +172,11 @@ static char *rcsid = "$Id$";
 #define _NO_LONGLONG
 #if defined WANT_PRINTF_LONG_LONG && defined __GNUC__
 # undef _NO_LONGLONG
+#endif
+
+#define _NO_POS_ARGS 
+#if defined WANT_IO_POS_ARGS
+# undef _NO_POS_ARGS
 #endif
 
 #include <_ansi.h>
@@ -279,6 +284,46 @@ static int exponent _PARAMS((char *, int, int));
 
 #endif /* FLOATING_POINT */
 
+#ifndef _NO_LONG_LONG
+#define quad_t long long
+#define u_quad_t unsigned long long
+#else
+#define quad_t long
+#define u_quad_t unsigned long
+#endif
+
+typedef quad_t * quad_ptr_t;
+typedef void *   void_ptr_t;
+typedef char *   char_ptr_t;
+typedef long *   long_ptr_t;
+typedef int  *   int_ptr_t;
+typedef short *  short_ptr_t;
+
+#ifndef _NO_POS_ARGS
+#define MAX_POS_ARGS 32
+
+union arg_val
+{
+  int val_int;
+  u_int val_u_int;
+  long val_long;
+  u_long val_u_long;
+  float val_float;
+  double val_double;
+  _LONG_DOUBLE val__LONG_DOUBLE;
+  int_ptr_t val_int_ptr_t;
+  short_ptr_t val_short_ptr_t;
+  long_ptr_t val_long_ptr_t;
+  char_ptr_t val_char_ptr_t;
+  quad_ptr_t val_quad_ptr_t;
+  void_ptr_t val_void_ptr_t;
+  quad_t val_quad_t;
+  u_quad_t val_u_quad_t;
+};
+
+static union arg_val *get_arg (int n, char *fmt, va_list *ap, int *numargs, union arg_val *args, 
+			       int *arg_type, char **last_fmt);
+#endif /* !_NO_POS_ARGS */
 
 /*
  * Macros for converting digits to letters and vice versa
@@ -305,6 +350,8 @@ static int exponent _PARAMS((char *, int, int));
 #define	SHORTINT	0x040		/* short integer */
 #define	ZEROPAD		0x080		/* zero (as opposed to blank) pad */
 #define FPT		0x100		/* Floating point number */
+
+int _EXFUN (_VFPRINTF_R, (struct _reent *, FILE *, _CONST char *, va_list));
 
 int 
 _DEFUN (VFPRINTF, (fp, fmt0, ap),
@@ -333,6 +380,17 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	register char *cp;	/* handy char pointer (short term usage) */
 	register struct __siov *iovp;/* for PRINT macro */
 	register int flags;	/* flags as above */
+	char *fmt_anchor;       /* current format spec being processed */
+	int N;                  /* arg number */
+	int arg_index;          /* index into args processed directly */
+#ifndef _NO_POS_ARGS
+	int numargs;            /* number of varargs read */
+	char *saved_fmt;        /* saved fmt pointer */
+	union arg_val args[MAX_POS_ARGS];
+	int arg_type[MAX_POS_ARGS];
+	int is_pos_arg;         /* is current format positional? */
+	int old_is_pos_arg;     /* is current format positional? */
+#endif
 	int ret;		/* return value accumulator */
 	int width;		/* width from format (%8d), or 0 */
 	int prec;		/* precision from format (%.3d), or -1 */
@@ -355,16 +413,9 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	char expstr[7];		/* buffer for exponent string */
 #endif
 
-#ifndef _NO_LONGLONG
-#define	quad_t	  long long
-#define	u_quad_t  unsigned long long
-#endif
 
-#ifndef _NO_LONGLONG
 	u_quad_t _uquad;	/* integer arguments %[diouxX] */
-#else
-	u_long _uquad;
-#endif
+
 	enum { OCT, DEC, HEX } base;/* base for [diouxX] conversion */
 	int dprec;		/* a copy of prec if [diouxX], 0 otherwise */
 	int realsz;		/* field size expanded by dprec */
@@ -418,30 +469,47 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	iovp = iov; \
 }
 
+	/* Macros to support positional arguments */
+#ifndef _NO_POS_ARGS
+#define GET_ARG(n, ap, type) \
+  ( is_pos_arg \
+      ? n < numargs \
+         ? args[n].val_##type \
+         : get_arg (n, fmt_anchor, &ap, &numargs, args, arg_type, &saved_fmt)->val_##type \
+      : arg_index++ < numargs \
+         ? args[n].val_##type \
+         : numargs < MAX_POS_ARGS \
+           ? args[numargs++].val_##type = va_arg(ap, type) \
+           : va_arg(ap, type) \
+  )
+#else
+#define GET_ARG(n, ap, type) (va_arg(ap, type))
+#endif
+    
 	/*
 	 * To extend shorts properly, we need both signed and unsigned
 	 * argument extraction methods.
 	 */
 #ifndef _NO_LONGLONG
 #define	SARG() \
-	(flags&QUADINT ? va_arg(ap, quad_t) : \
-	    flags&LONGINT ? va_arg(ap, long) : \
-	    flags&SHORTINT ? (long)(short)va_arg(ap, int) : \
-	    (long)va_arg(ap, int))
+	(flags&QUADINT ? GET_ARG(N, ap, quad_t) : \
+	    flags&LONGINT ? GET_ARG(N, ap, long) : \
+	    flags&SHORTINT ? (long)(short)GET_ARG(N, ap, int) : \
+	    (long)GET_ARG(N, ap, int))
 #define	UARG() \
-	(flags&QUADINT ? va_arg(ap, u_quad_t) : \
-	    flags&LONGINT ? va_arg(ap, u_long) : \
-	    flags&SHORTINT ? (u_long)(u_short)va_arg(ap, int) : \
-	    (u_long)va_arg(ap, u_int))
+	(flags&QUADINT ? GET_ARG(N, ap, u_quad_t) : \
+	    flags&LONGINT ? GET_ARG(N, ap, u_long) : \
+	    flags&SHORTINT ? (u_long)(u_short)GET_ARG(N, ap, int) : \
+	    (u_long)GET_ARG(N, ap, u_int))
 #else
 #define	SARG() \
-	(flags&LONGINT ? va_arg(ap, long) : \
-	    flags&SHORTINT ? (long)(short)va_arg(ap, int) : \
-	    (long)va_arg(ap, int))
+	(flags&LONGINT ? GET_ARG(N, ap, long) : \
+	    flags&SHORTINT ? (long)(short)GET_ARG(N, ap, int) : \
+	    (long)GET_ARG(N, ap, int))
 #define	UARG() \
-	(flags&LONGINT ? va_arg(ap, u_long) : \
-	    flags&SHORTINT ? (u_long)(u_short)va_arg(ap, int) : \
-	    (u_long)va_arg(ap, u_int))
+	(flags&LONGINT ? GET_ARG(N, ap, u_long) : \
+	    flags&SHORTINT ? (u_long)(u_short)GET_ARG(N, ap, int) : \
+	    (u_long)GET_ARG(N, ap, u_int))
 #endif
 
 	/* sorry, fprintf(read_only_file, "") returns EOF, not 0 */
@@ -458,6 +526,13 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	uio.uio_resid = 0;
 	uio.uio_iovcnt = 0;
 	ret = 0;
+	arg_index = 0;
+#ifndef _NO_POS_ARGS
+	saved_fmt = NULL;
+	arg_type[0] = -1;
+	numargs = 0;
+	is_pos_arg = 0;
+#endif
 
 	/*
 	 * Scan the format for conversions (`%' character).
@@ -477,6 +552,8 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 		}
 		if (n <= 0)
 			goto done;
+
+		fmt_anchor = fmt;
 		fmt++;		/* skip over '%' */
 
 		flags = 0;
@@ -484,6 +561,10 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 		width = 0;
 		prec = -1;
 		sign = '\0';
+		N = arg_index;
+#ifndef _NO_POS_ARGS
+		is_pos_arg = 0;
+#endif
 
 rflag:		ch = *fmt++;
 reswitch:	switch (ch) {
@@ -500,13 +581,47 @@ reswitch:	switch (ch) {
 			flags |= ALT;
 			goto rflag;
 		case '*':
+			n = N;
+#ifndef _NO_POS_ARGS
+			/* we must check for positional arg used for dynamic width */
+			old_is_pos_arg = is_pos_arg;
+			is_pos_arg = 0;
+			if (is_digit(*fmt)) {
+				char *old_fmt = fmt;
+
+				n = 0;
+				ch = *fmt++;
+				do {
+					n = 10 * n + to_digit(ch);
+					ch = *fmt++;
+				} while (is_digit(ch));
+
+				if (ch == '$') {
+					if (n <= MAX_POS_ARGS) {
+						n -= 1;
+						is_pos_arg = 1;
+					}
+					else
+						goto error;
+				}
+				else {
+					fmt = old_fmt;
+					goto rflag;
+				}
+			}
+#endif /* !_NO_POS_ARGS */
+
 			/*
 			 * ``A negative field width argument is taken as a
 			 * - flag followed by a positive field width.''
 			 *	-- ANSI X3J11
 			 * They don't exclude field widths read from args.
 			 */
-			if ((width = va_arg(ap, int)) >= 0)
+			width = GET_ARG(n, ap, int);
+#ifndef _NO_POS_ARGS
+			is_pos_arg = old_is_pos_arg;
+#endif
+			if (width >= 0)
 				goto rflag;
 			width = -width;
 			/* FALLTHROUGH */
@@ -518,8 +633,41 @@ reswitch:	switch (ch) {
 			goto rflag;
 		case '.':
 			if ((ch = *fmt++) == '*') {
-				n = va_arg(ap, int);
-				prec = n < 0 ? -1 : n;
+				n = N;
+#ifndef _NO_POS_ARGS
+				/* we must check for positional arg used for dynamic width */
+				old_is_pos_arg = is_pos_arg;
+				is_pos_arg = 0;
+				if (is_digit(*fmt)) {
+					char *old_fmt = fmt;
+
+					n = 0;
+					ch = *fmt++;
+					do {
+						n = 10 * n + to_digit(ch);
+						ch = *fmt++;
+					} while (is_digit(ch));
+
+					if (ch == '$') {
+						if (n <= MAX_POS_ARGS) {
+							n -= 1;
+							is_pos_arg = 1;
+						}
+						else
+							goto error;
+					}
+					else {
+						fmt = old_fmt;
+						goto rflag;
+					}
+				}
+#endif /* !_NO_POS_ARGS */
+				prec = GET_ARG(n, ap, int);
+#ifndef _NO_POS_ARGS
+				is_pos_arg = old_is_pos_arg;
+#endif
+				if (prec < 0)
+					prec = -1;
 				goto rflag;
 			}
 			n = 0;
@@ -544,6 +692,17 @@ reswitch:	switch (ch) {
 				n = 10 * n + to_digit(ch);
 				ch = *fmt++;
 			} while (is_digit(ch));
+#ifndef _NO_POS_ARGS
+			if (ch == '$') {
+				if (n <= MAX_POS_ARGS) {
+					N = n - 1;
+					is_pos_arg = 1;
+					goto rflag;
+				}
+				else
+					goto error;
+			}
+#endif /* !_NO_POS_ARGS */
 			width = n;
 			goto reswitch;
 #ifdef FLOATING_POINT
@@ -566,7 +725,7 @@ reswitch:	switch (ch) {
 			flags |= QUADINT;
 			goto rflag;
 		case 'c':
-			*(cp = buf) = va_arg(ap, int);
+			*(cp = buf) = GET_ARG(N, ap, int);
 			size = 1;
 			sign = '\0';
 			break;
@@ -602,9 +761,9 @@ reswitch:	switch (ch) {
 
 #ifdef _NO_LONGDBL
 			if (flags & LONGDBL) {
-				_fpvalue = (double) va_arg(ap, _LONG_DOUBLE);
+				_fpvalue = (double) GET_ARG(N, ap, _LONG_DOUBLE);
 			} else {
-				_fpvalue = va_arg(ap, double);
+				_fpvalue = GET_ARG(N, ap, double);
 			}
 
 			/* do this before tricky precision changes */
@@ -624,9 +783,9 @@ reswitch:	switch (ch) {
 #else /* !_NO_LONGDBL */
 			
 			if (flags & LONGDBL) {
-				_fpvalue = va_arg(ap, _LONG_DOUBLE);
+				_fpvalue = GET_ARG(N, ap, _LONG_DOUBLE);
 			} else {
-				_fpvalue = (_LONG_DOUBLE)va_arg(ap, double);
+				_fpvalue = (_LONG_DOUBLE)GET_ARG(N, ap, double);
 			}
 
 			/* do this before tricky precision changes */
@@ -684,15 +843,15 @@ reswitch:	switch (ch) {
 		case 'n':
 #ifndef _NO_LONGLONG
 			if (flags & QUADINT)
-				*va_arg(ap, quad_t *) = ret;
+				*GET_ARG(N, ap, quad_ptr_t *) = ret;
 			else 
 #endif
 			if (flags & LONGINT)
-				*va_arg(ap, long *) = ret;
+				*GET_ARG(N, ap, long_ptr_t) = ret;
 			else if (flags & SHORTINT)
-				*va_arg(ap, short *) = ret;
+				*GET_ARG(N, ap, short_ptr_t) = ret;
 			else
-				*va_arg(ap, int *) = ret;
+				*GET_ARG(N, ap, int_ptr_t) = ret;
 			continue;	/* no output */
 		case 'O':
 			flags |= LONGINT;
@@ -710,14 +869,14 @@ reswitch:	switch (ch) {
 			 *	-- ANSI X3J11
 			 */
 			/* NOSTRICT */
-			_uquad = (u_long)(unsigned _POINTER_INT)va_arg(ap, void *);
+			_uquad = (u_long)(unsigned _POINTER_INT)GET_ARG(N, ap, void_ptr_t);
 			base = HEX;
 			xdigs = "0123456789abcdef";
 			flags |= HEXPREFIX;
 			ch = 'x';
 			goto nosign;
 		case 's':
-			if ((cp = va_arg(ap, char *)) == NULL)
+			if ((cp = GET_ARG(N, ap, char_ptr_t)) == NULL)
 				cp = "(null)";
 			if (prec >= 0) {
 				/*
@@ -1053,3 +1212,384 @@ exponent(p0, exp, fmtch)
 	return (p - p0);
 }
 #endif /* FLOATING_POINT */
+
+
+#ifndef _NO_POS_ARGS
+
+/* Positional argument support.
+   Written by Jeff Johnston
+
+   Copyright (c) 2002 Red Hat Incorporated.
+   All rights reserved.
+
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions are met:
+
+      Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+      Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+      
+      The name of Red Hat Incorporated may not be used to endorse
+      or promote products derived from this software without specific
+      prior written permission.
+
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+   DISCLAIMED.  IN NO EVENT SHALL RED HAT INCORPORATED BE LIABLE FOR ANY
+   DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+   (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+   LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+   ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
+
+typedef enum {
+  ZERO,   /* '0' */
+  DIGIT,  /* '1-9' */
+  DOLLAR, /* '$' */
+  MODFR,  /* spec modifier */
+  SPEC,   /* format specifier */
+  DOT,    /* '.' */
+  STAR,   /* '*' */
+  FLAG,   /* format flag */
+  OTHER,  /* all other chars */ 
+  MAX_CH_CLASS /* place-holder */
+} CH_CLASS;
+
+typedef enum { 
+  START,  /* start */
+  SFLAG,  /* seen a flag */
+  WDIG,   /* seen digits in width area */
+  WIDTH,  /* processed width */
+  SMOD,   /* seen spec modifier */
+  SDOT,   /* seen dot */ 
+  VARW,   /* have variable width specifier */
+  VARP,   /* have variable precision specifier */
+  PREC,   /* processed precision */
+  VWDIG,  /* have digits in variable width specification */
+  VPDIG,  /* have digits in variable precision specification */
+  DONE,   /* done */   
+  MAX_STATE, /* place-holder */ 
+} STATE;
+
+typedef enum {
+  NOOP,  /* do nothing */
+  NUMBER, /* build a number from digits */
+  SKIPNUM, /* skip over digits */
+  GETMOD,  /* get and process format modifier */
+  GETARG,  /* get and process argument */
+  GETPW,   /* get variable precision or width */
+  GETPWB,  /* get variable precision or width and pushback fmt char */
+  GETPOS,  /* get positional parameter value */
+  PWPOS,   /* get positional parameter value for variable width or precision */
+} ACTION;
+
+const static CH_CLASS chclass[256] = {
+  /* 00-07 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
+  /* 08-0f */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
+  /* 10-17 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
+  /* 18-1f */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
+  /* 20-27 */  FLAG,    OTHER,   OTHER,   FLAG,    DOLLAR,  OTHER,   OTHER,   OTHER,
+  /* 28-2f */  OTHER,   OTHER,   STAR,    FLAG,    OTHER,   FLAG,    DOT,     OTHER,
+  /* 30-37 */  ZERO,    DIGIT,   DIGIT,   DIGIT,   DIGIT,   DIGIT,   DIGIT,   DIGIT,
+  /* 38-3f */  DIGIT,   DIGIT,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
+  /* 40-47 */  OTHER,   OTHER,   OTHER,   OTHER,   SPEC,    SPEC,    OTHER,   SPEC, 
+  /* 48-4f */  OTHER,   OTHER,   OTHER,   OTHER,   MODFR,   OTHER,   OTHER,   SPEC, 
+  /* 50-57 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   SPEC,    OTHER,   SPEC, 
+  /* 58-5f */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
+  /* 60-67 */  OTHER,   OTHER,   OTHER,   SPEC,    SPEC,    SPEC,    SPEC,    SPEC, 
+  /* 68-6f */  MODFR,   SPEC,    OTHER,   OTHER,   MODFR,   OTHER,   OTHER,   SPEC, 
+  /* 70-77 */  SPEC,    MODFR,   OTHER,   SPEC,    OTHER,   SPEC,    OTHER,   OTHER,
+  /* 78-7f */  SPEC,    OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
+  /* 80-87 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
+  /* 88-8f */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
+  /* 90-97 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
+  /* 98-9f */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
+  /* a0-a7 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
+  /* a8-af */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
+  /* b0-b7 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
+  /* b8-bf */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
+  /* c0-c7 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
+  /* c8-cf */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
+  /* d0-d7 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
+  /* d8-df */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
+  /* e0-e7 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
+  /* e8-ef */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
+  /* f0-f7 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
+  /* f8-ff */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
+};
+
+const static STATE state_table[MAX_STATE][MAX_CH_CLASS] = {
+  /*             '0'     '1-9'     '$'     MODFR    SPEC    '.'     '*'    FLAG    OTHER */ 
+  /* START */  { SFLAG,   WDIG,    DONE,   SMOD,    DONE,   SDOT,  VARW,   SFLAG,  DONE },
+  /* SFLAG */  { SFLAG,   WDIG,    DONE,   SMOD,    DONE,   SDOT,  VARW,   SFLAG,  DONE },
+  /* WDIG  */  { DONE,    DONE,    WIDTH,  SMOD,    DONE,   SDOT,  DONE,   DONE,   DONE },
+  /* WIDTH */  { DONE,    DONE,    DONE,   SMOD,    DONE,   SDOT,  DONE,   DONE,   DONE },
+  /* SMOD  */  { DONE,    DONE,    DONE,   DONE,    DONE,   DONE,  DONE,   DONE,   DONE },
+  /* SDOT  */  { SDOT,    PREC,    DONE,   SMOD,    DONE,   DONE,  VARP,   DONE,   DONE },
+  /* VARW  */  { DONE,    VWDIG,   DONE,   SMOD,    DONE,   SDOT,  DONE,   DONE,   DONE },
+  /* VARP  */  { DONE,    VPDIG,   DONE,   SMOD,    DONE,   DONE,  DONE,   DONE,   DONE },
+  /* PREC  */  { DONE,    DONE,    DONE,   SMOD,    DONE,   DONE,  DONE,   DONE,   DONE },
+  /* VWDIG */  { DONE,    DONE,    WIDTH,  DONE,    DONE,   DONE,  DONE,   DONE,   DONE },
+  /* VPDIG */  { DONE,    DONE,    PREC,   DONE,    DONE,   DONE,  DONE,   DONE,   DONE },
+};
+
+const static ACTION action_table[MAX_STATE][MAX_CH_CLASS] = {
+  /*             '0'     '1-9'     '$'     MODFR    SPEC    '.'     '*'    FLAG    OTHER */ 
+  /* START */  { NOOP,    NUMBER,  NOOP,   GETMOD,  GETARG, NOOP,  NOOP,   NOOP,   NOOP },
+  /* SFLAG */  { NOOP,    NUMBER,  NOOP,   GETMOD,  GETARG, NOOP,  NOOP,   NOOP,   NOOP },
+  /* WDIG  */  { NOOP,    NOOP,    GETPOS, GETMOD,  GETARG, NOOP,  NOOP,   NOOP,   NOOP },
+  /* WIDTH */  { NOOP,    NOOP,    NOOP,   GETMOD,  GETARG, NOOP,  NOOP,   NOOP,   NOOP },
+  /* SMOD  */  { NOOP,    NOOP,    NOOP,   NOOP,    GETARG, NOOP,  NOOP,   NOOP,   NOOP },
+  /* SDOT  */  { NOOP,    SKIPNUM, NOOP,   GETMOD,  GETARG, NOOP,  NOOP,   NOOP,   NOOP },
+  /* VARW  */  { NOOP,    NUMBER,  NOOP,   GETPW,   GETPWB, GETPW, NOOP,   NOOP,   NOOP },
+  /* VARP  */  { NOOP,    NUMBER,  NOOP,   GETPW,   GETPWB, NOOP,  NOOP,   NOOP,   NOOP },
+  /* PREC  */  { NOOP,    NOOP,    NOOP,   GETMOD,  GETARG, NOOP,  NOOP,   NOOP,   NOOP },
+  /* VWDIG */  { NOOP,    NOOP,    PWPOS,  NOOP,    NOOP,   NOOP,  NOOP,   NOOP,   NOOP },
+  /* VPDIG */  { NOOP,    NOOP,    PWPOS,  NOOP,    NOOP,   NOOP,  NOOP,   NOOP,   NOOP },
+};
+
+/* function to get positional parameter N where n = N - 1 */
+static union arg_val *
+get_arg (int n, char *fmt, va_list *ap, int *numargs_p, union arg_val *args, 
+	int *arg_type, char **last_fmt) 
+{
+  int ch;
+  wchar_t wc;
+  int nbytes, number, flags;
+  int spec_type;
+  int numargs = *numargs_p;
+  CH_CLASS chtype;
+  STATE state, next_state;
+  ACTION action;
+  int pos, last_arg;
+  int wc_state = 0;
+  int max_pos_arg = n;
+  enum types { INT, LONG_INT, SHORT_INT, QUAD_INT, CHAR, CHAR_PTR, DOUBLE, LONG_DOUBLE };
+  
+  /* if this isn't the first call, pick up where we left off last time */
+  if (*last_fmt != NULL)
+    fmt = *last_fmt;
+
+  /* we need to process either to end of fmt string or until we have actually
+     read the desired parameter from the vararg list. */
+  while (*fmt && n >= numargs)
+    {
+      while ((nbytes = _mbtowc_r(_REENT, &wc, fmt, MB_CUR_MAX, &wc_state)) > 0) 
+	{
+	  fmt += nbytes;
+	  if (wc == '%') 
+	    break;
+	}
+      
+      if (nbytes <= 0)
+	break;
+
+      state = START;
+      flags = 0;
+      pos = -1;
+      number = 0;
+      spec_type = INT;
+
+      /* Use state/action table to process format specifiers.  We ignore invalid
+         formats and we are only interested in information that tells us how to
+         read the vararg list. */
+      while (state != DONE)
+	{
+	  ch = *fmt++;
+	  chtype = chclass[ch];
+	  next_state = state_table[state][chtype];
+	  action = action_table[state][chtype];
+	  state = next_state;
+	  
+	  switch (action)
+	    {
+	    case GETMOD:  /* we have format modifier */
+	      switch (ch)
+		{
+		case 'h':
+		  flags |= SHORTINT;
+		  break;
+		case 'L':
+		  flags |= LONGDBL;
+		  break;
+		case 'q':
+		  flags |= QUADINT;
+		  break;
+		case 'l':
+		default:
+		  if (*fmt == 'l')
+		    {
+		      flags |= QUADINT;
+		      ++fmt;
+		    }
+		  else
+		    flags |= LONGINT;
+		  break;
+		}
+	      break;
+	    case GETARG: /* we have format specifier */
+	      {
+		numargs &= (MAX_POS_ARGS - 1);
+		/* process the specifier and translate it to a type to fetch from varargs */
+		switch (ch)
+		  {
+		  case 'd':
+		  case 'i':
+		  case 'o':
+		  case 'x':
+		  case 'X':
+		  case 'u':
+		    if (flags & LONGINT)
+		      spec_type = LONG_INT;
+		    else if (flags & SHORTINT)
+		      spec_type = SHORT_INT;
+#ifndef _NO_LONG_LONG
+		    else if (flags & QUADINT)
+		      spec_type = QUAD_INT;
+#endif
+		    else
+		      spec_type = INT;
+		    break;
+		  case 'D':
+		  case 'U':
+		  case 'O':
+		    spec_type = LONG_INT;
+		    break;
+		  case 'f':
+		  case 'g':
+		  case 'G':
+		  case 'E':
+		  case 'e':
+#ifndef _NO_LONGDBL
+		    if (flags & LONGDBL)
+		      spec_type = LONG_DOUBLE;
+		    else
+#endif
+		      spec_type = DOUBLE;
+		    break;
+		  case 's':
+		  case 'p':
+		    spec_type = CHAR_PTR;
+		    break;
+		  case 'c':
+		    spec_type = CHAR;
+		    break;
+		  }
+
+		/* if we have a positional parameter, just store the type, otherwise
+		   fetch the parameter from the vararg list */
+		if (pos != -1)
+		  arg_type[pos] = spec_type;
+		else
+		  {
+		    switch (spec_type)
+		      {
+		      case LONG_INT:
+			args[numargs++].val_long = va_arg(*ap, long);
+			break;
+		      case QUAD_INT:
+			args[numargs++].val_quad_t = va_arg(*ap, quad_t);
+			break;
+		      case CHAR:
+		      case SHORT_INT:
+		      case INT:
+			args[numargs++].val_int = va_arg(*ap, int);
+			break;
+		      case CHAR_PTR:
+			args[numargs++].val_char_ptr_t = va_arg(*ap, char *);
+			break;
+		      case DOUBLE:
+			args[numargs++].val_double = va_arg(*ap, double);
+			break;
+		      case LONG_DOUBLE:
+			args[numargs++].val__LONG_DOUBLE = va_arg(*ap, _LONG_DOUBLE);
+			break;
+		      }
+		  }
+	      }
+	      break;
+	    case GETPOS: /* we have positional specifier */
+	      if (arg_type[0] == -1)
+		memset (arg_type, 0, sizeof(int) * MAX_POS_ARGS);
+	      pos = number - 1;
+	      max_pos_arg = (max_pos_arg > pos ? max_pos_arg : pos);
+	      break;
+	    case PWPOS:  /* we have positional specifier for width or precision */
+	      if (arg_type[0] == -1)
+		memset (arg_type, 0, sizeof(int) * MAX_POS_ARGS);
+	      number -= 1;
+	      arg_type[number] = INT;
+	      max_pos_arg = (max_pos_arg > number ? max_pos_arg : number);
+	      break;
+	    case GETPWB: /* we require format pushback */
+	      --fmt;
+	      /* fallthrough */
+	    case GETPW:  /* we have a variable precision or width to acquire */
+	      args[numargs++].val_int = va_arg(*ap, int);
+	      break;
+	    case NUMBER: /* we have a number to process */
+	      number = (ch - '0');
+	      while ((ch = *fmt) != '\0' && is_digit(ch))
+		{
+		  number = number * 10 + (ch - '0');
+		  ++fmt;
+		}
+	      break;
+	    case SKIPNUM: /* we have a number to skip */
+	      while ((ch = *fmt) != '\0' && is_digit(ch))
+		++fmt;
+	      break;
+	    case NOOP:
+	    default:
+	      break; /* do nothing */
+	    }
+	}
+    }
+
+  /* process all arguments up to at least the one we are looking for and if we
+     have seen the end of the string, then process up to the max argument needed */
+  if (*fmt == '\0')
+    last_arg = max_pos_arg;
+  else
+    last_arg = n;
+
+  while (numargs <= last_arg)
+    {
+      switch (arg_type[numargs])
+	{
+	case LONG_INT:
+	  args[numargs++].val_long = va_arg(*ap, long);
+	  break;
+	case QUAD_INT:
+	  args[numargs++].val_quad_t = va_arg(*ap, quad_t);
+	  break;
+	case CHAR_PTR:
+	  args[numargs++].val_char_ptr_t = va_arg(*ap, char *);
+	  break;
+	case DOUBLE:
+	  args[numargs++].val_double = va_arg(*ap, double);
+	  break;
+	case LONG_DOUBLE:
+	  args[numargs++].val__LONG_DOUBLE = va_arg(*ap, _LONG_DOUBLE);
+	  break;
+	case INT:
+	case SHORT_INT:
+	case CHAR:
+	default:
+	  args[numargs++].val_int = va_arg(*ap, int);
+	  break;
+	}
+    }
+
+  /* alter the global numargs value and keep a reference to the last bit of the fmt
+     string we processed here because the caller will continue processing where we started */
+  *numargs_p = numargs;
+  *last_fmt = fmt;
+  return &args[n];
+}
+#endif /* !_NO_POS_ARGS */

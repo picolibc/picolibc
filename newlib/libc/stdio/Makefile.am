@@ -106,10 +106,10 @@ include $(srcdir)/../../Makefile.shared
 # libtool moves vfprintf.o and subsequently can't find it.
 
 vfprintf.$(oext): vfprintf.c
-	$(LIB_COMPILE) -c $(srcdir)/vfprintf.c
+	$(LIB_COMPILE) -fshort-enums -c $(srcdir)/vfprintf.c
 
 vfiprintf.$(oext): vfprintf.c
-	$(LIB_COMPILE) -DINTEGER_ONLY -c $(srcdir)/vfprintf.c -o $@
+	$(LIB_COMPILE) -fshort-enums -DINTEGER_ONLY -c $(srcdir)/vfprintf.c -o $@
 
 CHEWOUT_FILES = \
 	clearerr.def		\

@@ -239,6 +239,12 @@ if [ "${newlib_io_float}" = "no" ] ; then
 	newlib_cflags="${newlib_cflags} -DNO_FLOATING_POINT"
 fi
 
+# Enable printf positional argument support if requested.
+
+if [ "${newlib_io_pos_args}" = "yes" ] ; then
+        newlib_cflags="${newlib_cflags} -DWANT_IO_POS_ARGS"
+fi
+
 # Verify if shared newlib support is allowed and set appropriate variables
 # We don't want to use libtool for platforms that we are not going to
 # support shared libraries.  This is because it adds executable tests which
@@ -324,6 +330,7 @@ case "${host}" in
 	newlib_cflags="${newlib_cflags} -Wall"
 	newlib_cflags="${newlib_cflags} -D_I386MACH_ALLOW_HW_INTERRUPTS"
 	newlib_cflags="${newlib_cflags} -D_LOOSE_KERNEL_NAMES -DHAVE_FCNTL"
+	newlib_cflags="${newlib_cflags} -DWANT_IO_POS_ARGS"
 	# --- Required when building a shared library ------------------------
 	newlib_cflags="${newlib_cflags} -fPIC -D_I386MACH_NEED_SOTYPE_FUNCTION"
 	# --- The three lines below are optional ------------------------------

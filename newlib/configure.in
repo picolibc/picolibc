@@ -7,6 +7,18 @@ AC_INIT(libc)
 dnl Can't be done in NEWLIB_CONFIGURE because that confuses automake. 
 AC_CONFIG_AUX_DIR(..)
 
+dnl Support --enable-newlib-io-pos-args
+dnl This option is actually read in libc/configure.in.  It is repeated
+dnl here so that it shows up in the help text.
+AC_ARG_ENABLE(newlib-io-pos-args,
+[  --enable-newlib-io-pos-args enable printf-family positional arg support],
+[case "${enableval}" in
+  yes) newlib_io_pos_args=yes ;;
+  no)  newlib_io_pos_args=no ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-io-pos-args option) ;;
+ esac], [newlib_io_pos_args=no])dnl
+
+
 NEWLIB_CONFIGURE(.)
 
 dnl We have to enable libtool after NEWLIB_CONFIGURE because if we try and
