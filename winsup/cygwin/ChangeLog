@@ -1,5 +1,10 @@
 2002-11-06  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler_console.cc (keytable[]): Revert previous change.  It would
+	break too many things.
+
+2002-11-06  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler_console.cc (keytable[]): Redefine F1 - F5 to something a
 	little more sensical.
 
