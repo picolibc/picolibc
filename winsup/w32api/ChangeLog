@@ -1,5 +1,10 @@
 2004-12-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* lib/comctl32.def (ImageList_Copy, ImageList_DrawIndirect,
+	ImageList_Duplicate): Add stubs.
+
+2004-12-02  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* lib/directx/strmiids.c (MEDIASUBTYPE_YV12): Correct GUID.
 	Thanks to "Pete" <pross@xvid.org>
 

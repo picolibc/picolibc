@@ -59,6 +59,7 @@ ImageList_Add@12
 ImageList_AddIcon@8
 ImageList_AddMasked@12
 ImageList_BeginDrag@16
+ImageList_Copy@20
 ImageList_Create@20
 ImageList_Destroy@4
 ImageList_DragEnter@12
@@ -67,6 +68,8 @@ ImageList_DragMove@8
 ImageList_DragShowNolock@4
 ImageList_Draw@24
 ImageList_DrawEx@40
+ImageList_DrawIndirect@4
+ImageList_Duplicate@4
 ImageList_EndDrag@0
 ImageList_GetBkColor@4
 ImageList_GetDragImage@8
