@@ -1,3 +1,8 @@
+2000-10-20  Jakub Jelinek  <jakub@redhat.com>
+
+	* sparc.h (enum sparc_opcode_arch_val): Add SPARC_OPCODE_ARCH_V9B.
+	Note that '3' is used for siam operand.
+
 2000-09-22  Jim Wilson  <wilson@cygnus.com>
 
 	* ia64.h (enum ia64_dependency_semantics): Add IA64_DVS_STOP.
