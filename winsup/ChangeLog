@@ -1,6 +1,6 @@
 Mon Oct 23 00:50:02 2000  Christopher Faylor <cgf@cygnus.com>
 
-	* Makefile.common (LIBGCC): Acommodate older gcc's that don't need 
+	* Makefile.common (LIBGCC): Acommodate older gcc's that don't need
 	libstdc++.a.
 
 Sat Oct 21 18:01:22 2000  Christopher Faylor <cgf@cygnus.com>
