@@ -249,7 +249,7 @@ proc_subproc (DWORD what, DWORD val)
     case PROC_DETACHED_CHILD:
       if (vchild != myself)
 	{
-	  vchild->ppid = myself->pid;
+	  vchild->ppid = what == PROC_DETACHED_CHILD ? 1 : myself->pid;
 	  vchild->uid = myself->uid;
 	  vchild->gid = myself->gid;
 	  vchild->pgid = myself->pgid;

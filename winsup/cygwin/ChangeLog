@@ -1,3 +1,9 @@
+2004-12-27  Christopher Faylor  <cgf@timesys.com>
+
+	* pinfo.cc (_pinfo::exit): Beef up debugging output.
+	* sigproc.cc (proc_subproc): Detached children apparently need a ppid
+	of 1.
+
 2004-12-26  Christopher Faylor  <cgf@timesys.com>
 
 	* init.cc (dll_entry): Previous code reversion was ill-advised.  Revert

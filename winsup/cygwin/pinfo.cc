@@ -121,15 +121,15 @@ _pinfo::exit (UINT n, bool norecord)
       if (!norecord)
 	{
 	  process_state = PID_EXITED;
-	  /* We could just let this happen automatically when the process
-	     exits but this should gain us a microsecond or so by notifying
-	     the parent early.  */
+	  /* Ensure that the parent knows that this logical process has
+	     terminated. */
 	  myself->alert_parent (0);
 	    
 	}
     }
 
-  sigproc_printf ("Calling ExitProcess %d", n);
+  sigproc_printf ("Calling ExitProcess norecord %d, n %d, exitcode %d",
+		  norecord, n, exitcode);
   _my_tls.stacklock = 0;
   _my_tls.stackptr = _my_tls.stack;
   ExitProcess (exitcode);
