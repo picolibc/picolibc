@@ -1,3 +1,7 @@
+2002-11-20  Steven O'Brien  <steven.obrien2@ntlworld.com>
+
+	* poll.cc (poll): ...but set POLLIN instead.
+
 2002-11-20  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* security.cc (get_attribute_from_acl): Always test "anti",

@@ -111,9 +111,11 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
 				 Unfortunately, recvfrom() doesn't make much
 				 sense then.  It returns WSAENOTCONN in that
 				 case.  Since that's not actually an error,
-				 we must not set POLLERR. */
+				 we must not set POLLERR but POLLIN. */
 			      if (WSAGetLastError () != WSAENOTCONN)
 				fds[i].revents |= POLLERR;
+			      else
+				fds[i].revents |= POLLIN;
 			      break;
 			    case 0:  /* Closed on the read side. */
 			      fds[i].revents |= POLLHUP;
