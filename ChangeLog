@@ -1,3 +1,9 @@
+2002-12-12  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * COPYING.NEWLIB: Update list of alternate Regent of California
+        licenses and discuss official revoking of advertising clause.
+        * COPYING.LIBGLOSS: Ditto.
+
 2002-12-12  Alexandre Oliva  <aoliva@redhat.com>
 
 	* Makefile.tpl (configure-target-rda): Depend on $(ALL_GCC_C).
