@@ -256,15 +256,15 @@ get_lsa_srv_inf (LSA_HANDLE lsa, char *logonserver, char *domain)
 #endif
 
 BOOL
-get_logon_server (const char * domain, char * server, WCHAR *wserver)
+get_logon_server (const char *domain, char *server, WCHAR *wserver)
 {
   WCHAR wdomain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
   NET_API_STATUS ret;
   WCHAR * buf;
   DWORD size = INTERNET_MAX_HOST_NAME_LENGTH + 1;
 
-  if ((GetComputerNameA(server + 2, &size)) &&
-      !strcasecmp(domain, server + 2))
+  if ((GetComputerName (server + 2, &size)) &&
+      strcasematch (domain, server + 2))
     {
       server[0] = server[1] = '\\';
       if (wserver)
@@ -274,7 +274,7 @@ get_logon_server (const char * domain, char * server, WCHAR *wserver)
 
   /* Try to get the primary domain controller for the domain */
   sys_mbstowcs (wdomain, domain, INTERNET_MAX_HOST_NAME_LENGTH + 1);
-  if ((ret = NetGetDCName(NULL, wdomain, (LPBYTE *) &buf)) == STATUS_SUCCESS)
+  if ((ret = NetGetDCName (NULL, wdomain, (LPBYTE *) &buf)) == STATUS_SUCCESS)
     {
       sys_wcstombs (server, buf, INTERNET_MAX_HOST_NAME_LENGTH + 1);
       if (wserver)
@@ -511,7 +511,7 @@ get_group_sidlist (cygsidlist &grp_list,
     }
   else
     {
-      if (!get_logon_server( domain, server, wserver))
+      if (!get_logon_server (domain, server, wserver))
         return FALSE;
       if (my_grps)
 	{
