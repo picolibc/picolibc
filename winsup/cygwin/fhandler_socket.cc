@@ -202,11 +202,22 @@ fhandler_socket::fixup_after_fork (HANDLE parent)
     }
   else
     {
+#if 0
       fhandler_base::fixup_after_fork (parent);
+#endif
       debug_printf ("Without Winsock 2.0");
     }
   if (secret_event)
     fork_fixup (parent, secret_event, "secret_event");
+}
+
+void
+fhandler_socket::fixup_after_exec (HANDLE parent)
+{
+  if (!get_close_on_exec ())
+    fixup_after_fork (parent);
+  else
+    closesocket (get_socket ());
 }
 
 int
@@ -447,9 +458,11 @@ fhandler_socket::fcntl (int cmd, void *arg)
 void
 fhandler_socket::set_close_on_exec (int val)
 {
+#if 0
   extern WSADATA wsadata;
   if (wsadata.wVersion < 512) /* < Winsock 2.0 */
     set_inheritance (get_handle (), val);
+#endif
   set_close_on_exec_flag (val);
   debug_printf ("set close_on_exec for %s to %d", get_name (), val);
 }

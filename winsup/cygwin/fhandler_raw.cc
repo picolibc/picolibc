@@ -468,6 +468,14 @@ fhandler_dev_raw::dup (fhandler_base *child)
 void
 fhandler_dev_raw::fixup_after_fork (HANDLE)
 {
+  devbufstart = 0;
+  devbufend = 0;
+  lastblk_to_read = 0;
+}
+
+void
+fhandler_dev_raw::fixup_after_exec (HANDLE)
+{
   if (devbufsiz > 1L)
     devbuf = new char [devbufsiz];
   devbufstart = 0;

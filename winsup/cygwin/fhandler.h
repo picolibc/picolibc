@@ -418,7 +418,7 @@ public:
   void set_close_on_exec (int val);
   virtual void fixup_before_fork_exec (DWORD);
   void fixup_after_fork (HANDLE);
-  void fixup_after_exec (HANDLE parent) { fixup_after_fork (parent); }
+  void fixup_after_exec (HANDLE);
 
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
@@ -490,7 +490,7 @@ public:
   int ioctl (unsigned int cmd, void *buf);
 
   void fixup_after_fork (HANDLE);
-  void fixup_after_exec (HANDLE parent) { fixup_after_fork (parent); }
+  void fixup_after_exec (HANDLE);
 };
 
 class fhandler_dev_floppy: public fhandler_dev_raw

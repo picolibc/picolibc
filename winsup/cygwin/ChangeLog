@@ -1,3 +1,17 @@
+Thu Sep 20 13:20:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_socket::fixup_after_exec): Remove inline
+	implementation.
+	(fhandler_dev_raw::fixup_after_exec): Ditto.
+	* fhandler_raw.cc (fhandler_dev_raw::fixup_after_fork): Don't
+	duplicate buffer on fork to avoid memory leak.
+	(fhandler_dev_raw::fixup_after_exec): New implementation equal to
+	former fixup_after_fork() implementation.
+	* fhandler_socket.cc (fhandler_socket::fixup_after_fork): Do
+	nothing when not using Winsock2.
+	(fhandler_socket::fixup_after_exec): New implementation.
+	(fhandler_socket::set_close_on_exec): Never call set_inheritance().
+
 Thu Sep 20  9:55:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::set_inheritance): If available,
