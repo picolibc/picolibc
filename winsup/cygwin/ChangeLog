@@ -34,7 +34,6 @@ Mon Mar 26 18:48:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 Sun Mar 25 20:12:21 2001  Christopher Faylor <cgf@cygnus.com>
 
-
 	* dlfcn.cc (check_access): Eliminate.
 	(check_path_access): Use passed in path_conv buf.
 	(get_full_path_of_dll): Use passed in name buf to avoid a static.  Rip
