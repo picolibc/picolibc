@@ -1,3 +1,7 @@
+Wed Sep 19 12:24:09 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* lib/getopt.c (__progname): Don't declare if not compiling for cygwin.
+
 Wed Sep 19 18:07:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* lib/getopt.c (getopt_long): Avoid compiler warning.
