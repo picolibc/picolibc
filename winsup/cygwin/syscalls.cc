@@ -2101,7 +2101,7 @@ seteuid32 (__uid32_t uid)
  failed:
   if (uid == myself->uid)
     {
-      system_printf ("special case, returning 0");
+      syscall_printf ("special case, returning 0");
       return 0;
     }
   cygheap->user.token = sav_token;
