@@ -1,3 +1,20 @@
+Wed Feb 23 21:34:58 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (interruptible): Change method for determining if
+	something is interruptible.
+	(call_handler): Avoid suspending a thread if it owns a mutex.  Only set
+	signal_arrived if the thread was actually interrupted.
+	(events_init): Initialize module information needed by interruptible().
+	(sigdelayed): Don't call sig_dispatch_pending since it could screw up
+	* init.cc (dll_entry): Record module handle of main for use by
+	interruptible().
+	(proc_subproc): Reorganize handling of terminated child so that the
+	bulk of the processing comes from the signal thread.
+	(wait_sig): Force processing of waiting threads if SIGCHLD is not
+	processed.
+	* sync.cc (muto::release): Set tid == 0 after lock is released or
+	signal processor will be confused.
+
 Tue Feb 22 23:06:01 2000  Christopher Faylor <cgf@cygnus.com>
 
 	Respond to more g++ warnings relating to initializing structures.

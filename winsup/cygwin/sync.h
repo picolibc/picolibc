@@ -1,6 +1,6 @@
 /* sync.h: Header file for cygwin synchronization primitives.
 
-   Copyright 1999 Cygnus Solutions.
+   Copyright 1999, 2000 Cygnus Solutions.
 
    Written by Christopher Faylor <cgf@cygnus.com>
 
@@ -36,6 +36,7 @@ public:
 
   /* Return true if caller thread owns the lock. */
   int ismine () {return tid == GetCurrentThreadId ();}
+  DWORD owner () {return tid;}
 };
 
 /* Use a statically allocated buffer as the storage for a muto */

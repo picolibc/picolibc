@@ -4,7 +4,7 @@
    which is intended to operate similarly to a mutex but attempts to
    avoid making expensive calls to the kernel.
 
-   Copyright 1999 Cygnus Solutions.
+   Copyright 2000 Cygnus Solutions.
 
    Written by Christopher Faylor <cgf@cygnus.com>
 
@@ -43,7 +43,11 @@ muto::~muto ()
 
 /* Acquire the lock.  Argument is the number of milliseconds to wait for
    the lock.  Multiple visits from the same thread are allowed and should
-   be handled correctly.  */
+   be handled correctly.
+
+   Note: The goal here is to minimize, as much as possible, calls to the
+   OS.  Hence the use of InterlockedIncrement, etc., rather than (much) more
+   expensive OS mutexes.  */
 int
 muto::acquire (DWORD ms)
 {
@@ -59,7 +63,7 @@ muto::acquire (DWORD ms)
 	 lock the same muto to succeed without attempting to manipulate sync.
 	 If the muto is already locked then this thread will wait for ms until
 	 it is signalled by muto::release.  Then it will attempt to grab the
-	 sync field.  If it succeeds, then this thread owns the mutex.
+	 sync field.  If it succeeds, then this thread owns the muto.
 
 	 There is a pathological condition where a thread times out waiting for
 	 bruteforce but the release code triggers the bruteforce event.  In this
@@ -99,11 +103,11 @@ muto::release ()
   /* FIXME: Need to check that other thread has not exited, too. */
   if (!--visits)
     {
-      tid = 0;		/* We were the last unlocker. */
       InterlockedExchange (&sync, 0); /* Reset trigger. */
       /* This thread had incremented waiters but had never decremented it.
 	 Decrement it now.  If it is >= 0 then there are possibly other
 	 threads waiting for the lock, so trigger bruteforce. */
+      tid = 0;		/* We were the last unlocker. */
       if (InterlockedDecrement (&waiters) >= 0)
 	(void) SetEvent (bruteforce); /* Wake up one of the waiting threads */
     }

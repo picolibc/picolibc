@@ -1,6 +1,6 @@
-/* pipe.cc: pipe for WIN32.
+/* pipe.cc: pipe for Cygwin.
 
-   Copyright 1996, 1998, 1999 Cygnus Solutions.
+   Copyright 1996, 1998, 1999, 2000 Cygnus Solutions.
 
 This file is part of Cygwin.
 

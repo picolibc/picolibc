@@ -1,6 +1,6 @@
 /* autoload.h: Define functions for auto-loading symbols from a DLL.
 
-   Copyright 1999 Cygnus Solutions.
+   Copyright 1999, 2000 Cygnus Solutions.
 
    Written by Christopher Faylor <cgf@cygnus.com>
 

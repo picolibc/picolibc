@@ -1,6 +1,6 @@
 /* init.cc for WIN32.
 
-   Copyright 1996, 1997, 1998, 1999 Cygnus Solutions.
+   Copyright 1996, 1997, 1998, 1999, 2000 Cygnus Solutions.
 
 This file is part of Cygwin.
 
@@ -12,26 +12,17 @@ details. */
 #include <ctype.h>
 #include "winsup.h"
 
-extern "C"
-{
-  int WINAPI dll_entry (HANDLE h, DWORD reason, void *ptr);
-};
-
-extern "C" void *export_malloc (unsigned int);
-extern "C" void *export_realloc (void *,unsigned int);
-extern "C" void *export_calloc (unsigned int,unsigned int);
-extern "C" void export_free (void *);
-
-extern void do_global_ctors (void (**in_pfunc)(), int force);
+extern HMODULE cygwin_hmodule;
 
 int NO_COPY dynamically_loaded;
 
-int
-WINAPI dll_entry (HANDLE, DWORD reason, void *static_load)
+extern "C" int
+WINAPI dll_entry (HANDLE h, DWORD reason, void *static_load)
 {
   switch (reason)
     {
     case DLL_PROCESS_ATTACH:
+      cygwin_hmodule = (HMODULE) h;
       dynamically_loaded = (static_load == NULL);
       break;
     case DLL_THREAD_ATTACH:

@@ -31,12 +31,15 @@ extern DWORD __sigfirst, __siglast;
 
 static BOOL WINAPI ctrl_c_handler (DWORD);
 static void really_exit (int);
+static char windows_system_directory[1024];
+static size_t windows_system_directory_length;
 
 /* This is set to indicate that we have already exited.  */
 
 static NO_COPY int exit_already = 0;
 static NO_COPY muto *mask_sync = NULL;
 
+HMODULE cygwin_hmodule;
 HANDLE NO_COPY console_handler_thread_waiter = NULL;
 
 static const struct
@@ -611,12 +614,31 @@ handle_sigsuspend (sigset_t tempmask)
 extern DWORD exec_exit;		// Possible exit value for exec
 extern int pending_signals;
 
-extern __inline int
+int
 interruptible (DWORD pc)
 {
+#if 0
   DWORD pchigh = pc & 0xf0000000;
   return ((pc >= (DWORD) &__sigfirst) && (pc <= (DWORD) &__siglast)) ||
 	 !(pchigh == 0xb0000000 || pchigh == 0x70000000 || pchigh == 0x60000000);
+#else
+  if ((pc >= (DWORD) &__sigfirst) && (pc <= (DWORD) &__siglast))
+    return 1;
+
+  MEMORY_BASIC_INFORMATION m;
+  memset (&m, 0, sizeof m);
+  if (!VirtualQuery ((LPCVOID) pc, &m, sizeof m))
+    sigproc_printf ("couldn't get memory info, %E");
+
+# define h ((HMODULE) m.AllocationBase)
+  if (h == cygwin_hmodule)
+    return 0;
+  char *checkdir = (char *) alloca (windows_system_directory_length);
+  if (!GetModuleFileName (h, checkdir, windows_system_directory_length))
+    return 0;
+  return !strncasematch (windows_system_directory, checkdir, windows_system_directory_length);
+# undef h
+#endif
 }
 
 void
@@ -689,7 +711,9 @@ static int
 call_handler (int sig, struct sigaction& siga, void *handler)
 {
   CONTEXT *cx, orig;
+  int interrupted = 1;
   int res;
+  extern muto *sync_proc_subproc;
 
   if (hExeced != NULL && hExeced != INVALID_HANDLE_VALUE)
     {
@@ -706,7 +730,24 @@ call_handler (int sig, struct sigaction& siga, void *handler)
 
   sigproc_printf ("Suspending %p (mainthread)", myself->getthread2signal());
   HANDLE hth = myself->getthread2signal ();
-  res = SuspendThread (hth);
+  /* Suspend the thread which will receive the signal.  But first ensure that
+     this thread doesn't have the sync_proc_subproc and mask_sync mutos, since
+     we need those (hack alert).  If the thread-to-be-suspended has either of
+     these mutos, enter a busy loop until it is released.  If the thread is
+     already suspended (which should never occur) then just queue the signal. */
+  for (;;)
+    {
+      res = SuspendThread (hth);
+      /* FIXME: Make multi-thread aware */
+      if (sync_proc_subproc->owner () != maintid && mask_sync->owner () != maintid)
+	break;
+
+      if (res)
+	goto set_pending;
+      ResumeThread (hth);
+      Sleep (0);
+    }
+      
   sigproc_printf ("suspend said %d, %E", res);
 
   /* Clear any waiting threads prior to dispatching to handler function */
@@ -734,17 +775,20 @@ call_handler (int sig, struct sigaction& siga, void *handler)
     interrupt_now (cx, sig, siga, handler);
   else if (!interrupt_on_return (cx, sig, siga, handler))
     {
+    set_pending:
       pending_signals = 1;	/* FIXME: Probably need to be more tricky here */
       sig_set_pending (sig);
+      interrupted = 0;
     }
 
   (void) ResumeThread (hth);
-  (void) SetEvent (signal_arrived);	// For an EINTR case
+  if (interrupted)
+    (void) SetEvent (signal_arrived);	// For an EINTR case
   sigproc_printf ("armed signal_arrived %p, res %d", signal_arrived, res);
 
 out:
   sigproc_printf ("returning");
-  return 1;
+  return interrupted;
 }
 #endif /* i386 */
 
@@ -983,6 +1027,17 @@ events_init (void)
 
   ProtectHandle (title_mutex);
   mask_sync = new_muto (FALSE, NULL);
+  windows_system_directory[0] = '\0';
+  (void) GetSystemDirectory (windows_system_directory, sizeof (windows_system_directory) - 2);
+  char *end = strchr (windows_system_directory, '\0');
+  if (end == windows_system_directory)
+    api_fatal ("can't find windows system directory");
+  if (end[-1] != '\\')
+    {
+      *end++ = '\\';
+      *end = '\0';
+    }
+  windows_system_directory_length = end - windows_system_directory;
 }
 
 void
@@ -1035,12 +1090,7 @@ _sigreturn:
 	ret
 
 _sigdelayed:
-	# addl	4,%%esp
-	cmpl	$0,_pending_signals
-	je	2f
-	pushl	$0
-	call	_sig_dispatch_pending@4
-2:	pushl	%2	# original return address
+	pushl	%2	# original return address
 	pushf
 	pushl	%%esi
 	pushl	%%edi
@@ -1053,9 +1103,16 @@ _sigdelayed:
 	pushl	%4	# signal argument
 	pushl	$_sigreturn
 	movl	$0,%0
-	pushl	$_signal_arrived
-	call	_ResetEvent@4
-	jmp	*%5
+
+	pushl	_signal_arrived	# Everybody waiting for this should
+	call	_ResetEvent@4	# have woken up by now.
+
+	cmpl	$0,_pending_signals
+	je	2f
+	pushl	$0
+	call	_sig_dispatch_pending@4
+
+2:	jmp	*%5
 
 ___siglast:
 " : "=m" (sigsave.sig) : "m" (&_impure_ptr->_errno),

@@ -85,8 +85,6 @@ Static HANDLE hwait_subproc = NULL;	// Handle of sig_subproc thread
 
 Static HANDLE wait_sig_inited = NULL;	// Control synchronization of
 					//  message queue startup
-Static muto *sync_proc_subproc = NULL;	// Control access to
-					//  subproc stuff
 
 /* Used by WaitForMultipleObjects.  These are handles to child processes.
  */
@@ -99,6 +97,9 @@ Static int nzombies = 0;		// Number of deceased children
 
 Static waitq waitq_head = {0, 0, 0, 0, 0, 0, 0};// Start of queue for wait'ing threads
 Static waitq waitq_main;		// Storage for main thread
+
+muto NO_COPY *sync_proc_subproc = NULL;	// Control access to
+					//  subproc stuff
 
 DWORD NO_COPY maintid = 0;		// ID of the main thread
 Static DWORD sigtid = 0;		// ID of the signal thread
@@ -244,7 +245,7 @@ proc_subproc (DWORD what, DWORD val)
   int potential_match;
   DWORD exitcode;
   pinfo *child;
-  int send_sigchld = 0;
+  int clearing = 0;
   waitq *w;
 
 #define wval	 ((waitq *) val)
@@ -284,14 +285,6 @@ proc_subproc (DWORD what, DWORD val)
       wake_wait_subproc ();
       break;
 
-    /* A child is in the stopped state.  Scan wait() queue to see if anyone
-     * should be notified.  (Called from wait_sig thread)
-     */
-    case PROC_CHILDSTOPPED:
-      child = myself;		// Just to avoid accidental NULL dereference
-      sip_printf ("Received stopped notification");
-      goto scan_wait;
-
     /* A child process had terminated.
      * Possibly this is just due to an exec().  Cygwin implements an exec()
      * as a "handoff" from one windows process to another.  If child->hProcess
@@ -310,7 +303,6 @@ proc_subproc (DWORD what, DWORD val)
 	  ForceCloseHandle1 (hchildren[val], childhProc);
 	  hchildren[val] = child->hProcess; /* Filled out by child */
 	  ProtectHandle1 (child->hProcess, childhProc);
-	  wake_wait_subproc ();
 	  break;			// This was an exec()
 	}
 
@@ -318,46 +310,21 @@ proc_subproc (DWORD what, DWORD val)
 		  child->pid, val, hchildren[val], nchildren, nzombies);
       remove_child (val);		// Remove from children arrays
       zombies[nzombies++] = child;	// Add to zombie array
-      wake_wait_subproc ();		// Notify wait_subproc thread that
-					//  nchildren has changed.
       child->process_state = PID_ZOMBIE;// Walking dead
       if (!proc_loop_wait)		// Don't bother if wait_subproc is
 	break;				//  exiting
 
-      send_sigchld = 1;
-
-    scan_wait:
-      /* Scan the linked list of wait()ing threads.  If a wait's parameters
-       * match this pid, then activate it.
-       */
-      for (w = &waitq_head; w->next != NULL; w = w->next)
-	{
-	  if ((potential_match = checkstate (w)) > 0)
-	    sip_printf ("released waiting thread");
-	  else if (potential_match < 0)
-	    sip_printf ("only found non-terminated children");
-	  else if (potential_match == 0)		// nothing matched
-	    {
-	      sip_printf ("waiting thread found no children");
-	      HANDLE oldw = w->next->ev;
-	      w->next->ev = NULL;
-	      if (!SetEvent (oldw))
-		system_printf ("couldn't wake up wait event %p, %E", oldw);
-	      w->next = w->next->next;
-	    }
-	  if (w->next == NULL)
-	    break;
-	}
-
-      sip_printf ("finished processing terminated/stopped child");
-      if (!send_sigchld)
-	break;		// No need to send a SIGCHLD
-
       /* Send a SIGCHLD to myself. */
-      sync_proc_subproc->release ();	// Avoid a potential deadlock
-      rc = sig_send (NULL, SIGCHLD);	// Send a SIGCHLD
-      goto out1;	// Don't try to unlock.  We don't have a lock.
+      rc = sig_send (myself_nowait, SIGCHLD);	// Send a SIGCHLD
+      break;	// Don't try to unlock.  We don't have a lock.
 
+    /* A child is in the stopped state.  Scan wait() queue to see if anyone
+     * should be notified.  (Called from wait_sig thread)
+     */
+    case PROC_CHILDSTOPPED:
+      child = myself;		// Just to avoid accidental NULL dereference
+      sip_printf ("Received stopped notification");
+      goto scan_wait;
 
     /* Clear all waiting threads.  Called from exceptions.cc prior to
      * the main thread's dispatch to a signal handler function.
@@ -366,15 +333,41 @@ proc_subproc (DWORD what, DWORD val)
     case PROC_CLEARWAIT:
       /* Clear all "wait"ing threads. */
       sip_printf ("clear waiting threads");
+      clearing = 1;
+
+    case PROC_SIGCHLD:
+    scan_wait:
+      /* Scan the linked list of wait()ing threads.  If a wait's parameters
+       * match this pid, then activate it.
+       */
       for (w = &waitq_head; w->next != NULL; w = w->next)
 	{
-	  sip_printf ("clearing waiting thread, pid %d", w->next->pid);
-	  w->next->status = -1;		/* flag that a signal was received */
-	  if (!SetEvent (w->next->ev))
-	    system_printf ("Couldn't wake up wait event, %E");
+	  if ((potential_match = checkstate (w)) > 0)
+	    sip_printf ("released waiting thread");
+	  else if (!clearing && potential_match < 0)
+	    sip_printf ("only found non-terminated children");
+	  else if (potential_match <= 0)		// nothing matched
+	    {
+	      sip_printf ("waiting thread found no children");
+	      HANDLE oldw = w->next->ev;
+	      w->next->ev = NULL;
+	      if (clearing)
+		w->next->status = -1;		/* flag that a signal was received */
+	      if (!SetEvent (oldw))
+		system_printf ("couldn't wake up wait event %p, %E", oldw);
+	      w->next = w->next->next;
+	    }
+	  if (w->next == NULL)
+	    break;
 	}
-      waitq_head.next = NULL;
-      sip_printf ("finished clearing");
+
+      if (!clearing)
+	sip_printf ("finished processing terminated/stopped child");
+      else
+	{
+	  waitq_head.next = NULL;
+	  sip_printf ("finished clearing");
+	}
       break;
 
     /* Handle a wait4() operation.  Allocates an event for the calling
@@ -1252,6 +1245,10 @@ wait_sig (VOID *)
 		/* A normal UNIX signal */
 		default:
 		  sip_printf ("Got signal %d", sig);
+		  int wasdispatched = sig_handle (sig);
+		  dispatched |= wasdispatched;
+		  if (sig == SIGCHLD && !wasdispatched)
+		    proc_subproc (PROC_SIGCHLD, 0);
 		  dispatched |= sig_handle (sig);
 		  goto nextsig;
 		}

@@ -1,6 +1,6 @@
 /* thread.h: Locking and threading module definitions
 
-   Copyright 1998, 1999 Cygnus Solutions.
+   Copyright 1998, 1999, 2000 Cygnus Solutions.
 
    Written by Marco Fuykschot <marco@ddi.nl>
 
