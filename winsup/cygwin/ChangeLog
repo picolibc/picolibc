@@ -29,7 +29,7 @@
 	(setuid32): Ditto.
 	* uinfo.cc (getuid32): Ditto.
 	(geteuid32): Ditto.
-	* winsup.h (uid16touid32): New macro, correclt casting from __uid16_t
+	* winsup.h (uid16touid32): New macro, correct casting from __uid16_t
 	to __uid32_t.
 	(gid16togid32): Ditto fir gids.
 	(getuid32): Declare.
