@@ -78,14 +78,19 @@ just the individual packages that need it.
 @subsection The README says I should turn off anti-virus software.  Isn't that dangerous?
 
 Only Network Associates (formerly McAfee) products have been reported to
-"hang" when extracting Cygwin tar archives.  Other products should not
-cause problems, if you prefer to keep them running.
+"hang" when extracting Cygwin tar archives.  Other products have been
+reported to detect false positives in Cygwin files.  Depending on how
+your anti-virus software is configured, it may then delete the file(s)
+without prompting you.  Any problems will depend on the particular
+engine and/or signature file in use, and possibly other factors.  If you
+don't mind @emph{this} risk, then just leave your anti-virus software
+running.
 
 Otherwise, you can download @code{setup.exe} and scan it.  Then turn off
 the anti-virus software, then run setup to download and extract all the
 tar files.  Then re-activate your anti-virus software and scan
 everything in C:\cygwin (or wherever you chose to install).  This should
-be safe.  (As long as nobody substitutes a malicious setup.exe ...)
+be safe, as long as nobody substitutes a malicious @code{setup.exe}!
 
 @subsection What packages should I download?
 
