@@ -1,3 +1,8 @@
+2003-09-01  AJ Reins  <reinsaj@yahoo.com>
+
+	* mount.cc (mount_commands): Ensure user mode is actually user mode and
+	not the default system mode.
+
 2003-08-31  Christopher Faylor  <cgf@redhat.com>
 
 	* kill.cc (forcekill): Silence some compiler warnings.
