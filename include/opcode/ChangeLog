@@ -1,3 +1,7 @@
+2002-04-11  Alan Modra  <amodra@bigpond.net.au>
+
+	* i386.h: Add intel mode cmpsd and movsd.
+
 2002-03-15  Chris G. Demetriou  <cgd@broadcom.com>
 
 	* mips.h (INSN_MIPS3D): New definition used to mark MIPS-3D
