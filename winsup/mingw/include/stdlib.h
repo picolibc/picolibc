@@ -285,12 +285,26 @@ int	_wtoi (const wchar_t *);
 long _wtol (const wchar_t *);
 
 double	strtod	(const char*, char**);
-double	wcstod	(const wchar_t*, wchar_t**);
-long	strtol	(const char*, char**, int);
-long	wcstol	(const wchar_t*, wchar_t**, int);
+#if !defined __NO_ISOCEXT  /* extern stubs in static libmingwex.a */
+extern __inline__ float strtof (const char *nptr, char **endptr)
+  { return (strtod (nptr, endptr));}
+#endif /* __NO_ISOCEXT */
 
+long	strtol	(const char*, char**, int);
 unsigned long	strtoul	(const char*, char**, int);
+
+#ifndef _WSTDLIB_DEFINED
+/*  also declared in wchar.h */
+double	wcstod	(const wchar_t*, wchar_t**);
+#if !defined __NO_ISOCEXT /* extern stub in static libmingwex.a */
+extern __inline__ float wcstof( const wchar_t *nptr, wchar_t **endptr)
+{  return (wcstod(nptr, endptr)); }
+#endif /* __NO_ISOCEXT */
+
+long	wcstol	(const wchar_t*, wchar_t**, int);
 unsigned long	wcstoul (const wchar_t*, wchar_t**, int);
+#define _WSTDLIB_DEFINED
+#endif
 
 size_t	wcstombs	(char*, const wchar_t*, size_t);
 int	wctomb		(char*, wchar_t);
@@ -336,7 +350,6 @@ typedef struct { long quot, rem; } ldiv_t;
 div_t	div	(int, int);
 ldiv_t	ldiv	(long, long);
 
-
 #ifndef	__STRICT_ANSI__
 
 /*
@@ -348,6 +361,9 @@ void	_seterrormode (int);
 void	_sleep (unsigned long);
 
 void	_exit	(int) _ATTRIB_NORETURN;
+/* C99 function name */
+static __inline__ void _Exit(int status)
+	{  _exit(status); }
 
 /* _onexit is MS extension. Use atexit for portability.  */
 typedef  int (* _onexit_t)(void); 
@@ -405,6 +421,49 @@ char*	gcvt (double, int, char*);
 #endif	/* Not _NO_OLDNAMES */
 
 #endif	/* Not __STRICT_ANSI__ */
+
+/* C99 names */
+
+#if !defined __NO_ISOCEXT /* externs in static libmingwex.a */
+
+typedef struct { long long quot, rem; } lldiv_t;
+
+lldiv_t	lldiv (long long, long long);
+
+extern __inline__ long long llabs(long long _j)
+  {return (_j >= 0 ? _j : -_j);}
+
+long long strtoll (const char* __restrict__, char** __restrict, int);
+unsigned long long strtoull (const char* __restrict__, char** __restrict__, int);
+
+#if defined (__MSVCRT__) /* these are stubs for MS _i64 versions */ 
+long long atoll (const char *);
+
+#if !defined (__STRICT_ANSI__)
+long long wtoll(const wchar_t *);
+char* lltoa(long long, char *, int);
+char* ulltoa(unsigned long long , char *, int);
+wchar_t* lltow(long long, wchar_t *, int);
+wchar_t* ulltow(unsigned long long, wchar_t *, int);
+
+  /* inline using non-ansi functions */
+extern __inline__ long long atoll (const char * _c)
+	{ return _atoi64 (_c); }
+extern __inline__ char* lltoa(long long _n, char * _c, int _i)
+	{ return _i64toa (_n, _c, _i); }
+extern __inline__ char* ulltoa(unsigned long long _n, char * _c, int _i)
+	{ return _ui64toa (_n, _c, _i); }
+extern __inline__ long long wtoll(const wchar_t * _w)
+ 	{ return _wtoi64 (_w); }
+extern __inline__ wchar_t* lltow(long long _n, wchar_t * _w, int _i)
+	{ return _i64tow (_n, _w, _i); } 
+extern __inline__ wchar_t* ulltow(unsigned long long _n, wchar_t * _w, int _i)
+	{ return _ui64tow (_n, _w, _i); } 
+#endif /* (__STRICT_ANSI__)  */
+
+#endif /* __MSVCRT__ */
+
+#endif /* !__NO_ISOCEXT */
 
 /*
  * Undefine the no return attribute used in some function definitions
