@@ -255,11 +255,11 @@ extern const char __declspec(dllexport) * const _sys_errlist[]=
 /* ENOBUFS 105 */ "No buffer space available",
 /* EAFNOSUPPORT 106 */ "Address family not supported by protocol",
 /* EPROTOTYPE 107 */ "Protocol wrong type for transport endpoint",
-/* ENOTSOCK 108 */  "Socket operation on non-socket"
+/* ENOTSOCK 108 */  "Socket operation on non-socket",
 /* ENOPROTOOPT 109 */ "Protocol not available",
 /* ESHUTDOWN 110 */ "Cannot send after transport endpoint shutdown",
 /* ECONNREFUSED 111 */ "Connection refused",
-/* EADDRINUSE 112 */ "Address already in use"
+/* EADDRINUSE 112 */ "Address already in use",
 /* ECONNABORTED 113 */ "Connection aborted",
 /* ENETUNREACH 114 */ "Network is unreachable",
 /* ENETDOWN 115 */ "Network is down",
