@@ -1,3 +1,9 @@
+2002-03-29  Daniel Jacobowitz  <drow@mvista.com>
+
+	Merge from trunk:
+	2002-03-10  Daniel Jacobowitz <drow@mvista.com>
+	* gdb: New directory.
+
 2002-02-21  Jim Blandy  <jimb@redhat.com>
 
 	Allow the user to specify functions for allocating memory for
