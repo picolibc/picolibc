@@ -1420,6 +1420,7 @@ extern "C" {
 #define WM_SYSKEYDOWN 260
 #define WM_SYSKEYUP 261
 #define WM_TCARD 82
+#define WM_THEMECHANGED 794
 #define WM_TIMECHANGE 30
 #define WM_TIMER 275
 #define WM_UNDO 772
