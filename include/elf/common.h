@@ -397,6 +397,8 @@
 #define GNU_ABI_TAG_LINUX	0
 #define GNU_ABI_TAG_HURD	1
 #define GNU_ABI_TAG_SOLARIS	2
+#define GNU_ABI_TAG_FREEBSD	3
+#define GNU_ABI_TAG_NETBSD	4
 
 /* Values for NetBSD .note.netbsd.ident notes.  Note name is "NetBSD".  */
 
