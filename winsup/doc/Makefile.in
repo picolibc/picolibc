@@ -118,4 +118,4 @@ TBDEPS = cygwin-ug-net/cygwin-ug-net.html cygwin-api/cygwin-api.html
 
 tarball : cygwin-docs.tar.bz2
 cygwin-docs.tar.bz2 : $(TBFILES) $(TBDEPS)
-	tar cf - $(TBFILES) $(TBDIRS) | gzip -9 > cygwin-docs.tar.bz2
+	find $(TBFILES) $(TBDIRS) \! -type d | sort | tar -T - -cf -  | bzip2 > cygwin-docs.tar.bz2

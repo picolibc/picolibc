@@ -1,5 +1,10 @@
 2002-01-01  Christopher Faylor  <cgf@redhat.com>
 
+	* Makefile.in: Duh.  Actually use bzip2 to create the tarball.  Don't
+	just change the name.
+
+2002-01-01  Christopher Faylor  <cgf@redhat.com>
+
 	* Makefile.in: Make .bz2 tarball.
 
 2001-12-11  Christopher Faylor  <cgf@redhat.com>
