@@ -1,3 +1,11 @@
+2002-06-13  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* lib/test.c: #include comcat.h.
+
+2002-06-13  John K. Hohm <jhohm@acm.org>
+
+	* include/comcat.h: New file.
+
 2002-06-09  Gunnar Degnbol <gdegnbol@users.sourceforge.net>
 
 	* include/richedit.h (EM_*, TM_*, GT_*): Add new defines.

@@ -66,6 +66,7 @@
 
 #ifndef __OBJC__  /* problems with BOOL */
 #include <ole2.h>
+#include <comcat.h>
 #include <shlobj.h>
 #include <intshcut.h>
 #include <ocidl.h>
