@@ -80,22 +80,6 @@ target_tools="target-examples target-groff target-gperf"
 
 ################################################################################
 
-## These two lists are of directories that are to be removed from the
-## ${configdirs} list for either cross-compilations or for native-
-## compilations.  For example, it doesn't make that much sense to
-## cross-compile Emacs, nor is it terribly useful to compile target-libiberty in
-## a native environment.  
-
-# directories to be built in the native environment only
-#
-# This must be a single line because of the way it is searched by grep in
-# the code below.
-native_only="autoconf automake libtool fileutils find gawk gettext grep gzip hello indent m4 rcs recode sed shellutils tar textutils uudecode wdiff gprof target-groff guile perl time ash bash bzip2 prms snavigator gnuserv target-gperf"
-
-# directories to be built in a cross environment only
-#
-cross_only="target-libgloss target-newlib target-opcodes"
-
 ## All tools belong in one of the four categories, and are assigned above
 ## We assign ${configdirs} this way to remove all embedded newlines.  This
 ## is important because configure will choke if they ever get through.
@@ -184,8 +168,12 @@ case ${with_x} in
 esac
 
 # Some tools are only suitable for building in a "native" situation.
-# Remove these if host!=target.  Similarly, some are only suitable
-# for cross toolchains; remove if host=target.
+# Remove these if host!=target.  
+native_only="autoconf automake libtool fileutils find gawk gettext grep gzip hello indent m4 rcs recode sed shellutils tar textutils uudecode wdiff gprof target-groff guile perl time ash bash bzip2 prms snavigator gnuserv target-gperf"
+
+# Similarly, some are only suitable for cross toolchains.
+# Remove these if host=target.
+cross_only="target-libgloss target-newlib target-opcodes"
 
 case $is_cross_compiler in
   no) skipdirs="${skipdirs} ${cross_only}" ;;
@@ -277,7 +265,7 @@ case "${target}" in
     ;;
   *-*-netbsd*)
     # Skip some stuff on all NetBSD configurations.
-    skipdirs="$skipdirs target-newlib target-libiberty target-libgloss"
+    noconfigdirs="$noconfigdirs target-newlib target-libiberty target-libgloss"
 
     # Skip some stuff that's unsupported on some NetBSD configurations.
     case "${target}" in
@@ -333,7 +321,7 @@ case "${target}" in
     noconfigdirs="$noconfigdirs expect dejagnu"
     # the C++ libraries don't build on top of CE's C libraries
     noconfigdirs="$noconfigdirs ${libstdcxx_version}"
-    skipdirs="$skipdirs target-newlib"
+    noconfigdirs="$noconfigdirs target-newlib"
     case "${host}" in
       *-*-cygwin*) ;; # keep gdb and readline
       *) noconfigdirs="$noconfigdirs gdb readline ${libstdcxx_version}"
@@ -755,8 +743,7 @@ for dir in . $skipdirs $noconfigdirs ; do
   dirname=`echo $dir | sed -e s/target-//g`
   if test $dir != .  && echo " ${configdirs} " | grep " ${dir} " >/dev/null 2>&1; then
     configdirs=`echo " ${configdirs} " | sed -e "s/ ${dir} / /"`
-    if test -r $srcdir/$dirname/configure \
-	|| test -r $srcdir/$dirname/configure.in ; then
+    if test -r $srcdir/$dirname/configure ; then
       if echo " ${skipdirs} " | grep " ${dir} " >/dev/null 2>&1; then
 	true
       else
@@ -766,8 +753,7 @@ for dir in . $skipdirs $noconfigdirs ; do
   fi
   if test $dir != . && echo " ${target_configdirs} " | grep " ${dir} " >/dev/null 2>&1; then
     target_configdirs=`echo " ${target_configdirs} " | sed -e "s/ ${dir} / /"`
-    if test -r $srcdir/$dirname/configure \
-	|| test -r $srcdir/$dirname/configure.in ; then
+    if test -r $srcdir/$dirname/configure ; then
       if echo " ${skipdirs} " | grep " ${dir} " >/dev/null 2>&1; then
 	true
       else
@@ -783,7 +769,7 @@ if test -n "${target_configdirs}" ; then
   others=
   for i in `echo ${target_configdirs} | sed -e s/target-//g` ; do
     if test "$i" != "libiberty" ; then
-      if test -r $srcdir/$i/configure || test -r $srcdir/$i/configure.in ; then
+      if test -r $srcdir/$i/configure ; then
 	others=yes;
 	break;
       fi
@@ -876,36 +862,41 @@ esac
 
 copy_dirs=
 
-# Handle --with-headers=XXX.  The contents of the named directory are
-# copied to $(tooldir)/sys-include.
+# Handle --with-headers=XXX.  If the value is not "yes", the contents of
+# the named directory are copied to $(tooldir)/sys-include.
 if test x"${with_headers}" != x ; then
   if test x${is_cross_compiler} = xno ; then
     echo 1>&2 '***' --with-headers is only supported when cross compiling
     exit 1
   fi
-  case "${exec_prefixoption}" in
-  "") x=${prefix} ;;
-  *) x=${exec_prefix} ;;
-  esac
-  copy_dirs="${copy_dirs} ${with_headers} $x/${target_alias}/sys-include"
+  if test x"${with_headers}" != xyes ; then
+    case "${exec_prefixoption}" in
+    "") x=${prefix} ;;
+    *) x=${exec_prefix} ;;
+    esac
+    copy_dirs="${copy_dirs} ${with_headers} $x/${target_alias}/sys-include"
+  fi
 fi
 
-# Handle --with-libs=XXX.  Multiple directories are permitted.  The
-# contents are copied to $(tooldir)/lib.
+# Handle --with-libs=XXX.  If the value is not "yes", the contents of
+# the name directories are copied to $(tooldir)/lib.  Multiple directories
+# are permitted.
 if test x"${with_libs}" != x ; then
   if test x${is_cross_compiler} = xno ; then
     echo 1>&2 '***' --with-libs is only supported when cross compiling
     exit 1
   fi
-  # Copy the libraries in reverse order, so that files in the first named
-  # library override files in subsequent libraries.
-  case "${exec_prefixoption}" in
-  "") x=${prefix} ;;
-  *) x=${exec_prefix} ;;
-  esac
-  for l in ${with_libs}; do
-    copy_dirs="$l $x/${target_alias}/lib ${copy_dirs}"
-  done
+  if test x"${with_libs}" != xyes ; then
+    # Copy the libraries in reverse order, so that files in the first named
+    # library override files in subsequent libraries.
+    case "${exec_prefixoption}" in
+    "") x=${prefix} ;;
+    *) x=${exec_prefix} ;;
+    esac
+    for l in ${with_libs}; do
+      copy_dirs="$l $x/${target_alias}/lib ${copy_dirs}"
+    done
+  fi
 fi
 
 # Handle ${copy_dirs}
@@ -1127,25 +1118,6 @@ if test -n "${host_makefile_frag}" ; then
   host_makefile_frag=mh-frag
 fi
 
-# If we aren't going to be using gcc, see if we can extract a definition
-# of CC from the fragment.
-# Actually, use the 'pre-extracted' version above.
-if test -z "${CC}" && test "${build}" = "${host}" ; then
-  IFS="${IFS= 	}"; save_ifs="$IFS"; IFS="${IFS}:"
-  found=
-  for dir in $PATH; do
-    test -z "$dir" && dir=.
-    if test -f $dir/gcc; then
-      found=yes
-      break
-    fi
-  done
-  IFS="$save_ifs"
-  if test -z "${found}" && test -n "${tentative_cc}" ; then
-    CC=$tentative_cc
-  fi
-fi
-
 case "${target}" in
   v810*)
     target_makefile_frag="config/mt-v810"
@@ -1281,6 +1253,25 @@ case "${host}" in
     withoptions="$withoptions -x-libraries=/usr/lib/pa20_64 -x-includes=/usr/X11R6/include"
     ;;
 esac
+
+# If we aren't going to be using gcc, see if we can extract a definition
+# of CC from the fragment.
+# Actually, use the 'pre-extracted' version above.
+if test -z "${CC}" && test "${build}" = "${host}" ; then
+  IFS="${IFS= 	}"; save_ifs="$IFS"; IFS="${IFS}:"
+  found=
+  for dir in $PATH; do
+    test -z "$dir" && dir=.
+    if test -f $dir/gcc; then
+      found=yes
+      break
+    fi
+  done
+  IFS="$save_ifs"
+  if test -z "${found}" && test -n "${tentative_cc}" ; then
+    CC=$tentative_cc
+  fi
+fi
 
 # post-target:
 

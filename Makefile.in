@@ -1,3 +1,5 @@
+
+# Makefile.in is generated from Makefile.tpl by 'autogen Makefile.def'.
 #
 # Makefile for directory with subdirs to build.
 #   Copyright (C) 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998,
@@ -529,6 +531,7 @@ ALL_MODULES = \
 	all-automake \
 	all-bash \
 	all-bfd \
+	all-opcodes \
 	all-binutils \
 	all-bison \
 	all-byacc \
@@ -553,6 +556,7 @@ ALL_MODULES = \
 	all-hello \
 	all-indent \
 	all-intl \
+	all-tcl \
 	all-itcl \
 	all-ld \
 	all-libgui \
@@ -561,7 +565,6 @@ ALL_MODULES = \
 	all-m4 \
 	all-make \
 	all-mmalloc \
-	all-opcodes \
 	all-patch \
 	all-perl \
 	all-prms \
@@ -576,7 +579,6 @@ ALL_MODULES = \
 	all-sim \
 	all-snavigator \
 	all-tar \
-	all-tcl \
 	all-texinfo \
 	all-textutils \
 	all-time \
@@ -605,6 +607,7 @@ CROSS_CHECK_MODULES = \
 	check-automake \
 	check-bash \
 	check-bfd \
+	check-opcodes \
 	check-binutils \
 	check-bzip2 \
 	check-db \
@@ -624,6 +627,7 @@ CROSS_CHECK_MODULES = \
 	check-hello \
 	check-indent \
 	check-intl \
+	check-tcl \
 	check-itcl \
 	check-ld \
 	check-libgui \
@@ -631,8 +635,6 @@ CROSS_CHECK_MODULES = \
 	check-libtool \
 	check-m4 \
 	check-make \
-	check-mmcheckoc \
-	check-opcodes \
 	check-patch \
 	check-perl \
 	check-prms \
@@ -642,11 +644,10 @@ CROSS_CHECK_MODULES = \
 	check-sed \
 	check-send-pr \
 	check-shellutils \
-	check-snavigator \
 	check-sid \
 	check-sim \
+	check-snavigator \
 	check-tar \
-	check-tcl \
 	check-texinfo \
 	check-textutils \
 	check-time \
@@ -669,11 +670,11 @@ INSTALL_MODULES = \
 	install-automake \
 	install-bash \
 	install-bfd \
-	install-bzip2 \
 	install-opcodes \
 	install-binutils \
 	install-bison \
 	install-byacc \
+	install-bzip2 \
 	install-db \
 	install-dejagnu \
 	install-diff \
@@ -831,6 +832,7 @@ CLEAN_MODULES = \
 	clean-automake \
 	clean-bash \
 	clean-bfd \
+	clean-opcodes \
 	clean-binutils \
 	clean-bison \
 	clean-byacc \
@@ -855,6 +857,7 @@ CLEAN_MODULES = \
 	clean-hello \
 	clean-indent \
 	clean-intl \
+	clean-tcl \
 	clean-itcl \
 	clean-ld \
 	clean-libgui \
@@ -863,7 +866,6 @@ CLEAN_MODULES = \
 	clean-m4 \
 	clean-make \
 	clean-mmalloc \
-	clean-opcodes \
 	clean-patch \
 	clean-perl \
 	clean-prms \
@@ -878,14 +880,13 @@ CLEAN_MODULES = \
 	clean-sim \
 	clean-snavigator \
 	clean-tar \
-	clean-tcl \
 	clean-texinfo \
 	clean-textutils \
 	clean-time \
 	clean-uudecode \
 	clean-wdiff \
 	clean-zip \
-	clean-zlib
+	clean-zlib 
 
 # All of the target modules that can be cleaned
 CLEAN_TARGET_MODULES = \

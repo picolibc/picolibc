@@ -1,3 +1,25 @@
+2002-09-22  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* Makefile.def: New file.
+	* Makefile.tpl: New file.
+	* Makefile.in: Generate from Makefile.tpl with 'autogen Makefile.def'.
+
+	* configure.in: Minor rearrangement.  Simplify tests.
+
+2002-09-23  Jason Thorpe  <thorpej@wasabisystems.com>
+
+	* configure.in (with_headers): Skip copy if value is "yes".
+	(with_libs): Likewise.
+
+2002-09-20  Nathanael Nerode  <neroden@gcc.gnu.org>
+
+	* configure.in (*-*-netbsd*): Use noconfigdirs, not skipdirs.
+	* configure.in (sh*-*-pe*): Ditto.
+	* configure.in (mips*-*-pe*): Ditto.
+	* configure.in (*arm-wince-pe): Ditto.
+
+	* configure.in: Rearrange.
+
 2002-09-12  Nick Clifton  <nickc@redhat.com>
 
 	* Import these changes from the config master repository:
