@@ -167,7 +167,7 @@ fhandler_pty_master::accept_input ()
 	      get_ttyp ()->read_retval = -1;
 	      break;
 	    }
-	  else 
+	  else
 	    get_ttyp ()->read_retval = 1;
 
 	  p += written;
@@ -1077,8 +1077,12 @@ fhandler_pty_master::close ()
 int
 fhandler_pty_master::write (const void *ptr, size_t len)
 {
-  (void) line_edit ((char *) ptr, len);
-  return len;
+  size_t i;
+  char *p = (char *) ptr;
+  for (i=0; i<len; i++)
+    if (line_edit (p++, 1) == line_edit_error)
+      break;
+  return i;
 }
 
 int __stdcall

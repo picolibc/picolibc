@@ -118,6 +118,14 @@ typedef struct __DIR DIR;
 struct dirent;
 struct iovec;
 
+enum line_edit_status
+{
+  line_edit_signalled = -1,
+  line_edit_ok = 0,
+  line_edit_input_done = 1,
+  line_edit_error = 2
+};
+
 enum bg_check_types
 {
   bg_error = -1,
@@ -693,7 +701,7 @@ class fhandler_termios: public fhandler_base
     set_need_fork_fixup ();
   }
   HANDLE& get_output_handle () { return output_handle; }
-  int line_edit (const char *rptr, int nread, int always_accept = 0);
+  line_edit_status line_edit (const char *rptr, int nread, int always_accept = 0);
   void set_output_handle (HANDLE h) { output_handle = h; }
   void tcinit (tty_min *this_tc, int force = FALSE);
   virtual int is_tty () { return 1; }

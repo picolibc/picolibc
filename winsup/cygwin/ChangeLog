@@ -1,3 +1,15 @@
+2002-12-04  Steve Osborn  <bub@io.com>
+
+	* fhandler.h (fhandler_termios::line_edit): Change return from an int
+	to an enum to allow the function to return an error.
+	* fhandler_console.cc (fhandler_console::read): Update the line_edit
+	call to use the new enum.
+	* fhandler_termios.cc (fhandler_termios::line_edit): Change return from
+	an int to an enum to allow the function to return an error.  Put
+	put_readahead call before doecho for future patch.
+	* fhandler_tty.cc (fhandler_pty_master::write): Change to call
+	line_edit one character at a time, and stop if an error occurs.
+
 2002-12-04  Craig McGeachie  <slapdau@yahoo.com.au>
 
 	* netdb.cc: New file.

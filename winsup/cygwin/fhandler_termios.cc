@@ -186,9 +186,10 @@ fhandler_termios::echo_erase (int force)
     doecho ("\b \b", 3);
 }
 
-int
+line_edit_status
 fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
 {
+  line_edit_status ret = line_edit_ok;
   char c;
   int input_done = 0;
   bool sawsig = FALSE;
@@ -321,20 +322,23 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
       if (tc->ti.c_iflag & IUCLC && isupper (c))
 	c = cyg_tolower (c);
 
+      put_readahead (c);
       if (tc->ti.c_lflag & ECHO)
 	doecho (&c, 1);
-      put_readahead (c);
     }
 
   if (!iscanon || always_accept)
     set_input_done (ralen > 0);
 
   if (sawsig)
-    input_done = -1;
+    ret = line_edit_signalled;
   else if (input_done)
-    (void) accept_input ();
+    {
+      ret = line_edit_input_done;
+      (void) accept_input ();
+    }
 
-  return input_done;
+  return ret;
 }
 
 void

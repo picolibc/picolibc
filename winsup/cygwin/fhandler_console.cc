@@ -457,10 +457,10 @@ fhandler_console::read (void *pv, size_t buflen)
 
       if (toadd)
 	{
-	  int res = line_edit (toadd, nread);
-	  if (res < 0)
+	  line_edit_status res = line_edit (toadd, nread);
+	  if (res == line_edit_signalled)
 	    goto sig_exit;
-	  else if (res)
+	  else if (res == line_edit_input_done)
 	    break;
 	}
 #undef ich
