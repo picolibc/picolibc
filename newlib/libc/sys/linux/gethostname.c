@@ -4,9 +4,10 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/utsname.h>
+#include <machine/weakalias.h>
 
 int
-gethostname (char *name, size_t len)
+__gethostname (char *name, size_t len)
 {
 	struct utsname nodebuf;
 	size_t nodelen;
@@ -27,4 +28,4 @@ gethostname (char *name, size_t len)
 	}
 	return 0;
 }
-
+weak_alias(__gethostname, gethostname)

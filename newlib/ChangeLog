@@ -6,6 +6,11 @@ Mon Jun 24 21:17:02 2002  J"orn Rennecke <joern.rennecke@superh.com>
 
 2002-06-24  Jeff Johnston  <jjohnstn@redhat.com>
 
+        * libc/sys/linux/gethostname.c: Change name to __gethostname and
+        add gethostname alias.
+
+2002-06-24  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/include/math.h: Remove <sys/types.h>.
 	(__dmath): Use __ULong instead of __uint32_t.
 	* libc/include/sys/reent.h: If long or int is not 32-bits,
