@@ -1,3 +1,8 @@
+2002-07-19  Denis Chertykov  <denisc@overta.ru>
+	    Matthew Green  <mrg@redhat.com>
+
+	* dis-asm.h (print_insn_ip2k): Declare.
+
 2002-07-10  Jakub Jelinek  <jakub@redhat.com>
 
 	* elf/common.h (SHT_GNU_LIBLIST, DT_GNU_PRELINKED,
