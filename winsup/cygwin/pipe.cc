@@ -1,6 +1,7 @@
 /* pipe.cc: pipe for Cygwin.
 
-   Copyright 1996, 1998, 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
+   Copyright 1996, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+   2005 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -240,11 +241,11 @@ fhandler_pipe::dup (fhandler_base *child)
   goto out;
 
 err:
-  if (!ftp->guard)
+  if (ftp->guard)
     CloseHandle (ftp->guard);
-  if (!ftp->writepipe_exists)
+  if (ftp->writepipe_exists)
     CloseHandle (ftp->writepipe_exists);
-  if (!ftp->read_state)
+  if (ftp->read_state)
     CloseHandle (ftp->read_state);
   goto leave;
 
