@@ -1,4 +1,16 @@
 @chapter Known/potential Problems in the Latest Net Release
 
-None at this time.
+@section Aware of the problem, no solution yet found.
+
+@subsection On Win9x, scp and cvs/ssh leave ssh processes running
+
+This is a difficult problem, related to the implementation of select()
+and pipes on Windows 9x.  It has been discussed at length on the cygwin
+mailing list.  For an excellent technical description of the problem, see
+@file{http://sources.redhat.com/ml/cygwin/2000-12/msg00470.html}, and
+related threads.
+
+For now you'll just have to kill them manually.
+
+@section Fixed in the Next Release
 
