@@ -4,9 +4,8 @@
 #	This file is part of a free library for the Win32 API.
 # 
 #	This library is distributed in the hope that it will be useful,
-#	but WITHOUT ANY WARANTY; without even the implied warranty of
+#	but WITHOUT ANY WARRANTY; without even the implied warranty of
 #	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
 
 # start config section
 
@@ -27,183 +26,100 @@ datadir = @datadir@
 infodir = @infodir@
 includedir = @includedir@
 
-INSTALL = @INSTALL@
-INSTALL_DATA = @INSTALL_DATA@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@
-mkinstalldirs = mkdir -p
-
 CC = @CC@
 CC_FOR_TARGET = $(CC)
+CFLAGS = @CFLAGS@
 
 DLLTOOL = @DLLTOOL@
-DLLTOOL_FLAGS = --as=$(AS) -k
 AS = @AS@
 AS_FOR_TARGET = $(AS_FOR_TARGET)
 WINDRES = @WINDRES@
-
-# Depending on if we build as part of winsup or mingw we need to
-# add additional include paths in order to get the correct headers
-# from the C library.
-BUILDENV = @BUILDENV@
-
-ifeq ($(BUILDENV), cygwin)
-# winsup/include
-# winsup/../newlib/libc/include
-# winsup/../newlib/libc/sys/cygwin
-EXTRA_INCLUDES = -I$(srcdir)/../../include -I$(srcdir)/../../../newlib/libc/include -I$(srcdir)/../../../newlib/libc/sys/cygwin
-endif
-ifeq ($(BUILDENV), mingw)
-EXTRA_INCLUDES = -I$(srcdir)/../../mingw/include
-endif
-
-INCLUDES = -I$(srcdir)/../include $(EXTRA_INCLUDES)
-
-CFLAGS = @CFLAGS@
-ALL_CFLAGS = $(CFLAGS) $(INCLUDES)
 
 RANLIB = @RANLIB@
 AR = @AR@
 LD = @LD@
 
+TAR = tar
+
+FLAGS_TO_PASS = \
+	AS="$(AS)" \
+	CC="$(CC)" \
+	CPPFLAGS="$(CPPFLAGS)" \
+	CFLAGS="$(CFLAGS)" \
+	CXXFLAGS="$(CXXFLAGS)" \
+	AR="$(AR)" \
+	RANLIB="$(RANLIB)" \
+	LD="$(LD)" \
+	DLLTOOL="$(DLLTOOL)" \
+	WINDRES="$(WINDRES)"
+
 # end config section
 
-# headers
+SUBDIRS = lib
 
-HEADERS = $(notdir $(wildcard $(srcdir)/../include/*.h))
+PACKAGE = w32api
+VERSION = 0.3
 
-# libraries
+DIST_FILES = Makefile.in configure.in configure config.guess config.sub \
+install-sh README ChangeLog TODO
 
-DEF_FILES = $(notdir $(wildcard $(srcdir)/*.def))
-IMPLIBS = $(addprefix lib,$(subst .def,.a,$(DEF_FILES)))
-EXTRA_LIBS=libuuid.a libscrnsave.a libscrnsavw.a libdxguid.a liblargeint.a
-LIBS = $(IMPLIBS) $(EXTRA_LIBS)
-EXTRA_OBJS=uuid.o shell32.o dxguid.o scrnsave.o scrnsavw.o largeint.o $(UUID_OBJS) dinput.o
-SOURCES = scrnsave.c shell32.c uuid.c largeint.c dinput.c dxguid.c \
-res.rc test.c
+all: lib
 
-DISTFILES = Makefile.in $(DEF_FILES) $(SOURCES)
+%-subdirs:
+	for i in $(SUBDIRS); do \
+	  $(MAKE) $(FLAGS_TO_PASS) -C $$i $*; \
+	done
 
-# targets
-all: $(LIBS) $(EXTRA_OBJS)
+lib:
+	$(MAKE) $(FLAGS_TO_PASS) -C $@
 
-TEST_OPTIONS = $(ALL_CFLAGS) -Wall -c $(srcdir)/test.c -o test.o
-.PHONY: test
 test:
-	@echo "Testing w32api..."
-	@for lang in c c++ objective-c ; do \
-		echo "$$lang..."; \
-		$(CC) -x$$lang $(TEST_OPTIONS) ; \
-		echo "$$lang UNICODE..."; \
-		$(CC) -x$$lang -DUNICODE $(TEST_OPTIONS) ; \
-	done
-	@echo "windres..."
-	@$(WINDRES) --include-dir $(INCDIR) -i $(srcdir)/res.rc -o test.o
-	@echo "windres UNICODE..."
-	@$(WINDRES) --define UNICODE --include-dir $(INCDIR) -i $(srcdir)/res.rc -o test.o
-	@rm -f test.o
+	$(MAKE) -C lib test $(FLAGS_TO_PASS)
 
-scrnsavw.o: scrnsave.c
-	$(CC) -c $(ALL_CFLAGS) -DUNICODE -o $@ $<
-
-# make rules
-
-.SUFFIXES: .c .o .def .a
-
-.c.o:
-	$(CC) -c $(ALL_CFLAGS) -o $@ $<
-
-lib%.a : %.def %.o
-	$(DLLTOOL) $(DLLTOOL_FLAGS) --output-lib $@ --def $(srcdir)/$*.def
-	$(AR) r $@ $*.o
-	$(RANLIB) $@
-
-lib%.a: %.def
-	$(DLLTOOL) $(DLLTOOL_FLAGS) --output-lib $@ --def $<
-
-lib%.a: %.o
-	$(AR) rc $@ $*.o
-	$(RANLIB) $@
-
-# install headers and libraries in a target specified directory.
-xinstall: xinstall-libraries xinstall-headers
-
-xinstall-libraries: all
-	$(mkinstalldirs) $(tooldir)/lib
-	for i in $(LIBS); do \
-		$(INSTALL_DATA) $$i $(tooldir)/lib/$$i ; \
+install uninstall:
+	for i in $(SUBDIRS); do \
+		(cd $$i; $(MAKE) $@); \
 	done
 
-xinstall-headers:
-	$(mkinstalldirs) $(tooldir)/include
-	for i in $(HEADERS); do \
-		$(INSTALL_DATA) $(srcdir)/../include/$$i $(tooldir)/include/$$i ; \
-	done
-
-# uninstall headers and libraries from a target specified directory
-xuninstall: xuninstall-libraries xuninstall-headers
-
-xuninstall-libraries:
-	@for i in $(LIBS); do \
-		rm -f $(tooldir)/lib/$$i ; \
-	done
-
-xuninstall-headers:
-	@for i in $(HEADERS); do \
-		rm -f $(tooldir)/include/$$i ; \
-	done
-
-# install headers and libraries 
-install: install-libraries install-headers
-
-install-libraries: all
-	$(mkinstalldirs) $(exec_prefix)/lib
-	for i in $(LIBS); do \
-		$(INSTALL_DATA) $$i $(exec_prefix)/lib/$$i ; \
-	done
-
-install-headers:
-	$(mkinstalldirs) $(exec_prefix)/include
-	for i in $(HEADERS); do \
-		$(INSTALL_DATA) $(srcdir)/../include/$$i $(exec_prefix)/include/$$i ; \
-	done
-
-# uninstall headers and libraries 
-uninstall: uninstall-libraries uninstall-headers
-
-uninstall-libraries:
-	@for i in $(LIBS); do \
-		rm -f $(exec_prefix)/lib/$$i ; \
-	done
-
-uninstall-headers:
-	@for i in $(HEADERS); do \
-		rm -f $(exec_prefix)/include/$$i ; \
-	done
+distdir = $(PACKAGE)-$(VERSION)
 
 dist:
-	mkdir $(distdir)/include
-	chmod 755 $(distdir)/include
-	@for i in $(HEADERS); do \
-		cp -p $(srcdir)/../include/$$i $(distdir)/include/$$i ; \
+	rm -rf $(distdir)
+	mkdir $(distdir)
+	chmod 755 $(distdir)
+	for i in $(DIST_FILES); do \
+		cp -p $(srcdir)/$$i $(distdir)/$$i ; \
 	done
-	mkdir $(distdir)/lib
-	chmod 755 $(distdir)/lib
-	@for i in $(DISTFILES); do \
-		cp -p $(srcdir)/$$i $(distdir)/lib/$$i ; \
+	for i in $(SUBDIRS); do \
+		(cd $$i; $(MAKE) distdir=../$(distdir) dist); \
 	done
+	rm -f $(distdir)-src.tar.gz
+	$(TAR) czf $(distdir)-src.tar.gz $(distdir)
 
-Makefile: Makefile.in ../config.status ../configure
-	cd ..; $(SHELL) config.status
+bindist:
+	rm -rf $(distdir)
+	mkdir $(distdir)
+	chmod 755 $(distdir)
+	$(MAKE) install prefix=../$(distdir)
+	rm -f $(distdir).tar.gz
+	cd $(distdir); $(TAR) czf ../$(distdir).tar.gz .
 
-# clean
+Makefile: Makefile.in config.status configure
+	$(SHELL) config.status
 
-mostlyclean:
-	rm -f *~ *.o *.s
+mostlyclean-top:
+	rm -f *~
+clean-top:
+	rm -rf $(distdir)
+maintainer-clean-top:
 
-clean:
-	rm -f *.o *.a *.s *~
+mostlyclean: mostlyclean-top mostlyclean-subdirs
+clean: mostlyclean-top clean-subdirs
+distclean: clean-top
+	rm -f Makefile config.status config.log config.cache TAGS *~
+	rm -f include/*~
+	rm -f $(distdir)*.tar.gz
+	$(MAKE) -C lib distclean
+maintainer-clean: maintainer-clean-subdirs
 
-distclean: clean
-	rm -f config.cache config.status config.log Makefile
-
-maintainer-clean: distclean
+.PHONY: lib test

@@ -124,32 +124,60 @@ lib%.a: %.o
 	$(AR) rc $@ $*.o
 	$(RANLIB) $@
 
-# install headers and libraries
-install: install-libraries install-headers
+# install headers and libraries in a target specified directory.
+xinstall: xinstall-libraries xinstall-headers
 
-install-libraries: all
+xinstall-libraries: all
 	$(mkinstalldirs) $(tooldir)/lib
 	for i in $(LIBS); do \
 		$(INSTALL_DATA) $$i $(tooldir)/lib/$$i ; \
 	done
 
-install-headers:
+xinstall-headers:
 	$(mkinstalldirs) $(tooldir)/include
 	for i in $(HEADERS); do \
 		$(INSTALL_DATA) $(srcdir)/../include/$$i $(tooldir)/include/$$i ; \
 	done
 
-# uninstall headers and libraries
-uninstall: uninstall-libraries uninstall-headers
+# uninstall headers and libraries from a target specified directory
+xuninstall: xuninstall-libraries xuninstall-headers
 
-uninstall-libraries:
+xuninstall-libraries:
 	@for i in $(LIBS); do \
 		rm -f $(tooldir)/lib/$$i ; \
 	done
 
-uninstall-headers:
+xuninstall-headers:
 	@for i in $(HEADERS); do \
 		rm -f $(tooldir)/include/$$i ; \
+	done
+
+# install headers and libraries 
+install: install-libraries install-headers
+
+install-libraries: all
+	$(mkinstalldirs) $(exec_prefix)/lib
+	for i in $(LIBS); do \
+		$(INSTALL_DATA) $$i $(exec_prefix)/lib/$$i ; \
+	done
+
+install-headers:
+	$(mkinstalldirs) $(exec_prefix)/include
+	for i in $(HEADERS); do \
+		$(INSTALL_DATA) $(srcdir)/../include/$$i $(exec_prefix)/include/$$i ; \
+	done
+
+# uninstall headers and libraries 
+uninstall: uninstall-libraries uninstall-headers
+
+uninstall-libraries:
+	@for i in $(LIBS); do \
+		rm -f $(exec_prefix)/lib/$$i ; \
+	done
+
+uninstall-headers:
+	@for i in $(HEADERS); do \
+		rm -f $(exec_prefix)/include/$$i ; \
 	done
 
 dist:
