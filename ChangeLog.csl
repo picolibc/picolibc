@@ -1,3 +1,37 @@
+2005-03-25  Paul Brook  <paul@codesourcery.com>
+	    Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* gdb/configure.tgt: Add default OSABI setting for
+	arm*-*-linux-gnueabi.
+	* gdb/arm-tdep.c (arm_type_align): New function.
+	(arm_push_dummy_call): Use it.  Ensure proper argument alignment.
+	Don't try to align the stack.
+	(arm_frame_align): New function.
+	(arm_extract_struct_value_address): Remove.
+	(arm_use_struct_convention): Rename...
+	(arm_return_in_memory): ... To this.  Return nonzero for all small
+	aggregates under the EABI.
+	(arm_return_value): New function.
+	(arm_elf_osabi_sniffer): Add EF_ARM_EABI_VER4 case.  Handle
+	GDB_OSABI_ARM_EABI_V4_LINUX.
+	(arm_gdbarch_init): Set different FPU and ABI defaults for EABI
+	objects.  Use set_gdbarch_return_value instead of obsolete functions.
+	Call set_gdbarch_frame_align.
+	(arm_init_abi_eabi_v4): New function.
+	(_initialize_arm_tdep): Register GDB_OSABI_ARM_EABI_V4.
+	* gdb/arm-linux-tdep.c (ARM_LINUX_EABI_JB_PC): Define.
+	(arm_linux_eabi_init_abi): New function.
+	(_initialize_arm_linux_tdep): Register GDB_OSABI_ARM_EABI_V4_LINUX.
+	* gdb/arm-tdep.h (enum arm_abi_variant): New.
+	(struct gdbarch_tdep): Add abi field.
+	* gdb/defs.h (enum gdb_osabi): Add GDB_OSABI_ARM_EABI_V4 and
+	GDB_OSABI_ARM_EABI_V4_LINUX.
+	* gdb/osabi.c (gdb_osabi_name): Add "ARM EABI v4" and
+	"ARM EABI v4 GNU/Linux".
+
+	* gdb/testsuite/gdb.base/long_long.exp: Don't expect FPA format for
+	ARM EABI targets.
+
 2005-03-25  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* gdb/arm-linux-nat.c (store_register, store_regs): Handle
