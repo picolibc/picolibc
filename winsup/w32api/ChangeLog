@@ -1,3 +1,7 @@
+2002-02-16  Andriy Palamarchuk  <apa3a@yahoo.com>
+
+	* include/winuser.h (OIC_*): Add resource constants.
+
 2002-02-14 Mattia Barbon  <mbarbon@users.sourceforge.net>
 
 	* include/ntsecpkg.h: New file.
