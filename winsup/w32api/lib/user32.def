@@ -457,6 +457,8 @@ PostThreadMessageA@16
 PostThreadMessageW@16
 PtInRect@12
 RealChildWindowFromPoint@12
+RealGetWindowClassA@12
+RealGetWindowClassW@12
 RedrawWindow@16
 RegisterClassA@4
 RegisterClassExA@4

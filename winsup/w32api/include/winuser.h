@@ -3395,6 +3395,8 @@ BOOL WINAPI PostThreadMessageA(DWORD,UINT,WPARAM,LPARAM);
 BOOL WINAPI PostThreadMessageW(DWORD,UINT,WPARAM,LPARAM);
 BOOL WINAPI PtInRect(LPCRECT,POINT);
 HWND WINAPI RealChildWindowFromPoint(HWND,POINT);
+UINT WINAPI RealGetWindowClassA(HWND,LPSTR,UINT);
+UINT WINAPI RealGetWindowClassW(HWND,LPWSTR,UINT);
 BOOL WINAPI RedrawWindow(HWND,LPCRECT,HRGN,UINT);
 ATOM WINAPI RegisterClassA(CONST WNDCLASSA*);
 ATOM WINAPI RegisterClassW(CONST WNDCLASSW*);
@@ -3691,6 +3693,7 @@ typedef MONITORINFOEXW MONITORINFOEX, *LPMONITORINFOEX;
 #define PostAppMessage PostAppMessageW
 #define PostMessage PostMessageW
 #define PostThreadMessage PostThreadMessageW
+#define RealGetWindowClass RealGetWindowClassW
 #define RegisterClass RegisterClassW
 #define RegisterClassEx RegisterClassExW
 #define RegisterClipboardFormat RegisterClipboardFormatW
@@ -3853,6 +3856,7 @@ typedef MONITORINFOEXA MONITORINFOEX, *LPMONITORINFOEX;
 #define PostAppMessage PostAppMessageA
 #define PostMessage PostMessageA
 #define PostThreadMessage PostThreadMessageA
+#define RealGetWindowClass RealGetWindowClassA
 #define RegisterClass RegisterClassA
 #define RegisterClassEx RegisterClassExA
 #define RegisterClipboardFormat RegisterClipboardFormatA
