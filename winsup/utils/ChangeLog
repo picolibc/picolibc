@@ -1,3 +1,12 @@
+Sat Jun 24 23:16:33 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* cygcheck.cc (cygwin_info): New function.  Scans DLL for Cygwin
+	version info.
+	(dll_info): Add path parameter for checking "cygwin1.dll".
+	(track_down): Accomodate additional parameter for dll_info.
+	(ls): Ditto.
+	(dump_sys_info): Always print cygwin1.dll last.
+
 2000-06-07  Kazuhiro Fujieda <fujieda@jaist.ac.jp>
 
         mount.cc (error): New function to report an error and exit.

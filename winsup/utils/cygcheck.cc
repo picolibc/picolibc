@@ -272,8 +272,50 @@ struct ImpDirectory
 
 void track_down (char *file, char *suffix, int lvl);
 
+#define CYGPREFIX (sizeof ("%%% Cygwin ") - 1)
+static void
+cygwin_info (HANDLE h)
+{
+  char *buf, *bufend;
+  char *major, *minor;
+  const char *hello = "    Cygwin DLL version info:\n";
+  DWORD size = GetFileSize (h, NULL);
+  DWORD n;
+
+  if (size == 0xffffffff)
+    return;
+
+  buf = (char *) malloc (size);
+  if (!buf)
+    return;
+
+  (void) SetFilePointer (h, 0, NULL, FILE_BEGIN);
+  if (!ReadFile (h, buf, size, &n, NULL))
+    return;
+
+  bufend = buf + size;
+  major = minor = NULL;
+  while (buf < bufend)
+    if ((buf = (char *) memchr (buf, '%', bufend - buf)) == NULL)
+	break;
+    else if (strncmp ("%%% Cygwin ", buf, CYGPREFIX) != 0)
+	buf++;
+    else
+      {
+	char *p = strchr (buf += CYGPREFIX, '\n');
+	fputs (hello, stdout);
+	fputs ("        ", stdout);
+	fwrite (buf, 1 + p - buf, 1, stdout);
+	hello = "";
+      }
+
+  if (!*hello)
+    puts ("");
+  return;
+}
+
 void
-dll_info (HANDLE fh, int lvl, int recurse)
+dll_info (const char *path, HANDLE fh, int lvl, int recurse)
 {
   DWORD junk;
   int i;
@@ -342,6 +384,8 @@ dll_info (HANDLE fh, int lvl, int recurse)
 	    }
 	}
     }
+  if (strstr (path, "\\cygwin1.dll"))
+    cygwin_info (fh);
 }
 
 void
@@ -400,7 +444,7 @@ track_down (char *file, char *suffix, int lvl)
 
   d->state = DID_ACTIVE;
 
-  dll_info (fh, lvl, 1);
+  dll_info (path, fh, lvl, 1);
   d->state = DID_INACTIVE;
   CloseHandle (fh);
 }
@@ -418,7 +462,7 @@ ls (char *f)
 	  (((int) info.nFileSizeLow) + 512) / 1024,
 	  systime.wYear, systime.wMonth, systime.wDay,
 	  f);
-  dll_info (h, 16, 0);
+  dll_info (f, h, 16, 0);
   CloseHandle (h);
 
 }
@@ -566,6 +610,7 @@ dump_sysinfo ()
   int i, j;
   char tmp[4000];
   time_t now;
+  char *found_cygwin_dll;
 
   printf ("\nCygnus Win95/NT Configuration Diagnostics\n");
   time (&now);
@@ -837,6 +882,7 @@ dump_sysinfo ()
       sprintf (tmp, "%s/*.*", paths[i]);
       HANDLE ff = FindFirstFile (tmp, &ffinfo);
       int found = (ff != INVALID_HANDLE_VALUE);
+      found_cygwin_dll = NULL;
       while (found)
 	{
 	  char *f = ffinfo.cFileName;
@@ -845,11 +891,20 @@ dump_sysinfo ()
 	      if (strncasecmp (f, "cyg", 3) == 0)
 		{
 		  sprintf (tmp, "%s\\%s", paths[i], f);
-		  ls (tmp);
+		  if (strcasecmp (f, "cygwin1.dll") == 0)
+		    found_cygwin_dll = strdup (tmp);
+		  else
+		    ls (tmp);
 		}
 	    }
 	  found = FindNextFile (ff, &ffinfo);
 	}
+      if (found_cygwin_dll)
+	{
+	  ls (found_cygwin_dll);
+	  free (found_cygwin_dll);
+	}
+
       FindClose (ff);
     }
 }
