@@ -21,35 +21,36 @@ details. */
 #include <sys/cygwin.h>
 #include <ctype.h>
 
+static const char version[] = "$Revision$";
+
 static char *prog_name;
 static char *file_arg;
 static char *close_arg;
 static int path_flag, unix_flag, windows_flag, absolute_flag;
 static int shortname_flag, ignore_flag, allusers_flag, output_flag;
 
-static struct option long_options[] =
-{
-  { (char *) "help", no_argument, NULL, 'h' },
-  { (char *) "absolute", no_argument, NULL, 'a'},
-  { (char *) "option", no_argument, NULL, 'o'},
-  { (char *) "path", no_argument, NULL, 'p' },
-  { (char *) "close", required_argument, (int *) &close_arg, 'c'},
-  { (char *) "unix", no_argument, NULL, 'u' },
-  { (char *) "file", required_argument, (int *) &file_arg, 'f'},
-  { (char *) "version", no_argument, NULL, 'v' },
-  { (char *) "windows", no_argument, NULL, 'w' },
-  { (char *) "short-name", no_argument, NULL, 's' },
-  { (char *) "windir", no_argument, NULL, 'W' },
-  { (char *) "sysdir", no_argument, NULL, 'S' },
-  { (char *) "ignore", no_argument, NULL, 'i' },
-  { (char *) "allusers", no_argument, NULL, 'A' },
-  { (char *) "desktop", no_argument, NULL, 'D' },
-  { (char *) "smprograms", no_argument, NULL, 'P' },
-  { 0, no_argument, 0, 0 }
+static struct option long_options[] = {
+  {(char *) "help", no_argument, NULL, 'h'},
+  {(char *) "absolute", no_argument, NULL, 'a'},
+  {(char *) "option", no_argument, NULL, 'o'},
+  {(char *) "path", no_argument, NULL, 'p'},
+  {(char *) "close", required_argument, (int *) &close_arg, 'c'},
+  {(char *) "unix", no_argument, NULL, 'u'},
+  {(char *) "file", required_argument, (int *) &file_arg, 'f'},
+  {(char *) "version", no_argument, NULL, 'v'},
+  {(char *) "windows", no_argument, NULL, 'w'},
+  {(char *) "short-name", no_argument, NULL, 's'},
+  {(char *) "windir", no_argument, NULL, 'W'},
+  {(char *) "sysdir", no_argument, NULL, 'S'},
+  {(char *) "ignore", no_argument, NULL, 'i'},
+  {(char *) "allusers", no_argument, NULL, 'A'},
+  {(char *) "desktop", no_argument, NULL, 'D'},
+  {(char *) "smprograms", no_argument, NULL, 'P'},
+  {0, no_argument, 0, 0}
 };
 
 static void
-usage (FILE *stream, int status)
+usage (FILE * stream, int status)
 {
   if (!ignore_flag || !status)
     fprintf (stream, "\
@@ -67,8 +68,7 @@ Usage: %s [-p|--path] (-u|--unix)|(-w|--windows [-s|--short-name]) filename\n\
   -D|--desktop		output `Desktop' directory and exit\n\
   -P|--smprograms	output Start Menu `Programs' directory and exit\n\
   -S|--sysdir		output system directory and exit\n\
-  -W|--windir		output `Windows' directory and exit\n",
-	   prog_name);
+  -W|--windir		output `Windows' directory and exit\n", prog_name);
   exit (ignore_flag ? 0 : status);
 }
 
@@ -84,41 +84,43 @@ get_short_paths (char *path)
   DWORD len;
 
   while (ptr != NULL)
-  {
-    next = ptr;
-    ptr = strchr (ptr, ';');
-    if (ptr)
-      *ptr++ = 0;
-    len = GetShortPathName (next, NULL, 0);
-    if (len == ERROR_INVALID_PARAMETER)
     {
-      fprintf (stderr, "%s: cannot create short name of %s\n", prog_name, next);
-      exit (2);
+      next = ptr;
+      ptr = strchr (ptr, ';');
+      if (ptr)
+	*ptr++ = 0;
+      len = GetShortPathName (next, NULL, 0);
+      if (len == ERROR_INVALID_PARAMETER)
+	{
+	  fprintf (stderr, "%s: cannot create short name of %s\n", prog_name,
+		   next);
+	  exit (2);
+	}
+      acc += len + 1;
     }
-    acc += len+1;
-  }
-  sptr = sbuf = (char *) malloc(acc+1);
+  sptr = sbuf = (char *) malloc (acc + 1);
   if (sbuf == NULL)
-  {
-    fprintf (stderr, "%s: out of memory\n", prog_name);
-    exit (1);
-  }
-  ptr = path;
-  for(;;)
-  {
-    if (GetShortPathName (ptr, sptr, acc) == ERROR_INVALID_PARAMETER)
     {
-      fprintf (stderr, "%s: cannot create short name of %s\n", prog_name, ptr);
-      exit (2);
+      fprintf (stderr, "%s: out of memory\n", prog_name);
+      exit (1);
     }
+  ptr = path;
+  for (;;)
+    {
+      if (GetShortPathName (ptr, sptr, acc) == ERROR_INVALID_PARAMETER)
+	{
+	  fprintf (stderr, "%s: cannot create short name of %s\n", prog_name,
+		   ptr);
+	  exit (2);
+	}
 
-    ptr = strrchr (ptr, 0);
-    sptr = strrchr (sptr, 0);
-    if (ptr == end)
-      break;
-    *sptr = ';';
-    ++ptr, ++sptr;
-  }
+      ptr = strrchr (ptr, 0);
+      sptr = strrchr (sptr, 0);
+      if (ptr == end)
+	break;
+      *sptr = ';';
+      ++ptr, ++sptr;
+    }
   return sbuf;
 }
 
@@ -128,21 +130,23 @@ get_short_name (const char *filename)
   char *sbuf;
   DWORD len = GetShortPathName (filename, NULL, 0);
   if (len == ERROR_INVALID_PARAMETER)
-  {
-    fprintf (stderr, "%s: cannot create short name of %s\n", prog_name, filename);
-    exit (2);
-  }
-  sbuf = (char *) malloc(++len);
+    {
+      fprintf (stderr, "%s: cannot create short name of %s\n", prog_name,
+	       filename);
+      exit (2);
+    }
+  sbuf = (char *) malloc (++len);
   if (sbuf == NULL)
-  {
-    fprintf (stderr, "%s: out of memory\n", prog_name);
-    exit (1);
-  }
+    {
+      fprintf (stderr, "%s: out of memory\n", prog_name);
+      exit (1);
+    }
   if (GetShortPathName (filename, sbuf, len) == ERROR_INVALID_PARAMETER)
-  {
-    fprintf (stderr, "%s: cannot create short name of %s\n", prog_name, filename);
-    exit (2);
-  }
+    {
+      fprintf (stderr, "%s: cannot create short name of %s\n", prog_name,
+	       filename);
+      exit (2);
+    }
   return sbuf;
 }
 
@@ -152,13 +156,11 @@ doit (char *filename)
   char *buf;
   size_t len;
   int retval;
-  int (*conv_func)(const char *, char *);
+  int (*conv_func) (const char *, char *);
 
   if (path_flag)
     {
-      if (cygwin_posix_path_list_p (filename)
-	  ? unix_flag
-	  : windows_flag)
+      if (cygwin_posix_path_list_p (filename) ? unix_flag : windows_flag)
 	{
 	  /* The path is already in the right format.  */
 	  puts (filename);
@@ -166,19 +168,19 @@ doit (char *filename)
 	}
     }
 
-  if (! path_flag)
+  if (!path_flag)
     {
       len = strlen (filename) + 100;
       if (len == 100)
-        {
-          if (!ignore_flag)
-            {
-              fprintf(stderr, "%s: can't convert empty path\n", prog_name);
-              exit (1);
-            }
-          else
-            exit (0);
-        }
+	{
+	  if (!ignore_flag)
+	    {
+	      fprintf (stderr, "%s: can't convert empty path\n", prog_name);
+	      exit (1);
+	    }
+	  else
+	    exit (0);
+	}
     }
   else
     {
@@ -203,38 +205,60 @@ doit (char *filename)
       if (unix_flag)
 	cygwin_win32_to_posix_path_list (filename, buf);
       else
-      {
-	cygwin_posix_to_win32_path_list (filename, buf);
-	if (shortname_flag)
-	  buf = get_short_paths (buf);
-      }
+	{
+	  cygwin_posix_to_win32_path_list (filename, buf);
+	  if (shortname_flag)
+	    buf = get_short_paths (buf);
+	}
     }
   else
     {
       if (unix_flag)
-	conv_func = (absolute_flag ? cygwin_conv_to_full_posix_path : 
-                     cygwin_conv_to_posix_path);
+	conv_func = (absolute_flag ? cygwin_conv_to_full_posix_path :
+		     cygwin_conv_to_posix_path);
       else
-        conv_func = (absolute_flag ? cygwin_conv_to_full_win32_path :
-                     cygwin_conv_to_win32_path);
+	conv_func = (absolute_flag ? cygwin_conv_to_full_win32_path :
+		     cygwin_conv_to_win32_path);
       retval = conv_func (filename, buf);
       if (retval < 0)
-        {
-          fprintf (stderr, "%s: error converting \"%s\"\n",
-                   prog_name, filename);
-          exit (1);
-        }
+	{
+	  fprintf (stderr, "%s: error converting \"%s\"\n",
+		   prog_name, filename);
+	  exit (1);
+	}
       if (!unix_flag && shortname_flag)
-        buf = get_short_name (buf);
+	buf = get_short_name (buf);
     }
 
   puts (buf);
 }
 
+static void
+print_version ()
+{
+  const char *v = strchr (version, ':');
+  int len;
+  if (!v)
+    {
+      v = "?";
+      len = 1;
+    }
+  else
+    {
+      v += 2;
+      len = strchr (v, ' ') - v;
+    }
+  printf ("\
+cygpath (cygwin) %.*s\n\
+Path Conversion Utility\n\
+Copyright 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.\n\
+Compiled on %s", len, v, __DATE__);
+}
+
 int
 main (int argc, char **argv)
 {
-  int c, o;
+  int c, o = 0;
   int options_from_file_flag;
   char *filename;
   char buf[MAX_PATH], buf2[MAX_PATH];
@@ -257,8 +281,9 @@ main (int argc, char **argv)
   options_from_file_flag = 0;
   allusers_flag = 0;
   output_flag = 0;
-  while ((c = getopt_long (argc, argv, (char *) "hac:f:opsSuvwWiDPA", long_options, (int *) NULL))
-	 != EOF)
+  while ((c =
+	  getopt_long (argc, argv, (char *) "hac:f:opsSuvwWiDPA",
+		       long_options, (int *) NULL)) != EOF)
     {
       switch (c)
 	{
@@ -316,14 +341,14 @@ main (int argc, char **argv)
 	    usage (stderr, 1);
 	  output_flag = 1;
 	  o = 'P';
-          break;
+	  break;
 
 	case 'S':
 	  if (output_flag)
 	    usage (stderr, 1);
 	  output_flag = 1;
 	  o = 'S';
-          break;
+	  break;
 
 	case 'W':
 	  if (output_flag)
@@ -341,8 +366,7 @@ main (int argc, char **argv)
 	  break;
 
 	case 'v':
-	  printf ("Cygwin path conversion version 1.2\n");
-	  printf ("Copyright 1998-2002 Red Hat, Inc.\n");
+	  print_version ();
 	  exit (0);
 
 	default:
@@ -352,74 +376,78 @@ main (int argc, char **argv)
 
     }
 
-  if (output_flag) 
+  if (output_flag)
     {
-      switch(o) {
+      switch (o)
+	{
 	case 'D':
 	  if (!allusers_flag)
-            SHGetSpecialFolderLocation(NULL, CSIDL_DESKTOPDIRECTORY,&id);
+	    SHGetSpecialFolderLocation (NULL, CSIDL_DESKTOPDIRECTORY, &id);
 	  else
-            SHGetSpecialFolderLocation(NULL, CSIDL_COMMON_DESKTOPDIRECTORY,&id);
-          SHGetPathFromIDList(id, buf);
-          /* This if clause is a Fix for Win95 without any "All Users" */
-          if ( strlen(buf) == 0 ) {
-            SHGetSpecialFolderLocation(NULL, CSIDL_DESKTOPDIRECTORY,&id);
-            SHGetPathFromIDList(id, buf);
-          }
+	    SHGetSpecialFolderLocation (NULL, CSIDL_COMMON_DESKTOPDIRECTORY,
+					&id);
+	  SHGetPathFromIDList (id, buf);
+	  /* This if clause is a Fix for Win95 without any "All Users" */
+	  if (strlen (buf) == 0)
+	    {
+	      SHGetSpecialFolderLocation (NULL, CSIDL_DESKTOPDIRECTORY, &id);
+	      SHGetPathFromIDList (id, buf);
+	    }
 	  if (!windows_flag)
-	    cygwin_conv_to_posix_path(buf, buf2);
+	    cygwin_conv_to_posix_path (buf, buf2);
 	  else
-	    strcpy(buf2, buf);
-          printf("%s\n", buf2);
-          exit(0);
+	    strcpy (buf2, buf);
+	  printf ("%s\n", buf2);
+	  exit (0);
 
 	case 'P':
 	  if (!allusers_flag)
-            SHGetSpecialFolderLocation(NULL, CSIDL_PROGRAMS, &id);
+	    SHGetSpecialFolderLocation (NULL, CSIDL_PROGRAMS, &id);
 	  else
-            SHGetSpecialFolderLocation(NULL, CSIDL_COMMON_PROGRAMS, &id);
-          SHGetPathFromIDList(id, buf);
-          /* This if clause is a Fix for Win95 without any "All Users" */
-          if ( strlen(buf) == 0 ) {
-            SHGetSpecialFolderLocation(NULL, CSIDL_PROGRAMS, &id);
-            SHGetPathFromIDList(id, buf);
-          }
+	    SHGetSpecialFolderLocation (NULL, CSIDL_COMMON_PROGRAMS, &id);
+	  SHGetPathFromIDList (id, buf);
+	  /* This if clause is a Fix for Win95 without any "All Users" */
+	  if (strlen (buf) == 0)
+	    {
+	      SHGetSpecialFolderLocation (NULL, CSIDL_PROGRAMS, &id);
+	      SHGetPathFromIDList (id, buf);
+	    }
 	  if (!windows_flag)
-	    cygwin_conv_to_posix_path(buf, buf2);
+	    cygwin_conv_to_posix_path (buf, buf2);
 	  else
-	    strcpy(buf2, buf);
-          printf("%s\n", buf2);
-          exit(0);
- 
+	    strcpy (buf2, buf);
+	  printf ("%s\n", buf2);
+	  exit (0);
+
 	case 'S':
-	  GetSystemDirectory(buf, MAX_PATH);
-	  FindFirstFile(buf, &w32_fd);
-	  strcpy(strrchr(buf, '\\')+1, w32_fd.cFileName);
+	  GetSystemDirectory (buf, MAX_PATH);
+	  FindFirstFile (buf, &w32_fd);
+	  strcpy (strrchr (buf, '\\') + 1, w32_fd.cFileName);
 	  if (!windows_flag)
-	    cygwin_conv_to_posix_path(buf, buf2);
+	    cygwin_conv_to_posix_path (buf, buf2);
 	  else
-	    strcpy(buf2, buf);
-          printf("%s\n", buf2);
-          exit(0);
+	    strcpy (buf2, buf);
+	  printf ("%s\n", buf2);
+	  exit (0);
 
 	case 'W':
-	  GetWindowsDirectory(buf, MAX_PATH);
+	  GetWindowsDirectory (buf, MAX_PATH);
 	  if (!windows_flag)
-	    cygwin_conv_to_posix_path(buf, buf2);
+	    cygwin_conv_to_posix_path (buf, buf2);
 	  else
-	    strcpy(buf2, buf);
-          printf("%s\n", buf2);
-          exit(0);
- 
+	    strcpy (buf2, buf);
+	  printf ("%s\n", buf2);
+	  exit (0);
+
 	default:
-	  fprintf(stderr, "ERROR: main: switch(o)!\n");
-      }
-  }
+	  fprintf (stderr, "ERROR: main: switch (o)!\n");
+	}
+    }
 
   if (options_from_file_flag && !file_arg)
     usage (stderr, 1);
 
-  if (! unix_flag && ! windows_flag && !options_from_file_flag)
+  if (!unix_flag && !windows_flag && !options_from_file_flag)
     usage (stderr, 1);
 
   if (!file_arg)

@@ -1,3 +1,17 @@
+2002-03-06  Christopher Faylor  <cgf@redhat.com>
+
+	* cygpath.cc: Reformat.
+
+2002-02-27 Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
+
+	* cygpath.cc (print_version): New function.
+	(main): Accommodate new version function.  Initialize 'o' to prevent
+	warning.
+
+2002-02-27  Christopher Faylor  <cgf@redhat.com>
+
+	* cygcheck.cc (main): Eliminate non-GNU formatting glitch.
+
 2002-02-27  Christopher Faylor  <cgf@redhat.com>
 
 	* ssp.c (help_desk): Fix compiler warning.
