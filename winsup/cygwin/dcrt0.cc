@@ -33,13 +33,14 @@ details. */
 #include "shared_info.h"
 #include "cygwin_version.h"
 #include "dll_init.h"
+#include "cygthread.h"
 
 #define MAX_AT_FILE_LEVEL 10
 
 #define PREMAIN_LEN (sizeof (user_data->premain) / sizeof (user_data->premain[0]))
 
-HANDLE NO_COPY hMainProc = NULL;
-HANDLE NO_COPY hMainThread = NULL;
+HANDLE NO_COPY hMainProc;
+HANDLE NO_COPY hMainThread;
 
 sigthread NO_COPY mainthread;		// ID of the main thread
 
@@ -569,10 +570,8 @@ dll_crt0_1 ()
   user_data->resourcelocks->Init ();
   user_data->threadinterface->Init (user_data->forkee);
 
-  threadname_init ();
   (void) getpagesize ();	/* initialize page size constant */
 
-  regthread ("main", GetCurrentThreadId ());
   mainthread.init ("mainthread"); // For use in determining if signals
 				  //  should be blocked.
 
@@ -630,6 +629,7 @@ dll_crt0_1 ()
   /* Initialize the cygwin subsystem if this is the first process,
      or attach to shared data structures if it's already running. */
   memory_init ();
+  cygthread::init ();
 
   ProtectHandle (hMainProc);
   ProtectHandle (hMainThread);

@@ -42,6 +42,7 @@ details. */
 #include "sigproc.h"
 #include "perthread.h"
 #include "tty.h"
+#include "cygthread.h"
 
 /*
  * All these defines below should be in sys/types.h
@@ -512,7 +513,7 @@ static int start_thread_pipe (select_record *me, select_stuff *stuff);
 
 struct pipeinf
   {
-    HANDLE thread;
+    cygthread *thread;
     BOOL stop_thread_pipe;
     select_record *start;
   };
@@ -556,13 +557,14 @@ start_thread_pipe (select_record *me, select_stuff *stuff)
 {
   if (stuff->device_specific[FHDEVN(FH_PIPE)])
     {
-      me->h = ((pipeinf *) stuff->device_specific[FHDEVN(FH_PIPE)])->thread;
+      me->h = *((pipeinf *) stuff->device_specific[FHDEVN(FH_PIPE)])->thread;
       return 1;
     }
   pipeinf *pi = new pipeinf;
   pi->start = &stuff->start;
   pi->stop_thread_pipe = FALSE;
-  pi->thread = me->h = makethread (thread_pipe, (LPVOID)pi, 0, "select_pipe");
+  pi->thread = new cygthread (thread_pipe, (LPVOID)pi, "select_pipe");
+  me->h = *pi->thread;
   if (!me->h)
     return 0;
   stuff->device_specific[FHDEVN(FH_PIPE)] = (void *)pi;
@@ -576,8 +578,7 @@ pipe_cleanup (select_record *, select_stuff *stuff)
   if (pi && pi->thread)
     {
       pi->stop_thread_pipe = true;
-      WaitForSingleObject (pi->thread, INFINITE);
-      CloseHandle (pi->thread);
+      pi->thread->detach ();
       delete pi;
       stuff->device_specific[FHDEVN(FH_PIPE)] = NULL;
     }
@@ -865,7 +866,7 @@ static int start_thread_serial (select_record *me, select_stuff *stuff);
 
 struct serialinf
   {
-    HANDLE thread;
+    cygthread *thread;
     BOOL stop_thread_serial;
     select_record *start;
   };
@@ -1007,15 +1008,14 @@ start_thread_serial (select_record *me, select_stuff *stuff)
 {
   if (stuff->device_specific[FHDEVN(FH_SERIAL)])
     {
-      me->h = ((pipeinf *) stuff->device_specific[FHDEVN(FH_SERIAL)])->thread;
+      me->h = *((serialinf *) stuff->device_specific[FHDEVN(FH_SERIAL)])->thread;
       return 1;
     }
   serialinf *si = new serialinf;
   si->start = &stuff->start;
   si->stop_thread_serial = FALSE;
-  si->thread = me->h = makethread (thread_serial, (LPVOID)si, 0, "select_serial");
-  if (!me->h)
-    return 0;
+  si->thread = new cygthread (thread_serial, (LPVOID)si, "select_serial");
+  me->h = *si->thread;
   stuff->device_specific[FHDEVN(FH_SERIAL)] = (void *)si;
   return 1;
 }
@@ -1027,8 +1027,7 @@ serial_cleanup (select_record *, select_stuff *stuff)
   if (si && si->thread)
     {
       si->stop_thread_serial = true;
-      WaitForSingleObject (si->thread, INFINITE);
-      CloseHandle (si->thread);
+      si->thread->detach ();
       delete si;
       stuff->device_specific[FHDEVN(FH_SERIAL)] = NULL;
     }
@@ -1169,7 +1168,7 @@ fhandler_base::select_except (select_record *s)
 
 struct socketinf
   {
-    HANDLE thread;
+    cygthread *thread;
     winsock_fd_set readfds, writefds, exceptfds;
     SOCKET exitsock;
     struct sockaddr_in sin;
@@ -1280,7 +1279,7 @@ start_thread_socket (select_record *me, select_stuff *stuff)
 
   if ((si = (socketinf *)stuff->device_specific[FHDEVN(FH_SOCKET)]))
     {
-      me->h = si->thread;
+      me->h = *si->thread;
       return 1;
     }
 
@@ -1349,9 +1348,9 @@ start_thread_socket (select_record *me, select_stuff *stuff)
   stuff->device_specific[FHDEVN(FH_SOCKET)] = (void *) si;
   si->start = &stuff->start;
   select_printf ("stuff_start %p", &stuff->start);
-  si->thread = me->h = makethread (thread_socket, (LPVOID)si, 0,
-				  "select_socket");
-  return !!me->h;
+  si->thread = new cygthread (thread_socket, (LPVOID)si, "select_socket");
+  me->h = *si->thread;
+  return 1;
 
 err:
   set_winsock_errno ();
@@ -1387,10 +1386,9 @@ socket_cleanup (select_record *, select_stuff *stuff)
       closesocket (s);
 
       /* Wait for thread to go away */
-      WaitForSingleObject (si->thread, INFINITE);
+      si->thread->detach ();
       shutdown (si->exitsock, SD_BOTH);
       closesocket (si->exitsock);
-      CloseHandle (si->thread);
       stuff->device_specific[FHDEVN(FH_SOCKET)] = NULL;
       delete si;
     }

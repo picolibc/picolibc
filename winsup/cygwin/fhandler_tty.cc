@@ -25,6 +25,7 @@ details. */
 #include "cygheap.h"
 #include "shared_info.h"
 #include "cygwin/cygserver.h"
+#include "cygthread.h"
 
 /* Tty master stuff */
 
@@ -42,7 +43,6 @@ fhandler_tty_master::fhandler_tty_master (int unit)
 int
 fhandler_tty_master::init (int ntty)
 {
-  HANDLE h;
   termios_printf ("Creating master for tty%d", ntty);
 
   if (init_console ())
@@ -61,38 +61,16 @@ fhandler_tty_master::init (int ntty)
 
   inuse = get_ttyp ()->create_inuse (TTY_MASTER_ALIVE);
 
-  h = makethread (process_input, NULL, 0, "ttyin");
-  if (h == NULL)
-    {
-      termios_printf ("can't create input thread");
-      return -1;
-    }
-  else
-    {
-      SetThreadPriority (h, THREAD_PRIORITY_HIGHEST);
-      CloseHandle (h);
-    }
+  cygthread *h;
+  h = new cygthread (process_input, NULL, "ttyin");
+  SetThreadPriority (*h, THREAD_PRIORITY_HIGHEST);
 
-  h = makethread (process_ioctl, NULL, 0, "ttyioctl");
-  if (h == NULL)
-    {
-      termios_printf ("can't create ioctl thread");
-      return -1;
-    }
-  else
-    {
-      SetThreadPriority (h, THREAD_PRIORITY_HIGHEST);
-      CloseHandle (h);
-    }
+  h = new cygthread (process_ioctl, NULL, "ttyioctl");
+  SetThreadPriority (*h, THREAD_PRIORITY_HIGHEST);
 
-  hThread = makethread (process_output, NULL, 0, "ttyout");
-  if (hThread != NULL)
-    SetThreadPriority (hThread, THREAD_PRIORITY_HIGHEST);
-  else
-    {
-      termios_printf ("can't create output thread");
-      return -1;
-    }
+  h = new cygthread (process_output, NULL, "ttyout");
+  hThread = *h;
+  SetThreadPriority (h, THREAD_PRIORITY_HIGHEST);
 
   return 0;
 }
@@ -124,7 +102,7 @@ fhandler_tty_common::__acquire_output_mutex (const char *fn, int ln,
 #else
       ostack[osi].fn = fn;
       ostack[osi].ln = ln;
-      ostack[osi].tname = threadname (0, 0);
+      ostack[osi].tname = cygthread::name ();
       termios_printf ("acquired for %s:%d, osi %d", fn, ln, osi);
       osi++;
 #endif

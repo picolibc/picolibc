@@ -27,6 +27,7 @@ details. */
 #include "cygheap.h"
 #include "wincap.h"
 #include "heap.h"
+#include "cygthread.h"
 
 static external_pinfo *
 fillout_pinfo (pid_t pid, int winpid)
@@ -145,13 +146,12 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	return 1;
 
       case CW_GETTHREADNAME:
-	return (DWORD) threadname (va_arg (arg, DWORD));
+	return (DWORD) cygthread::name (va_arg (arg, DWORD));
 
       case CW_SETTHREADNAME:
 	{
-	  char *name = va_arg (arg, char *);
-	  regthread (name, va_arg (arg, DWORD));
-	  return 1;
+	  set_errno (ENOSYS);
+	  return 0;
 	}
 
       case CW_GETPINFO:

@@ -18,6 +18,7 @@ details. */
 #include "perprocess.h"
 #include "cygwin_version.h"
 #include "hires.h"
+#include "cygthread.h"
 
 #define PROTECT(x) x[sizeof(x)-1] = 0
 #define CHECK(x) if (x[sizeof(x)-1] != 0) { small_printf("array bound exceeded %d\n", __LINE__); ExitProcess(1); }
@@ -111,7 +112,7 @@ strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
   char fmt[80];
   static NO_COPY int nonewline = FALSE;
   DWORD err = GetLastError ();
-  const char *tn = threadname (0);
+  const char *tn = cygthread::name ();
   char *pn = __progname ?: myself->progname;
 
   int microsec = microseconds ();

@@ -143,6 +143,7 @@ tty_list::terminate (void)
       ForceCloseHandle1 (t->to_slave, to_pty);
       ForceCloseHandle1 (t->from_slave, from_pty);
       CloseHandle (tty_master->inuse);
+      // FIXME This should be using a cygthread object
       WaitForSingleObject (tty_master->hThread, INFINITE);
       t->init ();
 

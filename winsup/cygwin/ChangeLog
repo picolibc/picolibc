@@ -1,3 +1,41 @@
+2002-08-01  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc: Remove cruft.
+
+2002-08-01  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (DLL_OFILES): Add cygthread.o.
+	* dcrt0.cc (dll_crt0_1): Eliminate various thread initialization
+	functions in favor of new cygthread class.
+	* debug.cc: Remove thread manipulation functions.
+	* debug.h: Ditto.
+	* external.cc (cygwin_internal): Use cygthread method for determining
+	thread name.  Remove capability for setting thread name.
+	* fhandler_console.cc (fhandler_console::read): Use cygthread method
+	rather than iscygthread function.
+	* fhandler_tty.cc (fhandler_tty_master::fhandler_tty_master): Use
+	cygthread methods to create threads.
+	(fhandler_tty_common::__acquire_output_mutex): Use cygthread method to
+	retrieve thread name.
+	* select.cc (pipeinf): Use cygthread pointer rather than handle.
+	(start_thread_pipe): Ditto.
+	(pipe_cleanup): Ditto.
+	(serialinf): Ditto.
+	(start_thread_serial): Ditto.
+	(serial_cleanup): Ditto.
+	(socketinf): Ditto.
+	(start_thread_socket): Ditto.
+	(socket_cleanup): Ditto.
+	* sigproc.cc (hwait_sig): Ditto.
+	(hwait_subproc): Ditto.
+	(proc_terminate): Ditto.
+	(sigproc_terminate): Ditto.
+	(sigproc_init): Initialize cygthread hwait_sig pointer.
+	(subproc_init): Initialize cygthread hwait_subproc pointer.
+	(wait_sig): Rely on cygthread HANDLE operator.
+	* strace.cc (strace::vsprntf): Use cygthread::name rather than threadname.
+	* window.cc (gethwnd): Use cygthread method to initialize thread.
+
 2002-07-31  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* fhandler.h (fhandler_base::get_r_no_interrupt): Make non-virtual.
