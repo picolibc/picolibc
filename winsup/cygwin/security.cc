@@ -1367,27 +1367,39 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
       return NULL;
     }
 
-  /* Get SID and name of new owner. */
-  char owner[UNLEN + 1];
-  cygsid owner_sid;
-  struct passwd *pw = getpwuid32 (uid);
-  strcpy (owner, pw ? pw->pw_name : getlogin ());
-  if (!pw || !owner_sid.getfrompw (pw))
-    return NULL;
-  debug_printf ("owner: %s [%d]", owner,
-		*GetSidSubAuthority (owner_sid,
-		*GetSidSubAuthorityCount (owner_sid) - 1));
+  /* Get SID of owner. */
+  cygsid owner_sid (NO_SID);
+  /* Check for current user first */
+  if (uid == myself->uid)
+    owner_sid = cygheap->user.sid ();
+  else if (uid == cygheap->user.orig_uid)
+    owner_sid = cygheap->user.orig_sid ();
+  if (!owner_sid)
+    {
+      /* Otherwise retrieve user data from /etc/passwd */
+      struct passwd *pw = getpwuid32 (uid);
+      if (!pw)
+        {
+	  debug_printf ("no /etc/passwd entry for %d", uid);
+	  set_errno (EINVAL);
+	  return NULL;
+	}
+      else if (!owner_sid.getfrompw (pw))
+        {
+	  debug_printf ("no SID for user %d", uid);
+	  set_errno (EINVAL);
+	  return NULL;
+	}
+    }
+  owner_sid.debug_print ("alloc_sd: owner SID =");
 
-  /* Get SID and name of new group. */
+  /* Get SID of new group. */
   cygsid group_sid (NO_SID);
   struct __group32 *grp = getgrgid32 (gid);
-  if (grp)
-    {
-      if (!grp || !group_sid.getfromgr (grp))
-	return NULL;
-    }
-  else
-    debug_printf ("no group");
+  if (!grp)
+    debug_printf ("no /etc/group entry for %d", gid);
+  else if (!group_sid.getfromgr (grp))
+    debug_printf ("no SID for group %d", gid);
 
   /* Initialize local security descriptor. */
   SECURITY_DESCRIPTOR sd;

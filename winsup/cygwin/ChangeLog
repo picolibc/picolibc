@@ -401,6 +401,30 @@
 
 2002-06-21  Christopher Faylor  <cgf@redhat.com>
 
+	* Makefile.in (cygrun.exe): Move -lgcc where it will do some good.
+
+2002-06-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (stat64_to_stat32): Correctly evaluate st_rdev.
+	(fstat64): Set st_rdev to same value as st_dev.
+	(stat_worker): Ditto.
+
+2002-06-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (alloc_sd): Carefully check owner_sid again after trying
+	SIDs from cygheap.
+
+2002-06-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (alloc_sd): Remove unnecessary retrieval of owner name.
+	Check uid for current user first and use SIDs from cygheap if so.
+	Set errno to EINVAL if user SID isn't retrievable.  Just print user SID
+	as debug output.
+	Don't bail out if group SID isn't retrievable.  Change debug output
+	appropriately.
+
+2002-06-21  Christopher Faylor  <cgf@redhat.com>
+
 	* errno.cc: Change text description for EBADF throughout.
 
 2002-06-20  Pierre Humblet <pierre.humblet@ieee.org>
