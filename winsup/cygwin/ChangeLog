@@ -1,3 +1,9 @@
+2005-04-06  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* security.h (cygsidlist::addfromgr): Avoid duplicate entries.
+	* grp.cc (initgrousp): Add syscall_printf.
+	(setgroups): Add syscall_printf and make sure sids are added only once.
+
 2005-04-06  Christopher Faylor  <cgf@timesys.com>
 
 	* net.cc (cygwin_getservbyname): Return (possibly NULL) return value of

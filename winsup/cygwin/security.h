@@ -148,7 +148,8 @@ public:
   BOOL add (const char *sidstr)
     { cygsid nsi (sidstr); return add (nsi); }
   BOOL addfromgr (struct __group32 *gr) /* Only with alloc */
-    { return sids[count++].getfromgr (gr); }
+    { return sids[count].getfromgr (gr)
+	     && (contains (sids[count]) || ++count); }
 
   BOOL operator+= (cygsid &si) { return add (si); }
   BOOL operator+= (const char *sidstr) { return add (sidstr); }

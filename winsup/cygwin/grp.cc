@@ -448,15 +448,16 @@ getgroups (int gidsetsize, __gid16_t *grouplist)
 }
 
 extern "C" int
-initgroups32 (const char *, __gid32_t)
+initgroups32 (const char *name, __gid32_t gid)
 {
   if (wincap.has_security ())
     cygheap->user.groups.clear_supp ();
+  syscall_printf ( "0 = initgroups (%s, %u)", name, gid);
   return 0;
 }
 
 extern "C" int
-initgroups (const char * name, __gid16_t gid)
+initgroups (const char *name, __gid16_t gid)
 {
   return initgroups32 (name, gid16togid32(gid));
 }
@@ -465,6 +466,7 @@ initgroups (const char * name, __gid16_t gid)
 extern "C" int
 setgroups32 (int ngroups, const __gid32_t *grouplist)
 {
+  syscall_printf ("setgroups32 (%d)", ngroups);
   if (ngroups < 0 || (ngroups > 0 && !grouplist))
     {
       set_errno (EINVAL);
@@ -482,18 +484,13 @@ setgroups32 (int ngroups, const __gid32_t *grouplist)
 
   for (int gidx = 0; gidx < ngroups; ++gidx)
     {
-      for (int gidy = 0; gidy < gidx; gidy++)
-	if (grouplist[gidy] == grouplist[gidx])
-	  goto found; /* Duplicate */
-      if ((gr = internal_getgrgid (grouplist[gidx])) &&
-	  gsids.addfromgr (gr))
-	goto found;
+      if ((gr = internal_getgrgid (grouplist[gidx]))
+	  && gsids.addfromgr (gr))
+	continue;
       debug_printf ("No sid found for gid %d", grouplist[gidx]);
       gsids.free_sids ();
       set_errno (EINVAL);
       return -1;
-    found:
-      continue;
     }
   cygheap->user.groups.update_supp (gsids);
   return 0;
