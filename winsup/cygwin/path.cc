@@ -2631,8 +2631,6 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 
   pflags &= ~PATH_SYMLINK;
 
-  ext_tacked_on = !*ext_here;
-
   case_clash = FALSE;
 
   while (suffix.next ())
@@ -2649,11 +2647,16 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	  continue;
 	}
 
+
+      ext_tacked_on = !!*ext_here;
+
       if (pcheck_case != PCHECK_RELAXED && !case_check (path)
           || (opt & PC_SYM_IGNORE))
         goto file_not_symlink;
 
-      int sym_check = 0;
+      int sym_check;
+
+      sym_check = 0;
 
       if (fileattr & FILE_ATTRIBUTE_DIRECTORY)
         goto file_not_symlink;
@@ -2684,13 +2687,10 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	case 1:
 	  res = check_shortcut (suffix.path, fileattr, h, contents, &error, &pflags);
 	  if (res)
-	    {
-	      ext_tacked_on = 1;
-	      break;
-	    }
+	    break;
 	  /* If searching for `foo' and then finding a `foo.lnk' which is
 	     no shortcut, return the same as if file not found. */
-	  if (!suffix.lnk_match () || pathmatch(path, suffix.path))
+	  if (!suffix.lnk_match () || !ext_tacked_on)
 	    goto file_not_symlink;
 
 	  fileattr = (DWORD) -1;
@@ -2702,15 +2702,14 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	  break;
 	}
       break;
+
+    file_not_symlink:
+      is_symlink = FALSE;
+      syscall_printf ("not a symlink");
+      res = 0;
+      break;
     }
-  goto out;
 
-file_not_symlink:
-  is_symlink = FALSE;
-  syscall_printf ("not a symlink");
-  res = 0;
-
-out:
   syscall_printf ("%d = symlink.check (%s, %p) (%p)",
 		  res, suffix.path, contents, pflags);
   return res;
