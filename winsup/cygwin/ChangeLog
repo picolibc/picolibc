@@ -1,3 +1,9 @@
+2002-12-14  Steve Osborn  <bub@io.com>
+
+	* fhandler_termios.cc (fhandler_termios::line_edit): Call
+	accept_input() in character processing loop.  Set return value
+	independently of input_done.
+
 2002-12-14  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler.cc (fhandler_base::read): Signal event, if necessary, and

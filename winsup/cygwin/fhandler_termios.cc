@@ -308,7 +308,8 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
       else if (CCEQ (tc->ti.c_cc[VEOF], c))
 	{
 	  termios_printf ("EOF");
-	  input_done = 1;
+	  (void) accept_input();
+	  ret = line_edit_input_done;
 	  continue;
 	}
       else if (CCEQ (tc->ti.c_cc[VEOL], c) ||
@@ -323,20 +324,21 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
 	c = cyg_tolower (c);
 
       put_readahead (c);
+      if (!iscanon || always_accept || input_done)
+	{
+	  (void) accept_input();
+	  ret = line_edit_input_done;
+	  input_done = 0;
+	}
       if (tc->ti.c_lflag & ECHO)
 	doecho (&c, 1);
     }
 
-  if (!iscanon || always_accept)
-    set_input_done (ralen > 0);
+  if ((!iscanon || always_accept) && ralen > 0)
+    ret = line_edit_input_done;
 
   if (sawsig)
     ret = line_edit_signalled;
-  else if (input_done)
-    {
-      ret = line_edit_input_done;
-      (void) accept_input ();
-    }
 
   return ret;
 }
