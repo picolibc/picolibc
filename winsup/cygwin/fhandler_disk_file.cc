@@ -109,39 +109,26 @@ fhandler_disk_file::fstat_by_name (struct __stat64 *buf, path_conv *pc)
       set_errno (ENOENT);
       res = -1;
     }
+  else if (pc->isdir () && strlen (*pc) <= strlen (pc->root_dir ()))
+    {
+      FILETIME ft = {};
+      res = fstat_helper (buf, pc, ft, ft, ft, 0, 0);
+    }
+  else if ((handle = FindFirstFile (*pc, &local)) == INVALID_HANDLE_VALUE)
+    {
+      debug_printf ("FindFirstFile failed for '%s', %E", (char *) *pc);
+      __seterrno ();
+      res = -1;
+    }
   else
     {
-      char drivebuf[5];
-      char *name;
-      if ((*pc)[3] != '\0' || !isalpha ((*pc)[0]) || (*pc)[1] != ':' || (*pc)[2] != '\\')
-	name = *pc;
-      else
-	{
-	  /* FIXME: Does this work on empty disks? */
-	  drivebuf[0] = (*pc)[0];
-	  drivebuf[1] = (*pc)[1];
-	  drivebuf[2] = (*pc)[2];
-	  drivebuf[3] = '*';
-	  drivebuf[4] = '\0';
-	  name = drivebuf;
-	}
-
-      if ((handle = FindFirstFile (name, &local)) == INVALID_HANDLE_VALUE)
-      {
-	debug_printf ("FindFirstFile failed for '%s', %E", name);
-	__seterrno ();
-	res = -1;
-      }
-    else
-      {
-	FindClose (handle);
-	res = fstat_helper (buf, pc,
-			    local.ftCreationTime,
-			    local.ftLastAccessTime,
-			    local.ftLastWriteTime,
-			    local.nFileSizeHigh,
-			    local.nFileSizeLow);
-      }
+      FindClose (handle);
+      res = fstat_helper (buf, pc,
+			  local.ftCreationTime,
+			  local.ftLastAccessTime,
+			  local.ftLastWriteTime,
+			  local.nFileSizeHigh,
+			  local.nFileSizeLow);
     }
   return res;
 }

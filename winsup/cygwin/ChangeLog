@@ -1,6 +1,15 @@
+2003-05-25  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* autoload.cc (GetDiskFreeSpaceEx): Add.
+	* syscalls.cc (statfs): Call full_path.root_dir() instead of
+	rootdir(full_path). Use GetDiskFreeSpaceEx when available and
+	report space available in addition to free space.
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat_by_name):
+	Do not call FindFirstFile for disk root directories.
+
 2003-05-24  Joe Buehler  <jhpb@draco.hekimian.com>
 
-	* fhandler_process.cc (format_process_stat): use PagefileUsage
+	* fhandler_process.cc (format_process_stat): Use PagefileUsage
 	instead of VirtualSize.
 	(get_mem_values): Ditto.
 

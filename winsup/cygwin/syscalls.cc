@@ -1871,17 +1871,29 @@ statfs (const char *fname, struct statfs *sfs)
     }
 
   path_conv full_path (fname, PC_SYM_FOLLOW | PC_FULL);
-  char *root = rootdir (full_path);
+
+  const char *root = full_path.root_dir();
 
   syscall_printf ("statfs %s", root);
 
-  DWORD spc, bps, freec, totalc;
+  DWORD spc, bps, availc, freec, totalc;
 
   if (!GetDiskFreeSpace (root, &spc, &bps, &freec, &totalc))
     {
       __seterrno ();
       return -1;
     }
+
+  ULARGE_INTEGER availb, freeb, totalb;
+
+  if (GetDiskFreeSpaceEx (root, &availb, &totalb, &freeb))
+    {
+      availc = availb.QuadPart / (spc*bps);
+      totalc = totalb.QuadPart / (spc*bps);
+      freec = freeb.QuadPart / (spc*bps);
+    }
+  else
+    availc = freec;
 
   DWORD vsn, maxlen, flags;
 
@@ -1893,7 +1905,8 @@ statfs (const char *fname, struct statfs *sfs)
   sfs->f_type = flags;
   sfs->f_bsize = spc*bps;
   sfs->f_blocks = totalc;
-  sfs->f_bfree = sfs->f_bavail = freec;
+  sfs->f_bavail = availc;
+  sfs->f_bfree = freec;
   sfs->f_files = -1;
   sfs->f_ffree = -1;
   sfs->f_fsid = vsn;
