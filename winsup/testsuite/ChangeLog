@@ -1,3 +1,14 @@
+2004-08-17 Gerd Spalink <Gerd.Spalink@t-online.de>
+	   Pierre Humblet <Pierre.Humblet@ieee.org>
+
+	* devdsp.c: Outputs the names of the main test functions.
+	(forkrectest): Expect child success.
+	(forkplaytest): Ditto.
+	(syncwithchild): Output the child status and the desired value.
+	(sinegenw): Reduce volume of the beep.
+	(sinegenb): Ditto.
+	(dup_test): New test.
+
 2004-04-13  Gerd Spalink  <Gerd.Spalink@t-online.de>
 
 	* winsup.api/devdsp.c (forkrectest): Move synchronization with child

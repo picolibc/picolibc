@@ -29,6 +29,9 @@ details. */
 #include <errno.h>
 #include "test.h" /* use libltp framework */
 
+/* Controls if a child can open the device after the parent */
+#define CHILD_EXPECT 0 /* 0 or 1 */
+
 static const char wavfile_okay[] =
   {
 #include "devdsp_okay.h" /* a sound sample */
@@ -36,7 +39,7 @@ static const char wavfile_okay[] =
 
 /* Globals required by libltp */
 const char *TCID = "devdsp";   /* set test case identifier */
-int TST_TOTAL = 35;
+int TST_TOTAL = 37;
 
 /* Prototypes */
 void sinegen (void *wave, int rate, int bits, int len, int stride);
@@ -57,6 +60,7 @@ void abortplaytest (void);
 void playwavtest (void);
 void syncwithchild (pid_t pid, int expected_exit_status);
 void cleanup (void);
+void dup_test (void);
 
 static int expect_child_failure = 0;
 
@@ -83,6 +87,7 @@ main (int argc, char *argv[])
   forkrectest ();
   abortplaytest ();
   playwavtest ();
+  dup_test ();
   tst_exit ();
   /* NOTREACHED */
   return 0;
@@ -96,6 +101,7 @@ ioctltest (void)
   int ioctl_par;
   int channels;
 
+  tst_resm (TINFO, "Running %s", __FUNCTION__);
   audio1 = open ("/dev/dsp", O_WRONLY);
   if (audio1 < 0)
     {
@@ -143,6 +149,7 @@ playbacktest (void)
   int audio1, audio2;
   int rate, k;
 
+  tst_resm (TINFO, "Running %s", __FUNCTION__);
   audio1 = open ("/dev/dsp", O_WRONLY);
   if (audio1 < 0)
     {
@@ -155,7 +162,7 @@ playbacktest (void)
       tst_brkm (TFAIL, cleanup,
 		"Second open /dev/dsp W succeeded, but is expected to fail");
     }
-  if (errno != EBUSY)
+  else if (errno != EBUSY)
     {
       tst_brkm (TFAIL, cleanup, "Expected EBUSY here, exit: %s",
 		strerror (errno));
@@ -179,7 +186,9 @@ recordingtest (void)
 {
   int audio1, audio2;
   int rate, k;
+
   /* test read / record */
+  tst_resm (TINFO, "Running %s", __FUNCTION__);
   audio1 = open ("/dev/dsp", O_RDONLY);
   if (audio1 < 0)
     {
@@ -192,7 +201,7 @@ recordingtest (void)
       tst_brkm (TFAIL, cleanup,
 		"Second open /dev/dsp R succeeded, but is expected to fail");
     }
-  if (errno != EBUSY)
+  else if (errno != EBUSY)
     {
       tst_brkm (TFAIL, cleanup, "Expected EBUSY here, exit: %s",
 		strerror (errno));
@@ -216,6 +225,7 @@ monitortest (void)
 {
   int fd;
 
+  tst_resm (TINFO, "Running %s", __FUNCTION__);
   fd = open ("/dev/dsp", O_RDWR);
   if (fd < 0)
     {
@@ -235,6 +245,7 @@ forkrectest (void)
   int pid;
   int fd;
 
+  tst_resm (TINFO, "Running %s", __FUNCTION__);
   fd = open ("/dev/dsp", O_RDONLY);
   if (fd < 0)
     {
@@ -274,15 +285,16 @@ forkrectest (void)
   if (pid)
     {
       tst_resm (TINFO, "forked, child PID=%d", pid);
-      syncwithchild (pid, TFAIL);	/* expecting error exit */
+      syncwithchild (pid, CHILD_EXPECT?TFAIL:0);   /* expecting error exit */
       tst_resm (TINFO, "parent records again ..");
       rectest (fd, 22050, 1, 16);
       tst_resm (TINFO, "parent done");
     }
   else
     {				/* child */
-      expect_child_failure = 1;
-      tst_resm (TINFO, "child trying to record (should fail)..");
+      expect_child_failure = CHILD_EXPECT;
+      tst_resm (TINFO, "child trying to record %s",
+		CHILD_EXPECT?"(should fail)..":"");
       rectest (fd, 44100, 1, 16);
       /* NOTREACHED */
       tst_resm (TINFO, "child done");
@@ -293,7 +305,7 @@ forkrectest (void)
     {
       tst_brkm (TFAIL, cleanup, "Close audio: %s", strerror (errno));
     }
-  tst_resm (TPASS, "child cannot record if parent is already recording");
+  tst_resm (TPASS, "child tries to record while parent is already recording");
 }
 
 void
@@ -302,6 +314,7 @@ forkplaytest (void)
   int pid;
   int fd;
 
+  tst_resm (TINFO, "Running %s", __FUNCTION__);
   fd = open ("/dev/dsp", O_WRONLY);
   if (fd < 0)
     {
@@ -341,15 +354,16 @@ forkplaytest (void)
   if (pid)
     {
       tst_resm (TINFO, "forked, child PID=%d", pid);
-      syncwithchild (pid, TFAIL);	/* expected failure */
+      syncwithchild (pid, CHILD_EXPECT?TFAIL:0);  /* expected failure */
       tst_resm (TINFO, "parent plays again..");
       playtest (fd, 22050, 0, 8);
       tst_resm (TINFO, "parent done");
     }
   else
     {				/* child */
-      expect_child_failure = 1;
-      tst_resm (TINFO, "child trying to play (should fail)..");
+      expect_child_failure = CHILD_EXPECT;
+      tst_resm (TINFO, "child trying to play %s",
+		CHILD_EXPECT?"(should fail)..":"");
       playtest (fd, 44100, 1, 16);
       /* NOTREACHED */
       tst_resm (TINFO, "child done");
@@ -360,7 +374,7 @@ forkplaytest (void)
     {
       tst_brkm (TFAIL, cleanup, "Close audio: %s", strerror (errno));
     }
-  tst_resm (TPASS, "child cannot play if parent is already playing");
+  tst_resm (TPASS, "child tries to play while parent is already playing");
 }
 
 void
@@ -552,7 +566,8 @@ syncwithchild (pid_t pid, int expected_exit_status)
     }
   if (WEXITSTATUS (status) != expected_exit_status)
     {
-      tst_brkm (TBROK, cleanup, "Child had exit status != 0");
+      tst_brkm (TFAIL, cleanup, "Child had exit status %d != %d",
+		WEXITSTATUS (status), expected_exit_status);
     }
 }
 
@@ -582,7 +597,7 @@ sinegenw (int freq, int samprate, short *value, int len, int stride)
   incr = M_PI * 2.0 * (double) freq / (double) samprate;
   while (len-- > 0)
     {
-      *value = (short) floor (0.5 + 32766.5 * sin (phase));
+      *value = (short) floor (0.5 + 6553 * sin (phase));
       value += stride;
       phase += incr;
     }
@@ -597,7 +612,7 @@ sinegenb (int freq, int samprate, unsigned char *value, int len, int stride)
   incr = M_PI * 2.0 * (double) freq / (double) samprate;
   while (len-- > 0)
     {
-      *value = (unsigned char) floor (128.5 + 126.5 * sin (phase));
+      *value = (unsigned char) floor (128.5 + 26 * sin (phase));
       value += stride;
       phase += incr;
     }
@@ -611,6 +626,7 @@ abortplaytest (void)
   int n;
   int ioctl_par = 0;
 
+  tst_resm (TINFO, "Running %s", __FUNCTION__);
   audio = open ("/dev/dsp", O_WRONLY);
   if (audio < 0)
     {
@@ -642,6 +658,8 @@ playwavtest (void)
   int audio;
   int size = sizeof (wavfile_okay);
   int n;
+
+  tst_resm (TINFO, "Running %s", __FUNCTION__);
   audio = open ("/dev/dsp", O_WRONLY);
   if (audio < 0)
     {
@@ -663,6 +681,102 @@ playwavtest (void)
   tst_resm (TPASS, "Set parameters from wave file header");
 }
 
+void dup_test (void)
+{
+  int audio, fd, n;
+  int bits1, bits2;
+  int size = sizeof (wavfile_okay);
+  int header = 44;
+  const char *okay = wavfile_okay + header;
+
+  tst_resm (TINFO, "Running %s", __FUNCTION__);
+  audio = open ("/dev/dsp", O_WRONLY);
+  if (audio < 0)
+    {
+      tst_brkm (TFAIL, cleanup, "Error open /dev/dsp W: %s",
+		strerror (errno));
+    }
+  /* write header once to set parameters correctly */
+  n = write (audio, wavfile_okay, header);
+  if (n != header)
+    {
+      tst_brkm (TFAIL, cleanup, "Wrote %d, expected %d; exit", n, header);
+    }
+  size = size - header;
+  /* dup / close */
+  for (fd = audio+1; fd <= audio+5; fd++)
+    if (dup2 (fd-1, fd) != -1)
+      {
+	if (fd-2 >= audio)
+	  if (close (fd-2) < 0)
+	    {
+	      tst_brkm (TFAIL, cleanup, "Close audio: %s", strerror (errno));
+	    }
+	if ((n = write (fd, okay, size)) < 0)
+	  {
+	    tst_brkm (TFAIL, cleanup, "write: %s", strerror (errno));
+	  }
+	if (n != size)
+	  {
+	    tst_brkm (TFAIL, cleanup, "Wrote %d, expected %d; exit", n, size);
+	  }
+      }
+    else
+      tst_brkm (TFAIL, cleanup, "dup: %s", strerror (errno));
+
+  for (fd = audio+4; fd <= audio+5; fd++)
+    if (close (fd) < 0)
+      {
+	tst_brkm (TFAIL, cleanup, "Close audio: %s", strerror (errno));
+      }
+  tst_resm (TPASS, "Write to duped fd");
+
+  audio = open ("/dev/dsp", O_WRONLY);
+  if (audio < 0)
+    {
+      tst_brkm (TFAIL, cleanup, "Error open /dev/dsp W: %s",
+		strerror (errno));
+    }
+  fd = audio + 1;
+  if (dup2 (audio, fd) == -1)
+    {
+      tst_brkm (TFAIL, cleanup, "dup: %s", strerror (errno));
+    }
+  bits1 = AFMT_U8;
+  if (ioctl (audio, SNDCTL_DSP_SAMPLESIZE, &bits1) < 0)
+    {
+      tst_brkm (TFAIL, cleanup, "ioctl: %s", strerror (errno));
+    }
+  bits1 = AFMT_S16_LE;
+  if (ioctl (fd, SNDCTL_DSP_SAMPLESIZE, &bits1) < 0)
+    {
+      tst_brkm (TFAIL, cleanup, "ioctl: %s", strerror (errno));
+    }
+  bits1 = AFMT_QUERY;
+  if (ioctl (audio, SNDCTL_DSP_SAMPLESIZE, &bits1) < 0)
+    {
+      tst_brkm (TFAIL, cleanup, "ioctl: %s", strerror (errno));
+    }
+  bits2 = AFMT_QUERY;
+  if (ioctl (fd, SNDCTL_DSP_SAMPLESIZE, &bits2) < 0)
+    {
+      tst_brkm (TFAIL, cleanup, "ioctl: %s", strerror (errno));
+    }
+  if (bits1 != AFMT_S16_LE || bits2 != AFMT_S16_LE)
+    {
+      tst_brkm (TFAIL, cleanup, "Inconsistent state of duped fd: %d %d %d",
+		AFMT_S16_LE,bits1,bits2);
+    }
+  if (close (audio) < 0)
+    {
+      tst_brkm (TFAIL, cleanup, "Close audio: %s", strerror (errno));
+    }
+  if (close (fd) < 0)
+    {
+      tst_brkm (TFAIL, cleanup, "Close audio: %s", strerror (errno));
+    }
+  tst_resm (TPASS, "Parameter change to duped fd");
+}
 void
 cleanup (void)
 {
