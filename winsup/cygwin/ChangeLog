@@ -1,3 +1,7 @@
+Tue Sep 18 18:21:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* mmap.cc (mmap): Don't reuse anonymous memory in MAP_FIXED case.
+
 Mon Sep 17 17:29:25 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* include/io.h: Add access declaration.

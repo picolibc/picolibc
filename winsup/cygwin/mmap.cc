@@ -503,7 +503,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
   /* First check if this mapping matches into the chunk of another
      already performed mapping. Only valid for MAP_ANON in a special
      case of MAP_PRIVATE. */
-  if (l && fd == -1 && off == 0)
+  if (l && fd == -1 && off == 0 && !(flags & MAP_FIXED))
     {
       mmap_record *rec;
       if ((rec = l->match (off, len)) != NULL)
