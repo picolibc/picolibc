@@ -70,19 +70,14 @@ open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, shared_locat
       + pround (sizeof (_pinfo))
   };
 
-  if (m == SH_CYGWIN_SHARED)
+  void *addr;
+  if (!wincap.needs_memory_protection ())
+    addr = NULL;
+  else
     {
-      for (int i = SH_CYGWIN_SHARED; i < SH_TOTAL_SIZE; i++)
-	if (!VirtualAlloc (offsets[i], offsets[i + 1] - offsets[i],
-			   MEM_RESERVE, PAGE_NOACCESS))
-	  continue;  /* oh well */
-      if (!child_proc_info)
-	for (DWORD s = 0x950000; s <= 0xa40000; s += 0x1000)
-	  VirtualAlloc ((void *) s, 4, MEM_RESERVE, PAGE_NOACCESS);
+      addr = offsets[m];
+      (void) VirtualFree (addr, 0, MEM_RELEASE);
     }
-
-  void *addr = offsets[m];
-  (void) VirtualFree (addr, 0, MEM_RELEASE);
 
   if (!size)
     return addr;
@@ -117,6 +112,22 @@ open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, shared_locat
 
   if (!shared)
     api_fatal ("MapViewOfFileEx '%s'(%p), %E.  Terminating.", name, shared_h);
+
+  if (m == SH_CYGWIN_SHARED)
+    {
+      for (int i = SH_CYGWIN_SHARED + 1; i < SH_TOTAL_SIZE; i++)
+	{
+	  offsets[i] += (char *) shared - offsets[0];
+	  if (!VirtualAlloc (offsets[i], offsets[i + 1] - offsets[i],
+			     MEM_RESERVE, PAGE_NOACCESS))
+	    continue;  /* oh well */
+	  offsets[0] = (char *) shared;
+	}
+
+      if (!child_proc_info && wincap.needs_memory_protection ())
+	for (DWORD s = 0x950000; s <= 0xa40000; s += 0x1000)
+	  VirtualAlloc ((void *) s, 4, MEM_RESERVE, PAGE_NOACCESS);
+    }
 
   debug_printf ("name %s, shared %p (wanted %p), h %p", name, shared, addr, shared_h);
 

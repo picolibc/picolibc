@@ -1,5 +1,12 @@
 2002-10-15  Christopher Faylor  <cgf@redhat.com>
 
+	* shared.cc (open_shared): Revert to "old" method for shared memory
+	location if !wincap.needs_memory_protection.
+	* wincap.cc: Implement needs_memory_protection throughout.
+	* wincap.h: Ditto.
+
+2002-10-15  Christopher Faylor  <cgf@redhat.com>
+
 	* child_info.h (CURR_CHILD_INFO_MAGIC): Reset.
 	(child_info_fork::mount_table): Remove.
 	(child_info_fork::myself_addr): Remove.
