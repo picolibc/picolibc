@@ -1,3 +1,8 @@
+2001-09-14  Thiemo Seufer <seufer@csv.ica.uni-stuttgart.de>
+
+	* config.sub: Change machine triplets from mipsel*-* to mips*el-*.
+	Add support for mips64.
+
 2001-09-03  Jeff Holcomb  <jeffh@redhat.com>
 
 	* configure.in: Enable libstdc++-v3 for h8300 targets.

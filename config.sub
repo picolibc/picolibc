@@ -597,8 +597,16 @@ case $basic_machine in
 		basic_machine=m68k-atari
 		os=-mint
 		;;
-	mipsel*-linux*)
+	mips64*el-linux*)
+		basic_machine=mips64el-unknown
+		os=-linux-gnu
+		;;
+	mips*el-linux*)
 		basic_machine=mipsel-unknown
+		os=-linux-gnu
+		;;
+	mips64*-linux*)
+		basic_machine=mips64-unknown
 		os=-linux-gnu
 		;;
 	mips*-linux*)
