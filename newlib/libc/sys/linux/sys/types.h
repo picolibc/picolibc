@@ -24,6 +24,9 @@ typedef _TIME_T_ time_t;
 typedef _CLOCK_T_ clock_t;
 #endif
 
+typedef unsigned int __socklen_t;
+typedef long int __useconds_t;
+
 #include <linux/types.h>
 
 #endif

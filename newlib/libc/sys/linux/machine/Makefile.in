@@ -11,7 +11,6 @@
 # PARTICULAR PURPOSE.
 
 
-
 SHELL = @SHELL@
 
 srcdir = @srcdir@
@@ -62,14 +61,13 @@ host_alias = @host_alias@
 host_triplet = @host@
 AR = @AR@
 AS = @AS@
-AWK = @AWK@
 CC = @CC@
 CPP = @CPP@
+CRT0 = @CRT0@
 DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
 LDFLAGS = @LDFLAGS@
 LIBTOOL = @LIBTOOL@
-LINUX_MACH_LIB = @LINUX_MACH_LIB@
 LN_S = @LN_S@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
@@ -87,60 +85,17 @@ sys_dir = @sys_dir@
 
 AUTOMAKE_OPTIONS = cygnus
 
-INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+SUBDIRS = $(machine_dir) .
 
-SUBDIRS = machine .
-SUBLIBS = $(LINUX_MACH_LIB)
+noinst_DATA = $(CRT0)
 
-LIB_SOURCES = \
-	brk.c getoptlong.c ids.c inode.c io.c linux.c process.c realpath.c \
-	select.c signal.c socket.c sleep.c stack.c systat.c termios.c time.c \
-	usleep.c wait.c
+CLEANFILES = $(CRT0)
 
-
-# This will handle both /usr/src/linux-2.4/include/asm/signal.h (in Red Hat Linux 7.1)
-# and also /usr/src/linux/include/asm/signal.h in older versions of Red Hat Linux
-SIGNAL_H = /usr/src/$(shell ls /usr/src/ | grep ^linux | head -n 1)/include/asm/signal.h
-
-liblinux_la_LDFLAGS = -Xcompiler -nostdlib
-
-@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@liblinux.la
-@USE_LIBTOOL_TRUE@liblinux_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_SOURCES)
-@USE_LIBTOOL_TRUE@liblinux_la_LIBADD = @USE_LIBTOOL_TRUE@$(LINUX_MACH_LIB)
-@USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
-@USE_LIBTOOL_FALSE@noinst_DATA = 
-@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(LINUX_MACH_LIB)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(LINUX_MACH_LIB)
-
-ACLOCAL_AMFLAGS = -I ../../..
+ACLOCAL_AMFLAGS = -I ../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-mkinstalldirs = $(SHELL) $(top_srcdir)/../../../../mkinstalldirs
+mkinstalldirs = $(SHELL) $(top_srcdir)/../../../../../mkinstalldirs
 CONFIG_CLEAN_FILES = 
-LIBRARIES =  $(noinst_LIBRARIES)
-
-
-DEFS = @DEFS@ -I. -I$(srcdir) 
-CPPFLAGS = @CPPFLAGS@
-LIBS = @LIBS@
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  brk.o getoptlong.o ids.o inode.o \
-@USE_LIBTOOL_FALSE@io.o linux.o process.o realpath.o select.o signal.o \
-@USE_LIBTOOL_FALSE@socket.o sleep.o stack.o systat.o termios.o time.o \
-@USE_LIBTOOL_FALSE@usleep.o wait.o
-LTLIBRARIES =  $(noinst_LTLIBRARIES)
-
-@USE_LIBTOOL_TRUE@liblinux_la_DEPENDENCIES = 
-@USE_LIBTOOL_TRUE@liblinux_la_OBJECTS =  brk.lo getoptlong.lo ids.lo \
-@USE_LIBTOOL_TRUE@inode.lo io.lo linux.lo process.lo realpath.lo \
-@USE_LIBTOOL_TRUE@select.lo signal.lo socket.lo sleep.lo stack.lo \
-@USE_LIBTOOL_TRUE@systat.lo termios.lo time.lo usleep.lo wait.lo
-CFLAGS = @CFLAGS@
-COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-CCLD = $(CC)
-LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
 DATA =  $(noinst_DATA)
 
 DIST_COMMON =  Makefile.am Makefile.in aclocal.m4 configure configure.in
@@ -150,13 +105,9 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-SOURCES = $(lib_a_SOURCES) $(liblinux_la_SOURCES)
-OBJECTS = $(lib_a_OBJECTS) $(liblinux_la_OBJECTS)
-
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .lo .o .s
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(srcdir)/../../../Makefile.shared
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
@@ -164,72 +115,13 @@ Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
 	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ configure.in  \
-		../../../acinclude.m4 ../../../aclocal.m4
+		../../../../acinclude.m4 ../../../../aclocal.m4
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 
 config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
 $(srcdir)/configure: @MAINTAINER_MODE_TRUE@$(srcdir)/configure.in $(ACLOCAL_M4) $(CONFIGURE_DEPENDENCIES)
 	cd $(srcdir) && $(AUTOCONF)
-
-mostlyclean-noinstLIBRARIES:
-
-clean-noinstLIBRARIES:
-	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
-
-distclean-noinstLIBRARIES:
-
-maintainer-clean-noinstLIBRARIES:
-
-.c.o:
-	$(COMPILE) -c $<
-
-.s.o:
-	$(COMPILE) -c $<
-
-.S.o:
-	$(COMPILE) -c $<
-
-mostlyclean-compile:
-	-rm -f *.o core *.core
-
-clean-compile:
-
-distclean-compile:
-	-rm -f *.tab.c
-
-maintainer-clean-compile:
-
-.c.lo:
-	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
-
-.s.lo:
-	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
-
-.S.lo:
-	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
-
-mostlyclean-libtool:
-	-rm -f *.lo
-
-clean-libtool:
-	-rm -rf .libs _libs
-
-distclean-libtool:
-
-maintainer-clean-libtool:
-
-mostlyclean-noinstLTLIBRARIES:
-
-clean-noinstLTLIBRARIES:
-	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
-
-distclean-noinstLTLIBRARIES:
-
-maintainer-clean-noinstLTLIBRARIES:
-
-liblinux.la: $(liblinux_la_OBJECTS) $(liblinux_la_DEPENDENCIES)
-	$(LINK)  $(liblinux_la_LDFLAGS) $(liblinux_la_OBJECTS) $(liblinux_la_LIBADD) $(LIBS)
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run `make' without going through this Makefile.
@@ -399,7 +291,7 @@ install-am: all-am
 install: install-recursive
 uninstall-am:
 uninstall: uninstall-recursive
-all-am: Makefile $(LIBRARIES) $(LTLIBRARIES) $(DATA)
+all-am: Makefile $(DATA)
 all-redirect: all-recursive
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
@@ -410,36 +302,28 @@ installdirs-am:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-rm -f Makefile $(CONFIG_CLEAN_FILES)
 	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
 
 maintainer-clean-generic:
-mostlyclean-am:  mostlyclean-noinstLIBRARIES mostlyclean-compile \
-		mostlyclean-libtool mostlyclean-noinstLTLIBRARIES \
-		mostlyclean-tags mostlyclean-generic
+mostlyclean-am:  mostlyclean-tags mostlyclean-generic
 
 mostlyclean: mostlyclean-recursive
 
-clean-am:  clean-noinstLIBRARIES clean-compile clean-libtool \
-		clean-noinstLTLIBRARIES clean-tags clean-generic \
-		mostlyclean-am
+clean-am:  clean-tags clean-generic mostlyclean-am
 
 clean: clean-recursive
 
-distclean-am:  distclean-noinstLIBRARIES distclean-compile \
-		distclean-libtool distclean-noinstLTLIBRARIES \
-		distclean-tags distclean-generic clean-am
+distclean-am:  distclean-tags distclean-generic clean-am
 	-rm -f libtool
 
 distclean: distclean-recursive
 	-rm -f config.status
 
-maintainer-clean-am:  maintainer-clean-noinstLIBRARIES \
-		maintainer-clean-compile maintainer-clean-libtool \
-		maintainer-clean-noinstLTLIBRARIES \
-		maintainer-clean-tags maintainer-clean-generic \
+maintainer-clean-am:  maintainer-clean-tags maintainer-clean-generic \
 		distclean-am
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
@@ -447,17 +331,11 @@ maintainer-clean-am:  maintainer-clean-noinstLIBRARIES \
 maintainer-clean: maintainer-clean-recursive
 	-rm -f config.status
 
-.PHONY: mostlyclean-noinstLIBRARIES distclean-noinstLIBRARIES \
-clean-noinstLIBRARIES maintainer-clean-noinstLIBRARIES \
-mostlyclean-compile distclean-compile clean-compile \
-maintainer-clean-compile mostlyclean-libtool distclean-libtool \
-clean-libtool maintainer-clean-libtool mostlyclean-noinstLTLIBRARIES \
-distclean-noinstLTLIBRARIES clean-noinstLTLIBRARIES \
-maintainer-clean-noinstLTLIBRARIES install-data-recursive \
-uninstall-data-recursive install-exec-recursive \
-uninstall-exec-recursive installdirs-recursive uninstalldirs-recursive \
-all-recursive check-recursive installcheck-recursive info-recursive \
-dvi-recursive mostlyclean-recursive distclean-recursive clean-recursive \
+.PHONY: install-data-recursive uninstall-data-recursive \
+install-exec-recursive uninstall-exec-recursive installdirs-recursive \
+uninstalldirs-recursive all-recursive check-recursive \
+installcheck-recursive info-recursive dvi-recursive \
+mostlyclean-recursive distclean-recursive clean-recursive \
 maintainer-clean-recursive tags tags-recursive mostlyclean-tags \
 distclean-tags clean-tags maintainer-clean-tags distdir info-am info \
 dvi-am dvi check check-am installcheck-am installcheck install-info-am \
@@ -468,42 +346,14 @@ clean-generic maintainer-clean-generic clean mostlyclean distclean \
 maintainer-clean
 
 
-@USE_LIBTOOL_FALSE@lib.a:  $(LINUX_MACH_LIB) $(lib_a_OBJECTS)
-@USE_LIBTOOL_FALSE@	rm -f $@
-@USE_LIBTOOL_FALSE@	rm -rf tmp
-@USE_LIBTOOL_FALSE@	mkdir tmp
-@USE_LIBTOOL_FALSE@	cd tmp; \
-@USE_LIBTOOL_FALSE@	for i in $(SUBLIBS); do \
-@USE_LIBTOOL_FALSE@	  $(AR) x ../$$i; \
-@USE_LIBTOOL_FALSE@	done; \ 
-@USE_LIBTOOL_FALSE@	$(AR) $(AR_FLAGS) ../$@ *.o
-@USE_LIBTOOL_FALSE@	$(RANLIB) $@
-@USE_LIBTOOL_FALSE@	rm -rf tmp
-
-objectlist.awk.in: $(noinst_LTLIBRARIES)
-	-rm -f objectlist.awk.in
-	for i in `ls *.lo` ; \
-	do \
-	  echo $$i `pwd`/$$i >> objectlist.awk.in ; \
-	done
-
-all: crt0.o
-
-crt0.o: machine/crt0.o
+$(CRT0): $(machine_dir)/$(CRT0)
 	rm -f $@
-	ln machine/crt0.o $@ >/dev/null 2>/dev/null || cp machine/crt0.o $@
+	ln $(machine_dir)/$(CRT0) $@ >/dev/null 2>/dev/null \
+	 || cp $(machine_dir)/$(CRT0) $@
 
-machine/crt0.o: ; @true
+$(machine_dir)/$(CRT0): ; @true
 
-signal.$(oext):	siglist.inc
-
-siglist.inc:
-		$(AWK) '/#define.SIG.*[1-9][0-9]*/ { n[$$3] = $$2 } \
-		  /#define.NSIG.*[1-9][0-9]*/ { max = $$3 } \
-		  /#define.SIGUNUSED/ \
-		    { for (i = 0; i <= max; i++) print "\"" n[i] "\"," }' \
-		    < $(SIGNAL_H) > siglist.inc || \
-		    { rm -f siglist.inc; exit 1; }
+doc:
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -6,7 +6,7 @@
 #include <stddef.h> /* for NULL */
 #include <sys/types.h>
 #include <sys/unistd.h>
-#include <sys/syscall.h>
+#include <machine/syscall.h>
 
 
 static char *curr_brk = NULL;

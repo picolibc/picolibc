@@ -63,6 +63,11 @@ if test -n "${sys_dir}"; then
 fi
 AC_SUBST(SYS_OBJECTLIST)
 
+if test "${have_sys_mach_dir}" = "yes"; then
+  SYS_MACH_OBJECTLIST=libc/sys/${sys_dir}/machine/${machine_dir}/objectlist.awk.in
+fi
+AC_SUBST(SYS_MACH_OBJECTLIST)
+
 if test -n "${posix_dir}"; then
   POSIX_OBJECTLIST=libc/${posix_dir}/objectlist.awk.in
 fi

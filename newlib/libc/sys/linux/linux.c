@@ -8,7 +8,7 @@
  * is guided by glibc/autoconf compatibility and FFS
  */
 
-#include <sys/syscall.h>
+#include <machine/syscall.h>
 
 
 /* _syscall1(int,delete_module,const char *,name) */

@@ -27,6 +27,7 @@
 #   newlib_cflags	Special CFLAGS to use when building
 #   machine_dir		Subdirectory of libc/machine to configure
 #   sys_dir		Subdirectory of libc/sys to configure
+#   have_sys_mach_dir   Is there a machine subdirectory in sys subdirectory
 #   posix_dir		"posix" to build libc/posix, "" otherwise
 #   signal_dir		"signal" to build libc/signal, "" otherwise
 #   syscall_dir		"syscalls" to build libc/syscalls, "" otherwise
@@ -45,6 +46,7 @@ syscall_dir=
 unix_dir=
 mach_add_setjmp=
 use_libtool=no
+have_sys_mach_dir=no
 aext=a
 oext=o
 
@@ -222,6 +224,7 @@ fi
 case "${host}" in
   i[3456]86-pc-linux-*)
     use_libtool=yes
+    have_sys_mach_dir=yes
     oext=lo
     aext=la ;;
   *) ;; #shared library not supported for ${host}

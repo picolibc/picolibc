@@ -4,7 +4,7 @@
 
 
 #include <sys/wait.h>
-#include <sys/syscall.h>
+#include <machine/syscall.h>
 
 
 _syscall3(pid_t,waitpid,pid_t,pid,int *,wait_stat,int,options)

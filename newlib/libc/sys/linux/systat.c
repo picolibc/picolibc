@@ -4,7 +4,7 @@
 
 
 #include <sys/utsname.h>
-#include <sys/syscall.h>
+#include <machine/syscall.h>
 
 
 _syscall1(int,uname,struct utsname *,name)

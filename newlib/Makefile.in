@@ -83,6 +83,7 @@ POSIX_OBJECTLIST = @POSIX_OBJECTLIST@
 RANLIB = @RANLIB@
 SIGNAL_OBJECTLIST = @SIGNAL_OBJECTLIST@
 SYSCALL_OBJECTLIST = @SYSCALL_OBJECTLIST@
+SYS_MACH_OBJECTLIST = @SYS_MACH_OBJECTLIST@
 SYS_OBJECTLIST = @SYS_OBJECTLIST@
 UNIX_OBJECTLIST = @UNIX_OBJECTLIST@
 VERSION = @VERSION@
@@ -147,15 +148,19 @@ FLAGS_TO_PASS = $(AM_MAKEFLAGS)
 @HAVE_DOC_TRUE@DOCDIR = @HAVE_DOC_TRUE@doc
 @HAVE_DOC_FALSE@DOCDIR = 
 
-SUBDIRS = libc libm $(DOCDIR) .
+SUBDIRS = libc libm \
+	$(DOCDIR) .
+
 
 tooldir = $(exec_prefix)/$(host_alias)
 toollibdir = $(tooldir)/lib$(MULTISUBDIR)
 
 AR_FLAGS = rc
 
-@USE_LIBTOOL_TRUE@toollib_LTLIBRARIES = @USE_LIBTOOL_TRUE@libm.la libc.la
-@USE_LIBTOOL_FALSE@toollib_LIBRARIES = @USE_LIBTOOL_FALSE@libm.a libc.a
+@USE_LIBTOOL_TRUE@toollib_LTLIBRARIES = @USE_LIBTOOL_TRUE@libm.la \
+@USE_LIBTOOL_TRUE@	libc.la
+@USE_LIBTOOL_FALSE@toollib_LIBRARIES = @USE_LIBTOOL_FALSE@libm.a \
+@USE_LIBTOOL_FALSE@	libc.a
 
 noinst_DATA = stmp-targ-include
 
@@ -192,7 +197,8 @@ LIBC_OBJECTLISTS = \
 	libc/errno/objectlist.awk.in \
 	libc/stdio/objectlist.awk.in \
 	$(MACHINE_OBJECTLIST) \
-	$(SYS_OBJECTLIST)
+	$(SYS_OBJECTLIST) \
+	$(SYS_MACH_OBJECTLIST)
 
 
 LIBM_OBJECTLISTS = \
@@ -693,6 +699,11 @@ stmp-targ-include: config.status
 	-for i in $(srcdir)/libc/sys/$(sys_dir)/sys/*.h; do \
 	    if [ -f $$i ]; then \
 	      cp $$i targ-include/sys/`basename $$i`; \
+	    else true; fi ; \
+	  done
+	-for i in $(srcdir)/libc/sys/$(sys_dir)/machine/$(machine_dir)/*.h; do \
+	    if [ -f $$i ]; then \
+	      cp $$i targ-include/machine/`basename $$i`; \
 	    else true; fi ; \
 	  done
 	touch $@

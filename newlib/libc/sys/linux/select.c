@@ -5,8 +5,13 @@
 
 #include <sys/types.h>
 #include <sys/time.h>
-#include <sys/syscall.h>
+#include <machine/syscall.h>
 
 
-_syscall5(int,select,int,n,fd_set *,readfds,fd_set *,writefds,
-  fd_set *,exceptfds,struct timeval *,timeout)
+static _syscall5(int,_newselect,int,n,fd_set *,readfds,fd_set *,writefds,fd_set *,exceptfds,struct timeval *,timeout)
+
+int select (int n, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
+            struct timeval *timeout)
+{
+  return _newselect(n, readfds, writefds, exceptfds, timeout);
+}

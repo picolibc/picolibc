@@ -4,7 +4,7 @@
 
 
 #include <sys/unistd.h>
-#include <sys/syscall.h>
+#include <machine/syscall.h>
 
 
 #define __NR__exit __NR_exit

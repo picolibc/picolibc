@@ -61,7 +61,8 @@ else
 DOCDIR =
 endif
 
-SUBDIRS = libc libm $(DOCDIR) .
+SUBDIRS = libc libm \
+	$(DOCDIR) .
 
 tooldir = $(exec_prefix)/$(host_alias)
 toollibdir = $(tooldir)/lib$(MULTISUBDIR)
@@ -69,9 +70,11 @@ toollibdir = $(tooldir)/lib$(MULTISUBDIR)
 AR_FLAGS = rc
 
 if USE_LIBTOOL
-toollib_LTLIBRARIES = libm.la libc.la
+toollib_LTLIBRARIES = libm.la \
+	libc.la
 else
-toollib_LIBRARIES = libm.a libc.a
+toollib_LIBRARIES = libm.a \
+	libc.a
 endif
 
 noinst_DATA = stmp-targ-include
@@ -109,7 +112,8 @@ LIBC_OBJECTLISTS = \
 	libc/errno/objectlist.awk.in \
 	libc/stdio/objectlist.awk.in \
 	$(MACHINE_OBJECTLIST) \
-	$(SYS_OBJECTLIST)
+	$(SYS_OBJECTLIST) \
+	$(SYS_MACH_OBJECTLIST)
 
 LIBM_OBJECTLISTS = \
 	libm/$(MATHDIR)/objectlist.awk.in \
@@ -186,6 +190,11 @@ stmp-targ-include: config.status
 	-for i in $(srcdir)/libc/sys/$(sys_dir)/sys/*.h; do \
 	    if [ -f $$i ]; then \
 	      cp $$i targ-include/sys/`basename $$i`; \
+	    else true; fi ; \
+	  done
+	-for i in $(srcdir)/libc/sys/$(sys_dir)/machine/$(machine_dir)/*.h; do \
+	    if [ -f $$i ]; then \
+	      cp $$i targ-include/machine/`basename $$i`; \
 	    else true; fi ; \
 	  done
 	touch $@

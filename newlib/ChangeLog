@@ -1,3 +1,56 @@
+2002-04-03  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configure.host: Add support for machine subdirectory of
+	sys subdirectory.
+	* configure.in: Add check for sys machine subdirectory.
+	* Makefile.am: Ditto.
+	* configure: Regenerated.
+	* Makefile.in: Ditto.
+	* libc/sys/linux/crt0.c: Moved to machine/i386 directory.
+	* libc/sys/linux/sys/syscall.h: Ditto.
+	* libc/sys/linux/sleep.c: New file.
+	* libc/sys/linux/socket.c: Ditto.
+	* libc/sys/linux/sockops.h: Ditto.
+	* libc/sys/linux/stack.c: Ditto.
+	* libc/sys/linux/usleep.c: Ditto.
+	* libc/sys/linux/machine/Makefile.am: Ditto.
+	* libc/sys/linux/machine/Makefile.in: Ditto.
+	* libc/sys/linux/machine/aclocal.m4: Ditto.
+	* libc/sys/linux/machine/configure: Ditto.
+	* libc/sys/linux/machine/configure.in: Ditto.
+	* libc/sys/linux/machine/i386/Makefile.am: Ditto.
+	* libc/sys/linux/machine/i386/Makefile.in: Ditto.
+	* libc/sys/linux/machine/i386/aclocal.m4: Ditto.
+	* libc/sys/linux/machine/i386/configure: Ditto.
+	* libc/sys/linux/machine/i386/configure.in: Ditto.
+	* libc/sys/linux/machine/i386/crt0.c: Ditto.
+	* libc/sys/linux/machine/i386/sigset.c: Ditto.
+	* libc/sys/linux/machine/i386/sigstack.h: Ditto.
+	* libc/sys/linux/machine/i386/socketcall.h: Ditto.
+	* libc/sys/linux/machine/i386/syscall.h: Ditto.
+	* libc/sys/linux/sys/select.h: Ditto.
+	* libc/sys/linux/configure.in: Add support for machine directory.
+	* libc/sys/linux/Makefile.am: Ditto plus add new files above.
+	* libc/sys/linux/Makefile.in: Regenerated.
+	* libc/sys/linux/configure: Ditto.
+	* libc/sys/linux/brk.c: Use machine/syscall.h instead of sys/syscall.h.
+	* libc/sys/linux/inode.c: Ditto.
+	* libc/sys/linux/linux.c: Ditto.
+	* libc/sys/linux/process.c: Ditto.
+	* libc/sys/linux/systat.c: Ditto.
+	* libc/sys/linux/time.c: Ditto.
+	* libc/sys/linux/wait.c: Ditto.
+	* libc/sys/linux/ids.c: Change header plus add setfsgid/setfsuid.
+	* libc/sys/linux/io.c: Change header plus add readv/writev.
+	* libc/sys/linux/signal.c: Change header plus change sigsuspend to
+	use __sigsuspend syscall.
+	* libc/sys/linux/select.c: Change header plus change select to
+	use _newselect syscall.
+	* libc/sys/linux/sys/cdefs.h: Add a number of standard definitions
+	used by glibc header files.
+	* libc/sys/linux/sys/types.h: Add __socklen_t and __useconds_t
+	types.
+
 2002-04-01  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/reent.h (_REENT_INIT_PTR): New macro for

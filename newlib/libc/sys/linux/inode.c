@@ -9,7 +9,7 @@
 #include <sys/stat.h>
 #include <sys/utime.h>
 #include <linux/dirent.h>
-#include <sys/syscall.h>
+#include <machine/syscall.h>
 
 
 _syscall2(int,link,const char *,oldpath,const char *,newpath)

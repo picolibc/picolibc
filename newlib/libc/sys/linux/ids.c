@@ -5,12 +5,14 @@
 
 #include <sys/types.h>
 #include <sys/unistd.h>
-#include <sys/syscall.h>
+#include <machine/syscall.h>
 
 
 _syscall1(int,setuid,uid_t,uid)
+_syscall1(int,setfsuid,uid_t,uid)
 _syscall0(uid_t,getuid)
 _syscall1(int,setgid,gid_t,gid)
+_syscall1(int,setfsgid,gid_t,gid)
 _syscall0(gid_t,getgid)
 _syscall0(uid_t,geteuid)
 _syscall0(gid_t,getegid)
