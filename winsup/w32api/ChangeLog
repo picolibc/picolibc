@@ -1,3 +1,8 @@
+2000-06-14  Kazuhiro Fujieda <fujieda@jaist.ac.jp>
+
+	* include/winnt.h: Add some missing defines related to locale
+	identifiers.  Translate values of LANG_* and SUBLANG_* into hexadecimal.
+
 Thu May 27 15:57:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* include/wincrypt.h: Add missing CRYPT_MACHINE_KEYSET define.
