@@ -332,12 +332,12 @@ static void
 do_cleanup (void *args)
 {
 # define cleanup ((pthread_cleanup *) args)
-  if (cleanup->oldint)
-    signal (SIGINT, cleanup->oldint);
-  if (cleanup->oldquit)
-    signal (SIGQUIT, cleanup->oldquit);
   if (cleanup->oldmask != (sigset_t) -1)
-    sigprocmask (SIG_SETMASK, &(cleanup->oldmask), NULL);
+    {
+      signal (SIGINT, cleanup->oldint);
+      signal (SIGQUIT, cleanup->oldquit);
+      sigprocmask (SIG_SETMASK, &(cleanup->oldmask), NULL);
+    }
 # undef cleanup
 }
 
@@ -755,7 +755,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
   int res;
   pthread_cleanup cleanup;
-  pthread_cleanup_push (do_cleanup, (void *) &cleanup);
   if (mode == _P_SYSTEM)
     {
       sigset_t child_block;
@@ -765,6 +764,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       sigaddset (&child_block, SIGCHLD);
       (void) sigprocmask (SIG_BLOCK, &child_block, &cleanup.oldmask);
     }
+  pthread_cleanup_push (do_cleanup, (void *) &cleanup);
 
   /* Fixup the parent data structures if needed and resume the child's
      main thread. */
