@@ -205,7 +205,7 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
 		    }
 		}
 	    }
-	  printf ("%s::%d:%d:%s%s%s:%s:/bin/sh\n", username,
+	  printf ("%s::%d:%d:%s%s%s:%s:/bin/bash\n", username,
 		  uid + id_offset,
 		  gid + id_offset,
 		  fullname,
@@ -441,7 +441,7 @@ main (int argc, char **argv)
       if (!GetUserName (name, (len = 256, &len)))
 	strcpy (name, "unknown");
 
-      printf ("%s::%ld:%ld::%s%s:/bin/sh\n", name,
+      printf ("%s::%ld:%ld::%s%s:/bin/bash\n", name,
 					     DOMAIN_USER_RID_ADMIN,
 					     DOMAIN_ALIAS_RID_ADMINS,
 					     passed_home_path,
