@@ -95,6 +95,10 @@ client_request_msg::serve (transport_layer_base *const conn,
       case MSGOP_msgsnd:
 	res = msgsnd (&td, &_parameters.in.sndargs);
         break;
+      default:
+	res = ENOSYS;
+        td.td_retval[0] = -1;
+	break;
     }
   /* Allocated by the call to adjust_identity_info(). */
   if (_parameters.in.ipcblk.gidlist)

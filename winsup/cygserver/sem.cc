@@ -89,6 +89,10 @@ client_request_sem::serve (transport_layer_base *const conn,
       case SEMOP_semop:
 	res = semop (&td, &_parameters.in.opargs);
         break;
+      default:
+	res = ENOSYS;
+        td.td_retval[0] = -1;
+	break;
     }
   /* Allocated by the call to adjust_identity_info(). */
   if (_parameters.in.ipcblk.gidlist)

@@ -101,6 +101,10 @@ client_request_shm::serve (transport_layer_base *const conn,
       case SHMOP_shmfork:
         res = cygwin_shmfork_myhook (&td, &_parameters.in.forkargs);
 	break;
+      default:
+	res = ENOSYS;
+        td.td_retval[0] = -1;
+	break;
     }
   /* Allocated by the call to adjust_identity_info(). */
   if (_parameters.in.ipcblk.gidlist)

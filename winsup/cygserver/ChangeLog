@@ -1,3 +1,9 @@
+2003-11-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* msg.cc (client_request_msg::serve): Add default case to msgop switch.
+	* sem.cc (client_request_sem::serve): Add default case to semop switch.
+	* shm.cc (client_request_shm::serve): Add default case to shmop switch.
+
 2003-11-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (install): Explicitely create directories.  Install
