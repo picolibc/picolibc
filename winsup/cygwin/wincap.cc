@@ -51,7 +51,8 @@ static NO_COPY wincaps wincap_unknown = {
   needs_memory_protection:false,
   pty_needs_alloc_console:false,
   has_terminal_services:false,
-  has_switch_to_thread:false
+  has_switch_to_thread:false,
+  cant_debug_dll_entry:false
 };
 
 static NO_COPY wincaps wincap_95 = {
@@ -94,7 +95,8 @@ static NO_COPY wincaps wincap_95 = {
   needs_memory_protection:false,
   pty_needs_alloc_console:false,
   has_terminal_services:false,
-  has_switch_to_thread:false
+  has_switch_to_thread:false,
+  cant_debug_dll_entry:true
 };
 
 static NO_COPY wincaps wincap_95osr2 = {
@@ -137,7 +139,8 @@ static NO_COPY wincaps wincap_95osr2 = {
   needs_memory_protection:false,
   pty_needs_alloc_console:false,
   has_terminal_services:false,
-  has_switch_to_thread:false
+  has_switch_to_thread:false,
+  cant_debug_dll_entry:true
 };
 
 static NO_COPY wincaps wincap_98 = {
@@ -180,7 +183,8 @@ static NO_COPY wincaps wincap_98 = {
   needs_memory_protection:false,
   pty_needs_alloc_console:false,
   has_terminal_services:false,
-  has_switch_to_thread:false
+  has_switch_to_thread:false,
+  cant_debug_dll_entry:true
 };
 
 static NO_COPY wincaps wincap_98se = {
@@ -223,7 +227,8 @@ static NO_COPY wincaps wincap_98se = {
   needs_memory_protection:false,
   pty_needs_alloc_console:false,
   has_terminal_services:false,
-  has_switch_to_thread:false
+  has_switch_to_thread:false,
+  cant_debug_dll_entry:true
 };
 
 static NO_COPY wincaps wincap_me = {
@@ -266,7 +271,8 @@ static NO_COPY wincaps wincap_me = {
   needs_memory_protection:false,
   pty_needs_alloc_console:false,
   has_terminal_services:false,
-  has_switch_to_thread:false
+  has_switch_to_thread:false,
+  cant_debug_dll_entry:true
 };
 
 static NO_COPY wincaps wincap_nt3 = {
@@ -309,7 +315,8 @@ static NO_COPY wincaps wincap_nt3 = {
   needs_memory_protection:true,
   pty_needs_alloc_console:true,
   has_terminal_services:false,
-  has_switch_to_thread:false
+  has_switch_to_thread:false,
+  cant_debug_dll_entry:false
 };
 
 static NO_COPY wincaps wincap_nt4 = {
@@ -352,7 +359,8 @@ static NO_COPY wincaps wincap_nt4 = {
   needs_memory_protection:true,
   pty_needs_alloc_console:true,
   has_terminal_services:false,
-  has_switch_to_thread:true
+  has_switch_to_thread:true,
+  cant_debug_dll_entry:false
 };
 
 static NO_COPY wincaps wincap_nt4sp4 = {
@@ -395,7 +403,8 @@ static NO_COPY wincaps wincap_nt4sp4 = {
   needs_memory_protection:true,
   pty_needs_alloc_console:true,
   has_terminal_services:false,
-  has_switch_to_thread:true
+  has_switch_to_thread:true,
+  cant_debug_dll_entry:false
 };
 
 static NO_COPY wincaps wincap_2000 = {
@@ -438,7 +447,8 @@ static NO_COPY wincaps wincap_2000 = {
   needs_memory_protection:true,
   pty_needs_alloc_console:true,
   has_terminal_services:true,
-  has_switch_to_thread:true
+  has_switch_to_thread:true,
+  cant_debug_dll_entry:false
 };
 
 static NO_COPY wincaps wincap_xp = {
@@ -481,7 +491,8 @@ static NO_COPY wincaps wincap_xp = {
   needs_memory_protection:true,
   pty_needs_alloc_console:true,
   has_terminal_services:true,
-  has_switch_to_thread:true
+  has_switch_to_thread:true,
+  cant_debug_dll_entry:false
 };
 
 static NO_COPY wincaps wincap_2003 = {
@@ -524,7 +535,8 @@ static NO_COPY wincaps wincap_2003 = {
   needs_memory_protection:true,
   pty_needs_alloc_console:true,
   has_terminal_services:true,
-  has_switch_to_thread:true
+  has_switch_to_thread:true,
+  cant_debug_dll_entry:false
 };
 
 wincapc wincap;

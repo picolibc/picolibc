@@ -28,9 +28,6 @@ static void WINAPI
 threadfunc_fe (VOID *arg)
 {
   _threadinfo::call ((DWORD (*)  (void *, void *)) (((char **) _tlsbase)[OLDFUNC_OFFSET]), arg);
-  // void *threadfunc = (void *) TlsGetValue (tls_func);
-  // TlsFree (tls_func);
-  // _threadinfo::call ((DWORD (*)  (void *, void *)) (threadfunc), arg);
 }
 
 static DWORD WINAPI
@@ -39,6 +36,25 @@ calibration_thread (VOID *arg)
   ExitThread (0);
 }
 
+/* We need to know where the OS stores the address of the thread function
+   on the stack so that we can intercept the call and insert some tls
+   stuff on the stack.  This function starts a known calibration thread.
+   When it starts, a call will be made to dll_entry which will call munge_threadfunc
+   looking for the calibration thread offset on the stack.  This offset will
+   be stored and used by all executing cygwin processes. */
+void
+prime_threads ()
+{
+  if (!threadfunc_ix)
+    {
+      DWORD id;
+      search_for = (char *) calibration_thread;
+      sync_startup = CreateThread (NULL, 0, calibration_thread, 0, 0, &id);
+    }
+}
+
+/* If possible, redirect the thread entry point to a cygwin routine which
+   adds tls stuff to the stack. */
 static void
 munge_threadfunc (HANDLE cygwin_hmodule)
 {
@@ -71,18 +87,6 @@ foundit:
     }
 }
 
-void
-prime_threads ()
-{
-  // tls_func = TlsAlloc ();
-  if (!threadfunc_ix)
-    {
-      DWORD id;
-      search_for = (char *) calibration_thread;
-      sync_startup = CreateThread (NULL, 0, calibration_thread, 0, 0, &id);
-    }
-}
-
 extern void __stdcall dll_crt0_0 ();
 
 extern "C" int WINAPI
@@ -93,15 +97,12 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
     case DLL_PROCESS_ATTACH:
       prime_threads ();
       dynamically_loaded = (static_load == NULL);
-      // __cygwin_user_data.impure_ptr = &_my_tls.local_clib;
       dll_crt0_0 ();
-      // small_printf ("%u, %p, %p\n", cygwin_pid (GetCurrentProcessId ()), _tlstop, _tlsbase);
       break;
     case DLL_PROCESS_DETACH:
       break;
     case DLL_THREAD_ATTACH:
       munge_threadfunc (h);
-      // small_printf ("%u, %p, %p\n", cygwin_pid (GetCurrentProcessId ()), _tlstop, _tlsbase);
       break;
     case DLL_THREAD_DETACH:
       _my_tls.remove (0);

@@ -1,5 +1,25 @@
 2004-01-19  Christopher Faylor  <cgf@redhat.com>
 
+	* sigproc.cc (sigproc_terminate): Don't close sendsig handle when
+	execing since we're not closing what we think we're closing.
+	(sig_send): Improve debugging when exiting due to no_signals_available.
+
+	* wincap.h (wincaps::cant_debug_dll_entry): New element.
+	* wincap.cc: Implement above element throughout.
+	* dcrt0.cc (initial_env): Accommodate changes necessary to allow
+	initial debugging for systems which do not allow debugging in
+	dll_entry.
+	(dll_crt0_0): Add initial_env call back here.
+
+	* Makefile.in (install-man): Use mandir as target for installation.
+
+2004-01-19  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number to 7 (should have been
+	done earlier).
+
+2004-01-19  Christopher Faylor  <cgf@redhat.com>
+
 	* cygwin/include/signal.h: Add copyright notice.
 
 	* cygwin.din: Make clock SIGFE.  Add clock_gettime, sigwaitinfo,

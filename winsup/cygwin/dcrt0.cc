@@ -531,11 +531,20 @@ break_here ()
 #endif
 
 static void
-initial_env ()
+initial_env (bool first)
 {
   char buf[CYG_MAX_PATH + 1];
+  if (!first)
+    /* nothing */;
+  else if (GetEnvironmentVariable ("CYGWIN_TESTING", buf, sizeof (buf) - 1))
+    _cygwin_testing = 1;
 #ifdef DEBUGGING
   DWORD len;
+  static bool NO_COPY did_debugging_stuff;
+  if (did_debugging_stuff || (first && wincap.cant_debug_dll_entry ()))
+    return;
+
+  did_debugging_stuff = true;
   if (GetEnvironmentVariable ("CYGWIN_SLEEP", buf, sizeof (buf) - 1))
     {
       DWORD ms = atoi (buf);
@@ -569,14 +578,13 @@ initial_env ()
     }
 #endif
 
-  if (GetEnvironmentVariable ("CYGWIN_TESTING", buf, sizeof (buf) - 1))
-    _cygwin_testing = 1;
 }
 
 void __stdcall
 dll_crt0_0 ()
 {
   wincap.init ();
+  initial_env (true);
 
   char zeros[sizeof (child_proc_info->zero)] = {0};
 
@@ -722,7 +730,7 @@ dll_crt0_1 (char *)
   /* FIXME: Verify forked children get their exception handler set up ok. */
   exception_list cygwin_except_entry;
 
-  initial_env ();
+  initial_env (false);
   check_sanity_and_sync (user_data);
   malloc_init ();
 

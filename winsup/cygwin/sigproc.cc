@@ -633,6 +633,7 @@ sigproc_init ()
 void __stdcall
 sigproc_terminate (void)
 {
+  extern HANDLE hExeced;
   hwait_sig = NULL;
 
   if (myself->sendsig == INVALID_HANDLE_VALUE)
@@ -642,9 +643,12 @@ sigproc_terminate (void)
       sigproc_printf ("entering");
 				//  finished with anything it is doing
       ForceCloseHandle (sigcomplete_main);
-      HANDLE sendsig = myself->sendsig;
-      myself->sendsig = INVALID_HANDLE_VALUE;
-      CloseHandle (sendsig);
+      if (!hExeced)
+	{
+	  HANDLE sendsig = myself->sendsig;
+	  myself->sendsig = INVALID_HANDLE_VALUE;
+	  CloseHandle (sendsig);
+	}
     }
   proc_terminate ();		// Terminate process handling thread
 
@@ -680,7 +684,11 @@ sig_send (_pinfo *p, siginfo_t& si, _threadinfo *tls)
   else
     {
       if (no_signals_available ())
-	goto out;		// Either exiting or not yet initializing
+	{
+	  sigproc_printf ("hwait_sig %p, myself->sendsig %p, exit_state %d",
+			  hwait_sig, myself->sendsig, exit_state);
+	  goto out;		// Either exiting or not yet initializing
+	}
       if (wait_sig_inited)
 	wait_for_sigthread ();
       wait_for_completion = p != myself_nowait && _my_tls.isinitialized ();
@@ -696,8 +704,6 @@ sig_send (_pinfo *p, siginfo_t& si, _threadinfo *tls)
 		  p->pid, p->process_state, si.si_signo);
       goto out;
     }
-
-  sigproc_printf ("pid %d, signal %d, its_me %d", p->pid, si.si_signo, its_me);
 
   if (its_me)
     {
@@ -726,6 +732,8 @@ sig_send (_pinfo *p, siginfo_t& si, _threadinfo *tls)
       CloseHandle (hp);
       pack.wakeup = NULL;
     }
+
+  sigproc_printf ("sendsig %p, pid %d, signal %d, its_me %d", sendsig, p->pid, si.si_signo, its_me);
 
   sigset_t pending;
   if (!its_me)
@@ -1104,6 +1112,8 @@ wait_sig (VOID *self)
 
   exception_list el;
   _my_tls.init_threadlist_exceptions (&el);
+  debug_printf ("entering ReadFile loop, readsig %p, myself->sendsig %p",
+		readsig, myself->sendsig);
 
   for (;;)
     {
