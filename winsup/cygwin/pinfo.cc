@@ -125,22 +125,18 @@ _pinfo::exit (UINT n, bool norecord)
 
   if (this)
     {
-      if (!norecord)
-	{
-	  process_state = PID_EXITED;
-	  if (CGFFAST && myself->ppid != 1)
-	    {
-	      pinfo parent (myself->ppid);
-	      if (parent)
-		sig_send (parent, SIGCHLD);
-	    }
-	}
-
       /* FIXME:  There is a potential race between an execed process and its
 	 parent here.  I hated to add a mutex just for this, though.  */
       struct rusage r;
       fill_rusage (&r, hMainProc);
       add_rusage (&rusage_self, &r);
+
+      if (!norecord)
+	{
+	  process_state = PID_EXITED;
+	  if (wr_proc_pipe)
+	    CloseHandle (wr_proc_pipe);
+	}
     }
 
   sigproc_printf ("Calling ExitProcess %d", n);
@@ -766,14 +762,6 @@ pinfo::wait ()
 
   preserve ();
 
-#if 0
-  DWORD tid;
-  HANDLE h = CreateThread (&sec_none_nih, 0, proc_waiter, this, 0, &tid);
-  if (!h)
-    sigproc_printf ("tracking thread creation failed for pid %d", (*this)->pid);
-  else
-    CloseHandle (h);
-#else
   cygthread *h = new cygthread (proc_waiter, this, "sig");
   if (!h)
     sigproc_printf ("tracking thread creation failed for pid %d", (*this)->pid);
@@ -783,7 +771,7 @@ pinfo::wait ()
       sigproc_printf ("created tracking thread for pid %d, winpid %p, rd_pipe %p",
 		      (*this)->pid, (*this)->dwProcessId, rd_proc_pipe);
     }
-#endif
+
   return 1;
 }
 

@@ -274,13 +274,7 @@ proc_subproc (DWORD what, DWORD val)
       vchild->cygstarted = true;
       vchild->process_state |= PID_INITIALIZING | (myself->process_state & PID_USETTY);
       procs[nprocs] = vchild;
-      if (!CGFFAST)
-	rc = procs[nprocs].wait ();
-      else
-	{
-	  procs[nprocs].preserve ();
-	  rc = 1;
-	}
+      rc = procs[nprocs].wait ();
       if (rc)
 	{
 	  sigproc_printf ("added pid %d to proc table, slot %d", vchild->pid,
@@ -803,7 +797,7 @@ stopped_or_terminated (waitq *parent_w, _pinfo *child)
 
   int terminated;
 
-  if (!((terminated = (child->process_state == PID_ZOMBIE | child->process_state == PID_EXITED)) ||
+  if (!((terminated = (child->process_state == PID_ZOMBIE)) ||
       ((w->options & WUNTRACED) && child->stopsig)))
     return 0;
 
