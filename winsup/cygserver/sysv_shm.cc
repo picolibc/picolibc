@@ -80,10 +80,7 @@ __FBSDID("$FreeBSD: /repoman/r/ncvs/src/sys/kern/sysv_shm.c,v 1.89 2003/11/07 04
 #define vm_object_clear_flag(a,b)
 #define vm_object_set_flag(a,b)
 #define VM_OBJECT_UNLOCK(a)
-#define vm_object_reference(a)
 #define vm_map_remove(a,b,c) KERN_SUCCESS
-#define vm_map_find(a,b,c,d,e,f,g,h,i) KERN_SUCCESS
-#define vm_map_inherit(a,b,c,d)
 typedef int vm_prot_t;
 #endif /* __CYGWIN__ */
 
@@ -383,6 +380,13 @@ kern_shmat(struct thread *td, int shmid, const void *shmaddr, int shmflg)
 		prot |= VM_PROT_WRITE;
 	flags = MAP_ANON | MAP_SHARED;
 	debug_printf ("shmaddr: %x, shmflg: %x", shmaddr, shmflg);
+#ifdef __CYGWIN__
+	/* The alignment checks have already been made in the Cygwin DLL
+	   and shmat's only job is to keep record of the attached mem.
+	   These checks break shm on 9x since MapViewOfFileEx apparently
+	   returns memory which isn't aligned to SHMLBA.  Go figure!  */
+	attach_va = (vm_offset_t)shmaddr;
+#else
 	if (shmaddr) {
 		flags |= MAP_FIXED;
 		if (shmflg & SHM_RND) {
@@ -390,7 +394,6 @@ kern_shmat(struct thread *td, int shmid, const void *shmaddr, int shmflg)
 		} else if (((vm_offset_t)shmaddr & (SHMLBA-1)) == 0) {
 			attach_va = (vm_offset_t)shmaddr;
 		} else {
-			debug_printf ("Odd shmaddr: EINVAL");
 			error = EINVAL;
 			goto done2;
 		}
@@ -399,12 +402,8 @@ kern_shmat(struct thread *td, int shmid, const void *shmaddr, int shmflg)
 		 * This is just a hint to vm_map_find() about where to
 		 * put it.
 		 */
-#ifdef __CYGWIN__
-		attach_va = 0;
-#else
 		attach_va = round_page((vm_offset_t)p->p_vmspace->vm_taddr
 		    + maxtsiz + maxdsiz);
-#endif
 	}
 
 	shm_handle = shmseg->shm_internal;
@@ -417,6 +416,7 @@ kern_shmat(struct thread *td, int shmid, const void *shmaddr, int shmflg)
 	}
 	vm_map_inherit(&p->p_vmspace->vm_map,
 		attach_va, attach_va + size, VM_INHERIT_SHARE);
+#endif
 
 	shmmap_s->va = attach_va;
 	shmmap_s->shmid = shmid;

@@ -1,3 +1,11 @@
+2004-09-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysv_shm.cc (vm_object_reference): remove Cygwin specific define.
+	(vm_map_find): Ditto.
+	(vm_map_inherit): Ditto.
+	(kern_shmat): On Cygwin, take shmaddr just as is.  Don't call vm
+	system calls on Cygwin.  Add comment.
+
 2004-09-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	Fix copyright throughout. 
