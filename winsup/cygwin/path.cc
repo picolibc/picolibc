@@ -2319,11 +2319,12 @@ symlink_info::check (const char *in_path, const suffix_info *suffixes)
 	  else
 	    {
 	      /* Not a symlink, see if executable.  */
-	      if (!(pflags & PATH_ALL_EXEC) && got >= 2 &&
-		  ((cookie_buf[0] == '#' && cookie_buf[1] == '!') ||
-		   (cookie_buf[0] == ':' && cookie_buf[1] == '\n') ||
-		   (cookie_buf[0] == 'M' && cookie_buf[1] == 'Z')))
+	      if (!(pflags & PATH_ALL_EXEC) &&
+		  has_exec_chars (cookie_buf, got))
+{
+debug_printf ("setting exec flag");
 		pflags |= PATH_EXEC;
+}
 	    close_and_return:
 	      CloseHandle (h);
 	      goto file_not_symlink;

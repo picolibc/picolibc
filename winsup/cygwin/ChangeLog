@@ -1,3 +1,10 @@
+Tue Oct 31 18:12:56 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* path.h (has_exec_chars): Standard function for checking for
+	executable magic numbers.
+	* path.cc (symlink_info::check): Use the above function.
+	* fhandler.cc (fhandler_disk_file::open): Ditto.
+
 Tue Oct 31 17:57:52 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (_readlink): Return ENOENT when file does not exist.

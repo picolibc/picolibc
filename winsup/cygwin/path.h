@@ -122,6 +122,15 @@ const char * __stdcall find_exec (const char *name, path_conv& buf, const char *
 
 #define isdrive(s) (isalpha (*(s)) && (s)[1] == ':')
 
+static inline bool
+has_exec_chars (const char *buf, int len)
+{
+  return len >= 2 &&
+	 ((buf[0] == '#' && buf[1] == '!') ||
+	  (buf[0] == ':' && buf[1] == '\n') ||
+	  (buf[0] == 'M' && buf[1] == 'Z'));
+}
+
 /* cwd cache stuff.  */
 
 class muto;

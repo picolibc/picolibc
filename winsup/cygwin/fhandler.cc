@@ -1227,8 +1227,7 @@ fhandler_disk_file::open (path_conv& real_path, int flags, mode_t mode)
       /* FIXME should we use /etc/magic ? */
       magic[0] = magic[1] = magic[2] = '\0';
       ReadFile (get_handle (), magic, 3, &done, 0);
-      if ((magic[0] == ':' && magic[1] == '\n') ||
-	  (magic[0] == '#' && magic[1] == '!'))
+      if (has_exec_chars (magic, done))
 	real_path.set_exec ();
       if (!(flags & O_APPEND))
 	SetFilePointer (get_handle(), 0, 0, FILE_BEGIN);
