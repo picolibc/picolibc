@@ -182,7 +182,7 @@ write_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size)
   static BOOL first_time = TRUE;
   if (first_time)
     {
-      set_process_privileges ();
+      set_process_privilege (SE_RESTORE_NAME);
       first_time = FALSE;
     }
 
@@ -243,46 +243,6 @@ write_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size)
   BackupWrite (fh, NULL, 0, &bytes_written, TRUE, TRUE, &context);
   CloseHandle (fh);
   return 0;
-}
-
-int
-set_process_privileges ()
-{
-  HANDLE hToken = NULL;
-  LUID restore_priv;
-  TOKEN_PRIVILEGES new_priv;
-  int ret = -1;
-
-  if (!OpenProcessToken (hMainProc, TOKEN_ADJUST_PRIVILEGES, &hToken))
-    {
-      __seterrno ();
-      goto out;
-    }
-
-  if (!LookupPrivilegeValue (NULL, SE_RESTORE_NAME, &restore_priv))
-    {
-      __seterrno ();
-      goto out;
-    }
-
-  new_priv.PrivilegeCount = 1;
-  new_priv.Privileges[0].Luid = restore_priv;
-  new_priv.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-
-  if (!AdjustTokenPrivileges (hToken, FALSE, &new_priv, 0, NULL, NULL))
-    {
-      __seterrno ();
-      goto out;
-    }
-
-  ret = 0;
-
-out:
-  if (hToken)
-    CloseHandle (hToken);
-
-  syscall_printf ("%d = set_process_privileges ()", ret);
-  return ret;
 }
 
 static int

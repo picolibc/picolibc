@@ -45,6 +45,7 @@ BOOL __stdcall is_grp_member (uid_t uid, gid_t gid);
  * logsrv may be NULL, in this case only the local system is used for lookup.
  * The buffer for ret_sid (40 Bytes) has to be allocated by the caller! */
 BOOL __stdcall lookup_name (const char *, const char *, PSID);
+int set_process_privilege (const char *privilege, BOOL enable = TRUE);
 
 extern inline int get_uid_from_sid (PSID psid) { return get_id_from_sid (psid, FALSE);}
 extern inline int get_gid_from_sid (PSID psid) { return get_id_from_sid (psid, TRUE); }

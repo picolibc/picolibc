@@ -397,3 +397,43 @@ got_it:
 
   return TRUE;
 }
+
+int
+set_process_privilege (const char *privilege, BOOL enable)
+{
+  HANDLE hToken = NULL;
+  LUID restore_priv;
+  TOKEN_PRIVILEGES new_priv;
+  int ret = -1;
+
+  if (!OpenProcessToken (hMainProc, TOKEN_ADJUST_PRIVILEGES, &hToken))
+    {
+      __seterrno ();
+      goto out;
+    }
+
+  if (!LookupPrivilegeValue (NULL, privilege, &restore_priv))
+    {
+      __seterrno ();
+      goto out;
+    }
+
+  new_priv.PrivilegeCount = 1;
+  new_priv.Privileges[0].Luid = restore_priv;
+  new_priv.Privileges[0].Attributes = enable ? SE_PRIVILEGE_ENABLED : 0;
+
+  if (!AdjustTokenPrivileges (hToken, FALSE, &new_priv, 0, NULL, NULL))
+    {
+      __seterrno ();
+      goto out;
+    }
+
+  ret = 0;
+
+out:
+  if (hToken)
+    CloseHandle (hToken);
+
+  syscall_printf ("%d = set_process_privilege (%s, %d)",ret, privilege, enable);
+  return ret;
+}

@@ -1,3 +1,11 @@
+Fri Apr 20 22:25:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* security.cc (set_process_privileges): Swap out.
+	* sec_helper.cc (set_process_privilege): Rename from
+	`set_process_privileges'. Takes the privilege to enable or disable
+	as parameter now.
+	* security.h: Add prototype for `set_process_privileges'.
+
 2001-04-19  Egor Duda  <deo@logos-m.ru>
   
 	* path.cc (path_conv::check): Always initialize member variables.
