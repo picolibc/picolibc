@@ -484,21 +484,23 @@ _link (const char *a, const char *b)
 {
   int res = -1;
   path_conv real_a (a, SYMLINK_NOFOLLOW);
+  path_conv real_b (b, SYMLINK_NOFOLLOW);
 
   if (real_a.error)
     {
       set_errno (real_a.error);
-      syscall_printf ("-1 = link (%s, %s)", a, b);
-      return -1;
+      goto done;
     }
-
-  path_conv real_b (b, SYMLINK_NOFOLLOW);
-
   if (real_b.error)
     {
       set_errno (real_b.error);
-      syscall_printf ("-1 = link (%s, %s)", a, b);
-      return -1;
+      goto done;
+    }
+  if (real_b.get_win32 ()[strlen (real_b.get_win32 ()) - 1] == '.')
+    {
+      syscall_printf ("trailing dot, bailing out");
+      set_errno (EINVAL);
+      goto done;
     }
 
   /* Try to make hard link first on Windows NT */

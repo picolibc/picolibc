@@ -1,3 +1,7 @@
+Thu Apr 20 11:26:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * syscalls.cc (_link): Check new link path for trailing dot.
+
 Thu Apr 20 00:32:03 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler.h (fhandler_base::hclose): New virtual method.
