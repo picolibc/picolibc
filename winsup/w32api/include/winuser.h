@@ -2248,8 +2248,11 @@ extern "C" {
 #define LSFW_UNLOCK 2
 #endif
 #if (_WIN32_WINNT >= 0x0500)
-#define LWA_COLORKEY 1
-#define LWA_ALPHA 2
+#define LWA_COLORKEY	0x01
+#define LWA_ALPHA	0x02
+#define ULW_COLORKEY	0x01
+#define ULW_ALPHA	0x02
+#define ULW_OPAQUE	0x04
 #endif
 #define GA_PARENT 1
 #define GA_ROOT 2

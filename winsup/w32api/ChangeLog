@@ -1,3 +1,10 @@
+2004-11-21 Benoit Blanchon  <bblanchon@users.sourceforge.net>
+
+	* include/wingdi.h (AC_SRC_ALPHA, AC_SRC_NO_ALPHA, 
+	AC_DST_NO_ALPHA, ...): Add defines.
+	* include/winuser.h (ULW_COLORKEY,ULW_ALPHA,
+	ULW_OPAQUE): Add defines.	
+
 2004-11-21  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winnt.h (VerSetConditionMask): Correct typo in _WIN32_WINNT
@@ -33,7 +40,7 @@
 	Add defines.
 	(LLKHF_ALTDOWN): Define based on KF_ALTDOWN,
              
-2004-11-19  Benoit Blanchon  <benoit.blanchon@free.fr>
+2004-11-19  Benoit Blanchon  <bblanchon@users.sourceforge.net>
 
 	* include/shellapi.h (NIF_GUID): Add another define.
 
@@ -78,7 +85,7 @@
 
 	* include/shellapi.h (NIF_INFO): Add define.
 	(NIIF_*) Add defines..
-	Thanks to: Benoit Blanchon <benoit.blanchon@free.fr>
+	Thanks to: Benoit Blanchon <bblanchon@users.sourceforge.net>
 	(NIF_*): Convert constants to hex.
 
 2004-11-02  Danny Smith  <dannysmith@users.sourceforge.net>
@@ -417,7 +424,7 @@
 	* include/winnt.h (PROCESSOR_ARCHITECTURE_MSIL): Correct define.
 	(PROCESSOR_ARCHITECTURE_AMD64, PROCESSOR_ARCHITECTURE_IA32_ON_WIN64):
 	Add defines.
-	Thanks to Benoit Blanchon <benoit.blanchon@free.fr>
+	Thanks to Benoit Blanchon <bblanchon@users.sourceforge.net>
 
 2004-04-24  Justin Forest  <vhex@users.sourceforge.net>
 
