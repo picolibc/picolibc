@@ -238,7 +238,7 @@ _CRTIMP  wchar_t* __cdecl __wcserror(const wchar_t*);
 __CRT_INLINE int __cdecl
 wcscmpi (const wchar_t * __ws1, const wchar_t * __ws2)
   {return _wcsicmp (__ws1, __ws2);}
-_CRTIMP wchar_t* __cdecl wcsdup (wchar_t*);
+_CRTIMP wchar_t* __cdecl wcsdup (const wchar_t*);
 _CRTIMP int __cdecl	wcsicmp (const wchar_t*, const wchar_t*);
 _CRTIMP int __cdecl	wcsicoll (const wchar_t*, const wchar_t*);
 _CRTIMP wchar_t* __cdecl wcslwr (wchar_t*);

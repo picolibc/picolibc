@@ -1,3 +1,8 @@
+2004-12-20  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/wchar.h (wcsdup): Correct prototype.
+	* include/string.h (wcsdup): Correct prototype.
+
 2004-10-14  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/sys/stat.h: Make S_ISLNK comment comply with ISO C90.
