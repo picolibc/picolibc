@@ -39,38 +39,36 @@ pwdgrp::parse_group ()
   char *dp;
 
 # define grp (*group_buf)[curr_lines]
+
   memset (&grp, 0, sizeof (grp));
+
   grp.gr_name = next_str ();
-  if (!grp.gr_name)
+  if (!*grp.gr_name)
     return false;
 
   grp.gr_passwd = next_str ();
-  int n = next_int ();
-  if (n >= 0)
+
+  if (!next_num (grp.gr_gid))
+    return false;
+
+  int n;
+  dp = raw_ptr ();
+  for (n = 0; *next_str (','); n++)
+    continue;
+
+  grp.gr_mem = &null_ptr;
+  if (n)
     {
-      grp.gr_gid = n;
-      dp = next_str ();
-      if (!dp)
-	{
-	  static char empty[] = "";
-	  dp = empty;
-	}
-      int i = 0;
-      for (char *cp = dp; (cp = strchr (cp, ',')) != NULL; cp++)
-	i++;
-      char **namearray = (char **) calloc (i + 2, sizeof (char *));
+      char **namearray = (char **) calloc (n + 2, sizeof (char *));
       if (namearray)
 	{
-	  reparse (dp);
-	  for (i = 0; (dp = next_str (',')); i++)
+	  for (int i = 0; i < n; i++, dp = strchr (dp, '\0') + 1)
 	    namearray[i] = dp;
-	  namearray[i] = NULL;
 	  grp.gr_mem = namearray;
 	}
-      curr_lines++;
-      return true;
     }
-  return false;
+
+  return true;
 # undef grp
 }
 
@@ -85,8 +83,7 @@ pwdgrp::read_group ()
     if ((*group_buf)[i].gr_mem != &null_ptr)
       free ((*group_buf)[i].gr_mem);
 
-  if (!gr.load ("/etc/group"))
-    debug_printf ("gr.load failed");
+  load ("/etc/group");
 
   /* Complete /etc/group in memory if needed */
   if (!internal_getgrgid (myself->gid))
@@ -106,11 +103,11 @@ pwdgrp::read_group ()
       snprintf (linebuf, sizeof (linebuf), "%s:%s:%lu:%s",
 		group_name, strbuf, myself->gid, cygheap->user.name ());
       debug_printf ("Completing /etc/group: %s", linebuf);
-      gr.add_line (linebuf);
+      add_line (linebuf);
     }
   static char NO_COPY pretty_ls[] = "????????::-1:";
   if (wincap.has_security ())
-    gr.add_line (pretty_ls);
+    add_line (pretty_ls);
   return;
 }
 

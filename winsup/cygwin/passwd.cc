@@ -37,28 +37,22 @@ static pwdgrp pr (passwd_buf);
 bool
 pwdgrp::parse_passwd ()
 {
-  int n;
 # define res (*passwd_buf)[curr_lines]
-  /* Allocate enough room for the passwd struct and all the strings
-     in it in one go */
+
   memset (&res, 0, sizeof (res));
+
   res.pw_name = next_str ();
   res.pw_passwd = next_str ();
 
-  n = next_int ();
-  if (n < 0)
+  if (res.pw_name == res.pw_passwd)
     return false;
-  res.pw_uid = n;
 
-  n = next_int ();
-  if (n < 0)
-    return false;
-  res.pw_gid = n;
-  res.pw_comment = 0;
+  (void) next_num (res.pw_uid);
+  (void) next_num (res.pw_gid);
+  res.pw_comment = NULL;
   res.pw_gecos = next_str ();
   res.pw_dir =  next_str ();
   res.pw_shell = next_str ();
-  curr_lines++;
   return true;
 # undef res
 }
@@ -69,8 +63,7 @@ pwdgrp::parse_passwd ()
 void
 pwdgrp::read_passwd ()
 {
-  if (!load ("/etc/passwd"))
-    debug_printf ("load failed");
+  load ("/etc/passwd");
 
   char strbuf[128] = "";
   bool searchentry = true;
@@ -79,7 +72,7 @@ pwdgrp::read_passwd ()
   if (wincap.has_security ())
     {
       static char NO_COPY pretty_ls[] = "????????:*:-1:-1:";
-      pr.add_line (pretty_ls);
+      add_line (pretty_ls);
       cygsid tu = cygheap->user.sid ();
       tu.string (strbuf);
       if (myself->uid == ILLEGAL_UID)
@@ -101,7 +94,7 @@ pwdgrp::read_passwd ()
 		myself->gid,
 		strbuf, getenv ("HOME") ?: "");
       debug_printf ("Completing /etc/passwd: %s", linebuf);
-      pr.add_line (linebuf);
+      add_line (linebuf);
     }
   return;
 }

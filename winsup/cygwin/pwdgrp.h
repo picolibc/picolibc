@@ -45,14 +45,28 @@ class pwdgrp
   void read_passwd ();
   void read_group ();
   char *add_line (char *);
+  char *raw_ptr () const {return lptr;}
   char *next_str (char = 0);
-  int next_int (char = 0);
-  void reparse (char *);
+  bool next_num (unsigned long&);
+  bool next_num (unsigned int& i)
+  {
+    unsigned long x;
+    bool res = next_num (x);
+    i = (unsigned int) x;
+    return res;
+  }
+  bool next_num (int& i)
+  {
+    unsigned long x;
+    bool res = next_num (x);
+    i = (int) x;
+    return res;
+  }
 
 public:
   int curr_lines;
 
-  bool load (const char *);
+  void load (const char *);
   void refresh (bool check = true)
   {
     if (!check && initialized)

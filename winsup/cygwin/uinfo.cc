@@ -400,33 +400,23 @@ pwdgrp::next_str (char c)
   search[2] = c;
   char *res = lptr;
   char *p = strpbrk (lptr, search);
-  if (!p)
-    lptr = NULL;
-  else
+  if (p)
     {
-      lptr = (*p == '\n') ? NULL : p + 1;
+      lptr = (*p == '\n') ? p : p + 1;
       *p = '\0';
     }
   return res;
 }
 
-void
-pwdgrp::reparse (char *in_lptr)
+bool
+pwdgrp::next_num (unsigned long& n)
 {
-  lptr = in_lptr;
-}
-
-int
-pwdgrp::next_int (char c)
-{
-  char *p = next_str (c);
+  char *p = next_str ();
   if (!p)
     return -1;
   char *cp;
-  unsigned n = strtoul (p, &cp, 10);
-  if (p == cp)
-    return -1;
-  return n;
+  n = strtoul (p, &cp, 10);
+  return p != cp && !*cp;
 }
 
 char *
@@ -447,14 +437,19 @@ pwdgrp::add_line (char *eptr)
 	  max_lines += 10;
 	  *pwdgrp_buf = realloc (*pwdgrp_buf, max_lines * pwdgrp_buf_elem_size);
 	}
-      (void) (this->*parse) ();
+      if ((this->*parse) ())
+	curr_lines++;
     }
   return eptr;
 }
 
-bool
+void
 pwdgrp::load (const char *posix_fname)
 {
+  const char *res;
+  static const char failed[] = "failed";
+  static const char succeeded[] = "succeeded";
+
   if (buf)
     free (buf);
   buf = NULL;
@@ -464,26 +459,29 @@ pwdgrp::load (const char *posix_fname)
 
   paranoid_printf ("%s", posix_fname);
 
-  bool res;
   if (pc.error || !pc.exists () || !pc.isdisk () || pc.isdir ())
-    res = false;
+    {
+      paranoid_printf ("strange path_conv problem");
+      res = failed;
+    }
   else
     {
       HANDLE fh = CreateFile (pc, GENERIC_READ, wincap.shared (), NULL,
 			      OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
       if (fh == INVALID_HANDLE_VALUE)
-	res = false;
+	res = failed;
       else
 	{
 	  DWORD size = GetFileSize (fh, NULL), read_bytes;
 	  buf = (char *) malloc (size + 1);
 	  if (!ReadFile (fh, buf, size, &read_bytes, NULL))
 	    {
+	      paranoid_printf ("ReadFile failed, %E");
 	      CloseHandle (fh);
 	      if (buf)
 		free (buf);
 	      buf = NULL;
-	      res = false;
+	      res = failed;
 	    }
 	  else
 	    {
@@ -494,11 +492,12 @@ pwdgrp::load (const char *posix_fname)
 	      while ((eptr = add_line (eptr)))
 		continue;
 	      debug_printf ("%s curr_lines %d", posix_fname, curr_lines);
-	      res = true;
+	      res = succeeded;
 	    }
 	}
     }
 
+  debug_printf ("load of %s %s", posix_fname, res);
   initialized = true;
-  return res;
+  return;
 }
