@@ -1,1 +1,0 @@
-/* Empty stub to allow Cygwin to build something in lib.a */

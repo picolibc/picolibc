@@ -22,7 +22,7 @@ if test -n "${sys_dir}"; then
 fi
 
 CRT0=
-if test x${sys_dir} != xcygwin && test -n "${sys_dir}"; then
+if test -n "${sys_dir}"; then
   CRT0=crt0.o
 fi
 AC_SUBST(CRT0)

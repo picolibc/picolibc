@@ -62,7 +62,6 @@ struct __tm
  * atexit() support.
  */
 
-#define __REENT_HAS_CXA_SUPPORT 1
 #define	_ATEXIT_SIZE 32	/* must be at least 32 to guarantee ANSI conformance */
 
 struct _on_exit_args {
