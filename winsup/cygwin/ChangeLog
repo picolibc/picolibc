@@ -1,3 +1,8 @@
+2003-03-04  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.cc (MTinterface::fixup_after_fork): Initialize mainthread
+	prior to pthread objects.
+	
 2003-03-04  Jason Tishler <jason@tishler.net>
 
 	* fhandler_socket.cc (fhandler_socket::dup): Initialize type.
