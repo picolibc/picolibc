@@ -228,8 +228,9 @@ do-md5sum:
 	echo "==> Adding md5 checksum to top-level directory"
 	cd proto-toplev && find * -follow $(CVS_NAMES) -prune \
 			-o -type f -print \
-		| xargs $(MD5PROG) > ../md5.sum
-	mv md5.sum proto-toplev
+		| xargs $(MD5PROG) > ../md5.new
+	-rm -f proto-toplev/md5.sum
+	mv md5.new proto-toplev/md5.sum
 
 .PHONY: do-djunpack
 do-djunpack:
@@ -237,9 +238,8 @@ do-djunpack:
 	echo - 's /gdb-[0-9\.]*/$(PACKAGE)-'"$(VER)"'/'
 	sed < djunpack.bat > djunpack.new \
 		-e 's/gdb-[0-9][0-9\.]*/$(PACKAGE)-'"$(VER)"'/'
-	mv djunpack.new djunpack.bat
 	-rm -f proto-toplev/djunpack.bat
-	ln -s ../djunpack.bat proto-toplev/djunpack.bat
+	mv djunpack.new proto-toplev/djunpack.bat
 
 TEXINFO_SUPPORT= texinfo/texinfo.tex
 DIST_SUPPORT= $(DEVO_SUPPORT) $(TEXINFO_SUPPORT)
