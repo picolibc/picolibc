@@ -1,5 +1,6 @@
 /* ELF support for BFD.
-   Copyright (C) 1991,92,93,94,95,96,97,98,1999 Free Software Foundation, Inc.
+   Copyright (C) 1991, 92, 93, 94, 95, 96, 97, 98, 99, 2000
+   Free Software Foundation, Inc.
 
    Written by Fred Fish @ Cygnus Support, from information published
    in "UNIX System V Release 4, Programmers Guide: ANSI C and
@@ -59,6 +60,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define EI_OSABI        7       /* Operating System/ABI indication */
 #define ELFOSABI_SYSV   0       /* UNIX System V ABI */
 #define ELFOSABI_HPUX   1       /* HP-UX operating system */
+#define ELFOSABI_LINUX  3       /* GNU/Linux */
 #define ELFOSABI_STANDALONE 255 /* Standalone (embedded) application */
 #define ELFOSABI_ARM   97		/* ARM */
 

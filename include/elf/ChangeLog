@@ -1,3 +1,7 @@
+2000-02-22  H.J. Lu  <hjl@gnu.org>
+
+	* common.h (ELFOSABI_LINUX): Define.
+
 Thu Feb 17 00:18:33 2000  J"orn Rennecke <amylaar@cygnus.co.uk>
 
 	* sh.h: (EF_SH_MACH_MASK, EF_SH_UNKNOWN, EF_SH1, EF_SH2): New macros.
