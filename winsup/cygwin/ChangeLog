@@ -1,12 +1,3 @@
-2003-03-04  Christopher Faylor  <cgf@redhat.com>
-
-	* Makefile.in (strace.exe): Include mingw_getopt.o in link line.
-	* cygcheck.cc (print_version): Update copyright.
-	* strace.cc (print_version): Ditto.
-	(main): Allow cygwin paths for -o option.
-	(create_child): Allow cygwin path as argv[0].
-	* path.cc (path.cc): Allow UNC paths.
-
 2003-03-03  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler.h (fhandler_tty_slave::close): Declare new function.
