@@ -2,10 +2,10 @@
 <sect1 id="func-cygwin-detach-dll">
 <title>cygwin_detach_dll</title>
 
-<funcsynopsis>
+<funcsynopsis><funcprototype>
 <funcdef>extern "C" void
 <function>cygwin_detach_dll</function></funcdef>
 <paramdef>int <parameter>dll_index</parameter></paramdef>
-</funcsynopsis>
+</funcprototype></funcsynopsis>
 
 </sect1>
