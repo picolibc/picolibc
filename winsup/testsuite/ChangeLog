@@ -1,3 +1,9 @@
+2003-03-18  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* winsup.api/pthread/mutex1n.c: New test.
+	* winsup.api/pthread/mutex6n.c: Ditto.
+	* winsup.api/pthread/mutex7n.c: Ditto.
+
 2003-03-09  Christopher Faylor  <cgf@redhat.com>
 
 	* winsup.api/winsup.exp: Use -nostdinc when compiling.
