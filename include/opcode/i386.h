@@ -1340,6 +1340,7 @@ static const reg_entry i386_regtab[] = {
   /* make %st first as we test for it */
   {"st", FloatReg|FloatAcc, 0, 0},
   /* 8 bit regs */
+#define REGNAM_AL 1		/* Entry in i386_regtab.  */
   {"al", Reg8|Acc, 0, 0},
   {"cl", Reg8|ShiftCount, 0, 1},
   {"dl", Reg8, 0, 2},
@@ -1365,6 +1366,7 @@ static const reg_entry i386_regtab[] = {
   {"r14b", Reg8, RegRex64|RegRex, 6},
   {"r15b", Reg8, RegRex64|RegRex, 7},
   /* 16 bit regs */
+#define REGNAM_AX 25
   {"ax", Reg16|Acc, 0, 0},
   {"cx", Reg16, 0, 1},
   {"dx", Reg16|InOutPortReg, 0, 2},
@@ -1382,6 +1384,7 @@ static const reg_entry i386_regtab[] = {
   {"r14w", Reg16, RegRex, 6},
   {"r15w", Reg16, RegRex, 7},
   /* 32 bit regs */
+#define REGNAM_EAX 41
   {"eax", Reg32|BaseIndex|Acc, 0, 0},  /* Must be in ax + 16 slot */
   {"ecx", Reg32|BaseIndex, 0, 1},
   {"edx", Reg32|BaseIndex, 0, 2},

@@ -1,3 +1,7 @@
+2001-03-19  Alan Modra  <alan@linuxcare.com.au>
+
+	* i386.h (REGNAM_AL, REGNAM_AX, REGNAM_EAX): Define.
+
 2001-02-28  Igor Shevlyakov  <igor@windriver.com>
 
 	* m68k.h: new defines for Coldfire V4. Update mcf to know
