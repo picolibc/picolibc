@@ -309,15 +309,11 @@ Ideally, you should check out what you need from CVS
 method} for acquiring the sources.  Otherwise, you can install the
 appropriate source packages from the cygwin distribution.
 
-As of this writing, you need to install at least the cygwin source
-package and the w32api source package.  The winsup source package
-should be extracted first and the w32api source directory should
-be extracted into the resulting 'winsup' directory.  Then rename
-w32api-whatever to w32api.
-
-It is possible that the cygwin source package may require a newer
-version of the w32api package since the release of the packages is
-not always in lock step (another reason to just use CVS).
+If you are trying to duplicate a cygwin release then you should just
+download the corresponding source package and use "tar xjf" to unpack
+it.  This will unpack the sources into a directory named cygwin-x.y.z-n,
+where x.y.z-n correspond to the version numbering of the tar.bz2
+package.
 
 You @emph{must} build cygwin in a separate directory from the source.
 So, create something like a /obj directory.  You'll be performing
@@ -338,7 +334,7 @@ package named docbook-utils should get you most of what you need. For
 more information on building the documentation, see the README included
 in the cygwin-doc package.
 
-To check a cygwin1.dll, run "make check" in the winsup/cygwin directory.
+To check a cygwin1.dll, run "make check" in the winsup/testsuite directory.
 If that works, install everything @emph{except} the dll (if you can).
 Then, close down all cygwin programs (including bash windows, inetd,
 etc.), save your old dll, and copy the new dll to the correct place.

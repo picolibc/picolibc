@@ -1,3 +1,8 @@
+2005-01-21  Christopher Faylor  <cgf@timesys.com>
+
+	* how-programming.texinfo: Remove obsolete w32api instructions and add
+	some words about unpacking net release .tar.bz2.
+
 2004-12-30  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* path.sgml: Encode programming example with CDATA.
