@@ -116,7 +116,6 @@ _start:
 	.globl	get_mem_info .text
 	.globl	__stack
 	.globl	__global
-	.globl	zerobss
 	.ent	zerobss
 zerobss:
 	LA (v0, _fbss)
@@ -163,10 +162,10 @@ zerobss:
  */
 	.globl	hardware_init_hook .text
 	.globl	software_init_hook .text
-	.globl	__do_global_dtors .text
+	.type	_fini,@function
+	.type	_init,@function
 	.globl	atexit .text
 	.globl	exit .text
-	.globl	init
 	.ent	init
 init:
 	LA (t9, hardware_init_hook)		# init the hardware if needed
@@ -181,7 +180,7 @@ init:
 	jal	t9
 	nop
 7:
-	LA (a0, __do_global_dtors)
+	LA (a0, _fini)
 	jal	atexit
 	nop
 
@@ -193,6 +192,9 @@ init:
 	jal	monstartup
 	nop
 #endif
+
+	jal	_init				# run global constructors
+	nop
 
 	move	a0,zero				# set argc to 0
 	jal	main				# call the program start function
