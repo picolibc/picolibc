@@ -1,3 +1,8 @@
+2003-01-18  Nick Clifton  <nickc@redhat.com>
+
+	* libc/include/machine/ieeefp.h : Define __IEEE_BIG_ENDIAN,
+	__SMALL_BITFIELDS and _DOUBLE_IS_32BITS for IP2K.
+
 2003-01-16  Joel Sherrill <joel@OARcorp.com>
 
         * libc/sys/rtems/include/limits.h, libc/sys/rtems/sys/param.h,

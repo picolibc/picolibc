@@ -228,6 +228,12 @@
 #define __IEEE_BIG_ENDIAN
 #endif
 
+#ifdef __IP2K__
+#define __IEEE_BIG_ENDIAN
+#define __SMALL_BITFIELDS
+#define _DOUBLE_IS_32BITS
+#endif
+
 #ifndef __IEEE_BIG_ENDIAN
 #ifndef __IEEE_LITTLE_ENDIAN
 #error Endianess not declared!!
