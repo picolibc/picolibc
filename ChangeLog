@@ -1,5 +1,10 @@
 2003-04-27  Daniel Jacobowitz  <drow@mvista.com>
 
+	* src-release (DEVO_SUPPORT): Add src-release, Makefile.tpl,
+	and Makefile.def.
+
+2003-04-27  Daniel Jacobowitz  <drow@mvista.com>
+
 	* Makefile.tpl: Clean $(BUILD_SUBDIR).
 	* Makefile.in: Regenerated.
 
