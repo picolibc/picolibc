@@ -176,8 +176,8 @@ LoadDLLinitfunc (ws2_32)
   return 0;
 }
 
-static void dummy_autoload (void) __attribute__ ((unused));
-static void
+static void __stdcall dummy_autoload (void) __attribute__ ((unused));
+static void __stdcall
 dummy_autoload (void)
 {
 LoadDLLinit (advapi32)

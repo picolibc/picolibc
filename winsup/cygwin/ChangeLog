@@ -1,3 +1,12 @@
+Mon Dec 25 22:18:42 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* autoload.h: Make DLL initializers global to avoid inlining.
+	* exceptions.cc (interrupt_setup): Reorganize arguments to allow use of
+	regparm.
+	(interrupt_now): Ditto.
+	(interrupt_on_return): Ditto.
+	(call_handler): Ditto.
+
 Mon Dec 25 13:36:44 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* include/cygwin/version.h: Bump DLL minor version number to 8.

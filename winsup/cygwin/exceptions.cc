@@ -616,9 +616,13 @@ interruptible (DWORD pc, int testvalid = 0)
   return res;
 }
 
+static void __stdcall interrupt_setup (int sig, void *handler, DWORD retaddr,
+				       DWORD *retaddr_on_stack,
+				       struct sigaction& siga)
+		      __attribute__((regparm(3)));
 static void __stdcall
-interrupt_setup (int sig, struct sigaction& siga, void *handler,
-		 DWORD retaddr, DWORD *retaddr_on_stack)
+interrupt_setup (int sig, void *handler, DWORD retaddr, DWORD *retaddr_on_stack,
+		 struct sigaction& siga)
 {
   sigsave.retaddr = retaddr;
   sigsave.retaddr_on_stack = retaddr_on_stack;
@@ -630,10 +634,11 @@ interrupt_setup (int sig, struct sigaction& siga, void *handler,
   sigsave.saved_errno = -1;		// Flag: no errno to save
 }
 
+static bool interrupt_now (CONTEXT *, int, void *, struct sigaction&) __attribute__((regparm(3)));
 static bool
-interrupt_now (CONTEXT *ctx, int sig, struct sigaction& siga, void *handler)
+interrupt_now (CONTEXT *ctx, int sig, void *handler, struct sigaction& siga)
 {
-  interrupt_setup (sig, siga, handler, ctx->Eip, 0);
+  interrupt_setup (sig, handler, ctx->Eip, 0, siga);
   ctx->Eip = (DWORD) sigdelayed;
   SetThreadContext (myself->getthread2signal (), ctx); /* Restart the thread */
   return 1;
@@ -665,8 +670,9 @@ signal_fixup_after_exec (bool isspawn)
     }
 }
 
+static int interrupt_on_return (sigthread *, int, void *, struct sigaction&) __attribute__((regparm(3)));
 static int
-interrupt_on_return (sigthread *th, int sig, struct sigaction& siga, void *handler)
+interrupt_on_return (sigthread *th, int sig, void *handler, struct sigaction& siga)
 {
   int i;
   DWORD ebp = th->frame;
@@ -681,7 +687,7 @@ interrupt_on_return (sigthread *th, int sig, struct sigaction& siga, void *handl
 	DWORD *addr_retaddr = ((DWORD *)thestack.sf.AddrFrame.Offset) + 1;
 	if (*addr_retaddr  == thestack.sf.AddrReturn.Offset)
 	  {
-	    interrupt_setup (sig, siga, handler, *addr_retaddr, addr_retaddr);
+	    interrupt_setup (sig, handler, *addr_retaddr, addr_retaddr, siga);
 	    *addr_retaddr = (DWORD) sigdelayed;
 	  }
 	return 1;
@@ -699,8 +705,9 @@ set_sig_errno (int e)
   // sigproc_printf ("errno %d", e);
 }
 
+static int call_handler (int, void *, struct sigaction&) __attribute__((regparm(3)));
 static int
-call_handler (int sig, struct sigaction& siga, void *handler)
+call_handler (int sig, void *handler, struct sigaction& siga)
 {
   CONTEXT cx;
   bool interrupted = 0;
@@ -778,12 +785,12 @@ call_handler (int sig, struct sigaction& siga, void *handler)
     try_to_interrupt:
       if (th)
 	{
-	  interrupted = interrupt_on_return (th, sig, siga, handler);
+	  interrupted = interrupt_on_return (th, sig, handler, siga);
 	  if (!interrupted)
 	    LeaveCriticalSection (&th->lock);
 	}
       else if (interruptible (cx.Eip))
-	interrupted = interrupt_now (&cx, sig, siga, handler);
+	interrupted = interrupt_now (&cx, sig, handler, siga);
       else
 	break;
     }
@@ -979,7 +986,7 @@ stop:
 dosig:
   /* Dispatch to the appropriate function. */
   sigproc_printf ("signal %d, about to call %p", sig, thissig.sa_handler);
-  rc = call_handler (sig, thissig, handler);
+  rc = call_handler (sig, handler, thissig);
 
 done:
   sigproc_printf ("returning %d", rc);

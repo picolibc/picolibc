@@ -12,8 +12,8 @@ details. */
 
 #define LoadDLLinitfunc(dllname) \
 HANDLE NO_COPY dllname ## _handle = NULL; \
-static int dllname ## _init () __asm__ (#dllname "_init") __attribute__ ((unused)); \
-static int dllname ## _init ()
+/*static*/ int dllname ## _init () __asm__ (#dllname "_init"); \
+/*static*/ int dllname ## _init ()
 
 #define LoadDLLinitnow(dllname) \
   ({__asm__ ("movl $cygwin_dll_func_load, " #dllname "_init_holder"); dllname##_init ();})
