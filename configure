@@ -936,6 +936,7 @@ t loop
 
   AR=${AR-${host_alias}-ar}
   AR_FOR_TARGET=${AR_FOR_TARGET-${target_alias}-ar}
+  AR_FOR_TARGET=${AR_FOR_TARGET}${extra_arflags_for_target}
   AS=${AS-${host_alias}-as}
   AS_FOR_TARGET=${AS_FOR_TARGET-${target_alias}-as}
   BISON=${BISON-bison}
@@ -957,6 +958,7 @@ t loop
   MAKEINFO=${MAKEINFO-makeinfo}
   NM=${NM-${host_alias}-nm}
   NM_FOR_TARGET=${NM_FOR_TARGET-${target_alias}-nm}
+  NM_FOR_TARGET=${NM_FOR_TARGET}${extra_nmflags_for_target}
   RANLIB=${RANLIB-${host_alias}-ranlib}
   RANLIB_FOR_TARGET=${RANLIB_FOR_TARGET-${target_alias}-ranlib}
   WINDRES=${WINDRES-${host_alias}-windres}
@@ -1032,6 +1034,7 @@ else
 
   AR=ar
   AR_FOR_TARGET='\$(USUAL_AR_FOR_TARGET)'
+  AR_FOR_TARGET=${AR_FOR_TARGET}${extra_arflags_for_target}
   AS=as
   AS_FOR_TARGET='\$(USUAL_AS_FOR_TARGET)'
   BISON='$(USUAL_BISON)'
@@ -1046,6 +1049,7 @@ else
   MAKEINFO='\$(USUAL_MAKEINFO)'
   NM=nm
   NM_FOR_TARGET='\$(USUAL_NM_FOR_TARGET)'
+  NM_FOR_TARGET=${NM_FOR_TARGET}${extra_nmflags_for_target}
   RANLIB_FOR_TARGET='\$(USUAL_RANLIB_FOR_TARGET)'
   WINDRES=windres
   WINDRES_FOR_TARGET='\$(USUAL_WINDRES_FOR_TARGET)'

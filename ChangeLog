@@ -1,5 +1,14 @@
 2002-11-29  Nathanael Nerode  <neroden@gcc.gnu.org>
 
+	(Continuing slow-motion replay)
+	* configure.in (v810*): Remove special setting of tools.
+
+	* configure: Add support for extra required flags for ar or nm.
+	* configure.in (aix4.3+): Use above support for target-specific
+	issues, rather than using config/mt-aix43.
+
+2002-11-29  Nathanael Nerode  <neroden@gcc.gnu.org>
+
 	(Starting slow-motion replay merge from gcc 3.4 b-i-b branch)
 	* configure: Remove 'removing', which doesn't work.  Replace $subdir
 	with . everywhere.  Replace $subdirs with ''.  Replace $makesrcdir
