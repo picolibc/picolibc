@@ -9,26 +9,35 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include <windows.h>
+#include <string.h>
+
+#define SP " \t\n"
 
 /* Allow apps which don't have a main work, as long as they define WinMain */
 int
 main ()
 {
-  HMODULE x = GetModuleHandleA(0);
-  char *s = GetCommandLineA ();
+  HMODULE x = GetModuleHandle (0);
+  char *s = GetCommandLine ();
   STARTUPINFO si;
+  char *nexts;
 
-  /* GetCommandLineA returns the entire command line including the
-     program name, but WinMain is defined to accept the command
-     line without the program name.  */
-  while (*s != ' ' && *s != '\0')
-    ++s;
-  while (*s == ' ')
-    ++s;
+  s += strspn (s, SP);
+
+  if (*s != '"')
+    nexts = strpbrk (s, SP);
+  else
+    while ((nexts = strchr (s + 1, '"')) != NULL && nexts[-1] == '\\')
+      s = nexts;
+
+  if (!nexts)
+    nexts = strchr (s, '\0');
+  else
+    nexts += strspn (nexts + 1, SP);
 
   GetStartupInfo (&si);
 
-  return WinMain (x, 0, s,
+  return WinMain (x, 0, nexts,
 		  ((si.dwFlags & STARTF_USESHOWWINDOW) != 0
 		   ? si.wShowWindow
 		   : SW_SHOWNORMAL));
