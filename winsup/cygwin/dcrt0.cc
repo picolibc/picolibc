@@ -534,6 +534,7 @@ alloc_stack (child_info_fork *ci)
 static NO_COPY int mypid = 0;
 int _declspec(dllexport) __argc;
 char _declspec(dllexport) **__argv;
+vfork_save NO_COPY *main_vfork = NULL;
 
 void
 sigthread::init (const char *s)
@@ -644,6 +645,7 @@ dll_crt0_1 ()
   events_init ();
 
   cygheap->cwd.init ();
+  main_vfork = vfork_storage.create ();
 
   cygbench ("pre-forkee");
   if (user_data->forkee)

@@ -26,6 +26,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "child_info.h"
+#define NEED_VFORK
 #include "perthread.h"
 #include <assert.h>
 #include "shared_info.h"
@@ -1161,6 +1162,7 @@ wait_sig (VOID *)
 
 	      if (sig > 0 && sig != SIGKILL && sig != SIGSTOP &&
 		  (sigismember (&myself->getsigmask (), sig) ||
+		   main_vfork->pid ||
 		   (sig != SIGCONT && ISSTATE (myself, PID_STOPPED))))
 		{
 		  sigproc_printf ("signal %d blocked", sig);

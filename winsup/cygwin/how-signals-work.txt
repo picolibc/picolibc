@@ -67,10 +67,10 @@ but not yet dispatched in the main thread.  If the sigsave structure
 seems to be "active", then a "pending" flag is set (see below) and the
 function returns.  Otherwise processing continues.
 
-After determining that sigsave is available, setup_handler will take
-one of two routes, depending on whether the main thread is executing
-in the cygwin DLL or is currently in "user" code.  We'll discuss the
-cygwin DLL case first.
+After determining that sigsave is available, setup_handler will take one
+of two routes, depending on whether the main thread is executing in the
+cygwin DLL or is currently in "user" code.  We'll discuss the cygwin DLL
+case first.
 
 If sigsave seems to be available, then the frame information for the
 main thread is inspected.  This information is set by any cygwin
@@ -81,21 +81,33 @@ process.  Any function which uses 'sigframe thisframe' should be signal
 aware.  It should detect when a signal has arrived and return
 immediately.
 
-So, if mainframe is active, that means that we have good information about
-the state of the main thread.  Cygwin uses the stack frame info from this
-structure to insert a call to the assembly language function 'sigdelayed'
-in place of the main thread's normal return address.  So, when a call to
-(e.g.) _read returns after detecting a signal, it does not return to its
-caller.  Rather, it returns to sigdelayed.
+So, if mainframe is active, that means that we have good information
+about the state of the main thread.  Cygwin uses the stack frame info
+from this structure to insert a call to the assembly language function
+'sigdelayed' in place of the main thread's normal return address.  So,
+when a call to (e.g.) _read returns after detecting a signal, it does
+not return to its caller.  Rather, it returns to sigdelayed.
 
 The sigdelayed function saves a lot of state on the stack and sets the
 signal mask as appropriate for POSIX.  It uses information from the
 sigsave structure which has been filled in by interrupt_on_return, as
-called by setup_handler.  sigdelayed pushes a "call" the function
+called by setup_handler.  sigdelayed pushes a "call" to the function
 "sigreturn" on the stack.  This will be the return address seen by the
 signal handler.  After setting up the return value, modifying the signal
 mask, and saving other information on the stack, sigreturn clears the
 sigsave structure (so that setup_handler can use it) and jumps to the
-signal handler function.
+signal handler function.  And, so a UNIX signal handler function is
+emulated.
 
+The signal handler function operates as normal for UNIX but, upon
+return, it does not go directly back to the return address of the
+original cygwin function.  Instead it returns to the previously
+mentioned 'sigreturn' assembly language function.
 
+sigreturn resets the process mask to its state prior to calling the
+signal handler.  It checks to see if any new signals have come in and
+calls the handler for them now, ensuring that the order of signal
+arrival is more or less maintained.  It checks to see if a cygwin
+routine has set a special "restore this errno on returning from a
+signal" value and sets errno to this, if so.  Finally, it restores all
+of the register values that were in effect when sigdelayed was called.

@@ -75,7 +75,8 @@ public:
   }
 
   sigframe (): st (NULL) {}
-  sigframe (sigthread &t, DWORD ebp = (DWORD) __builtin_frame_address (0))
+  sigframe (sigthread &t, DWORD ebp = (DWORD) __builtin_frame_address (0)) {init (t, ebp);}
+  void init (sigthread &t, DWORD ebp = (DWORD) __builtin_frame_address (0))
   {
     if (!t.frame && t.id == GetCurrentThreadId ())
       set (t, ebp);

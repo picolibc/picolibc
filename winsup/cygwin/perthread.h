@@ -68,7 +68,7 @@ public:
   size_t size () {return sizeof (waitq);}
 };
 
-#ifdef NEED_VFORK
+#if defined (NEED_VFORK)
 struct vfork_save
 {
   int pid;
@@ -87,6 +87,7 @@ public:
   size_t size () {return sizeof (vfork_save);}
 };
 extern per_thread_vfork vfork_storage;
+extern vfork_save *main_vfork;
 #endif
 
 extern "C" {

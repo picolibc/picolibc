@@ -700,6 +700,7 @@ vfork ()
 #ifndef NEWVFORK
   return fork ();
 #else
+  sigframe thisframe;
   vfork_save *vf = get_vfork_val ();
   char **esp, **pp;
 
@@ -714,21 +715,21 @@ vfork ()
       __asm__ volatile ("movl %%esp,%0": "=r" (vf->vfork_esp):);
       __asm__ volatile ("movl %%ebp,%0": "=r" (vf->vfork_ebp):);
       for (pp = (char **)vf->frame, esp = vf->vfork_esp;
-	   esp <= vf->vfork_ebp + 1; pp++, esp++)
+	   esp <= vf->vfork_ebp + 2; pp++, esp++)
 	*pp = *esp;
       int res = cygheap->fdtab.vfork_child_dup () ? 0 : -1;
       debug_printf ("%d = vfork()", res);
       return res;
     }
 
-  cygheap->fdtab.vfork_parent_restore ();
-
   vf = get_vfork_val ();
 
-  __asm__ volatile ("movl %%esp,%0": "=r" (esp):);
   for (pp = (char **)vf->frame, esp = vf->vfork_esp;
-       esp <= vf->vfork_ebp + 1; pp++, esp++)
+       esp <= vf->vfork_ebp + 2; pp++, esp++)
     *esp = *pp;
+
+  thisframe.init (mainthread);
+  cygheap->fdtab.vfork_parent_restore ();
 
   if (vf->pid < 0)
     {
@@ -740,6 +741,7 @@ vfork ()
 
   int pid = vf->pid;
   vf->pid = 0;
+  sig_dispatch_pending ();
   return pid;
 #endif
 }
