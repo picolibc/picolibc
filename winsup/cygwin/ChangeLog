@@ -1,3 +1,13 @@
+2002-12-20  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.h (line_edit_status): Reorganize so that tests for error
+	condition can be < or >.
+	* fhandler_tty.cc (fhandler_pty_master::write): Don't return after
+	sending a signal.
+
+	* fhandler_termios.cc (fhandler_termios::line_edit): Trivial change to
+	use built-in bool types.
+
 2002-12-19  Pierre Humblet <pierre.humblet@ieee.org>
 
         * localtime.cc (tzsetwall): Set lcl_is_set and lcl_TZname

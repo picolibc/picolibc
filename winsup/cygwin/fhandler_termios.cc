@@ -192,7 +192,7 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
   line_edit_status ret = line_edit_ok;
   char c;
   int input_done = 0;
-  bool sawsig = FALSE;
+  bool sawsig = false;
   int iscanon = tc->ti.c_lflag & ICANON;
 
   while (nread-- > 0)
@@ -239,7 +239,7 @@ fhandler_termios::line_edit (const char *rptr, int nread, int always_accept)
 	  eat_readahead (-1);
 	  tc->kill_pgrp (sig);
 	  tc->ti.c_lflag &= ~FLUSHO;
-	  sawsig = 1;
+	  sawsig = true;
 	  goto restart_output;
 	}
     not_a_sig:

@@ -120,11 +120,11 @@ struct iovec;
 
 enum line_edit_status
 {
-  line_edit_signalled = -1,
   line_edit_ok = 0,
   line_edit_input_done = 1,
-  line_edit_error = 2,
-  line_edit_pipe_full = 3
+  line_edit_signalled = 2,
+  line_edit_error = 3,
+  line_edit_pipe_full = 4
 };
 
 enum bg_check_types

@@ -1083,11 +1083,12 @@ fhandler_pty_master::write (const void *ptr, size_t len)
   for (i=0; i < (int) len; i++)
     {
       line_edit_status status = line_edit (p++, 1);
-      if (status == line_edit_ok || status == line_edit_input_done)
-	continue;
-      if (status != line_edit_pipe_full)
-	i = -1;
-      break;
+      if (status > line_edit_signalled)
+	{
+	  if (status != line_edit_pipe_full)
+	    i = -1;
+	  break;
+	}
     }
   return i;
 }
