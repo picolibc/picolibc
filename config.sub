@@ -3,7 +3,7 @@
 #   Copyright (C) 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000
 #   Free Software Foundation, Inc.
 
-version='2000-05-30'
+version='2000-06-04'
 
 # This file is (in principle) common to ALL GNU software.
 # The presence of a machine in this file suggests that SOME GNU software
@@ -257,7 +257,7 @@ case $basic_machine in
 	      | f301-* | armv*-* | s390-* | sv1-* | t3e-* \
 	      | m88110-* | m680[01234]0-* | m683?2-* | m68360-* | z8k-* | d10v-* \
 	      | thumb-* | v850-* | d30v-* | tic30-* | c30-* | fr30-* \
-	      | bs2000-*)
+	      | bs2000-* | tic54x-* | c54x-*)
 		;;
 	# Recognize the various machine names and aliases which stand
 	# for a CPU type and a company and sometimes even an OS.
@@ -785,6 +785,10 @@ case $basic_machine in
 	symmetry)
 		basic_machine=i386-sequent
 		os=-dynix
+		;;
+        tic54x | c54x*)
+		basic_machine=tic54x-unknown
+		os=-coff
 		;;
 	t3e)
 		basic_machine=t3e-cray

@@ -1,3 +1,8 @@
+2000-06-19  Timothy Wall  <twall@cygnus.com>
+
+	* configure.in (noconfigdirs): Set noconfigdirs for tic54x target.
+	* config.sub: Add tic54x target.
+
 2000-06-07  Phillip Thomas  <pthomas@suse.de>
 
 	* README-maintainer-mode: New file: Contains notes on using
