@@ -1,3 +1,8 @@
+2000-05-11  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* mmap.cc (list::erase): Increment loop counter.
+	(map::erase): Likewise.
+
 Thu May 11 00:54:00 2000  Charles Wilson <cwilson@ece.gatech.edu>
 
 	* cygwin.din: insure that regsub() is included in

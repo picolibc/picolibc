@@ -83,7 +83,7 @@ list::add_record (mmap_record r)
 void
 list::erase (int i)
 {
-  while (i < nrecs-1)
+  for (; i < nrecs-1; i++)
     recs[i] = recs[i+1];
   nrecs--;
 }
@@ -137,7 +137,7 @@ map::add_list (list *l, int fd)
 void
 map::erase (int i)
 {
-  while (i < nlists-1)
+  for (; i < nlists-1; i++)
     lists[i] = lists[i+1];
   nlists--;
 }
