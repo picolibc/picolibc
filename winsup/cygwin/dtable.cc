@@ -255,73 +255,73 @@ dtable::build_fhandler_from_name (int fd, const char *name, HANDLE handle,
   return fh;
 }
 
+#define cnew(name) new ((void *) ccalloc (HEAP_FHANDLER, 1, sizeof (name))) name
 fhandler_base *
 dtable::build_fhandler (int fd, DWORD dev, const char *name, int unit)
 {
   fhandler_base *fh;
-  void *buf = ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_union) + 100);
 
   dev &= FH_DEVMASK;
   switch (dev)
     {
       case FH_TTYM:
-	fh = new (buf) fhandler_tty_master (name, unit);
+	fh = cnew (fhandler_tty_master) (name, unit);
 	break;
       case FH_CONSOLE:
       case FH_CONIN:
       case FH_CONOUT:
-	fh = new (buf) fhandler_console (name);
+	fh = cnew (fhandler_console) (name);
 	inc_console_fds ();
 	break;
       case FH_PTYM:
-	fh = new (buf) fhandler_pty_master (name);
+	fh = cnew (fhandler_pty_master) (name);
 	break;
       case FH_TTYS:
 	if (unit < 0)
-	  fh = new (buf) fhandler_tty_slave (name);
+	  fh = cnew (fhandler_tty_slave) (name);
 	else
-	  fh = new (buf) fhandler_tty_slave (unit, name);
+	  fh = cnew (fhandler_tty_slave) (unit, name);
 	break;
       case FH_WINDOWS:
-	fh = new (buf) fhandler_windows (name);
+	fh = cnew (fhandler_windows) (name);
 	break;
       case FH_SERIAL:
-	fh = new (buf) fhandler_serial (name, dev, unit);
+	fh = cnew (fhandler_serial) (name, dev, unit);
 	break;
       case FH_PIPE:
       case FH_PIPER:
       case FH_PIPEW:
-	fh = new (buf) fhandler_pipe (name, dev);
+	fh = cnew (fhandler_pipe) (name, dev);
 	break;
       case FH_SOCKET:
-	fh = new (buf) fhandler_socket (name);
+	fh = cnew (fhandler_socket) (name);
 	break;
       case FH_DISK:
-	fh = new (buf) fhandler_disk_file (NULL);
+	fh = cnew (fhandler_disk_file) (NULL);
 	break;
       case FH_FLOPPY:
-	fh = new (buf) fhandler_dev_floppy (name, unit);
+	fh = cnew (fhandler_dev_floppy) (name, unit);
 	break;
       case FH_TAPE:
-	fh = new (buf) fhandler_dev_tape (name, unit);
+	fh = cnew (fhandler_dev_tape) (name, unit);
 	break;
       case FH_NULL:
-	fh = new (buf) fhandler_dev_null (name);
+	fh = cnew (fhandler_dev_null) (name);
 	break;
       case FH_ZERO:
-	fh = new (buf) fhandler_dev_zero (name);
+	fh = cnew (fhandler_dev_zero) (name);
 	break;
       case FH_RANDOM:
-	fh = new (buf) fhandler_dev_random (name, unit);
+	fh = cnew (fhandler_dev_random) (name, unit);
 	break;
       case FH_MEM:
-	fh = new (buf) fhandler_dev_mem (name, unit);
+	fh = cnew (fhandler_dev_mem) (name, unit);
 	break;
       case FH_CLIPBOARD:
-	fh = new (buf) fhandler_dev_clipboard (name);
+	fh = cnew (fhandler_dev_clipboard) (name);
 	break;
       case FH_OSS_DSP:
-	fh = new (buf) fhandler_dev_dsp (name);
+	fh = cnew (fhandler_dev_dsp) (name);
 	break;
       default:
 	{

@@ -1019,18 +1019,31 @@ public:
   void fixup_after_exec (HANDLE);
 };
 
-#if 0
-/* You can't do this */
 typedef union
 {
-  fhandler_normal normal;
-  fhandler_dev_null dev_null;
-  fhandler bare;
-  fhandler_serial tty;
+  char base[sizeof(fhandler_base)];
+  char console[sizeof(fhandler_console)];
+  char dev_clipboard[sizeof(fhandler_dev_clipboard)];
+  char dev_dsp[sizeof(fhandler_dev_dsp)];
+  char dev_floppy[sizeof(fhandler_dev_floppy)];
+  char dev_mem[sizeof(fhandler_dev_mem)];
+  char dev_null[sizeof(fhandler_dev_null)];
+  char dev_random[sizeof(fhandler_dev_random)];
+  char dev_raw[sizeof(fhandler_dev_raw)];
+  char dev_tape[sizeof(fhandler_dev_tape)];
+  char dev_zero[sizeof(fhandler_dev_zero)];
+  char disk_file[sizeof(fhandler_disk_file)];
+  char pipe[sizeof(fhandler_pipe)];
+  char pty_master[sizeof(fhandler_pty_master)];
+  char serial[sizeof(fhandler_serial)];
+  char socket[sizeof(fhandler_socket)];
+  char termios[sizeof(fhandler_termios)];
+  char tty_common[sizeof(fhandler_tty_common)];
+  char tty_master[sizeof(fhandler_tty_master)];
+  char tty_slave[sizeof(fhandler_tty_slave)];
+  char windows[sizeof(fhandler_windows)];
 } fhandler_union;
-#else
-#define fhandler_union fhandler_console
-#endif
+
 struct select_record
 {
   int fd;
