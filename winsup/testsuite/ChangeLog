@@ -1,3 +1,10 @@
+2004-04-13  Gerd Spalink  <Gerd.Spalink@t-online.de>
+
+	* winsup.api/devdsp.c (forkrectest): Move synchronization with child
+	so that test passes also under high CPU load.
+	(forkplaytest): Ditto.
+	(abortplaytest): New function to test ioctl code SNDCTL_DSP_RESET.
+
 2004-04-04  Gerd Spalink  <Gerd.Spalink@t-online.de>
 
 	* winsup.api/devdsp.c (ioctltest): Add 2 tests for ioctl codes

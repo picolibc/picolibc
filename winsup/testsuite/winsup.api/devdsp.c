@@ -36,7 +36,7 @@ static const char wavfile_okay[] =
 
 /* Globals required by libltp */
 const char *TCID = "devdsp";   /* set test case identifier */
-int TST_TOTAL = 34;
+int TST_TOTAL = 35;
 
 /* Prototypes */
 void sinegen (void *wave, int rate, int bits, int len, int stride);
@@ -53,6 +53,7 @@ void recordingtest (void);
 void playbacktest (void);
 void monitortest (void);
 void ioctltest (void);
+void abortplaytest (void);
 void playwavtest (void);
 void syncwithchild (pid_t pid, int expected_exit_status);
 void cleanup (void);
@@ -80,6 +81,7 @@ main (int argc, char *argv[])
   monitortest ();
   forkplaytest ();
   forkrectest ();
+  abortplaytest ();
   playwavtest ();
   tst_exit ();
   /* NOTREACHED */
@@ -247,11 +249,10 @@ forkrectest (void)
   if (pid)
     {
       tst_resm (TINFO, "forked, child PID=%d", pid);
-      sleep (1);
+      syncwithchild (pid, 0);
       tst_resm (TINFO, "parent records..");
       rectest (fd, 22050, 1, 16);
       tst_resm (TINFO, "parent done");
-      syncwithchild (pid, 0);
     }
   else
     {				/* child */
@@ -273,10 +274,10 @@ forkrectest (void)
   if (pid)
     {
       tst_resm (TINFO, "forked, child PID=%d", pid);
+      syncwithchild (pid, TFAIL);	/* expecting error exit */
       tst_resm (TINFO, "parent records again ..");
       rectest (fd, 22050, 1, 16);
       tst_resm (TINFO, "parent done");
-      syncwithchild (pid, TFAIL);	/* expecting error exit */
     }
   else
     {				/* child */
@@ -315,11 +316,10 @@ forkplaytest (void)
   if (pid)
     {
       tst_resm (TINFO, "forked, child PID=%d", pid);
-      sleep (1);
+      syncwithchild (pid, 0);
       tst_resm (TINFO, "parent plays..");
       playtest (fd, 22050, 0, 8);
       tst_resm (TINFO, "parent done");
-      syncwithchild (pid, 0);
     }
   else
     {				/* child */
@@ -341,10 +341,10 @@ forkplaytest (void)
   if (pid)
     {
       tst_resm (TINFO, "forked, child PID=%d", pid);
+      syncwithchild (pid, TFAIL);	/* expected failure */
       tst_resm (TINFO, "parent plays again..");
       playtest (fd, 22050, 0, 8);
       tst_resm (TINFO, "parent done");
-      syncwithchild (pid, TFAIL);	/* expected failure */
     }
   else
     {				/* child */
@@ -601,6 +601,39 @@ sinegenb (int freq, int samprate, unsigned char *value, int len, int stride)
       value += stride;
       phase += incr;
     }
+}
+
+void
+abortplaytest (void)
+{
+  int audio;
+  int size = sizeof (wavfile_okay);
+  int n;
+  int ioctl_par = 0;
+
+  audio = open ("/dev/dsp", O_WRONLY);
+  if (audio < 0)
+    {
+      tst_brkm (TFAIL, cleanup, "Error open /dev/dsp W: %s",
+		strerror (errno));
+    }
+  if ((n = write (audio, wavfile_okay, size)) < 0)
+    {
+      tst_brkm (TFAIL, cleanup, "write: %s", strerror (errno));
+    }
+  if (n != size)
+    {
+      tst_brkm (TFAIL, cleanup, "Wrote %d, expected %d; exit", n, size);
+    }
+  if (ioctl (audio, SNDCTL_DSP_RESET, &ioctl_par) < 0)
+    {
+      tst_brkm (TFAIL, cleanup, "ioctl DSP_RESET: %s", strerror (errno));
+    }
+  if (close (audio) < 0)
+    {
+      tst_brkm (TFAIL, cleanup, "Close audio: %s", strerror (errno));
+    }
+  tst_resm (TPASS, "Playwav + ioctl DSP_RESET=%d", ioctl_par);
 }
 
 void
