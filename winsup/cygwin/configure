@@ -1965,7 +1965,7 @@ esac
 
 
 case "$target_cpu" in
-   i386|i486|i586|i686) DLL_ENTRY="_dll_entry@12"
+   i?86) DLL_ENTRY="_dll_entry@12"
 		DEF_DLL_ENTRY="dll_entry@12"
 		ALLOCA="_alloca"
 		CONFIG_DIR="i386"  ;;
