@@ -909,7 +909,7 @@ sig_handle (int sig, sigset_t mask, int pid, _threadinfo *tls)
   bool special_case = ISSTATE (myself, PID_STOPPED) || VFORKPID;
   bool masked = sigismember (&mask, sig);
   if (sig != SIGKILL && sig != SIGSTOP
-      && (special_case || main_vfork->pid || masked || insigwait_mask
+      && (special_case || masked || insigwait_mask
 	  || (tls && sigismember (&tls->sigmask, sig))))
     {
       sigproc_printf ("signal %d blocked", sig);

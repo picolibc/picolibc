@@ -1,5 +1,9 @@
 2004-01-23  Christopher Faylor  <cgf@redhat.com>
 
+	* exceptions.cc (sig_handle): Remove extraneous vforkism.
+
+2004-01-23  Christopher Faylor  <cgf@redhat.com>
+
 	* cygheap.cc (init_cygheap::close_ctty): Protect YA vforkism.
 	* fhandler.h (fhandler_base::has_acls): Make pass through for path_conv
 	method.
