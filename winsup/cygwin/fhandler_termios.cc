@@ -17,7 +17,6 @@ details. */
 #include "cygerrno.h"
 #include "fhandler.h"
 #include "sync.h"
-#include "interlock.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "tty.h"
