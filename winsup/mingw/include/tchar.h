@@ -190,6 +190,7 @@ typedef wchar_t _TCHAR;
 #define _tfindnext  _wfindnext
 #define _tfdopen    _wfdopen
 #define _tfopen     _wfopen
+#define _tfsopen    _wfsopen
 #define _tgetenv    _wgetenv
 #define _tputenv    _wputenv
 #define _tsearchenv _wsearchenv
@@ -274,6 +275,7 @@ typedef char	_TCHAR;
 #define	_fputts		fputs
 #define _tfdopen	_fdopen
 #define	_tfopen		fopen
+#define	_tfsopen	_fsopen
 #define	_tgetenv	getenv
 #define	_tputenv	_putenv
 #define	_tsearchenv	_searchenv
