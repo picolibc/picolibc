@@ -222,9 +222,14 @@ _CRTIMP int __cdecl	_vsnprintf (char*, size_t, const char*, __VALIST);
 
 #ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
 int __cdecl snprintf(char* s, size_t n, const char*  format, ...);
-extern __inline__ int __cdecl vsnprintf (char* s, size_t n, const char* format,
-			   __VALIST arg)
+extern __inline__ int __cdecl
+vsnprintf (char* s, size_t n, const char* format, __VALIST arg)
   { return _vsnprintf ( s, n, format, arg); }
+int __cdecl vscanf (const char * __restrict__, __VALIST);
+int __cdecl vfscanf (FILE * __restrict__, const char * __restrict__,
+		     __VALIST);
+int __cdecl vsscanf (const char * __restrict__,
+		     const char * __restrict__, __VALIST);
 #endif
 
 /*
@@ -358,6 +363,7 @@ _CRTIMP int __cdecl	swscanf (const wchar_t*, const wchar_t*, ...);
 _CRTIMP wint_t __cdecl	fgetwc (FILE*);
 _CRTIMP wint_t __cdecl	fputwc (wchar_t, FILE*);
 _CRTIMP wint_t __cdecl	ungetwc (wchar_t, FILE*);
+
 #ifdef __MSVCRT__ 
 _CRTIMP wchar_t* __cdecl fgetws (wchar_t*, int, FILE*);
 _CRTIMP int __cdecl	fputws (const wchar_t*, FILE*);
@@ -380,10 +386,15 @@ _CRTIMP FILE* __cdecl	_wpopen (const wchar_t*, const wchar_t*);
 #endif	/* __MSVCRT__ */
 
 #ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
-int __cdecl snwprintf(wchar_t* s, size_t n, const wchar_t*  format, ...);
+int __cdecl snwprintf (wchar_t* s, size_t n, const wchar_t*  format, ...);
 extern __inline__ int __cdecl
 vsnwprintf (wchar_t* s, size_t n, const wchar_t* format, __VALIST arg)
   { return _vsnwprintf ( s, n, format, arg);}
+int __cdecl vwscanf (const wchar_t * __restrict__, __VALIST);
+int __cdecl vfwscanf (FILE * __restrict__,
+		       const wchar_t * __restrict__, __VALIST);
+int __cdecl vswscanf (const wchar_t * __restrict__,
+		       const wchar_t * __restrict__, __VALIST);
 #endif
 
 #define _WSTDIO_DEFINED

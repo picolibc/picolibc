@@ -1,3 +1,35 @@
+2003-03-02  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/stdio.h (vscanf): Add prototype.
+	(vfscanf): Ditto.
+	(vsscanf): Ditto.
+	(vwscanf): Ditto.
+	(vfwscanf): Ditto.
+	(vswscanf): Ditto.
+	* include/wchar.h (vwscanf): Add prototype.
+	(vfwscanf): Ditto.
+	(vswscanf): Ditto.
+	* mingwex/snprintf.c: Move to mingwex/stdio.
+ 	* mingwex/vsnprintf.c: Ditto.
+	* mingwex/snwprintf.c: Ditto.
+	* mingwex/vsnwprintf.c: Ditto.
+	* mingwex/Makefile.in (VPATH): Add $(srcdir)/stdio
+	(STDIO_DISTFILES): Add.
+	(DISTFILES): Adjust.
+	(STDIO_STUB_OBJS): Rename to STDIO_OBJS and add v*scanf objects.
+	(LIB_OBJS): Adjust.
+	(dist): Adjust.
+
+2003-03-02  Aaron W  LaFramboise   <AWLaFramboise@aol.com>
+
+	* mingwex/stdio: New directory
+	* mingwex/stdio/vfscanf.c: New file.
+	* mingwex/stdio/vfwscanf.c:  New file.
+	* mingwex/stdio/vscanf.c:  New file.
+	* mingwex/stdio/vsscanf.c:  New file.
+	* mingwex/stdio/vswscanf.c:  New file.
+	* mingwex/stdio/vwscanf.c:  New file.
+
 2003-02-25  Earnie Boyd  <earnie@users.sf.net>
 
 	* Makefile.in (libmsvcrt20.a): Remove target and dependencies.
@@ -201,7 +233,7 @@
 
 2002-10-30  Guido Serassio  <serassio@libero.it>
 
-         * include/stdio.h (_getmaxstdio): Add prototype.
+        * include/stdio.h (_getmaxstdio): Add prototype.
          (_setmaxstdio): Likewise.
 
 2002-10-19  Kang Li  <rubylith@users.sourceforge.net>

@@ -118,10 +118,15 @@ _CRTIMP wint_t __cdecl	fputwc (wchar_t, FILE*);
 _CRTIMP wint_t __cdecl	ungetwc (wchar_t, FILE*);
 
 #ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
-int __cdecl snwprintf(wchar_t* s, size_t n, const wchar_t*  format, ...);
-extern __inline__ int __cdecl vsnwprintf (wchar_t* s, size_t n, const wchar_t* format,
-			   __VA_LIST arg)
-  { return _vsnwprintf ( s, n, format, arg); }
+int __cdecl snwprintf (wchar_t* s, size_t n, const wchar_t*  format, ...);
+extern __inline__ int __cdecl
+vsnwprintf (wchar_t* s, size_t n, const wchar_t* format, __VALIST arg)
+  { return _vsnwprintf ( s, n, format, arg);}
+int __cdecl vwscanf (const wchar_t * __restrict__, __VALIST);
+int __cdecl vfwscanf (FILE * __restrict__,
+		       const wchar_t * __restrict__, __VALIST);
+int __cdecl vswscanf (const wchar_t * __restrict__,
+		       const wchar_t * __restrict__, __VALIST);
 #endif
 
 #ifdef __MSVCRT__ 
