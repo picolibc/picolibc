@@ -442,7 +442,12 @@ pthread_cond::Signal ()
   if (pthread_mutex_lock (&cond_access))
     system_printf ("Failed to lock condition variable access mutex, this %0p\n", this);
   if (!verifyable_object_isvalid (mutex, PTHREAD_MUTEX_MAGIC))
-    return;
+    {
+      if (pthread_mutex_unlock (&cond_access))
+        system_printf ("Failed to unlock condition variable access mutex, this %0p\n",
+                       this);
+      return;
+    }
   PulseEvent (win32_obj_id);
   if (pthread_mutex_unlock (&cond_access))
     system_printf ("Failed to unlock condition variable access mutex, this %0p\n", this);
