@@ -1,3 +1,7 @@
+2003-11-24  Christopher Faylor  <cgf@redhat.com>
+
+	* configure.in: Avoid using cygserver unless hosting on cygwin.
+
 2003-11-23  Christopher Faylor  <cgf@redhat.com>
 
 	* sigproc.cc (sig_send): Correct below checkin.  Use

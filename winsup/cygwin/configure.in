@@ -75,12 +75,16 @@ case "$with_cross_host" in
   ""|*cygwin*)
     all_host="all_host"
     install_host="install_host"
+    LIBSERVER='$(bupdir)/cygserver/libcygserver.a'
     ;;
   *)
     all_host=
     install_host=
+    LIBSERVER=
     ;;
 esac
+
+test -n "$LIBSERVER" && AC_DEFINE(USE_SERVER)
 
 AC_SUBST(all_host)
 AC_SUBST(install_host)
@@ -135,7 +139,6 @@ no)	 ;;
 esac
 ])
 
-LIBSERVER='$(bupdir)/cygserver/libcygserver.a'
 AC_ARG_ENABLE(server,
 [ --enable-server		Build a cygwin DLL which can communicate with cygserver],
 [case "${enableval}" in
@@ -143,8 +146,6 @@ yes)	;;
 no)	LIBSERVER=;;
 esac
 ])
-
-test -n "$LIBSERVER" && AC_DEFINE(USE_SERVER)
 
 MALLOC_OFILES=malloc.o
 AC_ARG_ENABLE(malloc-debugging,
