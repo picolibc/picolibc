@@ -212,7 +212,7 @@ vr5xxx.o: ${srcdir}/vr5xxx.S
 	$(CC) -c $(CFLAGS_FOR_TARGET) $(CFLAGS) ${srcdir}/vr5xxx.S
 lsipmon.o: $(srcdir)/lsipmon.S $(srcdir)/pmon.S
 jmr3904-io.o: ${srcdir}/jmr3904-io.c
-	$(CC) -c $(CFLAGS_FOR_TARGET) $(CFLAGS) -mips3 ${srcdir}/jmr3904-io.c -o $@
+	$(CC) -c $(CFLAGS_FOR_TARGET) $(CFLAGS) ${srcdir}/jmr3904-io.c -o $@
 
 # cma101 can not be compiled mips16, if a mips16 version is needed then
 # it will have to be built, then this rule can be scrapped, allowing

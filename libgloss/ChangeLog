@@ -1,3 +1,7 @@
+2001-08-22  Jonathan Larmour  <jlarmour@redhat.com>
+
+	* mips/Makefile.in (jmr3904-io.o): Remove bogus use of `-mips3.'
+
 2001-07-18  Jeff Johnston  <jjohnstn@redhat.com>
 
         * hp74x/configure: Regenerated with current autoconf.
