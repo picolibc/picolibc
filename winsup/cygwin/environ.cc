@@ -719,9 +719,7 @@ environ_init (char **envp, int envc)
       envp[i] = newp;
       if (*newp == '=')
 	*newp = '!';
-      char *eq;
-      if ((eq = strchr (newp, '=')) == NULL)
-	eq = strchr (newp, '\0');
+      char *eq = strechr (newp, '=');
       if (!child_proc_info)
 	ucenv (newp, eq);
       if (*newp == 'T' && strncmp (newp, "TERM=", 5) == 0)

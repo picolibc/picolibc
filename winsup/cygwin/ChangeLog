@@ -1,3 +1,7 @@
+2003-02-13  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/in.h (sockaddr_in): Fix typo.
+
 2003-02-12  Christopher Faylor  <cgf@redhat.com>
 
 	* path.h (path_conv): Reorganize slightly.
