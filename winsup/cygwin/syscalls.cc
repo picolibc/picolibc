@@ -2066,7 +2066,7 @@ seteuid32 (__uid32_t uid)
   if (!wincap.has_security () && pw_new)
     {
       load_registry_hive (pw_new->pw_name);
-    goto success_9x;
+      goto success_9x;
     }
   if (!usersid.getfrompw (pw_new))
     {
@@ -2103,16 +2103,6 @@ seteuid32 (__uid32_t uid)
 
   debug_printf ("Found token %d", new_token);
 
-  /* Set process def dacl to allow access to impersonated token */
-  if (sec_acl ((PACL) dacl_buf, true, true, usersid))
-    {
-      tdacl.DefaultDacl = (PACL) dacl_buf;
-      if (!SetTokenInformation (ptok, TokenDefaultDacl,
-				&tdacl, sizeof dacl_buf))
-	debug_printf ("SetTokenInformation"
-		      "(TokenDefaultDacl), %E");
-    }
-
   /* If no impersonation token is available, try to
      authenticate using NtCreateToken () or subauthentication. */
   if (new_token == INVALID_HANDLE_VALUE)
@@ -2130,6 +2120,16 @@ seteuid32 (__uid32_t uid)
       if (cygheap->user.internal_token != NO_IMPERSONATION)
 	CloseHandle (cygheap->user.internal_token);
       cygheap->user.internal_token = new_token;
+    }
+
+  /* Set process def dacl to allow access to impersonated token */
+  if (sec_acl ((PACL) dacl_buf, true, true, usersid))
+    {
+      tdacl.DefaultDacl = (PACL) dacl_buf;
+      if (!SetTokenInformation (ptok, TokenDefaultDacl,
+				&tdacl, sizeof dacl_buf))
+	debug_printf ("SetTokenInformation"
+		      "(TokenDefaultDacl), %E");
     }
 
   if (new_token != ptok)
@@ -2166,11 +2166,8 @@ success_9x:
   cygheap->user.set_name (pw_new->pw_name);
   myself->uid = uid;
   groups.ischanged = FALSE;
-  if (!issamesid) /* MS KB 199190 */
-    {
-      RegCloseKey (HKEY_CURRENT_USER);
-      user_shared_initialize (true);
-    }
+  if (!issamesid)
+    user_shared_initialize (true);
   return 0;
 
 failed:
