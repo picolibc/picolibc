@@ -1,3 +1,7 @@
+2004-11-26  Paul Brook  <paul@codesourcery.com>
+
+	* libc/sys/arm/crt0.S (_start): Add .cantunwind annotation.
+                                                                                
 2004-11-24  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/stdlib.h (putenv, _putenv_r): Change to remove
