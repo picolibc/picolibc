@@ -214,9 +214,30 @@ to determine whether they are executable.
 
 @subsection How do I print under Cygwin?
 
-In lieu of a comprehensive FAQ entry (which will come soon), there are a
-couple of messages from the mailing list archives that may be helpful.
-Start at @file{http://cygwin.com/ml/cygwin/2001-04/msg00657.html}.
+Jason Tishler has written a couple of messages that explain how to use
+a2ps (for nicely formatted text in PostScript) and ghostscript (to print
+PostScript files on non-PostScript Windows printers).  Start at
+@file{http://cygwin.com/ml/cygwin/2001-04/msg00657.html}.  Note that the
+@samp{file} command is now available as part of Cygwin setup.
+
+Alternatively, on NT, you can use the Windows @samp{print} command.  (It
+does not seem to be available on Win9x.)  Type
+
+@example
+	bash$ print /\?
+@end example
+
+for usage instructions (note the @samp{?} must be escaped from the
+shell).
+
+Finally, you can simply @samp{cat} the file to the printer's share name:
+
+@example
+	bash$ cat myfile > //host/printer
+@end example
+
+You may need to press the formfeed button on your printer or append the
+formfeed character to your file.
 
 @subsection Why don't cursor keys work under Win95/Win98?
 
