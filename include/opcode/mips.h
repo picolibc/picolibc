@@ -307,6 +307,7 @@ struct mips_opcode
    ORs of these bits, indicatingthat they support the instructions
    defined at the given level.  */
 
+#define INSN_ISA_MASK		  0x0000ffff
 #define INSN_ISA1                 0x00000010
 #define INSN_ISA2                 0x00000020
 #define INSN_ISA3                 0x00000040
