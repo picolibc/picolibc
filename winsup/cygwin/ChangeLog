@@ -1,3 +1,7 @@
+2001-12-05  Christopher Faylor  <cgf@redhat.com>
+
+	* dir.cc (opendir): Detect error return from build_fhandler_from_name.
+
 2001-12-04  David Rothenberger  <daveroth@acm.org>
 
 	* net.cc (cygwin_getsockopt): Dereference optlen pointer when passing
