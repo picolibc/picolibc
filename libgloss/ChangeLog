@@ -1,3 +1,9 @@
+2000-09-05  Geoff Keating  <geoffk@cygnus.com>
+
+	* rs6000/simulator.S: Use conditional returns for documentation
+	purposes.
+	(access): Add new syscall.
+
 Wed May 24 16:47:12 2000  Alexandre Oliva  <aoliva@cygnus.com>
 
 	* mn10300/time.c (time): Set *tloc, since the sim doesn't.

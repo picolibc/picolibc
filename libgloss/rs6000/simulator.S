@@ -1,7 +1,7 @@
 /*
  * simulator.S -- PowerPC simulator system calls.
  *
- * Copyright (c) 1995 Cygnus Support
+ * Copyright (c) 1995, 2000 Cygnus Support
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -33,47 +33,48 @@ FUNC_END(_exit)
 FUNC_START(read)
 	li	r0,3
 	sc
-	bns+	0f
+	bnslr+
 	b	FUNC_NAME(_cerror)
-0:	blr
 FUNC_END(read)
 
 FUNC_START(write)
 	li	r0,4
 	sc
-	bns+	0f
+	bnslr+
 	b	FUNC_NAME(_cerror)
-0:	blr
 FUNC_END(write)
 
 FUNC_START(open)
 	li	r0,5
 	sc
-	bns+	0f
+	bnslr+
 	b	FUNC_NAME(_cerror)
-0:	blr
 FUNC_END(open)
 
 FUNC_START(close)
 	li	r0,6
 	sc
-	bns+	0f
+	bnslr+
 	b	FUNC_NAME(_cerror)
-0:	blr
 FUNC_END(close)
 
 FUNC_START(brk)
 	li	r0,17
 	sc
-	bns+	0f
+	bnslr+
 	b	FUNC_NAME(_cerror)
-0:	blr
 FUNC_END(brk)
+
+FUNC_START(access)
+	li	r0,33
+	sc
+	bnslr+
+	b	FUNC_NAME(_cerror)
+FUNC_END(access)
 
 FUNC_START(lseek)
 	li	r0,199
 	sc
-	bns+	0f
+	bnslr+
 	b	FUNC_NAME(_cerror)
-0:	blr
 FUNC_END(lseek)
