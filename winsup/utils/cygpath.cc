@@ -1,5 +1,5 @@
 /* cygpath.cc -- convert pathnames between Windows and Unix format
-   Copyright 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -20,6 +20,7 @@ details. */
 #include <sys/fcntl.h>
 #include <sys/cygwin.h>
 #include <ctype.h>
+#include <errno.h>
 
 static const char version[] = "$Revision$";
 
@@ -391,8 +392,11 @@ dowin (char option)
 
   if (!windows_flag)
     {
-      cygwin_conv_to_posix_path (buf, buf2);
-      buf = buf2;
+      if (cygwin_conv_to_posix_path (buf, buf2))
+	fprintf (stderr, "%s: error converting \"%s\" - %s\n",
+		 prog_name, buf, strerror (errno));
+      else
+	buf = buf2;
     }
   else
     {
@@ -410,7 +414,7 @@ doit (char *filename)
 {
   char *buf;
   DWORD len;
-  int retval;
+  int err;
   int (*conv_func) (const char *, char *);
 
   if (!path_flag)
@@ -441,16 +445,24 @@ doit (char *filename)
   if (path_flag)
     {
       if (unix_flag)
-	cygwin_win32_to_posix_path_list (filename, buf);
+	err = cygwin_win32_to_posix_path_list (filename, buf);
       else
 	{
-	  cygwin_posix_to_win32_path_list (filename, buf);
+	  err = cygwin_posix_to_win32_path_list (filename, buf);
+	  if (err)
+	    /* oops */;
 	  if (shortname_flag)
 	    buf = get_short_paths (buf);
 	  if (longname_flag)
 	    buf = get_long_paths (buf);
 	  if (mixed_flag)
 	    buf = get_mixed_name (buf);
+	}
+      if (err)
+	{
+	  fprintf (stderr, "%s: error converting \"%s\" - %s\n",
+		   prog_name, filename, strerror (errno));
+	  exit (1);
 	}
     }
   else
@@ -461,13 +473,13 @@ doit (char *filename)
       else
 	conv_func = (absolute_flag ? cygwin_conv_to_full_win32_path :
 		     cygwin_conv_to_win32_path);
-      retval = conv_func (filename, buf);
+      err = conv_func (filename, buf);
       if (mixed_flag)
 	buf = get_mixed_name (buf);
-      if (retval < 0)
+      if (err)
 	{
-	  fprintf (stderr, "%s: error converting \"%s\"\n",
-		   prog_name, filename);
+	  fprintf (stderr, "%s: error converting \"%s\" - %s\n",
+		   prog_name, filename, strerror (errno));
 	  exit (1);
 	}
       if (!unix_flag)

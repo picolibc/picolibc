@@ -985,7 +985,7 @@ character #%d.\n", optarg, (int) (endptr - optarg), endptr);
     error (0, "must provide a process id to toggle tracing");
 
   if (!mask)
-    mask = 1;
+    mask = _STRACE_ALL;
 
   if (bufsize)
     setvbuf (ofile, (char *) alloca (bufsize), _IOFBF, bufsize);

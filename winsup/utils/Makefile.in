@@ -36,9 +36,10 @@ override CXXFLAGS+=-fno-exceptions -fno-rtti -DHAVE_DECL_GETOPT=0
 
 include $(srcdir)/../Makefile.common
 
+LIBICONV:=@libiconv@
 libbfd:=${shell $(CC) -B$(bupdir2)/bfd/ --print-file-name=libbfd.a}
 libintl:=${shell $(CC) -B$(bupdir2)/intl/ --print-file-name=libintl.a}
-build_dumper:=${shell test -r $(libbfd) && test -r ${libintl} &&  echo 1}
+build_dumper:=${shell test -r $(libbfd) -a -r $(libintl) -a -n "$(LIBICONV)" && echo 1}
 
 libz:=${shell x=$$($(CC) -mno-cygwin --print-file-name=libz.a); cd $$(dirname $$x); dir=$$(pwd); case "$$dir" in *mingw*) echo $$dir/libz.a ;; esac}
 zlib_h:=-include ${patsubst %/lib/mingw/libz.a,%/include/zlib.h,${patsubst %/lib/libz.a,%/include/zlib.h,$(libz)}}
@@ -63,7 +64,6 @@ ALL_LDLIBS:=${patsubst $(w32api_lib)/lib%.a,-l%,\
 	       ${filter-out $(libkernel32),\
 		${filter-out $(libcygwin), $(ALL_DEP_LDLIBS)}}}}
 
-LIBICONV:=@libiconv@
 MINGW_LIB:=$(mingw_build)/libmingw32.a
 DUMPER_LIB:=${libbfd} ${libintl} -L$(bupdir1)/libiberty $(LIBICONV) -liberty
 MINGW_LDLIBS:=${filter-out $(libcygwin),$(ALL_LDLIBS) $(MINGW_LIB)}

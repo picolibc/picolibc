@@ -1,3 +1,13 @@
+2004-02-20  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (build_dumper): Detect missing iconv library.
+
+	* cygpath.cc (dowin): Report on filename conversion errors.
+	(doit): Ditto.
+
+	* strace.cc (main): Use symbolic constant for _STRACE_ALL when setting
+	mask.
+
 2004-02-14  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ssp.c (opts): Add leading '+' to force posixly correct behaviour.
