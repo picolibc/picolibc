@@ -122,37 +122,6 @@ latest version.  The Cygwin team frequently updates and adds new
 packages to the soureware web site.  The setup.exe program is the
 easiest way to determine what you need on your system.
 
-@section Ancient history of the project
-
-The first thing done was to enhance the development tools (gcc, gdb,
-gas, et al) so that they could generate/interpret Win32 native object
-files.
-
-The next task was to port the tools to Win NT/95.  We could have done
-this by rewriting large portions of the source to work within the
-context of the Win32 API.  But this would have meant spending a huge
-amount of time on each and every tool.  Instead, we took a substantially
-different approach by writing a shared library (cygwin.dll) that adds
-the necessary unix-like functionality missing from the Win32 API (fork,
-spawn, signals, select, sockets, etc.).  We call this new interface the
-Cygwin API.  Once written, it was possible to build working Win32
-tools using unix-hosted cross-compilers, linking against this library.
-
-From this point, we pursued the goal of producing native tools capable of
-rebuilding themselves under Windows 95 and NT (this is often
-called self-hosting).  Since neither OS ships with standard UNIX
-user tools (fileutils, textutils, bash, etc...), we had to get the
-GNU equivalents working with the Cygwin API.  Most of these tools were
-previously only built natively so we had to modify their configure
-scripts to be compatible with cross-compilation.  Other than the
-configuration changes, very few source-level changes had to be made.
-Running bash with the development tools and user tools in place,
-Windows 95 and NT look like a flavor of UNIX from the perspective of the
-GNU configure mechanism.  Self hosting was achieved as of the beta 17.1
-release.
-
-After adding Windows 98 support to Cygwin in mid-1998, we added support
-for the native Microsoft libraries in the compiler which allows
-compilation of executables that do not use Cygwin.  This is important to
-those people who want to use the tools to develop Win32 applications
-that do not need the UNIX emulation layer.
+For some "ancient" history of the project (rather, just woefully out of
+date), visit the Project History page at
+@file{http://sources.redhat.com/cygwin/history.html}.
