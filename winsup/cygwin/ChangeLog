@@ -1,3 +1,9 @@
+Fri Aug  3 13:04:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* path.cc (fchdir): Set the fhandler's path to absolute value to
+	ensure changing to the correct directory even if the fhandler originally
+	points to a relative path.
+
 Thu Aug  2 17:59:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* security.cc (set_file_attribute): Clean up. Don't call

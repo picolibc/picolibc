@@ -3092,6 +3092,25 @@ fchdir (int fd)
       return -1;
     }
   int ret = chdir (cygheap->fdtab[fd]->get_name ());
+  if (!ret)
+    {
+      /* The name in the fhandler is explicitely overwritten with the full path.
+	 Otherwise fchmod() to a path originally given as a relative path could
+	 end up in a completely different directory. Imagine:
+
+	   fd = open ("..");
+	   fchmod(fd);
+	   fchmod(fd);
+
+	 The 2nd fchmod should chdir to the same dir as the first call, not
+	 to it's parent dir. */
+      char path[MAX_PATH];
+      char posix_path[MAX_PATH];
+      mount_table->conv_to_posix_path (cygheap->cwd.get (path, 0, 1),
+				       posix_path, 0); 
+      cygheap->fdtab[fd]->set_name (path, posix_path);
+    }
+
   syscall_printf ("%d = fchdir (%d)", ret, fd);
   return ret;
 }
