@@ -1,0 +1,50 @@
+# Makefile for Cygwin server
+# Copyright 2003 Red Hat, Inc.
+
+# This file is part of Cygwin.
+
+# This software is a copyrighted work licensed under the terms of the
+# Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+# details.
+
+SHELL:=@SHELL@
+
+srcdir:=@srcdir@
+VPATH:=@srcdir@
+prefix:=@prefix@
+exec_prefix:=@exec_prefix@
+
+bindir:=@bindir@
+etcdir:=$(exec_prefix)/etc
+program_transform_name:=@program_transform_name@
+
+INSTALL:=@INSTALL@
+INSTALL_PROGRAM:=@INSTALL_PROGRAM@
+INSTALL_DATA:=@INSTALL_DATA@
+
+EXEEXT:=@EXEEXT@
+EXEEXT_FOR_BUILD:=@EXEEXT_FOR_BUILD@
+
+CC:=@CC@
+CC_FOR_TARGET:=$(CC)
+CXX:=@CXX@
+CXX_FOR_TARGET:=$(CXX)
+
+CFLAGS:=@CFLAGS@ -I$(cygwin_source)
+CXXFLAGS:=@CXXFLAGS@ -I$(cygwin_source)
+override CXXFLAGS+=-fno-exceptions -fno-rtti -DHAVE_DECL_GETOPT=0
+
+include $(srcdir)/../Makefile.common
+
+OBJS:=	cygserver.o client.o process.o shm.o transport.o transport_pipes.o \
+	transport_sockets.o
+
+CYGWIN_OBJS:=$(cygwin_build)/smallprint.o $(cygwin_build)/version.o \
+	$(cygwin_build)/wincap.o
+
+all: cygserver.exe
+
+install: all
+
+cygserver.exe: $(OBJS) $(CYGWIN_OBJS)
+	$(CXX) -o $@ $^ -lstdc++
