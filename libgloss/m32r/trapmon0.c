@@ -14,9 +14,9 @@ int __trap0 (int function, int p1, int p2, int p3, struct _reent *r)
   case SYS_exit:
     /* loop so GDB can't go past system exit call */
     while (1) {
-      asm volatile (" 
-          ldi	  r0, #0
-          trap    #15        ; return control to Mon2000");
+      asm volatile (
+          "ldi	  r0, #0						\n"
+          "trap    #15        ; return control to Mon2000");
     }
     break;
 
@@ -25,15 +25,15 @@ int __trap0 (int function, int p1, int p2, int p3, struct _reent *r)
     int i;
 
     for( i=0; i<p3; i++ ) {
-      asm volatile (" 
-          ldi   r0, #2
-          ldi   r1, #15      ; load Ctrl-O (ASCII 15)
-          trap  #15          ; write Ctrl-O for quoting purposes" );
+      asm volatile (
+          "ldi   r0, #2							\n"
+          "ldi   r1, #15      ; load Ctrl-O (ASCII 15)			\n"
+          "trap  #15          ; write Ctrl-O for quoting purposes" );
 
-      asm volatile (" 
-          ldi   r0, #2
-          ldb   r1, %0
-          trap  #15          ; write character to console" 
+      asm volatile (
+          "ldi   r0, #2							\n"
+          "ldb   r1, %0							\n"
+          "trap  #15          ; write character to console" 
           : /* no outputs */
           : "m" (((char*)p2)[i]));
     }
