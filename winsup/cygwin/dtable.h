@@ -88,6 +88,7 @@ public:
   friend class cygheap_fdmanip;
   friend class cygheap_fdget;
   friend class cygheap_fdnew;
+  friend class cygheap_fdenum;
 };
 
 fhandler_base *build_fh_dev (const device&, const char * = NULL);

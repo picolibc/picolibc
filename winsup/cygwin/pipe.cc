@@ -53,6 +53,12 @@ fhandler_pipe::set_close_on_exec (bool val)
     set_no_inheritance (writepipe_exists, val);
 }
 
+char *fhandler_pipe::get_proc_fd_name (char *buf)
+{
+  __small_sprintf (buf, "pipe:[%d]", get_handle ());
+  return buf;
+}
+
 struct pipeargs
 {
   fhandler_base *fh;

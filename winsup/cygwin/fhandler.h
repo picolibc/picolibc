@@ -218,6 +218,8 @@ class fhandler_base
   const char *get_name () const { return pc.normalized_path; }
   const char *get_win32_name () { return pc.get_win32 (); }
     __ino64_t get_namehash () { return namehash ?: namehash = hash_path_name (0, get_win32_name ()); }
+  /* Returns name used for /proc/<pid>/fd in buf. */
+  virtual char *get_proc_fd_name (char *buf);
 
   virtual void hclose (HANDLE h) {CloseHandle (h);}
   virtual void set_no_inheritance (HANDLE &h, int not_inheriting);
@@ -398,6 +400,7 @@ class fhandler_socket: public fhandler_base
   void fixup_after_fork (HANDLE);
   void fixup_after_exec ();
   bool need_fixup_before () const {return true;}
+  char *get_proc_fd_name (char *buf);
 
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
@@ -432,6 +435,7 @@ public:
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
+  char *get_proc_fd_name (char *buf);
   void set_close_on_exec (bool val);
   void __stdcall read (void *ptr, size_t& len) __attribute__ ((regparm (3)));
   int close ();
@@ -1105,7 +1109,7 @@ class fhandler_virtual : public fhandler_base
   virtual ~fhandler_virtual();
 
   virtual int exists();
-  DIR *opendir ();
+  virtual DIR *opendir ();
   _off64_t telldir (DIR *);
   void seekdir (DIR *, _off64_t);
   void rewinddir (DIR *);
@@ -1164,6 +1168,7 @@ class fhandler_process: public fhandler_proc
  public:
   fhandler_process ();
   int exists();
+  DIR *opendir ();
   struct dirent *readdir (DIR *);
   int open (int flags, mode_t mode = 0);
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));

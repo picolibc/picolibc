@@ -1,3 +1,43 @@
+2005-01-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygheap.h (class cygheap_fdenum): New class to enumerate used
+	fhandlers.
+	* dtable.h (class dtable): Add cygheap_fdenum as friend class.
+	* fhandler.h (fhandler_base::get_proc_fd_name): New virtual method
+	to return a name for /proc/<pid>/fd.
+	(fhandler_socket::get_proc_fd_name): Ditto.
+	(fhandler_pipe::get_proc_fd_name): Ditto.
+	(fhandler_virtual::opendir): Make virtual method.
+	(fhandler_process::opendir): New method.
+	* fhandler.cc (fhandler_base::get_proc_fd_name): New method.
+	* fhandler_process.cc: Include ctype.h.
+	(PROCESS_FD): Define.
+	(process_listing): Add "fd".
+	(fhandler_process::exists): Fix comment.  Return 1 in case of "fd"
+	directory. Handle files below "fd".
+	(fhandler_process::fstat): Drop "self" handling.  Set correct link
+	count for directories.
+	(fhandler_process::opendir): New method to handle "fd" directory.
+	(fhandler_process::readdir): Add "fd" handling.
+	(fhandler_process::open): Drop "self" handling.
+	(fhandler_process::fill_filebuf): Ditto.  Add "fd" handling.  Fix
+	"maps" output string.
+	* fhandler_registry.cc (fhandler_registry::fstat): Set correct link
+	count for directories.
+	* fhandler_socket.cc (fhandler_socket::get_proc_fd_name): New method.
+	* path.cc (symlink_info::set): Fix thinko.
+	* pinfo.cc (_pinfo::commune_recv): Rename pathbuf to path throughout.
+	Drop local path variable in PICOM_FIFO case.  Fix debug output.
+	Close handles as early as possible. Add PICOM_FDS and PICOM_FD
+	handling.
+	(_pinfo::commune_send): Add PICOM_FDS and PICOM_FD handling.
+	(_pinfo::fd): New method.
+	(_pinfo::fds): New method.
+	* pinfo.h (enum picom): Add PICOM_FDS and PICOM_FD.
+	(_pinfo::fd): Declare.
+	(_pinfo::fds): Declare.
+	* pipe.cc (fhandler_pipe::get_proc_fd_name): New method.
+
 2005-01-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* smallprint.c (rn): Change uval to unsigned long long to fix 64 bit

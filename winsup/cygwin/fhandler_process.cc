@@ -25,6 +25,7 @@ details. */
 #include <sys/param.h>
 #include <assert.h>
 #include <sys/sysmacros.h>
+#include <ctype.h>
 #include <psapi.h>
 
 #define _COMPILING_NEWLIB
@@ -43,10 +44,11 @@ static const int PROCESS_STAT = 11;
 static const int PROCESS_STATM = 12;
 static const int PROCESS_CMDLINE = 13;
 static const int PROCESS_MAPS = 14;
+static const int PROCESS_FD = 15;
 /* Keep symlinks always the last entries. */
-static const int PROCESS_ROOT = 15;
-static const int PROCESS_EXE = 16;
-static const int PROCESS_CWD = 17;
+static const int PROCESS_ROOT = 16;
+static const int PROCESS_EXE = 17;
+static const int PROCESS_CWD = 18;
 
 /* The position of "root" defines the beginning of symlik entries. */
 #define is_symlink(nr) ((nr) >= PROCESS_ROOT)
@@ -68,6 +70,7 @@ static const char * const process_listing[] =
   "statm",
   "cmdline",
   "maps",
+  "fd",
   /* Keep symlinks always the last entries. */
   "root",
   "exe",
@@ -89,7 +92,7 @@ static bool get_mem_values (DWORD dwProcessId, unsigned long *vmsize,
 			    unsigned long *vmshare);
 
 /* Returns 0 if path doesn't exist, >0 if path is a directory,
- * <0 if path is a file.
+ * -1 if path is a file, -2 if path is a symlink.
  */
 int
 fhandler_process::exists ()
@@ -106,8 +109,14 @@ fhandler_process::exists ()
     if (pathmatch (path + 1, process_listing[i]))
       {
 	fileid = i;
-	return is_symlink (i) ? -2 : -1;
+	return is_symlink (i) ? -2 : (i == PROCESS_FD) ? 1 : -1;
       }
+  if (pathnmatch (strchr (path, '/') + 1, "fd/", 3))
+    {
+      fileid = PROCESS_FD;
+      if (fill_filebuf ())
+        return -2;
+    }
   return 0;
 }
 
@@ -123,10 +132,7 @@ fhandler_process::fstat (struct __stat64 *buf)
   int file_type = exists ();
   (void) fhandler_base::fstat (buf);
   path += proc_len + 1;
-  if (path_prefix_p ("self", path, 4))
-    pid = getpid ();
-  else
-    pid = atoi (path);
+  pid = atoi (path);
   pinfo p (pid);
   if (!p)
     {
@@ -142,8 +148,6 @@ fhandler_process::fstat (struct __stat64 *buf)
       set_errno (ENOENT);
       return -1;
     case 1:
-      buf->st_mode |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
-      return 0;
     case 2:
       buf->st_ctime = buf->st_mtime = p->start_time;
       buf->st_ctim.tv_nsec = buf->st_mtim.tv_nsec = 0;
@@ -151,7 +155,10 @@ fhandler_process::fstat (struct __stat64 *buf)
       buf->st_uid = p->uid;
       buf->st_gid = p->gid;
       buf->st_mode |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
-      buf->st_nlink = PROCESS_LINK_COUNT;
+      if (file_type == 1)
+	buf->st_nlink = 2;
+      else
+	buf->st_nlink = 3;
       return 0;
     case -2:
       buf->st_uid = p->uid;
@@ -167,14 +174,38 @@ fhandler_process::fstat (struct __stat64 *buf)
     }
 }
 
+DIR *
+fhandler_process::opendir ()
+{
+  DIR *dir = fhandler_virtual::opendir ();
+  if (dir && fileid == PROCESS_FD)
+    fill_filebuf ();
+  return dir;
+}
+
 struct dirent *
 fhandler_process::readdir (DIR * dir)
 {
-  if (dir->__d_position >= PROCESS_LINK_COUNT)
+  if (fileid == PROCESS_FD)
+    {
+      if (dir->__d_position >= 2 + filesize / sizeof (int))
+        return NULL;
+    }
+  else if (dir->__d_position >= PROCESS_LINK_COUNT)
     return NULL;
-  strcpy (dir->__d_dirent->d_name, process_listing[dir->__d_position++]);
-  syscall_printf ("%p = readdir (%p) (%s)", &dir->__d_dirent, dir,
-		  dir->__d_dirent->d_name);
+  if (fileid == PROCESS_FD && dir->__d_position > 1)
+    {
+      int *p = (int *) filebuf;
+      __small_sprintf (dir->__d_dirent->d_name, "%d", p[dir->__d_position++ - 2]);
+      syscall_printf ("%p = readdir (%p) (%s)", &dir->__d_dirent, dir,
+		      dir->__d_dirent->d_name);
+    }
+  else
+    {
+      strcpy (dir->__d_dirent->d_name, process_listing[dir->__d_position++]);
+      syscall_printf ("%p = readdir (%p) (%s)", &dir->__d_dirent, dir,
+		      dir->__d_dirent->d_name);
+    }
   return dir->__d_dirent;
 }
 
@@ -191,10 +222,7 @@ fhandler_process::open (int flags, mode_t mode)
 
   const char *path;
   path = get_name () + proc_len + 1;
-  if (path_prefix_p ("self", path, 4))
-    pid = getpid ();
-  else
-    pid = atoi (path);
+  pid = atoi (path);
   while (*path != 0 && !isdirsep (*path))
     path++;
 
@@ -272,15 +300,11 @@ out:
 bool
 fhandler_process::fill_filebuf ()
 {
+  const char *path;
+  path = get_name () + proc_len + 1;
   if (!pid)
-    {
-      const char *path;
-      path = get_name () + proc_len + 1;
-      if (path_prefix_p ("self", path, 4))
-	pid = getpid ();
-      else
-	pid = atoi (path);
-    }
+    pid = atoi (path);
+
   pinfo p (pid);
 
   if (!p)
@@ -291,6 +315,36 @@ fhandler_process::fill_filebuf ()
 
   switch (fileid)
     {
+    case PROCESS_FD:
+      {
+	size_t fs; 
+	char *fdp = strrchr (path, '/');
+	if (!fdp || *++fdp == 'f') /* The "fd" directory itself. */
+	  {
+	    if (filebuf)
+	      free (filebuf);
+	    filebuf = p->fds (fs);
+	  }
+	else
+	  {
+	    if (filebuf)
+	      free (filebuf);
+	    int fd = atoi (fdp);
+	    if (fd < 0 || (fd == 0 && !isdigit (*fdp)))
+	      {
+		set_errno (ENOENT);
+		return false;
+	      }
+	    filebuf = p->fd (fd, fs);
+	    if (!filebuf || !*filebuf)
+	      {
+		filebuf = strdup ("<disconnected>");
+		fs = strlen (filebuf) + 1;
+	      }
+	  }
+	filesize = fs;
+	break;
+      }
     case PROCESS_UID:
     case PROCESS_GID:
     case PROCESS_PGID:
@@ -502,7 +556,7 @@ format_process_maps (_pinfo *p, char *destbuf, size_t maxsize)
 				st.st_ino);
 	while (written++ < 61)
 	  destbuf[len + written] = ' ';
-        len += written;
+        len += written - 1;
 	len += __small_sprintf (destbuf + len, "%s\n", posix_modname);
       }
 out:

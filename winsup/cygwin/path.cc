@@ -3135,22 +3135,10 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 int
 symlink_info::set (char *path, int type)
 {
-  extern suffix_info stat_suffixes[];
-
   strcpy (contents, path);
   pflags = PATH_SYMLINK;
-  if (type == -3) /* /proc/self */
-    {
-      fileattr = FILE_ATTRIBUTE_DIRECTORY;
-      error = 0;
-    }
-  else
-    {
-      /* That's save since a virtual symlink doesn't point to itself. */
-      path_conv pc (contents, PC_SYM_NOFOLLOW | PC_FULL, stat_suffixes);
-      fileattr = pc;
-      error = pc.error;
-    }
+  fileattr = FILE_ATTRIBUTE_NORMAL;
+  error = 0;
   is_symlink = true;
   ext_tacked_on = case_clash = false;
   ext_here = NULL;

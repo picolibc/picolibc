@@ -25,7 +25,9 @@ enum picom
   PICOM_CMDLINE = 1,
   PICOM_FIFO = 2,
   PICOM_CWD = 3,
-  PICOM_ROOT = 4
+  PICOM_ROOT = 4,
+  PICOM_FDS = 5,
+  PICOM_FD = 6
 };
 
 #define EXITCODE_SET 0x80000000
@@ -108,6 +110,8 @@ public:
   void commune_recv ();
   commune_result commune_send (DWORD, ...);
   bool alive ();
+  char *fd (int fd, size_t &);
+  char *fds (size_t &);
   char *root (size_t &);
   char *cwd (size_t &);
   char *cmdline (size_t &);

@@ -384,6 +384,29 @@ class cygheap_fdget : public cygheap_fdmanip
   }
 };
 
+class cygheap_fdenum : public cygheap_fdmanip
+{
+  int start_fd;
+ public:
+  cygheap_fdenum (int start_fd = -1, bool lockit = false)
+  {
+    if (lockit)
+      cygheap->fdtab.lock ();
+    this->start_fd = fd = start_fd < 0 ? -1 : start_fd;
+  }
+  int next ()
+  {
+    while (++fd < (int) cygheap->fdtab.size)
+      if (*(fh = cygheap->fdtab + fd) != NULL)
+        return fd;
+    return -1;
+  }
+  void rewind ()
+  {
+    fd = start_fd;
+  }
+};
+
 class child_info;
 void *__stdcall cygheap_setup_for_child (child_info *ci, bool dup_later) __attribute__ ((regparm(2)));
 void __stdcall cygheap_setup_for_child_cleanup (void *, child_info *, bool) __attribute__ ((regparm(3)));

@@ -147,6 +147,15 @@ fhandler_socket::~fhandler_socket ()
     cfree (sun_path);
 }
 
+char *fhandler_socket::get_proc_fd_name (char *buf)
+{
+  if (get_sun_path ())
+    __small_sprintf (buf, "%s", get_sun_path ());
+  else
+    __small_sprintf (buf, "socket:[%d]", get_socket ());
+  return buf;
+}
+
 void
 fhandler_socket::set_connect_secret ()
 {

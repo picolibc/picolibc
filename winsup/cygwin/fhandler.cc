@@ -154,6 +154,16 @@ fhandler_base::set_name (path_conv &in_pc)
   pc.set_normalized_path (in_pc.normalized_path, false);
 }
 
+char *fhandler_base::get_proc_fd_name (char *buf)
+{
+  if (get_name ())
+    return strcpy (buf, get_name ());
+  if (dev ().name)
+    return strcpy (buf, dev ().name);
+  __small_sprintf (buf, "device:[%d:%d]", get_major (), get_minor ());
+  return buf;
+}
+
 /* Detect if we are sitting at EOF for conditions where Windows
    returns an error but UNIX doesn't.  */
 static int __stdcall

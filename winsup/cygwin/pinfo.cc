@@ -380,7 +380,7 @@ extern char **__argv;
 void
 _pinfo::commune_recv ()
 {
-  char pathbuf[CYG_MAX_PATH];
+  char path[CYG_MAX_PATH + 1];
   DWORD nr;
   DWORD code;
   HANDLE hp;
@@ -460,33 +460,78 @@ _pinfo::commune_recv ()
       }
     case PICOM_CWD:
       {
-	unsigned int n = strlen (cygheap->cwd.get (pathbuf, 1, 1, CYG_MAX_PATH)) + 1;
         CloseHandle (__fromthem); __fromthem = NULL;
 	CloseHandle (hp);
+	unsigned int n = strlen (cygheap->cwd.get (path, 1, 1,
+						   CYG_MAX_PATH)) + 1;
 	if (!WriteFile (__tothem, &n, sizeof n, &nr, NULL))
-	  sigproc_printf ("WriteFile sizeof argv failed, %E");
-	else if (!WriteFile (__tothem, pathbuf, n, &nr, NULL))
-	  sigproc_printf ("WriteFile sizeof argv failed, %E");
+	  sigproc_printf ("WriteFile sizeof cwd failed, %E");
+	else if (!WriteFile (__tothem, path, n, &nr, NULL))
+	  sigproc_printf ("WriteFile cwd failed, %E");
 	break;
       }
     case PICOM_ROOT:
       {
-	unsigned int n;
-	if (cygheap->root.exists ())
-	  n = strlen (strcpy (pathbuf, cygheap->root.posix_path ())) + 1;
-	else
-	  n = strlen (strcpy (pathbuf, "/")) + 1;
         CloseHandle (__fromthem); __fromthem = NULL;
 	CloseHandle (hp);
+	unsigned int n;
+	if (cygheap->root.exists ())
+	  n = strlen (strcpy (path, cygheap->root.posix_path ())) + 1;
+	else
+	  n = strlen (strcpy (path, "/")) + 1;
 	if (!WriteFile (__tothem, &n, sizeof n, &nr, NULL))
-	  sigproc_printf ("WriteFile sizeof argv failed, %E");
-	else if (!WriteFile (__tothem, pathbuf, n, &nr, NULL))
-	  sigproc_printf ("WriteFile sizeof argv failed, %E");
+	  sigproc_printf ("WriteFile sizeof root failed, %E");
+	else if (!WriteFile (__tothem, path, n, &nr, NULL))
+	  sigproc_printf ("WriteFile root failed, %E");
 	break;
+      }
+    case PICOM_FDS:
+      {
+        CloseHandle (__fromthem); __fromthem = NULL;
+	CloseHandle (hp);
+	unsigned int n = 0;
+	int fd;
+	cygheap_fdenum cfd;
+	while ((fd = cfd.next ()) >= 0)
+	  n += sizeof (int);
+	cfd.rewind ();
+	if (!WriteFile (__tothem, &n, sizeof n, &nr, NULL))
+	  sigproc_printf ("WriteFile sizeof fds failed, %E");
+	else
+	  while ((fd = cfd.next ()) >= 0)
+	    if (!WriteFile (__tothem, &fd, sizeof fd, &nr, NULL))
+	      {
+		sigproc_printf ("WriteFile fd %d failed, %E", fd);
+		break;
+	      }
+        break;
+      }
+    case PICOM_FD:
+      {
+	int fd;
+	if (!ReadFile (__fromthem, &fd, sizeof fd, &nr, NULL)
+	    || nr != sizeof fd)
+	  {
+	    sigproc_printf ("ReadFile fd failed, %E");
+	    CloseHandle (hp);
+	    goto out;
+	  }
+	CloseHandle (__fromthem); __fromthem = NULL;
+	CloseHandle (hp);
+	unsigned int n;
+	cygheap_fdget cfd (fd);
+	if (cfd < 0)
+	  n = strlen (strcpy (path, "<disconnected>")) + 1;
+	else
+	  n = strlen (cfd->get_proc_fd_name (path)) + 1;
+	if (!WriteFile (__tothem, &n, sizeof n, &nr, NULL))
+	  sigproc_printf ("WriteFile sizeof fd failed, %E");
+	else if (!WriteFile (__tothem, path, n, &nr, NULL))
+	  sigproc_printf ("WriteFile fd failed, %E");
+        break;
       }
     case PICOM_FIFO:
       {
-	char path[CYG_MAX_PATH + 1];
 	unsigned len;
 	if (!ReadFile (__fromthem, &len, sizeof len, &nr, NULL)
 	    || nr != sizeof len)
@@ -614,9 +659,21 @@ _pinfo::commune_send (DWORD code, ...)
   size_t n;
   switch (code)
     {
+    case PICOM_FD:
+      {
+	int fd = va_arg (args, int);
+	if (!WriteFile (tothem, &fd, sizeof fd, &nr, NULL)
+	    || nr != sizeof fd)
+	  {
+	    __seterrno ();
+	    goto err;
+	  }
+      }
+      /*FALLTHRU*/
     case PICOM_CMDLINE:
     case PICOM_CWD:
     case PICOM_ROOT:
+    case PICOM_FDS:
       if (!ReadFile (fromthem, &n, sizeof n, &nr, NULL) || nr != sizeof n)
 	{
 	  __seterrno ();
@@ -681,6 +738,58 @@ out:
   myself->hello_pid = 0;
   myself.unlock ();
   return res;
+}
+
+char *
+_pinfo::fd (int fd, size_t &n)
+{
+  char *s;
+  if (!this || !pid)
+    return NULL;
+  if (pid != myself->pid)
+    {
+      commune_result cr = commune_send (PICOM_FD, fd);
+      s = cr.s;
+      n = cr.n;
+    }
+  else
+    {
+      cygheap_fdget cfd (fd);
+      if (cfd < 0)
+	s = strdup ("<disconnected>");
+      else
+	s = cfd->get_proc_fd_name ((char *) malloc (CYG_MAX_PATH + 1));
+      n = strlen (s) + 1;
+    }
+  return s;
+}
+
+char *
+_pinfo::fds (size_t &n)
+{
+  char *s;
+  if (!this || !pid)
+    return NULL;
+  if (pid != myself->pid)
+    {
+      commune_result cr = commune_send (PICOM_FDS);
+      s = cr.s;
+      n = cr.n;
+    }
+  else
+    {
+      n = 0;
+      int fd;
+      cygheap_fdenum cfd;
+      while ((fd = cfd.next ()) >= 0)
+	n += sizeof (int);
+      cfd.rewind ();
+      s = (char *) malloc (n);
+      int *p = (int *) s;
+      while ((fd = cfd.next ()) >= 0 && (char *) p - s < (int) n)
+	*p++ = fd;
+    }
+  return s;
 }
 
 char *

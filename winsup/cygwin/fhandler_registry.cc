@@ -236,7 +236,7 @@ fhandler_registry::fstat (struct __stat64 *buf)
 	      buf->st_ctim = buf->st_mtim;
 	      time_as_timestruc_t (&buf->st_atim);
 	      if (file_type > 0)
-		buf->st_nlink = subkey_count;
+		buf->st_nlink = subkey_count + 2;
 	      else
 		{
 		  int pathlen = strlen (path);
