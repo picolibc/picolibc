@@ -1,6 +1,11 @@
 2004-02-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/winioctl.h ( NTFS_VOLUME_DATA_BUFFER): Add structure.
+	* include/oleacc.h (LIBID_Accessibility): Declare.
+	* lib/uuid.c (LIBID_Accessibility): Define.
+
+2004-02-02  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winioctl.h (NTFS_VOLUME_DATA_BUFFER): Add structure.
 	(FSCTL_GET_NTFS_VOLUME_DATA): Add macro.
 
 2004-02-02  Danny Smith  <dannysmith@users.sourceforge.net>
