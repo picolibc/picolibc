@@ -1,3 +1,9 @@
+2003-06-26  Mattia Barbon  <mbarbon@dsi.unive.it>
+
+	* include/richedit.h (PARAFORMAT2): Add definition.
+	* include/richedit.h (PFA_*, PFE_*, PFM_*): Add some
+	missing constants.
+
 2003-06-17  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/shellapi.h (SHQUERYRBINFO): Add structure,

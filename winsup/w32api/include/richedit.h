@@ -61,10 +61,39 @@ extern "C" {
 #define PFM_RIGHTINDENT 2
 #define PFM_STARTINDENT 1
 #define PFM_TABSTOPS 16
+#define PFM_BORDER 2048
+#define PFM_LINESPACING 256
+#define PFM_NUMBERINGSTART 32768
+#define PFM_NUMBERINGSTYLE 8192
+#define PFM_NUMBERINGTAB 16384
+#define PFM_SHADING 4096
+#define PFM_SPACEAFTER 128
+#define PFM_SPACEBEFORE 64
+#define PFM_STYLE 1024
+#define PFM_DONOTHYPHEN 4194304
+#define PFM_KEEP 131072
+#define PFM_KEEPNEXT 262144
+#define PFM_NOLINENUMBER 1048576
+#define PFM_NOWIDOWCONTROL 2097152
+#define PFM_PAGEBREAKBEFORE 524288
+#define PFM_RTLPARA 65536
+#define PFM_SIDEBYSIDE 8388608
+#define PFM_TABLE 1073741824
 #define PFN_BULLET 1
+#define PFE_DONOTHYPHEN 64
+#define PFE_KEEP 2
+#define PFE_KEEPNEXT 4
+#define PFE_NOLINENUMBER 16
+#define PFE_NOWIDOWCONTROL 32
+#define PFE_PAGEBREAKBEFORE 8
+#define PFE_RTLPARA 1
+#define PFE_SIDEBYSIDE 128
+#define PFE_TABLE 16384
 #define PFA_LEFT 1
 #define PFA_RIGHT 2
 #define PFA_CENTER 3
+#define PFA_JUSTIFY 4
+#define PFA_FULL_INTERWORD 4
 #define SF_TEXT	1
 #define SF_RTF	2
 #define SF_RTFNOOBJS	3
@@ -385,6 +414,32 @@ typedef struct _paraformat {
 	SHORT cTabCount;
 	LONG rgxTabs[MAX_TAB_STOPS];
 } PARAFORMAT;
+typedef struct _paraformat2 {
+	UINT cbSize;
+	DWORD dwMask;
+	WORD wNumbering;
+	WORD wEffects;
+	LONG dxStartIndent;
+	LONG dxRightIndent;
+	LONG dxOffset;
+	WORD wAlignment;
+	SHORT cTabCount;
+	LONG rgxTabs[MAX_TAB_STOPS];
+	LONG dySpaceBefore;
+	LONG dySpaceAfter;
+	LONG dyLineSpacing;
+	SHORT sStype;
+	BYTE bLineSpacingRule;
+	BYTE bOutlineLevel;
+	WORD wShadingWeight;
+	WORD wShadingStyle;
+	WORD wNumberingStart;
+	WORD wNumberingStyle;
+	WORD wNumberingTab;
+	WORD wBorderSpace;
+	WORD wBorderWidth;
+	WORD wBorders;
+} PARAFORMAT2;
 typedef struct _selchange {
 	NMHDR nmhdr;
 	CHARRANGE chrg;
