@@ -1,3 +1,8 @@
+2002-05-31  Michal Ludvig  <mludvig@suse.cz>
+
+	* elf/dwarf2.h (DW_CFA_low_user, DW_CFA_high_user): Renamed
+	to DW_CFA_lo_user, DW_CFA_hi_user respectively.
+	
 2002-05-28  Kuang Hwa Lin <kuang@sbcglobal.net>
 
 	* dis-asm.h: Prototype print_insn_dlx.
