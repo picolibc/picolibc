@@ -1,5 +1,9 @@
 2005-01-03  Corinna Vinschen  <corinna@vinschen.de>
 
+	* signal.cc (abort): Call _GLOBAL_REENT's __cleanup.
+
+2005-01-03  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc (setmode): Call _fwalk with _GLOBAL_REENT.
 
 2005-01-01  Christopher Faylor  <cgf@timesys.com>

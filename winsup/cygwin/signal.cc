@@ -331,8 +331,8 @@ abort (void)
      be flushed.
      However this is the way FreeBSD does it, and it is much easier to
      do things this way, so... */
-  if (_REENT->__cleanup)
-    _REENT->__cleanup (_REENT);
+  if (_GLOBAL_REENT->__cleanup)
+    _GLOBAL_REENT->__cleanup (_GLOBAL_REENT);
 
   /* Ensure that SIGABRT can be caught regardless of blockage. */
   sigset_t sig_mask;
