@@ -1,3 +1,10 @@
+2004-10-01  Paul Brook  <paul@codesourcery.com>
+
+	* arm.h (SHT_ARM_EXIDX): Define.
+	(ELF_STRING_ARM_unwind, ELF_STRING_ARM_unwind,
+	ELF_STRING_ARM_unwind_once, ELF_STRING_ARM_unwind_info_once):
+	Define.
+
 2004-08-25  Dmitry Diky  <diwil@spec.ru>
 
 	* msp430.h: Add new relocs.

@@ -64,6 +64,9 @@
 #define STT_ARM_TFUNC      STT_LOPROC   /* A Thumb function.  */
 #define STT_ARM_16BIT      STT_HIPROC   /* A Thumb label.  */
 
+/* Additional section types.  */
+#define SHT_ARM_EXIDX	   0x70000001	/* Section holds ARM unwind info.  */
+
 /* ARM-specific values for sh_flags.  */
 #define SHF_ENTRYSECT      0x10000000   /* Section contains an entry point.  */
 #define SHF_COMDEF         0x80000000   /* Section may be multiply defined in the input to a link step.  */
@@ -157,5 +160,11 @@ END_RELOC_NUMBERS (R_ARM_max)
 
 /* The name of the note section used to identify arm variants.  */
 #define ARM_NOTE_SECTION ".note.gnu.arm.ident"
-     
+
+/* Special section names.  */
+#define ELF_STRING_ARM_unwind           ".ARM.exidx"
+#define ELF_STRING_ARM_unwind_info      ".ARM.extab"
+#define ELF_STRING_ARM_unwind_once      ".gnu.linkonce.armexidx."
+#define ELF_STRING_ARM_unwind_info_once ".gnu.linkonce.armextab."
+
 #endif /* _ELF_ARM_H */
