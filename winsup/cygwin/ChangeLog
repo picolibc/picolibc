@@ -1,3 +1,15 @@
+Mon Aug  6 19:58:43 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* cygheap.cc (cygheap_root::set): Avoid treating '/' specially.
+
+	* fhandler.cc (fhandler_base::fcntl): Only set specific O_NDELAY style
+	flag passed in from application.
+	* fhandler_socket.cc (fhandler_socket::fcntl): Ditto.
+	* fhandler.h: Set constant for future use.
+	* winsup.h: Define OLD_O_NDELAY only for old programs.
+	* include/cygwin/version.h: Define
+	CYGWIN_VERSION_CHECK_FOR_OLD_O_NONBLOCK.
+
 Sat Aug  4 16:52:03 2001  Christopher Faylor <cgf@cygnus.com>
 
 	Throughout, change check for running under Windows NT to 'iswinnt'.

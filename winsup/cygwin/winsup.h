@@ -250,7 +250,7 @@ extern SYSTEM_INFO system_info;
 /* newlib used to define O_NDELAY differently from O_NONBLOCK.  Now it
    properly defines both to be the same.  Unfortunately, we have to
    behave properly the old version, too, to accomodate older executables. */
-#define OLD_O_NDELAY	4
+#define OLD_O_NDELAY	(CYGWIN_VERSION_CHECK_FOR_OLD_O_NONBLOCK ? 4 : 0)
 
 /* The title on program start. */
 extern char *old_title;

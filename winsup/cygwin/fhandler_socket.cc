@@ -24,6 +24,8 @@
 #include <winsock2.h>
 #include "cygerrno.h"
 #include "security.h"
+#include "cygwin/version.h"
+#include "perprocess.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
@@ -412,17 +414,18 @@ fhandler_socket::fcntl (int cmd, void *arg)
       {
         /* Care for the old O_NDELAY flag. If one of the flags is set,
            both flags are set. */
-        int new_flags = (int) arg;
-        if (new_flags & (O_NONBLOCK | OLD_O_NDELAY))
-          new_flags |= O_NONBLOCK | OLD_O_NDELAY;
-        request = (new_flags & O_NONBLOCK) ? 1 : 0;
-        current = (get_flags () & O_NONBLOCK) ? 1 : 0;
-        if (request != current && (res = ioctl (FIONBIO, &request)))
+        const int allowed_flags = O_NONBLOCK | OLD_O_NDELAY;
+
+        /* Carefully test for the O_NONBLOCK or deprecated OLD_O_NDELAY flag.
+	   Set only the flag that has been passed in.  If both are set, just
+	   record O_NONBLOCK.   */
+	int new_flags = (int) arg & allowed_flags;
+	if ((new_flags & OLD_O_NDELAY) && (new_flags & O_NONBLOCK))
+	  new_flags = O_NONBLOCK;
+        current = get_flags () & allowed_flags;
+        if (!!current != !!new_flags && (res = ioctl (FIONBIO, &request)))
           break;
-        if (request)
-          set_flags (get_flags () | O_NONBLOCK | OLD_O_NDELAY);
-        else
-          set_flags (get_flags () & ~(O_NONBLOCK | OLD_O_NDELAY));
+	set_flags ((get_flags () & ~allowed_flags) | new_flags);
         break;
       }
     default:

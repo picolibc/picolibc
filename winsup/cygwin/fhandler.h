@@ -57,7 +57,7 @@ enum
   FH_WBINSET	= 0x00010000,	/* binary write mode has been explicitly set */
   FH_APPEND	= 0x00020000,	/* always append */
   FH_ASYNC	= 0x00040000,	/* async I/O */
-  FH_HADEOF	= 0x00080000,	/* EOF seen */
+  FH_SIGCLOSE	= 0x00080000,	/* signal handler should close fd on interrupt */
 
   FH_SYMLINK	= 0x00100000,	/* is a symlink */
   FH_EXECABL	= 0x00200000,	/* file looked like it would run:

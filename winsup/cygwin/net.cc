@@ -904,9 +904,9 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
       struct sockaddr_in peer_dummy;
       int len_dummy;
       if (!peer)
-        peer = (struct sockaddr *) &peer_dummy;
+	peer = (struct sockaddr *) &peer_dummy;
       if (!len)
-        {
+	{
 	  len_dummy = sizeof (struct sockaddr_in);
 	  len = &len_dummy;
 	}

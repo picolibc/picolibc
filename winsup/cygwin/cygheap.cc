@@ -330,6 +330,15 @@ cstrdup1 (const char *s)
 void
 cygheap_root::set (const char *posix, const char *native)
 {
+  if (*posix == '/' && posix[1] == '\0')
+    {
+      if (m)
+	{
+	  cfree (m);
+	  m = NULL;
+	}
+      return;
+    }
   if (!m)
     m = (struct cygheap_root_mount_info *) ccalloc (HEAP_MOUNT, 1, sizeof (*m));
   strcpy (m->posix_path, posix);

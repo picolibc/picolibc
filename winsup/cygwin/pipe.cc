@@ -1,6 +1,6 @@
 /* pipe.cc: pipe for Cygwin.
 
-   Copyright 1996, 1998, 1999, 2000 Cygnus Solutions.
+   Copyright 1996, 1998, 1999, 2000, 2001 Cygnus Solutions.
 
 This file is part of Cygwin.
 
@@ -22,7 +22,7 @@ details. */
 static int
 make_pipe (int fildes[2], unsigned int psize, int mode)
 {
-  SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," make_pipe");
+  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "make_pipe");
 
   HANDLE r, w;
   int  fdr = -1, fdw = -1;
@@ -37,8 +37,8 @@ make_pipe (int fildes[2], unsigned int psize, int mode)
     __seterrno ();
   else
     {
-      fhandler_base *fhr = cygheap->fdtab.build_fhandler (fdr, FH_PIPER, "/dev/piper");
-      fhandler_base *fhw = cygheap->fdtab.build_fhandler (fdw, FH_PIPEW, "/dev/pipew");
+      fhandler_pipe *fhr = (fhandler_pipe *) cygheap->fdtab.build_fhandler (fdr, FH_PIPER, "/dev/piper");
+      fhandler_pipe *fhw = (fhandler_pipe *) cygheap->fdtab.build_fhandler (fdw, FH_PIPEW, "/dev/pipew");
 
       int binmode = mode & O_TEXT ? 0 : 1;
       fhr->init (r, GENERIC_READ, binmode);
@@ -56,7 +56,7 @@ make_pipe (int fildes[2], unsigned int psize, int mode)
     }
 
   syscall_printf ("%d = make_pipe ([%d, %d], %d, %p)", res, fdr, fdw, psize, mode);
-  ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," make_pipe");
+  ReleaseResourceLock(LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "make_pipe");
   return res;
 }
 
@@ -81,11 +81,11 @@ int
 dup (int fd)
 {
   int res;
-  SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," dup");
+  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
 
   res = dup2 (fd, cygheap->fdtab.find_unused_handle ());
 
-  ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," dup");
+  ReleaseResourceLock(LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
 
   return res;
 }

@@ -18,6 +18,7 @@ details. */
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "security.h"
+#include "cygwin/version.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
@@ -1084,15 +1085,13 @@ int fhandler_base::fcntl (int cmd, void *arg)
 	 * ignored as well.
 	 */
         const int allowed_flags = O_APPEND | O_NONBLOCK | OLD_O_NDELAY;
-
-        /* Care for the old O_NDELAY flag. If one of the flags is set,
-           both flags are set. */
-	int new_flags = (int) arg;
-        if (new_flags & (O_NONBLOCK | OLD_O_NDELAY))
-          new_flags |= O_NONBLOCK | OLD_O_NDELAY;
-
-        int flags = get_flags () & ~allowed_flags;
-        set_flags (flags | (new_flags & allowed_flags));
+	int new_flags = (int) arg & allowed_flags;
+        /* Carefully test for the O_NONBLOCK or deprecated OLD_O_NDELAY flag.
+	   Set only the flag that has been passed in.  If both are set, just
+	   record O_NONBLOCK.   */
+	if ((new_flags & OLD_O_NDELAY) && (new_flags & O_NONBLOCK))
+	  new_flags = O_NONBLOCK;
+	set_flags ((get_flags () & ~allowed_flags) | new_flags);
       }
       res = 0;
       break;
