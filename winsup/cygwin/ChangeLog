@@ -1,3 +1,20 @@
+2002-08-11  Christopher Faylor  <cgf@redhat.com>
+
+	* assert.cc (__assert): Call debugger on assertion failure if
+	debugging.
+	* dcrt0.cc (dll_crt0_1): Just wait for signal thread to go live rather
+	than going through the overhead of invoking it.
+	* fork.cc (fork_child): Ditto.
+	* exceptions.cc (signal_fixup_after_fork): Call sigproc_init here.
+	* sigproc.cc (proc_can_be_signalled): Assume that the signal thread is
+	live.
+	(sig_dispatch): Ditto.
+	(sig_send): Ditto.
+	(wait_for_sigthread): Renamed from "wait_for_me".  Assume that
+	wait_sig_inited has been set and that this function is only called from
+	the main thread.
+	* winsup.h (wait_for_sigthread): Declare new function.
+
 2002-08-08  Christopher Faylor  <cgf@redhat.com>
 
 	* environ.cc (parse_options): Remember the "no" part of any options for

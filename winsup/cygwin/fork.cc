@@ -313,8 +313,7 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
 
   user_data->threadinterface->fixup_after_fork ();
 
-  /* Initialize signal/process handling */
-  sigproc_init ();
+  wait_for_sigthread ();
   __pthread_atforkchild ();
   cygbench ("fork-child");
   return 0;

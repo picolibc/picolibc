@@ -17,6 +17,7 @@ details. */
 #include <errno.h>
 #include <stdlib.h>
 #include <sys/cygwin.h>
+#include <assert.h>
 #include "cygerrno.h"
 #include "sync.h"
 #include "sigproc.h"
@@ -167,19 +168,13 @@ out:
   return res;
 }
 
-__inline static void
-wait_for_me ()
+void __stdcall
+wait_for_sigthread ()
 {
-  /* See if this is the first signal call after initialization.
-   * If so, wait for notification that all initialization has completed.
-   * Then set the handle to NULL to avoid checking this again.
-   */
-  if (wait_sig_inited)
-    {
-      (void) WaitForSingleObject (wait_sig_inited, INFINITE);
-      (void) ForceCloseHandle (wait_sig_inited);
-      wait_sig_inited = NULL;
-    }
+  assert (wait_sig_inited);
+  (void) WaitForSingleObject (wait_sig_inited, INFINITE);
+  (void) ForceCloseHandle (wait_sig_inited);
+  wait_sig_inited = NULL;
 }
 
 /* Get the sync_proc_subproc muto to control access to
@@ -210,7 +205,7 @@ proc_can_be_signalled (_pinfo *p)
 {
   if (p == myself_nowait || p == myself_nowait_nonmain || p == myself)
     {
-      wait_for_me ();
+      assert (!wait_sig_inited);
       return 1;
     }
 
@@ -535,7 +530,7 @@ sig_dispatch_pending (int justwake)
 #endif
   else
     {
-      wait_for_me ();
+      assert (!wait_sig_inited);
       if (!justwake)
 	(void) sig_send (myself, __SIGFLUSH);
       else if (ReleaseSemaphore (sigcatch_nosync, 1, NULL))
@@ -657,7 +652,7 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
     {
       if (no_signals_available ())
 	goto out;		// Either exiting or not yet initializing
-      wait_for_me ();
+      assert (!wait_sig_inited);
       wait_for_completion = p != myself_nowait;
       p = myself;
     }

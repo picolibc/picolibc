@@ -46,6 +46,9 @@ __assert (const char *file, int line, const char *failedexpr)
 		    failedexpr, file, line);
     }
 
+#ifdef DEBUGGING
+  try_to_debug ();
+#endif
   abort ();	// FIXME: Someday this should work.
 
   /* NOTREACHED */

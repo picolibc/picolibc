@@ -715,15 +715,16 @@ interrupt_now (CONTEXT *ctx, int sig, void *handler, struct sigaction& siga)
 void __stdcall
 signal_fixup_after_fork ()
 {
-  if (!sigsave.sig)
-    return;
-
-  sigsave.sig = 0;
-  if (sigsave.retaddr_on_stack)
+  if (sigsave.sig)
     {
-      *sigsave.retaddr_on_stack = sigsave.retaddr;
-      set_process_mask (sigsave.oldmask);
+      sigsave.sig = 0;
+      if (sigsave.retaddr_on_stack)
+	{
+	  *sigsave.retaddr_on_stack = sigsave.retaddr;
+	  set_process_mask (sigsave.oldmask);
+	}
     }
+  sigproc_init ();
 }
 
 void __stdcall
