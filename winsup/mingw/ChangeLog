@@ -1,3 +1,8 @@
+2002-10-30  Guido Serassio  <serassio@libero.it>
+
+         * include/stdio.h (_getnaxstdio): Add prototype.
+         (_setmaxstdio): Likewise.
+
 2002-10-19  Kang Li  <rubylith@users.sourceforge.net>
 
 	* include/fcntl.h (O_SEQUENTIAL): Correct typo.

@@ -323,7 +323,11 @@ int	_fgetchar (void);
 int	_fputchar (int);
 FILE*	_fdopen (int, const char*);
 int	_fileno (FILE*);
-int 	_fcloseall(void);
+int	_fcloseall(void);
+#ifdef __MSVCRT__
+int	_getmaxstdio(void);
+int	_setmaxstdio(int);
+#endif
 
 #ifndef _NO_OLDNAMES
 int	fgetchar (void);
