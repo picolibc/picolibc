@@ -1,8 +1,8 @@
 /* shm.cc: Single unix specification IPC interface for Cygwin
 
-Copyright 2001, 2002 Red Hat, Inc.
+   Copyright 2001, 2002 Red Hat, Inc.
 
-Originally written by Robert Collins <robert.collins@hotmail.com>
+   Originally written by Robert Collins <robert.collins@hotmail.com>
 
 This file is part of Cygwin.
 
@@ -123,7 +123,7 @@ build_inprocess_shmds (HANDLE hfilemap, HANDLE hattachmap, key_t key,
 
   /* Now get the user data */
   HANDLE attachmap = hattachmap;
-  shmid_ds *shmtemp = new shmid_ds;
+  int_shmid_ds *shmtemp = new int_shmid_ds;
   if (!shmtemp)
     {
       system_printf ("failed to malloc shm node");
@@ -136,7 +136,7 @@ build_inprocess_shmds (HANDLE hfilemap, HANDLE hattachmap, key_t key,
     }
 
   /* get the system node data */
-  *shmtemp = *(shmid_ds *) mapptr;
+  shmtemp->ds = *(shmid_ds *) mapptr;
 
   /* process local data */
   shmnode *tempnode = new shmnode;
@@ -201,7 +201,7 @@ fixup_shms_after_fork ()
 			 tempnode);
 	  return 1;
 	}
-      tempnode->shmds = (class shmid_ds *) newshmds;
+      tempnode->shmds->ds = *(shmid_ds *) newshmds;
       tempnode->shmds->mapptr = newshmds;
       _shmattach *attachnode = tempnode->attachhead;
       while (attachnode)
@@ -406,21 +406,14 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
   switch (cmd)
     {
     case IPC_STAT:
-      buf->shm_perm = tempnode->shmds->shm_perm;
-      buf->shm_segsz = tempnode->shmds->shm_segsz;
-      buf->shm_lpid = tempnode->shmds->shm_lpid;
-      buf->shm_cpid = tempnode->shmds->shm_cpid;
-      buf->shm_nattch = tempnode->shmds->shm_nattch;
-      buf->shm_atime = tempnode->shmds->shm_atime;
-      buf->shm_dtime = tempnode->shmds->shm_dtime;
-      buf->shm_ctime = tempnode->shmds->shm_ctime;
+      *buf = tempnode->shmds->ds;
       break;
     case IPC_RMID:
       {
 	/* TODO: check permissions. Or possibly, the daemon gets to be the only
 	 * one with write access to the memory area?
 	 */
-	if (tempnode->shmds->shm_nattch)
+	if (tempnode->shmds->ds.shm_nattch)
 	  system_printf
 	    ("call to shmctl with cmd= IPC_RMID when memory area still has"
 	     " attachees");
@@ -494,7 +487,7 @@ shmget (key_t key, size_t size, int shmflg)
       if (tempnode->key == key && key != IPC_PRIVATE)
 	{
 	  // FIXME: free the mutex
-	  if (size && tempnode->shmds->shm_segsz < size)
+	  if (size && tempnode->shmds->ds.shm_segsz < size)
 	    {
 	      set_errno (EINVAL);
 	      return -1;
@@ -544,25 +537,4 @@ shmget (key_t key, size_t size, int shmflg)
   if (shmtemp)
     return shmtemp->shm_id;
   return -1;
-
-
-#if 0
-  /* fill out the node data */
-  shmtemp->shm_perm.cuid = getuid32 ();
-  shmtemp->shm_perm.uid = shmtemp->shm_perm.cuid;
-  shmtemp->shm_perm.cgid = getgid32 ();
-  shmtemp->shm_perm.gid = shmtemp->shm_perm.cgid;
-  shmtemp->shm_perm.mode = shmflg & 0x01ff;
-  shmtemp->shm_lpid = 0;
-  shmtemp->shm_nattch = 0;
-  shmtemp->shm_atime = 0;
-  shmtemp->shm_dtime = 0;
-  shmtemp->shm_ctime = time (NULL);
-  shmtemp->shm_segsz = size;
-  *(shmid_ds *) mapptr = *shmtemp;
-  shmtemp->filemap = filemap;
-  shmtemp->attachmap = attachmap;
-  shmtemp->mapptr = mapptr;
-
-#endif
 }

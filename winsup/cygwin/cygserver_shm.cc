@@ -59,60 +59,6 @@ client_request_shm::client_request_shm ():client_request (CYGSERVER_REQUEST_SHM_
   buffer = (char *) &parameters;
 }
 
-/* FIXME: If building on a 64-bit compiler, the address->int typecast will fail.
- * Solution: manually calculate the next id value
- */
-
-#if 0
-extern
-"C" void *
-shmat (int shmid, const void *shmaddr, int parameters.in.shmflg)
-{
-  class shmid_ds *
-    shm = (class shmid_ds *)
-    shmid;			//FIXME: verifyable object test
-
-  if (shmaddr)
-    {
-      //FIXME: requested base address ?!
-      set_errno (EINVAL);
-      return (void *) -1;
-    }
-
-  void *
-    rv =
-    MapViewOfFile (shm->attachmap,
-
-
-		   (parameters.in.shmflg & SHM_RDONLY) ?
-		   FILE_MAP_READ : FILE_MAP_WRITE, 0,
-		   0, 0);
-
-  if (!rv)
-    {
-      //FIXME: translate GetLastError()
-      set_errno (EACCES);
-      return (void *) -1;
-    }
-
-/* FIXME: this needs to be globally protected to prevent a mismatch betwen
- * attach count and attachees list
- */
-
-  InterlockedIncrement (&shm->shm_nattch);
-  _shmattach *
-    attachnode =
-    new
-    _shmattach;
-
-  attachnode->data = rv;
-  attachnode->next =
-    (_shmattach *) InterlockedExchangePointer ((LONG *) & shm->attachhead,
-					       (long int) attachnode);
-  return rv;
-}
-#endif
-
 /* FIXME: evaluate getuid() and getgid() against the requested mode. Then
  * choose PAGE_READWRITE | PAGE_READONLY and FILE_MAP_WRITE  |  FILE_MAP_READ
  * appropriately
@@ -275,7 +221,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 	{
 	  if (tempnode->shm_id == parameters.in.shm_id)
 	    {
-	      InterlockedIncrement (&tempnode->shmds->shm_nattch);
+	      InterlockedIncrement (&tempnode->shmds->ds.shm_nattch);
 	      header.error_code = 0;
 	      CloseHandle (token_handle);
 	      return;
@@ -295,7 +241,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 	{
 	  if (tempnode->shm_id == parameters.in.shm_id)
 	    {
-	      InterlockedDecrement (&tempnode->shmds->shm_nattch);
+	      InterlockedDecrement (&tempnode->shmds->ds.shm_nattch);
 	      header.error_code = 0;
 	      CloseHandle (token_handle);
 	      return;
@@ -323,7 +269,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 		deleted_head = temp2;
 
 		// FIXME: when/where do we delete the handles?
-		if (temp2->shmds->shm_nattch)
+		if (temp2->shmds->ds.shm_nattch)
 		  {
 		    // FIXME: add to a pending queue?
 		  }
@@ -395,7 +341,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 	    {
 	      // FIXME: free the mutex
 	      if (parameters.in.size
-		  && tempnode->shmds->shm_segsz < parameters.in.size)
+		  && tempnode->shmds->ds.shm_segsz < parameters.in.size)
 		{
 		  header.error_code = EINVAL;
 		  CloseHandle (token_handle);
@@ -561,7 +507,7 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 	  return;
 	}
 
-      shmid_ds *shmtemp = new shmid_ds;
+      int_shmid_ds *shmtemp = new int_shmid_ds;
       if (!shmtemp)
 	{
 	  system_printf ("failed to malloc shm node");
@@ -575,18 +521,18 @@ client_request_shm::serve (transport_layer_base * conn, process_cache * cache)
 	}
 
       /* fill out the node data */
-      shmtemp->shm_perm.cuid = getuid ();
-      shmtemp->shm_perm.uid = shmtemp->shm_perm.cuid;
-      shmtemp->shm_perm.cgid = getgid ();
-      shmtemp->shm_perm.gid = shmtemp->shm_perm.cgid;
-      shmtemp->shm_perm.mode = parameters.in.shmflg & 0x01ff;
-      shmtemp->shm_lpid = 0;
-      shmtemp->shm_nattch = 0;
-      shmtemp->shm_atime = 0;
-      shmtemp->shm_dtime = 0;
-      shmtemp->shm_ctime = time (NULL);
-      shmtemp->shm_segsz = parameters.in.size;
-      *(shmid_ds *) mapptr = *shmtemp;
+      shmtemp->ds.shm_perm.cuid = getuid ();
+      shmtemp->ds.shm_perm.uid = shmtemp->ds.shm_perm.cuid;
+      shmtemp->ds.shm_perm.cgid = getgid ();
+      shmtemp->ds.shm_perm.gid = shmtemp->ds.shm_perm.cgid;
+      shmtemp->ds.shm_perm.mode = parameters.in.shmflg & 0x01ff;
+      shmtemp->ds.shm_lpid = 0;
+      shmtemp->ds.shm_nattch = 0;
+      shmtemp->ds.shm_atime = 0;
+      shmtemp->ds.shm_dtime = 0;
+      shmtemp->ds.shm_ctime = time (NULL);
+      shmtemp->ds.shm_segsz = parameters.in.size;
+      *(shmid_ds *) mapptr = shmtemp->ds;
       shmtemp->mapptr = mapptr;
 
       /* no need for InterlockedExchange here, we're serialised by the global mutex */

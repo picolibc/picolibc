@@ -1,5 +1,32 @@
 2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* include/sys/ipc.h (IPC_PRIVATE): Add cast to key_t.
+	(IPC_INFO): New flag for ipcs(8).
+	(IPC_RMID IPC_SET IPC_STAT): Renumber.
+	* include/sys/shm.h (SHM_RDONLY SHM_RND): Renumber with distinct
+	values [sic].
+	(class _shmattach): Internal type moved to "cygserver_shm.h".
+	(class shmnode): Ditto.
+	(class shmid_ds): Ditto.
+	(struct shmid_ds): Add spare fields.
+	(struct shminfo): New type for IPC_INFO interface.
+	* cygserver_shm.h: Remove obsolete #if 0 ... #endif block.
+	(class shm_cleanup): Remove unused class.
+	(struct _shmattach): Internal type moved from <sys/shm.h>.
+	(struct shmnode): Ditto.
+	(struct int_shmid_ds): Ditto. Renamed to avoid name clash with
+	public interface struct shmid_ds. Use the shmid_bs structure as a
+	field.
+	* cygserver_shm.cc: Remove obsolete #if 0 ... #endif block.
+	(client_request_shm::serve): Update for redefinition of
+	int_shmid_ds structure.
+	* shm.cc (build_inprocess_shmds): Ditto.
+	(fixup_shms_after_fork): Ditto.
+	(shmctl): Ditto.
+	(shmget): Ditto. Remove obsolete #if 0 ... #endif code.
+
+2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* include/cygwin/cygserver_transport.h
 	(transport_layer_base::transport_layer_base): Remove since it is
 	now redundant.

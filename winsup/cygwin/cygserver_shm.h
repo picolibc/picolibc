@@ -10,19 +10,47 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include <sys/types.h>
+#include <sys/shm.h>
+
+#include "threaded_queue.h"
+#include "cygwin/cygserver_process.h"
 #include "cygwin/cygserver_transport.h"
 #include "cygwin/cygserver.h"
 
-#define SHM_CREATE 0
+/* Values for the client_request_shm::parameters.in.type field. */
+#define SHM_CREATE   0
 #define SHM_REATTACH 1
-#define SHM_ATTACH 2
-#define SHM_DETACH 3
-#define SHM_DEL    4
+#define SHM_ATTACH   2
+#define SHM_DETACH   3
+#define SHM_DEL      4
 
+struct _shmattach
+{
+  void *data;
+  int shmflg;
+  struct _shmattach *next;
+};
+
+struct int_shmid_ds
+{
+  struct shmid_ds ds;
+  void *mapptr;
+};
+
+struct shmnode
+{
+  struct int_shmid_ds *shmds;
+  int shm_id;
+  struct shmnode *next;
+  key_t key;
+  HANDLE filemap;
+  HANDLE attachmap;
+  struct _shmattach *attachhead;
+};
 
 class client_request_shm : public client_request
 {
-  public:
+public:
 #ifndef __INSIDE_CYGWIN__
   virtual void serve (transport_layer_base *conn, process_cache *cache);
 #endif
@@ -34,58 +62,3 @@ class client_request_shm : public client_request
    struct {int shm_id; HANDLE filemap; HANDLE attachmap; key_t key;} out;
   } parameters;
 };
-
-#ifndef __INSIDE_CYGWIN__
-class shm_cleanup : cleanup_routine
-{
-public:
-  virtual void cleanup (long winpid);
-};
-#endif
-#if 0
-class _shmattach {
-public:
-  void *data;
-  class _shmattach *next;
-};
-
-class shmid_ds {
-public:
-  struct   ipc_perm shm_perm;
-  size_t   shm_segsz;
-  pid_t    shm_lpid;
-  pid_t    shm_cpid;
-  shmatt_t shm_nattch;
-  time_t   shm_atime;
-  time_t   shm_dtime;
-  time_t   shm_ctime;
-  HANDLE filemap;
-  HANDLE attachmap;
-  void *mapptr;
-  class _shmattach *attachhead;
-};
-
-class shmnode {
-public:
-  class shmid_ds * shmid;
-  class shmnode *next;
-  key_t key;
-};
-//....
-struct shmid_ds {
-  struct   ipc_perm shm_perm;
-  size_t   shm_segsz;
-  pid_t    shm_lpid;
-  pid_t    shm_cpid;
-  shmatt_t shm_nattch;
-  time_t   shm_atime;
-  time_t   shm_dtime;
-  time_t   shm_ctime;
-};
-
-void *shmat(int, const void *, int);
-int   shmctl(int, int, struct shmid_ds *);
-int   shmdt(const void *);
-int   shmget(key_t, size_t, int);
-
-#endif
