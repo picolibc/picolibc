@@ -1,3 +1,63 @@
+Sat May 19 23:40:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* autoload.cc: Add load statements for `LookupAccountNameW',
+	`LsaClose', `LsaEnumerateAccountRights', `LsaFreeMemory',
+	`LsaOpenPolicy', `LsaQueryInformationPolicy', `NetLocalGroupEnum',
+	`NetLocalGroupGetMembers', `NetServerEnum', `NetUserGetGroups' and
+	`NtCreateToken'.
+	* ntdll.h: Add declaration for `NtCreateToken'.
+	* sec_helper.cc: Add `well_known_local_sid', `well_known_dialup_sid',
+	`well_known_network_sid', `well_known_batch_sid',
+	`well_known_interactive_sid', `well_known_service_sid' and
+	`well_known_authenticated_users_sid'.
+	(cygsid::string): Define as const method.
+	(cygsid::get_sid): Set psid to NO_SID on error.
+	(cygsid::getfromstr): Ditto.
+	(cygsid::getfrompw): Simplify.
+	(cygsid::getfromgr): Check for gr == NULL.
+	(legal_sid_type): Move to security.h.
+	(set_process_privilege): Return -1 on error, otherwise 0 or 1 related
+	to previous privilege setting.
+	* security.cc (extract_nt_dom_user): Remove `static'.
+	(lsa2wchar): New function.
+	(open_local_policy): Ditto.
+	(close_local_policy): Ditto.
+	(get_lsa_srv_inf): Ditto.
+	(get_logon_server): Ditto.
+	(get_logon_server_and_user_domain): Ditto.
+	(get_user_groups): Ditto.
+	(is_group_member): Ditto.
+	(get_user_local_groups): Ditto.
+	(sid_in_token_groups): Ditto.
+	(get_user_primary_group): Ditto.
+	(get_group_sidlist): Ditto.
+	(get_system_priv_list): Ditto.
+	(get_priv_list): Ditto.
+	(get_dacl): Ditto.
+	(create_token): Ditto.
+	(subauth): Return immediately if SE_TCB_NAME can't be assigned.
+	Change all return statements in case of error to jumps to `out'
+	label. Add `out' label to support cleanup.
+	* security.h: Add extern declarations for `well_known_local_sid',
+	`well_known_dialup_sid', `well_known_network_sid',
+	`well_known_batch_sid', `well_known_interactive_sid',
+	`well_known_service_sid' and `well_known_authenticated_users_sid'.
+	Add extern declarations for functions `create_token',
+	`extract_nt_dom_user' and `get_logon_server_and_user_domain'.
+	(class cygsid): Add method `assign'. Change operator= to call new
+	`assign' method. Add `debug_print' method.
+	(class cygsidlist): New class.
+	(legal_sid_type): Moved from sec_helper.cc to here.
+	* spawn.cc (spawn_guts) Revert reversion of previous patch.
+	Call `RevertToSelf' and `ImpersonateLoggedOnUser' instead of `seteuid'
+	again.
+	* syscalls.cc (seteuid): Rearranged. Call `create_token' now when
+	needed. Call `subauth' if `create_token' fails. Try setting token
+	owner and primary group only if token was not explicitely created
+	by `create_token'.
+	* uinfo.cc (internal_getlogin): Try harder to generate correct user
+	information. Especially don't trust return value of `GetUserName'.
+
 Sat May 19 21:16:07 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* fork.cc (fork_parent): Move atforkprepare call here.

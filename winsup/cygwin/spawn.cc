@@ -622,10 +622,9 @@ skip_arg_parsing:
 					 : &sec_all_nih;
 
       /* Remove impersonation */
-      uid_t uid = geteuid ();
       if (cygheap->user.impersonated
           && cygheap->user.token != INVALID_HANDLE_VALUE)
-	seteuid (cygheap->user.orig_uid);
+	RevertToSelf ();
 
       /* Load users registry hive. */
       load_registry_hive (sid);
@@ -664,7 +663,7 @@ skip_arg_parsing:
       if (mode != _P_OVERLAY && mode != _P_VFORK
 	  && cygheap->user.impersonated
 	  && cygheap->user.token != INVALID_HANDLE_VALUE)
-	seteuid (uid);
+	ImpersonateLoggedOnUser (cygheap->user.token);
     }
 
   MALLOC_CHECK;

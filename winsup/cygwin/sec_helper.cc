@@ -44,13 +44,20 @@ SID_IDENTIFIER_AUTHORITY sid_auth[] = {
         {SECURITY_NT_AUTHORITY}
 };
 
-cygsid well_known_admin_sid ("S-1-5-32-544");
-cygsid well_known_system_sid ("S-1-5-18");
-cygsid well_known_creator_owner_sid ("S-1-3-0");
 cygsid well_known_world_sid ("S-1-1-0");
+cygsid well_known_local_sid ("S-1-2-0");
+cygsid well_known_creator_owner_sid ("S-1-3-0");
+cygsid well_known_dialup_sid ("S-1-5-1");
+cygsid well_known_network_sid ("S-1-5-2");
+cygsid well_known_batch_sid ("S-1-5-3");
+cygsid well_known_interactive_sid ("S-1-5-4");
+cygsid well_known_service_sid ("S-1-5-6");
+cygsid well_known_authenticated_users_sid ("S-1-5-11");
+cygsid well_known_system_sid ("S-1-5-18");
+cygsid well_known_admin_sid ("S-1-5-32-544");
 
 char *
-cygsid::string (char *nsidstr)
+cygsid::string (char *nsidstr) const
 {
   char t[32];
   DWORD i;
@@ -74,7 +81,10 @@ cygsid::get_sid (DWORD s, DWORD cnt, DWORD *r)
   DWORD i;
 
   if (s > 5 || cnt < 1 || cnt > 8)
-    return NULL;
+    {
+      psid = NO_SID;
+      return NULL;
+    }
   set ();
   InitializeSid(psid, &sid_auth[s], cnt);
   for (i = 0; i < cnt; ++i)
@@ -92,7 +102,10 @@ cygsid::getfromstr (const char *nsidstr)
   DWORD i, r[8];
 
   if (!nsidstr || strncmp (nsidstr, "S-1-", 4))
-    return NULL;
+    {
+      psid = NO_SID;
+      return NULL;
+    }
 
   strcpy (sid_buf, nsidstr);
 
@@ -110,17 +123,15 @@ cygsid::getfromstr (const char *nsidstr)
 BOOL
 cygsid::getfrompw (struct passwd *pw)
 {
-  char *sp = pw->pw_gecos ? strrchr (pw->pw_gecos, ',') : NULL;
-
-  if (!sp)
-    return FALSE;
-  return (*this = ++sp) != NULL;
+  char *sp = (pw && pw->pw_gecos) ? strrchr (pw->pw_gecos, ',') : NULL;
+  return (*this = sp ? sp + 1 : "") != NULL;
 }
 
 BOOL
 cygsid::getfromgr (struct group *gr)
 {
-  return (*this = gr->gr_passwd) != NULL;
+  char *sp = (gr && gr->gr_passwd) ? gr->gr_passwd : NULL;
+  return (*this = sp ?: "") != NULL;
 }
 
 int
@@ -238,13 +249,6 @@ cygsid::get_id (BOOL search_grp, int *type)
   return id;
 }
 
-static inline BOOL
-legal_sid_type (SID_NAME_USE type)
-{
-  return type == SidTypeUser  || type == SidTypeGroup
-      || type == SidTypeAlias || type == SidTypeWellKnownGroup;
-}
-
 BOOL
 is_grp_member (uid_t uid, gid_t gid)
 {
@@ -338,10 +342,12 @@ set_process_privilege (const char *privilege, BOOL enable)
 {
   HANDLE hToken = NULL;
   LUID restore_priv;
-  TOKEN_PRIVILEGES new_priv;
+  TOKEN_PRIVILEGES new_priv, orig_priv;
   int ret = -1;
+  DWORD size;
 
-  if (!OpenProcessToken (hMainProc, TOKEN_ADJUST_PRIVILEGES, &hToken))
+  if (!OpenProcessToken (hMainProc, TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES,
+  			 &hToken))
     {
       __seterrno ();
       goto out;
@@ -357,13 +363,22 @@ set_process_privilege (const char *privilege, BOOL enable)
   new_priv.Privileges[0].Luid = restore_priv;
   new_priv.Privileges[0].Attributes = enable ? SE_PRIVILEGE_ENABLED : 0;
 
-  if (!AdjustTokenPrivileges (hToken, FALSE, &new_priv, 0, NULL, NULL))
+  if (!AdjustTokenPrivileges (hToken, FALSE, &new_priv,
+  			      sizeof orig_priv, &orig_priv, &size))
     {
       __seterrno ();
       goto out;
     }
+  /* AdjustTokenPrivileges returns TRUE even if the privilege could not
+     be enabled. GetLastError() returns an correct error code, though. */
+  if (enable && GetLastError () == ERROR_NOT_ALL_ASSIGNED)
+    {
+      debug_printf ("Privilege %s couldn't be assigned", privilege);
+      __seterrno ();
+      goto out;
+    }
 
-  ret = 0;
+  ret = orig_priv.Privileges[0].Attributes == SE_PRIVILEGE_ENABLED ? 1 : 0;
 
 out:
   if (hToken)

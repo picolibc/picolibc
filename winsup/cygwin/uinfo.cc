@@ -38,12 +38,15 @@ internal_getlogin (cygheap_user &user)
     user.set_name ("unknown");
   else
     user.set_name (username);
+  debug_printf ("GetUserName() = %s", user.name ());
 
   if (os_being_run == winNT)
     {
       LPWKSTA_USER_INFO_1 wui;
-      char buf[MAX_PATH], *env;
-      char *un = NULL;
+      NET_API_STATUS ret;
+      char buf[512];
+      char dom[INTERNET_MAX_HOST_NAME_LENGTH + 1];
+      char *env, *un = NULL;
 
       /* First trying to get logon info from environment */
       if ((env = getenv ("USERNAME")) != NULL)
@@ -58,10 +61,8 @@ internal_getlogin (cygheap_user &user)
 	debug_printf ("Domain: %s, Logon Server: %s",
 		      user.domain (), user.logsrv ());
       /* If that failed, try to get that info from NetBIOS */
-      else if (!NetWkstaUserGetInfo (NULL, 1, (LPBYTE *)&wui))
+      else if (!(ret = NetWkstaUserGetInfo (NULL, 1, (LPBYTE *)&wui)))
 	{
-	  char buf[512]; /* Bigger than each of the below defines. */
-
 	  sys_wcstombs (buf, wui->wkui1_username, UNLEN + 1);
 	  user.set_name (buf);
 	  sys_wcstombs (buf, wui->wkui1_logon_server,
@@ -112,6 +113,22 @@ internal_getlogin (cygheap_user &user)
 			user.domain (), user.logsrv (), user.name ());
 	  NetApiBufferFree (wui);
 	}
+      else
+        {
+	  /* If `NetWkstaUserGetInfo' failed, try to get default values known
+	     by local policy object.*/
+          debug_printf ("NetWkstaUserGetInfo() Err %d", ret);
+
+	  if (get_logon_server_and_user_domain (buf, dom))
+	    {
+	      user.set_logsrv (buf + 2);
+	      user.set_domain (dom);
+	      setenv ("LOGONSERVER", buf, 1);
+	      setenv ("USERDOMAIN", dom, 1);
+	    }
+	  else
+	    debug_printf ("get_logon_server_and_user_domain() failed");
+	}
       if (allow_ntsec)
 	{
 	  HANDLE ptok = user.token; /* Which is INVALID_HANDLE_VALUE if no
@@ -147,7 +164,7 @@ internal_getlogin (cygheap_user &user)
 	  /* If that fails, too, as a last resort try to get the SID from
 	     the logon server. */
 	  if (!ret && !(ret = lookup_name (user.name (), user.logsrv (),
-					  user.sid ())))
+					   user.sid ())))
 	    debug_printf ("Couldn't retrieve SID from '%s'!", user.logsrv ());
 
 	  /* If we have a SID, try to get the corresponding Cygwin user name
@@ -157,12 +174,6 @@ internal_getlogin (cygheap_user &user)
 	    {
 	      cygsid psid;
 
-	      if (!strcasematch (user.name (), "SYSTEM")
-		  && user.domain () && user.logsrv ())
-		{
-		  if (get_registry_hive_path (user.sid (), buf))
-		    setenv ("USERPROFILE", buf, 1);
-		}
 	      for (int pidx = 0; (pw = internal_getpwent (pidx)); ++pidx)
 		if (psid.getfrompw (pw) && EqualSid (user.sid (), psid))
 		  {
@@ -171,8 +182,24 @@ internal_getlogin (cygheap_user &user)
 		    if (gr)
 		      if (!gsid.getfromgr (gr))
 			  gsid = NO_SID;
+		    extract_nt_dom_user (pw, dom, buf);
+		    setenv ("USERNAME", buf, 1);
+		    if (*dom)
+		      user.set_domain (dom);
+		    else if (user.logsrv ())
+		      user.set_domain (user.logsrv ());
+		    if (user.domain ())
+		      setenv ("USERDOMAIN", user.domain (), 1);
 		    break;
 		  }
+	      if (!strcasematch (user.name (), "SYSTEM")
+		  && user.domain () && user.logsrv ())
+		{
+		  if (get_registry_hive_path (user.sid (), buf))
+		    setenv ("USERPROFILE", buf, 1);
+		  else
+		    unsetenv ("USERPROFILE");
+		}
 	    }
 
 	  /* If this process is started from a non Cygwin process,
