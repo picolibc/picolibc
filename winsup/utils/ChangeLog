@@ -1,3 +1,8 @@
+Thu Jul 13 13:02:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* mount.cc (mount_already_exists): Additional warning message
+	if mount point exists with another mount type.
+
 Sat Jul  1 00:19:27 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Find getopt.c in cygwin/lib subdirectory.

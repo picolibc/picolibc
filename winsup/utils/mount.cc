@@ -217,6 +217,12 @@ mount_already_exists (const char *posix_path, int flags)
 	      found_matching = 1;
 	      break;
 	    }
+	  else if (strchr ("su", p->mnt_type[0]))
+            {
+	      fprintf (stderr, "%s: warning -- there's already a %s mount point to '%s'.\n", progname, p->mnt_type, posix_path);
+	      fprintf (stderr, "%*s  (user mount points cover system mount points!)\n", strlen (progname), " ");
+	      break;
+            }
 	  else
 	    {
 	      fprintf (stderr, "%s: warning -- couldn't determine mount type.\n", progname);
