@@ -438,12 +438,12 @@ get_raw_device_number (const char *uxname, const char *w32path, int &unit)
 {
   DWORD devn = FH_BAD;
 
-  if (strncasecmp (w32path, "\\\\.\\tape", 8) == 0)
+  if (strncasematch (w32path, "\\\\.\\tape", 8))
     {
       devn = FH_TAPE;
       unit = digits (w32path + 8);
       // norewind tape devices have leading n in name
-      if (! strncasecmp (uxname, "/dev/n", 6))
+      if (strncasematch (uxname, "/dev/n", 6))
 	unit += 128;
     }
   else if (isdrive (w32path + 4))
@@ -451,7 +451,7 @@ get_raw_device_number (const char *uxname, const char *w32path, int &unit)
       devn = FH_FLOPPY;
       unit = tolower (w32path[4]) - 'a';
     }
-  else if (strncasecmp (w32path, "\\\\.\\physicaldrive", 17) == 0)
+  else if (strncasematch (w32path, "\\\\.\\physicaldrive", 17))
     {
       devn = FH_FLOPPY;
       unit = digits (w32path + 17) + 128;
@@ -1566,7 +1566,7 @@ sort_by_native_name (const void *a, const void *b)
 
   /* The two paths were the same length, so just determine normal
      lexical sorted order. */
-  res = strcasecmp (ap->posix_path, bp->posix_path);
+  res = strcmp (ap->native_path, bp->native_path);
 
   if (res == 0)
    {

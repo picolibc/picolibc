@@ -14,7 +14,6 @@ details. */
 #include <sys/socket.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <ctype.h>
 #include <unistd.h>
 #include <fcntl.h>
 

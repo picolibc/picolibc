@@ -11,7 +11,6 @@ details. */
 #include <errno.h>
 #include <unistd.h>
 #include <utmp.h>
-#include <ctype.h>
 #include "winsup.h"
 
 extern fhandler_tty_master *tty_master;

@@ -1,3 +1,20 @@
+2000-06-28  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
+
+	* assert.cc (__assert): Reduce dependency on newlib.
+	* exec.cc: Eliminate unnecessary inclusion of ctype.h.
+	* glob.c: Ditto.
+	* hinfo.cc: Ditto.
+	* init.cc: Ditto.
+	* strace.cc: Ditto.
+	* tty.cc: Ditto.
+	* grp.cc (parse_grp): Eliminate atoi.
+	* passwd.cc (grab_int): Ditto.
+	* grp.cc (getgroups): Eliminate str{n,}casecmp.
+	* path.cc (get_raw_device_number): Ditto.
+	* path.cc (sort_by_native_name): Ditto.
+	* spawn.cc (iscmd): Ditto.
+	* uinfo.cc (internal_getlogin): Ditto.
+
 Sat Jul  1 11:43:32 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* binmode.c (cygwin_premain0): Fix erroneous clearing of bit.

@@ -8,7 +8,6 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#include <ctype.h>
 #include <stdlib.h>
 #include <time.h>
 #include "winsup.h"

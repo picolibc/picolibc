@@ -41,7 +41,7 @@ internal_getlogin (struct pinfo *pi)
       if ((env = getenv ("USERDOMAIN")) != NULL)
         strcpy (pi->domain, env);
       /* Trust only if usernames are identical */
-      if (!strcasecmp (pi->username, buf) && pi->domain[0] && pi->logsrv[0])
+      if (strcasematch (pi->username, buf) && pi->domain[0] && pi->logsrv[0])
         debug_printf ("Domain: %s, Logon Server: %s", pi->domain, pi->logsrv);
       /* If that failed, try to get that info from NetBIOS */
       else if (!NetWkstaUserGetInfo (NULL, 1, (LPBYTE *)&wui))
@@ -53,7 +53,7 @@ internal_getlogin (struct pinfo *pi)
           wcstombs (pi->domain, wui->wkui1_logon_domain,
                     (wcslen (wui->wkui1_logon_domain) + 1) * sizeof (WCHAR));
           /* Save values in environment */
-          if (strcasecmp (pi->username, "SYSTEM")
+          if (!strcasematch (pi->username, "SYSTEM")
               && pi->domain[0] && pi->logsrv[0])
             {
               LPUSER_INFO_3 ui = NULL;
@@ -139,7 +139,7 @@ internal_getlogin (struct pinfo *pi)
               PSID psid = (PSID) psidbuf;
 
               pi->psid = (PSID) pi->sidbuf;
-              if (strcasecmp (pi->username, "SYSTEM")
+              if (!strcasematch (pi->username, "SYSTEM")
                   && pi->domain[0] && pi->logsrv[0])
                 {
                   if (get_registry_hive_path (pi->psid, buf))

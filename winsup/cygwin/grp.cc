@@ -66,7 +66,7 @@ parse_grp (struct group &grp, const char *line)
       if (!strlen (grp.gr_passwd))
         grp.gr_passwd = NULL;
 
-      grp.gr_gid = atoi (dp);
+      grp.gr_gid = strtol (dp, NULL, 10);
       dp = strchr (dp, ':');
       if (dp)
         {
@@ -249,7 +249,7 @@ getgroups (int gidsetsize, gid_t *grouplist, gid_t gid, const char *username)
       }
     else if (group_buf[i].gr_mem)
       for (int gi = 0; group_buf[i].gr_mem[gi]; ++gi)
-        if (! strcasecmp (username, group_buf[i].gr_mem[gi]))
+        if (strcasematch (username, group_buf[i].gr_mem[gi]))
           {
             if (cnt < gidsetsize)
               grouplist[cnt] = group_buf[i].gr_gid;

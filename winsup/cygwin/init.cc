@@ -9,7 +9,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include <stdlib.h>
-#include <ctype.h>
 #include "winsup.h"
 
 extern HMODULE cygwin_hmodule;

@@ -57,7 +57,7 @@ static int
 grab_int (char **p)
 {
   char *src = *p;
-  int val = atoi (src);
+  int val = strtol (src, NULL, 10);
   while (*src && *src != ':' && *src != '\n')
     src++;
   if (*src == ':')

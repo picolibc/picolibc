@@ -11,7 +11,6 @@ details. */
 #include <unistd.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <ctype.h>
 #include <process.h>
 #include "winsup.h"
 

@@ -169,7 +169,7 @@ iscmd (const char *argv0, const char *what)
   n = strlen (argv0) - strlen (what);
   if (n >= 2 && argv0[1] != ':')
     return 0;
-  return n >= 0 && strcasecmp (argv0 + n, what) == 0 &&
+  return n >= 0 && strcasematch (argv0 + n, what) &&
 	 (n == 0 || isdirsep (argv0[n - 1]));
 }
 

@@ -32,16 +32,15 @@ __assert (const char *file, int line, const char *failedexpr)
       char *buf;
 
       buf = (char *) alloca (100 + strlen (failedexpr));
-      siprintf (buf, "Failed assertion\n\t%s\nat line %d of file %s",
+      __small_sprintf (buf, "Failed assertion\n\t%s\nat line %d of file %s",
 		failedexpr, line, file);
       MessageBox (NULL, buf, NULL, MB_OK | MB_ICONERROR | MB_TASKMODAL);
     }
   else
     {
       CloseHandle (h);
-      (void) fiprintf (stderr,
-		       "assertion \"%s\" failed: file \"%s\", line %d\n",
-		       failedexpr, file, line);
+      small_printf ("assertion \"%s\" failed: file \"%s\", line %d\n",
+                   failedexpr, file, line);
     }
 
   abort ();
