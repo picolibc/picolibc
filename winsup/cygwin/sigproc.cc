@@ -944,7 +944,7 @@ getsem (_pinfo *p, const char *str, int init, int max)
       p = myself;
       if (!h)
 	{
-	  system_printf ("can't %s %s, %E", p ? "open" : "create", str);
+	  system_printf ("can't create semaphore %s, %E", str);
 	  __seterrno ();
 	}
     }
