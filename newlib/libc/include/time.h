@@ -109,7 +109,7 @@ extern __IMPORT char *_tzname[2];
 #ifndef daylight
 #define daylight _daylight
 #endif
-#if timezonevar
+#ifdef timezonevar
 #ifndef timezone
 #define timezone ((long int) _timezone)
 #endif
