@@ -159,6 +159,7 @@ _cygtls::remove (DWORD wait)
 	    if (i < --nthreads)
 	      cygheap->threadlist[i] = cygheap->threadlist[nthreads];
 	    debug_printf ("removed %p element %d", this, i);
+	    remove_wq ();
 	    break;
 	  }
     }

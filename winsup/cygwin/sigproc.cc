@@ -401,7 +401,7 @@ proc_subproc (DWORD what, DWORD val)
 	{
 	  wval->ev = wval->thread_ev = CreateEvent (&sec_none_nih, TRUE,
 						    FALSE, NULL);
-	  ProtectHandle (wval->ev);
+	  ProtectHandle1 (wval->ev, wq_ev);
 	}
 
       ResetEvent (wval->ev);
@@ -467,6 +467,21 @@ out:
 out1:
   sigproc_printf ("returning %d", rc);
   return rc;
+}
+
+// FIXME: This is inelegant
+void
+_cygtls::remove_wq ()
+{
+  sync_proc_subproc->acquire ();
+  for (waitq *w = &waitq_head; w->next != NULL; w = w->next)
+    if (w->next == &wq)
+      {
+	ForceCloseHandle1 (wq.thread_ev, wq_ev);
+	w->next = wq.next;
+	break;
+      }
+  sync_proc_subproc->release ();
 }
 
 /* Terminate the wait_subproc thread.

@@ -912,7 +912,8 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       break;
     case _P_WAIT:
     case _P_SYSTEM:
-      waitpid (cygpid, (int *) &res, 0);
+      if (waitpid (cygpid, (int *) &res, 0) != cygpid)
+	res = -1;
       break;
     case _P_DETACH:
       res = 0;	/* Lose all memory of this child. */
