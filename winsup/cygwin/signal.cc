@@ -19,8 +19,7 @@ details. */
 #include "sigproc.h"
 #include "pinfo.h"
 
-extern "C"
-_sig_func_ptr
+extern "C" _sig_func_ptr
 signal (int sig, _sig_func_ptr func)
 {
   _sig_func_ptr prev;
@@ -33,15 +32,14 @@ signal (int sig, _sig_func_ptr func)
       return (_sig_func_ptr) SIG_ERR;
     }
 
-  prev = myself->getsig(sig).sa_handler;
-  myself->getsig(sig).sa_handler = func;
-  myself->getsig(sig).sa_mask = 0;
+  prev = myself->getsig (sig).sa_handler;
+  myself->getsig (sig).sa_handler = func;
+  myself->getsig (sig).sa_mask = 0;
   syscall_printf ("%p = signal (%d, %p)", prev, sig, func);
   return prev;
 }
 
-extern "C"
-unsigned int
+extern "C" unsigned int
 sleep (unsigned int seconds)
 {
   int rc;
@@ -62,8 +60,7 @@ sleep (unsigned int seconds)
   return res;
 }
 
-extern "C"
-unsigned int
+extern "C" unsigned int
 usleep (unsigned int useconds)
 {
   syscall_printf ("usleep (%d)", useconds);
@@ -72,8 +69,7 @@ usleep (unsigned int useconds)
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 sigprocmask (int sig, const sigset_t *set, sigset_t *oldset)
 {
   /* check that sig is in right range */
@@ -125,7 +121,7 @@ kill_worker (pid_t pid, int sig)
       return -1;
     }
 
-  dest->setthread2signal(NULL);
+  dest->setthread2signal (NULL);
 
   if ((sendSIGCONT = (sig < 0)))
     sig = -sig;
@@ -221,19 +217,19 @@ kill_pgrp (pid_t pid, int sig)
   return res;
 }
 
-extern "C"
-int
+extern "C" int
 killpg (int pgrp, int sig)
 {
   return _kill (-pgrp, sig);
 }
 
-extern "C"
-int
+extern "C" int
 sigaction (int sig,
 		const struct sigaction *newaction,
 		struct sigaction *oldaction)
 {
+  struct sigaction out_oldaction;
+
   /* check that sig is in right range */
   if (sig < 0 || sig >= NSIG)
     {
@@ -243,7 +239,7 @@ sigaction (int sig,
     }
 
   if (oldaction)
-      *oldaction = myself->getsig(sig);
+    out_oldaction = myself->getsig (sig);
 
   if (newaction)
     {
@@ -252,18 +248,20 @@ sigaction (int sig,
 	  set_errno (EINVAL);
 	  return -1;
 	}
-      myself->getsig(sig) = *newaction;
+      myself->getsig (sig) = *newaction;
       if (newaction->sa_handler == SIG_IGN)
 	sig_clear (sig);
       if (newaction->sa_handler == SIG_DFL && sig == SIGCHLD)
 	sig_clear (sig);
     }
 
+  if (oldaction)
+    *oldaction = out_oldaction;
+
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 sigaddset (sigset_t *set, const int sig)
 {
   /* check that sig is in right range */
@@ -278,8 +276,7 @@ sigaddset (sigset_t *set, const int sig)
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 sigdelset (sigset_t *set, const int sig)
 {
   /* check that sig is in right range */
@@ -294,8 +291,7 @@ sigdelset (sigset_t *set, const int sig)
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 sigismember (const sigset_t *set, int sig)
 {
   /* check that sig is in right range */
@@ -312,50 +308,44 @@ sigismember (const sigset_t *set, int sig)
     return 0;
 }
 
-extern "C"
-int
+extern "C" int
 sigemptyset (sigset_t *set)
 {
   *set = (sigset_t) 0;
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 sigfillset (sigset_t *set)
 {
   *set = ~((sigset_t) 0);
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 sigpending (sigset_t *set)
 {
   unsigned bit;
   *set = 0;
   for (int sig = 1; sig < NSIG; sig++)
-    if (*myself->getsigtodo(sig) && myself->getsigmask () & (bit = SIGTOMASK (sig)))
+    if (*myself->getsigtodo (sig) && myself->getsigmask () & (bit = SIGTOMASK (sig)))
       *set |= bit;
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 sigsuspend (const sigset_t *set)
 {
   return handle_sigsuspend (*set);
 }
 
-extern "C"
-int
+extern "C" int
 sigpause (int signal_mask)
 {
   return handle_sigsuspend ((sigset_t) signal_mask);
 }
 
-extern "C"
-int
+extern "C" int
 pause (void)
 {
   return handle_sigsuspend (myself->getsigmask ());

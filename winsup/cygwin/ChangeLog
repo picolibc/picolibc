@@ -1,3 +1,7 @@
+Mon Oct  2 15:15:01 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* signal.cc (sigaction): Allow new action == oldaction.
+
 Mon Oct  2 11:05:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
         * fhandler_mem.cc: Load ntdll functions via autoload method.
