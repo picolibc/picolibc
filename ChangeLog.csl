@@ -1,5 +1,11 @@
 2005-03-25  Daniel Jacobowitz  <dan@codesourcery.com>
 
+	* gdb/arm-linux-tdep.c (arm_linux_thumb_be_breakpoint)
+	(arm_linux_thumb_le_breakpoint): New.  Update comments.
+	(arm_linux_init_abi): Set Thumb breakpoints also.
+
+2005-03-25  Daniel Jacobowitz  <dan@codesourcery.com>
+
 	* gdb/Makefile.in (arm-tdep.o): Update dependencies.
 	* gdb/arm-tdep.c: Include "objfiles.h" and "dwarf2-frame.h".
 	(arm_gdbarch_init): Register dwarf2_frame_sniffer.
