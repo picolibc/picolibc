@@ -1,3 +1,7 @@
+2004-12-16  Richard Sandiford  <rsandifo@redhat.com>
+
+	* v850.h (R_V850_LO16_SPLIT_OFFSET): New reloc.
+
 2004-12-09  Ian Lance Taylor  <ian@wasabisystems.com>
 
 	* mips.h (E_MIPS_MACH_9000): Define.
