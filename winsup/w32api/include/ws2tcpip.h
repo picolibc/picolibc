@@ -8,6 +8,9 @@
 
 #ifndef _WS2TCPIP_H
 #define _WS2TCPIP_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
 
 #include <winsock2.h>
 #ifdef  __cplusplus

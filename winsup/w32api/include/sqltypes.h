@@ -1,5 +1,9 @@
 #ifndef _SQLTYPES_H
 #define _SQLTYPES_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

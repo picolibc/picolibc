@@ -1,5 +1,9 @@
 #ifndef _WTYPES_H
 #define _WTYPES_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
+
 #include <rpc.h>
 #include <rpcndr.h>
 #ifdef __cplusplus

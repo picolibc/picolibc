@@ -1,5 +1,9 @@
 #ifndef _LMSNAME_H
 #define _LMSNAME_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
+
 #define SERVICE_WORKSTATION TEXT("LanmanWorkstation")
 #define SERVICE_LM20_WORKSTATION TEXT("WORKSTATION")
 #define WORKSTATION_DISPLAY_NAME TEXT("Workstation")

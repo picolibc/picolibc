@@ -1,5 +1,9 @@
 #ifndef _OBJBASE_H
 #define _OBJBASE_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
+
 #include <rpc.h>
 #include <rpcndr.h>
 #include <stdlib.h>

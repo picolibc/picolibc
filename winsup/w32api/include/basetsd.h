@@ -1,5 +1,8 @@
 #ifndef _BASETSD_H
 #define _BASETSD_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
 
 #ifdef __GNUC__
 #ifndef __int64

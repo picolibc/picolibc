@@ -1,5 +1,9 @@
 #ifndef _UNKNWN_H
 #define _UNKNWN_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
+
 #include <windows.h>
 #ifdef __cplusplus
 extern "C"{

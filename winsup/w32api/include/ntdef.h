@@ -1,5 +1,9 @@
 #ifndef _NTDEF_H
 #define _NTDEF_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
+
 #define NTAPI __stdcall
 #define OBJ_INHERIT 2L
 #define OBJ_PERMANENT 16L

@@ -1,5 +1,9 @@
 #ifndef _RPCNTERR_H
 #define _RPCNTERR_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
+
 #define RPC_S_OK ERROR_SUCCESS
 #define RPC_S_INVALID_ARG ERROR_INVALID_PARAMETER
 #define RPC_S_OUT_OF_MEMORY ERROR_OUTOFMEMORY

@@ -1,3 +1,34 @@
+2002-03-09  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/accctrl.h, aclapi.h, basetsd.h, basetyps.h, cderr.h,
+	cguid.h, commctrl.h, commdlg.h, cpl.h, cplext.h, custcntl.h,
+	dbt.h, dde.h, ddeml.h, dlgs.h, excpt.h, httpext.h, imagehlp.h,
+	imm.h, initguid.h, intshcut.h, ipexport.h, iphlpapi.h,
+	ipifcons.h, iprtrmib.h, iptypes.h, isguids.h, largeint.h, lm.h,
+	lmaccess.h, lmalert.h, lmapibuf.h, lmat.h, lmaudit.h,
+	lmbrowsr.h, lmchdev.h, lmconfig.h, lmcons.h, lmerr.h,
+	lmerrlog.h, lmmsg.h, lmremutl.h, lmrepl.h, lmserver.h,
+	lmshare.h, lmsname.h, lmstats.h, lmsvc.h, lmuse.h, lmuseflg.h,
+	lmwksta.h, lzexpand.h, mapi.h, mciavi.h, mcx.h, mmsystem.h,
+	mswsock.h, nb30.h, nddeapi.h, nspapi.h, ntdef.h, ntsecapi.h,
+	ntsecpkg.h, oaidl.h, objbase.h, objfwd.h, objidl.h, odbcinst.h,
+	ole.h, ole2.h, ole2ver.h, oleauto.h, olectl.h, olectlid.h,
+	oledlg.h, oleidl.h, pbt.h, prsht.h, psapi.h, rapi.h, ras.h,
+	raserror.h, rassapi.h, regstr.h, richedit.h, richole.h, rpc.h,
+	rpcdce.h, rpcdce2.h, rpcdcep.h, rpcndr.h, rpcnsi.h, rpcnsip.h,
+	rpcnterr.h, rpcproxy.h, schannel.h, schnlsp.h, scrnsave.h,
+	security.h, setupapi.h, shellapi.h, shlguid.h, shlobj.h, sql.h,
+	sqlext.h, sqltypes.h, sqlucode.h, sspi.h, subauth.h,
+	tlhelp32.h, unknwn.h, userenv.h, w32api.h, winbase.h, wincon.h,
+	wincrypt.h, windef.h, windows.h, windowsx.h, winerror.h,
+	wingdi.h, wininet.h, winioctl.h, winnetwk.h, winnls.h, winnt.h,
+	winperf.h, winreg.h, winresrc.h, winsock.h, winsock2.h,
+	winspool.h, winsvc.h, winuser.h, winver.h, ws2tcpip.h,
+	wsnetbs.h, wtypes.h, zmouse.h:	Add #pragma GCC system_header
+	if __GNUC__ >= 3.
+	* include/mapi.h: Change header guard name to _MAPI_H  for
+	consistency.
+
 2002-03-08  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/accctrl.h (_ACCCTRL_H): Correct typo.

@@ -1,5 +1,8 @@
 #ifndef _LM_H
 #define _LM_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
 
 #include <lmcons.h>
 #include <lmaccess.h>

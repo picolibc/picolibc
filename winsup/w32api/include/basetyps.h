@@ -1,12 +1,15 @@
 #ifndef _BASETYPS_H
 #define _BASETYPS_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
 
 #ifndef __OBJC__
 #ifdef __cplusplus
 #define EXTERN_C extern "C"
 #else
 #define EXTERN_C extern
-#endif
+#endif  /* __cplusplus */ 
 #define STDMETHODCALLTYPE	__stdcall
 #define STDMETHODVCALLTYPE	__cdecl
 #define STDAPICALLTYPE	__stdcall

@@ -1,5 +1,8 @@
 #ifndef _RPCDCE_H
 #define _RPCDCE_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
 
 #ifdef __cplusplus
 extern "C" {

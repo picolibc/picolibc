@@ -1,5 +1,9 @@
 #ifndef _WINERROR_H
 #define _WINERROR_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
+
 #define ERROR_SUCCESS 0L
 #define NO_ERROR 0L
 #define ERROR_INVALID_FUNCTION 1L

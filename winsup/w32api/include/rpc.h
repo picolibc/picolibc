@@ -1,5 +1,9 @@
 #ifndef _RPC_H
 #define _RPC_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
+
 #ifndef RPC_NO_WINDOWS_H
 #include <windows.h>
 #endif

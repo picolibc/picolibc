@@ -1,5 +1,8 @@
 #ifndef _EXCPT_H
 #define _EXCPT_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
 
 /* FIXME: This will make some code compile. The programs will most
    likely crash when an exception is raised, but at least they will

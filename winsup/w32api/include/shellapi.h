@@ -1,5 +1,9 @@
 #ifndef _SHELLAPI_H
 #define _SHELLAPI_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

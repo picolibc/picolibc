@@ -1,5 +1,9 @@
 #ifndef _OLEAUTO_H
 #define _OLEAUTO_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
+
 #pragma pack(push,8)
 #define WINOLEAUTAPI STDAPI
 #define WINOLEAUTAPI_(type) STDAPI_(type)
@@ -253,4 +257,5 @@ WINOLEAUTAPI VarSub(LPVARIANT, LPVARIANT, LPVARIANT);
 WINOLEAUTAPI VarMul(LPVARIANT, LPVARIANT, LPVARIANT);
 WINOLEAUTAPI VarDiv(LPVARIANT, LPVARIANT, LPVARIANT);
 #pragma pack(pop)
+
 #endif

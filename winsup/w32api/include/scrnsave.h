@@ -9,6 +9,9 @@
  */
 #ifndef _SCRNSAVE_H
 #define _SCRNSAVE_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
 
 #ifdef __cplusplus
 extern "C" {

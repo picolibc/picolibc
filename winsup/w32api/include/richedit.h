@@ -1,5 +1,9 @@
 #ifndef _RICHEDIT_H
 #define _RICHEDIT_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

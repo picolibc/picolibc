@@ -1,5 +1,9 @@
 #ifndef _LMREPL_H
 #define _LMREPL_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif

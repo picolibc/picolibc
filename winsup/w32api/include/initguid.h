@@ -1,5 +1,9 @@
 #ifndef _INITGUID_H
 #define _INITGUID_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
+
 #ifndef DEFINE_GUID
 #include <basetyps.h>
 #endif

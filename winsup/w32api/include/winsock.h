@@ -10,6 +10,10 @@
 
 #ifndef _WINSOCK_H
 #define _WINSOCK_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
+
 #define _GNU_H_WINDOWS32_SOCKETS
 #include <windows.h>
 

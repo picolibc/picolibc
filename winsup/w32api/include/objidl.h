@@ -1,5 +1,8 @@
 #ifndef _OBJIDL_H
 #define _OBJIDL_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
 
 #include <objfwd.h>
 

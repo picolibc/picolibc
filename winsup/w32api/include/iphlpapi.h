@@ -1,5 +1,9 @@
 #ifndef _IPHLPAPI_H
 #define _IPHLPAPI_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
+
 #include <iprtrmib.h>
 #include <ipexport.h>
 #include <iptypes.h>

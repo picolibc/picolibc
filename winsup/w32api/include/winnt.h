@@ -1,5 +1,9 @@
 #ifndef _WINNT_H
 #define _WINNT_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
+
 /* translate GCC target defines to MS equivalents. Keep this synchronized
    with windows.h. */
 #if defined(__i686__) && !defined(_M_IX86)

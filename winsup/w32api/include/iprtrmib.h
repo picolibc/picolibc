@@ -1,5 +1,9 @@
 #ifndef _IPRTRMIB_H
 #define _IPRTRMIB_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
+
 #include <ipifcons.h>
 #ifdef __cplusplus
 extern "C" {

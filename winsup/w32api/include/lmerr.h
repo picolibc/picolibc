@@ -1,5 +1,9 @@
 #ifndef _LMERR_H
 #define _LMERR_H
+#if __GNUC__ >=3
+#pragma GCC system_header
+#endif
+
 #include <winerror.h>
 #define NERR_Success 0 
 #define NERR_BASE 2100
