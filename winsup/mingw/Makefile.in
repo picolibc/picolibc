@@ -96,7 +96,8 @@ LIBM_A=@LIBM_A@
 
 INCLUDES = -I$(srcdir)/include -I$(srcdir)/../w32api/include \
   -I$(srcdir)/../include \
-  -nostdinc -nostdinc++
+  -nostdinc -nostdinc++ \
+  -iwithprefixbefore include
 ALL_CFLAGS = $(CFLAGS) $(INCLUDES) $(MNO_CYGWIN)
 ALL_CXXFLAGS = $(CXXFLAGS) $(INCLUDES) $(MNO_CYGWIN)
 

@@ -1,5 +1,20 @@
 2002-04-17  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* Makefile.in (INCLUDES): Add "-iwithprefixbefore include" to
+	ensure gcc include dir is searched despite -nostdinc.
+	* profile/Makefile.in (INCLUDES): Likewise.
+	* mingwex/Makefile.in (INCLUDES): Likewise.
+	* include/stdarg.h: Replace with stub that just guards the
+	real gcc system header with #ifndef RCINVOKED
+	* include/varargs.h: Likewise.
+	* include/stddef.h: Likewise.
+	* include/stdio.h: Include stdarg.h after defining
+	 __need___va_list.
+	(__VALIST): Define as __gnuc_va_list if __GNUC__, else char*.
+	Replace va_list with __VALIST throughout.
+
+2002-04-17  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* crt1.c: Revert changes of 2002-04-16. Use _fpreset again.
 	* msvcrt.def (_fpreset): Mark as DATA so that only
 	_imp___fpreset is exported.

@@ -98,7 +98,8 @@ MNO_CYGWIN = @MNO_CYGWIN@
 
 INCLUDES = -I$(srcdir) -I$(srcdir)/../include \
   -I$(srcdir)/../../w32api/include \
-  -nostdinc -nostdinc++
+  -nostdinc -nostdinc++ \
+  -iwithprefixbefore include
 ALL_CFLAGS = $(CFLAGS) $(OPTFLAGS) $(INCLUDES) $(MNO_CYGWIN)
 ALL_CXXFLAGS = $(CXXFLAGS) $(OPTFLAGS) $(INCLUDES) $(MNO_CYGWIN)
 
