@@ -1,3 +1,10 @@
+2001-11-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (get_supplementary_group_sidlist): New function.
+	(get_group_sidlist): Call get_supplementary_group_sidlist() to
+	retrieve list of supplementary groups SIDs from /etc/group and
+	add them to the user's group list.
+
 2001-11-03  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler.cc (fhandler_base::read): Return just read ahead characters
