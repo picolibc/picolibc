@@ -1,5 +1,11 @@
 2004-08-15  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* profile/COPYING: New file.
+	* profile/CYGWIN_LICENSE: New file.
+	* profile/Makefile.in (DISTFILES): Add COPYING, CYGWIN_LICENSE.
+
+2004-08-15  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* mingwex/fopen64.c: Move.
 	* mingwex/fseeko64.c: Move.
 	* mingwex/ftello64.c: Move.
