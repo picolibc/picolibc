@@ -149,7 +149,7 @@ shared_info::initialize ()
   if (version)
     {
       if (version != SHARED_VERSION_MAGIC)
-	multiple_cygwin_problem ("shared", version, SHARED_VERSION);
+	multiple_cygwin_problem ("shared", version, SHARED_VERSION_MAGIC);
       else if (cb != SHARED_INFO_CB)
 	multiple_cygwin_problem ("shared size", cb, SHARED_INFO_CB);
       return;

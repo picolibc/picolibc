@@ -230,5 +230,5 @@ details. */
 	cygwin_internal (CW_GETVERSIONINFO).
      */
 
-#define CYGWIN_VERSION_MAGIC(a, b) ((unsigned) (((unsigned short) a) | (unsigned short) b))
+#define CYGWIN_VERSION_MAGIC(a, b) ((unsigned) ((((unsigned short) a) << 16) | (unsigned short) b))
 #define CYGWIN_VERSION_MAGIC_VERSION(a) ((unsigned) ((unsigned)a & 0xffff))
