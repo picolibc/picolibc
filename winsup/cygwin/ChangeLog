@@ -1,3 +1,7 @@
+2001-10-16  Frederic Devernay  <Frederic.Devernay@sophia.inria.fr>
+
+	* poll.cc (poll): Call cygwin_select() if any fd is valid.
+
 2001-10-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_raw.cc (fhandler_dev_raw::open): Eliminate compatibility
