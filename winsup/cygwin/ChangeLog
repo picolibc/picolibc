@@ -1,5 +1,9 @@
 2004-03-17  Christopher Faylor  <cgf@redhat.com>
 
+	* pipe.cc (fhandler_pipe::dup): Fix debugging message.
+
+2004-03-17  Christopher Faylor  <cgf@redhat.com>
+
 	* include/cygwin/version.h: Bump DLL minor number to 9.
 
 2004-03-16  Christopher Faylor  <cgf@redhat.com>
