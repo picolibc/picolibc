@@ -376,13 +376,18 @@ got_it:
 
 /* read_sd reads a security descriptor from a file.
    In case of error, -1 is returned and errno is set.
-   If the file doesn't have a SD, 0 is returned.
-   Otherwise, the size of the SD is returned and
-   the SD is copied to the buffer, pointed to by sd_buf.
-   sd_size contains the size of the buffer. If
-   it's too small, to contain the complete SD, 0 is
-   returned and sd_size is set to the needed size
-   of the buffer.
+   If sd_buf is too small, 0 is returned and sd_size
+   is set to the needed buffer size.
+   On success, 1 is returned.
+
+   GetFileSecurity() is used instead of BackupRead()
+   to avoid access denied errors if the caller has
+   not the permission to open that file for read.
+
+   Originally the function should return the size
+   of the SD on success. Unfortunately NT returns
+   0 in `len' on success, while W2K returns the
+   correct size!
 */
 
 LONG
@@ -415,7 +420,7 @@ read_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd_size)
       *sd_size = len;
       return 0;
     }
-  return len;
+  return 1;
 }
 
 LONG
