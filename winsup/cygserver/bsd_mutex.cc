@@ -222,10 +222,12 @@ _msleep (void *ident, struct mtx *mtx, int priority,
 	panic ("wait in msleep (%s) failed, %E", wmesg);
 	break;
     }
-  set_priority (old_priority);
-  if (!(priority & PDROP) && mtx)
-    mtx_lock (mtx);
+  /* Dismiss event before entering mutex. */
+  ResetEvent (evt);
   CloseHandle (evt);
+  set_priority (old_priority);
+  if (mtx && !(priority & PDROP))
+    mtx_lock (mtx);
   return ret;
 }
 
