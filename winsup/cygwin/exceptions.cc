@@ -1271,11 +1271,11 @@ _sigdelayed0:								\n\
 	call	_reset_signal_arrived@0					\n\
 	pushl	%5			# signal number			\n\
 	pushl	%7			# newmask			\n\
+									\n\
+	call	_set_process_mask@4					\n\
 	movl	$0,%0			# zero the signal number as a	\n\
 					# flag to the signal handler thread\n\
 					# that it is ok to set up sigsave\n\
-									\n\
-	call	_set_process_mask@4					\n\
 	popl	%%eax							\n\
 	jmp	*%%eax							\n\
 __no_sig_end:								\n\
