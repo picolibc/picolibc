@@ -2448,13 +2448,15 @@ fi
 
 # Put a plausible default for CC_FOR_BUILD in Makefile.
 if test -z "$CC_FOR_BUILD"; then
-  if test "x$cross_compiling" = "xno"; then
-    CC_FOR_BUILD='$(CC)'
-  else
-    CC_FOR_BUILD=gcc
-  fi
+  CC_FOR_BUILD=gcc
 fi
 
+
+# These get added in the top-level configure.in, except in the case where
+# newlib is being built natively.
+if test -z `echo ${CC} | grep \/libc\/include`; then
+  CC="${CC} -isystem $PWD/targ-include -isystem ${newlib_basedir}/libc/include"
+fi
 
 if test "${multilib}" = "yes"; then
   multilib_arg="--enable-multilib"
