@@ -2131,6 +2131,31 @@ setuid (__uid16_t uid)
   return setuid32 (uid16touid32 (uid));
 }
 
+extern "C" int
+setreuid32 (__uid32_t ruid, __uid32_t euid)
+{
+  int ret = 0;
+  bool tried = false;
+  __uid32_t old_euid = myself->uid;
+
+  if (ruid != ILLEGAL_UID && cygheap->user.real_uid != ruid && euid != ruid)
+    tried = !(ret = seteuid32 (ruid));
+  if (!ret && euid != ILLEGAL_UID)
+    ret = seteuid32 (euid);
+  if (tried && (ret || euid == ILLEGAL_UID) && seteuid32 (old_euid))
+    system_printf ("Cannot restore original euid %u", old_euid);
+  if (!ret && ruid != ILLEGAL_UID)
+    cygheap->user.real_uid = ruid;
+  debug_printf ("real: %u, effective: %u", cygheap->user.real_uid, myself->uid);
+  return ret;
+}
+
+extern "C" int
+setreuid (__uid16_t ruid, __uid16_t euid)
+{
+  return setreuid32 (uid16touid32 (ruid), uid16touid32 (euid));
+}
+
 /* setegid: from System V.  */
 extern "C" int
 setegid32 (__gid32_t gid)
@@ -2207,6 +2232,31 @@ setgid (__gid16_t gid)
   if (!ret)
     cygheap->user.real_gid = myself->gid;
   return ret;
+}
+
+extern "C" int
+setregid32 (__gid32_t rgid, __gid32_t egid)
+{
+  int ret = 0;
+  bool tried = false;
+  __gid32_t old_egid = myself->gid;
+
+  if (rgid != ILLEGAL_GID && cygheap->user.real_gid != rgid && egid != rgid)
+    tried = !(ret = setegid32 (rgid));
+  if (!ret && egid != ILLEGAL_GID)
+    ret = setegid32 (egid);
+  if (tried && (ret || egid == ILLEGAL_GID) && setegid32 (old_egid))
+    system_printf ("Cannot restore original egid %u", old_egid);
+  if (!ret && rgid != ILLEGAL_GID)
+    cygheap->user.real_gid = rgid;
+  debug_printf ("real: %u, effective: %u", cygheap->user.real_gid, myself->gid);
+  return ret;
+}
+
+extern "C" int
+setregid (__gid16_t rgid, __gid16_t egid)
+{
+  return setregid32 (gid16togid32 (rgid), gid16togid32 (egid));
 }
 
 /* chroot: privileged Unix system call.  */

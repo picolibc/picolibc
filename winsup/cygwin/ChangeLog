@@ -1,3 +1,13 @@
+2003-01-24  Pierre Humblet <pierre.humblet@ieee.org>
+	    Jason Tishler  <jason@tishler.net>
+
+	* cygwin.din: Export setreuid32, setreuid, setregid32, setregid.
+	* syscalls.cc (setreuid32): New function.
+	(setreuid): Ditto.
+	(setregid32): Ditto.
+	(setregid): Ditto.
+	* include/cygwin/version.h: Bump API minor number.
+
 2003-01-23  Christopher Faylor  <cgf@redhat.com>
 
 	* pwdrp.h (pwdgrp::refresh): Lock entire test prior to reading.

@@ -170,12 +170,13 @@ details. */
        70: Export asprintf, _asprintf_r, vasprintf, _vasprintf_r
        71: Export strerror_r
        72: Export nanosleep
+       73: Export setreuid32, setreuid, setregid32, setregid
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 72
+#define CYGWIN_VERSION_API_MINOR 73
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
