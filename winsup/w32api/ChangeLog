@@ -1,5 +1,11 @@
 2003-01-11  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/accctrl.h (enum _SE_OBJECT_TYPE): Add
+	SE_REGISTRY_WOW64_32KEY.
+	Reported by: Dimitri Papadopoulos  <dimitri_at@sourceforge.users.net>
+
+2003-01-11  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/commctrl.h (HDN_GETDISPINFO[AW]: Add defines.
 	(tagNMHDDISPINFO[AW}: Add structures and typedefs.
 	Reported by: Mat Nieuwenhoven  <matnieuw@users.sourceforge.net>
