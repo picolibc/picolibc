@@ -1147,8 +1147,9 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
       trailing_slash_p = SLASH_P (*lastchar) && lastchar[-1] != ':';
     }
     
-  debug_printf ("conv_to_posix_path (%s, %s)", src_path,
-		keep_rel_p ? "keep-rel" : "no-keep-rel");
+  debug_printf ("conv_to_posix_path (%s, %s, %s)", src_path,
+		keep_rel_p ? "keep-rel" : "no-keep-rel",
+		trailing_slash_p ? "add-slash" : "no-add-slash");
   MALLOC_CHECK;
 
   if (src_path_len >= MAX_PATH)
@@ -1192,9 +1193,11 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
 
       /* SRC_PATH is in the mount table. */
       int nextchar;
-      if (!pathbuf[mi.native_pathlen])
+      const char *p = pathbuf + mi.native_pathlen;
+
+      if (!*p || !p[1])
 	nextchar = 0;
-      else if (isdirsep (pathbuf[mi.native_pathlen]))
+      else if (isdirsep (*p))
 	nextchar = -1;
       else
 	nextchar = 1;
@@ -1206,9 +1209,9 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
       if (addslash)
 	strcat (posix_path, "/");
       if (nextchar)
-	slashify (pathbuf + mi.native_pathlen,
+	slashify (p,
 		  posix_path + addslash + (mi.posix_pathlen == 1 ? 0 : mi.posix_pathlen),
-		trailing_slash_p);
+		  trailing_slash_p);
       goto out;
     }
 

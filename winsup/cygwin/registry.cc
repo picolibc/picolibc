@@ -49,6 +49,7 @@ reg_key::build_reg (HKEY top, REGSAM access, va_list av)
 {
   char *name;
   HKEY r = top;
+  key_is_invalid = 0;
 
   /* FIXME: Most of the time a valid mount area should exist.  Perhaps
      we should just try an open of the correct key first and only resort
@@ -72,7 +73,7 @@ reg_key::build_reg (HKEY top, REGSAM access, va_list av)
       r = key;
       if (res != ERROR_SUCCESS)
 	{
-	  key = (HKEY) INVALID_HANDLE_VALUE;
+	  key_is_invalid = res;
 	  debug_printf ("failed to create key %s in the registry", name);
 	  break;
 	}
@@ -95,11 +96,11 @@ reg_key::get_int (const char *name, int def)
   DWORD dst;
   DWORD size = sizeof (dst);
 
-  LONG res = RegQueryValueExA (key,
-			       name,
-			       0,
-			       &type,
-			       (unsigned char *) &dst, &size);
+  if (key_is_invalid)
+    return def;
+
+  LONG res = RegQueryValueExA (key, name, 0, &type, (unsigned char *) &dst,
+			       &size);
 
   if (type != REG_DWORD || res != ERROR_SUCCESS)
     return def;
@@ -113,6 +114,9 @@ int
 reg_key::set_int (const char *name, int val)
 {
   DWORD value = val;
+  if (key_is_invalid)
+    return key_is_invalid;
+
   return (int) RegSetValueExA (key, name, 0, REG_DWORD,
 			       (unsigned char *) &value, sizeof (value));
 }
@@ -125,13 +129,15 @@ reg_key::get_string (const char *name, char *dst, size_t max, const char * def)
 {
   DWORD size = max;
   DWORD type;
-  LONG res = RegQueryValueExA (key, name, 0, &type, (unsigned char *) dst,
-								&size);
+  LONG res;
+
+  if (key_is_invalid)
+    res = key_is_invalid;
+  else
+    res = RegQueryValueExA (key, name, 0, &type, (unsigned char *) dst, &size);
 
   if ((def != 0) && ((type != REG_SZ) || (res != ERROR_SUCCESS)))
-    {
-      strcpy (dst, def);
-    }
+    strcpy (dst, def);
   return (int) res;
 }
 
@@ -140,15 +146,10 @@ reg_key::get_string (const char *name, char *dst, size_t max, const char * def)
 int
 reg_key::set_string (const char *name, const char *src)
 {
+  if (key_is_invalid)
+    return key_is_invalid;
   return (int) RegSetValueExA (key, name, 0, REG_SZ, (unsigned char*) src,
 			       strlen (src) + 1);
-}
-
-int
-reg_key::setone_string (const char *src, const char *name)
-{
-  return (int) RegSetValueExA (key, name, 0, REG_SZ,
-			       (const unsigned char *) src, strlen (src) + 1);
 }
 
 /* Return the handle to key. */
@@ -165,12 +166,14 @@ reg_key::get_key ()
 int
 reg_key::kill (const char *name)
 {
+  if (key_is_invalid)
+    return key_is_invalid;
   return RegDeleteKeyA (key, name);
 }
 
 reg_key::~reg_key ()
 {
-  if (key != (HKEY) INVALID_HANDLE_VALUE)
+  if (!key_is_invalid)
     RegCloseKey (key);
-  key = (HKEY) INVALID_HANDLE_VALUE;
+  key_is_invalid = 1;
 }

@@ -219,6 +219,7 @@ class reg_key
 private:
 
   HKEY key;
+  LONG key_is_invalid;
 
 public:
 
@@ -238,7 +239,6 @@ public:
   int get_string (const char *, char *buf, size_t len, const char *def);
   int set_string (const char *,const char *);
   int set_int (const char *, int val);
-  int setone_string (const char *src, const char *name);
 
   ~reg_key ();
 };
