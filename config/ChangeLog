@@ -1,3 +1,8 @@
+2000-01-06  Geoff Keating  <geoffk@cygnus.com>
+
+	* mh-aix43: Delete, move to mt-aix43.
+	* mt-aix43: New file.
+
 1999-04-07  Michael Meissner  <meissner@cygnus.com>
 
 	* mt-d30v: New file, pass -g -Os -Wa,-C as default options.

@@ -1,3 +1,8 @@
+2000-01-06  Geoff Keating  <geoffk@cygnus.com>
+
+	* configure.in: Use mt-aix43 to handle *_TARGET defs,
+	not mh-aix43.
+
 1999-09-04  Steve Chamberlain  <sac@pobox.com>
 
 	* config.sub: Add support for configuring for pj.
