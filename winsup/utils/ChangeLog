@@ -1,3 +1,11 @@
+2002-01-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* passwd.cc (ChangePW): Add parameter to differ between called for
+	checking old password and called for changing password.  If called
+	for checking old password, return non-zero only if password is surely
+	incorrect.
+	(main): Call ChangePW() with additional parameter.
+
 2002-01-29  Christopher Faylor  <cgf@redhat.com>
 
 	* dump_setup.cc (parse_filename): Don't consider '_' part of the

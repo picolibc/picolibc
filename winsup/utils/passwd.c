@@ -97,7 +97,7 @@ GetPW (const char *user)
 }
 
 int
-ChangePW (const char *user, const char *oldpwd, const char *pwd)
+ChangePW (const char *user, const char *oldpwd, const char *pwd, int justcheck)
 {
   WCHAR name[512], oldpass[512], pass[512];
   DWORD ret;
@@ -116,7 +116,9 @@ ChangePW (const char *user, const char *oldpwd, const char *pwd)
       MultiByteToWideChar (CP_ACP, 0, oldpwd, -1, oldpass, 512);
       ret = NetUserChangePassword (NULL, name, oldpass, pass);
     }
-  if (! EvalRet (ret, user))
+  if (justcheck && ret != ERROR_INVALID_PASSWORD)
+    return 0;
+  if (! EvalRet (ret, user) && ! justcheck)
     {
       eprint (0, "Password changed.");
     }
@@ -334,7 +336,7 @@ main (int argc, char **argv)
   if (li->usri3_priv != USER_PRIV_ADMIN)
     {
       strcpy (oldpwd, getpass ("Old password: "));
-      if (ChangePW (user, oldpwd, oldpwd))
+      if (ChangePW (user, oldpwd, oldpwd, 1))
         return 1;
     }
 
@@ -343,7 +345,7 @@ main (int argc, char **argv)
       strcpy (newpwd, getpass ("New password: "));
       if (strcmp (newpwd, getpass ("Re-enter new password: ")))
         eprint (0, "Password is not identical.");
-      else if (! ChangePW (user, *oldpwd ? oldpwd : NULL, newpwd))
+      else if (! ChangePW (user, *oldpwd ? oldpwd : NULL, newpwd, 0))
         ret = 1;
       if (! ret && cnt < 2)
         eprint (0, "Try again.");
