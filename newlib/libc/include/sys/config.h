@@ -80,6 +80,9 @@
 #if defined(_CALL_SYSV)
 #define __ATTRIBUTE_IMPURE_PTR__ __attribute__((__section__(".sdata")))
 #endif
+#ifdef __SPE__
+#define _LONG_DOUBLE double
+#endif
 #endif
 
 #ifdef __xstormy16__
