@@ -1,3 +1,10 @@
+
+Sun Jan 28 13:01:08  2001  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* include/wchar.h: The 2001.01.18 Change was incorrect.  The functions
+	are actually C functions.  These functions are resolved via the
+	-lmsvcp60 library and comments were placed in the header.
+
 2001-01-28  Danny Smith  <danny_r_smith_2001@yahoo.co.nz>
 
 	*include/stdlib.h (__p__pgmptr): add prototype.

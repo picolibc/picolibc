@@ -256,8 +256,9 @@ wchar_t * 	wmktemp(wchar_t *);
 
 #endif /* not __STRICT_ANSI__ */
 
-#ifdef __cplusplus
-/* These are only defined in C++ STL runtime dll.  */
+/* These are resolved by -lmsvcp60 */
+/* If you don't have msvcp60.dll in your windows system directory, you can
+   easily obtain it with a search from your favorite search engine. */
 typedef int mbstate_t;
 typedef wchar_t _Wint_t;
 
@@ -269,7 +270,6 @@ size_t  mbsrtowcs(wchar_t *, const char **, size_t, mbstate_t *);
 size_t  wcrtomb(char *, wchar_t, mbstate_t *);
 size_t  wcsrtombs(char *, const wchar_t **, size_t, mbstate_t *);
 int  	wctob(wint_t);
-#endif def __cplusplus
 
 #ifdef __cplusplus
 }	/* end of extern "C" */
