@@ -1268,8 +1268,8 @@ _rename (const char *oldpath, const char *newpath)
 
   if (real_old.error)
     {
-      set_errno (real_old.error);
       syscall_printf ("-1 = rename (%s, %s)", oldpath, newpath);
+      set_errno (real_old.error);
       return -1;
     }
 
@@ -1293,8 +1293,8 @@ _rename (const char *oldpath, const char *newpath)
 
   if (real_new.error)
     {
-      set_errno (real_new.error);
       syscall_printf ("-1 = rename (%s, %s)", oldpath, newpath);
+      set_errno (real_new.error);
       return -1;
     }
 
@@ -1302,12 +1302,14 @@ _rename (const char *oldpath, const char *newpath)
       || !writable_directory (real_new.get_win32 ()))
     {
       syscall_printf ("-1 = rename (%s, %s)", oldpath, newpath);
+      set_errno (EACCES);
       return -1;
     }
 
   if (real_old.file_attributes () == (DWORD) -1) /* file to move doesn't exist */
     {
        syscall_printf ("file to move doesn't exist");
+       set_errno (ENOENT);
        return (-1);
     }
 

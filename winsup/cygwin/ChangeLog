@@ -1,3 +1,9 @@
+Sat Mar 10 15:22:44 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* syscalls.cc (_rename): Set errno to ENOENT when an old path doesn't
+	exist (from Kazuhiro Fujieda <fujieda@jaist.ac.jp>).  Also set EACCES
+	when directory is not writable.
+
 Wed Mar  7 15:49:47 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* syscalls.cc (_read): Change definition to return ssize_t to be
