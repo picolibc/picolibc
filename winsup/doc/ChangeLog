@@ -1,3 +1,7 @@
+2004-03-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pathnames.sgml: Fix /dev/srX description.
+
 2004-03-28  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* how-programming.texinfo: Make list in .lib FAQ enumerative. 

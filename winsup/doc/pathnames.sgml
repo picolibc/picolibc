@@ -222,6 +222,10 @@ follows:</para>
 /dev/scd1	\device\cdrom1
 ...
 
+/dev/sr0	\device\cdrom0
+/dev/sr1	\device\cdrom1
+...
+
 /dev/sda	\device\harddisk0\partition0	(whole disk)
 /dev/sda1	\device\harddisk0\partition1	(first partition)
 ...
@@ -245,7 +249,6 @@ links as they are created on Linux systems for convenience:
 
 <screen>
 ln -s /dev/scd0 /dev/cdrom
-ln -s /dev/scd2 /dev/sr2      # actually srX are real device nodes on Linux but who cares.
 ln -s /dev/nst0  /dev/tape
 ...
 </screen>
