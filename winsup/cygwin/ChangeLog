@@ -1,3 +1,10 @@
+2003-02-04  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* syscalls.cc (struct system_cleanup_args): New struct.
+	(system_cleanup): New function.
+	(system): Use pthread_cleanup_push and _pop to save and restore
+	signal handlers and sigprocmask.
+
 2003-02-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (symlink): Create security attributes so that only the

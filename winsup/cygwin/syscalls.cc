@@ -1371,6 +1371,21 @@ done:
   return res;
 }
 
+struct system_cleanup_args
+{
+  _sig_func_ptr oldint, oldquit;
+  sigset_t old_mask;
+};
+
+static void system_cleanup (void *args)
+{
+  struct system_cleanup_args *cleanup_args = (struct system_cleanup_args *) args;
+
+  signal (SIGINT, cleanup_args->oldint);
+  signal (SIGQUIT, cleanup_args->oldquit);
+  (void) sigprocmask (SIG_SETMASK, &cleanup_args->old_mask, 0);
+}  
+
 extern "C" int
 system (const char *cmdstring)
 {
@@ -1382,22 +1397,24 @@ system (const char *cmdstring)
   sigframe thisframe (mainthread);
   int res;
   const char* command[4];
-  _sig_func_ptr oldint, oldquit;
-  sigset_t child_block, old_mask;
+  struct system_cleanup_args cleanup_args;
+  sigset_t child_block;
 
   if (cmdstring == (const char *) NULL)
 	return 1;
 
-  oldint = signal (SIGINT, SIG_IGN);
-  oldquit = signal (SIGQUIT, SIG_IGN);
+  cleanup_args.oldint = signal (SIGINT, SIG_IGN);
+  cleanup_args.oldquit = signal (SIGQUIT, SIG_IGN);
   sigemptyset (&child_block);
   sigaddset (&child_block, SIGCHLD);
-  (void) sigprocmask (SIG_BLOCK, &child_block, &old_mask);
+  (void) sigprocmask (SIG_BLOCK, &child_block, &cleanup_args.old_mask);
 
   command[0] = "sh";
   command[1] = "-c";
   command[2] = cmdstring;
   command[3] = (const char *) NULL;
+
+  pthread_cleanup_push (system_cleanup, (void *) &cleanup_args);
 
   if ((res = spawnvp (_P_WAIT, "sh", command)) == -1)
     {
@@ -1406,9 +1423,8 @@ system (const char *cmdstring)
       res = 127;
     }
 
-  signal (SIGINT, oldint);
-  signal (SIGQUIT, oldquit);
-  (void) sigprocmask (SIG_SETMASK, &old_mask, 0);
+  pthread_cleanup_pop (1);
+
   return res;
 }
 
