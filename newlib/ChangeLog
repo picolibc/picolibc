@@ -1,3 +1,8 @@
+2001-12-17  Corinna Vinschen  <vinschen@redhat.de>
+
+	* libc/sys/cygwin/include/unistd.h: Add __UNISTD_GETOPT_ to allow
+	conditionalized including of getopt stuff.
+
 2001-12-14  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* libc/stdio/Makefile.am (vfprintf.$(oext)): Add $(INCLUDES) to
