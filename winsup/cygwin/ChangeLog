@@ -1,3 +1,7 @@
+Wed Dec 20 01:02:13 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (reset_signal_arrived): Make global to avoid inlining.
+
 Wed Dec 20 00:57:10 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler_serial.cc (fhandler_serial::raw_read): Always find number of

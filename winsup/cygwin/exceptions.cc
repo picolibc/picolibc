@@ -1072,8 +1072,7 @@ events_terminate (void)
 
 #define pid_offset (unsigned)(((_pinfo *)NULL)->pid)
 extern "C" {
-static void volatile __stdcall reset_signal_arrived () __attribute__ ((unused));
-static void volatile __stdcall
+void __stdcall
 reset_signal_arrived ()
 {
   (void) ResetEvent (signal_arrived);
