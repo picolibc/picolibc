@@ -1,3 +1,10 @@
+2004-03-25  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/linux/sys/lock.h: Turn on __USE_GNU flag if not already
+	defined.  Change __LOCK_RECURSIVE_INIT to be __LOCK_INIT_RECURSIVE.
+	* libc/sys/linux/dl/dl-support.c: Change __LOCK_RECURSIVE_INIT
+	to be __LOCK_INIT_RECURSIVE.
+
 2004-03-11  Kazu Hirata  <kazu@cs.umass.edu>
 
 	* libc/sys/h8300hms/Makefile.am (lib_a_SOURCES): Replace

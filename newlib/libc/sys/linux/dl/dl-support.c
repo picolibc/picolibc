@@ -112,7 +112,7 @@ hp_timing_t _dl_cpuclock_offset;
    This must be a recursive lock since the initializer function of
    the loaded object might as well require a call to this function.
    At this time it is not anymore a problem to modify the tables.  */
-__LOCK_RECURSIVE_INIT (, _dl_load_lock)
+__LOCK_INIT_RECURSIVE(, _dl_load_lock)
 
 
 #ifdef HAVE_AUX_VECTOR
