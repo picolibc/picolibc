@@ -50,28 +50,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 static const template i386_optab[] = {
 
 #define X None
-#define NoSuf (No_bSuf|No_wSuf|No_lSuf|No_sSuf|No_dSuf|No_xSuf)
-#define b_Suf (No_wSuf|No_lSuf|No_sSuf|No_dSuf|No_xSuf)
-#define w_Suf (No_bSuf|No_lSuf|No_sSuf|No_dSuf|No_xSuf)
-#define l_Suf (No_bSuf|No_wSuf|No_sSuf|No_dSuf|No_xSuf)
-#define d_Suf (No_bSuf|No_wSuf|No_sSuf|No_lSuf|No_xSuf)
-#define x_Suf (No_bSuf|No_wSuf|No_sSuf|No_lSuf|No_dSuf)
-#define bw_Suf (No_lSuf|No_sSuf|No_dSuf|No_xSuf)
-#define bl_Suf (No_wSuf|No_sSuf|No_dSuf|No_xSuf)
-#define wl_Suf (No_bSuf|No_sSuf|No_dSuf|No_xSuf)
-#define wld_Suf (No_bSuf|No_sSuf|No_xSuf)
-#define sl_Suf (No_bSuf|No_wSuf|No_dSuf|No_xSuf)
-#define sld_Suf (No_bSuf|No_wSuf|No_xSuf)
-#define sldx_Suf (No_bSuf|No_wSuf)
-#define bwl_Suf (No_sSuf|No_dSuf|No_xSuf)
-#define bwld_Suf (No_sSuf|No_xSuf)
+#define NoSuf (No_bSuf|No_wSuf|No_lSuf|No_sSuf|No_xSuf)
+#define b_Suf (No_wSuf|No_lSuf|No_sSuf|No_xSuf)
+#define w_Suf (No_bSuf|No_lSuf|No_sSuf|No_xSuf)
+#define l_Suf (No_bSuf|No_wSuf|No_sSuf|No_xSuf)
+#define x_Suf (No_bSuf|No_wSuf|No_sSuf|No_lSuf)
+#define bw_Suf (No_lSuf|No_sSuf|No_xSuf)
+#define bl_Suf (No_wSuf|No_sSuf|No_xSuf)
+#define wl_Suf (No_bSuf|No_sSuf|No_xSuf)
+#define sl_Suf (No_bSuf|No_wSuf|No_xSuf)
+#define bwl_Suf (No_sSuf|No_xSuf)
 #define FP (NoSuf|IgnoreSize)
 #define l_FP (l_Suf|IgnoreSize)
-#define d_FP (d_Suf|IgnoreSize)
 #define x_FP (x_Suf|IgnoreSize)
 #define sl_FP (sl_Suf|IgnoreSize)
-#define sld_FP (sld_Suf|IgnoreSize)
-#define sldx_FP (sldx_Suf|IgnoreSize)
 #if SYSV386_COMPAT
 /* Someone forgot that the FloatR bit reverses the operation when not
    equal to the FloatD bit.  ie. Changing only FloatD results in the
@@ -125,7 +117,7 @@ static const template i386_optab[] = {
 {"push",   1,	0x68, X, Cpu186, wl_Suf|DefaultSize,		{ Imm16|Imm32, 0, 0} },
 {"push",   1,	0x06, X, 0,	 wl_Suf|Seg2ShortForm|DefaultSize, { SReg2, 0, 0 } },
 {"push",   1, 0x0fa0, X, Cpu386, wl_Suf|Seg3ShortForm|DefaultSize, { SReg3, 0, 0 } },
-{"pusha",  0,	0x60, X, Cpu186, wld_Suf|DefaultSize,		{ 0, 0, 0 } },
+{"pusha",  0,	0x60, X, Cpu186, wl_Suf|DefaultSize,		{ 0, 0, 0 } },
 
 /* Pop instructions.  */
 {"pop",	   1,	0x58, X, 0,	 wl_Suf|ShortForm|DefaultSize,	{ WordReg, 0, 0 } },
@@ -133,7 +125,7 @@ static const template i386_optab[] = {
 #define POP_SEG_SHORT 0x07
 {"pop",	   1,	0x07, X, 0,	 wl_Suf|Seg2ShortForm|DefaultSize, { SReg2, 0, 0 } },
 {"pop",	   1, 0x0fa1, X, Cpu386, wl_Suf|Seg3ShortForm|DefaultSize, { SReg3, 0, 0 } },
-{"popa",   0,	0x61, X, Cpu186, wld_Suf|DefaultSize,		{ 0, 0, 0 } },
+{"popa",   0,	0x61, X, Cpu186, wl_Suf|DefaultSize,		{ 0, 0, 0 } },
 
 /* Exchange instructions.
    xchg commutes:  we allow both operand orders.  */
@@ -170,8 +162,8 @@ static const template i386_optab[] = {
 {"cmc",	   0,	0xf5, X, 0,	 NoSuf,			{ 0, 0, 0} },
 {"lahf",   0,	0x9f, X, 0,	 NoSuf,			{ 0, 0, 0} },
 {"sahf",   0,	0x9e, X, 0,	 NoSuf,			{ 0, 0, 0} },
-{"pushf",  0,	0x9c, X, 0,	 wld_Suf|DefaultSize,	{ 0, 0, 0} },
-{"popf",   0,	0x9d, X, 0,	 wld_Suf|DefaultSize,	{ 0, 0, 0} },
+{"pushf",  0,	0x9c, X, 0,	 wl_Suf|DefaultSize,	{ 0, 0, 0} },
+{"popf",   0,	0x9d, X, 0,	 wl_Suf|DefaultSize,	{ 0, 0, 0} },
 {"stc",	   0,	0xf9, X, 0,	 NoSuf,			{ 0, 0, 0} },
 {"std",	   0,	0xfd, X, 0,	 NoSuf,			{ 0, 0, 0} },
 {"sti",	   0,	0xfb, X, 0,	 NoSuf,			{ 0, 0, 0} },
@@ -429,36 +421,36 @@ static const template i386_optab[] = {
 {"setg",   1, 0x0f9f, 0, Cpu386, b_Suf|Modrm,		{ Reg8|ByteMem, 0, 0} },
 
 /* String manipulation.  */
-{"cmps",   0,	0xa6, X, 0,	 bwld_Suf|W|IsString,	{ 0, 0, 0} },
-{"cmps",   2,	0xa6, X, 0,	 bwld_Suf|W|IsString,	{ AnyMem|EsSeg, AnyMem, 0} },
-{"scmp",   0,	0xa6, X, 0,	 bwld_Suf|W|IsString,	{ 0, 0, 0} },
-{"scmp",   2,	0xa6, X, 0,	 bwld_Suf|W|IsString,	{ AnyMem|EsSeg, AnyMem, 0} },
-{"ins",	   0,	0x6c, X, Cpu186, bwld_Suf|W|IsString,	{ 0, 0, 0} },
-{"ins",	   2,	0x6c, X, Cpu186, bwld_Suf|W|IsString,	{ InOutPortReg, AnyMem|EsSeg, 0} },
-{"outs",   0,	0x6e, X, Cpu186, bwld_Suf|W|IsString,	{ 0, 0, 0} },
-{"outs",   2,	0x6e, X, Cpu186, bwld_Suf|W|IsString,	{ AnyMem, InOutPortReg, 0} },
-{"lods",   0,	0xac, X, 0,	 bwld_Suf|W|IsString,	{ 0, 0, 0} },
-{"lods",   1,	0xac, X, 0,	 bwld_Suf|W|IsString,	{ AnyMem, 0, 0} },
-{"lods",   2,	0xac, X, 0,	 bwld_Suf|W|IsString,	{ AnyMem, Acc, 0} },
-{"slod",   0,	0xac, X, 0,	 bwld_Suf|W|IsString,	{ 0, 0, 0} },
-{"slod",   1,	0xac, X, 0,	 bwld_Suf|W|IsString,	{ AnyMem, 0, 0} },
-{"slod",   2,	0xac, X, 0,	 bwld_Suf|W|IsString,	{ AnyMem, Acc, 0} },
-{"movs",   0,	0xa4, X, 0,	 bwld_Suf|W|IsString,	{ 0, 0, 0} },
-{"movs",   2,	0xa4, X, 0,	 bwld_Suf|W|IsString,	{ AnyMem, AnyMem|EsSeg, 0} },
-{"smov",   0,	0xa4, X, 0,	 bwld_Suf|W|IsString,	{ 0, 0, 0} },
-{"smov",   2,	0xa4, X, 0,	 bwld_Suf|W|IsString,	{ AnyMem, AnyMem|EsSeg, 0} },
-{"scas",   0,	0xae, X, 0,	 bwld_Suf|W|IsString,	{ 0, 0, 0} },
-{"scas",   1,	0xae, X, 0,	 bwld_Suf|W|IsString,	{ AnyMem|EsSeg, 0, 0} },
-{"scas",   2,	0xae, X, 0,	 bwld_Suf|W|IsString,	{ AnyMem|EsSeg, Acc, 0} },
-{"ssca",   0,	0xae, X, 0,	 bwld_Suf|W|IsString,	{ 0, 0, 0} },
-{"ssca",   1,	0xae, X, 0,	 bwld_Suf|W|IsString,	{ AnyMem|EsSeg, 0, 0} },
-{"ssca",   2,	0xae, X, 0,	 bwld_Suf|W|IsString,	{ AnyMem|EsSeg, Acc, 0} },
-{"stos",   0,	0xaa, X, 0,	 bwld_Suf|W|IsString,	{ 0, 0, 0} },
-{"stos",   1,	0xaa, X, 0,	 bwld_Suf|W|IsString,	{ AnyMem|EsSeg, 0, 0} },
-{"stos",   2,	0xaa, X, 0,	 bwld_Suf|W|IsString,	{ Acc, AnyMem|EsSeg, 0} },
-{"ssto",   0,	0xaa, X, 0,	 bwld_Suf|W|IsString,	{ 0, 0, 0} },
-{"ssto",   1,	0xaa, X, 0,	 bwld_Suf|W|IsString,	{ AnyMem|EsSeg, 0, 0} },
-{"ssto",   2,	0xaa, X, 0,	 bwld_Suf|W|IsString,	{ Acc, AnyMem|EsSeg, 0} },
+{"cmps",   0,	0xa6, X, 0,	 bwl_Suf|W|IsString,	{ 0, 0, 0} },
+{"cmps",   2,	0xa6, X, 0,	 bwl_Suf|W|IsString,	{ AnyMem|EsSeg, AnyMem, 0} },
+{"scmp",   0,	0xa6, X, 0,	 bwl_Suf|W|IsString,	{ 0, 0, 0} },
+{"scmp",   2,	0xa6, X, 0,	 bwl_Suf|W|IsString,	{ AnyMem|EsSeg, AnyMem, 0} },
+{"ins",	   0,	0x6c, X, Cpu186, bwl_Suf|W|IsString,	{ 0, 0, 0} },
+{"ins",	   2,	0x6c, X, Cpu186, bwl_Suf|W|IsString,	{ InOutPortReg, AnyMem|EsSeg, 0} },
+{"outs",   0,	0x6e, X, Cpu186, bwl_Suf|W|IsString,	{ 0, 0, 0} },
+{"outs",   2,	0x6e, X, Cpu186, bwl_Suf|W|IsString,	{ AnyMem, InOutPortReg, 0} },
+{"lods",   0,	0xac, X, 0,	 bwl_Suf|W|IsString,	{ 0, 0, 0} },
+{"lods",   1,	0xac, X, 0,	 bwl_Suf|W|IsString,	{ AnyMem, 0, 0} },
+{"lods",   2,	0xac, X, 0,	 bwl_Suf|W|IsString,	{ AnyMem, Acc, 0} },
+{"slod",   0,	0xac, X, 0,	 bwl_Suf|W|IsString,	{ 0, 0, 0} },
+{"slod",   1,	0xac, X, 0,	 bwl_Suf|W|IsString,	{ AnyMem, 0, 0} },
+{"slod",   2,	0xac, X, 0,	 bwl_Suf|W|IsString,	{ AnyMem, Acc, 0} },
+{"movs",   0,	0xa4, X, 0,	 bwl_Suf|W|IsString,	{ 0, 0, 0} },
+{"movs",   2,	0xa4, X, 0,	 bwl_Suf|W|IsString,	{ AnyMem, AnyMem|EsSeg, 0} },
+{"smov",   0,	0xa4, X, 0,	 bwl_Suf|W|IsString,	{ 0, 0, 0} },
+{"smov",   2,	0xa4, X, 0,	 bwl_Suf|W|IsString,	{ AnyMem, AnyMem|EsSeg, 0} },
+{"scas",   0,	0xae, X, 0,	 bwl_Suf|W|IsString,	{ 0, 0, 0} },
+{"scas",   1,	0xae, X, 0,	 bwl_Suf|W|IsString,	{ AnyMem|EsSeg, 0, 0} },
+{"scas",   2,	0xae, X, 0,	 bwl_Suf|W|IsString,	{ AnyMem|EsSeg, Acc, 0} },
+{"ssca",   0,	0xae, X, 0,	 bwl_Suf|W|IsString,	{ 0, 0, 0} },
+{"ssca",   1,	0xae, X, 0,	 bwl_Suf|W|IsString,	{ AnyMem|EsSeg, 0, 0} },
+{"ssca",   2,	0xae, X, 0,	 bwl_Suf|W|IsString,	{ AnyMem|EsSeg, Acc, 0} },
+{"stos",   0,	0xaa, X, 0,	 bwl_Suf|W|IsString,	{ 0, 0, 0} },
+{"stos",   1,	0xaa, X, 0,	 bwl_Suf|W|IsString,	{ AnyMem|EsSeg, 0, 0} },
+{"stos",   2,	0xaa, X, 0,	 bwl_Suf|W|IsString,	{ Acc, AnyMem|EsSeg, 0} },
+{"ssto",   0,	0xaa, X, 0,	 bwl_Suf|W|IsString,	{ 0, 0, 0} },
+{"ssto",   1,	0xaa, X, 0,	 bwl_Suf|W|IsString,	{ AnyMem|EsSeg, 0, 0} },
+{"ssto",   2,	0xaa, X, 0,	 bwl_Suf|W|IsString,	{ Acc, AnyMem|EsSeg, 0} },
 {"xlat",   0,	0xd7, X, 0,	 b_Suf|IsString,	{ 0, 0, 0} },
 {"xlat",   1,	0xd7, X, 0,	 b_Suf|IsString,	{ AnyMem, 0, 0} },
 
@@ -482,7 +474,7 @@ static const template i386_optab[] = {
 {"int",	   1,	0xcd, X, 0,	 NoSuf,			{ Imm8, 0, 0} },
 {"int3",   0,	0xcc, X, 0,	 NoSuf,			{ 0, 0, 0} },
 {"into",   0,	0xce, X, 0,	 NoSuf,			{ 0, 0, 0} },
-{"iret",   0,	0xcf, X, 0,	 wld_Suf|DefaultSize,	{ 0, 0, 0} },
+{"iret",   0,	0xcf, X, 0,	 wl_Suf|DefaultSize,	{ 0, 0, 0} },
 /* i386sl, i486sl, later 486, and Pentium.  */
 {"rsm",	   0, 0x0faa, X, Cpu386, NoSuf,			{ 0, 0, 0} },
 
@@ -515,7 +507,7 @@ static const template i386_optab[] = {
 
 /* load */
 {"fld",	   1, 0xd9c0, X, 0,	 FP|ShortForm,		{ FloatReg, 0, 0} },
-{"fld",	   1,	0xd9, 0, 0,	 sld_FP|FloatMF|Modrm,	{ LongMem|LLongMem, 0, 0} },
+{"fld",	   1,	0xd9, 0, 0,	 sl_FP|FloatMF|Modrm,	{ LongMem|LLongMem, 0, 0} },
 {"fld",	   1, 0xd9c0, X, 0,	 l_FP|ShortForm|Ugh,	{ FloatReg, 0, 0} },
 /* Intel Syntax */
 {"fld",    1,	0xdb, 5, 0,	 x_FP|Modrm,		{ LLongMem, 0, 0} },
@@ -529,13 +521,13 @@ static const template i386_optab[] = {
 
 /* store (no pop) */
 {"fst",	   1, 0xddd0, X, 0,	 FP|ShortForm,		{ FloatReg, 0, 0} },
-{"fst",	   1,	0xd9, 2, 0,	 sld_FP|FloatMF|Modrm,	{ LongMem|LLongMem, 0, 0} },
+{"fst",	   1,	0xd9, 2, 0,	 sl_FP|FloatMF|Modrm,	{ LongMem|LLongMem, 0, 0} },
 {"fst",	   1, 0xddd0, X, 0,	 l_FP|ShortForm|Ugh,	{ FloatReg, 0, 0} },
-{"fist",   1,	0xdf, 2, 0,	 sld_FP|FloatMF|Modrm,	{ ShortMem|LongMem, 0, 0} },
+{"fist",   1,	0xdf, 2, 0,	 sl_FP|FloatMF|Modrm,	{ ShortMem|LongMem, 0, 0} },
 
 /* store (with pop) */
 {"fstp",   1, 0xddd8, X, 0,	 FP|ShortForm,		{ FloatReg, 0, 0} },
-{"fstp",   1,	0xd9, 3, 0,	 sld_FP|FloatMF|Modrm,	{ LongMem|LLongMem, 0, 0} },
+{"fstp",   1,	0xd9, 3, 0,	 sl_FP|FloatMF|Modrm,	{ LongMem|LLongMem, 0, 0} },
 {"fstp",   1, 0xddd8, X, 0,	 l_FP|ShortForm|Ugh,	{ FloatReg, 0, 0} },
 /* Intel Syntax */
 {"fstp",   1,	0xdb, 7, 0,	 x_FP|Modrm,		{ LLongMem, 0, 0} },
@@ -556,7 +548,7 @@ static const template i386_optab[] = {
 {"fcom",   1, 0xd8d0, X, 0,	 FP|ShortForm,		{ FloatReg, 0, 0} },
 /* alias for fcom %st(1) */
 {"fcom",   0, 0xd8d1, X, 0,	 FP,			{ 0, 0, 0} },
-{"fcom",   1,	0xd8, 2, 0,	 sld_FP|FloatMF|Modrm,	{ LongMem|LLongMem, 0, 0} },
+{"fcom",   1,	0xd8, 2, 0,	 sl_FP|FloatMF|Modrm,	{ LongMem|LLongMem, 0, 0} },
 {"fcom",   1, 0xd8d0, X, 0,	 l_FP|ShortForm|Ugh,	{ FloatReg, 0, 0} },
 {"ficom",  1,	0xde, 2, 0,	 sl_FP|FloatMF|Modrm,	{ ShortMem|LongMem, 0, 0} },
 
@@ -564,7 +556,7 @@ static const template i386_optab[] = {
 {"fcomp",  1, 0xd8d8, X, 0,	 FP|ShortForm,		{ FloatReg, 0, 0} },
 /* alias for fcomp %st(1) */
 {"fcomp",  0, 0xd8d9, X, 0,	 FP,			{ 0, 0, 0} },
-{"fcomp",  1,	0xd8, 3, 0,	 sld_FP|FloatMF|Modrm,	{ LongMem|LLongMem, 0, 0} },
+{"fcomp",  1,	0xd8, 3, 0,	 sl_FP|FloatMF|Modrm,	{ LongMem|LLongMem, 0, 0} },
 {"fcomp",  1, 0xd8d8, X, 0,	 l_FP|ShortForm|Ugh,	{ FloatReg, 0, 0} },
 {"ficomp", 1,	0xde, 3, 0,	 sl_FP|FloatMF|Modrm,	{ ShortMem|LongMem, 0, 0} },
 {"fcompp", 0, 0xded9, X, 0,	 FP,			{ 0, 0, 0} },
@@ -600,8 +592,8 @@ static const template i386_optab[] = {
 /* alias for faddp */
 {"fadd",   0, 0xdec1, X, 0,	 FP|Ugh,		{ 0, 0, 0} },
 #endif
-{"fadd",   1,	0xd8, 0, 0,	 sld_FP|FloatMF|Modrm,	{ LongMem|LLongMem, 0, 0} },
-{"fiadd",  1,	0xde, 0, 0,	 sld_FP|FloatMF|Modrm,	{ ShortMem|LongMem, 0, 0} },
+{"fadd",   1,	0xd8, 0, 0,	 sl_FP|FloatMF|Modrm,	{ LongMem|LLongMem, 0, 0} },
+{"fiadd",  1,	0xde, 0, 0,	 sl_FP|FloatMF|Modrm,	{ ShortMem|LongMem, 0, 0} },
 
 {"faddp",  2, 0xdec0, X, 0,	 FP|ShortForm,		{ FloatAcc, FloatReg, 0} },
 {"faddp",  1, 0xdec0, X, 0,	 FP|ShortForm,		{ FloatReg, 0, 0} },
@@ -616,7 +608,7 @@ static const template i386_optab[] = {
 /* alias for fsubp */
 {"fsub",   0, 0xdee1, X, 0,	 FP|Ugh,		{ 0, 0, 0} },
 #endif
-{"fsub",   1,	0xd8, 4, 0,	 sld_FP|FloatMF|Modrm,	{ LongMem|LLongMem, 0, 0} },
+{"fsub",   1,	0xd8, 4, 0,	 sl_FP|FloatMF|Modrm,	{ LongMem|LLongMem, 0, 0} },
 {"fisub",  1,	0xde, 4, 0,	 sl_FP|FloatMF|Modrm,	{ ShortMem|LongMem, 0, 0} },
 
 #if SYSV386_COMPAT
@@ -639,7 +631,7 @@ static const template i386_optab[] = {
 /* alias for fsubrp */
 {"fsubr",  0, 0xdee9, X, 0,	 FP|Ugh,		{ 0, 0, 0} },
 #endif
-{"fsubr",  1,	0xd8, 5, 0,	 sld_FP|FloatMF|Modrm,	{ LongMem|LLongMem, 0, 0} },
+{"fsubr",  1,	0xd8, 5, 0,	 sl_FP|FloatMF|Modrm,	{ LongMem|LLongMem, 0, 0} },
 {"fisubr", 1,	0xde, 5, 0,	 sl_FP|FloatMF|Modrm,	{ ShortMem|LongMem, 0, 0} },
 
 #if SYSV386_COMPAT
@@ -662,8 +654,8 @@ static const template i386_optab[] = {
 /* alias for fmulp */
 {"fmul",   0, 0xdec9, X, 0,	 FP|Ugh,		{ 0, 0, 0} },
 #endif
-{"fmul",   1,	0xd8, 1, 0,	 sld_FP|FloatMF|Modrm,	{ LongMem|LLongMem, 0, 0} },
-{"fimul",  1,	0xde, 1, 0,	 sld_FP|FloatMF|Modrm,	{ ShortMem|LongMem, 0, 0} },
+{"fmul",   1,	0xd8, 1, 0,	 sl_FP|FloatMF|Modrm,	{ LongMem|LLongMem, 0, 0} },
+{"fimul",  1,	0xde, 1, 0,	 sl_FP|FloatMF|Modrm,	{ ShortMem|LongMem, 0, 0} },
 
 {"fmulp",  2, 0xdec8, X, 0,	 FP|ShortForm,		{ FloatAcc, FloatReg, 0} },
 {"fmulp",  1, 0xdec8, X, 0,	 FP|ShortForm,		{ FloatReg, 0, 0} },
@@ -677,8 +669,8 @@ static const template i386_optab[] = {
 /* alias for fdivp */
 {"fdiv",   0, 0xdef1, X, 0,	 FP|Ugh,		{ 0, 0, 0} },
 #endif
-{"fdiv",   1,	0xd8, 6, 0,	 sld_FP|FloatMF|Modrm,	{ LongMem|LLongMem, 0, 0} },
-{"fidiv",  1,	0xde, 6, 0,	 sld_FP|FloatMF|Modrm,	{ ShortMem|LongMem, 0, 0} },
+{"fdiv",   1,	0xd8, 6, 0,	 sl_FP|FloatMF|Modrm,	{ LongMem|LLongMem, 0, 0} },
+{"fidiv",  1,	0xde, 6, 0,	 sl_FP|FloatMF|Modrm,	{ ShortMem|LongMem, 0, 0} },
 
 #if SYSV386_COMPAT
 {"fdivp",  2, 0xdef0, X, 0,	 FP|ShortForm,		{ FloatAcc, FloatReg, 0} },
@@ -700,7 +692,7 @@ static const template i386_optab[] = {
 /* alias for fdivrp */
 {"fdivr",  0, 0xdef9, X, 0,	 FP|Ugh,		{ 0, 0, 0} },
 #endif
-{"fdivr",  1,	0xd8, 7, 0,	 sld_FP|FloatMF|Modrm,	{ LongMem|LLongMem, 0, 0} },
+{"fdivr",  1,	0xd8, 7, 0,	 sl_FP|FloatMF|Modrm,	{ LongMem|LLongMem, 0, 0} },
 {"fidivr", 1,	0xde, 7, 0,	 sl_FP|FloatMF|Modrm,	{ ShortMem|LongMem, 0, 0} },
 
 #if SYSV386_COMPAT
@@ -1075,24 +1067,16 @@ static const template i386_optab[] = {
 #undef b_Suf
 #undef w_Suf
 #undef l_Suf
-#undef d_Suf
 #undef x_Suf
 #undef bw_Suf
 #undef bl_Suf
 #undef wl_Suf
-#undef wld_Suf
 #undef sl_Suf
-#undef sld_Suf
-#undef sldx_Suf
 #undef bwl_Suf
-#undef bwld_Suf
 #undef FP
 #undef l_FP
-#undef d_FP
 #undef x_FP
 #undef sl_FP
-#undef sld_FP
-#undef sldx_FP
 
 #define MAX_MNEM_SIZE 16	/* for parsing insn mnemonics from input */
 
