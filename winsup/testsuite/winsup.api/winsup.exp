@@ -48,7 +48,7 @@ foreach src [glob -nocomplain $srcdir/$subdir/*.c $srcdir/$subdir/*/*.c] {
 	clear_xfail
     }
 
-    ws_spawn "$CC -g3 -mwin32 $CFLAGS $src $add_includes $add_libs $runtime_root/binmode.o $runtime_root/new-libcygwin.a -o $base.exe"
+    ws_spawn "$CC -g3 -nodefaultlibs -mwin32 $CFLAGS $src $add_includes $add_libs $runtime_root/binmode.o -lgcc $runtime_root/new-libcygwin.a -lkernel32 -luser32 -o $base.exe"
     if { $rv != "" } {
 	verbose -log "$rv"
 	fail "$testcase (compile)"

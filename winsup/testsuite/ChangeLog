@@ -1,3 +1,10 @@
+2002-08-25  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (RUNTEST): Use Makefile's srcdir and bupdir* macros,
+	where appropriate.
+	* winsup.api/winsup.exp: Use -nodefaultlibs when linking executable to
+	avoid potentially linking installed dll.
+
 2002-07-06  Christopher Faylor  <cgf@redhat.com>
 
 	* testsuite/winsup.api/winsup.exp: Add -mwin32 to gcc flags so
