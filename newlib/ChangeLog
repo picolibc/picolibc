@@ -1,3 +1,11 @@
+2003-10-23  Artem B. Bityuckiy  <mail_lists@mail.ru>
+
+	* libc/string/wcsnlen.c: New file.
+	* libc/include/wchar.h: Add wcsnlen prototype.
+	* libc/string/Makefile.am: Add wcsnlen support.
+	* libc/string/Makefile.in: Regenerated.
+	* libc/string/wcstrings.tex: Add wcsnlen documentation.
+
 2003-10-22  Richard Sandiford  <rsandifo@redhat.com>
 
 	* libc/stdlib/exit.c (exit): Handle null _GLOBAL_REENT->_atexits.

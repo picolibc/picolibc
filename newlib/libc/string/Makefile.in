@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.4 from Makefile.am
+# Makefile.in generated automatically by automake 1.4-p5 from Makefile.am
 
-# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999, 2001 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -163,6 +163,7 @@ GENERAL_SOURCES = \
 	wcsncat.c \
 	wcsncmp.c \
 	wcsncpy.c \
+	wcsnlen.c \
 	wcspbrk.c \
 	wcsrchr.c \
 	wcsspn.c \
@@ -206,11 +207,12 @@ memcmp.def	strchr.def	strlen.def	strnlen.def strspn.def \
 strcasecmp.def	strncasecmp.def strlwr.def	strupr.def  memccpy.def \
 mempcpy.def \
 wcscat.def	wcschr.def	wcscmp.def	wcscoll.def \
-wcscpy.def wcscspn.def \
-wcslcat.def	wcslcpy.def	wcslen.def	wcsncat.def wcsncmp.def \
-wcsncpy.def	wcspbrk.def	wcsrchr.def	wcsspn.def wcsstr.def \
-wcswidth.def	wcwidth.def	wmemchr.def	wmemcmp.def wmemcpy.def \
-wmemmove.def	wmemset.def
+wcscpy.def	wcscspn.def \
+wcslcat.def	wcslcpy.def	wcslen.def	wcsncat.def \
+wcsncmp.def	wcsncpy.def	wcsnlen.def	wcspbrk.def \
+wcsrchr.def	wcsspn.def	wcsstr.def \
+wcswidth.def	wcwidth.def	wmemchr.def \
+wmemcmp.def	wmemcpy.def	wmemmove.def	wmemset.def
 
 
 SUFFIXES = .def
@@ -248,10 +250,12 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@wcscpy.$(OBJEXT) wcscspn.$(OBJEXT) wcslcat.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@wcslcpy.$(OBJEXT) wcslen.$(OBJEXT) wcsncat.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@wcsncmp.$(OBJEXT) wcsncpy.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@wcspbrk.$(OBJEXT) wcsrchr.$(OBJEXT) wcsspn.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@wcsstr.$(OBJEXT) wcswidth.$(OBJEXT) wcwidth.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@wmemchr.$(OBJEXT) wmemcmp.$(OBJEXT) wmemcpy.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@wmemmove.$(OBJEXT) wmemset.$(OBJEXT)
+@USE_LIBTOOL_FALSE@wcsnlen.$(OBJEXT) wcspbrk.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wcsrchr.$(OBJEXT) wcsspn.$(OBJEXT) wcsstr.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wcswidth.$(OBJEXT) wcwidth.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wmemchr.$(OBJEXT) wmemcmp.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wmemcpy.$(OBJEXT) wmemmove.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wmemset.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 @USE_LIBTOOL_TRUE@libstring_la_OBJECTS =  bcopy.lo bzero.lo index.lo \
@@ -265,9 +269,10 @@ LTLIBRARIES =  $(noinst_LTLIBRARIES)
 @USE_LIBTOOL_TRUE@strupr.lo strxfrm.lo strstr.lo swab.lo u_strerr.lo \
 @USE_LIBTOOL_TRUE@wcscat.lo wcschr.lo wcscmp.lo wcscoll.lo wcscpy.lo \
 @USE_LIBTOOL_TRUE@wcscspn.lo wcslcat.lo wcslcpy.lo wcslen.lo wcsncat.lo \
-@USE_LIBTOOL_TRUE@wcsncmp.lo wcsncpy.lo wcspbrk.lo wcsrchr.lo wcsspn.lo \
-@USE_LIBTOOL_TRUE@wcsstr.lo wcswidth.lo wcwidth.lo wmemchr.lo wmemcmp.lo \
-@USE_LIBTOOL_TRUE@wmemcpy.lo wmemmove.lo wmemset.lo
+@USE_LIBTOOL_TRUE@wcsncmp.lo wcsncpy.lo wcsnlen.lo wcspbrk.lo \
+@USE_LIBTOOL_TRUE@wcsrchr.lo wcsspn.lo wcsstr.lo wcswidth.lo wcwidth.lo \
+@USE_LIBTOOL_TRUE@wmemchr.lo wmemcmp.lo wmemcpy.lo wmemmove.lo \
+@USE_LIBTOOL_TRUE@wmemset.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
