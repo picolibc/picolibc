@@ -77,7 +77,7 @@ do_mount (const char *dev, const char *where, int flags)
   else if (!(statbuf.st_mode & S_IFDIR))
     {
       if (force == FALSE)
-	fprintf (stderr, "%s: warning: %s is not a directory!\n", progname, where);
+	fprintf (stderr, "%s: warning: %s is not a directory.\n", progname, where);
     }    
 
   exit (0);
@@ -207,25 +207,31 @@ mount_already_exists (const char *posix_path, int flags)
       /* if the paths match, and they're both the same type of mount. */
       if (strcmp (p->mnt_dir, posix_path) == 0)
 	{
-	  if (p->mnt_type[0] == 'u' && !(flags & MOUNT_SYSTEM)) /* both current_user */
+	  if (p->mnt_type[0] == 'u')
 	    {
-	      found_matching = 1;
-	      break;
-	    }
-	  else if (p->mnt_type[0] == 's' && (flags & MOUNT_SYSTEM)) /* both system */
-	    {
-	      found_matching = 1;
-	      break;
-	    }
-	  else if (strchr ("su", p->mnt_type[0]))
-            {
-	      fprintf (stderr, "%s: warning -- there's already a %s mount point to '%s'.\n", progname, p->mnt_type, posix_path);
-	      fprintf (stderr, "%*s  (user mount points cover system mount points!)\n", strlen (progname), " ");
+              if (!(flags & MOUNT_SYSTEM)) /* both current_user */
+                found_matching = 1;
+              else
+	        fprintf (stderr,
+                         "%s: warning: system mount point of '%s' "
+                         "will always be masked by user mount.\n",
+                         progname, posix_path);
 	      break;
             }
+	  else if (p->mnt_type[0] == 's')
+	    {
+              if (flags & MOUNT_SYSTEM) /* both system */
+                found_matching = 1;
+              else
+	        fprintf (stderr,
+                         "%s: warning: user mount point of '%s' "
+                         "masks system mount.\n",
+                         progname, posix_path);
+	      break;
+	    }
 	  else
 	    {
-	      fprintf (stderr, "%s: warning -- couldn't determine mount type.\n", progname);
+	      fprintf (stderr, "%s: warning: couldn't determine mount type.\n", progname);
 	      break;
 	    }
 	}
