@@ -43,7 +43,7 @@ applies.</para>
 </listitem>
 <listitem>
 <para>If the file appears to reside on a file system that is not mounted
-(as can happen when the path contains a drive letter), the default is text.
+(as can happen when the path contains a drive letter), the default is binary.
 </para>
 </listitem>
 <listitem>

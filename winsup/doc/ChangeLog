@@ -1,3 +1,7 @@
+2004-09-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* textbinary.sgml: Change default mode for non-mounted paths to binary.
+
 2004-07-16  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
 	* how-resources.texinfo: Update documentation to /usr/share/doc.
