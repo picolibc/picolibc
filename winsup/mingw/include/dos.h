@@ -46,15 +46,8 @@
 extern "C" {
 #endif
 
+#ifndef __MSVCRT__ /* these are in CRTDLL, but not MSVCRT */
 #ifndef __DECLSPEC_SUPPORTED
-
-extern char** __imp__pgmptr_dll;
-#define _pgmptr (*__imp__pgmptr_dll)
-
-/* Wide character equivalent */
-extern wchar_t** __imp_wpgmptr_dll;
-#define _wpgmptr (*__imp__wpgmptr_dll)
-
 extern unsigned int *__imp__basemajor_dll;
 extern unsigned int *__imp__baseminor_dll;
 extern unsigned int *__imp__baseversion_dll;
@@ -71,13 +64,6 @@ extern unsigned int *__imp__osmode_dll;
 
 #else /* __DECLSPEC_SUPPORTED */
 
-__MINGW_IMPORT char* _pgmptr_dll;
-#define _pgmptr _pgmptr_dll
-
-/* Wide character equivalent */
-__MINGW_IMPORT wchar_t* _wpgmptr_dll;
-#define _wpgmptr _wpgmptr_dll
-
 __MINGW_IMPORT unsigned int _basemajor_dll;
 __MINGW_IMPORT unsigned int _baseminor_dll;
 __MINGW_IMPORT unsigned int _baseversion_dll;
@@ -93,6 +79,7 @@ __MINGW_IMPORT unsigned int _osmode_dll;
 #define _osmode _osmode_dll
 
 #endif /* __DECLSPEC_SUPPORTED */
+#endif /* ! __MSVCRT__ */
 
 #ifndef _DISKFREE_T_DEFINED
 /* needed by _getdiskfree (also in direct.h) */

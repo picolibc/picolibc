@@ -1,3 +1,15 @@
+2001-01-28  Danny Smith  <danny_r_smith_2001@yahoo.co.nz>
+
+	*include/stdlib.h (__p__pgmptr): add prototype.
+	(__p__wpgmptr): likewise.
+	(_pgmptr_dll): move declaration from dos.h.
+	(_wpgmptr_dll): likewise.
+	(_pgmptr): conditional define (MSVCT/CRTDLL).
+	(_wpgmptr): likewise.
+	*include/dos.h (_base*_dll variables): declare only for CRTDLL.
+	(_os*_dll variables): likewise.
+	(_pgmptr_dll): remove declaration and associated defines to stdlib.h.
+	(_wpgmptr_dll): likewise.
 
 2001-01-22  Danny Smith  <danny_r_smith_2001@yahoo.co.nz>
 
