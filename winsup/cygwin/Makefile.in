@@ -351,7 +351,7 @@ uninstall-man:
 	done
 
 clean:
-	-rm -f *.o *.dll *.a *.exp junk *.base version.cc regexp/*.o winver_stamp *.exe *.d *stamp* *_magic.h sigfe.s
+	-rm -f *.o *.dll *.a *.exp junk *.base version.cc regexp/*.o winver_stamp *.exe *.d *stamp* *_magic.h sigfe.s cygwin.def
 	-@$(MAKE) -C $(bupdir)/cygserver libclean
 
 maintainer-clean realclean: clean
