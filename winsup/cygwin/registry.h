@@ -18,8 +18,7 @@ private:
 public:
 
   reg_key (HKEY toplev, REGSAM access, ...);
-  reg_key (REGSAM access, ...);
-  reg_key (REGSAM access = KEY_ALL_ACCESS);
+  reg_key (bool isHKLM, REGSAM access, ...);
 
   void *operator new (size_t, void *p) {return p;}
   void build_reg (HKEY key, REGSAM access, va_list av);

@@ -640,29 +640,22 @@ static bool __stdcall
 regopt (const char *name)
 {
   bool parsed_something = false;
-  /* FIXME: should not be under mount */
-  reg_key r (KEY_READ, CYGWIN_INFO_PROGRAM_OPTIONS_NAME, NULL);
   char buf[CYG_MAX_PATH];
   char lname[strlen (name) + 1];
   strlwr (strcpy (lname, name));
 
-  if (r.get_string (lname, buf, sizeof (buf) - 1, "") == ERROR_SUCCESS)
+  for (int i = 0; i < 2; i++)
     {
-      parse_options (buf);
-      parsed_something = true;
-    }
-  else
-    {
-      reg_key r1 (HKEY_LOCAL_MACHINE, KEY_READ, "SOFTWARE",
-		  CYGWIN_INFO_CYGNUS_REGISTRY_NAME,
-		  CYGWIN_INFO_CYGWIN_REGISTRY_NAME,
-		  CYGWIN_INFO_PROGRAM_OPTIONS_NAME, NULL);
-      if (r1.get_string (lname, buf, sizeof (buf) - 1, "") == ERROR_SUCCESS)
+      reg_key r (i, KEY_READ, CYGWIN_INFO_PROGRAM_OPTIONS_NAME, NULL);
+
+      if (r.get_string (lname, buf, sizeof (buf) - 1, "") == ERROR_SUCCESS)
 	{
 	  parse_options (buf);
 	  parsed_something = true;
+	  break;
 	}
     }
+
   MALLOC_CHECK;
   return parsed_something;
 }

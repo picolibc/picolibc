@@ -250,22 +250,20 @@ shared_info::heap_chunk_size ()
 {
   if (!heap_chunk)
     {
-      /* Fetch misc. registry entries.  */
+      /* Fetch from registry, first user then local machine.  */
+      for (int i = 0; i < 2; i++)
+	{
+	  reg_key reg (i, KEY_READ, NULL);
 
-      reg_key reg (KEY_READ, NULL);
+	  /* Note that reserving a huge amount of heap space does not result in
+	     the use of swap since we are not committing it. */
+	  /* FIXME: We should not be restricted to a fixed size heap no matter
+	     what the fixed size is. */
 
-      /* Note that reserving a huge amount of heap space does not result in
-      the use of swap since we are not committing it. */
-      /* FIXME: We should not be restricted to a fixed size heap no matter
-      what the fixed size is. */
-
-      heap_chunk = reg.get_int ("heap_chunk_in_mb", 0);
-      if (!heap_chunk) {
-	reg_key r1 (HKEY_LOCAL_MACHINE, KEY_READ, "SOFTWARE",
-		    CYGWIN_INFO_CYGNUS_REGISTRY_NAME,
-		    CYGWIN_INFO_CYGWIN_REGISTRY_NAME, NULL);
-	heap_chunk = r1.get_int ("heap_chunk_in_mb", 384);
-      }
+	  if ((heap_chunk = reg.get_int ("heap_chunk_in_mb", 0)))
+	    break;
+	  heap_chunk = 384; /* Default */
+	}
 
       if (heap_chunk < 4)
 	heap_chunk = 4 * 1024 * 1024;

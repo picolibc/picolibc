@@ -70,10 +70,6 @@ class mount_info
   int native_sorted[MAX_MOUNTS];
 
  public:
-  /* Increment when setting up a reg_key if mounts area had to be
-     created so we know when we need to import old mount tables. */
-  int had_to_create_mount_areas;
-
   void init ();
   int add_item (const char *dev, const char *path, unsigned flags, int reg_p);
   int del_item (const char *path, unsigned flags, int reg_p);

@@ -13,8 +13,12 @@ details. */
 #include "registry.h"
 #include "security.h"
 #include <cygwin/version.h>
-
-static char NO_COPY cygnus_class[] = "cygnus";
+#include "path.h"
+#include "fhandler.h"
+#include "dtable.h"
+#include "cygerrno.h"
+#include "cygheap.h"
+static const char cygnus_class[] = "cygnus";
 
 reg_key::reg_key (HKEY top, REGSAM access, ...)
 {
@@ -24,28 +28,44 @@ reg_key::reg_key (HKEY top, REGSAM access, ...)
   va_end (av);
 }
 
-reg_key::reg_key (REGSAM access, ...)
+/* Opens a key under the appropriate Cygwin key.
+   Do not use HKCU per MS KB 199190  */
+ 
+reg_key::reg_key (bool isHKLM, REGSAM access, ...)
 {
   va_list av;
+  HKEY top;
 
-  new (this) reg_key (HKEY_CURRENT_USER, access, "SOFTWARE",
-		 CYGWIN_INFO_CYGNUS_REGISTRY_NAME,
-		 CYGWIN_INFO_CYGWIN_REGISTRY_NAME, NULL);
-
-  HKEY top = key;
+  if (isHKLM)
+    top = HKEY_LOCAL_MACHINE;
+  else
+    {
+      char name[128]; 
+      const char *names[2] = {cygheap->user.get_windows_id (name), ".DEFAULT"}; 
+      for (int i = 0; i < 2; i++)
+	{
+	  key_is_invalid = RegOpenKeyEx (HKEY_USERS, names[i], 0, access, &top);
+	  if (key_is_invalid == ERROR_SUCCESS)
+	    goto OK;
+	  debug_printf ("HKU\\%s failed, Win32 error %ld", names[i], key_is_invalid);
+	}
+      return;
+    }
+OK:
+  new (this) reg_key (top, access, "SOFTWARE", 
+		      CYGWIN_INFO_CYGNUS_REGISTRY_NAME,
+		      CYGWIN_INFO_CYGWIN_REGISTRY_NAME, NULL);
+  if (top != HKEY_LOCAL_MACHINE)
+    RegCloseKey (top);
+  if (key_is_invalid)
+    return;
+    
+  top = key;
   va_start (av, access);
-  build_reg (top, KEY_READ, av);
+  build_reg (top, access, av);
   va_end (av);
   if (top != key)
     RegCloseKey (top);
-}
-
-reg_key::reg_key (REGSAM access)
-{
-  new (this) reg_key (HKEY_CURRENT_USER, access, "SOFTWARE",
-		 CYGWIN_INFO_CYGNUS_REGISTRY_NAME,
-		 CYGWIN_INFO_CYGWIN_REGISTRY_NAME,
-		 CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME, NULL);
 }
 
 void
@@ -62,16 +82,15 @@ reg_key::build_reg (HKEY top, REGSAM access, va_list av)
 
   while ((name = va_arg (av, char *)) != NULL)
     {
-      DWORD disp;
       int res = RegCreateKeyExA (r,
 				 name,
 				 0,
-				 cygnus_class,
+				 (char *) cygnus_class,
 				 REG_OPTION_NON_VOLATILE,
 				 access,
 				 &sec_none_nih,
 				 &key,
-				 &disp);
+				 NULL);
       if (r != top)
 	RegCloseKey (r);
       r = key;
@@ -81,12 +100,6 @@ reg_key::build_reg (HKEY top, REGSAM access, va_list av)
 	  debug_printf ("failed to create key %s in the registry", name);
 	  break;
 	}
-
-      /* If we're considering the mounts key, check if it had to
-	 be created and set had_to_create appropriately. */
-      if (strcmp (name, CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME) == 0)
-	if (disp == REG_CREATED_NEW_KEY)
-	  mount_table->had_to_create_mount_areas++;
     }
 }
 
