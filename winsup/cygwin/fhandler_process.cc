@@ -97,7 +97,7 @@ fhandler_process::exists ()
 }
 
 fhandler_process::fhandler_process ():
-  fhandler_proc (FH_PROCESS)
+  fhandler_proc ()
 {
 }
 
