@@ -1,3 +1,14 @@
+2003-05-28  Dhananjay Deshpande  <dhananjayd@kpitcummins.com> 
+
+	* newlib/libc/machine/h8300/memcpy.S: Use .h8300hn and .h8300sn for 
+	normal mode
+	* newlib/libc/machine/h8300/memset.S: Likewise
+	* newlib/lib/machine/h8300/reg_memcpy.S: Likewise
+	* newlib/lib/machine/h8300/reg_memset.S: Likewise
+	* newlib/lib/machine/h8300/setjmp.S: Likewise
+	* newlib/lib/machine/h8300/strcmp.S: Likewise
+	* newlib/lib/sys/h8300hms/crt0.S: Likewise
+
 2003-05-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/ctype/ctype_.c: Remove checks for deprecated __CYGWIN32__.
