@@ -2722,7 +2722,7 @@ BOOL WINAPI wglDeleteContext(HGLRC);
 BOOL WINAPI wglDescribeLayerPlane(HDC,int,int,UINT,LPLAYERPLANEDESCRIPTOR);
 HGLRC WINAPI wglGetCurrentContext(void);
 HDC WINAPI wglGetCurrentDC(void);
-int WINAPI wglGetLayerPaletteEntries(HDC,int,int,int,CONST COLORREF*);
+int WINAPI wglGetLayerPaletteEntries(HDC,int,int,int,COLORREF*);
 PROC WINAPI wglGetProcAddress(LPCSTR);
 BOOL WINAPI wglMakeCurrent(HDC,HGLRC);
 BOOL WINAPI wglRealizeLayerPalette(HDC,int,BOOL);

@@ -1,3 +1,8 @@
+2002-12-30  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/wingdi.h (wglGetLayerPaletteEntries): Correct
+	prototype. Thanks to: Joe Krahn  <jkrahn at nc dot rr dot com>.
+
 2002-12-26  Dimitri Papadopoulos  <dimitri_at@sourceforge.users.net>
 
 	* include/wingdi.h (DOCINFOA): Replace LPCTSTR with LPCSTR.
@@ -1397,7 +1402,6 @@
 
 	* include/winnt.h (FILE_ATTRIBUTE_ENCRYPTED): Correct constant.
 	(FILE_ATTRIBUTE_DEVICE): Add define.
-
 
 2002-01-14  Corinna Vinschen  <vinschen@redhat.com>
 
