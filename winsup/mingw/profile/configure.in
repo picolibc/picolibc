@@ -16,7 +16,7 @@ dnl You should have received a copy of the GNU General Public License
 dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-AC_PREREQ(2.12)
+AC_PREREQ(2.13)
 AC_INIT(gcrt0.c)
 
 CC=${CC-cc}
@@ -36,18 +36,18 @@ AC_SUBST(DLLWRAP)
 AC_CANONICAL_SYSTEM
 
 case "$target_os" in
-*mingw32msvc*)
-  CRT_ID=2
+*mingw32crt*)
+  CRT_ID=1
   MNO_CYGWIN=
-  RUNTIME=msvcrt
-  THREAD_DLL=mingwm
+  RUNTIME=crtdll
+  THREAD_DLL=mingwc
   LIBM_A=libm.a
   LIBGMON_A=libgmon.a
   ;;
 *cygwin*)
-  CRT_ID=1
+  CRT_ID=2
   MNO_CYGWIN=-mno-cygwin
-  RUNTIME=crtdll
+  RUNTIME=msvcrt
   THREAD_DLL=mingwc
   # Do not build libm.a when building under Cygwin winsup. Otherwise, it'll
   # overwrite Cygwin's one. Likewise for libgmon.a.
@@ -55,11 +55,11 @@ case "$target_os" in
   LIBGMON_A=
   ;;
 *)
-  # Build it for CRTDLL by default.
-  CRT_ID=1
+  # Build it for MSVCRT by default.
+  CRT_ID=2
   MNO_CYGWIN=
-  RUNTIME=crtdll
-  THREAD_DLL=mingwc
+  RUNTIME=msvcrt
+  THREAD_DLL=mingwm
   LIBM_A=libm.a
   LIBGMON_A=libgmon.a
   ;;

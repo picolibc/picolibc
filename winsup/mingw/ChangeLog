@@ -1,4 +1,10 @@
 
+2001-06-11  Danny Smith  <danny_r_smith_2001@yahoo.co.nz>
+
+	* profile/configure.in: Make msvcrt.dll version default.
+	* profile/makefile.in: Build both gcrt1.o and gcrt2.o.	
+	* provile/configure: Regenerate.
+
 2001-06-11  Mattia Barbon  <mbarbon@dsi.unive.it>
 
 	* include/stdio.h (swscanf): Make first arugument const. 

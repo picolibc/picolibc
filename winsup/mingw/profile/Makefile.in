@@ -65,7 +65,7 @@ DLLTOOL_FLAGS = --as $(AS_FOR_TARGET)
 
 LIBGMON_A = @LIBGMON_A@
 LIBGMON_OBJS = gmon.o mcount.o profil.o
-CRT0S = gcrt$(CRT_ID).o
+CRT0S = gcrt1.o gcrt2.o
 
 LIBS = $(LIBGMON_A)
 DLLS = 

@@ -646,18 +646,18 @@ test "$host_alias" != "$target_alias" &&
 
 
 case "$target_os" in
-*mingw32msvc*)
-  CRT_ID=2
+*mingw32crt*)
+  CRT_ID=1
   MNO_CYGWIN=
-  RUNTIME=msvcrt
-  THREAD_DLL=mingwm
+  RUNTIME=crtdll
+  THREAD_DLL=mingwc
   LIBM_A=libm.a
   LIBGMON_A=libgmon.a
   ;;
 *cygwin*)
-  CRT_ID=1
+  CRT_ID=2
   MNO_CYGWIN=-mno-cygwin
-  RUNTIME=crtdll
+  RUNTIME=msvcrt
   THREAD_DLL=mingwc
   # Do not build libm.a when building under Cygwin winsup. Otherwise, it'll
   # overwrite Cygwin's one. Likewise for libgmon.a.
@@ -665,11 +665,11 @@ case "$target_os" in
   LIBGMON_A=
   ;;
 *)
-  # Build it for CRTDLL by default.
-  CRT_ID=1
+  # Build it for MSVCRT by default.
+  CRT_ID=2
   MNO_CYGWIN=
-  RUNTIME=crtdll
-  THREAD_DLL=mingwc
+  RUNTIME=msvcrt
+  THREAD_DLL=mingwm
   LIBM_A=libm.a
   LIBGMON_A=libgmon.a
   ;;
