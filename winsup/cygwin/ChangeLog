@@ -1,3 +1,8 @@
+Tue Jun 13 12:41:41 2000  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
+
+	* path.cc (mount_info::add_item): The previous patch can't handle
+	the case of overwriting a mount entry.
+
 Tue Jun 13 00:17:04 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* thread.h: Shorten "current_directory" variables to "cwd_*"

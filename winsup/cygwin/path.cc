@@ -1645,13 +1645,15 @@ mount_info::add_item (const char *native, const char *posix, unsigned mountflags
 	break;
     }
 
-  /* Can't add more than MAX_MOUNTS. */
-  if (i == nmounts && nmounts < MAX_MOUNTS)
-    i = nmounts++;
-  else
+  if (i == nmounts)
     {
-      set_errno (EMFILE);
-      return -1;
+      if (nmounts < MAX_MOUNTS)
+	i = nmounts++;
+      else
+	{
+	  set_errno (EMFILE);
+	  return -1;
+	}
     }
 
   if (reg_p && add_reg_mount (nativetmp, posixtmp, mountflags))
