@@ -1,3 +1,8 @@
+2003-03-21  Christopher Faylor  <cgf@redhat.com>
+
+	* fork.cc: Conditionalize use of slow_pid_reuse throughout.  It's not
+	necessary for newer versions of bash.
+
 2003-03-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::sendto): Restrict EPIPE and

@@ -325,6 +325,7 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   return 0;
 }
 
+#ifdef SLOW_PID_REUSE
 static void
 slow_pid_reuse (HANDLE h)
 {
@@ -349,6 +350,7 @@ slow_pid_reuse (HANDLE h)
     }
   nfork_procs++;
 }
+#endif
 
 static int __stdcall
 fork_parent (HANDLE& hParent, dll *&first_dll,
@@ -537,7 +539,9 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
       goto cleanup;
     }
 
+#ifdef SLOW_PID_REUSE
   slow_pid_reuse (pi.hProcess);
+#endif
 
   /* Wait for subproc to initialize itself. */
   if (!sync_with_child (pi, subproc_ready, TRUE, "waiting for longjmp"))
