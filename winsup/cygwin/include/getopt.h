@@ -38,13 +38,6 @@
 extern "C" {
 #endif
 
-struct option {
-	const char *name;
-	int  has_arg;
-	int *flag;
-	int val;
-};
-
 extern int   opterr;      /* if error message should be printed */
 extern int   optind;      /* index into parent argv vector */
 extern int   optopt;      /* character checked for validity */
@@ -52,6 +45,27 @@ extern int   optreset;    /* reset getopt */
 extern char *optarg;      /* argument associated with option */
 
 int getopt (int, char * const *, const char *);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __GETOPT_H__ */
+
+#ifndef __UNISTD_GETOPT__
+#ifndef __GETOPT_LONG_H__
+#define __GETOPT_LONG_H__
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+struct option {
+	const char *name;
+	int  has_arg;
+	int *flag;
+	int val;
+};
 
 int getopt_long (int, char *const *, const char *, const struct option *, int *);
 #define HAVE_DECL_GETOPT 1
@@ -64,4 +78,5 @@ int getopt_long (int, char *const *, const char *, const struct option *, int *)
 }
 #endif
 
-#endif /* __GETOPT_H__ */
+#endif /* __GETOPT_LONG_H__ */
+#endif /* __UNISTD_GETOPT__ */

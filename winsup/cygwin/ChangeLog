@@ -1,3 +1,8 @@
+2001-12-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/getopt.h: Don't define getopt_long() and friends when
+	included through unistd.h.
+
 2001-12-17  Christopher Faylor  <cgf@redhat.com>
 
 	* dtable.cc (dtable::init_std_file_from_handle): Avoid initializing
