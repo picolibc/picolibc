@@ -1,3 +1,7 @@
+Sun Apr 22 20:48:24 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* include/cygwin/version.h: Bump Cygwin version and API version.
+
 Mon Apr 23  9:27:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
 	* thread.cc (MTinterface::Init): Always initialise per process variables.

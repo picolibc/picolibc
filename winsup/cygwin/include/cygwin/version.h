@@ -41,10 +41,10 @@ details. */
 	 the Cygwin library".  This version is used to track important
 	 changes to the DLL and is mainly informative in nature. */
 
-  /* The current cygwin version is 1.3.0 */
+  /* The current cygwin version is 1.3.1 */
 
 #define CYGWIN_VERSION_DLL_MAJOR 1003
-#define CYGWIN_VERSION_DLL_MINOR 0
+#define CYGWIN_VERSION_DLL_MINOR 1
 
       /* Major numbers before CYGWIN_VERSION_DLL_EPOCH are
 	 incompatible. */
@@ -131,10 +131,11 @@ details. */
            mrand48, nrand48, seed48, and srand48.
        36: Added _cygwin_S_IEXEC, et al
        37: [f]pathconv support _PC_POSIX_PERMISSIONS and _PC_POSIX_SECURITY
+       38: vscanf, vscanf_r, and random pthread functions
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 37
+#define CYGWIN_VERSION_API_MINOR 38
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
