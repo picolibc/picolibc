@@ -1,13 +1,14 @@
 /*
- *	%G% (UofMD) %D%
+ *	Common definitions for atexit-like routines
  */
 
-#define	ATEXIT_SIZE 32	/* must be at least 32 to guarantee ANSI conformance */
-
-struct atexit {
-	struct	atexit *next;		/* next in list */
-	int	ind;			/* next index in this table */
-	void	(*fns[ATEXIT_SIZE])();	/* the table itself */
+enum __atexit_types
+{
+  __et_atexit,
+  __et_onexit,
+  __et_cxa
 };
 
-struct atexit *__atexit;	/* points to head of LIFO stack */
+void __call_exitprocs _PARAMS ((int, _PTR));
+int __register_exitproc _PARAMS ((int, void (*fn) (void), _PTR, _PTR));
+

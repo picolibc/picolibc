@@ -59,19 +59,24 @@ struct __tm
 };
 
 /*
- * atexit() support.  For _REENT_SMALL, we limit to 32 max.
+ * atexit() support.
  */
 
 #define	_ATEXIT_SIZE 32	/* must be at least 32 to guarantee ANSI conformance */
 
 struct _on_exit_args {
-	void *  _fnargs[_ATEXIT_SIZE];	        /* fn args for on_exit */
+	void *  _fnargs[_ATEXIT_SIZE];	        /* user fn args */
+	void *	_dso_handle[_ATEXIT_SIZE];
+	/* Bitmask is set if user function takes arguments.  */
 	__ULong _fntypes;           	        /* type of exit routine -
-						   Must have at least _ATEXIT_SIZE bits */
+				   Must have at least _ATEXIT_SIZE bits */
+	/* Bitmask is set if function was registered via __cxa_atexit.  */
+	__ULong _is_cxa;
 };
 
 #ifdef _REENT_SMALL
 struct _atexit {
+	struct	_atexit *_next;			/* next in list */
 	int	_ind;				/* next index in this table */
 	void	(*_fns[_ATEXIT_SIZE])(void);	/* the table itself */
         struct _on_exit_args * _on_exit_args_ptr;
@@ -80,6 +85,7 @@ struct _atexit {
 struct _atexit {
 	struct	_atexit *_next;			/* next in list */
 	int	_ind;				/* next index in this table */
+	/* Some entries may already have been called, and will be NULL.  */
 	void	(*_fns[_ATEXIT_SIZE])(void);	/* the table itself */
         struct _on_exit_args _on_exit_args;
 };
@@ -371,7 +377,8 @@ struct _reent
   void (**(_sig_func))(int);
 
   /* atexit stuff */
-  struct _atexit _atexit;
+  struct _atexit *_atexit;
+  struct _atexit _atexit0;
 
   struct _glue __sglue;			/* root of glue chain */
   __FILE *__sf;			        /* file descriptors */
@@ -399,7 +406,8 @@ struct _reent
     _NULL, \
     _NULL, \
     _NULL, \
-    {0, {_NULL}, _NULL}, \
+    _NULL, \
+    {_NULL, 0, {_NULL}, _NULL}, \
     {_NULL, 0, _NULL}, \
     _NULL, \
     {_NULL, 0, 0, 0, 0, {_NULL, 0}, 0, _NULL}, \
@@ -426,9 +434,11 @@ struct _reent
     var->_localtime_buf = _NULL; \
     var->_asctime_buf = _NULL; \
     var->_sig_func = _NULL; \
-    var->_atexit._ind = 0; \
-    var->_atexit._fns[0] = _NULL; \
-    var->_atexit._on_exit_args = _NULL; \
+    var->_atexit = _NULL; \
+    var->_atexit0._next = _NULL; \
+    var->_atexit0._ind = 0; \
+    var->_atexit0._fns[0] = _NULL; \
+    var->_atexit0._on_exit_args_ptr = _NULL; \
     var->__sglue._next = _NULL; \
     var->__sglue._niobs = 0; \
     var->__sglue._iobs = _NULL; \
@@ -673,7 +683,7 @@ struct _reent
       } \
     }, \
     _NULL, \
-    {_NULL, 0, {_NULL}, {{_NULL}, 0}}, \
+    {_NULL, 0, {_NULL}, {{_NULL}, {_NULL}, 0, 0}}, \
     _NULL, \
     {_NULL, 0, _NULL} \
   }

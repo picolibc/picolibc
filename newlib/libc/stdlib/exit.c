@@ -48,6 +48,7 @@ Supporting OS subroutines required: <<_exit>>.
 #include <stdlib.h>
 #include <unistd.h>	/* for _exit() declaration */
 #include <reent.h>
+#include "atexit.h"
 
 #ifndef _REENT_ONLY
 
@@ -59,43 +60,7 @@ void
 _DEFUN (exit, (code),
 	int code)
 {
-  register struct _atexit *p;
-  register struct _on_exit_args * args;
-  register int n;
-  int i;
-
-#ifdef _REENT_SMALL
-  p = &_GLOBAL_REENT->_atexit;
-  args = p->_on_exit_args_ptr;
-  
-  if (args == NULL)
-    {
-      for (n = p->_ind; n--;)
-        p->_fns[n] ();
-    }
-  else
-    {
-      for (n = p->_ind - 1, i = (n >= 0) ? (1 << n) : 0; n >= 0; --n, i >>= 1)
-        if (args->_fntypes & i)
-          (*((void (*)(int, void *)) p->_fns[n]))(code, args->_fnargs[n]);
-        else
-          p->_fns[n] ();
-    }
-#else
-  p = _GLOBAL_REENT->_atexit;
-  while (p)
-    {
-      args = & p->_on_exit_args;
-  
-      for (n = p->_ind - 1, i = (n >= 0) ? (1 << n) : 0; n >= 0; --n, i >>= 1)
-        if (args->_fntypes & i)
-          (*((void (*)(int, void *)) p->_fns[n]))(code, args->_fnargs[n]);
-        else
-          p->_fns[n] ();
-
-      p = p->_next;
-    }
-#endif
+  __call_exitprocs (code, NULL);
 
   if (_GLOBAL_REENT->__cleanup)
     (*_GLOBAL_REENT->__cleanup) (_GLOBAL_REENT);

@@ -1,3 +1,26 @@
+2004-09-09  Paul Brook  <paul@codesourcery.com>
+
+	* libc/include/sys/reent.h (struct _on_exit_args): Add _dso_handle
+	and _is_cxa.
+	(struct _atexit): Add _next when _REENT_SMALL.
+	(struct _reent): Add _atexit0 when _REENT_SMALL.
+	(_REENT_INIT_PTR): Adjust.
+	* libc/stdlib/Makefile.am (GENERAL_SOURCES): Add __atexit.c and
+	__call_exit.c.
+	(EXTENDED_SOURCES): Add cxa_atexit.c and cxa_finalize.c.
+	* libc/stdlib/Makefile.in: Regenerate.
+	* libc/stdlib/__atexit.c: New file.
+	* libc/stdlib/__call_atexit.c: New file.
+	* libc/stdlib/atexit.h: Remove old definitions.  Add new.
+	* libc/stdlib/atexit.c (atexit): Use __register_exitproc.
+	* libc/stdlib/cxa_atexit.c: New file.
+	* libc/stdlib/cxa_finalize.c: New file.
+	* libc/stdlib/exit.c (exit): Use __call_exitprocs.
+	* libc/stdlib/on_exit.c (on_exit): Use __register_exitproc.
+	2004-09-09  Jeff Johnston  <jjohnstn@redhat.com>
+	* libc/reent/reent.c [_REENT_SMALL]: Fix reference to
+	_on_exit_args_ptr.
+
 2004-08-23  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/unistd.h (getpass): Change prototype to use

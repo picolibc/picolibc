@@ -50,10 +50,8 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.
 */
 
-#include <stddef.h>
 #include <stdlib.h>
-#include <reent.h>
-#include <sys/lock.h>
+#include "atexit.h"
 
 /*
  * Register a function to be performed at exit.
@@ -64,45 +62,5 @@ _DEFUN (atexit,
 	(fn),
 	_VOID _EXFUN ((*fn), (_VOID)))
 {
-  register struct _atexit *p;
-
-#ifndef __SINGLE_THREAD__
-  __LOCK_INIT(static, lock);
-
-  __lock_acquire(lock);
-#endif
-      
-  /* _REENT_SMALL atexit() doesn't allow more than the required 32 entries.  */
-#ifndef _REENT_SMALL
-  if ((p = _GLOBAL_REENT->_atexit) == NULL)
-    _GLOBAL_REENT->_atexit = p = &_GLOBAL_REENT->_atexit0;
-  if (p->_ind >= _ATEXIT_SIZE)
-    {
-      if ((p = (struct _atexit *) malloc (sizeof *p)) == NULL)
-        {
-#ifndef __SINGLE_THREAD__
-          __lock_release(lock);
-#endif
-          return -1;
-        }
-      p->_ind = 0;
-      p->_on_exit_args._fntypes = 0;
-      p->_next = _GLOBAL_REENT->_atexit;
-      _GLOBAL_REENT->_atexit = p;
-    }
-#else
-  p = &_GLOBAL_REENT->_atexit;
-  if (p->_ind >= _ATEXIT_SIZE)
-    {
-#ifndef __SINGLE_THREAD__
-      __lock_release(lock);
-#endif
-      return -1;
-    }
-#endif
-  p->_fns[p->_ind++] = fn;
-#ifndef __SINGLE_THREAD__
-  __lock_release(lock);
-#endif
-  return 0;
+  return __register_exitproc (__et_atexit, fn, NULL, NULL);
 }

@@ -6,6 +6,8 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 GENERAL_SOURCES = \
 	__adjust.c 	\
+	__atexit.c	\
+	__call_atexit.c	\
 	__exp10.c 	\
 	__ten_mu.c 	\
 	_Exit.c		\
@@ -52,6 +54,8 @@ GENERAL_SOURCES = \
 	wctomb_r.c
 
 EXTENDED_SOURCES = \
+	cxa_atexit.c	\
+	cxa_finalize.c	\
 	drand48.c	\
 	ecvtbuf.c 	\
 	efgcvt.c 	\
