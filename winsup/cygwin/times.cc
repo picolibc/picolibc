@@ -21,6 +21,7 @@ details. */
 #include "security.h"
 #include "path.h"
 #include "fhandler.h"
+#include "dtable.h"
 #include "pinfo.h"
 #include "hires.h"
 #include "cygtls.h"
@@ -29,8 +30,6 @@ details. */
 
 #define FACTOR (0x19db1ded53e8000LL)
 #define NSPERSEC 10000000LL
-
-static void __stdcall timeval_to_filetime (const struct timeval *time, FILETIME *out);
 
 /* Cygwin internal */
 static unsigned long long __stdcall
@@ -184,7 +183,7 @@ time_t_to_filetime (time_t time_in, FILETIME *out)
 }
 
 /* Cygwin internal */
-static void __stdcall
+void __stdcall
 timeval_to_filetime (const struct timeval *time_in, FILETIME *out)
 {
   long long x = time_in->tv_sec * NSPERSEC +
@@ -444,91 +443,27 @@ gmtime (const time_t *tim_p)
 
 #endif /* POSIX_LOCALTIME */
 
-/* utimes: standards? */
+/* utimes: POSIX/SUSv3 */
 extern "C" int
 utimes (const char *path, const struct timeval *tvp)
 {
-  int res = 0;
-  struct timeval tmp[2];
-  path_conv win32 (path);
+  int res = -1;
+  fhandler_base *fh;
 
-  if (win32.error)
+  if (!(fh = build_fh_name (path, NULL, PC_SYM_FOLLOW)))
+    goto error;
+
+  if (fh->error ())
     {
-      set_errno (win32.error);
-      syscall_printf ("-1 = utimes (%s, %x)", path, tvp);
-      return -1;
-    }
-
-  /* MSDN suggests using FILE_FLAG_BACKUP_SEMANTICS for accessing
-     the times of directories.  */
-  /* Note: It's documented in MSDN that FILE_WRITE_ATTRIBUTES is
-     sufficient to change the timestamps.  Unfortunately it's not
-     sufficient for a remote HPFS which requires GENERIC_WRITE.
-     Since we don't trust the weird FS name "??SS", we just try to
-     open with GENERIC_WRITE if opening with FILE_WRITE_ATTRIBUTES
-     failed.  That should do it, though this fails for R/O files
-     of course. */
-  HANDLE h = CreateFile (win32, FILE_WRITE_ATTRIBUTES,
-			 FILE_SHARE_READ | FILE_SHARE_WRITE,
-			 &sec_none_nih, OPEN_EXISTING,
-			 FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
-			 0);
-  if (h == INVALID_HANDLE_VALUE)
-    h = CreateFile (win32, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
-		    &sec_none_nih, OPEN_EXISTING,
-		    FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS, 0);
-
-  if (h == INVALID_HANDLE_VALUE)
-    {
-      if (win32.isdir ())
-	{
-	  /* What we can do with directories more? */
-	  res = 0;
-	}
-      else
-	{
-	  res = -1;
-	  __seterrno ();
-	}
+      debug_printf ("got %d error from build_fh_name", fh->error ());
+      set_errno (fh->error ());
     }
   else
-    {
-      gettimeofday (&tmp[0], 0);
-      if (tvp == 0)
-	{
-	  tmp[1] = tmp[0];
-	  tvp = tmp;
-	}
+    res = fh->utimes (tvp);
 
-      FILETIME lastaccess;
-      FILETIME lastwrite;
-      FILETIME lastchange;
-
-      timeval_to_filetime (tvp + 0, &lastaccess);
-      timeval_to_filetime (tvp + 1, &lastwrite);
-      /* Update st_ctime */
-      timeval_to_filetime (tmp + 0, &lastchange);
-
-      debug_printf ("incoming lastaccess %08x %08x",
-		   tvp->tv_sec,
-		   tvp->tv_usec);
-
-      /* FIXME: SetFileTime needs a handle with a write lock
-	 on the file whose time is being modified.  So calls to utime()
-	 fail for read only files.  */
-
-      if (!SetFileTime (h, &lastchange, &lastaccess, &lastwrite))
-	{
-	  __seterrno ();
-	  res = -1;
-	}
-      else
-	res = 0;
-      CloseHandle (h);
-    }
-
-  syscall_printf ("%d = utimes (%s, %x); (h%d)",
-		  res, path, tvp, h);
+  delete fh;
+ error:
+  syscall_printf ("%d = utimes (%s, %p)", res, path, tvp);
   return res;
 }
 

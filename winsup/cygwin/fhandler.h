@@ -66,7 +66,8 @@ enum query_state {
   no_query = 0,
   query_read_control = 1,
   query_stat_control = 2,
-  query_write_control = 3
+  query_write_control = 3,
+  query_write_attributes = 4
 };
 
 class fhandler_base
@@ -87,7 +88,7 @@ class fhandler_base
 					_write should check if we've moved
 					beyond EOF, zero filling or making
 					file sparse if so. */
-    unsigned query_open         : 2; /* open file without requesting either
+    unsigned query_open         : 3; /* open file without requesting either
 					read or write access */
     unsigned close_on_exec      : 1; /* close-on-exec */
     unsigned need_fork_fixup    : 1; /* Set if need to fixup after fork. */
@@ -265,6 +266,7 @@ class fhandler_base
   virtual int __stdcall facl (int, int, __acl32 *) __attribute__ ((regparm (3)));
   virtual int __stdcall ftruncate (_off64_t) __attribute__ ((regparm (2)));
   virtual int __stdcall link (const char *) __attribute__ ((regparm (2)));
+  virtual int __stdcall utimes (const struct timeval *) __attribute__ ((regparm (2)));
   virtual int ioctl (unsigned int cmd, void *);
   virtual int fcntl (int cmd, void *);
   virtual char const *ttyname () { return get_name (); }
@@ -438,6 +440,7 @@ class fhandler_socket: public fhandler_base
   int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
   int __stdcall facl (int, int, __acl32 *) __attribute__ ((regparm (3)));
   int __stdcall link (const char *) __attribute__ ((regparm (2)));
+  int __stdcall utimes (const struct timeval *) __attribute__ ((regparm (2)));
   bool is_slow () {return 1;}
 };
 
@@ -600,6 +603,7 @@ class fhandler_disk_file: public fhandler_base
 
  public:
   fhandler_disk_file ();
+  fhandler_disk_file (path_conv &pc);
 
   int open (int flags, mode_t mode);
   int close ();
@@ -611,6 +615,7 @@ class fhandler_disk_file: public fhandler_base
   int __stdcall facl (int, int, __acl32 *) __attribute__ ((regparm (3)));
   int __stdcall ftruncate (_off64_t) __attribute__ ((regparm (2)));
   int __stdcall link (const char *) __attribute__ ((regparm (2)));
+  int __stdcall utimes (const struct timeval *) __attribute__ ((regparm (2)));
 
   HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, _off64_t off);
   int munmap (HANDLE h, caddr_t addr, size_t len);

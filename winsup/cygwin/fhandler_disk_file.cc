@@ -633,28 +633,27 @@ fhandler_disk_file::ftruncate (_off64_t length)
 int
 fhandler_disk_file::link (const char *newpath)
 {
-  int res = -1;
   path_conv newpc (newpath, PC_SYM_NOFOLLOW | PC_FULL | PC_POSIX);
   extern bool allow_winsymlinks;
 
   if (newpc.error)
     {
       set_errno (newpc.case_clash ? ECASECLASH : newpc.error);
-      goto done;
+      return -1;
     }
 
   if (newpc.exists ())
     {
       syscall_printf ("file '%s' exists?", (char *) newpc);
       set_errno (EEXIST);
-      goto done;
+      return -1;
     }
 
   if (newpc[strlen (newpc) - 1] == '.')
     {
       syscall_printf ("trailing dot, bailing out");
       set_errno (EINVAL);
-      goto done;
+      return -1;
     }
 
   /* Shortcut hack. */
@@ -667,12 +666,12 @@ fhandler_disk_file::link (const char *newpath)
       newpc.check (newpath, PC_SYM_NOFOLLOW | PC_FULL);
     }
 
-  query_open (query_write_control);
+  query_open (query_write_attributes);
   if (!open (O_BINARY, 0))
     {
       syscall_printf ("Opening file failed");
       __seterrno ();
-      goto done;
+      return -1;
     }
 
   /* Try to make hard link first on Windows NT */
@@ -697,17 +696,14 @@ fhandler_disk_file::link (const char *newpath)
 	  syscall_printf ("CreateHardLinkA failed");
 	  __seterrno ();
 	  close ();
-	  goto done;
+	  return -1;
 	}
 
       WIN32_STREAM_ID stream_id;
-      DWORD written;
       LPVOID context;
-      DWORD path_len;
-      DWORD size;
       WCHAR wbuf[CYG_MAX_PATH];
       BOOL ret;
-      DWORD write_err;
+      DWORD written, write_err, path_len, size;
 
       path_len = sys_mbstowcs (wbuf, newpc, CYG_MAX_PATH) * sizeof (WCHAR);
 
@@ -756,50 +752,96 @@ fhandler_disk_file::link (const char *newpath)
 
 	  close ();
 	  __seterrno_from_win_error (write_err);
-	  goto done;
+	  return -1;
 	}
 
     success:
-      res = 0;
-      /* touch st_ctime */
+      /* Set ctime on success. */
       has_changed (true);
       close ();
       if (!allow_winsymlinks && pc.is_lnk_symlink ())
 	SetFileAttributes (newpc, (DWORD) pc
 				   | FILE_ATTRIBUTE_SYSTEM
 				   | FILE_ATTRIBUTE_READONLY);
-
-      goto done;
+      return 0;
     }
 docopy:
   /* do this with a copy */
-  if (CopyFileA (pc, newpc, 1))
+  if (!CopyFileA (pc, newpc, 1))
     {
-      res = 0;
-      /* touch st_ctime */
-      has_changed (true);
-      close ();
-      fhandler_disk_file fh;
-      fh.set_name (newpc);
-      fh.query_open (query_write_control);
-      if (fh.open (O_BINARY, 0))
-	{
-	  fh.has_changed (true);
-	  fh.close ();
-	}
+      __seterrno ();
+      return -1;
     }
-  else
-    __seterrno ();
-
-done:
-  syscall_printf ("%d = link (%s, %s)", res, get_name (), newpath);
-  return res;
+  /* Set ctime on success, also on the copy. */
+  has_changed (true);
+  close ();
+  fhandler_disk_file fh (newpc);
+  fh.query_open (query_write_attributes);
+  if (fh.open (O_BINARY, 0))
+    {
+      fh.has_changed (true);
+      fh.close ();
+    }
+  return 0;
 }
 
+int
+fhandler_disk_file::utimes (const struct timeval *tvp)
+{
+  FILETIME lastaccess, lastwrite, lastchange;
+  struct timeval tmp[2];
+
+  query_open (query_write_attributes);
+  if (!open (O_BINARY, 0))
+    {
+      /* It's documented in MSDN that FILE_WRITE_ATTRIBUTES is sufficient
+         to change the timestamps.  Unfortunately it's not sufficient for a
+	 remote HPFS which requires GENERIC_WRITE, so we just retry to open
+	 for writing, though this fails for R/O files of course. */
+      query_open (no_query);
+      if (!open (O_WRONLY | O_BINARY, 0))
+        {
+	  syscall_printf ("Opening file failed");
+	  __seterrno ();
+	  if (pc.isdir ()) /* What we can do with directories more? */
+	    return 0;
+	    
+	  __seterrno ();
+	  return -1;
+        }
+    }
+
+  gettimeofday (&tmp[0], 0);
+  if (!tvp)
+    {
+      tmp[1] = tmp[0];
+      tvp = tmp;
+    }
+  timeval_to_filetime (&tvp[0], &lastaccess);
+  timeval_to_filetime (&tvp[1], &lastwrite);
+  /* Update ctime */
+  timeval_to_filetime (&tmp[0], &lastchange);
+  debug_printf ("incoming lastaccess %08x %08x", tvp[0].tv_sec, tvp[0].tv_usec);
+  if (!SetFileTime (get_handle (), &lastchange, &lastaccess, &lastwrite))
+    {
+      DWORD errcode = GetLastError ();
+      close ();
+      __seterrno_from_win_error (errcode);
+      return -1;
+    }
+  close ();
+  return 0;
+}
 
 fhandler_disk_file::fhandler_disk_file () :
   fhandler_base ()
 {
+}
+
+fhandler_disk_file::fhandler_disk_file (path_conv &pc) :
+  fhandler_base ()
+{
+  set_name (pc);
 }
 
 int

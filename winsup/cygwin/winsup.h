@@ -254,10 +254,11 @@ extern "C" int __stdcall strncasematch (const char *s1, const char *s2, size_t n
 extern "C" char *__stdcall strcasestr (const char *searchee, const char *lookfor) __attribute__ ((regparm(2)));
 
 /* Time related */
-void __stdcall totimeval (struct timeval *dst, FILETIME * src, int sub, int flag);
-long __stdcall to_time_t (FILETIME * ptr);
-void __stdcall to_timestruc_t (FILETIME * ptr, timestruc_t * out);
-void __stdcall time_as_timestruc_t (timestruc_t * out);
+void __stdcall totimeval (struct timeval *, FILETIME *, int, int);
+long __stdcall to_time_t (FILETIME *);
+void __stdcall to_timestruc_t (FILETIME *, timestruc_t *);
+void __stdcall time_as_timestruc_t (timestruc_t *);
+void __stdcall timeval_to_filetime (const struct timeval *, FILETIME *);
 
 void __stdcall set_console_title (char *);
 void init_console_handler ();

@@ -414,8 +414,7 @@ fhandler_socket::fchmod (mode_t mode)
 {
   if (get_device () == FH_UNIX)
     {
-      fhandler_disk_file fh;
-      fh.set_name (pc);
+      fhandler_disk_file fh (pc);
       fh.get_device () = FH_FS;
       int ret = fh.fchmod (mode);
       SetFileAttributes	(pc, GetFileAttributes (pc) | FILE_ATTRIBUTE_SYSTEM);
@@ -429,8 +428,7 @@ fhandler_socket::fchown (__uid32_t uid, __gid32_t gid)
 {
   if (get_device () == FH_UNIX)
     {
-      fhandler_disk_file fh;
-      fh.set_name (pc);
+      fhandler_disk_file fh (pc);
       return fh.fchown (uid, gid);
     }
   return 0;
@@ -441,8 +439,7 @@ fhandler_socket::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 {
   if (get_device () == FH_UNIX)
     {
-      fhandler_disk_file fh;
-      fh.set_name (pc);
+      fhandler_disk_file fh (pc);
       return fh.facl (cmd, nentries, aclbufp);
     }
   return fhandler_base::facl (cmd, nentries, aclbufp);
@@ -453,11 +450,21 @@ fhandler_socket::link (const char *newpath)
 {
   if (get_device () == FH_UNIX)
     {
-      fhandler_disk_file fh;
-      fh.set_name (pc);
+      fhandler_disk_file fh (pc);
       return fh.link (newpath);
     }
   return fhandler_base::link (newpath);
+}
+
+int
+fhandler_socket::utimes (const struct timeval *tvp)
+{
+  if (get_device () == FH_UNIX)
+    {
+      fhandler_disk_file fh (pc);
+      return fh.utimes (tvp);
+    }
+  return fhandler_base::utimes (tvp);
 }
 
 int

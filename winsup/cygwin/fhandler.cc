@@ -583,6 +583,10 @@ fhandler_base::open (int flags, mode_t mode)
 	access = READ_CONTROL | WRITE_OWNER | WRITE_DAC | FILE_WRITE_ATTRIBUTES;
 	create_options = FILE_OPEN_FOR_BACKUP_INTENT | FILE_OPEN_FOR_RECOVERY;
 	break;
+      case query_write_attributes:
+	access = READ_CONTROL | FILE_WRITE_ATTRIBUTES;
+	create_options = FILE_OPEN_FOR_BACKUP_INTENT | FILE_OPEN_FOR_RECOVERY;
+	break;
       default:
 	create_options = 0;
 	if (get_major () == DEV_TAPE_MAJOR && (flags & O_TEXT))
@@ -1608,6 +1612,13 @@ fhandler_base::ftruncate (_off64_t length)
 
 int
 fhandler_base::link (const char *newpath)
+{
+  set_errno (EINVAL);
+  return -1;
+}
+
+int
+fhandler_base::utimes (const struct timeval *tvp)
 {
   set_errno (EINVAL);
   return -1;

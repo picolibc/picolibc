@@ -1,3 +1,34 @@
+2005-02-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (enum query_state): Add query_write_attributes state.
+	(fhandler_base::status.query_open): Add a bit to make room for more
+	states.
+	(class fhandler_base): Declare new method utimes.
+	(class fhandler_socket): Ditto.
+	(class fhandler_disk_file): Ditto.
+	(fhandler_disk_file::fhandler_disk_file): Add constructor with
+	path_conv parameter.
+	* fhandler.cc (fhandler_base::open): Add query_write_attributes
+	handling.
+	(fhandler_base::utimes): New method.
+	* fhandler_disk_file.cc (fhandler_disk_file::link): Simplify.
+	Open file with query_write_attributes instead of query_write_control.
+	(fhandler_disk_file::utimes): New method.
+	(fhandler_disk_file::fhandler_disk_file): Add constructor with
+	path_conv parameter setting pc member immediately.
+	* fhandler_socket.cc (fhandler_socket::fchmod): Use new
+	fhandler_disk_file constructor.
+	(fhandler_socket::fchown): Ditto.
+	(fhandler_socket::facl): Ditto.
+	(fhandler_socket::link): Ditto.
+	(fhandler_socket::utimes): New method.
+	* times.cc: Include dtable.h.
+	(timeval_to_filetime): Make non-static.
+	(utimes): Move functionality into fhandler method utimes. Just call
+	this method from here.
+	* winsup.h: Simplify declarations of time helper functions.
+	(timeval_to_filetime): Add extern declaration.
+
 2005-02-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (class fhandler_base): Declare new method link.
