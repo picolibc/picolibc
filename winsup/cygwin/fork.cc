@@ -687,8 +687,7 @@ get_vfork_val ()
 }
 #endif
 
-extern "C"
-int
+extern "C" int
 vfork ()
 {
 #ifndef NEWVFORK
@@ -711,9 +710,11 @@ vfork ()
       for (pp = (char **)vf->frame, esp = vf->vfork_esp;
 	   esp <= vf->vfork_ebp + 2; pp++, esp++)
 	*pp = *esp;
+      vf->ctty = myself->ctty;
+      vf->sid = myself->sid;
+      vf->pgid = myself->pgid;
       int res = cygheap->fdtab.vfork_child_dup () ? 0 : -1;
       debug_printf ("%d = vfork()", res);
-      debug_printf ("exiting vfork, res %d", res);
       return res;
     }
 
@@ -726,9 +727,13 @@ vfork ()
   thisframe.init (mainthread);
   cygheap->fdtab.vfork_parent_restore ();
 
+  myself->ctty = vf->ctty;
+  myself->sid = vf->sid;
+  myself->pgid = vf->pgid;
+
   if (vf->pid < 0)
     {
-      int exitval = -vf->pid;
+      int exitval = vf->exitval;
       vf->pid = 0;
       if ((vf->pid = fork ()) == 0)
 	exit (exitval);

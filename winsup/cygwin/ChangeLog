@@ -1,3 +1,43 @@
+2002-08-18  Christopher Faylor  <cgf@redhat.com>
+
+	* perthread.h (vfork_save): Add ctty, sid, pgid, exitval fields.
+	(vfork_save::restore_pid): New method.
+	(vfork_save::restore_exit): New method.
+	* fork.cc (vfork): Save ctty, sid, pgid and restore them when returning
+	to "parent".  Use exitval field if exiting but never created a new
+	process.
+	* syscalls.cc (setsid): Detect when in "vfork" and force an actual fork
+	so that pid will be allocated (UGLY!).
+	(getsid): New function.
+	* dcrt0.cc (do_exit): Use vfork_save::restore_exit method for returning
+	from a vfork.
+	* spawn.cc (spawnve): Use vfork_save::{restore_pid,restore_exit}
+	methods for returning from vfork.
+	* cygwin.din: Export getsid.
+	* include/cygwin/version.h: Bump api minor number.
+
+	* malloc.cc: #ifdef sYSTRIm for when MORECORE_CANNOT_TRIM is true.
+
+2002-08-18  Christopher Faylor  <cgf@redhat.com>
+
+	* cygmalloc.h (MORECORE_CANNOT_TRIM): Define.
+
+2002-08-18  Christopher Faylor  <cgf@redhat.com>
+
+	* sigproc.cc (sigCONT): Define.
+	* sigproc.h (sigCONT): Declare.
+	(wait_sig): Create sigCONT event here.
+	* exceptions.cc (sig_handle_tty_stop): Wait for sigCONT event rather
+	than stopping thread.
+	(sig_handle): Set sigCONT event as appropriate on SIGCONT rather than
+	calling ResumeThread.
+
+2002-08-17  Christopher Faylor  <cgf@redhat.com>
+
+	* malloc.cc: Update to 2.7.2.
+	* malloc_wrapper.cc (malloc_init): Call user level mallocs to determine
+	if the malloc routines have been overridden.
+
 2002-08-16  Christopher Faylor  <cgf@redhat.com>
 
 	* winsup.h: Remove malloc_*lock functions.
@@ -65,7 +105,7 @@
 	(wait_for_sigthread): Rename from "wait_for_me".  Assume that
 	wait_sig_inited has been set and that this function is only called from
 	the main thread.
-	* winsup.h (wait_for_sigthread): Declare new function.
+	* sigproc.h (wait_for_sigthread): Declare new function.
 
 2002-08-08  Christopher Faylor  <cgf@redhat.com>
 

@@ -95,6 +95,7 @@ public:
 
 extern sigthread mainthread;
 extern HANDLE signal_arrived;
+extern HANDLE sigCONT;
 
 BOOL __stdcall my_parent_is_alive ();
 extern "C" int __stdcall sig_dispatch_pending (int force = FALSE);

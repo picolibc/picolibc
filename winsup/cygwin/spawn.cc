@@ -907,11 +907,13 @@ spawnve (int mode, const char *path, const char *const *argv,
     case _P_DETACH:
       subproc_init ();
       ret = spawn_guts (path, argv, envp, mode);
-      if (vf && ret > 0)
+      if (vf)
 	{
 	  debug_printf ("longjmping due to vfork");
-	  vf->pid = ret;
-	  longjmp (vf->j, 1);
+	  if (ret < 0)
+	    vf->restore_exit (ret);
+	  else
+	    vf->restore_pid (ret);
 	}
       break;
     default:

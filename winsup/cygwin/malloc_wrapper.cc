@@ -111,7 +111,7 @@ strdup (const char *s)
 extern "C" void
 free (void *p)
 {
-  malloc_printf ("(%p), called by %x", p, ((int *)&p)[-1]);
+  malloc_printf ("(%p), called by %p", p, __builtin_return_address (0));
   if (!use_internal_malloc)
     user_data->free (p);
   else
@@ -135,7 +135,7 @@ malloc (size_t size)
       res = dlmalloc (size);
       __malloc_unlock ();
     }
-  malloc_printf ("(%d) = %x, called by %x", size, res, ((int *)&size)[-1]);
+  malloc_printf ("(%d) = %x, called by %p", size, res, __builtin_return_address (0));
   return res;
 }
 
@@ -151,7 +151,7 @@ realloc (void *p, size_t size)
       res = dlrealloc (p, size);
       __malloc_unlock ();
     }
-  malloc_printf ("(%x, %d) = %x, called by %x", p, size, res, ((int *)&p)[-1]);
+  malloc_printf ("(%x, %d) = %x, called by %x", p, size, res, __builtin_return_address (0));
   return res;
 }
 
@@ -167,7 +167,7 @@ calloc (size_t nmemb, size_t size)
       res = dlcalloc (nmemb, size);
       __malloc_unlock ();
     }
-  malloc_printf ("(%d, %d) = %x, called by %x", nmemb, size, res, ((int *)&nmemb)[-1]);
+  malloc_printf ("(%d, %d) = %x, called by %x", nmemb, size, res, __builtin_return_address (0));
   return res;
 }
 
@@ -313,7 +313,7 @@ malloc_init ()
 #ifdef MALLOC_DEBUG
       _free_r (NULL, _malloc_r (NULL, 16));
 #else
-      free (malloc (16));
+      user_data->free (user_data->malloc (16));
 #endif
       if (!export_malloc_called)
 	use_internal_malloc = 0;
