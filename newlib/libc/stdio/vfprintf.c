@@ -762,8 +762,10 @@ reswitch:	switch (ch) {
 				memset ((_PTR)&ps, '\0', sizeof (mbstate_t));
 				if ((size = (int)_wcrtomb_r (data, cp, 
 				    	       (wchar_t)GET_ARG (N, ap, wint_t), 
-					        &ps)) == -1)
+					        &ps)) == -1) {
+					fp->_flags |= __SERR;
 					goto error; 
+				}
 			}
 			else {
 				*cp = GET_ARG (N, ap, int);
@@ -942,8 +944,10 @@ reswitch:	switch (ch) {
 						if (wcp[m] == L'\0')
 							break;
 						if ((n = (int)_wcrtomb_r (data, 
-                                                     buf, wcp[m], &ps)) == -1)
+                                                     buf, wcp[m], &ps)) == -1) {
+							fp->_flags |= __SERR;
 							goto error;
+						}
 						if (n + size > prec)
 							break;
 						m += 1;
@@ -954,8 +958,10 @@ reswitch:	switch (ch) {
 				}
 				else {
 					if ((size = (int)_wcsrtombs_r (data, 
-                                                   NULL, &wcp, 0, &ps)) == -1)
-						goto error; 
+                                                   NULL, &wcp, 0, &ps)) == -1) {
+						fp->_flags |= __SERR;
+						goto error;
+					}
 					wcp = (_CONST wchar_t *)cp;
 				}
  
@@ -963,14 +969,18 @@ reswitch:	switch (ch) {
 					break;
  
 				if ((malloc_buf = 
-				    (char *)_malloc_r (data, size + 1)) == NULL)
+				    (char *)_malloc_r (data, size + 1)) == NULL) {
+					fp->_flags |= __SERR;
 					goto error;
+				}
                              
 				/* Convert widechar string to multibyte string. */
 				memset ((_PTR)&ps, '\0', sizeof (mbstate_t));
 				if (_wcsrtombs_r (data, malloc_buf, 
-                                                 &wcp, size, &ps) != size)
+                                                 &wcp, size, &ps) != size) {
+					fp->_flags |= __SERR;
 					goto error;
+				}
 				cp = malloc_buf;
 				cp[size] = '\0';
 			}

@@ -1,5 +1,11 @@
 2004-05-03  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
 
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Set error flag when
+	multibyte functions return failure for %C, %S, %lc, and %ls
+	format specifiers.
+
+2004-05-03  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
+
 	* testsuite/include/check.h (CHECK): Add flush of stdout.
 
 2004-05-03  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
