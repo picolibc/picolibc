@@ -405,10 +405,10 @@ fhandler_disk_file::fchmod (mode_t mode)
       if (!get_io_handle () && pc.has_acls ())
 	{
 	  /* Open for writing required to be able to set ctime. */
-	  if (!(oret = open_fs (O_WRONLY | O_BINARY, 0)))
+	  if (!(oret = open (O_WRONLY | O_BINARY, 0)))
 	    {
 	      query_open (query_write_control);
-	      if (!(oret = open_fs (O_BINARY, 0)))
+	      if (!(oret = open (O_BINARY, 0)))
 		return -1;
 	    }
 	}
@@ -435,11 +435,12 @@ fhandler_disk_file::fchmod (mode_t mode)
     /* Correct NTFS security attributes have higher priority */
     res = 0;
 
+  /* Set ctime on success. */
   if (!res && !query_open ())
-    touch_ctime ();
+    has_changed (true);
 
   if (oret)
-    close_fs ();
+    close ();
 
   return res;
 }
@@ -460,10 +461,10 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
   if (!get_io_handle ())
     {
       /* Open for writing required to be able to set ctime. */
-      if (!(oret = open_fs (O_WRONLY | O_BINARY, 0)))
+      if (!(oret = open (O_WRONLY | O_BINARY, 0)))
         {
 	  query_open (query_write_control);
-	  if (!(oret = open_fs (O_BINARY, 0)))
+	  if (!(oret = open (O_BINARY, 0)))
 	    return -1;
       	}
     }
@@ -476,12 +477,13 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
     {
       res = set_file_attribute (pc.has_acls (), get_io_handle (), pc,
 				uid, gid, attrib);
+      /* Set ctime on success. */
       if (!res && !query_open ())
-	touch_ctime ();
+	has_changed (true);
     }
 
   if (oret)
-    close_fs ();
+    close ();
 
   return res;
 }
@@ -502,7 +504,7 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 	    /* Open for writing required to be able to set ctime
 	       (even though setting the ACL is just pretended). */
 	    if (!get_io_handle ())
-	      oret = open_fs (O_WRONLY | O_BINARY, 0);
+	      oret = open (O_WRONLY | O_BINARY, 0);
 	    res = 0;
 	    break;
 	  case GETACL:
@@ -515,7 +517,7 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 		if (!get_io_handle ())
 		  {
 		    query_open (query_read_control);
-		    if (!(oret = open_fs (O_BINARY, 0)))
+		    if (!(oret = open (O_BINARY, 0)))
 		      return -1;
 		  }
 		if (!fstat_by_handle (&st))
@@ -552,12 +554,12 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 	{
 	  /* Open for writing required to be able to set ctime. */
 	  if (cmd == SETACL)
-	    oret = open_fs (O_WRONLY | O_BINARY, 0);
+	    oret = open (O_WRONLY | O_BINARY, 0);
 	  if (!oret)
 	    {
 	      query_open (cmd == SETACL ? query_write_control
 	      				: query_read_control);
-	      if (!(oret = open_fs (O_BINARY, 0)))
+	      if (!(oret = open (O_BINARY, 0)))
 		return -1;
 	    }
 	}
@@ -581,11 +583,12 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 	}
     }
 
+  /* Set ctime on success. */
   if (!res && cmd == SETACL && !query_open ())
-    touch_ctime ();
+    has_changed (true);
 
   if (oret)
-    close_fs ();
+    close ();
 
   return res;
 }
@@ -630,8 +633,9 @@ fhandler_disk_file::ftruncate (_off64_t length)
 	    res = res_bug;
 	  /* restore original file pointer location */
 	  lseek (prev_loc, SEEK_SET);
+	  /* Set ctime on success. */
 	  if (!res)
-	    touch_ctime ();
+	    has_changed (true);
 	}
     }
   return res;
@@ -692,6 +696,10 @@ fhandler_base::open_fs (int flags, mode_t mode)
       && !allow_ntsec && allow_ntea)
     set_file_attribute (false, NULL, get_win32_name (), mode);
 
+  /* O_TRUNC on existing file requires setting ctime. */
+  if ((flags & (O_CREAT | O_TRUNC)) == O_TRUNC)
+    has_changed (true);
+
   set_fs_flags (pc.fs_flags ());
 
 out:
@@ -703,6 +711,9 @@ out:
 int
 fhandler_disk_file::close ()
 {
+  /* Changing file data requires setting ctime. */
+  if (has_changed ())
+    touch_ctime ();
   return close_fs ();
 }
 

@@ -288,12 +288,14 @@ fhandler_base::raw_write (const void *ptr, size_t len)
   if (!WriteFile (get_output_handle (), ptr, len, &bytes_written, 0))
     {
       if (GetLastError () == ERROR_DISK_FULL && bytes_written > 0)
-	return bytes_written;
+	goto written;
       __seterrno ();
       if (get_errno () == EPIPE)
 	raise (SIGPIPE);
       return -1;
     }
+written:
+  has_changed (true);
   return bytes_written;
 }
 

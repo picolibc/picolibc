@@ -1,3 +1,18 @@
+2005-02-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::raw_write): Mark as changed on
+	successful write.
+	* fhandler.h (fhandler_base::status_flags): Add 'has_changed' flag.
+	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Call
+	fhandler_disk_file's own open and close instead of open_fs and
+	close_fs.  Mark as changed on success.
+	(fhandler_disk_file::fchown): Ditto.
+	(fhandler_disk_file::facl): Ditto.
+	(fhandler_disk_file::ftruncate): Ditto.
+	(fhandler_base::open_fs): Mark as changed when O_TRUNC flag on existing
+	file is set.
+	(fhandler_disk_file::close): Set st_ctime if has_changed flag is set.
+
 2005-02-11  Christopher Faylor  <cgf@timesys.com>
 
 	* cygthread.cc (cygthread::release): Reset ev here if it exists.
