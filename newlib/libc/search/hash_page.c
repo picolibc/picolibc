@@ -552,7 +552,7 @@ __get_page(hashp, p, bucket, is_bucket, is_disk, is_bitmap)
 	if (!is_bitmap && !bp[0]) {
 		PAGE_INIT(p);
 	} else
-		if (hashp->LORDER != BYTE_ORDER) {
+               if (hashp->LORDER != DB_BYTE_ORDER) {
 			int i, max;
 
 			if (is_bitmap) {
@@ -591,7 +591,7 @@ __put_page(hashp, p, bucket, is_bucket, is_bitmap)
 		return (-1);
 	fd = hashp->fp;
 
-	if (hashp->LORDER != BYTE_ORDER) {
+       if (hashp->LORDER != DB_BYTE_ORDER) {
 		int i;
 		int max;
 

@@ -45,11 +45,23 @@
 #define __IEEE_BIG_ENDIAN
 #endif
 
+#ifdef __sh__
+#ifdef __LITTLE_ENDIAN__
+#define __IEEE_LITTLE_ENDIAN
+#else
+#define __IEEE_BIG_ENDIAN
+#endif
+#if defined(__SH3E__) || defined(__SH4_SINGLE_ONLY__)
+#define _DOUBLE_IS_32BITS
+#endif
+#endif
+
 #ifdef ___AM29K__
 #define _FLOAT_RET double
 #endif
 
 #ifdef __i386__
+#define __IEEE_LITTLE_ENDIAN
 #ifndef __unix__
 /* in other words, go32 */
 #define _FLOAT_RET double
@@ -82,6 +94,13 @@
 #define __IEEE_LITTLE_ENDIAN
 #endif
 
+#ifdef __MIPSEL__
+#define __IEEE_LITTLE_ENDIAN
+#endif
+#ifdef __MIPSEB__
+#define __IEEE_BIG_ENDIAN
+#endif
+
 #ifdef __MMIX__
 #define __IEEE_BIG_ENDIAN
 #endif
@@ -97,18 +116,56 @@
 #define __IEEE_LITTLE_ENDIAN
 #endif
 
+#ifdef __v800
+#define __IEEE_LITTLE_ENDIAN
+#endif
+
 #ifdef __v850
 #define __IEEE_LITTLE_ENDIAN
 #define __ATTRIBUTE_IMPURE_PTR__ __attribute__((__sda__))
+#endif
+
+#ifdef __ia64__
+#ifdef __BIG_ENDIAN__
+#define __IEEE_BIG_ENDIAN
+#else
+#define __IEEE_LITTLE_ENDIAN
+#endif
 #endif
 
 #ifdef __D30V__
 #define __IEEE_BIG_ENDIAN
 #endif
 
+#ifdef __m88k__
+#define __IEEE_BIG_ENDIAN
+#endif
+
 /* For the PowerPC eabi, force the _impure_ptr to be in .sdata */
-#if defined(__PPC__) && defined(_CALL_SYSV)
+#if defined(__PPC__)
+#if defined(_CALL_SYSV)
 #define __ATTRIBUTE_IMPURE_PTR__ __attribute__((__section__(".sdata")))
+#endif
+#if (defined(_BIG_ENDIAN) && _BIG_ENDIAN) || (defined(_AIX) && _AIX)
+#define __IEEE_BIG_ENDIAN
+#else
+#if (defined(_LITTLE_ENDIAN) && _LITTLE_ENDIAN) || (defined(__sun__) && __sun__) || (defined(_WIN32) && _WIN32)
+#define __IEEE_LITTLE_ENDIAN
+#endif
+#endif
+#endif
+
+#if defined(__arm__) || defined(__thumb__)
+/* ARM always has big-endian words.  Within those words the byte ordering
+   will be big or little endian depending upon the target.  */
+#define __IEEE_BIG_ENDIAN
+#ifdef __ARMEL__
+#define __IEEE_BYTES_LITTLE_ENDIAN
+#endif
+#endif
+
+#ifdef __hppa__
+#define __IEEE_BIG_ENDIAN
 #endif
 
 #ifdef __sparc__
@@ -118,6 +175,11 @@
 #define __IEEE_BIG_ENDIAN
 #endif
 #endif
+
+#if defined(__or32__) || defined(__or1k__) || defined(__or16__)
+#define __IEEE_BIG_ENDIAN
+#endif
+
 
 #ifdef __xstormy16__
 #define __IEEE_LITTLE_ENDIAN
@@ -164,6 +226,22 @@
 #define _POINTER_INT long
 #endif
 
+#ifdef __arc__
+#ifdef __big_endian__
+#define __IEEE_BIG_ENDIAN
+#else
+#define __IEEE_LITTLE_ENDIAN
+#endif
+#endif
+
+#ifdef __fr30__
+#define __IEEE_BIG_ENDIAN
+#endif
+
+#ifdef __mcore__
+#define __IEEE_BIG_ENDIAN
+#endif
+
 #ifdef __frv__
 #define __IEEE_BIG_ENDIAN
 #define __ATTRIBUTE_IMPURE_PTR__ __attribute__((__section__(".sdata")))
@@ -201,5 +279,11 @@
 #ifndef _READ_WRITE_RETURN_TYPE
 #define _READ_WRITE_RETURN_TYPE int
 #endif
+
+#ifndef __IEEE_BIG_ENDIAN
+#ifndef __IEEE_LITTLE_ENDIAN
+#error Endianess not declared!!
+#endif /* not __IEEE_LITTLE_ENDIAN */
+#endif /* not __IEEE_BIG_ENDIAN */
 
 #endif /* __SYS_CONFIG_H__ */

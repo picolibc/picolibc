@@ -72,7 +72,7 @@ static int   hash_sync(const DB *, __uint32_t);
 static int   hdestroy(HTAB *);
 static HTAB *init_hash(HTAB *, const char *, HASHINFO *);
 static int   init_htab(HTAB *, int);
-#ifdef _IEEE_LITTLE_ENDIAN
+#if (BYTE_ORDER == LITTLE_ENDIAN)
 static void  swap_header(HTAB *);
 static void  swap_header_copy(HASHHDR *, HASHHDR *);
 #endif
@@ -156,7 +156,7 @@ __hash_open(file, flags, mode, info, dflags)
 			hashp->hash = __default_hash;
 
 		hdrsize = read(hashp->fp, &hashp->hdr, sizeof(HASHHDR));
-#ifdef _IEEE_LITTLE_ENDIAN
+#if (BYTE_ORDER == LITTLE_ENDIAN)
 		swap_header(hashp);
 #endif
 		if (hdrsize == -1)
@@ -299,7 +299,7 @@ init_hash(hashp, file, info)
 
 	nelem = 1;
 	hashp->NKEYS = 0;
-	hashp->LORDER = BYTE_ORDER;
+       hashp->LORDER = DB_BYTE_ORDER;
 	hashp->BSIZE = DEF_BUCKET_SIZE;
 	hashp->BSHIFT = DEF_BUCKET_SHIFT;
 	hashp->SGSIZE = DEF_SEGSIZE;
@@ -335,8 +335,8 @@ init_hash(hashp, file, info)
 		if (info->nelem)
 			nelem = info->nelem;
 		if (info->lorder) {
-			if (info->lorder != BIG_ENDIAN &&
-			    info->lorder != LITTLE_ENDIAN) {
+                       if (info->lorder != DB_BIG_ENDIAN &&
+                           info->lorder != DB_LITTLE_ENDIAN) {
 				errno = EINVAL;
 				return (NULL);
 			}
@@ -495,7 +495,7 @@ flush_meta(hashp)
 	HTAB *hashp;
 {
 	HASHHDR *whdrp;
-#ifdef _IEEE_LITTLE_ENDIAN
+#if (BYTE_ORDER == LITTLE_ENDIAN)
 	HASHHDR whdr;
 #endif
 	int fp, i, wsize;
@@ -508,7 +508,7 @@ flush_meta(hashp)
 
 	fp = hashp->fp;
 	whdrp = &hashp->hdr;
-#ifdef _IEEE_LITTLE_ENDIAN
+#if (BYTE_ORDER == LITTLE_ENDIAN)
 	whdrp = &whdr;
 	swap_header_copy(&hashp->hdr, whdrp);
 #endif
@@ -941,7 +941,7 @@ alloc_segs(hashp, nsegs)
 	return (0);
 }
 
-#ifdef _IEEE_LITTLE_ENDIAN
+#if (BYTE_ORDER == LITTLE_ENDIAN)
 /*
  * Hashp->hdr needs to be byteswapped.
  */

@@ -39,18 +39,18 @@
 
 #include <sys/param.h>
 
+/* Check that newlib understands the byte order of its target system.  */
 #ifndef BYTE_ORDER
-#ifndef LITTLE_ENDIAN
-#define LITTLE_ENDIAN 1234
+#error BYTE_ORDER not defined by sys/param.h
 #endif
-#ifndef BIG_ENDIAN
-#define BIG_ENDIAN 4321
-#endif
-#ifdef __IEEE_LITTLE_ENDIAN
-#define BYTE_ORDER LITTLE_ENDIAN
+
+/* Define DB endianness constants based on target endianness.  */
+#define DB_LITTLE_ENDIAN 1234
+#define DB_BIG_ENDIAN 4321
+#if (BYTE_ORDER == LITTLE_ENDIAN)
+#define DB_BYTE_ORDER DB_LITTLE_ENDIAN
 #else
-#define BYTE_ORDER BIG_ENDIAN
-#endif
+#define DB_BYTE_ORDER DB_BIG_ENDIAN
 #endif
 
 /* Operations */

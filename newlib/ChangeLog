@@ -1,3 +1,16 @@
+2002-07-02  Chris Demetriou  <cgd@broadcom.com>
+
+        * libc/include/sys/config.h (__IEEE_LITTLE_ENDIAN)
+        (__IEEE_BIG_ENDIAN): Define appropriately for MIPS.
+        Check that one of them is defined and error out if not.
+	Add any platforms defined in <machine/ieeefp.h> that are missing.
+        * libc/search/hash.h (DB_BYTE_ORDER, DB_BIG_ENDIAN)
+        (DB_LITTLE_ENDIAN): New defines.
+        * libc/search/hash.c: Replace all incorrect checks for
+        _IEEE_LITTLE_ENDIAN with tests of BYTE_ORDER, and all uses of
+        BYTE_ORDER, LITTLE_ENDIAN, and BIG_ENDIAN with DB_* versions.
+        * libc/search/hash_page.c: Likewise.
+
 2002-06-28  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* libm/mathfp/sf_pow.c (powf): Change k from int to float.
