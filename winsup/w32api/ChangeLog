@@ -1,4 +1,9 @@
 
+2001-03-13  Earnie Boyd  <earnie@users.sourceforge.net
+
+	* include/wingdi.h: (DOCINFO) Ansi version defined incorrectly.
+	Thanks to: Mattia Barbon <mbarbon@dsi.unive.it>
+
 2001-03-12  Earnie Boyd  <earnie@users.sourceforge.net
 
 	* include/commctrl.h (TBSTYLE_FLAT): New definition.
