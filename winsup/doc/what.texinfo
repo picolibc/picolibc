@@ -30,7 +30,7 @@ application using Cygwin, you will need the proprietary-use license
 for the Cygwin library.  This is available for purchase; please
 contact sales@@cygnus.com for more information.
 All other questions should be sent to the project
-mailing list cygwin@@sourceware.cygnus.com.
+mailing list cygwin@@sources.redhat.com.
 
 Note that when we say "free" we mean freedom, not price.  The goal of
 such freedom is that the people who use a given piece of software

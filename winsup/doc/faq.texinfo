@@ -4,10 +4,7 @@
 
 @subtitle (Only partially updated for the latest net release.)
 
-@author You can always find the latest version of this FAQ at @file{http://sourceware.cygnus.com/cygwin/faq/}.
-
-@c Something better than this is needed!
-@c @author This version of the FAQ is maintained by David Starks-Browning <starksb@ebi.ac.uk>.  It is possible thanks to contributions from the Cygwin community.
+@author You can always find the latest version of this FAQ at @file{http://sources.redhat.com/cygwin/faq/}.
 
 @setfilename faq.txt
 

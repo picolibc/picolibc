@@ -6,7 +6,7 @@
 automatically.  If you notice an error here, such as a broken link, a
 site that's down, or an ommission, please notify the FAQ maintainer.
 You can always find an up-to-date list of mirrors at
-@file{http://sourceware.cygnus.com/cygwin/mirrors.html}.)}
+@file{http://sources.redhat.com/cygwin/mirrors.html}.)}
 
 @c Just commenting out unreachable sites now, though problem could have
 @c been transient or a simple typo.  It would be nice to automate this,
@@ -20,7 +20,7 @@ You can always find an up-to-date list of mirrors at
 @item North America:
 @itemize @bullet
 @item California: @file{ftp://ftp.freesoftware.com/pub/sourceware/cygwin/}
-@item California : @file{ftp://sourceware.cygnus.com/pub/cygwin/} (This
+@item California : @file{ftp://sources.redhat.com/pub/cygwin/} (This
 is the "master" site, and is almost always too busy to permit logins.)
 @item Tennessee: @file{ftp://ftp.sunsite.utk.edu/pub/cygwin/}
 @end itemize
@@ -94,7 +94,7 @@ is the "master" site, and is almost always too busy to permit logins.)
 @section The Cygwin Project WWW Site
 
 The main WWW page for the Cygwin project is
-@file{http://sourceware.cygnus.com/cygwin/}.  There you will find a
+@file{http://sources.redhat.com/cygwin/}.  There you will find a
 great many links to additional resources and related sites.
 
 You can find documentation for the individual GNU tools at

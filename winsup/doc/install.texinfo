@@ -76,7 +76,7 @@ installation.  You can, however, add and update packages later.  See
 below.
 
 Whichever you choose, the first step is to open an ftp mirror site near
-you from @file{http://sourceware.cygnus.com/cygwin/mirrors.html}.  Then
+you from @file{http://sources.redhat.com/cygwin/mirrors.html}.  Then
 go to the 'latest' directory, download @code{setup.exe} and save that to
 an @strong{empty temporary directory}.  While you're there, download the
 README file and read it.  Then read it again.
@@ -97,7 +97,7 @@ default.
 At the next prompt, choose to install from the Internet ('i').  This is
 the default.
 
-Setup will connect to sourceware.cygnus.com to read a list of mirror
+Setup will connect to sources.redhat.com to read a list of mirror
 sites.  Choose one from the list, or choose 'other' to supply your own.
 If you supply your own, you must provide a full URL, not just the ftp
 hostname.  Setup will then proceed to download and install all packages
@@ -210,8 +210,8 @@ if your installation failed for some reason.
 @subsubsection Error message: "Unable to retrieve the list of cygwin mirrors..."
 
 This means that @code{setup.exe} could not make an http connection to
-@file{http://sourceware.cygnus.com/cygwin/mirrors.html}.  This is
-required for an internet ('i') install.  Either sourceware.cygnus.com was
+@file{http://sources.redhat.com/cygwin/mirrors.html}.  This is
+required for an internet ('i') install.  Either sources.redhat.com was
 too busy, or there is a problem with your network.  Note that
 @code{setup.exe} has very limited proxy functionality for firewalls, and
 depends on IE4 or later being installed and configured properly.  If you
