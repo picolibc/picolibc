@@ -11,7 +11,7 @@ while [ -n "$1" ]; do
     oldsym=$1; shift
     cat <<EOF > newsym.dir/$newsym.s
 	.section .idata$6
-	.extern	__imp__$oldsym
+	.extern	__imp_$oldsym
 	.extern __head_cygwin1_dll
 	.section .text
 	.global	_$newsym
