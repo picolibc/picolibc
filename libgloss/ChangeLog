@@ -1,3 +1,8 @@
+2005-01-18  Hans-Peter Nilsson  <hp@axis.com>
+
+	* libnosys/Makefile.in (LD, AS): Correct obsoleted suffix: Say
+	as-new and ld-new, not as.new and ld.new.
+
 2005-01-14  Hans-Peter Nilsson  <hp@axis.com>
                                                                                 
         * libnosys/warning.h (__make_section_unallocated)

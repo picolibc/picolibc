@@ -44,15 +44,15 @@ SHELL =	/bin/sh
 CC = @CC@
 
 #AS = @AS@
-AS = `if [ -f ${objroot}/../gas/as.new ] ; \
-	then echo ${objroot}/../gas/as.new ; \
+AS = `if [ -f ${objroot}/../gas/as-new ] ; \
+	then echo ${objroot}/../gas/as-new ; \
 	else echo as ; fi`
 
 AR = @AR@
 
 #LD = @LD@
-LD = `if [ -f ${objroot}/../ld/ld.new ] ; \
-	then echo ${objroot}/../ld/ld.new ; \
+LD = `if [ -f ${objroot}/../ld/ld-new ] ; \
+	then echo ${objroot}/../ld/ld-new ; \
 	else echo ld ; fi`
 
 RANLIB = @RANLIB@
