@@ -30,8 +30,3 @@
 {
 	return exp (lgamma_r(x,signgamp));
 }
-
-double gamma(double x)
-{
-  return gamma_r(x, &(_REENT_SIGNGAM(_REENT)));
-}

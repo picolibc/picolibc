@@ -422,9 +422,3 @@ static double zero=  0.00000000000000000000e+00;
 	if(hx<0) r = nadj - r;
 	return r;
 }
-
-double
-lgamma(double x)
-{
-  return lgamma_r(x, &(_REENT_SIGNGAM(_REENT)));
-}
