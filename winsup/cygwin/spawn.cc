@@ -809,9 +809,14 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	 dup_proc_pipe essentially a no-op.  */
       if (myself->wr_proc_pipe)
 	{
-	  /* Make sure that we own wr_proc_pipe just in case we've been
-	     previously execed. */
-	  myself->sync_proc_pipe ();
+	  myself->sync_proc_pipe ();	/* Make sure that we own wr_proc_pipe
+					   just in case we've been previously
+					   execed. */
+	  SetCurrentDirectory ("c:\\");	/* Move to an innocuous location to
+					   avoid races with other processes
+					   that may want to manipulate the
+					   current directory before this process
+					   has completely exited.  */
 	  (void) myself->dup_proc_pipe (pi.hProcess);
 	}
     }

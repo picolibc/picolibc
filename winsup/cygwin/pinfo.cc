@@ -138,18 +138,20 @@ pinfo::exit (DWORD n)
   fill_rusage (&r, hMainProc);
   add_rusage (&self->rusage_self, &r);
 
-  /* The below call could be moved down two lines, but I like to see consistent
+  /* The below call could be moved down two lines, but this provides consistent
      output from strace and the overhead should be extremely negligible.  */
   maybe_set_exit_code_from_windows ();
+
+
   if (n != EXITCODE_NOSET)
     {
-      /* Move to an innocuous location to avoid races with other processes
-	 that may want to manipulate the current directory before this process
-	 has completely exited.  */
-      SetCurrentDirectory ("c:\\");
-      /* Shave a little time off by telling our parent that we have now
-	 exited.  */
-      self->alert_parent (0);
+      SetCurrentDirectory ("c:\\");	/* Move to an innocuous location to
+					   avoid races with other processes
+					   that may want to manipulate the
+					   current directory before this process
+					   has completely exited.  */
+      self->alert_parent (0);		/* Shave a little time by telling our
+					   parent that we have now exited.  */
     }
   int exitcode = self->exitcode;
   release ();
