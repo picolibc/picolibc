@@ -1,3 +1,8 @@
+2003-05-09  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::detach): Prioritize waiting for I/O
+	completion over waiting for signal delivery.
+
 2003-05-06  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* signal.cc (nanosleep): Do not wait twice for signal arrival.

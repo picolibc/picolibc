@@ -10,6 +10,7 @@ details. */
 
 #define _sys_nerr FOO_sys_nerr
 #define sys_nerr FOOsys_nerr
+#define sys_errlist FOOsys_errlist
 #include "winsup.h"
 #define _REENT_ONLY
 #include <stdio.h>
@@ -18,6 +19,7 @@ details. */
 #include "thread.h"
 #undef _sys_nerr
 #undef sys_nerr
+#undef sys_errlist
 
 /* Table to map Windows error codes to Errno values.  */
 /* FIXME: Doing things this way is a little slow.  It's trivial to change
@@ -25,133 +27,8 @@ details. */
 
 #define X(w, e) {ERROR_##w, #w, e}
 
-static const NO_COPY struct
-  {
-    DWORD w;		 /* windows version of error */
-    const char *s;	 /* text of windows version */
-    int e;		 /* errno version of error */
-  }
-errmap[] =
-{
-  /* FIXME: Some of these choices are arbitrary! */
-  X (INVALID_FUNCTION,		EBADRQC),
-  X (FILE_NOT_FOUND,		ENOENT),
-  X (PATH_NOT_FOUND,		ENOENT),
-  X (TOO_MANY_OPEN_FILES,	EMFILE),
-  X (ACCESS_DENIED,		EACCES),
-  X (INVALID_HANDLE,		EBADF),
-  X (NOT_ENOUGH_MEMORY,		ENOMEM),
-  X (INVALID_DATA,		EINVAL),
-  X (OUTOFMEMORY,		ENOMEM),
-  X (INVALID_DRIVE,		ENODEV),
-  X (NOT_SAME_DEVICE,		EXDEV),
-  X (NO_MORE_FILES,		ENMFILE),
-  X (WRITE_PROTECT,		EROFS),
-  X (BAD_UNIT,			ENODEV),
-  X (SHARING_VIOLATION,		EACCES),
-  X (LOCK_VIOLATION,		EACCES),
-  X (SHARING_BUFFER_EXCEEDED,	ENOLCK),
-  X (HANDLE_EOF,		ENODATA),
-  X (HANDLE_DISK_FULL,		ENOSPC),
-  X (NOT_SUPPORTED,		ENOSYS),
-  X (REM_NOT_LIST,		ENONET),
-  X (DUP_NAME,			ENOTUNIQ),
-  X (BAD_NETPATH,		ENOSHARE),
-  X (BAD_NET_NAME,		ENOSHARE),
-  X (FILE_EXISTS,		EEXIST),
-  X (CANNOT_MAKE,		EPERM),
-  X (INVALID_PARAMETER,		EINVAL),
-  X (NO_PROC_SLOTS,		EAGAIN),
-  X (BROKEN_PIPE,		EPIPE),
-  X (OPEN_FAILED,		EIO),
-  X (NO_MORE_SEARCH_HANDLES,	ENFILE),
-  X (CALL_NOT_IMPLEMENTED,	ENOSYS),
-  X (INVALID_NAME,		ENOENT),
-  X (WAIT_NO_CHILDREN,		ECHILD),
-  X (CHILD_NOT_COMPLETE,	EBUSY),
-  X (DIR_NOT_EMPTY,		ENOTEMPTY),
-  X (SIGNAL_REFUSED,		EIO),
-  X (BAD_PATHNAME,		ENOENT),
-  X (SIGNAL_PENDING,		EBUSY),
-  X (MAX_THRDS_REACHED,		EAGAIN),
-  X (BUSY,			EBUSY),
-  X (ALREADY_EXISTS,		EEXIST),
-  X (NO_SIGNAL_SENT,		EIO),
-  X (FILENAME_EXCED_RANGE,	EINVAL),
-  X (META_EXPANSION_TOO_LONG,	EINVAL),
-  X (INVALID_SIGNAL_NUMBER,	EINVAL),
-  X (THREAD_1_INACTIVE,		EINVAL),
-  X (BAD_PIPE,			EINVAL),
-  X (PIPE_BUSY,			EBUSY),
-  X (NO_DATA,			EPIPE),
-  X (PIPE_NOT_CONNECTED,	ECOMM),
-  X (MORE_DATA,			EAGAIN),
-  X (DIRECTORY,			ENOTDIR),
-  X (PIPE_CONNECTED,		EBUSY),
-  X (PIPE_LISTENING,		ECOMM),
-  X (NO_TOKEN,			EINVAL),
-  X (PROCESS_ABORTED,		EFAULT),
-  X (BAD_DEVICE,		ENODEV),
-  X (BAD_USERNAME,		EINVAL),
-  X (NOT_CONNECTED,		ENOLINK),
-  X (OPEN_FILES,		EAGAIN),
-  X (ACTIVE_CONNECTIONS,	EAGAIN),
-  X (DEVICE_IN_USE,		EAGAIN),
-  X (INVALID_AT_INTERRUPT_TIME,	EINTR),
-  X (IO_DEVICE,			EIO),
-  X (NOT_OWNER,			EPERM),
-  X (END_OF_MEDIA,		ENOSPC),
-  X (EOM_OVERFLOW,		ENOSPC),
-  X (BEGINNING_OF_MEDIA,	ESPIPE),
-  X (SETMARK_DETECTED,		ESPIPE),
-  X (NO_DATA_DETECTED,		ENOSPC),
-  X (POSSIBLE_DEADLOCK,		EDEADLOCK),
-  X (CRC,			EIO),
-  X (NEGATIVE_SEEK,		EINVAL),
-  X (NOT_READY,			ENOMEDIUM),
-  X (DISK_FULL,			ENOSPC),
-  X (NOACCESS,			EFAULT),
-  X (FILE_INVALID,		ENXIO),
-  X (INVALID_ADDRESS,		EOVERFLOW),
-  { 0, NULL, 0}
-};
-
-int __stdcall
-geterrno_from_win_error (DWORD code, int deferrno)
-{
-  for (int i = 0; errmap[i].w != 0; ++i)
-    if (code == errmap[i].w)
-      {
-	syscall_printf ("windows error %u == errno %d", code, errmap[i].e);
-	return errmap[i].e;
-      }
-
-  syscall_printf ("unknown windows error %u, setting errno to %d", code,
-		  deferrno);
-  return deferrno;	/* FIXME: what's so special about EACCESS? */
-}
-
-/* seterrno_from_win_error: Given a Windows error code, set errno
-   as appropriate. */
-void __stdcall
-seterrno_from_win_error (const char *file, int line, DWORD code)
-{
-  syscall_printf ("%s:%d windows error %d", file, line, code);
-  set_errno (geterrno_from_win_error (code, EACCES));
-  return;
-}
-
-/* seterrno: Set `errno' based on GetLastError (). */
-void __stdcall
-seterrno (const char *file, int line)
-{
-  seterrno_from_win_error (file, line, GetLastError ());
-}
-
-extern char *_user_strerror _PARAMS ((int));
-
 extern "C" {
-const NO_COPY char __declspec(dllexport) * const _sys_errlist[]=
+const char __declspec(dllexport) * _sys_errlist[] NO_COPY_INIT =
 {
 /*      NOERROR 0       */ "No error",
 /*	EPERM 1		*/ "Operation not permitted",
@@ -295,8 +172,133 @@ const NO_COPY char __declspec(dllexport) * const _sys_errlist[]=
 /* EOVERFLOW 139 */ "Value too large for defined data type"
 };
 
-extern const int NO_COPY __declspec(dllexport) _sys_nerr = sizeof (_sys_errlist) / sizeof (_sys_errlist[0]);
+int NO_COPY_INIT _sys_nerr = sizeof (_sys_errlist) / sizeof (_sys_errlist[0]);
 };
+
+static const NO_COPY struct
+  {
+    DWORD w;		 /* windows version of error */
+    const char *s;	 /* text of windows version */
+    int e;		 /* errno version of error */
+  }
+errmap[] =
+{
+  /* FIXME: Some of these choices are arbitrary! */
+  X (INVALID_FUNCTION,		EBADRQC),
+  X (FILE_NOT_FOUND,		ENOENT),
+  X (PATH_NOT_FOUND,		ENOENT),
+  X (TOO_MANY_OPEN_FILES,	EMFILE),
+  X (ACCESS_DENIED,		EACCES),
+  X (INVALID_HANDLE,		EBADF),
+  X (NOT_ENOUGH_MEMORY,		ENOMEM),
+  X (INVALID_DATA,		EINVAL),
+  X (OUTOFMEMORY,		ENOMEM),
+  X (INVALID_DRIVE,		ENODEV),
+  X (NOT_SAME_DEVICE,		EXDEV),
+  X (NO_MORE_FILES,		ENMFILE),
+  X (WRITE_PROTECT,		EROFS),
+  X (BAD_UNIT,			ENODEV),
+  X (SHARING_VIOLATION,		EACCES),
+  X (LOCK_VIOLATION,		EACCES),
+  X (SHARING_BUFFER_EXCEEDED,	ENOLCK),
+  X (HANDLE_EOF,		ENODATA),
+  X (HANDLE_DISK_FULL,		ENOSPC),
+  X (NOT_SUPPORTED,		ENOSYS),
+  X (REM_NOT_LIST,		ENONET),
+  X (DUP_NAME,			ENOTUNIQ),
+  X (BAD_NETPATH,		ENOSHARE),
+  X (BAD_NET_NAME,		ENOSHARE),
+  X (FILE_EXISTS,		EEXIST),
+  X (CANNOT_MAKE,		EPERM),
+  X (INVALID_PARAMETER,		EINVAL),
+  X (NO_PROC_SLOTS,		EAGAIN),
+  X (BROKEN_PIPE,		EPIPE),
+  X (OPEN_FAILED,		EIO),
+  X (NO_MORE_SEARCH_HANDLES,	ENFILE),
+  X (CALL_NOT_IMPLEMENTED,	ENOSYS),
+  X (INVALID_NAME,		ENOENT),
+  X (WAIT_NO_CHILDREN,		ECHILD),
+  X (CHILD_NOT_COMPLETE,	EBUSY),
+  X (DIR_NOT_EMPTY,		ENOTEMPTY),
+  X (SIGNAL_REFUSED,		EIO),
+  X (BAD_PATHNAME,		ENOENT),
+  X (SIGNAL_PENDING,		EBUSY),
+  X (MAX_THRDS_REACHED,		EAGAIN),
+  X (BUSY,			EBUSY),
+  X (ALREADY_EXISTS,		EEXIST),
+  X (NO_SIGNAL_SENT,		EIO),
+  X (FILENAME_EXCED_RANGE,	EINVAL),
+  X (META_EXPANSION_TOO_LONG,	EINVAL),
+  X (INVALID_SIGNAL_NUMBER,	EINVAL),
+  X (THREAD_1_INACTIVE,		EINVAL),
+  X (BAD_PIPE,			EINVAL),
+  X (PIPE_BUSY,			EBUSY),
+  X (NO_DATA,			EPIPE),
+  X (PIPE_NOT_CONNECTED,	ECOMM),
+  X (MORE_DATA,			EAGAIN),
+  X (DIRECTORY,			ENOTDIR),
+  X (PIPE_CONNECTED,		EBUSY),
+  X (PIPE_LISTENING,		ECOMM),
+  X (NO_TOKEN,			EINVAL),
+  X (PROCESS_ABORTED,		EFAULT),
+  X (BAD_DEVICE,		ENODEV),
+  X (BAD_USERNAME,		EINVAL),
+  X (NOT_CONNECTED,		ENOLINK),
+  X (OPEN_FILES,		EAGAIN),
+  X (ACTIVE_CONNECTIONS,	EAGAIN),
+  X (DEVICE_IN_USE,		EAGAIN),
+  X (INVALID_AT_INTERRUPT_TIME,	EINTR),
+  X (IO_DEVICE,			EIO),
+  X (NOT_OWNER,			EPERM),
+  X (END_OF_MEDIA,		ENOSPC),
+  X (EOM_OVERFLOW,		ENOSPC),
+  X (BEGINNING_OF_MEDIA,	ESPIPE),
+  X (SETMARK_DETECTED,		ESPIPE),
+  X (NO_DATA_DETECTED,		ENOSPC),
+  X (POSSIBLE_DEADLOCK,		EDEADLOCK),
+  X (CRC,			EIO),
+  X (NEGATIVE_SEEK,		EINVAL),
+  X (NOT_READY,			ENOMEDIUM),
+  X (DISK_FULL,			ENOSPC),
+  X (NOACCESS,			EFAULT),
+  X (FILE_INVALID,		ENXIO),
+  X (INVALID_ADDRESS,		EOVERFLOW),
+  { 0, NULL, 0}
+};
+
+int __stdcall
+geterrno_from_win_error (DWORD code, int deferrno)
+{
+  for (int i = 0; errmap[i].w != 0; ++i)
+    if (code == errmap[i].w)
+      {
+	syscall_printf ("windows error %u == errno %d", code, errmap[i].e);
+	return errmap[i].e;
+      }
+
+  syscall_printf ("unknown windows error %u, setting errno to %d", code,
+		  deferrno);
+  return deferrno;	/* FIXME: what's so special about EACCESS? */
+}
+
+/* seterrno_from_win_error: Given a Windows error code, set errno
+   as appropriate. */
+void __stdcall
+seterrno_from_win_error (const char *file, int line, DWORD code)
+{
+  syscall_printf ("%s:%d windows error %d", file, line, code);
+  set_errno (geterrno_from_win_error (code, EACCES));
+  return;
+}
+
+/* seterrno: Set `errno' based on GetLastError (). */
+void __stdcall
+seterrno (const char *file, int line)
+{
+  seterrno_from_win_error (file, line, GetLastError ());
+}
+
+extern char *_user_strerror _PARAMS ((int));
 
 /* FIXME: Why is strerror() a long switch and not just:
 	return sys_errlist[errnum];
