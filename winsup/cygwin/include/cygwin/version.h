@@ -135,10 +135,11 @@ details. */
        39: asctime_r, ctime_r, gmtime_r, localtime_r
        40: fchdir
        41: __signgam
+       42: sys_errlist, sys_nerr
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 41
+#define CYGWIN_VERSION_API_MINOR 42
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

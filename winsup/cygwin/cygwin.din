@@ -1073,7 +1073,9 @@ __cygwin_environ DATA
 __cygwin_user_data DATA
 _ctype_ DATA
 _sys_errlist DATA
+sys_errlist = _sys_errlist DATA
 _sys_nerr DATA
+sys_nerr = _sys_nerr DATA
 __mb_cur_max DATA
 _timezone DATA
 _daylight DATA

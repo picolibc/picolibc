@@ -1,3 +1,8 @@
+Fri Jul 27 12:28:12 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* cygwin.din: Export sys_errlist, sys_nerr.
+	* include/cygwin/version.h: Bump minor version number.
+
 Fri 27 Jul 2001 10:29:00  Corinna Vinschen <corinna@vinschen.de>
 
 	* security.cc (get_user_primary_group): Fix compiler warning.
