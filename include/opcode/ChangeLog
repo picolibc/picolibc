@@ -1,3 +1,7 @@
+2000-09-05  Alan Modra  <alan@linuxcare.com.au>
+
+	* hppa.h: Mention cz completer.
+
 2000-08-16  Jim Wilson  <wilson@cygnus.com>
 
 	* ia64.h (IA64_OPCODE_POSTINC): New.

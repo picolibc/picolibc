@@ -1,5 +1,6 @@
 /* Table of opcodes for the PA-RISC.
-   Copyright (C) 1990, 1991, 1993, 1995, 1999 Free Software Foundation, Inc.
+   Copyright (C) 1990, 1991, 1993, 1995, 1999, 2000
+   Free Software Foundation, Inc.
 
    Contributed by the Center for Software Science at the
    University of Utah (pa-gdb-bugs@cs.utah.edu).
@@ -200,6 +201,7 @@ Completer operands all have 'c' as the prefix:
    ch	left/right half completer
    cH	signed/unsigned saturation completer
    cS	signed/unsigned completer at 21
+   cz	zero/sign extension completer.
    c*	permutation completer
 
 Condition operands all have '?' as the prefix:
