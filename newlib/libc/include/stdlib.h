@@ -17,7 +17,7 @@ extern "C" {
 #include <stddef.h>
 
 #include <sys/reent.h>
-
+#include <machine/stdlib.h>
 #ifndef __STRICT_ANSI__
 #include <alloca.h>
 #endif

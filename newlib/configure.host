@@ -477,6 +477,9 @@ case "${host}" in
   mn10?00-*-*)
 	syscall_dir=syscalls
 	;;
+  powerpc*-*-eabialtivec*)
+	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES -DWANT_PRINTF_LONG_LONG"
+	;;
   powerpc*-*-eabi* | \
   powerpc*-*-elf* | \
   powerpc*-*-linux* | \

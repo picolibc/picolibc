@@ -1,11 +1,17 @@
 /* This is a simple version of setjmp and longjmp for the PowerPC.
-   Ian Lance Taylor, Cygnus Support, 9 Feb 1994.  */
+   Ian Lance Taylor, Cygnus Support, 9 Feb 1994.  
+   Modified by Jeff Johnston, Red Hat Inc. 2 Oct 2001. */
 
 #include "ppc-asm.h"
 
 FUNC_START(setjmp)
+#ifdef __ALTIVEC__
+	addi	3,3,15		# align Altivec to 16 byte boundary
+	rlwinm	3,3,0,0,27
+#else
 	addi	3,3,7		# align to 8 byte boundary
 	rlwinm	3,3,0,0,28
+#endif
 	stw	1,0(3)		# offset 0
 	stwu	2,4(3)		# offset 4
 	stwu	13,4(3)		# offset 8
@@ -56,14 +62,50 @@ FUNC_START(setjmp)
 	/* This requires a total of 21 * 4 + 18 * 8 + 4 + 4 + 4
 	   bytes == 60 * 4 bytes == 240 bytes.  */
 
+#ifdef __ALTIVEC__
+	/* save Altivec vrsave and vr20-vr31 registers */
+	mfspr	4,256		# vrsave register
+	stwu	4,16(3)		# offset 248
+	addi	3,3,8
+	stvx	20,0,3		# offset 256
+	addi	3,3,16
+	stvx	21,0,3		# offset 272
+	addi	3,3,16
+	stvx	22,0,3		# offset 288
+	addi	3,3,16
+	stvx	23,0,3		# offset 304
+	addi	3,3,16
+	stvx	24,0,3		# offset 320
+	addi	3,3,16
+	stvx	25,0,3		# offset 336
+	addi	3,3,16
+	stvx	26,0,3		# offset 352
+	addi	3,3,16
+	stvx	27,0,3		# offset 368
+	addi	3,3,16
+	stvx	28,0,3		# offset 384
+	addi	3,3,16
+	stvx	29,0,3		# offset 400
+	addi	3,3,16
+	stvx	30,0,3		# offset 416
+	addi	3,3,16
+	stvx	31,0,3		# offset 432
+
+	/* This requires a total of 240 + 8 + 8 + 12 * 16 == 448 bytes. */
+#endif
 	li	3,0
 	blr
 FUNC_END(setjmp)
 
 
 FUNC_START(longjmp)
+#ifdef __ALTIVEC__
+	addi	3,3,15		# align Altivec to 16 byte boundary
+	rlwinm	3,3,0,0,27
+#else
 	addi	3,3,7		# align to 8 byte boundary
 	rlwinm	3,3,0,0,28
+#endif
 	lwz	1,0(3)		# offset 0 
 	lwzu	2,4(3)		# offset 4 
 	lwzu	13,4(3)		# offset 8 
@@ -109,6 +151,36 @@ FUNC_START(longjmp)
 	lfdu	29,8(3)         # offset 216
 	lfdu	30,8(3)         # offset 224
 	lfdu	31,8(3)         # offset 232
+#endif
+
+#ifdef __ALTIVEC__
+	/* restore Altivec vrsave and v20-v31 registers */
+	lwzu	5,16(3)		# offset 248
+	mtspr	256,5		# vrsave
+	addi	3,3,8
+	lvx	20,0,3		# offset 256
+	addi	3,3,16
+	lvx	21,0,3		# offset 272
+	addi	3,3,16
+	lvx	22,0,3		# offset 288
+	addi	3,3,16
+	lvx	23,0,3		# offset 304
+	addi	3,3,16
+	lvx	24,0,3		# offset 320
+	addi	3,3,16
+	lvx	25,0,3		# offset 336
+	addi	3,3,16
+	lvx	26,0,3		# offset 352
+	addi	3,3,16
+	lvx	27,0,3		# offset 368
+	addi	3,3,16
+	lvx	28,0,3		# offset 384
+	addi	3,3,16
+	lvx	29,0,3		# offset 400
+	addi	3,3,16
+	lvx	30,0,3		# offset 416
+	addi	3,3,16
+	lvx	31,0,3		# offset 432
 #endif
 
 	mr.	3,4

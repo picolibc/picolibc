@@ -1,3 +1,30 @@
+2002-04-19  Jeff Johnston  <jjohnstn@redhat.com>
+
+	*  configure.host: Add support for powerpc-eabialtivec*.
+	*  libc/include/malloc.h: Add include of <machine/malloc.h>.
+	*  libc/include/stdlib.h: Add include of <machine/stdlib.h>.
+	*  libc/include/machine/malloc.h: New file.
+	*  libc/include/machine/stdlib.h: Ditto.
+	*  libc/include/machine/setjmp.h: Add support for powerpc altivec.
+	*  libc/machine/powerpc/Makefile.am: Add conditional objects and
+	sources based on configuration.
+	*  libc/machine/powerpc/Makefile.in: Regenerated.
+	*  libc/machine/powerpc/configure: Ditto.
+	*  libc/machine/powerpc/configure.in: Add check for
+	powerpc-eabialtivec* in which case add in additional source files.
+	*  libc/machine/powerpc/setjmp.S: Add altivec support.
+	*  libc/machine/powerpc/vec_calloc.c: New file.
+	*  libc/machine/powerpc/vec_free.c: Ditto.
+	*  libc/machine/powerpc/vec_malloc.c: Ditto.
+	*  libc/machine/powerpc/vec_mallocr.c: Ditto.
+	*  libc/machine/powerpc/vec_realloc.c: Ditto.
+	*  libc/machine/powerpc/machine/malloc.h: Ditto.
+	*  libc/machine/powerpc/machine/stdlib.h: Ditto.
+	*  libc/machine/powerpc/vfprintf.c: New file that is vfprintf.c
+	with added altivec format specifiers.
+	*  libc/machine/powerpc/vfscanf.c: New file that is vfscanf.c with
+	added altivec format specifiers.
+
 2002-04-19	Joel Sherrill <joel@OARcorp.com>
 
 	* libs/sys/rtems/crt0.c: Satisfy gcc's references to libc functions

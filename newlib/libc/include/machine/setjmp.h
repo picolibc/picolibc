@@ -106,7 +106,11 @@ typedef int jmp_buf[_JBLEN];
 #endif
 
 #ifdef __PPC__
+#ifdef __ALTIVEC__
+#define _JBLEN 64
+#else
 #define _JBLEN 32
+#endif
 #define _JBTYPE double
 #endif
 

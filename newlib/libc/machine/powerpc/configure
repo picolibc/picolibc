@@ -1440,6 +1440,17 @@ fi
 
 
 
+extra_objs=
+extra_sources=
+case $host in
+  powerpc*-*altivec*)
+	extra_objs="vfprintf.o vfscanf.o vec_malloc.o vec_calloc.o vec_free.o vec_realloc.o vec_reallocr.o vec_callocr.o"
+	extra_sources="vfprintf.c vfscanf.c vec_malloc.c vec_calloc.c vec_free.c vec_realloc.c vec_mallocr.c"
+	;;
+esac
+
+
+
 trap '' 1 2 15
 cat > confcache <<\EOF
 # This file is a shell script that caches the results of configure
@@ -1623,6 +1634,8 @@ s%@aext@%$aext%g
 s%@libm_machine_dir@%$libm_machine_dir%g
 s%@machine_dir@%$machine_dir%g
 s%@sys_dir@%$sys_dir%g
+s%@extra_objs@%$extra_objs%g
+s%@extra_sources@%$extra_sources%g
 
 CEOF
 EOF
