@@ -1,3 +1,7 @@
+2000-07-20  Hans-Peter Nilsson  <hp@axis.com>
+
+	* config.sub: Update to subversions version 2000-07-06.
+
 2000-07-07 Phil Edwards  <pme@sourceware.cygnus.com>
 
 	* symlink-tree:  Check number of arguments.
