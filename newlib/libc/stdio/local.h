@@ -95,7 +95,11 @@ char *_EXFUN(_llicvt,(char *, long long, char));
 #ifdef __SINGLE_THREAD__
 #define __sfp_lock_acquire()
 #define __sfp_lock_release()
+#define __sinit_lock_acquire()
+#define __sinit_lock_release()
 #else
 _VOID _EXFUN(__sfp_lock_acquire,(_VOID));
 _VOID _EXFUN(__sfp_lock_release,(_VOID));
+_VOID _EXFUN(__sinit_lock_acquire,(_VOID));
+_VOID _EXFUN(__sinit_lock_release,(_VOID));
 #endif

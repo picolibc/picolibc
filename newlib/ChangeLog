@@ -1,5 +1,13 @@
 2005-02-07  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/stdio/findfp.c (__sinit): Protect with new lock.
+	(__sinit_lock): New lock.
+	(__sinit_lock_acquire, __sinit_lock_release): New functions.
+	* libc/stdio/local.h: Add reference to new __sinit locking
+	functions.
+
+2005-02-07  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/include/math.h (isfinite, isnormal, isunordered): Change
 	input variable names to avoid mixups with nesting macros.
 

@@ -163,6 +163,14 @@ _VOID
 _DEFUN(__sinit, (s),
        struct _reent *s)
 {
+  __sinit_lock_acquire ();
+
+  if (s->__sdidinit)
+    {
+      __sinit_lock_release ();
+      return;
+    }
+
   /* make sure we clean up on exit */
   s->__cleanup = _cleanup_r;	/* conservative */
   s->__sdidinit = 1;
@@ -192,11 +200,13 @@ _DEFUN(__sinit, (s),
 
   std (s->_stderr, __SWR | __SNBF, 2, s);
 
+  __sinit_lock_release ();
 }
 
 #ifndef __SINGLE_THREAD__
 
 __LOCK_INIT_RECURSIVE(static, __sfp_lock);
+__LOCK_INIT_RECURSIVE(static, __sinit_lock);
 
 _VOID
 _DEFUN_VOID(__sfp_lock_acquire)
@@ -208,6 +218,18 @@ _VOID
 _DEFUN_VOID(__sfp_lock_release)
 {
   __lock_release_recursive (__sfp_lock); 
+}
+
+_VOID
+_DEFUN_VOID(__sinit_lock_acquire)
+{
+  __lock_acquire_recursive (__sinit_lock); 
+}
+
+_VOID
+_DEFUN_VOID(__sinit_lock_release)
+{
+  __lock_release_recursive (__sinit_lock); 
 }
 
 /* Walkable file locking routine.  */
