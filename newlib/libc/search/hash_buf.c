@@ -94,8 +94,12 @@ static BUFHEAD *newbuf(HTAB *, __uint32_t, BUFHEAD *);
 #define LRU_INSERT(B)	BUF_INSERT((B), LRU)
 
 /* Macros for min/max.  */
+#ifndef MIN
 #define MIN(a,b) (((a)<(b))?(a):(b))
+#endif
+#ifndef MAX
 #define MAX(a,b) (((a)>(b))?(a):(b))
+#endif
 
 /*
  * We are looking for a buffer with address "addr".  If prev_bp is NULL, then

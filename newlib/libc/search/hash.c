@@ -78,8 +78,12 @@ static void  swap_header_copy(HASHHDR *, HASHHDR *);
 #endif
 
 /* Macros for min/max.  */
+#ifndef MIN
 #define MIN(a,b) (((a)<(b))?(a):(b))
+#endif
+#ifndef MAX
 #define MAX(a,b) (((a)>(b))?(a):(b))
+#endif
 
 /* Fast arithmetic, relying on powers of 2, */
 #define MOD(x, y)		((x) & ((y) - 1))
