@@ -71,12 +71,14 @@ class process
   friend class process_cleanup;
 
 public:
-  process (pid_t cygpid, DWORD winpid);
+  process (pid_t cygpid, DWORD winpid,
+  	   HANDLE signal_arrived = INVALID_HANDLE_VALUE);
   ~process ();
 
   pid_t cygpid () const { return _cygpid; }
   DWORD winpid () const { return _winpid; }
   HANDLE handle () const { return _hProcess; }
+  HANDLE signal_arrived () const { return _signal_arrived; }
 
   bool is_active () const { return _exit_status == STILL_ACTIVE; }
 
@@ -90,6 +92,7 @@ private:
   const pid_t _cygpid;
   const DWORD _winpid;
   HANDLE _hProcess;
+  HANDLE _signal_arrived;
   long _cleaning_up;
   DWORD _exit_status;		// Set in the constructor and in exit_code ().
   cleanup_routine *_routines_head;
@@ -131,7 +134,8 @@ public:
   process_cache (unsigned int initial_workers);
   ~process_cache ();
 
-  class process *process (pid_t cygpid, DWORD winpid);
+  class process *process (pid_t cygpid, DWORD winpid,
+  			  HANDLE signal_arrived = INVALID_HANDLE_VALUE);
 
   bool running () const { return _queue.running (); }
 

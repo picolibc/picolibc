@@ -55,7 +55,8 @@ client_request_msg::serve (transport_layer_base *const conn,
       return;
     }
   process *const client = cache->process (_parameters.in.ipcblk.cygpid,
-					  _parameters.in.ipcblk.winpid);
+					  _parameters.in.ipcblk.winpid,
+					  _parameters.in.ipcblk.signal_arrived);
   if (!client)
     {
       error_code (EAGAIN);

@@ -188,9 +188,14 @@ _msleep (void *ident, struct mtx *mtx, int priority,
   if (mtx)
     mtx_unlock (mtx);
   int old_priority = set_priority (priority);
-  /* PCATCH can't be handled here. */
-  HANDLE obj[3] = { evt, td->client->handle (), msleep_glob_evt };
-  switch (WaitForMultipleObjects (3, obj, FALSE, timo ?: INFINITE))
+  HANDLE obj[4] = { evt, td->client->handle (), msleep_glob_evt, td->client->signal_arrived () };
+  /* PCATCH handling.  If PCATCH is given and signal_arrived is a valid
+     handle, then it's used in the WaitFor call and EINTR is returned. */
+  int obj_cnt = 3;
+  if ((priority & PCATCH)
+      && td->client->signal_arrived () != INVALID_HANDLE_VALUE)
+    obj_cnt = 4;
+  switch (WaitForMultipleObjects (obj_cnt, obj, FALSE, timo ?: INFINITE))
     {
       case WAIT_OBJECT_0:	/* wakeup() has been called. */
 	ret = 0;
@@ -201,6 +206,9 @@ _msleep (void *ident, struct mtx *mtx, int priority,
       case WAIT_OBJECT_0 + 1:	/* The dependent process has exited. */
 	ret = EIDRM;
         break;
+      case WAIT_OBJECT_0 + 3:	/* Signal for calling process arrived. */
+        ret = EINTR;
+	break;
       case WAIT_TIMEOUT:
         ret = EWOULDBLOCK;
         break;

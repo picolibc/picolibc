@@ -40,10 +40,11 @@ process_cleanup::process ()
 
 /*****************************************************************************/
 
-process::process (const pid_t cygpid, const DWORD winpid)
+process::process (const pid_t cygpid, const DWORD winpid, HANDLE signal_arrived)
   : _cygpid (cygpid),
     _winpid (winpid),
     _hProcess (NULL),
+    _signal_arrived (INVALID_HANDLE_VALUE),
     _cleaning_up (false),
     _exit_status (STILL_ACTIVE),
     _routines_head (NULL),
@@ -60,13 +61,22 @@ process::process (const pid_t cygpid, const DWORD winpid)
   else
     debug_printf ("got handle %p for new cache process %d(%lu)",
 		  _hProcess, _cygpid, _winpid);
+  if (signal_arrived != INVALID_HANDLE_VALUE)
+    {
+      if (!DuplicateHandle (_hProcess, signal_arrived,
+			    GetCurrentProcess (), &_signal_arrived,
+			    0, FALSE, DUPLICATE_SAME_ACCESS))
+	system_printf ("error getting signal_arrived to server (%lu)",
+		       GetLastError ());
+    }
   InitializeCriticalSection (&_access);
 }
 
 process::~process ()
 {
   DeleteCriticalSection (&_access);
-  (void) CloseHandle (_hProcess);
+  CloseHandle (_signal_arrived);
+  CloseHandle (_hProcess);
 }
 
 /* No need to be thread-safe as this is only ever called by
@@ -221,7 +231,8 @@ process_cache::~process_cache ()
  * have been deleted once it has been unlocked.
  */
 class process *
-process_cache::process (const pid_t cygpid, const DWORD winpid)
+process_cache::process (const pid_t cygpid, const DWORD winpid,
+			HANDLE signal_arrived)
 {
   /* TODO: make this more granular, so a search doesn't involve the
    * write lock.
@@ -243,7 +254,7 @@ process_cache::process (const pid_t cygpid, const DWORD winpid)
 	  return NULL;
 	}
 
-      entry = new class process (cygpid, winpid);
+      entry = new class process (cygpid, winpid, signal_arrived);
       if (!entry->is_active ())
 	{
 	  LeaveCriticalSection (&_cache_write_access);

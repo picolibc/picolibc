@@ -1,3 +1,20 @@
+2004-02-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_mutex.cc (_msleep): Handle PCATCH using signal_arrived event.
+	* client.cc: Include sigproc.h.
+	* msg.cc (client_request_msg::serve): Accomodate third parameter to
+	process::process.
+	* sem.cc (client_request_sem::serve): Ditto.
+	* shm.cc (client_request_shm::serve): Ditto.
+	* process.cc (process::process): Duplicate signal_arrived into
+	Cygserver process space.
+	(process::~process): Close _signal_arrived handle.
+	(process_cache::process): Add signal_arrived handling.
+	* process.h (process::process): Add signal_arrived parameter.
+	(process:signal_arrived): New read accessor.
+	(process:_signal_arrived): New member.
+	(process_cache::process): Add signal_arrived parameter.
+
 2004-01-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* process.h (cleanup_routine::~cleanup_routine): Make pure virtual
