@@ -380,7 +380,10 @@ getacl (const char *file, DWORD attr, int nentries, __aclent16_t *aclbufp)
     if (EqualSid (owner_sid, group_sid)) 
       lacl[0].a_perm = lacl[1].a_perm;
     if (pos > nentries)
-      pos = nentries;
+      {
+        set_errno (ENOSPC);
+	return -1;
+      }
     memcpy (aclbufp, lacl, pos * sizeof (__aclent16_t));
     for (i = 0; i < pos; ++i)
       aclbufp[i].a_perm &= ~(DENY_R | DENY_W | DENY_X);

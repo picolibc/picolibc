@@ -1,3 +1,8 @@
+2002-11-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_acl.cc (getacl): Set errno to ENOSPC if command is GETACL and
+	nentries is less than the number of entries in the file's ACL.
+
 2002-11-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_acl.cc: Fix some formatting.  Only set and check `other' bits in
