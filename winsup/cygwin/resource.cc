@@ -14,6 +14,7 @@ details. */
 
 #include "winsup.h"
 #include <errno.h>
+#include <unistd.h>
 #include "cygerrno.h"
 #include "sync.h"
 #include "sigproc.h"
@@ -164,6 +165,10 @@ setrlimit (int resource, const struct rlimit *rlp)
     {
     case RLIMIT_CORE:
       rlim_core = rlp->rlim_cur;
+      break;
+    case RLIMIT_NOFILE:
+      if (rlp->rlim_cur != RLIM_INFINITY)
+        return setdtablesize (rlp->rlim_cur);
       break;
     default:
       set_errno (EINVAL);

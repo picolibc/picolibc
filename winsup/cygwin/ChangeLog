@@ -1,3 +1,7 @@
+Thu Jan 18 10:27:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* resource.cc (setrlimit): Support RLIMIT_NOFILE.
+
 Wed Jan 17 23:23:12 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* syscalls.cc (setdtablesize): Call with amount to increment not total
