@@ -1,3 +1,8 @@
+2001-09-07  Jeff Law  <law@redhat.com>
+
+        * libc/sys/h8300hms/crt0.S: For H8/300H and H8/S, load address of
+        __fini with "mov.l" instead of "mov.w".
+
 2001-09-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/sys/cygwin/include/unistd.h: New file, wrapping sys/unistd.h

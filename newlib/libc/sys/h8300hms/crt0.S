@@ -14,7 +14,7 @@ _start:
 	cmp	r1,r0
 	blo	.loop
 #ifdef __ELF__
-	mov.w   #__fini,r0
+	mov.l   #__fini,r0
 	jsr     @_atexit
 	jsr     @__init
 #else
@@ -43,7 +43,7 @@ _start:
 	cmp.l	er1,er0
 	blo	.loop
 #ifdef __ELF__
-	mov.w   #__fini,r0
+	mov.l   #__fini,r0
 	jsr     @_atexit
 	jsr     @__init
 #else
@@ -72,7 +72,7 @@ _start:
 	cmp.l	er1,er0
 	blo	.loop
 #ifdef __ELF__
-	mov.w   #__fini,r0
+	mov.l   #__fini,r0
 	jsr     @_atexit
 	jsr     @__init
 #else
