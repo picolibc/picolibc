@@ -21,6 +21,7 @@ int _EXFUN(tolower, (int __c));
 int _EXFUN(toupper, (int __c));
 
 #ifndef __STRICT_ANSI__
+int _EXFUN(isblank, (int __c));
 int _EXFUN(isascii, (int __c));
 int _EXFUN(toascii, (int __c));
 int _EXFUN(_tolower, (int __c));

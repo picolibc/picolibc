@@ -9,6 +9,7 @@ LIB_SOURCES = \
 	isalnum.c \
 	isalpha.c \
 	isascii.c \
+	isblank.c \
 	iscntrl.c \
 	isdigit.c \
 	islower.c \

@@ -44,6 +44,7 @@
 #ifndef _SYS_CDEFS_H
 #define _SYS_CDEFS_H
 
+#define __FBSDID(x) /* nothing */
 /*
  * Note: the goal here is not compatibility to K&R C. Since we know that we
  * have GCC which understands ANSI C perfectly well, we make use of this.

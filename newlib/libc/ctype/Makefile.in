@@ -113,6 +113,7 @@ LIB_SOURCES = \
 	isalnum.c \
 	isalpha.c \
 	isascii.c \
+	isblank.c \
 	iscntrl.c \
 	isdigit.c \
 	islower.c \
@@ -172,21 +173,21 @@ LIBS = @LIBS@
 lib_a_LIBADD = 
 @USE_LIBTOOL_FALSE@lib_a_OBJECTS =  ctype_.$(OBJEXT) isalnum.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@isalpha.$(OBJEXT) isascii.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@iscntrl.$(OBJEXT) isdigit.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@islower.$(OBJEXT) isupper.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@isprint.$(OBJEXT) ispunct.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@isspace.$(OBJEXT) isxdigit.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@toascii.$(OBJEXT) tolower.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@toupper.$(OBJEXT) _tolower.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@_toupper.$(OBJEXT)
+@USE_LIBTOOL_FALSE@isblank.$(OBJEXT) iscntrl.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@isdigit.$(OBJEXT) islower.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@isupper.$(OBJEXT) isprint.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@ispunct.$(OBJEXT) isspace.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@isxdigit.$(OBJEXT) toascii.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@tolower.$(OBJEXT) toupper.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@_tolower.$(OBJEXT) _toupper.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 libctype_la_LIBADD = 
 @USE_LIBTOOL_TRUE@libctype_la_OBJECTS =  ctype_.lo isalnum.lo isalpha.lo \
-@USE_LIBTOOL_TRUE@isascii.lo iscntrl.lo isdigit.lo islower.lo \
-@USE_LIBTOOL_TRUE@isupper.lo isprint.lo ispunct.lo isspace.lo \
-@USE_LIBTOOL_TRUE@isxdigit.lo toascii.lo tolower.lo toupper.lo \
-@USE_LIBTOOL_TRUE@_tolower.lo _toupper.lo
+@USE_LIBTOOL_TRUE@isascii.lo isblank.lo iscntrl.lo isdigit.lo \
+@USE_LIBTOOL_TRUE@islower.lo isupper.lo isprint.lo ispunct.lo \
+@USE_LIBTOOL_TRUE@isspace.lo isxdigit.lo toascii.lo tolower.lo \
+@USE_LIBTOOL_TRUE@toupper.lo _tolower.lo _toupper.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

@@ -1,3 +1,12 @@
+2002-06-18  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* libc/include/ctype.h: Remove isblank macro.
+
+	* libc/ctype/Makefile.am (LIB_SOURCES): Add isblank.c.
+	* libc/ctype/isblank.c: New file.
+	* libc/include/ctype.h [!__STRICT_ANSI__]: Add isblank
+	declaration.  Add isblank macro.
+
 2002-06-18  Jeff Johnston  <jjohnstn@redhat.com>
 
         * testsuite/newlib.stdlib/atexit.c: New file.
