@@ -1272,7 +1272,7 @@ gcc-no-fixedincludes:
 
 # Host modules specific to gcc.
 # GCC needs to identify certain tools.
-gcc/Makefile: maybe-configure-binutils maybe-configure-gas maybe-configure-ld maybe-configure-bison maybe-configure-flex
+configure-gcc: maybe-configure-binutils maybe-configure-gas maybe-configure-ld maybe-configure-bison maybe-configure-flex
 all-gcc: maybe-all-libiberty maybe-all-bison maybe-all-byacc maybe-all-binutils maybe-all-gas maybe-all-ld maybe-all-zlib
 # This is a slightly kludgy method of getting dependencies on 
 # all-build-libiberty correct; it would be better to build it every time.
@@ -1281,7 +1281,7 @@ all-bootstrap: maybe-all-libiberty maybe-all-texinfo maybe-all-bison maybe-all-b
 
 # Host modules specific to gdb.
 # GDB needs to know that the simulator is being built.
-gdb/Makefile: maybe-configure-tcl maybe-configure-tk maybe-configure-sim
+configure-gdb: maybe-configure-tcl maybe-configure-tk maybe-configure-sim
 GDB_TK = @GDB_TK@
 all-gdb: maybe-all-libiberty maybe-all-opcodes maybe-all-bfd maybe-all-mmalloc maybe-all-readline maybe-all-bison maybe-all-byacc maybe-all-sim $(gdbnlmrequirements) $(GDB_TK)
 install-gdb: maybe-install-tcl maybe-install-tk maybe-install-itcl maybe-install-tix maybe-install-libgui
@@ -1289,7 +1289,7 @@ libgui/Makefile: maybe-configure-tcl maybe-configure-tk
 all-libgui: maybe-all-tcl maybe-all-tk maybe-all-itcl
 
 # Host modules specific to binutils.
-bfd/Makefile: configure-libiberty
+configure-bfd: configure-libiberty
 all-bfd: maybe-all-libiberty maybe-all-intl
 all-binutils: maybe-all-libiberty maybe-all-opcodes maybe-all-bfd maybe-all-flex maybe-all-bison maybe-all-byacc maybe-all-intl
 # We put install-opcodes before install-binutils because the installed
@@ -1303,9 +1303,9 @@ all-opcodes: maybe-all-bfd maybe-all-libiberty
 
 # Other host modules in the 'src' repository.
 all-dejagnu: maybe-all-tcl maybe-all-expect maybe-all-tk
-expect/Makefile: maybe-configure-tcl maybe-configure-tk
+configure-expect: maybe-configure-tcl maybe-configure-tk
 all-expect: maybe-all-tcl maybe-all-tk
-itcl/Makefile: maybe-configure-tcl maybe-configure-tk
+configure-itcl: maybe-configure-tcl maybe-configure-tk
 all-itcl: maybe-all-tcl maybe-all-tk
 # We put install-tcl before install-itcl because itcl wants to run a
 # program on installation which uses the Tcl libraries.
@@ -1313,9 +1313,9 @@ install-itcl: maybe-install-tcl
 all-sid: maybe-all-tcl maybe-all-tk
 install-sid: maybe-install-tcl maybe-install-tk
 all-sim: maybe-all-libiberty maybe-all-bfd maybe-all-opcodes maybe-all-readline
-tk/Makefile: maybe-configure-tcl
+configure-tk: maybe-configure-tcl
 all-tk: maybe-all-tcl
-tix/Makefile: maybe-configure-tcl maybe-configure-tk
+configure-tix: maybe-configure-tcl maybe-configure-tk
 all-tix: maybe-all-tcl maybe-all-tk
 all-texinfo: maybe-all-libiberty
 
@@ -1347,34 +1347,34 @@ ALL_GCC_C = $(ALL_GCC) maybe-all-target-newlib maybe-all-target-libgloss
 ALL_GCC_CXX = $(ALL_GCC_C) maybe-all-target-libstdc++-v3
 
 # Target modules specific to gcc.
-$(TARGET_SUBDIR)/boehm-gc/Makefile: $(ALL_GCC_C) maybe-configure-target-qthreads
-$(TARGET_SUBDIR)/fastjar/Makefile: maybe-configure-target-zlib
+configure-target-boehm-gc: $(ALL_GCC_C) maybe-configure-target-qthreads
+configure-target-fastjar: maybe-configure-target-zlib
 all-target-fastjar: maybe-all-target-zlib maybe-all-target-libiberty
-$(TARGET_SUBDIR)/libf2c/Makefile: $(ALL_GCC_C)
+configure-target-libf2c: $(ALL_GCC_C)
 all-target-libf2c: maybe-all-target-libiberty
-$(TARGET_SUBDIR)/libffi/Makefile: $(ALL_GCC_C) 
-$(TARGET_SUBDIR)/libjava/Makefile: $(ALL_GCC_C) maybe-configure-target-zlib maybe-configure-target-boehm-gc maybe-configure-target-qthreads maybe-configure-target-libffi
+configure-target-libffi: $(ALL_GCC_C) 
+configure-target-libjava: $(ALL_GCC_C) maybe-configure-target-zlib maybe-configure-target-boehm-gc maybe-configure-target-qthreads maybe-configure-target-libffi
 all-target-libjava: maybe-all-fastjar maybe-all-target-zlib maybe-all-target-boehm-gc maybe-all-target-qthreads maybe-all-target-libffi
-$(TARGET_SUBDIR)/libobjc/Makefile: $(ALL_GCC_C)
+configure-target-libobjc: $(ALL_GCC_C)
 all-target-libobjc: maybe-all-target-libiberty
-$(TARGET_SUBDIR)/libstdc++-v3/Makefile: $(ALL_GCC_C)
+configure-target-libstdc++-v3: $(ALL_GCC_C)
 all-target-libstdc++-v3: maybe-all-target-libiberty
-$(TARGET_SUBDIR)/zlib/Makefile: $(ALL_GCC_C)
+configure-target-zlib: $(ALL_GCC_C)
 
 # Target modules in the 'src' repository.
-$(TARGET_SUBDIR)/examples/Makefile: $(ALL_GCC_C)
-$(TARGET_SUBDIR)/libgloss/Makefile: $(ALL_GCC)
+configure-target-examples: $(ALL_GCC_C)
+configure-target-libgloss: $(ALL_GCC)
 all-target-libgloss: maybe-configure-target-newlib
-$(TARGET_SUBDIR)/libiberty/Makefile: $(ALL_GCC_C)
-$(TARGET_SUBDIR)/libtermcap/Makefile: $(ALL_GCC_C)
-$(TARGET_SUBDIR)/newlib/Makefile: $(ALL_GCC)
-$(TARGET_SUBDIR)/winsup/Makefile: $(ALL_GCC_C)
+configure-target-libiberty: $(ALL_GCC_C)
+configure-target-libtermcap: $(ALL_GCC_C)
+configure-target-newlib: $(ALL_GCC)
+configure-target-winsup: $(ALL_GCC_C)
 all-target-winsup: maybe-all-target-libiberty maybe-all-target-libtermcap
 
 # Other target modules.  Warning, these are not well tested.
-$(TARGET_SUBDIR)/gperf/Makefile: $(ALL_GCC_CXX)
+configure-target-gperf: $(ALL_GCC_CXX)
 all-target-gperf: maybe-all-target-libiberty maybe-all-target-libstdc++-v3
-$(TARGET_SUBDIR)/qthreads/Makefile: $(ALL_GCC_C)
+configure-target-qthreads: $(ALL_GCC_C)
 
 # Dependencies of maybe-foo on foo.  These are used because, for example,
 # all-gcc only depends on all-gas if gas is present and being configured.
