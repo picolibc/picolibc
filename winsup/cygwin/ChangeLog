@@ -1,3 +1,9 @@
+2001-10-18  Christopher Faylor  <cgf@redhat.com>
+
+	* syscalls.cc (_read): Validate input pointer.
+	(_write): Ditto.
+	(system): Ditto.
+
 2001-10-16  Frederic Devernay  <Frederic.Devernay@sophia.inria.fr>
 
 	* poll.cc (poll): Call cygwin_select() if any fd is valid.

@@ -287,6 +287,9 @@ setsid (void)
 extern "C" ssize_t
 _read (int fd, void *ptr, size_t len)
 {
+  if (__check_null_invalid_struct_errno (ptr, len))
+    return -1;
+
   int res;
   extern int sigcatchers;
   int e = get_errno ();
@@ -341,9 +344,12 @@ _read (int fd, void *ptr, size_t len)
 extern "C" ssize_t
 _write (int fd, const void *ptr, size_t len)
 {
-  int res = -1;
-  sigframe thisframe (mainthread);
+  if (__check_null_invalid_struct_errno (ptr, len))
+    return -1;
 
+  int res = -1;
+
+  sigframe thisframe (mainthread);
   cygheap_fdget cfd (fd);
   if (cfd < 0)
     goto done;
@@ -1245,6 +1251,9 @@ done:
 extern "C" int
 system (const char *cmdstring)
 {
+  if (check_null_empty_str_errno (cmdstring))
+    return -1;
+
   sigframe thisframe (mainthread);
   int res;
   const char* command[4];
