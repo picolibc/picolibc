@@ -1,5 +1,10 @@
 2002-07-15  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/include/sys/config.h[__H8300__]: Replace __SMALL_BITFIELDS
+	definition that was removed in error.
+
+2002-07-15  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/include/machine/ieeefp.h: Change to only define
 	floating point defines (e.g one of __IEEE_BIG_ENDIAN or 
 	__IEEE_LITTLE_ENDIAN must be defined for each platform).

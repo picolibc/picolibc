@@ -7,6 +7,7 @@
 #if defined(__H8300__) || defined(__H8500__) || defined (__H8300H__) ||  defined(__W65__) || defined (__H8300S__)
 /* ???  This conditional is true for the h8500 and the w65, defining H8300
    in those cases probably isn't the right thing to do.  */
+#define __SMALL_BITFIELDS
 #define H8300 1
 #endif
 
