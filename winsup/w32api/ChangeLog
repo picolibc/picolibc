@@ -1,3 +1,8 @@
+2003-10-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/winbase.h (AddVectoredExceptionHandler): Only define if
+	_WIN32_WINNT >= 0x0501.
+
 2003-10-07  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/winbase.h [_WIN32_WINNT >= 0x0500] (SetComputerNameEx[AW],
