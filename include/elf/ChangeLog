@@ -1,3 +1,10 @@
+2000-09-05  Alan Modra  <alan@linuxcare.com.au>
+
+	* hppa.h: Fix a comment.
+	(R_PARISC_PCREL12F): Define.
+	(R_PARISC_GNU_VTENTRY): Define.
+	(R_PARISC_GNU_VTINHERIT): Define.
+
 2000-09-01  Alexandre Oliva  <aoliva@redhat.com>
 
 	* sh.h (R_SH_GOT32, R_SH_PLT32, R_SH_COPY, R_SH_GLOB_DAT,

@@ -135,6 +135,9 @@ RELOC_NUMBER (R_PARISC_DIR14R,	   	 6)
    addend being zero.  A consequence of this limitation is GAS
    can not perform relocation reductions for function symbols.  */
 
+RELOC_NUMBER (R_PARISC_PCREL12F,  	 8)
+/*		op & branch (17)	   symbol - PC - 8 + addend    	  */
+
 RELOC_NUMBER (R_PARISC_PCREL32,   	 9)
 /*		32-bit word		   symbol - PC - 8 + addend    	  */
 
@@ -229,7 +232,7 @@ RELOC_NUMBER (R_PARISC_SEGBASE,       	48)
 /*		none                       no relocation; SB := sym  	  */
 
 RELOC_NUMBER (R_PARISC_SEGREL32,      	49)
-/*		32-bit                     word symbol - SB + addend 	  */
+/*		32-bit word                symbol - SB + addend 	  */
   
 
 /* Offsets from the PLT.  */  
@@ -470,6 +473,9 @@ RELOC_NUMBER (R_PARISC_LTOFF_TP16WF,   230)
 
 RELOC_NUMBER (R_PARISC_LTOFF_TP16DF,   231)
 /*		load/store doubleword (3)  ltoff(symbol - TP + addend)    */
+
+RELOC_NUMBER (R_PARISC_GNU_VTENTRY,    232)
+RELOC_NUMBER (R_PARISC_GNU_VTINHERIT,  233)
 
 END_RELOC_NUMBERS (R_PARISC_UNIMPLEMENTED)
 
