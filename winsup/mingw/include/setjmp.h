@@ -44,7 +44,7 @@ _CRTIMP int __cdecl _setjmp (jmp_buf);
  * Return to the last setjmp call and act as if setjmp had returned
  * nVal (which had better be non-zero!).
  */
-_CRTIMP void __cdecl longjmp (jmp_buf, int) ___MINGW_ATTRIB_NORETURN;
+_CRTIMP void __cdecl longjmp (jmp_buf, int) __MINGW_ATTRIB_NORETURN;
 
 #ifdef __cplusplus
 }

@@ -1,3 +1,14 @@
+2004-07-26  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/_mingw.h: Use only two underscores to uglify
+	__MINGW_ATTRIB_* macros.
+	* include/stdlib.h: Adjust __MINGW_ATTRIB_* tokens.
+	* includ/setjmp.h: Likewise.
+
+	* include/sting.h: Add __MINGW_ATTRIB_PURE to locale-independent
+	string functions.
+	(_strdup, strdup): Add __MINGW_ATTRIB_MALLOC.
+
 2004-07-25  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/string.h: Group wide string functions together,
@@ -5,7 +16,7 @@
 
 2004-07-25  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/_mingw.h (_MINGW_ATTR_*):  Replace with
+	* include/_mingw.h (__MINGW_ATTR_*):  Replace with
 	__MINGW_ATTRIB_*.
 	* include/stdlib.h (_ATTRIB_NORETURN): Replace with
 	__MINGW_ATTRIB_NOREURN, throughout.

@@ -342,13 +342,13 @@ _CRTIMP int __cdecl	mbtowc		(wchar_t*, const char*, size_t);
 _CRTIMP int __cdecl	rand	(void);
 _CRTIMP void __cdecl	srand	(unsigned int);
 
-_CRTIMP void* __cdecl	calloc	(size_t, size_t) ___MINGW_ATTRIB_MALLOC;
-_CRTIMP void* __cdecl	malloc	(size_t) ___MINGW_ATTRIB_MALLOC;
+_CRTIMP void* __cdecl	calloc	(size_t, size_t) __MINGW_ATTRIB_MALLOC;
+_CRTIMP void* __cdecl	malloc	(size_t) __MINGW_ATTRIB_MALLOC;
 _CRTIMP void* __cdecl	realloc	(void*, size_t);
 _CRTIMP void __cdecl	free	(void*);
 
-_CRTIMP void __cdecl	abort	(void) ___MINGW_ATTRIB_NORETURN;
-_CRTIMP void __cdecl	exit	(int) ___MINGW_ATTRIB_NORETURN;
+_CRTIMP void __cdecl	abort	(void) __MINGW_ATTRIB_NORETURN;
+_CRTIMP void __cdecl	exit	(int) __MINGW_ATTRIB_NORETURN;
 
 /* Note: This is in startup code, not imported directly from dll */
 int __cdecl	atexit	(void (*)(void));
@@ -362,8 +362,8 @@ _CRTIMP void* __cdecl	bsearch	(const void*, const void*, size_t, size_t,
 _CRTIMP void __cdecl	qsort	(void*, size_t, size_t,
 				 int (*)(const void*, const void*));
 
-_CRTIMP int __cdecl	abs	(int) ___MINGW_ATTRIB_CONST;
-_CRTIMP long __cdecl	labs	(long) ___MINGW_ATTRIB_CONST;
+_CRTIMP int __cdecl	abs	(int) __MINGW_ATTRIB_CONST;
+_CRTIMP long __cdecl	labs	(long) __MINGW_ATTRIB_CONST;
 
 /*
  * div_t and ldiv_t are structures used to return the results of div and
@@ -376,8 +376,8 @@ _CRTIMP long __cdecl	labs	(long) ___MINGW_ATTRIB_CONST;
 typedef struct { int quot, rem; } div_t;
 typedef struct { long quot, rem; } ldiv_t;
 
-_CRTIMP div_t __cdecl	div	(int, int) ___MINGW_ATTRIB_CONST;
-_CRTIMP ldiv_t __cdecl	ldiv	(long, long) ___MINGW_ATTRIB_CONST;
+_CRTIMP div_t __cdecl	div	(int, int) __MINGW_ATTRIB_CONST;
+_CRTIMP ldiv_t __cdecl	ldiv	(long, long) __MINGW_ATTRIB_CONST;
 
 #if !defined (__STRICT_ANSI__)
 
@@ -389,7 +389,7 @@ _CRTIMP void __cdecl	_beep (unsigned int, unsigned int);
 _CRTIMP void __cdecl	_seterrormode (int);
 _CRTIMP void __cdecl	_sleep (unsigned long);
 
-_CRTIMP void __cdecl	_exit	(int) ___MINGW_ATTRIB_NORETURN;
+_CRTIMP void __cdecl	_exit	(int) __MINGW_ATTRIB_NORETURN;
 
 /* _onexit is MS extension. Use atexit for portability.  */
 /* Note: This is in startup code, not imported directly from dll */
@@ -430,10 +430,10 @@ _CRTIMP void __cdecl    _wmakepath(wchar_t*, const wchar_t*, const wchar_t*, con
 _CRTIMP void __cdecl	_wsplitpath (const wchar_t*, wchar_t*, wchar_t*, wchar_t*, wchar_t*);
 _CRTIMP wchar_t* __cdecl    _wfullpath (wchar_t*, const wchar_t*, size_t);
 
-_CRTIMP unsigned int __cdecl _rotl(unsigned int, int) ___MINGW_ATTRIB_CONST;
-_CRTIMP unsigned int __cdecl _rotr(unsigned int, int) ___MINGW_ATTRIB_CONST;
-_CRTIMP unsigned long __cdecl _lrotl(unsigned long, int) ___MINGW_ATTRIB_CONST;
-_CRTIMP unsigned long __cdecl _lrotr(unsigned long, int) ___MINGW_ATTRIB_CONST;
+_CRTIMP unsigned int __cdecl _rotl(unsigned int, int) __MINGW_ATTRIB_CONST;
+_CRTIMP unsigned int __cdecl _rotr(unsigned int, int) __MINGW_ATTRIB_CONST;
+_CRTIMP unsigned long __cdecl _lrotl(unsigned long, int) __MINGW_ATTRIB_CONST;
+_CRTIMP unsigned long __cdecl _lrotr(unsigned long, int) __MINGW_ATTRIB_CONST;
 #endif
 
 #ifndef	_NO_OLDNAMES
@@ -458,7 +458,7 @@ _CRTIMP char* __cdecl	gcvt (double, int, char*);
 #if !defined __NO_ISOCEXT /* externs in static libmingwex.a */
 
 /* C99 name for _exit */
-void __cdecl _Exit(int) ___MINGW_ATTRIB_NORETURN;
+void __cdecl _Exit(int) __MINGW_ATTRIB_NORETURN;
 #ifndef __STRICT_ANSI__   /* inline using non-ansi functions */
 __CRT_INLINE void __cdecl _Exit(int status)
 	{  _exit(status); }
@@ -466,7 +466,7 @@ __CRT_INLINE void __cdecl _Exit(int status)
 
 typedef struct { long long quot, rem; } lldiv_t;
 
-lldiv_t	__cdecl lldiv (long long, long long) ___MINGW_ATTRIB_CONST;
+lldiv_t	__cdecl lldiv (long long, long long) __MINGW_ATTRIB_CONST;
 
 __CRT_INLINE long long __cdecl llabs(long long _j)
   {return (_j >= 0 ? _j : -_j);}

@@ -33,27 +33,27 @@ extern "C" {
 /*
  * Prototypes of the ANSI Standard C library string functions.
  */
-_CRTIMP void* __cdecl	memchr (const void*, int, size_t);
-_CRTIMP int __cdecl 	memcmp (const void*, const void*, size_t);
-_CRTIMP void* __cdecl 	memcpy (void*, const void*, size_t);
-_CRTIMP void* __cdecl	memmove (void*, const void*, size_t);
-_CRTIMP void* __cdecl	memset (void*, int, size_t);
-_CRTIMP char* __cdecl	strcat (char*, const char*);
-_CRTIMP char* __cdecl	strchr (const char*, int);
-_CRTIMP int __cdecl	strcmp (const char*, const char*);
+_CRTIMP void* __cdecl	memchr (const void*, int, size_t) __MINGW_ATTRIB_PURE;
+_CRTIMP int __cdecl 	memcmp (const void*, const void*, size_t) __MINGW_ATTRIB_PURE;
+_CRTIMP void* __cdecl 	memcpy (void*, const void*, size_t) __MINGW_ATTRIB_PURE;
+_CRTIMP void* __cdecl	memmove (void*, const void*, size_t) __MINGW_ATTRIB_PURE;
+_CRTIMP void* __cdecl	memset (void*, int, size_t) __MINGW_ATTRIB_PURE;
+_CRTIMP char* __cdecl	strcat (char*, const char*) __MINGW_ATTRIB_PURE;
+_CRTIMP char* __cdecl	strchr (const char*, int) __MINGW_ATTRIB_PURE;
+_CRTIMP int __cdecl	strcmp (const char*, const char*) __MINGW_ATTRIB_PURE;
 _CRTIMP int __cdecl	strcoll (const char*, const char*);	/* Compare using locale */
-_CRTIMP char* __cdecl	strcpy (char*, const char*);
-_CRTIMP size_t __cdecl	strcspn (const char*, const char*);
+_CRTIMP char* __cdecl	strcpy (char*, const char*) __MINGW_ATTRIB_PURE;
+_CRTIMP size_t __cdecl	strcspn (const char*, const char*) __MINGW_ATTRIB_PURE;
 _CRTIMP char* __cdecl	strerror (int); /* NOTE: NOT an old name wrapper. */
 
-_CRTIMP size_t __cdecl	strlen (const char*);
-_CRTIMP char* __cdecl	strncat (char*, const char*, size_t);
-_CRTIMP int __cdecl	strncmp (const char*, const char*, size_t);
-_CRTIMP char* __cdecl	strncpy (char*, const char*, size_t);
-_CRTIMP char* __cdecl	strpbrk (const char*, const char*);
-_CRTIMP char* __cdecl	strrchr (const char*, int);
-_CRTIMP size_t __cdecl	strspn (const char*, const char*);
-_CRTIMP char* __cdecl	strstr (const char*, const char*);
+_CRTIMP size_t __cdecl	strlen (const char*) __MINGW_ATTRIB_PURE;
+_CRTIMP char* __cdecl	strncat (char*, const char*, size_t) __MINGW_ATTRIB_PURE;
+_CRTIMP int __cdecl	strncmp (const char*, const char*, size_t) __MINGW_ATTRIB_PURE;
+_CRTIMP char* __cdecl	strncpy (char*, const char*, size_t) __MINGW_ATTRIB_PURE;
+_CRTIMP char* __cdecl	strpbrk (const char*, const char*) __MINGW_ATTRIB_PURE;
+_CRTIMP char* __cdecl	strrchr (const char*, int) __MINGW_ATTRIB_PURE;
+_CRTIMP size_t __cdecl	strspn (const char*, const char*) __MINGW_ATTRIB_PURE;
+_CRTIMP char* __cdecl	strstr (const char*, const char*) __MINGW_ATTRIB_PURE;
 _CRTIMP char* __cdecl	strtok (char*, const char*);
 _CRTIMP size_t __cdecl	strxfrm (char*, const char*, size_t);
 
@@ -62,19 +62,19 @@ _CRTIMP size_t __cdecl	strxfrm (char*, const char*, size_t);
  * Extra non-ANSI functions provided by the CRTDLL library
  */
 _CRTIMP char* __cdecl	_strerror (const char *);
-_CRTIMP void* __cdecl	_memccpy (void*, const void*, int, size_t);
+_CRTIMP void* __cdecl	_memccpy (void*, const void*, int, size_t) __MINGW_ATTRIB_PURE;
 _CRTIMP int __cdecl 	_memicmp (const void*, const void*, size_t);
-_CRTIMP char* __cdecl 	_strdup (const char*);
+_CRTIMP char* __cdecl 	_strdup (const char*) __MINGW_ATTRIB_MALLOC;
 _CRTIMP int __cdecl	_strcmpi (const char*, const char*);
 _CRTIMP int __cdecl	_stricmp (const char*, const char*);
 _CRTIMP int __cdecl	_stricoll (const char*, const char*);
 _CRTIMP char* __cdecl	_strlwr (char*);
 _CRTIMP int __cdecl	_strnicmp (const char*, const char*, size_t);
-_CRTIMP char* __cdecl	_strnset (char*, int, size_t);
-_CRTIMP char* __cdecl	_strrev (char*);
-_CRTIMP char* __cdecl	_strset (char*, int);
+_CRTIMP char* __cdecl	_strnset (char*, int, size_t) __MINGW_ATTRIB_PURE;
+_CRTIMP char* __cdecl	_strrev (char*) __MINGW_ATTRIB_PURE;
+_CRTIMP char* __cdecl	_strset (char*, int) __MINGW_ATTRIB_PURE;
 _CRTIMP char* __cdecl	_strupr (char*);
-_CRTIMP void __cdecl	_swab (const char*, char*, size_t);
+_CRTIMP void __cdecl	_swab (const char*, char*, size_t) __MINGW_ATTRIB_PURE;
 
 #ifdef __MSVCRT__
 _CRTIMP int __cdecl  _strncoll(const char*, const char*, size_t);
@@ -87,9 +87,9 @@ _CRTIMP int __cdecl  _strnicoll(const char*, const char*, size_t);
  * and provide a little extra portability. Also a few extra UNIX-isms like
  * strcasecmp.
  */
-_CRTIMP void* __cdecl	memccpy (void*, const void*, int, size_t);
+_CRTIMP void* __cdecl	memccpy (void*, const void*, int, size_t) __MINGW_ATTRIB_PURE;
 _CRTIMP int __cdecl	memicmp (const void*, const void*, size_t);
-_CRTIMP char* __cdecl	strdup (const char*);
+_CRTIMP char* __cdecl	strdup (const char*) __MINGW_ATTRIB_MALLOC;
 _CRTIMP int __cdecl	strcmpi (const char*, const char*);
 _CRTIMP int __cdecl	stricmp (const char*, const char*);
 __CRT_INLINE int __cdecl
@@ -101,12 +101,12 @@ _CRTIMP int __cdecl	strnicmp (const char*, const char*, size_t);
 __CRT_INLINE int __cdecl
 strncasecmp (const char * __sz1, const char * __sz2, size_t __sizeMaxCompare)
   {return _strnicmp (__sz1, __sz2, __sizeMaxCompare);}
-_CRTIMP char* __cdecl	strnset (char*, int, size_t);
-_CRTIMP char* __cdecl	strrev (char*);
-_CRTIMP char* __cdecl	strset (char*, int);
+_CRTIMP char* __cdecl	strnset (char*, int, size_t) __MINGW_ATTRIB_PURE;
+_CRTIMP char* __cdecl	strrev (char*) __MINGW_ATTRIB_PURE;
+_CRTIMP char* __cdecl	strset (char*, int) __MINGW_ATTRIB_PURE;
 _CRTIMP char* __cdecl	strupr (char*);
 #ifndef _UWIN
-_CRTIMP void __cdecl	swab (const char*, char*, size_t);
+_CRTIMP void __cdecl	swab (const char*, char*, size_t) __MINGW_ATTRIB_PURE;
 #endif /* _UWIN */
 #endif /* _NO_OLDNAMES */
 
