@@ -1,5 +1,10 @@
 2005-04-05  Christopher Faylor  <cgf@timesys.com>
 
+	* cygtls.cc (_cygtls::remove): Don't free or close stuff if we're being
+	called in a "non-standard" way.
+
+2005-04-05  Christopher Faylor  <cgf@timesys.com>
+
 	* sync.h (muto::initforce): Delete flawed implementation.
 	* pwdgrp.h (pwdgrp::pglock): Make static.
 	* grp.cc (pwdgrp::pwdgrp): Eliminate use of initforce.

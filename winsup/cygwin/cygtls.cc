@@ -165,15 +165,18 @@ _cygtls::remove (DWORD wait)
   debug_printf ("wait %p", wait);
   if (!locals.exitsock)
     return;
-  // FIXME: Need some sort of atthreadexit function to allow things like
-  // select to control this themselves
-  if (locals.exitsock != INVALID_SOCKET)
-    closesocket (locals.exitsock);
-  free_local (process_ident);
-  free_local (ntoa_buf);
-  free_local (protoent_buf);
-  free_local (servent_buf);
-  free_local (hostent_buf);
+  if (wait)
+    {
+      // FIXME: Need some sort of atthreadexit function to allow things like
+      // select to control this themselves
+      if (locals.exitsock != INVALID_SOCKET)
+	closesocket (locals.exitsock);
+      free_local (process_ident);
+      free_local (ntoa_buf);
+      free_local (protoent_buf);
+      free_local (servent_buf);
+      free_local (hostent_buf);
+    }
 
   do
     {
