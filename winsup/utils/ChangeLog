@@ -1,3 +1,19 @@
+2003-11-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* passwd.c (UF_LOCKOUT): Remove (defined in lmaccess.h).
+	(version): Bump version number to 1.5.
+	(longopts): Add -c, -C, -e, -E, -p, -P options.
+	(opts): Ditto.
+	(PrintPW): Print values of UF_PASSWD_CANT_CHANGE and
+	UF_DONT_EXPIRE_PASSWD flags. Slightly reformat output. Don't suppress
+	correct system password settings just because the account has admin
+	privileges.
+	(usage): Define as "noreturn" function. Restructure and rephrase
+	output. Accomodate new options.
+	(print_version): Fix copyright dates.
+	(main): Accomodate new options for setting UF_PASSWD_CANT_CHANGE,
+	UF_DONT_EXPIRE_PASSWD and UF_PASSWD_NOTREQD settings.
+
 2003-10-17  Christopher Faylor  <cgf@redhat.com>
 
 	* cygcheck.cc (pretty_id): Don't exec if `id' program is not found.

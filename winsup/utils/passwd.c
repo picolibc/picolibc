@@ -1,6 +1,6 @@
 /* passwd.c: Changing passwords and managing account information
 
-   Copyright 1999, 2000, 2001, 2002 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
 
    Written by Corinna Vinschen <corinna.vinschen@cityweb.de>
 
@@ -29,17 +29,21 @@ details. */
 
 #define USER_PRIV_ADMIN		 2
 
-#define UF_LOCKOUT            0x00010
-
 static const char version[] = "$Revision$";
 static char *prog_name;
 
 static struct option longopts[] =
 {
+  {"cannot-change", no_argument, NULL, 'c'},
+  {"can-change", no_argument, NULL, 'C'},
+  {"never-expires", no_argument, NULL, 'e'},
+  {"expires", no_argument, NULL, 'E'},
   {"help", no_argument, NULL, 'h' },
   {"inactive", required_argument, NULL, 'i'},
   {"lock", no_argument, NULL, 'l'},
   {"minage", required_argument, NULL, 'n'},
+  {"pwd-not-required", no_argument, NULL, 'p'},
+  {"pwd-required", no_argument, NULL, 'P'},
   {"unlock", no_argument, NULL, 'u'},
   {"version", no_argument, NULL, 'v'},
   {"maxage", required_argument, NULL, 'x'},
@@ -48,7 +52,7 @@ static struct option longopts[] =
   {NULL, 0, NULL, 0}
 };
 
-static char opts[] = "L:x:n:i:luShv";
+static char opts[] = "cCeEhi:ln:pPuvx:L:S";
 
 int
 eprint (int with_name, const char *fmt, ...)
@@ -169,27 +173,29 @@ PrintPW (PUSER_INFO_3 ui)
   int ret;
   PUSER_MODALS_INFO_0 mi;
 
-  printf ("Account disabled : %s", (ui->usri3_flags & UF_ACCOUNTDISABLE)
-                                ? "yes\n" : "no\n");
-  printf ("Password required: %s", (ui->usri3_flags & UF_PASSWD_NOTREQD)
-                                ? "no\n" : "yes\n");
-  printf ("Password expired : %s", (ui->usri3_password_expired)
-                                ? "yes\n" : "no\n");
-  printf ("Password changed : %s", ctime(&t));
+  printf ("Account disabled           : %s",
+  	(ui->usri3_flags & UF_ACCOUNTDISABLE) ? "yes\n" : "no\n");
+  printf ("Password required          : %s",
+  	(ui->usri3_flags & UF_PASSWD_NOTREQD) ? "no\n" : "yes\n");
+  printf ("User can't change password : %s",
+  	(ui->usri3_flags & UF_PASSWD_CANT_CHANGE) ? "yes\n" : "no\n");
+  printf ("Password never expires     : %s",
+  	(ui->usri3_flags & UF_DONT_EXPIRE_PASSWD) ? "yes\n" : "no\n");
+  printf ("Password expired           : %s",
+	(ui->usri3_password_expired) ? "yes\n" : "no\n");
+  printf ("Latest password change     : %s", ctime(&t));
   ret = NetUserModalsGet (NULL, 0, (LPBYTE *) &mi);
   if (! ret)
     {
-      if (mi->usrmod0_max_passwd_age == TIMEQ_FOREVER
-          || ui->usri3_priv == USER_PRIV_ADMIN)
+      if (mi->usrmod0_max_passwd_age == TIMEQ_FOREVER)
         mi->usrmod0_max_passwd_age = 0;
-      if (mi->usrmod0_min_passwd_age == TIMEQ_FOREVER
-          || ui->usri3_priv == USER_PRIV_ADMIN)
+      if (mi->usrmod0_min_passwd_age == TIMEQ_FOREVER)
         mi->usrmod0_min_passwd_age = 0;
-      if (mi->usrmod0_force_logoff == TIMEQ_FOREVER
-          || ui->usri3_priv == USER_PRIV_ADMIN)
+      if (mi->usrmod0_force_logoff == TIMEQ_FOREVER)
         mi->usrmod0_force_logoff = 0;
       if (ui->usri3_priv == USER_PRIV_ADMIN)
         mi->usrmod0_min_passwd_len = 0;
+      printf ("\nSystem password settings:\n");
       printf ("Max. password age %ld days\n",
               mi->usrmod0_max_passwd_age / ONE_DAY);
       printf ("Min. password age %ld days\n",
@@ -237,30 +243,43 @@ SetModals (int xarg, int narg, int iarg, int Larg)
   return EvalRet (ret, NULL);
 }
 
+static void usage (FILE * stream, int status) __attribute__ ((noreturn));
 static void
 usage (FILE * stream, int status)
 {
   fprintf (stream, ""
-  "Usage: %s (-l|-u|-S) [USER]\n"
-  "       %s [-i NUM] [-n MINDAYS] [-x MAXDAYS] [-L LEN]\n"
-  "Change USER's password or password attributes\n"
+  "Usage: %s [OPTION] [USER]\n"
+  "Change USER's password or password attributes.\n"
   "\n"
   "User operations:\n"
-  " -l, --lock      lock USER's account\n"
-  " -u, --unlock    unlock USER's account\n"
-  " -S, --status    display password status for USER (locked, expired, etc.)\n"
+  "  -l, --lock               lock USER's account.\n"
+  "  -u, --unlock             unlock USER's account.\n"
+  "  -c, --cannot-change      USER can't change password.\n"
+  "  -C, --can-change         USER can change password.\n"
+  "  -e, --never-expires      USER's password never expires.\n"
+  "  -E, --expires            USER's password expires according to system's\n"
+  "                           password aging rule.\n"
+  "  -p, --pwd-not-required   no password required for USER.\n"
+  "  -P, --pwd-required       password is required for USER.\n"
   "\n"
   "System operations:\n"
-  " -i, --inactive  set NUM of days before inactive accounts are disabled\n"
-  "                 (inactive accounts are those with expired passwords)\n"
-  " -n, --minage    set system minimum password age to MINDAYS\n"
-  " -x, --maxage    set system maximum password age to MAXDAYS\n"
-  " -L, --length    set system minimum password length to LEN\n"
+  "  -i, --inactive NUM       set NUM of days before inactive accounts are disabled\n"
+  "                           (inactive accounts are those with expired passwords).\n"
+  "  -n, --minage DAYS        set system minimum password age to DAYS days.\n"
+  "  -x, --maxage DAYS        set system maximum password age to DAYS days.\n"
+  "  -L, --length LEN         set system minimum password length to LEN.\n"
   "\n"
   "Other options:\n"
-  " -h, --help      output usage information and exit\n"
-  " -v, --version   output version information and exit\n"
-  "", prog_name, prog_name);
+  "  -S, --status             display password status for USER (locked, expired,\n"
+  "                           etc.) plus global system password settings.\n"
+  "  -h, --help               output usage information and exit.\n"
+  "  -v, --version            output version information and exit.\n"
+  "\n"
+  "If no option is given, change USER's password.  If no user name is given,\n"
+  "operate on current user.  System operations must not be mixed with user\n"
+  "operations.  Don't specify a USER when triggering a system operation. \n"
+  "\n"
+  "Report bugs to <cygwin@cygwin.com>\n", prog_name);
   exit (status);
 }
 
@@ -282,7 +301,7 @@ print_version ()
   printf ("\
 %s (cygwin) %.*s\n\
 Password Utility\n\
-Copyright 1999, 2000, 2001, 2002 Red Hat, Inc.\n\
+Copyright 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.\n\
 Compiled on %s\n\
 ", prog_name, len, v, __DATE__);
 }
@@ -301,6 +320,12 @@ main (int argc, char **argv)
   int iarg = -1;
   int lopt = 0;
   int uopt = 0;
+  int copt = 0;
+  int Copt = 0;
+  int eopt = 0;
+  int Eopt = 0;
+  int popt = 0;
+  int Popt = 0;
   int Sopt = 0;
   PUSER_INFO_3 ui, li;
 
@@ -323,6 +348,8 @@ main (int argc, char **argv)
         break;
 
       case 'i':
+	if (lopt || uopt || copt || Copt || eopt || Eopt || popt || Popt || Sopt)
+	  usage (stderr, 1);
 	if ((iarg = atoi (optarg)) < 0 || iarg > 999)
 	  return eprint (1, "Force logout time must be between 0 and 999.");
         break;
@@ -334,6 +361,8 @@ main (int argc, char **argv)
         break;
 
       case 'n':
+	if (lopt || uopt || copt || Copt || eopt || Eopt || popt || Popt || Sopt)
+	  usage (stderr, 1);
 	if ((narg = atoi (optarg)) < 0 || narg > 999)
 	  return eprint (1, "Minimum password age must be between 0 and 999.");
 	if (xarg >= 0 && narg > xarg)
@@ -347,12 +376,50 @@ main (int argc, char **argv)
 	uopt = 1;
         break;
 
+      case 'c':
+	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || Sopt)
+	  usage (stderr, 1);
+	copt = 1;
+        break;
+
+      case 'C':
+	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || Sopt)
+	  usage (stderr, 1);
+	Copt = 1;
+        break;
+
+      case 'e':
+	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || Sopt)
+	  usage (stderr, 1);
+	eopt = 1;
+        break;
+
+      case 'E':
+	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || Sopt)
+	  usage (stderr, 1);
+	Eopt = 1;
+        break;
+
+      case 'p':
+	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || Sopt)
+	  usage (stderr, 1);
+	popt = 1;
+        break;
+
+      case 'P':
+	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || Sopt)
+	  usage (stderr, 1);
+	Popt = 1;
+        break;
+
       case 'v':
 	print_version ();
         exit (0);
         break;
 
       case 'x':
+	if (lopt || uopt || copt || Copt || eopt || Eopt || popt || Popt || Sopt)
+	  usage (stderr, 1);
 	if ((xarg = atoi (optarg)) < 0 || xarg > 999)
 	  return eprint (1, "Maximum password age must be between 0 and 999.");
 	if (narg >= 0 && xarg < narg)
@@ -361,13 +428,16 @@ main (int argc, char **argv)
         break;
 
       case 'L':
+	if (lopt || uopt || copt || Copt || eopt || Eopt || popt || Popt || Sopt)
+	  usage (stderr, 1);
 	if ((Larg = atoi (optarg)) < 0 || Larg > LM20_PWLEN)
 	  return eprint (1, "Minimum password length must be between "
 	                    "0 and %d.", LM20_PWLEN);
         break;
 
       case 'S':
-	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || lopt || uopt)
+	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || lopt || uopt
+	    || copt || Copt || eopt || Eopt || popt || Popt)
 	  usage (stderr, 1);
 	Sopt = 1;
         break;
@@ -392,7 +462,7 @@ main (int argc, char **argv)
   if (! ui)
     return 1;
 
-  if (lopt || uopt || Sopt)
+  if (lopt || uopt || copt || Copt || eopt || Eopt || popt || Popt || Sopt)
     {
       if (li->usri3_priv != USER_PRIV_ADMIN)
         return eprint (0, "You have no maintenance privileges.");
@@ -404,7 +474,20 @@ main (int argc, char **argv)
         }
       if (uopt)
         ui->usri3_flags &= ~UF_ACCOUNTDISABLE;
-      if (lopt || uopt)
+      if (copt)
+        ui->usri3_flags |= UF_PASSWD_CANT_CHANGE;
+      if (Copt)
+        ui->usri3_flags &= ~UF_PASSWD_CANT_CHANGE;
+      if (eopt)
+        ui->usri3_flags |= UF_DONT_EXPIRE_PASSWD;
+      if (Eopt)
+        ui->usri3_flags &= ~UF_DONT_EXPIRE_PASSWD;
+      if (popt)
+        ui->usri3_flags |= UF_PASSWD_NOTREQD;
+      if (Popt)
+        ui->usri3_flags &= ~UF_PASSWD_NOTREQD;
+
+      if (lopt || uopt || copt || Copt || eopt || Eopt || popt || Popt)
 	{
           ret = NetUserSetInfo (NULL, ui->usri3_name, 3, (LPBYTE) ui, NULL);
           return EvalRet (ret, NULL);
