@@ -36,7 +36,7 @@ const char *usage_msg[] = {
   "Regtool Copyright (c) 2000 Red Hat Inc",
   " regtool -h  - print this message",
   " regtool [-v|-p|-k|-l] list [key]  - list subkeys and values",
-  "     -p=postfix, like ls -p, appends / postfix to key names",
+  "     -p=postfix, like ls -p, appends \\ postfix to key names",
   "     -k=keys, lists only keys",
   "     -l=values, lists only values",
   " regtool [-v] add [key\\subkey]  - add new subkey",
@@ -194,13 +194,10 @@ find_key (int howmanyparts, REGSAM access)
   int i;
   if (*n == '/')
     translate (n);
-  while ((*n == '\\') || (*n == '/'))
+  while (*n == '\\')
     n++;
-  for (e = n; *e && *e != '\\' && *e != '/'; e++);
-  if (*e == '/')
-    c = '\\';
-  else
-    c = *e;
+  for (e = n; *e && *e != '\\'; e++);
+  c = *e;
   *e = 0;
   for (i = 0; wkprefixes[i].string; i++)
     if (strcmp (wkprefixes[i].string, n) == 0)

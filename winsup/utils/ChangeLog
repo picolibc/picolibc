@@ -1,3 +1,7 @@
+Wed Jun 27 22:46:10 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* regtool.cc (find_key): Revert previous change.
+
 Wed Jun 27 13:37:41 2001  Keith Starsmeare" <keith_starsmeare@yahoo.co.uk>
 
 	* regtool.cc (find_key): Allow '/' as a synonym for '\\'.
