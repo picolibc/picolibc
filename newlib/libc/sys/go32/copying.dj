@@ -2,8 +2,6 @@ This is the file "copying.dj".
 
    Copyright Information for sources and executables that are marked
    Copyright (C) DJ Delorie
-                 24 Kirsten Ave
-                 Rochester NH  03867-2954
 
 This document is Copyright (C) DJ Delorie and may be distributed
 verbatim, but changing it is not allowed.
@@ -32,9 +30,9 @@ GNU General Public Licence, with the following exceptions:
   * If a user creates an application, prepends a copy of go32.exe onto
     the beginning of it, and charges a fee for the software, then a
     royalty of $5 or 5% of the selling price per copy sold must be paid
-    to DJ Delorie, 24 Kirsten Ave, Rochester NH 03867-2954.  Note that
-    shareware programs are not considered "sold" until payment is rendered
-    for them.
+    to DJ Delorie.  DJ's mailing address is documented on the web page:
+    http://www.delorie.com/users/dj/.  Note that shareware programs are 
+    not considered "sold" until payment is rendered for them.
 
   * For all other cases, source code for go32.exe must be distributed
     with any distributed copies of go32.exe.

@@ -1,3 +1,29 @@
+2001-02-22  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/machine/setjmp-dj.h: With DJ Delorie's permission,
+	changed the copyright information to allow free modification of the
+	file with no reference to "copying.dj".
+	* libc/include/sys/stat-dj.h: Ditto.
+	* libc/machine/i386/setjmp.S: Ditto.
+	* libc/sys/h8300hms/sys/file.h: Ditto.
+	* libc/sys/sysmec/access.c: Ditto.
+	* libc/sys/sysnecv850/access.c: Ditto.
+	* libc/stdio/mktemp.c: Fixed typo for the word copyright.
+	* libc/stdlib/getenv_r.c: Ditto.
+	* libc/stdlib/putenv_r.c: Ditto.
+	* libc/stdlib/setenv_r.c: Ditto.
+	* libc/stdlib/getenv.c: Removed DJ reference since any possible
+	modifications will now be in the _r version of this file.
+	* libc/stdlib/putenv.c: Ditto.
+	* libc/stdlib/setenv.c: Ditto.
+	* libc/sys/go32/copying.dj: Removed DJ's address which is no longer
+	valid.  Added a reference to DJ's web page that contains his address.
+	* libc/sys/go32/*.s: Removed references to DJ's old address.
+	* libc/sys/go32/*.c: Ditto.
+	* libc/sys/go32/*.h: Ditto.
+	* libc/sys/go32/*.S: Ditto.
+	* libc/sys/go32/sys/*.h: Ditto.
+
 2001-02-21  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/fdopen.c (fdopen): Protect calls to _fcntl() with
