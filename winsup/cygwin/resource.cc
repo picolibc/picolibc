@@ -120,7 +120,7 @@ getrlimit (int resource, struct rlimit *rlp)
     case RLIMIT_STACK:
       break;
     case RLIMIT_NOFILE:
-      rlp->rlim_cur = OPEN_MAX;
+      rlp->rlim_cur = getdtablesize ();
       break;
     case RLIMIT_CORE:
       rlp->rlim_cur = rlim_core;

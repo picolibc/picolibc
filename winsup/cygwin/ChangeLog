@@ -1,3 +1,11 @@
+Thu Aug 16 16:26:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* resource.cc (getrlimit): Return getdtablesize () as current limit
+	on RLIMIT_NOFILE.
+	* syscalls.cc (getdtablesize): Return OPEN_MAX if current dtable size
+	is less than OPEN_MAX, the current dtable size otherwise.
+	* sysconf.cc (sysconf): Return getdtablesize () on _SC_OPEN_MAX.
+
 Thu Aug 16 16:17:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* resource.cc (getrlimit): Return OPEN_MAX as current limit
