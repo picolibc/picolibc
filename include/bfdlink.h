@@ -41,6 +41,15 @@ enum bfd_link_discard
   discard_l,		/* Discard local temporary symbols.  */
   discard_all		/* Discard all locals.  */
 };
+
+/* Describes the type of hash table entry structure being used.
+   Different hash table structure have different fields and so
+   support different linking features.  */
+enum bfd_link_hash_table_type
+  {
+    bfd_link_generic_hash_table,
+    bfd_link_elf_hash_table
+  };
 
 /* These are the possible types of an entry in the BFD link hash
    table.  */
@@ -146,6 +155,8 @@ struct bfd_link_hash_table
   struct bfd_link_hash_entry *undefs;
   /* Entries are added to the tail of the undefs list.  */
   struct bfd_link_hash_entry *undefs_tail;
+  /* The type of the ink hash table.  */
+  enum bfd_link_hash_table_type type;
 };
 
 /* Look up an entry in a link hash table.  If FOLLOW is true, this

@@ -1,3 +1,11 @@
+2001-08-24  H.J. Lu  <hjl@gnu.org>
+
+	* bfdlink.h (bfd_link_hash_table_type): New. The linker hash
+	table type, bfd_link_generic_hash_table and
+	bfd_link_elf_hash_table.
+	(bfd_link_hash_table): Add a new field, type, for the linker
+	hash table type.
+
 2001-08-23  Jakub Jelinek  <jakub@redhat.com>
 
 	* bfdlink.h (struct bfd_link_info): Add combreloc and
