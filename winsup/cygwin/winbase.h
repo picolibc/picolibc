@@ -19,7 +19,7 @@ ilockincr (long *m)
 	movl	$1,%0\n\
 	lock	xadd %0,%1\n\
 	inc	%0\n\
-	": "=a" (__res), "=m" (*m): "m" (m): "cc");
+	": "=r" (__res), "=m" (*m): "m" (*m): "cc");
   return __res;
 }
 
@@ -31,7 +31,7 @@ ilockdecr (long *m)
 	movl	$0xffffffff,%0\n\
 	lock	xadd %0,%1\n\
 	dec	%0\n\
-	": "=a" (__res), "=m" (*m): "m" (m): "cc");
+	": "=r" (__res), "=m" (*m): "m" (*m): "cc");
   return __res;
 }
 

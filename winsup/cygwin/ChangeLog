@@ -1,3 +1,10 @@
+2004-06-04  Christopher Faylor  <cgf@alum.bu.edu>
+
+	* winbase.h (ilockincr): Add more neverending changes from the
+	inexplicable world of gcc asm constraint magic.  Should stop random
+	crashes.
+	(ilockdecr): Ditto.
+
 2004-06-03  Christopher Faylor  <cgf@alum.bu.edu>
 
 	* autoload.cc (IsDosDeviceName_U): Define.
