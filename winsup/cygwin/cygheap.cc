@@ -17,6 +17,7 @@
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "child_info.h"
 #include "heap.h"
 #include "cygerrno.h"
 #include "sync.h"
@@ -28,13 +29,96 @@ void NO_COPY *cygheap_max = NULL;
 
 static NO_COPY muto *cygheap_protect = NULL;
 
+struct cygheap_entry
+  {
+    int type;
+    struct cygheap_entry *next;
+    char data[0];
+  };
+
+#define NBUCKETS 32
+char *buckets[NBUCKETS] = {0};
+
+#define N0 ((_cmalloc_entry *) NULL)
+#define to_cmalloc(s) ((_cmalloc_entry *) (((char *) (s)) - (int) (N0->data)))
+
+extern "C" {
+static void __stdcall _cfree (void *ptr) __attribute__((regparm(1)));
+}
+
 inline static void
 init_cheap ()
 {
-  cygheap = (init_cygheap *) VirtualAlloc (NULL, CYGHEAPSIZE, MEM_RESERVE, PAGE_NOACCESS);
+  HANDLE cygheap_h;
+  cygheap_h = CreateFileMapping (INVALID_HANDLE_VALUE, &sec_none_nih,
+				 PAGE_READWRITE | SEC_RESERVE, 0, CYGHEAPSIZE,
+				 NULL);
+  cygheap = (init_cygheap *) MapViewOfFileEx (cygheap_h,
+      					      FILE_MAP_READ | FILE_MAP_WRITE,
+					      0, 0, 0, NULL);
+  CloseHandle (cygheap_h);
   if (!cygheap)
     api_fatal ("Couldn't reserve space for cygwin's heap, %E");
   cygheap_max = cygheap + 1;
+}
+
+void __stdcall
+cygheap_setup_for_child (child_info *ci)
+{
+  void *newcygheap;
+  cygheap_protect->acquire ();
+  unsigned n = (char *) cygheap_max - (char *) cygheap;
+  ci->cygheap_h = CreateFileMapping (INVALID_HANDLE_VALUE, &sec_none,
+				     PAGE_READWRITE | SEC_RESERVE, 0,
+				     CYGHEAPSIZE, NULL);
+  newcygheap = MapViewOfFileEx (ci->cygheap_h, FILE_MAP_READ | FILE_MAP_WRITE,
+				0, 0, 0, NULL);
+  if (!VirtualAlloc (newcygheap, n, MEM_COMMIT, PAGE_READWRITE))
+    api_fatal ("couldn't allocate new heap for child, %E");
+  memcpy (newcygheap, cygheap, n);
+  UnmapViewOfFile (newcygheap);
+  ci->cygheap = cygheap;
+  ci->cygheap_max = cygheap_max;
+  ProtectHandle1 (ci->cygheap_h, passed_cygheap_h);
+  cygheap_protect->release ();
+  return;
+}
+
+/* Called by fork or spawn to reallocate cygwin heap */
+void __stdcall
+cygheap_fixup_in_child (child_info *ci, bool execed)
+{
+  cygheap = ci->cygheap;
+  cygheap_max = ci->cygheap_max;
+#if 0
+  if (!DuplicateHandle (hMainProc, ci->cygheap_h,
+			hMainProc, &cygheap_h, 0, 0,
+			DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
+    cygheap_h = ci->cygheap_h;
+#endif
+  if (MapViewOfFileEx (ci->cygheap_h, FILE_MAP_READ | FILE_MAP_WRITE,
+		       0, 0, 0, cygheap) != cygheap)
+    api_fatal ("Couldn't allocate space for child's heap from %p, to %p, %E",
+	       cygheap, cygheap_max);
+
+  ForceCloseHandle1 (ci->cygheap_h, passed_cygheap_h);
+  cygheap_init ();
+
+  if (execed)
+    {
+      /* Walk the allocated memory chain looking for orphaned memory from
+	 previous execs */
+      for (_cmalloc_entry *rvc = cygheap->chain; rvc; rvc = rvc->prev)
+	{
+	  cygheap_entry *ce = (cygheap_entry *) rvc->data;
+	  if (rvc->b >= NBUCKETS || ce->type <= HEAP_1_START)
+	    continue;
+	  else if (ce->type < HEAP_1_MAX)
+	    ce->type += HEAP_1_MAX;	/* Mark for freeing after next exec */
+	  else
+	    _cfree (ce);		/* Marked by parent for freeing in child */
+	}
+    }
 }
 
 #define pagetrunc(x) ((void *) (((DWORD) (x)) & ~(4096 - 1)))
@@ -76,12 +160,6 @@ cygheap_init ()
 
 /* Copyright (C) 1997, 2000 DJ Delorie */
 
-#define NBUCKETS 32
-char *buckets[NBUCKETS] = {0};
-
-#define N0 ((_cmalloc_entry *) NULL)
-#define to_cmalloc(s) ((_cmalloc_entry *) (((char *) (s)) - (int) (N0->data)))
-
 static void *_cmalloc (int size) __attribute ((regparm(1)));
 static void *__stdcall _crealloc (void *ptr, int size) __attribute ((regparm(2)));
 
@@ -115,7 +193,6 @@ _cmalloc (int size)
   return rvc->data;
 }
 
-static void __stdcall _cfree (void *ptr) __attribute__((regparm(1)));
 static void __stdcall
 _cfree (void *ptr)
 {
@@ -150,56 +227,8 @@ _crealloc (void *ptr, int size)
 
 #define sizeof_cygheap(n) ((n) + sizeof(cygheap_entry))
 
-struct cygheap_entry
-  {
-    int type;
-    struct cygheap_entry *next;
-    char data[0];
-  };
-
 #define N ((cygheap_entry *) NULL)
 #define tocygheap(s) ((cygheap_entry *) (((char *) (s)) - (int) (N->data)))
-
-/* Called by fork or spawn to reallocate cygwin heap */
-extern "C" void __stdcall
-cygheap_fixup_in_child (HANDLE parent, bool execed)
-{
-  DWORD m, n;
-  n = (DWORD) cygheap_max - (DWORD) cygheap;
-
-  /* Reserve cygwin heap in same spot as parent */
-  if (!VirtualAlloc (cygheap, CYGHEAPSIZE, MEM_RESERVE, PAGE_NOACCESS))
-    api_fatal ("Couldn't reserve space for cygwin's heap (%p) in child, cygheap, %E", cygheap);
-
-  /* Allocate same amount of memory as parent */
-  if (!VirtualAlloc (cygheap, n, MEM_COMMIT, PAGE_READWRITE))
-    api_fatal ("Couldn't allocate space for child's heap %p, size %d, %E",
-	       cygheap, n);
-
-  /* Copy memory from the parent */
-  m = 0;
-  if (!ReadProcessMemory (parent, cygheap, cygheap, n, &m) || m != n)
-    api_fatal ("Couldn't read parent's cygwin heap %d bytes != %d, %E",
-	       n, m);
-
-  cygheap_init ();
-
-  if (execed)
-    {
-      /* Walk the allocated memory chain looking for orphaned memory from
-	 previous execs */
-      for (_cmalloc_entry *rvc = cygheap->chain; rvc; rvc = rvc->prev)
-	{
-	  cygheap_entry *ce = (cygheap_entry *) rvc->data;
-	  if (rvc->b >= NBUCKETS || ce->type <= HEAP_1_START)
-	    continue;
-	  else if (ce->type < HEAP_1_MAX)
-	    ce->type += HEAP_1_MAX;	/* Mark for freeing after next exec */
-	  else
-	    _cfree (ce);		/* Marked by parent for freeing in child */
-	}
-    }
-}
 
 inline static void *
 creturn (cygheap_types x, cygheap_entry * c, int len)

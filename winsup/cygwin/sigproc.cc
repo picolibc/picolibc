@@ -1103,8 +1103,7 @@ wait_sig (VOID *)
    * windows process waiting to see if it's started a cygwin process or not.
    * Signalling subproc_ready indicates that we are a cygwin process.
    */
-  if (child_proc_info &&
-      (child_proc_info->type == PROC_EXEC || child_proc_info->type == PROC_SPAWN))
+  if (child_proc_info && child_proc_info->type == PROC_EXEC)
     {
       debug_printf ("subproc_ready %p", child_proc_info->subproc_ready);
       if (!SetEvent (child_proc_info->subproc_ready))

@@ -86,7 +86,7 @@ open_shared (const char *name, HANDLE &shared_h, DWORD size, void *addr)
       /* Probably win95, so try without specifying the address.  */
       shared = (shared_info *) MapViewOfFileEx (shared_h,
 				       FILE_MAP_READ|FILE_MAP_WRITE,
-				       0,0,0,0);
+				       0, 0, 0, 0);
     }
 
   if (!shared)

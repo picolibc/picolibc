@@ -442,8 +442,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
     RevertToSelf ();
 
   ch.parent = hParent;
-  ch.cygheap = cygheap;
-  ch.cygheap_max = cygheap_max;
+  cygheap_setup_for_child (&ch);
 #ifdef DEBUGGING
   if (npid_max)
     {
@@ -477,6 +476,7 @@ out:
 		      &pi);
 
   CloseHandle (hParent);
+  ForceCloseHandle1 (ch.cygheap_h, passed_cygheap_h);
 
   if (!rc)
     {

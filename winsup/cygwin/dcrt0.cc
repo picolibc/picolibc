@@ -669,13 +669,11 @@ dll_crt0_1 ()
 
   if (child_proc_info)
     {
-      cygheap = child_proc_info->cygheap;
-      cygheap_max = child_proc_info->cygheap_max;
       switch (child_proc_info->type)
 	{
 	  case PROC_FORK:
 	  case PROC_FORK1:
-	    cygheap_fixup_in_child (child_proc_info->parent, 0);
+	    cygheap_fixup_in_child (child_proc_info, 0);
 	    alloc_stack (fork_info);
 	    set_myself (mypid);
 	    user_data->heaptop = child_proc_info->heaptop;
@@ -690,7 +688,7 @@ dll_crt0_1 ()
 	    hexec_proc = spawn_info->hexec_proc;
 	  around:
 	    HANDLE h;
-	    cygheap_fixup_in_child (spawn_info->parent, 1);
+	    cygheap_fixup_in_child (spawn_info, 1);
 	    if (!spawn_info->moreinfo->myself_pinfo ||
 		!DuplicateHandle (hMainProc, spawn_info->moreinfo->myself_pinfo,
 				  hMainProc, &h, 0, 0,
@@ -709,7 +707,8 @@ dll_crt0_1 ()
 		old_title = strcpy (title_buf, spawn_info->moreinfo->old_title);
 		cfree (spawn_info->moreinfo->old_title);
 	      }
-	    ProtectHandle (child_proc_info->subproc_ready);
+	    if (child_proc_info->subproc_ready)
+	      ProtectHandle (child_proc_info->subproc_ready);
 	    myself->uid = spawn_info->moreinfo->uid;
 	    if (myself->uid == USHRT_MAX)
 	      cygheap->user.set_sid (NULL);

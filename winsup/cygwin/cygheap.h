@@ -166,9 +166,11 @@ struct init_cygheap
 extern init_cygheap *cygheap;
 extern void *cygheap_max;
 
+class child_info;
+void __stdcall cygheap_setup_for_child (child_info *ci) __attribute__ ((regparm(1)));
+void __stdcall cygheap_fixup_in_child (child_info *, bool);
 extern "C" {
 void __stdcall cfree (void *) __attribute__ ((regparm(1)));
-void __stdcall cygheap_fixup_in_child (HANDLE, bool);
 void *__stdcall cmalloc (cygheap_types, DWORD) __attribute__ ((regparm(2)));
 void *__stdcall crealloc (void *, DWORD) __attribute__ ((regparm(2)));
 void *__stdcall ccalloc (cygheap_types, DWORD, DWORD) __attribute__ ((regparm(3)));

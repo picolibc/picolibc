@@ -12,7 +12,7 @@ details. */
 
 enum
 {
-  PROC_MAGIC = 0xaf0ff000,
+  PROC_MAGIC = 0xaf10f000,
   PROC_FORK = PROC_MAGIC + 1,
   PROC_EXEC = PROC_MAGIC + 2,
   PROC_SPAWN = PROC_MAGIC + 3,
@@ -39,6 +39,7 @@ public:
   HANDLE pppid_handle;
   init_cygheap *cygheap;
   void *cygheap_max;
+  HANDLE cygheap_h;
 };
 
 class child_info_fork: public child_info
