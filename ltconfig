@@ -623,26 +623,33 @@ echo $ac_n "checking for executable suffix... $ac_c" 1>&6
 if eval "test \"`echo '$''{'ac_cv_exeext'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
-  ac_cv_exeext="no"
-  $rm conftest*
-  echo 'main () { return 0; }' > conftest.c
-  echo "$progname:629: checking for executable suffix" >& 5
-  if { (eval echo $progname:630: \"$ac_link\") 1>&5; (eval $ac_link) 2>conftest.err; }; then
-    # Append any warnings to the config.log.
-    cat conftest.err 1>&5
+  case "$host_os" in
+  cygwin* | mingw* | os2*)
+    ac_cv_exeext=.exe
+    ;;
+  *)
+    ac_cv_exeext="no"
+    $rm conftest*
+    echo 'main () { return 0; }' > conftest.c
+    echo "$progname:634: checking for executable suffix" >& 5
+    if { (eval echo $progname:635: \"$ac_link\") 1>&5; (eval $ac_link) 2>conftest.err; }; then
+      # Append any warnings to the config.log.
+      cat conftest.err 1>&5
 
-    for ac_file in conftest.*; do
-      case $ac_file in
-      *.c | *.err | *.$objext ) ;;
-      *) ac_cv_exeext=.`echo $ac_file | sed -e s/conftest.//` ;;
-      esac
-    done
-  else
-    cat conftest.err 1>&5
-    echo "$progname: failed program was:" >&5
-    cat conftest.c >&5
-  fi
-  $rm conftest*
+      for ac_file in conftest.*; do
+        case $ac_file in
+        *.c | *.err | *.$objext ) ;;
+        *) ac_cv_exeext=.`echo $ac_file | sed -e s/conftest.//` ;;
+        esac
+      done
+    else
+      cat conftest.err 1>&5
+      echo "$progname: failed program was:" >&5
+      cat conftest.c >&5
+    fi
+    $rm conftest*
+    ;;
+  esac
 fi
 if test "X$ac_cv_exeext" = Xno; then
   exeext=""

@@ -1,3 +1,8 @@
+2000-06-28  Corinna Vinschen  <vinschen@cygnus.com>
+
+	* ltconfig: Check for host_os beeing one of `cygwin', `mingw' or
+	`os2'. Force ac_cv_exeext to be ".exe" in that case.
+
 2000-06-19  Timothy Wall  <twall@cygnus.com>
 
 	* configure.in (noconfigdirs): Set noconfigdirs for tic54x target.
