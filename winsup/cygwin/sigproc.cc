@@ -608,7 +608,7 @@ sigproc_terminate (void)
   hwait_sig = NULL;
 
   if (!sig_loop_wait)
-    sigproc_printf ("sigproc_terminate: sigproc handling not active");
+    sigproc_printf ("sigproc handling not active");
   else
     {
       sigproc_printf ("entering");
