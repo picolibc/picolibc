@@ -1,3 +1,7 @@
+2002-07-06  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Use MINGW stuff from Makefile.common.
+
 Wed Apr 18 23:54:53 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Add -U_WIN32 to CFLAGS compile line to avoid

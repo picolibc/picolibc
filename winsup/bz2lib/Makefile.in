@@ -46,10 +46,6 @@ RANLIB:=@RANLIB@
 
 include $(srcdir)/../Makefile.common
 
-MINGW_INCLUDES:=-I. -I$(srcdir) -I$(mingw_source)/include -I$(w32api_include) -I$(updir)/bz2lib
-
-MINGW_CXXFLAGS:=-MMD $(CXXFLAGS) -mno-cygwin $(MINGW_INCLUDES) -mwindows -U_WIN32
-MINGW_CFLAGS:=-MMD $(CFLAGS) -mno-cygwin $(MINGW_INCLUDES) -mwindows -U_WIN32
 
 ZLIB:=zlib/libzcygw.a
 BZ2LIB:=$(bupdir)/bz2lib/libbz2.a
@@ -98,19 +94,12 @@ install: all
 
 %.o: %.c
 ifdef VERBOSE
-	$(CC) $(MINGW_CFLAGS) -c -o $@ $<
+	$(CC) $c -o $(@D)/$(basename $@)$o -MD $(MINGW_CFLAGS) $<
 else
-	@echo $(CC) -c $(CFLAGS) ... $(<F)
-	@$(CC) $(MINGW_CFLAGS) -c -o $@ $<
+	@echo $(CC) $c -o $(@D)/$(basename $@)$o $(MINGW_CFLAGS) ... $^;\
+	$(CC) $c -o $(@D)/$(basename $@)$o -MD $(MINGW_CFLAGS) $<
 endif
 
-%.o: %.cc
-ifdef VERBOSE
-	$(CXX) $(MINGW_CXXFLAGS) -c -o $@ $<
-else
-	@echo $(CXX) -c $(CXXFLAGS) ... $(<F)
-	@$(CXX) $(MINGW_CXXFLAGS) -c -o $@ $<
-endif
 
 D=$(wildcard *.d)
 ifneq ($D,)
