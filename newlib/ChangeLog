@@ -1,3 +1,15 @@
+2004-06-09  Toralf Lund  <toralf@procaptura.com>
+
+	* libc/sys/arm/setjmp.S, libc/sys/arm/access.c: Move
+	files from libc/sys/arm to libc/machine/arm.
+	* libc/machine/arm/Makefile.am, libc/machine/arm/Makefile.in: Add
+	library build support for files moved from libc/sys/arm.
+	* libc/sys/arm/Makefile.am, libc/sys/arm/Makefile.in:  Remove
+	references to access and setjmp.
+	* configure.host: Add checks for newlib_may_supply_syscalls to
+	determine whether or not to use sys/arm directory and use
+	special compiler flags: ARM_RDI_MONITOR and ARM_RDP_MONITOR.
+       
 2004-06-02  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/vfscanf.c (__svfscanf_r): For CT_INT conversions,

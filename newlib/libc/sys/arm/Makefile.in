@@ -91,7 +91,7 @@ noinst_LIBRARIES = lib.a
 @MAY_SUPPLY_SYSCALLS_TRUE@extra_objs = syscalls.o
 @MAY_SUPPLY_SYSCALLS_FALSE@extra_objs = 
 
-lib_a_SOURCES = access.c libcfunc.c trap.S setjmp.S
+lib_a_SOURCES = libcfunc.c trap.S
 lib_a_LIBADD = $(extra_objs)
 lib_a_DEPENDENCIES = $(extra_objs)
 
@@ -106,7 +106,7 @@ LIBRARIES =  $(noinst_LIBRARIES)
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
-lib_a_OBJECTS =  access.o libcfunc.o trap.o setjmp.o
+lib_a_OBJECTS =  libcfunc.o trap.o
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)

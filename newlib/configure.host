@@ -302,7 +302,9 @@ case "${host}" in
 	sys_dir=arc
 	;;
   arm-*-*)
-	sys_dir=arm 
+	if [ "x${newlib_may_supply_syscalls}" = "xyes" ] ; then
+	  sys_dir=arm
+	fi
 	;;
   d10v*)
 	sys_dir=d10v
@@ -311,8 +313,13 @@ case "${host}" in
 	sys_dir=
 	;;
   ep9312-*-*)
-	sys_dir=arm
+	if [ "x${newlib_may_supply_syscalls}" = "xyes" ] ; then
+	  sys_dir=arm
+	fi
 	;;
+  frv*)
+        sys_dir=
+        ;;
   h8300-*-hms*)
 	sys_dir=h8300hms
 	;;
@@ -387,13 +394,14 @@ case "${host}" in
 	unix_dir=unix
 	;;
   strongarm-*-*)
-	sys_dir=arm 
-	;;
-  xscale-*-*)
-	sys_dir=arm 
+	if [ "x${newlib_may_supply_syscalls}" = "xyes" ] ; then
+	  sys_dir=arm
+	fi
 	;;
   thumb-*-*)
-	sys_dir=arm 
+	if [ "x${newlib_may_supply_syscalls}" = "xyes" ] ; then
+	  sys_dir=arm
+	fi
 	;;
   tic80*)
 	sys_dir=tic80
@@ -413,11 +421,13 @@ case "${host}" in
   v850ea-*-*)
 	sys_dir=sysnecv850
 	;;
-  frv*)
-        sys_dir=
-        ;;
   w65-*-*)
 	sys_dir=w65
+	;;
+  xscale-*-*)
+	if [ "x${newlib_may_supply_syscalls}" = "xyes" ] ; then
+	  sys_dir=arm
+	fi
 	;;
   z8k-*-coff)
 	sys_dir=z8ksim
@@ -465,19 +475,22 @@ case "${host}" in
   arm-*-pe)
 	syscall_dir=syscalls
 	newlib_cflags="${newlib_cflags} -DABORT_PROVIDED -DHAVE_GETTIMEOFDAY"
-# Don't use the debugging protocols just yet.
 	;;
   arm-*-*)
 	syscall_dir=syscalls
 	newlib_cflags="${newlib_cflags} -DABORT_PROVIDED -DHAVE_GETTIMEOFDAY"
-# Select which debug protocol is being used.
+# If newlib is supplying syscalls, select which debug protocol is being used.
 # ARM_RDP_MONITOR selects the Demon monitor.
 # ARM_RDI_MONITOR selects the Angel monitor.
 # If neither are defined, then hard coded defaults will be used
 # to create the program's environment.
+# If --disable-newlib-supplied-syscalls is specified, then the end-user
+# may specify the protocol via gcc spec files supplied by libgloss.
 # See also thumb below.
-#	newlib_cflags="${newlib_cflags} -DARM_RDP_MONITOR"
-	newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
+	if [ "x${newlib_may_supply_syscalls}" = "xyes" ] ; then
+#         newlib_cflags="${newlib_cflags} -DARM_RDP_MONITOR"
+	  newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
+	fi
 	;;
   avr*)
 	newlib_cflags="${newlib_cflags} -DNO_EXEC -DSMALL_MEMORY -DMISSING_SYSCALL_NAMES"
@@ -493,7 +506,9 @@ case "${host}" in
   ep9312-*-*)
 	syscall_dir=syscalls
 	newlib_cflags="${newlib_cflags} -DABORT_PROVIDED -DHAVE_GETTIMEOFDAY"
-	newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
+	if [ "x${newlib_may_supply_syscalls}" = "xyes" ] ; then
+	  newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
+	fi
 	;;
   fr30-*-*)
 	syscall_dir=syscalls
@@ -593,13 +608,6 @@ case "${host}" in
   strongarm-*-*)
 	syscall_dir=syscalls
 	newlib_cflags="${newlib_cflags} -DABORT_PROVIDED -DHAVE_GETTIMEOFDAY"
-	newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
-	;;
-  xscale-*-*)
-	syscall_dir=syscalls
-	newlib_cflags="${newlib_cflags} -DABORT_PROVIDED -DHAVE_GETTIMEOFDAY"
-	newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
-	newlib_cflags="${newlib_cflags} -DHAVE_SYSTEM -DHAVE_RENAME"
 	;;
   thumb-*-pe)
 	syscall_dir=syscalls
@@ -609,14 +617,17 @@ case "${host}" in
   thumb-*-*)
 	syscall_dir=syscalls
 	newlib_cflags="${newlib_cflags} -DABORT_PROVIDED -DHAVE_GETTIMEOFDAY"
-# Select which debug protocol is being used.
+# If newlib is supplying syscalls, select which debug protocol is being used.
 # ARM_RDP_MONITOR selects the Demon monitor.
 # ARM_RDI_MONITOR selects the Angel monitor.
 # If neither are defined, then hard coded defaults will be used
 # to create the program's environment.
-# See also arm and strongarm above.
-#	newlib_cflags="${newlib_cflags} -DARM_RDP_MONITOR"
-	newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
+# If --disable-newlib-supplied-syscalls is specified, then the end-user
+# may specify the protocol via gcc spec files supplied by libgloss.
+	if [ "x${newlib_may_supply_syscalls}" = "xyes" ] ; then
+#         newlib_cflags="${newlib_cflags} -DARM_RDP_MONITOR"
+	  newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
+	fi
 	;;
   tic80*)
 	syscall_dir=syscalls
@@ -634,6 +645,14 @@ case "${host}" in
 	syscall_dir=syscalls	
 	newlib_cflags="${newlib_cflags} -DSMALL_DTOA -DSMALL_MEMORY"
 	;;	
+  xscale-*-*)
+	syscall_dir=syscalls
+	newlib_cflags="${newlib_cflags} -DABORT_PROVIDED -DHAVE_GETTIMEOFDAY"
+	newlib_cflags="${newlib_cflags} -DHAVE_SYSTEM -DHAVE_RENAME"
+	if [ "x${newlib_may_supply_syscalls}" = "xyes" ] ; then
+	  newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
+	fi
+	;;
   xstormy16-*-*)
 	newlib_cflags="${newlib_cflags} -DHAVE_GETTIMEOFDAY"
 	syscall_dir=syscalls

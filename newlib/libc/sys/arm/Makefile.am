@@ -12,7 +12,7 @@ else
 extra_objs =
 endif
 
-lib_a_SOURCES = access.c libcfunc.c trap.S setjmp.S
+lib_a_SOURCES = libcfunc.c trap.S
 lib_a_LIBADD = $(extra_objs)
 lib_a_DEPENDENCIES = $(extra_objs)
 

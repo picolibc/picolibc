@@ -89,7 +89,7 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 noinst_LIBRARIES = lib.a
 
-lib_a_SOURCES = 
+lib_a_SOURCES = setjmp.S access.c
 
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
@@ -103,7 +103,11 @@ DEFS = @DEFS@ -I. -I$(srcdir)
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 lib_a_LIBADD = 
-lib_a_OBJECTS = 
+lib_a_OBJECTS =  setjmp.o access.o
+CFLAGS = @CFLAGS@
+COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
 DIST_COMMON =  Makefile.am Makefile.in aclocal.m4 configure configure.in
 
 
@@ -166,9 +170,35 @@ lib.a: $(lib_a_OBJECTS) $(lib_a_DEPENDENCIES)
 	-rm -f lib.a
 	$(AR) cru lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
 	$(RANLIB) lib.a
-tags: TAGS
-TAGS:
 
+tags: TAGS
+
+ID: $(HEADERS) $(SOURCES) $(LISP)
+	list='$(SOURCES) $(HEADERS)'; \
+	unique=`for i in $$list; do echo $$i; done | \
+	  awk '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
+	here=`pwd` && cd $(srcdir) \
+	  && mkid -f$$here/ID $$unique $(LISP)
+
+TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) $(LISP)
+	tags=; \
+	here=`pwd`; \
+	list='$(SOURCES) $(HEADERS)'; \
+	unique=`for i in $$list; do echo $$i; done | \
+	  awk '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
+	test -z "$(ETAGS_ARGS)$$unique$(LISP)$$tags" \
+	  || (cd $(srcdir) && etags $(ETAGS_ARGS) $$tags  $$unique $(LISP) -o $$here/TAGS)
+
+mostlyclean-tags:
+
+clean-tags:
+
+distclean-tags:
+	-rm -f TAGS ID
+
+maintainer-clean-tags:
 
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -256,24 +286,24 @@ distclean-generic:
 
 maintainer-clean-generic:
 mostlyclean-am:  mostlyclean-noinstLIBRARIES mostlyclean-compile \
-		mostlyclean-generic
+		mostlyclean-tags mostlyclean-generic
 
 mostlyclean: mostlyclean-am
 
-clean-am:  clean-noinstLIBRARIES clean-compile clean-generic \
+clean-am:  clean-noinstLIBRARIES clean-compile clean-tags clean-generic \
 		mostlyclean-am
 
 clean: clean-am
 
 distclean-am:  distclean-noinstLIBRARIES distclean-compile \
-		distclean-generic clean-am
+		distclean-tags distclean-generic clean-am
 
 distclean: distclean-am
 	-rm -f config.status
 
 maintainer-clean-am:  maintainer-clean-noinstLIBRARIES \
-		maintainer-clean-compile maintainer-clean-generic \
-		distclean-am
+		maintainer-clean-compile maintainer-clean-tags \
+		maintainer-clean-generic distclean-am
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 
@@ -283,7 +313,8 @@ maintainer-clean: maintainer-clean-am
 .PHONY: mostlyclean-noinstLIBRARIES distclean-noinstLIBRARIES \
 clean-noinstLIBRARIES maintainer-clean-noinstLIBRARIES \
 mostlyclean-compile distclean-compile clean-compile \
-maintainer-clean-compile tags distdir info-am info dvi-am dvi check \
+maintainer-clean-compile tags mostlyclean-tags distclean-tags \
+clean-tags maintainer-clean-tags distdir info-am info dvi-am dvi check \
 check-am installcheck-am installcheck install-info-am install-info \
 install-exec-am install-exec install-data-am install-data install-am \
 install uninstall-am uninstall all-redirect all-am all installdirs \
