@@ -1,3 +1,8 @@
+2004-03-24  Gerd Spalink  <Gerd.Spalink@t-online.de>
+
+	* winsup.api/devdsp.c: New file, testing fhandler_dev_dsp code.
+	* winsup.api/devdsp_okay.h: Ditto.
+
 2004-03-06  Christopher Faylor  <cgf@redhat.com>
 
 	* winsup.api/known_bugs.tcl: Remove mknod01 since mknod now works.
