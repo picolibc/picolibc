@@ -1,3 +1,10 @@
+2001-02-16  Egor Duda  <deo@logos-m.ru>
+
+	* signal.cc (signal): Prohibit setting handlers for SIGKILL and
+	SIGSTOP
+	* signal.cc (sigaction): Ditto
+	* syscalls.cc (_lseek): Return EINVAL on invalid input
+
 Wed Feb 14 14:54:40 2001 Christophe Iasci <chrisiasci@aol.com>
 
 	* dlfcn.cc (dlopen): Do not call LoadLibrary with a NULL pointer, when

@@ -46,7 +46,7 @@ signal (int sig, _sig_func_ptr func)
   _sig_func_ptr prev;
 
   /* check that sig is in right range */
-  if (sig < 0 || sig >= NSIG)
+  if (sig < 0 || sig >= NSIG || sig == SIGKILL || sig == SIGSTOP)
     {
       set_errno (EINVAL);
       syscall_printf ("SIG_ERR = signal (%d, %p)", sig, func);
@@ -260,7 +260,7 @@ sigaction (int sig, const struct sigaction *newact, struct sigaction *oldact)
 
   if (newact)
     {
-      if ((sig == SIGKILL || sig == SIGSTOP) && newact->sa_handler != SIG_DFL)
+      if (sig == SIGKILL || sig == SIGSTOP)
 	{
 	  set_errno (EINVAL);
 	  return -1;

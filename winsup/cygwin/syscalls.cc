@@ -447,7 +447,12 @@ _lseek (int fd, off_t pos, int dir)
   off_t res;
   sigframe thisframe (mainthread);
 
-  if (fdtab.not_open (fd))
+  if ( dir != SEEK_SET && dir != SEEK_CUR && dir != SEEK_END )
+    {
+      set_errno ( EINVAL );
+      res = -1;
+    }
+  else if (fdtab.not_open (fd))
     {
       set_errno (EBADF);
       res = -1;
