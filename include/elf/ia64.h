@@ -25,7 +25,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 /* Bits in the e_flags field of the Elf64_Ehdr:  */
 
 #define EF_IA_64_MASKOS	 0x0000000f	/* os-specific flags */
-#define EF_IA_64_ABI64	 (1 << 4)	/* 64-bit ABI */
 #define EF_IA_64_ARCH	 0xff000000	/* arch. version mask */
 
 /* ??? These four definitions are not part of the SVR4 ABI.
@@ -35,6 +34,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define EF_IA_64_EXT	 (1 << 2)	/* program uses arch. extensions */
 #define EF_IA_64_BE	 (1 << 3)	/* PSR BE bit set (big-endian) */
 #define EFA_IA_64_EAS2_3 0x23000000	/* ia64 EAS 2.3 */
+
+#define EF_IA_64_ABI64		    (1 << 4) /* 64-bit ABI */
+/* Not used yet.  */
+#define EF_IA_64_REDUCEDFP	    (1 << 5) /* Only FP6-FP11 used.  */
+#define EF_IA_64_CONS_GP	    (1 << 6) /* gp as program wide constant. */
+#define EF_IA_64_NOFUNCDESC_CONS_GP (1 << 7) /* And no function descriptors. */
+/* Not used yet.  */
+#define EF_IA_64_ABSOLUTE	    (1 << 8) /* Load at absolute addresses.  */
 
 #define ELF_STRING_ia64_archext		".IA_64.archext"
 #define ELF_STRING_ia64_pltoff		".IA_64.pltoff"
