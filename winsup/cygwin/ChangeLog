@@ -1,3 +1,7 @@
+Tue Oct 10 15:21:10 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (cwdstuff::get): Set EINVAL when length is zero.
+
 Mon Oct  9 14:07:04 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (mount_info::cygdrive_posix_path): Handle e:foo construction

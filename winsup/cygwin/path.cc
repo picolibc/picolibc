@@ -2937,6 +2937,13 @@ char *
 cwdstuff::get (char *buf, int need_posix, int with_chroot, unsigned ulen)
 {
   MALLOC_CHECK;
+
+  if (ulen == 0)
+    {
+      set_errno (EINVAL);
+      goto out;
+    }
+
   if (!get_initial ())	/* Get initial cwd and set cwd lock */
     return NULL;
 
@@ -2955,7 +2962,7 @@ cwdstuff::get (char *buf, int need_posix, int with_chroot, unsigned ulen)
     }
   else
     {
-      if (need_posix && !buf)
+      if (!buf)
 	buf = (char *) malloc (strlen (tocopy) + 1);
       strcpy (buf, tocopy);
       if (!buf[0])	/* Should only happen when chroot */
@@ -2963,8 +2970,10 @@ cwdstuff::get (char *buf, int need_posix, int with_chroot, unsigned ulen)
     }
 
   lock->release ();
-  syscall_printf ("(%s) = cwdstuff::get (%p, %d, %d, %d)",
-		  buf, buf, ulen, need_posix, with_chroot);
+
+out:
+  syscall_printf ("(%s) = cwdstuff::get (%p, %d, %d, %d), errno %d",
+		  buf, buf, ulen, need_posix, with_chroot, errno);
   MALLOC_CHECK;
   return buf;
 }
