@@ -1720,7 +1720,7 @@ truncate64 (const char *pathname, __off64_t length)
     set_errno (EBADF);
   else
     {
-      res = ftruncate (fd, length);
+      res = ftruncate64 (fd, length);
       close (fd);
     }
   syscall_printf ("%d = truncate (%s, %d)", res, pathname, length);

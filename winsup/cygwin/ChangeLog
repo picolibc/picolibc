@@ -1,3 +1,8 @@
+2002-03-04  Dmitry Timoshkov  <dmitry@baikal.ru>
+
+	* syscalls.cc (truncate64): Use ftruncate64 directly to not lose
+	upper 32 bits.
+
 2002-03-04  Robert Collins  <rbtcollins@hotmail.com>
 
 	* cygserver_shm.cc (delete_shmnode): New function.
