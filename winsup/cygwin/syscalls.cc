@@ -1222,7 +1222,7 @@ rename (const char *oldpath, const char *newpath)
   int res = 0;
   char *lnk_suffix = NULL;
 
-  path_conv real_old (oldpath, PC_SYM_NOFOLLOW);
+  path_conv real_old (oldpath, PC_FULL | PC_SYM_NOFOLLOW);
 
   if (real_old.error)
     {
@@ -1231,7 +1231,7 @@ rename (const char *oldpath, const char *newpath)
       return -1;
     }
 
-  path_conv real_new (newpath, PC_SYM_NOFOLLOW);
+  path_conv real_new (newpath, PC_FULL | PC_SYM_NOFOLLOW);
 
   /* Shortcut hack. */
   char new_lnk_buf[CYG_MAX_PATH + 5];
@@ -1240,7 +1240,7 @@ rename (const char *oldpath, const char *newpath)
       strcpy (new_lnk_buf, newpath);
       strcat (new_lnk_buf, ".lnk");
       newpath = new_lnk_buf;
-      real_new.check (newpath, PC_SYM_NOFOLLOW);
+      real_new.check (newpath, PC_FULL | PC_SYM_NOFOLLOW);
     }
 
   if (real_new.error || real_new.case_clash)
@@ -1252,9 +1252,16 @@ rename (const char *oldpath, const char *newpath)
 
   if (!real_old.exists ()) /* file to move doesn't exist */
     {
-       syscall_printf ("file to move doesn't exist");
-       set_errno (ENOENT);
-       return (-1);
+      syscall_printf ("file to move doesn't exist");
+      set_errno (ENOENT);
+      return -1;
+    }
+
+  if (real_new.isdir () && !real_old.isdir ())
+    {
+      syscall_printf ("newpath is directory, but oldpath is not");
+      set_errno (EISDIR);
+      return -1;
     }
 
   /* Destination file exists and is read only, change that or else
@@ -1271,26 +1278,71 @@ rename (const char *oldpath, const char *newpath)
     goto done;
 
   res = -1;
-  if (wincap.has_move_file_ex ())
+
+  /* Test for an attempt to make a directory a subdirectory of itself first.
+     This test has to be made before any attempt to remove the potentially
+     existing file or directory real_new.  Otherwise we end up with a
+     non-moved directory *and* a deleted read_new path.  Also this case
+     has to generate an EINVAL in all circumstances,
+     
+     NB: We could test this also before calling MoveFile but the idea is
+     that this is a somewhat seldom case and we like to avoid expensive
+     string comparison.  So we allow MoveFile to fail and test the error
+     code instead. 
+     
+     The order in the condition is (hopefully) trimmed for doing the least
+     expensive stuff first.  Nevertheless it would be nice if 9x could
+     generate the same error codes as NT.
+     NT generates ERROR_SHARING_VIOLATION in all cases, while 9x generates
+     ERROR_ACCESS_DENIED if the target path doesn't exist,
+     ERROR_ALREADY_EXISTS otherwise */
+  int len;
+  DWORD lasterr;
+  lasterr = GetLastError ();
+  if (real_old.isdir ()
+      && ((lasterr == ERROR_SHARING_VIOLATION && wincap.has_move_file_ex ())
+       || (lasterr == ERROR_ACCESS_DENIED && !real_new.exists ()
+           && !wincap.has_move_file_ex ())
+       || (lasterr == ERROR_ALREADY_EXISTS && real_new.exists ()
+           && !wincap.has_move_file_ex ()))
+      && (len = strlen (real_old), strncasematch (real_old, real_new, len))
+      && real_new[len] == '\\')
+    SetLastError (ERROR_INVALID_PARAMETER);
+  else if (real_new.isdir ())
+    {
+      /* Since neither MoveFileEx(MOVEFILE_REPLACE_EXISTING) nor DeleteFile
+	 allow to remove directories, this case is handled separately. */
+      if (!RemoveDirectoryA (real_new))
+	{
+	  syscall_printf ("Can't remove target directory");
+	  /* On 9X ERROR_ACCESS_DENIED is returned if you try to remove
+	     a non-empty directory. */
+	  if (GetLastError () == ERROR_ACCESS_DENIED
+	      && wincap.access_denied_on_delete ())
+	    SetLastError (ERROR_DIR_NOT_EMPTY);
+	}
+      else if (MoveFile (real_old, real_new))
+	res = 0;
+    }
+  else if (wincap.has_move_file_ex ())
     {
       if (MoveFileEx (real_old.get_win32 (), real_new.get_win32 (),
 		      MOVEFILE_REPLACE_EXISTING))
 	res = 0;
     }
-  else if (GetLastError () == ERROR_ALREADY_EXISTS
-	   || GetLastError () == ERROR_FILE_EXISTS)
+  else if (lasterr == ERROR_ALREADY_EXISTS || lasterr == ERROR_FILE_EXISTS)
     {
       syscall_printf ("try win95 hack");
       for (int i = 0; i < 2; i++)
 	{
-	  if (!DeleteFileA (real_new.get_win32 ()) &&
+	  if (!DeleteFileA (real_new) &&
 	      GetLastError () != ERROR_FILE_NOT_FOUND)
 	    {
 	      syscall_printf ("deleting %s to be paranoid",
 			      real_new.get_win32 ());
 	      break;
 	    }
-	  else if (MoveFile (real_old.get_win32 (), real_new.get_win32 ()))
+	  else if (MoveFile (real_old, real_new))
 	    {
 	      res = 0;
 	      break;
