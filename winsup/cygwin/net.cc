@@ -1929,14 +1929,14 @@ extern "C" void
 wsock_init ()
 {
   static LONG NO_COPY here = -1L;
-  static int NO_COPY was_in_progress = 0;
+  static int NO_COPY wsock_started = 0;
 
   while (InterlockedIncrement (&here))
     {
       InterlockedDecrement (&here);
       Sleep (0);
     }
-  if (!was_in_progress && (wsock32_handle || ws2_32_handle))
+  if (!wsock_started && (wsock32_handle || ws2_32_handle))
     {
       /* Don't use autoload to load WSAStartup to eliminate recursion. */
       int (*wsastartup) (int, WSADATA *);
@@ -1957,7 +1957,7 @@ wsock_init ()
 	  debug_printf ("iMaxUdpDg %d", wsadata.iMaxUdpDg);
 	  debug_printf ("lpVendorInfo %d", wsadata.lpVendorInfo);
 
-	  was_in_progress = 1;
+	  wsock_started = 1;
         }
     }
   InterlockedDecrement (&here);
