@@ -30,6 +30,7 @@ Fri Jun 30 23:21:40 2000  Christopher Faylor <cgf@cygnus.com>
 	* include/cygwin/version.h: Bump API minor version.
 	* binmode.c: New file.
 	* textmode.c: Ditto.
+	* perthread.h: Ditto.
 	* lib/_cygwin_crt0_common.cc: Ditto.
 	* lib/crt0.h: Ditto.
 	* lib/cygwin_attach_dll.c: Ditto.
