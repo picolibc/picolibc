@@ -31,7 +31,7 @@
 
 2005-03-23  Christopher Faylor  <cgf@timesys.com>
 
-	* include/cygwin/version.h: Change coment for most recent API version
+	* include/cygwin/version.h: Change comment for most recent API version
 	bump to reflect new additions to the DLL and to remove change obsoleted
 	by the previous checkin.
 
