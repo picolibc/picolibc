@@ -1,3 +1,12 @@
+2002-10-18  Christopher Faylor  <cgf@redhat.com>
+
+	* fork.cc (fork_child): Move mmap initialization.
+	* shared.cc (shared_info::heap_chunk_size): Store info as megabytes.
+	Search HKEY_LOCAL_MACHINE as well as HKEY_CURRENT_USER.
+	* shared_info.h (shared_info::initial_heap_size): Change element name
+	to reflect new functionality.
+	* strace.cc (strace::hello): Report on initial heap size.
+
 2002-10-18  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* thread.cc (verifyable_object_isvalid): Test for a valid object

@@ -280,13 +280,13 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   cygheap->fdtab.fixup_after_fork (hParent);
   ProtectHandleINH (hParent);
 
+  if (fixup_mmaps_after_fork (hParent))
+    api_fatal ("recreate_mmaps_after_fork_failed");
+
   pinfo_fixup_after_fork ();
   signal_fixup_after_fork ();
 
   MALLOC_CHECK;
-
-  if (fixup_mmaps_after_fork (hParent))
-    api_fatal ("recreate_mmaps_after_fork_failed");
 
   /* If we haven't dynamically loaded any dlls, just signal
      the parent.  Otherwise, load all the dlls, tell the parent

@@ -223,7 +223,8 @@ memory_init ()
 unsigned
 shared_info::heap_chunk_size ()
 {
-  if (!heap_chunk_in_mb)
+  unsigned val;
+  if (!initial_heap_size)
     {
       /* Fetch misc. registry entries.  */
 
@@ -234,13 +235,20 @@ shared_info::heap_chunk_size ()
       /* FIXME: We should not be restricted to a fixed size heap no matter
       what the fixed size is. */
 
-      heap_chunk_in_mb = reg.get_int ("heap_chunk_in_mb", 256);
-      if (heap_chunk_in_mb < 4)
-	{
-	  heap_chunk_in_mb = 4;
-	  reg.set_int ("heap_chunk_in_mb", heap_chunk_in_mb);
-	}
+      initial_heap_size = reg.get_int ("heap_chunk_in_mb", 0);
+      if (!initial_heap_size) {
+	reg_key r1 (HKEY_LOCAL_MACHINE, KEY_READ, "SOFTWARE",
+		    CYGWIN_INFO_CYGNUS_REGISTRY_NAME,
+		    CYGWIN_INFO_CYGWIN_REGISTRY_NAME, NULL);
+        initial_heap_size = reg.get_int ("heap_chunk_in_mb", 384);
+      }
+
+      if (initial_heap_size < 4)
+	initial_heap_size = 4 * 1024 * 1024;
+      else
+	initial_heap_size <<= 20;
+      debug_printf ("fixed heap size is %u", initial_heap_size);
     }
 
-  return heap_chunk_in_mb << 20;
+  return initial_heap_size;
 }

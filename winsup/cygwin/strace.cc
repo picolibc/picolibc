@@ -19,6 +19,7 @@ details. */
 #include "cygwin_version.h"
 #include "hires.h"
 #include "cygthread.h"
+#include "shared_info.h"
 
 #define PROTECT(x) x[sizeof (x)-1] = 0
 #define CHECK(x) if (x[sizeof (x)-1] != 0) { small_printf ("array bound exceeded %d\n", __LINE__); ExitProcess (1); }
@@ -57,6 +58,7 @@ strace::hello ()
 	     cygwin_version.api_major, cygwin_version.api_minor);
       prntf (1, NULL, "DLL build:    %s", cygwin_version.dll_build_date);
       prntf (1, NULL, "OS version:   Windows %s", wincap.osname ());
+      prntf (1, NULL, "Heap size:    %u", cygwin_shared->heap_chunk_size ());
       prntf (1, NULL, "**********************************************");
     }
 }
