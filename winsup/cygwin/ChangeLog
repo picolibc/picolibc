@@ -1,3 +1,11 @@
+Wed Aug 15 12:18:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* security.cc (set_nt_attribute): Return always -1 in case of
+	a failure.
+	* times.cc (utimes): On NTFS with ntsec ON, change the file's
+	security descriptor temporarily to acquire write access if
+	opening the file failed.
+
 Wed Aug 15  9:42:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::is_nonblocking): New method.

@@ -1570,7 +1570,7 @@ set_nt_attribute (const char *file, uid_t uid, gid_t gid,
   if ((ret = read_sd (file, psd, &sd_size)) <= 0)
     {
       debug_printf ("read_sd %E");
-      return ret;
+      return -1;
     }
 
   sd_size = 4096;

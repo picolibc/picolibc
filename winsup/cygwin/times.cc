@@ -449,6 +449,8 @@ utimes (const char *path, struct timeval *tvp)
   int res = 0;
   struct timeval tmp[2];
   path_conv win32 (path);
+  PSECURITY_DESCRIPTOR sd = NULL;
+  DWORD sd_size;
 
   if (win32.error)
     {
@@ -475,13 +477,38 @@ utimes (const char *path, struct timeval *tvp)
 	  /* What we can do with directories more? */
 	  res = 0;
 	}
+      else if (allow_ntsec && win32.has_acls ())
+        {
+	  /* The following hack allows setting the correct filetime
+	     on NTFS with ntsec ON even when the file is R/O for the
+	     current user. This solves the `cp -p' problem and allows
+	     a more UNIX like behaviour. Basically we save the file's
+	     current security descriptor, change the file access so
+	     that we have write access (if possible) and if that worked
+	     fine, reset the old security descriptor at the end of the
+	     function. */
+	  sd_size = 4096;
+	  sd = (PSECURITY_DESCRIPTOR) alloca (sd_size);
+	  if (read_sd (win32.get_win32 (), sd, &sd_size) <= 0)
+	    sd = NULL;
+	  else if (set_file_attribute (TRUE, win32.get_win32 (), 0600))
+	    sd = NULL;
+	  else
+	    h = CreateFileA (win32.get_win32 (),
+			     GENERIC_WRITE,
+			     FILE_SHARE_READ | FILE_SHARE_WRITE,
+			     &sec_none_nih,
+			     OPEN_EXISTING,
+			     FILE_ATTRIBUTE_NORMAL | FILE_FLAG_BACKUP_SEMANTICS,
+			     0);
+	}
       else
 	{
 	  res = -1;
 	  __seterrno ();
 	}
     }
-  else
+  if (h != INVALID_HANDLE_VALUE)
     {
       if (tvp == 0)
 	{
@@ -516,6 +543,9 @@ utimes (const char *path, struct timeval *tvp)
 	res = 0;
       CloseHandle (h);
     }
+
+  if (sd)
+    write_sd (win32.get_win32 (), sd, sd_size);
 
   syscall_printf ("%d = utimes (%s, %x); (h%d)",
 		  res, path, tvp, h);
