@@ -80,6 +80,8 @@
 #include <unistd.h>
 #include <windows.h>
 
+#include "perprocess.h"
+
 #ifdef __weak_alias
 #ifdef __LIBC12_SOURCE__
 __weak_alias(glob,_glob);
@@ -386,7 +388,7 @@ globtilde(pattern, patbuf, pglob)
 		 * first and then trying the password file
 		 */
 		if ((h = getenv("HOME")) == NULL) {
-			if ((pwd = getpwuid(getuid())) == NULL)
+			if ((pwd = getpwuid32(getuid32())) == NULL)
 				return pattern;
 			else
 				h = pwd->pw_dir;
@@ -831,16 +833,6 @@ g_lstat(fn, sb, pglob)
 	struct STAT *sb;
 	glob_t *pglob;
 {
-	/* FIXME: This only works as long as the application uses the old
-	   struct stat with 32 bit off_t types!!!
-
-	   As soon as we switch over to 64 bit, we have to decide by
-	   the applications API minor version number, whether to use
-	   a pointer to a __stat64 or a _stat32 struct to the
-	   pglob->gl_lstat function. */
-#ifdef __CYGWIN_USE_BIG_TYPES__
-#error FIXME check apps API minor and use correct struct stat
-#endif
 	char buf[MAXPATHLEN];
 
 	g_Ctoc(fn, buf);
@@ -848,7 +840,9 @@ g_lstat(fn, sb, pglob)
 		struct __stat32 lsb;
 		int ret;
 
-		if (!(ret = (*pglob->gl_lstat)(buf, &lsb)))
+		if (user_data->api_major > 0 || user_data->api_minor > 77)
+		  ret = (*pglob->gl_lstat)(buf, &sb);
+		else if (!(ret = (*pglob->gl_lstat)(buf, &lsb)))
 			stat32_to_STAT (&lsb, sb);
 		return ret;
 	}
@@ -865,16 +859,6 @@ g_stat(fn, sb, pglob)
 	struct STAT *sb;
 	glob_t *pglob;
 {
-	/* FIXME: This only works as long as the application uses the old
-	   struct stat with 32 bit off_t types!!!
-
-	   As soon as we switch over to 64 bit, we have to decide by
-	   the applications API minor version number, whether to use
-	   a pointer to a __stat64 or a _stat32 struct to the
-	   pglob->gl_stat function. */
-#ifdef __CYGWIN_USE_BIG_TYPES__
-#error FIXME check apps API minor and use correct struct stat
-#endif
 	char buf[MAXPATHLEN];
 
 	g_Ctoc(fn, buf);
@@ -882,6 +866,8 @@ g_stat(fn, sb, pglob)
 		struct __stat32 lsb;
 		int ret;
 
+		if (user_data->api_major > 0 || user_data->api_minor > 77)
+		  ret = (*pglob->gl_stat)(buf, &sb);
 		if (!(ret = (*pglob->gl_stat)(buf, &lsb)))
 			stat32_to_STAT (&lsb, sb);
 		return ret;
