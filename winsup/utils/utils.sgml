@@ -120,8 +120,9 @@ identical to <literal>-w</literal> and <literal>-s</literal> together.
 </para>
 
 <para>Caveat: The <literal>-l</literal> option does not work if the
-<em>check_case</em> parameter of <em>CYGWIN</em> is set to <em>strict</em>,
-since Cygwin is not able to match any Windows short path in this mode.
+<emphasis>check_case</emphasis> parameter of <emphasis>CYGWIN</emphasis> 
+is set to <emphasis>strict</emphasis>, since Cygwin is not able to match 
+any Windows short path in this mode.
 </para>
 
 <para>The <literal>-p</literal> option means that you want to convert
@@ -169,16 +170,110 @@ other formats.
 
 </sect2>
 
+<sect2 id="dumper"><title>dumper</title>
+
+<screen>
+Usage: dumper [OPTION] FILENAME WIN32PID
+Dump core from WIN32PID to FILENAME.core
+-d, --verbose  be verbose while dumping
+-h, --help     output help information and exit
+-q, --quiet    be quiet while dumping (default)
+-v, --version  output version information and exit
+</screen>
+
+<para>The <command>dumper</command> utility can be used to create a
+core dump of running Windows process. This core dump can be later loaded
+to <command>gdb</command> and analyzed. One common way to use 
+<command>dumper</command> is to plug it into cygwin's Just-In-Time 
+debugging facility by adding
+
+<screen>
+error_start=x:\path\to\dumper.exe
+</screen>
+
+to the <emphasis>CYGWIN</emphasis> environment variable. Please note that
+<literal>x:\path\to\dumper.exe</literal> is Windows-style and not cygwin
+path. If <literal>error_start</literal> is set this way, then dumper will
+be started whenever some program encounters a fatal error.
+</para>
+
+<para>
+<command>dumper</command> can be also be started from the command line to 
+create a core dump of any running process. Unfortunately, because of a Windows 
+API limitation, when a core dump is created and <command>dumper</command> 
+exits, the target process is terminated too.
+</para>
+
+<para>
+To save space in the core dump, <command>dumper</command> doesn't write those
+portions of target process' memory space that are loaded from executable and
+dll files and are unchangeable, such as program code and debug info. Instead,
+<command>dumper</command> saves paths to files which contain that data. When a
+core dump is loaded into gdb, it uses these paths to load appropriate files.
+That means that if you create a core dump on one machine and try to debug it on
+another, you'll need to place identical copies of the executable and dlls in 
+the same directories as on the machine where the core dump was created.
+</para>
+
+</sect2>
+
+<sect2 id="getfacl"><title>getfacl</title>
+
+<screen>
+Usage: getfacl [-adn] FILE [FILE2...]
+Display file and directory access control lists (ACLs).
+
+  -a, --all      display the filename, the owner, the group, and
+                 the ACL of the file
+  -d, --dir      display the filename, the owner, the group, and
+                 the default ACL of the directory, if it exists
+  -h, --help     output usage information and exit
+  -n, --noname   display user and group IDs instead of names
+  -v, --version  output version information and exit
+
+When multiple files are specified on the command line, a blank
+line separates the ACLs for each file.
+</screen>
+
+<para>
+For each argument that is a regular file, special file or
+directory, <command>getfacl</command> displays the owner, the group, and the 
+ACL.  For directories <command>getfacl</command> displays additionally the 
+default ACL.  With no options specified, <command>getfacl</command> displays 
+the filename, the owner, the group, and both the ACL and the default ACL, if 
+it exists. For more information on Cygwin and Windows ACLs, see
+see <Xref Linkend="ntsec"> in the Cygwin User's Guide.
+The format for ACL output is as follows:
+<screen>
+     # file: filename
+     # owner: name or uid
+     # group: name or uid
+     user::perm
+     user:name or uid:perm
+     group::perm
+     group:name or gid:perm
+     mask:perm
+     other:perm
+     default:user::perm
+     default:user:name or uid:perm
+     default:group::perm
+     default:group:name or gid:perm
+     default:mask:perm
+     default:other:perm
+</screen>
+
+</sect2>
+
 <sect2 id="kill"><title>kill</title>
 
 <screen>
 Usage: kill [-f] [-signal] [-s signal] pid1 [pid2 ...]
-       kill -l [signal]
- -f, --force     force, using win32 interface if necessary
- -l, --list      print a list of signal names
- -s, --signal    send signal (use kill --list for a list)
- -h, --help      output usage information and exit
- -v, --version   output version information and exit
+kill -l [signal]
+-f, --force     force, using win32 interface if necessary
+-l, --list      print a list of signal names
+-s, --signal    send signal (use kill --list for a list)
+-h, --help      output usage information and exit
+-v, --version   output version information and exit
 </screen>
 
 <para>The <command>kill</command> program allows you to send arbitrary
@@ -188,16 +283,29 @@ also send program-specified signals such as SIGUSR1 to trigger actions
 within the program, like enabling debugging or re-opening log files.
 Each program defines the signals they understand.</para>
 
-<para>Note that, unless you specific the <literal>-f</literal> option,
-the "pid" values are the Cygwin pids, not the Windows pids.  To get a
-list of running programs and their Cygwin pids, use the Cygwin
+<para>You may need to specify the full path to use <command>kill</command> 
+from within some shells, including <command>bash</command>, the default Cygwin
+shell. This is because <command>bash</command> defines a 
+<command>kill</command> builtin function; see the <command>bash</command>
+man page under <emphasis>BUILTIN COMMANDS</emphasis> for more information.
+To make sure you are using the Cygwin version, try
+
+<screen>
+$ /bin/kill --version
+</screen>
+
+which should give the Cygwin <command>kill</command> version number and
+copyright information.
+</para>
+
+<para>Unless you specific the <literal>-f</literal> option, the "pid" values 
+used by <command>kill</command> are the Cygwin pids, not the Windows pids.  
+To get a list of running programs and their Cygwin pids, use the Cygwin
 <command>ps</command> program. <command>ps -W</command> will display
 <emphasis>all</emphasis> windows pids.</para>
 
 <para>The <command>kill -l</command> option prints the name of the
 given signal, or a list of all signal names if no signal is given.</para>
-
-<para><command>kill -h</command> just displays the kill usage message.</para>
 
 <para>To send a specific signal, use the <literal>-signN</literal>
 option, either with a signal number or a signal name (minus the "SIG"
@@ -238,10 +346,8 @@ SIGSTOP     17    sendable stop signal not from tty
 SIGTSTP     18    stop signal from tty
 SIGCONT     19    continue a stopped process
 SIGCHLD     20    to parent on child stop or exit
-SIGCLD      20    System V name for SIGCHLD
 SIGTTIN     21    to readers pgrp upon background tty read
 SIGTTOU     22    like TTIN for output if (tp-&gt;t_local&amp;LTOSTOP)
-SIGIO       23    input/output possible signal
 SIGPOLL     23    System V name for SIGIO
 SIGXCPU     24    exceeded CPU time limit
 SIGXFSZ     25    exceeded file size limit
@@ -815,51 +921,4 @@ print the message but does return the non-zero exit code.</para>
 
 </sect2>
 
-<sect2 id="dumper"><title>dumper</title>
-
-<screen>
-Usage: dumper [OPTION] FILENAME WIN32PID
-Dump core from WIN32PID to FILENAME.core
- -d, --verbose  be verbose while dumping
- -h, --help     output help information and exit
- -q, --quiet    be quiet while dumping (default)
- -v, --version  output version information and exit
-</screen>
-
-<para>The <command>dumper</command> utility can be used to create
-core dump of running windows process. This core dump can be later loaded
-to gdb an analyzed. One common way to use <command>dumper</command> is to
-plug it into cygwin's Just-In-Time debugging facility by adding
-
-<screen>
-error_start=x:\path\to\dumper.exe
-</screen>
-
-to <em>CYGWIN</em> environment variable. Please note that
-<literal>x:\path\to\dumper.exe</literal> is win32-style and not cygwin
-path. If <literal>error_start</literal> is set this way, then dumper will
-be started whenever some program encounters fatal error.
-</para>
-
-<para>
-<command>dumper</command> can be also be started from command line to create
-core dump of any running process. Unfortunately, because of windows API
-limitation, when core dump is created and <command>dumper</command> exits,
-the target process is terminated too.
-</para>
-
-<para>
-To save the space in core dump, <command>dumper</command> doesn't write those
-portions of target process' memory space that are loaded from executable and
-dll files and are unchangeable, such as program code and debug info. Instead,
-<command>dumper</command> saves paths to files which contain that data. When
-core dump is loaded into gdb, it uses these paths to load appropriate files.
-That means that if you create core dump on one machine and try to debug it on
-other, you'll need to place identical copies of executable and dlls in the same
-directories as on machine where core dump has been created.
-</para>
-
-</sect2>
-
 </sect1>
-
