@@ -1,3 +1,8 @@
+2002-03-12  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/sys/go32/access.c: Change license to relaxed license
+        used in identical file throughout newlib/libgloss.
+
 2002-03-12  Richard Earnshaw  <rearnsha@arm.com>
 
 	* libc/sys/arm/access.c: New file.
