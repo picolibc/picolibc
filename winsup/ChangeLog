@@ -1,3 +1,9 @@
+Sun Apr  9 02:06:49 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Work around MAKEOVERRIDES problem with older versions
+	of make.
+	* Makefile.common: Ditto.
+
 Fri Apr  7 17:04:02  Ron Parker <rdparker@sourceware.cygnus.com>
 
 	* configure.in: Added cinstall to the list of subdirs.

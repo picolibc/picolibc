@@ -88,7 +88,13 @@ COMPILE_CC:=$(CC) $c -nostdinc $(ALL_CFLAGS) -I$(GCC_INCLUDE)
 
 vpath %.a	$(cygwin_build):$(w32api_lib):$(newlib_build)/libc:$(newlib_build)/libm
 
-unexport MAKEOVERRIDES
+MAKEOVERRIDES_WORKAROUND=${wordlist 2,1,a b c}
+
+ifneq ($(MAKEOVERRIDES_WORKAROUND),)
+    override MAKE:=$(MAKE) $(MAKEOVERRIDES)
+    MAKEOVERRIDES:=
+    export MAKEOVERRIDES
+endif
 
 .PRECIOUS: %.o
 

@@ -45,7 +45,13 @@ CLEAN_SUBDIRS=${patsubst %,clean_%,$(SUBDIRS)}
 
 .SUFFIXES:
 
-unexport MAKEOVERRIDES
+MAKEOVERRIDES_WORKAROUND=${wordlist 2,1,a b c}
+
+ifneq ($(MAKEOVERRIDES_WORKAROUND),)
+    override MAKE:=$(MAKE) $(MAKEOVERRIDES)
+    MAKEOVERRIDES:=
+    export MAKEOVERRIDES
+endif
 
 all: Makefile $(SUBDIRS)
 
@@ -54,13 +60,13 @@ install: Makefile $(INSTALL_SUBDIRS)
 clean: $(CLEAN_SUBDIRS)
 
 $(SUBDIRS):
-	@$(MAKE) -C $@ $(MAKEOVERRIDES) all
+	@$(MAKE) -C $@ all
 
 $(INSTALL_SUBDIRS):
-	@$(MAKE) -C ${patsubst install_%,%,$@} $(MAKEOVERRIDES) install
+	@$(MAKE) -C ${patsubst install_%,%,$@} install
 
 $(CLEAN_SUBDIRS):
-	@$(MAKE) -C ${patsubst clean_%,%,$@} $(MAKEOVERRIDES) clean
+	@$(MAKE) -C ${patsubst clean_%,%,$@} clean
 
 .PRECIOUS: Makefile
 
