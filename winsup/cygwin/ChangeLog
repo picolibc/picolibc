@@ -1,5 +1,10 @@
 2003-12-04  Christopher Faylor  <cgf@redhat.com>
 
+	* path.cc (slash_unc_prefix_p): Allow '.' as a valid character after
+	'\\' in a UNC path.
+
+2003-12-04  Christopher Faylor  <cgf@redhat.com>
+
 	* exceptions.cc (setup_handler): Remove ill-advised debugging output.
 
 2003-12-04  Corinna Vinschen  <corinna@vinschen.de>

@@ -1076,7 +1076,7 @@ slash_unc_prefix_p (const char *path)
   char *p = NULL;
   int ret = (isdirsep (path[0])
 	     && isdirsep (path[1])
-	     && isalnum (path[2])
+	     && (isalnum (path[2]) || path[2] == '.')
 	     && ((p = strpbrk (path + 3, "\\/")) != NULL));
   if (!ret || p == NULL)
     return ret;
