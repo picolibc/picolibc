@@ -1,5 +1,10 @@
 Fri Aug 11 14:47:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
+	* poll.cc: Allow any descriptor and any number of descriptors.
+	Allocate fd_set struct sdynamically.
+
+Fri Aug 11 14:47:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
 	* poll.cc: Add bounds checking for file descriptors. Return POLLNVAL
 	if fd is invalid. Return POLLERR for each valid fd if cygwin_select
 	returned with error.
