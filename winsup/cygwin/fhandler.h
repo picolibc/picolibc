@@ -335,7 +335,7 @@ public:
   virtual int dup (fhandler_base *child);
 
   virtual HANDLE mmap (caddr_t *addr, size_t len, DWORD access,
-                       int flags, off_t off);
+		       int flags, off_t off);
   virtual int munmap (HANDLE h, caddr_t addr, size_t len);
   virtual int msync (HANDLE h, caddr_t addr, size_t len, int flags);
   virtual BOOL fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
@@ -461,7 +461,7 @@ protected:
   int lastblk_to_read : 1;
   int is_writing      : 1;
   int has_written     : 1;
-  int varblkop        : 1;
+  int varblkop	      : 1;
   int unit;
 
   virtual void clear (void);
