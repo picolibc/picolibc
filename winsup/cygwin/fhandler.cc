@@ -1404,3 +1404,10 @@ fhandler_base::closedir (DIR *)
   set_errno (ENOTDIR);
   return -1;
 }
+
+int
+fhandler_base::fchmod (mode_t mode)
+{
+  /* By default, just succeeds. */
+  return 0;
+}

@@ -226,3 +226,11 @@ fhandler_virtual::fill_filebuf ()
 {
   return true;
 }
+
+int
+fhandler_virtual::fchmod (mode_t mode)
+{
+  /* Same as on Linux. */
+  set_errno (EPERM);
+  return -1;
+}

@@ -366,6 +366,48 @@ fhandler_disk_file::fstat (struct __stat64 *buf)
   return fstat_fs (buf);
 }
 
+int __stdcall
+fhandler_disk_file::fchmod (mode_t mode)
+{
+  extern int chmod_device (path_conv& pc, mode_t mode);
+  int res = -1;
+  int oret = 0;
+
+  if (pc.is_fs_special ())
+    return chmod_device (pc, mode);
+
+  if (!get_io_handle () && !(oret = open_fs (O_RDONLY | O_BINARY, 0)))
+    return -1;
+
+  SetFileAttributes (get_win32_name (), (DWORD) pc & ~FILE_ATTRIBUTE_READONLY);
+  if (pc.isdir ())
+    mode |= S_IFDIR;
+  if (!set_file_attribute (pc.has_acls (), get_io_handle (), get_win32_name (),
+			   ILLEGAL_UID, ILLEGAL_GID, mode)
+      && allow_ntsec)
+    res = 0;
+
+  /* if the mode we want has any write bits set, we can't be read only. */
+  if (mode & (S_IWUSR | S_IWGRP | S_IWOTH))
+    (DWORD) pc &= ~FILE_ATTRIBUTE_READONLY;
+  else
+    (DWORD) pc |= FILE_ATTRIBUTE_READONLY;
+
+  if (!pc.is_lnk_symlink () && S_ISLNK (mode) || S_ISSOCK (mode))
+    (DWORD) pc |= FILE_ATTRIBUTE_SYSTEM;
+
+  if (!SetFileAttributes (pc, pc))
+    __seterrno ();
+  else if (!allow_ntsec)
+    /* Correct NTFS security attributes have higher priority */
+    res = 0;
+
+  if (oret)
+    close_fs ();
+
+  return res;
+}
+
 fhandler_disk_file::fhandler_disk_file () :
   fhandler_base ()
 {
@@ -411,7 +453,7 @@ fhandler_base::open_fs (int flags, mode_t mode)
   if (flags & O_CREAT
       && GetLastError () != ERROR_ALREADY_EXISTS
       && !allow_ntsec && allow_ntea)
-    set_file_attribute (has_acls (), get_win32_name (), mode);
+    set_file_attribute (has_acls (), NULL, get_win32_name (), mode);
 
   set_fs_flags (pc.fs_flags ());
 

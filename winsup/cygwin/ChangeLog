@@ -1,5 +1,30 @@
 2004-04-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dir.cc (mkdir): Call set_file_attribute with additional handle
+	argument.
+	* fhandler.cc (fhandler_base::fchmod): New method.
+	* fhandler.h: Declare fchmod method in fhandler_base,
+	fhandler_disk_file and fhandler_virtual.
+	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): New method.
+	(fhandler_base::open_fs): Call set_file_attribute with additional
+	handle argument.
+	* fhandler_virtual.cc (fhandler_virtual::fchmod): New method.
+	* path.cc (symlink_worker): Call set_file_attribute with additional
+	handle argument.
+	* security.cc (get_nt_object_security): New function.
+	(get_nt_object_attribute): Call get_nt_object_security.
+	(set_nt_attribute): Add handle argument.  Call get_nt_object_security
+	first, read_sd only if that fails.
+	(set_file_attribute): Add handle argument.
+	* security.h (set_file_attribute): Declare with additional handle
+	argument.
+	* syscalls.cc (stat_suffixes): Move to beginning of file.
+	(chown_worker): Call set_file_attribute with additional handle argument.
+	(chmod): Reorganize to call fhandler's fchmod method eventually.
+	(fchmod): Ditto.
+
+2004-04-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (NtQuerySecurityObject): Add.
 	* ntdll.h (STATUS_BUFFER_TOO_SMALL): Add definition.
 	(NtQuerySecurityObject): Add declaration.

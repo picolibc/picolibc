@@ -242,6 +242,7 @@ class fhandler_base
     __attribute__ ((regparm (3)));
   int __stdcall fstat_by_handle (struct __stat64 *buf) __attribute__ ((regparm (2)));
   int __stdcall fstat_by_name (struct __stat64 *buf) __attribute__ ((regparm (2)));
+  virtual int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
   virtual int ioctl (unsigned int cmd, void *);
   virtual int fcntl (int cmd, void *);
   virtual char const *ttyname () { return get_name (); }
@@ -566,6 +567,7 @@ class fhandler_disk_file: public fhandler_base
   int lock (int, struct __flock64 *);
   bool isdevice () { return false; }
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
+  int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
 
   HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, _off64_t off);
   int munmap (HANDLE h, caddr_t addr, size_t len);
@@ -1098,6 +1100,7 @@ class fhandler_virtual : public fhandler_base
   int open (int flags, mode_t mode = 0);
   int close (void);
   int __stdcall fstat (struct stat *buf) __attribute__ ((regparm (2)));
+  int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
   virtual bool fill_filebuf ();
   void fixup_after_exec ();
 };

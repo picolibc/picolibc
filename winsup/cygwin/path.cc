@@ -2648,7 +2648,7 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
 	{
 	  CloseHandle (h);
 	  if (!allow_ntsec && allow_ntea)
-	    set_file_attribute (win32_path.has_acls (),
+	    set_file_attribute (win32_path.has_acls (), NULL,
 				win32_path.get_win32 (),
 				S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO);
 

@@ -71,6 +71,13 @@ details. */
 #undef _lseek64
 #undef _fstat64
 
+suffix_info stat_suffixes[] =
+{
+  suffix_info ("", 1),
+  suffix_info (".exe", 1),
+  suffix_info (NULL)
+};
+
 SYSTEM_INFO system_info;
 
 static int __stdcall mknod_worker (const char *, mode_t, mode_t, _major_t,
@@ -849,8 +856,8 @@ chown_worker (const char *name, unsigned fmode, __uid32_t uid, __gid32_t gid)
       res = get_file_attribute (win32_path.has_acls (), NULL,
 				win32_path.get_win32 (), &attrib);
       if (!res)
-	 res = set_file_attribute (win32_path.has_acls (), win32_path, uid,
-				   gid, attrib);
+	 res = set_file_attribute (win32_path.has_acls (), NULL, win32_path,
+				   uid, gid, attrib);
       if (res != 0 && (!win32_path.has_acls () || !allow_ntsec))
 	{
 	  /* fake - if not supported, pretend we're like win95
@@ -943,60 +950,16 @@ extern "C" int
 chmod (const char *path, mode_t mode)
 {
   int res = -1;
-
-  path_conv win32_path (path);
-
-  if (win32_path.error)
+  fhandler_base *fh = build_fh_name (path, NULL, PC_SYM_FOLLOW | PC_FULL,
+				     stat_suffixes);
+  if (fh->error ())
     {
-      set_errno (win32_path.error);
-      goto done;
+      debug_printf ("got %d error from build_fh_name", fh->error ());
+      set_errno (fh->error ());
     }
-
-  /* FIXME: This makes chmod on a device succeed always.  Someday we'll want
-     to actually allow chmod to work properly on devices. */
-  if (win32_path.is_auto_device ())
-    {
-      res = 0;
-      goto done;
-    }
-  if (win32_path.is_fs_special ())
-    {
-      res = chmod_device (win32_path, mode);
-      goto done;
-    }
-
-  if (!win32_path.exists ())
-    __seterrno ();
   else
-    {
-      /* temporary erase read only bit, to be able to set file security */
-      SetFileAttributes (win32_path, (DWORD) win32_path & ~FILE_ATTRIBUTE_READONLY);
+    res = fh->fchmod (mode);
 
-      if (win32_path.isdir ())
-	mode |= S_IFDIR;
-      if (!set_file_attribute (win32_path.has_acls (), win32_path,
-			       ILLEGAL_UID, ILLEGAL_GID, mode)
-	  && allow_ntsec)
-	res = 0;
-
-      /* if the mode we want has any write bits set, we can't
-	 be read only. */
-      if (mode & (S_IWUSR | S_IWGRP | S_IWOTH))
-	(DWORD) win32_path &= ~FILE_ATTRIBUTE_READONLY;
-      else
-	(DWORD) win32_path |= FILE_ATTRIBUTE_READONLY;
-
-      if (!win32_path.is_lnk_symlink () && S_ISLNK (mode) || S_ISSOCK (mode))
-	(DWORD) win32_path |= FILE_ATTRIBUTE_SYSTEM;
-
-      if (!SetFileAttributes (win32_path, win32_path))
-	__seterrno ();
-      else if (!allow_ntsec)
-	/* Correct NTFS security attributes have higher priority */
-	res = 0;
-    }
-
-done:
   syscall_printf ("%d = chmod (%s, %p)", res, path, mode);
   return res;
 }
@@ -1013,18 +976,7 @@ fchmod (int fd, mode_t mode)
       return -1;
     }
 
-  const char *path = cfd->get_name ();
-
-  if (path == NULL)
-    {
-      syscall_printf ("-1 = fchmod (%d, 0%o) (no name)", fd, mode);
-      set_errno (ENOSYS);
-      return -1;
-    }
-
-  syscall_printf ("fchmod (%d, 0%o): calling chmod (%s, 0%o)",
-		  fd, mode, path, mode);
-  return chmod (path, mode);
+  return cfd->fchmod (mode);
 }
 
 static void
@@ -1128,13 +1080,6 @@ extern "C" void
 sync ()
 {
 }
-
-suffix_info stat_suffixes[] =
-{
-  suffix_info ("", 1),
-  suffix_info (".exe", 1),
-  suffix_info (NULL)
-};
 
 /* Cygwin internal */
 static int __stdcall

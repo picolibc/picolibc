@@ -1368,6 +1368,37 @@ get_nt_attribute (const char *file, mode_t *attribute,
 }
 
 static int
+get_nt_object_security (HANDLE handle, SE_OBJECT_TYPE object_type,
+			security_descriptor &sd_ret)
+{
+  NTSTATUS ret;
+  ULONG len = 0;
+  ret = NtQuerySecurityObject (handle,
+			       DACL_SECURITY_INFORMATION
+			       | GROUP_SECURITY_INFORMATION
+			       | OWNER_SECURITY_INFORMATION,
+			       sd_ret, len, &len);
+  if (ret == STATUS_BUFFER_TOO_SMALL)
+    {
+      if (!sd_ret.malloc (len))
+	set_errno (ENOMEM);
+      else
+	ret = NtQuerySecurityObject (handle,
+				     DACL_SECURITY_INFORMATION
+				     | GROUP_SECURITY_INFORMATION
+				     | OWNER_SECURITY_INFORMATION,
+				     sd_ret, len, &len);
+    }
+  if (ret != STATUS_SUCCESS)
+    {
+      sd_ret.free ();
+      __seterrno_from_win_error (RtlNtStatusToDosError (ret));
+      return -1;
+    }
+  return 0;
+}
+
+static int
 get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
 			 mode_t *attribute, __uid32_t *uidret,
 			 __gid32_t *gidret)
@@ -1375,34 +1406,14 @@ get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
   security_descriptor sd;
   PSECURITY_DESCRIPTOR psd = NULL;
 
-  NTSTATUS ret;
-  ULONG len = 0;
-  ret = NtQuerySecurityObject (handle,
-			       DACL_SECURITY_INFORMATION
-			       | GROUP_SECURITY_INFORMATION
-			       | OWNER_SECURITY_INFORMATION,
-			       sd, len, &len);
-  if (ret == STATUS_BUFFER_TOO_SMALL)
+  if (get_nt_object_security (handle, object_type, sd))
     {
-      if (!sd.malloc (len))
-	set_errno (ENOMEM);
-      else
-	ret = NtQuerySecurityObject (handle,
-				     DACL_SECURITY_INFORMATION
-				     | GROUP_SECURITY_INFORMATION
-				     | OWNER_SECURITY_INFORMATION,
-				     sd, len, &len);
-    }
-  if (ret != STATUS_SUCCESS)
-    {
-      __seterrno_from_win_error (RtlNtStatusToDosError (ret));
       if (object_type == SE_FILE_OBJECT)
-        return -1;
+	return -1;
     }
   else
     psd = sd;
   get_info_from_sd (psd, attribute, uidret, gidret);
-
   return 0;
 }
 
@@ -1805,16 +1816,16 @@ set_security_attribute (int attribute, PSECURITY_ATTRIBUTES psa,
 }
 
 static int
-set_nt_attribute (const char *file, __uid32_t uid, __gid32_t gid,
-		  int attribute)
+set_nt_attribute (HANDLE handle, const char *file,
+		  __uid32_t uid, __gid32_t gid, int attribute)
 {
   if (!wincap.has_security ())
     return 0;
 
   security_descriptor sd;
 
-  int ret;
-  if ((ret = read_sd (file, sd)) <= 0)
+  if (get_nt_object_security (handle, SE_FILE_OBJECT, sd)
+      && read_sd (file, sd) <= 0)
     {
       debug_printf ("read_sd %E");
       return -1;
@@ -1827,13 +1838,13 @@ set_nt_attribute (const char *file, __uid32_t uid, __gid32_t gid,
 }
 
 int
-set_file_attribute (int use_ntsec, const char *file,
+set_file_attribute (bool use_ntsec, HANDLE handle, const char *file,
 		    __uid32_t uid, __gid32_t gid, int attribute)
 {
   int ret = 0;
 
   if (use_ntsec && allow_ntsec)
-    ret = set_nt_attribute (file, uid, gid, attribute);
+    ret = set_nt_attribute (handle, file, uid, gid, attribute);
   else if (allow_ntea && !NTWriteEA (file, ".UNIXATTR", (char *) &attribute,
 				     sizeof (attribute)))
     {
@@ -1846,9 +1857,10 @@ set_file_attribute (int use_ntsec, const char *file,
 }
 
 int
-set_file_attribute (int use_ntsec, const char *file, int attribute)
+set_file_attribute (bool use_ntsec, HANDLE handle, const char *file,
+		    int attribute)
 {
-  return set_file_attribute (use_ntsec, file,
+  return set_file_attribute (use_ntsec, handle, file,
 			     myself->uid, myself->gid, attribute);
 }
 

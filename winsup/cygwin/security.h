@@ -251,8 +251,8 @@ extern bool allow_smbntsec;
 int __stdcall set_process_privileges ();
 int __stdcall get_file_attribute (int, HANDLE, const char *, mode_t *,
 				  __uid32_t * = NULL, __gid32_t * = NULL);
-int __stdcall set_file_attribute (int, const char *, int);
-int __stdcall set_file_attribute (int, const char *, __uid32_t, __gid32_t, int);
+int __stdcall set_file_attribute (bool, HANDLE, const char *, int);
+int __stdcall set_file_attribute (bool, HANDLE, const char *, __uid32_t, __gid32_t, int);
 int __stdcall get_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type, mode_t *,
 				  __uid32_t * = NULL, __gid32_t * = NULL);
 LONG __stdcall read_sd (const char *file, security_descriptor &sd);
