@@ -601,7 +601,7 @@ static const template i386_optab[] =
 {"fild",   1,	0xdf, 5, 0,	 q_FP|Modrm,		{ LLongMem, 0, 0} },
 {"fildll", 1,	0xdf, 5, 0,	 FP|Modrm,		{ LLongMem, 0, 0} },
 {"fldt",   1,	0xdb, 5, 0,	 FP|Modrm,		{ LLongMem, 0, 0} },
-{"fbld",   1,	0xdf, 4, 0,	 FP|Modrm,		{ LLongMem, 0, 0} },
+{"fbld",   1,	0xdf, 4, 0,	 x_Suf|Modrm,		{ LLongMem, 0, 0} },
 
 /* store (no pop) */
 {"fst",	   1, 0xddd0, X, 0,	 FP|ShortForm,		{ FloatReg, 0, 0} },
@@ -619,7 +619,7 @@ static const template i386_optab[] =
 {"fistp",  1,	0xdf, 7, 0,	 q_FP|Modrm,		{ LLongMem, 0, 0} },
 {"fistpll",1,	0xdf, 7, 0,	 FP|Modrm,		{ LLongMem, 0, 0} },
 {"fstpt",  1,	0xdb, 7, 0,	 FP|Modrm,		{ LLongMem, 0, 0} },
-{"fbstp",  1,	0xdf, 6, 0,	 FP|Modrm,		{ LLongMem, 0, 0} },
+{"fbstp",  1,	0xdf, 6, 0,	 x_Suf|Modrm,		{ LLongMem, 0, 0} },
 
 /* exchange %st<n> with %st0 */
 {"fxch",   1, 0xd9c8, X, 0,	 FP|ShortForm,		{ FloatReg, 0, 0} },
@@ -812,16 +812,16 @@ static const template i386_optab[] =
 /* processor control */
 {"fninit", 0, 0xdbe3, X, 0,	 FP,			{ 0, 0, 0} },
 {"finit",  0, 0xdbe3, X, 0,	 FP|FWait,		{ 0, 0, 0} },
-{"fldcw",  1,	0xd9, 5, 0,	 FP|Modrm,		{ ShortMem, 0, 0} },
-{"fnstcw", 1,	0xd9, 7, 0,	 FP|Modrm,		{ ShortMem, 0, 0} },
-{"fstcw",  1,	0xd9, 7, 0,	 FP|FWait|Modrm,	{ ShortMem, 0, 0} },
+{"fldcw",  1,	0xd9, 5, 0,	 w_Suf|FloatMF|Modrm,	{ ShortMem, 0, 0} },
+{"fnstcw", 1,	0xd9, 7, 0,	 w_Suf|FloatMF|Modrm,	{ ShortMem, 0, 0} },
+{"fstcw",  1,	0xd9, 7, 0,	 w_Suf|FloatMF|FWait|Modrm, { ShortMem, 0, 0} },
 /* XXX should reject %al, %eax, and %rax */
 {"fnstsw", 1, 0xdfe0, X, 0,	 FP|IgnoreSize,		{ Acc, 0, 0} },
-{"fnstsw", 1,	0xdd, 7, 0,	 FP|Modrm,		{ ShortMem, 0, 0} },
+{"fnstsw", 1,	0xdd, 7, 0,	 w_Suf|FloatMF|Modrm,	{ ShortMem, 0, 0} },
 {"fnstsw", 0, 0xdfe0, X, 0,	 FP,			{ 0, 0, 0} },
 /* XXX should reject %al, %eax, and %rax */
 {"fstsw",  1, 0xdfe0, X, 0,	 FP|FWait|IgnoreSize,	{ Acc, 0, 0} },
-{"fstsw",  1,	0xdd, 7, 0,	 FP|FWait|Modrm,	{ ShortMem, 0, 0} },
+{"fstsw",  1,	0xdd, 7, 0,	 w_Suf|FloatMF|FWait|Modrm, { ShortMem, 0, 0} },
 {"fstsw",  0, 0xdfe0, X, 0,	 FP|FWait,		{ 0, 0, 0} },
 {"fnclex", 0, 0xdbe2, X, 0,	 FP,			{ 0, 0, 0} },
 {"fclex",  0, 0xdbe2, X, 0,	 FP|FWait,		{ 0, 0, 0} },

@@ -1,3 +1,10 @@
+2005-02-09  Jan Beulich  <jbeulich@novell.com>
+
+	PR gas/707
+	* i386.h (i386_optab): Add x_Suf to fbld and fbstp. Add w_Suf and
+	FloatMF to fldcw, fstcw, fnstcw, and the memory formas of fstsw and
+	fnstsw.
+
 2005-01-25  Alexandre Oliva  <aoliva@redhat.com>
 
 	2004-11-10  Alexandre Oliva  <aoliva@redhat.com>
