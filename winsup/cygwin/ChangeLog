@@ -1,3 +1,8 @@
+2003-01-30  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_registry.cc (fhandler_registry::exists): Fix off-by-one
+	error when inspecting path.
+
 2003-01-29  Christopher Faylor  <cgf@redhat.com>
 
 	* lib/getopt.c: Allow environment variable control of POSIXLY_INCORRECT

@@ -106,8 +106,10 @@ fhandler_registry::exists ()
 
   const char *path = get_name ();
   debug_printf ("exists (%s)", path);
-  path += proc_len + registry_len + 2;
-  if (*path == 0)
+  path += proc_len + registry_len + 1;
+  if (*path)
+    path++;
+  else
     {
       file_type = 2;
       goto out;
