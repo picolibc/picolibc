@@ -396,32 +396,33 @@ fhandler_socket::dup (fhandler_base *child)
   debug_printf ("here");
   fhandler_socket *fhs = (fhandler_socket *) child;
   fhs->addr_family = addr_family;
-  fhs->set_io_handle (get_io_handle ());
   if (get_addr_family () == AF_LOCAL)
     fhs->set_sun_path (get_sun_path ());
   fhs->set_socket_type (get_socket_type ());
 
-  /* Since WSADuplicateSocket() fails on NT systems when the process
-     is currently impersonating a non-privileged account, we revert
-     to the original account before calling WSADuplicateSocket() and
-     switch back afterwards as it's also in fork().
-     If WSADuplicateSocket() still fails for some reason, we fall back
-     to DuplicateHandle(). */
-
-  WSASetLastError (0);
-  if (cygheap->user.issetuid ())
-    RevertToSelf ();
-  fhs->fixup_before_fork_exec (GetCurrentProcessId ());
-  if (cygheap->user.issetuid ())
-    ImpersonateLoggedOnUser (cygheap->user.token);
-  if (winsock2_active && !WSAGetLastError ())
+  if (winsock2_active)
     {
-      fhs->fixup_after_fork (hMainProc);
-      if (get_io_handle() != (HANDLE) INVALID_SOCKET)
-	return 0;
+      /* Since WSADuplicateSocket() fails on NT systems when the process
+	 is currently impersonating a non-privileged account, we revert
+	 to the original account before calling WSADuplicateSocket() and
+	 switch back afterwards as it's also in fork().
+	 If WSADuplicateSocket() still fails for some reason, we fall back
+	 to DuplicateHandle(). */
+      WSASetLastError (0);
+      if (cygheap->user.issetuid ())
+	RevertToSelf ();
+      fhs->set_io_handle (get_io_handle ());
+      fhs->fixup_before_fork_exec (GetCurrentProcessId ());
+      if (cygheap->user.issetuid ())
+	ImpersonateLoggedOnUser (cygheap->user.token);
+      if (!WSAGetLastError ())
+	{
+	  fhs->fixup_after_fork (hMainProc);
+	  if (fhs->get_io_handle() != (HANDLE) INVALID_SOCKET)
+	    return 0;
+	}
+      debug_printf ("WSADuplicateSocket failed, trying DuplicateHandle");
     }
-
-  debug_printf ("WSADuplicateSocket failed, trying DuplicateHandle");
 
   /* We don't call fhandler_base::dup here since that requires to
      have winsock called from fhandler_base and it creates only
@@ -435,7 +436,7 @@ fhandler_socket::dup (fhandler_base *child)
       __seterrno ();
       return -1;
     }
-  child->set_io_handle (nh);
+  fhs->set_io_handle (nh);
   return 0;
 }
 

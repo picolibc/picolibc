@@ -1,3 +1,9 @@
+2003-05-29  Pierre Humblet  <pierre.humblet@ieee.org>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::dup): Rearrange.  Fix
+	conditional.
+
 2003-05-28  Christopher Faylor  <cgf@redhat.com>
 
 	* mkvers.sh: Avoid "-dontuse" tags.
@@ -9,7 +15,7 @@
 	(mount_info::conv_to_win32_path): Use build_win32 to build windows
 	path.
 	* path.h (mount_item::fnmunge): Declare new function.
-        (mount_item::build_win32): Ditto.
+	(mount_item::build_win32): Ditto.
 	* sys/mount.h (MOUNT_ENC): Define.
 
 2003-05-28  Corinna Vinschen  <corinna@vinschen.de>
