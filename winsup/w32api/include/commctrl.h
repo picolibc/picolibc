@@ -440,9 +440,9 @@ extern "C" {
 #define TBSTYLE_EX_MIXEDBUTTONS 8
 #define TBSTYLE_EX_HIDECLIPPEDBUTTONS 16
 #endif /* _WIN32_IE >= 0x0501 */
-#if (_WIN32_WINNT >= _WXP)
+#if (_WIN32_WINNT >= 0x0501)
 #define TBSTYLE_EX_DOUBLEBUFFER	0x80
-#endif /* _WIN32_WINNT >= _WXP */
+#endif /* _WIN32_WINNT >= 0x0501 */
 #if (_WIN32_IE >= 0x0500)
 #define BTNS_BUTTON	TBSTYLE_BUTTON
 #define BTNS_SEP	TBSTYLE_SEP
@@ -914,7 +914,7 @@ extern "C" {
 #define CDIS_SELECTED 1
 #define CDIS_MARKED 128
 #define CDIS_INDETERMINATE 256
-#if (_WIN32_WINNT >= _WXP)
+#if (_WIN32_WINNT >= 0x0501)
 #define CDIS_SHOWKEYBOARDCUES 512
 #endif
 #define CDDS_POSTERASE 4
@@ -990,7 +990,7 @@ extern "C" {
 #define LVIF_INDENT 16
 #define LVIF_NORECOMPUTE 2048
 #endif
-#if (_WIN32_WINNT >= _WXP)
+#if (_WIN32_WINNT >= 0x0501)
 #define LVIF_GROUPID 128
 #define LVIF_COLUMNS 256
 #endif
@@ -1374,6 +1374,10 @@ extern "C" {
 #if (_WIN32_IE >= 0x0400)
 #define TCIF_STATE	16
 #endif
+#define TCIS_BUTTONPRESSED 1
+#if (_WIN32_IE >= 0x0400)
+#define TCIS_HIGHLIGHTED 2
+#endif
 #define TCM_FIRST	0x1300
 #define TCM_GETIMAGELIST	(TCM_FIRST+2)
 #define TCM_SETIMAGELIST	(TCM_FIRST+3)
@@ -1441,7 +1445,7 @@ extern "C" {
 #define CCM_SETVERSION 0x2007
 #define CCM_GETVERSION 0x2008
 #define CCM_SETNOTIFYWINDOW 0x2009
-#if (_WIN32_WINNT >= _WXP)
+#if (_WIN32_WINNT >= 0x0501)
 #define CCM_SETWINDOWTHEME 0x200b
 #define CCM_DPISCALE 0x200c
 #endif 
@@ -2119,7 +2123,7 @@ typedef struct _NMTBCUSTOMDRAW {
 	RECT rcText;
 	int nStringBkMode;
 	int nHLStringBkMode;
-#if (_WIN32_WINNT >= _WXP)
+#if (_WIN32_WINNT >= 0x0501)
 	int iListGap;
 #endif
 } NMTBCUSTOMDRAW, * LPNMTBCUSTOMDRAW;
@@ -2275,7 +2279,7 @@ typedef struct _LVITEMA {
 #if (_WIN32_IE >= 0x0300)
 	int iIndent;
 #endif
-#if (_WIN32_WINNT >= _WXP)
+#if (_WIN32_WINNT >= 0x0501)
 	int iGroupId;
 	UINT cColumns;
 	PUINT puColumns;
@@ -2296,7 +2300,7 @@ typedef struct _LVITEMW {
 #if (_WIN32_IE >= 0x0300)
 	int iIndent;
 #endif
-#if (_WIN32_WINNT >= _WXP)
+#if (_WIN32_WINNT >= 0x0501)
 	int iGroupId;
 	UINT cColumns;
 	PUINT puColumns;
@@ -2700,7 +2704,7 @@ typedef struct tagIMAGELISTDRAWPARAMS {
 	COLORREF rgbFg;
 	UINT fStyle;
 	DWORD dwRop;
-#if (_WIN32_WINNT >= _WXP)
+#if (_WIN32_WINNT >= 0x0501)
 	DWORD fState;
 	DWORD Frame;
 	COLORREF crEffect;

@@ -151,6 +151,12 @@ extern "C" {
 #define DISP_CHANGE_FAILED	(-1)
 #define DISP_CHANGE_BADMODE	(-2)
 #define DISP_CHANGE_NOTUPDATED	(-3)
+#define DISPLAY_DEVICE_ATTACHED_TO_DESKTOP	0x01
+#define DISPLAY_DEVICE_PRIMARY_DEVICE		0x04
+#define DISPLAY_DEVICE_MIRRORING_DRIVER		0x08
+#define DISPLAY_DEVICE_VGA_COMPATIBLE		0x10
+#define DISPLAY_DEVICE_REMOVABLE		0x20
+#define DISPLAY_DEVICE_MODESPRUNED		0x08000000
 #define BST_CHECKED	1
 #define BST_INDETERMINATE	2
 #define BST_UNCHECKED	0
@@ -2857,6 +2863,8 @@ BOOL WINAPI ChangeClipboardChain(HWND,HWND);
 #ifndef NOGDI
 LONG WINAPI ChangeDisplaySettingsA(PDEVMODEA,DWORD);
 LONG WINAPI ChangeDisplaySettingsW(PDEVMODEW,DWORD);
+LONG WINAPI ChangeDisplaySettingsExA(LPCSTR,LPDEVMODEA,HWND,DWORD,LPVOID);
+LONG WINAPI ChangeDisplaySettingsExW(LPCWSTR,LPDEVMODEW,HWND,DWORD,LPVOID);
 #endif
 BOOL WINAPI ChangeMenuA(HMENU,UINT,LPCSTR,UINT,UINT);
 BOOL WINAPI ChangeMenuW(HMENU,UINT,LPCWSTR,UINT,UINT);
@@ -3566,9 +3574,10 @@ typedef MONITORINFOEXW MONITORINFOEX, *LPMONITORINFOEX;
 typedef ICONMETRICSW ICONMETRICS,*LPICONMETRICS;
 typedef NONCLIENTMETRICSW NONCLIENTMETRICS,*LPNONCLIENTMETRICS;
 #define ChangeDisplaySettings ChangeDisplaySettingsW
+#define ChangeDisplaySettingsEx ChangeDisplaySettingsExW
 #define CreateDesktop CreateDesktopW
 #define EnumDisplaySettings EnumDisplaySettingsW
-#define EnumDisplayDevices  EnumDisplayDevicesW
+#define EnumDisplayDevices EnumDisplayDevicesW
 #endif /* NOGDI */
 #else /* UNICODE */
 #define EDITWORDBREAKPROC EDITWORDBREAKPROCA
@@ -3723,9 +3732,10 @@ typedef MONITORINFOEXA MONITORINFOEX, *LPMONITORINFOEX;
 typedef ICONMETRICSA ICONMETRICS,*LPICONMETRICS;
 typedef NONCLIENTMETRICSA NONCLIENTMETRICS,*LPNONCLIENTMETRICS;
 #define ChangeDisplaySettings ChangeDisplaySettingsA
+#define ChangeDisplaySettingsEx ChangeDisplaySettingsExA
 #define CreateDesktop CreateDesktopA
 #define EnumDisplaySettings EnumDisplaySettingsA
-#define EnumDisplayDevices  EnumDisplayDevicesA
+#define EnumDisplayDevices EnumDisplayDevicesA
 #endif /* NOGDI */
 #endif /* UNICODE */
 #endif /* RC_INVOKED */

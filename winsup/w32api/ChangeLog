@@ -1,3 +1,33 @@
+2003-09-15  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/ws2spi.h (LPWSPBIND): Change CONST LPSOCKADDR to
+	const struct sockaddr*.
+	(LPWSPCONNECT): Likewise.
+	(LPWSPJOINLEAF): Likewise.
+	(LPWSPSENDTO): Likewise.
+	Tanks to Sebastian Nowak  <snowak1@users.spourceforge.net>
+
+2003-09-15  Filip Navara  <xnavara@volny.cz>
+
+	* include/commctrl.h (TCIS_BUTTONPRESSED, TCIS_HIGHLIGHTED):
+	Add definitions.
+
+2003-09-15  Sascha Brawer  <brawer@dandelis.ch>
+
+	* include/winuser.h (DISPLAY_DEVICE_ATTACHED_TO_DESKTOP,
+	DISPLAY_DEVICE_PRIMARY_DEVICE, DISPLAY_DEVICE_MIRRORING_DRIVER,
+	DISPLAY_DEVICE_VGA_COMPATIBLE, DISPLAY_DEVICE_REMOVABLE,
+	DISPLAY_DEVICE_MODESPRUNED): Define constants.
+	(ChangeDisplaySettingsEx[A,W]): Add prototype.
+
+	* lib/user32.def (ChangeDisplaySettingsEx[A,W]): Add exports.
+	(EnumDisplayDevices[A,W]): Likewise.
+
+2003-09-15  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include.commctrl.h (_WIN32_WINNT): Change _WXP to 0x0501,
+	throughout.
+
 2003-09-13  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/olectl.h (TEXTMETRICOLE, LPERRORLOG, LPPROPERTYBAG,

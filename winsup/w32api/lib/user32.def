@@ -25,6 +25,8 @@ CascadeWindows@20
 ChangeClipboardChain@8
 ChangeDisplaySettingsA@8
 ChangeDisplaySettingsW@8
+ChangeDisplaySettingsExA@20
+ChangeDisplaySettingsExW@20
 ChangeMenuA@20
 ChangeMenuW@20
 CharLowerA@4
@@ -179,6 +181,8 @@ EnumClipboardFormats@4
 EnumDesktopWindows@12
 EnumDesktopsA@12
 EnumDesktopsW@12
+EnumDisplayDevicesA@16
+EnumDisplayDevicesW@16
 EnumDisplayMonitors@16
 EnumDisplaySettingsA@12
 EnumDisplaySettingsW@12
