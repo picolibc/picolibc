@@ -1111,7 +1111,24 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	    }
 	  if (zeroes)
 	    flags &= ~NDIGITS;
-	  /*
+          /* We may have a 'N' or possibly even a 'Na' as the start of 'NaN', 
+	     only to run out of chars before it was complete (or having 
+	     encountered a non- matching char).  So check here if we have an 
+	     outstanding nancount, and if so put back the chars we did 
+	     swallow and treat as a failed match. */
+          if (nancount && nancount != 3)
+            {
+              /* Ok... what are we supposed to do in the event that the
+              __srefill call above was triggered in the middle of the partial
+              'NaN' and so we can't put it all back? */
+              while (nancount-- && (p > buf))
+                {
+                  ungetc (*(u_char *)--p, fp);
+                  --nread;
+                }
+              goto match_failure;
+            }
+          /*
 	   * If no digits, might be missing exponent digits
 	   * (just give back the exponent) or might be missing
 	   * regular digits, but had sign and/or decimal point.
@@ -1123,7 +1140,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		  /* no digits at all */
 		  while (p > buf)
                     {
-		      ungetc (*(u_char *)-- p, fp);
+		      ungetc (*(u_char *)--p, fp);
                       --nread;
                     }
 		  goto match_failure;
