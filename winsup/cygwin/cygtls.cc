@@ -151,7 +151,7 @@ _cygtls::fixup_after_fork ()
 void
 _cygtls::remove (DWORD wait)
 {
-  debug_printf ("wait %p\n", wait);
+  debug_printf ("wait %p", wait);
   if (!locals.exitsock)
     return;
   // FIXME: Need some sort of atthreadexit function to allow things like
