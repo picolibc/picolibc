@@ -35,6 +35,8 @@ enum bfd_link_strip
    if strip_all is used.  */
 enum bfd_link_discard
 {
+  discard_sec_merge,	/* Discard local temporary symbols in SEC_MERGE
+			   sections.  */
   discard_none,		/* Don't discard any locals.  */
   discard_l,		/* Discard local temporary symbols.  */
   discard_all		/* Discard all locals.  */
