@@ -1,3 +1,10 @@
+2004-03-16  Martin Fuchs <martin-fuchs@gmx.net>
+
+	* include/shellapi.h (NIM_* NIS_*): Define constants for
+	notification icons with _WIN32_IE >= 0x0500.
+	(NOTIFYICONDATA): Add new structure members for notification
+	icons with _WIN32_IE >= 0x0500.
+
 2004-03-13  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	*include/wininet.h (CACHEGROUP_SEARCH_ALL, CACHEGROUP_SEARCH_BYURL):
