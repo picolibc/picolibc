@@ -126,7 +126,7 @@ two (see <Xref Linkend="cygpath">) can be eliminated:</para>
 
 <example><title>Identity mount setup</title>
 <screen>
-<prompt>C:\&gt;</prompt> <userinput>mount c:\ \</userinput>
+<prompt>C:\&gt;</prompt> <userinput>mount c:\ /</userinput>
 <prompt>C:\&gt;</prompt> <userinput>mount d:\foo /foo</userinput>
 <prompt>C:\&gt;</prompt> <userinput>mount d:\bar /bar</userinput>
 <prompt>C:\&gt;</prompt> <userinput>mount e:\grill /grill</userinput>
@@ -192,14 +192,60 @@ default printer with the command <command>cat filename > PRN</command>
 <para>There is no need to create a POSIX <filename>/dev</filename> 
 directory as it is simulated within Cygwin automatically.
 It supports the following devices: <filename>/dev/null</filename>,
-<filename>/dev/tty</filename> and
-<filename>/dev/comX</filename> (the serial ports).
+<filename>/dev/zero</filename>, <filename>/dev/tty</filename>,
+<filename>/dev/ttyX</filename>, <filename>/dev/ptmx</filename>,
+<filename>/dev/comX</filename> (the serial ports),
+<filename>/dev/windows</filename> (the windows message queue),
+<filename>/dev/random</filename> and <filename>/dev/urandom</filename>.
 These devices cannot be seen with the command <command>ls /dev</command>
 although commands such as <command>ls /dev/tty</command> work fine.
-<comment>
-FIXME: Are there other devices under /dev. What about the funny ones
-mounted by default, such as /dev/fd1. What do they really do?
-</comment>
+</para>
+
+<para>However, on Windows NT/W2K there are different devices which are
+supported but have to be created as mount points. These are the raw block
+special devices and tape devices. These devices need a special handling
+which is enabled through the mount points. The usage of the native Windows
+device names is not sufficent.
+</para>
+
+<para>NT/W2K supports raw block special device support for partitions
+and drives. The device names for partitions is the drive letter
+with leading <filename>\\.\</filename>, so the floppy would be
+<filename>\\.\A:</filename>, the first partition typically
+<filename>\\.\C:</filename>. Complete drives (except floppies
+which are supported as partitions only) are named
+<filename>\\.\PHYSICALDRIVEx</filename>. The <literal>x</literal>
+is the drive number which you can check in the disk manager.
+Each drive line has prepended the text "Disk x".
+</para>
+
+<para>To access tape drives, NT/W2K uses the file name
+<filename>\\.\TAPEx</filename>. For example the first installed tape device
+is named <filename>\\.\tape0</filename>.
+</para>
+
+<para>To access those devices you have to mount them and you have to
+use the posix name of the device to be recognized by Cygwin.
+The naming convention is simple: The name has to begin with
+<filename>/dev/</filename> and the rest is as you like. The only
+exception are tape devices. To identify if the tape device is
+used as rewind or no-rewind device the name must not begin with
+<literal>n</literal> (rewind) or has to begin with <literal>n</literal>
+(no-rewind).
+</para>
+
+<para>Some examples:</para>
+
+<screen>
+mount -b //./A: /dev/fd0              # mount floppy as raw block special
+mount -b //./physicaldrive1 /dev/hdb  # mount "Disk 1"
+mount -b //./tape0 /dev/st0           # mount first tape as the rewind device...
+mount -b //./tape0 /dev/nst0          # ...and as the no-rewind device
+</screen>
+
+<para>Note the usage of the <literal>-b</literal> option. It is best to
+include the -b option when mounting these devices to ensure that all
+file I/O is in "binary mode".
 </para>
 
 </sect2>

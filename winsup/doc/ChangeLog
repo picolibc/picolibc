@@ -1,3 +1,8 @@
+Fri Sep 29 23:52:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* pathnames.sgml: Add documentation about raw block special
+	devices and tape devices to the "POSIX devices" chapter.
+
 Fri Aug 18 15:51:06 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler-tut.txt: hinfo -> dtable.
