@@ -32,11 +32,25 @@
 /* All the headers include this file. */
 #include <_mingw.h>
 
-#define SH_COMPAT	0x00	/* Compatibility */
-#define	SH_DENYRW	0x10	/* Deny read/write */
-#define	SH_DENYWR	0x20	/* Deny write */
-#define	SH_DENYRD	0x30	/* Deny read */
-#define	SH_DENYNO	0x40	/* Deny nothing */
+#define _SH_COMPAT	0x00	/* Compatibility */
+#define	_SH_DENYRW	0x10	/* Deny read/write */
+#define	_SH_DENYWR	0x20	/* Deny write */
+#define	_SH_DENYRD	0x30	/* Deny read */
+#define	_SH_DENYNO	0x40	/* Deny nothing */
+
+#ifndef __STRICT_ANSI__
+
+#ifndef _NO_OLDNAMES
+
+/* Non ANSI names */
+#define SH_DENYRW _SH_DENYRW
+#define SH_DENYWR _SH_DENYWR
+#define SH_DENYRD _SH_DENYRD
+#define SH_DENYNO _SH_DENYNO
+
+#endif	/* Not _NO_OLDNAMES */
+
+#endif	/* Not __STRICT_ANSI__ */
 
 #endif	/* Not _SHARE_H_ */
 

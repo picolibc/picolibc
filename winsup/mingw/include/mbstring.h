@@ -76,13 +76,13 @@ unsigned char* _mbsnset (unsigned char*, unsigned int, size_t);
 unsigned char* _mbsnbset (unsigned char*, unsigned int, size_t);
 unsigned char* _mbsdup (const unsigned char*);
 unsigned char* _mbsrev (unsigned char*);
-unsigned char* _mbscat (unsigned char*, const unsigned char*); /* also in string.h  */
+unsigned char* _mbscat (unsigned char*, const unsigned char*);
 unsigned char* _mbsncat (unsigned char*, const unsigned char*, size_t);
 unsigned char* _mbsnbcat (unsigned char*, const unsigned char*, size_t);
 size_t _mbslen (const unsigned char*);
 size_t _mbsnbcnt (const unsigned char*, size_t);
 size_t _mbsnccnt (const unsigned char*, size_t);
-unsigned char* _mbschr (const unsigned char*, unsigned int); /* also in string.h  */
+unsigned char* _mbschr (const unsigned char*, unsigned int);
 unsigned char* _mbsrchr (const unsigned char*, unsigned int);
 size_t _mbsspn (const unsigned char*, const unsigned char*);
 size_t _mbscspn (const unsigned char*, const unsigned char*);
@@ -107,7 +107,7 @@ unsigned char* _mbsdec (const unsigned char*, const unsigned char*);
 unsigned int _mbsnextc  (const unsigned char*);
 unsigned char* _mbslwr (unsigned char*);
 unsigned char* _mbsupr (unsigned char*);
-unsigned char* _mbstok (unsigned char*, const unsigned char*); /* also in string.h */
+unsigned char* _mbstok (unsigned char*, const unsigned char*);
 
 /* Kanji */
 int _ismbchira (unsigned int);

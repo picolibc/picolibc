@@ -1,3 +1,27 @@
+2002-06-18  Casper S. Hornstrup  <chorns@users.sourceforge.net>
+
+	* include/_mingw.h (__MINGW_IMPORT): Check for prior definition before
+	defining.
+	* include/excpt.h (): Include windef.h not windows.h.
+	* include/fcntl.h (_O_SHORT_LIVED): Add define.
+	(_chmod): Add prototype.
+        (_creat): Correct prototype.
+	(SH_DENY*): Rename defines to _SH_DENY*.
+	(SH_DENY*): Add Non-ANSI names for _SH_DENY*.
+	include/stdio.h (_IOMYBUF, _IOEOF, _IOERR, _IOSTRG,
+	_IOAPPEND): Add defines.
+	(_wfindfirst): Correct prototype.
+	(_wfdopen): Add prototype.
+	* include/stdlib.h (_rotl, _rotr, _lrotl, _lrotr): Add
+	prototypes.
+	* include/string.h (_mbschr, _mbstok, _mbsncat): Remove
+	 prototypes.
+	(_wcsdup): Correct prototype.
+	* include/mbstring.h: Remove comments about _mbschr, _mbstok,
+	 _mbsncat being in string.h.
+	* include/wchar.h (_wfindfirst): Correct prototype.
+	* include/tchar.h (_tfdopen): Add _UNICODE mappings.
+
 2002-06-15  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/_mingw.h: Increment to version 2.1.

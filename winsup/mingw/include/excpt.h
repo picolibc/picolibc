@@ -36,7 +36,7 @@
 
 #ifndef	__STRICT_ANSI__
 
-#include <windows.h>
+#include <windef.h>
 
 /*
  * NOTE: The constants structs and typedefs below should be defined in the

@@ -125,6 +125,7 @@ char*	_getcwd (char*, int);
 int	_mkdir (const char*);
 char*	_mktemp (char*);
 int	_rmdir (const char*);
+int _chmod (const char*, int);
 
 
 #ifdef __MSVCRT__
@@ -144,6 +145,7 @@ char*	getcwd (char*, int);
 int	mkdir (const char*);
 char*	mktemp (char*);
 int	rmdir (const char*);
+int chmod (const char*, int);
 #endif /* _UWIN */
 
 #endif /* Not _NO_OLDNAMES */
@@ -181,7 +183,7 @@ int		_commit(int);
 
 /* NOTE: The only significant bit in unPermissions appears to be bit 7 (0x80),
  *       the "owner write permission" bit (on FAT). */
-int		_creat (const char*, unsigned);
+int		_creat (const char*, int);
 
 int		_dup (int);
 int		_dup2 (int, int);
@@ -228,7 +230,7 @@ int		_write (int, const void*, unsigned int);
 int 		_waccess(const wchar_t*, int);
 int 		_wchmod(const wchar_t*, int);
 int 		_wcreat(const wchar_t*, int);
-long 		_wfindfirst(wchar_t*, struct _wfinddata_t*);
+long 		_wfindfirst(const wchar_t*, struct _wfinddata_t*);
 int 		_wfindnext(long, struct _wfinddata_t *);
 int 		_wunlink(const wchar_t*);
 int 		_wopen(const wchar_t*, int, ...);

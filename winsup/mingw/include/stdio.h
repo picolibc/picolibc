@@ -46,8 +46,8 @@
 
 
 /* Flags for the iobuf structure  */
-#define	_IOREAD	1
-#define	_IOWRT	2
+#define	_IOREAD	1 /* currently reading */
+#define	_IOWRT	2 /* currently writing */
 #define	_IORW	0x0080 /* opened as "r+w" */
 
 
@@ -96,10 +96,17 @@
  */
 #define L_tmpnam (16)
 
-#define _IOFBF		0x0000
-#define _IOLBF		0x0040
-#define _IONBF		0x0004
+#define _IOFBF    0x0000  /* full buffered */
+#define _IOLBF    0x0040  /* line buffered */
+#define _IONBF    0x0004  /* not buffered */
 
+#define _IOMYBUF  0x0008  /* stdio malloc()'d buffer */
+#define _IOEOF    0x0010  /* EOF reached on read */
+#define _IOERR    0x0020  /* I/O error from system */
+#define _IOSTRG   0x0040  /* Strange or no file descriptor */
+#ifdef _POSIX_SOURCE
+# define _IOAPPEND 0x0200
+#endif
 /*
  * The buffer size as used by setbuf such that it is equivalent to
  * (void) setvbuf(fileSetBuffer, caBuffer, _IOFBF, BUFSIZ).
@@ -353,6 +360,7 @@ wchar_t* _getws (wchar_t*);
 wint_t	putwc (wint_t, FILE*);
 int	_putws (const wchar_t*);
 wint_t	putwchar (wint_t);
+FILE*	_wfdopen(int, wchar_t *);
 FILE*	_wfopen (const wchar_t*, const wchar_t*);
 FILE*	_wfreopen (const wchar_t*, const wchar_t*, FILE*);
 FILE*	_wfsopen (const wchar_t*, const wchar_t*, int);

@@ -44,13 +44,18 @@
    style declarations.  */
 
 #ifndef __GNUC__
-# define __MINGW_IMPORT  __declspec(dllimport)
+# ifndef __MINGW_IMPORT
+#  define __MINGW_IMPORT  __declspec(dllimport)
+# endif
 # define __DECLSPEC_SUPPORTED
 #else /* __GNUC__ */
 # ifdef __declspec
+#  ifndef __MINGW_IMPORT
+
    /* Note the extern. This is needed to work around GCC's
       limitations in handling dllimport attribute.  */
-#  define __MINGW_IMPORT  extern __attribute__((dllimport))
+#   define __MINGW_IMPORT  extern __attribute__((dllimport))
+#   endif
 #  define __DECLSPEC_SUPPORTED
 # else
 #  undef __DECLSPEC_SUPPORTED

@@ -58,6 +58,8 @@
 #define	_O_TRUNC	0x0200	/* Truncate the file if it does exist. */
 #define	_O_EXCL		0x0400	/* Open only if the file does not exist. */
 
+#define _O_SHORT_LIVED  0x1000
+
 /* NOTE: Text is the default even if the given _O_TEXT bit is not on. */
 #define	_O_TEXT		0x4000	/* CR-LF in file becomes LF in memory. */
 #define	_O_BINARY	0x8000	/* Input and output is not translated. */
