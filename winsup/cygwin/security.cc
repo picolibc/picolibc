@@ -1,9 +1,9 @@
 /* security.cc: NT security functions
 
-   Copyright 1997, 1998, 1999, 2000 Cygnus Solutions.
+   Copyright 1997, 1998, 1999, 2000, 2001 Cygnus Solutions.
 
    Originaly written by Gunther Ebert, gunther.ebert@ixos-leipzig.de
-   Extensions by Corinna Vinschen <corinna.vinschen@cityweb.de>
+   Completely rewritten by Corinna Vinschen <corinna@vinschen.de>
 
 This file is part of Cygwin.
 
