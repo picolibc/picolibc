@@ -1,5 +1,9 @@
 2003-03-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* winver.rc: Change Copyright hint to inlcude 2003.
+
+2003-03-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	Switch to 32/64 datatypes:
 	* Makefile.in (OBSOLETE_FUNCTIONS): Add open acl aclcheck aclfrommode
 	aclfrompbits aclfromtext aclsort acltomode acltopbits acltotext chown
