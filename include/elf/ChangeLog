@@ -1,3 +1,9 @@
+2000-01-13  Nick Clifton  <nickc@cygnus.com>
+
+	* common.h (EM_S370): Change comment - this is now the IBM
+	System/370.
+	(EM_IA_64): Change comment - this is now the IA-64.
+
 2000-01-11  Nick Clifton  <nickc@cygnus.com>
 
 	* common.h (DT_ENCODING): Fix definition of this value.

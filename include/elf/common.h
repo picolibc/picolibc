@@ -90,7 +90,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define EM_486		6	/* Intel 80486 */
 #define EM_860		7	/* Intel 80860 */
 #define EM_MIPS		8	/* MIPS R3000 (officially, big-endian only) */
-#define EM_S370		9	/* Amdahl */
+#define EM_S370		9	/* IBM System/370 */
 #define EM_MIPS_RS4_BE 10	/* MIPS R4000 big-endian */ /* Depreciated */
 #define EM_MIPS_RS3_LE 10	/* MIPS R3000 little-endian (Oct 4 1999 Draft)*/ /* Depreciated */
 
@@ -117,7 +117,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define EM_H8_300H     47       /* Hitachi H8/300H */
 #define EM_H8S         48       /* Hitachi H8S */
 #define EM_H8_500      49       /* Hitachi H8/500 */
-#define EM_IA_64       50       /* Intel MercedTM Processor */
+#define EM_IA_64       50       /* Intel IA-64 Processor */
 #define EM_MIPS_X      51       /* Stanford MIPS-X */
 #define EM_COLDFIRE    52       /* Motorola Coldfire */
 #define EM_68HC12      53       /* Motorola M68HC12 */
