@@ -1,3 +1,8 @@
+Tue Sep 25 02:09:42 2001  Christopher Faylor <cgf@redhat.com>
+
+	* select.cc (fhandler_tty_common::ready_for_read): Rewrite to correctly
+	call peek_pipe.
+
 Mon Sep 24 18:46:39 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* select.cc (peek_pipe): Only grab mutex when we actually got something
