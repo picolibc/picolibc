@@ -1,3 +1,7 @@
+Mon Jul  4 19:22:00 2000  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/version.h: Bump API minor version to 24.
+
 2000-07-04  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
 	* security.cc (read_sd): Eliminate OemToChar.

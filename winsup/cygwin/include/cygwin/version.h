@@ -113,10 +113,11 @@ details. */
            setuid, setgid set effective and real uid/gid.
        23: Export new dll_crt0 interface and cygwin_user_data for use
 	   with crt0 startup code.
+       24: Export poll and _poll.
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 23
+#define CYGWIN_VERSION_API_MINOR 24
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
