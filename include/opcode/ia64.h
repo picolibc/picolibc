@@ -152,6 +152,7 @@ enum ia64_dependency_semantics
   IA64_DVS_DATA,
   IA64_DVS_INSTR,
   IA64_DVS_SPECIFIC,
+  IA64_DVS_STOP,
   IA64_DVS_OTHER,
 };
 
@@ -179,7 +180,8 @@ enum ia64_resource_specifier
   IA64_RS_PKR,
   IA64_RS_PMC,
   IA64_RS_PMD,
-  IA64_RS_PR,
+  IA64_RS_PR,  /* non-rotating, 1-15 */
+  IA64_RS_PRr, /* rotating, 16-62 */
   IA64_RS_PR63,
   IA64_RS_RR,
 
@@ -300,7 +302,8 @@ struct ia64_opcode
 #define IA64_OPCODE_PSEUDO	(1<<6)	/* insn is a pseudo-op */
 #define IA64_OPCODE_F2_EQ_F3	(1<<7)	/* constraint: F2 == F3 */
 #define IA64_OPCODE_LEN_EQ_64MCNT	(1<<8)	/* constraint: LEN == 64-CNT */
-#define IA64_OPCODE_MOD_RRBS    (1<<9) /* modifies all rrbs in CFM */
+#define IA64_OPCODE_MOD_RRBS    (1<<9)	/* modifies all rrbs in CFM */
+#define IA64_OPCODE_POSTINC	(1<<10)	/* postincrement MR3 operand */
 
 /* A macro to extract the major opcode from an instruction.  */
 #define IA64_OP(i)	(((i) >> 37) & 0xf)

@@ -1,0 +1,130 @@
+The newlib subdirectory is a collection of software from several sources.
+Each have their own copyrights embedded in each file that they concern.
+
+(1) University of California, Berkeley
+
+Copyright (c) 1990 The Regents of the University of California.
+All rights reserved.
+
+Redistribution and use in source and binary forms are permitted
+provided that the above copyright notice and this paragraph are
+duplicated in all such forms and that any documentation,
+advertising materials, and other materials related to such
+distribution and use acknowledge that the software was developed
+by the University of California, Berkeley.  The name of the
+University may not be used to endorse or promote products derived
+from this software without specific prior written permission.
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+(2) DJ Delorie
+
+Copyright (C) 1991 DJ Delorie, 24 Kirsten Ave, Rochester NH 03867-2954
+
+This file is distributed under the terms listed in the document
+"copying.dj", available from DJ Delorie at the address above.
+A copy of "copying.dj" should accompany this file; if not, a copy
+should be available from where this file was obtained.  This file
+may not be distributed without a verbatim copy of "copying.dj".
+
+This file is distributed WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+(3) David M. Gay at AT&T
+
+The author of this software is David M. Gay.
+
+Copyright (c) 1991 by AT&T.
+
+Permission to use, copy, modify, and distribute this software for any
+purpose without fee is hereby granted, provided that this entire notice
+is included in all copies of any software which is or includes a copy
+or modification of this software and in all copies of the supporting
+documentation for such software.
+
+THIS SOFTWARE IS BEING PROVIDED "AS IS", WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTY.  IN PARTICULAR, NEITHER THE AUTHOR NOR AT&T MAKES ANY
+REPRESENTATION OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY
+OF THIS SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
+
+(4) Advanced Micro Devices
+
+Copyright 1989, 1990 Advanced Micro Devices, Inc.
+
+This software is the property of Advanced Micro Devices, Inc  (AMD)  which
+specifically  grants the user the right to modify, use and distribute this
+software provided this notice is not removed or altered.  All other rights
+are reserved by AMD.
+
+AMD MAKES NO WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, WITH REGARD TO THIS
+SOFTWARE.  IN NO EVENT SHALL AMD BE LIABLE FOR INCIDENTAL OR CONSEQUENTIAL
+DAMAGES IN CONNECTION WITH OR ARISING FROM THE FURNISHING, PERFORMANCE, OR
+USE OF THIS SOFTWARE.
+
+So that all may benefit from your experience, please report  any  problems
+or  suggestions about this software to the 29K Technical Support Center at
+800-29-29-AMD (800-292-9263) in the USA, or 0800-89-1131  in  the  UK,  or
+0031-11-1129 in Japan, toll free.  The direct dial number is 512-462-4118.
+
+Advanced Micro Devices, Inc.
+29K Support Products
+Mail Stop 573
+5900 E. Ben White Blvd.
+Austin, TX 78741
+800-292-9263
+
+(5) C.W. Sandmann
+
+Copyright (C) 1993 C.W. Sandmann
+
+This file may be freely distributed as long as the author's name remains.
+
+(6) Eric Backus
+
+(C) Copyright 1992 Eric Backus
+
+This software may be used freely so long as this copyright notice is
+left intact.  There is no warrantee on this software.
+
+(7) Sun Microsystems
+
+Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+
+Developed at SunPro, a Sun Microsystems, Inc. business.
+Permission to use, copy, modify, and distribute this
+software is freely granted, provided that this notice 
+is preserved.
+
+(8) Hewlett Packard
+
+(c) Copyright 1986 HEWLETT-PACKARD COMPANY
+
+To anyone who acknowledges that this file is provided "AS IS"
+without any express or implied warranty:
+    permission to use, copy, modify, and distribute this file
+for any purpose is hereby granted without fee, provided that
+the above copyright notice and this notice appears in all
+copies, and that the name of Hewlett-Packard Company not be
+used in advertising or publicity pertaining to distribution
+of the software without specific, written prior permission.
+Hewlett-Packard Company makes no representations about the
+suitability of this software for any purpose.
+
+(9) Unless otherwise stated in each remaining newlib file, the remaining
+files in the newlib subdirectory are governed by the following copyright.
+
+Copyright (c) 1994, 1997, 2001 Red Hat Incorporated.
+All rights reserved.
+
+Redistribution and use in source and binary forms are permitted
+provided that the above copyright notice and this paragraph are
+duplicated in all such forms and that any documentation,
+advertising materials, and other materials related to such
+distribution and use acknowledge that the software was developed
+at Cygnus Solutions.  Cygnus Solutions may not be used to
+endorse or promote products derived from this software without
+specific prior written permission.
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.

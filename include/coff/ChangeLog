@@ -1,3 +1,15 @@
+2000-12-11  Alan Modra  <alan@linuxcare.com.au>
+
+	* ti.h (OCTETS_PER_BYTE_POWER): Change #warning to #error.
+
+2000-12-08  Alan Modra  <alan@linuxcare.com.au>
+
+	* ti.h (OCTETS_PER_BYTE_POWER): Change #warn to #warning.
+
+2000-06-30  DJ Delorie  <dj@cygnus.com>
+
+	* pe.h: Clarify a comment.
+
 2000-04-17  Timothy Wall  <twall@cygnus.com>
 	
 	* ti.h: Load page cleanup.
