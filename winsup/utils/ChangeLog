@@ -1,3 +1,7 @@
+2003-01-09  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* setfacl (usage): Remove double ":" for mask and other.
+
 2003-01-07  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* mkpasswd.cc (current_user): Create.
