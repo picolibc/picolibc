@@ -3262,7 +3262,7 @@ hash_path_name (__ino64_t hash, const char *name)
 	  hash = cygheap->cwd.get_hash ();
 	  if (name[0] == '.' && name[1] == '\0')
 	    return hash;
-	  hash = (hash << 5) - hash + '\\';
+	  hash = '\\' + (hash << 6) + (hash << 16) - hash;
 	}
     }
 
@@ -3272,7 +3272,7 @@ hashit:
   do
     {
       int ch = cyg_tolower (*name);
-      hash = (hash << 5) - hash + ch;
+      hash = ch + (hash << 6) + (hash << 16) - hash;
     }
   while (*++name != '\0' &&
 	 !(*name == '\\' && (!name[1] || (name[1] == '.' && !name[2]))));

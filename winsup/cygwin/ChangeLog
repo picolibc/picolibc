@@ -1,4 +1,8 @@
-2004-04-07  Corinna Vinschen  <corinna@vinschen.de>
+2004-04-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (hash_path_name): Replace hash algorithm with SDBM.
+
+2004-04-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::open): Set query access mode according
 	to query_open setting.
