@@ -1171,7 +1171,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
 
   /* An MS-DOS spec has either a : or a \.  If this is found, short
      circuit most of the rest of this function. */
-  if (strpbrk (src_path, ":\\") != NULL)
+  if (strpbrk (src_path, ":\\") != NULL || slash_unc_prefix_p (src_path))
     {
       debug_printf ("%s already win32", src_path);
       rc = normalize_win32_path (src_path, dst);
