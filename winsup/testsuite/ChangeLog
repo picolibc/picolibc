@@ -1,3 +1,8 @@
+2003-02-04  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* winsup.api/pthread/cancel11.c: New test.
+	* winsup.api/pthread/cancel12.c: Ditto.
+
 2003-01-23  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in: Don't filter out -g.  Actually pass correct CFLAGS to
