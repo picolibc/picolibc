@@ -590,33 +590,28 @@ struct internal_reloc
   unsigned long r_offset;	/* Used by Alpha ECOFF, SPARC, others */
 };
 
-#define R_RELBYTE	017
-#define R_RELWORD	020
-#define R_PCRBYTE	022
-#define R_PCRWORD	023
-#define R_PCRLONG	024
+#define R_DIR16 	 1
+#define R_DIR32 	 6
+#define R_IMAGEBASE	 7
+#define R_RELBYTE	15
+#define R_RELWORD	16
+#define R_RELLONG	17
+#define R_PCRBYTE	18
+#define R_PCRWORD	19
+#define R_PCRLONG	20
+#define R_IPRSHORT	24
+#define R_IPRLONG	26
+#define R_GETSEG	29
+#define R_GETPA 	30
+#define R_TAGWORD	31
+#define R_JUMPTARG	32	/* strange 29k 00xx00xx reloc */
 
-#define	R_DIR16		01
-#define R_DIR32		06
-#define	R_PCLONG	020
-#define R_RELBYTE	017
-#define R_RELWORD	020
-#define R_IMAGEBASE     07
-
-
-#define R_PCR16L 128
-#define R_PCR26L 129
-#define R_VRT16  130
-#define R_HVRT16 131
-#define R_LVRT16 132
-#define R_VRT32  133
-#define R_RELLONG	(0x11)	/* Direct 32-bit relocation */
-#define R_IPRSHORT	(0x18)
-#define R_IPRLONG	(0x1a)
-#define R_GETSEG	(0x1d)
-#define R_GETPA		(0x1e)
-#define R_TAGWORD	(0x1f)
-#define R_JUMPTARG	0x20	/* strange 29k 00xx00xx reloc */
+#define R_PCR16L       128
+#define R_PCR26L       129
+#define R_VRT16        130
+#define R_HVRT16       131
+#define R_LVRT16       132
+#define R_VRT32        133
 
 
 /* This reloc identifies mov.b instructions with a 16bit absolute

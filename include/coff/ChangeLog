@@ -1,3 +1,8 @@
+1999-09-20  Alan Modra  <alan@spri.levels.unisa.edu.au>
+
+	* internal.h: Delete bogus R_PCLONG, duplicate R_RELBYTE and
+	R_RELWORD, and rewrite some R_* as decimal.
+
 1999-09-06  Donn Terry  <donn@interix.com>
 
 	* internal.h (DTYPE): Define.
