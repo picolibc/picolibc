@@ -1,3 +1,11 @@
+Fri May 12 20:31:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler_raw.cc (write_file, read_file): New wrapper functions
+	for WriteFile and ReadFile to get rid of ERROR_MEDIA_CHANGED
+	and ERROR_BUS_RESET in case of first access to tape.
+	(fhandler_dev_raw::raw_write): Use write_file instead of WriteFile.
+	(fhandler_dev_raw::raw_read): Use read_file instead of ReadFile.
+
 Fri May 12 01:04:57 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in (DLL_OFILES): Sort.

@@ -17,6 +17,52 @@
 #include <cygwin/rdevio.h>
 #include <sys/mtio.h>
 
+/* static wrapper functions to hide the effect of media changes and
+   bus resets which occurs after a new media is inserted. This is
+   also related to the used tape device.  */
+
+static BOOL write_file (HANDLE fh, const void *buf, DWORD to_write,
+                        DWORD *written, int *err)
+{
+  BOOL ret;
+
+  *err = 0;
+  if (!(ret = WriteFile (fh, buf, to_write, written, 0)))
+    {
+      if ((*err = GetLastError ()) == ERROR_MEDIA_CHANGED
+          || *err == ERROR_BUS_RESET)
+        {
+          *err = 0;
+          if (!(ret = WriteFile (fh, buf, to_write, written, 0)))
+            *err = GetLastError ();
+        }
+    }
+  syscall_printf ("%d (err %d) = WriteFile (%d, %d, write %d, written %d, 0)\n",
+                  ret, *err, fh, buf, to_write, *written);
+  return ret;
+}
+
+static BOOL read_file (HANDLE fh, void *buf, DWORD to_read,
+                       DWORD *read, int *err)
+{
+  BOOL ret;
+
+  *err = 0;
+  if (!(ret = ReadFile(fh, buf, to_read, read, 0)))
+    {
+      if ((*err = GetLastError ()) == ERROR_MEDIA_CHANGED
+          || *err == ERROR_BUS_RESET)
+        {
+          *err = 0;
+          if (!(ret = ReadFile (fh, buf, to_read, read, 0)))
+            *err = GetLastError ();
+        }
+    }
+  syscall_printf ("%d (err %d) = ReadFile (%d, %d, to_read %d, read %d, 0)\n",
+                  ret, *err, fh, buf, to_read, *read);
+  return ret;
+}
+
 /**********************************************************************/
 /* fhandler_dev_raw */
 
@@ -45,18 +91,13 @@ fhandler_dev_raw::writebuf (void)
       DWORD to_write = ((devbufend - 1) / 512 + 1) * 512;
       ret = 0;
 
-      if (!WriteFile (get_handle (), devbuf, to_write, &written, 0))
+      if (!write_file (get_handle (), devbuf, to_write, &written, &ret))
 	{
-	  ret = GetLastError ();
 	  if (is_eom (ret))
 	    eom_detected = 1;
 	}
-
       if (written)
 	has_written = 1;
-
-      syscall_printf ("%d = WriteFile(%d, %d, write %d, written %d, 0)\n",
-		      ret, get_handle (), devbuf, to_write, written);
       devbufstart = devbufend = 0;
     }
   is_writing = 0;
@@ -208,11 +249,8 @@ fhandler_dev_raw::raw_read (void *ptr, size_t ulen)
 		  debug_printf ("read %d bytes from file into buffer\n",
 				bytes_to_read);
 		}
-	      if (!ReadFile (get_handle (), tgt, bytes_to_read, &read2, 0))
+	      if (!read_file (get_handle (), tgt, bytes_to_read, &read2, &ret))
 		{
-		  ret = GetLastError ();
-		  syscall_printf ("ReadFile %s failed with error %d\n",
-				  get_name (), ret);
 		  if (!is_eof (ret) && !is_eom (ret))
 		    {
                       debug_printf ("return -1, set errno to EACCES");
@@ -253,11 +291,8 @@ fhandler_dev_raw::raw_read (void *ptr, size_t ulen)
 	    }
 	}
     }
-  else if (!ReadFile (get_handle (), ptr, len, &bytes_read, 0))
+  else if (!read_file (get_handle (), ptr, len, &bytes_read, &ret))
     {
-      ret = GetLastError ();
-      syscall_printf ("ReadFile %s failed with error %d\n",
-		      get_name (), ret);
       if (!is_eof (ret) && !is_eom (ret))
 	{
           debug_printf ("return -1, set errno to EACCES");
@@ -330,10 +365,7 @@ fhandler_dev_raw::raw_write (const void *ptr, size_t len)
 		}
 
 	      ret = 0;
-	      if (!WriteFile (get_handle (), tgt, bytes_to_write, &written, 0))
-		ret = GetLastError ();
-	      syscall_printf ("%d = WriteFile(%d, %d, write %d, written %d, 0)\n",
-			  ret, get_handle (), tgt, bytes_to_write, written);
+	      write_file (get_handle (), tgt, bytes_to_write, &written, &ret);
 	      if (written)
 		has_written = 1;
 
@@ -376,11 +408,8 @@ fhandler_dev_raw::raw_write (const void *ptr, size_t len)
     }
   else if (len > 0)
     {
-      if (!WriteFile (get_handle (), ptr, len, &bytes_written, 0))
+      if (!write_file (get_handle (), ptr, len, &bytes_written, &ret))
 	{
-	  ret = GetLastError ();
-	  syscall_printf ("WriteFile %s failed with error %d\n",
-			  get_name (), ret);
 	  if (bytes_written)
 	    has_written = 1;
 	  if (!is_eom (ret))
