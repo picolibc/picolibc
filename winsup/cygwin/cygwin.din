@@ -346,8 +346,12 @@ gcvtf
 _gcvtf = gcvtf
 getc
 _getc = getc
+getc_unlocked
+_getc_unlocked = getc_unlocked
 getchar
 _getchar = getchar
+getchar_unlocked
+_getchar_unlocked = getchar_unlocked
 getcwd
 _getcwd = getcwd
 getdtablesize
@@ -609,8 +613,12 @@ printf
 _printf = printf
 putc
 _putc = putc
+putc_unlocked
+_putc_unlocked = putc_unlocked
 putchar
 _putchar = putchar
+putchar_unlocked
+_putchar_unlocked = putchar_unlocked
 puts
 _puts = puts
 putw

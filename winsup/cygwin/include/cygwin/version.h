@@ -159,12 +159,14 @@ details. */
            malloc_stats
        59: getsid
        60: MSG_NOSIGNAL
+       61: Export getc_unlocked, getchar_unlocked, putc_unlocked,
+	   putchar_unlocked
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 60
+#define CYGWIN_VERSION_API_MINOR 61
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
