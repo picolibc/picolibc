@@ -1,3 +1,8 @@
+2000-08-25  DJ Delorie  <dj@redhat.com>
+
+	* libc/include/sys/unistd.h (environ): this one isn't from the
+	DLL, no __IMPORT
+
 Fri Aug 25 13:37:11 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* libc/stdlib/system.c (do_system): Eliminate explicit declaration of
