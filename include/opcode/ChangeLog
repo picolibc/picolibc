@@ -1,3 +1,7 @@
+2000-12-12  Nick Clifton  <nickc@redhat.com>
+
+	* mips.h: Fix formatting.
+
 2000-12-01  Chris Demetriou  <cgd@sibyte.com>
 
         mips.h (OP_MASK_SYSCALL, OP_SH_SYSCALL): Delete.

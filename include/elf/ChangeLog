@@ -1,3 +1,7 @@
+2000-12-12  Nick Clifton  <nickc@redhat.com>
+
+	* mips.h: Fix formatting.
+
 Mon Dec 11 10:56:58 2000  Jeffrey A Law  (law@cygnus.com)
 
 	* hppa.h (DT_HP_*): Define relative to OLD_DT_LOOS for hpux

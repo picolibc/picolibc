@@ -133,7 +133,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  *
 #define OP_SH_CODE19		6       /* 19 bit wait code.  */
 #define OP_MASK_CODE19		0x7ffff
 
-
 /* This structure holds information for a particular instruction.  */
 
 struct mips_opcode
@@ -322,11 +321,11 @@ struct mips_opcode
 /* LSI R4010 instruction.  */
 #define INSN_4010                 0x00020000
 /* NEC VR4100 instruction.  */
-#define INSN_4100                   0x00040000
+#define INSN_4100                 0x00040000
 /* Toshiba R3900 instruction.  */
-#define INSN_3900                   0x00080000
+#define INSN_3900                 0x00080000
 /* 32-bit code running on a ISA3+ CPU.  */
-#define INSN_GP32                   0x00100000
+#define INSN_GP32                 0x00100000
 
 /* MIPS ISA defines, use instead of hardcoding ISA level.  */
 
