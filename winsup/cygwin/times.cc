@@ -658,6 +658,12 @@ hires_ms::usecs (bool justdelta)
   if (!minperiod) /* NO_COPY variable */
     prime ();
   DWORD now = timeGetTime ();
+  if (now <= initime_ms)
+    {
+      inited = 0;
+      prime ();
+      now = timeGetTime ();
+    }
   // FIXME: Not sure how this will handle the 49.71 day wrap around
   LONGLONG res = initime_us.QuadPart + ((LONGLONG) (now - initime_ms) * 1000);
   return res;
