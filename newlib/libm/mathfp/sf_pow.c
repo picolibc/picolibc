@@ -6,8 +6,8 @@
 
 float powf (float x, float y)
 {
-  float d, t, r = 1.0;
-  int n, k, sign = 0, exponent_is_even_int = 0;
+  float d, k, t, r = 1.0;
+  int n, sign, exponent_is_even_int = 0;
   __int32_t px;
 
   GET_FLOAT_WORD (px, x);
