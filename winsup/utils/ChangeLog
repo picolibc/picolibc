@@ -1,3 +1,20 @@
+Wed Nov  8 15:52:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* mkgroup.c (load_netapi): New function to load netapi32.dll functions
+	dynamically so that mkgroup works on 9x/ME as well.
+	Use corresponding function pointers throughout.
+	(usage): Change to `int'. Change text to be conformant to mkpasswd.
+	(main): Use `getlongopt' to process options.
+	Special handling to create a group entry on 9x/ME.
+	* mkpasswd.c (load_netapi): New function to load netapi32.dll functions
+	dynamically so that mkpasswd works on 9x/ME as well.
+	Use corresponding function pointers throughout.
+	(usage): Change to `int'. Change text to be conformant to mkgroup.
+	(main): Use `getlongopt' to process options.
+	Special handling to create a passwd entry on 9x/ME.
+	Change conditional to create an entry for the local administrators
+	group when appropriate.
+
 Thu Nov  2  2:01:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* kill.cc (main): Return 1 in case of errors.

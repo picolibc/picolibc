@@ -14,15 +14,41 @@
 #include <stdio.h>
 #include <windows.h>
 #include <sys/cygwin.h>
+#include <getopt.h>
 #include <lmaccess.h>
 #include <lmapibuf.h>
 
 SID_IDENTIFIER_AUTHORITY sid_world_auth = {SECURITY_WORLD_SID_AUTHORITY};
 SID_IDENTIFIER_AUTHORITY sid_nt_auth = {SECURITY_NT_AUTHORITY};
 
+NET_API_STATUS WINAPI (*netapibufferfree)(PVOID);
+NET_API_STATUS WINAPI (*netuserenum)(LPWSTR,DWORD,DWORD,PBYTE*,DWORD,PDWORD,PDWORD,PDWORD);
+NET_API_STATUS WINAPI (*netlocalgroupenum)(LPWSTR,DWORD,PBYTE*,DWORD,PDWORD,PDWORD,PDWORD);
+NET_API_STATUS WINAPI (*netgetdcname)(LPWSTR,LPWSTR,PBYTE*);
+
 #ifndef min
 #define min(a,b) (((a)<(b))?(a):(b))
 #endif
+
+BOOL
+load_netapi ()
+{
+  HANDLE h = LoadLibrary ("netapi32.dll");
+
+  if (!h)
+    return FALSE;
+
+  if (!(netapibufferfree = GetProcAddress (h, "NetApiBufferFree")))
+    return FALSE;
+  if (!(netuserenum = GetProcAddress (h, "NetUserEnum")))
+    return FALSE;
+  if (!(netlocalgroupenum = GetProcAddress (h, "NetLocalGroupEnum")))
+    return FALSE;
+  if (!(netgetdcname = GetProcAddress (h, "NetGetDCName")))
+    return FALSE;
+
+  return TRUE;
+}
 
 char *
 put_sid (PSID sid)
@@ -92,7 +118,7 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath)
     {
       DWORD i;
 
-      rc = NetUserEnum (servername, 3, FILTER_NORMAL_ACCOUNT,
+      rc = netuserenum (servername, 3, FILTER_NORMAL_ACCOUNT,
 			(LPBYTE *) & buffer, 1024,
 			&entriesread, &totalentries, &resume_handle);
       switch (rc)
@@ -180,13 +206,13 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath)
                   homedir_psx);
 	}
 
-      NetApiBufferFree (buffer);
+      netapibufferfree (buffer);
 
     }
   while (rc == ERROR_MORE_DATA);
 
   if (servername)
-    NetApiBufferFree (servername);
+    netapibufferfree (servername);
 
   return 0;
 }
@@ -204,7 +230,7 @@ enum_local_groups (int print_sids)
     {
       DWORD i;
 
-      rc = NetLocalGroupEnum (NULL, 0, (LPBYTE *) & buffer, 1024,
+      rc = netlocalgroupenum (NULL, 0, (LPBYTE *) & buffer, 1024,
 			      &entriesread, &totalentries, &resume_handle);
       switch (rc)
 	{
@@ -217,7 +243,7 @@ enum_local_groups (int print_sids)
 	  break;
 
 	default:
-	  fprintf (stderr, "NetUserEnum() failed with %ld\n", rc);
+	  fprintf (stderr, "NetLocalGroupEnum() failed with %ld\n", rc);
 	  exit (1);
 	}
 
@@ -269,7 +295,7 @@ enum_local_groups (int print_sids)
                   print_sids ? put_sid (psid) : "");
 	}
 
-      NetApiBufferFree (buffer);
+      netapibufferfree (buffer);
 
     }
   while (rc == ERROR_MORE_DATA);
@@ -277,24 +303,36 @@ enum_local_groups (int print_sids)
   return 0;
 }
 
-void
+int
 usage ()
 {
-  fprintf (stderr, "\n");
-  fprintf (stderr, "usage: mkpasswd [options] [domain]\n\n");
+  fprintf (stderr, "Usage: mkpasswd [OPTION]... [domain]\n\n");
   fprintf (stderr, "This program prints a /etc/passwd file to stdout\n\n");
-  fprintf (stderr, "Options are\n");
-  fprintf (stderr, "   -l,--local              print local accounts\n");
-  fprintf (stderr, "   -d,--domain             print domain accounts (from current domain\n");
-  fprintf (stderr, "                           if no domain specified\n");
-  fprintf (stderr, "   -g,--local-groups       print local group information too\n");
-  fprintf (stderr, "   -m,--no-mount           don't use mount points for home dir\n");
-  fprintf (stderr, "   -s,--no-sids            don't print SIDs in GCOS field\n");
-  fprintf (stderr, "                           (this affects ntsec)\n");
-  fprintf (stderr, "   -?,--help               displays this message\n\n");
-  fprintf (stderr, "This program does only work on Windows NT\n\n");
-  exit (1);
+  fprintf (stderr, "Options:\n");
+  fprintf (stderr, "   -l,--local           print local user accounts\n");
+  fprintf (stderr, "   -d,--domain          print domain accounts (from current domain\n");
+  fprintf (stderr, "                        if no domain specified)\n");
+  fprintf (stderr, "   -g,--local-groups    print local group information too\n");
+  fprintf (stderr, "                        if no domain specified\n");
+  fprintf (stderr, "   -m,--no-mount        don't use mount points for home dir\n");
+  fprintf (stderr, "   -s,--no-sids         don't print SIDs in GCOS field\n");
+  fprintf (stderr, "                        (this affects ntsec)\n");
+  fprintf (stderr, "   -?,--help            displays this message\n\n");
+  fprintf (stderr, "One of `-l', `-d' or `-g' must be given on NT/W2K.\n");
+  return 1;
 }
+
+struct option longopts[] = {
+  {"local", no_argument, NULL, 'l'},
+  {"domain", no_argument, NULL, 'd'},
+  {"loca-groups", no_argument, NULL, 'g'},
+  {"no-mount", no_argument, NULL, 'm'},
+  {"no-sids", no_argument, NULL, 's'},
+  {"help", no_argument, NULL, 'h'},
+  {0, no_argument, NULL, 0}
+};
+
+char opts[] = "ldgsmh";
 
 int
 main (int argc, char **argv)
@@ -315,44 +353,73 @@ main (int argc, char **argv)
   PSID sid;
   SID_NAME_USE use;
 
-  if (argc == 1)
-    usage ();
-
-  else
-    {
-      for (i = 1; i < argc; i++)
-	{
-	  if (!strcmp (argv[i], "-l") || !strcmp (argv[i], "--local"))
-	    print_local = 1;
-
-	  else if (!strcmp (argv[i], "-d") || !strcmp (argv[i], "--domain"))
-	    print_domain = 1;
-
-	  else if (!strcmp (argv[i], "-g") || !strcmp (argv[i], "--local-groups"))
-	    print_local_groups = 1;
-
-	  else if (!strcmp (argv[i], "-s") || !strcmp (argv[i], "--no-sids"))
-	    print_sids = 0;
-
-	  else if (!strcmp (argv[i], "-m") || !strcmp (argv[i], "--no-mount"))
-	    print_cygpath = 0;
-
-	  else if (!strcmp (argv[i], "-?") || !strcmp (argv[i], "--help"))
-	    usage ();
-
-	  else
+  if (GetVersion () < 0x80000000)
+    if (argc == 1)
+      return usage ();
+    else
+      {
+        while ((i = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
+          switch (i)
 	    {
-	      mbstowcs (domain_name, argv[i], (strlen (argv[i]) + 1));
-	      domain_name_specified = 1;
+	    case 'l':
+	      print_local = 1;
+	      break;
+	    case 'd':
+	      print_domain = 1;
+	      break;
+	    case 'g':
+	      print_local_groups = 1;
+	      break;
+	    case 's':
+	      print_sids = 0;
+	      break;
+	    case 'm':
+	      print_cygpath = 0;
+	      break;
+	    case 'h':
+	      return usage ();
+	    default:
+	      fprintf (stderr, "Try `%s --help' for more information.\n", argv[0]);
+	      return 1;
 	    }
-	}
-    }
+        if (!print_local && !print_domain && !print_local_groups)
+          {
+	    fprintf (stderr, "%s: Specify one of `-l', `-d' or `-g'\n", argv[0]);
+	    return 1;
+	  }
+        if (optind < argc)
+          {
+	    if (!print_domain)
+	      {
+	        fprintf (stderr, "%s: A domain name is only accepted "
+	      		         "when `-d' is given.\n", argv[0]);
+	        return 1;
+	      }
+	    mbstowcs (domain_name, argv[optind], (strlen (argv[optind]) + 1));
+	    domain_name_specified = 1;
+	  }
+      }
 
-  /* FIXME: this needs to take Windows 98 into account. */
+  /* This takes Windows 9x/ME into account. */
   if (GetVersion () >= 0x80000000)
     {
-      fprintf (stderr, "The required functionality is not supported by Windows 95. Sorry.\n");
-      exit (1);
+      /* Same behaviour as in cygwin/uinfo.cc (internal_getlogin). */
+      if (!GetUserName (name, (len = 256, &len)))
+        strcpy (name, "unknown");
+
+      printf ("%s::%ld:%ld::/home/%s:/bin/sh\n", name,
+                                                 DOMAIN_USER_RID_ADMIN,
+                                                 DOMAIN_ALIAS_RID_ADMINS,
+						 name);
+
+      return 0;
+    }
+
+  if (!load_netapi ())
+    {
+      fprintf (stderr, "Failed loading symbols from netapi32.dll "
+      		       "with error %lu\n", GetLastError ());
+      return 1;
     }
 
   /*
@@ -365,7 +432,7 @@ main (int argc, char **argv)
                             name, (len = 256, &len),
                             dom, (len2 = 256, &len),
                             &use))
-        printf ("%s:*:%ld:%ld:%s%s::\n", name,
+        printf ("%s:*:%d:%d:%s%s::\n", name,
                                          SECURITY_WORLD_RID,
                                          SECURITY_WORLD_RID,
                                          print_sids ? "," : "",
@@ -383,7 +450,7 @@ main (int argc, char **argv)
                             name, (len = 256, &len),
                             dom, (len2 = 256, &len),
                             &use))
-        printf ("%s:*:%ld:%ld:%s%s::\n", name,
+        printf ("%s:*:%d:%d:%s%s::\n", name,
                                          SECURITY_LOCAL_SYSTEM_RID,
                                          SECURITY_LOCAL_SYSTEM_RID,
                                          print_sids ? "," : "",
@@ -394,7 +461,7 @@ main (int argc, char **argv)
   /*
    * Get `administrators' group
   */
-  if (!print_local
+  if (!print_local_groups
       && AllocateAndInitializeSid (&sid_nt_auth, 2,
                                    SECURITY_BUILTIN_DOMAIN_RID,
                                    DOMAIN_ALIAS_RID_ADMINS,
@@ -418,10 +485,10 @@ main (int argc, char **argv)
   if (print_domain)
     {
       if (domain_name_specified)
-	rc = NetGetDCName (NULL, domain_name, (LPBYTE *) & servername);
+	rc = netgetdcname (NULL, domain_name, (LPBYTE *) & servername);
 
       else
-	rc = NetGetDCName (NULL, NULL, (LPBYTE *) & servername);
+	rc = netgetdcname (NULL, NULL, (LPBYTE *) & servername);
 
       if (rc != ERROR_SUCCESS)
 	{
@@ -436,7 +503,7 @@ main (int argc, char **argv)
     enum_users (NULL, print_sids, print_cygpath);
 
   if (servername)
-    NetApiBufferFree (servername);
+    netapibufferfree (servername);
 
   return 0;
 }
