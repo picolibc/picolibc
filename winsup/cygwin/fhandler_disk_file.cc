@@ -601,7 +601,7 @@ fhandler_disk_file::ftruncate (_off64_t length)
     {
       _off64_t prev_loc = lseek (0, SEEK_CUR);
       if (lseek (length, SEEK_SET) >= 0)
-        {
+	{
 	  if (get_fs_flags (FILE_SUPPORTS_SPARSE_FILES))
 	    {
 	      _off64_t actual_length;
@@ -609,14 +609,14 @@ fhandler_disk_file::ftruncate (_off64_t length)
 	      actual_length = GetFileSize (get_output_handle (), &size_high);
 	      actual_length += ((_off64_t) size_high) << 32;
 	      if (length >= actual_length + (128 * 1024))
-	        {
+		{
 		  DWORD dw;
 		  BOOL r = DeviceIoControl (get_output_handle (),
 					    FSCTL_SET_SPARSE, NULL, 0, NULL,
 					    0, &dw, NULL);
 		  syscall_printf ("%d = DeviceIoControl(%p, FSCTL_SET_SPARSE)",
-		  		  r, get_output_handle ());
-	        }
+				  r, get_output_handle ());
+		}
 	    }
 	  else if (wincap.has_lseek_bug ())
 	    res_bug = write (&res, 0);
@@ -799,12 +799,12 @@ fhandler_disk_file::utimes (const struct timeval *tvp)
   if (!open (O_BINARY, 0))
     {
       /* It's documented in MSDN that FILE_WRITE_ATTRIBUTES is sufficient
-         to change the timestamps.  Unfortunately it's not sufficient for a
+	 to change the timestamps.  Unfortunately it's not sufficient for a
 	 remote HPFS which requires GENERIC_WRITE, so we just retry to open
 	 for writing, though this fails for R/O files of course. */
       query_open (no_query);
       if (!open (O_WRONLY | O_BINARY, 0))
-        {
+	{
 	  syscall_printf ("Opening file failed");
 	  __seterrno ();
 	  if (pc.isdir ()) /* What we can do with directories more? */
@@ -812,7 +812,7 @@ fhandler_disk_file::utimes (const struct timeval *tvp)
 	    
 	  __seterrno ();
 	  return -1;
-        }
+	}
     }
 
   gettimeofday (&tmp[0], 0);
@@ -1225,10 +1225,10 @@ fhandler_disk_file::telldir (DIR *dir)
 void
 fhandler_disk_file::seekdir (DIR *dir, _off64_t loc)
 {
-    rewinddir (dir);
-    while (loc > dir->__d_position)
-      if (!readdir (dir))
-	break;
+  rewinddir (dir);
+  while (loc > dir->__d_position)
+    if (!::readdir (dir))
+      break;
 }
 
 void
@@ -1326,15 +1326,7 @@ fhandler_cygdrive::telldir (DIR *dir)
 void
 fhandler_cygdrive::seekdir (DIR *dir, _off64_t loc)
 {
-  if (!iscygdrive_root ())
-    return fhandler_disk_file::seekdir (dir, loc);
-
-  for (pdrive = get_win32_name (), dir->__d_position = -1; *pdrive;
-       pdrive = strchr (pdrive, '\0') + 1)
-    if (++dir->__d_position >= loc)
-      break;
-
-  return;
+  return fhandler_disk_file::seekdir (dir, loc);
 }
 
 void
