@@ -1,3 +1,7 @@
+Fri Aug  6 09:46:35 1999  Jerry Quinn <jquinn@nortelnetworks.com>
+
+	* hppa.h:  Document 64 bit condition completers.
+
 Thu Aug  5 16:56:07 1999  Jerry Quinn <jquinn@nortelnetworks.com>
 
 	* hppa.h (pa_opcodes): Change condition args to use '?' prefix.

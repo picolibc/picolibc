@@ -106,21 +106,35 @@ Condition operands all have '?' as the prefix:
    ?f   Floating point compare conditions (encoded as 5 bits at 31)
 
    ?a	add conditions
-   ?d	non-negated add branch conditions
+   ?A	64 bit add conditions
    ?@   add branch conditions followed by nullify
+   ?d	non-negated add branch conditions
+   ?D	negated add branch conditions
+   ?w	wide mode non-negated add branch conditions
+   ?W	wide mode negated add branch conditions
 
    ?s   compare/subtract conditions
+   ?S	64 bit compare/subtract conditions
    ?t   non-negated compare conditions
+   ?T	negated compare conditions
+   ?r	64 bit non-negated compare conditions
+   ?R	64 bit negated compare conditions
+   ?Q	64 bit compare conditions for CMPIB instruction
    ?n   compare conditions followed by nullify
 
    ?l   logical conditions
+   ?L	64 bit logical conditions
+
    ?b   branch on bit conditions
+   ?B	64 bit branch on bit conditions
 
    ?x   shift/extract/deposit conditions
+   ?X	64 bit shift/extract/deposit conditions
    ?y   shift/extract/deposit conditions followed by nullify for conditional
         branches
 
    ?u   unit conditions
+   ?U   64 bit unit conditions
 
 Also these:
 
@@ -173,7 +187,8 @@ And these (PJH) for PA-89 F.P. registers and instructions:
    8    5 bit register field at 20 (used in 'fmpyadd' and 'fmpysub')
    9    5 bit register field at 25 (used in 'fmpyadd' and 'fmpysub')
    H    Floating Point Operand Format at 26 for 'fmpyadd' and 'fmpysub'
-        (very similar to 'F') */
+        (very similar to 'F')
+*/
 
 
 /* List of characters not to put a space after.  Note that
