@@ -736,7 +736,9 @@ void _reclaim_reent _PARAMS ((struct _reent *));
 #ifndef _REENT_ONLY
 
 #if defined(__DYNAMIC_REENT__) && !defined(__SINGLE_THREAD__)
+#ifndef __getreent
   struct _reent * _EXFUN(__getreent, (void));
+#endif
 # define _REENT (__getreent())
 #else /* __SINGLE_THREAD__ || !__DYNAMIC_REENT__ */
 # define _REENT _impure_ptr

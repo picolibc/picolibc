@@ -1,3 +1,10 @@
+2004-02-08  Christopher Faylor  <cgf@redhat.com>
+
+	* libc/include/sys/features.h: Add _POSIX_TIMERS define for __CYGWIN__.
+	* libc/include/sys/reent.h (__getreent): Protect against possibly being
+	defined.
+	* libc/include/sys/unistd.h (fdatasync): Don't define for __CYGWIN__.
+
 2004-02-05  Paul Brook  <paul@codesourcery.com>
 
 	* libc/include/machine/ieeefp.h[__arm__][__VFP_FP__]: Set 
