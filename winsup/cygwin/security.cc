@@ -1570,7 +1570,8 @@ int
 acl_worker (const char *path, int cmd, int nentries, aclent_t *aclbufp,
             int nofollow)
 {
-  path_conv real_path (path, (nofollow ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW) | PC_FULL);
+  extern suffix_info stat_suffixes[];
+  path_conv real_path (path, (nofollow ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW) | PC_FULL, stat_suffixes);
   if (real_path.error)
     {
       set_errno (real_path.error);

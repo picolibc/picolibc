@@ -1,3 +1,8 @@
+Fri Jul 21 12:03:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* security.cc (acl_worker): Use stat_suffixes in call to path_conv
+	just as in `stat_worker'.
+
 Wed Jul 19 22:24:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* spawn.cc (spawn_guts): Don't restore impersonation in case
