@@ -44,7 +44,7 @@ fillout_pinfo (pid_t pid, int winpid)
       DWORD thispid = pids[i++];
       if (!thispid)
 	continue;
-      pinfo p (thispid);
+      pinfo p (thispid, PID_NOREDIR);
 
       if (!p)
 	{

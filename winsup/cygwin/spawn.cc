@@ -175,9 +175,7 @@ public:
   size_t ix;
   char *buf;
   size_t alloced;
-  linebuf () : ix (0), buf (NULL), alloced (0)
-  {
-  }
+  linebuf () : ix (0), buf (NULL), alloced (0) {}
   ~linebuf () {/* if (buf) free (buf);*/}
   void add (const char *what, int len);
   void add (const char *what) {add (what, strlen (what));}
@@ -349,15 +347,21 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 
   av newargv (ac, argv);
 
+  int null_app_name = 0;
   if (ac == 3 && argv[1][0] == '/' && argv[1][1] == 'c' &&
       (iscmd (argv[0], "command.com") || iscmd (argv[0], "cmd.exe")))
     {
-      one_line.add (argv[0]);
+      real_path.check (prog_arg);
+      if (!real_path.error)
+	one_line.add (real_path);
+      else
+	one_line.add (argv[0]);
       one_line.add (" ");
       one_line.add (argv[1]);
       one_line.add (" ");
       one_line.add (argv[2]);
       strcpy (real_path, argv[0]);
+      null_app_name = 1;
       goto skip_arg_parsing;
     }
 
@@ -525,8 +529,6 @@ skip_arg_parsing:
   si.hStdError = handle (2, 1); /* Get output handle */
   si.cb = sizeof (si);
 
-  syscall_printf ("spawn_guts (%s, %.132s)", (char *) real_path, one_line.buf);
-
   int flags = CREATE_DEFAULT_ERROR_MODE | GetPriorityClass (hMainProc);
 
   if (mode == _P_DETACH || !set_console_state_for_spawn ())
@@ -550,11 +552,15 @@ skip_arg_parsing:
   if (!hToken && myself->token != INVALID_HANDLE_VALUE)
     hToken = myself->token;
 
-cygbench ("spawn-guts");
+  const char *runpath = null_app_name ? NULL : (const char *) real_path;
+
+  syscall_printf ("spawn_guts null_app_name %d (%s, %.132s)", null_app_name, runpath, one_line.buf);
+
+  cygbench ("spawn-guts");
   if (!hToken)
     {
       ciresrv.moreinfo->uid = getuid ();
-      rc = CreateProcess (real_path,	/* image name - with full path */
+      rc = CreateProcess (runpath,	/* image name - with full path */
 			  one_line.buf,	/* what was passed to exec */
 					  /* process security attrs */
 			  allow_ntsec ? sec_user (sa_buf) : &sec_all_nih,
@@ -612,7 +618,7 @@ cygbench ("spawn-guts");
       load_registry_hive (sid);
 
       rc = CreateProcessAsUser (hToken,
-		       real_path,	/* image name - with full path */
+		       runpath,		/* image name - with full path */
 		       one_line.buf,	/* what was passed to exec */
 		       sec_attribs,     /* process security attrs */
 		       sec_attribs,     /* thread security attrs */
@@ -639,10 +645,10 @@ cygbench ("spawn-guts");
      messages].  */
   if (!rc)
     {
-      if (spr)
-	ForceCloseHandle (spr);
       __seterrno ();
       syscall_printf ("CreateProcess failed, %E");
+      if (spr)
+	ForceCloseHandle (spr);
       return -1;
     }
 

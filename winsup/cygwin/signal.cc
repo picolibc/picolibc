@@ -193,7 +193,7 @@ kill_pgrp (pid_t pid, int sig)
   winpids pids;
   for (unsigned i = 0; i < pids.npids; i++)
     {
-      pinfo p (pids[i]);
+      pinfo p (pids[i], PID_NOREDIR);
 
       if (!proc_exists (p))
 	continue;

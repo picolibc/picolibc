@@ -1,3 +1,13 @@
+Thu Oct 19 23:31:41 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* external.cc (fillout_pinfo): Pass PID_NOREDIR flag to pinfo init to
+	avoid finding execed processes twice.
+	* signal.cc (kill_pgrp): Ditto.
+	* spawn.cc (spawn_guts): Avoid passing first argument to CreateProcess
+	when running a windows shell so that CreateProcess will locate the
+	shell.  Reorganize so that correct error is returned when CreateProcess
+	fails.
+
 Thu Oct 19 13:55:31 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dcrt0.cc (sigthread::init): Correct overzealous ifdef.

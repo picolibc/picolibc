@@ -163,7 +163,6 @@ pinfo::init (pid_t n, DWORD create, HANDLE in_h)
 	}
       else if (!create)
 	{
-	  /* CGF FIXME -- deal with inheritance after an exec */
 	  h = OpenFileMappingA (FILE_MAP_READ | FILE_MAP_WRITE, FALSE, mapname);
 	  created = 0;
 	}
@@ -184,6 +183,13 @@ pinfo::init (pid_t n, DWORD create, HANDLE in_h)
 
       procinfo = (_pinfo *) MapViewOfFile (h, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
       ProtectHandle1 (h, pinfo_shared_handle);
+
+      if ((procinfo->process_state & PID_INITIALIZING) && (create & PID_NOREDIR))
+	{
+	  release ();
+	  set_errno (ENOENT);
+	  return;
+	}
 
       if (procinfo->process_state & PID_EXECED)
 	{
@@ -232,6 +238,7 @@ pinfo::release ()
       if (((DWORD) procinfo & 0x77000000) == 0x61000000) try_to_debug ();
 #endif
       UnmapViewOfFile (procinfo);
+      procinfo = NULL;
       ForceCloseHandle1 (h, pinfo_shared_handle);
       h = NULL;
     }
