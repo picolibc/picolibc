@@ -780,8 +780,8 @@ dll_crt0_1 ()
    UPTR is a pointer to global data that lives on the libc side of the
    line [if one distinguishes the application from the dll].  */
 
-void __stdcall
-dll_crt0 ()
+extern "C" void __stdcall
+_dll_crt0 ()
 {
   char zeros[sizeof (ciresrv->zero)] = {0};
 
@@ -864,7 +864,7 @@ dll_crt0 (per_process *uptr)
   /* Set the local copy of the pointer into the user space. */
   if (uptr)
     *user_data = *uptr;
-  dll_crt0 ();
+  _dll_crt0 ();
 }
 
 extern "C" void *export_malloc (unsigned int);

@@ -11,7 +11,7 @@ details. */
 #include <windows.h>
 #include "crt0.h"
 
-extern void __stdcall dll_crt0 (void)  __declspec (dllimport);
+extern void __stdcall _dll_crt0 (void)  __declspec (dllimport) __attribute ((noreturn));
 
 /* for main module */
 void
@@ -20,5 +20,5 @@ cygwin_crt0 (MainFunc f)
   _cygwin_crt0_common (f);
 
  /* Jump into the dll. */
-  dll_crt0 ();
+  _dll_crt0 ();
 }

@@ -272,7 +272,7 @@ extern unsigned int signal_shift_subtract;
 
 /* cygwin .dll initialization */
 void dll_crt0 (per_process *);
-void __stdcall dll_crt0 () __asm__ ("dll_crt0");
+extern "C" void __stdcall _dll_crt0 () __asm__ ("dll_crt0");
 
 /* dynamically loaded dll initialization */
 extern "C" int dll_dllcrt0 (HMODULE, per_process*);
