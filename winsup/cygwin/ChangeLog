@@ -1,3 +1,10 @@
+2002-06-29  Pierre Humblet <pierre.humblet@ieee.org>   
+
+	* security.cc (extract_nt_dom_user): Check for all buffer overflows.
+	Call LookupAccountSid after trying to get domain & user from passwd.
+	(get_group_sidlist): Obtain the domain and user by calling
+	extract_nt_dom_user instead of LookupAccountSid.
+
 2002-06-29  Christopher Faylor  <cgf@redhat.com>
 
 	* uinfo.cc (cygheap_user::test_uid): Use standard issetuid test.

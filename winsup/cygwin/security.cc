@@ -60,43 +60,34 @@ cygwin_set_impersonation_token (const HANDLE hToken)
 void
 extract_nt_dom_user (const struct passwd *pw, char *domain, char *user)
 {
+  char *d, *u, *c;
+
+  domain[0] = 0;
+  strlcpy (user, pw->pw_name, UNLEN+1);
+  debug_printf ("pw_gecos = %x (%s)", pw->pw_gecos, pw->pw_gecos);
+
+  if ((d = strstr (pw->pw_gecos, "U-")) != NULL &&
+      (d == pw->pw_gecos || d[-1] == ','))
+    {
+      c = strchr (d + 2, ',');
+      if ((u = strchr (d + 2, '\\')) == NULL || (c != NULL && u > c))
+	u = d + 1;
+      else if (u - d <= INTERNET_MAX_HOST_NAME_LENGTH + 2)
+	strlcpy(domain, d + 2, u - d - 1);
+      if (c == NULL)
+        c = u + UNLEN + 1;
+      if (c - u <= UNLEN + 1)
+	strlcpy(user, u + 1, c - u);
+    }
+  if (domain[0])
+    return;
+
   cygsid psid;
   DWORD ulen = UNLEN + 1;
   DWORD dlen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
   SID_NAME_USE use;
-  char buf[INTERNET_MAX_HOST_NAME_LENGTH + UNLEN + 2];
-  char *c;
-
-  strcpy (domain, "");
-  strcpy (buf, pw->pw_name);
-  debug_printf ("pw_gecos = %x (%s)", pw->pw_gecos, pw->pw_gecos);
-
-  if (psid.getfrompw (pw) &&
-      LookupAccountSid (NULL, psid, user, &ulen, domain, &dlen, &use))
-    return;
-
-  if (pw->pw_gecos)
-    {
-      if ((c = strstr (pw->pw_gecos, "U-")) != NULL &&
-	  (c == pw->pw_gecos || c[-1] == ','))
-	{
-	  buf[0] = '\0';
-	  strncat (buf, c + 2, INTERNET_MAX_HOST_NAME_LENGTH + UNLEN + 1);
-	  if ((c = strchr (buf, ',')) != NULL)
-	    *c = '\0';
-	}
-    }
-  if ((c = strchr (buf, '\\')) != NULL)
-    {
-      *c++ = '\0';
-      strcpy (domain, buf);
-      strcpy (user, c);
-    }
-  else
-    {
-      strcpy (domain, "");
-      strcpy (user, buf);
-    }
+  if (psid.getfrompw (pw))
+    LookupAccountSid (NULL, psid, user, &ulen, domain, &dlen, &use);
 }
 
 extern "C" HANDLE
@@ -490,18 +481,9 @@ get_group_sidlist (cygsidlist &grp_list,
   char domain[INTERNET_MAX_HOST_NAME_LENGTH + 1];
   WCHAR wserver[INTERNET_MAX_HOST_NAME_LENGTH + 3];
   char server[INTERNET_MAX_HOST_NAME_LENGTH + 3];
-  DWORD ulen = sizeof (user);
-  DWORD dlen = sizeof (domain);
-  SID_NAME_USE use;
   cygsidlist sup_list;
 
   auth_pos = -1;
-  if (!LookupAccountSid (NULL, usersid, user, &ulen, domain, &dlen, &use))
-    {
-      debug_printf ("LookupAccountSid () %E");
-      __seterrno ();
-      return FALSE;
-    }
 
   grp_list += well_known_world_sid;
   if (usersid == well_known_system_sid)
@@ -511,6 +493,7 @@ get_group_sidlist (cygsidlist &grp_list,
     }
   else
     {
+      extract_nt_dom_user (pw, domain, user);
       if (!get_logon_server (domain, server, wserver))
 	return FALSE;
       if (my_grps)
