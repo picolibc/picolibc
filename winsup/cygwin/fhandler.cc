@@ -300,6 +300,7 @@ fhandler_base::open (int flags, mode_t mode)
   int file_attributes;
   int shared;
   int creation_distribution;
+  SECURITY_ATTRIBUTES sa = sec_none;
 
   syscall_printf ("(%s, %p)", get_win32_name (), flags);
 
@@ -382,14 +383,20 @@ fhandler_base::open (int flags, mode_t mode)
       set_errno (ENOENT);
       goto done;
     }
+
+  /* If the file should actually be created and ntsec is on,
+     set files attributes. */
+  if (flags & O_CREAT && get_device () == FH_DISK && allow_ntsec && has_acls ())
+    set_security_attribute (mode, &sa, alloca (256), 256);
+
   x = CreateFileA (get_win32_name (), access, shared,
-		   &sec_none, creation_distribution,
+		   &sa, creation_distribution,
 		   file_attributes,
 		   0);
 
   syscall_printf ("%p = CreateFileA (%s, %p, %p, %p, %p, %p, 0)",
 		  x, get_win32_name (), access, shared,
-		  &sec_none, creation_distribution,
+		  &sa, creation_distribution,
 		  file_attributes);
 
   if (x == INVALID_HANDLE_VALUE)
@@ -401,9 +408,12 @@ fhandler_base::open (int flags, mode_t mode)
       goto done;
     }
 
-  // Attributes may be set only if a file is _really_ created.
+  /* Attributes may be set only if a file is _really_ created.
+     This code is now only used for ntea here since the files
+     security attributes are set in CreateFile () now. */
   if (flags & O_CREAT && get_device () == FH_DISK
-      && GetLastError () != ERROR_ALREADY_EXISTS)
+      && GetLastError () != ERROR_ALREADY_EXISTS
+      && !allow_ntsec && allow_ntea)
     set_file_attribute (has_acls (), get_win32_name (), mode);
 
   namehash = hash_path_name (0, get_win32_name ());

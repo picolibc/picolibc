@@ -1,3 +1,14 @@
+Tue Aug  7 16:24:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* dir.cc (mkdir): Set security attributes correctly for
+	CreateDirectoryA () call if ntsec is on. Don't call
+	set_file_attributes () then.
+	* fhandler.cc (fhandler_base::open): Ditto for CreateFileA () call.
+	* path.cc (symlink): Ditto.
+	* security.cc (set_security_attribute): New function.
+	* security.h: Add declaration for `allow_ntea' and
+	`set_security_attribute'.
+
 Tue Aug  7 10:54:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
         * grp.cc (class grp_check): New class. Make `group_state'

@@ -151,6 +151,7 @@ legal_sid_type (SID_NAME_USE type)
       || type == SidTypeAlias || type == SidTypeWellKnownGroup;
 }
 
+extern BOOL allow_ntea;
 extern BOOL allow_ntsec;
 extern BOOL allow_smbntsec;
 
@@ -170,6 +171,9 @@ LONG __stdcall read_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, LPDWORD sd
 LONG __stdcall write_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size);
 BOOL __stdcall add_access_allowed_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
 BOOL __stdcall add_access_denied_ace (PACL acl, int offset, DWORD attributes, PSID sid, size_t &len_add, DWORD inherit);
+
+void set_security_attribute (int attribute, PSECURITY_ATTRIBUTES psa,
+			     void *sd_buf, DWORD sd_buf_size);
 
 /* Try a subauthentication. */
 HANDLE subauth (struct passwd *pw);

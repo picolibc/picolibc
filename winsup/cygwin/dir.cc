@@ -305,6 +305,7 @@ extern "C" int
 mkdir (const char *dir, mode_t mode)
 {
   int res = -1;
+  SECURITY_ATTRIBUTES sa = sec_none_nih;
 
   path_conv real_dir (dir, PC_SYM_NOFOLLOW);
 
@@ -318,10 +319,15 @@ mkdir (const char *dir, mode_t mode)
   if (! writable_directory (real_dir.get_win32 ()))
     goto done;
 
-  if (CreateDirectoryA (real_dir.get_win32 (), 0))
+  if (allow_ntsec && real_dir.has_acls ())
+    set_security_attribute (S_IFDIR | ((mode & 0777) & ~cygheap->umask),
+			    &sa, alloca (256), 256);
+
+  if (CreateDirectoryA (real_dir.get_win32 (), &sa))
     {
-      set_file_attribute (real_dir.has_acls (), real_dir.get_win32 (),
-			  S_IFDIR | ((mode & 0777) & ~cygheap->umask));
+      if (!allow_ntsec && allow_ntea)
+	set_file_attribute (real_dir.has_acls (), real_dir.get_win32 (),
+			    S_IFDIR | ((mode & 0777) & ~cygheap->umask));
       res = 0;
     }
   else

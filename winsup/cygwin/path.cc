@@ -2395,6 +2395,7 @@ symlink (const char *topath, const char *frompath)
   char cwd[MAX_PATH + 1], *cp = NULL, c = 0;
   char w32topath[MAX_PATH + 1];
   DWORD written;
+  SECURITY_ATTRIBUTES sa = sec_none_nih;
 
   win32_path.check (frompath, PC_SYM_NOFOLLOW);
   if (allow_winsymlinks && !win32_path.error)
@@ -2456,7 +2457,11 @@ symlink (const char *topath, const char *frompath)
 	}
     }
 
-  h = CreateFileA(win32_path, GENERIC_WRITE, 0, &sec_none_nih,
+  if (allow_ntsec && win32_path.has_acls ())
+    set_security_attribute (S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO,
+			    &sa, alloca (256), 256);
+
+  h = CreateFileA(win32_path, GENERIC_WRITE, 0, &sa,
 		  CREATE_NEW, FILE_ATTRIBUTE_NORMAL, 0);
   if (h == INVALID_HANDLE_VALUE)
       __seterrno ();
@@ -2499,9 +2504,10 @@ symlink (const char *topath, const char *frompath)
       if (success)
 	{
 	  CloseHandle (h);
-	  set_file_attribute (win32_path.has_acls (),
-			      win32_path.get_win32 (),
-			      S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO);
+	  if (!allow_ntsec && allow_ntea)
+	    set_file_attribute (win32_path.has_acls (),
+				win32_path.get_win32 (),
+				S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO);
 	  SetFileAttributesA (win32_path.get_win32 (),
 			      allow_winsymlinks ? FILE_ATTRIBUTE_READONLY
 						: FILE_ATTRIBUTE_SYSTEM);
