@@ -1,3 +1,7 @@
+2000-09-28  John David Anglin <dave@hiauly1.hia.nrc.ca>
+
+	* alloca-conf.h: New file (copied from libiberty).
+
 2000-09-05  John David Anglin <dave@hiauly1.hia.nrc.ca>
 
 	* md5.h (md5_uint32): Choose via INT_MAX instead of UINT_MAX.
