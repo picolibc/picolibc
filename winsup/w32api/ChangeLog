@@ -1,5 +1,10 @@
 2002-12-26  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/dbt.h (DEV_BROADCAST_PORT): Add UNICODE version.
+	Thanks to: Dimitri Papadopoulos  <dimitri_at@sourceforge.users.net>
+
+2002-12-26  Danny Smith  <dannysmith@users.sourceforge.net>
+
  	* include/unknwn.h: Include windows.h and ole2.h before header
 	guard to avoid circular inclusion of COM headers.
 

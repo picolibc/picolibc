@@ -66,12 +66,18 @@ typedef struct _DEV_BROADCAST_OEM {
 	DWORD dbco_identifier;
 	DWORD dbco_suppfunc;
 } DEV_BROADCAST_OEM,*PDEV_BROADCAST_OEM;
-typedef struct _DEV_BROADCAST_PORT {
+typedef struct _DEV_BROADCAST_PORT_A {
 	DWORD dbcp_size;
 	DWORD dbcp_devicetype;
 	DWORD dbcp_reserved;
 	char dbcp_name[1];
-} DEV_BROADCAST_PORT,*PDEV_BROADCAST_PORT;
+} DEV_BROADCAST_PORT_A, *PDEV_BROADCAST_PORT_A;
+typedef struct _DEV_BROADCAST_PORT_W {
+	DWORD dbcp_size;
+	DWORD dbcp_devicetype;
+	DWORD dbcp_reserved;
+	wchar_t dbcp_name[1];
+} DEV_BROADCAST_PORT_W, *PDEV_BROADCAST_PORT_W;
 typedef struct _DEV_BROADCAST_USERDEFINED {
 	struct _DEV_BROADCAST_HDR dbud_dbh;
 	char dbud_szName[1];
@@ -83,6 +89,12 @@ typedef struct _DEV_BROADCAST_VOLUME {
 	DWORD dbcv_unitmask;
 	WORD dbcv_flags;
 } DEV_BROADCAST_VOLUME,*PDEV_BROADCAST_VOLUME;
+
+#ifdef UNICODE
+typedef DEV_BROADCAST_PORT_W DEV_BROADCAST_PORT, *PDEV_BROADCAST_PORT;
+#else
+typedef DEV_BROADCAST_PORT_A DEV_BROADCAST_PORT, *PDEV_BROADCAST_PORT;
+#endif
 
 #ifdef __cplusplus
 }
