@@ -1,3 +1,10 @@
+2003-04-01  Bob Wilson  <bob.wilson@acm.org>
+
+        * dis-asm.h (print_insn_xtensa): Declare.
+        * xtensa-config.h: New file.
+        * xtensa-isa-internal.h: Likewise.
+        * xtensa-isa.h: Likewise.
+
 2003-03-17  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
 
 	* ansidecl.h (ATTRIBUTE_NONNULL, ATTRIBUTE_NULL_PRINTF,
