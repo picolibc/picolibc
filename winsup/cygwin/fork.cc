@@ -241,11 +241,11 @@ fork ()
   int res;
   DWORD rc;
   HANDLE hParent;
-  pinfo *child;
   HANDLE subproc_ready, forker_finished;
   void *stack_here;
   int x;
   PROCESS_INFORMATION pi = {0, NULL, 0, 0};
+  static NO_COPY HANDLE last_fork_proc = NULL;
 
   MALLOC_CHECK;
 
@@ -271,15 +271,6 @@ fork ()
       return -1;
     }
 
-  /* Don't start the fork until we have the lock.  */
-  child = cygwin_shared->p.allocate_pid ();
-  if (!child)
-    {
-      set_errno (EAGAIN);
-      syscall_printf ("-1 = fork (), process table full");
-      return -1;
-    }
-
   /* Remember the address of the first loaded dll and decide
      if we need to load dlls.  We do this here so that this
      information will be available in the parent and, when
@@ -292,11 +283,8 @@ fork ()
 
   if (x == 0)
     {
-
       /* This will help some of the confusion.  */
       fflush (stdout);
-
-      debug_printf ("parent pid %d, child pid %d", myself->pid, child->pid);
 
       subproc_ready = CreateEvent (&sec_all, FALSE, FALSE, NULL);
       forker_finished = CreateEvent (&sec_all, FALSE, FALSE, NULL);
@@ -326,7 +314,7 @@ fork ()
       free (malloc (4096));
 #endif
 
-      init_child_info (PROC_FORK1, &ch, child->pid, subproc_ready);
+      init_child_info (PROC_FORK1, &ch, 1, subproc_ready);
 
       ch.forker_finished = forker_finished;
       ch.heaptop = user_data->heaptop;
@@ -334,10 +322,6 @@ fork ()
       ch.heapptr = user_data->heapptr;
 
       stack_base (ch);
-
-      /* Initialize things that are done later in dll_crt0_1 that aren't done
-	 for the forkee.  */
-      strcpy(child->progname, myself->progname);
 
       STARTUPINFO si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL};
 
@@ -393,7 +377,6 @@ fork ()
 	{
 	  __seterrno ();
 	  syscall_printf ("-1 = fork(), CreateProcessA failed");
-	  child->process_state = PID_NOT_IN_USE;
 	  ForceCloseHandle(subproc_ready);
 	  ForceCloseHandle(forker_finished);
 	  subproc_ready = forker_finished = NULL;
@@ -403,6 +386,12 @@ fork ()
 	  return -1;
 	}
 
+      pinfo forked (cygwin_pid (pi.dwProcessId), 1);
+
+      /* Initialize things that are done later in dll_crt0_1 that aren't done
+	 for the forkee.  */
+      strcpy(forked->progname, myself->progname);
+
       /* Restore impersonation */
       if (myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
         seteuid (uid);
@@ -411,35 +400,43 @@ fork ()
       /* Protect the handle but name it similarly to the way it will
 	 be called in subproc handling. */
       ProtectHandle1 (pi.hProcess, childhProc);
+      if (os_being_run != winNT)
+	{
+	  if (last_fork_proc)
+	    CloseHandle (last_fork_proc);
+	  if (!DuplicateHandle (hMainProc, pi.hProcess, hMainProc, &last_fork_proc,
+			        0, FALSE, DUPLICATE_SAME_ACCESS))
+	    system_printf ("couldn't create last_fork_proc, %E");
+	}
 
       /* Fill in fields in the child's process table entry.  */
-      child->ppid = myself->pid;
-      child->hProcess = pi.hProcess;
-      child->dwProcessId = pi.dwProcessId;
-      child->uid = myself->uid;
-      child->gid = myself->gid;
-      child->pgid = myself->pgid;
-      child->sid = myself->sid;
-      child->ctty = myself->ctty;
-      child->umask = myself->umask;
-      child->copysigs(myself);
-      child->process_state |= PID_INITIALIZING |
+      forked->ppid = myself->pid;
+      forked->hProcess = pi.hProcess;
+      forked->dwProcessId = pi.dwProcessId;
+      forked->uid = myself->uid;
+      forked->gid = myself->gid;
+      forked->pgid = myself->pgid;
+      forked->sid = myself->sid;
+      forked->ctty = myself->ctty;
+      forked->umask = myself->umask;
+      forked->copysigs(myself);
+      forked->process_state |= PID_INITIALIZING |
 			      (myself->process_state & PID_USETTY);
-      memcpy (child->username, myself->username, MAX_USER_NAME);
-      memcpy (child->sidbuf, myself->sidbuf, MAX_SID_LEN);
+      memcpy (forked->username, myself->username, MAX_USER_NAME);
+      memcpy (forked->sidbuf, myself->sidbuf, MAX_SID_LEN);
       if (myself->psid)
-        child->psid = child->sidbuf;
-      memcpy (child->logsrv, myself->logsrv, MAX_HOST_NAME);
-      memcpy (child->domain, myself->domain, MAX_COMPUTERNAME_LENGTH+1);
-      child->token = myself->token;
-      child->impersonated = myself->impersonated;
-      child->orig_uid = myself->orig_uid;
-      child->orig_gid = myself->orig_gid;
-      child->real_uid = myself->real_uid;
-      child->real_gid = myself->real_gid;
-      memcpy (child->root, myself->root, MAX_PATH+1);
-      child->rootlen = myself->rootlen;
-      set_child_mmap_ptr (child);
+        forked->psid = forked->sidbuf;
+      memcpy (forked->logsrv, myself->logsrv, MAX_HOST_NAME);
+      memcpy (forked->domain, myself->domain, MAX_COMPUTERNAME_LENGTH+1);
+      forked->token = myself->token;
+      forked->impersonated = myself->impersonated;
+      forked->orig_uid = myself->orig_uid;
+      forked->orig_gid = myself->orig_gid;
+      forked->real_uid = myself->real_uid;
+      forked->real_gid = myself->real_gid;
+      strcpy (forked->root, myself->root);
+      forked->rootlen = myself->rootlen;
+      set_child_mmap_ptr (forked);
 
       /* Wait for subproc to initialize itself. */
       if (!sync_with_child(pi, subproc_ready, TRUE, "waiting for longjmp"))
@@ -476,7 +473,7 @@ fork ()
 	    goto cleanup;
 	}
 
-      proc_register (child);
+      forked.remember ();
 
       /* Start thread, and wait for it to reload dlls.  */
       if (!resume_child (pi, forker_finished) ||
@@ -508,7 +505,7 @@ fork ()
       forker_finished = NULL;
       pi.hThread = NULL;
 
-      res = child->pid;
+      res = forked->pid;
     }
   else
     {
@@ -518,8 +515,7 @@ fork ()
       (void) stack_dummy (0);		// Just to make sure
       debug_printf ("child is running %d", x);
 
-      debug_printf ("self %p, pid %d, ppid %d",
-		    myself, x, myself ? myself->ppid : -1);
+      debug_printf ("pid %d, ppid %d", x, myself->ppid);
 
       /* Restore the inheritance state as in parent
          Don't call setuid here! The flags are already set. */
@@ -563,6 +559,7 @@ fork ()
 
       dtable.fixup_after_fork (hParent);
       signal_fixup_after_fork ();
+      exec_fixup_after_fork ();
 
       MALLOC_CHECK;
 
@@ -605,7 +602,6 @@ fork ()
 /* Common cleanup code for failure cases */
 cleanup:
   /* Remember to de-allocate the fd table. */
-  child->process_state = PID_NOT_IN_USE;
   if (pi.hProcess)
     ForceCloseHandle1 (pi.hProcess, childhProc);
   if (pi.hThread)
@@ -614,7 +610,7 @@ cleanup:
     ForceCloseHandle (subproc_ready);
   if (forker_finished)
     ForceCloseHandle (forker_finished);
-  forker_finished = subproc_ready = child->hProcess = NULL;
+  forker_finished = subproc_ready = NULL;
   return -1;
 }
 

@@ -92,13 +92,17 @@ void __stdcall sig_clear (int);
 void __stdcall sig_set_pending (int);
 int __stdcall handle_sigsuspend (sigset_t);
 
+int __stdcall proc_subproc (DWORD, DWORD);
+
+#include "pinfo.h"
+
 void __stdcall proc_terminate ();
 void __stdcall sigproc_init ();
 void __stdcall subproc_init ();
 void __stdcall sigproc_terminate ();
-BOOL __stdcall proc_exists (pinfo *);
-int __stdcall proc_subproc (DWORD, DWORD);
-int __stdcall sig_send (pinfo *, int, DWORD ebp = 0);
+BOOL __stdcall proc_exists (_pinfo *);
+BOOL __stdcall proc_exists (pid_t);
+int __stdcall sig_send (_pinfo *, int, DWORD ebp = 0);
 void __stdcall signal_fixup_after_fork ();
 
 extern char myself_nowait_dummy[];
@@ -110,7 +114,5 @@ extern HANDLE hExeced;		// Process handle of new window
 
 #define allow_sig_dispatch(n) __allow_sig_dispatch (__FILE__, __LINE__, (n))
 
-#define myself_nowait ((pinfo *)myself_nowait_dummy)
-#define myself_nowait_nonmain ((pinfo *)myself_nowait_nonmain_dummy)
-#define proc_register(child) \
-	proc_subproc (PROC_ADDCHILD, (DWORD) (child))
+#define myself_nowait ((_pinfo *)myself_nowait_dummy)
+#define myself_nowait_nonmain ((_pinfo *)myself_nowait_nonmain_dummy)

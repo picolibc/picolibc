@@ -1,9 +1,93 @@
+Sat Jul 29 12:11:33 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* include/cygwin/version.h: Bump DLL minor version number to 5 due
+	to all of the changes below.
+
+Sat Jul 29 12:01:32 2000  Christopher Faylor <cgf@cygnus.com>
+
+	Redefine process structure to avoid a fixed size table.  Redefine
+	pinfo/_pinfo classes.  Use these throughout.
+	* dcrt0.cc (dll_crt0_1): Accomodate set_myself argument change.
+	(__api_fatal): Accomodate _pinfo::record_death argument change.
+	* exceptions.cc (really_exit): Ditto.
+	(sig_handle_tty_stop): Use pinfo constructor to access process info.
+	(events_init): Don't create pinfo_mutex since it is no longer required.
+	* external.cc (fillout_pinfo): Use winpids class to iterate over all
+	system pids.
+	(cygwin_internal): lock_pinfo_for_update and unlock_pinfo are now
+	noops.
+	* fhandler_termios.cc (fhandler_termios::set_ctty): Use pinfo
+	constructor to access process info.
+	* fork.cc (fork): Reorganize to initialize child info after the child
+	has started since that is when we know the child's winpid, which is
+	necessary to allocate the pinfo shared memory.
+	* mmap.cc (recreate_mmaps_after_fork): Change arg type to _pinfo.
+	* pinfo.cc: Rename pinfo methods to _pinfo throughout.  Eliminate
+	pinfo_list stuff.
+	(set_myself): Accept a pid argument now.  Call pinfo initializer to
+	initialize myself.  Detect when this is an "execed" process and create
+	an "indirect" pid block.
+	(pinfo_init): Accomodate set_myself arg change.
+	(procinfo): Remove.
+	(pinfo::lock_pinfo): Remove.
+	(pinfo::unlock_pinfo): Remove.
+	(pinfo::init): New method.  Allocates shared memory space for process
+	pinfo structure.
+	(pinfo::record_death): Don't call locking functions.
+	(cygwin_winpid_to_pid): Simplify by using new pinfo constructor.
+	(EnumProcessesW95): New function for iterating over processes on
+	Windows 95.
+	(winpids::winpids): New constructor for winpids class.  Sets up a list
+	of process ids.
+	(enum_init): Initialize w95/wnt pid enumerators.
+	* shared.cc (shared-info::initialize): Remove pid initialization.
+	* shared.h: Move pinfo stuff into pinfo.h.
+	(class shared_info): Remove pinfo_list element.
+	* signal.cc (kill_worker): Use pinfo constructor to access process
+	info.
+	(kill_pgrp): Ditto.  Use winpids methods to access list of processes.
+	* sigproc.cc: Throughout, modify to use _pinfo where appropriate.
+	(proc_exists (pid_t)): New function.  Determines if a process exists
+	based on the pid.
+	(proc_exists (_pinfo *p): Use new proc_exists function above.
+	(proc_subproc): Copy pinfo stuff around rather than _pinfo pointers.
+	Try to be careful about releasing shared memory when we don't need it
+	anymore.  Remove pinfo locks.
+	(remove_zombies): Remove pinfo memory when zombie is going away.
+	* sigproc.h: Reflect _pinfo/pinfo changes in sigproc.cc.
+	* spawn.cc (spawn_guts): Eliminate pinfo *child argument.  Reorganize
+	to only initialize child pinfo after process has been started and we
+	know the windows pid.
+	(_spawnve): Reflect spawn_guts changes.
+	* syscalls.cc (setpgid): Use pinfo constructor to access process info.
+	(getpgid): Ditto.
+	(internal_getlogin): Use _pinfo.
+	* winsup.h: Eliminate pinfo_mutex.  Eliminate spawn_guts declaration
+	since it is static now.  Reflect set_myself argument change.
+	* include/sys/cygwin.h: Add some PID_* enums to accomodate new pinfo
+	stuff.
+
+Sat Jul 29 12:13:27 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* include/cygwin/version.h: Update minor version for cygdrive changes
+	below.
+
 Sat Jul 29 11:59:29 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* environ.cc (parse_thing): Make binmode a DWORD.
 	* hinfo.cc (hinfo::init_std_file_from_handle): Use 'binmode' to
 	determine default open mode.
 	* winsup.h: Declare binmode.
+
+Sat Jul 29 00:16:35 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* include/cygwin/cygwin_dll.h: Update for modern compilers.
+	* lib/cygwin_crt0.c: Inexplicably need to define alloca for newer
+	compilers.
+	* fhandler.h (fhandler_console): Add new method.
+	* fhandler.cc (fhandler_console::set_cursor_maybe): New method.
+	(fhandler_console::read): Set cursor if it has moved to make it
+	visible.
 
 Thu Jul 27 22:54:28 2000  Jason Tishler <jt@dothill.com>
 

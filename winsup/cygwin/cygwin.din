@@ -8,7 +8,7 @@ __infinity
 __main
 __srget
 __swbuf
-__vc__10pinfo_listi
+; __vc__10pinfo_listi
 @ALLOCA@
 cygwin_stackdump
 abort

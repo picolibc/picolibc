@@ -16,11 +16,12 @@ details. */
 #include <sys/socket.h>
 #include <sys/un.h>
 
+#include <unistd.h>
+
 #define Win32_Winsock
 #include "winsup.h"
 #include <netdb.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include "autoload.h"
 #include <winsock.h>
 

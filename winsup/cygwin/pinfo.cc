@@ -14,33 +14,27 @@ details. */
 #include <limits.h>
 #include "winsup.h"
 
-/* The first pid used; also the lowest value allowed. */
-#define PBASE 1000
-
 static char NO_COPY pinfo_dummy[sizeof(pinfo)] = {0};
 
-pinfo NO_COPY *myself = (pinfo *)&pinfo_dummy;	// Avoid myself != NULL checks
+pinfo NO_COPY myself ((_pinfo *)&pinfo_dummy);	// Avoid myself != NULL checks
+static pinfo NO_COPY myself_identity ((_pinfo *)&pinfo_dummy);
 
 /* Initialize the process table.
    This is done once when the dll is first loaded.  */
 
-void
-pinfo_list::init (void)
+void __stdcall
+set_myself (pid_t pid)
 {
-  next_pid = PBASE;	/* Next pid to try to allocate.  */
-
-  /* We assume the shared data area is already initialized to zeros.
-     Note that SIG_DFL is zero.  */
-}
-
-pinfo * __stdcall
-set_myself (pinfo *p)
-{
-  myself = p;
-  if (!p)
-    return NULL;
-
+  DWORD winpid = GetCurrentProcessId ();
+  if (pid == 1)
+    pid = cygwin_pid (winpid);
+  myself.init (pid, 1);
+  myself->dwProcessId = winpid;
+  myself->process_state |= PID_IN_USE;
   myself->start_time = time (NULL); /* Register our starting time. */
+  pid_t myself_cyg_pid = cygwin_pid (myself->dwProcessId);
+  if (pid != myself_cyg_pid)
+    myself_identity.init (myself_cyg_pid, PID_EXECED);
 
   char buf[30];
   __small_sprintf (buf, "cYg%8x %x", _STRACE_INTERFACE_ACTIVATE_ADDR,
@@ -65,7 +59,7 @@ set_myself (pinfo *p)
       strace.prntf (1, "**********************************************");
     }
 
-  return myself;
+  return;
 }
 
 /* Initialize the process table entry for the current task.
@@ -94,9 +88,9 @@ pinfo_init (LPBYTE info)
     {
       /* Invent our own pid.  */
 
-      if (!set_myself (cygwin_shared->p.allocate_pid ()))
-	api_fatal ("No more processes");
-      myself->ppid = myself->pgid = myself->sid = myself->pid;
+      set_myself (1);
+      myself->ppid = 1;
+      myself->pgid = myself->sid = myself->pid;
       myself->ctty = -1;
       myself->uid = USHRT_MAX;
 
@@ -106,25 +100,8 @@ pinfo_init (LPBYTE info)
   debug_printf ("pid %d, pgid %d", myself->pid, myself->pgid);
 }
 
-/* [] operator.  This is the mechanism for table lookups.  */
-/* Returns the index into the pinfo_list table for pid arg */
-
-pinfo *
-pinfo_list::operator[] (pid_t pid)
-{
-  if (pid <= 0)
-    return NULL;
-
-  pinfo *p = vec + (pid % size ());
-
-  if (p->pid != pid || p->process_state == PID_NOT_IN_USE)
-    return NULL;
-  else
-    return p;
-}
-
 struct sigaction&
-pinfo::getsig(int sig)
+_pinfo::getsig(int sig)
 {
 #ifdef _MT_SAFE
   if ( thread2signal )
@@ -136,7 +113,7 @@ pinfo::getsig(int sig)
 };
 
 sigset_t&
-pinfo::getsigmask ()
+_pinfo::getsigmask ()
 {
 #ifdef _MT_SAFE
   if ( thread2signal )
@@ -148,7 +125,7 @@ pinfo::getsigmask ()
 };
 
 void
-pinfo::setsigmask (sigset_t _mask)
+_pinfo::setsigmask (sigset_t _mask)
 {
 #ifdef _MT_SAFE
   if ( thread2signal )
@@ -160,7 +137,7 @@ pinfo::setsigmask (sigset_t _mask)
 }
 
 LONG *
-pinfo::getsigtodo(int sig)
+_pinfo::getsigtodo(int sig)
 {
 #ifdef _MT_SAFE
   if ( thread2signal )
@@ -174,7 +151,7 @@ pinfo::getsigtodo(int sig)
 extern HANDLE hMainThread;
 
 HANDLE
-pinfo::getthread2signal()
+_pinfo::getthread2signal()
 {
 #ifdef _MT_SAFE
   if ( thread2signal )
@@ -186,7 +163,7 @@ pinfo::getthread2signal()
 }
 
 void
-pinfo::setthread2signal(void *_thr)
+_pinfo::setthread2signal(void *_thr)
 {
 #ifdef _MT_SAFE
    // assert has myself lock
@@ -196,190 +173,87 @@ pinfo::setthread2signal(void *_thr)
 }
 
 void
-pinfo::copysigs(pinfo *_other)
+_pinfo::copysigs(_pinfo *_other)
 {
   sigs = _other->sigs;
 }
 
-pinfo * __stdcall
-procinfo (int pid)
-{
-  return cygwin_shared->p[pid];
-}
-
-#ifdef DEBUGGING
-/*
- * Code to lock/unlock the process table.
- */
-
-int __stdcall
-lpfu (const char *func, int ln, DWORD timeout)
-{
-  int rc;
-  DWORD t;
-
-  debug_printf ("timeout %d, pinfo_mutex %p", timeout, pinfo_mutex);
-  t = (timeout == INFINITE) ? 10000 : timeout;
-  SetLastError(0);
-  while ((rc = WaitForSingleObject (pinfo_mutex, t)) != WAIT_OBJECT_0)
-    {
-      if (rc == WAIT_ABANDONED_0)
-	break;
-      system_printf ("%s:%d having problems getting lock", func, ln);
-      system_printf ("*** %s, rc %d, %E", cygwin_shared->p.lock_info, rc);
-      if (t == timeout)
-	break;
-     }
-
-  __small_sprintf (cygwin_shared->p.lock_info, "%s(%d), pid %d ", func, ln,
-		   (user_data && myself) ? (int)myself->dwProcessId : -1);
-  return rc;
-}
-
 void
-unlock_pinfo (void)
+_pinfo::record_death ()
 {
-
-  debug_printf ("handle %d", pinfo_mutex);
-
-  if (!cygwin_shared->p.lock_info[0])
-    system_printf ("lock_info not set?");
-  else
-    strcat (cygwin_shared->p.lock_info, " unlocked");
-  if (!ReleaseMutex (pinfo_mutex))
-    system_printf ("ReleaseMutext (pinfo_mutex<%p>) failed, %E", pinfo_mutex);
-}
-#else
-/*
- * Code to lock/unlock the process table.
- */
-
-int __stdcall
-lock_pinfo_for_update (DWORD timeout)
-{
-  DWORD rc;
-  DWORD t;
-
-  debug_printf ("timeout %d, pinfo_mutex %p", timeout, pinfo_mutex);
-  t = (timeout == INFINITE) ? 10000 : timeout;
-  SetLastError(0);
-  while ((rc = WaitForSingleObject (pinfo_mutex, t)) != WAIT_OBJECT_0)
-    {
-      if (rc == WAIT_ABANDONED_0)
-	break;
-      system_printf ("rc %d, pinfo_mutex %p, %E", pinfo_mutex, rc);
-      if (t == timeout)
-	break;
-      if (rc == WAIT_FAILED)
-	/* sigh, must be properly fixed up later. */
-	return rc;
-      Sleep(10); /* to prevent 100% CPU in those rare cases */
-     }
-
-  return (int)rc;
-}
-
-void
-unlock_pinfo (void)
-{
-
-  debug_printf ("handle %d", pinfo_mutex);
-
-  ReleaseMutex (pinfo_mutex);
-}
-#endif
-
-
-/* Allocate a process table entry by finding an empty slot in the
-   fixed-size process table.  We could use a linked list, but this
-   would probably be too slow.
-
-   Try to allocate next_pid, incrementing next_pid and trying again
-   up to size() times at which point we reach the conclusion that
-   table is full.  Eventually at this point we would grow the table
-   by size() and start over.  If we find a pid to use,
-
-   If all else fails, sweep through the loop looking for processes that
-   may have died abnormally without registering themselves as "dead".
-   Clear out these pinfo structures.  Then scan the table again.
-
-   Note that the process table is in the shared data space and thus
-   is susceptible to corruption.  The amount of time spent scanning the
-   table is presumably quite small compared with the total time to
-   create a process.
-*/
-
-pinfo *
-pinfo_list::allocate_pid (void)
-{
-
-  pinfo *newp;
-
-  lock_pinfo_for_update (INFINITE);
-  for (int tries = 0; ; tries++)
-    {
-      for (int i = next_pid; i < (next_pid + size ()); i++)
-	{
-	  /* i mod size() gives place to check */
-	  newp = vec + (i % size());
-	  if (newp->process_state == PID_NOT_IN_USE)
-	    {
-	      debug_printf ("found empty slot %d for pid %d",
-			     (i % size ()), i);
-	      next_pid = i;
-	      goto gotit;
-	    }
-	}
-
-      if (tries > 0)
-	break;
-
-      /* try once to remove bogus dead processes */
-      debug_printf ("clearing out deadwood");
-      for (newp = vec; newp < vec + size(); newp++)
-	proc_exists (newp);
-    }
-
-  /* The process table is full.  */
-  debug_printf ("process table is full");
-  unlock_pinfo ();
-
-  return NULL;
-
-gotit:
-
-  /* Set new pid based on the position of this element in the pinfo list */
-  newp->pid = next_pid;
-
-  /* Determine next slot to consider, wrapping if we hit the end of
-   * the array.  Since allocation involves looping through size () pids,
-   * don't allow next_pid to be greater than SHRT_MAX - size ().
-   */
-  if (next_pid < (SHRT_MAX - size ()))
-    next_pid++;
-  else
-    next_pid = PBASE;
-
-  newp->process_state = PID_IN_USE;
-  unlock_pinfo ();
-
-  memset (newp, 0, PINFO_ZERO);
-  debug_printf ("pid %d, state %x", newp->pid, newp->process_state);
-  return newp;
-}
-
-void
-pinfo::record_death (int lock)
-{
-  int unlock = lock ? 0 : lock_pinfo_for_update (999);
+  /* CGF FIXME - needed? */
   if (dwProcessId == GetCurrentProcessId () && !my_parent_is_alive ())
     {
       process_state = PID_NOT_IN_USE;
       hProcess = NULL;
     }
+}
 
-  if (unlock)
-    unlock_pinfo ();
+void
+pinfo::init (pid_t n, DWORD create)
+{
+  if (n == myself->pid)
+    {
+      child = myself;
+      destroy = 0;
+      h = NULL;
+      return;
+    }
+
+  int created;
+  char mapname[MAX_PATH];
+  __small_sprintf (mapname, "cygpid.%x", n);
+
+  int mapsize;
+  if (create & PID_EXECED)
+    mapsize = PINFO_REDIR_SIZE;
+  else
+    mapsize = sizeof (_pinfo);
+
+  if (!create)
+    {
+      /* CGF FIXME -- deal with inheritance after an exec */
+      h = OpenFileMappingA (FILE_MAP_READ | FILE_MAP_WRITE, FALSE, mapname);
+      created = 0;
+    }
+  else
+    {
+      h = CreateFileMapping ((HANDLE) 0xffffffff, &sec_none_nih,
+			      PAGE_READWRITE, 0, mapsize, mapname);
+      created = h && GetLastError () != ERROR_ALREADY_EXISTS;
+    }
+
+  if (!h)
+    {
+      if (create)
+	__seterrno ();
+      child = NULL;
+      return;
+    }
+
+  child = (_pinfo *) MapViewOfFile (h, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
+
+  if (child->process_state & PID_EXECED)
+    {
+      pid_t realpid = child->pid;
+      release ();
+      if (realpid == n)
+	api_fatal ("retrieval of execed process info for pid %d failed due to recursion.", n);
+      return init (realpid);
+    }
+
+  if (created)
+    {
+      if (!(create & PID_EXECED))
+	child->pid = n;
+      else
+	{
+	  child->pid = myself->pid;
+	  child->process_state |= PID_IN_USE | PID_EXECED;
+	}
+    }
+
+  destroy = 1;
 }
 
 /* DOCTOOL-START
@@ -412,18 +286,92 @@ a cygwin pid.</para>
 extern "C" pid_t
 cygwin_winpid_to_pid (int winpid)
 {
-  for (int i = 0; i < cygwin_shared->p.size (); i++)
-    {
-      pinfo *p = &cygwin_shared->p.vec[i];
-
-      if (p->process_state == PID_NOT_IN_USE)
-	continue;
-
-      /* FIXME: signed vs unsigned comparison: winpid can be < 0 !!! */
-      if (p->dwProcessId == (DWORD)winpid)
-	return p->pid;
-    }
+  pinfo p (winpid);
+  if (p)
+    return p->pid;
 
   set_errno (ESRCH);
   return (pid_t) -1;
+}
+
+#include <tlhelp32.h>
+#include <psapi.h>
+
+typedef BOOL (WINAPI * ENUMPROCESSES) (DWORD *, DWORD, DWORD *);
+typedef HANDLE (WINAPI * CREATESNAPSHOT) (DWORD, DWORD);
+typedef BOOL (WINAPI * PROCESSWALK) (HANDLE, LPPROCESSENTRY32);
+typedef BOOL (WINAPI * CLOSESNAPSHOT) (HANDLE);
+
+static NO_COPY CREATESNAPSHOT myCreateToolhelp32Snapshot = NULL;
+static NO_COPY PROCESSWALK myProcess32First = NULL;
+static NO_COPY PROCESSWALK myProcess32Next  = NULL;
+static BOOL WINAPI enum_init (DWORD *lpidProcess, DWORD cb, DWORD *cbneeded);
+
+static NO_COPY ENUMPROCESSES myEnumProcesses = enum_init;
+
+static BOOL WINAPI
+EnumProcessesW95 (DWORD *lpidProcess, DWORD cb, DWORD *cbneeded)
+{
+  HANDLE h;
+
+  *cbneeded = 0;
+  h = myCreateToolhelp32Snapshot (TH32CS_SNAPPROCESS, 0);
+  if (!h)
+    return 0;
+
+  PROCESSENTRY32 proc;
+  int i = 0;
+  proc.dwSize = sizeof (proc);
+  if (myProcess32First(h, &proc))
+    do
+      lpidProcess[i++] = cygwin_pid (proc.th32ProcessID);
+    while (myProcess32Next (h, &proc));
+  CloseHandle (h);
+  if (i == 0)
+    return 0;
+  *cbneeded = i * sizeof (DWORD);
+  return 1;
+}
+
+void
+winpids::init ()
+{
+  DWORD n;
+  if (!myEnumProcesses (pidlist, sizeof (pidlist) / sizeof (pidlist[0]), &n))
+    npids = 0;
+  else
+    npids = n / sizeof (pidlist[0]);
+
+  pidlist[npids] = 0;
+}
+
+static BOOL WINAPI
+enum_init (DWORD *lpidProcess, DWORD cb, DWORD *cbneeded)
+{
+  HINSTANCE h;
+  if (os_being_run == winNT)
+    {
+      h = LoadLibrary ("psapi.dll");
+      if (!h)
+	return 0;
+      myEnumProcesses = (ENUMPROCESSES) GetProcAddress (h, "EnumProcesses");
+      if (!myEnumProcesses)
+	return 0;
+    }
+  else
+    {
+      h = GetModuleHandle("kernel32.dll");
+      myCreateToolhelp32Snapshot = (CREATESNAPSHOT)
+		  GetProcAddress(h, "CreateToolhelp32Snapshot");
+      myProcess32First = (PROCESSWALK)
+	      GetProcAddress(h, "Process32First");
+      myProcess32Next  = (PROCESSWALK)
+	      GetProcAddress(h, "Process32Next");
+      if (!myCreateToolhelp32Snapshot || !myProcess32First || !myProcess32Next)
+	return 0;
+
+      myEnumProcesses = EnumProcessesW95;
+    }
+
+  return myEnumProcesses (lpidProcess, cb, cbneeded);
 }

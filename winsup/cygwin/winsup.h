@@ -178,10 +178,7 @@ class host_dependent_constants
 extern host_dependent_constants host_dependent;
 
 /* Events/mutexes */
-extern HANDLE pinfo_mutex;
 extern HANDLE title_mutex;
-
-
 
 /*************************** Per Thread ******************************/
 
@@ -283,7 +280,7 @@ extern unsigned int signal_shift_subtract;
 #endif
 
 #define api_fatal(fmt, args...) \
-  __api_fatal ("%P: *** " fmt, ## args)
+  __api_fatal ("%P: *** " fmt,##args)
 
 #undef issep
 #define issep(ch) (strchr (" \t\n\r", (ch)) != NULL)
@@ -378,13 +375,12 @@ void __stdcall mark (const char *, int);
 
 extern "C" int _spawnve (HANDLE hToken, int mode, const char *path,
 			 const char *const *argv, const char *const *envp);
-int __stdcall spawn_guts (HANDLE hToken, const char *prog_arg,
-		   const char *const *argv, const char *const envp[],
-		   pinfo *child, int mode);
+
+extern void __stdcall exec_fixup_after_fork ();
 
 /* For mmaps across fork(). */
 int __stdcall recreate_mmaps_after_fork (void *);
-void __stdcall set_child_mmap_ptr (pinfo *);
+void __stdcall set_child_mmap_ptr (_pinfo *);
 
 /* String manipulation */
 char *__stdcall strccpy (char *s1, const char **s2, char c);
@@ -401,7 +397,7 @@ long __stdcall to_time_t (FILETIME * ptr);
 int __stdcall lock_pinfo_for_update (DWORD timeout);
 #endif
 void unlock_pinfo (void);
-pinfo *__stdcall set_myself (pinfo *);
+void _stdcall set_myself (pid_t pid);
 
 /* Retrieve a security descriptor that allows all access */
 SECURITY_DESCRIPTOR *__stdcall get_null_sd (void);
@@ -500,7 +496,7 @@ win_env * __stdcall getwinenv (const char *name, const char *posix = NULL);
 void __stdcall update_envptrs ();
 char * __stdcall winenv (const char * const *, int);
 extern char **__cygwin_environ, ***main_environ;
-extern char __stdcall **cur_environ ();
+extern "C" char __stdcall **cur_environ ();
 #define environ (cur_environ ())
 
 /* The title on program start. */

@@ -108,7 +108,7 @@ static int
 kill_worker (pid_t pid, int sig)
 {
   int res = 0;
-  pinfo  *dest = procinfo (pid);
+  pinfo dest (pid);
   BOOL sendSIGCONT;
 
   if (!dest)
@@ -171,9 +171,10 @@ kill_pgrp (pid_t pid, int sig)
 
   sigproc_printf ("pid %d, sig %d", pid, sig);
 
-  for (int i = 0; i < cygwin_shared->p.size (); i++)
+  winpids pids;
+  for (unsigned i = 0; i < pids.npids; i++)
     {
-      pinfo *p = &cygwin_shared->p.vec[i];
+      pinfo p = pids[i];
 
       if (!proc_exists (p))
 	continue;

@@ -119,9 +119,6 @@ shared_info::initialize ()
   /* Initialize the mount table.  */
   mount.init ();
 
-  /* Initialize the process table.  */
-  p.init ();
-
   /* Initialize the queue of deleted files.  */
   delqueue.init ();
 

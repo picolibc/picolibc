@@ -41,140 +41,6 @@ public:
   void process_queue ();
 };
 
-/******** Process Table ********/
-
-/* Signal constants (have to define them here, unfortunately) */
-
-enum
-{
-  __SIGFLUSH	    = -2,
-  __SIGSTRACE	    = -1,
-  __SIGCHILDSTOPPED =  0,
-  __SIGOFFSET	    =  3
-};
-
-class pinfo
-{
- public:
-
-  /* If hProcess is set, it's because it came from a
-     CreateProcess call.  This means it's process relative
-     to the thing which created the process.  That's ok because
-     we only use this handle from the parent. */
-  HANDLE hProcess;
-
-  HANDLE parent_alive;
-
-  /* dwProcessId contains the processid used for sending signals.  It
-   * will be reset in a child process when it is capable of receiving
-   * signals.
-   */
-  DWORD dwProcessId;
-
-  /* User information.
-     The information is derived from the GetUserName system call,
-     with the name looked up in /etc/passwd and assigned a default value
-     if not found.  This data resides in the shared data area (allowing
-     tasks to store whatever they want here) so it's for informational
-     purposes only. */
-  uid_t uid;	    /* User ID */
-  gid_t gid;	    /* Group ID */
-  pid_t pgid;	    /* Process group ID */
-  pid_t sid;	    /* Session ID */
-  int ctty;	    /* Control tty */
-  mode_t umask;
-  char username[MAX_USER_NAME]; /* user's name */
-
-  /* Extendend user information.
-     The information is derived from the internal_getlogin call
-     when on a NT system. */
-  PSID psid;        /* user's SID */
-  char sidbuf[MAX_SID_LEN];  /* buffer for user's SID */
-  char logsrv[MAX_HOST_NAME]; /* Logon server, may be FQDN */
-  char domain[MAX_COMPUTERNAME_LENGTH+1]; /* Logon domain of the user */
-
-  /* token is needed if sexec should be called. It can be set by a call
-     to `set_impersonation_token()'. */
-  HANDLE token;
-  BOOL impersonated;
-  uid_t orig_uid;        /* Remains intact also after impersonation */
-  uid_t orig_gid;        /* Ditto */
-  uid_t real_uid;        /* Remains intact on seteuid, replaced by setuid */
-  gid_t real_gid;	 /* Ditto */
-
-  /* Filled when chroot() is called by the process or one of it's parents.
-     Saved without trailing backslash. */
-  char root[MAX_PATH+1];
-  size_t rootlen;
-
-  /* Non-zero if process was stopped by a signal. */
-  char stopsig;
-
-  struct sigaction& getsig (int);
-  void copysigs (pinfo *);
-  sigset_t& getsigmask ();
-  void setsigmask (sigset_t);
-  LONG* getsigtodo (int);
-  HANDLE getthread2signal ();
-  void setthread2signal (void *);
-
-  /* Resources used by process. */
-  long start_time;
-  struct rusage rusage_self;
-  struct rusage rusage_children;
-
-private:
-  struct sigaction sigs[NSIG];
-  sigset_t sig_mask;		/* one set for everything to ignore. */
-  LONG _sigtodo[NSIG + __SIGOFFSET];
-#ifdef _MT_SAFE
-  ThreadItem* thread2signal;  // NULL means means thread any other means a pthread
-#endif
-
-public:
-
-  /* Pointer to mmap'ed areas for this process.  Set up by fork. */
-  void *mmap_ptr;
-
-  /* Used to spawn a child for fork(), among other things. */
-  char progname[MAX_PATH];
-
-  #define PINFO_ZERO ((((pinfo *) NULL)->progname + 1) - ((char *) NULL))
-
-  /* Anything below this point is not zeroed automatically by allocate_pid */
-
-  /* The pid stays the same, while the hProcess moves due to execs. */
-  pid_t pid;
-  /* Parent process id.  */
-  pid_t ppid;
-
-  /* Various flags indicating the state of the process.  See PID_
-     constants below. */
-  DWORD process_state;
-
-  void record_death (int lock = 1);
-};
-
-#define ISSTATE(p, f)	(!!((p)->process_state & f))
-#define NOTSTATE(p, f)	(!((p)->process_state & f))
-
-#define PSIZE 128
-
-class pinfo_list
-{
- public:
-  int next_pid;
-  pinfo vec[PSIZE];
-  char lock_info[MAX_PATH + 1];
-  pinfo * operator[] (pid_t x);
-  int size (void) { return PSIZE; }
-  pinfo *allocate_pid (void);
-  void init (void);
-};
-
-void __stdcall pinfo_init (PBYTE);
-pinfo *__stdcall procinfo (int n);
-
 enum
 {
   PROC_MAGIC = 0xaf08f000,
@@ -221,7 +87,7 @@ void __stdcall init_child_info (DWORD, child_info *, int, HANDLE);
 extern child_info_fork *child_proc_info;
 
 /* Process info for this process */
-extern pinfo *myself;
+extern pinfo myself;
 
 /* non-NULL if this process is a child of a cygwin process */
 extern HANDLE parent_alive;
@@ -499,8 +365,6 @@ class shared_info
   DWORD inited;
 
 public:
-  pinfo_list p;
-
   /* FIXME: Doesn't work if more than one user on system. */
   mount_info mount;
 

@@ -223,13 +223,24 @@ linebuf::prepend (const char *what, int len)
   ix = newix;
 }
 
-int __stdcall
+static HANDLE hexec_proc = NULL;
+
+void __stdcall
+exec_fixup_after_fork ()
+{
+  if (hexec_proc)
+    CloseHandle (hexec_proc);
+  hexec_proc = NULL;
+}
+
+static int __stdcall
 spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
-	    const char *const envp[], pinfo *child, int mode)
+	    const char *const envp[], int mode)
 {
   int i;
   BOOL rc;
   int argc;
+  pid_t cygpid;
 
   hExeced = NULL;
 
@@ -474,7 +485,7 @@ skip_arg_parsing:
       chtype = PROC_EXEC;
     }
 
-  init_child_info (chtype, ciresrv, child->pid, spr);
+  init_child_info (chtype, ciresrv, (mode == _P_OVERLAY) ? myself->pid : 1, spr);
 
   LPBYTE resrv = si.lpReserved2 + sizeof *ciresrv;
 # undef ciresrv
@@ -508,6 +519,11 @@ skip_arg_parsing:
 
   if (!hToken && myself->token != INVALID_HANDLE_VALUE)
     hToken = myself->token;
+
+  if (mode == _P_OVERLAY && !hexec_proc &&
+      !DuplicateHandle (hMainProc, hMainProc, hMainProc, &hexec_proc, 0,
+		        TRUE, DUPLICATE_SAME_ACCESS))
+    system_printf ("couldn't save current process handle %p, %E", hMainProc);
 
   if (hToken)
     {
@@ -548,12 +564,6 @@ skip_arg_parsing:
       uid_t uid = geteuid();
       if (myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
         seteuid (myself->orig_uid);
-
-      /* Set child->uid to USHRT_MAX to force calling internal_getlogin()
-         from child process. Clear username and psid to play it safe. */
-      child->uid = USHRT_MAX;
-      child->username[0] = '\0';
-      child->psid = NULL;
 
       /* Load users registry hive. */
       load_registry_hive (sid);
@@ -599,15 +609,14 @@ skip_arg_parsing:
   if (!rc)
     __seterrno ();
 
-  MALLOC_CHECK;
-  /* Name the handle similarly to proc_subproc. */
-  ProtectHandle1 (pi.hProcess, childhProc);
-  ProtectHandle (pi.hThread);
-  MALLOC_CHECK;
+  if (mode == _P_OVERLAY)
+    cygpid = myself->pid;
+  else
+    cygpid = cygwin_pid (pi.dwProcessId);
 
   /* We print the original program name here so the user can see that too.  */
   syscall_printf ("%d = spawn_guts (%s, %.132s)",
-		  rc ? pi.dwProcessId : (unsigned int) -1,
+		  rc ? cygpid : (unsigned int) -1,
 		  prog_arg, one_line.buf);
 
   if (!rc)
@@ -617,27 +626,73 @@ skip_arg_parsing:
       return -1;
     }
 
-  /* Set up child's signal handlers */
-  for (i = 0; i < NSIG; i++)
-    {
-      child->getsig(i).sa_mask = 0;
-      if (myself->getsig(i).sa_handler != SIG_IGN || (mode != _P_OVERLAY))
-	child->getsig(i).sa_handler = SIG_DFL;
-    }
+  MALLOC_CHECK;
+  /* Name the handle similarly to proc_subproc. */
+  ProtectHandle1 (pi.hProcess, childhProc);
+  ProtectHandle (pi.hThread);
+  MALLOC_CHECK;
 
   if (mode == _P_OVERLAY)
     {
       close_all_files ();
-      strcpy (child->progname, real_path_buf);
+      strcpy (myself->progname, real_path_buf);
       proc_terminate ();
       hExeced = pi.hProcess;
+
+    /* Set up child's signal handlers */
+    /* CGF FIXME - consolidate with signal stuff below */
+    for (i = 0; i < NSIG; i++)
+      {
+	myself->getsig(i).sa_mask = 0;
+	if (myself->getsig(i).sa_handler != SIG_IGN || (mode != _P_OVERLAY))
+	  myself->getsig(i).sa_handler = SIG_DFL;
+      }
     }
   else
     {
+      pinfo child (cygpid, 1);
+      if (!child)
+	{
+	  set_errno (EAGAIN);
+	  syscall_printf ("-1 = spawnve (), process table full");
+	  return -1;
+	}
+      child->username[0] = '\0';
+      child->progname[0] = '\0';
+      // CGF FIXME -- need to do this? strcpy (child->progname, path);
+      // CGF FIXME -- need to do this? memcpy (child->username, myself->username, MAX_USER_NAME);
+      child->ppid = myself->pid;
+      child->uid = myself->uid;
+      child->gid = myself->gid;
+      child->pgid = myself->pgid;
+      child->sid = myself->sid;
+      child->ctty = myself->ctty;
+      child->umask = myself->umask;
+      child->process_state |= PID_INITIALIZING;
+      memcpy (child->sidbuf, myself->sidbuf, MAX_SID_LEN);
+      if (myself->psid)
+	child->psid = child->sidbuf;
+      memcpy (child->logsrv, myself->logsrv, MAX_HOST_NAME);
+      memcpy (child->domain, myself->domain, MAX_COMPUTERNAME_LENGTH+1);
+      memcpy (child->root, myself->root, MAX_PATH+1);
+      child->rootlen = myself->rootlen;
       child->dwProcessId = pi.dwProcessId;
       child->hProcess = pi.hProcess;
       child->process_state |= PID_INITIALIZING;
-      proc_register (child);
+      for (i = 0; i < NSIG; i++)
+	{
+	  child->getsig(i).sa_mask = 0;
+	  if (child->getsig(i).sa_handler != SIG_IGN || (mode != _P_OVERLAY))
+	    child->getsig(i).sa_handler = SIG_DFL;
+	}
+      if (hToken)
+	{
+	  /* Set child->uid to USHRT_MAX to force calling internal_getlogin()
+	     from child process. Clear username and psid to play it safe. */
+	  child->uid = USHRT_MAX;
+	  child->psid = NULL;
+	}
+      child.remember ();
     }
 
   sigproc_printf ("spawned windows pid %d", pi.dwProcessId);
@@ -735,13 +790,14 @@ skip_arg_parsing:
 	   * EXIT_REPARENTING status. Wait() syscall in parent will then wait
 	   * for newly created child.
 	   */
-	  if (my_parent_is_alive ())
+	  pinfo parent (myself->ppid);
+	  if (!parent)
+	    /* nothing */;
+	  else
 	    {
-	      pinfo  *parent = procinfo (myself->ppid);
-	      sigproc_printf ("parent = %p", parent);
 	      HANDLE hP = OpenProcess (PROCESS_ALL_ACCESS, FALSE,
 				       parent->dwProcessId);
-	      sigproc_printf ("parent's handle = %d", hP);
+	      sigproc_printf ("parent handle %p, pid %d", hP, parent->dwProcessId);
 	      if (hP == NULL && GetLastError () == ERROR_INVALID_PARAMETER)
 		res = 1;
 	      else if (hP)
@@ -778,18 +834,11 @@ skip_arg_parsing:
     }
 
   if (mode == _P_WAIT)
-    {
-      waitpid (child->pid, (int *) &res, 0);
-    }
+    waitpid (cygpid, (int *) &res, 0);
   else if (mode == _P_DETACH)
-    {
-      /* Lose all memory of this child. */
-      res = 0;
-    }
+    res = 0;	/* Lose all memory of this child. */
   else if ((mode == _P_NOWAIT) || (mode == _P_NOWAITO))
-    {
-      res = child->pid;
-    }
+    res = cygpid;
 
   return (int) res;
 }
@@ -810,7 +859,6 @@ extern "C" int
 _spawnve (HANDLE hToken, int mode, const char *path, const char *const *argv,
 	  const char *const *envp)
 {
-  pinfo *child;
   int ret;
   vfork_save *vf = vfork_storage.val ();
 
@@ -826,7 +874,7 @@ _spawnve (HANDLE hToken, int mode, const char *path, const char *const *argv,
       case _P_OVERLAY:
 	/* We do not pass _P_SEARCH_PATH here. execve doesn't search PATH.*/
 	/* Just act as an exec if _P_OVERLAY set. */
-	spawn_guts (hToken, path, argv, envp, myself, mode);
+	spawn_guts (hToken, path, argv, envp, mode);
 	/* Errno should be set by spawn_guts.  */
 	ret = -1;
 	break;
@@ -834,38 +882,11 @@ _spawnve (HANDLE hToken, int mode, const char *path, const char *const *argv,
       case _P_NOWAITO:
       case _P_WAIT:
       case _P_DETACH:
-	child = cygwin_shared->p.allocate_pid ();
-	if (!child)
-	  {
-	    set_errno (EAGAIN);
-	    syscall_printf ("-1 = spawnve (), process table full");
-	    return -1;
-	  }
-	strcpy (child->progname, path);
-	child->ppid = myself->pid;
-	child->uid = myself->uid;
-	child->gid = myself->gid;
-	child->pgid = myself->pgid;
-	child->sid = myself->sid;
-	child->ctty = myself->ctty;
-	child->umask = myself->umask;
-	child->process_state |= PID_INITIALIZING;
-        memcpy (child->username, myself->username, MAX_USER_NAME);
-        memcpy (child->sidbuf, myself->sidbuf, MAX_SID_LEN);
-        if (myself->psid)
-          child->psid = child->sidbuf;
-        memcpy (child->logsrv, myself->logsrv, MAX_HOST_NAME);
-        memcpy (child->domain, myself->domain, MAX_COMPUTERNAME_LENGTH+1);
-        memcpy (child->root, myself->root, MAX_PATH+1);
-        child->rootlen = myself->rootlen;
 	subproc_init ();
-	ret = spawn_guts (hToken, path, argv, envp, child, mode);
-	if (ret == -1)
-	  child->process_state = PID_NOT_IN_USE;
-
+	ret = spawn_guts (hToken, path, argv, envp, mode);
 	if (vf)
 	  {
-	    vf->pid = child->pid;
+	    vf->pid = ret;
 	    longjmp (vf->j, 1);
 	  }
 	break;

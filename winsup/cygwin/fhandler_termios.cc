@@ -84,7 +84,7 @@ fhandler_termios::set_ctty (int ttynum, int flags)
       syscall_printf ("attached tty%d sid %d, pid %d, tty->pgid %d, tty->sid %d",
 		      ttynum, myself->sid, myself->pid, tc->pgid, tc->getsid ());
 
-      pinfo *p = procinfo (tc->getsid ());
+      pinfo p (tc->getsid ());
       if (myself->sid == myself->pid &&
 	  (p == myself || !proc_exists (p)))
 	{
@@ -127,7 +127,7 @@ fhandler_termios::bg_check (int sig)
 
   /* If the process group is no more or if process is ignoring or blocks 'sig',
      return with error */
-  int pgid_gone = !proc_exists (procinfo (myself->pgid));
+  int pgid_gone = !proc_exists (myself->pgid);
   int sigs_ignored =
     ((void *) myself->getsig(sig).sa_handler == (void *) SIG_IGN) ||
     (myself->getsigmask () & SIGTOMASK (sig));

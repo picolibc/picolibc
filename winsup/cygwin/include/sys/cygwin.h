@@ -60,7 +60,8 @@ typedef enum
     CW_READ_V1_MOUNT_TABLES,
     CW_USER_DATA,
     CW_PERFILE,
-	CW_GET_CYGDRIVE_PREFIXES
+    CW_GET_CYGDRIVE_PREFIXES,
+    CW_GETPINFO_FULL
   } cygwin_getinfo_types;
 
 #define CW_NEXTPID 0x80000000	// or with pid to get next one
@@ -86,7 +87,9 @@ enum
   PID_USETTY	       = 0x1000, // Setting this enables or disables cygwin's
 				 //  tty support.  This is inherited by
 				 //  all execed or forked processes.
-  PID_REPARENT	       = 0x2000  // child has execed
+  PID_REPARENT	       = 0x2000, // child has execed
+  PID_EXECED	       = 0x4000, // redirect to original pid info block
+  PID_NOREDIR	       = 0x8000  // don't redirect if execed
 };
 
 #ifdef WINVER

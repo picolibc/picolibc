@@ -110,6 +110,23 @@ set_console_state_for_spawn ()
   return 1;
 }
 
+void
+fhandler_console::set_cursor_maybe ()
+{
+  CONSOLE_SCREEN_BUFFER_INFO now;
+  static CONSOLE_SCREEN_BUFFER_INFO last = {{0, 0}, {-1, -1}, 0, {0, 0}, {0, 0}};
+
+  if (!GetConsoleScreenBufferInfo (get_output_handle(), &now))
+    return;
+
+  if (last.dwCursorPosition.X != now.dwCursorPosition.X ||
+      last.dwCursorPosition.Y != now.dwCursorPosition.Y)
+    {
+      SetConsoleCursorPosition (get_output_handle (), now.dwCursorPosition);
+      last.dwCursorPosition = now.dwCursorPosition;
+    }
+}
+
 int
 fhandler_console::read (void *pv, size_t buflen)
 {
@@ -147,7 +164,7 @@ fhandler_console::read (void *pv, size_t buflen)
       if ((bgres = bg_check (SIGTTIN)) <= 0)
 	return bgres;
 
-      cursor_rel (0,0); /* to make cursor appear on the screen immediately */
+      set_cursor_maybe ();	/* to make cursor appear on the screen immediately */
       switch (WaitForMultipleObjects (nwait, w4, FALSE, INFINITE))
 	{
 	case WAIT_OBJECT_0:
@@ -1244,6 +1261,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	  break;
 	}
     }
+
   syscall_printf ("%d = write_console (,..%d)", len, len);
 
   return len;

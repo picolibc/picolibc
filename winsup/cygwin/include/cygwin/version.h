@@ -44,7 +44,7 @@ details. */
   /* The current cygwin version is 1.1.0 */
 
 #define CYGWIN_VERSION_DLL_MAJOR 1001
-#define CYGWIN_VERSION_DLL_MINOR 4
+#define CYGWIN_VERSION_DLL_MINOR 5
 
       /* Major numbers before CYGWIN_VERSION_DLL_EPOCH are
 	 incompatible. */
@@ -115,10 +115,12 @@ details. */
 	   with crt0 startup code.
        24: Export poll and _poll.
        25: Export getmode and _getmode.
+       26: CW_GET_CYGDRIVE_PREFIXES addition to external.cc
+       27: CW_GETPINFO_FULL addition to external.cc
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 24
+#define CYGWIN_VERSION_API_MINOR 28
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

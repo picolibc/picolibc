@@ -315,7 +315,6 @@ try_to_debug ()
   /* if any of these mutexes is owned, we will fail to start any cygwin app
      until trapped app exits */
 
-  ReleaseMutex (pinfo_mutex);
   ReleaseMutex (title_mutex);
 
   /* prevent recursive exception handling */
@@ -877,7 +876,7 @@ sig_handle_tty_stop (int sig)
    */
   if (my_parent_is_alive ())
     {
-      pinfo *parent = procinfo (myself->ppid);
+      pinfo parent (myself->ppid);
       sig_send (parent, __SIGCHILDSTOPPED);
     }
   sigproc_printf ("process %d stopped by signal %d, parent_alive %p",
@@ -1007,27 +1006,18 @@ signal_exit (int rc)
   if (exit_already++)
     {
       /* We are going down - reset our process_state without locking. */
-      myself->record_death (FALSE);
+      myself->record_death ();
       ExitProcess (rc);
     }
 
   do_exit (rc);
 }
 
-HANDLE NO_COPY pinfo_mutex = NULL;
 HANDLE NO_COPY title_mutex = NULL;
 
 void
 events_init (void)
 {
-  /* pinfo_mutex protects access to process table */
-
-  if (!(pinfo_mutex = CreateMutex (&sec_all_nih, FALSE,
-				   shared_name ("pinfo_mutex", 0))))
-    api_fatal ("catastrophic failure - unable to create pinfo_mutex, %E");
-
-  ProtectHandle (pinfo_mutex);
-
   /* title_mutex protects modification of console title. It's neccessary
      while finding console window handle */
 
@@ -1056,12 +1046,11 @@ events_init (void)
 void
 events_terminate (void)
 {
-//CloseHandle (pinfo_mutex);	// Use implicit close on exit to avoid race
   ForceCloseHandle (title_mutex);
   exit_already = 1;
 }
 
-#define pid_offset (unsigned)(((pinfo *)NULL)->pid)
+#define pid_offset (unsigned)(((_pinfo *)NULL)->pid)
 extern "C" {
 static void __stdcall
 reset_signal_arrived () __attribute__ ((unused));

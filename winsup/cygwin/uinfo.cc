@@ -10,17 +10,17 @@ details. */
 
 #include <pwd.h>
 #include "winsup.h"
+#include <unistd.h>
 #include <winnls.h>
 #include <utmp.h>
 #include <limits.h>
-#include <unistd.h>
 #include "autoload.h"
 #include <stdlib.h>
 #include <wchar.h>
 #include <lm.h>
 
 char *
-internal_getlogin (struct pinfo *pi)
+internal_getlogin (_pinfo *pi)
 {
   if (! pi)
     api_fatal ("pinfo pointer is NULL!\n");

@@ -13,7 +13,6 @@ details. */
 #include <winsup.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 /* Default to not using NTEA information */
 BOOL allow_ntea = FALSE;

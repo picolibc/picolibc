@@ -657,7 +657,7 @@ dll_crt0_1 ()
 				  //  should be blocked.
 
   if (mypid)
-    set_myself (cygwin_shared->p[mypid]);
+    set_myself ((pid_t) mypid);
 
   (void) SetErrorMode (SEM_FAILCRITICALERRORS);
 
@@ -1047,7 +1047,7 @@ __api_fatal (const char *fmt, ...)
   /* We are going down without mercy.  Make sure we reset
      our process_state. */
   sigproc_terminate ();
-  myself->record_death (FALSE);
+  myself->record_death ();
 #ifdef DEBUGGING
   (void) try_to_debug ();
 #endif

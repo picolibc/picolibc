@@ -47,6 +47,7 @@ wait4 (int intpid, int *status, int options, struct rusage *r)
   waitq *w;
   HANDLE waitfor;
 
+sigproc_printf ("here");
  if (options & ~(WNOHANG | WUNTRACED))
     {
       set_errno (EINVAL);

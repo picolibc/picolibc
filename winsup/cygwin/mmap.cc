@@ -468,7 +468,7 @@ recreate_mmaps_after_fork (void *param)
    pointer for fork. */
 
 void __stdcall
-set_child_mmap_ptr (pinfo *child)
+set_child_mmap_ptr (_pinfo *child)
 {
   child->mmap_ptr = (void *) mmapped_areas;
 }

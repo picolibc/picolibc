@@ -13,53 +13,80 @@ details. */
 #include "winsup.h"
 
 static external_pinfo *
-fillout_pinfo (DWORD pid)
+fillout_pinfo (pid_t pid, int winpid)
 {
   BOOL nextpid;
-  pinfo *p = NULL;
-  int i;
   static external_pinfo ep;
 
   if ((nextpid = !!(pid & CW_NEXTPID)))
     pid ^= CW_NEXTPID;
-  for (i = 0; i < cygwin_shared->p.size(); i++, p = NULL)
+
+  static winpids pids (0);
+
+  if (!pids.npids)
+    pids.init ();
+
+  memset (&ep, 0, sizeof ep);
+  for (unsigned i = 0; i < pids.npids; i++)
     {
-      p = cygwin_shared->p.vec + i;
-      if (!pid || (DWORD) p->pid == pid)
+      if (!pids[i])
+	continue;
+      pinfo p (pids[i]);
+      pid_t thispid;
+
+      if (p)
+	thispid = p->pid;
+      else if (winpid)
+	thispid = pids[i];
+      else
+	continue;
+
+      if (!pid || thispid == pid)
 	{
 	  if (nextpid && pid)
 	    {
 	      pid = 0;
 	      nextpid = 0;
+	      continue;
+	    }
+
+	  if (!p)
+	    {
+	      ep.pid = pids[i];
+	      ep.dwProcessId = cygwin_pid (pids[i]);
+	      ep.process_state = PID_IN_USE;
+	      ep.ctty = -1;
 	    }
 	  else if (p->pid && NOTSTATE(p, PID_CLEAR))
-	    break;
+	    {
+	      ep.ctty = tty_attached (p) ? p->ctty : -1;
+	      ep.pid = p->pid;
+	      ep.ppid = p->ppid;
+	      ep.hProcess = p->hProcess;
+	      ep.dwProcessId = p->dwProcessId;
+	      ep.uid = p->uid;
+	      ep.gid = p->gid;
+	      ep.pgid = p->pgid;
+	      ep.sid = p->sid;
+	      ep.umask = p->umask;
+	      ep.start_time = p->start_time;
+	      ep.rusage_self = p->rusage_self;
+	      ep.rusage_children = p->rusage_children;
+	      strcpy (ep.progname, p->progname);
+	      ep.strace_mask = 0;
+	      ep.strace_file = 0;
+
+	      ep.process_state = p->process_state;
+	    }
+	  break;
 	}
     }
 
-  if (p == NULL)
-    return 0;
-
-  memset (&ep, 0, sizeof ep);
-  ep.ctty = tty_attached (p) ? p->ctty : -1;
-  ep.pid = p->pid;
-  ep.ppid = p->ppid;
-  ep.hProcess = p->hProcess;
-  ep.dwProcessId = p->dwProcessId;
-//ep.dwSpawnedProcessId = p->dwSpawnedProcessId;
-  ep.uid = p->uid;
-  ep.gid = p->gid;
-  ep.pgid = p->pgid;
-  ep.sid = p->sid;
-  ep.umask = p->umask;
-  ep.start_time = p->start_time;
-  ep.rusage_self = p->rusage_self;
-  ep.rusage_children = p->rusage_children;
-  strcpy (ep.progname, p->progname);
-  ep.strace_mask = 0;
-  ep.strace_file = 0;
-
-  ep.process_state = p->process_state;
+  if (!ep.pid)
+    {
+      pids.reset ();
+      return 0;
+    }
   return &ep;
 }
 
@@ -80,11 +107,9 @@ cygwin_internal (cygwin_getinfo_types t, ...)
   switch (t)
     {
       case CW_LOCK_PINFO:
-	return lock_pinfo_for_update (va_arg (arg, DWORD));
-	break;
+	return 1;
 
       case CW_UNLOCK_PINFO:
-	unlock_pinfo ();
 	return 1;
 
       case CW_GETTHREADNAME:
@@ -98,7 +123,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	}
 
       case CW_GETPINFO:
-	return (DWORD) fillout_pinfo (va_arg (arg, DWORD));
+	return (DWORD) fillout_pinfo (va_arg (arg, DWORD), 0);
 
       case CW_GETVERSIONINFO:
 	return (DWORD) cygwin_version_strings;
@@ -121,6 +146,9 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  char *system = va_arg (arg, char *);
 	  return get_cygdrive_prefixes (user, system);
 	}
+
+      case CW_GETPINFO_FULL:
+	return (DWORD) fillout_pinfo (va_arg (arg, pid_t), 1);
 
       default:
 	return (DWORD) -1;

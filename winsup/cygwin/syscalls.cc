@@ -21,9 +21,9 @@ details. */
 #include <errno.h>
 #include <limits.h>
 #include "winsup.h"
+#include <unistd.h>
 #include <winnls.h>
 #include <lmcons.h> /* for UNLEN */
-#include <unistd.h>
 
 extern BOOL allow_ntsec;
 
@@ -1413,8 +1413,7 @@ pathconf (const char *file, int v)
     }
 }
 
-extern "C"
-char *
+extern "C" char *
 ctermid (char *str)
 {
   static NO_COPY char buf[16];
@@ -1714,23 +1713,25 @@ setpgid (pid_t pid, pid_t pgid)
       set_errno (EINVAL);
       goto out;
     }
-  pinfo *p;
-  p = procinfo (pid);
-  if (p == NULL)
-    {
-      set_errno (ESRCH);
-      goto out;
-    }
-  /* A process may only change the process group of itself and its children */
-  if (p == myself || p->ppid == myself->pid)
-    {
-      p->pgid = pgid;
-      res = 0;
-    }
   else
     {
-      set_errno (EPERM);
-      goto out;
+      pinfo p (pid);
+      if (!p)
+	{
+	  set_errno (ESRCH);
+	  goto out;
+	}
+      /* A process may only change the process group of itself and its children */
+      if (p == myself || p->ppid == myself->pid)
+	{
+	  p->pgid = pgid;
+	  res = 0;
+	}
+      else
+	{
+	  set_errno (EPERM);
+	  goto out;
+	}
     }
 out:
   syscall_printf ("pid %d, pgid %d, res %d", pid, pgid, res);
@@ -1744,7 +1745,7 @@ getpgid (pid_t pid)
   if (pid == 0)
     pid = getpid ();
 
-  pinfo *p = procinfo (pid);
+  pinfo p (pid);
   if (p == 0)
     {
       set_errno (ESRCH);
@@ -1824,7 +1825,7 @@ setuid (uid_t uid)
   return ret;
 }
 
-extern char *internal_getlogin (struct pinfo *pi);
+extern char *internal_getlogin (_pinfo *pi);
 
 /* seteuid: standards? */
 extern "C"
@@ -1863,7 +1864,7 @@ seteuid (uid_t uid)
 		    myself->impersonated = TRUE;
 	      }
 
-	  struct pinfo pi;
+	  struct _pinfo pi;
 	  pi.psid = (PSID) pi.sidbuf;
 	  /* pi.token is used in internal_getlogin() to determine if
 	     impersonation is active. If so, the token is used for

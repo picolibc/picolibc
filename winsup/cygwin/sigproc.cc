@@ -90,8 +90,8 @@ Static HANDLE wait_sig_inited = NULL;	// Control synchronization of
  */
 Static HANDLE events[PSIZE + 1] = {0};	// All my children's handles++
 #define hchildren (events + 1)		// Where the children handles begin
-Static pinfo *pchildren[PSIZE] = {NULL};// All my children info
-Static pinfo *zombies[PSIZE] = {NULL};	// All my deceased children info
+Static pinfo pchildren[PSIZE] = {pinfo ()};// All my children info
+Static pinfo zombies[PSIZE] = {pinfo ()};	// All my deceased children info
 Static int nchildren = 0;		// Number of active children
 Static int nzombies = 0;		// Number of deceased children
 
@@ -108,11 +108,11 @@ int NO_COPY pending_signals = 0;	// TRUE if signals pending
  */
 static int __stdcall checkstate (waitq *);
 static __inline__ BOOL get_proc_lock (DWORD, DWORD);
-static HANDLE __stdcall getsem (pinfo *, const char *, int, int);
+static HANDLE __stdcall getsem (_pinfo *, const char *, int, int);
 static void __stdcall remove_child (int);
 static void __stdcall remove_zombie (int);
 static DWORD WINAPI wait_sig (VOID *arg);
-static int __stdcall stopped_or_terminated (waitq *, pinfo *);
+static int __stdcall stopped_or_terminated (waitq *, _pinfo *);
 static DWORD WINAPI wait_subproc (VOID *);
 
 /* Determine if the parent process is alive.
@@ -168,7 +168,7 @@ wait_for_me ()
 }
 
 static BOOL __stdcall
-proc_can_be_signalled (pinfo *p)
+proc_can_be_signalled (_pinfo *p)
 {
   if (p == myself_nowait || p == myself_nowait_nonmain || p == myself)
     {
@@ -181,11 +181,18 @@ proc_can_be_signalled (pinfo *p)
 	  (PID_ACTIVE | PID_IN_USE));
 }
 
+BOOL __stdcall
+proc_exists (pid_t pid)
+{
+  pinfo p (pid);
+  return proc_exists (p);
+}
+
 /* Test to determine if a process really exists and is processing
  * signals.
  */
 BOOL __stdcall
-proc_exists (pinfo *p)
+proc_exists (_pinfo *p)
 {
   HANDLE h;
 
@@ -225,7 +232,7 @@ proc_exists (pinfo *p)
   /* If the parent pid does not exist, clean this process out of the pinfo
    * table.  It must have died abnormally.
    */
-  if ((p->pid == p->ppid) || (p->ppid == 1) || !proc_exists (procinfo (p->ppid)))
+  if ((p->pid == p->ppid) || (p->ppid == 1) || !proc_exists (p->ppid))
     {
       p->hProcess = NULL;
       p->process_state = PID_NOT_IN_USE;
@@ -235,14 +242,14 @@ proc_exists (pinfo *p)
 
 /* Handle all subprocess requests
  */
-#define vchild ((pinfo *) val)
+#define vchild (*((pinfo *) val))
 int __stdcall
 proc_subproc (DWORD what, DWORD val)
 {
   int rc = 1;
   int potential_match;
   DWORD exitcode;
-  pinfo *child;
+  _pinfo *child;
   int clearing;
   waitq *w;
 
@@ -292,23 +299,22 @@ proc_subproc (DWORD what, DWORD val)
      */
     case PROC_CHILDTERMINATED:
       rc = 0;
-      child = pchildren[val];
       if (GetExitCodeProcess (hchildren[val], &exitcode) &&
-	  hchildren[val] != child->hProcess)
+	  hchildren[val] != pchildren[val]->hProcess)
 	{
 	  sip_printf ("pid %d[%d], reparented old hProcess %p, new %p",
-		      child->pid, val, hchildren[val], child->hProcess);
+		      pchildren[val]->pid, val, hchildren[val], pchildren[val]->hProcess);
 	  ForceCloseHandle1 (hchildren[val], childhProc);
-	  hchildren[val] = child->hProcess; /* Filled out by child */
-	  ProtectHandle1 (child->hProcess, childhProc);
+	  hchildren[val] = pchildren[val]->hProcess; /* Filled out by child */
+	  ProtectHandle1 (pchildren[val]->hProcess, childhProc);
 	  break;			// This was an exec()
 	}
 
       sip_printf ("pid %d[%d] terminated, handle %p, nchildren %d, nzombies %d",
-		  child->pid, val, hchildren[val], nchildren, nzombies);
-      remove_child (val);		// Remove from children arrays
-      zombies[nzombies++] = child;	// Add to zombie array
-      child->process_state = PID_ZOMBIE;// Walking dead
+		  pchildren[val]->pid, val, hchildren[val], nchildren, nzombies);
+      zombies[nzombies] = pchildren[val];	// Add to zombie array
+      zombies[nzombies++]->process_state = PID_ZOMBIE;// Walking dead
+      remove_child (val);		// Remove from children array
       if (!proc_loop_wait)		// Don't bother if wait_subproc is
 	break;				//  exiting
 
@@ -381,7 +387,7 @@ proc_subproc (DWORD what, DWORD val)
 
       if (wval->pid <= 0)
 	child = NULL;		// Not looking for a specific pid
-      else if ((child = procinfo (wval->pid)) == NULL)
+      else if (!proc_exists (wval->pid)) /* CGF FIXME -- test that this is one of mine */
 	goto out;		// invalid pid.  flag no such child
 
       wval->status = 0;		// Don't know status yet
@@ -480,50 +486,49 @@ proc_terminate (void)
       sync_proc_subproc->acquire(WPSP);
       (void) proc_subproc (PROC_CLEARWAIT, 1);
 
-      lock_pinfo_for_update (INFINITE);
       /* Clean out zombie processes from the pid list. */
       int i;
       for (i = 0; i < nzombies; i++)
 	{
-	  pinfo *child;
-	  if ((child = zombies[i])->hProcess)
+	  if (zombies[i]->hProcess)
 	    {
-	      ForceCloseHandle1 (child->hProcess, childhProc);
-	      child->hProcess = NULL;
+	      ForceCloseHandle1 (zombies[i]->hProcess, childhProc);
+	      zombies[i]->hProcess = NULL;
 	    }
-	  child->process_state = PID_NOT_IN_USE;
+	  zombies[i]->process_state = PID_NOT_IN_USE;	/* CGF FIXME - still needed? */
+	  zombies[i].release();
 	}
 
       /* Disassociate my subprocesses */
       for (i = 0; i < nchildren; i++)
 	{
-	  pinfo *child;
-	  if ((child = pchildren[i])->process_state == PID_NOT_IN_USE)
+	  pinfo child; /* CGF FIXME */
+	  if (pchildren[i]->process_state == PID_NOT_IN_USE)
 	    continue;		// Should never happen
-	  if (!child->hProcess)
-	    sip_printf ("%d(%d) hProcess cleared already?", child->pid,
-			child->dwProcessId);
+	  if (!pchildren[i]->hProcess)
+	    sip_printf ("%d(%d) hProcess cleared already?", pchildren[i]->pid,
+			pchildren[i]->dwProcessId);
 	  else
 	    {
-	      ForceCloseHandle1 (child->hProcess, childhProc);
-	      child->hProcess = NULL;
-	      if (!proc_exists (child))
+	      ForceCloseHandle1 (pchildren[i]->hProcess, childhProc);
+	      pchildren[i]->hProcess = NULL;
+	      if (!proc_exists (pchildren[i]))
 		{
-		  sip_printf ("%d(%d) doesn't exist", child->pid,
-			      child->dwProcessId);
-		  child->process_state = PID_NOT_IN_USE;	/* a reaped child */
+		  sip_printf ("%d(%d) doesn't exist", pchildren[i]->pid,
+			      pchildren[i]->dwProcessId);
+		  pchildren[i]->process_state = PID_NOT_IN_USE;	/* a reaped child  CGF FIXME -- still needed? */
 		}
 	      else
 		{
-		  sip_printf ("%d(%d) closing active child handle", child->pid,
-			      child->dwProcessId);
-		  child->ppid = 1;
-		  if (child->pgid == myself->pid)
-		    child->process_state |= PID_ORPHANED;
+		  sip_printf ("%d(%d) closing active child handle", pchildren[i]->pid,
+			      pchildren[i]->dwProcessId);
+		  pchildren[i]->ppid = 1;
+		  if (pchildren[i]->pgid == myself->pid)
+		    pchildren[i]->process_state |= PID_ORPHANED;
 		}
 	    }
+	  pchildren[i].release ();
 	}
-      unlock_pinfo ();
       nchildren = nzombies = 0;
 
       /* Attempt to close and release sync_proc_subproc in a
@@ -706,7 +711,7 @@ sigproc_terminate (void)
  * completed before returning.
  */
 int __stdcall
-sig_send (pinfo *p, int sig, DWORD ebp)
+sig_send (_pinfo *p, int sig, DWORD ebp)
 {
   int rc = 1;
   DWORD tid = GetCurrentThreadId ();
@@ -717,7 +722,7 @@ sig_send (pinfo *p, int sig, DWORD ebp)
   sigframe thisframe;
 
   if (p == myself_nowait_nonmain)
-    p = (tid == mainthread.id) ? myself : myself_nowait;
+    p = (tid == mainthread.id) ? (_pinfo *) myself : myself_nowait;
   if (!(its_me = (p == NULL || p == myself || p == myself_nowait)))
     wait_for_completion = FALSE;
   else
@@ -888,7 +893,7 @@ subproc_init (void)
    by fork/spawn/exec. */
 
 void __stdcall
-init_child_info (DWORD chtype, child_info *ch, int pid, HANDLE subproc_ready)
+init_child_info (DWORD chtype, child_info *ch, pid_t pid, HANDLE subproc_ready)
 {
   subproc_init ();
   memset (ch, 0, sizeof *ch);
@@ -912,7 +917,7 @@ static int __stdcall
 checkstate (waitq *w)
 {
   int i, x, potential_match = 0;
-  pinfo *child;
+  _pinfo *child;
 
   sip_printf ("nchildren %d, nzombies %d", nchildren, nzombies);
 
@@ -949,7 +954,7 @@ out:
 /* Get or create a process specific semaphore used in message passing.
  */
 static HANDLE __stdcall
-getsem (pinfo *p, const char *str, int init, int max)
+getsem (_pinfo *p, const char *str, int init, int max)
 {
   HANDLE h;
 
@@ -1047,6 +1052,10 @@ remove_zombie (int ci)
 {
   sip_printf ("removing %d, pid %d, nzombies %d", ci, zombies[ci]->pid,
 	      nzombies);
+
+  if (zombies[ci])
+    zombies[ci].release ();
+
   if (ci < --nzombies)
     zombies[ci] = zombies[nzombies];
 
@@ -1064,7 +1073,7 @@ remove_zombie (int ci)
  *   0 if child does not match parent_w->next criteria
  */
 static int __stdcall
-stopped_or_terminated (waitq *parent_w, pinfo *child)
+stopped_or_terminated (waitq *parent_w, _pinfo *child)
 {
   int potential_match;
   waitq *w = parent_w->next;
@@ -1096,7 +1105,7 @@ stopped_or_terminated (waitq *parent_w, pinfo *child)
 	  w->status = (child->stopsig << 8) | 0x7f;
 	  child->stopsig = 0;
 	}
-      else
+      else /* Should only get here when child has been moved to the zombies array */
 	{
 	  DWORD status;
 	  if (!GetExitCodeProcess (child->hProcess, &status))
