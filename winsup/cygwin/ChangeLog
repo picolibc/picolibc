@@ -1,3 +1,8 @@
+Sun Jul  2  1:57:00 2000  Corinna Vinschen  <corinna@vinschen.de>
+
+	* uinfo.cc (uinfo_init): Eliminate calls to read_etc_group()
+	and read_etc_passwd().
+
 2000-06-28  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
 	* assert.cc (__assert): Reduce dependency on newlib.

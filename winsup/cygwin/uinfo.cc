@@ -162,11 +162,6 @@ internal_getlogin (struct pinfo *pi)
 void
 uinfo_init ()
 {
-  void read_etc_passwd ();
-  extern int passwd_in_memory_p;
-  void read_etc_group ();
-  extern int group_in_memory_p;
-
   char *username;
   struct passwd *p;
 
@@ -181,28 +176,17 @@ uinfo_init ()
      another cygwin process without changing the user context.
      So all user infos in myself as well as the environment are
      (perhaps) valid. */
-  if (myself->psid)
-    {
-      if (!passwd_in_memory_p)
-        read_etc_passwd();
-      if (!group_in_memory_p)
-        read_etc_group ();
-    }
-  else if ((p = getpwnam (username = internal_getlogin (myself))) != NULL)
-    {
-      /* calling getpwnam assures us that /etc/password has been
-         read in, but we can't be sure about /etc/group */
-      if (!group_in_memory_p)
-        read_etc_group ();
-
-      myself->uid = p->pw_uid;
-      myself->gid = p->pw_gid;
-    }
-  else
-    {
-      myself->uid = DEFAULT_UID;
-      myself->gid = DEFAULT_GID;
-    }
+  if (!myself->psid)
+    if ((p = getpwnam (username = internal_getlogin (myself))) != NULL)
+      {
+        myself->uid = p->pw_uid;
+        myself->gid = p->pw_gid;
+      }
+    else
+      {
+        myself->uid = DEFAULT_UID;
+        myself->gid = DEFAULT_GID;
+      }
   /* Real and effective uid/gid are always identical on process start up.
      This is at least true for NT/W2K. */
   myself->orig_uid = myself->real_uid = myself->uid;
