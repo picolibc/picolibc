@@ -16,30 +16,28 @@ would be difficult.
 
 @subsection Why is make behaving badly?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
+Make has two operating modes, UNIX and WIN32.  You need to make sure
+that you are operating in the right mode.
 
-Starting with the beta 19 release, make defaults to a win32 mode in
-which backslashes in filenames are permitted and cmd.exe/command.com
-is used as the sub-shell.  In this mode, escape characters aren't
-allowed among other restrictions.  For this reason, you must set
-the environment variable MAKE_MODE to UNIX to run make on ordinary Unix
-Makefiles.  Here is the full scoop:
+In UNIX mode, make uses sh.exe as a subshell.  The path list separator
+is ':', '\' is the escape character, POSIX paths are expected, and
+Cygwin mounts will be understood.  Use this for Makefiles written for
+UNIX.
 
-MAKE_MODE selects between native Win32 make mode (the default) and
-a Unix mode where it behaves like a Unix make.  The Unix mode does
-allow specifying Win32-style paths but only containing forward slashes
-as the path separator.  The path list separator character is a colon
-in Unix mode.
+In WIN32 mode, make uses the "native" command shell (cmd.exe or
+command.com), with all the restrictions that implies.  The path list
+separator is ';', the path separator is '\', "copy" and "del" work, but
+the Cygwin mount table is not understood.  Use this for nmake-style
+Makefiles.
 
-Win32 mode expects path separators to be either / or \.  Thus no
-Unix-style \s as escape are allowed.  Win32 mode also uses
-cmd.exe/command.com as the subshell which means "copy" and "del"
-(and other shell builtins) will work.  The path list separator
-character is semi-colon in Win32 mode.  People who want an nmake-like
-make might want to use this mode but no one should expect Unix
-Makefiles to compile in this mode.  That is why the default b19
-install sets MAKE_MODE to UNIX.
+The default mode for the Net Release of make (the one installed by
+@code{setup.exe}) is UNIX.  The default mode for commercial releases to
+Redhat (formerly Cygnus) customers is WIN32.
+
+You can override the default by setting the environment variable
+MAKE_MODE to "UNIX" (actually case is not significant) or "WIN32"
+(actually anything other than "UNIX").  You can also specify the options
+--unix or --win32 on the make command line.
 
 @subsection Why the undefined reference to "WinMain@@16"?
 
