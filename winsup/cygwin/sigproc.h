@@ -40,6 +40,9 @@ struct sigthread
   DWORD id;
   DWORD frame;
   CRITICAL_SECTION lock;
+  LONG winapi_lock;
+  bool get_winapi_lock (int test = 0);
+  void release_winapi_lock ();
   void init (const char *s);
 };
 
@@ -51,8 +54,11 @@ private:
 public:
   void set (sigthread &t, DWORD ebp)
   {
+    DWORD oframe = t.frame;
     st = &t;
     t.frame = ebp;
+    if (!oframe)
+      t.get_winapi_lock ();
   }
 
   sigframe () {st = NULL;}
@@ -69,6 +75,7 @@ public:
       {
 	EnterCriticalSection (&st->lock);
 	st->frame = 0;
+	st->release_winapi_lock ();
 	LeaveCriticalSection (&st->lock);
 	st = NULL;
       }

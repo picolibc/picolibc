@@ -647,6 +647,26 @@ interruptible (DWORD pc, int testvalid = 0)
   return res;
 }
 
+bool
+sigthread::get_winapi_lock (int test)
+{
+  if (test)
+    return !InterlockedExchange (&winapi_lock, 1);
+
+  /* Need to do a busy loop because we can't block or a potential SuspendThread
+     will hang. */
+  while (InterlockedExchange (&winapi_lock, 1))
+    Sleep (1);
+  return 1;
+}
+
+void
+sigthread::release_winapi_lock ()
+{
+  /* Assumes that we have the lock. */
+  InterlockedExchange (&winapi_lock, 0);
+}
+
 static void __stdcall interrupt_setup (int sig, void *handler, DWORD retaddr,
 				       DWORD *retaddr_on_stack,
 				       struct sigaction& siga)
@@ -778,8 +798,13 @@ setup_handler (int sig, void *handler, struct sigaction& siga)
 	     If the thread is already suspended (which can occur when a program is stopped) then
 	     just queue the signal. */
 
+	  if (!mainthread.get_winapi_lock (1))
+	    continue;
 	  sigproc_printf ("suspending mainthread");
 	  res = SuspendThread (hth);
+	  mainthread.release_winapi_lock ();
+	  if (mainthread.frame)
+	    goto resume_thread;	/* In case the main thread *just* set the frame */
 
 	  /* Just set pending if thread is already suspended */
 	  if (res)

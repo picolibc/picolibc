@@ -1,3 +1,17 @@
+Wed Mar  7 01:08:21 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* sigproc.h (sigthread): Declare new methods.  Create new winapi_lock
+	field.
+	(sigframe:;set): Call get_winapi_lock after frame is set so that signal
+	handler thread knows not to call SuspendThread.
+	(sigframe::~sigframe): Release winapi_lock.
+	* exceptions.cc (sigthread::get_winapi_lock): New method.
+	(sigthread::release_winapi_lock): New method.
+	(setup_handler): Use get_winapi_lock to ensure that signalled thread is
+	not blocked in a Windows API.
+
+	* path.h (path_types): Avoid broken GCC warning.
+
 Tue Mar  6 14:02:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* path.cc (suffix_scan::has): Change order of conditionals
@@ -211,7 +225,7 @@ Wed Feb 28 15:10:00 2001  Corinna Vinschen <corinna@vinschen.de>
 	default values on reset command.
 
 2001-02-26  Mike Simons  <msimons@moria.simons-clan.com>
-  
+
 	* times.cc (settimeofday): Replace function stub with working code.
 
 Mon Feb 26 10:42:00 2001  Corinna Vinschen <corinna@vinschen.de>
@@ -362,7 +376,7 @@ Wed Feb 14 14:54:40 2001 Christophe Iasci <chrisiasci@aol.com>
 	the library is not found
 
 2001-02-14  Egor Duda  <deo@logos-m.ru>
-  
+
 	* fhandler_console.cc (fhandler_console::char_command): Ignore unknown
 	rendition codes in \033[xx;yym control sequences
 
