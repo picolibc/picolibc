@@ -2467,15 +2467,17 @@ chdir (const char *dir)
   int res = SetCurrentDirectoryA (native_dir) ? 0 : -1;
   if (res == -1)
     __seterrno ();
+  else
+    {
+      /* Store new cache information */
+      free (cwd_win32);
+      cwd_win32 = strdup (path);;
 
-  /* Clear the cache until we need to retrieve the directory again.  */
-  free (cwd_win32);
-  cwd_win32 = strdup (path);;
-
-  char pathbuf[MAX_PATH];
-  (void) normalize_posix_path (cwd_posix, dir, pathbuf);
-  free (cwd_posix);
-  cwd_posix = strdup (pathbuf);
+      char pathbuf[MAX_PATH];
+      (void) normalize_posix_path (cwd_posix, dir, pathbuf);
+      free (cwd_posix);
+      cwd_posix = strdup (pathbuf);
+    }
 
   syscall_printf ("%d = chdir (%s <dos %s>)", res, cwd_posix, cwd_win32);
   return res;

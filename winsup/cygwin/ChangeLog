@@ -1,3 +1,8 @@
+Thu Jun 15 18:12:36 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (chdir): Don't set cache to offending chdir.  Change comment
+	to reflect current reality.
+
 Thu Jun 15 15:43:50 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (normalize_posix_path): Convert path to POSIX if it seems to
