@@ -1,3 +1,12 @@
+2002-10-18  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * testsuite/include/check.h: New header file to use with
+        test cases.
+        * testsuite/lib/newlib.exp: Add testsuite/include directory
+        to list of header files to use.
+        * testsuite/newlib.wctype/twctype.c: New test case for iswctype fns.
+        * testsuite/newlib.wctype/wctype.exp: New file.
+
 2002-10-11  Graham Stott  <graham.stott@btinternet.com>
 	    Richard Sandiford  <rsandifo@redhat.com>
 

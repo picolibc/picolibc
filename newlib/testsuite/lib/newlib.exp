@@ -58,6 +58,9 @@ proc newlib_target_compile { source dest type options } {
     global host_triplet target_triplet
 
     verbose "In newlib_target_compile...\n"
+
+    lappend options "libs=-I$srcdir/include"
+    verbose "srcdir is $srcdir"
 	
     if {[target_info needs_status_wrapper] != "" && \
 	    [target_info needs_status_wrapper] != "0" && \
