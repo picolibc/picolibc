@@ -844,7 +844,7 @@ if test "${enable_newlib_mb+set}" = set; then
   *)   { echo "configure: error: bad value ${enableval} for newlib-mb option" 1>&2; exit 1; } ;;
  esac
 else
-  newlib_mb=no
+  newlib_mb=
 fi
 
 # Check whether --enable-newlib-multithread or --disable-newlib-multithread was given.

@@ -1,3 +1,83 @@
+2002-09-11  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * acinclude.m4 (enable-newlib-mb): Change check to
+        default newlib_mb variable to empty string rather than "no".
+        * configure.host: Remove hard-coding of -DMB_CAPABLE for
+        x86-linux and Cygwin.  Add code to check for newlib_mb
+        being unset in which case set to "yes" for x86-linux and
+        Cygwin.  Change check for newlib_mb being "yes" to allow
+        for an empty string.
+        * configure.in (_MB_LEN_MAX): New AC_DEFINE.
+        * newlib.hin (_MB_LEN_MAX): New define to configure.
+        * aclocal.m4: Regenerated.
+        * configure: Ditto.
+        * libc/include/limits.h: New file.
+        * libc/sys/linux/include/limits.h: Ditto.
+        * doc/aclocal.m4 doc/configure libc/aclocal.m4
+          libc/configure libc/include/%redact libc/machine/aclocal.m4
+          libc/machine/configure libc/machine/a29k/aclocal.m4
+          libc/machine/a29k/configure libc/machine/arm/aclocal.m4
+          libc/machine/arm/configure libc/machine/d10v/aclocal.m4
+          libc/machine/d10v/configure libc/machine/d30v/aclocal.m4
+          libc/machine/d30v/configure libc/machine/fr30/aclocal.m4
+          libc/machine/fr30/configure libc/machine/frv/aclocal.m4
+          libc/machine/frv/configure libc/machine/h8300/aclocal.m4
+          libc/machine/h8300/configure libc/machine/h8500/aclocal.m4
+          libc/machine/h8500/configure libc/machine/hppa/aclocal.m4
+          libc/machine/hppa/configure libc/machine/i386/aclocal.m4
+          libc/machine/i386/configure libc/machine/i960/aclocal.m4
+          libc/machine/i960/configure libc/machine/m32r/aclocal.m4
+          libc/machine/m32r/configure libc/machine/m68hc11/aclocal.m4
+          libc/machine/m68hc11/configure libc/machine/m68k/aclocal.m4
+          libc/machine/m68k/configure libc/machine/m88k/aclocal.m4
+          libc/machine/m88k/configure libc/machine/mips/aclocal.m4
+          libc/machine/mips/configure libc/machine/mn10200/aclocal.m4
+          libc/machine/mn10200/configure libc/machine/mn10300/aclocal.m4
+          libc/machine/mn10300/configure libc/machine/necv70/aclocal.m4
+          libc/machine/necv70/configure libc/machine/powerpc/aclocal.m4
+          libc/machine/powerpc/configure libc/machine/sh/aclocal.m4
+          libc/machine/sh/configure libc/machine/sparc/aclocal.m4
+          libc/machine/sparc/configure libc/machine/tic80/aclocal.m4
+          libc/machine/tic80/configure libc/machine/v850/aclocal.m4
+          libc/machine/v850/configure libc/machine/w65/aclocal.m4
+          libc/machine/w65/configure libc/machine/xscale/aclocal.m4
+          libc/machine/xscale/configure
+          libc/machine/xstormy16/aclocal.m4
+          libc/machine/xstormy16/configure libc/machine/z8k/aclocal.m4
+          libc/machine/z8k/configure libc/sys/aclocal.m4
+          libc/sys/configure libc/sys/a29khif/aclocal.m4
+          libc/sys/a29khif/configure libc/sys/arc/aclocal.m4
+          libc/sys/arc/configure libc/sys/arm/aclocal.m4
+          libc/sys/arm/configure libc/sys/cygwin/aclocal.m4
+          libc/sys/cygwin/configure libc/sys/d10v/aclocal.m4
+          libc/sys/d10v/configure libc/sys/decstation/aclocal.m4
+          libc/sys/decstation/configure libc/sys/go32/aclocal.m4
+          libc/sys/go32/configure libc/sys/h8300hms/aclocal.m4
+          libc/sys/h8300hms/configure libc/sys/h8500hms/aclocal.m4
+          libc/sys/h8500hms/configure libc/sys/idt/aclocal.m4
+          libc/sys/idt/configure libc/sys/linux/aclocal.m4
+          libc/sys/linux/configure libc/sys/linux/include/%redact
+          libc/sys/linux/machine/aclocal.m4
+          libc/sys/linux/machine/configure
+          libc/sys/linux/machine/i386/aclocal.m4
+          libc/sys/linux/machine/i386/configure
+          libc/sys/m88kbug/aclocal.m4 libc/sys/m88kbug/configure
+          libc/sys/mmixware/aclocal.m4 libc/sys/mmixware/configure
+          libc/sys/netware/aclocal.m4 libc/sys/netware/configure
+          libc/sys/rtems/aclocal.m4 libc/sys/rtems/configure
+          libc/sys/sh/aclocal.m4 libc/sys/sh/configure
+          libc/sys/sparc64/aclocal.m4 libc/sys/sparc64/configure
+          libc/sys/sun4/aclocal.m4 libc/sys/sun4/configure
+          libc/sys/sysmec/aclocal.m4 libc/sys/sysmec/configure
+          libc/sys/sysnec810/aclocal.m4 libc/sys/sysnec810/configure
+          libc/sys/sysnecv850/aclocal.m4 libc/sys/sysnecv850/configure
+          libc/sys/sysvi386/aclocal.m4 libc/sys/sysvi386/configure
+          libc/sys/sysvnecv70/aclocal.m4 libc/sys/sysvnecv70/configure
+          libc/sys/tic80/aclocal.m4 libc/sys/tic80/configure
+          libc/sys/w65/aclocal.m4 libc/sys/w65/configure
+          libc/sys/z8ksim/aclocal.m4 libc/sys/z8ksim/configure
+          libm/aclocal.m4 libm/configure: Regenerated.
+
 2002-09-09  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/sys/linux/machine/i386/crt0.c (_start): Remove

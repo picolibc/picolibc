@@ -42,7 +42,7 @@ AC_ARG_ENABLE(newlib-mb,
   yes) newlib_mb=yes ;;
   no)  newlib_mb=no ;;
   *)   AC_MSG_ERROR(bad value ${enableval} for newlib-mb option) ;;
- esac], [newlib_mb=no])dnl
+ esac], [newlib_mb=])dnl
 
 dnl Support --enable-newlib-multithread
 AC_ARG_ENABLE(newlib-multithread,

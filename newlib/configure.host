@@ -227,9 +227,18 @@ if [ "${newlib_multithread}" = "no" ] ; then
 	newlib_cflags="${newlib_cflags} -D__SINGLE_THREAD__"
 fi
 
-# Enable multibyte support if requested.
+# Enable multibyte support if requested or it is defaulted
+# for target.
 
-if [ "${newlib_mb}" = "yes" ] ; then
+if [ "x${newlib_mb}" = "x" ]; then
+	case "${host}" in
+	  i[3456]86-pc-linux-*|*-*-cygwin*)
+		newlib_mb=yes
+		;;
+	esac
+fi
+
+if [ "x${newlib_mb}" = "xyes" ] ; then
 	newlib_cflags="${newlib_cflags} -DMB_CAPABLE"
 fi
 
@@ -330,7 +339,7 @@ case "${host}" in
 	newlib_cflags="${newlib_cflags} -Wall"
 	newlib_cflags="${newlib_cflags} -D_I386MACH_ALLOW_HW_INTERRUPTS"
 	newlib_cflags="${newlib_cflags} -D_LOOSE_KERNEL_NAMES -DHAVE_FCNTL"
-	newlib_cflags="${newlib_cflags} -DWANT_IO_POS_ARGS -DMB_CAPABLE"
+	newlib_cflags="${newlib_cflags} -DWANT_IO_POS_ARGS"
 	# --- Required when building a shared library ------------------------
 	newlib_cflags="${newlib_cflags} -fPIC -D_I386MACH_NEED_SOTYPE_FUNCTION"
 	# --- The three lines below are optional ------------------------------
@@ -413,7 +422,7 @@ esac
 
 case "${host}" in
   *-*-cygwin*)
-	newlib_cflags="${newlib_cflags} -DHAVE_OPENDIR -DHAVE_RENAME -DSIGNAL_PROVIDED -DWANT_IO_LONG_DBL -DWANT_PRINTF_LONG_LONG -D_COMPILING_NEWLIB -DHAVE_FCNTL -DMALLOC_PROVIDED -DMB_CAPABLE"
+	newlib_cflags="${newlib_cflags} -DHAVE_OPENDIR -DHAVE_RENAME -DSIGNAL_PROVIDED -DWANT_IO_LONG_DBL -DWANT_PRINTF_LONG_LONG -D_COMPILING_NEWLIB -DHAVE_FCNTL -DMALLOC_PROVIDED"
 	syscall_dir=syscalls
 	;;
 # RTEMS supplies its own versions of some routines:
