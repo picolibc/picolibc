@@ -170,28 +170,6 @@ _gettimeofday (struct timeval *p, struct timezone *z)
   return gettimeofday (p, z);
 }
 
-#if 0
-/* Work out magic constant below */
-genf ()
-{
-  SYSTEMTIME s;
-  FILETIME f;
-  s.wYear = 1970;
-  s.wMonth = 1;
-  s.wDayOfWeek = 4;
-  s.wDay = 1;
-  s.wHour = 0;
-  s.wMinute = 0;
-  s.wSecond = 0;
-  s.wMilliseconds = 0;
-  SystemTimeToFileTime (&s, &f);
-
-  small_printf ("FILE TIME is %08x%08x\n",
-	       f.dwHighDateTime,
-	       f.dwLowDateTime);
-}
-#endif
-
 /* Cygwin internal */
 void
 time_t_to_filetime (time_t time_in, FILETIME *out)
@@ -552,8 +530,7 @@ ftime (struct timeb *tp)
 }
 
 /* obsolete, changed to cygwin_tzset when localtime.c was added - dj */
-extern "C"
-void
+extern "C" void
 cygwin_tzset ()
 {
 }

@@ -1,3 +1,11 @@
+2002-02-28  Christopher Faylor  <cgf@redhat.com>
+
+	* times.cc: Remove if 0'd code.  Clean up slightly.
+
+2002-02-28  Robert Collins  <rbtcollins@hotmail.com>
+
+	* Merged cygwin_daemon into head minus the new shm and ipc exports.
+
 2002-02-28  Robert Collins  <rbtcollins@hotmail.com>
 
 	* fhandler_tty.cc (fhandler_tty_slave::open): More debugging.
@@ -162,7 +170,8 @@ Mon Oct  1 12:38:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	(process_cache::process): Use the critical section. Also add missing entries to 
 	the cache.
 	(do_process_init): New function to initalise class process static variables.
-	(process::process): Ensure that the process access critical section is initialised.
+	(process::process): Ensure that the process access critical section is 
+	initialised.
 	(process::handle): Close the handle of old process's when they have terminated
 	and we are returning the handle for a process with the same pid.
 	* cygserver_shm.cc: Run indent.
@@ -170,10 +179,14 @@ Mon Oct  1 12:38:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	(client_request_shm_get::serve): New parameter for process cache support.
 	Use the process cache, not OpenProcess to get a handle to the originating process.
 	Fix a handle leak with token_handle.
-	* cygserver_shm.h (class client_request_shm_get): Update ::serve for process cache support.
+	* cygserver_shm.h (class client_request_shm_get): Update ::serve for process 
+	cache support.
 	* cygserver_transport_pipes.cc: Redefine debug_printf to be conditional on DEBUG.
-	* include/cygwin/cygserver.h: Do not implement client_request::serve in the header.
-	* include/cygwin/cygserver_process.h (class process_cache): Add a write access critical section to prevent races when requests from a  multithreaded application arrive.
+	* include/cygwin/cygserver.h: Do not implement client_request::serve in the 
+	header.
+	* include/cygwin/cygserver_process.h (class process_cache): Add a write access 
+	critical section to prevent races when requests from a  multithreaded 
+	application arrive.
 
 Sun Sep 30 23:41:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
@@ -192,7 +205,8 @@ Sun Sep 30 23:41:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	(server_request_queue::process_requests): Initiator for threaded request loops.
 	(client_request_shutdown::serve): Add beginning of process cache support.
 	(server_request::server_request): Ditto.
-	(server_request::process): Use debug_printf. Add beginning of process cache support.
+	(server_request::process): Use debug_printf. Add beginning of process cache 
+	support.
 	(server_request_queue::cleanup): Kill off any request loop threads.
 	(server_request_queue::add): Add beginning of process cache support.
 	(handle_signal): Trigger a shutdown.
@@ -200,7 +214,8 @@ Sun Sep 30 23:41:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	Add process cache support.
 	Spawn a separate thread for the transport request loop, thus allowing concurrent
 	support for multiple transports.
-	* cygserver_client.cc (client_request_get_version::serve): Add process cache support.
+	* cygserver_client.cc (client_request_get_version::serve): Add process cache 
+	support.
 	(client_request_attach_tty::serve): Add process cache support.
 	(client_request_shutdown::serve): Add process cache support.
 	* cygsserver_process.cc: New file with the process cache support.
@@ -277,6 +292,12 @@ Tue Sep 25 16:22:00 2001  Robert Collins <rbtcollins@hotmail.com>
 	* include/cygwin/cygserver_transport.h: New file.
 	* include/sys/ipc.h: New file.
 	* include/sys/shm.h: New file.
+
+2002-02-28  Robert Collins  <rbtcollins@hotmail.com>
+
+	* thread.cc (semaphore::TryWait): Set errno as required by posix 1003.1.
+	(__sem_wait): Ditto.
+	(__sem_trywait): Ditto.
 
 2002-02-27  Christopher Faylor  <cgf@redhat.com>
 
