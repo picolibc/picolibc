@@ -1,3 +1,8 @@
+Tue Oct  9 19:17:53 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* uinfo.cc (internal_getlogin): Reorganize slightly to minimize work in
+	default condition.
+
 Tue Oct  9 18:53:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_disk_file::open): Add missing case clash check.

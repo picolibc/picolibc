@@ -834,12 +834,7 @@ _dll_crt0 ()
 	    if (_cygwin_testing)
 	      fork_info = NULL;
 	    else if ((fork_info->type & PROC_MAGIC_MASK) == PROC_MAGIC_GENERIC)
-	      api_fatal ("\
-You have multiple copies of cygwin1.dll on your system.\n\
-Search for cygwin1.dll using the Windows Start->Find/Search facility\n\
-and delete all but the most recent version.  This will probably be\n\
-the one that resides in x:\\cygwin\\bin, where 'x' is the drive on which\n\
-you have installed the cygwin distribution.\n");
+	      multiple_cygwin_die ();
 	    break;
 	}
     }
@@ -1011,6 +1006,17 @@ __api_fatal (const char *fmt, ...)
   (void) try_to_debug ();
 #endif
   myself->exit (1);
+}
+
+void
+multiple_cygwin_die ()
+{
+  api_fatal ("\
+You have multiple copies of cygwin1.dll on your system.\n\
+Search for cygwin1.dll using the Windows Start->Find/Search facility\n\
+and delete all but the most recent version.  This will probably be\n\
+the one that resides in x:\\cygwin\\bin, where 'x' is the drive on which\n\
+you have installed the cygwin distribution.\n");
 }
 
 #ifdef DEBUGGING
