@@ -1,3 +1,10 @@
+2001-11-04  Egor Duda  <deo@logos-m.ru>
+
+	* strace.cc (main): New option '-w'. Start traced process in separate
+	window. New option '-S x'. Flush buffered output every x seconds.
+	(create_child): Start child process in new window, when requested.
+	When requested, periodically flush debugging output.
+
 2001-10-24  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in: Remove EXEEXT consideration.  We always need .exe

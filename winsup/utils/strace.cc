@@ -16,6 +16,7 @@ details. */
 #include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 #include <windows.h>
 #include <signal.h>
 #include "sys/strace.h"
@@ -36,6 +37,8 @@ static int usecs = 1;
 static int delta = 1;
 static int hhmmss = 0;
 static int bufsize = 0;
+static int new_window = 0;
+static long flush_period = 0;
 
 static BOOL close_handle (HANDLE h, DWORD ok);
 
@@ -264,8 +267,8 @@ create_child (char **argv)
   /* cygwin32_conv_to_win32_path (exec_file, real_path); */
 
   flags = forkdebug ? 0 : DEBUG_ONLY_THIS_PROCESS;
-  flags |=
-    /*CREATE_NEW_PROCESS_GROUP | */ CREATE_DEFAULT_ERROR_MODE | DEBUG_PROCESS;
+  flags |= CREATE_DEFAULT_ERROR_MODE | DEBUG_PROCESS;
+  flags |= (new_window ? CREATE_NEW_CONSOLE | CREATE_NEW_PROCESS_GROUP : 0);
 
   make_command_line (one_line, argv);
 
@@ -524,11 +527,22 @@ proc_child (unsigned mask, FILE *ofile)
 {
   DEBUG_EVENT ev;
   int processes = 0;
+  time_t cur_time, last_time;
+
   SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_HIGHEST);
+  last_time = time (NULL);
   while (1)
     {
       BOOL debug_event = WaitForDebugEvent (&ev, 1000);
       DWORD status = DBG_CONTINUE;
+
+      if (bufsize && flush_period > 0 &&
+	  (cur_time = time (NULL)) >= last_time + flush_period)
+	{
+	  last_time = cur_time;
+	  fflush (ofile);
+	}
+
       if (!debug_event)
 	continue;
 
@@ -600,7 +614,7 @@ main (int argc, char **argv)
   else
     pgm++;
 
-  while ((opt = getopt (argc, argv, "b:m:o:fndut")) != EOF)
+  while ((opt = getopt (argc, argv, "b:m:o:fndutwS:")) != EOF)
     switch (opt)
       {
       case 'f':
@@ -630,6 +644,13 @@ main (int argc, char **argv)
 	break;
       case 'u':
 	usecs ^= 1;
+	break;
+      case 'w':
+	new_window ^= 1;
+	break;
+      case 'S':
+	flush_period = strtol (optarg, NULL, 10);
+	break;
       }
 
   if (!mask)
