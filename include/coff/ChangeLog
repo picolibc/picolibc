@@ -1,3 +1,10 @@
+2001-11-11  Timothy Wall  <twall@alum.mit.edu>
+
+	* ti.h: Move arch-specific stuff from here...
+	(COFF_ADJUST_SYM_IN/OUT): Optionally put page flag into symbol
+	value. 
+	* tic54x.h: ...to here.
+	
 2001-10-26  Christian Groessler  <cpg@aladdin.de>
 
 	* external.h (GET_LINENO_LNNO): Fix usage of H_GET_32/16.

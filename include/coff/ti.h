@@ -95,7 +95,7 @@ struct external_filehdr
   do									\
     {									\
       ((struct internal_filehdr *)(dst))->f_target_id =			\
-	H_GET_16 (abfd, ((FILHDR *)(src))->f_target_id);			\
+	H_GET_16 (abfd, ((FILHDR *)(src))->f_target_id);		\
     }									\
   while (0)
 #endif
@@ -260,27 +260,6 @@ struct external_scnhdr {
     }									   \
    while (0)
 
-/* Page macros
-
-   The first GDB port requires flags in its remote memory access commands to
-   distinguish between data/prog space.  Hopefully we can make this go away
-   eventually.  Stuff the page in the upper bits of a 32-bit address, since
-   the c5x family only uses 16 or 23 bits.
-
-   c2x, c5x and most c54x devices have 16-bit addresses, but the c548 has
-   23-bit program addresses.  Make sure the page flags don't interfere.
-   These flags are used by GDB to identify the destination page for
-   addresses. 
-*/
-
-/* recognized load pages */
-#define PG_PROG         0x0         /* PROG page */
-#define PG_DATA         0x1         /* DATA page */
-
-#define ADDR_MASK       0x00FFFFFF
-#define PG_TO_FLAG(p)   (((unsigned long)(p) & 0xFF) << 24)
-#define FLAG_TO_PG(f)   (((f) >> 24) & 0xFF)
-
 /*
  * names of "special" sections
  */
@@ -411,13 +390,23 @@ union external_auxent {
   H_PUT_16 (abfd, ((class != C_FIELD) ? (in) * 8 : (in)), \
 	   ext->x_sym.x_misc.x_lnsz.x_size)
  
-/* TI COFF stores offsets for MOS and MOU in bits; BFD expects bytes */
+/* TI COFF stores offsets for MOS and MOU in bits; BFD expects bytes 
+   Also put the load page flag of the section into the symbol value if it's an
+   address.  */
+#ifndef NEEDS_PAGE
+#define NEEDS_PAGE(X) 0
+#define PAGE_MASK 0
+#endif
 #define COFF_ADJUST_SYM_IN_POST(ABFD, EXT, INT) \
   do									\
     {									\
       struct internal_syment *dst = (struct internal_syment *)(INT);	\
       if (dst->n_sclass == C_MOS || dst->n_sclass == C_MOU)		\
 	dst->n_value /= 8;						\
+      else if (NEEDS_PAGE (dst->n_sclass)) {                            \
+        asection *scn = coff_section_from_bfd_index (abfd, dst->n_scnum); \
+        dst->n_value |= (scn->lma & PAGE_MASK);                         \
+      }									\
     }									\
    while (0)
 
@@ -428,6 +417,9 @@ union external_auxent {
        SYMENT *dst = (SYMENT *)(EXT);					\
        if (src->n_sclass == C_MOU || src->n_sclass == C_MOS)		\
 	 H_PUT_32 (abfd, src->n_value * 8, dst->e_value);		\
+       else if (NEEDS_PAGE (src->n_sclass)) {                           \
+         H_PUT_32 (abfd, src->n_value &= ~PAGE_MASK, dst->e_value);     \
+       }								\
     }									\
    while (0)
 

@@ -1,3 +1,8 @@
+2001-11-11  Timothy Wall  <twall@alum.mit.edu>
+
+	* tic54x.h: Revise opcode layout; don't really need a separate
+	structure for parallel opcodes.
+
 2001-11-13  Zack Weinberg <zack@codesourcery.com>
 	    Alan Modra  <amodra@bigpond.net.au>
 
