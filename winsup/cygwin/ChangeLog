@@ -1,3 +1,7 @@
+Tue 17 Jul 2001 10:19:00  Corinna Vinschen <corinna@vinschen.de>
+
+	* delqueue.h: Remove obsolete file.
+
 Mon 16 Jul 2001 10:47:17 PM EDT  Christopher Faylor <cgf@cygnus.com>
 
 	* child_info.h: Bump magic number.
