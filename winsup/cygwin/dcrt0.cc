@@ -704,9 +704,6 @@ dll_crt0_1 ()
 	{
 	  char *new_argv0 = (char *) alloca (MAX_PATH);
 	  cygwin_conv_to_posix_path (__argv[0], new_argv0);
-	  char *p = strchr (new_argv0, '\0') - 4;
-	  if (p > new_argv0 && strcasematch (p, ".exe"))
-	    *p = '\0';
 	  __argv[0] = new_argv0;
 	}
     }
@@ -719,7 +716,16 @@ dll_crt0_1 ()
   cygheap->fdtab.stdio_init ();
 
   /* Set up __progname for getopt error call. */
-  __progname = __argv[0];
+  if (__argv[0] && (__progname = strrchr (__argv[0], '/')))
+    ++__progname;
+  else
+    __progname = __argv[0];
+  if (__progname)
+    {
+      char *cp = strchr (__progname, '\0') - 4;
+      if (cp > __progname && strcasematch (cp, ".exe"))
+	*cp = '\0';
+    }
 
   /* Set new console title if appropriate. */
 
