@@ -779,18 +779,6 @@ fhandler_tty_slave::tcflush (int)
   return 0;
 }
 
-void
-fhandler_tty_slave::send_ioctl_request (void)
-{
-  if (ioctl_request_event == NULL || ioctl_done_event == NULL) // slave of pty
-    return;
-
-  acquire_output_mutex (INFINITE);
-  SetEvent (ioctl_request_event);
-  WaitForSingleObject (ioctl_done_event, INFINITE);
-  release_output_mutex ();
-}
-
 int
 fhandler_tty_slave::ioctl (unsigned int cmd, void *arg)
 {
@@ -804,31 +792,51 @@ fhandler_tty_slave::ioctl (unsigned int cmd, void *arg)
 		     myself->pgid, get_ttyp ()->getpgid (), myself->ctty);
       _raise (SIGTTOU);
     }
-  get_ttyp ()->cmd = cmd;
-  get_ttyp ()->ioctl_retval = 0;
+
   switch (cmd)
     {
     case TIOCGWINSZ:
-      get_ttyp ()->arg.winsize = get_ttyp ()->winsize;
-      send_ioctl_request ();
-      * (struct winsize *) arg = get_ttyp ()->arg.winsize;
-      get_ttyp ()->winsize = get_ttyp ()->arg.winsize;
-      break;
     case TIOCSWINSZ:
-      get_ttyp ()->ioctl_retval = -1;
-      get_ttyp ()->arg.winsize = * (struct winsize *) arg;
-      send_ioctl_request ();
       break;
     case FIONBIO:
       if (* (int *) arg)
 	set_flags (get_flags () | O_NONBLOCK);
       else
 	set_flags (get_flags () & ~O_NONBLOCK);
-      break;
+      goto out;
     default:
       set_errno (EINVAL);
       return -1;
     }
+
+  acquire_output_mutex (INFINITE);
+
+  get_ttyp ()->cmd = cmd;
+  get_ttyp ()->ioctl_retval = 0;
+  switch (cmd)
+    {
+    case TIOCGWINSZ:
+      get_ttyp ()->arg.winsize = get_ttyp ()->winsize;
+      if (ioctl_request_event)
+	SetEvent (ioctl_request_event);
+      * (struct winsize *) arg = get_ttyp ()->arg.winsize;
+      if (ioctl_done_event)
+	WaitForSingleObject (ioctl_done_event, INFINITE);
+      get_ttyp ()->winsize = get_ttyp ()->arg.winsize;
+      break;
+    case TIOCSWINSZ:
+      get_ttyp ()->ioctl_retval = -1;
+      get_ttyp ()->arg.winsize = * (struct winsize *) arg;
+      if (ioctl_request_event)
+	SetEvent (ioctl_request_event);
+      if (ioctl_done_event)
+	WaitForSingleObject (ioctl_done_event, INFINITE);
+      break;
+    }
+
+  release_output_mutex ();
+
+out:
   termios_printf ("%d = ioctl (%x)", get_ttyp ()->ioctl_retval, cmd);
   return get_ttyp ()->ioctl_retval;
 }

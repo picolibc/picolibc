@@ -645,8 +645,6 @@ public:
 
 class fhandler_tty_slave: public fhandler_tty_common
 {
-  void send_ioctl_request ();
-
 public:
   /* Constructor */
   fhandler_tty_slave (const char *name);
