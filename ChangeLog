@@ -1,3 +1,11 @@
+2004-12-03  Richard Sandiford  <rsandifo@redhat.com>
+
+	* config.if: Delete.
+	* configure.in: Set libstdcxx_incdir directly.
+	* configure: Regenerate.
+	* MAINTAINERS: Remove mention of config.if.
+	* src-release (DEVO_SUPPORT): Remove config.if.
+
 2004-12-02  Eric Christopher  <echristo@redhat.com>
 
 	* Makefile.tpl (clean-target-libgcc): Add stmp-dirs to list

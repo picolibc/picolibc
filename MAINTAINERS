@@ -96,7 +96,7 @@ winsup/
 	See also winsup/MAINTAINERS.
 
 config-ml.in; setup.com; missing; makefile.vms; utils/; config/;
-config.if; makefile.vms; missing; ylwrap; mkdep; etc/; install-sh; intl/
+makefile.vms; missing; ylwrap; mkdep; etc/; install-sh; intl/
 	Ask DJ Delorie <dj@redhat.com> after reading the libiberty entry.
 
 modules file
