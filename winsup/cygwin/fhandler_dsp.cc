@@ -420,7 +420,7 @@ fhandler_dev_dsp::setupwav (const char *pData, int nBytes)
 
 //------------------------------------------------------------------------
 fhandler_dev_dsp::fhandler_dev_dsp ():
-  fhandler_base (FH_OSS_DSP)
+  fhandler_base ()
 {
 }
 
