@@ -1,5 +1,9 @@
 2002-05-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/cygwin/types.h: Revert previous patch.
+
+2002-05-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/types.h: Define pthread stuff only if _POSIX_THREADS
 	is defined.
 
