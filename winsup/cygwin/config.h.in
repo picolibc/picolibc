@@ -35,4 +35,4 @@
 #undef _MT_SAFE
 
 /* Define if using new vfork functionality. */
-#undef NEWVFORK
+#define NEWVFORK

@@ -1,3 +1,7 @@
+Sat Apr 14 19:23:52 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* config.h.in: Turn on VFORK by default.
+
 Sat Apr 14 18:04:35 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* net.cc (cygwin_socket): Set SO_LINGER to small value so closed UNIX
