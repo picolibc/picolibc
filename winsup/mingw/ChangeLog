@@ -1,3 +1,8 @@
+2005-01-11  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/sys/stat.h (_S_IFLNK, S_IFLNK, _S_ISLNK, S_ISLNK, _lstat,
+	lstat): Conditionalize defines for __STRICT_ANSI__.
+
 2005-01-10  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/errno.h (ELOOP): Add definition.
