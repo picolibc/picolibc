@@ -729,9 +729,9 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
     }
 
   void *base = MapViewOfFileEx (h, access, 0, off, len,
-                               (flags & MAP_FIXED) ? addr : NULL);
+                               (flags & MAP_FIXED) ? *addr : NULL);
 
-  if (!base || ((flags & MAP_FIXED) && base != addr))
+  if (!base || ((flags & MAP_FIXED) && base != *addr))
     {
       if (!base)
         {

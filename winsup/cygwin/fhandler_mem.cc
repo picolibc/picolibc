@@ -332,7 +332,7 @@ fhandler_dev_mem::mmap (caddr_t *addr, size_t len, DWORD access,
       syscall_printf ("-1 = mmap(): NtMapViewOfSection failed with %E");
       return INVALID_HANDLE_VALUE;
     }
-  if ((flags & MAP_FIXED) && base != addr)
+  if ((flags & MAP_FIXED) && base != *addr)
     {
       set_errno (EINVAL);
       syscall_printf ("-1 = mmap(): address shift with MAP_FIXED given");

@@ -1,3 +1,8 @@
+Fri Feb 23 10:42:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* mmap.cc (fhandler_disk_file::mmap): Use `addr' correctly.
+	* fhandler_mem.cc (fhandler_dev_mem::mmap): Ditto.
+
 Thu Feb 22 17:09:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* path.cc (symlink): Keep relative paths relative in the DOS
