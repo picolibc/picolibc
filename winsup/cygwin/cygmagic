@@ -1,4 +1,14 @@
 #!/bin/sh
+# cygmagic - Generate "magic numbers" from a structure.
+#
+#   Copyright 2001, 2002 Red Hat, Inc.
+#
+# This file is part of Cygwin.
+#
+# This software is a copyrighted work licensed under the terms of the
+# Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+# details.
+
 file_magic=$1; shift
 gcc=$1; shift
 file=$1; shift
