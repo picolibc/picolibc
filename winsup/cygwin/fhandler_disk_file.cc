@@ -604,7 +604,7 @@ fhandler_disk_file::ftruncate (_off64_t length)
   else
     {
       _off64_t prev_loc = lseek (0, SEEK_CUR);
-      if (lseek (length, SEEK_SET) > 0)
+      if (lseek (length, SEEK_SET) >= 0)
         {
 	  if (get_fs_flags (FILE_SUPPORTS_SPARSE_FILES))
 	    {
