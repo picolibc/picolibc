@@ -31,8 +31,12 @@
 #   signal_dir		"signal" to build libc/signal, "" otherwise
 #   syscall_dir		"syscalls" to build libc/syscalls, "" otherwise
 #   unix_dir		"unix" to build libc/unix, "" otherwise
+#   use_libtool         flag: use libtool to build newlib?
+#   aext                library extension - needed for libtool support
+#   oext                object file extension - needed for libtool support
 
 newlib_cflags=
+libm_machine_dir=
 machine_dir=
 sys_dir=
 posix_dir=
@@ -40,6 +44,9 @@ signal_dir=signal
 syscall_dir=
 unix_dir=
 mach_add_setjmp=
+use_libtool=no
+aext=a
+oext=o
 
 case "${target_optspace}:${host}" in
   yes:*)
@@ -71,6 +78,7 @@ case "${host_cpu}" in
   avr*)
 	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -mcall-prologues"
 	;;
+
   d10v*)
 	machine_dir=d10v
 	;;
@@ -96,9 +104,11 @@ case "${host_cpu}" in
 	# Don't use for these since they provide their own setjmp.
 	case ${host} in
 	*-*-go32 | *-*-sco* | *-*-cygwin*) 
+		libm_machine_dir=i386
 		machine_dir=i386
 		;;
 	*) 
+		libm_machine_dir=i386
 		machine_dir=i386
 		mach_add_setjmp=true
 		;;
@@ -194,6 +204,18 @@ if [ "${newlib_mb}" = "yes" ] ; then
 	newlib_cflags="${newlib_cflags} -DMB_CAPABLE"
 fi
 
+# Verify if shared newlib support is allowed and set appropriate variables
+# We don't want to use libtool for platforms that we are not going to
+# support shared libraries.  This is because it adds executable tests which
+# we don't want for most embedded platforms.
+case "${host}" in
+  i[3456]86-pc-linux-*)
+    use_libtool=yes
+    oext=lo
+    aext=la ;;
+  *) ;; #shared library not supported for ${host}
+esac
+
 # Get the source directories to use for the host.  unix_dir is set
 # to unix to get some standard Unix routines.  posix_dir is set to get some
 # standard Posix routines.  sys_dir should supply system dependent routines
@@ -251,7 +273,6 @@ case "${host}" in
 	sys_dir=sysvi386
 	unix_dir=unix
 	;;
-
   i[3456]86-pc-linux-*)
 	sys_dir=linux
 	unix_dir=unix
@@ -261,14 +282,13 @@ case "${host}" in
 	newlib_cflags="${newlib_cflags} -Wall"
 	newlib_cflags="${newlib_cflags} -D_I386MACH_ALLOW_HW_INTERRUPTS"
 	newlib_cflags="${newlib_cflags} -D_LOOSE_KERNEL_NAMES -DHAVE_FCNTL"
-	# --- Required when building a shared library ------------------------ 
+	# --- Required when building a shared library ------------------------
 	newlib_cflags="${newlib_cflags} -fPIC -D_I386MACH_NEED_SOTYPE_FUNCTION"
 	# --- The three lines below are optional ------------------------------
 	##newlib_cflags="${newlib_cflags} -nostdinc"
 	##newlib_cflags="${newlib_cflags} -I`newlib-flags --kernel-dir`/include"
 	##newlib_cflags="${newlib_cflags} -idirafter ${gcc_dir}include"
 	;;
-
   m68k-sun-sunos*)
 	unix_dir=unix
 	;;

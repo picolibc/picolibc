@@ -1,3 +1,51 @@
+2001-12-13  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* Makefile.shared: New file.
+	* libc/sys/linux/shared.ld: New file.
+	* libm/machine/*: New files.
+	* libm/machine/i386/*: New files.
+	* Makefile.am: Add libtool support.  Change math and mathfp
+	references to variables.
+	* configure.host: Add variables for libtool support.  Add
+	libm_machine_dir variable.
+	* configure.in: Add objectlist variables, for libtool
+	support.  Add CC_FOR_BUILD tests.
+	* libc/Makefile.am: Add libtool support.  Change crt0.o
+	reference to be a variable reference.
+	* libc/configure.in: Add libtool support.  Change sublib
+	names to be lib${subdir}.la when using libtool.
+	* libc/ctype/Makefile.am: Add libtool support.
+	* libc/errno/Makefile.am: Likewise.
+	* libc/locale/Makefile.am: Likewise.
+	* libc/machine/Makefile.am: Likewise.
+	* libc/machine/configure.in: Likewise.
+	* libc/machine/i386/Makefile.am: Likewise.
+	* libc/machine/i386/configure.in: Likewise.
+	* libc/misc/Makefile.am: Likewise.
+	* libc/posix/Makefile.am: Likewise.
+	* libc/reent/Makefile.am: Likewise.
+	* libc/signal/Makefile.am: Likewise.
+	* libc/stdio/Makefile.am: Likewise.
+	* libc/stdlib/Makefile.am: Likewise.
+	* libc/string/Makefile.am: Likewise.
+	* libc/sys/Makefile.am: Likewise.
+	* libc/sys/configure.in: Likewise.
+	* libc/sys/linux/Makefile.am: Add libtool support.  Change
+	awk reference to a variable reference.  Change signal.h
+	reference to a variable reference.
+	* libc/sys/linux/configure.in: Add libtool support.
+	* libc/syscalls/Makefile.am: Likewise.
+	* libc/time/Makefile.am: Likewise.
+	* libc/unix/Makefile.am: Likewise.
+	* libm/Makefile.am: Add libtool support.  Change math and
+	mathfp references to variables.
+	* libm/configure.in: Add libtool support.  Add
+	LIBM_MACHINE_LIB variable.
+	* libm/common/Makefile.am: Add libtool support.
+	* libm/math/Makefile.am: Likewise.
+	* libm/mathfp/Makefile.am: Likewise.
+	Regenerate all Makefile.in, aclocal.m4, and configure.
+
 2001-12-13 Anita Kulkarni <anitak@kpit.com>
 
         * libc/sys/sh/crt0.S: Remove stack symbol definition 0xdeaddead.

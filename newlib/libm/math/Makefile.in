@@ -1,6 +1,6 @@
-# Makefile.in generated automatically by automake 1.3b from Makefile.am
+# Makefile.in generated automatically by automake 1.4 from Makefile.am
 
-# Copyright (C) 1994, 1995, 1996, 1997, 1998 Free Software Foundation, Inc.
+# Copyright (C) 1994, 1995-8, 1999 Free Software Foundation, Inc.
 # This Makefile.in is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -9,6 +9,7 @@
 # but WITHOUT ANY WARRANTY, to the extent permitted by law; without
 # even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 # PARTICULAR PURPOSE.
+
 
 
 SHELL = @SHELL@
@@ -46,7 +47,7 @@ AUTOMAKE = @AUTOMAKE@
 AUTOHEADER = @AUTOHEADER@
 
 INSTALL = @INSTALL@
-INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 transform = @program_transform_name@
@@ -63,24 +64,31 @@ AR = @AR@
 AS = @AS@
 CC = @CC@
 CPP = @CPP@
+DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
+LDFLAGS = @LDFLAGS@
+LIBM_MACHINE_LIB = @LIBM_MACHINE_LIB@
+LIBTOOL = @LIBTOOL@
+LN_S = @LN_S@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
+OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
+aext = @aext@
+libm_machine_dir = @libm_machine_dir@
 machine_dir = @machine_dir@
 newlib_basedir = @newlib_basedir@
+oext = @oext@
 sys_dir = @sys_dir@
 
 AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = -I$(srcdir)/../common $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-noinst_LIBRARIES = lib.a
-
-src = 	k_standard.c k_rem_pio2.c \
+src = k_standard.c k_rem_pio2.c \
 	k_cos.c k_sin.c k_tan.c \
 	e_acos.c e_acosh.c e_asin.c e_atan2.c \
 	e_atanh.c e_cosh.c e_exp.c e_fmod.c \
@@ -102,7 +110,8 @@ src = 	k_standard.c k_rem_pio2.c \
 	s_tan.c s_tanh.c \
 	s_isinf.c s_infconst.c
 
-fsrc =	kf_rem_pio2.c \
+
+fsrc = kf_rem_pio2.c \
 	kf_cos.c kf_sin.c kf_tan.c \
 	ef_acos.c ef_acosh.c ef_asin.c ef_atan2.c \
 	ef_atanh.c ef_cosh.c ef_exp.c ef_fmod.c \
@@ -124,9 +133,17 @@ fsrc =	kf_rem_pio2.c \
 	sf_tan.c sf_tanh.c \
 	sf_isinf.c
 
-lib_a_SOURCES = $(src) $(fsrc)
 
-chobj =	wacos.def wacosh.def wasin.def sasinh.def \
+libmath_la_LDFLAGS = -Xcompiler -nostdlib
+
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libmath.la
+@USE_LIBTOOL_TRUE@libmath_la_SOURCES = @USE_LIBTOOL_TRUE@$(src) $(fsrc)
+@USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
+@USE_LIBTOOL_FALSE@noinst_DATA = 
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(src) $(fsrc)
+
+chobj = wacos.def wacosh.def wasin.def sasinh.def \
 	satan.def watan2.def watanh.def wj0.def \
 	wcosh.def serf.def wexp.def \
 	sfabs.def sfloor.def wfmod.def sfrexp.def \
@@ -135,6 +152,7 @@ chobj =	wacos.def wacosh.def wasin.def sasinh.def \
 	wpow.def wremainder.def ssin.def wsinh.def \
 	wsqrt.def stan.def stanh.def \
 	sisnan.def
+
 
 SUFFIXES = .def
 
@@ -150,47 +168,91 @@ LIBRARIES =  $(noinst_LIBRARIES)
 
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
-LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 lib_a_LIBADD = 
-lib_a_OBJECTS =  k_standard.o k_rem_pio2.o k_cos.o k_sin.o k_tan.o \
-e_acos.o e_acosh.o e_asin.o e_atan2.o e_atanh.o e_cosh.o e_exp.o \
-e_fmod.o er_gamma.o e_hypot.o e_j0.o e_j1.o e_jn.o er_lgamma.o e_log.o \
-e_log10.o e_pow.o e_rem_pio2.o e_remainder.o e_scalb.o e_sinh.o \
-e_sqrt.o w_acos.o w_acosh.o w_asin.o w_atan2.o w_atanh.o w_cosh.o \
-w_exp.o w_fmod.o w_gamma.o wr_gamma.o w_hypot.o w_j0.o w_j1.o w_jn.o \
-w_lgamma.o wr_lgamma.o w_log.o w_log10.o w_pow.o w_remainder.o \
-w_scalb.o w_sinh.o w_sqrt.o w_cabs.o w_drem.o s_asinh.o s_atan.o \
-s_ceil.o s_cos.o s_erf.o s_fabs.o s_floor.o s_frexp.o s_isnan.o \
-s_ldexp.o s_signif.o s_sin.o s_tan.o s_tanh.o s_isinf.o s_infconst.o \
-kf_rem_pio2.o kf_cos.o kf_sin.o kf_tan.o ef_acos.o ef_acosh.o ef_asin.o \
-ef_atan2.o ef_atanh.o ef_cosh.o ef_exp.o ef_fmod.o erf_gamma.o \
-ef_hypot.o ef_j0.o ef_j1.o ef_jn.o erf_lgamma.o ef_log.o ef_log10.o \
-ef_pow.o ef_rem_pio2.o ef_remainder.o ef_scalb.o ef_sinh.o ef_sqrt.o \
-wf_acos.o wf_acosh.o wf_asin.o wf_atan2.o wf_atanh.o wf_cosh.o wf_exp.o \
-wf_fmod.o wf_gamma.o wrf_gamma.o wf_hypot.o wf_j0.o wf_j1.o wf_jn.o \
-wf_lgamma.o wrf_lgamma.o wf_log.o wf_log10.o wf_pow.o wf_remainder.o \
-wf_scalb.o wf_sinh.o wf_sqrt.o wf_cabs.o wf_drem.o sf_asinh.o sf_atan.o \
-sf_ceil.o sf_cos.o sf_erf.o sf_fabs.o sf_floor.o sf_frexp.o sf_isnan.o \
-sf_ldexp.o sf_signif.o sf_sin.o sf_tan.o sf_tanh.o sf_isinf.o
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  k_standard.o k_rem_pio2.o k_cos.o \
+@USE_LIBTOOL_FALSE@k_sin.o k_tan.o e_acos.o e_acosh.o e_asin.o \
+@USE_LIBTOOL_FALSE@e_atan2.o e_atanh.o e_cosh.o e_exp.o e_fmod.o \
+@USE_LIBTOOL_FALSE@er_gamma.o e_hypot.o e_j0.o e_j1.o e_jn.o \
+@USE_LIBTOOL_FALSE@er_lgamma.o e_log.o e_log10.o e_pow.o e_rem_pio2.o \
+@USE_LIBTOOL_FALSE@e_remainder.o e_scalb.o e_sinh.o e_sqrt.o w_acos.o \
+@USE_LIBTOOL_FALSE@w_acosh.o w_asin.o w_atan2.o w_atanh.o w_cosh.o \
+@USE_LIBTOOL_FALSE@w_exp.o w_fmod.o w_gamma.o wr_gamma.o w_hypot.o \
+@USE_LIBTOOL_FALSE@w_j0.o w_j1.o w_jn.o w_lgamma.o wr_lgamma.o w_log.o \
+@USE_LIBTOOL_FALSE@w_log10.o w_pow.o w_remainder.o w_scalb.o w_sinh.o \
+@USE_LIBTOOL_FALSE@w_sqrt.o w_cabs.o w_drem.o s_asinh.o s_atan.o \
+@USE_LIBTOOL_FALSE@s_ceil.o s_cos.o s_erf.o s_fabs.o s_floor.o \
+@USE_LIBTOOL_FALSE@s_frexp.o s_isnan.o s_ldexp.o s_signif.o s_sin.o \
+@USE_LIBTOOL_FALSE@s_tan.o s_tanh.o s_isinf.o s_infconst.o \
+@USE_LIBTOOL_FALSE@kf_rem_pio2.o kf_cos.o kf_sin.o kf_tan.o ef_acos.o \
+@USE_LIBTOOL_FALSE@ef_acosh.o ef_asin.o ef_atan2.o ef_atanh.o ef_cosh.o \
+@USE_LIBTOOL_FALSE@ef_exp.o ef_fmod.o erf_gamma.o ef_hypot.o ef_j0.o \
+@USE_LIBTOOL_FALSE@ef_j1.o ef_jn.o erf_lgamma.o ef_log.o ef_log10.o \
+@USE_LIBTOOL_FALSE@ef_pow.o ef_rem_pio2.o ef_remainder.o ef_scalb.o \
+@USE_LIBTOOL_FALSE@ef_sinh.o ef_sqrt.o wf_acos.o wf_acosh.o wf_asin.o \
+@USE_LIBTOOL_FALSE@wf_atan2.o wf_atanh.o wf_cosh.o wf_exp.o wf_fmod.o \
+@USE_LIBTOOL_FALSE@wf_gamma.o wrf_gamma.o wf_hypot.o wf_j0.o wf_j1.o \
+@USE_LIBTOOL_FALSE@wf_jn.o wf_lgamma.o wrf_lgamma.o wf_log.o wf_log10.o \
+@USE_LIBTOOL_FALSE@wf_pow.o wf_remainder.o wf_scalb.o wf_sinh.o \
+@USE_LIBTOOL_FALSE@wf_sqrt.o wf_cabs.o wf_drem.o sf_asinh.o sf_atan.o \
+@USE_LIBTOOL_FALSE@sf_ceil.o sf_cos.o sf_erf.o sf_fabs.o sf_floor.o \
+@USE_LIBTOOL_FALSE@sf_frexp.o sf_isnan.o sf_ldexp.o sf_signif.o \
+@USE_LIBTOOL_FALSE@sf_sin.o sf_tan.o sf_tanh.o sf_isinf.o
+LTLIBRARIES =  $(noinst_LTLIBRARIES)
+
+libmath_la_LIBADD = 
+@USE_LIBTOOL_TRUE@libmath_la_OBJECTS =  k_standard.lo k_rem_pio2.lo \
+@USE_LIBTOOL_TRUE@k_cos.lo k_sin.lo k_tan.lo e_acos.lo e_acosh.lo \
+@USE_LIBTOOL_TRUE@e_asin.lo e_atan2.lo e_atanh.lo e_cosh.lo e_exp.lo \
+@USE_LIBTOOL_TRUE@e_fmod.lo er_gamma.lo e_hypot.lo e_j0.lo e_j1.lo \
+@USE_LIBTOOL_TRUE@e_jn.lo er_lgamma.lo e_log.lo e_log10.lo e_pow.lo \
+@USE_LIBTOOL_TRUE@e_rem_pio2.lo e_remainder.lo e_scalb.lo e_sinh.lo \
+@USE_LIBTOOL_TRUE@e_sqrt.lo w_acos.lo w_acosh.lo w_asin.lo w_atan2.lo \
+@USE_LIBTOOL_TRUE@w_atanh.lo w_cosh.lo w_exp.lo w_fmod.lo w_gamma.lo \
+@USE_LIBTOOL_TRUE@wr_gamma.lo w_hypot.lo w_j0.lo w_j1.lo w_jn.lo \
+@USE_LIBTOOL_TRUE@w_lgamma.lo wr_lgamma.lo w_log.lo w_log10.lo w_pow.lo \
+@USE_LIBTOOL_TRUE@w_remainder.lo w_scalb.lo w_sinh.lo w_sqrt.lo \
+@USE_LIBTOOL_TRUE@w_cabs.lo w_drem.lo s_asinh.lo s_atan.lo s_ceil.lo \
+@USE_LIBTOOL_TRUE@s_cos.lo s_erf.lo s_fabs.lo s_floor.lo s_frexp.lo \
+@USE_LIBTOOL_TRUE@s_isnan.lo s_ldexp.lo s_signif.lo s_sin.lo s_tan.lo \
+@USE_LIBTOOL_TRUE@s_tanh.lo s_isinf.lo s_infconst.lo kf_rem_pio2.lo \
+@USE_LIBTOOL_TRUE@kf_cos.lo kf_sin.lo kf_tan.lo ef_acos.lo ef_acosh.lo \
+@USE_LIBTOOL_TRUE@ef_asin.lo ef_atan2.lo ef_atanh.lo ef_cosh.lo \
+@USE_LIBTOOL_TRUE@ef_exp.lo ef_fmod.lo erf_gamma.lo ef_hypot.lo \
+@USE_LIBTOOL_TRUE@ef_j0.lo ef_j1.lo ef_jn.lo erf_lgamma.lo ef_log.lo \
+@USE_LIBTOOL_TRUE@ef_log10.lo ef_pow.lo ef_rem_pio2.lo ef_remainder.lo \
+@USE_LIBTOOL_TRUE@ef_scalb.lo ef_sinh.lo ef_sqrt.lo wf_acos.lo \
+@USE_LIBTOOL_TRUE@wf_acosh.lo wf_asin.lo wf_atan2.lo wf_atanh.lo \
+@USE_LIBTOOL_TRUE@wf_cosh.lo wf_exp.lo wf_fmod.lo wf_gamma.lo \
+@USE_LIBTOOL_TRUE@wrf_gamma.lo wf_hypot.lo wf_j0.lo wf_j1.lo wf_jn.lo \
+@USE_LIBTOOL_TRUE@wf_lgamma.lo wrf_lgamma.lo wf_log.lo wf_log10.lo \
+@USE_LIBTOOL_TRUE@wf_pow.lo wf_remainder.lo wf_scalb.lo wf_sinh.lo \
+@USE_LIBTOOL_TRUE@wf_sqrt.lo wf_cabs.lo wf_drem.lo sf_asinh.lo \
+@USE_LIBTOOL_TRUE@sf_atan.lo sf_ceil.lo sf_cos.lo sf_erf.lo sf_fabs.lo \
+@USE_LIBTOOL_TRUE@sf_floor.lo sf_frexp.lo sf_isnan.lo sf_ldexp.lo \
+@USE_LIBTOOL_TRUE@sf_signif.lo sf_sin.lo sf_tan.lo sf_tanh.lo \
+@USE_LIBTOOL_TRUE@sf_isinf.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LINK = $(CC) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
+LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
+DATA =  $(noinst_DATA)
+
 DIST_COMMON =  Makefile.am Makefile.in
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
-GZIP = --best
-SOURCES = $(lib_a_SOURCES)
-OBJECTS = $(lib_a_OBJECTS)
+TAR = gtar
+GZIP_ENV = --best
+SOURCES = $(lib_a_SOURCES) $(libmath_la_SOURCES)
+OBJECTS = $(lib_a_OBJECTS) $(libmath_la_OBJECTS)
 
-all: Makefile $(LIBRARIES)
-
+all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .def .o .s
-$(srcdir)/Makefile.in: @MAINT@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4)
+.SUFFIXES: .S .c .def .lo .o .s
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(srcdir)/../../Makefile.shared
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus math/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
@@ -226,16 +288,51 @@ distclean-compile:
 
 maintainer-clean-compile:
 
+.c.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+.s.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+.S.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+mostlyclean-libtool:
+	-rm -f *.lo
+
+clean-libtool:
+	-rm -rf .libs _libs
+
+distclean-libtool:
+
+maintainer-clean-libtool:
+
 lib.a: $(lib_a_OBJECTS) $(lib_a_DEPENDENCIES)
 	-rm -f lib.a
 	$(AR) cru lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
 	$(RANLIB) lib.a
 
+mostlyclean-noinstLTLIBRARIES:
+
+clean-noinstLTLIBRARIES:
+	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
+
+distclean-noinstLTLIBRARIES:
+
+maintainer-clean-noinstLTLIBRARIES:
+
+libmath.la: $(libmath_la_OBJECTS) $(libmath_la_DEPENDENCIES)
+	$(LINK)  $(libmath_la_LDFLAGS) $(libmath_la_OBJECTS) $(libmath_la_LIBADD) $(LIBS)
+
 tags: TAGS
 
 ID: $(HEADERS) $(SOURCES) $(LISP)
+	list='$(SOURCES) $(HEADERS)'; \
+	unique=`for i in $$list; do echo $$i; done | \
+	  awk '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
 	here=`pwd` && cd $(srcdir) \
-	  && mkid -f$$here/ID $(SOURCES) $(HEADERS) $(LISP)
+	  && mkid -f$$here/ID $$unique $(LISP)
 
 TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) $(LISP)
 	tags=; \
@@ -263,28 +360,39 @@ subdir = math
 distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
-	  test -f $(distdir)/$$file \
-	  || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
-	  || cp -p $$d/$$file $(distdir)/$$file; \
+	  if test -d $$d/$$file; then \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
+	  else \
+	    test -f $(distdir)/$$file \
+	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
+	    || cp -p $$d/$$file $(distdir)/$$file || :; \
+	  fi; \
 	done
-info:
-dvi:
-check:
-installcheck:
-install-info:
-install-exec: 
-	@$(NORMAL_INSTALL)
+info-am:
+info: info-am
+dvi-am:
+dvi: dvi-am
+check-am:
+check: check-am
+installcheck-am:
+installcheck: installcheck-am
+install-info-am: 
+install-info: install-info-am
+install-exec-am:
+install-exec: install-exec-am
 
-install-data: 
-	@$(NORMAL_INSTALL)
+install-data-am:
+install-data: install-data-am
 
-install: install-exec install-data all
-	@:
-
-uninstall: 
-
+install-am: all-am
+	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
+install: install-am
+uninstall-am:
+uninstall: uninstall-am
+all-am: Makefile $(LIBRARIES) $(LTLIBRARIES) $(DATA)
+all-redirect: all-am
 install-strip:
-	$(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM='$(INSTALL_PROGRAM) -s' INSTALL_SCRIPT='$(INSTALL_PROGRAM)' install
+	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
 installdirs:
 
 
@@ -298,31 +406,56 @@ distclean-generic:
 	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
 
 maintainer-clean-generic:
-mostlyclean:  mostlyclean-noinstLIBRARIES mostlyclean-compile \
+mostlyclean-am:  mostlyclean-noinstLIBRARIES mostlyclean-compile \
+		mostlyclean-libtool mostlyclean-noinstLTLIBRARIES \
 		mostlyclean-tags mostlyclean-generic
 
-clean:  clean-noinstLIBRARIES clean-compile clean-tags clean-generic \
-		mostlyclean
+mostlyclean: mostlyclean-am
 
-distclean:  distclean-noinstLIBRARIES distclean-compile distclean-tags \
-		distclean-generic clean
-	-rm -f config.status
+clean-am:  clean-noinstLIBRARIES clean-compile clean-libtool \
+		clean-noinstLTLIBRARIES clean-tags clean-generic \
+		mostlyclean-am
 
-maintainer-clean:  maintainer-clean-noinstLIBRARIES \
-		maintainer-clean-compile maintainer-clean-tags \
-		maintainer-clean-generic distclean
+clean: clean-am
+
+distclean-am:  distclean-noinstLIBRARIES distclean-compile \
+		distclean-libtool distclean-noinstLTLIBRARIES \
+		distclean-tags distclean-generic clean-am
+	-rm -f libtool
+
+distclean: distclean-am
+
+maintainer-clean-am:  maintainer-clean-noinstLIBRARIES \
+		maintainer-clean-compile maintainer-clean-libtool \
+		maintainer-clean-noinstLTLIBRARIES \
+		maintainer-clean-tags maintainer-clean-generic \
+		distclean-am
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
+
+maintainer-clean: maintainer-clean-am
 
 .PHONY: mostlyclean-noinstLIBRARIES distclean-noinstLIBRARIES \
 clean-noinstLIBRARIES maintainer-clean-noinstLIBRARIES \
 mostlyclean-compile distclean-compile clean-compile \
-maintainer-clean-compile tags mostlyclean-tags distclean-tags \
-clean-tags maintainer-clean-tags distdir info dvi installcheck \
-install-info install-exec install-data install uninstall all \
-installdirs mostlyclean-generic distclean-generic clean-generic \
+maintainer-clean-compile mostlyclean-libtool distclean-libtool \
+clean-libtool maintainer-clean-libtool mostlyclean-noinstLTLIBRARIES \
+distclean-noinstLTLIBRARIES clean-noinstLTLIBRARIES \
+maintainer-clean-noinstLTLIBRARIES tags mostlyclean-tags distclean-tags \
+clean-tags maintainer-clean-tags distdir info-am info dvi-am dvi check \
+check-am installcheck-am installcheck install-info-am install-info \
+install-exec-am install-exec install-data-am install-data install-am \
+install uninstall-am uninstall all-redirect all-am all installdirs \
+mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
+
+objectlist.awk.in: $(noinst_LTLIBRARIES)
+	-rm -f objectlist.awk.in
+	for i in `ls *.lo` ; \
+	do \
+	  echo $$i `pwd`/$$i >> objectlist.awk.in ; \
+	done
 
 .c.def:
 	$(CHEW) < $< > $*.def 2> $*.ref

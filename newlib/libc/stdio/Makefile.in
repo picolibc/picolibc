@@ -11,6 +11,7 @@
 # PARTICULAR PURPOSE.
 
 
+
 SHELL = @SHELL@
 
 srcdir = @srcdir@
@@ -64,7 +65,9 @@ AS = @AS@
 CC = @CC@
 CPP = @CPP@
 CRT0 = @CRT0@
+DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
+LDFLAGS = @LDFLAGS@
 LIBC_MACHINE_LIB = @LIBC_MACHINE_LIB@
 LIBC_POSIX_LIB = @LIBC_POSIX_LIB@
 LIBC_SIGNAL_DEF = @LIBC_SIGNAL_DEF@
@@ -72,23 +75,27 @@ LIBC_SIGNAL_LIB = @LIBC_SIGNAL_LIB@
 LIBC_SYSCALL_LIB = @LIBC_SYSCALL_LIB@
 LIBC_SYS_LIB = @LIBC_SYS_LIB@
 LIBC_UNIX_LIB = @LIBC_UNIX_LIB@
+LIBTOOL = @LIBTOOL@
+LN_S = @LN_S@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
+OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
+aext = @aext@
+libm_machine_dir = @libm_machine_dir@
 machine_dir = @machine_dir@
 newlib_basedir = @newlib_basedir@
+oext = @oext@
 sys_dir = @sys_dir@
 
 AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-noinst_LIBRARIES = lib.a
-
-lib_a_SOURCES = \
+LIB_SOURCES = \
 	clearerr.c 			\
 	fclose.c 			\
 	fdopen.c 			\
@@ -144,7 +151,6 @@ lib_a_SOURCES = \
 	tmpfile.c 			\
 	tmpnam.c 			\
 	ungetc.c 			\
-	vfprintf.c 			\
 	vfscanf.c 			\
 	vprintf.c 			\
 	vscanf.c			\
@@ -155,7 +161,20 @@ lib_a_SOURCES = \
 	wsetup.c 
 
 
-lib_a_LIBADD = vfiprintf.o
+LIBADD_OBJS = vfiprintf.$(oext) vfprintf.$(oext)
+
+libstdio_la_LDFLAGS = -Xcompiler -nostdlib
+
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libstdio.la
+@USE_LIBTOOL_TRUE@libstdio_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_SOURCES)
+@USE_LIBTOOL_TRUE@libstdio_la_LIBADD = @USE_LIBTOOL_TRUE@$(LIBADD_OBJS)
+@USE_LIBTOOL_TRUE@LIB_COMPILE = @USE_LIBTOOL_TRUE@$(LTCOMPILE)
+@USE_LIBTOOL_FALSE@LIB_COMPILE = @USE_LIBTOOL_FALSE@$(CC)
+@USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
+@USE_LIBTOOL_FALSE@noinst_DATA = 
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_SOURCES)
+@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(LIBADD_OBJS)
 
 CHEWOUT_FILES = \
 	clearerr.def		\
@@ -217,22 +236,45 @@ LIBRARIES =  $(noinst_LIBRARIES)
 
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
-LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
-lib_a_DEPENDENCIES =  vfiprintf.o
-lib_a_OBJECTS =  clearerr.o fclose.o fdopen.o feof.o ferror.o fflush.o \
-fgetc.o fgetpos.o fgets.o fileno.o findfp.o fiprintf.o flags.o fopen.o \
-fprintf.o fputc.o fputs.o fread.o freopen.o fscanf.o fseek.o fsetpos.o \
-ftell.o fvwrite.o fwalk.o fwrite.o getc.o getchar.o gets.o getw.o \
-iprintf.o makebuf.o mktemp.o perror.o printf.o putc.o putchar.o puts.o \
-putw.o refill.o remove.o rename.o rewind.o rget.o scanf.o setbuf.o \
-setvbuf.o siprintf.o snprintf.o sprintf.o sscanf.o stdio.o tmpfile.o \
-tmpnam.o ungetc.o vfprintf.o vfscanf.o vprintf.o vscanf.o vsnprintf.o \
-vsprintf.o vsscanf.o wbuf.o wsetup.o
+@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES =  vfiprintf.$(oext) \
+@USE_LIBTOOL_FALSE@vfprintf.$(oext)
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  clearerr.o fclose.o fdopen.o feof.o \
+@USE_LIBTOOL_FALSE@ferror.o fflush.o fgetc.o fgetpos.o fgets.o fileno.o \
+@USE_LIBTOOL_FALSE@findfp.o fiprintf.o flags.o fopen.o fprintf.o \
+@USE_LIBTOOL_FALSE@fputc.o fputs.o fread.o freopen.o fscanf.o fseek.o \
+@USE_LIBTOOL_FALSE@fsetpos.o ftell.o fvwrite.o fwalk.o fwrite.o getc.o \
+@USE_LIBTOOL_FALSE@getchar.o gets.o getw.o iprintf.o makebuf.o mktemp.o \
+@USE_LIBTOOL_FALSE@perror.o printf.o putc.o putchar.o puts.o putw.o \
+@USE_LIBTOOL_FALSE@refill.o remove.o rename.o rewind.o rget.o scanf.o \
+@USE_LIBTOOL_FALSE@setbuf.o setvbuf.o siprintf.o snprintf.o sprintf.o \
+@USE_LIBTOOL_FALSE@sscanf.o stdio.o tmpfile.o tmpnam.o ungetc.o \
+@USE_LIBTOOL_FALSE@vfscanf.o vprintf.o vscanf.o vsnprintf.o vsprintf.o \
+@USE_LIBTOOL_FALSE@vsscanf.o wbuf.o wsetup.o
+LTLIBRARIES =  $(noinst_LTLIBRARIES)
+
+@USE_LIBTOOL_TRUE@libstdio_la_DEPENDENCIES =  vfiprintf.$(oext) \
+@USE_LIBTOOL_TRUE@vfprintf.$(oext)
+@USE_LIBTOOL_TRUE@libstdio_la_OBJECTS =  clearerr.lo fclose.lo fdopen.lo \
+@USE_LIBTOOL_TRUE@feof.lo ferror.lo fflush.lo fgetc.lo fgetpos.lo \
+@USE_LIBTOOL_TRUE@fgets.lo fileno.lo findfp.lo fiprintf.lo flags.lo \
+@USE_LIBTOOL_TRUE@fopen.lo fprintf.lo fputc.lo fputs.lo fread.lo \
+@USE_LIBTOOL_TRUE@freopen.lo fscanf.lo fseek.lo fsetpos.lo ftell.lo \
+@USE_LIBTOOL_TRUE@fvwrite.lo fwalk.lo fwrite.lo getc.lo getchar.lo \
+@USE_LIBTOOL_TRUE@gets.lo getw.lo iprintf.lo makebuf.lo mktemp.lo \
+@USE_LIBTOOL_TRUE@perror.lo printf.lo putc.lo putchar.lo puts.lo \
+@USE_LIBTOOL_TRUE@putw.lo refill.lo remove.lo rename.lo rewind.lo \
+@USE_LIBTOOL_TRUE@rget.lo scanf.lo setbuf.lo setvbuf.lo siprintf.lo \
+@USE_LIBTOOL_TRUE@snprintf.lo sprintf.lo sscanf.lo stdio.lo tmpfile.lo \
+@USE_LIBTOOL_TRUE@tmpnam.lo ungetc.lo vfscanf.lo vprintf.lo vscanf.lo \
+@USE_LIBTOOL_TRUE@vsnprintf.lo vsprintf.lo vsscanf.lo wbuf.lo wsetup.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
+LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
+DATA =  $(noinst_DATA)
+
 DIST_COMMON =  Makefile.am Makefile.in
 
 
@@ -240,13 +282,13 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-SOURCES = $(lib_a_SOURCES)
-OBJECTS = $(lib_a_OBJECTS)
+SOURCES = $(lib_a_SOURCES) $(libstdio_la_SOURCES)
+OBJECTS = $(lib_a_OBJECTS) $(libstdio_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .def .o .s
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
+.SUFFIXES: .S .c .def .lo .o .s
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(srcdir)/../../Makefile.shared
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus stdio/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
@@ -282,10 +324,41 @@ distclean-compile:
 
 maintainer-clean-compile:
 
+.c.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+.s.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+.S.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+mostlyclean-libtool:
+	-rm -f *.lo
+
+clean-libtool:
+	-rm -rf .libs _libs
+
+distclean-libtool:
+
+maintainer-clean-libtool:
+
 lib.a: $(lib_a_OBJECTS) $(lib_a_DEPENDENCIES)
 	-rm -f lib.a
 	$(AR) cru lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
 	$(RANLIB) lib.a
+
+mostlyclean-noinstLTLIBRARIES:
+
+clean-noinstLTLIBRARIES:
+	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
+
+distclean-noinstLTLIBRARIES:
+
+maintainer-clean-noinstLTLIBRARIES:
+
+libstdio.la: $(libstdio_la_OBJECTS) $(libstdio_la_DEPENDENCIES)
+	$(LINK)  $(libstdio_la_LDFLAGS) $(libstdio_la_OBJECTS) $(libstdio_la_LIBADD) $(LIBS)
 
 tags: TAGS
 
@@ -352,7 +425,7 @@ install-am: all-am
 install: install-am
 uninstall-am:
 uninstall: uninstall-am
-all-am: Makefile $(LIBRARIES)
+all-am: Makefile $(LIBRARIES) $(LTLIBRARIES) $(DATA)
 all-redirect: all-am
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
@@ -370,23 +443,29 @@ distclean-generic:
 
 maintainer-clean-generic:
 mostlyclean-am:  mostlyclean-noinstLIBRARIES mostlyclean-compile \
+		mostlyclean-libtool mostlyclean-noinstLTLIBRARIES \
 		mostlyclean-tags mostlyclean-generic
 
 mostlyclean: mostlyclean-am
 
-clean-am:  clean-noinstLIBRARIES clean-compile clean-tags clean-generic \
+clean-am:  clean-noinstLIBRARIES clean-compile clean-libtool \
+		clean-noinstLTLIBRARIES clean-tags clean-generic \
 		mostlyclean-am
 
 clean: clean-am
 
 distclean-am:  distclean-noinstLIBRARIES distclean-compile \
+		distclean-libtool distclean-noinstLTLIBRARIES \
 		distclean-tags distclean-generic clean-am
+	-rm -f libtool
 
 distclean: distclean-am
 
 maintainer-clean-am:  maintainer-clean-noinstLIBRARIES \
-		maintainer-clean-compile maintainer-clean-tags \
-		maintainer-clean-generic distclean-am
+		maintainer-clean-compile maintainer-clean-libtool \
+		maintainer-clean-noinstLTLIBRARIES \
+		maintainer-clean-tags maintainer-clean-generic \
+		distclean-am
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 
@@ -395,7 +474,10 @@ maintainer-clean: maintainer-clean-am
 .PHONY: mostlyclean-noinstLIBRARIES distclean-noinstLIBRARIES \
 clean-noinstLIBRARIES maintainer-clean-noinstLIBRARIES \
 mostlyclean-compile distclean-compile clean-compile \
-maintainer-clean-compile tags mostlyclean-tags distclean-tags \
+maintainer-clean-compile mostlyclean-libtool distclean-libtool \
+clean-libtool maintainer-clean-libtool mostlyclean-noinstLTLIBRARIES \
+distclean-noinstLTLIBRARIES clean-noinstLTLIBRARIES \
+maintainer-clean-noinstLTLIBRARIES tags mostlyclean-tags distclean-tags \
 clean-tags maintainer-clean-tags distdir info-am info dvi-am dvi check \
 check-am installcheck-am installcheck install-info-am install-info \
 install-exec-am install-exec install-data-am install-data install-am \
@@ -404,8 +486,21 @@ mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
 
-vfiprintf.o: vfprintf.c
-	$(COMPILE) -DINTEGER_ONLY -c $(srcdir)/vfprintf.c -o $@
+objectlist.awk.in: $(noinst_LTLIBRARIES)
+	-rm -f objectlist.awk.in
+	for i in `ls *.lo` ; \
+	do \
+	  echo $$i `pwd`/$$i >> objectlist.awk.in ; \
+	done
+
+# This rule is needed so that libtool compiles vfiprintf before vfprintf. Otherwise
+# libtool moves vfprintf.o and subsequently can't find it.
+
+vfprintf.$(oext): vfprintf.c
+	$(LIB_COMPILE) -c $(srcdir)/vfprintf.c
+
+vfiprintf.$(oext): vfprintf.c
+	$(LIB_COMPILE) -DINTEGER_ONLY -c $(srcdir)/vfprintf.c -o $@
 
 .c.def:
 	$(CHEW) < $< > $*.def 2> $*.ref
@@ -414,37 +509,37 @@ vfiprintf.o: vfprintf.c
 doc: $(CHEWOUT_FILES)
 	cat $(srcdir)/stdio.tex >> $(TARGETDOC)
 
-fclose.o: local.h
-fdopen.o: local.h
-fflush.o: local.h
-findfp.o: local.h
-fopen.o: local.h
-fputs.o: fvwrite.h
-fread.o: local.h
-freopen.o: local.h
-fseek.o: local.h
-ftell.o: local.h
-fvwrite.o: local.h fvwrite.h
-fwalk.o: local.h
-fwrite.o: local.h fvwrite.h
-makebuf.o: local.h
-puts.o: fvwrite.h
-refill.o: local.h
-scanf.o: local.h
-setbuf.o: local.h
-setvbuf.o: local.h
-siprintf.o: local.h
-sprintf.o: local.h
-sscanf.o: local.h
-stdio.o: local.h
-ungetc.o: local.h
-vfiprintf.o: local.h
-vfprintf.o: local.h
-vfscanf.o: local.h floatio.h
-vscanf.o: local.h
-vsscanf.o: local.h
-wbuf.o: local.h fvwrite.h
-wsetup.o: local.h
+fclose.$(oext): local.h
+fdopen.$(oext): local.h
+fflush.$(oext): local.h
+findfp.$(oext): local.h
+fopen.$(oext): local.h
+fputs.$(oext): fvwrite.h
+fread.$(oext): local.h
+freopen.$(oext): local.h
+fseek.$(oext): local.h
+ftell.$(oext): local.h
+fvwrite.$(oext): local.h fvwrite.h
+fwalk.$(oext): local.h
+fwrite.$(oext): local.h fvwrite.h
+makebuf.$(oext): local.h
+puts.$(oext): fvwrite.h
+refill.$(oext): local.h
+scanf.$(oext): local.h
+setbuf.$(oext): local.h
+setvbuf.$(oext): local.h
+siprintf.$(oext): local.h
+sprintf.$(oext): local.h
+sscanf.$(oext): local.h
+stdio.$(oext): local.h
+ungetc.$(oext): local.h
+vfiprintf.$(oext): local.h
+vfprintf.$(oext): local.h
+vfscanf.$(oext): local.h floatio.h
+vscanf.$(oext): local.h
+vsscanf.$(oext): local.h
+wbuf.$(oext): local.h fvwrite.h
+wsetup.$(oext): local.h
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -11,6 +11,7 @@
 # PARTICULAR PURPOSE.
 
 
+
 SHELL = @SHELL@
 
 srcdir = @srcdir@
@@ -64,7 +65,9 @@ AS = @AS@
 CC = @CC@
 CPP = @CPP@
 CRT0 = @CRT0@
+DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
+LDFLAGS = @LDFLAGS@
 LIBC_MACHINE_LIB = @LIBC_MACHINE_LIB@
 LIBC_POSIX_LIB = @LIBC_POSIX_LIB@
 LIBC_SIGNAL_DEF = @LIBC_SIGNAL_DEF@
@@ -72,23 +75,36 @@ LIBC_SIGNAL_LIB = @LIBC_SIGNAL_LIB@
 LIBC_SYSCALL_LIB = @LIBC_SYSCALL_LIB@
 LIBC_SYS_LIB = @LIBC_SYS_LIB@
 LIBC_UNIX_LIB = @LIBC_UNIX_LIB@
+LIBTOOL = @LIBTOOL@
+LN_S = @LN_S@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
+OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
+aext = @aext@
+libm_machine_dir = @libm_machine_dir@
 machine_dir = @machine_dir@
 newlib_basedir = @newlib_basedir@
+oext = @oext@
 sys_dir = @sys_dir@
 
 AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-noinst_LIBRARIES = lib.a
+LIB_SOURCES = errno.c
 
-lib_a_SOURCES = errno.c
+liberrno_la_LDFLAGS = -Xcompiler -nostdlib
+
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@liberrno.la
+@USE_LIBTOOL_TRUE@liberrno_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_SOURCES)
+@USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
+@USE_LIBTOOL_FALSE@noinst_DATA = 
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_SOURCES)
 
 CHEWOUT_FILES = 
 
@@ -106,28 +122,34 @@ LIBRARIES =  $(noinst_LIBRARIES)
 
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
-LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 lib_a_LIBADD = 
-lib_a_OBJECTS =  errno.o
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  errno.o
+LTLIBRARIES =  $(noinst_LTLIBRARIES)
+
+liberrno_la_LIBADD = 
+@USE_LIBTOOL_TRUE@liberrno_la_OBJECTS =  errno.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
+LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
+DATA =  $(noinst_DATA)
+
 DIST_COMMON =  Makefile.am Makefile.in
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
+TAR = gtar
 GZIP_ENV = --best
-SOURCES = $(lib_a_SOURCES)
-OBJECTS = $(lib_a_OBJECTS)
+SOURCES = $(lib_a_SOURCES) $(liberrno_la_SOURCES)
+OBJECTS = $(lib_a_OBJECTS) $(liberrno_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .def .o .s
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
+.SUFFIXES: .S .c .def .lo .o .s
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(srcdir)/../../Makefile.shared
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus errno/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
@@ -163,10 +185,41 @@ distclean-compile:
 
 maintainer-clean-compile:
 
+.c.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+.s.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+.S.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+mostlyclean-libtool:
+	-rm -f *.lo
+
+clean-libtool:
+	-rm -rf .libs _libs
+
+distclean-libtool:
+
+maintainer-clean-libtool:
+
 lib.a: $(lib_a_OBJECTS) $(lib_a_DEPENDENCIES)
 	-rm -f lib.a
 	$(AR) cru lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
 	$(RANLIB) lib.a
+
+mostlyclean-noinstLTLIBRARIES:
+
+clean-noinstLTLIBRARIES:
+	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
+
+distclean-noinstLTLIBRARIES:
+
+maintainer-clean-noinstLTLIBRARIES:
+
+liberrno.la: $(liberrno_la_OBJECTS) $(liberrno_la_DEPENDENCIES)
+	$(LINK)  $(liberrno_la_LDFLAGS) $(liberrno_la_OBJECTS) $(liberrno_la_LIBADD) $(LIBS)
 
 tags: TAGS
 
@@ -205,7 +258,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
@@ -233,7 +286,7 @@ install-am: all-am
 install: install-am
 uninstall-am:
 uninstall: uninstall-am
-all-am: Makefile $(LIBRARIES)
+all-am: Makefile $(LIBRARIES) $(LTLIBRARIES) $(DATA)
 all-redirect: all-am
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
@@ -251,23 +304,29 @@ distclean-generic:
 
 maintainer-clean-generic:
 mostlyclean-am:  mostlyclean-noinstLIBRARIES mostlyclean-compile \
+		mostlyclean-libtool mostlyclean-noinstLTLIBRARIES \
 		mostlyclean-tags mostlyclean-generic
 
 mostlyclean: mostlyclean-am
 
-clean-am:  clean-noinstLIBRARIES clean-compile clean-tags clean-generic \
+clean-am:  clean-noinstLIBRARIES clean-compile clean-libtool \
+		clean-noinstLTLIBRARIES clean-tags clean-generic \
 		mostlyclean-am
 
 clean: clean-am
 
 distclean-am:  distclean-noinstLIBRARIES distclean-compile \
+		distclean-libtool distclean-noinstLTLIBRARIES \
 		distclean-tags distclean-generic clean-am
+	-rm -f libtool
 
 distclean: distclean-am
 
 maintainer-clean-am:  maintainer-clean-noinstLIBRARIES \
-		maintainer-clean-compile maintainer-clean-tags \
-		maintainer-clean-generic distclean-am
+		maintainer-clean-compile maintainer-clean-libtool \
+		maintainer-clean-noinstLTLIBRARIES \
+		maintainer-clean-tags maintainer-clean-generic \
+		distclean-am
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 
@@ -276,7 +335,10 @@ maintainer-clean: maintainer-clean-am
 .PHONY: mostlyclean-noinstLIBRARIES distclean-noinstLIBRARIES \
 clean-noinstLIBRARIES maintainer-clean-noinstLIBRARIES \
 mostlyclean-compile distclean-compile clean-compile \
-maintainer-clean-compile tags mostlyclean-tags distclean-tags \
+maintainer-clean-compile mostlyclean-libtool distclean-libtool \
+clean-libtool maintainer-clean-libtool mostlyclean-noinstLTLIBRARIES \
+distclean-noinstLTLIBRARIES clean-noinstLTLIBRARIES \
+maintainer-clean-noinstLTLIBRARIES tags mostlyclean-tags distclean-tags \
 clean-tags maintainer-clean-tags distdir info-am info dvi-am dvi check \
 check-am installcheck-am installcheck install-info-am install-info \
 install-exec-am install-exec install-data-am install-data install-am \
@@ -284,6 +346,13 @@ install uninstall-am uninstall all-redirect all-am all installdirs \
 mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
+
+objectlist.awk.in: $(noinst_LTLIBRARIES)
+	-rm -f objectlist.awk.in
+	for i in `ls *.lo` ; \
+	do \
+	  echo $$i `pwd`/$$i >> objectlist.awk.in ; \
+	done
 
 .c.def:
 	$(CHEW) < $< > $*.def 2> $*.ref

@@ -874,7 +874,7 @@ echo "$ac_t""$host" 1>&6
 
 PACKAGE=newlib
 
-VERSION=1.9.0
+VERSION=1.10.0
 
 if test "`cd $srcdir && pwd`" != "`pwd`" && test -f $srcdir/config.status; then
   { echo "configure: error: source directory already configured; run "make distclean" there first" 1>&2; exit 1; }
@@ -1405,6 +1405,22 @@ newlib_cflags="${newlib_cflags} -fno-builtin"
 NEWLIB_CFLAGS=${newlib_cflags}
 
 
+LDFLAGS=${ldflags}
+
+
+
+
+if test x${use_libtool} = xyes; then
+  USE_LIBTOOL_TRUE=
+  USE_LIBTOOL_FALSE='#'
+else
+  USE_LIBTOOL_TRUE='#'
+  USE_LIBTOOL_FALSE=
+fi
+
+
+
+
 
 
 
@@ -1424,7 +1440,7 @@ if test "x$cross_compiling" = "xno"; then
   EXEEXT_FOR_BUILD='$(EXEEXT)'
 else
   echo $ac_n "checking for build system executable suffix""... $ac_c" 1>&6
-echo "configure:1428: checking for build system executable suffix" >&5
+echo "configure:1444: checking for build system executable suffix" >&5
 if eval "test \"`echo '$''{'newlib_cv_build_exeext'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -1621,6 +1637,11 @@ s%@MAINTAINER_MODE_FALSE@%$MAINTAINER_MODE_FALSE%g
 s%@MAINT@%$MAINT%g
 s%@EXEEXT@%$EXEEXT%g
 s%@NEWLIB_CFLAGS@%$NEWLIB_CFLAGS%g
+s%@USE_LIBTOOL_TRUE@%$USE_LIBTOOL_TRUE%g
+s%@USE_LIBTOOL_FALSE@%$USE_LIBTOOL_FALSE%g
+s%@oext@%$oext%g
+s%@aext@%$aext%g
+s%@libm_machine_dir@%$libm_machine_dir%g
 s%@machine_dir@%$machine_dir%g
 s%@sys_dir@%$sys_dir%g
 s%@CC_FOR_BUILD@%$CC_FOR_BUILD%g
@@ -1633,7 +1654,7 @@ cat >> $CONFIG_STATUS <<\EOF
 
 # Split the substitutions into bite-sized pieces for seds with
 # small command number limits, like on Digital OSF/1 and HP-UX.
-ac_max_sed_cmds=90 # Maximum number of lines to put in a sed script.
+ac_max_sed_cmds=60 # Maximum number of lines to put in a sed script.
 ac_file=1 # Number of current file.
 ac_beg=1 # First line for current file.
 ac_end=$ac_max_sed_cmds # Line after last line for current file.

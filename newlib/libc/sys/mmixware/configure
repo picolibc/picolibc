@@ -874,7 +874,7 @@ echo "$ac_t""$host" 1>&6
 
 PACKAGE=newlib
 
-VERSION=1.9.0
+VERSION=1.10.0
 
 if test "`cd $srcdir && pwd`" != "`pwd`" && test -f $srcdir/config.status; then
   { echo "configure: error: source directory already configured; run "make distclean" there first" 1>&2; exit 1; }
@@ -1405,6 +1405,22 @@ newlib_cflags="${newlib_cflags} -fno-builtin"
 NEWLIB_CFLAGS=${newlib_cflags}
 
 
+LDFLAGS=${ldflags}
+
+
+
+
+if test x${use_libtool} = xyes; then
+  USE_LIBTOOL_TRUE=
+  USE_LIBTOOL_FALSE='#'
+else
+  USE_LIBTOOL_TRUE='#'
+  USE_LIBTOOL_FALSE=
+fi
+
+
+
+
 
 
 
@@ -1585,6 +1601,11 @@ s%@MAINTAINER_MODE_FALSE@%$MAINTAINER_MODE_FALSE%g
 s%@MAINT@%$MAINT%g
 s%@EXEEXT@%$EXEEXT%g
 s%@NEWLIB_CFLAGS@%$NEWLIB_CFLAGS%g
+s%@USE_LIBTOOL_TRUE@%$USE_LIBTOOL_TRUE%g
+s%@USE_LIBTOOL_FALSE@%$USE_LIBTOOL_FALSE%g
+s%@oext@%$oext%g
+s%@aext@%$aext%g
+s%@libm_machine_dir@%$libm_machine_dir%g
 s%@machine_dir@%$machine_dir%g
 s%@sys_dir@%$sys_dir%g
 

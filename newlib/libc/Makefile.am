@@ -23,26 +23,52 @@ endif
 SUBDIRS = stdlib ctype stdio string $(SIGNAL_SUBDIR) time locale sys reent \
 	errno misc machine $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) .
 
-noinst_LIBRARIES = libc.a
 noinst_DATA = $(CRT0)
 
+if USE_LIBTOOL
+noinst_LTLIBRARIES = libc.la
 SUBLIBS = \
-	stdlib/lib.a \
-	ctype/lib.a \
-	stdio/lib.a \
-	string/lib.a \
+	stdlib/libstdlib.$(aext) \
+	ctype/libctype.$(aext) \
+	stdio/libstdio.$(aext) \
+	string/libstring.$(aext) \
 	$(LIBC_SIGNAL_LIB) \
-	time/lib.a \
-	locale/lib.a \
+	time/libtime.$(aext) \
+	locale/liblocale.$(aext) \
 	$(LIBC_SYS_LIB) \
-	reent/lib.a \
-	errno/lib.a \
-	misc/lib.a \
+	reent/libreent.$(aext) \
+	errno/liberrno.$(aext) \
+	misc/libmisc.$(aext) \
 	$(LIBC_MACHINE_LIB) \
 	$(LIBC_UNIX_LIB) \
 	$(LIBC_POSIX_LIB) \
 	$(LIBC_SYSCALL_LIB)
+else
+noinst_LIBRARIES = libc.a
+SUBLIBS = \
+	stdlib/lib.$(aext) \
+	ctype/lib.$(aext) \
+	stdio/lib.$(aext) \
+	string/lib.$(aext) \
+	$(LIBC_SIGNAL_LIB) \
+	time/lib.$(aext) \
+	locale/lib.$(aext) \
+	$(LIBC_SYS_LIB) \
+	reent/lib.$(aext) \
+	errno/lib.$(aext) \
+	misc/lib.$(aext) \
+	$(LIBC_MACHINE_LIB) \
+	$(LIBC_UNIX_LIB) \
+	$(LIBC_POSIX_LIB) \
+	$(LIBC_SYSCALL_LIB)
+endif
 
+libc_la_LDFLAGS = -Xcompiler -nostdlib
+
+if USE_LIBTOOL
+libc_la_SOURCES =
+libc_la_LIBADD = $(SUBLIBS)
+else
 libc.a: $(SUBLIBS)
 	rm -f $@
 	rm -rf tmp
@@ -54,6 +80,7 @@ libc.a: $(SUBLIBS)
 	$(AR) $(AR_FLAGS) ../$@ *.o
 	$(RANLIB) $@
 	rm -rf tmp
+endif # USE_LIBTOOL
 
 $(SUBLIBS): ; @true
 
@@ -112,7 +139,7 @@ $(SUBDEFS): stmp-targetdep ; @true
 .PHONY: force
 force:
 
-CLEANFILES = crt0.o \
+CLEANFILES = $(CRT0) \
 	sigset.texi stmp-sigset tmp.texi targetdep.tex stmp-targetdep
 
 ACLOCAL_AMFLAGS = -I ..

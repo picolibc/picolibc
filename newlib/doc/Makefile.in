@@ -66,14 +66,18 @@ CC_FOR_BUILD = @CC_FOR_BUILD@
 CPP = @CPP@
 EXEEXT = @EXEEXT@
 EXEEXT_FOR_BUILD = @EXEEXT_FOR_BUILD@
+LDFLAGS = @LDFLAGS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
+aext = @aext@
+libm_machine_dir = @libm_machine_dir@
 machine_dir = @machine_dir@
 newlib_basedir = @newlib_basedir@
+oext = @oext@
 sys_dir = @sys_dir@
 
 AUTOMAKE_OPTIONS = cygnus
@@ -95,7 +99,7 @@ DIST_COMMON =  Makefile.am Makefile.in aclocal.m4 configure configure.in
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
+TAR = gtar
 GZIP_ENV = --best
 all: all-redirect
 .SUFFIXES:
@@ -159,7 +163,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \

@@ -64,28 +64,36 @@ AS = @AS@
 CC = @CC@
 CPP = @CPP@
 CRT0 = @CRT0@
+DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
+LDFLAGS = @LDFLAGS@
+LIBTOOL = @LIBTOOL@
+LN_S = @LN_S@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
+OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
+aext = @aext@
+libm_machine_dir = @libm_machine_dir@
 machine_dir = @machine_dir@
 newlib_basedir = @newlib_basedir@
+oext = @oext@
 sys_dir = @sys_dir@
 
 AUTOMAKE_OPTIONS = cygnus
 
 SUBDIRS = $(sys_dir) .
 
-@HAVE_SYS_DIR_TRUE@SYSLIB = \
-@HAVE_SYS_DIR_TRUE@lib.a
+@HAVE_SYS_DIR_TRUE@SYSLIB = @HAVE_SYS_DIR_TRUE@lib.a
 
-noinst_LIBRARIES = $(SYSLIB)
 noinst_DATA = $(CRT0)
 
-CLEANFILES = crt0.o
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@$(SYSLIB)
+
+CLEANFILES = $(CRT0)
 
 ACLOCAL_AMFLAGS = -I ../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
@@ -97,15 +105,15 @@ LIBRARIES =  $(noinst_LIBRARIES)
 
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
-LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 lib_a_LIBADD = 
 lib_a_SOURCES = lib.a.c
 lib_a_OBJECTS =  lib.a.o
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
+LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
 DATA =  $(noinst_DATA)
 
 DIST_COMMON =  Makefile.am Makefile.in aclocal.m4 configure configure.in
@@ -113,14 +121,14 @@ DIST_COMMON =  Makefile.am Makefile.in aclocal.m4 configure configure.in
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
+TAR = gtar
 GZIP_ENV = --best
 SOURCES = lib.a.c
 OBJECTS = lib.a.o
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .o .s
+.SUFFIXES: .S .c .lo .o .s
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus Makefile
 
@@ -164,6 +172,25 @@ distclean-compile:
 	-rm -f *.tab.c
 
 maintainer-clean-compile:
+
+.c.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+.s.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+.S.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+mostlyclean-libtool:
+	-rm -f *.lo
+
+clean-libtool:
+	-rm -rf .libs _libs
+
+distclean-libtool:
+
+maintainer-clean-libtool:
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run `make' without going through this Makefile.
@@ -295,7 +322,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
@@ -352,24 +379,28 @@ distclean-generic:
 
 maintainer-clean-generic:
 mostlyclean-am:  mostlyclean-noinstLIBRARIES mostlyclean-compile \
-		mostlyclean-tags mostlyclean-generic
+		mostlyclean-libtool mostlyclean-tags \
+		mostlyclean-generic
 
 mostlyclean: mostlyclean-recursive
 
-clean-am:  clean-noinstLIBRARIES clean-compile clean-tags clean-generic \
-		mostlyclean-am
+clean-am:  clean-noinstLIBRARIES clean-compile clean-libtool clean-tags \
+		clean-generic mostlyclean-am
 
 clean: clean-recursive
 
 distclean-am:  distclean-noinstLIBRARIES distclean-compile \
-		distclean-tags distclean-generic clean-am
+		distclean-libtool distclean-tags distclean-generic \
+		clean-am
+	-rm -f libtool
 
 distclean: distclean-recursive
 	-rm -f config.status
 
 maintainer-clean-am:  maintainer-clean-noinstLIBRARIES \
-		maintainer-clean-compile maintainer-clean-tags \
-		maintainer-clean-generic distclean-am
+		maintainer-clean-compile maintainer-clean-libtool \
+		maintainer-clean-tags maintainer-clean-generic \
+		distclean-am
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 
@@ -379,7 +410,8 @@ maintainer-clean: maintainer-clean-recursive
 .PHONY: mostlyclean-noinstLIBRARIES distclean-noinstLIBRARIES \
 clean-noinstLIBRARIES maintainer-clean-noinstLIBRARIES \
 mostlyclean-compile distclean-compile clean-compile \
-maintainer-clean-compile install-data-recursive \
+maintainer-clean-compile mostlyclean-libtool distclean-libtool \
+clean-libtool maintainer-clean-libtool install-data-recursive \
 uninstall-data-recursive install-exec-recursive \
 uninstall-exec-recursive installdirs-recursive uninstalldirs-recursive \
 all-recursive check-recursive installcheck-recursive info-recursive \
@@ -394,19 +426,19 @@ clean-generic maintainer-clean-generic clean mostlyclean distclean \
 maintainer-clean
 
 
-lib.a: $(sys_dir)/lib.a
+@USE_LIBTOOL_FALSE@lib.a: $(sys_dir)/lib.a
+@USE_LIBTOOL_FALSE@	rm -f $@
+@USE_LIBTOOL_FALSE@	ln $(sys_dir)/lib.a $@ >/dev/null 2>/dev/null \
+@USE_LIBTOOL_FALSE@	 || cp $(sys_dir)/lib.a $@
+
+$(sys_dir)/libsys.$(aext): ; @true
+
+$(CRT0): $(sys_dir)/$(CRT0)
 	rm -f $@
-	ln $(sys_dir)/lib.a $@ >/dev/null 2>/dev/null \
-	 || cp $(sys_dir)/lib.a $@
+	ln $(sys_dir)/$(CRT0) $@ >/dev/null 2>/dev/null \
+	 || cp $(sys_dir)/$(CRT0) $@
 
-$(sys_dir)/lib.a: ; @true
-
-crt0.o: $(sys_dir)/crt0.o
-	rm -f $@
-	ln $(sys_dir)/crt0.o $@ >/dev/null 2>/dev/null \
-	 || cp $(sys_dir)/crt0.o $@
-
-$(sys_dir)/crt0.o: ; @true
+$(sys_dir)/$(CRT0): ; @true
 
 doc:
 

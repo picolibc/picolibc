@@ -10,6 +10,14 @@ MULTISUBDIR =
 MULTIDO = true
 MULTICLEAN = true
 
+LIBTOOL_VERSION_INFO = 0:0:0
+
+if NEWLIB_HW_FP
+MATHDIR = mathfp
+else
+MATHDIR = math
+endif
+
 # Work around what appears to be a GNU make bug handling MAKEFLAGS
 # values defined in terms of make variables, as is the case for CC and
 # friends when we are called from the top level Makefile.
@@ -58,20 +66,74 @@ toollibdir = $(tooldir)/lib$(MULTISUBDIR)
 
 AR_FLAGS = rc
 
+if USE_LIBTOOL
+toollib_LTLIBRARIES = libm.la libc.la
+else
 toollib_LIBRARIES = libm.a libc.a
-toollib_DATA = $(CRT0)
+endif
+
 noinst_DATA = stmp-targ-include
+
+toollib_DATA = $(CRT0)
+
 
 # The functions ldexp, frexp and modf are traditionally supplied in
 # both libc.a and libm.a.  We build them in libm.a and copy them over,
 # along with some required supporting routines.
 MATHOBJS_IN_LIBC = \
-	s_isinf.o sf_isinf.o \
-	s_isnan.o sf_isnan.o \
-	s_ldexp.o sf_ldexp.o \
-	s_frexp.o sf_frexp.o s_modf.o sf_modf.o \
-	s_scalbn.o sf_scalbn.o s_finite.o sf_finite.o \
-	s_copysign.o sf_copysign.o s_infconst.o
+	s_isinf.$(oext) sf_isinf.$(oext) \
+	s_isnan.$(oext) sf_isnan.$(oext) \
+	s_ldexp.$(oext) sf_ldexp.$(oext) \
+	s_frexp.$(oext) sf_frexp.$(oext) \
+	s_modf.$(oext) \
+	sf_modf.$(oext) s_scalbn.$(oext) \
+	sf_scalbn.$(oext) \
+	s_finite.$(oext) sf_finite.$(oext) \
+	s_copysign.$(oext) sf_copysign.$(oext) \
+	s_infconst.$(oext)
+
+LIBC_OBJECTLISTS = \
+	$(POSIX_OBJECTLIST) \
+	$(SIGNAL_OBJECTLIST) \
+	$(SYSCALL_OBJECTLIST) \
+	$(UNIX_OBJECTLIST) \
+	libc/stdlib/objectlist.awk.in \
+	libc/time/objectlist.awk.in \
+	libc/ctype/objectlist.awk.in \
+	libc/string/objectlist.awk.in \
+	libc/locale/objectlist.awk.in \
+	libc/misc/objectlist.awk.in \
+	libc/reent/objectlist.awk.in \
+	libc/errno/objectlist.awk.in \
+	libc/stdio/objectlist.awk.in \
+	$(MACHINE_OBJECTLIST) \
+	$(SYS_OBJECTLIST)
+
+LIBM_OBJECTLISTS = \
+	libm/$(MATHDIR)/objectlist.awk.in \
+	libm/common/objectlist.awk.in \
+	$(LIBM_MACHINE_OBJECTLIST)
+
+libm_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/libc/sys/linux/shared.ld `cat libm-libtool-objectlist`
+
+libc_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/libc/sys/linux/shared.ld `cat libc-libtool-objectlist`
+
+if USE_LIBTOOL
+libm_la_SOURCES =
+libm_la_DEPENDENCIES = libm-libtool-objectlist
+
+# objects listed later in LIBM_OBJECTLISTS will override those listed earlier
+libm-libtool-objectlist: $(LIBM_OBJECTLISTS)
+	cat $(LIBM_OBJECTLISTS) | $(AWK) '{ libm[$$1] = $$2 }; END { for (x in libm) printf ("%s\n", libm[x]) }' > $@
+
+libc_la_SOURCES =
+libc_la_DEPENDENCIES = libc-libtool-objectlist
+
+# objects listed later in LIBM_OBJECTLISTS and LIBC_OBJECTLISTS will override those listed earlier
+libc-libtool-objectlist: $(LIBM_OBJECTLISTS) $(LIBC_OBJECTLISTS)
+	cat $(LIBM_OBJECTLISTS) $(LIBC_OBJECTLISTS) |  $(AWK) '{ libc[$$1] = $$2 }; END { for (x in libc) printf ("%s\n", libc[x]) }' > $@
+
+else
 
 libc.a: libc/libc.a libm.a
 	rm -rf libc.a libg.a tmp
@@ -91,6 +153,8 @@ libm.a: libm/libm.a
 	ln libm/libm.a $@ >/dev/null 2>/dev/null || cp libm/libm.a $@
 
 libm/libm.a: ; @true
+
+endif # USE_LIBTOOL
 
 crt0.o: $(CRT0_DIR)/$(CRT0)
 	rm -f $@
@@ -127,8 +191,11 @@ stmp-targ-include: config.status
 CLEANFILES = targ-include stmp-targ-include
 
 install-data-local:	install-toollibLIBRARIES
+if USE_LIBTOOL
+else
 	rm -f $(DESTDIR)$(toollibdir)/libg.a
 	ln $(DESTDIR)$(toollibdir)/libc.a $(DESTDIR)$(toollibdir)/libg.a >/dev/null 2>/dev/null || cp $(DESTDIR)$(toollibdir)/libc.a $(DESTDIR)$(toollibdir)/libg.a
+endif
 	$(MULTIDO) $(AM_MAKEFLAGS) DO=install multi-do
 	-if [ -z "$(MULTISUBDIR)" ]; then \
 	  $(mkinstalldirs) $(DESTDIR)$(tooldir)/include; \

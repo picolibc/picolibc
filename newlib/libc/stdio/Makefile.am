@@ -4,9 +4,7 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-noinst_LIBRARIES = lib.a
-
-lib_a_SOURCES = \
+LIB_SOURCES = \
 	clearerr.c 			\
 	fclose.c 			\
 	fdopen.c 			\
@@ -62,7 +60,6 @@ lib_a_SOURCES = \
 	tmpfile.c 			\
 	tmpnam.c 			\
 	ungetc.c 			\
-	vfprintf.c 			\
 	vfscanf.c 			\
 	vprintf.c 			\
 	vscanf.c			\
@@ -72,10 +69,34 @@ lib_a_SOURCES = \
 	wbuf.c 				\
 	wsetup.c 
 
-lib_a_LIBADD = vfiprintf.o
+LIBADD_OBJS = vfiprintf.$(oext) vfprintf.$(oext)
 
-vfiprintf.o: vfprintf.c
-	$(COMPILE) -DINTEGER_ONLY -c $(srcdir)/vfprintf.c -o $@
+libstdio_la_LDFLAGS = -Xcompiler -nostdlib
+
+if USE_LIBTOOL
+noinst_LTLIBRARIES = libstdio.la
+libstdio_la_SOURCES = $(LIB_SOURCES)
+libstdio_la_LIBADD = $(LIBADD_OBJS)
+LIB_COMPILE = $(LTCOMPILE)
+noinst_DATA = objectlist.awk.in
+else
+noinst_LIBRARIES = lib.a
+lib_a_SOURCES = $(LIB_SOURCES)
+lib_a_LIBADD = $(LIBADD_OBJS)
+LIB_COMPILE = $(CC)
+noinst_DATA =
+endif # USE_LIBTOOL
+
+include $(srcdir)/../../Makefile.shared
+
+# This rule is needed so that libtool compiles vfiprintf before vfprintf. Otherwise
+# libtool moves vfprintf.o and subsequently can't find it.
+
+vfprintf.$(oext): vfprintf.c
+	$(LIB_COMPILE) -c $(srcdir)/vfprintf.c
+
+vfiprintf.$(oext): vfprintf.c
+	$(LIB_COMPILE) -DINTEGER_ONLY -c $(srcdir)/vfprintf.c -o $@
 
 CHEWOUT_FILES = \
 	clearerr.def		\
@@ -137,34 +158,34 @@ doc: $(CHEWOUT_FILES)
 
 CLEANFILES = $(CHEWOUT_FILES) *.ref
 
-fclose.o: local.h
-fdopen.o: local.h
-fflush.o: local.h
-findfp.o: local.h
-fopen.o: local.h
-fputs.o: fvwrite.h
-fread.o: local.h
-freopen.o: local.h
-fseek.o: local.h
-ftell.o: local.h
-fvwrite.o: local.h fvwrite.h
-fwalk.o: local.h
-fwrite.o: local.h fvwrite.h
-makebuf.o: local.h
-puts.o: fvwrite.h
-refill.o: local.h
-scanf.o: local.h
-setbuf.o: local.h
-setvbuf.o: local.h
-siprintf.o: local.h
-sprintf.o: local.h
-sscanf.o: local.h
-stdio.o: local.h
-ungetc.o: local.h
-vfiprintf.o: local.h
-vfprintf.o: local.h
-vfscanf.o: local.h floatio.h
-vscanf.o: local.h
-vsscanf.o: local.h
-wbuf.o: local.h fvwrite.h
-wsetup.o: local.h
+fclose.$(oext): local.h
+fdopen.$(oext): local.h
+fflush.$(oext): local.h
+findfp.$(oext): local.h
+fopen.$(oext): local.h
+fputs.$(oext): fvwrite.h
+fread.$(oext): local.h
+freopen.$(oext): local.h
+fseek.$(oext): local.h
+ftell.$(oext): local.h
+fvwrite.$(oext): local.h fvwrite.h
+fwalk.$(oext): local.h
+fwrite.$(oext): local.h fvwrite.h
+makebuf.$(oext): local.h
+puts.$(oext): fvwrite.h
+refill.$(oext): local.h
+scanf.$(oext): local.h
+setbuf.$(oext): local.h
+setvbuf.$(oext): local.h
+siprintf.$(oext): local.h
+sprintf.$(oext): local.h
+sscanf.$(oext): local.h
+stdio.$(oext): local.h
+ungetc.$(oext): local.h
+vfiprintf.$(oext): local.h
+vfprintf.$(oext): local.h
+vfscanf.$(oext): local.h floatio.h
+vscanf.$(oext): local.h
+vsscanf.$(oext): local.h
+wbuf.$(oext): local.h fvwrite.h
+wsetup.$(oext): local.h

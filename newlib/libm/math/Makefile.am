@@ -4,8 +4,6 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = -I$(srcdir)/../common $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-noinst_LIBRARIES = lib.a
-
 src = 	k_standard.c k_rem_pio2.c \
 	k_cos.c k_sin.c k_tan.c \
 	e_acos.c e_acosh.c e_asin.c e_atan2.c \
@@ -50,7 +48,19 @@ fsrc =	kf_rem_pio2.c \
 	sf_tan.c sf_tanh.c \
 	sf_isinf.c
 
+libmath_la_LDFLAGS = -Xcompiler -nostdlib
+
+if USE_LIBTOOL
+noinst_LTLIBRARIES = libmath.la
+libmath_la_SOURCES = $(src) $(fsrc)
+noinst_DATA = objectlist.awk.in
+else
+noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(src) $(fsrc)
+noinst_DATA =
+endif # USE_LIBTOOL
+
+include $(srcdir)/../../Makefile.shared
 
 chobj =	wacos.def wacosh.def wasin.def sasinh.def \
 	satan.def watan2.def watanh.def wj0.def \

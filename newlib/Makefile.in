@@ -61,19 +61,36 @@ host_alias = @host_alias@
 host_triplet = @host@
 AR = @AR@
 AS = @AS@
+AWK = @AWK@
 CC = @CC@
+CC_FOR_BUILD = @CC_FOR_BUILD@
 CPP = @CPP@
 CRT0 = @CRT0@
 CRT0_DIR = @CRT0_DIR@
+DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
+LDFLAGS = @LDFLAGS@
+LIBM_MACHINE_OBJECTLIST = @LIBM_MACHINE_OBJECTLIST@
+LIBTOOL = @LIBTOOL@
+LN_S = @LN_S@
+MACHINE_OBJECTLIST = @MACHINE_OBJECTLIST@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
+OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
+POSIX_OBJECTLIST = @POSIX_OBJECTLIST@
 RANLIB = @RANLIB@
+SIGNAL_OBJECTLIST = @SIGNAL_OBJECTLIST@
+SYSCALL_OBJECTLIST = @SYSCALL_OBJECTLIST@
+SYS_OBJECTLIST = @SYS_OBJECTLIST@
+UNIX_OBJECTLIST = @UNIX_OBJECTLIST@
 VERSION = @VERSION@
+aext = @aext@
+libm_machine_dir = @libm_machine_dir@
 machine_dir = @machine_dir@
 newlib_basedir = @newlib_basedir@
+oext = @oext@
 sys_dir = @sys_dir@
 
 AUTOMAKE_OPTIONS = cygnus
@@ -85,6 +102,10 @@ MULTIDIRS =
 MULTISUBDIR = 
 MULTIDO = true
 MULTICLEAN = true
+
+LIBTOOL_VERSION_INFO = 0:0:0
+@NEWLIB_HW_FP_TRUE@MATHDIR = @NEWLIB_HW_FP_TRUE@mathfp
+@NEWLIB_HW_FP_FALSE@MATHDIR = @NEWLIB_HW_FP_FALSE@math
 
 # Work around what appears to be a GNU make bug handling MAKEFLAGS
 # values defined in terms of make variables, as is the case for CC and
@@ -133,21 +154,62 @@ toollibdir = $(tooldir)/lib$(MULTISUBDIR)
 
 AR_FLAGS = rc
 
-toollib_LIBRARIES = libm.a libc.a
-toollib_DATA = $(CRT0)
+@USE_LIBTOOL_TRUE@toollib_LTLIBRARIES = @USE_LIBTOOL_TRUE@libm.la libc.la
+@USE_LIBTOOL_FALSE@toollib_LIBRARIES = @USE_LIBTOOL_FALSE@libm.a libc.a
+
 noinst_DATA = stmp-targ-include
+
+toollib_DATA = $(CRT0)
 
 # The functions ldexp, frexp and modf are traditionally supplied in
 # both libc.a and libm.a.  We build them in libm.a and copy them over,
 # along with some required supporting routines.
 MATHOBJS_IN_LIBC = \
-	s_isinf.o sf_isinf.o \
-	s_isnan.o sf_isnan.o \
-	s_ldexp.o sf_ldexp.o \
-	s_frexp.o sf_frexp.o s_modf.o sf_modf.o \
-	s_scalbn.o sf_scalbn.o s_finite.o sf_finite.o \
-	s_copysign.o sf_copysign.o s_infconst.o
+	s_isinf.$(oext) sf_isinf.$(oext) \
+	s_isnan.$(oext) sf_isnan.$(oext) \
+	s_ldexp.$(oext) sf_ldexp.$(oext) \
+	s_frexp.$(oext) sf_frexp.$(oext) \
+	s_modf.$(oext) \
+	sf_modf.$(oext) s_scalbn.$(oext) \
+	sf_scalbn.$(oext) \
+	s_finite.$(oext) sf_finite.$(oext) \
+	s_copysign.$(oext) sf_copysign.$(oext) \
+	s_infconst.$(oext)
 
+
+LIBC_OBJECTLISTS = \
+	$(POSIX_OBJECTLIST) \
+	$(SIGNAL_OBJECTLIST) \
+	$(SYSCALL_OBJECTLIST) \
+	$(UNIX_OBJECTLIST) \
+	libc/stdlib/objectlist.awk.in \
+	libc/time/objectlist.awk.in \
+	libc/ctype/objectlist.awk.in \
+	libc/string/objectlist.awk.in \
+	libc/locale/objectlist.awk.in \
+	libc/misc/objectlist.awk.in \
+	libc/reent/objectlist.awk.in \
+	libc/errno/objectlist.awk.in \
+	libc/stdio/objectlist.awk.in \
+	$(MACHINE_OBJECTLIST) \
+	$(SYS_OBJECTLIST)
+
+
+LIBM_OBJECTLISTS = \
+	libm/$(MATHDIR)/objectlist.awk.in \
+	libm/common/objectlist.awk.in \
+	$(LIBM_MACHINE_OBJECTLIST)
+
+
+libm_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/libc/sys/linux/shared.ld `cat libm-libtool-objectlist`
+
+libc_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib -no-undefined -Xcompiler -nostdlib -Xlinker --version-script=$(srcdir)/libc/sys/linux/shared.ld `cat libc-libtool-objectlist`
+
+@USE_LIBTOOL_TRUE@libm_la_SOURCES = 
+@USE_LIBTOOL_TRUE@libm_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@libm-libtool-objectlist
+
+@USE_LIBTOOL_TRUE@libc_la_SOURCES = 
+@USE_LIBTOOL_TRUE@libc_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@libc-libtool-objectlist
 
 CLEANFILES = targ-include stmp-targ-include
 
@@ -162,7 +224,6 @@ LIBRARIES =  $(toollib_LIBRARIES)
 
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
-LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libm_a_LIBADD = 
 libm_a_SOURCES = libm.a.c
@@ -170,10 +231,17 @@ libm_a_OBJECTS =  libm.a.o
 libc_a_LIBADD = 
 libc_a_SOURCES = libc.a.c
 libc_a_OBJECTS =  libc.a.o
+LTLIBRARIES =  $(toollib_LTLIBRARIES)
+
+libm_la_LIBADD = 
+@USE_LIBTOOL_TRUE@libm_la_OBJECTS = 
+libc_la_LIBADD = 
+@USE_LIBTOOL_TRUE@libc_la_OBJECTS = 
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
+LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
 DATA =  $(noinst_DATA) $(toollib_DATA)
 
 DIST_COMMON =  README ChangeLog Makefile.am Makefile.in NEWS \
@@ -185,12 +253,12 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 TAR = gtar
 GZIP_ENV = --best
 DIST_SUBDIRS =  libc libm doc .
-SOURCES = libm.a.c libc.a.c
-OBJECTS = libm.a.o libc.a.o
+SOURCES = libm.a.c libc.a.c $(libm_la_SOURCES) $(libc_la_SOURCES)
+OBJECTS = libm.a.o libc.a.o $(libm_la_OBJECTS) $(libc_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .o .s
+.SUFFIXES: .S .c .lo .o .s
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus Makefile
 
@@ -256,6 +324,56 @@ distclean-compile:
 	-rm -f *.tab.c
 
 maintainer-clean-compile:
+
+.c.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+.s.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+.S.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+mostlyclean-libtool:
+	-rm -f *.lo
+
+clean-libtool:
+	-rm -rf .libs _libs
+
+distclean-libtool:
+
+maintainer-clean-libtool:
+
+mostlyclean-toollibLTLIBRARIES:
+
+clean-toollibLTLIBRARIES:
+	-test -z "$(toollib_LTLIBRARIES)" || rm -f $(toollib_LTLIBRARIES)
+
+distclean-toollibLTLIBRARIES:
+
+maintainer-clean-toollibLTLIBRARIES:
+
+install-toollibLTLIBRARIES: $(toollib_LTLIBRARIES)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(toollibdir)
+	@list='$(toollib_LTLIBRARIES)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    echo "$(LIBTOOL)  --mode=install $(INSTALL) $$p $(DESTDIR)$(toollibdir)/$$p"; \
+	    $(LIBTOOL)  --mode=install $(INSTALL) $$p $(DESTDIR)$(toollibdir)/$$p; \
+	  else :; fi; \
+	done
+
+uninstall-toollibLTLIBRARIES:
+	@$(NORMAL_UNINSTALL)
+	list='$(toollib_LTLIBRARIES)'; for p in $$list; do \
+	  $(LIBTOOL)  --mode=uninstall rm -f $(DESTDIR)$(toollibdir)/$$p; \
+	done
+
+libm.la: $(libm_la_OBJECTS) $(libm_la_DEPENDENCIES)
+	$(LINK) -rpath $(toollibdir) $(libm_la_LDFLAGS) $(libm_la_OBJECTS) $(libm_la_LIBADD) $(LIBS)
+
+libc.la: $(libc_la_OBJECTS) $(libc_la_DEPENDENCIES)
+	$(LINK) -rpath $(toollibdir) $(libc_la_LDFLAGS) $(libc_la_OBJECTS) $(libc_la_LIBADD) $(LIBS)
 
 install-toollibDATA: $(toollib_DATA)
 	@$(NORMAL_INSTALL)
@@ -436,22 +554,24 @@ install-info: install-info-recursive
 install-exec-am:
 install-exec: install-exec-recursive
 
-install-data-am: install-toollibLIBRARIES install-toollibDATA \
-		install-data-local
+install-data-am: install-toollibLIBRARIES install-toollibLTLIBRARIES \
+		install-toollibDATA install-data-local
 install-data: install-data-recursive
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 install: install-recursive
-uninstall-am: uninstall-toollibLIBRARIES uninstall-toollibDATA
+uninstall-am: uninstall-toollibLIBRARIES uninstall-toollibLTLIBRARIES \
+		uninstall-toollibDATA
 uninstall: uninstall-recursive
-all-am: Makefile $(LIBRARIES) $(DATA)
+all-am: Makefile $(LIBRARIES) $(LTLIBRARIES) $(DATA)
 all-redirect: all-recursive
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
 installdirs: installdirs-recursive
 installdirs-am:
-	$(mkinstalldirs)  $(DESTDIR)$(toollibdir) $(DESTDIR)$(toollibdir)
+	$(mkinstalldirs)  $(DESTDIR)$(toollibdir) $(DESTDIR)$(toollibdir) \
+		$(DESTDIR)$(toollibdir)
 
 
 mostlyclean-generic:
@@ -465,24 +585,30 @@ distclean-generic:
 
 maintainer-clean-generic:
 mostlyclean-am:  mostlyclean-toollibLIBRARIES mostlyclean-compile \
+		mostlyclean-libtool mostlyclean-toollibLTLIBRARIES \
 		mostlyclean-tags mostlyclean-generic
 
 mostlyclean: mostlyclean-recursive
 
-clean-am:  clean-toollibLIBRARIES clean-compile clean-tags clean-generic \
+clean-am:  clean-toollibLIBRARIES clean-compile clean-libtool \
+		clean-toollibLTLIBRARIES clean-tags clean-generic \
 		mostlyclean-am
 
 clean: clean-recursive
 
 distclean-am:  distclean-toollibLIBRARIES distclean-compile \
+		distclean-libtool distclean-toollibLTLIBRARIES \
 		distclean-tags distclean-generic clean-am
+	-rm -f libtool
 
 distclean: distclean-recursive
 	-rm -f config.status
 
 maintainer-clean-am:  maintainer-clean-toollibLIBRARIES \
-		maintainer-clean-compile maintainer-clean-tags \
-		maintainer-clean-generic distclean-am
+		maintainer-clean-compile maintainer-clean-libtool \
+		maintainer-clean-toollibLTLIBRARIES \
+		maintainer-clean-tags maintainer-clean-generic \
+		distclean-am
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 
@@ -493,8 +619,12 @@ maintainer-clean: maintainer-clean-recursive
 clean-toollibLIBRARIES maintainer-clean-toollibLIBRARIES \
 uninstall-toollibLIBRARIES install-toollibLIBRARIES mostlyclean-compile \
 distclean-compile clean-compile maintainer-clean-compile \
-uninstall-toollibDATA install-toollibDATA install-data-recursive \
-uninstall-data-recursive install-exec-recursive \
+mostlyclean-libtool distclean-libtool clean-libtool \
+maintainer-clean-libtool mostlyclean-toollibLTLIBRARIES \
+distclean-toollibLTLIBRARIES clean-toollibLTLIBRARIES \
+maintainer-clean-toollibLTLIBRARIES uninstall-toollibLTLIBRARIES \
+install-toollibLTLIBRARIES uninstall-toollibDATA install-toollibDATA \
+install-data-recursive uninstall-data-recursive install-exec-recursive \
 uninstall-exec-recursive installdirs-recursive uninstalldirs-recursive \
 all-recursive check-recursive installcheck-recursive info-recursive \
 dvi-recursive mostlyclean-recursive distclean-recursive clean-recursive \
@@ -508,24 +638,32 @@ distclean-generic clean-generic maintainer-clean-generic clean \
 mostlyclean distclean maintainer-clean
 
 
-libc.a: libc/libc.a libm.a
-	rm -rf libc.a libg.a tmp
-	mkdir tmp
-	cd tmp; \
-	 $(AR) x ../libm.a $(MATHOBJS_IN_LIBC) ; \
-	 $(AR) x ../libc/libc.a ; \
-	 $(AR) $(AR_FLAGS) ../$@ *.o
-	$(RANLIB) libc.a
-	ln libc.a libg.a >/dev/null 2>/dev/null || cp libc.a libg.a
-	rm -rf tmp
+# objects listed later in LIBM_OBJECTLISTS will override those listed earlier
+@USE_LIBTOOL_TRUE@libm-libtool-objectlist: $(LIBM_OBJECTLISTS)
+@USE_LIBTOOL_TRUE@	cat $(LIBM_OBJECTLISTS) | $(AWK) '{ libm[$$1] = $$2 }; END { for (x in libm) printf ("%s\n", libm[x]) }' > $@
 
-libc/libc.a: ; @true
+# objects listed later in LIBM_OBJECTLISTS and LIBC_OBJECTLISTS will override those listed earlier
+@USE_LIBTOOL_TRUE@libc-libtool-objectlist: $(LIBM_OBJECTLISTS) $(LIBC_OBJECTLISTS)
+@USE_LIBTOOL_TRUE@	cat $(LIBM_OBJECTLISTS) $(LIBC_OBJECTLISTS) |  $(AWK) '{ libc[$$1] = $$2 }; END { for (x in libc) printf ("%s\n", libc[x]) }' > $@
 
-libm.a: libm/libm.a
-	rm -f $@
-	ln libm/libm.a $@ >/dev/null 2>/dev/null || cp libm/libm.a $@
+@USE_LIBTOOL_FALSE@libc.a: libc/libc.a libm.a
+@USE_LIBTOOL_FALSE@	rm -rf libc.a libg.a tmp
+@USE_LIBTOOL_FALSE@	mkdir tmp
+@USE_LIBTOOL_FALSE@	cd tmp; \
+@USE_LIBTOOL_FALSE@	 $(AR) x ../libm.a $(MATHOBJS_IN_LIBC) ; \
+@USE_LIBTOOL_FALSE@	 $(AR) x ../libc/libc.a ; \
+@USE_LIBTOOL_FALSE@	 $(AR) $(AR_FLAGS) ../$@ *.o
+@USE_LIBTOOL_FALSE@	$(RANLIB) libc.a
+@USE_LIBTOOL_FALSE@	ln libc.a libg.a >/dev/null 2>/dev/null || cp libc.a libg.a
+@USE_LIBTOOL_FALSE@	rm -rf tmp
 
-libm/libm.a: ; @true
+@USE_LIBTOOL_FALSE@libc/libc.a: ; @true
+
+@USE_LIBTOOL_FALSE@libm.a: libm/libm.a
+@USE_LIBTOOL_FALSE@	rm -f $@
+@USE_LIBTOOL_FALSE@	ln libm/libm.a $@ >/dev/null 2>/dev/null || cp libm/libm.a $@
+
+@USE_LIBTOOL_FALSE@libm/libm.a: ; @true
 
 crt0.o: $(CRT0_DIR)/$(CRT0)
 	rm -f $@
@@ -560,8 +698,8 @@ stmp-targ-include: config.status
 	touch $@
 
 install-data-local:	install-toollibLIBRARIES
-	rm -f $(DESTDIR)$(toollibdir)/libg.a
-	ln $(DESTDIR)$(toollibdir)/libc.a $(DESTDIR)$(toollibdir)/libg.a >/dev/null 2>/dev/null || cp $(DESTDIR)$(toollibdir)/libc.a $(DESTDIR)$(toollibdir)/libg.a
+@USE_LIBTOOL_FALSE@	rm -f $(DESTDIR)$(toollibdir)/libg.a
+@USE_LIBTOOL_FALSE@	ln $(DESTDIR)$(toollibdir)/libc.a $(DESTDIR)$(toollibdir)/libg.a >/dev/null 2>/dev/null || cp $(DESTDIR)$(toollibdir)/libc.a $(DESTDIR)$(toollibdir)/libg.a
 	$(MULTIDO) $(AM_MAKEFLAGS) DO=install multi-do
 	-if [ -z "$(MULTISUBDIR)" ]; then \
 	  $(mkinstalldirs) $(DESTDIR)$(tooldir)/include; \

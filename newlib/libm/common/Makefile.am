@@ -4,8 +4,6 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-noinst_LIBRARIES = lib.a
-
 src = 	s_finite.c s_copysign.c s_modf.c s_scalbn.c \
 	s_cbrt.c s_expm1.c s_ilogb.c \
 	s_infinity.c s_log1p.c s_nan.c s_nextafter.c \
@@ -16,7 +14,19 @@ fsrc =	sf_finite.c sf_copysign.c sf_modf.c sf_scalbn.c \
 	sf_infinity.c sf_log1p.c sf_nan.c sf_nextafter.c \
 	sf_rint.c sf_logb.c
 
+libcommon_la_LDFLAGS = -Xcompiler -nostdlib
+
+if USE_LIBTOOL
+noinst_LTLIBRARIES = libcommon.la
+libcommon_la_SOURCES = $(src) $(fsrc)
+noinst_DATA = objectlist.awk.in
+else
+noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(src) $(fsrc)
+noinst_DATA =
+endif # USE_LIBTOOL
+
+include $(srcdir)/../../Makefile.shared
 
 chobj =	scbrt.def scopysign.def sexpm1.def silogb.def \
 	sinfinity.def slog1p.def smatherr.def smodf.def \

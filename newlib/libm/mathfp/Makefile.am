@@ -4,7 +4,6 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = -I$(srcdir)/../common $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-noinst_LIBRARIES = lib.a
 src =	s_acos.c s_frexp.c s_mathcnst.c \
 	s_cos.c s_sinh.c \
 	s_asin.c\
@@ -41,7 +40,19 @@ fsrc =	sf_ceil.c \
 	wf_cabs.c wf_drem.c sf_asinh.c sf_fmod.c \
 	ef_scalb.c sf_signif.c
 
+libmathfp_la_LDFLAGS = -Xcompiler -nostdlib
+
+if USE_LIBTOOL
+noinst_LTLIBRARIES = libmathfp.la
+libmathfp_la_SOURCES = $(src) $(fsrc)
+noinst_DATA = objectlist.awk.in
+else
+noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(src) $(fsrc)
+noinst_DATA =
+endif # USE_LIBTOOL
+
+include $(srcdir)/../../Makefile.shared
 
 chobj = eacosh.def \
 	eatanh.def \

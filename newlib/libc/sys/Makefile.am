@@ -8,24 +8,28 @@ if HAVE_SYS_DIR
 SYSLIB = lib.a
 endif
 
-noinst_LIBRARIES = $(SYSLIB)
 noinst_DATA = $(CRT0)
+
+if USE_LIBTOOL
+else
+noinst_LIBRARIES = $(SYSLIB)
 
 lib.a: $(sys_dir)/lib.a
 	rm -f $@
 	ln $(sys_dir)/lib.a $@ >/dev/null 2>/dev/null \
 	 || cp $(sys_dir)/lib.a $@
+endif # USE_LIBTOOL
 
-$(sys_dir)/lib.a: ; @true
+$(sys_dir)/libsys.$(aext): ; @true
 
-crt0.o: $(sys_dir)/crt0.o
+$(CRT0): $(sys_dir)/$(CRT0)
 	rm -f $@
-	ln $(sys_dir)/crt0.o $@ >/dev/null 2>/dev/null \
-	 || cp $(sys_dir)/crt0.o $@
+	ln $(sys_dir)/$(CRT0) $@ >/dev/null 2>/dev/null \
+	 || cp $(sys_dir)/$(CRT0) $@
 
-$(sys_dir)/crt0.o: ; @true
+$(sys_dir)/$(CRT0): ; @true
 
-CLEANFILES = crt0.o
+CLEANFILES = $(CRT0)
 
 doc:
 

@@ -11,6 +11,7 @@
 # PARTICULAR PURPOSE.
 
 
+
 SHELL = @SHELL@
 
 srcdir = @srcdir@
@@ -64,7 +65,9 @@ AS = @AS@
 CC = @CC@
 CPP = @CPP@
 CRT0 = @CRT0@
+DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
+LDFLAGS = @LDFLAGS@
 LIBC_MACHINE_LIB = @LIBC_MACHINE_LIB@
 LIBC_POSIX_LIB = @LIBC_POSIX_LIB@
 LIBC_SIGNAL_DEF = @LIBC_SIGNAL_DEF@
@@ -72,23 +75,27 @@ LIBC_SIGNAL_LIB = @LIBC_SIGNAL_LIB@
 LIBC_SYSCALL_LIB = @LIBC_SYSCALL_LIB@
 LIBC_SYS_LIB = @LIBC_SYS_LIB@
 LIBC_UNIX_LIB = @LIBC_UNIX_LIB@
+LIBTOOL = @LIBTOOL@
+LN_S = @LN_S@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
+OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
+aext = @aext@
+libm_machine_dir = @libm_machine_dir@
 machine_dir = @machine_dir@
 newlib_basedir = @newlib_basedir@
+oext = @oext@
 sys_dir = @sys_dir@
 
 AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-noinst_LIBRARIES = lib.a
-
-lib_a_SOURCES = \
+LIB_SOURCES = \
 	bcmp.c \
 	bcopy.c \
 	bzero.c \
@@ -125,6 +132,15 @@ lib_a_SOURCES = \
 	u_strerr.c
 
 
+libstring_la_LDFLAGS = -Xcompiler -nostdlib
+
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libstring.la
+@USE_LIBTOOL_TRUE@libstring_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_SOURCES)
+@USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
+@USE_LIBTOOL_FALSE@noinst_DATA = 
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
+@USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_SOURCES)
+
 CHEWOUT_FILES = \
 bcmp.def	memcpy.def	strcmp.def	strncat.def strstr.def \
 bcopy.def	memmove.def	strcoll.def	strncmp.def strtok.def \
@@ -149,32 +165,47 @@ LIBRARIES =  $(noinst_LIBRARIES)
 
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
-LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 lib_a_LIBADD = 
-lib_a_OBJECTS =  bcmp.o bcopy.o bzero.o index.o memchr.o memcmp.o \
-memcpy.o memmove.o memset.o rindex.o strcat.o strchr.o strcmp.o \
-strcasecmp.o strcoll.o strcpy.o strcspn.o strerror.o strlen.o strlwr.o \
-strncat.o strncmp.o strncasecmp.o strncpy.o strpbrk.o strrchr.o \
-strspn.o strtok.o strtok_r.o strupr.o strxfrm.o strstr.o swab.o u_strerr.o
+@USE_LIBTOOL_FALSE@lib_a_OBJECTS =  bcmp.o bcopy.o bzero.o index.o \
+@USE_LIBTOOL_FALSE@memchr.o memcmp.o memcpy.o memmove.o memset.o \
+@USE_LIBTOOL_FALSE@rindex.o strcat.o strchr.o strcmp.o strcasecmp.o \
+@USE_LIBTOOL_FALSE@strcoll.o strcpy.o strcspn.o strerror.o strlen.o \
+@USE_LIBTOOL_FALSE@strlwr.o strncat.o strncmp.o strncasecmp.o strncpy.o \
+@USE_LIBTOOL_FALSE@strpbrk.o strrchr.o strspn.o strtok.o strtok_r.o \
+@USE_LIBTOOL_FALSE@strupr.o strxfrm.o strstr.o swab.o u_strerr.o
+LTLIBRARIES =  $(noinst_LTLIBRARIES)
+
+libstring_la_LIBADD = 
+@USE_LIBTOOL_TRUE@libstring_la_OBJECTS =  bcmp.lo bcopy.lo bzero.lo \
+@USE_LIBTOOL_TRUE@index.lo memchr.lo memcmp.lo memcpy.lo memmove.lo \
+@USE_LIBTOOL_TRUE@memset.lo rindex.lo strcat.lo strchr.lo strcmp.lo \
+@USE_LIBTOOL_TRUE@strcasecmp.lo strcoll.lo strcpy.lo strcspn.lo \
+@USE_LIBTOOL_TRUE@strerror.lo strlen.lo strlwr.lo strncat.lo strncmp.lo \
+@USE_LIBTOOL_TRUE@strncasecmp.lo strncpy.lo strpbrk.lo strrchr.lo \
+@USE_LIBTOOL_TRUE@strspn.lo strtok.lo strtok_r.lo strupr.lo strxfrm.lo \
+@USE_LIBTOOL_TRUE@strstr.lo swab.lo u_strerr.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
+LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
+DATA =  $(noinst_DATA)
+
 DIST_COMMON =  Makefile.am Makefile.in
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
+TAR = gtar
 GZIP_ENV = --best
-SOURCES = $(lib_a_SOURCES)
-OBJECTS = $(lib_a_OBJECTS)
+SOURCES = $(lib_a_SOURCES) $(libstring_la_SOURCES)
+OBJECTS = $(lib_a_OBJECTS) $(libstring_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .def .o .s
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
+.SUFFIXES: .S .c .def .lo .o .s
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) $(srcdir)/../../Makefile.shared
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus string/Makefile
 
 Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status
@@ -210,10 +241,41 @@ distclean-compile:
 
 maintainer-clean-compile:
 
+.c.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+.s.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+.S.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+mostlyclean-libtool:
+	-rm -f *.lo
+
+clean-libtool:
+	-rm -rf .libs _libs
+
+distclean-libtool:
+
+maintainer-clean-libtool:
+
 lib.a: $(lib_a_OBJECTS) $(lib_a_DEPENDENCIES)
 	-rm -f lib.a
 	$(AR) cru lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
 	$(RANLIB) lib.a
+
+mostlyclean-noinstLTLIBRARIES:
+
+clean-noinstLTLIBRARIES:
+	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
+
+distclean-noinstLTLIBRARIES:
+
+maintainer-clean-noinstLTLIBRARIES:
+
+libstring.la: $(libstring_la_OBJECTS) $(libstring_la_DEPENDENCIES)
+	$(LINK)  $(libstring_la_LDFLAGS) $(libstring_la_OBJECTS) $(libstring_la_LIBADD) $(LIBS)
 
 tags: TAGS
 
@@ -252,7 +314,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
@@ -280,7 +342,7 @@ install-am: all-am
 install: install-am
 uninstall-am:
 uninstall: uninstall-am
-all-am: Makefile $(LIBRARIES)
+all-am: Makefile $(LIBRARIES) $(LTLIBRARIES) $(DATA)
 all-redirect: all-am
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
@@ -298,23 +360,29 @@ distclean-generic:
 
 maintainer-clean-generic:
 mostlyclean-am:  mostlyclean-noinstLIBRARIES mostlyclean-compile \
+		mostlyclean-libtool mostlyclean-noinstLTLIBRARIES \
 		mostlyclean-tags mostlyclean-generic
 
 mostlyclean: mostlyclean-am
 
-clean-am:  clean-noinstLIBRARIES clean-compile clean-tags clean-generic \
+clean-am:  clean-noinstLIBRARIES clean-compile clean-libtool \
+		clean-noinstLTLIBRARIES clean-tags clean-generic \
 		mostlyclean-am
 
 clean: clean-am
 
 distclean-am:  distclean-noinstLIBRARIES distclean-compile \
+		distclean-libtool distclean-noinstLTLIBRARIES \
 		distclean-tags distclean-generic clean-am
+	-rm -f libtool
 
 distclean: distclean-am
 
 maintainer-clean-am:  maintainer-clean-noinstLIBRARIES \
-		maintainer-clean-compile maintainer-clean-tags \
-		maintainer-clean-generic distclean-am
+		maintainer-clean-compile maintainer-clean-libtool \
+		maintainer-clean-noinstLTLIBRARIES \
+		maintainer-clean-tags maintainer-clean-generic \
+		distclean-am
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 
@@ -323,7 +391,10 @@ maintainer-clean: maintainer-clean-am
 .PHONY: mostlyclean-noinstLIBRARIES distclean-noinstLIBRARIES \
 clean-noinstLIBRARIES maintainer-clean-noinstLIBRARIES \
 mostlyclean-compile distclean-compile clean-compile \
-maintainer-clean-compile tags mostlyclean-tags distclean-tags \
+maintainer-clean-compile mostlyclean-libtool distclean-libtool \
+clean-libtool maintainer-clean-libtool mostlyclean-noinstLTLIBRARIES \
+distclean-noinstLTLIBRARIES clean-noinstLTLIBRARIES \
+maintainer-clean-noinstLTLIBRARIES tags mostlyclean-tags distclean-tags \
 clean-tags maintainer-clean-tags distdir info-am info dvi-am dvi check \
 check-am installcheck-am installcheck install-info-am install-info \
 install-exec-am install-exec install-data-am install-data install-am \
@@ -331,6 +402,13 @@ install uninstall-am uninstall all-redirect all-am all installdirs \
 mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
+
+objectlist.awk.in: $(noinst_LTLIBRARIES)
+	-rm -f objectlist.awk.in
+	for i in `ls *.lo` ; \
+	do \
+	  echo $$i `pwd`/$$i >> objectlist.awk.in ; \
+	done
 
 .c.def:
 	$(CHEW) < $< > $*.def 2> $*.ref

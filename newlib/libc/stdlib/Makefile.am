@@ -4,9 +4,7 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-noinst_LIBRARIES = lib.a
-
-lib_a_SOURCES = \
+LIB_SOURCES = \
 	__adjust.c 	\
 	__exp10.c 	\
 	__ten_mu.c 	\
@@ -82,45 +80,64 @@ lib_a_SOURCES = \
 	wctomb.c	\
 	wctomb_r.c
 
-lib_a_LIBADD = mallocr.o freer.o reallocr.o callocr.o cfreer.o malignr.o \
-	vallocr.o pvallocr.o mallinfor.o mallstatsr.o msizer.o malloptr.o
+# Because of how libtool moves objects around, mallocr must be built last.
+LIBADD_OBJS = freer.$(oext) reallocr.$(oext) callocr.$(oext) cfreer.$(oext) malignr.$(oext) \
+	vallocr.$(oext) pvallocr.$(oext) mallinfor.$(oext) mallstatsr.$(oext) msizer.$(oext) malloptr.$(oext) mallocr.$(oext)
 
-MALLOC_COMPILE = $(COMPILE) -DINTERNAL_NEWLIB
+libstdlib_la_LDFLAGS = -Xcompiler -nostdlib
 
-mallocr.o: mallocr.c
+if USE_LIBTOOL
+noinst_LTLIBRARIES = libstdlib.la
+libstdlib_la_SOURCES = $(LIB_SOURCES)
+libstdlib_la_LIBADD = $(LIBADD_OBJS)
+LIB_COMPILE = $(LTCOMPILE)
+noinst_DATA = objectlist.awk.in
+else
+noinst_LIBRARIES = lib.a
+lib_a_SOURCES = $(LIB_SOURCES)
+lib_a_LIBADD = $(LIBADD_OBJS)
+LIB_COMPILE = $(CC)
+noinst_DATA =
+endif # USE_LIBTOOL
+
+include $(srcdir)/../../Makefile.shared
+
+MALLOC_COMPILE = $(LIB_COMPILE) -DINTERNAL_NEWLIB
+
+mallocr.$(oext): mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_MALLOC -c $(srcdir)/mallocr.c -o $@
 
-freer.o: mallocr.c
+freer.$(oext): mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_FREE -c $(srcdir)/mallocr.c -o $@
 
-reallocr.o: mallocr.c
+reallocr.$(oext): mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_REALLOC -c $(srcdir)/mallocr.c -o $@
 
-callocr.o: mallocr.c
+callocr.$(oext): mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_CALLOC -c $(srcdir)/mallocr.c -o $@
 
-cfreer.o: mallocr.c
+cfreer.$(oext): mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_CFREE -c $(srcdir)/mallocr.c -o $@
 
-malignr.o: mallocr.c
+malignr.$(oext): mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_MEMALIGN -c $(srcdir)/mallocr.c -o $@
 
-vallocr.o: mallocr.c
+vallocr.$(oext): mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_VALLOC -c $(srcdir)/mallocr.c -o $@
 
-pvallocr.o: mallocr.c
+pvallocr.$(oext): mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_PVALLOC -c $(srcdir)/mallocr.c -o $@
 
-mallinfor.o: mallocr.c
+mallinfor.$(oext): mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_MALLINFO -c $(srcdir)/mallocr.c -o $@
 
-mallstatsr.o: mallocr.c
+mallstatsr.$(oext): mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_MALLOC_STATS -c $(srcdir)/mallocr.c -o $@
 
-msizer.o: mallocr.c
+msizer.$(oext): mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_MALLOC_USABLE_SIZE -c $(srcdir)/mallocr.c -o $@
 
-malloptr.o: mallocr.c
+malloptr.$(oext): mallocr.c
 	$(MALLOC_COMPILE) -DDEFINE_MALLOPT -c $(srcdir)/mallocr.c -o $@
 
 CHEWOUT_FILES= \
@@ -174,22 +191,22 @@ doc: $(CHEWOUT_FILES)
 
 CLEANFILES = $(CHEWOUT_FILES) *.ref
 
-dtoa.o: dtoa.c mprec.h
-ldtoa.o: ldtoa.c mprec.h
-ecvtbuf.o: ecvtbuf.c mprec.h
-mbtowc_r.o: mbtowc_r.c mbctype.h
-	$(COMPILE) -c -fshort-enums $(srcdir)/mbtowc_r.c -o $@
+dtoa.$(oext): dtoa.c mprec.h
+ldtoa.$(oext): ldtoa.c mprec.h
+ecvtbuf.$(oext): ecvtbuf.c mprec.h
+mbtowc_r.$(oext): mbtowc_r.c mbctype.h
+	$(LIB_COMPILE) -c -fshort-enums $(srcdir)/mbtowc_r.c -o $@
 
-mprec.o: mprec.c mprec.h
-strtod.o: strtod.c mprec.h
-wctomb_r.o: wctomb_r.c mbctype.h
-drand48.o: drand48.c rand48.h
-erand48.o: erand48.c rand48.h
-jrand48.o: jrand48.c rand48.h
-lcong48.o: lcong48.c rand48.h
-lrand48.o: lrand48.c rand48.h
-mrand48.o: mrand48.c rand48.h
-nrand48.o: nrand48.c rand48.h
-rand48.o: rand48.c rand48.h
-seed48.o: seed48.c rand48.h
-srand48.o: srand48.c rand48.h
+mprec.$(oext): mprec.c mprec.h
+strtod.$(oext): strtod.c mprec.h
+wctomb_r.$(oext): wctomb_r.c mbctype.h
+drand48.$(oext): drand48.c rand48.h
+erand48.$(oext): erand48.c rand48.h
+jrand48.$(oext): jrand48.c rand48.h
+lcong48.$(oext): lcong48.c rand48.h
+lrand48.$(oext): lrand48.c rand48.h
+mrand48.$(oext): mrand48.c rand48.h
+nrand48.$(oext): nrand48.c rand48.h
+rand48.$(oext): rand48.c rand48.h
+seed48.$(oext): seed48.c rand48.h
+srand48.$(oext): srand48.c rand48.h

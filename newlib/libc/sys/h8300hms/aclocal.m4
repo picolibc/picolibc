@@ -74,7 +74,7 @@ AC_SUBST(newlib_basedir)
 
 AC_CANONICAL_HOST
 
-AM_INIT_AUTOMAKE(newlib, 1.9.0)
+AM_INIT_AUTOMAKE(newlib, 1.10.0)
 
 # FIXME: We temporarily define our own version of AC_PROG_CC.  This is
 # copied from autoconf 2.12, but does not call AC_PROG_CC_WORKS.  We
@@ -160,6 +160,14 @@ newlib_cflags="[$]{newlib_cflags} -fno-builtin"
 NEWLIB_CFLAGS=${newlib_cflags}
 AC_SUBST(NEWLIB_CFLAGS)
 
+LDFLAGS=${ldflags}
+AC_SUBST(LDFLAGS)
+
+AM_CONDITIONAL(USE_LIBTOOL, test x[$]{use_libtool} = xyes)
+AC_SUBST(oext)
+AC_SUBST(aext)
+
+AC_SUBST(libm_machine_dir)
 AC_SUBST(machine_dir)
 AC_SUBST(sys_dir)
 ])

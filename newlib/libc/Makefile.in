@@ -64,7 +64,9 @@ AS = @AS@
 CC = @CC@
 CPP = @CPP@
 CRT0 = @CRT0@
+DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
+LDFLAGS = @LDFLAGS@
 LIBC_MACHINE_LIB = @LIBC_MACHINE_LIB@
 LIBC_POSIX_LIB = @LIBC_POSIX_LIB@
 LIBC_SIGNAL_DEF = @LIBC_SIGNAL_DEF@
@@ -72,29 +74,31 @@ LIBC_SIGNAL_LIB = @LIBC_SIGNAL_LIB@
 LIBC_SYSCALL_LIB = @LIBC_SYSCALL_LIB@
 LIBC_SYS_LIB = @LIBC_SYS_LIB@
 LIBC_UNIX_LIB = @LIBC_UNIX_LIB@
+LIBTOOL = @LIBTOOL@
+LN_S = @LN_S@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
+OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
+aext = @aext@
+libm_machine_dir = @libm_machine_dir@
 machine_dir = @machine_dir@
 newlib_basedir = @newlib_basedir@
+oext = @oext@
 sys_dir = @sys_dir@
 
 AUTOMAKE_OPTIONS = cygnus
 
-@HAVE_POSIX_DIR_TRUE@POSIX_SUBDIR = \
-@HAVE_POSIX_DIR_TRUE@posix
+@HAVE_POSIX_DIR_TRUE@POSIX_SUBDIR = @HAVE_POSIX_DIR_TRUE@posix
 
-@HAVE_SIGNAL_DIR_TRUE@SIGNAL_SUBDIR = \
-@HAVE_SIGNAL_DIR_TRUE@signal
+@HAVE_SIGNAL_DIR_TRUE@SIGNAL_SUBDIR = @HAVE_SIGNAL_DIR_TRUE@signal
 
-@HAVE_SYSCALL_DIR_TRUE@SYSCALLS_SUBDIR = \
-@HAVE_SYSCALL_DIR_TRUE@syscalls
+@HAVE_SYSCALL_DIR_TRUE@SYSCALLS_SUBDIR = @HAVE_SYSCALL_DIR_TRUE@syscalls
 
-@HAVE_UNIX_DIR_TRUE@UNIX_SUBDIR = \
-@HAVE_UNIX_DIR_TRUE@unix
+@HAVE_UNIX_DIR_TRUE@UNIX_SUBDIR = @HAVE_UNIX_DIR_TRUE@unix
 
 # The order of SUBDIRS is important for the integrated documentation.
 # Do not change the order without considering the doc impact.
@@ -102,26 +106,47 @@ SUBDIRS = stdlib ctype stdio string $(SIGNAL_SUBDIR) time locale sys reent \
 	errno misc machine $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) .
 
 
-noinst_LIBRARIES = libc.a
 noinst_DATA = $(CRT0)
 
-SUBLIBS = \
-	stdlib/lib.a \
-	ctype/lib.a \
-	stdio/lib.a \
-	string/lib.a \
-	$(LIBC_SIGNAL_LIB) \
-	time/lib.a \
-	locale/lib.a \
-	$(LIBC_SYS_LIB) \
-	reent/lib.a \
-	errno/lib.a \
-	misc/lib.a \
-	$(LIBC_MACHINE_LIB) \
-	$(LIBC_UNIX_LIB) \
-	$(LIBC_POSIX_LIB) \
-	$(LIBC_SYSCALL_LIB)
+@USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@libc.la
+@USE_LIBTOOL_TRUE@SUBLIBS = @USE_LIBTOOL_TRUE@\
+@USE_LIBTOOL_TRUE@	stdlib/libstdlib.$(aext) \
+@USE_LIBTOOL_TRUE@	ctype/libctype.$(aext) \
+@USE_LIBTOOL_TRUE@	stdio/libstdio.$(aext) \
+@USE_LIBTOOL_TRUE@	string/libstring.$(aext) \
+@USE_LIBTOOL_TRUE@	$(LIBC_SIGNAL_LIB) \
+@USE_LIBTOOL_TRUE@	time/libtime.$(aext) \
+@USE_LIBTOOL_TRUE@	locale/liblocale.$(aext) \
+@USE_LIBTOOL_TRUE@	$(LIBC_SYS_LIB) \
+@USE_LIBTOOL_TRUE@	reent/libreent.$(aext) \
+@USE_LIBTOOL_TRUE@	errno/liberrno.$(aext) \
+@USE_LIBTOOL_TRUE@	misc/libmisc.$(aext) \
+@USE_LIBTOOL_TRUE@	$(LIBC_MACHINE_LIB) \
+@USE_LIBTOOL_TRUE@	$(LIBC_UNIX_LIB) \
+@USE_LIBTOOL_TRUE@	$(LIBC_POSIX_LIB) \
+@USE_LIBTOOL_TRUE@	$(LIBC_SYSCALL_LIB)
+@USE_LIBTOOL_FALSE@SUBLIBS = @USE_LIBTOOL_FALSE@\
+@USE_LIBTOOL_FALSE@	stdlib/lib.$(aext) \
+@USE_LIBTOOL_FALSE@	ctype/lib.$(aext) \
+@USE_LIBTOOL_FALSE@	stdio/lib.$(aext) \
+@USE_LIBTOOL_FALSE@	string/lib.$(aext) \
+@USE_LIBTOOL_FALSE@	$(LIBC_SIGNAL_LIB) \
+@USE_LIBTOOL_FALSE@	time/lib.$(aext) \
+@USE_LIBTOOL_FALSE@	locale/lib.$(aext) \
+@USE_LIBTOOL_FALSE@	$(LIBC_SYS_LIB) \
+@USE_LIBTOOL_FALSE@	reent/lib.$(aext) \
+@USE_LIBTOOL_FALSE@	errno/lib.$(aext) \
+@USE_LIBTOOL_FALSE@	misc/lib.$(aext) \
+@USE_LIBTOOL_FALSE@	$(LIBC_MACHINE_LIB) \
+@USE_LIBTOOL_FALSE@	$(LIBC_UNIX_LIB) \
+@USE_LIBTOOL_FALSE@	$(LIBC_POSIX_LIB) \
+@USE_LIBTOOL_FALSE@	$(LIBC_SYSCALL_LIB)
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@libc.a
 
+libc_la_LDFLAGS = -Xcompiler -nostdlib
+
+@USE_LIBTOOL_TRUE@libc_la_SOURCES = 
+@USE_LIBTOOL_TRUE@libc_la_LIBADD = @USE_LIBTOOL_TRUE@$(SUBLIBS)
 
 info_TEXINFOS = libc.texinfo
 
@@ -141,7 +166,7 @@ SUBDEFS = \
 	misc/stmp-def
 
 
-CLEANFILES = crt0.o \
+CLEANFILES = $(CRT0) \
 	sigset.texi stmp-sigset tmp.texi targetdep.tex stmp-targetdep
 
 
@@ -155,15 +180,23 @@ LIBRARIES =  $(noinst_LIBRARIES)
 
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
-LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 libc_a_LIBADD = 
 libc_a_SOURCES = libc.a.c
 libc_a_OBJECTS =  libc.a.o
+LTLIBRARIES =  $(noinst_LTLIBRARIES)
+
+@USE_LIBTOOL_TRUE@libc_la_DEPENDENCIES =  stdlib/libstdlib.$(aext) \
+@USE_LIBTOOL_TRUE@ctype/libctype.$(aext) stdio/libstdio.$(aext) \
+@USE_LIBTOOL_TRUE@string/libstring.$(aext) time/libtime.$(aext) \
+@USE_LIBTOOL_TRUE@locale/liblocale.$(aext) reent/libreent.$(aext) \
+@USE_LIBTOOL_TRUE@errno/liberrno.$(aext) misc/libmisc.$(aext)
+@USE_LIBTOOL_TRUE@libc_la_OBJECTS = 
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
+LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
 TEXI2DVI = `if test -f $(top_srcdir)/../texinfo/util/texi2dvi; then echo $(top_srcdir)/../texinfo/util/texi2dvi; else echo texi2dvi; fi`
 TEXINFO_TEX = $(top_srcdir)/../texinfo/texinfo.tex
 INFO_DEPS = libc.info
@@ -176,16 +209,16 @@ DIST_COMMON =  Makefile.am Makefile.in aclocal.m4 configure configure.in
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
-TAR = tar
+TAR = gtar
 GZIP_ENV = --best
 DIST_SUBDIRS =  stdlib ctype stdio string signal time locale sys reent \
 errno misc machine unix posix syscalls .
-SOURCES = libc.a.c
-OBJECTS = libc.a.o
+SOURCES = libc.a.c $(libc_la_SOURCES)
+OBJECTS = libc.a.o $(libc_la_OBJECTS)
 
 all: all-redirect
 .SUFFIXES:
-.SUFFIXES: .S .c .dvi .info .o .ps .s .texi .texinfo .txi
+.SUFFIXES: .S .c .dvi .info .lo .o .ps .s .texi .texinfo .txi
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ Makefile.am $(top_srcdir)/configure.in $(ACLOCAL_M4) 
 	cd $(top_srcdir) && $(AUTOMAKE) --cygnus Makefile
 
@@ -229,6 +262,37 @@ distclean-compile:
 	-rm -f *.tab.c
 
 maintainer-clean-compile:
+
+.c.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+.s.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+.S.lo:
+	$(LIBTOOL) --mode=compile $(COMPILE) -c $<
+
+mostlyclean-libtool:
+	-rm -f *.lo
+
+clean-libtool:
+	-rm -rf .libs _libs
+
+distclean-libtool:
+
+maintainer-clean-libtool:
+
+mostlyclean-noinstLTLIBRARIES:
+
+clean-noinstLTLIBRARIES:
+	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
+
+distclean-noinstLTLIBRARIES:
+
+maintainer-clean-noinstLTLIBRARIES:
+
+libc.la: $(libc_la_OBJECTS) $(libc_la_DEPENDENCIES)
+	$(LINK)  $(libc_la_LDFLAGS) $(libc_la_OBJECTS) $(libc_la_LIBADD) $(LIBS)
 
 libc.info: libc.texinfo
 libc.dvi: libc.texinfo
@@ -471,7 +535,7 @@ distdir: $(DISTFILES)
 	@for file in $(DISTFILES); do \
 	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
 	  if test -d $$d/$$file; then \
-	    cp -pr $$/$$file $(distdir)/$$file; \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
 	  else \
 	    test -f $(distdir)/$$file \
 	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
@@ -510,7 +574,7 @@ install-am: all-am
 install: install-recursive
 uninstall-am:
 uninstall: uninstall-recursive
-all-am: Makefile $(LIBRARIES) $(DATA)
+all-am: Makefile $(LIBRARIES) $(LTLIBRARIES) $(DATA)
 all-redirect: all-recursive
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
@@ -529,26 +593,31 @@ distclean-generic:
 
 maintainer-clean-generic:
 mostlyclean-am:  mostlyclean-noinstLIBRARIES mostlyclean-compile \
+		mostlyclean-libtool mostlyclean-noinstLTLIBRARIES \
 		mostlyclean-aminfo mostlyclean-tags mostlyclean-generic
 
 mostlyclean: mostlyclean-recursive
 
-clean-am:  clean-noinstLIBRARIES clean-compile clean-aminfo clean-tags \
+clean-am:  clean-noinstLIBRARIES clean-compile clean-libtool \
+		clean-noinstLTLIBRARIES clean-aminfo clean-tags \
 		clean-generic mostlyclean-am
 
 clean: clean-recursive
 
 distclean-am:  distclean-noinstLIBRARIES distclean-compile \
+		distclean-libtool distclean-noinstLTLIBRARIES \
 		distclean-aminfo distclean-tags distclean-generic \
 		clean-am
+	-rm -f libtool
 
 distclean: distclean-recursive
 	-rm -f config.status
 
 maintainer-clean-am:  maintainer-clean-noinstLIBRARIES \
-		maintainer-clean-compile maintainer-clean-aminfo \
-		maintainer-clean-tags maintainer-clean-generic \
-		distclean-am
+		maintainer-clean-compile maintainer-clean-libtool \
+		maintainer-clean-noinstLTLIBRARIES \
+		maintainer-clean-aminfo maintainer-clean-tags \
+		maintainer-clean-generic distclean-am
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 
@@ -558,7 +627,10 @@ maintainer-clean: maintainer-clean-recursive
 .PHONY: mostlyclean-noinstLIBRARIES distclean-noinstLIBRARIES \
 clean-noinstLIBRARIES maintainer-clean-noinstLIBRARIES \
 mostlyclean-compile distclean-compile clean-compile \
-maintainer-clean-compile install-info-am uninstall-info \
+maintainer-clean-compile mostlyclean-libtool distclean-libtool \
+clean-libtool maintainer-clean-libtool mostlyclean-noinstLTLIBRARIES \
+distclean-noinstLTLIBRARIES clean-noinstLTLIBRARIES \
+maintainer-clean-noinstLTLIBRARIES install-info-am uninstall-info \
 mostlyclean-aminfo distclean-aminfo clean-aminfo \
 maintainer-clean-aminfo install-data-recursive uninstall-data-recursive \
 install-exec-recursive uninstall-exec-recursive installdirs-recursive \
@@ -574,18 +646,17 @@ installdirs-am installdirs mostlyclean-generic distclean-generic \
 clean-generic maintainer-clean-generic clean mostlyclean distclean \
 maintainer-clean
 
-
-libc.a: $(SUBLIBS)
-	rm -f $@
-	rm -rf tmp
-	mkdir tmp
-	cd tmp; \
-	 for i in $(SUBLIBS); do \
-	   $(AR) x ../$$i; \
-	 done; \
-	$(AR) $(AR_FLAGS) ../$@ *.o
-	$(RANLIB) $@
-	rm -rf tmp
+@USE_LIBTOOL_FALSE@libc.a: $(SUBLIBS)
+@USE_LIBTOOL_FALSE@	rm -f $@
+@USE_LIBTOOL_FALSE@	rm -rf tmp
+@USE_LIBTOOL_FALSE@	mkdir tmp
+@USE_LIBTOOL_FALSE@	cd tmp; \
+@USE_LIBTOOL_FALSE@	 for i in $(SUBLIBS); do \
+@USE_LIBTOOL_FALSE@	   $(AR) x ../$$i; \
+@USE_LIBTOOL_FALSE@	 done; \
+@USE_LIBTOOL_FALSE@	$(AR) $(AR_FLAGS) ../$@ *.o
+@USE_LIBTOOL_FALSE@	$(RANLIB) $@
+@USE_LIBTOOL_FALSE@	rm -rf tmp
 
 $(SUBLIBS): ; @true
 

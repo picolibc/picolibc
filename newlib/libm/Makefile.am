@@ -3,15 +3,23 @@
 AUTOMAKE_OPTIONS = cygnus
 
 if NEWLIB_HW_FP
-SUBDIRS = mathfp common .
-SUBLIBS = mathfp/lib.a common/lib.a
+MATHDIR = mathfp
 else
-SUBDIRS = math common . 
-SUBLIBS = math/lib.a common/lib.a
+MATHDIR = math
 endif
 
-noinst_LIBRARIES = libm.a
+SUBDIRS = $(MATHDIR) common machine
 
+libm_la_LDFLAGS = -Xcompiler -nostdlib
+
+if USE_LIBTOOL
+SUBLIBS = $(MATHDIR)/lib$(MATHDIR).$(aext) common/libcommon.$(aext) $(LIBM_MACHINE_LIB)
+noinst_LTLIBRARIES = libm.la
+libm_la_SOURCES =
+libm_la_LIBADD = $(SUBLIBS)
+else
+SUBLIBS = $(MATHDIR)/lib.$(aext) common/lib.$(aext) $(LIBM_MACHINE_LIB)
+noinst_LIBRARIES = libm.a
 libm.a: $(SUBLIBS)
 	rm -f $@
 	rm -rf tmp
@@ -23,6 +31,7 @@ libm.a: $(SUBLIBS)
 	$(AR) $(AR_FLAGS) ../$@ *.o
 	$(RANLIB) $@
 	rm -rf tmp
+endif
 
 $(SUBLIBS):
 

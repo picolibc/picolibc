@@ -4,9 +4,21 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-noinst_LIBRARIES = lib.a
+LIB_SOURCES = errno.c
 
-lib_a_SOURCES = errno.c
+liberrno_la_LDFLAGS = -Xcompiler -nostdlib
+
+if USE_LIBTOOL
+noinst_LTLIBRARIES = liberrno.la
+liberrno_la_SOURCES = $(LIB_SOURCES)
+noinst_DATA = objectlist.awk.in
+else
+noinst_LIBRARIES = lib.a
+lib_a_SOURCES = $(LIB_SOURCES)
+noinst_DATA =
+endif # USE_LIBTOOL
+
+include $(srcdir)/../../Makefile.shared
 
 CHEWOUT_FILES =
 

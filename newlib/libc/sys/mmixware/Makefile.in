@@ -64,14 +64,18 @@ AS = @AS@
 CC = @CC@
 CPP = @CPP@
 EXEEXT = @EXEEXT@
+LDFLAGS = @LDFLAGS@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 NEWLIB_CFLAGS = @NEWLIB_CFLAGS@
 PACKAGE = @PACKAGE@
 RANLIB = @RANLIB@
 VERSION = @VERSION@
+aext = @aext@
+libm_machine_dir = @libm_machine_dir@
 machine_dir = @machine_dir@
 newlib_basedir = @newlib_basedir@
+oext = @oext@
 sys_dir = @sys_dir@
 
 AUTOMAKE_OPTIONS = cygnus
@@ -97,7 +101,6 @@ LIBRARIES =  $(noinst_LIBRARIES)
 
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
-LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 lib_a_LIBADD = 
 lib_a_OBJECTS =  _exit.o access.o chmod.o chown.o close.o creat.o \
