@@ -52,6 +52,12 @@ class wsock_event
   WSAOVERLAPPED		ovr;
 public:
   wsock_event () : event (NULL) {};
+  ~wsock_event ()
+    {
+      if (event)
+        WSACloseEvent (event);
+      event = NULL;
+    };
 
   LPWSAOVERLAPPED prepare ();
   int wait (int socket, LPDWORD flags);

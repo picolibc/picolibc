@@ -1,3 +1,7 @@
+Mon Jun  4  0:14:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* net.cc (wsock_event): Add destructor.
+
 Sun Jun  3 09:49:55 2001  Robert Collins  <rbtcollins@hotmail.com>
 
 	* dlfcn.cc (dlclose): Do not call FreeLibrary if the symbol to close
