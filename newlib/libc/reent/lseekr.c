@@ -45,11 +45,11 @@ DESCRIPTION
 	<<errno>>.
 */
 
-off_t
+_off_t
 _lseek_r (ptr, fd, pos, whence)
      struct _reent *ptr;
      int fd;
-     off_t pos;
+     _off_t pos;
      int whence;
 {
   off_t ret;

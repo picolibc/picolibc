@@ -1,5 +1,9 @@
 2003-03-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/reent/lseekr.c (lseek_r): Use _off_t instead of off_t.
+
+2003-03-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/include/sys/config.h: Define __CYGWIN_USE_BIG_TYPES__ for
 	Cygwin.
 
