@@ -1,3 +1,7 @@
+Sat Jun 17 21:48:23 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in (subdirs): Eliminate for loop.
+
 Sat Jun 17 18:27:59 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in (subdirs): Previous change did not fix problem in

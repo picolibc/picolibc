@@ -1717,6 +1717,13 @@ if test -n "$configdirs"; then
 
 fi
 
+if test -n "$configdirs"; then
+  dosubdirs=dosubdirs
+else
+  dosubdirs=
+fi
+
+
 MKINSTALLDIRS=$ac_aux_dir/mkinstalldirs
 
 
@@ -1740,7 +1747,7 @@ MKINSTALLDIRS=$ac_aux_dir/mkinstalldirs
 # SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
 # ./install, which can be erroneously created by make from ./install.sh.
 echo $ac_n "checking for a BSD compatible install""... $ac_c" 1>&6
-echo "configure:1744: checking for a BSD compatible install" >&5
+echo "configure:1751: checking for a BSD compatible install" >&5
 if test -z "$INSTALL"; then
 if eval "test \"`echo '$''{'ac_cv_path_install'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -1965,6 +1972,7 @@ s%@target_cpu@%$target_cpu%g
 s%@target_vendor@%$target_vendor%g
 s%@target_os@%$target_os%g
 s%@subdirs@%$subdirs%g
+s%@dosubdirs@%$dosubdirs%g
 s%@MKINSTALLDIRS@%$MKINSTALLDIRS%g
 s%@CRT_ID@%$CRT_ID%g
 s%@RUNTIME@%$RUNTIME%g
