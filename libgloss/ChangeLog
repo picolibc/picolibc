@@ -1,3 +1,7 @@
+2002-07-18  Chris Demetriou  <cgd@broadcom.com>
+
+        * read.c (read): Don't assign past end of buffer, fix return value.
+
 2002-07-12  Chris Demetriou  <cgd@broadcom.com>
 
         * mips/Makefile.in (GENOBJS2): New variable to name other
