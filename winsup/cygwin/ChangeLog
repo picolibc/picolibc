@@ -1,3 +1,12 @@
+2004-04-21  Yitzchak Scott-Thoennes  <sthoenna@efn.org>
+
+	* syscalls.cc (lseek64): Fix debug_printf format string.
+	(truncate64): Ditto.
+
+2004-04-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::lseek): Force res to -1 on error.
+
 2004-04-20  Christopher Faylor  <cgf@alum.bu.edu>
 
 	* path.cc (is_unc_share): Rename from slash_unc_prefix_p throughout.

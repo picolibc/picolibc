@@ -603,7 +603,7 @@ lseek64 (int fd, _off64_t pos, int dir)
       else
 	res = -1;
     }
-  syscall_printf ("%d = lseek (%d, %D, %d)", res, fd, pos, dir);
+  syscall_printf ("%D = lseek (%d, %D, %d)", res, fd, pos, dir);
 
   return res;
 }
@@ -1709,7 +1709,7 @@ truncate64 (const char *pathname, _off64_t length)
       res = ftruncate64 (fd, length);
       close (fd);
     }
-  syscall_printf ("%d = truncate (%s, %d)", res, pathname, length);
+  syscall_printf ("%d = truncate (%s, %D)", res, pathname, length);
 
   return res;
 }

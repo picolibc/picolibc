@@ -1090,6 +1090,7 @@ fhandler_base::lseek (_off64_t offset, int whence)
   if (res == INVALID_SET_FILE_POINTER && GetLastError ())
     {
       __seterrno ();
+      res = -1;
     }
   else
     {
