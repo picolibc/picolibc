@@ -45,7 +45,7 @@ case "${target_optspace}:${host}" in
   yes:*)
     newlib_cflags="${newlib_cflags} -Os"
     ;;
-  :m32r-* | :d10v-* | :d30v-*)
+  :m32r-* | :d10v-* | :d30v-* | :avr-*)
     newlib_cflags="${newlib_cflags} -Os"
     ;;
   no:* | :*)
@@ -67,6 +67,9 @@ case "${host_cpu}" in
 	;;
   arm)
 	machine_dir=arm
+	;;
+  avr*)
+	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -mcall-prologues"
 	;;
   d10v*)
 	machine_dir=d10v
@@ -337,6 +340,9 @@ case "${host}" in
 # See also thumb below.
 #	newlib_cflags="${newlib_cflags} -DARM_RDP_MONITOR"
 	newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
+	;;
+  avr*)
+	newlib_cflags="${newlib_cflags} -DNO_EXEC -DSMALL_MEMORY -DMISSING_SYSCALL_NAMES"
 	;;
   d10v*)
 	newlib_cflags="${newlib_cflags} -DSMALL_MEMORY"

@@ -152,6 +152,12 @@
 #endif
 #endif
 
+#ifdef __AVR__
+#define __IEEE_LITTLE_ENDIAN
+#define __SMALL_BITFIELDS
+#define _DOUBLE_IS_32BITS
+#endif
+
 #ifndef __IEEE_BIG_ENDIAN
 #ifndef __IEEE_LITTLE_ENDIAN
 #error Endianess not declared!!

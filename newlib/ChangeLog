@@ -1,3 +1,9 @@
+Tue Jun 27 15:49:00 2000  Marek Michalkiewicz  <marekm@linux.org.pl>
+
+	* configure.host: Add support for AVR target.
+	* libc/include/machine/ieeefp.h: Likewise.
+	* libc/include/sys/config.h: Likewise.
+
 Thu Jun 22 18:35:00 2000  Ranjith Kumaran  <ranjith@cygnus.com>
 
 	* README: Newlib 1.8.2 must be built in a separate directory
