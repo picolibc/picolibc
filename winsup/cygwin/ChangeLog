@@ -1,3 +1,7 @@
+2003-03-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (seteuid32): Fix formatting.
+
 2003-03-04  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* thread.cc (MTinterface::fixup_after_fork): Initialize mainthread

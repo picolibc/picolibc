@@ -2040,7 +2040,8 @@ seteuid32 (__uid32_t uid)
 
   /* Set process def dacl to allow access to impersonated token */
   char dacl_buf[MAX_DACL_LEN (5)];
-  if (usersid != (origpsid =  cygheap->user.orig_sid ())) psid2 = usersid;
+  if (usersid != (origpsid = cygheap->user.orig_sid ()))
+    psid2 = usersid;
   if (sec_acl ((PACL) dacl_buf, FALSE, origpsid, psid2))
     {
       TOKEN_DEFAULT_DACL tdacl;
@@ -2110,11 +2111,11 @@ success:
   groups.ischanged = FALSE;
   return 0;
 
- failed:
+failed:
   cygheap->user.token = sav_token;
   cygheap->user.impersonated = sav_impersonated;
   if (cygheap->user.issetuid ()
-       && !ImpersonateLoggedOnUser (cygheap->user.token))
+      && !ImpersonateLoggedOnUser (cygheap->user.token))
     system_printf ("Impersonating in seteuid failed: %E");
   return -1;
 }
