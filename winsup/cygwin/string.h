@@ -23,7 +23,7 @@ extern inline __stdcall char *
 strchr (const char *s, int c)
 {
   register char * res;
-  __asm__ __volatile__ ("
+  __asm__ __volatile__ ("\
 		movb	%%al,%%ah\n\
 	1:	movb	(%1),%%al\n\
 		cmpb	%%ah,%%al\n\
@@ -33,7 +33,7 @@ strchr (const char *s, int c)
 		jne	1b\n\
 		xorl	%1,%1\n\
 	2:	movl	%1,%0\n\
-	":"=a" (__res), "=r" (s)
+	":"=a" (res), "=r" (s)
 	:"0" (c), "1" (s));
   return res;
 }
