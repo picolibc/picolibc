@@ -22,12 +22,12 @@ uname (struct utsname *name)
   SYSTEM_INFO sysinfo;
   extern char osname[];
 
+  memset (name, 0, sizeof (*name));
   __small_sprintf (name->sysname, "CYGWIN_%s", osname);
 
   GetSystemInfo (&sysinfo);
 
   /* Computer name */
-  memset (name, 0, sizeof (*name));
   len = sizeof (name->nodename) - 1;
   GetComputerNameA (name->nodename, &len);
 
