@@ -142,7 +142,7 @@
 /*
  * The structure underlying the FILE type.
  *
- * I still believe that nobody in their right mind should make use of the
+ * Some believe that nobody in their right mind should make use of the
  * internals of this structure. Provided by Pedro A. Aranda Gutiirrez
  * <paag@tid.es>.
  */
@@ -247,13 +247,56 @@ _CRTIMP int __cdecl	fgetc (FILE*);
 _CRTIMP char* __cdecl	fgets (char*, int, FILE*);
 _CRTIMP int __cdecl	fputc (int, FILE*);
 _CRTIMP int __cdecl	fputs (const char*, FILE*);
-_CRTIMP int __cdecl	getc (FILE*);
-_CRTIMP int __cdecl	getchar (void);
 _CRTIMP char* __cdecl	gets (char*);
-_CRTIMP int __cdecl	putc (int, FILE*);
-_CRTIMP int __cdecl	putchar (int);
 _CRTIMP int __cdecl	puts (const char*);
 _CRTIMP int __cdecl	ungetc (int, FILE*);
+
+/* Traditionally, getc and putc are defined as macros. but the
+   standard doesn't say that they must be macros.
+   We use inline functions here to allow the fast versions
+   to be used in C++ with namespace qualification, eg., ::getc.
+
+   _filbuf and _flsbuf  are not thread-safe. */
+_CRTIMP int __cdecl	_filbuf (FILE*);
+_CRTIMP int __cdecl	_flsbuf (int, FILE*);
+
+#if !defined _MT
+
+__CRT_INLINE int __cdecl getc (FILE* __F)
+{
+  return (--__F->_cnt >= 0)
+    ?  (int) *__F->_ptr++
+    : _filbuf (__F);
+}
+
+__CRT_INLINE int __cdecl putc (int __c, FILE* __F)
+{
+  return (--__F->_cnt >= 0)
+    ?  (int)(*__F->_ptr++ = (char)__c)
+    :  _flsbuf (__c, __F);
+}
+
+__CRT_INLINE int __cdecl getchar (void)
+{
+  return (--stdin->_cnt >= 0)
+    ?  (int) *stdin->_ptr++
+    : _filbuf (stdin);
+}
+
+__CRT_INLINE int __cdecl putchar(int __c)
+{
+  return (--stdout->_cnt >= 0)
+    ?  (int)(*stdout->_ptr++ = (char)__c)
+    :  _flsbuf (__c, stdout);}
+
+#else  /* Use library functions.  */
+
+_CRTIMP int __cdecl	getc (FILE*);
+_CRTIMP int __cdecl	putc (int, FILE*);
+_CRTIMP int __cdecl	getchar (void);
+_CRTIMP int __cdecl	putchar (int);
+
+#endif
 
 /*
  * Direct Input and Output Functions

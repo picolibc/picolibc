@@ -1,5 +1,14 @@
 2003-10-03  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/stdio.h (_filbuf): Add prototype.
+	(_flsbuf): Add prototype.
+	(getc): Add inline version.
+	(putc): Likewise.
+	(getchar): Likewise.
+	(putchar): Likewise.
+
+2003-10-03  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* mingwex/dirent.c (_treaddir): Reset errno to 0 if end
 	of directory.
 
