@@ -1185,11 +1185,11 @@ typedef struct tagMIXERCONTROLA {
 	CHAR szShortName[MIXER_SHORT_NAME_CHARS];
 	CHAR szName[MIXER_LONG_NAME_CHARS];
 	union {
-		struct {
+		_ANONYMOUS_STRUCT struct {
 			LONG lMinimum;
 			LONG lMaximum;
 		}_STRUCT_NAME(s);
-		struct {
+		_ANONYMOUS_STRUCT struct {
 			DWORD dwMinimum;
 			DWORD dwMaximum;
 		}_STRUCT_NAME(s1);
@@ -1210,11 +1210,11 @@ typedef struct tagMIXERCONTROLW {
 	WCHAR szShortName[MIXER_SHORT_NAME_CHARS];
 	WCHAR szName[MIXER_LONG_NAME_CHARS];
 	union {
-		struct {
+		_ANONYMOUS_STRUCT struct {
 			LONG lMinimum;
 			LONG lMaximum;
 		}_STRUCT_NAME(s);
-		struct {
+		_ANONYMOUS_STRUCT struct {
 			DWORD dwMinimum;
 			DWORD dwMaximum;
 		}_STRUCT_NAME(s1);
@@ -1229,7 +1229,7 @@ typedef struct tagMIXERCONTROLW {
 typedef struct tagMIXERLINECONTROLSA {
 	DWORD cbStruct;
 	DWORD dwLineID;
-	union {
+	_ANONYMOUS_UNION union {
 		DWORD dwControlID;
 		DWORD dwControlType;
 	} DUMMYUNIONNAME;
@@ -1240,7 +1240,7 @@ typedef struct tagMIXERLINECONTROLSA {
 typedef struct tagMIXERLINECONTROLSW {
 	DWORD cbStruct;
 	DWORD dwLineID;
-	union {
+	_ANONYMOUS_UNION union {
 		DWORD dwControlID;
 		DWORD dwControlType;
 	} DUMMYUNIONNAME;
@@ -1252,7 +1252,7 @@ typedef struct tMIXERCONTROLDETAILS {
 	DWORD cbStruct;
 	DWORD dwControlID;
 	DWORD cChannels;
-	union {
+	_ANONYMOUS_UNION union {
 		HWND hwndOwner;
 		DWORD cMultipleItems;
 	} DUMMYUNIONNAME;

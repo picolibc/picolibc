@@ -1,4 +1,20 @@
 
+2001-04-17  Egor Duda  <deo@logos-m.ru>
+
+	* include/windows.h: Define _ANONYMOUS_STRUCT and _ANONYMOUS_UNION
+	as __extenstion__ when appropriate.
+	* include/mmsystem.h: Mark anonymous structs and unions as
+	__extension__ to prevent compiler warning when invoked with
+	-pedantic
+	* include/oaidl.h: Ditto.
+	* include/objidl.h: Ditto.
+	* include/olectl.h: Ditto.
+	* include/prsht.h: Ditto.
+	* include/shlobj.h: Ditto.
+	* include/winbase.h: Ditto.
+	* include/winnt.h: Ditto.
+	* include/wtypes.h: Ditto.
+
 2001-04-11 Danny Smith <dannysmith@users.sourceforge.net>
 
 	* include/windows.h (#include <winsock.h>): Include <winsock2.h>

@@ -807,9 +807,9 @@ typedef enum _GET_FILEEX_INFO_LEVELS {
 	GetFileExMaxInfoLevel
 } GET_FILEEX_INFO_LEVELS;
 typedef struct _SYSTEM_INFO {
-	union {
+	_ANONYMOUS_UNION union {
 		DWORD dwOemId;
-		struct {
+		_ANONYMOUS_STRUCT struct {
 			WORD wProcessorArchitecture;
 			WORD wReserved;
 		} DUMMYSTRUCTNAME;
@@ -897,7 +897,7 @@ typedef struct _PROCESS_HEAP_ENTRY {
 	BYTE cbOverhead;
 	BYTE iRegionIndex;
 	WORD wFlags;
-	union {
+	_ANONYMOUS_UNION union {
 		struct {
 			HANDLE hMem;
 			DWORD dwReserved[3];

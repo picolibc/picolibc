@@ -97,11 +97,11 @@ typedef struct _PROPSHEETPAGEA {
 	DWORD	dwSize;
 	DWORD	dwFlags;
 	HINSTANCE	hInstance;
-	union {
+	_ANONYMOUS_UNION union {
 		LPCSTR	pszTemplate;
 		LPCDLGTEMPLATE	pResource;
 	} DUMMYUNIONNAME;
-	union {
+	_ANONYMOUS_UNION union {
 		HICON hIcon;
 		LPCSTR pszIcon;
 	} DUMMYUNIONNAME2;
@@ -116,11 +116,11 @@ typedef struct _PROPSHEETPAGEW {
 	DWORD	dwSize;
 	DWORD	dwFlags;
 	HINSTANCE	hInstance;
-	union {
+	_ANONYMOUS_UNION union {
 		LPCWSTR	pszTemplate;
 		LPCDLGTEMPLATE	pResource;
 	} DUMMYUNIONNAME;
-	union {
+	_ANONYMOUS_UNION union {
 		HICON hIcon;
 		LPCWSTR pszIcon;
 	} DUMMYUNIONNAME2;
@@ -140,17 +140,17 @@ typedef struct _PROPSHEETHEADERA {
 	DWORD	dwFlags;
 	HWND	hwndParent;
 	HINSTANCE	hInstance;
-	union {
+	_ANONYMOUS_UNION union {
 		HICON	hIcon;
 		LPCSTR	pszIcon;
 	}DUMMYUNIONNAME;
 	LPCSTR	pszCaption;
 	UINT	nPages;
-	union {
+	_ANONYMOUS_UNION union {
 		UINT	nStartPage;
 		LPCSTR	pStartPage;
 	}DUMMYUNIONNAME2;
-	union {
+	_ANONYMOUS_UNION union {
 		LPCPROPSHEETPAGEA ppsp;
 		HPROPSHEETPAGE *phpage;
 	}DUMMYUNIONNAME3;
@@ -162,17 +162,17 @@ typedef struct _PROPSHEETHEADERW {
 	DWORD	dwFlags;
 	HWND	hwndParent;
 	HINSTANCE	hInstance;
-	union {
+	_ANONYMOUS_UNION union {
 		HICON	hIcon;
 		LPCWSTR	pszIcon;
 	}DUMMYUNIONNAME;
 	LPCWSTR	pszCaption;
 	UINT	nPages;
-	union {
+	_ANONYMOUS_UNION union {
 		UINT	nStartPage;
 		LPCWSTR	pStartPage;
 	}DUMMYUNIONNAME2;
-	union {
+	_ANONYMOUS_UNION union {
 		LPCPROPSHEETPAGEW ppsp;
 		HPROPSHEETPAGE *phpage;
 	}DUMMYUNIONNAME3;

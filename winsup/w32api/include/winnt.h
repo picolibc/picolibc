@@ -1693,7 +1693,7 @@ typedef struct _EXCEPTION_POINTERS {
 	PCONTEXT ContextRecord;
 } EXCEPTION_POINTERS,*PEXCEPTION_POINTERS,*LPEXCEPTION_POINTERS;
 typedef union _LARGE_INTEGER {
-	struct {
+	_ANONYMOUS_STRUCT struct {
 		DWORD LowPart;
 		LONG HighPart;
 	}_STRUCT_NAME(u);
@@ -1701,7 +1701,7 @@ typedef union _LARGE_INTEGER {
 } LARGE_INTEGER;
 typedef LARGE_INTEGER *PLARGE_INTEGER;
 typedef union _ULARGE_INTEGER {
-	struct {
+	_ANONYMOUS_STRUCT struct {
 		DWORD LowPart;
 		DWORD HighPart;
 	}_STRUCT_NAME(u);
@@ -2231,7 +2231,7 @@ typedef struct _IMAGE_COFF_SYMBOLS_HEADER {
 	DWORD RvaToLastByteOfData;
 } IMAGE_COFF_SYMBOLS_HEADER,*PIMAGE_COFF_SYMBOLS_HEADER;
 typedef struct _IMAGE_RELOCATION {
-	union {
+	_ANONYMOUS_UNION union {
 		DWORD VirtualAddress;
 		DWORD RelocCount;
 	} DUMMYUNIONNAME;
@@ -2290,7 +2290,7 @@ typedef struct _IMAGE_THUNK_DATA {
 	} u1;
 } IMAGE_THUNK_DATA,*PIMAGE_THUNK_DATA;
 typedef struct _IMAGE_IMPORT_DESCRIPTOR {
-	union {
+	_ANONYMOUS_UNION union {
 		DWORD Characteristics;
 		PIMAGE_THUNK_DATA OriginalFirstThunk;
 	} DUMMYUNIONNAME;
@@ -2326,18 +2326,18 @@ typedef struct _IMAGE_RESOURCE_DIRECTORY {
 	WORD NumberOfNamedEntries;
 	WORD NumberOfIdEntries;
 } IMAGE_RESOURCE_DIRECTORY,*PIMAGE_RESOURCE_DIRECTORY;
-typedef struct _IMAGE_RESOURCE_DIRECTORY_ENTRY {
-	union {
-		struct {
+_ANONYMOUS_STRUCT typedef struct _IMAGE_RESOURCE_DIRECTORY_ENTRY {
+	_ANONYMOUS_UNION union {
+		_ANONYMOUS_STRUCT struct {
 			DWORD NameOffset:31;
 			DWORD NameIsString:1;
 		}DUMMYSTRUCTNAME;
 		DWORD Name;
 		WORD Id;
 	} DUMMYUNIONNAME;
-	union {
+	_ANONYMOUS_UNION union {
 		DWORD OffsetToData;
-		struct {
+		_ANONYMOUS_STRUCT struct {
 			DWORD OffsetToDirectory:31;
 			DWORD DataIsDirectory:1;
 		} DUMMYSTRUCTNAME2;
@@ -2455,7 +2455,7 @@ typedef struct _NT_TIB {
 	PVOID StackBase;
 	PVOID StackLimit;
 	PVOID SubSystemTib;
-	union {
+	_ANONYMOUS_UNION union {
 		PVOID FiberData;
 		DWORD Version;
 	} DUMMYUNIONNAME;
@@ -2466,7 +2466,7 @@ typedef struct _REPARSE_DATA_BUFFER {
 	DWORD  ReparseTag;
 	WORD   ReparseDataLength;
 	WORD   Reserved;
-	union {
+	_ANONYMOUS_UNION union {
 		struct {
 			WORD   SubstituteNameOffset;
 			WORD   SubstituteNameLength;

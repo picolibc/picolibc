@@ -272,7 +272,7 @@ typedef enum tagSHCONTF {
 } SHCONTF;
 typedef struct _STRRET {
 	UINT uType;
-	union {
+	_ANONYMOUS_UNION union {
 		LPWSTR pOleStr;
 		UINT uOffset;
 		char cStr[MAX_PATH];

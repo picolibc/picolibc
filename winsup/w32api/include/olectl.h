@@ -325,7 +325,7 @@ typedef struct tagFONTDESC {
 typedef struct tagPICTDESC {
 	UINT cbSizeofstruct;
 	UINT picType;
-	union {
+	_ANONYMOUS_UNION union {
 		struct {
 			HBITMAP hbitmap;
 			HPALETTE hpal;

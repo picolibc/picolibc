@@ -151,7 +151,7 @@ typedef enum tagBIND_FLAGS {
 } BIND_FLAGS;
 typedef struct tagSTGMEDIUM {
 	DWORD tymed;
-	union {
+	_ANONYMOUS_UNION union {
 		HBITMAP hBitmap;
 		PVOID hMetaFilePict;
 		HENHMETAFILE hEnhMetaFile;
@@ -297,7 +297,7 @@ typedef struct tagPROPVARIANT {
 	WORD wReserved1;
 	WORD wReserved2;
 	WORD wReserved3;
-	union {
+	_ANONYMOUS_UNION union {
 		UCHAR bVal;
 		short iVal;
 		USHORT uiVal;
@@ -349,7 +349,7 @@ typedef struct tagPROPVARIANT {
 } PROPVARIANT;
 typedef struct tagPROPSPEC {
 	ULONG ulKind;
-	union {
+	_ANONYMOUS_UNION union {
 		PROPID propid;
 		LPOLESTR lpwstr;
 	} DUMMYUNIONNAME;

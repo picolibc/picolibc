@@ -216,7 +216,7 @@ typedef struct _wireVARIANT {
 	USHORT wReserved1;
 	USHORT wReserved2;
 	USHORT wReserved3;
-	union {
+	_ANONYMOUS_UNION union {
 		LONG lVal;
 		BYTE bVal;
 		SHORT iVal;
@@ -292,7 +292,7 @@ typedef struct tagIDLDESC {
 }IDLDESC,*LPIDLDESC;
 typedef struct tagELEMDESC {
 	TYPEDESC tdesc;
-	union {
+	_ANONYMOUS_UNION union {
 		IDLDESC idldesc;
 		PARAMDESC paramdesc;
 	} DUMMYUNIONNAME;
@@ -367,7 +367,7 @@ typedef enum tagVARKIND {
 typedef struct tagVARDESC {
 	MEMBERID memid;
 	LPOLESTR lpstrSchema;
-	union {
+	_ANONYMOUS_UNION union {
 		ULONG oInst;
 		VARIANT *lpvarValue;
 	} DUMMYUNIONNAME;

@@ -78,7 +78,7 @@ typedef BSTR *LPBSTR;
 typedef LONG SCODE;
 typedef void *HCONTEXT;
 typedef union tagCY {
-	struct {
+	_ANONYMOUS_STRUCT struct {
 		unsigned long Lo;
 		long Hi;
 	}_STRUCT_NAME(s);
@@ -138,16 +138,16 @@ typedef struct _HYPER_SIZEDARR {
 typedef double DOUBLE;
 typedef struct tagDEC {
 	USHORT wReserved;
-	union {
-		struct {
+	_ANONYMOUS_UNION union {
+		_ANONYMOUS_STRUCT struct {
 			BYTE scale;
 			BYTE sign;
 		}_STRUCT_NAME(s);
 		USHORT signscale;
 	} DUMMYUNIONNAME;
 	ULONG Hi32;
-	union {
-		struct {
+	_ANONYMOUS_UNION union {
+		_ANONYMOUS_STRUCT struct {
 			ULONG Lo32;
 			ULONG Mid32;
 		}_STRUCT_NAME(s2);

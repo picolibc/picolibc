@@ -42,18 +42,19 @@
 
 #ifdef __GNUC__
 #ifndef NONAMELESSUNION
-#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 95)
-#define _ANONYMOUS_UNION
-#define _ANONYMOUS_STRUCT
+#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 95) 
+#define _ANONYMOUS_UNION __extension__
+#define _ANONYMOUS_STRUCT __extension__
 #else
 #if defined(__cplusplus)
-#define _ANONYMOUS_UNION
+#define _ANONYMOUS_UNION __extension__
 #endif
 #endif /* __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 95) */
 #endif /* NONAMELESSUNION */
 #endif /* __GNUC__ */
 
 #ifndef _ANONYMOUS_UNION
+#define _ANONYMOUS_UNION
 #define _UNION_NAME(x) x
 #define DUMMYUNIONNAME	u
 #define DUMMYUNIONNAME2	u2
@@ -75,6 +76,7 @@
 #define DUMMYUNIONNAME8
 #endif
 #ifndef _ANONYMOUS_STRUCT
+#define _ANONYMOUS_STRUCT
 #define _STRUCT_NAME(x) x
 #define DUMMYSTRUCTNAME	s
 #define DUMMYSTRUCTNAME2 s2
