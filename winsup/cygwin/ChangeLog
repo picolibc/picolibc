@@ -1,3 +1,25 @@
+2004-01-19  Christopher Faylor  <cgf@redhat.com>
+
+	* cygwin/include/signal.h: Add copyright notice.
+
+	* cygwin.din: Make clock SIGFE.  Add clock_gettime, sigwaitinfo,
+	timer_create, timer_delete, timer_settime.
+	* include/cygwin/version.h: Reflect above additions.
+	* fork.cc (fork_child): Call fixup_timers_after_fork.
+	* signal.cc (sigwait): Remove unused variable.
+	* timer.cc: New file.
+	(clock_gettime): Define new function.
+	(timer_tracker): Define new struct used by timer functions.
+	(timer_tracker::timer_tracker): New function.
+	(to_us): New function.
+	(timer_thread): New function.
+	(timer_tracker::settime): New function.
+	(timer_create): New function.
+	(timer_settime): New function.
+	(timer_delete): New function.
+	(fixup_timers_after_fork): New function.
+	* cygthread.cc: Bump thread count.
+
 2004-01-17  Christopher Faylor  <cgf@redhat.com>
 
 	* signal.cc (sigwaitinfo): Define new function.

@@ -481,11 +481,10 @@ siginterrupt (int sig, int flag)
 extern "C" int
 sigwait (const sigset_t *set, int *sig_ptr)
 {
-  siginfo_t si;
-  int pid = sigwaitinfo (set, NULL);
-  if (pid > 0)
-    *sig_ptr = pid;
-  return pid > 0 ? 0 : -1;
+  int sig = sigwaitinfo (set, NULL);
+  if (sig > 0)
+    *sig_ptr = sig;
+  return sig > 0 ? 0 : -1;
 }
 
 extern "C" int
@@ -506,7 +505,8 @@ sigwaitinfo (const sigset_t *set, siginfo_t *info)
   switch (WaitForSingleObject (_my_tls.event, INFINITE))
     {
     case WAIT_OBJECT_0:
-      res = _my_tls.infodata.si_pid;
+      res = _my_tls.infodata.si_signo;
+      sigproc_printf ("returning sig %d", res);
       if (info)
 	*info = _my_tls.infodata;
       break;

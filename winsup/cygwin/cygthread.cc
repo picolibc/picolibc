@@ -20,7 +20,7 @@ details. */
 
 #undef CloseHandle
 
-static cygthread NO_COPY threads[18];
+static cygthread NO_COPY threads[32];
 #define NTHREADS (sizeof (threads) / sizeof (threads[0]))
 
 DWORD NO_COPY cygthread::main_thread_id;

@@ -246,8 +246,9 @@ _chroot = chroot SIGFE
 cleanup_glue NOSIGFE
 clearerr NOSIGFE
 _clearerr = clearerr NOSIGFE
-clock NOSIGFE
-_clock = clock NOSIGFE
+clock SIGFE
+_clock = clock SIGFE
+clock_gettime SIGFE
 close SIGFE
 _close = close SIGFE
 closedir SIGFE
@@ -1234,6 +1235,7 @@ sigpending SIGFE
 sigprocmask SIGFE
 sigsuspend SIGFE
 sigwait SIGFE
+sigwaitinfo SIGFE
 sin NOSIGFE
 _sin = sin NOSIGFE
 sincos NOSIGFE
@@ -1407,6 +1409,9 @@ tgamma NOSIGFE
 tgammaf NOSIGFE
 time SIGFE
 _time = time SIGFE
+timer_create SIGFE
+timer_delete SIGFE
+timer_settime SIGFE
 times SIGFE
 _times = times SIGFE
 timezone SIGFE

@@ -935,40 +935,52 @@ sigpacket::process ()
     }
 
   int rc = 1;
-  bool insigwait_mask = tls ? sigismember (&tls->sigwait_mask, si.si_signo) : false;
-  bool special_case = ISSTATE (myself, PID_STOPPED) || main_vfork->pid;
-  bool masked = sigismember (mask, si.si_signo);
-  if (si.si_signo != SIGKILL && si.si_signo != SIGSTOP
-      && (special_case || main_vfork->pid || masked || insigwait_mask
-	  || (tls && sigismember (&tls->sigmask, si.si_signo))))
-    {
-      sigproc_printf ("signal %d blocked", si.si_signo);
-      if ((!special_case && !masked)
-	  && (insigwait_mask || (tls = _threadinfo::find_tls (si.si_signo)) != NULL))
-	goto thread_specific;
-      rc = -1;
-      goto done;
-    }
-
-  /* Clear pending SIGCONT on stop signals */
-  if (si.si_signo == SIGSTOP || si.si_signo == SIGTSTP || si.si_signo == SIGTTIN || si.si_signo == SIGTTOU)
-    sig_clear (SIGCONT);
 
   sigproc_printf ("signal %d processing", si.si_signo);
   struct sigaction thissig = global_sigs[si.si_signo];
-  void *handler;
-  handler = (void *) thissig.sa_handler;
 
   myself->rusage_self.ru_nsignals++;
 
   if (si.si_signo == SIGKILL)
     goto exit_sig;
+  if ( si.si_signo == SIGSTOP)
+    {
+      sig_clear (SIGCONT);
+      goto stop;
+    }
+
+  bool masked;
+  bool special_case;
+  bool insigwait_mask;
+  insigwait_mask = masked = false;
+  if (special_case = (main_vfork->pid || ISSTATE (myself, PID_STOPPED)))
+    /* nothing to do */;
+  else if (tls && sigismember (&tls->sigwait_mask, si.si_signo))
+    insigwait_mask = true;
+  else if (!tls && (tls = _threadinfo::find_tls (si.si_signo)))
+    insigwait_mask = true;
+  else if (!(masked = sigismember (mask, si.si_signo)) && tls)
+    masked  = sigismember (&tls->sigmask, si.si_signo);
+
+  if (insigwait_mask)
+    goto thread_specific;
 
   if (!tls)
     tls = _main_tls;
 
-  if (si.si_signo == SIGSTOP)
-    goto stop;
+  if (special_case || masked)
+    {
+      sigproc_printf ("signal %d blocked", si.si_signo);
+      rc = -1;
+      goto done;
+    }
+
+  void *handler;
+  handler = (void *) thissig.sa_handler;
+
+  /* Clear pending SIGCONT on stop signals */
+  if (si.si_signo == SIGTSTP || si.si_signo == SIGTTIN || si.si_signo == SIGTTOU)
+    sig_clear (SIGCONT);
 
 #if 0
   char sigmsg[24];
@@ -1025,6 +1037,7 @@ done:
 
 thread_specific:
   tls->sig = si.si_signo;
+  tls->set_siginfo (this);
   sigproc_printf ("releasing sigwait for thread");
   SetEvent (tls->event);
   goto done;

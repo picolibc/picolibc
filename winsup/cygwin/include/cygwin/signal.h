@@ -1,3 +1,13 @@
+/* signal.h
+
+  Copyright 2004 Red Hat, Inc.
+
+  This file is part of Cygwin.
+
+  This software is a copyrighted work licensed under the terms of the
+  Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+  details. */
+
 #ifndef _CYGWIN_SIGNAL_H
 #define _CYGWIN_SIGNAL_H
 
@@ -22,6 +32,15 @@ typedef union sigval
   void  *sival_ptr;			/* pointer signal value */
 } sigval_t;
 
+typedef struct sigevent
+{
+  sigval_t sigev_value;			/* signal value */
+  int sigev_signo;			/* signal number */
+  int sigev_notify;			/* notification type */
+  void (*sigev_notify_function) (sigval_t); /* notification function */
+  pthread_attr_t *sigev_notify_attributes; /* notification attributes */
+} sigevent_t;
+
 #pragma pack(push,4)
 typedef struct
 {
@@ -43,11 +62,12 @@ typedef struct
 	{
 	  struct
 	  {
-	    unsigned int si_tid;	/* timer id */
+	    timer_t si_tid;		/* timer id */
 	    unsigned int si_overrun;	/* overrun count */
 	  };
+	  sigval_t si_sigval;		/* signal value */
+	  sigval_t si_value;		/* signal value */
 	};
-	sigval_t si_sigval;		/* signal value */
       };
     };
 
@@ -109,15 +129,6 @@ enum
   CLD_STOPPED,				/* child has stopped */
   CLD_CONTINUED				/* stopped child has continued */
 };
-
-typedef struct sigevent
-{
-  sigval_t sigev_value;			/* signal value */
-  int sigev_signo;			/* signal number */
-  int sigev_notify;			/* notification type */
-  void (*sigev_notify_function) (sigval_t); /* notification function */
-  pthread_attr_t *sigev_notify_attributes; /* notification attributes */
-} sigevent_t;
 
 enum
 {
