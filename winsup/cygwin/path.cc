@@ -3186,7 +3186,7 @@ readlink (const char *path, char *buf, int buflen)
 /* Cygwin internal */
 
 unsigned long __stdcall
-hash_path_name (unsigned long hash, const char *name)
+hash_path_name (ino_t hash, const char *name)
 {
   if (!*name)
     return hash;

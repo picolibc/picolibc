@@ -295,7 +295,7 @@ const NO_COPY char __declspec(dllexport) * const _sys_errlist[]=
 /* EOVERFLOW 139 */ "Value too large for defined data type"
 };
 
-int NO_COPY __declspec(dllexport) _sys_nerr = sizeof (_sys_errlist) / sizeof (_sys_errlist[0]);
+const int NO_COPY __declspec(dllexport) _sys_nerr = sizeof (_sys_errlist) / sizeof (_sys_errlist[0]);
 };
 
 /* FIXME: Why is strerror() a long switch and not just:

@@ -1,3 +1,8 @@
+2003-04-26  Christopher Faylor  <cgf@redhat.com>
+
+	* errno.cc (_sys_nerr): Fix compile error erroneously checked in on
+	2003-04-23.
+
 2003-04-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/netinet/ip.h: Include netinet/in_systm.h and netinet/in.h
