@@ -1,3 +1,9 @@
+2001-11-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_raw.cc (fhandler_dev_raw::clear): Don't reset unit.
+	* fhandler_tape.cc (fhandler_dev_tape::fhandler_dev_tape): Add debug
+	output.
+
 2001-11-15  Egor Duda  <deo@logos-m.ru>
 
 	* include/pthread.h (PTHREAD_COND_INITIALIZER): Define.

@@ -86,7 +86,6 @@ fhandler_dev_raw::clear (void)
   eof_detected = 0;
   lastblk_to_read = 0;
   varblkop = 0;
-  unit = 0;
 }
 
 int
