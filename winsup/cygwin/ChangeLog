@@ -1,3 +1,7 @@
+2003-04-03  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_console.cc (CONVERT_LIMIT): Use a size for the 21st century.
+
 2003-04-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* external.cc (check_ntsec): Return general ntsec state on NULL
