@@ -56,49 +56,4 @@ ilockcmpexch (long *t, long v, long c)
 #define InterlockedExchange ilockexch
 #undef InterlockedCompareExchange
 #define InterlockedCompareExchange ilockcmpexch
-
-// extern char * volatile *__stackbase __asm__ ("%fs:4");
-#ifndef EXPCGf
-#define DECLARE_TLS_STORAGE do {} while (0)
-#else
-#define DECLARE_TLS_STORAGE char **tls[4096] __attribute__ ((unused))
-extern long tls_ix;
-
-extern __inline__ DWORD
-my_tlsalloc ()
-{
-  DWORD n = ilockdecr (&tls_ix);
-  __stackbase[tls_ix] = NULL;
-  return n;
-}
-
-extern __inline__ BOOL
-my_tlssetvalue (DWORD ix, void *val)
-{
-  __stackbase[ix] = (char *) val;
-  return 1;
-}
-
-extern __inline__ void *
-my_tlsgetvalue (DWORD ix)
-{
-  return __stackbase[ix];
-}
-
-extern __inline__ BOOL
-my_tlsfree (DWORD ix)
-{
-  /* nothing for now */
-  return 1;
-}
-
-#undef TlsAlloc
-#define TlsAlloc my_tlsalloc
-#undef TlsGetValue
-#define TlsGetValue my_tlsgetvalue
-#undef TlsSetValue
-#define TlsSetValue my_tlssetvalue
-#undef TlsFree
-#define TlsFree my_tlsfree
-#endif /*EXPCGF*/
 #endif /*_WINBASE2_H*/

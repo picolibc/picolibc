@@ -532,8 +532,9 @@ _threadinfo NO_COPY *_main_tls;
 static void
 dll_crt0_1 ()
 {
-  __uint64_t padding[CYGTLS_PADSIZE];
-  _main_tls = _my_tls.init (padding);
+  char padding[CYGTLS_PADSIZE];
+  _main_tls = &_my_tls;
+  _main_tls->init (padding);
 
   /* According to onno@stack.urc.tue.nl, the exception handler record must
      be on the stack.  */
@@ -838,7 +839,6 @@ initial_env ()
 extern "C" void __stdcall
 _dll_crt0 ()
 {
-  DECLARE_TLS_STORAGE;
   initial_env ();
   char zeros[sizeof (fork_info->zero)] = {0};
   static NO_COPY STARTUPINFO si;
@@ -907,7 +907,6 @@ _dll_crt0 ()
 void
 dll_crt0 (per_process *uptr)
 {
-  DECLARE_TLS_STORAGE;
   /* Set the local copy of the pointer into the user space. */
   if (uptr && uptr != user_data)
     {

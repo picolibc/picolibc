@@ -1885,14 +1885,10 @@ __reent_t::init_clib (struct _reent& var)
   _clib = &var;
 };
 
-/* Pthreads */
-void *
-pthread::thread_init_wrapper (void *_arg)
+void
+pthread::thread_init_wrapper2 (void *arg, void *)
 {
-  // Setup the local/global storage of this thread
-  __uint64_t padding[CYGTLS_PADSIZE];
-  pthread *thread = (pthread *) _arg;
-  thread->cygtls = _my_tls.init (padding, &thread);
+  pthread *thread = (pthread *) arg;
   _my_tls.tid = thread;
 
   exception_list cygwin_except_entry;
@@ -1923,13 +1919,21 @@ pthread::thread_init_wrapper (void *_arg)
     system_printf ("local storage for thread isn't setup correctly");
 #endif
 
-  thread_printf ("started thread %p %p %p %p %p %p", _arg, &local_clib,
+  thread_printf ("started thread %p %p %p %p %p %p", arg, &local_clib,
 		 _impure_ptr, thread, thread->function, thread->arg);
 
   // call the user's thread
   void *ret = thread->function (thread->arg);
 
   thread->exit (ret);
+}
+
+/* Pthreads */
+void
+pthread::thread_init_wrapper (void *arg)
+{
+  // calls thread_init_wrapper2.  Never returns.
+  _threadinfo::call (thread_init_wrapper2, arg);
 }
 
 bool

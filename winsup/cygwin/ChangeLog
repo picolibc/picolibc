@@ -1,3 +1,28 @@
+2003-12-03  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::stub): Properly establish _threadinfo
+	environment.
+	(cygthread::stub2): New function.
+	(cygthread::simplestub): Ditto.
+	(cygthread::simplestub2): New function.
+	* cygthread.h (cygthread::stub2): Declare new function.
+	(cygthread::simplestub2): Ditto.
+	* cygtls.h (_threadinfo::call): Declare new function.
+	(_threadinfo::call2): Ditto.
+	* dcrt0.cc (dll_crt0_1): Accommodate new _threadinfo::init which
+	doesn't return pointer to tls.
+	(_dll_crt0): Remove obsolete DECLARE_TLS_STORAGE.
+	(dll_crt0): Ditto.
+	* exceptions.cc (_threadinfo::call): New function.
+	(_threadinfo::call2): Ditto.
+	(_threadinfo::init): Don't return pointer.
+	* thread.cc (pthread::thread_init_wrapper): Properly establish
+	_threadinfo environment.
+	(pthread::thread_init_wrapper2): New function.
+	* thread.h (pthread::thread_init_wrapper): Remove noreturn attribute
+	(pthread::thread_init_wrapper2): Declare new function.
+	* winbase.h: Remove obsolete code.
+
 2003-12-02  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in: Change the way that -f options are appended to CFLAGS,

@@ -40,7 +40,9 @@ struct _threadinfo
   int sig;
   __stack_t *stackptr;
 
-  struct _threadinfo *init (void *, void * = NULL);
+  void init (void *);
+  static void call (void (*) (void *, void *), void *);
+  void call2 (void (*) (void *, void *), void *, void *);
   void remove ();
   void push (__stack_t, bool = false);
   __stack_t pop ();

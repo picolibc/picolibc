@@ -147,8 +147,22 @@ _threadinfo::reset_exception ()
     }
 }
 
-_threadinfo *
-_threadinfo::init (void *, void *thread)
+void
+_threadinfo::call (void (*func) (void *, void *), void *arg)
+{
+  char buf[CYGTLS_PADSIZE];
+  _my_tls.call2 (func, arg, buf);
+}
+
+void
+_threadinfo::call2 (void (*func) (void *, void *), void *arg, void *buf)
+{
+  init (buf);
+  func (arg, buf);
+}
+
+void
+_threadinfo::init (void *)
 {
   memset (this, 0, sizeof (*this));
   stackptr = stack;
@@ -157,7 +171,6 @@ _threadinfo::init (void *, void *thread)
   _last_thread = this;
   set_state (false);
   errno_addr = &errno;
-  return this;
 }
 
 void

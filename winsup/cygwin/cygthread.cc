@@ -15,6 +15,8 @@ details. */
 #include "sync.h"
 #include "cygerrno.h"
 #include "sigproc.h"
+#include "thread.h"
+#include "cygtls.h"
 
 #undef CloseHandle
 
@@ -30,12 +32,19 @@ bool NO_COPY cygthread::exiting;
 DWORD WINAPI
 cygthread::stub (VOID *arg)
 {
-  DECLARE_TLS_STORAGE;
+  _threadinfo::call (stub2, arg);
+  return 0;
+}
+
+void
+cygthread::stub2 (void *arg, void *)
+{
   exception_list except_entry;
 
   /* Initialize this thread's ability to respond to things like
      SIGSEGV or SIGFPE. */
   init_exceptions (&except_entry);
+
 
   cygthread *info = (cygthread *) arg;
   if (info->arg == cygself)
@@ -91,7 +100,13 @@ cygthread::stub (VOID *arg)
 DWORD WINAPI
 cygthread::simplestub (VOID *arg)
 {
-  DECLARE_TLS_STORAGE;
+  _threadinfo::call (simplestub2, arg);
+  return 0;
+}
+
+void
+cygthread::simplestub2 (void *arg, void *)
+{
   exception_list except_entry;
 
   /* Initialize this thread's ability to respond to things like
