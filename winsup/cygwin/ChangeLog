@@ -1,3 +1,8 @@
+Thu Jun 22 17:50:59 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Autogenerate cygwin.def when appropriate.
+	* include/sys/cygwin.h: Correct prototype.
+
 Thu Jun 22 17:05:04 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* include/sys/cygwin.h: Don't define parts of this file that rely on

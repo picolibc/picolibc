@@ -41,8 +41,8 @@ extern HANDLE cygwin_logon_user (const struct passwd *, const char *);
 extern void cygwin_set_impersonation_token (const HANDLE);
 
 /* included if <windows.h> is included */
-extern int cygwin32_attach_handle_to_fd (char *, int, HANDLE, int, int);
-extern int cygwin_attach_handle_to_fd (char *, int, HANDLE, mode_t, unsigned);
+extern int cygwin32_attach_handle_to_fd (char *, int, HANDLE, mode_t, DWORD);
+extern int cygwin_attach_handle_to_fd (char *, int, HANDLE, mode_t, DWORD);
 
 #include <sys/resource.h>
 
