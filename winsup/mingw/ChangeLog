@@ -1,3 +1,7 @@
+2004-03-28  Hans Leidekker  <hans@it.vu.nl>
+
+	* include/math.h (FP_*): Add defines.
+
 2004-03-29  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/math/round.c: Rewrite.

@@ -234,6 +234,17 @@ _CRTIMP double __cdecl scalb (double, long);
 _CRTIMP int __cdecl finite (double);
 _CRTIMP int __cdecl fpclass (double);
 
+#define FP_SNAN    _FPCLASS_SNAN
+#define FP_QNAN    _FPCLASS_QNAN
+#define FP_NINF    _FPCLASS_NINF
+#define FP_PINF    _FPCLASS_PINF
+#define FP_NDENORM _FPCLASS_ND
+#define FP_PDENORM _FPCLASS_PD
+#define FP_NZERO   _FPCLASS_NZ
+#define FP_PZERO   _FPCLASS_PZ
+#define FP_NNORM   _FPCLASS_NN
+#define FP_PNORM   _FPCLASS_PN
+
 #endif /* Not _NO_OLDNAMES */
 
 /* This require msvcr70.dll or higher. */ 
