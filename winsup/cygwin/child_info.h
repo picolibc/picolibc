@@ -29,7 +29,7 @@ enum
 
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
-#define CURR_CHILD_INFO_MAGIC 0xb3836013U
+#define CURR_CHILD_INFO_MAGIC 0x64848c11U
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -53,14 +53,16 @@ public:
   unsigned fhandler_union_cb;
 };
 
+class mount_info;
+class _pinfo;
+
 class child_info_fork: public child_info
 {
 public:
   HANDLE forker_finished;// for synchronization with child
   DWORD stacksize;	// size of parent stack
-  void *heaptop;
-  void *heapbase;
-  void *heapptr;
+  mount_info *mount_table;// location of mount table in parent
+  _pinfo *myself_addr;	// where myself shared memory lives in the parent
   jmp_buf jmp;		// where child will jump to
   void *stacktop;	// location of top of parent stack
   void *stackbottom;	// location of bottom of parent stack

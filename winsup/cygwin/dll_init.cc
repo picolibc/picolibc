@@ -231,7 +231,7 @@ reserve_upto (const char *name, DWORD here)
   MEMORY_BASIC_INFORMATION mb;
   for (DWORD start = 0x10000; start < here; start += size)
     if (!VirtualQuery ((void *) start, &mb, sizeof (mb)))
-      size = 64 * 1024;
+      size = A64K;
     else
       {
 	size = A64K * ((mb.RegionSize + A64K - 1) / A64K);
@@ -261,7 +261,8 @@ release_upto (const char *name, DWORD here)
       {
 	size = mb.RegionSize;
 	if (!(mb.State == MEM_RESERVE && mb.AllocationProtect == PAGE_NOACCESS &&
-	    ((void *) start < cygheap->heapbase || (void *) start > cygheap->heaptop)))
+	    (((void *) start < cygheap->heapbase || (void *) start > cygheap->heaptop) &&
+	     ((void *) start < (void *) cygheap || (void *) start > (void *) ((char *) cygheap + CYGHEAPSIZE)))))
 	  continue;
 	if (!VirtualFree ((void *) start, 0, MEM_RELEASE))
 	  api_fatal ("couldn't release memory %p(%d) for '%s' alignment, %E\n",
@@ -307,7 +308,8 @@ dll_list::load_after_fork (HANDLE parent, dll *first)
 	      LoadLibrary (d.name);
 	    }
 	  else if (try2)
-	    api_fatal ("unable to remap %s to same address as parent -- %p", d.name, h);
+	    api_fatal ("unable to remap %s to same address as parent(%p) != %p",
+		       d.name, d.handle, h);
 	  else
 	    {
 	      /* It loaded in the wrong place.  Dunno why this happens but it always

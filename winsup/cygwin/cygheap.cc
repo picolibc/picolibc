@@ -25,9 +25,9 @@
 #include "shared_info.h"
 
 init_cygheap NO_COPY *cygheap;
-void NO_COPY *cygheap_max = NULL;
+void NO_COPY *cygheap_max;
 
-static NO_COPY muto *cygheap_protect = NULL;
+static NO_COPY muto *cygheap_protect;
 
 struct cygheap_entry
   {
@@ -63,7 +63,7 @@ init_cheap ()
   cygheap_max = cygheap;
 }
 
-// static void dup_now (void *, child_info *, unsigned) __attribute__ ((regparm(3)));
+static void dup_now (void *, child_info *, unsigned) __attribute__ ((regparm(3)));
 static void
 dup_now (void *newcygheap, child_info *ci, unsigned n)
 {
@@ -78,7 +78,6 @@ cygheap_setup_for_child (child_info *ci, bool dup_later)
 {
   void *newcygheap;
   cygheap_protect->acquire ();
-if (!ci) try_to_debug ();
   unsigned n = (char *) cygheap_max - (char *) cygheap;
   unsigned size = CYGHEAPSIZE;
   if (size < n)

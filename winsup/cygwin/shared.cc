@@ -27,8 +27,8 @@ details. */
 #include "registry.h"
 #include "cygwin_version.h"
 
-shared_info NO_COPY *cygwin_shared = NULL;
-mount_info NO_COPY *mount_table = NULL;
+shared_info NO_COPY *cygwin_shared;
+mount_info NO_COPY *mount_table;
 HANDLE NO_COPY cygwin_mount_h;
 
 char * __stdcall
@@ -145,8 +145,8 @@ memory_init ()
   getpagesize ();
   heap_init ();
   mount_table = (mount_info *) open_shared (user_name, MOUNT_VERSION,
-					    cygwin_mount_h,
-					    sizeof (mount_info), 0);
+					    cygwin_mount_h, sizeof (mount_info),
+					    mount_table);
   debug_printf ("opening mount table for '%s' at %p", cygheap->user.name (),
 		mount_table_address);
   ProtectHandleINH (cygwin_mount_h);

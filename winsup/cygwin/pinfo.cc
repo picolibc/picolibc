@@ -33,6 +33,7 @@ static char NO_COPY pinfo_dummy[sizeof (_pinfo)] = {0};
 pinfo NO_COPY myself ((_pinfo *)&pinfo_dummy);	// Avoid myself != NULL checks
 
 HANDLE hexec_proc;
+_pinfo NO_COPY *myself_addr;
 
 void __stdcall
 pinfo_fixup_after_fork ()
@@ -57,7 +58,7 @@ set_myself (pid_t pid, HANDLE h)
   DWORD winpid = GetCurrentProcessId ();
   if (pid == 1)
     pid = cygwin_pid (winpid);
-  myself.init (pid, 1, h);
+  myself.init (pid, PID_IN_USE | PID_MYSELF, h);
   myself->dwProcessId = winpid;
   myself->process_state |= PID_IN_USE;
   myself->start_time = time (NULL); /* Register our starting time. */
@@ -126,6 +127,20 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
       return;
     }
 
+  void *mapaddr;
+  bool itsme;
+  if (!(flag & PID_MYSELF))
+    {
+      mapaddr = NULL;
+      itsme = false;
+    }
+  else
+    {
+      flag &= ~PID_MYSELF;
+      mapaddr = myself_addr;
+      itsme = true;
+    }
+
   int createit = flag & (PID_IN_USE | PID_EXECED);
   for (int i = 0; i < 10; i++)
     {
@@ -164,8 +179,11 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
 	  return;
 	}
 
-      procinfo = (_pinfo *) MapViewOfFile (h, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
+      procinfo = (_pinfo *) MapViewOfFileEx (h, FILE_MAP_READ | FILE_MAP_WRITE,
+					     0, 0, 0, mapaddr);
       ProtectHandle1 (h, pinfo_shared_handle);
+      if (itsme)
+	myself_addr = procinfo;
 
       if ((procinfo->process_state & PID_INITIALIZING) && (flag & PID_NOREDIR)
 	  && cygwin_pid (procinfo->dwProcessId) != procinfo->pid)

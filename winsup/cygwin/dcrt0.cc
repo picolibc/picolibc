@@ -581,6 +581,8 @@ dll_crt0_1 ()
 	  case _PROC_FORK:
 	    cygheap_fixup_in_child (0);
 	    alloc_stack (fork_info);
+	    mount_table = fork_info->mount_table;
+	    myself_addr = fork_info->myself_addr;
 	    set_myself (mypid);
 	    close_ppid_handle = !!child_proc_info->pppid_handle;
 	    break;
@@ -793,7 +795,7 @@ initial_env ()
       DWORD ms = atoi (buf);
       buf[0] = '\0';
       len = GetModuleFileName (NULL, buf, MAX_PATH);
-      console_printf ("Sleeping %d, pid %u %s", ms, GetCurrentProcessId (), buf);
+      console_printf ("Sleeping %d, pid %u %s\n", ms, GetCurrentProcessId (), buf);
       Sleep (ms);
     }
   if (GetEnvironmentVariable ("CYGWIN_DEBUG", buf, sizeof (buf) - 1))

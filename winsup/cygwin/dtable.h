@@ -68,7 +68,7 @@ public:
   int find_unused_handle (int start);
   int find_unused_handle () { return find_unused_handle (first_fd_for_open);}
   void release (int fd);
-  void init_std_file_from_handle (int fd, HANDLE handle, DWORD access);
+  void init_std_file_from_handle (int fd, HANDLE handle);
   int dup2 (int oldfd, int newfd);
   void fixup_after_exec (HANDLE);
   inline fhandler_base *operator [](int fd) const { return fds[fd]; }

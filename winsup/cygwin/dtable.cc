@@ -139,7 +139,7 @@ dtable::stdio_init ()
   HANDLE out = GetStdHandle (STD_OUTPUT_HANDLE);
   HANDLE err = GetStdHandle (STD_ERROR_HANDLE);
 
-  init_std_file_from_handle (0, in, GENERIC_READ);
+  init_std_file_from_handle (0, in);
 
   /* STD_ERROR_HANDLE has been observed to be the same as
      STD_OUTPUT_HANDLE.  We need separate handles (e.g. using pipes
@@ -157,8 +157,8 @@ dtable::stdio_init ()
 	}
     }
 
-  init_std_file_from_handle (1, out, GENERIC_WRITE);
-  init_std_file_from_handle (2, err, GENERIC_WRITE);
+  init_std_file_from_handle (1, out);
+  init_std_file_from_handle (2, err);
   /* Assign the console as the controlling tty for this process if we actually
      have a console and no other controlling tty has been assigned. */
   if (myself->ctty < 0 && GetConsoleCP () > 0)
@@ -213,7 +213,7 @@ cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
 }
 
 void
-dtable::init_std_file_from_handle (int fd, HANDLE handle, DWORD myaccess)
+dtable::init_std_file_from_handle (int fd, HANDLE handle)
 {
   const char *name;
   CONSOLE_SCREEN_BUFFER_INFO buf;
@@ -269,11 +269,11 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle, DWORD myaccess)
       path_conv pc;
       unsigned bin;
       fhandler_base *fh = build_fhandler_from_name (fd, name, handle, pc);
-      bin = fh->get_default_fmode (myaccess == GENERIC_READ ? O_RDONLY : O_WRONLY);
+      bin = fh->get_default_fmode (O_RDWR);
       if (!bin && name != unknown_file)
 	bin = pc.binmode ();
 
-      fh->init (handle, myaccess, bin);
+      fh->init (handle, GENERIC_READ | GENERIC_WRITE, bin);
       set_std_handle (fd);
       paranoid_printf ("fd %d, handle %p", fd, handle);
     }

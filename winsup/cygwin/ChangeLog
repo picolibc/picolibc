@@ -1,3 +1,38 @@
+2002-10-14  Christopher Faylor  <cgf@redhat.com>
+
+	* child_info.h (CURR_CHILD_INFO_MAGIC): Reset.
+	(child_info_fork::heaptop): Remove obsolete element.
+	(child_info_fork::heabbase): Ditto.
+	(child_info_fork::heapptr): Ditto.
+	(child_info_fork::mount_table): New element.
+	(child_info_fork::myself_addr): Ditto.
+	* dcrt0.cc (dll_crt0_1): Set mount_table and myself_addr when forking.
+	(initial_env): Add newline to "sleeping" message.
+	* dll_init.cc (reserve_upto): Accommodate cygwin heap when freeing
+	memory.  Make debugging output a little more descriptive.
+	* fork.cc (fork_parent): Save mount_table and myself_addr.
+	* pinfo.cc (myself_addr): New variable.
+	(set_myself): Pass PID_MYSELF flag to init.
+	(pinfo::Init): Honor PID_MYSELF.  Save address where myself shared
+	memory resides in myself_addr, for fork.
+	* pinfo.h (myself_addr): Declare.
+	* shared.cc (memory_init): On fork, use previously saved address for
+	location of mount table.
+	* include/sys/cygwin.h (PID_MYSELF): New value.
+
+	* dtable.cc (dtable::stdio_init): Don't pass access type to
+	init_std_file_from_handle.  It's always the same.
+	(dtable::init_std_file_from_handle): Remove access type argument.
+	Assume read/write.
+	* dtable.h (dtable::init_std_file_from_handle): Ditto for declaration.
+
+	* exceptions.cc (try_to_debug): Don't try to debug if already being
+	debugged.
+
+	* fhandler_console.cc (shared_console_info_save): New variable.
+	(fhandler_console::get_tty_stuff): Save address of shared console stuff
+	for fork.
+
 2002-10-13  Christopher Faylor  <cgf@redhat.com>
 
 	* cygthread.cc (cygthread::stub): Reintroduce clearing of __name but do
