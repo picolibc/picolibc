@@ -1,3 +1,7 @@
+2003-11-06  Bruno Rohee  <bruno@rohee.com>
+
+	* hp-symtab.h: Fix "the the" typo.
+
 2003-10-24  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* bfdlink.h (bfd_elf_version_expr): Add "symbol" and remove
