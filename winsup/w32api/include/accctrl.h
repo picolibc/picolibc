@@ -1,6 +1,5 @@
-#ifndef _ACCCRTL_H
-#define _ACCCRTL_H
-#include <wtypes.h>
+#ifndef _ACCCTRL_H
+#define _ACCCTRL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -309,4 +308,4 @@ typedef OBJECTS_AND_NAME_A OBJECTS_AND_NAME_, *POBJECTS_AND_NAME_;
 }
 #endif
 
-#endif /* _ACCCRTL_H */
+#endif /* _ACCCTRL_H */

@@ -1,11 +1,21 @@
-2002-03-06  dannysmith@users.sourceforge.net
+2002-03-08  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/accctrl.h (_ACCCTRL_H): Correct typo.
+	Remove unnecessary inclusion of <wtypes.h>.
+	* ChangeLog: Fix omission of name in recent entries.
+
+2002-03-08  Antony Blakey  <antony.blakey@ihug.com.au>
+
+	* include/initguid.h (DEFINE_GUID): Add GUID_EXT to define.
+
+2002-03-06  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/mswsock.h: Group winsock2 dependants
 	together and protect with #ifdef _WINSOCK2_H.
 	* lib/test.c: Only test ws2tcpip.h if winsock2.h
 	has been included.
 
-2002-03-05  dannysmith@users.sourceforge.net
+2002-03-05  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/mswsock.h (TP_*): Add new defines.
 	(TRANSMIT_PACKETS_ELEMENT): Define new structure.
@@ -15,7 +25,7 @@
 	(WSARecvMsg): Likewise.
 	(WSA_CMSG_*) Add empty macros, guarded by #if 0.
 
-2002-03-02  dannysmith@users.sourceforge.net
+2002-03-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* ChangeLog: Fix typo in last entry. 
 	* include/winsock2.h (IPPROTO_*): Add IPv6 defines.
@@ -50,7 +60,7 @@
 	(INTERFACE_INFO_OLD): Add comment on workaround for problems
 	with INTERFACE_INFO on NT4 prior to sp4.
 
-2002-02-28  dannysmith@users.sourceforge.net
+2002-02-28  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/windows.h; Remove test for __W32API_MAJOR_VERSION
 	when selecting winsock interface.
