@@ -1,3 +1,12 @@
+Sat May 20 01:34:57 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (interruptible): Add an argument to control whether
+	function just checks for validity.  Flag module handle == 0 as
+	noninterrupible.
+	(call_handler): Always acquire and release ebp lock.  Loop for only a
+	fixed amount of time attempting to grab mutos and find an interruptible
+	PC.
+
 2000-05-19  DJ Delorie  <dj@cygnus.com>
 
 	* syscalls.cc (setmode): change mode of any matching FILE* also.

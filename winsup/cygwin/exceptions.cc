@@ -553,7 +553,7 @@ extern DWORD exec_exit;		// Possible exit value for exec
 extern int pending_signals;
 
 int
-interruptible (DWORD pc)
+interruptible (DWORD pc, int testvalid = 0)
 {
   int res;
   if ((pc >= (DWORD) &__sigfirst) && (pc <= (DWORD) &__siglast))
@@ -568,7 +568,14 @@ interruptible (DWORD pc)
       char *checkdir = (char *) alloca (windows_system_directory_length + 4);
       memset (checkdir, 0, sizeof (checkdir));
 #     define h ((HMODULE) m.AllocationBase)
-      if (h == user_data->hmodule)
+      /* Apparently Windows 95 can sometimes return bogus addresses from
+	 GetThreadContext.  These resolve to an allocation base == 0.
+	 These should *never* be treated as interruptible. */
+      if (!h)
+	res = 0;
+      else if (testvalid)
+	res = 1;	/* All we wanted to know was if this was a valid module. */
+      else if (h == user_data->hmodule)
 	res = 1;
       else if (h == cygwin_hmodule)
 	res = 0;
@@ -654,6 +661,8 @@ set_sig_errno (int e)
   debug_printf ("errno %d", e);
 }
 
+#define SUSPEND_TRIES 10000
+
 static int
 call_handler (int sig, struct sigaction& siga, void *handler)
 {
@@ -662,33 +671,33 @@ call_handler (int sig, struct sigaction& siga, void *handler)
   HANDLE hth = NULL;
   DWORD ebp;
   int res;
-  int locked;
+  int using_mainthread_frame;
 
-  if (!mainthread.lock)
-    locked = 0;
-  else
-    {
-      mainthread.lock->acquire ();
-      locked = 1;
-    }
+  mainthread.lock->acquire ();
 
   if (mainthread.frame)
-    ebp = mainthread.frame;
+    {
+      ebp = mainthread.frame;
+      using_mainthread_frame = 1;
+    }
   else
     {
-      if (locked)
-	{
-	  mainthread.lock->release ();
-	  locked = 0;
-	}
+      int i;
+      using_mainthread_frame = 0;
+      mainthread.lock->release ();
 
       hth = myself->getthread2signal ();
       /* Suspend the thread which will receive the signal.  But first ensure that
-	 this thread doesn't have the sync_proc_subproc and mask_sync mutos, since
-	 we need those (hack alert).  If the thread-to-be-suspended has either of
-	 these mutos, enter a busy loop until it is released.  If the thread is
-	 already suspended (which should never occur) then just queue the signal. */
-      for (;;)
+	 this thread doesn't have any mutos.  (FIXME: Someday we should just grab
+	 all of the mutos rather than checking for them)
+	 For Windows 95, we also have to ensure that the addresses returned by GetThreadContext
+	 are valid.
+	 If one of these conditions is not true we loop for a fixed number of times
+	 since we don't want to stall the signal handler.  FIXME: Will this result in
+	 noticeable delays?
+	 If the thread is already suspended (which can occur when a program is stopped) then
+	 just queue the signal. */
+      for (i = 0; i < SUSPEND_TRIES; i++)
 	{
 	  sigproc_printf ("suspending mainthread");
 	  res = SuspendThread (hth);
@@ -697,38 +706,51 @@ call_handler (int sig, struct sigaction& siga, void *handler)
 	  /* FIXME: Make multi-thread aware */
 	  for (m = muto_start.next;  m != NULL; m = m->next)
 	    if (m->unstable () || m->owner () == mainthread.id)
-	      goto keep_looping;
+	      goto owns_muto;
 
+	  mainthread.lock->acquire ();
 	  if (mainthread.frame)
 	    {
 	      ebp = mainthread.frame;	/* try to avoid a race */
-	      goto ebp_set;
+	      using_mainthread_frame = 1;
+	      goto next;
+	    }
+	  mainthread.lock->release ();
+
+	  cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
+	  if (!GetThreadContext (hth, &cx))
+	    {
+	      system_printf ("couldn't get context of main thread, %E");
+	      goto out;
 	    }
 
-	  break;
+	  if (interruptible (cx.Eip, 1))
+	    break;
 
-	keep_looping:
+	  sigproc_printf ("suspended thread in a strange state pc %p, sp %p",
+			  cx.Eip, cx.Esp);
+	  goto resume_thread;
+
+	owns_muto:
 	  sigproc_printf ("suspended thread owns a muto (%s)", m->name);
+	  
 	  if (res)
-	      goto set_pending;
+	    goto set_pending;
 
+	resume_thread:
 	  ResumeThread (hth);
 	  Sleep (0);
 	}
 
-      sigproc_printf ("SuspendThread returned %d", res);
+      if (i >= SUSPEND_TRIES)
+	goto set_pending;
 
-      cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
-      if (!GetThreadContext (hth, &cx))
-	{
-	  system_printf ("couldn't get context of main thread, %E");
-	  goto out;
-	}
+      sigproc_printf ("SuspendThread returned %d", res);
       ebp = cx.Ebp;
     }
 
-ebp_set:
-  if (hExeced != NULL || (!mainthread.frame && interruptible (cx.Eip)))
+next:
+  if (hExeced != NULL || (!using_mainthread_frame && interruptible (cx.Eip)))
     interrupt_now (&cx, sig, siga, handler);
   else if (!interrupt_on_return (ebp, sig, siga, handler))
     {
@@ -755,8 +777,7 @@ out:
       sigproc_printf ("ResumeThread returned %d", res);
     }
 
-  if (locked)
-    mainthread.lock->release ();
+  mainthread.lock->release ();
 
   sigproc_printf ("returning %d", interrupted);
   return interrupted;
