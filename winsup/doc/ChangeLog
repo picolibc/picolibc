@@ -1,5 +1,9 @@
 2004-09-30  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
 
+	* how-using.texinfo: Fix typo. Add note about "Install For All Users"
+
+2004-09-30  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+
 	* how-programming.texinfo: Add gcj note to WinMain@16 FAQ.
 	* how-using.texinfo: Add FAQ about network shares and authentication.
 	* install.texinfo: Add "Where is make" to FAQ subtitle. 

@@ -44,24 +44,24 @@ with it now, refer to
 
 @subsection Why don't my services work (or access network shares)?
 
-Most Windows services run as a special user called SYSTEM.  If you
-installed Cygwin for "Just Me", the SYSTEM user won't see your
+Most Windows services run as a special user called @samp{SYSTEM}.  If you
+installed Cygwin for "Just Me", the @samp{SYSTEM} user won't see your
 Cygwin mount table.  You need to re-mount all of your mounts as
-"system" for services to work. This script will do the trick:
+"system" for services to work. You can re-run @samp{setup.exe} and
+select "Install for All Users", or this script will do the trick:
 
 @example
 eval "`mount -m | sed -e 's/ -u / -s /g' -e 's/$/;/'`"
 @end example
 
-The SYSTEM user cannot access network shares that require
+The @samp{SYSTEM} user cannot access network shares that require
 authentication.  For more information, see
 @file{http://cygwin.com/cygwin-ug-net/ntsec.html}.
 
 Workarounds include using public network share that does not require
 authentication (for non-critical files), or running the service as
-your own user with @samp{cygrunsrv}.
-
-@subsection How should I set my PATH?
+your own user with @samp{cygrunsrv -u} (see 
+@samp{/usr/share/doc/Cygwin/cygrunsrv.README} for more information).
 
 @subsection How should I set my PATH?
 
