@@ -1,3 +1,8 @@
+2003-05-09  Alan Modra  <amodra@bigpond.net.au>
+
+	* xtensa-isa-internal.h (xtensa_isa_module_struct): Remove const on
+	gen_num_opcodes_fn return type.
+
 2003-05-07  Jason Merrill  <jason@redhat.com>
 
 	* hashtab.h (iterative_hash): Prototype.
