@@ -39,6 +39,7 @@ details. */
 #include <ntdef.h>
 #include "ntdll.h"
 #include "lm.h"
+#include "pwdgrp.h"
 
 extern BOOL allow_ntea;
 BOOL allow_ntsec;
@@ -1550,7 +1551,7 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
     owner_sid = cygheap->user.sid ();
   else if (uid == ILLEGAL_UID)
     owner_sid = cur_owner_sid;
-  else if (!owner_sid.getfrompw (getpwuid32 (uid)))
+  else if (!owner_sid.getfrompw (internal_getpwuid (uid)))
     {
       set_errno (EINVAL);
       return NULL;
@@ -1564,7 +1565,7 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
     group_sid = cygheap->user.groups.pgsid;
   else if (gid == ILLEGAL_GID)
     group_sid = cur_group_sid;
-  else if (!group_sid.getfromgr (getgrgid32 (gid)))
+  else if (!group_sid.getfromgr (internal_getgrgid (gid)))
     {
       set_errno (EINVAL);
       return NULL;

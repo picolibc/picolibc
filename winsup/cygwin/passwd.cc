@@ -27,7 +27,7 @@ details. */
    on the first call that needs information from it. */
 
 static struct passwd *passwd_buf;	/* passwd contents in memory */
-static int curr_lines = -1;
+static int curr_lines;
 static int max_lines;
 
 static pwdgrp_check passwd_state;
@@ -47,7 +47,7 @@ grab_string (char **p)
   char *src = *p;
   char *res = src;
 
-  while (*src && *src != ':' && *src != '\n')
+  while (*src && *src != ':')
     src++;
 
   if (*src == ':')
@@ -60,16 +60,12 @@ grab_string (char **p)
 }
 
 /* same, for ints */
-static int
+static unsigned int
 grab_int (char **p)
 {
   char *src = *p;
-  int val = strtol (src, NULL, 10);
-  while (*src && *src != ':' && *src != '\n')
-    src++;
-  if (*src == ':')
-    src++;
-  *p = src;
+  unsigned int val = strtoul (src, p, 10);
+  *p = (*p == src || **p != ':') ? almost_null : *p + 1;
   return val;
 }
 
@@ -79,16 +75,12 @@ parse_pwd (struct passwd &res, char *buf)
 {
   /* Allocate enough room for the passwd struct and all the strings
      in it in one go */
-  size_t len = strlen (buf);
-  if (buf[--len] == '\r')
-    buf[len] = '\0';
-  if (len < 6)
-    return 0;
-
   res.pw_name = grab_string (&buf);
   res.pw_passwd = grab_string (&buf);
   res.pw_uid = grab_int (&buf);
   res.pw_gid = grab_int (&buf);
+  if (!*buf)
+    return 0;
   res.pw_comment = 0;
   res.pw_gecos = grab_string (&buf);
   res.pw_dir =  grab_string (&buf);
@@ -129,28 +121,6 @@ class passwd_lock
 
 pthread_mutex_t NO_COPY passwd_lock::mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
 
-/* Cygwin internal */
-/* If this ever becomes non-reentrant, update all the getpw*_r functions */
-static struct passwd *
-search_for (__uid32_t uid, const char *name)
-{
-  struct passwd *res = 0;
-
-  for (int i = 0; i < curr_lines; i++)
-    {
-      res = passwd_buf + i;
-      /* on Windows NT user names are case-insensitive */
-      if (name)
-        {
-	  if (strcasematch (name, res->pw_name))
-	    return res;
-	}
-      else if (uid == (__uid32_t) res->pw_uid)
-	return res;
-    }
-  return NULL;
-}
-
 /* Read in /etc/passwd and save contents in the password cache.
    This sets passwd_state to loaded or emulated so functions in this file can
    tell that /etc/passwd has been read in or will be emulated. */
@@ -166,12 +136,8 @@ read_etc_passwd ()
   passwd_lock here (cygwin_finished_initializing);
 
   /* if we got blocked by the mutex, then etc_passwd may have been processed */
-  if (passwd_state != uninitialized)
-    return;
-
-  if (passwd_state != initializing)
+  if (passwd_state.isinitializing ())
     {
-      passwd_state = initializing;
       curr_lines = 0;
       if (pr.open ("/etc/passwd"))
 	{
@@ -183,6 +149,7 @@ read_etc_passwd ()
 	  pr.close ();
 	  debug_printf ("Read /etc/passwd, %d lines", curr_lines);
 	}
+      passwd_state = loaded;
 
       static char linebuf[1024];
       char strbuf[128] = "";
@@ -199,12 +166,12 @@ read_etc_passwd ()
 	    default_uid = DEFAULT_UID_NT;
 	}
       else if (myself->uid == ILLEGAL_UID)
-        searchentry = !search_for (DEFAULT_UID, NULL);
+        searchentry = !internal_getpwuid (DEFAULT_UID);
       if (searchentry &&
-	  (!(pw = search_for (0, cygheap->user.name ())) ||
+	  (!(pw = internal_getpwnam (cygheap->user.name ())) ||
 	   (myself->uid != ILLEGAL_UID &&
 	    myself->uid != (__uid32_t) pw->pw_uid  &&
-	    !search_for (myself->uid, NULL))))
+	    !internal_getpwuid (myself->uid))))
 	{
 	  snprintf (linebuf, sizeof (linebuf), "%s:*:%lu:%lu:,%s:%s:/bin/sh",
 		    cygheap->user.name (),
@@ -214,7 +181,6 @@ read_etc_passwd ()
 	  debug_printf ("Completing /etc/passwd: %s", linebuf);
 	  add_pwd_line (linebuf);
 	}
-      passwd_state = loaded;
     }
   return;
 }
@@ -226,7 +192,7 @@ internal_getpwsid (cygsid &sid)
   char *ptr1, *ptr2, *endptr;
   char sid_string[128] = {0,','};
 
-  if (curr_lines < 0 && passwd_state  <= initializing)
+  if (passwd_state.isuninitialized ())
     read_etc_passwd ();
 
   if (sid.string (sid_string + 2))
@@ -242,15 +208,40 @@ internal_getpwsid (cygsid &sid)
   return NULL;
 }
 
+struct passwd *
+internal_getpwuid (__uid32_t uid, BOOL check)
+{
+  if (passwd_state.isuninitialized ()
+      || (check && passwd_state.isinitializing ()))
+    read_etc_passwd ();
+
+  for (int i = 0; i < curr_lines; i++)
+    if (uid == (__uid32_t) passwd_buf[i].pw_uid)
+      return passwd_buf + i;
+  return NULL;
+}
+
+struct passwd *
+internal_getpwnam (const char *name, BOOL check)
+{
+  if (passwd_state.isuninitialized ()
+      || (check && passwd_state.isinitializing ()))
+    read_etc_passwd ();
+
+  for (int i = 0; i < curr_lines; i++)
+    /* on Windows NT user names are case-insensitive */
+    if (strcasematch (name, passwd_buf[i].pw_name))
+      return passwd_buf + i;
+  return NULL;
+}
+
+
 extern "C" struct passwd *
 getpwuid32 (__uid32_t uid)
 {
-  if (passwd_state  <= initializing)
-    read_etc_passwd ();
-
+  struct passwd *temppw = internal_getpwuid (uid, TRUE);
   pthread_testcancel ();
-
-  return search_for (uid, 0);
+  return temppw;
 }
 
 extern "C" struct passwd *
@@ -267,13 +258,8 @@ getpwuid_r32 (__uid32_t uid, struct passwd *pwd, char *buffer, size_t bufsize, s
   if (!pwd || !buffer)
     return ERANGE;
 
-  if (passwd_state  <= initializing)
-    read_etc_passwd ();
-
+  struct passwd *temppw = internal_getpwuid (uid, TRUE);
   pthread_testcancel ();
-
-  struct passwd *temppw = search_for (uid, 0);
-
   if (!temppw)
     return 0;
 
@@ -310,12 +296,9 @@ getpwuid_r (__uid16_t uid, struct passwd *pwd, char *buffer, size_t bufsize, str
 extern "C" struct passwd *
 getpwnam (const char *name)
 {
-  if (passwd_state  <= initializing)
-    read_etc_passwd ();
-
+  struct passwd *temppw = internal_getpwnam (name, TRUE);
   pthread_testcancel ();
-
-  return search_for (0, name);
+  return temppw;
 }
 
 
@@ -331,12 +314,8 @@ getpwnam_r (const char *nam, struct passwd *pwd, char *buffer, size_t bufsize, s
   if (!pwd || !buffer || !nam)
     return ERANGE;
 
-  if (passwd_state  <= initializing)
-    read_etc_passwd ();
-
+  struct passwd *temppw = internal_getpwnam (nam, TRUE);
   pthread_testcancel ();
-
-  struct passwd *temppw = search_for (0, nam);
 
   if (!temppw)
     return 0;
@@ -368,7 +347,7 @@ getpwnam_r (const char *nam, struct passwd *pwd, char *buffer, size_t bufsize, s
 extern "C" struct passwd *
 getpwent (void)
 {
-  if (passwd_state  <= initializing)
+  if (passwd_state.isinitializing ())
     read_etc_passwd ();
 
   if (pw_pos < curr_lines)
@@ -401,20 +380,6 @@ setpassent ()
   return 0;
 }
 
-#if 0 /* Unused */
-/* Internal function. ONLY USE THIS INTERNALLY, NEVER `getpwent'!!! */
-struct passwd *
-internal_getpwent (int pos)
-{
-  if (passwd_state  <= initializing)
-    read_etc_passwd ();
-
-  if (pos < curr_lines)
-    return passwd_buf + pos;
-  return NULL;
-}
-#endif
-
 extern "C" char *
 getpass (const char * prompt)
 {
@@ -425,7 +390,7 @@ getpass (const char * prompt)
 #endif
   struct termios ti, newti;
 
-  if (passwd_state  <= initializing)
+  if (passwd_state.isinitializing ())
     read_etc_passwd ();
 
   cygheap_fdget fhstdin (0);

@@ -204,13 +204,6 @@ extern BOOL allow_ntea;
 extern BOOL allow_ntsec;
 extern BOOL allow_smbntsec;
 
-/* These functions are needed to allow walking through the passwd
-   and group lists so they are somehow security related. Besides that
-   I didn't find a better place to declare them. */
-extern struct __group32 *internal_getgrent (int);
-extern struct passwd *internal_getpwsid (cygsid &);
-extern struct __group32 *internal_getgrsid (cygsid &);
-
 /* File manipulation */
 int __stdcall set_process_privileges ();
 int __stdcall get_file_attribute (int, const char *, int *,

@@ -45,6 +45,7 @@ details. */
 #define NEED_VFORK
 #include <setjmp.h>
 #include "perthread.h"
+#include "pwdgrp.h"
 
 #undef _close
 #undef _lseek
@@ -1970,7 +1971,7 @@ seteuid32 (__uid32_t uid)
   struct passwd * pw_new;
   PSID origpsid, psid2 = NO_SID;
 
-  pw_new = getpwuid32 (uid);
+  pw_new = internal_getpwuid (uid);
   if (!usersid.getfrompw (pw_new))
     {
       set_errno (EINVAL);
@@ -2146,7 +2147,7 @@ setegid32 (__gid32_t gid)
   cygsid gsid;
   HANDLE ptok;
 
-  struct __group32 * gr = getgrgid32 (gid);
+  struct __group32 * gr = internal_getgrgid (gid);
   if (!gr || gr->gr_gid != gid || !gsid.getfromgr (gr))
     {
       set_errno (EINVAL);

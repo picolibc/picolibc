@@ -30,6 +30,7 @@ details. */
 #include "dtable.h"
 #include "pinfo.h"
 #include "cygheap.h"
+#include "pwdgrp.h"
 
 extern "C" int aclsort (int nentries, int, __aclent16_t *aclbufp);
 extern "C" int acl (const char *path, int cmd, int nentries, __aclent16_t *aclbufp);
@@ -158,7 +159,7 @@ setacl (const char *file, int nentries, __aclent16_t *aclbufp)
 	  break;
 	case USER:
 	case DEF_USER:
-	  if (!(pw = getpwuid32 (aclbufp[i].a_id))
+	  if (!(pw = internal_getpwuid (aclbufp[i].a_id))
 	      || !sid.getfrompw (pw)
 	      || !add_access_allowed_ace (acl, ace_off++, allow,
 					   sid, acl_len, inheritance))
@@ -172,7 +173,7 @@ setacl (const char *file, int nentries, __aclent16_t *aclbufp)
 	  break;
 	case GROUP:
 	case DEF_GROUP:
-	  if (!(gr = getgrgid32 (aclbufp[i].a_id))
+	  if (!(gr = internal_getgrgid (aclbufp[i].a_id))
 	      || !sid.getfromgr (gr)
 	      || !add_access_allowed_ace (acl, ace_off++, allow,
 					   sid, acl_len, inheritance))
@@ -419,21 +420,15 @@ acl_access (const char *path, int flags)
 	       * Take SID from passwd, search SID in group, check is_grp_member.
 	       */
 	      cygsid owner;
-	      cygsid group;
 	      struct passwd *pw;
 	      struct __group32 *gr = NULL;
 
-	      if ((pw = getpwuid32 (acls[i].a_id)) != NULL
-		  && owner.getfrompw (pw))
-		{
-		  for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
-		    if (group.getfromgr (gr)
-			&& owner == group
-			&& is_grp_member (myself->uid, gr->gr_gid))
-		      break;
-		}
-	      if (!gr)
-		continue;
+	      if ((pw = internal_getpwuid (acls[i].a_id)) != NULL
+		  && owner.getfrompw (pw)
+		  && (gr = internal_getgrsid (owner))
+		  && is_grp_member (myself->uid, gr->gr_gid))
+		break;
+	      continue;
 	    }
 	  break;
 	case GROUP_OBJ:
@@ -958,7 +953,7 @@ aclfromtext (char *acltextp, int *)
 	      c += 5;
 	      if (isalpha (*c))
 		{
-		  struct passwd *pw = getpwnam (c);
+		  struct passwd *pw = internal_getpwnam (c);
 		  if (!pw)
 		    {
 		      set_errno (EINVAL);
@@ -986,7 +981,7 @@ aclfromtext (char *acltextp, int *)
 	      c += 5;
 	      if (isalpha (*c))
 		{
-		  struct __group32 *gr = getgrnam32 (c);
+		  struct __group32 *gr = internal_getgrnam (c);
 		  if (!gr)
 		    {
 		      set_errno (EINVAL);

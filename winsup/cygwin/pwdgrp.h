@@ -10,10 +10,20 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+/* These functions are needed to allow searching and walking through
+   the passwd and group lists */
+extern struct passwd *internal_getpwsid (cygsid &);
+extern struct passwd *internal_getpwnam (const char *, BOOL = FALSE);
+extern struct passwd *internal_getpwuid (__uid32_t, BOOL = FALSE);
+extern struct __group32 *internal_getgrsid (cygsid &);
+extern struct __group32 *internal_getgrgid (__gid32_t gid, BOOL = FALSE);
+extern struct __group32 *internal_getgrnam (const char *, BOOL = FALSE);
+extern struct __group32 *internal_getgrent (int);
+int internal_getgroups (int, __gid32_t *);
+
 enum pwdgrp_state {
   uninitialized = 0,
   initializing,
-  emulated,
   loaded
 };
 
@@ -24,26 +34,34 @@ class pwdgrp_check {
 
 public:
   pwdgrp_check () : state (uninitialized) {}
-  operator pwdgrp_state ()
+  BOOL isinitializing ()
     {
-      if (state != uninitialized && file_w32[0] && cygheap->etc_changed ())
-	{
-	  HANDLE h;
-	  WIN32_FIND_DATA data;
-
-	  if ((h = FindFirstFile (file_w32, &data)) != INVALID_HANDLE_VALUE)
+      if (state <= initializing)
+	state = initializing;
+      else if (cygheap->etc_changed ())
+        {
+	  if (!file_w32[0])
+	    state = initializing;
+	  else
 	    {
-	      if (CompareFileTime (&data.ftLastWriteTime, &last_modified) > 0)
-		state = uninitialized;
-	      FindClose (h);
+	      HANDLE h;
+	      WIN32_FIND_DATA data;
+
+	      if ((h = FindFirstFile (file_w32, &data)) != INVALID_HANDLE_VALUE)
+	        {
+		  if (CompareFileTime (&data.ftLastWriteTime, &last_modified) > 0)
+		    state = initializing;
+		  FindClose (h);
+		}
 	    }
 	}
-      return state;
+      return state == initializing;
     }
   void operator = (pwdgrp_state nstate)
     {
       state = nstate;
     }
+  BOOL isuninitialized () const { return state == uninitialized; }
   void set_last_modified (HANDLE fh, const char *name)
     {
       if (!file_w32[0])
@@ -101,7 +119,11 @@ public:
       lptr = eptr;
     eptr = strchr (lptr, '\n');
     if (eptr)
-      *eptr++ = '\0';
+      {
+	if (eptr > lptr && *(eptr - 1) == '\r')
+          *(eptr - 1) = 0;
+	*eptr++ = '\0';
+      }
     return lptr;
   }
   inline HANDLE get_fhandle () { return fh; }

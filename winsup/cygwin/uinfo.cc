@@ -29,6 +29,7 @@ details. */
 #include "registry.h"
 #include "child_info.h"
 #include "environ.h"
+#include "pwdgrp.h"
 
 void
 internal_getlogin (cygheap_user &user)
@@ -68,8 +69,8 @@ internal_getlogin (cygheap_user &user)
 	 }
     }
 
-  if (!pw && !(pw = getpwnam (user.name ()))
-      && !(pw = getpwuid32 (DEFAULT_UID)))
+  if (!pw && !(pw = internal_getpwnam (user.name ()))
+      && !(pw = internal_getpwuid (DEFAULT_UID)))
     debug_printf("user not found in augmented /etc/passwd");
   else
     {
@@ -79,7 +80,7 @@ internal_getlogin (cygheap_user &user)
       if (wincap.has_security ())
 	{
 	  cygsid gsid;
-	  if (gsid.getfromgr (getgrgid32 (pw->pw_gid)))
+	  if (gsid.getfromgr (internal_getgrgid (pw->pw_gid)))
 	    {
 	      /* Set primary group to the group in /etc/passwd. */
 	      user.groups.pgsid = gsid;
@@ -214,7 +215,7 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
       else
 	{
 	  if (!pw)
-	    pw = getpwnam (name ());
+	    pw = internal_getpwnam (name ());
 	  if (pw && pw->pw_dir && *pw->pw_dir)
 	    {
 	      debug_printf ("Set HOME (from /etc/passwd) to %s", pw->pw_dir);
@@ -238,7 +239,7 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
   if (what != CH_HOME && homepath == NULL && newhomepath == NULL)
     {
       if (!pw)
-	pw = getpwnam (name ());
+	pw = internal_getpwnam (name ());
       if (pw && pw->pw_dir && *pw->pw_dir)
 	cygwin_conv_to_full_win32_path (pw->pw_dir, homepath_env_buf);
       else

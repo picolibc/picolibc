@@ -1,3 +1,85 @@
+2002-12-10  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* pwdgrp.h (pwdgrp_check::pwdgrp_state): Replace by
+	pwdgrp_check::isinitializing ().
+	(pwdgrp_check::isinitializing): Create.
+	* passwd.cc (grab_int): Change type to unsigned, use strtoul and
+	set the pointer content to 0 if the field is invalid.
+	(parse_pwd): Move validity test after getting pw_gid.
+	(read_etc_passwd): Replace "passwd_state <= " by
+	passwd_state::isinitializing ().
+	(internal_getpwuid): Ditto.
+	(internal_getpwnam): Ditto.
+	(getpwent): Ditto.
+	(getpass): Ditto.
+	* grp.cc (parse_grp): Use strtoul for gr_gid and verify the validity.   
+	(read_etc_group): Replace "group_state <= " by
+	group_state::isinitializing ().
+	(internal_getgrgid): Ditto.
+	(getgrent32): Ditto.
+	(internal_getgrent): Ditto.
+
+2002-12-10  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* security.h: Move declarations of internal_getgrent,
+	internal_getpwsid and internal_getgrsid to pwdgrp.h.
+	* pwdgrp.h: Declare internal_getpwsid, internal_getpwnam,
+	internal_getpwuid, internal_getgrsid, internal_getgrgid,
+	internal_getgrnam, internal_getgrent and internal_getgroups.
+	Delete "emulated" from enum pwdgrp_state.
+	(pwdgrp_check::isuninitialized): Create.
+	(pwdgrp_check::pwdgrp_state): Change state to initializing
+	rather than to uninitialized.
+	(pwdgrp_read::gets): Remove trailing CRs.
+	* passwd.cc (grab_string): Don't look for NLs.
+	(grab_int): Ditto.
+	(parse_pwd): Don't look for CRs. Return 0 if entry is too short.
+	(search_for): Delete.
+	(read_etc_passwd): Simplify tests to actually read the file.
+	Set state to loaded before making internal_getpwXX calls.
+	Replace search_for calls by equivalent internal_pwgetXX calls.
+	(internal_getpwsid): Use passwd_state.isuninitialized to decide
+	to call read_etc_passwd.
+	(internal_getpwuid): Create.
+	(internal_getpwnam): Create.
+	(getpwuid32): Simply call internal_getpwuid.
+	(getpwuid_r32): Call internal_getpwuid.
+	(getpwnam): Simply call internal_getpwnam.
+	(getpwnam_r): Call internal_getpwnam.
+	* grp.cc (parse_grp): Don't look for CRs. Adjust blank space.
+	(add_grp_line): Adjust blank space.
+	(class group_lock): Ditto.
+	(read_etc_group): Simplify tests to actually read the file.
+	Set state to loaded before making internal_getgrXX calls.
+	Replace getgrXX calls by equivalent internal calls.
+	(internal_getgrsid): Use group_state.isuninitialized to decide
+	to call read_etc_group.
+	(internal_getgrgid): Create.
+	(internal_getgrnam): Create.
+	(getgroups32): Simply call internal_getgrgid.
+	(getgrnam32): Simply call internal_getgrnam.
+	(internal_getgrent): Call group_state.isuninitialized.
+	(internal_getgroups): Create from the former getgroups32, using
+	two of the four arguments. Set gid to myself->gid and username
+	to cygheap->user.name ().
+	(getgroups32): Simply call internal_getgroup.
+	(getgroups): Call internal_getgroup instead of getgroups32.
+	(setgroups32): Call internal versions of get{pw,gr}XX.
+	* sec_helper.cc: Include pwdgrp.h.
+	(is_grp_member): Call internal versions of get{pw,gr}XX.
+	* security.cc: Include pwdgrp.h.
+	(alloc_sd): Call internal versions of get{pw,gr}XX.
+	* syscalls.cc: Include pwdgrp.h.
+	(seteuid32): Call internal versions of get{pw,gr}XX.
+	(setegid32): Ditto.
+	* uinfo.cc: Include pwdgrp.h.
+	(internal_getlogin): Call internal versions of get{pw,gr}XX.
+	(cygheap_user::ontherange): Ditto.
+	* sec_acl.cc: Include pwdgrp.h.
+	(setacl): Call internal versions of get{pw,gr}XX.
+	(acl_access): Ditto and simplify logic.
+	(aclfromtext): Ditto.
+
 2002-12-09  2002-12-02  Egor Duda <deo@logos-m.ru>
 
 	* lib/pseudo-reloc.c: New file.

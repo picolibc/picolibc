@@ -30,7 +30,7 @@ details. */
    on the first call that needs information from it. */
 
 static struct __group32 *group_buf;		/* group contents in memory */
-static int curr_lines = -1;
+static int curr_lines;
 static int max_lines;
 
 /* Position in the group cache */
@@ -46,10 +46,6 @@ static char * NO_COPY null_ptr = NULL;
 static int
 parse_grp (struct __group32 &grp, char *line)
 {
-  int len = strlen (line);
-  if (line[--len] == '\r')
-    line[len] = '\0';
-
   char *dp = strchr (line, ':');
 
   if (!dp)
@@ -63,9 +59,8 @@ parse_grp (struct __group32 &grp, char *line)
   if (dp)
     {
       *dp++ = '\0';
-      grp.gr_gid = strtol (dp, NULL, 10);
-      dp = strchr (dp, ':');
-      if (dp)
+      grp.gr_gid = strtoul (line = dp, &dp, 10);
+      if (dp != line && *dp == ':')
 	{
 	  grp.gr_mem = &null_ptr;
 	  if (*++dp)
@@ -100,10 +95,10 @@ static void
 add_grp_line (char *line)
 {
     if (curr_lines == max_lines)
-    {
+      {
 	max_lines += 10;
 	group_buf = (struct __group32 *) realloc (group_buf, max_lines * sizeof (struct __group32));
-    }
+      }
     if (parse_grp (group_buf[curr_lines], line))
       curr_lines++;
 }
@@ -114,15 +109,15 @@ class group_lock
   static NO_COPY pthread_mutex_t mutex;
  public:
   group_lock (bool doit)
-  {
-    if (armed = doit)
-      pthread_mutex_lock (&mutex);
-  }
+    {
+      if (armed = doit)
+        pthread_mutex_lock (&mutex);
+    }
   ~group_lock ()
-  {
-    if (armed)
-      pthread_mutex_unlock (&mutex);
-  }
+    {
+      if (armed)
+        pthread_mutex_unlock (&mutex);
+    }
 };
 
 pthread_mutex_t NO_COPY group_lock::mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
@@ -139,12 +134,8 @@ read_etc_group ()
   group_lock here (cygwin_finished_initializing);
 
   /* if we got blocked by the mutex, then etc_group may have been processed */
-  if (group_state != uninitialized)
-    return;
-
-  if (group_state != initializing)
+  if (group_state.isinitializing ())
     {
-      group_state = initializing;
       for (int i = 0; i < curr_lines; i++)
 	if ((group_buf + i)->gr_mem != &null_ptr)
 	  free ((group_buf + i)->gr_mem);
@@ -160,9 +151,10 @@ read_etc_group ()
 	  gr.close ();
 	  debug_printf ("Read /etc/group, %d lines", curr_lines);
 	}
+      group_state = loaded;
 
       /* Complete /etc/group in memory if needed */
-      if (!getgrgid32 (myself->gid))
+      if (!internal_getgrgid (myself->gid))
         {
 	  static char linebuf [200];
 	  char group_name [UNLEN + 1] = "unknown";
@@ -181,7 +173,6 @@ read_etc_group ()
 	  debug_printf ("Completing /etc/group: %s", linebuf);
 	  add_grp_line (linebuf);
 	}
-      group_state = loaded;
     }
   return;
 }
@@ -191,13 +182,47 @@ internal_getgrsid (cygsid &sid)
 {
   char sid_string[128];
 
-  if (curr_lines < 0 && group_state  <= initializing)
+  if (group_state.isuninitialized ())
     read_etc_group ();
 
   if (sid.string (sid_string))
     for (int i = 0; i < curr_lines; i++)
-      if (!strcmp (sid_string, (group_buf + i)->gr_passwd))
+      if (!strcmp (sid_string, group_buf[i].gr_passwd))
         return group_buf + i;
+  return NULL;
+}
+
+struct __group32 *
+internal_getgrgid (__gid32_t gid, BOOL check)
+{
+  struct __group32 * default_grp = NULL;
+
+  if (group_state.isuninitialized ()
+      || (check && group_state.isinitializing ()))
+    read_etc_group ();
+
+  for (int i = 0; i < curr_lines; i++)
+    {
+      if (group_buf[i].gr_gid == myself->gid)
+	default_grp = group_buf + i;
+      if (group_buf[i].gr_gid == gid)
+	return group_buf + i;
+    }
+  return allow_ntsec || gid != ILLEGAL_GID ? NULL : default_grp;
+}
+
+struct __group32 *
+internal_getgrnam (const char *name, BOOL check)
+{
+  if (group_state.isuninitialized ()
+      || (check && group_state.isinitializing ()))
+    read_etc_group ();
+
+  for (int i = 0; i < curr_lines; i++)
+    if (strcasematch (group_buf[i].gr_name, name))
+      return group_buf + i;
+
+  /* Didn't find requested group */
   return NULL;
 }
 
@@ -221,18 +246,7 @@ grp32togrp16 (struct __group16 *gp16, struct __group32 *gp32)
 extern "C" struct __group32 *
 getgrgid32 (__gid32_t gid)
 {
-  struct __group32 * default_grp = NULL;
-  if (group_state  <= initializing)
-    read_etc_group ();
-
-  for (int i = 0; i < curr_lines; i++)
-    {
-      if (group_buf[i].gr_gid == myself->gid)
-	default_grp = group_buf + i;
-      if (group_buf[i].gr_gid == gid)
-	return group_buf + i;
-    }
-  return allow_ntsec || gid != ILLEGAL_GID ? NULL : default_grp;
+  return internal_getgrgid (gid, TRUE);
 }
 
 extern "C" struct __group16 *
@@ -246,15 +260,7 @@ getgrgid (__gid16_t gid)
 extern "C" struct __group32 *
 getgrnam32 (const char *name)
 {
-  if (group_state  <= initializing)
-    read_etc_group ();
-
-  for (int i = 0; i < curr_lines; i++)
-    if (strcasematch (group_buf[i].gr_name, name))
-      return group_buf + i;
-
-  /* Didn't find requested group */
-  return NULL;
+  return internal_getgrnam (name, TRUE);
 }
 
 extern "C" struct __group16 *
@@ -274,7 +280,7 @@ endgrent ()
 extern "C" struct __group32 *
 getgrent32 ()
 {
-  if (group_state  <= initializing)
+  if (group_state.isinitializing ())
     read_etc_group ();
 
   if (grp_pos < curr_lines)
@@ -301,7 +307,7 @@ setgrent ()
 struct __group32 *
 internal_getgrent (int pos)
 {
-  if (group_state  <= initializing)
+  if (group_state.isuninitialized ())
     read_etc_group ();
 
   if (pos < curr_lines)
@@ -310,16 +316,14 @@ internal_getgrent (int pos)
 }
 
 int
-getgroups32 (int gidsetsize, __gid32_t *grouplist, __gid32_t gid,
-	     const char *username)
+internal_getgroups (int gidsetsize, __gid32_t *grouplist)
 {
   HANDLE hToken = NULL;
   DWORD size;
   int cnt = 0;
   struct __group32 *gr;
-
-  if (group_state  <= initializing)
-    read_etc_group ();
+  __gid32_t gid;
+  const char *username;
 
   if (allow_ntsec)
     {
@@ -368,6 +372,8 @@ getgroups32 (int gidsetsize, __gid32_t *grouplist, __gid32_t gid,
 	return cnt;
     }
 
+  gid = myself->gid;
+  username = cygheap->user.name ();
   for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
     if (gid == gr->gr_gid)
       {
@@ -397,8 +403,7 @@ error:
 extern "C" int
 getgroups32 (int gidsetsize, __gid32_t *grouplist)
 {
-  return getgroups32 (gidsetsize, grouplist, myself->gid,
-		      cygheap->user.name ());
+  return internal_getgroups (gidsetsize, grouplist);
 }
 
 extern "C" int
@@ -414,8 +419,7 @@ getgroups (int gidsetsize, __gid16_t *grouplist)
   if (gidsetsize > 0 && grouplist)
     grouplist32 = (__gid32_t *) alloca (gidsetsize * sizeof (__gid32_t));
 
-  int ret = getgroups32 (gidsetsize, grouplist32, myself->gid,
-			 cygheap->user.name ());
+  int ret = internal_getgroups (gidsetsize, grouplist32);
 
   if (gidsetsize > 0 && grouplist)
     for (int i = 0; i < ret; ++ i)
@@ -462,7 +466,7 @@ setgroups32 (int ngroups, const __gid32_t *grouplist)
       for (int gidy = 0; gidy < gidx; gidy++)
 	if (grouplist[gidy] == grouplist[gidx])
 	  goto found; /* Duplicate */
-      if ((gr = getgrgid32 (grouplist[gidx])) &&
+      if ((gr = internal_getgrgid (grouplist[gidx])) &&
 	  gsids.addfromgr (gr))
 	goto found;
       debug_printf ("No sid found for gid %d", grouplist[gidx]);

@@ -31,6 +31,7 @@ details. */
 #include "dtable.h"
 #include "pinfo.h"
 #include "cygheap.h"
+#include "pwdgrp.h"
 
 /* General purpose security attribute objects for global use. */
 SECURITY_ATTRIBUTES NO_COPY sec_none;
@@ -164,7 +165,6 @@ cygsid::get_id (BOOL search_grp, int *type)
 BOOL
 is_grp_member (__uid32_t uid, __gid32_t gid)
 {
-  extern int getgroups32 (int, __gid32_t *, __gid32_t, const char *);
   struct passwd *pw;
   struct __group32 *gr;
   int idx;
@@ -176,12 +176,11 @@ is_grp_member (__uid32_t uid, __gid32_t gid)
       /* If gid == primary group of current user, return immediately. */
       if (gid == myself->gid)
         return TRUE;
-      /* Calling getgroups32 only makes sense when reading the access token. */
+      /* Calling getgroups only makes sense when reading the access token. */
       if (allow_ntsec)
         {
 	  __gid32_t grps[NGROUPS_MAX];
-	  int cnt = getgroups32 (NGROUPS_MAX, grps, myself->gid,
-				 cygheap->user.name ());
+	  int cnt = internal_getgroups (NGROUPS_MAX, grps);
 	  for (idx = 0; idx < cnt; ++idx)
 	    if (grps[idx] == gid)
 	      return TRUE;
@@ -190,13 +189,13 @@ is_grp_member (__uid32_t uid, __gid32_t gid)
     }
 
   /* Otherwise try getting info from examining passwd and group files. */
-  if ((pw = getpwuid32 (uid)))
+  if ((pw = internal_getpwuid (uid)))
     {
       /* If gid == primary group of uid, return immediately. */
       if ((__gid32_t) pw->pw_gid == gid)
 	return TRUE;
       /* Otherwise search for supplementary user list of this group. */
-      if ((gr = getgrgid32 (gid)) && gr->gr_mem)
+      if ((gr = internal_getgrgid (gid)))
 	for (idx = 0; gr->gr_mem[idx]; ++idx)
 	  if (strcasematch (cygheap->user.name (), gr->gr_mem[idx]))
 	    return TRUE;
