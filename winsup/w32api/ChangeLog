@@ -1,6 +1,7 @@
 2004-11-18  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/wincon.h (AttachConsole): Correct the _WIN32_WINNT filter.
+	Changed it twice due to inconsistent MSDN documentation.
 
 2004-11-13  Danny Smith  <dannysmith@users.sourceforge.net>
 
