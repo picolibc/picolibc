@@ -56,7 +56,7 @@
 	(fhandler_tty_slave::read): Don't do anything special with vtime when
 	vmin == 0.
 
-2002-07-25  Egor Duda  <deo@logos-m.ru>
+2002-08-30  Egor Duda  <deo@logos-m.ru>
 
 	* autoload.cc (GetConsoleWindow): Correct parameter count.
 
