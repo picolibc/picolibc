@@ -1,5 +1,9 @@
 2003-02-10  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* mingwex/math/cephes_emath.h: Don't redefine INFINITY.
+
+2003-02-10  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/_mingw.h (_CRTIMP): Define for __GNUC__ if
 	__declspec(dllimport)  supported.
 	(__cdecl): Define if not already defined.

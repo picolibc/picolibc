@@ -285,7 +285,6 @@ static __inline__ void __eshdn6(register short unsigned int *x);
 #define XPD 0,
 /* #define XPD */
 #define NANS
-#define INFINITY
 
 /* NaN's require infinity support. */
 #ifdef NANS
