@@ -13,17 +13,19 @@
 
 #include <sys/types.h>
 
-#define __DIRENT_VERSION	1
+#define __DIRENT_VERSION	2
 
+#pragma pack(push,4)
 struct dirent
 {
   long d_version;	/* Used since Cygwin 1.3.3. */
-  long __d_reserved[2];
+  ino_t d_ino;		/* still junk but with more bits */
   long d_fd;		/* File descriptor of open directory.
 			   Used since Cygwin 1.3.3. */
-  ino_t d_ino;		/* Just for compatibility, it's junk */
+  unsigned long old_d_ino;/* Just for compatibility, it's junk */
   char d_name[256];	/* FIXME: use NAME_MAX? */
 };
+#pragma pack(pop)
 
 #define __DIRENT_COOKIE 0xdede4242
 
