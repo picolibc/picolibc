@@ -1,8 +1,11 @@
 LIBRARY SECUR32.dll
 EXPORTS
+AcceptSecurityContext@36
 AcquireCredentialsHandleA@36
 AcquireCredentialsHandleW@36
-AcceptSecurityContext@36
+ApplyControlTokenA@8
+ApplyControlTokenW@8
+CompleteAuthToken@8
 DecryptMessage@16
 DeleteSecurityContext@4
 EncryptMessage@16
@@ -10,6 +13,11 @@ EnumerateSecurityPackagesA@8
 EnumerateSecurityPackagesW@8
 FreeContextBuffer@4
 FreeCredentialsHandle@4
+GetComputerObjectNameA@12
+GetComputerObjectNameW@12
+GetUserNameExA@12
+GetUserNameExW@12
+ImpersonateSecurityContext@4
 InitializeSecurityContextA@48
 InitializeSecurityContextW@48
 LsaCallAuthenticationPackage@28
@@ -18,16 +26,14 @@ LsaFreeReturnBuffer@4
 LsaLogonUser@56
 LsaLookupAuthenticationPackage@12
 LsaRegisterLogonProcess@12
+MakeSignature@16
 QueryContextAttributesA@12
 QueryContextAttributesW@12
 QueryCredentialsAttributesA@12
 QueryCredentialsAttributesW@12
-CompleteAuthToken@8
-ApplyControlTokenA@8
-ApplyControlTokenW@8
-ImpersonateSecurityContext@4
-RevertSecurityContext@4
-MakeSignature@16
-VerifySignature@16
 QuerySecurityPackageInfoA@8
 QuerySecurityPackageInfoW@8
+RevertSecurityContext@4
+TranslateNameA@20
+TranslateNameW@20
+VerifySignature@16

@@ -1,3 +1,11 @@
+2003-03-27  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/secext.h (GetComputerObjectName[AW],GetUserNameEx[AW],
+	TranslateName[AW]): Add prototypes.
+	* lib/sec32.def (GetComputerObjectName[AW],GetUserNameEx[AW],
+	TranslateName[AW]): Add stubs.
+	* lib/test.c: Include secext.h.
+
 2003-03-27  Vladimir Michl  <michlv@users.sourceforge.net>
 
 	* include/ddk/ndis.h (NdisAllocateSpinLock,NdisFreeSpinLock,
