@@ -1,7 +1,7 @@
 2004-02-15  Christopher Faylor  <cgf@redhat.com>
 
-	* cygheap.cc (_csbrk): Report failing condition to stderr rather than
-	strace.
+	* cygheap.cc (_csbrk): Report more debugging details on failing
+	condition.
 
 2004-02-14  Christopher Faylor  <cgf@redhat.com>
 
