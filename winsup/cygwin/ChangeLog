@@ -1,3 +1,10 @@
+2002-09-29  Christopher Faylor  <cgf@redhat.com>
+
+	* thread.cc: Use "%E" in *_printf throughout rather than calling
+	GetLastError.  GNUify comments.
+	(__pthread_mutex_lock): Don't return error on EBUSY since that just
+	means that the mutex has already been initialized.
+
 2002-09-30  Robert Collins <rbtcollins@hotmail.com>
 
 	* pthread.cc (pthread_mutex_init): Use new pthread_mutex::init.
