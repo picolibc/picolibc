@@ -128,8 +128,7 @@ readdir (DIR * dir)
 {
   WIN32_FIND_DATA buf;
   HANDLE handle;
-  struct dirent *res = 0;
-  int prior_errno;
+  struct dirent *res = NULL;
 
   if (dir->__d_cookie != __DIRENT_COOKIE)
     {
@@ -138,40 +137,28 @@ readdir (DIR * dir)
       return res;
     }
 
-  if (dir->__d_u.__d_data.__handle != INVALID_HANDLE_VALUE)
+  if (dir->__d_u.__d_data.__handle == INVALID_HANDLE_VALUE)
     {
-      if (FindNextFileA (dir->__d_u.__d_data.__handle, &buf) == 0)
+      handle = FindFirstFileA (dir->__d_dirname, &buf);
+      DWORD lasterr = GetLastError ();
+      dir->__d_u.__d_data.__handle = handle;
+      if (handle == INVALID_HANDLE_VALUE && (lasterr != ERROR_NO_MORE_FILES))
 	{
-	  prior_errno = get_errno();
-	  (void) FindClose (dir->__d_u.__d_data.__handle);
-	  dir->__d_u.__d_data.__handle = INVALID_HANDLE_VALUE;
-	  __seterrno ();
-	  /* POSIX says you shouldn't set errno when readdir can't
-	     find any more files; if another error we leave it set. */
-	  if (get_errno () == ENMFILE)
-	      set_errno (prior_errno);
-	  syscall_printf ("%p = readdir (%p)", res, dir);
+	  seterrno_from_win_error (__FILE__, __LINE__, lasterr);
 	  return res;
 	}
     }
-  else
+  else if (!FindNextFileA (dir->__d_u.__d_data.__handle, &buf))
     {
-      handle = FindFirstFileA (dir->__d_dirname, &buf);
-
-      if (handle == INVALID_HANDLE_VALUE)
-	{
-	  /* It's possible that someone else deleted or emptied the directory
-	     or some such between the opendir () call and here.  */
-	  prior_errno = get_errno ();
-	  __seterrno ();
-	  /* POSIX says you shouldn't set errno when readdir can't
-	     find any more files; if another error we leave it set. */
-	  if (get_errno () == ENMFILE)
-	      set_errno (prior_errno);
-	  syscall_printf ("%p = readdir (%p)", res, dir);
-	  return res;
-	}
-      dir->__d_u.__d_data.__handle = handle;
+      DWORD lasterr = GetLastError ();
+      (void) FindClose (dir->__d_u.__d_data.__handle);
+      dir->__d_u.__d_data.__handle = INVALID_HANDLE_VALUE;
+      /* POSIX says you shouldn't set errno when readdir can't
+	 find any more files; so, if another error we leave it set. */
+      if (lasterr != ERROR_NO_MORE_FILES)
+	  seterrno_from_win_error (__FILE__, __LINE__, lasterr);
+      syscall_printf ("%p = readdir (%p)", res, dir);
+      return res;
     }
 
   /* We get here if `buf' contains valid data.  */

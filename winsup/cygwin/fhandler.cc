@@ -865,7 +865,7 @@ fhandler_disk_file::fstat (struct stat *buf)
 {
   int res = 0;	// avoid a compiler warning
   BY_HANDLE_FILE_INFORMATION local;
-  int old_errno = get_errno ();
+  save_errno saved_errno;
 
   memset (buf, 0, sizeof (*buf));
 
@@ -907,11 +907,9 @@ fhandler_disk_file::fstat (struct stat *buf)
 
   if (!get_win32_name ())
     {
-      set_errno (ENOENT);
+      saved_errno.set (ENOENT);
       return -1;
     }
-
-  set_errno (old_errno);
 
   buf->st_atime   = to_time_t (&local.ftLastAccessTime);
   buf->st_mtime   = to_time_t (&local.ftLastWriteTime);

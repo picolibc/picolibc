@@ -1,3 +1,10 @@
+Thu Aug 10 15:17:53 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dir.cc (readdir): Ensure that errno is *only* set when we've run out
+	of filenames.
+	* fhandler.cc (fhandler_disk_file::fstat): Use modern method for saving
+	errno, making it effective for the whole function.
+
 Tue Aug  8 22:25:39 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* select.cc (allocfd_set): Zero allocated fd_set.
