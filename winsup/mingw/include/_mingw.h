@@ -107,6 +107,16 @@
 #define __CRT_INLINE extern __inline__
 #endif
 
+#ifdef __cplusplus
+# define __UNUSED_PARAM(x) 
+#else 
+# ifdef __GNUC__
+#  define __UNUSED_PARAM(x) x __attribute__((unused))
+# else
+#  define __UNUSED_PARAM(x) x
+# endif
+#endif
+
 #define __MINGW32_VERSION 4.0
 #define __MINGW32_MAJOR_VERSION 4
 #define __MINGW32_MINOR_VERSION 0

@@ -1,3 +1,9 @@
+2004-02-21  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/_mingw.h (__UNUSED_PARAM): Define macro.
+	* include/wchar.h (fwide): Use it.
+	(mbsinit): Ditto.
+
 2004-02-05  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/getopt.c: Define IS_POSIXLY_CORRECT as per
