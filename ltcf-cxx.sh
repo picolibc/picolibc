@@ -2,7 +2,7 @@
 
 # ltcf-cxx.sh - Create a C++ compiler specific configuration
 #
-# Copyright (C) 1996-1999,2000 Free Software Foundation, Inc.
+# Copyright (C) 1996-1999, 2000, 2001 Free Software Foundation, Inc.
 # Originally by Gordon Matzigkeit <gord@gnu.ai.mit.edu>, 1996
 #
 # Original C++ support by:Gary V. Vaughan <gvv@techie.com>
@@ -133,6 +133,12 @@ case "$host_os" in
   aix3*)
     # FIXME: insert proper C++ library support
     ld_shlibs=no
+
+    # We don't want to build shared libraries on unknown CPU types.
+    case $host_cpu in
+    powerpc | rs6000) ;;
+    *) ld_shlibs=no ;;
+    esac
     ;;
   aix4*)
     archive_expsym_cmds="\$CC $shared_flag"' -o $output_objdir/$soname $libobjs $deplibs $compiler_flags ${wl}-bE:$export_symbols ${wl}-bnoentry${allow_undefined_flag}~$AR $AR_FLAGS $output_objdir/$libname$release.a $output_objdir/$soname'
