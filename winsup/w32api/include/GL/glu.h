@@ -227,6 +227,7 @@ GLAPI void APIENTRY gluEndPolygon (GLUtesselator* tess);
 GLAPI void APIENTRY gluEndSurface (GLUnurbs* nurb);
 GLAPI void APIENTRY gluEndTrim (GLUnurbs* nurb);
 GLAPI const GLubyte * APIENTRY gluErrorString (GLenum error);
+GLAPI wchar_t* APIENTRY gluErrorUnicodeStringEXT (GLenum errCode);
 GLAPI void APIENTRY gluGetNurbsProperty (GLUnurbs* nurb, GLenum property, GLfloat* data);
 GLAPI const GLubyte * APIENTRY gluGetString (GLenum name);
 GLAPI void APIENTRY gluGetTessProperty (GLUtesselator* tess, GLenum which, GLdouble* data);

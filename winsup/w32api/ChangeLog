@@ -1,5 +1,11 @@
 2003-09-24  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/GL/glu.h (gluErrorUnicodeStringEXT): Add function.
+	Function exists in glu32.def but is undocumented on MSDN.
+	A Google search came up with this declaration.
+
+2003-09-24  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/GL/glu.h: Rewritten from scratch. Started from GLU 1.3
 	headers from OpenGL Sample Implementation. Windows ships with
 	GLU 1.2 so some constants and functions were removed. Then some
