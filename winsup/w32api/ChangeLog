@@ -1,3 +1,7 @@
+2003-09-25  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* lib/version.def (LIBRARY): Quote name.
+
 2003-09-25  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/winuser.h (GetClipboardSequenceNumber): Add functions
