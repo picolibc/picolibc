@@ -71,7 +71,6 @@ class fhandler_base;
 class cygheap_exec_info
 {
 public:
-  __uid32_t uid;
   char *old_title;
   int argc;
   char **argv;

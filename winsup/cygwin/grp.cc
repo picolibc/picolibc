@@ -61,6 +61,7 @@ pwdgrp::parse_group ()
       char **namearray = (char **) calloc (i + 2, sizeof (char *));
       if (namearray)
 	{
+	  reparse (dp);
 	  for (i = 0; (dp = next_str (',')); i++)
 	    namearray[i] = dp;
 	  namearray[i] = NULL;
