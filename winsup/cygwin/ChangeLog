@@ -1,3 +1,23 @@
+2001-06-05  Egor Duda  <deo@logos-m.ru>
+
+	* security.h (NTWriteEA): Change prototype.
+	* ntea.cc (NTReadEA): Don't check for global ntea setting, now
+	it's caller responsibility.
+	(NTWriteEA): Ditto.
+	* security.cc (get_file_attribute): Read attribute from EA only
+	if 'ntea' is enabled.
+	(set_file_attribute): Ditto.
+	* path.h: (class path_conv): Add members to store file system
+	information.
+	(path_conv::get_drive_type): New function.
+	* syscalls.cc (stat_worker): Use it.
+	* path.cc (path_conv::update_fs_info): New functions.
+	(path_conv::check): Get file system information from device where
+	file resides. On NTFS, try to read symlink contents from EA.
+	(get_symlink_ea): New function.
+	(set_symlink_ea): Ditto.
+	(symlink): Store symlink in extended attribute, if possible.
+
 Tue Jun  5 11:18:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_disk_file::fstat): Always reset file position

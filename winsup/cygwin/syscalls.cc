@@ -1040,7 +1040,7 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 
   debug_printf ("%d = file_attributes for '%s'", atts, real_path.get_win32 ());
 
-  dtype = real_path.drive_type;
+  dtype = real_path.get_drive_type ();
 
   if ((atts == -1 || ! (atts & FILE_ATTRIBUTE_DIRECTORY) ||
        (os_being_run == winNT

@@ -306,6 +306,52 @@ mkrelpath (char *path)
     strcpy (path, ".");
 }
 
+void
+path_conv::update_fs_info (const char* win32_path)
+{
+  char tmp_buf [MAX_PATH];
+  strncpy (tmp_buf, win32_path, MAX_PATH);
+
+  if (!rootdir (tmp_buf) &&
+      (!GetCurrentDirectory (sizeof (tmp_buf), tmp_buf) <= sizeof (tmp_buf) ||
+       !rootdir (tmp_buf)))       
+    {
+      debug_printf ("Cannot get root component of path %s", win32_path);
+      root_dir [0] = fs_name [0] = '\0';
+      fs_flags = fs_serial = 0;
+      sym_opt = 0;
+      return;
+    }
+
+  if (strcmp (tmp_buf, root_dir) != 0)
+    {
+      drive_type = GetDriveType (root_dir);
+      if (drive_type == DRIVE_REMOTE || (drive_type == DRIVE_UNKNOWN && (root_dir[0] == '\\' && root_dir[1] == '\\')))
+	is_remote_drive = 1;
+      else
+	is_remote_drive = 0;
+
+      strncpy (root_dir, tmp_buf, MAX_PATH);
+      if (!GetVolumeInformation (root_dir, NULL, 0, &fs_serial, NULL, &fs_flags,
+				     fs_name, sizeof (fs_name)))
+	{
+	  debug_printf ("Cannot get volume information (%s), %E", root_dir);
+	  fs_name [0] = '\0';
+	  fs_flags = fs_serial = 0;
+	  sym_opt = 0;
+	}
+      else
+        {
+	  /* FIXME: Samba by default returns "NTFS" in file system name, but
+	   * doesn't support Extended Attributes. If there's some fast way to
+	   * distinguish between samba and real ntfs, it should be implemented
+	   * here.
+	   */
+	  sym_opt = (strcmp (fs_name, "NTFS") == 0 ? PC_CHECK_EA : 0);
+        }
+    }
+}
+
 /* Convert an arbitrary path SRC to a pure Win32 path, suitable for
    passing to Win32 API routines.
 
@@ -350,7 +396,10 @@ path_conv::check (const char *src, unsigned opt,
   fileattr = (DWORD) -1;
   case_clash = FALSE;
   devn = unit = 0;
-  vol_flags = 0;
+  root_dir[0] = '\0';
+  fs_name[0] = '\0';
+  fs_flags = fs_serial = 0;
+  sym_opt = 0;
   drive_type = 0;
   is_remote_drive = 0;
 
@@ -423,6 +472,8 @@ path_conv::check (const char *src, unsigned opt,
 	  if (error)
 	    return;
 
+	  update_fs_info (full_path);
+
 	  /* devn should not be a device.  If it is, then stop parsing now. */
 	  if (devn != FH_BAD)
 	    {
@@ -451,7 +502,7 @@ path_conv::check (const char *src, unsigned opt,
 	      goto out;
 	    }
 
-	  int len = sym.check (full_path, suff, opt);
+	  int len = sym.check (full_path, suff, opt | sym_opt );
 
 	  if (sym.case_clash)
 	    {
@@ -616,31 +667,21 @@ out:
       return;
     }
 
-  char fs_name[16];
-
-  strcpy (tmp_buf, this->path);
-
-  if (!rootdir (tmp_buf) ||
-      !GetVolumeInformation (tmp_buf, NULL, 0, &vol_serial, NULL,
-			     &vol_flags, fs_name, 16))
+  update_fs_info (path);
+  if (!fs_name[0])
     {
-      debug_printf ("GetVolumeInformation(%s) = ERR, this->path(%s), set_has_acls(FALSE)",
-		    tmp_buf, this->path, GetLastError ());
       set_has_acls (FALSE);
       set_has_buggy_open (FALSE);
     }
   else
     {
       set_isdisk ();
-      debug_printf ("GetVolumeInformation(%s) = OK, this->path(%s), set_has_acls(%d)",
-		    tmp_buf, this->path, vol_flags & FS_PERSISTENT_ACLS);
-      drive_type = GetDriveType (tmp_buf);
-      if (drive_type == DRIVE_REMOTE || (drive_type == DRIVE_UNKNOWN && (tmp_buf[0] == '\\' && tmp_buf[1] == '\\')))
-	is_remote_drive = 1;
+      debug_printf ("root_dir(%s), this->path(%s), set_has_acls(%d)",
+		    root_dir, this->path, fs_flags & FS_PERSISTENT_ACLS);
       if (!allow_smbntsec && is_remote_drive)
 	set_has_acls (FALSE);
       else
-	set_has_acls (vol_flags & FS_PERSISTENT_ACLS);
+	set_has_acls (fs_flags & FS_PERSISTENT_ACLS);
       /* Known file systems with buggy open calls. Further explanation
 	 in fhandler.cc (fhandler_disk_file::open). */
       set_has_buggy_open (strcmp (fs_name, "SUNWNFS") == 0);
@@ -2316,6 +2357,28 @@ endmntent (FILE *)
 
 /********************** Symbolic Link Support **************************/
 
+/* Read symlink from Extended Attribute */
+int
+get_symlink_ea (const char* frompath, char* buf, int buf_size)
+{
+  int res = NTReadEA (frompath, SYMLINK_EA_NAME, buf, buf_size);
+  if (res == 0)
+    debug_printf ("Cannot read symlink from EA");
+  return (res - 1);
+}
+
+/* Save symlink to Extended Attribute */
+BOOL
+set_symlink_ea (const char* frompath, const char* topath)
+{
+  if (!NTWriteEA (frompath, SYMLINK_EA_NAME, topath, strlen (topath) + 1))
+    {
+      debug_printf ("Cannot save symlink in EA");
+      return FALSE;
+    }
+  return TRUE;
+}
+
 /* Create a symlink from FROMPATH to TOPATH. */
 
 /* If TRUE create symlinks as Windows shortcuts, if FALSE create symlinks
@@ -2441,8 +2504,10 @@ symlink (const char *topath, const char *frompath)
 			      win32_path.get_win32 (),
 			      S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO);
 	  SetFileAttributesA (win32_path.get_win32 (),
-			      allow_winsymlinks ? FILE_ATTRIBUTE_READONLY
-						: FILE_ATTRIBUTE_SYSTEM);
+	  		      allow_winsymlinks ? FILE_ATTRIBUTE_READONLY
+			      			: FILE_ATTRIBUTE_SYSTEM);
+	  if (win32_path.fs_fast_ea ())
+            set_symlink_ea (win32_path, topath);
 	  res = 0;
 	}
       else
@@ -2706,6 +2771,14 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
       if (!sym_check)
 	goto file_not_symlink;
 
+      if (sym_check > 0 && opt & PC_CHECK_EA &&
+	  (res = get_symlink_ea (suffix.path, contents, sizeof (contents))) > 0)
+	{
+	  pflags = PATH_SYMLINK;
+	  debug_printf ("Got symlink from EA: %s", contents);
+	  break;
+	}
+
       /* Open the file.  */
 
       h = CreateFileA (suffix.path, GENERIC_READ, FILE_SHARE_READ, &sec_none_nih, OPEN_EXISTING,
@@ -2714,6 +2787,9 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
       if (h == INVALID_HANDLE_VALUE)
 	goto file_not_symlink;
 
+      /* FIXME: if symlink isn't present in EA, but EAs are supported, 
+       * should we write it there?
+       */
       switch (sym_check)
 	{
 	case 1:

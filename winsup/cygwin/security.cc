@@ -1199,9 +1199,14 @@ get_file_attribute (int use_ntsec, const char *file,
   if (!attribute)
     return 0;
 
-  int oatt = *attribute;
-  res = NTReadEA (file, ".UNIXATTR", (char *) attribute, sizeof (*attribute));
-  *attribute |= oatt;
+  if (allow_ntea)
+    {
+      int oatt = *attribute;
+      res = NTReadEA (file, ".UNIXATTR", (char *) attribute, sizeof (*attribute));
+      *attribute |= oatt;
+    }
+  else
+    res = 0;
 
   /* symlinks are everything for everyone!*/
   if ((*attribute & S_IFLNK) == S_IFLNK)
@@ -1523,7 +1528,7 @@ set_file_attribute (int use_ntsec, const char *file,
   if ((attribute & S_IFLNK) == S_IFLNK)
     attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
 
-  if (!use_ntsec || !allow_ntsec)
+  if (allow_ntea && (!use_ntsec || !allow_ntsec))
     {
       if (!NTWriteEA (file, ".UNIXATTR", (char *) &attribute,
 		      sizeof (attribute)))

@@ -85,10 +85,6 @@ BOOL NTWriteEA(const char *file, const char *attrname, char *buf, int len);
 int __stdcall
 NTReadEA (const char *file, const char *attrname, char *attrbuf, int len)
 {
-    /* return immediately if NTEA usage is turned off */
-    if (!allow_ntea)
-      return FALSE;
-
     HANDLE hFileSource;
     int eafound = 0;
     PFILE_FULL_EA_INFORMATION ea, sea;
@@ -254,12 +250,8 @@ NTReadEARaw (HANDLE hFileSource, int *len)
  */
 
 BOOL __stdcall
-NTWriteEA (const char *file, const char *attrname, char *buf, int len)
+NTWriteEA (const char *file, const char *attrname, const char *buf, int len)
 {
-  /* return immediately if NTEA usage is turned off */
-  if (!allow_ntea)
-    return TRUE;
-
   HANDLE hFileSource;
   WIN32_STREAM_ID StreamId;
   DWORD dwBytesWritten;

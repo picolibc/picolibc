@@ -198,4 +198,4 @@ extern SECURITY_ATTRIBUTES *__stdcall sec_user (PVOID sa_buf, PSID sid2 = NULL, 
 extern SECURITY_ATTRIBUTES *__stdcall sec_user_nih (PVOID sa_buf, PSID sid2 = NULL);
 
 int __stdcall NTReadEA (const char *file, const char *attrname, char *buf, int len);
-BOOL __stdcall NTWriteEA (const char *file, const char *attrname, char *buf, int len);
+BOOL __stdcall NTWriteEA (const char *file, const char *attrname, const char *buf, int len);

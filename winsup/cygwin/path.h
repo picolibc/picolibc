@@ -22,7 +22,8 @@ enum pathconv_arg
   PC_SYM_IGNORE		= 0x0004,
   PC_SYM_CONTENTS	= 0x0008,
   PC_FULL		= 0x0010,
-  PC_NULLEMPTY		= 0x0020
+  PC_NULLEMPTY		= 0x0020,
+  PC_CHECK_EA		= 0x0040
 };
 
 enum case_checking
@@ -56,14 +57,18 @@ class symlink_info;
 class path_conv
 {
   char path[MAX_PATH];
+  char root_dir[MAX_PATH];
+  char fs_name[MAX_PATH];
+  DWORD fs_flags;
+  DWORD fs_serial;
+  DWORD sym_opt; /* additional options to pass to symlink_info resolver */
   void add_ext_from_sym (symlink_info&);
+  void update_fs_info (const char*);
+  DWORD drive_type;
   bool is_remote_drive;
  public:
 
   unsigned path_flags;
-  DWORD vol_flags;
-  DWORD drive_type;
-  DWORD vol_serial;
 
   int isdisk () const { return path_flags & PATH_ISDISK;}
   int isremote () const {return is_remote_drive;}
@@ -128,10 +133,14 @@ class path_conv
   DWORD get_devn () {return devn == FH_BAD ? (DWORD) FH_DISK : devn;}
   short get_unitn () {return devn == FH_BAD ? 0 : unit;}
   DWORD file_attributes () {return fileattr;}
+  DWORD get_drive_type () {return drive_type;}
+  BOOL fs_fast_ea () {return sym_opt & PC_CHECK_EA;}
 };
 
 /* Symlink marker */
 #define SYMLINK_COOKIE "!<symlink>"
+
+#define SYMLINK_EA_NAME ".CYGSYMLINK"
 
 /* Socket marker */
 #define SOCKET_COOKIE  "!<socket >"
