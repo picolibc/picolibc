@@ -1,3 +1,10 @@
+Sun Oct  1 22:09:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * include/ipifcons.h: New header file.
+        * include/iprtrmib.h: Move operational states to ipifcons.h.
+        * include/iphlpapi.h: Add missing parameters to GetIfTable()
+        declaration.
+
 Sun Oct  1 16:30:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
         * include/iprtrmib.h: Add missing MIB_IF_OPER_STATUS_xxx definitions.
