@@ -9,6 +9,8 @@
 #include <sys/types.h>
 #include <linux/signal.h>
 #include <bits/sigset.h>
+#define _SIGNAL_H
+#include <bits/signum.h>
 
 /* --- include/signal.h thinks it knows better :-( --- */
 

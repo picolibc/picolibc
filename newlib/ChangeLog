@@ -1,3 +1,20 @@
+2002-05-30  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/sys/linux/Makefile.am: Add support for new files.
+        * libc/sys/linux/Makefile.in: Regenerated.
+        * libc/sys/linux/ids.c: Add __getuid weak alias for getuid.
+        * libc/sys/linux/signal.c: Change to use real-time syscalls for
+        sigsuspend, sigprocmask, and sigpending.  Also remove sigaction as
+        it is in a separate file now.
+        * libc/sys/linux/machine/i386/Makefile.am
+        * libc/sys/linux/machine/i386/Makefile.in
+        * libc/sys/linux/sys/signal.h: Add include of <bits/signum.h>.
+        * libc/sys/linux/sigaction.c: New file.
+        * libc/sys/linux/sigqueue.c: Ditto.
+        * libc/sys/linux/sigwait.c: Ditto.
+        * libc/sys/linux/machine/i386/sigaction.c: Ditto.
+        * libc/sys/linux/kernel_sigaction.h: Ditto.
+
 2002-05-28  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/sys/linux/Makefile.am: Add support for cfspeed.c and

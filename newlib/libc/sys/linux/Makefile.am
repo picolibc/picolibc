@@ -14,9 +14,9 @@ LIB_SOURCES = \
 	getreent.c ids.c inode.c io.c io64.c linux.c mmap.c \
 	pread.c pread64.c process.c pwrite.c pwrite64.c raise.c realpath.c \
 	rename.c resource.c sched.c select.c seteuid.c shm_open.c \
-	shm_unlink.c signal.c siglongjmp.c socket.c sleep.c stack.c \
-	sysconf.c sysctl.c systat.c system.c tcdrain.c tcsendbrk.c termios.c \
-	time.c usleep.c wait.c
+	shm_unlink.c sigaction.c sigqueue.c signal.c siglongjmp.c sigwait.c \
+	socket.c sleep.c stack.c sysconf.c sysctl.c systat.c system.c \
+	tcdrain.c tcsendbrk.c termios.c time.c usleep.c wait.c
 
 # This will handle both /usr/src/linux-2.4/include/asm/signal.h (in Red Hat Linux 7.1)
 # and also /usr/src/linux/include/asm/signal.h in older versions of Red Hat Linux

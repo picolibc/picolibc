@@ -19,3 +19,5 @@ _syscall0(gid_t,getegid)
 _syscall3(int,setresuid,uid_t,ruid,uid_t,euid,uid_t,suid)
 _syscall2(int,getgroups,int,size,gid_t *,list)
 _syscall3(int,syslog,int,type,char *,bufp,int,len)
+
+weak_alias(__libc_getuid,__getuid);

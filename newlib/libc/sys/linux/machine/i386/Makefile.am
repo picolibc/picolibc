@@ -4,7 +4,7 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-LIB_SOURCES = setjmp.S sigset.c
+LIB_SOURCES = setjmp.S sigaction.c sigset.c
 
 liblinuxi386_la_LDFLAGS = -Xcompiler -nostdlib
 
