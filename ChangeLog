@@ -1,3 +1,7 @@
+2000-11-23  Alexandre Oliva  <aoliva@redhat.com>
+
+	* ltcf-gcj.sh: Added file, required by 2000-11-18 merge.
+
 2000-11-20  Ian Lance Taylor  <ian@zembu.com>
 
 	* ltcf-cxx.sh: Added file, required by 2000-11-18 merge.
