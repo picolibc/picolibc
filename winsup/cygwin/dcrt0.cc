@@ -308,6 +308,8 @@ globify (char *word, char **&argv, int &argc, int &argvlen)
   int n = 0;
   char *p, *s;
   int dos_spec = isalpha(*word) && word[1] == ':' ? 1 : 0;
+  if (!dos_spec && isquote(*word) && word[1] && word[2])
+    dos_spec = isalpha(word[1]) && word[2] == ':' ? 1 : 0;
 
   /* We'll need more space if there are quoting characters in
      word.  If that is the case, doubling the size of the
@@ -330,7 +332,11 @@ globify (char *word, char **&argv, int &argc, int &argvlen)
 	char quote = *s;
 	while (*++s && *s != quote)
 	  {
-	    if (*s == '\\' && s[1] == quote)
+	    if (*s != '\\')
+	      /* nothing */;
+	    else if (dos_spec)
+	      *p++ = '\\';
+	    else if (s[1] == quote || s[1] == '\\')
 	      s++;
 	    *p++ = '\\';
 	    *p++ = *s;

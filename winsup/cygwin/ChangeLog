@@ -1,3 +1,8 @@
+Tue Apr 18 17:26:43 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dcrt0.cc (globify): Don't use \ quoting when apparently quoting a DOS
+	path spec.
+
 Sun Apr 16 18:54:21 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* init.cc (dll_entry): Use better check for determining when to set
