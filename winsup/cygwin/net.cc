@@ -74,11 +74,11 @@ wsock_event::wait (int socket, LPDWORD flags)
 {
   int ret = -1;
   WSAEVENT ev[2] = { event, signal_arrived };
+  DWORD len;
 
   switch (WSAWaitForMultipleEvents (2, ev, FALSE, WSA_INFINITE, FALSE))
     {
       case WSA_WAIT_EVENT_0:
-	DWORD len;
 	if (WSAGetOverlappedResult (socket, &ovr, &len, FALSE, flags))
 	  ret = (int) len;
 	break;
