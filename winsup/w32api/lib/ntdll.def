@@ -21,6 +21,7 @@ NtAccessCheck@32
 NtAdjustPrivilegesToken@24
 NtAllocateVirtualMemory@24
 NtClose@4
+NtConnectPort@32
 NtCreateFile@44
 NtCreateKey@28
 NtCurrentTeb@0
@@ -32,6 +33,7 @@ NtEnumerateValueKey@24
 NtFlushVirtualMemory@16
 NtFreeVirtualMemory@16
 NtLockVirtualMemory@16
+NtOpenEvent@12
 NtOpenFile@24
 NtOpenKey@12
 NtOpenProcessToken@12
@@ -43,10 +45,12 @@ NtQueryValueKey@24
 NtQueryVirtualMemory@24
 NtReadFile@36
 NtReadVirtualMemory@20
+NtRequestWaitReplyPort@12
 NtSetSecurityObject@12
 NtSetValueKey@24
 NtShutdownSystem@4
 NtUnlockVirtualMemory@16
+NtWaitForSingleObject@12 
 NtWriteFile@36
 NtWriteVirtualMemory@20
 RtlAcquirePebLock@0
@@ -218,6 +222,7 @@ ZwAccessCheck@32
 ZwAdjustPrivilegesToken@24
 ZwAllocateVirtualMemory@24
 ZwClose@4
+ZwConnectPort@32
 ZwCreateFile@44
 ZwCreateKey@28
 ZwDeleteValueKey@8
@@ -226,6 +231,7 @@ ZwEnumerateValueKey@24
 ZwFlushVirtualMemory@16
 ZwFreeVirtualMemory@16
 ZwLockVirtualMemory@16
+ZwOpenEvent@12
 ZwOpenFile@24
 ZwOpenKey@12
 ZwOpenProcessToken@12
@@ -237,9 +243,11 @@ ZwQueryValueKey@24
 ZwQueryVirtualMemory@24
 ZwReadFile@36
 ZwReadVirtualMemory@20
+ZwRequestWaitReplyPort@12
 ZwSetSecurityObject@12
 ZwSetValueKey@24
 ZwUnlockVirtualMemory@16
+ZwWaitForSingleObject@12 
 ZwWriteFile@36 
 ZwWriteVirtualMemory@20
 __isascii

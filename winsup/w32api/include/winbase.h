@@ -107,7 +107,7 @@ extern "C" {
 #define OF_REOPEN	32768
 #define OF_VERIFY	1024
 #define NMPWAIT_NOWAIT	1
-#define NMPWAIT_WAIT_FOREVER	(-1)
+#define NMPWAIT_WAIT_FOREVER	((DWORD)-1)
 #define NMPWAIT_USE_DEFAULT_WAIT	0
 #define CE_BREAK	16
 #define CE_DNS	2048

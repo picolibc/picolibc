@@ -1,3 +1,12 @@
+2002-12-30  Hartmut Honisch <hhonisch@users.sourceforge.net>
+
+	* include/winbase.h (NMPWAIT_WAIT_FOREVER): Cast to DWORD.
+
+	* lib/ntdll.def (NtConnectPort, NtOpenEvent,
+	NtRequestWaitReplyPort, NtWaitForSingleObject,ZwConnectPort,
+	ZwOpenEvent, ZwRequestWaitReplyPort, ZwWaitForSingleObject):
+	Add stubs.
+
 2002-12-30  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/wingdi.h (wglGetLayerPaletteEntries): Correct
