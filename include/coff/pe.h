@@ -76,12 +76,7 @@
 #undef  FILNMLEN
 #define FILNMLEN	18	/* # characters in a file name		*/
 
-
-#ifdef COFF_IMAGE_WITH_PE
-/* The filehdr is only weired in images */
-
-#undef FILHDR
-struct external_PE_filehdr
+struct external_PEI_filehdr
 {
   /* DOS header fields */
   char e_magic[2];		/* Magic number, 0x5a4d */
@@ -119,12 +114,16 @@ struct external_PE_filehdr
 
 };
 
+#ifdef COFF_IMAGE_WITH_PE
 
-#define FILHDR struct external_PE_filehdr
+/* The filehdr is only weird in images */
+
+#undef FILHDR
+#define FILHDR struct external_PEI_filehdr
 #undef FILHSZ
 #define FILHSZ 152
 
-#endif
+#endif /* COFF_IMAGE_WITH_PE */
 
 typedef struct 
 {

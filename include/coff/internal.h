@@ -421,6 +421,7 @@ struct internal_syment
 #define DT_ARY		(3)	/* array */
 
 #define BTYPE(x)	((x) & N_BTMASK)
+#define DTYPE(x)	(((x) & N_TMASK) >> N_BTSHFT)
 
 #define ISPTR(x) \
   (((unsigned long) (x) & N_TMASK) == ((unsigned long) DT_PTR << N_BTSHFT))

@@ -1,3 +1,10 @@
+1999-09-06  Donn Terry  <donn@interix.com>
+
+	* internal.h (DTYPE): Define.
+	* pe.h (struct external_PEI_filehdr): Rename from
+	external_PE_filehdr.  Define even if COFF_IMAGE_WITH_PE is not
+	defined.
+
 1999-07-17  Nick Clifton  <nickc@cygnus.com>
 
 	* arm.h (F_SOFT_FLOAT): Rename from F_SOFTFLOAT.
