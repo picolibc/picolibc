@@ -1,3 +1,8 @@
+2003-06-03  Nick Clifton  <nickc@redhat.com>
+
+	* v850.h (R_V850_32): Rename to R_V850_ABS32.
+        Add R_V850_REL32.
+
 2003-05-15  Roland McGrath  <roland@redhat.com>
 
 	* common.h (NT_AUXV, AT_*): New macros.

@@ -288,6 +288,7 @@
 #define PT_HIPROC	0x7FFFFFFF	/* Processor-specific */
 
 #define PT_GNU_EH_FRAME	(PT_LOOS + 0x474e550)
+#define PT_GNU_STACK	(PT_LOOS + 0x474e551)
 
 /* Program segment permissions, in program header p_flags field.  */
 
