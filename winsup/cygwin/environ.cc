@@ -292,7 +292,7 @@ _addenv (const char *name, const char *value, int overwrite)
 
 /* putenv Sets an environment variable */
 extern "C" int
-putenv (const char *str)
+putenv (char *str)
 {
   int res;
   if ((res = check_null_empty_str (str)))

@@ -1,5 +1,10 @@
 2004-11-25  Christopher Faylor  <cgf@timesys.com>
 
+	* environ.cc (putenv): Accommodate recent newlib change in argument to
+	putenv.
+
+2004-11-25  Christopher Faylor  <cgf@timesys.com>
+
 	* child_info.h (child_info_spawn::hexec_proc): Eliminate.
 	* dcrt0.cc (dll_crt0_0): Remove hexec_proc stuff.
 	* fork.cc (fork_child): Remove call to pinfo_fixup_after_fork.
