@@ -2360,8 +2360,7 @@ mount (const char *win32_path, const char *posix_path, unsigned flags)
 {
   int res = -1;
 
-  if (check_null_empty_str_errno (win32_path)
-      || check_null_empty_str_errno (posix_path))
+  if (check_null_empty_str_errno (posix_path))
     /* errno set */;
   else if (strpbrk (posix_path, "\\:"))
     set_errno (EINVAL);
@@ -2373,7 +2372,7 @@ mount (const char *win32_path, const char *posix_path, unsigned flags)
       res = mount_table->write_cygdrive_info_to_registry (posix_path, flags);
       win32_path = NULL;
     }
-  else
+  else if (!check_null_empty_str_errno (win32_path))
     res = mount_table->add_item (win32_path, posix_path, flags, TRUE);
 
   syscall_printf ("%d = mount (%s, %s, %p)", res, win32_path, posix_path, flags);

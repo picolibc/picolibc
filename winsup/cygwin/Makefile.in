@@ -154,7 +154,7 @@ DLL_OFILES:=assert.o autoload.o cxx.o cygheap.o cygthread.o dcrt0.o debug.o \
 	fhandler_socket.o fhandler_tape.o fhandler_termios.o \
 	fhandler_tty.o fhandler_virtual.o fhandler_windows.o \
 	fhandler_zero.o fnmatch.o fork.o glob.o grp.o heap.o init.o ioctl.o \
-	ipc.o localtime.o malloc.o malloc_wrapper.o miscfuncs.o mmap.o msg.o \
+	ipc.o localtime.o malloc_wrapper.o miscfuncs.o mmap.o msg.o \
 	net.o netdb.o ntea.o passwd.o path.o pinfo.o pipe.o poll.o pthread.o \
 	regcomp.o regerror.o regexec.o regfree.o registry.o resource.o \
 	scandir.o sched.o sec_acl.o sec_helper.o security.o select.o sem.o \

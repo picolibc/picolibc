@@ -3744,6 +3744,7 @@ void fREe(mem) Void_t* mem;
   mchunkptr       bck;         /* misc temp for linking */
   mchunkptr       fwd;         /* misc temp for linking */
 
+  check_malloc_state();
   /* free(0) has no effect */
   if (mem != 0) {
     p = mem2chunk(mem);
@@ -3878,6 +3879,7 @@ void fREe(mem) Void_t* mem;
 #endif
     }
   }
+    check_malloc_state();
 }
 
 /*

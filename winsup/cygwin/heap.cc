@@ -139,7 +139,6 @@ sbrk (int n)
   /* Couldn't allocate memory.  Maybe we can reserve some more.
      Reserve either the maximum of the standard cygwin_shared->heap_chunk_size ()
      or the requested amount.  Then attempt to actually allocate it.  */
-
   if ((newbrksize = cygheap->user_heap.chunk) < commitbytes)
     newbrksize = commitbytes;
 
@@ -147,7 +146,7 @@ sbrk (int n)
         || VirtualAlloc (cygheap->user_heap.top, newbrksize = commitbytes, MEM_RESERVE, PAGE_NOACCESS))
        && VirtualAlloc (cygheap->user_heap.top, commitbytes, MEM_COMMIT, PAGE_READWRITE) != NULL)
      {
-	(char *) cygheap->user_heap.max += newbrksize;
+	(char *) cygheap->user_heap.max += pround (newbrksize);
 	goto good;
      }
 

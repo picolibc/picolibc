@@ -51,6 +51,7 @@ struct wincaps
   unsigned needs_memory_protection			: 1;
   unsigned pty_needs_alloc_console			: 1;
   unsigned has_terminal_services			: 1;
+  unsigned has_switch_to_thread				: 1;
 };
 
 class wincapc
@@ -106,6 +107,7 @@ public:
   bool  IMPLEMENT (needs_memory_protection)
   bool  IMPLEMENT (pty_needs_alloc_console)
   bool  IMPLEMENT (has_terminal_services)
+  bool  IMPLEMENT (has_switch_to_thread)
 
 #undef IMPLEMENT
 };

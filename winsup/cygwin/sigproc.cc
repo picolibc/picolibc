@@ -17,6 +17,7 @@ details. */
 #include <stdlib.h>
 #include <sys/cygwin.h>
 #include <assert.h>
+#include <sys/signal.h>
 #include "cygerrno.h"
 #include "sync.h"
 #include "sigproc.h"
@@ -48,10 +49,33 @@ details. */
 
 #define NZOMBIES	256
 
-LONG local_sigtodo[TOTSIGS];
-inline LONG* getlocal_sigtodo (int sig)
+static LONG local_sigtodo[TOTSIGS];
+struct sigaction *global_sigs;
+
+inline LONG *
+getlocal_sigtodo (int sig)
 {
   return local_sigtodo + __SIGOFFSET + sig;
+}
+
+void __stdcall
+sigalloc ()
+{
+  cygheap->sigs = global_sigs =
+    (struct sigaction *) ccalloc (HEAP_SIGS, NSIG, sizeof (struct sigaction));
+}
+
+void __stdcall
+signal_fixup_after_exec ()
+{
+  global_sigs = cygheap->sigs;
+  /* Set up child's signal handlers */
+  for (int i = 0; i < NSIG; i++)
+    {
+      myself->getsig (i).sa_mask = 0;
+      if (myself->getsig (i).sa_handler != SIG_IGN)
+	myself->getsig (i).sa_handler = SIG_DFL;
+    }
 }
 
 /*
@@ -127,9 +151,9 @@ static bool NO_COPY pending_signals = false;	// true if signals pending
 
 /* Functions
  */
-static int __stdcall checkstate (waitq *);
+static int __stdcall checkstate (waitq *) __attribute__ ((regparm (1)));
 static __inline__ BOOL get_proc_lock (DWORD, DWORD);
-static HANDLE __stdcall getsem (_pinfo *, const char *, int, int);
+static HANDLE __stdcall getevent (_pinfo *, const char *) __attribute__ ((regparm (2)));
 static void __stdcall remove_zombie (int);
 static DWORD WINAPI wait_sig (VOID *arg);
 static int __stdcall stopped_or_terminated (waitq *, _pinfo *);
@@ -300,7 +324,6 @@ proc_subproc (DWORD what, DWORD val)
       vchild->sid = myself->sid;
       vchild->ctty = myself->ctty;
       vchild->process_state |= PID_INITIALIZING | (myself->process_state & PID_USETTY);
-      vchild->copysigs (myself);
 
       sigproc_printf ("added pid %d to wait list, slot %d, winpid %p, handle %p",
 		  vchild->pid, nchildren, vchild->dwProcessId,
@@ -540,12 +563,11 @@ sig_dispatch_pending ()
 
   sigframe thisframe (mainthread);
 
-  int was_pending = pending_signals;
 #ifdef DEBUGGING
-  sigproc_printf ("pending_signals %d", was_pending);
+  sigproc_printf ("pending_signals %d", pending_signals);
 #endif
 
-  if (!was_pending)
+  if (!pending_signals)
 #ifdef DEBUGGING
     sigproc_printf ("no need to wake anything up");
 #else
@@ -559,10 +581,7 @@ sig_dispatch_pending ()
 #endif
     }
 
-  if (was_pending)
-    thisframe.call_signal_handler ();
-
-  return was_pending;
+  return thisframe.call_signal_handler ();
 }
 
 /* Message initialization.  Called from dll_crt0_1
@@ -679,18 +698,21 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
   sigproc_printf ("pid %d, signal %d, its_me %d", p->pid, sig, its_me);
 
   LONG *todo;
+  bool issem;
   if (its_me)
     {
       if (!wait_for_completion)
 	{
 	  thiscatch = sigcatch_nosync;
 	  todo = myself->getsigtodo (sig);
+	  issem = false;
 	}
       else if (tid != mainthread.id)
 	{
 	  thiscatch = sigcatch_nonmain;
 	  thiscomplete = sigcomplete_nonmain;
 	  todo = getlocal_sigtodo (sig);
+	  issem = true;
 	}
       else
 	{
@@ -698,12 +720,16 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
 	  thiscomplete = sigcomplete_main;
 	  thisframe.set (mainthread, ebp, exception);
 	  todo = getlocal_sigtodo (sig);
+	  issem = true;
 	}
     }
-  else if (thiscatch = getsem (p, "sigcatch", 0, 0))
-    todo = p->getsigtodo (sig);
+  else if ((thiscatch = getevent (p, "sigcatch")))
+    {
+      todo = p->getsigtodo (sig);
+      issem = false;
+    }
   else
-    goto out;		  // Couldn't get the semaphore.  getsem issued
+    goto out;		  // Couldn't get the semaphore.  getevent issued
 			  //  an error, if appropriate.
 
 #if WHEN_MULTI_THREAD_SIGNALS_WORK
@@ -719,15 +745,7 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
 
   /* Notify the process that a signal has arrived.
    */
-  SetLastError (0);
-
-#if 0
-  int prio;
-  prio = GetThreadPriority (GetCurrentThread ());
-  (void) SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
-#endif
-
-  if (!ReleaseSemaphore (thiscatch, 1, NULL) && (int) GetLastError () > 0)
+  if (issem ? !ReleaseSemaphore (thiscatch, 1, NULL) : !SetEvent (thiscatch))
     {
       /* Couldn't signal the semaphore.  This probably means that the
        * process is exiting.
@@ -764,23 +782,8 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
   else
     {
       sigproc_printf ("Waiting for thiscomplete %p", thiscomplete);
-
-      SetLastError (0);
       rc = WaitForSingleObject (thiscomplete, WSSC);
-#if 0 // STILL NEEDED?
-      /* Check for strangeness due to this thread being redirected by the
-	 signal handler.  Sometimes a WAIT_TIMEOUT will occur when the
-	 thread hasn't really timed out.  So, check again.
-	 FIXME: This isn't foolproof. */
-      if (rc != WAIT_OBJECT_0 &&
-	  WaitForSingleObject (thiscomplete, 0) == WAIT_OBJECT_0)
-	rc = WAIT_OBJECT_0;
-#endif
     }
-
-#if 0
-  SetThreadPriority (GetCurrentThread (), prio);
-#endif
 
   if (rc == WAIT_OBJECT_0)
     rc = 0;		// Successful exit
@@ -892,7 +895,7 @@ out:
 /* Get or create a process specific semaphore used in message passing.
  */
 static HANDLE __stdcall
-getsem (_pinfo *p, const char *str, int init, int max)
+getevent (_pinfo *p, const char *str)
 {
   HANDLE h;
   char sem_name[MAX_PATH];
@@ -912,14 +915,18 @@ getsem (_pinfo *p, const char *str, int init, int max)
 	low_priority_sleep (1);
     }
 
-  SetLastError (0);
   if (p == NULL)
     {
       char sa_buf[1024];
 
       DWORD winpid = GetCurrentProcessId ();
+#if 0
       h = CreateSemaphore (sec_user_nih (sa_buf), init, max,
 			   str = shared_name (sem_name, str, winpid));
+#else
+      h = CreateEvent (sec_user_nih (sa_buf), FALSE, FALSE,
+		       str = shared_name (sem_name, str, winpid));
+#endif
       p = myself;
       if (!h)
 	{
@@ -929,8 +936,13 @@ getsem (_pinfo *p, const char *str, int init, int max)
     }
   else
     {
+#if 0
       h = OpenSemaphore (SEMAPHORE_ALL_ACCESS, FALSE,
 			 shared_name (sem_name, str, p->dwProcessId));
+#else
+      h = OpenEvent (EVENT_ALL_ACCESS, FALSE,
+		     shared_name (sem_name, str, p->dwProcessId));
+#endif
 
       if (!h)
 	{
@@ -1075,7 +1087,7 @@ wait_sig (VOID *self)
    * sigcomplete_nonmain   - semaphore signaled for non-main thread on signal
    *			     completion
    */
-  sigcatch_nosync = getsem (NULL, "sigcatch", 0, MAXLONG);
+  sigcatch_nosync = getevent (NULL, "sigcatch");
   sigcatch_nonmain = CreateSemaphore (&sec_none_nih, 0, MAXLONG, NULL);
   sigcatch_main = CreateSemaphore (&sec_none_nih, 0, MAXLONG, NULL);
   sigcomplete_nonmain = CreateSemaphore (&sec_none_nih, 0, MAXLONG, NULL);
@@ -1137,8 +1149,7 @@ wait_sig (VOID *self)
       (void) SetThreadPriority (GetCurrentThread (), WAIT_SIG_PRIORITY);
 
       /* sigproc_terminate sets sig_loop_wait to zero to indicate that
-       * this thread should terminate.
-       */
+         this thread should terminate.  */
       if (rc == WAIT_TIMEOUT)
 	{
 	  if (!sig_loop_wait)
@@ -1158,81 +1169,90 @@ wait_sig (VOID *self)
       sigproc_printf ("awake, rc %d", rc);
       LONG *todo;
       if (rc != RC_NOSYNC)
-	todo = *todos;
+	todo = todos[0];
       else
 	todo = todos[1];
 
       /* A sigcatch semaphore has been signaled.  Scan the sigtodo
-       * array looking for any unprocessed signals.
-       */
+         array looking for any unprocessed signals.  */
       pending_signals = false;
-      bool more_signals = false;
+      unsigned more_signals = 0;
       bool saw_failed_interrupt = false;
       do
-	for (int sig = -__SIGOFFSET, more_signals = false; sig < NSIG; sig++)
-	  {
-	    LONG x = InterlockedDecrement (todo + sig);
-	    if (x < 0)
-	      InterlockedIncrement (todo + sig);
-	    else if (x >= 0)
-	      {
-		if (sig > 0 && sig != SIGKILL && sig != SIGSTOP &&
-		    (sigismember (&myself->getsigmask (), sig) ||
-		     main_vfork->pid ||
-		     (sig != SIGCONT && ISSTATE (myself, PID_STOPPED))))
-		  {
-		    sigproc_printf ("signal %d blocked", sig);
-		    pending_signals = true;	// FIXME: This will cause unnecessary sig_dispatch_pending spins
-		    InterlockedIncrement (myself->getsigtodo (sig));
-		  }
-		else
-		  {
-		    /* Found a signal to process */
-		    if (rc != RC_NOSYNC)
-		      pending_signals = true;	// There should be an armed semaphore, in this case
+	{
+	  more_signals = 0;
+	  for (int sig = -__SIGOFFSET; sig < NSIG; sig++)
+	    {
+	      LONG x = InterlockedDecrement (todo + sig);
+	      if (x < 0)
+		InterlockedIncrement (todo + sig);
+	      else if (x >= 0)
+		{
+		  /* If x > 0, we have to deal with a signal at some later point */
+		  if (rc != RC_NOSYNC && x > 0)
+		    pending_signals = true;	// There should be an armed semaphore, in this case
 
-		    sigproc_printf ("processing signal %d", sig);
-		    switch (sig)
-		      {
-		      case __SIGFLUSH:
-			if (rc == RC_MAIN)
-			  {
-			    flush = true;
-			    ReleaseSemaphore (sigcatch_nosync, 1, NULL);
-			    goto out1;
-			  }
-			break;
+		  if (sig > 0 && sig != SIGKILL && sig != SIGSTOP &&
+		      (sigismember (&myself->getsigmask (), sig) ||
+		       main_vfork->pid ||
+		       (sig != SIGCONT && ISSTATE (myself, PID_STOPPED))))
+		    {
+		      sigproc_printf ("signal %d blocked", sig);
+		      x = InterlockedIncrement (myself->getsigtodo (sig));
+		      pending_signals = true;
+		    }
+		  else
+		    {
+		      sigproc_printf ("processing signal %d", sig);
+		      switch (sig)
+			{
+			case __SIGFLUSH:
+			  if (rc == RC_MAIN)
+			    {
+			      flush = true;
+			      SetEvent (sigcatch_nosync);
+			      goto out1;
+			    }
+			  break;
 
-		      /* Internal signal to turn on stracing. */
-		      case __SIGSTRACE:
-			strace.hello ();
-			break;
+			/* Internal signal to turn on stracing. */
+			case __SIGSTRACE:
+			  strace.hello ();
+			  break;
 
-		      case __SIGCOMMUNE:
-			talktome ();
-			break;
+			case __SIGCOMMUNE:
+			  talktome ();
+			  break;
 
-		      /* A normal UNIX signal */
-		      default:
-			sigproc_printf ("Got signal %d", sig);
-			if (!sig_handle (sig))
-			  {
-			    pending_signals = saw_failed_interrupt = true;
-			    sigproc_printf ("couldn't send signal %d", sig);
-			    InterlockedIncrement (myself->getsigtodo (sig));
-			  }
-		      }
-		    if (rc == RC_NOSYNC)
-		      more_signals = x > 0;
-		  }
+			/* A normal UNIX signal */
+			default:
+			  sigproc_printf ("Got signal %d", sig);
+			  if (!sig_handle (sig))
+			    {
+			      saw_failed_interrupt = true;
+			      x = InterlockedIncrement (myself->getsigtodo (sig));
+			      pending_signals = true;
+			    }
+			}
+		      if (rc == RC_NOSYNC && x > 0)
+			more_signals++;
+		    }
 
-		if (sig == SIGCHLD)
-		  proc_subproc (PROC_CLEARWAIT, 0);
-		if (saw_failed_interrupt || rc != RC_NOSYNC)
-		  goto out;
-	      }
-	  }
-      while (more_signals);
+		  if (sig == SIGCHLD)
+		    proc_subproc (PROC_CLEARWAIT, 0);
+
+		  /* Need to take special action if an interrupt failed due to main thread not
+		     getting around to calling handler yet.  */
+		  if (saw_failed_interrupt || rc != RC_NOSYNC)
+		    goto out;
+		}
+	    }
+#ifdef DEBUGGING
+	  if (more_signals > 100)
+	    system_printf ("hmm.  infinite loop? more_signals %u\n", more_signals);
+#endif
+	}
+      while (more_signals && sig_loop_wait);
 
     out:
       /* Signal completion of signal handling depending on which semaphore
@@ -1245,10 +1265,11 @@ wait_sig (VOID *self)
 	  sigproc_printf ("set main thread completion event");
 	  flush = false;
 	}
+
     out1:
       if (saw_failed_interrupt)
 	{
-	  ReleaseSemaphore (sigcatch_nosync, 1, NULL);
+	  SetEvent (sigcatch_nosync);
 	  low_priority_sleep (0);	/* Hopefully, other thread will be waking up soon. */
 	}
       sigproc_printf ("looping");

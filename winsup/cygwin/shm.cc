@@ -1,6 +1,6 @@
 /* shm.cc: Single unix specification IPC interface for Cygwin.
 
-   Copyright 2002 Red Hat, Inc.
+   Copyright 2002,2003 Red Hat, Inc.
 
    Written by Conrad Scott <conrad.scott@dsl.pipex.com>.
    Based on code by Robert Collins <robert.collins@hotmail.com>.

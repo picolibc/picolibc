@@ -38,6 +38,8 @@ enum picom
   PICOM_FIFO = 2
 };
 
+extern struct sigaction *global_sigs;
+
 class _pinfo
 {
 public:
@@ -112,10 +114,8 @@ public:
 
   inline struct sigaction& getsig (int sig)
   {
-    return thread2signal ? thread2signal->sigs[sig] : sigs[sig];
+    return global_sigs[sig];
   }
-
-  inline void copysigs (_pinfo *p) {memcpy (sigs, p->sigs, sizeof (sigs));}
 
   inline sigset_t& getsigmask ()
   {
@@ -145,7 +145,6 @@ public:
   friend void __stdcall set_myself (pid_t, HANDLE);
 
 private:
-  struct sigaction sigs[NSIG];
   sigset_t sig_mask;		/* one set for everything to ignore. */
   LONG _sigtodo[NSIG + __SIGOFFSET];
   pthread *thread2signal;  // NULL means thread any other means a pthread

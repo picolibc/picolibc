@@ -213,7 +213,7 @@ fhandler_base::raw_read (void *ptr, size_t& ulen)
   int prio = 0;		/* ditto */
   DWORD len = ulen;
 
-  (ssize_t) ulen = -1;
+  ulen = (size_t) -1;
   if (read_state)
     {
       h = GetCurrentThread ();

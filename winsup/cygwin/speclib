@@ -26,7 +26,7 @@ sort -o /tmp/$$.objs -u /tmp/$$.objs
 
 [ -s /tmp/$$.objs ] || { echo "speclib: couldn't find symbols for $lib" 1>&2; exit 1; }
 
-/bin/rm -f /tmp/$$>dir
+/bin/rm -rf /tmp/$$.dir
 mkdir /tmp/$$.dir
 cd /tmp/$$.dir
 if v; then

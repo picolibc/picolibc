@@ -1,3 +1,154 @@
+2003-09-01  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number to 4.
+
+2003-09-01  Christopher Faylor  <cgf@redhat.com>
+
+	* net.cc (dup_ent): Restore check for NULL input.
+
+2003-08-31  Christopher Faylor  <cgf@redhat.com>
+
+	* include/sys/cygwin.h: Don't define cygwin-specific things if
+	!__CYGWIN__.
+
+2003-08-31  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.cc (cygheap_init): Allocate space for sigaction array in
+	cygheap.
+	* cygheap.h (cygheap_types): Add HEAP_SIGS.
+	* exceptions.cc (signal_fixup_after_exec): Remove from this file.
+	* pinfo.h (pinfo::getsig): Just return global_sigs array.
+	(pinfo::sigs): Delete.
+	* sigproc.cc (signal_fixup_after_exec): Move it here.
+	(global_sigs): New global array, moved from pinfo structure.
+	(sigalloc): New function.  Allocate global sigaction array here.
+	(proc_subproc): Remove copysigs call.  It's automatic now.
+	* include/sys/cygwin.h (PID_NOCLDSTOP): New value.
+	* signal.cc (sigaction): Set myself->PID_NODCLDSTOP when appropriate.
+	* sigproc.h (sigalloc): Declare.
+
+	* fnmatch.c (fnmatch): Use C90 parameters.
+	(rangematch): Ditto.
+
+	* fhandler.cc (fhandler_base::raw_read): Use right coercion to avoid a
+	compiler warning.
+
+2003-08-31  Christopher Faylor  <cgf@redhat.com>
+
+	* net.cc (dup_ent): Make debugging output consistent.
+
+2003-08-31  Christopher Faylor  <cgf@redhat.com>
+
+	Use dup_ent rather than specific dup_*_ptr functions throughout.
+	* (gen_ent): Delete.
+	(dup_ent): Subsume gen_ent functionality.
+	(dup_host_ptr): Delete.
+	(dup_proto_ptr): Ditto.
+	(dup_servent_ptr): Ditto.
+
+2003-08-31  Christopher Faylor  <cgf@redhat.com>
+
+	* net.cc (gen_ent): Invert sense of null check so that debug output
+	makes sense.
+
+2003-08-31  Christopher Faylor  <cgf@redhat.com>
+
+	* net.cc (free_char_list): Delete.
+	(dup_addr_list): Delete.
+	(dup_char_list): Delete.
+	(free_hostent_ptr): Delete.
+	(free_protoent_ptr): Delete.
+	(free_servent_ptr): Delete.
+	(DWORD_round): New function.
+	(strlen_round): New function.  Returns strlen rounded up to word size.
+	(dup_ent): New, generic function to duplicate a {host,proto,serv}ent
+	structure.
+	(gen_ent): New macro.  Generates a generic dup_{host,proto,serv}ent_ptr
+	function.
+	(cygwin_getservbyname): Remove call to free_servent_ptr, pass
+	servent_buf to dup_servent_ptr.
+	(cygwin_getservbyport): Ditto.
+	(cygwin_gethostbyname): Ditto for hostent.
+	(cygwin_gethostbyaddr): Ditto.
+	(cygwin_getprotobyname): Ditto for protoent.
+	(cygwin_getprotobynumber): Ditto.
+
+2003-08-31  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (MALLOC_OFILES): Always fill in with correct malloc
+	object.
+	* configure.in: Fill in MALLOC_OFILES with either debugging or regular
+	malloc.
+	* configure: Regenerate.
+	* dlmalloc.c: Make various fruitless changes to attempt to get to work.
+	* dlmalloc.h: Ditto.
+	* malloc.cc (free): Check malloc pool when debugging.
+
+	* path.cc (win32_device_name): Eliminate compiler warning.
+
+	* sigproc.cc (sig_dispatch_pending): Remove use of was_pending.  Let
+	thisframe.call_signal_handler decide if handler should be called rather
+	than using bogus was_pending check.
+
+	* exceptions.cc (interrupt_setup): Remove accidentally checked in
+	debugging code.
+
+2003-08-30  Christopher Faylor  <cgf@redhat.com>
+
+	* heap.cc (sbrk): Save rounded addess in user_heap_max.
+
+2003-08-30  Christopher Faylor  <cgf@redhat.com>
+
+	* sigproc.cc (sig_dispatch_pending): Remove explicit call to
+	thisframe.call_signal_handler.
+
+2003-08-30  Christopher Faylor  <cgf@redhat.com>
+
+	Remove some cygserver files.
+
+2003-08-28  Christopher Faylor  <cgf@redhat.com>
+
+	* sigproc.h: Make some functions regparm.
+	* sigproc.cc (checkstate): Make regparm.
+	(getevent): Change parameters in declaration, rename from getsem, make regparm.
+	(sig_send): Recognize that nosync is now an event.  Remove some old
+	cruft from previous interrupt anywhere signal handler.
+	(getevent): Change parameters in definition, rename from getsem.
+	Allocate event rather than semaphore.
+	(wait_sig): Treat sigcatch_nosync as an event.
+
+2003-08-28  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (sigreturn): Fix problem where old return address was
+	not properly restored for a nested signal.
+
+2003-08-27  Christopher Faylor  <cgf@redhat.com>
+
+	* autoload.cc (SwitchToThread): Declare as autoload function.
+	* cygthread.h (cygthread::main_thread_id): Make public.
+	* exceptions.cc (setup_handler): Remove unneeded priority stuff.
+	Rename label to reflect what it does.  Add debugging for idiotic
+	Windows NT problem.  Change debugging output to include signal number.
+	* miscfuncs.cc (low_priority_sleep): If available, use SwitchToThread
+	function to give time slice to other threads.
+	* wincap.cc: Properly define have_switch_to_thread throughout.
+	* wincap.h (wincap::switch_to_thread): New element.
+
+2003-08-27  Christopher Faylor  <cgf@redhat.com>
+
+	* syscalls.cc (mount): Don't check win32_path when doing cygdrive
+	mount.
+
+2003-08-27  Christopher Faylor  <cgf@redhat.com>
+
+	* specdir: Correctly remove temporary directory prior to use.
+
+2003-08-27  Christopher Faylor  <cgf@redhat.com>
+
+	* sigproc.cc (wait_sig): Count number of iterations through
+	'more_signals' loop and issue a warning if DEBUGGING and excessive.
+	(WFSO): When debugging and infinite timeout, loop.
+
 2003-08-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/stat.h: Allow definition of internal stat structures

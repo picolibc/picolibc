@@ -731,18 +731,6 @@ signal_fixup_after_fork ()
   sigproc_init ();
 }
 
-void __stdcall
-signal_fixup_after_exec ()
-{
-  /* Set up child's signal handlers */
-  for (int i = 0; i < NSIG; i++)
-    {
-      myself->getsig (i).sa_mask = 0;
-      if (myself->getsig (i).sa_handler != SIG_IGN)
-	myself->getsig (i).sa_handler = SIG_DFL;
-    }
-}
-
 static int interrupt_on_return (sigthread *, int, void *, struct sigaction&) __attribute__((regparm(3)));
 static int
 interrupt_on_return (sigthread *th, int sig, void *handler, struct sigaction& siga)
@@ -785,10 +773,9 @@ setup_handler (int sig, void *handler, struct sigaction& siga)
   CONTEXT cx;
   bool interrupted = false;
   sigthread *th = NULL;		// Initialization needed to shut up gcc
-  int prio = INFINITE;
 
   if (sigsave.sig)
-    goto set_pending;
+    goto out;
 
   for (int i = 0; i < CALL_HANDLER_RETRY; i++)
     {
@@ -823,7 +810,18 @@ setup_handler (int sig, void *handler, struct sigaction& siga)
 	     SuspendThread on itself then just queue the signal. */
 
 	  EnterCriticalSection (&mainthread.lock);
+#ifndef DEBUGGING
 	  sigproc_printf ("suspending mainthread");
+#else
+	  cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
+	  if (!GetThreadContext (hth, &cx))
+	    memset (&cx, 0, sizeof cx);
+#if 0
+	  if ((cx.Eip & 0xff000000) == 0x77000000)
+	    try_to_debug ();
+#endif
+	  sigproc_printf ("suspending mainthread PC %p", cx.Eip);
+#endif
 	  res = SuspendThread (hth);
 	  /* Just release the lock now since we hav suspended the main thread and it
 	     definitely can't be grabbing it now.  This will have to change, of course,
@@ -866,13 +864,6 @@ setup_handler (int sig, void *handler, struct sigaction& siga)
 	    }
 	}
 
-      if ((DWORD) prio != INFINITE)
-	{
-	  /* Reset the priority so we can finish this off quickly. */
-	  SetThreadPriority (GetCurrentThread (), WAIT_SIG_PRIORITY);
-	  prio = INFINITE;
-	}
-
       if (th)
 	{
 	  interrupted = interrupt_on_return (th, sig, handler, siga);
@@ -888,20 +879,11 @@ setup_handler (int sig, void *handler, struct sigaction& siga)
       if (interrupted)
 	break;
 
-      if ((DWORD) prio != INFINITE && !mainthread.frame)
-	prio = low_priority_sleep (SLEEP_0_STAY_LOW);
       sigproc_printf ("couldn't interrupt.  trying again.");
     }
 
- set_pending:
-  if (interrupted)
-    {
-      if ((DWORD) prio != INFINITE)
-	SetThreadPriority (GetCurrentThread (), WAIT_SIG_PRIORITY);
-      sigproc_printf ("signal successfully delivered");
-    }
-
-  sigproc_printf ("returning %d", interrupted);
+out:
+  sigproc_printf ("signal %d %sdelivered", sig, interrupted ? "" : "not ");
   return interrupted;
 }
 #endif /* i386 */
@@ -1225,7 +1207,9 @@ _sigreturn:								\n\
 	cmpl	$0,%4		# Did a signal come in?			\n\
 	jz	1f		# No, if zero				\n\
 	movl	%2,%%eax						\n\
-	movl	%%eax,36(%%esp)	# Restore return address		\n\
+	movl	%8,%%ebx	# Where return address lives		\n\
+	movl	%%eax,(%%ebx)	# Restore return address of		\n\
+				# most recent caller			\n\
 	jmp	3f							\n\
 									\n\
 1:	popl	%%eax		# saved errno				\n\
@@ -1272,10 +1256,10 @@ _sigdelayed0:								\n\
 	popl	%%eax							\n\
 	jmp	*%%eax							\n\
 __no_sig_end:								\n\
-" : "=m" (sigsave.sig):  "X" ((char *) &_impure_ptr->_errno),
-  "g" (sigsave.retaddr), "g" (sigsave.oldmask), "g" (sigsave.sig),
-    "g" (sigsave.func), "g" (sigsave.saved_errno), "g" (sigsave.newmask),
-    "g" (sigsave.retaddr_on_stack)
+" : "=m" (sigsave.sig)/*0*/:  "X" ((char *) &_impure_ptr->_errno)/*1*/,
+  "g" (sigsave.retaddr)/*2*/, "g" (sigsave.oldmask)/*3*/, "g" (sigsave.sig)/*4*/,
+    "g" (sigsave.func)/*5*/, "g" (sigsave.saved_errno)/*6*/, "g" (sigsave.newmask)/*7*/,
+    "g" (sigsave.retaddr_on_stack)/*8*/
 );
 }
 }

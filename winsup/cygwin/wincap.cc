@@ -49,7 +49,8 @@ static NO_COPY wincaps wincap_unknown = {
   supports_reading_modem_output_lines:false,
   needs_memory_protection:false,
   pty_needs_alloc_console:false,
-  has_terminal_services:false
+  has_terminal_services:false,
+  has_switch_to_thread:false
 };
 
 static NO_COPY wincaps wincap_95 = {
@@ -90,7 +91,8 @@ static NO_COPY wincaps wincap_95 = {
   supports_reading_modem_output_lines:false,
   needs_memory_protection:false,
   pty_needs_alloc_console:false,
-  has_terminal_services:false
+  has_terminal_services:false,
+  has_switch_to_thread:false
 };
 
 static NO_COPY wincaps wincap_95osr2 = {
@@ -131,7 +133,8 @@ static NO_COPY wincaps wincap_95osr2 = {
   supports_reading_modem_output_lines:false,
   needs_memory_protection:false,
   pty_needs_alloc_console:false,
-  has_terminal_services:false
+  has_terminal_services:false,
+  has_switch_to_thread:false
 };
 
 static NO_COPY wincaps wincap_98 = {
@@ -172,7 +175,8 @@ static NO_COPY wincaps wincap_98 = {
   supports_reading_modem_output_lines:false,
   needs_memory_protection:false,
   pty_needs_alloc_console:false,
-  has_terminal_services:false
+  has_terminal_services:false,
+  has_switch_to_thread:false
 };
 
 static NO_COPY wincaps wincap_98se = {
@@ -213,7 +217,8 @@ static NO_COPY wincaps wincap_98se = {
   supports_reading_modem_output_lines:false,
   needs_memory_protection:false,
   pty_needs_alloc_console:false,
-  has_terminal_services:false
+  has_terminal_services:false,
+  has_switch_to_thread:false
 };
 
 static NO_COPY wincaps wincap_me = {
@@ -254,7 +259,8 @@ static NO_COPY wincaps wincap_me = {
   supports_reading_modem_output_lines:false,
   needs_memory_protection:false,
   pty_needs_alloc_console:false,
-  has_terminal_services:false
+  has_terminal_services:false,
+  has_switch_to_thread:false
 };
 
 static NO_COPY wincaps wincap_nt3 = {
@@ -295,7 +301,8 @@ static NO_COPY wincaps wincap_nt3 = {
   supports_reading_modem_output_lines:true,
   needs_memory_protection:true,
   pty_needs_alloc_console:true,
-  has_terminal_services:false
+  has_terminal_services:false,
+  has_switch_to_thread:false
 };
 
 static NO_COPY wincaps wincap_nt4 = {
@@ -336,7 +343,8 @@ static NO_COPY wincaps wincap_nt4 = {
   supports_reading_modem_output_lines:true,
   needs_memory_protection:true,
   pty_needs_alloc_console:true,
-  has_terminal_services:false
+  has_terminal_services:false,
+  has_switch_to_thread:true
 };
 
 static NO_COPY wincaps wincap_nt4sp4 = {
@@ -377,7 +385,8 @@ static NO_COPY wincaps wincap_nt4sp4 = {
   supports_reading_modem_output_lines:true,
   needs_memory_protection:true,
   pty_needs_alloc_console:true,
-  has_terminal_services:false
+  has_terminal_services:false,
+  has_switch_to_thread:true
 };
 
 static NO_COPY wincaps wincap_2000 = {
@@ -418,7 +427,8 @@ static NO_COPY wincaps wincap_2000 = {
   supports_reading_modem_output_lines:true,
   needs_memory_protection:true,
   pty_needs_alloc_console:true,
-  has_terminal_services:true
+  has_terminal_services:true,
+  has_switch_to_thread:true
 };
 
 static NO_COPY wincaps wincap_xp = {
@@ -459,7 +469,8 @@ static NO_COPY wincaps wincap_xp = {
   supports_reading_modem_output_lines:true,
   needs_memory_protection:true,
   pty_needs_alloc_console:true,
-  has_terminal_services:true
+  has_terminal_services:true,
+  has_switch_to_thread:true
 };
 
 static NO_COPY wincaps wincap_2003 = {
@@ -500,7 +511,8 @@ static NO_COPY wincaps wincap_2003 = {
   supports_reading_modem_output_lines:true,
   needs_memory_protection:true,
   pty_needs_alloc_console:true,
-  has_terminal_services:true
+  has_terminal_services:true,
+  has_switch_to_thread:true
 };
 
 wincapc wincap;
