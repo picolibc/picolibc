@@ -93,6 +93,7 @@ CXXFLAGS = -g -O2
 
 LDFLAGS = 
 LIBCFLAGS = $(CFLAGS)
+CFLAGS_FOR_BUILD = $(CFLAGS)
 CFLAGS_FOR_TARGET = $(CFLAGS)
 LDFLAGS_FOR_TARGET = 
 LIBCFLAGS_FOR_TARGET = $(CFLAGS_FOR_TARGET)
@@ -107,8 +108,6 @@ CXX = c++
 LIBCXXFLAGS = $(CXXFLAGS) -fno-implicit-templates
 CXXFLAGS_FOR_TARGET = $(CXXFLAGS)
 LIBCXXFLAGS_FOR_TARGET = $(CXXFLAGS_FOR_TARGET) -fno-implicit-templates
-
-RANLIB = ranlib
 
 DLLTOOL = dlltool
 WINDRES = windres
@@ -179,7 +178,7 @@ OTHERS =
 
 # This is set by the configure script to the list of directories which
 # should be built using the target tools.
-TARGET_CONFIGDIRS = libiberty libgloss $(SPECIAL_LIBS) newlib libio librx libstdc++ libg++ winsup opcodes bsp libstub cygmon libf2c libchill libobjc
+TARGET_CONFIGDIRS = libiberty libgloss $(SPECIAL_LIBS) newlib librx winsup opcodes bsp libstub cygmon libf2c libchill libobjc
 
 # Target libraries are put under this directory:
 # Changed by configure to $(target_alias) if cross.
@@ -210,7 +209,7 @@ HOST_LIB_PATH = $$r/bfd:$$r/opcodes
 
 # This is the list of directories that may be needed in RPATH_ENVVAR
 # so that prorgams built for the target machine work.
-TARGET_LIB_PATH = $$r/$(TARGET_SUBDIR)/libstdc++-v3/src/.libs:$$r/$(TARGET_SUBDIR)/libstdc++
+TARGET_LIB_PATH = $$r/$(TARGET_SUBDIR)/libstdc++-v3/src/.libs:
 
 # configure.in sets SET_LIB_PATH to this if --enable-shared was used.
 # Some platforms don't like blank entries, so we remove duplicate,
@@ -239,6 +238,7 @@ CC_FOR_TARGET =
 CHILL_FOR_TARGET =
 CXX_FOR_TARGET =
 CXX_FOR_TARGET_FOR_RECURSIVE_MAKE =
+GCJ_FOR_TARGET =
 
 # If GCC_FOR_TARGET is not overriden on the command line, then this
 # variable is passed down to the gcc Makefile, where it is used to
@@ -362,6 +362,7 @@ BASE_FLAGS_TO_PASS = \
 	"CHILLFLAGS=$(CHILLFLAGS)" \
 	"CHILL_FOR_TARGET=$(CHILL_FOR_TARGET)" \
 	"CHILL_LIB=$(CHILL_LIB)" \
+	"GCJ_FOR_TARGET=$(GCJ_FOR_TARGET)" \
 	"CXX_FOR_BUILD=$(CXX_FOR_BUILD)" \
 	"CXXFLAGS=$(CXXFLAGS)" \
 	"CXXFLAGS_FOR_TARGET=$(CXXFLAGS_FOR_TARGET)" \
@@ -399,6 +400,8 @@ BASE_FLAGS_TO_PASS = \
 	"libdir=$(libdir)" \
 	"libexecdir=$(libexecdir)" \
 	"lispdir=$(lispdir)" \
+	"libstdcxx_incdir=$(libstdcxx_incdir)" \
+	"libsubdir=$(libsubdir)" \
 	"localstatedir=$(localstatedir)" \
 	"mandir=$(mandir)" \
 	"oldincludedir=$(oldincludedir)" \
@@ -411,8 +414,7 @@ BASE_FLAGS_TO_PASS = \
 	"gxx_include_dir=$(gxx_include_dir)" \
 	"gcc_version=$(gcc_version)" \
 	"gcc_version_trigger=$(gcc_version_trigger)" \
-	"target_alias=$(target_alias)" \
-	"libsubdir=$(libsubdir)"
+	"target_alias=$(target_alias)" 
 
 # For any flags above that may contain shell code that varies from one
 # target library to another.  When doing recursive invocations of the
@@ -433,7 +435,7 @@ EXTRA_HOST_FLAGS = \
 	'DLLTOOL=$(DLLTOOL)' \
 	'LD=$(LD)' \
 	'NM=$(NM)' \
-	'RANLIB=$(RANLIB)' \
+	"`echo 'RANLIB=$(RANLIB)' | sed -e s/.*=$$/XFOO=/`" \
 	'WINDRES=$(WINDRES)'
 
 FLAGS_TO_PASS = $(BASE_FLAGS_TO_PASS) $(EXTRA_HOST_FLAGS)
@@ -487,9 +489,10 @@ EXTRA_GCC_FLAGS = \
 	'HOST_PREFIX=$(HOST_PREFIX)' \
 	'HOST_PREFIX_1=$(HOST_PREFIX_1)' \
 	'NM=$(NM)' \
-	'RANLIB=$(RANLIB)' \
+	"`echo 'RANLIB=$(RANLIB)' | sed -e s/.*=$$/XFOO=/`" \
 	'WINDRES=$$(WINDRES_FOR_TARGET)' \
 	"GCC_FOR_TARGET=$(GCC_FOR_TARGET)" \
+	"CFLAGS_FOR_BUILD=$(CFLAGS_FOR_BUILD)" \
 	"`echo 'LANGUAGES=$(LANGUAGES)' | sed -e s/.*=$$/XFOO=/`" \
 	"`echo 'STMP_FIXPROTO=$(STMP_FIXPROTO)' | sed -e s/.*=$$/XFOO=/`" \
 	"`echo 'LIMITS_H_TEST=$(LIMITS_H_TEST)' | sed -e s/.*=$$/XFOO=/`" \
@@ -498,6 +501,7 @@ EXTRA_GCC_FLAGS = \
 	"`echo 'LIBGCC2_DEBUG_CFLAGS=$(LIBGCC2_DEBUG_CFLAGS)' | sed -e s/.*=$$/XFOO=/`" \
 	"`echo 'LIBGCC2_INCLUDES=$(LIBGCC2_INCLUDES)' | sed -e s/.*=$$/XFOO=/`" \
 	"`echo 'ENQUIRE=$(ENQUIRE)' | sed -e s/.*=$$/XFOO=/`" \
+	"`echo 'STAGE1_CFLAGS=$(STAGE1_CFLAGS)' | sed -e s/.*=$$/XFOO=/`" \
 	"`echo 'BOOT_CFLAGS=$(BOOT_CFLAGS)' | sed -e s/.*=$$/XFOO=/`"
 
 GCC_FLAGS_TO_PASS = $(BASE_FLAGS_TO_PASS) $(EXTRA_GCC_FLAGS)
@@ -534,6 +538,7 @@ ALL_MODULES = \
 	all-diff \
 	all-dosutils \
 	all-etc \
+	all-fastjar \
 	all-fileutils \
 	all-findutils \
 	all-find \
@@ -595,6 +600,7 @@ ALL_MODULES = \
 NATIVE_CHECK_MODULES = \
 	check-bison \
 	check-byacc \
+	check-fastjar \
 	check-flex \
 	check-zip
 
@@ -687,6 +693,7 @@ INSTALL_MODULES = \
 	install-diff \
 	install-dosutils \
 	install-etc \
+	install-fastjar \
 	install-fileutils \
 	install-findutils \
 	install-find \
@@ -778,11 +785,8 @@ INSTALL_X11_MODULES = \
 # This is a list of the targets for all of the modules which are compiled
 # using $(TARGET_FLAGS_TO_PASS).
 ALL_TARGET_MODULES = \
-	all-target-libio \
-	all-target-libstdc++ \
 	all-target-libstdc++-v3 \
 	all-target-librx \
-	all-target-libg++ \
 	all-target-newlib \
 	all-target-libf2c \
 	all-target-libchill \
@@ -805,11 +809,8 @@ ALL_TARGET_MODULES = \
 # This is a list of the configure targets for all of the modules which
 # are compiled using the target tools.
 CONFIGURE_TARGET_MODULES = \
-	configure-target-libio \
-	configure-target-libstdc++ \
 	configure-target-libstdc++-v3 \
 	configure-target-librx \
-	configure-target-libg++ \
 	configure-target-newlib \
 	configure-target-libf2c \
 	configure-target-libchill \
@@ -832,10 +833,7 @@ CONFIGURE_TARGET_MODULES = \
 # This is a list of the check targets for all of the modules which are
 # compiled using $(TARGET_FLAGS_TO_PASS).
 CHECK_TARGET_MODULES = \
-	check-target-libio \
-	check-target-libstdc++ \
 	check-target-libstdc++-v3 \
-	check-target-libg++ \
 	check-target-newlib \
 	check-target-libf2c \
 	check-target-libchill \
@@ -852,10 +850,7 @@ CHECK_TARGET_MODULES = \
 # This is a list of the install targets for all of the modules which are
 # compiled using $(TARGET_FLAGS_TO_PASS).
 INSTALL_TARGET_MODULES = \
-	install-target-libio \
-	install-target-libstdc++ \
 	install-target-libstdc++-v3 \
-	install-target-libg++ \
 	install-target-newlib \
 	install-target-libf2c \
 	install-target-libchill \
@@ -890,6 +885,7 @@ CLEAN_MODULES = \
 	clean-diff \
 	clean-dosutils \
 	clean-etc \
+	clean-fastjar \
 	clean-fileutils \
 	clean-findutils \
 	clean-find \
@@ -942,11 +938,8 @@ CLEAN_MODULES = \
 
 # All of the target modules that can be cleaned
 CLEAN_TARGET_MODULES = \
-	clean-target-libio \
-	clean-target-libstdc++ \
 	clean-target-libstdc++-v3 \
 	clean-target-librx \
-	clean-target-libg++ \
 	clean-target-newlib \
 	clean-target-libf2c \
 	clean-target-libchill \
@@ -1026,7 +1019,7 @@ $(DO_X):
 	    if (cd ./$$i; \
 	        $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
 			"CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
-			"RANLIB=$${RANLIB}" \
+	                "`echo \"RANLIB=$${RANLIB}\" | sed -e 's/.*=$$/XFOO=/'`" \
 			"DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 			$${target}); \
 	    then true; else exit 1; fi; \
@@ -1044,7 +1037,7 @@ $(DO_X):
 	    if (cd $(TARGET_SUBDIR)/$$i; \
 	        $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
 			"CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
-			"RANLIB=$${RANLIB}" \
+	                "`echo \"RANLIB=$${RANLIB}\" | sed -e 's/.*=$$/XFOO=/'`" \
 			"DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
 			$${target}); \
 	    then true; else exit 1; fi; \
@@ -1077,6 +1070,11 @@ local-distclean:
 	-if [ "$(TARGET_SUBDIR)" != "." ]; then \
 	  rm -rf $(TARGET_SUBDIR); \
 	else true; fi
+	-rm -f texinfo/po/Makefile texinfo/po/Makefile.in texinfo/info/Makefile
+	-rm -f texinfo/doc/Makefile texinfo/po/POTFILES
+	-rmdir texinfo/doc texinfo/info texinfo/intl texinfo/lib 2>/dev/null
+	-rmdir texinfo/makeinfo texinfo/po texinfo/util 2>/dev/null
+	-rmdir fastjar gcc libiberty texinfo zlib 2>/dev/null
 
 local-maintainer-clean:
 	@echo "This command is intended for maintainers to use;"
@@ -1425,6 +1423,7 @@ $(CONFIGURE_TARGET_MODULES):
 	    CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
 	    CXX="$(CXX_FOR_TARGET)"; export CXX; \
 	    CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
+	    GCJ="$(GCJ_FOR_TARGET)"; export GCJ; \
 	    DLLTOOL="$(DLLTOOL_FOR_TARGET)"; export DLLTOOL; \
 	    LD="$(LD_FOR_TARGET)"; export LD; \
             LDFLAGS="$(LDFLAGS_FOR_TARGET)"; export LDFLAGS; \
@@ -1432,9 +1431,9 @@ $(CONFIGURE_TARGET_MODULES):
 	    RANLIB="$(RANLIB_FOR_TARGET)"; export RANLIB; \
 	    WINDRES="$(WINDRES_FOR_TARGET)"; export WINDRES; \
 	    echo Configuring in $(TARGET_SUBDIR)/$${dir}; \
-	    cd $(TARGET_SUBDIR)/$${dir}; \
+	    cd "$(TARGET_SUBDIR)/$${dir}" || exit 1; \
 	    case $(srcdir) in \
-	    /*) \
+	    /* | [A-Za-z]:[\\/]*) \
 	      topdir=$(srcdir) ;; \
 	    *) \
 	      case "$(TARGET_SUBDIR)" in \
@@ -1476,7 +1475,7 @@ $(CONFIGURE_TARGET_MODULES):
 	      CONFIG_SITE=no-such-file $(SHELL) $$s/configure \
 		$(TARGET_CONFIGARGS) $${srcdiroption} \
 		--with-target-subdir="$(TARGET_SUBDIR)"; \
-	    fi; \
+	    fi || exit 1; \
 	    if [ -f skip-this-dir ] ; then \
 	      sh skip-this-dir; \
 	      rm -f skip-this-dir; \
@@ -1658,6 +1657,18 @@ check-gcc:
 	  true; \
 	fi
 
+.PHONY: check-c++
+check-c++:
+	@if [ -f ./gcc/Makefile ] ; then \
+	  r=`pwd`; export r; \
+	  s=`cd $(srcdir); pwd`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd gcc; $(MAKE) $(GCC_FLAGS_TO_PASS) check-c++); \
+	  $(MAKE) check-target-libstdc++-v3; \
+	else \
+	  true; \
+	fi 
+
 .PHONY: install-gcc
 install-gcc:
 	@if [ -f ./gcc/Makefile ] ; then \
@@ -1698,7 +1709,7 @@ install-dosrel-fake:
 
 ALL_GCC = all-gcc
 ALL_GCC_C = $(ALL_GCC) all-target-newlib all-target-libgloss
-ALL_GCC_CXX = $(ALL_GCC_C) all-target-libstdc++ all-target-libstdc++-v3
+ALL_GCC_CXX = $(ALL_GCC_C) all-target-libstdc++-v3
 
 # This is a list of inter-dependencies among modules.
 all-apache:
@@ -1709,7 +1720,7 @@ all-bash:
 all-bfd: all-libiberty all-intl
 all-binutils: all-libiberty all-opcodes all-bfd all-flex all-bison all-byacc all-intl
 all-bison: all-texinfo
-configure-target-boehm-gc: $(ALL_GCC_CXX) configure-target-qthreads
+configure-target-boehm-gc: $(ALL_GCC_C) configure-target-qthreads
 all-target-boehm-gc: configure-target-boehm-gc
 configure-target-bsp: $(ALL_GCC_C)
 all-target-bsp: configure-target-bsp
@@ -1718,7 +1729,7 @@ all-bzip2:
 all-cgen: all-libiberty
 all-cvssrc:
 configure-target-cygmon: $(ALL_GCC_C)
-all-target-cygmon: configure-target-cygmon all-target-libiberty all-target-libio all-target-libstub all-target-bsp
+all-target-cygmon: configure-target-cygmon all-target-libiberty all-target-libstub all-target-bsp
 all-db:
 all-dejagnu: all-tcl all-expect all-tk
 all-diff: all-libiberty
@@ -1756,13 +1767,8 @@ all-intl:
 all-ispell: all-emacs19
 all-itcl: all-tcl all-tk all-tcl8.1 all-tk8.1
 all-ld: all-libiberty all-bfd all-opcodes all-bison all-byacc all-flex all-intl
-configure-target-libg++: $(ALL_GCC_CXX) configure-target-librx
-all-target-libg++: configure-target-libg++ all-target-libiberty all-target-librx
 configure-target-libgloss: $(ALL_GCC)
 all-target-libgloss: configure-target-libgloss configure-target-newlib
-configure-target-libio: $(ALL_GCC_C)
-all-target-libio: configure-target-libio all-gas all-ld all-gcc all-target-libiberty all-target-newlib
-check-target-libio: all-target-libstdc++
 all-libgui: all-tcl all-tk all-tcl8.1 all-tk8.1 all-itcl
 all-libiberty:
 
@@ -1770,12 +1776,10 @@ all-build-libiberty: configure-build-libiberty
 
 configure-target-libffi: $(ALL_GCC_C) 
 all-target-libffi: configure-target-libffi
-configure-target-libjava: $(ALL_GCC_CXX) configure-target-zlib configure-target-boehm-gc configure-target-qthreads configure-target-libffi
-all-target-libjava: configure-target-libjava all-zip all-target-zlib all-target-boehm-gc all-target-qthreads all-target-libffi
+configure-target-libjava: $(ALL_GCC_C) configure-target-zlib configure-target-boehm-gc configure-target-qthreads configure-target-libffi
+all-target-libjava: configure-target-libjava all-fastjar all-target-zlib all-target-boehm-gc all-target-qthreads all-target-libffi
 configure-target-librx: $(ALL_GCC_C)
 all-target-librx: configure-target-librx
-configure-target-libstdc++: $(ALL_GCC_C)
-all-target-libstdc++: configure-target-libstdc++ all-target-libiberty all-target-libio
 configure-target-libstdc++-v3: $(ALL_GCC_C)
 all-target-libstdc++-v3: configure-target-libstdc++-v3 all-target-libiberty
 configure-target-libstub: $(ALL_GCC_C)
@@ -1828,6 +1832,9 @@ all-zip:
 all-zlib:
 configure-target-zlib: $(ALL_GCC_C)
 all-target-zlib: configure-target-zlib
+all-fastjar: all-zlib all-libiberty
+configure-target-fastjar: configure-target-zlib
+all-target-fastjar: configure-target-fastjar all-target-zlib all-target-libiberty
 configure-target-libiberty: $(ALL_GCC_C)
 all-target-libiberty: configure-target-libiberty
 all-target: $(ALL_TARGET_MODULES)
@@ -2074,13 +2081,6 @@ gas+binutils.tar.bz2: $(DIST_SUPPORT) $(GASB_SUPPORT_DIRS) gas
 	$(MAKE) -f Makefile.in taz TOOL=gas \
 		MD5PROG="$(MD5PROG)" \
 		SUPPORT_FILES="$(GASB_SUPPORT_DIRS)"
-
-.PHONY: libg++.tar.bz2
-LIBGXX_SUPPORT_DIRS=include libstdc++ libio librx libiberty
-libg++.tar.bz2: $(DIST_SUPPORT) libg++
-	$(MAKE) -f Makefile.in taz TOOL=libg++ \
-		MD5PROG="$(MD5PROG)" \
-		SUPPORT_FILES="$(LIBGXX_SUPPORT_DIRS)"
 
 GNATS_SUPPORT_DIRS=include libiberty send-pr
 gnats.tar.bz2: $(DIST_SUPPORT) $(GNATS_SUPPORT_DIRS) gnats
