@@ -274,8 +274,12 @@ get_user_groups (WCHAR *wlogonserver, cygsidlist &grp_list, char *user)
   DWORD cnt, tot;
   NET_API_STATUS ret;
 
-  if ((ret = NetUserGetGroups (wlogonserver, wuser, 0, (LPBYTE *) &buf,
-			       MAX_PREFERRED_LENGTH, &cnt, &tot)))
+  ret = NetUserGetGroups (wlogonserver, wuser, 0, (LPBYTE *) &buf,
+			  MAX_PREFERRED_LENGTH, &cnt, &tot);
+  if (ret == ERROR_BAD_NETPATH || ret == RPC_S_SERVER_UNAVAILABLE)
+    ret = NetUserGetGroups (NULL, wuser, 0, (LPBYTE *) &buf,
+			    MAX_PREFERRED_LENGTH, &cnt, &tot);
+  if (ret)
     {
       debug_printf ("%d = NetUserGetGroups ()", ret);
       set_errno (ret);
@@ -319,22 +323,27 @@ is_group_member (WCHAR *wlogonserver, WCHAR *wgroup,
 {
   LPLOCALGROUP_MEMBERS_INFO_0 buf;
   DWORD cnt, tot;
-  BOOL ret = FALSE;
+  NET_API_STATUS ret;
+  BOOL retval = FALSE;
 
-  if (NetLocalGroupGetMembers (wlogonserver, wgroup, 0, (LPBYTE *) &buf,
-                               MAX_PREFERRED_LENGTH, &cnt, &tot, NULL))
+  ret = NetLocalGroupGetMembers (wlogonserver, wgroup, 0, (LPBYTE *) &buf,
+				 MAX_PREFERRED_LENGTH, &cnt, &tot, NULL);
+  if (ret == ERROR_BAD_NETPATH || ret == RPC_S_SERVER_UNAVAILABLE)
+    ret = NetLocalGroupGetMembers (NULL, wgroup, 0, (LPBYTE *) &buf,
+				   MAX_PREFERRED_LENGTH, &cnt, &tot, NULL);
+  if (ret)
     return FALSE;
 
-  for (DWORD bidx = 0; !ret && bidx < cnt; ++bidx)
+  for (DWORD bidx = 0; !retval && bidx < cnt; ++bidx)
     if (EqualSid (usersid, buf[bidx].lgrmi0_sid))
-      ret = TRUE;
+      retval = TRUE;
     else
-      for (int glidx = 0; !ret && glidx < grp_list.count; ++glidx)
+      for (int glidx = 0; !retval && glidx < grp_list.count; ++glidx)
 	if (EqualSid (grp_list.sids[glidx], buf[bidx].lgrmi0_sid))
-	  ret = TRUE;
+	  retval = TRUE;
 
   NetApiBufferFree (buf);
-  return ret;
+  return retval;
 }
 
 static BOOL
@@ -345,8 +354,12 @@ get_user_local_groups (WCHAR *wlogonserver, const char *logonserver,
   DWORD cnt, tot;
   NET_API_STATUS ret;
 
-  if ((ret = NetLocalGroupEnum (wlogonserver, 0, (LPBYTE *) &buf,
-			        MAX_PREFERRED_LENGTH, &cnt, &tot, NULL)))
+  ret = NetLocalGroupEnum (wlogonserver, 0, (LPBYTE *) &buf,
+			   MAX_PREFERRED_LENGTH, &cnt, &tot, NULL);
+  if (ret == ERROR_BAD_NETPATH || ret == RPC_S_SERVER_UNAVAILABLE)
+    ret = NetLocalGroupEnum (NULL, 0, (LPBYTE *) &buf,
+			     MAX_PREFERRED_LENGTH, &cnt, &tot, NULL);
+  if (ret)
     {
       debug_printf ("%d = NetLocalGroupEnum ()", ret);
       set_errno (ret);
@@ -410,7 +423,8 @@ get_user_primary_group (WCHAR *wlogonserver, const char *user,
 {
   LPUSER_INFO_3 buf;
   WCHAR wuser[UNLEN + 1];
-  BOOL ret = FALSE;
+  NET_API_STATUS ret;
+  BOOL retval = FALSE;
   UCHAR count;
 
   if (usersid == well_known_system_sid)
@@ -420,16 +434,24 @@ get_user_primary_group (WCHAR *wlogonserver, const char *user,
     }
 
   sys_mbstowcs (wuser, user, UNLEN + 1);
-  if (NetUserGetInfo (wlogonserver, wuser, 3, (LPBYTE *) &buf))
-    return FALSE;
+  ret = NetUserGetInfo (wlogonserver, wuser, 3, (LPBYTE *) &buf);
+  if (ret == ERROR_BAD_NETPATH || ret == RPC_S_SERVER_UNAVAILABLE)
+    ret = NetUserGetInfo (NULL, wuser, 3, (LPBYTE *) &buf);
+  if (ret)
+    {
+      debug_printf ("%d = NetUserGetInfo ()", ret);
+      set_errno (ret);
+      return FALSE;
+    }
+
   pgrpsid = usersid;
   if (IsValidSid (pgrpsid) && (count = *GetSidSubAuthorityCount (pgrpsid)) > 1)
     {
       *GetSidSubAuthority (pgrpsid, count - 1) = buf->usri3_primary_group_id;
-      ret = TRUE;
+      retval = TRUE;
     }
   NetApiBufferFree (buf);
-  return ret;
+  return retval;
 }
 
 static BOOL

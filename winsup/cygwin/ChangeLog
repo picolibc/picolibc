@@ -1,3 +1,11 @@
+Wed 18 Jul 2001 12:54:17  Corinna Vinschen <corinna@vinschen.de>
+
+	* security.cc (get_user_groups): Call Net function with NULL server
+	name under specific error conditions.
+	(is_group_member): Ditto.
+	(get_user_local_groups): Ditto.
+	(get_user_primary_group): Ditto.
+
 Wed 18 Jul 2001 11:56:00  Corinna Vinschen <corinna@vinschen.de>
 
 	* syscalls.cc (_unlink): Explicitely check for non-existant file.
