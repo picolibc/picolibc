@@ -1,5 +1,9 @@
 2005-01-27  Hans-Peter Nilsson  <hp@axis.com>
 
+	* testsuite/newlib.string/memmove1.c: New test.
+
+2005-01-27  Hans-Peter Nilsson  <hp@axis.com>
+
 	* testsuite/include/check.h: Include stdlib.h.
 
 2005-01-27  Hans-Peter Nilsson  <hp@axis.com>
