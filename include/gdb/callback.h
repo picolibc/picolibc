@@ -56,6 +56,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #include <varargs.h>
 #endif
 #endif
+/* Needed for enum bfd_endian.  */
+#include "bfd.h"
 
 /* Mapping of host/target values.  */
 /* ??? For debugging purposes, one might want to add a string of the
@@ -150,6 +152,8 @@ struct host_callback_struct
      use "name.bits".
      Example: "st_dev,4:st_ino,4:st_mode,4:..."  */
   const char *stat_map;
+
+  enum bfd_endian target_endian;
 
   /* Marker for those wanting to do sanity checks.
      This should remain the last member of this struct to help catch
@@ -279,6 +283,9 @@ int cb_host_to_target_signal PARAMS ((host_callback *, int));
    If stat struct ptr is NULL, just compute target stat struct size.
    Result is size of target stat struct or 0 if error.  */
 int cb_host_to_target_stat PARAMS ((host_callback *, const struct stat *, PTR));
+
+/* Translate a value to target endian.  */
+void cb_store_target_endian PARAMS ((host_callback *, char *, int, long));
 
 /* Perform a system call.  */
 CB_RC cb_syscall PARAMS ((host_callback *, CB_SYSCALL *));

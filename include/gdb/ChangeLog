@@ -1,3 +1,9 @@
+2005-01-28  Hans-Peter Nilsson  <hp@axis.com>
+
+	* callback.h: Include "bfd.h".
+	(struct host_callback_struct): New member target_endian.
+	(cb_store_target_endian): Declare.
+
 2004-12-15  Hans-Peter Nilsson  <hp@axis.com>
 
 	* callback.h (CB_SYS_truncate, CB_SYS_ftruncate): New macros.
