@@ -962,20 +962,10 @@ all.normal: \
 # This target ensures that $(BASE_FLAGS_TO_PASS) appears only once,
 # because it is so large that it can easily overflow the command line
 # length limit on some systems.
-DO_X = \
-	do-clean \
-	do-distclean \
-	do-dvi \
-	do-info \
-	do-install-info \
-	do-installcheck \
-	do-mostlyclean \
-	do-maintainer-clean \
-	do-TAGS
-.PHONY: $(DO_X)
-$(DO_X):
-	@target=`echo $@ | sed -e 's/^do-//'`; \
-	r=`${PWD}`; export r; \
+
+.PHONY: do-clean
+do-clean:
+	@r=`${PWD}`; export r; \
 	s=`cd $(srcdir); ${PWD}`; export s; \
 	$(SET_LIB_PATH) \
 	for i in $(SUBDIRS) -dummy-; do \
@@ -997,11 +987,11 @@ $(DO_X):
 			"CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
 	                "`echo \"RANLIB=$${RANLIB}\" | sed -e 's/.*=$$/XFOO=/'`" \
 			"DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
-			$${target}); \
+			clean); \
 	    then true; else exit 1; fi; \
 	  else true; fi; \
 	done
-	@target=`echo $@ | sed -e 's/^do-//'`; \
+	# Break into two pieces
 	r=`${PWD}`; export r; \
 	s=`cd $(srcdir); ${PWD}`; export s; \
 	$(SET_LIB_PATH) \
@@ -1015,10 +1005,388 @@ $(DO_X):
 			"CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
 	                "`echo \"RANLIB=$${RANLIB}\" | sed -e 's/.*=$$/XFOO=/'`" \
 			"DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
-			$${target}); \
+			clean); \
 	    then true; else exit 1; fi; \
 	  else true; fi; \
 	done
+
+.PHONY: do-distclean
+do-distclean:
+	@r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	$(SET_LIB_PATH) \
+	for i in $(SUBDIRS) -dummy-; do \
+	  if [ -f ./$$i/Makefile ]; then \
+	    case $$i in \
+	    gcc) \
+	      for flag in $(EXTRA_GCC_FLAGS); do \
+		eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	      done; \
+	      ;; \
+	    *) \
+	      for flag in $(EXTRA_HOST_FLAGS); do \
+		eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	      done; \
+	      ;; \
+	    esac ; \
+	    if (cd ./$$i; \
+	        $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+			"CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	                "`echo \"RANLIB=$${RANLIB}\" | sed -e 's/.*=$$/XFOO=/'`" \
+			"DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+			distclean); \
+	    then true; else exit 1; fi; \
+	  else true; fi; \
+	done
+	# Break into two pieces
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	$(SET_LIB_PATH) \
+	for i in $(TARGET_CONFIGDIRS) -dummy-; do \
+	  if [ -f $(TARGET_SUBDIR)/$$i/Makefile ]; then \
+	    for flag in $(EXTRA_TARGET_FLAGS); do \
+		eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	    done; \
+	    if (cd $(TARGET_SUBDIR)/$$i; \
+	        $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+			"CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	                "`echo \"RANLIB=$${RANLIB}\" | sed -e 's/.*=$$/XFOO=/'`" \
+			"DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+			distclean); \
+	    then true; else exit 1; fi; \
+	  else true; fi; \
+	done
+
+.PHONY: do-dvi
+do-dvi:
+	@r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	$(SET_LIB_PATH) \
+	for i in $(SUBDIRS) -dummy-; do \
+	  if [ -f ./$$i/Makefile ]; then \
+	    case $$i in \
+	    gcc) \
+	      for flag in $(EXTRA_GCC_FLAGS); do \
+		eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	      done; \
+	      ;; \
+	    *) \
+	      for flag in $(EXTRA_HOST_FLAGS); do \
+		eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	      done; \
+	      ;; \
+	    esac ; \
+	    if (cd ./$$i; \
+	        $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+			"CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	                "`echo \"RANLIB=$${RANLIB}\" | sed -e 's/.*=$$/XFOO=/'`" \
+			"DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+			dvi); \
+	    then true; else exit 1; fi; \
+	  else true; fi; \
+	done
+	# Break into two pieces
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	$(SET_LIB_PATH) \
+	for i in $(TARGET_CONFIGDIRS) -dummy-; do \
+	  if [ -f $(TARGET_SUBDIR)/$$i/Makefile ]; then \
+	    for flag in $(EXTRA_TARGET_FLAGS); do \
+		eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	    done; \
+	    if (cd $(TARGET_SUBDIR)/$$i; \
+	        $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+			"CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	                "`echo \"RANLIB=$${RANLIB}\" | sed -e 's/.*=$$/XFOO=/'`" \
+			"DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+			dvi); \
+	    then true; else exit 1; fi; \
+	  else true; fi; \
+	done
+
+.PHONY: do-info
+do-info:
+	@r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	$(SET_LIB_PATH) \
+	for i in $(SUBDIRS) -dummy-; do \
+	  if [ -f ./$$i/Makefile ]; then \
+	    case $$i in \
+	    gcc) \
+	      for flag in $(EXTRA_GCC_FLAGS); do \
+		eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	      done; \
+	      ;; \
+	    *) \
+	      for flag in $(EXTRA_HOST_FLAGS); do \
+		eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	      done; \
+	      ;; \
+	    esac ; \
+	    if (cd ./$$i; \
+	        $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+			"CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	                "`echo \"RANLIB=$${RANLIB}\" | sed -e 's/.*=$$/XFOO=/'`" \
+			"DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+			info); \
+	    then true; else exit 1; fi; \
+	  else true; fi; \
+	done
+	# Break into two pieces
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	$(SET_LIB_PATH) \
+	for i in $(TARGET_CONFIGDIRS) -dummy-; do \
+	  if [ -f $(TARGET_SUBDIR)/$$i/Makefile ]; then \
+	    for flag in $(EXTRA_TARGET_FLAGS); do \
+		eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	    done; \
+	    if (cd $(TARGET_SUBDIR)/$$i; \
+	        $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+			"CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	                "`echo \"RANLIB=$${RANLIB}\" | sed -e 's/.*=$$/XFOO=/'`" \
+			"DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+			info); \
+	    then true; else exit 1; fi; \
+	  else true; fi; \
+	done
+
+.PHONY: do-install-info
+do-install-info:
+	@r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	$(SET_LIB_PATH) \
+	for i in $(SUBDIRS) -dummy-; do \
+	  if [ -f ./$$i/Makefile ]; then \
+	    case $$i in \
+	    gcc) \
+	      for flag in $(EXTRA_GCC_FLAGS); do \
+		eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	      done; \
+	      ;; \
+	    *) \
+	      for flag in $(EXTRA_HOST_FLAGS); do \
+		eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	      done; \
+	      ;; \
+	    esac ; \
+	    if (cd ./$$i; \
+	        $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+			"CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	                "`echo \"RANLIB=$${RANLIB}\" | sed -e 's/.*=$$/XFOO=/'`" \
+			"DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+			install-info); \
+	    then true; else exit 1; fi; \
+	  else true; fi; \
+	done
+	# Break into two pieces
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	$(SET_LIB_PATH) \
+	for i in $(TARGET_CONFIGDIRS) -dummy-; do \
+	  if [ -f $(TARGET_SUBDIR)/$$i/Makefile ]; then \
+	    for flag in $(EXTRA_TARGET_FLAGS); do \
+		eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	    done; \
+	    if (cd $(TARGET_SUBDIR)/$$i; \
+	        $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+			"CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	                "`echo \"RANLIB=$${RANLIB}\" | sed -e 's/.*=$$/XFOO=/'`" \
+			"DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+			install-info); \
+	    then true; else exit 1; fi; \
+	  else true; fi; \
+	done
+
+.PHONY: do-installcheck
+do-installcheck:
+	@r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	$(SET_LIB_PATH) \
+	for i in $(SUBDIRS) -dummy-; do \
+	  if [ -f ./$$i/Makefile ]; then \
+	    case $$i in \
+	    gcc) \
+	      for flag in $(EXTRA_GCC_FLAGS); do \
+		eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	      done; \
+	      ;; \
+	    *) \
+	      for flag in $(EXTRA_HOST_FLAGS); do \
+		eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	      done; \
+	      ;; \
+	    esac ; \
+	    if (cd ./$$i; \
+	        $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+			"CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	                "`echo \"RANLIB=$${RANLIB}\" | sed -e 's/.*=$$/XFOO=/'`" \
+			"DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+			installcheck); \
+	    then true; else exit 1; fi; \
+	  else true; fi; \
+	done
+	# Break into two pieces
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	$(SET_LIB_PATH) \
+	for i in $(TARGET_CONFIGDIRS) -dummy-; do \
+	  if [ -f $(TARGET_SUBDIR)/$$i/Makefile ]; then \
+	    for flag in $(EXTRA_TARGET_FLAGS); do \
+		eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	    done; \
+	    if (cd $(TARGET_SUBDIR)/$$i; \
+	        $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+			"CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	                "`echo \"RANLIB=$${RANLIB}\" | sed -e 's/.*=$$/XFOO=/'`" \
+			"DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+			installcheck); \
+	    then true; else exit 1; fi; \
+	  else true; fi; \
+	done
+
+.PHONY: do-mostlyclean
+do-mostlyclean:
+	@r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	$(SET_LIB_PATH) \
+	for i in $(SUBDIRS) -dummy-; do \
+	  if [ -f ./$$i/Makefile ]; then \
+	    case $$i in \
+	    gcc) \
+	      for flag in $(EXTRA_GCC_FLAGS); do \
+		eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	      done; \
+	      ;; \
+	    *) \
+	      for flag in $(EXTRA_HOST_FLAGS); do \
+		eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	      done; \
+	      ;; \
+	    esac ; \
+	    if (cd ./$$i; \
+	        $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+			"CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	                "`echo \"RANLIB=$${RANLIB}\" | sed -e 's/.*=$$/XFOO=/'`" \
+			"DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+			mostlyclean); \
+	    then true; else exit 1; fi; \
+	  else true; fi; \
+	done
+	# Break into two pieces
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	$(SET_LIB_PATH) \
+	for i in $(TARGET_CONFIGDIRS) -dummy-; do \
+	  if [ -f $(TARGET_SUBDIR)/$$i/Makefile ]; then \
+	    for flag in $(EXTRA_TARGET_FLAGS); do \
+		eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	    done; \
+	    if (cd $(TARGET_SUBDIR)/$$i; \
+	        $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+			"CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	                "`echo \"RANLIB=$${RANLIB}\" | sed -e 's/.*=$$/XFOO=/'`" \
+			"DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+			mostlyclean); \
+	    then true; else exit 1; fi; \
+	  else true; fi; \
+	done
+
+.PHONY: do-maintainer-clean
+do-maintainer-clean:
+	@r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	$(SET_LIB_PATH) \
+	for i in $(SUBDIRS) -dummy-; do \
+	  if [ -f ./$$i/Makefile ]; then \
+	    case $$i in \
+	    gcc) \
+	      for flag in $(EXTRA_GCC_FLAGS); do \
+		eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	      done; \
+	      ;; \
+	    *) \
+	      for flag in $(EXTRA_HOST_FLAGS); do \
+		eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	      done; \
+	      ;; \
+	    esac ; \
+	    if (cd ./$$i; \
+	        $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+			"CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	                "`echo \"RANLIB=$${RANLIB}\" | sed -e 's/.*=$$/XFOO=/'`" \
+			"DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+			maintainer-clean); \
+	    then true; else exit 1; fi; \
+	  else true; fi; \
+	done
+	# Break into two pieces
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	$(SET_LIB_PATH) \
+	for i in $(TARGET_CONFIGDIRS) -dummy-; do \
+	  if [ -f $(TARGET_SUBDIR)/$$i/Makefile ]; then \
+	    for flag in $(EXTRA_TARGET_FLAGS); do \
+		eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	    done; \
+	    if (cd $(TARGET_SUBDIR)/$$i; \
+	        $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+			"CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	                "`echo \"RANLIB=$${RANLIB}\" | sed -e 's/.*=$$/XFOO=/'`" \
+			"DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+			maintainer-clean); \
+	    then true; else exit 1; fi; \
+	  else true; fi; \
+	done
+
+.PHONY: do-TAGS
+do-TAGS:
+	@r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	$(SET_LIB_PATH) \
+	for i in $(SUBDIRS) -dummy-; do \
+	  if [ -f ./$$i/Makefile ]; then \
+	    case $$i in \
+	    gcc) \
+	      for flag in $(EXTRA_GCC_FLAGS); do \
+		eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	      done; \
+	      ;; \
+	    *) \
+	      for flag in $(EXTRA_HOST_FLAGS); do \
+		eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	      done; \
+	      ;; \
+	    esac ; \
+	    if (cd ./$$i; \
+	        $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+			"CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	                "`echo \"RANLIB=$${RANLIB}\" | sed -e 's/.*=$$/XFOO=/'`" \
+			"DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+			TAGS); \
+	    then true; else exit 1; fi; \
+	  else true; fi; \
+	done
+	# Break into two pieces
+	r=`${PWD}`; export r; \
+	s=`cd $(srcdir); ${PWD}`; export s; \
+	$(SET_LIB_PATH) \
+	for i in $(TARGET_CONFIGDIRS) -dummy-; do \
+	  if [ -f $(TARGET_SUBDIR)/$$i/Makefile ]; then \
+	    for flag in $(EXTRA_TARGET_FLAGS); do \
+		eval `echo "$$flag" | sed -e "s|^\([^=]*\)=\(.*\)|\1='\2'; export \1|"`; \
+	    done; \
+	    if (cd $(TARGET_SUBDIR)/$$i; \
+	        $(MAKE) $(BASE_FLAGS_TO_PASS) "AR=$${AR}" "AS=$${AS}" \
+			"CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
+	                "`echo \"RANLIB=$${RANLIB}\" | sed -e 's/.*=$$/XFOO=/'`" \
+			"DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
+			TAGS); \
+	    then true; else exit 1; fi; \
+	  else true; fi; \
+	done
+
+
 
 # Here are the targets which correspond to the do-X targets.
 
@@ -1194,31 +1562,28 @@ gcc-no-fixedincludes:
 	  mv gcc/tmp-include gcc/include 2>/dev/null; \
 	else true; fi
 
-# This rule is used to build the modules which are built with the
+# These rules are used to build the modules which are built with the
 # build machine's native compiler.
-.PHONY: $(ALL_BUILD_MODULES)
-$(ALL_BUILD_MODULES):
-	dir=`echo $@ | sed -e 's/all-build-//'`; \
-	if [ -f ./$${dir}/Makefile ] ; then \
+
+.PHONY: all-build-libiberty
+all-build-libiberty:
+	@if [ -f ./libiberty/Makefile ] ; then \
 	  r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
-	  (cd $(BUILD_SUBDIR)/$${dir} && $(MAKE) all); \
+	  (cd $(BUILD_SUBDIR)/libiberty && $(MAKE) all); \
 	else \
 	  true; \
 	fi
 
-# This rule is used to configure the modules which are built with the
-# native tools.
-.PHONY: $(CONFIGURE_BUILD_MODULES)
-$(CONFIGURE_BUILD_MODULES):
-	@dir=`echo $@ | sed -e 's/configure-build-//'`; \
-	if [ ! -d $(BUILD_SUBDIR) ]; then \
+.PHONY: configure-build-libiberty
+configure-build-libiberty:
+	@if [ ! -d $(BUILD_SUBDIR) ]; then \
 	  true; \
-	elif [ -f $(BUILD_SUBDIR)/$${dir}/Makefile ] ; then \
+	elif [ -f $(BUILD_SUBDIR)/libiberty/Makefile ] ; then \
 	  true; \
-	elif echo " $(BUILD_CONFIGDIRS) " | grep " $${dir} " >/dev/null 2>&1; then \
-	  if [ -d $(srcdir)/$${dir} ]; then \
-	    [ -d $(BUILD_SUBDIR)/$${dir} ] || mkdir $(BUILD_SUBDIR)/$${dir};\
+	elif echo " $(BUILD_CONFIGDIRS) " | grep " libiberty " >/dev/null 2>&1; then \
+	  if [ -d $(srcdir)/libiberty ]; then \
+	    [ -d $(BUILD_SUBDIR)/libiberty ] || mkdir $(BUILD_SUBDIR)/libiberty;\
 	    r=`${PWD}`; export r; \
 	    s=`cd $(srcdir); ${PWD}`; export s; \
 	    AR="$(AR_FOR_BUILD)"; export AR; \
@@ -1234,8 +1599,8 @@ $(CONFIGURE_BUILD_MODULES):
 	    NM="$(NM_FOR_BUILD)"; export NM; \
 	    RANLIB="$(RANLIB_FOR_BUILD)"; export RANLIB; \
 	    WINDRES="$(WINDRES_FOR_BUILD)"; export WINDRES; \
-	    echo Configuring in $(BUILD_SUBDIR)/$${dir}; \
-	    cd "$(BUILD_SUBDIR)/$${dir}" || exit 1; \
+	    echo Configuring in $(BUILD_SUBDIR)/libiberty; \
+	    cd "$(BUILD_SUBDIR)/libiberty" || exit 1; \
 	    case $(srcdir) in \
 	    /* | [A-Za-z]:[\\/]*) \
 	      topdir=$(srcdir) ;; \
@@ -1247,7 +1612,7 @@ $(CONFIGURE_BUILD_MODULES):
 	    esac; \
 	    if [ "$(srcdir)" = "." ] ; then \
 	      if [ "$(BUILD_SUBDIR)" != "." ] ; then \
-		if $(SHELL) $$s/symlink-tree $${topdir}/$${dir} "no-such-file" ; then \
+		if $(SHELL) $$s/symlink-tree $${topdir}/libiberty "no-such-file" ; then \
 		  if [ -f Makefile ]; then \
 		    if $(MAKE) distclean; then \
 		      true; \
@@ -1266,8 +1631,8 @@ $(CONFIGURE_BUILD_MODULES):
 	      srcdiroption="--srcdir=."; \
 	      libsrcdir="."; \
 	    else \
-	      srcdiroption="--srcdir=$${topdir}/$${dir}"; \
-	      libsrcdir="$$s/$${dir}"; \
+	      srcdiroption="--srcdir=$${topdir}/libiberty"; \
+	      libsrcdir="$$s/libiberty"; \
 	    fi; \
 	    if [ -f $${libsrcdir}/configure ] ; then \
 	      rm -f no-such-file skip-this-dir; \
@@ -1283,7 +1648,7 @@ $(CONFIGURE_BUILD_MODULES):
 	    if [ -f skip-this-dir ] ; then \
 	      sh skip-this-dir; \
 	      rm -f skip-this-dir; \
-	      cd ..; rmdir $${dir} || true; \
+	      cd ..; rmdir libiberty || true; \
 	    else \
 	      true; \
 	    fi; \
@@ -1293,6 +1658,7 @@ $(CONFIGURE_BUILD_MODULES):
 	else \
 	  true; \
 	fi
+
 
 # This rule is used to build the modules which use FLAGS_TO_PASS.  To
 # build a target all-X means to cd to X and make all.
@@ -1351,36 +1717,36 @@ $(INSTALL_MODULES): installdirs
 	  true; \
 	fi
 
-# This rule is used to configure the modules which are built with the
-# target tools.
-.PHONY: $(CONFIGURE_TARGET_MODULES)
-$(CONFIGURE_TARGET_MODULES):
-	@dir=`echo $@ | sed -e 's/configure-target-//'`; \
-	if [ -d $(TARGET_SUBDIR)/$${dir} ]; then \
+# These rules are used to build the modules which are built with the target
+# tools.  To make foo-X means to cd to X and make foo.
+
+.PHONY: configure-target-libstdc++-v3
+configure-target-libstdc++-v3:
+	@if [ -d $(TARGET_SUBDIR)/libstdc++-v3 ]; then \
 	  r=`${PWD}`; export r; \
-	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/$${dir}/tmpmulti.out 2> /dev/null; \
-	  if [ -s $(TARGET_SUBDIR)/$${dir}/tmpmulti.out ]; then \
-	    if [ -f $(TARGET_SUBDIR)/$${dir}/multilib.out ]; then \
-	      if cmp $(TARGET_SUBDIR)/$${dir}/multilib.out $(TARGET_SUBDIR)/$${dir}/tmpmulti.out > /dev/null; then \
-		rm -f $(TARGET_SUBDIR)/$${dir}/tmpmulti.out; \
+	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libstdc++-v3/tmpmulti.out 2> /dev/null; \
+	  if [ -s $(TARGET_SUBDIR)/libstdc++-v3/tmpmulti.out ]; then \
+	    if [ -f $(TARGET_SUBDIR)/libstdc++-v3/multilib.out ]; then \
+	      if cmp $(TARGET_SUBDIR)/libstdc++-v3/multilib.out $(TARGET_SUBDIR)/libstdc++-v3/tmpmulti.out > /dev/null; then \
+		rm -f $(TARGET_SUBDIR)/libstdc++-v3/tmpmulti.out; \
 	      else \
-		echo "Multilibs changed for $${dir}, reconfiguring"; \
-		rm -f $(TARGET_SUBDIR)/$${dir}/multilib.out $(TARGET_SUBDIR)/$${dir}/Makefile; \
-		mv $(TARGET_SUBDIR)/$${dir}/tmpmulti.out $(TARGET_SUBDIR)/$${dir}/multilib.out; \
+		echo "Multilibs changed for libstdc++-v3, reconfiguring"; \
+		rm -f $(TARGET_SUBDIR)/libstdc++-v3/multilib.out $(TARGET_SUBDIR)/libstdc++-v3/Makefile; \
+		mv $(TARGET_SUBDIR)/libstdc++-v3/tmpmulti.out $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; \
 	      fi; \
 	    else \
-	      mv $(TARGET_SUBDIR)/$${dir}/tmpmulti.out $(TARGET_SUBDIR)/$${dir}/multilib.out; \
+	      mv $(TARGET_SUBDIR)/libstdc++-v3/tmpmulti.out $(TARGET_SUBDIR)/libstdc++-v3/multilib.out; \
 	    fi; \
 	  fi; \
 	fi; exit 0	# break command into two pieces
-	@dir=`echo $@ | sed -e 's/configure-target-//'`; \
+	@dir=libstdc++-v3 ; \
 	if [ ! -d $(TARGET_SUBDIR) ]; then \
 	  true; \
-	elif [ -f $(TARGET_SUBDIR)/$${dir}/Makefile ] ; then \
+	elif [ -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile ] ; then \
 	  true; \
-	elif echo " $(TARGET_CONFIGDIRS) " | grep " $${dir} " >/dev/null 2>&1; then \
-	  if [ -d $(srcdir)/$${dir} ]; then \
-	    [ -d $(TARGET_SUBDIR)/$${dir} ] || mkdir $(TARGET_SUBDIR)/$${dir};\
+	elif echo " $(TARGET_CONFIGDIRS) " | grep " libstdc++-v3 " >/dev/null 2>&1; then \
+	  if [ -d $(srcdir)/libstdc++-v3 ]; then \
+	    [ -d $(TARGET_SUBDIR)/libstdc++-v3 ] || mkdir $(TARGET_SUBDIR)/libstdc++-v3;\
 	    r=`${PWD}`; export r; \
 	    s=`cd $(srcdir); ${PWD}`; export s; \
 	    $(SET_LIB_PATH) \
@@ -1397,8 +1763,8 @@ $(CONFIGURE_TARGET_MODULES):
 	    NM="$(NM_FOR_TARGET)"; export NM; \
 	    RANLIB="$(RANLIB_FOR_TARGET)"; export RANLIB; \
 	    WINDRES="$(WINDRES_FOR_TARGET)"; export WINDRES; \
-	    echo Configuring in $(TARGET_SUBDIR)/$${dir}; \
-	    cd "$(TARGET_SUBDIR)/$${dir}" || exit 1; \
+	    echo Configuring in $(TARGET_SUBDIR)/libstdc++-v3; \
+	    cd "$(TARGET_SUBDIR)/libstdc++-v3" || exit 1; \
 	    case $(srcdir) in \
 	    /* | [A-Za-z]:[\\/]*) \
 	      topdir=$(srcdir) ;; \
@@ -1410,7 +1776,7 @@ $(CONFIGURE_TARGET_MODULES):
 	    esac; \
 	    if [ "$(srcdir)" = "." ] ; then \
 	      if [ "$(TARGET_SUBDIR)" != "." ] ; then \
-		if $(SHELL) $$s/symlink-tree $${topdir}/$${dir} "no-such-file" ; then \
+		if $(SHELL) $$s/symlink-tree $${topdir}/libstdc++-v3 "no-such-file" ; then \
 		  if [ -f Makefile ]; then \
 		    if $(MAKE) distclean; then \
 		      true; \
@@ -1429,8 +1795,8 @@ $(CONFIGURE_TARGET_MODULES):
 	      srcdiroption="--srcdir=."; \
 	      libsrcdir="."; \
 	    else \
-	      srcdiroption="--srcdir=$${topdir}/$${dir}"; \
-	      libsrcdir="$$s/$${dir}"; \
+	      srcdiroption="--srcdir=$${topdir}/libstdc++-v3"; \
+	      libsrcdir="$$s/libstdc++-v3"; \
 	    fi; \
 	    if [ -f $${libsrcdir}/configure ] ; then \
 	      rm -f no-such-file skip-this-dir; \
@@ -1446,7 +1812,7 @@ $(CONFIGURE_TARGET_MODULES):
 	    if [ -f skip-this-dir ] ; then \
 	      sh skip-this-dir; \
 	      rm -f skip-this-dir; \
-	      cd ..; rmdir $${dir} || true; \
+	      cd ..; rmdir libstdc++-v3 || true; \
 	    else \
 	      true; \
 	    fi; \
@@ -1457,51 +1823,2142 @@ $(CONFIGURE_TARGET_MODULES):
 	  true; \
 	fi
 
-# This rule is used to build the modules which use TARGET_FLAGS_TO_PASS.
-# To build a target all-X means to cd to X and make all.
-.PHONY: $(ALL_TARGET_MODULES)
-$(ALL_TARGET_MODULES):
-	@dir=`echo $@ | sed -e 's/all-target-//'`; \
-	if [ -f $(TARGET_SUBDIR)/$${dir}/Makefile ] ; then \
+.PHONY: all-target-libstdc++-v3
+all-target-libstdc++-v3:
+	@dir=libstdc++-v3 ; \
+	if [ -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile ] ; then \
 	  r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
-	  (cd $(TARGET_SUBDIR)/$${dir}; \
+	  (cd $(TARGET_SUBDIR)/libstdc++-v3; \
 	    $(MAKE) $(TARGET_FLAGS_TO_PASS) all); \
 	else \
 	  true; \
 	fi
 
-# This rule is used to check the modules which use TARGET_FLAGS_TO_PASS.
-# To build a target install-X means to cd to X and make install.
-.PHONY: $(CHECK_TARGET_MODULES)
-$(CHECK_TARGET_MODULES):
-	@dir=`echo $@ | sed -e 's/check-target-//'`; \
-	if [ -f $(TARGET_SUBDIR)/$${dir}/Makefile ] ; then \
+.PHONY: check-target-libstdc++-v3
+check-target-libstdc++-v3:
+	@dir=libstdc++-v3 ; \
+	if [ -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile ] ; then \
 	  r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
-	  (cd $(TARGET_SUBDIR)/$${dir}; \
+	  (cd $(TARGET_SUBDIR)/libstdc++-v3; \
 	    $(MAKE) $(TARGET_FLAGS_TO_PASS) check);\
 	else \
 	  true; \
 	fi
 
-# This rule is used to install the modules which use
-# TARGET_FLAGS_TO_PASS.  To build a target install-X means to cd to X
-# and make install.
-.PHONY: $(INSTALL_TARGET_MODULES)
-$(INSTALL_TARGET_MODULES): installdirs
-	@dir=`echo $@ | sed -e 's/install-target-//'`; \
-	if [ -f $(TARGET_SUBDIR)/$${dir}/Makefile ] ; then \
+\
+.PHONY: install-target-libstdc++-v3
+install-target-libstdc++-v3: installdirs
+	@dir=libstdc++-v3 ; \
+	if [ -f $(TARGET_SUBDIR)/libstdc++-v3/Makefile ] ; then \
 	  r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
-	  (cd $(TARGET_SUBDIR)/$${dir}; \
+	  (cd $(TARGET_SUBDIR)/libstdc++-v3; \
 	    $(MAKE) $(TARGET_FLAGS_TO_PASS) install); \
 	else \
 	  true; \
 	fi
+
+
+.PHONY: configure-target-newlib
+configure-target-newlib:
+	@if [ -d $(TARGET_SUBDIR)/newlib ]; then \
+	  r=`${PWD}`; export r; \
+	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/newlib/tmpmulti.out 2> /dev/null; \
+	  if [ -s $(TARGET_SUBDIR)/newlib/tmpmulti.out ]; then \
+	    if [ -f $(TARGET_SUBDIR)/newlib/multilib.out ]; then \
+	      if cmp $(TARGET_SUBDIR)/newlib/multilib.out $(TARGET_SUBDIR)/newlib/tmpmulti.out > /dev/null; then \
+		rm -f $(TARGET_SUBDIR)/newlib/tmpmulti.out; \
+	      else \
+		echo "Multilibs changed for newlib, reconfiguring"; \
+		rm -f $(TARGET_SUBDIR)/newlib/multilib.out $(TARGET_SUBDIR)/newlib/Makefile; \
+		mv $(TARGET_SUBDIR)/newlib/tmpmulti.out $(TARGET_SUBDIR)/newlib/multilib.out; \
+	      fi; \
+	    else \
+	      mv $(TARGET_SUBDIR)/newlib/tmpmulti.out $(TARGET_SUBDIR)/newlib/multilib.out; \
+	    fi; \
+	  fi; \
+	fi; exit 0	# break command into two pieces
+	@dir=newlib ; \
+	if [ ! -d $(TARGET_SUBDIR) ]; then \
+	  true; \
+	elif [ -f $(TARGET_SUBDIR)/newlib/Makefile ] ; then \
+	  true; \
+	elif echo " $(TARGET_CONFIGDIRS) " | grep " newlib " >/dev/null 2>&1; then \
+	  if [ -d $(srcdir)/newlib ]; then \
+	    [ -d $(TARGET_SUBDIR)/newlib ] || mkdir $(TARGET_SUBDIR)/newlib;\
+	    r=`${PWD}`; export r; \
+	    s=`cd $(srcdir); ${PWD}`; export s; \
+	    $(SET_LIB_PATH) \
+	    AR="$(AR_FOR_TARGET)"; export AR; \
+	    AS="$(AS_FOR_TARGET)"; export AS; \
+	    CC="$(CC_FOR_TARGET)"; export CC; \
+	    CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
+	    CXX="$(CXX_FOR_TARGET)"; export CXX; \
+	    CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
+	    GCJ="$(GCJ_FOR_TARGET)"; export GCJ; \
+	    DLLTOOL="$(DLLTOOL_FOR_TARGET)"; export DLLTOOL; \
+	    LD="$(LD_FOR_TARGET)"; export LD; \
+            LDFLAGS="$(LDFLAGS_FOR_TARGET)"; export LDFLAGS; \
+	    NM="$(NM_FOR_TARGET)"; export NM; \
+	    RANLIB="$(RANLIB_FOR_TARGET)"; export RANLIB; \
+	    WINDRES="$(WINDRES_FOR_TARGET)"; export WINDRES; \
+	    echo Configuring in $(TARGET_SUBDIR)/newlib; \
+	    cd "$(TARGET_SUBDIR)/newlib" || exit 1; \
+	    case $(srcdir) in \
+	    /* | [A-Za-z]:[\\/]*) \
+	      topdir=$(srcdir) ;; \
+	    *) \
+	      case "$(TARGET_SUBDIR)" in \
+	      .) topdir="../$(srcdir)" ;; \
+	      *) topdir="../../$(srcdir)" ;; \
+	      esac ;; \
+	    esac; \
+	    if [ "$(srcdir)" = "." ] ; then \
+	      if [ "$(TARGET_SUBDIR)" != "." ] ; then \
+		if $(SHELL) $$s/symlink-tree $${topdir}/newlib "no-such-file" ; then \
+		  if [ -f Makefile ]; then \
+		    if $(MAKE) distclean; then \
+		      true; \
+		    else \
+		      exit 1; \
+		    fi; \
+		  else \
+		    true; \
+		  fi; \
+		else \
+		  exit 1; \
+		fi; \
+	      else \
+		true; \
+	      fi; \
+	      srcdiroption="--srcdir=."; \
+	      libsrcdir="."; \
+	    else \
+	      srcdiroption="--srcdir=$${topdir}/newlib"; \
+	      libsrcdir="$$s/newlib"; \
+	    fi; \
+	    if [ -f $${libsrcdir}/configure ] ; then \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    else \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $$s/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    fi || exit 1; \
+	    if [ -f skip-this-dir ] ; then \
+	      sh skip-this-dir; \
+	      rm -f skip-this-dir; \
+	      cd ..; rmdir newlib || true; \
+	    else \
+	      true; \
+	    fi; \
+	  else \
+	    true; \
+	  fi; \
+	else \
+	  true; \
+	fi
+
+.PHONY: all-target-newlib
+all-target-newlib:
+	@dir=newlib ; \
+	if [ -f $(TARGET_SUBDIR)/newlib/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/newlib; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) all); \
+	else \
+	  true; \
+	fi
+
+.PHONY: check-target-newlib
+check-target-newlib:
+	@dir=newlib ; \
+	if [ -f $(TARGET_SUBDIR)/newlib/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/newlib; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) check);\
+	else \
+	  true; \
+	fi
+
+\
+.PHONY: install-target-newlib
+install-target-newlib: installdirs
+	@dir=newlib ; \
+	if [ -f $(TARGET_SUBDIR)/newlib/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/newlib; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) install); \
+	else \
+	  true; \
+	fi
+
+
+.PHONY: configure-target-libf2c
+configure-target-libf2c:
+	@if [ -d $(TARGET_SUBDIR)/libf2c ]; then \
+	  r=`${PWD}`; export r; \
+	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libf2c/tmpmulti.out 2> /dev/null; \
+	  if [ -s $(TARGET_SUBDIR)/libf2c/tmpmulti.out ]; then \
+	    if [ -f $(TARGET_SUBDIR)/libf2c/multilib.out ]; then \
+	      if cmp $(TARGET_SUBDIR)/libf2c/multilib.out $(TARGET_SUBDIR)/libf2c/tmpmulti.out > /dev/null; then \
+		rm -f $(TARGET_SUBDIR)/libf2c/tmpmulti.out; \
+	      else \
+		echo "Multilibs changed for libf2c, reconfiguring"; \
+		rm -f $(TARGET_SUBDIR)/libf2c/multilib.out $(TARGET_SUBDIR)/libf2c/Makefile; \
+		mv $(TARGET_SUBDIR)/libf2c/tmpmulti.out $(TARGET_SUBDIR)/libf2c/multilib.out; \
+	      fi; \
+	    else \
+	      mv $(TARGET_SUBDIR)/libf2c/tmpmulti.out $(TARGET_SUBDIR)/libf2c/multilib.out; \
+	    fi; \
+	  fi; \
+	fi; exit 0	# break command into two pieces
+	@dir=libf2c ; \
+	if [ ! -d $(TARGET_SUBDIR) ]; then \
+	  true; \
+	elif [ -f $(TARGET_SUBDIR)/libf2c/Makefile ] ; then \
+	  true; \
+	elif echo " $(TARGET_CONFIGDIRS) " | grep " libf2c " >/dev/null 2>&1; then \
+	  if [ -d $(srcdir)/libf2c ]; then \
+	    [ -d $(TARGET_SUBDIR)/libf2c ] || mkdir $(TARGET_SUBDIR)/libf2c;\
+	    r=`${PWD}`; export r; \
+	    s=`cd $(srcdir); ${PWD}`; export s; \
+	    $(SET_LIB_PATH) \
+	    AR="$(AR_FOR_TARGET)"; export AR; \
+	    AS="$(AS_FOR_TARGET)"; export AS; \
+	    CC="$(CC_FOR_TARGET)"; export CC; \
+	    CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
+	    CXX="$(CXX_FOR_TARGET)"; export CXX; \
+	    CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
+	    GCJ="$(GCJ_FOR_TARGET)"; export GCJ; \
+	    DLLTOOL="$(DLLTOOL_FOR_TARGET)"; export DLLTOOL; \
+	    LD="$(LD_FOR_TARGET)"; export LD; \
+            LDFLAGS="$(LDFLAGS_FOR_TARGET)"; export LDFLAGS; \
+	    NM="$(NM_FOR_TARGET)"; export NM; \
+	    RANLIB="$(RANLIB_FOR_TARGET)"; export RANLIB; \
+	    WINDRES="$(WINDRES_FOR_TARGET)"; export WINDRES; \
+	    echo Configuring in $(TARGET_SUBDIR)/libf2c; \
+	    cd "$(TARGET_SUBDIR)/libf2c" || exit 1; \
+	    case $(srcdir) in \
+	    /* | [A-Za-z]:[\\/]*) \
+	      topdir=$(srcdir) ;; \
+	    *) \
+	      case "$(TARGET_SUBDIR)" in \
+	      .) topdir="../$(srcdir)" ;; \
+	      *) topdir="../../$(srcdir)" ;; \
+	      esac ;; \
+	    esac; \
+	    if [ "$(srcdir)" = "." ] ; then \
+	      if [ "$(TARGET_SUBDIR)" != "." ] ; then \
+		if $(SHELL) $$s/symlink-tree $${topdir}/libf2c "no-such-file" ; then \
+		  if [ -f Makefile ]; then \
+		    if $(MAKE) distclean; then \
+		      true; \
+		    else \
+		      exit 1; \
+		    fi; \
+		  else \
+		    true; \
+		  fi; \
+		else \
+		  exit 1; \
+		fi; \
+	      else \
+		true; \
+	      fi; \
+	      srcdiroption="--srcdir=."; \
+	      libsrcdir="."; \
+	    else \
+	      srcdiroption="--srcdir=$${topdir}/libf2c"; \
+	      libsrcdir="$$s/libf2c"; \
+	    fi; \
+	    if [ -f $${libsrcdir}/configure ] ; then \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    else \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $$s/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    fi || exit 1; \
+	    if [ -f skip-this-dir ] ; then \
+	      sh skip-this-dir; \
+	      rm -f skip-this-dir; \
+	      cd ..; rmdir libf2c || true; \
+	    else \
+	      true; \
+	    fi; \
+	  else \
+	    true; \
+	  fi; \
+	else \
+	  true; \
+	fi
+
+.PHONY: all-target-libf2c
+all-target-libf2c:
+	@dir=libf2c ; \
+	if [ -f $(TARGET_SUBDIR)/libf2c/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/libf2c; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) all); \
+	else \
+	  true; \
+	fi
+
+.PHONY: check-target-libf2c
+check-target-libf2c:
+	@dir=libf2c ; \
+	if [ -f $(TARGET_SUBDIR)/libf2c/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/libf2c; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) check);\
+	else \
+	  true; \
+	fi
+
+\
+.PHONY: install-target-libf2c
+install-target-libf2c: installdirs
+	@dir=libf2c ; \
+	if [ -f $(TARGET_SUBDIR)/libf2c/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/libf2c; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) install); \
+	else \
+	  true; \
+	fi
+
+
+.PHONY: configure-target-libobjc
+configure-target-libobjc:
+	@if [ -d $(TARGET_SUBDIR)/libobjc ]; then \
+	  r=`${PWD}`; export r; \
+	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libobjc/tmpmulti.out 2> /dev/null; \
+	  if [ -s $(TARGET_SUBDIR)/libobjc/tmpmulti.out ]; then \
+	    if [ -f $(TARGET_SUBDIR)/libobjc/multilib.out ]; then \
+	      if cmp $(TARGET_SUBDIR)/libobjc/multilib.out $(TARGET_SUBDIR)/libobjc/tmpmulti.out > /dev/null; then \
+		rm -f $(TARGET_SUBDIR)/libobjc/tmpmulti.out; \
+	      else \
+		echo "Multilibs changed for libobjc, reconfiguring"; \
+		rm -f $(TARGET_SUBDIR)/libobjc/multilib.out $(TARGET_SUBDIR)/libobjc/Makefile; \
+		mv $(TARGET_SUBDIR)/libobjc/tmpmulti.out $(TARGET_SUBDIR)/libobjc/multilib.out; \
+	      fi; \
+	    else \
+	      mv $(TARGET_SUBDIR)/libobjc/tmpmulti.out $(TARGET_SUBDIR)/libobjc/multilib.out; \
+	    fi; \
+	  fi; \
+	fi; exit 0	# break command into two pieces
+	@dir=libobjc ; \
+	if [ ! -d $(TARGET_SUBDIR) ]; then \
+	  true; \
+	elif [ -f $(TARGET_SUBDIR)/libobjc/Makefile ] ; then \
+	  true; \
+	elif echo " $(TARGET_CONFIGDIRS) " | grep " libobjc " >/dev/null 2>&1; then \
+	  if [ -d $(srcdir)/libobjc ]; then \
+	    [ -d $(TARGET_SUBDIR)/libobjc ] || mkdir $(TARGET_SUBDIR)/libobjc;\
+	    r=`${PWD}`; export r; \
+	    s=`cd $(srcdir); ${PWD}`; export s; \
+	    $(SET_LIB_PATH) \
+	    AR="$(AR_FOR_TARGET)"; export AR; \
+	    AS="$(AS_FOR_TARGET)"; export AS; \
+	    CC="$(CC_FOR_TARGET)"; export CC; \
+	    CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
+	    CXX="$(CXX_FOR_TARGET)"; export CXX; \
+	    CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
+	    GCJ="$(GCJ_FOR_TARGET)"; export GCJ; \
+	    DLLTOOL="$(DLLTOOL_FOR_TARGET)"; export DLLTOOL; \
+	    LD="$(LD_FOR_TARGET)"; export LD; \
+            LDFLAGS="$(LDFLAGS_FOR_TARGET)"; export LDFLAGS; \
+	    NM="$(NM_FOR_TARGET)"; export NM; \
+	    RANLIB="$(RANLIB_FOR_TARGET)"; export RANLIB; \
+	    WINDRES="$(WINDRES_FOR_TARGET)"; export WINDRES; \
+	    echo Configuring in $(TARGET_SUBDIR)/libobjc; \
+	    cd "$(TARGET_SUBDIR)/libobjc" || exit 1; \
+	    case $(srcdir) in \
+	    /* | [A-Za-z]:[\\/]*) \
+	      topdir=$(srcdir) ;; \
+	    *) \
+	      case "$(TARGET_SUBDIR)" in \
+	      .) topdir="../$(srcdir)" ;; \
+	      *) topdir="../../$(srcdir)" ;; \
+	      esac ;; \
+	    esac; \
+	    if [ "$(srcdir)" = "." ] ; then \
+	      if [ "$(TARGET_SUBDIR)" != "." ] ; then \
+		if $(SHELL) $$s/symlink-tree $${topdir}/libobjc "no-such-file" ; then \
+		  if [ -f Makefile ]; then \
+		    if $(MAKE) distclean; then \
+		      true; \
+		    else \
+		      exit 1; \
+		    fi; \
+		  else \
+		    true; \
+		  fi; \
+		else \
+		  exit 1; \
+		fi; \
+	      else \
+		true; \
+	      fi; \
+	      srcdiroption="--srcdir=."; \
+	      libsrcdir="."; \
+	    else \
+	      srcdiroption="--srcdir=$${topdir}/libobjc"; \
+	      libsrcdir="$$s/libobjc"; \
+	    fi; \
+	    if [ -f $${libsrcdir}/configure ] ; then \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    else \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $$s/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    fi || exit 1; \
+	    if [ -f skip-this-dir ] ; then \
+	      sh skip-this-dir; \
+	      rm -f skip-this-dir; \
+	      cd ..; rmdir libobjc || true; \
+	    else \
+	      true; \
+	    fi; \
+	  else \
+	    true; \
+	  fi; \
+	else \
+	  true; \
+	fi
+
+.PHONY: all-target-libobjc
+all-target-libobjc:
+	@dir=libobjc ; \
+	if [ -f $(TARGET_SUBDIR)/libobjc/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/libobjc; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) all); \
+	else \
+	  true; \
+	fi
+
+.PHONY: check-target-libobjc
+check-target-libobjc:
+	@dir=libobjc ; \
+	if [ -f $(TARGET_SUBDIR)/libobjc/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/libobjc; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) check);\
+	else \
+	  true; \
+	fi
+
+\
+.PHONY: install-target-libobjc
+install-target-libobjc: installdirs
+	@dir=libobjc ; \
+	if [ -f $(TARGET_SUBDIR)/libobjc/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/libobjc; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) install); \
+	else \
+	  true; \
+	fi
+
+
+.PHONY: configure-target-libtermcap
+configure-target-libtermcap:
+	@if [ -d $(TARGET_SUBDIR)/libtermcap ]; then \
+	  r=`${PWD}`; export r; \
+	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libtermcap/tmpmulti.out 2> /dev/null; \
+	  if [ -s $(TARGET_SUBDIR)/libtermcap/tmpmulti.out ]; then \
+	    if [ -f $(TARGET_SUBDIR)/libtermcap/multilib.out ]; then \
+	      if cmp $(TARGET_SUBDIR)/libtermcap/multilib.out $(TARGET_SUBDIR)/libtermcap/tmpmulti.out > /dev/null; then \
+		rm -f $(TARGET_SUBDIR)/libtermcap/tmpmulti.out; \
+	      else \
+		echo "Multilibs changed for libtermcap, reconfiguring"; \
+		rm -f $(TARGET_SUBDIR)/libtermcap/multilib.out $(TARGET_SUBDIR)/libtermcap/Makefile; \
+		mv $(TARGET_SUBDIR)/libtermcap/tmpmulti.out $(TARGET_SUBDIR)/libtermcap/multilib.out; \
+	      fi; \
+	    else \
+	      mv $(TARGET_SUBDIR)/libtermcap/tmpmulti.out $(TARGET_SUBDIR)/libtermcap/multilib.out; \
+	    fi; \
+	  fi; \
+	fi; exit 0	# break command into two pieces
+	@dir=libtermcap ; \
+	if [ ! -d $(TARGET_SUBDIR) ]; then \
+	  true; \
+	elif [ -f $(TARGET_SUBDIR)/libtermcap/Makefile ] ; then \
+	  true; \
+	elif echo " $(TARGET_CONFIGDIRS) " | grep " libtermcap " >/dev/null 2>&1; then \
+	  if [ -d $(srcdir)/libtermcap ]; then \
+	    [ -d $(TARGET_SUBDIR)/libtermcap ] || mkdir $(TARGET_SUBDIR)/libtermcap;\
+	    r=`${PWD}`; export r; \
+	    s=`cd $(srcdir); ${PWD}`; export s; \
+	    $(SET_LIB_PATH) \
+	    AR="$(AR_FOR_TARGET)"; export AR; \
+	    AS="$(AS_FOR_TARGET)"; export AS; \
+	    CC="$(CC_FOR_TARGET)"; export CC; \
+	    CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
+	    CXX="$(CXX_FOR_TARGET)"; export CXX; \
+	    CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
+	    GCJ="$(GCJ_FOR_TARGET)"; export GCJ; \
+	    DLLTOOL="$(DLLTOOL_FOR_TARGET)"; export DLLTOOL; \
+	    LD="$(LD_FOR_TARGET)"; export LD; \
+            LDFLAGS="$(LDFLAGS_FOR_TARGET)"; export LDFLAGS; \
+	    NM="$(NM_FOR_TARGET)"; export NM; \
+	    RANLIB="$(RANLIB_FOR_TARGET)"; export RANLIB; \
+	    WINDRES="$(WINDRES_FOR_TARGET)"; export WINDRES; \
+	    echo Configuring in $(TARGET_SUBDIR)/libtermcap; \
+	    cd "$(TARGET_SUBDIR)/libtermcap" || exit 1; \
+	    case $(srcdir) in \
+	    /* | [A-Za-z]:[\\/]*) \
+	      topdir=$(srcdir) ;; \
+	    *) \
+	      case "$(TARGET_SUBDIR)" in \
+	      .) topdir="../$(srcdir)" ;; \
+	      *) topdir="../../$(srcdir)" ;; \
+	      esac ;; \
+	    esac; \
+	    if [ "$(srcdir)" = "." ] ; then \
+	      if [ "$(TARGET_SUBDIR)" != "." ] ; then \
+		if $(SHELL) $$s/symlink-tree $${topdir}/libtermcap "no-such-file" ; then \
+		  if [ -f Makefile ]; then \
+		    if $(MAKE) distclean; then \
+		      true; \
+		    else \
+		      exit 1; \
+		    fi; \
+		  else \
+		    true; \
+		  fi; \
+		else \
+		  exit 1; \
+		fi; \
+	      else \
+		true; \
+	      fi; \
+	      srcdiroption="--srcdir=."; \
+	      libsrcdir="."; \
+	    else \
+	      srcdiroption="--srcdir=$${topdir}/libtermcap"; \
+	      libsrcdir="$$s/libtermcap"; \
+	    fi; \
+	    if [ -f $${libsrcdir}/configure ] ; then \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    else \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $$s/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    fi || exit 1; \
+	    if [ -f skip-this-dir ] ; then \
+	      sh skip-this-dir; \
+	      rm -f skip-this-dir; \
+	      cd ..; rmdir libtermcap || true; \
+	    else \
+	      true; \
+	    fi; \
+	  else \
+	    true; \
+	  fi; \
+	else \
+	  true; \
+	fi
+
+.PHONY: all-target-libtermcap
+all-target-libtermcap:
+	@dir=libtermcap ; \
+	if [ -f $(TARGET_SUBDIR)/libtermcap/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/libtermcap; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) all); \
+	else \
+	  true; \
+	fi
+
+\
+.PHONY: install-target-libtermcap
+install-target-libtermcap: installdirs
+	@dir=libtermcap ; \
+	if [ -f $(TARGET_SUBDIR)/libtermcap/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/libtermcap; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) install); \
+	else \
+	  true; \
+	fi
+
+
+.PHONY: configure-target-winsup
+configure-target-winsup:
+	@if [ -d $(TARGET_SUBDIR)/winsup ]; then \
+	  r=`${PWD}`; export r; \
+	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/winsup/tmpmulti.out 2> /dev/null; \
+	  if [ -s $(TARGET_SUBDIR)/winsup/tmpmulti.out ]; then \
+	    if [ -f $(TARGET_SUBDIR)/winsup/multilib.out ]; then \
+	      if cmp $(TARGET_SUBDIR)/winsup/multilib.out $(TARGET_SUBDIR)/winsup/tmpmulti.out > /dev/null; then \
+		rm -f $(TARGET_SUBDIR)/winsup/tmpmulti.out; \
+	      else \
+		echo "Multilibs changed for winsup, reconfiguring"; \
+		rm -f $(TARGET_SUBDIR)/winsup/multilib.out $(TARGET_SUBDIR)/winsup/Makefile; \
+		mv $(TARGET_SUBDIR)/winsup/tmpmulti.out $(TARGET_SUBDIR)/winsup/multilib.out; \
+	      fi; \
+	    else \
+	      mv $(TARGET_SUBDIR)/winsup/tmpmulti.out $(TARGET_SUBDIR)/winsup/multilib.out; \
+	    fi; \
+	  fi; \
+	fi; exit 0	# break command into two pieces
+	@dir=winsup ; \
+	if [ ! -d $(TARGET_SUBDIR) ]; then \
+	  true; \
+	elif [ -f $(TARGET_SUBDIR)/winsup/Makefile ] ; then \
+	  true; \
+	elif echo " $(TARGET_CONFIGDIRS) " | grep " winsup " >/dev/null 2>&1; then \
+	  if [ -d $(srcdir)/winsup ]; then \
+	    [ -d $(TARGET_SUBDIR)/winsup ] || mkdir $(TARGET_SUBDIR)/winsup;\
+	    r=`${PWD}`; export r; \
+	    s=`cd $(srcdir); ${PWD}`; export s; \
+	    $(SET_LIB_PATH) \
+	    AR="$(AR_FOR_TARGET)"; export AR; \
+	    AS="$(AS_FOR_TARGET)"; export AS; \
+	    CC="$(CC_FOR_TARGET)"; export CC; \
+	    CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
+	    CXX="$(CXX_FOR_TARGET)"; export CXX; \
+	    CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
+	    GCJ="$(GCJ_FOR_TARGET)"; export GCJ; \
+	    DLLTOOL="$(DLLTOOL_FOR_TARGET)"; export DLLTOOL; \
+	    LD="$(LD_FOR_TARGET)"; export LD; \
+            LDFLAGS="$(LDFLAGS_FOR_TARGET)"; export LDFLAGS; \
+	    NM="$(NM_FOR_TARGET)"; export NM; \
+	    RANLIB="$(RANLIB_FOR_TARGET)"; export RANLIB; \
+	    WINDRES="$(WINDRES_FOR_TARGET)"; export WINDRES; \
+	    echo Configuring in $(TARGET_SUBDIR)/winsup; \
+	    cd "$(TARGET_SUBDIR)/winsup" || exit 1; \
+	    case $(srcdir) in \
+	    /* | [A-Za-z]:[\\/]*) \
+	      topdir=$(srcdir) ;; \
+	    *) \
+	      case "$(TARGET_SUBDIR)" in \
+	      .) topdir="../$(srcdir)" ;; \
+	      *) topdir="../../$(srcdir)" ;; \
+	      esac ;; \
+	    esac; \
+	    if [ "$(srcdir)" = "." ] ; then \
+	      if [ "$(TARGET_SUBDIR)" != "." ] ; then \
+		if $(SHELL) $$s/symlink-tree $${topdir}/winsup "no-such-file" ; then \
+		  if [ -f Makefile ]; then \
+		    if $(MAKE) distclean; then \
+		      true; \
+		    else \
+		      exit 1; \
+		    fi; \
+		  else \
+		    true; \
+		  fi; \
+		else \
+		  exit 1; \
+		fi; \
+	      else \
+		true; \
+	      fi; \
+	      srcdiroption="--srcdir=."; \
+	      libsrcdir="."; \
+	    else \
+	      srcdiroption="--srcdir=$${topdir}/winsup"; \
+	      libsrcdir="$$s/winsup"; \
+	    fi; \
+	    if [ -f $${libsrcdir}/configure ] ; then \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    else \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $$s/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    fi || exit 1; \
+	    if [ -f skip-this-dir ] ; then \
+	      sh skip-this-dir; \
+	      rm -f skip-this-dir; \
+	      cd ..; rmdir winsup || true; \
+	    else \
+	      true; \
+	    fi; \
+	  else \
+	    true; \
+	  fi; \
+	else \
+	  true; \
+	fi
+
+.PHONY: all-target-winsup
+all-target-winsup:
+	@dir=winsup ; \
+	if [ -f $(TARGET_SUBDIR)/winsup/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/winsup; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) all); \
+	else \
+	  true; \
+	fi
+
+.PHONY: check-target-winsup
+check-target-winsup:
+	@dir=winsup ; \
+	if [ -f $(TARGET_SUBDIR)/winsup/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/winsup; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) check);\
+	else \
+	  true; \
+	fi
+
+\
+.PHONY: install-target-winsup
+install-target-winsup: installdirs
+	@dir=winsup ; \
+	if [ -f $(TARGET_SUBDIR)/winsup/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/winsup; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) install); \
+	else \
+	  true; \
+	fi
+
+
+.PHONY: configure-target-libgloss
+configure-target-libgloss:
+	@if [ -d $(TARGET_SUBDIR)/libgloss ]; then \
+	  r=`${PWD}`; export r; \
+	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libgloss/tmpmulti.out 2> /dev/null; \
+	  if [ -s $(TARGET_SUBDIR)/libgloss/tmpmulti.out ]; then \
+	    if [ -f $(TARGET_SUBDIR)/libgloss/multilib.out ]; then \
+	      if cmp $(TARGET_SUBDIR)/libgloss/multilib.out $(TARGET_SUBDIR)/libgloss/tmpmulti.out > /dev/null; then \
+		rm -f $(TARGET_SUBDIR)/libgloss/tmpmulti.out; \
+	      else \
+		echo "Multilibs changed for libgloss, reconfiguring"; \
+		rm -f $(TARGET_SUBDIR)/libgloss/multilib.out $(TARGET_SUBDIR)/libgloss/Makefile; \
+		mv $(TARGET_SUBDIR)/libgloss/tmpmulti.out $(TARGET_SUBDIR)/libgloss/multilib.out; \
+	      fi; \
+	    else \
+	      mv $(TARGET_SUBDIR)/libgloss/tmpmulti.out $(TARGET_SUBDIR)/libgloss/multilib.out; \
+	    fi; \
+	  fi; \
+	fi; exit 0	# break command into two pieces
+	@dir=libgloss ; \
+	if [ ! -d $(TARGET_SUBDIR) ]; then \
+	  true; \
+	elif [ -f $(TARGET_SUBDIR)/libgloss/Makefile ] ; then \
+	  true; \
+	elif echo " $(TARGET_CONFIGDIRS) " | grep " libgloss " >/dev/null 2>&1; then \
+	  if [ -d $(srcdir)/libgloss ]; then \
+	    [ -d $(TARGET_SUBDIR)/libgloss ] || mkdir $(TARGET_SUBDIR)/libgloss;\
+	    r=`${PWD}`; export r; \
+	    s=`cd $(srcdir); ${PWD}`; export s; \
+	    $(SET_LIB_PATH) \
+	    AR="$(AR_FOR_TARGET)"; export AR; \
+	    AS="$(AS_FOR_TARGET)"; export AS; \
+	    CC="$(CC_FOR_TARGET)"; export CC; \
+	    CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
+	    CXX="$(CXX_FOR_TARGET)"; export CXX; \
+	    CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
+	    GCJ="$(GCJ_FOR_TARGET)"; export GCJ; \
+	    DLLTOOL="$(DLLTOOL_FOR_TARGET)"; export DLLTOOL; \
+	    LD="$(LD_FOR_TARGET)"; export LD; \
+            LDFLAGS="$(LDFLAGS_FOR_TARGET)"; export LDFLAGS; \
+	    NM="$(NM_FOR_TARGET)"; export NM; \
+	    RANLIB="$(RANLIB_FOR_TARGET)"; export RANLIB; \
+	    WINDRES="$(WINDRES_FOR_TARGET)"; export WINDRES; \
+	    echo Configuring in $(TARGET_SUBDIR)/libgloss; \
+	    cd "$(TARGET_SUBDIR)/libgloss" || exit 1; \
+	    case $(srcdir) in \
+	    /* | [A-Za-z]:[\\/]*) \
+	      topdir=$(srcdir) ;; \
+	    *) \
+	      case "$(TARGET_SUBDIR)" in \
+	      .) topdir="../$(srcdir)" ;; \
+	      *) topdir="../../$(srcdir)" ;; \
+	      esac ;; \
+	    esac; \
+	    if [ "$(srcdir)" = "." ] ; then \
+	      if [ "$(TARGET_SUBDIR)" != "." ] ; then \
+		if $(SHELL) $$s/symlink-tree $${topdir}/libgloss "no-such-file" ; then \
+		  if [ -f Makefile ]; then \
+		    if $(MAKE) distclean; then \
+		      true; \
+		    else \
+		      exit 1; \
+		    fi; \
+		  else \
+		    true; \
+		  fi; \
+		else \
+		  exit 1; \
+		fi; \
+	      else \
+		true; \
+	      fi; \
+	      srcdiroption="--srcdir=."; \
+	      libsrcdir="."; \
+	    else \
+	      srcdiroption="--srcdir=$${topdir}/libgloss"; \
+	      libsrcdir="$$s/libgloss"; \
+	    fi; \
+	    if [ -f $${libsrcdir}/configure ] ; then \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    else \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $$s/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    fi || exit 1; \
+	    if [ -f skip-this-dir ] ; then \
+	      sh skip-this-dir; \
+	      rm -f skip-this-dir; \
+	      cd ..; rmdir libgloss || true; \
+	    else \
+	      true; \
+	    fi; \
+	  else \
+	    true; \
+	  fi; \
+	else \
+	  true; \
+	fi
+
+.PHONY: all-target-libgloss
+all-target-libgloss:
+	@dir=libgloss ; \
+	if [ -f $(TARGET_SUBDIR)/libgloss/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/libgloss; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) all); \
+	else \
+	  true; \
+	fi
+
+\
+.PHONY: install-target-libgloss
+install-target-libgloss: installdirs
+	@dir=libgloss ; \
+	if [ -f $(TARGET_SUBDIR)/libgloss/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/libgloss; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) install); \
+	else \
+	  true; \
+	fi
+
+
+.PHONY: configure-target-libiberty
+configure-target-libiberty:
+	@if [ -d $(TARGET_SUBDIR)/libiberty ]; then \
+	  r=`${PWD}`; export r; \
+	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libiberty/tmpmulti.out 2> /dev/null; \
+	  if [ -s $(TARGET_SUBDIR)/libiberty/tmpmulti.out ]; then \
+	    if [ -f $(TARGET_SUBDIR)/libiberty/multilib.out ]; then \
+	      if cmp $(TARGET_SUBDIR)/libiberty/multilib.out $(TARGET_SUBDIR)/libiberty/tmpmulti.out > /dev/null; then \
+		rm -f $(TARGET_SUBDIR)/libiberty/tmpmulti.out; \
+	      else \
+		echo "Multilibs changed for libiberty, reconfiguring"; \
+		rm -f $(TARGET_SUBDIR)/libiberty/multilib.out $(TARGET_SUBDIR)/libiberty/Makefile; \
+		mv $(TARGET_SUBDIR)/libiberty/tmpmulti.out $(TARGET_SUBDIR)/libiberty/multilib.out; \
+	      fi; \
+	    else \
+	      mv $(TARGET_SUBDIR)/libiberty/tmpmulti.out $(TARGET_SUBDIR)/libiberty/multilib.out; \
+	    fi; \
+	  fi; \
+	fi; exit 0	# break command into two pieces
+	@dir=libiberty ; \
+	if [ ! -d $(TARGET_SUBDIR) ]; then \
+	  true; \
+	elif [ -f $(TARGET_SUBDIR)/libiberty/Makefile ] ; then \
+	  true; \
+	elif echo " $(TARGET_CONFIGDIRS) " | grep " libiberty " >/dev/null 2>&1; then \
+	  if [ -d $(srcdir)/libiberty ]; then \
+	    [ -d $(TARGET_SUBDIR)/libiberty ] || mkdir $(TARGET_SUBDIR)/libiberty;\
+	    r=`${PWD}`; export r; \
+	    s=`cd $(srcdir); ${PWD}`; export s; \
+	    $(SET_LIB_PATH) \
+	    AR="$(AR_FOR_TARGET)"; export AR; \
+	    AS="$(AS_FOR_TARGET)"; export AS; \
+	    CC="$(CC_FOR_TARGET)"; export CC; \
+	    CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
+	    CXX="$(CXX_FOR_TARGET)"; export CXX; \
+	    CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
+	    GCJ="$(GCJ_FOR_TARGET)"; export GCJ; \
+	    DLLTOOL="$(DLLTOOL_FOR_TARGET)"; export DLLTOOL; \
+	    LD="$(LD_FOR_TARGET)"; export LD; \
+            LDFLAGS="$(LDFLAGS_FOR_TARGET)"; export LDFLAGS; \
+	    NM="$(NM_FOR_TARGET)"; export NM; \
+	    RANLIB="$(RANLIB_FOR_TARGET)"; export RANLIB; \
+	    WINDRES="$(WINDRES_FOR_TARGET)"; export WINDRES; \
+	    echo Configuring in $(TARGET_SUBDIR)/libiberty; \
+	    cd "$(TARGET_SUBDIR)/libiberty" || exit 1; \
+	    case $(srcdir) in \
+	    /* | [A-Za-z]:[\\/]*) \
+	      topdir=$(srcdir) ;; \
+	    *) \
+	      case "$(TARGET_SUBDIR)" in \
+	      .) topdir="../$(srcdir)" ;; \
+	      *) topdir="../../$(srcdir)" ;; \
+	      esac ;; \
+	    esac; \
+	    if [ "$(srcdir)" = "." ] ; then \
+	      if [ "$(TARGET_SUBDIR)" != "." ] ; then \
+		if $(SHELL) $$s/symlink-tree $${topdir}/libiberty "no-such-file" ; then \
+		  if [ -f Makefile ]; then \
+		    if $(MAKE) distclean; then \
+		      true; \
+		    else \
+		      exit 1; \
+		    fi; \
+		  else \
+		    true; \
+		  fi; \
+		else \
+		  exit 1; \
+		fi; \
+	      else \
+		true; \
+	      fi; \
+	      srcdiroption="--srcdir=."; \
+	      libsrcdir="."; \
+	    else \
+	      srcdiroption="--srcdir=$${topdir}/libiberty"; \
+	      libsrcdir="$$s/libiberty"; \
+	    fi; \
+	    if [ -f $${libsrcdir}/configure ] ; then \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    else \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $$s/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    fi || exit 1; \
+	    if [ -f skip-this-dir ] ; then \
+	      sh skip-this-dir; \
+	      rm -f skip-this-dir; \
+	      cd ..; rmdir libiberty || true; \
+	    else \
+	      true; \
+	    fi; \
+	  else \
+	    true; \
+	  fi; \
+	else \
+	  true; \
+	fi
+
+.PHONY: all-target-libiberty
+all-target-libiberty:
+	@dir=libiberty ; \
+	if [ -f $(TARGET_SUBDIR)/libiberty/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/libiberty; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) all); \
+	else \
+	  true; \
+	fi
+
+.PHONY: check-target-libiberty
+check-target-libiberty:
+	@dir=libiberty ; \
+	if [ -f $(TARGET_SUBDIR)/libiberty/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/libiberty; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) check);\
+	else \
+	  true; \
+	fi
+
+\
+.PHONY: install-target-libiberty
+install-target-libiberty: installdirs
+	@dir=libiberty ; \
+	if [ -f $(TARGET_SUBDIR)/libiberty/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/libiberty; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) install); \
+	else \
+	  true; \
+	fi
+
+
+.PHONY: configure-target-gperf
+configure-target-gperf:
+	@if [ -d $(TARGET_SUBDIR)/gperf ]; then \
+	  r=`${PWD}`; export r; \
+	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/gperf/tmpmulti.out 2> /dev/null; \
+	  if [ -s $(TARGET_SUBDIR)/gperf/tmpmulti.out ]; then \
+	    if [ -f $(TARGET_SUBDIR)/gperf/multilib.out ]; then \
+	      if cmp $(TARGET_SUBDIR)/gperf/multilib.out $(TARGET_SUBDIR)/gperf/tmpmulti.out > /dev/null; then \
+		rm -f $(TARGET_SUBDIR)/gperf/tmpmulti.out; \
+	      else \
+		echo "Multilibs changed for gperf, reconfiguring"; \
+		rm -f $(TARGET_SUBDIR)/gperf/multilib.out $(TARGET_SUBDIR)/gperf/Makefile; \
+		mv $(TARGET_SUBDIR)/gperf/tmpmulti.out $(TARGET_SUBDIR)/gperf/multilib.out; \
+	      fi; \
+	    else \
+	      mv $(TARGET_SUBDIR)/gperf/tmpmulti.out $(TARGET_SUBDIR)/gperf/multilib.out; \
+	    fi; \
+	  fi; \
+	fi; exit 0	# break command into two pieces
+	@dir=gperf ; \
+	if [ ! -d $(TARGET_SUBDIR) ]; then \
+	  true; \
+	elif [ -f $(TARGET_SUBDIR)/gperf/Makefile ] ; then \
+	  true; \
+	elif echo " $(TARGET_CONFIGDIRS) " | grep " gperf " >/dev/null 2>&1; then \
+	  if [ -d $(srcdir)/gperf ]; then \
+	    [ -d $(TARGET_SUBDIR)/gperf ] || mkdir $(TARGET_SUBDIR)/gperf;\
+	    r=`${PWD}`; export r; \
+	    s=`cd $(srcdir); ${PWD}`; export s; \
+	    $(SET_LIB_PATH) \
+	    AR="$(AR_FOR_TARGET)"; export AR; \
+	    AS="$(AS_FOR_TARGET)"; export AS; \
+	    CC="$(CC_FOR_TARGET)"; export CC; \
+	    CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
+	    CXX="$(CXX_FOR_TARGET)"; export CXX; \
+	    CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
+	    GCJ="$(GCJ_FOR_TARGET)"; export GCJ; \
+	    DLLTOOL="$(DLLTOOL_FOR_TARGET)"; export DLLTOOL; \
+	    LD="$(LD_FOR_TARGET)"; export LD; \
+            LDFLAGS="$(LDFLAGS_FOR_TARGET)"; export LDFLAGS; \
+	    NM="$(NM_FOR_TARGET)"; export NM; \
+	    RANLIB="$(RANLIB_FOR_TARGET)"; export RANLIB; \
+	    WINDRES="$(WINDRES_FOR_TARGET)"; export WINDRES; \
+	    echo Configuring in $(TARGET_SUBDIR)/gperf; \
+	    cd "$(TARGET_SUBDIR)/gperf" || exit 1; \
+	    case $(srcdir) in \
+	    /* | [A-Za-z]:[\\/]*) \
+	      topdir=$(srcdir) ;; \
+	    *) \
+	      case "$(TARGET_SUBDIR)" in \
+	      .) topdir="../$(srcdir)" ;; \
+	      *) topdir="../../$(srcdir)" ;; \
+	      esac ;; \
+	    esac; \
+	    if [ "$(srcdir)" = "." ] ; then \
+	      if [ "$(TARGET_SUBDIR)" != "." ] ; then \
+		if $(SHELL) $$s/symlink-tree $${topdir}/gperf "no-such-file" ; then \
+		  if [ -f Makefile ]; then \
+		    if $(MAKE) distclean; then \
+		      true; \
+		    else \
+		      exit 1; \
+		    fi; \
+		  else \
+		    true; \
+		  fi; \
+		else \
+		  exit 1; \
+		fi; \
+	      else \
+		true; \
+	      fi; \
+	      srcdiroption="--srcdir=."; \
+	      libsrcdir="."; \
+	    else \
+	      srcdiroption="--srcdir=$${topdir}/gperf"; \
+	      libsrcdir="$$s/gperf"; \
+	    fi; \
+	    if [ -f $${libsrcdir}/configure ] ; then \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    else \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $$s/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    fi || exit 1; \
+	    if [ -f skip-this-dir ] ; then \
+	      sh skip-this-dir; \
+	      rm -f skip-this-dir; \
+	      cd ..; rmdir gperf || true; \
+	    else \
+	      true; \
+	    fi; \
+	  else \
+	    true; \
+	  fi; \
+	else \
+	  true; \
+	fi
+
+.PHONY: all-target-gperf
+all-target-gperf:
+	@dir=gperf ; \
+	if [ -f $(TARGET_SUBDIR)/gperf/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/gperf; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) all); \
+	else \
+	  true; \
+	fi
+
+.PHONY: check-target-gperf
+check-target-gperf:
+	@dir=gperf ; \
+	if [ -f $(TARGET_SUBDIR)/gperf/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/gperf; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) check);\
+	else \
+	  true; \
+	fi
+
+\
+.PHONY: install-target-gperf
+install-target-gperf: installdirs
+	@dir=gperf ; \
+	if [ -f $(TARGET_SUBDIR)/gperf/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/gperf; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) install); \
+	else \
+	  true; \
+	fi
+
+
+.PHONY: configure-target-examples
+configure-target-examples:
+	@if [ -d $(TARGET_SUBDIR)/examples ]; then \
+	  r=`${PWD}`; export r; \
+	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/examples/tmpmulti.out 2> /dev/null; \
+	  if [ -s $(TARGET_SUBDIR)/examples/tmpmulti.out ]; then \
+	    if [ -f $(TARGET_SUBDIR)/examples/multilib.out ]; then \
+	      if cmp $(TARGET_SUBDIR)/examples/multilib.out $(TARGET_SUBDIR)/examples/tmpmulti.out > /dev/null; then \
+		rm -f $(TARGET_SUBDIR)/examples/tmpmulti.out; \
+	      else \
+		echo "Multilibs changed for examples, reconfiguring"; \
+		rm -f $(TARGET_SUBDIR)/examples/multilib.out $(TARGET_SUBDIR)/examples/Makefile; \
+		mv $(TARGET_SUBDIR)/examples/tmpmulti.out $(TARGET_SUBDIR)/examples/multilib.out; \
+	      fi; \
+	    else \
+	      mv $(TARGET_SUBDIR)/examples/tmpmulti.out $(TARGET_SUBDIR)/examples/multilib.out; \
+	    fi; \
+	  fi; \
+	fi; exit 0	# break command into two pieces
+	@dir=examples ; \
+	if [ ! -d $(TARGET_SUBDIR) ]; then \
+	  true; \
+	elif [ -f $(TARGET_SUBDIR)/examples/Makefile ] ; then \
+	  true; \
+	elif echo " $(TARGET_CONFIGDIRS) " | grep " examples " >/dev/null 2>&1; then \
+	  if [ -d $(srcdir)/examples ]; then \
+	    [ -d $(TARGET_SUBDIR)/examples ] || mkdir $(TARGET_SUBDIR)/examples;\
+	    r=`${PWD}`; export r; \
+	    s=`cd $(srcdir); ${PWD}`; export s; \
+	    $(SET_LIB_PATH) \
+	    AR="$(AR_FOR_TARGET)"; export AR; \
+	    AS="$(AS_FOR_TARGET)"; export AS; \
+	    CC="$(CC_FOR_TARGET)"; export CC; \
+	    CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
+	    CXX="$(CXX_FOR_TARGET)"; export CXX; \
+	    CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
+	    GCJ="$(GCJ_FOR_TARGET)"; export GCJ; \
+	    DLLTOOL="$(DLLTOOL_FOR_TARGET)"; export DLLTOOL; \
+	    LD="$(LD_FOR_TARGET)"; export LD; \
+            LDFLAGS="$(LDFLAGS_FOR_TARGET)"; export LDFLAGS; \
+	    NM="$(NM_FOR_TARGET)"; export NM; \
+	    RANLIB="$(RANLIB_FOR_TARGET)"; export RANLIB; \
+	    WINDRES="$(WINDRES_FOR_TARGET)"; export WINDRES; \
+	    echo Configuring in $(TARGET_SUBDIR)/examples; \
+	    cd "$(TARGET_SUBDIR)/examples" || exit 1; \
+	    case $(srcdir) in \
+	    /* | [A-Za-z]:[\\/]*) \
+	      topdir=$(srcdir) ;; \
+	    *) \
+	      case "$(TARGET_SUBDIR)" in \
+	      .) topdir="../$(srcdir)" ;; \
+	      *) topdir="../../$(srcdir)" ;; \
+	      esac ;; \
+	    esac; \
+	    if [ "$(srcdir)" = "." ] ; then \
+	      if [ "$(TARGET_SUBDIR)" != "." ] ; then \
+		if $(SHELL) $$s/symlink-tree $${topdir}/examples "no-such-file" ; then \
+		  if [ -f Makefile ]; then \
+		    if $(MAKE) distclean; then \
+		      true; \
+		    else \
+		      exit 1; \
+		    fi; \
+		  else \
+		    true; \
+		  fi; \
+		else \
+		  exit 1; \
+		fi; \
+	      else \
+		true; \
+	      fi; \
+	      srcdiroption="--srcdir=."; \
+	      libsrcdir="."; \
+	    else \
+	      srcdiroption="--srcdir=$${topdir}/examples"; \
+	      libsrcdir="$$s/examples"; \
+	    fi; \
+	    if [ -f $${libsrcdir}/configure ] ; then \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    else \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $$s/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    fi || exit 1; \
+	    if [ -f skip-this-dir ] ; then \
+	      sh skip-this-dir; \
+	      rm -f skip-this-dir; \
+	      cd ..; rmdir examples || true; \
+	    else \
+	      true; \
+	    fi; \
+	  else \
+	    true; \
+	  fi; \
+	else \
+	  true; \
+	fi
+
+.PHONY: all-target-examples
+all-target-examples:
+	@dir=examples ; \
+	if [ -f $(TARGET_SUBDIR)/examples/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/examples; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) all); \
+	else \
+	  true; \
+	fi
+
+
+
+.PHONY: configure-target-libffi
+configure-target-libffi:
+	@if [ -d $(TARGET_SUBDIR)/libffi ]; then \
+	  r=`${PWD}`; export r; \
+	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libffi/tmpmulti.out 2> /dev/null; \
+	  if [ -s $(TARGET_SUBDIR)/libffi/tmpmulti.out ]; then \
+	    if [ -f $(TARGET_SUBDIR)/libffi/multilib.out ]; then \
+	      if cmp $(TARGET_SUBDIR)/libffi/multilib.out $(TARGET_SUBDIR)/libffi/tmpmulti.out > /dev/null; then \
+		rm -f $(TARGET_SUBDIR)/libffi/tmpmulti.out; \
+	      else \
+		echo "Multilibs changed for libffi, reconfiguring"; \
+		rm -f $(TARGET_SUBDIR)/libffi/multilib.out $(TARGET_SUBDIR)/libffi/Makefile; \
+		mv $(TARGET_SUBDIR)/libffi/tmpmulti.out $(TARGET_SUBDIR)/libffi/multilib.out; \
+	      fi; \
+	    else \
+	      mv $(TARGET_SUBDIR)/libffi/tmpmulti.out $(TARGET_SUBDIR)/libffi/multilib.out; \
+	    fi; \
+	  fi; \
+	fi; exit 0	# break command into two pieces
+	@dir=libffi ; \
+	if [ ! -d $(TARGET_SUBDIR) ]; then \
+	  true; \
+	elif [ -f $(TARGET_SUBDIR)/libffi/Makefile ] ; then \
+	  true; \
+	elif echo " $(TARGET_CONFIGDIRS) " | grep " libffi " >/dev/null 2>&1; then \
+	  if [ -d $(srcdir)/libffi ]; then \
+	    [ -d $(TARGET_SUBDIR)/libffi ] || mkdir $(TARGET_SUBDIR)/libffi;\
+	    r=`${PWD}`; export r; \
+	    s=`cd $(srcdir); ${PWD}`; export s; \
+	    $(SET_LIB_PATH) \
+	    AR="$(AR_FOR_TARGET)"; export AR; \
+	    AS="$(AS_FOR_TARGET)"; export AS; \
+	    CC="$(CC_FOR_TARGET)"; export CC; \
+	    CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
+	    CXX="$(CXX_FOR_TARGET)"; export CXX; \
+	    CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
+	    GCJ="$(GCJ_FOR_TARGET)"; export GCJ; \
+	    DLLTOOL="$(DLLTOOL_FOR_TARGET)"; export DLLTOOL; \
+	    LD="$(LD_FOR_TARGET)"; export LD; \
+            LDFLAGS="$(LDFLAGS_FOR_TARGET)"; export LDFLAGS; \
+	    NM="$(NM_FOR_TARGET)"; export NM; \
+	    RANLIB="$(RANLIB_FOR_TARGET)"; export RANLIB; \
+	    WINDRES="$(WINDRES_FOR_TARGET)"; export WINDRES; \
+	    echo Configuring in $(TARGET_SUBDIR)/libffi; \
+	    cd "$(TARGET_SUBDIR)/libffi" || exit 1; \
+	    case $(srcdir) in \
+	    /* | [A-Za-z]:[\\/]*) \
+	      topdir=$(srcdir) ;; \
+	    *) \
+	      case "$(TARGET_SUBDIR)" in \
+	      .) topdir="../$(srcdir)" ;; \
+	      *) topdir="../../$(srcdir)" ;; \
+	      esac ;; \
+	    esac; \
+	    if [ "$(srcdir)" = "." ] ; then \
+	      if [ "$(TARGET_SUBDIR)" != "." ] ; then \
+		if $(SHELL) $$s/symlink-tree $${topdir}/libffi "no-such-file" ; then \
+		  if [ -f Makefile ]; then \
+		    if $(MAKE) distclean; then \
+		      true; \
+		    else \
+		      exit 1; \
+		    fi; \
+		  else \
+		    true; \
+		  fi; \
+		else \
+		  exit 1; \
+		fi; \
+	      else \
+		true; \
+	      fi; \
+	      srcdiroption="--srcdir=."; \
+	      libsrcdir="."; \
+	    else \
+	      srcdiroption="--srcdir=$${topdir}/libffi"; \
+	      libsrcdir="$$s/libffi"; \
+	    fi; \
+	    if [ -f $${libsrcdir}/configure ] ; then \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    else \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $$s/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    fi || exit 1; \
+	    if [ -f skip-this-dir ] ; then \
+	      sh skip-this-dir; \
+	      rm -f skip-this-dir; \
+	      cd ..; rmdir libffi || true; \
+	    else \
+	      true; \
+	    fi; \
+	  else \
+	    true; \
+	  fi; \
+	else \
+	  true; \
+	fi
+
+.PHONY: all-target-libffi
+all-target-libffi:
+	@dir=libffi ; \
+	if [ -f $(TARGET_SUBDIR)/libffi/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/libffi; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) all); \
+	else \
+	  true; \
+	fi
+
+.PHONY: check-target-libffi
+check-target-libffi:
+	@dir=libffi ; \
+	if [ -f $(TARGET_SUBDIR)/libffi/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/libffi; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) check);\
+	else \
+	  true; \
+	fi
+
+
+
+.PHONY: configure-target-libjava
+configure-target-libjava:
+	@if [ -d $(TARGET_SUBDIR)/libjava ]; then \
+	  r=`${PWD}`; export r; \
+	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/libjava/tmpmulti.out 2> /dev/null; \
+	  if [ -s $(TARGET_SUBDIR)/libjava/tmpmulti.out ]; then \
+	    if [ -f $(TARGET_SUBDIR)/libjava/multilib.out ]; then \
+	      if cmp $(TARGET_SUBDIR)/libjava/multilib.out $(TARGET_SUBDIR)/libjava/tmpmulti.out > /dev/null; then \
+		rm -f $(TARGET_SUBDIR)/libjava/tmpmulti.out; \
+	      else \
+		echo "Multilibs changed for libjava, reconfiguring"; \
+		rm -f $(TARGET_SUBDIR)/libjava/multilib.out $(TARGET_SUBDIR)/libjava/Makefile; \
+		mv $(TARGET_SUBDIR)/libjava/tmpmulti.out $(TARGET_SUBDIR)/libjava/multilib.out; \
+	      fi; \
+	    else \
+	      mv $(TARGET_SUBDIR)/libjava/tmpmulti.out $(TARGET_SUBDIR)/libjava/multilib.out; \
+	    fi; \
+	  fi; \
+	fi; exit 0	# break command into two pieces
+	@dir=libjava ; \
+	if [ ! -d $(TARGET_SUBDIR) ]; then \
+	  true; \
+	elif [ -f $(TARGET_SUBDIR)/libjava/Makefile ] ; then \
+	  true; \
+	elif echo " $(TARGET_CONFIGDIRS) " | grep " libjava " >/dev/null 2>&1; then \
+	  if [ -d $(srcdir)/libjava ]; then \
+	    [ -d $(TARGET_SUBDIR)/libjava ] || mkdir $(TARGET_SUBDIR)/libjava;\
+	    r=`${PWD}`; export r; \
+	    s=`cd $(srcdir); ${PWD}`; export s; \
+	    $(SET_LIB_PATH) \
+	    AR="$(AR_FOR_TARGET)"; export AR; \
+	    AS="$(AS_FOR_TARGET)"; export AS; \
+	    CC="$(CC_FOR_TARGET)"; export CC; \
+	    CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
+	    CXX="$(CXX_FOR_TARGET)"; export CXX; \
+	    CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
+	    GCJ="$(GCJ_FOR_TARGET)"; export GCJ; \
+	    DLLTOOL="$(DLLTOOL_FOR_TARGET)"; export DLLTOOL; \
+	    LD="$(LD_FOR_TARGET)"; export LD; \
+            LDFLAGS="$(LDFLAGS_FOR_TARGET)"; export LDFLAGS; \
+	    NM="$(NM_FOR_TARGET)"; export NM; \
+	    RANLIB="$(RANLIB_FOR_TARGET)"; export RANLIB; \
+	    WINDRES="$(WINDRES_FOR_TARGET)"; export WINDRES; \
+	    echo Configuring in $(TARGET_SUBDIR)/libjava; \
+	    cd "$(TARGET_SUBDIR)/libjava" || exit 1; \
+	    case $(srcdir) in \
+	    /* | [A-Za-z]:[\\/]*) \
+	      topdir=$(srcdir) ;; \
+	    *) \
+	      case "$(TARGET_SUBDIR)" in \
+	      .) topdir="../$(srcdir)" ;; \
+	      *) topdir="../../$(srcdir)" ;; \
+	      esac ;; \
+	    esac; \
+	    if [ "$(srcdir)" = "." ] ; then \
+	      if [ "$(TARGET_SUBDIR)" != "." ] ; then \
+		if $(SHELL) $$s/symlink-tree $${topdir}/libjava "no-such-file" ; then \
+		  if [ -f Makefile ]; then \
+		    if $(MAKE) distclean; then \
+		      true; \
+		    else \
+		      exit 1; \
+		    fi; \
+		  else \
+		    true; \
+		  fi; \
+		else \
+		  exit 1; \
+		fi; \
+	      else \
+		true; \
+	      fi; \
+	      srcdiroption="--srcdir=."; \
+	      libsrcdir="."; \
+	    else \
+	      srcdiroption="--srcdir=$${topdir}/libjava"; \
+	      libsrcdir="$$s/libjava"; \
+	    fi; \
+	    if [ -f $${libsrcdir}/configure ] ; then \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    else \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $$s/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    fi || exit 1; \
+	    if [ -f skip-this-dir ] ; then \
+	      sh skip-this-dir; \
+	      rm -f skip-this-dir; \
+	      cd ..; rmdir libjava || true; \
+	    else \
+	      true; \
+	    fi; \
+	  else \
+	    true; \
+	  fi; \
+	else \
+	  true; \
+	fi
+
+.PHONY: all-target-libjava
+all-target-libjava:
+	@dir=libjava ; \
+	if [ -f $(TARGET_SUBDIR)/libjava/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/libjava; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) all); \
+	else \
+	  true; \
+	fi
+
+.PHONY: check-target-libjava
+check-target-libjava:
+	@dir=libjava ; \
+	if [ -f $(TARGET_SUBDIR)/libjava/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/libjava; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) check);\
+	else \
+	  true; \
+	fi
+
+\
+.PHONY: install-target-libjava
+install-target-libjava: installdirs
+	@dir=libjava ; \
+	if [ -f $(TARGET_SUBDIR)/libjava/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/libjava; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) install); \
+	else \
+	  true; \
+	fi
+
+
+.PHONY: configure-target-zlib
+configure-target-zlib:
+	@if [ -d $(TARGET_SUBDIR)/zlib ]; then \
+	  r=`${PWD}`; export r; \
+	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/zlib/tmpmulti.out 2> /dev/null; \
+	  if [ -s $(TARGET_SUBDIR)/zlib/tmpmulti.out ]; then \
+	    if [ -f $(TARGET_SUBDIR)/zlib/multilib.out ]; then \
+	      if cmp $(TARGET_SUBDIR)/zlib/multilib.out $(TARGET_SUBDIR)/zlib/tmpmulti.out > /dev/null; then \
+		rm -f $(TARGET_SUBDIR)/zlib/tmpmulti.out; \
+	      else \
+		echo "Multilibs changed for zlib, reconfiguring"; \
+		rm -f $(TARGET_SUBDIR)/zlib/multilib.out $(TARGET_SUBDIR)/zlib/Makefile; \
+		mv $(TARGET_SUBDIR)/zlib/tmpmulti.out $(TARGET_SUBDIR)/zlib/multilib.out; \
+	      fi; \
+	    else \
+	      mv $(TARGET_SUBDIR)/zlib/tmpmulti.out $(TARGET_SUBDIR)/zlib/multilib.out; \
+	    fi; \
+	  fi; \
+	fi; exit 0	# break command into two pieces
+	@dir=zlib ; \
+	if [ ! -d $(TARGET_SUBDIR) ]; then \
+	  true; \
+	elif [ -f $(TARGET_SUBDIR)/zlib/Makefile ] ; then \
+	  true; \
+	elif echo " $(TARGET_CONFIGDIRS) " | grep " zlib " >/dev/null 2>&1; then \
+	  if [ -d $(srcdir)/zlib ]; then \
+	    [ -d $(TARGET_SUBDIR)/zlib ] || mkdir $(TARGET_SUBDIR)/zlib;\
+	    r=`${PWD}`; export r; \
+	    s=`cd $(srcdir); ${PWD}`; export s; \
+	    $(SET_LIB_PATH) \
+	    AR="$(AR_FOR_TARGET)"; export AR; \
+	    AS="$(AS_FOR_TARGET)"; export AS; \
+	    CC="$(CC_FOR_TARGET)"; export CC; \
+	    CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
+	    CXX="$(CXX_FOR_TARGET)"; export CXX; \
+	    CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
+	    GCJ="$(GCJ_FOR_TARGET)"; export GCJ; \
+	    DLLTOOL="$(DLLTOOL_FOR_TARGET)"; export DLLTOOL; \
+	    LD="$(LD_FOR_TARGET)"; export LD; \
+            LDFLAGS="$(LDFLAGS_FOR_TARGET)"; export LDFLAGS; \
+	    NM="$(NM_FOR_TARGET)"; export NM; \
+	    RANLIB="$(RANLIB_FOR_TARGET)"; export RANLIB; \
+	    WINDRES="$(WINDRES_FOR_TARGET)"; export WINDRES; \
+	    echo Configuring in $(TARGET_SUBDIR)/zlib; \
+	    cd "$(TARGET_SUBDIR)/zlib" || exit 1; \
+	    case $(srcdir) in \
+	    /* | [A-Za-z]:[\\/]*) \
+	      topdir=$(srcdir) ;; \
+	    *) \
+	      case "$(TARGET_SUBDIR)" in \
+	      .) topdir="../$(srcdir)" ;; \
+	      *) topdir="../../$(srcdir)" ;; \
+	      esac ;; \
+	    esac; \
+	    if [ "$(srcdir)" = "." ] ; then \
+	      if [ "$(TARGET_SUBDIR)" != "." ] ; then \
+		if $(SHELL) $$s/symlink-tree $${topdir}/zlib "no-such-file" ; then \
+		  if [ -f Makefile ]; then \
+		    if $(MAKE) distclean; then \
+		      true; \
+		    else \
+		      exit 1; \
+		    fi; \
+		  else \
+		    true; \
+		  fi; \
+		else \
+		  exit 1; \
+		fi; \
+	      else \
+		true; \
+	      fi; \
+	      srcdiroption="--srcdir=."; \
+	      libsrcdir="."; \
+	    else \
+	      srcdiroption="--srcdir=$${topdir}/zlib"; \
+	      libsrcdir="$$s/zlib"; \
+	    fi; \
+	    if [ -f $${libsrcdir}/configure ] ; then \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    else \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $$s/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    fi || exit 1; \
+	    if [ -f skip-this-dir ] ; then \
+	      sh skip-this-dir; \
+	      rm -f skip-this-dir; \
+	      cd ..; rmdir zlib || true; \
+	    else \
+	      true; \
+	    fi; \
+	  else \
+	    true; \
+	  fi; \
+	else \
+	  true; \
+	fi
+
+.PHONY: all-target-zlib
+all-target-zlib:
+	@dir=zlib ; \
+	if [ -f $(TARGET_SUBDIR)/zlib/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/zlib; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) all); \
+	else \
+	  true; \
+	fi
+
+.PHONY: check-target-zlib
+check-target-zlib:
+	@dir=zlib ; \
+	if [ -f $(TARGET_SUBDIR)/zlib/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/zlib; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) check);\
+	else \
+	  true; \
+	fi
+
+\
+.PHONY: install-target-zlib
+install-target-zlib: installdirs
+	@dir=zlib ; \
+	if [ -f $(TARGET_SUBDIR)/zlib/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/zlib; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) install); \
+	else \
+	  true; \
+	fi
+
+
+.PHONY: configure-target-boehm-gc
+configure-target-boehm-gc:
+	@if [ -d $(TARGET_SUBDIR)/boehm-gc ]; then \
+	  r=`${PWD}`; export r; \
+	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/boehm-gc/tmpmulti.out 2> /dev/null; \
+	  if [ -s $(TARGET_SUBDIR)/boehm-gc/tmpmulti.out ]; then \
+	    if [ -f $(TARGET_SUBDIR)/boehm-gc/multilib.out ]; then \
+	      if cmp $(TARGET_SUBDIR)/boehm-gc/multilib.out $(TARGET_SUBDIR)/boehm-gc/tmpmulti.out > /dev/null; then \
+		rm -f $(TARGET_SUBDIR)/boehm-gc/tmpmulti.out; \
+	      else \
+		echo "Multilibs changed for boehm-gc, reconfiguring"; \
+		rm -f $(TARGET_SUBDIR)/boehm-gc/multilib.out $(TARGET_SUBDIR)/boehm-gc/Makefile; \
+		mv $(TARGET_SUBDIR)/boehm-gc/tmpmulti.out $(TARGET_SUBDIR)/boehm-gc/multilib.out; \
+	      fi; \
+	    else \
+	      mv $(TARGET_SUBDIR)/boehm-gc/tmpmulti.out $(TARGET_SUBDIR)/boehm-gc/multilib.out; \
+	    fi; \
+	  fi; \
+	fi; exit 0	# break command into two pieces
+	@dir=boehm-gc ; \
+	if [ ! -d $(TARGET_SUBDIR) ]; then \
+	  true; \
+	elif [ -f $(TARGET_SUBDIR)/boehm-gc/Makefile ] ; then \
+	  true; \
+	elif echo " $(TARGET_CONFIGDIRS) " | grep " boehm-gc " >/dev/null 2>&1; then \
+	  if [ -d $(srcdir)/boehm-gc ]; then \
+	    [ -d $(TARGET_SUBDIR)/boehm-gc ] || mkdir $(TARGET_SUBDIR)/boehm-gc;\
+	    r=`${PWD}`; export r; \
+	    s=`cd $(srcdir); ${PWD}`; export s; \
+	    $(SET_LIB_PATH) \
+	    AR="$(AR_FOR_TARGET)"; export AR; \
+	    AS="$(AS_FOR_TARGET)"; export AS; \
+	    CC="$(CC_FOR_TARGET)"; export CC; \
+	    CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
+	    CXX="$(CXX_FOR_TARGET)"; export CXX; \
+	    CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
+	    GCJ="$(GCJ_FOR_TARGET)"; export GCJ; \
+	    DLLTOOL="$(DLLTOOL_FOR_TARGET)"; export DLLTOOL; \
+	    LD="$(LD_FOR_TARGET)"; export LD; \
+            LDFLAGS="$(LDFLAGS_FOR_TARGET)"; export LDFLAGS; \
+	    NM="$(NM_FOR_TARGET)"; export NM; \
+	    RANLIB="$(RANLIB_FOR_TARGET)"; export RANLIB; \
+	    WINDRES="$(WINDRES_FOR_TARGET)"; export WINDRES; \
+	    echo Configuring in $(TARGET_SUBDIR)/boehm-gc; \
+	    cd "$(TARGET_SUBDIR)/boehm-gc" || exit 1; \
+	    case $(srcdir) in \
+	    /* | [A-Za-z]:[\\/]*) \
+	      topdir=$(srcdir) ;; \
+	    *) \
+	      case "$(TARGET_SUBDIR)" in \
+	      .) topdir="../$(srcdir)" ;; \
+	      *) topdir="../../$(srcdir)" ;; \
+	      esac ;; \
+	    esac; \
+	    if [ "$(srcdir)" = "." ] ; then \
+	      if [ "$(TARGET_SUBDIR)" != "." ] ; then \
+		if $(SHELL) $$s/symlink-tree $${topdir}/boehm-gc "no-such-file" ; then \
+		  if [ -f Makefile ]; then \
+		    if $(MAKE) distclean; then \
+		      true; \
+		    else \
+		      exit 1; \
+		    fi; \
+		  else \
+		    true; \
+		  fi; \
+		else \
+		  exit 1; \
+		fi; \
+	      else \
+		true; \
+	      fi; \
+	      srcdiroption="--srcdir=."; \
+	      libsrcdir="."; \
+	    else \
+	      srcdiroption="--srcdir=$${topdir}/boehm-gc"; \
+	      libsrcdir="$$s/boehm-gc"; \
+	    fi; \
+	    if [ -f $${libsrcdir}/configure ] ; then \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    else \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $$s/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    fi || exit 1; \
+	    if [ -f skip-this-dir ] ; then \
+	      sh skip-this-dir; \
+	      rm -f skip-this-dir; \
+	      cd ..; rmdir boehm-gc || true; \
+	    else \
+	      true; \
+	    fi; \
+	  else \
+	    true; \
+	  fi; \
+	else \
+	  true; \
+	fi
+
+.PHONY: all-target-boehm-gc
+all-target-boehm-gc:
+	@dir=boehm-gc ; \
+	if [ -f $(TARGET_SUBDIR)/boehm-gc/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/boehm-gc; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) all); \
+	else \
+	  true; \
+	fi
+
+.PHONY: check-target-boehm-gc
+check-target-boehm-gc:
+	@dir=boehm-gc ; \
+	if [ -f $(TARGET_SUBDIR)/boehm-gc/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/boehm-gc; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) check);\
+	else \
+	  true; \
+	fi
+
+\
+.PHONY: install-target-boehm-gc
+install-target-boehm-gc: installdirs
+	@dir=boehm-gc ; \
+	if [ -f $(TARGET_SUBDIR)/boehm-gc/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/boehm-gc; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) install); \
+	else \
+	  true; \
+	fi
+
+
+.PHONY: configure-target-qthreads
+configure-target-qthreads:
+	@if [ -d $(TARGET_SUBDIR)/qthreads ]; then \
+	  r=`${PWD}`; export r; \
+	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/qthreads/tmpmulti.out 2> /dev/null; \
+	  if [ -s $(TARGET_SUBDIR)/qthreads/tmpmulti.out ]; then \
+	    if [ -f $(TARGET_SUBDIR)/qthreads/multilib.out ]; then \
+	      if cmp $(TARGET_SUBDIR)/qthreads/multilib.out $(TARGET_SUBDIR)/qthreads/tmpmulti.out > /dev/null; then \
+		rm -f $(TARGET_SUBDIR)/qthreads/tmpmulti.out; \
+	      else \
+		echo "Multilibs changed for qthreads, reconfiguring"; \
+		rm -f $(TARGET_SUBDIR)/qthreads/multilib.out $(TARGET_SUBDIR)/qthreads/Makefile; \
+		mv $(TARGET_SUBDIR)/qthreads/tmpmulti.out $(TARGET_SUBDIR)/qthreads/multilib.out; \
+	      fi; \
+	    else \
+	      mv $(TARGET_SUBDIR)/qthreads/tmpmulti.out $(TARGET_SUBDIR)/qthreads/multilib.out; \
+	    fi; \
+	  fi; \
+	fi; exit 0	# break command into two pieces
+	@dir=qthreads ; \
+	if [ ! -d $(TARGET_SUBDIR) ]; then \
+	  true; \
+	elif [ -f $(TARGET_SUBDIR)/qthreads/Makefile ] ; then \
+	  true; \
+	elif echo " $(TARGET_CONFIGDIRS) " | grep " qthreads " >/dev/null 2>&1; then \
+	  if [ -d $(srcdir)/qthreads ]; then \
+	    [ -d $(TARGET_SUBDIR)/qthreads ] || mkdir $(TARGET_SUBDIR)/qthreads;\
+	    r=`${PWD}`; export r; \
+	    s=`cd $(srcdir); ${PWD}`; export s; \
+	    $(SET_LIB_PATH) \
+	    AR="$(AR_FOR_TARGET)"; export AR; \
+	    AS="$(AS_FOR_TARGET)"; export AS; \
+	    CC="$(CC_FOR_TARGET)"; export CC; \
+	    CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
+	    CXX="$(CXX_FOR_TARGET)"; export CXX; \
+	    CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
+	    GCJ="$(GCJ_FOR_TARGET)"; export GCJ; \
+	    DLLTOOL="$(DLLTOOL_FOR_TARGET)"; export DLLTOOL; \
+	    LD="$(LD_FOR_TARGET)"; export LD; \
+            LDFLAGS="$(LDFLAGS_FOR_TARGET)"; export LDFLAGS; \
+	    NM="$(NM_FOR_TARGET)"; export NM; \
+	    RANLIB="$(RANLIB_FOR_TARGET)"; export RANLIB; \
+	    WINDRES="$(WINDRES_FOR_TARGET)"; export WINDRES; \
+	    echo Configuring in $(TARGET_SUBDIR)/qthreads; \
+	    cd "$(TARGET_SUBDIR)/qthreads" || exit 1; \
+	    case $(srcdir) in \
+	    /* | [A-Za-z]:[\\/]*) \
+	      topdir=$(srcdir) ;; \
+	    *) \
+	      case "$(TARGET_SUBDIR)" in \
+	      .) topdir="../$(srcdir)" ;; \
+	      *) topdir="../../$(srcdir)" ;; \
+	      esac ;; \
+	    esac; \
+	    if [ "$(srcdir)" = "." ] ; then \
+	      if [ "$(TARGET_SUBDIR)" != "." ] ; then \
+		if $(SHELL) $$s/symlink-tree $${topdir}/qthreads "no-such-file" ; then \
+		  if [ -f Makefile ]; then \
+		    if $(MAKE) distclean; then \
+		      true; \
+		    else \
+		      exit 1; \
+		    fi; \
+		  else \
+		    true; \
+		  fi; \
+		else \
+		  exit 1; \
+		fi; \
+	      else \
+		true; \
+	      fi; \
+	      srcdiroption="--srcdir=."; \
+	      libsrcdir="."; \
+	    else \
+	      srcdiroption="--srcdir=$${topdir}/qthreads"; \
+	      libsrcdir="$$s/qthreads"; \
+	    fi; \
+	    if [ -f $${libsrcdir}/configure ] ; then \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    else \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $$s/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    fi || exit 1; \
+	    if [ -f skip-this-dir ] ; then \
+	      sh skip-this-dir; \
+	      rm -f skip-this-dir; \
+	      cd ..; rmdir qthreads || true; \
+	    else \
+	      true; \
+	    fi; \
+	  else \
+	    true; \
+	  fi; \
+	else \
+	  true; \
+	fi
+
+.PHONY: all-target-qthreads
+all-target-qthreads:
+	@dir=qthreads ; \
+	if [ -f $(TARGET_SUBDIR)/qthreads/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/qthreads; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) all); \
+	else \
+	  true; \
+	fi
+
+.PHONY: check-target-qthreads
+check-target-qthreads:
+	@dir=qthreads ; \
+	if [ -f $(TARGET_SUBDIR)/qthreads/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/qthreads; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) check);\
+	else \
+	  true; \
+	fi
+
+\
+.PHONY: install-target-qthreads
+install-target-qthreads: installdirs
+	@dir=qthreads ; \
+	if [ -f $(TARGET_SUBDIR)/qthreads/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/qthreads; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) install); \
+	else \
+	  true; \
+	fi
+
+
+.PHONY: configure-target-rda
+configure-target-rda:
+	@if [ -d $(TARGET_SUBDIR)/rda ]; then \
+	  r=`${PWD}`; export r; \
+	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/rda/tmpmulti.out 2> /dev/null; \
+	  if [ -s $(TARGET_SUBDIR)/rda/tmpmulti.out ]; then \
+	    if [ -f $(TARGET_SUBDIR)/rda/multilib.out ]; then \
+	      if cmp $(TARGET_SUBDIR)/rda/multilib.out $(TARGET_SUBDIR)/rda/tmpmulti.out > /dev/null; then \
+		rm -f $(TARGET_SUBDIR)/rda/tmpmulti.out; \
+	      else \
+		echo "Multilibs changed for rda, reconfiguring"; \
+		rm -f $(TARGET_SUBDIR)/rda/multilib.out $(TARGET_SUBDIR)/rda/Makefile; \
+		mv $(TARGET_SUBDIR)/rda/tmpmulti.out $(TARGET_SUBDIR)/rda/multilib.out; \
+	      fi; \
+	    else \
+	      mv $(TARGET_SUBDIR)/rda/tmpmulti.out $(TARGET_SUBDIR)/rda/multilib.out; \
+	    fi; \
+	  fi; \
+	fi; exit 0	# break command into two pieces
+	@dir=rda ; \
+	if [ ! -d $(TARGET_SUBDIR) ]; then \
+	  true; \
+	elif [ -f $(TARGET_SUBDIR)/rda/Makefile ] ; then \
+	  true; \
+	elif echo " $(TARGET_CONFIGDIRS) " | grep " rda " >/dev/null 2>&1; then \
+	  if [ -d $(srcdir)/rda ]; then \
+	    [ -d $(TARGET_SUBDIR)/rda ] || mkdir $(TARGET_SUBDIR)/rda;\
+	    r=`${PWD}`; export r; \
+	    s=`cd $(srcdir); ${PWD}`; export s; \
+	    $(SET_LIB_PATH) \
+	    AR="$(AR_FOR_TARGET)"; export AR; \
+	    AS="$(AS_FOR_TARGET)"; export AS; \
+	    CC="$(CC_FOR_TARGET)"; export CC; \
+	    CFLAGS="$(CFLAGS_FOR_TARGET)"; export CFLAGS; \
+	    CXX="$(CXX_FOR_TARGET)"; export CXX; \
+	    CXXFLAGS="$(CXXFLAGS_FOR_TARGET)"; export CXXFLAGS; \
+	    GCJ="$(GCJ_FOR_TARGET)"; export GCJ; \
+	    DLLTOOL="$(DLLTOOL_FOR_TARGET)"; export DLLTOOL; \
+	    LD="$(LD_FOR_TARGET)"; export LD; \
+            LDFLAGS="$(LDFLAGS_FOR_TARGET)"; export LDFLAGS; \
+	    NM="$(NM_FOR_TARGET)"; export NM; \
+	    RANLIB="$(RANLIB_FOR_TARGET)"; export RANLIB; \
+	    WINDRES="$(WINDRES_FOR_TARGET)"; export WINDRES; \
+	    echo Configuring in $(TARGET_SUBDIR)/rda; \
+	    cd "$(TARGET_SUBDIR)/rda" || exit 1; \
+	    case $(srcdir) in \
+	    /* | [A-Za-z]:[\\/]*) \
+	      topdir=$(srcdir) ;; \
+	    *) \
+	      case "$(TARGET_SUBDIR)" in \
+	      .) topdir="../$(srcdir)" ;; \
+	      *) topdir="../../$(srcdir)" ;; \
+	      esac ;; \
+	    esac; \
+	    if [ "$(srcdir)" = "." ] ; then \
+	      if [ "$(TARGET_SUBDIR)" != "." ] ; then \
+		if $(SHELL) $$s/symlink-tree $${topdir}/rda "no-such-file" ; then \
+		  if [ -f Makefile ]; then \
+		    if $(MAKE) distclean; then \
+		      true; \
+		    else \
+		      exit 1; \
+		    fi; \
+		  else \
+		    true; \
+		  fi; \
+		else \
+		  exit 1; \
+		fi; \
+	      else \
+		true; \
+	      fi; \
+	      srcdiroption="--srcdir=."; \
+	      libsrcdir="."; \
+	    else \
+	      srcdiroption="--srcdir=$${topdir}/rda"; \
+	      libsrcdir="$$s/rda"; \
+	    fi; \
+	    if [ -f $${libsrcdir}/configure ] ; then \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $${libsrcdir}/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    else \
+	      rm -f no-such-file skip-this-dir; \
+	      CONFIG_SITE=no-such-file $(SHELL) $$s/configure \
+		$(TARGET_CONFIGARGS) $${srcdiroption} \
+		--with-target-subdir="$(TARGET_SUBDIR)"; \
+	    fi || exit 1; \
+	    if [ -f skip-this-dir ] ; then \
+	      sh skip-this-dir; \
+	      rm -f skip-this-dir; \
+	      cd ..; rmdir rda || true; \
+	    else \
+	      true; \
+	    fi; \
+	  else \
+	    true; \
+	  fi; \
+	else \
+	  true; \
+	fi
+
+.PHONY: all-target-rda
+all-target-rda:
+	@dir=rda ; \
+	if [ -f $(TARGET_SUBDIR)/rda/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/rda; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) all); \
+	else \
+	  true; \
+	fi
+
+.PHONY: check-target-rda
+check-target-rda:
+	@dir=rda ; \
+	if [ -f $(TARGET_SUBDIR)/rda/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/rda; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) check);\
+	else \
+	  true; \
+	fi
+
+\
+.PHONY: install-target-rda
+install-target-rda: installdirs
+	@dir=rda ; \
+	if [ -f $(TARGET_SUBDIR)/rda/Makefile ] ; then \
+	  r=`${PWD}`; export r; \
+	  s=`cd $(srcdir); ${PWD}`; export s; \
+	  $(SET_LIB_PATH) \
+	  (cd $(TARGET_SUBDIR)/rda; \
+	    $(MAKE) $(TARGET_FLAGS_TO_PASS) install); \
+	else \
+	  true; \
+	fi
+
+
 
 # This rule is used to build the modules which use X11_FLAGS_TO_PASS.
 # To build a target all-X means to cd to X and make all.

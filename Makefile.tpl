@@ -652,20 +652,10 @@ all.normal: \
 # This target ensures that $(BASE_FLAGS_TO_PASS) appears only once,
 # because it is so large that it can easily overflow the command line
 # length limit on some systems.
-DO_X = \
-	do-clean \
-	do-distclean \
-	do-dvi \
-	do-info \
-	do-install-info \
-	do-installcheck \
-	do-mostlyclean \
-	do-maintainer-clean \
-	do-TAGS
-.PHONY: $(DO_X)
-$(DO_X):
-	@target=`echo $@ | sed -e 's/^do-//'`; \
-	r=`${PWD}`; export r; \
+[+ FOR recursive_targets +]
+.PHONY: do-[+target+]
+do-[+target+]:
+	@r=`${PWD}`; export r; \
 	s=`cd $(srcdir); ${PWD}`; export s; \
 	$(SET_LIB_PATH) \
 	for i in $(SUBDIRS) -dummy-; do \
@@ -687,11 +677,11 @@ $(DO_X):
 			"CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
 	                "`echo \"RANLIB=$${RANLIB}\" | sed -e 's/.*=$$/XFOO=/'`" \
 			"DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
-			$${target}); \
+			[+target+]); \
 	    then true; else exit 1; fi; \
 	  else true; fi; \
 	done
-	@target=`echo $@ | sed -e 's/^do-//'`; \
+	# Break into two pieces
 	r=`${PWD}`; export r; \
 	s=`cd $(srcdir); ${PWD}`; export s; \
 	$(SET_LIB_PATH) \
@@ -705,10 +695,12 @@ $(DO_X):
 			"CC=$${CC}" "CXX=$${CXX}" "LD=$${LD}" "NM=$${NM}" \
 	                "`echo \"RANLIB=$${RANLIB}\" | sed -e 's/.*=$$/XFOO=/'`" \
 			"DLLTOOL=$${DLLTOOL}" "WINDRES=$${WINDRES}" \
-			$${target}); \
+			[+target+]); \
 	    then true; else exit 1; fi; \
 	  else true; fi; \
 	done
+[+ ENDFOR recursive_targets +]
+
 
 # Here are the targets which correspond to the do-X targets.
 
@@ -884,31 +876,28 @@ gcc-no-fixedincludes:
 	  mv gcc/tmp-include gcc/include 2>/dev/null; \
 	else true; fi
 
-# This rule is used to build the modules which are built with the
+# These rules are used to build the modules which are built with the
 # build machine's native compiler.
-.PHONY: $(ALL_BUILD_MODULES)
-$(ALL_BUILD_MODULES):
-	dir=`echo $@ | sed -e 's/all-build-//'`; \
-	if [ -f ./$${dir}/Makefile ] ; then \
+[+ FOR build_modules +]
+.PHONY: all-build-[+module+]
+all-build-[+module+]:
+	@if [ -f ./[+module+]/Makefile ] ; then \
 	  r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
-	  (cd $(BUILD_SUBDIR)/$${dir} && $(MAKE) all); \
+	  (cd $(BUILD_SUBDIR)/[+module+] && $(MAKE) all); \
 	else \
 	  true; \
 	fi
 
-# This rule is used to configure the modules which are built with the
-# native tools.
-.PHONY: $(CONFIGURE_BUILD_MODULES)
-$(CONFIGURE_BUILD_MODULES):
-	@dir=`echo $@ | sed -e 's/configure-build-//'`; \
-	if [ ! -d $(BUILD_SUBDIR) ]; then \
+.PHONY: configure-build-[+module+]
+configure-build-[+module+]:
+	@if [ ! -d $(BUILD_SUBDIR) ]; then \
 	  true; \
-	elif [ -f $(BUILD_SUBDIR)/$${dir}/Makefile ] ; then \
+	elif [ -f $(BUILD_SUBDIR)/[+module+]/Makefile ] ; then \
 	  true; \
-	elif echo " $(BUILD_CONFIGDIRS) " | grep " $${dir} " >/dev/null 2>&1; then \
-	  if [ -d $(srcdir)/$${dir} ]; then \
-	    [ -d $(BUILD_SUBDIR)/$${dir} ] || mkdir $(BUILD_SUBDIR)/$${dir};\
+	elif echo " $(BUILD_CONFIGDIRS) " | grep " [+module+] " >/dev/null 2>&1; then \
+	  if [ -d $(srcdir)/[+module+] ]; then \
+	    [ -d $(BUILD_SUBDIR)/[+module+] ] || mkdir $(BUILD_SUBDIR)/[+module+];\
 	    r=`${PWD}`; export r; \
 	    s=`cd $(srcdir); ${PWD}`; export s; \
 	    AR="$(AR_FOR_BUILD)"; export AR; \
@@ -924,8 +913,8 @@ $(CONFIGURE_BUILD_MODULES):
 	    NM="$(NM_FOR_BUILD)"; export NM; \
 	    RANLIB="$(RANLIB_FOR_BUILD)"; export RANLIB; \
 	    WINDRES="$(WINDRES_FOR_BUILD)"; export WINDRES; \
-	    echo Configuring in $(BUILD_SUBDIR)/$${dir}; \
-	    cd "$(BUILD_SUBDIR)/$${dir}" || exit 1; \
+	    echo Configuring in $(BUILD_SUBDIR)/[+module+]; \
+	    cd "$(BUILD_SUBDIR)/[+module+]" || exit 1; \
 	    case $(srcdir) in \
 	    /* | [A-Za-z]:[\\/]*) \
 	      topdir=$(srcdir) ;; \
@@ -937,7 +926,7 @@ $(CONFIGURE_BUILD_MODULES):
 	    esac; \
 	    if [ "$(srcdir)" = "." ] ; then \
 	      if [ "$(BUILD_SUBDIR)" != "." ] ; then \
-		if $(SHELL) $$s/symlink-tree $${topdir}/$${dir} "no-such-file" ; then \
+		if $(SHELL) $$s/symlink-tree $${topdir}/[+module+] "no-such-file" ; then \
 		  if [ -f Makefile ]; then \
 		    if $(MAKE) distclean; then \
 		      true; \
@@ -956,8 +945,8 @@ $(CONFIGURE_BUILD_MODULES):
 	      srcdiroption="--srcdir=."; \
 	      libsrcdir="."; \
 	    else \
-	      srcdiroption="--srcdir=$${topdir}/$${dir}"; \
-	      libsrcdir="$$s/$${dir}"; \
+	      srcdiroption="--srcdir=$${topdir}/[+module+]"; \
+	      libsrcdir="$$s/[+module+]"; \
 	    fi; \
 	    if [ -f $${libsrcdir}/configure ] ; then \
 	      rm -f no-such-file skip-this-dir; \
@@ -973,7 +962,7 @@ $(CONFIGURE_BUILD_MODULES):
 	    if [ -f skip-this-dir ] ; then \
 	      sh skip-this-dir; \
 	      rm -f skip-this-dir; \
-	      cd ..; rmdir $${dir} || true; \
+	      cd ..; rmdir [+module+] || true; \
 	    else \
 	      true; \
 	    fi; \
@@ -983,6 +972,7 @@ $(CONFIGURE_BUILD_MODULES):
 	else \
 	  true; \
 	fi
+[+ ENDFOR build_modules +]
 
 # This rule is used to build the modules which use FLAGS_TO_PASS.  To
 # build a target all-X means to cd to X and make all.
@@ -1041,36 +1031,36 @@ $(INSTALL_MODULES): installdirs
 	  true; \
 	fi
 
-# This rule is used to configure the modules which are built with the
-# target tools.
-.PHONY: $(CONFIGURE_TARGET_MODULES)
-$(CONFIGURE_TARGET_MODULES):
-	@dir=`echo $@ | sed -e 's/configure-target-//'`; \
-	if [ -d $(TARGET_SUBDIR)/$${dir} ]; then \
+# These rules are used to build the modules which are built with the target
+# tools.  To make foo-X means to cd to X and make foo.
+[+ FOR target_modules +]
+.PHONY: configure-target-[+module+]
+configure-target-[+module+]:
+	@if [ -d $(TARGET_SUBDIR)/[+module+] ]; then \
 	  r=`${PWD}`; export r; \
-	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/$${dir}/tmpmulti.out 2> /dev/null; \
-	  if [ -s $(TARGET_SUBDIR)/$${dir}/tmpmulti.out ]; then \
-	    if [ -f $(TARGET_SUBDIR)/$${dir}/multilib.out ]; then \
-	      if cmp $(TARGET_SUBDIR)/$${dir}/multilib.out $(TARGET_SUBDIR)/$${dir}/tmpmulti.out > /dev/null; then \
-		rm -f $(TARGET_SUBDIR)/$${dir}/tmpmulti.out; \
+	  $(CC_FOR_TARGET) --print-multi-lib > $(TARGET_SUBDIR)/[+module+]/tmpmulti.out 2> /dev/null; \
+	  if [ -s $(TARGET_SUBDIR)/[+module+]/tmpmulti.out ]; then \
+	    if [ -f $(TARGET_SUBDIR)/[+module+]/multilib.out ]; then \
+	      if cmp $(TARGET_SUBDIR)/[+module+]/multilib.out $(TARGET_SUBDIR)/[+module+]/tmpmulti.out > /dev/null; then \
+		rm -f $(TARGET_SUBDIR)/[+module+]/tmpmulti.out; \
 	      else \
-		echo "Multilibs changed for $${dir}, reconfiguring"; \
-		rm -f $(TARGET_SUBDIR)/$${dir}/multilib.out $(TARGET_SUBDIR)/$${dir}/Makefile; \
-		mv $(TARGET_SUBDIR)/$${dir}/tmpmulti.out $(TARGET_SUBDIR)/$${dir}/multilib.out; \
+		echo "Multilibs changed for [+module+], reconfiguring"; \
+		rm -f $(TARGET_SUBDIR)/[+module+]/multilib.out $(TARGET_SUBDIR)/[+module+]/Makefile; \
+		mv $(TARGET_SUBDIR)/[+module+]/tmpmulti.out $(TARGET_SUBDIR)/[+module+]/multilib.out; \
 	      fi; \
 	    else \
-	      mv $(TARGET_SUBDIR)/$${dir}/tmpmulti.out $(TARGET_SUBDIR)/$${dir}/multilib.out; \
+	      mv $(TARGET_SUBDIR)/[+module+]/tmpmulti.out $(TARGET_SUBDIR)/[+module+]/multilib.out; \
 	    fi; \
 	  fi; \
 	fi; exit 0	# break command into two pieces
-	@dir=`echo $@ | sed -e 's/configure-target-//'`; \
+	@dir=[+module+] ; \
 	if [ ! -d $(TARGET_SUBDIR) ]; then \
 	  true; \
-	elif [ -f $(TARGET_SUBDIR)/$${dir}/Makefile ] ; then \
+	elif [ -f $(TARGET_SUBDIR)/[+module+]/Makefile ] ; then \
 	  true; \
-	elif echo " $(TARGET_CONFIGDIRS) " | grep " $${dir} " >/dev/null 2>&1; then \
-	  if [ -d $(srcdir)/$${dir} ]; then \
-	    [ -d $(TARGET_SUBDIR)/$${dir} ] || mkdir $(TARGET_SUBDIR)/$${dir};\
+	elif echo " $(TARGET_CONFIGDIRS) " | grep " [+module+] " >/dev/null 2>&1; then \
+	  if [ -d $(srcdir)/[+module+] ]; then \
+	    [ -d $(TARGET_SUBDIR)/[+module+] ] || mkdir $(TARGET_SUBDIR)/[+module+];\
 	    r=`${PWD}`; export r; \
 	    s=`cd $(srcdir); ${PWD}`; export s; \
 	    $(SET_LIB_PATH) \
@@ -1087,8 +1077,8 @@ $(CONFIGURE_TARGET_MODULES):
 	    NM="$(NM_FOR_TARGET)"; export NM; \
 	    RANLIB="$(RANLIB_FOR_TARGET)"; export RANLIB; \
 	    WINDRES="$(WINDRES_FOR_TARGET)"; export WINDRES; \
-	    echo Configuring in $(TARGET_SUBDIR)/$${dir}; \
-	    cd "$(TARGET_SUBDIR)/$${dir}" || exit 1; \
+	    echo Configuring in $(TARGET_SUBDIR)/[+module+]; \
+	    cd "$(TARGET_SUBDIR)/[+module+]" || exit 1; \
 	    case $(srcdir) in \
 	    /* | [A-Za-z]:[\\/]*) \
 	      topdir=$(srcdir) ;; \
@@ -1100,7 +1090,7 @@ $(CONFIGURE_TARGET_MODULES):
 	    esac; \
 	    if [ "$(srcdir)" = "." ] ; then \
 	      if [ "$(TARGET_SUBDIR)" != "." ] ; then \
-		if $(SHELL) $$s/symlink-tree $${topdir}/$${dir} "no-such-file" ; then \
+		if $(SHELL) $$s/symlink-tree $${topdir}/[+module+] "no-such-file" ; then \
 		  if [ -f Makefile ]; then \
 		    if $(MAKE) distclean; then \
 		      true; \
@@ -1119,8 +1109,8 @@ $(CONFIGURE_TARGET_MODULES):
 	      srcdiroption="--srcdir=."; \
 	      libsrcdir="."; \
 	    else \
-	      srcdiroption="--srcdir=$${topdir}/$${dir}"; \
-	      libsrcdir="$$s/$${dir}"; \
+	      srcdiroption="--srcdir=$${topdir}/[+module+]"; \
+	      libsrcdir="$$s/[+module+]"; \
 	    fi; \
 	    if [ -f $${libsrcdir}/configure ] ; then \
 	      rm -f no-such-file skip-this-dir; \
@@ -1136,7 +1126,7 @@ $(CONFIGURE_TARGET_MODULES):
 	    if [ -f skip-this-dir ] ; then \
 	      sh skip-this-dir; \
 	      rm -f skip-this-dir; \
-	      cd ..; rmdir $${dir} || true; \
+	      cd ..; rmdir [+module+] || true; \
 	    else \
 	      true; \
 	    fi; \
@@ -1147,51 +1137,47 @@ $(CONFIGURE_TARGET_MODULES):
 	  true; \
 	fi
 
-# This rule is used to build the modules which use TARGET_FLAGS_TO_PASS.
-# To build a target all-X means to cd to X and make all.
-.PHONY: $(ALL_TARGET_MODULES)
-$(ALL_TARGET_MODULES):
-	@dir=`echo $@ | sed -e 's/all-target-//'`; \
-	if [ -f $(TARGET_SUBDIR)/$${dir}/Makefile ] ; then \
+.PHONY: all-target-[+module+]
+all-target-[+module+]:
+	@dir=[+module+] ; \
+	if [ -f $(TARGET_SUBDIR)/[+module+]/Makefile ] ; then \
 	  r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
-	  (cd $(TARGET_SUBDIR)/$${dir}; \
+	  (cd $(TARGET_SUBDIR)/[+module+]; \
 	    $(MAKE) $(TARGET_FLAGS_TO_PASS) all); \
 	else \
 	  true; \
 	fi
-
-# This rule is used to check the modules which use TARGET_FLAGS_TO_PASS.
-# To build a target install-X means to cd to X and make install.
-.PHONY: $(CHECK_TARGET_MODULES)
-$(CHECK_TARGET_MODULES):
-	@dir=`echo $@ | sed -e 's/check-target-//'`; \
-	if [ -f $(TARGET_SUBDIR)/$${dir}/Makefile ] ; then \
+[+ IF no_check +][+ ELSE check +]
+.PHONY: check-target-[+module+]
+check-target-[+module+]:
+	@dir=[+module+] ; \
+	if [ -f $(TARGET_SUBDIR)/[+module+]/Makefile ] ; then \
 	  r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
-	  (cd $(TARGET_SUBDIR)/$${dir}; \
+	  (cd $(TARGET_SUBDIR)/[+module+]; \
 	    $(MAKE) $(TARGET_FLAGS_TO_PASS) check);\
 	else \
 	  true; \
 	fi
-
-# This rule is used to install the modules which use
-# TARGET_FLAGS_TO_PASS.  To build a target install-X means to cd to X
-# and make install.
-.PHONY: $(INSTALL_TARGET_MODULES)
-$(INSTALL_TARGET_MODULES): installdirs
-	@dir=`echo $@ | sed -e 's/install-target-//'`; \
-	if [ -f $(TARGET_SUBDIR)/$${dir}/Makefile ] ; then \
+[+ ENDIF no_check +]
+[+ IF no_install +][+ ELSE install +]\
+.PHONY: install-target-[+module+]
+install-target-[+module+]: installdirs
+	@dir=[+module+] ; \
+	if [ -f $(TARGET_SUBDIR)/[+module+]/Makefile ] ; then \
 	  r=`${PWD}`; export r; \
 	  s=`cd $(srcdir); ${PWD}`; export s; \
 	  $(SET_LIB_PATH) \
-	  (cd $(TARGET_SUBDIR)/$${dir}; \
+	  (cd $(TARGET_SUBDIR)/[+module+]; \
 	    $(MAKE) $(TARGET_FLAGS_TO_PASS) install); \
 	else \
 	  true; \
 	fi
+[+ ENDIF no_install +]
+[+ ENDFOR target_modules +]
 
 # This rule is used to build the modules which use X11_FLAGS_TO_PASS.
 # To build a target all-X means to cd to X and make all.

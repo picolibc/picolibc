@@ -1,6 +1,8 @@
 #! /usr/bin/autogen
 AutoGen definitions Makefile.tpl;
 
+build_modules= { module= libiberty; };
+
 host_modules= { module= ash; };
 host_modules= { module= autoconf; };
 host_modules= { module= automake; };
@@ -85,3 +87,15 @@ target_modules = { module= zlib; };
 target_modules = { module= boehm-gc; };
 target_modules = { module= qthreads; };
 target_modules = { module= rda; };
+
+// These are (some of) the targets to be done in each subdirectory.
+// Not all; these are the ones which don't have special options.
+recursive_targets = { target= clean; };
+recursive_targets = { target= distclean; };
+recursive_targets = { target= dvi; };
+recursive_targets = { target= info; };
+recursive_targets = { target= install-info; };
+recursive_targets = { target= installcheck; };
+recursive_targets = { target= mostlyclean; };
+recursive_targets = { target= maintainer-clean; };
+recursive_targets = { target= TAGS; };
