@@ -37,7 +37,8 @@ infodir=${prefix}/info
 mandir=${prefix}/man
 gxx_include_dir=${includedir}/g++
 
-tooldir = $(exec_prefix)/$(target)
+tooldir = $(exec_prefix)/$(target_alias)
+build_tooldir = $(exec_prefix)/$(target_alias)
 
 program_transform_name =
 
@@ -97,9 +98,9 @@ CHILL_LIB = -lchill
 CXX = c++
 
 # Use -O2 to stress test the compiler.
-LIBCXXFLAGS = $(CXXFLAGS) -fno-implicit-templates -fexceptions
+LIBCXXFLAGS = $(CXXFLAGS) -fno-implicit-templates
 CXXFLAGS_FOR_TARGET = $(CXXFLAGS)
-LIBCXXFLAGS_FOR_TARGET = $(CXXFLAGS_FOR_TARGET) -fno-implicit-templates -fexceptions
+LIBCXXFLAGS_FOR_TARGET = $(CXXFLAGS_FOR_TARGET) -fno-implicit-templates
 
 RANLIB = ranlib
 
@@ -168,9 +169,7 @@ OTHERS =
 
 # This is set by the configure script to the list of directories which
 # should be built using the target tools.
-
-
-TARGET_CONFIGDIRS = libiberty libgloss $(SPECIAL_LIBS) newlib libio librx libstdc++ libg++ winsup opcodes bsp libstub cygmon
+TARGET_CONFIGDIRS = libiberty libgloss $(SPECIAL_LIBS) newlib libio librx libstdc++ libg++ winsup opcodes bsp libstub cygmon libf2c libchill libobjc
 
 # Target libraries are put under this directory:
 # Changed by configure to $(target_alias) if cross.
@@ -216,10 +215,10 @@ CC_FOR_TARGET = ` \
     if [ -f $$r/$(TARGET_SUBDIR)/newlib/Makefile ] ; then \
       case "$(target_canonical)" in \
         i[3456]86-*-cygwin*) \
-          echo $$r/gcc/xgcc -B$$r/gcc/ -B$(build_tooldir)/bin/ -B$$r/$(TARGET_SUBDIR)/newlib/ -L$$r/$(TARGET_SUBDIR)/winsup -L$$r/$(TARGET_SUBDIR)/winsup/cygwin -L$$r/$(TARGET_SUBDIR)/winsup/w32api/lib -idirafter $$r/$(TARGET_SUBDIR)/newlib/targ-include -idirafter $$s/winsup/include -idirafter $$s/winsup/cygwin/include -idirafter $$s/winsup/w32api/include -idirafter $$s/newlib/libc/include -idirafter $$s/newlib/libc/sys/cygwin -idirafter $$s/newlib/libc/sys/cygwin32 -nostdinc; \
+          echo $$r/gcc/xgcc -B$(build_tooldir)/bin/ -B$$r/$(TARGET_SUBDIR)/newlib/ -B$$r/gcc/ -L$$r/$(TARGET_SUBDIR)/winsup -L$$r/$(TARGET_SUBDIR)/winsup/cygwin -L$$r/$(TARGET_SUBDIR)/winsup/w32api/lib -idirafter $$r/$(TARGET_SUBDIR)/newlib/targ-include -idirafter $$s/winsup/include -idirafter $$s/winsup/cygwin/include -idirafter $$s/winsup/w32api/include -idirafter $$s/newlib/libc/include -idirafter $$s/newlib/libc/sys/cygwin -idirafter $$s/newlib/libc/sys/cygwin32 -nostdinc; \
           ;; \
         *) \
-          echo $$r/gcc/xgcc -B$$r/gcc/ -idirafter $$r/$(TARGET_SUBDIR)/newlib/targ-include -idirafter $$s/newlib/libc/include -nostdinc; \
+          echo $$r/gcc/xgcc -B$(build_tooldir)/bin/ -B$$r/$(TARGET_SUBDIR)/newlib/ -B$$r/gcc/ -idirafter $$r/$(TARGET_SUBDIR)/newlib/targ-include -idirafter $$s/newlib/libc/include -nostdinc; \
 	  ;; \
       esac \
     else \
@@ -237,11 +236,11 @@ CC_FOR_TARGET = ` \
 # variable is passed down to the gcc Makefile, where it is used to
 # build libgcc2.a.  We define it here so that it can itself be
 # overridden on the command line.
-GCC_FOR_TARGET = $$r/gcc/xgcc -B$(build_tooldir)/bin/ -B$(build_tooldir)/lib/ -B$$r/gcc/ -I$(build_tooldir)/include
+GCC_FOR_TARGET = $$r/gcc/xgcc -B$(build_tooldir)/bin/ -B$(build_tooldir)/lib/ -B$$r/gcc/ -isystem $(build_tooldir)/include
 
 CHILL_FOR_TARGET = ` \
   if [ -f $$r/gcc/xgcc ] ; then \
-    echo $$r/gcc/xgcc -B$$r/gcc/ -L$$r/gcc/ch/runtime/; \
+    echo $$r/gcc/xgcc -B$(build_tooldir)/bin/ -B$(build_tooldir)/lib/ -B$$r/gcc/ -L$$r/gcc/ch/runtime/; \
   else \
     if [ "$(host_canonical)" = "$(target_canonical)" ] ; then \
       echo $(CC); \
@@ -251,18 +250,18 @@ CHILL_FOR_TARGET = ` \
   fi`
 
 CXX_FOR_TARGET = ` \
-  if [ -f $$r/gcc/xgcc ] ; then \
+  if [ -f $$r/gcc/g++ ] ; then \
     if [ -f $$r/$(TARGET_SUBDIR)/newlib/Makefile ] ; then \
       case "$(target_canonical)" in \
         i[3456]86-*-cygwin*) \
-          echo $$r/gcc/xgcc -B$$r/gcc/ -B$(build_tooldir)/bin/ -B$$r/$(TARGET_SUBDIR)/newlib/ -L$$r/$(TARGET_SUBDIR)/winsup -idirafter $$r/$(TARGET_SUBDIR)/newlib/targ-include -idirafter $$s/winsup/cygwin/include -idirafter $$s/winsup/w32api/include -idirafter $$s/newlib/libc/include -idirafter $$s/newlib/libc/sys/cygwin -idirafter $$s/newlib/libc/sys/cygwin32 -nostdinc; \
+          echo $$r/gcc/g++ -B$(build_tooldir)/bin/ -B$$r/$(TARGET_SUBDIR)/newlib/ -B$$r/gcc/ -L$$r/$(TARGET_SUBDIR)/winsup -idirafter $$r/$(TARGET_SUBDIR)/newlib/targ-include -idirafter $$s/winsup/cygwin/include -idirafter $$s/winsup/w32api/include -idirafter $$s/newlib/libc/include -idirafter $$s/newlib/libc/sys/cygwin -idirafter $$s/newlib/libc/sys/cygwin32 -nostdinc -L$$r/$(TARGET_SUBDIR)/libstdc++; \
           ;; \
         *) \
-          echo $$r/gcc/xgcc -B$$r/gcc/ -idirafter $$r/$(TARGET_SUBDIR)/newlib/targ-include -idirafter $$s/newlib/libc/include -nostdinc; \
+          echo $$r/gcc/g++ -B$(build_tooldir)/bin/ -B$$r/$(TARGET_SUBDIR)/newlib/ -B$$r/gcc/ -idirafter $$r/$(TARGET_SUBDIR)/newlib/targ-include -idirafter $$s/newlib/libc/include -nostdinc -L$$r/$(TARGET_SUBDIR)/libstdc++; \
 	  ;; \
       esac \
     else \
-      echo $$r/gcc/g++ -B$(build_tooldir)/bin/ -B$(build_tooldir)/lib/ -B$$r/gcc/ -I$(build_tooldir)/include; \
+      echo $$r/gcc/g++ -B$(build_tooldir)/bin/ -B$(build_tooldir)/lib/ -B$$r/gcc/ -isystem $(build_tooldir)/include -L$$r/$(TARGET_SUBDIR)/libstdc++; \
     fi; \
   else \
     if [ "$(host_canonical)" = "$(target_canonical)" ] ; then \
@@ -423,6 +422,7 @@ BASE_FLAGS_TO_PASS = \
 	"sharedstatedir=$(sharedstatedir)" \
 	"sysconfdir=$(sysconfdir)" \
 	"tooldir=$(tooldir)" \
+	"build_tooldir=$(build_tooldir)" \
 	"gxx_include_dir=$(gxx_include_dir)" \
 	"gcc_version=$(gcc_version)" \
 	"gcc_version_trigger=$(gcc_version_trigger)" \
@@ -565,6 +565,7 @@ ALL_MODULES = \
 	all-send-pr \
 	all-shellutils \
 	all-sim \
+	all-snavigator \
 	all-tar \
 	all-tcl \
 	all-tcl8.1 \
@@ -636,6 +637,7 @@ CROSS_CHECK_MODULES = \
 	check-sed \
 	check-send-pr \
 	check-shellutils \
+	check-snavigator \
 	check-sim \
 	check-tar \
 	check-tcl \
@@ -711,8 +713,8 @@ INSTALL_MODULES = \
 	install-send-pr \
 	install-shellutils \
 	install-sim \
+	install-snavigator \
 	install-tar \
-	install-texinfo \
 	install-textutils \
 	install-tgas \
 	install-time \
@@ -766,9 +768,13 @@ INSTALL_X11_MODULES = \
 ALL_TARGET_MODULES = \
 	all-target-libio \
 	all-target-libstdc++ \
+	all-target-libstdc++-v3 \
 	all-target-librx \
 	all-target-libg++ \
 	all-target-newlib \
+	all-target-libf2c \
+	all-target-libchill \
+	all-target-libobjc \
 	all-target-libtermcap \
 	all-target-winsup \
 	all-target-libgloss \
@@ -776,6 +782,11 @@ ALL_TARGET_MODULES = \
 	all-target-gperf \
 	all-target-examples \
 	all-target-libstub \
+	all-target-libffi \
+	all-target-libjava \
+	all-target-zlib \
+	all-target-boehm-gc \
+	all-target-qthreads \
 	all-target-bsp \
 	all-target-cygmon
 
@@ -784,9 +795,13 @@ ALL_TARGET_MODULES = \
 CONFIGURE_TARGET_MODULES = \
 	configure-target-libio \
 	configure-target-libstdc++ \
+	configure-target-libstdc++-v3 \
 	configure-target-librx \
 	configure-target-libg++ \
 	configure-target-newlib \
+	configure-target-libf2c \
+	configure-target-libchill \
+	configure-target-libobjc \
 	configure-target-libtermcap \
 	configure-target-winsup \
 	configure-target-libgloss \
@@ -794,6 +809,11 @@ CONFIGURE_TARGET_MODULES = \
 	configure-target-gperf \
 	configure-target-examples \
 	configure-target-libstub \
+	configure-target-libffi \
+	configure-target-libjava \
+	configure-target-zlib \
+	configure-target-boehm-gc \
+	configure-target-qthreads \
 	configure-target-bsp \
 	configure-target-cygmon
 
@@ -802,10 +822,19 @@ CONFIGURE_TARGET_MODULES = \
 CHECK_TARGET_MODULES = \
 	check-target-libio \
 	check-target-libstdc++ \
+	check-target-libstdc++-v3 \
 	check-target-libg++ \
 	check-target-newlib \
+	check-target-libf2c \
+	check-target-libchill \
+	check-target-libobjc \
 	check-target-winsup \
 	check-target-libiberty \
+	check-target-libffi \
+	check-target-libjava \
+	check-target-zlib \
+	check-target-boehm-gc \
+	check-target-qthreads \
 	check-target-gperf
 
 # This is a list of the install targets for all of the modules which are
@@ -813,13 +842,21 @@ CHECK_TARGET_MODULES = \
 INSTALL_TARGET_MODULES = \
 	install-target-libio \
 	install-target-libstdc++ \
+	install-target-libstdc++-v3 \
 	install-target-libg++ \
 	install-target-newlib \
+	install-target-libf2c \
+	install-target-libchill \
+	install-target-libobjc \
 	install-target-libtermcap \
 	install-target-winsup \
 	install-target-libgloss \
 	install-target-libiberty \
 	install-target-bsp \
+	install-target-libjava \
+	install-target-zlib \
+	install-target-boehm-gc \
+	install-target-qthreads \
 	install-target-gperf
 
 # This is a list of the targets for which we can do a clean-{target}.
@@ -877,6 +914,7 @@ CLEAN_MODULES = \
 	clean-send-pr \
 	clean-shellutils \
 	clean-sim \
+	clean-snavigator \
 	clean-tar \
 	clean-tcl \
 	clean-texinfo \
@@ -891,15 +929,24 @@ CLEAN_MODULES = \
 CLEAN_TARGET_MODULES = \
 	clean-target-libio \
 	clean-target-libstdc++ \
+	clean-target-libstdc++-v3 \
 	clean-target-librx \
 	clean-target-libg++ \
 	clean-target-newlib \
+	clean-target-libf2c \
+	clean-target-libchill \
+	clean-target-libobjc \
 	clean-target-winsup \
 	clean-target-libgloss \
 	clean-target-libiberty \
 	clean-target-gperf \
 	clean-target-examples \
 	clean-target-libstub \
+	clean-target-libffi \
+	clean-target-libjava \
+	clean-target-zlib \
+	clean-target-boehm-gc \
+	clean-target-qthreads \
 	clean-target-bsp \
 	clean-target-cygmon
 
@@ -1155,7 +1202,6 @@ gcc-no-fixedincludes:
 	  rm -rf gcc/include; \
 	  mv gcc/tmp-include gcc/include 2>/dev/null; \
 	else true; fi
-
 
 # This rule is used to build the modules which use FLAGS_TO_PASS.  To
 # build a target all-X means to cd to X and make all.
@@ -1535,6 +1581,8 @@ all-bash:
 all-bfd: all-libiberty all-intl
 all-binutils: all-libiberty all-opcodes all-bfd all-flex all-bison all-byacc all-intl
 all-bison: all-texinfo
+configure-target-boehm-gc: configure-target-newlib configure-target-qthreads
+all-target-boehm-gc: configure-target-boehm-gc
 configure-target-bsp: $(ALL_GCC)
 all-target-bsp: configure-target-bsp all-gcc all-binutils all-target-newlib
 all-byacc:
@@ -1568,6 +1616,7 @@ all-gnuserv:
 configure-target-gperf: $(ALL_GCC)
 all-target-gperf: configure-target-gperf all-target-libiberty all-target-libstdc++
 all-gprof: all-libiberty all-bfd all-opcodes all-intl
+all-grep: all-libiberty
 all-grez: all-libiberty all-bfd all-opcodes
 all-gui: all-gdb all-libproc all-target-librx
 all-guile:
@@ -1588,13 +1637,22 @@ all-target-libio: configure-target-libio all-gas all-ld all-gcc all-target-libib
 check-target-libio:
 all-libgui: all-tcl all-tk all-tcl8.1 all-tk8.1 all-itcl
 all-libiberty:
+configure-target-libffi: $(ALL_GCC) 
+configure-target-libjava: $(ALL_GCC) configure-target-zlib configure-target-boehm-gc configure-target-qthreads configure-target-newlib configure-target-libffi
+all-target-libffi: configure-target-libffi
+all-target-libjava: configure-target-libjava all-gcc all-zip all-target-newlib all-target-zlib all-target-boehm-gc all-target-qthreads all-target-libffi
 configure-target-librx: $(ALL_GCC) configure-target-newlib
 all-target-librx: configure-target-librx
 configure-target-libstdc++: $(ALL_GCC)
+configure-target-libstdc++-v3: $(ALL_GCC)
 all-target-libstdc++: configure-target-libstdc++ all-gas all-ld all-gcc all-target-libiberty all-target-newlib all-target-libio
+all-target-libstdc++-v3: configure-target-libstdc++-v3 all-gas all-ld all-gcc all-target-libiberty all-target-newlib 
 configure-target-libstub: $(ALL_GCC)
 all-target-libstub: configure-target-libstub
 all-libtool:
+all-target-libf2c: configure-target-libf2c all-gas all-ld all-gcc all-target-libiberty all-target-newlib
+all-target-libchill: configure-target-libchill all-gas all-ld all-gcc all-target-libiberty all-target-newlib
+all-target-libobjc: configure-target-libobjc all-gas all-ld all-gcc all-target-libiberty all-target-newlib
 all-m4: all-libiberty
 all-make: all-libiberty
 all-mmalloc:
@@ -1606,6 +1664,8 @@ all-opcodes: all-bfd all-libiberty
 all-patch: all-libiberty
 all-perl:
 all-prms: all-libiberty
+configure-target-qthreads: configure-target-newlib
+all-target-qthreads: configure-target-qthreads
 all-rcs:
 all-readline:
 all-recode: all-libiberty
@@ -1613,6 +1673,7 @@ all-sed: all-libiberty
 all-send-pr: all-prms
 all-shellutils:
 all-sim: all-libiberty all-bfd all-opcodes all-readline
+all-snavigator: all-tcl all-tk all-itcl all-db all-grep all-libgui
 all-tar: all-libiberty
 all-tcl:
 all-tcl8.1:
@@ -1629,6 +1690,8 @@ all-target-winsup: all-target-newlib all-target-libiberty all-target-libtermcap 
 configure-target-winsup: configure-target-newlib
 all-uudecode: all-libiberty
 all-zip:
+configure-target-zlib: $(ALL_GCC)
+all-target-zlib: configure-target-zlib
 configure-target-libiberty: $(ALL_GCC) configure-target-newlib
 all-target-libiberty: configure-target-libiberty all-gcc all-ld all-target-newlib
 all-target: $(ALL_TARGET_MODULES)

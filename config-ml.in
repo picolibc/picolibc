@@ -280,6 +280,17 @@ arm-*-*)
 	    esac
 	  done
 	fi
+	if [ x"$enable_nofmult" = xno ]
+	then
+	  old_multidirs="${multidirs}"
+	  multidirs=""
+	  for x in ${old_multidirs}; do
+	    case "$x" in
+	      *nofmult* ) : ;;
+	      *) multidirs="${multidirs} ${x}" ;;
+	    esac
+	  done
+	fi
 	;;
 m68*-*-*)
 	if [ x$enable_softfloat = xno ]
@@ -362,6 +373,28 @@ mips*-*-*)
 	    esac
 	  done
 	fi
+	case " $multidirs " in
+	*" mabi=64 "*)
+	  # We will not be able to create libraries with -mabi=64 if
+	  # we cannot even link a trivial program.  It usually
+	  # indicates the 64bit libraries are missing.
+	  if echo 'main() {}' > conftest.c &&
+	     ${CC-gcc} -mabi=64 conftest.c -o conftest; then
+	    :
+	  else
+	    echo Could not link program with -mabi=64, disabling it.
+	    old_multidirs="${multidirs}"
+	    multidirs=""
+	    for x in ${old_multidirs}; do
+	      case "$x" in
+	      *mabi=64* ) : ;;
+	      *) multidirs="${multidirs} ${x}" ;;
+	      esac
+	    done
+	  fi
+	  rm -f conftest.c conftest
+	  ;;
+	esac
 	;;
 powerpc*-*-* | rs6000*-*-*)
 	if [ x$enable_softfloat = xno ]
@@ -442,6 +475,30 @@ powerpc*-*-* | rs6000*-*-*)
 	  done
 	fi
 	;;
+sparc*-*-*)
+	case " $multidirs " in
+	*" m64 "*)
+	  # We will not be able to create libraries with -m64 if
+	  # we cannot even link a trivial program.  It usually
+	  # indicates the 64bit libraries are missing.
+	  if echo 'main() {}' > conftest.c &&
+	     ${CC-gcc} -m64 conftest.c -o conftest; then
+	    :
+	  else
+	    echo Could not link program with -m64, disabling it.
+	    old_multidirs="${multidirs}"
+	    multidirs=""
+	    for x in ${old_multidirs}; do
+	      case "$x" in
+	      *m64* ) : ;;
+	      *) multidirs="${multidirs} ${x}" ;;
+	      esac
+	    done
+	  fi
+	  rm -f conftest.c conftest
+	  ;;
+	esac
+	;;
 esac
 
 # Remove extraneous blanks from multidirs.
@@ -472,6 +529,8 @@ multi-do:
 		flags=`echo $$i | sed -e 's/^[^;]*;//' -e 's/@/ -/g'`; \
 		if (cd ../$${dir}/$${lib}; $(MAKE) $(FLAGS_TO_PASS) \
 				CFLAGS="$(CFLAGS) $${flags}" \
+				prefix="$(prefix)" \
+				exec_prefix="$(exec_prefix)" \
 				CXXFLAGS="$(CXXFLAGS) $${flags}" \
 				LIBCFLAGS="$(LIBCFLAGS) $${flags}" \
 				LIBCXXFLAGS="$(LIBCXXFLAGS) $${flags}" \
@@ -615,7 +674,24 @@ if [ -n "${multidirs}" ] && [ -z "${ml_norecursion}" ]; then
       echo "pwd: `pwd`"
     fi
 
-    if [ -d ${ml_dir} ]; then true; else mkdir ${ml_dir}; fi
+    if [ -d ${ml_dir} ]; then true; else
+      # ``mkdir -p ${ml_dir}'' See also mkinstalldirs.
+      pathcomp=""
+      for d in `echo ":${ml_dir}" | sed -ne 's/^:\//#/;s/^://;s/\// /g;s/^#/\//;p'`; do
+        pathcomp="$pathcomp$d"
+        case "$pathcomp" in
+          -* ) pathcomp=./$pathcomp ;;
+        esac
+        if test ! -d "$pathcomp"; then
+           echo "mkdir $pathcomp" 1>&2
+           mkdir "$pathcomp" > /dev/null 2>&1 || lasterr=$?
+        fi
+        if test ! -d "$pathcomp"; then
+	   exit $lasterr
+        fi
+        pathcomp="$pathcomp/"
+      done
+    fi
     if [ -d ${ml_dir}/${ml_libdir} ]; then true; else mkdir ${ml_dir}/${ml_libdir}; fi
 
     # Eg: if ${ml_dir} = m68000/m68881, dotdot = ../../
@@ -668,7 +744,18 @@ if [ -n "${multidirs}" ] && [ -z "${ml_norecursion}" ]; then
     if [ -f ${ml_newsrcdir}/configure ]; then
       ml_recprog=${ml_newsrcdir}/configure
     fi
-    if eval ${ml_config_shell} ${ml_recprog} \
+
+    # find compiler flag corresponding to ${ml_dir}
+    for i in `${CC-gcc} --print-multi-lib 2>/dev/null`; do 
+      dir=`echo $i | sed -e 's/;.*$//'`
+      if [ "${dir}" = "${ml_dir}" ]; then
+        flags=`echo $i | sed -e 's/^[^;]*;//' -e 's/@/ -/g'`
+        break
+      fi
+    done
+    ml_config_env='CC="${CC} $flags"'
+
+    if eval ${ml_config_env} ${ml_config_shell} ${ml_recprog} \
 	--with-multisubdir=${ml_dir} --with-multisrctop=${multisrctop} \
 	${ml_arguments} ${ml_srcdiroption} ; then
       true
