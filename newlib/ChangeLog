@@ -1,3 +1,8 @@
+2002-11-25  Kazu Hirata  <kazu@cs.umass.edu>
+
+	* libc/string/memset.c (memset): Make it safe even if
+	sizeof (int) = 2.
+
 2002-11-22  Joe Buehler  <jbuehler@hekimian.com>
 
 	* configure.in: Change check for libc/include in ${CC} to
