@@ -1,3 +1,8 @@
+Mon Jul 17 17:56:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* environ.cc (setenv): Use __cygwin_environ instead of
+	environ after reallocating environment space.
+
 Sun Jul 16 20:23:21 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* _cygwin_crt0_common.cc: Undef 'environ' or suffer compiler error.

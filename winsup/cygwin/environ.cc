@@ -228,9 +228,9 @@ setenv (const char *name, const char *value, int rewrite)
 	;
       __cygwin_environ = (char **) realloc ((char *) environ,
 				   (size_t) (sizeof (char *) * (cnt + 2)));
-      if (!environ)
+      if (!__cygwin_environ)
 	return -1;
-      environ[cnt + 1] = NULL;
+      __cygwin_environ[cnt + 1] = NULL;
       update_envptrs ();
       offset = cnt;
     }
