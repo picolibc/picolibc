@@ -146,6 +146,7 @@ LIB_SOURCES = \
 	sched.c \
 	select.c \
 	seteuid.c \
+	sethostname.c \
 	shm_open.c \
 	shm_unlink.c \
 	sig.c \
@@ -177,15 +178,18 @@ SIGNAL_H = /usr/src/$(shell ls /usr/src/ | grep ^linux | head -n 1)/include/asm/
 
 liblinux_la_LDFLAGS = -Xcompiler -nostdlib
 
+add_objs = 
+
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = @USE_LIBTOOL_TRUE@liblinux.la
 @USE_LIBTOOL_TRUE@liblinux_la_SOURCES = @USE_LIBTOOL_TRUE@$(LIB_SOURCES)
-@USE_LIBTOOL_TRUE@liblinux_la_LIBADD = @USE_LIBTOOL_TRUE@$(LINUX_MACH_LIB)
+@USE_LIBTOOL_TRUE@liblinux_la_LIBADD = @USE_LIBTOOL_TRUE@$(LINUX_MACH_LIB) $(add_objs)
+@USE_LIBTOOL_TRUE@liblinux_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@$(LINUX_MACH_LIB) $(add_objs)
 @USE_LIBTOOL_TRUE@noinst_DATA = @USE_LIBTOOL_TRUE@objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_DATA = 
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
 @USE_LIBTOOL_FALSE@lib_a_SOURCES = @USE_LIBTOOL_FALSE@$(LIB_SOURCES)
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(LINUX_MACH_LIB)
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(LINUX_MACH_LIB)
+@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(LINUX_MACH_LIB) $(add_objs)
+@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(LINUX_MACH_LIB) $(add_objs)
 
 AM_CFLAGS = -I $(srcdir)/../../stdio
 ACLOCAL_AMFLAGS = -I ../../..
@@ -216,9 +220,9 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@pwrite64.$(OBJEXT) raise.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@realpath.$(OBJEXT) rename.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@resource.$(OBJEXT) sched.$(OBJEXT) select.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@seteuid.$(OBJEXT) shm_open.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@shm_unlink.$(OBJEXT) sig.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@sigaction.$(OBJEXT) sigqueue.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@seteuid.$(OBJEXT) sethostname.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@shm_open.$(OBJEXT) shm_unlink.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@sig.$(OBJEXT) sigaction.$(OBJEXT) sigqueue.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@signal.$(OBJEXT) siglongjmp.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@sigset.$(OBJEXT) sigwait.$(OBJEXT) socket.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@sleep.$(OBJEXT) stack.$(OBJEXT) strsignal.$(OBJEXT) \
@@ -228,7 +232,6 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@usleep.$(OBJEXT) wait.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
-@USE_LIBTOOL_TRUE@liblinux_la_DEPENDENCIES = 
 @USE_LIBTOOL_TRUE@liblinux_la_OBJECTS =  brk.lo cfspeed.lo flockfile.lo \
 @USE_LIBTOOL_TRUE@ftok.lo funlockfile.lo getdate.lo getdate_err.lo \
 @USE_LIBTOOL_TRUE@gethostname.lo getoptlong.lo getreent.lo ids.lo \
@@ -238,11 +241,12 @@ LTLIBRARIES =  $(noinst_LTLIBRARIES)
 @USE_LIBTOOL_TRUE@ntp_gettime.lo pread.lo pread64.lo process.lo \
 @USE_LIBTOOL_TRUE@psignal.lo pwrite.lo pwrite64.lo raise.lo realpath.lo \
 @USE_LIBTOOL_TRUE@rename.lo resource.lo sched.lo select.lo seteuid.lo \
-@USE_LIBTOOL_TRUE@shm_open.lo shm_unlink.lo sig.lo sigaction.lo \
-@USE_LIBTOOL_TRUE@sigqueue.lo signal.lo siglongjmp.lo sigset.lo \
-@USE_LIBTOOL_TRUE@sigwait.lo socket.lo sleep.lo stack.lo strsignal.lo \
-@USE_LIBTOOL_TRUE@sysconf.lo sysctl.lo systat.lo system.lo tcdrain.lo \
-@USE_LIBTOOL_TRUE@tcsendbrk.lo termios.lo time.lo usleep.lo wait.lo
+@USE_LIBTOOL_TRUE@sethostname.lo shm_open.lo shm_unlink.lo sig.lo \
+@USE_LIBTOOL_TRUE@sigaction.lo sigqueue.lo signal.lo siglongjmp.lo \
+@USE_LIBTOOL_TRUE@sigset.lo sigwait.lo socket.lo sleep.lo stack.lo \
+@USE_LIBTOOL_TRUE@strsignal.lo sysconf.lo sysctl.lo systat.lo system.lo \
+@USE_LIBTOOL_TRUE@tcdrain.lo tcsendbrk.lo termios.lo time.lo usleep.lo \
+@USE_LIBTOOL_TRUE@wait.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -581,7 +585,7 @@ clean-generic maintainer-clean-generic clean mostlyclean distclean \
 maintainer-clean
 
 
-@USE_LIBTOOL_FALSE@lib.a:  $(LINUX_MACH_LIB) $(lib_a_OBJECTS)
+@USE_LIBTOOL_FALSE@lib.a:  $(LINUX_MACH_LIB) $(lib_a_OBJECTS) $(add_objs)
 @USE_LIBTOOL_FALSE@	rm -f $@
 @USE_LIBTOOL_FALSE@	rm -rf tmp
 @USE_LIBTOOL_FALSE@	mkdir tmp

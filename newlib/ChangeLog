@@ -1,3 +1,9 @@
+2002-06-25  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/sys/linux/sethostname.c: New file.
+        * libc/sys/linux/Makefile.am: Add sethostname.c support.
+        * libc/sys/linux/Makefile.in: Regenerated.
+
 2002-06-24  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* libc/search/db_local.h: New file.

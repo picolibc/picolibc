@@ -49,6 +49,7 @@ LIB_SOURCES = \
 	sched.c \
 	select.c \
 	seteuid.c \
+	sethostname.c \
 	shm_open.c \
 	shm_unlink.c \
 	sig.c \
@@ -79,19 +80,22 @@ SIGNAL_H = /usr/src/$(shell ls /usr/src/ | grep ^linux | head -n 1)/include/asm/
 
 liblinux_la_LDFLAGS = -Xcompiler -nostdlib
 
+add_objs = 
+
 if USE_LIBTOOL
 noinst_LTLIBRARIES = liblinux.la
 liblinux_la_SOURCES = $(LIB_SOURCES)
-liblinux_la_LIBADD = $(LINUX_MACH_LIB)
+liblinux_la_LIBADD = $(LINUX_MACH_LIB) $(add_objs)
+liblinux_la_DEPENDENCIES = $(LINUX_MACH_LIB) $(add_objs)
 noinst_DATA = objectlist.awk.in
 else
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)
-lib_a_LIBADD = $(LINUX_MACH_LIB)
-lib_a_DEPENDENCIES = $(LINUX_MACH_LIB)
+lib_a_LIBADD = $(LINUX_MACH_LIB) $(add_objs)
+lib_a_DEPENDENCIES = $(LINUX_MACH_LIB) $(add_objs)
 noinst_DATA =
 
-lib.a:  $(LINUX_MACH_LIB) $(lib_a_OBJECTS)
+lib.a:  $(LINUX_MACH_LIB) $(lib_a_OBJECTS) $(add_objs)
 	rm -f $@
 	rm -rf tmp
 	mkdir tmp
