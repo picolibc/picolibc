@@ -52,8 +52,8 @@ _BEGIN_STD_C
 #if defined(__CYGWIN__) && !defined (_JBLEN)
 #define _JBLEN (13 * 4)
 #elif defined (__i386__)
-#ifdef __unix__
-# define _JBLEN	36
+#if defined(__unix__) || defined(__rtems__)
+# define _JBLEN	9
 #else
 #include "setjmp-dj.h"
 #endif

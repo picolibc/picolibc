@@ -1,3 +1,8 @@
+2002-12-10  Joel Sherrill  <joel@OARcorp.com>
+
+	* libc/include/machine/setjmp.h: Make sure _JBLEN is defined
+	for i386-rtems targets.
+
 2002-12-06  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/stdlib.h (strtof): New prototype (from C99).
