@@ -1,3 +1,8 @@
+2003-04-15  Chris January <chris@atomice.net>
+
+	* newlib/libc/include/sys/unistd.h: add declaration for gethostid on
+	Cygwin.
+
 2003-04-09  J"orn Rennecke <joern.rennecke@superh.com>
 
 	* libc/machine/sh/memset.S: Avoid clobbering volatile
