@@ -2553,27 +2553,36 @@ ffs (int i)
   return table[x >> a] + a;
 }
 
+static void
+locked_append (int fd, const void * buf, size_t size)
+{
+  struct __flock64 lock_buffer = {F_WRLCK, SEEK_SET, 0, 0, 0};
+  int count = 0;
+
+  do
+    if ((lock_buffer.l_start = lseek64 (fd, 0, SEEK_END)) != (_off64_t)-1
+	&& fcntl_worker (fd, F_SETLKW, &lock_buffer) != -1)
+      {
+	if (lseek64 (fd, 0, SEEK_END) != (_off64_t)-1)
+	  write (fd, buf, size);
+	lock_buffer.l_type = F_UNLCK;
+	fcntl_worker (fd, F_SETLK, &lock_buffer);
+	break;
+      }
+  while (count++ < 1000
+	 && (errno == EACCES || errno == EAGAIN)
+	 && !usleep (1000));
+}
+
 extern "C" void
 updwtmp (const char *wtmp_file, const struct utmp *ut)
 {
-  /* Writing to wtmp must be atomic to prevent mixed up data. */
-  char mutex_name[CYG_MAX_PATH];
-  HANDLE mutex;
   int fd;
 
-  mutex = CreateMutex (NULL, FALSE, shared_name (mutex_name, "wtmp_mutex", 0));
-  if (mutex)
-    while (WaitForSingleObject (mutex, INFINITE) == WAIT_ABANDONED)
-      ;
-  if ((fd = open (wtmp_file, O_WRONLY | O_APPEND | O_BINARY, 0)) >= 0)
+  if ((fd = open (wtmp_file, O_WRONLY | O_BINARY, 0)) >= 0)
     {
-      write (fd, ut, sizeof *ut);
+      locked_append (fd, ut, sizeof *ut);
       close (fd);
-    }
-  if (mutex)
-    {
-      ReleaseMutex (mutex);
-      CloseHandle (mutex);
     }
 }
 
@@ -2783,25 +2792,15 @@ pututline (struct utmp *ut)
 		ut->ut_type, ut->ut_pid, ut->ut_line, ut->ut_id);
   debug_printf ("ut->ut_user '%s', ut->ut_host '%s'\n",
 		ut->ut_user, ut->ut_host);
-  /* Read/write to utmp must be atomic to prevent overriding data
-     by concurrent processes. */
-  char mutex_name[CYG_MAX_PATH];
-  HANDLE mutex = CreateMutex (NULL, FALSE,
-			      shared_name (mutex_name, "utmp_mutex", 0));
-  if (mutex)
-    while (WaitForSingleObject (mutex, INFINITE) == WAIT_ABANDONED)
-      ;
+
   struct utmp *u;
   if ((u = getutid (ut)))
-    lseek (utmp_fd, -sizeof *ut, SEEK_CUR);
-  else
-    lseek (utmp_fd, 0, SEEK_END);
-  write (utmp_fd, ut, sizeof *ut);
-  if (mutex)
     {
-      ReleaseMutex (mutex);
-      CloseHandle (mutex);
+      lseek (utmp_fd, -sizeof *ut, SEEK_CUR);
+      write (utmp_fd, ut, sizeof *ut);
     }
+  else
+    locked_append (utmp_fd, ut, sizeof *ut);
 }
 
 extern "C"
