@@ -176,7 +176,10 @@ setitimer (int which, const struct itimerval *value, struct itimerval *oldvalue)
   itv = *value;
   elapse = itv.it_value.tv_sec * 1000 + itv.it_value.tv_usec / 1000;
   if (elapse == 0)
-    return 0;
+    if (itv.it_value.tv_usec)
+      elapse = 1;
+    else
+      return 0;
   if (!(timer_active = SetTimer (gethwnd(), 1, elapse, NULL)))
     {
       __seterrno ();

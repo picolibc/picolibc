@@ -1,3 +1,7 @@
+Mon Jun 26 18:32:41 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* windows.cc (setitimer): Round up when < 1000 usecs.
+
 Mon Jun 26 17:34:54 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* hinfo.cc (hinfo::dup2): Eliminate compiler warning.
