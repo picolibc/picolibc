@@ -16,14 +16,21 @@ details. */
 #include <io.h>
 #include <sys/fcntl.h>
 #include <sys/cygwin.h>
+#include <ctype.h>
+#include <windows.h>
 
 static char *prog_name;
 static char *file_arg;
+static char *close_arg;
+static int path_flag, unix_flag, windows_flag, absolute_flag;
 
 static struct option long_options[] =
 {
   { (char *) "help", no_argument, NULL, 'h' },
+  { (char *) "absolute", no_argument, NULL, 'a'},
+  { (char *) "option", no_argument, NULL, 'o'},
   { (char *) "path", no_argument, NULL, 'p' },
+  { (char *) "close", required_argument, (int *) &close_arg, 'c'},
   { (char *) "unix", no_argument, NULL, 'u' },
   { (char *) "file", required_argument, (int *) &file_arg, 'f'},
   { (char *) "version", no_argument, NULL, 'v' },
@@ -36,16 +43,18 @@ usage (FILE *stream, int status)
 {
   fprintf (stream, "\
 Usage: %s [-p|--path] (-u|--unix)|(-w|--windows) filename\n\
-  -f|--file	read file for path information\n\
-  -u|--unix     print Unix form of filename\n\
-  -w|--windows  print Windows form of filename\n\
-  -p|--path     filename argument is a path\n",
+  -a|--absolute		output absolute path\n\
+  -c|--close handle	close handle (for use in captured process)\n\
+  -f|--file file	read file for path information\n\
+  -u|--unix     	print Unix form of filename\n\
+  -w|--windows  	print Windows form of filename\n\
+  -p|--path     	filename argument is a path\n",
 	   prog_name);
   exit (status);
 }
 
 static void
-doit (char *filename, int path_flag, int unix_flag, int windows_flag)
+doit (char *filename)
 {
   char *buf;
   size_t len;
@@ -92,9 +101,9 @@ doit (char *filename, int path_flag, int unix_flag, int windows_flag)
   else
     {
       if (unix_flag)
-	cygwin_conv_to_posix_path (filename, buf);
+	(absolute_flag ? cygwin_conv_to_full_posix_path : cygwin_conv_to_posix_path) (filename, buf);
       else
-	cygwin_conv_to_win32_path (filename, buf);
+	(absolute_flag ? cygwin_conv_to_full_win32_path : cygwin_conv_to_win32_path) (filename, buf);
     }
 
   puts (buf);
@@ -103,8 +112,8 @@ doit (char *filename, int path_flag, int unix_flag, int windows_flag)
 int
 main (int argc, char **argv)
 {
-  int path_flag, unix_flag, windows_flag;
   int c;
+  int options_from_file_flag;
   char *filename;
 
   prog_name = strrchr (argv[0], '/');
@@ -116,13 +125,26 @@ main (int argc, char **argv)
   path_flag = 0;
   unix_flag = 0;
   windows_flag = 0;
-  while ((c = getopt_long (argc, argv, (char *) "hf:puvw", long_options, (int *) NULL))
+  options_from_file_flag = 0;
+  while ((c = getopt_long (argc, argv, (char *) "hac:f:opuvw", long_options, (int *) NULL))
 	 != EOF)
     {
       switch (c)
 	{
+	case 'a':
+	  absolute_flag = 1;
+	  break;
+
+	case 'c':
+	  CloseHandle ((HANDLE) strtoul (optarg, NULL, 16));
+	  break;
+
 	case 'f':
 	  file_arg = optarg;
+	  break;
+
+	case 'o':
+	  options_from_file_flag = 1;
 	  break;
 
 	case 'p':
@@ -156,7 +178,10 @@ main (int argc, char **argv)
 	}
     }
 
-  if (! unix_flag && ! windows_flag)
+  if (options_from_file_flag && !file_arg)
+    usage (stderr, 1);
+
+  if (! unix_flag && ! windows_flag && !options_from_file_flag)
     usage (stderr, 1);
 
   if (!file_arg)
@@ -165,7 +190,7 @@ main (int argc, char **argv)
 	usage (stderr, 1);
 
       filename = argv[optind];
-      doit (filename, path_flag, unix_flag, windows_flag);
+      doit (filename);
     }
   else
     {
@@ -188,12 +213,40 @@ main (int argc, char **argv)
 	  exit (1);
 	}
 
+      setbuf (stdout, NULL);
       while (fgets (buf, sizeof (buf), fp) != NULL)
 	{
-	  char *p = strchr (buf, '\n');
+	  char *s = buf;
+	  char *p = strchr (s, '\n');
 	  if (p)
 	    *p = '\0';
-	  doit (buf, path_flag, unix_flag, windows_flag);
+	  if (options_from_file_flag && *s == '-')
+	    {
+	      char c;
+	      for (c = *++s; c && !isspace (c); c = *++s)
+		switch (c)
+		  {
+		  case 'a':
+		    absolute_flag = 1;
+		    break;
+		  case 'w':
+		    unix_flag = 0;
+		    windows_flag = 1;
+		    break;
+		  case 'u':
+		    windows_flag = 0;
+		    unix_flag = 1;
+		    break;
+		  case 'p':
+		    path_flag = 1;
+		  }
+	      if (*s)
+		do
+		  s++;
+		while (*s && isspace (*s));
+	    }
+	  if (*s)
+	    doit (s);
 	}
     }
 

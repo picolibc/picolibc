@@ -1,3 +1,8 @@
+Thu Apr 13 01:22:35 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* cygpath.cc (main): Add -a -o and -c options.
+	(doit): Ditto.
+
 Mon Apr 10 22:56:07 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* cygpath.cc (main): Add -f option for processing a group of paths from
