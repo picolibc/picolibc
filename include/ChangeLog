@@ -1,3 +1,11 @@
+Sun Oct 24 19:11:32 1999  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* sim-d10v.h (SIM_D10V_TS2_DMAP_REGNUM): Define.
+
+Sat Oct 23 19:00:13 1999  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* sim-d10v.h: New file.
+
 1999-09-04  Steve Chamberlain  <sac@pobox.com>
 
 	* dis-asm.h (print_insn_pj): Declare.
