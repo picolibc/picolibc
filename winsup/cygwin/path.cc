@@ -615,6 +615,8 @@ path_conv::check (const char *src, unsigned opt,
 	 to the symbolic link. */
       if ((p = strrchr (path_copy, '/')) == NULL)
 	p = path_copy;
+      else if (p == path_copy)
+	p++;
       *p = '\0';
 
       char *headptr;

@@ -1,3 +1,8 @@
+Wed Aug 29 00:40:42 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (path_conv::check): Avoid splitting off leading '/' in path
+	component when building a symlink.
+
 Wed Aug 29  0:45:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* resource.cc (getrlimit): Return actual values on RLIMIT_STACK.
