@@ -3,6 +3,22 @@
 	* fhandler_disk_file.cc (fhandler_cygdrive::readdir): Avoid reporting
 	inaccessible drives.
 
+2001-11-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_hstrerror): Allow s == NULL.
+	(cygwin_rcmd): Add parameter checking.
+	(cygwin_rexec): Ditto.
+
+2001-11-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_inet_ntoa): Add parameter checking.
+	(cygwin_inet_network): Return INADDR_NONE instead of 0 in case of
+	EFAULT.
+	(cygwin_hstrerror): Add parameter checking.
+	(cygwin_rresvport): Ditto.
+	(socketpair): Ditto.
+	* winsup.h (check_null_str): Add extern declaration.
+
 2001-11-24  Christopher Faylor  <cgf@redhat.com>
 
 	* path.cc (path_conv::check): Tighten FH_CYGDRIVE check to avoid
