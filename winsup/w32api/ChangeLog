@@ -1,3 +1,8 @@
+2001-12-17  Robret Collins  <rbtcollins@hotmail.com>
+
+	* include/commctrl.h: New typedefs for HDLAYOUT and LPHDLAYOUT based
+	on MSDN documentation for XP.
+	
 2001-12-07  Earnie Boyd  <earnie@users.sf.net>
 
 	* Makefile.in: Increment VERSION.

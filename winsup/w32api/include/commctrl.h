@@ -1240,10 +1240,31 @@ typedef struct _HD_ITEMW {
 	LPVOID pvFilter;
 #endif
 } HD_ITEMW;
+typedef struct _HDITEM {
+	UINT    mask; 
+        int     cxy; 
+	LPTSTR  pszText; 
+	HBITMAP hbm; 
+	int     cchTextMax; 
+	int     fmt; 
+	LPARAM  lParam; 
+#if (_WIN32_IE >= 0x0300)
+	int     iImage;
+	int     iOrder;
+#endif
+#if (_WIN32_IE >= 0x0500)
+	UINT    type;
+	LPVOID  pvFilter;
+#endif
+} HDITEM, FAR * LPHDITEM;
 typedef struct _HD_LAYOUT {
 	RECT *prc;
 	WINDOWPOS *pwpos;
 } HD_LAYOUT;
+typedef struct _HD_LAYOUT_XP {
+      RECT FAR*      prc;  
+      WINDOWPOS FAR* pwpos; 
+} HDLAYOUT, FAR *LPHDLAYOUT; 
 typedef struct _HD_HITTESTINFO {
 	POINT pt;
 	UINT flags;
