@@ -1,3 +1,8 @@
+2001-11-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/winbase.h (OSVERSIONINFOEX): Add definition.
+	* include/winnt.h: Add VER_NT_* and VER_SUITE_* defines.
+
 2001-11-10  Robert Collins  <rbtcollins@hotmail.com>
 
 	* include/winnt.h: Add Danny Smith's text comment about gcc compiler warnings
