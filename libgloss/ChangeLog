@@ -1,5 +1,13 @@
 2003-02-05  Chris Demetriou  <cgd@broadcom.com>
 
+	* mips/configure.in (mipsisa32el-*-*): Handle in the same way
+	as mipsisa32-*-*.
+	(mipsisa32r2-*-*, mipsisa32r2el-*-*): New, handled in the same
+	way as mipsisa32-*-*.
+	* mips/configure: Regenerate.
+
+2003-02-05  Chris Demetriou  <cgd@broadcom.com>
+
 	* mips/cfe.c (hardware_hazard_hook): Move...
 	* mips/cfe_prestart.S (hardware_hazard_hook): To here,
 	and translate into assembly.
