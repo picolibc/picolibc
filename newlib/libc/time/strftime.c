@@ -362,9 +362,10 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 	case 'W':
 	  if (count < maxsize - 2)
 	    {
+	      int wday = (tim_p->tm_wday) ? tim_p->tm_wday - 1 : 6;
 	      sprintf (&s[count], "%2.2d",
-		       (tim_p->tm_yday + ((8 -
-					   tim_p->tm_wday) % 7)) / 7);
+		       (tim_p->tm_yday + 7 -
+			wday) / 7);
 	      count += 2;
 	    }
 	  else

@@ -1,3 +1,8 @@
+Thu Sep 13 08:49:49 2001  Jason Tishler <jason@tishler.net>
+
+        * strftime.c (strftime): Fix "%W" implementation to properly handle
+        Mondays too.
+
 2001-09-07  Jeff Law  <law@redhat.com>
 
         * libc/sys/h8300hms/crt0.S: For H8/300H and H8/S, load address of
