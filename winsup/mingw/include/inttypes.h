@@ -254,19 +254,21 @@ typedef struct {
 
 #endif	/* !defined(__cplusplus) || defined(__STDC_FORMAT_MACROS) */
 
-extern __inline__ intmax_t	imaxabs (intmax_t j)
+extern __inline__ intmax_t __cdecl imaxabs (intmax_t j)
 	{return	(j >= 0 ? j : -j);}
-imaxdiv_t imaxdiv (intmax_t numer, intmax_t denom);
+imaxdiv_t __cdecl imaxdiv (intmax_t numer, intmax_t denom);
 
 /* 7.8.2 Conversion functions for greatest-width integer types */
 
-intmax_t   strtoimax (const char* __restrict__ nptr, char** __restrict__ endptr, int base);
-uintmax_t  strtoumax (const char* __restrict__ nptr, char** __restrict__ endptr, int base);
+intmax_t __cdecl strtoimax (const char* __restrict__ nptr,
+                            char** __restrict__ endptr, int base);
+uintmax_t __cdecl strtoumax (const char* __restrict__ nptr,
+			     char** __restrict__ endptr, int base);
 
-intmax_t wcstoimax (const wchar_t* __restrict__ nptr, wchar_t** __restrict__ endptr,
-	   int base);
-uintmax_t wcstoumax (const wchar_t* __restrict__ nptr, wchar_t** __restrict__ endptr,
-	   int base);
+intmax_t __cdecl wcstoimax (const wchar_t* __restrict__ nptr,
+                            wchar_t** __restrict__ endptr, int base);
+uintmax_t __cdecl wcstoumax (const wchar_t* __restrict__ nptr,
+			     wchar_t** __restrict__ endptr, int base);
 
 #ifdef	__cplusplus
 }

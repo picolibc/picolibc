@@ -29,6 +29,7 @@
    __DECLSPEC_SUPPORTED    Defined if dllimport attribute is supported.
    __MINGW_IMPORT          The attribute definition to specify imported
                            variables/functions. 
+   _CRTIMP                 As above.  For MS compatibility.  
    __MINGW32_VERSION       Runtime version.
    __MINGW32_MAJOR_VERSION Runtime major version.
    __MINGW32_MINOR_VERSION Runtime minor version.
@@ -47,6 +48,9 @@
 # ifndef __MINGW_IMPORT
 #  define __MINGW_IMPORT  __declspec(dllimport)
 # endif
+# ifndef _CRTIMP
+#  define _CRTIMP  __declspec(dllimport)
+# endif
 # define __DECLSPEC_SUPPORTED
 #else /* __GNUC__ */
 # ifdef __declspec
@@ -55,12 +59,24 @@
    /* Note the extern. This is needed to work around GCC's
       limitations in handling dllimport attribute.  */
 #   define __MINGW_IMPORT  extern __attribute__((dllimport))
-#   endif
+#  endif
+#  ifndef _CRTIMP
+#   define _CRTIMP  __attribute__((dllimport))
+#  endif
 #  define __DECLSPEC_SUPPORTED
-# else
+# else /* __declspec */
 #  undef __DECLSPEC_SUPPORTED
 #  undef __MINGW_IMPORT
-# endif 
+#  ifndef _CRTIMP
+#   define _CRTIMP
+#  endif
+# endif /* __declspec */
+# ifndef __cdecl
+#  define __cdecl __attribute__((cdecl))
+# endif
+# ifndef __stdcall
+#  define __stdcall __attribute__((stdcall))
+# endif
 # undef __int64
 # define __int64 long long
 #endif /* __GNUC__ */
@@ -70,4 +86,3 @@
 #define __MINGW32_MINOR_VERSION 0
 
 #endif /* __MINGW_H */
-

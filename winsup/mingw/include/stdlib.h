@@ -89,9 +89,9 @@ extern char**	_argv;
 /* imports from runtime dll of the above variables */
 #ifdef __MSVCRT__
 
-extern int*     __p___argc(void);
-extern char***   __p___argv(void);
-extern wchar_t***   __p___wargv(void);
+extern int*  __cdecl   __p___argc(void);
+extern char*** __cdecl  __p___argv(void);
+extern wchar_t***  __cdecl __p___wargv(void);
 
 #define __argc (*__p___argc())
 #define __argv (*__p___argv())
@@ -149,10 +149,10 @@ __MINGW_IMPORT char**  __argv_dll;
 #undef errno
 extern int errno;
 #else
-int*	_errno(void);
+ _CRTIMP int* __cdecl	_errno(void);
 #define	errno		(*_errno())
 #endif
-int*	__doserrno(void);
+ _CRTIMP int* __cdecl	__doserrno(void);
 #define	_doserrno	(*__doserrno())
 
 /*
@@ -160,8 +160,8 @@ int*	__doserrno(void);
  */
 
 #ifdef __MSVCRT__
-  extern char *** __p__environ(void);
-  extern wchar_t *** __p__wenviron(void);
+  extern _CRTIMP char *** __cdecl __p__environ(void);
+  extern _CRTIMP wchar_t *** __cdecl  __p__wenviron(void);
 # define _environ (*__p__environ())
 # define _wenviron (*__p__wenviron())
 #else /* ! __MSVCRT__ */
@@ -221,10 +221,10 @@ __MINGW_IMPORT char*	_sys_errlist[];
 #ifdef	__MSVCRT__
 /* msvcrtxx.dll */
 
-extern unsigned int*	__p__osver(void);
-extern unsigned int*	__p__winver(void);
-extern unsigned int*	__p__winmajor(void);
-extern unsigned int*	__p__winminor(void);
+extern _CRTIMP unsigned __cdecl int*	__p__osver(void);
+extern _CRTIMP unsigned __cdecl int*	__p__winver(void);
+extern _CRTIMP unsigned __cdecl int*	__p__winmajor(void);
+extern _CRTIMP unsigned __cdecl int*	__p__winminor(void);
 
 #ifndef __DECLSPEC_SUPPORTED
 # define _osver		(*__p__osver())
@@ -272,9 +272,9 @@ __MINGW_IMPORT unsigned int	_winminor_dll;
 #if defined  __MSVCRT__
 /* although the _pgmptr is exported as DATA,
  * be safe and use the access function __p__pgmptr() to get it. */
-char**  __p__pgmptr(void);
+_CRTIMP char** __cdecl __p__pgmptr(void);
 #define _pgmptr     (*__p__pgmptr())
-wchar_t**  __p__wpgmptr(void);
+_CRTIMP wchar_t** __cdecl __p__wpgmptr(void);
 #define _wpgmptr    (*__p__wpgmptr())
 #else /* ! __MSVCRT__ */
 # ifndef __DECLSPEC_SUPPORTED
@@ -321,65 +321,67 @@ __MINGW_IMPORT  int _fmode_dll;
 #define	_ATTRIB_NORETURN
 #endif	/* __GNUC__ */
 
-double	atof	(const char*);
-int	atoi	(const char*);
-long	atol	(const char*);
-int	_wtoi (const wchar_t *);
-long _wtol (const wchar_t *);
+_CRTIMP double __cdecl	atof	(const char*);
+_CRTIMP int __cdecl	atoi	(const char*);
+_CRTIMP long __cdecl 	atol	(const char*);
+_CRTIMP int __cdecl	_wtoi (const wchar_t *);
+_CRTIMP long __cdecl _wtol (const wchar_t *);
 
-double	strtod	(const char*, char**);
-#if !defined __NO_ISOCEXT  /* extern stubs in static libmingwex.a */
-extern __inline__ float strtof (const char *nptr, char **endptr)
+_CRTIMP double __cdecl	strtod	(const char*, char**);
+#if !defined __NO_ISOCEXT  /* extern stub in static libmingwex.a */
+extern __inline__ float __cdecl strtof (const char *nptr, char **endptr)
   { return (strtod (nptr, endptr));}
-long double strtold (const char * __restrict__, char ** __restrict__);
+long double __cdecl strtold (const char * __restrict__, char ** __restrict__);
 #endif /* __NO_ISOCEXT */
 
-long	strtol	(const char*, char**, int);
-unsigned long	strtoul	(const char*, char**, int);
+_CRTIMP long __cdecl	strtol	(const char*, char**, int);
+_CRTIMP unsigned long __cdecl	strtoul	(const char*, char**, int);
 
 #ifndef _WSTDLIB_DEFINED
 /*  also declared in wchar.h */
-double	wcstod	(const wchar_t*, wchar_t**);
+_CRTIMP double __cdecl	wcstod	(const wchar_t*, wchar_t**);
 #if !defined __NO_ISOCEXT /* extern stub in static libmingwex.a */
-extern __inline__ float wcstof( const wchar_t *nptr, wchar_t **endptr)
+extern __inline__ float __cdecl wcstof( const wchar_t *nptr, wchar_t **endptr)
 {  return (wcstod(nptr, endptr)); }
-long double wcstold (const wchar_t * __restrict__, wchar_t ** __restrict__);
+long double __cdecl wcstold (const wchar_t * __restrict__, wchar_t ** __restrict__);
 #endif /* __NO_ISOCEXT */
 
-long	wcstol	(const wchar_t*, wchar_t**, int);
-unsigned long	wcstoul (const wchar_t*, wchar_t**, int);
+_CRTIMP long __cdecl	wcstol	(const wchar_t*, wchar_t**, int);
+_CRTIMP unsigned long __cdecl	wcstoul (const wchar_t*, wchar_t**, int);
 #define _WSTDLIB_DEFINED
 #endif
 
-size_t	wcstombs	(char*, const wchar_t*, size_t);
-int	wctomb		(char*, wchar_t);
+_CRTIMP size_t __cdecl	wcstombs	(char*, const wchar_t*, size_t);
+_CRTIMP int __cdecl	wctomb		(char*, wchar_t);
 
-int	mblen		(const char*, size_t);
-size_t	mbstowcs	(wchar_t*, const char*, size_t);
-int	mbtowc		(wchar_t*, const char*, size_t);
+_CRTIMP int __cdecl	mblen		(const char*, size_t);
+_CRTIMP size_t __cdecl	mbstowcs	(wchar_t*, const char*, size_t);
+_CRTIMP int __cdecl	mbtowc		(wchar_t*, const char*, size_t);
 
-int	rand	(void);
-void	srand	(unsigned int);
+_CRTIMP int __cdecl	rand	(void);
+_CRTIMP void __cdecl	srand	(unsigned int);
 
-void*	calloc	(size_t, size_t);
-void*	malloc	(size_t);
-void*	realloc	(void*, size_t);
-void	free	(void*);
+_CRTIMP void* __cdecl	calloc	(size_t, size_t);
+_CRTIMP void* __cdecl	malloc	(size_t);
+_CRTIMP void* __cdecl	realloc	(void*, size_t);
+_CRTIMP void __cdecl	free	(void*);
 
-void	abort	(void) _ATTRIB_NORETURN;
-void	exit	(int) _ATTRIB_NORETURN;
-int	atexit	(void (*)(void));
+_CRTIMP void __cdecl	abort	(void) _ATTRIB_NORETURN;
+_CRTIMP void __cdecl	exit	(int) _ATTRIB_NORETURN;
 
-int	system	(const char*);
-char*	getenv	(const char*);
+/* Note: This in startup code, not imported directly from dll */
+int __cdecl	atexit	(void (*)(void));
 
-void*	bsearch	(const void*, const void*, size_t, size_t, 
-                 int (*)(const void*, const void*));
-void	qsort	(const void*, size_t, size_t,
-                 int (*)(const void*, const void*));
+_CRTIMP int __cdecl	system	(const char*);
+_CRTIMP char* __cdecl	getenv	(const char*);
 
-int	abs	(int);
-long	labs	(long);
+_CRTIMP void* __cdecl	bsearch	(const void*, const void*, size_t, size_t, 
+				 int (*)(const void*, const void*));
+_CRTIMP void __cdecl	qsort	(const void*, size_t, size_t,
+				 int (*)(const void*, const void*));
+
+_CRTIMP int __cdecl	abs	(int);
+_CRTIMP long __cdecl	labs	(long);
 
 /*
  * div_t and ldiv_t are structures used to return the results of div and
@@ -392,8 +394,8 @@ long	labs	(long);
 typedef struct { int quot, rem; } div_t;
 typedef struct { long quot, rem; } ldiv_t;
 
-div_t	div	(int, int);
-ldiv_t	ldiv	(long, long);
+_CRTIMP div_t __cdecl	div	(int, int);
+_CRTIMP ldiv_t __cdecl	ldiv	(long, long);
 
 #ifndef	__STRICT_ANSI__
 
@@ -401,74 +403,75 @@ ldiv_t	ldiv	(long, long);
  * NOTE: Officially the three following functions are obsolete. The Win32 API
  *       functions SetErrorMode, Beep and Sleep are their replacements.
  */
-void	_beep (unsigned int, unsigned int);
-void	_seterrormode (int);
-void	_sleep (unsigned long);
+_CRTIMP void __cdecl	_beep (unsigned int, unsigned int);
+_CRTIMP void __cdecl	_seterrormode (int);
+_CRTIMP void __cdecl	_sleep (unsigned long);
 
-void	_exit	(int) _ATTRIB_NORETURN;
+_CRTIMP void __cdecl	_exit	(int) _ATTRIB_NORETURN;
 #if !defined __NO_ISOCEXT /* extern stub in static libmingwex.a */
 /* C99 function name */
-void _Exit(int) _ATTRIB_NORETURN; /* Declare to get noreturn attribute.  */
-extern __inline__ void _Exit(int status)
+void __cdecl _Exit(int) _ATTRIB_NORETURN; /* Declare to get noreturn attribute.  */
+extern __inline__ void __cdecl _Exit(int status)
 	{  _exit(status); }
 #endif
 /* _onexit is MS extension. Use atexit for portability.  */
+/* Note: This is in startup code, not imported directly from dll */
 typedef  int (* _onexit_t)(void);
-_onexit_t _onexit( _onexit_t );
+_onexit_t __cdecl _onexit( _onexit_t );
 
-int	_putenv	(const char*);
-void	_searchenv (const char*, const char*, char*);
-
-
-char*	_ecvt (double, int, int*, int*);
-char*	_fcvt (double, int, int*, int*);
-char*	_gcvt (double, int, char*);
-
-void	_makepath (char*, const char*, const char*, const char*, const char*);
-void	_splitpath (const char*, char*, char*, char*, char*);
-char*	_fullpath (char*, const char*, size_t);
+_CRTIMP int __cdecl	_putenv	(const char*);
+_CRTIMP void __cdecl	_searchenv (const char*, const char*, char*);
 
 
-char*	_itoa (int, char*, int);
-char*	_ltoa (long, char*, int);
-char*   _ultoa(unsigned long, char*, int);
-wchar_t*  _itow (int, wchar_t*, int);
-wchar_t*  _ltow (long, wchar_t*, int);
-wchar_t*  _ultow (unsigned long, wchar_t*, int);
+_CRTIMP char* __cdecl	_ecvt (double, int, int*, int*);
+_CRTIMP char* __cdecl	_fcvt (double, int, int*, int*);
+_CRTIMP char* __cdecl	_gcvt (double, int, char*);
+
+_CRTIMP void __cdecl	_makepath (char*, const char*, const char*, const char*, const char*);
+_CRTIMP void __cdecl	_splitpath (const char*, char*, char*, char*, char*);
+_CRTIMP char* __cdecl	_fullpath (char*, const char*, size_t);
+
+
+_CRTIMP char* __cdecl	_itoa (int, char*, int);
+_CRTIMP char* __cdecl	_ltoa (long, char*, int);
+_CRTIMP char* __cdecl   _ultoa(unsigned long, char*, int);
+_CRTIMP wchar_t* __cdecl  _itow (int, wchar_t*, int);
+_CRTIMP wchar_t* __cdecl  _ltow (long, wchar_t*, int);
+_CRTIMP wchar_t* __cdecl  _ultow (unsigned long, wchar_t*, int);
 
 #ifdef __MSVCRT__
-__int64	_atoi64(const char *);
-char*	_i64toa(__int64, char *, int);
-char*	_ui64toa(unsigned __int64, char *, int);
-__int64	_wtoi64(const wchar_t *);
-wchar_t* _i64tow(__int64, wchar_t *, int);
-wchar_t* _ui64tow(unsigned __int64, wchar_t *, int);
+_CRTIMP __int64 __cdecl	_atoi64(const char *);
+_CRTIMP char* __cdecl	_i64toa(__int64, char *, int);
+_CRTIMP char* __cdecl	_ui64toa(unsigned __int64, char *, int);
+_CRTIMP __int64 __cdecl	_wtoi64(const wchar_t *);
+_CRTIMP wchar_t* __cdecl _i64tow(__int64, wchar_t *, int);
+_CRTIMP wchar_t* __cdecl _ui64tow(unsigned __int64, wchar_t *, int);
 
-wchar_t* _wgetenv(const wchar_t*);
-int	 _wputenv(const wchar_t*);
-void	_wsearchenv(const wchar_t*, const wchar_t*, wchar_t*);
-void    _wmakepath(wchar_t*, const wchar_t*, const wchar_t*, const wchar_t*, const wchar_t*);
-void	_wsplitpath (const wchar_t*, wchar_t*, wchar_t*, wchar_t*, wchar_t*);
-wchar_t*    _wfullpath (wchar_t*, const wchar_t*, size_t);
+_CRTIMP wchar_t* __cdecl _wgetenv(const wchar_t*);
+_CRTIMP int __cdecl	 _wputenv(const wchar_t*);
+_CRTIMP void __cdecl	_wsearchenv(const wchar_t*, const wchar_t*, wchar_t*);
+_CRTIMP void __cdecl    _wmakepath(wchar_t*, const wchar_t*, const wchar_t*, const wchar_t*, const wchar_t*);
+_CRTIMP void __cdecl	_wsplitpath (const wchar_t*, wchar_t*, wchar_t*, wchar_t*, wchar_t*);
+_CRTIMP wchar_t* __cdecl    _wfullpath (wchar_t*, const wchar_t*, size_t);
 
-unsigned int _rotl(unsigned int, int);
-unsigned int _rotr(unsigned int, int);
-unsigned long _lrotl(unsigned long, int);
-unsigned long _lrotr(unsigned long, int);
+_CRTIMP unsigned int __cdecl _rotl(unsigned int, int);
+_CRTIMP unsigned int __cdecl _rotr(unsigned int, int);
+_CRTIMP unsigned long __cdecl _lrotl(unsigned long, int);
+_CRTIMP unsigned long __cdecl _lrotr(unsigned long, int);
 #endif
 
 #ifndef	_NO_OLDNAMES
 
-int	putenv (const char*);
-void	searchenv (const char*, const char*, char*);
+_CRTIMP int __cdecl	putenv (const char*);
+_CRTIMP void __cdecl	searchenv (const char*, const char*, char*);
 
-char*	itoa (int, char*, int);
-char*	ltoa (long, char*, int);
+_CRTIMP char* __cdecl	itoa (int, char*, int);
+_CRTIMP char* __cdecl	ltoa (long, char*, int);
 
 #ifndef _UWIN
-char*	ecvt (double, int, int*, int*);
-char*	fcvt (double, int, int*, int*);
-char*	gcvt (double, int, char*);
+_CRTIMP char* __cdecl	ecvt (double, int, int*, int*);
+_CRTIMP char* __cdecl	fcvt (double, int, int*, int*);
+_CRTIMP char* __cdecl	gcvt (double, int, char*);
 #endif /* _UWIN */
 #endif	/* Not _NO_OLDNAMES */
 
@@ -480,36 +483,36 @@ char*	gcvt (double, int, char*);
 
 typedef struct { long long quot, rem; } lldiv_t;
 
-lldiv_t	lldiv (long long, long long);
+lldiv_t	__cdecl lldiv (long long, long long);
 
-extern __inline__ long long llabs(long long _j)
+extern __inline__ long long __cdecl llabs(long long _j)
   {return (_j >= 0 ? _j : -_j);}
 
-long long strtoll (const char* __restrict__, char** __restrict, int);
-unsigned long long strtoull (const char* __restrict__, char** __restrict__, int);
+long long  __cdecl strtoll (const char* __restrict__, char** __restrict, int);
+unsigned long long  __cdecl strtoull (const char* __restrict__, char** __restrict__, int);
 
 #if defined (__MSVCRT__) /* these are stubs for MS _i64 versions */ 
-long long atoll (const char *);
+long long  __cdecl atoll (const char *);
 
 #if !defined (__STRICT_ANSI__)
-long long wtoll(const wchar_t *);
-char* lltoa(long long, char *, int);
-char* ulltoa(unsigned long long , char *, int);
-wchar_t* lltow(long long, wchar_t *, int);
-wchar_t* ulltow(unsigned long long, wchar_t *, int);
+long long  __cdecl wtoll (const wchar_t *);
+char* __cdecl lltoa (long long, char *, int);
+char* __cdecl ulltoa (unsigned long long , char *, int);
+wchar_t* __cdecl lltow (long long, wchar_t *, int);
+wchar_t* __cdecl ulltow (unsigned long long, wchar_t *, int);
 
   /* inline using non-ansi functions */
-extern __inline__ long long atoll (const char * _c)
+extern __inline__ long long  __cdecl atoll (const char * _c)
 	{ return _atoi64 (_c); }
-extern __inline__ char* lltoa(long long _n, char * _c, int _i)
+extern __inline__ char*  __cdecl lltoa (long long _n, char * _c, int _i)
 	{ return _i64toa (_n, _c, _i); }
-extern __inline__ char* ulltoa(unsigned long long _n, char * _c, int _i)
+extern __inline__ char*  __cdecl ulltoa (unsigned long long _n, char * _c, int _i)
 	{ return _ui64toa (_n, _c, _i); }
-extern __inline__ long long wtoll(const wchar_t * _w)
+extern __inline__ long long  __cdecl wtoll (const wchar_t * _w)
  	{ return _wtoi64 (_w); }
-extern __inline__ wchar_t* lltow(long long _n, wchar_t * _w, int _i)
+extern __inline__ wchar_t*  __cdecl lltow (long long _n, wchar_t * _w, int _i)
 	{ return _i64tow (_n, _w, _i); } 
-extern __inline__ wchar_t* ulltow(unsigned long long _n, wchar_t * _w, int _i)
+extern __inline__ wchar_t*  __cdecl ulltow (unsigned long long _n, wchar_t * _w, int _i)
 	{ return _ui64tow (_n, _w, _i); } 
 #endif /* (__STRICT_ANSI__)  */
 

@@ -84,13 +84,13 @@ struct lconv
 extern "C" {
 #endif
 
-char*		setlocale (int, const char*);
-struct lconv*	localeconv (void);
+_CRTIMP  char* __cdecl setlocale (int, const char*);
+_CRTIMP struct lconv* __cdecl localeconv (void);
 
 #ifndef _WLOCALE_DEFINED  /* also declared in wchar.h */
 # define __need_wchar_t
 # include <stddef.h>
-  wchar_t* 	_wsetlocale(int, const wchar_t*);
+  _CRTIMP wchar_t* __cdecl _wsetlocale(int, const wchar_t*);
 # define _WLOCALE_DEFINED
 #endif /* ndef _WLOCALE_DEFINED */
 

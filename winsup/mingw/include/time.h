@@ -93,10 +93,10 @@ struct tm
 extern "C" {
 #endif
 
-clock_t	clock (void);
-time_t	time (time_t*);
-double	difftime (time_t, time_t);
-time_t	mktime (struct tm*);
+_CRTIMP clock_t __cdecl	clock (void);
+_CRTIMP time_t __cdecl	time (time_t*);
+_CRTIMP double __cdecl	difftime (time_t, time_t);
+_CRTIMP time_t __cdecl	mktime (struct tm*);
 
 /*
  * These functions write to and return pointers to static buffers that may
@@ -108,26 +108,26 @@ time_t	mktime (struct tm*);
  * Fault and crap out your program. Guess how I know. Hint: stat called on
  * a directory gives 'invalid' times in st_atime etc...
  */
-char*		asctime (const struct tm*);
-char*		ctime (const time_t*);
-struct tm*	gmtime (const time_t*);
-struct tm*	localtime (const time_t*);
+_CRTIMP char* __cdecl		asctime (const struct tm*);
+_CRTIMP char* __cdecl		ctime (const time_t*);
+_CRTIMP struct tm*  __cdecl	gmtime (const time_t*);
+_CRTIMP struct tm*  __cdecl	localtime (const time_t*);
 
 
-size_t	strftime (char*, size_t, const char*, const struct tm*);
+_CRTIMP size_t __cdecl	strftime (char*, size_t, const char*, const struct tm*);
 
-size_t	wcsftime (wchar_t*, size_t, const wchar_t*, const struct tm*);
+_CRTIMP size_t __cdecl	wcsftime (wchar_t*, size_t, const wchar_t*, const struct tm*);
 
 #ifndef __STRICT_ANSI__
-extern void	_tzset (void);
+extern _CRTIMP void __cdecl	_tzset (void);
 
 #ifndef _NO_OLDNAMES
-extern void	tzset (void);
+extern _CRTIMP void __cdecl	tzset (void);
 #endif
 
-size_t	strftime(char*, size_t, const char*, const struct tm*);
-char*	_strdate(char*);
-char*	_strtime(char*);
+_CRTIMP size_t __cdecl	strftime(char*, size_t, const char*, const struct tm*);
+_CRTIMP char* __cdecl	_strdate(char*);
+_CRTIMP char* __cdecl	_strtime(char*);
 
 #endif	/* Not __STRICT_ANSI__ */
 
@@ -140,9 +140,9 @@ char*	_strtime(char*);
 #ifdef __MSVCRT__
 
 /* These are for compatibility with pre-VC 5.0 suppied MSVCRT. */
-extern int*	__p__daylight (void);
-extern long*	__p__timezone (void);
-extern char**	__p__tzname (void);
+extern _CRTIMP int* __cdecl	__p__daylight (void);
+extern _CRTIMP long* __cdecl	__p__timezone (void);
+extern _CRTIMP char** __cdecl	__p__tzname (void);
 
 __MINGW_IMPORT int	_daylight;
 __MINGW_IMPORT long	_timezone;
@@ -186,10 +186,10 @@ __MINGW_IMPORT char 	*tzname[2];
 
 /* wide function prototypes, also declared in wchar.h */
 
-wchar_t *	_wasctime(const struct tm*);
-wchar_t *	_wctime(const time_t*);
-wchar_t*	_wstrdate(wchar_t*);
-wchar_t*	_wstrtime(wchar_t*);
+_CRTIMP wchar_t* __cdecl	_wasctime(const struct tm*);
+_CRTIMP wchar_t* __cdecl	_wctime(const time_t*);
+_CRTIMP wchar_t* __cdecl	_wstrdate(wchar_t*);
+_CRTIMP wchar_t* __cdecl	_wstrtime(wchar_t*);
 
 #define _WTIME_DEFINED
 #endif /* _WTIME_DEFINED */ 

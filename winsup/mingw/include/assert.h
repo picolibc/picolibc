@@ -49,7 +49,7 @@ extern "C" {
  * CRTDLL nicely supplies a function which does the actual output and
  * call to abort.
  */
-void	_assert (const char*, const char*, int)
+_CRTIMP void __cdecl _assert (const char*, const char*, int)
 #ifdef	__GNUC__
 	__attribute__ ((noreturn))
 #endif

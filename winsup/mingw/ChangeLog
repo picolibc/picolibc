@@ -1,3 +1,44 @@
+2003-02-10  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/_mingw.h (_CRTIMP): Define for __GNUC__ if
+	__declspec(dllimport)  supported.
+	(__cdecl): Define if not already defined.
+	(__stdcall): Likewise.
+	* include/dirent.h: Qualify fuctions with __cdecl.
+	* include/fenv.h: Likewise.
+	* include/inttypes.h: Likewise.
+	* include/assert.h: Qualify fuctions with __cdecl. Qualify
+	CRT dll imports with _CRTIMP.
+	* include/conio.h: Likewise.
+	* include/ctype.h: Likewise.
+	* include/direct.h: Likewise.
+	* include/dos.h: Likewise.
+	* include/errno.h: Likewise.
+	* include/float.h: Likewise.
+	* include/io.h: Likewise.
+	* include/locale.h: Likewise.
+	* include/malloc.h: Likewise.
+	* include/math.h: Likewise.
+	* include/mbctype.h: Likewise.
+	* include/mbstring.h: Likewise.
+	* include/process.h: Likewise.
+	* include/setjmp.h: Likewise.
+	* include/signal.h: Likewise.
+	* include/stdio.h: Likewise.
+	* include/stdlib.h: Likewise.
+	* include/string.h: Likewise.
+	* include/time.h: Likewise.
+	* include/wchar.h: Likewise.
+	* include/wctype.h: Likewise.
+	* include/sys/stat.h: Likewise.
+	* include/sys/timeb.h: Likewise.
+	* include/sys/utime.h: Likewise.
+
+	* include/ctype.h: Guard ctype inlines with __NO_INLINE__.
+	* include/wctype.h: Guard wctype inlines with __NO_INLINE__.
+
+	* include/stdio.h (__VALIST): Guard against prior definition.
+
 2003-02-08  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/_mingw.h: Change version to 3.0

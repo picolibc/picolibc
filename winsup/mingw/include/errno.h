@@ -104,7 +104,7 @@ extern "C" {
 #undef errno
 extern int errno;
 #else
-int*	_errno(void);
+_CRTIMP int* __cdecl _errno(void);
 #define	errno		(*_errno())
 #endif
 

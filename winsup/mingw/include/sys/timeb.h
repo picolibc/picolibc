@@ -64,10 +64,10 @@ extern "C" {
 #endif
 
 /* TODO: Not tested. */
-void	_ftime (struct _timeb*);
+_CRTIMP void __cdecl	_ftime (struct _timeb*);
 
 #ifndef	_NO_OLDNAMES
-void	ftime (struct timeb*);
+_CRTIMP void __cdecl	ftime (struct timeb*);
 #endif	/* Not _NO_OLDNAMES */
 
 #ifdef	__cplusplus

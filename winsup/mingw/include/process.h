@@ -73,30 +73,30 @@
 extern "C" {
 #endif
 
-void	_cexit(void);
-void	_c_exit(void);
+_CRTIMP void __cdecl _cexit(void);
+_CRTIMP void __cdecl _c_exit(void);
 
-int	_cwait (int*, _pid_t, int);
+_CRTIMP int __cdecl _cwait (int*, _pid_t, int);
 
-_pid_t	_getpid(void);
+_CRTIMP _pid_t __cdecl _getpid(void);
 
-int	_execl		(const char*, const char*, ...);
-int	_execle		(const char*, const char*, ...);
-int	_execlp		(const char*, const char*, ...);
-int	_execlpe	(const char*, const char*, ...);
-int	_execv		(const char*, char* const*);
-int	_execve		(const char*, char* const*, char* const*);
-int	_execvp		(const char*, char* const*);
-int	_execvpe	(const char*, char* const*, char* const*);
+_CRTIMP int __cdecl _execl	(const char*, const char*, ...);
+_CRTIMP int __cdecl _execle		(const char*, const char*, ...);
+_CRTIMP int __cdecl _execlp	(const char*, const char*, ...);
+_CRTIMP int __cdecl _execlpe	(const char*, const char*, ...);
+_CRTIMP int __cdecl _execv	(const char*, char* const*);
+_CRTIMP int __cdecl _execve	(const char*, char* const*, char* const*);
+_CRTIMP int __cdecl _execvp	(const char*, char* const*);
+_CRTIMP int __cdecl _execvpe	(const char*, char* const*, char* const*);
 
-int	_spawnl		(int, const char*, const char*, ...);
-int	_spawnle	(int, const char*, const char*, ...);
-int	_spawnlp	(int, const char*, const char*, ...);
-int	_spawnlpe	(int, const char*, const char*, ...);
-int	_spawnv		(int, const char*, char* const*);
-int	_spawnve	(int, const char*, char* const*, char* const*);
-int	_spawnvp	(int, const char*, char* const*);
-int	_spawnvpe	(int, const char*, char* const*, char* const*);
+_CRTIMP int __cdecl _spawnl	(int, const char*, const char*, ...);
+_CRTIMP int __cdecl _spawnle	(int, const char*, const char*, ...);
+_CRTIMP int __cdecl _spawnlp	(int, const char*, const char*, ...);
+_CRTIMP int __cdecl _spawnlpe	(int, const char*, const char*, ...);
+_CRTIMP int __cdecl _spawnv	(int, const char*, char* const*);
+_CRTIMP int __cdecl _spawnve	(int, const char*, char* const*, char* const*);
+_CRTIMP int __cdecl _spawnvp	(int, const char*, char* const*);
+_CRTIMP int __cdecl _spawnvpe	(int, const char*, char* const*, char* const*);
 
 /*
  * The functions _beginthreadex and _endthreadex are not provided by CRTDLL.
@@ -109,15 +109,15 @@ int	_spawnvpe	(int, const char*, char* const*, char* const*);
  *
  * NOTE: No old names for these functions. Use the underscore.
  */
-unsigned long
+_CRTIMP unsigned long __cdecl
 	_beginthread	(void (*)(void *), unsigned, void*);
-void	_endthread	(void);
+_CRTIMP void __cdecl _endthread	(void);
 
 #ifdef	__MSVCRT__
-unsigned long
+_CRTIMP unsigned long __cdecl
 	_beginthreadex	(void *, unsigned, unsigned (__stdcall *) (void *), 
 			 void*, unsigned, unsigned*);
-void	_endthreadex	(unsigned);
+_CRTIMP void __cdecl _endthreadex (unsigned);
 #endif
 
 
@@ -126,24 +126,24 @@ void	_endthreadex	(unsigned);
  * Functions without the leading underscore, for portability. These functions
  * live in liboldnames.a.
  */
-int	cwait (int*, pid_t, int);
-pid_t	getpid (void);
-int	execl (const char*, const char*, ...);
-int	execle (const char*, const char*, ...);
-int	execlp (const char*, const char*, ...);
-int	execlpe (const char*, const char*, ...);
-int	execv (const char*, char* const*);
-int	execve (const char*, char* const*, char* const*);
-int	execvp (const char*, char* const*);
-int	execvpe (const char*, char* const*, char* const*);
-int	spawnl (int, const char*, const char*, ...);
-int	spawnle (int, const char*, const char*, ...);
-int	spawnlp (int, const char*, const char*, ...);
-int	spawnlpe (int, const char*, const char*, ...);
-int	spawnv (int, const char*, char* const*);
-int	spawnve (int, const char*, char* const*, char* const*);
-int	spawnvp (int, const char*, char* const*);
-int	spawnvpe (int, const char*, char* const*, char* const*);
+_CRTIMP int  __cdecl cwait (int*, pid_t, int);
+_CRTIMP pid_t __cdecl getpid (void);
+_CRTIMP int __cdecl execl (const char*, const char*, ...);
+_CRTIMP int __cdecl execle (const char*, const char*, ...);
+_CRTIMP int __cdecl execlp (const char*, const char*, ...);
+_CRTIMP int __cdecl execlpe (const char*, const char*, ...);
+_CRTIMP int __cdecl execv (const char*, char* const*);
+_CRTIMP int __cdecl execve (const char*, char* const*, char* const*);
+_CRTIMP int __cdecl execvp (const char*, char* const*);
+_CRTIMP int __cdecl execvpe (const char*, char* const*, char* const*);
+_CRTIMP int __cdecl spawnl (int, const char*, const char*, ...);
+_CRTIMP int __cdecl spawnle (int, const char*, const char*, ...);
+_CRTIMP int __cdecl spawnlp (int, const char*, const char*, ...);
+_CRTIMP int __cdecl spawnlpe (int, const char*, const char*, ...);
+_CRTIMP int __cdecl spawnv (int, const char*, char* const*);
+_CRTIMP int __cdecl spawnve (int, const char*, char* const*, char* const*);
+_CRTIMP int __cdecl spawnvp (int, const char*, char* const*);
+_CRTIMP int __cdecl spawnvpe (int, const char*, char* const*, char* const*);
 #endif	/* Not _NO_OLDNAMES */
 
 #ifdef	__cplusplus

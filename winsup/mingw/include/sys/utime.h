@@ -65,16 +65,16 @@ struct utimbuf
 extern "C" {
 #endif
 
-int	_utime (const char*, struct _utimbuf*);
-int	_futime (int, struct _utimbuf*);
+_CRTIMP int __cdecl	_utime (const char*, struct _utimbuf*);
+_CRTIMP int __cdecl	_futime (int, struct _utimbuf*);
 
 /* The wide character version, only available for MSVCRT versions of the
  * C runtime library. */
 #ifdef __MSVCRT__
-int	_wutime (const wchar_t*, struct _utimbuf*);
+_CRTIMP int __cdecl	_wutime (const wchar_t*, struct _utimbuf*);
 #endif /* MSVCRT runtime */
 #ifndef	_NO_OLDNAMES
-int	utime (const char*, struct utimbuf*);
+_CRTIMP int __cdecl	utime (const char*, struct utimbuf*);
 #endif	/* Not _NO_OLDNAMES */
 
 #ifdef	__cplusplus
