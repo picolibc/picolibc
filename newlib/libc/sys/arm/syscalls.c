@@ -15,9 +15,6 @@
 #include "swi.h"
 
 /* Forward prototypes.  */
-#ifndef _PARAMS
-#error UGG
-#endif
 int     isatty		_PARAMS ((int));
 clock_t _times		_PARAMS ((struct tms *));
 int     _gettimeofday	_PARAMS ((struct timeval *, struct timezone *));
@@ -64,7 +61,7 @@ extern void   _EXFUN(__sinit,(struct _reent *));
     }                                   \
   while (0)
 
-/* Adjust our internal handles to stay away from std* handles */
+/* Adjust our internal handles to stay away from std* handles.  */
 #define FILE_HANDLE_OFFSET (0x20)
 
 static int std_files_checked;
@@ -103,18 +100,18 @@ do_AngelSWI (int reason, void * arg)
   asm volatile ("mov r0, %1; mov r1, %2; swi %a3; mov %0, r0"
        : "=r" (value) /* Outputs */
        : "r" (reason), "r" (arg), "i" (AngelSWI) /* Inputs */
-       : "r0", "r1", "r2", "r3", "ip", "lr", "memory"
+       : "r0", "r1", "r2", "r3", "ip", "lr", "memory", "cc"
 		/* Clobbers r0 and r1, and lr if in supervisor mode */);
                 /* Accordingly to page 13-77 of ARM DUI 0040D other registers
                    can also be clobbered.  Some memory positions may also be
                    changed by a system call, so they should not be kept in
                    registers. Note: we are assuming the manual is right and
-                   Angel is respecting the APCS */
+                   Angel is respecting the APCS.  */
   return value;
 }
 #endif /* ARM_RDI_MONITOR */
 
-/* Function to convert std(in|out|err) handles to internal versions */
+/* Function to convert std(in|out|err) handles to internal versions.  */
 static int
 remap_handle (int fh)
 {
@@ -205,8 +202,7 @@ wrap (int result)
   return result;
 }
 
-/* Returns # chars not! written */
-
+/* Returns # chars not! written.  */
 int
 _swiread (int file,
 	  char * ptr,
@@ -243,7 +239,7 @@ _read (int file,
   if (slot != MAX_OPEN_FILES)
     openfiles [slot].pos += len - x;
 
-  /* x == len is not an error, at least if we want feof() to work */
+  /* x == len is not an error, at least if we want feof() to work.  */
   return len - x;
 }
 
@@ -274,7 +270,7 @@ _swilseek (int file,
       ptr += do_AngelSWI (AngelSWI_Reason_FLen, block);
     }
   
-  /* This code only does absolute seeks */
+  /* This code only does absolute seeks.  */
   block[0] = remap_handle (file);
   block[1] = ptr;
   res = do_AngelSWI (AngelSWI_Reason_Seek, block);
@@ -288,7 +284,7 @@ _swilseek (int file,
       ptr += res;
     }
 
-  /* This code only does absolute seeks */
+  /* This code only does absolute seeks.  */
   asm ("mov r0, %2; mov r1, %3; swi %a1; mov %0, r0"
        : "=r" (res)
        : "i" (SWI_Seek), "r" (fh), "r" (ptr)
@@ -298,7 +294,7 @@ _swilseek (int file,
   if (slot != MAX_OPEN_FILES && res == 0)
     openfiles[slot].pos = ptr;
 
-  /* This is expected to return the position in the file */
+  /* This is expected to return the position in the file.  */
   return res == 0 ? ptr : -1;
 }
 
@@ -310,7 +306,7 @@ _lseek (int file,
   return wrap (_swilseek (file, ptr, dir));
 }
 
-/* Returns #chars not! written */
+/* Returns #chars not! written.  */
 int
 _swiwrite (
 	   int    file,
@@ -351,6 +347,8 @@ _write (int    file,
   return len - x;
 }
 
+extern int strlen (const char *);
+
 int
 _swiopen (const char * path,
 	  int          flags)
@@ -365,7 +363,7 @@ _swiopen (const char * path,
   if (i == MAX_OPEN_FILES)
     return -1;
 
-  /* The flags are Unix-style, so we need to convert them */
+  /* The flags are Unix-style, so we need to convert them.  */
 #ifdef O_BINARY
   if (flags & O_BINARY)
     aflags |= 1;
@@ -382,7 +380,7 @@ _swiopen (const char * path,
 
   if (flags & O_APPEND)
     {
-      aflags &= ~4;     /* Can't ask for w AND a; means just 'a' */
+      aflags &= ~4;     /* Can't ask for w AND a; means just 'a'.  */
       aflags |= 8;
     }
   
@@ -450,6 +448,7 @@ _exit (int n)
 #else
   asm ("swi %a0" :: "i" (SWI_Exit));
 #endif
+  n = n;
 }
 
 int
@@ -461,18 +460,22 @@ _kill (int n, int m)
 #else
   asm ("swi %a0" :: "i" (SWI_Exit));
 #endif
+  n = n; m = m;
 }
 
 int
 _getpid (int n)
 {
   return 1;
+  n = n;
 }
+
+extern void abort (void);
 
 caddr_t
 _sbrk (int incr)
 {
-  extern char   end asm ("end");	/* Defined by the linker */
+  extern char   end asm ("end");	/* Defined by the linker.  */
   static char * heap_end;
   char *        prev_heap_end;
 
@@ -492,6 +495,8 @@ _sbrk (int incr)
   return (caddr_t) prev_heap_end;
 }
 
+extern void memset (struct stat *, int, unsigned int);
+
 int
 _fstat (int file, struct stat * st)
 {
@@ -499,6 +504,7 @@ _fstat (int file, struct stat * st)
   st->st_mode = S_IFCHR;
   st->st_blksize = 1024;
   return 0;
+  file = file;
 }
 
 int
@@ -525,7 +531,7 @@ _gettimeofday (struct timeval * tp, struct timezone * tzp)
 
   if (tp)
     {
-    /* Ask the host for the seconds since the Unix epoch */
+    /* Ask the host for the seconds since the Unix epoch.  */
 #ifdef ARM_RDI_MONITOR
       tp->tv_sec = do_AngelSWI (AngelSWI_Reason_Time,NULL);
 #else
@@ -538,7 +544,7 @@ _gettimeofday (struct timeval * tp, struct timezone * tzp)
       tp->tv_usec = 0;
     }
 
-  /* Return fixed data for the timezone */
+  /* Return fixed data for the timezone.  */
   if (tzp)
     {
       tzp->tz_minuteswest = 0;
@@ -548,7 +554,7 @@ _gettimeofday (struct timeval * tp, struct timezone * tzp)
   return 0;
 }
 
-/* Return a clock that ticks at 100Hz. */
+/* Return a clock that ticks at 100Hz.  */
 clock_t 
 _times (struct tms * tp)
 {
@@ -576,5 +582,5 @@ int
 isatty (int fd)
 {
   return 1;
+  fd = fd;
 }
-
