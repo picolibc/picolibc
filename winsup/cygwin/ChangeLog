@@ -1,3 +1,10 @@
+2003-10-08  Christopher Faylor  <cgf@redhat.com>
+
+	* dcrt0.cc (hMainProc): Initialize to useful value for use when dll is
+	dynamically loaded.
+	(shared_info::initialize): Don't initialize user stuff if myself
+	doesn't exit.
+
 2003-10-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (unlink): Don't even try DELETE_ON_CLOSE technique on

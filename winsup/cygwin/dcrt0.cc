@@ -39,7 +39,7 @@ details. */
 
 #define PREMAIN_LEN (sizeof (user_data->premain) / sizeof (user_data->premain[0]))
 
-HANDLE NO_COPY hMainProc;
+HANDLE NO_COPY hMainProc = (HANDLE) -1;
 HANDLE NO_COPY hMainThread;
 
 sigthread NO_COPY mainthread;		// ID of the main thread

@@ -220,7 +220,8 @@ shared_info::initialize ()
   if (!cygheap)
     {
       cygheap_init ();
-      cygheap->user.init ();
+      if (myself)
+	cygheap->user.init ();
     }
 
   heap_init ();
