@@ -88,7 +88,9 @@ ifdef CONFIG_DIR
 INCLUDES+=-I$(CONFIG_DIR)
 endif
 
-MINGW_INCLUDES:=-I$(updir)/mingw/include $(INCLUDES)
+MINGW_INCLUDES:=-I$(updir)/mingw/include $(w32api_include)
+MINGW_CFLAGS:=-mno-cygwin $(MINGW_INCLUDES)
+MINGW_CXXFLAGS:=${filter-out $(newlib_source)/%,$(CXXFLAGS)} -mno-cygwin $(MINGW_INCLUDES)
 
 GCC_DEFAULT_OPTIONS:=$(CFLAGS_COMMON) $(CFLAGS_CONFIG) $(INCLUDES)
 
