@@ -1,5 +1,9 @@
 2003-09-01  Christopher Faylor  <cgf@redhat.com>
 
+	* include/cygwin/version.h: Bump DLL minor number to 4.
+
+2003-09-01  Christopher Faylor  <cgf@redhat.com>
+
 	* net.cc (dup_ent): Restore check for NULL input.
 
 2003-08-31  Christopher Faylor  <cgf@redhat.com>
