@@ -3,6 +3,8 @@
 	Throughout, change USE_CYGSERVER to USE_SERVER.
 	* Makefile.in (LIBSERVER): Define and use.
 	* configure.in: Set LIBSERVER as appropriate.
+	* configure: Regenerate.
+	* acconfig.h: Regenerate.
 	* environ.cc: Rename allow_daemon to allow_server.  Only recognize when
 	USE_SERVER is defined.
 
