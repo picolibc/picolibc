@@ -153,7 +153,7 @@ extern "C" {
 const NO_COPY char __declspec(dllexport) * const _sys_errlist[]=
 {
 /*      NOERROR 0       */ "No error",
-/*	EPERM 1		*/ "Not super-user",
+/*	EPERM 1		*/ "Operation not permitted",
 /*	ENOENT 2	*/ "No such file or directory",
 /*	ESRCH 3		*/ "No such process",
 /*	EINTR 4		*/ "Interrupted system call",
@@ -308,10 +308,13 @@ extern "C" char *
 strerror (int errnum)
 {
   const char *error;
+  if (errnum < _sys_nerr)
+    error = _sys_errlist [errnum];
+  else
   switch (errnum)
     {
     case EPERM:
-      error = "Not owner";
+      error = "Operation not permitted";
       break;
     case ENOENT:
       error = "No such file or directory";
