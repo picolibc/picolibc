@@ -5,29 +5,41 @@ Unlike previous net releases such as B20.1 and earlier, there is no
 monolithic "full" or "usertools" installation.  Rather, you can pick and
 choose the packages you wish to install, and update them individually.
 
-The following packages are available with the latest net release:
+The following packages are available with the current release, in their
+respective directories:
 
-ash, bash, binutils, bison, byacc, bzip2, clear, common, cygwin,
-dejagnu, diff, expect, fileutils, findutils, flex, gawk, gcc, gdb,
-gperf, grep, groff, gzip, inetutils, less, libpng, login, m4, make, man,
-opengl, patch, sed, shellutils, tar, tcltk, termcap, texinfo, textutils,
-time, zlib
+@table @samp
+
+@item latest
+bison common diff flex gperf inetutils make opengl shellutils texinfo
+ash byacc crypt expect gawk grep less man patch tar textutils bash bzip2
+cygwin fileutils gcc groff login sed tcltk time binutils clear dejagnu
+findutils gdb gzip m4 mt termcap vim
+
+@item contrib
+cvs gdbm jbigkit jpeg libpng tiff zlib
+
+@end table
 
 Full source code is available for all packages and tools.
 
-There are a few different ways to install the Cygwin net release, and
-we'll try to cover them all here.  It is strongly recommended to use the
-automatic @code{setup.exe} program if you can.
+There is one recommended way to install Cygwin, which is to use the GUI
+installer @code{setup.exe}.  There are some variations on how you go
+about that.
+
+Do it any other way, and you're on your own!  That said, keep in mind
+that the GUI installer is a "work in progress", so there might be a few
+difficulties, especially if you are behind a firewall or have other
+specific requirements.  If something doesn't work right for you, and
+it's not covered here or elsewhere, then by all means report it to the
+mailing list.
 
 @section Installation using the @code{setup.exe} program
 
-@strong{IMPORTANT: If you run @code{setup.exe} on an existing Cygwin
-installation, Setup will overwrite the contents of mounted directories.
-There is no recovery from this.  If you are upgrading from an older
-version of Cygwin, you may wish to back up your current installation and
-unmount old mount points in order to isolate them.  Then you can
-re-install Cygwin in a new location with new mount points, if this is
-what you want.}
+@strong{IMPORTANT: First read the README file in the @code{latest}
+directory at any ftp mirror.  DO THIS NOW!  Information in the README
+file is not repeated here.  You can find a mirror site near you from
+@file{http://sources.redhat.com/cygwin/mirrors.html}.}
 
 The @code{setup.exe} program is the recommended way to install Cygwin,
 but it is still a work in progress.  Expect features and functionality
@@ -36,199 +48,89 @@ build time reported by @code{setup.exe} when you run it.  This will help
 diagnose problems, should you have any.  Check the cygwin mailing list
 for the latest news about @code{setup.exe}.
 
-You have a few options when using @code{setup.exe}.  
+@subsection Why not install in C:\?
 
 The @code{setup.exe} program will prompt you for a "root" directory.
-The default is 'C:\cygwin', but you can change it.  (You are strongly
-urged @strong{not} to choose something like 'C:\'.)  It will contain the
-necessary files and directory structure, and will be mounted to '/' as
-part of the installation process.
+The default is 'C:\cygwin', but you can change it.  You are urged not to
+choose something like 'C:\' (the root directory on the system drive) for
+your Cygwin root.  If you do, then critical Cygwin system directories
+like 'etc', 'lib' and 'bin' could easily be corrupted by other (non-Cygwin)
+applications or packages that use \etc, \lib or \bin.  Perhaps there is
+no conflict now, but who knows what you might install in the future?
+It's also just good common sense to segregate your Cygwin "filesystems"
+from the rest of your Windows system disk.  (In the past, there had been
+genuine bugs that would cause problems for people who installed in C:\,
+but we believe those are gone now.)
 
-After a new installation in the default location, your mount points will
-look something like this:
+@subsection Can I use the new setup to update a B18, B19, B20, B20.1 or CD-ROM (1.0) installation of Cygwin?
 
-@example
-Device              Directory           Type         Flags
-C:\cygwin\bin       /usr/bin            user         binmode
-C:\cygwin\lib       /usr/lib            user         binmode
-C:\cygwin           /                   user         binmode
-@end example
+No, you must start from scratch with the new setup.  The overall
+structure has changed so much that it would be silly to try to
+accomodate old installations of Cygwin.  You'll probably be much better
+off with a whole new installation anyway.  You may backup or rename your
+old installation first, or just install the new one somewhere else.  Be
+sure to make note of your current mount table, because this will be
+overwritten during the new setup.
 
-Note that /bin and /usr/bin point to the same location, as do /lib and
-/usr/lib.  This is intentional, and you should not undo these mounts
-unless you @emph{really} know what you are doing.  Currently,
-@code{setup.exe} creates only binary mounts, but future versions will
-probably be more flexible.
+Once you've installed the latest net release, the new setup will update
+just the individual packages that need it.
 
-You can let @code{setup.exe} download all the files for you on the fly.
-This is the 'internet' installation.  Or you can download all (or some)
-of the packages ahead of time, and instruct @code{setup.exe} to install
-Cygwin from those files.  This is the 'directory' installation.  You
-must use this method if you want to install only a subset of the
-available packages.
+@subsection The README says I should turn off anti-virus software.  Isn't that dangerous?
 
-Note that you cannot combine methods.  If you use the directory
-installation, @code{setup.exe} will install @strong{only} the packages
-it finds in the directory; it will not also be able to download packages
-from the internet in the same pass.  If you have not carefully chosen
-which packages to download, you may not end up with a working Cygwin
-installation.  You can, however, add and update packages later.  See
-below.
+Only Network Associates (formerly McAfee) products have been reported to
+"hang" when extracting Cygwin tar archives.  Other products should not
+cause problems, if you prefer to keep them running.
 
-Whichever you choose, the first step is to open an ftp mirror site near
-you from @file{http://sources.redhat.com/cygwin/mirrors.html}.  Then
-go to the 'latest' directory, download @code{setup.exe} and save that to
-an @strong{empty temporary directory}.  While you're there, download the
-README file and read it.  Then read it again.
+Otherwise, you can download @code{setup.exe} and scan it.  Then turn off
+the anti-virus software, then run setup to download and extract all the
+tar files.  Then re-activate your anti-virus software and scan
+everything in C:\cygwin (or wherever you chose to install).  This should
+be safe.  (As long as nobody substitutes a malicious setup.exe ...)
 
-Then proceed according to your choice below.
+@subsection What packages should I download?
 
-@subsection Internet installation with @code{setup.exe}
+Just get everything, if you have room for it.  But if you must be
+selective:
 
-Shut down @strong{all cygwin applications} (including inetd, etc.).
+@table @samp
 
-Then, in a @strong{Windows command prompt} ("MS-DOS Prompt" in Windows
-95/98), '@code{cd}' to the temporary directory and type
-'@code{setup.exe}'.
+@item cygwin
+This is the minimum core, consisting of the cygwin1.dll and a few
+commands (like @code{mount}).  Not much else, and no shell!
 
-When prompted, specify the location of the root directory, or accept the
-default.
+@item bash
+This is the default interactive command shell for cygwin.  If you don't
+install @samp{bash}, then the "Cygwin Bash Shell" shortcut that setup
+creates for you won't actually do anything.
 
-At the next prompt, choose to install from the Internet ('i').  This is
-the default.
+@item ash
+This is often forgotten because it's not obvious that @samp{ash}
+contains @code{/bin/sh}, which is essential for running scripts, (and
+@code{make} and ...).
 
-Setup will connect to sources.redhat.com to read a list of mirror
-sites.  Choose one from the list, or choose 'other' to supply your own.
-If you supply your own, you must provide a full URL, not just the ftp
-hostname.  Setup will then proceed to download and install all packages
-from the ftp site.  Of course this may take a while if you have a slow
-connection.
+@end table
 
-When finished, Setup will have created a "Cygnus Solutions" folder on
-your Start Menu, containing a shortcut to @code{cygwin.bat}, which
-invokes bash with various environment variables set correctly.  The
-"Uninstall Cygwin" shortcut, if present, is unlikely to do a proper
-job.  If you want to completely uninstall Cygwin, you will probably have
-to delete some things by hand.
+If you want to build programs, of course you'll need @samp{gcc}, but
+you'll also need @samp{binutils}, probably @samp{make} and
+@samp{fileutils}, and possibly lots more.  (Again, consider just getting
+everything!)
 
-Once setup is complete you may remove the temporary directory.  It will
-contain @code{setup.exe}, the downloaded @code{.tar.gz} files, and a
-setup log file, which is not needed, but may contain helpful diagnostics
-if your installation failed for some reason.
+@subsection What if setup fails?
 
-@subsection Directory installation with @code{setup.exe}
+If you are downloading from the internet, setup will fail if it cannot
+download the list of mirrors at
+@file{http://sources.redhat.com/cygwin/mirrors.html}.  It could be that
+the network is too busy.  Similarly for an ftp download site that isn't
+working.  Try another mirror, or try again later.
 
-Before proceeding, you must download packages into the temporary
-directory containing @code{setup.exe}.  These are in subdirectories of
-'latest' and end in .tar.gz and not in -src.tar.gz.  If there is more
-than one in a given directory, pick the one with the highest version
-number.  Put them together in the temporary directory containing
-@code{setup.exe}.  You may preserve the directory structure of 'latest',
-and include the -src.tar.gz files, without ill effect.
+If setup refuses to download a package that you know needs to be
+upgraded, try deleting that package's entry from /etc/setup.  If you are
+reacting quickly to an announcement on the mailing list, it could be
+that the mirror you are using doesn't have the latest copy yet.  Try
+another mirror, or try again tomorrow.
 
-Whatever subset you think is appropriate, it @strong{must} contain the
-'cygwin' package, or you will not end up with a working Cygwin
-installation.
+@subsection What's the difference between packages in @samp{latest} and @samp{contrib}?
 
-When you have all the necessary tar files together with
-@code{setup.exe}, proceed as you would for an internet installation,
-except choose directory installation ('d') when prompted.  Setup will
-install all the tar files that it finds there.  Here are the gory
-details again:
-
-Shut down @strong{all cygwin applications} (including inetd, etc.).
-
-Then, in a @strong{Windows command prompt} ("MS-DOS Prompt" in Windows
-95/98), '@code{cd}' to the temporary directory and type
-'@code{setup.exe}'.
-
-When prompted, specify the location of the root directory, or accept the
-default.
-
-At the next prompt, choose to install from the current directory ('d').
-This is @strong{not} the default.
-
-When finished, Setup will have created a "Cygnus Solutions" folder on
-your Start Menu, containing a shortcut to @code{cygwin.bat}, which
-invokes bash with various environment variables set correctly.  The
-"Uninstall Cygwin" shortcut, if present, is unlikely to do a proper
-job.  If you want to completely uninstall Cygwin, you will probably have
-to delete some things by hand.
-
-Once setup is complete you may remove the temporary directory.  It will
-contain @code{setup.exe}, the downloaded @code{.tar.gz} files, and a
-setup log file, which is not needed, but may contain helpful diagnostics
-if your installation failed for some reason.
-
-@subsection Adding or updating packages
-
-Later versions of @code{setup.exe} permit you to add and/or update
-packages to an existing cygwin installation.
-
-@strong{You cannot use this method to update a B18, B19, B20, B20.1 or
-CD-ROM (1.0) installation of Cygwin.  You must have previously installed
-a net release of Cygwin 1.1.0 or greater, using @code{setup.exe}, before
-you can update packages with 'setup -u'.}
-
-To update your installation, create an empty temporary directory, and
-download the latest version of @code{setup.exe} to it from a Cygwin
-mirror near you.
-
-Then, in a @strong{Windows command prompt} ("MS-DOS Prompt" in Windows
-95/98), '@code{cd}' to the temporary directory and type
-@example
-	setup -u <pkg>
-@end example
-where "<pkg>" is the name of the package you wish to update, such as
-"cygwin" or "gdb" or "make" or ...
-
-Specify the root directory as you did when you first installed Cygwin.
-This will update the package.  As with the initial installation, you can
-update from the internet ('i') or from the directory ('d').  The latter
-requires that you download the @code{.tar.gz} file of the package ahead
-of time, along with @code{setup.exe}.
-
-If you are updating the package "cygwin", then you must close
-@strong{all} Cygwin applications (including @code{inetd}, for example),
-before running setup.
-
-You can omit the '-u' option, which will force setup to install the
-latest package (from internet or directory), regardless of whether
-@code{setup.exe} believes it is necessary.  You @strong{must} omit '-u'
-if you are updating from a development snapshot, because development
-snapshots have their version numbers "bumped" to the next release
-number.  In this case, @code{setup.exe} will think your installation is
-already up-to-date.
-
-Once setup is complete you may remove the temporary directory.  It will
-contain @code{setup.exe}, the downloaded @code{.tar.gz} files, and a
-setup log file, which is not needed, but may contain helpful diagnostics
-if your installation failed for some reason.
-
-@subsection Problems running @code{setup.exe}
-
-@subsubsection Error message: "Unable to retrieve the list of cygwin mirrors..."
-
-This means that @code{setup.exe} could not make an http connection to
-@file{http://sources.redhat.com/cygwin/mirrors.html}.  This is
-required for an internet ('i') install.  Either sources.redhat.com was
-too busy, or there is a problem with your network.  Note that
-@code{setup.exe} has very limited proxy functionality for firewalls, and
-depends on IE4 or later being installed and configured properly.  If you
-cannot get the internet installation to work, just download the
-packages yourself and do a directory ('d') install.
-
-@subsubsection System hangs when unpacking tar archives
-
-Your anti-virus software is interfering with @code{setup.exe}.  You will
-have to disable it before running setup.  In that case, you will
-probably want to:
-@enumerate
-@item download all the .tar.gz files for the packages, along with @code{setup.exe}
-@item scan it all for viruses
-@item disable the anti-virus software
-@item perform a directory ('d') install
-@item re-enable the anti-virus software
-@item scan everything below your Cygwin root directory (@code{C:\cygwin} by default)
-@end enumerate
-
+Good question!  That very issue is sometimes debated on the
+@samp{cygwin-apps} mailing list.  Check the list archives if you want to
+know more.
