@@ -1,5 +1,9 @@
 2002-09-18  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* mingwex/math/files.txt: Remove inadvertantly added file.
+
+2002-09-18  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/string.h (_strerror): Move into #ifndef
 	__STRICT_ANSI__ block.
 
