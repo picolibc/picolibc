@@ -1,3 +1,7 @@
+2004-04-06  Luke Dunstan  <infidel@users.sourceforge.net>
+
+	* include/ocidl.h (QACONTAINERFLAGS): Correct typedef.
+
 2004-03-29  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/Makefile,in; Add directx to .PHONY target.
