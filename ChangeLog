@@ -1,3 +1,7 @@
+2003-10-03  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* ltconfig (sys_lib_search_path_spec): Fix a typo for HPUX.
+
 2003-10-01  Phil Edwards  <pme@gcc.gnu.org>
 
 	* config-ml.in:  Use ac_configure_args directly instead of
