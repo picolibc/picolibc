@@ -14,7 +14,7 @@ srcdir:=@srcdir@
 objdir:=.
 
 CONFIG_DIR:=$(srcdir)/config/@CONFIG_DIR@
-VPATH:=$(srcdir):$(CONFIG_DIR):$(srcdir)/regexp:$(srcdir)/lib
+VPATH:=$(srcdir):$(CONFIG_DIR):$(srcdir)/regex:$(srcdir)/regexp:$(srcdir)/lib
 
 target_alias:=@target_alias@
 build_alias:=@build_alias@
@@ -44,14 +44,14 @@ INSTALL_PROGRAM:=@INSTALL_PROGRAM@
 #
 # --enable options from configure
 #
-MT_SAFE = @MT_SAFE@
-DEFS = @DEFS@
+MT_SAFE:=@MT_SAFE@
+DEFS:=@DEFS@
 
 CC:=@CC@
 # FIXME: Which is it, CC or CC_FOR_TARGET?
 CC_FOR_TARGET:=$(CC)
 CFLAGS:=@CFLAGS@
-CFLAGS+=-MD -fbuiltin
+CFLAGS+=-MMD -fbuiltin
 CXX:=@CXX@
 CXXFLAGS:=@CXXFLAGS@
 
@@ -65,7 +65,8 @@ LD:=@LD@
 DLLTOOL:=@DLLTOOL@
 WINDRES:=@WINDRES@
 AS:=@AS@
-LDSCRIPT=cygwin.sc
+NM:=@NM@
+LDSCRIPT:=cygwin.sc
 
 #
 # Include common definitions for winsup directory
@@ -122,23 +123,34 @@ DLL_OFILES:=assert.o autoload.o cygheap.o cygserver_client.o \
 	delqueue.o dir.o \
 	dlfcn.o dll_init.o dtable.o environ.o  errno.o exceptions.o exec.o \
 	external.o fcntl.o fhandler.o fhandler_clipboard.o fhandler_console.o \
-	fhandler_dsp.o fhandler_floppy.o fhandler_mem.o fhandler_random.o \
-	fhandler_raw.o fhandler_serial.o fhandler_socket.o fhandler_tape.o \
-	fhandler_termios.o fhandler_tty.o fhandler_windows.o fhandler_zero.o \
-	fork.o glob.o grp.o heap.o init.o ioctl.o ipc.o localtime.o malloc.o \
-	miscfuncs.o mmap.o net.o ntea.o passwd.o path.o pinfo.o pipe.o poll.o \
-	pthread.o regexp.o regerror.o regsub.o registry.o resource.o scandir.o \
-	sched.o sec_acl.o sec_helper.o security.o select.o shared.o shm.o \
-	shortcut.o signal.o sigproc.o \
-	smallprint.o spawn.o strace.o strsep.o sync.o syscalls.o sysconf.o \
-	syslog.o termios.o thread.o times.o tty.o uinfo.o uname.o wait.o \
-	wincap.o window.o \
-	$(EXTRA_DLL_OFILES) $(EXTRA_OFILES) $(MALLOC_OFILES) $(MT_SAFE_OBJECTS) 
+	fhandler_disk_file.o fhandler_dsp.o fhandler_floppy.o fhandler_mem.o \
+	fhandler_random.o fhandler_raw.o fhandler_serial.o fhandler_socket.o \
+	fhandler_tape.o fhandler_termios.o fhandler_tty.o fhandler_windows.o \
+	fhandler_zero.o fork.o glob.o grp.o heap.o init.o ioctl.o ipc.o \
+	localtime.o malloc.o miscfuncs.o mmap.o net.o ntea.o passwd.o path.o \
+	pinfo.o pipe.o poll.o pthread.o regcomp.o regerror.o regexec.o \
+	regfree.o registry.o resource.o scandir.o sched.o sec_acl.o \
+	sec_helper.o security.o select.o shared.o shm.o shortcut.o signal.o \
+	sigproc.o smallprint.o spawn.o strace.o strsep.o sync.o syscalls.o \
+	sysconf.o syslog.o termios.o thread.o times.o tty.o uinfo.o uname.o \
+	v8_regexp.o v8_regerror.o v8_regsub.o wait.o wincap.o window.o \
+	$(EXTRA_DLL_OFILES) $(EXTRA_OFILES) $(MALLOC_OFILES) $(MT_SAFE_OBJECTS)
 
-GMON_OFILES:= gmon.o mcount.o profil.o
+GMON_OFILES:=gmon.o mcount.o profil.o
 
+OBSOLETE_FUNCTIONS:=regcomp regerror regexec regfree regsub
+NEW_FUNCTIONS:=regcomp posix_regcomp \
+	       regerror posix_regerror \
+	       regexec posix_regexec \
+	       regfree posix_regfree
+
+PWD:=${shell pwd}
+SUBLIBS:=libpthread.a $(PWD)/libm.a libc.a
+EXTRALIBS:=libautomode.a libbinmode.a libtextmode.a
+INSTOBJS:=automode.o binmode.o textmode.o
+TARGET_LIBS:=$(LIB_NAME) $(SUBLIBS) $(GMON_START) $(LIBGMON_A) $(SUBLIBS) $(INSTOBJS) $(EXTRALIBS)
 .PHONY: all force dll_ofiles install all_target install_target all_host install_host \
-	install install_target install-libs install-headers
+	install install-libs install-headers
 
 .SUFFIXES:
 .SUFFIXES: .c .cc .def .a .o .d
@@ -148,7 +160,7 @@ install_host=@install_host@
 
 all: all_target $(all_host)
 
-all_target: $(LIB_NAME) automode.o binmode.o textmode.o $(LIBGMON_A) cygserver.exe
+all_target: $(TARGET_LIBS) cygserver.exe
 
 all_host: new-$(LIB_NAME) cygrun.exe
 
@@ -156,13 +168,13 @@ force:
 
 install: install-bin install-libs install-headers $(install_host) $(install_target)
 
-install-bin: cygserver.exe
-	$(INSTALL_PROGRAM) cygserver.exe $(bindir)/cygserver.exe	
+install: install-libs install-headers install-man install_target \
+	$(install_host) $(install_target)
 
-install-libs: $(LIB_NAME)
+install-libs: $(TARGET_LIBS)
 	$(INSTALL_DATA) new-$(DLL_NAME) $(bindir)/$(DLL_NAME); \
-	for i in $(LIB_NAME) $(GMON_START) $(LIBGMON_A) automode.o binmode.o textmode.o ; do \
-	    $(INSTALL_DATA) $$i $(tooldir)/lib/$$i ; \
+	for i in $^; do \
+	    $(INSTALL_DATA) $$i $(tooldir)/lib/`basename $$i` ; \
 	done
 
 install-headers:
@@ -172,43 +184,57 @@ install-headers:
 	      $(INSTALL_DATA) $$i $(tooldir)/$$sub/`basename $$i` ; \
 	    done ; \
 	done ; \
-	$(INSTALL_DATA) regexp/regexp.h $(tooldir)/include/regexp.h
+	$(INSTALL_DATA) regex/regex.h $(tooldir)/include/regex.h
 
+install-man:
+	cd $(srcdir); \
+	for i in `find . -type f -name '*.2'`; do \
+	    $(INSTALL_DATA) $$i $(tooldir)/man/man2/`basename $$i` ; \
+	done; \
+	for i in `find . -type f -name '*.3'`; do \
+	    $(INSTALL_DATA) $$i $(tooldir)/man/man3/`basename $$i` ; \
+	done; \
+	for i in `find . -type f -name '*.5'`; do \
+	    $(INSTALL_DATA) $$i $(tooldir)/man/man5/`basename $$i` ; \
+	done; \
+	for i in `find . -type f -name '*.7'`; do \
+	    $(INSTALL_DATA) $$i $(tooldir)/man/man7/`basename $$i` ; \
+	done
+
+install_target: cygserver.exe
+	$(INSTALL_PROGRAM) cygserver.exe $(bindir)/cygserver.exe
+	
 install_host:
 
 clean:
-	-rm -f *.o *.dll *.a *.exp junk *.base version.cc regexp/*.o winver_stamp *.exe *.d
+	-rm -f *.o *.dll *.a *.exp junk *.base version.cc regexp/*.o winver_stamp *.exe *.d *stamp* *_magic.h
 
 maintainer-clean realclean: clean
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 	-rm -fr configure
 
+
+# Rule to build cygwin.dll
+new-$(DLL_NAME): $(LDSCRIPT) $(DLL_OFILES) $(DEF_FILE) $(DLL_IMPORTS) $(LIBC) $(LIBM) Makefile winver_stamp
+	$(CXX) $(CXXFLAGS) -nostdlib -Wl,-T$(firstword $^) -Wl,--out-implib,cygdll.a -shared -o $@ \
+	-e $(DLL_ENTRY) $(DEF_FILE) $(DLL_OFILES) version.o winver.o \
+	$(DLL_IMPORTS) $(MALLOC_OBJ) $(LIBM) $(LIBC) \
+	-lstdc++ -lgcc -lshell32 -luuid
+
 # Rule to build libcygwin.a
+$(LIB_NAME): rmsym newsym new-$(DLL_NAME) $(LIBCOS)
+	/bin/sh ${word 1,$^} ./cygdll.a "$(NM)" "$(AR)" "$(RANLIB)" $(OBSOLETE_FUNCTIONS) || exit 0
+	/bin/sh ${word 2,$^} ./cygdll.a "$(AS)" "$(AR)" "$(RANLIB)" $(NEW_FUNCTIONS) || exit 0
+	(echo create $(LIB_NAME); echo addmod $(LIBCOS); echo addlib cygdll.a; echo save) | $(AR) -M
 
 # Rule to make stub library used by testsuite
-
-# dependency set to $(LIB_NAME) to accomodate make -j2.
+# dependency set to $(LIB_NAME) to accommodate make -j2.
 # Otherwise dlltool gets confused. cgf (11-16-2000)
 new-$(LIB_NAME): $(LIB_NAME)
 	$(DLLTOOL) --as=$(AS) --dllname new-$(DLL_NAME) --def $(DEF_FILE) --output-lib new-templib.a
 	$(AR) rcv new-templib.a $(LIBCOS)
 	mv new-templib.a new-$(LIB_NAME)
-
-# Rule to build cygwin.dll
-
-new-$(DLL_NAME): $(LDSCRIPT) $(DLL_OFILES) $(DEF_FILE) $(DLL_IMPORTS) $(LIBC) $(LIBM) Makefile winver_stamp
-	$(CXX) $(CXXFLAGS) -nostdlib -Wl,-T$(firstword $^) -Wl,--out-implib,$(LIB_NAME) -shared -o $@ \
-	-e $(DLL_ENTRY) $(DEF_FILE) $(DLL_OFILES) version.o winver.o \
-	$(DLL_IMPORTS) $(MALLOC_OBJ) $(LIBM) $(LIBC) \
-	-lstdc++ -lgcc -lshell32 -luuid
-	@rm -f stamp-cygwin-lib
-
-$(LIB_NAME): new-$(DLL_NAME) $(LIBCOS) stamp-cygwin-lib
-	$(AR) rcv $(LIB_NAME) $(LIBCOS)
-
-stamp-cygwin-lib:
-	@touch stamp-cygwin-lib
 
 dll_ofiles: $(DLL_OFILES)
 
@@ -217,6 +243,28 @@ $(LIBGMON_A): $(GMON_OFILES) $(GMON_START)
 
 version.cc winver.o: winver_stamp
 	@ :
+
+shared_info_magic.h: cygmagic shared_info.h
+	/bin/sh ${word 1,$^} $@ "$(CC)" ${word 2,$^} MOUNT_MAGIC 'class mount_info' SHARED_MAGIC 'class shared_info'
+
+child_info_magic.h: cygmagic child_info.h
+	/bin/sh ${word 1,$^} $@ "$(CC)" ${word 2,$^} CHILD_INFO_MAGIC 'class child_info'
+
+dcrt0.o sigproc.o: child_info_magic.h
+
+shared.o: shared_info_magic.h
+
+libpthread.a: speclib cygwin.def pthread.o thread.o
+	/bin/sh ${word 1, $^} $@ "${NM}" "${DLLTOOL}" ${wordlist 2, 99, $^}
+
+$(PWD)/libm.a: speclib cygwin.def $(LIBM)
+	/bin/sh ${word 1, $^} $@ "${NM}" "${DLLTOOL}" ${wordlist 2, 99, $^}
+
+$(PWD)/libc.a: speclib cygwin.def $(PWD)/libm.a libpthread.a
+	/bin/sh ${word 1, $^} -v $@ "${NM}" "${DLLTOOL}" ${wordlist 2, 99, $^}
+
+lib%.a: %.o
+	$(AR) cru $@ $?
 
 winver_stamp: mkvers.sh include/cygwin/version.h winver.rc $(DLL_OFILES)
 	@echo "Making version.o and winver.o";\

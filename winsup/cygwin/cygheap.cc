@@ -17,10 +17,10 @@
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
+#include "cygerrno.h"
 #include "cygheap.h"
 #include "child_info.h"
 #include "heap.h"
-#include "cygerrno.h"
 #include "sync.h"
 #include "shared_info.h"
 
@@ -93,12 +93,12 @@ cygheap_setup_for_child (child_info *ci, bool dup_later)
 
 void __stdcall
 cygheap_setup_for_child_cleanup (void *newcygheap, child_info *ci,
-    				 bool dup_it_now)
+				 bool dup_it_now)
 {
   if (dup_it_now)
     {
       /* NOTE: There is an assumption here that cygheap_max has not changed
-         between the time that cygheap_setup_for_child was called and now.
+	 between the time that cygheap_setup_for_child was called and now.
 	 Make sure that this is a correct assumption.  */
       cygheap_protect->acquire ();
       dup_now (newcygheap, ci, (char *) cygheap_max - (char *) cygheap);
@@ -322,7 +322,6 @@ crealloc (void *s, DWORD n)
 extern "C" void __stdcall
 cfree (void *s)
 {
-  MALLOC_CHECK;
   assert (!inheap (s));
   (void) _cfree (tocygheap (s));
   MALLOC_CHECK;
@@ -378,13 +377,13 @@ init_cygheap::etc_changed ()
 					      FILE_NOTIFY_CHANGE_LAST_WRITE);
       if (etc_changed_h == INVALID_HANDLE_VALUE)
 	system_printf ("Can't open /etc for checking, %E", (char *) pwd,
-	    	       etc_changed_h);
+		       etc_changed_h);
       else if (!DuplicateHandle (hMainProc, etc_changed_h, hMainProc,
-	    			 &etc_changed_h, 0, TRUE,
+				 &etc_changed_h, 0, TRUE,
 				 DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
 	{
 	  system_printf ("Can't inherit /etc handle, %E", (char *) pwd,
-	      		 etc_changed_h);
+			 etc_changed_h);
 	  etc_changed_h = INVALID_HANDLE_VALUE;
 	}
     }

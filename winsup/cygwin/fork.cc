@@ -218,7 +218,7 @@ sync_with_parent(const char *s, bool hang_self)
 	      WaitForSingleObject (child_proc_info->forker_finished, 1) != WAIT_FAILED)
 	    break;
 	  api_fatal ("WFSO failed for %s, fork_finished %p, %E", s,
-	      	     child_proc_info->forker_finished);
+		     child_proc_info->forker_finished);
 	  break;
 	default:
 	  debug_printf ("no problems");
@@ -425,14 +425,14 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
     {
       CloseHandle (hParent);
       CloseHandle (subproc_ready);
-      system_printf ("unable to allocate subproc_ready event, %E");
+      system_printf ("unable to allocate forker_finished event, %E");
       return -1;
     }
 
   ProtectHandle (subproc_ready);
   ProtectHandle (forker_finished);
 
-  init_child_info (PROC_FORK1, &ch, 1, subproc_ready);
+  init_child_info (PROC_FORK, &ch, 1, subproc_ready);
 
   ch.forker_finished = forker_finished;
 
@@ -548,7 +548,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   slow_pid_reuse (pi.hProcess);
 
   /* Wait for subproc to initialize itself. */
-  if (!sync_with_child(pi, subproc_ready, TRUE, "waiting for longjmp"))
+  if (!sync_with_child (pi, subproc_ready, TRUE, "waiting for longjmp"))
     goto cleanup;
 
   /* CHILD IS STOPPED */
@@ -724,6 +724,7 @@ vfork ()
 	*pp = *esp;
       int res = cygheap->fdtab.vfork_child_dup () ? 0 : -1;
       debug_printf ("%d = vfork()", res);
+      debug_printf ("exiting vfork, res %d", res);
       return res;
     }
 
@@ -746,6 +747,7 @@ vfork ()
 
   int pid = vf->pid;
   vf->pid = 0;
+  debug_printf ("exiting vfork, pid %d", pid);
   sig_dispatch_pending ();
   return pid;
 #endif

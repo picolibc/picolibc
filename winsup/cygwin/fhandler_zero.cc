@@ -15,14 +15,13 @@ details. */
 #include "security.h"
 #include "fhandler.h"
 
-fhandler_dev_zero::fhandler_dev_zero (const char *name)
-  : fhandler_base (FH_ZERO, name)
+fhandler_dev_zero::fhandler_dev_zero ()
+  : fhandler_base (FH_ZERO)
 {
-  set_cb (sizeof *this);
 }
 
 int
-fhandler_dev_zero::open (const char *, int flags, mode_t)
+fhandler_dev_zero::open (path_conv *, int flags, mode_t)
 {
   set_flags (flags);
   set_open_status ();
@@ -35,7 +34,7 @@ fhandler_dev_zero::write (const void *, size_t len)
   return len;
 }
 
-int
+int __stdcall
 fhandler_dev_zero::read (void *ptr, size_t len)
 {
   memset(ptr, 0, len);

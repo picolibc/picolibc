@@ -165,6 +165,7 @@ struct init_cygheap
   HANDLE shared_h;
   HANDLE console_h;
   HANDLE etc_changed_h;
+  char *cygwin_regname;
   cwdstuff cwd;
   dtable fdtab;
 
@@ -175,6 +176,88 @@ struct init_cygheap
 
 extern init_cygheap *cygheap;
 extern void *cygheap_max;
+
+class cygheap_fdmanip
+{
+ protected:
+  int fd;
+  fhandler_base **fh;
+  bool locked;
+ public:
+  cygheap_fdmanip (): fh (NULL) {}
+  virtual ~cygheap_fdmanip ()
+  {
+    if (locked)
+      ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "cygheap_fdmanip");
+  }
+  void release ()
+  {
+    cygheap->fdtab.release (fd);
+  }
+  operator int &() {return fd;}
+  operator fhandler_base* &() {return *fh;}
+  void operator = (fhandler_base *fh) {*this->fh = fh;}
+  fhandler_base *operator -> () const {return *fh;}
+  bool isopen () const
+  {
+    if (*fh)
+      return true;
+    set_errno (EBADF);
+    return false;
+  }
+};
+
+class cygheap_fdnew : public cygheap_fdmanip
+{
+ public:
+  cygheap_fdnew (int seed_fd = -1, bool lockit = true)
+  {
+    if (lockit)
+      SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "cygheap_fdnew");
+    if (seed_fd < 0)
+      fd = cygheap->fdtab.find_unused_handle ();
+    else
+      fd = cygheap->fdtab.find_unused_handle (seed_fd + 1);
+    if (fd >= 0)
+      {
+	locked = lockit;
+	fh = cygheap->fdtab + fd;
+      }
+    else
+      {
+	set_errno (EMFILE);
+	if (lockit)
+	  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "cygheap_fdnew");
+	locked = false;
+      }
+  }
+  void operator = (fhandler_base *fh) {*this->fh = fh;}
+};
+
+class cygheap_fdget : public cygheap_fdmanip
+{
+ public:
+  cygheap_fdget (int fd, bool lockit = false, bool do_set_errno = true)
+  {
+    if (lockit)
+      SetResourceLock (LOCK_FD_LIST, READ_LOCK, "cygheap_fdget");
+    if (fd >= 0 && fd < (int) cygheap->fdtab.size
+	&& *(fh = cygheap->fdtab + fd) != NULL)
+      {
+	this->fd = fd;
+	locked = lockit;
+      }
+    else
+      {
+	this->fd = -1;
+	if (do_set_errno)
+	  set_errno (EBADF);
+	if (lockit)
+	  ReleaseResourceLock (LOCK_FD_LIST, READ_LOCK, "cygheap_fdget");
+	locked = false;
+      }
+  }
+};
 
 class child_info;
 void *__stdcall cygheap_setup_for_child (child_info *ci, bool dup_later) __attribute__ ((regparm(2)));

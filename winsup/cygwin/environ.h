@@ -28,7 +28,8 @@ struct win_env
     int (*posix_len) (const char *);
     int (*win32_len) (const char *);
     void add_cache (const char *in_posix, const char *in_native = NULL);
-    const char * get_native () {return native ? native + namelen : NULL;}
+    const char * get_native () const {return native ? native + namelen : NULL;}
+    const char * get_posix () const {return posix ? posix : NULL;}
   };
 
 win_env * __stdcall getwinenv (const char *name, const char *posix = NULL);

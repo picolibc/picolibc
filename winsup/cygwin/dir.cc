@@ -65,6 +65,8 @@ writable_directory (const char *file)
 extern "C" int
 dirfd (DIR *dir)
 {
+  if (check_null_invalid_struct_errno (dir))
+    return -1;
   if (dir->__d_cookie != __DIRENT_COOKIE)
     {
       set_errno (EBADF);
@@ -76,220 +78,85 @@ dirfd (DIR *dir)
 
 /* opendir: POSIX 5.1.2.1 */
 extern "C" DIR *
-opendir (const char *dirname)
+opendir (const char *name)
 {
-  int len;
-  DIR *dir;
-  DIR *res = 0;
-  struct stat statbuf;
+  fhandler_base *fh;
+  path_conv pc;
+  DIR *res;
 
-  path_conv real_dirname (dirname, PC_SYM_FOLLOW | PC_FULL);
-
-  if (real_dirname.error)
-    {
-      set_errno (real_dirname.error);
-      goto failed;
-    }
-
-  if (stat (real_dirname, &statbuf) == -1)
-    goto failed;
-
-  if (!(statbuf.st_mode & S_IFDIR))
-    {
-      set_errno (ENOTDIR);
-      goto failed;
-    }
-
-  len = strlen (real_dirname);
-  if (len > MAX_PATH - 3)
-    {
-      set_errno (ENAMETOOLONG);
-      goto failed;
-    }
-
-  if ((dir = (DIR *) malloc (sizeof (DIR))) == NULL)
-    {
-      set_errno (ENOMEM);
-      goto failed;
-    }
-  if ((dir->__d_dirname = (char *) malloc (len + 3)) == NULL)
-    {
-      free (dir);
-      set_errno (ENOMEM);
-      goto failed;
-    }
-  if ((dir->__d_dirent =
-	    (struct dirent *) malloc (sizeof (struct dirent))) == NULL)
-    {
-      free (dir->__d_dirname);
-      free (dir);
-      set_errno (ENOMEM);
-      goto failed;
-    }
-  strcpy (dir->__d_dirname, real_dirname.get_win32 ());
-  dir->__d_dirent->d_version = __DIRENT_VERSION;
-  dir->__d_dirent->d_fd = open (dir->__d_dirname, O_RDONLY | O_DIROPEN);
-  /* FindFirstFile doesn't seem to like duplicate /'s. */
-  len = strlen (dir->__d_dirname);
-  if (len == 0 || SLASH_P (dir->__d_dirname[len - 1]))
-    strcat (dir->__d_dirname, "*");
+  fh = cygheap->fdtab.build_fhandler_from_name (-1, name, NULL, pc,
+						PC_SYM_FOLLOW | PC_FULL, NULL);
+  if (!fh)
+    res = NULL;
   else
-    strcat (dir->__d_dirname, "\\*");  /**/
-  dir->__d_cookie = __DIRENT_COOKIE;
-  dir->__d_u.__d_data.__handle = INVALID_HANDLE_VALUE;
-  dir->__d_position = 0;
-  dir->__d_dirhash = statbuf.st_ino;
-
-  res = dir;
-
-failed:
-  syscall_printf ("%p = opendir (%s)", res, dirname);
+    {
+      res = fh->opendir (pc);
+      if (!res)
+	delete fh;
+    }
   return res;
 }
 
 /* readdir: POSIX 5.1.2.1 */
 extern "C" struct dirent *
-readdir (DIR * dir)
+readdir (DIR *dir)
 {
-  WIN32_FIND_DATA buf;
-  HANDLE handle;
-  struct dirent *res = NULL;
+  if (check_null_invalid_struct_errno (dir))
+    return NULL;
 
   if (dir->__d_cookie != __DIRENT_COOKIE)
     {
       set_errno (EBADF);
-      syscall_printf ("%p = readdir (%p)", res, dir);
-      return res;
+      syscall_printf ("%p = readdir (%p)", NULL, dir);
+      return NULL;
     }
 
-  if (dir->__d_u.__d_data.__handle == INVALID_HANDLE_VALUE
-      && dir->__d_position == 0)
-    {
-      handle = FindFirstFileA (dir->__d_dirname, &buf);
-      DWORD lasterr = GetLastError ();
-      dir->__d_u.__d_data.__handle = handle;
-      if (handle == INVALID_HANDLE_VALUE && (lasterr != ERROR_NO_MORE_FILES))
-	{
-	  seterrno_from_win_error (__FILE__, __LINE__, lasterr);
-	  return res;
-	}
-    }
-  else if (dir->__d_u.__d_data.__handle == INVALID_HANDLE_VALUE)
-    {
-      return res;
-    }
-  else if (!FindNextFileA (dir->__d_u.__d_data.__handle, &buf))
-    {
-      DWORD lasterr = GetLastError ();
-      (void) FindClose (dir->__d_u.__d_data.__handle);
-      dir->__d_u.__d_data.__handle = INVALID_HANDLE_VALUE;
-      /* POSIX says you shouldn't set errno when readdir can't
-	 find any more files; so, if another error we leave it set. */
-      if (lasterr != ERROR_NO_MORE_FILES)
-	  seterrno_from_win_error (__FILE__, __LINE__, lasterr);
-      syscall_printf ("%p = readdir (%p)", res, dir);
-      return res;
-    }
-
-  /* We get here if `buf' contains valid data.  */
-  strcpy (dir->__d_dirent->d_name, buf.cFileName);
-
-  /* Check for Windows shortcut. If it's a Cygwin or U/WIN
-     symlink, drop the .lnk suffix. */
-  if (buf.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
-    {
-      char *c = dir->__d_dirent->d_name;
-      int len = strlen (c);
-      if (strcasematch (c + len - 4, ".lnk"))
-	{
-	  char fbuf[MAX_PATH + 1];
-	  strcpy (fbuf, dir->__d_dirname);
-	  strcpy (fbuf + strlen (fbuf) - 1, dir->__d_dirent->d_name);
-	  path_conv fpath (fbuf, PC_SYM_NOFOLLOW);
-	  if (fpath.issymlink ())
-	    c[len - 4] = '\0';
-	}
-    }
-
-  /* Compute d_ino by combining filename hash with the directory hash
-     (which was stored in dir->__d_dirhash when opendir was called). */
-  if (buf.cFileName[0] == '.')
-    {
-      if (buf.cFileName[1] == '\0')
-	dir->__d_dirent->d_ino = dir->__d_dirhash;
-      else if (buf.cFileName[1] != '.' || buf.cFileName[2] != '\0')
-	goto hashit;
-      else
-	{
-	  char *p, up[strlen (dir->__d_dirname) + 1];
-	  strcpy (up, dir->__d_dirname);
-	  if (!(p = strrchr (up, '\\')))
-	    goto hashit;
-	  *p = '\0';
-	  if (!(p = strrchr (up, '\\')))
-	    dir->__d_dirent->d_ino = hash_path_name (0, ".");
-	  else
-	    {
-	      *p = '\0';
-	      dir->__d_dirent->d_ino = hash_path_name (0, up);
-	    }
-	}
-    }
-  else
-    {
-  hashit:
-      ino_t dino = hash_path_name (dir->__d_dirhash, "\\");
-      dir->__d_dirent->d_ino = hash_path_name (dino, buf.cFileName);
-    }
-
-  ++dir->__d_position;
-  res = dir->__d_dirent;
-  syscall_printf ("%p = readdir (%p) (%s)",
-		  &dir->__d_dirent, dir, buf.cFileName);
-  return res;
+  return ((fhandler_base *) dir->__d_u.__d_data.__fh)->readdir (dir);
 }
 
 /* telldir */
 extern "C" off_t
-telldir (DIR * dir)
+telldir (DIR *dir)
 {
+  if (check_null_invalid_struct_errno (dir))
+    return -1;
+
   if (dir->__d_cookie != __DIRENT_COOKIE)
     return 0;
-  return dir->__d_position;
+  return ((fhandler_base *) dir->__d_u.__d_data.__fh)->telldir (dir);
 }
 
 /* seekdir */
 extern "C" void
-seekdir (DIR * dir, off_t loc)
+seekdir (DIR *dir, off_t loc)
 {
+  if (check_null_invalid_struct_errno (dir))
+    return;
+
   if (dir->__d_cookie != __DIRENT_COOKIE)
     return;
-  rewinddir (dir);
-  while (loc > dir->__d_position)
-    if (! readdir (dir))
-      break;
+  return ((fhandler_base *) dir->__d_u.__d_data.__fh)->seekdir (dir, loc);
 }
 
 /* rewinddir: POSIX 5.1.2.1 */
 extern "C" void
-rewinddir (DIR * dir)
+rewinddir (DIR *dir)
 {
-  syscall_printf ("rewinddir (%p)", dir);
+  if (check_null_invalid_struct_errno (dir))
+    return;
 
   if (dir->__d_cookie != __DIRENT_COOKIE)
     return;
-  if (dir->__d_u.__d_data.__handle != INVALID_HANDLE_VALUE)
-    {
-      (void) FindClose (dir->__d_u.__d_data.__handle);
-      dir->__d_u.__d_data.__handle = INVALID_HANDLE_VALUE;
-    }
-  dir->__d_position = 0;
+  return ((fhandler_base *) dir->__d_u.__d_data.__fh)->rewinddir (dir);
 }
 
 /* closedir: POSIX 5.1.2.1 */
 extern "C" int
-closedir (DIR * dir)
+closedir (DIR *dir)
 {
+  if (check_null_invalid_struct_errno (dir))
+    return -1;
+
   if (dir->__d_cookie != __DIRENT_COOKIE)
     {
       set_errno (EBADF);
@@ -297,25 +164,18 @@ closedir (DIR * dir)
       return -1;
     }
 
-  if (dir->__d_u.__d_data.__handle != INVALID_HANDLE_VALUE &&
-      FindClose (dir->__d_u.__d_data.__handle) == 0)
-    {
-      __seterrno ();
-      syscall_printf ("-1 = closedir (%p)", dir);
-      return -1;
-    }
-
-  if (dir->__d_dirent->d_fd >= 0)
-    close (dir->__d_dirent->d_fd);
-
   /* Reset the marker in case the caller tries to use `dir' again.  */
   dir->__d_cookie = 0;
+
+  int res = ((fhandler_base *) dir->__d_u.__d_data.__fh)->closedir (dir);
+
+  cygheap->fdtab.release (dir->__d_dirent->d_fd);
 
   free (dir->__d_dirname);
   free (dir->__d_dirent);
   free (dir);
-  syscall_printf ("0 = closedir (%p)", dir);
-  return 0;
+  syscall_printf ("%d = closedir (%p)", res);
+  return res;
 }
 
 /* mkdir: POSIX 5.4.1.1 */
@@ -346,6 +206,11 @@ mkdir (const char *dir, mode_t mode)
       if (!allow_ntsec && allow_ntea)
 	set_file_attribute (real_dir.has_acls (), real_dir.get_win32 (),
 			    S_IFDIR | ((mode & 07777) & ~cygheap->umask));
+#ifdef HIDDEN_DOT_FILES
+      char *c = strrchr (real_dir.get_win32 (), '\\');
+      if ((c && c[1] == '.') || *real_dir.get_win32 () == '.')
+        SetFileAttributes (real_dir.get_win32 (), FILE_ATTRIBUTE_HIDDEN);
+#endif
       res = 0;
     }
   else
@@ -384,7 +249,7 @@ rmdir (const char *dir)
       /* Even own directories can't be removed if R/O attribute is set. */
       if (real_dir.has_attribute (FILE_ATTRIBUTE_READONLY))
 	SetFileAttributes (real_dir,
-	    		   (DWORD) real_dir & ~FILE_ATTRIBUTE_READONLY);
+			   (DWORD) real_dir & ~FILE_ATTRIBUTE_READONLY);
 
       if (RemoveDirectory (real_dir))
 	{

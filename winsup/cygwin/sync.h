@@ -22,14 +22,16 @@ class muto
 public:
   class muto *next;
   const char *name;
+
+  muto() {}
+  /* The real constructor. */
+  muto(int inh, const char *name);
+
   void *operator new (size_t, void *p) {return p;}
   void *operator new (size_t) {return ::new muto; }
   void operator delete (void *) {;} /* can't handle allocated mutos
 					currently */
 
-  muto() {}
-  /* The real constructor. */
-  muto(int inh, const char *name);
   ~muto ();
   int acquire (DWORD ms = INFINITE) __attribute__ ((regparm(1))); /* Acquire the lock. */
   int release ();		     /* Release the lock. */
@@ -47,7 +49,7 @@ extern muto muto_start;
 #define new_muto(__inh, __name) \
 ({ \
   static __attribute__((section(".data_cygwin_nocopy"))) muto __mbuf; \
-  (void) new ((char *) &__mbuf) muto (__inh, __name); \
+  (void) new ((void *) &__mbuf) muto (__inh, __name); \
   __mbuf.next = muto_start.next; \
   muto_start.next = &__mbuf; \
   &__mbuf; \

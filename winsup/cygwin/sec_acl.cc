@@ -577,13 +577,13 @@ extern "C"
 int
 facl (int fd, int cmd, int nentries, aclent_t *aclbufp)
 {
-  if (cygheap->fdtab.not_open (fd))
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
     {
       syscall_printf ("-1 = facl (%d)", fd);
-      set_errno (EBADF);
       return -1;
     }
-  const char *path = cygheap->fdtab[fd]->get_name ();
+  const char *path = cfd->get_name ();
   if (path == NULL)
     {
       syscall_printf ("-1 = facl (%d) (no name)", fd);

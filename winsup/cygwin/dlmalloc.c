@@ -28,6 +28,32 @@
  *  malloc_usable_size(P) is equivalent to realloc(P, malloc_usable_size(P))
  *
  * $Log$
+ * Revision 1.4.4.1  2002/01/04 03:56:06  rbcollins
+ * Merged changes from HEAD
+ *
+ * Revision 1.5  2001/10/03 03:49:25  cgf
+ * * cygheap.cc (cfree): Remove malloc debugging probe.
+ * * dlmalloc.c (errprint): Remove abort() call which causes interesting error
+ * message printing to abort prematurely.
+ * * environ.cc: Sprinkle MALLOC_CHECKs liberally throughout.
+ * (_addenv): Allocate two empty elements at end of environ to
+ * (apparently) work around problems with some buggy applications.
+ * (winenv): Avoid calling alloca if no forced environment variable is present.
+ *
+ * * exceptions.cc (open_stackdumpfile): Don't print "Dumping stack trace to..."
+ * when running in a cygwin environment (i.e., the parent is a cygwin process).
+ *
+ * * dtable.cc (dtable::init_std_file_from_handle): Move device type detection
+ * code from build_fhandler here since it is only used by this function.
+ * (dtable::build_fhandler_from_name): New method.  Renamed from
+ * dtable::build_fhandler.
+ * (dtable::build_fhandler): Use build_fhandler_from_name.
+ * (cygwin_attach_handle_to_fd): Ditto.
+ * * syscalls.cc (_open): Ditto.
+ * (stat_worker): Ditto.
+ * * dtable.h (dtable::build_fhandler_from_name): Rename declaration from
+ * dtable::build_fhandler.
+ *
  * Revision 1.4  2001/09/07 21:32:04  cgf
  * * cygheap.h (init_cygheap): Move heap pointers here.
  * * include/sys/cygwin.h (perprocess): Remove heap pointers.
@@ -1843,7 +1869,6 @@ static void errprint(const char *file, int line, const char *err)
   write(2, err, strlen(err));
   write(2, "\n", 1);
   recurs--;
-  abort ();
 }
 
 static void malloc_err(const char *err, mchunkptr p)

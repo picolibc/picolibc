@@ -50,7 +50,7 @@ class sigframe
 {
 private:
   sigthread *st;
-  bool unregister ()
+  inline bool unregister ()
   {
     if (!st)
       return 0;
@@ -64,7 +64,7 @@ private:
   }
 
 public:
-  void set (sigthread &t, DWORD ebp, bool is_exception = 0)
+  inline void set (sigthread &t, DWORD ebp, bool is_exception = 0)
   {
     DWORD oframe = t.frame;
     st = &t;
@@ -73,16 +73,16 @@ public:
     if (!oframe)
       t.get_winapi_lock ();
   }
-
-  sigframe (): st (NULL) {}
-  sigframe (sigthread &t, DWORD ebp = (DWORD) __builtin_frame_address (0)) {init (t, ebp);}
-  void init (sigthread &t, DWORD ebp = (DWORD) __builtin_frame_address (0))
+  inline void init (sigthread &t, DWORD ebp = (DWORD) __builtin_frame_address (0))
   {
     if (!t.frame && t.id == GetCurrentThreadId ())
       set (t, ebp);
     else
       st = NULL;
   }
+
+  sigframe (): st (NULL) {}
+  sigframe (sigthread &t, DWORD ebp = (DWORD) __builtin_frame_address (0)) {init (t, ebp);}
   ~sigframe ()
   {
     unregister ();

@@ -157,7 +157,7 @@ str2buf2lsa (LSA_STRING &tgt, char *buf, const char *srcstr)
   memcpy(buf, srcstr, tgt.MaximumLength);
 }
 
-static void
+void
 str2buf2uni (UNICODE_STRING &tgt, WCHAR *buf, const char *srcstr)
 {
   tgt.Length = strlen (srcstr) * sizeof (WCHAR);
@@ -181,9 +181,9 @@ static LSA_HANDLE
 open_local_policy ()
 {
   LSA_OBJECT_ATTRIBUTES oa = { 0, 0, 0, 0, 0, 0 };
-  LSA_HANDLE lsa = INVALID_HANDLE_VALUE;
+  LSA_HANDLE lsa = NULL;
 
-  NTSTATUS ret = LsaOpenPolicy(NULL, &oa, POLICY_ALL_ACCESS, &lsa);
+  NTSTATUS ret = LsaOpenPolicy(NULL, &oa, POLICY_EXECUTE, &lsa);
   if (ret != STATUS_SUCCESS)
     set_errno (LsaNtStatusToWinError (ret));
   return lsa;
@@ -326,11 +326,8 @@ is_group_member (WCHAR *wlogonserver, WCHAR *wgroup,
   NET_API_STATUS ret;
   BOOL retval = FALSE;
 
-  ret = NetLocalGroupGetMembers (wlogonserver, wgroup, 0, (LPBYTE *) &buf,
+  ret = NetLocalGroupGetMembers (NULL, wgroup, 0, (LPBYTE *) &buf,
 				 MAX_PREFERRED_LENGTH, &cnt, &tot, NULL);
-  if (ret == ERROR_BAD_NETPATH || ret == RPC_S_SERVER_UNAVAILABLE)
-    ret = NetLocalGroupGetMembers (NULL, wgroup, 0, (LPBYTE *) &buf,
-				   MAX_PREFERRED_LENGTH, &cnt, &tot, NULL);
   if (ret)
     return FALSE;
 
@@ -354,11 +351,8 @@ get_user_local_groups (WCHAR *wlogonserver, const char *logonserver,
   DWORD cnt, tot;
   NET_API_STATUS ret;
 
-  ret = NetLocalGroupEnum (wlogonserver, 0, (LPBYTE *) &buf,
+  ret = NetLocalGroupEnum (NULL, 0, (LPBYTE *) &buf,
 			   MAX_PREFERRED_LENGTH, &cnt, &tot, NULL);
-  if (ret == ERROR_BAD_NETPATH || ret == RPC_S_SERVER_UNAVAILABLE)
-    ret = NetLocalGroupEnum (NULL, 0, (LPBYTE *) &buf,
-			     MAX_PREFERRED_LENGTH, &cnt, &tot, NULL);
   if (ret)
     {
       debug_printf ("%d = NetLocalGroupEnum ()", ret);
@@ -454,6 +448,30 @@ get_user_primary_group (WCHAR *wlogonserver, const char *user,
   return retval;
 }
 
+static int
+get_supplementary_group_sidlist (const char *username, cygsidlist &grp_list)
+{
+  struct group *gr;
+  int cnt = 0;
+
+  for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
+    {
+      if (gr->gr_mem)
+	for (int gi = 0; gr->gr_mem[gi]; ++gi)
+	  if (strcasematch (username, gr->gr_mem[gi]))
+	    {
+	      if (gr->gr_passwd && *gr->gr_passwd)
+		{
+		  cygsid sid (gr->gr_passwd);
+		  if ((PSID)sid && grp_list.add (sid))
+		    ++cnt;
+		}
+	      break;
+	    }
+    }
+  return cnt;
+}
+
 static BOOL
 get_group_sidlist (const char *logonserver, cygsidlist &grp_list,
 		   cygsid &usersid, cygsid &pgrpsid,
@@ -465,6 +483,7 @@ get_group_sidlist (const char *logonserver, cygsidlist &grp_list,
   DWORD ulen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
   DWORD dlen = INTERNET_MAX_HOST_NAME_LENGTH + 1;
   SID_NAME_USE use;
+  cygsidlist sup_list;
 
   auth_pos = -1;
   sys_mbstowcs (wserver, logonserver, INTERNET_MAX_HOST_NAME_LENGTH + 1);
@@ -520,6 +539,12 @@ get_group_sidlist (const char *logonserver, cygsidlist &grp_list,
     return FALSE;
   if (!grp_list.contains (pgrpsid))
     grp_list += pgrpsid;
+  if (get_supplementary_group_sidlist (user, sup_list))
+    {
+      for (int i = 0; i < sup_list.count; ++i)
+	if (!grp_list.contains (sup_list.sids[i]))
+	  grp_list += sup_list.sids[i];
+    }
   return TRUE;
 }
 
@@ -714,7 +739,7 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
     goto out;
 
   /* Open policy object. */
-  if ((lsa = open_local_policy ()) == INVALID_HANDLE_VALUE)
+  if (!(lsa = open_local_policy ()))
     goto out;
 
   /* Get logon server. */

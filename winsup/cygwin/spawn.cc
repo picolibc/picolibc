@@ -63,7 +63,7 @@ perhaps_suffix (const char *prog, path_conv &buf)
   debug_printf ("prog '%s'", prog);
   buf.check (prog, PC_SYM_FOLLOW | PC_FULL, std_suffixes);
 
-  if (buf.isdir ())
+  if (!buf.exists () || buf.isdir ())
     ext = NULL;
   else if (buf.known_suffix)
     ext = (char *) buf + (buf.known_suffix - buf.get_win32 ());
@@ -84,21 +84,34 @@ perhaps_suffix (const char *prog, path_conv &buf)
 
 const char * __stdcall
 find_exec (const char *name, path_conv& buf, const char *mywinenv,
-	   int null_if_notfound, const char **known_suffix)
+	   unsigned opt, const char **known_suffix)
 {
   const char *suffix = "";
   debug_printf ("find_exec (%s)", name);
   char *retval = buf;
+  char tmp[MAX_PATH];
+  const char *posix = (opt & FE_NATIVE) ? NULL : name;
+  bool has_slash = strchr (name, '/');
 
   /* Check to see if file can be opened as is first.
      Win32 systems always check . first, but PATH may not be set up to
      do this. */
-  if ((suffix = perhaps_suffix (name, buf)) != NULL)
-    goto out;
+  if ((has_slash || opt & FE_CWD)
+      && (suffix = perhaps_suffix (name, buf)) != NULL)
+    {
+      if (posix && !has_slash)
+	{
+	  tmp[0] = '.';
+	  tmp[1] = '/';
+	  strcpy (tmp + 2, name);
+	  posix = tmp;
+	}
+      goto out;
+    }
 
   win_env *winpath;
   const char *path;
-  char tmp[MAX_PATH];
+  const char *posix_path;
 
   /* Return the error condition if this is an absolute path or if there
      is no PATH to search. */
@@ -111,14 +124,17 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
 
   debug_printf ("%s%s", mywinenv, path);
 
+  posix = (opt & FE_NATIVE) ? NULL : tmp;
+  posix_path = winpath->get_posix () - 1;
   /* Iterate over the specified path, looking for the file with and
      without executable extensions. */
   do
     {
+      posix_path++;
       char *eotmp = strccpy (tmp, &path, ';');
       /* An empty path or '.' means the current directory, but we've
 	 already tried that.  */
-      if (tmp[0] == '\0' || (tmp[0] == '.' && tmp[1] == '\0'))
+      if (opt & FE_CWD && (tmp[0] == '\0' || (tmp[0] == '.' && tmp[1] == '\0')))
 	continue;
 
       *eotmp++ = '\\';
@@ -127,19 +143,32 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
       debug_printf ("trying %s", tmp);
 
       if ((suffix = perhaps_suffix (tmp, buf)) != NULL)
-	goto out;
+	{
+	  if (posix == tmp)
+	    {
+	      eotmp = strccpy (tmp, &posix_path, ':');
+	      if (eotmp == tmp)
+		*eotmp++ = '.';
+	      *eotmp++ = '/';
+	      strcpy (eotmp, name);
+	    }
+	  goto out;
+	}
     }
-  while (*path && *++path);
+  while (*path && *++path && (posix_path = strchr (posix_path, ':')));
 
  errout:
+  posix = NULL;
   /* Couldn't find anything in the given path.
      Take the appropriate action based on null_if_not_found. */
-  if (null_if_notfound)
+  if (opt & FE_NNF)
     retval = NULL;
-  else
+  else if (opt & FE_NATIVE)
     buf.check (name);
 
  out:
+  if (posix)
+    buf.set_path (posix);
   debug_printf ("%s = find_exec (%s)", (char *) buf, name);
   if (known_suffix)
     *known_suffix = suffix ?: strchr (buf, '\0');
@@ -322,13 +351,13 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
   si.cbReserved2 = sizeof (ciresrv);
 
   DWORD chtype;
-  if (mode != _P_OVERLAY && mode != _P_VFORK)
+  if (mode != _P_OVERLAY)
     chtype = PROC_SPAWN;
   else
     chtype = PROC_EXEC;
 
   HANDLE spr;
-  if (mode != _P_OVERLAY)
+  if (chtype != PROC_EXEC)
     spr = NULL;
   else
     {
@@ -336,7 +365,8 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
       ProtectHandle (spr);
     }
 
-  init_child_info (chtype, &ciresrv, (mode == _P_OVERLAY) ? myself->pid : 1, spr);
+  init_child_info (chtype, &ciresrv, (mode == _P_OVERLAY) ? myself->pid : 1,
+		   spr);
   if (!DuplicateHandle (hMainProc, hMainProc, hMainProc, &ciresrv.parent, 0, 1,
 			DUPLICATE_SAME_ACCESS))
      {
@@ -465,7 +495,9 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
       if (arg1)
 	newargv.unshift (arg1);
 
-      find_exec (pgm, real_path, "PATH=", 0, &ext);
+      /* FIXME: This should not be using FE_NATIVE.  It should be putting
+	 the posix path on the argv list. */
+      find_exec (pgm, real_path, "PATH=", FE_NATIVE, &ext);
       newargv.unshift (real_path, 1);
     }
 
@@ -674,7 +706,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 		       &pi);
       /* Restore impersonation. In case of _P_OVERLAY this isn't
 	 allowed since it would overwrite child data. */
-      if (mode != _P_OVERLAY && mode != _P_VFORK
+      if (mode != _P_OVERLAY
 	  && cygheap->user.impersonated
 	  && cygheap->user.token != INVALID_HANDLE_VALUE)
 	ImpersonateLoggedOnUser (cygheap->user.token);
@@ -746,6 +778,13 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
       child->hProcess = pi.hProcess;
       child.remember ();
       strcpy (child->progname, real_path);
+      /* FIXME: This introduces an unreferenced, open handle into the child.
+	 The purpose is to keep the pid shared memory open so that all of
+	 the fields filled out by child.remember do not disappear and so there
+	 is not a brief period during which the pid is not available.
+	 However, we should try to find another way to do this eventually. */
+      (void) DuplicateHandle (hMainProc, child.shared_handle (), pi.hProcess,
+			      NULL, 0, 0, DUPLICATE_SAME_ACCESS);
       /* Start the child running */
       ResumeThread (pi.hThread);
     }

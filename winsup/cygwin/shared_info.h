@@ -17,7 +17,6 @@ class mount_item
  public:
   /* FIXME: Nasty static allocation.  Need to have a heap in the shared
      area [with the user being able to configure at runtime the max size].  */
-
   /* Win32-style mounted partition source ("C:\foo\bar").
      native_path[0] == 0 for unused entries.  */
   char native_path[MAX_PATH];
@@ -40,13 +39,21 @@ class mount_item
    scheme should be satisfactory for a long while yet.  */
 #define MAX_MOUNTS 30
 
-#define MOUNT_VERSION	0x01010103
+#define MOUNT_VERSION	27	// increment when mount table changes and
+#define MOUNT_VERSION_MAGIC CYGWIN_VERSION_MAGIC (MOUNT_MAGIC, MOUNT_VERSION)
+#define CURR_MOUNT_MAGIC 0x41e0
+#define MOUNT_INFO_CB 16488
 
 class reg_key;
+
+/* NOTE: Do not make gratuitous changes to the names or organization of the
+   below class.  The layout is checksummed to determine compatibility between
+   different cygwin versions. */
 class mount_info
 {
  public:
   DWORD version;
+ unsigned cb;
   DWORD sys_mount_table_counter;
   int nmounts;
   mount_item mount[MAX_MOUNTS];
@@ -97,7 +104,7 @@ class mount_info
   void mount_slash ();
   void to_registry ();
 
-  int cygdrive_win32_path (const char *src, char *dst, int trailing_slash_p);
+  int cygdrive_win32_path (const char *src, char *dst, int& unit);
   void cygdrive_posix_path (const char *src, char *dst, int trailing_slash_p);
   void read_cygdrive_info_from_registry ();
 };
@@ -128,9 +135,21 @@ public:
 /******** Shared Info ********/
 /* Data accessible to all tasks */
 
+#define SHARED_VERSION (unsigned)(cygwin_version.api_major << 8 | \
+				  cygwin_version.api_minor)
+#define SHARED_VERSION_MAGIC CYGWIN_VERSION_MAGIC (SHARED_MAGIC, SHARED_VERSION)
+
+#define SHARED_INFO_CB 47112
+
+#define CURR_SHARED_MAGIC 0x88e
+
+/* NOTE: Do not make gratuitous changes to the names or organization of the
+   below class.  The layout is checksummed to determine compatibility between
+   different cygwin versions. */
 class shared_info
 {
-  DWORD inited;
+  DWORD version;
+  DWORD cb;
  public:
   int heap_chunk_in_mb;
   DWORD sys_mount_table_counter;
@@ -158,4 +177,4 @@ void __stdcall shared_terminate (void);
 #define cygheap_address		shared_align_past ((mount_info *) shared_align_past (cygwin_shared))
 
 char *__stdcall shared_name (const char *, int);
-void *__stdcall open_shared (const char *name, HANDLE &shared_h, DWORD size, void *addr);
+void *__stdcall open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, void *addr);

@@ -159,6 +159,8 @@ ecvtf
 _ecvtf = ecvtf
 endgrent
 _endgrent = endgrent
+endutent
+_endutent = endutent
 erf
 _erf = erf
 erfc
@@ -376,6 +378,12 @@ gettimeofday
 _gettimeofday = gettimeofday
 getuid
 _getuid = getuid
+getutent
+_getutent = getutent
+getutid
+_getutid = getutid
+getutline
+_getutline = getutline
 glob
 _glob = glob
 globfree
@@ -594,16 +602,10 @@ readv
 _readv = readv
 realloc = export_realloc
 _realloc = export_realloc
-regcomp
-_regcomp = regcomp
-regexec
-_regexec = regexec
-regerror
-_regerror = regerror
-regfree
-_regfree = regfree
-regsub
-_regsub = regsub
+posix_regcomp
+posix_regerror
+posix_regexec
+posix_regfree
 remainder
 _remainder = remainder
 remainderf
@@ -666,6 +668,8 @@ setegid
 _setegid = setegid
 setuid
 _setuid = setuid
+setutent
+_setutent = setutent
 chroot
 _chroot = chroot
 setvbuf
@@ -858,6 +862,8 @@ ttyname
 _ttyname = ttyname
 tzset
 _tzset = tzset
+ualarm
+_ualarm = ualarm
 umask
 _umask = umask
 uname
@@ -866,10 +872,14 @@ ungetc
 _ungetc = ungetc
 unlink
 _unlink = unlink
+usleep
+_usleep = usleep
 utime
 _utime = utime
 utimes
 _utimes = utimes
+utmpname
+_utmpname = utmpname
 vfiprintf
 _vfiprintf = vfiprintf
 vfork
@@ -906,6 +916,7 @@ wctomb
 _wctomb = wctomb
 write
 _write = write
+barfly = write
 writev
 _writev = writev
 y0
@@ -963,8 +974,6 @@ wcscmp
 _wcscmp = wcscmp
 wcslen
 _wcslen = wcslen
-usleep
-_usleep = usleep
 wprintf
 _wprintf = wprintf
 memccpy

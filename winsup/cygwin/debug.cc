@@ -14,6 +14,7 @@ details. */
 #include "perthread.h"
 #include "perprocess.h"
 #include "security.h"
+#include "cygerrno.h"
 
 #undef CloseHandle
 
@@ -81,6 +82,7 @@ thread_start NO_COPY start_buf[NTHREADS] = {{0, NULL,NULL}};
 static DWORD WINAPI
 thread_stub (VOID *arg)
 {
+  DECLARE_TLS_STORAGE;
   LPTHREAD_START_ROUTINE threadfunc = ((thread_start *) arg)->func;
   VOID *threadarg = ((thread_start *) arg)->arg;
 
@@ -93,7 +95,6 @@ thread_stub (VOID *arg)
      SIGSEGV or SIGFPE. */
   init_exceptions (&except_entry);
 
-  set_reent (user_data->impure_ptr);
   ExitThread (threadfunc (threadarg));
 }
 
@@ -123,7 +124,7 @@ out:
   info->arg = param;	/* The single parameter to the thread */
 
   if ((h = CreateThread (&sec_none_nih, 0, thread_stub, (VOID *) info, flags,
-	  		 &tid)))
+			 &tid)))
     regthread (name, tid);	/* Register for debugging output. */
 
   return h;
@@ -213,11 +214,14 @@ out:
 }
 
 void
-setclexec_pid (HANDLE h, bool setit)
+setclexec_pid (HANDLE oh, HANDLE nh, bool setit)
 {
-  handle_list *hl = find_handle (h);
+  handle_list *hl = find_handle (oh);
   if (hl)
-    hl->clexec_pid = setit ? GetCurrentProcessId () : 0;
+    {
+      hl->clexec_pid = setit ? GetCurrentProcessId () : 0;
+      hl->h = nh;
+    }
 }
 
 /* Create a new handle record */
@@ -347,5 +351,13 @@ close_handle (const char *func, int ln, HANDLE h, const char *name, BOOL force)
     small_printf ("CloseHandle(%s) failed %s:%d\n", name, func, ln);
 #endif
   return ret;
+}
+
+/* Add a handle to the linked list of known handles. */
+int __stdcall
+__set_errno (const char *func, int ln, int val)
+{
+  debug_printf ("%s:%d val %d", func, ln, val);
+  return _impure_ptr->_errno = val;
 }
 #endif /*DEBUGGING*/

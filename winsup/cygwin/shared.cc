@@ -14,6 +14,7 @@ details. */
 #include <stdlib.h>
 #include <grp.h>
 #include <pwd.h>
+#include <errno.h>
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
@@ -21,14 +22,12 @@ details. */
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
+#include "cygerrno.h"
 #include "cygheap.h"
 #include "heap.h"
-#include "shared_info.h"
+#include "shared_info_magic.h"
 #include "registry.h"
 #include "cygwin_version.h"
-
-#define SHAREDVER (unsigned)(cygwin_version.api_major << 16 | \
-		   cygwin_version.api_minor)
 
 shared_info NO_COPY *cygwin_shared = NULL;
 mount_info NO_COPY *mount_table = NULL;
@@ -53,7 +52,7 @@ shared_name (const char *str, int num)
 }
 
 void * __stdcall
-open_shared (const char *name, HANDLE &shared_h, DWORD size, void *addr)
+open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, void *addr)
 {
   void *shared;
 
@@ -64,7 +63,7 @@ open_shared (const char *name, HANDLE &shared_h, DWORD size, void *addr)
 	mapname = NULL;
       else
 	{
-	  mapname = shared_name (name, 0);
+	  mapname = shared_name (name, n);
 	  shared_h = OpenFileMappingA (FILE_MAP_READ | FILE_MAP_WRITE,
 				       TRUE, mapname);
 	}
@@ -104,13 +103,12 @@ open_shared (const char *name, HANDLE &shared_h, DWORD size, void *addr)
 void
 shared_info::initialize ()
 {
-  if (inited)
+  if (version)
     {
-      if (inited != SHAREDVER)
-	api_fatal ("Shared region version mismatch.  Version %x != %x.\n"
-		   "Are you using multiple versions of cygwin1.dll?\n"
-		   "Run 'cygcheck -r -s -v' to find out.",
-		   inited, SHAREDVER);
+      if (version != SHARED_VERSION_MAGIC)
+	multiple_cygwin_problem ("shared", version, SHARED_VERSION);
+      else if (cb != SHARED_INFO_CB)
+	multiple_cygwin_problem ("shared size", cb, SHARED_INFO_CB);
       return;
     }
 
@@ -119,7 +117,11 @@ shared_info::initialize ()
 
   /* Initialize tty table.  */
   tty.init ();
-  inited = SHAREDVER;
+  version = SHARED_VERSION_MAGIC;
+  cb = sizeof (*this);
+  if (cb != SHARED_INFO_CB)
+    system_printf ("size of shared memory region changed from %u to %u",
+		   SHARED_INFO_CB, cb);
 }
 
 void __stdcall
@@ -128,6 +130,7 @@ memory_init ()
   /* Initialize general shared memory */
   HANDLE shared_h = cygheap ? cygheap->shared_h : NULL;
   cygwin_shared = (shared_info *) open_shared ("shared",
+					       CYGWIN_VERSION_SHARED_DATA,
 					       shared_h,
 					       sizeof (*cygwin_shared),
 					       cygwin_shared_address);
@@ -152,7 +155,8 @@ memory_init ()
   ProtectHandle (cygheap->shared_h);
 
   heap_init ();
-  mount_table = (mount_info *) open_shared (user_name, cygwin_mount_h,
+  mount_table = (mount_info *) open_shared (user_name, MOUNT_VERSION,
+					    cygwin_mount_h,
 					    sizeof (mount_info), 0);
   debug_printf ("opening mount table for '%s' at %p", cygheap->user.name (),
 		mount_table_address);
@@ -162,10 +166,19 @@ memory_init ()
   /* Initialize the Cygwin per-user mount table, if necessary */
   if (!mount_table->version)
     {
-      mount_table->version = MOUNT_VERSION;
+      mount_table->version = MOUNT_VERSION_MAGIC;
       debug_printf ("initializing mount table");
+      mount_table->cb = sizeof (*mount_table);
+      if (mount_table->cb != MOUNT_INFO_CB)
+	system_printf ("size of mount table region changed from %u to %u",
+		       MOUNT_INFO_CB, mount_table->cb);
       mount_table->init ();	/* Initialize the mount table.  */
     }
+  else if (mount_table->version != MOUNT_VERSION_MAGIC)
+    multiple_cygwin_problem ("mount", mount_table->version, MOUNT_VERSION);
+  else if (mount_table->cb !=  MOUNT_INFO_CB)
+    multiple_cygwin_problem ("mount table size", mount_table->cb, MOUNT_INFO_CB);
+
 }
 
 void __stdcall

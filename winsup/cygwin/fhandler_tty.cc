@@ -37,12 +37,9 @@ static DWORD WINAPI process_input (void *);		// Input queue thread
 static DWORD WINAPI process_output (void *);		// Output queue thread
 static DWORD WINAPI process_ioctl (void *);		// Ioctl requests thread
 
-fhandler_tty_master::fhandler_tty_master (const char *name, int unit) :
-	fhandler_pty_master (name, FH_TTYM, unit)
+fhandler_tty_master::fhandler_tty_master (int unit)
+  : fhandler_pty_master (FH_TTYM, unit), console (NULL), hThread (NULL)
 {
-  set_cb (sizeof *this);
-  console = NULL;
-  hThread = NULL;
 }
 
 int
@@ -439,26 +436,20 @@ process_ioctl (void *)
 /**********************************************************************/
 /* Tty slave stuff */
 
-fhandler_tty_slave::fhandler_tty_slave (int num, const char *name) :
-	fhandler_tty_common (FH_TTYS, name, num)
+fhandler_tty_slave::fhandler_tty_slave (int num)
+  : fhandler_tty_common (FH_TTYS, num)
 {
-  set_cb (sizeof *this);
-  ttynum = num;
-  debug_printf ("unix '%s', win32 '%s'", unix_path_name, win32_path_name);
-  inuse = NULL;
 }
 
-fhandler_tty_slave::fhandler_tty_slave (const char *name) :
-	fhandler_tty_common (FH_TTYS, name, 0)
+fhandler_tty_slave::fhandler_tty_slave ()
+  : fhandler_tty_common (FH_TTYS, 0)
 {
-  set_cb (sizeof *this);
-  inuse = NULL;
 }
 
 /* FIXME: This function needs to close handles when it has
    a failing condition. */
 int
-fhandler_tty_slave::open (const char *, int flags, mode_t)
+fhandler_tty_slave::open (path_conv *, int flags, mode_t)
 {
   tcinit (cygwin_shared->tty[ttynum]);
 
@@ -677,7 +668,7 @@ fhandler_tty_slave::write (const void *ptr, size_t len)
   return towrite;
 }
 
-int
+int __stdcall
 fhandler_tty_slave::read (void *ptr, size_t len)
 {
   DWORD n;
@@ -999,18 +990,13 @@ out:
 /*******************************************************
  fhandler_pty_master
 */
-fhandler_pty_master::fhandler_pty_master (const char *name, DWORD devtype, int unit) :
-	fhandler_tty_common (devtype, name, unit)
+fhandler_pty_master::fhandler_pty_master (DWORD devtype, int unit)
+  : fhandler_tty_common (devtype, unit)
 {
-  set_cb (sizeof *this);
-  ioctl_request_event = NULL;
-  ioctl_done_event = NULL;
-  pktmode = need_nl = 0;
-  inuse = NULL;
 }
 
 int
-fhandler_pty_master::open (const char *, int flags, mode_t)
+fhandler_pty_master::open (path_conv *, int flags, mode_t)
 {
   ttynum = cygwin_shared->tty.allocate_tty (0);
   if (ttynum < 0)
@@ -1095,7 +1081,7 @@ fhandler_pty_master::write (const void *ptr, size_t len)
   return len;
 }
 
-int
+int __stdcall
 fhandler_pty_master::read (void *ptr, size_t len)
 {
   return process_slave_output ((char *) ptr, len, pktmode);
@@ -1192,15 +1178,9 @@ fhandler_tty_common::fixup_after_fork (HANDLE parent)
   if (ioctl_done_event)
     fork_fixup (parent, ioctl_done_event, "ioctl_done_event");
   if (output_mutex)
-    {
-      fork_fixup (parent, output_mutex, "output_mutex");
-      ProtectHandle (output_mutex);
-    }
+    fork_fixup (parent, output_mutex, "output_mutex");
   if (input_mutex)
-    {
-      fork_fixup (parent, input_mutex, "input_mutex");
-      ProtectHandle (input_mutex);
-    }
+    fork_fixup (parent, input_mutex, "input_mutex");
   if (input_available_event)
     fork_fixup (parent, input_available_event, "input_available_event");
   fork_fixup (parent, inuse, "inuse");

@@ -24,6 +24,8 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "shared_info.h"
+#include "sigproc.h"
+#include "pinfo.h"
 #include <assert.h>
 
 static NO_COPY const int CHUNK_SIZE = 1024; /* Used for crlf conversions */
@@ -187,6 +189,7 @@ fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit
       system_printf ("fatal error. strdup failed");
       exit (ENOMEM);
     }
+  namehash = hash_path_name (0, win32_path_name);
 }
 
 void
@@ -305,16 +308,9 @@ fhandler_base::get_default_fmode (int flags)
   return __fmode;
 }
 
+/* Open system call handler function. */
 int
-fhandler_base::open (path_conv& real_path, int flags, mode_t mode)
-{
-  return open ((char *) real_path, flags, mode);
-}
-
-/* Open system call handler function.
-   Path is now already checked for symlinks */
-int
-fhandler_base::open (int flags, mode_t mode)
+fhandler_base::open (path_conv *, int flags, mode_t mode)
 {
   int res = 0;
   HANDLE x;
@@ -375,6 +371,15 @@ fhandler_base::open (int flags, mode_t mode)
   if (get_device () == FH_SERIAL)
     file_attributes |= FILE_FLAG_OVERLAPPED;
 
+#ifdef HIDDEN_DOT_FILES
+  if (flags & O_CREAT && get_device () == FH_DISK)
+    {
+      char *c = strrchr (get_win32_name (), '\\');
+      if ((c && c[1] == '.') || *get_win32_name () == '.')
+        file_attributes |= FILE_ATTRIBUTE_HIDDEN;
+    }
+#endif
+
   /* CreateFile() with dwDesiredAccess == 0 when called on remote
      share returns some handle, even if file doesn't exist. This code
      works around this bug. */
@@ -392,15 +397,12 @@ fhandler_base::open (int flags, mode_t mode)
   if (flags & O_CREAT && get_device () == FH_DISK && allow_ntsec && has_acls ())
     set_security_attribute (mode, &sa, alloca (4096), 4096);
 
-  x = CreateFileA (get_win32_name (), access, shared,
-		   &sa, creation_distribution,
-		   file_attributes,
-		   0);
+  x = CreateFile (get_win32_name (), access, shared, &sa, creation_distribution,
+		  file_attributes, 0);
 
   syscall_printf ("%p = CreateFileA (%s, %p, %p, %p, %p, %p, 0)",
-		  x, get_win32_name (), access, shared,
-		  &sa, creation_distribution,
-		  file_attributes);
+		  x, get_win32_name (), access, shared, &sa,
+		  creation_distribution, file_attributes);
 
   if (x == INVALID_HANDLE_VALUE)
     {
@@ -419,7 +421,6 @@ fhandler_base::open (int flags, mode_t mode)
       && !allow_ntsec && allow_ntea)
     set_file_attribute (has_acls (), get_win32_name (), mode);
 
-  namehash = hash_path_name (0, get_win32_name ());
   set_io_handle (x);
   int bin;
   int fmode;
@@ -486,6 +487,9 @@ fhandler_base::read (void *in_ptr, size_t in_len)
 	ptr[copied_chars++] = (unsigned char) (c & 0xff);
 	len--;
       }
+
+  if (copied_chars && is_slow ())
+    return copied_chars;
 
   if (len)
     {
@@ -792,7 +796,7 @@ fhandler_base::close ()
 {
   int res = -1;
 
-  syscall_printf ("handle %p", get_handle());
+  syscall_printf ("closing '%s' handle %p", get_name (), get_handle());
   if (CloseHandle (get_handle()))
     res = 0;
   else
@@ -857,172 +861,28 @@ rootdir(char *full_path)
   return root;
 }
 
-int
-fhandler_disk_file::fstat (struct stat *buf)
+int __stdcall
+fhandler_base::fstat (struct stat *buf, path_conv *)
 {
-  int res = 0;	// avoid a compiler warning
-  BY_HANDLE_FILE_INFORMATION local;
-  save_errno saved_errno;
-
-  memset (buf, 0, sizeof (*buf));
-
-  /* NT 3.51 seems to have a bug when attempting to get vol serial
-     numbers.  This loop gets around this. */
-  for (int i = 0; i < 2; i++)
+  switch (get_device ())
     {
-      if (!(res = GetFileInformationByHandle (get_handle (), &local)))
-	break;
-      if (local.dwVolumeSerialNumber && (long) local.dwVolumeSerialNumber != -1)
-	break;
-    }
-  debug_printf ("%d = GetFileInformationByHandle (%s, %d)",
-		res, get_win32_name (), get_handle ());
-  if (res == 0)
-    {
-      /* GetFileInformationByHandle will fail if it's given stdin/out/err
-	 or a pipe*/
-      DWORD lsize, hsize;
-
-      if (GetFileType (get_handle ()) != FILE_TYPE_DISK)
-	buf->st_mode = S_IFCHR;
-
-      lsize = GetFileSize (get_handle (), &hsize);
-      if (lsize == 0xffffffff && GetLastError () != NO_ERROR)
-	buf->st_mode = S_IFCHR;
-      else
-	buf->st_size = lsize;
-      /* We expect these to fail! */
-      buf->st_mode |= STD_RBITS | STD_WBITS;
-      buf->st_blksize = S_BLKSIZE;
-      buf->st_ino = get_namehash ();
-      syscall_printf ("0 = fstat (, %p)",  buf);
-      return 0;
-    }
-
-  if (!get_win32_name ())
-    {
-      saved_errno.set (ENOENT);
-      return -1;
-    }
-
-  buf->st_atime   = to_time_t (&local.ftLastAccessTime);
-  buf->st_mtime   = to_time_t (&local.ftLastWriteTime);
-  buf->st_ctime   = to_time_t (&local.ftCreationTime);
-  buf->st_nlink   = local.nNumberOfLinks;
-  buf->st_dev     = local.dwVolumeSerialNumber;
-  buf->st_size    = local.nFileSizeLow;
-
-  /* This is for FAT filesystems, which don't support atime/ctime */
-  if (buf->st_atime == 0)
-    buf->st_atime = buf->st_mtime;
-  if (buf->st_ctime == 0)
-    buf->st_ctime = buf->st_mtime;
-
-  /* Allocate some place to determine the root directory. Need to allocate
-     enough so that rootdir can add a trailing slash if path starts with \\. */
-  char root[strlen (get_win32_name ()) + 3];
-  strcpy (root, get_win32_name ());
-
-  /* Assume that if a drive has ACL support it MAY have valid "inodes".
-     It definitely does not have valid inodes if it does not have ACL
-     support. */
-  switch (has_acls () ? GetDriveType (rootdir (root)) : DRIVE_UNKNOWN)
-    {
-    case DRIVE_FIXED:
-    case DRIVE_REMOVABLE:
-    case DRIVE_CDROM:
-    case DRIVE_RAMDISK:
-      /* Although the documentation indicates otherwise, it seems like
-	 "inodes" on these devices are persistent, at least across reboots. */
-      buf->st_ino = local.nFileIndexHigh | local.nFileIndexLow;
+    case FH_PIPEW:
+      buf->st_mode = STD_WBITS | S_IWGRP | S_IWOTH;
+      break;
+    case FH_PIPER:
+      buf->st_mode = STD_RBITS;
       break;
     default:
-      /* Either the nFileIndex* fields are unreliable or unavailable.  Use the
-	 next best alternative. */
-      buf->st_ino = get_namehash ();
+      buf->st_mode = STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
       break;
     }
 
+  buf->st_mode |= get_device () == FH_FLOPPY ? S_IFBLK : S_IFCHR;
+  buf->st_nlink = 1;
   buf->st_blksize = S_BLKSIZE;
-  buf->st_blocks  = ((unsigned long) buf->st_size + S_BLKSIZE-1) / S_BLKSIZE;
-
-  buf->st_mode = 0;
-  /* Using a side effect: get_file_attibutes checks for
-     directory. This is used, to set S_ISVTX, if needed.  */
-  if (local.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-    buf->st_mode = S_IFDIR;
-  else if (get_symlink_p ())
-    buf->st_mode = S_IFLNK;
-  else if (get_socket_p ())
-    buf->st_mode = S_IFSOCK;
-  if (get_file_attribute (has_acls (), get_win32_name (), &buf->st_mode,
-			  &buf->st_uid, &buf->st_gid) == 0)
-    {
-      /* If read-only attribute is set, modify ntsec return value */
-      if ((local.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
-	  && !get_symlink_p ())
-	buf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
-
-      if (!(buf->st_mode & S_IFMT))
-	buf->st_mode |= S_IFREG;
-    }
-  else
-    {
-      buf->st_mode |= STD_RBITS;
-
-      if (!(local.dwFileAttributes & FILE_ATTRIBUTE_READONLY))
-	buf->st_mode |= STD_WBITS;
-      /* | S_IWGRP | S_IWOTH; we don't give write to group etc */
-
-      if (buf->st_mode & S_IFDIR)
-	buf->st_mode |= S_IFDIR | STD_XBITS;
-      else if (buf->st_mode & S_IFMT)
-	/* nothing */;
-      else if (get_socket_p ())
-	buf->st_mode |= S_IFSOCK;
-      else
-	switch (GetFileType (get_handle ()))
-	  {
-	  case FILE_TYPE_CHAR:
-	  case FILE_TYPE_UNKNOWN:
-	    buf->st_mode |= S_IFCHR;
-	    break;
-	  case FILE_TYPE_DISK:
-	    buf->st_mode |= S_IFREG;
-	    if (!dont_care_if_execable () && !get_execable_p ())
-	      {
-		DWORD cur, done;
-		char magic[3];
-
-		/* First retrieve current position, set to beginning
-		   of file if not already there. */
-		cur = SetFilePointer (get_handle(), 0, NULL, FILE_CURRENT);
-		if (cur != INVALID_SET_FILE_POINTER &&
-		    (!cur ||
-		     SetFilePointer (get_handle(), 0, NULL, FILE_BEGIN)
-		     != INVALID_SET_FILE_POINTER))
-		  {
-		    /* FIXME should we use /etc/magic ? */
-		    magic[0] = magic[1] = magic[2] = '\0';
-		    if (ReadFile (get_handle (), magic, 3, &done, NULL) &&
-			has_exec_chars (magic, done))
-			set_execable_p ();
-		    SetFilePointer (get_handle(), cur, NULL, FILE_BEGIN);
-		  }
-	      }
-	    if (get_execable_p ())
-	      buf->st_mode |= STD_XBITS;
-	    break;
-	  case FILE_TYPE_PIPE:
-	    buf->st_mode |= S_IFSOCK;
-	    break;
-	  }
-    }
-
-  syscall_printf ("0 = fstat (, %p) st_atime=%x st_size=%d, st_mode=%p, st_ino=%d, sizeof=%d",
-		 buf, buf->st_atime, buf->st_size, buf->st_mode,
-		 (int) buf->st_ino, sizeof (*buf));
-
+  buf->st_dev = buf->st_rdev = FHDEVN (get_device ()) << 8 | (get_unit () & 0xff);
+  buf->st_ino = get_namehash ();
+  buf->st_atime = buf->st_mtime = buf->st_ctime = time (NULL) - 1;
   return 0;
 }
 
@@ -1056,7 +916,9 @@ fhandler_base::dup (fhandler_base *child)
   debug_printf ("in fhandler_base dup");
 
   HANDLE nh;
-  if (!DuplicateHandle (hMainProc, get_handle(), hMainProc, &nh, 0, TRUE,
+  if (get_nohandle ())
+    nh = NULL;
+  else if (!DuplicateHandle (hMainProc, get_handle(), hMainProc, &nh, 0, TRUE,
 			DUPLICATE_SAME_ACCESS))
     {
       system_printf ("dup(%s) failed, handle %x, %E",
@@ -1184,7 +1046,8 @@ fhandler_base::operator delete (void *p)
 }
 
 /* Normal I/O constructor */
-fhandler_base::fhandler_base (DWORD devtype, const char *name, int unit):
+fhandler_base::fhandler_base (DWORD devtype, int unit):
+  status (devtype),
   access (0),
   io_handle (NULL),
   namehash (0),
@@ -1198,7 +1061,6 @@ fhandler_base::fhandler_base (DWORD devtype, const char *name, int unit):
   win32_path_name (NULL),
   open_status (0)
 {
-  status = devtype;
   int bin = __fmode & O_TEXT ? 0 : 1;
   if (status != FH_DISK && status != FH_CONSOLE)
     {
@@ -1222,257 +1084,11 @@ fhandler_base::~fhandler_base (void)
 }
 
 /**********************************************************************/
-/* fhandler_disk_file */
-
-fhandler_disk_file::fhandler_disk_file (const char *name) :
-	fhandler_base (FH_DISK, name)
-{
-  set_cb (sizeof *this);
-}
-
-int
-fhandler_disk_file::open (const char *path, int flags, mode_t mode)
-{
-  syscall_printf ("(%s, %p)", path, flags);
-
-  /* O_NOSYMLINK is an internal flag for implementing lstat, nothing more. */
-  path_conv real_path (path, (flags & O_NOSYMLINK) ?
-			     PC_SYM_NOFOLLOW : PC_SYM_FOLLOW);
-
-  if (real_path.error &&
-      (flags & O_NOSYMLINK || real_path.error != ENOENT
-       || !(flags & O_CREAT) || real_path.case_clash))
-    {
-      set_errno (flags & O_CREAT && real_path.case_clash ? ECASECLASH
-							 : real_path.error);
-      syscall_printf ("0 = fhandler_disk_file::open (%s, %p)", path, flags);
-      return 0;
-    }
-
-  set_name (path, real_path.get_win32 ());
-  return open (real_path, flags, mode);
-}
-
-int
-fhandler_disk_file::open (path_conv& real_path, int flags, mode_t mode)
-{
-  if (real_path.isbinary ())
-    {
-      set_r_binary (1);
-      set_w_binary (1);
-    }
-
-  set_has_acls (real_path.has_acls ());
-  set_isremote (real_path.isremote ());
-
-  if (real_path.isdir ())
-    flags |= O_DIROPEN;
-
-  int res = this->fhandler_base::open (flags, mode);
-
-  if (!res)
-    goto out;
-
-  /* This is for file systems known for having a buggy CreateFile call
-     which might return a valid HANDLE without having actually opened
-     the file.
-     The only known file system to date is the SUN NFS Solstice Client 3.1
-     which returns a valid handle when trying to open a file in a nonexistent
-     directory. */
-  if (real_path.has_buggy_open ()
-      && GetFileAttributes (win32_path_name) == (DWORD) -1)
-    {
-      debug_printf ("Buggy open detected.");
-      close ();
-      set_errno (ENOENT);
-      return 0;
-    }
-
-  if (flags & O_APPEND)
-    SetFilePointer (get_handle(), 0, 0, FILE_END);
-
-  set_symlink_p (real_path.issymlink ());
-  set_execable_p (real_path.exec_state ());
-  set_socket_p (real_path.issocket ());
-
-out:
-  syscall_printf ("%d = fhandler_disk_file::open (%s, %p)", res,
-		  get_win32_name (), flags);
-  return res;
-}
-
-int
-fhandler_disk_file::close ()
-{
-  int res = this->fhandler_base::close ();
-  if (!res)
-    cygwin_shared->delqueue.process_queue ();
-  return res;
-}
-
-/*
- * FIXME !!!
- * The correct way to do this to get POSIX locking
- * semantics is to keep a linked list of posix lock
- * requests and map them into Win32 locks. The problem
- * is that Win32 does not deal correctly with overlapping
- * lock requests. Also another pain is that Win95 doesn't do
- * non-blocking or non exclusive locks at all. For '95 just
- * convert all lock requests into blocking,exclusive locks.
- * This shouldn't break many apps but denying all locking
- * would.
- * For now just convert to Win32 locks and hope for the best.
- */
-
-int
-fhandler_disk_file::lock (int cmd, struct flock *fl)
-{
-  int win32_start;
-  int win32_len;
-  DWORD win32_upper;
-  DWORD startpos;
-
-  /*
-   * We don't do getlck calls yet.
-   */
-
-  if (cmd == F_GETLK)
-    {
-      set_errno (ENOSYS);
-      return -1;
-    }
-
-  /*
-   * Calculate where in the file to start from,
-   * then adjust this by fl->l_start.
-   */
-
-  switch (fl->l_whence)
-    {
-      case SEEK_SET:
-	startpos = 0;
-	break;
-      case SEEK_CUR:
-	if ((off_t) (startpos = lseek (0, SEEK_CUR)) == (off_t)-1)
-	  return -1;
-	break;
-      case SEEK_END:
-	{
-	  BY_HANDLE_FILE_INFORMATION finfo;
-	  if (GetFileInformationByHandle (get_handle(), &finfo) == 0)
-	    {
-	      __seterrno ();
-	      return -1;
-	    }
-	  startpos = finfo.nFileSizeLow; /* Nowhere to keep high word */
-	  break;
-	}
-      default:
-	set_errno (EINVAL);
-	return -1;
-    }
-
-  /*
-   * Now the fun starts. Adjust the start and length
-   *  fields until they make sense.
-   */
-
-  win32_start = startpos + fl->l_start;
-  if (fl->l_len < 0)
-    {
-      win32_start -= fl->l_len;
-      win32_len = -fl->l_len;
-    }
-  else
-    win32_len = fl->l_len;
-
-  if (win32_start < 0)
-    {
-      /* watch the signs! */
-      win32_len -= -win32_start;
-      if (win32_len <= 0)
-	{
-	  /* Failure ! */
-	  set_errno (EINVAL);
-	  return -1;
-	}
-      win32_start = 0;
-    }
-
-  /*
-   * Special case if len == 0 for POSIX means lock
-   * to the end of the entire file (and all future extensions).
-   */
-  if (win32_len == 0)
-    {
-      win32_len = 0xffffffff;
-      win32_upper = wincap.lock_file_highword ();
-    }
-  else
-    win32_upper = 0;
-
-  BOOL res;
-
-  if (wincap.has_lock_file_ex ())
-    {
-      DWORD lock_flags = (cmd == F_SETLK) ? LOCKFILE_FAIL_IMMEDIATELY : 0;
-      lock_flags |= (fl->l_type == F_WRLCK) ? LOCKFILE_EXCLUSIVE_LOCK : 0;
-
-      OVERLAPPED ov;
-
-      ov.Internal = 0;
-      ov.InternalHigh = 0;
-      ov.Offset = (DWORD)win32_start;
-      ov.OffsetHigh = 0;
-      ov.hEvent = (HANDLE) 0;
-
-      if (fl->l_type == F_UNLCK)
-	{
-	  res = UnlockFileEx (get_handle (), 0, (DWORD)win32_len, win32_upper, &ov);
-	}
-      else
-	{
-	  res = LockFileEx (get_handle (), lock_flags, 0, (DWORD)win32_len,
-							win32_upper, &ov);
-	  /* Deal with the fail immediately case. */
-	  /*
-	   * FIXME !! I think this is the right error to check for
-	   * but I must admit I haven't checked....
-	   */
-	  if ((res == 0) && (lock_flags & LOCKFILE_FAIL_IMMEDIATELY) &&
-			    (GetLastError () == ERROR_LOCK_FAILED))
-	    {
-	      set_errno (EAGAIN);
-	      return -1;
-	    }
-	}
-    }
-  else
-    {
-      /* Windows 95 -- use primitive lock call */
-      if (fl->l_type == F_UNLCK)
-	res = UnlockFile (get_handle (), (DWORD)win32_start, 0, (DWORD)win32_len,
-							win32_upper);
-      else
-	res = LockFile (get_handle (), (DWORD)win32_start, 0, (DWORD)win32_len, win32_upper);
-    }
-
-  if (res == 0)
-    {
-      __seterrno ();
-      return -1;
-    }
-
-  return 0;
-}
-
-/**********************************************************************/
 /* /dev/null */
 
-fhandler_dev_null::fhandler_dev_null (const char *name) :
-	fhandler_base (FH_NULL, name)
+fhandler_dev_null::fhandler_dev_null () :
+	fhandler_base (FH_NULL)
 {
-  set_cb (sizeof *this);
 }
 
 void
@@ -1484,6 +1100,9 @@ fhandler_dev_null::dump (void)
 void
 fhandler_base::set_inheritance (HANDLE &h, int not_inheriting)
 {
+#ifdef DEBUGGING
+  HANDLE oh = h;
+#endif
   /* Note that we could use SetHandleInformation here but it is not available
      on all platforms.  Test cases seem to indicate that using DuplicateHandle
      in this fashion does not actually close the original handle, which is
@@ -1493,18 +1112,30 @@ fhandler_base::set_inheritance (HANDLE &h, int not_inheriting)
 			     DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
     debug_printf ("DuplicateHandle failed, %E");
 #ifdef DEBUGGING
-  setclexec_pid (h, not_inheriting);
+  if (h)
+    setclexec_pid (oh, h, not_inheriting);
 #endif
 }
 
 void
 fhandler_base::fork_fixup (HANDLE parent, HANDLE &h, const char *name)
 {
-  if (!get_close_on_exec ())
+#ifdef DEBUGGING
+  HANDLE oh = h;
+#endif
+  if (/* !is_socket () && */ !get_close_on_exec ())
     debug_printf ("handle %p already opened", h);
   else if (!DuplicateHandle (parent, h, hMainProc, &h, 0, !get_close_on_exec (),
-			DUPLICATE_SAME_ACCESS))
+			     DUPLICATE_SAME_ACCESS))
     system_printf ("%s - %E, handle %s<%p>", get_name (), name, h);
+#ifdef DEBUGGING
+  else
+    {
+      debug_printf ("%s success - oldh %p, h %p", get_name (), oh, h);
+      // someday, maybe ProtectHandle2 (h, name);
+      setclexec_pid (oh, h, !get_close_on_exec ());
+    }
+#endif
 }
 
 void
@@ -1522,7 +1153,7 @@ fhandler_base::fixup_after_fork (HANDLE parent)
   fork_fixup (parent, io_handle, "io_handle");
 }
 
-int
+bool
 fhandler_base::is_nonblocking ()
 {
   return (openflags & O_NONBLOCK_MASK) != 0;
@@ -1534,4 +1165,46 @@ fhandler_base::set_nonblocking (int yes)
   int current = openflags & O_NONBLOCK_MASK;
   int new_flags = yes ? (!current ? O_NONBLOCK : current) : 0;
   openflags = (openflags & ~O_NONBLOCK_MASK) | new_flags;
+}
+
+DIR *
+fhandler_base::opendir (path_conv&)
+{
+  set_errno (ENOTDIR);
+  return NULL;
+}
+
+struct dirent *
+fhandler_base::readdir (DIR *)
+{
+  set_errno (ENOTDIR);
+  return NULL;
+}
+
+off_t
+fhandler_base::telldir (DIR *)
+{
+  set_errno (ENOTDIR);
+  return -1;
+}
+
+void
+fhandler_base::seekdir (DIR *, off_t)
+{
+  set_errno (ENOTDIR);
+  return;
+}
+
+void
+fhandler_base::rewinddir (DIR *)
+{
+  set_errno (ENOTDIR);
+  return;
+}
+
+int
+fhandler_base::closedir (DIR *)
+{
+  set_errno (ENOTDIR);
+  return -1;
 }

@@ -65,19 +65,20 @@ close_all_files (void)
   cygwin_shared->delqueue.process_queue ();
 }
 
-static BOOL __stdcall
-check_ttys_fds (void)
+BOOL __stdcall
+check_pty_fds (void)
 {
   int res = FALSE;
-  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "close_all_files");
+  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK, "check_pty_fds");
   fhandler_base *fh;
   for (int i = 0; i < (int) cygheap->fdtab.size; i++)
-    if ((fh = cygheap->fdtab[i]) != NULL && fh->get_device() == FH_TTYS)
+    if ((fh = cygheap->fdtab[i]) != NULL &&
+	(fh->get_device () == FH_TTYS || fh->get_device () == FH_PTYM))
       {
 	res = TRUE;
 	break;
       }
-  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "close_all_files");
+  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK, "check_pty_fds");
   return res;
 }
 
@@ -85,11 +86,12 @@ int
 dup (int fd)
 {
   int res;
-  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
+  cygheap_fdnew newfd;
 
-  res = dup2 (fd, cygheap->fdtab.find_unused_handle ());
-
-  ReleaseResourceLock(LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
+  if (newfd < 0)
+    res = -1;
+  else
+    res = dup2 (fd, newfd);
 
   return res;
 }
@@ -185,7 +187,7 @@ _unlink (const char *ourname)
   bool delete_on_close_ok;
 
   delete_on_close_ok  = !win32_name.isremote ()
-  			&& wincap.has_delete_on_close ();
+			&& wincap.has_delete_on_close ();
 
   /* Attempt to use "delete on close" semantics to handle removing
      a file which may be open. */
@@ -270,7 +272,7 @@ setsid (void)
     {
       if (myself->ctty == TTY_CONSOLE &&
 	  !cygheap->fdtab.has_console_fds () &&
-	  !check_ttys_fds ())
+	  !check_pty_fds ())
 	FreeConsole ();
       myself->ctty = -1;
       myself->sid = _getpid ();
@@ -285,8 +287,13 @@ setsid (void)
 extern "C" ssize_t
 _read (int fd, void *ptr, size_t len)
 {
+  if (len == 0)
+    return 0;
+
+  if (__check_null_invalid_struct_errno (ptr, len))
+    return -1;
+
   int res;
-  fhandler_base *fh;
   extern int sigcatchers;
   int e = get_errno ();
 
@@ -294,38 +301,42 @@ _read (int fd, void *ptr, size_t len)
     {
       sigframe thisframe (mainthread);
 
-      if (cygheap->fdtab.not_open (fd))
-	{
-	  set_errno (EBADF);
-	  return -1;
-	}
+      cygheap_fdget cfd (fd);
+      if (cfd < 0)
+	return -1;
 
-      // set_sig_errno (0);
-      fh = cygheap->fdtab[fd];
-      DWORD wait = fh->is_nonblocking () ? 0 : INFINITE;
+      DWORD wait = cfd->is_nonblocking () ? 0 : INFINITE;
 
       /* Could block, so let user know we at least got here.  */
       syscall_printf ("read (%d, %p, %d) %sblocking, sigcatchers %d", fd, ptr, len, wait ? "" : "non", sigcatchers);
 
-      if (wait && (/*!sigcatchers || */!fh->is_slow () || fh->get_r_no_interrupt ()))
+      if (wait && (!cfd->is_slow () || cfd->get_r_no_interrupt ()))
 	debug_printf ("non-interruptible read\n");
-      else if (!fh->ready_for_read (fd, wait, 0))
+      else if (!cfd->ready_for_read (fd, wait))
 	{
-	  if (!wait)
-	    set_sig_errno (EAGAIN);	/* Don't really need 'set_sig_errno' here, but... */
-	  else
-	    set_sig_errno (EINTR);
 	  res = -1;
 	  goto out;
 	}
 
+      /* FIXME: This is not thread safe.  We need some method to
+	 ensure that an fd, closed in another thread, aborts I/O
+	 operations. */
+      if (!cfd.isopen())
+	return -1;
+
       /* Check to see if this is a background read from a "tty",
 	 sending a SIGTTIN, if appropriate */
-      res = fh->bg_check (SIGTTIN);
+      res = cfd->bg_check (SIGTTIN);
+
+      if (!cfd.isopen())
+	return -1;
+
       if (res > bg_eof)
 	{
 	  myself->process_state |= PID_TTYIN;
-	  res = fh->read (ptr, len);
+	  if (!cfd.isopen())
+	    return -1;
+	  res = cfd->read (ptr, len);
 	  myself->process_state &= ~PID_TTYIN;
 	}
 
@@ -335,8 +346,8 @@ _read (int fd, void *ptr, size_t len)
       set_errno (e);
     }
 
-  syscall_printf ("%d = read (%d<%s>, %p, %d), bin %d, errno %d", res, fd, fh->get_name (),
-		  ptr, len, fh->get_r_binary (), get_errno ());
+  syscall_printf ("%d = read (%d, %p, %d), errno %d", res, fd, ptr, len,
+		  get_errno ());
   MALLOC_CHECK;
   return res;
 }
@@ -345,13 +356,21 @@ extern "C" ssize_t
 _write (int fd, const void *ptr, size_t len)
 {
   int res = -1;
-  sigframe thisframe (mainthread);
 
-  if (cygheap->fdtab.not_open (fd))
+  sigframe thisframe (mainthread);
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    goto done;
+
+  /* No further action required for len == 0 */
+  if (len == 0)
     {
-      set_errno (EBADF);
+      res = 0;
       goto done;
     }
+
+  if (len && __check_invalid_read_ptr_errno (ptr, len))
+    goto done;
 
   /* Could block, so let user know we at least got here.  */
   if (fd == 1 || fd == 2)
@@ -359,15 +378,12 @@ _write (int fd, const void *ptr, size_t len)
   else
     syscall_printf  ("write (%d, %p, %d)", fd, ptr, len);
 
-  fhandler_base *fh;
-  fh = cygheap->fdtab[fd];
-
-  res = fh->bg_check (SIGTTOU);
+  res = cfd->bg_check (SIGTTOU);
 
   if (res > bg_eof)
     {
       myself->process_state |= PID_TTYOU;
-      res = fh->write (ptr, len);
+      res = cfd->write (ptr, len);
       myself->process_state &= ~PID_TTYOU;
     }
 
@@ -377,8 +393,7 @@ done:
   else
     syscall_printf ("%d = write (%d, %p, %d)", res, fd, ptr, len);
 
-  MALLOC_CHECK;
-  return (ssize_t)res;
+  return (ssize_t) res;
 }
 
 /*
@@ -475,41 +490,36 @@ readv (int fd, const struct iovec *iov, int iovcnt)
 extern "C" int
 _open (const char *unix_path, int flags, ...)
 {
-  int fd;
   int res = -1;
   va_list ap;
   mode_t mode = 0;
-  fhandler_base *fh;
   sigframe thisframe (mainthread);
 
   syscall_printf ("open (%s, %p)", unix_path, flags);
   if (!check_null_empty_str_errno (unix_path))
     {
-      SetResourceLock (LOCK_FD_LIST, WRITE_LOCK|READ_LOCK, " open ");
-
       /* check for optional mode argument */
       va_start (ap, flags);
       mode = va_arg (ap, mode_t);
       va_end (ap);
 
-      fd = cygheap->fdtab.find_unused_handle ();
+      fhandler_base *fh;
+      cygheap_fdnew fd;
 
-      if (fd < 0)
-	set_errno (ENMFILE);
-      else
+      if (fd >= 0)
 	{
 	  path_conv pc;
-	  if (!(fh = cygheap->fdtab.build_fhandler (fd, unix_path, NULL, pc)))
+	  if (!(fh = cygheap->fdtab.build_fhandler_from_name (fd, unix_path,
+							      NULL, pc)))
 	    res = -1;		// errno already set
-	  else if (!fh->open (pc, flags, (mode & 07777) & ~cygheap->umask))
+	  else if (!fh->open (&pc, flags, (mode & 07777) & ~cygheap->umask))
 	    {
-	      cygheap->fdtab.release (fd);
+	      fd.release ();
 	      res = -1;
 	    }
 	  else if ((res = fd) <= 2)
 	    set_std_handle (res);
 	}
-      ReleaseResourceLock (LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," open");
     }
 
   syscall_printf ("%d = open (%s, %p)", res, unix_path, flags);
@@ -527,14 +537,13 @@ _lseek (int fd, off_t pos, int dir)
       set_errno (EINVAL);
       res = -1;
     }
-  else if (cygheap->fdtab.not_open (fd))
-    {
-      set_errno (EBADF);
-      res = -1;
-    }
   else
     {
-      res = cygheap->fdtab[fd]->lseek (pos, dir);
+      cygheap_fdget cfd (fd);
+      if (cfd >= 0)
+	res = cfd->lseek (pos, dir);
+      else
+	res = -1;
     }
   syscall_printf ("%d = lseek (%d, %d, %d)", res, fd, pos, dir);
 
@@ -550,18 +559,14 @@ _close (int fd)
   syscall_printf ("close (%d)", fd);
 
   MALLOC_CHECK;
-  if (cygheap->fdtab.not_open (fd))
-    {
-      debug_printf ("handle %d not open", fd);
-      set_errno (EBADF);
-      res = -1;
-    }
+  cygheap_fdget cfd (fd, true);
+  if (cfd < 0)
+    res = -1;
   else
     {
-      SetResourceLock (LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," close");
-      res = cygheap->fdtab[fd]->close ();
-      cygheap->fdtab.release (fd);
-      ReleaseResourceLock (LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," close");
+      cfd->close ();
+      cfd.release ();
+      res = 0;
     }
 
   syscall_printf ("%d = close (%d)", res, fd);
@@ -575,13 +580,11 @@ isatty (int fd)
   int res;
   sigframe thisframe (mainthread);
 
-  if (cygheap->fdtab.not_open (fd))
-    {
-      syscall_printf ("0 = isatty (%d)", fd);
-      return 0;
-    }
-
-  res = cygheap->fdtab[fd]->is_tty ();
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    res = 0;
+  else
+    res = cfd->is_tty ();
   syscall_printf ("%d = isatty (%d)", res, fd);
   return res;
 }
@@ -788,7 +791,7 @@ chown_worker (const char *name, unsigned fmode, uid_t uid, gid_t gid)
 	  if (win32_path.isdir())
 	    attrib |= S_IFDIR;
 	  res = set_file_attribute (win32_path.has_acls (), win32_path, uid,
-	      			    gid, attrib, cygheap->user.logsrv ());
+				    gid, attrib, cygheap->user.logsrv ());
 	}
       if (res != 0 && (!win32_path.has_acls () || !allow_ntsec))
 	{
@@ -822,14 +825,14 @@ extern "C" int
 fchown (int fd, uid_t uid, gid_t gid)
 {
   sigframe thisframe (mainthread);
-  if (cygheap->fdtab.not_open (fd))
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
     {
       syscall_printf ("-1 = fchown (%d,...)", fd);
-      set_errno (EBADF);
       return -1;
     }
 
-  const char *path = cygheap->fdtab[fd]->get_name ();
+  const char *path = cfd->get_name ();
 
   if (path == NULL)
     {
@@ -931,14 +934,14 @@ extern "C" int
 fchmod (int fd, mode_t mode)
 {
   sigframe thisframe (mainthread);
-  if (cygheap->fdtab.not_open (fd))
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
     {
       syscall_printf ("-1 = fchmod (%d, 0%o)", fd, mode);
-      set_errno (EBADF);
       return -1;
     }
 
-  const char *path = cygheap->fdtab[fd]->get_name ();
+  const char *path = cfd->get_name ();
 
   if (path == NULL)
     {
@@ -952,56 +955,23 @@ fchmod (int fd, mode_t mode)
   return chmod (path, mode);
 }
 
-/* Cygwin internal */
-static int
-num_entries (const char *win32_name)
-{
-  WIN32_FIND_DATA buf;
-  HANDLE handle;
-  char buf1[MAX_PATH];
-  int count = 0;
-
-  strcpy (buf1, win32_name);
-  int len = strlen (buf1);
-  if (len == 0 || isdirsep (buf1[len - 1]))
-    strcat (buf1, "*");
-  else
-    strcat (buf1, "/*");	/* */
-
-  handle = FindFirstFileA (buf1, &buf);
-
-  if (handle == INVALID_HANDLE_VALUE)
-    return 0;
-  count ++;
-  while (FindNextFileA (handle, &buf))
-    {
-      if ((buf.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
-	count ++;
-    }
-  FindClose (handle);
-  return count;
-}
-
 extern "C" int
 _fstat (int fd, struct stat *buf)
 {
-  int r;
+  int res;
   sigframe thisframe (mainthread);
 
-  if (cygheap->fdtab.not_open (fd))
-    {
-      syscall_printf ("-1 = fstat (%d, %p)", fd, buf);
-      set_errno (EBADF);
-      r = -1;
-    }
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    res = -1;
   else
     {
       memset (buf, 0, sizeof (struct stat));
-      r = cygheap->fdtab[fd]->fstat (buf);
-      syscall_printf ("%d = fstat (%d, %x)", r, fd, buf);
+      res = cfd->fstat (buf, NULL);
     }
 
-  return r;
+  syscall_printf ("%d = fstat (%d, %p)", res, fd, buf);
+  return res;
 }
 
 /* fsync: P96 6.6.1.1 */
@@ -1009,16 +979,20 @@ extern "C" int
 fsync (int fd)
 {
   sigframe thisframe (mainthread);
-  if (cygheap->fdtab.not_open (fd))
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
     {
       syscall_printf ("-1 = fsync (%d)", fd);
-      set_errno (EBADF);
       return -1;
     }
 
+<<<<<<< syscalls.cc
   HANDLE h = cygheap->fdtab[fd]->get_handle ();
 
   if (FlushFileBuffers (h) == 0)
+=======
+  if (FlushFileBuffers (cfd->get_handle ()) == 0)
+>>>>>>> 1.176
     {
       __seterrno ();
       return -1;
@@ -1033,32 +1007,6 @@ sync ()
   return 0;
 }
 
-int __stdcall
-stat_dev (DWORD devn, int unit, unsigned long ino, struct stat *buf)
-{
-  sigframe thisframe (mainthread);
-  switch (devn)
-    {
-    case FH_PIPEW:
-      buf->st_mode = STD_WBITS | S_IWGRP | S_IWOTH;
-      break;
-    case FH_PIPER:
-      buf->st_mode = STD_RBITS;
-      break;
-    default:
-      buf->st_mode = STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
-      break;
-    }
-
-  buf->st_mode |= devn == FH_FLOPPY ? S_IFBLK : S_IFCHR;
-  buf->st_blksize = S_BLKSIZE;
-  buf->st_nlink = 1;
-  buf->st_dev = buf->st_rdev = FHDEVN (devn) << 8 | (unit & 0xff);
-  buf->st_ino = ino;
-  buf->st_atime = buf->st_mtime = buf->st_ctime = time (NULL);
-  return 0;
-}
-
 suffix_info stat_suffixes[] =
 {
   suffix_info ("", 1),
@@ -1067,136 +1015,43 @@ suffix_info stat_suffixes[] =
 };
 
 /* Cygwin internal */
-static int
-stat_worker (const char *caller, const char *name, struct stat *buf,
-	     int nofollow)
+int __stdcall
+stat_worker (const char *name, struct stat *buf, int nofollow, path_conv *pc)
 {
   int res = -1;
-  int oret;
-  uid_t uid;
-  gid_t gid;
   path_conv real_path;
   fhandler_base *fh = NULL;
 
+  if (!pc)
+    pc = &real_path;
+
   MALLOC_CHECK;
-  int open_flags = O_RDONLY | O_BINARY | O_DIROPEN
-    		   | (nofollow ? O_NOSYMLINK : 0);
-
-  debug_printf ("%s (%s, %p)", caller, name, buf);
-
   if (check_null_invalid_struct_errno (buf))
     goto done;
 
-  fh = cygheap->fdtab.build_fhandler (-1, name, NULL, real_path,
-				      (nofollow ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW)
-				      | PC_FULL, stat_suffixes);
-
-  if (real_path.error)
+  fh = cygheap->fdtab.build_fhandler_from_name (-1, name, NULL, *pc,
+						(nofollow ?
+						 PC_SYM_NOFOLLOW
+						 : PC_SYM_FOLLOW)
+						| PC_FULL, stat_suffixes);
+  if (pc->error)
     {
-      set_errno (real_path.error);
-      goto done;
+      debug_printf ("got %d error from build_fhandler_from_name", pc->error);
+      set_errno (pc->error);
     }
-
-  memset (buf, 0, sizeof (struct stat));
-
-  if (real_path.is_device ())
-    return stat_dev (real_path.get_devn (), real_path.get_unitn (),
-		     hash_path_name (0, real_path.get_win32 ()), buf);
-
-  debug_printf ("%d = file_attributes for '%s'", (DWORD) real_path,
-		(char *) real_path);
-
-  if ((oret = fh->open (real_path, open_flags, 0)))
-    /* ok */;
   else
     {
-      int ntsec_atts = 0;
-      /* If we couldn't open the file, try a "query open" with no permissions.
-	 This will allow us to determine *some* things about the file, at least. */
-      fh->set_query_open (TRUE);
-      if ((oret = fh->open (real_path, open_flags, 0)))
-        /* ok */;
-      else if (allow_ntsec && real_path.has_acls () && get_errno () == EACCES
-		&& !get_file_attribute (TRUE, real_path, &ntsec_atts, &uid, &gid)
-		&& !ntsec_atts && uid == myself->uid && gid == myself->gid)
-        {
-	  /* Check a special case here. If ntsec is ON it happens
-	     that a process creates a file using mode 000 to disallow
-	     other processes access. In contrast to UNIX, this results
-	     in a failing open call in the same process. Check that
-	     case. */
-	  set_file_attribute (TRUE, real_path, 0400);
-	  oret = fh->open (real_path, open_flags, 0);
-	  set_file_attribute (TRUE, real_path, ntsec_atts);
-        }
-    }
-  if (oret)
-    {
-      res = fh->fstat (buf);
-      /* The number of links to a directory includes the
-	 number of subdirectories in the directory, since all
-	 those subdirectories point to it.
-	 This is too slow on remote drives, so we do without it and
-	 set the number of links to 2. */
-      /* Unfortunately the count of 2 confuses `find (1)' command. So
-	 let's try it with `1' as link count. */
-      if (real_path.isdir ())
-	buf->st_nlink = (real_path.isremote ()
-			 ? 1 : num_entries (real_path.get_win32 ()));
-      fh->close ();
-    }
-  else if (real_path.exists ())
-    {
-      /* Unfortunately, the above open may fail if the file exists, though.
-	 So we have to care for this case here, too. */
-      WIN32_FIND_DATA wfd;
-      HANDLE handle;
-      buf->st_nlink = 1;
-      if (real_path.isdir () && real_path.isremote ())
-	buf->st_nlink = num_entries (real_path.get_win32 ());
-      buf->st_dev = FHDEVN (FH_DISK) << 8;
-      buf->st_ino = hash_path_name (0, real_path.get_win32 ());
-      if (real_path.isdir ())
-	buf->st_mode = S_IFDIR;
-      else if (real_path.issymlink ())
-	buf->st_mode = S_IFLNK;
-      else if (real_path.issocket ())
-	buf->st_mode = S_IFSOCK;
-      else
-	buf->st_mode = S_IFREG;
-      if (!real_path.has_acls ()
-	  || get_file_attribute (TRUE, real_path.get_win32 (),
-				 &buf->st_mode,
-				 &buf->st_uid, &buf->st_gid))
-	{
-	  buf->st_mode |= STD_RBITS | STD_XBITS;
-	  if (!(real_path.has_attribute (FILE_ATTRIBUTE_READONLY)))
-	    buf->st_mode |= STD_WBITS;
-	  if (real_path.issymlink ())
-	    buf->st_mode |= S_IRWXU | S_IRWXG | S_IRWXO;
-	  get_file_attribute (FALSE, real_path.get_win32 (),
-			      NULL, &buf->st_uid, &buf->st_gid);
-	}
-      if ((handle = FindFirstFile (real_path.get_win32 (), &wfd))
-	  != INVALID_HANDLE_VALUE)
-	{
-	  buf->st_atime   = to_time_t (&wfd.ftLastAccessTime);
-	  buf->st_mtime   = to_time_t (&wfd.ftLastWriteTime);
-	  buf->st_ctime   = to_time_t (&wfd.ftCreationTime);
-	  buf->st_size    = wfd.nFileSizeLow;
-	  buf->st_blksize = S_BLKSIZE;
-	  buf->st_blocks  = ((unsigned long) buf->st_size +
-			    S_BLKSIZE-1) / S_BLKSIZE;
-	  FindClose (handle);
-	}
-      res = 0;
+      debug_printf ("(%s, %p, %d, %p), file_attributes %d", name, buf, nofollow,
+		    pc, (DWORD) real_path);
+      memset (buf, 0, sizeof (struct stat));
+      res = fh->fstat (buf, pc);
     }
 
  done:
   if (fh)
     delete fh;
   MALLOC_CHECK;
-  syscall_printf ("%d = %s (%s, %p)", res, caller, name, buf);
+  syscall_printf ("%d = (%s, %p)", res, name, buf);
   return res;
 }
 
@@ -1204,7 +1059,8 @@ extern "C" int
 _stat (const char *name, struct stat *buf)
 {
   sigframe thisframe (mainthread);
-  return stat_worker ("stat", name, buf, 0);
+  syscall_printf ("entering");
+  return stat_worker (name, buf, 0);
 }
 
 /* lstat: Provided by SVR4 and 4.3+BSD, POSIX? */
@@ -1212,7 +1068,8 @@ extern "C" int
 lstat (const char *name, struct stat *buf)
 {
   sigframe thisframe (mainthread);
-  return stat_worker ("lstat", name, buf, 1);
+  syscall_printf ("entering");
+  return stat_worker (name, buf, 1);
 }
 
 extern int acl_access (const char *, int);
@@ -1222,7 +1079,7 @@ access (const char *fn, int flags)
 {
   sigframe thisframe (mainthread);
   // flags were incorrectly specified
-  if (flags & ~ (F_OK|R_OK|W_OK|X_OK))
+  if (flags & ~(F_OK|R_OK|W_OK|X_OK))
     {
       set_errno (EINVAL);
       return -1;
@@ -1232,7 +1089,7 @@ access (const char *fn, int flags)
     return acl_access (fn, flags);
 
   struct stat st;
-  int r = stat (fn, &st);
+  int r = stat_worker (fn, &st, 0);
   if (r)
     return -1;
   r = -1;
@@ -1396,7 +1253,16 @@ done:
   else
     {
       /* make the new file have the permissions of the old one */
-      SetFileAttributes (real_new, real_old);
+      DWORD attr = real_old;
+#ifdef HIDDEN_DOT_FILES
+      char *c = strrchr (real_old.get_win32 (), '\\');
+      if ((c && c[1] == '.') || *real_old.get_win32 () == '.')
+        attr &= ~FILE_ATTRIBUTE_HIDDEN;
+      c = strrchr (real_new.get_win32 (), '\\');
+      if ((c && c[1] == '.') || *real_new.get_win32 () == '.')
+        attr |= FILE_ATTRIBUTE_HIDDEN;
+#endif
+      SetFileAttributes (real_new, attr);
 
       /* Shortcut hack, No. 2, part 2 */
       /* if the new filename was an existing shortcut, remove it now if the
@@ -1417,6 +1283,9 @@ done:
 extern "C" int
 system (const char *cmdstring)
 {
+  if (check_null_empty_str_errno (cmdstring))
+    return -1;
+
   sigframe thisframe (mainthread);
   int res;
   const char* command[4];
@@ -1511,11 +1380,9 @@ check_posix_perm (const char *fname, int v)
 extern "C" long int
 fpathconf (int fd, int v)
 {
-  if (cygheap->fdtab.not_open (fd))
-    {
-      set_errno (EBADF);
-      return -1;
-    }
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    return -1;
   switch (v)
     {
     case _PC_LINK_MAX:
@@ -1538,7 +1405,7 @@ fpathconf (int fd, int v)
     case _PC_NO_TRUNC:
       return -1;
     case _PC_VDISABLE:
-      if (isatty (fd))
+      if (cfd->is_tty ())
 	return -1;
       else
 	{
@@ -1547,13 +1414,10 @@ fpathconf (int fd, int v)
 	}
     case _PC_POSIX_PERMISSIONS:
     case _PC_POSIX_SECURITY:
-      {
-	fhandler_base *fh = cygheap->fdtab[fd];
-	if (fh->get_device () == FH_DISK)
-	  return check_posix_perm (fh->get_win32_name (), v);
-	set_errno (EINVAL);
-	return -1;
-      }
+      if (cfd->get_device () == FH_DISK)
+	return check_posix_perm (cfd->get_win32_name (), v);
+      set_errno (EINVAL);
+      return -1;
     default:
       set_errno (EINVAL);
       return -1;
@@ -1606,11 +1470,12 @@ pathconf (const char *file, int v)
 extern "C" char *
 ttyname (int fd)
 {
-  if (cygheap->fdtab.not_open (fd) || !cygheap->fdtab[fd]->is_tty ())
+  cygheap_fdget cfd (fd);
+  if (cfd < 0 || !cfd->is_tty ())
     {
       return 0;
     }
-  return (char *) (cygheap->fdtab[fd]->ttyname ());
+  return (char *) (cfd->ttyname ());
 }
 
 extern "C" char *
@@ -1637,21 +1502,20 @@ _cygwin_istext_for_stdio (int fd)
       return 0; /* we do it for old apps, due to getc/putc macros */
     }
 
-  if (cygheap->fdtab.not_open (fd))
+  cygheap_fdget cfd (fd, false, false);
+  if (cfd < 0)
     {
       syscall_printf (" _cifs: fd not open\n");
       return 0;
     }
 
-  fhandler_base *p = cygheap->fdtab[fd];
-
-  if (p->get_device () != FH_DISK)
+  if (cfd->get_device () != FH_DISK)
     {
       syscall_printf (" _cifs: fd not disk file\n");
       return 0;
     }
 
-  if (p->get_w_binary () || p->get_r_binary ())
+  if (cfd->get_w_binary () || cfd->get_r_binary ())
     {
       syscall_printf (" _cifs: get_*_binary\n");
       return 0;
@@ -1685,13 +1549,11 @@ setmode_helper (FILE *f)
 extern "C" int
 getmode (int fd)
 {
-  if (cygheap->fdtab.not_open (fd))
-    {
-      set_errno (EBADF);
-      return -1;
-    }
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    return -1;
 
-  return cygheap->fdtab[fd]->get_flags () & (O_BINARY | O_TEXT);
+  return cfd->get_flags () & (O_BINARY | O_TEXT);
 }
 
 /* Set a file descriptor into text or binary mode, returning the
@@ -1700,18 +1562,14 @@ getmode (int fd)
 extern "C" int
 setmode (int fd, int mode)
 {
-  if (cygheap->fdtab.not_open (fd))
-    {
-      set_errno (EBADF);
-      return -1;
-    }
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    return -1;
   if (mode != O_BINARY  && mode != O_TEXT && mode != 0)
     {
       set_errno (EINVAL);
       return -1;
     }
-
-  fhandler_base *p = cygheap->fdtab[fd];
 
   /* Note that we have no way to indicate the case that writes are
      binary but not reads, or vice-versa.  These cases can arise when
@@ -1719,24 +1577,24 @@ setmode (int fd, int mode)
      interfaces should not use setmode.  */
 
   int res;
-  if (p->get_w_binary () && p->get_r_binary ())
+  if (cfd->get_w_binary () && cfd->get_r_binary ())
     res = O_BINARY;
-  else if (p->get_w_binset () && p->get_r_binset ())
+  else if (cfd->get_w_binset () && cfd->get_r_binset ())
     res = O_TEXT;	/* Specifically set O_TEXT */
   else
     res = 0;
 
   if (!mode)
-    p->reset_to_open_binmode ();
+    cfd->reset_to_open_binmode ();
   else if (mode & O_BINARY)
     {
-      p->set_w_binary (1);
-      p->set_r_binary (1);
+      cfd->set_w_binary (1);
+      cfd->set_r_binary (1);
     }
   else
     {
-      p->set_w_binary (0);
-      p->set_r_binary (0);
+      cfd->set_w_binary (0);
+      cfd->set_r_binary (0);
     }
 
   if (_cygwin_istext_for_stdio (fd))
@@ -1746,7 +1604,7 @@ setmode (int fd, int mode)
   setmode_file = fd;
   _fwalk (_REENT, setmode_helper);
 
-  syscall_printf ("setmode (%d<%s>, %s) returns %s\n", fd, p->get_name (),
+  syscall_printf ("setmode (%d<%s>, %s) returns %s\n", fd, cfd->get_name (),
 		  mode & O_TEXT ? "text" : "binary",
 		  res & O_TEXT ? "text" : "binary");
   return res;
@@ -1760,37 +1618,32 @@ ftruncate (int fd, off_t length)
   int res = -1;
 
   if (length < 0)
-    {
-      set_errno (EINVAL);
-    }
-  else if (cygheap->fdtab.not_open (fd))
-    {
-      set_errno (EBADF);
-    }
+    set_errno (EINVAL);
   else
     {
-      HANDLE h = cygheap->fdtab[fd]->get_handle ();
-      off_t prev_loc;
-
-      if (h)
+      cygheap_fdget cfd (fd);
+      if (cfd >= 0)
 	{
-	  /* remember curr file pointer location */
-	  prev_loc = cygheap->fdtab[fd]->lseek (0, SEEK_CUR);
+	  HANDLE h = cygheap->fdtab[fd]->get_handle ();
 
-	  cygheap->fdtab[fd]->lseek (length, SEEK_SET);
-	  if (!SetEndOfFile (h))
+	  if (cfd->get_handle ())
 	    {
-	      __seterrno ();
-	    }
-	  else
-	    res = 0;
+	      /* remember curr file pointer location */
+	      off_t prev_loc = cfd->lseek (0, SEEK_CUR);
 
-	  /* restore original file pointer location */
-	  cygheap->fdtab[fd]->lseek (prev_loc, 0);
+	      cfd->lseek (length, SEEK_SET);
+	      if (!SetEndOfFile (h))
+		__seterrno ();
+	      else
+		res = 0;
+
+	      /* restore original file pointer location */
+	      cfd->lseek (prev_loc, 0);
+	    }
 	}
     }
-  syscall_printf ("%d = ftruncate (%d, %d)", res, fd, length);
 
+  syscall_printf ("%d = ftruncate (%d, %d)", res, fd, length);
   return res;
 }
 
@@ -1819,12 +1672,13 @@ truncate (const char *pathname, off_t length)
 extern "C" long
 get_osfhandle (int fd)
 {
-  long res = -1;
+  long res;
 
-  if (cygheap->fdtab.not_open (fd))
-    set_errno (EBADF);
+  cygheap_fdget cfd (fd);
+  if (cfd >= 0)
+    res = (long) cfd->get_handle ();
   else
-    res = (long) cygheap->fdtab[fd]->get_handle ();
+    res = -1;
 
   syscall_printf ("%d = get_osfhandle (%d)", res, fd);
   return res;
@@ -1875,13 +1729,10 @@ extern "C" int
 fstatfs (int fd, struct statfs *sfs)
 {
   sigframe thisframe (mainthread);
-  if (cygheap->fdtab.not_open (fd))
-    {
-      set_errno (EBADF);
-      return -1;
-    }
-  fhandler_disk_file *f = (fhandler_disk_file *) cygheap->fdtab[fd];
-  return statfs (f->get_name (), sfs);
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    return -1;
+  return statfs (cfd->get_name (), sfs);
 }
 
 /* setpgid: POSIX 4.3.3.1 */
@@ -1961,12 +1812,10 @@ extern "C" char *
 ptsname (int fd)
 {
   sigframe thisframe (mainthread);
-  if (cygheap->fdtab.not_open (fd))
-    {
-      set_errno (EBADF);
-      return 0;
-    }
-  return (char *) (cygheap->fdtab[fd]->ptsname ());
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    return 0;
+  return (char *) (cfd->ptsname ());
 }
 
 /* FIXME: what is this? */
@@ -2214,6 +2063,11 @@ seteuid (uid_t uid)
 	 retrieving user's SID. */
       user.token = cygheap->user.impersonated ? cygheap->user.token
 					      : INVALID_HANDLE_VALUE;
+      /* Unsetting these both env vars is necessary to get NetUserGetInfo()
+	 called in internal_getlogin ().  Otherwise the wrong path is used
+	 after a user switch, probably. */
+      unsetenv ("HOMEDRIVE");
+      unsetenv ("HOMEPATH");
       struct passwd *pw_cur = internal_getlogin (user);
       if (pw_cur != pw_new)
 	{
@@ -2558,4 +2412,102 @@ logout (char *line)
     }
 
   return res;
+}
+
+static int utmp_fd = -2;
+static char *utmp_file = (char *) _PATH_UTMP;
+
+static struct utmp utmp_data;
+
+extern "C" void
+setutent ()
+{
+  sigframe thisframe (mainthread);
+  if (utmp_fd == -2)
+    {
+      utmp_fd = _open (utmp_file, O_RDONLY);
+    }
+  _lseek (utmp_fd, 0, SEEK_SET);
+}
+
+extern "C" void
+endutent ()
+{
+  sigframe thisframe (mainthread);
+  _close (utmp_fd);
+  utmp_fd = -2;
+}
+
+extern "C" void
+utmpname (_CONST char *file)
+{
+  sigframe thisframe (mainthread);
+  if (check_null_empty_str (file))
+    {
+      debug_printf ("Invalid file");
+      return;
+    }
+  utmp_file = strdup (file);
+  debug_printf ("New UTMP file: %s", utmp_file);
+}
+
+extern "C" struct utmp *
+getutent ()
+{
+  sigframe thisframe (mainthread);
+  if (utmp_fd == -2)
+    setutent ();
+  if (_read (utmp_fd, &utmp_data, sizeof (utmp_data)) != sizeof (utmp_data))
+    return NULL;
+  return &utmp_data;
+}
+
+extern "C" struct utmp *
+getutid (struct utmp *id)
+{
+  sigframe thisframe (mainthread);
+  if (check_null_invalid_struct_errno (id))
+    return NULL;
+  while (_read (utmp_fd, &utmp_data, sizeof (utmp_data)) == sizeof (utmp_data))
+    {
+      switch (id->ut_type)
+	{
+#if 0 /* Not available in Cygwin. */
+	case RUN_LVL:
+	case BOOT_TIME:
+	case OLD_TIME:
+	case NEW_TIME:
+	  if (id->ut_type == utmp_data.ut_type)
+	    return &utmp_data;
+	  break;
+#endif
+	case INIT_PROCESS:
+	case LOGIN_PROCESS:
+	case USER_PROCESS:
+	case DEAD_PROCESS:
+	  if (id->ut_id == utmp_data.ut_id)
+	    return &utmp_data;
+	  break;
+	default:
+	  return NULL;
+	}
+    }
+  return NULL;
+}
+
+extern "C" struct utmp *
+getutline (struct utmp *line)
+{
+  sigframe thisframe (mainthread);
+  if (check_null_invalid_struct_errno (line))
+    return NULL;
+  while (_read (utmp_fd, &utmp_data, sizeof (utmp_data)) == sizeof (utmp_data))
+    {
+      if ((utmp_data.ut_type == LOGIN_PROCESS ||
+	   utmp_data.ut_type == USER_PROCESS) &&
+	  !strncmp (utmp_data.ut_line, line->ut_line,
+		    sizeof (utmp_data.ut_line)))
+	return &utmp_data;
+    }
+  return NULL;
 }

@@ -11,6 +11,7 @@ details. */
 #include "winsup.h"
 #include <imagehlp.h>
 #include <errno.h>
+#include <stdlib.h>
 
 #include "exceptions.h"
 #include "sync.h"
@@ -49,11 +50,11 @@ static NO_COPY muto *mask_sync = NULL;
 
 HMODULE NO_COPY cygwin_hmodule;
 
-static const struct
+NO_COPY static struct
 {
   unsigned int code;
   const char *name;
-} status_info[] NO_COPY =
+} status_info[] =
 {
 #define X(s) s, #s
   { X (STATUS_ABANDONED_WAIT_0) },
@@ -170,7 +171,10 @@ open_stackdumpfile ()
 			     CREATE_ALWAYS, 0, 0);
       if (h != INVALID_HANDLE_VALUE)
 	{
-	  system_printf ("Dumping stack trace to %s", corefile);
+	  if (!myself->ppid_handle)
+	    system_printf ("Dumping stack trace to %s", corefile);
+	  else
+	    debug_printf ("Dumping stack trace to %s", corefile);
 	  SetStdHandle (STD_ERROR_HANDLE, h);
 	}
     }
@@ -379,19 +383,19 @@ try_to_debug (bool waitloop)
 		       &si,
 		       &pi);
 
-  static int NO_COPY keep_looping = 0;
-
-  if (dbg)
+  if (!dbg)
+    system_printf ("Failed to start debugger: %E");
+  else
     {
       if (!waitloop)
 	return 1;
       SetThreadPriority (hMainThread, THREAD_PRIORITY_IDLE);
-      while (keep_looping)
+      while (!IsDebuggerPresent ())
 	/* spin */;
+      Sleep (4000);
+      small_printf ("*** continuing from debugger call\n");
     }
 
-
-  system_printf ("Failed to start debugger: %E");
   /* FIXME: need to know handles of all running threads to
     resume_all_threads_except (current_thread_id);
   */
@@ -1065,6 +1069,7 @@ signal_exit (int rc)
      causes random, inexplicable hangs.  So, instead, we set up the priority
      of this thread really high so that it should do its thing and then exit. */
   (void) SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
+  (void) SetThreadPriority (hMainThread, THREAD_PRIORITY_IDLE);
 
   /* Unlock any main thread mutos since we're executing with prejudice. */
   muto *m;

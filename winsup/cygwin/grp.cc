@@ -24,8 +24,8 @@ details. */
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
-#include "cygheap.h"
 #include "cygerrno.h"
+#include "cygheap.h"
 #include "pwdgrp.h"
 
 /* Read /etc/group only once for better performance.  This is done
@@ -198,7 +198,7 @@ read_etc_group ()
 	      debug_printf ("Failed to get local admins group name. %E");
 	    }
 
-	  snprintf (linebuf, sizeof (linebuf), "%s::%u:\n", group_name, DEFAULT_GID);
+	  snprintf (linebuf, sizeof (linebuf), "%s::%u:\n", group_name, (unsigned) DEFAULT_GID);
 	  add_grp_line (linebuf);
 	  group_state = emulated;
 	}

@@ -41,10 +41,10 @@ details. */
 	 the Cygwin library".  This version is used to track important
 	 changes to the DLL and is mainly informative in nature. */
 
-  /* The current cygwin version is 1.3.4 */
+  /* The current cygwin version is 1.3.6 */
 
 #define CYGWIN_VERSION_DLL_MAJOR 1003
-#define CYGWIN_VERSION_DLL_MINOR 4
+#define CYGWIN_VERSION_DLL_MINOR 7
 
       /* Major numbers before CYGWIN_VERSION_DLL_EPOCH are
 	 incompatible. */
@@ -93,12 +93,12 @@ details. */
      /* API_MAJOR 0.0: Initial version.  API_MINOR changes:
 	1: Export cygwin32_ calls as cygwin_ as well.
 	2: Export j1, jn, y1, yn.
-        3: Export dll_noncygwin_dllcrt0.
-        4: New socket ioctls, revamped ifconf support.
-        5: Thread support/exports.
-        6: Change in termios handling.
-        7: Export scandir and alphasort.
-        8: Export _ctype_, _sys_errlist, _sys_nerr.
+	3: Export dll_noncygwin_dllcrt0.
+	4: New socket ioctls, revamped ifconf support.
+	5: Thread support/exports.
+	6: Change in termios handling.
+	7: Export scandir and alphasort.
+	8: Export _ctype_, _sys_errlist, _sys_nerr.
 	9: Mount-related changes, new cygwin_umount export.
 	   Raw device support (tape, floppies).
        10: Fast math routine support added.
@@ -114,10 +114,10 @@ details. */
        20: regsub, inet_network
        21: incompatible change to stdio cr/lf and buffering
        22: Export cygwin_logon_user, cygwin_set_impersonation_token.
-           geteuid, getegid return effective uid/gid.
-           getuid, getgid return real uid/gid.
-           seteuid, setegid set only effective uid/gid.
-           setuid, setgid set effective and real uid/gid.
+	   geteuid, getegid return effective uid/gid.
+	   getuid, getgid return real uid/gid.
+	   seteuid, setegid set only effective uid/gid.
+	   setuid, setgid set effective and real uid/gid.
        23: Export new dll_crt0 interface and cygwin_user_data for use
 	   with crt0 startup code.
        24: Export poll and _poll.
@@ -132,7 +132,7 @@ details. */
        33: Export setlogmask
        34: Separated out mount table
        35: Export drand48, erand48, jrand48, lcong48, lrand48,
-           mrand48, nrand48, seed48, and srand48.
+	   mrand48, nrand48, seed48, and srand48.
        36: Added _cygwin_S_IEXEC, et al
        37: [f]pathconv support _PC_POSIX_PERMISSIONS and _PC_POSIX_SECURITY
        38: vscanf, vscanf_r, and random pthread functions
@@ -144,10 +144,15 @@ details. */
        44: Export dirfd
        45: perprocess change, gamma_r, gammaf_r, lgamma_r, lgammaf_r
        46: Remove cygwin_getshared
+       47: Report EOTWarningZoneSize in struct mtget.
+       48: Export "posix" regex functions
+       49: Export setutent, endutent, utmpname, getutent, getutid, getutline.
      */
 
+     /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
+
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 46
+#define CYGWIN_VERSION_API_MINOR 49
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
@@ -212,3 +217,5 @@ details. */
 	cygwin_internal (CW_GETVERSIONINFO).
      */
 
+#define CYGWIN_VERSION_MAGIC(a, b) ((unsigned) (((unsigned short) a) | (unsigned short) b))
+#define CYGWIN_VERSION_MAGIC_VERSION(a) ((unsigned) ((unsigned)a & 0xffff))

@@ -18,6 +18,8 @@ details. */
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
+#include <errno.h>
+#include "cygerrno.h"
 #include "cygheap.h"
 #include "heap.h"
 #include "sync.h"

@@ -18,6 +18,7 @@ details. */
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/cygwin.h>
+#include <assert.h>
 
 #define USE_SYS_TYPES_FD_SET
 #include <winsock.h>
@@ -55,7 +56,8 @@ set_std_handle (int fd)
 void
 dtable::dec_console_fds ()
 {
-  if (console_fds > 0 && !--console_fds && myself->ctty != TTY_CONSOLE)
+  if (console_fds > 0 && !--console_fds &&
+      myself->ctty != TTY_CONSOLE && !check_pty_fds())
     FreeConsole ();
 }
 
@@ -168,22 +170,42 @@ dtable::release (int fd)
     }
 }
 
+extern "C"
+int
+cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
+			    DWORD myaccess)
+{
+  if (fd == -1)
+    fd = cygheap->fdtab.find_unused_handle ();
+  path_conv pc;
+  fhandler_base *res = cygheap->fdtab.build_fhandler_from_name (fd, name, handle,
+								pc);
+  res->init (handle, myaccess, bin);
+  return fd;
+}
+
 void
-dtable::init_std_file_from_handle (int fd, HANDLE handle,
-				  DWORD myaccess)
+dtable::init_std_file_from_handle (int fd, HANDLE handle, DWORD myaccess)
 {
   int bin;
-  const char *name = NULL;
+  const char *name;
+  CONSOLE_SCREEN_BUFFER_INFO buf;
+  struct sockaddr sa;
+  int sal = sizeof (sa);
+  DCB dcb;
+
+  first_fd_for_open = 0;
+
+  if (!handle || handle == INVALID_HANDLE_VALUE)
+    return;
 
   if (__fmode)
     bin = __fmode;
   else
     bin = binmode ?: 0;
 
-  first_fd_for_open = 0;
   /* See if we can consoleify it  - if it is a console,
    don't open it in binary.  That will screw up our crlfs*/
-  CONSOLE_SCREEN_BUFFER_INFO buf;
   if (GetConsoleScreenBufferInfo (handle, &buf))
     {
       if (ISSTATE (myself, PID_USETTY))
@@ -192,7 +214,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle,
 	name = "/dev/conout";
       bin = 0;
     }
-  else if (FlushConsoleInputBuffer (handle))
+  else if (GetNumberOfConsoleInputEvents (handle, (DWORD *) &buf))
     {
       if (ISSTATE (myself, PID_USETTY))
 	name = "/dev/tty";
@@ -204,57 +226,29 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle,
     {
       if (fd == 0)
 	name = "/dev/piper";
-      else if (fd == 1 || fd == 2)
+      else
 	name = "/dev/pipew";
       if (bin == 0)
 	bin = O_BINARY;
     }
+  else if (wsock_started && getpeername ((SOCKET) handle, &sa, &sal) == 0)
+    name = "/dev/socket";
+  else if (GetCommState (handle, &dcb))
+    name = "/dev/ttyS0"; // FIXME - determine correct device
+  else
+    name = "unknown disk file";
 
   path_conv pc;
-  build_fhandler (fd, name, handle, pc)->init (handle, myaccess, bin);
+  build_fhandler_from_name (fd, name, handle, pc)->init (handle, myaccess, bin);
   set_std_handle (fd);
   paranoid_printf ("fd %d, handle %p", fd, handle);
 }
 
-extern "C"
-int
-cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
-			    DWORD myaccess)
-{
-  if (fd == -1)
-    fd = cygheap->fdtab.find_unused_handle ();
-  path_conv pc;
-  fhandler_base *res = cygheap->fdtab.build_fhandler (fd, name, handle, pc);
-  res->init (handle, myaccess, bin);
-  return fd;
-}
-
 fhandler_base *
-dtable::build_fhandler (int fd, const char *name, HANDLE handle, path_conv& pc,
-    			unsigned opt, suffix_info *si)
+dtable::build_fhandler_from_name (int fd, const char *name, HANDLE handle,
+				  path_conv& pc, unsigned opt, suffix_info *si)
 {
-  if (!name && handle)
-    {
-      struct sockaddr sa;
-      int sal = sizeof (sa);
-      CONSOLE_SCREEN_BUFFER_INFO cinfo;
-      DCB dcb;
-
-      if (GetNumberOfConsoleInputEvents (handle, (DWORD *) &cinfo))
-	name = "/dev/conin";
-      else if (GetConsoleScreenBufferInfo (handle, &cinfo))
-	name = "/dev/conout";
-      else if (wsock_started && getpeername ((SOCKET) handle, &sa, &sal) == 0)
-	name = "/dev/socket";
-      else if (GetFileType (handle) == FILE_TYPE_PIPE)
-	name = "/dev/pipe";
-      else if (GetCommState (handle, &dcb))
-	name = "/dev/ttyS0"; // FIXME - determine correct device
-      else
-	name = "some disk file";
-    }
-
-  pc.check (name, opt | PC_NULLEMPTY, si);
+  pc.check (name, opt | PC_NULLEMPTY | PC_FULL, si);
   if (pc.error)
     {
       set_errno (pc.error);
@@ -266,84 +260,84 @@ dtable::build_fhandler (int fd, const char *name, HANDLE handle, path_conv& pc,
   return fh;
 }
 
+#define cnew(name) new ((void *) ccalloc (HEAP_FHANDLER, 1, sizeof (name))) name
 fhandler_base *
 dtable::build_fhandler (int fd, DWORD dev, const char *name, int unit)
 {
   fhandler_base *fh;
-  void *buf = ccalloc (HEAP_FHANDLER, 1, sizeof (fhandler_union) + 100);
 
   dev &= FH_DEVMASK;
   switch (dev)
     {
       case FH_TTYM:
-	fh = new (buf) fhandler_tty_master (name, unit);
+	fh = cnew (fhandler_tty_master) (unit);
 	break;
       case FH_CONSOLE:
       case FH_CONIN:
       case FH_CONOUT:
-	fh = new (buf) fhandler_console (name);
-	inc_console_fds ();
+	if ((fh = cnew (fhandler_console) ()))
+	  inc_console_fds ();
 	break;
       case FH_PTYM:
-	fh = new (buf) fhandler_pty_master (name);
+	fh = cnew (fhandler_pty_master) ();
 	break;
       case FH_TTYS:
 	if (unit < 0)
-	  fh = new (buf) fhandler_tty_slave (name);
+	  fh = cnew (fhandler_tty_slave) ();
 	else
-	  fh = new (buf) fhandler_tty_slave (unit, name);
+	  fh = cnew (fhandler_tty_slave) (unit);
 	break;
       case FH_WINDOWS:
-	fh = new (buf) fhandler_windows (name);
+	fh = cnew (fhandler_windows) ();
 	break;
       case FH_SERIAL:
-	fh = new (buf) fhandler_serial (name, dev, unit);
+	fh = cnew (fhandler_serial) (unit);
 	break;
       case FH_PIPE:
       case FH_PIPER:
       case FH_PIPEW:
-	fh = new (buf) fhandler_pipe (name, dev);
+	fh = cnew (fhandler_pipe) (dev);
 	break;
       case FH_SOCKET:
-	fh = new (buf) fhandler_socket (name);
+	if ((fh = cnew (fhandler_socket) ()))
+	  inc_need_fixup_before ();
 	break;
       case FH_DISK:
-	fh = new (buf) fhandler_disk_file (NULL);
+	fh = cnew (fhandler_disk_file) ();
+	break;
+      case FH_CYGDRIVE:
+	fh = cnew (fhandler_cygdrive) (unit);
 	break;
       case FH_FLOPPY:
-	fh = new (buf) fhandler_dev_floppy (name, unit);
+	fh = cnew (fhandler_dev_floppy) (unit);
 	break;
       case FH_TAPE:
-	fh = new (buf) fhandler_dev_tape (name, unit);
+	fh = cnew (fhandler_dev_tape) (unit);
 	break;
       case FH_NULL:
-	fh = new (buf) fhandler_dev_null (name);
+	fh = cnew (fhandler_dev_null) ();
 	break;
       case FH_ZERO:
-	fh = new (buf) fhandler_dev_zero (name);
+	fh = cnew (fhandler_dev_zero) ();
 	break;
       case FH_RANDOM:
-	fh = new (buf) fhandler_dev_random (name, unit);
+	fh = cnew (fhandler_dev_random) (unit);
 	break;
       case FH_MEM:
-	fh = new (buf) fhandler_dev_mem (name, unit);
+	fh = cnew (fhandler_dev_mem) (unit);
 	break;
       case FH_CLIPBOARD:
-	fh = new (buf) fhandler_dev_clipboard (name);
+	fh = cnew (fhandler_dev_clipboard) ();
 	break;
       case FH_OSS_DSP:
-	fh = new (buf) fhandler_dev_dsp (name);
+	fh = cnew (fhandler_dev_dsp) ();
 	break;
       default:
-	{
-	  /* FIXME - this could recurse forever */
-	  path_conv pc;
-	  return build_fhandler (fd, name, NULL, pc);
-	}
+	system_printf ("internal error -- unknown device - %p", dev);
+	fh = NULL;
     }
 
-  debug_printf ("%s - cb %d, fd %d, fh %p", fh->get_name () ?: "", fh->cb,
-		fd, fh);
+  debug_printf ("fd %d, fh %p", fd, fh);
   return fd >= 0 ? (fds[fd] = fh) : fh;
 }
 
@@ -394,6 +388,7 @@ dtable::dup2 (int oldfd, int newfd)
       goto done;
     }
 
+  debug_printf ("newfh->io_handle %p, oldfh->io_handle %p", newfh->get_io_handle (), fds[oldfd]->get_io_handle ());
   SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
 
   if (newfd < 0)
@@ -403,20 +398,16 @@ dtable::dup2 (int oldfd, int newfd)
       goto done;
     }
 
-  if ((size_t) newfd >= cygheap->fdtab.size)
+  if ((size_t) newfd >= size)
    {
      int inc_size = NOFILE_INCR * ((newfd + NOFILE_INCR - 1) / NOFILE_INCR) -
-		    cygheap->fdtab.size;
-     cygheap->fdtab.extend (inc_size);
+		    size;
+     extend (inc_size);
    }
 
   if (!not_open (newfd))
     _close (newfd);
   fds[newfd] = newfh;
-
-  /* Count sockets. */
-  if ((fds[newfd]->get_device () & FH_DEVMASK) == FH_SOCKET)
-    inc_need_fixup_before ();
 
   ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
   MALLOC_CHECK;
@@ -569,6 +560,10 @@ dtable::vfork_child_dup ()
   newtable = (fhandler_base **) ccalloc (HEAP_ARGV, size, sizeof (fds[0]));
   int res = 1;
 
+  /* Remove impersonation */
+  if (cygheap->user.impersonated && cygheap->user.token != INVALID_HANDLE_VALUE)
+    RevertToSelf ();
+
   for (size_t i = 0; i < size; i++)
     if (not_open (i))
       continue;
@@ -580,6 +575,10 @@ dtable::vfork_child_dup ()
 	set_errno (EBADF);
 	goto out;
       }
+
+  /* Restore impersonation */
+  if (cygheap->user.impersonated && cygheap->user.token != INVALID_HANDLE_VALUE)
+    ImpersonateLoggedOnUser (cygheap->user.token);
 
   fds_on_hold = fds;
   fds = newtable;
@@ -596,6 +595,7 @@ dtable::vfork_parent_restore ()
 
   close_all_files ();
   fhandler_base **deleteme = fds;
+  assert (fds_on_hold != NULL);
   fds = fds_on_hold;
   fds_on_hold = NULL;
   cfree (deleteme);

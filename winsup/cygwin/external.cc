@@ -11,6 +11,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include <errno.h>
 #include "security.h"
 #include "fhandler.h"
 #include "sync.h"
@@ -20,6 +21,11 @@ details. */
 #include "shared_info.h"
 #include "cygwin_version.h"
 #include "perprocess.h"
+#include "cygerrno.h"
+#include "fhandler.h"
+#include "path.h"
+#include "dtable.h"
+#include "cygheap.h"
 
 static external_pinfo *
 fillout_pinfo (pid_t pid, int winpid)
@@ -32,10 +38,13 @@ fillout_pinfo (pid_t pid, int winpid)
 
   static winpids pids (0);
 
-  if (!pids.npids || !nextpid)
-    pids.init (winpid);
-
   static unsigned int i;
+  if (!pids.npids || !nextpid)
+    {
+      pids.init (winpid);
+      i = 0;
+    }
+
   if (!pid)
     i = 0;
 
@@ -170,6 +179,19 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  char *user_flags = va_arg (arg, char *);
 	  char *system_flags = va_arg (arg, char *);
 	  return get_cygdrive_info (user, system, user_flags, system_flags);
+	}
+
+      case CW_SET_CYGWIN_REGISTRY_NAME:
+	{
+#	  define cr ((char *) arg)
+	  if (check_null_empty_str_errno (cr))
+	    return (DWORD) NULL;
+	  cygheap->cygwin_regname = (char *) crealloc (cygheap->cygwin_regname,
+						       strlen (cr) + 1);
+	  strcpy (cygheap->cygwin_regname, cr);
+      case CW_GET_CYGWIN_REGISTRY_NAME:
+	  return (DWORD) cygheap->cygwin_regname;
+#	  undef cr
 	}
 
       default:

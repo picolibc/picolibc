@@ -1,17 +1,17 @@
 Copyright 2001 Red Hat Inc., Egor Duda
 
-So, your favourite program has crashed? And did you say something about
+So, your favorite program has crashed? And did you say something about
 'stackdump'? Or it just prints its output from left to right and upside-down?
 Well, you can file an angry bug report and wait until some of the core
 developers try to reproduce your problem, try to find what's the matter
 with your program and cygwin and fix the bug, if any. But you can do something
 better than that. You can debug the problem yourself, and even if you can't
-fix it, your analysis may be very helpful. Here's the (incoplete) howto on 
+fix it, your analysis may be very helpful. Here's the (incomplete) howto on
 cygwin debugging.
 
 1. The first thing you'll need to do is to build cygwin1.dll and your crashed
 application from sources. To debug them you'll need debug information, which
-is normally stripped from executables. 
+is normally stripped from executables.
 
 2. Create known-working cygwin debugging environment.
 - create a separate directory, say, c:\cygdeb, and put known-working
@@ -19,7 +19,7 @@ is normally stripped from executables.
 - create a wrapper c:\cygdeb\debug_wrapper.cmd:
 
 ========= debug_wrapper.cmd =========
-rem setting CYGWIN_TESTING environement variable makes cygwin application
+rem setting CYGWIN_TESTING environment variable makes cygwin application
 rem not to interfere with other already running cygwin applications.
 set CYGWIN_TESTING=1
 c:\cygdeb\gdb.exe -nw %1 %2
@@ -33,27 +33,27 @@ c:\cygdeb\gdb.exe -nw %1 %2
 
 4. Strace.
   You can run your program under 'strace' utility, described if user's manual.
-  If you know where the problem approximately is, you can add a bunch of 
-  additional debug_printf()s in the source code and see what they print in 
+  If you know where the problem approximately is, you can add a bunch of
+  additional debug_printf()s in the source code and see what they print in
   strace log. There's one common problem with this method, that some bugs
-  may misteriously disappear once the program is run under strace. Then the
+  may mysteriously disappear once the program is run under strace. Then the
   bug is likely a race condition. strace has two useful options to deal with
   such situation: -b enables buffering of output and reduces additional
   timeouts introduced by strace, and -m option allows you to mask certain
   classes of *_printf() functions, reducing timeouts even more.
 
-5. Problems at early startup. 
+5. Problems at early startup.
   Sometimes, something crashes at the very early stages of application
   initialization, when JIT debugging facility is not yet active. Ok, there's
   another environment variable that may help. Create program_wrapper.cmd:
 
 ========= program_wrapper.cmd =========
-rem setting CYGWIN_SLEEP environement variable makes cygwin application
+rem setting CYGWIN_SLEEP environment variable makes cygwin application
 rem to sleep for x milliseconds at startup
 set CYGWIN_SLEEP=20000
 c:\some\path\bad_program.exe some parameters
 ===================================
-  
+
   Now, run program_wrapper.cmd. It should print running program pid.
   After starting program_wrapper.cmd you've got 20 seconds to open another
   window, cd to c:\cygdeb in it, run gdb there and in gdb prompt type
@@ -70,4 +70,27 @@ c:\some\path\bad_program.exe some parameters
   build special version of cygwin1.dll which includes heap sanity checking.
   To do it, just add --enable-malloc-debugging option to configure. Be warned,
   however, that this version of dll is _very_ slow (10-100 times slower than
-  normal), so use it only when absolutely neccessary.
+  normal), so use it only when absolutely necessary.
+
+7. Program dies when running under strace.
+  If your program crashes when you run it using strace but runs ok (or has a
+  different problem) otherwise, then there may be a problem in one of the
+  strace *_printf statements.  Usually this is caused by a change in arguments
+  resulting in a %s being used with something other than a pointer to a
+  string.
+
+  To debug this scenario, do something like this:
+
+   bash$ gdb -nw yourapp.exe
+   (gdb) dll cygwin1
+   (gdb) l dll_crt0_1
+   (gdb) bp <<first line in the function>>
+   (gdb) run
+   (gdb) set strace.active=1
+   (gdb) continue
+
+  The program will then run in "strace mode", calling each strace *_printf,
+  just like it does when run under the strace program.  Eventually, the
+  program will crash, probably in small_printf.  At that point, a 'bt'
+  command should show you the offending call to strace_printf with the
+  improper format string.

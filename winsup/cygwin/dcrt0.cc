@@ -17,6 +17,7 @@ details. */
 #include <limits.h>
 #include <wingdi.h>
 #include <winuser.h>
+#include <errno.h>
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
@@ -29,7 +30,7 @@ details. */
 #include "path.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "child_info.h"
+#include "child_info_magic.h"
 #include "perthread.h"
 #include "shared_info.h"
 #include "cygwin_version.h"
@@ -74,6 +75,7 @@ ResourceLocks _reslock NO_COPY;
 MTinterface _mtinterf;
 
 bool NO_COPY _cygwin_testing;
+unsigned NO_COPY _cygwin_testing_magic;
 
 extern "C"
 {
@@ -517,18 +519,13 @@ alloc_stack (child_info_fork *ci)
      fork on Win95, but I don't know exactly why yet. DJ */
   volatile char b[ci->stacksize + 16384];
 
-  if (ci->type == PROC_FORK)
-    ci->stacksize = 0;		// flag to fork not to do any funny business
-  else
-    {
-      if (!VirtualQuery ((LPCVOID) &b, &sm, sizeof sm))
-	api_fatal ("fork: couldn't get stack info, %E");
+  if (!VirtualQuery ((LPCVOID) &b, &sm, sizeof sm))
+    api_fatal ("fork: couldn't get stack info, %E");
 
-      if (sm.AllocationBase != ci->stacktop)
-	alloc_stack_hard_way (ci, b + sizeof (b) - 1);
-      else
-	ci->stacksize = 0;
-    }
+  if (sm.AllocationBase != ci->stacktop)
+    alloc_stack_hard_way (ci, b + sizeof (b) - 1);
+  else
+    ci->stacksize = 0;
 
   return;
 }
@@ -592,17 +589,17 @@ dll_crt0_1 ()
     {
       switch (child_proc_info->type)
 	{
-	  case PROC_FORK:
-	  case PROC_FORK1:
+	  case _PROC_FORK:
 	    cygheap_fixup_in_child (child_proc_info, 0);
 	    alloc_stack (fork_info);
 	    set_myself (mypid);
 	    ProtectHandle (child_proc_info->forker_finished);
 	    break;
-	  case PROC_SPAWN:
-	    CloseHandle (spawn_info->hexec_proc);
+	  case _PROC_SPAWN:
+	    if (spawn_info->hexec_proc)
+	      CloseHandle (spawn_info->hexec_proc);
 	    goto around;
-	  case PROC_EXEC:
+	  case _PROC_EXEC:
 	    hexec_proc = spawn_info->hexec_proc;
 	  around:
 	    HANDLE h;
@@ -776,6 +773,31 @@ dll_crt0_1 ()
     exit (user_data->main (__argc, __argv, *user_data->envptr));
 }
 
+void
+initial_env ()
+{
+  char buf[MAX_PATH + 1];
+#ifdef DEBUGGING
+  if (GetEnvironmentVariable ("CYGWIN_SLEEP", buf, sizeof (buf) - 1))
+    {
+      console_printf ("Sleeping %d, pid %u\n", atoi (buf), GetCurrentProcessId ());
+      Sleep (atoi (buf));
+    }
+#endif
+
+  if (GetEnvironmentVariable ("CYGWIN_TESTING", buf, sizeof (buf) - 1))
+    {
+      _cygwin_testing = 1;
+      DWORD len;
+      if ((len = GetModuleFileName (cygwin_hmodule, buf, MAX_PATH))
+	  && len > sizeof ("new-cygwin1.dll")
+	  && strcasematch (buf + len - sizeof ("new-cygwin1.dll"),
+			   "\\new-cygwin1.dll"))
+	_cygwin_testing_magic = 0x10;
+    }
+}
+
+
 /* Wrap the real one, otherwise gdb gets confused about
    two symbols with the same name, but different addresses.
 
@@ -785,18 +807,8 @@ dll_crt0_1 ()
 extern "C" void __stdcall
 _dll_crt0 ()
 {
-  char envbuf[8];
-#ifdef DEBUGGING
-  if (GetEnvironmentVariable ("CYGWIN_SLEEP", envbuf, sizeof (envbuf) - 1))
-    {
-      console_printf ("Sleeping %d, pid %u\n", atoi (envbuf), GetCurrentProcessId ());
-      Sleep (atoi (envbuf));
-    }
-#endif
-
-  if (GetEnvironmentVariable ("CYGWIN_TESTING", envbuf, sizeof (envbuf) - 1))
-    _cygwin_testing = 1;
-
+  DECLARE_TLS_STORAGE;
+  initial_env ();
   char zeros[sizeof (fork_info->zero)] = {0};
 #ifdef DEBUGGING
   strace.microseconds ();
@@ -818,31 +830,37 @@ _dll_crt0 ()
   if (si.cbReserved2 >= EXEC_MAGIC_SIZE &&
       memcmp (fork_info->zero, zeros, sizeof (zeros)) == 0)
     {
+      if ((fork_info->intro & OPROC_MAGIC_MASK) == OPROC_MAGIC_GENERIC)
+	multiple_cygwin_problem ("proc", fork_info->intro, 0);
+      else if (fork_info->intro == PROC_MAGIC_GENERIC
+	       && fork_info->magic != CHILD_INFO_MAGIC)
+	multiple_cygwin_problem ("proc", fork_info->magic, CHILD_INFO_MAGIC);
+      unsigned should_be_cb = 0;
       switch (fork_info->type)
 	{
-	  case PROC_FORK:
-	  case PROC_FORK1:
+	  case _PROC_FORK:
 	    user_data->forkee = fork_info->cygpid;
-	  case PROC_SPAWN:
+	    should_be_cb = sizeof (child_info_fork);
+	  case _PROC_SPAWN:
 	    if (fork_info->pppid_handle)
 	      CloseHandle (fork_info->pppid_handle);
-	  case PROC_EXEC:
-	    {
-	      child_proc_info = fork_info;
-	      cygwin_mount_h = child_proc_info->mount_h;
-	      mypid = child_proc_info->cygpid;
-	      break;
-	    }
+	  case _PROC_EXEC:
+	    if (!should_be_cb)
+	      should_be_cb = sizeof (child_info);
+	    if (should_be_cb != fork_info->cb)
+	      multiple_cygwin_problem ("proc size", fork_info->cb, should_be_cb);
+	    else if (sizeof (fhandler_union) != fork_info->fhandler_union_cb)
+	      multiple_cygwin_problem ("fhandler size", fork_info->fhandler_union_cb, sizeof (fhandler_union));
+	    else
+	      {
+		child_proc_info = fork_info;
+		cygwin_mount_h = child_proc_info->mount_h;
+		mypid = child_proc_info->cygpid;
+		break;
+	      }
 	  default:
-	    if (_cygwin_testing)
-	      fork_info = NULL;
-	    else if ((fork_info->type & PROC_MAGIC_MASK) == PROC_MAGIC_GENERIC)
-	      api_fatal ("\
-You have multiple copies of cygwin1.dll on your system.\n\
-Search for cygwin1.dll using the Windows Start->Find/Search facility\n\
-and delete all but the most recent version.  This will probably be\n\
-the one that resides in x:\\cygwin\\bin, where 'x' is the drive on which\n\
-you have installed the cygwin distribution.\n");
+	    system_printf ("unknown exec type %d", fork_info->type);
+	    fork_info = NULL;
 	    break;
 	}
     }
@@ -852,6 +870,7 @@ you have installed the cygwin distribution.\n");
 void
 dll_crt0 (per_process *uptr)
 {
+  DECLARE_TLS_STORAGE;
   /* Set the local copy of the pointer into the user space. */
   if (uptr && uptr != user_data)
     {
@@ -1014,6 +1033,27 @@ __api_fatal (const char *fmt, ...)
   (void) try_to_debug ();
 #endif
   myself->exit (1);
+}
+
+void
+multiple_cygwin_problem (const char *what, unsigned magic_version, unsigned version)
+{
+  if (_cygwin_testing && strstr (what, "proc"))
+    {
+      fork_info = NULL;
+      return;
+    }
+  if (CYGWIN_VERSION_MAGIC_VERSION (magic_version) != version)
+    api_fatal ("%s version mismatch detected - %p/%p.\n\
+You have multiple copies of cygwin1.dll on your system.\n\
+Search for cygwin1.dll using the Windows Start->Find/Search facility\n\
+and delete all but the most recent version.  The most recent version *should*\n\
+reside in x:\\cygwin\\bin, where 'x' is the drive on which you have\n\
+installed the cygwin distribution.", what, magic_version, version);
+
+  char buf[1024];
+  if (!GetEnvironmentVariable ("CYGWIN_MISMATCH_OK", buf, sizeof (buf)))
+    system_printf ("%s magic number mismatch detected - %p/%p", what, magic_version, version);
 }
 
 #ifdef DEBUGGING

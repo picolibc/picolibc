@@ -22,8 +22,8 @@ details. */
 #include "dll_init.h"
 #include "cygerrno.h"
 
-#define _dl_error _reent_winsup()->_dl_error
-#define _dl_buffer _reent_winsup()->_dl_buffer
+#define _dl_error _reent_winsup ()->_dl_error
+#define _dl_buffer _reent_winsup ()->_dl_buffer
 
 static void __stdcall
 set_dl_error (const char *str)
@@ -38,7 +38,7 @@ set_dl_error (const char *str)
 inline const char * __stdcall
 check_path_access (const char *mywinenv, const char *name, path_conv& buf)
 {
-  return find_exec (name, buf, mywinenv, TRUE);
+  return find_exec (name, buf, mywinenv, FE_NNF | FE_NATIVE | FE_CWD);
 }
 
 /* Search LD_LIBRARY_PATH for dll, if it exists.
@@ -85,7 +85,7 @@ get_full_path_of_dll (const char* str, char *name)
 void *
 dlopen (const char *name, int)
 {
-  SetResourceLock(LOCK_DLL_LIST,READ_LOCK|WRITE_LOCK," dlopen");
+  SetResourceLock (LOCK_DLL_LIST, READ_LOCK | WRITE_LOCK, "dlopen");
 
   void *ret;
 
@@ -110,7 +110,7 @@ dlopen (const char *name, int)
     set_dl_error ("dlopen");
   debug_printf ("ret %p", ret);
 
-  ReleaseResourceLock(LOCK_DLL_LIST,READ_LOCK|WRITE_LOCK," dlopen");
+  ReleaseResourceLock (LOCK_DLL_LIST, READ_LOCK | WRITE_LOCK, "dlopen");
   return ret;
 }
 
@@ -127,7 +127,7 @@ dlsym (void *handle, const char *name)
 int
 dlclose (void *handle)
 {
-  SetResourceLock(LOCK_DLL_LIST,READ_LOCK|WRITE_LOCK," dlclose");
+  SetResourceLock (LOCK_DLL_LIST, READ_LOCK | WRITE_LOCK, "dlclose");
 
   int ret = -1;
   void *temphandle = (void *) GetModuleHandle (NULL);
@@ -137,7 +137,7 @@ dlclose (void *handle)
     set_dl_error ("dlclose");
   CloseHandle ((HMODULE) temphandle);
 
-  ReleaseResourceLock(LOCK_DLL_LIST,READ_LOCK|WRITE_LOCK," dlclose");
+  ReleaseResourceLock (LOCK_DLL_LIST, READ_LOCK | WRITE_LOCK, "dlclose");
   return ret;
 }
 

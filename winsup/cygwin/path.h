@@ -136,6 +136,7 @@ class path_conv
   DWORD file_attributes () {return fileattr;}
   DWORD get_drive_type () {return drive_type;}
   BOOL fs_fast_ea () {return sym_opt & PC_CHECK_EA;}
+  void set_path (const char *p) {strcpy (path, p);}
 };
 
 /* Symlink marker */
@@ -148,12 +149,20 @@ class path_conv
 
 /* Maximum depth of symlinks (after which ELOOP is issued).  */
 #define MAX_LINK_DEPTH 10
-
-int __stdcall get_device_number (const char *name, int &unit, BOOL from_conv = FALSE)  __attribute__ ((regparm(3)));
 int __stdcall slash_unc_prefix_p (const char *path) __attribute__ ((regparm(1)));
 
-const char * __stdcall find_exec (const char *name, path_conv& buf, const char *winenv = "PATH=",
-			int null_if_notfound = 0, const char **known_suffix = NULL)  __attribute__ ((regparm(3)));
+enum fe_types
+{
+  FE_NADA = 0,		/* Nothing special */
+  FE_NNF = 1,		/* Return NULL if not found */
+  FE_NATIVE = 2,	/* Return native path in path_conv struct */
+  FE_CWD = 4		/* Search CWD for program */
+};
+const char * __stdcall find_exec (const char *name, path_conv& buf,
+				  const char *winenv = "PATH=",
+				  unsigned opt = FE_NADA,
+				  const char **known_suffix = NULL)
+  __attribute__ ((regparm(3)));
 
 /* Common macros for checking for invalid path names */
 #define isdrive(s) (isalpha (*(s)) && (s)[1] == ':')

@@ -109,6 +109,8 @@ mmap_record::find_empty (DWORD pages)
   DWORD mapped_pages = PAGE_CNT (size_to_map_);
   DWORD start;
 
+  if (pages > mapped_pages)
+    return (DWORD)-1;
   for (start = 0; start <= mapped_pages - pages; ++start)
     if (!MAP_ISSET (start))
       {
@@ -217,7 +219,7 @@ mmap_record::fixup_map ()
 		    &old_prot);
 }
 
-static fhandler_disk_file fh_paging_file (NULL);
+static fhandler_disk_file fh_paging_file;
 
 fhandler_base *
 mmap_record::alloc_fh ()
@@ -445,21 +447,21 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
   DWORD gran_off = off & ~(granularity - 1);
   DWORD gran_len = howmany (len, granularity) * granularity;
 
-  fhandler_base *fh = NULL;
+  fhandler_base *fh;
   caddr_t base = addr;
   HANDLE h;
 
   if (fd != -1)
     {
       /* Ensure that fd is open */
-      if (cygheap->fdtab.not_open (fd))
+      cygheap_fdget cfd (fd);
+      if (cfd < 0)
 	{
-	  set_errno (EBADF);
 	  syscall_printf ("-1 = mmap(): EBADF");
 	  ReleaseResourceLock(LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
 	  return MAP_FAILED;
 	}
-      fh = cygheap->fdtab[fd];
+      fh = cfd;
       if (fh->get_device () == FH_DISK)
 	{
 	  DWORD fsiz = GetFileSize (fh->get_handle (), NULL);
@@ -503,7 +505,7 @@ mmap (caddr_t addr, size_t len, int prot, int flags, int fd, off_t off)
      While the changes are not propagated to the file, they are
      visible to other processes sharing the same file mapping object.
      Workaround: Don't use named file mapping.  That should work since
-     		 sharing file mappings only works reliable using named
+		 sharing file mappings only works reliable using named
 		 file mapping on 9x.
   */
   if ((flags & MAP_PRIVATE)

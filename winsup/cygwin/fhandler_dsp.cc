@@ -420,10 +420,9 @@ fhandler_dev_dsp::setupwav (const char *pData, int nBytes)
 }
 
 //------------------------------------------------------------------------
-fhandler_dev_dsp::fhandler_dev_dsp (const char *name):
-  fhandler_base (FH_OSS_DSP, name)
+fhandler_dev_dsp::fhandler_dev_dsp ():
+  fhandler_base (FH_OSS_DSP)
 {
-  set_cb (sizeof *this);
 }
 
 fhandler_dev_dsp::~fhandler_dev_dsp ()
@@ -431,7 +430,7 @@ fhandler_dev_dsp::~fhandler_dev_dsp ()
 }
 
 int
-fhandler_dev_dsp::open (const char *path, int flags, mode_t mode = 0)
+fhandler_dev_dsp::open (path_conv *, int flags, mode_t mode = 0)
 {
   // currently we only support writing
   if ((flags & (O_WRONLY | O_RDONLY | O_RDWR)) != O_WRONLY)
@@ -443,14 +442,11 @@ fhandler_dev_dsp::open (const char *path, int flags, mode_t mode = 0)
     s_audio = new (audio_buf) Audio;
 
   // Work out initial sample format & frequency
-  if (strcmp (path, "/dev/dsp") == 0L)
-    {
       // dev/dsp defaults
-      audioformat_ = AFMT_S8;
-      audiofreq_ = 8000;
-      audiobits_ = 8;
-      audiochannels_ = 1;
-    }
+  audioformat_ = AFMT_S8;
+  audiofreq_ = 8000;
+  audiobits_ = 8;
+  audiochannels_ = 1;
 
   if (!s_audio->open (audiofreq_, audiobits_, audiochannels_))
     debug_printf ("/dev/dsp: failed to open\n");
@@ -480,7 +476,7 @@ fhandler_dev_dsp::write (const void *ptr, size_t len)
   return len;
 }
 
-int
+int __stdcall
 fhandler_dev_dsp::read (void *ptr, size_t len)
 {
   return len;
@@ -529,7 +525,7 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
 
       CASE (SNDCTL_DSP_GETBLKSIZE)
 	*intptr = Audio::BLOCK_SIZE;
-	break;
+	return 0;
 
       CASE (SNDCTL_DSP_SETFMT)
       {

@@ -117,14 +117,17 @@ pinfo_init (char **envp, int envc)
 void
 _pinfo::exit (UINT n, bool norecord)
 {
-  if (!norecord)
-    process_state = PID_EXITED;
+  if (this)
+    {
+      if (!norecord)
+	process_state = PID_EXITED;
 
-  /* FIXME:  There is a potential race between an execed process and its
-     parent here.  I hated to add a mutex just for this, though.  */
-  struct rusage r;
-  fill_rusage (&r, hMainProc);
-  add_rusage (&rusage_self, &r);
+      /* FIXME:  There is a potential race between an execed process and its
+	 parent here.  I hated to add a mutex just for this, though.  */
+      struct rusage r;
+      fill_rusage (&r, hMainProc);
+      add_rusage (&rusage_self, &r);
+    }
 
   sigproc_printf ("Calling ExitProcess %d", n);
   ExitProcess (n);
@@ -182,7 +185,8 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
       procinfo = (_pinfo *) MapViewOfFile (h, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
       ProtectHandle1 (h, pinfo_shared_handle);
 
-      if ((procinfo->process_state & PID_INITIALIZING) && (flag & PID_NOREDIR))
+      if ((procinfo->process_state & PID_INITIALIZING) && (flag & PID_NOREDIR)
+	  && cygwin_pid (procinfo->dwProcessId) != procinfo->pid)
 	{
 	  release ();
 	  set_errno (ENOENT);
@@ -293,8 +297,8 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
   if (nelem >= npidlist)
     {
       npidlist += slop_pidlist;
-      pidlist = (DWORD *) realloc (pidlist, size_pidlist (npidlist));
-      pinfolist = (pinfo *) realloc (pinfolist, size_pinfolist (npidlist));
+      pidlist = (DWORD *) realloc (pidlist, size_pidlist (npidlist + 1));
+      pinfolist = (pinfo *) realloc (pinfolist, size_pinfolist (npidlist + 1));
     }
 
   pinfolist[nelem].init (cygpid, PID_NOREDIR);
@@ -324,7 +328,7 @@ winpids::enumNT (bool winpid)
 
   DWORD nelem = 0;
   if (!szprocs)
-    procs = (SYSTEM_PROCESSES *) malloc (szprocs = 200 * sizeof (*procs));
+    procs = (SYSTEM_PROCESSES *) malloc (sizeof (*procs) + (szprocs = 200 * sizeof (*procs)));
 
   NTSTATUS res;
   for (;;)
@@ -387,7 +391,8 @@ void
 winpids::init (bool winpid)
 {
   npids = (this->*enum_processes) (winpid);
-  pidlist[npids] = 0;
+  if (pidlist)
+    pidlist[npids] = 0;
 }
 
 DWORD

@@ -41,8 +41,6 @@
 #ifndef _GLOB_H_
 #define	_GLOB_H_
 
-/* CYGNUS LOCAL: end */
-
 #include <sys/cdefs.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -93,7 +91,6 @@ typedef struct {
 #define	GLOB_ABEND	(-2)	/* Unignored error. */
 
 __BEGIN_DECLS
-/* CYGNUS LOCAL: normal protos */
 
 #undef DLLEXPORT
 #ifdef __INSIDE_CYGWIN__
@@ -105,7 +102,6 @@ int	DLLEXPORT glob(const char *, int, int (*)(const char *, int), glob_t *);
 void    DLLEXPORT globfree(glob_t *);
 
 #undef DLLEXPORT
-/* end CYGNUS LOCAL */
 __END_DECLS
 
 #endif /* !_GLOB_H_ */

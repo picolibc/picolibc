@@ -18,6 +18,7 @@ details. */
 #include <limits.h>
 #include <wingdi.h>
 #include <winuser.h>
+#include <unistd.h>
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "security.h"
@@ -74,7 +75,7 @@ Winmain (VOID *)
 {
   MSG msg;
   WNDCLASS wc;
-  static const NO_COPY char classname[] = "CygwinWndClass";
+  static NO_COPY char classname[] = "CygwinWndClass";
 
   /* Register the window class for the main window. */
 
@@ -150,8 +151,7 @@ window_terminate ()
     SendMessage (ourhwnd, WM_DESTROY, 0, 0);
 }
 
-extern "C"
-int
+extern "C" int
 setitimer (int which, const struct itimerval *value, struct itimerval *oldvalue)
 {
   UINT elapse;
@@ -195,8 +195,7 @@ setitimer (int which, const struct itimerval *value, struct itimerval *oldvalue)
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 getitimer (int which, struct itimerval *value)
 {
   UINT elapse, val;
@@ -221,27 +220,41 @@ getitimer (int which, struct itimerval *value)
   elapse = GetTickCount () - start_time;
   val = itv.it_value.tv_sec * 1000 + itv.it_value.tv_usec / 1000;
   val -= elapse;
-  value->it_value.tv_sec = val/1000;
-  value->it_value.tv_usec = val%1000;
+  value->it_value.tv_sec = val / 1000;
+  value->it_value.tv_usec = val % 1000;
   return 0;
 }
 
-extern "C"
-unsigned int
+extern "C" unsigned int
 alarm (unsigned int seconds)
 {
   int ret;
   struct itimerval newt, oldt;
 
-  getitimer (ITIMER_REAL, &oldt);
-
   newt.it_value.tv_sec = seconds;
   newt.it_value.tv_usec = 0;
   newt.it_interval.tv_sec = 0;
   newt.it_interval.tv_usec = 0;
-  setitimer (ITIMER_REAL, &newt, NULL);
+  setitimer (ITIMER_REAL, &newt, &oldt);
   ret = oldt.it_value.tv_sec;
   if (ret == 0 && oldt.it_value.tv_usec)
     ret = 1;
   return ret;
 }
+
+extern "C" useconds_t
+ualarm (useconds_t value, useconds_t interval)
+{
+  struct itimerval timer, otimer;
+
+  timer.it_value.tv_sec = 0;
+  timer.it_value.tv_usec = value;
+  timer.it_interval.tv_sec = 0;
+  timer.it_interval.tv_usec = interval;
+
+  if (setitimer (ITIMER_REAL, &timer, &otimer) < 0)
+    return (u_int)-1;
+
+  return (otimer.it_value.tv_sec * 1000000) + otimer.it_value.tv_usec;
+}
+

@@ -26,7 +26,7 @@ details. */
 #include "path.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "child_info.h"
+#include "child_info_magic.h"
 #define NEED_VFORK
 #include "perthread.h"
 #include <assert.h>
@@ -177,6 +177,29 @@ wait_for_me ()
       (void) ForceCloseHandle (wait_sig_inited);
       wait_sig_inited = NULL;
     }
+}
+
+/* Get the sync_proc_subproc muto to control access to
+ * children, zombie arrays.
+ * Attempt to handle case where process is exiting as we try to grab
+ * the mutex.
+ */
+static BOOL
+get_proc_lock (DWORD what, DWORD val)
+{
+  Static int lastwhat = -1;
+  if (!sync_proc_subproc)
+    return FALSE;
+  if (sync_proc_subproc->acquire (WPSP))
+    {
+      lastwhat = what;
+      return TRUE;
+    }
+  if (!sync_proc_subproc)
+    return FALSE;
+  system_printf ("Couldn't aquire sync_proc_subproc for(%d,%d), %E, last %d",
+		  what, val, lastwhat);
+  return TRUE;
 }
 
 static BOOL __stdcall
@@ -612,7 +635,7 @@ sigproc_terminate (void)
 				//  finished with anything it is doing
       // sig_dispatch_pending (TRUE);	// wake up and die
       /* In case of a sigsuspend */
-      SetEvent (signal_arrived);
+      // SetEvent (signal_arrived);
 
       /* If !hwait_sig, then the process probably hasn't even finished
        * its initialization phase.
@@ -834,11 +857,14 @@ void __stdcall
 init_child_info (DWORD chtype, child_info *ch, pid_t pid, HANDLE subproc_ready)
 {
   memset (ch, 0, sizeof *ch);
-  ch->cb = sizeof *ch;
+  ch->cb = chtype == PROC_FORK ? sizeof (child_info_fork) : sizeof (child_info);
+  ch->intro = PROC_MAGIC_GENERIC;
+  ch->magic = CHILD_INFO_MAGIC;
   ch->type = chtype;
   ch->cygpid = pid;
   ch->subproc_ready = subproc_ready;
   ch->pppid_handle = myself->ppid_handle;
+  ch->fhandler_union_cb = sizeof (fhandler_union);
 }
 
 /* Check the state of all of our children to see if any are stopped or
@@ -899,7 +925,7 @@ getsem (_pinfo *p, const char *str, int init, int max)
 	  set_errno (ESRCH);
 	  return NULL;
 	}
-      int wait = 10000;
+      int wait = 1000;
       sigproc_printf ("pid %d, ppid %d, wait %d, initializing %x", p->pid, p->ppid, wait,
 		  ISSTATE (p, PID_INITIALIZING));
       for (int i = 0; ISSTATE (p, PID_INITIALIZING) && i < wait; i++)
@@ -937,29 +963,6 @@ getsem (_pinfo *p, const char *str, int init, int max)
       set_errno (ESRCH);
     }
   return h;
-}
-
-/* Get the sync_proc_subproc muto to control access to
- * children, zombie arrays.
- * Attempt to handle case where process is exiting as we try to grab
- * the mutex.
- */
-static BOOL
-get_proc_lock (DWORD what, DWORD val)
-{
-  Static int lastwhat = -1;
-  if (!sync_proc_subproc)
-    return FALSE;
-  if (sync_proc_subproc->acquire (WPSP))
-    {
-      lastwhat = what;
-      return TRUE;
-    }
-  if (!sync_proc_subproc)
-    return FALSE;
-  system_printf ("Couldn't aquire sync_proc_subproc for(%d,%d), %E, last %d",
-		  what, val, lastwhat);
-  return TRUE;
 }
 
 /* Remove a zombie from zombies by swapping it with the last child in the list.

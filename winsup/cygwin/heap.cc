@@ -70,14 +70,14 @@ heap_init ()
        * to assure contiguous memory.  */
       cygheap->heapptr = cygheap->heaptop = cygheap->heapbase =
 	VirtualAlloc(NULL, cygwin_shared->heap_chunk_size (), MEM_RESERVE,
-	    	     PAGE_NOACCESS);
+		     PAGE_NOACCESS);
       if (cygheap->heapbase == NULL)
 	api_fatal ("2. unable to allocate heap, heap_chunk_size %d, %E",
 		   cygwin_shared->heap_chunk_size ());
     }
 
   debug_printf ("heap base %p, heap top %p", cygheap->heapbase,
-      		cygheap->heaptop);
+		cygheap->heaptop);
   page_const--;
   malloc_init ();
 }

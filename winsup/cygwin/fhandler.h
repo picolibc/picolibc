@@ -1,6 +1,6 @@
 /* fhandler.h
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -12,41 +12,6 @@ details. */
 #define _FHANDLER_H_
 
 #include <sys/ioctl.h>
-
-/* Classes
-
-  Code is located in fhandler.cc unless another file name is given.
-
-  fhandler_base		  normal I/O
-
-     fhandler_disk_file
-     fhandler_serial      Adds vmin and vtime.
-     fhandler_dev_null    Not really I/O
-     fhandler_dev_zero    Faked
-
-     fhandler_dev_raw     (fhandler_raw.cc)
-     fhandler_dev_floppy  (fhandler_floppy.cc)
-     fhandler_dev_tape    (fhandler_tape.cc)
-
-     fhandler_pipe
-     fhandler_socket      (fhandler_socket.cc)
-
-     fhandler_tty_slave   (tty.cc)
-     fhandler_pty_master  (tty.cc)
-     fhandler_tty_master  (tty.cc)
-
-     fhandler_console     Out with ansi control. (console.cc)
-
-     fhandler_windows	  Windows messages I/O (fhandler_windows.cc)
-
-     fhandler_dev_random  /dev/[u]random implementation (fhandler_random.cc)
-
-     fhandler_dev_mem     /dev/mem implementation (fhandler_mem.cc)
-
-     fhandler_dev_clipboard	/dev/clipboard implementation (fhandler_clipboard.cc)
-
-     fhandler_proc	  Interesting possibility, not implemented yet
-*/
 
 enum
 {
@@ -65,7 +30,7 @@ enum
   FH_W95LSBUG	= 0x00400000,	/* set when lseek is called as a flag that
 				 * _write should check if we've moved beyond
 				 * EOF, zero filling if so. */
-  FH_UNUSED	= 0x00800000,	/* currently unused. */
+  FH_NOHANDLE	= 0x00800000,	/* No handle associated with fhandler. */
   FH_NOEINTR	= 0x01000000,	/* Set if I/O should be uninterruptible. */
   FH_FFIXUP	= 0x02000000,	/* Set if need to fixup after fork. */
   FH_LOCAL	= 0x04000000,	/* File is unix domain socket */
@@ -102,10 +67,11 @@ enum
   FH_ZERO    = 0x00000014,	/* is the zero device */
   FH_RANDOM  = 0x00000015,	/* is a random device */
   FH_MEM     = 0x00000016,	/* is a mem device */
-  FH_CLIPBOARD = 0x00000017, /* is a clipbaord device */
+  FH_CLIPBOARD = 0x00000017,	/* is a clipboard device */
   FH_OSS_DSP = 0x00000018,	/* is a dsp audio device */
+  FH_CYGDRIVE= 0x00000019,	/* /cygdrive/x */
 
-  FH_NDEV    = 0x00000019,	/* Maximum number of devices */
+  FH_NDEV    = 0x0000001a,	/* Maximum number of devices */
   FH_DEVMASK = 0x00000fff,	/* devices live here */
   FH_BAD     = 0xffffffff
 };
@@ -124,7 +90,7 @@ enum
 
 /* newlib used to define O_NDELAY differently from O_NONBLOCK.  Now it
    properly defines both to be the same.  Unfortunately, we have to
-   behave properly the old version, too, to accomodate older executables. */
+   behave properly the old version, too, to accommodate older executables. */
 #define OLD_O_NDELAY	(CYGWIN_VERSION_CHECK_FOR_OLD_O_NONBLOCK ? 4 : 0)
 
 /* Care for the old O_NDELAY flag. If one of the flags is set,
@@ -138,6 +104,8 @@ extern struct __cygwin_perfile *perfile_table;
 class select_record;
 class path_conv;
 class fhandler_disk_file;
+typedef struct __DIR DIR;
+struct dirent;
 
 enum bg_check_types
 {
@@ -157,17 +125,15 @@ enum executable_states
 
 class fhandler_base
 {
-protected:
+ protected:
   DWORD status;
-public:
-  int cb;
-private:
+ private:
   int access;
   HANDLE io_handle;
 
   unsigned long namehash;	/* hashed filename, used as inode num */
 
-protected:
+ protected:
   /* Full unix path name of this file */
   /* File open flags from open () and fcntl () calls */
   int openflags;
@@ -182,19 +148,18 @@ protected:
   char *win32_path_name;
   DWORD open_status;
 
-public:
+ public:
   void set_name (const char * unix_path, const char * win32_path = NULL,
 		 int unit = 0);
 
   void reset_unix_path_name (const char *);
   virtual fhandler_base& operator =(fhandler_base &x);
-  fhandler_base (DWORD dev, const char *name = 0, int unit = 0);
+  fhandler_base (DWORD dev, int unit = 0);
   virtual ~fhandler_base ();
 
   /* Non-virtual simple accessor functions. */
   void set_io_handle (HANDLE x) { io_handle = x; }
 
-  void set_cb (size_t size) { cb = size; }
   DWORD get_device () { return status & FH_DEVMASK; }
   virtual int get_unit () { return 0; }
   virtual BOOL is_slow () { return get_device () < FH_SLOW; }
@@ -202,25 +167,29 @@ public:
   int get_access () { return access; }
   void set_access (int x) { access = x; }
 
-  int get_async () { return FHISSETF (ASYNC); }
+  bool get_async () { return FHISSETF (ASYNC); }
   void set_async (int x) { FHCONDSETF (x, ASYNC); }
 
   int get_flags () { return openflags; }
   void set_flags (int x) { openflags = x; }
 
-  int is_nonblocking ();
+  bool is_nonblocking ();
   void set_nonblocking (int yes);
 
-  int get_w_binary () { return FHISSETF (WBINARY); }
-  int get_r_binary () { return FHISSETF (RBINARY); }
+  bool get_w_binary () { return FHISSETF (WBINARY); }
+  bool get_r_binary () { return FHISSETF (RBINARY); }
 
-  int get_w_binset () { return FHISSETF (WBINSET); }
-  int get_r_binset () { return FHISSETF (RBINSET); }
+  bool get_w_binset () { return FHISSETF (WBINSET); }
+  bool get_r_binset () { return FHISSETF (RBINSET); }
 
   void set_w_binary (int b) { FHCONDSETF (b, WBINARY); FHSETF (WBINSET); }
   void set_r_binary (int b) { FHCONDSETF (b, RBINARY); FHSETF (RBINSET); }
   void clear_w_binary () {FHCLEARF (WBINARY); FHCLEARF (WBINSET); }
   void clear_r_binary () {FHCLEARF (RBINARY); FHCLEARF (RBINSET); }
+
+  bool get_nohandle () { return FHISSETF (NOHANDLE); }
+  void set_nohandle (int x) { FHCONDSETF (x, NOHANDLE); }
+
   void set_open_status () {open_status = status;}
   DWORD get_open_status () {return open_status;}
   void reset_to_open_binmode ()
@@ -232,10 +201,10 @@ public:
 
   int get_default_fmode (int flags);
 
-  int get_r_no_interrupt () { return FHISSETF (NOEINTR); }
+  bool get_r_no_interrupt () { return FHISSETF (NOEINTR); }
   void set_r_no_interrupt (int b) { FHCONDSETF (b, NOEINTR); }
 
-  int get_close_on_exec () { return FHISSETF (CLOEXEC); }
+  bool get_close_on_exec () { return FHISSETF (CLOEXEC); }
   int set_close_on_exec_flag (int b) { return FHCONDSETF (b, CLOEXEC); }
 
   LPSECURITY_ATTRIBUTES get_inheritance (bool all = 0)
@@ -247,9 +216,9 @@ public:
   }
 
   void set_check_win95_lseek_bug (int b = 1) { FHCONDSETF (b, W95LSBUG); }
-  int get_check_win95_lseek_bug () { return FHISSETF (W95LSBUG); }
+  bool get_check_win95_lseek_bug () { return FHISSETF (W95LSBUG); }
 
-  int get_need_fork_fixup () { return FHISSETF (FFIXUP); }
+  bool get_need_fork_fixup () { return FHISSETF (FFIXUP); }
   void set_need_fork_fixup () { FHSETF (FFIXUP); }
 
   virtual void set_close_on_exec (int val);
@@ -258,31 +227,31 @@ public:
   virtual void fixup_after_fork (HANDLE);
   virtual void fixup_after_exec (HANDLE) {}
 
-  int get_symlink_p () { return FHISSETF (SYMLINK); }
+  bool get_symlink_p () { return FHISSETF (SYMLINK); }
   void set_symlink_p (int val) { FHCONDSETF (val, SYMLINK); }
   void set_symlink_p () { FHSETF (SYMLINK); }
 
-  int get_socket_p () { return FHISSETF (LOCAL); }
+  bool get_socket_p () { return FHISSETF (LOCAL); }
   void set_socket_p (int val) { FHCONDSETF (val, LOCAL); }
   void set_socket_p () { FHSETF (LOCAL); }
 
-  int get_execable_p () { return FHISSETF (EXECABL); }
+  bool get_execable_p () { return FHISSETF (EXECABL); }
   void set_execable_p (executable_states val)
   {
     FHCONDSETF (val == is_executable, EXECABL);
     FHCONDSETF (val == dont_care_if_executable, DCEXEC);
   }
   void set_execable_p () { FHSETF (EXECABL); }
-  int dont_care_if_execable () { return FHISSETF (DCEXEC); }
+  bool dont_care_if_execable () { return FHISSETF (DCEXEC); }
 
-  int get_append_p () { return FHISSETF (APPEND); }
+  bool get_append_p () { return FHISSETF (APPEND); }
   void set_append_p (int val) { FHCONDSETF (val, APPEND); }
   void set_append_p () { FHSETF (APPEND); }
 
-  int get_query_open () { return FHISSETF (QUERYOPEN); }
+  bool get_query_open () { return FHISSETF (QUERYOPEN); }
   void set_query_open (int val) { FHCONDSETF (val, QUERYOPEN); }
 
-  int get_readahead_valid () { return raixget < ralen; }
+  bool get_readahead_valid () { return raixget < ralen; }
   int puts_readahead (const char *s, size_t len = (size_t) -1);
   int put_readahead (char value);
 
@@ -295,10 +264,10 @@ public:
 
   int get_readahead_into_buffer (char *buf, size_t buflen);
 
-  int has_acls () { return FHISSETF (HASACLS); }
+  bool has_acls () { return FHISSETF (HASACLS); }
   void set_has_acls (int val) { FHCONDSETF (val, HASACLS); }
 
-  int isremote () { return FHISSETF (ISREMOTE); }
+  bool isremote () { return FHISSETF (ISREMOTE); }
   void set_isremote (int val) { FHCONDSETF (val, ISREMOTE); }
 
   const char *get_name () { return unix_path_name; }
@@ -311,19 +280,13 @@ public:
   /* fixup fd possibly non-inherited handles after fork */
   void fork_fixup (HANDLE parent, HANDLE &h, const char *name);
 
-  /* Potentially overridden virtual functions. */
-  virtual int open (const char *, int flags, mode_t mode = 0)
-  {
-    return open (flags, mode);
-  }
-  virtual int open (path_conv& real_path, int flags, mode_t mode);
-  virtual int open (int flags, mode_t mode = 0);
+  virtual int open (path_conv * real_path, int flags, mode_t mode = 0);
   virtual int close ();
-  virtual int fstat (struct stat *buf) { return stat_dev (get_device (), get_unit (), get_namehash (), buf); }
+  virtual int __stdcall fstat (struct stat *buf, path_conv *) __attribute__ ((regparm (3)));
   virtual int ioctl (unsigned int cmd, void *);
   virtual int fcntl (int cmd, void *);
   virtual char const * ttyname () { return get_name(); }
-  virtual int read (void *ptr, size_t len);
+  virtual int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   virtual int write (const void *ptr, size_t len);
   virtual off_t lseek (off_t offset, int whence);
   virtual int lock (int, struct flock *);
@@ -368,7 +331,7 @@ public:
   virtual select_record *select_read (select_record *s);
   virtual select_record *select_write (select_record *s);
   virtual select_record *select_except (select_record *s);
-  virtual int ready_for_read (int fd, DWORD howlong, int ignra);
+  virtual int ready_for_read (int fd, DWORD howlong);
   virtual const char * get_native_name ()
   {
     return windows_device_names[FHDEVN (status)];
@@ -380,18 +343,27 @@ public:
     rabuf = NULL;
   }
   void operator delete (void *);
+  virtual HANDLE get_guard () const {return NULL;}
+  virtual void set_eof () {}
+  virtual DIR *opendir (path_conv& pc);
+  virtual dirent *readdir (DIR *);
+  virtual off_t telldir (DIR *);
+  virtual void seekdir (DIR *, off_t);
+  virtual void rewinddir (DIR *);
+  virtual int closedir (DIR *);
 };
 
 class fhandler_socket: public fhandler_base
 {
-private:
+ private:
   int addr_family;
   int connect_secret [4];
   HANDLE secret_event;
   struct _WSAPROTOCOL_INFOA *prot_info_ptr;
+  char *sun_path;
 
-public:
-  fhandler_socket (const char *name = 0);
+ public:
+  fhandler_socket ();
   ~fhandler_socket ();
   int get_socket () { return (int) get_handle(); }
   fhandler_socket * is_socket () { return this; }
@@ -403,7 +375,7 @@ public:
   void set_shutdown_write () {FHSETF (SHUTWR);}
 
   int write (const void *ptr, size_t len);
-  int read (void *ptr, size_t len);
+  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   int ioctl (unsigned int cmd, void *);
   int fcntl (int cmd, void *);
   off_t lseek (off_t, int) { return 0; }
@@ -419,43 +391,47 @@ public:
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
-  int ready_for_read (int fd, DWORD howlong, int ignra);
   int get_addr_family () {return addr_family;}
   void set_addr_family (int af) {addr_family = af;}
+  void set_sun_path (const char *path);
+  char *get_sun_path () {return sun_path;}
   void set_connect_secret ();
   void get_connect_secret (char*);
   HANDLE create_secret_event (int *secret = NULL);
   int check_peer_secret_event (struct sockaddr_in *peer, int *secret = NULL);
   void signal_secret_event ();
   void close_secret_event ();
+  int __stdcall fstat (struct stat *buf, path_conv *) __attribute__ ((regparm (3)));
 };
 
 class fhandler_pipe: public fhandler_base
 {
   HANDLE guard;
+  bool broken_pipe;
   HANDLE writepipe_exists;
   DWORD orig_pid;
   unsigned id;
-public:
-  fhandler_pipe (const char *name = 0, DWORD devtype = FH_PIPE);
+ public:
+  fhandler_pipe (DWORD devtype);
   off_t lseek (off_t offset, int whence);
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
-  int ready_for_read (int fd, DWORD howlong, int ignra);
   void set_close_on_exec (int val);
-  int read (void *ptr, size_t len);
+  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   int close ();
   void create_guard (SECURITY_ATTRIBUTES *sa) {guard = CreateMutex (sa, FALSE, NULL);}
   int dup (fhandler_base *child);
   void fixup_after_fork (HANDLE);
   bool hit_eof ();
+  void set_eof () {broken_pipe = true;}
   friend int make_pipe (int fildes[2], unsigned int psize, int mode);
+  HANDLE get_guard () const {return guard;}
 };
 
 class fhandler_dev_raw: public fhandler_base
 {
-protected:
+ protected:
   char *devbuf;
   size_t devbufsiz;
   size_t devbufstart;
@@ -476,18 +452,18 @@ protected:
   /* returns not null, if `win_error' determines an end of file condition */
   virtual int is_eof(int win_error) = 0;
 
-  fhandler_dev_raw (DWORD dev, const char *name, int unit);
+  fhandler_dev_raw (DWORD dev, int unit);
 
-public:
+ public:
   ~fhandler_dev_raw (void);
 
-  int open (const char *path, int flags, mode_t mode = 0);
+  int get_unit () { return unit; }
+
+  int open (path_conv *, int flags, mode_t mode = 0);
   int close (void);
 
   int raw_read (void *ptr, size_t ulen);
   int raw_write (const void *ptr, size_t ulen);
-
-  int fstat (struct stat *buf);
 
   int dup (fhandler_base *child);
 
@@ -499,14 +475,14 @@ public:
 
 class fhandler_dev_floppy: public fhandler_dev_raw
 {
-protected:
+ protected:
   virtual int is_eom (int win_error);
   virtual int is_eof (int win_error);
 
-public:
-  fhandler_dev_floppy (const char *name, int unit);
+ public:
+  fhandler_dev_floppy (int unit);
 
-  virtual int open (const char *path, int flags, mode_t mode = 0);
+  virtual int open (path_conv *, int flags, mode_t mode = 0);
   virtual int close (void);
 
   virtual off_t lseek (off_t offset, int whence);
@@ -516,30 +492,31 @@ public:
 
 class fhandler_dev_tape: public fhandler_dev_raw
 {
-  int norewind;
   int lasterr;
 
-protected:
+  bool is_rewind_device () { return get_unit () < 128; }
+
+ protected:
   virtual void clear (void);
 
   virtual int is_eom (int win_error);
   virtual int is_eof (int win_error);
 
-public:
-  fhandler_dev_tape (const char *name, int unit);
+ public:
+  fhandler_dev_tape (int unit);
 
-  virtual int open (const char *path, int flags, mode_t mode = 0);
-  virtual int close (void);
+  int open (path_conv *, int flags, mode_t mode = 0);
+  int close (void);
 
-  virtual off_t lseek (off_t offset, int whence);
+  off_t lseek (off_t offset, int whence);
 
-  virtual int fstat (struct stat *buf);
+  int __stdcall fstat (struct stat *buf, path_conv *) __attribute__ ((regparm (3)));
 
-  virtual int dup (fhandler_base *child);
+  int dup (fhandler_base *child);
 
-  virtual int ioctl (unsigned int cmd, void *buf);
+  int ioctl (unsigned int cmd, void *buf);
 
-private:
+ private:
   int tape_write_marks (int marktype, DWORD len);
   int tape_get_pos (unsigned long *ret);
   int tape_set_pos (int mode, long count, BOOLEAN sfm_func = FALSE);
@@ -556,38 +533,64 @@ private:
 
 class fhandler_disk_file: public fhandler_base
 {
-public:
-  fhandler_disk_file (const char *name);
+ public:
+  fhandler_disk_file ();
+  fhandler_disk_file (DWORD devtype);
 
-  int open (const char *path, int flags, mode_t mode = 0);
-  int open (path_conv& real_path, int flags, mode_t mode);
+  int open (path_conv * real_path, int flags, mode_t mode);
   int close ();
   int lock (int, struct flock *);
   BOOL is_device () { return FALSE; }
-  int fstat (struct stat *buf);
+  int __stdcall fstat (struct stat *buf, path_conv *pc) __attribute__ ((regparm (3)));
+  int __stdcall fstat_helper (struct stat *buf) __attribute__ ((regparm (2)));
 
   HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, off_t off);
   int munmap (HANDLE h, caddr_t addr, size_t len);
   int msync (HANDLE h, caddr_t addr, size_t len, int flags);
   BOOL fixup_mmap_after_fork (HANDLE h, DWORD access, DWORD offset,
 			      DWORD size, void *address);
+  DIR *opendir (path_conv& pc);
+  struct dirent *readdir (DIR *);
+  off_t telldir (DIR *);
+  void seekdir (DIR *, off_t);
+  void rewinddir (DIR *);
+  int closedir (DIR *);
+};
+
+class fhandler_cygdrive: public fhandler_disk_file
+{
+  int unit;
+  int ndrives;
+  const char *pdrive;
+  void set_drives ();
+ public:
+  bool iscygdrive_root () const { return !unit; }
+  fhandler_cygdrive (int unit);
+  DIR *opendir (path_conv& pc);
+  struct dirent *readdir (DIR *);
+  off_t telldir (DIR *);
+  void seekdir (DIR *, off_t);
+  void rewinddir (DIR *);
+  int closedir (DIR *);
+  int __stdcall fstat (struct stat *buf, path_conv *pc) __attribute__ ((regparm (3)));
 };
 
 class fhandler_serial: public fhandler_base
 {
-private:
+ private:
   unsigned int vmin_;			/* from termios */
   unsigned int vtime_;			/* from termios */
   pid_t pgrp_;
 
-public:
+ public:
   int overlapped_armed;
   OVERLAPPED io_status;
+  DWORD ev;
 
   /* Constructor */
-  fhandler_serial (const char *name, DWORD devtype = FH_SERIAL, int unit = 0);
+  fhandler_serial (int unit);
 
-  int open (const char *path, int flags, mode_t mode);
+  int open (path_conv *, int flags, mode_t mode);
   int close ();
   void init (HANDLE h, DWORD a, mode_t flags);
   void overlapped_setup ();
@@ -614,7 +617,6 @@ public:
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
-  int ready_for_read (int fd, DWORD howlong, int ignra);
 };
 
 #define acquire_output_mutex(ms) \
@@ -627,14 +629,14 @@ class tty;
 class tty_min;
 class fhandler_termios: public fhandler_base
 {
-protected:
+ protected:
   HANDLE output_handle;
   virtual void doecho (const void *, DWORD) {};
   virtual int accept_input () {return 1;};
-public:
+ public:
   tty_min *tc;
-  fhandler_termios (DWORD dev, const char *name = 0, int unit = 0) :
-  fhandler_base (dev, name, unit)
+  fhandler_termios (DWORD dev, int unit = 0) :
+  fhandler_base (dev, unit)
   {
     set_need_fork_fixup ();
   }
@@ -674,7 +676,7 @@ enum ansi_intensity
 /* This is a input and output console handle */
 class fhandler_console: public fhandler_termios
 {
-private:
+ private:
 
   WORD default_color, underline_color, dim_color;
 
@@ -686,13 +688,13 @@ private:
   int args_[MAXARGS];
   int nargs_;
   unsigned rarg;
-  BOOL saw_question_mark;
+  bool saw_question_mark;
 
   char my_title_buf [TITLESIZE + 1];
 
   WORD current_win32_attr;
   ansi_intensity intensity;
-  BOOL underline, blink, reverse;
+  bool underline, blink, reverse;
   WORD fg, bg;
 
   /* saved cursor coordinates */
@@ -720,9 +722,9 @@ private:
   DWORD dwLastButtonState;
   int nModifiers;
 
-  BOOL insert_mode;
-  BOOL use_mouse;
-  BOOL raw_win32_keyboard_mode;
+  bool insert_mode;
+  bool use_mouse;
+  bool raw_win32_keyboard_mode;
 
 /* Output calls */
   void set_default_attr ();
@@ -744,17 +746,17 @@ private:
   int input_tcsetattr (int a, const struct termios *t);
   void set_cursor_maybe ();
 
-public:
+ public:
 
-  fhandler_console (const char *name);
+  fhandler_console ();
 
   fhandler_console* is_console () { return this; }
 
-  int open (const char *path, int flags, mode_t mode = 0);
+  int open (path_conv *, int flags, mode_t mode = 0);
 
   int write (const void *ptr, size_t len);
   void doecho (const void *str, DWORD len) { (void) write (str, len); }
-  int read (void *ptr, size_t len);
+  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   int close ();
 
   int tcflush (int);
@@ -771,7 +773,6 @@ public:
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
-  int ready_for_read (int fd, DWORD howlong, int ignra);
   void fixup_after_exec (HANDLE);
   void set_close_on_exec (int val);
   void fixup_after_fork (HANDLE parent);
@@ -780,10 +781,11 @@ public:
 
 class fhandler_tty_common: public fhandler_termios
 {
-public:
-  fhandler_tty_common (DWORD dev, const char *name = 0, int unit = 0) :
-    fhandler_termios (dev, name, unit),
-    ttynum (unit)
+ public:
+  fhandler_tty_common (DWORD dev, int unit = 0)
+    : fhandler_termios (dev, unit), output_done_event (NULL),
+    ioctl_request_event (NULL), ioctl_done_event (NULL), output_mutex (NULL),
+    input_mutex (NULL), input_available_event (NULL), inuse (NULL), ttynum (unit)
   {
     // nothing to do
   }
@@ -796,12 +798,11 @@ public:
   HANDLE output_mutex, input_mutex;
   HANDLE input_available_event;
   HANDLE inuse;			// used to indicate that a tty is in use
-
+  int ttynum;			// Master tty num.
 
   DWORD __acquire_output_mutex (const char *fn, int ln, DWORD ms);
   void __release_output_mutex (const char *fn, int ln);
 
-  int ttynum;			// Master tty num.
   virtual int dup (fhandler_base *child);
 
   tty *get_ttyp () { return (tty *)tc; }
@@ -813,19 +814,18 @@ public:
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
-  int ready_for_read (int fd, DWORD howlong, int ignra);
 };
 
 class fhandler_tty_slave: public fhandler_tty_common
 {
-public:
+ public:
   /* Constructor */
-  fhandler_tty_slave (const char *name);
-  fhandler_tty_slave (int, const char *name);
+  fhandler_tty_slave ();
+  fhandler_tty_slave (int);
 
-  int open (const char *path, int flags, mode_t mode = 0);
+  int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
-  int read (void *ptr, size_t len);
+  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   void init (HANDLE, DWORD, mode_t);
 
   int tcsetattr (int a, const struct termios *t);
@@ -835,7 +835,7 @@ public:
 
   off_t lseek (off_t, int) { return 0; }
   select_record *select_read (select_record *s);
-  int ready_for_read (int fd, DWORD howlong, int ignra);
+  int ready_for_read (int fd, DWORD howlong);
 
   int cygserver_attach_tty (HANDLE*, HANDLE*);
 };
@@ -843,18 +843,18 @@ public:
 class fhandler_pty_master: public fhandler_tty_common
 {
   int pktmode;			// non-zero if pty in a packet mode.
-public:
+ public:
   int need_nl;			// Next read should start with \n
 
   /* Constructor */
-  fhandler_pty_master (const char *name, DWORD devtype = FH_PTYM, int unit = -1);
+  fhandler_pty_master (DWORD devtype = FH_PTYM, int unit = -1);
 
   int process_slave_output (char *buf, size_t len, int pktmode_on);
   void doecho (const void *str, DWORD len);
   int accept_input ();
-  int open (const char *path, int flags, mode_t mode = 0);
+  int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
-  int read (void *ptr, size_t len);
+  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   int close ();
 
   int tcsetattr (int a, const struct termios *t);
@@ -871,12 +871,12 @@ public:
 
 class fhandler_tty_master: public fhandler_pty_master
 {
-public:
+ public:
   /* Constructor */
-  fhandler_tty_master (const char *name, int unit);
   fhandler_console *console;	// device handler to perform real i/o.
   HANDLE hThread;		// process_output thread handle.
 
+  fhandler_tty_master (int unit);
   int init (int);
   int init_console ();
   void fixup_after_fork (HANDLE parent);
@@ -885,8 +885,8 @@ public:
 
 class fhandler_dev_null: public fhandler_base
 {
-public:
-  fhandler_dev_null (const char *name);
+ public:
+  fhandler_dev_null ();
 
   void dump ();
   select_record *select_read (select_record *s);
@@ -896,11 +896,11 @@ public:
 
 class fhandler_dev_zero: public fhandler_base
 {
-public:
-  fhandler_dev_zero (const char *name);
-  int open (const char *path, int flags, mode_t mode = 0);
+ public:
+  fhandler_dev_zero ();
+  int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
-  int read (void *ptr, size_t len);
+  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   off_t lseek (off_t offset, int whence);
   int close (void);
 
@@ -909,7 +909,7 @@ public:
 
 class fhandler_dev_random: public fhandler_base
 {
-protected:
+ protected:
   int unit;
   HCRYPTPROV crypt_prov;
   long pseudo;
@@ -918,12 +918,12 @@ protected:
   int pseudo_write (const void *ptr, size_t len);
   int pseudo_read (void *ptr, size_t len);
 
-public:
-  fhandler_dev_random (const char *name, int unit);
+ public:
+  fhandler_dev_random (int unit);
   int get_unit () { return unit; }
-  int open (const char *path, int flags, mode_t mode = 0);
+  int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
-  int read (void *ptr, size_t len);
+  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   off_t lseek (off_t offset, int whence);
   int close (void);
   int dup (fhandler_base *child);
@@ -933,21 +933,21 @@ public:
 
 class fhandler_dev_mem: public fhandler_base
 {
-protected:
+ protected:
   int unit;
   DWORD mem_size;
   DWORD pos;
 
-public:
-  fhandler_dev_mem (const char *name, int unit);
+ public:
+  fhandler_dev_mem (int unit);
   ~fhandler_dev_mem (void);
 
-  int open (const char *path, int flags, mode_t mode = 0);
+  int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t ulen);
-  int read (void *ptr, size_t ulen);
+  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   off_t lseek (off_t offset, int whence);
   int close (void);
-  int fstat (struct stat *buf);
+  int __stdcall fstat (struct stat *buf, path_conv *) __attribute__ ((regparm (3)));
   int dup (fhandler_base *child);
 
   HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, off_t off);
@@ -961,12 +961,12 @@ public:
 
 class fhandler_dev_clipboard: public fhandler_base
 {
-public:
-  fhandler_dev_clipboard (const char *name);
+ public:
+  fhandler_dev_clipboard ();
   int is_windows (void) { return 1; }
-  int open (const char *path, int flags, mode_t mode = 0);
+  int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
-  int read (void *ptr, size_t len);
+  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   off_t lseek (off_t offset, int whence);
   int close (void);
 
@@ -974,24 +974,24 @@ public:
 
   void dump ();
 
-private:
+ private:
   off_t pos;
   void *membuffer;
   size_t msize;
-  BOOL eof;
+  bool eof;
 };
 
 class fhandler_windows: public fhandler_base
 {
-private:
+ private:
   HWND hWnd_;	// the window whose messages are to be retrieved by read() call
   int method_;  // write method (Post or Send)
-public:
-  fhandler_windows (const char *name = 0);
+ public:
+  fhandler_windows ();
   int is_windows (void) { return 1; }
-  int open (const char *path, int flags, mode_t mode = 0);
+  int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
-  int read (void *ptr, size_t len);
+  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   int ioctl (unsigned int cmd, void *);
   off_t lseek (off_t, int) { return 0; }
   int close (void) { return 0; }
@@ -1001,24 +1001,23 @@ public:
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
   select_record *select_except (select_record *s);
-  int ready_for_read (int fd, DWORD howlong, int ignra);
 };
 
 class fhandler_dev_dsp : public fhandler_base
 {
-private:
+ private:
   int audioformat_;
   int audiofreq_;
   int audiobits_;
   int audiochannels_;
   bool setupwav(const char *pData, int nBytes);
-public:
-  fhandler_dev_dsp (const char *name = 0);
+ public:
+  fhandler_dev_dsp ();
   ~fhandler_dev_dsp();
 
-  int open (const char *path, int flags, mode_t mode = 0);
+  int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
-  int read (void *ptr, size_t len);
+  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   int ioctl (unsigned int cmd, void *);
   off_t lseek (off_t, int);
   int close (void);
@@ -1027,30 +1026,42 @@ public:
   void fixup_after_exec (HANDLE);
 };
 
-#if 0
-/* You can't do this */
 typedef union
 {
-  fhandler_normal normal;
-  fhandler_dev_null dev_null;
-  fhandler bare;
-  fhandler_serial tty;
+  char base[sizeof(fhandler_base)];
+  char console[sizeof(fhandler_console)];
+  char dev_clipboard[sizeof(fhandler_dev_clipboard)];
+  char dev_dsp[sizeof(fhandler_dev_dsp)];
+  char dev_floppy[sizeof(fhandler_dev_floppy)];
+  char dev_mem[sizeof(fhandler_dev_mem)];
+  char dev_null[sizeof(fhandler_dev_null)];
+  char dev_random[sizeof(fhandler_dev_random)];
+  char dev_raw[sizeof(fhandler_dev_raw)];
+  char dev_tape[sizeof(fhandler_dev_tape)];
+  char dev_zero[sizeof(fhandler_dev_zero)];
+  char disk_file[sizeof(fhandler_disk_file)];
+  char pipe[sizeof(fhandler_pipe)];
+  char pty_master[sizeof(fhandler_pty_master)];
+  char serial[sizeof(fhandler_serial)];
+  char socket[sizeof(fhandler_socket)];
+  char termios[sizeof(fhandler_termios)];
+  char tty_common[sizeof(fhandler_tty_common)];
+  char tty_master[sizeof(fhandler_tty_master)];
+  char tty_slave[sizeof(fhandler_tty_slave)];
+  char windows[sizeof(fhandler_windows)];
 } fhandler_union;
-#else
-#define fhandler_union fhandler_console
-#endif
+
 struct select_record
 {
   int fd;
   HANDLE h;
   fhandler_base *fh;
-  BOOL saw_error;
-  BOOL windows_handle;
-  BOOL read_ready, write_ready, except_ready;
-  BOOL read_selected, write_selected, except_selected;
+  bool saw_error;
+  bool windows_handle;
+  bool read_ready, write_ready, except_ready;
+  bool read_selected, write_selected, except_selected;
   int (*startup) (select_record *me, class select_stuff *stuff);
-  int (*poll) (select_record *me, fd_set *readfds, fd_set *writefds,
-	       fd_set *exceptfds);
+  int (*peek) (select_record *, bool);
   int (*verify) (select_record *me, fd_set *readfds, fd_set *writefds,
 		 fd_set *exceptfds);
   void (*cleanup) (select_record *me, class select_stuff *stuff);
@@ -1060,19 +1071,19 @@ struct select_record
 		 fh (in_fh), saw_error (0), windows_handle (0),
 		 read_ready (0), write_ready (0), except_ready (0),
 		 read_selected (0), write_selected (0), except_selected (0),
-		 startup (NULL), poll (NULL), verify (NULL), cleanup (NULL),
+		 startup (NULL), peek (NULL), verify (NULL), cleanup (NULL),
 		 next (NULL) {}
 };
 
 class select_stuff
 {
-public:
+ public:
   ~select_stuff ();
   select_stuff (): always_ready (0), windows_used (0), start (0)
   {
     memset (device_specific, 0, sizeof (device_specific));
   }
-  BOOL always_ready, windows_used;
+  bool always_ready, windows_used;
   select_record start;
   void *device_specific[FH_NDEV];
 

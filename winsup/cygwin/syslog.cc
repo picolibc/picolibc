@@ -14,6 +14,7 @@ details. */
 #include <syslog.h>
 #include <stdarg.h>
 #include <unistd.h>
+#include <errno.h>
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"
@@ -257,13 +258,18 @@ syslog (int priority, const char *message, ...)
     WORD eventType;
     switch (LOG_PRI (priority))
       {
+      case LOG_EMERG:
+      case LOG_ALERT:
+      case LOG_CRIT:
       case LOG_ERR:
 	eventType = EVENTLOG_ERROR_TYPE;
 	break;
       case LOG_WARNING:
 	eventType = EVENTLOG_WARNING_TYPE;
 	break;
+      case LOG_NOTICE:
       case LOG_INFO:
+      case LOG_DEBUG:
 	eventType = EVENTLOG_INFORMATION_TYPE;
 	break;
       default:
@@ -307,14 +313,29 @@ syslog (int priority, const char *message, ...)
 	       eventlog capability. */
 	    switch (LOG_PRI (priority))
 	      {
+	     case LOG_EMERG:
+	       pass.print ("%s : ", "LOG_EMERG");
+	       break;
+	     case LOG_ALERT:
+	       pass.print ("%s : ", "LOG_ALERT");
+	       break;
+	     case LOG_CRIT:
+	       pass.print ("%s : ", "LOG_CRIT");
+	       break;
 	      case LOG_ERR:
 		pass.print ("%s : ", "LOG_ERR");
 		break;
 	      case LOG_WARNING:
 		pass.print ("%s : ", "LOG_WARNING");
 		break;
+	     case LOG_NOTICE:
+	       pass.print ("%s : ", "LOG_NOTICE");
+	       break;
 	      case LOG_INFO:
 		pass.print ("%s : ", "LOG_INFO");
+	       break;
+	     case LOG_DEBUG:
+	       pass.print ("%s : ", "LOG_DEBUG");
 		break;
 	      default:
 		pass.print ("%s : ", "LOG_ERR");

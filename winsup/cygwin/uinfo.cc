@@ -17,6 +17,7 @@ details. */
 #include <limits.h>
 #include <stdlib.h>
 #include <lm.h>
+#include <errno.h>
 #include <sys/cygwin.h>
 #include "sync.h"
 #include "sigproc.h"
@@ -25,12 +26,14 @@ details. */
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
+#include "cygerrno.h"
 #include "cygheap.h"
 #include "registry.h"
 
 struct passwd *
 internal_getlogin (cygheap_user &user)
 {
+  char buf[512];
   char username[UNLEN + 1];
   DWORD username_len = UNLEN + 1;
   struct passwd *pw = NULL;
@@ -45,7 +48,6 @@ internal_getlogin (cygheap_user &user)
     {
       LPWKSTA_USER_INFO_1 wui;
       NET_API_STATUS ret;
-      char buf[512];
       char *env;
 
       user.set_logsrv (NULL);
@@ -59,7 +61,7 @@ internal_getlogin (cygheap_user &user)
       if (user.name () && user.domain ())
 	debug_printf ("User: %s, Domain: %s, Logon Server: %s",
 		      user.name (), user.domain (), user.logsrv ());
-      else if (!(ret = NetWkstaUserGetInfo (NULL, 1, (LPBYTE *)&wui)))
+      else if (!(ret = NetWkstaUserGetInfo (NULL, 1, (LPBYTE *) &wui)))
 	{
 	  sys_wcstombs (buf, wui->wkui1_username, UNLEN + 1);
 	  user.set_name (buf);
@@ -76,44 +78,54 @@ internal_getlogin (cygheap_user &user)
 	  user.set_logsrv (buf + 2);
 	  setenv ("LOGONSERVER", buf, 1);
 	}
-      LPUSER_INFO_3 ui = NULL;
-      WCHAR wuser[UNLEN + 1];
-      WCHAR wlogsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];
-
-      /* HOMEDRIVE and HOMEPATH are wrong most of the time, too,
-	 after changing user context! */
-      sys_mbstowcs (wuser, user.name (), UNLEN + 1);
-      wlogsrv[0] = '\0';
-      if (user.logsrv ())
-	{
-	  strcat (strcpy (buf, "\\\\"), user.logsrv ());
-	  sys_mbstowcs (wlogsrv, buf, INTERNET_MAX_HOST_NAME_LENGTH + 3);
-	}
-      if (!NetUserGetInfo (NULL, wuser, 3, (LPBYTE *)&ui)
-	  || (wlogsrv[0] && !NetUserGetInfo (wlogsrv, wuser, 3,(LPBYTE *)&ui)))
-	{
-	  sys_wcstombs (buf, ui->usri3_home_dir, MAX_PATH);
-	  if (!buf[0])
-	    {
-	      sys_wcstombs (buf, ui->usri3_home_dir_drive, MAX_PATH);
-	      if (buf[0])
-		strcat (buf, "\\");
-	      else
-		{
-		  env = getenv ("SYSTEMDRIVE");
-		  if (env && *env)
-		    strcat (strcpy (buf, env), "\\");
-		  else
-		    GetSystemDirectoryA (buf, MAX_PATH);
-		}
-	    }
-	  setenv ("HOMEPATH", buf + 2, 1);
-	  buf[2] = '\0';
-	  setenv ("HOMEDRIVE", buf, 1);
-	  NetApiBufferFree (ui);
-	}
       debug_printf ("Domain: %s, Logon Server: %s, Windows Username: %s",
 		    user.domain (), user.logsrv (), user.name ());
+
+      /* NetUserGetInfo() can be slow in NT domain environment, thus we
+       * only obtain HOMEDRIVE and HOMEPATH if they are not already set
+       * in the environment. */
+      if (!getenv ("HOMEPATH") || !getenv ("HOMEDRIVE"))
+	{
+	  LPUSER_INFO_3 ui = NULL;
+	  WCHAR wuser[UNLEN + 1];
+
+	  sys_mbstowcs (wuser, user.name (), sizeof (wuser) / sizeof (*wuser));
+	  if ((ret = NetUserGetInfo (NULL, wuser, 3, (LPBYTE *)&ui)))
+	    {
+	      if (user.logsrv ())
+		{
+		  WCHAR wlogsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];
+		  strcat (strcpy (buf, "\\\\"), user.logsrv ());
+
+		  sys_mbstowcs (wlogsrv, buf,
+				sizeof (wlogsrv) / sizeof(*wlogsrv));
+		  ret = NetUserGetInfo (wlogsrv, wuser, 3,(LPBYTE *)&ui);
+		}
+	    }
+	  if (!ret)
+	    {
+	      sys_wcstombs (buf, ui->usri3_home_dir, MAX_PATH);
+	      if (!buf[0])
+		{
+		  sys_wcstombs (buf, ui->usri3_home_dir_drive, MAX_PATH);
+		  if (buf[0])
+		    strcat (buf, "\\");
+		  else
+		    {
+		      env = getenv ("SYSTEMDRIVE");
+		      if (env && *env)
+			strcat (strcpy (buf, env), "\\");
+		      else
+			GetSystemDirectoryA (buf, MAX_PATH);
+		    }
+		}
+	      setenv ("HOMEPATH", buf + 2, 1);
+	      buf[2] = '\0';
+	      setenv ("HOMEDRIVE", buf, 1);
+	    }
+	  if (ui)
+	    NetApiBufferFree (ui);
+	}
 
       if (allow_ntsec)
 	{
@@ -200,7 +212,28 @@ internal_getlogin (cygheap_user &user)
 	}
     }
   debug_printf ("Cygwins Username: %s", user.name ());
-  return pw ?: getpwnam(user.name ());
+  if (!pw)
+    pw = getpwnam(user.name ());
+  if (!getenv ("HOME"))
+    {
+      const char *homedrive, *homepath;
+      if (pw && pw->pw_dir && *pw->pw_dir)
+	{
+	  setenv ("HOME", pw->pw_dir, 1);
+	  debug_printf ("Set HOME (from /etc/passwd) to %s", pw->pw_dir);
+	}
+      else if ((homedrive = getenv ("HOMEDRIVE"))
+	       && (homepath = getenv ("HOMEPATH")))
+	{
+	  char home[MAX_PATH];
+	  strcpy (buf, homedrive);
+	  strcat (buf, homepath);
+	  cygwin_conv_to_full_posix_path (buf, home);
+	  setenv ("HOME", home, 1);
+	  debug_printf ("Set HOME (from HOMEDRIVE/HOMEPATH) to %s", home);
+	}
+    }
+  return pw;
 }
 
 void

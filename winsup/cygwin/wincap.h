@@ -12,7 +12,7 @@ details. */
 #define _WINCAP_H
 
 struct wincaps
-{ 
+{
   DWORD    lock_file_highword;
   DWORD    chunksize;
   int      shared;
@@ -44,6 +44,8 @@ struct wincaps
   unsigned has_negative_pids                            : 1;
   unsigned has_unreliable_pipes                         : 1;
   unsigned has_try_enter_critical_section		: 1;
+  unsigned has_raw_devices				: 1;
+  unsigned has_valid_processorlevel			: 1;
 };
 
 class wincapc
@@ -56,7 +58,7 @@ public:
   void init ();
 
   void set_chunksize (DWORD nchunksize);
-  
+
   const char *osname () const { return osnam; }
 
 #define IMPLEMENT(cap) cap() const { return ((wincaps *)this->caps)->cap; }
@@ -92,6 +94,8 @@ public:
   bool  IMPLEMENT (has_negative_pids)
   bool  IMPLEMENT (has_unreliable_pipes)
   bool  IMPLEMENT (has_try_enter_critical_section)
+  bool  IMPLEMENT (has_raw_devices)
+  bool  IMPLEMENT (has_valid_processorlevel)
 
 #undef IMPLEMENT
 };

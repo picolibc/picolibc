@@ -24,7 +24,7 @@ uname (struct utsname *name)
 
   if (check_null_invalid_struct_errno (name))
     return -1;
-    
+
   char *snp = strstr  (cygwin_version.dll_build_date, "SNP");
 
   memset (name, 0, sizeof (*name));
@@ -57,13 +57,23 @@ uname (struct utsname *name)
     {
       case PROCESSOR_ARCHITECTURE_INTEL:
 	unsigned int ptype;
-	if (sysinfo.dwProcessorType < 3) /* Shouldn't happen. */
-	  ptype = 3;
-	else if (sysinfo.dwProcessorType > 9) /* P4 */
-	  ptype = 6;
+	if (wincap.has_valid_processorlevel ())
+	  {
+	    if (sysinfo.wProcessorLevel < 3) /* Shouldn't happen. */
+	      ptype = 3;
+	    else if (sysinfo.wProcessorLevel > 9) /* P4 */
+	      ptype = 6;
+	    else
+	      ptype = sysinfo.wProcessorLevel;
+	  }
 	else
-	  ptype = sysinfo.dwProcessorType;
-
+	  {
+	    if (sysinfo.dwProcessorType == PROCESSOR_INTEL_386 ||
+	        sysinfo.dwProcessorType == PROCESSOR_INTEL_486)
+	      ptype = sysinfo.dwProcessorType / 100;
+	    else
+	      ptype = PROCESSOR_INTEL_PENTIUM / 100;
+	  }
 	__small_sprintf (name->machine, "i%d86", ptype);
 	break;
       case PROCESSOR_ARCHITECTURE_ALPHA:

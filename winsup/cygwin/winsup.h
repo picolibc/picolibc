@@ -14,7 +14,6 @@ details. */
 
 #define __INSIDE_CYGWIN__
 
-#define alloca __builtin_alloca
 #define strlen __builtin_strlen
 #define strcmp __builtin_strcmp
 #define strcpy __builtin_strcpy
@@ -25,6 +24,13 @@ details. */
 #endif
 
 #define NO_COPY __attribute__((section(".data_cygwin_nocopy")))
+
+#ifdef EXPCGF
+#define DECLARE_TLS_STORAGE char **tls[4096] __attribute__ ((unused))
+#else
+#define DECLARE_TLS_STORAGE do {} while (0)
+#define _WINBASE2_H
+#endif
 
 #ifdef __cplusplus
 
@@ -146,6 +152,7 @@ void events_init (void);
 void events_terminate (void);
 
 void __stdcall close_all_files (void);
+BOOL __stdcall check_pty_fds (void);
 
 /* Invisible window initialization/termination. */
 HWND __stdcall gethwnd (void);
@@ -190,13 +197,16 @@ long __stdcall to_time_t (FILETIME * ptr);
 void __stdcall set_console_title (char *);
 void set_console_handler ();
 
+int __stdcall check_null_str (const char *name) __attribute__ ((regparm(1)));
 int __stdcall check_null_empty_str (const char *name) __attribute__ ((regparm(1)));
 int __stdcall check_null_empty_str_errno (const char *name) __attribute__ ((regparm(1)));
-int __stdcall __check_null_invalid_struct (const void *s, unsigned sz) __attribute__ ((regparm(1)));
-int __stdcall __check_null_invalid_struct_errno (const void *s, unsigned sz) __attribute__ ((regparm(1)));
+int __stdcall check_null_str_errno (const char *name) __attribute__ ((regparm(1)));
+int __stdcall __check_null_invalid_struct (const void *s, unsigned sz) __attribute__ ((regparm(2)));
+int __stdcall __check_null_invalid_struct_errno (const void *s, unsigned sz) __attribute__ ((regparm(2)));
+int __stdcall __check_invalid_read_ptr_errno (const void *s, unsigned sz) __attribute__ ((regparm(2)));
 
 #define check_null_invalid_struct(s) \
-  __check_null_invalid ((s), sizeof (*(s)))
+  __check_null_invalid_struct ((s), sizeof (*(s)))
 #define check_null_invalid_struct_errno(s) \
   __check_null_invalid_struct_errno ((s), sizeof (*(s)))
 
@@ -209,12 +219,17 @@ extern bool wsock_started;
 extern "C" void __api_fatal (const char *, ...) __attribute__ ((noreturn));
 extern "C" int __small_sprintf (char *dst, const char *fmt, ...) /*__attribute__ ((regparm (2)))*/;
 extern "C" int __small_vsprintf (char *dst, const char *fmt, va_list ap) /*__attribute__ ((regparm (3)))*/;
+extern void multiple_cygwin_problem (const char *, unsigned, unsigned);
 
 extern "C" void __malloc_lock (struct _reent *);
 extern "C" void __malloc_unlock (struct _reent *);
 
 extern "C" void __malloc_lock (struct _reent *);
 extern "C" void __malloc_unlock (struct _reent *);
+
+class path_conv;
+int __stdcall stat_worker (const char *name, struct stat *buf, int nofollow,
+			   path_conv *pc = NULL) __attribute__ ((regparm (3)));
 
 /**************************** Exports ******************************/
 
@@ -257,5 +272,13 @@ extern BOOL display_title;
 
 extern HANDLE hMainThread;
 extern HANDLE hMainProc;
+
+extern bool cygwin_testing;
+extern unsigned _cygwin_testing_magic;
+extern HMODULE cygwin_hmodule;
+
+#define winsock2_active (wsadata.wVersion >= 512)
+#define winsock_active (wsadata.wVersion < 512)
+extern struct WSAData wsadata;
 
 #endif /* defined __cplusplus */

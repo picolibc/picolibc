@@ -12,12 +12,13 @@
 #include <sys/time.h>
 #include <sys/poll.h>
 #include <errno.h>
+#include <stdlib.h>
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
-#include "cygheap.h"
 #include "cygerrno.h"
+#include "cygheap.h"
 #include "sigproc.h"
 
 extern "C"
@@ -51,10 +52,12 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
   memset (write_fds, 0, fds_size);
   memset (except_fds, 0, fds_size);
 
-  bool invalid_fds = false;
+  bool valid_fds = false;
   for (unsigned int i = 0; i < nfds; ++i)
     if (!cygheap->fdtab.not_open (fds[i].fd))
       {
+	valid_fds = true;
+	fds[i].revents = 0;
 	FD_SET (fds[i].fd, open_fds);
 	if (fds[i].events & POLLIN)
 	  FD_SET (fds[i].fd, read_fds);
@@ -64,20 +67,17 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
 	  FD_SET (fds[i].fd, except_fds);
       }
       else
-	invalid_fds = true;
+	fds[i].revents = POLLNVAL;
 
   int ret = 0;
-  if (!invalid_fds)
+  if (valid_fds)
     ret = cygwin_select (max_fd + 1, read_fds, write_fds, except_fds,
 			 timeout < 0 ? NULL : &tv);
 
   for (unsigned int i = 0; i < nfds; ++i)
     {
-      if (!FD_ISSET (fds[i].fd, open_fds))
-	{
-	  fds[i].revents = POLLNVAL;
-	  ret++;
-	}
+      if (fds[i].revents == POLLNVAL && ret >= 0)
+	ret++;
       else if (cygheap->fdtab.not_open(fds[i].fd))
 	fds[i].revents = POLLHUP;
       else if (ret < 0)

@@ -9,6 +9,7 @@
    details. */
 
 #define STATUS_INFO_LENGTH_MISMATCH ((NTSTATUS) 0xc0000004)
+#define FILE_SYNCHRONOUS_IO_NONALERT 32
 
 typedef enum _SYSTEM_INFORMATION_CLASS
 {
@@ -132,6 +133,12 @@ typedef struct _SYSTEM_PROCESSES
   SYSTEM_THREADS Threads[1];
 } SYSTEM_PROCESSES, *PSYSTEM_PROCESSES;
 
+typedef struct _IO_STATUS_BLOCK
+{
+  NTSTATUS Status;
+  ULONG Information;
+} IO_STATUS_BLOCK, *PIO_STATUS_BLOCK;
+
 /* Function declarations for ntdll.dll.  These don't appear in any
    standard Win32 header.  */
 extern "C"
@@ -144,6 +151,8 @@ extern "C"
   NTSTATUS NTAPI NtMapViewOfSection (HANDLE, HANDLE, PVOID *, ULONG, ULONG,
 				     PLARGE_INTEGER, PULONG, SECTION_INHERIT,
 				     ULONG, ULONG);
+  NTSTATUS NTAPI NtOpenFile (PHANDLE, ACCESS_MASK, POBJECT_ATTRIBUTES,
+			     PIO_STATUS_BLOCK, ULONG, ULONG);
   NTSTATUS NTAPI NtOpenSection (PHANDLE, ACCESS_MASK, POBJECT_ATTRIBUTES);
   NTSTATUS NTAPI NtQuerySystemInformation (SYSTEM_INFORMATION_CLASS,
 					   PVOID, ULONG, PULONG);

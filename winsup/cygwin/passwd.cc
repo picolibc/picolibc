@@ -170,7 +170,7 @@ read_etc_passwd ()
 	  {
 	    debug_printf ("Emulating /etc/passwd");
 	    snprintf (linebuf, sizeof (linebuf), "%s::%u:%u::%s:/bin/sh", cygheap->user.name (),
-		      DEFAULT_UID, DEFAULT_GID, getenv ("HOME") ?: "/");
+		      (unsigned) DEFAULT_UID, (unsigned) DEFAULT_GID, getenv ("HOME") ?: "/");
 	    add_pwd_line (linebuf);
 	    passwd_state = emulated;
 	  }
@@ -385,14 +385,12 @@ getpass (const char * prompt)
   if (passwd_state  <= initializing)
     read_etc_passwd ();
 
-  if (cygheap->fdtab.not_open (0))
-    {
-      set_errno (EBADF);
-      pass[0] = '\0';
-    }
+  cygheap_fdget fhstdin (0);
+
+  if (fhstdin < 0)
+    pass[0] = '\0';
   else
     {
-      fhandler_base *fhstdin = cygheap->fdtab[0];
       fhstdin->tcgetattr (&ti);
       newti = ti;
       newti.c_lflag &= ~ECHO;

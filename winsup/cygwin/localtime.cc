@@ -4,15 +4,12 @@
 */
 /* Temporarily merged private.h and tzfile.h for ease of management - DJ */
 
-/* CYGNUS LOCAL */
 #include "winsup.h"
 #include "cygerrno.h"
 #include <windows.h>
 #define lint
 
 #define USG_COMPAT
-
-/* END CYGNUS LOCAL */
 
 #ifndef lint
 #ifndef NOID
@@ -501,7 +498,7 @@ struct tzhead {
 
 static char wildabbr[] NO_COPY = WILDABBR;
 
-static const char gmt[] NO_COPY = "GMT";
+static char gmt[] NO_COPY = "GMT";
 
 struct ttinfo {				/* time type information */
 	long		tt_gmtoff;	/* UTC offset in seconds */

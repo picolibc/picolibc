@@ -241,10 +241,8 @@ static long long
 wsock_init ()
 {
   static LONG NO_COPY here = -1L;
-  extern WSADATA wsadata;
   struct func_info *func = (struct func_info *) __builtin_return_address (0);
   struct dll_info *dll = func->dll;
-  retchain ret;
 
   __asm__ ("						\n\
 	.section .ws2_32_info				\n\
@@ -262,7 +260,7 @@ wsock_init ()
       Sleep (0);
     }
 
-  if (!wsock_started && (wsock32_handle || ws2_32_handle))
+  if (!wsock_started && (winsock_active || winsock2_active))
     {
       /* Don't use autoload to load WSAStartup to eliminate recursion. */
       int (*wsastartup) (int, WSADATA *);
@@ -293,6 +291,7 @@ wsock_init ()
 	movl	$dll_chain1,4(%ebp)	\n\
   ");
 
+  volatile retchain ret;
   /* Set "arguments for dll_chain1. */
   ret.low = (long) dll_func_load;
   ret.high = (long) func;
@@ -375,12 +374,15 @@ LoadDLLfunc (NetWkstaUserGetInfo, 12, netapi32)
 
 LoadDLLfuncEx (NtCreateToken, 52, ntdll, 1)
 LoadDLLfuncEx (NtMapViewOfSection, 40, ntdll, 1)
+LoadDLLfuncEx (NtOpenFile, 24, ntdll, 1)
 LoadDLLfuncEx (NtOpenSection, 12, ntdll, 1)
 LoadDLLfuncEx (NtQuerySystemInformation, 16, ntdll, 1)
 LoadDLLfuncEx (NtUnmapViewOfSection, 8, ntdll, 1)
 LoadDLLfuncEx (RtlInitUnicodeString, 8, ntdll, 1)
 LoadDLLfuncEx (RtlNtStatusToDosError, 4, ntdll, 1)
 LoadDLLfuncEx (ZwQuerySystemInformation, 16, ntdll, 1)
+
+LoadDLLfuncEx (GetProcessMemoryInfo, 12, psapi, 1)
 
 LoadDLLfuncEx (LsaDeregisterLogonProcess, 4, secur32, 1)
 LoadDLLfuncEx (LsaFreeReturnBuffer, 4, secur32, 1)
@@ -418,11 +420,12 @@ LoadDLLfunc (SetClipboardData, 8, user32)
 LoadDLLfunc (SetTimer, 16, user32)
 LoadDLLfunc (SetUserObjectSecurity, 12, user32)
 
+LoadDLLfuncEx (load_wsock32, 0, wsock32, 1) // non-existent function forces wsock32 load
 LoadDLLfunc (WSAAsyncSelect, 16, wsock32)
 LoadDLLfunc (WSACleanup, 0, wsock32)
 LoadDLLfunc (WSAGetLastError, 0, wsock32)
 LoadDLLfunc (WSASetLastError, 4, wsock32)
-LoadDLLfunc (WSAStartup, 8, wsock32)
+// LoadDLLfunc (WSAStartup, 8, wsock32)
 LoadDLLfunc (__WSAFDIsSet, 8, wsock32)
 LoadDLLfunc (accept, 12, wsock32)
 LoadDLLfunc (bind, 12, wsock32)
@@ -474,12 +477,13 @@ LoadDLLfunc (CoInitialize, 4, ole32)
 LoadDLLfunc (CoUninitialize, 0, ole32)
 LoadDLLfunc (CoCreateInstance, 20, ole32)
 
-LoadDLLfuncEx (SignalObjectAndWait, 16, kernel32, 1)
 LoadDLLfuncEx (CancelIo, 4, kernel32, 1)
+LoadDLLfuncEx (CreateHardLinkA, 12, kernel32, 1)
+LoadDLLfuncEx (CreateToolhelp32Snapshot, 8, kernel32, 1)
+LoadDLLfuncEx (IsDebuggerPresent, 0, kernel32, 1)
 LoadDLLfuncEx (Process32First, 8, kernel32, 1)
 LoadDLLfuncEx (Process32Next, 8, kernel32, 1)
-LoadDLLfuncEx (CreateToolhelp32Snapshot, 8, kernel32, 1)
-LoadDLLfuncEx (CreateHardLinkA, 12, kernel32, 1)
+LoadDLLfuncEx (SignalObjectAndWait, 16, kernel32, 1)
 LoadDLLfunc (TryEnterCriticalSection, 4, kernel32)
 
 LoadDLLfuncEx (waveOutGetNumDevs, 0, winmm, 1)

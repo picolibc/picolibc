@@ -104,7 +104,7 @@ get_tty_stuff (int flags = 0)
   if (shared_console_info)
     return shared_console_info;
 
-  shared_console_info = (tty_min *) open_shared (NULL, cygheap->console_h,
+  shared_console_info = (tty_min *) open_shared (NULL, 0, cygheap->console_h,
 						 sizeof (*shared_console_info),
 						 NULL);
   ProtectHandle (cygheap->console_h);
@@ -195,12 +195,9 @@ fhandler_console::set_cursor_maybe ()
     }
 }
 
-int
+int __stdcall
 fhandler_console::read (void *pv, size_t buflen)
 {
-  if (!buflen)
-    return 0;
-
   HANDLE h = get_io_handle ();
 
 #define buf ((char *) pv)
@@ -310,7 +307,7 @@ fhandler_console::read (void *pv, size_t buflen)
 	      tmp[1] = ich;
 	      /* Need this check since US code page seems to have a bug when
 		 converting a CTRL-U. */
-	      if ((unsigned char)ich > 0x7f)
+	      if ((unsigned char) ich > 0x7f)
 		con_to_str (tmp + 1, tmp + 1, 1);
 	      /* Determine if the keystroke is modified by META.  The tricky
 		 part is to distinguish whether the right Alt key should be
@@ -542,7 +539,7 @@ fhandler_console::scroll_screen (int x1, int y1, int x2, int y2, int xn, int yn)
 }
 
 int
-fhandler_console::open (const char *, int flags, mode_t)
+fhandler_console::open (path_conv *, int flags, mode_t)
 {
   HANDLE h;
 
@@ -617,7 +614,7 @@ fhandler_console::dup (fhandler_base *child)
 {
   fhandler_console *fhc = (fhandler_console *) child;
 
-  if (!fhc->open (get_name (), get_flags () & ~O_NOCTTY, 0))
+  if (!fhc->open (NULL, get_flags () & ~O_NOCTTY, 0))
     system_printf ("error opening console, %E");
 
   fhc->default_color = default_color;
@@ -858,29 +855,21 @@ fhandler_console::tcgetattr (struct termios *t)
   return res;
 }
 
-/*
- * Constructor.
- */
-
-fhandler_console::fhandler_console (const char *name) :
-  fhandler_termios (FH_CONSOLE, name, -1)
+fhandler_console::fhandler_console () :
+  fhandler_termios (FH_CONSOLE, -1),
+  default_color (FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE),
+  underline_color (FOREGROUND_GREEN | FOREGROUND_BLUE),
+  dim_color (FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE),
+  meta_mask (LEFT_ALT_PRESSED), state_ (normal), nargs_ (0), savex (0),
+  savey (0), savebuf (NULL), dwLastButtonState (0), nModifiers (0),
+  insert_mode (false), use_mouse (false), raw_win32_keyboard_mode (false)
 {
-  set_cb (sizeof *this);
-  default_color = dim_color = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
-  underline_color = FOREGROUND_GREEN | FOREGROUND_BLUE;
-  state_ = normal;
-  nargs_ = 0;
   for (int i = 0; i < MAXARGS; i++) args_ [i] = 0;
-  savex = savey = 0;
   savebufsiz.X = savebufsiz.Y = 0;
-  savebuf = NULL;
   scroll_region.Top = 0;
   scroll_region.Bottom = -1;
   dwLastCursorPosition.X = -1;
   dwLastCursorPosition.Y = -1;
-  dwLastButtonState = 0;
-  nModifiers = 0;
-  insert_mode = use_mouse = raw_win32_keyboard_mode = FALSE;
   /* Set the mask that determines if an input keystroke is modified by
      META.  We set this based on the keyboard layout language loaded
      for the current thread.  The left <ALT> key always generates
@@ -890,7 +879,6 @@ fhandler_console::fhandler_console (const char *name) :
      language-specific characters (umlaut, accent grave, etc.).  On
      these keyboards right <ALT> (called AltGr) is used to produce the
      shell symbols and should not be interpreted as META. */
-  meta_mask = LEFT_ALT_PRESSED;
   if (PRIMARYLANGID (LOWORD (GetKeyboardLayout (0))) == LANG_ENGLISH)
     meta_mask |= RIGHT_ALT_PRESSED;
 
@@ -1647,7 +1635,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 static struct {
   int vk;
   const char *val[4];
-} const keytable[] NO_COPY = {
+} keytable[] NO_COPY = {
 	       /* NORMAL */  /* SHIFT */    /* CTRL */       /* ALT */
   {VK_LEFT,	{"\033[D",	"\033[D",	"\033[D",	"\033\033[D"}},
   {VK_RIGHT,	{"\033[C",	"\033[C",	"\033[C",	"\033\033[C"}},
@@ -1723,7 +1711,7 @@ fhandler_console::init (HANDLE f, DWORD a, mode_t bin)
     mode = O_WRONLY;
   if (a == (GENERIC_READ | GENERIC_WRITE))
     mode = O_RDWR;
-  open (0, mode);
+  open ((path_conv *) NULL, mode);
   if (f != INVALID_HANDLE_VALUE)
     CloseHandle (f);	/* Reopened by open */
 
@@ -1752,7 +1740,7 @@ fhandler_console::fixup_after_fork (HANDLE)
   /* Windows does not allow duplication of console handles between processes
      so open the console explicitly. */
 
-  if (!open (get_name (), O_NOCTTY | get_flags (), 0))
+  if (!open (NULL, O_NOCTTY | get_flags (), 0))
     system_printf ("error opening console after fork, %E");
 
   if (!get_close_on_exec ())
@@ -1782,7 +1770,7 @@ fhandler_console::fixup_after_exec (HANDLE)
   HANDLE h = get_handle ();
   HANDLE oh = get_output_handle ();
 
-  if (!open (get_name (), O_NOCTTY | get_flags (), 0))
+  if (!open (NULL, O_NOCTTY | get_flags (), 0))
     {
       int sawerr = 0;
       if (!get_io_handle ())

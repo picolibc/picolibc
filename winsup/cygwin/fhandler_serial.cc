@@ -24,13 +24,9 @@ details. */
 /**********************************************************************/
 /* fhandler_serial */
 
-fhandler_serial::fhandler_serial (const char *name, DWORD devtype, int unit) :
-	fhandler_base (devtype, name, unit)
+fhandler_serial::fhandler_serial (int unit)
+  : fhandler_base (FH_SERIAL, unit), vmin_ (0), vtime_ (0), pgrp_ (myself->pgid)
 {
-  set_cb (sizeof *this);
-  vmin_ = 0;
-  vtime_ = 0;
-  pgrp_ = myself->pgid;
   set_need_fork_fixup ();
 }
 
@@ -64,7 +60,6 @@ fhandler_serial::raw_read (void *ptr, size_t ulen)
 
   for (n = 0, tot = 0; ulen; ulen -= n, ptr = (char *)ptr + n)
     {
-      DWORD ev;
       COMSTAT st;
       DWORD inq = 1;
 
@@ -212,7 +207,7 @@ fhandler_serial::init (HANDLE f, DWORD flags, mode_t bin)
 }
 
 int
-fhandler_serial::open (const char *name, int flags, mode_t mode)
+fhandler_serial::open (path_conv *, int flags, mode_t mode)
 {
   int res;
   COMMTIMEOUTS to;
@@ -221,10 +216,10 @@ fhandler_serial::open (const char *name, int flags, mode_t mode)
   syscall_printf ("fhandler_serial::open (%s, %p, %p)",
 			get_name (), flags, mode);
 
-  if (name && !(res = this->fhandler_base::open (flags, mode)))
+  if (!(res = this->fhandler_base::open (NULL, flags, mode)))
     return 0;
-  else
-    res = 1;
+
+  res = 1;
 
   (void) SetCommMask (get_handle (), EV_RXCHAR);
 
@@ -378,7 +373,6 @@ fhandler_serial::tcflush (int queue)
        (we stop after 1000 chars anyway) */
     for (int max = 1000; max > 0; max--)
       {
-	DWORD ev;
 	COMSTAT st;
 	if (!PurgeComm (get_handle (), PURGE_RXABORT | PURGE_RXCLEAR))
 	  break;

@@ -17,8 +17,8 @@ details. */
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
-#include "cygheap.h"
 #include "cygerrno.h"
+#include "cygheap.h"
 #include "thread.h"
 
 extern "C"
@@ -29,22 +29,20 @@ _fcntl (int fd, int cmd,...)
   va_list args;
   int res;
 
-  if (cygheap->fdtab.not_open (fd))
+  cygheap_fdget cfd (fd, true);
+  if (cfd < 0)
     {
-      set_errno (EBADF);
       res = -1;
       goto done;
     }
 
-  SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK, "_fcntl");
   va_start (args, cmd);
   arg = va_arg (args, void *);
-  if (cmd == F_DUPFD)
-    res = dup2 (fd, cygheap->fdtab.find_unused_handle ((int) arg));
+  if (cmd != F_DUPFD)
+    res = cfd->fcntl(cmd, arg);
   else
-    res = cygheap->fdtab[fd]->fcntl(cmd, arg);
+    res = dup2 (fd, cygheap_fdnew (((int) arg) - 1));
   va_end (args);
-  ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"_fcntl");
 
 done:
   syscall_printf ("%d = fcntl (%d, %d, %p)", res, fd, cmd, arg);

@@ -27,17 +27,17 @@ public:
   operator pwdgrp_state ()
     {
       if (state != uninitialized && file_w32[0] && cygheap->etc_changed ())
-        {
-          HANDLE h;
-          WIN32_FIND_DATA data;
+	{
+	  HANDLE h;
+	  WIN32_FIND_DATA data;
 
-          if ((h = FindFirstFile (file_w32, &data)) != INVALID_HANDLE_VALUE)
-            {
-              if (CompareFileTime (&data.ftLastWriteTime, &last_modified) > 0)
-                state = uninitialized;
-              FindClose (h);
-            }
-        }
+	  if ((h = FindFirstFile (file_w32, &data)) != INVALID_HANDLE_VALUE)
+	    {
+	      if (CompareFileTime (&data.ftLastWriteTime, &last_modified) > 0)
+		state = uninitialized;
+	      FindClose (h);
+	    }
+	}
       return state;
     }
   void operator = (pwdgrp_state nstate)
@@ -47,7 +47,7 @@ public:
   void set_last_modified (FILE *f)
     {
       if (!file_w32[0])
-        strcpy (file_w32, cygheap->fdtab[fileno (f)]->get_win32_name ());
+	strcpy (file_w32, cygheap->fdtab[fileno (f)]->get_win32_name ());
 
       GetFileTime (cygheap->fdtab[fileno (f)]->get_handle (),
 		   NULL, NULL, &last_modified);

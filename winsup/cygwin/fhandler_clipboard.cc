@@ -32,14 +32,10 @@ static const NO_COPY char *CYGWIN_NATIVE = "CYGWIN_NATIVE_CLIPBOARD";
 /* this is MT safe because windows format id's are atomic */
 static UINT cygnativeformat;
 
-fhandler_dev_clipboard::fhandler_dev_clipboard (const char *name):
-fhandler_base (FH_CLIPBOARD, name)
+fhandler_dev_clipboard::fhandler_dev_clipboard ()
+  : fhandler_base (FH_CLIPBOARD), pos (0), membuffer (NULL), msize (0),
+  eof (true)
 {
-  set_cb (sizeof *this);
-  eof = true;
-  pos = 0;
-  membuffer = NULL;
-  msize = 0;
   /* FIXME: check for errors and loop until we can open the clipboard */
   OpenClipboard (NULL);
   cygnativeformat = RegisterClipboardFormat (CYGWIN_NATIVE);
@@ -56,7 +52,7 @@ fhandler_dev_clipboard::dup (fhandler_base * child)
 {
   fhandler_dev_clipboard *fhc = (fhandler_dev_clipboard *) child;
 
-  if (!fhc->open (get_name (), get_flags (), 0))
+  if (!fhc->open (NULL, get_flags (), 0))
     system_printf ("error opening clipboard, %E");
 
   fhc->membuffer = membuffer;
@@ -67,7 +63,7 @@ fhandler_dev_clipboard::dup (fhandler_base * child)
 }
 
 int
-fhandler_dev_clipboard::open (const char *, int flags, mode_t)
+fhandler_dev_clipboard::open (path_conv *, int flags, mode_t)
 {
   set_flags (flags);
   eof = false;
@@ -188,7 +184,7 @@ fhandler_dev_clipboard::write (const void *buf, size_t len)
     }
 }
 
-int
+int __stdcall
 fhandler_dev_clipboard::read (void *ptr, size_t len)
 {
   HGLOBAL hglb;

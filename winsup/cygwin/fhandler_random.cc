@@ -23,16 +23,13 @@ details. */
 #define PSEUDO_MULTIPLIER       (6364136223846793005LL)
 #define PSEUDO_SHIFTVAL		(21)
 
-fhandler_dev_random::fhandler_dev_random (const char *name, int nunit)
-  : fhandler_base (FH_RANDOM, name),
-    unit(nunit),
-    crypt_prov((HCRYPTPROV)NULL)
+fhandler_dev_random::fhandler_dev_random (int nunit)
+  : fhandler_base (FH_RANDOM), unit(nunit), crypt_prov((HCRYPTPROV) NULL)
 {
-  set_cb (sizeof *this);
 }
 
 int
-fhandler_dev_random::open (const char *, int flags, mode_t)
+fhandler_dev_random::open (path_conv *, int flags, mode_t)
 {
   set_flags (flags);
   set_open_status ();
@@ -112,7 +109,7 @@ fhandler_dev_random::pseudo_read (void *ptr, size_t len)
   return len;
 }
 
-int
+int __stdcall
 fhandler_dev_random::read (void *ptr, size_t len)
 {
   if (!len)

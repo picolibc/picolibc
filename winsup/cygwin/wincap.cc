@@ -43,6 +43,8 @@ static NO_COPY wincaps wincap_unknown = {
   has_negative_pids:false,
   has_unreliable_pipes:false,
   has_try_enter_critical_section:false,
+  has_raw_devices:false,
+  has_valid_processorlevel:false,
 };
 
 static NO_COPY wincaps wincap_95 = {
@@ -77,6 +79,8 @@ static NO_COPY wincaps wincap_95 = {
   has_negative_pids:true,
   has_unreliable_pipes:true,
   has_try_enter_critical_section:false,
+  has_raw_devices:false,
+  has_valid_processorlevel:false,
 };
 
 static NO_COPY wincaps wincap_95osr2 = {
@@ -111,6 +115,8 @@ static NO_COPY wincaps wincap_95osr2 = {
   has_negative_pids:true,
   has_unreliable_pipes:true,
   has_try_enter_critical_section:false,
+  has_raw_devices:false,
+  has_valid_processorlevel:false,
 };
 
 static NO_COPY wincaps wincap_98 = {
@@ -145,6 +151,8 @@ static NO_COPY wincaps wincap_98 = {
   has_negative_pids:true,
   has_unreliable_pipes:true,
   has_try_enter_critical_section:false,
+  has_raw_devices:false,
+  has_valid_processorlevel:true,
 };
 
 static NO_COPY wincaps wincap_98se = {
@@ -179,6 +187,8 @@ static NO_COPY wincaps wincap_98se = {
   has_negative_pids:true,
   has_unreliable_pipes:true,
   has_try_enter_critical_section:false,
+  has_raw_devices:false,
+  has_valid_processorlevel:true,
 };
 
 static NO_COPY wincaps wincap_me = {
@@ -213,6 +223,8 @@ static NO_COPY wincaps wincap_me = {
   has_negative_pids:true,
   has_unreliable_pipes:true,
   has_try_enter_critical_section:false,
+  has_raw_devices:false,
+  has_valid_processorlevel:true,
 };
 
 static NO_COPY wincaps wincap_nt3 = {
@@ -247,6 +259,8 @@ static NO_COPY wincaps wincap_nt3 = {
   has_negative_pids:false,
   has_unreliable_pipes:false,
   has_try_enter_critical_section:false,
+  has_raw_devices:true,
+  has_valid_processorlevel:true,
 };
 
 static NO_COPY wincaps wincap_nt4 = {
@@ -281,6 +295,8 @@ static NO_COPY wincaps wincap_nt4 = {
   has_negative_pids:false,
   has_unreliable_pipes:false,
   has_try_enter_critical_section:true,
+  has_raw_devices:true,
+  has_valid_processorlevel:true,
 };
 
 static NO_COPY wincaps wincap_nt4sp4 = {
@@ -315,6 +331,8 @@ static NO_COPY wincaps wincap_nt4sp4 = {
   has_negative_pids:false,
   has_unreliable_pipes:false,
   has_try_enter_critical_section:true,
+  has_raw_devices:true,
+  has_valid_processorlevel:true,
 };
 
 static NO_COPY wincaps wincap_2000 = {
@@ -349,6 +367,8 @@ static NO_COPY wincaps wincap_2000 = {
   has_negative_pids:false,
   has_unreliable_pipes:false,
   has_try_enter_critical_section:true,
+  has_raw_devices:true,
+  has_valid_processorlevel:true,
 };
 
 static NO_COPY wincaps wincap_xp = {
@@ -383,6 +403,8 @@ static NO_COPY wincaps wincap_xp = {
   has_negative_pids:false,
   has_unreliable_pipes:false,
   has_try_enter_critical_section:true,
+  has_raw_devices:true,
+  has_valid_processorlevel:true,
 };
 
 wincapc NO_COPY wincap;
@@ -408,9 +430,9 @@ wincapc::init ()
 	    case 4:
 	      os = "NT";
 	      if (strcmp (version.szCSDVersion, "Service Pack 4") < 0)
-	        caps = &wincap_nt4;
+		caps = &wincap_nt4;
 	      else
-	        caps = &wincap_nt4sp4;
+		caps = &wincap_nt4sp4;
 	      break;
 	    case 5:
 	      os = "NT";
@@ -424,7 +446,7 @@ wincapc::init ()
 	      caps = &wincap_unknown;
 	      break;
 	  }
-        break;
+	break;
       case VER_PLATFORM_WIN32_WINDOWS:
 	switch (version.dwMinorVersion)
 	  {
@@ -438,9 +460,9 @@ wincapc::init ()
 	    case 10:
 	      os = "98";
 	      if (strchr(version.szCSDVersion, 'A'))
-	        caps = &wincap_98se;
+		caps = &wincap_98se;
 	      else
-	        caps = &wincap_98;
+		caps = &wincap_98;
 	      break;
 	    case 90:
 	      os = "ME";
@@ -451,9 +473,9 @@ wincapc::init ()
 	      caps = &wincap_unknown;
 	      break;
 	  }
-        break;
+	break;
       default:
-        os = "??";
+	os = "??";
 	caps = &wincap_unknown;
 	break;
     }

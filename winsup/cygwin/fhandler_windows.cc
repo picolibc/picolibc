@@ -46,16 +46,13 @@ The following unix-style calls are supported:
 	select () call marks read fd when any message posted to queue.
 */
 
-fhandler_windows::fhandler_windows (const char *name) :
-	fhandler_base (FH_WINDOWS, name)
+fhandler_windows::fhandler_windows ()
+  : fhandler_base (FH_WINDOWS), hWnd_ (NULL), method_ (WINDOWS_POST)
 {
-  set_cb (sizeof *this);
-  hWnd_ = NULL;
-  method_ = WINDOWS_POST;
 }
 
 int
-fhandler_windows::open (const char *, int flags, mode_t)
+fhandler_windows::open (path_conv *, int flags, mode_t)
 {
   set_flags (flags);
   set_close_on_exec_flag (1);
@@ -82,7 +79,7 @@ fhandler_windows::write (const void *buf, size_t)
     return SendMessage (ptr->hwnd, ptr->message, ptr->wParam, ptr->lParam);
 }
 
-int
+int __stdcall
 fhandler_windows::read (void *buf, size_t len)
 {
   MSG *ptr = (MSG *) buf;

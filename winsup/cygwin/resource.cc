@@ -20,6 +20,7 @@ details. */
 #include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
+#include "psapi.h"
 
 /* add timeval values */
 static void
@@ -73,6 +74,15 @@ fill_rusage (struct rusage *r, HANDLE h)
   add_timeval (&r->ru_stime, &tv);
   totimeval (&tv, &user_time, 0, 0);
   add_timeval (&r->ru_utime, &tv);
+
+  PROCESS_MEMORY_COUNTERS pmc;
+
+  memset (&pmc, 0, sizeof (pmc));
+  if (GetProcessMemoryInfo( h, &pmc, sizeof (pmc)))
+    {
+      r->ru_maxrss += (long) (pmc.WorkingSetSize /1024);
+      r->ru_majflt += pmc.PageFaultCount;
+    }
 }
 
 extern "C"
@@ -102,8 +112,7 @@ getrusage (int intwho, struct rusage *rusage_in)
 
 unsigned long rlim_core = RLIM_INFINITY;
 
-extern "C"
-int
+extern "C" int
 getrlimit (int resource, struct rlimit *rlp)
 {
   MEMORY_BASIC_INFORMATION m;
@@ -147,8 +156,7 @@ getrlimit (int resource, struct rlimit *rlp)
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 setrlimit (int resource, const struct rlimit *rlp)
 {
   if (check_null_invalid_struct_errno (rlp))

@@ -229,7 +229,7 @@ strace_printf (unsigned category, const char *func, const char *fmt, ...)
     }
 }
 
-static NO_COPY const struct tab
+static NO_COPY struct tab
 {
   int v;
   const char *n;
