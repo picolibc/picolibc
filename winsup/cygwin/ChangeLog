@@ -1,3 +1,7 @@
+2001-12-20  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump API minor version for below changes.
+
 2001-12-19  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in (VPATH): Add regex directory.
