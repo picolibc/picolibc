@@ -52,6 +52,7 @@
 
 #include <sys/config.h>
 #include <machine/types.h>
+#include <sys/_types.h>
 
 #if !defined(__time_t_defined) && !defined(_TIME_T)
 #define _TIME_T
@@ -65,20 +66,12 @@ typedef _TIME_T_ time_t;
 typedef _CLOCK_T_ clock_t;
 #endif
 
-typedef unsigned int __socklen_t;
-typedef unsigned int __useconds_t;
-
-typedef __pid_t pid_t;
-typedef __off_t off_t;
-typedef __loff_t loff_t;
-typedef __uint32_t uintptr_t;
-typedef __int32_t intptr_t;
+#ifndef _SSIZE_T
+#define _SSIZE_T
+typedef _ssize_t ssize_t;
+#endif
 
 #ifndef __u_char_defined
-typedef unsigned char u_char;
-typedef unsigned short u_short;
-typedef unsigned int u_int;
-typedef unsigned long u_long;
 #ifdef __GNUC__
 __extension__ typedef long long quad_t;
 __extension__ typedef unsigned long long u_quad_t;
@@ -97,12 +90,6 @@ typedef struct
     int __val[2];
   } fsid_t;
 #define __u_char_defined
-#endif
-
-#ifndef __daddr_t_defined
-typedef int daddr_t;
-typedef char *caddr_t;
-# define __daddr_t_defined
 #endif
 
 typedef int clockid_t;
@@ -152,5 +139,12 @@ typedef	long	fd_mask;
 #define __mode_t_defined
 #define __gid_t_defined
 #define __uid_t_defined
+#define __pid_t_defined
+#define __ssize_t_defined
+#define __key_t_defined
+#define __off_t_defined
+
+typedef __uint32_t uintptr_t;
+typedef __int32_t intptr_t;
 
 #endif

@@ -73,14 +73,14 @@ struct _atexit {
 	int	_ind;				/* next index in this table */
 	void	(*_fns[_ATEXIT_SIZE])(void);	/* the table itself */
 	void	*_fnargs[_ATEXIT_SIZE];	        /* fn args for on_exit */
-	__uint32_t _fntypes;           	        /* type of exit routine */
+	__ULong _fntypes;           	        /* type of exit routine */
 };
 #else
 struct _atexit {
 	int	_ind;				/* next index in this table */
 	void	(*_fns[_ATEXIT_SIZE])(void);	/* the table itself */
 	void	*_fnargs[_ATEXIT_SIZE];	        /* fn args for on_exit */
-	__uint32_t _fntypes;           	        /* type of exit routine */
+	__ULong _fntypes;           	        /* type of exit routine */
 };
 #endif
 
@@ -259,6 +259,7 @@ struct _misc_reent
   int _wctomb_state;
   int _mbtowc_state;
   char _l64a_buf[8];
+  int _getdate_err;
 };
 
 /* This version of _reent is layed our with "int"s in pairs, to help
@@ -344,6 +345,7 @@ struct _reent
     var->__sf = 0; \
     var->_misc = _NULL; \
     var->_signal_buf = _NULL; \
+    var->_getdate_err = 0; \
     var->__sf_fake._p = _NULL; \
     var->__sf_fake._r = 0; \
     var->__sf_fake._w = 0; \
@@ -413,6 +415,7 @@ struct _reent
   _r->_misc->_wctomb_state = 0; \
   _r->_misc->_mbtowc_state = 0; \
   _r->_misc->_l64a_buf[0] = '\0'; \
+  _r->_misc->_getdate_err = 0; \
 } while (0)
 #define _REENT_CHECK_MISC(var) \
   _REENT_CHECK(var, _misc, struct _misc_reent *, sizeof *((var)->_misc), _REENT_INIT_MISC(var))
@@ -437,6 +440,7 @@ struct _reent
 #define _REENT_MBTOWC_STATE(ptr)((ptr)->_misc->_mbtowc_state)
 #define _REENT_WCTOMB_STATE(ptr)((ptr)->_misc->_wctomb_state)
 #define _REENT_L64A_BUF(ptr)    ((ptr)->_misc->_l64a_buf)
+#define _REENT_GETDATE_ERR_P(ptr) (&((ptr)->_misc->_getdate_err))
 #define _REENT_SIGNAL_BUF(ptr)  ((ptr)->_signal_buf)
 
 #else /* !_REENT_SMALL */
@@ -486,6 +490,7 @@ struct _reent
           int _wctomb_state;
           char _l64a_buf[8];
           char _signal_buf[_REENT_SIGNAL_SIZE];
+          int _getdate_err;  
         } _reent;
   /* Two next two fields were once used by malloc.  They are no longer
      used. They are used to preserve the space used before so as to
@@ -518,7 +523,7 @@ struct _reent
     { 0,0,0,0,0,0,0,0}, 0, 1, \
     {{_RAND48_SEED_0, _RAND48_SEED_1, _RAND48_SEED_2}, \
      {_RAND48_MULT_0, _RAND48_MULT_1, _RAND48_MULT_2}, _RAND48_ADD}, \
-    0, 0, 0, ""} } }
+    0, 0, 0, "", "", 0} } }
 
 #define _REENT_INIT_PTR(var) \
   { int i; \
@@ -560,6 +565,7 @@ struct _reent
     var->_new._reent._wctomb_state = 0; \
     var->_new._reent._l64a_buf[0] = '\0'; \
     var->_new._reent._signal_buf[0] = '\0'; \
+    var->_new._reent._getdate_err = 0; \
     var->_atexit = _NULL; \
     var->_atexit0._ind = 0; \
     var->_atexit0._fns[0] = _NULL; \
@@ -597,6 +603,7 @@ struct _reent
 #define _REENT_WCTOMB_STATE(ptr)((ptr)->_new._reent._wctomb_state)
 #define _REENT_L64A_BUF(ptr)    ((ptr)->_new._reent._l64a_buf)
 #define _REENT_SIGNAL_BUF(ptr)  ((ptr)->_new._reent._signal_buf)
+#define _REENT_GETDATE_ERR_P(ptr) (&((ptr)->_new._reent._getdate_err))
 
 #endif /* !_REENT_SMALL */
 

@@ -37,6 +37,16 @@
  * $FreeBSD: src/lib/libc/db/hash/hash.h,v 1.6 2002/03/21 22:46:26 obrien Exp $
  */
 
+#include <sys/param.h>
+
+#ifndef BYTE_ORDER
+#ifdef __IEEE_LITTLE_ENDIAN
+#define BYTE_ORDER LITTLE_ENDIAN
+#else
+#define BYTE_ORDER BIG_ENDIAN
+#endif
+#endif
+
 /* Operations */
 typedef enum {
 	HASH_GET, HASH_PUT, HASH_PUTNEW, HASH_DELETE, HASH_FIRST, HASH_NEXT

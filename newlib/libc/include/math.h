@@ -7,6 +7,7 @@ extern "C" {
 #define  _MATH_H_
 
 #include <sys/reent.h>
+#include <sys/types.h>
 #include <machine/ieeefp.h>
 #include "_ansi.h"
 

@@ -1,5 +1,32 @@
 2002-06-21  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/include/math.h: Add <sys/types.h> to get _uint32_t definition.
+	* libc/include/machine/types.h: Skip __off_t, __pid_t, and
+	__loff_t definitions if special _HAVE_SYSTYPES macro defined.
+	* libc/include/sys/config.h: Removed _uint*, _int* definitions.
+	* libc/include/sys/param.h: Remove i386 case which is handled
+	by default case.
+	(BIG_ENDIAN, LITTLE_ENDIAN): Protect
+	definitions in case they are already defined.
+	(BYTE_ORDER): Add default case using _IEEE_BIG_ENDIAN and
+	_IEEE_LITTLE_ENDIAN flags.
+	* libc/include/sys/reent.h: Change __uint32_t references to
+	use _ULong instead.
+	(_REENT_GETDATE_REENT_P): New macro.
+	* libc/include/sys/types.h (__int16_t, __uint16_t): Added.
+	(__int32_t, __uint32_t, __int64_t, __uint64_t): Ditto.
+	* libc/search/hash.h: Add default setting of BYTE_ORDER,
+	LITTLE_ENDIAN, and BIG_ENDIAN, if not already defined.
+	* libc/sys/linux/sys/types.h: Include <sys/_types.h>.  Define
+	ssize_t based on _ssize_t.  Remove __socklen_t, __uintptr_t,
+	pid_t, off_t, loff_t, caddr_t, and daddr_t type
+	definitions which are done by subsequent glibc headers.
+	Add macro definitions to prevent subsequent header files from
+	defining pid_t, off_t, ssize_t, and key_t.  Move uintptr_t and
+	intptr_t to after glibc definitions of types they are based on.
+
+2002-06-21  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/include/errno.h: Protect from multiple inclusion.
 
 2002-06-21  Nick Clifton  <nickc@cambridge.redhat.com>
