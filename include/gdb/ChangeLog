@@ -1,3 +1,9 @@
+2002-05-09  Daniel Jacobowitz  <drow@mvista.com>
+
+	* signals.h: Update comments.
+	(enum target_signal): Remove conditional compilation around
+	Mach-specific signals.  Move them to after TARGET_SIGNAL_DEFAULT.
+
 2002-03-10  Daniel Jacobowitz  <drow@mvista.com>
 
 	* signals.h: New file, from gdb/defs.h.
