@@ -15,6 +15,9 @@ details. */
 #include <reent.h>
 #include <stdlib.h>
 
+/* Avoid an info message from linker when linking applications. */
+extern __declspec(dllimport) struct _reent *_impure_ptr;
+
 #undef environ
 
 extern "C"
@@ -23,7 +26,6 @@ char **environ;
 int cygwin_attach_dll (HMODULE, MainFunc);
 int cygwin_attach_noncygwin_dll (HMODULE, MainFunc);
 int main (int, char **, char **);
-struct _reent *_impure_ptr;
 int _fmode;
 void _pei386_runtime_relocator ();
 

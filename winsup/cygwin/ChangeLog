@@ -1,3 +1,13 @@
+2004-09-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din (_impure_ptr): Export.
+	(reent_data): Don't export.
+	* dcrt0.cc (reent_data): Drop.
+	(__cygwin_user_data): Initialize impure_ptr as GLOBAL_REENT.
+	(_dll_crt0): Initialize _impure_ptr as GLOBAL_REENT.
+	* lib/_cygwin_crt0_common.cc (_impure_ptr): Drop.  Declare extern as
+	dllimport instead.
+
 2004-09-14  Christopher Faylor  <cgf@timesys.com>
 
 	* cygtls.h: Add alignment kludge to fix disparity between compilers.

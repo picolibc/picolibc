@@ -98,7 +98,6 @@ extern "C"
   char ***main_environ;
   /* __progname used in getopt error message */
   char *__progname;
-  struct _reent reent_data;
   struct per_process __cygwin_user_data =
   {/* initial_sp */ 0, /* magic_biscuit */ 0,
    /* dll_major */ CYGWIN_VERSION_DLL_MAJOR,
@@ -119,7 +118,7 @@ extern "C"
    /* api_minor */ CYGWIN_VERSION_API_MINOR,
    /* unused2 */ {0, 0, 0, 0, 0},
    /* resourcelocks */ &_reslock, /* threadinterface */ &_mtinterf,
-   /* impure_ptr */ &reent_data,
+   /* impure_ptr */ _GLOBAL_REENT,
   };
   bool ignore_case_with_glob;
   int __declspec (dllexport) _check_for_executable = true;
@@ -925,7 +924,7 @@ _dll_crt0 ()
   *main_environ = NULL;
 
   char padding[CYGTLS_PADSIZE];
-  _impure_ptr = &reent_data;
+  _impure_ptr = _GLOBAL_REENT;
   _impure_ptr->_stdin = &_impure_ptr->__sf[0];
   _impure_ptr->_stdout = &_impure_ptr->__sf[1];
   _impure_ptr->_stderr = &_impure_ptr->__sf[2];
@@ -947,7 +946,7 @@ dll_crt0 (per_process *uptr)
   if (uptr && uptr != user_data)
     {
       memcpy (user_data, uptr, per_process_overwrite);
-      *(user_data->impure_ptr_ptr) = &reent_data;
+      *(user_data->impure_ptr_ptr) = _GLOBAL_REENT;
     }
   _dll_crt0 ();
 }
