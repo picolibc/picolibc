@@ -36,7 +36,7 @@ static DWORD WINAPI process_output (void *);		// Output queue thread
 static DWORD WINAPI process_ioctl (void *);		// Ioctl requests thread
 
 fhandler_tty_master::fhandler_tty_master ()
-  : fhandler_pty_master (FH_TTYM), console (NULL)
+  : fhandler_pty_master (), console (NULL)
 {
 }
 
@@ -423,7 +423,7 @@ process_ioctl (void *)
 /* Tty slave stuff */
 
 fhandler_tty_slave::fhandler_tty_slave ()
-  : fhandler_tty_common (FH_TTYS)
+  : fhandler_tty_common ()
 {
   set_r_no_interrupt (1);
 }
@@ -994,8 +994,8 @@ out:
 /*******************************************************
  fhandler_pty_master
 */
-fhandler_pty_master::fhandler_pty_master (DWORD devtype)
-  : fhandler_tty_common (devtype)
+fhandler_pty_master::fhandler_pty_master ()
+  : fhandler_tty_common ()
 {
 }
 
