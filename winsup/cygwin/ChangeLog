@@ -1,3 +1,8 @@
+Sun May 13 22:49:04 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (path_conv::check): Revert allow_ntsec check so that volume
+	info is always retrieved and isdisk setting is properly set.
+
 Sun May 13 14:02:36 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* fhandler_tty.cc (fhandler_tty_common::dup): Preserve O_NOCTTY when

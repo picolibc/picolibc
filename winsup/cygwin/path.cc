@@ -639,9 +639,9 @@ out:
 
   strcpy (tmp_buf, this->path);
 
-  if (allow_ntsec && (!rootdir (tmp_buf) ||
+  if (!rootdir (tmp_buf) ||
       !GetVolumeInformation (tmp_buf, NULL, 0, &serial, NULL,
-      			     &volflags, fs_name, 16)))
+      			     &volflags, fs_name, 16))
     {
       debug_printf ("GetVolumeInformation(%s) = ERR, this->path(%s), set_has_acls(FALSE)",
 		    tmp_buf, this->path, GetLastError ());
