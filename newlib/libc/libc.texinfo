@@ -36,7 +36,7 @@ University of California, Berkeley and its contributors.
 libc includes software developed by Martin Jackson, Graham Haley
 and Steve Chamberlain of Tadpole Technology and released to Cygnus.
 
-libc uses floating point converstion software developed at AT&T, which
+libc uses floating-point conversion software developed at AT&T, which
 includes this copyright information:
 
  The author of this software is David M. Gay.
@@ -106,7 +106,7 @@ University of California, Berkeley and its contributors.
 @file{libc} includes software developed by Martin Jackson, Graham Haley
 and Steve Chamberlain of Tadpole Technology and released to Cygnus.
 
-@file{libc} uses floating point conversion software developed at AT&T,
+@file{libc} uses floating-point conversion software developed at AT&T,
 which includes this copyright information:
 
 @cartouche

@@ -234,11 +234,11 @@ DESCRIPTION
 		<<(int *arg)>>.
 
 		o e, f, g
-		Read a floating point number into the corresponding <[arg]>:
+		Read a floating-point number into the corresponding <[arg]>:
 		<<(float *arg)>>.
 
 		o E, F, G
-		Read a floating point number into the corresponding <[arg]>:
+		Read a floating-point number into the corresponding <[arg]>:
 		<<(double *arg)>>.
 
 		o  i

@@ -39,9 +39,9 @@ remainder of <[x]>/<[y]> (<[x]> modulo <[y]>).
 
 RETURNS
 The <<fmod>> function returns the value
-@ifinfo
+@ifnottex
 <[x]>-<[i]>*<[y]>,
-@end ifinfo
+@end ifnottex
 @tex
 $x-i\times y$,
 @end tex

@@ -13,7 +13,7 @@
 
 /*
 FUNCTION
-       <<ilogb>>, <<ilogbf>>---get exponent of floating point number
+       <<ilogb>>, <<ilogbf>>---get exponent of floating-point number
 INDEX
 	ilogb
 INDEX
@@ -35,7 +35,7 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
 
-	All non zero, normal numbers can be described as <[m]> *
+	All nonzero, normal numbers can be described as <[m]> *
 	2**<[p]>.  <<ilogb>> and <<ilogbf>> examine the argument
 	<[val]>, and return <[p]>.  The functions <<frexp>> and
 	<<frexpf>> are similar to <<ilogb>> and <<ilogbf>>, but also
@@ -44,7 +44,7 @@ DESCRIPTION
 RETURNS
 
 <<ilogb>> and <<ilogbf>> return the power of two used to form the
-floating point argument.  If <[val]> is <<0>>, they return <<-
+floating-point argument.  If <[val]> is <<0>>, they return <<-
 INT_MAX>> (<<INT_MAX>> is defined in limits.h).  If <[val]> is
 infinite, or NaN, they return <<INT_MAX>>.
 

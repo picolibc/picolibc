@@ -33,9 +33,9 @@ DESCRIPTION
 
 	<<cosh>> computes the hyperbolic cosine of the argument <[x]>.
 	<<cosh(<[x]>)>> is defined as 
-	@ifinfo
+	@ifnottex
 	. (exp(x) + exp(-x))/2
-	@end ifinfo
+	@end ifnottex
 	@tex
 	$${(e^x + e^{-x})} \over 2$$
 	@end tex

@@ -34,8 +34,12 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
 	<<exp2>> and <<exp2f>> calculate 2 ^ <[x]>, that is, 
-	@ifinfo
+	@ifnottex
 	2 raised to the power <[x]>.
+	@end ifnottex
+	@tex
+	$2^x$
+	@end tex
 
 	You can use the (non-ANSI) function <<matherr>> to specify
 	error handling for these functions.

@@ -44,7 +44,7 @@ void _IO_ldtostr(long double *, char *, int, int, char);
  /* Maximum exponent digits - base 10 */
  #define MAX_EXP_DIGITS 5
 
-/* Control structure for long doublue conversion including rounding precision values.
+/* Control structure for long double conversion including rounding precision values.
  * rndprc can be set to 80 (if NE=6), 64, 56, 53, or 24 bits.
  */
 typedef struct

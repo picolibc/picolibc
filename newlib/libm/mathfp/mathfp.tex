@@ -102,7 +102,7 @@ In X/Open mode, @code{errno} is set correctly, and @code{matherr} is
 called, but warning message are not printed.
 
 In SVID mode, functions which overflow return 3.40282346638528860e+38,
-the maximum single precision floating point value, rather than infinity.
+the maximum single-precision floating-point value, rather than infinity.
 Also, @code{errno} is set correctly, @code{matherr} is called, and, if
 @code{matherr} returns 0, warning messages are printed for some errors.
 For example, by default @samp{log(-1.0)} writes this message on standard

@@ -91,10 +91,10 @@ float <[x]>;
 DESCRIPTION
 The Bessel functions are a family of functions that solve the
 differential equation 
-@ifinfo
+@ifnottex
 .  2               2    2
 . x  y'' + xy' + (x  - p )y  = 0
-@end ifinfo
+@end ifnottex
 @tex
 $$x^2{d^2y\over dx^2} + x{dy\over dx} + (x^2-p^2)y = 0$$
 @end tex

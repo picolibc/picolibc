@@ -36,9 +36,9 @@ DESCRIPTION
         @tex
         $\sqrt{x^2+y^2}$
         @end tex
-        @ifinfo
+        @ifnottex
         <<sqrt(<[x]>*<[x]> + <[y]>*<[y]>)>>
-        @end ifinfo
+        @end ifnottex
         between the origin (0,0) and a point represented by the
         Cartesian coordinates (<[x]>,<[y]>).  <<hypotf>> differs only
         in the type of its arguments and result.

@@ -46,9 +46,9 @@ returning floats.
 You can modify error handling for these routines using <<matherr>>. 
 
 RETURNS
-@ifinfo
+@ifnottex
 <<asin>> returns values in radians, in the range of -pi/2 to pi/2.
-@end ifinfo
+@end ifnottex
 @tex
 <<asin>> returns values in radians, in the range of $-\pi/2$ to $\pi/2$.
 @end tex

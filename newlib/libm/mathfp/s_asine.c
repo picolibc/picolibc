@@ -62,9 +62,9 @@ Arguments to <<asin>> and <<acos>> must be in the range @minus{}1 to 1.
 than taking and returning floats.
 
 RETURNS
-@ifinfo
+@ifnottex
 <<asin>> and <<acos>> return values in radians, in the range of -pi/2 to pi/2.
-@end ifinfo
+@end ifnottex
 @tex
 <<asin>> and <<acos>> return values in radians, in the range of $-\pi/2$ to $\pi/2$.
 @end tex

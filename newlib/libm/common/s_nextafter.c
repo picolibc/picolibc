@@ -38,7 +38,7 @@ TRAD_SYNOPSIS
 
 
 DESCRIPTION
-<<nextafter>> returns the double) precision floating point number
+<<nextafter>> returns the double-precision floating-point number
 closest to <[val]> in the direction toward <[dir]>.  <<nextafterf>>
 performs the same operation in single precision.  For example,
 <<nextafter(0.0,1.0)>> returns the smallest positive number which is

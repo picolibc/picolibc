@@ -1,8 +1,8 @@
 @node machine,,syscalls,Top
 @chapter NEC V70 Specific Functions
 
-The NEC V70 has machine instructions for fast IEEE floating point,
-including operations normally provided by the library.  
+The NEC V70 has machine instructions for fast IEEE floating-point
+arithmetic, including operations normally provided by the library.  
 
 When you use the @file{/usr/include/fastmath.h} header file, the
 names of several library math functions are redefined to call the
@@ -43,7 +43,7 @@ Also, the library provides true @code{float} entry points.  The
 @code{fast_sinf} entry point really performs a @code{fsin.s}
 operation.  Because of this, the instructions are only useful when
 using code compiled with an ANSI C compiler.  The prototypes
-and definitions for the floating point versions of the math library
+and definitions for the floating-point versions of the math library
 routines are only defined if compiling a module with an ANSI C
 compiler.
 

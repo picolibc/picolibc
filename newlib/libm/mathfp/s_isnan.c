@@ -46,7 +46,7 @@ TRAD_SYNOPSIS
 
 
 DESCRIPTION
-        These functions provide information on the floating point
+        These functions provide information on the floating-point
         argument supplied.
 
         There are five major number formats -
@@ -54,14 +54,14 @@ DESCRIPTION
         o zero
          a number which contains all zero bits.
         o subnormal
-         Is used to represent  number with a zero exponent, but a non zero fract
+         Is used to represent  number with a zero exponent, but a nonzero fract
 ion.
          o normal
           A number with an exponent, and a fraction
         o infinity
           A number with an all 1's exponent and a zero fraction.
         o NAN
-          A number with an all 1's exponent and a non zero fraction.
+          A number with an all 1's exponent and a nonzero fraction.
 
         o-
 
@@ -71,7 +71,7 @@ ion.
 
         The <<isnanf>>, <<isinff>> and <<finitef>> perform the same
         operations as their <<isnan>>, <<isinf>> and <<finite>>
-        counterparts, but on single precision floating point numbers.
+        counterparts, but on single-precision floating-point numbers.
 
 QUICKREF
         isnan - pure
@@ -92,7 +92,7 @@ QUICKREF
  * isnan
  *
  * Input:
- *   x - pointer to a floating point value
+ *   x - pointer to a floating-point value
  *
  * Output:
  *   An integer that indicates if the number is NaN.

@@ -25,7 +25,7 @@ DESCRIPTION
 <<atoff>> converts the initial portion of a string to a <<float>>.
 
 The functions parse the character string <[s]>,
-locating a substring which can be converted to a floating point
+locating a substring which can be converted to a floating-point
 value. The substring must match the format:
 . [+|-]<[digits]>[.][<[digits]>][(e|E)[+|-]<[digits]>]
 The substring converted is the longest initial

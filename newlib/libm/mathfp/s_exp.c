@@ -30,9 +30,9 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
         <<exp>> and <<expf>> calculate the exponential of <[x]>, that is,
-        @ifinfo
+        @ifnottex
         e raised to the power <[x]> (where e
-        @end ifinfo
+        @end ifnottex
         @tex
         $e^x$ (where $e$
         @end tex

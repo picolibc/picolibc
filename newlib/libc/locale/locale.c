@@ -42,17 +42,17 @@ execution environment for international collating and formatting
 information; <<localeconv>> reports on the settings of the current
 locale.
 
-This is a minimal implementation, supporting only the required <<``C''>>
+This is a minimal implementation, supporting only the required <<"C">>
 value for <[locale]>; strings representing other locales are not
 honored unless MB_CAPABLE is defined in which case three new
-extensions are allowed for LC_CTYPE or LC_MESSAGES only: <<''C-JIS''>>, 
-<<''C-EUCJP''>>, <<''C-SJIS''>>, or <<''C-ISO-8859-1''>>.  (<<``''>> is 
+extensions are allowed for LC_CTYPE or LC_MESSAGES only: <<"C-JIS">>, 
+<<"C-EUCJP">>, <<"C-SJIS">>, or <<"C-ISO-8859-1">>.  (<<"">> is 
 also accepted; it represents the default locale
-for an implementation, here equivalent to <<``C''>>.)
+for an implementation, here equivalent to <<"C">>.)
 
 If you use <<NULL>> as the <[locale]> argument, <<setlocale>> returns
 a pointer to the string representing the current locale (always
-<<``C''>> in this implementation).  The acceptable values for
+<<"C">> in this implementation).  The acceptable values for
 <[category]> are defined in `<<locale.h>>' as macros beginning with
 <<"LC_">>, but this implementation does not check the values you pass
 in the <[category]> argument.
@@ -67,7 +67,7 @@ in effect.
 
 RETURNS
 <<setlocale>> returns either a pointer to a string naming the locale
-currently in effect (always <<``C''>> for this implementation, or, if
+currently in effect (always <<"C">> for this implementation, or, if
 the locale request cannot be honored, <<NULL>>.
 
 <<localeconv>> returns a pointer to a structure of type <<lconv>>,

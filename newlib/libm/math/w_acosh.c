@@ -37,9 +37,9 @@ TRAD_SYNOPSIS
 DESCRIPTION
 <<acosh>> calculates the inverse hyperbolic cosine of <[x]>.
 <<acosh>> is defined as 
-@ifinfo
+@ifnottex
 . log(<[x]> + sqrt(<[x]>*<[x]>-1))
-@end ifinfo
+@end ifnottex
 @tex
 $$ln\Bigl(x + \sqrt{x^2-1}\Bigr)$$
 @end tex

@@ -5,7 +5,7 @@
 
 /*
 FUNCTION
-	<<nan>>, <<nanf>>---representation of infinity
+	<<nan>>, <<nanf>>---representation of ``Not a Number''
 
 INDEX
 	nan
@@ -25,7 +25,7 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
 	<<nan>> and <<nanf>> return an IEEE NaN (Not a Number) in
-	double and single precision arithmetic respectivly.  The
+	double- and single-precision arithmetic respectively.  The
 	argument is currently disregarded.
 
 QUICKREF

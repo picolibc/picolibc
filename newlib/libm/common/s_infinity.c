@@ -25,8 +25,8 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
 	<<infinity>> and <<infinityf>> return the special number IEEE
-	infinity in double and single precision arithmetic
-	respectivly.
+	infinity in double- and single-precision arithmetic
+	respectively.
 
 QUICKREF
 	infinity - pure

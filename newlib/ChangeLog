@@ -1,3 +1,68 @@
+2003-10-20  Bob Wilson  <bob.wilson@acm.org>
+
+	* libc/locale/locale.c: Use double quotes in code.
+	* libc/locale/locale.tex: Likewise.
+	* libc/libc.texinfo: Hyphenate "floating-point".
+	* libc/machine/necv70/necv70.tex: Likewise.
+	* libc/stdio/sprintf.c: Likewise.
+	* libc/stdio/sscanf.c: Likewise.
+	* libc/stdlib/atof.c: Likewise.
+	* libc/stdlib/ldtoa.c: Fix comment typo.
+	* libc/stdlib/div.c: Use @ifnottex instead of @ifinfo.
+	* libc/stdlib/ldiv.c: Likewise.
+	* libm/common/s_expm1.c: Likewise.
+	* libm/common/s_ilogb.c: Hyphenate "floating-point".  Use "nonzero".
+	* libm/common/s_infinity: Hyphenate "double- and single-precision".
+	* libm/common/s_nan.c: Likewise.  Also correct the FUNCTION summary.
+	* libm/common/s_nextafter.c: Fix typo.  Hyphenate "double-precision"
+	and "floating-point".
+	* libm/common/s_scalbn.c: Correct the FUNCTION summary.
+	* libm/math/e_pow.c: Fix comment typo.
+	* libm/math/math.tex: Hyphenate "single-precision" and "floating-point".
+	* libm/math/s_asinh.c: Use @ifnottex instead of @ifinfo.
+	* libm/math/s_atan.c: Likewise.
+	* libm/math/s_frexp.c: Likewise.  Also use "nonzero".
+	* libm/math/s_isnan.c: Hyphenate "single-precision" and
+	"floating-point".  Use "nonzero".
+	* libm/math/s_ldexp.c: Use @ifnottex instead of @ifinfo.
+	* libm/math/w_acos.c: Likewise.
+	* libm/math/w_acosh.c: Likewise.
+	* libm/math/w_asin.c: Likewise.
+	* libm/math/w_atan2.c: Likewise.
+	* libm/math/w_atanh.c: Likewise.
+	* libm/math/w_cosh.c: Likewise.
+	* libm/math/w_exp.c: Likewise.
+	* libm/math/w_exp2.c: Likewise.  Add missing @end and missing @tex
+	version of 2^x in the description.
+	* libm/math/w_fmod.c: Use @ifnottex instead of @ifinfo.
+	* libm/math/w_gamma.c: Likewise.
+	* libm/math/w_hypot.c: Likewise.
+	* libm/math/w_j0.c: Likewise.
+	* libm/math/w_sinh.c: Likewise.
+	* libm/math/w_pow.c: Replace "exp1.0nt" with "exponent".
+	* libm/mathfp/mathfp.tex: Hyphenate "single-precision" and
+	"floating-point".
+	* libm/mathfp/e_acosh.c: Use @ifnottex instead of @ifinfo.
+	* libm/mathfp/e_atanh.c: Likewise.
+	* libm/mathfp/e_hypot.c: Likewise.
+	* libm/mathfp/er_lgamma.c: Likewise.
+	* libm/mathfp/s_acos.c: Likewise.
+	* libm/mathfp/s_asine.c: Likewise.
+	* libm/mathfp/s_asinh.c: Likewise.
+	* libm/mathfp/s_atan.c: Likewise.
+	* libm/mathfp/s_atan2.c: Likewise.
+	* libm/mathfp/s_atangent.c: Likewise.
+	* libm/mathfp/s_cosh.c: Likewise.
+	* libm/mathfp/s_exp.c: Likewise.
+	* libm/mathfp/s_fmod.c: Likewise.
+	* libm/mathfp/s_frexp.c: Likewise.  Also use "nonzero".
+	* libm/mathfp/s_isnan.c: Hyphenate "single-precision" and
+	"floating-point".  Use "nonzero".
+	* libm/math/s_pow.c: Replace "exp1.0nt" with "exponent".
+	* libm/mathfp/s_ldexp.c: Use @ifnottex instead of @ifinfo.
+	* libm/mathfp/s_sineh.c: Likewise.
+	* libm/mathfp/w_jn.c: Likewise.
+
 2003-10-15  Alexandre Oliva  <aoliva@redhat.com>
 
 	* Makefile.am: Add $(MAKE) comments to multido and multiclean

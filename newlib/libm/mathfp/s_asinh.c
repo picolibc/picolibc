@@ -36,9 +36,9 @@ TRAD_SYNOPSIS
 DESCRIPTION
 <<asinh>> calculates the inverse hyperbolic sine of <[x]>.
 <<asinh>> is defined as 
-@ifinfo
+@ifnottex
 . sgn(<[x]>) * log(abs(<[x]>) + sqrt(1+<[x]>*<[x]>))
-@end ifinfo
+@end ifnottex
 @tex
 $$sign(x) \times ln\Bigl(|x| + \sqrt{1+x^2}\Bigr)$$
 @end tex

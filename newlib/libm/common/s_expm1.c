@@ -35,9 +35,9 @@ TRAD_SYNOPSIS
 DESCRIPTION
 	<<expm1>> and <<expm1f>> calculate the exponential of <[x]>
 	and subtract 1, that is,
-	@ifinfo
+	@ifnottex
 	e raised to the power <[x]> minus 1 (where e
-	@end ifinfo
+	@end ifnottex
 	@tex
 	$e^x - 1$ (where $e$
 	@end tex

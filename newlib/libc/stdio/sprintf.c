@@ -250,24 +250,24 @@ DESCRIPTION
 
 		o f
 		prints a signed value of the form <<[-]9999.9999>>; takes
-		a floating point number
+		a floating-point number
 	
 		o e
 		prints a signed	value of the form <<[-]9.9999e[+|-]999>>; takes a
-		floating point number
+		floating-point number
 
 		o E
 		prints the same way as <<e>>, but using <<E>> to introduce the
-		exponent; takes a floating point number
+		exponent; takes a floating-point number
 
 		o g
 		prints a signed value in either <<f>> or <<e>> form, based on given
 		value and precision---trailing zeros and the decimal point are
-		printed only if necessary; takes a floating point number
+		printed only if necessary; takes a floating-point number
 	
 		o G
 		prints the same way as <<g>>, but using <<E>> for the exponent if an
-		exponent is needed; takes a floating point number
+		exponent is needed; takes a floating-point number
 
 		o n
 		stores (in the same object) a count of the characters written;

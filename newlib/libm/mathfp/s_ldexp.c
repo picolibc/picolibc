@@ -28,9 +28,9 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
 <<ldexp>> calculates the value
-@ifinfo
+@ifnottex
 <[val]> times 2 to the power <[exp]>.
-@end ifinfo
+@end ifnottex
 @tex
 $val\times 2^{exp}$.
 @end tex

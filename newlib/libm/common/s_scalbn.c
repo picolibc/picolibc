@@ -13,7 +13,7 @@
 
 /*
 FUNCTION
-<<scalbn>>, <<scalbnf>>---scale by integer
+<<scalbn>>, <<scalbnf>>---scale by power of two
 INDEX
 	scalbn
 INDEX

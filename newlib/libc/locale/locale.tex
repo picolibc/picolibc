@@ -6,10 +6,10 @@ collating sequences and formatting conventions) that may be different
 depending on location or culture.  The @code{"C"} locale is the only
 one defined in the ANSI C standard.
 
-This is a minimal implementation, supporting only the required @code{``C''}
+This is a minimal implementation, supporting only the required @code{"C"}
 value for locale; strings representing other locales are not
-honored.  (@code{``''} is also accepted; it represents the default locale
-for an implementation, here equivalent to  @code{``C''}.
+honored.  (@code{""} is also accepted; it represents the default locale
+for an implementation, here equivalent to @code{"C"}.
 
 
 @file{locale.h} defines the structure @code{lconv} to collect the
@@ -18,13 +18,13 @@ information on a locale, with the following fields:
 @table @code
 @item char *decimal_point
 The decimal point character used to format ``ordinary'' numbers (all
-numbers except those referring to amounts of money).  @code{``.''} in the
+numbers except those referring to amounts of money).  @code{"."} in the
 C locale. 
 
 @item char *thousands_sep
 The character (if any) used to separate groups of digits, when
 formatting ordinary numbers.
-@code{``''} in the C locale.
+@code{""} in the C locale.
 
 @item char *grouping
 Specifications for how many digits to group (if any grouping is done at
@@ -33,36 +33,36 @@ character in the string represents the number of digits for the next
 group, and a value of @code{0} (that is, the string's trailing
 @code{NULL}) means to continue grouping digits using the last value
 specified.  Use @code{CHAR_MAX} to indicate that no further grouping is
-desired.  @code{``''} in the C locale. 
+desired.  @code{""} in the C locale. 
 
 @item char *int_curr_symbol
 The international currency symbol (first three characters), if any, and
 the character used to separate it from numbers.
-@code{``''} in the C locale.
+@code{""} in the C locale.
 
 @item char *currency_symbol
 The local currency symbol, if any.
-@code{``''} in the C locale.
+@code{""} in the C locale.
 
 @item char *mon_decimal_point
 The symbol used to delimit fractions in amounts of money.
-@code{``''} in the C locale.
+@code{""} in the C locale.
 
 @item char *mon_thousands_sep
 Similar to @code{thousands_sep}, but used for amounts of money.
-@code{``''} in the C locale.
+@code{""} in the C locale.
 
 @item char *mon_grouping
 Similar to @code{grouping}, but used for amounts of money.
-@code{``''} in the C locale.
+@code{""} in the C locale.
 
 @item char *positive_sign
 A string to flag positive amounts of money when formatting.
-@code{``''} in the C locale.
+@code{""} in the C locale.
 
 @item char *negative_sign
 A string to flag negative amounts of money when formatting.
-@code{``''} in the C locale.
+@code{""} in the C locale.
 
 @item char int_frac_digits
 The number of digits to display when formatting amounts of money to

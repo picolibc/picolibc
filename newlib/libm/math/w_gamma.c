@@ -76,9 +76,9 @@ $\mit ln\bigl(\Gamma(x)\bigr)$,
 the natural logarithm of the gamma function of <[x]>.  The gamma function
 (<<exp(gamma(<[x]>))>>) is a generalization of factorial, and retains
 the property that  
-@ifinfo
+@ifnottex
 <<exp(gamma(N))>> is equivalent to <<N*exp(gamma(N-1))>>.
-@end ifinfo
+@end ifnottex
 @tex
 $\mit \Gamma(N)\equiv N\times\Gamma(N-1)$.
 @end tex
@@ -87,10 +87,10 @@ quickly.  <<gamma>> is defined as
 @tex
 $\mit ln\bigl(\Gamma(x)\bigr)$ rather than simply $\mit \Gamma(x)$
 @end tex
-@ifinfo
+@ifnottex
 the natural log of the gamma function, rather than the gamma function
 itself, 
-@end ifinfo
+@end ifnottex
 to extend the useful range of results representable.
 
 The sign of the result is returned in the global variable <<signgam>>,
