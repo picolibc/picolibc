@@ -1,3 +1,13 @@
+2002-06-16  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.h (cygheap_user::winname): New field.
+	* cygheap.cc (cygheap_user::set_name): Clear winname when name changes.
+	* uinfo.cc (cygheap_user::env_logsrv): Avoid calculating server when
+	Windows user == SYSTEM.
+	(cygheap_user::env_domain): Set winname here too.
+	(cygheap_user::env_userprofile): Eliminate superfluous tests.
+	(cygheap_user::env_name): Seed winname by calling env_domain().
+
 2002-06-12  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* spawn.cc (spawn_guts): Revert removal of ciresrv.moreinfo->uid =

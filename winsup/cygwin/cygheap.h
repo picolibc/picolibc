@@ -103,6 +103,7 @@ class cygheap_user
   char  *pdomain;       /* Logon domain of the user */
   char  *homedrive;	/* User's home drive */
   char  *homepath;	/* User's home path */
+  char  *winname;	/* User's name as far as Windows knows it */
   PSID   psid;          /* buffer for user's SID */
   PSID   orig_psid;     /* Remains intact even after impersonation */
   static char homedrive_env_buf[3]; /* Where the HOMEDRIVE environment variable

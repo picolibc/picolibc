@@ -449,7 +449,9 @@ cygheap_user::set_name (const char *new_name)
     cfree (plogsrv);
   if (pdomain)
     cfree (pdomain);
-  plogsrv = pdomain = NULL;
+  if (winname)
+    cfree (winname);
+  plogsrv = pdomain = winname = NULL;
 }
 
 BOOL
