@@ -400,6 +400,14 @@ fhandler_disk_file::open (path_conv *real_path, int flags, mode_t mode)
       return 0;
     }
 
+  /* Attributes may be set only if a file is _really_ created.
+     This code is now only used for ntea here since the files
+     security attributes are set in CreateFile () now. */
+  if (flags & O_CREAT
+      && GetLastError () != ERROR_ALREADY_EXISTS
+      && !allow_ntsec && allow_ntea)
+    set_file_attribute (has_acls (), get_win32_name (), mode);
+
   /* Set newly created and truncated files as sparse files. */
   if ((real_path->fs_flags () & FILE_SUPPORTS_SPARSE_FILES)
       && (get_access () & GENERIC_WRITE) == GENERIC_WRITE

@@ -170,10 +170,12 @@ out:
 void __stdcall
 wait_for_sigthread ()
 {
-  assert (wait_sig_inited);
-  (void) WaitForSingleObject (wait_sig_inited, INFINITE);
-  (void) ForceCloseHandle (wait_sig_inited);
+  sigproc_printf ("wait_sig_inited %p", wait_sig_inited);
+  HANDLE hsig_inited = wait_sig_inited;
+  assert (hsig_inited);
+  (void) WaitForSingleObject (hsig_inited, INFINITE);
   wait_sig_inited = NULL;
+  (void) ForceCloseHandle1 (hsig_inited, wait_sig_inited);
 }
 
 /* Get the sync_proc_subproc muto to control access to
@@ -654,7 +656,8 @@ sig_send (_pinfo *p, int sig, DWORD ebp, bool exception)
     {
       if (no_signals_available ())
 	goto out;		// Either exiting or not yet initializing
-      assert (!wait_sig_inited);
+      if (wait_sig_inited)
+	wait_for_sigthread ();
       wait_for_completion = p != myself_nowait;
       p = myself;
     }

@@ -1,3 +1,11 @@
+2003-02-19  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.cc (fhandler_base::open): Move some filesystem specific
+	stuff.
+	(fhandler_disk_file::open): Accept some filesystem specific stuff.
+	* sigproc.cc (wait_for_sigthread): Become slightly more thread safe.
+	(sig_send): Don't assume that signal thread is ready.
+
 2003-02-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* wincap.h (wincap): Remove unnecessary definition of

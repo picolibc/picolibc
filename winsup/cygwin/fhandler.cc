@@ -455,36 +455,28 @@ fhandler_base::open (path_conv *pc, int flags, mode_t mode)
   x = CreateFile (get_win32_name (), access, shared, &sa, creation_distribution,
 		  file_attributes, 0);
 
-  syscall_printf ("%p = CreateFile (%s, %p, %p, %p, %p, %p, 0)",
-		  x, get_win32_name (), access, shared, &sa,
-		  creation_distribution, file_attributes);
-
   if (x == INVALID_HANDLE_VALUE)
     {
       if (!wincap.can_open_directories () && pc && pc->isdir ())
-	{
-	  if (flags & (O_CREAT | O_EXCL) == (O_CREAT | O_EXCL))
-	    set_errno (EEXIST);
-	  else if (flags & (O_WRONLY | O_RDWR))
-	    set_errno (EISDIR);
-	  else
-	    set_nohandle (true);
-	}
+       {
+	 if (flags & (O_CREAT | O_EXCL) == (O_CREAT | O_EXCL))
+	   set_errno (EEXIST);
+	 else if (flags & (O_WRONLY | O_RDWR))
+	   set_errno (EISDIR);
+	 else
+	   set_nohandle (true);
+       }
       else if (GetLastError () == ERROR_INVALID_HANDLE)
-	set_errno (ENOENT);
+       set_errno (ENOENT);
       else
-	__seterrno ();
+       __seterrno ();
       if (!get_nohandle ())
-	goto done;
-    }
+       goto done;
+   }
 
-  /* Attributes may be set only if a file is _really_ created.
-     This code is now only used for ntea here since the files
-     security attributes are set in CreateFile () now. */
-  if (flags & O_CREAT && get_device () == FH_DISK
-      && GetLastError () != ERROR_ALREADY_EXISTS
-      && !allow_ntsec && allow_ntea)
-    set_file_attribute (has_acls (), get_win32_name (), mode);
+  syscall_printf ("%p = CreateFile (%s, %p, %p, %p, %p, %p, 0)",
+		  x, get_win32_name (), access, shared, &sa,
+		  creation_distribution, file_attributes);
 
   set_io_handle (x);
   set_flags (flags, pc ? pc->binmode () : 0);
