@@ -237,36 +237,52 @@ file_exists (int verbose, char *filename, const char *alt, char *package)
 static bool
 check_package_files (int verbose, char *package)
 {
+  char filelist[MAX_PATH + 1] = "/etc/setup/";
+  strcat (strcat (filelist, package), ".lst.gz");
+  if (!file_exists (false, filelist, NULL, NULL))
+    {
+      if (verbose)
+	printf ("Missing file list /%s for package %s\n", filelist, package);
+      return false;
+    }
+
+  static char *zcat;
+  static char *zcat_end;
+  if (!zcat)
+    {
+      zcat = cygpath ("/bin/gzip.exe", NULL);
+      while (char *p = strchr (zcat, '/'))
+	*p = '\\';
+      zcat = (char *) realloc (zcat, strlen (zcat) + sizeof (" -dc ") + 4096);
+      zcat_end = strchr (strcat (zcat, " -dc "), '\0');
+    }
+
+  strcpy (zcat_end, filelist);
+  FILE *fp = popen (zcat, "rt");
+
   bool result = true;
-  char filelist[4096] = " -dc /etc/setup/";
-  strcat(strcat(filelist, package), ".lst.gz");
-  char *zcat = cygpath("/bin/gzip.exe", NULL);
-  char command[4096];
-  while (char *p = strchr (zcat, '/'))
-    *p = '\\';
-  strcat(strcpy(command, zcat), filelist);
-  FILE *fp = popen (command, "rt");
-  char buf[4096];
+  char buf[MAX_PATH + 1];
   while (fgets (buf, 4096, fp))
     {
       char *filename = strtok(buf, "\n");
-      if (filename[strlen(filename)-1] == '/')
+      if (filename[strlen (filename) - 1] == '/')
         {
-          if (!directory_exists(verbose, filename, package))
+          if (!directory_exists (verbose, filename, package))
             result = false;
         }
-      else if (!strncmp(filename, "etc/postinstall/", 16))
+      else if (!strncmp (filename, "etc/postinstall/", 16))
         {
-          if (!file_exists(verbose, filename, ".done", package))
+          if (!file_exists (verbose, filename, ".done", package))
             result = false;
         }
       else
         {
-          if (!file_exists(verbose, filename, ".lnk", package))
+          if (!file_exists (verbose, filename, ".lnk", package))
             result = false;
         }
     }
-  fclose(fp);
+
+  fclose (fp);
   return result;
 }
 

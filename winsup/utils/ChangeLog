@@ -1,3 +1,9 @@
+2003-08-09  Igor Pechtchanski  <pechtcha@cs.nyu.edu>
+	    Christopher Faylor  <cgf@redhat.com>
+
+	* dump_setup.cc (dump_setup): Check for the existence of the package
+	list file.  Rework slightly to use static buffer for popen commands.
+
 2003-08-07  Igor Pechtchanski  <pechtcha@cs.nyu.edu>
 	    Christopher Faylor  <cgf@redhat.com>
 
