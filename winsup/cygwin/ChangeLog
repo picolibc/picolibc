@@ -1,3 +1,7 @@
+2003-12-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/ipc.h: Include sys/types.h.
+
 2003-12-15  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* thread.cc (pthread::init_main_thread): Make sure that the main thread

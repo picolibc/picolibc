@@ -12,6 +12,8 @@ details. */
 #ifndef _CYGWIN_IPC_H
 #define _CYGWIN_IPC_H
 
+#include <sys/types.h>
+
 #ifdef __cplusplus
 extern "C"
 {
