@@ -1,6 +1,6 @@
 /* pwdgrp.h
 
-   Copyright 2001 Red Hat inc.
+   Copyright 2001, 2002, 2003 Red Hat inc.
 
    Stuff common to pwd and grp handling.
 
