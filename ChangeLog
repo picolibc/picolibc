@@ -1,3 +1,9 @@
+2004-01-14  Loren J. Rittle <ljrittle@acm.org>
+
+	* Makefile.def (target_modules) [libtermcap, libiberty, zlib]: Stage.
+	* Makefile.tpl (configure-target-[+module+]): Support stage.
+	* Makefile.in: Rebuilt.
+
 2003-01-14  Maciej W. Rozycki  <macro@ds2.pg.gda.pl>
 
 	* gettext.m4: Quote names of macros to be defined by AC_DEFUN
