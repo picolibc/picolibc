@@ -411,18 +411,18 @@ path_conv::check (const char *src, unsigned opt,
     {
       MALLOC_CHECK;
       assert (src);
-      char *p = strrchr (src, '/');
+
+      char *p = strrchr (src, '\0');
       /* Detect if the user was looking for a directory.  We have to strip the
 	 trailing slash initially and add it back on at the end due to Windows
 	 brain damage. */
-      if (p)
+      if (--p > src)
 	{
-	  if (p[1] == '\0' || strcmp (p, "/.") == 0)
+	  if (isdirsep (*p))
+	    need_directory = 1;
+	  else if (--p  > src && p[1] == '.' && isdirsep (*p))
 	    need_directory = 1;
 	}
-      else if ((p = strrchr (src, '\\')) &&
-	       (p[1] == '\0' || strcmp (p, "\\.") == 0))
-	need_directory = 1;
 
       is_relpath = !isabspath (src);
       error = normalize_posix_path (src, path_copy);

@@ -1,3 +1,7 @@
+Fri Jun 15 14:34:19 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (path_conv::check): Deal more robustly with foo/ behavior.
+
 Fri Jun 15 11:15:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler_tape.cc (fhandler_dev_tape::tape_status): Set size
