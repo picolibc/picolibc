@@ -1,3 +1,16 @@
+2001-08-01  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/stdlib.h (_wpgmptr): Don't declare ifndef __MSVCRT__.
+	* include/stdio.h (_IORW): Change constant to 0x0080.
+	(TMP_MAX): Add new define.
+	(_P_tmpdir): Ditto.
+	(_wP_tmpdir): Ditto.
+	(L_tmpnam): Change constant to 16.
+
+2001-06-28  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/malloc.h: Fix non-ANSI comment after #endif.
+
 2001-06-11  Danny Smith  <danny_r_smith_2001@yahoo.co.nz>
 
 	* profile/configure.in: Make msvcrt.dll version default.
@@ -11,6 +24,10 @@
 	* include/tchar.h (_tfopen): New _UNICODE define.
 	(_tgetenv): Ditto.
 	(_tsetlocale): Ditto.
+
+2001-06-04  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* profile/Makefile.in (mkinstalldirs): Correct relative path.
 
 2001-06-04  Earnie Boyd  <earnie@users.sourceforge.net>
 

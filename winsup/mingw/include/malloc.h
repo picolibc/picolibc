@@ -70,7 +70,7 @@ size_t	_msize (void*);
 }
 #endif
 
-#endif	RC_INVOKED
+#endif	/* RC_INVOKED */
 
 #endif /* Not _MALLOC_H_ */
 

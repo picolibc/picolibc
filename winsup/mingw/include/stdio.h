@@ -43,10 +43,11 @@
 #endif	/* Not RC_INVOKED */
 
 
-/* Some flags for the iobuf structure provided by <paag@tid.es> */
+/* Flags for the iobuf structure  */
 #define	_IOREAD	1
 #define	_IOWRT	2
-#define	_IORW	4
+#define	_IORW	0x0080 /* opened as "r+w" */
+
 
 /*
  * The three standard file pointers provided by the run time library.
@@ -74,14 +75,24 @@
  */
 #define FOPEN_MAX	(20)
 
+/* After creating this many names, tmpnam and tmpfile return NULL */
+#define TMP_MAX	32767
+/*
+ * Tmpnam, tmpfile and, sometimes, _tempnam try to create
+ * temp files in the root directory of the current drive
+ * (not in pwd, as suggested by some older MS doc's).
+ * Redefining these macros does not effect the CRT functions.
+ */
+#define _P_tmpdir   "\\"
+#define _wP_tmpdir  L"\\"
+
 /*
  * The maximum size of name (including NUL) that will be put in the user
  * supplied buffer caName for tmpnam.
- * NOTE: This has not been determined by experiment, but based on the
- * maximum file name length above it is probably reasonable. I could be
- * wrong...
+ * Inferred from the size of the static buffer returned by tmpnam
+ * when passed a NULL argument. May actually be smaller.
  */
-#define	L_tmpnam	(260)
+#define L_tmpnam (16)
 
 #define _IOFBF		0x0000
 #define _IOLBF		0x0040
