@@ -278,7 +278,7 @@ _pinfo::set_ctty (tty_min *tc, int flags, fhandler_tty_slave *arch)
 	tc->setpgid (pgid);
       if (cygheap->ctty != arch)
 	{
-	  if (cygheap->ctty)
+	  if (!cygheap->ctty)
 	    syscall_printf ("ctty NULL");
 	  else
 	    {

@@ -1,5 +1,9 @@
 2003-12-11  Christopher Faylor  <cgf@redhat.com>
 
+	* pinfo.cc (_pinfo::set_ctty): Correct stupid typo.
+
+2003-12-11  Christopher Faylor  <cgf@redhat.com>
+
 	* cygheap.h (cygheap_types): Add HEAP_ARCHETYPES.
 	(init_cheap::ctty): Change to pointer.
 	* dtable.h (dtable::find_archetype): Declare new function.
