@@ -500,19 +500,22 @@ typedef enum elf_hppa_reloc_type elf_hppa_reloc_type;
 
 /* Processor specific dynamic array tags.  */
 
-#define DT_HP_LOAD_MAP		(DT_LOOS + 0x0)
-#define DT_HP_DLD_FLAGS		(DT_LOOS + 0x1)
-#define DT_HP_DLD_HOOK		(DT_LOOS + 0x2)
-#define DT_HP_UX10_INIT		(DT_LOOS + 0x3)
-#define DT_HP_UX10_INITSZ	(DT_LOOS + 0x4)
-#define DT_HP_PREINIT		(DT_LOOS + 0x5)
-#define DT_HP_PREINITSZ		(DT_LOOS + 0x6)
-#define DT_HP_NEEDED		(DT_LOOS + 0x7)
-#define DT_HP_TIME_STAMP	(DT_LOOS + 0x8)
-#define DT_HP_CHECKSUM		(DT_LOOS + 0x9)
-#define DT_HP_GST_SIZE		(DT_LOOS + 0xa)
-#define DT_HP_GST_VERSION	(DT_LOOS + 0xb)
-#define DT_HP_GST_HASHVAL	(DT_LOOS + 0xc)
+/* Arggh.  HP's tools define these symbols based on the
+   old value of DT_LOOS.  So we must do the same to be
+   compatible.  */
+#define DT_HP_LOAD_MAP		(OLD_DT_LOOS + 0x0)
+#define DT_HP_DLD_FLAGS		(OLD_DT_LOOS + 0x1)
+#define DT_HP_DLD_HOOK		(OLD_DT_LOOS + 0x2)
+#define DT_HP_UX10_INIT		(OLD_DT_LOOS + 0x3)
+#define DT_HP_UX10_INITSZ	(OLD_DT_LOOS + 0x4)
+#define DT_HP_PREINIT		(OLD_DT_LOOS + 0x5)
+#define DT_HP_PREINITSZ		(OLD_DT_LOOS + 0x6)
+#define DT_HP_NEEDED		(OLD_DT_LOOS + 0x7)
+#define DT_HP_TIME_STAMP	(OLD_DT_LOOS + 0x8)
+#define DT_HP_CHECKSUM		(OLD_DT_LOOS + 0x9)
+#define DT_HP_GST_SIZE		(OLD_DT_LOOS + 0xa)
+#define DT_HP_GST_VERSION	(OLD_DT_LOOS + 0xb)
+#define DT_HP_GST_HASHVAL	(OLD_DT_LOOS + 0xc)
 
 /* Values for DT_HP_DLD_FLAGS.  */
 #define DT_HP_DEBUG_PRIVATE		0x0001 /* Map text private */
