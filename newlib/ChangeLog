@@ -1,5 +1,10 @@
 2005-03-06  Ralf Corsepious  <ralf.corsepius@rtems.org>
 
+	* libc/sys/rtems/include/inttypes.h: New file.
+	* libc/sys/rtems/include/stdint.h: Ditto.
+
+2005-03-06  Ralf Corsepious  <ralf.corsepius@rtems.org>
+
 	* libc/string/memcmp.c: Fix to avoid pointer signedness warning.
 
 2005-03-06  Ralf Corsepious  <ralf.corsepius@rtems.org>
