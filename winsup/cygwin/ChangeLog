@@ -1,3 +1,8 @@
+Wed Jul 19 22:24:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* spawn.cc (spawn_guts): Don't restore impersonation in case
+	of _P_OVERLAY. Clean up slightly. Accomodate comments.
+
 Wed Jul 19 22:11:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* shared.h (class pinfo): New members `root' and `rootlen'.

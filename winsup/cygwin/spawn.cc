@@ -525,9 +525,6 @@ skip_arg_parsing:
       strcat (wstname, "\\");
       strcat (wstname, dskname);
       si.lpDesktop = wstname;
-      /* force the new process to reread /etc/passwd and /etc/group */
-      child->uid = USHRT_MAX;
-      child->username[0] = '\0';
 
       char tu[1024];
       PSID sid = NULL;
@@ -545,8 +542,9 @@ skip_arg_parsing:
         seteuid (myself->orig_uid);
 
       /* Set child->uid to USHRT_MAX to force calling internal_getlogin()
-         from child process. Set psid to NULL to play it safe. */
+         from child process. Clear username and psid to play it safe. */
       child->uid = USHRT_MAX;
+      child->username[0] = '\0';
       child->psid = NULL;
 
       /* Load users registry hive. */
@@ -567,8 +565,10 @@ skip_arg_parsing:
 		       0,	/* use current drive/directory */
 		       &si,
 		       &pi);
-      /* Restore impersonation */
-      if (myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
+      /* Restore impersonation. In case of _P_OVERLAY this isn't
+         allowed since it would overwrite child data. */
+      if (mode != _P_OVERLAY
+          && myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
         seteuid (uid);
     }
   else
