@@ -1,3 +1,19 @@
+2004-11-04 Jan Beulich <jbeulich@novell.com>
+
+	* i386.h (sldx_Suf): Remove.
+	(FP, l_FP, sl_FP, x_FP): Don't imply IgnoreSize.
+	(q_FP): Define, implying no REX64.
+	(x_FP, sl_FP): Imply FloatMF.
+	(i386_optab): Split reg and mem forms of moving from segment registers
+	so that the memory forms can ignore the 16-/32-bit operand size
+	distinction. Adjust a few others for Intel mode. Remove *FP uses from
+	all non-floating-point instructions. Unite 32- and 64-bit forms of
+	movsx, movzx, and movd. Adjust floating point operations for the above
+	changes to the *FP macros. Add DefaultSize to floating point control
+	insns operating on larger memory ranges. Remove left over comments
+	hinting at certain insns being Intel-syntax ones where the ones
+	actually meant are already gone.
+
 2004-10-07  Tomer Levi  <Tomer.Levi@nsc.com>
 
 	* crx.h: Add COPS_REG_INS - Coprocessor Special register
