@@ -1,5 +1,15 @@
 2002-10-13  Christopher Faylor  <cgf@redhat.com>
 
+	* spawn.cc (spawn_guts): Fix so that cygthread::terminate is *really*
+	called only for exec.
+
+2002-10-13  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::stub): Don't zero __name here.  That
+	introduces a race.
+
+2002-10-13  Christopher Faylor  <cgf@redhat.com>
+
 	* cygthread.cc (cygthread::stub): Don't create event for long-running
 	threads.  Initialize thread_sync event here which is used to Suspend
 	using an event rather than relying on SuspendThread/ResumeThread.
