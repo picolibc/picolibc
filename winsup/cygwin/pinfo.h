@@ -168,9 +168,10 @@ public:
 #ifndef _SIGPROC_H
   int remember () {system_printf ("remember is not here"); return 0;}
 #else
-  int remember ()
+  int remember (bool detach)
   {
-    int res = proc_subproc (PROC_ADDCHILD, (DWORD) this);
+    int res = proc_subproc (detach ? PROC_DETACHED_CHILD : PROC_ADDCHILD,
+			    (DWORD) this);
     destroy = res ? false : true;
     return res;
   }

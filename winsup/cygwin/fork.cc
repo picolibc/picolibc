@@ -413,7 +413,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
      it in afterwards.  This requires more bookkeeping than I like, though,
      so we'll just do it the easy way.  So, terminate any child process if
      we can't actually record the pid in the internal table. */
-  if (!child.remember ())
+  if (!child.remember (false))
     {
       TerminateProcess (pi.hProcess, 1);
       set_errno (EAGAIN);

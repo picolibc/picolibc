@@ -1,3 +1,23 @@
+2004-12-23  Christopher Faylor  <cgf@timesys.com>
+
+	* cygthread.cc (cygthread::stub): Detect if thread function wants to
+	release itself here, to avoid a race.
+	(cygthread::release): Clear more stuff.  Add a diagnostic for an
+	internal error.
+	* cygthread.h (auto_release): New function.
+	* pinfo.h (pinfo::remember): Add an argument to denote whether child is
+	detached.
+	* fork.cc (fork_parent): Reflect change in arguments to
+	pinfo::remember.
+	* pinfo.cc (_pinfo::exit): Signal exit more forcibly.
+	(proc_waiter): Use cygthread::auto_release to signify that
+	cygthread::stub should release the thread.  This should avoid a race.
+	(pinfo::alert_parent): Don't signify an error when wr_proc_pipe == NULL.
+	* sigproc.cc (proc_subproc): Add support for PROC_DETACHED_CHILD.
+	* sigproc.h: Ditto.
+	* spawn.cc (spawn_guts): Specify whether child is detached or not when
+	calling pinfo::remember.
+
 2004-12-22  Christopher Faylor  <cgf@timesys.com>
 
 	* cygheap.cc (cygheap_setup_for_child): Add api_fatal to catch failing

@@ -38,8 +38,6 @@ details. */
 #define WSSC		  60000	// Wait for signal completion
 #define WPSP		  40000	// Wait for proc_subproc mutex
 
-#define PSIZE 63		// Number of processes
-
 #define no_signals_available() (!hwait_sig || (myself->sendsig == INVALID_HANDLE_VALUE) || exit_state)
 
 #define NPROCS	256
@@ -246,7 +244,9 @@ proc_subproc (DWORD what, DWORD val)
 	  set_errno (EAGAIN);
 	  break;
 	}
+      /* fall through intentionally */
 
+    case PROC_DETACHED_CHILD:
       if (vchild != myself)
 	{
 	  vchild->ppid = myself->pid;
@@ -258,6 +258,8 @@ proc_subproc (DWORD what, DWORD val)
 	  vchild->cygstarted = true;
 	  vchild->process_state |= PID_INITIALIZING | (myself->process_state & PID_USETTY);
 	}
+      if (what == PROC_DETACHED_CHILD)
+	break;
       procs[nprocs] = vchild;
       rc = procs[nprocs].wait ();
       if (rc)

@@ -802,7 +802,7 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	this). */
       if (!myself->wr_proc_pipe)
        {
-	 myself.remember ();
+	 myself.remember (true);
 	 wait_for_myself = true;
 	 myself->wr_proc_pipe = INVALID_HANDLE_VALUE;
        }
@@ -822,14 +822,6 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	}
       child->dwProcessId = pi.dwProcessId;
       child.hProcess = pi.hProcess;
-      if (!child.remember ())
-	{
-	  /* FIXME: Child in strange state now. */
-	  CloseHandle (pi.hProcess);
-	  CloseHandle (pi.hThread);
-	  res = -1;
-	  goto out;
-	}
 
       strcpy (child->progname, real_path);
       /* FIXME: This introduces an unreferenced, open handle into the child.
@@ -839,9 +831,15 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 	 However, we should try to find another way to do this eventually. */
       (void) DuplicateHandle (hMainProc, child.shared_handle (), pi.hProcess,
 			      NULL, 0, 0, DUPLICATE_SAME_ACCESS);
-      if (mode == _P_DETACH)
-	myself.alert_parent (0);
       child->start_time = time (NULL); /* Register child's starting time. */
+      if (!child.remember (mode == _P_DETACH))
+	{
+	  /* FIXME: Child in strange state now */
+	  CloseHandle (pi.hProcess);
+	  ForceCloseHandle (pi.hThread);
+	  res = -1;
+	  goto out;
+	}
     }
 
 /* Start the child running */
@@ -867,7 +865,7 @@ switch (mode)
       res = -1;
     break;
   case _P_DETACH:
-    res = 0;	/* Lose all memory of this child. */
+    res = 0;	/* Lost all memory of this child. */
     break;
   case _P_NOWAIT:
   case _P_NOWAITO:

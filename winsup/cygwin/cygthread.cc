@@ -69,13 +69,21 @@ cygthread::stub (VOID *arg)
 	  info->func (info->arg == cygself ? info : info->arg);
 	  /* ...so the above should always return */
 
+	  /* If stack_ptr is NULL, the above function has set that to indicate
+	     that it doesn't want to alert anyone with a SetEvent and should
+	     just be marked as no longer inuse.  Hopefully the function knows
+	     that it is doing.  */
+	  if (!info->func)
+	    info->release (false);
+	  else
+	    {
 #ifdef DEBUGGING
-	  info->func = NULL;	// catch erroneous activation
-	  info->__oldname = info->__name;
+	      info->func = NULL;	// catch erroneous activation
+	      info->__oldname = info->__name;
 #endif
-	  info->__name = NULL;
-	  if (info->inuse)
-	    SetEvent (info->ev);
+	      info->__name = NULL;
+	      SetEvent (info->ev);
+	    }
 	}
       switch (WaitForSingleObject (info->thread_sync, INFINITE))
 	{
@@ -231,7 +239,13 @@ cygthread::release (bool nuke_h)
   __oldname = __name;
   __name = NULL;
   stack_ptr = NULL;
-  (void) InterlockedExchange (&inuse, 0); /* No longer in use */
+  func = NULL;
+  if (!InterlockedExchange (&inuse, 0))
+#ifdef DEBUGGING
+    api_fatal ("released a thread that was not inuse");
+#else
+    system_printf ("released a thread that was not inuse");
+#endif
 }
 
 /* Forcibly terminate a thread. */

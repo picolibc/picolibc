@@ -135,8 +135,8 @@ _pinfo::exit (UINT n, bool norecord)
 	  /* We could just let this happen automatically when the process
 	     exits but this should gain us a microsecond or so by notifying
 	     the parent early.  */
-	  if (wr_proc_pipe)
-	    CloseHandle (wr_proc_pipe);
+	  myself.alert_parent (0);
+	    
 	}
     }
 
@@ -764,7 +764,7 @@ proc_waiter (void *arg)
 
   sigproc_printf ("exiting wait thread for pid %d", pid);
   vchild.wait_thread = NULL;
-  _my_tls._ctinfo->release (false);	/* return the cygthread to the cygthread pool */
+  _my_tls._ctinfo->auto_release ();	/* automatically return the cygthread to the cygthread pool */
   return 0;
 }
 
@@ -816,10 +816,10 @@ pinfo::alert_parent (char sig)
   DWORD nb = 0;
   /* Send something to our parent.  If the parent has gone away,
      close the pipe. */
-  if (myself->wr_proc_pipe == INVALID_HANDLE_VALUE)
+  if (myself->wr_proc_pipe == INVALID_HANDLE_VALUE
+      || !myself->wr_proc_pipe)
     /* no parent */;
-  else if (myself->wr_proc_pipe
-	   && WriteFile (myself->wr_proc_pipe, &sig, 1, &nb, NULL))
+  else if (WriteFile (myself->wr_proc_pipe, &sig, 1, &nb, NULL))
     /* all is well */;
   else if (GetLastError () != ERROR_BROKEN_PIPE)
     debug_printf ("sending %d notification to parent failed, %E", sig);
