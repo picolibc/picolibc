@@ -1,3 +1,8 @@
+Sun Apr 16 12:45:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * libc/posix/execvp.c (execvp): Check path for
+        trailing slash.
+
 Fri Mar 31 20:39:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
         * libc/include/sys/unistd.h: Add prototypes for

@@ -73,7 +73,7 @@ _DEFUN (execvp, (file, argv),
     {
       strccpy (buf, path, PATH_DELIM);
       /* An empty entry means the current directory.  */
-      if (*buf != 0)
+      if (*buf != 0 && buf[strlen(buf) - 1] != '/')
 	strcat (buf, "/");
       strcat (buf, file);
       if (execv (buf, argv) == -1 && errno != ENOENT)
