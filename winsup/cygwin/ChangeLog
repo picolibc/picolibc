@@ -1,3 +1,10 @@
+Sun Oct 22 12:07:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* pinfo.cc (pinfo_init): Eliminate call to `set_process_privileges'.
+	* security.cc (write_sd): Call `set_process_privileges' on the first
+	call to `write_sd'.
+	(set_process_privileges): Eliminate adjusting SE_BACKUP_NAME privilege.
+
 Sat Oct 21 16:57:23 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* pinfo.cc (pinfo::init): Make PID_EXECED signal creation as well as

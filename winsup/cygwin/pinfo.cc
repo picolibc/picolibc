@@ -109,11 +109,6 @@ pinfo_init (char **envp, int envc)
       environ_init (NULL, 0);	/* call after myself has been set up */
     }
 
-  /* Allow backup semantics. It's better done only once on process start
-     instead of each time a file is opened. */
-  if (allow_ntsec)
-    set_process_privileges ();
-
   debug_printf ("pid %d, pgid %d", myself->pid, myself->pgid);
 }
 

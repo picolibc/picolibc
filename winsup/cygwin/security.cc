@@ -540,6 +540,14 @@ write_sd(const char *file, PSECURITY_DESCRIPTOR sd_buf, DWORD sd_size)
       return -1;
     }
 
+  /* No need to be thread save. */
+  static BOOL first_time = TRUE;
+  if (first_time)
+    {
+      set_process_privileges ();
+      first_time = FALSE;
+    }
+
   HANDLE fh;
   fh = CreateFile (file,
 		   WRITE_OWNER | WRITE_DAC,
@@ -604,14 +612,10 @@ set_process_privileges ()
 {
   HANDLE hToken = NULL;
   LUID restore_priv;
-  LUID backup_priv;
-  char buf[sizeof (TOKEN_PRIVILEGES) + 2 * sizeof (LUID_AND_ATTRIBUTES)];
-  TOKEN_PRIVILEGES *new_priv = (TOKEN_PRIVILEGES *) buf;
+  TOKEN_PRIVILEGES new_priv;
   int ret = -1;
 
-  if (! OpenProcessToken (hMainProc,
-			  TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES,
-			  &hToken))
+  if (! OpenProcessToken (hMainProc, TOKEN_ADJUST_PRIVILEGES, &hToken))
     {
       __seterrno ();
       goto out;
@@ -622,28 +626,18 @@ set_process_privileges ()
       __seterrno ();
       goto out;
     }
-  if (! LookupPrivilegeValue (NULL, SE_BACKUP_NAME, &backup_priv))
-    {
-      __seterrno ();
-      goto out;
-    }
 
-  new_priv->PrivilegeCount = 2;
-  new_priv->Privileges[0].Luid = restore_priv;
-  new_priv->Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-  new_priv->Privileges[1].Luid = backup_priv;
-  new_priv->Privileges[1].Attributes = SE_PRIVILEGE_ENABLED;
+  new_priv.PrivilegeCount = 1;
+  new_priv.Privileges[0].Luid = restore_priv;
+  new_priv.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
 
-  if (! AdjustTokenPrivileges (hToken, FALSE, new_priv, 0, NULL, NULL))
+  if (! AdjustTokenPrivileges (hToken, FALSE, &new_priv, 0, NULL, NULL))
     {
       __seterrno ();
       goto out;
     }
 
   ret = 0;
-
-  if (ret == -1)
-    __seterrno ();
 
 out:
   if (hToken)
