@@ -209,7 +209,7 @@ int	_EXFUN(fileno, (FILE *));
 int	_EXFUN(getw, (FILE *));
 int	_EXFUN(pclose, (FILE *));
 FILE *  _EXFUN(popen, (const char *, const char *));
-int	_EXFUN(putw, (int w, FILE *));
+int	_EXFUN(putw, (int, FILE *));
 void    _EXFUN(setbuffer, (FILE *, char *, int));
 int	_EXFUN(setlinebuf, (FILE *));
 #endif

@@ -1,3 +1,7 @@
+2001-02-08  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/stdio.h: Revert putw prototype.
+
 2001-02-08  Edward M. Lee  <tailbert@yahoo.com>
 
         * libc/include/grp.h: add prototype for initgroups.
