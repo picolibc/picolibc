@@ -1941,8 +1941,6 @@ pthread::cancel (pthread_t thread)
 void
 pthread::atforkprepare (void)
 {
-  MT_INTERFACE->fixup_before_fork ();
-
   callback *cb = MT_INTERFACE->pthread_prepare;
   while (cb)
     {
@@ -1951,6 +1949,8 @@ pthread::atforkprepare (void)
     }
 
   __fp_lock_all ();
+
+  MT_INTERFACE->fixup_before_fork ();
 }
 
 void

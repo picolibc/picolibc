@@ -1,3 +1,8 @@
+2004-03-29  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.cc (pthread::atforkprepare): Call
+	MT_INTERFACE->fixup_before_fork at the end of atforkprepare.
+
 2004-03-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (wsock_event::wait): Change scope of local "len" variable.
