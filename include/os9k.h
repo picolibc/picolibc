@@ -10,7 +10,7 @@
 #define M_PARITY N_M_PARITY
 
 #ifdef _MPF68K
-#define MODSYNC 0x4afd      /* module header sync code for 680x0 processors */
+#define MODSYNC 0x4afc      /* module header sync code for 680x0 processors */
 #endif
 
 #ifdef _MPF386
@@ -18,7 +18,7 @@
 #endif
 
 #define MODREV	1			/* module format revision 1 */
-#define CRCCON	0x800fe3	/* crc polynomial constant */
+#define CRCCON	0x800063	/* crc polynomial constant */
 
 /* Module access permission values */
 #define MP_OWNER_READ	0x0001
