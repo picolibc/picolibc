@@ -88,7 +88,7 @@ check_and_dup_handle (HANDLE from_process, HANDLE to_process,
 		      HANDLE from_process_token,
                       DWORD access,
                       HANDLE from_handle,
-                      HANDLE* to_handle_ptr, BOOL bInheritHandle)
+                      HANDLE* to_handle_ptr, BOOL bInheritHandle = FALSE)
 {
   HANDLE local_handle = NULL;
   int ret_val = EACCES;
@@ -143,6 +143,7 @@ check_and_dup_handle (HANDLE from_process, HANDLE to_process,
       printf ( "error getting handle to client (%lu)\n", GetLastError ());
       goto out;
     }
+  debug_printf ("Duplicated %p to %p\n", from_handle, *to_handle_ptr);
 
   ret_val = 0;
                     
@@ -151,16 +152,6 @@ out:
     CloseHandle (local_handle);
 
   return (ret_val);
-}
-
-int
-check_and_dup_handle (HANDLE from_process, HANDLE to_process,
-                      HANDLE from_process_token,
-                      DWORD access,
-                      HANDLE from_handle,
-                      HANDLE* to_handle_ptr)
-{
-  return check_and_dup_handle(from_process,to_process,from_process_token,access,from_handle,to_handle_ptr,FALSE);
 }
 
 void
@@ -186,11 +177,9 @@ client_request_attach_tty::serve(transport_layer_base *conn, class process_cache
       return;
     }
 
-#if DEBUG
-  printf ("pid %ld:(%p,%p) -> pid %ld\n", req.master_pid,
+  debug_printf ("pid %ld:(%p,%p) -> pid %ld\n", req.master_pid,
   	  			req.from_master, req.to_master,
 				req.pid);
-#endif
 
   debug_printf ("opening process %ld\n", req.master_pid);
   from_process_handle = OpenProcess (PROCESS_DUP_HANDLE, FALSE, req.master_pid);
@@ -226,7 +215,7 @@ client_request_attach_tty::serve(transport_layer_base *conn, class process_cache
                             token_handle,
                             GENERIC_READ,
                             req.from_master,
-                            &req.from_master) != 0)
+                            &req.from_master, TRUE) != 0)
     {
       printf ("error duplicating from_master handle (%lu)\n", GetLastError ());
       header.error_code = EACCES;
@@ -239,7 +228,7 @@ client_request_attach_tty::serve(transport_layer_base *conn, class process_cache
 				token_handle,
 				GENERIC_WRITE,
 				req.to_master,
-				&req.to_master) != 0)
+				&req.to_master, TRUE) != 0)
 	{
 	  printf ("error duplicating to_master handle (%lu)\n", GetLastError ());
 	  header.error_code = EACCES;

@@ -1,3 +1,12 @@
+2002-01-17  Robert Collins  <rbtcollins@hotmail.com>
+
+	* cygserver.cc (check_and_dup_handle): Consolidate the two variants for 
+	simplicity.
+	Add Some basic debug output.
+	(client_request_attach_tty::serve): Use the new debug_printf for clarity.
+	Mark the duplicated handles as inheritable - fixup_after_fork() doesn't reopen
+	tty's.
+
 2002-01-16  Robert Collins  <rbtcollins@hotmail.com>
 
 	* cygserver.cc (transport): Correct scope.
