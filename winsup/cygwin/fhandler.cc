@@ -615,7 +615,7 @@ fhandler_base::write (const void *ptr, size_t len)
   int res;
 
   if (get_append_p ())
-    SetFilePointer (get_handle (), 0, 0, FILE_END);
+    SetFilePointer (get_output_handle (), 0, 0, FILE_END);
   else if (get_did_lseek ())
     {
       _off64_t actual_length, current_position;
@@ -624,10 +624,10 @@ fhandler_base::write (const void *ptr, size_t len)
 
       set_did_lseek (0); /* don't do it again */
 
-      actual_length = GetFileSize (get_handle (), &size_high);
+      actual_length = GetFileSize (get_output_handle (), &size_high);
       actual_length += ((_off64_t) size_high) << 32;
 
-      current_position = SetFilePointer (get_handle (), 0, &pos_high,
+      current_position = SetFilePointer (get_output_handle (), 0, &pos_high,
 					 FILE_CURRENT);
       current_position += ((_off64_t) pos_high) << 32;
 
@@ -640,7 +640,7 @@ fhandler_base::write (const void *ptr, size_t len)
 	         is writing after a long seek beyond EOF, convert the file to
 		 a sparse file. */
 	      DWORD dw;
-	      HANDLE h = get_handle ();
+	      HANDLE h = get_output_handle ();
 	      BOOL r = DeviceIoControl (h, FSCTL_SET_SPARSE, NULL, 0, NULL,
 	      				0, &dw, NULL);
 	      syscall_printf ("%d = DeviceIoControl(%p, FSCTL_SET_SPARSE, "
@@ -657,20 +657,20 @@ fhandler_base::write (const void *ptr, size_t len)
 	      char zeros[512];
 	      int number_of_zeros_to_write = current_position - actual_length;
 	      memset (zeros, 0, 512);
-	      SetFilePointer (get_handle (), 0, NULL, FILE_END);
+	      SetFilePointer (get_output_handle (), 0, NULL, FILE_END);
 	      while (number_of_zeros_to_write > 0)
 		{
 		  DWORD zeros_this_time = (number_of_zeros_to_write > 512
 					 ? 512 : number_of_zeros_to_write);
 		  DWORD written;
-		  if (!WriteFile (get_handle (), zeros, zeros_this_time,
+		  if (!WriteFile (get_output_handle (), zeros, zeros_this_time,
 				  &written, NULL))
 		    {
 		      __seterrno ();
 		      if (get_errno () == EPIPE)
 			raise (SIGPIPE);
 		      /* This might fail, but it's the best we can hope for */
-		      SetFilePointer (get_handle (), current_position, NULL,
+		      SetFilePointer (get_output_handle (), current_position, NULL,
 				      FILE_BEGIN);
 		      return -1;
 
@@ -679,7 +679,7 @@ fhandler_base::write (const void *ptr, size_t len)
 		    {
 		      set_errno (ENOSPC);
 		      /* This might fail, but it's the best we can hope for */
-		      SetFilePointer (get_handle (), current_position, NULL,
+		      SetFilePointer (get_output_handle (), current_position, NULL,
 				      FILE_BEGIN);
 		      return -1;
 		    }
@@ -886,7 +886,7 @@ fhandler_base::lseek (_off64_t offset, int whence)
       set_readahead_valid (0);
     }
 
-  debug_printf ("lseek (%s, %D, %d)", unix_path_name, offset, whence);
+  debug_printf ("lseek (%s, %D, %d)", get_name (), offset, whence);
 
   DWORD win32_whence = whence == SEEK_SET ? FILE_BEGIN
 		       : (whence == SEEK_CUR ? FILE_CURRENT : FILE_END);

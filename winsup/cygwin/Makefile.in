@@ -50,6 +50,7 @@ DEFS:=@DEFS@
 
 # cygheap_CFLAGS:=-fomit-frame-pointer
 malloc_CFLAGS:=-fomit-frame-pointer
+malloc_wrapper_CFLAGS:=-fomit-frame-pointer
 shared_CFLAGS:=-fomit-frame-pointer
 cygthread_CFLAGS:=-fomit-frame-pointer
 miscfuncs_CFLAGS:=-fomit-frame-pointer

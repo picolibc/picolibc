@@ -846,7 +846,6 @@ _lseek = lseek
 _lseek64 = lseek64
 _lstat64 = lstat64
 mallinfo
-mallinfo
 malloc
 _malloc = malloc
 malloc_stats

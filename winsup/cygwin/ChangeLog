@@ -1,5 +1,17 @@
 2003-09-13  Christopher Faylor  <cgf@redhat.com>
 
+	* Makefile.in: Make malloc_wrapper -fomit-frame-pointer.
+
+	* cygwin.din: Remove extraneous mallinfo definition.
+
+	* dcrt0.cc (quoted): Use strechr for efficiency.
+
+	* fhandler.cc (fhandler_base::write): Correctly use get_output_handle
+	rather than get_handle.
+	(fhandler_base::lseek): Use method for accessing name in debug output.
+
+2003-09-13  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler_disk_file.cc (path_conv::ndisk_links): Fix potential
 	off-by-one problem when first file in a directory is a directory.
 
