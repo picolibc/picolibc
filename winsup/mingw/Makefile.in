@@ -29,6 +29,7 @@ host_alias = @host_alias@
 build_alias = @build_alias@
 target_alias = @target_alias@
 prefix = @prefix@
+conf_prefix = @prefix@
 
 program_transform_name = @program_transform_name@
 exec_prefix = @exec_prefix@
@@ -286,6 +287,12 @@ ifneq (,$(findstring cygwin, $(target_alias)))
   TARFILEEXT = .tar.bz2
 endif
 
+ifneq (,$(findstring mingw, $(target_alias)))
+    dist_prefix =
+else
+    dist_prefix = $(conf_prefix)
+endif
+
 dist: srcdist bindist
 
 srcdist:
@@ -312,7 +319,7 @@ bindist:
 	rm -rf $(distdir)
 	mkdir $(distdir)
 	chmod 755 $(distdir)
-	$(MAKE) install prefix=$(shell pwd)/$(distdir)
+	$(MAKE) install prefix=$(shell pwd)/$(distdir)$(dist_prefix)
 	rm -f $(distdir).tar.gz
 	cd $(distdir); \
 	$(TAR) $(TARFLAGS)cf ../$(distdir)$(TARFILEEXT) *
