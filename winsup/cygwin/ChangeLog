@@ -1,3 +1,7 @@
+Sat Dec  2 22:26:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* net.cc (get_inet_addr ): Close AF_UNIX socket file after reading.
+
 Wed Nov 29 18:25:53 2000  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
 	* cygheap.cc (chgheap_root::operator =): Check root dir properly.

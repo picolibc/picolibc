@@ -387,22 +387,26 @@ static int get_inet_addr (const struct sockaddr *in, int inlen,
     }
   else if (in->sa_family == AF_UNIX)
     {
-      sockaddr_in sin;
-      char buf[32];
-
-      memset (buf, 0, sizeof buf);
-      int fd = open (in->sa_data, O_RDONLY);
+      int fd = _open (in->sa_data, O_RDONLY);
       if (fd == -1)
 	return 0;
-      if (read (fd, buf, sizeof buf) == -1)
-	return 0;
-      sin.sin_family = AF_INET;
-      sscanf (buf + strlen (SOCKET_COOKIE), "%hu", &sin.sin_port);
-      sin.sin_port = htons (sin.sin_port);
-      sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
-      *out = sin;
-      *outlen = sizeof sin;
-      return 1;
+
+      int ret = 0;
+      char buf[32];
+      memset (buf, 0, sizeof buf);
+      if (read (fd, buf, sizeof buf) != -1)
+        {
+	  sockaddr_in sin;
+	  sin.sin_family = AF_INET;
+	  sscanf (buf + strlen (SOCKET_COOKIE), "%hu", &sin.sin_port);
+	  sin.sin_port = htons (sin.sin_port);
+	  sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
+	  *out = sin;
+	  *outlen = sizeof sin;
+	  ret = 1;
+        }
+      _close (fd);
+      return ret;
     }
   else
     {
