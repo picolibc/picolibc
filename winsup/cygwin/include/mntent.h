@@ -15,11 +15,13 @@ struct mntent
   int mnt_passno;
 };
 
+#ifndef _NOMNTENT_FUNCS
 FILE *setmntent (const char *__filep, const char *__type);
 struct mntent *getmntent (FILE *__filep);
 int addmntent (FILE *__filep, const struct mntent *__mnt);
 int endmntent (FILE *__filep);
 char *hasmntopt (const struct mntent *__mnt, const char *__opt);
+#endif
 
 /* This next file doesn't exist, it is in the registry,
    however applications need the define to pass to

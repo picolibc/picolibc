@@ -1,3 +1,8 @@
+Tue Aug 22 11:08:11 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* include/sys/cygwin.h: Declare some thread classes.
+	* include/mntent.h: Avoid declaring functions.
+
 Tue Aug 22 01:08:01 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* winsup.h: Eliminate inclusion of most of the cygwin .h files.  Use .h

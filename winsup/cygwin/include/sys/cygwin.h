@@ -109,6 +109,9 @@ enum
    SIZEOF_PER_PROCESS) to make sure you remember to make the adjustment.
 */
 
+class ResourceLocks;
+class MTinterface;
+
 struct per_process
 {
   char *initial_sp;
