@@ -1,3 +1,20 @@
+Wed Sep  5 23:36:03 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* cygheap.h (init_cygheap): Move bucket array here from cygheap.cc.
+	* cygheap.cc: Throughout use bucket array from cygheap.
+
+	* sigproc.cc (proc_subproc): Dynamically allocate zombie buffer to save
+	DLL space.
+	(sigproc_fixup_after_fork): Free zombie array after a fork.
+	* sigproc.h (sigproc_fixup_after_fork): Declare.
+
+2001-09-06  Egor Duda  <deo@logos-m.ru>
+
+	* dir.cc (mkdir): Expand buffer for security descriptor to 4K to avoid
+	stack corruption.
+	* fhandler.cc (fhandler_base::open): Ditto.
+	* path.cc (symlink): Ditto.
+
 Wed Sep  5 21:35:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* winver.rc: Change copyright to include 2001.

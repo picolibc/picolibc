@@ -279,6 +279,7 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   debug_fixup_after_fork ();
   pinfo_fixup_after_fork ();
   cygheap->fdtab.fixup_after_fork (hParent);
+  sigproc_fixup_after_fork ();
   signal_fixup_after_fork ();
 
   MALLOC_CHECK;

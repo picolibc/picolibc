@@ -339,7 +339,7 @@ mkdir (const char *dir, mode_t mode)
 
   if (allow_ntsec && real_dir.has_acls ())
     set_security_attribute (S_IFDIR | ((mode & 07777) & ~cygheap->umask),
-			    &sa, alloca (256), 256);
+			    &sa, alloca (4096), 4096);
 
   if (CreateDirectoryA (real_dir.get_win32 (), &sa))
     {

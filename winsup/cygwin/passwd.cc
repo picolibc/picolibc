@@ -27,9 +27,9 @@ details. */
 /* Read /etc/passwd only once for better performance.  This is done
    on the first call that needs information from it. */
 
-static struct passwd *passwd_buf = NULL;	/* passwd contents in memory */
-static int curr_lines = 0;
-static int max_lines = 0;
+static struct passwd *passwd_buf;	/* passwd contents in memory */
+static int curr_lines;
+static int max_lines;
 
 /* Set to loaded when /etc/passwd has been read in by read_etc_passwd ().
    Set to emulated if passwd is emulated. */

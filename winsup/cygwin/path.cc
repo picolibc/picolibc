@@ -2461,7 +2461,7 @@ symlink (const char *topath, const char *frompath)
 
   if (allow_ntsec && win32_path.has_acls ())
     set_security_attribute (S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO,
-			    &sa, alloca (256), 256);
+			    &sa, alloca (4096), 4096);
 
   h = CreateFileA(win32_path, GENERIC_WRITE, 0, &sa,
 		  CREATE_NEW, FILE_ATTRIBUTE_NORMAL, 0);

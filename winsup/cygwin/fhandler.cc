@@ -387,7 +387,7 @@ fhandler_base::open (int flags, mode_t mode)
   /* If the file should actually be created and ntsec is on,
      set files attributes. */
   if (flags & O_CREAT && get_device () == FH_DISK && allow_ntsec && has_acls ())
-    set_security_attribute (mode, &sa, alloca (256), 256);
+    set_security_attribute (mode, &sa, alloca (4096), 4096);
 
   x = CreateFileA (get_win32_name (), access, shared,
 		   &sa, creation_distribution,

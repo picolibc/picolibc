@@ -46,7 +46,7 @@ details. */
 
 #define no_signals_available() (!hwait_sig || !sig_loop_wait)
 
-#define ZOMBIEMAX	((int) (sizeof (zombies) / sizeof (zombies[0])) - 1)
+#define ZOMBIEMAX	4096
 
 /*
  * Global variables
@@ -102,9 +102,9 @@ Static HANDLE wait_sig_inited = NULL;	// Control synchronization of
 Static HANDLE events[PSIZE + 1] = {0};	// All my children's handles++
 #define hchildren (events + 1)		// Where the children handles begin
 Static pinfo pchildren[PSIZE];		// All my children info
-Static pinfo zombies[16384];		// All my deceased children info
 Static int nchildren = 0;		// Number of active children
-Static int nzombies = 0;		// Number of deceased children
+static pinfo *zombies;			// All my deceased children info
+static int nzombies;			// Number of deceased children
 
 Static waitq waitq_head = {0, 0, 0, 0, 0, 0, 0};// Start of queue for wait'ing threads
 Static waitq waitq_main;		// Storage for main thread
@@ -303,6 +303,8 @@ proc_subproc (DWORD what, DWORD val)
 
       int thiszombie;
       thiszombie = nzombies;
+      if (!zombies)
+	zombies = (pinfo *) malloc (sizeof (pinfo) * ZOMBIEMAX);
       zombies[nzombies] = pchildren[val];	// Add to zombie array
       zombies[nzombies++]->process_state = PID_ZOMBIE;// Walking dead
 
@@ -1300,6 +1302,17 @@ wait_subproc (VOID *)
   events[0] = NULL;
   sigproc_printf ("done");
   return 0;
+}
+
+void __stdcall
+sigproc_fixup_after_fork ()
+{
+  if (zombies)
+    {
+      free (zombies);
+      nzombies = 0;
+      zombies = NULL;
+    }
 }
 
 extern "C" {

@@ -35,9 +35,7 @@ struct cygheap_entry
     char data[0];
   };
 
-#define NBUCKETS 32
-static char *buckets[NBUCKETS] = {0};
-
+#define NBUCKETS (sizeof (cygheap->buckets) / sizeof (cygheap->buckets[0]))
 #define N0 ((_cmalloc_entry *) NULL)
 #define to_cmalloc(s) ((_cmalloc_entry *) (((char *) (s)) - (int) (N0->data)))
 
@@ -202,10 +200,10 @@ _cmalloc (int size)
     continue;
 
   cygheap_protect->acquire ();
-  if (buckets[b])
+  if (cygheap->buckets[b])
     {
-      rvc = (_cmalloc_entry *) buckets[b];
-      buckets[b] = rvc->ptr;
+      rvc = (_cmalloc_entry *) cygheap->buckets[b];
+      cygheap->buckets[b] = rvc->ptr;
       rvc->b = b;
     }
   else
@@ -227,8 +225,8 @@ _cfree (void *ptr)
   cygheap_protect->acquire ();
   _cmalloc_entry *rvc = to_cmalloc (ptr);
   DWORD b = rvc->b;
-  rvc->ptr = buckets[b];
-  buckets[b] = (char *) rvc;
+  rvc->ptr = cygheap->buckets[b];
+  cygheap->buckets[b] = (char *) rvc;
   cygheap_protect->release ();
 }
 

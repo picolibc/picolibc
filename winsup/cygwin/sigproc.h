@@ -115,6 +115,7 @@ int __stdcall sig_send (_pinfo *, int, DWORD ebp = (DWORD) __builtin_frame_addre
 			bool exception = 0)  __attribute__ ((regparm(3)));
 void __stdcall signal_fixup_after_fork ();
 void __stdcall signal_fixup_after_exec (bool);
+void __stdcall sigproc_fixup_after_fork ();
 
 extern char myself_nowait_dummy[];
 extern char myself_nowait_nonmain_dummy[];

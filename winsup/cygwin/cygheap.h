@@ -152,6 +152,7 @@ struct cwdstuff
 struct init_cygheap
 {
   _cmalloc_entry *chain;
+  char *buckets[32];
   cygheap_root root;
   cygheap_user user;
   mode_t umask;
