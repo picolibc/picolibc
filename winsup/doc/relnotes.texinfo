@@ -9,16 +9,6 @@ not have this problem.  This is no real loss, because rxvt has many
 other advantages.  (Do not attempt to use the "broken" pipe key
 (@samp{¦}) as a substitute, it is a different character.)
 
-@subsection On Win9x, scp and cvs/ssh leave ssh processes running
-
-For now you'll just have to kill them manually.
-
-This is a difficult problem, related to the implementation of select()
-and pipes on Windows 9x.  It has been discussed at length on the cygwin
-mailing list.  For an excellent technical description of the problem, see
-@file{http://sources.redhat.com/ml/cygwin/2000-12/msg00470.html}, and
-related threads.
-
 @subsection Cannot access tape devices with mt on Win9x
 
 Win9x does not support the API used by the Cygwin fhandler_dev_tape
@@ -27,4 +17,5 @@ class.  Details at
 
 @section Fixed in the Next Release
 
-(section empty)
+@subsection On Win9x, scp and cvs/ssh leave ssh processes running, and cvs/ssh hangs at completion
+
