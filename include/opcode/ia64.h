@@ -300,7 +300,8 @@ struct ia64_opcode
 #define IA64_OPCODE_PSEUDO	(1<<6)	/* insn is a pseudo-op */
 #define IA64_OPCODE_F2_EQ_F3	(1<<7)	/* constraint: F2 == F3 */
 #define IA64_OPCODE_LEN_EQ_64MCNT	(1<<8)	/* constraint: LEN == 64-CNT */
-#define IA64_OPCODE_MOD_RRBS    (1<<9) /* modifies all rrbs in CFM */
+#define IA64_OPCODE_MOD_RRBS    (1<<9)	/* modifies all rrbs in CFM */
+#define IA64_OPCODE_POSTINC	(1<<10)	/* postincrement MR3 operand */
 
 /* A macro to extract the major opcode from an instruction.  */
 #define IA64_OP(i)	(((i) >> 37) & 0xf)
