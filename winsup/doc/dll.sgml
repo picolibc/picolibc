@@ -41,52 +41,40 @@ For this example, we'll use a single file
 
 <para>Now compile everything to objects:</para>
 
-<screen>
-gcc -c myprog.c
-gcc -c mydll.c
-</screen>
+<screen>gcc -c myprog.c
+gcc -c mydll.c</screen>
 
-<para>Unfortunately, the process for building a dll is, well, convoluted.
-You have to run five commands, like this:</para>
+<para>Fortunately, with the latest gcc and binutils the process for building a dll
+is now much simpler. Say you want to build this minimal function in mydll.c:</para>
 
-<screen>
-gcc -s -Wl,--base-file,mydll.base -o mydll.dll mydll.o -Wl,-e,_mydll_init@12 
-dlltool --base-file mydll.base --def mydll.def --output-exp mydll.exp --dllname mydll.dll
-gcc -s -Wl,--base-file,mydll.base,mydll.exp -o mydll.dll mydll.o -Wl,-e,_mydll_init@12
-dlltool --base-file mydll.base --def mydll.def --output-exp mydll.exp --dllname mydll.dll
-gcc -Wl,mydll.exp -o mydll.dll mydll.o -Wl,-e,_mydll_init@12
-</screen>
-
-<para>The extra steps give <filename>dlltool</filename> the
-opportunity to generate the extra sections (exports and relocation)
-that a dll needs.  After this, you build the import library:</para>
-
-<screen>
-dlltool --def mydll.def --dllname mydll.dll --output-lib mydll.a
-</screen>
-
-<para>Now, when you build your program, you link against the import
-library:</para>
-
-<screen>
-gcc -o myprog myprog.o mydll.a
-</screen>
-
-<para>Note that we linked with <command>-e _mydll_init@12</command>.
-This tells the OS what the DLL's "entry point" is, and this is a
-special function that coordinates bringing the dll to life withing the
-OS.  The minimum function looks like this:</para>
-
-<screen>
-#include &lt;windows.h&gt;
-
-int WINAPI
+<screen>int WINAPI
 mydll_init(HANDLE h, DWORD reason, void *foo)
 {
   return 1;
-}  
-</screen>
+}</screen>
 
+<para>First compile mydll.c to object code:</para>
+
+<screen>gcc -c mydll.c</screen>
+
+<para>Then, tell gcc that it is building a shared library:</para>
+
+<screen>gcc -shared -o mydll.dll mydll.o</screen>
+
+<para>That's it! However, if you are building a dll as an export library,
+you will probably want to use the complete syntax:</para>
+
+<screen>gcc -shared -o cyg${module}.dll \
+    -Wl,--out-implib=lib${module}.dll.a \
+    -Wl,--export-all-symbols \
+    -Wl,--enable-auto-import \
+    -Wl,--whole-archive ${old_lib} \
+    -Wl,--no-whole-archive ${dependency_libs}</screen>
+
+<para>Where ${module} is the name of your DLL, ${old_lib} are all
+your object files, bundled together in static libs or single object
+files and the ${dependency_libs} are import libs you need to
+link against, e.g '-lpng -lz -L/usr/local/special -lmyspeciallib'.</para>
 </sect2>
 
 <sect2 id="dll-link"><title>Linking Against DLLs</title>

@@ -1,3 +1,11 @@
+2002-06-22  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
+
+	* dll.sgml: Refine dll build instructions.
+
+2002-08-21  Christopher Faylor  <cgf@redhat.com>
+
+	* ntsec.html: Correct some typos.
+
 2002-07-23  Nicholas Wourms  <nwourms@netscape.net>
 
 	* calls.texinfo: Add fcloseall and fcloseall_r.

@@ -286,9 +286,9 @@ powerusers::547:
 </screen>
 </example>
 
-<para>As you can see I've changed my primary group membership from 513 (None)
+<para>As you can see, I've changed my primary group membership from 513 (None)
 to 547 (powerusers).  So all file I created inside of Cygwin were now owned
-by the powerusers group instead of None.  This is the way I liked it.<para>
+by the powerusers group instead of None.  This is the way I liked it.</para>
 
 <para>Groups may be mentioned in the passwd file, too. This has two
 advantages:</para>
