@@ -187,7 +187,7 @@ MTinterface::Init (int forked)
     }
 
   concurrency = 0;
-  threadcount = 1; /*1 current thread when Init occurs.*/
+  threadcount = 1; /* 1 current thread when Init occurs.*/
 
   pthread::initMainThread (&mainthread, myself->hProcess);
   pthread_mutex::initMutex ();
@@ -2110,7 +2110,7 @@ pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
   struct timeb currSysTime;
   long waitlength;
   ftime (&currSysTime);
-  waitlength = (abstime->tv_sec - currSysTime.time) *1000;
+  waitlength = (abstime->tv_sec - currSysTime.time) * 1000;
   if (waitlength < 0)
     return ETIMEDOUT;
   return __pthread_cond_dowait (cond, mutex, waitlength);
@@ -2217,14 +2217,13 @@ __pthread_equal (pthread_t *t1, pthread_t *t2)
 
 /*Mutexes  */
 
-/*FIXME: there's a potential race with PTHREAD_MUTEX_INITALIZER:
- *the mutex is not actually inited until the first use.
- *So two threads trying to lock/trylock may collide.
- *Solution: we need a global mutex on mutex creation, or possibly simply
- *on all constructors that allow INITIALIZER macros.
- *the lock should be very small: only around the init routine, not
- *every test, or all mutex access will be synchronised.
- */
+/* FIXME: there's a potential race with PTHREAD_MUTEX_INITALIZER:
+   the mutex is not actually inited until the first use.
+   So two threads trying to lock/trylock may collide.
+   Solution: we need a global mutex on mutex creation, or possibly simply
+   on all constructors that allow INITIALIZER macros.
+   the lock should be very small: only around the init routine, not
+   every test, or all mutex access will be synchronised.  */
 
 int
 pthread_mutex::init (pthread_mutex_t *mutex,
