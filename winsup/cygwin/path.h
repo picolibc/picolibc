@@ -75,6 +75,7 @@ struct fs_info
 {
   char name_storage[CYG_MAX_PATH];
   char root_dir_storage[CYG_MAX_PATH];
+  __ino64_t name_hash;
   DWORD flags_storage;
   DWORD serial_storage;
   DWORD sym_opt_storage; /* additional options to pass to symlink_info resolver */

@@ -1,5 +1,12 @@
 2004-04-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.cc (fsinfo): Global storage for file system information.
+	(fs_info::update): Store file system information also in fsinfo and
+	short circuit GetVolumeInformation by using alredy stored file system
+	information.
+
+2004-04-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (fhandler_base::status): Declare private.
 	(fhandler_base::open_status): Ditto.
 	(class fhandler_socket): Move status bits into private bitfield struct

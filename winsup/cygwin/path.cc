@@ -354,6 +354,9 @@ mkrelpath (char *path)
     strcpy (path, ".");
 }
 
+#define MAX_FS_INFO_CNT 25
+fs_info fsinfo[MAX_FS_INFO_CNT];
+
 bool
 fs_info::update (const char *win32_path)
 {
@@ -368,8 +371,20 @@ fs_info::update (const char *win32_path)
       return false;
     }
 
-  if (strcmp (tmp_buf, root_dir_storage) == 0)
-    return 1;
+  __ino64_t tmp_name_hash = hash_path_name (1, tmp_buf);
+  if (tmp_name_hash == name_hash)
+    return true;
+  int idx = 0;
+  while (idx < MAX_FS_INFO_CNT && fsinfo[idx].name_hash)
+    {
+      if (tmp_name_hash == fsinfo[idx].name_hash)
+        {
+	  *this = fsinfo[idx];
+	  return true;
+	}
+      ++idx;
+    }
+  name_hash = tmp_name_hash;
 
   strncpy (root_dir_storage, tmp_buf, CYG_MAX_PATH);
   drive_type_storage = GetDriveType (root_dir_storage);
@@ -395,6 +410,8 @@ fs_info::update (const char *win32_path)
    */
   sym_opt_storage = (!is_remote_drive_storage && strcmp (name_storage, "NTFS") == 0) ? PC_CHECK_EA : 0;
 
+  if (idx < MAX_FS_INFO_CNT && drive_type_storage != DRIVE_REMOVABLE)
+    fsinfo[idx] = *this;
   return true;
 }
 
