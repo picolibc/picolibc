@@ -1,3 +1,20 @@
+2002-10-25  Bernd Schmidt  <bernds@redhat.com>
+
+        * i386/cygmon.ld: Add entry for .gcc_except_table.
+
+2000-10-25  Mark Salter  <msalter@redhat.com>
+
+        * i386/cygmon-crt0.S: Use __USER_LABEL_PREFIX__ for symbols. Always
+        use __start for start symbol.
+        * i386/cygmon-salib.c: Don't build __do_global_[cd]tors for AOUT.
+        Disable file I/O extensions to make Plum Hall happy.
+        * i386/cygmon.ld: Set __start as entry point.
+        * i386/Makefile.in: Support IS_AOUT.
+        * i386/configure.in: Support IS_AOUT.
+        * i386/configure: Regenerated.
+        * i386/cygmon-salib.c:
+        * i386/cygmon-gmon.c (_mcount): It's _etext.
+
 2002-10-25  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* configure.in: Clarify some of the triplets so unsupported

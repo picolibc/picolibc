@@ -77,6 +77,9 @@ case "$target" in
     *coff)
 	IS_COFF="-DCOFF"
 	;;
+    *aout)
+	IS_AOUT="-DAOUT"
+	;;
 esac
 
 LIB_AC_PROG_CC
@@ -87,6 +90,7 @@ AC_SUBST(AR)
 LD=${LD-ld}
 AC_SUBST(LD)
 AC_SUBST(IS_COFF)
+AC_SUBST(IS_AOUT)
 AC_SUBST(NEED_UNDERSCORE)
 AC_PROG_RANLIB
 

@@ -1,7 +1,7 @@
 /*
  * crt0 startup code for user programs running under Cygmon
  *
- * Copyright (c) 1998 Cygnus Support
+ * Copyright (c) 1998, 2000 Cygnus Support
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -14,11 +14,9 @@
  * they apply.
  */
 
-#ifndef NEED_UNDERSCORE
-#define SYM(X) X
-#else
-#define SYM(X) _ ## X
-#endif
+#define _S2(P,X) P ## X
+#define _S1(P,X) _S2(P,X)
+#define SYM(X) _S1(__USER_LABEL_PREFIX__,X)
 
 .data
         .align  8
@@ -31,52 +29,51 @@ SYM(argc):
 	.text
 	.align 4
 
-	.globl SYM(_start)
-SYM(_start):
+	.globl __start
+__start:
 	/* see if the stack is already setup. if not, then default
          *  to using the value of %sp as set by the ROM monitor
          */
-	lea __stack,%eax
-	cmpl $0,%eax
-	jz 1f
-	mov %eax, %esp
+	movl	$__stack, %eax
+	testl	%eax, %eax
+	jz	1f
+	movl	%eax, %esp
 1:
 	mov $0, %ebp
 
-	lea __bss_start, %eax
-2:
-	movb $0,(%eax)
-	inc %eax
-	cmp $__bss_end,%eax
-	jl 2b
-	
-2:
-	pushl $SYM(__sigtramp)
-	pushl $0
-	call SYM(__install_signal_handler)
-	add $4, %esp
+	movl	$__bss_start, %edi
+	movl	$__bss_end, %ecx
+	subl	%edi, %ecx
+	xorl	%eax, %eax
+	rep; stosb
 
-	pushl $SYM(__do_global_dtors)
-	call SYM(atexit)
-	add $4, %esp
+	pushl	$SYM(__sigtramp)
+	pushl	$0
+	call	SYM(__install_signal_handler)
+	popl	%eax
 
-	call SYM(__do_global_ctors)
+	pushl	$SYM(__do_global_dtors)
+	call	SYM(atexit)
+	popl	%eax
 
-	pushl $SYM(argc)
-	call SYM(__get_program_arguments)
-	add $4, %esp
+	call	SYM(__do_global_ctors)
 
-	pushl %eax
-	lea SYM(argc), %ebx
-	pushl (%ebx)
-	call SYM(main)
-	add $8, %esp
+	pushl	$SYM(argc)
+	call	SYM(__get_program_arguments)
+	popl	%ecx
+
+	movl	SYM(argc), %ecx
+	pushl	%eax
+	pushl	%ecx
+	call	SYM(main)
+	popl	%ecx
+	popl	%edx
 
 	/* call exit from the C library so atexit gets called, and the
 	 * C++ destructors get run. This calls our exit routine below	 
 	 * when it's done.
 	 */
-	pushl %eax
+	pushl	%eax
 	call	SYM(exit)
 3:
-	jmp 3b
+	jmp	3b

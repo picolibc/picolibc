@@ -1,5 +1,5 @@
 STARTUP(cygmon-crt0.o)
-ENTRY(_start)
+ENTRY(__start)
 GROUP(-lcygmon -lc -lcygmon -lgcc)
 SEARCH_DIR(.)
 __DYNAMIC  =  0;
@@ -45,8 +45,8 @@ SECTIONS
     *(.dtors)
      LONG(0)
     __DTOR_END__ = .;
-     etext  =  .;
-     _etext  =  .;
+    PROVIDE(_etext  =  .);
+    PROVIDE(__etext  =  .);
   }
   . = .;
   .rdata : {
@@ -55,6 +55,8 @@ SECTIONS
    _fdata = ALIGN(16);
   .data : {
     *(.data)
+    *(.gcc_except_table)
+    *(.gcc_exc)
   }
   . = ALIGN(8);
   _gp = . + 0x8000;
@@ -69,20 +71,20 @@ SECTIONS
     *(.sdata)
   }
   . = ALIGN(4);
-   edata  =  .;
-   _edata  =  .;
+   PROVIDE(_edata  =  .);
+   PROVIDE(__edata  =  .);
    fbss = .;
    _fbss = .;
   .sbss : {
+    PROVIDE(__bss_start = .);
     *(.sbss)
     *(.scommon)
   }
   .bss : {
-    __bss_start = . ;
     *(.bss)
     *(COMMON)
-    __bss_end = . ;
+    PROVIDE(__bss_end = .);
   }
-   end = .;
-   _end = .;
+  PROVIDE(_end = .);
+  PROVIDE(__end = .);
 }
