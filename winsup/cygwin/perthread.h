@@ -59,7 +59,6 @@ class vfork_save
   int ctty;
   pid_t sid;
   pid_t pgid;
-  class fhandler_tty_slave *fhctty;
   int open_fhs;
   int is_active () { return pid < 0; }
   void restore_pid (int val)

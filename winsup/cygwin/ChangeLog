@@ -1,3 +1,19 @@
+2004-01-02  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.h (init_cygheap): Play more vfork shell games and move
+	ctty_on_hold and open_fhs_on_hold (back) here.
+	* dcrt0.cc (_dll_crt0): Just set impure_ptr_ptr here and let later
+	initialization deal with tls.
+	* dtable.cc (dtable::vfork_child_fixup): Move ctty considerations here.
+	(dtable:vfork_parent_restore): And here.
+	* fork.cc (vfork): Reflect change to ctty handling.
+	* perthread.h (vfork_save::fhctty): Eliminate.
+
+	* cygwin.din: Make more exports NOSIGFE that will never be interrupted
+	by a signal.
+
+	* init.cc (dll_entry): Set stackptr to NULL to catch problems earlier.
+
 2003-12-31  Christopher Faylor  <cgf@redhat.com>
 
 	* cygwin.din: Make crt0 functions NOSIGFE.

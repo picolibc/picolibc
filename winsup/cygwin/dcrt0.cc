@@ -916,12 +916,11 @@ _dll_crt0 ()
 void
 dll_crt0 (per_process *uptr)
 {
-  char padding[CYGTLS_PADSIZE];
   /* Set the local copy of the pointer into the user space. */
   if (uptr && uptr != user_data)
     {
       memcpy (user_data, uptr, per_process_overwrite);
-      *(user_data->impure_ptr_ptr) = initialize_main_tls (padding);
+      *(user_data->impure_ptr_ptr) = &reent_data;
     }
   _dll_crt0 ();
 }

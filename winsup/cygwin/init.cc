@@ -53,7 +53,7 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
     case DLL_PROCESS_ATTACH:
       dynamically_loaded = (static_load == NULL);
       // __cygwin_user_data.impure_ptr = &_my_tls.local_clib;
-      _my_tls.stackptr = _my_tls.stack;
+      _my_tls.stackptr = NULL;
       break;
     case DLL_PROCESS_DETACH:
       break;

@@ -745,8 +745,13 @@ dtable::vfork_parent_restore ()
   fds = fds_on_hold;
   fds_on_hold = NULL;
   cfree (deleteme);
-
   ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "restore");
+
+  cygheap->ctty = cygheap->ctty_on_hold;	// revert
+  if (cygheap->ctty)
+    cygheap->ctty->close ();			// Undo previous bump of this archetype
+  cygheap->ctty_on_hold = NULL;
+
   return;
 }
 
@@ -776,6 +781,12 @@ dtable::vfork_child_fixup ()
   fds = saveme;
   cfree (fds_on_hold);
   fds_on_hold = NULL;
+
+  if (cygheap->ctty_on_hold)
+    {
+      cygheap->ctty_on_hold->close ();
+      cygheap->ctty_on_hold = NULL;
+    }
 
   return;
 }

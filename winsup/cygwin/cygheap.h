@@ -262,6 +262,7 @@ struct init_cygheap
   struct sigaction *sigs;
 
   fhandler_tty_slave *ctty;	/* Current tty */
+  fhandler_tty_slave *ctty_on_hold;
   int open_fhs;
 };
 

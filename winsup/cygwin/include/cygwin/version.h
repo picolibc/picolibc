@@ -34,8 +34,8 @@ details. */
    that didn't invalidate existing executables.  Both numbers were
    recorded in the executable and in the dll.
 
-   In October 1998 (starting with Cygwin 19.6), we started a new
-   means of Cygwin versioning: */
+   In October 1998 (starting with Cygwin 19.6), we started a new method
+   of Cygwin versioning: */
 
       /* The DLL major and minor numbers correspond to the "version of
 	 the Cygwin shared library".  This version is used to track important

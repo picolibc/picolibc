@@ -28,6 +28,8 @@ details. */
 # define UNLEN 256
 #endif
 
+#define TLS_STACK_SIZE 1024
+
 #pragma pack(push,4)
 struct _local_storage
 {
@@ -107,7 +109,7 @@ struct _threadinfo
   struct _threadinfo *prev, *next;
   __stack_t *stackptr;
   int sig;
-  __stack_t stack[1024];
+  __stack_t stack[TLS_STACK_SIZE];
 
   /*gentls_offsets*/
   static CRITICAL_SECTION protect_linked_list;
