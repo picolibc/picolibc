@@ -32,10 +32,10 @@ _DEFUN (_mktm_r, (tim_p, res, is_gmtime),
 {
   long days, rem;
   time_t lcltime;
-  int i;
   int y;
   int yleap;
   _CONST int *ip;
+   __tzinfo_type *tz = __gettzinfo ();
 
   /* base decision about std/dst time on current time */
   lcltime = *tim_p;
@@ -101,17 +101,21 @@ _DEFUN (_mktm_r, (tim_p, res, is_gmtime),
       TZ_LOCK;
       if (_daylight)
 	{
-	  if (y == __tzyear || __tzcalc_limits (y))
-	    res->tm_isdst = (__tznorth 
-			     ? (*tim_p >= __tzrule[0].change && *tim_p < __tzrule[1].change)
-			     : (*tim_p >= __tzrule[0].change || *tim_p < __tzrule[1].change));
+	  if (y == tz->__tzyear || __tzcalc_limits (y))
+	    res->tm_isdst = (tz->__tznorth 
+			     ? (*tim_p >= tz->__tzrule[0].change 
+				&& *tim_p < tz->__tzrule[1].change)
+			     : (*tim_p >= tz->__tzrule[0].change 
+				|| *tim_p < tz->__tzrule[1].change));
 	  else
 	    res->tm_isdst = -1;
 	}
       else
 	res->tm_isdst = 0;
 
-      offset = (res->tm_isdst == 1 ? __tzrule[1].offset : __tzrule[0].offset);
+      offset = (res->tm_isdst == 1 
+		  ? tz->__tzrule[1].offset 
+		  : tz->__tzrule[0].offset);
 
       hours = offset / SECSPERHOUR;
       offset = offset % SECSPERHOUR;
@@ -197,11 +201,12 @@ _DEFUN (__tzcalc_limits, (year),
 {
   int days, year_days, years;
   int i, j;
+  __tzinfo_type *tz = __gettzinfo ();
 
   if (year < EPOCH_YEAR)
     return 0;
 
-  __tzyear = year;
+  tz->__tzyear = year;
 
   years = (year - EPOCH_YEAR);
 
@@ -211,10 +216,11 @@ _DEFUN (__tzcalc_limits, (year),
   
   for (i = 0; i < 2; ++i)
     {
-      if (__tzrule[i].ch == 'J')
-	days = year_days + __tzrule[i].d + (isleap(year) && __tzrule[i].d >= 60);
-      else if (__tzrule[i].ch == 'D')
-	days = year_days + __tzrule[i].d;
+      if (tz->__tzrule[i].ch == 'J')
+	days = year_days + tz->__tzrule[i].d + 
+		(isleap(year) && tz->__tzrule[i].d >= 60);
+      else if (tz->__tzrule[i].ch == 'D')
+	days = year_days + tz->__tzrule[i].d;
       else
 	{
 	  int yleap = isleap(year);
@@ -223,15 +229,15 @@ _DEFUN (__tzcalc_limits, (year),
 
 	  days = year_days;
 
-	  for (j = 1; j < __tzrule[i].m; ++j)
+	  for (j = 1; j < tz->__tzrule[i].m; ++j)
 	    days += ip[j-1];
 
 	  m_wday = (EPOCH_WDAY + days) % DAYSPERWEEK;
 	  
-	  wday_diff = __tzrule[i].d - m_wday;
+	  wday_diff = tz->__tzrule[i].d - m_wday;
 	  if (wday_diff < 0)
 	    wday_diff += DAYSPERWEEK;
-	  m_day = (__tzrule[i].n - 1) * DAYSPERWEEK + wday_diff;
+	  m_day = (tz->__tzrule[i].n - 1) * DAYSPERWEEK + wday_diff;
 
 	  while (m_day >= ip[j-1])
 	    m_day -= DAYSPERWEEK;
@@ -240,10 +246,11 @@ _DEFUN (__tzcalc_limits, (year),
 	}
 
       /* store the change-over time in GMT form by adding offset */
-      __tzrule[i].change = days * SECSPERDAY + __tzrule[i].s + __tzrule[i].offset;
+      tz->__tzrule[i].change = days * SECSPERDAY + 
+	      			tz->__tzrule[i].s + tz->__tzrule[i].offset;
     }
 
-  __tznorth = (__tzrule[0].change < __tzrule[1].change);
+  tz->__tznorth = (tz->__tzrule[0].change < tz->__tzrule[1].change);
 
   return 1;
 }

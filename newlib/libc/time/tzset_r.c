@@ -14,14 +14,7 @@ static char *prev_tzenv = NULL;
 /* default to GMT */
 char *_tzname[2] = {"GMT", "GMT"};
 int _daylight = 0;
-time_t _timezone = (time_t)0;
-
-int __tzyear = 0;
-
-int __tznorth = 1;
-
-__tzrule_type __tzrule[2] = { {'J', 0, 0, 0, 0, (time_t)0, 0 }, 
-			      {'J', 0, 0, 0, 0, (time_t)0, 0 } };
+long _timezone = 0;
 
 _VOID
 _DEFUN (_tzset_r, (reent_ptr),
@@ -31,11 +24,12 @@ _DEFUN (_tzset_r, (reent_ptr),
   unsigned short hh, mm, ss, m, w, d;
   int sign, n;
   int i, ch;
+  __tzinfo_type *tz = __gettzinfo ();
 
   if ((tzenv = _getenv_r (reent_ptr, "TZ")) == NULL)
       {
 	TZ_LOCK;
-	_timezone = (time_t)0;
+	_timezone = 0;
 	_daylight = 0;
 	_tzname[0] = "GMT";
 	_tzname[1] = "GMT";
@@ -86,7 +80,7 @@ _DEFUN (_tzset_r, (reent_ptr),
       return;
     }
   
-  __tzrule[0].offset = sign * (ss + SECSPERMIN * mm + SECSPERHOUR * hh);
+  tz->__tzrule[0].offset = sign * (ss + SECSPERMIN * mm + SECSPERHOUR * hh);
   _tzname[0] = __tzname_std;
   tzenv += n;
   
@@ -116,9 +110,9 @@ _DEFUN (_tzset_r, (reent_ptr),
   ss = 0;
   
   if (sscanf (tzenv, "%hu%n:%hu%n:%hu%n", &hh, &n, &mm, &n, &ss, &n) <= 0)
-    __tzrule[1].offset = __tzrule[0].offset - 3600;
+    tz->__tzrule[1].offset = tz->__tzrule[0].offset - 3600;
   else
-    __tzrule[1].offset = sign * (ss + SECSPERMIN * mm + SECSPERHOUR * hh);
+    tz->__tzrule[1].offset = sign * (ss + SECSPERMIN * mm + SECSPERHOUR * hh);
 
   tzenv += n;
 
@@ -136,10 +130,10 @@ _DEFUN (_tzset_r, (reent_ptr),
 	      return;
 	    }
 	  
-	  __tzrule[i].ch = 'M';
-	  __tzrule[i].m = m;
-	  __tzrule[i].n = w;
-	  __tzrule[i].d = d;
+	  tz->__tzrule[i].ch = 'M';
+	  tz->__tzrule[i].m = m;
+	  tz->__tzrule[i].n = w;
+	  tz->__tzrule[i].d = d;
 	  
 	  tzenv += n;
 	}
@@ -161,23 +155,23 @@ _DEFUN (_tzset_r, (reent_ptr),
 	    {
 	      if (i == 0)
 		{
-		  __tzrule[0].ch = 'M';
-		  __tzrule[0].m = 4;
-		  __tzrule[0].n = 1;
-		  __tzrule[0].d = 0;
+		  tz->__tzrule[0].ch = 'M';
+		  tz->__tzrule[0].m = 4;
+		  tz->__tzrule[0].n = 1;
+		  tz->__tzrule[0].d = 0;
 		}
 	      else
 		{
-		  __tzrule[1].ch = 'M';
-		  __tzrule[1].m = 10;
-		  __tzrule[1].n = 5;
-		  __tzrule[1].d = 0;
+		  tz->__tzrule[1].ch = 'M';
+		  tz->__tzrule[1].m = 10;
+		  tz->__tzrule[1].n = 5;
+		  tz->__tzrule[1].d = 0;
 		}
 	    }
 	  else
 	    {
-	      __tzrule[i].ch = ch;
-	      __tzrule[i].d = d;
+	      tz->__tzrule[i].ch = ch;
+	      tz->__tzrule[i].d = d;
 	    }
 	  
 	  tzenv = end;
@@ -192,14 +186,14 @@ _DEFUN (_tzset_r, (reent_ptr),
       if (*tzenv == '/')
 	sscanf (tzenv, "/%hu%n:%hu%n:%hu%n", &hh, &n, &mm, &n, &ss, &n);
 
-      __tzrule[i].s = ss + SECSPERMIN * mm + SECSPERHOUR  * hh;
+      tz->__tzrule[i].s = ss + SECSPERMIN * mm + SECSPERHOUR  * hh;
       
       tzenv += n;
     }
 
-  __tzcalc_limits (__tzyear);
-  _timezone = (time_t)(__tzrule[0].offset);  
-  _daylight = __tzrule[0].offset != __tzrule[1].offset;
+  __tzcalc_limits (tz->__tzyear);
+  _timezone = tz->__tzrule[0].offset;  
+  _daylight = tz->__tzrule[0].offset != tz->__tzrule[1].offset;
 
   TZ_UNLOCK;
 }

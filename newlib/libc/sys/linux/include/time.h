@@ -84,6 +84,26 @@ char      *_EXFUN(strptime,     (const char *, const char *, struct tm *));
 _VOID      _EXFUN(tzset,	(_VOID));
 _VOID      _EXFUN(_tzset_r,	(struct _reent *));
 
+typedef struct __tzrule_struct
+{
+  char ch;
+  int m;
+  int n;
+  int d;
+  int s;
+  time_t change;
+  int offset;
+} __tzrule_type;
+
+typedef struct __tzinfo_struct
+{
+  int __tznorth;
+  int __tzyear;
+  __tzrule_type __tzrule[2];
+} __tzinfo_type;
+
+__tzinfo_type *_EXFUN (__gettzinfo, (_VOID));
+
 /* getdate functions */
 
 #ifndef _REENT_ONLY
@@ -106,7 +126,7 @@ struct tm *	_EXFUN(getdate, (const char *));
 int		_EXFUN(getdate_r, (const char *, struct tm *));
 
 /* defines for the opengroup specifications Derived from Issue 1 of the SVID.  */
-extern __IMPORT time_t _timezone;
+extern __IMPORT long _timezone;
 extern __IMPORT int _daylight;
 extern __IMPORT char *_tzname[2];
 

@@ -757,11 +757,12 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 	      if (count < maxsize - 5)
 		{
 		  int offset;
+		  __tzinfo_type *tz = __gettzinfo ();
 		  TZ_LOCK;
 		  /* The sign of this is exactly opposite the envvar TZ.  We
 		     could directly use the global _timezone for tm_isdst==0,
 		     but have to use __tzrule for daylight savings.  */
-		  offset = -__tzrule[tim_p->tm_isdst > 0].offset;
+		  offset = -tz->__tzrule[tim_p->tm_isdst > 0].offset;
 		  TZ_UNLOCK;
 		  sprintf (&s[count], "%+03ld%.2d", offset / SECSPERHOUR,
 			   abs (offset / SECSPERMIN) % 60);

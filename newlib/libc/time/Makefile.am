@@ -11,6 +11,7 @@ LIB_SOURCES = \
 	ctime.c		\
 	ctime_r.c	\
 	difftime.c	\
+	gettzinfo.c	\
 	gmtime.c	\
 	gmtime_r.c	\
 	lcltime.c	\

@@ -1,3 +1,21 @@
+2005-02-23  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/time.h [!CYGWIN](_timezone): Change to long.
+	(__tzrule_type, __tzinfo_type): New types.
+	(__gettzinfo): New function.
+	* libc/sys/linux/include/time.h: Ditto.
+	* libc/time/Makefile.am: Add gettzinfo.c.
+	* libc/time/Makefile.in: Regenerated.
+	* libc/time/local.h: Moved __tzrule_type to time.h.
+	* libc/time/mktime.c: Call __gettzinfo to reference
+	__tznorth, __tzyear, and __tzrule array.
+	* libc/time/mktm_r.c: Ditto.
+	* libc/time/strftime.c: Ditto.
+	* libc/time/tzset_r.c: Ditto.  Also remove definition
+	of __tzrule which is now in gettzinfo.c.  Change _timezone
+	references to not cast to time_t.
+	* libc/time/gettzinfo.c: New file.
+
 2005-02-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/sys/unistd.h: Define getpeereid for Cygwin.

@@ -19,24 +19,6 @@
 
 #define isleap(y) ((((y) % 4) == 0 && ((y) % 100) != 0) || ((y) % 400) == 0)
 
-extern time_t __tzstart_std;
-extern time_t __tzstart_dst;
-extern int __tznorth;
-extern int __tzyear;
-
-typedef struct __tzrule_struct
-{
-  char ch;
-  int m;
-  int n;
-  int d;
-  int s;
-  time_t change;
-  int offset;
-} __tzrule_type;
-
-extern __tzrule_type __tzrule[2];
-
 struct tm * _EXFUN (_mktm_r, (_CONST time_t *, struct tm *, int __is_gmtime));
 int         _EXFUN (__tzcalc_limits, (int __year));
 
