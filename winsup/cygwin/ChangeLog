@@ -1,5 +1,10 @@
 2002-05-31  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler.cc (fhandler_base::open): Make default open mode == binmode.
+	(fhandler_base::init): Set open flags based on derived binmode argument.
+
+2002-05-31  Christopher Faylor  <cgf@redhat.com>
+
 	* dll_init.cc (dll_list::init): Eliminate unneeded debugging statement.
 
 2002-05-31  Christopher Faylor  <cgf@redhat.com>

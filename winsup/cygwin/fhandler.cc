@@ -434,9 +434,9 @@ fhandler_base::open (path_conv *pc, int flags, mode_t mode)
   else if (fmode & O_TEXT)
     bin = O_TEXT;
   else if (get_device () == FH_DISK)
-    bin = get_w_binary () || get_r_binary () || O_BINARY;
+    bin = get_w_binary () || get_r_binary () || 1;
   else
-    bin = (binmode == O_BINARY) || get_w_binary () || get_r_binary ();
+    bin = get_w_binary () || get_r_binary () || (binmode != O_TEXT);
 
   if (bin & O_TEXT)
     bin = 0;
@@ -853,12 +853,14 @@ fhandler_base::init (HANDLE f, DWORD a, mode_t bin)
   set_w_binary (bin);
   access = a;
   a &= GENERIC_READ | GENERIC_WRITE;
+  int oflags = 0;
   if (a == GENERIC_READ)
-    set_flags (O_RDONLY);
-  if (a == GENERIC_WRITE)
-    set_flags (O_WRONLY);
-  if (a == (GENERIC_READ | GENERIC_WRITE))
-    set_flags (O_RDWR);
+    oflags = O_RDONLY;
+  else if (a == GENERIC_WRITE)
+    oflags = O_WRONLY;
+  else if (a == (GENERIC_READ | GENERIC_WRITE))
+    oflags = O_RDWR;
+  set_flags (oflags | (bin ? O_BINARY : O_TEXT));
   set_open_status ();
   debug_printf ("created new fhandler_base for handle %p", f);
 }
