@@ -308,11 +308,6 @@ dll_list::load_after_fork (HANDLE parent, dll *first)
 	  HMODULE h = LoadLibraryEx (d.name, NULL, DONT_RESOLVE_DLL_REFERENCES);
 
 	  if (!h)
-	    {
-	      unload = false;
-	      h = LoadLibrary (d.name);
-	    }
-	  if (!h)
 	    system_printf ("can't reload %s", d.name);
 	  /* See if DLL will load in proper place.  If so, free it and reload
 	     it the right way.

@@ -77,23 +77,6 @@ close_all_files (void)
   cygwin_shared->delqueue.process_queue ();
 }
 
-BOOL __stdcall
-check_pty_fds (void)
-{
-  int res = FALSE;
-  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK, "check_pty_fds");
-  fhandler_base *fh;
-  for (int i = 0; i < (int) cygheap->fdtab.size; i++)
-    if ((fh = cygheap->fdtab[i]) != NULL &&
-	(fh->get_device () == FH_TTYS || fh->get_device () == FH_PTYM))
-      {
-	res = TRUE;
-	break;
-      }
-  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK, "check_pty_fds");
-  return res;
-}
-
 int
 dup (int fd)
 {
@@ -302,11 +285,9 @@ setsid (void)
 
   if (myself->pgid != myself->pid)
     {
-      if (myself->ctty == TTY_CONSOLE
-	  && !cygheap->fdtab.has_console_fds ()
-	  && !check_pty_fds ())
-	FreeConsole ();
       myself->ctty = -1;
+      if (fhandler_console::open_fhs <= 0)
+	FreeConsole ();
       myself->sid = getpid ();
       myself->pgid = getpid ();
       syscall_printf ("sid %d, pgid %d, ctty %d", myself->sid, myself->pgid, myself->ctty);

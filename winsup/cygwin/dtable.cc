@@ -57,14 +57,6 @@ set_std_handle (int fd)
     SetStdHandle (std_consts[fd], cygheap->fdtab[fd]->get_output_handle ());
 }
 
-void
-dtable::dec_console_fds ()
-{
-  if (console_fds > 0 && !--console_fds &&
-      myself->ctty != TTY_CONSOLE && !check_pty_fds())
-    FreeConsole ();
-}
-
 int
 dtable::extend (int howmuch)
 {
@@ -189,9 +181,6 @@ dtable::release (int fd)
 	{
 	case FH_SOCKET:
 	  dec_need_fixup_before ();
-	  break;
-	case FH_CONSOLE:
-	  dec_console_fds ();
 	  break;
 	}
       delete fds[fd];
@@ -334,8 +323,7 @@ dtable::build_fhandler (int fd, DWORD dev, char *unix_name,
       case FH_CONSOLE:
       case FH_CONIN:
       case FH_CONOUT:
-	if ((fh = cnew (fhandler_console) ()))
-	  inc_console_fds ();
+	fh = cnew (fhandler_console) ();
 	break;
       case FH_PTYM:
 	fh = cnew (fhandler_pty_master) ();

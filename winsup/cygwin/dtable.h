@@ -20,11 +20,10 @@ class dtable
   fhandler_base **fds_on_hold;
   int first_fd_for_open;
   int cnt_need_fixup_before;
-  int console_fds;
 public:
   size_t size;
 
-  dtable () : first_fd_for_open(3), cnt_need_fixup_before(0), console_fds(0) {}
+  dtable () : first_fd_for_open(3), cnt_need_fixup_before(0) {}
   void init () {first_fd_for_open = 3;}
 
   void dec_need_fixup_before ()
@@ -33,12 +32,6 @@ public:
     { cnt_need_fixup_before++; }
   BOOL need_fixup_before ()
     { return cnt_need_fixup_before > 0; }
-
-  void dec_console_fds ();
-  void inc_console_fds ()
-    { console_fds++; }
-  BOOL has_console_fds ()
-    { return console_fds > 0; }
 
   int vfork_child_dup ();
   void vfork_parent_restore ();

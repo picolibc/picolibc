@@ -164,7 +164,6 @@ void events_init (void);
 void events_terminate (void);
 
 void __stdcall close_all_files (void);
-BOOL __stdcall check_pty_fds (void);
 
 /* Invisible window initialization/termination. */
 HWND __stdcall gethwnd (void);
