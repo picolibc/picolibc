@@ -1,6 +1,6 @@
 2002-07-31  Ian Dall  <ian@sibyl.beware.dropbear.id.au>
 
-	* bfdlink.h )bfd_link_common_skip_ar_symbols): New enum.
+	* bfdlink.h (bfd_link_common_skip_ar_symbols): New enum.
 	(struct bfd_link_info): Add new field 'common_skip_ar_symbols'.
 
 2002-07-25  Richard Sandiford  <rsandifo@redhat.com>
