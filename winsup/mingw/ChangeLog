@@ -1,4 +1,10 @@
 
+2000-02-21  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* include/tchar.h: (__TEXT): Remove undef.
+	(_TEXT): Ditto.
+	(_T): Ditto.
+
 Fri Feb  2 10:34:07  2001  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* include/tchar.h: (__TEXT): Add private macro.

@@ -66,8 +66,7 @@ typedef	wchar_t	TCHAR;
  * macro within your programs.  It's name and function could change without
  * notice.
  */
-#undef  __TEXT
-#define	__TEXT(x)	L ## x
+#define	__TEXT(x)	L##x
 
 /*  for porting from other Windows compilers */
 #if 0  // no  wide startup module
@@ -217,7 +216,6 @@ typedef char	TCHAR;
  * macro within your programs.  It's name and function could change without
  * notice.
  */
-#undef __TEXT
 #define	__TEXT(x)	x
 
 /*  for porting from other Windows compilers */
@@ -354,9 +352,7 @@ typedef char	TCHAR;
  * UNICODE a constant string when _UNICODE is defined else returns the string
  * unmodified.  Also defined in w32api/winnt.h.
  */
-#undef  _TEXT
 #define _TEXT(x)	__TEXT(x)
-#undef  _T
 #define	_T(x)		__TEXT(x)
 
 #endif	/* Not _TCHAR_H_ */
