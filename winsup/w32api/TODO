@@ -8,9 +8,6 @@ _WIN32_IE issue
 
 Missing functions/defines/structs
 =================================
-CS_ENABLE
-CS_DISABLE
-CS_DELETE_TRANSFORM
 ATF_AVAILABLE
 SERKF_ACTIVE
 TIMER_ALL_ACCESS,TIMER_MODIFY_STATE (new style Win32 Access Control: accctrl)

@@ -1,3 +1,44 @@
+2003-09-23  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/winuser.h (KEYEVENTF_UNICODE, KEYEVENTF_SCANCODE):
+	Add defines.
+
+2003-09-23  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/winable.h [_WIN32_WINNT < 0x0403] (INPUT_MOUSE,
+	INPUT_KEYBOARD, INPUT_HARDWARE): Duplicate defines in
+	<winable.h> as seems to be required on older versions of
+	Windows.
+
+2003-09-23  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/winuser.h [WINVER >= 0x0500] (CHILDID_SELF,
+	GUI_CARETBLINKING, GUI_INMOVESIZE, GUI_INMENUMODE,
+	GUI_SYSTEMMENUMODE, GUI_POPUPMENUMODE, GUI_16BITTASK):
+	Add defines, the last one only on Windows XP...
+
+	* include/winable.h [WINVER < 0x0500] (CHILDID_SELF,
+	GUI_CARETBLINKING, GUI_INMOVESIZE, GUI_INMENUMODE,
+	GUI_SYSTEMMENUMODE, GUI_POPUPMENUMODE): ...and duplicate
+	them in <winable.h> as seems to be required on older
+	versions of Windows.
+
+2003-09-23  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/winuser.h [WINVER >= 0x0500] (GUITHREADINFO,
+	OBJID_WINDOW, OBJID_SYSMENU, OBJID_TITLEBAR, OBJID_MENU,
+	OBJID_CLIENT, OBJID_VSCROLL, OBJID_HSCROLL, OBJID_SIZEGRIP,
+	OBJID_CARET, OBJID_CURSOR, OBJID_ALERT, OBJID_SOUND): Bring
+	back into <winuser.h>...
+
+	* include/winable.h [WINVER < 0x0500] (GUITHREADINFO,
+	OBJID_WINDOW, OBJID_SYSMENU, OBJID_TITLEBAR, OBJID_MENU,
+	OBJID_CLIENT, OBJID_VSCROLL, OBJID_HSCROLL, OBJID_SIZEGRIP,
+	OBJID_CARET, OBJID_CURSOR, OBJID_ALERT, OBJID_SOUND): ...and
+	comment out in <winable.h>. MSDN may say <winable.h> but this
+	breaks many programs. It seems it used to be <winable.h> on
+	older versions of Windows.
+
 2003-09-17  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winuser.h (UpdateLayeredWindow): Protect against NOGDI.

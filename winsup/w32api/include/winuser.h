@@ -2025,7 +2025,7 @@ extern "C" {
 #define MOD_RIGHT 16384
 #define MOD_LEFT 32768
 #define LLKHF_ALTDOWN  0x00000020
-#if(WINVER >= 0x0500)
+#if (WINVER >= 0x0500)
 #define FLASHW_STOP 0
 #define FLASHW_CAPTION 1
 #define FLASHW_TRAY 2
@@ -2037,9 +2037,10 @@ extern "C" {
 #define INPUT_KEYBOARD 1
 #define INPUT_HARDWARE 2
 #define CURSOR_SHOWING 0x00000001
-#if(WINVER >= 0x0400)
+#if (WINVER >= 0x0400)
 #define ENDSESSION_LOGOFF    0x80000000
 #endif /* WINVER >= 0x0400 */
+#if (WINVER >= 0x0500)
 #define CHILDID_SELF 0
 #define OBJID_WINDOW 0x00000000
 #define OBJID_SYSMENU 0xFFFFFFFF
@@ -2058,15 +2059,16 @@ extern "C" {
 #define GUI_INMENUMODE 0x00000004
 #define GUI_SYSTEMMENUMODE 0x00000008
 #define GUI_POPUPMENUMODE 0x00000010
-#if(_WIN32_WINNT >= 0x0501)
+#if (_WIN32_WINNT >= 0x0501)
 #define GUI_16BITTASK 0x00000020
 #endif
+#endif /* (WINVER >= 0x0500) */
 #if (_WIN32_WINNT >= 0x0500 || _WIN32_WINDOWS >= 0x0490)
 #define ASFW_ANY ((DWORD)-1)
 #define LSFW_LOCK 1
 #define LSFW_UNLOCK 2
 #endif
-#if(_WIN32_WINNT >= 0x0500)
+#if (_WIN32_WINNT >= 0x0500)
 #define LWA_COLORKEY 1
 #define LWA_ALPHA 2
 #endif
@@ -2836,6 +2838,7 @@ typedef struct tagINPUT {
 		HARDWAREINPUT hi;
   } DUMMYUNIONNAME;
 } INPUT, *PINPUT, FAR *LPINPUT;
+#if (WINVER >= 0x0500)
 typedef struct tagGUITHREADINFO {
 	DWORD cbSize;
 	DWORD flags;
@@ -2847,6 +2850,7 @@ typedef struct tagGUITHREADINFO {
 	HWND hwndCaret;
 	RECT rcCaret;
 } GUITHREADINFO,*PGUITHREADINFO;
+#endif /* (WINVER >= 0x0500) */
 
 #define AnsiToOem CharToOemA
 #define OemToAnsi OemToCharA
