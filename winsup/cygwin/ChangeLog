@@ -1,3 +1,7 @@
+Thu Apr 13 20:50:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* include/cygwin/version.h: Bump minor api to reflect export change.
+
 Thu Apr 13  8:48:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* path.cc (conv_to_win32_path): Detect a win32 path
