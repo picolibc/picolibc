@@ -1,8 +1,0 @@
-LIBRARY SECUR32.dll
-EXPORTS
-LsaCallAuthenticationPackage@28
-LsaDeregisterLogonProcess@4
-LsaFreeReturnBuffer@4
-LsaLogonUser@56
-LsaLookupAuthenticationPackage@12
-LsaRegisterLogonProcess@12
