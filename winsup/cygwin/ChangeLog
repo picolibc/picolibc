@@ -1,3 +1,8 @@
+2002-08-15  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* dcrt0.cc: Modify define for CYGWIN_GUARD.
+	(alloc_stack_hard_way): Just use CYGWIN_GUARD in VirtualAlloc call.
+
 2002-08-11  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* fhandler.h (fhandler_socket::recv): Remove method.
