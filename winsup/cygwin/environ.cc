@@ -765,8 +765,8 @@ static NO_COPY spenv spenvs[] =
   {"LOGONSERVER=", &cygheap_user::env_logsrv},
   {"SYSTEMDRIVE=", NULL},
   {"SYSTEMROOT=", NULL},
-  {"USERDOMAIN=", &cygheap_user::env_name},
-  {"USERNAME=", &cygheap_user::env_domain},
+  {"USERDOMAIN=", &cygheap_user::env_domain},
+  {"USERNAME=", &cygheap_user::env_name},
   {"USERPROFILE=", &cygheap_user::env_userprofile},
 };
 
@@ -939,6 +939,7 @@ build_env (const char * const *envp, char *&envblock, int &envc,
 					   of buffer */
     }
 
+  debug_printf ("envp %p, envc %d", newenv, envc);
   return newenv;
 }
 

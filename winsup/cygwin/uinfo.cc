@@ -190,6 +190,7 @@ cuserid (char *src)
 
 char cygheap_user::homepath_env_buf[MAX_PATH + 1];
 char cygheap_user::homedrive_env_buf[3];
+char cygheap_user::userprofile_env_buf[MAX_PATH + 1];
 
 const char *
 cygheap_user::ontherange (homebodies what, struct passwd *pw)
@@ -335,12 +336,11 @@ cygheap_user::env_domain ()
 const char *
 cygheap_user::env_userprofile ()
 {
-  static char buf[512]; /* FIXME: This shouldn't be static. */
   if (strcasematch (name (), "SYSTEM") || !env_domain () || !env_logsrv ())
     return NULL;
 
-  if (get_registry_hive_path (sid (), buf))
-    return buf;
+  if (get_registry_hive_path (sid (), userprofile_env_buf))
+    return userprofile_env_buf;
   else
     return NULL;
 }

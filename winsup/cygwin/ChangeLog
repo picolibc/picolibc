@@ -1,5 +1,14 @@
 2002-06-14  Christopher Faylor  <cgf@redhat.com>
 
+	* cygheap.h (cygheap_user::userprofile_env_buf): New static member.
+	* environ.cc (build_env): Add debugging statement.
+	(spenvs): Switch functions for USERDOMAIN and USERNAME.
+	* spawn.cc (spawn_guts): Move environment initialization prior to
+	cygheap_setup_for_child or environment info will never be copied to
+	child.
+
+2002-06-14  Christopher Faylor  <cgf@redhat.com>
+
 	* cygheap.h (cygheap_user): Add static members to hold home{drive,path}
 	info.
 	* uinfo.cc (cygheap_user::ontherange): Use static class members for

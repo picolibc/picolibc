@@ -613,9 +613,9 @@ spawn_guts (const char * prog_arg, const char *const *argv,
   if (!cygheap->user.impersonated || cygheap->user.token == INVALID_HANDLE_VALUE)
     {
       PSECURITY_ATTRIBUTES sec_attribs = sec_user_nih (sa_buf);
-      newheap = cygheap_setup_for_child (&ciresrv, cygheap->fdtab.need_fixup_before ());
       ciresrv.moreinfo->envp = build_env (envp, envblock, ciresrv.moreinfo->envc,
 					  real_path.iscygexec ());
+      newheap = cygheap_setup_for_child (&ciresrv, cygheap->fdtab.need_fixup_before ());
       rc = CreateProcess (runpath,	/* image name - with full path */
 			  one_line.buf,	/* what was passed to exec */
 			  sec_attribs,	/* process security attrs */
@@ -656,9 +656,9 @@ spawn_guts (const char * prog_arg, const char *const *argv,
       strcat (wstname, dskname);
       si.lpDesktop = wstname;
 
-      newheap = cygheap_setup_for_child (&ciresrv, cygheap->fdtab.need_fixup_before ());
       ciresrv.moreinfo->envp = build_env (envp, envblock, ciresrv.moreinfo->envc,
 					  real_path.iscygexec ());
+      newheap = cygheap_setup_for_child (&ciresrv, cygheap->fdtab.need_fixup_before ());
       rc = CreateProcessAsUser (cygheap->user.token,
 		       runpath,		/* image name - with full path */
 		       one_line.buf,	/* what was passed to exec */

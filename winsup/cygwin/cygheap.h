@@ -109,6 +109,9 @@ class cygheap_user
 				       info may live. */
   static char homepath_env_buf[MAX_PATH + 1]; /* Where the HOMEPATH environment
 						 variable info may live. */
+  static char userprofile_env_buf[MAX_PATH + 1]; /* Where the USERPROFILE
+						    environment variable info
+						    may live. */
 public:
   __uid32_t orig_uid;      /* Remains intact even after impersonation */
   __gid32_t orig_gid;      /* Ditto */
