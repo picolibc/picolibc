@@ -326,8 +326,6 @@ struct mips_opcode
 #define INSN_4100                 0x00040000
 /* Toshiba R3900 instruction.  */
 #define INSN_3900                 0x00080000
-/* 32-bit code running on a ISA3+ CPU.  */
-#define INSN_GP32                 0x00100000
 
 /* MIPS ISA defines, use instead of hardcoding ISA level.  */
 
@@ -369,15 +367,10 @@ struct mips_opcode
 /* Test for membership in an ISA including chip specific ISAs.
    INSN is pointer to an element of the opcode table; ISA is the
    specified ISA to test against; and CPU is the CPU specific ISA
-   to test, or zero if no CPU specific ISA test is desired.
-   The gp32 arg is set when you need to force 32-bit register usage on
-   a machine with 64-bit registers; see the documentation under -mgp32
-   in the MIPS gas docs.  */
+   to test, or zero if no CPU specific ISA test is desired.  */
 
-#define OPCODE_IS_MEMBER(insn, isa, cpu, gp32)				\
-    ((((insn)->membership & isa) != 0                           	\
-      && ((insn)->membership & INSN_GP32 ? gp32 : 1)			\
-     )									\
+#define OPCODE_IS_MEMBER(insn, isa, cpu)				\
+    (((insn)->membership & isa) != 0					\
      || (cpu == CPU_R4650 && ((insn)->membership & INSN_4650) != 0)	\
      || (cpu == CPU_R4010 && ((insn)->membership & INSN_4010) != 0)	\
      || ((cpu == CPU_VR4100 || cpu == CPU_R4111)			\
@@ -508,6 +501,7 @@ enum
   M_LWR_A,
   M_LWR_AB,
   M_LWU_AB,
+  M_MOVE,
   M_MUL,
   M_MUL_I,
   M_MULO,
