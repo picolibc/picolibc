@@ -1,3 +1,7 @@
+2003-01-31  Grant Grundler  <grundler@dsl2.external.hp.com>
+
+        * hppa.h (ldwa, ldda): Add ordered opcodes.
+
 2003-01-26  Daniel Jacobowitz  <drow@mvista.com>
 
 	* hashtab.h (htab_alloc_with_arg, htab_free_with_arg): Add new types.
