@@ -1,3 +1,14 @@
+2000-03-02  J"orn Rennecke <amylaar@cygnus.co.uk>
+
+        * d30v.h:
+        (SHORT_B2r, SHORT_B3, SHORT_B3r, SHORT_B3b, SHORT_B3br): Updated.
+        (SHORT_D1r, SHORT_D2, SHORT_D2r, SHORT_D2Br, SHORT_U): Updated.
+        (SHORT_F, SHORT_AF, SHORT_T, SHORT_A5, SHORT_CMP, SHORT_CMPU): Updated.
+        (SHORT_A1, SHORT_AA, SHORT_RA, SHORT_MODINC, SHORT_MODDEC): Updated.
+        (SHORT_C1, SHORT_C2, SHORT_UF, SHORT_A2, SHORT_NONE, LONG): Updated.
+        (LONG_U, LONG_Ur, LONG_CMP, LONG_M, LONG_M2, LONG_2, LONG_2r): Updated.
+        (LONG_2b, LONG_2br, LONG_D, LONG_Dr, LONG_Dbr): Updated.
+
 2000-02-25  Alan Modra  <alan@spri.levels.unisa.edu.au>
 
 	* i386.h (fild, fistp): Change intel d_Suf form to fildd and
