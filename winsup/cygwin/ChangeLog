@@ -1,3 +1,9 @@
+2003-08-05  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Rework to accommodate new speclib arguments.
+	* speclib: Rework to extract everything from libcygwin.a rather than
+	building things from existing object files.
+
 2003-08-05  Pavel Tsekov  <ptsekov@gmx.net>
 
 	* path.cc (cygdrive_getmntent): Do not skip over drives of type
