@@ -30,7 +30,7 @@ details. */
    on the first call that needs information from it. */
 
 static struct __group32 *group_buf;		/* group contents in memory */
-static int curr_lines;
+static int curr_lines = -1;
 static int max_lines;
 
 /* Position in the group cache */
@@ -41,6 +41,7 @@ static int grp_pos = 0;
 #endif
 
 static pwdgrp_check group_state;
+static char * NO_COPY null_ptr = NULL;
 
 static int
 parse_grp (struct __group32 &grp, char *line)
@@ -62,13 +63,11 @@ parse_grp (struct __group32 &grp, char *line)
   if (dp)
     {
       *dp++ = '\0';
-      if (!strlen (grp.gr_passwd))
-	grp.gr_passwd = NULL;
-
       grp.gr_gid = strtol (dp, NULL, 10);
       dp = strchr (dp, ':');
       if (dp)
 	{
+	  grp.gr_mem = &null_ptr;
 	  if (*++dp)
 	    {
 	      int i = 0;
@@ -87,11 +86,9 @@ parse_grp (struct __group32 &grp, char *line)
 		    }
 		  namearray[i++] = dp;
 		  namearray[i] = NULL;
+		  grp.gr_mem = namearray;
 		}
-	      grp.gr_mem = namearray;
 	    }
-	  else
-	    grp.gr_mem = (char **) calloc (1, sizeof (char *));
 	  return 1;
 	}
     }
@@ -134,9 +131,7 @@ pthread_mutex_t NO_COPY group_lock::mutex = (pthread_mutex_t) PTHREAD_MUTEX_INIT
 /* Read in /etc/group and save contents in the group cache */
 /* This sets group_in_memory_p to 1 so functions in this file can
    tell that /etc/group has been read in */
-/* FIXME: should be static but this is called in uinfo_init outside this
-   file */
-void
+static void
 read_etc_group ()
 {
   static pwdgrp_read gr;
@@ -150,74 +145,60 @@ read_etc_group ()
   if (group_state != initializing)
     {
       group_state = initializing;
+      for (int i = 0; i < curr_lines; i++)
+	if ((group_buf + i)->gr_mem != &null_ptr)
+	  free ((group_buf + i)->gr_mem);
+
+      curr_lines = 0;
       if (gr.open ("/etc/group"))
 	{
 	  char *line;
 	  while ((line = gr.gets ()) != NULL)
-	    if (strlen (line))
-	      add_grp_line (line);
+            add_grp_line (line);
 
 	  group_state.set_last_modified (gr.get_fhandle (), gr.get_fname ());
-	  group_state = loaded;
 	  gr.close ();
 	  debug_printf ("Read /etc/group, %d lines", curr_lines);
 	}
-      else /* /etc/group doesn't exist -- create default one in memory */
-	{
-	  char group_name [UNLEN + 1];
-	  DWORD group_name_len = UNLEN + 1;
-	  char domain_name [INTERNET_MAX_HOST_NAME_LENGTH + 1];
-	  DWORD domain_name_len = INTERNET_MAX_HOST_NAME_LENGTH + 1;
-	  SID_NAME_USE acType;
+
+      /* Complete /etc/group in memory if needed */
+      if (!getgrgid32 (myself->gid))
+        {
 	  static char linebuf [200];
+	  char group_name [UNLEN + 1] = "unknown";
+	  char strbuf[128] = "";
 
 	  if (wincap.has_security ())
-	    {
-	      HANDLE ptok;
-	      cygsid tg;
-	      DWORD siz;
+            {
+	      struct __group32 *gr;
 
-	      if (OpenProcessToken (hMainProc, TOKEN_QUERY, &ptok))
-		{
-		  if (GetTokenInformation (ptok, TokenPrimaryGroup, &tg,
-					   sizeof tg, &siz)
-		      && LookupAccountSidA (NULL, tg, group_name,
-					    &group_name_len, domain_name,
-					    &domain_name_len, &acType))
-		    {
-		      char strbuf[100];
-		      snprintf (linebuf, sizeof (linebuf), "%s:%s:%lu:",
-				group_name,
-				tg.string (strbuf),
-				*GetSidSubAuthority (tg,
-					     *GetSidSubAuthorityCount (tg) - 1));
-		      debug_printf ("Emulating /etc/group: %s", linebuf);
-		      add_grp_line (linebuf);
-		      group_state = emulated;
-		    }
-		  CloseHandle (ptok);
-		}
+	      cygheap->user.groups.pgsid.string (strbuf);
+	      if ((gr = internal_getgrsid (cygheap->user.groups.pgsid)))
+		strlcpy (group_name, gr->gr_name, sizeof (group_name));
 	    }
-	  if (group_state != emulated)
-	    {
-	      strncpy (group_name, "Administrators", sizeof (group_name));
-	      if (!LookupAccountSidA (NULL, well_known_admins_sid, group_name,
-				      &group_name_len, domain_name,
-				      &domain_name_len, &acType))
-		{
-		  strcpy (group_name, "unknown");
-		  debug_printf ("Failed to get local admins group name. %E");
-		}
-	      snprintf (linebuf, sizeof (linebuf), "%s::%u:", group_name,
-			(unsigned) DEFAULT_GID);
-	      debug_printf ("Emulating /etc/group: %s", linebuf);
-	      add_grp_line (linebuf);
-	      group_state = emulated;
-	    }
+	  snprintf (linebuf, sizeof (linebuf), "%s:%s:%lu:%s",
+		    group_name, strbuf, myself->gid, cygheap->user.name ());
+	  debug_printf ("Completing /etc/group: %s", linebuf);
+	  add_grp_line (linebuf);
 	}
+      group_state = loaded;
     }
-
   return;
+}
+
+struct __group32 *
+internal_getgrsid (cygsid &sid)
+{
+  char sid_string[128];
+
+  if (curr_lines < 0 && group_state  <= initializing)
+    read_etc_group ();
+
+  if (sid.string (sid_string))
+    for (int i = 0; i < curr_lines; i++)
+      if (!strcmp (sid_string, (group_buf + i)->gr_passwd))
+        return group_buf + i;
+  return NULL;
 }
 
 static
@@ -246,13 +227,12 @@ getgrgid32 (__gid32_t gid)
 
   for (int i = 0; i < curr_lines; i++)
     {
-      if (group_buf[i].gr_gid == DEFAULT_GID)
+      if (group_buf[i].gr_gid == myself->gid)
 	default_grp = group_buf + i;
       if (group_buf[i].gr_gid == gid)
 	return group_buf + i;
     }
-
-  return allow_ntsec ? NULL : default_grp;
+  return allow_ntsec || gid != ILLEGAL_GID ? NULL : default_grp;
 }
 
 extern "C" struct __group16 *
@@ -482,13 +462,9 @@ setgroups32 (int ngroups, const __gid32_t *grouplist)
       for (int gidy = 0; gidy < gidx; gidy++)
 	if (grouplist[gidy] == grouplist[gidx])
 	  goto found; /* Duplicate */
-      for (int gidy = 0; (gr = internal_getgrent (gidy)); ++gidy)
-	if (gr->gr_gid == (__gid32_t) grouplist[gidx])
-	  {
-	    if (gsids.addfromgr (gr))
-	      goto found;
-	    break;
-	  }
+      if ((gr = getgrgid32 (grouplist[gidx])) &&
+	  gsids.addfromgr (gr))
+	goto found;
       debug_printf ("No sid found for gid %d", grouplist[gidx]);
       gsids.free_sids ();
       set_errno (EINVAL);

@@ -27,7 +27,7 @@ details. */
    on the first call that needs information from it. */
 
 static struct passwd *passwd_buf;	/* passwd contents in memory */
-static int curr_lines;
+static int curr_lines = -1;
 static int max_lines;
 
 static pwdgrp_check passwd_state;
@@ -74,7 +74,7 @@ grab_int (char **p)
 }
 
 /* Parse /etc/passwd line into passwd structure. */
-void
+static int
 parse_pwd (struct passwd &res, char *buf)
 {
   /* Allocate enough room for the passwd struct and all the strings
@@ -82,6 +82,8 @@ parse_pwd (struct passwd &res, char *buf)
   size_t len = strlen (buf);
   if (buf[--len] == '\r')
     buf[len] = '\0';
+  if (len < 6)
+    return 0;
 
   res.pw_name = grab_string (&buf);
   res.pw_passwd = grab_string (&buf);
@@ -91,6 +93,7 @@ parse_pwd (struct passwd &res, char *buf)
   res.pw_gecos = grab_string (&buf);
   res.pw_dir =  grab_string (&buf);
   res.pw_shell = grab_string (&buf);
+  return 1;
 }
 
 /* Add one line from /etc/passwd into the password cache */
@@ -102,7 +105,8 @@ add_pwd_line (char *line)
 	max_lines += 10;
 	passwd_buf = (struct passwd *) realloc (passwd_buf, max_lines * sizeof (struct passwd));
       }
-    parse_pwd (passwd_buf[curr_lines++], line);
+    if (parse_pwd (passwd_buf[curr_lines], line))
+      curr_lines++;
 }
 
 class passwd_lock
@@ -125,10 +129,32 @@ class passwd_lock
 
 pthread_mutex_t NO_COPY passwd_lock::mutex = (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER;
 
+/* Cygwin internal */
+/* If this ever becomes non-reentrant, update all the getpw*_r functions */
+static struct passwd *
+search_for (__uid32_t uid, const char *name)
+{
+  struct passwd *res = 0;
+
+  for (int i = 0; i < curr_lines; i++)
+    {
+      res = passwd_buf + i;
+      /* on Windows NT user names are case-insensitive */
+      if (name)
+        {
+	  if (strcasematch (name, res->pw_name))
+	    return res;
+	}
+      else if (uid == (__uid32_t) res->pw_uid)
+	return res;
+    }
+  return NULL;
+}
+
 /* Read in /etc/passwd and save contents in the password cache.
    This sets passwd_state to loaded or emulated so functions in this file can
    tell that /etc/passwd has been read in or will be emulated. */
-void
+static void
 read_etc_passwd ()
 {
   static pwdgrp_read pr;
@@ -146,97 +172,71 @@ read_etc_passwd ()
   if (passwd_state != initializing)
     {
       passwd_state = initializing;
+      curr_lines = 0;
       if (pr.open ("/etc/passwd"))
 	{
 	  char *line;
 	  while ((line = pr.gets ()) != NULL)
-	    if (strlen (line))
-	      add_pwd_line (line);
+	    add_pwd_line (line);
 
 	  passwd_state.set_last_modified (pr.get_fhandle (), pr.get_fname ());
-	  passwd_state = loaded;
 	  pr.close ();
 	  debug_printf ("Read /etc/passwd, %d lines", curr_lines);
 	}
-      else
+
+      static char linebuf[1024];
+      char strbuf[128] = "";
+      BOOL searchentry = TRUE;
+      __uid32_t default_uid = DEFAULT_UID;
+      struct passwd *pw;
+
+      if (wincap.has_security ())
 	{
-	  static char linebuf[1024];
-
-	  if (wincap.has_security ())
-	    {
-	      HANDLE ptok;
-	      cygsid tu, tg;
-	      DWORD siz;
-
-	      if (OpenProcessToken (hMainProc, TOKEN_QUERY, &ptok))
-		{
-		  if (GetTokenInformation (ptok, TokenUser, &tu, sizeof tu,
-					   &siz)
-		      && GetTokenInformation (ptok, TokenPrimaryGroup, &tg,
-					      sizeof tg, &siz))
-		    {
-		      char strbuf[100];
-		      snprintf (linebuf, sizeof (linebuf),
-				"%s::%lu:%lu:%s:%s:/bin/sh",
-				cygheap->user.name (),
-				*GetSidSubAuthority (tu,
-					     *GetSidSubAuthorityCount(tu) - 1),
-				*GetSidSubAuthority (tg,
-					     *GetSidSubAuthorityCount(tg) - 1),
-				tu.string (strbuf), getenv ("HOME") ?: "/");
-		      debug_printf ("Emulating /etc/passwd: %s", linebuf);
-		      add_pwd_line (linebuf);
-		      passwd_state = emulated;
-		    }
-		  CloseHandle (ptok);
-		}
-	    }
-	  if (passwd_state != emulated)
-	    {
-	      snprintf (linebuf, sizeof (linebuf), "%s::%u:%u::%s:/bin/sh",
-			cygheap->user.name (), (unsigned) DEFAULT_UID,
-			(unsigned) DEFAULT_GID, getenv ("HOME") ?: "/");
-	      debug_printf ("Emulating /etc/passwd: %s", linebuf);
-	      add_pwd_line (linebuf);
-	      passwd_state = emulated;
-	    }
+	  cygsid tu = cygheap->user.sid ();
+	  tu.string (strbuf);
+	  if (myself->uid == ILLEGAL_UID
+	      && (searchentry = !internal_getpwsid (tu)))
+	    default_uid = DEFAULT_UID_NT;
 	}
-
+      if (searchentry &&
+	  (!(pw = search_for (0, cygheap->user.name ())) ||
+	   (myself->uid != ILLEGAL_UID &&
+	    myself->uid != (__uid32_t) pw->pw_uid  &&
+	    !search_for (myself->uid, NULL))))
+	{
+	  snprintf (linebuf, sizeof (linebuf), "%s:*:%lu:%lu:,%s:%s:/bin/sh",
+		    cygheap->user.name (),
+		    myself->uid == ILLEGAL_UID ? default_uid : myself->uid,
+		    myself->gid,
+		    strbuf, getenv ("HOME") ?: "/");
+	  debug_printf ("Completing /etc/passwd: %s", linebuf);
+	  add_pwd_line (linebuf);
+	}
+      passwd_state = loaded;
     }
-
   return;
 }
 
-/* Cygwin internal */
-/* If this ever becomes non-reentrant, update all the getpw*_r functions */
-static struct passwd *
-search_for (__uid32_t uid, const char *name)
+struct passwd *
+internal_getpwsid (cygsid &sid)
 {
-  struct passwd *res = 0;
-  struct passwd *default_pw = 0;
+  struct passwd *pw;
+  char *ptr1, *ptr2, *endptr;
+  char sid_string[128] = {0,','};
 
-  for (int i = 0; i < curr_lines; i++)
+  if (curr_lines < 0 && passwd_state  <= initializing)
+    read_etc_passwd ();
+
+  if (sid.string (sid_string + 2))
     {
-      res = passwd_buf + i;
-      if (res->pw_uid == DEFAULT_UID)
-	default_pw = res;
-      /* on Windows NT user names are case-insensitive */
-      if (name)
-	{
-	  if (strcasematch (name, res->pw_name))
-	    return res;
-	}
-      else if (uid == (__uid32_t) res->pw_uid)
-	return res;
+      endptr = strchr (sid_string + 2, 0) - 1;
+      for (int i = 0; i < curr_lines; i++)
+	if ((pw = passwd_buf + i)->pw_dir > pw->pw_gecos + 8)
+	  for (ptr1 = endptr, ptr2 = pw->pw_dir - 2;
+	       *ptr1 == *ptr2; ptr2--)
+	    if (!*--ptr1)
+	      return pw;
     }
-
-  /* Return default passwd entry if passwd is emulated or it's a
-     request for the current user. */
-  if (passwd_state != loaded
-      || (!name && uid == myself->uid)
-      || (name && strcasematch (name, cygheap->user.name ())))
-    return default_pw;
-
   return NULL;
 }
 
@@ -399,6 +399,7 @@ setpassent ()
   return 0;
 }
 
+#if 0 /* Unused */
 /* Internal function. ONLY USE THIS INTERNALLY, NEVER `getpwent'!!! */
 struct passwd *
 internal_getpwent (int pos)
@@ -410,6 +411,7 @@ internal_getpwent (int pos)
     return passwd_buf + pos;
   return NULL;
 }
+#endif
 
 extern "C" char *
 getpass (const char * prompt)

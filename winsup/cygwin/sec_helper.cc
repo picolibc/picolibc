@@ -118,21 +118,20 @@ BOOL
 cygsid::getfrompw (const struct passwd *pw)
 {
   char *sp = (pw && pw->pw_gecos) ? strrchr (pw->pw_gecos, ',') : NULL;
-  return (*this = sp ? sp + 1 : "") != NULL;
+  return (*this = sp ? sp + 1 : sp) != NULL;
 }
 
 BOOL
 cygsid::getfromgr (const struct __group32 *gr)
 {
   char *sp = (gr && gr->gr_passwd) ? gr->gr_passwd : NULL;
-  return (*this = sp ?: "") != NULL;
+  return (*this = sp) != NULL;
 }
 
 __uid32_t
 cygsid::get_id (BOOL search_grp, int *type)
 {
   /* First try to get SID from passwd or group entry */
-  cygsid sid;
   __uid32_t id = ILLEGAL_UID;
 
   if (!search_grp)
@@ -140,42 +139,25 @@ cygsid::get_id (BOOL search_grp, int *type)
       struct passwd *pw;
       if (*this == cygheap->user.sid ())
 	id = myself->uid;
-      else
-	for (int pidx = 0; (pw = internal_getpwent (pidx)); ++pidx)
-          {
-	    if (sid.getfrompw (pw) && sid == psid)
-	      {
-		id = pw->pw_uid;
-		break;
-	      }
-	  }
+      else if ((pw = internal_getpwsid (*this)))
+	id = pw->pw_uid;
       if (id != ILLEGAL_UID)
 	{
 	  if (type)
 	    *type = USER;
 	   return id;
-	 }
+	}
     }
   if (search_grp || type)
     {
       struct __group32 *gr;
       if (cygheap->user.groups.pgsid == psid)
 	id = myself->gid;
-      else
-	for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
-	  {
-	    if (sid.getfromgr (gr) && sid == psid)
-	      {
-		id = gr->gr_gid;
-		break;
-	      }
-	  }
-      if (id != ILLEGAL_UID)
-	{
-	  if (type)
-	    *type = GROUP;
-	}
-     }
+      else if ((gr = internal_getgrsid (*this)))
+	id = gr->gr_gid;
+      if (id != ILLEGAL_UID && type)
+	*type = GROUP;
+    }
   return id;
 }
 
@@ -208,24 +190,17 @@ is_grp_member (__uid32_t uid, __gid32_t gid)
     }
 
   /* Otherwise try getting info from examining passwd and group files. */
-  for (int idx = 0; (pw = internal_getpwent (idx)); ++idx)
-    if ((__uid32_t) pw->pw_uid == uid)
-      {
-	/* If gid == primary group of uid, return immediately. */
-	if ((__gid32_t) pw->pw_gid == gid)
-	  return TRUE;
-	/* Otherwise search for supplementary user list of this group. */
-	for (idx = 0; (gr = internal_getgrent (idx)); ++idx)
-	  if ((__gid32_t) gr->gr_gid == gid)
-	    {
-	      if (gr->gr_mem)
-		for (idx = 0; gr->gr_mem[idx]; ++idx)
-		  if (strcasematch (cygheap->user.name (), gr->gr_mem[idx]))
-		    return TRUE;
-	      return FALSE;
-	    }
-        return FALSE;
-      }
+  if ((pw = getpwuid32 (uid)))
+    {
+      /* If gid == primary group of uid, return immediately. */
+      if ((__gid32_t) pw->pw_gid == gid)
+	return TRUE;
+      /* Otherwise search for supplementary user list of this group. */
+      if ((gr = getgrgid32 (gid)) && gr->gr_mem)
+	for (idx = 0; gr->gr_mem[idx]; ++idx)
+	  if (strcasematch (cygheap->user.name (), gr->gr_mem[idx]))
+	    return TRUE;
+    }
   return FALSE;
 }
 

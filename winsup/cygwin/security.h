@@ -11,7 +11,8 @@ details. */
 #include <accctrl.h>
 
 #define DEFAULT_UID DOMAIN_USER_RID_ADMIN
-#define DEFAULT_GID DOMAIN_ALIAS_RID_ADMINS
+#define DEFAULT_UID_NT 400 /* Non conflicting number */
+#define DEFAULT_GID 401
 
 #define MAX_SID_LEN 40
 #define MAX_DACL_LEN(n) (sizeof (ACL) \
@@ -203,11 +204,12 @@ extern BOOL allow_ntea;
 extern BOOL allow_ntsec;
 extern BOOL allow_smbntsec;
 
-/* These both functions are needed to allow walking through the passwd
+/* These functions are needed to allow walking through the passwd
    and group lists so they are somehow security related. Besides that
    I didn't find a better place to declare them. */
-extern struct passwd *internal_getpwent (int);
 extern struct __group32 *internal_getgrent (int);
+extern struct passwd *internal_getpwsid (cygsid &);
+extern struct __group32 *internal_getgrsid (cygsid &);
 
 /* File manipulation */
 int __stdcall set_process_privileges ();

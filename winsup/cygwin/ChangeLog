@@ -1,3 +1,31 @@
+2002-11-20  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* security.h: Declare internal_getpwsid and internal_getgrsid.
+	Undeclare internal_getpwent.  Define DEFAULT_UID_NT.  Change
+	DEFAULT_GID.
+	* passwd.cc (internal_getpwsid): New function.
+	(internal_getpwent): Suppress.
+	(read_etc_passwd): Make static.  Rewrite the code for the completion
+	line.  Set curr_lines to 0.
+	(parse_pwd): Change type to static int.  Return 0 for short lines.
+	(add_pwd_line): Pay attention to the value of parse_pwd.
+	(search_for): Do not look for nor return the DEFAULT_UID.
+	* grp.cc (read_etc_group): Make static.  Free gr_mem and set
+	curr_lines to 0.  Always call add_pwd_line.  Rewrite the code for the
+	completion line.
+	(internal_getgrsid): New function.
+	(parse_grp): If grp.gr_mem is empty, set it to &null_ptr.
+	Never NULL gr_passwd.
+	(getgrgid32): Only return the default if ntsec is off and the gid is
+	ILLEGAL_GID.
+	* sec_helper.cc (cygsid::get_id): Use getpwsid and getgrsid.
+	(cygsid_getfrompw): Clean up last line.
+	(cygsid_getfromgr): Ditto.
+	(is_grp_member): Use getpwuid32 and getgrgid32.
+	* uinfo.cc (internal_getlogin): Set DEFAULT_GID at start.
+	Use getpwsid. Move the read of /etc/group after the second access
+	to /etc/passwd.  Change some debug_printf.
+
 2002-11-20  Steven O'Brien  <steven.obrien2@ntlworld.com>
 
 	* poll.cc (poll): ...but set POLLIN instead.

@@ -34,10 +34,11 @@ void
 internal_getlogin (cygheap_user &user)
 {
   struct passwd *pw = NULL;
+  HANDLE ptok = INVALID_HANDLE_VALUE;
 
+  myself->gid = DEFAULT_GID;
   if (wincap.has_security ())
     {
-      HANDLE ptok = INVALID_HANDLE_VALUE;
       DWORD siz;
       cygsid tu;
       DWORD ret = 0;
@@ -58,52 +59,39 @@ internal_getlogin (cygheap_user &user)
 	 If we have a SID, try to get the corresponding Cygwin
 	 password entry. Set user name which can be different
 	 from the Windows user name */
-       if (ret)
-	 {
-	  cygsid gsid (NO_SID);
-	  cygsid psid;
-
-	  for (int pidx = 0; (pw = internal_getpwent (pidx)); ++pidx)
-	    if (psid.getfrompw (pw) && EqualSid (user.sid (), psid))
-	      {
-		user.set_name (pw->pw_name);
-		struct __group32 *gr = getgrgid32 (pw->pw_gid);
-		if (gr)
-		  if (!gsid.getfromgr (gr))
-		      gsid = NO_SID;
-		break;
-	      }
-
-	  /* Set token owner to the same value as token user and
-	     primary group to the group in /etc/passwd. */
+      if (ret)
+	{
+	  if ((pw = internal_getpwsid (tu)))
+	    user.set_name (pw->pw_name);
+	  /* Set token owner to the same value as token user */
 	  if (!SetTokenInformation (ptok, TokenOwner, &tu, sizeof tu))
 	    debug_printf ("SetTokenInformation(TokenOwner): %E");
-	  if (gsid)
+	 }
+    }
+
+  if (!pw && !(pw = getpwnam (user.name ())))
+    debug_printf("user name not found in augmented /etc/passwd");
+  else
+    {
+      myself->uid = pw->pw_uid;
+      myself->gid = pw->pw_gid;
+      if (wincap.has_security ())
+        {
+	  cygsid gsid;
+	  if (gsid.getfromgr (getgrgid32 (pw->pw_gid)))
 	    {
+	      /* Set primary group to the group in /etc/passwd. */
 	      user.groups.pgsid = gsid;
 	      if (!SetTokenInformation (ptok, TokenPrimaryGroup,
 					&gsid, sizeof gsid))
 		debug_printf ("SetTokenInformation(TokenPrimaryGroup): %E");
 	    }
-	 }
-      if (ptok != INVALID_HANDLE_VALUE)
-	CloseHandle (ptok);
+	  else
+	    debug_printf ("gsid not found in augmented /etc/group");
+	}
     }
-
-  if (!pw)
-    pw = getpwnam (user.name ());
-
-  if (pw)
-    {
-      myself->uid = pw->pw_uid;
-      myself->gid = pw->pw_gid;
-    }
-  else
-    {
-      myself->uid = DEFAULT_UID;
-      myself->gid = DEFAULT_GID;
-    }
-
+  if (ptok != INVALID_HANDLE_VALUE)
+    CloseHandle (ptok);
   (void) cygheap->user.ontherange (CH_HOME, pw);
 
   return;
