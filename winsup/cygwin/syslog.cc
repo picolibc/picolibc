@@ -17,6 +17,7 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygerrno.h"
+#include "cygheap.h"
 #include "thread.h"
 
 /* FIXME: These should probably be in the registry. */
@@ -348,7 +349,7 @@ syslog (int priority, const char *message, ...)
 	    return;
 	  }
 	ReportEventA (hEventSrc, eventType, 0, 0,
-		      NULL, 1, 0, msg_strings, NULL);
+		      cygheap->user.sid (), 1, 0, msg_strings, NULL);
 	DeregisterEventSource (hEventSrc);
       }
     else

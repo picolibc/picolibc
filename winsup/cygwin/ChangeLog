@@ -1,3 +1,7 @@
+Fri Nov 17 12:28:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* syslog.cc (syslog): Add users SID to NT syslog entry.
+
 Thu Nov 16 15:59:58 2000 Bradley A. Town <townba@pobox.com>
 
 	* fhandler_console.cc: New member variable `dwBufferSize' for `info'.
