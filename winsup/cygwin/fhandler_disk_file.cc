@@ -296,7 +296,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
   			   &buf->st_mode, &buf->st_uid, &buf->st_gid))
     {
       /* If read-only attribute is set, modify ntsec return value */
-      if (pc.has_attribute (FILE_ATTRIBUTE_READONLY) && !get_symlink_p ())
+      if (pc.has_attribute (FILE_ATTRIBUTE_READONLY) && !pc.issymlink ())
 	buf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
 
       if (!(buf->st_mode & S_IFMT))
@@ -339,7 +339,6 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
 		  if (ReadFile (get_handle (), magic, 3, &done, NULL)
 		      && has_exec_chars (magic, done))
 		    {
-		      set_execable_p ();
 		      pc.set_exec ();
 		      buf->st_mode |= STD_XBITS;
 		    }
@@ -416,9 +415,6 @@ fhandler_base::open_fs (int flags, mode_t mode)
     set_file_attribute (has_acls (), get_win32_name (), mode);
 
   set_fs_flags (pc.fs_flags ());
-  set_symlink_p (pc.issymlink ());
-  set_execable_p (pc.exec_state ());
-  set_socket_p (pc.issocket ());
 
 out:
   syscall_printf ("%d = fhandler_disk_file::open (%s, %p)", res,

@@ -1,5 +1,38 @@
 2004-04-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::write): Use bool parameter in calls to
+	set_did_lseek.
+	(fhandler_base::fhandler_base): Accomodate new status and open_status
+	constructor.
+	* fhandler.h: Remove status bit enumerator.
+	(FHDEVN): Remove.
+	(FHISSETF): Remove.
+	(FHSETF): Remove.
+	(FHCLEARF): Remove.
+	(FHCONDSETF): Remove.
+	(FHSTATOFF): Remove.
+	(UNCONNECTED, CONNECT_PENDING, CONNECTED): Substitute by enum
+	connect_state.
+	(fhandler_base::status): Define as bitfield struct type status_flags. 
+	Remove unused flags entirely.  Accomodate all status access methods.
+	(open_status): Define as bitfield struct type status_flags.
+	(fhandler_socket): Move socket related status bits to here.  Redefine
+	had_connect_or_listen to be part of these status bits.  Accomodate
+	related access methods.
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Use pc.issymlink
+	instead of dropped method get_symlink_p. 
+	(fhandler_base::open_fs): Remove setting dropped status flags.
+	* fhandler_socket.cc: Use values from enum connect_state throughout.
+	(fhandler_socket::fhandler_socket): Initialize status bits.
+	* fhandler_virtual.cc (fhandler_virtual::open): Remove setting dropped
+	status flags.
+	* net.cc: Use values from enum connect_state throughout.
+	* select.cc: Ditto.
+	* shared_info.h: Protect struct console_state using _FHANDLER_H_
+	instead of FHDEVN.
+
+2004-04-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* security.cc (get_file_attribute): Fix conditional.
 
 2004-04-08  Christopher Faylor  <cgf@bosbc.com>

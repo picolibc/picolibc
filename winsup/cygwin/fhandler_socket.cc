@@ -121,8 +121,12 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 /**********************************************************************/
 /* fhandler_socket */
 
-fhandler_socket::fhandler_socket ()
-  : fhandler_base (), sun_path (NULL)
+fhandler_socket::fhandler_socket () :
+  fhandler_base (),
+  sun_path (NULL),
+  sock_saw_shut_rd (0),
+  sock_saw_shut_wr (0),
+  had_connect_or_listen (unconnected)
 {
   set_need_fork_fixup ();
   prot_info_ptr = (LPWSAPROTOCOL_INFOA) cmalloc (HEAP_BUF,
@@ -545,9 +549,9 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
 
   err = WSAGetLastError ();
   if (err == WSAEINPROGRESS || err == WSAEALREADY)
-    set_connect_state (CONNECT_PENDING);
+    set_connect_state (connect_pending);
   else
-    set_connect_state (CONNECTED);
+    set_connect_state (connected);
 
   return res;
 }
@@ -559,7 +563,7 @@ fhandler_socket::listen (int backlog)
   if (res)
     set_winsock_errno ();
   else
-    set_connect_state (CONNECTED);
+    set_connect_state (connected);
   return res;
 }
 
@@ -634,7 +638,7 @@ fhandler_socket::accept (struct sockaddr *peer, int *len)
 	    ((fhandler_socket *) res_fd)->set_sun_path (get_sun_path ());
 	  ((fhandler_socket *) res_fd)->set_addr_family (get_addr_family ());
 	  ((fhandler_socket *) res_fd)->set_socket_type (get_socket_type ());
-	  ((fhandler_socket *) res_fd)->set_connect_state (CONNECTED);
+	  ((fhandler_socket *) res_fd)->set_connect_state (connected);
 	  res = res_fd;
 	}
       else

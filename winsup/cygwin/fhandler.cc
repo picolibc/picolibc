@@ -678,7 +678,7 @@ fhandler_base::write (const void *ptr, size_t len)
       DWORD size_high = 0;
       LONG pos_high = 0;
 
-      set_did_lseek (0); /* don't do it again */
+      set_did_lseek (false); /* don't do it again */
 
       actual_length = GetFileSize (get_output_handle (), &size_high);
       actual_length += ((_off64_t) size_high) << 32;
@@ -970,7 +970,7 @@ fhandler_base::lseek (_off64_t offset, int whence)
 
       /* When next we write(), we will check to see if *this* seek went beyond
 	 the end of the file, and back-seek and fill with zeros if so - DJ */
-      set_did_lseek ();
+      set_did_lseek (true);
 
       /* If this was a SEEK_CUR with offset 0, we still might have
 	 readahead that we have to take into account when calculating
@@ -1256,9 +1256,9 @@ fhandler_base::operator delete (void *p)
 }
 
 /* Normal I/O constructor */
-fhandler_base::fhandler_base ():
-  status (0),
-  query_open (no_query),
+fhandler_base::fhandler_base () :
+  status (),
+  open_status (),
   access (0),
   io_handle (NULL),
   namehash (0),
@@ -1268,7 +1268,6 @@ fhandler_base::fhandler_base ():
   raixget (0),
   raixput (0),
   rabuflen (0),
-  open_status (0),
   fs_flags (0),
   read_state (NULL),
   archetype (NULL),

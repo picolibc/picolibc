@@ -210,11 +210,6 @@ fhandler_virtual::open (int flags, mode_t mode)
   set_r_binary (1);
   set_w_binary (1);
 
-  /* what to do about symlinks? */
-  set_symlink_p (false);
-  set_execable_p (not_executable);
-  set_socket_p (false);
-
   set_flags ((flags & ~O_TEXT) | O_BINARY);
 
   return 1;

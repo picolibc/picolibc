@@ -335,7 +335,7 @@ set_bits (select_record *me, fd_set *readfds, fd_set *writefds,
     {
       UNIX_FD_SET (me->fd, writefds);
       if (me->except_on_write && me->fh->is_socket ())
-	((fhandler_socket *) me->fh)->set_connect_state (CONNECTED);
+	((fhandler_socket *) me->fh)->set_connect_state (connected);
       ready++;
     }
   if ((me->except_selected || me->except_on_write) && me->except_ready)
@@ -344,7 +344,7 @@ set_bits (select_record *me, fd_set *readfds, fd_set *writefds,
 	{
 	  UNIX_FD_SET (me->fd, writefds);
 	  if (me->fh->is_socket ())
-	    ((fhandler_socket *) me->fh)->set_connect_state (CONNECTED);
+	    ((fhandler_socket *) me->fh)->set_connect_state (connected);
 	}
       if (me->except_selected)
 	UNIX_FD_SET (me->fd, exceptfds);

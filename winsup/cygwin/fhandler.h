@@ -11,42 +11,6 @@ details. */
 #ifndef _FHANDLER_H_
 #define _FHANDLER_H_
 
-enum
-{
-  FH_RBINARY	= 0x00001000,	/* binary read mode */
-  FH_WBINARY	= 0x00002000,	/* binary write mode */
-  FH_CLOEXEC	= 0x00004000,	/* close-on-exec */
-  FH_RBINSET	= 0x00008000,	/* binary read mode has been explicitly set */
-  FH_WBINSET	= 0x00010000,	/* binary write mode has been explicitly set */
-  FH_APPEND	= 0x00020000,	/* always append */
-  FH_ASYNC	= 0x00040000,	/* async I/O */
-  FH_ENC	= 0x00080000,	/* native path is encoded */
-  FH_SYMLINK	= 0x00100000,	/* is a symlink */
-  FH_EXECABL	= 0x00200000,	/* file looked like it would run:
-				 * ends in .exe or .bat or begins with #! */
-  FH_LSEEKED	= 0x00400000,	/* set when lseek is called as a flag that
-				 * _write should check if we've moved beyond
-				 * EOF, zero filling or making file sparse
-				   if so. */
-  FH_NOHANDLE	= 0x00800000,	/* No handle associated with fhandler. */
-  FH_NOEINTR	= 0x01000000,	/* Set if I/O should be uninterruptible. */
-  FH_FFIXUP	= 0x02000000,	/* Set if need to fixup after fork. */
-  FH_LOCAL	= 0x04000000,	/* File is unix domain socket */
-  FH_SHUTRD	= 0x08000000,	/* Socket saw a SHUT_RD */
-  FH_SHUTWR	= 0x10000000,	/* Socket saw a SHUT_WR */
-  FH_ISREMOTE	= 0x10000000,	/* File is on a remote drive */
-  FH_DCEXEC	= 0x20000000,	/* Don't care if this is executable */
-  FH_HASACLS	= 0x40000000,	/* True if fs of file has ACLS */
-};
-
-#define FHDEVN(n)	(n)
-#define FHISSETF(x)	__ISSETF (this, x, FH)
-#define FHSETF(x)	__SETF (this, x, FH)
-#define FHCLEARF(x)	__CLEARF (this, x, FH)
-#define FHCONDSETF(n, x) __CONDSETF(n, this, x, FH)
-
-#define FHSTATOFF	0
-
 /* fcntl flags used only internaly. */
 #define O_NOSYMLINK 0x080000
 #define O_DIROPEN   0x100000
@@ -60,10 +24,6 @@ enum
    both flags are set. */
 #define O_NONBLOCK_MASK (O_NONBLOCK | OLD_O_NDELAY)
 
-#define UNCONNECTED     0
-#define CONNECT_PENDING 1
-#define CONNECTED       2
-
 extern const char *windows_device_names[];
 extern struct __cygwin_perfile *perfile_table;
 #define __fmode (*(user_data->fmode_ptr))
@@ -75,6 +35,13 @@ class fhandler_disk_file;
 typedef struct __DIR DIR;
 struct dirent;
 struct iovec;
+
+enum connect_state
+{
+  unconnected = 0,
+  connect_pending = 1,
+  connected = 2
+};
 
 enum line_edit_status
 {
@@ -103,9 +70,37 @@ class fhandler_base
 {
   friend class dtable;
   friend void close_all_files ();
+
  protected:
-  DWORD status;
-  unsigned query_open : 2;
+  struct status_flags
+  {
+    unsigned rbinary            : 1; /* binary read mode */
+    unsigned rbinset            : 1; /* binary read mode explicitly set */
+    unsigned wbinary            : 1; /* binary write mode */
+    unsigned wbinset            : 1; /* binary write mode explicitly set */
+    unsigned no_handle          : 1; /* No handle associated with fhandler. */
+    unsigned async_io           : 1; /* async I/O */
+    unsigned uninterruptible_io : 1; /* Set if I/O should be uninterruptible. */
+    unsigned append_mode        : 1; /* always append */
+    unsigned lseeked            : 1; /* set when lseek is called as a flag that
+					_write should check if we've moved
+					beyond EOF, zero filling or making
+					file sparse if so. */
+    unsigned encoded            : 1; /* native path is encoded */
+    unsigned query_open         : 2; /* open file without requesting either
+    					read or write access */
+    unsigned close_on_exec      : 1; /* close-on-exec */
+    unsigned need_fork_fixup    : 1; /* Set if need to fixup after fork. */
+
+    public:
+    status_flags () :
+      rbinary (0), rbinset (0), wbinary (0), wbinset (0), no_handle (0),
+      async_io (0), uninterruptible_io (0), append_mode (0), lseeked (0),
+      encoded (0), query_open (no_query), close_on_exec (0),
+      need_fork_fixup (0)
+      {}
+  } status, open_status;
+
  private:
   int access;
   HANDLE io_handle;
@@ -122,7 +117,6 @@ class fhandler_base
   size_t raixput;
   size_t rabuflen;
 
-  DWORD open_status;
   DWORD fs_flags;
   HANDLE read_state;
   path_conv pc;
@@ -155,8 +149,8 @@ class fhandler_base
   int get_access () const { return access; }
   void set_access (int x) { access = x; }
 
-  bool get_async () { return FHISSETF (ASYNC); }
-  void set_async (int x) { FHCONDSETF (x, ASYNC); }
+  bool get_async () { return status.async_io; }
+  void set_async (int x) { status.async_io = (x ? 1 : 0); }
 
   int get_flags () { return openflags; }
   void set_flags (int x, int supplied_bin = 0);
@@ -164,36 +158,35 @@ class fhandler_base
   bool is_nonblocking ();
   void set_nonblocking (int yes);
 
-  bool get_w_binary () { return FHISSETF (WBINSET) ? FHISSETF (WBINARY) : 1; }
-  bool get_r_binary () { return FHISSETF (RBINSET) ? FHISSETF (RBINARY) : 1; }
+  bool get_w_binary () { return status.wbinset ? status.wbinary : 1; }
+  bool get_r_binary () { return status.rbinset ? status.rbinary : 1; }
 
-  bool get_w_binset () { return FHISSETF (WBINSET); }
-  bool get_r_binset () { return FHISSETF (RBINSET); }
+  bool get_w_binset () { return status.wbinset; }
+  bool get_r_binset () { return status.rbinset; }
 
-  void set_w_binary (int b) { FHCONDSETF (b, WBINARY); FHSETF (WBINSET); }
-  void set_r_binary (int b) { FHCONDSETF (b, RBINARY); FHSETF (RBINSET); }
-  void clear_w_binary () {FHCLEARF (WBINARY); FHCLEARF (WBINSET); }
-  void clear_r_binary () {FHCLEARF (RBINARY); FHCLEARF (RBINSET); }
+  void set_w_binary (int b) {status.wbinary = (b ? 1 : 0); status.wbinset = 1;}
+  void set_r_binary (int b) {status.rbinary = (b ? 1 : 0); status.rbinset = 1;}
+  void clear_w_binary () { status.wbinary = 0; status.wbinset = 0; }
+  void clear_r_binary () { status.rbinary = 0; status.rbinset = 0; }
 
-  bool get_nohandle () { return FHISSETF (NOHANDLE); }
-  void set_nohandle (int x) { FHCONDSETF (x, NOHANDLE); }
+  bool get_nohandle () { return status.no_handle; }
+  void set_nohandle (bool x) { status.no_handle = x; }
 
   void set_open_status () {open_status = status;}
-  DWORD get_open_status () {return open_status;}
   void reset_to_open_binmode ()
   {
     set_flags ((get_flags () & ~(O_TEXT | O_BINARY))
-	       | ((open_status & (FH_WBINARY | FH_RBINARY)
-		   ? O_BINARY : O_TEXT)));
+	       | ((open_status.wbinary || open_status.rbinary)
+		   ? O_BINARY : O_TEXT));
   }
 
   int get_default_fmode (int flags);
 
-  bool get_r_no_interrupt () { return FHISSETF (NOEINTR); }
-  void set_r_no_interrupt (bool b) { FHCONDSETF (b, NOEINTR); }
+  bool get_r_no_interrupt () { return status.uninterruptible_io; }
+  void set_r_no_interrupt (bool b) { status.uninterruptible_io = b; }
 
-  bool get_close_on_exec () { return FHISSETF (CLOEXEC); }
-  int set_close_on_exec_flag (int b) { return FHCONDSETF (b, CLOEXEC); }
+  bool get_close_on_exec () { return status.close_on_exec; }
+  void set_close_on_exec_flag (int b) { status.close_on_exec = (b ? 1 : 0); }
 
   LPSECURITY_ATTRIBUTES get_inheritance (bool all = 0)
   {
@@ -203,14 +196,14 @@ class fhandler_base
       return get_close_on_exec () ? &sec_none_nih : &sec_none;
   }
 
-  void set_did_lseek (int b = 1) { FHCONDSETF (b, LSEEKED); }
-  bool get_did_lseek () { return FHISSETF (LSEEKED); }
+  void set_did_lseek (bool b) { status.lseeked = b; }
+  bool get_did_lseek () { return status.lseeked; }
 
-  bool get_need_fork_fixup () { return FHISSETF (FFIXUP); }
-  void set_need_fork_fixup () { FHSETF (FFIXUP); }
+  bool get_need_fork_fixup () { return status.need_fork_fixup; }
+  void set_need_fork_fixup () { status.need_fork_fixup = 1; }
 
-  bool get_encoded () { return FHISSETF (ENC);}
-  void set_encoded () { FHSETF (ENC);}
+  bool get_encoded () { return status.encoded;}
+  void set_encoded () { status.encoded = 1;}
 
   virtual void set_close_on_exec (int val);
 
@@ -218,34 +211,15 @@ class fhandler_base
   virtual void fixup_after_fork (HANDLE);
   virtual void fixup_after_exec () {}
 
-  bool get_symlink_p () { return FHISSETF (SYMLINK); }
-  void set_symlink_p (int val) { FHCONDSETF (val, SYMLINK); }
-  void set_symlink_p () { FHSETF (SYMLINK); }
-
-  bool get_socket_p () { return FHISSETF (LOCAL); }
-  void set_socket_p (int val) { FHCONDSETF (val, LOCAL); }
-  void set_socket_p () { FHSETF (LOCAL); }
-
-  bool get_execable_p () { return FHISSETF (EXECABL); }
-  void set_execable_p (executable_states val)
-  {
-    FHCONDSETF (val == is_executable, EXECABL);
-    FHCONDSETF (val == dont_care_if_executable, DCEXEC);
-  }
-  void set_execable_p () { FHSETF (EXECABL); }
-  bool dont_care_if_execable () { return FHISSETF (DCEXEC); }
-  bool exec_state_isknown () { return FHISSETF (DCEXEC) || FHISSETF (EXECABL); }
-
-  bool get_append_p () { return FHISSETF (APPEND); }
-  void set_append_p (int val) { FHCONDSETF (val, APPEND); }
-  void set_append_p () { FHSETF (APPEND); }
+  bool get_append_p () { return status.append_mode; }
+  void set_append_p () { status.append_mode = 1; }
 
   void set_fs_flags (DWORD flags) { fs_flags = flags; }
   bool get_fs_flags (DWORD flagval = UINT32_MAX)
     { return (fs_flags & (flagval)); }
 
-  query_state get_query_open () { return (query_state) query_open; }
-  void set_query_open (query_state val) { query_open = val; }
+  query_state get_query_open () { return (query_state) status.query_open; }
+  void set_query_open (query_state val) { status.query_open = val; }
 
   bool get_readahead_valid () { return raixget < ralen; }
   int puts_readahead (const char *s, size_t len = (size_t) -1);
@@ -381,7 +355,9 @@ class fhandler_socket: public fhandler_base
   HANDLE secret_event;
   struct _WSAPROTOCOL_INFOA *prot_info_ptr;
   char *sun_path;
-  int had_connect_or_listen;
+  unsigned sock_saw_shut_rd      : 1; /* Socket saw a SHUT_RD */
+  unsigned sock_saw_shut_wr      : 1; /* Socket saw a SHUT_WR */
+  unsigned had_connect_or_listen : 2;
 
  public:
   fhandler_socket ();
@@ -389,17 +365,20 @@ class fhandler_socket: public fhandler_base
   int get_socket () { return (int) get_handle(); }
   fhandler_socket *is_socket () { return this; }
 
-  bool saw_shutdown_read () const {return FHISSETF (SHUTRD);}
-  bool saw_shutdown_write () const {return FHISSETF (SHUTWR);}
+  bool saw_shutdown_read () const {return sock_saw_shut_rd;}
+  bool saw_shutdown_write () const {return sock_saw_shut_wr;}
 
-  void set_shutdown_read () {FHSETF (SHUTRD);}
-  void set_shutdown_write () {FHSETF (SHUTWR);}
+  void set_shutdown_read () { sock_saw_shut_rd = 1;}
+  void set_shutdown_write () { sock_saw_shut_wr = 1;}
 
-  bool is_unconnected () const {return had_connect_or_listen == UNCONNECTED;}
-  bool is_connect_pending () const {return had_connect_or_listen == CONNECT_PENDING;}
-  bool is_connected () const {return had_connect_or_listen == CONNECTED;}
-  void set_connect_state (int newstate) { had_connect_or_listen = newstate; }
-  int get_connect_state () const { return had_connect_or_listen; }
+  bool is_unconnected () const { return had_connect_or_listen == unconnected; }
+  bool is_connect_pending () const
+    { return had_connect_or_listen == connect_pending; }
+  bool is_connected () const { return had_connect_or_listen == connected; }
+  void set_connect_state (connect_state newstate)
+    { had_connect_or_listen = newstate; }
+  connect_state get_connect_state () const
+    { return (connect_state) had_connect_or_listen; }
 
   int bind (const struct sockaddr *name, int namelen);
   int connect (const struct sockaddr *name, int namelen);

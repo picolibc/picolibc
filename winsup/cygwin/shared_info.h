@@ -188,7 +188,7 @@ void __stdcall memory_init ();
 
 #define cygwin_shared_address	((void *) 0xa000000)
 
-#ifdef FHDEVN
+#ifdef _FHANDLER_H_
 struct console_state
 {
   tty_min tty_min_state;
