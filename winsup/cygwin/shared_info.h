@@ -47,6 +47,7 @@ class mount_info
 {
 public:
   DWORD version;
+  DWORD sys_mount_table_counter;
   int nmounts;
   mount_item mount[MAX_MOUNTS];
 
@@ -138,14 +139,14 @@ public:
 class shared_info
 {
   DWORD inited;
-
 public:
   int heap_chunk_in_mb;
-  unsigned heap_chunk_size (void);
+  DWORD sys_mount_table_counter;
 
   tty_list tty;
   delqueue_list delqueue;
   void initialize (void);
+  unsigned heap_chunk_size (void);
 };
 
 extern shared_info *cygwin_shared;

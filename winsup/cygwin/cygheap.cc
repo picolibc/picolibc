@@ -32,14 +32,6 @@ init_cheap ()
   if (!cygheap)
     api_fatal ("Couldn't reserve space for cygwin's heap, %E");
   cygheap_max = cygheap + 1;
-
-  char username[MAX_USER_NAME];
-  DWORD username_len = MAX_USER_NAME;
-
-  if (!GetUserName (username, &username_len))
-    cygheap->user.set_name ("unknown");
-  else
-    cygheap->user.set_name (username);
 }
 
 #define pagetrunc(x) ((void *) (((DWORD) (x)) & ~(4096 - 1)))
@@ -75,6 +67,14 @@ cygheap_init ()
 {
   cygheap_protect = new_muto (FALSE, "cygheap_protect");
   _csbrk (0);
+
+  char username[MAX_USER_NAME];
+  DWORD username_len = MAX_USER_NAME;
+
+  if (!GetUserName (username, &username_len))
+    cygheap->user.set_name ("unknown");
+  else
+    cygheap->user.set_name (username);
 }
 
 /* Copyright (C) 1997, 2000 DJ Delorie */

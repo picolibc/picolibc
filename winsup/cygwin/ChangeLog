@@ -1,3 +1,17 @@
+Sun Jan 28 01:18:22 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* cygheap.cc (init_cheap): Move username initialization.
+	(cygheap_init): Here.
+	* shared_info.h (mount_info): Add a sys_mount_table_counter field.
+	(shared_info): Ditto.
+	* path.cc (mount_info::conv_to_win32_path): Check that our mount table
+	is in sync with the system mount table and reinitialize it if not.
+	(mount_info::add_reg_mount): Bump sys_mount_table counters if the
+	system mount table changes.
+	(mount_info::del_reg_mount): Ditto.
+	(mount_info::write_cygdrive_info_to_registry): Ditto.
+	(mount_info::remove_cygdrive_info_from_registry): Ditto.
+
 Sun Jan 28 00:28:30 2001  Christopher Faylor <cgf@cygnus.com>
 
 	Throughout, change 'cygwin_shared.mount' to 'mount_table'.

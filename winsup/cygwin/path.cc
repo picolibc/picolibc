@@ -979,6 +979,11 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
 				char *full_win32_path, DWORD &devn, int &unit,
 				unsigned *flags)
 {
+  while (sys_mount_table_counter < cygwin_shared->sys_mount_table_counter)
+    {
+      init ();
+      sys_mount_table_counter++;
+    }
   int src_path_len = strlen (src_path);
   int trailing_slash_p = (src_path_len > 1
 			  && SLASH_P (src_path[src_path_len - 1]));
@@ -1485,6 +1490,9 @@ mount_info::add_reg_mount (const char * native_path, const char * posix_path, un
       if (res != ERROR_SUCCESS)
 	goto err;
       res = subkey.set_int ("flags", mountflags);
+
+      sys_mount_table_counter++;
+      cygwin_shared->sys_mount_table_counter++;
     }
 
   return 0; /* Success! */
@@ -1502,7 +1510,7 @@ mount_info::del_reg_mount (const char * posix_path, unsigned flags)
 {
   int res;
 
-  if ((flags & MOUNT_SYSTEM) == 0)	/* Delete from user registry */
+  if (!(flags & MOUNT_SYSTEM))	/* Delete from user registry */
     {
       reg_key reg_user (KEY_ALL_ACCESS,
 			CYGWIN_INFO_CYGWIN_MOUNT_REGISTRY_NAME, NULL);
@@ -1510,6 +1518,8 @@ mount_info::del_reg_mount (const char * posix_path, unsigned flags)
     }
   else					/* Delete from system registry */
     {
+      sys_mount_table_counter++;
+      cygwin_shared->sys_mount_table_counter++;
       reg_key reg_sys (HKEY_LOCAL_MACHINE, KEY_ALL_ACCESS, "SOFTWARE",
 		       CYGWIN_INFO_CYGNUS_REGISTRY_NAME,
 		       CYGWIN_INFO_CYGWIN_REGISTRY_NAME,
@@ -1586,6 +1596,12 @@ mount_info::write_cygdrive_info_to_registry (const char *cygdrive_prefix, unsign
   /* Determine whether to modify user or system cygdrive path prefix. */
   HKEY top = (flags & MOUNT_SYSTEM) ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
 
+  if (flags & MOUNT_SYSTEM)
+    {
+      sys_mount_table_counter++;
+      cygwin_shared->sys_mount_table_counter++;
+    }
+
   /* reg_key for user path prefix in HKEY_CURRENT_USER or system path prefix in
      HKEY_LOCAL_MACHINE.  */
   reg_key r (top, KEY_ALL_ACCESS, "SOFTWARE",
@@ -1621,8 +1637,7 @@ mount_info::write_cygdrive_info_to_registry (const char *cygdrive_prefix, unsign
      appropriate:
        1. setting user path prefix, or
        2. overwriting (a previous) system path prefix */
-  if ((flags & MOUNT_SYSTEM) == 0 ||
-      (mount_table->cygdrive_flags & MOUNT_SYSTEM) != 0)
+  if (!(flags & MOUNT_SYSTEM) || (mount_table->cygdrive_flags & MOUNT_SYSTEM))
     {
       slashify (cygdrive_prefix, mount_table->cygdrive, 1);
       mount_table->cygdrive_flags = flags;
@@ -1637,6 +1652,12 @@ mount_info::remove_cygdrive_info_from_registry (const char *cygdrive_prefix, uns
 {
   /* Determine whether to modify user or system cygdrive path prefix. */
   HKEY top = (flags & MOUNT_SYSTEM) ? HKEY_LOCAL_MACHINE : HKEY_CURRENT_USER;
+
+  if (flags & MOUNT_SYSTEM)
+    {
+      sys_mount_table_counter++;
+      cygwin_shared->sys_mount_table_counter++;
+    }
 
   /* reg_key for user path prefix in HKEY_CURRENT_USER or system path prefix in
      HKEY_LOCAL_MACHINE.  */
@@ -1728,7 +1749,7 @@ sort_by_posix_name (const void *a, const void *b)
   if (res == 0)
    {
      /* need to select between user and system mount to same POSIX path */
-     if ((bp->flags & MOUNT_SYSTEM) == 0) /* user mount */
+     if (!(bp->flags & MOUNT_SYSTEM))	/* user mount */
       return 1;
      else
       return -1;
@@ -1764,7 +1785,7 @@ sort_by_native_name (const void *a, const void *b)
   if (res == 0)
    {
      /* need to select between user and system mount to same POSIX path */
-     if ((bp->flags & MOUNT_SYSTEM) == 0) /* user mount */
+     if (!(bp->flags & MOUNT_SYSTEM))	/* user mount */
       return 1;
      else
       return -1;
