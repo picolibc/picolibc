@@ -351,6 +351,9 @@ extern "C" {
 #define CRYPT_FLAG_TLS1    0x0008
 #define CRYPT_FLAG_IPSEC   0x0010
 #define CRYPT_FLAG_SIGNING 0x0020
+#define SCHANNEL_MAC_KEY    0x00000000
+#define SCHANNEL_ENC_KEY    0x00000001
+#define INTERNATIONAL_USAGE 0x00000001
 
 typedef UINT ALG_ID;
 typedef struct _VTableProvStruc {FARPROC FuncVerifyImage;} VTableProvStruc,*PVTableProvStruc;
