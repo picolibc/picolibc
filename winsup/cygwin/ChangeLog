@@ -1,3 +1,7 @@
+Tue May  1 01:26:15 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (mount_info::conv_to_win32_path): More path tweaking.
+
 Tue May  1 00:34:46 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (mount_info::conv_to_win32_path): Fix debugging output to
