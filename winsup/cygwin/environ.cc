@@ -259,12 +259,13 @@ setenv (const char *name, const char *value, int rewrite)
 extern "C" void
 unsetenv (const char *name)
 {
-  register char **P;
+  register char **e;
   int offset;
 
   while (my_findenv (name, &offset))	/* if set multiple times */
-    for (P = &environ[offset];; ++P)
-      if (!(*P = *(P + 1)))
+    /* Move up the rest of the array */
+    for (e = environ + offset; ; e++)
+      if (!(*e = *(e + 1)))
 	break;
 }
 

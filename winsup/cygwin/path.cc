@@ -182,8 +182,8 @@ path_prefix_p_ (const char *path1, const char *path2, int len1)
 */
 
 void
-path_conv::check (const char *src, symlink_follow follow_mode,
-		  int use_full_path, const suffix_info *suffixes)
+path_conv::check (const char *src, unsigned opt,
+		  const suffix_info *suffixes)
 {
   /* This array is used when expanding symlinks.  It is MAX_PATH * 2
      in length so that we can hold the expanded symlink plus a
@@ -195,10 +195,12 @@ path_conv::check (const char *src, symlink_follow follow_mode,
 
   char *rel_path, *full_path;
 
-  if ((error = check_null_empty_path (src)))
+  if (!(opt & PC_NULLEMPTY))
+    error = 0;
+  else if ((error = check_null_empty_path (src)))
     return;
 
-  if (use_full_path)
+  if (opt & PC_FULL)
     rel_path = path_buf, full_path = this->path;
   else
     rel_path = this->path, full_path = path_buf;
@@ -235,7 +237,7 @@ path_conv::check (const char *src, symlink_follow follow_mode,
       if (full_path[0] && full_path[1] == ':' && full_path[2] == '\0')
 	strcat (full_path, "\\");
 
-      if (follow_mode == SYMLINK_IGNORE)
+      if (opt & PC_SYM_IGNORE)
 	{
 	  fileattr = GetFileAttributesA (path);
 	  goto out;
@@ -297,11 +299,11 @@ path_conv::check (const char *src, symlink_follow follow_mode,
 	     these operations again on the newly derived path. */
 	  else if (len > 0)
 	    {
-	      if (component == 0 && follow_mode != SYMLINK_FOLLOW)
+	      if (component == 0 && !(opt & PC_SYM_FOLLOW))
 		{
 		  set_symlink (); // last component of path is a symlink.
 		  fileattr = sym.fileattr;
-		  if (follow_mode == SYMLINK_CONTENTS)
+		  if (opt & PC_SYM_CONTENTS)
 		      strcpy (path, sym.contents);
 		  goto fillin;
 		}
@@ -370,7 +372,7 @@ path_conv::check (const char *src, symlink_follow follow_mode,
 fillin:
   if (sym.known_suffix)
     known_suffix = this->path + (sym.known_suffix - path_copy);
-  else if (sym.ext_here && follow_mode != SYMLINK_CONTENTS)
+  else if (sym.ext_here && !(opt & PC_SYM_CONTENTS))
     {
       known_suffix = strchr (this->path, '\0');
       strcpy (known_suffix, sym.ext_here);
@@ -510,7 +512,7 @@ get_device_number (const char *name, int &unit, BOOL from_conv)
       else if (! from_conv)
 	devn = get_raw_device_number (name - 5,
 				      path_conv (name - 5,
-						 SYMLINK_IGNORE).get_win32 (),
+						 PC_SYM_IGNORE).get_win32 (),
 				      unit);
     }
   else if (deveqn ("com", 3) && (unit = digits (name + 3)) >= 0)
@@ -1975,7 +1977,7 @@ symlink (const char *topath, const char *frompath)
   HANDLE h;
   int res = -1;
 
-  path_conv win32_path (frompath, SYMLINK_NOFOLLOW);
+  path_conv win32_path (frompath, PC_SYM_NOFOLLOW);
   if (win32_path.error)
     {
       set_errno (win32_path.error);
@@ -2221,7 +2223,7 @@ int
 readlink (const char *path, char *buf, int buflen)
 {
   extern suffix_info stat_suffixes[];
-  path_conv pathbuf (path, SYMLINK_CONTENTS, 0, stat_suffixes);
+  path_conv pathbuf (path, PC_SYM_CONTENTS, stat_suffixes);
 
   if (pathbuf.error)
     {
@@ -2492,7 +2494,7 @@ extern "C"
 int
 cygwin_conv_to_win32_path (const char *path, char *win32_path)
 {
-  path_conv p (path, SYMLINK_FOLLOW, 0);
+  path_conv p (path, PC_SYM_FOLLOW);
   if (p.error)
     {
       set_errno (p.error);
@@ -2507,7 +2509,7 @@ extern "C"
 int
 cygwin_conv_to_full_win32_path (const char *path, char *win32_path)
 {
-  path_conv p (path, SYMLINK_FOLLOW, 1);
+  path_conv p (path, PC_SYM_FOLLOW | PC_FULL);
   if (p.error)
     {
       set_errno (p.error);
@@ -2548,7 +2550,7 @@ realpath (const char *path, char *resolved)
 {
   int err;
 
-  path_conv real_path (path, SYMLINK_FOLLOW, 1);
+  path_conv real_path (path, PC_SYM_FOLLOW | PC_FULL);
 
   if (real_path.error)
     err = real_path.error;
@@ -2806,4 +2808,17 @@ strcasestr (const char *searchee, const char *lookfor)
     }
 
   return NULL;
+}
+
+int __stdcall
+check_null_empty_path (const char *name)
+{
+  MEMORY_BASIC_INFORMATION m;
+  if (!name || !VirtualQuery (name, &m, sizeof (m)) || (m.State != MEM_COMMIT))
+    return EFAULT;
+
+  if (!*name)
+    return ENOENT;
+
+  return 0;
 }

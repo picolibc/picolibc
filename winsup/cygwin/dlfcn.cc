@@ -145,7 +145,7 @@ get_full_path_of_dll (const char* str)
      to resolve symlinks etc so that win32 API finds the underlying file.  */
   if (ret)
     {
-      path_conv real_filename (ret, SYMLINK_FOLLOW, 1);
+      path_conv real_filename (ret, PC_SYM_FOLLOW | PC_FULL);
       if (real_filename.error)
 	ret = 0;
       else

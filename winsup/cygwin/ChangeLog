@@ -1,3 +1,22 @@
+Mon Jul 17 14:57:53 2000  Christopher Faylor <cgf@cygnus.com>
+
+	Throughout, eliminate third argument to path_conv and use new PC_*
+	constants for second argument.
+	* path.h: Generalize SYMLINK_* constants to PC_*.
+	(path_conv): Create a new method.  Fold third argument into second.
+	* dll_init.cc (dll_list::alloc): Try harder to find space to allocate
+	dll struct.
+	(dll_dllcrt0): Don't check sanity if we've already called dll_crt0.
+	* path.cc (path_conv::check): Don't check for a null or empty path
+	unless specifically told with a flag setting.
+	(check_null_empty_path): New function, adapted from macro.
+	* syscalls.cc (_rename): Use already-determined file attributes rather
+	than checking again.
+	* lib/cygwin/cygwin_attach.dll.c (cygwin_attach_dll): Use a static
+	per_process structure since this is apparently supposed to be zeroed.
+	* lib/cygwin_crt0.c (cygwin_crt0): Zero per_process structure sent to
+	older DLLs.
+
 Mon Jul 17 19:39:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	Patch suggested by Eric Fifer <EFifer@sanwaint.com>

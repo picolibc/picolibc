@@ -59,7 +59,7 @@ opendir (const char *dirname)
   DIR *res = 0;
   struct stat statbuf;
 
-  path_conv real_dirname (dirname, SYMLINK_FOLLOW, 1);
+  path_conv real_dirname (dirname, PC_SYM_FOLLOW | PC_FULL);
 
   if (real_dirname.error)
     {
@@ -286,7 +286,7 @@ mkdir (const char *dir, mode_t mode)
 {
   int res = -1;
 
-  path_conv real_dir (dir, SYMLINK_NOFOLLOW);
+  path_conv real_dir (dir, PC_SYM_NOFOLLOW);
 
   if (real_dir.error)
     {
@@ -318,7 +318,7 @@ rmdir (const char *dir)
 {
   int res = -1;
 
-  path_conv real_dir (dir, SYMLINK_NOFOLLOW);
+  path_conv real_dir (dir, PC_SYM_NOFOLLOW);
 
   if (real_dir.error)
     {

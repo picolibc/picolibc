@@ -15,17 +15,21 @@ struct suffix_info
   suffix_info (const char *s, int addit = 0) {name = s, addon = addit;}
 };
 
-enum symlink_follow
+enum pathconv_arg
 {
-  SYMLINK_FOLLOW,
-  SYMLINK_NOFOLLOW,
-  SYMLINK_IGNORE,
-  SYMLINK_CONTENTS
+  PC_SYM_FOLLOW		= 0x0001,
+  PC_SYM_NOFOLLOW	= 0x0002,
+  PC_SYM_IGNORE		= 0x0004,
+  PC_SYM_CONTENTS	= 0x0008,
+  PC_FULL		= 0x0010,
+  PC_NULLEMPTY		= 0x0020
 };
+
+#define PC_NONULLEMPTY -1
 
 #include <sys/mount.h>
 
-enum
+enum path_types
 {
   PATH_NOTHING = 0,
   PATH_SYMLINK = MOUNT_SYMLINK,
@@ -35,7 +39,6 @@ enum
   PATH_SOCKET =  0x40000000,
   PATH_HASACLS = 0x80000000
 };
-
 
 class path_conv
 {
@@ -65,12 +68,19 @@ class path_conv
 
   DWORD fileattr;
 
-  void check (const char *src, symlink_follow follow_mode = SYMLINK_FOLLOW,
-	      int use_full_path = 0, const suffix_info *suffixes = NULL);
-  path_conv (const char *src, symlink_follow follow_mode = SYMLINK_FOLLOW,
-	     int use_full_path = 0, const suffix_info *suffixes = NULL)
+  void check (const char *src, unsigned opt = PC_SYM_FOLLOW,
+	      const suffix_info *suffixes = NULL);
+
+  path_conv (int, const char *src, unsigned opt = PC_SYM_FOLLOW,
+	     const suffix_info *suffixes = NULL)
   {
-    check (src, follow_mode, use_full_path, suffixes);
+    check (src, opt, suffixes);
+  }
+
+  path_conv (const char *src, unsigned opt = PC_SYM_FOLLOW,
+	     const suffix_info *suffixes = NULL)
+  {
+    check (src, opt | PC_NULLEMPTY, suffixes);
   }
 
   path_conv (): path_flags (0), known_suffix (NULL), error (0), devn (0), unit (0), fileattr (0xffffffff) {path[0] = '\0';}
@@ -96,10 +106,9 @@ extern suffix_info std_suffixes[];
 
 int __stdcall get_device_number (const char *name, int &unit, BOOL from_conv = FALSE);
 int __stdcall slash_unc_prefix_p (const char *path);
+int __stdcall check_null_empty_path (const char *name);
 
 /* Common macros for checking for invalid path names */
-#define check_null_empty_path(src) \
-  (!(src) ? EFAULT : *(src) ? 0 : ENOENT)
 
 #define check_null_empty_path_errno(src) \
 ({ \

@@ -132,7 +132,7 @@ fhandler_dev_raw::de_linearize (const char *buf, const char *unix_name,
 int
 fhandler_dev_raw::open (const char *path, int flags, mode_t)
 {
-  path_conv real_path (path, SYMLINK_IGNORE);
+  path_conv real_path (path, PC_SYM_IGNORE);
   int ret;
 
   set_name (path, real_path.get_win32 ());

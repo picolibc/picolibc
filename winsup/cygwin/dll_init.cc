@@ -106,43 +106,46 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
       return d;		/* Return previously allocated pointer. */
     }
 
+  SYSTEM_INFO s1;
+  GetSystemInfo (&s1);
+
   int i;
   void *s = p->bss_end;
+  DWORD n;
   MEMORY_BASIC_INFORMATION m;
   /* Search for space after the DLL */
-  for (i = 0; i <= RETRIES; i++)
+  for (i = 0; i <= RETRIES; i++, s = (char *) m.BaseAddress + m.RegionSize)
     {
       if (!VirtualQuery (s, &m, sizeof (m)))
 	return NULL;	/* Can't do it. */
       if (m.State == MEM_FREE)
-	break;		/* Found some free space */
-      s = (char *) m.BaseAddress + m.RegionSize;
+	{
+	  /* Couldn't find any.  Uh oh.  FIXME: Issue an error? */
+	  if (i == RETRIES)
+	    return NULL;	/* Oh well.  Couldn't locate free space. */
+
+	  /* Ensure that this is rounded to the nearest page boundary.
+	     FIXME: Should this be ensured by VirtualQuery? */
+	  n = (DWORD) m.BaseAddress;
+	  DWORD r = n % s1.dwAllocationGranularity;
+
+	  if (r)
+	    n = ((n - r) + s1.dwAllocationGranularity);
+
+	  /* First reserve the area of memory, then commit it. */
+	  if (VirtualAlloc ((void *) n, sizeof (dll), MEM_RESERVE, PAGE_READWRITE))
+	    d = (dll *) VirtualAlloc ((void *) n, sizeof (dll), MEM_COMMIT,
+				      PAGE_READWRITE);
+	  if (d)
+	    break;
+	}
     }
-
-  /* Couldn't find any.  Uh oh.  FIXME: Issue an error? */
-  if (i == RETRIES)
-    return NULL;	/* Oh well.  Couldn't locate free space. */
-
-  SYSTEM_INFO s1;
-  GetSystemInfo (&s1);
-
-  /* Ensure that this is rounded to the nearest page boundary.
-     FIXME: Should this be ensured by VirtualQuery? */
-  DWORD n = (DWORD) m.BaseAddress;
-  DWORD r = n % s1.dwAllocationGranularity;
-
-  if (r)
-    n = ((n - r) + s1.dwAllocationGranularity);
-
-  /* First reserve the area of memory, then commit it. */
-  if (VirtualAlloc ((void *) n, sizeof (dll), MEM_RESERVE, PAGE_READWRITE))
-    d = (dll *) VirtualAlloc ((void *) n, sizeof (dll), MEM_COMMIT, PAGE_READWRITE);
 
   /* Did we succeed? */
   if (d == NULL)
     {			/* Nope. */
 #ifdef DEBUGGING
-      system_printf ("VirtualAlloc failed for %p, %E", n);
+      system_printf ("VirtualAlloc failed for %E");
 #endif
       __seterrno ();
       return NULL;
@@ -330,8 +333,7 @@ dll_dllcrt0 (HMODULE h, per_process *p)
   /* Partially initialize Cygwin guts for non-cygwin apps. */
   if (dynamically_loaded && user_data->magic_biscuit == 0)
     dll_crt0 (p);
-
-  if (p)
+  else
     check_sanity_and_sync (p);
 
   dll_type type;

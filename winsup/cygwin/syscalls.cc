@@ -47,7 +47,7 @@ _unlink (const char *ourname)
 {
   int res = -1;
 
-  path_conv win32_name (ourname, SYMLINK_NOFOLLOW, 1);
+  path_conv win32_name (ourname, PC_SYM_NOFOLLOW | PC_FULL);
 
   if (win32_name.error)
     {
@@ -494,8 +494,8 @@ int
 _link (const char *a, const char *b)
 {
   int res = -1;
-  path_conv real_a (a, SYMLINK_NOFOLLOW);
-  path_conv real_b (b, SYMLINK_NOFOLLOW);
+  path_conv real_a (a, PC_SYM_NOFOLLOW);
+  path_conv real_b (b, PC_SYM_NOFOLLOW);
 
   if (real_a.error)
     {
@@ -658,18 +658,21 @@ rel2abssd (PSECURITY_DESCRIPTOR psd_rel, PSECURITY_DESCRIPTOR psd_abs,
  * systems, it is only a stub that always returns zero.
  */
 static int
-chown_worker (const char *name, symlink_follow fmode, uid_t uid, gid_t gid)
+chown_worker (const char *name, unsigned fmode, uid_t uid, gid_t gid)
 {
   int res;
   uid_t old_uid;
   gid_t old_gid;
+
+  if (check_null_empty_path_errno(name))
+    return -1;
 
   if (os_being_run != winNT)    // real chown only works on NT
     res = 0;			// return zero (and do nothing) under Windows 9x
   else
     {
       /* we need Win32 path names because of usage of Win32 API functions */
-      path_conv win32_path (name, fmode);
+      path_conv win32_path (PC_NONULLEMPTY, name, fmode);
 
       if (win32_path.error)
 	{
@@ -717,7 +720,7 @@ chown_worker (const char *name, symlink_follow fmode, uid_t uid, gid_t gid)
 
 done:
   syscall_printf ("%d = %schown (%s,...)",
-                  res, fmode == SYMLINK_IGNORE ? "l" : "", name);
+                  res, (fmode & PC_SYM_IGNORE) ? "l" : "", name);
   return res;
 }
 
@@ -725,14 +728,14 @@ extern "C"
 int
 chown (const char * name, uid_t uid, gid_t gid)
 {
-  return chown_worker (name, SYMLINK_FOLLOW, uid, gid);
+  return chown_worker (name, PC_SYM_FOLLOW, uid, gid);
 }
 
 extern "C"
 int
 lchown (const char * name, uid_t uid, gid_t gid)
 {
-  return chown_worker (name, SYMLINK_IGNORE, uid, gid);
+  return chown_worker (name, PC_SYM_IGNORE, uid, gid);
 }
 
 extern "C"
@@ -757,7 +760,7 @@ fchown (int fd, uid_t uid, gid_t gid)
 
   syscall_printf ("fchown (%d,...): calling chown_worker (%s,FOLLOW,...)",
                   fd, path);
-  return chown_worker (path, SYMLINK_FOLLOW, uid, gid);
+  return chown_worker (path, PC_SYM_FOLLOW, uid, gid);
 }
 
 /* umask: POSIX 5.3.3.1 */
@@ -1005,7 +1008,7 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 
   debug_printf ("%s (%s, %p)", caller, name, buf);
 
-  path_conv real_path (name, nofollow ? SYMLINK_NOFOLLOW : SYMLINK_FOLLOW, 1,
+  path_conv real_path (name, (nofollow ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW) | PC_FULL,
 		       stat_suffixes);
 
   if (real_path.error)
@@ -1193,7 +1196,7 @@ _rename (const char *oldpath, const char *newpath)
 {
   int res = 0;
 
-  path_conv real_old (oldpath, SYMLINK_NOFOLLOW);
+  path_conv real_old (oldpath, PC_SYM_NOFOLLOW);
 
   if (real_old.error)
     {
@@ -1202,7 +1205,7 @@ _rename (const char *oldpath, const char *newpath)
       return -1;
     }
 
-  path_conv real_new (newpath, SYMLINK_NOFOLLOW);
+  path_conv real_new (newpath, PC_SYM_NOFOLLOW);
 
   if (real_new.error)
     {
@@ -1218,20 +1221,18 @@ _rename (const char *oldpath, const char *newpath)
       return -1;
     }
 
-  int oldatts = GetFileAttributesA (real_old.get_win32 ());
-  int newatts = GetFileAttributesA (real_new.get_win32 ());
-
-  if (oldatts == -1) /* file to move doesn't exist */
+  if (real_old.file_attributes () == (DWORD) -1) /* file to move doesn't exist */
     {
        syscall_printf ("file to move doesn't exist");
        return (-1);
     }
 
-  if (newatts != -1 && newatts & FILE_ATTRIBUTE_READONLY)
+  if (real_new.file_attributes () != (DWORD) -1 &&
+      real_new.file_attributes () & FILE_ATTRIBUTE_READONLY)
     {
       /* Destination file exists and is read only, change that or else
 	 the rename won't work. */
-      SetFileAttributesA (real_new.get_win32 (), newatts & ~ FILE_ATTRIBUTE_READONLY);
+      SetFileAttributesA (real_new.get_win32 (), real_new.file_attributes () & ~ FILE_ATTRIBUTE_READONLY);
     }
 
   if (!MoveFile (real_old.get_win32 (), real_new.get_win32 ()))
@@ -1277,7 +1278,7 @@ done:
   if (res == 0)
     {
       /* make the new file have the permissions of the old one */
-      SetFileAttributesA (real_new.get_win32 (), oldatts);
+      SetFileAttributesA (real_new.get_win32 (), real_old.file_attributes ());
     }
 
   syscall_printf ("%d = rename (%s, %s)", res, real_old.get_win32 (),

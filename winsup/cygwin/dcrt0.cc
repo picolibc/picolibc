@@ -735,25 +735,18 @@ dll_crt0_1 ()
 /* Initialize uid, gid. */
   uinfo_init ();
 
-  /* beyond this we only do for cygwin apps or dlls */
-  if (dynamically_loaded)
-    {
-      cygwin_finished_initializing = 1;
-      return;
-    }
-
   /* Initialize signal/subprocess handling. */
   sigproc_init ();
 
   /* Connect to tty. */
   tty_init ();
 
+  /* Set up standard fds in file descriptor table. */
+  hinfo_init ();
+
   if (user_data->premain[0])
     for (unsigned int i = 0; i < PREMAIN_LEN / 2; i++)
       user_data->premain[i] (argc, argv);
-
-  /* Set up standard fds in file descriptor table. */
-  hinfo_init ();
 
   /* Scan the command line and build argv.  Expand wildcards if not
      called from another cygwin process. */
@@ -772,11 +765,6 @@ dll_crt0_1 ()
   /* Set up __progname for getopt error call. */
   __progname = argv[0];
 
-  /* Flush signals and ensure that signal thread is up and running. Can't
-     do this for noncygwin case since the signal thread is blocked due to
-     LoadLibrary serialization. */
-  sig_send (NULL, __SIGFLUSH);
-
   cygwin_finished_initializing = 1;
   /* Call init of loaded dlls. */
   dlls.init ();
@@ -787,6 +775,17 @@ dll_crt0_1 ()
       user_data->premain[i] (argc, argv);
 
   debug_printf ("user_data->main %p", user_data->main);
+
+  if (dynamically_loaded)
+    {
+      set_errno (0);
+      return;
+    }
+
+  /* Flush signals and ensure that signal thread is up and running. Can't
+     do this for noncygwin case since the signal thread is blocked due to
+     LoadLibrary serialization. */
+  sig_send (NULL, __SIGFLUSH);
 
   set_errno (0);
 

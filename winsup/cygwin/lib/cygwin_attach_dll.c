@@ -17,7 +17,7 @@ details. */
 int
 cygwin_attach_dll (HMODULE h, MainFunc f)
 {
-  struct per_process u;
+  static struct per_process u;
   (void) _cygwin_crt0_common (f, &u);
 
   /* jump into the dll. */

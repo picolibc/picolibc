@@ -25,6 +25,7 @@ cygwin_crt0 (MainFunc f)
   else			/* Older DLL.  Provide a per_process */
     {
       u = (struct per_process *) alloca (sizeof (*u));
+      memset (u, 0, sizeof (u));
       (void) _cygwin_crt0_common (f, u);
     }
   dll_crt0__FP11per_process (u); 	/* Jump into the dll, never to return */
