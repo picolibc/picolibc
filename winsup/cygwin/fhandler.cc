@@ -331,19 +331,20 @@ fhandler_base::device_access_denied (int flags)
   return fhaccess (mode);
 }
 
-bool
+int
 fhandler_base::fhaccess (int flags)
 {
+  int res = -1;
   if (error ())
     {
       set_errno (error ());
-      return -1;
+      goto done;
     }
 
   if (!exists ())
     {
       set_errno (ENOENT);
-      return -1;
+      goto done;
     }
 
   if (!(flags & (R_OK | W_OK | X_OK)))
@@ -354,16 +355,15 @@ fhandler_base::fhaccess (int flags)
   else if (has_attribute (FILE_ATTRIBUTE_READONLY) && (flags & W_OK))
     {
       set_errno (EACCES);
-      return -1;
+      goto done;
     }
   else if (has_acls () && allow_ntsec)
     return check_file_access (get_win32_name (), flags);
 
   struct __stat64 st;
-  int r = fstat (&st);
-  if (r)
-    return -1;
-  r = -1;
+  if (fstat (&st))
+    goto done;
+
   if (flags & R_OK)
     {
       if (st.st_uid == myself->uid)
@@ -379,6 +379,7 @@ fhandler_base::fhaccess (int flags)
       else if (!(st.st_mode & S_IROTH))
 	goto done;
     }
+
   if (flags & W_OK)
     {
       if (st.st_uid == myself->uid)
@@ -394,6 +395,7 @@ fhandler_base::fhaccess (int flags)
       else if (!(st.st_mode & S_IWOTH))
 	goto done;
     }
+
   if (flags & X_OK)
     {
       if (st.st_uid == myself->uid)
@@ -409,11 +411,12 @@ fhandler_base::fhaccess (int flags)
       else if (!(st.st_mode & S_IXOTH))
 	goto done;
     }
-  r = 0;
+  res = 0;
 done:
-  if (r)
+  if (res)
     set_errno (EACCES);
-  return r;
+  debug_printf ("returning %d", res);
+  return res;
 }
 
 /* Open system call handler function. */
