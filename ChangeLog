@@ -1,3 +1,8 @@
+2005-04-05  Paolo Bonzini  <bonzini@gnu.org>
+
+	* Makefile.tpl: Sync with gcc.
+	* Makefile.in: Regenerate.
+
 2005-03-30  J"orn Rennecke <joern.rennecke@st.com>
 
 	* config/mh-mingw32: Delete.
