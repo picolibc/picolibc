@@ -1190,6 +1190,11 @@ extern "C" {
 #define DISPLAY_DEVICE_VGA_COMPATIBLE      0x00000010
 #define DISPLAY_DEVICE_REMOVABLE           0x00000020
 #define DISPLAY_DEVICE_MODESPRUNED         0x08000000
+
+#if (_WIN32_WINNT >= 0x0500)
+#define GGI_MARK_NONEXISTING_GLYPHS 1
+#endif
+
 #ifndef RC_INVOKED
 typedef struct _ABC {
 	int abcA;
@@ -2868,10 +2873,16 @@ BOOL WINAPI wglUseFontBitmapsW(HDC,DWORD,DWORD,DWORD);
 BOOL WINAPI wglUseFontOutlinesA(HDC,DWORD,DWORD,DWORD,FLOAT,FLOAT,int,LPGLYPHMETRICSFLOAT);
 BOOL WINAPI wglUseFontOutlinesW(HDC,DWORD,DWORD,DWORD,FLOAT,FLOAT,int,LPGLYPHMETRICSFLOAT);
 
-#if (WINVER>= 0x0500)
+#if (WINVER >= 0x0500)
 BOOL WINAPI AlphaBlend(HDC,int,int,int,int,HDC,int,int,int,int,BLENDFUNCTION);
 BOOL WINAPI GradientFill(HDC,PTRIVERTEX,ULONG,PVOID,ULONG,ULONG);
 BOOL WINAPI TransparentBlt(HDC,int,int,int,int,HDC,int,int,int,int,UINT);
+#endif
+
+#if (_WIN32_WINNT >= 0x0500)
+DWORD WINAPI GetFontUnicodeRanges(HDC,LPGLYPHSET);
+DWORD WINAPI GetGlyphIndicesA(HDC,LPCSTR,int,LPWORD,DWORD);
+DWORD WINAPI GetGlyphIndicesW(HDC,LPCWSTR,int,LPWORD,DWORD);
 #endif
 
 #ifdef UNICODE
@@ -2948,7 +2959,10 @@ typedef DISPLAY_DEVICEW DISPLAY_DEVICE, *PDISPLAY_DEVICE, *LPDISPLAY_DEVICE;
 #define UpdateICMRegKey UpdateICMRegKeyW
 #define wglUseFontBitmaps wglUseFontBitmapsW
 #define wglUseFontOutlines wglUseFontOutlinesW
-#else
+#if (_WIN32_WINNT >= 0x0500)
+#define GetGlyphIndices  GetGlyphIndicesW
+#endif
+#else  /* UNICODE */
 typedef BYTE BCHAR;
 typedef DOCINFOA DOCINFO, *LPDOCINFO;
 typedef LOGFONTA LOGFONT,*PLOGFONT,*LPLOGFONT;
@@ -3022,8 +3036,11 @@ typedef DISPLAY_DEVICEA DISPLAY_DEVICE, *PDISPLAY_DEVICE, *LPDISPLAY_DEVICE;
 #define UpdateICMRegKey UpdateICMRegKeyA
 #define wglUseFontBitmaps wglUseFontBitmapsA
 #define wglUseFontOutlines wglUseFontOutlinesA
+#if (_WIN32_WINNT >= 0x0500)
+#define GetGlyphIndices  GetGlyphIndicesA
 #endif
-#endif
+#endif /* UNICODE */
+#endif /* RC_INVOKED */
 #ifdef __cplusplus
 }
 #endif

@@ -159,6 +159,9 @@ GetFontData@20
 GetFontLanguageInfo@4
 GetFontResourceInfo@16
 GetFontResourceInfoW@16
+GetFontUnicodeRanges@8
+GetGlyphIndicesA@20
+GetGlyphIndicesW@20
 GetGlyphOutline@28
 GetGlyphOutlineA@28
 GetGlyphOutlineW@28

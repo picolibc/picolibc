@@ -1,3 +1,11 @@
+2004-11-02  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/wingdi.h (GetFontUnicodeRanges,GetGlyphIndicesA,
+	GetGlyphIndicesW): Declare.
+	(GGI_MARK_NONEXISTING_GLYPHS): Define
+	* lib/gdi32.def (GetFontUnicodeRanges,GetGlyphIndicesA,
+	GetGlyphIndicesW): Add stubs.
+
 2004-10-24  Dan Aloni  <da-x@colinux.org>
 
 	* include/ddk/ntapi.h (NtQueryFullAttributesFile,
