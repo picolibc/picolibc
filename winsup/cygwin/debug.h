@@ -23,7 +23,7 @@ DWORD __stdcall WFMO (DWORD, CONST HANDLE *, BOOL, DWORD) __attribute__ ((regpar
 }
 
 #define WaitForSingleObject WFSO
-#define WaitForMultipleObject WFMO
+#define WaitForMultipleObjects WFMO
 
 #if !defined(_DEBUG_H_)
 #define _DEBUG_H_
