@@ -1,3 +1,17 @@
+2002-06-03  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.cc (fhandler_base::open): Don't set binmode if already set.
+	Don't check for file.  Files should already be set.  Report on binary
+	mode for debugging.
+	(fhandler_base::fhandler_base): Don't set default binmode here.  That's
+	for later.
+	* fhandler_console.cc (fhandler_console::output_tcsetattr): Don't set
+	binmode, ever, for console.
+	* fhandler_disk_file.cc (fhandler_disk_file::open): Always set the
+	binary mode to the value derived from mount table.
+	* path.cc (mount_info::conv_to_win32_path): Default to binmode if path
+	does not translate into anything in the mount table.
+
 2002-06-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* external.cc (cygwin_internal): Add CW_EXTRACT_DOMAIN_AND_USER

@@ -1508,7 +1508,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
   if (i >= nmounts)
     {
       backslashify (pathbuf, dst, 0);	/* just convert */
-      *flags = 0;
+      *flags = PATH_BINARY;		/* Default to binmode */
     }
   else
     {

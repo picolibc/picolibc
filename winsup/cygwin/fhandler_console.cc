@@ -719,8 +719,10 @@ fhandler_console::output_tcsetattr (int, struct termios const *t)
   /* Ignore the optional_actions stuff, since all output is emitted
      instantly */
 
+#if 0
   /* Enable/disable LF -> CRLF conversions */
   set_w_binary ((t->c_oflag & ONLCR) ? 0 : 1);
+#endif
 
   /* All the output bits we can ignore */
 

@@ -424,27 +424,30 @@ fhandler_base::open (path_conv *pc, int flags, mode_t mode)
     set_file_attribute (has_acls (), get_win32_name (), mode);
 
   set_io_handle (x);
-  int bin;
-  int fmode;
-  if ((bin = flags & (O_BINARY | O_TEXT)))
-    /* nothing to do */;
-  else if ((fmode = get_default_fmode (flags)) & O_BINARY)
-    bin = O_BINARY;
-  else if (fmode & O_TEXT)
-    bin = O_TEXT;
-  else if (get_device () == FH_DISK)
-    bin = get_w_binary () || get_r_binary () || 1;
+  if (get_w_binset () && get_r_binset ())
+    syscall_printf ("filemode already set to %d/%d", get_r_binary (), get_w_binary ());
   else
-    bin = get_w_binary () || get_r_binary () || (binmode != O_TEXT);
+    {
+      int bin;
+      int fmode;
+      if ((bin = flags & (O_BINARY | O_TEXT)))
+	/* nothing to do */;
+      else if ((fmode = get_default_fmode (flags)) & O_BINARY)
+	bin = O_BINARY;
+      else if (fmode & O_TEXT)
+	bin = O_TEXT;
+      else
+	bin = get_w_binary () || get_r_binary () || (binmode != O_TEXT);
 
-  if (bin & O_TEXT)
-    bin = 0;
+      if (bin & O_TEXT)
+	bin = 0;
 
-  set_flags (flags | (bin ? O_BINARY : O_TEXT));
+      set_flags (flags | (bin ? O_BINARY : O_TEXT));
 
-  set_r_binary (bin);
-  set_w_binary (bin);
-  syscall_printf ("filemode set to %s", bin ? "binary" : "text");
+      set_r_binary (bin);
+      set_w_binary (bin);
+      syscall_printf ("filemode set to %s", bin ? "binary" : "text");
+    }
 
   res = 1;
   set_open_status ();
@@ -859,7 +862,7 @@ fhandler_base::init (HANDLE f, DWORD a, mode_t bin)
     oflags = O_RDWR;
   set_flags (oflags | (bin ? O_BINARY : O_TEXT));
   set_open_status ();
-  debug_printf ("created new fhandler_base for handle %p", f);
+  debug_printf ("created new fhandler_base for handle %p, bin %d", f, get_r_binary ());
 }
 
 void
@@ -1019,6 +1022,7 @@ fhandler_base::fhandler_base (DWORD devtype, int unit):
   win32_path_name (NULL),
   open_status (0)
 {
+#if 0
   int bin = __fmode & O_TEXT ? 0 : 1;
   if (status != FH_DISK && status != FH_CONSOLE)
     {
@@ -1027,6 +1031,7 @@ fhandler_base::fhandler_base (DWORD devtype, int unit):
       if (!get_w_binset ())
 	set_w_binary (bin);
     }
+#endif
 }
 
 /* Normal I/O destructor */

@@ -339,11 +339,8 @@ fhandler_disk_file::open (path_conv *real_path, int flags, mode_t mode)
       return 0;
     }
 
-  if (real_path->isbinary ())
-    {
-      set_r_binary (1);
-      set_w_binary (1);
-    }
+  set_r_binary (real_path->isbinary ());
+  set_w_binary (real_path->isbinary ());
 
   set_has_acls (real_path->has_acls ());
   set_isremote (real_path->isremote ());
