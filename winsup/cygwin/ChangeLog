@@ -1,3 +1,11 @@
+2002-05-19  Pierre Humblet <pierre.humblet@ieee.org>
+
+        * security.cc (open_local_policy): Initialize lsa to
+	INVALID_HANDLE_VALUE instead of NULL.
+	(get_logon_server_and_user_domain): Test for INVALID_HANDLE_VALUE
+	instead of NULL.
+	(create_token): Both of the above.
+
 2002-05-18  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::fstat): Make handling of

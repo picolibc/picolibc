@@ -180,7 +180,7 @@ static LSA_HANDLE
 open_local_policy ()
 {
   LSA_OBJECT_ATTRIBUTES oa = { 0, 0, 0, 0, 0, 0 };
-  LSA_HANDLE lsa = NULL;
+  LSA_HANDLE lsa = INVALID_HANDLE_VALUE;
 
   NTSTATUS ret = LsaOpenPolicy(NULL, &oa, POLICY_EXECUTE, &lsa);
   if (ret != STATUS_SUCCESS)
@@ -258,7 +258,7 @@ get_logon_server_and_user_domain (char *logonserver, char *userdomain)
 {
   BOOL ret = FALSE;
   LSA_HANDLE lsa = open_local_policy ();
-  if (lsa)
+  if (lsa != INVALID_HANDLE_VALUE)
     {
       ret = get_lsa_srv_inf (lsa, logonserver, userdomain);
       close_local_policy (lsa);
@@ -723,7 +723,7 @@ HANDLE
 create_token (cygsid &usersid, cygsid &pgrpsid)
 {
   NTSTATUS ret;
-  LSA_HANDLE lsa = NULL;
+  LSA_HANDLE lsa = INVALID_HANDLE_VALUE;
   char logonserver[INTERNET_MAX_HOST_NAME_LENGTH + 1];
   int old_priv_state;
 
@@ -764,7 +764,7 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
     goto out;
 
   /* Open policy object. */
-  if (!(lsa = open_local_policy ()))
+  if ((lsa = open_local_policy ()) == INVALID_HANDLE_VALUE)
     goto out;
 
   /* Get logon server. */
