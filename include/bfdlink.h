@@ -262,6 +262,9 @@ struct bfd_link_info
   /* true if ok to have multiple definition.  */
   boolean allow_multiple_definition;
 
+  /* true if ok to have version with no definition.  */
+  boolean allow_undefined_version;
+
   /* Which symbols to strip.  */
   enum bfd_link_strip strip;
 
@@ -602,6 +605,10 @@ struct bfd_elf_version_expr
   const char *pattern;
   /* Matching function.  */
   int (*match) PARAMS((struct bfd_elf_version_expr *, const char *));
+  /* Defined by ".symver".  */
+  unsigned int symver: 1;
+  /* Defined by version script.  */
+  unsigned int script : 1;
 };
 
 /* Version dependencies.  */

@@ -1,3 +1,8 @@
+2002-08-07  H.J. Lu <hjl@gnu.org>
+
+	* bfdlink.h (bfd_link_info): Add allow_undefined_version.
+	(bfd_elf_version_expr): Add symver and script.
+
 2002-07-31  Ian Dall  <ian@sibyl.beware.dropbear.id.au>
 
 	* bfdlink.h (bfd_link_common_skip_ar_symbols): New enum.
