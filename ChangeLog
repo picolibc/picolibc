@@ -1,3 +1,7 @@
+2000-07-23  Michael Sokolov  <msokolov@ivan.Harhan.ORG>
+
+	* configure (topsrcdir): Don't use dirname.
+
 2000-07-20  Jason Merrill  <jason@redhat.com>
 
 	* configure.in: Remove all references to libg++ and librx.
