@@ -1,5 +1,17 @@
 2002-12-28  Christopher Faylor  <cgf@redhat.com>
 
+	Eliminate unit argument and special unit fields from fhandler classes
+	and constructors throughout.
+	* fhandler_mem.cc (fhandler_dev_mem::fhandler_dev_mem): Make decisions
+	based on specific device type rather than unit number.
+	* fhandler_random.cc (fhandler_dev_random::write): Ditto.
+	(fhandler_dev_random::read): Ditto.
+	* fhandler_socket.cc (fhandler_socket::set_connect_secret): Set device
+	type to "urandom" after construction of entropy_source.
+	* path.cc (windows_devices_names): Remove.
+
+2002-12-28  Christopher Faylor  <cgf@redhat.com>
+
 	* Makefile.in: Add devices.gperf.
 	* devices.h: New file.
 	* devices.gperf: Ditto.
