@@ -273,7 +273,7 @@ You can avoid the ambiguity of Windows paths, and avoid typing
 	bash$ mkdir /c
 	bash$ mount c:/ /c
 	bash$ ls /c
-	@end example
+@end example
 
 Note that you only need to mount drives once.  The mapping is kept
 in the registry so mounts stay valid pretty much indefinitely.
@@ -341,9 +341,6 @@ code for beta 16.
 
 @subsection What about DOS special filenames?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
 Files cannot be named com1, lpt1, or aux (to name a few); either as
 the root filename or as the extension part.  If you do, you'll have
 trouble.  Unix programs don't avoid these names which can make things
@@ -353,9 +350,6 @@ interesting.  E.g., the perl distribution has a file called
 letters 'aux' in it will hang.
 
 @subsection When it hangs, how do I get it back?
-
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
 
 If something goes wrong and the tools hang on you for some reason (easy
 to do if you try and read a file called aux.sh), first try hitting ^C to
@@ -437,16 +431,24 @@ Place the following code in your startup file and try again:
     (original-comint-exec-1 name buffer command switches)))
 @end smallexample
 
-@subsection Where did the man/info pages go?
+@subsection info error "dir: No such file or directory"
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
+Cygwin packages install their info documentation in the /usr/info
+directory.  But you need to create a @code{dir} file there before the
+standalone info program (probably @code{/usr/bin/info}) can be used to
+read those info files.  This is how you do it:
+@example
+	bash$ cd /usr/info
+	bash$ for f in *.info ; do install-info $f dir ; done
+@end example
 
-In order to save space and download times, we have stopped providing
-the man/info files for the tools with the binary install since we are
-not yet providing a man page or info reader.  Both types of
-documentation are available in a tar file available from the project ftp
-site.  Or consult the online documentation over the WWW.
+This may generate warnings:
+@example
+	install-info: warning: no info dir entry in `gzip.info'
+	install-info: warning: no info dir entry in `time.info'
+@end example
+The @code{install-info} command cannot parse these files, so you will
+have to add their entries to @code{/usr/info/dir} by hand.
 
 @subsection Why do I get a message saying Out of Queue slots?
 
@@ -500,9 +502,6 @@ them have been implemented in Cygwin yet.
 
 @subsection How does everything work?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
 There's a C library which provides a Unix-style API.  The
 applications are linked with it and voila - they run on Windows.
 
@@ -520,9 +519,6 @@ Symposium in August 1998.  It is available in html format on the project
 WWW site.
 
 @subsection Are development snapshots for the Cygwin library available?
-
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
 
 Yes.  They're made whenever anything interesting happens inside the
 Cygwin library (usually roughly on a nightly basis, depending on how much
@@ -623,9 +619,6 @@ should be fine.
 
 @subsection Why is some functionality only supported in Windows NT?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
 Windows 9x: n.
 32 bit extensions and a graphical shell for a 16 bit patch to an
 8 bit operating system originally coded for a 4 bit microprocessor,
@@ -701,9 +694,6 @@ attribute.
 
 @subsection Why do some files, which are not executables have the 'x' type.
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
-
 When working out the unix-style attribute bits on a file, the library
 has to fill out some information not provided by the WIN32 API.  
 
@@ -711,9 +701,6 @@ It guesses that files ending in .exe and .bat are executable, as are
 ones which have a "#!" as their first characters.
 
 @subsection How secure is Cygwin in a multi-user environment?
-
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
 
 Cygwin is not secure in a multi-user environment.  For
 example if you have a long running daemon such as "inetd"
@@ -1007,8 +994,8 @@ rewriting the runtime library in question from specs...
 
 @subsection How do I rebuild the tools on my NT box?
 
-@strong{(Please note: This section has not yet been updated for the latest
-net release.)}
+@strong{Note:} You must build in a directory @emph{outside} the source
+tree.
 
 Assuming that you have the src installed as /src, will build in
 the directory /obj, and want to install the tools in /install:
