@@ -232,8 +232,6 @@ fhandler_socket::dup (fhandler_base *child)
   fhs->addr_family = addr_family;
   fhs->set_io_handle (get_io_handle ());
 
-  fhs->prot_info_ptr = (LPWSAPROTOCOL_INFOA)
-    cmalloc (HEAP_BUF, sizeof (WSAPROTOCOL_INFOA));
   fhs->fixup_before_fork_exec (GetCurrentProcessId ());
   if (winsock2_active)
     {

@@ -1,3 +1,7 @@
+2001-10-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* (fhandler_socket::dup): Revert previous change.
+
 2001-10-30  Christopher Faylor  <cgf@redhat.com>
 
 	* dtable.cc (dtable::dup2): Add some debugging.  Use methods from
