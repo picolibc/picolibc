@@ -1,3 +1,7 @@
+2001-04-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* winsup.api/mmaptest01.c: New test.
+
 2001-03-10  Egor Duda  <deo@logos-m.ru>
 
 	* winsup.api/ltp/access01.c: Avoid compilation error if X_OK
