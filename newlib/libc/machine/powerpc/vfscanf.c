@@ -107,7 +107,6 @@ Supporting OS subroutines required:
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <wchar.h>
 #include <string.h>
 #ifdef _HAVE_STDC
 #include <stdarg.h>
@@ -130,11 +129,6 @@ Supporting OS subroutines required:
 #if defined WANT_IO_LONG_DBL && (LDBL_MANT_DIG > DBL_MANT_DIG)
 #undef _NO_LONGDBL
 extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
-#endif
-
-#ifdef __SPE__
-extern __int64_t _strtosfix64_r _PARAMS((struct _reent *, char *s, char **sptr));
-extern __uint64_t _strtoufix64_r _PARAMS((struct _reent *, char *s, char **sptr));
 #endif
 
 #define _NO_LONGLONG
@@ -284,7 +278,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
   vec_union vec_buf;
   char *lptr;                   /* literal pointer */
 #ifdef MB_CAPABLE
-  mbstate_t state;                /* value to keep track of multibyte state */
+  int state;                    /* value to keep track of multibyte state */
 #endif
 
   char *ch_dest;

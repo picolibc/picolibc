@@ -1,3 +1,16 @@
+2002-08-19  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/sys/types.h: Support __need_inttypes macro
+	that only sets the __intxx and __uintxx types.  
+	* libc/machine/powerpc/Makefile.am: Add stdlib to include directories
+	to get mprec.h.
+	* libc/machine/powerpc/Makefile.in: Regenerated.
+	* libc/machine/powerpc/vfprintf.c: Fix state variable type.
+	* libc/machine/powerpc/vfscanf.c: Fix state variable type.  Remove
+	redundant fixed-point conversion prototypes.
+	* libc/machine/powerpc/machine/stdlib.h[__SPE__]: Include <sys/types.h>
+	after setting __need_inttypes.
+
 2002-08-18  Christopher Faylor  <cgf@redhat.com>
 
 	* libc/include/sys/unistd.h: Add getsid declaration for cygwin.

@@ -16,9 +16,34 @@
  */
 
 #ifndef _SYS_TYPES_H
-#define _SYS_TYPES_H
 
 #include <_ansi.h>
+
+#ifndef __INTTYPES_DEFINED__
+#define __INTTYPES_DEFINED__
+typedef short int __int16_t;
+typedef unsigned short int __uint16_t;
+
+#if __INT_MAX__ == 32767
+typedef long int __int32_t;
+typedef unsigned long int __uint32_t;
+#else
+typedef int __int32_t;
+typedef unsigned int __uint32_t;
+#endif
+
+#if __LONG_MAX__ > 2147483647 || !defined(__GNUC__)
+typedef long int __int64_t;
+typedef unsigned long int __uint64_t;
+#else
+__extension__ typedef long long __int64_t;
+__extension__ typedef unsigned long long __uint64_t;
+#endif
+#endif /* ! __INTTYPES_DEFINED */
+
+#ifndef __need_inttypes
+
+#define _SYS_TYPES_H
 #include <sys/_types.h>
 
 #if defined (_WIN32) || defined (__CYGWIN__)
@@ -100,24 +125,6 @@ typedef	unsigned short	ino_t;
 #endif
 #endif
 
-typedef short int __int16_t;
-typedef unsigned short int __uint16_t;
-
-#if __INT_MAX__ == 32767
-typedef long int __int32_t;
-typedef unsigned long int __uint32_t;
-#else
-typedef int __int32_t;
-typedef unsigned int __uint32_t;
-#endif
-
-#if __LONG_MAX__ > 2147483647 || !defined(__GNUC__)
-typedef long int __int64_t;
-typedef unsigned long int __uint64_t;
-#else
-__extension__ typedef long long __int64_t;
-__extension__ typedef unsigned long long __uint64_t;
-#endif
 
 #ifdef __MS_types__
 typedef unsigned long vm_offset_t;
@@ -359,5 +366,9 @@ typedef struct {
 #endif /* defined(_POSIX_THREADS) */
 
 #endif  /* defined(__rtems__) */
+
+#endif  /* !__need_inttypes */
+
+#undef __need_inttypes
 
 #endif	/* _SYS_TYPES_H */

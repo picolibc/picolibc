@@ -12,7 +12,7 @@ EXTRA_lib_a_SOURCES = @extra_sources@
 lib_a_DEPENDENCIES = @extra_objs@
 
 ACLOCAL_AMFLAGS = -I ../../.. 
-AM_CFLAGS = -I $(srcdir)/../../stdio
+AM_CFLAGS = -I $(srcdir)/../../stdio -I $(srcdir)/../../stdlib
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 
 VEC_MALLOC_COMPILE = $(COMPILE) -DINTERNAL_NEWLIB

@@ -18,6 +18,9 @@ _PTR    _EXFUN(_vec_realloc_r,(struct _reent *, _PTR __r, size_t __size));
 
 # if defined(__SPE__)
 
+#define __need_inttypes
+#include <sys/types.h>
+
 __int16_t   _EXFUN(atosfix16,(const char *__str));
 __int16_t   _EXFUN(_atosfix16_r,(struct _reent *, const char *__str));
 __int32_t   _EXFUN(atosfix32,(const char *__str));

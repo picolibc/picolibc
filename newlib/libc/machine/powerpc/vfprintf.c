@@ -166,7 +166,6 @@ static char *rcsid = "$Id$";
 #include <stdlib.h>
 #include <string.h>
 #include <reent.h>
-#include <wchar.h>
 #include <string.h>
 #ifdef __ALTIVEC__
 #include <altivec.h>
@@ -389,7 +388,7 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	int vec_print_count;    /* number of vector chunks remaining */
 	vec_16_byte_union vec_tmp;
 #endif /* __ALTIVEC__ */ 
-        mbstate_t state;          /* mbtowc calls from library must not change state */
+        int state;              /* mbtowc calls from library must not change state */
 
 	/*
 	 * Choose PADSIZE to trade efficiency vs. size.  If larger printf
