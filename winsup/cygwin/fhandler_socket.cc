@@ -48,7 +48,8 @@ fhandler_dev_random* entropy_source;
 /* cygwin internal: map sockaddr into internet domain address */
 static int
 get_inet_addr (const struct sockaddr *in, int inlen,
-	       struct sockaddr_in *out, int *outlen, int* secret = 0)
+	       struct sockaddr_in *out, int *outlen,
+	       int *type = NULL, int *secret = NULL)
 {
   int secret_buf [4];
   int* secret_ptr = (secret ? : secret_buf);
@@ -91,14 +92,20 @@ get_inet_addr (const struct sockaddr *in, int inlen,
       if (ReadFile (fh, buf, 128, &len, 0))
 	{
 	  struct sockaddr_in sin;
+	  char ctype;
 	  sin.sin_family = AF_INET;
-	  sscanf (buf + strlen (SOCKET_COOKIE), "%hu %08x-%08x-%08x-%08x",
+	  sscanf (buf + strlen (SOCKET_COOKIE), "%hu %c %08x-%08x-%08x-%08x",
 		  &sin.sin_port,
+		  &ctype,
 		  secret_ptr, secret_ptr + 1, secret_ptr + 2, secret_ptr + 3);
 	  sin.sin_port = htons (sin.sin_port);
 	  sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
 	  *out = sin;
 	  *outlen = sizeof sin;
+	  if (type)
+	    *type = (ctype == 's' ? SOCK_STREAM :
+	             ctype == 'd' ? SOCK_DGRAM
+		                  : 0);
 	  ret = 1;
 	}
       CloseHandle (fh);
@@ -656,7 +663,7 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
 	}
 
       char buf[sizeof (SOCKET_COOKIE) + 80];
-      __small_sprintf (buf, "%s%u ", SOCKET_COOKIE, sin.sin_port);
+      __small_sprintf (buf, "%s%u %c ", SOCKET_COOKIE, sin.sin_port, get_socket_type () == SOCK_STREAM ? 's' : get_socket_type () == SOCK_DGRAM ? 'd' : '-');
       af_local_set_secret (strchr (buf, '\0'));
       DWORD blen = strlen (buf) + 1;
       if (!WriteFile (fh, buf, blen, &blen, 0))
@@ -689,9 +696,17 @@ fhandler_socket::connect (const struct sockaddr *name, int namelen)
   bool in_progress = false;
   struct sockaddr_in sin;
   DWORD err;
+  int type;
 
-  if (!get_inet_addr (name, namelen, &sin, &namelen, connect_secret))
+  if (!get_inet_addr (name, namelen, &sin, &namelen, &type, connect_secret))
     return -1;
+
+  if (get_addr_family () == AF_LOCAL && get_socket_type () != type)
+    {
+      WSASetLastError (WSAEPROTOTYPE);
+      set_winsock_errno ();
+      return -1;
+    }
 
   res = ::connect (get_socket (), (struct sockaddr *) &sin, namelen);
 

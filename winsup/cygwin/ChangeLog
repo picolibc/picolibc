@@ -1,3 +1,12 @@
+2005-04-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (get_inet_addr): Add type parameter to return
+	unix socket type.  Read socket type from unix socket file.
+	(fhandler_socket::bind): Write socket type to unix socket file.
+	(fhandler_socket::connect): Return with errno EPROTOTYPE if
+	socket type of socket doesn't match socket type of unix socket
+	trying to connect to.
+
 2005-04-06  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* security.h (cygsidlist::addfromgr): Avoid duplicate entries.
