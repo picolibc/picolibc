@@ -1,3 +1,38 @@
+2005-03-28  Mark Mitchell <mark@codesourcery.com>
+
+	* readline/Makefile.in (RLTTYOBJ): New variable.
+	(OBJECTS): Use RLTTYOBJ.
+	* readline/aclocal.m4: Use AC_RTY_LINK to check for mbstate_t.
+	* readline/complete.c (pwd.h): Guard with HAVE_PWD_H.
+	(getpwent): Guard with HAVE_GETPWENT.
+	(rl_username_completion_function): Guard use of getpwent.
+	(endpwent): Likewise.
+	* readline/config.h.in (HAVE_FCNTL): New macro.
+	(HAVE_GETPWENT): Likewise.
+	(HAVE_GETPWNAM): Likewise.
+	(HAVE_GETPWUID): Likewise.
+	(HAVE_PWD_H): Likewise.
+	* readline/configure: Regenerated.
+	* readline/configure.in: Handle MinGW when cross compiling.  Check for
+	getpwnam, getpwent, getpwuid, and pwd.h.  Set RLTTYOBJ.
+	* readline/display.c (rl_clear_screen): Treat Windows like DOS.
+	(insert_some_chars): Likewise.
+	(delete_chars): Likewise.
+	* readline/rldefs.h (NEW_TTY_DRIVER): Do not define for Windows.
+	* readline/rlnotty.c: New file.
+	* readline/shell.c (pwd.h): Guard with HAVE_PWD_H.
+	(getpwuid): Guard with HAVE_GETPWUID.
+	(sh_unset_nodelay_mode): Guard use of fnctl with HAVE_FNCTL_H.
+	* readline/signals.c (rl_signal_handler): Don't use SIGALRM or
+	SIGQUIT if not defined.  Use "raise" rather than "kill".
+	(rl_set_signals): Don't set handlers for SIGQUIT or SIGALRM if
+	they are not defined.
+	(rl_clear_signals): Likewise.
+	* readline/tilde.c (pwd.h): Guard with HAVE_PWD_H.
+	(getpwuid): Guard declaration with HAVE_GETPWUID.
+	(getpwnam): Guard declaration with HAVE_GETPWNAM.
+	(tilde_expand_word): Guard use of getpwnam with HAVE_GETPWNAM.
+
 2005-03-28  Mark Mitchell  <mark@codesourcery.com>
 
 	* gdb/configure.ac: No tgetent on MinGW.
