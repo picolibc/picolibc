@@ -98,7 +98,7 @@ dll_list::operator[] (const char *name)
   return NULL;
 }
 
-#define RETRIES 100
+#define RETRIES 1000
 
 /* Allocate space for a dll struct contiguous with the just-loaded dll. */
 dll *
