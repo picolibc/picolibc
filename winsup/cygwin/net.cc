@@ -119,7 +119,8 @@ void
 wsock_event::release (int sock)
 {
   int last_err = WSAGetLastError ();
-  WSAEventSelect (sock, event, 0);
+  /* KB 168349: NT4 fails if the event parameter is not NULL. */
+  WSAEventSelect (sock, NULL, 0);
   WSACloseEvent (event);
   unsigned long non_block = 0;
   if (ioctlsocket (sock, FIONBIO, &non_block))
