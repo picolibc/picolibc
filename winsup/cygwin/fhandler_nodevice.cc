@@ -31,7 +31,8 @@ details. */
 int
 fhandler_nodevice::open (int, mode_t)
 {
-  set_errno (ENXIO);
+  if (!pc.error)
+    set_errno (ENXIO);
   return 0;
 }
 
