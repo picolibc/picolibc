@@ -9,7 +9,6 @@
    details. */
 
 #include "winsup.h"
-#include <sys/termios.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
@@ -17,10 +16,8 @@
 #include <ntdef.h>
 
 #include "autoload.h"
-#include "cygheap.h"
 #include "cygerrno.h"
 #include "fhandler.h"
-#include "path.h"
 
 /*
  * The following both data structures aren't defined anywhere in the Microsoft
@@ -65,6 +62,13 @@ fhandler_dev_mem::fhandler_dev_mem (const char *name, int nunit)
 : fhandler_base (FH_MEM, name),
   unit (nunit)
 {
+  /* Reading physical memory only supported on NT/W2K. */
+  if (os_being_run != winNT)
+    {
+      mem_size = 0;
+      return;
+    }
+
   if (unit == 1) /* /dev/mem */
     {
       NTSTATUS ret;

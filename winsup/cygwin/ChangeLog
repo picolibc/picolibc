@@ -1,3 +1,8 @@
+Mon Oct  9 15:58:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler_mem.cc: Eliminate unused include statements.
+	(fhandler_dev_mem::fhandler_dev_mem): Check for 9X/ME.
+
 Mon Oct  9 15:11:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_dev_mem): Erase member `init_phase' and
