@@ -294,7 +294,7 @@ install-dirs:
 	$(mkinstalldirs) $(bindir)
 	$(mkinstalldirs) $(tooldir)/lib$(subdirforlib)
 
-install: all install-dirs $(install_dlls_host)
+install: all install-dirs $(install_dlls_host) $(tooldir)/lib$(subdirforlib)/libstdc++.a
 	for i in $(LIBS); do \
 		$(INSTALL_DATA) $$i $(tooldir)/lib$(subdirforlib)/$$i ; \
 	done
@@ -309,6 +309,12 @@ install: all install-dirs $(install_dlls_host)
 		done ; \
 	done
 	@$(MAKE) subdirs DO=$@ $(FLAGS_TO_PASS)
+
+$(tooldir)/lib$(subdirforlib)/libstdc++.a: libstdc++.a
+	@[ -f $? ] && cp -vp $? $@; exit 0
+
+libstdc++.a:
+	@true
 
 subdirs: $(SUBDIRS)
 	@true
