@@ -1,5 +1,8 @@
 Sat Aug 28 00:25:25 1999  Jerry Quinn <jquinn@nortelnetworks.com>
 
+	* hppa.h (pa_opcodes): Replace 'f' by 'v'.  Prefix float register args
+	by 'f'.
+
 	* hppa.h (pa_opcodes): Add extrd, extrw, depd, depdi, depw, depwi.
 	Add supporting args.
 

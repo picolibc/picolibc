@@ -70,9 +70,9 @@ struct pa_opcode
 
    In the args field, the following characters are unused:
 
-	'  "#  &     -  /          :;< > @'
-	' BC        LM       U   YZ[\]  '
-	'   de gh   lm             { } '
+	'  "#  &     -  /   34 6789:;< > @'
+	' BC      JKLM          XYZ[\]  '
+	'   de gh   lm           y { } '
 
    Here are all the characters:
 
@@ -85,7 +85,6 @@ Kinds of operands:
    b    integer register field at 10.
    t    integer register field at 31.
    a	integer register field at 10 and 15 (for PERMH)
-   y    floating point register field at 31
    5    5 bit immediate at 15.
    s    2 bit space specifier at 17.
    S    3 bit space specifier at 18.
@@ -98,6 +97,49 @@ Kinds of operands:
    w    12 bit branch displacement
    W    17 bit branch displacement (PC relative)
    z    17 bit branch displacement (just a number, not an address)
+
+Also these:
+
+   .    2 bit shift amount at 25
+   *    4 bit shift amount at 25
+   p    5 bit shift count at 26 (to support the SHD instruction) encoded as
+        31-p
+   ~    6 bit shift count at 20,22:26 encoded as 63-~.
+   P    5 bit bit position at 26
+   T    5 bit field length at 31 (encoded as 32-T)
+   A    13 bit immediate at 18 (to support the BREAK instruction)
+   ^	like b, but describes a control register
+   !    sar (cr11) register
+   D    26 bit immediate at 31 (to support the DIAG instruction)
+   $    9 bit immediate at 28 (to support POPBTS)
+
+   v    3 bit Special Function Unit identifier at 25
+   O    20 bit Special Function Unit operation split between 15 bits at 20
+        and 5 bits at 31
+   o    15 bit Special Function Unit operation at 20
+   2    22 bit Special Function Unit operation split between 17 bits at 20
+        and 5 bits at 31
+   1    15 bit Special Function Unit operation split between 10 bits at 20
+        and 5 bits at 31
+   0    10 bit Special Function Unit operation split between 5 bits at 20
+        and 5 bits at 31
+   u    3 bit coprocessor unit identifier at 25
+   F    Source Floating Point Operand Format Completer encoded 2 bits at 20
+   I    Source Floating Point Operand Format Completer encoded 1 bits at 20
+	(for 0xe format FP instructions)
+   G    Destination Floating Point Operand Format Completer encoded 2 bits at 18
+   H    Floating Point Operand Format at 26 for 'fmpyadd' and 'fmpysub'
+        (very similar to 'F')
+
+   r	5 bit immediate value at 31 (for the break instruction)
+	(very similar to V above, except the value is unsigned instead of
+	low_sign_ext)
+   R	5 bit immediate value at 15 (for the ssm, rsm, probei instructions)
+	(same as r above, except the value is in a different location)
+   U	10 bit immediate value at 15 (for SSM, RSM on pa2.0)
+   Q	5 bit immediate value at 10 (a bit position specified in
+	the bb instruction. It's the same as r above, except the
+        value is in a different location)
 
 Completer operands all have 'c' as the prefix:
 
@@ -160,64 +202,24 @@ Condition operands all have '?' as the prefix:
    ?u   unit conditions
    ?U   64 bit unit conditions
 
-Also these:
+Floating point registers all have 'f' as a prefix:
+  
+   ft	target register at 31
+   fT	target register with L/R halves at 31
+   fa	operand 1 register at 10
+   fA   operand 1 register with L/R halves at 10
+   fb	operand 2 register at 15
+   fB   operand 2 register with L/R halves at 15
+   fC   operand 3 register with L/R halves at 16:18,21:23
 
-   .    2 bit shift amount at 25
-   *    4 bit shift amount at 25
-   p    5 bit shift count at 26 (to support the SHD instruction) encoded as
-        31-p
-   ~    6 bit shift count at 20,22:26 encoded as 63-~.
-   P    5 bit bit position at 26
-   q    6 bit bit position at 20,22:26
-   T    5 bit field length at 31 (encoded as 32-T)
-   %	6 bit field length at 23,27:31 (variable extract/deposit)
-   |	6 bit field length at 19,27:31 (fixed extract/deposit)
-   A    13 bit immediate at 18 (to support the BREAK instruction)
-   ^	like b, but describes a control register
-   !    sar (cr11) register
-   D    26 bit immediate at 31 (to support the DIAG instruction)
-   $    9 bit immediate at 28 (to support POPBTS)
+Float registers for fmpyadd and fmpysub:
 
-   f    3 bit Special Function Unit identifier at 25
-   O    20 bit Special Function Unit operation split between 15 bits at 20
-        and 5 bits at 31
-   o    15 bit Special Function Unit operation at 20
-   2    22 bit Special Function Unit operation split between 17 bits at 20
-        and 5 bits at 31
-   1    15 bit Special Function Unit operation split between 10 bits at 20
-        and 5 bits at 31
-   0    10 bit Special Function Unit operation split between 5 bits at 20
-        and 5 bits at 31
-   u    3 bit coprocessor unit identifier at 25
-   F    Source Floating Point Operand Format Completer encoded 2 bits at 20
-   I    Source Floating Point Operand Format Completer encoded 1 bits at 20
-	(for 0xe format FP instructions)
-   G    Destination Floating Point Operand Format Completer encoded 2 bits at 18
+   fi	mult operand 1 register at 10
+   fj	mult operand 2 register at 15
+   fk	mult target register at 20
+   fl	add/sub operand register at 25
+   fm	add/sub target register at 31
 
-   r	5 bit immediate value at 31 (for the break instruction)
-	(very similar to V above, except the value is unsigned instead of
-	low_sign_ext)
-   R	5 bit immediate value at 15 (for the ssm, rsm, probei instructions)
-	(same as r above, except the value is in a different location)
-   U	10 bit immediate value at 15 (for SSM, RSM on pa2.0)
-   Q	5 bit immediate value at 10 (a bit position specified in
-	the bb instruction. It's the same as r above, except the
-        value is in a different location)
-
-And these (PJH) for PA-89 F.P. registers and instructions:
-
-   v    a 't' operand type extended to handle L/R register halves.
-   E    a 'b' operand type extended to handle L/R register halves.
-   X    an 'x' operand type extended to handle L/R register halves.
-   J    a 'b' operand type further extended to handle extra 1.1 registers
-   K    a 'x' operand type further extended to handle extra 1.1 registers
-   4    a variation of the 'b' operand type for 'fmpyadd' and 'fmpysub'
-   6    a variation of the 'x' operand type for 'fmpyadd' and 'fmpysub'
-   7    a variation of the 't' operand type for 'fmpyadd' and 'fmpysub'
-   8    5 bit register field at 20 (used in 'fmpyadd' and 'fmpysub')
-   9    5 bit register field at 25 (used in 'fmpyadd' and 'fmpysub')
-   H    Floating Point Operand Format at 26 for 'fmpyadd' and 'fmpysub'
-        (very similar to 'F')
 */
 
 
@@ -546,63 +548,63 @@ static const struct pa_opcode pa_opcodes[] =
 
 /* Floating Point Coprocessor Instructions */
   
-{ "fldwx",      0x24000000, 0xfc001f80, "cxx(s,b),v", pa10},
-{ "fldwx",      0x24000000, 0xfc001f80, "cxx(b),v", pa10},
-{ "flddx",      0x2c000000, 0xfc001fc0, "cxx(s,b),y", pa10},
-{ "flddx",      0x2c000000, 0xfc001fc0, "cxx(b),y", pa10},
-{ "fstwx",      0x24000200, 0xfc001f80, "cxv,x(s,b)", pa10},
-{ "fstwx",      0x24000200, 0xfc001f80, "cxv,x(b)", pa10},
-{ "fstdx",      0x2c000200, 0xfc001fc0, "cxy,x(s,b)", pa10},
-{ "fstdx",      0x2c000200, 0xfc001fc0, "cxy,x(b)", pa10},
-{ "fstqx",      0x3c000200, 0xfc001fc0, "cxy,x(s,b)", pa10},
-{ "fstqx",      0x3c000200, 0xfc001fc0, "cxy,x(b)", pa10},
-{ "fldws",      0x24001000, 0xfc001f80, "cm5(s,b),v", pa10},
-{ "fldws",      0x24001000, 0xfc001f80, "cm5(b),v", pa10},
-{ "fldds",      0x2c001000, 0xfc001fc0, "cm5(s,b),y", pa10},
-{ "fldds",      0x2c001000, 0xfc001fc0, "cm5(b),y", pa10},
-{ "fstws",      0x24001200, 0xfc001f80, "cmv,5(s,b)", pa10},
-{ "fstws",      0x24001200, 0xfc001f80, "cmv,5(b)", pa10},
-{ "fstds",      0x2c001200, 0xfc001fc0, "cmy,5(s,b)", pa10},
-{ "fstds",      0x2c001200, 0xfc001fc0, "cmy,5(b)", pa10},
-{ "fstqs",      0x3c001200, 0xfc001fc0, "cmy,5(s,b)", pa10},
-{ "fstqs",      0x3c001200, 0xfc001fc0, "cmy,5(b)", pa10},
-{ "fadd",       0x30000600, 0xfc00e7e0, "FE,X,v", pa10},
-{ "fadd",       0x38000600, 0xfc00e720, "IJ,K,v", pa10},
-{ "fsub",       0x30002600, 0xfc00e7e0, "FE,X,v", pa10},
-{ "fsub",       0x38002600, 0xfc00e720, "IJ,K,v", pa10},
-{ "fmpy",       0x30004600, 0xfc00e7e0, "FE,X,v", pa10},
-{ "fmpy",       0x38004600, 0xfc00e720, "IJ,K,v", pa10},
-{ "fdiv",       0x30006600, 0xfc00e7e0, "FE,X,v", pa10},
-{ "fdiv",       0x38006600, 0xfc00e720, "IJ,K,v", pa10},
-{ "fsqrt",      0x30008000, 0xfc1fe7e0, "FE,v", pa10},
-{ "fsqrt",      0x38008000, 0xfc1fe720, "FJ,v", pa10},
-{ "fabs",       0x30006000, 0xfc1fe7e0, "FE,v", pa10},
-{ "fabs",       0x38006000, 0xfc1fe720, "FJ,v", pa10},
-{ "frem",       0x30008600, 0xfc00e7e0, "FE,X,v", pa10},
-{ "frem",       0x38008600, 0xfc00e720, "FJ,K,v", pa10},
-{ "frnd",       0x3000a000, 0xfc1fe7e0, "FE,v", pa10},
-{ "frnd",       0x3800a000, 0xfc1fe720, "FJ,v", pa10},
-{ "fcpy",       0x30004000, 0xfc1fe7e0, "FE,v", pa10},
-{ "fcpy",       0x38004000, 0xfc1fe720, "FJ,v", pa10},
-{ "fcnvff",     0x30000200, 0xfc1f87e0, "FGE,v", pa10},
-{ "fcnvff",     0x38000200, 0xfc1f8720, "FGJ,v", pa10},
-{ "fcnvxf",     0x30008200, 0xfc1f87e0, "FGE,v", pa10},
-{ "fcnvxf",     0x38008200, 0xfc1f8720, "FGJ,v", pa10},
-{ "fcnvfx",     0x30010200, 0xfc1f87e0, "FGE,v", pa10},
-{ "fcnvfx",     0x38010200, 0xfc1f8720, "FGJ,v", pa10},
-{ "fcnvfxt",    0x30018200, 0xfc1f87e0, "FGE,v", pa10},
-{ "fcnvfxt",    0x38018200, 0xfc1f8720, "FGJ,v", pa10},
-{ "fmpyfadd",   0xb8000000, 0xfc000020, "IJ,K,3,v", pa20, FLAG_STRICT},
-{ "fmpynfadd",  0xb8000020, 0xfc000020, "IJ,K,3,v", pa20, FLAG_STRICT},
-{ "fneg",       0x3000c000, 0xfc1fe7e0, "FE,v", pa20, FLAG_STRICT},
-{ "fneg",       0x3800c000, 0xfc1fe720, "IJ,v", pa20, FLAG_STRICT},
-{ "fnegabs",    0x3000e000, 0xfc1fe7e0, "FE,v", pa20, FLAG_STRICT},
-{ "fnegabs",    0x3800e000, 0xfc1fe720, "IJ,v", pa20, FLAG_STRICT},
-{ "fcmp",       0x30000400, 0xfc00e7e0, "F?fE,X", pa10},
-{ "fcmp",       0x38000400, 0xfc00e720, "I?fJ,K", pa10},
-{ "xmpyu",	0x38004700, 0xfc00e720, "J,K,v", pa11},
-{ "fmpyadd",	0x18000000, 0xfc000000, "H4,6,7,9,8", pa11},
-{ "fmpysub",	0x98000000, 0xfc000000, "H4,6,7,9,8", pa11},
+{ "fldwx",      0x24000000, 0xfc001f80, "cxx(s,b),fT", pa10},
+{ "fldwx",      0x24000000, 0xfc001f80, "cxx(b),fT", pa10},
+{ "flddx",      0x2c000000, 0xfc001fc0, "cxx(s,b),ft", pa10},
+{ "flddx",      0x2c000000, 0xfc001fc0, "cxx(b),ft", pa10},
+{ "fstwx",      0x24000200, 0xfc001f80, "cxfT,x(s,b)", pa10},
+{ "fstwx",      0x24000200, 0xfc001f80, "cxfT,x(b)", pa10},
+{ "fstdx",      0x2c000200, 0xfc001fc0, "cxft,x(s,b)", pa10},
+{ "fstdx",      0x2c000200, 0xfc001fc0, "cxft,x(b)", pa10},
+{ "fstqx",      0x3c000200, 0xfc001fc0, "cxft,x(s,b)", pa10},
+{ "fstqx",      0x3c000200, 0xfc001fc0, "cxft,x(b)", pa10},
+{ "fldws",      0x24001000, 0xfc001f80, "cm5(s,b),fT", pa10},
+{ "fldws",      0x24001000, 0xfc001f80, "cm5(b),fT", pa10},
+{ "fldds",      0x2c001000, 0xfc001fc0, "cm5(s,b),ft", pa10},
+{ "fldds",      0x2c001000, 0xfc001fc0, "cm5(b),ft", pa10},
+{ "fstws",      0x24001200, 0xfc001f80, "cmfT,5(s,b)", pa10},
+{ "fstws",      0x24001200, 0xfc001f80, "cmfT,5(b)", pa10},
+{ "fstds",      0x2c001200, 0xfc001fc0, "cmft,5(s,b)", pa10},
+{ "fstds",      0x2c001200, 0xfc001fc0, "cmft,5(b)", pa10},
+{ "fstqs",      0x3c001200, 0xfc001fc0, "cmft,5(s,b)", pa10},
+{ "fstqs",      0x3c001200, 0xfc001fc0, "cmft,5(b)", pa10},
+{ "fadd",       0x30000600, 0xfc00e7e0, "Ffa,fb,fT", pa10},
+{ "fadd",       0x38000600, 0xfc00e720, "IfA,fB,fT", pa10},
+{ "fsub",       0x30002600, 0xfc00e7e0, "Ffa,fb,fT", pa10},
+{ "fsub",       0x38002600, 0xfc00e720, "IfA,fB,fT", pa10},
+{ "fmpy",       0x30004600, 0xfc00e7e0, "Ffa,fb,fT", pa10},
+{ "fmpy",       0x38004600, 0xfc00e720, "IfA,fB,fT", pa10},
+{ "fdiv",       0x30006600, 0xfc00e7e0, "Ffa,fb,fT", pa10},
+{ "fdiv",       0x38006600, 0xfc00e720, "IfA,fB,fT", pa10},
+{ "fsqrt",      0x30008000, 0xfc1fe7e0, "Ffa,fT", pa10},
+{ "fsqrt",      0x38008000, 0xfc1fe720, "FfA,fT", pa10},
+{ "fabs",       0x30006000, 0xfc1fe7e0, "Ffa,fT", pa10},
+{ "fabs",       0x38006000, 0xfc1fe720, "FfA,fT", pa10},
+{ "frem",       0x30008600, 0xfc00e7e0, "Ffa,fb,fT", pa10},
+{ "frem",       0x38008600, 0xfc00e720, "FfA,fB,fT", pa10},
+{ "frnd",       0x3000a000, 0xfc1fe7e0, "Ffa,fT", pa10},
+{ "frnd",       0x3800a000, 0xfc1fe720, "FfA,fT", pa10},
+{ "fcpy",       0x30004000, 0xfc1fe7e0, "Ffa,fT", pa10},
+{ "fcpy",       0x38004000, 0xfc1fe720, "FfA,fT", pa10},
+{ "fcnvff",     0x30000200, 0xfc1f87e0, "FGfa,fT", pa10},
+{ "fcnvff",     0x38000200, 0xfc1f8720, "FGfA,fT", pa10},
+{ "fcnvxf",     0x30008200, 0xfc1f87e0, "FGfa,fT", pa10},
+{ "fcnvxf",     0x38008200, 0xfc1f8720, "FGfA,fT", pa10},
+{ "fcnvfx",     0x30010200, 0xfc1f87e0, "FGfa,fT", pa10},
+{ "fcnvfx",     0x38010200, 0xfc1f8720, "FGfA,fT", pa10},
+{ "fcnvfxt",    0x30018200, 0xfc1f87e0, "FGfa,fT", pa10},
+{ "fcnvfxt",    0x38018200, 0xfc1f8720, "FGfA,fT", pa10},
+{ "fmpyfadd",   0xb8000000, 0xfc000020, "IfA,fB,fC,fT", pa20, FLAG_STRICT},
+{ "fmpynfadd",  0xb8000020, 0xfc000020, "IfA,fB,fC,fT", pa20, FLAG_STRICT},
+{ "fneg",       0x3000c000, 0xfc1fe7e0, "Ffa,fT", pa20, FLAG_STRICT},
+{ "fneg",       0x3800c000, 0xfc1fe720, "IfA,fT", pa20, FLAG_STRICT},
+{ "fnegabs",    0x3000e000, 0xfc1fe7e0, "Ffa,fT", pa20, FLAG_STRICT},
+{ "fnegabs",    0x3800e000, 0xfc1fe720, "IfA,fT", pa20, FLAG_STRICT},
+{ "fcmp",       0x30000400, 0xfc00e7e0, "F?ffa,fb", pa10},
+{ "fcmp",       0x38000400, 0xfc00e720, "I?ffA,fB", pa10},
+{ "xmpyu",	0x38004700, 0xfc00e720, "fA,fB,fT", pa11},
+{ "fmpyadd",	0x18000000, 0xfc000000, "Hfi,fj,fk,fl,fm", pa11},
+{ "fmpysub",	0x98000000, 0xfc000000, "Hfi,fj,fk,fl,fm", pa11},
 { "ftest",      0x30002420, 0xffffffff, "", pa10},
 { "fid",        0x30000000, 0xffffffff, "", pa11},
 
@@ -613,10 +615,10 @@ static const struct pa_opcode pa_opcodes[] =
 
 /* Assist Instructions */
 
-{ "spop0",      0x10000000, 0xfc000600, "f,ON", pa10},
-{ "spop1",      0x10000200, 0xfc000600, "f,oNt", pa10},
-{ "spop2",      0x10000400, 0xfc000600, "f,1Nb", pa10},
-{ "spop3",      0x10000600, 0xfc000600, "f,0Nx,b", pa10},
+{ "spop0",      0x10000000, 0xfc000600, "v,ON", pa10},
+{ "spop1",      0x10000200, 0xfc000600, "v,oNt", pa10},
+{ "spop2",      0x10000400, 0xfc000600, "v,1Nb", pa10},
+{ "spop3",      0x10000600, 0xfc000600, "v,0Nx,b", pa10},
 { "copr",       0x30000000, 0xfc000000, "u,2N", pa10},
 { "cldwx",      0x24000000, 0xfc001e00, "ucxx(s,b),t", pa10},
 { "cldwx",      0x24000000, 0xfc001e00, "ucxx(b),t", pa10},
