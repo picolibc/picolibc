@@ -482,7 +482,7 @@ get_supplementary_group_sidlist (const char *username, cygsidlist &grp_list)
 
 static BOOL
 get_group_sidlist (cygsidlist &grp_list,
-		   cygsid &usersid, cygsid &pgrpsid,
+		  cygsid &usersid, cygsid &pgrpsid, struct passwd * pw,
 		   PTOKEN_GROUPS my_grps, LUID auth_luid, int &auth_pos,
 		   BOOL * special_pgrp)
 {
@@ -554,7 +554,7 @@ get_group_sidlist (cygsidlist &grp_list,
       get_user_primary_group (wserver, user, usersid, pgrpsid);
     }
   else * special_pgrp = TRUE;
-  if (get_supplementary_group_sidlist (user, sup_list))
+  if (pw->pw_name && get_supplementary_group_sidlist (pw->pw_name, sup_list))
     {
       for (int i = 0; i < sup_list.count; ++i)
 	if (!grp_list.contains (sup_list.sids[i]))
@@ -734,7 +734,7 @@ verify_token (HANDLE token, cygsid &usersid, cygsid &pgrpsid, BOOL * pintern)
 }
 
 HANDLE
-create_token (cygsid &usersid, cygsid &pgrpsid)
+create_token (cygsid &usersid, cygsid &pgrpsid, struct passwd * pw)
 {
   NTSTATUS ret;
   LSA_HANDLE lsa = INVALID_HANDLE_VALUE;
@@ -818,7 +818,7 @@ create_token (cygsid &usersid, cygsid &pgrpsid)
 
   /* Create list of groups, the user is member in. */
   int auth_pos;
-  if (!get_group_sidlist (grpsids, usersid, pgrpsid,
+  if (!get_group_sidlist (grpsids, usersid, pgrpsid, pw,
 			  my_grps, auth_luid, auth_pos, &special_pgrp))
     goto out;
 
@@ -1379,13 +1379,13 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
       /* Otherwise retrieve user data from /etc/passwd */
       struct passwd *pw = getpwuid32 (uid);
       if (!pw)
-        {
+	{
 	  debug_printf ("no /etc/passwd entry for %d", uid);
 	  set_errno (EINVAL);
 	  return NULL;
 	}
       else if (!owner_sid.getfrompw (pw))
-        {
+	{
 	  debug_printf ("no SID for user %d", uid);
 	  set_errno (EINVAL);
 	  return NULL;

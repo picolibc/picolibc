@@ -1,3 +1,34 @@
+2002-06-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* syscalls.cc (chown): Convert uid to 32 bit.
+	(lchown): Ditto.
+	(fchown): Ditto.
+
+2002-06-24  Christopher Faylor  <cgf@redhat.com>
+
+	* dtable.cc (dtable::find_unused_handle): Avoid coercion.
+
+2002-06-24  Christopher Faylor  <cgf@redhat.com>
+
+	* dtable.cc (fhandler_base::dup2): Cleanup.  Ensure that lock is turned
+	off in error condition.
+
+2002-06-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* uinfo.cc (internal_getlogin): Set myself->uid and myself->gid instead
+	of user.real_uid and user.real_gid.
+	(uinfo_init): Evaluate orig_uid and real_uid from myself->uid.  Ditto
+	for gid.
+
+2002-06-23  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* security.cc (get_group_sidlist): Add pw argument and use pw->pw_name
+	in call to get_supplementary_group_sidlist.
+	(create_token): Add pw argument and use it in call to
+	get_group_sidlist.
+	* security.h: Add pw argument in declaration of create_token.
+	* syscalls.cc (seteuid32): Add pw argument in call to create_token.
+
 2002-06-24  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygserver_client (client_request::make_request): Replace my
