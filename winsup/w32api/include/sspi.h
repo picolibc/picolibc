@@ -89,7 +89,7 @@ typedef struct _SecPkgContext_StreamSizes {
 } SecPkgContext_StreamSizes, *PSecPkgContext_StreamSizes;
 typedef struct _SecPkgContext_Sizes {
 	ULONG cbMaxToken;
-	ULONG cbMaxSIgnature;
+	ULONG cbMaxSignature;
 	ULONG cbBlockSize;
 	ULONG cbSecurityTrailer;
 } SecPkgContext_Sizes, *PSecPkgContext_Sizes;
