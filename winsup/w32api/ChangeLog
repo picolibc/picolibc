@@ -1,3 +1,8 @@
+2005-01-02  Jiri Malak  <Jiri.Malak@geac.cz>
+
+	* include/winnt.h (GetCurrentFiber, GetFiberData): Make inline
+	assembly code conditional on _X86_.
+
 2005-01-02  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/w32api.h: Increment version.

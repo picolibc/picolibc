@@ -3346,6 +3346,7 @@ ULONGLONG WINAPI VerSetConditionMask(ULONGLONG,DWORD,BYTE);
 PVOID GetCurrentFiber(void);
 PVOID GetFiberData(void);
 
+#ifdef _X86_
 #if defined(__GNUC__)
 #if (__GNUC__ >= 3)
 /* Support -masm=intel.  */
@@ -3432,6 +3433,7 @@ static __inline__ struct _TEB * NtCurrentTeb(void)
         modify [eax];
         
 #endif /* __GNUC__ */
+#endif /* _X86_ */
 
 #endif /* RC_INVOKED */
 
