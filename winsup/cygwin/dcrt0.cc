@@ -160,10 +160,10 @@ do_global_ctors (void (**in_pfunc)(), int force)
 }
 
 /*
- * Replaces -@file in the command line with the contents of the file.
- * There may be multiple -@file's in a single command line
- * A \-@file is replaced with -@file so that echo \-@foo would print
- * -@foo and not the contents of foo.
+ * Replaces @file in the command line with the contents of the file.
+ * There may be multiple @file's in a single command line
+ * A \@file is replaced with @file so that echo \@foo would print
+ * @foo and not the contents of foo.
  */
 static int __stdcall
 insert_file (char *name, char *&cmd)
