@@ -259,7 +259,7 @@ struct init_cygheap
   struct sigaction *sigs;
 };
 
-#define CYGHEAPSIZE (sizeof (init_cygheap) + (16000 * sizeof (fhandler_union)) + (5 * 65536))
+#define CYGHEAPSIZE (sizeof (init_cygheap) + (20000 * sizeof (fhandler_union)) + (5 * 65536))
 
 extern init_cygheap *cygheap;
 extern void *cygheap_max;

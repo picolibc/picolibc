@@ -333,7 +333,7 @@ fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
   return;
 
 err:
-  (ssize_t) ulen = -1;
+  ulen = (size_t) -1;
   return;
 }
 

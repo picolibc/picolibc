@@ -523,6 +523,7 @@ alloc_stack (child_info_fork *ci)
 }
 
 static NO_COPY int mypid = 0;
+int __argc_safe;
 int _declspec(dllexport) __argc;
 char _declspec(dllexport) **__argv;
 vfork_save NO_COPY *main_vfork = NULL;
@@ -606,7 +607,7 @@ dll_crt0_1 ()
 				  DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
 	      h = NULL;
 	    set_myself (mypid, h);
-	    __argc = spawn_info->moreinfo->argc;
+	    __argc = __argc_safe = spawn_info->moreinfo->argc;
 	    __argv = spawn_info->moreinfo->argv;
 	    envp = spawn_info->moreinfo->envp;
 	    envc = spawn_info->moreinfo->envc;
