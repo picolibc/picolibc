@@ -1100,6 +1100,19 @@ fhandler_socket::sendmsg (const struct msghdr *msg, int flags, ssize_t tot)
 	res = ret;
     }
 
+  /* Special handling for EPIPE and SIGPIPE.
+
+     EPIPE is generated if the local end has been shut down on a connection
+     oriented socket.  In this case the process will also receive a SIGPIPE
+     unless MSG_NOSIGNAL is set.  */
+  if (res == SOCKET_ERROR && get_errno () == ESHUTDOWN
+      && get_socket_type () == SOCK_STREAM)
+    {
+      set_errno (EPIPE);
+      if (! (flags & MSG_NOSIGNAL))
+	raise (SIGPIPE);
+    }
+
   return res;
 }
 
