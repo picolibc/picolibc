@@ -1,3 +1,8 @@
+Sat May  5 01:04:11 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (handle_exceptions): Vastly increase test for exception
+	loop guard variable.
+
 Fri May  4 22:23:33 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (stack_info): Add some controls.

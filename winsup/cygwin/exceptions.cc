@@ -406,8 +406,11 @@ handle_exceptions (EXCEPTION_RECORD *e, void *, CONTEXT *in, void *)
   static int NO_COPY debugging = 0;
   static int NO_COPY recursed = 0;
 
-  if (debugging && ++debugging < 50)
-    return 0;
+  if (debugging && ++debugging < 50000)
+    {
+      SetThreadPriority (hMainThread, THREAD_PRIORITY_NORMAL);
+      return 0;
+    }
 
   /* If we've already exited, don't do anything here.  Returning 1
      tells Windows to keep looking for an exception handler.  */
