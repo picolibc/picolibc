@@ -3551,7 +3551,7 @@ conv_path_list_buf_size (const char *path_list, bool to_posix)
   /* 100: slop */
   size = strlen (path_list)
     + (num_elms * max_mount_path_len)
-    + (nrel * strlen (to_posix ? pc.get_win32 () : pc.normalized_path))
+    + (nrel * strlen (to_posix ? pc.normalized_path : pc.get_win32 ()))
     + 100;
   return size;
 }

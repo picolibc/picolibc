@@ -1,3 +1,8 @@
+2003-06-04  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (conv_path_list): Use correct value when calculating length
+	to avoid a potential SEGV.
+
 2003-06-03  Pierre Humblet  <pierre.humblet@ieee.org>
 
         * fhandler_disk_file.cc (fhandler_disk_file::fstat): Mark the pc
