@@ -1,6 +1,29 @@
-Tue Oct  2 22:25:23 2001  Robert Collins <rbtcollins@hotmail.com>
+Tue Oct  2 23:49:18 2001  Christopher Faylor <cgf@cygnus.com>
 
-	* how-fhandlers-work.txt: New file.
+	* cygheap.cc (cfree): Remove malloc debugging probe.
+	* dlmalloc.c (errprint): Remove abort() call which causes interesting
+	error message printing to abort prematurely.
+	* environ.cc: Sprinkle MALLOC_CHECKs liberally throughout.
+	(_addenv): Allocate two empty elements at end of environ to
+	(apparently) work around problems with some buggy applications.
+	(winenv): Avoid calling alloca if no forced environment variable is
+	present.
+
+	* exceptions.cc (open_stackdumpfile): Don't print "Dumping stack trace
+	to..." when running in a cygwin environment (i.e., the parent is a
+	cygwin process).
+
+	* dtable.cc (dtable::init_std_file_from_handle): Move device type
+	detection code from build_fhandler here since it is only used by this
+	function.
+	(dtable::build_fhandler_from_name): New method.  Renamed from
+	dtable::build_fhandler.
+	(dtable::build_fhandler): Use build_fhandler_from_name.
+	(cygwin_attach_handle_to_fd): Ditto.
+	* syscalls.cc (_open): Ditto.
+	(stat_worker): Ditto.
+	* dtable.h (dtable::build_fhandler_from_name): Rename declaration from
+	dtable::build_fhandler.
 
 Mon Oct  1 16:52:23 2001  Christopher Faylor <cgf@cygnus.com>
 

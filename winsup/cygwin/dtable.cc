@@ -168,22 +168,39 @@ dtable::release (int fd)
     }
 }
 
+extern "C"
+int
+cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
+			    DWORD myaccess)
+{
+  if (fd == -1)
+    fd = cygheap->fdtab.find_unused_handle ();
+  path_conv pc;
+  fhandler_base *res = cygheap->fdtab.build_fhandler_from_name (fd, name, handle,
+      								pc);
+  res->init (handle, myaccess, bin);
+  return fd;
+}
+
 void
-dtable::init_std_file_from_handle (int fd, HANDLE handle,
-				  DWORD myaccess)
+dtable::init_std_file_from_handle (int fd, HANDLE handle, DWORD myaccess)
 {
   int bin;
-  const char *name = NULL;
+  const char *name;
+  CONSOLE_SCREEN_BUFFER_INFO buf;
+  struct sockaddr sa;
+  int sal = sizeof (sa);
+  DCB dcb;
+
+  first_fd_for_open = 0;
 
   if (__fmode)
     bin = __fmode;
   else
     bin = binmode ?: 0;
 
-  first_fd_for_open = 0;
   /* See if we can consoleify it  - if it is a console,
    don't open it in binary.  That will screw up our crlfs*/
-  CONSOLE_SCREEN_BUFFER_INFO buf;
   if (GetConsoleScreenBufferInfo (handle, &buf))
     {
       if (ISSTATE (myself, PID_USETTY))
@@ -192,7 +209,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle,
 	name = "/dev/conout";
       bin = 0;
     }
-  else if (FlushConsoleInputBuffer (handle))
+  else if (GetNumberOfConsoleInputEvents (handle, (DWORD *) &buf))
     {
       if (ISSTATE (myself, PID_USETTY))
 	name = "/dev/tty";
@@ -204,56 +221,28 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle,
     {
       if (fd == 0)
 	name = "/dev/piper";
-      else if (fd == 1 || fd == 2)
+      else
 	name = "/dev/pipew";
       if (bin == 0)
 	bin = O_BINARY;
     }
+  else if (wsock_started && getpeername ((SOCKET) handle, &sa, &sal) == 0)
+    name = "/dev/socket";
+  else if (GetCommState (handle, &dcb))
+    name = "/dev/ttyS0"; // FIXME - determine correct device
+  else
+    name = "unknown disk file";
 
   path_conv pc;
-  build_fhandler (fd, name, handle, pc)->init (handle, myaccess, bin);
+  build_fhandler_from_name (fd, name, handle, pc)->init (handle, myaccess, bin);
   set_std_handle (fd);
   paranoid_printf ("fd %d, handle %p", fd, handle);
 }
 
-extern "C"
-int
-cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
-			    DWORD myaccess)
-{
-  if (fd == -1)
-    fd = cygheap->fdtab.find_unused_handle ();
-  path_conv pc;
-  fhandler_base *res = cygheap->fdtab.build_fhandler (fd, name, handle, pc);
-  res->init (handle, myaccess, bin);
-  return fd;
-}
-
 fhandler_base *
-dtable::build_fhandler (int fd, const char *name, HANDLE handle, path_conv& pc,
-    			unsigned opt, suffix_info *si)
+dtable::build_fhandler_from_name (int fd, const char *name, HANDLE handle,
+    				  path_conv& pc, unsigned opt, suffix_info *si)
 {
-  if (!name && handle)
-    {
-      struct sockaddr sa;
-      int sal = sizeof (sa);
-      CONSOLE_SCREEN_BUFFER_INFO cinfo;
-      DCB dcb;
-
-      if (GetNumberOfConsoleInputEvents (handle, (DWORD *) &cinfo))
-	name = "/dev/conin";
-      else if (GetConsoleScreenBufferInfo (handle, &cinfo))
-	name = "/dev/conout";
-      else if (wsock_started && getpeername ((SOCKET) handle, &sa, &sal) == 0)
-	name = "/dev/socket";
-      else if (GetFileType (handle) == FILE_TYPE_PIPE)
-	name = "/dev/pipe";
-      else if (GetCommState (handle, &dcb))
-	name = "/dev/ttyS0"; // FIXME - determine correct device
-      else
-	name = "some disk file";
-    }
-
   pc.check (name, opt | PC_NULLEMPTY, si);
   if (pc.error)
     {
@@ -338,7 +327,7 @@ dtable::build_fhandler (int fd, DWORD dev, const char *name, int unit)
 	{
 	  /* FIXME - this could recurse forever */
 	  path_conv pc;
-	  return build_fhandler (fd, name, NULL, pc);
+	  return build_fhandler_from_name (fd, name, NULL, pc);
 	}
     }
 

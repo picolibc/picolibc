@@ -322,7 +322,6 @@ crealloc (void *s, DWORD n)
 extern "C" void __stdcall
 cfree (void *s)
 {
-  MALLOC_CHECK;
   assert (!inheap (s));
   (void) _cfree (tocygheap (s));
   MALLOC_CHECK;

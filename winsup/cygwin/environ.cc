@@ -76,6 +76,7 @@ static unsigned char conv_start_chars[256] = {0};
 void
 win_env::add_cache (const char *in_posix, const char *in_native)
 {
+  MALLOC_CHECK;
   posix = (char *) realloc (posix, strlen (in_posix) + 1);
   strcpy (posix, in_posix);
   if (in_native)
@@ -90,6 +91,7 @@ win_env::add_cache (const char *in_posix, const char *in_native)
       (void) strcpy (native, name);
       towin32 (in_posix, native + namelen);
     }
+  MALLOC_CHECK;
   debug_printf ("posix %s", posix);
   debug_printf ("native %s", native);
 }
@@ -145,6 +147,7 @@ posify (char **here, const char *value)
   debug_printf ("env var converted to %s", outenv);
   *here = outenv;
   free (src);
+  MALLOC_CHECK;
 }
 
 /*
@@ -177,6 +180,7 @@ my_findenv (const char *name, int *offset)
 	  *offset = p - cur_environ ();
 	  return (char *) (++c);
 	}
+  MALLOC_CHECK;
   return NULL;
 }
 
@@ -231,12 +235,12 @@ _addenv (const char *name, const char *value, int overwrite)
   else
     {				/* Create new slot. */
       int sz = envsize (cur_environ ());
-      int allocsz = sz + sizeof (char *);
+      int allocsz = sz + (2 * sizeof (char *));
 
       offset = (sz - 1) / sizeof (char *);
 
       /* Allocate space for additional element plus terminating NULL. */
-      if (__cygwin_environ == lastenviron)
+      if (cur_environ () == lastenviron)
 	lastenviron = __cygwin_environ = (char **) realloc (cur_environ (),
 							    allocsz);
       else if ((lastenviron = (char **) malloc (allocsz)) != NULL)
@@ -248,7 +252,7 @@ _addenv (const char *name, const char *value, int overwrite)
 #ifdef DEBUGGING
 	  try_to_debug ();
 #endif
-	  return -1;		/* Oops.  No more memory. */
+	  return -1;				/* Oops.  No more memory. */
 	}
 
       __cygwin_environ[offset + 1] = NULL;	/* NULL terminate. */
@@ -282,6 +286,7 @@ _addenv (const char *name, const char *value, int overwrite)
   if ((spenv = getwinenv (envhere)))
     spenv->add_cache (value);
 
+  MALLOC_CHECK;
   return 0;
 }
 
@@ -612,13 +617,11 @@ parse_options (char *buf)
 static void __stdcall
 regopt (const char *name)
 {
-  MALLOC_CHECK;
   /* FIXME: should not be under mount */
   reg_key r (KEY_READ, CYGWIN_INFO_PROGRAM_OPTIONS_NAME, NULL);
   char buf[MAX_PATH];
   char lname[strlen(name) + 1];
   strlwr (strcpy (lname, name));
-  MALLOC_CHECK;
   if (r.get_string (lname, buf, sizeof (buf) - 1, "") == ERROR_SUCCESS)
     parse_options (buf);
   else
@@ -810,18 +813,21 @@ winenv (const char * const *envp, int keep_posix)
   for (int i = 0; forced_winenv_vars[i]; i++)
     if (!saw_forced_winenv[i])
       {
-	int namelen = strlen (forced_winenv_vars[i]) + 1;
-	int vallen = GetEnvironmentVariable (forced_winenv_vars[i], dum, 0) + 1;
-	p = (char *) alloca (namelen + vallen);
-	strcpy (p, forced_winenv_vars[i]);
-	strcat (p, "=");
-	if (!GetEnvironmentVariable (forced_winenv_vars[i], p + namelen,
-	      			     vallen + 1))
-	  debug_printf ("warning: %s not present in environment", *srcp);
-	else
+	int vallen = GetEnvironmentVariable (forced_winenv_vars[i], dum, 0);
+	if (vallen > 0)
 	  {
-	    *dstp++ = p;
-	    tl += strlen (p) + 1;
+	    int namelen = strlen (forced_winenv_vars[i]) + 1;
+	    p = (char *) alloca (namelen + ++vallen);
+	    strcpy (p, forced_winenv_vars[i]);
+	    strcat (p, "=");
+	    if (!GetEnvironmentVariable (forced_winenv_vars[i], p + namelen,
+					 vallen))
+	      debug_printf ("warning: %s not present in environment", *srcp);
+	    else
+	      {
+		*dstp++ = p;
+		tl += strlen (p) + 1;
+	      }
 	  }
       }
 

@@ -377,7 +377,6 @@ done:
   else
     syscall_printf ("%d = write (%d, %p, %d)", res, fd, ptr, len);
 
-  MALLOC_CHECK;
   return (ssize_t)res;
 }
 
@@ -499,7 +498,8 @@ _open (const char *unix_path, int flags, ...)
       else
 	{
 	  path_conv pc;
-	  if (!(fh = cygheap->fdtab.build_fhandler (fd, unix_path, NULL, pc)))
+	  if (!(fh = cygheap->fdtab.build_fhandler_from_name (fd, unix_path,
+		  					      NULL, pc)))
 	    res = -1;		// errno already set
 	  else if (!fh->open (pc, flags, (mode & 07777) & ~cygheap->umask))
 	    {
@@ -1087,10 +1087,11 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
   if (check_null_invalid_struct_errno (buf))
     goto done;
 
-  fh = cygheap->fdtab.build_fhandler (-1, name, NULL, real_path,
-				      (nofollow ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW)
-				      | PC_FULL, stat_suffixes);
-
+  fh = cygheap->fdtab.build_fhandler_from_name (-1, name, NULL, real_path,
+						(nofollow ?
+						 PC_SYM_NOFOLLOW
+						 : PC_SYM_FOLLOW)
+						| PC_FULL, stat_suffixes);
   if (real_path.error)
     {
       set_errno (real_path.error);

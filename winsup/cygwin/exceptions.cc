@@ -170,7 +170,10 @@ open_stackdumpfile ()
 			     CREATE_ALWAYS, 0, 0);
       if (h != INVALID_HANDLE_VALUE)
 	{
-	  system_printf ("Dumping stack trace to %s", corefile);
+	  if (!myself->ppid_handle)
+	    system_printf ("Dumping stack trace to %s", corefile);
+	  else
+	    debug_printf ("Dumping stack trace to %s", corefile);
 	  SetStdHandle (STD_ERROR_HANDLE, h);
 	}
     }
