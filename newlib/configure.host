@@ -519,6 +519,7 @@ case "${host}" in
 	syscall_dir=syscalls
 	newlib_cflags="${newlib_cflags} -DABORT_PROVIDED -DHAVE_GETTIMEOFDAY"
 	newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
+	newlib_cflags="${newlib_cflags} -DHAVE_SYSTEM -DHAVE_RENAME"
 	;;
   thumb-*-pe)
 	syscall_dir=syscalls

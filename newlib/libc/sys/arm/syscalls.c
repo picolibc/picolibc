@@ -15,6 +15,8 @@
 #include "swi.h"
 
 /* Forward prototypes.  */
+int     _system     _PARAMS ((const char *));
+int     _rename     _PARAMS ((const char *, const char *));
 int     isatty		_PARAMS ((int));
 clock_t _times		_PARAMS ((struct tms *));
 int     _gettimeofday	_PARAMS ((struct timeval *, struct timezone *));
@@ -608,4 +610,20 @@ isatty (int fd)
 {
   return 1;
   fd = fd;
+}
+
+int
+_system (const char *s)
+{
+  if (s == NULL)
+    return 0;
+  errno = ENOSYS;
+  return -1;
+}
+
+int
+_rename (const char *, const char *)
+{
+  errno = ENOSYS;
+  return -1;
 }

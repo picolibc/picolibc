@@ -1,3 +1,11 @@
+2002-04-29  Jonathan Larmour  <jlarmour@redhat.com>
+
+	* libc/sys/arm/syscalls.c (_rename): New function. Just a stub.
+	(_system): New function. Ditto.
+	* libc/stdlib/system.c (_system_r): Call _system if HAVE_SYSTEM.
+	* configure.host: define HAVE_SYSTEM and HAVE_RENAME for xscale
+	targets.
+
 2002-04-29  Jeff Johnston  <jjohnstn@redhat.com>
 
         *  libc/include/sys/unistd.h (pread, pwrite): Added prototypes.
