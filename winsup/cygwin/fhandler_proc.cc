@@ -419,7 +419,7 @@ format_proc_uptime (char *destbuf, size_t maxsize)
   unsigned long long uptime = 0ULL, idle_time = 0ULL;
   SYSTEM_PROCESSOR_TIMES spt;
 
-  NTSTATUS ret = ZwQuerySystemInformation (SystemProcessorTimes, (PVOID) &spt,
+  NTSTATUS ret = NtQuerySystemInformation (SystemProcessorTimes, (PVOID) &spt,
 					   sizeof spt, NULL);
   if (!ret && GetLastError () == ERROR_PROC_NOT_FOUND)
     uptime = GetTickCount() / 10;
@@ -459,15 +459,15 @@ format_proc_stat (char *destbuf, size_t maxsize)
       SYSTEM_PROCESSOR_TIMES spt;
       SYSTEM_PERFORMANCE_INFORMATION spi;
       SYSTEM_TIME_OF_DAY_INFORMATION stodi;
-      ret = ZwQuerySystemInformation (SystemProcessorTimes,
+      ret = NtQuerySystemInformation (SystemProcessorTimes,
 				      (PVOID) &spt,
 				      sizeof spt, NULL);
       if (ret == STATUS_SUCCESS)
-	ret = ZwQuerySystemInformation (SystemPerformanceInformation,
+	ret = NtQuerySystemInformation (SystemPerformanceInformation,
 					(PVOID) &spi,
 					sizeof spi, NULL);
       if (ret == STATUS_SUCCESS)
-	ret = ZwQuerySystemInformation (SystemTimeOfDayInformation,
+	ret = NtQuerySystemInformation (SystemTimeOfDayInformation,
 					(PVOID) &stodi,
 					sizeof stodi, NULL);
       if (ret != STATUS_SUCCESS)

@@ -318,7 +318,7 @@ winpids::enumNT (bool winpid)
   NTSTATUS res;
   for (;;)
     {
-      res = ZwQuerySystemInformation (SystemProcessesAndThreadsInformation,
+      res = NtQuerySystemInformation (SystemProcessesAndThreadsInformation,
 				      procs, szprocs, NULL);
       if (res == 0)
 	break;

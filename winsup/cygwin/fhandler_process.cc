@@ -418,22 +418,22 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
 			      FALSE, p->dwProcessId);
       if (hProcess != NULL)
 	{
-	  ret = ZwQueryInformationProcess (hProcess,
+	  ret = NtQueryInformationProcess (hProcess,
 					   ProcessVmCounters,
 					   (PVOID) &vmc,
 					   sizeof vmc, NULL);
 	  if (ret == STATUS_SUCCESS)
-	    ret = ZwQueryInformationProcess (hProcess,
+	    ret = NtQueryInformationProcess (hProcess,
 					     ProcessTimes,
 					     (PVOID) &put,
 					     sizeof put, NULL);
 	  if (ret == STATUS_SUCCESS)
-	    ret = ZwQueryInformationProcess (hProcess,
+	    ret = NtQueryInformationProcess (hProcess,
 					     ProcessBasicInformation,
 					     (PVOID) &pbi,
 					     sizeof pbi, NULL);
 	  if (ret == STATUS_SUCCESS)
-	    ret = ZwQueryInformationProcess (hProcess,
+	    ret = NtQueryInformationProcess (hProcess,
 					     ProcessQuotaLimits,
 					     (PVOID) &ql,
 					     sizeof ql, NULL);
@@ -448,11 +448,11 @@ format_process_stat (_pinfo *p, char *destbuf, size_t maxsize)
 	  return 0;
 	}
       if (ret == STATUS_SUCCESS)
-	ret = ZwQuerySystemInformation (SystemTimeOfDayInformation,
+	ret = NtQuerySystemInformation (SystemTimeOfDayInformation,
 					(PVOID) &stodi,
 					sizeof stodi, NULL);
       if (ret == STATUS_SUCCESS)
-	ret = ZwQuerySystemInformation (SystemProcessorTimes,
+	ret = NtQuerySystemInformation (SystemProcessorTimes,
 					(PVOID) &spt,
 					sizeof spt, NULL);
       if (ret != STATUS_SUCCESS)
@@ -629,7 +629,7 @@ get_process_state (DWORD dwProcessId)
   PULONG p = new ULONG[n];
   int state =' ';
   while (STATUS_INFO_LENGTH_MISMATCH ==
-	 (ret = ZwQuerySystemInformation (SystemProcessesAndThreadsInformation,
+	 (ret = NtQuerySystemInformation (SystemProcessesAndThreadsInformation,
 					 (PVOID) p,
 					 n * sizeof *p, NULL)))
     delete [] p, p = new ULONG[n *= 2];
@@ -705,7 +705,7 @@ get_mem_values(DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss, u
 		    error);
       return false;
     }
-  while ((ret = ZwQueryVirtualMemory (hProcess, 0,
+  while ((ret = NtQueryVirtualMemory (hProcess, 0,
 				      MemoryWorkingSetList,
 				      (PVOID) p,
 				      n * sizeof *p, &length)),
@@ -734,7 +734,7 @@ get_mem_values(DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss, u
       else
 	  ++*vmdata;
     }
-  ret = ZwQueryInformationProcess (hProcess,
+  ret = NtQueryInformationProcess (hProcess,
 				   ProcessVmCounters,
 				   (PVOID) &vmc,
 				   sizeof vmc, NULL);

@@ -1,3 +1,22 @@
+2002-05-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc: Replace autoload statments for ZwXXX by NtXXX.
+	Drop ZwQuerySystemInformation since NtQuerySystemInformation was
+	already available.
+	* fhandler_proc.cc (format_proc_uptime): Replace call to
+	ZwQuerySystemInformation by call to NtQuerySystemInformation.
+	(format_proc_stat): Ditto.
+	* fhandler_process.cc (format_process_stat): Replace call to
+	ZwQueryInformationProcess by call to NtQueryInformationProcess.
+	(get_process_state): Ditto.
+	(get_mem_values): Ditto.  Replace call to ZwQueryVirtualMemory by
+	call to NtQueryVirtualMemory.
+	* ntdll.h: Cleanup.  Drop ZwQuerySystemInformation since
+	NtQuerySystemInformation was already available.  Replace declarations
+	of ZwXXX functions by declarations of NtXXX.
+	* pinfo.cc (winpids::enumNT): Replace call to ZwQuerySystemInformation
+	by call to NtQuerySystemInformation.
+
 2002-05-29  Christopher Faylor  <cgf@redhat.com>
 
 	* include/sys/cygwin.h (EXTERNAL_PINFO_VERSION): Reinstate.
