@@ -294,10 +294,19 @@ struct addrinfo {
 	struct addrinfo  *ai_next;
 };
 
+#if (_WIN32_WINNT >= 0x0501)
 void WSAAPI freeaddrinfo (struct addrinfo*);
 int WSAAPI getaddrinfo (const char*,const char*,const struct addrinfo*,
 		        struct addrinfo**);
+int WSAAPI getnameinfo(const struct sockaddr*,socklen_t,char*,DWORD,
+		       char*,DWORD,int);
+#else
+/* FIXME: Need WS protocol-independent API helpers.  */
+#endif
 
+#if 0
+/* These are not exported from any known w32api library.  Are they
+   implemented as macros or inline finctions?  */
 char* WSAAPI gai_strerrorA(int);
 WCHAR* WSAAPI gai_strerrorW(int);
 #ifdef UNICODE
@@ -305,10 +314,7 @@ WCHAR* WSAAPI gai_strerrorW(int);
 #else
 #define gai_strerror   gai_strerrorA
 #endif  /* UNICODE */
-
-int WSAAPI getnameinfo(const struct sockaddr*,socklen_t,char*,DWORD,
-		       char*,DWORD,int);
-
+#endif /* 0 */
 
 /* Some older IPv4/IPv6 compatability stuff */
 
