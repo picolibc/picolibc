@@ -28,48 +28,6 @@ details. */
 #include "cygserver_shm.h"
 
 /*---------------------------------------------------------------------------*
- * with_strerr ()
- *---------------------------------------------------------------------------*/
-
-#define with_strerr(MSG, ACTION)					\
-  do									\
-    {									\
-      const DWORD lasterr = GetLastError ();				\
-      char *MSG = NULL;							\
-      if (!FormatMessage ((FORMAT_MESSAGE_ALLOCATE_BUFFER		\
-			   | FORMAT_MESSAGE_FROM_SYSTEM			\
-			   | FORMAT_MESSAGE_IGNORE_INSERTS),		\
-			  NULL,						\
-			  lasterr,					\
-			  MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),	\
-			  reinterpret_cast<char *>(&MSG),		\
-			  0,						\
-			  NULL))					\
-	{								\
-	  MSG = static_cast<char *>					\
-	    (LocalAlloc (LMEM_FIXED, 24)); /* Big enough. */		\
-	  if (!MSG)							\
-	    {								\
-	      system_printf (("failure in LocalAlloc(LMEM_FIXED, 16): "	\
-			      "error = %lu"),				\
-			     GetLastError ());				\
-	    }								\
-	  else								\
-	    {								\
-	      snprintf (MSG, 24, "error = %lu", lasterr);		\
-	    }								\
-	}								\
-      SetLastError (lasterr);						\
-      { ACTION; }							\
-      if (MSG && !LocalFree (MSG))					\
-	{								\
-	  system_printf ("failed to free memory at %p, error = %lu",	\
-			 MSG, GetLastError ());				\
-	}								\
-      SetLastError (lasterr);						\
-    } while (false)
-
-/*---------------------------------------------------------------------------*
  * class client_shmmgr
  *
  * A singleton class.
@@ -335,22 +293,17 @@ client_shmmgr::shmdt (const void *const shmaddr)
   assert (cnt >= 0);
 
   if (!UnmapViewOfFile ((void *) shmaddr))
-    with_strerr (msg,
-		 syscall_printf (("failed to unmap view "
-				  "[shmid = %d, handle = %p, shmaddr = %p]:"
-				  "%s"),
-				 segptr->shmid, segptr->hFileMap, shmaddr,
-				 msg));
+    syscall_printf (("failed to unmap view "
+		     "[shmid = %d, handle = %p, shmaddr = %p]:"
+		     "%E"),
+		    segptr->shmid, segptr->hFileMap, shmaddr);
 
   assert (segptr->hFileMap);
 
   if (!CloseHandle (segptr->hFileMap))
-    with_strerr (msg,
-		 syscall_printf (("failed to close file map handle "
-				  "[shmid = %d, handle = %p]:"
-				  "%s"),
-				 segptr->shmid, segptr->hFileMap,
-				 msg));
+    syscall_printf (("failed to close file map handle "
+		     "[shmid = %d, handle = %p]: %E"),
+		    segptr->shmid, segptr->hFileMap);
 
   client_request_shm request (segptr->shmid);
 
@@ -514,12 +467,9 @@ client_shmmgr::attach (const int shmid,
 
   if (!ptr)
     {
-      with_strerr (msg,
-		   syscall_printf (("failed to map view "
-				    "[shmid = %d, handle = %p, shmaddr = %p]:"
-				    "%s"),
-				   shmid, request.hFileMap (), shmaddr,
-				   msg));
+      syscall_printf (("failed to map view "
+		       "[shmid = %d, handle = %p, shmaddr = %p]: %E"),
+		      shmid, request.hFileMap (), shmaddr);
       result = EINVAL;		// FIXME
     }
   else if (shmaddr && ptr != shmaddr)
@@ -535,12 +485,9 @@ client_shmmgr::attach (const int shmid,
   if (result != 0)
     {
       if (!CloseHandle (request.hFileMap ()))
-	with_strerr (msg,
-		     syscall_printf (("failed to close file map handle "
-				      "[shmid = %d, handle = %p]:"
-				      "%s"),
-				     shmid, request.hFileMap (),
-				     msg));
+	syscall_printf (("failed to close file map handle "
+			 "[shmid = %d, handle = %p]: %E"),
+			shmid, request.hFileMap ());
 
       client_request_shm dt_req (shmid);
 

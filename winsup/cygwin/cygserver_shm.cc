@@ -28,48 +28,6 @@ details. */
 #include "cygwin/cygserver_transport.h"
 
 /*---------------------------------------------------------------------------*
- * with_strerr ()
- *---------------------------------------------------------------------------*/
-
-#define with_strerr(MSG, ACTION)					\
-  do									\
-    {									\
-      const DWORD lasterr = GetLastError ();				\
-      char *MSG = NULL;							\
-      if (!FormatMessage ((FORMAT_MESSAGE_ALLOCATE_BUFFER		\
-			   | FORMAT_MESSAGE_FROM_SYSTEM			\
-			   | FORMAT_MESSAGE_IGNORE_INSERTS),		\
-			  NULL,						\
-			  lasterr,					\
-			  MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),	\
-			  reinterpret_cast<char *>(&MSG),		\
-			  0,						\
-			  NULL))					\
-	{								\
-	  MSG = static_cast<char *>					\
-	    (LocalAlloc (LMEM_FIXED, 24)); /* Big enough. */		\
-	  if (!MSG)							\
-	    {								\
-	      system_printf (("failure in LocalAlloc(LMEM_FIXED, 16): "	\
-			      "error = %lu"),				\
-			     GetLastError ());				\
-	    }								\
-	  else								\
-	    {								\
-	      snprintf (MSG, 24, "error = %lu", lasterr);		\
-	    }								\
-	}								\
-      SetLastError (lasterr);						\
-      { ACTION; }							\
-      if (MSG && !LocalFree (MSG))					\
-	{								\
-	  system_printf ("failed to free memory at %p, error = %lu",	\
-			 MSG, GetLastError ());				\
-	}								\
-      SetLastError (lasterr);						\
-    } while (false)
-
-/*---------------------------------------------------------------------------*
  * class server_shmmgr
  *
  * A singleton class.
@@ -239,10 +197,7 @@ server_shmmgr::segment_t::~segment_t ()
   assert (!_attach_head);
 
   if (!CloseHandle (_hFileMap))
-    with_strerr
-      (msg,
-       syscall_printf (("failed to close file map [handle = 0x%x]: %s"),
-		       _hFileMap, msg));
+    syscall_printf ("failed to close file map [handle = 0x%x]: %E", _hFileMap);
 }
 
 /*---------------------------------------------------------------------------*
@@ -263,13 +218,9 @@ server_shmmgr::segment_t::attach (class process *const client,
 			FALSE, // bInheritHandle
 			DUPLICATE_SAME_ACCESS))
     {
-      with_strerr
-	(msg,
-	 syscall_printf (("failed to duplicate handle for client "
-			  "[key = 0x%016llx, shmid = %d, handle = 0x%x]:"
-			  "%s"),
-			 _ds.shm_perm.key, _shmid, _hFileMap,
-			 msg));
+      syscall_printf (("failed to duplicate handle for client "
+		       "[key = 0x%016llx, shmid = %d, handle = 0x%x]: %E"),
+		      _ds.shm_perm.key, _shmid, _hFileMap);
 
       return -EACCES;	// FIXME: Case analysis?
     }
@@ -748,11 +699,7 @@ server_shmmgr::new_segment (const key_t key,
 
   if (!hFileMap)
     {
-      with_strerr
-	(msg,
-	 syscall_printf (("failed to create file mapping [size = %lu]: %s"),
-			 size, msg));
-
+      syscall_printf ("failed to create file mapping [size = %lu]: %E", size);
       return -ENOMEM;		// FIXME
     }
 

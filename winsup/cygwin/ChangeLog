@@ -1,3 +1,13 @@
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_shm.cc (with_strerr): Remove macro.
+	(server_shmmgr::segment_t::~segment_t): Remove calls to with_strerr.
+	(server_shmmgr::segment_t::attach): Ditto.
+	(server_shmmgr::new_segment): Ditto.
+	* shm.cc (with_strerr): Remove macro.
+	(client_shmmgr::shmdt): Remove calls to with_strerr.
+	(client_shmmgr::attach): Ditto.
+
 2002-09-21  Christopher Faylor  <cgf@redhat.com>
 
 	* init.cc (dll_entry): Temporarily disable thread detach code.
