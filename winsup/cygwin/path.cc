@@ -408,6 +408,7 @@ path_conv::check (const char *src, unsigned opt,
   bool need_directory = 0;
   bool saw_symlinks = 0;
   int is_relpath;
+  char *tail;
   sigframe thisframe (mainthread);
 
 #if 0
@@ -463,7 +464,7 @@ path_conv::check (const char *src, unsigned opt,
       if (error)
 	return;
 
-      char *tail = strchr (path_copy, '\0');   // Point to end of copy
+      tail = strchr (path_copy, '\0');   // Point to end of copy
       char *path_end = tail;
       tail[1] = '\0';
 
@@ -726,8 +727,11 @@ path_conv::check (const char *src, unsigned opt,
 out:
   if (opt & PC_POSIX)
     {
+      if (tail[1] != '\0')
+	*tail = '/';
       normalized_path = cstrdup (path_copy);
       debug_printf ("path_copy %s", path_copy);
+      opt ^= PC_POSIX;
     }
   /* Deal with Windows stupidity which considers filename\. to be valid
      even when "filename" is not a directory. */

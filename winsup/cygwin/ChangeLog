@@ -1,5 +1,10 @@
 2002-05-23  Christopher Faylor  <cgf@redhat.com>
 
+	* path.cc (path_conv::check): Make sure any trailing path component is
+	part of potential normalized posix path.
+
+2002-05-23  Christopher Faylor  <cgf@redhat.com>
+
 	* smallprint.c (__small_vsprintf): Implement '%o' after all these
 	years.
 
