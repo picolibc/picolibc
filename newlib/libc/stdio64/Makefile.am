@@ -38,10 +38,7 @@ CHEWOUT_FILES = \
 	freopen64.def		\
 	fseeko64.def		\
 	fsetpos64.def		\
-	fstat64r.def		\
 	ftello64.def		\
-	lseek64r.def		\
-	open64r.def		\
 	tmpfile64.def
 
 SUFFIXES = .def

@@ -8,6 +8,7 @@ LIB_SOURCES = \
 	asprintf.c			\
 	clearerr.c 			\
 	fclose.c 			\
+	fcloseall.c			\
 	fdopen.c 			\
 	feof.c 				\
 	ferror.c 			\
@@ -113,6 +114,7 @@ vfiprintf.$(oext): vfprintf.c
 CHEWOUT_FILES = \
 	clearerr.def		\
 	fclose.def		\
+	fcloseall.def		\
 	fdopen.def		\
 	feof.def		\
 	ferror.def		\

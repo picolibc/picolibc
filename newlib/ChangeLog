@@ -1,5 +1,14 @@
 2002-07-22  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/include/stdio.h (fcloseall, _fcloseall_r): Added prototypes.
+	* libc/stdio/Makefile.am: Added fcloseall.c support.
+	* libc/stdio/Makefile.in: Regenerated.
+	* libc/stdio/fcloseall.c: New file.
+	* libc/stdio64/Makefile.am: Remove missing .def references.
+	* libc/stdio64/Makefile.in: Regenerated.
+
+2002-07-22  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/machine/powerpc/time.c: Removed..renamed to times.c.
 	* libc/machine/powerpc/times.c: New file.
 	* libc/machine/powerpc/Makefile.am: Change time.c to times.c.

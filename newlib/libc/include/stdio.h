@@ -204,6 +204,7 @@ int	_EXFUN(rename, (const char *, const char *));
 #endif
 #ifndef __STRICT_ANSI__
 int	_EXFUN(asprintf, (char **, const char *, ...));
+int	_EXFUN(fcloseall, (_VOID));
 int	_EXFUN(fseeko, (FILE *, off_t, int));
 off_t	_EXFUN(ftello, ( FILE *));
 int	_EXFUN(vfiprintf, (FILE *, const char *, __VALIST));
@@ -250,6 +251,7 @@ int	_EXFUN(putchar_unlocked, (int));
  */
 
 int	_EXFUN(_asprintf_r, (struct _reent *, char **, const char *, ...));
+int	_EXFUN(_fcloseall_r, (struct _reent *));
 FILE *	_EXFUN(_fdopen_r, (struct _reent *, int, const char *));
 FILE *	_EXFUN(_fopen_r, (struct _reent *, const char *, const char *));
 int	_EXFUN(_fscanf_r, (struct _reent *, FILE *, const char *, ...));
