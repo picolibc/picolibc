@@ -1,3 +1,12 @@
+2003-02-01  Jesus Alvarez  <jesus_alvarez@users.sourceforge.net>
+	    Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/prsht.h (PSP_*, PSH_*): Add missing defines.
+	(PROPSHEETPAGE[AW]): Add pszHeaderTitle, pszHeaderSubTitle
+	for (_WIN32_IE >= 0x0400).
+	(PROPSHEETHEADER[AW]): Add hplWatermark and anonymous union
+	fields for (_WIN32_IE >= 0x0400).
+
 2003-01-31  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winbase.h (CreateFiber): Change first parameter
