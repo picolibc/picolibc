@@ -46,12 +46,12 @@ extern "C" {
  */
 
 #include <sys/reent.h>
-
-#include <sys/stdio.h>
+#include <sys/types.h>
 
 typedef _fpos_t fpos_t;
-
 typedef struct __sFILE FILE;
+
+#include <sys/stdio.h>
 
 #define	__SLBF	0x0001		/* line buffered */
 #define	__SNBF	0x0002		/* unbuffered */
@@ -270,6 +270,9 @@ int	_EXFUN(_vsnprintf_r, (struct _reent *, char *, size_t, const char *, __VALIS
 int	_EXFUN(_vfscanf_r, (struct _reent *, FILE *, const char *, __VALIST));
 int	_EXFUN(_vscanf_r, (struct _reent *, const char *, __VALIST));
 int	_EXFUN(_vsscanf_r, (struct _reent *, const char *, const char *, __VALIST));
+
+ssize_t _EXFUN(__getdelim, (char **, size_t *, int, FILE *));
+ssize_t _EXFUN(__getline, (char **, size_t *, FILE *));
 
 /*
  * Routines internal to the implementation.

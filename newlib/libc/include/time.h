@@ -67,6 +67,29 @@ char      *_EXFUN(strptime,     (const char *, const char *, struct tm *));
 _VOID      _EXFUN(tzset,	(_VOID));
 _VOID      _EXFUN(_tzset_r,	(struct _reent *));
 
+/* getdate functions */
+
+#ifdef HAVE_GETDATE
+#ifndef _REENT_ONLY
+#define getdate_err (*__getdate_err())
+int *_EXFUN(__getdate_err,(_VOID));
+
+struct tm *	_EXFUN(getdate, (const char *));
+/* getdate_err is set to one of the following values to indicate the error.
+     1  the DATEMSK environment variable is null or undefined,
+     2  the template file cannot be opened for reading,
+     3  failed to get file status information,
+     4  the template file is not a regular file,
+     5  an error is encountered while reading the template file,
+     6  memory allication failed (not enough memory available),
+     7  there is no line in the template that matches the input,
+     8  invalid input specification  */
+#endif /* !_REENT_ONLY */
+
+/* getdate_r returns the error code as above */
+int		_EXFUN(getdate_r, (const char *, struct tm *));
+#endif /* HAVE_GETDATE */
+
 /* defines for the opengroup specifications Derived from Issue 1 of the SVID.  */
 extern __IMPORT time_t _timezone;
 extern __IMPORT int _daylight;

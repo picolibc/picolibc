@@ -15,6 +15,8 @@ LIB_SOURCES = \
 	flockfile.c \
 	ftok.c \
 	funlockfile.c \
+	getdate.c \
+	getdate_err.c \
 	gethostname.c \
 	getoptlong.c \
 	getreent.c \
@@ -33,6 +35,7 @@ LIB_SOURCES = \
 	mq_send.c \
 	mq_setattr.c \
 	mq_unlink.c \
+	ntp_gettime.c \
 	pread.c \
 	pread64.c \
 	process.c \
@@ -124,5 +127,6 @@ siglist.inc:
 		    < $(SIGNAL_H) > siglist.inc || \
 		    { rm -f siglist.inc; exit 1; }
 
+AM_CFLAGS = -I $(srcdir)/../../stdio
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

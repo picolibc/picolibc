@@ -1,5 +1,23 @@
 2002-06-21  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/include/stdio.h (__getline, __getdelim): New prototypes.
+	* libc/include/time.h [HAVE_GETDATE](getdate, getdate_r): Ditto.
+	[HAVE_GETDATE](getdate_err): New error code.
+	* libc/stdio/Makefile.am: Add support for getline.c and getdelim.c.
+	* libc/stdio/Makefile.in: Regenerated.
+	* libc/stdio/getdelim.c: New file.
+	* libc/stdio/getline.c: Ditto.
+	* libc/sys/linux/Makefile.am: Add support for getdate.c, getdate_err.c
+	and ntp_gettime.c.  Also add AM_CFLAGS to point to libc/stdio.
+	* libc/sys/linux/Makefile.in: Regenerated.
+	* libc/sys/linux/getdate.c: New file.
+	* libc/sys/linux/getdate_err.c: Ditto.
+	* libc/sys/linux/ntp_gettime.c: Ditto.
+	* libc/sys/linux/time.c (adjtimex, ntp_adjtime): New functions.
+	* libc/sys/linux/sys/stdio.h (getline, getdelim): New macros.
+
+2002-06-21  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/include/math.h: Add <sys/types.h> to get _uint32_t definition.
 	* libc/include/machine/types.h: Skip __off_t, __pid_t, and
 	__loff_t definitions if special _HAVE_SYSTYPES macro defined.

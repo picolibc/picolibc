@@ -112,6 +112,8 @@ LIB_SOURCES = \
 	flockfile.c \
 	ftok.c \
 	funlockfile.c \
+	getdate.c \
+	getdate_err.c \
 	gethostname.c \
 	getoptlong.c \
 	getreent.c \
@@ -130,6 +132,7 @@ LIB_SOURCES = \
 	mq_send.c \
 	mq_setattr.c \
 	mq_unlink.c \
+	ntp_gettime.c \
 	pread.c \
 	pread64.c \
 	process.c \
@@ -184,6 +187,7 @@ liblinux_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(LINUX_MACH_LIB)
 @USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = @USE_LIBTOOL_FALSE@$(LINUX_MACH_LIB)
 
+AM_CFLAGS = -I $(srcdir)/../../stdio
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -197,7 +201,8 @@ CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@lib_a_OBJECTS =  brk.$(OBJEXT) cfspeed.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@flockfile.$(OBJEXT) ftok.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@funlockfile.$(OBJEXT) gethostname.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@funlockfile.$(OBJEXT) getdate.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@getdate_err.$(OBJEXT) gethostname.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@getoptlong.$(OBJEXT) getreent.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@ids.$(OBJEXT) inode.$(OBJEXT) io.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@io64.$(OBJEXT) ipc.$(OBJEXT) linux.$(OBJEXT) \
@@ -205,8 +210,8 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@mq_getattr.$(OBJEXT) mq_notify.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@mq_open.$(OBJEXT) mq_receive.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@mq_send.$(OBJEXT) mq_setattr.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@mq_unlink.$(OBJEXT) pread.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@pread64.$(OBJEXT) process.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@mq_unlink.$(OBJEXT) ntp_gettime.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@pread.$(OBJEXT) pread64.$(OBJEXT) process.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@psignal.$(OBJEXT) pwrite.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@pwrite64.$(OBJEXT) raise.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@realpath.$(OBJEXT) rename.$(OBJEXT) \
@@ -225,19 +230,19 @@ LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 @USE_LIBTOOL_TRUE@liblinux_la_DEPENDENCIES = 
 @USE_LIBTOOL_TRUE@liblinux_la_OBJECTS =  brk.lo cfspeed.lo flockfile.lo \
-@USE_LIBTOOL_TRUE@ftok.lo funlockfile.lo gethostname.lo getoptlong.lo \
-@USE_LIBTOOL_TRUE@getreent.lo ids.lo inode.lo io.lo io64.lo ipc.lo \
-@USE_LIBTOOL_TRUE@linux.lo mmap.lo mq_close.lo mq_getattr.lo \
-@USE_LIBTOOL_TRUE@mq_notify.lo mq_open.lo mq_receive.lo mq_send.lo \
-@USE_LIBTOOL_TRUE@mq_setattr.lo mq_unlink.lo pread.lo pread64.lo \
-@USE_LIBTOOL_TRUE@process.lo psignal.lo pwrite.lo pwrite64.lo raise.lo \
-@USE_LIBTOOL_TRUE@realpath.lo rename.lo resource.lo sched.lo select.lo \
-@USE_LIBTOOL_TRUE@seteuid.lo shm_open.lo shm_unlink.lo sig.lo \
-@USE_LIBTOOL_TRUE@sigaction.lo sigqueue.lo signal.lo siglongjmp.lo \
-@USE_LIBTOOL_TRUE@sigset.lo sigwait.lo socket.lo sleep.lo stack.lo \
-@USE_LIBTOOL_TRUE@strsignal.lo sysconf.lo sysctl.lo systat.lo system.lo \
-@USE_LIBTOOL_TRUE@tcdrain.lo tcsendbrk.lo termios.lo time.lo usleep.lo \
-@USE_LIBTOOL_TRUE@wait.lo
+@USE_LIBTOOL_TRUE@ftok.lo funlockfile.lo getdate.lo getdate_err.lo \
+@USE_LIBTOOL_TRUE@gethostname.lo getoptlong.lo getreent.lo ids.lo \
+@USE_LIBTOOL_TRUE@inode.lo io.lo io64.lo ipc.lo linux.lo mmap.lo \
+@USE_LIBTOOL_TRUE@mq_close.lo mq_getattr.lo mq_notify.lo mq_open.lo \
+@USE_LIBTOOL_TRUE@mq_receive.lo mq_send.lo mq_setattr.lo mq_unlink.lo \
+@USE_LIBTOOL_TRUE@ntp_gettime.lo pread.lo pread64.lo process.lo \
+@USE_LIBTOOL_TRUE@psignal.lo pwrite.lo pwrite64.lo raise.lo realpath.lo \
+@USE_LIBTOOL_TRUE@rename.lo resource.lo sched.lo select.lo seteuid.lo \
+@USE_LIBTOOL_TRUE@shm_open.lo shm_unlink.lo sig.lo sigaction.lo \
+@USE_LIBTOOL_TRUE@sigqueue.lo signal.lo siglongjmp.lo sigset.lo \
+@USE_LIBTOOL_TRUE@sigwait.lo socket.lo sleep.lo stack.lo strsignal.lo \
+@USE_LIBTOOL_TRUE@sysconf.lo sysctl.lo systat.lo system.lo tcdrain.lo \
+@USE_LIBTOOL_TRUE@tcsendbrk.lo termios.lo time.lo usleep.lo wait.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

@@ -13,4 +13,7 @@
 #  endif
 #endif /* __SINGLE_THREAD__ */
 
+#define getline __getline
+#define getdelim __getdelim
+
 #endif /* _NEWLIB_STDIO_H */

@@ -35,6 +35,8 @@ LIB_SOURCES = \
 	getchar.c 			\
 	getc_u.c			\
 	getchar_u.c			\
+	getdelim.c			\
+	getline.c			\
 	gets.c 				\
 	getw.c				\
 	iprintf.c 			\
@@ -129,6 +131,8 @@ CHEWOUT_FILES = \
 	getchar.def		\
 	getc_u.def		\
 	getchar_u.def		\
+	getdelim.def		\
+	getline.def		\
 	gets.def		\
 	getw.def		\
 	iprintf.def		\
