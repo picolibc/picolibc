@@ -1,5 +1,9 @@
 2003-06-20  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* configure.host (iq2000): Add tabs.
+
+2003-06-20  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/include/sys/reent.h (_REENT_INIT_PTR): Fix macros
 	to handle latest on_exit change.
 	* libc/sys/linux/Makefile.am: Remove special compilation
