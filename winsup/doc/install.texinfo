@@ -179,9 +179,9 @@ that the mirror you are using doesn't have the latest copy yet.  Try
 another mirror, or try again tomorrow.
 
 If setup has otherwise behaved strangely, check the files
-@samp{setup.log} and @samp{setup.log.full} in the Cygwin root directory
-(@code{C:\cygwin} by default).  It may provide some clues as to what
-went wrong and why.
+@samp{setup.log} and @samp{setup.log.full} in @code{/var/log}
+(@code{C:\cygwin\var\log} by default).  It may provide some clues as
+to what went wrong and why.
 
 If you're still baffled, search the Cygwin mailing list for clues.
 Others may have the same problem, and a solution may be posted there.
