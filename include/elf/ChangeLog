@@ -1,3 +1,8 @@
+1999-07-13  Andreas Schwab  <schwab@suse.de>
+
+	* m68k.h (EF_CPU32): Move definition inside multiple inclusion
+	guard.
+
 1999-07-08  Richard Henderson  <rth@cygnus.com>
 
 	* sparc.h (ELF64_R_TYPE_DATA): Sign extend the value.
