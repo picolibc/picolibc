@@ -106,9 +106,6 @@ extern "C" void dll_func_load () __asm__ ("dll_func_load");
    functions from this DLL.  */
 extern "C" void dll_chain () __asm__ ("dll_chain");
 
-/* called by the secondary initialization function to call dll_func_load. */
-extern "C" void dll_chain1 () __asm__ ("dll_chain1");
-
 extern "C" {
 
 /* FIXME: This is not thread-safe? */
@@ -164,12 +161,6 @@ gotit:									\n\
 									\n\
 	.global	dll_chain						\n\
 dll_chain:								\n\
-	pushl	%eax		# Restore 'return address'		\n\
-	movl	(%eax),%eax	# Get address of DLL info block		\n\
-	movl	$dll_func_load,(%eax) # Just load func now		\n\
-	jmp	*%edx		# Jump to next init function		\n\
-									\n\
-dll_chain1:								\n\
 	pushl	%eax		# Restore 'return address'		\n\
 	jmp	*%edx		# Jump to next init function		\n\
 ");
@@ -264,7 +255,7 @@ wsock_init ()
       low_priority_sleep (0);
     }
 
-  if (!wsock_started && (winsock_active || winsock2_active))
+  if (!wsock_started)
     {
       /* Don't use autoload to load WSAStartup to eliminate recursion. */
       int (*wsastartup) (int, WSADATA *);
@@ -290,13 +281,13 @@ wsock_init ()
 
   InterlockedDecrement (&here);
 
-  /* Kludge alert.  Redirects the return address to dll_chain1. */
+  /* Kludge alert.  Redirects the return address to dll_chain. */
   __asm__ __volatile__ ("		\n\
-	movl	$dll_chain1,4(%ebp)	\n\
+	movl	$dll_chain,4(%ebp)	\n\
   ");
 
   volatile retchain ret;
-  /* Set "arguments for dll_chain1. */
+  /* Set "arguments for dll_chain. */
   ret.low = (long) dll_func_load;
   ret.high = (long) func;
   return ret.ll;
