@@ -28,7 +28,7 @@ details. */
 #include <winuser.h>
 #include <netdb.h>
 #include <unistd.h>
-#include <stdio.h>
+#include <limits.h>
 #define USE_SYS_TYPES_FD_SET
 #include <winsock.h>
 #include "select.h"
@@ -42,6 +42,7 @@ details. */
 #include "perthread.h"
 #include "tty.h"
 #include "cygthread.h"
+#include "ntdll.h"
 
 /*
  * All these defines below should be in sys/types.h
@@ -419,7 +420,7 @@ peek_pipe (select_record *s, bool from_select)
     {
       if (s->read_ready)
 	{
-	  select_printf ("already ready");
+	  select_printf ("%s, already ready for read", fh->get_name ());
 	  gotone = 1;
 	  goto out;
 	}
@@ -451,7 +452,8 @@ peek_pipe (select_record *s, bool from_select)
     }
 
   if (fh->get_device () == FH_PIPEW)
-    /* nothing */;
+    select_printf ("%s, select for read/except on write end of pipe",
+		   fh->get_name ());
   else if (!PeekNamedPipe (h, NULL, 0, NULL, (DWORD *) &n, NULL))
     {
       select_printf ("%s, PeekNamedPipe failed, %E", fh->get_name ());
@@ -489,21 +491,82 @@ peek_pipe (select_record *s, bool from_select)
     }
   if (n > 0 && s->read_selected)
     {
-      select_printf ("%s, ready for read", fh->get_name ());
+      select_printf ("%s, ready for read: avail %d", fh->get_name (), n);
       gotone += s->read_ready = true;
     }
   if (!gotone && s->fh->hit_eof ())
     {
       select_printf ("%s, saw EOF", fh->get_name ());
       if (s->except_selected)
-	gotone = s->except_ready = true;
+	gotone += s->except_ready = true;
       if (s->read_selected)
 	gotone += s->read_ready = true;
-      select_printf ("saw eof on '%s'", fh->get_name ());
     }
 
 out:
-  return gotone || s->write_ready;
+  if (s->write_selected)
+    {
+      if (s->write_ready)
+        {
+          select_printf ("%s, already ready for write", fh->get_name ());
+          gotone++;
+        }
+      /* Do we need to do anything about SIGTTOU here? */
+      else if (fh->get_device () == FH_PIPER)
+	select_printf ("%s, select for write on read end of pipe",
+		       fh->get_name ());
+      else
+        {
+          /* We don't worry about the guard mutex, because that only applies
+             when from_select is false, and peek_pipe is never called that
+             way for writes.  */
+
+          IO_STATUS_BLOCK iosb = {0};
+          FILE_PIPE_LOCAL_INFORMATION fpli = {0};
+
+          if (NtQueryInformationFile (h,
+                                      &iosb,
+                                      &fpli,
+                                      sizeof (fpli),
+                                      FilePipeLocalInformation))
+            {
+              /* If NtQueryInformationFile fails, optimistically assume the
+                 pipe is writable.  This could happen on Win9x, because
+                 NtQueryInformationFile is not available, or if we somehow
+                 inherit a pipe that doesn't permit FILE_READ_ATTRIBUTES
+                 access on the write end.  */
+              select_printf ("%s, NtQueryInformationFile failed",
+                             fh->get_name ());
+              gotone += s->write_ready = true;
+            }
+          /* Ensure that enough space is available for atomic writes,
+             as required by POSIX.  Subsequent writes with size > PIPE_BUF
+             can still block, but most (all?) UNIX variants seem to work
+             this way (e.g., BSD, Linux, Solaris).  */
+          else if (fpli.WriteQuotaAvailable >= PIPE_BUF)
+            {
+              select_printf ("%s, ready for write: size %lu, avail %lu",
+                             fh->get_name (),
+                             fpli.OutboundQuota,
+                             fpli.WriteQuotaAvailable);
+              gotone += s->write_ready = true;
+            }
+          /* If we somehow inherit a tiny pipe (size < PIPE_BUF), then consider
+             the pipe writable only if it is completely empty, to minimize the
+             probability that a subsequent write will block.  */
+          else if (fpli.OutboundQuota < PIPE_BUF &&
+                   fpli.WriteQuotaAvailable == fpli.OutboundQuota)
+            {
+              select_printf ("%s, tiny pipe: size %lu, avail %lu",
+                             fh->get_name (),
+                             fpli.OutboundQuota,
+                             fpli.WriteQuotaAvailable);
+              gotone += s->write_ready = true;
+            }
+        }
+    }
+
+  return gotone;
 }
 
 static int start_thread_pipe (select_record *me, select_stuff *stuff);
@@ -603,9 +666,9 @@ fhandler_pipe::select_read (select_record *s)
   s->startup = start_thread_pipe;
   s->peek = peek_pipe;
   s->verify = verify_ok;
+  s->cleanup = pipe_cleanup;
   s->read_selected = true;
   s->read_ready = false;
-  s->cleanup = pipe_cleanup;
   return s;
 }
 
@@ -613,14 +676,13 @@ select_record *
 fhandler_pipe::select_write (select_record *s)
 {
   if (!s)
-    {
-      s = new select_record;
-      s->startup = no_startup;
-      s->verify = no_verify;
-    }
+    s = new select_record;
+  s->startup = start_thread_pipe;
   s->peek = peek_pipe;
+  s->verify = verify_ok;
+  s->cleanup = pipe_cleanup;
   s->write_selected = true;
-  s->write_ready = true;
+  s->write_ready = false;
   return s;
 }
 
@@ -628,7 +690,7 @@ select_record *
 fhandler_pipe::select_except (select_record *s)
 {
   if (!s)
-      s = new select_record;
+    s = new select_record;
   s->startup = start_thread_pipe;
   s->peek = peek_pipe;
   s->verify = verify_ok;

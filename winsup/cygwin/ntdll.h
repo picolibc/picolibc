@@ -358,6 +358,20 @@ typedef struct _FILE_NAME_INFORMATION
   WCHAR FileName[MAX_PATH + 100];
 } FILE_NAME_INFORMATION;
 
+typedef struct _FILE_PIPE_LOCAL_INFORMATION
+{
+  ULONG NamedPipeType;
+  ULONG NamedPipeConfiguration;
+  ULONG MaximumInstances;
+  ULONG CurrentInstances;
+  ULONG InboundQuota;
+  ULONG ReadDataAvailable;
+  ULONG OutboundQuota;
+  ULONG WriteQuotaAvailable;
+  ULONG NamedPipeState;
+  ULONG NamedPipeEnd;
+} FILE_PIPE_LOCAL_INFORMATION, *PFILE_PIPE_LOCAL_INFORMATION;
+
 typedef struct _FILE_COMPRESSION_INFORMATION
 {
   LARGE_INTEGER CompressedSize;
@@ -369,6 +383,7 @@ typedef struct _FILE_COMPRESSION_INFORMATION
 
 typedef enum _FILE_INFORMATION_CLASS
 {
+  FilePipeLocalInformation = 24,
   FileCompressionInformation = 28
 } FILE_INFORMATION_CLASS, *PFILE_INFORMATION_CLASS;
 
@@ -404,7 +419,7 @@ extern "C"
 			     PIO_STATUS_BLOCK, ULONG, ULONG);
   NTSTATUS NTAPI NtOpenSection (PHANDLE, ACCESS_MASK, POBJECT_ATTRIBUTES);
   NTSTATUS NTAPI NtQueryInformationFile (HANDLE, IO_STATUS_BLOCK *, VOID *,
-					 DWORD, DWORD);
+					 ULONG, FILE_INFORMATION_CLASS);
   NTSTATUS NTAPI NtQueryInformationProcess (HANDLE, PROCESSINFOCLASS,
 					    PVOID, ULONG, PULONG);
   NTSTATUS NTAPI NtQueryObject (HANDLE, OBJECT_INFORMATION_CLASS, VOID *,

@@ -12,7 +12,9 @@ details. */
 
 #include "winsup.h"
 #include <unistd.h>
+#include <stdlib.h>
 #include <sys/socket.h>
+#include <limits.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -22,6 +24,7 @@ details. */
 #include "thread.h"
 #include "pinfo.h"
 #include "cygthread.h"
+#include "ntdll.h"
 
 static unsigned pipecount;
 static const NO_COPY char pipeid_fmt[] = "stupid_pipe.%u.%u";
@@ -211,15 +214,139 @@ leave:
   return res;
 }
 
+/* Create a pipe, and return handles to the read and write ends,
+   just like CreatePipe, but ensure that the write end permits
+   FILE_READ_ATTRIBUTES access, on later versions of win32 where
+   this is supported.  This access is needed by NtQueryInformationFile,
+   which is used to implement select and nonblocking writes.
+   Note that the return value is either NO_ERROR or GetLastError,
+   unlike CreatePipe, which returns a bool for success or failure.  */
+static int
+create_selectable_pipe (PHANDLE read_pipe_ptr,
+                        PHANDLE write_pipe_ptr,
+                        LPSECURITY_ATTRIBUTES sa_ptr,
+                        DWORD psize)
+{
+  /* Default to error. */
+  *read_pipe_ptr = *write_pipe_ptr = INVALID_HANDLE_VALUE;
+
+  HANDLE read_pipe = INVALID_HANDLE_VALUE, write_pipe = INVALID_HANDLE_VALUE;
+
+  /* Ensure that there is enough pipe buffer space for atomic writes.  */
+  if (psize < PIPE_BUF)
+    psize = PIPE_BUF;
+
+  char pipename[CYG_MAX_PATH];
+
+  /* Retry CreateNamedPipe as long as the pipe name is in use.
+     Retrying will probably never be necessary, but we want
+     to be as robust as possible.  */
+  while (1)
+    {
+      static volatile LONG pipe_unique_id;
+
+      __small_sprintf (pipename, "\\\\.\\pipe\\cygwin-%d-%ld", myself->pid,
+		       InterlockedIncrement ((LONG *) &pipe_unique_id));
+
+      debug_printf ("CreateNamedPipe: name %s, size %lu", pipename, psize);
+
+      /* Use CreateNamedPipe instead of CreatePipe, because the latter
+         returns a write handle that does not permit FILE_READ_ATTRIBUTES
+         access, on versions of win32 earlier than WinXP SP2.
+         CreatePipe also stupidly creates a full duplex pipe, which is
+         a waste, since only a single direction is actually used.
+         It's important to only allow a single instance, to ensure that
+         the pipe was not created earlier by some other process, even if
+         the pid has been reused.  We avoid FILE_FLAG_FIRST_PIPE_INSTANCE
+         because that is only available for Win2k SP2 and WinXP.  */
+      read_pipe = CreateNamedPipe (pipename,
+                                   PIPE_ACCESS_INBOUND,
+                                   PIPE_TYPE_BYTE | PIPE_READMODE_BYTE,
+                                   1,       /* max instances */
+                                   psize,   /* output buffer size */
+                                   psize,   /* input buffer size */
+                                   NMPWAIT_USE_DEFAULT_WAIT,
+                                   sa_ptr);
+
+      if (read_pipe != INVALID_HANDLE_VALUE)
+        {
+          debug_printf ("pipe read handle %p", read_pipe);
+          break;
+        }
+
+      DWORD err = GetLastError ();
+      switch (err)
+        {
+        case ERROR_PIPE_BUSY:
+          /* The pipe is already open with compatible parameters.
+             Pick a new name and retry.  */
+          debug_printf ("pipe busy, retrying");
+          continue;
+        case ERROR_ACCESS_DENIED:
+          /* The pipe is already open with incompatible parameters.
+             Pick a new name and retry.  */
+          debug_printf ("pipe access denied, retrying");
+          continue;
+        case ERROR_CALL_NOT_IMPLEMENTED:
+          /* We are on an older Win9x platform without named pipes.
+             Return an anonymous pipe as the best approximation.  */
+          debug_printf ("CreateNamedPipe not implemented, resorting to "
+                        "CreatePipe size %lu", psize);
+          if (CreatePipe (read_pipe_ptr, write_pipe_ptr, sa_ptr, psize))
+            {
+              debug_printf ("pipe read handle %p", *read_pipe_ptr);
+              debug_printf ("pipe write handle %p", *write_pipe_ptr);
+              return NO_ERROR;
+            }
+          err = GetLastError ();
+          debug_printf ("CreatePipe failed, %E");
+          return err;
+        default:
+          debug_printf ("CreateNamedPipe failed, %E");
+          return err;
+        }
+      /* NOTREACHED */
+    }
+
+  debug_printf ("CreateFile: name %s", pipename);
+
+  /* Open the named pipe for writing.
+     Be sure to permit FILE_READ_ATTRIBUTES access.  */
+  write_pipe = CreateFile (pipename,
+                           GENERIC_WRITE | FILE_READ_ATTRIBUTES,
+                           0,       /* share mode */
+                           sa_ptr,
+                           OPEN_EXISTING,
+                           0,       /* flags and attributes */
+                           0);      /* handle to template file */
+
+  if (write_pipe == INVALID_HANDLE_VALUE)
+    {
+      /* Failure. */
+      DWORD err = GetLastError ();
+      debug_printf ("CreateFile failed, %E");
+      CloseHandle (read_pipe);
+      return err;
+    }
+
+  debug_printf ("pipe write handle %p", write_pipe);
+
+  /* Success. */
+  *read_pipe_ptr = read_pipe;
+  *write_pipe_ptr = write_pipe;
+  return NO_ERROR;
+}
+
 int
 fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode, bool fifo)
 {
   HANDLE r, w;
   SECURITY_ATTRIBUTES *sa = (mode & O_NOINHERIT) ?  &sec_none_nih : &sec_none;
   int res = -1;
+  int ret;
 
-  if (!CreatePipe (&r, &w, sa, psize))
-    __seterrno ();
+  if ((ret = create_selectable_pipe (&r, &w, sa, psize)) != NO_ERROR)
+    __seterrno_from_win_error (ret);
   else
     {
       fhs[0] = (fhandler_pipe *) build_fh_dev (*piper_dev);
@@ -282,13 +409,16 @@ fhandler_pipe::ioctl (unsigned int cmd, void *p)
   return 0;
 }
 
+#define DEFAULT_PIPEBUFSIZE (4 * PIPE_BUF)
+
 extern "C" int
 pipe (int filedes[2])
 {
   extern DWORD binmode;
   fhandler_pipe *fhs[2];
-  int res = fhandler_pipe::create (fhs, 16384, (!binmode || binmode == O_BINARY)
-					       ? O_BINARY : O_TEXT);
+  int res = fhandler_pipe::create (fhs, DEFAULT_PIPEBUFSIZE,
+				   (!binmode || binmode == O_BINARY)
+				   ? O_BINARY : O_TEXT);
   if (res == 0)
     {
       cygheap_fdnew fdin;

@@ -1,3 +1,25 @@
+2004-09-02  Bob Byrnes  <byrnes@curl.com>
+	    Christopher Faylor  <cgf@timesys.com>
+
+	* autoload.cc (NtQueryInformationFile): Return nonzero on error.
+	* ntdll.h (FILE_PIPE_LOCAL_INFORMATION): Add.
+	(NtQueryInformationFile): Fix types for last two arguments.
+	* pipe.cc: Include stdlib.h, limits.h, and ntdll.h.
+	(create_selectable_pipe): New function to create a pipe that can be
+	used with NtQueryInformationFile for select.
+	(fhandler_pipe::create): Call create_selectable_pipe instead of
+	CreatePipe.
+	(pipe): Use DEFAULT_PIPEBUFSIZE as argument to create_pipe.
+	* select.cc: Include limits.h and ntdll.h.
+	(peek_pipe): Add select_printf output.  Call NtQueryInformationFile to
+	implement select for write on pipes.
+	(fhandler_pipe::select_read): Reorder field assignments to be
+	consistent with fhandler_pipe::select_write.
+	(fhandler_pipe::select_write): Initialize startup, verify, cleanup, and
+	write_ready fields for select_record.
+	(fhandler_pipe::select_except): Tweak indentation to be consistent with
+	fhandler_pipe::select_write.
+
 2004-08-30  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* fork.cc (fork_parent): Return the cygpid directly derived from the
