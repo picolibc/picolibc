@@ -389,3 +389,88 @@ cygheap_user::env_name (const char *name, size_t namelen)
     (void) domain ();
   return pwinname;
 }
+
+int NO_COPY etc::curr_ix = -1;
+bool NO_COPY etc::sawchange[MAX_ETC_FILES];
+const NO_COPY char *etc::fn[MAX_ETC_FILES];
+FILETIME NO_COPY etc::last_modified[MAX_ETC_FILES];
+
+int
+etc::init (int n, const char *etc_fn)
+{
+  if (n >= 0)
+    /* ok */;
+  else if (++curr_ix < MAX_ETC_FILES)
+    n = curr_ix;
+  else
+    api_fatal ("internal error");
+
+  fn[n] = etc_fn;
+  sawchange[n] = false;
+  paranoid_printf ("curr_ix %d, n %d", curr_ix, n);
+  return curr_ix;
+}
+
+bool
+etc::dir_changed (int n)
+{
+  bool res = sawchange[n];
+
+  if (!res)
+    {
+      static HANDLE NO_COPY changed_h;
+      if (!changed_h)
+	{
+	  path_conv pwd ("/etc");
+	  changed_h = FindFirstChangeNotification (pwd, FALSE,
+						  FILE_NOTIFY_CHANGE_LAST_WRITE);
+	  if (changed_h == INVALID_HANDLE_VALUE)
+	    system_printf ("Can't open /etc for checking, %E", (char *) pwd,
+			   changed_h);
+	}
+
+      if (changed_h == INVALID_HANDLE_VALUE)
+	res = true;
+      else if (WaitForSingleObject (changed_h, 0) == WAIT_OBJECT_0)
+	{
+	  (void) FindNextChangeNotification (changed_h);
+	  memset (sawchange, true, sizeof sawchange);
+	  res = true;
+	}
+    }
+
+  paranoid_printf ("%s res %d", fn[n], res);
+  return res;
+}
+
+bool
+etc::file_changed (int n)
+{
+  bool res = false;
+  if (!fn[n])
+    res = true;
+  else if (dir_changed (n))
+    {
+      HANDLE h;
+      WIN32_FIND_DATA data;
+
+      if ((h = FindFirstFile (fn[n], &data)) == INVALID_HANDLE_VALUE)
+	res = true;
+      else
+	{
+	  FindClose (h);
+	  if (CompareFileTime (&data.ftLastWriteTime, last_modified + n) > 0)
+	    res = true;
+	}
+    }
+  sawchange[n] = false;
+  paranoid_printf ("%s res %d", fn[n], res);
+  return res;
+}
+
+void
+etc::set_last_modified (int n, FILETIME& ft)
+{
+  last_modified[n] = ft;
+  sawchange[n] = false;
+}

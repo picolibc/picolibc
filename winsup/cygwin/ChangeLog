@@ -1,3 +1,46 @@
+2003-01-17   Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* grp.cc (read_etc_group): On NT, add a line for gid = -1.  Change name
+	"unknown" to "mkgroup".
+	(internal_getgrgid): Do not return default in nontsec case.
+	(internal_getgroups): Add argument srchsid and look for it in groups if
+	not NULL.
+	* passwd.cc (read_etc_passwd): On NT, add a line for uid = -1.  Use
+	same default uid for Win95 and NT.  Call cygheap_user::ontherange to
+	initialize HOME.
+
+
+2003-01-16  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.cc (init_cygheap::etc_changed): Move to uinfo.cc.
+	* cygheap.h (init_cygheap::etc_changed_h): Remove.
+	(init_cygheap::etc_changed): Ditto.
+	* grp.cc (group_state): Remove.  Use gr instead throughout.
+	(gr): Define as class pwdgrp.
+	(read_etc_group): Remove gr definition.  Remove calls to
+	set_last_modified and close.  Pass add_grp to gr.load to load file.
+	* passwd.cc (passwd_state): Remove.  Use pr instead, throughout.
+	(pr): Define as class pwdgrp.
+	(read_etc_passwd): Remove pr definition.  Remove calls to
+	set_last_modified and close.  Pass add_pwd_line to pr.load to load
+	file.
+	* pwdgrp.h (etc): New helper class for pwdgrp.
+	(pwdgrp): Combine pwdgrp_check and pwdgrp_read into one class.  Remove
+	file_w32 and last_modified fields.
+	(pwdgrp::set_last_modified): Remove.
+	(pwdgrp::isinitializing): Remove FindFirstFile stuff.  Move to
+	etc::file_changed.
+	(pwdgrp::load): Rename from 'open'.  Call etc::init to initialize etc
+	scanning.  Close file handle after reading buffer into memory.  Parse
+	buffer by calling second argument.
+	(pwdgrp::gets): Reorganize slightly to rely on eptr starting at
+	beginning of buffer.  Free buffer when memory exhausted.
+	(pwdgrp::close): Remove.
+	* uinfo.cc (etc::dir_changed): New function.
+	(etc::init): Ditto.
+	(etc::file_changed): Ditto.
+	(etc::set_last_modified): Ditto.
+
 2003-01-16  Jason Tishler  <jason@tishler.net>
 
 	* mmap.cc (fixup_mmaps_after_fork): Add ERROR_NOACCESS to the list of

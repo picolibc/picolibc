@@ -40,8 +40,8 @@ static int max_lines;
 static int grp_pos = 0;
 #endif
 
-static pwdgrp_check group_state;
-static char * NO_COPY null_ptr = NULL;
+static pwdgrp gr;
+static char * NO_COPY null_ptr;
 
 static int
 parse_grp (struct __group32 &grp, char *line)
@@ -129,35 +129,24 @@ pthread_mutex_t NO_COPY group_lock::mutex = (pthread_mutex_t) PTHREAD_MUTEX_INIT
 static void
 read_etc_group ()
 {
-  static pwdgrp_read gr;
-
   group_lock here (cygwin_finished_initializing);
 
   /* if we got blocked by the mutex, then etc_group may have been processed */
-  if (group_state.isinitializing ())
+  if (gr.isinitializing ())
     {
       for (int i = 0; i < curr_lines; i++)
 	if ((group_buf + i)->gr_mem != &null_ptr)
 	  free ((group_buf + i)->gr_mem);
 
       curr_lines = 0;
-      if (gr.open ("/etc/group"))
-	{
-	  char *line;
-	  while ((line = gr.gets ()) != NULL)
-            add_grp_line (line);
-
-	  group_state.set_last_modified (gr.get_fhandle (), gr.get_fname ());
-	  gr.close ();
-	  debug_printf ("Read /etc/group, %d lines", curr_lines);
-	}
-      group_state = loaded;
+      if (!gr.load ("/etc/group", add_grp_line))
+	debug_printf ("gr.load failed");
 
       /* Complete /etc/group in memory if needed */
       if (!internal_getgrgid (myself->gid))
         {
 	  static char linebuf [200];
-	  char group_name [UNLEN + 1] = "unknown";
+	  char group_name [UNLEN + 1] = "mkgroup";
 	  char strbuf[128] = "";
 
 	  if (wincap.has_security ())
@@ -173,6 +162,9 @@ read_etc_group ()
 	  debug_printf ("Completing /etc/group: %s", linebuf);
 	  add_grp_line (linebuf);
 	}
+      static char pretty_ls[] = "????????::-1:";
+      if (wincap.has_security ())
+	add_grp_line (pretty_ls);
     }
   return;
 }
@@ -182,7 +174,7 @@ internal_getgrsid (cygsid &sid)
 {
   char sid_string[128];
 
-  if (group_state.isuninitialized ())
+  if (gr.isuninitialized ())
     read_etc_group ();
 
   if (sid.string (sid_string))
@@ -195,27 +187,19 @@ internal_getgrsid (cygsid &sid)
 struct __group32 *
 internal_getgrgid (__gid32_t gid, BOOL check)
 {
-  struct __group32 * default_grp = NULL;
-
-  if (group_state.isuninitialized ()
-      || (check && group_state.isinitializing ()))
+  if (gr.isuninitialized () || (check && gr.isinitializing ()))
     read_etc_group ();
 
   for (int i = 0; i < curr_lines; i++)
-    {
-      if (group_buf[i].gr_gid == myself->gid)
-	default_grp = group_buf + i;
-      if (group_buf[i].gr_gid == gid)
-	return group_buf + i;
-    }
-  return allow_ntsec || gid != ILLEGAL_GID ? NULL : default_grp;
+    if (group_buf[i].gr_gid == gid)
+      return group_buf + i;
+  return NULL;
 }
 
 struct __group32 *
 internal_getgrnam (const char *name, BOOL check)
 {
-  if (group_state.isuninitialized ()
-      || (check && group_state.isinitializing ()))
+  if (gr.isuninitialized () || (check && gr.isinitializing ()))
     read_etc_group ();
 
   for (int i = 0; i < curr_lines; i++)
@@ -280,7 +264,7 @@ endgrent ()
 extern "C" struct __group32 *
 getgrent32 ()
 {
-  if (group_state.isinitializing ())
+  if (gr.isinitializing ())
     read_etc_group ();
 
   if (grp_pos < curr_lines)
@@ -307,7 +291,7 @@ setgrent ()
 struct __group32 *
 internal_getgrent (int pos)
 {
-  if (group_state.isuninitialized ())
+  if (gr.isuninitialized ())
     read_etc_group ();
 
   if (pos < curr_lines)
@@ -316,7 +300,7 @@ internal_getgrent (int pos)
 }
 
 int
-internal_getgroups (int gidsetsize, __gid32_t *grouplist)
+internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygsid * srchsid)
 {
   HANDLE hToken = NULL;
   DWORD size;
@@ -345,6 +329,13 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist)
 	    {
 	      cygsid sid;
 
+	      if (srchsid)
+	        {
+		  for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
+		    if (*srchsid == groups->Groups[pg].Sid)
+		      return 1;
+		  return 0;
+		}
 	      for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
 		if (sid.getfromgr (gr))
 		  for (DWORD pg = 0; pg < groups->GroupCount; ++pg)

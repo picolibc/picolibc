@@ -19,7 +19,7 @@ extern struct __group32 *internal_getgrsid (cygsid &);
 extern struct __group32 *internal_getgrgid (__gid32_t gid, BOOL = FALSE);
 extern struct __group32 *internal_getgrnam (const char *, BOOL = FALSE);
 extern struct __group32 *internal_getgrent (int);
-int internal_getgroups (int, __gid32_t *);
+int internal_getgroups (int, __gid32_t *, cygsid * = NULL);
 
 enum pwdgrp_state {
   uninitialized = 0,
@@ -27,111 +27,107 @@ enum pwdgrp_state {
   loaded
 };
 
-class pwdgrp_check {
-  pwdgrp_state	state;
-  FILETIME	last_modified;
-  char		file_w32[MAX_PATH];
+#define MAX_ETC_FILES 2
+class etc
+{
+  static int curr_ix;
+  static bool sawchange[MAX_ETC_FILES];
+  static const char *fn[MAX_ETC_FILES];
+  static FILETIME last_modified[MAX_ETC_FILES];
+  static bool dir_changed (int);
+  static int init (int, const char *);
+  static bool file_changed (int);
+  static void set_last_modified (int, FILETIME&);
+  friend class pwdgrp;
+};
+
+class pwdgrp
+{
+  pwdgrp_state state;
+  int pwd_ix;
+  path_conv pc;
+  char *buf;
+  char *lptr, *eptr;
+
+  char *gets ()
+  {
+    if (!buf)
+      lptr = NULL;
+    else if (!eptr)
+      lptr = NULL;
+    else
+      {
+	lptr = eptr;
+	eptr = strchr (lptr, '\n');
+	if (eptr)
+	  {
+	    if (eptr > lptr && *(eptr - 1) == '\r')
+	      *(eptr - 1) = 0;
+	    *eptr++ = '\0';
+	  }
+      }
+    return lptr;
+  }
 
 public:
-  pwdgrp_check () : state (uninitialized) {}
+  pwdgrp () : state (uninitialized) {}
   BOOL isinitializing ()
     {
       if (state <= initializing)
 	state = initializing;
-      else if (cygheap->etc_changed ())
-        {
-	  if (!file_w32[0])
-	    state = initializing;
-	  else
-	    {
-	      HANDLE h;
-	      WIN32_FIND_DATA data;
-
-	      if ((h = FindFirstFile (file_w32, &data)) != INVALID_HANDLE_VALUE)
-	        {
-		  if (CompareFileTime (&data.ftLastWriteTime, &last_modified) > 0)
-		    state = initializing;
-		  FindClose (h);
-		}
-	    }
-	}
+      else if (etc::file_changed (pwd_ix - 1))
+	state = initializing;
       return state == initializing;
     }
-  void operator = (pwdgrp_state nstate)
-    {
-      state = nstate;
-    }
+  void operator = (pwdgrp_state nstate) { state = nstate; }
   BOOL isuninitialized () const { return state == uninitialized; }
-  void set_last_modified (HANDLE fh, const char *name)
-    {
-      if (!file_w32[0])
-	strcpy (file_w32, name);
-      GetFileTime (fh, NULL, NULL, &last_modified);
-    }
-};
 
-class pwdgrp_read {
-  path_conv pc;
-  HANDLE fh;
-  char *buf;
-  char *lptr, *eptr;
-
-public:
-  bool open (const char *posix_fname)
+  bool load (const char *posix_fname, void (* add_line) (char *))
   {
     if (buf)
       free (buf);
     buf = lptr = eptr = NULL;
 
     pc.check (posix_fname);
-    if (pc.error || !pc.exists () || !pc.isdisk () || pc.isdir ())
-      return false;
+    pwd_ix = etc::init (pwd_ix - 1, pc) + 1;
 
-    fh = CreateFile (pc, GENERIC_READ, wincap.shared (), NULL, OPEN_EXISTING,
-		     FILE_ATTRIBUTE_NORMAL, 0);
-    if (fh != INVALID_HANDLE_VALUE)
-      {
-	DWORD size = GetFileSize (fh, NULL), read_bytes;
-	buf = (char *) malloc (size + 1);
-	if (!ReadFile (fh, buf, size, &read_bytes, NULL))
-	  {
-	    if (buf)
-	      free (buf);
-	    buf = NULL;
-	    CloseHandle (fh);
-	    fh = NULL;
-	    return false;
-	  }
-	buf[read_bytes] = '\0';
-	return true;
-      }
-    return false;
-  }
-  char *gets ()
-  {
-    if (!buf)
-      return NULL;
-    if (!lptr)
-      lptr = buf;
-    else if (!eptr)
-      return lptr = NULL;
+    paranoid_printf ("%s", posix_fname);
+
+    bool res;
+    if (pc.error || !pc.exists () || !pc.isdisk () || pc.isdir ())
+      res = false;
     else
-      lptr = eptr;
-    eptr = strchr (lptr, '\n');
-    if (eptr)
       {
-	if (eptr > lptr && *(eptr - 1) == '\r')
-          *(eptr - 1) = 0;
-	*eptr++ = '\0';
+	HANDLE fh = CreateFile (pc, GENERIC_READ, wincap.shared (), NULL,
+				OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	if (fh == INVALID_HANDLE_VALUE)
+	  res = false;
+	else
+	  {
+	    DWORD size = GetFileSize (fh, NULL), read_bytes;
+	    buf = (char *) malloc (size + 1);
+	    if (!ReadFile (fh, buf, size, &read_bytes, NULL))
+	      {
+		if (buf)
+		  free (buf);
+		buf = NULL;
+		fh = NULL;
+		return false;
+	      }
+	    buf[read_bytes] = '\0';
+	    eptr = buf;
+	    CloseHandle (fh);
+	    FILETIME ft;
+	    if (GetFileTime (fh, NULL, NULL, &ft))
+	      etc::set_last_modified (pwd_ix - 1, ft);
+	    char *line;
+	    while ((line = gets()) != NULL)
+	      add_line (line);
+	    res = true;
+	  }
       }
-    return lptr;
-  }
-  inline HANDLE get_fhandle () { return fh; }
-  inline const char *get_fname () { return pc; }
-  void close ()
-  {
-    if (fh)
-      CloseHandle (fh);
-    fh = NULL;
+
+    state = loaded;
+    return res;
   }
 };
