@@ -33,7 +33,6 @@ details. */
 #include "pinfo.h"
 #include "registry.h"
 #include "wsock_event.h"
-#include <sys/uio.h>
 
 extern "C" {
 int h_errno;
@@ -558,104 +557,20 @@ done:
   return res;
 }
 
-/* cygwin internal: map sockaddr into internet domain address */
-
-static int get_inet_addr (const struct sockaddr *in, int inlen,
-			   struct sockaddr_in *out, int *outlen, int* secret = 0)
-{
-  int secret_buf [4];
-  int* secret_ptr = (secret ? : secret_buf);
-
-  if (in->sa_family == AF_INET)
-    {
-      *out = * (sockaddr_in *)in;
-      *outlen = inlen;
-      return 1;
-    }
-  else if (in->sa_family == AF_LOCAL)
-    {
-      int fd = _open (in->sa_data, O_RDONLY);
-      if (fd == -1)
-	return 0;
-
-      int ret = 0;
-      char buf[128];
-      memset (buf, 0, sizeof buf);
-      if (read (fd, buf, sizeof buf) != -1)
-	{
-	  sockaddr_in sin;
-	  sin.sin_family = AF_INET;
-	  sscanf (buf + strlen (SOCKET_COOKIE), "%hu %08x-%08x-%08x-%08x",
-		  &sin.sin_port,
-		  secret_ptr, secret_ptr + 1, secret_ptr + 2, secret_ptr + 3);
-	  sin.sin_port = htons (sin.sin_port);
-	  sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
-	  *out = sin;
-	  *outlen = sizeof sin;
-	  ret = 1;
-	}
-      _close (fd);
-      return ret;
-    }
-  else
-    {
-      set_errno (EAFNOSUPPORT);
-      return 0;
-    }
-}
-
 /* exported as sendto: standards? */
 extern "C" int
-cygwin_sendto (int fd,
-	       const void *buf,
-	       int len,
-	       unsigned int flags,
-	       const struct sockaddr *to,
-	       int tolen)
+cygwin_sendto (int fd, const void *buf, int len, unsigned int flags,
+	       const struct sockaddr *to, int tolen)
 {
   int res;
-  wsock_event wsock_evt;
-  LPWSAOVERLAPPED ovr;
-  fhandler_socket *h = get (fd);
+  fhandler_socket *fh = get (fd);
 
   if ((len && __check_invalid_read_ptr_errno (buf, (unsigned) len))
       || __check_null_invalid_struct_errno (to, tolen)
-      || !h)
+      || !fh)
     res = -1;
   else
-    {
-      sockaddr_in sin;
-      sigframe thisframe (mainthread);
-
-      if (get_inet_addr (to, tolen, &sin, &tolen) == 0)
-	return -1;
-
-      if (h->is_nonblocking () || !(ovr = wsock_evt.prepare ()))
-	{
-	  debug_printf ("Fallback to winsock 1 sendto call");
-	  if ((res = sendto (h->get_socket (), (const char *) buf, len, flags,
-			     (sockaddr *) &sin, tolen)) == SOCKET_ERROR)
-	    {
-	      set_winsock_errno ();
-	      res = -1;
-	    }
-	}
-      else
-	{
-	  WSABUF wsabuf = { len, (char *) buf };
-	  DWORD ret = 0;
-	  if (WSASendTo (h->get_socket (), &wsabuf, 1, &ret, (DWORD)flags,
-			 (sockaddr *) &sin, tolen, ovr, NULL) != SOCKET_ERROR)
-	    res = ret;
-	  else if ((res = WSAGetLastError ()) != WSA_IO_PENDING)
-	    {
-	      set_winsock_errno ();
-	      res = -1;
-	    }
-	  else if ((res = wsock_evt.wait (h->get_socket (), (DWORD *)&flags)) == -1)
-	    set_winsock_errno ();
-	}
-    }
+    res = fh->sendto (buf, len, flags, to, tolen);
 
   syscall_printf ("%d = sendto (%d, %x, %x, %x)", res, fd, buf, len, flags);
 
@@ -664,53 +579,19 @@ cygwin_sendto (int fd,
 
 /* exported as recvfrom: standards? */
 extern "C" int
-cygwin_recvfrom (int fd,
-		   char *buf,
-		   int len,
-		   int flags,
-		   struct sockaddr *from,
-		   int *fromlen)
+cygwin_recvfrom (int fd, char *buf, int len, int flags, struct sockaddr *from,
+		 int *fromlen)
 {
   int res;
-  wsock_event wsock_evt;
-  LPWSAOVERLAPPED ovr;
-  fhandler_socket *h = get (fd);
+  fhandler_socket *fh = get (fd);
 
   if (__check_null_invalid_struct_errno (buf, (unsigned) len)
       || check_null_invalid_struct_errno (fromlen)
       || (from && __check_null_invalid_struct_errno (from, (unsigned) *fromlen))
-      || !h)
+      || !fh)
     res = -1;
   else
-    {
-      sigframe thisframe (mainthread);
-
-      if (h->is_nonblocking () ||!(ovr = wsock_evt.prepare ()))
-	{
-	  debug_printf ("Fallback to winsock 1 recvfrom call");
-	  if ((res = recvfrom (h->get_socket (), buf, len, flags, from, fromlen))
-	      == SOCKET_ERROR)
-	    {
-	      set_winsock_errno ();
-	      res = -1;
-	    }
-	}
-      else
-	{
-	  WSABUF wsabuf = { len, (char *) buf };
-	  DWORD ret = 0;
-	  if (WSARecvFrom (h->get_socket (), &wsabuf, 1, &ret, (DWORD *)&flags,
-			   from, fromlen, ovr, NULL) != SOCKET_ERROR)
-	    res = ret;
-	  else if ((res = WSAGetLastError ()) != WSA_IO_PENDING)
-	    {
-	      set_winsock_errno ();
-	      res = -1;
-	    }
-	  else if ((res = wsock_evt.wait (h->get_socket (), (DWORD *)&flags)) == -1)
-	    set_winsock_errno ();
-	}
-    }
+    res = fh->recvfrom (buf, len, flags, from, fromlen);
 
   syscall_printf ("%d = recvfrom (%d, %x, %x, %x)", res, fd, buf, len, flags);
 
@@ -719,17 +600,14 @@ cygwin_recvfrom (int fd,
 
 /* exported as setsockopt: standards? */
 extern "C" int
-cygwin_setsockopt (int fd,
-		     int level,
-		     int optname,
-		     const void *optval,
-		     int optlen)
+cygwin_setsockopt (int fd, int level, int optname, const void *optval,
+		   int optlen)
 {
-  fhandler_socket *h = get (fd);
+  fhandler_socket *fh = get (fd);
   int res = -1;
   const char *name = "error";
 
-  if ((!optval || !__check_invalid_read_ptr_errno (optval, optlen)) && h)
+  if ((!optval || !__check_invalid_read_ptr_errno (optval, optlen)) && fh)
     {
       /* For the following debug_printf */
       switch (optname)
@@ -766,8 +644,8 @@ cygwin_setsockopt (int fd,
 	  break;
 	}
 
-      res = setsockopt (h->get_socket (), level, optname,
-				     (const char *) optval, optlen);
+      res = setsockopt (fh->get_socket (), level, optname,
+			(const char *) optval, optlen);
 
       if (optlen == 4)
 	syscall_printf ("setsockopt optval=%x", *(long *) optval);
@@ -783,18 +661,15 @@ cygwin_setsockopt (int fd,
 
 /* exported as getsockopt: standards? */
 extern "C" int
-cygwin_getsockopt (int fd,
-		     int level,
-		     int optname,
-		     void *optval,
-		     int *optlen)
+cygwin_getsockopt (int fd, int level, int optname, void *optval, int *optlen)
 {
-  fhandler_socket *h = get (fd);
+  fhandler_socket *fh = get (fd);
   int res = -1;
   const char *name = "error";
   if (!check_null_invalid_struct_errno (optlen)
-      && (!optval || !__check_null_invalid_struct_errno (optval, (unsigned) *optlen))
-      && h)
+      && (!optval
+          || !__check_null_invalid_struct_errno (optval, (unsigned) *optlen))
+      && fh)
     {
       /* For the following debug_printf */
       switch (optname)
@@ -831,8 +706,8 @@ cygwin_getsockopt (int fd,
 	  break;
 	}
 
-      res = getsockopt (h->get_socket (), level, optname,
-				       (char *) optval, (int *) optlen);
+      res = getsockopt (fh->get_socket (), level, optname, (char *) optval,
+      			(int *) optlen);
 
       if (optname == SO_ERROR)
 	{
@@ -851,78 +726,21 @@ cygwin_getsockopt (int fd,
 
 /* exported as connect: standards? */
 extern "C" int
-cygwin_connect (int fd,
-		  const struct sockaddr *name,
-		  int namelen)
+cygwin_connect (int fd, const struct sockaddr *name, int namelen)
 {
   int res;
-  BOOL secret_check_failed = FALSE;
-  BOOL in_progress = FALSE;
-  fhandler_socket *sock = get (fd);
-  sockaddr_in sin;
-  int secret [4];
-  sigframe thisframe (mainthread);
+  fhandler_socket *fh = get (fd);
 
   if (__check_invalid_read_ptr_errno (name, namelen))
     return -1;
 
-  if (get_inet_addr (name, namelen, &sin, &namelen, secret) == 0)
-    return -1;
-
-  if (!sock)
+  if (!fh)
     res = -1;
   else
-    {
-      res = connect (sock->get_socket (), (sockaddr *) &sin, namelen);
-      if (res)
-	{
-	  /* Special handling for connect to return the correct error code
-	     when called on a non-blocking socket. */
-	  if (sock->is_nonblocking ())
-	    {
-	      DWORD err = WSAGetLastError ();
-	      if (err == WSAEWOULDBLOCK || err == WSAEALREADY)
-		{
-		  WSASetLastError (WSAEINPROGRESS);
-		  in_progress = TRUE;
-		}
-	      else if (err == WSAEINVAL)
-		WSASetLastError (WSAEISCONN);
-	    }
-	  set_winsock_errno ();
-	}
-      if (sock->get_addr_family () == AF_LOCAL &&
-	  sock->get_socket_type () == SOCK_STREAM)
-	{
-	  if (!res || in_progress)
-	    {
-	      if (!sock->create_secret_event (secret))
-		{
-		  secret_check_failed = TRUE;
-		}
-	      else if (in_progress)
-		sock->signal_secret_event ();
-	    }
+    res = fh->connect (name, namelen);
 
-	  if (!secret_check_failed && !res)
-	    {
-	      if (!sock->check_peer_secret_event (&sin, secret))
-		{
-		  debug_printf ( "accept from unauthorized server" );
-		  secret_check_failed = TRUE;
-		}
-	   }
+  syscall_printf ("%d = connect (%d, %x, %x)", res, fd, name, namelen);
 
-	  if (secret_check_failed)
-	    {
-	      sock->close_secret_event ();
-	      if (res)
-		closesocket (res);
-	      set_errno (ECONNREFUSED);
-	      res = -1;
-	    }
-	}
-    }
   return res;
 }
 
@@ -1179,86 +997,11 @@ cygwin_accept (int fd, struct sockaddr *peer, int *len)
     return -1;
 
   int res = -1;
-  BOOL secret_check_failed = FALSE;
-  BOOL in_progress = FALSE;
-  sigframe thisframe (mainthread);
 
-  fhandler_socket *sock = get (fd);
-  if (sock)
-    {
-      /* Allows NULL peer and len parameters. */
-      struct sockaddr_in peer_dummy;
-      int len_dummy;
-      if (!peer)
-	peer = (struct sockaddr *) &peer_dummy;
-      if (!len)
-	{
-	  len_dummy = sizeof (struct sockaddr_in);
-	  len = &len_dummy;
-	}
+  fhandler_socket *fh = get (fd);
+  if (fh)
+    res = fh->accept (peer, len);
 
-      /* accept on NT fails if len < sizeof (sockaddr_in)
-       * some programs set len to
-       * sizeof (name.sun_family) + strlen (name.sun_path) for UNIX domain
-       */
-      if (len && ((unsigned) *len < sizeof (struct sockaddr_in)))
-	*len = sizeof (struct sockaddr_in);
-
-      res = accept (sock->get_socket (), peer, len);  // can't use a blocking call inside a lock
-
-      if ((SOCKET) res == (SOCKET) INVALID_SOCKET &&
-	  WSAGetLastError () == WSAEWOULDBLOCK)
-	in_progress = TRUE;
-
-      if (sock->get_addr_family () == AF_LOCAL &&
-	  sock->get_socket_type () == SOCK_STREAM)
-	{
-	  if ((SOCKET) res != (SOCKET) INVALID_SOCKET || in_progress)
-	    {
-	      if (!sock->create_secret_event ())
-		secret_check_failed = TRUE;
-	      else if (in_progress)
-		sock->signal_secret_event ();
-	    }
-
-	  if (!secret_check_failed &&
-	      (SOCKET) res != (SOCKET) INVALID_SOCKET)
-	    {
-	      if (!sock->check_peer_secret_event ((struct sockaddr_in*) peer))
-		{
-		  debug_printf ("connect from unauthorized client");
-		  secret_check_failed = TRUE;
-		}
-	    }
-
-	  if (secret_check_failed)
-	    {
-	      sock->close_secret_event ();
-	      if ((SOCKET) res != (SOCKET) INVALID_SOCKET)
-		closesocket (res);
-	      set_errno (ECONNABORTED);
-	      res = -1;
-	      goto done;
-	    }
-	}
-
-
-      cygheap_fdnew res_fd;
-      if (res_fd < 0)
-	/* FIXME: what is correct errno? */;
-      else if ((SOCKET) res == (SOCKET) INVALID_SOCKET)
-	set_winsock_errno ();
-      else
-	{
-	  fhandler_socket* res_fh = fdsock (res_fd, sock->get_name (), res);
-	  if (sock->get_addr_family () == AF_LOCAL)
-	    res_fh->set_sun_path (sock->get_sun_path ());
-	  res_fh->set_addr_family (sock->get_addr_family ());
-	  res_fh->set_socket_type (sock->get_socket_type ());
-	  res = res_fd;
-	}
-    }
- done:
   syscall_printf ("%d = accept (%d, %x, %x)", res, fd, peer, len);
   return res;
 }
@@ -1272,83 +1015,10 @@ cygwin_bind (int fd, const struct sockaddr *my_addr, int addrlen)
 
   int res = -1;
 
-  fhandler_socket *sock = get (fd);
-  if (sock)
-    {
-      if (my_addr->sa_family == AF_LOCAL)
-	{
-#define un_addr ((struct sockaddr_un *) my_addr)
-	  struct sockaddr_in sin;
-	  int len = sizeof sin;
-	  int fd;
+  fhandler_socket *fh = get (fd);
+  if (fh)
+    res = fh->bind (my_addr, addrlen);
 
-	  if (strlen (un_addr->sun_path) >= UNIX_PATH_LEN)
-	    {
-	      set_errno (ENAMETOOLONG);
-	      goto out;
-	    }
-	  sin.sin_family = AF_INET;
-	  sin.sin_port = 0;
-	  sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
-	  if (bind (sock->get_socket (), (sockaddr *) &sin, len))
-	    {
-	      syscall_printf ("AF_LOCAL: bind failed %d", get_errno ());
-	      set_winsock_errno ();
-	      goto out;
-	    }
-	  if (getsockname (sock->get_socket (), (sockaddr *) &sin, &len))
-	    {
-	      syscall_printf ("AF_LOCAL: getsockname failed %d", get_errno ());
-	      set_winsock_errno ();
-	      goto out;
-	    }
-
-	  sin.sin_port = ntohs (sin.sin_port);
-	  debug_printf ("AF_LOCAL: socket bound to port %u", sin.sin_port);
-
-	  /* bind must fail if file system socket object already exists
-	     so _open () is called with O_EXCL flag. */
-	  fd = _open (un_addr->sun_path,
-		      O_WRONLY | O_CREAT | O_EXCL | O_BINARY,
-		      0);
-	  if (fd < 0)
-	    {
-	      if (get_errno () == EEXIST)
-		set_errno (EADDRINUSE);
-	      goto out;
-	    }
-
-	  sock->set_connect_secret ();
-
-	  char buf[sizeof (SOCKET_COOKIE) + 80];
-	  __small_sprintf (buf, "%s%u ", SOCKET_COOKIE, sin.sin_port);
-	  sock->get_connect_secret (strchr (buf, '\0'));
-	  len = strlen (buf) + 1;
-
-	  /* Note that the terminating nul is written.  */
-	  if (_write (fd, buf, len) != len)
-	    {
-	      save_errno here;
-	      _close (fd);
-	      _unlink (un_addr->sun_path);
-	    }
-	  else
-	    {
-	      _close (fd);
-	      chmod (un_addr->sun_path,
-		(S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO) & ~cygheap->umask);
-	      sock->set_sun_path (un_addr->sun_path);
-	      res = 0;
-	    }
-#undef un_addr
-	}
-      else if (bind (sock->get_socket (), my_addr, addrlen))
-	set_winsock_errno ();
-      else
-	res = 0;
-    }
-
-out:
   syscall_printf ("%d = bind (%d, %x, %d)", res, fd, my_addr, addrlen);
   return res;
 }
@@ -1363,36 +1033,10 @@ cygwin_getsockname (int fd, struct sockaddr *addr, int *namelen)
 
   int res = -1;
 
-  fhandler_socket *sock = get (fd);
-  if (sock)
-    {
-      if (sock->get_addr_family () == AF_LOCAL)
-	{
-	  struct sockaddr_un *sun = (struct sockaddr_un *) addr;
-	  memset (sun, 0, *namelen);
-	  sun->sun_family = AF_LOCAL;
+  fhandler_socket *fh = get (fd);
+  if (fh)
+    res = fh->getsockname (addr, namelen);
 
-	  if (!sock->get_sun_path ())
-	    sun->sun_path[0] = '\0';
-	  else
-	    /* According to SUSv2 "If the actual length of the address is
-	       greater than the length of the supplied sockaddr structure, the
-	       stored address will be truncated."  We play it save here so
-	       that the path always has a trailing 0 even if it's truncated. */
-	    strncpy (sun->sun_path, sock->get_sun_path (),
-		     *namelen - sizeof *sun + sizeof sun->sun_path - 1);
-
-	  *namelen = sizeof *sun - sizeof sun->sun_path
-		     + strlen (sun->sun_path) + 1;
-	  res = 0;
-	}
-      else
-	{
-	  res = getsockname (sock->get_socket (), addr, namelen);
-	  if (res)
-	    set_winsock_errno ();
-	}
-    }
   syscall_printf ("%d = getsockname (%d, %x, %d)", res, fd, addr, namelen);
   return res;
 }
@@ -1403,14 +1047,10 @@ cygwin_listen (int fd, int backlog)
 {
   int res = -1;
 
+  fhandler_socket *fh = get (fd);
+  if (fh)
+    res = fh->listen (backlog);
 
-  fhandler_socket *sock = get (fd);
-  if (sock)
-    {
-      res = listen (sock->get_socket (), backlog);
-      if (res)
-	set_winsock_errno ();
-    }
   syscall_printf ("%d = listen (%d, %d)", res, fd, backlog);
   return res;
 }
@@ -1422,27 +1062,10 @@ cygwin_shutdown (int fd, int how)
   int res = -1;
   sigframe thisframe (mainthread);
 
-  fhandler_socket *sock = get (fd);
-  if (sock)
-    {
-      res = shutdown (sock->get_socket (), how);
-      if (res)
-	set_winsock_errno ();
-      else
-	switch (how)
-	  {
-	  case SHUT_RD:
-	    sock->set_shutdown_read ();
-	    break;
-	  case SHUT_WR:
-	    sock->set_shutdown_write ();
-	    break;
-	  case SHUT_RDWR:
-	    sock->set_shutdown_read ();
-	    sock->set_shutdown_write ();
-	    break;
-	  }
-    }
+  fhandler_socket *fh = get (fd);
+  if (fh)
+    res = fh->shutdown (how);
+
   syscall_printf ("%d = shutdown (%d, %d)", res, fd, how);
   return res;
 }
@@ -1498,23 +1121,18 @@ cygwin_herror (const char *s)
 extern "C" int
 cygwin_getpeername (int fd, struct sockaddr *name, int *len)
 {
-  int res;
+  int res = -1;
+
   if (check_null_invalid_struct_errno (len)
       || __check_null_invalid_struct_errno (name, (unsigned) *len))
     return -1;
 
-  fhandler_socket *h = get (fd);
+  fhandler_socket *fh = get (fd);
+  if (fh)
+    res = fh->getpeername (name, len);
 
-  if (!h)
-    res = -1;
-  else
-    {
-      res = getpeername (h->get_socket (), name, len);
-      if (res)
-	set_winsock_errno ();
-    }
+  syscall_printf ("%d = getpeername %d", res, fh->get_socket ());
 
-  debug_printf ("%d = getpeername %d", res, h->get_socket ());
   return res;
 }
 
@@ -2476,64 +2094,32 @@ endhostent (void)
 
 /* exported as recvmsg: standards? */
 extern "C" int
-cygwin_recvmsg(int s, struct msghdr *msg, int flags)
+cygwin_recvmsg (int s, struct msghdr *msg, int flags)
 {
-    int ret, nb;
-    size_t tot = 0;
-    int i;
-    char *buf, *p;
-    struct iovec *iov = msg->msg_iov;
+  if (check_null_invalid_struct_errno (msg))
+    return -1;
 
-    for(i = 0; i < msg->msg_iovlen; ++i)
-	tot += iov[i].iov_len;
-    buf = (char *) malloc(tot);
-    if (tot != 0 && buf == NULL)
-      {
-	errno = ENOMEM;
-	return -1;
-      }
-    nb = ret = cygwin_recvfrom (s, buf, tot, flags,
-      (struct sockaddr *) msg->msg_name, (int *) &msg->msg_namelen);
-    p = buf;
-    while (nb > 0)
-      {
-	ssize_t cnt = min(nb, iov->iov_len);
-
-	memcpy (iov->iov_base, p, cnt);
-	p += cnt;
-	nb -= cnt;
-	++iov;
-      }
-    free(buf);
-    return ret;
+  fhandler_socket *fh = get (s);
+  if (!fh)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+  return fh->recvmsg (msg, flags);
 }
 
 /* exported as sendmsg: standards? */
 extern "C" int
-cygwin_sendmsg(int s, const struct msghdr *msg, int flags)
+cygwin_sendmsg (int s, const struct msghdr *msg, int flags)
 {
-    int ret;
-    size_t tot = 0;
-    int i;
-    char *buf, *p;
-    struct iovec *iov = msg->msg_iov;
+    if (__check_invalid_read_ptr_errno (msg, sizeof msg))
+      return -1;
 
-    for(i = 0; i < msg->msg_iovlen; ++i)
-	tot += iov[i].iov_len;
-    buf = (char *) malloc(tot);
-    if (tot != 0 && buf == NULL)
+    fhandler_socket *fh = get (s);
+    if (!fh)
       {
-	errno = ENOMEM;
+        set_errno (EINVAL);
 	return -1;
       }
-    p = buf;
-    for (i = 0; i < msg->msg_iovlen; ++i)
-      {
-	memcpy (p, iov[i].iov_base, iov[i].iov_len);
-	p += iov[i].iov_len;
-      }
-    ret = cygwin_sendto (s, buf, tot, flags,
-      (struct sockaddr *) msg->msg_name, msg->msg_namelen);
-    free (buf);
-    return ret;
+    return fh->sendmsg (msg, flags);
 }

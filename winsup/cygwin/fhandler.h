@@ -380,15 +380,30 @@ class fhandler_socket: public fhandler_base
   void set_shutdown_read () {FHSETF (SHUTRD);}
   void set_shutdown_write () {FHSETF (SHUTWR);}
 
+  int bind (const struct sockaddr *name, int namelen);
+  int connect (const struct sockaddr *name, int namelen);
+  int listen (int backlog);
+  int accept (struct sockaddr *peer, int *len);
+  int getsockname (struct sockaddr *name, int *namelen);
+  int getpeername (struct sockaddr *name, int *namelen);
+
   int recv (void *ptr, size_t len, unsigned int flags);
   int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
+  int recvfrom (void *ptr, size_t len, unsigned int flags,
+		struct sockaddr *from, int *fromlen);
+  int recvmsg (struct msghdr *msg, int flags);
 
   int send (const void *ptr, size_t len, unsigned int flags);
   int write (const void *ptr, size_t len);
 
+  int sendto (const void *ptr, size_t len, unsigned int flags,
+	      const struct sockaddr *to, int tolen);
+  int sendmsg (const struct msghdr *msg, int flags);
+
   int ioctl (unsigned int cmd, void *);
   int fcntl (int cmd, void *);
   __off64_t lseek (__off64_t, int) { return 0; }
+  int shutdown (int how);
   int close ();
   void hclose (HANDLE) {close ();}
   int dup (fhandler_base *child);
