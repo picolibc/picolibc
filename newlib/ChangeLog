@@ -1,3 +1,10 @@
+2002-08-07  Richard Sandiford  <rsandifo@redhat.com>
+
+	* libc/include/machine/setjmp.h: For mips, define _JBLEN based
+	based on __mips_soft_float rather than __mips64.
+	* libc/machine/mips/setjmp.S: Provide hard and soft float versions
+	of both 32-bit and 64-bit code.
+
 2002-08-04  Christopher Faylor  <cgf@redhat.com>
 
 	* libc/stdio/popen.c (popen): Allow "rb", "rt", "wb", and "wt"
