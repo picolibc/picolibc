@@ -66,6 +66,9 @@ typedef struct __sFILE FILE;
 #define	__SNPT	0x0800		/* do not do fseek() optimisation */
 #define	__SOFF	0x1000		/* set iff _offset is in fact correct */
 #define	__SMOD	0x2000		/* true => fgetline modified _p text */
+#if defined(__CYGWIN__) || defined(__CYGWIN32__)
+#define __SCLE        0x4000          /* convert line endings CR/LF <-> NL */
+#endif
 
 /*
  * The following three definitions are for ANSI C, which took them
@@ -251,7 +254,26 @@ FILE	*_EXFUN(funopen,(const _PTR _cookie,
  * The __sfoo macros are here so that we can 
  * define function versions in the C library.
  */
-#define	__sgetc(p) (--(p)->_r < 0 ? __srget(p) : (int)(*(p)->_p++))
+#define       __sgetc_raw(p) (--(p)->_r < 0 ? __srget(p) : (int)(*(p)->_p++))
+
+#ifdef __SCLE
+static __inline__ int __sgetc(FILE *__p)
+  {
+    int __c = __sgetc_raw(__p);
+    if ((__p->_flags & __SCLE) && (__c == '\r'))
+      {
+      int __c2 = __sgetc_raw(__p);
+      if (__c2 == '\n')
+        __c = __c2;
+      else
+        ungetc(__c2, __p);
+      }
+    return __c;
+  }
+#else
+#define __sgetc(p) __sgetc_raw(p)
+#endif
+
 #ifdef _never /* __GNUC__ */
 /* If this inline is actually used, then systems using coff debugging
    info get hopelessly confused.  21sept93 rich@cygnus.com.  */
@@ -265,7 +287,7 @@ static __inline int __sputc(int _c, FILE *_p) {
 /*
  * This has been tuned to generate reasonable code on the vax using pcc
  */
-#define	__sputc(c, p) \
+#define       __sputc_raw(c, p) \
 	(--(p)->_w < 0 ? \
 		(p)->_w >= (p)->_lbfsize ? \
 			(*(p)->_p = (c)), *(p)->_p != '\n' ? \
@@ -273,6 +295,14 @@ static __inline int __sputc(int _c, FILE *_p) {
 				__swbuf('\n', p) : \
 			__swbuf((int)(c), p) : \
 		(*(p)->_p = (c), (int)*(p)->_p++))
+#ifdef __SCLE
+#define __sputc(c, p) \
+        ((((p)->_flags & __SCLE) && ((c) == '\n')) \
+          ? __sputc_raw('\r', (p)) : 0 , \
+        __sputc_raw((c), (p)))
+#else
+#define __sputc(c, p) __sputc_raw(c, p)
+#endif
 #endif
 
 #define	__sfeof(p)	(((p)->_flags & __SEOF) != 0)

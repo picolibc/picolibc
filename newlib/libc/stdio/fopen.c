@@ -116,6 +116,9 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include <stdio.h>
 #include <errno.h>
 #include "local.h"
+#ifdef __CYGWIN__
+#include <fcntl.h>
+#endif
 
 FILE *
 _DEFUN (_fopen_r, (ptr, file, mode),
@@ -148,6 +151,11 @@ _DEFUN (_fopen_r, (ptr, file, mode),
 
   if (fp->_flags & __SAPP)
     fseek (fp, 0, SEEK_END);
+
+#ifdef __SCLE
+  if (setmode(fp->_file, O_BINARY) == O_TEXT)
+    fp->_flags |= __SCLE;
+#endif
 
   return fp;
 }

@@ -62,6 +62,27 @@ __sfvwrite (fp, uio)
 
   iov = uio->uio_iov;
   len = 0;
+
+#ifdef __SCLE
+  if (fp->_flags & __SCLE) /* text mode */
+    {
+      do
+      {
+        GETIOV (;);
+        while (len > 0)
+          {
+            if (putc(*p, fp) == EOF)
+              return EOF;
+            p++;
+            len--;
+            uio->uio_resid--;
+          }
+      }
+      while (uio->uio_resid > 0);
+      return 0;
+    }
+#endif
+
   if (fp->_flags & __SNBF)
     {
       /*

@@ -1,3 +1,15 @@
+Tue May 02 23:45:48 2000  DJ Delorie  <dj@cygnus.com>
+
+	* libc/include/stdio.h (FILE): define __SCLE for "convert line
+	endings" for Cygwin.
+	(__sgetc): convert line endings if needed
+	(__sputc): ditto
+	* libc/stdio/fdopen.c (_fdopen_r): Remember if we opened in text mode
+	* libc/stdio/fopen.c (_fopen_r): ditto
+	* libc/stdio/freopen.c (freopen): ditto
+	* libc/stdio/fread.c (fread): perform CRLF conversions if __SCLE
+	* libc/stdio/fvwrite.c (__sfvwrite): ditto
+
 Thu Apr 27 07:45:48 2000  Alexandre Oliva  <aoliva@cygnus.com>
 
 	* libc/machine/mn10300/setjmp.S (setjmp, longjmp): Use

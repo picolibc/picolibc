@@ -147,5 +147,11 @@ _DEFUN (freopen, (file, mode, fp),
   fp->_write = __swrite;
   fp->_seek = __sseek;
   fp->_close = __sclose;
+
+#ifdef __SCLE
+  if (setmode(fp->_file, O_BINARY) == O_TEXT)
+    fp->_flags |= __SCLE;
+#endif
+
   return fp;
 }

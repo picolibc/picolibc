@@ -59,6 +59,55 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <string.h>
 #include "local.h"
 
+#ifdef __SCLE
+static size_t
+_DEFUN (crlf, (fp, buf, count, eof),
+      FILE * fp _AND
+      char * buf _AND
+      size_t count _AND
+      int eof)
+{
+  int newcount = 0, r;
+  char *s, *d, *e;
+
+  if (count == 0)
+    return 0;
+
+  e = buf + count;
+  for (s=d=buf; s<e-1; s++)
+    {
+      if (*s == '\r' && s[1] == '\n')
+      s++;
+      *d++ = *s;
+    }
+  if (s < e)
+    {
+      if (*s == '\r')
+      {
+        int c = __sgetc_raw(fp);
+        if (c == '\n')
+          *s = '\n';
+        else
+          ungetc(c, fp);
+      }
+      *d++ = *s++;
+    }
+
+
+  while (d < e)
+    {
+      r = getc(fp);
+      if (r == EOF)
+      return count - (e-d);
+      *d++ = r;
+    }
+
+  return count;
+  
+}
+
+#endif
+
 size_t
 _DEFUN (fread, (buf, size, count, fp),
 	_PTR buf _AND
@@ -77,6 +126,7 @@ _DEFUN (fread, (buf, size, count, fp),
     fp->_r = 0;
   total = resid;
   p = buf;
+
   while (resid > (r = fp->_r))
     {
       (void) memcpy ((void *) p, (void *) fp->_p, (size_t) r);
@@ -87,11 +137,19 @@ _DEFUN (fread, (buf, size, count, fp),
       if (__srefill (fp))
 	{
 	  /* no more input: return partial result */
+#ifdef __SCLE
+        if (fp->_flags & __SCLE)
+            return crlf(fp, buf, total-resid, 1) / size;
+#endif
 	  return (total - resid) / size;
 	}
     }
   (void) memcpy ((void *) p, (void *) fp->_p, resid);
   fp->_r -= resid;
   fp->_p += resid;
+#ifdef __SCLE
+  if (fp->_flags & __SCLE)
+    return crlf(fp, buf, total, 0) / size;
+#endif
   return count;
 }
