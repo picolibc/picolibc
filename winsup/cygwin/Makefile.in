@@ -179,9 +179,6 @@ maintainer-clean realclean: clean
 
 # Rule to build libcygwin.a
 
-$(LIB_NAME): new-$(DLL_NAME) $(LIBCOS)
-	$(AR) rcv $(LIB_NAME) $(LIBCOS)
-
 # Rule to make stub library used by testsuite
 
 # dependency set to $(LIB_NAME) to accomodate make -j2.
@@ -198,6 +195,9 @@ new-$(DLL_NAME): $(LDSCRIPT) $(DLL_OFILES) $(DEF_FILE) $(DLL_IMPORTS) $(LIBC) $(
 	-e $(DLL_ENTRY) $(DEF_FILE) $(DLL_OFILES) version.o winver.o \
 	$(DLL_IMPORTS) $(MALLOC_OBJ) $(LIBM) $(LIBC) \
 	-lstdc++ -lgcc -lshell32 -luuid
+
+$(LIB_NAME): new-$(DLL_NAME) $(LIBCOS)
+	$(AR) rcv $(LIB_NAME) $(LIBCOS)
 
 dll_ofiles: $(DLL_OFILES)
 

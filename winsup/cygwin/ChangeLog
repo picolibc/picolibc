@@ -1,3 +1,8 @@
+Mon Sep 24 18:46:39 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* select.cc (peek_pipe): Only grab mutex when we actually got something
+	from the pipe.
+
 Mon Sep 24 17:41:03 2001  Christopher Faylor <cgf@redhat.com>
 
 	* fhandler.h (fhandler_pipe::hit_eof): New method.

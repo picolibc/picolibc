@@ -449,16 +449,16 @@ peek_pipe (select_record *s, int ignra, HANDLE guard_mutex = NULL)
 
   if (fh->get_device () == FH_PIPEW)
     /* nothing */;
+  else if (!PeekNamedPipe (h, NULL, 0, NULL, (DWORD *) &n, NULL))
+    {
+      select_printf ("%s, PeekNamedPipe failed, %E", fh->get_name ());
+      n = -1;
+    }
   else if (guard_mutex && WaitForSingleObject (guard_mutex, 0) != WAIT_OBJECT_0)
     {
       select_printf ("%s, couldn't get mutex %p, %E", fh->get_name (),
 	  	     guard_mutex);
       n = 0;
-    }
-  else if (!PeekNamedPipe (h, NULL, 0, NULL, (DWORD *) &n, NULL))
-    {
-      select_printf ("%s, PeekNamedPipe failed, %E", fh->get_name ());
-      n = -1;
     }
 
   if (n < 0)
