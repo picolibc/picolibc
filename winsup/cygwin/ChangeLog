@@ -1,5 +1,11 @@
 2004-08-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* errno.cc (_sys_errlist): Change various text to their english Linux
+	counterparts.  Unify layout.
+	(strerror): Remove switch statement.
+
+2004-08-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.cc (fhandler_base::open): Set shared flags to 0 when
 	opening a tape device.
 

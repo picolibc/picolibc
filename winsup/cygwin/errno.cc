@@ -127,146 +127,146 @@ static NO_COPY struct
 extern "C" {
 const char __declspec(dllexport) * _sys_errlist[] NO_COPY_INIT =
 {
-/*      NOERROR 0       */ "No error",
-/*	EPERM 1		*/ "Operation not permitted",
-/*	ENOENT 2	*/ "No such file or directory",
-/*	ESRCH 3		*/ "No such process",
-/*	EINTR 4		*/ "Interrupted system call",
-/*	EIO 5		*/ "I/O error",
-/*	ENXIO 6		*/ "No such device or address",
-/*	E2BIG 7		*/ "Arg list too long",
-/*	ENOEXEC 8	*/ "Exec format error",
-/*	EBADF 9		*/ "Bad file descriptor",
-/*	ECHILD 10	*/ "No children",
-/*	EAGAIN 11	*/ "Resource temporarily unavailable",
-/*	ENOMEM 12	*/ "Not enough core",
-/*	EACCES 13	*/ "Permission denied",
-/*	EFAULT 14	*/ "Bad address",
-/*	ENOTBLK 15	*/ "Block device required",
-/*	EBUSY 16	*/ "Mount device busy",
-/*	EEXIST 17	*/ "File exists",
-/*	EXDEV 18	*/ "Cross-device link",
-/*	ENODEV 19	*/ "No such device",
-/*	ENOTDIR 20	*/ "Not a directory",
-/*	EISDIR 21	*/ "Is a directory",
-/*	EINVAL 22	*/ "Invalid argument",
-/*	ENFILE 23	*/ "Too many open files in system",
-/*	EMFILE 24	*/ "Too many open files",
-/*	ENOTTY 25	*/ "Not a typewriter",
-/*	ETXTBSY 26	*/ "Text file busy",
-/*	EFBIG 27	*/ "File too large",
-/*	ENOSPC 28	*/ "No space left on device",
-/*	ESPIPE 29	*/ "Illegal seek",
-/*	EROFS 30	*/ "Read only file system",
-/*	EMLINK 31	*/ "Too many links",
-/*	EPIPE 32	*/ "Broken pipe",
-/*	EDOM 33		*/ "Math arg out of domain of func",
-/*	ERANGE 34	*/ "Math result not representable",
-/*	ENOMSG 35	*/ "No message of desired type",
-/*	EIDRM 36	*/ "Identifier removed",
-/*	ECHRNG 37	*/ "Channel number out of range",
-/*	EL2NSYNC 38	*/ "Level 2 not synchronized",
-/*	EL3HLT 39	*/ "Level 3 halted",
-/*	EL3RST 40	*/ "Level 3 reset",
-/*	ELNRNG 41	*/ "Link number out of range",
-/*	EUNATCH 42	*/ "Protocol driver not attached",
-/*	ENOCSI 43	*/ "No CSI structure available",
-/*	EL2HLT 44	*/ "Level 2 halted",
-/*	EDEADLK 45	*/ "Deadlock condition",
-/*	ENOLCK 46	*/ "No record locks available",
-			   "47",
-			   "48",
-			   "49",
-/* EBADE 50	*/ "Invalid exchange",
-/* EBADR 51	*/ "Invalid request descriptor",
-/* EXFULL 52	*/ "Exchange full",
-/* ENOANO 53	*/ "No anode",
-/* EBADRQC 54	*/ "Invalid request code",
-/* EBADSLT 55	*/ "Invalid slot",
-/* EDEADLOCK 56	*/ "File locking deadlock error",
-/* EBFONT 57	*/ "Bad font file fmt",
-			   "58",
-			   "59",
-/* ENOSTR 60	*/ "Device not a stream",
-/* ENODATA 61	*/ "No data (for no delay io)",
-/* ETIME 62	*/ "Timer expired",
-/* ENOSR 63	*/ "Out of streams resources",
-/* ENONET 64	*/ "Machine is not on the network",
-/* ENOPKG 65	*/ "Package not installed",
-/* EREMOTE 66	*/ "The object is remote",
-/* ENOLINK 67	*/ "The link has been severed",
-/* EADV 68		*/ "Advertise error",
-/* ESRMNT 69	*/ "Srmount error",
-/*	ECOMM 70	*/ "Communication error on send",
-/* EPROTO 71	*/ "Protocol error",
-			   "72",
-			   "73",
-/*	EMULTIHOP 74	*/ "Multihop attempted",
-/*	ELBIN 75	*/ "Inode is remote (not really error)",
-/*	EDOTDOT 76	*/ "Cross mount point (not really error)",
-/* EBADMSG 77	*/ "Trying to read unreadable message",
-			   "78",
-			   "79",
-/* ENOTUNIQ 80	*/ "Given log. name not unique",
-/* EBADFD 81	*/ "f.d. invalid for this operation",
-/* EREMCHG 82	*/ "Remote address changed",
-/* ELIBACC 83	*/ "Can't access a needed shared lib",
-/* ELIBBAD 84	*/ "Accessing a corrupted shared lib",
-/* ELIBSCN 85	*/ ".lib section in a.out corrupted",
-/* ELIBMAX 86	*/ "Attempting to link in too many libs",
-/* ELIBEXEC 87	*/ "Attempting to exec a shared library",
-/* ENOSYS 88	*/ "Function not implemented",
-/* ENMFILE 89      */ "No more files",
-/* ENOTEMPTY 90	*/ "Directory not empty",
-/* ENAMETOOLONG 91	*/ "File or path name too long",
-/* ELOOP 92     */ "Too many symbolic links",
-		   "93",
-		   "94",
-/* EOPNOTSUPP 95 */ "Operation not supported on transport endpoint",
-/* EPFNOSUPPORT 96 */ "Protocol family not supported",
-		   "97",
-		   "98",
-		   "99",
-		   "100",
-		   "101",
-		   "102",
-		   "103",
-/* ECONNRESET 104 */ "Connection reset by peer",
-/* ENOBUFS 105 */ "No buffer space available",
-/* EAFNOSUPPORT 106 */ "Address family not supported by protocol",
-/* EPROTOTYPE 107 */ "Protocol wrong type for transport endpoint",
-/* ENOTSOCK 108 */  "Socket operation on non-socket",
-/* ENOPROTOOPT 109 */ "Protocol not available",
-/* ESHUTDOWN 110 */ "Cannot send after transport endpoint shutdown",
-/* ECONNREFUSED 111 */ "Connection refused",
-/* EADDRINUSE 112 */ "Address already in use",
-/* ECONNABORTED 113 */ "Connection aborted",
-/* ENETUNREACH 114 */ "Network is unreachable",
-/* ENETDOWN 115 */ "Network is down",
-/* ETIMEDOUT 116 */ "Connection timed out",
-/* EHOSTDOWN 117 */ "Host is down",
-/* EHOSTUNREACH 118 */ "No route to host",
-/* EINPROGRESS 119 */ "Operation now in progress",
-/* EALREADY 120 */ "Operation already in progress",
-/* EDESTADDRREQ 121 */ "Destination address required",
-/* EMSGSIZE 122 */ "Message too long",
+/* NOERROR 0 */		  "No error",
+/* EPERM 1 */		  "Operation not permitted",
+/* ENOENT 2 */		  "No such file or directory",
+/* ESRCH 3 */		  "No such process",
+/* EINTR 4 */		  "Interrupted system call",
+/* EIO 5 */		  "Input/Output error",
+/* ENXIO 6 */		  "No such device or address",
+/* E2BIG 7 */		  "Argument list too long",
+/* ENOEXEC 8 */		  "Exec format error",
+/* EBADF 9 */		  "Bad file descriptor",
+/* ECHILD 10 */		  "No child processes",
+/* EAGAIN 11 */		  "Resource temporarily unavailable",
+/* ENOMEM 12 */		  "Cannot allocate memory",
+/* EACCES 13 */		  "Permission denied",
+/* EFAULT 14 */		  "Bad address",
+/* ENOTBLK 15 */	  "Block device required",
+/* EBUSY 16 */		  "Device or resource busy",
+/* EEXIST 17 */		  "File exists",
+/* EXDEV 18 */		  "Invalid cross-device link",
+/* ENODEV 19 */		  "No such device",
+/* ENOTDIR 20 */	  "Not a directory",
+/* EISDIR 21 */		  "Is a directory",
+/* EINVAL 22 */		  "Invalid argument",
+/* ENFILE 23 */		  "Too many open files in system",
+/* EMFILE 24 */		  "Too many open files",
+/* ENOTTY 25 */		  "Inappropriate ioctl for device",
+/* ETXTBSY 26 */	  "Text file busy",
+/* EFBIG 27 */		  "File too large",
+/* ENOSPC 28 */		  "No space left on device",
+/* ESPIPE 29 */		  "Illegal seek",
+/* EROFS 30 */		  "Read-only file system",
+/* EMLINK 31 */		  "Too many links",
+/* EPIPE 32 */		  "Broken pipe",
+/* EDOM 33 */		  "Numerical argument out of domain",
+/* ERANGE 34 */		  "Numerical result out of range",
+/* ENOMSG 35 */		  "No message of desired type",
+/* EIDRM 36 */		  "Identifier removed",
+/* ECHRNG 37 */		  "Channel number out of range",
+/* EL2NSYNC 38 */	  "Level 2 not synchronized",
+/* EL3HLT 39 */		  "Level 3 halted",
+/* EL3RST 40 */		  "Level 3 reset",
+/* ELNRNG 41 */		  "Link number out of range",
+/* EUNATCH 42 */	  "Protocol driver not attached",
+/* ENOCSI 43 */		  "No CSI structure available",
+/* EL2HLT 44 */		  "Level 2 halted",
+/* EDEADLK 45 */	  "Resource deadlock avoided",
+/* ENOLCK 46 */		  "No locks available",
+		  	  "error 47",
+		  	  "error 48",
+		  	  "error 49",
+/* EBADE 50 */		  "Invalid exchange",
+/* EBADR 51 */		  "Invalid request descriptor",
+/* EXFULL 52 */		  "Exchange full",
+/* ENOANO 53 */		  "No anode",
+/* EBADRQC 54 */	  "Invalid request code",
+/* EBADSLT 55 */	  "Invalid slot",
+/* EDEADLOCK 56 */	  "File locking deadlock error",
+/* EBFONT 57 */		  "Bad font file format",
+		  	  "error 58",
+		  	  "error 59",
+/* ENOSTR 60 */		  "Device not a stream",
+/* ENODATA 61 */	  "No data available",
+/* ETIME 62 */		  "Timer expired",
+/* ENOSR 63 */		  "Out of streams resources",
+/* ENONET 64 */		  "Machine is not on the network",
+/* ENOPKG 65 */		  "Package not installed",
+/* EREMOTE 66 */	  "Object is remote",
+/* ENOLINK 67 */	  "Link has been severed",
+/* EADV 68 */		  "Advertise error",
+/* ESRMNT 69 */		  "Srmount error",
+/* ECOMM 70 */		  "Communication error on send",
+/* EPROTO 71 */		  "Protocol error",
+		  	  "error 72",
+		  	  "error 73",
+/* EMULTIHOP 74 */	  "Multihop attempted",
+/* ELBIN 75 */		  "Inode is remote (not really error)",
+/* EDOTDOT 76 */	  "RFS specific error",
+/* EBADMSG 77 */	  "Bad message",
+		  	  "error 78",
+/* EFTYPE 79 */		  "Inappropriate file type or format",
+/* ENOTUNIQ 80 */	  "Name not unique on network",
+/* EBADFD 81 */		  "File descriptor in bad state",
+/* EREMCHG 82 */	  "Remote address changed",
+/* ELIBACC 83 */	  "Can not access a needed shared library",
+/* ELIBBAD 84 */	  "Accessing a corrupted shared library",
+/* ELIBSCN 85 */	  ".lib section in a.out corrupted",
+/* ELIBMAX 86 */	  "Attempting to link in too many shared libraries",
+/* ELIBEXEC 87 */	  "Cannot exec a shared library directly",
+/* ENOSYS 88 */		  "Function not implemented",
+/* ENMFILE 89 */	  "No more files",
+/* ENOTEMPTY 90	*/	  "Directory not empty",
+/* ENAMETOOLONG 91 */	  "File name too long",
+/* ELOOP 92 */		  "Too many levels of symbolic links",
+		  	  "error 93",
+		  	  "error 94",
+/* EOPNOTSUPP 95 */	  "Operation not supported",
+/* EPFNOSUPPORT 96 */	  "Protocol family not supported",
+		  	  "error 97",
+		  	  "error 98",
+		  	  "error 99",
+		  	  "error 100",
+		  	  "error 101",
+		  	  "error 102",
+		  	  "error 103",
+/* ECONNRESET 104 */	  "Connection reset by peer",
+/* ENOBUFS 105 */	  "No buffer space available",
+/* EAFNOSUPPORT 106 */	  "Address family not supported by protocol",
+/* EPROTOTYPE 107 */	  "Protocol wrong type for socket",
+/* ENOTSOCK 108 */ 	  "Socket operation on non-socket",
+/* ENOPROTOOPT 109 */	  "Protocol not available",
+/* ESHUTDOWN 110 */	  "Cannot send after transport endpoint shutdown",
+/* ECONNREFUSED 111 */	  "Connection refused",
+/* EADDRINUSE 112 */	  "Address already in use",
+/* ECONNABORTED 113 */	  "Software caused connection abort",
+/* ENETUNREACH 114 */	  "Network is unreachable",
+/* ENETDOWN 115 */	  "Network is down",
+/* ETIMEDOUT 116 */	  "Connection timed out",
+/* EHOSTDOWN 117 */	  "Host is down",
+/* EHOSTUNREACH 118 */	  "No route to host",
+/* EINPROGRESS 119 */	  "Operation now in progress",
+/* EALREADY 120 */	  "Operation already in progress",
+/* EDESTADDRREQ 121 */	  "Destination address required",
+/* EMSGSIZE 122 */	  "Message too long",
 /* EPROTONOSUPPORT 123 */ "Protocol not supported",
 /* ESOCKTNOSUPPORT 124 */ "Socket type not supported",
-/* EADDRNOTAVAIL 125 */ "Cannot assign requested address",
-/* ENETRESET 126 */ "Network dropped connection because of reset",
-/* EISCONN 127 */ "Transport endpoint is already connected",
-/* ENOTCONN 128 */ "Transport endpoint is not connected",
-/* ETOOMANYREFS 129 */ "Too many references: cannot splice",
-/* EPROCLIM 130 */ "Process limit exceeded",
-/* EUSERS 131 */ "Too many users",
-/* EDQUOT 132 */ "Quota exceeded",
-/* ESTALE 133 */ "Stale NFS file handle",
-/* ENOTSUP 134 */   "134",
-/* ENOMEDIUM 135 */ "no medium",
-/* ENOSHARE 136 */   "No such host or network path",
-/* ECASECLASH 137 */ "Filename exists with different case",
-/* EILSEQ 138 */ "Illegal byte sequence",
-/* EOVERFLOW 139 */ "Value too large for defined data type"
+/* EADDRNOTAVAIL 125 */	  "Cannot assign requested address",
+/* ENETRESET 126 */	  "Network dropped connection on reset",
+/* EISCONN 127 */	  "Transport endpoint is already connected",
+/* ENOTCONN 128 */	  "Transport endpoint is not connected",
+/* ETOOMANYREFS 129 */	  "Too many references: cannot splice",
+/* EPROCLIM 130 */	  "Too many processes",
+/* EUSERS 131 */	  "Too many users",
+/* EDQUOT 132 */	  "Disk quota exceeded",
+/* ESTALE 133 */	  "Stale NFS file handle",
+/* ENOTSUP 134 */  	  "Not supported",
+/* ENOMEDIUM 135 */	  "No medium found",
+/* ENOSHARE 136 */  	  "No such host or network path",
+/* ECASECLASH 137 */	  "Filename exists with different case",
+/* EILSEQ 138 */	  "Invalid or incomplete multibyte or wide character",
+/* EOVERFLOW 139 */	  "Value too large for defined data type"
 };
 
 int NO_COPY_INIT _sys_nerr = sizeof (_sys_errlist) / sizeof (_sys_errlist[0]);
@@ -322,378 +322,10 @@ strerror (int errnum)
   if (errnum < _sys_nerr)
     error = _sys_errlist [errnum];
   else
-  switch (errnum)
     {
-    case EPERM:
-      error = "Operation not permitted";
-      break;
-    case ENOENT:
-      error = "No such file or directory";
-      break;
-    case ESRCH:
-      error = "No such process";
-      break;
-    case EINTR:
-      error = "Interrupted system call";
-      break;
-    case EIO:
-      error = "I/O error";
-      break;
-    case ENXIO:
-      error = "No such device or address";
-      break;
-    case E2BIG:
-      error = "Arg list too long";
-      break;
-    case ENOEXEC:
-      error = "Exec format error";
-      break;
-    case EBADF:
-      error = "Bad file descriptor";
-      break;
-    case ECHILD:
-      error = "No children";
-      break;
-    case EAGAIN:
-      error = "Resource temporarily unavailable";
-      break;
-    case ENOMEM:
-      error = "Not enough memory";
-      break;
-    case EACCES:
-      error = "Permission denied";
-      break;
-    case EFAULT:
-      error = "Bad address";
-      break;
-    case ENOTBLK:
-      error = "Block device required";
-      break;
-    case EBUSY:
-      error = "Device or resource busy";
-      break;
-    case EEXIST:
-      error = "File exists";
-      break;
-    case EXDEV:
-      error = "Cross-device link";
-      break;
-    case ENODEV:
-      error = "No such device";
-      break;
-    case ENOTDIR:
-      error = "Not a directory";
-      break;
-    case EISDIR:
-      error = "Is a directory";
-      break;
-    case EINVAL:
-      error = "Invalid argument";
-      break;
-    case ENFILE:
-      error = "Too many open files in system";
-      break;
-    case EMFILE:
-      error = "Too many open files";
-      break;
-    case ENOTTY:
-      error = "Not a character device";
-      break;
-    case ETXTBSY:
-      error = "Text file busy";
-      break;
-    case EFBIG:
-      error = "File too large";
-      break;
-    case ENOSPC:
-      error = "No space left on device";
-      break;
-    case ESPIPE:
-      error = "Illegal seek";
-      break;
-    case EROFS:
-      error = "Read-only file system";
-      break;
-    case EMLINK:
-      error = "Too many links";
-      break;
-    case EPIPE:
-      error = "Broken pipe";
-      break;
-    case EDOM:
-      error = "Math arg out of domain of func";
-      break;
-    case ERANGE:
-      error = "Math result out of range";
-      break;
-    case ENOMSG:
-      error = "No message of desired type";
-      break;
-    case EIDRM:
-      error = "Identifier removed";
-      break;
-    case ECHRNG:
-      error = "Channel number out of range";
-      break;
-    case EL2NSYNC:
-      error = "Level 2 not synchronized";
-      break;
-    case EL3HLT:
-      error = "Level 3 halted";
-      break;
-    case EL3RST:
-      error = "Level 3 reset";
-      break;
-    case ELNRNG:
-      error = "Link number out of range";
-      break;
-    case EUNATCH:
-      error = "Protocol driver not attached";
-      break;
-    case ENOCSI:
-      error = "No CSI structure available";
-      break;
-    case EL2HLT:
-      error = "Level 2 halted";
-      break;
-    case EDEADLK:
-      error = "Deadlock condition";
-      break;
-    case ENOLCK:
-      error = "No lock";
-      break;
-    case EBADE:
-      error = "Invalid exchange";
-      break;
-    case EBADR:
-      error = "Invalid request descriptor";
-      break;
-    case EXFULL:
-      error = "Exchange full";
-      break;
-    case ENOANO:
-      error = "No anode";
-      break;
-    case EBADRQC:
-      error = "Invalid request code";
-      break;
-    case EBADSLT:
-      error = "Invalid slot";
-      break;
-    case EDEADLOCK:
-      error = "File locking deadlock error";
-      break;
-    case EBFONT:
-      error = "Bad font file fmt";
-      break;
-    case ENOSTR:
-      error = "Not a stream";
-      break;
-    case ENODATA:
-      error = "No data (for no delay io)";
-      break;
-    case ETIME:
-      error = "Stream ioctl timeout";
-      break;
-    case ENOSR:
-      error = "No stream resources";
-      break;
-    case ENONET:
-      error = "Machine is not on the network";
-      break;
-    case ENOPKG:
-      error = "No package";
-      break;
-    case EREMOTE:
-      error = "Resource is remote";
-      break;
-    case ENOLINK:
-      error = "Virtual circuit is gone";
-      break;
-    case EADV:
-      error = "Advertise error";
-      break;
-    case ESRMNT:
-      error = "Srmount error";
-      break;
-    case ECOMM:
-      error = "Communication error";
-      break;
-    case EPROTO:
-      error = "Protocol error";
-      break;
-    case EMULTIHOP:
-      error = "Multihop attempted";
-      break;
-    case ELBIN:
-      error = "Inode is remote (not really error)";
-      break;
-    case EDOTDOT:
-      error = "Cross mount point (not really error)";
-      break;
-    case EBADMSG:
-      error = "Bad message";
-      break;
-    case ENOTUNIQ:
-      error = "Given log. name not unique";
-      break;
-    case EBADFD:
-      error = "f.d. invalid for this operation";
-      break;
-    case EREMCHG:
-      error = "Remote address changed";
-      break;
-    case ELIBACC:
-      error = "Cannot access a needed shared library";
-      break;
-    case ELIBBAD:
-      error = "Accessing a corrupted shared library";
-      break;
-    case ELIBSCN:
-      error = ".lib section in a.out corrupted";
-      break;
-    case ELIBMAX:
-      error = "Attempting to link in more shared libraries than system limit";
-      break;
-    case ELIBEXEC:
-      error = "Cannot exec a shared library directly";
-      break;
-    case ENOSYS:
-      error = "Function not implemented";
-      break;
-    case ENMFILE:
-      error = "No more files";
-      break;
-    case ENOTEMPTY:
-      error = "Directory not empty";
-      break;
-    case ENAMETOOLONG:
-      error = "File or path name too long";
-      break;
-    case ELOOP:
-      error = "Too many symbolic links";
-      break;
-    case EOPNOTSUPP:
-      error = "Operation not supported on transport endpoint";
-      break;
-    case EPFNOSUPPORT:
-      error = "Protocol family not supported";
-      break;
-    case ECONNRESET:
-      error = "Connection reset by peer";
-      break;
-    case ENOBUFS:
-      error = "No buffer space available; the socket cannot be connected";
-      break;
-    case EAFNOSUPPORT:
-      error = "Addresses in the specified family cannot be used with this socket";
-      break;
-    case EPROTOTYPE:
-      error = "errno EPROTOTYPE triggered";
-      break;
-    case ENOTSOCK:
-      error = "The descriptor is a file, not a socket";
-      break;
-    case ENOPROTOOPT:
-      error = "This option is unsupported";
-      break;
-    case ESHUTDOWN:
-      error = "errno ESHUTDOWN triggered";
-      break;
-    case ECONNREFUSED:
-      error = "Connection refused";
-      break;
-    case EADDRINUSE:
-      error = "Address already in use";
-      break;
-    case ECONNABORTED:
-      error = "The connection was aborted";
-      break;
-    case ENETUNREACH:
-      error ="The network can't be reached from this host at this time";
-      break;
-    case ENETDOWN:
-      error = "Network failed.";
-      break;
-    case ETIMEDOUT:
-      error = "Attempt to connect timed out without establishing a connection";
-      break;
-    case EHOSTDOWN:
-      error = "errno EHOSTDOWN triggered";
-      break;
-    case EHOSTUNREACH:
-      error = "errno EHOSTUNREACH triggered";
-      break;
-    case EINPROGRESS:
-      error = "errno EINPROGRESS triggered";
-      break;
-    case EALREADY:
-      error = "errno EALREADY triggered";
-      break;
-    case EDESTADDRREQ:
-      error = "errno EDESTADDRREQ triggered";
-      break;
-    case EMSGSIZE:
-      error = "errno EMSGSIZE triggered";
-      break;
-
-    case EPROTONOSUPPORT:
-      error = "errno EPROTONOSUPPORT triggered";
-      break;
-    case ESOCKTNOSUPPORT:
-      error = "errno ESOCKTNOSUPPORT triggered";
-      break;
-    case EADDRNOTAVAIL:
-      error = "errno EADDRNOTAVAIL triggered";
-      break;
-    case ENETRESET:
-      error = "errno ENETRESET triggered";
-      break;
-    case EISCONN:
-      error = "The socket is already connected";
-      break;
-    case ENOTCONN:
-      error = "The socket is not connected";
-      break;
-    case ETOOMANYREFS:
-      error = "errno ETOOMANYREFS triggered";
-      break;
-    case EPROCLIM:
-      error = "errno EPROCLIM triggered";
-      break;
-    case EUSERS:
-      error = "errno EUSERS triggered";
-      break;
-    case EDQUOT:
-      error = "errno EDQUOT triggered";
-      break;
-    case ESTALE:
-      error = "errno ESTALE triggered";
-      break;
-    case ENOTSUP:
-      error = "errno ENOTSUP triggered";
-      break;
-    case ENOMEDIUM:
-      error = "no medium";
-      break;
-    case ENOSHARE:
-      error = "No such host or network path";
-      break;
-    case ECASECLASH:
-      error = "Filename exists with different case";
-      break;
-    case EILSEQ:
-      error = "Illegal byte sequence";
-      break;
-    case EOVERFLOW:
-      error = "Value too large for defined data type";
-      break;
-    default:
       __small_sprintf (_my_tls.locals.strerror_buf, "error %d", errnum);
       error = _my_tls.locals.strerror_buf;
-      break;
     }
-
   /* FIXME: strerror should really be const in the appropriate newlib
      include files. */
   return (char *) error;
