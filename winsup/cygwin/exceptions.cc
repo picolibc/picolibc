@@ -614,7 +614,7 @@ sig_handle_tty_stop (int sig)
      its list of subprocesses.  */
   if (my_parent_is_alive ())
     {
-      pinfo parent (myself->ppid);
+      pinfo parent (myself->ppid, PID_MAP_RW);
       if (NOTSTATE (parent, PID_NOCLDSTOP))
 	sig_send (parent, SIGCHLD);
     }

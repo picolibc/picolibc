@@ -173,7 +173,7 @@ kill_worker (pid_t pid, int sig)
   sig_dispatch_pending ();
 
   int res = 0;
-  pinfo dest (pid);
+  pinfo dest (pid, PID_MAP_RW);
   BOOL sendSIGCONT;
 
   if (!dest)

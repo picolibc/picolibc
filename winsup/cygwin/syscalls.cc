@@ -1961,7 +1961,7 @@ setpgid (pid_t pid, pid_t pgid)
     }
   else
     {
-      pinfo p (pid);
+      pinfo p (pid, PID_MAP_RW);
       if (!p)
 	{
 	  set_errno (ESRCH);

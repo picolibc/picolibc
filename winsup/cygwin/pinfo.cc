@@ -89,7 +89,7 @@ pinfo_init (char **envp, int envc)
       myself->pgid = myself->sid = myself->pid;
       myself->ctty = -1;
       myself->uid = ILLEGAL_UID;
-
+      myself->gid = UNKNOWN_GID;
       environ_init (NULL, 0);	/* call after myself has been set up */
     }
 
@@ -138,6 +138,8 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
     }
 
   int createit = flag & (PID_IN_USE | PID_EXECED);
+  DWORD access = FILE_MAP_READ
+                 | (flag & (PID_IN_USE | PID_EXECED | PID_MAP_RW) ? FILE_MAP_WRITE : 0);
   for (int i = 0; i < 10; i++)
     {
       int created;
@@ -157,7 +159,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
 	}
       else if (!createit)
 	{
-	  h = OpenFileMappingA (FILE_MAP_READ | FILE_MAP_WRITE, FALSE, mapname);
+	  h = OpenFileMappingA (access, FALSE, mapname);
 	  created = 0;
 	}
       else
@@ -175,8 +177,7 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
 	  return;
 	}
 
-      procinfo = (_pinfo *) MapViewOfFileEx (h, FILE_MAP_READ | FILE_MAP_WRITE,
-					     0, 0, 0, mapaddr);
+      procinfo = (_pinfo *) MapViewOfFileEx (h, access, 0, 0, 0, mapaddr);
       ProtectHandle1 (h, pinfo_shared_handle);
 
       if ((procinfo->process_state & PID_INITIALIZING) && (flag & PID_NOREDIR)

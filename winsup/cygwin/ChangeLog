@@ -1,3 +1,13 @@
+2003-09-13  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* include/sys/cygwin.h: Rename PID_UNUSED to PID_MAP_RW.
+	* pinfo.cc (pinfo_init): Initialize myself->gid.
+	(pinfo::init): Create the "access" variable, set it appropriately and
+	use it to specify the requested access.
+	* exceptions.cc (sig_handle_tty_stop): Add PID_MAP_RW in pinfo parent.
+	* signal.cc (kill_worker): Ditto for pinfo dest.
+	* syscalls.cc (setpgid): Ditto for pinfo p.
+
 2003-09-13  Christopher Faylor  <cgf@redhat.com>
 
 	* include/cygwin/version.h: Bump DLL minor number to 5.

@@ -89,7 +89,7 @@ enum
   PID_ORPHANED	       = 0x0020, /* Member of an orphaned process group. */
   PID_ACTIVE	       = 0x0040, /* Pid accepts signals. */
   PID_CYGPARENT	       = 0x0080, /* Set if parent was a cygwin app. */
-  PID_UNUSED	       = 0x0100, /* ... */
+  PID_MAP_RW	       = 0x0100, /* Flag to open map rw. */
   PID_MYSELF	       = 0x0200, /* Flag that pid is me. */
   PID_NOCLDSTOP	       = 0x0400, /* Set if no SIGCHLD signal on stop. */
   PID_INITIALIZING     = 0x0800, /* Set until ready to receive signals. */
