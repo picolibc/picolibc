@@ -17,14 +17,17 @@
 
 /*
 FUNCTION
-<<fseek>>---set file position
+<<fseek>>, <<fseeko>>---set file position
 
 INDEX
 	fseek
+INDEX
+	fseeko
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	int fseek(FILE *<[fp]>, long <[offset]>, int <[whence]>)
+	int fseeko(FILE *<[fp]>, off_t <[offset]>, int <[whence]>)
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
@@ -33,12 +36,17 @@ TRAD_SYNOPSIS
 	long <[offset]>;
 	int <[whence]>;
 
+	int fseeko(<[fp]>, <[offset]>, <[whence]>)
+	FILE *<[fp]>;
+	off_t <[offset]>;
+	int <[whence]>;
+
 DESCRIPTION
 Objects of type <<FILE>> can have a ``position'' that records how much
 of the file your program has already read.  Many of the <<stdio>> functions
 depend on this position, and many change it as a side effect.
 
-You can use <<fseek>> to set the position for the file identified by
+You can use <<fseek>>/<<fseeko>> to set the position for the file identified by
 <[fp]>.  The value of <[offset]> determines the new position, in one
 of three ways selected by the value of <[whence]> (defined as macros
 in `<<stdio.h>>'):
@@ -53,16 +61,18 @@ from the beginning of the file) desired.  <[offset]> must be positive.
 <[offset]> can meaningfully be either positive (to increase the size
 of the file) or negative.
 
-See <<ftell>> to determine the current file position.
+See <<ftell>>/<<ftello>> to determine the current file position.
 
 RETURNS
-<<fseek>> returns <<0>> when successful.  If <<fseek>> fails, the
+<<fseek>>/<<fseeko>> return <<0>> when successful.  On failure, the
 result is <<EOF>>.  The reason for failure is indicated in <<errno>>:
 either <<ESPIPE>> (the stream identified by <[fp]> doesn't support
 repositioning) or <<EINVAL>> (invalid file position).
 
 PORTABILITY
 ANSI C requires <<fseek>>.
+
+<<fseeko>> is defined by the Single Unix specification.
 
 Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.

@@ -1,5 +1,15 @@
 2002-07-04  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/include/stdio.h: Add new prototypes.
+	* libc/stdio/Makefile.am: Add fseeko.c and ftello.c.
+	* libc/stdio/Makefile.in: Regenerated.
+	* libc/stdio/fseek.c: Add fseeko documentation.
+	* libc/stdio/ftell.c: Add ftello documentation.
+	* libc/stdio/fseeko.c: New file.
+	* libc/stdio/ftello.c: New file.
+
+2002-07-04  Jeff Johnston  <jjohnstn@redhat.com>
+
         * libc/stdio/Makefile.am: Add asprintf.c and vasprintf.c.
         * libc/stdio/Makefile.in: Regenerated.
         * libc/stdio/asprintf.c: New file.

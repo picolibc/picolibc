@@ -199,6 +199,8 @@ int	_EXFUN(rename, (const char *, const char *));
 #endif
 #ifndef __STRICT_ANSI__
 int	_EXFUN(asprintf, (char **, const char *, ...));
+int	_EXFUN(fseeko, (FILE *, off_t, int));
+off_t	_EXFUN(ftello, ( FILE *));
 int	_EXFUN(vfiprintf, (FILE *, const char *, __VALIST));
 int	_EXFUN(iprintf, (const char *, ...));
 int	_EXFUN(fiprintf, (FILE *, const char *, ...));

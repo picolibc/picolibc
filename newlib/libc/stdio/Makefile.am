@@ -27,8 +27,10 @@ LIB_SOURCES = \
 	freopen.c 			\
 	fscanf.c 			\
 	fseek.c 			\
+	fseeko.c 			\
 	fsetpos.c 			\
 	ftell.c 			\
+	ftello.c 			\
 	fvwrite.c 			\
 	fwalk.c 			\
 	fwrite.c 			\

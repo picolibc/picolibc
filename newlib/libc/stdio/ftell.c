@@ -17,18 +17,24 @@
 
 /*
 FUNCTION
-<<ftell>>---return position in a stream or file
+<<ftell>>, <<ftello>>---return position in a stream or file
 
 INDEX
 	ftell
+INDEX
+	ftello
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
 	long ftell(FILE *<[fp]>);
+	off_t ftello(FILE *<[fp]>);
 
 TRAD_SYNOPSIS
 	#include <stdio.h>
 	long ftell(<[fp]>)
+	FILE *<[fp]>;
+
+	off_t ftello(<[fp]>)
 	FILE *<[fp]>;
 
 DESCRIPTION
@@ -36,18 +42,19 @@ Objects of type <<FILE>> can have a ``position'' that records how much
 of the file your program has already read.  Many of the <<stdio>> functions
 depend on this position, and many change it as a side effect.
 
-The result of <<ftell>> is the current position for a file
+The result of <<ftell>>/<<ftello>> is the current position for a file
 identified by <[fp]>.  If you record this result, you can later
-use it with <<fseek>> to return the file to this
-position.
+use it with <<fseek>>/<<fseeko>> to return the file to this
+position.  The difference between <<ftell>> and <<ftello>> is that
+<<ftell>> returns <<long>> and <<ftello> returns <<off_t>>.
 
-In the current implementation, <<ftell>> simply uses a character
+In the current implementation, <<ftell>>/<<ftello>> simply uses a character
 count to represent the file position; this is the same number that
 would be recorded by <<fgetpos>>.
 
 RETURNS
-<<ftell>> returns the file position, if possible.  If it cannot do
-this, it returns <<-1L>>.  Failure occurs on streams that do not support
+<<ftell>>/<<ftello>> return the file position, if possible.  If they cannot do
+this, they return <<-1L>>.  Failure occurs on streams that do not support
 positioning; the global <<errno>> indicates this condition with the
 value <<ESPIPE>>.
 
@@ -57,6 +64,8 @@ result (when successful) is not specified beyond requiring that it be
 acceptable as an argument to <<fseek>>.  In particular, other
 conforming C implementations may return a different result from
 <<ftell>> than what <<fgetpos>> records.
+
+<<ftello>> is defined by the Single Unix specification.
 
 No supporting OS subroutines are required.
 */
