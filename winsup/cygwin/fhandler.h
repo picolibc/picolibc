@@ -78,6 +78,12 @@ enum query_state {
   query_write_attributes = 4
 };
 
+enum change_state {
+  no_change = 0,
+  inode_changed = 1,
+  data_changed = 2
+};
+
 class fhandler_base
 {
   friend class dtable;
@@ -100,14 +106,14 @@ class fhandler_base
 					read or write access */
     unsigned close_on_exec      : 1; /* close-on-exec */
     unsigned need_fork_fixup    : 1; /* Set if need to fixup after fork. */
-    unsigned has_changed	: 1; /* Flag used to set ctime on close. */
+    unsigned has_changed	: 2; /* Flag used to set ctime on close. */
 
    public:
     status_flags () :
       rbinary (0), rbinset (0), wbinary (0), wbinset (0), nohandle (0),
       uninterruptible_io (0), append_mode (0), did_lseek (0),
       query_open (no_query), close_on_exec (0), need_fork_fixup (0),
-      has_changed (0)
+      has_changed (no_change)
       {}
   } status, open_status;
 
@@ -188,7 +194,7 @@ class fhandler_base
   IMPLEMENT_STATUS_FLAG (query_state, query_open)
   IMPLEMENT_STATUS_FLAG (bool, close_on_exec)
   IMPLEMENT_STATUS_FLAG (bool, need_fork_fixup)
-  IMPLEMENT_STATUS_FLAG (bool, has_changed)
+  IMPLEMENT_STATUS_FLAG (change_state, has_changed)
 
   int get_default_fmode (int flags);
 

@@ -391,10 +391,13 @@ fhandler_disk_file::touch_ctime (void)
   FILETIME ft;
 
   GetSystemTimeAsFileTime (&ft);
-  if (!SetFileTime (get_io_handle (), &ft, NULL, NULL))
+  /* Modification time is touched if the file data has changed as well.
+     This happens for instance on write() or ftruncate(). */
+  if (!SetFileTime (get_io_handle (), &ft, NULL,
+		    has_changed () == data_changed ? &ft : NULL))
     debug_printf ("SetFileTime (%s) failed, %E", get_win32_name ());
   else
-    has_changed (false);
+    has_changed (no_change);
 }
 
 int __stdcall
@@ -407,15 +410,16 @@ fhandler_disk_file::fchmod (mode_t mode)
   if (pc.is_fs_special ())
     return chmod_device (pc, mode);
 
+  /* Also open on 9x, otherwise we can't touch ctime. */
+  if (!get_io_handle ())
+    {
+      query_open (query_write_control);
+      if (!(oret = open (O_BINARY, 0)))
+	return -1;
+    }
+
   if (wincap.has_security ())
     {
-      if (!get_io_handle () && pc.has_acls ())
-	{
-	  query_open (query_write_control);
-	  if (!(oret = open (O_BINARY, 0)))
-	    return -1;
-	}
-
       if (!allow_ntsec && allow_ntea) /* Not necessary when manipulating SD. */
 	SetFileAttributes (pc, (DWORD) pc & ~FILE_ATTRIBUTE_READONLY);
       if (pc.isdir ())
@@ -440,7 +444,7 @@ fhandler_disk_file::fchmod (mode_t mode)
 
   /* Set ctime on success. */
   if (!res)
-    has_changed (true);
+    has_changed (inode_changed);
 
   if (oret)
     close ();
@@ -477,7 +481,7 @@ fhandler_disk_file::fchown (__uid32_t uid, __gid32_t gid)
 				uid, gid, attrib);
       /* Set ctime on success. */
       if (!res)
-	has_changed (true);
+	has_changed (inode_changed);
     }
 
   if (oret)
@@ -574,7 +578,7 @@ fhandler_disk_file::facl (int cmd, int nentries, __aclent32_t *aclbufp)
 
   /* Set ctime on success. */
   if (!res && cmd == SETACL)
-    has_changed (true);
+    has_changed (inode_changed);
 
   if (oret)
     close ();
@@ -624,7 +628,7 @@ fhandler_disk_file::ftruncate (_off64_t length)
 	  lseek (prev_loc, SEEK_SET);
 	  /* Set ctime on success. */
 	  if (!res)
-	    has_changed (true);
+	    has_changed (data_changed);
 	}
     }
   return res;
@@ -757,7 +761,7 @@ fhandler_disk_file::link (const char *newpath)
 
     success:
       /* Set ctime on success. */
-      has_changed (true);
+      has_changed (inode_changed);
       close ();
       if (!allow_winsymlinks && pc.is_lnk_symlink ())
 	SetFileAttributes (newpc, (DWORD) pc
@@ -773,13 +777,13 @@ docopy:
       return -1;
     }
   /* Set ctime on success, also on the copy. */
-  has_changed (true);
+  has_changed (inode_changed);
   close ();
   fhandler_disk_file fh (newpc);
   fh.query_open (query_write_attributes);
   if (fh.open (O_BINARY, 0))
     {
-      fh.has_changed (true);
+      fh.has_changed (inode_changed);
       fh.close ();
     }
   return 0;
@@ -895,7 +899,7 @@ fhandler_base::open_fs (int flags, mode_t mode)
 
   /* O_TRUNC on existing file requires setting ctime. */
   if ((flags & (O_CREAT | O_TRUNC)) == O_TRUNC)
-    has_changed (true);
+    has_changed (data_changed);
 
   set_fs_flags (pc.fs_flags ());
 

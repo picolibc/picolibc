@@ -770,7 +770,8 @@ dll_crt0_1 (char *)
   pinfo_init (envp, envc);
 
   /* Can be set only after environment has been initialized. */
-  set_cygwin_privileges (hProcImpToken);
+  if (wincap.has_security ())
+    set_cygwin_privileges (hProcImpToken);
 
   if (!old_title && GetConsoleTitle (title_buf, TITLESIZE))
       old_title = title_buf;
