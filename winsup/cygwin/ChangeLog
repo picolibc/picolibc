@@ -1,3 +1,7 @@
+2003-10-27  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.h (fast_mutex::init): Initialize lock_counter.
+
 2003-10-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (OBSOLETE_FUNCTION):  Add tmpfile.

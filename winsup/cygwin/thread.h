@@ -140,6 +140,7 @@ public:
 
   bool init ()
   {
+    lock_counter = 0;
     win32_obj_id = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
     if (!win32_obj_id)
       {
