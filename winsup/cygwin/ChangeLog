@@ -1,3 +1,18 @@
+2004-06-17  Pierre Humblet <pierre.humblet@ieee.org>
+ 
+	* fhandler.cc (fhandler_base::open_9x): Do not check for null name.
+	Move debug_printf to common code line.
+	(fhandler_base::open): Ditto. Initialize upath. Remove second argument
+	of pc.get_nt_native_path.
+	* path.h (path_conv::get_nt_native_path): Remove second argument.
+	* path.cc (path_conv::get_nt_native_path): Ditto. Call str2uni_cat.
+	* security.h (str2buf2uni_cat): Delete declaration.
+	(str2uni_cat): New declaration.
+	* security.cc (str2buf2uni): Get length from sys_mbstowcs call.
+	(str2buf2uni_cat): Delete function.
+	(str2uni_cat): New function.
+	* miscfuncs.cc (sys_mbstowcs): Add debug_printf.
+
 2004-06-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::open): Substitute FILE_SUPERSEDE with

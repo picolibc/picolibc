@@ -156,23 +156,28 @@ str2buf2lsa (LSA_STRING &tgt, char *buf, const char *srcstr)
   memcpy (buf, srcstr, tgt.MaximumLength);
 }
 
+/* The dimension of buf is assumed to be at least strlen(srcstr) + 1,
+   The result will be shorter if the input has multibyte chars */
 void
 str2buf2uni (UNICODE_STRING &tgt, WCHAR *buf, const char *srcstr)
 {
-  tgt.Length = strlen (srcstr) * sizeof (WCHAR);
-  tgt.MaximumLength = tgt.Length + sizeof (WCHAR);
   tgt.Buffer = (PWCHAR) buf;
-  sys_mbstowcs (buf, srcstr, tgt.MaximumLength);
+  tgt.MaximumLength = (strlen (srcstr) + 1) * sizeof (WCHAR);
+  tgt.Length = sys_mbstowcs (buf, srcstr, tgt.MaximumLength / sizeof (WCHAR)) 
+               * sizeof (WCHAR);
+  if (tgt.Length)
+    tgt.Length -= sizeof (WCHAR);
 }
 
 void
-str2buf2uni_cat (UNICODE_STRING &tgt, const char *srcstr)
+str2uni_cat (UNICODE_STRING &tgt, const char *srcstr)
 {
-  DWORD len = strlen (srcstr) * sizeof (WCHAR);
-  sys_mbstowcs (tgt.Buffer + tgt.Length / sizeof (WCHAR), srcstr,
-		len + tgt.MaximumLength);
-  tgt.Length += len;
-  tgt.MaximumLength += len;
+  int len = sys_mbstowcs (tgt.Buffer + tgt.Length / sizeof (WCHAR), srcstr,
+		          (tgt.MaximumLength - tgt.Length) / sizeof (WCHAR));
+  if (len)
+    tgt.Length += (len - 1) * sizeof (WCHAR);
+  else
+    tgt.Length = tgt.MaximumLength = 0;
 }
 
 #if 0				/* unused */

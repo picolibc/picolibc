@@ -312,7 +312,10 @@ sys_wcstombs (char *tgt, const WCHAR *src, int len)
 int __stdcall
 sys_mbstowcs (WCHAR *tgt, const char *src, int len)
 {
-  return MultiByteToWideChar (get_cp (), 0, src, -1, tgt, len);
+  int res = MultiByteToWideChar (get_cp (), 0, src, -1, tgt, len);
+  if (!res)
+    debug_printf ("MultiByteToWideChar %E");
+  return res;
 }
 
 extern "C" int

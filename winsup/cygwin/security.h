@@ -276,7 +276,7 @@ int setacl (HANDLE, const char *, int, __acl32 *);
 
 struct _UNICODE_STRING;
 void __stdcall str2buf2uni (_UNICODE_STRING &, WCHAR *, const char *) __attribute__ ((regparm (3)));
-void __stdcall str2buf2uni_cat (_UNICODE_STRING &, const char *) __attribute__ ((regparm (2)));
+void __stdcall str2uni_cat (_UNICODE_STRING &, const char *) __attribute__ ((regparm (2)));
 
 /* Try a subauthentication. */
 HANDLE subauth (struct passwd *pw);

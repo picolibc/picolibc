@@ -437,12 +437,6 @@ fhandler_base::open_9x (int flags, mode_t mode)
 
   syscall_printf ("(%s, %p)", get_win32_name (), flags);
 
-  if (get_win32_name () == NULL)
-    {
-      set_errno (ENOENT);
-      goto done;
-    }
-
   if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDONLY)
     access = GENERIC_READ;
   else if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_WRONLY)
@@ -512,16 +506,16 @@ fhandler_base::open_9x (int flags, mode_t mode)
 	goto done;
    }
 
-  syscall_printf ("%p = CreateFile (%s, %p, %p, %p, %p, %p, 0)",
-		  x, get_win32_name (), access, shared, &sa,
-		  creation_distribution, file_attributes);
-
   set_io_handle (x);
   set_flags (flags, pc.binmode ());
 
   res = 1;
   set_open_status ();
 done:
+  debug_printf ("%p = CreateFile (%s, %p, %p, %p, %p, %p, 0)",
+		x, get_win32_name (), access, shared, &sa,
+		creation_distribution, file_attributes);
+
   syscall_printf ("%d = fhandler_base::open (%s, %p)", res, get_win32_name (),
 		  flags);
   return res;
@@ -534,11 +528,11 @@ fhandler_base::open (int flags, mode_t mode)
   if (!wincap.is_winnt ())
     return fhandler_base::open_9x (flags, mode);
 
-  UNICODE_STRING upath;
   WCHAR wpath[CYG_MAX_PATH + 10];
-  pc.get_nt_native_path (upath, wpath);
+  UNICODE_STRING upath = {0, sizeof (wpath), wpath};
+  pc.get_nt_native_path (upath);
 
-  if (RtlIsDosDeviceName_U (wpath))
+  if (RtlIsDosDeviceName_U (upath.Buffer))
     return fhandler_base::open_9x (flags, mode);
 
   int res = 0;
@@ -554,11 +548,6 @@ fhandler_base::open (int flags, mode_t mode)
   NTSTATUS status;
 
   syscall_printf ("(%s, %p)", get_win32_name (), flags);
-  if (get_win32_name () == NULL)
-    {
-      set_errno (ENOENT);
-      goto done;
-    }
 
   InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
 			      sa.lpSecurityDescriptor, NULL);
@@ -657,17 +646,17 @@ fhandler_base::open (int flags, mode_t mode)
 	goto done;
    }
 
-  syscall_printf ("%x = NtCreateFile "
-		  "(%p, %x, %s, io, NULL, %x, %x, %x, %x, NULL, 0)",
-		  status, x, access, get_win32_name (), file_attributes, shared,
-		  create_disposition, create_options);
-
   set_io_handle (x);
   set_flags (flags, pc.binmode ());
 
   res = 1;
   set_open_status ();
 done:
+  debug_printf ("%x = NtCreateFile "
+		"(%p, %x, %s, io, NULL, %x, %x, %x, %x, NULL, 0)",
+		status, x, access, get_win32_name (), file_attributes, shared,
+		create_disposition, create_options);
+
   syscall_printf ("%d = fhandler_base::open (%s, %p)", res, get_win32_name (),
 		  flags);
   return res;

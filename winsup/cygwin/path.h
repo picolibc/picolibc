@@ -192,7 +192,7 @@ class path_conv
 
   ~path_conv ();
   inline char *get_win32 () { return path; }
-  PUNICODE_STRING get_nt_native_path (UNICODE_STRING &upath, WCHAR *wpath);
+  PUNICODE_STRING get_nt_native_path (UNICODE_STRING &upath);
   operator char *() {return path;}
   operator const char *() {return path;}
   operator DWORD &() {return fileattr;}

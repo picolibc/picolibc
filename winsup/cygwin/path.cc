@@ -459,25 +459,25 @@ path_conv::set_normalized_path (const char *path_copy)
 }
 
 PUNICODE_STRING
-path_conv::get_nt_native_path (UNICODE_STRING &upath, WCHAR *wpath)
+path_conv::get_nt_native_path (UNICODE_STRING &upath)
 {
   if (path[0] != '\\')			/* X:\...  or NUL, etc. */
     {
-      str2buf2uni (upath, wpath, "\\??\\");
-      str2buf2uni_cat (upath, path);
+      str2uni_cat (upath, "\\??\\");
+      str2uni_cat (upath, path);
     }
   else if (path[1] != '\\')		/* \Device\... */
-    str2buf2uni (upath, wpath, path);
+    str2uni_cat (upath, path);
   else if (path[2] != '.'
 	   || path[3] != '\\')		/* \\server\share\... */
     {
-      str2buf2uni (upath, wpath, "\\??\\UNC\\");
-      str2buf2uni_cat (upath, path + 2);
+      str2uni_cat (upath, "\\??\\UNC\\");
+      str2uni_cat (upath, path + 2);
     }
   else					/* \\.\device */
     {
-      str2buf2uni (upath, wpath, "\\??\\");
-      str2buf2uni_cat (upath, path + 4);
+      str2uni_cat (upath, "\\??\\");
+      str2uni_cat (upath, path + 4);
     }
   return &upath;
 }
