@@ -31,6 +31,8 @@ details. */
 #define NEW_MACRO_VARARGS
 #endif
 
+#define _WIN32_WINNT 0x0500
+
 #include <sys/types.h>
 #include <sys/strace.h>
 
