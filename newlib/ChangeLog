@@ -1,3 +1,15 @@
+2000-08-23  Werner Almesberger  <Werner.Almesberger@epfl.ch>
+
+        * libc/stdlib/envlock.c: changed documented "__env_lock" and
+        "__env_unlock" prototype from "void *" or "char *" to
+        "struct _reent *" to match real function.  Also added include
+	of envlock.h.
+        * libc/stdlib/mlock.c: changed documented "__malloc_lock" and
+        "__malloc_unlock" prototype from "void *" or "char *" to
+        "struct _reent *" to match real function.
+        * libc/stdlib/envlock.h: added "__env_lock" and "__env_unlock"
+        prototypes (for getenv_r.c and setenv_r.c).
+
 2000-08-22  Werner Almesberger  <Werner.Almesberger@epfl.ch>
 
 	* libc/unix/getut.c (utmpname): added _CONST to reflect common use

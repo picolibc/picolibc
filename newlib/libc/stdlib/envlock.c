@@ -9,15 +9,15 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include "envlock.h"
-	void __env_lock (void *<[reent]>);
-	void __env_unlock (void *<[reent]>);
+       void __env_lock (struct _reent *<[reent]>);
+       void __env_unlock (struct _reent *<[reent]>);
 
 TRAD_SYNOPSIS
 	void __env_lock(<[reent]>)
-	char *<[reent]>;
+       struct _reent *<[reent]>;
 
 	void __env_unlock(<[reent]>)
-	char *<[reent]>;
+       struct _reent *<[reent]>;
 
 DESCRIPTION
 The <<setenv>> family of routines call these functions when they need
@@ -34,6 +34,9 @@ the sequence of calls may go <<__env_lock>>, <<__env_lock>>,
 routines must be careful to avoid causing a thread to wait for a lock
 that it already holds.
 */
+
+#include "envlock.h"
+
 
 void
 __env_lock (ptr)

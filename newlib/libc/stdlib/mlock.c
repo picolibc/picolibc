@@ -9,15 +9,15 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <malloc.h>
-	void __malloc_lock (void *<[reent]>);
-	void __malloc_unlock (void *<[reent]>);
+	void __malloc_lock (struct _reent *<[reent]>);
+	void __malloc_unlock (struct _reent *<[reent]>);
 
 TRAD_SYNOPSIS
 	void __malloc_lock(<[reent]>)
-	char *<[reent]>;
+	struct _reent *<[reent]>;
 
 	void __malloc_unlock(<[reent]>)
-	char *<[reent]>;
+	struct _reent *<[reent]>;
 
 DESCRIPTION
 The <<malloc>> family of routines call these functions when they need
