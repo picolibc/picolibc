@@ -1350,10 +1350,7 @@ fhandler_dev_tape::raw_read (void *ptr, size_t &ulen)
 	    lastblk_to_read (true);
 	}
     }
-  if (ret)
-    ulen = (size_t) -1;
-  else
-    ulen = bytes_read;
+  ulen = (ret ? (size_t) -1 : bytes_read);
   unlock ();
 }
 
@@ -1366,7 +1363,7 @@ fhandler_dev_tape::raw_write (const void *ptr, size_t len)
   int ret = mt->drive (driveno ())->write (get_handle (), mt_evt, ptr, len);
   if (ret)
     __seterrno_from_win_error (ret);
-  return unlock (len);
+  return unlock (ret ? -1 : (int) len);
 }
 
 _off64_t

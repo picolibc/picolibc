@@ -1,3 +1,9 @@
+2004-08-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_tape.cc (fhandler_dev_tape::raw_read): Use ?: instead of
+	if/else.
+	(fhandler_dev_tape::raw_write): Return -1 in case of error.
+
 2004-08-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* errno.cc (_sys_errlist): Change various text to their english Linux
