@@ -1,3 +1,7 @@
+2004-03-19  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number to 10.
+
 2004-03-18  Christopher Faylor  <cgf@redhat.com>
 
 	* child_info.h (CURR_CHILD_INFO_MAGIC): Reset to new value.
