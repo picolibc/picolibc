@@ -1,5 +1,5 @@
 /* An abstract string datatype.
-   Copyright (C) 1998, 1999, 2000, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2002, 2004 Free Software Foundation, Inc.
    Contributed by Mark Mitchell (mark@markmitchell.com).
 
 This file is part of GCC.
@@ -38,35 +38,6 @@ typedef struct dyn_string
 /* Compare DS1 to DS2 with strcmp.  */
 #define dyn_string_compare(DS1, DS2)                                    \
   (strcmp ((DS1)->s, (DS2)->s))
-
-
-/* dyn_string functions are used in the demangling implementation
-   included in the G++ runtime library.  To prevent collisions with
-   names in user programs, the functions that are used in the
-   demangler are given implementation-reserved names.  */
-
-#if defined(IN_LIBGCC2) || defined(IN_GLIBCPP_V3)
-
-#define dyn_string_init                 __cxa_dyn_string_init
-#define dyn_string_new                  __cxa_dyn_string_new
-#define dyn_string_delete               __cxa_dyn_string_delete
-#define dyn_string_release              __cxa_dyn_string_release
-#define dyn_string_resize               __cxa_dyn_string_resize
-#define dyn_string_clear                __cxa_dyn_string_clear
-#define dyn_string_copy                 __cxa_dyn_string_copy
-#define dyn_string_copy_cstr            __cxa_dyn_string_copy_cstr
-#define dyn_string_prepend              __cxa_dyn_string_prepend
-#define dyn_string_prepend_cstr         __cxa_dyn_string_prepend_cstr
-#define dyn_string_insert               __cxa_dyn_string_insert
-#define dyn_string_insert_cstr          __cxa_dyn_string_insert_cstr
-#define dyn_string_insert_char          __cxa_dyn_string_insert_char
-#define dyn_string_append               __cxa_dyn_string_append
-#define dyn_string_append_cstr          __cxa_dyn_string_append_cstr
-#define dyn_string_append_char          __cxa_dyn_string_append_char
-#define dyn_string_substring            __cxa_dyn_string_substring
-#define dyn_string_eq                   __cxa_dyn_string_eq
-
-#endif /* IN_LIBGCC2 || IN_GLIBCPP_V3 */
 
 
 extern int dyn_string_init              PARAMS ((struct dyn_string *, int));
