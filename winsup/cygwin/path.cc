@@ -693,6 +693,7 @@ is_virtual_symlink:
 		}
 	      fileattr = 0;
 	      dev.parse (FH_UNIX);
+	      dev.setfs (1);
 	      goto out;
 	    }
 
