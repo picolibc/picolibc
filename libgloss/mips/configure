@@ -929,7 +929,7 @@ case "${target}" in
         script_list="idt pmon ddb lsi idtecoff nullmon"
         bsp_list="libidt.a libpmon.a liblsi.a libnullmon.a"
 	;;
-  mipsisa32-*-*)
+  mipsisa32*-*-*)
         part_specific_obj=
         part_specific_defines=
         script_list="idt32 idt64"
