@@ -74,12 +74,14 @@ sleep (unsigned int seconds)
   sigframe thisframe (mainthread);
   DWORD ms, start_time, end_time;
 
+  pthread_testcancel ();
+
   ms = seconds * 1000;
   start_time = GetTickCount ();
   end_time = start_time + (seconds * 1000);
   syscall_printf ("sleep (%d)", seconds);
 
-  rc = WaitForSingleObject (signal_arrived, ms);
+  rc = pthread::cancelable_wait (signal_arrived, ms);
   DWORD now = GetTickCount ();
   if (rc == WAIT_TIMEOUT || now >= end_time)
     ms = 0;
@@ -97,9 +99,11 @@ sleep (unsigned int seconds)
 extern "C" unsigned int
 usleep (unsigned int useconds)
 {
+  pthread_testcancel ();
+
   sig_dispatch_pending (0);
   syscall_printf ("usleep (%d)", useconds);
-  WaitForSingleObject (signal_arrived, (useconds + 500) / 1000);
+  pthread::cancelable_wait (signal_arrived, (useconds + 500) / 1000);
   syscall_printf ("0 = usleep (%d)", useconds);
   return 0;
 }

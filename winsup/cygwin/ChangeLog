@@ -1,4 +1,10 @@
-2003-01-10  Thomas Pfaff  <tpfaff@gmx.net>
+2003-01-14  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* signal.cc (sleep): Add pthread_testcancel call.
+	Wait for signal and cancellation event.
+	(usleep): Ditto.
+
+2003-01-14  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* exceptions.cc (handle_sigsuspend): Add pthread_testcancel call.
 	Wait for signal and cancellation event.
