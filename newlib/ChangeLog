@@ -1,3 +1,8 @@
+Tue Nov 21 20:32:21 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* libc/sys/cygwin/sys/dirent.h: Change definition to avoid necessity of
+	including windows headers.
+
 2000-11-20  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/sys/unistd.h: Removed definition of MAXNAMLEN.

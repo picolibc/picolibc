@@ -30,7 +30,7 @@ typedef struct
 #ifdef _COMPILING_NEWLIB
       struct
 	{
-	  HANDLE __handle;
+	  void *__handle;
 	  char __open_p;
 	} __d_data;
 #endif
