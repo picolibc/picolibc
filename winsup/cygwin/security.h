@@ -86,7 +86,7 @@ public:
     }
 };
 
-typedef enum { cygsidlist_unknown, cygsidlist_alloc, cygsidlist_auto } cygsidlist_type;
+typedef enum { cygsidlist_empty, cygsidlist_alloc, cygsidlist_auto } cygsidlist_type;
 class cygsidlist {
   int maxcount;
 public:
@@ -165,6 +165,11 @@ public:
     {
       sgsids.free_sids ();
       sgsids = newsids;
+      ischanged = TRUE;
+    }
+  void clear_supp ()
+    {
+      sgsids.free_sids ();
       ischanged = TRUE;
     }
   void update_pgrp (const PSID sid)

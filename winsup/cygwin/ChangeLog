@@ -1,3 +1,11 @@
+2002-09-10  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* grp.cc (initgroups): Call groups::clear_supp to free the
+	supplementary group sids that may have been set by setgroups.
+	* security.cc (cygsidlist::free_sids): Also zero the class members.
+	* security.h (groups::clear_supp): New.
+	Rename cygsidlist_unknown to cygsidlist_empty.
+
 2002-09-08  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_tty.cc (fhandler_tty_slave::open): Don't protect

@@ -61,6 +61,9 @@ cygsidlist::free_sids ()
 {
   if (sids)
     cfree (sids);
+  sids = NULL;
+  count = maxcount = 0;
+  type = cygsidlist_empty;
 }
 
 extern "C" void

@@ -449,14 +449,16 @@ extern "C"
 int
 initgroups32 (const char *, __gid32_t)
 {
+  if (wincap.has_security ())
+    cygheap->user.groups.clear_supp ();
   return 0;
 }
 
 extern "C"
 int
-initgroups (const char *, __gid16_t)
+initgroups (const char * name, __gid16_t gid)
 {
-  return 0;
+  return initgroups32 (name, gid16togid32(gid));
 }
 
 /* setgroups32: standards? */
