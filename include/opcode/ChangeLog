@@ -1,3 +1,14 @@
+Sun Oct 10 01:46:56 1999  Jerry Quinn <jerry.quinn.adv91@alum.dartmouth.org>
+
+	* hppa.h (pa_opcodes):  Add load and store cache control to
+	instructions.  Add ordered access load and store.
+
+	* hppa.h (pa_opcode): Add new entries for addb and addib.
+
+	* hppa.h (pa_opcodes): Fix cmpb and cmpib entries.
+
+	* hppa.h (pa_opcodes):  Add entries for cmpb and cmpib.
+
 Thu Oct  7 00:12:25 MDT 1999	Diego Novillo <dnovillo@cygnus.com>
 
 	* d10v.h: Add flag RESTRICTED_NUM3 for imm3 operands.

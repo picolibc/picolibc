@@ -155,16 +155,21 @@ Also these:
    J    Yet another 14bit offset with an unusual encoding.
    K    Yet another 14bit offset with an unusual encoding.
    Y    %sr0,%r31 -- implicit target of be,l instruction.
+   @	implicit immediate value of 0
 
 Completer operands all have 'c' as the prefix:
 
    cx   indexed load completer.
    cm   short load and store completer.
-   cq   short load and store completer (like cm, but inserted into a
+   cq   long load and store completer (like cm, but inserted into a
 	different location in the target instruction).
    cs   store bytes short completer.
-   cc   Another load/store completer with a different encoding than the
+   ce   long load/store completer for LDW/STW with a different encoding than the
 	others
+   cc   load cache control hint
+   cd   load and clear cache control hint
+   cC   store cache control hint
+   co	ordered access
 
    cp	branch link and push completer
    cP	branch pop completer
@@ -205,12 +210,10 @@ Condition operands all have '?' as the prefix:
 
    ?s   compare/subtract conditions
    ?S	64 bit compare/subtract conditions
-   ?t   non-negated compare conditions
-   ?T	negated compare conditions
-   ?r	64 bit non-negated compare conditions
-   ?R	64 bit negated compare conditions
-   ?Q	64 bit compare conditions for CMPIB instruction
-   ?n   compare conditions followed by nullify
+   ?t   non-negated compare and branch conditions
+   ?n   32 bit compare and branch conditions followed by nullify
+   ?N   64 bit compare and branch conditions followed by nullify
+   ?Q	64 bit compare and branch conditions for CMPIB instruction
 
    ?l   logical conditions
    ?L	64 bit logical conditions
@@ -272,18 +275,24 @@ static const struct pa_opcode pa_opcodes[] =
 { "call",	0xe800a000, 0xffe0e000, "nW", pa10, FLAG_STRICT},
 { "ret",	0xe840d000, 0xfffffffd, "n", pa20, FLAG_STRICT},
 
+{ "cmpib", 	0xec000000, 0xfc000000, "?Qn5,b,w", pa20, FLAG_STRICT},
+{ "cmpib", 	0x84000000, 0xf4000000, "?nn5,b,w", pa10, FLAG_STRICT},
 { "comib", 	0x84000000, 0xfc000000, "?nn5,b,w", pa10, 0}, /* comib{tf}*/
 /* This entry is for the disassembler only.  It will never be used by
    assembler.  */
 { "comib", 	0x8c000000, 0xfc000000, "?nn5,b,w", pa10, 0}, /* comib{tf}*/
+{ "cmpb",	0x9c000000, 0xdc000000, "?Nnx,b,w", pa20, FLAG_STRICT},
+{ "cmpb",	0x80000000, 0xf4000000, "?nnx,b,w", pa10, FLAG_STRICT},
 { "comb",	0x80000000, 0xfc000000, "?nnx,b,w", pa10, 0}, /* comb{tf} */
 /* This entry is for the disassembler only.  It will never be used by
    assembler.  */
 { "comb",	0x88000000, 0xfc000000, "?nnx,b,w", pa10, 0}, /* comb{tf} */
+{ "addb",	0xa0000000, 0xf4000000, "?Wnx,b,w", pa20, FLAG_STRICT},
 { "addb",	0xa0000000, 0xfc000000, "?@nx,b,w", pa10, 0}, /* addb{tf} */
 /* This entry is for the disassembler only.  It will never be used by
    assembler.  */
 { "addb",	0xa8000000, 0xfc000000, "?@nx,b,w", pa10, 0},
+{ "addib",	0xa4000000, 0xf4000000, "?Wn5,b,w", pa20, FLAG_STRICT},
 { "addib",	0xa4000000, 0xfc000000, "?@n5,b,w", pa10, 0}, /* addib{tf}*/
 /* This entry is for the disassembler only.  It will never be used by
    assembler.  */
@@ -293,53 +302,70 @@ static const struct pa_opcode pa_opcodes[] =
 { "mtsar",      0x01601840, 0xffe0ffff, "x", pa10, 0}, /* mtctl r,cr11 */
 
 /* Loads and Stores for integer registers.  */
-{ "ldd",        0x0c0000c0, 0xfc001fc0, "cxx(s,b),t", pa20, FLAG_STRICT},
-{ "ldd",        0x0c0000c0, 0xfc001fc0, "cxx(b),t", pa20, FLAG_STRICT},
-{ "ldd",	0x0c0010c0, 0xfc001fc0, "cm5(s,b),t", pa20, FLAG_STRICT},
-{ "ldd",	0x0c0010c0, 0xfc001fc0, "cm5(b),t", pa20, FLAG_STRICT},
+
+{ "ldd",	0x0c0010e0, 0xfc1f33e0, "cocc@(s,b),t", pa20, FLAG_STRICT},
+{ "ldd",	0x0c0010e0, 0xfc1f33e0, "cocc@(b),t", pa20, FLAG_STRICT},
+{ "ldd",        0x0c0000c0, 0xfc0013c0, "cxccx(s,b),t", pa20, FLAG_STRICT},
+{ "ldd",        0x0c0000c0, 0xfc0013c0, "cxccx(b),t", pa20, FLAG_STRICT},
+{ "ldd",	0x0c0010c0, 0xfc0013c0, "cmcc5(s,b),t", pa20, FLAG_STRICT},
+{ "ldd",	0x0c0010c0, 0xfc0013c0, "cmcc5(b),t", pa20, FLAG_STRICT},
 { "ldd",        0x50000000, 0xfc000002, "cq#(s,b),x", pa20, FLAG_STRICT},
 { "ldd",        0x50000000, 0xfc000002, "cq#(b),x", pa20, FLAG_STRICT},
-{ "ldw",        0x0c000080, 0xfc001fc0, "cxx(s,b),t", pa10, FLAG_STRICT},
-{ "ldw",        0x0c000080, 0xfc001fc0, "cxx(b),t", pa10, FLAG_STRICT},
-{ "ldw",	0x0c001080, 0xfc001fc0, "cm5(s,b),t", pa10, FLAG_STRICT},
-{ "ldw",	0x0c001080, 0xfc001fc0, "cm5(b),t", pa10, FLAG_STRICT},
-{ "ldw",        0x4c000000, 0xfc000000, "ccJ(s,b),x", pa10, FLAG_STRICT},
-{ "ldw",        0x4c000000, 0xfc000000, "ccJ(b),x", pa10, FLAG_STRICT},
-{ "ldw",        0x5c000004, 0xfc000006, "ccK(s,b),x", pa20, FLAG_STRICT},
-{ "ldw",        0x5c000004, 0xfc000006, "ccK(b),x", pa20, FLAG_STRICT},
+{ "ldw",        0x0c000080, 0xfc0013c0, "cxccx(s,b),t", pa10, FLAG_STRICT},
+{ "ldw",        0x0c000080, 0xfc0013c0, "cxccx(b),t", pa10, FLAG_STRICT},
+{ "ldw",	0x0c0010a0, 0xfc1f33e0, "cocc@(s,b),t", pa20, FLAG_STRICT},
+{ "ldw",	0x0c0010a0, 0xfc1f33e0, "cocc@(b),t", pa20, FLAG_STRICT},
+{ "ldw",	0x0c001080, 0xfc0013c0, "cmcc5(s,b),t", pa10, FLAG_STRICT},
+{ "ldw",	0x0c001080, 0xfc0013c0, "cmcc5(b),t", pa10, FLAG_STRICT},
+{ "ldw",        0x4c000000, 0xfc000000, "ceJ(s,b),x", pa10, FLAG_STRICT},
+{ "ldw",        0x4c000000, 0xfc000000, "ceJ(b),x", pa10, FLAG_STRICT},
+{ "ldw",        0x5c000004, 0xfc000006, "ceK(s,b),x", pa20, FLAG_STRICT},
+{ "ldw",        0x5c000004, 0xfc000006, "ceK(b),x", pa20, FLAG_STRICT},
 { "ldw",        0x48000000, 0xfc000000, "j(s,b),x", pa10, 0},
 { "ldw",        0x48000000, 0xfc000000, "j(s,b),x", pa10, 0},
 { "ldw",        0x48000000, 0xfc000000, "j(b),x", pa10, 0},
-{ "ldh",        0x0c000040, 0xfc001fc0, "cxx(s,b),t", pa10, FLAG_STRICT},
-{ "ldh",        0x0c000040, 0xfc001fc0, "cxx(b),t", pa10, FLAG_STRICT},
-{ "ldh",	0x0c001040, 0xfc001fc0, "cm5(s,b),t", pa10, FLAG_STRICT},
-{ "ldh",	0x0c001040, 0xfc001fc0, "cm5(b),t", pa10, FLAG_STRICT},
+{ "ldh",        0x0c000040, 0xfc0013c0, "cxccx(s,b),t", pa10, FLAG_STRICT},
+{ "ldh",        0x0c000040, 0xfc0013c0, "cxccx(b),t", pa10, FLAG_STRICT},
+{ "ldh",	0x0c001060, 0xfc1f33e0, "cocc@(s,b),t", pa20, FLAG_STRICT},
+{ "ldh",	0x0c001060, 0xfc1f33e0, "cocc@(b),t", pa20, FLAG_STRICT},
+{ "ldh",	0x0c001040, 0xfc0013c0, "cmcc5(s,b),t", pa10, FLAG_STRICT},
+{ "ldh",	0x0c001040, 0xfc0013c0, "cmcc5(b),t", pa10, FLAG_STRICT},
 { "ldh",        0x44000000, 0xfc000000, "j(s,b),x", pa10, 0},
 { "ldh",        0x44000000, 0xfc000000, "j(b),x", pa10, 0},
-{ "ldb",        0x0c000000, 0xfc001fc0, "cxx(s,b),t", pa10, FLAG_STRICT},
-{ "ldb",        0x0c000000, 0xfc001fc0, "cxx(b),t", pa10, FLAG_STRICT},
-{ "ldb",	0x0c001000, 0xfc001fc0, "cm5(s,b),t", pa10, FLAG_STRICT},
-{ "ldb",	0x0c001000, 0xfc001fc0, "cm5(b),t", pa10, FLAG_STRICT},
+{ "ldb",        0x0c000000, 0xfc0013c0, "cxccx(s,b),t", pa10, FLAG_STRICT},
+{ "ldb",        0x0c000000, 0xfc0013c0, "cxccx(b),t", pa10, FLAG_STRICT},
+{ "ldb",	0x0c001020, 0xfc1f33e0, "cocc@(s,b),t", pa20, FLAG_STRICT},
+{ "ldb",	0x0c001020, 0xfc1f33e0, "cocc@(b),t", pa20, FLAG_STRICT},
+{ "ldb",	0x0c001000, 0xfc0013c0, "cmcc5(s,b),t", pa10, FLAG_STRICT},
+{ "ldb",	0x0c001000, 0xfc0013c0, "cmcc5(b),t", pa10, FLAG_STRICT},
 { "ldb",        0x40000000, 0xfc000000, "j(s,b),x", pa10, 0},
 { "ldb",        0x40000000, 0xfc000000, "j(b),x", pa10, 0},
-{ "std",	0x0c0012c0, 0xfc001fc0, "cmx,V(s,b)", pa20, FLAG_STRICT},
-{ "std",	0x0c0012c0, 0xfc001fc0, "cmx,V(b)", pa20, FLAG_STRICT},
+{ "std",	0x0c0012e0, 0xfc0033ff, "cocCx,@(s,b)", pa20, FLAG_STRICT},
+{ "std",	0x0c0012e0, 0xfc0033ff, "cocCx,@(b)", pa20, FLAG_STRICT},
+{ "std",	0x0c0012c0, 0xfc0013c0, "cmcCx,V(s,b)", pa20, FLAG_STRICT},
+{ "std",	0x0c0012c0, 0xfc0013c0, "cmcCx,V(b)", pa20, FLAG_STRICT},
 { "std",        0x70000000, 0xfc000002, "cqx,#(s,b)", pa20, FLAG_STRICT},
 { "std",        0x70000000, 0xfc000002, "cqx,#(b)", pa20, FLAG_STRICT},
-{ "stw",	0x0c001280, 0xfc001fc0, "cmx,V(s,b)", pa10, FLAG_STRICT},
-{ "stw",	0x0c001280, 0xfc001fc0, "cmx,V(b)", pa10, FLAG_STRICT},
-{ "stw",        0x6c000000, 0xfc000000, "ccx,J(s,b)", pa10, FLAG_STRICT},
-{ "stw",        0x6c000000, 0xfc000000, "ccx,J(b)", pa10, FLAG_STRICT},
-{ "stw",        0x7c000004, 0xfc000006, "ccx,K(s,b)", pa20, FLAG_STRICT},
-{ "stw",        0x7c000004, 0xfc000006, "ccx,K(b)", pa20, FLAG_STRICT},
+{ "stw",	0x0c0012a0, 0xfc0013ff, "cocCx,@(s,b)", pa20, FLAG_STRICT},
+{ "stw",	0x0c0012a0, 0xfc0013ff, "cocCx,@(b)", pa20, FLAG_STRICT},
+{ "stw",	0x0c001280, 0xfc0013c0, "cmcCx,V(s,b)", pa10, FLAG_STRICT},
+{ "stw",	0x0c001280, 0xfc0013c0, "cmcCx,V(b)", pa10, FLAG_STRICT},
+{ "stw",        0x6c000000, 0xfc000000, "cex,J(s,b)", pa10, FLAG_STRICT},
+{ "stw",        0x6c000000, 0xfc000000, "cex,J(b)", pa10, FLAG_STRICT},
+{ "stw",        0x7c000004, 0xfc000006, "cex,K(s,b)", pa20, FLAG_STRICT},
+{ "stw",        0x7c000004, 0xfc000006, "cex,K(b)", pa20, FLAG_STRICT},
 { "stw",        0x68000000, 0xfc000000, "x,j(s,b)", pa10, 0},
 { "stw",        0x68000000, 0xfc000000, "x,j(b)", pa10, 0},
-{ "sth",	0x0c001240, 0xfc001fc0, "cmx,V(s,b)", pa10, FLAG_STRICT},
-{ "sth",	0x0c001240, 0xfc001fc0, "cmx,V(b)", pa10, FLAG_STRICT},
+{ "sth",	0x0c001260, 0xfc0033ff, "cocCx,@(s,b)", pa20, FLAG_STRICT},
+{ "sth",	0x0c001260, 0xfc0033ff, "cocCx,@(b)", pa20, FLAG_STRICT},
+{ "sth",	0x0c001240, 0xfc0013c0, "cmcCx,V(s,b)", pa10, FLAG_STRICT},
+{ "sth",	0x0c001240, 0xfc0013c0, "cmcCx,V(b)", pa10, FLAG_STRICT},
 { "sth",        0x64000000, 0xfc000000, "x,j(s,b)", pa10, 0},
 { "sth",        0x64000000, 0xfc000000, "x,j(b)", pa10, 0},
-{ "stb",	0x0c001200, 0xfc001fc0, "cmx,V(s,b)", pa10, FLAG_STRICT},
-{ "stb",	0x0c001200, 0xfc001fc0, "cmx,V(b)", pa10, FLAG_STRICT},
+{ "stb",	0x0c001220, 0xfc0033ff, "cocCx,@(s,b)", pa20, FLAG_STRICT},
+{ "stb",	0x0c001220, 0xfc0033ff, "cocCx,@(b)", pa20, FLAG_STRICT},
+{ "stb",	0x0c001200, 0xfc0013c0, "cmcCx,V(s,b)", pa10, FLAG_STRICT},
+{ "stb",	0x0c001200, 0xfc0013c0, "cmcCx,V(b)", pa10, FLAG_STRICT},
 { "stb",        0x60000000, 0xfc000000, "x,j(s,b)", pa10, 0},
 { "stb",        0x60000000, 0xfc000000, "x,j(b)", pa10, 0},
 { "ldwm",       0x4c000000, 0xfc000000, "j(s,b),x", pa10, 0},
@@ -352,23 +378,26 @@ static const struct pa_opcode pa_opcodes[] =
 { "ldhx",       0x0c000040, 0xfc001fc0, "cxx(b),t", pa10, 0},
 { "ldbx",       0x0c000000, 0xfc001fc0, "cxx(s,b),t", pa10, 0},
 { "ldbx",       0x0c000000, 0xfc001fc0, "cxx(b),t", pa10, 0},
-{ "ldwa",       0x0c000180, 0xfc00dfc0, "cxx(b),t", pa10, FLAG_STRICT},
-{ "ldwa",	0x0c001180, 0xfc00dfc0, "cm5(b),t", pa10, FLAG_STRICT},
-{ "ldcw",       0x0c0001c0, 0xfc001fc0, "cxx(s,b),t", pa10, FLAG_STRICT},
-{ "ldcw",       0x0c0001c0, 0xfc001fc0, "cxx(b),t", pa10, FLAG_STRICT},
-{ "ldcw",	0x0c0011c0, 0xfc001fc0, "cm5(s,b),t", pa10, FLAG_STRICT},
-{ "ldcw",	0x0c0011c0, 0xfc001fc0, "cm5(b),t", pa10, FLAG_STRICT},
-{ "stwa",	0x0c001380, 0xfc00dfc0, "cmx,V(b)", pa10, FLAG_STRICT},
-{ "stby",	0x0c001300, 0xfc001fc0, "csx,V(s,b)", pa10, FLAG_STRICT},
-{ "stby",	0x0c001300, 0xfc001fc0, "csx,V(b)", pa10, FLAG_STRICT},
-{ "ldda",       0x0c000100, 0xfc00dfc0, "cxx(b),t", pa20, FLAG_STRICT},
-{ "ldda",	0x0c001100, 0xfc00dfc0, "cm5(b),t", pa20, FLAG_STRICT},
-{ "ldcd",       0x0c000140, 0xfc001fc0, "cxx(s,b),t", pa20, FLAG_STRICT},
-{ "ldcd",       0x0c000140, 0xfc001fc0, "cxx(b),t", pa20, FLAG_STRICT},
-{ "ldcd",	0x0c001140, 0xfc001fc0, "cm5(s,b),t", pa20, FLAG_STRICT},
-{ "ldcd",	0x0c001140, 0xfc001fc0, "cm5(b),t", pa20, FLAG_STRICT},
-{ "stda",	0x0c0013c0, 0xfc001fc0, "cmx,V(s,b)", pa20, FLAG_STRICT},
-{ "stda",	0x0c0013c0, 0xfc001fc0, "cmx,V(b)", pa20, FLAG_STRICT},
+{ "ldwa",       0x0c000180, 0xfc00d3c0, "cxccx(b),t", pa10, FLAG_STRICT},
+{ "ldwa",	0x0c001180, 0xfc00d3c0, "cmcc5(b),t", pa10, FLAG_STRICT},
+{ "ldcw",       0x0c0001c0, 0xfc0013c0, "cxcdx(s,b),t", pa10, FLAG_STRICT},
+{ "ldcw",       0x0c0001c0, 0xfc0013c0, "cxcdx(b),t", pa10, FLAG_STRICT},
+{ "ldcw",	0x0c0011c0, 0xfc0013c0, "cmcd5(s,b),t", pa10, FLAG_STRICT},
+{ "ldcw",	0x0c0011c0, 0xfc0013c0, "cmcd5(b),t", pa10, FLAG_STRICT},
+{ "stwa",	0x0c0013a0, 0xfc00d3ff, "cocCx,@(b)", pa20, FLAG_STRICT},
+{ "stwa",	0x0c001380, 0xfc00d3c0, "cmcCx,V(b)", pa10, FLAG_STRICT},
+{ "stby",	0x0c001300, 0xfc0013c0, "cscCx,V(s,b)", pa10, FLAG_STRICT},
+{ "stby",	0x0c001300, 0xfc0013c0, "cscCx,V(b)", pa10, FLAG_STRICT},
+{ "ldda",       0x0c000100, 0xfc00d3c0, "cxccx(b),t", pa20, FLAG_STRICT},
+{ "ldda",	0x0c001100, 0xfc00d3c0, "cmcc5(b),t", pa20, FLAG_STRICT},
+{ "ldcd",       0x0c000140, 0xfc0013c0, "cxcdx(s,b),t", pa20, FLAG_STRICT},
+{ "ldcd",       0x0c000140, 0xfc0013c0, "cxcdx(b),t", pa20, FLAG_STRICT},
+{ "ldcd",	0x0c001140, 0xfc0013c0, "cmcd5(s,b),t", pa20, FLAG_STRICT},
+{ "ldcd",	0x0c001140, 0xfc0013c0, "cmcd5(b),t", pa20, FLAG_STRICT},
+{ "stda",	0x0c0013e0, 0xfc0033ff, "cocCx,@(s,b)", pa20, FLAG_STRICT},
+{ "stda",	0x0c0013e0, 0xfc0033ff, "cocCx,@(b)", pa20, FLAG_STRICT},
+{ "stda",	0x0c0013c0, 0xfc0013c0, "cmcCx,V(s,b)", pa20, FLAG_STRICT},
+{ "stda",	0x0c0013c0, 0xfc0013c0, "cmcCx,V(b)", pa20, FLAG_STRICT},
 { "ldwax",      0x0c000180, 0xfc00dfc0, "cxx(b),t", pa10, 0},
 { "ldcwx",      0x0c0001c0, 0xfc001fc0, "cxx(s,b),t", pa10, 0},
 { "ldcwx",      0x0c0001c0, 0xfc001fc0, "cxx(b),t", pa10, 0},
@@ -388,8 +417,8 @@ static const struct pa_opcode pa_opcodes[] =
 { "stbs",	0x0c001200, 0xfc001fc0, "cmx,V(s,b)", pa10, 0},
 { "stbs",	0x0c001200, 0xfc001fc0, "cmx,V(b)", pa10, 0},
 { "stwas",	0x0c001380, 0xfc00dfc0, "cmx,V(b)", pa10, 0},
-{ "stdby",	0x0c001340, 0xfc001fc0, "csx,V(s,b)", pa20, FLAG_STRICT},
-{ "stdby",	0x0c001340, 0xfc001fc0, "csx,V(b)", pa20, FLAG_STRICT},
+{ "stdby",	0x0c001340, 0xfc0013c0, "cscCx,V(s,b)", pa20, FLAG_STRICT},
+{ "stdby",	0x0c001340, 0xfc0013c0, "cscCx,V(b)", pa20, FLAG_STRICT},
 { "stbys",	0x0c001300, 0xfc001fc0, "csx,V(s,b)", pa10, 0},
 { "stbys",	0x0c001300, 0xfc001fc0, "csx,V(b)", pa10, 0},
 
@@ -648,32 +677,40 @@ static const struct pa_opcode pa_opcodes[] =
 
 /* Floating Point Coprocessor Instructions */
  
-{ "fldw",       0x24000000, 0xfc001f80, "cxx(s,b),fT", pa10, FLAG_STRICT},
-{ "fldw",       0x24000000, 0xfc001f80, "cxx(b),fT", pa10, FLAG_STRICT},
-{ "fldw",       0x24001000, 0xfc001f80, "cm5(s,b),fT", pa10, FLAG_STRICT},
-{ "fldw",       0x24001000, 0xfc001f80, "cm5(b),fT", pa10, FLAG_STRICT},
+{ "fldw",       0x24001020, 0xfc1f33a0, "cocc@(s,b),fT", pa20, FLAG_STRICT},
+{ "fldw",       0x24001020, 0xfc1f33a0, "cocc@(b),fT", pa20, FLAG_STRICT},
+{ "fldw",       0x24000000, 0xfc001380, "cxccx(s,b),fT", pa10, FLAG_STRICT},
+{ "fldw",       0x24000000, 0xfc001380, "cxccx(b),fT", pa10, FLAG_STRICT},
+{ "fldw",       0x24001000, 0xfc001380, "cmcc5(s,b),fT", pa10, FLAG_STRICT},
+{ "fldw",       0x24001000, 0xfc001380, "cmcc5(b),fT", pa10, FLAG_STRICT},
 { "fldw",       0x5c000000, 0xfc000004, "d(s,b),fe", pa20, FLAG_STRICT},
 { "fldw",       0x5c000000, 0xfc000004, "d(b),fe", pa20, FLAG_STRICT},
 { "fldw",       0x58000000, 0xfc000004, "cJd(s,b),fe", pa20, FLAG_STRICT},
 { "fldw",       0x58000000, 0xfc000004, "cJd(b),fe", pa20, FLAG_STRICT},
-{ "fldd",       0x2c000000, 0xfc001fc0, "cxx(s,b),ft", pa10, FLAG_STRICT},
-{ "fldd",       0x2c000000, 0xfc001fc0, "cxx(b),ft", pa10, FLAG_STRICT},
-{ "fldd",       0x2c001000, 0xfc001fc0, "cm5(s,b),ft", pa10, FLAG_STRICT},
-{ "fldd",       0x2c001000, 0xfc001fc0, "cm5(b),ft", pa10, FLAG_STRICT},
+{ "fldd",       0x2c001020, 0xfc1f33e0, "cocc@(s,b),ft", pa20, FLAG_STRICT},
+{ "fldd",       0x2c001020, 0xfc1f33e0, "cocc@(b),ft", pa20, FLAG_STRICT},
+{ "fldd",       0x2c000000, 0xfc0013c0, "cxccx(s,b),ft", pa10, FLAG_STRICT},
+{ "fldd",       0x2c000000, 0xfc0013c0, "cxccx(b),ft", pa10, FLAG_STRICT},
+{ "fldd",       0x2c001000, 0xfc0013c0, "cmcc5(s,b),ft", pa10, FLAG_STRICT},
+{ "fldd",       0x2c001000, 0xfc0013c0, "cmcc5(b),ft", pa10, FLAG_STRICT},
 { "fldd",       0x50000002, 0xfc000002, "cq#(s,b),x", pa20, FLAG_STRICT},
 { "fldd",       0x50000002, 0xfc000002, "cq#(b),x", pa20, FLAG_STRICT},
-{ "fstw",       0x24000200, 0xfc001f80, "cxfT,x(s,b)", pa10, FLAG_STRICT},
-{ "fstw",       0x24000200, 0xfc001f80, "cxfT,x(b)", pa10, FLAG_STRICT},
-{ "fstw",       0x24001200, 0xfc001f80, "cmfT,5(s,b)", pa10, FLAG_STRICT},
-{ "fstw",       0x24001200, 0xfc001f80, "cmfT,5(b)", pa10, FLAG_STRICT},
+{ "fstw",       0x24001220, 0xfc1f33a0, "cocCfT,@(s,b)", pa10, FLAG_STRICT},
+{ "fstw",       0x24001220, 0xfc1f33a0, "cocCfT,@(b)", pa10, FLAG_STRICT},
+{ "fstw",       0x24000200, 0xfc001380, "cxcCfT,x(s,b)", pa10, FLAG_STRICT},
+{ "fstw",       0x24000200, 0xfc001380, "cxcCfT,x(b)", pa10, FLAG_STRICT},
+{ "fstw",       0x24001200, 0xfc001380, "cmcCfT,5(s,b)", pa10, FLAG_STRICT},
+{ "fstw",       0x24001200, 0xfc001380, "cmcCfT,5(b)", pa10, FLAG_STRICT},
 { "fstw",       0x7c000000, 0xfc000004, "fe,d(s,b)", pa20, FLAG_STRICT},
 { "fstw",       0x7c000000, 0xfc000004, "fe,d(b)", pa20, FLAG_STRICT},
 { "fstw",       0x78000000, 0xfc000004, "cJfe,d(s,b)", pa20, FLAG_STRICT},
 { "fstw",       0x78000000, 0xfc000004, "cJfe,d(b)", pa20, FLAG_STRICT},
-{ "fstd",       0x2c000200, 0xfc001fc0, "cxft,x(s,b)", pa10, FLAG_STRICT},
-{ "fstd",       0x2c000200, 0xfc001fc0, "cxft,x(b)", pa10, FLAG_STRICT},
-{ "fstd",       0x2c001200, 0xfc001fc0, "cmft,5(s,b)", pa10, FLAG_STRICT},
-{ "fstd",       0x2c001200, 0xfc001fc0, "cmft,5(b)", pa10, FLAG_STRICT},
+{ "fstd",       0x2c001220, 0xfc1f33e0, "cocCft,@(s,b)", pa10, FLAG_STRICT},
+{ "fstd",       0x2c001220, 0xfc1f33e0, "cocCft,@(b)", pa10, FLAG_STRICT},
+{ "fstd",       0x2c000200, 0xfc0013c0, "cxcCft,x(s,b)", pa10, FLAG_STRICT},
+{ "fstd",       0x2c000200, 0xfc0013c0, "cxcCft,x(b)", pa10, FLAG_STRICT},
+{ "fstd",       0x2c001200, 0xfc0013c0, "cmcCft,5(s,b)", pa10, FLAG_STRICT},
+{ "fstd",       0x2c001200, 0xfc0013c0, "cmcCft,5(b)", pa10, FLAG_STRICT},
 { "fstd",       0x70000002, 0xfc000002, "cqx,#(s,b)", pa20, FLAG_STRICT},
 { "fstd",       0x70000002, 0xfc000002, "cqx,#(b)", pa20, FLAG_STRICT},
 { "fldwx",      0x24000000, 0xfc001f80, "cxx(s,b),fT", pa10, 0},
