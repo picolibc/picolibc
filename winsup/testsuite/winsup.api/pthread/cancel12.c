@@ -58,7 +58,6 @@ static void *Thread(void *punused)
 
 int main (void)
 {
-  void *old_sigh;
   void * result;
   pthread_t t;
 

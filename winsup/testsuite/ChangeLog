@@ -1,3 +1,9 @@
+2003-02-07  Christopher Faylor  <cgf@redhat.com>
+
+	* libltp/lib/parse_opts.c: Deal with C warnings.
+	* winsup.api/pthread/cancel12.c: Ditto.
+	* winsup.api/winsup.exp: Don't use -g3.
+
 2003-02-04  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* winsup.api/pthread/cancel11.c: New test.

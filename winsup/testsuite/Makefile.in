@@ -56,7 +56,6 @@ else
   CFLAGS:=@CFLAGS@ -MD $(TESTSUP_INCLUDES)
 endif
 CXXFLAGS:=@CXXFLAGS@
-export ALL_CFLAGS
 
 AR:=@AR@
 AR_FLAGS:=qv
@@ -91,6 +90,10 @@ RUNTIME=$(cygwin_build)/new-cygwin1.dll $(cygwin_build)/new-libcygwin.a
 
 TESTSUP_LIB_NAME:=libltp.a
 TESTSUP_OFILES:=${sort ${addsuffix .o,${basename ${notdir ${wildcard $(libltp_srcdir)/lib/*.c}}}}}
+
+override ALL_CFLAGS:=${filter-out -O%,$(ALL_CFLAGS)}
+override COMPILE_CC:=${filter-out -O%,$(COMPILE_CC)}
+override CFLAGS:=${filter-out -O%,$(CFLAGS)}
 
 .PHONY: all force dll_ofiles install all_target install_target all_host install_host
 
