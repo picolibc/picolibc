@@ -180,6 +180,7 @@
 #define EM_ARC_A5	 93	/* ARC Cores Tangent-A5 */
 #define EM_XTENSA	 94	/* Tensilica Xtensa Architecture */
 #define EM_IP2K		101	/* Ubicom IP2022 micro controller */
+#define EM_CR		103	/* National Semiconductor CompactRISC */
 #define EM_MSP430	105	/* TI msp430 micro controller */
 
 /* If it is necessary to assign new unofficial EM_* values, please pick large
