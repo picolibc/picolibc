@@ -1,5 +1,9 @@
 2003-10-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/wincrypt.h (CRYPT_FLAGS_*): Add constants. Protocol flags.
+
+2003-10-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/wincrypt.h (KP_*): Add constants. Needed by
 	CryptSetKeyParam() and other functions.
 

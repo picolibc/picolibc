@@ -345,6 +345,12 @@ extern "C" {
 #define KP_INFO             0x00000012
 #define KP_EFFECTIVE_KEYLEN 0x00000013
 #define KP_PUB_PARAMS       0x00000027
+#define CRYPT_FLAG_PCT1    0x0001
+#define CRYPT_FLAG_SSL2    0x0002
+#define CRYPT_FLAG_SSL3    0x0004
+#define CRYPT_FLAG_TLS1    0x0008
+#define CRYPT_FLAG_IPSEC   0x0010
+#define CRYPT_FLAG_SIGNING 0x0020
 
 typedef UINT ALG_ID;
 typedef struct _VTableProvStruc {FARPROC FuncVerifyImage;} VTableProvStruc,*PVTableProvStruc;
