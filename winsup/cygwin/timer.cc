@@ -133,7 +133,7 @@ timer_thread (VOID *x)
 	    debug_printf ("%p starting thread", x);
 	    int rc = pthread_create (&notify_thread, tt.evp.sigev_notify_attributes,
 				     (void * (*) (void *)) tt.evp.sigev_notify_function,
-				     &tt.evp.sigev_value);
+				     tt.evp.sigev_value.sival_ptr);
 	    if (rc)
 	      {
 		debug_printf ("thread creation failed, %E");
