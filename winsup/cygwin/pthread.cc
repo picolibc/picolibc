@@ -140,7 +140,7 @@ pthread_attr_getstackaddr (const pthread_attr_t * attr, void **stackaddr)
 void
 pthread_exit (void *value_ptr)
 {
-  return __pthread_exit (value_ptr);
+  return pthread::self()->exit (value_ptr);
 }
 
 int
@@ -428,25 +428,25 @@ pthread_cancel (pthread_t thread)
 int
 pthread_setcancelstate (int state, int *oldstate)
 {
-  return __pthread_setcancelstate (state, oldstate);
+  return pthread::self()->setcancelstate (state, oldstate);
 }
 
 int
 pthread_setcanceltype (int type, int *oldtype)
 {
-  return __pthread_setcanceltype (type, oldtype);
+  return pthread::self()->setcanceltype (type, oldtype);
 }
 
 void
 pthread_testcancel (void)
 {
-  __pthread_testcancel ();
+  pthread::self()->testcancel ();
 }
 
 void
 _pthread_cleanup_push (__pthread_cleanup_handler *handler)
 {
-  pthread::self()->push_cleanup_handler(handler);
+  pthread::self()->push_cleanup_handler (handler);
 }
 
 void

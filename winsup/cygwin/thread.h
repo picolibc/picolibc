@@ -266,6 +266,7 @@ public:
   void *return_ptr;
   bool suspended;
   int cancelstate, canceltype;
+  HANDLE cancel_event;
   pthread_t joiner;
   // int joinable;
 
@@ -287,6 +288,19 @@ public:
     pthread ();
    ~pthread ();
 
+   void exit (void *value_ptr);
+
+   int cancel ();
+   void testcancel ();
+   void cancel_self ()
+   {
+     exit (PTHREAD_CANCELED);
+   }
+   static void static_cancel_self ();
+
+   int setcancelstate (int state, int *oldstate);
+   int setcanceltype (int type, int *oldtype);
+
    void push_cleanup_handler (__pthread_cleanup_handler *handler);
    void pop_cleanup_handler (int const execute);
 
@@ -298,7 +312,6 @@ private:
     __pthread_cleanup_handler *cleanup_stack;
     pthread_mutex mutex;
 
-    friend void __pthread_exit (void *value_ptr);
     friend int __pthread_join (pthread_t * thread, void **return_val);
     friend int __pthread_detach (pthread_t * thread);
 
@@ -406,8 +419,10 @@ void __pthread_atforkprepare(void);
 void __pthread_atforkparent(void);
 void __pthread_atforkchild(void);
 
+/* Cancellation */
+int __pthread_cancel (pthread_t thread);
+
 /* Thread Exit */
-void __pthread_exit (void *value_ptr);
 int __pthread_join (pthread_t * thread, void **return_val);
 int __pthread_detach (pthread_t * thread);
 
@@ -504,10 +519,6 @@ int __pthread_setschedparam (pthread_t thread, int policy,
 			     const struct sched_param *param);
 
 /* cancelability states */
-int __pthread_cancel (pthread_t thread);
-int __pthread_setcancelstate (int state, int *oldstate);
-int __pthread_setcanceltype (int type, int *oldtype);
-void __pthread_testcancel (void);
 
 /* Semaphores */
 int __sem_init (sem_t * sem, int pshared, unsigned int value);
