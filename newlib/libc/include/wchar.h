@@ -11,8 +11,12 @@
 /* For _mbstate_t definition. */
 #include <sys/_types.h>
 
+#ifndef NULL
+#define NULL	0
+#endif
+
 #ifndef WEOF
-# define WEOF (0xffffffffu)
+# define WEOF ((wint_t)-1)
 #endif
 
 #ifndef MBSTATE_T
@@ -20,18 +24,33 @@
 typedef _mbstate_t mbstate_t;
 #endif /* MBSTATE_T */
 
-wint_t btowc (int c);
-int wctob (wint_t c);
-int mbsinit(const mbstate_t *ps);
-size_t mbrlen(const char *s, size_t n, mbstate_t *ps);
-size_t mbrtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *ps);
-size_t wcrtomb(char *s, wchar_t wc, mbstate_t *ps);
-size_t mbsrtowcs(wchar_t *dst, const char **src, size_t len, mbstate_t *ps);
-size_t wcsrtombs(char *dst, const wchar_t **src, size_t len, mbstate_t *ps);
-wchar_t *wmemchr(const wchar_t *ws, wchar_t wc, size_t n);
-int wmemcmp(const wchar_t *ws1, const wchar_t *ws2, size_t n);
-wchar_t *wmemcpy(wchar_t *ws1, const wchar_t *ws2, size_t n);
-wchar_t *wmemmove(wchar_t *ws1, const wchar_t *ws2, size_t n);
-wchar_t *wmemset(wchar_t *ws, wchar_t wc, size_t n);
+wint_t	_EXFUN(btowc, (int));
+int	_EXFUN(wctob, (wint_t));
+size_t	_EXFUN(mbrlen, (const char * , size_t, mbstate_t *));
+size_t	_EXFUN(mbrtowc, (wchar_t * , const char * , size_t, mbstate_t *));
+int	_EXFUN(mbsinit, (const mbstate_t *));
+size_t	_EXFUN(mbsrtowcs, (wchar_t * , const char ** , size_t, mbstate_t *));
+size_t	_EXFUN(wcrtomb, (char * , wchar_t, mbstate_t *));
+size_t	_EXFUN(wcsrtombs, (char * , const wchar_t ** , size_t, mbstate_t *));
+wchar_t	*_EXFUN(wcscat, (wchar_t * , const wchar_t *));
+wchar_t	*_EXFUN(wcschr, (const wchar_t *, wchar_t));
+int	_EXFUN(wcscmp, (const wchar_t *, const wchar_t *));
+wchar_t	*_EXFUN(wcscpy, (wchar_t * , const wchar_t *));
+size_t	_EXFUN(wcscspn, (const wchar_t *, const wchar_t *));
+size_t	_EXFUN(wcslcat, (wchar_t *, const wchar_t *, size_t));
+size_t	_EXFUN(wcslcpy, (wchar_t *, const wchar_t *, size_t));
+size_t	_EXFUN(wcslen, (const wchar_t *));
+wchar_t	*_EXFUN(wcsncat, (wchar_t * , const wchar_t * , size_t));
+int	_EXFUN(wcsncmp, (const wchar_t *, const wchar_t *, size_t));
+wchar_t	*_EXFUN(wcsncpy, (wchar_t *  , const wchar_t * , size_t));
+wchar_t	*_EXFUN(wcspbrk, (const wchar_t *, const wchar_t *));
+wchar_t	*_EXFUN(wcsrchr, (const wchar_t *, wchar_t));
+size_t	_EXFUN(wcsspn, (const wchar_t *, const wchar_t *));
+wchar_t	*_EXFUN(wcsstr, (const wchar_t *, const wchar_t *));
+wchar_t	*_EXFUN(wmemchr, (const wchar_t *, wchar_t, size_t));
+int	_EXFUN(wmemcmp, (const wchar_t *, const wchar_t *, size_t));
+wchar_t	*_EXFUN(wmemcpy, (wchar_t * , const wchar_t * , size_t));
+wchar_t	*_EXFUN(wmemmove, (wchar_t *, const wchar_t *, size_t));
+wchar_t	*_EXFUN(wmemset, (wchar_t *, wchar_t, size_t));
 
 #endif /* _WCHAR_H_ */

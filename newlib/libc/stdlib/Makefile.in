@@ -155,12 +155,7 @@ GENERAL_SOURCES = \
 	wcstombs.c	\
 	wcstombs_r.c	\
 	wctomb.c	\
-	wctomb_r.c	\
-	wmemchr.c	\
-	wmemcmp.c	\
-	wmemcpy.c	\
-	wmemmove.c	\
-	wmemset.c
+	wctomb_r.c
 
 
 EXTENDED_SOURCES = \
@@ -312,15 +307,12 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@realloc.$(OBJEXT) strtod.$(OBJEXT) strtol.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@strtoul.$(OBJEXT) wcstombs.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@wcstombs_r.$(OBJEXT) wctomb.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@wctomb_r.$(OBJEXT) wmemchr.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@wmemcmp.$(OBJEXT) wmemcpy.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@wmemmove.$(OBJEXT) wmemset.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@drand48.$(OBJEXT) ecvtbuf.$(OBJEXT) efgcvt.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@erand48.$(OBJEXT) jrand48.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@lcong48.$(OBJEXT) lrand48.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@mrand48.$(OBJEXT) msize.$(OBJEXT) mtrim.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@nrand48.$(OBJEXT) rand48.$(OBJEXT) seed48.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@srand48.$(OBJEXT) strtoll.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wctomb_r.$(OBJEXT) drand48.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@ecvtbuf.$(OBJEXT) efgcvt.$(OBJEXT) erand48.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@jrand48.$(OBJEXT) lcong48.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@lrand48.$(OBJEXT) mrand48.$(OBJEXT) msize.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@mtrim.$(OBJEXT) nrand48.$(OBJEXT) rand48.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@seed48.$(OBJEXT) srand48.$(OBJEXT) strtoll.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@strtoll_r.$(OBJEXT) strtoull.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@strtoull_r.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
@@ -334,11 +326,10 @@ LTLIBRARIES =  $(noinst_LTLIBRARIES)
 @USE_LIBTOOL_TRUE@mbstowcs.lo mbstowcs_r.lo mbtowc.lo mbtowc_r.lo \
 @USE_LIBTOOL_TRUE@mlock.lo mprec.lo mstats.lo rand.lo rand_r.lo \
 @USE_LIBTOOL_TRUE@realloc.lo strtod.lo strtol.lo strtoul.lo wcstombs.lo \
-@USE_LIBTOOL_TRUE@wcstombs_r.lo wctomb.lo wctomb_r.lo wmemchr.lo \
-@USE_LIBTOOL_TRUE@wmemcmp.lo wmemcpy.lo wmemmove.lo wmemset.lo \
-@USE_LIBTOOL_TRUE@drand48.lo ecvtbuf.lo efgcvt.lo erand48.lo jrand48.lo \
-@USE_LIBTOOL_TRUE@lcong48.lo lrand48.lo mrand48.lo msize.lo mtrim.lo \
-@USE_LIBTOOL_TRUE@nrand48.lo rand48.lo seed48.lo srand48.lo strtoll.lo \
+@USE_LIBTOOL_TRUE@wcstombs_r.lo wctomb.lo wctomb_r.lo drand48.lo \
+@USE_LIBTOOL_TRUE@ecvtbuf.lo efgcvt.lo erand48.lo jrand48.lo lcong48.lo \
+@USE_LIBTOOL_TRUE@lrand48.lo mrand48.lo msize.lo mtrim.lo nrand48.lo \
+@USE_LIBTOOL_TRUE@rand48.lo seed48.lo srand48.lo strtoll.lo \
 @USE_LIBTOOL_TRUE@strtoll_r.lo strtoull.lo strtoull_r.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

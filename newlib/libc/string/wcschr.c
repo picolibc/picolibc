@@ -1,3 +1,34 @@
+/*
+FUNCTION
+	<<wcschr>>---wide-character string scanning operation
+
+ANSI_SYNOPSIS
+	#include <wchar.h>
+	wchar_t *wcschr(const wchar_t *<[s]>, wchar_t <[c]>);
+
+TRAD_SYNOPSIS
+	wchar_t *wcschr(<[s]>, <[c]>
+	const wchar_t *<[s]>;
+	wchar_t <[c]>;
+
+DESCRIPTION
+	The <<wcschr>> function locates the first occurrence of <[c]> in the
+	wide-character string pointed to by <[s]>. The value of <[c]> must be a
+	character representable as a type wchar_t and must be a wide-character
+	code corresponding to a valid character in the current locale.
+	The terminating null wide-character string.
+
+RETURNS
+	Upon completion, <<wcschr>> returns a pointer to the wide-character
+	code, or a null pointer if the wide-character code is not found. 
+
+PORTABILITY
+<<wcschr>> is ISO/IEC 9899/AMD1:1995 (ISO C).
+No supporting OS subroutines are required.
+*/
+
+/*	$NetBSD: wcschr.c,v 1.1 2000/12/23 23:14:36 itojun Exp $	*/
+
 /*-
  * Copyright (c)1999 Citrus Project,
  * All rights reserved.
@@ -23,19 +54,28 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	citrus Id: wmemcpy.c,v 1.2 2000/12/20 14:08:31 itojun Exp
+ *	citrus Id: wcschr.c,v 1.2 2000/12/21 05:07:25 itojun Exp
  */
 
 #include <_ansi.h>
-#include <string.h>
 #include <wchar.h>
 
 wchar_t *
-_DEFUN (wmemcpy, (d, s, n),
-	wchar_t *d _AND
-	const wchar_t *s _AND
-	size_t n)
+_DEFUN (wcschr, (s, c),
+	_CONST wchar_t * s _AND
+	wchar_t c)
 {
+  _CONST wchar_t *p;
 
-	return (wchar_t *)memcpy(d, s, n * sizeof(wchar_t));
+  p = s;
+  while (*p)
+    {
+      if (*p == c)
+	{
+	  /* LINTED interface specification */
+	  return (wchar_t *) p;
+	}
+      p++;
+    }
+  return NULL;
 }

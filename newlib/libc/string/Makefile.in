@@ -150,7 +150,27 @@ GENERAL_SOURCES = \
 	strxfrm.c  \
 	strstr.c \
 	swab.c \
-	u_strerr.c
+	u_strerr.c \
+	wcscat.c \
+	wcschr.c \
+	wcscmp.c \
+	wcscpy.c \
+	wcscspn.c \
+	wcslcat.c \
+	wcslcpy.c \
+	wcslen.c \
+	wcsncat.c \
+	wcsncmp.c \
+	wcsncpy.c \
+	wcspbrk.c \
+	wcsrchr.c \
+	wcsspn.c \
+	wcsstr.c \
+	wmemchr.c \
+	wmemcmp.c \
+	wmemcpy.c \
+	wmemmove.c \
+	wmemset.c
 
 @ELIX_LEVEL_1_TRUE@LIB_OBJS = 
 @ELIX_LEVEL_1_FALSE@LIB_OBJS = @ELIX_LEVEL_1_FALSE@\
@@ -181,7 +201,11 @@ index.def	rindex.def	strcspn.def	strpbrk.def swab.def \
 memchr.def	strcat.def	strerror.def	strerror_r.def strrchr.def \
 memcmp.def	strchr.def	strlen.def	strnlen.def strspn.def \
 strcasecmp.def	strncasecmp.def strlwr.def	strupr.def  memccpy.def \
-mempcpy.def
+mempcpy.def \
+wcscat.def	wcschr.def	wcscmp.def	wcscpy.def wcscspn.def \
+wcslcat.def	wcslcpy.def	wcslen.def	wcsncat.def wcsncmp.def \
+wcsncpy.def	wcspbrk.def	wcsrchr.def	wcsspn.def wcsstr.def \
+wmemchr.def	wmemcmp.def	wmemcpy.def	wmemmove.def wmemset.def
 
 
 SUFFIXES = .def
@@ -214,7 +238,15 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@strpbrk.$(OBJEXT) strrchr.$(OBJEXT) strsep.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@strspn.$(OBJEXT) strtok.$(OBJEXT) strtok_r.$(OBJEXT) \
 @USE_LIBTOOL_FALSE@strupr.$(OBJEXT) strxfrm.$(OBJEXT) strstr.$(OBJEXT) \
-@USE_LIBTOOL_FALSE@swab.$(OBJEXT) u_strerr.$(OBJEXT)
+@USE_LIBTOOL_FALSE@swab.$(OBJEXT) u_strerr.$(OBJEXT) wcscat.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wcschr.$(OBJEXT) wcscmp.$(OBJEXT) wcscpy.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wcscspn.$(OBJEXT) wcslcat.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wcslcpy.$(OBJEXT) wcslen.$(OBJEXT) wcsncat.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wcsncmp.$(OBJEXT) wcsncpy.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wcspbrk.$(OBJEXT) wcsrchr.$(OBJEXT) wcsspn.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wcsstr.$(OBJEXT) wmemchr.$(OBJEXT) wmemcmp.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wmemcpy.$(OBJEXT) wmemmove.$(OBJEXT) \
+@USE_LIBTOOL_FALSE@wmemset.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 @USE_LIBTOOL_TRUE@libstring_la_OBJECTS =  bcopy.lo bzero.lo index.lo \
@@ -225,7 +257,12 @@ LTLIBRARIES =  $(noinst_LTLIBRARIES)
 @USE_LIBTOOL_TRUE@strlen.lo strlwr.lo strncasecmp.lo strncat.lo \
 @USE_LIBTOOL_TRUE@strncmp.lo strncpy.lo strnlen.lo strpbrk.lo \
 @USE_LIBTOOL_TRUE@strrchr.lo strsep.lo strspn.lo strtok.lo strtok_r.lo \
-@USE_LIBTOOL_TRUE@strupr.lo strxfrm.lo strstr.lo swab.lo u_strerr.lo
+@USE_LIBTOOL_TRUE@strupr.lo strxfrm.lo strstr.lo swab.lo u_strerr.lo \
+@USE_LIBTOOL_TRUE@wcscat.lo wcschr.lo wcscmp.lo wcscpy.lo wcscspn.lo \
+@USE_LIBTOOL_TRUE@wcslcat.lo wcslcpy.lo wcslen.lo wcsncat.lo wcsncmp.lo \
+@USE_LIBTOOL_TRUE@wcsncpy.lo wcspbrk.lo wcsrchr.lo wcsspn.lo wcsstr.lo \
+@USE_LIBTOOL_TRUE@wmemchr.lo wmemcmp.lo wmemcpy.lo wmemmove.lo \
+@USE_LIBTOOL_TRUE@wmemset.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

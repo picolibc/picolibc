@@ -1,3 +1,37 @@
+2002-08-29  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
+
+        * libc/include/wchar.h: Define NULL. Define WEOF more general
+        way. Declare functions in newlib manner.
+        * libc/stdlib/Makefile.am: Delete wmem*.c
+        * libc/stdlib/Makefile.in: Regenerated.
+        * libc/stdlib/wmemchr.c: Delete.
+        * libc/stdlib/wmemcmp.c: Ditto.
+        * libc/stdlib/wmemcpy.c: Ditto.
+        * libc/stdlib/wmemmove.c: Ditto.
+        * libc/stdlib/wmemset.c: Ditto.
+        * libc/string/Makefile.am: Add wmem*.c and wcs*.c.
+        * libc/string/Makefile.in: Regenerated.
+        * libc/string/wcscat.c: New file derived from the NetBSD C Library.
+        * libc/string/wcschr.c: Ditto.
+        * libc/string/wcscmp.c: Ditto.
+        * libc/string/wcscpy.c: Ditto.
+        * libc/string/wcscspn.c: Ditto.
+        * libc/string/wcslcat.c: Ditto.
+        * libc/string/wcslcpy.c: Ditto.
+        * libc/string/wcslen.c: Ditto.
+        * libc/string/wcsncat.c: Ditto.
+        * libc/string/wcsncmp.c: Ditto.
+        * libc/string/wcsncpy.c: Ditto.
+        * libc/string/wcspbrk.c: Ditto.
+        * libc/string/wcsrchr.c: Ditto.
+        * libc/string/wcsspn.c: Ditto.
+        * libc/string/wcsstr.c: Ditto.
+        * libc/string/wmemchr.c: Ditto.
+        * libc/string/wmemcmp.c: Ditto.
+        * libc/string/wmemcpy.c: Ditto.
+        * libc/string/wmemmove.c: Ditto.
+        * libc/string/wmemset.c: Ditto.
+
 2002-08-29  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/locale/locale.c (_setlocale_r)[MB_CAPABLE]: Fix so

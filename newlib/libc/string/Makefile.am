@@ -44,7 +44,27 @@ GENERAL_SOURCES = \
 	strxfrm.c  \
 	strstr.c \
 	swab.c \
-	u_strerr.c
+	u_strerr.c \
+	wcscat.c \
+	wcschr.c \
+	wcscmp.c \
+	wcscpy.c \
+	wcscspn.c \
+	wcslcat.c \
+	wcslcpy.c \
+	wcslen.c \
+	wcsncat.c \
+	wcsncmp.c \
+	wcsncpy.c \
+	wcspbrk.c \
+	wcsrchr.c \
+	wcsspn.c \
+	wcsstr.c \
+	wmemchr.c \
+	wmemcmp.c \
+	wmemcpy.c \
+	wmemmove.c \
+	wmemset.c
 
 if ELIX_LEVEL_1
 LIB_OBJS =
@@ -83,7 +103,11 @@ index.def	rindex.def	strcspn.def	strpbrk.def swab.def \
 memchr.def	strcat.def	strerror.def	strerror_r.def strrchr.def \
 memcmp.def	strchr.def	strlen.def	strnlen.def strspn.def \
 strcasecmp.def	strncasecmp.def strlwr.def	strupr.def  memccpy.def \
-mempcpy.def
+mempcpy.def \
+wcscat.def	wcschr.def	wcscmp.def	wcscpy.def wcscspn.def \
+wcslcat.def	wcslcpy.def	wcslen.def	wcsncat.def wcsncmp.def \
+wcsncpy.def	wcspbrk.def	wcsrchr.def	wcsspn.def wcsstr.def \
+wmemchr.def	wmemcmp.def	wmemcpy.def	wmemmove.def wmemset.def
 
 SUFFIXES = .def
 

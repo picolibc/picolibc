@@ -1,3 +1,33 @@
+/*
+FUNCTION
+	<<wcscpy>>---copy a wide-character string 
+
+ANSI_SYNOPSIS
+	#include <wchar.h>
+	wchar_t *wcscpy(wchar_t *<[s1]>, const wchar_t *,<[s2]>);
+
+TRAD_SYNOPSIS
+	wchar_t *wcscpy(<[s1]>, <[s2]>
+	wchar_t *<[s1]>;
+	const wchar_t *<[s2]>;
+
+DESCRIPTION
+	The <<wcscpy>> function copies the wide-character string pointed to by
+	<[s2]> (including the terminating null wide-character code) into the
+	array pointed to by <[s1]>. If copying takes place between objects that
+	overlap, the behaviour is undefined. 
+
+RETURNS
+	The <<wcscpy>> function returns <[s1]>; no return value is reserved to
+	indicate an error. 
+
+PORTABILITY
+<<wcscpy>> is ISO/IEC 9899/AMD1:1995 (ISO C).
+No supporting OS subroutines are required.
+*/
+
+/*	$NetBSD: wcscpy.c,v 1.1 2000/12/23 23:14:36 itojun Exp $	*/
+
 /*-
  * Copyright (c)1999 Citrus Project,
  * All rights reserved.
@@ -23,25 +53,26 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	citrus Id: wmemset.c,v 1.2 2000/12/20 14:08:31 itojun Exp
+ *	citrus Id: wcscpy.c,v 1.2 2000/12/21 04:51:09 itojun Exp
  */
 
 #include <_ansi.h>
 #include <wchar.h>
 
-wchar_t	*
-_DEFUN(wmemset, (s, c, n),
-	wchar_t *s _AND
-	wchar_t c _AND
-	size_t n)
+wchar_t *
+_DEFUN (wcscpy, (s1, s2),
+	wchar_t * s1 _AND
+	_CONST wchar_t * s2)
 {
-	size_t i;
-	wchar_t *p;
+  wchar_t *p;
+  _CONST wchar_t *q;
 
-	p = (wchar_t *)s;
-	for (i = 0; i < n; i++) {
-		*p = c;
-		p++;
-	}
-	return s;
+  *s1 = '\0';
+  p = s1;
+  q = s2;
+  while (*q)
+    *p++ = *q++;
+  *p = '\0';
+
+  return s1;
 }

@@ -1,3 +1,37 @@
+/*
+FUNCTION
+	<<wcsrchr>>---wide-character string scanning operation 
+
+ANSI_SYNOPSIS
+	#include <wchar.h>
+	wchar_t *wcsrchr(const wchar_t *<[s]>, wchar_t <[c]>);
+
+TRAD_SYNOPSIS
+	#include <wchar.h>
+	wchar_t *wcsrchr(<[s]>, <[c]>
+	const wchar_t *<[s]>;
+	wchar_t <[c]>;
+
+DESCRIPTION
+	The <<wcsrchr>> function locates the last occurrence of <[c]> in the
+	wide-character string pointed to by <[s]>. The value of <[c]> must be a
+	character representable as a type wchar_t and must be a wide-character
+	code corresponding to a valid character in the current locale.
+	The terminating null wide-character code is considered to be part of
+	the wide-character string. 
+
+RETURNS
+	Upon successful completion, <<wcsrchr>> returns a pointer to the
+	wide-character code or a null pointer if <[c]> does not occur in the
+	wide-character string.
+
+PORTABILITY
+<<wcsrchr>> is ISO/IEC 9899/AMD1:1995 (ISO C).
+No supporting OS subroutines are required.
+*/
+
+/*	$NetBSD: wcsrchr.c,v 1.1 2000/12/23 23:14:37 itojun Exp $	*/
+
 /*-
  * Copyright (c)1999 Citrus Project,
  * All rights reserved.
@@ -23,19 +57,30 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	citrus Id: wmemmove.c,v 1.2 2000/12/20 14:08:31 itojun Exp
+ *	citrus Id: wcsrchr.c,v 1.2 2000/12/21 05:07:25 itojun Exp
  */
 
 #include <_ansi.h>
-#include <string.h>
 #include <wchar.h>
 
 wchar_t *
-_DEFUN (wmemmove, (d, s, n),
-	wchar_t *d _AND
-	const wchar_t *s _AND
-	size_t n)
+_DEFUN (wcsrchr, (s, c),
+	_CONST wchar_t * s _AND
+	wchar_t c)
 {
+  _CONST wchar_t *p;
 
-	return (wchar_t *)memmove(d, s, n * sizeof(wchar_t));
+  p = s;
+  while (*p)
+    p++;
+  while (s <= p)
+    {
+      if (*p == c)
+	{
+	  /* LINTED interface specification */
+	  return (wchar_t *) p;
+	}
+      p--;
+    }
+  return NULL;
 }

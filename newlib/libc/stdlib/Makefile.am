@@ -49,12 +49,7 @@ GENERAL_SOURCES = \
 	wcstombs.c	\
 	wcstombs_r.c	\
 	wctomb.c	\
-	wctomb_r.c	\
-	wmemchr.c	\
-	wmemcmp.c	\
-	wmemcpy.c	\
-	wmemmove.c	\
-	wmemset.c
+	wctomb_r.c
 
 EXTENDED_SOURCES = \
 	drand48.c	\

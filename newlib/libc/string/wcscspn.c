@@ -1,3 +1,33 @@
+/*
+FUNCTION
+	<<wcscspn>>---get length of a complementary wide substring 
+
+ANSI_SYNOPSIS
+	#include <wchar.h>
+	size_t wcscspn(const wchar_t *<[s]>, wchar_t *<[set]>);
+
+TRAD_SYNOPSIS
+	size_t wcscspn(<[s]>, <[set]>
+	const wchar_t *<[s]>;
+	const wchar_t *<[set]>;
+
+DESCRIPTION
+	The <<wcscspn>> function computes the length of the maximum initial
+	segment of the wide-character string pointed to by <[s]> which consists
+	entirely of wide-character codes not from the wide-character string
+	pointed to by <[set]>. 
+
+RETURNS
+	The <<wcscspn>> function returns the length of the initial substring of
+	<[s1]>; no return value is reserved to indicate an error.
+
+PORTABILITY
+<<wcscspn>> is ISO/IEC 9899/AMD1:1995 (ISO C).
+No supporting OS subroutines are required.
+*/
+
+/*	$NetBSD: wcscspn.c,v 1.1 2000/12/23 23:14:36 itojun Exp $	*/
+
 /*-
  * Copyright (c)1999 Citrus Project,
  * All rights reserved.
@@ -23,27 +53,33 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- *	citrus Id: wmemchr.c,v 1.2 2000/12/20 14:08:31 itojun Exp
+ *	citrus Id: wcscspn.c,v 1.1 1999/12/29 21:47:45 tshiozak Exp
  */
 
 #include <_ansi.h>
-#include <stdlib.h>
 #include <wchar.h>
 
-wchar_t	*
-_DEFUN (wmemchr, (s, c, n),
-	const wchar_t *s _AND
-	wchar_t c _AND
-	size_t n)
+size_t
+_DEFUN (wcscspn, (s, set),
+	_CONST wchar_t * s _AND
+	_CONST wchar_t * set)
 {
-	size_t i;
+  _CONST wchar_t *p;
+  _CONST wchar_t *q;
 
-	for (i = 0; i < n; i++) {
-		if (*s == c) {
-			/* LINTED const castaway */
-			return (wchar_t *)s;
-		}
-		s++;
+  p = s;
+  while (*p)
+    {
+      q = set;
+      while (*q)
+	{
+	  if (*p == *q)
+	    goto done;
+	  q++;
 	}
-	return NULL;
+      p++;
+    }
+
+done:
+  return (p - s);
 }
