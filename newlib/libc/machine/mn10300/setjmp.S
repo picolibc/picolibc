@@ -4,10 +4,11 @@
 	.align 1
 	.global _setjmp
 #ifdef __AM33__
-	.am33
-#endif
 #ifdef __AM33_2__
 	.am33_2
+#else
+	.am33
+#endif
 #endif
 _setjmp:
         mov d0,a0
