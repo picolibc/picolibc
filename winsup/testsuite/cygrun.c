@@ -63,5 +63,7 @@ main (int argc, char **argv)
 
   CloseHandle (pi.hProcess);
   CloseHandle (pi.hThread);
+  if (ec > 0xff)
+    ec >>= 8;
   return ec;
 }

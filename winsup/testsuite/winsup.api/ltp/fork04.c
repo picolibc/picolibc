@@ -165,7 +165,7 @@ setup()
   tst_tmpdir();
 
   /* add a variable to the environment */
-  putenv("TESTPROG=FRKTCS04");
+  putenv(strdup("TESTPROG=FRKTCS04"));
 
   /* Pause if that option was specified */
   TEST_PAUSE;

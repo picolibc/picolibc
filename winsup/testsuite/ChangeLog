@@ -1,3 +1,9 @@
+2005-01-09  Christopher Faylor  <cgf@timesys.com>
+
+	* cygrun.c (main): Fix exit code so that it reflects UNIX style.
+	* winsup.api/ltp/fork04.c (setup): Accommodate change in putenv
+	declaration.
+
 2004-08-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* winsup.api/mmaptest01.c (main): Accomodate 9x memory usage.
