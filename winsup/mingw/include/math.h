@@ -533,13 +533,11 @@ extern long double erfcl (long double);
 */ 
 
 /* 7.12.8.3 The lgamma functions */
-
 extern double lgamma (double);
 extern float lgammaf (float);
 extern long double lgammal (long double);
 
-/* 77.12.8.4 The tgamma functions */
-
+/* 7.12.8.4 The tgamma functions */
 extern double tgamma (double);
 extern float tgammaf (float);
 extern long double tgammal (long double);

@@ -1,5 +1,9 @@
 2003-01-26  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/math.h (tgamma): Correct typo in comment.
+
+2003-01-26  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* mingwex/mingw-fseek.c (INLINE): Remove define.
 	(__mingw_is_win9x): Remove static inline function.
 	(_mingw_fwrite): Use _osver instead of __mingw_is_win9x.
