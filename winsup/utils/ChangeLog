@@ -5,6 +5,10 @@
 
 2001-11-11  Christopher Faylor  <cgf@redhat.com>
 
+	* path.h: New file.
+
+2001-11-11  Christopher Faylor  <cgf@redhat.com>
+
 	* cygcheck.cc (scan_registry): Open registry with read-only access.
 	(main): Reflect argument change for dump_setup.
 	* dump_setup.cc (dump_setup): Add preliminary extra argument for future
