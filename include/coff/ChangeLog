@@ -1,6 +1,6 @@
 2001-12-17  Tom Rix  <trix@redhat.com>
 
-	* xcoff.h :  Add .except and .typchk section string.  
+	* xcoff.h :  Add .except and .typchk section string and styp flags.
 	Fix xcoff_big_format_p macro.  
 
 2001-12-16  Tom Rix  <trix@redhat.com>

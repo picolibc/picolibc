@@ -44,6 +44,15 @@
    another section header with STYP_OVRFLO set.  */
 #define STYP_OVRFLO 0x8000
 
+/* Specifies an exception section.  A section of this type provides 
+   information to identify the reason that a trap or ececptin occured within 
+   and executable object program */
+#define STYP_EXCEPT 0x0100
+
+/* Specifies a type check section.  A section of this type contains parameter 
+   argument type check strings used by the AIX binder.  */
+#define STYP_TYPCHK 0x4000
+
 #define	RS6K_AOUTHDR_OMAGIC 0x0107 /* old: text & data writeable */
 #define	RS6K_AOUTHDR_NMAGIC 0x0108 /* new: text r/o, data r/w */
 #define	RS6K_AOUTHDR_ZMAGIC 0x010B /* paged: text r/o, both page-aligned */
