@@ -1,3 +1,7 @@
+1999-05-15  Nick Clifton  <nickc@cygnus.com>
+
+	* mcore.h (IMAGE_REL_MCORE_RVA): Define.
+
 1999-04-21  Nick Clifton  <nickc@cygnus.com>
 
 	* mcore.h (GET_LINENO_LNNO): New macro.
