@@ -1,3 +1,10 @@
+2002-07-29  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/sys/linux/Makefile.am: Add aio64.c. 
+        * libc/sys/linux/Makefile.in: Regenerated.
+        * libc/sys/linux/aio.c (aio_init): ENOSYS stub added.
+        * libc/sys/linux/aio64.c: New file.
+
 2002-07-26  Jeff Johnston  <jjohnstn@redhat.com>
 
 	*  libc/include/sys/param.h (MAX, MIN): Added macros.

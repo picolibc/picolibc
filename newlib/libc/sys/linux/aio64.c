@@ -1,4 +1,4 @@
-/* libc/sys/linux/aio.c - asychronous I/O */
+/* libc/sys/linux/aio64.c - asychronous I/O */
 
 /* Copyright 2002, Red Hat Inc. */
 
@@ -9,42 +9,42 @@
 #include <errno.h>
 
 int
-aio_cancel (int fd, struct aiocb *cb)
+aio_cancel64 (int fd, struct aiocb64 *cb)
 {
   errno = ENOSYS;
   return -1;
 }
 
 int
-aio_error (const struct aiocb *cb)
+aio_error64 (const struct aiocb64 *cb)
 {
   errno = ENOSYS;
   return -1;
 }
 
 int
-aio_fsync (int op, struct aiocb *cb)
+aio_fsync64 (int op, struct aiocb64 *cb)
 {
   errno = ENOSYS;
   return -1;
 }
 
 int
-aio_read (struct aiocb *cb)
+aio_read64 (struct aiocb64 *cb)
 {
   errno = ENOSYS;
   return -1;
 }
 
 ssize_t
-aio_return (struct aiocb *cb)
+aio_return64 (struct aiocb64 *cb)
 {
   errno = ENOSYS;
   return -1;
 }
 
 int
-aio_suspend (const struct aiocb *const list[], int nent,
+aio_suspend64 (const struct aiocb64 *const list[], int nent,
              const struct timespec *timeout)
 {
   errno = ENOSYS;
@@ -52,22 +52,16 @@ aio_suspend (const struct aiocb *const list[], int nent,
 }
 
 int
-aio_write (struct aiocb *cb)
+aio_write64 (struct aiocb64 *cb)
 {
   errno = ENOSYS;
   return -1;
 }
 
 int
-lio_listio (int mode, struct aiocb * const list[], int nent,
-            struct sigevent *sig)
+lio_listio64 (int mode, struct aiocb64 * const list[], int nent,
+              struct sigevent *sig)
 {
   errno = ENOSYS;
   return -1;
-}
-
-void 
-aio_init (const struct aioinit *INIT)
-{
-  errno = ENOSYS;
 }

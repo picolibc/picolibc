@@ -11,6 +11,7 @@ SUBLIBS = \
 
 LIB_SOURCES = \
 	aio.c \
+	aio64.c \
 	brk.c \
 	calloc.c \
 	callocr.c \
