@@ -1,5 +1,21 @@
 2002-06-10  Christopher Faylor  <cgf@redhat.com>
 
+	* Makefile.in: Ensure that -MD gets added to CFLAGS regardless of
+	CFLAGS command-line setting.
+
+	* cygwin.din: Export sexec* functions as function which returns ENOSYS
+	(i.e., sexec* is deprecated).
+	* dtable.cc (dtable::vfork_child_dup): Ensure that impersonation is
+	restored even on failure.
+	* exec.cc: Throughout, remove references to sexec* and _spawnve.
+	* pinfo.h: Remove _spawnve declaration.
+	* spawn.cc: Rename _spawnve to spawnve and use throughout.
+	(spawn_guts): Eliminate hToken argument and processing of same.  Just
+	perform special actions if impersonating.
+	(spawnve): Rename from _spawnve.
+
+2002-06-10  Christopher Faylor  <cgf@redhat.com>
+
 	* include/sys/strace.h (strace): Avoid use of constructor.
 
 2002-06-10  Christopher Faylor  <cgf@redhat.com>

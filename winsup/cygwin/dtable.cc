@@ -633,14 +633,14 @@ dtable::vfork_child_dup ()
 	goto out;
       }
 
-  /* Restore impersonation */
-  if (cygheap->user.impersonated && cygheap->user.token != INVALID_HANDLE_VALUE)
-    ImpersonateLoggedOnUser (cygheap->user.token);
-
   fds_on_hold = fds;
   fds = newtable;
 
 out:
+  /* Restore impersonation */
+  if (cygheap->user.impersonated && cygheap->user.token != INVALID_HANDLE_VALUE)
+    ImpersonateLoggedOnUser (cygheap->user.token);
+
   ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "dup");
   return 1;
 }

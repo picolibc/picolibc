@@ -1144,14 +1144,14 @@ _tzname DATA
 ptsname
 grantpt
 unlockpt
-sexecve
-sexecl
-sexecle
-sexeclp
-sexeclpe
-sexecv
-sexecp
-sexecvpe
+sexecve = sexecve_is_bad
+sexecl = sexecve_is_bad
+sexecle = sexecve_is_bad
+sexeclp = sexecve_is_bad
+sexeclpe = sexecve_is_bad
+sexecv = sexecve_is_bad
+sexecp = sexecve_is_bad
+sexecvpe = sexecve_is_bad
 ttyslot
 rcmd = cygwin_rcmd
 rresvport = cygwin_rresvport

@@ -46,8 +46,7 @@ BOOL allow_ntsec;
    The default is TRUE to reflect the old behaviour. */
 BOOL allow_smbntsec = TRUE;
 
-extern "C"
-void
+extern "C" void
 cygwin_set_impersonation_token (const HANDLE hToken)
 {
   debug_printf ("set_impersonation_token (%d)", hToken);
@@ -100,8 +99,7 @@ extract_nt_dom_user (const struct passwd *pw, char *domain, char *user)
     }
 }
 
-extern "C"
-HANDLE
+extern "C" HANDLE
 cygwin_logon_user (const struct passwd *pw, const char *password)
 {
   if (!wincap.has_security ())

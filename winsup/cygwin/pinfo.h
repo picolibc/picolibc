@@ -199,9 +199,6 @@ void __stdcall set_myself (pid_t pid, HANDLE h = NULL);
 extern pinfo myself;
 
 #define _P_VFORK 0
-extern "C" int _spawnve (HANDLE hToken, int mode, const char *path,
-			 const char *const *argv, const char *const *envp);
-
 extern void __stdcall pinfo_fixup_after_fork ();
 extern HANDLE hexec_proc;
 

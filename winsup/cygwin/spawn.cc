@@ -316,7 +316,7 @@ av::unshift (const char *what, int conv)
 }
 
 static int __stdcall
-spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
+spawn_guts (const char * prog_arg, const char *const *argv,
 	    const char *const envp[], int mode)
 {
   BOOL rc;
@@ -612,21 +612,18 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
   else
     envblock = winenv (envp, 0);
 
+  const char *runpath = null_app_name ? NULL : (const char *) real_path;
+
+  syscall_printf ("null_app_name %d (%s, %.132s)", null_app_name, runpath, one_line.buf);
+
+  void *newheap;
   /* Preallocated buffer for `sec_user' call */
   char sa_buf[1024];
 
-  if (!hToken && cygheap->user.impersonated
-      && cygheap->user.token != INVALID_HANDLE_VALUE)
-    hToken = cygheap->user.token;
-
-  const char *runpath = null_app_name ? NULL : (const char *) real_path;
-
-  syscall_printf ("spawn_guts null_app_name %d (%s, %.132s)", null_app_name, runpath, one_line.buf);
-
-  void *newheap;
   cygbench ("spawn-guts");
-  if (!hToken)
+  if (!cygheap->user.impersonated || cygheap->user.token == INVALID_HANDLE_VALUE)
     {
+
       ciresrv.moreinfo->uid = getuid32 ();
       /* FIXME: This leaks a handle in the CreateProcessAsUser case since the
 	 child process doesn't know about cygwin_mount_h. */
@@ -649,7 +646,8 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
     {
       cygsid sid;
       DWORD ret_len;
-      if (!GetTokenInformation (hToken, TokenUser, &sid, sizeof sid, &ret_len))
+      if (!GetTokenInformation (cygheap->user.token, TokenUser, &sid,
+				sizeof sid, &ret_len))
 	{
 	  sid = NO_SID;
 	  system_printf ("GetTokenInformation: %E");
@@ -685,7 +683,7 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
       si.lpDesktop = wstname;
 
       newheap = cygheap_setup_for_child (&ciresrv, cygheap->fdtab.need_fixup_before ());
-      rc = CreateProcessAsUser (hToken,
+      rc = CreateProcessAsUser (cygheap->user.token,
 		       runpath,		/* image name - with full path */
 		       one_line.buf,	/* what was passed to exec */
 		       sec_attribs,     /* process security attrs */
@@ -785,9 +783,6 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
   ForceCloseHandle (pi.hThread);
 
   sigproc_printf ("spawned windows pid %d", pi.dwProcessId);
-
-  if (hToken && hToken != cygheap->user.token)
-    CloseHandle (hToken);
 
   DWORD res;
   BOOL exited;
@@ -909,8 +904,8 @@ cwait (int *result, int pid, int)
  */
 
 extern "C" int
-_spawnve (HANDLE hToken, int mode, const char *path, const char *const *argv,
-	  const char *const *envp)
+spawnve (int mode, const char *path, const char *const *argv,
+	 const char *const *envp)
 {
   int ret;
   vfork_save *vf = vfork_storage.val ();
@@ -920,14 +915,14 @@ _spawnve (HANDLE hToken, int mode, const char *path, const char *const *argv,
   else
     vf = NULL;
 
-  syscall_printf ("_spawnve (%s, %s, %x)", path, argv[0], envp);
+  syscall_printf ("spawnve (%s, %s, %x)", path, argv[0], envp);
 
   switch (mode)
     {
     case _P_OVERLAY:
       /* We do not pass _P_SEARCH_PATH here. execve doesn't search PATH.*/
       /* Just act as an exec if _P_OVERLAY set. */
-      spawn_guts (hToken, path, argv, envp, mode);
+      spawn_guts (path, argv, envp, mode);
       /* Errno should be set by spawn_guts.  */
       ret = -1;
       break;
@@ -937,7 +932,7 @@ _spawnve (HANDLE hToken, int mode, const char *path, const char *const *argv,
     case _P_WAIT:
     case _P_DETACH:
       subproc_init ();
-      ret = spawn_guts (hToken, path, argv, envp, mode);
+      ret = spawn_guts (path, argv, envp, mode);
       if (vf && ret > 0)
 	{
 	  debug_printf ("longjmping due to vfork");
@@ -975,7 +970,7 @@ spawnl (int mode, const char *path, const char *arg0, ...)
 
   va_end (args);
 
-  return _spawnve (NULL, mode, path, (char * const  *) argv, cur_environ ());
+  return spawnve (mode, path, (char * const  *) argv, cur_environ ());
 }
 
 extern "C" int
@@ -997,8 +992,7 @@ spawnle (int mode, const char *path, const char *arg0, ...)
   envp = va_arg (args, const char * const *);
   va_end (args);
 
-  return _spawnve (NULL, mode, path, (char * const *) argv,
-		   (char * const *) envp);
+  return spawnve (mode, path, (char * const *) argv, (char * const *) envp);
 }
 
 extern "C" int
@@ -1046,14 +1040,7 @@ spawnlpe (int mode, const char *path, const char *arg0, ...)
 extern "C" int
 spawnv (int mode, const char *path, const char * const *argv)
 {
-  return _spawnve (NULL, mode, path, argv, cur_environ ());
-}
-
-extern "C" int
-spawnve (int mode, const char *path, char * const *argv,
-					     const char * const *envp)
-{
-  return _spawnve (NULL, mode, path, argv, envp);
+  return spawnve (mode, path, argv, cur_environ ());
 }
 
 extern "C" int
@@ -1067,5 +1054,5 @@ spawnvpe (int mode, const char *file, const char * const *argv,
 					     const char * const *envp)
 {
   path_conv buf;
-  return _spawnve (NULL, mode, find_exec (file, buf), argv, envp);
+  return spawnve (mode, find_exec (file, buf), argv, envp);
 }
