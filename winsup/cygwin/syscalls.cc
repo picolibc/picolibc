@@ -986,13 +986,7 @@ fsync (int fd)
       return -1;
     }
 
-<<<<<<< syscalls.cc
-  HANDLE h = cygheap->fdtab[fd]->get_handle ();
-
-  if (FlushFileBuffers (h) == 0)
-=======
   if (FlushFileBuffers (cfd->get_handle ()) == 0)
->>>>>>> 1.176
     {
       __seterrno ();
       return -1;
