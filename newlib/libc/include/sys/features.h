@@ -86,6 +86,7 @@ extern "C" {
 # define _POSIX_THREAD_SAFE_FUNCTIONS            1
 # define _POSIX_THREAD_PRIORITY_SCHEDULING       1
 # define _POSIX_THREAD_ATTR_STACKSIZE            1
+# define _POSIX_SEMAPHORES                       1
 #endif
 
 #ifdef __cplusplus
