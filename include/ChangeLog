@@ -2,10 +2,6 @@
 
 	* sim-sh64.h: New file.
 
-2001-10-24  Neil Booth  <neil@daikokuya.demon.co.uk>
-
-	* safe-ctype.h (_sch_isbasic, IS_ISOBASIC): New.
-
 2002-01-31  Ivan Guzvinec  <ivang@opencores.org>
 
 	* dis-asm.h : Add support for or32 targets
@@ -157,7 +153,7 @@
 
 	* hashtab.h (htab_hash_string): Declare.
 
-2001-06-13  Andrew Cagney  <ac131313@redhat.com>
+2001-08-10  Andrew Cagney  <ac131313@redhat.com>
 
 	* libiberty.h (lbasename): Change function declaration to return a
 	const char pointer.
@@ -306,11 +302,11 @@
 
 	* getopt.h obstack.h: Standarize copyright statement.
 
-2000-12-05  Richard Henderson  <rth@redhat.com>
+2000-12-04  Richard Henderson  <rth@redhat.com>
 
 	* demangle.h: Change "new_abi" to "v3" everywhere.
 
-2000-11-29  Zack Weinberg  <zack@wolery.stanford.edu>
+2000-11-22  Zack Weinberg  <zack@wolery.stanford.edu>
 
 	* libiberty.h: Move #includes to top.  Prototype xmalloc_failed.
 
