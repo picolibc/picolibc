@@ -2777,6 +2777,10 @@ typedef struct _WINDOWPOS {
 	int cy;
 	UINT flags;
 } WINDOWPOS,*PWINDOWPOS,*LPWINDOWPOS;
+typedef struct tagNCCALCSIZE_PARAMS {
+	RECT rgrc[3];
+	PWINDOWPOS lppos;
+} NCCALCSIZE_PARAMS, *LPNCCALCSIZE_PARAMS;
 typedef struct tagMDICREATESTRUCTA {
 	LPCSTR szClass;
 	LPCSTR szTitle;

@@ -140,7 +140,7 @@ typedef unsigned long PROPID;
 #define REFCLSID const CLSID* const
 #endif
 #define _REFGUID_DEFINED
-#define _REFGIID_DEFINED
+#define _REFIID_DEFINED
 #define _REFCLSID_DEFINED
 #endif
 #ifndef GUID_SECTION
