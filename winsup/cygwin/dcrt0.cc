@@ -695,6 +695,7 @@ dll_crt0_1 ()
 				  DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
 	      h = NULL;
 	    set_myself (mypid, h);
+	    myself->uid = spawn_info->moreinfo->uid;
 	    __argc = spawn_info->moreinfo->argc;
 	    __argv = spawn_info->moreinfo->argv;
 	    envp = spawn_info->moreinfo->envp;
@@ -709,7 +710,6 @@ dll_crt0_1 ()
 	      }
 	    if (child_proc_info->subproc_ready)
 	      ProtectHandle (child_proc_info->subproc_ready);
-	    myself->uid = spawn_info->moreinfo->uid;
 	    if (myself->uid == USHRT_MAX)
 	      cygheap->user.set_sid (NULL);
 	    break;

@@ -167,10 +167,11 @@ static void *__stdcall
 _cmalloc (int size)
 {
   _cmalloc_entry *rvc;
-  int b, sz;
+  unsigned b, sz;
 
   /* Calculate "bit bucket" and size as a power of two. */
-  for (b = 3, sz = 8; sz && sz < (size + 4); b++, sz <<= 1)
+  for (b = 3, sz = 8; sz && sz < (size + sizeof (_cmalloc_entry));
+       b++, sz <<= 1)
     continue;
 
   cygheap_protect->acquire ();

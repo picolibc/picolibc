@@ -1,3 +1,11 @@
+Wed 18 Jul 2001 01:00:47 PM EDT  Christopher Faylor <cgf@cygnus.com>
+
+	* cygheap.cc (_cmalloc): Use correct constants for size calculation.
+	* dcrt0.cc (dll_crt0_1): Move uid initialization earlier.
+	* fork.cc (fork_parent): Move cygheap_setup_in_child to just prior to
+	CreateProcess so that all contents of cygheap are copied.
+	* spawn.cc (spawn_guts): Ditto.
+
 Wed 18 Jul 2001 12:54:17  Corinna Vinschen <corinna@vinschen.de>
 
 	* security.cc (get_user_groups): Call Net function with NULL server

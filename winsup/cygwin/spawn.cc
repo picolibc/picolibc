@@ -542,7 +542,8 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
     *c++ = cstrdup1 (*e++);
   *c = NULL;
   if (mode != _P_OVERLAY ||
-      !DuplicateHandle (hMainProc, myself.shared_handle (), hMainProc, &ciresrv.moreinfo->myself_pinfo, 0,
+      !DuplicateHandle (hMainProc, myself.shared_handle (), hMainProc,
+			&ciresrv.moreinfo->myself_pinfo, 0,
 			TRUE, DUPLICATE_SAME_ACCESS))
     ciresrv.moreinfo->myself_pinfo = NULL;
 
@@ -578,8 +579,6 @@ skip_arg_parsing:
   else
     envblock = winenv (envp, 0);
 
-  cygheap_setup_for_child (&ciresrv);
-
   /* Preallocated buffer for `sec_user' call */
   char sa_buf[1024];
 
@@ -598,6 +597,7 @@ skip_arg_parsing:
       /* FIXME: This leaks a handle in the CreateProcessAsUser case since the
 	 child process doesn't know about cygwin_mount_h. */
       ciresrv.mount_h = cygwin_mount_h;
+      cygheap_setup_for_child (&ciresrv);
       rc = CreateProcess (runpath,	/* image name - with full path */
 			  one_line.buf,	/* what was passed to exec */
 					  /* process security attrs */
@@ -652,6 +652,7 @@ skip_arg_parsing:
       strcat (wstname, dskname);
       si.lpDesktop = wstname;
 
+      cygheap_setup_for_child (&ciresrv);
       rc = CreateProcessAsUser (hToken,
 		       runpath,		/* image name - with full path */
 		       one_line.buf,	/* what was passed to exec */

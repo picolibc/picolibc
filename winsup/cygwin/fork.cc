@@ -442,7 +442,6 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
     RevertToSelf ();
 
   ch.parent = hParent;
-  cygheap_setup_for_child (&ch);
 #ifdef DEBUGGING
   if (npid_max)
     {
@@ -464,6 +463,7 @@ out:
   char sa_buf[1024];
   syscall_printf ("CreateProcess (%s, %s, 0, 0, 1, %x, 0, 0, %p, %p)",
 		  myself->progname, myself->progname, c_flags, &si, &pi);
+  cygheap_setup_for_child (&ch);
   rc = CreateProcess (myself->progname, /* image to run */
 		      myself->progname, /* what we send in arg0 */
 		      allow_ntsec ? sec_user (sa_buf) : &sec_none_nih,
