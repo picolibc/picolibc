@@ -1,3 +1,8 @@
+2003-10-02  Luke Dunstan  <infidel@users.sourceforge.net>
+
+	* include/winspool.h (GetDefaultPrinter[AW]): Add functions.
+	* lib/winspool.def (GetDefaultPrinter[AW]): Add stubs.
+
 2003-10-01  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winnt.h (INVALID_FILE_ATTRIBUTES): Fix define.

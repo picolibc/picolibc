@@ -612,6 +612,10 @@ BOOL WINAPI FindClosePrinterChangeNotification(HANDLE);
 HANDLE WINAPI FindFirstPrinterChangeNotification(HANDLE,DWORD,DWORD,PVOID);
 HANDLE WINAPI FindNextPrinterChangeNotification(HANDLE,PDWORD,PVOID,PVOID*);
 BOOL WINAPI FreePrinterNotifyInfo(PPRINTER_NOTIFY_INFO);
+#if _WIN32_WINNT >= 0x0500
+BOOL WINAPI GetDefaultPrinterA(LPSTR,LPDWORD);
+BOOL WINAPI GetDefaultPrinterW(LPWSTR,LPDWORD);
+#endif
 BOOL WINAPI GetFormA(HANDLE,LPSTR,DWORD,PBYTE,DWORD,PDWORD);
 BOOL WINAPI GetFormW(HANDLE,LPWSTR,DWORD,PBYTE,DWORD,PDWORD);
 BOOL WINAPI GetJobA(HANDLE,DWORD,DWORD,PBYTE,DWORD,PDWORD);
@@ -698,6 +702,7 @@ typedef PRINTER_DEFAULTSW PRINTER_DEFAULTS,*PPRINTER_DEFAULTS,*LPPRINTER_DEFAULT
 #define EnumPrinters EnumPrintersW
 #define EnumPrintProcessorDatatypes EnumPrintProcessorDatatypesW
 #define EnumPrintProcessors EnumPrintProcessorsW
+#define GetDefaultPrinter GetDefaultPrinterW
 #define	GetForm	GetFormW
 #define GetJob GetJobW
 #define GetPrinter GetPrinterW
@@ -762,6 +767,7 @@ typedef PRINTER_DEFAULTSA PRINTER_DEFAULTS,*PPRINTER_DEFAULTS,*LPPRINTER_DEFAULT
 #define EnumPrinters EnumPrintersA
 #define EnumPrintProcessorDatatypes EnumPrintProcessorDatatypesA
 #define EnumPrintProcessors EnumPrintProcessorsA
+#define GetDefaultPrinter GetDefaultPrinterA
 #define	GetForm	GetFormA
 #define GetJob GetJobA
 #define GetPrinter GetPrinterA
