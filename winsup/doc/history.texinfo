@@ -298,7 +298,7 @@ Under NT only, utilities mkpasswd and mkgroup can generate a valid
 /etc/passwd and /etc/group.
 
 Earlier releases stored mount points in the registry under
-"Cygnus Support".  This changed to "Cygnus Solutions" starting
+"Cygnus Support".  This changed to "Red Hat, Inc." starting
 with beta 18.  Either use a registry editor (regedit under NT)
 to rename the old entry or just redo your mount points and the
 cygwin.dll will automatically create the new one for you.

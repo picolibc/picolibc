@@ -461,7 +461,7 @@ you should have better luck.
 If you are trying to umount '/' and are getting this message, you may
 need to run @code{regedit.exe} and change the "native" key for the '/'
 mount in one of the mount points kept under
-HKEY_CURRENT_USER/Software/Cygnus Solutions/CYGWIN.DLL setup/<version>
+HKEY_CURRENT_USER/Software/Red Hat, Inc./CYGWIN.DLL setup/<version>
 where <version> is the latest registry version associated with the
 Cygwin library.
 

@@ -127,7 +127,7 @@ In the second case we rely on the DOS shell to redirect in binary mode.
 <para>UNIX programs that have been written for maximum portability
 will know the difference between text and binary files and act
 appropriately under Cygwin.  For those programs, the text mode default
-is a good choice.  Programs included in official Cygnus distributions
+is a good choice.  Programs included in official Cygwin distributions
 should work well in the default mode. </para>
 
 <para>Text mode makes it much easier to mix files between Cygwin and

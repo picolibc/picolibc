@@ -164,7 +164,7 @@ backslashes) and CIFS paths (//server/share or \\server\share) as well.</para>
 
 <sect2 id="ov-hi-textvsbinary"><title>Text Mode vs. Binary Mode</title>
 <para>Interoperability with other Win32 programs such as text editors was
-critical to the success of the port of the development tools.  Most Cygnus
+critical to the success of the port of the development tools.  Most Red Hat
 customers upgrading from the older DOS-hosted toolchains expected the new
 Win32-hosted ones to continue to work with their old development
 sources.</para>
@@ -184,8 +184,7 @@ set to override this behavior.</para>
 </sect2>
 
 <sect2 id="ov-hi-ansiclib"><title>ANSI C Library</title>
-<para>We chose to include
-Cygnus' own existing ANSI C library
+<para>We chose to include Red Hat's own existing ANSI C library
 "newlib" as part of the library, rather than write all of the lib C
 and math calls from scratch.  Newlib is a BSD-derived ANSI C library,
 previously only used by cross-compilers for embedded systems

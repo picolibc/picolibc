@@ -1,3 +1,8 @@
+2001-12-03  Christopher Faylor  <cgf@redhat.com>
+
+	Cleanup copyrights and Cygnus'isms throughout.
+	* setup.sgml: Nuke ancient instructions.
+
 Tue Oct 16 18:02:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* pathnames.sgml: Cleanup raw device text to be more coherent.

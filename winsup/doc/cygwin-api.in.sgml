@@ -1,13 +1,12 @@
 <!doctype book PUBLIC "-//Davenport//DTD DocBook V3.0//EN" [
-  <!ENTITY cygnus-copyright "<YEAR>1998</YEAR><HOLDER>Cygnus
-            Solutions</HOLDER>">
+  <!ENTITY cygnus-copyright "<YEAR>1998</YEAR><HOLDER>Red Hat, Inc.</HOLDER>">
   <!ENTITY cygnus-code-copyright "
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Copyright (C) 1998 Cygnus Solutions.
+Copyright (C) 1998,2001 Red Hat, Inc.
 
 This is copyrighted software that may only
 be reproduced, modified, or distributed
-under license from Cygnus Solutions.
+under license from Red Hat, Inc.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ">
  ]>
@@ -34,13 +33,13 @@ under license from Cygnus Solutions.
       <revision>
 	<revnumber>0.0</revnumber>
 	<date>1998-08-31</date>
-	<authorinitials>dj@cygnus.com</authorinitials>
+	<authorinitials>dj</authorinitials>
 	<revremark>Initial revision</revremark>
       </revision>
       <revision>
 	<revnumber>0.5.0</revnumber>
 	<date>1998-12-17</date>
-	<authorinitials>noer@cygnus.com</authorinitials>
+	<authorinitials>noer</authorinitials>
 	<revremark>Add pthread, sem calls.  Change revnumber to
 	three-part number: Cygwin API major, Cygwin API minor, Doc rev
 	number.  Starts out at 0.5.0.</revremark>

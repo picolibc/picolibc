@@ -42,7 +42,7 @@ the appropriate priviledges (Administrator priviledges in Windows
 NT).</para>
 
 <para>The current user's table is located under
-"HKEY_CURRENT_USER/Software/Cygnus Solutions/Cygwin/mounts
+"HKEY_CURRENT_USER/Software/Red Hat, Inc./Cygwin/mounts
 v&lt;version&gt;"
 where &lt;version&gt; is the latest registry version associated with
 the Cygwin library (this version is not the same as the release
@@ -70,10 +70,13 @@ to the current user.</para>
 <example>
 <title>Displaying the current set of mount points</title>
 <screen>
-<prompt>c:\cygnus\&gt;</prompt> <userinput>mount</userinput>
-Device           Directory           Type        Flags
-D:               /d                  user        textmode
-C:               /                   system      textmode
+<prompt>c:\&gt;</prompt> <userinput>mount</userinput>
+f:\cygwin\bin on /usr/bin type system (binmode)
+f:\cygwin\lib on /usr/lib type system (binmode)
+f:\cygwin on / type system (binmode)
+e:\src on /usr/src type system (binmode)
+c: on /cygdrive/c type user (binmode,noumount)
+e: on /cygdrive/e type user (binmode,noumount)
 </screen>
 </example>
 
@@ -102,43 +105,6 @@ information on text and binary modes.</para>
 
 </sect2>
 
-<sect2><title>Cygwin Mount Table Strategies</title>
-
-<para>Which set of mounts is right for a given Cygwin user depends
-largely on how closely you want to simulate a POSIX environment,
-whether you mix Windows and Cygwin programs, and how many drive
-letters you are using.  If you want to be very POSIX-like (assuming
-"CygwinRoot" is the top directory of your Cygwin distribution), you may
-want to do something like this:</para>
-
-<example><title>POSIX-like mount setup</title>
-<screen>
-<prompt>C:\&gt;</prompt> <userinput>mount c:\Cygnus\CygwinRoot /</userinput>
-<prompt>C:\&gt;</prompt> <userinput>mount c:\ /c</userinput>
-<prompt>C:\&gt;</prompt> <userinput>mount d:\ /d</userinput>
-<prompt>C:\&gt;</prompt> <userinput>mount e:\ /cdrom</userinput>
-</screen>
-</example>
-
-<para>However, if you mix Windows and Cygwin programs a lot, you might
-want to create an "identity" mapping, so that conversions between the
-two (see <Xref Linkend="cygpath">) can be eliminated:</para>
-
-<example><title>Identity mount setup</title>
-<screen>
-<prompt>C:\&gt;</prompt> <userinput>mount c:\ /</userinput>
-<prompt>C:\&gt;</prompt> <userinput>mount d:\foo /foo</userinput>
-<prompt>C:\&gt;</prompt> <userinput>mount d:\bar /bar</userinput>
-<prompt>C:\&gt;</prompt> <userinput>mount e:\grill /grill</userinput>
-</screen>
-</example>
-
-<para>You'd have to repeat this for all top-level subdirectories on
-all drives, but then you'd always have the top-level directories
-available as the same names in both systems.</para>
-
-</sect2>
-
 <sect2><title>Additional Path-related Information</title>
 
 <para>The <command>cygpath</command> program provides the ability to
@@ -147,10 +113,10 @@ translate between Win32 and POSIX pathnames in shell scripts. See
 
 <para>The <EnVar>HOME</EnVar>, <EnVar>PATH</EnVar>, and
 <EnVar>LD_LIBRARY_PATH</EnVar> environment variables are automatically
-converted from Win32 format to POSIX format (e.g. from
-<filename>C:\cygnus\cygwin-b20\H-i586-cygwin32\bin</filename> to
-<filename>/bin</filename>, if there was a mount from that Win32 path to
-that POSIX path) when a Cygwin process first starts.</para>
+converted from Win32 format to POSIX format (e.g.  from
+<filename>c:\cygwin\bin</filename> to <filename>/bin</filename>, if
+there was a mount from that Win32 path to that POSIX path) when a Cygwin
+process first starts.</para>
 
 <para>Symbolic links can also be used to map Win32 pathnames to POSIX.
 For example, the command
@@ -339,11 +305,11 @@ does not.  In the same situation the function call
 <filename>filename.exe</filename>.  The two files can be distinguished
 by examining their inodes, as demonstrated below.
 <screen>
-<prompt>C:\Cygnus\&gt;</prompt> <userinput>ls * </userinput>
+<prompt>C:\&gt;</prompt> <userinput>ls * </userinput>
 a      a.exe     b.exe
-<prompt>C:\Cygnus\&gt;</prompt> <userinput>ls -i a a.exe</userinput>
+<prompt>C:\&gt;</prompt> <userinput>ls -i a a.exe</userinput>
 445885548 a       435996602 a.exe
-<prompt>C:\Cygnus\&gt;</prompt> <userinput>ls -i b b.exe</userinput>
+<prompt>C:\&gt;</prompt> <userinput>ls -i b b.exe</userinput>
 432961010 b       432961010 b.exe
 </screen>
 If a shell script <filename>myprog</filename> and a program
@@ -381,13 +347,13 @@ In the following example compare the behaviors of the bash built-in
 
 <example><title> Using @pathname</title>
 <screen>
-<prompt>/Cygnus$</prompt> <userinput>echo  'This   is   "a     long"  line' > mylist</userinput>
-<prompt>/Cygnus$</prompt> <userinput>echo @mylist</userinput>
+<prompt>bash$</prompt> <userinput>echo  'This   is   "a     long"  line' > mylist</userinput>
+<prompt>bash$</prompt> <userinput>echo @mylist</userinput>
 @mylist
-<prompt>/Cygnus$</prompt> <userinput>/bin/echo @mylist</userinput>
+<prompt>bash$</prompt> <userinput>/bin/echo @mylist</userinput>
 This is a     long line
-<prompt>/Cygnus$</prompt> <userinput>rm mylist</userinput>
-<prompt>/Cygnus$</prompt> <userinput>/bin/echo @mylist</userinput>
+<prompt>bash$</prompt> <userinput>rm mylist</userinput>
+<prompt>bash$</prompt> <userinput>/bin/echo @mylist</userinput>
 @mylist
 </screen>
 </example>
