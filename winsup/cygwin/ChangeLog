@@ -1,3 +1,15 @@
+Thu Apr 13  8:48:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* path.cc (conv_to_win32_path): Detect a win32 path
+	if path contains backslashes.
+        * cygwin.din: Add symbol for `lacl'.
+        * security.cc (ReadSD): Add debug output.
+        (acl_worker):  New static function.
+        (acl): Call acl_worker now.
+        (lacl): New function.
+        (facl): Call acl_worker now.
+	* include/cygwin/acl.h: Add prototype for `lacl'.
+
 Wed Apr 12 18:48:33 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (path_conv::path_conv): Ensure that suffix is correctly

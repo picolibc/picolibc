@@ -396,6 +396,7 @@ ReadSD(const char *file, PSECURITY_DESCRIPTOR sdBuf, LPDWORD sdBufSize)
     }
 
   /* Open file for read */
+  debug_printf("file = %s", file);
   HANDLE hFile = CreateFile (file, GENERIC_READ,
 			     FILE_SHARE_READ | FILE_SHARE_WRITE,
 			     &sec_none_nih, OPEN_EXISTING,
@@ -1518,11 +1519,12 @@ acl_access (const char *path, int flags)
   return -1;
 }
 
-extern "C"
+static
 int
-acl (const char *path, int cmd, int nentries, aclent_t *aclbufp)
+acl_worker (const char *path, int cmd, int nentries, aclent_t *aclbufp,
+            int nofollow)
 {
-  path_conv real_path (path);
+  path_conv real_path (path, nofollow ? SYMLINK_NOFOLLOW : SYMLINK_FOLLOW, 1);
   if (real_path.error)
     {
       set_errno (real_path.error);
@@ -1542,7 +1544,8 @@ acl (const char *path, int cmd, int nentries, aclent_t *aclbufp)
         case GETACL:
           if (nentries < 1)
             set_errno (EINVAL);
-          else if (! stat (path, &st))
+          else if ((nofollow && ! lstat (path, &st))
+                   || (!nofollow && ! stat (path, &st)))
             {
               aclent_t lacl[4];
               if (nentries > 0)
@@ -1618,6 +1621,20 @@ acl (const char *path, int cmd, int nentries, aclent_t *aclbufp)
 
 extern "C"
 int
+acl (const char *path, int cmd, int nentries, aclent_t *aclbufp)
+{
+  return acl_worker (path, cmd, nentries, aclbufp, 0);
+}
+
+extern "C"
+int
+lacl (const char *path, int cmd, int nentries, aclent_t *aclbufp)
+{
+  return acl_worker (path, cmd, nentries, aclbufp, 1);
+}
+
+extern "C"
+int
 facl (int fd, int cmd, int nentries, aclent_t *aclbufp)
 {
   if (dtable.not_open (fd))
@@ -1634,7 +1651,7 @@ facl (int fd, int cmd, int nentries, aclent_t *aclbufp)
       return -1;
     }
   syscall_printf ("facl (%d): calling acl (%s)", fd, path);
-  return acl (path, cmd, nentries, aclbufp);
+  return acl_worker (path, cmd, nentries, aclbufp, 0);
 }
 
 extern "C"

@@ -65,6 +65,7 @@ typedef struct acl {
 } aclent_t;
 
 int _EXFUN(acl,(const char *path, int cmd, int nentries, aclent_t *aclbufp));
+int _EXFUN(lacl,(const char *path, int cmd, int nentries, aclent_t *aclbufp));
 int _EXFUN(facl,(int fd, int cmd, int nentries, aclent_t *aclbufp));
 int _EXFUN(aclcheck,(aclent_t *aclbufp, int nentries, int *which));
 int _EXFUN(aclsort,(int nentries, int calclass, aclent_t *aclbufp));
