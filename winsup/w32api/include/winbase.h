@@ -859,6 +859,19 @@ typedef struct _MEMORYSTATUS {
 	DWORD dwTotalVirtual;
 	DWORD dwAvailVirtual;
 } MEMORYSTATUS,*LPMEMORYSTATUS;
+#if (_WIN32_WINNT >= 0x0500)
+typedef struct _MEMORYSTATUSEX {
+	DWORD dwLength;
+	DWORD dwMemoryLoad;
+	DWORDLONG ullTotalPhys;
+	DWORDLONG ullAvailPhys;
+	DWORDLONG ullTotalPageFile;
+	DWORDLONG ullAvailPageFile;
+	DWORDLONG ullTotalVirtual;
+	DWORDLONG ullAvailVirtual;
+	DWORDLONG ullAvailExtendedVirtual;
+} MEMORYSTATUSEX, *LPMEMORYSTATUSEX;
+#endif
 typedef struct _LDT_ENTRY {
 	WORD LimitLow;
 	WORD BaseLow;
@@ -1293,6 +1306,9 @@ UINT WINAPI GlobalGetAtomNameW(ATOM,LPWSTR,int);
 HGLOBAL WINAPI GlobalHandle(PCVOID);
 LPVOID WINAPI GlobalLock(HGLOBAL);
 VOID WINAPI GlobalMemoryStatus(LPMEMORYSTATUS);
+#if (_WIN32_WINNT >= 0x0500)
+BOOL WINAPI GlobalMemoryStatusEx(LPMEMORYSTATUSEX);
+#endif
 HGLOBAL WINAPI GlobalReAlloc(HGLOBAL,DWORD,UINT);
 DWORD WINAPI GlobalSize(HGLOBAL);
 VOID WINAPI GlobalUnfix(HGLOBAL);

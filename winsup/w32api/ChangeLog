@@ -1,3 +1,9 @@
+2003-02-22  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/winbase.h (MEMORYSTATUSEX): Add structure.
+	(GlobalMemoryStatusEx): Add prototype.
+	* lib/kernel32.def (GlobalMemoryStatusEx): Add stub.
+
 2003-02-17 Vaclav Haisman <V.Haisman@sh.cvut.cz>
 
 	* include/winioctl.h (FSCTL_SET_SPARSE): Define.

@@ -406,6 +406,7 @@ GlobalGetAtomNameW@12
 GlobalHandle@4
 GlobalLock@4
 GlobalMemoryStatus@4
+GlobalMemoryStatusEx@4
 GlobalMemoryStatusVlm@4
 GlobalReAlloc@12
 GlobalSize@4
