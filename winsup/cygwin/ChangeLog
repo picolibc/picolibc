@@ -1,3 +1,14 @@
+2005-02-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (class mmap_record): Declare new map_pages method with
+	address parameter.
+	(mmap_record::map_pages): New method with address parameter.
+	(mmap64): Evaluate access mode before checking if already existing
+	mapping can be used.
+	Only use existing mapping if requested access mode matches the one
+	in the existing mapping.
+	Add check for existing mapping for MAP_FIXED case.
+
 2005-02-23  Corinna Vinschen  <corinna@vinschen.de>
 	
 	* localtime.cc: Implement setting __tzrule's offset member using

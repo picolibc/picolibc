@@ -93,6 +93,7 @@ class mmap_record
 
     DWORD find_unused_pages (DWORD pages);
     _off64_t map_pages (_off64_t off, DWORD len);
+    bool map_pages (caddr_t addr, DWORD len);
     bool unmap_pages (caddr_t addr, DWORD len);
     int access (caddr_t address);
 
@@ -232,6 +233,45 @@ mmap_record::map_pages (_off64_t off, DWORD len)
   while (len-- > 0)
     MAP_SET (off + len);
   return off * getpagesize ();
+}
+
+bool
+mmap_record::map_pages (caddr_t addr, DWORD len)
+{
+  debug_printf ("map_pages (addr=%x, len=%u)", addr, len);
+  DWORD prot, old_prot;
+  DWORD off = addr - base_address_;
+  off /= getpagesize ();
+  len = PAGE_CNT (len);
+  /* First check if the area is unused right now. */
+  for (DWORD l = 0; l < len; ++l)
+    if (MAP_ISSET (off + l))
+      {
+        set_errno (EINVAL);
+	return false;
+      }
+  switch (access_mode_)
+    {
+    case FILE_MAP_WRITE:
+      prot = PAGE_READWRITE;
+      break;
+    case FILE_MAP_READ:
+      prot = PAGE_READONLY;
+      break;
+    default:
+      prot = PAGE_WRITECOPY;
+      break;
+    }
+  if (wincap.virtual_protect_works_on_shared_pages ()
+      && !VirtualProtect (base_address_ + off * getpagesize (),
+			  len * getpagesize (), prot, &old_prot))
+    {
+      __seterrno ();
+      return false;
+    }
+  for (; len-- > 0; ++off)
+    MAP_SET (off);
+  return true;
 }
 
 bool
@@ -536,29 +576,6 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
       fh = &fh_paging_file;
     }
 
-  list *map_list = mmapped_areas->get_list_by_fd (fd);
-
-  /* First check if this mapping matches into the chunk of another
-     already performed mapping. Only valid for MAP_ANON in a special
-     case of MAP_PRIVATE. */
-  if (map_list && fd == -1 && off == 0 && !(flags & MAP_FIXED))
-    {
-      mmap_record *rec;
-      if ((rec = map_list->search_record (off, len)) != NULL)
-	{
-	  if ((off = rec->map_pages (off, len)) == (_off64_t)-1)
-	    {
-	      syscall_printf ("-1 = mmap()");
-	      ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK|WRITE_LOCK, "mmap");
-	      return MAP_FAILED;
-	    }
-	  caddr_t ret = rec->get_address () + off;
-	  syscall_printf ("%x = mmap() succeeded", ret);
-	  ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
-	  return ret;
-	}
-    }
-
   DWORD access = (prot & PROT_WRITE) ? FILE_MAP_WRITE : FILE_MAP_READ;
   /* copy-on-write doesn't work at all on 9x using anonymous maps.
      Workaround: Anonymous mappings always use normal READ or WRITE
@@ -573,6 +590,65 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, _off64_t off)
   if ((flags & MAP_PRIVATE)
       && (wincap.has_working_copy_on_write () || fd != -1))
     access = FILE_MAP_COPY;
+
+  list *map_list = mmapped_areas->get_list_by_fd (fd);
+
+  /* First check if this mapping matches into the chunk of another
+     already performed mapping. Only valid for MAP_ANON in a special
+     case of MAP_PRIVATE. */
+  if (map_list && fd == -1 && off == 0 && !(flags & MAP_FIXED))
+    {
+      mmap_record *rec;
+      if ((rec = map_list->search_record (off, len)) != NULL
+          && rec->get_access () == access)
+	{
+	  if ((off = rec->map_pages (off, len)) == (_off64_t)-1)
+	    {
+	      syscall_printf ("-1 = mmap()");
+	      ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK|WRITE_LOCK,
+	      			   "mmap");
+	      return MAP_FAILED;
+	    }
+	  caddr_t ret = rec->get_address () + off;
+	  syscall_printf ("%x = mmap() succeeded", ret);
+	  ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
+	  return ret;
+	}
+    }
+  if (map_list && fd == -1 && off == 0 && (flags & MAP_FIXED))
+    {
+      caddr_t u_addr;
+      DWORD u_len;
+      long record_idx = -1;
+      if ((record_idx = map_list->search_record ((caddr_t)addr, len, u_addr,
+      						 u_len, record_idx)) >= 0)
+	{
+	  mmap_record *rec = map_list->get_record (record_idx);
+	  if (u_addr > (caddr_t)addr || u_addr + len < (caddr_t)addr + len
+	      || rec->get_access () != access)
+	    {
+	      /* Partial match only, or access mode doesn't match. */
+	      /* FIXME: Handle partial mappings gracefully if adjacent
+	         memory is available. */
+	      set_errno (EINVAL);
+	      syscall_printf ("-1 = mmap()");
+	      ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK,
+				   "mmap");
+	      return MAP_FAILED;
+	    }
+	  if (!rec->map_pages ((caddr_t)addr, len))
+	    {
+	      syscall_printf ("-1 = mmap()");
+	      ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK,
+				   "mmap");
+	      return MAP_FAILED;
+	    }
+	  caddr_t ret = (caddr_t)addr;
+	  syscall_printf ("%x = mmap() succeeded", ret);
+	  ReleaseResourceLock (LOCK_MMAP_LIST, READ_LOCK | WRITE_LOCK, "mmap");
+	  return ret;
+	}
+    }
 
   caddr_t base = (caddr_t)addr;
   /* This shifts the base address to the next lower 64K boundary.
