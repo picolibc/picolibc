@@ -124,7 +124,7 @@ extern void cleanup();
 
 
 
-char *TCID="execvp01";		/* Test program identifier.    */
+const char *TCID="execvp01";		/* Test program identifier.    */
 int TST_TOTAL=1;		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 extern int Tst_nobuf;		/* used to turn off buffering in tst_ routines */
@@ -133,7 +133,7 @@ int exp_enos[]={0, 0};		/* Zero terminated list of expected errnos */
 
 int pid;		/* process id from fork */
 int status;		/* status returned from waitpid */
-char *args[2]={"/usr/bin/test", 0};	/* argument list for execvp call */
+const char *const args[2]={"/usr/bin/test", 0};	/* argument list for execvp call */
 
 int
 main(int ac, char **av)

@@ -56,15 +56,16 @@
  * 	None
  */
 
-#include <stdio.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 #include "test.h"
 #include "usctest.h"
 
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 void setup(void);
 
-char *TCID = "close01()";
+const char *TCID = "close01()";
 int TST_TOTAL = 2;
 extern int Tst_count;
 
@@ -76,7 +77,7 @@ int pipefildes[2];
 
 struct test_case_t {
         int *fd;
-	char *type;
+	const char *type;
 } TC[] = {
 	/* file descriptor for a regular file */
         {&newfd, "file"},
@@ -85,6 +86,7 @@ struct test_case_t {
         {&pipefildes[0], "pipe"}
 };
 
+int
 main(int ac, char **av)
 {
 

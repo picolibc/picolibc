@@ -114,15 +114,14 @@
 #include <errno.h>
 #include <string.h>
 #include <signal.h>
-#include <unistd.h>
 #include "test.h"
 #include "usctest.h"
 
 void setup();
-void cleanup();
+void cleanup(void) __attribute__((noreturn));
 void rec_sigsys(int);
 
-char *TCID="lseek03"; 		/* Test program identifier.    */
+const char *TCID="lseek03"; 		/* Test program identifier.    */
 int TST_TOTAL=3;    		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 

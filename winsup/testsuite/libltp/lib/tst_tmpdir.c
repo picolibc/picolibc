@@ -63,11 +63,7 @@
  *      Neither tst_tmpdir() or tst_rmdir() has a return value.
  *
  *#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#**/
-#include <stdio.h>
 #include <errno.h>
-#include <stdlib.h>        /* for getenv() */
-#include <string.h>        /* for string functions */
-#include <unistd.h>        /* for sysconf(), getcwd(), rmdir() */
 #include <sys/types.h>     /* for mkdir() */
 #include <sys/stat.h>      /* for mkdir() */
 #include "test.h"

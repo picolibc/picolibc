@@ -68,7 +68,6 @@
  *
  */
 
-#include <stdio.h>
 #include <sys/types.h>
 #include <sys/fcntl.h>
 #include <errno.h>
@@ -82,13 +81,13 @@
 #define  TESTFILE	"testfile"
 #define  SYMFILE	"slink_file"
 
-char *TCID="symlink02";		/* Test program identifier.    */
+const char *TCID="symlink02";		/* Test program identifier.    */
 int TST_TOTAL=1;		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 int exp_enos[]={0};
 
 extern void setup();		/* Setup function for the test */
-extern void cleanup();		/* Cleanup function for the test */
+void cleanup() __attribute__((noreturn));/* Cleanup function for the test */
 
 int
 main(int ac, char **av)

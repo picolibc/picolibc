@@ -68,8 +68,6 @@
  *  None.
  */
 
-#include <stdio.h>
-#include <unistd.h>
 #include <sys/types.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -84,20 +82,19 @@
 #define TEMP_FILE	"tmp_file"
 #define FILE_MODE	S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH
 
-char *TCID="lseek04";		/* Test program identifier.    */
+const char *TCID="lseek04";		/* Test program identifier.    */
 int TST_TOTAL=1;		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 int fildes;			/* file handle for temp file */
 size_t file_size;		/* total size of file after data write */
 
 void setup();			/* Main setup function of test */
-void cleanup();			/* cleanup function for the test */
+void cleanup(void) __attribute__((noreturn));			/* cleanup function for the test */
 
 int
 main(int ac, char **av)
 {
 	int lc;			/* loop counter */
-	int rval;
 	const char *msg;	/* message returned from parse_opts */
 	char read_buf[BUFSIZ];	/* data read from temp. file */
     

@@ -39,27 +39,30 @@
  * 	None
  */
 
-#include <stdio.h>
 #include <errno.h>
 #include <limits.h>	/* for OPEN_MAX */
+#include <sys/fcntl.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
 #include "test.h"
 #include "usctest.h"
 
-char *TCID = "fork01";
+const char *TCID = "fork01";
 int TST_TOTAL = 1;
 extern int Tst_count;
 
 void setup(void);
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 
 char filname[40], childfile[40];
 int first;
 FILE **fildeses;			/* file streams */
 int mypid, nfiles;
 
+int
 main(int ac, char **av)
 {
-	int pid, status, dtable, nf;
+	int pid, status, nf;
 	
 	int lc;			/* loop counter */
 	const char *msg;	/* message returned from parse_opts */
@@ -211,8 +214,6 @@ setup()
 void
 cleanup()
 {
-	int nf;
-
 	/*
 	 * print timing stats if that option was specified.
 	 * print errno log if that option was specified.

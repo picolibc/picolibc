@@ -50,14 +50,15 @@
 #include <test.h>
 #include <usctest.h>
 
-char *TCID = "times02";
+const char *TCID = "times02";
 int TST_TOTAL = 1;
 extern int Tst_count;
 int exp_enos[]={EFAULT, 0};
 
 void setup(void);
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 
+int
 main(int argc, char **argv)
 {
 	int lc;				/* loop counter */

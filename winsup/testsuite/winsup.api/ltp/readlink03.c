@@ -74,7 +74,6 @@
  *  This test should be executed by 'non-super-user'  only.
  */
 
-#include <stdio.h>
 #include <sys/types.h>
 #include <sys/fcntl.h>
 #include <errno.h>
@@ -95,7 +94,7 @@
 #define SYM_FILE2	"sfile_2"
 #define MAX_SIZE	256
 
-char *TCID="readlink03";	/* Test program identifier.    */
+const char *TCID="readlink03";	/* Test program identifier.    */
 int TST_TOTAL=5;		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 int exp_enos[]={EACCES, EINVAL, ENAMETOOLONG, ENOENT, 0};
@@ -108,8 +107,8 @@ int lpath_setup();	   /* setup function to test chmod for ENAMETOOLONG */
 char Longpathname[PATH_MAX+2];
 
 struct test_case_t {		/* test case struct. to hold ref. test cond's*/
-	char *link;
-	char *desc;
+	const char *link;
+	const char *desc;
 	int exp_errno;
 	size_t buf_siz;
 	int (*setupfunc)();
@@ -127,7 +126,7 @@ struct test_case_t {		/* test case struct. to hold ref. test cond's*/
 };
 
 extern void setup();		/* Setup function for the test */
-extern void cleanup();		/* Cleanup function for the test */
+void cleanup() __attribute__((noreturn));/* Cleanup function for the test */
 
 int
 main(int ac, char **av)
@@ -135,8 +134,8 @@ main(int ac, char **av)
 	char buffer[MAX_SIZE];  /* temporary buffer to hold symlink contents*/
 	int lc;			/* loop counter */
 	const char *msg;	/* message returned from parse_opts */
-	char *sym_file;		/* symbolic link file name */
-	char *test_desc;	/* test specific error message */
+	const char *sym_file;		/* symbolic link file name */
+	const char *test_desc;	/* test specific error message */
 	int i;			/* counter to test different test conditions */
 	size_t buf_size;	/* size of buffer for readlink */
 

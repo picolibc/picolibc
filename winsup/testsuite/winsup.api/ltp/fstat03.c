@@ -46,9 +46,6 @@
  *
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
@@ -62,14 +59,14 @@
 #define FILE_MODE	S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH
 #define TEST_FILE	"testfile"
 
-char *TCID="fstat03";           /* Test program identifier.    */
+const char *TCID="fstat03";	/* Test program identifier.    */
 int TST_TOTAL = 1;		/* Total number of test cases. */
 extern int Tst_count;           /* Test Case counter for tst_* routines */
 int exp_enos[]={EBADF, 0};
 int fildes;			/* testfile descriptor */
 
 void setup();			/* Main setup function for the tests */
-void cleanup();			/* cleanup function for the test */
+void cleanup() __attribute__((noreturn));/* cleanup function for the test */
 
 int
 main(int ac, char **av)

@@ -40,21 +40,23 @@
  * 	None
  */
 
-#include <stdio.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <sys/wait.h>
 #include "test.h"
 #include "usctest.h"
 
-char *TCID = "fork04";
+const char *TCID = "fork04";
 int TST_TOTAL = 1;
 extern int Tst_count;
 
 void setup(void);
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 
 char pidbuf[10];
 char fnamebuf[40];
 
+int
 main(int ac, char **av)
 {
 	int status, pid, fildes;

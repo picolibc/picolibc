@@ -101,7 +101,7 @@ char **argv;
  */
 int
 search_path(cmd, res_path, access_mode, fullpath)
-char *cmd;	/* The requested filename */
+const char *cmd;	/* The requested filename */
 char *res_path; /* The resulting path or error mesg */
 int access_mode; /* the mode used by access(2) */
 int fullpath;	/* if set, cwd will be prepended to all non-full paths */

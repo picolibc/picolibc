@@ -53,20 +53,21 @@
  * 	None
  */
 
-#include <stdio.h>
 #include <errno.h>
+#include <sys/stat.h>
 #include "test.h"
 #include "usctest.h"
 
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 void setup(void);
 
 int exp_enos[] = {EBADF, 0};
 
-char *TCID = "close02()";
+const char *TCID = "close02()";
 int TST_TOTAL = 1;
 extern int Tst_count;
 
+int
 main(int ac, char **av)
 {
 	int lc;				/* loop counter */

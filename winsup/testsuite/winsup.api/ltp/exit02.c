@@ -41,17 +41,17 @@
  * 	None
  */
 
-#include <stdio.h>
 #include <errno.h>
 #include <signal.h>
 #include <fcntl.h>
+#include <sys/wait.h>
 #include "test.h"
 #include "usctest.h"
 
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 void setup(void);
 
-char *TCID = "exit02";
+const char *TCID = "exit02";
 int TST_TOTAL = 1;
 extern int Tst_count;
 
@@ -61,6 +61,7 @@ extern int Tst_count;
 
 char filen[40];
 
+int
 main(int ac, char **av)
 {
 	int pid, npid, sig, nsig, exno, nexno, status;

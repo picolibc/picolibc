@@ -67,7 +67,6 @@
  * Restrictions:
  *
  */
-#include <stdio.h>
 #include <sys/types.h>
 #include <sys/fcntl.h>
 #include <sys/stat.h>
@@ -86,7 +85,7 @@
 #define NEW_MODE	0222
 #define MASK		0777
 
-char *TCID="stat02"; 		/* Test program identifier.    */
+const char *TCID="stat02"; 		/* Test program identifier.    */
 int TST_TOTAL=1;			/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 int exp_enos[]={0};
@@ -96,7 +95,7 @@ char nobody_uid[] = "nobody";
 struct passwd *ltpuser;
 
 void setup();			/* Setup function for the test */
-void cleanup();			/* Cleanup function for the test */
+void cleanup(void) __attribute__((noreturn));			/* Cleanup function for the test */
 
 int
 main(int ac, char **av)

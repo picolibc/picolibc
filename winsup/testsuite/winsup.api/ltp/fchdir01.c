@@ -63,10 +63,10 @@
 #include <fcntl.h>
 #include <string.h>
 
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 void setup(void);
 
-char *TCID = "fchdir01";
+const char *TCID = "fchdir01";
 int TST_TOTAL = 1;
 extern int Tst_count;
 
@@ -77,6 +77,7 @@ const char *TEST_DIR = "alpha";
 
 #define MODES	S_IRWXU
 
+int
 main(int ac, char **av)
 {
 	int lc;				/* loop counter */

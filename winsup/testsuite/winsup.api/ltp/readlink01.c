@@ -65,7 +65,6 @@
  *  This test should be run by 'non-super-user' only.
  *
  */
-#include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <sys/stat.h>
@@ -78,14 +77,14 @@
 #define FILE_MODE       S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH
 #define MAX_SIZE	256
 
-char *TCID="readlink01";	/* Test program identifier.    */
+const char *TCID="readlink01";	/* Test program identifier.    */
 int TST_TOTAL=1;		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 
 int exp_val;			/* strlen of testfile */
 
 void setup();			/* Setup function for the test */
-void cleanup();			/* Cleanup function for the test */
+void cleanup(void) __attribute__((noreturn));			/* Cleanup function for the test */
 
 int
 main(int ac, char **av)

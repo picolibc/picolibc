@@ -45,13 +45,14 @@
 #include <test.h>
 #include <usctest.h>
 
-char *TCID = "getuid02";
+const char *TCID = "getuid02";
 int TST_TOTAL = 1;
 extern int Tst_count;
 
 void setup(void);
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 
+int
 main(int ac, char **av)
 {
 	int lc;				/* loop counter */

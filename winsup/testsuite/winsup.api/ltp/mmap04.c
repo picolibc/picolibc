@@ -72,11 +72,8 @@
  *  None.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <sys/types.h>
 #include <errno.h>
-#include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
 #include <signal.h>
@@ -88,7 +85,7 @@
 
 #define TEMPFILE	"mmapfile"
 
-char *TCID="mmap04";		/* Test program identifier.    */
+const char *TCID="mmap04";		/* Test program identifier.    */
 int TST_TOTAL=1;		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 size_t page_sz;			/* system page size */
@@ -97,14 +94,13 @@ char *dummy;			/* dummy variable to hold temp file contents */
 int fildes = -1;		/* file descriptor for temporary file */
 
 void setup();			/* Main setup function of test */
-void cleanup();			/* cleanup function for the test */
+void cleanup(void) __attribute__((noreturn));			/* cleanup function for the test */
 
 int
 main(int ac, char **av)
 {
 	int lc;			/* loop counter */
 	const char *msg;	/* message returned from parse_opts */
-	char file_content;	/* tempfile content */
 	
 	/* Parse standard options given to run the test. */
 	msg = parse_opts(ac, av, (option_t *) NULL, NULL);

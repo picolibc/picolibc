@@ -134,7 +134,6 @@
 #include <errno.h>   
 #include <fcntl.h>
 #include <string.h>
-#include <stdlib.h>
 #include "test.h"    
 #include "usctest.h"
 
@@ -202,9 +201,9 @@ void chld1_kill();		/*This routine is used by child 1 to remove itself and	*/
 				/*its children A and B.					*/
 
 void setup();
-void cleanup();
+void cleanup(void) __attribute__((noreturn));
 
-char *TCID="kill02";          /* Test program identifier.    */
+const char *TCID="kill02";          /* Test program identifier.    */
 int TST_TOTAL=2;                /* Total number of test cases. */
 extern int Tst_count;           /* Test Case counter for tst_* routines */
 extern int Tst_nobuf;           /* var. used to turn off tst_res buffering */
@@ -657,7 +656,7 @@ void childB_rout()
 void
 setup()
 {
-	int errno_buf;		/*indicates the errno if pipe set up fails.		*/
+	int errno_buf = 0;	/*indicates the errno if pipe set up fails.		*/
 	int err_flag = FALSE;	/*Indicates if an error has occurred in pipe set up.	*/
 	char mesg[MAXMESG];	/*Used to buffer messages for tst_res.			*/
 

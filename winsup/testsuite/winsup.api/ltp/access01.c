@@ -118,8 +118,6 @@
  * 
  *#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#**/
 
-#include <string.h>
-#include <sys/unistd.h>
 #include <sys/types.h>
 #include <sys/fcntl.h>
 #include <errno.h>
@@ -128,9 +126,9 @@
 #include "test.h"
 #include "usctest.h"
 void setup();
-void cleanup();
+void cleanup(void) __attribute__((noreturn));
 
-char *TCID="access01"; 	/* Test program identifier.    */
+const char *TCID="access01"; 	/* Test program identifier.    */
 int TST_TOTAL=4;    		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 

@@ -22,16 +22,13 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/mman.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
 #include <errno.h>
 #include <string.h>
 
 #include "test.h"
 #include "usctest.h"
 
-char *TCID="mmap001";
+const char *TCID="mmap001";
 int TST_TOTAL=5;
 extern int Tst_count;
 static char *filename=NULL;

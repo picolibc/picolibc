@@ -115,7 +115,7 @@
  * to indicate valid options and return option arguments
  ***********************************************************************/
 typedef struct {		
-  char *option;      	/* Valid option string (one option only) like "a:" */
+  const char *option;	/* Valid option string (one option only) like "a:" */
   int  *flag;		/* pointer to location to set true if option given */
   char **arg;		/* pointer to location to place argument, if needed */
 } option_t;

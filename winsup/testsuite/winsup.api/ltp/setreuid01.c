@@ -123,7 +123,7 @@ extern void cleanup();
 
 
 
-char *TCID="setreuid01";	/* Test program identifier.    */
+const char *TCID="setreuid01";	/* Test program identifier.    */
 int TST_TOTAL=5;		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 
@@ -166,7 +166,7 @@ main(int ac, char **av)
 	 *  Don't change either real or effective uid
 	 */
 	ruid=getuid();	/* get real uid */
-euid=geteuid();		/* get effective uid */
+	euid=geteuid();		/* get effective uid */
 
 
 	/* Call setreuid(2) */

@@ -62,8 +62,6 @@
  *  None.
  */
 
-#include <stdio.h>
-#include <unistd.h>
 #include <sys/types.h>
 #include <errno.h>
 #include <string.h>
@@ -73,13 +71,13 @@
 #include "test.h"
 #include "usctest.h"
 
-char *TCID="alarm03";		/* Test program identifier.    */
+const char *TCID="alarm03";		/* Test program identifier.    */
 int TST_TOTAL=1;		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 int almreceived = 0;		/* flag to indicate SIGALRM received or not */
 
 void setup();			/* Main setup function of test */
-void cleanup();			/* cleanup function for the test */
+void cleanup(void) __attribute__((noreturn));			/* cleanup function for the test */
 void sigproc(int sig);		/* signal catching function */
 
 int

@@ -102,18 +102,17 @@
 #include <signal.h>
 
  
-#include <unistd.h>
 #include "test.h"
 #include "usctest.h"
 
 
 void setup();
-void cleanup();
+void cleanup(void) __attribute__((noreturn));
 
 
 char *get_high_address();
 
-char *TCID="access03";		/* Test program identifier.    */
+const char *TCID="access03";		/* Test program identifier.    */
 int TST_TOTAL=8;		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 

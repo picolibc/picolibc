@@ -69,11 +69,8 @@
  *  None.
  */
 
-#include <stdio.h>
-#include <unistd.h>
 #include <sys/types.h>
 #include <errno.h>
-#include <unistd.h>
 #include <fcntl.h>
 #include <utime.h>
 #include <string.h>
@@ -90,7 +87,7 @@
 #define PIPE_MODE	S_IFIFO | S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH
 #define SEEK_TOP	10
 
-char *TCID="lseek05";		/* Test program identifier.    */
+const char *TCID="lseek05";		/* Test program identifier.    */
 int TST_TOTAL=3;		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 int exp_enos[]={ESPIPE, EINVAL, EBADF, 0};
@@ -107,7 +104,7 @@ int fd3;			/* file handle for testfile3  */
 struct test_case_t {		/* test case struct. to hold ref. test cond's*/
 	int fd;
 	int Whence;
-	char *desc;
+	const char *desc;
 	int exp_errno;
 	int (*setupfunc)();
 } Test_cases[] = {
@@ -118,7 +115,7 @@ struct test_case_t {		/* test case struct. to hold ref. test cond's*/
 };
 
 void setup();			/* Main setup function of test */
-void cleanup();			/* cleanup function for the test */
+void cleanup(void) __attribute__((noreturn));			/* cleanup function for the test */
 
 int
 main(int ac, char **av)
@@ -127,7 +124,7 @@ main(int ac, char **av)
 	const char *msg;	/* message returned from parse_opts */
 	int fildes;		/* file handle for testfile */
 	int whence;		/* position of file handle in the file */
-	char *test_desc;	/* test specific error message */
+	const char *test_desc;	/* test specific error message */
 	int ind;		/* counter to test different test conditions */
     
 	/* Parse standard options given to run the test. */

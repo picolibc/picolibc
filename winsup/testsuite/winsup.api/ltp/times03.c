@@ -52,21 +52,22 @@
 #include <test.h>
 #include <usctest.h>
 
-char *TCID = "times01";
+const char *TCID = "times01";
 int TST_TOTAL = 1;
 extern int Tst_count;
 int exp_enos[]={0};
 
 void setup(void);
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 
+int
 main(int argc, char **argv)
 {
 	const char *msg;		/* message returned from parse_opts */
 
 	struct tms buf1, buf2;
 	time_t start_time, end_time;
-	int i, pid1, pid2, status, fail=0;
+	int i, pid2, status, fail=0;
 
 	/* parse standard options */
 	if ((msg = parse_opts(argc, argv, (option_t *)NULL, NULL)) !=

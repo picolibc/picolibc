@@ -115,7 +115,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include "test.h"
 #include "usctest.h"
 
@@ -124,7 +123,7 @@ extern void cleanup();
 
 
 
-char *TCID="mkdir08"; 		/* Test program identifier.    */
+const char *TCID="mkdir08"; 	/* Test program identifier.    */
 int TST_TOTAL=1;    		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 

@@ -67,7 +67,6 @@
  *
  */ 
 
-#include <stdio.h>
 #include <errno.h>
 #include <string.h>
 #include <signal.h>
@@ -78,9 +77,9 @@
 #include "usctest.h"
 
 extern void setup();		/* setup function for the test */
-extern void cleanup();		/* cleanup function for the test */
+void cleanup(void) __attribute__((noreturn));/* cleanup function for the test */
 
-char *TCID="time01";		/* Test program identifier.    */
+const char *TCID="time01";		/* Test program identifier.    */
 int TST_TOTAL = 1;		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 int exp_enos[]={0};

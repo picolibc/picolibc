@@ -48,19 +48,20 @@
  */
 
 #include <errno.h>
-#include <stdio.h>
 #include "test.h"
 #include "usctest.h"
+#include <fcntl.h>
 
-char *TCID = "write02()";
+const char *TCID = "write02()";
 int TST_TOTAL = 1;
 extern int Tst_count;
 
-void cleanup(void);
+void cleanup(void) __attribute__ ((noreturn));
 void setup(void);
 
 char pfiln[40] = "";
 
+int
 main(int argc, char **argv)
 {
 	int lc;				/* loop counter */
@@ -73,7 +74,7 @@ main(int argc, char **argv)
 	char pwbuf[BUFSIZ + 1];
 
 	/* parse standard options */
-	if (msg = parse_opts(argc, argv, (option_t *) NULL, NULL)) {
+	if ((msg = parse_opts(argc, argv, (option_t *) NULL, NULL))) {
 		tst_brkm(TBROK, cleanup, "OPTION PARSING ERROR - %s", msg);
 		/*NOTREACHED*/
 	}
@@ -86,7 +87,6 @@ main(int argc, char **argv)
 		/* reset Tst_count in case we are looping */
 		Tst_count = 0;
 
-block1:
 		tst_resm(TINFO, "Block 1: test to see write() returns proper "
 			 "write count");
 

@@ -1,7 +1,4 @@
-#include <stdio.h>
 #include <errno.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <signal.h>
 
 #include "test.h"

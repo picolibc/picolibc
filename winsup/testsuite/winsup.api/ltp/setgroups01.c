@@ -113,18 +113,17 @@
 #include <string.h>
 #include <signal.h>
 #include <sys/param.h>
-#include <unistd.h>
 #include <grp.h>
 
 #include "test.h"
 #include "usctest.h"
 
 void setup();
-void cleanup();
+void cleanup(void) __attribute__((noreturn));
 
 
 
-char *TCID="setgroups01"; 	/* Test program identifier.    */
+const char *TCID="setgroups01"; 	/* Test program identifier.    */
 int TST_TOTAL=1;    		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 

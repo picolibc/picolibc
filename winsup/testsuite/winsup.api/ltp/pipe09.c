@@ -46,7 +46,6 @@
  * RESTRICTIONS
  *	None
  */
-#include <unistd.h>
 #include <signal.h>
 #include <sys/wait.h>
 #include <errno.h>
@@ -55,22 +54,21 @@
 
 #define	PIPEWRTCNT	100		/* must be an even number */
 
-char *TCID = "pipe09";
+const char *TCID = "pipe09";
 int TST_TOTAL = 1;
 extern int Tst_count;
 
 void setup(void);
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 
+int
 main(int ac, char **av)
 {
 	int lc;				/* loop counter */
 	const char *msg;		/* message returned from parse_opts */
 
-	int i, red, wtstatus, ret_val;
-	int pipe_ret;			/* exit stat of pipe */
+	int i, red, wtstatus;
 	int pipefd[2];			/* fds for pipe read/write */
-	char synbuf[BUFSIZ];
 	char rebuf[BUFSIZ];
 	int Acnt = 0, Bcnt = 0;		/* count 'A' and 'B' */
 	int fork_1, fork_2;		/* ret values in parent */

@@ -72,11 +72,8 @@
  *  None.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <sys/types.h>
 #include <errno.h>
-#include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
 #include <signal.h>
@@ -89,7 +86,7 @@
 
 #define TEMPFILE	"mmapfile"
 
-char *TCID="mmap05";		/* Test program identifier.    */
+const char *TCID="mmap05";		/* Test program identifier.    */
 int TST_TOTAL=1;		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 size_t page_sz;			/* system page size */
@@ -99,7 +96,7 @@ int pass=0;			/* pass flag perhaps set to 1 in sig_handler */
 sigjmp_buf env;			/* environment for sigsetjmp/siglongjmp */
 
 void setup();			/* Main setup function of test */
-void cleanup();			/* cleanup function for the test */
+void cleanup(void) __attribute__((noreturn));			/* cleanup function for the test */
 void sig_handler();		/* signal handler to catch SIGSEGV */
 
 int

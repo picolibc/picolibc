@@ -62,16 +62,17 @@
 #include <errno.h>
 #include <sys/wait.h>
 
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 void setup(void);
 
-char *TCID= "kill01()";
+const char *TCID= "kill01()";
 int TST_TOTAL = 1;
 
 extern int Tst_count;
 
 #define TEST_SIG SIGKILL
 
+int
 main(int ac, char **av)
 {
 	int lc;                         /* loop counter */

@@ -66,7 +66,6 @@
  *  This test should be run by 'non-super-user' only.
  *
  */
-#include <stdio.h>
 #include <sys/types.h>
 #include <sys/fcntl.h>
 #include <sys/stat.h>
@@ -83,7 +82,7 @@
 #define BUF_SIZE	256
 #define MASK		0777
 
-char *TCID="fstat02"; 		/* Test program identifier.    */
+const char *TCID="fstat02"; 	/* Test program identifier.    */
 int TST_TOTAL=1;    		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 uid_t User_id;			/* user id/group id of test process */
@@ -91,7 +90,7 @@ gid_t Group_id;
 int fildes;			/* File descriptor of testfile */
 
 void setup();			/* Setup function for the test */
-void cleanup();			/* Cleanup function for the test */
+void cleanup() __attribute__((noreturn));/* Cleanup function for the test */
 
 int
 main(int ac, char **av)

@@ -33,4 +33,4 @@
 /* $Id$ */
 
 
-int search_path(char *cmd, char *res_path, int access_mode, int fullpath);
+int search_path(const char *cmd, const char *res_path, int access_mode, int fullpath);

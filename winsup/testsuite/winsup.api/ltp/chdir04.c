@@ -54,13 +54,12 @@
  *	NONE
  */
 
-#include <stdio.h>
 #include <errno.h>
 #include <sys/stat.h>
 #include <test.h>
 #include <usctest.h>
 
-char *TCID = "chdir02";
+const char *TCID = "chdir02";
 int TST_TOTAL = 3;
 extern int Tst_count;
 
@@ -97,14 +96,14 @@ int flag;
 #define	FAILED	1
 
 void setup(void);
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 
+int
 main(int ac, char **av)
 {
 	int lc;				/* loop counter */
 	int i;
 	const char *msg;		/* message returned from parse_opts */
-	struct stat statbuf;
 
 	/* parse standard options */
 	if ((msg = parse_opts(ac, av, (option_t *)NULL, NULL)) != (char *)NULL){

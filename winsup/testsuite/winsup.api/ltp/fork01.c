@@ -119,7 +119,6 @@
 #include <string.h>
 #include <signal.h>
 #include <fcntl.h>
-#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include "test.h"
@@ -134,7 +133,7 @@ extern void cleanup();
 
 
 
-char *TCID="fork01"; 		/* Test program identifier.    */
+const char *TCID="fork01"; 		/* Test program identifier.    */
 int TST_TOTAL=2;    		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 

@@ -110,7 +110,6 @@
  *#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#**/
 
 #include <fcntl.h>
-#include <unistd.h>
 #include <errno.h>
 #include <string.h>
 #include <signal.h>
@@ -122,7 +121,7 @@ extern void cleanup();
 
 
 
-char *TCID="fpathconf01"; 	/* Test program identifier.    */
+const char *TCID="fpathconf01"; 	/* Test program identifier.    */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 
 #define FILENAME	"fpafile01"
@@ -133,7 +132,7 @@ int i;
 
 struct pathconf_args
 {
-   char *define_tag;
+   const char *define_tag;
    int value;
    int defined;   /* Some of these are undefined on regular files.
 		   * Cancer does a slightly better job with these already,

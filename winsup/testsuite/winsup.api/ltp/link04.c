@@ -121,12 +121,12 @@
 #include "usctest.h"
 
 void setup();
-void cleanup();
+void cleanup(void) __attribute__((noreturn));
 
 
 extern char *get_high_address();
 
-char *TCID="link04"; 		/* Test program identifier.    */
+const char *TCID="link04"; 		/* Test program identifier.    */
 int TST_TOTAL=14;    		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 
@@ -141,10 +141,10 @@ char High_address[64];
 int dir_setup();
 
 struct test_case_t {
-   char *file1;
-   char *desc1;
-   char *file2;
-   char *desc2;
+   const char *file1;
+   const char *desc1;
+   const char *file2;
+   const char *desc2;
    int exp_errno;
    int (*setupfunc1)();
    int (*setupfunc2)();
@@ -214,8 +214,8 @@ main(int ac, char **av)
 {
     int lc;		/* loop counter */
     const char *msg;		/* message returned from parse_opts */
-    char *fname1, *fname2;
-    char *desc1, *desc2;
+    const char *fname1, *fname2;
+    const char *desc1, *desc2;
     int ind;
     
     /***************************************************************

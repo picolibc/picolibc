@@ -47,18 +47,18 @@
  * 	None
  */
 
-#include <stdio.h>
+#include <fcntl.h>
 #include <sys/stat.h>
 #include <errno.h>
 #include "test.h"
 #include "usctest.h"
 
 void setup(void);
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 void functest1(void);
 void functest2(void);
 
-char *TCID = "creat01";
+const char *TCID = "creat01";
 int TST_TOTAL = 2;
 extern int Tst_count;
 
@@ -79,6 +79,7 @@ struct test_case_t {
 	{filename, MODE2, functest2}
 };
 
+int
 main(int ac, char **av)
 {
 	int i;

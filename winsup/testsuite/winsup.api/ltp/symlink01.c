@@ -276,7 +276,6 @@
 *
 *#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#**/
 
-#include <stdio.h>
 #include <signal.h>
 #include <string.h>
 #include <fcntl.h>             /* open(2) system call */
@@ -290,7 +289,7 @@
 #include "usctest.h"
 
 void setup();
-void cleanup();
+void cleanup(void) __attribute__((noreturn));
 void help();
 void delete_files();
 void do_EEXIST();
@@ -388,13 +387,13 @@ int creat_both(), creat_symlink(), creat_path_max(), ck_symlink(),
  */
 struct all_test_cases
 {
-    char *tcid;
+    const char *tcid;
     int test_fail;
     int errno_val;
     int pass_msg;
     int (*test_setup)();
     int (*ck_test)();
-    char *fn_arg[3];
+    const char *fn_arg[3];
     
 } test_objects[] = {
     {SYMLINK, 0, 0, 0, creat_symlink, ck_symlink, {"%bc+eFhi!k", S_FILE, NULL}},
@@ -444,11 +443,11 @@ struct all_test_cases
  */
 struct tcses
 {
-    char *tcid;
-    char *syscall;
+    const char *tcid;
+    const char *syscall;
     int test_cases;		/* number of entries in test_objects array */
     struct all_test_cases *tc_ptr;
-    char *desc;
+    const char *desc;
 } all_tcses[] = {
 
    { SYMLINK,  "symlink",  5, &test_objects[0],
@@ -486,7 +485,7 @@ struct tcses
 int TST_TOTAL;
 int TEST_RESULT;
 time_t a_time_value = 100;
-char  *TCID = NULL;
+const char  *TCID = NULL;
 char  *Selectedtests = NULL;		/* Name (tcid) of selected test cases */
 char test_msg[BUFMAX];
 char full_path[PATH_MAX+1];
@@ -593,7 +592,7 @@ main(int argc, char *argv[])
 struct tcses *get_tcs_info(ptr)
 char *ptr;
 {
-    int ctr;
+    unsigned ctr;
     struct tcses *tcs_ptr;
 
 #if ALL
@@ -2022,7 +2021,7 @@ cleanup()
  */
 void help()
 {
-    int ind;
+    unsigned ind;
 
     printf("   -T id  Determines which tests cases to execute:\n");
 

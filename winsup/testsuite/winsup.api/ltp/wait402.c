@@ -73,15 +73,16 @@
 #endif
 #endif
 
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 void setup(void);
 
-char *TCID= "wait402()";
+const char *TCID= "wait402()";
 int TST_TOTAL = 1;
 extern int Tst_count;
 
 int exp_enos[] = {10, 0};
 
+int
 main(int ac, char **av)
 {
 	int lc;				/* loop counter */

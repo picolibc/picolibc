@@ -74,9 +74,6 @@
  *
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
@@ -106,8 +103,8 @@ char Longpathname[PATH_MAX+2];
 char High_address_node[64];
 
 struct test_case_t {		/* test case struct. to hold ref. test cond's*/
-	char *pathname;
-	char *desc;
+	const char *pathname;
+	const char *desc;
 	int exp_errno;
 	int (*setupfunc)();
 } Test_cases[] = {
@@ -124,13 +121,14 @@ struct test_case_t {		/* test case struct. to hold ref. test cond's*/
 	{ NULL, NULL, 0, no_setup }
 };
 
-char *TCID="stat03";           /* Test program identifier.    */
+const char *TCID="stat03";           /* Test program identifier.    */
 int TST_TOTAL = 6;		/* Total number of test cases. */
 extern int Tst_count;           /* Test Case counter for tst_* routines */
 int exp_enos[]={EACCES, EFAULT, ENAMETOOLONG, ENOENT, ENOTDIR, 0};
 
 void setup();			/* Main setup function for the tests */
-void cleanup();			/* cleanup function for the test */
+void cleanup(void) __attribute__((noreturn));			/* cleanup function for the test */
+char *get_high_address(void);
 
 int
 main(int ac, char **av)
@@ -138,8 +136,8 @@ main(int ac, char **av)
 	struct stat stat_buf;	/* stat structure buffer */
 	int lc;			/* loop counter */
 	const char *msg;	/* message returned from parse_opts */
-	char *file_name;	/* ptr. for file name whose mode is modified*/
-	char *test_desc;	/* test specific error message */
+	const char *file_name;	/* ptr. for file name whose mode is modified*/
+	const char *test_desc;	/* test specific error message */
 	int ind;		/* counter to test different test conditions */
 
 	/* Parse standard options given to run the test. */

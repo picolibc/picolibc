@@ -7,12 +7,15 @@
 #ifndef _PTHREAD_TEST_H_
 #define _PTHREAD_TEST_H_
 
-#include "pthread.h"
-#include "sched.h"
-#include "semaphore.h"
+#include <pthread.h>
+#include <sched.h>
+#include <semaphore.h>
 #include <stdio.h>
-#include <windows.h>
+#include <unistd.h>
+#include <stdlib.h>
 #include <errno.h>
+#include <assert.h>
+#include <windows.h>
 
 /* #define assert(x) do { fprint (stderr, "assertion failed\n"); exit(1) } while (0) */
 

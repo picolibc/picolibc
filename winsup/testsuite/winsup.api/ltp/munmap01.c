@@ -69,7 +69,6 @@
  *  None.  
  */
 #include <errno.h>
-#include <unistd.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
@@ -79,7 +78,7 @@
 
 #define TEMPFILE	"mmapfile"
 
-char *TCID="munmap01";		/* Test program identifier.    */
+const char *TCID="munmap01";		/* Test program identifier.    */
 int TST_TOTAL=1;		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 
@@ -88,7 +87,7 @@ int fildes;			/* file descriptor for tempfile */
 unsigned int map_len;		/* length of the region to be mapped */
 
 void setup();			/* Main setup function of test */
-void cleanup();			/* cleanup function for the test */
+void cleanup(void);		/* cleanup function for the test */
 void sig_handler();		/* signal catching function */
 
 int

@@ -43,14 +43,16 @@
 #include <errno.h>
 #include <test.h>
 #include <usctest.h>
+#include <sys/wait.h>
 
-char *TCID = "getppid01";
+const char *TCID = "getppid01";
 int TST_TOTAL = 1;
 extern int Tst_count;
 
 void setup(void);
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 
+int
 main(int ac, char **av)
 {
 	int pid, ppid;

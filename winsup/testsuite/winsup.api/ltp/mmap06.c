@@ -68,11 +68,8 @@
  *  None.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <sys/types.h>
 #include <errno.h>
-#include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
 #include <signal.h>
@@ -84,7 +81,7 @@
 
 #define TEMPFILE	"mmapfile"
 
-char *TCID="mmap06";		/* Test program identifier.    */
+const char *TCID="mmap06";		/* Test program identifier.    */
 int TST_TOTAL=1;		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 int exp_enos[]={EACCES, 0};
@@ -94,7 +91,7 @@ char *addr;			/* addr of memory mapped region */
 int fildes = -1;		/* file descriptor for temporary file */
 
 void setup();			/* Main setup function of test */
-void cleanup();			/* cleanup function for the test */
+void cleanup(void) __attribute__((noreturn));			/* cleanup function for the test */
 
 int
 main(int ac, char **av)

@@ -46,17 +46,18 @@
  *	None
  */
 
-#include <stdio.h>
+#include <sys/stat.h>
 #include "test.h"
 #include "usctest.h"
 
-char *TCID = "umask02";
+const char *TCID = "umask02";
 int TST_TOTAL = 1;
 extern int Tst_count;
 
 void setup(void);
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 
+int
 main(int argc, char **argv)
 {
 	int lc;				/* loop counter */

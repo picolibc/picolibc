@@ -47,7 +47,6 @@
  *	NONE
  */
 
-#include <unistd.h>
 #include <string.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -57,16 +56,17 @@
 /* 0 terminated list of expected errnos */
 int exp_enos[] = {14,0};
 
-char *TCID = "write03";
+const char *TCID = "write03";
 int TST_TOTAL = 1;
 extern int Tst_count;
 
 void setup(void);
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 
 int fd = -1;
 char filename[100];
 
+int
 main(int argc, char **argv)
 {
 	int lc;				/* loop counter */
@@ -90,7 +90,6 @@ main(int argc, char **argv)
 		/* reset Tst_count in case we are looping */
 		Tst_count = 0;
 
-block1:
 		tst_resm(TINFO, "Enter Block 1: test to check if write "
 			 "corrupts the file when write fails");
 

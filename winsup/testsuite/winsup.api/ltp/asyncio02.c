@@ -95,7 +95,6 @@
 #include <sys/stat.h>
 #include <sys/signal.h>
 #include <errno.h>
-#include <stdlib.h>
 #include "test.h"
 #include "usctest.h"
 
@@ -116,10 +115,10 @@
 char	*dp;	/* pointer to area of memory */
 
 void setup();
-void cleanup();
+void cleanup(void) __attribute__((noreturn));
 int testrun(int flag, int bytes, int ti);
 
-char *TCID="asyncio02";         /* Test program identifier.    */
+const char *TCID="asyncio02";         /* Test program identifier.    */
 int TST_TOTAL=6;                /* Total number of test cases. */
 extern int Tst_count;           /* Test Case counter for tst_* routines */
 extern int Tst_nobuf;           /* variable used to turn off tst_res buffering */
@@ -128,7 +127,7 @@ extern int errno;
 
 int exp_enos[]={0};             /* Array of expected errnos */
 char mesg[150];
-char *filename;			/* name of the temporary file */
+const char *filename;		/* name of the temporary file */
 
 char *Progname;
 int Open_flags;

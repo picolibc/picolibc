@@ -112,7 +112,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
-#include <unistd.h>
 
 #include <errno.h>
 #include <string.h>
@@ -125,7 +124,7 @@ extern void cleanup();
 
 
 
-char *TCID="rmdir04"; 		/* Test program identifier.    */
+const char *TCID="rmdir04"; 	/* Test program identifier.    */
 int TST_TOTAL=1;    		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 

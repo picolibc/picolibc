@@ -61,16 +61,15 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include "test.h" 
 #include "usctest.h"
 
 void setup();
-void cleanup();
+void cleanup() __attribute__((noreturn));
 
 #define PERMS		0777
 
-char *TCID="rmdir01";           /* Test program identifier.    */
+const char *TCID="rmdir01";	/* Test program identifier.    */
 int TST_TOTAL=1;                /* Total number of test cases. */
 extern int Tst_count;           /* Test Case counter for tst_* routines */
 

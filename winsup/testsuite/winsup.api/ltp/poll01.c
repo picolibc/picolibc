@@ -62,7 +62,6 @@
  * RESTRICTIONS:
  *  None.
  */
-#include <unistd.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/wait.h>
@@ -73,7 +72,7 @@
 
 #define BUF_SIZE	512
 
-char *TCID="poll01";		/* Test program identifier.    */
+const char *TCID="poll01";		/* Test program identifier.    */
 int TST_TOTAL=1;		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 
@@ -81,7 +80,7 @@ int fildes[2];			/* file descriptors of the pipe. */
 struct pollfd fds[1];		/* struct. for poll() */
 
 void setup();			/* Main setup function of test */
-void cleanup();			/* cleanup function for the test */
+void cleanup(void) __attribute__((noreturn));			/* cleanup function for the test */
 
 int
 main(int ac, char **av)

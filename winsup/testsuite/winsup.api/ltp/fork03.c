@@ -39,20 +39,21 @@
  * 	None
  */
 
-#include <stdio.h>
+#include <sys/wait.h>
 #include "test.h"
 #include "usctest.h"
 
 void setup(void);
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 
-char *TCID = "fork03";
+const char *TCID = "fork03";
 int TST_TOTAL = 1;
 extern int Tst_count;
 
 void setup(void);
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 
+int
 main(int ac, char **av)
 {
 	float fl1, fl2;

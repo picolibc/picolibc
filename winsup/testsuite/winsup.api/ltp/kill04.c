@@ -62,10 +62,10 @@
 #include <errno.h>
 #include <sys/wait.h>
 
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 void setup(void);
 
-char *TCID= "kill04()";
+const char *TCID= "kill04()";
 int TST_TOTAL = 1;
 
 extern int Tst_count;
@@ -74,6 +74,7 @@ int exp_enos[] = {ESRCH, 0};
 
 #define TEST_SIG SIGKILL
 
+int
 main(int ac, char **av)
 {
 	int lc;                         /* loop counter */

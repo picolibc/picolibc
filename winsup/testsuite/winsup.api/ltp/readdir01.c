@@ -111,7 +111,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <dirent.h>
-#include <unistd.h>
 #include <errno.h>
 #include <string.h>
 #include <signal.h>
@@ -128,9 +127,9 @@
   */
 void setup(); 
 void help();
-void cleanup();
+void cleanup(void) __attribute__((noreturn));
 
-char *TCID="readdir01";		/* Test program identifier.    */
+const char *TCID="readdir01";		/* Test program identifier.    */
 int TST_TOTAL=2;    		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 extern int Tst_nobuf;

@@ -38,25 +38,27 @@
  * 	None
  */
 
-#include <stdio.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
 #include "test.h"
 #include "usctest.h"
 
-char *TCID = "fork07";
+const char *TCID = "fork07";
 int TST_TOTAL = 1;
 extern int Tst_count;
 
 void setup(void);
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 
 char pbuf[10];
 char fnamebuf[40];
 
+int
 main(int ac, char **av)
 {
 	int status, count, forks, pid1;
 	int ch_r_stat;
-	FILE *rea, *writ;
+	FILE *rea = NULL, *writ = NULL;
 
 	int lc;			/* loop counter */
 	const char *msg;	/* message returned from parse_opts */

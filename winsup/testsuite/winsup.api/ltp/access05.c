@@ -76,9 +76,7 @@
  * 
  */
 
-#include <stdio.h>
 #include <errno.h>
-#include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
 #include <signal.h>
@@ -107,9 +105,9 @@ char Longpathname[PATH_MAX+2];
 char High_address_node[64];
 
 struct test_case_t {		/* test case structure */
-	char *pathname;
+	const char *pathname;
 	int a_mode;
-	char *desc;
+	const char *desc;
 	int exp_errno;
 	int (*setupfunc)();
 } Test_cases[] = {
@@ -124,21 +122,22 @@ struct test_case_t {		/* test case structure */
 	{ NULL, 0, NULL, 0, no_setup }
 };
 
-char *TCID="access03";		/* Test program identifier.    */
+const char *TCID="access03";		/* Test program identifier.    */
 int TST_TOTAL=8;		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 int exp_enos[]={EACCES, EFAULT, EINVAL, ENOENT, ENAMETOOLONG, 0};
 
 void setup();			/* Main setup function of test */
-void cleanup();			/* cleanup function for the test */
+void cleanup(void) __attribute__((noreturn));			/* cleanup function for the test */
+char *get_high_address (void);
 
 int
 main(int ac, char **av)
 {
 	int lc;			/* loop counter */
 	const char *msg;	/* message returned from parse_opts */
-	char *file_name;	/* name of the testfile */
-	char *test_desc;	/* test specific message */
+	const char *file_name;	/* name of the testfile */
+	const char *test_desc;	/* test specific message */
 	int access_mode;	/* specified access mode for testfile */
 	int ind;		/* counter for testcase looping */
 

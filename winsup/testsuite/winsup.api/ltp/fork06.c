@@ -40,19 +40,20 @@
  * 	None
  */
 
-#include <stdio.h>
+#include <sys/wait.h>
 #include "test.h"
 #include "usctest.h"
 
-char *TCID = "fork06";
+const char *TCID = "fork06";
 int TST_TOTAL = 1;
 extern int Tst_count;
 
 void setup(void);
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 
 #define NUMFORKS 1000
 
+int
 main(int ac, char **av)
 {
 	int i, pid, status, childpid, succeed, fail;

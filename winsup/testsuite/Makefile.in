@@ -50,7 +50,6 @@ INSTALL_PROGRAM:=@INSTALL_PROGRAM@
 CC:=@CC@
 # FIXME: Which is it, CC or CC_FOR_TARGET?
 CC_FOR_TARGET:=$(CC)
-#CFLAGS:=@CFLAGS@ -MD -Wno-write-strings $(TESTSUP_INCLUDES)
 ifneq (,$(CFLAGS))
   override CFLAGS+= -MD $(TESTSUP_INCLUDES)
 else

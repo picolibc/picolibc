@@ -45,16 +45,15 @@
  * RESTRICTIONS
  *	None
  */
-#include <stdio.h>
 #include <fcntl.h>
 #include <errno.h>
 #include "test.h"
 #include "usctest.h"
 
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 void setup(void);
 
-char *TCID = "read01";
+const char *TCID = "read01";
 int TST_TOTAL = 1;
 extern int Tst_count;
 
@@ -63,12 +62,12 @@ char    fname[255];
 char    palfa[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" ;
 int fild;
 
+int
 main(int ac, char **av)
 {
 	int lc;			/* loop counter */
 	const char *msg;	/* message returned from parse_opts */
 
-	int n;
 	int rfild;
 	char prbuf[BUFSIZ];
 

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2000 Silicon Graphics, Inc.  All Rights Reserved.
- * 
+ *. 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of version 2 of the GNU General Public License as
  * published by the Free Software Foundation.
@@ -35,9 +35,26 @@
 #ifndef __TEST_H__
 #define __TEST_H__
 
+#define execve execve_foo
+#define execv execv_foo
+#define execvp execvp_foo
 #include <stdio.h>
 #include <signal.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+#undef execvp
+#undef execv
+#undef execve
+
+int execve(const char *, const char * const [], char * const *);
+int execv(const char *, const char * const []);
+int execvp(const char *, const char * const []);
+
+/* CGF: Avoid compilation warnings for undefined functions */
+extern int setregid (gid_t, gid_t);
+int setreuid (uid_t, uid_t);
+int gethostid (void);
 
 #define TPASS    0    /* Test passed flag */
 #define TFAIL    1    /* Test failed flag */
@@ -190,7 +207,7 @@ extern void tst_clear_error();
  * The following prototypes are needed to remove compile errors
  * on IRIX systems when compiled with -n32 and -64.
  */
-extern void tst_res(int ttype, char *fname, const char *arg_fmt, ...);
+extern void tst_res(int ttype, const char *fname, const char *arg_fmt, ...);
 extern void tst_resm(int ttype, const char *arg_fmt, ...);
 extern void tst_brk(int ttype, char *fname, void (*func)(), 
 							const char *arg_fmt, ...);

@@ -44,13 +44,13 @@
  */
 
 #include <errno.h>
-#include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 #include "test.h"
 #include "usctest.h"
 
-char *TCID = "creat03";			/* Test program identifier */
+const char *TCID = "creat03";			/* Test program identifier */
 int TST_TOTAL = 1;			/* Total number of test cases */
 extern int Tst_count;			/* Test case counter */
 
@@ -58,8 +58,9 @@ char pfilname[40] = "";
 #define FMODE	0444
 
 void setup(void);
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 
+int
 main(int ac, char **av)
 {
 	struct stat statbuf;

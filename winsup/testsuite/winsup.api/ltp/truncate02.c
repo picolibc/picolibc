@@ -86,7 +86,7 @@
 #define TRUNC_LEN1	256			/* truncation length */
 #define TRUNC_LEN2	512			/* truncation length */
 
-char *TCID="truncate02";	/* Test program identifier.    */
+const char *TCID="truncate02";	/* Test program identifier.    */
 int TST_TOTAL=1;		/* Total number of test conditions */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 int fd;				/* file descriptor of testfile */
@@ -94,7 +94,7 @@ char tst_buff[BUF_SIZE];	/* buffer to hold testfile contents */
 int exp_enos[]={0};
 
 void setup();			/* setup function for the test */
-void cleanup();			/* cleanup function for the test */
+void cleanup(void) __attribute__((noreturn));			/* cleanup function for the test */
 
 int
 main(int ac, char **av)

@@ -115,18 +115,17 @@
 #include <errno.h>
 #include <string.h>
 #include <signal.h>
-#include <unistd.h>
 #include <sys/param.h>		/* for PATH_MAX */
 #include "test.h"
 #include "usctest.h"
 
 void setup();
-void cleanup();
+void cleanup(void) __attribute__((noreturn));
 
 
 extern char *get_high_address();
 
-char *TCID="unlink07";		/* Test program identifier.    */
+const char *TCID="unlink07";		/* Test program identifier.    */
 int TST_TOTAL=6;    		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 
@@ -139,8 +138,8 @@ char Longpathname[PATH_MAX+2];
 char High_address[64];
 
 struct test_case_t {
-   char *pathname;
-   char *desc;
+   const char *pathname;
+   const char *desc;
    int exp_errno;
    int (*setupfunc)();
 } Test_cases[] = {
@@ -167,8 +166,8 @@ main(int ac, char **av)
 {
     int lc;		/* loop counter */
     const char *msg;		/* message returned from parse_opts */
-    char *fname;
-    char *desc;
+    const char *fname;
+    const char *desc;
     int ind;
     
     /***************************************************************

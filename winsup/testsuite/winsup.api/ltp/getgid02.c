@@ -65,13 +65,14 @@
 #include "test.h"
 #include "usctest.h"
 
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 void setup(void);
 
-char *TCID= "getgid02";
+const char *TCID= "getgid02";
 int TST_TOTAL = 1;
 extern int Tst_count;
 
+int
 main(int ac, char **av)
 {
 	int lc;                         /* loop counter */

@@ -67,7 +67,6 @@
  *  This test should be executed by 'non-super-user'  only.
  */
 
-#include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/fcntl.h>
@@ -93,7 +92,7 @@ int fd2;			/* File descriptor for testfile2 */
 
 struct test_case_t {		/* test case struct. to hold ref. test cond's*/
 	int fd;
-	char *desc;
+	const char *desc;
 	int exp_errno;
 	int len;
 	int (*setupfunc)();
@@ -103,20 +102,20 @@ struct test_case_t {		/* test case struct. to hold ref. test cond's*/
 	{ 0, NULL, 0, 0, no_setup }
 };
 
-char *TCID="ftruncate03";	/* Test program identifier.    */
+const char *TCID="ftruncate03";	/* Test program identifier.    */
 int TST_TOTAL=2;		/* Total number of test conditions */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 int exp_enos[]={EINVAL, EBADF, 0};
 
 void setup();			/* Main setup function for the test */
-void cleanup();			/* Main cleanup function for the test */
+void cleanup(void) __attribute__((noreturn));			/* Main cleanup function for the test */
 
 int
 main(int ac, char **av)
 {
 	int lc;			/* loop counter */
 	const char *msg;	/* message returned from parse_opts */
-	char *test_desc;	/* test specific error message */
+	const char *test_desc;	/* test specific error message */
 	int fildes;		/* File descriptor of testfile */
 	off_t trunc_len;	/* truncate length */
 	int ind;

@@ -62,10 +62,10 @@
 #include <errno.h>
 #include <sys/wait.h>
 
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 void setup(void);
 
-char *TCID= "kill03()";
+const char *TCID= "kill03()";
 int TST_TOTAL = 1;
 
 extern int Tst_count;
@@ -74,12 +74,13 @@ int exp_enos[] = {EINVAL, 0};
 
 #define TEST_SIG 2000
 
+int
 main(int ac, char **av)
 {
 	int lc;                         /* loop counter */
 	const char *msg;		/* message returned from parse_opts */
 	pid_t pid;			
-	int exno, status, nsig;
+	int exno, status;
 
 	/* parse standard options */
 	if ((msg = parse_opts(ac, av, (option_t *)NULL, NULL)) != (char *)NULL){

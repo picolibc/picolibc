@@ -60,15 +60,16 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 void setup(void);
 
-char *TCID = "fchdir02";
+const char *TCID = "fchdir02";
 int TST_TOTAL = 1;
 extern int Tst_count;
 
 int exp_enos[] = {9, 0};	/* 0 terminated list of expected errnos */
 
+int
 main(int ac, char **av)
 {
 	const int bad_fd = -5;

@@ -75,7 +75,6 @@ BUGS:
 
 ************************************************************/
 
-#include <unistd.h>
 #include <signal.h>
 #include <string.h>
 #include <errno.h>
@@ -84,9 +83,9 @@ BUGS:
 #include "usctest.h"
 
 void setup();
-void cleanup();
+void cleanup(void) __attribute__((noreturn));
 
-char *TCID="getgroups01";          /* Test program identifier.    */
+const char *TCID="getgroups01";          /* Test program identifier.    */
 int TST_TOTAL=4;                /* Total number of test cases. */
 extern int Tst_count;           /* Test Case counter for tst_* routines */
 

@@ -118,14 +118,13 @@
 #include <string.h>
 #include <signal.h>
 #include <setjmp.h>
-#include <unistd.h>
 #include "test.h"
 #include "usctest.h"
 
 void setup();
-void cleanup();
+void cleanup(void) __attribute__((noreturn));
 
-char *TCID="stat06";		/* Test program identifier.    */
+const char *TCID="stat06";		/* Test program identifier.    */
 int TST_TOTAL=8;    		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 
@@ -144,9 +143,9 @@ jmp_buf sig11_recover;
 void sig11_handler(int sig);
 
 struct test_case_t {
-   char *pathname;
+   const char *pathname;
    struct stat *stbuf;
-   char *desc;
+   const char *desc;
    int exp_errno;
    int (*setupfunc)();
 } Test_cases[] = {
@@ -173,8 +172,8 @@ main(int ac, char **av)
 {
     int lc;		/* loop counter */
     const char *msg;	/* message returned from parse_opts */
-    char *fname;
-    char *desc;
+    const char *fname;
+    const char *desc;
     int ind;
     struct stat *stbuf;
     struct sigaction sa, osa;

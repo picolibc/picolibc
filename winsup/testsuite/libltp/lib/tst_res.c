@@ -106,11 +106,7 @@
  *
  *#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#**/
 #include <errno.h>
-#include <string.h>
-#include <stdio.h>         /* for I/O functions, BUFSIZ */
-#include <stdlib.h>        /* for getenv() */
 #include <stdarg.h>        /* for varargs stuff */
-#include <unistd.h>        /* for access() */
 #include "test.h"          /* for output display mode & result type */
                            /* defines */
 
@@ -154,14 +150,14 @@
 static void check_env();
 static void tst_condense(int tnum, int ttype, char *tmesg);
 static void tst_print(char *tcid, int tnum, int trange, int ttype, const char *tmesg);
-static void cat_file(char *filename);
+static void cat_file(const char *filename);
 
 
 /*
  * Define some static/global variables.
  */
 static FILE *T_out = NULL;    /* tst_res() output file descriptor */
-static char *File;            /* file whose contents is part of result */
+static const char *File;      /* file whose contents is part of result */
 static int  T_exitval = 0;    /* exit value used by tst_exit() */
 static int  T_mode = VERBOSE; /* flag indicating print mode: VERBOSE, */
                               /* CONDENSE, NOPASS, DISCARD */
@@ -216,7 +212,7 @@ char *TESTDIR = NULL;
  *             eventually get here to print the results.
  */
 void
-tst_res(int ttype, char *fname, const char *arg_fmt, ...)
+tst_res(int ttype, const char *fname, const char *arg_fmt, ...)
 {
    int  i;
    char tmesg[USERMESG];     /* expanded message */
@@ -329,7 +325,7 @@ tst_res(int ttype, char *fname, const char *arg_fmt, ...)
 static void
 tst_condense(int tnum, int ttype, char *tmesg)
 {
-   char *file;
+   const char *file;
 
 #if DEBUG
    printf("IN tst_condense: tcid = %s, tnum = %d, ttype = %d, tmesg = %s\n",
@@ -802,7 +798,7 @@ tst_brkloopm(int ttype, void (*func)(), const char *arg_fmt, ...)
  * cat_file() - Print the contents of a file to standard out.
  */
 static void
-cat_file(char *filename)
+cat_file(const char *filename)
 {
    FILE *fp;                  /* file pointer */
    int  b_read;               /* number of bytes read with read() */

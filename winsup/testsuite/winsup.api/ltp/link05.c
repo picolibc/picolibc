@@ -119,12 +119,12 @@
 #include "usctest.h"
 
 void setup();
-void cleanup();
+void cleanup(void) __attribute__((noreturn));
 void help();
 
 
 
-char *TCID="link05"; 	/* Test program identifier.    */
+const char *TCID="link05"; 	/* Test program identifier.    */
 #ifdef CRAY
 int TST_TOTAL=2;    		/* Total number of test cases. */
 #else

@@ -117,11 +117,11 @@
 #include "usctest.h"
 
 void setup();
-void cleanup();
+void cleanup(void) __attribute__((noreturn));
 
 
 
-char *TCID="ulimit01"; 	/* Test program identifier.    */
+const char *TCID="ulimit01"; 	/* Test program identifier.    */
 int TST_TOTAL=6;    		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 

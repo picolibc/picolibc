@@ -109,7 +109,6 @@
  * 
  *#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#**/
 
-#include <unistd.h>
 #include <errno.h>
 #include <string.h>
 #include <signal.h>
@@ -120,11 +119,11 @@
 #include "usctest.h"
 
 void setup();
-void cleanup();
+void cleanup(void) __attribute__((noreturn));
 
 
 
-char *TCID="mknod01";		/* Test program identifier.    */
+const char *TCID="mknod01";		/* Test program identifier.    */
 int TST_TOTAL;			/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 

@@ -50,12 +50,13 @@
 #include <usctest.h>
 
 void setup(void);
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 
-char *TCID = "getpgid01";
+const char *TCID = "getpgid01";
 int TST_TOTAL = 1;
 extern int Tst_count;
 
+int
 main(int ac, char **av)
 {
 	int lc;				/* loop counter */
@@ -98,7 +99,6 @@ main(int ac, char **av)
 		}
 
 		/* child */
-block1:
 		tst_resm(TINFO, "Enter block 1");
 		fail = 0;
 		if ((pgid_0 = getpgid(0)) < 0) {
@@ -114,7 +114,6 @@ block1:
 		}
 		tst_resm(TINFO, "Exit block 1");
 
-block2:
 		tst_resm(TINFO, "Enter block 2");
 		fail = 0;
 
@@ -138,7 +137,6 @@ block2:
 		}
 		tst_resm(TINFO, "Exit block 2");
 
-block3:
 		tst_resm(TINFO, "Enter block 3");
 		fail = 0;
 
@@ -164,7 +162,6 @@ block3:
 		}
 		tst_resm(TINFO, "Exit block 3");
 
-block4:
 		tst_resm(TINFO, "Enter block 4");
 		fail = 0;
 

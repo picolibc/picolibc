@@ -132,11 +132,8 @@
  *#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#**/
 
 #include <errno.h>
-#include <string.h>
 #include <signal.h>
 #include <sys/types.h>
-#include <unistd.h>
-#include <stdlib.h>
 #include <fcntl.h>
 #include <sys/wait.h>
 #include <limits.h>
@@ -146,10 +143,10 @@
 #include "search_path.h"
 
 void setup();
-void cleanup();
+void cleanup(void) __attribute__((noreturn));
 void help();
 
-char *TCID="fcntl07";		/* Test program identifier.    */
+const char *TCID="fcntl07";		/* Test program identifier.    */
 int TST_TOTAL=2;		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 
@@ -170,10 +167,10 @@ int stat_loc;			/* for waitpid() */
 int file_fd, pipe_fds[2];
 	/* file descriptors for a file and a system pipe */
 #define DEFAULT_FILE "DefaultFileName"
-char *File1 = DEFAULT_FILE;
+const char *File1 = DEFAULT_FILE;
 
 #define DEFAULT_SUBPROG "test_open"
-char *openck = DEFAULT_SUBPROG;		/* support program name to check for open FD */
+const char *openck = DEFAULT_SUBPROG;	/* support program name to check for open FD */
 char subprog_path[_POSIX_PATH_MAX];	/* path to exec "openck" with */
 #define STRSIZE 255
 
@@ -181,13 +178,13 @@ int *testfds[] = {
     &file_fd,	&pipe_fds[1],	0
     };
 
-char *testfdtypes[] = {
+const char *testfdtypes[] = {
     "regular file",
     "write side of system pipe",
     };
 
-int test_open(char *arg);
-int do_exec(char *prog, int fd, char *tcd);
+int test_open(const char *arg);
+int do_exec(const char *prog, int fd, const char *tcd);
 
 int
 main(int ac, char **av)
@@ -197,7 +194,7 @@ main(int ac, char **av)
     
     int exec_return;	/* return from do_exec */
     int **tcp;		/* testcase pointer (pointer to FD) */
-    char **tcd;		/* testcase description pointer */
+    const char **tcd;		/* testcase description pointer */
     
     /***************************************************************
      * parse standard options, and exit if there is an error
@@ -358,7 +355,7 @@ help()
  */
 
 int
-do_exec(char *prog, int fd, char *tcd)
+do_exec(const char *prog, int fd, const char *tcd)
 {
     int pid;
     char pidname[STRSIZE];
@@ -400,7 +397,7 @@ do_exec(char *prog, int fd, char *tcd)
  *    It tests if a file descriptor is open and exits accordingly.
  */
 int
-test_open(char *arg)
+test_open(const char *arg)
 {
     int fd, rc;
     int status;

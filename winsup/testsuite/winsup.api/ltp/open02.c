@@ -42,7 +42,6 @@
  * RESTRICTIONS
  * 	None
  */
-#include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
@@ -50,7 +49,7 @@
 #include <test.h>
 #include <usctest.h>
 
-char *TCID = "open02";
+const char *TCID = "open02";
 int TST_TOTAL = 1;
 extern int Tst_count;
 
@@ -58,17 +57,14 @@ char pfilname[40] = "";
 
 int exp_enos[] = {ENOENT, 0};
 
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 void setup(void);
 
+int
 main(int ac, char **av)
 {
 	int lc;				/* loop counter */
 	const char *msg;		/* message returned from parse_opts */
-
-	struct stat statbuf;
-	int fildes;
-	unsigned short filmode;
 
 	/*
 	 * parse standard command line options

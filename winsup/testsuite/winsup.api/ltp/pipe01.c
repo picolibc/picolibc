@@ -43,24 +43,23 @@
  * RESTRICITONS
  *	NONE
  */
-#include <unistd.h>
 #include <errno.h>
 #include "test.h"
 #include "usctest.h"
 
-char *TCID = "pipe01";
+const char *TCID = "pipe01";
 int TST_TOTAL = 1;
 extern int Tst_count;
 
 void setup(void);
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 
+int
 main(int ac, char **av)
 {
 	int lc;				/* loop counter */
 	const char *msg;		/* message returned from parse_opts */
 
-	int pipe_ret;			/* exit status of pipe */
 	int fildes[2];			/* fds for pipe read and write */
 	char wrbuf[BUFSIZ], rebuf[BUFSIZ];
 	int red, written;		/* no. of chars read/written to pipe */

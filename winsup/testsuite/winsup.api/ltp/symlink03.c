@@ -77,7 +77,6 @@
  *  This test should be executed by 'non-super-user' only.
  */
 
-#include <stdio.h>
 #include <sys/types.h>
 #include <sys/fcntl.h>
 #include <errno.h>
@@ -99,7 +98,7 @@
 #define TEST_FILE3      "tfile_3"
 #define SYM_FILE3	"t_file/sfile_3"
 
-char *TCID="symlink03";		/* Test program identifier.    */
+const char *TCID="symlink03";		/* Test program identifier.    */
 int TST_TOTAL=1;		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 int exp_enos[]={ENOTDIR, ENOENT, ENAMETOOLONG, EFAULT,  EEXIST, EACCES, 0};
@@ -114,9 +113,9 @@ char Longpathname[PATH_MAX+2];
 char High_address_node[64];
 
 struct test_case_t {		/* test case struct. to hold ref. test cond's*/
-	char *file;
-	char *link;
-	char *desc;
+	const char *file;
+	const char *link;
+	const char *desc;
 	int exp_errno;
 	int (*setupfunc)();
 } Test_cases[] = {
@@ -133,16 +132,17 @@ struct test_case_t {		/* test case struct. to hold ref. test cond's*/
 };
 
 extern void setup();		/* Setup function for the test */
-extern void cleanup();		/* Cleanup function for the test */
+void cleanup() __attribute__((noreturn));/* Cleanup function for the test */
+char *get_high_address (void);
 
 int
 main(int ac, char **av)
 {
 	int lc;			/* loop counter */
 	const char *msg;	/* message returned from parse_opts */
-	char *test_file;	/* testfile name */
-	char *sym_file;		/* symbolic link file name */
-	char *test_desc;	/* test specific error message */
+	const char *test_file;	/* testfile name */
+	const char *sym_file;		/* symbolic link file name */
+	const char *test_desc;	/* test specific error message */
 	int ind;		/* counter to test different test conditions */
 
 	/* Parse standard options given to run the test. */

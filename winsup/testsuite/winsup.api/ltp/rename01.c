@@ -68,17 +68,16 @@
 #include <sys/types.h>
 #include <sys/fcntl.h>
 #include <sys/stat.h>
-#include <unistd.h>
 #include <errno.h>
 
 #include "test.h"
 #include "usctest.h"
 
 void setup();
-void cleanup();
+void cleanup(void) __attribute__((noreturn));
 extern void do_file_setup(char *);
 
-char *TCID="rename01";		/* Test program identifier.    */
+const char *TCID="rename01";		/* Test program identifier.    */
 int TST_TOTAL=2;		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 
@@ -89,9 +88,9 @@ dev_t f_olddev, d_olddev;
 ino_t f_oldino, d_oldino;
 
 struct test_case_t {
-	char *name1;
-	char *name2;
-	char *desc;
+	const char *name1;
+	const char *name2;
+	const char *desc;
 	dev_t *olddev;
 	ino_t *oldino;
 } TC[] = {

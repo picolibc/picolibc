@@ -47,17 +47,17 @@
  *	None
  */
 #include <errno.h>
-#include <stdio.h>
 #include <limits.h>
+#include <sys/wait.h>
 #include "test.h"
 #include "usctest.h"
 
-char *TCID = "pipe11";
+const char *TCID = "pipe11";
 int TST_TOTAL = 1;
 extern int Tst_count;
 
 void setup(void);
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 
 #define	NUMCHILD	50
 #define	NCPERCHILD	50
@@ -69,15 +69,15 @@ int szcharbuf;			/* size of char buf */
 int pipewrcnt;			/* chars written to pipe */
 char *wrbuf, *rdbuf;
 
+int
 main(int ac, char **av)
 {
 	int lc;				/* loop counter */
 	const char *msg;		/* message returned from parse_opts */
 
-	int pipe_ret;			/* exit status of pipe */
 	int fd[2];			/* fds for pipe read/write */
 	int i;
-	int fork_ret, status, cond_numb = 0;
+	int fork_ret, status;
 	int nread, written;		/* no of chars read and written */
 
 	/* parse standard options */

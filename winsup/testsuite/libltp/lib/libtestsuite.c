@@ -29,10 +29,6 @@
  *	my_getpwnam(), do_file_setup()
  *
  */
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
 #include <pwd.h>
 #include <errno.h>
 #include <fcntl.h>

@@ -62,10 +62,8 @@
  *  None.
  */
 
-#include <unistd.h>
 #include <sys/types.h>
 #include <errno.h>
-#include <unistd.h>
 #include <string.h>
 #include <signal.h>
 #include <sys/wait.h>
@@ -74,9 +72,9 @@
 #include "usctest.h"
 
 void setup();			/* Main setup function of test */
-void cleanup();			/* cleanup function for the test */
+void cleanup(void) __attribute__((noreturn));			/* cleanup function for the test */
 
-char *TCID="getpid01";		/* Test program identifier.    */
+const char *TCID="getpid01";		/* Test program identifier.    */
 int TST_TOTAL=1;		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 

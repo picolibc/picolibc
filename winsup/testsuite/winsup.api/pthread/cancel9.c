@@ -40,6 +40,8 @@
  */
 
 #include "test.h"
+#include <assert.h>
+#include <sys/wait.h>
 
 static pid_t pid;
 

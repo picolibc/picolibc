@@ -136,12 +136,12 @@ extern void cleanup();
 
 
 
-char *TCID="read01"; 		/* Test program identifier.    */
+const char *TCID="read01"; 		/* Test program identifier.    */
 int TST_TOTAL=1;    		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 
 int exp_enos[]={0, 0};
-char fname[255], *malloc();
+char fname[255];
 int fd, i;
 int offset=0;
 char *s;

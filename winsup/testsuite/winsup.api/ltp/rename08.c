@@ -66,17 +66,16 @@
  */
 #include <sys/types.h>
 #include <sys/fcntl.h>
-#include <unistd.h>
 #include <errno.h>
 
 #include "test.h"
 #include "usctest.h"
 
 void setup();
-void cleanup();
+void cleanup(void) __attribute__((noreturn));
 extern void do_file_setup(char *);
 
-char *TCID="rename08";		/* Test program identifier.    */
+const char *TCID="rename08";		/* Test program identifier.    */
 int TST_TOTAL=3;		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 

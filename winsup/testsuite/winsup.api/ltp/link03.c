@@ -121,11 +121,11 @@
 
 void setup(); 
 void help();
-void cleanup();
+void cleanup(void) __attribute__((noreturn));
 
 
 
-char *TCID="link03";		/* Test program identifier.    */
+const char *TCID="link03";		/* Test program identifier.    */
 int TST_TOTAL=2;    		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 extern int Tst_nobuf;

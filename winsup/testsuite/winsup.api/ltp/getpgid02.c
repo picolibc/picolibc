@@ -52,9 +52,9 @@
 #include <usctest.h>
 
 void setup(void);
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 
-char *TCID = "getpgid01";
+const char *TCID = "getpgid01";
 int TST_TOTAL = 2;
 extern int Tst_count;
 
@@ -74,6 +74,7 @@ struct test_case_t {
         {&pgid_1, ESRCH}
 };
 
+int
 main(int ac, char **av)
 {
 	int lc;				/* loop counter */

@@ -45,21 +45,22 @@
  *	None
  */
 
-#include <stdio.h>
 #include "test.h"
 #include "usctest.h"
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 
-char *TCID = "umask01";
+const char *TCID = "umask01";
 int TST_TOTAL = 1;
 extern int Tst_count;
 
 char filname[40];
 
 void setup(void);
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 
+int
 main(int argc, char **argv)
 {
 	int lc;

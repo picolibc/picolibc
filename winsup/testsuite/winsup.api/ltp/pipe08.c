@@ -48,25 +48,24 @@
  *	None
  */
 #include <errno.h>
-#include <unistd.h>
 #include <signal.h>
 #include "test.h"
 #include "usctest.h"
 
-char *TCID = "pipe08";
+const char *TCID = "pipe08";
 int TST_TOTAL = 1;
 extern int Tst_count;
 
 void setup(void);
-void cleanup(void);
+void cleanup(void) __attribute__((noreturn));
 void sighandler(int);
 
+int
 main(int ac, char **av)
 {
 	int lc;				/* loop counter */
 	const char *msg;		/* message returned from parse_opts */
 
-	int pipe_ret;			/* exit status of pipe */
 	int pipefd[2];			/* fds for pipe read/write */
 	char wrbuf[BUFSIZ];
 	int written, length;

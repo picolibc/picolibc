@@ -107,10 +107,8 @@
  * 
  * 
  *#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#*#**/
-#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
 #include <sys/param.h>
@@ -119,7 +117,7 @@
 #include "test.h"    
 #include "usctest.h"
 
-char *TCID="fork04";		/* Test program identifier.    */
+const char *TCID="fork04";		/* Test program identifier.    */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 
 
@@ -130,7 +128,7 @@ extern int Tst_count;		/* Test Case counter for tst_* routines */
 #define ENV_NOT_SET  "getenv() does not find variable set"
 
 /* list of environment variables to test */
-char *environ_list[] = {"TERM","NoTSetzWq","TESTPROG"};
+const char *environ_list[] = {"TERM","NoTSetzWq","TESTPROG"};
 #define NUMBER_OF_ENVIRON sizeof(environ_list)/sizeof(char *)
 int TST_TOTAL=NUMBER_OF_ENVIRON;		/* Total number of test cases. */
 
