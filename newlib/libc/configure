@@ -860,7 +860,7 @@ echo "$ac_t""$host" 1>&6
 
 PACKAGE=newlib
 
-VERSION=1.8.1
+VERSION=1.8.2
 
 if test "`cd $srcdir && pwd`" != "`pwd`" && test -f $srcdir/config.status; then
   { echo "configure: error: source directory already configured; run "make distclean" there first" 1>&2; exit 1; }

@@ -65,7 +65,7 @@ AC_SUBST(newlib_basedir)
 
 AC_CANONICAL_HOST
 
-AM_INIT_AUTOMAKE(newlib, 1.8.1)
+AM_INIT_AUTOMAKE(newlib, 1.8.2)
 
 # FIXME: We temporarily define our own version of AC_PROG_CC.  This is
 # copied from autoconf 2.12, but does not call AC_PROG_CC_WORKS.  We
@@ -142,7 +142,7 @@ esac
 newlib_cflags="[$]{newlib_cflags} -I"'[$](top_builddir)'"/$1/targ-include -I[$]{newlib_flagbasedir}/libc/include"
 case "${host}" in
   *-*-cygwin*)
-    newlib_cflags="[$]{newlib_cflags} -I[$]{newlib_flagbasedir}/../winsup/include"
+    newlib_cflags="[$]{newlib_cflags} -I[$]{newlib_flagbasedir}/../winsup/cygwin/include  -I[$]{newlib_flagbasedir}/../winsup/w32api/include"
     ;;
 esac
 
