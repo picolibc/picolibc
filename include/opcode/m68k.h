@@ -35,15 +35,27 @@
 #define	m68881   0x040
 #define	m68882   m68881 /* Synonym for -m68881.  otherwise unused.  */
 #define	m68851   0x080
-#define cpu32	 0x100	/* e.g., 68332 */
-#define mcf5200  0x200
-#define mcf5206e 0x400
-#define mcf5307  0x800
-#define mcf5407  0x1000
-#define mcfv4e   0x2000
-#define mcf528x  0x4000
-#define mcfmac   0x8000
-#define mcfemac  0x10000
+#define cpu32	 0x100		/* e.g., 68332 */
+
+#define mcfmac   0x200		/* ColdFire MAC. */
+#define mcfemac  0x400		/* ColdFire EMAC. */
+#define cfloat   0x800		/* ColdFire FPU.  */
+#define mcfhwdiv 0x1000		/* ColdFire hardware divide.  */
+
+#define mcfisa_a 0x2000		/* ColdFire ISA_A.  */
+#define mcfisa_aa 0x4000	/* ColdFire ISA_A+.  */
+#define mcfisa_b 0x8000		/* ColdFire ISA_B.  */
+#define mcfusp   0x10000	/* ColdFire USP instructions.  */
+
+#define mcf5200  0x20000
+#define mcf5206e 0x40000
+#define mcf521x  0x80000
+#define mcf5249  0x100000
+#define mcf528x  0x200000
+#define mcf5307  0x400000
+#define mcf5407  0x800000
+#define mcf5470  0x1000000
+#define mcf5480  0x2000000
 
  /* Handy aliases.  */
 #define	m68040up   (m68040 | m68060)
@@ -51,13 +63,7 @@
 #define	m68020up   (m68020 | m68030up)
 #define	m68010up   (m68010 | cpu32 | m68020up)
 #define	m68000up   (m68000 | m68010up)
-#define mcf        (mcf5200 | mcf5206e | mcf528x | mcf5307 | mcf5407 | mcfv4e)
-#define mcf5206eup (mcf5206e | mcf528x | mcf5307 | mcf5407 | mcfv4e)
-#define mcf5307up  (mcf5307 | mcf5407 | mcfv4e)
-#define mcfv4up    (mcf5407 | mcfv4e)
-#define mcfv4eup   (mcfv4e)
 
-#define cfloat  (mcfv4e)
 #define	mfloat  (m68881 | m68882 | m68040 | m68060)
 #define	mmmu    (m68851 | m68030 | m68040 | m68060)
 

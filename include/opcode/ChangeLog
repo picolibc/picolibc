@@ -1,4 +1,8 @@
-2004-04-22  Peter Barada <peter@the-baradas.com>
+2004-05-05  Peter Barada  <peter@the-baradas.com>
+
+	* m68k.h: Switch from ColdFire chip name to core variant.
+
+2004-04-22  Peter Barada  <peter@the-baradas.com>
 
 	* m68k.h: Add mcfmac/mcfemac definitions.  Update operand
 	descriptions for new EMAC cases.
