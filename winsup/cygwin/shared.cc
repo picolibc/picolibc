@@ -146,6 +146,7 @@ memory_init ()
   cygheap->shared_h = shared_h;
   ProtectHandleINH (cygheap->shared_h);
 
+  getpagesize ();
   heap_init ();
   mount_table = (mount_info *) open_shared (user_name, MOUNT_VERSION,
 					    cygwin_mount_h,

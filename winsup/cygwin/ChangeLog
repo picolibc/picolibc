@@ -1,20 +1,56 @@
-2002-08-29  Conrad Scott  <conrad.scott@dsl.pipex.com>
+2002-09-02  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
-	* safe_memory.h: Replace #include <new> with an explicit
-	definition of the placement new operator.
-	(safe_delete): Remove unnecessary ## operator.
+	* cygwin.din: Revert exporting new wchar functions.
+	* include/cygwin/version.h: Change comment for API minor 62.
+
+2002-09-02  Christopher Faylor  <cgf@redhat.com>
+
+	* dcrt0.cc (dll_crt0_1): Remove getpagesize() call.
+	* shared.cc (memory_init): Move it here.
+
+2002-08-31  Christopher January  <chris@atomice.net>
+
+	* fhandler_proc.cc: Add <sys/param.h> include.
+	(format_proc_uptime): Use KernelTime and UserTime only as they include
+	the other counters.
+	(format_proc_stat): KernelTime includes IdleTime, so subtract IdleTime
+	from KernelTime. Make number of 'jiffies' per second same as HZ define.
+	* fhandler_process.cc: Add <sys/param.h> include.
+	(format_process_stat): Make number of 'jiffies' per second same as
+	HZ define. Use KernelTime and UserTime only to calculate start_time.
+	
+2002-08-30  Christopher Faylor  <cgf@redhat.com>
+
+	(inspired by a patch from Egor Duda)
+	* select.cc (fhandler_tty_slave::ready_for_read): Remove.
+	* fhandler.h (fhandler_tty_slave::ready_for_read): Remove declaration.
+	* fhandler_tty.cc (fhandler_tty_slave::fhandler_tty_slave): Set "don't
+	need ready for read" flag.
+	(fhandler_tty_slave::read): Don't do anything special with vtime when
+	vmin == 0.
+
+2002-07-25  Egor Duda  <deo@logos-m.ru>
+
+	* autoload.cc (GetConsoleWindow): Correct parameter count.
 
 2002-08-30  Christopher January  <chris@atomice.net>
 	    Christopher Faylor  <cgf@redhat.com>
 
 	* tty.cc (tty_list::allocate_tty): Use GetConsoleWindow, if available.
 	Call FindWindow in a loop.
+	* autoload.cc (GetConsoleWindow): Export
 
 2002-08-30  Christopher Faylor  <cgf@redhat.com>
 
 	* miscfuncs.cc (check_iovec_for_read): Don't check buffer when zero
 	length iov_len.
 	(check_iovec_for_write): Ditto.
+
+2002-08-29  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* safe_memory.h: Replace #include <new> with an explicit
+	definition of the placement new operator.
+	(safe_delete): Remove unnecessary ## operator.
 
 2002-08-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
 

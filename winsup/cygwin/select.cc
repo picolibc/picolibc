@@ -787,40 +787,6 @@ fhandler_tty_slave::select_read (select_record *s)
   return s;
 }
 
-int
-fhandler_tty_slave::ready_for_read (int fd, DWORD howlong)
-{
-  HANDLE w4[2];
-  if (cygheap->fdtab.not_open (fd))
-    {
-      set_sig_errno (EBADF);
-      return 0;
-    }
-  if (get_readahead_valid ())
-    {
-      select_printf ("readahead");
-      return 1;
-    }
-  w4[0] = signal_arrived;
-  w4[1] = input_available_event;
-  switch (WaitForMultipleObjects (2, w4, FALSE, howlong))
-    {
-    case WAIT_OBJECT_0:
-      set_sig_errno (EINTR);
-      return 0;
-    case WAIT_OBJECT_0 + 1:
-      return 1;
-    case WAIT_FAILED:
-      select_printf ("wait failed %E");
-      set_sig_errno (EINVAL); /* FIXME: correct errno? */
-      return 0;
-    default:
-      if (!howlong)
-	set_sig_errno (EAGAIN);
-      return 0;
-    }
-}
-
 select_record *
 fhandler_dev_null::select_read (select_record *s)
 {

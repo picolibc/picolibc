@@ -161,9 +161,7 @@ details. */
        60: MSG_NOSIGNAL
        61: Export getc_unlocked, getchar_unlocked, putc_unlocked,
 	   putchar_unlocked
-       62: Export wcscat, wcschr, wcscpy, wcscspn, wcslcat, wcslcpy, wcsncat,
-           wcsncmp, wcsncpy, wcspbrk, wcsrchr, wcsspn, wcsstr, wmemchr,
-	   wmemcmp, wmemcpy, wmemmove, wmemset
+       62: Erroneously bumped.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
