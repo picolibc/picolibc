@@ -1,3 +1,8 @@
+Tue Jan 23 21:56:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* mmap.cc (fhandler_disk_file::mmap): Call CreateFileMapping with
+	len != 0 only when performing an anonymous mapping.
+
 Mon Jan 22 15:35:28 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* path.h: Add a new constant.

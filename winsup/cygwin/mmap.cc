@@ -1,6 +1,6 @@
 /* mmap.cc
 
-   Copyright 1996, 1997, 1998, 2000 Cygnus Solutions.
+   Copyright 1996, 1997, 1998, 2000, 2001 Cygnus Solutions.
 
 This file is part of Cygwin.
 
@@ -689,7 +689,12 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
   else
     protect = PAGE_READONLY;
 
-  HANDLE h = CreateFileMapping (get_handle(), &sec_none, protect, 0, len, NULL);
+  HANDLE h = CreateFileMapping (get_handle (),
+  				&sec_none,
+				protect,
+				0,
+  				get_handle () == INVALID_HANDLE_VALUE ? len : 0,
+				NULL);
   if (h == 0)
     {
       __seterrno ();
