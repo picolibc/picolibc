@@ -1,3 +1,10 @@
+2004-02-21  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (sigpacket::process): Make sure that tls is filled in
+	for SIGSTOP condition.
+	(_cygtls::call_signal_handler): Restore signal mask using saved oldmask
+	rather than current oldmask.
+
 2004-02-20  Christopher Faylor  <cgf@redhat.com>
 
 	* path.cc (conv_path_list): Return error condition.

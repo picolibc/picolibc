@@ -707,7 +707,7 @@ _cygtls::interrupt_setup (int sig, void *handler,
       myself->process_state |= PID_STOPPED;
     }
 
-  this->sig = sig;			// Should ALWAYS be last setting set to avoid a race
+  this->sig = sig;			// Should always be last thing set to avoid a race
 
   /* Clear any waiting threads prior to dispatching to handler function */
   int res = SetEvent (signal_arrived);	// For an EINTR case
@@ -955,6 +955,8 @@ sigpacket::process ()
   if ( si.si_signo == SIGSTOP)
     {
       sig_clear (SIGCONT);
+      if (!tls)
+	tls = _main_tls;
       goto stop;
     }
 
@@ -1156,12 +1158,12 @@ _cygtls::call_signal_handler ()
 
       (void) pop ();
       reset_signal_arrived ();
-      sigset_t oldmask = oldmask;
+      sigset_t this_oldmask = oldmask;
       int this_errno = saved_errno;
       set_process_mask (newmask);
       sig = 0;
       sigfunc (thissig);
-      set_process_mask (oldmask);
+      set_process_mask (this_oldmask);
       if (this_errno >= 0)
 	set_errno (this_errno);
     }
