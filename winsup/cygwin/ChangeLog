@@ -1,5 +1,22 @@
 2003-01-31  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler_serial.cc (fhandler_serial::open): Avoid extraneous setting
+	of res.
+
+	* termios.cc (tcsetattr): Correctly record errno after tcsetattr call.
+
+2003-01-31  Troy Curtiss  <troyc@usa.net>
+
+	* fhandler_serial.cc (fhandler_serial::tcsetattr): Add error-checking
+	so that if any Win32 SetComm*() calls fail, errno gets set to EINVAL
+	and tcsetattr() returns -1.  Catch invalid bitrates, mostly.  If baud
+	rate setting is B0, just drop DTR and leave Win32 DCB bitrate as-is
+	since 0 is not a valid Win32 setting.
+	(fhandler_serial::tcgetattr): If DTR is low, populate the bitrate as
+	B0, otherwise get it from the DCB.
+
+2003-01-31  Christopher Faylor  <cgf@redhat.com>
+
 	* passwd.cc (pwdgrp::read_passwd): linebuf *must* be static (from
 	Pierre Humblet).
 	* pwdgrp.h (pwdgrp::refresh): Avoid calling read function if we already

@@ -41,8 +41,8 @@ struct device;
 "/dev/tcp", FH_SOCKET, "\\dev\\socket", 0, 0, 0, 0
 "/dev/udp", FH_SOCKET, "\\dev\\socket", 0, 0, 0, 0
 "/dev/dgsocket", FH_SOCKET, "\\dev\\socket", 0, 0, 0, 0
-"/dev/st", FH_TAPE, "\\Device\\Tape%d", 0, 127,
-"/dev/nst", FH_NTAPE, "\\Device\\Tape%d", 0, 127,
+"/dev/st", FH_TAPE, "\\Device\\Tape%d", 0, 127
+"/dev/nst", FH_NTAPE, "\\Device\\Tape%d", 0, 127
 "/dev/fd", FH_FLOPPY, "\\Device\\Floppy%d", 0, 15
 "/dev/scd", FH_CDROM, "\\Device\\CdRom%d", 0, 15
 "/dev/sr", FH_CDROM, "\\Device\\CdRom%d", 0, 15

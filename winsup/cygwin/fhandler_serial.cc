@@ -168,12 +168,12 @@ fhandler_serial::raw_write (const void *ptr, size_t len)
 
       switch (GetLastError ())
 	{
-	  case ERROR_OPERATION_ABORTED:
-	    continue;
-	  case ERROR_IO_PENDING:
-	    break;
-	  default:
-	    goto err;
+	case ERROR_OPERATION_ABORTED:
+	  continue;
+	case ERROR_IO_PENDING:
+	  break;
+	default:
+	  goto err;
 	}
 
       if (!GetOverlappedResult (get_handle (), &write_status, &bytes_written, TRUE))
@@ -214,7 +214,7 @@ fhandler_serial::open (path_conv *, int flags, mode_t mode)
   syscall_printf ("fhandler_serial::open (%s, %p, %p)",
 			get_name (), flags, mode);
 
-  if (!(res = this->fhandler_base::open (NULL, flags, mode)))
+  if (!this->fhandler_base::open (NULL, flags, mode))
     return 0;
 
   res = 1;
@@ -347,27 +347,27 @@ fhandler_serial::tcflow (int action)
 
   switch (action)
     {
-      case TCOOFF:
-	win32action = SETXOFF;
-	break;
-      case TCOON:
-	win32action = SETXON;
-	break;
-      case TCION:
-      case TCIOFF:
-	if (GetCommState (get_handle (), &dcb) == 0)
-	  return -1;
-	if (action == TCION)
-	  xchar = (dcb.XonChar ? dcb.XonChar : 0x11);
-	else
-	  xchar = (dcb.XoffChar ? dcb.XoffChar : 0x13);
-	if (TransmitCommChar (get_handle (), xchar) == 0)
-	  return -1;
-	return 0;
-	break;
-      default:
+    case TCOOFF:
+      win32action = SETXOFF;
+      break;
+    case TCOON:
+      win32action = SETXON;
+      break;
+    case TCION:
+    case TCIOFF:
+      if (GetCommState (get_handle (), &dcb) == 0)
 	return -1;
-	break;
+      if (action == TCION)
+	xchar = (dcb.XonChar ? dcb.XonChar : 0x11);
+      else
+	xchar = (dcb.XoffChar ? dcb.XoffChar : 0x13);
+      if (TransmitCommChar (get_handle (), xchar) == 0)
+	return -1;
+      return 0;
+      break;
+    default:
+      return -1;
+      break;
     }
 
   if (EscapeCommFunction (get_handle (), win32action) == 0)
@@ -530,8 +530,8 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
   COMMTIMEOUTS to;
   DCB ostate, state;
   unsigned int ovtime = vtime_, ovmin = vmin_;
-  int tmpDtr, tmpRts;
-  tmpDtr = tmpRts = 0;
+  int tmpDtr, tmpRts, res;
+  res = tmpDtr = tmpRts = 0;
 
   termios_printf ("action %d", action);
   if ((action == TCSADRAIN) || (action == TCSAFLUSH))
@@ -554,75 +554,76 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
 
   switch (t->c_ospeed)
     {
-      case B0:	/* drop DTR */
-	dropDTR = TRUE;
-	state.BaudRate = 0;
-	break;
-      case B110:
-	state.BaudRate = CBR_110;
-	break;
-      case B300:
-	state.BaudRate = CBR_300;
-	break;
-      case B600:
-	state.BaudRate = CBR_600;
-	break;
-      case B1200:
-	state.BaudRate = CBR_1200;
-	break;
-      case B2400:
-	state.BaudRate = CBR_2400;
-	break;
-      case B4800:
-	state.BaudRate = CBR_4800;
-	break;
-      case B9600:
-	state.BaudRate = CBR_9600;
-	break;
-      case B19200:
-	state.BaudRate = CBR_19200;
-	break;
-      case B38400:
-	state.BaudRate = CBR_38400;
-	break;
-      case B57600:
-	state.BaudRate = CBR_57600;
-	break;
-      case B115200:
-	state.BaudRate = CBR_115200;
-	break;
-      case B230400:
-	state.BaudRate = 230400 /* CBR_230400 - not defined */;
-	break;
-      default:
-	/* Unsupported baud rate! */
-	termios_printf ("Invalid t->c_ospeed %d", t->c_ospeed);
-	set_errno (EINVAL);
-	return -1;
+    case B0:
+      /* Drop DTR - but leave DCB-resident bitrate as-is since
+	 0 is an invalid bitrate in Win32 */
+      dropDTR = TRUE;
+      break;
+    case B110:
+      state.BaudRate = CBR_110;
+      break;
+    case B300:
+      state.BaudRate = CBR_300;
+      break;
+    case B600:
+      state.BaudRate = CBR_600;
+      break;
+    case B1200:
+      state.BaudRate = CBR_1200;
+      break;
+    case B2400:
+      state.BaudRate = CBR_2400;
+      break;
+    case B4800:
+      state.BaudRate = CBR_4800;
+      break;
+    case B9600:
+      state.BaudRate = CBR_9600;
+      break;
+    case B19200:
+      state.BaudRate = CBR_19200;
+      break;
+    case B38400:
+      state.BaudRate = CBR_38400;
+      break;
+    case B57600:
+      state.BaudRate = CBR_57600;
+      break;
+    case B115200:
+      state.BaudRate = CBR_115200;
+      break;
+    case B230400:
+      state.BaudRate = 230400 /* CBR_230400 - not defined */;
+      break;
+    default:
+      /* Unsupported baud rate! */
+      termios_printf ("Invalid t->c_ospeed %d", t->c_ospeed);
+      set_errno (EINVAL);
+      return -1;
     }
 
   /* -------------- Set byte size ------------------ */
 
   switch (t->c_cflag & CSIZE)
     {
-      case CS5:
-	state.ByteSize = 5;
-	break;
-      case CS6:
-	state.ByteSize = 6;
-	break;
-      case CS7:
-	state.ByteSize = 7;
-	break;
-      case CS8:
-	state.ByteSize = 8;
-	break;
-      default:
-	/* Unsupported byte size! */
-	termios_printf ("Invalid t->c_cflag byte size %d",
-			t->c_cflag & CSIZE);
-	set_errno (EINVAL);
-	return -1;
+    case CS5:
+      state.ByteSize = 5;
+      break;
+    case CS6:
+      state.ByteSize = 6;
+      break;
+    case CS7:
+      state.ByteSize = 7;
+      break;
+    case CS8:
+      state.ByteSize = 8;
+      break;
+    default:
+      /* Unsupported byte size! */
+      termios_printf ("Invalid t->c_cflag byte size %d",
+		      t->c_cflag & CSIZE);
+      set_errno (EINVAL);
+      return -1;
     }
 
   /* -------------- Set stop bits ------------------ */
@@ -725,8 +726,16 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
 
   state.fAbortOnError = TRUE;
 
-  if (memcmp (&ostate, &state, sizeof (state)) != 0)
-    SetCommState (get_handle (), &state);
+  if ((memcmp (&ostate, &state, sizeof (state)) != 0)
+      && !SetCommState (get_handle (), &state))
+    {
+      /* SetCommState() failed, usually due to invalid DCB param.
+	 Keep track of this so we can set errno to EINVAL later
+	 and return failure */
+      termios_printf ("SetCommState() failed, %E");
+      __seterrno ();
+      res = -1;
+    }
 
   set_r_binary ((t->c_iflag & IGNCR) ? 0 : 1);
   set_w_binary ((t->c_oflag & ONLCR) ? 0 : 1);
@@ -750,8 +759,7 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
   rts = tmpRts;
   dtr = tmpDtr;
 
-  /*
-  The following documentation on was taken from "Linux Serial Programming
+  /* The following documentation on was taken from "Linux Serial Programming
   HOWTO".  It explains how MIN (t->c_cc[VMIN] || vmin_) and TIME
   (t->c_cc[VTIME] || vtime_) is to be used.
 
@@ -794,49 +802,51 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
 
   debug_printf ("vtime %d, vmin %d", vtime_, vmin_);
 
-  if (ovmin == vmin_ && ovtime == vtime_)
-    return 0;
+  if (ovmin != vmin_ || ovtime != vtime_)
+  {
+    memset (&to, 0, sizeof (to));
 
-  memset (&to, 0, sizeof (to));
+    if ((vmin_ > 0) && (vtime_ == 0))
+      {
+	/* Returns immediately with whatever is in buffer on a ReadFile();
+	   or blocks if nothing found.  We will keep calling ReadFile(); until
+	   vmin_ characters are read */
+	to.ReadIntervalTimeout = to.ReadTotalTimeoutMultiplier = MAXDWORD;
+	to.ReadTotalTimeoutConstant = MAXDWORD - 1;
+      }
+    else if ((vmin_ == 0) && (vtime_ > 0))
+      {
+	/* set timeoout constant appropriately and we will only try to
+	   read one character in ReadFile() */
+	to.ReadTotalTimeoutConstant = vtime_;
+	to.ReadIntervalTimeout = to.ReadTotalTimeoutMultiplier = MAXDWORD;
+      }
+    else if ((vmin_ > 0) && (vtime_ > 0))
+      {
+	/* time applies to the interval time for this case */
+	to.ReadIntervalTimeout = vtime_;
+      }
+    else if ((vmin_ == 0) && (vtime_ == 0))
+      {
+	/* returns immediately with whatever is in buffer as per
+	   Time-Outs docs in Win32 SDK API docs */
+	to.ReadIntervalTimeout = MAXDWORD;
+      }
 
-  if ((vmin_ > 0) && (vtime_ == 0))
-    {
-      /* Returns immediately with whatever is in buffer on a ReadFile();
-	 or blocks if nothing found.  We will keep calling ReadFile(); until
-	 vmin_ characters are read */
-      to.ReadIntervalTimeout = to.ReadTotalTimeoutMultiplier = MAXDWORD;
-      to.ReadTotalTimeoutConstant = MAXDWORD - 1;
-    }
-  else if ((vmin_ == 0) && (vtime_ > 0))
-    {
-      /* set timeoout constant appropriately and we will only try to
-	 read one character in ReadFile() */
-      to.ReadTotalTimeoutConstant = vtime_;
-      to.ReadIntervalTimeout = to.ReadTotalTimeoutMultiplier = MAXDWORD;
-    }
-  else if ((vmin_ > 0) && (vtime_ > 0))
-    {
-      /* time applies to the interval time for this case */
-      to.ReadIntervalTimeout = vtime_;
-    }
-  else if ((vmin_ == 0) && (vtime_ == 0))
-    {
-      /* returns immediately with whatever is in buffer as per
-	 Time-Outs docs in Win32 SDK API docs */
-      to.ReadIntervalTimeout = MAXDWORD;
-    }
+    debug_printf ("ReadTotalTimeoutConstant %d, ReadIntervalTimeout %d, ReadTotalTimeoutMultiplier %d",
+                  to.ReadTotalTimeoutConstant, to.ReadIntervalTimeout, to.ReadTotalTimeoutMultiplier);
 
-  debug_printf ("ReadTotalTimeoutConstant %d, ReadIntervalTimeout %d, ReadTotalTimeoutMultiplier %d",
-		to.ReadTotalTimeoutConstant, to.ReadIntervalTimeout, to.ReadTotalTimeoutMultiplier);
-  int res = SetCommTimeouts (get_handle (), &to);
-  if (!res)
-    {
-      system_printf ("SetCommTimeout failed, %E");
-      __seterrno ();
-      return -1;
-    }
+    if (!SetCommTimeouts(get_handle (), &to))
+      {
+	/* SetCommTimeouts() failed. Keep track of this so we
+	   can set errno to EINVAL later and return failure */
+	termios_printf ("SetCommTimeouts() failed, %E");
+	__seterrno ();
+	res = -1;
+      }
+  }
 
-  return 0;
+  return res;
 }
 
 /* tcgetattr: POSIX 7.2.1.1 */
@@ -854,12 +864,12 @@ fhandler_serial::tcgetattr (struct termios *t)
 
   /* -------------- Baud rate ------------------ */
 
-  switch (state.BaudRate)
-    {
-      case 0:
-	/* FIXME: need to drop DTR */
-	t->c_cflag = t->c_ospeed = t->c_ispeed = B0;
-	break;
+  /* If DTR is NOT set, return B0 as our speed */
+  if (dtr != TIOCM_DTR)
+    t->c_cflag = t->c_ospeed = t->c_ispeed = B0;
+  else
+    switch (state.BaudRate)
+      {
       case CBR_110:
 	t->c_cflag = t->c_ospeed = t->c_ispeed = B110;
 	break;
@@ -901,29 +911,29 @@ fhandler_serial::tcgetattr (struct termios *t)
 	termios_printf ("Invalid baud rate %d", state.BaudRate);
 	set_errno (EINVAL);
 	return -1;
-    }
+      }
 
   /* -------------- Byte size ------------------ */
 
   switch (state.ByteSize)
     {
-      case 5:
-	t->c_cflag |= CS5;
-	break;
-      case 6:
-	t->c_cflag |= CS6;
-	break;
-      case 7:
-	t->c_cflag |= CS7;
-	break;
-      case 8:
-	t->c_cflag |= CS8;
-	break;
-      default:
-	/* Unsupported byte size! */
-	termios_printf ("Invalid byte size %d", state.ByteSize);
-	set_errno (EINVAL);
-	return -1;
+    case 5:
+      t->c_cflag |= CS5;
+      break;
+    case 6:
+      t->c_cflag |= CS6;
+      break;
+    case 7:
+      t->c_cflag |= CS7;
+      break;
+    case 8:
+      t->c_cflag |= CS8;
+      break;
+    default:
+      /* Unsupported byte size! */
+      termios_printf ("Invalid byte size %d", state.ByteSize);
+      set_errno (EINVAL);
+      return -1;
     }
 
   /* -------------- Stop bits ------------------ */

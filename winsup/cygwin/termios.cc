@@ -144,8 +144,7 @@ tcsetattr (int fd, int a, const struct termios *t)
 	case bg_ok:
 	  if (cfd.isopen ())
 	    res = cfd->tcsetattr (a, t);
-	  else
-	    e = get_errno ();
+	  e = get_errno ();
 	  break;
 	case bg_signalled:
 	  if (thisframe.call_signal_handler ())
