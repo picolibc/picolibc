@@ -1,5 +1,9 @@
 2002-09-28  Christopher Faylor  <cgf@redhat.com>
 
+	* thread.h (verifyable_object:~verifyable_object): Make virtual.
+
+2002-09-28  Christopher Faylor  <cgf@redhat.com>
+
 	* cygthread.h (cygthread::terminate): Declare new function.
 	(cygthread::initialized): Change to 'int'.
 	* cygthread.cc (cygthread::stub): Exit thread if initialized < 0.
