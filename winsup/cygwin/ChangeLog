@@ -1,3 +1,8 @@
+Sat Mar 17 18:10:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* net.cc (cygwin_socket): Set protocol to 0 when address family is
+	AF_UNIX to avoid WSAEPROTONOSUPPORT error.
+
 Sat Mar 17 09:51:32 2001  Mathew Brozowski <brozow@tavve.com>
 
 	* net.cc (cygwin_socket): Pass protocol parameter to socket call.
