@@ -200,7 +200,8 @@ must create the whatis database.  Just run the command
 
 @subsection Why doesn't chmod work?
 
-@samp{ntsec} will allow UNIX permissions in Windows NT on NTFS file systems.
+@samp{ntsec} will allow UNIX permissions in Windows NT on NTFS file
+systems.  This is on by default (a recent change).
 
 @samp{ntea} works on NTFS @emph{and} FAT but it creates a huge,
 @strong{undeletable} file on FAT filesystems.
