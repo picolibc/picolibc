@@ -1609,7 +1609,7 @@ BOOL WINAPI IsValidAcl(PACL);
 BOOL WINAPI IsValidSecurityDescriptor(PSECURITY_DESCRIPTOR);
 BOOL WINAPI IsValidSid(PSID);
 #if (_WIN32_WINNT >= 0x0501)
-BOOL IsWow64Process(HANDLE,PBOOL);
+BOOL WINAPI IsWow64Process(HANDLE,PBOOL);
 #endif
 void WINAPI LeaveCriticalSection(LPCRITICAL_SECTION);
 #define LimitEmsPages(n)
