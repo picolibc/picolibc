@@ -315,7 +315,7 @@ cygthread::detach (HANDLE sigwait)
       if (!sigwait)
 	/* If the caller specified a special handle for notification, wait for that.
 	   This assumes that the thread in question is auto releasing. */
-	res = WaitForSingleObject (notify_detached ?: *this, INFINITE);
+	res = WaitForSingleObject (*this, INFINITE);
       else
 	{
 	  /* Lower our priority and give priority to the read thread */

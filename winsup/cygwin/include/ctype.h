@@ -38,7 +38,11 @@ int __cdecl _toupper(int);
 #define _X	0100
 #define	_B	0200
 
+#ifdef __INSIDE_CYGWIN__
 extern const char _ctype_[];
+#else
+extern const __declspec(dllimport) char _ctype_[];
+#endif
 
 #if !defined(__cplusplus) || defined(__INSIDE_CYGWIN__)
 #define	isalpha(c)	((_ctype_+1)[(unsigned)(c)]&(_U|_L))

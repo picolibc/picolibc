@@ -26,11 +26,11 @@ struct timer_tracker
   clockid_t clock_id;
   sigevent evp;
   timespec it_interval;
-  HANDLE cancel;
+  HANDLE hcancel;
   HANDLE syncthread;
   long long interval_us;
   long long sleepto_us;
-  cygthread *th;
+  bool cancel ();
   struct timer_tracker *next;
   int settime (int, const itimerspec *, itimerspec *);
   void gettime (itimerspec *);
@@ -61,16 +61,25 @@ lock_timer_tracker::~lock_timer_tracker ()
   protect->release ();
 }
 
+bool
+timer_tracker::cancel ()
+{
+  if (!hcancel)
+    return false;
+    
+  SetEvent (hcancel);
+  if (WaitForSingleObject (syncthread, INFINITE) != WAIT_OBJECT_0)
+    api_fatal ("WFSO failed waiting for timer thread, %E");
+  return true;
+}
+
 timer_tracker::~timer_tracker ()
 {
-  if (cancel)
+  if (cancel ())
     {
-      SetEvent (cancel);
-      th->detach ();
-      CloseHandle (cancel);
+      CloseHandle (hcancel);
 #ifdef DEBUGGING
-      th = NULL;
-      cancel = NULL;
+      hcancel = NULL;
 #endif
     }
   if (syncthread)
@@ -90,9 +99,9 @@ timer_tracker::timer_tracker (clockid_t c, const sigevent *e)
     }
   clock_id = c;
   magic = TT_MAGIC;
+  hcancel = NULL;
   if (this != &ttstart)
     {
-      cancel = NULL;
       lock_timer_tracker here;
       next = ttstart.next;
       ttstart.next = this;
@@ -134,7 +143,7 @@ timer_thread (VOID *x)
 	}
 
       debug_printf ("%p waiting for %u ms", x, sleep_ms);
-      switch (WaitForSingleObject (tt->cancel, sleep_ms))
+      switch (WaitForSingleObject (tt->hcancel, sleep_ms))
 	{
 	case WAIT_TIMEOUT:
 	  debug_printf ("timed out");
@@ -216,11 +225,7 @@ timer_tracker::settime (int in_flags, const itimerspec *value, itimerspec *ovalu
   long long now = in_flags & TIMER_ABSTIME ? 0 : gtod.usecs (false);
 
   lock_timer_tracker here;
-  if (cancel)
-    {
-      SetEvent (cancel);	// should be closed when the thread exits
-      th->detach ();
-    }
+  cancel ();
 
   if (ovalue)
     gettime (ovalue);
@@ -230,15 +235,15 @@ timer_tracker::settime (int in_flags, const itimerspec *value, itimerspec *ovalu
       sleepto_us = now + to_us (value->it_value);
       interval_us = to_us (value->it_interval);
       it_interval = value->it_interval;
-      if (!cancel)
-	cancel = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
+      if (!hcancel)
+	hcancel = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
       else
-	ResetEvent (cancel);
+	ResetEvent (hcancel);
       if (!syncthread)
 	syncthread = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
       else
 	ResetEvent (syncthread);
-      th = new cygthread (timer_thread, this, "itimer", syncthread);
+      (void) new cygthread (timer_thread, this, "itimer", syncthread);
     }
 
   return 0;
@@ -247,7 +252,7 @@ timer_tracker::settime (int in_flags, const itimerspec *value, itimerspec *ovalu
 void
 timer_tracker::gettime (itimerspec *ovalue)
 {
-  if (!cancel)
+  if (!hcancel)
     memset (ovalue, 0, sizeof (*ovalue));
   else
     {
@@ -333,12 +338,12 @@ timer_delete (timer_t timerid)
 void
 fixup_timers_after_fork ()
 {
-  ttstart.cancel = ttstart.syncthread = NULL;
+  ttstart.hcancel = ttstart.syncthread = NULL;
   for (timer_tracker *tt = &ttstart; tt->next != NULL; /* nothing */)
     {
       timer_tracker *deleteme = tt->next;
       tt->next = deleteme->next;
-      deleteme->cancel = deleteme->syncthread = NULL;
+      deleteme->hcancel = deleteme->syncthread = NULL;
       delete deleteme;
     }
 }

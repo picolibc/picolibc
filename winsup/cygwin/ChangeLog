@@ -1,5 +1,24 @@
 2005-03-28  Christopher Faylor  <cgf@timesys.com>
 
+	* cygthread.cc (cygthread::detach): Revert to just waiting for thred
+	event since waiting for anything else is racy.
+	* timer.cc (timer_tracker::hcancel): Rename from cancel.
+	(timer_tracker::cancel): New method.
+	(timer_tracker::th): Remove.
+	(timer_tracker::~timer_tracker): Call cancel method.
+	(timer_tracker::timer_tracker): Ditto.
+	(timer_tracker::timer_tracker): Always, clear cancel, even though it is
+	probably not strictly necessary for ttstart.
+	(timer_thread): Accommodate cancel -> hcancel rename.
+	(timer_tracker::settime): Ditto.
+	(timer_tracker::gettime): Ditto.
+	(timer_delete): Ditto.
+
+	* cygwin.din: Export _ctype_.
+	* include/ctype.h: Mark that _ctype_ is imported.
+
+2005-03-28  Christopher Faylor  <cgf@timesys.com>
+
 	* timer.cc (timer_tracker::timer_tracker): Eliminate simple
 	constructor.
 	(ttstart): Fully initialize.

@@ -4,6 +4,7 @@ EXPORTS
 __argc DATA
 __argv DATA
 __check_rhosts_file DATA
+_ctype_ DATA
 __cygwin_environ DATA
 __cygwin_user_data DATA
 __mb_cur_max DATA
