@@ -108,7 +108,7 @@ case "$target_os" in
   LIBM_A=
   LIBGMON_A=
   # Install mingw headers in mingw subdirectory.
-  HEADER_SUBDIR="mingw"
+  HEADER_SUBDIR="mingw32"
   ;;
 *)
   # Build it for CRTDLL by default.
