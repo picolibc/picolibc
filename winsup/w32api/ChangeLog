@@ -1,3 +1,26 @@
+2003-05-30  Mattia Barbon  <mbarbon@dsi.unive.it>
+
+	* lib/oleacc.def: New file.
+	* include/winable.h: New file.
+	* include/oleacc.h: Add extern "C" guard.
+	(NAVDIR_*, ROLE_*, STATE_*): Add missing constants.
+	(AccessibleChildren, AccessibleObjectFromEvent,
+	AccessibleObjectFromPoint, AccessibleObjectFromWindow,
+	CreateStdAccessibleProxy[AW], GetOleaccVersionInfo, GetRoleText[AW],
+	GetStateText[AW], LresultFromObject, ObjectFromLresult,
+	WindowFromAccessibleObject): Add prototypes and UNICODE mappings.
+	* include/winuser.h (NotifyWinEvent): Add prototype.
+	(OBJID_WINDOW, OBJID_SYSMENU, OBJID_TITLEBAR,
+	OBJID_MENU, OBJID_CLIENT, OBJID_VSCROLL, OBJID_HSCROLL,
+	OBJID_SIZEGRIP, OBJID_CARET, OBJID_CURSOR, OBJID_ALERT,
+	OBJID_SOUND): Move from here to...
+	* include/winable.h (OBJID_WINDOW, OBJID_SYSMENU, OBJID_TITLEBAR,
+	OBJID_MENU, OBJID_CLIENT, OBJID_VSCROLL, OBJID_HSCROLL,
+	OBJID_SIZEGRIP, OBJID_CARET, OBJID_CURSOR, OBJID_ALERT,
+	OBJID_SOUND): Here, as per documentation.
+	* lib/test.c: Include winable.h.
+	* lib/user32.def (NotifyWinEvent): Add missing export.
+
 2003-05-30  Bang Jun-Young  <junyoung@netbsd.org>
 
 	* include/winbase.h (HeapCompact): Correct prototype.

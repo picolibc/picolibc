@@ -409,6 +409,7 @@ ModifyMenuW@20
 MoveWindow@24
 MsgWaitForMultipleObjects@20
 MsgWaitForMultipleObjectsEx@20
+NotifyWinEvent@16
 OemKeyScan@4
 OemToCharA@8
 OemToCharBuffA@12
