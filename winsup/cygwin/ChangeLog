@@ -1,3 +1,9 @@
+2003-07-18  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* security.cc (verify_token): Fix white space and style.
+	Use type bool instead of BOOL and char. Use alloca
+	instead of malloc and free for my_grps. 
+
 2003-07-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sysconf.cc (sysconf): Fix OPEN_MAX patch.  Return page size on

@@ -744,30 +744,26 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, BOOL *pintern)
 	return gsid == groups.pgsid;
     }
 
-  PTOKEN_GROUPS my_grps = NULL;
-  BOOL ret = FALSE;
-  char saw_buf[NGROUPS_MAX] = {};
-  char *saw = saw_buf, sawpg = FALSE;
+  PTOKEN_GROUPS my_grps;
+  bool saw_buf[NGROUPS_MAX] = {};
+  bool *saw = saw_buf, sawpg = false, ret = false;
 
   if (!GetTokenInformation (token, TokenGroups, NULL, 0, &size) &&
       GetLastError () != ERROR_INSUFFICIENT_BUFFER)
     debug_printf ("GetTokenInformation(token, TokenGroups): %E");
-  else if (!(my_grps = (PTOKEN_GROUPS) malloc (size)))
-    debug_printf ("malloc (my_grps) failed.");
+  else if (!(my_grps = (PTOKEN_GROUPS) alloca (size)))
+    debug_printf ("alloca (my_grps) failed.");
   else if (!GetTokenInformation (token, TokenGroups, my_grps, size, &size))
     debug_printf ("GetTokenInformation(my_token, TokenGroups): %E");
   else if (!groups.issetgroups ()) /* setgroups was never called */
-    {
-      ret = sid_in_token_groups (my_grps, groups.pgsid);
-      if (ret == FALSE)
-	ret = (groups.pgsid == tok_usersid);
-    }
+    ret = sid_in_token_groups (my_grps, groups.pgsid)
+          || groups.pgsid == usersid;
   else /* setgroups was called */
     {
       struct __group32 *gr;
       cygsid gsid;
-      if (groups.sgsids.count > (int) sizeof (saw_buf) &&
-	  !(saw = (char *) calloc (groups.sgsids.count, sizeof (char))))
+      if (groups.sgsids.count > (int) (sizeof (saw_buf) / sizeof (*saw_buf))
+	  && !(saw = (bool *) calloc (groups.sgsids.count, sizeof (bool))))
 	goto done;
 
       /* token groups found in /etc/group match the user.gsids ? */
@@ -776,24 +772,21 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, BOOL *pintern)
 	  {
 	    int pos = groups.sgsids.position (gsid);
 	    if (pos >= 0)
-	      saw[pos] = TRUE;
+	      saw[pos] = true;
 	    else if (groups.pgsid == gsid)
-	      sawpg = TRUE;
-	   else if (gsid != well_known_world_sid &&
-		    gsid != usersid)
+	      sawpg = true;
+	    else if (gsid != well_known_world_sid
+		     && gsid != usersid)
 	      goto done;
 	  }
       for (int gidx = 0; gidx < groups.sgsids.count; gidx++)
 	if (!saw[gidx])
 	  goto done;
-      if (sawpg ||
-	  groups.sgsids.contains (groups.pgsid) ||
-	  groups.pgsid == usersid)
-	ret = TRUE;
+      ret = sawpg
+	    || groups.sgsids.contains (groups.pgsid)
+	    || groups.pgsid == usersid;
     }
 done:
-  if (my_grps)
-    free (my_grps);
   if (saw != saw_buf)
     free (saw);
   return ret;
