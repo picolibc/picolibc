@@ -1,4 +1,11 @@
-2002-05-24  Christopher January <chris@atomice.net>
+2002-05-05  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* spawn.cc (spawn_guts): Move call to set_process_privilege()
+	to load_registry_hive().
+	* registry.cc (load_registry_hive): ditto.
+	* fork.cc (fork_parent): Call sec_user_nih() only once.
+
+2002-05-04  Christopher January <chris@atomice.net>
 
 	* path.h (path_conv::path_conv): Initialise normalized_path to NULL.
 

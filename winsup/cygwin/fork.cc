@@ -466,6 +466,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 #endif
 
   char sa_buf[1024];
+  PSECURITY_ATTRIBUTES sec_attribs = sec_user_nih (sa_buf);
   syscall_printf ("CreateProcess (%s, %s, 0, 0, 1, %x, 0, 0, %p, %p)",
 		  myself->progname, myself->progname, c_flags, &si, &pi);
   __malloc_lock (_reent_clib ());
@@ -473,8 +474,8 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   newheap = cygheap_setup_for_child (&ch,cygheap->fdtab.need_fixup_before ());
   rc = CreateProcess (myself->progname, /* image to run */
 		      myself->progname, /* what we send in arg0 */
-		      sec_user_nih (sa_buf),
-		      sec_user_nih (sa_buf),
+		      sec_attribs,
+		      sec_attribs,
 		      TRUE,	  /* inherit handles from parent */
 		      c_flags,
 		      NULL,	  /* environment filled in later */

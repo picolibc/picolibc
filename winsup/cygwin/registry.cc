@@ -235,12 +235,13 @@ load_registry_hive (PSID psid)
   /* Check if user hive is already loaded. */
   cygsid csid (psid);
   csid.string (sid);
-  if (!RegOpenKeyExA (HKEY_USERS, csid.string (sid), 0, KEY_READ, &hkey))
+  if (!RegOpenKeyExA (HKEY_USERS, sid, 0, KEY_READ, &hkey))
     {
       debug_printf ("User registry hive for %s already exists", sid);
       RegCloseKey (hkey);
       return;
     }
+  set_process_privilege (SE_RESTORE_NAME);
   if (get_registry_hive_path (psid, path))
     {
       strcat (path, "\\NTUSER.DAT");
