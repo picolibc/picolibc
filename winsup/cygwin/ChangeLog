@@ -1,3 +1,8 @@
+2001-10-21  Christopher Faylor  <cgf@redhat.com>
+
+	* resource.cc (fill_rusage): Perform paranoid zero structure passed to
+	GetProcessMemoryInfo.
+
 2001-10-22  Robert Collins  <rbtcollins@hotmail.com>
 
 	* autoload.cc: Autoload GetProcessMemoryInfo.

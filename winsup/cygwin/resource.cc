@@ -77,6 +77,7 @@ fill_rusage (struct rusage *r, HANDLE h)
 
   PROCESS_MEMORY_COUNTERS pmc;
 
+  memset (&pmc, 0, sizeof (pmc));
   if (GetProcessMemoryInfo( h, &pmc, sizeof (pmc)))
     {
       r->ru_maxrss += (long) (pmc.WorkingSetSize /1024);
@@ -111,8 +112,7 @@ getrusage (int intwho, struct rusage *rusage_in)
 
 unsigned long rlim_core = RLIM_INFINITY;
 
-extern "C"
-int
+extern "C" int
 getrlimit (int resource, struct rlimit *rlp)
 {
   MEMORY_BASIC_INFORMATION m;
@@ -156,8 +156,7 @@ getrlimit (int resource, struct rlimit *rlp)
   return 0;
 }
 
-extern "C"
-int
+extern "C" int
 setrlimit (int resource, const struct rlimit *rlp)
 {
   if (check_null_invalid_struct_errno (rlp))
