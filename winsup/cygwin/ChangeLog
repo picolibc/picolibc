@@ -1,3 +1,8 @@
+2004-06-23  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* fhandler_socket.cc (fhandler_socket::release): Call
+	WSASetLastError last.
+
 2004-06-21  Christopher Faylor  <cgf@alum.bu.edu>
 
 	* autoload.cc (wsock_init): Keep lock while modifying return address.
@@ -7,7 +12,7 @@
 	* fhandler.cc (fhandler_base::open): Remove 9x specific code.
 
 2004-06-17  Pierre Humblet <pierre.humblet@ieee.org>
- 
+
 	* fhandler.cc (fhandler_base::open_9x): Do not check for null name.
 	Move debug_printf to common code line.
 	(fhandler_base::open): Ditto. Initialize upath. Remove second argument

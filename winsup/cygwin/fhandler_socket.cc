@@ -792,12 +792,12 @@ fhandler_socket::release (HANDLE event)
   int last_err = WSAGetLastError ();
   /* KB 168349: NT4 fails if the event parameter is not NULL. */
   WSAEventSelect (get_socket (), NULL, 0);
+  WSACloseEvent (event);
   unsigned long non_block = 0;
   if (ioctlsocket (get_socket (), FIONBIO, &non_block))
     debug_printf ("return to blocking failed: %d", WSAGetLastError ());
   else
     WSASetLastError (last_err);
-  WSACloseEvent (event);
 }
 
 int
