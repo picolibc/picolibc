@@ -1,5 +1,9 @@
 2002-10-10  Christopher Faylor  <cgf@redhat.com>
 
+	* window.cc (gethwnd): Use SetThreadPriority method.
+
+2002-10-10  Christopher Faylor  <cgf@redhat.com>
+
 	* Makefile.in (new-cygwin1.dll): Reorganize library order.
 
 	* dcrt0.cc (do_exit): Move thread stuff after vfork stuff or threads

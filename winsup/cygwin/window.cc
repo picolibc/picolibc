@@ -103,10 +103,10 @@ Winmain (VOID *)
     }
 
   /* Create hidden window. */
-  ourhwnd = CreateWindow (classname, classname,
-	WS_POPUP, CW_USEDEFAULT, CW_USEDEFAULT,
-	CW_USEDEFAULT, CW_USEDEFAULT, (HWND) NULL,
-	(HMENU) NULL, user_data->hmodule, (LPVOID) NULL);
+  ourhwnd = CreateWindow (classname, classname, WS_POPUP, CW_USEDEFAULT,
+			  CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+			  (HWND) NULL, (HMENU) NULL, user_data->hmodule,
+			  (LPVOID) NULL);
 
   SetEvent (window_started);
 
@@ -119,9 +119,7 @@ Winmain (VOID *)
   /* Start the message loop. */
 
   while (GetMessage (&msg, ourhwnd, 0, 0) == TRUE)
-    {
-      DispatchMessage (&msg);
-    }
+    DispatchMessage (&msg);
 
   return msg.wParam;
 }
@@ -136,9 +134,10 @@ gethwnd ()
 
   window_started = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
   h = new cygthread (Winmain, NULL, "win");
-  SetThreadPriority (*h, THREAD_PRIORITY_HIGHEST);
+  h->SetThreadPriority (THREAD_PRIORITY_HIGHEST);
   WaitForSingleObject (window_started, INFINITE);
   CloseHandle (window_started);
+  h->zap_h ();
   return ourhwnd;
 }
 
