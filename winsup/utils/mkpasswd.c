@@ -206,7 +206,7 @@ enum_users (LPWSTR servername, int print_sids, int print_cygpath,
 		    }
 		}
 	    }
-	  printf ("%s:This_field_is_not_used_by_cygwin_on_nt/2000/xp:%d:%d:%s%s%s:%s:/bin/bash\n", username,
+	  printf ("%s:unused_by_nt/2000/xp:%d:%d:%s%s%s:%s:/bin/bash\n", username,
 		  uid + id_offset,
 		  gid + id_offset,
 		  fullname,
