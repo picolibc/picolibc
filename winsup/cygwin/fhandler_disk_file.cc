@@ -137,8 +137,6 @@ fhandler_disk_file::fstat (struct __stat64 *buf, path_conv *pc)
 {
   int res = -1;
   int oret;
-  __uid32_t uid;
-  __gid32_t gid;
   int open_flags = O_RDONLY | O_BINARY | O_DIROPEN;
   bool query_open_already;
 
@@ -159,27 +157,15 @@ fhandler_disk_file::fstat (struct __stat64 *buf, path_conv *pc)
   if (query_open_already && strncasematch (pc->volname (), "FAT", 3)
       && !strpbrk (get_win32_name (), "?*|<>"))
     oret = 0;
-  else if (!(oret = open (pc, open_flags, 0)))
+  else if (!(oret = open (pc, open_flags, 0))
+	   && !query_open_already
+	   && get_errno () == EACCES)
     {
-      mode_t ntsec_atts = 0;
       /* If we couldn't open the file, try a "query open" with no permissions.
 	 This will allow us to determine *some* things about the file, at least. */
+      pc->set_exec (0);
       set_query_open (true);
-      if (!query_open_already && (oret = open (pc, open_flags, 0)))
-	/* ok */;
-      else if (allow_ntsec && pc->has_acls () && get_errno () == EACCES
-		&& !get_file_attribute (TRUE, get_win32_name (), &ntsec_atts, &uid, &gid)
-		&& !ntsec_atts && uid == myself->uid && gid == myself->gid)
-	{
-	  /* Check a special case here. If ntsec is ON it happens
-	     that a process creates a file using mode 000 to disallow
-	     other processes access. In contrast to UNIX, this results
-	     in a failing open call in the same process. Check that
-	     case. */
-	  set_file_attribute (TRUE, get_win32_name (), 0400);
-	  oret = open (pc, open_flags, 0);
-	  set_file_attribute (TRUE, get_win32_name (), ntsec_atts);
-	}
+      oret = open (pc, open_flags, 0);
     }
 
   if (!oret || get_nohandle ())
@@ -217,7 +203,11 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
   to_timestruc_t (&ftCreationTime, &buf->st_ctim);
   buf->st_dev = pc->volser ();
   buf->st_size = ((_off64_t)nFileSizeHigh << 32) + nFileSizeLow;
-  /* Unfortunately the count of 2 confuses `find (1)' command. So
+  /* The number of links to a directory includes the
+     number of subdirectories in the directory, since all
+     those subdirectories point to it.
+     This is too slow on remote drives, so we do without it.
+     Setting the count to 2 confuses `find (1)' command. So
      let's try it with `1' as link count. */
   if (pc->isdir () && !pc->isremote () && nNumberOfLinks == 1)
     buf->st_nlink = num_entries (pc->get_win32 ());
@@ -336,11 +326,6 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
       buf->st_mode &= ~(cygheap->umask);
     }
 
-  /* The number of links to a directory includes the
-     number of subdirectories in the directory, since all
-     those subdirectories point to it.
-     This is too slow on remote drives, so we do without it and
-     set the number of links to 2. */
  done:
   syscall_printf ("0 = fstat (, %p) st_atime=%x st_size=%D, st_mode=%p, st_ino=%d, sizeof=%d",
 		  buf, buf->st_atime, buf->st_size, buf->st_mode,
