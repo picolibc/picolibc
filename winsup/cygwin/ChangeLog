@@ -1,3 +1,7 @@
+2003-11-25  Christopher Faylor  <cgf@redhat.com>
+
+	* thread.cc: Minor whitespace cleanup.  Remove some obsolete code.
+
 2003-11-24  Christopher Faylor  <cgf@redhat.com>
 
 	* dtable.cc (build_fh_name): Set error in dummy fhandler when one is

@@ -336,10 +336,11 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
       thread_printf ("CreateThread failed: this %p LastError %E", this);
       magic = 0;
     }
-  else {
+  else
+    {
       postcreate ();
       ResumeThread (win32_obj_id);
-  }
+    }
 }
 
 void
@@ -2902,11 +2903,6 @@ pthread_kill (pthread_t thread, int sig)
   if (!pthread::is_good_object (&thread))
     return EINVAL;
 
-#if 0
-  if (thread->sigs)
-    myself->setthread2signal (thread);
-#endif
-
   int rval = raise (sig);
 
   // unlock myself
@@ -2916,16 +2912,6 @@ pthread_kill (pthread_t thread, int sig)
 extern "C" int
 pthread_sigmask (int operation, const sigset_t *set, sigset_t *old_set)
 {
-#if 0
-  pthread *thread = pthread::self ();
-
-  // lock this myself, for the use of thread2signal
-  // two differt kills might clash: FIXME
-
-  if (thread->sigs)
-    myself->setthread2signal (thread);
-#endif
-
   int rval = sigprocmask (operation, set, old_set);
 
   // unlock this myself
