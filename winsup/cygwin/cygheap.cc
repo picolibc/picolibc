@@ -318,6 +318,7 @@ cygheap_root::operator =(const char *new_root)
 
 cygheap_user::~cygheap_user ()
 {
+#if 0
   if (pname)
     cfree (pname);
   if (plogsrv)
@@ -326,6 +327,7 @@ cygheap_user::~cygheap_user ()
     cfree (pdomain);
   if (psid)
     cfree (psid);
+#endif
 }
 
 void

@@ -1,3 +1,8 @@
+Wed Jan 17 10:56:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* cygheap.cc (cygheap_user::~cygheap_user): Temporarily
+	disable free'ing memory.
+
 Tue Jan 16 18:01:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* mmap.cc (mmap): Initialize fh to avoid compiler warnings.
