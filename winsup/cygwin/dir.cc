@@ -88,14 +88,16 @@ opendir (const char *name)
 						PC_SYM_FOLLOW | PC_FULL, NULL);
   if (!fh)
     res = NULL;
-  else if (!pc.exists ())
-    set_errno (ENOENT);
+  else if (pc.exists ())
+      res = fh->opendir (pc);
   else
     {
-      res = fh->opendir (pc);
-      if (!res)
-	delete fh;
+      set_errno (ENOENT);
+      res = NULL;
     }
+
+  if (!res && fh)
+    delete fh;
   return res;
 }
 

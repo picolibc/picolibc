@@ -1,8 +1,13 @@
-2001-01-05  Corinna Vinschen  <corinna@vinschen.de>
+2002-01-05  Christopher Faylor  <cgf@redhat.com>
 
-	exceptions.cc (sig_handle): Set default action for SIGURG to SIG_IGN.
+	* dir.cc (opendir): Guarantee release of alloced fhandler structure on
+	error.
 
-2001-01-05  Corinna Vinschen  <corinna@vinschen.de>
+2002-01-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (sig_handle): Set default action for SIGURG to SIG_IGN.
+
+2002-01-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dtable.cc (dtable::init_std_file_from_handle): Don't treat NULL
 	handle as errorneous.
@@ -15,7 +20,7 @@
 
 	* dir.cc (opendir): Don't attempt to call sub-opendir if ENOENT.
 
-2001-01-04  Corinna Vinschen  <corinna@vinschen.de>
+2002-01-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc: Replace usage of AF_UNIX by Posix compliant AF_LOCAL
 	throughout.
