@@ -1,3 +1,8 @@
+2003-04-26  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
+
+	* gcc.sgml: Remove outdated "WinMainCRTStartup" references. Add a
+	hellogui.c example. 
+
 2003-03-26  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
 	* setup-net.sgml: Make suggested additions to setup.exe documentation

@@ -38,17 +38,6 @@ int
 foo (int i)
 </screen>
 
-<para>For most cases, you can just remove the __export and leave it at
-that.  For convenience sake, you might want to include the following
-code snippet when compiling GUI programs.  If you don't, you will want
-to add "-e _mainCRTStartup" to your link line in your Makefile.</para>
-
-<screen>
-#ifdef __CYGWIN__
-WinMainCRTStartup() { mainCRTStartup(); }
-#endif
-</screen>
-
 <para>The Makefile is similar to any other UNIX-like Makefile,
 and like any other Cygwin makefile.  The only difference is that you use
 <command>gcc -mwindows</command> to link your program into a GUI
@@ -73,6 +62,93 @@ compatibility with the many examples that assume your linker can
 handle Windows resource files directly, we maintain the
 <filename>.res</filename> naming convention.  For more information on
 <filename>windres</filename>, consult the Binutils manual.  </para>
+
+<para>
+The following is a simple GUI-mode "Hello, World!" program to help
+get you started:
+<screen>
+/*-------------------------------------------------*/
+/* hellogui.c - gui hello world                    */
+/* build: gcc -mwindows hellogui.c -o hellogui.exe */
+/*-------------------------------------------------*/
+#include &lt;windows.h&gt;
+
+char glpszText[1024];
+
+LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+
+int APIENTRY WinMain(HINSTANCE hInstance, 
+		HINSTANCE hPrevInstance,
+		LPSTR lpCmdLine,
+		int nCmdShow)
+{
+	sprintf(glpszText, 
+		"Hello World\nGetCommandLine(): [%s]\n"
+		"WinMain lpCmdLine: [%s]\n",
+		lpCmdLine, GetCommandLine() );
+
+	WNDCLASSEX wcex; 
+ 
+	wcex.cbSize = sizeof(wcex);
+	wcex.style = CS_HREDRAW | CS_VREDRAW;
+	wcex.lpfnWndProc = WndProc;
+	wcex.cbClsExtra = 0;
+	wcex.cbWndExtra = 0;
+	wcex.hInstance = hInstance;
+	wcex.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+	wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
+	wcex.lpszMenuName = NULL;
+	wcex.lpszClassName = "HELLO";
+	wcex.hIconSm = NULL;
+
+	if (!RegisterClassEx(&amp;wcex))
+		return FALSE; 
+
+	HWND hWnd;
+	hWnd = CreateWindow("HELLO", "Hello", WS_OVERLAPPEDWINDOW,
+		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
+
+	if (!hWnd)
+		return FALSE;
+
+	ShowWindow(hWnd, nCmdShow);
+	UpdateWindow(hWnd);
+
+	MSG msg;
+	while (GetMessage(&amp;msg, NULL, 0, 0)) 
+	{
+		TranslateMessage(&amp;msg);
+		DispatchMessage(&amp;msg);
+	}
+
+	return msg.wParam;
+}
+
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	PAINTSTRUCT ps;
+	HDC hdc;
+	
+	switch (message) 
+	{
+		case WM_PAINT:
+			hdc = BeginPaint(hWnd, &amp;ps);
+			RECT rt;
+			GetClientRect(hWnd, &amp;rt);
+			DrawText(hdc, glpszText, strlen(glpszText), &amp;rt, DT_TOP | DT_LEFT);
+			EndPaint(hWnd, &amp;ps);
+			break;
+		case WM_DESTROY:
+			PostQuitMessage(0);
+			break;
+		default:
+			return DefWindowProc(hWnd, message, wParam, lParam);
+	}
+	return 0;
+}
+</screen>
+</para>
 
 </sect2>
 </sect1>
