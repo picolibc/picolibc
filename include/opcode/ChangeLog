@@ -1,3 +1,10 @@
+2003-01-07  Chris Demetriou  <cgd@broadcom.com>
+
+	* mips.h: Fix missing space in comment.
+	(INSN_ISA1, INSN_ISA2, INSN_ISA3, INSN_ISA4, INSN_ISA5)
+	(INSN_ISA32, INSN_ISA32R2, INSN_ISA64): Shift values right
+	by four bits.
+
 2003-01-02  Chris Demetriou  <cgd@broadcom.com>
 
 	* mips.h: Update copyright years to include 2002 (which had

@@ -373,18 +373,18 @@ struct mips_opcode
 
 /* Masks used to mark instructions to indicate which MIPS ISA level
    they were introduced in.  ISAs, as defined below, are logical
-   ORs of these bits, indicatingthat they support the instructions
+   ORs of these bits, indicating that they support the instructions
    defined at the given level.  */
 
 #define INSN_ISA_MASK		  0x00000fff
-#define INSN_ISA1                 0x00000010
-#define INSN_ISA2                 0x00000020
-#define INSN_ISA3                 0x00000040
-#define INSN_ISA4                 0x00000080
-#define INSN_ISA5                 0x00000100
-#define INSN_ISA32                0x00000200
-#define INSN_ISA64                0x00000400
-#define INSN_ISA32R2              0x00000800
+#define INSN_ISA1                 0x00000001
+#define INSN_ISA2                 0x00000002
+#define INSN_ISA3                 0x00000004
+#define INSN_ISA4                 0x00000008
+#define INSN_ISA5                 0x00000010
+#define INSN_ISA32                0x00000020
+#define INSN_ISA64                0x00000040
+#define INSN_ISA32R2              0x00000080
 
 /* Masks used for MIPS-defined ASEs.  */
 #define INSN_ASE_MASK		  0x0000f000
