@@ -615,7 +615,7 @@ random
 initstate
 setstate
 _read
-read = read
+read = _read
 readdir
 _readdir = readdir
 readlink
@@ -946,7 +946,6 @@ wctomb
 _wctomb = wctomb
 _write
 write = _write
-barfly = write
 writev
 _writev = writev
 y0

@@ -1,3 +1,7 @@
+2002-07-12  Christopher Faylor  <cgf@redhat.com>
+
+	* cygwin.in: Change erroneous entries.
+
 2002-07-11  Pavel Tsekov  <ptsekov@gmx.net>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::open): Don't
