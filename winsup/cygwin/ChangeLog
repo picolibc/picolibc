@@ -1,3 +1,8 @@
+2004-02-03  Jason Tishler <jason@tishler.net>
+
+	* window.cc (Winmain): Show windows error code in error output when
+	RegisterClass fails.
+
 2004-02-02  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler.h (*::fixup_after_exec): Eliminate unused handle argument.

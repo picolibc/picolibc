@@ -97,7 +97,7 @@ Winmain (VOID *)
 
   if (!RegisterClass (&wc))
     {
-      system_printf ("Cannot register window class");
+      system_printf ("Cannot register window class, %E");
       return FALSE;
     }
 
