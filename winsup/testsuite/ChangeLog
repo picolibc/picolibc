@@ -1,7 +1,7 @@
 2001-11-15  Egor Duda  <deo@logos-m.ru>
 
 	* winsup.api/pthread/: New directory. Ports of pthread functionality
-	tests ported from pthreads-win32 project.
+	tests from pthreads-win32 project.
 	* winsup.api/pthread/test.h: Commmon declaraions for pthread tests.
 	* winsup.api/pthread/cleanup2.c: New test.
 	* winsup.api/pthread/cleanup3.c: Ditto.
