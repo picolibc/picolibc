@@ -3,7 +3,7 @@ FUNCTION
 	<<swab>>---swap adjacent bytes
 
 ANSI_SYNOPSIS
-	#include <string.h>
+	#include <unistd.h>
 	void swab(const void *<[in]>, void *<[out]>, ssize_t <[n]>);
 
 TRAD_SYNOPSIS

@@ -1,3 +1,10 @@
+2000-08-30  Geoffrey Keating  <geoffk@cygnus.com>
+
+	* libc/string/swab.c: Specify that it's defined in <unistd.h>.
+	* libc/include/string.h: Don't include <sys/types.h>,
+	as it causes really bad namespace pollution.  Don't declare
+	swab(), it is properly declared in unistd.h.
+
 2000-08-29  Werner Almesberger  <Werner.Almesberger@epfl.ch>
 
         * libc/unix/getpwent.c (getpwnam, getpwuid, getpwent): removed
