@@ -125,9 +125,38 @@ listsig (const char *in_sig)
     }
 }
 
+static void
+get_debug_priv (void)
+{
+  HANDLE tok;
+  LUID luid;
+  TOKEN_PRIVILEGES tkp;
+
+  if (!OpenProcessToken (GetCurrentProcess (),
+  			 TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &tok))
+    return;
+
+  if (!LookupPrivilegeValue (NULL, SE_DEBUG_NAME, &luid))
+    {
+      CloseHandle (tok);
+      return;
+    }
+
+  tkp.PrivilegeCount = 1;
+  tkp.Privileges[0].Luid = luid;
+  tkp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+
+  AdjustTokenPrivileges (tok, FALSE, &tkp, sizeof tkp, NULL, NULL);
+
+  CloseHandle (tok);
+}
+
 static void __stdcall
 forcekill (int pid, int sig, int wait)
 {
+  // try to acquire SeDebugPrivilege
+  get_debug_priv();
+
   external_pinfo *p = (external_pinfo *) cygwin_internal (CW_GETPINFO_FULL, pid);
   DWORD dwpid = p ? p->dwProcessId : (DWORD) pid;
   HANDLE h = OpenProcess (PROCESS_TERMINATE, FALSE, (DWORD) dwpid);
@@ -254,3 +283,4 @@ out:
     }
   return ret;
 }
+
