@@ -91,14 +91,21 @@ BSP_SCRIPTS	=
 BSP_TEST	=
 BSP_INSTALL	= install-bsp
 
+ALL_INSTALL_FILES = \
+ ${SIM_CRT0} ${SIM_EXTRA} ${SIM_BSP} \
+ ${LIN_CRT0} ${LIN_EXTRA} ${LIN_BSP} \
+ ${BSP_CRT0} ${BSP_EXTRA} ${BSP_BSP}
+
+ALL_INSTALL_FILES_NEWLIB_COPY = \
+ $(sort ${ALL_INSTALL_FILES:%=$(objroot)/newlib/%}) $(objroot)/newlib/libnosys.a
+
 # Host specific makefile fragment comes in here.
 @host_makefile_frag@
 
 # Need to augment the definition from host_makefile_frag above.
 INCLUDES += -I$(srcdir)
 
-all: ${SIM_CRT0} ${LIN_CRT0} ${BSP_CRT0} ${SIM_BSP} ${LIN_BSP} ${BSP_BSP} \
- libnosys.a ${LIN_EXTRA}
+all: ${ALL_INSTALL_FILES} ${ALL_INSTALL_FILES_NEWLIB_COPY} libnosys.a
 
 #
 # Here's where we build the board support packages for each target.
@@ -121,6 +128,22 @@ ${LIN_BSP}: ${LIN_OBJS}
 # matter whether libnosys.a is built yet when the rule is executed.
 libnosys.a:
 	ln -s ../libnosys/libnosys.a
+
+# Toplevel build rules for various other libraries have gcc -B options
+# applied so the newlib build directory is reached, but not the target
+# libgloss directory (whose name is unknown to the toplevel configury
+# anyway).  Configury tests that check for a successful link therefore
+# fail; they can't find crt0.o and non-libc.a+libm.a libraries.  We copy
+# over all files we would install to the neighboring newlib directory.
+# Only the default crt0.o and libraries are needed, but we do them all for
+# completeness.  They're however installed from here, not from the newlib
+# build directory.
+$(objroot)/newlib/%: %
+	cp -p $^ $@
+
+# This rule, being more specific, overrides the pattern rule above.
+$(objroot)/newlib/libnosys.a:
+	ln -s ../libgloss/libnosys/libnosys.a $(objroot)/newlib
 
 #
 # Build a test program for each target board. Just trying to get

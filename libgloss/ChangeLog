@@ -1,3 +1,11 @@
+2005-02-01  Hans-Peter Nilsson  <hp@axis.com>
+
+	* cris/Makefile.in (ALL_INSTALL_FILES): New macro.
+	(ALL_INSTALL_FILES_NEWLIB_COPY): New macro.
+	(all): Use ALL_INSTALL_FILES instead of its contents.  Add
+	ALL_INSTALL_FILES_NEWLIB_COPY.
+	($(objroot)/newlib/%, $(objroot)/newlib/libnosys.a): New rules
+
 2005-01-27  Hans-Peter Nilsson  <hp@axis.com>
 
         * configure.in: Support cris-*-* and crisv32-*-*.
