@@ -1,6 +1,5 @@
-/* pathconv.cc -- convert pathnames between Windows and Unix format
-   Copyright 1998, 1999, 2000 Cygnus Solutions.
-   Written by Ian Lance Taylor <ian@cygnus.com>.
+/* cygpath.cc -- convert pathnames between Windows and Unix format
+   Copyright 1998, 1999, 2000, 2001 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -294,8 +293,8 @@ main (int argc, char **argv)
 	  break;
 
 	case 'v':
-	  printf ("Cygwin pathconv version 1.0\n");
-	  printf ("Copyright 1998,1999,2000 Cygnus Solutions\n");
+	  printf ("Cygwin path conversion version 1.1\n");
+	  printf ("Copyright 1998,1999,2000,2001 Red Hat, Inc.\n");
 	  exit (0);
 
 	default:

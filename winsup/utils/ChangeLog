@@ -1,3 +1,7 @@
+2001-12-11  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Add define to CXXFLAGS.
+
 2001-12-03  Christopher Faylor  <cgf@redhat.com>
 
 	* cygcheck.cc (usage): Add -c description.

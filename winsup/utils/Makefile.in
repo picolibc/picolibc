@@ -1,5 +1,5 @@
 # Makefile for Cygwin utilities
-# Copyright 1996, 1997, 1998, 1999, 2000 Cygnus Solutions.
+# Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
 
 # This file is part of Cygwin.
 
@@ -31,7 +31,7 @@ CXX:=@CXX@
 CXX_FOR_TARGET:=$(CXX)
 
 CFLAGS:=@CFLAGS@
-CXXFLAGS:=@CXXFLAGS@ -fno-exceptions -fno-rtti
+CXXFLAGS:=@CXXFLAGS@ -fno-exceptions -fno-rtti -DHAVE_DECL_GETOPT=0
 
 include $(srcdir)/../Makefile.common
 
