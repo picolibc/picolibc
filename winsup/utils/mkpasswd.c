@@ -17,6 +17,7 @@
 #include <getopt.h>
 #include <lmaccess.h>
 #include <lmapibuf.h>
+#include <sys/fcntl.h>
 
 SID_IDENTIFIER_AUTHORITY sid_world_auth = {SECURITY_WORLD_SID_AUTHORITY};
 SID_IDENTIFIER_AUTHORITY sid_nt_auth = {SECURITY_NT_AUTHORITY};
@@ -369,6 +370,7 @@ main (int argc, char **argv)
   SID_NAME_USE use;
 
   passed_home_path[0] = '\0';
+  setmode (1, O_BINARY);
 
   if (GetVersion () < 0x80000000)
     if (argc == 1)

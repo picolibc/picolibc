@@ -1,3 +1,10 @@
+Fri Jun 15 00:49:21 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* mkpasswd.c (main): Output passwd file in binary mode so that there
+	are no CRs in the file.
+	* umount.cc (remove_all_user_mounts): Don't try to remove /cygdrive
+	mounts.
+
 Tue May  1 10:50:48 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* mkpasswd.c (enum_users): Use /bin/bash as the default shell.

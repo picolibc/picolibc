@@ -159,7 +159,8 @@ remove_all_user_mounts ()
   while ((p = getmntent (m)) != NULL)
     {
       /* Remove the mount if it's a user mount. */
-      if (strncmp (p->mnt_type, "user", 4) == 0)
+      if (strncmp (p->mnt_type, "user", 4) == 0 &&
+	  strstr (p->mnt_opts, "noumount") == NULL)
 	{
 	  if (cygwin_umount (p->mnt_dir, 0))
 	    error (p->mnt_dir);
@@ -183,7 +184,8 @@ remove_all_system_mounts ()
   while ((p = getmntent (m)) != NULL)
     {
       /* Remove the mount if it's a system mount. */
-      if (strncmp (p->mnt_type, "system", 6) == 0)
+      if (strncmp (p->mnt_type, "system", 6) == 0 &&
+	  strstr (p->mnt_opts, "noumount") == NULL)
 	{
 	  if (cygwin_umount (p->mnt_dir, MOUNT_SYSTEM))
 	    error (p->mnt_dir);
