@@ -1,3 +1,9 @@
+2004-08-24  Dmitry Diky  <diwil@spec.ru>
+
+	* msp430.h (msp430_opc): Add new instructions.
+	(msp430_rcodes): Declare new instructions.
+	(msp430_hcodes): Likewise..
+
 2004-08-13  Nick Clifton  <nickc@redhat.com>
 
 	PR/301

@@ -1,3 +1,7 @@
+2004-08-25  Dmitry Diky  <diwil@spec.ru>
+
+	* msp430.h: Add new relocs.
+
 2004-08-12  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* i386.h (R_386_USED_BY_INTEL_200): New.
