@@ -44,9 +44,10 @@ fhandler_dev_random::read (void *ptr, size_t len)
     return 0;
   if (!crypt_prov
       && !CryptAcquireContext (&crypt_prov, NULL, MS_DEF_PROV, PROV_RSA_FULL,
-                               CRYPT_MACHINE_KEYSET)
+                               CRYPT_VERIFYCONTEXT | CRYPT_MACHINE_KEYSET)
       && !CryptAcquireContext (&crypt_prov, NULL, MS_DEF_PROV, PROV_RSA_FULL,
-                               CRYPT_MACHINE_KEYSET | CRYPT_NEWKEYSET ))
+                               CRYPT_VERIFYCONTEXT | CRYPT_MACHINE_KEYSET
+                               | CRYPT_NEWKEYSET ))
     {
       __seterrno ();
       return -1;

@@ -1,3 +1,8 @@
+Sun Jun 11 15:57:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler_random.cc (read): Call CryptAquireContext with
+        CRYPT_VERIFYCONTEXT.
+
 Thu Jun  8 22:49:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* path.cc (path_conv::check): Erase two lines checked in
