@@ -1,3 +1,11 @@
+2000-07-28  Michael Meissner  <meissner@redhat.com>
+
+	* libc/include/math.h (__infinity): Declare as an array without
+	bounds to get around small data support.  Rewrite Cygwin support
+	to be more general.
+	* libm/math/s_infconst.c (__infinity): Ditto.
+	* libm/mathfp/s_infconst.c (__infinity): Ditto.
+
 Thu Jul 27 10:46:01 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* libc/include/math.h: Use appropriate dll import linkage for

@@ -21,13 +21,23 @@ union __dmath
   double d;
 };
 
+/* Declare this as an array without bounds so that no matter what small data
+   support a port and/or library has, this reference will be via the general
+   method for accessing globals.
+
+   Also under Cygwin, the library exports a pointer to the real value, so we
+   need to properly dereference it.  */
+#ifndef __INFINITY_DECL__
 #if !defined(__CYGWIN__) || defined(__INSIDE_CYGWIN__) || defined(_COMPILING_NEWLIB)
-extern const union __dmath __infinity;
+#define __INFINITY_DECL__
 #else
-extern __declspec(dllimport) const union __dmath __infinity;
+#define __INFINITY_DECL__ __declspec(dllimport)
+#endif
 #endif
 
-#define HUGE_VAL (__infinity.d)
+extern __INFINITY_DECL__ const union __dmath __infinity[];
+
+#define HUGE_VAL (__infinity[0].d)
 
 #endif /* ! defined (HUGE_VAL) */
 
