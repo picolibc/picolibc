@@ -1,3 +1,7 @@
+Mon Apr 10 17:24:28 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* include/string.h: Use proper prototype for _strerror.
+
 2000-03-30  Mumit Khan  <khan@xraylith.wisc.edu>
 
 	* Makefile.in (subdirs): Workaround for broken shells.

@@ -61,7 +61,7 @@ int	strcoll (const char*, const char*);	/* Compare using locale */
 char*	strcpy (char*, const char*);
 size_t	strcspn (const char*, const char*);
 char*	strerror (int); /* NOTE: NOT an old name wrapper. */
-char*	_strerror (int);
+char*	_strerror (const char *);
 size_t	strlen (const char*);
 char*	strncat (char*, const char*, size_t);
 int	strncmp (const char*, const char*, size_t);
