@@ -29,6 +29,8 @@ static char *close_arg;
 static int path_flag, unix_flag, windows_flag, absolute_flag;
 static int shortname_flag, longname_flag;
 static int ignore_flag, allusers_flag, output_flag;
+static int mixed_flag;
+static const char *windows_format_arg;
 
 static struct option long_options[] = {
   {(char *) "help", no_argument, NULL, 'h'},
@@ -48,6 +50,7 @@ static struct option long_options[] = {
   {(char *) "allusers", no_argument, NULL, 'A'},
   {(char *) "desktop", no_argument, NULL, 'D'},
   {(char *) "smprograms", no_argument, NULL, 'P'},
+  {(char *) "type", required_argument, (int *) &windows_format_arg, 't'},
   {(char *) "homeroot", no_argument, NULL, 'H'},
   {0, no_argument, 0, 0}
 };
@@ -68,6 +71,9 @@ Other options:\n\
   -l|--long-name	print Windows long form of filename (with -w only)\n\
   -p|--path		filename argument is a path\n\
   -s|--short-name	print Windows short form of filename (with -w only)\n\
+  -t|--type             print Windows form of filename with specified\n\
+     dos                drive letter with backslashes (C:\\WINNT)\n\
+     mixed              drive letter with regular slashes (C:/WINNT)\n\
   -A|--allusers		use `All Users' instead of current user for -D, -P\n\
   -D|--desktop		output `Desktop' directory and exit\n\
   -H|--homeroot		output `Profiles' directory (home root) and exit\n\
@@ -373,6 +379,33 @@ dowin (char option)
 }
 
 static void
+convert_slashes (char* name)
+{
+  while ((name = strchr (name, '\\')) != NULL)
+    {
+      if (*name == '\\')
+	*name = '/';
+       name++;
+   }
+}
+
+static char *
+get_mixed_name (const char* filename)
+{
+  char* mixed_buf = strdup (filename);
+
+  if (mixed_buf == NULL)
+    {
+      fprintf (stderr, "%s: out of memory\n", prog_name);
+      exit (1);
+    }
+
+  convert_slashes (mixed_buf);
+
+  return mixed_buf;
+}
+
+static void
 doit (char *filename)
 {
   char *buf;
@@ -433,6 +466,8 @@ doit (char *filename)
 	    buf = get_short_paths (buf);
 	  if (longname_flag)
 	    buf = get_long_paths (buf);
+	  if (mixed_flag)
+	    buf = get_mixed_name (buf);
 	}
     }
   else
@@ -444,6 +479,8 @@ doit (char *filename)
 	conv_func = (absolute_flag ? cygwin_conv_to_full_win32_path :
 		     cygwin_conv_to_win32_path);
       retval = conv_func (filename, buf);
+      if (mixed_flag)
+	buf = get_mixed_name (buf);
       if (retval < 0)
 	{
 	  fprintf (stderr, "%s: error converting \"%s\"\n",
@@ -504,13 +541,13 @@ main (int argc, char **argv)
   windows_flag = 0;
   shortname_flag = 0;
   longname_flag = 0;
+  mixed_flag = 0;
   ignore_flag = 0;
   options_from_file_flag = 0;
   allusers_flag = 0;
   output_flag = 0;
-  while ((c =
-	  getopt_long (argc, argv, (char *) "hac:f:opslSuvwWiDPAH",
-		       long_options, (int *) NULL)) != EOF)
+  while ((c = getopt_long (argc, argv, (char *) "hac:f:opslSuvwt:WiDPAH",
+			   long_options, (int *) NULL)) != EOF)
     {
       switch (c)
 	{
@@ -556,6 +593,21 @@ main (int argc, char **argv)
 	  if (unix_flag || longname_flag)
 	    usage (stderr, 1);
 	  shortname_flag = 1;
+	  break;
+
+	 case 't':
+	  if (unix_flag || (optarg == NULL))
+	    usage (stderr, 1);
+
+	  windows_flag = 1;
+	  windows_format_arg = (*optarg == '=') ? (optarg + 1) : (optarg);
+
+	  if (strcasecmp (windows_format_arg, "mixed") == 0)
+	    mixed_flag = 1;
+	  else if (strcasecmp (windows_format_arg, "dos") == 0)
+	    /* nothing */;
+	  else
+	    usage (stderr, 1);
 	  break;
 
 	case 'A':
@@ -673,9 +725,9 @@ main (int argc, char **argv)
 		  case 'P':
 		  case 'S':
 		  case 'W':
-	  	    output_flag = 1;
+		    output_flag = 1;
 		    o = c;
-	  	    break;
+		    break;
 		  }
 	      if (*s)
 		do

@@ -83,6 +83,9 @@ Usage: cygpath [-A|--allusers] (-D|--desktop)|(-P|--smprograms) [-s|--short-name
   -p|--path             filename argument is a path
   -s|--short-name       print Windows short form of filename
   -u|--unix             print Unix form of filename
+  -t|--type             print Windows form of filename with specified
+     dos                drive letter with backslashes (c:\winnt)
+     mixed              drive letter with regular slashes (c:/winnt)
   -v|--version          output version information and exit
   -w|--windows          print Windows form of filename
   -A|--allusers         use `All Users' instead of current user for -D, -P

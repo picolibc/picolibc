@@ -1,3 +1,11 @@
+2002-06-07  David Peterson  <chief@mail.idrive.com>
+	    Christopher Faylor  <cgf@redhat.com>
+
+	* cygpath.cc: Add option to output windows paths in different formats:
+	"dos" and "mixed".
+	(main): Process options.
+	(doit): Check new options flags.
+
 2002-06-06  Egor Duda <deo@logos-m.ru>
 
 	* regtool.cc (Fail): Be more verbose.
@@ -27,7 +35,7 @@
 2002-06-05  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
 	* strace.cc (version): New global variable.
-	(usage): Accomodate stdout output.
+	(usage): Accommodate stdout output.
 	(print_version): New function.
 
 2002-06-03  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
