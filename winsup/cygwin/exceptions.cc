@@ -744,7 +744,11 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _threadinfo *tls)
   bool interrupted = false;
 
   if (tls->sig)
-    goto out;
+    {
+      sigproc_printf ("trying to send sig %d but signal %d already armed",
+		      sig, tls->sig);
+      goto out;
+    }
 
   for (int i = 0; i < CALL_HANDLER_RETRY; i++)
     {
@@ -1141,10 +1145,6 @@ call_signal_handler_now ()
       void (*sigfunc) (int) = _my_tls.func;
 
       (void) _my_tls.pop ();
-#ifdef DEBUGGING
-      if (_my_tls.stackptr > (_my_tls.stack + 1))
-	try_to_debug ();
-#endif
       reset_signal_arrived ();
       sigset_t oldmask = _my_tls.oldmask;
       int this_errno = _my_tls.saved_errno;

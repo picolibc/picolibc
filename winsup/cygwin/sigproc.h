@@ -55,7 +55,6 @@ struct sigpacket
   pid_t pid;
   class _threadinfo *tls;
   sigset_t *mask;
-  sigset_t mask_storage;
   union
   {
     HANDLE wakeup;
