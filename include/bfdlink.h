@@ -366,11 +366,6 @@ struct bfd_link_info
      unloaded.  */
   const char *fini_function;
 
-  /* If non-zero, specifies that branches which are problematic for the
-     MPC860 C0 (or earlier) should be checked for and modified.  It gives the
-     number of bytes that should be checked at the end of each text page.  */
-  int mpc860c0;
-
   /* Non-zero if auto-import thunks for DATA items in pei386 DLLs
      should be generated/linked against.  Set to 1 if this feature
      is explicitly requested by the user, -1 if enabled by default.  */
