@@ -260,7 +260,7 @@ rmdir (const char *dir)
 	  /* RemoveDirectory on a samba drive doesn't return an error if the
 	     directory can't be removed because it's not empty. Checking for
 	     existence afterwards keeps us informed about success. */
-	  if (GetFileAttributes (real_dir) != (DWORD) -1)
+	  if (GetFileAttributes (real_dir) != INVALID_FILE_ATTRIBUTES)
 	    set_errno (ENOTEMPTY);
 	  else
 	    res = 0;

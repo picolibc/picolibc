@@ -1,6 +1,6 @@
 /* fhandler.cc.  See console.cc for fhandler_console functions.
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -386,7 +386,7 @@ fhandler_base::open (path_conv *, int flags, mode_t mode)
   if (get_query_open () &&
       isremote () &&
       creation_distribution == OPEN_EXISTING &&
-      GetFileAttributes (get_win32_name ()) == (DWORD) -1)
+      GetFileAttributes (get_win32_name ()) == INVALID_FILE_ATTRIBUTES)
     {
       set_errno (ENOENT);
       goto done;

@@ -1,6 +1,6 @@
 /* path.cc: path support.
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -400,7 +400,7 @@ path_conv::check (const char *src, unsigned opt,
   int loop = 0;
   path_flags = 0;
   known_suffix = NULL;
-  fileattr = (DWORD) -1;
+  fileattr = INVALID_FILE_ATTRIBUTES;
   case_clash = false;
   devn = unit = 0;
   root_dir[0] = '\0';
@@ -551,7 +551,7 @@ path_conv::check (const char *src, unsigned opt,
 	      /* If symlink.check found an existing non-symlink file, then
 		 it sets the appropriate flag.  It also sets any suffix found
 		 into `ext_here'. */
-	      if (!sym.is_symlink && sym.fileattr != (DWORD) -1)
+	      if (!sym.is_symlink && sym.fileattr != INVALID_FILE_ATTRIBUTES)
 		{
 		  error = sym.error;
 		  if (component == 0)
@@ -2397,7 +2397,7 @@ cygdrive_getmntent ()
 
       __small_sprintf (native_path, "%c:\\", drive);
       if (GetDriveType (native_path) == DRIVE_REMOVABLE ||
-	  GetFileAttributes (native_path) == (DWORD) -1)
+	  GetFileAttributes (native_path) == INVALID_FILE_ATTRIBUTES)
 	{
 	  available_drives &= ~mask;
 	  continue;
@@ -2609,7 +2609,7 @@ symlink (const char *topath, const char *frompath)
 	    }
 	  backslashify (topath, w32topath, 0);
 	}
-      if (!cp || GetFileAttributes (w32topath) == (DWORD)-1)
+      if (!cp || GetFileAttributes (w32topath) == INVALID_FILE_ATTRIBUTES)
 	{
 	  win32_topath.check (topath, PC_SYM_NOFOLLOW);
 	  if (!cp || win32_topath.error != ENOENT)
@@ -2911,7 +2911,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
     {
       error = 0;
       fileattr = GetFileAttributes (suffix.path);
-      if (fileattr == (DWORD) -1)
+      if (fileattr == INVALID_FILE_ATTRIBUTES)
 	{
 	  /* The GetFileAttributes call can fail for reasons that don't
 	     matter, so we just return 0.  For example, getting the
@@ -2978,7 +2978,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	  if (!suffix.lnk_match () || !ext_tacked_on)
 	    goto file_not_symlink;
 
-	  fileattr = (DWORD) -1;
+	  fileattr = INVALID_FILE_ATTRIBUTES;
 	  continue;		/* in case we're going to tack *another* .lnk on this filename. */
 	case 2:
 	  res = check_sysfile (suffix.path, fileattr, h, contents, &error, &pflags);
@@ -3072,7 +3072,7 @@ readlink (const char *path, char *buf, int buflen)
 
   if (!pathbuf.issymlink ())
     {
-      if (pathbuf.fileattr != (DWORD) -1)
+      if (pathbuf.fileattr != INVALID_FILE_ATTRIBUTES)
 	set_errno (EINVAL);
       return -1;
     }

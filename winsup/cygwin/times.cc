@@ -1,6 +1,6 @@
 /* times.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -475,8 +475,7 @@ utimes (const char *path, struct timeval *tvp)
 
   if (h == INVALID_HANDLE_VALUE)
     {
-      if ((res = GetFileAttributes (win32.get_win32 ())) != -1 &&
-		(res & FILE_ATTRIBUTE_DIRECTORY))
+      if (win32.isdir ())
 	{
 	  /* What we can do with directories more? */
 	  res = 0;

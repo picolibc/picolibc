@@ -1,3 +1,15 @@
+2002-01-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dir.cc: Use INVALID_FILE_ATTRIBUTES instead of "(DWORD) -1"
+	for file attributes throughout.
+	* fhandler.cc: Ditto.
+	* fhandler_disk_file.cc: Ditto.
+	* path.cc: Ditto.
+	* path.h: Ditto.
+	* syscalls.cc: Ditto.
+	* times.cc (utimes): Use path_conv::isdir() instead of explicit
+	GetFileAttributes() call.
+
 2002-01-13  Christopher Faylor  <cgf@redhat.com>
 
 	* dcrt0.cc (multiple_cygwin_problem): Clarify logic and make
