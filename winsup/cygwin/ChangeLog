@@ -1,3 +1,19 @@
+2002-04-18  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.h (pthread::joiner): New member.
+	* thread.cc (pthread::pthread): Initialize joiner to NULL
+	(pthread::create): Increment of thread counter moved from
+	__pthread_create to this location.
+	(__pthread_create): Increment thread counter removed.
+	(thread_init_wrapper): Set joiner to self when thread was created
+	detached.
+	(__pthread_exit): delete thread when it is detached and not
+	joined.
+	(__pthread_join): Check for deadlock and delete thread when it has
+	terminated.
+	(__pthread_detach): Set joiner to self when thread state
+	changed to detached.
+
 2002-06-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* grp.cc (read_etc_group): When emulating nonexisting group file on

@@ -344,7 +344,7 @@ MTinterface::fixup_after_fork (void)
 }
 
 pthread::pthread ():verifyable_object (PTHREAD_MAGIC), win32_obj_id (0),
-cancelstate (0), canceltype (0)
+cancelstate (0), canceltype (0), joiner(NULL)
 {
 }
 
@@ -381,6 +381,7 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
     magic = 0;
   else
     {
+      InterlockedIncrement (&MT_INTERFACE->threadcount);
       /*FIXME: set the priority appropriately for system contention scope */
       if (attr.inheritsched == PTHREAD_EXPLICIT_SCHED)
 	{
@@ -908,6 +909,10 @@ thread_init_wrapper (void *_arg)
   /*the OS doesn't check this for <= 64 Tls entries (pre win2k) */
   TlsSetValue (MT_INTERFACE->thread_self_dwTlsIndex, thread);
 
+  // if thread is detached force cleanup on exit
+  if (thread->attr.joinable == PTHREAD_CREATE_DETACHED)
+    thread->joiner = __pthread_self();
+
 #ifdef _CYG_THREAD_FAILSAFE
   if (_REENT == _impure_ptr)
     system_printf ("local storage for thread isn't setup correctly");
@@ -945,7 +950,6 @@ __pthread_create (pthread_t *thread, const pthread_attr_t *attr,
       *thread = NULL;
       return EAGAIN;
     }
-  InterlockedIncrement (&MT_INTERFACE->threadcount);
 
   return 0;
 }
@@ -1491,11 +1495,16 @@ __pthread_attr_destroy (pthread_attr_t *attr)
 void
 __pthread_exit (void *value_ptr)
 {
-  class pthread *thread = __pthread_self ();
+  pthread_t thread = __pthread_self ();
 
   MT_INTERFACE->destructors.IterateNull ();
 
-  thread->return_ptr = value_ptr;
+  // cleanup if thread is in detached state and not joined
+  if( __pthread_equal(&thread->joiner, &thread ) )
+    delete thread;
+  else
+    thread->return_ptr = value_ptr;
+
   if (InterlockedDecrement (&MT_INTERFACE->threadcount) == 0)
     exit (0);
   else
@@ -1505,6 +1514,8 @@ __pthread_exit (void *value_ptr)
 int
 __pthread_join (pthread_t *thread, void **return_val)
 {
+   pthread_t joiner = __pthread_self();
+
   /*FIXME: wait on the thread cancellation event as well - we are a cancellation point*/
   if (verifyable_object_isvalid (thread, PTHREAD_MAGIC) != VALID_OBJECT)
     return ESRCH;
@@ -1512,15 +1523,26 @@ __pthread_join (pthread_t *thread, void **return_val)
   if ((*thread)->attr.joinable == PTHREAD_CREATE_DETACHED)
     {
       if (return_val)
-	*return_val = NULL;
+        *return_val = NULL;
       return EINVAL;
     }
+
+  else if( __pthread_equal(thread, &joiner ) )
+    {
+      if (return_val)
+        *return_val = NULL;
+      return EDEADLK;
+    }
+
   else
     {
       (*thread)->attr.joinable = PTHREAD_CREATE_DETACHED;
+      (*thread)->joiner = joiner;
       WaitForSingleObject ((*thread)->win32_obj_id, INFINITE);
       if (return_val)
-	*return_val = (*thread)->return_ptr;
+         *return_val = (*thread)->return_ptr;
+      // cleanup
+      delete (*thread);
     }	/*End if */
 
   pthread_testcancel ();
@@ -1536,11 +1558,13 @@ __pthread_detach (pthread_t *thread)
 
   if ((*thread)->attr.joinable == PTHREAD_CREATE_DETACHED)
     {
-      (*thread)->return_ptr = NULL;
       return EINVAL;
     }
 
   (*thread)->attr.joinable = PTHREAD_CREATE_DETACHED;
+  // force cleanup on exit
+  (*thread)->joiner = *thread;
+
   return 0;
 }
 

@@ -239,6 +239,7 @@ public:
   void *return_ptr;
   bool suspended;
   int cancelstate, canceltype;
+  pthread_t joiner;
   // int joinable;
 
   DWORD GetThreadId ()
