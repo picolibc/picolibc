@@ -661,6 +661,7 @@ fhandler_console::select_read (select_record *s)
       s->startup = no_startup;
       s->poll = poll_console;
       s->verify = poll_console;
+      set_cursor_maybe ();
     }
 
   s->h = get_handle ();
@@ -677,6 +678,7 @@ fhandler_console::select_write (select_record *s)
       s->startup = no_startup;
       s->poll = poll_console;
       s->verify = no_verify;
+      set_cursor_maybe ();
     }
 
   s->write_selected = TRUE;
@@ -693,6 +695,7 @@ fhandler_console::select_except (select_record *s)
       s->startup = no_startup;
       s->poll = poll_console;
       s->verify = no_verify;
+      set_cursor_maybe ();
     }
 
   s->except_selected = TRUE;
