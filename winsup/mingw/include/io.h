@@ -32,9 +32,6 @@
 /* All the headers include this file. */
 #include <_mingw.h>
 
-/* We need the definition of FILE anyway... */
-#include <stdio.h>
-
 /* MSVC's io.h contains the stuff from dir.h, so I will too.
  * NOTE: This also defines off_t, the file offset type, through
  *       an inclusion of sys/types.h */
@@ -59,6 +56,15 @@
 #ifndef	_FSIZE_T_DEFINED
 typedef	unsigned long	_fsize_t;
 #define _FSIZE_T_DEFINED
+#endif
+
+/*
+ * The maximum length of a file name. You should use GetVolumeInformation
+ * instead of this constant. But hey, this works.
+ * Also defined in stdio.h. 
+ */
+#ifndef FILENAME_MAX
+#define	FILENAME_MAX	(260)
 #endif
 
 /*
@@ -188,7 +194,6 @@ _CRTIMP int __cdecl _creat (const char*, int);
 _CRTIMP int __cdecl _dup (int);
 _CRTIMP int __cdecl _dup2 (int, int);
 _CRTIMP long __cdecl _filelength (int);
-_CRTIMP int __cdecl _fileno (FILE*);
 _CRTIMP long __cdecl _get_osfhandle (int);
 _CRTIMP int __cdecl _isatty (int);
 
@@ -258,7 +263,6 @@ _CRTIMP int __cdecl dup (int);
 _CRTIMP int __cdecl dup2 (int, int);
 _CRTIMP int __cdecl eof (int);
 _CRTIMP long __cdecl filelength (int);
-_CRTIMP int __cdecl fileno (FILE*);
 _CRTIMP int __cdecl isatty (int);
 _CRTIMP long __cdecl lseek (int, long, int);
 _CRTIMP int __cdecl open (const char*, int, ...);

@@ -65,11 +65,11 @@
 /*
  * The maximum length of a file name. You should use GetVolumeInformation
  * instead of this constant. But hey, this works.
- *
- * NOTE: This is used in the structure _finddata_t (see io.h) so changing it
- *       is probably not a good idea.
+ * Also defined in io.h.
  */
+#ifndef FILENAME_MAX
 #define	FILENAME_MAX	(260)
+#endif
 
 /*
  * The maximum number of files that may be open at once. I have set this to
@@ -336,11 +336,16 @@ _CRTIMP int __cdecl	_getmaxstdio(void);
 _CRTIMP int __cdecl	_setmaxstdio(int);
 #endif
 
+#define _fileno(__F) ((__F)->_file)
+
 #ifndef _NO_OLDNAMES
 _CRTIMP int __cdecl	fgetchar (void);
 _CRTIMP int __cdecl	fputchar (int);
 _CRTIMP FILE* __cdecl	fdopen (int, const char*);
 _CRTIMP int __cdecl	fileno (FILE*);
+
+#define fileno(__F) ((__F)->_file)
+
 #endif	/* Not _NO_OLDNAMES */
 
 #endif	/* Not __STRICT_ANSI__ */

@@ -1,5 +1,16 @@
 2003-09-24  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/io.h (_fileno): Remove prototype.
+	(fileno): Likewise.
+	(FILENAME_MAX): Define, if needed.
+	Don't include <stdio.h>.
+	* include/stdio.h (FILENAME_MAX): Protect against
+	prior definition.
+	(_fileno): Define macro implementation.
+	(fileno): Likewise.
+
+2003-09-24  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/inttypes.h: Include _mingw.h.
 
 2003-09-24  Danny Smith  <dannysmith@users.sourceforge.net>
