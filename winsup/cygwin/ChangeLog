@@ -1,3 +1,9 @@
+2004-03-23  Gerd Spalink  <Gerd.Spalink@t-online.de>
+
+	* fhandler_dsp.cc (fhandler_dev_dsp::write): Remove type
+	cast from argument to audio_out_->parsewav() to make reference
+	work properly. Now .wav file headers are properly discarded.
+
 2004-03-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_disk_file.cc (fhandler_base::fstat_fs): Use created

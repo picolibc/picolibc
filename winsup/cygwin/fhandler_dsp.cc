@@ -1098,7 +1098,9 @@ fhandler_dev_dsp::open (int flags, mode_t mode)
 int
 fhandler_dev_dsp::write (const void *ptr, size_t len)
 {
-  int len_s = len; 
+  int len_s = len;
+  const char *ptr_s = static_cast <const char *> (ptr);
+
   debug_printf ("ptr=%08x len=%d", ptr, len);
   if (!audio_out_)
     {
@@ -1109,9 +1111,10 @@ fhandler_dev_dsp::write (const void *ptr, size_t len)
   if (audio_out_->getOwner () == 0L)
     { // No owner yet, lets do it
       // check for wave file & get parameters & skip header if possible.
-      if (audio_out_->parsewav ((const char *) ptr, len_s,
+      if (audio_out_->parsewav (ptr_s, len_s,
 				audiofreq_, audiobits_, audiochannels_))
 	{ // update our format conversion
+	  debug_printf ("=> ptr_s=%08x len_s=%d", ptr_s, len_s);
 	  audioformat_ = ((audiobits_ == 8) ? AFMT_U8 : AFMT_S16_LE);
 	  audio_out_->setformat (audioformat_);
 	}
@@ -1123,7 +1126,7 @@ fhandler_dev_dsp::write (const void *ptr, size_t len)
 	}
     }
 
-  audio_out_->write ((char *)ptr, len_s);
+  audio_out_->write (ptr_s, len_s);
   return len;
 }
 
