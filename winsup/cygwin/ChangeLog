@@ -1,3 +1,7 @@
+Mon Apr 23  9:27:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* thread.cc (MTinterface::Init): Always initialise per process variables.
+
 Sun Apr 22 19:18:18 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* features.h: Reinstate as wrapper for sys/features.h.

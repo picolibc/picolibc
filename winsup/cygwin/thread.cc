@@ -294,16 +294,16 @@ MTinterface::Init (int forked)
   concurrency = 0;
   threadcount = 1; /* 1 current thread when Init occurs.*/
 
+  mainthread.win32_obj_id = myself->hProcess;
+  mainthread.setThreadIdtoCurrent ();
+  /* store the main thread's self pointer */
+  TlsSetValue (thread_self_dwTlsIndex, &mainthread);
+
   if (forked)
     return;
 
   /* possible the atfork lists should be inited here as well */
 
-  mainthread.win32_obj_id = myself->hProcess;
-  mainthread.setThreadIdtoCurrent ();
-  /* store the main thread's self pointer */
-  TlsSetValue (thread_self_dwTlsIndex, &mainthread);
-  
   for (int i =0;i<256;i++)pshared_mutexs[i]=NULL;
 
 #if 0
