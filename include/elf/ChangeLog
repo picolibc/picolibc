@@ -1,3 +1,9 @@
+2001-06-15  Per Bothner  <per@bothner.com>
+
+	* dwarf2.h:  Partial merge with gcc version.
+	(enum dwarf_descrim_list):  Fix typo -> dwarf_discrim_list.
+	(DW_LANG_Java):  Use value from dwarf 2.1 draft (also used in gcc).
+
 2001-05-15  Ralf Baechle  <ralf@gnu.org>
 
 	* common.h: Remove definition of EM_MIPS_RS4_BE.  The constant was

@@ -1,6 +1,6 @@
-/* Declarations and definitions of codes relating to the DWARF symbolic
+/* Declarations and definitions of codes relating to the DWARF2 symbolic
    debugging information format.
-   Copyright 1992, 1993, 1995, 1996, 1999 Free Software Foundation, Inc.
+   Copyright 1992, 1993, 1995, 1996, 1999, 2000 Free Software Foundation, Inc.
 
    Written by Gary Funck (gary@intrepid.com) The Ada Joint Program
    Office (AJPO), Florida State Unviversity and Silicon Graphics Inc.
@@ -30,6 +30,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  *
    Programming Languages Special Interest Group (UI/PLSIG) and distributed
    by UNIX International.  Copies of this specification are available from
    UNIX International, 20 Waterview Boulevard, Parsippany, NJ, 07054.  */
+
+/* This file is shared between GCC and GDB, and should not contain
+   prototypes.  */
 
 #ifndef _ELF_DWARF2_H
 #define _ELF_DWARF2_H
@@ -177,7 +180,9 @@ enum dwarf_tag
     /* GNU extensions */
     DW_TAG_format_label = 0x4101,	/* for FORTRAN 77 and Fortran 90 */
     DW_TAG_function_template = 0x4102,	/* for C++ */
-    DW_TAG_class_template = 0x4103	/* for C++ */
+    DW_TAG_class_template = 0x4103,	/* for C++ */
+    DW_TAG_GNU_BINCL = 0x4104,
+    DW_TAG_GNU_EINCL = 0x4105
   };
 
 #define DW_TAG_lo_user	0x4080
@@ -535,8 +540,8 @@ enum dwarf_inline_attribute
     DW_INL_declared_inlined = 3
   };
 
-/* descriminant lists */
-enum dwarf_descrim_list
+/* discriminant lists */
+enum dwarf_discrim_list
   {
     DW_DSC_label = 0,
     DW_DSC_range = 1
@@ -586,8 +591,20 @@ enum dwarf_call_frame_info
     DW_CFA_def_cfa = 0x0c,
     DW_CFA_def_cfa_register = 0x0d,
     DW_CFA_def_cfa_offset = 0x0e,
+    DW_CFA_def_cfa_expression = 0x0f,
+    DW_CFA_expression = 0x10,
+    /* Dwarf 2.1 */
+    DW_CFA_offset_extended_sf = 0x11,
+    DW_CFA_def_cfa_sf = 0x12,
+    DW_CFA_def_cfa_offset_sf = 0x13,
+
     /* SGI/MIPS specific */
-    DW_CFA_MIPS_advance_loc8 = 0x1d
+    DW_CFA_MIPS_advance_loc8 = 0x1d,
+
+    /* GNU extensions */
+    DW_CFA_GNU_window_save = 0x2d,
+    DW_CFA_GNU_args_size = 0x2e,
+    DW_CFA_GNU_negative_offset_extended = 0x2f
   };
 
 #define DW_CIE_ID	  0xffffffff
@@ -616,7 +633,7 @@ enum dwarf_source_language
     DW_LANG_Fortran90 = 0x0008,
     DW_LANG_Pascal83 = 0x0009,
     DW_LANG_Modula2 = 0x000a,
-    DW_LANG_Java = 0x9af4,
+    DW_LANG_Java = 0x000b,
     DW_LANG_Mips_Assembler = 0x8001
   };
 
@@ -634,5 +651,29 @@ enum dwarf_macinfo_record_type
     DW_MACINFO_end_file = 4,
     DW_MACINFO_vendor_ext = 255
   };
+
+
+/* @@@ For use with GNU frame unwind information.  */
+
+#define DW_EH_PE_absptr		0x00
+#define DW_EH_PE_omit		0xff
+
+#define DW_EH_PE_uleb128	0x01
+#define DW_EH_PE_udata2		0x02
+#define DW_EH_PE_udata4		0x03
+#define DW_EH_PE_udata8		0x04
+#define DW_EH_PE_sleb128	0x09
+#define DW_EH_PE_sdata2		0x0A
+#define DW_EH_PE_sdata4		0x0B
+#define DW_EH_PE_sdata8		0x0C
+#define DW_EH_PE_signed		0x08
+
+#define DW_EH_PE_pcrel		0x10
+#define DW_EH_PE_textrel	0x20
+#define DW_EH_PE_datarel	0x30
+#define DW_EH_PE_funcrel	0x40
+#define DW_EH_PE_aligned	0x50
+
+#define DW_EH_PE_indirect	0x80
 
 #endif /* _ELF_DWARF2_H */
