@@ -109,6 +109,8 @@ mingw: w32api
 
 cygwin: w32api
 
+cygserver: cygwin
+
 install_utils: cygwin mingw
 
 install_mingw: w32api

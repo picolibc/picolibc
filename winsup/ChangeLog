@@ -1,3 +1,7 @@
+2003-11-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in: Make cygserver depending on cygwin.
+
 2003-11-20  Christopher Faylor  <cgf@redhat.com>
 
 	* configure.in: Make --use-server the default.
