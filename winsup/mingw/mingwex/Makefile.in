@@ -83,7 +83,7 @@ OPTFLAGS= -fomit-frame-pointer
 MNO_CYGWIN = @MNO_CYGWIN@
 
 W32API_INCLUDE = @W32API_INCLUDE@
-INCLUDES = -I$(srcdir) -isystem$(srcdir)/../include \
+INCLUDES = -I$(srcdir) -I$(srcdir)/../include \
   -nostdinc \
   -iwithprefixbefore include
 ALL_CFLAGS = $(CFLAGS) $(OPTFLAGS) $(W32API_INCLUDE) $(INCLUDES) $(MNO_CYGWIN)
@@ -151,7 +151,7 @@ POSIX_OBJS = \
 REPLACE_OBJS = \
 	mingw-fseek.o
 COMPLEX_OBJS = \
-	cabs.o cacos.o cacosh.o casin.o casinh.o carg.o catan.o catanh.o \
+	cabs.o cacos.o cacosh.o casin.o casinh.o catan.o catanh.o \
 	ccos.o ccosh.o cexp.o cimag.o clog.o cpow.o cproj.o creal.o \
 	csin.o csinh.o csqrt.o ctan.o ctanh.o 
 

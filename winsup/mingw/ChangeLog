@@ -1,3 +1,10 @@
+2004-07-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (INCLUDES): Temporarily revert previous change.
+	* mingwex/Makefile,in (INCLUDES): Ditto.
+	* profile/Makefile,in (INCLUDES): Ditto.
+	* mingwex/Makefile,in: Drop carg.o dependency.
+
 2004-07-14  Christopher Faylor  <cgf@timesys.com>
 
 	* mingwex/fwide.c: Include <stdio.h> to resolve FILE usage.
