@@ -1,3 +1,14 @@
+Sat Dec 30 19:03:15 MET 2000  Jan hubicka  <jh@suse.cz>
+
+	* i386.h (i386_optab): Add "rex*" instructions;
+	add swapgs; disable jmp/call far direct instructions for
+	64bit mode; add syscall and sysret; disable registers for 0xc6
+	template.  Add 'q' suffixes to extendable instructions, disable
+	obsoletted instructions, add new sign/zero extension ones.
+	(i386_regtab): Add extended registers.
+	(*Suf): Add No_qSuf.
+	(q_Suf, wlq_Suf, bwlq_Suf): New.
+
 Wed Dec 20 14:22:03 MET 2000  Jan Hubicka  <jh@suse.cz>
 
 	* i386.h (i386_optab): Replace "Imm" with "EncImm".
