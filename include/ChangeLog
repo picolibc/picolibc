@@ -1,3 +1,8 @@
+2002-07-10  Jakub Jelinek  <jakub@redhat.com>
+
+	* elf/common.h (SHT_GNU_LIBLIST, DT_GNU_PRELINKED,
+	DT_GNU_CONFLICT*, DT_GNU_LIBLIST*): Define.
+
 2002-07-01  Alan Modra  <amodra@bigpond.net.au>
 
 	* bfdlink.h (struct bfd_sym_chain): Declare.

@@ -303,6 +303,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define SHT_LOOS        0x60000000      /* First of OS specific semantics */
 #define SHT_HIOS        0x6fffffff      /* Last of OS specific semantics */
 
+#define SHT_GNU_LIBLIST	0x6ffffff7	/* List of prelink dependencies */
+
 /* The next three section types are defined by Solaris, and are named
    SHT_SUNW*.  We use them in GNU code, so we also define SHT_GNU*
    versions.  */
@@ -520,6 +522,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    OS specific values.  This is a deliberate special case and we
    maintain it for backwards compatability.  */
 #define DT_VALRNGLO	0x6ffffd00
+#define DT_GNU_PRELINKED 0x6ffffdf5
+#define DT_GNU_CONFLICTSZ 0x6ffffdf6
+#define DT_GNU_LIBLISTSZ 0x6ffffdf7
 #define DT_CHECKSUM	0x6ffffdf8
 #define DT_PLTPADSZ	0x6ffffdf9
 #define DT_MOVEENT	0x6ffffdfa
@@ -531,6 +536,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define DT_VALRNGHI	0x6ffffdff
 
 #define DT_ADDRRNGLO	0x6ffffe00
+#define DT_GNU_CONFLICT	0x6ffffef8
+#define DT_GNU_LIBLIST	0x6ffffef9
 #define DT_CONFIG	0x6ffffefa
 #define DT_DEPAUDIT	0x6ffffefb
 #define DT_AUDIT	0x6ffffefc
