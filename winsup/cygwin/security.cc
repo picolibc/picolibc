@@ -1612,7 +1612,7 @@ set_security_attribute (int attribute, PSECURITY_ATTRIBUTES psa,
   psa->lpSecurityDescriptor = sd_buf;
   InitializeSecurityDescriptor ((PSECURITY_DESCRIPTOR)sd_buf,
 				SECURITY_DESCRIPTOR_REVISION);
-  psa->lpSecurityDescriptor = alloc_sd (geteuid (), getegid (),
+  psa->lpSecurityDescriptor = alloc_sd (geteuid (), getegid32 (),
 					cygheap->user.logsrv (),
 					attribute, (PSECURITY_DESCRIPTOR)sd_buf,
 					&sd_buf_size);

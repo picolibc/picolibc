@@ -38,6 +38,7 @@ struct __group32
 struct __group32 * getgrgid32 (__gid32_t gid);
 struct __group32 * getgrnam32 (const char *name);
 __gid32_t getgid32 ();
+__gid32_t getegid32 ();
 #endif
 
 #ifdef __cplusplus

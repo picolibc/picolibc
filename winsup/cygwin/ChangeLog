@@ -1,5 +1,11 @@
 2002-05-28  Corinna Vinschen  <corinna@vinschen.de>
 
+	* security.cc (set_security_attribute): Call getegid32() instead of
+	getegid().
+	* include/cygwin/grp.h: Declare getegid32().
+
+2002-05-28  Corinna Vinschen  <corinna@vinschen.de>
+
 	Change internal gid datatype from __gid16_t to __gid32_t
 	throughout.
 	* cygwin.din: Export new symbols chown32, fchown32, getegid32,
