@@ -1,3 +1,11 @@
+2003-02-07  Christopher Faylor  <cgf@redhat.com>
+
+	* malloc.cc (DEFAULT_MMAP_THRESHOLD): Set high to avoid mmaps.
+
+2003-02-07  Christopher Faylor  <cgf@redhat.com>
+
+	* pipe.cc (fhandler_pipe::close): Avoid extraneous this->.
+
 2003-02-06  Christopher Faylor  <cgf@redhat.com>
 
 	* heap.cc (heap_init): Remove debugging code.
