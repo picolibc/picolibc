@@ -1,3 +1,10 @@
+Fri Apr 20 11:48:45 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* include/sys/file.h: Move X_OK protection earlier.
+
+	* dtable.cc (dtable::vfork_child_fixup): Avoid closing already closed
+	handles.
+
 Fri Apr 20 16:29:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* grp.cc (getgroups): Change so that SIDs get compared instead

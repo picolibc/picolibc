@@ -25,10 +25,10 @@
 
 #define	F_OK		0	/* does file exist */
 #define	_X_OK		1	/* is it executable by caller */
+#undef X_OK
 #if defined (__CYGWIN__) || defined (__INSIDE_CYGWIN__)
 # define X_OK	_X_OK	/* Check for execute permission. */
 #else
-# undef X_OK
 extern const unsigned _cygwin_X_OK;
 # define X_OK	_cygwin_X_OK
 #endif

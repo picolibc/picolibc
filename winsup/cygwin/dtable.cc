@@ -580,9 +580,14 @@ dtable::vfork_child_fixup ()
   for (int i = 0; i < (int) cygheap->fdtab.size; i++)
     if ((fh = cygheap->fdtab[i]) != NULL)
       {
-        fh->close ();
 	fh->clear_readahead ();
-        cygheap->fdtab.release (i);
+	if (fh->get_close_on_exec ())
+	  release (i);
+	else
+	  {
+	    fh->close ();
+	    cygheap->fdtab.release (i);
+	  }
       }
 
   fds = saveme;
