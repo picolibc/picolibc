@@ -54,8 +54,9 @@ ALL_LDLIBS:=${patsubst $(w32api_lib)/lib%.a,-l%,\
 	       ${filter-out $(libkernel32),\
 		${filter-out $(libcygwin), $(ALL_DEP_LDLIBS)}}}}
 
+LIBICONV:=@libiconv@
 MINGW_LIB:=$(mingw_build)/libmingw32.a
-DUMPER_LIB:=${libbfd} ${libintl} -L$(bupdir1)/libiberty -liberty
+DUMPER_LIB:=${libbfd} ${libintl} -L$(bupdir1)/libiberty $(LIBICONV) -liberty
 MINGW_LDLIBS:=$(ALL_LDLIBS) $(MINGW_LIB)
 MINGW_DEP_LDLIBS:=${ALL_DEP_LDLIBS} ${MINGW_LIB}
 ALL_LDFLAGS:=-B$(newlib_build)/libc/ -B$(newlib_build)/libm/ -B$(w32api_lib)/ \

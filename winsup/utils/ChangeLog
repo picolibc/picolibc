@@ -1,5 +1,11 @@
 2002-07-06  Christopher Faylor  <cgf@redhat.com>
 
+	* configure.in: Check for libiconv.a.
+	* configure: Regenerate.
+	* Makefile.in: Add libiconv.a to libraries required for dumper.exe.
+
+2002-07-06  Christopher Faylor  <cgf@redhat.com>
+
 	* Makefile.in: Use MINGW stuff from Makefile.common.
 
 2002-07-01  Corinna Vinschen  <corinna@vinschen.de>
