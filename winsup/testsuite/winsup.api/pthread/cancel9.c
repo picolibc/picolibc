@@ -41,11 +41,13 @@
 
 #include "test.h"
 
+static pid_t pid;
+
 static void *Thread(void *punused)
 {
   int res;
-  pid_t pid = fork ();
 
+  pid = fork ();
   assert (pid != -1);
   switch (pid)
     {
@@ -61,6 +63,8 @@ static void *Thread(void *punused)
 
 int main (void)
 {
+  int res;
+
   void * result;
   pthread_t t;
 
@@ -69,6 +73,7 @@ int main (void)
   assert (pthread_cancel (t) == 0);
   assert (pthread_join (t, &result) == 0);
   assert (result == PTHREAD_CANCELED);
+  assert (waitpid (pid, &res, 0) != -1);
 
   return 0;
 }

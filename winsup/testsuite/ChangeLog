@@ -1,3 +1,8 @@
+2003-01-21  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* winsup.api/pthread/cancel9.c: Wait in mainthread until child
+	process has terminated.
+
 2003-01-14  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* winsup.api/pthread/cancel10.c: New test.
