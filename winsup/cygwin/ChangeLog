@@ -80,7 +80,6 @@ Wed Feb 23 21:34:58 2000  Christopher Faylor <cgf@cygnus.com>
 	(call_handler): Avoid suspending a thread if it owns a muto.  Only set
 	signal_arrived if the thread was actually interrupted.
 	(events_init): Initialize module information needed by interruptible().
-	(sigdelayed): Don't call sig_dispatch_pending since it could screw up
 	* init.cc (dll_entry): Record module handle of main for use by
 	interruptible().
 	(proc_subproc): Reorganize handling of terminated child so that the
