@@ -1,3 +1,7 @@
+Fri May 12 11:23:17 2000  Jeffrey A Law  (law@cygnus.com)
+
+	* config.sub (basic_machine): Recognize hppa64 as a valid cpu type.
+
 Wed May 10 21:26:51 2000  Jim Wilson  <wilson@cygnus.com>
 
 	* configure.in (ia64*-*-elf*): Add gdb and friends to noconfigdirs.
