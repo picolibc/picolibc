@@ -1,3 +1,11 @@
+2002-01-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in: Add fnmatch.o to DLL_OFILES.
+	* cygwin.din: Add fnmatch export symbol.
+	* fnmatch.c: New file.
+	* include/fnmatch.h: Ditto.
+	* include/cygwin/version.h: Bump API minor version to 50.
+
 2002-01-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (fchdir): Call chdir with full windows path.

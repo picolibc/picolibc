@@ -263,6 +263,8 @@ floor
 _floor = floor
 floorf
 _floorf = floorf
+fnmatch
+_fnmatch = fnmatch
 fmod
 _fmod = fmod
 fmodf

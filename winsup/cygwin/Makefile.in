@@ -123,7 +123,8 @@ DLL_OFILES:=assert.o autoload.o cygheap.o dcrt0.o debug.o delqueue.o dir.o \
 	fhandler_disk_file.o fhandler_dsp.o fhandler_floppy.o fhandler_mem.o \
 	fhandler_random.o fhandler_raw.o fhandler_serial.o fhandler_socket.o \
 	fhandler_tape.o fhandler_termios.o fhandler_tty.o fhandler_windows.o \
-	fhandler_zero.o fork.o glob.o grp.o heap.o init.o ioctl.o localtime.o \
+	fhandler_zero.o fnmatch.o \
+	fork.o glob.o grp.o heap.o init.o ioctl.o localtime.o \
 	malloc.o miscfuncs.o mmap.o net.o ntea.o passwd.o path.o pinfo.o pipe.o \
 	poll.o pthread.o regcomp.o regerror.o regexec.o regfree.o registry.o \
 	resource.o scandir.o sched.o sec_acl.o sec_helper.o security.o \
