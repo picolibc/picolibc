@@ -1,3 +1,7 @@
+2002-01-21  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number.
+
 2002-01-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* grp.cc (getgrgid): Don't return default gid entry when ntsec is on.
