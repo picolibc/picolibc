@@ -154,6 +154,7 @@ zerobss:
 
 	/* NOTE: a0[0] contains the amount of memory available, and
 	         not the last memory address. */
+	la	a0, __memsize
 	lw	t0,0(a0)			# last address of memory available
 	la	t1,K0BASE			# cached kernel memory
 	addu	t0,t0,t1			# get the end of memory address

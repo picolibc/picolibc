@@ -1,3 +1,7 @@
+2003-02-18  Richard Sandiford  <rsandifo@redhat.com>
+
+	* mips/crt0.S (zerobss): Reload __memsize after call.
+
 2003-02-17  Chris Demetriou  <cgd@broadcom.com>
 
 	* mips/cfe.c (__cfe_handle, __cfe_entrypt): Fix types.
