@@ -41,7 +41,6 @@ class cygthread
   operator HANDLE ();
   void * operator new (size_t);
   static cygthread *freerange ();
-  void exit_thread ();
   static void terminate ();
   bool SetThreadPriority (int nPriority) {return ::SetThreadPriority (h, nPriority);}
   void zap_h ()

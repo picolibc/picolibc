@@ -63,8 +63,11 @@ cygthread::stub (VOID *arg)
 #endif
       else
 	{
-	  if (!info->func || exiting)
-	    return 0;
+	  if (exiting)
+	    {
+	      info->inuse = false;	// FIXME: Do we need this?
+	      return 0;
+	    }
 
 	  /* Cygwin threads should not call ExitThread directly */
 	  info->func (info->arg == cygself ? info : info->arg);
@@ -167,7 +170,7 @@ cygthread::cygthread (LPTHREAD_START_ROUTINE start, LPVOID param,
       while (!thread_sync)
 	low_priority_sleep (0);
       SetEvent (thread_sync);
-      thread_printf ("activated name '%s', thread_sync %p for thread %p", thread_sync, id);
+      thread_printf ("activated name '%s', thread_sync %p for thread %p", name, thread_sync, id);
     }
   else
     {
@@ -180,7 +183,7 @@ cygthread::cygthread (LPTHREAD_START_ROUTINE start, LPVOID param,
 			this, 0, &id);
       if (!h)
 	api_fatal ("thread handle not set - %p<%p>, %E", h, id);
-      thread_printf ("created name '%s', thread %p, id %p", __name, h, id);
+      thread_printf ("created name '%s', thread %p, id %p", name, h, id);
 #ifdef DEBUGGING
       terminated = false;
 #endif
@@ -224,16 +227,6 @@ HANDLE ()
   return ev;
 }
 
-/* Should only be called when the process is exiting since it
-   leaves an open thread slot. */
-void
-cygthread::exit_thread ()
-{
-  if (!is_freerange)
-    SetEvent (*this);
-  ExitThread (0);
-}
-
 void
 cygthread::release (bool nuke_h)
 {
@@ -241,9 +234,9 @@ cygthread::release (bool nuke_h)
     h = NULL;
 #ifdef DEBUGGING
   __oldname = __name;
+  debug_printf ("released thread '%s'", __oldname);
 #endif
   __name = NULL;
-  stack_ptr = NULL;
   func = NULL;
   if (!InterlockedExchange (&inuse, 0))
 #ifdef DEBUGGING

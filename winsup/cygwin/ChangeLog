@@ -1,5 +1,15 @@
 2005-01-01  Christopher Faylor  <cgf@timesys.com>
 
+	* cygthread.cc (cygthread::stub): Set inuse to false when exiting.
+	(cygthread::cygthread): Actually pass name as argument to debugging
+	output to avoid SEGV when strace'ing.
+	(cygthread::release): Don't set stack_ptr to NULL, since it is only set
+	once on first entry to a stub not on each stub iteration.
+	(cygthead::exit_thread): Remove obsolete function.
+	* cygthread.h (cygthread::exit_thread): Ditto.
+
+2005-01-01  Christopher Faylor  <cgf@timesys.com>
+
 	* shared.cc (open_shared): Don't attempt VirtualAlloc magic if first
 	attempt to map memory fails.
 
@@ -415,7 +425,7 @@
 	Do not set mount_table->had_to_create_mount_areas.
 	* path.cc (mount_info::conv_to_win32_path): Improve update of
 	sys_mount_table_counter.
-	(mount_info::read_mounts): Use new reg_key constructor.	
+	(mount_info::read_mounts): Use new reg_key constructor.
 	(mount_info::add_reg_mount): Ditto.
 	(mount_info::del_reg_mount): Ditto.
 	(mount_info::read_cygdrive_info_from_registry): Ditto.
@@ -632,7 +642,7 @@
 
 	* registry.cc (get_registry_hive_path): Simplify and add a
 	debug_printf in case of failure.
-	(load_registry_hive): Revert the 2004-04-19 change.	
+	(load_registry_hive): Revert the 2004-04-19 change.
 
 2004-10-20  Christopher Faylor  <cgf@timesys.com>
 
