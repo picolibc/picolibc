@@ -1,3 +1,8 @@
+2000-05-17  S. Bharadwaj Yadavalli  <sby@scrugs.lkg.dec.com>
+	    Rick Gorton	            <gorton@scrugs.lkg.dec.com>
+	    
+	* bfdlink.h (struct bfd_link_info): Add emitrelocations flag.
+
 2000-05-08  Alan Modra  <alan@linuxcare.com.au>
 
 	* dis-asm.h (print_insn_tic54x): Declare.
@@ -269,7 +274,7 @@ Mon Feb  1 21:05:46 1999  Catherine Moore  <clm@cygnus.com>
        * dis-asm.h (print_insn_i386_att):  Declare.
        (print_insn_i386_intel):  Declare.
 
-998-12-30  Michael Meissner  <meissner@cygnus.com>
+1998-12-30  Michael Meissner  <meissner@cygnus.com>
 
 	* dis-asm.h (INIT_DISASSEMBLE_INFO_NO_ARCH): Cast STREAM and
 	FPRINTF_FUNC to avoid compiler warnings.
@@ -299,8 +304,7 @@ Tue Dec  8 00:30:31 1998  Elena Zannoni  <ezannoni@kwikemart.cygnus.com>
 	(demangling_styles): add new edg_demangling style
 	(EDG_DEMANGLING_STYLE_STRING): new macro
 	(EDG_DEMANGLING): new macro
-
-	* demangle.h (DMGL_HP): new macro, for HP/aCC compiler.
+	(DMGL_HP): new macro, for HP/aCC compiler.
 	(DMGL_STYLE_MASK): modify to include new HP's style.
 	(demangling_styles): add new hp_demangling value.
 	(HP_DEMANGLING_STYLE_STRING): new macro.
