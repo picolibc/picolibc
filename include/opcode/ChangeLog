@@ -1,3 +1,9 @@
+2001-05-12  Alan Modra  <amodra@one.net.au>
+
+	* i386.h (i386_optab): Second operand of cvtps2dq is an xmm reg,
+	not an mmx reg.  Swap xmm/mmx regs on both movdq2q and movq2dq,
+	and use InvMem as these insns must have register operands.
+
 2001-05-04  Alan Modra  <amodra@one.net.au>
 
 	* i386.h (i386_optab): Move InvMem to first operand of pmovmskb
