@@ -520,6 +520,7 @@ case "${host}" in
         ;;
   h8300*-*-*)
 	syscall_dir=syscalls	
+	default_newlib_io_long_long="yes"
 	newlib_cflags="${newlib_cflags} -DSMALL_DTOA -DSMALL_MEMORY"
 	# Simulator only extensions for H8300.
 	# Uncomment the next line to enable them.

@@ -1,3 +1,7 @@
+2004-07-16  Anil Paranjpe  <anilp1@kpitcummins.com>
+
+	* configure.host (h8300*-*-*): Default long long printing support. 
+
 2004-07-16  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdio/fvwrite.c (_sfvwrite):  For asprintf family
