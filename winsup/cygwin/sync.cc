@@ -23,6 +23,8 @@ details. */
 
 muto NO_COPY muto_start;
 
+#undef WaitForSingleObject
+
 /* Constructor */
 muto::muto (int inh, const char *s) : sync (0), visits(0), waiters(-1), tid (0), next (NULL)
 {

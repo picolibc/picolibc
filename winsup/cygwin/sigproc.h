@@ -40,6 +40,11 @@ struct sigthread
   DWORD frame;
   muto *lock;
   sigthread () : id (0), frame (0), lock (0) {}
+  void init (const char *s)
+  {
+    lock = new_muto (FALSE, s);
+    id = GetCurrentThreadId ();
+  }
 };
 
 class sigframe
@@ -50,8 +55,6 @@ private:
 public:
   void set (sigthread &t, int up = 1)
   {
-    if (!t.lock)
-      t.lock = new_muto (FALSE, "sigthread");
     t.lock->acquire ();
     st = &t;
     t.frame = (DWORD) (up ? __builtin_frame_address (1) :

@@ -100,7 +100,6 @@ Static waitq waitq_main;		// Storage for main thread
 
 muto NO_COPY *sync_proc_subproc = NULL;	// Control access to subproc stuff
 
-sigthread NO_COPY mainthread;		// ID of the main thread
 DWORD NO_COPY sigtid = 0;		// ID of the signal thread
 
 int NO_COPY pending_signals = 0;	// TRUE if signals pending
@@ -603,9 +602,6 @@ sigproc_init ()
   /* local event signaled when main thread has been dispatched
      to a signal handler function. */
   signal_arrived = CreateEvent(&sec_none_nih, TRUE, FALSE, NULL);
-
-  mainthread.id = GetCurrentThreadId ();// For use in determining if signals
-				  //  should be blocked.
 
   if (!(hwait_sig = makethread (wait_sig, NULL, 0, "sig")))
     {

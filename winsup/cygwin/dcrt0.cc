@@ -22,6 +22,8 @@ details. */
 HANDLE NO_COPY hMainProc = NULL;
 HANDLE NO_COPY hMainThread = NULL;
 
+sigthread NO_COPY mainthread;		// ID of the main thread
+
 static NO_COPY char dummy_user_data[sizeof (per_process)] = {0};
 per_process NO_COPY *user_data = (per_process *) &dummy_user_data;
 
@@ -623,6 +625,9 @@ dll_crt0_1 ()
   /* Initialize the cygwin subsystem if this is the first process,
      or attach to the shared data structure if it's already running. */
   shared_init ();
+
+  mainthread.init ("mainthread"); // For use in determining if signals
+				  //  should be blocked.
 
   if (mypid)
     set_myself (cygwin_shared->p[mypid]);

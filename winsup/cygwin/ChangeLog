@@ -1,3 +1,13 @@
+Wed May 17 23:13:32 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dcrt0.cc (dll_crt0_1): Initialize mainthread stuff here before
+	anything needs it.
+	* sigproc.cc (sigproc_init): Move mainthread initialization out of
+	here.
+	* sigproc.h (sigthread): Add init() method.
+	(sigframe): Don't try to initialize muto.
+	* sync.cc: Undef WaitForSingleObject to avoid recursion.
+
 2000-05-17  DJ Delorie  <dj@cygnus.com>
 
 	* testsuite/winsup.api/crlf.c: New
