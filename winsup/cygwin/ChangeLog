@@ -1,5 +1,18 @@
 2004-11-20  Christopher Faylor  <cgf@timesys.com>
 
+	* cygheap.h (init_cygheap::pid_handle): New element.
+	* pinfo.cc (set_myself): Clear previously existing cygheap->pid_handle
+	when a new process has been started.
+	(pinfo::wait): Make sure that a handle to the newly forked/spawned
+	process is kept around so that the pid will not be reused.
+	* pinfo.h (_pinfo::pid_handle): Move.
+	(pinfo::pid_handle): to here.
+	* spawn.cc (spawn_guts): Create a pid_handle in cygheap prior to
+	spawning to ensure that the pid does not get reused during the lifetime
+	of the "cygwin pid".
+
+2004-11-20  Christopher Faylor  <cgf@timesys.com>
+
 	* pinfo.h (pinfo::alert_parent): New function.
 	* exceptions.cc (sig_handle_tty_stop): Use alert_parent to send
 	"signals" to parent.

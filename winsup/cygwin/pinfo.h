@@ -40,9 +40,6 @@ public:
 
 #define PINFO_REDIR_SIZE ((char *) &myself.procinfo->exitcode - (char *) myself.procinfo)
 
-  /* Handle associated with initial Windows pid which started it all. */
-  HANDLE pid_handle;
-
   /* > 0 if started by a cygwin process */
   DWORD cygstarted;
 
@@ -130,6 +127,8 @@ public:
   HANDLE rd_proc_pipe;
   HANDLE hProcess;
   CRITICAL_SECTION lock;
+  /* Handle associated with initial Windows pid which started it all. */
+  HANDLE pid_handle;
   void init (pid_t, DWORD, HANDLE = NULL) __attribute__ ((regparm(3)));
   pinfo () {}
   pinfo (_pinfo *x): procinfo (x) {}

@@ -59,14 +59,18 @@ set_myself (HANDLE h)
   myself->dwProcessId = GetCurrentProcessId ();
   if (h)
     {
+      /* here if execed */
       static pinfo NO_COPY myself_identity;
       myself_identity.init (cygwin_pid (myself->dwProcessId), PID_EXECED);
     }
   else if (myself->ppid)
     {
+      /* here if forked/spawned */
       pinfo parent (myself->ppid);
       if (parent && parent->wr_proc_pipe)
 	CloseHandle (parent->wr_proc_pipe);
+      if (cygheap->pid_handle)
+	CloseHandle (cygheap->pid_handle);
     }
   return;
 }
@@ -779,6 +783,13 @@ pinfo::wait ()
     }
   if (!DuplicateHandle (hMainProc, out, hProcess, &((*this)->wr_proc_pipe), 0,
 			TRUE, DUPLICATE_SAME_ACCESS))
+    {
+      system_printf ("Couldn't duplicate pipe topid %d(%p), %E", (*this)->pid,
+		     hProcess);
+      return 0;
+    }
+  if (!DuplicateHandle (hMainProc, hProcess, hMainProc, &pid_handle, 0,
+			FALSE, DUPLICATE_SAME_ACCESS))
     {
       system_printf ("Couldn't duplicate pipe topid %d(%p), %E", (*this)->pid,
 		     hProcess);

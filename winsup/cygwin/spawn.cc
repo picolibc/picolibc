@@ -624,6 +624,10 @@ spawn_guts (const char * prog_arg, const char *const *argv,
     {
       saved_sendsig = myself->sendsig;
       myself->sendsig = INVALID_HANDLE_VALUE;
+      if (!cygheap->pid_handle
+	  && !DuplicateHandle (hMainProc, hMainProc, hMainProc, &cygheap->pid_handle,
+			   0, TRUE, DUPLICATE_SAME_ACCESS))
+	system_printf ("duplicate to pid_handle failed, %E");
     }
 
   /* Some file types (currently only sockets) need extra effort in the
