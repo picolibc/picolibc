@@ -837,9 +837,11 @@ _dll_crt0 ()
 	  case _PROC_FORK:
 	    user_data->forkee = fork_info->cygpid;
 	    should_be_cb = sizeof (child_info_fork);
+	    /* fall through */;
 	  case _PROC_SPAWN:
 	    if (fork_info->pppid_handle)
 	      CloseHandle (fork_info->pppid_handle);
+	    /* fall through */;
 	  case _PROC_EXEC:
 	    if (!should_be_cb)
 	      should_be_cb = sizeof (child_info);
@@ -1039,17 +1041,20 @@ multiple_cygwin_problem (const char *what, unsigned magic_version, unsigned vers
       fork_info = NULL;
       return;
     }
-  if (CYGWIN_VERSION_MAGIC_VERSION (magic_version) != version)
+
+  char buf[1024];
+  if (GetEnvironmentVariable ("CYGWIN_MISMATCH_OK", buf, sizeof (buf)))
+    return;
+
+  if (CYGWIN_VERSION_MAGIC_VERSION (magic_version) == version)
+    system_printf ("%s magic number mismatch detected - %p/%p", what, magic_version, version);
+  else
     api_fatal ("%s version mismatch detected - %p/%p.\n\
 You have multiple copies of cygwin1.dll on your system.\n\
 Search for cygwin1.dll using the Windows Start->Find/Search facility\n\
 and delete all but the most recent version.  The most recent version *should*\n\
 reside in x:\\cygwin\\bin, where 'x' is the drive on which you have\n\
 installed the cygwin distribution.", what, magic_version, version);
-
-  char buf[1024];
-  if (!GetEnvironmentVariable ("CYGWIN_MISMATCH_OK", buf, sizeof (buf)))
-    system_printf ("%s magic number mismatch detected - %p/%p", what, magic_version, version);
 }
 
 #ifdef DEBUGGING

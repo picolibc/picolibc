@@ -1,3 +1,8 @@
+2002-01-13  Christopher Faylor  <cgf@redhat.com>
+
+	* dcrt0.cc (multiple_cygwin_problem): Clarify logic and make
+	CYGWIN_MISMATCH_OK more powerful.
+
 2002-01-10  Christopher Faylor  <cgf@redhat.com>
 
 	* exceptions.cc (sig_handle): Accept a second argument indicating
