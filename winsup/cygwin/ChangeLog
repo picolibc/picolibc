@@ -1,3 +1,9 @@
+2001-11-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* select.cc (fhandler_tty_slave::ready_for_read):  Return 0 on EBADF.
+	* syscalls.cc (_read): If ready_for_read() failed, save errno from
+	being overwritten by signal handler call.
+
 2001-11-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* lib/getopt.c (getopt_internal): Reset optind to 1 only if optreset

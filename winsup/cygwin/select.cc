@@ -781,7 +781,7 @@ fhandler_tty_slave::ready_for_read (int fd, DWORD howlong)
   if (cygheap->fdtab.not_open (fd))
     {
       set_errno (EBADF);
-      return 1;
+      return 0;
     }
   if (get_readahead_valid ())
     {

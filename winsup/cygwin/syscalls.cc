@@ -314,6 +314,7 @@ _read (int fd, void *ptr, size_t len)
 	debug_printf ("non-interruptible read\n");
       else if (!cfd->ready_for_read (fd, wait))
 	{
+	  set_sig_errno (get_errno ());
 	  res = -1;
 	  goto out;
 	}
