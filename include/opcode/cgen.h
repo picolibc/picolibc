@@ -736,7 +736,7 @@ typedef struct
    the data is recorded in the parse/insert/extract/print switch statements. */
 
 /* This should be at least as large as necessary for any target. */
-#define CGEN_MAX_SYNTAX_ELEMENTS 40
+#define CGEN_MAX_SYNTAX_ELEMENTS 48
 
 /* A target may know its own precise maximum.  Assert that it falls below
    the above limit. */
