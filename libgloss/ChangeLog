@@ -1,3 +1,9 @@
+2005-01-14  Hans-Peter Nilsson  <hp@axis.com>
+                                                                                
+        * libnosys/warning.h (__make_section_unallocated)
+        [HAVE_ASM_PREVIOUS_DIRECTIVE, HAVE_ASM_POPSECTION_DIRECTIVE]: Use "\n"
+        instead of ";" to delimit assembly lines.
+                                                                                
 2005-01-07  Paul Brook  <paul@codesourcery.com>
                                                                                 
 	* arm/crt0.S: Call __libc_{init,fini}_array instead of

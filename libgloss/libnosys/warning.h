@@ -7,10 +7,10 @@
 /* We want the .gnu.warning.SYMBOL section to be unallocated.  */
 #  ifdef HAVE_ASM_PREVIOUS_DIRECTIVE
 #   define __make_section_unallocated(section_string)   \
-  asm(".section " section_string "; .previous");
+  asm(".section " section_string "\n .previous");
 #  elif defined (HAVE_ASM_POPSECTION_DIRECTIVE)
 #   define __make_section_unallocated(section_string)   \
-  asm(".pushsection " section_string "; .popsection");
+  asm(".pushsection " section_string "\n .popsection");
 #  else
 #   define __make_section_unallocated(section_string)
 #  endif
