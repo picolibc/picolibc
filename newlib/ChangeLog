@@ -1,3 +1,19 @@
+2002-08-27  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* Makefile.am(stmp-targ-include): Copy newlib.h to targ-include.
+	(install-data-local): Install newlib.h.
+	* Makefile.in: Regenerated.
+	* aclocal.m4: Ditto.
+	* configure: Ditto.
+	* configure.in: Add AM_CONFIG_HEADER to generate newlib.h based on 
+	newlib.hin.  Add AC_DEFINE_UNQUOTED entries for _ELIX_LEVEL
+	and _NEWLIB_VERSION to fill in newlib.h header file entries.
+	In AC_OUTPUT statement, unset ac_file so multilib support does
+	not use last ac_file temporary used in newlib.h configuration.
+	* libc/include/_ansi.h: Include <newlib.h>.
+	* newlib.hin: New template file for newlib.h.
+	* stamp-h.in: New file.
+
 2002-08-26  Wu Yongwei <adah@netstd.com>
 
         * time.h (timezonevar): Change "#if" to "#ifdef".

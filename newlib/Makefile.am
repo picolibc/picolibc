@@ -189,6 +189,7 @@ all-recursive: stmp-targ-include
 stmp-targ-include: config.status
 	-rm -rf targ-include stmp-targ-include
 	mkdir targ-include targ-include/sys targ-include/machine
+	cp newlib.h targ-include/newlib.h
 	-for i in $(srcdir)/libc/machine/$(machine_dir)/machine/*.h; do \
 	    if [ -f $$i ]; then \
 	      cp $$i targ-include/machine/`basename $$i`; \
@@ -227,6 +228,7 @@ endif
 	$(MULTIDO) $(AM_MAKEFLAGS) DO=install multi-do
 	-if [ -z "$(MULTISUBDIR)" ]; then \
 	  $(mkinstalldirs) $(DESTDIR)$(tooldir)/include; \
+	  $(INSTALL_DATA) newlib.h $(DESTDIR)$(tooldir)/include/newlib.h; \
 	  for i in $(srcdir)/libc/include/*.h; do \
 	   $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/`basename $$i`; \
 	  done; \

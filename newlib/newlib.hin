@@ -1,0 +1,12 @@
+#ifndef __NEWLIB_H__
+
+#define __NEWLIB_H__ 1
+
+/* EL/IX level */
+#undef _ELIX_LEVEL
+
+/* Newlib version */
+#undef _NEWLIB_VERSION
+
+#endif /* !__NEWLIB_H__ */
+

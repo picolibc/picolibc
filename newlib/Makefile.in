@@ -246,11 +246,12 @@ MAKEOVERRIDES =
 RUNTESTFLAGS = 
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/../mkinstalldirs
+CONFIG_HEADER = newlib.h
 CONFIG_CLEAN_FILES = 
 LIBRARIES =  $(toollib_LIBRARIES)
 
 
-DEFS = @DEFS@ -I. -I$(srcdir) 
+DEFS = @DEFS@ -I. -I$(srcdir) -I.
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
 libm_a_LIBADD = 
@@ -272,8 +273,8 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
 DATA =  $(noinst_DATA) $(toollib_DATA)
 
-DIST_COMMON =  README ChangeLog Makefile.am Makefile.in NEWS \
-acinclude.m4 aclocal.m4 configure configure.in
+DIST_COMMON =  README ./stamp-h.in ChangeLog Makefile.am Makefile.in \
+NEWS acinclude.m4 aclocal.m4 configure configure.in newlib.hin
 
 
 DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
@@ -303,6 +304,34 @@ config.status: $(srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
 $(srcdir)/configure: @MAINTAINER_MODE_TRUE@$(srcdir)/configure.in $(ACLOCAL_M4) $(CONFIGURE_DEPENDENCIES)
 	cd $(srcdir) && $(AUTOCONF)
+
+newlib.h: stamp-h
+	@if test ! -f $@; then \
+		rm -f stamp-h; \
+		$(MAKE) stamp-h; \
+	else :; fi
+stamp-h: $(srcdir)/newlib.hin $(top_builddir)/config.status
+	cd $(top_builddir) \
+	  && CONFIG_FILES= CONFIG_HEADERS=newlib.h:newlib.hin \
+	     $(SHELL) ./config.status
+	@echo timestamp > stamp-h 2> /dev/null
+$(srcdir)/newlib.hin: @MAINTAINER_MODE_TRUE@$(srcdir)/stamp-h.in
+	@if test ! -f $@; then \
+		rm -f $(srcdir)/stamp-h.in; \
+		$(MAKE) $(srcdir)/stamp-h.in; \
+	else :; fi
+$(srcdir)/stamp-h.in: $(top_srcdir)/configure.in $(ACLOCAL_M4) 
+	cd $(top_srcdir) && $(AUTOHEADER)
+	@echo timestamp > $(srcdir)/stamp-h.in 2> /dev/null
+
+mostlyclean-hdr:
+
+clean-hdr:
+
+distclean-hdr:
+	-rm -f newlib.h
+
+maintainer-clean-hdr:
 
 mostlyclean-toollibLIBRARIES:
 
@@ -495,7 +524,7 @@ ID: $(HEADERS) $(SOURCES) $(LISP)
 	here=`pwd` && cd $(srcdir) \
 	  && mkid -f$$here/ID $$unique $(LISP)
 
-TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) $(LISP)
+TAGS: tags-recursive $(HEADERS) $(SOURCES) newlib.hin $(TAGS_DEPENDENCIES) $(LISP)
 	tags=; \
 	here=`pwd`; \
 	list='$(SUBDIRS)'; for subdir in $$list; do \
@@ -507,8 +536,8 @@ TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) $(LISP)
 	unique=`for i in $$list; do echo $$i; done | \
 	  awk '    { files[$$0] = 1; } \
 	       END { for (i in files) print i; }'`; \
-	test -z "$(ETAGS_ARGS)$$unique$(LISP)$$tags" \
-	  || (cd $(srcdir) && etags $(ETAGS_ARGS) $$tags  $$unique $(LISP) -o $$here/TAGS)
+	test -z "$(ETAGS_ARGS)newlib.hin$$unique$(LISP)$$tags" \
+	  || (cd $(srcdir) && etags $(ETAGS_ARGS) $$tags newlib.hin $$unique $(LISP) -o $$here/TAGS)
 
 mostlyclean-tags:
 
@@ -592,6 +621,9 @@ installcheck-am:
 installcheck: installcheck-recursive
 install-info-am: 
 install-info: install-info-recursive
+all-recursive-am: newlib.h
+	$(MAKE) $(AM_MAKEFLAGS) all-recursive
+
 install-exec-am:
 install-exec: install-exec-recursive
 
@@ -605,8 +637,8 @@ install: install-recursive
 uninstall-am: uninstall-toollibLIBRARIES uninstall-toollibLTLIBRARIES \
 		uninstall-toollibDATA
 uninstall: uninstall-recursive
-all-am: Makefile $(LIBRARIES) $(LTLIBRARIES) $(DATA)
-all-redirect: all-recursive
+all-am: Makefile $(LIBRARIES) $(LTLIBRARIES) $(DATA) newlib.h
+all-redirect: all-recursive-am
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
 installdirs: installdirs-recursive
@@ -625,27 +657,30 @@ distclean-generic:
 	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
 
 maintainer-clean-generic:
-mostlyclean-am:  mostlyclean-toollibLIBRARIES mostlyclean-compile \
-		mostlyclean-libtool mostlyclean-toollibLTLIBRARIES \
-		mostlyclean-tags mostlyclean-generic
+mostlyclean-am:  mostlyclean-hdr mostlyclean-toollibLIBRARIES \
+		mostlyclean-compile mostlyclean-libtool \
+		mostlyclean-toollibLTLIBRARIES mostlyclean-tags \
+		mostlyclean-generic
 
 mostlyclean: mostlyclean-recursive
 
-clean-am:  clean-toollibLIBRARIES clean-compile clean-libtool \
+clean-am:  clean-hdr clean-toollibLIBRARIES clean-compile clean-libtool \
 		clean-toollibLTLIBRARIES clean-tags clean-generic \
 		mostlyclean-am
 
 clean: clean-recursive
 
-distclean-am:  distclean-toollibLIBRARIES distclean-compile \
-		distclean-libtool distclean-toollibLTLIBRARIES \
-		distclean-tags distclean-generic clean-am
+distclean-am:  distclean-hdr distclean-toollibLIBRARIES \
+		distclean-compile distclean-libtool \
+		distclean-toollibLTLIBRARIES distclean-tags \
+		distclean-generic clean-am
 	-rm -f libtool
 
 distclean: distclean-recursive
 	-rm -f config.status
 
-maintainer-clean-am:  maintainer-clean-toollibLIBRARIES \
+maintainer-clean-am:  maintainer-clean-hdr \
+		maintainer-clean-toollibLIBRARIES \
 		maintainer-clean-compile maintainer-clean-libtool \
 		maintainer-clean-toollibLTLIBRARIES \
 		maintainer-clean-tags maintainer-clean-generic \
@@ -656,7 +691,8 @@ maintainer-clean-am:  maintainer-clean-toollibLIBRARIES \
 maintainer-clean: maintainer-clean-recursive
 	-rm -f config.status
 
-.PHONY: mostlyclean-toollibLIBRARIES distclean-toollibLIBRARIES \
+.PHONY: mostlyclean-hdr distclean-hdr clean-hdr maintainer-clean-hdr \
+mostlyclean-toollibLIBRARIES distclean-toollibLIBRARIES \
 clean-toollibLIBRARIES maintainer-clean-toollibLIBRARIES \
 uninstall-toollibLIBRARIES install-toollibLIBRARIES mostlyclean-compile \
 distclean-compile clean-compile maintainer-clean-compile \
@@ -672,9 +708,9 @@ dvi-recursive mostlyclean-recursive distclean-recursive clean-recursive \
 maintainer-clean-recursive tags tags-recursive mostlyclean-tags \
 distclean-tags clean-tags maintainer-clean-tags distdir check-DEJAGNU \
 info-am info dvi-am dvi check check-am installcheck-am installcheck \
-install-info-am install-info install-exec-am install-exec \
-install-data-local install-data-am install-data install-am install \
-uninstall-am uninstall all-redirect all-am all installdirs-am \
+install-info-am install-info all-recursive-am install-exec-am \
+install-exec install-data-local install-data-am install-data install-am \
+install uninstall-am uninstall all-redirect all-am all installdirs-am \
 installdirs mostlyclean-generic distclean-generic clean-generic \
 maintainer-clean-generic clean mostlyclean distclean maintainer-clean
 
@@ -728,6 +764,7 @@ all-recursive: stmp-targ-include
 stmp-targ-include: config.status
 	-rm -rf targ-include stmp-targ-include
 	mkdir targ-include targ-include/sys targ-include/machine
+	cp newlib.h targ-include/newlib.h
 	-for i in $(srcdir)/libc/machine/$(machine_dir)/machine/*.h; do \
 	    if [ -f $$i ]; then \
 	      cp $$i targ-include/machine/`basename $$i`; \
@@ -761,6 +798,7 @@ install-data-local:	install-toollibLIBRARIES
 	$(MULTIDO) $(AM_MAKEFLAGS) DO=install multi-do
 	-if [ -z "$(MULTISUBDIR)" ]; then \
 	  $(mkinstalldirs) $(DESTDIR)$(tooldir)/include; \
+	  $(INSTALL_DATA) newlib.h $(DESTDIR)$(tooldir)/include/newlib.h; \
 	  for i in $(srcdir)/libc/include/*.h; do \
 	   $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/`basename $$i`; \
 	  done; \
