@@ -522,7 +522,7 @@ fdsock (int &fd, const char *name, SOCKET soc)
     debug_printf ("not setting socket inheritance since winsock2_active %d",
 		  winsock2_active);
   fhandler_socket *fh = (fhandler_socket *)
-  	cygheap->fdtab.build_fhandler (fd, FH_SOCKET, name, NULL,
+	cygheap->fdtab.build_fhandler (fd, FH_SOCKET, name, NULL,
 				       tolower (name[5]) - 'a');
   if (!fh)
     return NULL;
@@ -775,14 +775,14 @@ cygwin_connect (int fd, const struct sockaddr *name, int namelen)
     {
       bool was_blocking = false;
       if (!fh->is_nonblocking ())
-        {
+	{
 	  int nonblocking = 1;
 	  fh->ioctl (FIONBIO, &nonblocking);
 	  was_blocking = true;
 	}
       res = fh->connect (name, namelen);
       if (was_blocking)
-        {
+	{
 	  if (res == -1 && get_errno () == EINPROGRESS)
 	    {
 	      size_t fds_size = howmany (fd + 1, NFDBITS) * sizeof (fd_mask);
@@ -794,7 +794,7 @@ cygwin_connect (int fd, const struct sockaddr *name, int namelen)
 	      FD_SET (fd, except_fds);
 	      res = cygwin_select (fd + 1, NULL, write_fds, except_fds, NULL);
 	      if (res > 0 && FD_ISSET (fd, except_fds))
-	        {
+		{
 		  res = -1;
 		  for (;;)
 		    {
@@ -803,7 +803,7 @@ cygwin_connect (int fd, const struct sockaddr *name, int namelen)
 		      cygwin_getsockopt (fd, SOL_SOCKET, SO_ERROR,
 					 (void *) &err, &len);
 		      if (err)
-		        {
+			{
 			  set_errno (err);
 			  break;
 			}
@@ -811,9 +811,9 @@ cygwin_connect (int fd, const struct sockaddr *name, int namelen)
 		    }
 		}
 	      else if (res > 0)
-	        res = 0;
+		res = 0;
 	      else
-	        {
+		{
 		  WSASetLastError (WSAEINPROGRESS);
 		  set_winsock_errno ();
 		}
@@ -1304,7 +1304,7 @@ getdomainname (char *domain, size_t len)
 
   /* This is only used by Win95 and NT <=  4.0.
      The registry names are language independent.
-     FIXME: Handle DHCP on Win95. The DhcpDomain(s) may be available 
+     FIXME: Handle DHCP on Win95. The DhcpDomain(s) may be available
      in ..VxD\DHCP\DhcpInfoXX\OptionInfo, RFC 1533 format */
 
   reg_key r (HKEY_LOCAL_MACHINE, KEY_READ,
@@ -2014,7 +2014,7 @@ cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
 	  fh = NULL;
 	  if (newfd >= 0)
 	    fh = fdsock (newfd, "/dev/tcp", fd2s);
-	  if (fh) 
+	  if (fh)
 	    {
 	      *fd2p = newfd;
 	      fh->set_connect_state (CONNECTED);

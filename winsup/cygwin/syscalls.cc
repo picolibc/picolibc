@@ -284,14 +284,14 @@ setsid (void)
     {
       if (myself->ctty >= 0 && fhandler_console::open_fhs <= 0)
 	{
-	  syscall_printf ("open_fhs %d, freeing console",
-			  fhandler_console::open_fhs);
+	  syscall_printf ("freeing console");
 	  FreeConsole ();
 	}
       myself->ctty = -1;
       myself->sid = getpid ();
       myself->pgid = getpid ();
-      syscall_printf ("sid %d, pgid %d, ctty %d", myself->sid, myself->pgid, myself->ctty);
+      syscall_printf ("sid %d, pgid %d, ctty %d, open_fhs %d", myself->sid,
+		      myself->pgid, myself->ctty, fhandler_console::open_fhs);
       return myself->sid;
     }
 
@@ -2105,7 +2105,7 @@ seteuid32 (__uid32_t uid)
       if (usersid != (origpsid = cygheap->user.orig_sid ()))
 	psid2 = usersid;
       if (sec_acl ((PACL) dacl_buf, FALSE, origpsid, psid2))
-        {
+	{
 	  TOKEN_DEFAULT_DACL tdacl;
 	  tdacl.DefaultDacl = (PACL) dacl_buf;
 	  if (!SetTokenInformation (ptok, TokenDefaultDacl,
@@ -2562,7 +2562,7 @@ logout (char *line)
       /* Writing to wtmp must be atomic to prevent mixed up data. */
       char mutex_name[MAX_PATH];
       HANDLE mutex = CreateMutex (NULL, FALSE,
-      				  shared_name (mutex_name, "wtmp_mutex", 0));
+				  shared_name (mutex_name, "wtmp_mutex", 0));
       if (mutex)
 	while (WaitForSingleObject (mutex, INFINITE) == WAIT_ABANDONED)
 	  ;
@@ -2603,11 +2603,11 @@ internal_setutent (bool force_readwrite)
 	 case we try again for reading only unless the process calls
 	 pututline() (==force_readwrite) in which case opening just fails. */
       if (utmp_fd < 0 && !force_readwrite)
-        {
+	{
 	  utmp_fd = open (utmp_file, O_RDONLY | O_BINARY);
 	  if (utmp_fd >= 0)
 	    utmp_readonly = true;
-        }
+	}
     }
   else
     lseek (utmp_fd, 0, SEEK_SET);
@@ -2653,7 +2653,7 @@ getutent ()
     {
       internal_setutent (false);
       if (utmp_fd < 0)
-        return NULL;
+	return NULL;
     }
   if (read (utmp_fd, &utmp_data, sizeof utmp_data) != sizeof utmp_data)
     return NULL;
@@ -2670,7 +2670,7 @@ getutid (struct utmp *id)
     {
       internal_setutent (false);
       if (utmp_fd < 0)
-        return NULL;
+	return NULL;
     }
   while (read (utmp_fd, &utmp_data, sizeof utmp_data) == sizeof utmp_data)
     {
@@ -2707,7 +2707,7 @@ getutline (struct utmp *line)
     {
       internal_setutent (false);
       if (utmp_fd < 0)
-        return NULL;
+	return NULL;
     }
   while (read (utmp_fd, &utmp_data, sizeof utmp_data) == sizeof utmp_data)
     {
@@ -2754,18 +2754,18 @@ extern "C"
 long gethostid(void)
 {
   unsigned data[13] = {0x92895012,
-                       0x10293412,
-                       0x29602018,
-                       0x81928167,
-                       0x34601329,
-                       0x75630198,
-                       0x89860395,
-                       0x62897564,
-                       0x00194362,
-                       0x20548593,
-                       0x96839102,
-                       0x12219854,
-                       0x00290012};
+		       0x10293412,
+		       0x29602018,
+		       0x81928167,
+		       0x34601329,
+		       0x75630198,
+		       0x89860395,
+		       0x62897564,
+		       0x00194362,
+		       0x20548593,
+		       0x96839102,
+		       0x12219854,
+		       0x00290012};
 
   bool has_cpuid = false;
   sigframe thisframe (mainthread);
@@ -2780,12 +2780,12 @@ long gethostid(void)
     {
       debug_printf ("486 processor");
       if (can_set_flag (0x00200000))
-        {
-          debug_printf ("processor supports CPUID instruction");
-          has_cpuid = true;
-        }
+	{
+	  debug_printf ("processor supports CPUID instruction");
+	  has_cpuid = true;
+	}
       else
-        debug_printf ("processor does not support CPUID instruction");
+	debug_printf ("processor does not support CPUID instruction");
     }
   if (has_cpuid)
     {
@@ -2793,22 +2793,22 @@ long gethostid(void)
       cpuid (&maxf, &unused[0], &unused[1], &unused[2], 0);
       maxf &= 0xffff;
       if (maxf >= 1)
-        {
-          unsigned features;
-          cpuid (&data[0], &unused[0], &unused[1], &features, 1);
-          if (features & (1 << 18))
-            {
-              debug_printf ("processor has psn");
-              if (maxf >= 3)
-                {
-                  cpuid (&unused[0], &unused[1], &data[1], &data[2], 3);
-                  debug_printf ("Processor PSN: %04x-%04x-%04x-%04x-%04x-%04x",
-                                data[0] >> 16, data[0] & 0xffff, data[2] >> 16, data[2] & 0xffff, data[1] >> 16, data[1] & 0xffff);
-                }
-            }
-          else
-            debug_printf ("processor does not have psn");
-        }
+	{
+	  unsigned features;
+	  cpuid (&data[0], &unused[0], &unused[1], &features, 1);
+	  if (features & (1 << 18))
+	    {
+	      debug_printf ("processor has psn");
+	      if (maxf >= 3)
+		{
+		  cpuid (&unused[0], &unused[1], &data[1], &data[2], 3);
+		  debug_printf ("Processor PSN: %04x-%04x-%04x-%04x-%04x-%04x",
+				data[0] >> 16, data[0] & 0xffff, data[2] >> 16, data[2] & 0xffff, data[1] >> 16, data[1] & 0xffff);
+		}
+	    }
+	  else
+	    debug_printf ("processor does not have psn");
+	}
     }
 
   UUID Uuid;
@@ -2822,8 +2822,8 @@ long gethostid(void)
       // Unfortunately Windows will sometimes pick a virtual Ethernet card
       // e.g. VMWare Virtual Ethernet Adaptor
       debug_printf ("MAC address of first Ethernet card: %02x:%02x:%02x:%02x:%02x:%02x",
-                    Uuid.Data4[2], Uuid.Data4[3], Uuid.Data4[4],
-                    Uuid.Data4[5], Uuid.Data4[6], Uuid.Data4[7]);
+		    Uuid.Data4[2], Uuid.Data4[3], Uuid.Data4[4],
+		    Uuid.Data4[5], Uuid.Data4[6], Uuid.Data4[7]);
     }
   else
     {
@@ -2839,16 +2839,16 @@ long gethostid(void)
     GetDiskFreeSpace ("C:\\", NULL, NULL, NULL, (DWORD *)&data[11]);
 
   debug_printf ("hostid entropy: %08x %08x %08x %08x "
-                                "%08x %08x %08x %08x "
-                                "%08x %08x %08x %08x "
-                                "%08x",
-                                data[0], data[1],
-                                data[2], data[3],
-                                data[4], data[5],
-                                data[6], data[7],
-                                data[8], data[9],
-                                data[10], data[11],
-                                data[12]);
+				"%08x %08x %08x %08x "
+				"%08x %08x %08x %08x "
+				"%08x",
+				data[0], data[1],
+				data[2], data[3],
+				data[4], data[5],
+				data[6], data[7],
+				data[8], data[9],
+				data[10], data[11],
+				data[12]);
 
   long hostid = 0x40291372;
   // a random hashing algorithm

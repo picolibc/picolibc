@@ -122,7 +122,7 @@ fhandler_disk_file::fstat_by_name (struct __stat64 *buf, path_conv *pc)
       FILETIME ft = {};
       res = fstat_helper (buf, pc, ft, ft, ft, 0, 0);
     }
-  else 
+  else
     {
       debug_printf ("FindFirstFile failed for '%s', %E", (char *) *pc);
       __seterrno ();
@@ -226,7 +226,7 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
       /* Although the documentation indicates otherwise, it seems like
 	 "inodes" on these devices are persistent, at least across reboots. */
       buf->st_ino = (((__ino64_t) nFileIndexHigh) << 32)
-                    | (__ino64_t) nFileIndexLow;
+		    | (__ino64_t) nFileIndexLow;
       break;
     default:
       /* Either the nFileIndex* fields are unreliable or unavailable.  Use the

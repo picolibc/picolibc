@@ -1,3 +1,18 @@
+2003-07-26  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (ctrl_c_handler): Send SIGHUP when events occur only if
+	there is a tty associated with the process.  Send SIGHUP on
+	CTRL_LOGOFF_EVENT.
+
+	* fhandler_tty.cc (fhandler_tty_slave::open): Adjust console open
+	handle counter regardless of whether this is a pty or tty.
+	(fhandler_tty_slave::open): Ditto.
+	(fhandler_tty_slave::dup): Ditto.
+	(fhandler_tty_common::set_close_on_exec): Ditto.
+	(fhandler_tty_master::init_console): Decrement console open handle
+	counter after init since it will now be handled by all tty open.
+	* syscalls.cc (setsid): Rework debugging output slightly.
+
 2003-07-25  Christopher Faylor  <cgf@redhat.com>
 
 	* configure.in: Use 'install-sh -c'.
@@ -42,7 +57,7 @@
 
 	* security.cc (verify_token): Fix white space and style.
 	Use type bool instead of BOOL and char. Use alloca
-	instead of malloc and free for my_grps. 
+	instead of malloc and free for my_grps.
 
 2003-07-17  Corinna Vinschen  <corinna@vinschen.de>
 

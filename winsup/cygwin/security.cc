@@ -757,7 +757,7 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, BOOL *pintern)
     debug_printf ("GetTokenInformation(my_token, TokenGroups): %E");
   else if (!groups.issetgroups ()) /* setgroups was never called */
     ret = sid_in_token_groups (my_grps, groups.pgsid)
-          || groups.pgsid == usersid;
+	  || groups.pgsid == usersid;
   else /* setgroups was called */
     {
       struct __group32 *gr;
@@ -1430,15 +1430,15 @@ get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
       psd = (PSECURITY_DESCRIPTOR) & sd_buf[0];
       DWORD len = sizeof (sd_buf);
       if (ERROR_SUCCESS != RegGetKeySecurity ((HKEY) handle,
-                                              DACL_SECURITY_INFORMATION |
-                                              GROUP_SECURITY_INFORMATION |
-                                              OWNER_SECURITY_INFORMATION,
-                                              psd, &len))
-        {
-          __seterrno ();
-          debug_printf ("RegGetKeySecurity %E");
-          psd = NULL;
-        }
+					      DACL_SECURITY_INFORMATION |
+					      GROUP_SECURITY_INFORMATION |
+					      OWNER_SECURITY_INFORMATION,
+					      psd, &len))
+	{
+	  __seterrno ();
+	  debug_printf ("RegGetKeySecurity %E");
+	  psd = NULL;
+	}
       }
   else
     {
@@ -1447,7 +1447,7 @@ get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
 					    GROUP_SECURITY_INFORMATION |
 					    OWNER_SECURITY_INFORMATION,
 					    NULL, NULL, NULL, NULL, &psd))
-        {
+	{
 	  __seterrno ();
 	  debug_printf ("GetSecurityInfo %E");
 	  psd = NULL;

@@ -1391,7 +1391,7 @@ static char special_chars[] =
     "I"    "J"    "K"    "L"    "M"    "N"    "O"    "P"
     "Q"    "R"    "S"    "T"    "U"    "V"    "W"    "X"
     "Y"    "Z";
-static char special_introducers[] = 
+static char special_introducers[] =
     "anpcl";
 
 static char
@@ -1434,7 +1434,7 @@ special_name (const char *s, int inc = 1)
 }
 
 bool
-fnunmunge (char *dst, const char *src) 
+fnunmunge (char *dst, const char *src)
 {
   bool converted = false;
   char c;

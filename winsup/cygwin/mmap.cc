@@ -332,7 +332,7 @@ list::match (caddr_t addr, DWORD len, caddr_t &m_addr, DWORD &m_len,
   for (int i = start + 1; i < nrecs; ++i)
     {
       low = (addr >= recs[i].get_address ()) ? addr : recs[i].get_address ();
-      high = recs[i].get_address () 
+      high = recs[i].get_address ()
 	     + (PAGE_CNT (recs[i].get_size ()) * getpagesize ());
       high = (addr + len < high) ? addr + len : high;
       if (low < high)
@@ -565,7 +565,7 @@ mmap64 (caddr_t addr, size_t len, int prot, int flags, int fd, _off64_t off)
      The offset is re-added when evaluating the return value. */
   if (base)
     base -= off - gran_off;
-  
+
   HANDLE h = fh->mmap (&base, gran_len, access, flags, gran_off);
 
   if (h == INVALID_HANDLE_VALUE)
@@ -843,7 +843,7 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, DWORD access,
   if (!base && !(flags & MAP_FIXED))
     base = MapViewOfFileEx (h, access, high, low, len, NULL);
   debug_printf ("%x = MapViewOfFileEx (h:%x, access:%x, 0, off:%D, "
-  		"len:%u, addr:%x)", base, h, access, off, len, *addr);
+		"len:%u, addr:%x)", base, h, access, off, len, *addr);
   if (!base || ((flags & MAP_FIXED) && base != *addr))
     {
       if (!base)
