@@ -54,7 +54,7 @@ static char **lastenviron;
    CreateProcess.  HOME is here because most shells use it and would be
    confused by Windows style path names.  */
 static int return_MAX_PATH (const char *) {return CYG_MAX_PATH;}
-static NO_COPY win_env conv_envvars[] =
+static win_env conv_envvars[] =
   {
     {NL ("PATH="), NULL, NULL, cygwin_win32_to_posix_path_list,
      cygwin_posix_to_win32_path_list,

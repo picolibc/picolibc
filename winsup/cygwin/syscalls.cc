@@ -61,6 +61,7 @@ details. */
 #include "pwdgrp.h"
 #include "cpuid.h"
 #include "registry.h"
+#include "environ.h"
 
 #undef _close
 #undef _lseek
@@ -2232,21 +2233,16 @@ chroot (const char *newroot)
 {
   path_conv path (newroot, PC_SYM_FOLLOW | PC_FULL | PC_POSIX);
 
-  int ret;
+  int ret = -1;
   if (path.error)
-    ret = -1;
+    set_errno (path.error);
   else if (!path.exists ())
-    {
-      set_errno (ENOENT);
-      ret = -1;
-    }
+    set_errno (ENOENT);
   else if (!path.isdir ())
-    {
-      set_errno (ENOTDIR);
-      ret = -1;
-    }
+    set_errno (ENOTDIR);
   else
     {
+      getwinenv("PATH="); /* Save the native PATH */
       cygheap->root.set (path.normalized_path, path);
       ret = 0;
     }
