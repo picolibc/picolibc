@@ -1833,34 +1833,34 @@ seteuid (uid_t uid)
 	    if (uid == cygheap->user.orig_uid)
 	      {
 		debug_printf ("RevertToSelf() (uid == orig_uid, token=%d)",
-			      myself->token);
+			      cygheap->user.token);
 		RevertToSelf();
-		if (myself->token != INVALID_HANDLE_VALUE)
-		  myself->impersonated = FALSE;
+		if (cygheap->user.token != INVALID_HANDLE_VALUE)
+		  cygheap->user.impersonated = FALSE;
 	      }
-	    else if (!myself->impersonated)
+	    else if (!cygheap->user.impersonated)
 	      {
 		debug_printf ("Impersonate(uid == %d)", uid);
 		RevertToSelf();
-		if (myself->token != INVALID_HANDLE_VALUE)
-		  if (!ImpersonateLoggedOnUser (myself->token))
+		if (cygheap->user.token != INVALID_HANDLE_VALUE)
+		  if (!ImpersonateLoggedOnUser (cygheap->user.token))
 		    system_printf ("Impersonate(%d) in set(e)uid failed: %E",
-				   myself->token);
+				   cygheap->user.token);
 		  else
-		    myself->impersonated = TRUE;
+		    cygheap->user.impersonated = TRUE;
 	      }
 
 	  cygheap_user user;
 	  /* token is used in internal_getlogin() to determine if
 	     impersonation is active. If so, the token is used for
 	     retrieving user's SID. */
-	  HANDLE token = myself->impersonated ? myself->token
+	  HANDLE token = cygheap->user.impersonated ? cygheap->user.token
 					      : INVALID_HANDLE_VALUE;
 	  struct passwd *pw_cur = getpwnam (internal_getlogin (user, token));
 	  if (pw_cur != pw_new)
 	    {
 	      debug_printf ("Diffs!!! token: %d, cur: %d, new: %d, orig: %d",
-			    myself->token, pw_cur->pw_uid,
+			    cygheap->user.token, pw_cur->pw_uid,
 			    pw_new->pw_uid, cygheap->user.orig_uid);
 	      set_errno (EPERM);
 	      return -1;

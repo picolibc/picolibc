@@ -562,8 +562,8 @@ skip_arg_parsing:
   /* Preallocated buffer for `sec_user' call */
   char sa_buf[1024];
 
-  if (!hToken && myself->token != INVALID_HANDLE_VALUE)
-    hToken = myself->token;
+  if (!hToken && cygheap->user.token != INVALID_HANDLE_VALUE)
+    hToken = cygheap->user.token;
 
   const char *runpath = null_app_name ? NULL : (const char *) real_path;
 
@@ -624,7 +624,8 @@ skip_arg_parsing:
 
       /* Remove impersonation */
       uid_t uid = geteuid();
-      if (myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
+      if (cygheap->user.impersonated
+          && cygheap->user.token != INVALID_HANDLE_VALUE)
 	seteuid (cygheap->user.orig_uid);
 
       /* Load users registry hive. */
@@ -644,7 +645,8 @@ skip_arg_parsing:
       /* Restore impersonation. In case of _P_OVERLAY this isn't
 	 allowed since it would overwrite child data. */
       if (mode != _P_OVERLAY && mode != _P_VFORK
-	  && myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
+	  && cygheap->user.impersonated
+	  && cygheap->user.token != INVALID_HANDLE_VALUE)
 	seteuid (uid);
     }
 
@@ -717,7 +719,7 @@ skip_arg_parsing:
 
   sigproc_printf ("spawned windows pid %d", pi.dwProcessId);
 
-  if (hToken && hToken != myself->token)
+  if (hToken && hToken != cygheap->user.token)
     CloseHandle (hToken);
 
   DWORD res;

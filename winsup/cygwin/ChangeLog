@@ -1,3 +1,17 @@
+Wed Nov 15 21:56:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* cygheap.h: Move `token' and `impersonated' from class _pinfo
+	to class cygheap_user.
+	* pinfo.h: Ditto.
+	* fork.cc (fork_child): Change usage of `token' and `impersonated'
+	accordingly.
+	(fork_parent): Ditto.
+	* security.cc (cygwin_set_impersonation_token): Ditto.
+	* sigproc.cc (proc_subproc): Ditto.
+	* spawn.cc (spawn_guts): Ditto.
+	* syscalls.cc (seteuid): Ditto.
+	* uinfo.cc (uinfo_init): Ditto.
+
 Wed Nov 15  9:59:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* spawn.cc (spawn_guts): Revert patch to ignore chroot settings

@@ -263,8 +263,6 @@ proc_subproc (DWORD what, DWORD val)
       vchild->pgid = myself->pgid;
       vchild->sid = myself->sid;
       vchild->ctty = myself->ctty;
-      vchild->impersonated = myself->impersonated;
-      vchild->token = myself->token;
       vchild->process_state |= PID_INITIALIZING | (myself->process_state & PID_USETTY);
 
       sigproc_printf ("added pid %d to wait list, slot %d, winpid %p, handle %p",

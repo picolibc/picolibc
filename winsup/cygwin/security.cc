@@ -422,12 +422,12 @@ void
 cygwin_set_impersonation_token (const HANDLE hToken)
 {
   debug_printf ("set_impersonation_token (%d)", hToken);
-  if (myself->token != hToken)
+  if (cygheap->user.token != hToken)
     {
-      if (myself->token != INVALID_HANDLE_VALUE)
-	CloseHandle (myself->token);
-      myself->token = hToken;
-      myself->impersonated = FALSE;
+      if (cygheap->user.token != INVALID_HANDLE_VALUE)
+	CloseHandle (cygheap->user.token);
+      cygheap->user.token = hToken;
+      cygheap->user.impersonated = FALSE;
     }
 }
 

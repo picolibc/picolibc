@@ -72,11 +72,6 @@ public:
   int ctty;		/* Control tty */
   bool has_pgid_children;/* True if we've forked or spawned children with our GID. */
 
-  /* token is needed if sexec should be called. It can be set by a call
-     to `set_impersonation_token()'. */
-  HANDLE token;
-  BOOL impersonated;
-
   /* Resources used by process. */
   long start_time;
   struct rusage rusage_self;

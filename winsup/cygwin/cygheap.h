@@ -57,16 +57,20 @@ class cygheap_user {
   /* Extendend user information.
      The information is derived from the internal_getlogin call
      when on a NT system. */
-  char *pname;         /* user's name */
-  char *plogsrv;       /* Logon server, may be FQDN */
-  char *pdomain;       /* Logon domain of the user */
-  PSID  psid;          /* buffer for user's SID */
-
+  char  *pname;         /* user's name */
+  char  *plogsrv;       /* Logon server, may be FQDN */
+  char  *pdomain;       /* Logon domain of the user */
+  PSID   psid;          /* buffer for user's SID */
 public:
   uid_t orig_uid;      /* Remains intact even after impersonation */
   uid_t orig_gid;      /* Ditto */
   uid_t real_uid;      /* Remains intact on seteuid, replaced by setuid */
   gid_t real_gid;      /* Ditto */
+
+  /* token is needed if set(e)uid should be called. It can be set by a call
+     to `set_impersonation_token()'. */
+  HANDLE token;
+  BOOL   impersonated;
 
   cygheap_user () : pname (NULL), plogsrv (NULL), pdomain (NULL), psid (NULL) {}
   ~cygheap_user ();

@@ -234,12 +234,12 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
 
   /* Restore the inheritance state as in parent
      Don't call setuid here! The flags are already set. */
-  if (myself->impersonated)
+  if (cygheap->user.impersonated)
     {
-      debug_printf ("Impersonation of child, token: %d", myself->token);
-      if (myself->token == INVALID_HANDLE_VALUE)
+      debug_printf ("Impersonation of child, token: %d", cygheap->user.token);
+      if (cygheap->user.token == INVALID_HANDLE_VALUE)
 	RevertToSelf (); // probably not needed
-      else if (!ImpersonateLoggedOnUser (myself->token))
+      else if (!ImpersonateLoggedOnUser (cygheap->user.token))
 	system_printf ("Impersonate for forked child failed: %E");
     }
 
@@ -434,7 +434,7 @@ fork_parent (void *stack_here, HANDLE& hParent, dll *&first_dll,
   /* Remove impersonation */
   uid_t uid;
   uid = geteuid();
-  if (myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
+  if (cygheap->user.impersonated && cygheap->user.token != INVALID_HANDLE_VALUE)
     seteuid (cygheap->user.orig_uid);
 
   ch.parent = hParent;
@@ -481,7 +481,8 @@ out:
       ForceCloseHandle(subproc_ready);
       ForceCloseHandle(forker_finished);
       /* Restore impersonation */
-      if (myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
+      if (cygheap->user.impersonated
+          && cygheap->user.token != INVALID_HANDLE_VALUE)
 	seteuid (uid);
       return -1;
     }
@@ -505,7 +506,7 @@ out:
   strcpy(forked->progname, myself->progname);
 
   /* Restore impersonation */
-  if (myself->impersonated && myself->token != INVALID_HANDLE_VALUE)
+  if (cygheap->user.impersonated && cygheap->user.token != INVALID_HANDLE_VALUE)
     seteuid (uid);
 
   ProtectHandle (pi.hThread);
