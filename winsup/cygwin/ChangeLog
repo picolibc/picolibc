@@ -1,3 +1,14 @@
+2003-04-28  Brian Ford  <ford@vss.fsi.com>
+
+	* profil.h (PROFADDR): Prevent overflow when text segments are larger
+	than 256k.
+	* profil.c (profthr_func): Raise thread priority for more accurate
+	sampling.
+
+2003-04-26  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (hash_path_name): Use ino_t as type.
+
 2003-04-26  Christopher Faylor  <cgf@redhat.com>
 
 	* errno.cc (_sys_nerr): Fix compile error erroneously checked in on

@@ -24,7 +24,7 @@ details. */
 
 /* convert an index into an address */
 #define PROFADDR(idx, base, scale)	\
-	((base) + ((((idx) << 16) / (scale)) << 1))
+	((base) + ((((unsigned long long)(idx) << 16) / (scale)) << 1))
 
 /* convert a bin size into a scale */
 #define PROFSCALE(range, bins)		(((bins) << 16) / ((range) >> 1))

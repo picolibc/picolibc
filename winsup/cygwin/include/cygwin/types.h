@@ -90,11 +90,7 @@ typedef __gid16_t gid_t;
 
 #ifndef __ino_t_defined
 #define __ino_t_defined
-#ifdef __CYGWIN_USE_BIG_TYPES1__
 typedef unsigned long long ino_t;
-#else
-typedef unsigned long ino_t;
-#endif
 #endif /*__ino_t_defined*/
 
 #ifndef __BIT_TYPES_DEFINED
