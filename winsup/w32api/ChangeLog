@@ -1,3 +1,27 @@
+2002-10-04  Steven Edwards  <Steven_Ed4153@yahoo.com>
+
+	* lib/ntdll.def (NtAccessCheck, NtAdjustPrivilegesToken,
+	NtCreateKey, NtDeleteKey, NtDeleteValueKey, NtEnumerateKey,
+	NtEnumerateValueKey, NtOpenKey, NtOpenProcessToken,
+	NtOpenThreadToken, NtQueryInformationToken, NtQueryKey,
+	NtQueryValueKey, NtSetSecurityObject, NtSetValueKey,
+	RtlAddAccessAllowedAce, RtlCreateAcl,
+	RtlCreateSecurityDescriptor, RtlCreateUnicodeStringFromAsciiz,
+	RtlGetAce, RtlGetControlSecurityDescriptor,
+	RtlGetDaclSecurityDescriptor,RtlGetGroupSecurityDescriptor,
+	RtlGetOwnerSecurityDescriptor,RtlGetSaclSecurityDescriptor,
+	RtlImpersonateSelf, RtlIsTextUnicode, RtlLargeIntegerAdd,
+	RtlLengthSecurityDescriptor, RtlMakeSelfRelativeSD,  
+	RtlMultiByteToUnicodeN RtlMultiByteToUnicodeSize,
+	RtlOpenCurrentUser, RtlSetDaclSecurityDescriptor,
+	RtlSetGroupSecurityDescriptor, RtlSetOwnerSecurityDescriptor,
+	RtlSetSaclSecurityDescriptor, RtlValidSecurityDescriptor,
+	ZwAccessCheck, ZwAdjustPrivilegesToken, ZwCreateKey,
+	ZwDeleteValueKey, ZwEnumerateKey, ZwEnumerateValueKey,
+	ZwOpenKey, ZwOpenProcessToken, ZwOpenThreadToken,
+	ZwQueryInformationToken, ZwQueryKey, ZwQueryValueKey
+	ZwSetSecurityObject, ZwSetValueKey): Added missing exports.
+
 2002-10-04  "KJK::Hyperion"  <noog@libero.it>
 
 	*include/windef.h (WPARAM): Update typedef.
@@ -15,9 +39,9 @@
 
 2002-09-24  René Møller Fonseca  <fonseca@users.sourceforge.net>
 
-        * include/winbase.h (FindFirstFileEx): Fixed ANSI mode.
-        * include/wingdi.h (PFD_SWAP_LAYER_BUFFERS):Added define.
-        * include/winuser.h (AppendMenu[AW]): Fixed prototypes.
+	* include/winbase.h (FindFirstFileEx): Fixed ANSI mode.
+	* include/wingdi.h (PFD_SWAP_LAYER_BUFFERS):Added define.
+	* include/winuser.h (AppendMenu[AW]): Fixed prototypes.
 
 2002-09-18  Eric R. Krause  <ekrause_98@users.sourceforge.net>
 
@@ -1079,7 +1103,7 @@
 	* include/rpcnsip.h: Ditto.
 	* include/rpcproxy.h: Ditto.
 	* include/windef.h: Ditto.
-									
+
 2002-01-07  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/vfw32.def (LIBRARY): Change to MSVFW32.DLL.
@@ -1121,7 +1145,7 @@
 
 	* include/winsvc.h: Add ChangeServiceConfig2() &
 	QueryServiceConfig2() definition
-    
+	
 2001-12-17  Robert Collins  <rbtcollins@hotmail.com>
 
 	* include/commctrl.h: New typedefs for HDLAYOUT and LPHDLAYOUT based
@@ -1182,11 +1206,11 @@
 
 2001-12-04  Danny Smith  <dannysmith@users.sourceforge.net>
 
-        Cleanup merge between SourceForge and winsup CVS.
-        * include/winbase.h (OSVERSIONINFO[AW], OSVERSIONINFOEX[AW]: Remove 
+	Cleanup merge between SourceForge and winsup CVS.
+	* include/winbase.h (OSVERSIONINFO[AW], OSVERSIONINFOEX[AW]: Remove 
 	definitions.
-        * include/winnt.h (VER_NT*): Remove duplicate defines.
-        (VER_SUITE*): Group with VER_PLATFORM*, VER_NT* defines.
+	* include/winnt.h (VER_NT*): Remove duplicate defines.
+	(VER_SUITE*): Group with VER_PLATFORM*, VER_NT* defines.
 
 2001-12-03  Earnie Boyd  <earnie@users.sf.net>
 
@@ -1814,11 +1838,11 @@ Sun Apr  8 20:48:01 2001  Christopher Faylor <cgf@cygnus.com>
 
 2001-04-08  Michael Soderstrom <ichaelsoderstro@hotmail.com>
 
-        * include/commctrl.h Updated TreeView and ListView defines and macros.
+	* include/commctrl.h Updated TreeView and ListView defines and macros.
 
 2001-04-08  Danny Smith <dannysmith@users.sourceforge.net>
 
-        * include/winuser.h (MB_SERVICE_NOTIFICATION): Correct value for NT4
+	* include/winuser.h (MB_SERVICE_NOTIFICATION): Correct value for NT4
 	and above.
 
 2001-03-30  Earnie Boyd  <earnie@users.sourceforge.net>
@@ -1883,7 +1907,7 @@ Sun Apr  8 20:48:01 2001  Christopher Faylor <cgf@cygnus.com>
 	* include/mswsock.h: New file.
 	* include/ws2tcpip.h: New file.
 	* include/winsock.h (IPPROTO_IGMP): New define.
-	(IPPROTO_GGP): Correct value.		
+	(IPPROTO_GGP): Correct value.
 	(SO_* macros): Remove mswsock defines.
 	(TCP_BSDURGENT): Likewise.
 	(IP_* macros): Add comment warning of WinSock2 incompatibility
