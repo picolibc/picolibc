@@ -1,3 +1,7 @@
+2003-01-20  Christopher Faylor  <cgf@redhat.com>
+
+	* libc/include/sys/unistd.h: Add rresvport declaration for cygwin.
+
 2003-01-18  Nick Clifton  <nickc@redhat.com>
 
 	* libc/include/machine/ieeefp.h : Define __IEEE_BIG_ENDIAN,
