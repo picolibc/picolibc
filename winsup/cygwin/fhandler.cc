@@ -1021,16 +1021,6 @@ fhandler_base::fhandler_base (DWORD devtype, int unit):
   win32_path_name (NULL),
   open_status (0)
 {
-#if 0
-  int bin = __fmode & O_TEXT ? 0 : 1;
-  if (status != FH_DISK && status != FH_CONSOLE)
-    {
-      if (!get_r_binset ())
-	set_r_binary (bin);
-      if (!get_w_binset ())
-	set_w_binary (bin);
-    }
-#endif
 }
 
 /* Normal I/O destructor */

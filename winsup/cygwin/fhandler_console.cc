@@ -1,6 +1,6 @@
 /* fhandler_console.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -713,14 +713,6 @@ fhandler_console::tcflush (int queue)
 int
 fhandler_console::output_tcsetattr (int, struct termios const *t)
 {
-  /* Ignore the optional_actions stuff, since all output is emitted
-     instantly */
-
-#if 0
-  /* Enable/disable LF -> CRLF conversions */
-  set_w_binary ((t->c_oflag & ONLCR) ? 0 : 1);
-#endif
-
   /* All the output bits we can ignore */
 
   DWORD flags = ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT;
@@ -743,8 +735,10 @@ fhandler_console::input_tcsetattr (int, struct termios const *t)
     oflags = 0;
   DWORD flags = 0;
 
+#if 0
   /* Enable/disable LF -> CRLF conversions */
   set_r_binary ((t->c_iflag & INLCR) ? 0 : 1);
+#endif
 
   /* There's some disparity between what we need and what's
      available.  We've got ECHO and ICANON, they've
@@ -818,13 +812,6 @@ fhandler_console::tcgetattr (struct termios *t)
   *t = tc->ti;
 
   t->c_cflag |= CS8;
-
-#if 0
-  if (!get_r_binary ())
-    t->c_iflag |= IGNCR;
-  if (!get_w_binary ())
-    t->c_oflag |= ONLCR;
-#endif
 
   DWORD flags;
 

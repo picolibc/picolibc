@@ -1,5 +1,13 @@
 2002-06-04  Christopher Faylor  <cgf@redhat.com>
 
+	* dtable.cc (handle_to_fn): Attempt to handle "raw" accesses to remote
+	shares.
+	* path.cc (mount_info::conv_to_win32_path): Set flags to binary when
+	mount entry is not found.
+	(mount_info::set_flags_from_win32_path): Ditto.
+
+2002-06-04  Christopher Faylor  <cgf@redhat.com>
+
 	* dtable.cc (handle_to_fn): Correct placement and length of name
 	buffer. (Suggested by Pavel Tsekov)
 

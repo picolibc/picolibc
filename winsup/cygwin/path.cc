@@ -1512,7 +1512,10 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst,
     }
 
   if (i >= nmounts)
-    backslashify (pathbuf, dst, 0);	/* just convert */
+    {
+      backslashify (pathbuf, dst, 0);	/* just convert */
+      set_flags (flags, PATH_BINARY);
+    }
   else
     {
       int n;
@@ -1755,7 +1758,7 @@ mount_info::set_flags_from_win32_path (const char *p)
       if (path_prefix_p (mi.native_path, p, mi.native_pathlen))
 	return mi.flags;
     }
-  return 0;
+  return PATH_BINARY;
 }
 
 /* read_mounts: Given a specific regkey, read mounts from under its

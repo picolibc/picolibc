@@ -718,6 +718,9 @@ handle_to_fn (HANDLE h, char *posix_fn)
 #else
 #define DEVICE_PREFIX "\\device\\"
 #define DEVICE_PREFIX_LEN sizeof(DEVICE_PREFIX) - 1
+#define REMOTE "\\Device\\LanmanRedirector\\"
+#define REMOTE_LEN sizeof (REMOTE) - 1
+
 static char *
 handle_to_fn (HANDLE h, char *posix_fn)
 {
@@ -794,6 +797,13 @@ handle_to_fn (HANDLE h, char *posix_fn)
       memcpy (w32, maxmatchdos, n);
       w32[n] = '\\';
     }
+  else if (strncasematch (w32, REMOTE, REMOTE_LEN))
+    {
+      w32 += REMOTE_LEN - 2;
+      *w32 = '\\';
+      debug_printf ("remote drive");
+    }
+
 
   debug_printf ("derived path '%s'", w32);
   cygwin_conv_to_full_posix_path (w32, posix_fn);
