@@ -992,7 +992,7 @@ set_process_mask (sigset_t newmask)
 int __stdcall
 sig_handle (int sig)
 {
-  int rc = 0;
+  int rc = 1;
 
   sigproc_printf ("signal %d", sig);
 

@@ -1,3 +1,8 @@
+2003-08-22  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (sig_handle): Change so that default signals indicate
+	success.
+
 2003-08-21  Christopher Faylor  <cgf@redhat.com>
 
 	* sigproc.cc (wait_sig): Remove redundant test in do/while.
