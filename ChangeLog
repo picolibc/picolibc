@@ -741,6 +741,11 @@ Tue May  5 18:02:24 1998  Ian Lance Taylor  <ian@cygnus.com>
         * Makefile.in (EXTRA_GCC_FLAGS): Remove backslash at end;
         Solaris `make' causes it to continue to next definition. 
 
+Tue Apr 28 16:24:24 1998  Jason Molenda  (crash@bugshack.cygnus.com)
+
+	* Makefile.in (install-gdbtk): Call this 'install-gdb' so that
+	the right GUI libraries and files are installed along with GDB.
+
 Tue Apr 28 18:11:24 1998  Ian Lance Taylor  <ian@cygnus.com>
 
 	* configure.in: Change alpha to alpha* in several places.
@@ -841,6 +846,10 @@ Thu Mar 26 12:53:20 1998  Tom Tromey  <tromey@cygnus.com>
 	(native_only): Likewise.
 	(noconfigdirs) [various cases]: Likewise.
 	(host_libs): Added intl.
+
+Thu Mar 26 15:00:11 1998  Keith Seitz  <keiths@onions.cygnus.com>
+
+	* configure: Do not disable building gdbtk for cygwin32 hosts.
 
 Wed Mar 25 11:49:12 1998  Jason Molenda  (crash@bugshack.cygnus.com)
 
@@ -1289,6 +1298,11 @@ Thu Sep 18 21:43:23 1997  Alexandre Oliva  <oliva@dcc.unicamp.br>
 	* Makefile.in (bootstrap2, bootstrap3): New targets.
 	(all-bootstrap): Remove outdated and confusing target.
 	(bootstrap, bootstrap2, bootstrap3): Don't pass BOOT_CFLAGS down.
+
+Thu Sep 18 15:37:42 1997  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* configure (tooldir): enable_gdbtk=YES for cygwin32, NO for
+ 	windows.  Consistent with gdb/configure.
 
 
 1997-09-15 02:37  Ulrich Drepper  <drepper@cygnus.com>
@@ -2383,6 +2397,7 @@ Mon Jun 17 16:34:46 1996  Jason Merrill  <jason@yorick.cygnus.com>
 
 Sat Jun 15 17:13:25 1996  Geoffrey Noer <noer@cygnus.com>
 
+	* configure: enable_gdbtk=no for cygwin32-hosted toolchains
 	* configure.in: remove make from disable-if-Can-Cross list
 		enable gdb if ${host} and ${target} are cygwin32
 
@@ -2774,6 +2789,12 @@ Fri Jan 12 15:25:35 1996  Ian Lance Taylor  <ian@cygnus.com>
 
 	* configure.in: Make sure that ${CC} can be used to compile an
 	executable.
+
+Sat Jan  6 07:23:33 1996  Michael Meissner  <meissner@wogglebug.tiac.net>
+
+	* Makefile.in (all-gdb): Depend on $(GDB_TK).
+	* configure (GDB_TK): Set GDB_TK to either "all-tcl all-tk" or
+	nothing depending on whether gdbtk is being built.
 
 Wed Jan  3 17:54:41 1996  Doug Evans  <dje@canuck.cygnus.com>
 
@@ -3372,6 +3393,11 @@ Mon Aug  7 09:21:35 1995  Doug Evans  <dje@canuck.cygnus.com>
 	* configure.in (i386-go32 host): Fix typo (deja-gnu -> dejagnu).
 	(i386-win32 host): Likewise.  Don't build readline.
 
+Sat Aug  5 09:51:49 1995  Fred Fish  <fnf@rtl.cygnus.com>
+
+	* Makefile.in (GDBTK_SUPPORT_DIRS):  Define and pass as part of
+	SUPPORT_FILES to submakes.
+
 Fri Aug  4 13:04:36 1995  Fred Fish  <fnf@cygnus.com>
 
 	* Makefile.in (GDB_SUPPORT_DIRS): Add utils.
@@ -3549,6 +3575,11 @@ Tue Apr 11 18:55:40 1995  Doug Evans  <dje@canuck.cygnus.com>
 
 	* configure.in: Recognize --with-newlib.
 	(sparc-*-sunos4*): Build sim, dejagnu, expect, tcl if cross target.
+
+Mon Apr 10 14:38:20 1995  Jason Molenda (crash@phydeaux.cygnus.com)
+
+	* Makefile.in: move {all,check,install}-gdb from *_MODULES
+	to *_X11_MODULES due to gdbtk needing X include files et al.
 
 Mon Apr 10 11:42:22 1995  Stan Shebs  <shebs@andros.cygnus.com>
 

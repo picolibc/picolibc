@@ -1632,6 +1632,7 @@ configure-target-libiberty: $(ALL_GCC)
 all-target-libiberty: configure-target-libiberty all-gcc all-ld all-target-newlib
 all-target: $(ALL_TARGET_MODULES)
 install-target: $(INSTALL_TARGET_MODULES)
+install-gdb: install-tcl install-tk install-itcl install-tix install-libgui
 ### other supporting targets
 
 MAKEDIRS= \
@@ -1790,9 +1791,10 @@ gnats.tar.bz2: $(DIST_SUPPORT) $(GNATS_SUPPORT_DIRS) gnats
 
 .PHONY: gdb.tar.bz2
 GDB_SUPPORT_DIRS= bfd include libiberty mmalloc opcodes readline sim utils intl
+GDBTK_SUPPORT_DIRS= `if [ -d tcl -a -d tk ] ; then echo tcl tk itcl tix libgui; fi`
 gdb.tar.bz2: $(DIST_SUPPORT) $(GDB_SUPPORT_DIRS) gdb
 	$(MAKE) -f Makefile.in taz TOOL=gdb \
-		SUPPORT_FILES="$(GDB_SUPPORT_DIRS)"
+		SUPPORT_FILES="$(GDB_SUPPORT_DIRS) $(GDBTK_SUPPORT_DIRS)"
 
 .PHONY: newlib.tar.bz2
 NEWLIB_SUPPORT_DIRS=libgloss
