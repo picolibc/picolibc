@@ -1,3 +1,8 @@
+2004-11-12  Bob Wilson  <bob.wilson@acm.org>
+
+	* xtensa-isa-internal.h (xtensa_interface_internal): Add class_id.
+	* xtensa-isa.h (xtensa_interface_class_id): New prototype.
+
 2004-11-08  Inderpreet Singh   <inderpreetb@nioda.hcltech.com>
 	    Vineet Sharma      <vineets@noida.hcltech.com>
 

@@ -131,6 +131,7 @@ typedef struct xtensa_interface_internal_struct
   const char *name;			/* Interface name.  */
   int num_bits;				/* Width of the interface.  */
   uint32 flags;				/* See XTENSA_INTERFACE_* flags.  */
+  int class_id;				/* Class of related interfaces.  */
   char inout;				/* "i" or "o".  */
 } xtensa_interface_internal;
 

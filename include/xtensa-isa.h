@@ -755,6 +755,19 @@ xtensa_interface_inout (xtensa_isa isa, xtensa_interface intf);
 extern int
 xtensa_interface_has_side_effect (xtensa_isa isa, xtensa_interface intf);
 
+
+/* Some interfaces may be related such that accessing one interface
+   has side effects on a set of related interfaces.  The interfaces
+   are partitioned into equivalence classes of related interfaces, and
+   each class is assigned a unique identifier number.  This function
+   returns the class identifier for an interface, or XTENSA_UNDEFINED
+   on error.  These identifiers can be compared to determine if two
+   interfaces are related; the specific values of the identifiers have
+   no particular meaning otherwise.  */
+
+extern int
+xtensa_interface_class_id (xtensa_isa isa, xtensa_interface intf);
+
 
 /* Functional Units.  */
 
