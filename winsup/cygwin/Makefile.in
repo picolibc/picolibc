@@ -114,12 +114,14 @@ RUNTEST = `if [ -f $${srcdir}/../dejagnu/runtest ] ; then \
 RUNTESTFLAGS =
 
 # Parameters used in building the cygwin.dll.
-# We build as new-cygwin.dll and rename at install time to overcome
+# We build as cygwin0.dll and rename at install time to overcome
 # native rebuilding issues (we don't want the build tools to see a partially
 # built cygwin.dll and attempt to use it instead of the old one).
 
 DLL_NAME:=cygwin1.dll
+TEST_DLL_NAME:=cygwin0.dll
 LIB_NAME:=libcygwin.a
+TEST_LIB_NAME:=libcygwin0.a
 DEF_FILE:=cygwin.def
 DLL_ENTRY:=@DLL_ENTRY@
 
@@ -194,7 +196,7 @@ all: all_target $(all_host)
 
 all_target: $(TARGET_LIBS) cygserver.exe
 
-all_host: new-$(LIB_NAME)
+all_host: $(TEST_LIB_NAME)
 
 force:
 
@@ -204,7 +206,7 @@ install: install-libs install-headers install-man install_target \
 uninstall: uninstall-libs uninstall-headers uninstall-man
 
 install-libs: $(TARGET_LIBS)
-	$(INSTALL_DATA) new-$(DLL_NAME) $(bindir)/$(DLL_NAME); \
+	$(INSTALL_DATA) $(TEST_DLL_NAME) $(bindir)/$(DLL_NAME); \
 	for i in $^; do \
 	    $(INSTALL_DATA) $$i $(tooldir)/lib/`basename $$i` ; \
 	done
@@ -279,26 +281,25 @@ maintainer-clean realclean: clean
 
 
 # Rule to build cygwin.dll
-new-$(DLL_NAME): $(LDSCRIPT) $(DLL_OFILES) $(DEF_FILE) $(DLL_IMPORTS) $(LIBC) $(LIBM) $(API_VER) Makefile winver_stamp
+$(TEST_DLL_NAME): $(LDSCRIPT) $(DLL_OFILES) $(DEF_FILE) $(DLL_IMPORTS) $(LIBC) $(LIBM) $(API_VER) Makefile winver_stamp
 	$(CXX) $(CXXFLAGS) -nostdlib -Wl,-T$(firstword $^) -Wl,--out-implib,cygdll.a -shared -o $@ \
 	-e $(DLL_ENTRY) $(DEF_FILE) $(DLL_OFILES) version.o winver.o \
 	$(MALLOC_OBJ) $(LIBM) $(LIBC) \
 	-lgcc $(DLL_IMPORTS)
+	@ln -f $@ new-$(DLL_NAME)
 
 # Rule to build libcygwin.a
-$(LIB_NAME): rmsym newsym new-$(DLL_NAME) $(LIBCOS)
+$(LIB_NAME): rmsym newsym $(TEST_DLL_NAME) $(LIBCOS)
 	/bin/sh ${word 1,$^} ./cygdll.a "$(NM)" "$(AR)" "$(RANLIB)" $(OBSOLETE_FUNCTIONS) || exit 0
 	/bin/sh ${word 2,$^} ./cygdll.a "$(AS)" "$(AR)" "$(RANLIB)" $(NEW_FUNCTIONS) || exit 0
 	(echo create $(LIB_NAME); echo addmod $(LIBCOS); echo addlib cygdll.a; echo save) | $(AR) -M
+	$(RANLIB) $@
 
 # Rule to make stub library used by testsuite
 # dependency set to $(LIB_NAME) to accommodate make -j2.
 # Otherwise dlltool gets confused. cgf (11-16-2000)
-new-$(LIB_NAME): $(LIB_NAME)
-	$(DLLTOOL) --as=$(AS) --dllname new-$(DLL_NAME) --def $(DEF_FILE) --output-lib new-templib.a
-	$(AR) rcv new-templib.a $(LIBCOS)
-	mv new-templib.a new-$(LIB_NAME)
-	$(RANLIB) $@
+$(TEST_LIB_NAME): $(LIB_NAME)
+	perl -p -e 'BEGIN{binmode(STDIN); binmode(STDOUT);}; s/cygwin1/cygwin0/g' < $? > $@
 
 dll_ofiles: $(DLL_OFILES)
 
