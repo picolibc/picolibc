@@ -239,15 +239,6 @@ check_and_dup_handle (HANDLE from_process, HANDLE to_process,
 }
 
 void
-client_request::serve (transport_layer_base *conn, class process_cache *cache)
-{
-  system_printf ("*****************************************\n"
-		 "A call to the base client_request class has occurred\n"
-		 "This indicates a mismatch in a virtual function definition somewhere");
-  exit (1);
-}
-
-void
 client_request_attach_tty::serve(transport_layer_base *conn, class process_cache *cache)
 {
   HANDLE from_process_handle = NULL;
@@ -362,6 +353,31 @@ client_request_get_version::serve(transport_layer_base *conn, class process_cach
   version.patch = CYGWIN_SERVER_VERSION_PATCH;
 }
 
+/*
+ * class client_request_invalid
+ *
+ * Used by server_request::process() to handle unrecognised client
+ * requests.  Apart from error reporting (to the log and to the
+ * client), its main purpose is to provide an implementation of the
+ * (pure virtual) serve() method that server_request::process() can
+ * call.
+ */
+
+class client_request_invalid : public client_request
+{
+public:
+  client_request_invalid (const request_header * const hdr)
+    : client_request (CYGSERVER_REQUEST_INVALID, 0)
+  {
+      header.error_code = ENOSYS;
+      system_printf ("invalid request [type = %d]: returning ENOSYS",
+		     hdr->req_id);
+  };
+
+  virtual void serve (transport_layer_base *, class process_cache *)
+  {};
+};
+
 class server_request : public queue_request
 {
   public:
@@ -452,7 +468,7 @@ server_request::process ()
   if (bytes_read != sizeof (struct request_header))
     {
       system_printf ("error reading from connection (%lu)", GetLastError ());
-      goto out;
+      return;
     }
   // verbose: debug_printf ("got header (%ld)", bytes_read);
 
@@ -465,27 +481,28 @@ server_request::process ()
     case CYGSERVER_REQUEST_SHUTDOWN:
       req = new client_request_shutdown (); break;
     case CYGSERVER_REQUEST_SHM_GET:
-     req = new client_request_shm (); break;
+      req = new client_request_shm (); break;
     default:
-      req = new client_request (CYGSERVER_REQUEST_INVALID, 0);
-      req->header.error_code = ENOSYS;
-      system_printf ("Bad client request - returning ENOSYS");
+      req = new client_request_invalid (req_ptr); break;
     }
+
+  assert (req);
 
   if (req->header.cb != req_ptr->cb)
     {
       system_printf ("Mismatch in request buffer sizes");
-      goto out;
+      delete req;
+      return;
     }
 
   if (req->header.cb)
     {
-
       bytes_read = conn->read (req->buffer, req->header.cb);
       if (bytes_read != req->header.cb)
 	{
 	  system_printf ("error reading from connection (%lu)", GetLastError ());
-	  goto out;
+	  delete req;
+	  return;
 	}
       // verbose: debug_printf ("got body (%ld)",bytes_read);
     }
@@ -499,15 +516,14 @@ server_request::process ()
     {
       req->header.error_code = -1;
       system_printf ("error writing to connection (%lu)", GetLastError ());
-      goto out;
+      delete req;
+      return;
     }
 
   // verbose: debug_printf("Sent reply, size (%ld)",bytes_written);
   printf (".");
 
-out:
-  if (req)
-    delete (req);
+  delete (req);
 }
 
 void

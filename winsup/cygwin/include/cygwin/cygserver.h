@@ -89,7 +89,7 @@ public:
   client_request (cygserver_request_code id, ssize_t data_size);
   void send (transport_layer_base *conn);
 #ifndef __INSIDE_CYGWIN__
-  virtual void serve (transport_layer_base *conn, class process_cache *cache);
+  virtual void serve (transport_layer_base *, class process_cache *) = 0;
 #endif
   cygserver_request_code req_id () {return header.req_id;};
   virtual ~client_request();

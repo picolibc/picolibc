@@ -1,5 +1,15 @@
 2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* include/cygwin/cygserver.h (client_request::serve): Make pure
+	virtual.
+	* cygserver.cc (client_request::serve): Remove definition of pure
+	virtual method.
+	(class client_request_invalid): New class.
+	(server_request::process): Use new client_request_invalid
+	class. And remove goto's.
+
+2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* cygserver.cc (class server_request): Add virtual destructor.
 	(server_request_queue::addConnection): New method to replace bad
 	virtual add() method.
