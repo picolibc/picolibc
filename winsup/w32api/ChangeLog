@@ -1,3 +1,14 @@
+2002-06-25  Ken Fitlike  <kenfitlike@hotmail.com>
+
+	* include/commctrl.h: (CBEIF_*): Add defines.
+	(CBEN_*): Add defines and UNICODE mappings
+	(WC_COMBOBOXEX[AW]): Add defines and UNICODE mappings.
+	(CBEMAXSTRLEN): Add define.
+	(COMBOBOXEXITEM[AW]): Add structures and typedefs.
+	(NMCOMBOBOXEX[AW]): Add structures and typedefs.
+	(NMCBEDRAGBEGIN[AW]): Add structure and typedefs.
+	(NMCBEENDEDIT[AW]): Add structure and typedefs.
+
 2002-06-24  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/objidl.h (struct tagPROPVARIANT): Kill obsolete
