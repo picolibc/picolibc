@@ -1,5 +1,10 @@
 2000-12-04  Joel Sherrill <joel@OARcorp.com>
 
+        * libc/include/machine/time.h: RTEMS systems can configure clock
+	tick rate so use sysconf() to ask.
+
+2000-12-04  Joel Sherrill <joel@OARcorp.com>
+
         * libc/include/sys/times.h: Add reference to POSIX standard.
 
 2000-12-04  Joel Sherrill <joel@OARcorp.com>
