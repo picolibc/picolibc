@@ -258,7 +258,7 @@ fhandler_base::set_flags (int flags, int supplied_bin)
 void
 fhandler_base::raw_read (void *ptr, size_t& ulen)
 {
-#define bytes_read ((ssize_t) ulen)
+#define bytes_read ulen
 
   HANDLE h = NULL;	/* grumble */
   int prio = 0;		/* ditto */
@@ -304,13 +304,13 @@ fhandler_base::raw_read (void *ptr, size_t& ulen)
 	  if (openflags & O_DIROPEN)
 	    {
 	      set_errno (EISDIR);
-	      bytes_read = -1;
+	      bytes_read = (size_t) -1;
 	      break;
 	    }
 	default:
 	  syscall_printf ("ReadFile %s failed, %E", unix_path_name);
 	  __seterrno_from_win_error (errcode);
-	  bytes_read = -1;
+	  bytes_read = (size_t) -1;
 	  break;
 	}
     }

@@ -737,7 +737,7 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
 	  if (totalread > 0)
 	    break;
 	  set_sig_errno (EINTR);
-	  (ssize_t) len = -1;
+	  len = (size_t) -1;
 	  return;
 	}
 

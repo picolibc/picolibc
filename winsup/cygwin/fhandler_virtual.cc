@@ -179,18 +179,18 @@ fhandler_virtual::read (void *ptr, size_t& len)
   if (openflags & O_DIROPEN)
     {
       set_errno (EISDIR);
-      (ssize_t) len = -1;
+      len = (size_t) -1;
       return;
     }
   if (!filebuf)
     {
-      (ssize_t) len = 0;
+      len = (size_t) 0;
       return;
     }
   if ((ssize_t) len > filesize - position)
-    (ssize_t) len = filesize - position;
+    len = (size_t) (filesize - position);
   if ((ssize_t) len < 0)
-    (ssize_t) len = 0;
+    len = 0;
   else
     memcpy (ptr, filebuf + position, len);
   position += len;
