@@ -1,3 +1,7 @@
+Tue Sep 12 12:29:29 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Make clean target remove *.d.
+
 Mon Sep 11 13:19:15 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (normalize_posix_path): Correctly deal with a "." parameter.

@@ -167,7 +167,7 @@ install: all $(install_host) $(install_target)
 install_host:
 
 clean:
-	-rm -f *.o *.dll *.a *.exp junk *.base version.cc regexp/*.o winver_stamp *.exe
+	-rm -f *.o *.dll *.a *.exp junk *.base version.cc regexp/*.o winver_stamp *.exe *.d
 
 maintainer-clean realclean: clean
 	@echo "This command is intended for maintainers to use;"
