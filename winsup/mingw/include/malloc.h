@@ -41,20 +41,25 @@
 
 /*
  * The structure used to walk through the heap with _heapwalk.
- * TODO: This is a guess at the internals of this structure.
  */
 typedef	struct _heapinfo
 {
-	void*		ptr;
-	unsigned int	size;
-	int		in_use;
+	int*	_pentry;
+	size_t	_size;
+	int	_useflag;
 } _HEAPINFO;
 
+/* Values for _heapinfo.useflag */
+#define _USEDENTRY 0
+#define _FREEENTRY 1
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
-
+/*
+   The _heap* memory allocation functions are supported on NT
+   but not W9x. On latter, they always set errno to ENOSYS.
+*/
 int	_heapwalk (_HEAPINFO*);
 
 #ifndef	_NO_OLDNAMES
@@ -64,7 +69,11 @@ int	heapwalk (_HEAPINFO*);
 int	_heapchk (void);	/* Verify heap integrety. */
 int	_heapmin (void);	/* Return unused heap to the OS. */
 int	_heapset (unsigned int);
+
 size_t	_msize (void*);
+size_t	_get_sbh_threshold (void); 
+int	_set_sbh_threshold (size_t);
+void *	_expand (void*, size_t); 
 
 #ifdef __cplusplus
 }

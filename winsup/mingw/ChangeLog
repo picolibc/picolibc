@@ -1,3 +1,12 @@
+2002-01-28  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/malloc.h (_heapinfo): Correct structure definition.
+	(_USEDENTRY,_FREEENTRY): Add defines.
+	Add comment on platform support for _heap* functions.
+	(_get_sbh_threshold): Add prototype.
+	(_set_sbh_threshold): Likewise.
+	(_expand): Likewise.
+
 2002-01-25  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* profile/profil.c: Update copyright info.
