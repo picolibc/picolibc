@@ -83,7 +83,7 @@ AC_SUBST(LD)
 AC_PROG_RANLIB
 
 case "${target}" in
-  *-*-elf)
+  *-*-elf | *-*-eabi)
 	objtype=elf-
 	;;
   *-*-coff)

@@ -1,3 +1,8 @@
+2004-01-01  Paul Brook  <paul@codesourcery.com>
+
+	* arm/configure.in: Add *-*-aebi target.
+	* arm/configure: Regenerate.
+
 2004-08-25  Corinna Vinschen  <vinschen@redhat.com>
 
 	* i386/cygmon.ld (.text): Fix alignment.

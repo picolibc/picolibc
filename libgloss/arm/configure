@@ -926,7 +926,7 @@ fi
 
 
 case "${target}" in
-  *-*-elf)
+  *-*-elf | *-*-eabi)
 	objtype=elf-
 	;;
   *-*-coff)
