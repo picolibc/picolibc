@@ -413,7 +413,7 @@ esac
 
 case "${host}" in
   *-*-cygwin*)
-	newlib_cflags="${newlib_cflags} -DHAVE_OPENDIR -DHAVE_RENAME -DSIGNAL_PROVIDED -DWANT_IO_LONG_DBL -DWANT_PRINTF_LONG_LONG -D_COMPILING_NEWLIB -DHAVE_FCNTL -DMALLOC_PROVIDED"
+	newlib_cflags="${newlib_cflags} -DHAVE_OPENDIR -DHAVE_RENAME -DSIGNAL_PROVIDED -DWANT_IO_LONG_DBL -DWANT_PRINTF_LONG_LONG -D_COMPILING_NEWLIB -DHAVE_FCNTL -DMALLOC_PROVIDED -DMB_CAPABLE"
 	syscall_dir=syscalls
 	;;
 # RTEMS supplies its own versions of some routines:
