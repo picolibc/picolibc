@@ -1,3 +1,12 @@
+2002-09-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (DLL_OFILES): Drop shortcut.o.
+	* path.cc: Move all shortcut functions from shortcut.c to here.
+	(check_shortcut): Implement without using COM interface.
+	* path.h: Move definition of SHORTCUT_HDR_SIZE to here.
+	* shortcut.c: Remove.
+	* shortcut.h: Ditto.
+
 2002-09-03  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* fhandler.h (fhandler_socket::read): Remove method.

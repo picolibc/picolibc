@@ -74,7 +74,6 @@ details. */
 #include "shared_info.h"
 #include "registry.h"
 #include <assert.h>
-#include "shortcut.h"
 
 #ifdef _MT_SAFE
 #define iteration _reent_winsup ()->_iteration
@@ -104,6 +103,26 @@ struct symlink_info
 };
 
 int pcheck_case = PCHECK_RELAXED; /* Determines the case check behaviour. */
+
+static char shortcut_header[SHORTCUT_HDR_SIZE];
+static BOOL shortcut_initalized;
+
+static void
+create_shortcut_header (void)
+{
+  if (!shortcut_initalized)
+    {
+      shortcut_header[0] = 'L';
+      shortcut_header[4] = '\001';
+      shortcut_header[5] = '\024';
+      shortcut_header[6] = '\002';
+      shortcut_header[12] = '\300';
+      shortcut_header[19] = 'F';
+      shortcut_header[20] = '\f';
+      shortcut_header[60] = '\001';
+      shortcut_initalized = TRUE;
+    }
+}
 
 #define CYGWIN_REGNAME (cygheap->cygwin_regname ?: CYGWIN_INFO_CYGWIN_REGISTRY_NAME)
 
@@ -2695,6 +2714,68 @@ done:
   syscall_printf ("%d = symlink (%s, %s)", res, topath, frompath);
   return res;
 }
+
+static BOOL
+cmp_shortcut_header (const char *file_header)
+{
+  create_shortcut_header ();
+  return memcmp (shortcut_header, file_header, SHORTCUT_HDR_SIZE);
+}
+
+static int
+check_shortcut (const char *path, DWORD fileattr, HANDLE h,
+		char *contents, int *error, unsigned *pflags)
+{
+  char file_header[SHORTCUT_HDR_SIZE];
+  unsigned short len;
+  int res = 0;
+  DWORD got = 0;
+
+  /* Valid Cygwin & U/WIN shortcuts are R/O. */
+  if (!(fileattr & FILE_ATTRIBUTE_READONLY))
+    goto file_not_symlink;
+  /* Read the files header information. This is used to check for a
+     Cygwin or U/WIN shortcut or later to check for executable files. */
+  if (!ReadFile (h, file_header, SHORTCUT_HDR_SIZE, &got, 0))
+    {
+      *error = EIO;
+      goto close_it;
+    }
+  /* Check header if the shortcut is really created by Cygwin or U/WIN. */
+  if (got != SHORTCUT_HDR_SIZE || cmp_shortcut_header (file_header))
+    goto file_not_symlink;
+  /* Next 2 byte are USHORT, containing length of description entry. */
+  if (!ReadFile (h, &len, sizeof len, &got, 0))
+    {
+      *error = EIO;
+      goto close_it;
+    }
+  if (got != sizeof len || len == 0 || len > MAX_PATH)
+    goto file_not_symlink;
+  /* Now read description entry. */
+  if (!ReadFile (h, contents, len, &got, 0))
+    {
+      *error = EIO;
+      goto close_it;
+    }
+  if (got != len)
+    goto file_not_symlink;
+  contents[len] = '\0';
+  res = len;
+  if (res) /* It's a symlink.  */
+    *pflags = PATH_SYMLINK;
+  goto close_it;
+
+file_not_symlink:
+  /* Not a symlink, see if executable.  */
+  if (!(*pflags & PATH_ALL_EXEC) && has_exec_chars (file_header, got))
+    *pflags |= PATH_EXEC;
+
+close_it:
+  CloseHandle (h);
+  return res;
+}
+
 
 static int
 check_sysfile (const char *path, DWORD fileattr, HANDLE h,

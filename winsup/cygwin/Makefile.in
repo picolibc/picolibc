@@ -132,7 +132,7 @@ DLL_OFILES:=assert.o autoload.o cygheap.o cygserver_client.o \
 	malloc_wrapper.o miscfuncs.o mmap.o net.o ntea.o passwd.o path.o \
 	pinfo.o pipe.o poll.o pthread.o regcomp.o regerror.o regexec.o \
 	regfree.o registry.o resource.o scandir.o sched.o sec_acl.o \
-	sec_helper.o security.o select.o shared.o shm.o shortcut.o signal.o \
+	sec_helper.o security.o select.o shared.o shm.o signal.o \
 	sigproc.o smallprint.o spawn.o strace.o strsep.o sync.o syscalls.o \
 	sysconf.o syslog.o termios.o thread.o times.o tty.o uinfo.o uname.o \
 	v8_regexp.o v8_regerror.o v8_regsub.o wait.o wincap.o window.o \

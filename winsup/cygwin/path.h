@@ -170,6 +170,9 @@ class path_conv
 /* Socket marker */
 #define SOCKET_COOKIE  "!<socket >"
 
+/* The sizeof header written to a shortcut by Cygwin or U/WIN. */
+#define SHORTCUT_HDR_SIZE       76
+
 /* Maximum depth of symlinks (after which ELOOP is issued).  */
 #define MAX_LINK_DEPTH 10
 int __stdcall slash_unc_prefix_p (const char *path) __attribute__ ((regparm(1)));
