@@ -118,13 +118,10 @@ strcasestr (const char *searchee, const char *lookfor)
 int __stdcall
 check_null_empty_str (const char *name)
 {
-  if (!name || IsBadStringPtr (name, MAX_PATH))
-    return EFAULT;
+  if (name && !IsBadStringPtr (name, MAX_PATH))
+    return !*name ? ENOENT : 0;
 
-  if (!*name)
-    return ENOENT;
-
-  return 0;
+  return EFAULT;
 }
 
 int __stdcall
@@ -139,26 +136,25 @@ check_null_empty_str_errno (const char *name)
 int __stdcall
 __check_null_invalid_struct (const void *s, unsigned sz)
 {
-  if (!s || IsBadWritePtr ((void *) s, sz))
-    return EFAULT;
+  if (s && !IsBadWritePtr ((void *) s, sz))
+    return 0;
 
-  return 0;
+  return EFAULT;
 }
 
 int __stdcall
 __check_null_invalid_struct_errno (const void *s, unsigned sz)
 {
-  int __err;
-  if ((__err = __check_null_invalid_struct (s, sz)))
-    set_errno (__err);
-  return __err;
+  int err;
+  if ((err = __check_null_invalid_struct (s, sz)))
+    set_errno (err);
+  return err;
 }
 
 int __stdcall
 __check_invalid_read_ptr_errno (const void *s, unsigned sz)
 {
-  if (!s || IsBadReadPtr ((void *) s, sz))
-    return set_errno (EFAULT);
-
-  return 0;
+  if (s && !IsBadReadPtr ((void *) s, sz))
+    return 0;
+  return set_errno (EFAULT);
 }

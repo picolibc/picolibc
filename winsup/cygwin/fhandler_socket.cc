@@ -247,7 +247,7 @@ fhandler_socket::fstat (struct stat *buf, path_conv *pc)
   return fh.fstat (buf, pc);
 }
 
-int
+int __stdcall
 fhandler_socket::read (void *ptr, size_t len)
 {
   sigframe thisframe (mainthread);

@@ -619,7 +619,7 @@ fhandler_tty_slave::write (const void *ptr, size_t len)
   return towrite;
 }
 
-int
+int __stdcall
 fhandler_tty_slave::read (void *ptr, size_t len)
 {
   DWORD n;
@@ -1032,7 +1032,7 @@ fhandler_pty_master::write (const void *ptr, size_t len)
   return len;
 }
 
-int
+int __stdcall
 fhandler_pty_master::read (void *ptr, size_t len)
 {
   return process_slave_output ((char *) ptr, len, pktmode);

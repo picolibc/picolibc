@@ -476,7 +476,7 @@ fhandler_dev_dsp::write (const void *ptr, size_t len)
   return len;
 }
 
-int
+int __stdcall
 fhandler_dev_dsp::read (void *ptr, size_t len)
 {
   return len;

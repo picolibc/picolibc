@@ -287,6 +287,9 @@ setsid (void)
 extern "C" ssize_t
 _read (int fd, void *ptr, size_t len)
 {
+  if (len == 0)
+    return 0;
+
   if (__check_null_invalid_struct_errno (ptr, len))
     return -1;
 

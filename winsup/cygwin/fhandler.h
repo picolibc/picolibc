@@ -311,11 +311,11 @@ public:
 
   virtual int open (path_conv * real_path, int flags, mode_t mode = 0);
   virtual int close ();
-  virtual int __stdcall fstat (struct stat *buf, path_conv *) __attribute__ ((regparm (2)));
+  virtual int __stdcall fstat (struct stat *buf, path_conv *) __attribute__ ((regparm (3)));
   virtual int ioctl (unsigned int cmd, void *);
   virtual int fcntl (int cmd, void *);
   virtual char const * ttyname () { return get_name(); }
-  virtual int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (2)));
+  virtual int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   virtual int write (const void *ptr, size_t len);
   virtual off_t lseek (off_t offset, int whence);
   virtual int lock (int, struct flock *);
@@ -395,7 +395,7 @@ public:
   void set_shutdown_write () {FHSETF (SHUTWR);}
 
   int write (const void *ptr, size_t len);
-  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (2)));
+  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   int ioctl (unsigned int cmd, void *);
   int fcntl (int cmd, void *);
   off_t lseek (off_t, int) { return 0; }
@@ -420,7 +420,7 @@ public:
   int check_peer_secret_event (struct sockaddr_in *peer, int *secret = NULL);
   void signal_secret_event ();
   void close_secret_event ();
-  int __stdcall fstat (struct stat *buf, path_conv *) __attribute__ ((regparm (2)));
+  int __stdcall fstat (struct stat *buf, path_conv *) __attribute__ ((regparm (3)));
 };
 
 class fhandler_pipe: public fhandler_base
@@ -437,7 +437,7 @@ public:
   select_record *select_except (select_record *s);
   int ready_for_read (int fd, DWORD howlong, int ignra);
   void set_close_on_exec (int val);
-  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (2)));
+  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   int close ();
   void create_guard (SECURITY_ATTRIBUTES *sa) {guard = CreateMutex (sa, FALSE, NULL);}
   int dup (fhandler_base *child);
@@ -527,7 +527,7 @@ public:
 
   off_t lseek (off_t offset, int whence);
 
-  int __stdcall fstat (struct stat *buf, path_conv *) __attribute__ ((regparm (2)));
+  int __stdcall fstat (struct stat *buf, path_conv *) __attribute__ ((regparm (3)));
 
   int dup (fhandler_base *child);
 
@@ -557,8 +557,8 @@ public:
   int close ();
   int lock (int, struct flock *);
   BOOL is_device () { return FALSE; }
-  int __stdcall fstat (struct stat *buf, path_conv *pc) __attribute__ ((regparm (2)));
-  int __stdcall fstat_helper (struct stat *buf) __attribute__ ((regparm (1)));
+  int __stdcall fstat (struct stat *buf, path_conv *pc) __attribute__ ((regparm (3)));
+  int __stdcall fstat_helper (struct stat *buf) __attribute__ ((regparm (2)));
 
   HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, off_t off);
   int munmap (HANDLE h, caddr_t addr, size_t len);
@@ -748,7 +748,7 @@ public:
 
   int write (const void *ptr, size_t len);
   void doecho (const void *str, DWORD len) { (void) write (str, len); }
-  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (2)));
+  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   int close ();
 
   int tcflush (int);
@@ -819,7 +819,7 @@ public:
 
   int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
-  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (2)));
+  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   void init (HANDLE, DWORD, mode_t);
 
   int tcsetattr (int a, const struct termios *t);
@@ -846,7 +846,7 @@ public:
   int accept_input ();
   int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
-  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (2)));
+  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   int close ();
 
   int tcsetattr (int a, const struct termios *t);
@@ -892,7 +892,7 @@ public:
   fhandler_dev_zero ();
   int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
-  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (2)));
+  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   off_t lseek (off_t offset, int whence);
   int close (void);
 
@@ -915,7 +915,7 @@ public:
   int get_unit () { return unit; }
   int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
-  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (2)));
+  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   off_t lseek (off_t offset, int whence);
   int close (void);
   int dup (fhandler_base *child);
@@ -936,10 +936,10 @@ public:
 
   int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t ulen);
-  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (2)));
+  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   off_t lseek (off_t offset, int whence);
   int close (void);
-  int __stdcall fstat (struct stat *buf, path_conv *) __attribute__ ((regparm (2)));
+  int __stdcall fstat (struct stat *buf, path_conv *) __attribute__ ((regparm (3)));
   int dup (fhandler_base *child);
 
   HANDLE mmap (caddr_t *addr, size_t len, DWORD access, int flags, off_t off);
@@ -958,7 +958,7 @@ public:
   int is_windows (void) { return 1; }
   int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
-  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (2)));
+  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   off_t lseek (off_t offset, int whence);
   int close (void);
 
@@ -983,7 +983,7 @@ public:
   int is_windows (void) { return 1; }
   int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
-  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (2)));
+  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   int ioctl (unsigned int cmd, void *);
   off_t lseek (off_t, int) { return 0; }
   int close (void) { return 0; }
@@ -1010,7 +1010,7 @@ public:
 
   int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
-  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (2)));
+  int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (3)));
   int ioctl (unsigned int cmd, void *);
   off_t lseek (off_t, int);
   int close (void);

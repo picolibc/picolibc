@@ -1,3 +1,19 @@
+2001-10-23  Christopher Faylor  <cgf@redhat.com>
+
+	Ensure that all fhandler_*::read definitions are __stdcall throughout.
+	* fhandler.cc (fhandler_base::set_inheritance): Be more defensive in
+	debugging code.
+	* fhandler.h: Adjust regparms throughout to reflect passing 'this'
+	parameter.
+	* fhandler_console.cc (fhandler_console::read): Remove unneeded test.
+	Only honor "key down" events.
+	* miscfuncs.cc (strcasestr): Reorganize for efficient code use.
+	(check_null_empty_str_errno): Ditto.
+	(__check_null_invalid_struct_errno): Ditto.
+	(__check_invalid_read_ptr_errno): Ditto.
+	* syscalls.cc (_read): Return 0 when length == 0, as per Single UNIX
+	Specification.
+
 2001-10-22  Christopher Faylor  <cgf@redhat.com>
 
 	* debug.cc (set_errno): Return value of errno that was set, just like

@@ -79,7 +79,7 @@ fhandler_windows::write (const void *buf, size_t)
     return SendMessage (ptr->hwnd, ptr->message, ptr->wParam, ptr->lParam);
 }
 
-int
+int __stdcall
 fhandler_windows::read (void *buf, size_t len)
 {
   MSG *ptr = (MSG *) buf;

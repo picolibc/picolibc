@@ -1611,7 +1611,9 @@ fhandler_dev_null::dump (void)
 void
 fhandler_base::set_inheritance (HANDLE &h, int not_inheriting)
 {
+#ifdef DEBUGGING
   HANDLE oh = h;
+#endif
   /* Note that we could use SetHandleInformation here but it is not available
      on all platforms.  Test cases seem to indicate that using DuplicateHandle
      in this fashion does not actually close the original handle, which is
@@ -1621,7 +1623,8 @@ fhandler_base::set_inheritance (HANDLE &h, int not_inheriting)
 			     DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
     debug_printf ("DuplicateHandle failed, %E");
 #ifdef DEBUGGING
-  setclexec_pid (oh, h, not_inheriting);
+  if (h)
+    setclexec_pid (oh, h, not_inheriting);
 #endif
 }
 

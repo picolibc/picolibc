@@ -184,7 +184,7 @@ fhandler_dev_clipboard::write (const void *buf, size_t len)
     }
 }
 
-int
+int __stdcall
 fhandler_dev_clipboard::read (void *ptr, size_t len)
 {
   HGLOBAL hglb;

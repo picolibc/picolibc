@@ -195,12 +195,9 @@ fhandler_console::set_cursor_maybe ()
     }
 }
 
-int
+int __stdcall
 fhandler_console::read (void *pv, size_t buflen)
 {
-  if (!buflen)
-    return 0;
-
   HANDLE h = get_io_handle ();
 
 #define buf ((char *) pv)
@@ -262,6 +259,9 @@ fhandler_console::read (void *pv, size_t buflen)
 #define virtual_key_code (input_rec.Event.KeyEvent.wVirtualKeyCode)
 #define control_key_state (input_rec.Event.KeyEvent.dwControlKeyState)
 
+	  if (!input_rec.Event.KeyEvent.bKeyDown)
+	    continue;
+
 #ifdef DEBUGGING
 	  /* allow manual switching to/from raw mode via ctrl-alt-scrolllock */
 	  if (input_rec.Event.KeyEvent.bKeyDown &&
@@ -310,7 +310,7 @@ fhandler_console::read (void *pv, size_t buflen)
 	      tmp[1] = ich;
 	      /* Need this check since US code page seems to have a bug when
 		 converting a CTRL-U. */
-	      if ((unsigned char)ich > 0x7f)
+	      if ((unsigned char) ich > 0x7f)
 		con_to_str (tmp + 1, tmp + 1, 1);
 	      /* Determine if the keystroke is modified by META.  The tricky
 		 part is to distinguish whether the right Alt key should be
