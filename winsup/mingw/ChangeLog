@@ -1,3 +1,22 @@
+2004-07-25  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/_mingw.h (_MINGW_ATTR_*):  Replace with
+	__MINGW_ATTRIB_*.
+	* include/stdlib.h (_ATTRIB_NORETURN): Replace with
+	__MINGW_ATTRIB_NOREURN, throughout.
+	(malloc): Declare with __MINGW_ATTRIB_MALLOC.
+	(calloc): Likewise.
+	(abs): Declare with __MINGW_ATTRIB_CONST.
+	(labs): Likewise.
+	(div): Likewise.
+	(ldiv): Likewise.
+	(lldiv): Likewise.
+	(_rotl): Likewise.
+	(_rotr): Likewise.
+	(_lrotl): Likewise.
+	(_lrotr): Likewise.
+	* include/setjmp.h (longjmp): Add __MINGW_ATTRIB_NORETURN.
+
 2004-07-21  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/_mingw.h: Undefine __attribute__.

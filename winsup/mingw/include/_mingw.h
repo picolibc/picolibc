@@ -121,19 +121,19 @@
 #endif
 
 #ifdef __GNUC__
-#define __MINGW_ATTR_NORETURN __attribute__ ((__noreturn__))
-#define __MINGW_ATTR_CONST __attribute__ ((__const__))
+#define ___MINGW_ATTRIB_NORETURN __attribute__ ((__noreturn__))
+#define ___MINGW_ATTRIB_CONST __attribute__ ((__const__))
 #else
-#define __MINGW_ATTR_NORETURN
-#define __MINGW_ATTR_CONST
+#define ___MINGW_ATTRIB_NORETURN
+#define ___MINGW_ATTRIB_CONST
 #endif
 
 #if ( __GNUC__ >= 3)
-#define __MINGW_ATTR_MALLOC __attribute__ ((__malloc__))
-#define __MINGW_ATTR_PURE __attribute__ ((__pure__))
+#define ___MINGW_ATTRIB_MALLOC __attribute__ ((__malloc__))
+#define ___MINGW_ATTRIB_PURE __attribute__ ((__pure__))
 #else
-#define __MINGW_ATTR_MALLOC
-#define __MINGW_ATTR_PURE
+#define ___MINGW_ATTRIB_MALLOC
+#define ___MINGW_ATTRIB_PURE
 #endif
 
 #ifndef __MSVCRT_VERSION__

@@ -301,12 +301,6 @@ __MINGW_IMPORT  int _fmode_dll;
 
 #endif /* Not __STRICT_ANSI__ */
 
-#ifdef	__GNUC__
-#define	_ATTRIB_NORETURN	__attribute__ ((noreturn))
-#else	/* Not __GNUC__ */
-#define	_ATTRIB_NORETURN
-#endif	/* __GNUC__ */
-
 _CRTIMP double __cdecl	atof	(const char*);
 _CRTIMP int __cdecl	atoi	(const char*);
 _CRTIMP long __cdecl 	atol	(const char*);
@@ -348,13 +342,13 @@ _CRTIMP int __cdecl	mbtowc		(wchar_t*, const char*, size_t);
 _CRTIMP int __cdecl	rand	(void);
 _CRTIMP void __cdecl	srand	(unsigned int);
 
-_CRTIMP void* __cdecl	calloc	(size_t, size_t);
-_CRTIMP void* __cdecl	malloc	(size_t);
+_CRTIMP void* __cdecl	calloc	(size_t, size_t) ___MINGW_ATTRIB_MALLOC;
+_CRTIMP void* __cdecl	malloc	(size_t) ___MINGW_ATTRIB_MALLOC;
 _CRTIMP void* __cdecl	realloc	(void*, size_t);
 _CRTIMP void __cdecl	free	(void*);
 
-_CRTIMP void __cdecl	abort	(void) _ATTRIB_NORETURN;
-_CRTIMP void __cdecl	exit	(int) _ATTRIB_NORETURN;
+_CRTIMP void __cdecl	abort	(void) ___MINGW_ATTRIB_NORETURN;
+_CRTIMP void __cdecl	exit	(int) ___MINGW_ATTRIB_NORETURN;
 
 /* Note: This is in startup code, not imported directly from dll */
 int __cdecl	atexit	(void (*)(void));
@@ -368,8 +362,8 @@ _CRTIMP void* __cdecl	bsearch	(const void*, const void*, size_t, size_t,
 _CRTIMP void __cdecl	qsort	(void*, size_t, size_t,
 				 int (*)(const void*, const void*));
 
-_CRTIMP int __cdecl	abs	(int);
-_CRTIMP long __cdecl	labs	(long);
+_CRTIMP int __cdecl	abs	(int) ___MINGW_ATTRIB_CONST;
+_CRTIMP long __cdecl	labs	(long) ___MINGW_ATTRIB_CONST;
 
 /*
  * div_t and ldiv_t are structures used to return the results of div and
@@ -382,8 +376,8 @@ _CRTIMP long __cdecl	labs	(long);
 typedef struct { int quot, rem; } div_t;
 typedef struct { long quot, rem; } ldiv_t;
 
-_CRTIMP div_t __cdecl	div	(int, int);
-_CRTIMP ldiv_t __cdecl	ldiv	(long, long);
+_CRTIMP div_t __cdecl	div	(int, int) ___MINGW_ATTRIB_CONST;
+_CRTIMP ldiv_t __cdecl	ldiv	(long, long) ___MINGW_ATTRIB_CONST;
 
 #if !defined (__STRICT_ANSI__)
 
@@ -395,7 +389,7 @@ _CRTIMP void __cdecl	_beep (unsigned int, unsigned int);
 _CRTIMP void __cdecl	_seterrormode (int);
 _CRTIMP void __cdecl	_sleep (unsigned long);
 
-_CRTIMP void __cdecl	_exit	(int) _ATTRIB_NORETURN;
+_CRTIMP void __cdecl	_exit	(int) ___MINGW_ATTRIB_NORETURN;
 
 /* _onexit is MS extension. Use atexit for portability.  */
 /* Note: This is in startup code, not imported directly from dll */
@@ -436,10 +430,10 @@ _CRTIMP void __cdecl    _wmakepath(wchar_t*, const wchar_t*, const wchar_t*, con
 _CRTIMP void __cdecl	_wsplitpath (const wchar_t*, wchar_t*, wchar_t*, wchar_t*, wchar_t*);
 _CRTIMP wchar_t* __cdecl    _wfullpath (wchar_t*, const wchar_t*, size_t);
 
-_CRTIMP unsigned int __cdecl _rotl(unsigned int, int);
-_CRTIMP unsigned int __cdecl _rotr(unsigned int, int);
-_CRTIMP unsigned long __cdecl _lrotl(unsigned long, int);
-_CRTIMP unsigned long __cdecl _lrotr(unsigned long, int);
+_CRTIMP unsigned int __cdecl _rotl(unsigned int, int) ___MINGW_ATTRIB_CONST;
+_CRTIMP unsigned int __cdecl _rotr(unsigned int, int) ___MINGW_ATTRIB_CONST;
+_CRTIMP unsigned long __cdecl _lrotl(unsigned long, int) ___MINGW_ATTRIB_CONST;
+_CRTIMP unsigned long __cdecl _lrotr(unsigned long, int) ___MINGW_ATTRIB_CONST;
 #endif
 
 #ifndef	_NO_OLDNAMES
@@ -464,7 +458,7 @@ _CRTIMP char* __cdecl	gcvt (double, int, char*);
 #if !defined __NO_ISOCEXT /* externs in static libmingwex.a */
 
 /* C99 name for _exit */
-void __cdecl _Exit(int) _ATTRIB_NORETURN;
+void __cdecl _Exit(int) ___MINGW_ATTRIB_NORETURN;
 #ifndef __STRICT_ANSI__   /* inline using non-ansi functions */
 __CRT_INLINE void __cdecl _Exit(int status)
 	{  _exit(status); }
@@ -472,7 +466,7 @@ __CRT_INLINE void __cdecl _Exit(int status)
 
 typedef struct { long long quot, rem; } lldiv_t;
 
-lldiv_t	__cdecl lldiv (long long, long long);
+lldiv_t	__cdecl lldiv (long long, long long) ___MINGW_ATTRIB_CONST;
 
 __CRT_INLINE long long __cdecl llabs(long long _j)
   {return (_j >= 0 ? _j : -_j);}
@@ -509,10 +503,6 @@ __CRT_INLINE wchar_t*  __cdecl ulltow (unsigned long long _n, wchar_t * _w, int 
 
 #endif /* !__NO_ISOCEXT */
 
-/*
- * Undefine the no return attribute used in some function definitions
- */
-#undef	_ATTRIB_NORETURN
 
 #ifdef __cplusplus
 }
