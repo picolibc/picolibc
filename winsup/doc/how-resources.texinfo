@@ -86,9 +86,9 @@ is @emph{"it"}?)
 Directory install?  If the former, exactly when and from what mirror?
 If the latter, which packages did you download?  Which version of
 setup.exe?  Any subsequent updates?)
-@item Details about your Cygwin setup, accomplished by @emph{pasting}
-the output of 'cygcheck -s -v -r' into your message.  (Do not send the
-output as a file attachment.)
+@item Details about your Cygwin setup, accomplished by @emph{attaching}
+the output of 'cygcheck -s -v -r' to your message.  (Do not paste the
+output into your message.)
 @item A valid return address, so that a reply doesn't require manual editing of
 the 'To:' header.
 @end itemize
