@@ -1,3 +1,9 @@
+2003-01-24  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/ras.h (RASCONN[AW]): Guard szDeviceType,
+	szDeviceName fields with (WINVER >= 0x400). Add dwFlags, luid
+	fields for (WINVER >= 0x501).
+
 2003-01-23  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* lib/ws2_32.def (getaddrinfo, freeaddrinfo and getnameinfo):

@@ -222,8 +222,10 @@ typedef struct tagRASCONNW {
     DWORD dwSize;
     HRASCONN hrasconn;
     WCHAR szEntryName[RAS_MaxEntryName + 1];
+#if (WINVER >= 0x400) 
     WCHAR szDeviceType[RAS_MaxDeviceType + 1];
     WCHAR szDeviceName[RAS_MaxDeviceName + 1];
+#endif
 #if (WINVER >= 0x401)
     WCHAR szPhonebook[MAX_PATH];
     DWORD dwSubEntry;
@@ -231,20 +233,30 @@ typedef struct tagRASCONNW {
 #if (WINVER >= 0x500)
     GUID guidEntry;
 #endif
+#if (WINVER >= 0x501)
+    DWORD dwFlags;
+    LUID luid;
+#endif
 } RASCONNW, *LPRASCONNW;
 
 typedef struct tagRASCONNA {
     DWORD dwSize;
     HRASCONN hrasconn;
     CHAR szEntryName[RAS_MaxEntryName + 1];
+#if (WINVER >= 0x400) 
     CHAR szDeviceType[RAS_MaxDeviceType + 1];
     CHAR szDeviceName[RAS_MaxDeviceName + 1];
+#endif
 #if (WINVER >= 0x401)
     CHAR szPhonebook[MAX_PATH];
     DWORD dwSubEntry;
 #endif
 #if (WINVER >= 0x500)
     GUID guidEntry;
+#endif
+#if (WINVER >= 0x501)
+    DWORD dwFlags;
+    LUID luid;
 #endif
 } RASCONNA, *LPRASCONNA;
 
