@@ -1,3 +1,7 @@
+2004-07-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* spawn.cc (spawn_guts): Check if script is executable.
+
 2004-06-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* times.cc (hires_ms::usecs): Don't overreact.

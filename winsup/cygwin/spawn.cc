@@ -469,6 +469,13 @@ spawn_guts (const char * prog_arg, const char *const *argv,
 
       debug_printf ("%s is a script", (char *) real_path);
 
+      if (real_path.has_acls () && allow_ntsec
+	  && check_file_access (real_path, X_OK))
+	{
+	  debug_printf ("... but not executable");
+	  break;
+	}
+
       char *pgm, *arg1;
 
       if (buf[0] != '#' || buf[1] != '!')
