@@ -1,3 +1,8 @@
+2003-04-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/netinet/ip.h: Include netinet/in_systm.h and netinet/in.h
+	to allow standalone usage (autoconf).
+
 2003-04-23  Christopher Faylor  <cgf@redhat.com>
 
 	* fork.cc: Change SLOW_PID_REUSE to NO_SLOW_PID_REUSE and invert ifdef
