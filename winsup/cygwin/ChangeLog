@@ -1,3 +1,7 @@
+2002-02-06  Alexander Gottwald <Alexander.Gottwald@s1999.tuchemnitz.de>
+
+	* net.cc (get_2k_ifconf): Create interface entries for tokenring cards.
+
 2002-02-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dtable.cc (dtable::dup2): Store fd for fhandler_socket.

@@ -1659,7 +1659,7 @@ static void
 get_2k_ifconf (struct ifconf *ifc, int what)
 {
   int cnt = 0;
-  char eth[2] = "/", ppp[2] = "/", slp[2] = "/", sub[2] = "0";
+  char eth[2] = "/", ppp[2] = "/", slp[2] = "/", sub[2] = "0", tok[2] = "/";
 
   /* Union maps buffer to correct struct */
   struct ifreq *ifr = ifc->ifc_req;
@@ -1692,6 +1692,11 @@ get_2k_ifconf (struct ifconf *ifc, int what)
 		  /* Setup the interface name */
 		  switch (ift->table[if_cnt].dwType)
 		    {
+		      case MIB_IF_TYPE_TOKENRING:
+		        ++*tok;
+			strcpy (ifr->ifr_name, "tok");
+			strcat (ifr->ifr_name, tok);
+			break;
 		      case MIB_IF_TYPE_ETHERNET:
 			if (*sub == '0')
 			  ++*eth;
