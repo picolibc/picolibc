@@ -17,7 +17,7 @@ details. */
 
 int NO_COPY dynamically_loaded;
 static char *search_for = (char *) cygthread::stub;
-unsigned threadfunc_ix __attribute__((section ("cygwin_dll_common"), shared)) = 0;
+unsigned threadfunc_ix[8] __attribute__((section ("cygwin_dll_common"), shared));
 DWORD tls_func;
 
 HANDLE sync_startup;
@@ -45,7 +45,7 @@ calibration_thread (VOID *arg)
 void
 prime_threads ()
 {
-  if (!threadfunc_ix)
+  if (!threadfunc_ix[0])
     {
       DWORD id;
       search_for = (char *) calibration_thread;
@@ -58,32 +58,30 @@ prime_threads ()
 static void
 munge_threadfunc ()
 {
+  int i;
   char **ebp = (char **) __builtin_frame_address (0);
-  if (!threadfunc_ix)
+  if (!threadfunc_ix[0])
     {
-      for (char **peb = ebp; peb < (char **) _tlsbase; peb++)
+      char **peb;
+      char **top = (char **) _tlsbase;
+      for (peb = ebp, i = 0; peb < top && i < 7; peb++)
 	if (*peb == search_for)
-	  {
-	    threadfunc_ix = peb - ebp;
-	    goto foundit;
-	  }
-#ifdef DEBUGGING_HARD
-      system_printf ("non-fatal warning: unknown thread! search_for %p, cygthread::stub %p, calibration_thread %p, possible func offset %p",
-		     search_for, cygthread::stub, calibration_thread, ebp[137]);
-#endif
-      try_to_debug ();
-      return;
+	  threadfunc_ix[i++] = peb - ebp;
+      if (!threadfunc_ix[0])
+	{
+	  try_to_debug ();
+	  return;
+	}
     }
 
-foundit:
-  char *threadfunc = ebp[threadfunc_ix];
+  char *threadfunc = ebp[threadfunc_ix[0]];
   if (threadfunc == (char *) calibration_thread)
     /* no need for the overhead */;
   else
     {
-      ebp[threadfunc_ix] = (char *) threadfunc_fe;
+      for (i = 0; threadfunc_ix[i]; i++)		
+	ebp[threadfunc_ix[i]] = (char *) threadfunc_fe;
       ((char **) _tlsbase)[OLDFUNC_OFFSET] = threadfunc;
-      // TlsSetValue (tls_func, (void *) threadfunc);
     }
 }
 

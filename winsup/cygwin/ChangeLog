@@ -1,3 +1,9 @@
+2004-03-19  Pierre Humblet  <pierre.humblet@ieee.org>
+	    Christopher Faylor  <cgf@redhat.com>
+
+	* init.cc (munge_threadfunc): Handle all instances of search_for.
+	(prime_threads): Test threadfunc_ix[0].
+
 2004-03-21  Christopher Faylor  <cgf@redhat.com>
 
 	* cygheap.cc (init_cheap): Set initial_sz to something or suffer
