@@ -130,30 +130,87 @@ _DEFUN(fread, (buf, size, count, fp),
   total = resid;
   p = buf;
 
-  while (resid > (r = fp->_r))
+#if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
+
+  /* Optimize unbuffered I/O.  */
+  if (fp->_flags & __SNBF)
     {
-      _CAST_VOID memcpy ((_PTR) p, (_PTR) fp->_p, (size_t) r);
-      fp->_p += r;
-      /* fp->_r = 0 ... done in __srefill */
-      p += r;
-      resid -= r;
-      if (__srefill (fp))
+      /* First copy any available characters from ungetc buffer.  */
+      int copy_size = resid > fp->_r ? fp->_r : resid;
+      _CAST_VOID memcpy ((_PTR) p, (_PTR) fp->_p, (size_t) copy_size);
+      fp->_p += copy_size;
+      fp->_r -= copy_size;
+      p += copy_size;
+      resid -= copy_size;
+
+      /* If still more data needed, free any allocated ungetc buffer.  */
+      if (HASUB (fp) && resid > 0)
+	FREEUB (fp);
+
+      /* Finally read directly into user's buffer if needed.  */
+      if (resid > 0)
 	{
-	  /* no more input: return partial result */
+	  int rc = 0;
+	  /* save fp buffering state */
+	  void *old_base = fp->_bf._base;
+	  void * old_p = fp->_p;
+	  int old_size = fp->_bf._size;
+	  /* allow __refill to use user's buffer */
+	  fp->_bf._base = p;
+	  fp->_bf._size = resid;
+	  fp->_p = p;
+	  rc = __srefill (fp);
+	  /* restore fp buffering back to original state */
+	  resid -= fp->_r;
+	  fp->_r = 0;
+	  fp->_bf._base = old_base;
+	  fp->_bf._size = old_size;
+	  fp->_p = old_p;
+	  if (rc)
+	    {
+	      /* no more input: return partial result */
 #ifdef __SCLE
-          if (fp->_flags & __SCLE)
-            {
-              _funlockfile (fp);
-              return crlf (fp, buf, total-resid, 1) / size;
-            }
+	      if (fp->_flags & __SCLE)
+		{
+		  _funlockfile (fp);
+		  return crlf (fp, buf, total-resid, 1) / size;
+		}
 #endif
-          _funlockfile (fp);
-	  return (total - resid) / size;
+	      _funlockfile (fp);
+	      return (total - resid) / size;
+	    }
 	}
     }
-  _CAST_VOID memcpy ((_PTR) p, (_PTR) fp->_p, resid);
-  fp->_r -= resid;
-  fp->_p += resid;
+  else
+#endif /* !PREFER_SIZE_OVER_SPEED && !__OPTIMIZE_SIZE__ */
+    {
+      while (resid > (r = fp->_r))
+	{
+	  _CAST_VOID memcpy ((_PTR) p, (_PTR) fp->_p, (size_t) r);
+	  fp->_p += r;
+	  /* fp->_r = 0 ... done in __srefill */
+	  p += r;
+	  resid -= r;
+	  if (__srefill (fp))
+	    {
+	      /* no more input: return partial result */
+#ifdef __SCLE
+	      if (fp->_flags & __SCLE)
+		{
+		  _funlockfile (fp);
+		  return crlf (fp, buf, total-resid, 1) / size;
+		}
+#endif
+	      _funlockfile (fp);
+	      return (total - resid) / size;
+	    }
+	}
+      _CAST_VOID memcpy ((_PTR) p, (_PTR) fp->_p, resid);
+      fp->_r -= resid;
+      fp->_p += resid;
+    }
+
+  /* Perform any CR/LF clean-up if necessary.  */
 #ifdef __SCLE
   if (fp->_flags & __SCLE)
     {

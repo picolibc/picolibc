@@ -1,3 +1,9 @@
+2004-09-22  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdio/fread.c (fread):  For non-space-optimized case,
+	add special code for unbuffered files to use user buffer and
+	only require one low-level system read.
+
 2004-09-21  Ian Lance Taylor  <ian@wasabisystems.com>
 
 	* libc/machine/xscale/setjmp.S: New file, copied from
