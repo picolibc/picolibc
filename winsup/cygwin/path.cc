@@ -203,10 +203,10 @@ normalize_posix_path (const char *src, char *dst)
 
   syscall_printf ("src %s", src);
 
-  if (isdrive (src))
+  if (isdrive (src) || slash_unc_prefix_p (src))
     {
       int err = normalize_win32_path (src, dst);
-      if (!err && isdrive (dst))
+      if (!err)
 	for (char *p = dst; (p = strchr (p, '\\')); p++)
 	  *p = '/';
       return err;
@@ -1315,9 +1315,7 @@ slash_unc_prefix_p (const char *path)
   char *p = NULL;
   int ret = (isdirsep (path[0])
 	     && isdirsep (path[1])
-	     && isalpha (path[2])
-	     && path[3] != 0
-	     && !isdirsep (path[3])
+	     && isalnum (path[2])
 	     && ((p = strpbrk (path + 3, "\\/")) != NULL));
   if (!ret || p == NULL)
     return ret;

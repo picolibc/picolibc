@@ -1,5 +1,12 @@
 2003-09-11  Christopher Faylor  <cgf@redhat.com>
 
+	* path.cc (normalize_posix_path): Put check for '//' prefix back to
+	denote a UNC path.
+	(slash_unc_prefix_p): Remove vestige of old //c method for accessing
+	drives.
+
+2003-09-11  Christopher Faylor  <cgf@redhat.com>
+
 	* dir.cc (rmdir): Add more samba workarounds.
 
 2003-09-11  Corinna Vinschen  <corinna@vinschen.de>
