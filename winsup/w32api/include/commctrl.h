@@ -1634,6 +1634,9 @@ typedef struct tagTOOLINFOA {
 	RECT rect;
 	HINSTANCE hinst;
 	LPSTR lpszText;
+#if (_WIN32_IE >= 0x0300)
+	LPARAM lParam;
+#endif
 } TOOLINFOA,*PTOOLINFOA,*LPTOOLINFOA;
 typedef struct tagTOOLINFOW {
 	UINT cbSize;
@@ -1643,6 +1646,9 @@ typedef struct tagTOOLINFOW {
 	RECT rect;
 	HINSTANCE hinst;
 	LPWSTR lpszText;
+#if (_WIN32_IE >= 0x0300)
+	LPARAM lParam;
+#endif
 } TOOLINFOW,*PTOOLINFOW,*LPTOOLINFOW;
 typedef struct _TT_HITTESTINFOA {
 	HWND hwnd;
@@ -1741,6 +1747,9 @@ typedef struct _LVHITTESTINFO {
 	POINT pt;
 	UINT flags;
 	int iItem;
+#if (_WIN32_IE >= 0x0300)
+	int iSubItem;
+#endif
 } LVHITTESTINFO;
 #define _LV_HITTESTINFO _LVHITTESTINFO
 #define LV_HITTESTINFO LVHITTESTINFO

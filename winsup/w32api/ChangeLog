@@ -1,3 +1,11 @@
+2003-01-04  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/commctrl.h (TOOLINFO[AW]: Update structures.
+	(LVHITTESTINFO): Likewise.
+
+	* include/wingdi.h (GRADIENT_TRIANGLE): Add structure.
+	(GRADIENT_RECT): Likewise.
+
 2003-01-03  Bang Jun-Young  <junyoung@netbsd.org>
 
 	* include/winerror.h (ERROR_OPLOCK_NOT_GRANTED,
