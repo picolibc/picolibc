@@ -1,3 +1,7 @@
+2001-09-21  Nick Clifton  <nickc@cambridge.redhat.com>
+
+	* ti.h (GET_SCNHDR_PAGE): Fix compile time warning.
+
 2001-09-18  Alan Modra  <amodra@bigpond.net.au>
 
 	* external.h (GET_LINENO_LNNO): Use H_GET_32/16.

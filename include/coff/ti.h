@@ -219,7 +219,7 @@ struct external_scnhdr {
 #define PUT_SCNHDR_FLAGS(ABFD, VAL, PTR) \
   (COFF2_P (ABFD) ? H_PUT_32 (ABFD, VAL, PTR) : H_PUT_16 (ABFD, VAL, (PTR) -4))
 #define GET_SCNHDR_PAGE(ABFD, PTR) \
-  (COFF2_P (ABFD) ? H_GET_16 (ABFD, PTR) : H_GET_8 (ABFD, (PTR) -7))
+  (COFF2_P (ABFD) ? H_GET_16 (ABFD, PTR) : (unsigned) H_GET_8 (ABFD, (PTR) -7))
 /* on output, make sure that the "reserved" field is zero */
 #define PUT_SCNHDR_PAGE(ABFD, VAL, PTR) \
   (COFF2_P (ABFD) \
