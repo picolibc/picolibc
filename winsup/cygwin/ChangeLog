@@ -1,7 +1,7 @@
-Tue Apr 18 17:26:43 2000  Christopher Faylor <cgf@cygnus.com>
+Tue Apr 18 19:15:29 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dcrt0.cc (globify): Don't use \ quoting when apparently quoting a DOS
-	path spec.
+	path spec, even within a quoted string.
 
 Sun Apr 16 18:54:21 2000  Christopher Faylor <cgf@cygnus.com>
 
