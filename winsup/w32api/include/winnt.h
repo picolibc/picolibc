@@ -631,19 +631,10 @@ typedef BYTE BOOLEAN,*PBOOLEAN;
 #define MEM_MAPPED          0x40000
 #define MEM_RESET           0x80000
 #define MEM_TOP_DOWN       0x100000
+#define MEM_WRITE_WATCH	   0x200000 /* 98/Me */
+#define MEM_PHYSICAL	   0x400000
 #define MEM_4MB_PAGES    0x80000000
 #define MEM_IMAGE 16777216
-<<<<<<< winnt.h
-#define MEM_MAPPED 262144
-#define MEM_PRIVATE 131072
-#define MEM_DECOMMIT 16384
-#define MEM_RELEASE 32768
-#define MEM_PHYSICAL	0x400000
-#define MEM_RESET	0x80000 /* NT */
-#define MEM_TOP_DOWN	0x100000 /* NT */
-#define MEM_WRITE_WATCH	0x200000 /* 98/Me */
-=======
->>>>>>> 1.42
 #define SEC_FILE 0x800000
 #define SEC_IMAGE 0x1000000
 #define SEC_VLM 0x2000000

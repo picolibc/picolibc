@@ -1,3 +1,7 @@
+2002-01-25  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/winnt.h: Remove merge conflict.
+
 2002-01-25  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winnt.h (_TCHAR): Add typedefs.
