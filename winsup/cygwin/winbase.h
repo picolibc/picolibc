@@ -9,9 +9,9 @@ ilockincr (long *m)
   register int __res;
   __asm__ __volatile__ ("\n\
 	movl	$1,%0\n\
-	lock	xadd %0,%1\n\
+	lock	xadd %0,%2\n\
 	inc	%0\n\
-	": "=a" (__res), "+m" (*m): : "cc");
+	": "=a" (__res), "=m" (*m): "m" (m): "cc");
   return __res;
 }
 
@@ -21,9 +21,9 @@ ilockdecr (long *m)
   register int __res;
   __asm__ __volatile__ ("\n\
 	movl	$0xffffffff,%0\n\
-	lock	xadd %0,%1\n\
+	lock	xadd %0,%2\n\
 	dec	%0\n\
-	": "=a" (__res), "+m" (*m):  : "cc");
+	": "=a" (__res), "=m" (*m): "m" (m): "cc");
   return __res;
 }
 

@@ -1,3 +1,9 @@
+2004-06-03  Christopher Faylor  <me@cgf.cx>
+
+	* winbase.h (ilockincr): YA correction to ensure correct operation with
+	no optimization.
+	(ilockdecr): Ditto.
+
 2004-06-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygserver.h (CYGWIN_SERVER_VERSION_API): Bump.
