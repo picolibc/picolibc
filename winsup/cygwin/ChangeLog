@@ -1,5 +1,13 @@
 2001-11-01  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler.h: Change Windows 'BOOL's to c++ 'bool's for all variables.
+	* select.cc (fhandler_base::ready_for_read): Set read_ready to zero
+	prior to testing it or it will be uninitialized.
+
+	* Makefile.in (CFLAGS): Move setting to Makefile.common.
+
+2001-11-01  Christopher Faylor  <cgf@redhat.com>
+
 	* cygheap.h (cygheap_fdmanip::isopen): Set appropriate errno if fd not
 	open.
 	* select.cc (fhandler_base::ready_for_read): Release an open guard

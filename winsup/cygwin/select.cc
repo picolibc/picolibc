@@ -1074,6 +1074,7 @@ fhandler_base::ready_for_read (int fd, DWORD howlong, int ignra)
 {
   int avail = 0;
   select_record me (this);
+  me.read_ready = false;
   me.fd = fd;
   while (!avail)
     {

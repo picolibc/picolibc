@@ -678,13 +678,13 @@ class fhandler_console: public fhandler_termios
   int args_[MAXARGS];
   int nargs_;
   unsigned rarg;
-  BOOL saw_question_mark;
+  bool saw_question_mark;
 
   char my_title_buf [TITLESIZE + 1];
 
   WORD current_win32_attr;
   ansi_intensity intensity;
-  BOOL underline, blink, reverse;
+  bool underline, blink, reverse;
   WORD fg, bg;
 
   /* saved cursor coordinates */
@@ -712,9 +712,9 @@ class fhandler_console: public fhandler_termios
   DWORD dwLastButtonState;
   int nModifiers;
 
-  BOOL insert_mode;
-  BOOL use_mouse;
-  BOOL raw_win32_keyboard_mode;
+  bool insert_mode;
+  bool use_mouse;
+  bool raw_win32_keyboard_mode;
 
 /* Output calls */
   void set_default_attr ();
@@ -966,7 +966,7 @@ class fhandler_dev_clipboard: public fhandler_base
   off_t pos;
   void *membuffer;
   size_t msize;
-  BOOL eof;
+  bool eof;
 };
 
 class fhandler_windows: public fhandler_base
@@ -1044,10 +1044,10 @@ struct select_record
   int fd;
   HANDLE h;
   fhandler_base *fh;
-  BOOL saw_error;
-  BOOL windows_handle;
-  BOOL read_ready, write_ready, except_ready;
-  BOOL read_selected, write_selected, except_selected;
+  bool saw_error;
+  bool windows_handle;
+  bool read_ready, write_ready, except_ready;
+  bool read_selected, write_selected, except_selected;
   int (*startup) (select_record *me, class select_stuff *stuff);
   int (*poll) (select_record *me, fd_set *readfds, fd_set *writefds,
 	       fd_set *exceptfds);
@@ -1073,7 +1073,7 @@ class select_stuff
   {
     memset (device_specific, 0, sizeof (device_specific));
   }
-  BOOL always_ready, windows_used;
+  bool always_ready, windows_used;
   select_record start;
   void *device_specific[FH_NDEV];
 
