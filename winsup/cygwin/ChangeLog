@@ -1,3 +1,11 @@
+2001-06-12  Egor Duda  <deo@logos-m.ru>
+
+	* environ.cc (set_file_api_mode): New function. Move setting
+	of file APIs mode (OEM/ANSI) here.
+	(codepage_init): From here.
+	* winsup.h (set_file_api_mode): Declare it.
+	* fork.cc (fork_child): Set file APIs mode in forkee.
+
 Mon Jun 11 14:19:49 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* pinfo.cc: Use autoloaded ToolHelp functions throughout for Win9x.

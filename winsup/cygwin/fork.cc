@@ -271,6 +271,8 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
       ((DWORD *)child_proc_info->stackbottom)[-15] = (DWORD)0;
     }
 
+  set_file_api_mode (current_codepage);
+
   MALLOC_CHECK;
 
   pinfo_fixup_after_fork ();

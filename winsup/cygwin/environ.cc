@@ -423,6 +423,21 @@ check_case_init (const char *buf)
     }
 }
 
+void
+set_file_api_mode (codepage_type cp)
+{
+  if (cp == oem_cp)
+    {
+      SetFileApisToOEM ();
+      debug_printf ("File APIs set to OEM");
+    }
+  else if (cp == ansi_cp)
+    {
+      SetFileApisToANSI ();
+      debug_printf ("File APIs set to ANSI");
+    }
+}
+
 static void
 codepage_init (const char *buf)
 {
@@ -432,14 +447,12 @@ codepage_init (const char *buf)
   if (strcmp (buf, "oem")== 0)
     {
       current_codepage = oem_cp;
-      SetFileApisToOEM ();
-      debug_printf ("File APIs set to OEM");
+      set_file_api_mode (current_codepage);
     }
   else if (strcmp (buf, "ansi")== 0)
     {
       current_codepage = ansi_cp;
-      SetFileApisToANSI ();
-      debug_printf ("File APIs set to ANSI");
+      set_file_api_mode (current_codepage);
     }
   else
     {
