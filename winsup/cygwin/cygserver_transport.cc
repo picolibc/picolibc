@@ -31,12 +31,12 @@ create_server_transport ()
   if (wincap.is_winnt ())
     return safe_new0 (transport_layer_pipes);
   else
-    return safe_new0 (transport_layer_pipes);
+    return safe_new0 (transport_layer_sockets);
 #else
   if (wincap.is_winnt ())
     return new transport_layer_pipes;
   else
-    return new transport_layer_pipes;
+    return new transport_layer_sockets;
 #endif
 }
 
