@@ -1250,7 +1250,7 @@ wait_subproc (VOID *)
 	     closed a handle in the children[] array.  So, we try looping a couple
 	     of times to stabilize. FIXME - this is not foolproof.  Probably, this
 	     thread should be responsible for closing the children. */
-	  if (++errloop < 10 && GetLastError () == ERROR_INVALID_HANDLE)
+	  if (++errloop < 10)
 	    continue;
 
 	  system_printf ("wait failed. nchildren %d, wait %d, %E",
@@ -1261,7 +1261,9 @@ wait_subproc (VOID *)
 		rc == WAIT_TIMEOUT)
 	      continue;
 	    else
-	      system_printf ("event[%d] %p, %E", i, events[0]);
+	      system_printf ("event[%d] %p, pid %d, dwProcessId %u, progname '%s', %E", i,
+			     events[0], pchildren[i]->pid, pchildren[i]->dwProcessId,
+			     pchildren[i]->progname);
 	  break;
 	}
 

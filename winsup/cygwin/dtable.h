@@ -20,8 +20,7 @@ class dtable
 public:
   size_t size;
 
-  dtable ()
-    : first_fd_for_open(3), cnt_need_fixup_before(0) {}
+  dtable () : first_fd_for_open(3), cnt_need_fixup_before(0) {}
 
   void dec_need_fixup_before ()
     { if (cnt_need_fixup_before > 0) --cnt_need_fixup_before; }

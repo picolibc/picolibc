@@ -219,8 +219,8 @@ pinfo::init (pid_t n, DWORD flag, HANDLE in_h)
 	procinfo->pid = n;
       else
 	{
-	  procinfo->pid = myself->pid;
 	  procinfo->process_state |= PID_IN_USE | PID_EXECED;
+	  procinfo->pid = myself->pid;
 	}
       break;
     }

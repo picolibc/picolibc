@@ -143,7 +143,7 @@ install_host=@install_host@
 
 all: new-$(DLL_NAME) $(all_host) all_target
 
-all_target: $(LIBGMON_A) $(LIB_NAME) binmode.o textmode.o
+all_target: $(LIBGMON_A) $(LIB_NAME) automode.o binmode.o textmode.o
 
 all_host: new-$(LIB_NAME) cygrun.exe
 
@@ -151,7 +151,7 @@ force:
 
 install: all $(install_host) $(install_target)
 	$(INSTALL_DATA) new-$(DLL_NAME) $(bindir)/$(DLL_NAME); \
-	for i in $(LIB_NAME) $(GMON_START) $(LIBGMON_A) binmode.o textmode.o ; do \
+	for i in $(LIB_NAME) $(GMON_START) $(LIBGMON_A) automode.o binmode.o textmode.o ; do \
 	    $(INSTALL_DATA) $$i $(tooldir)/lib/$$i ; \
 	done ; \
 	cd $(srcdir); \

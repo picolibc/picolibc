@@ -260,7 +260,7 @@ ccalloc (cygheap_types x, DWORD n, DWORD size)
   MALLOC_CHECK;
   c = (cygheap_entry *) _cmalloc (sizeof_cygheap (n * size));
   if (c)
-    memset (c->data, 0, size);
+    memset (c->data, 0, n * size);
   if (!c)
     system_printf ("ccalloc returned NULL");
   return creturn (x, c, n);

@@ -142,9 +142,6 @@ fhandler_base::get_readahead_into_buffer (char *buf, size_t buflen)
   return copied_chars;
 }
 
-/**********************************************************************/
-/* fhandler_base */
-
 /* Record the file name.
    Filenames are used mostly for debugging messages, and it's hoped that
    in cases where the name is really required, the filename wouldn't ever
@@ -253,14 +250,17 @@ fhandler_base::get_default_fmode (int flags)
       size_t nlen = strlen (get_name ());
       unsigned accflags = ACCFLAGS (flags);
       for (__cygwin_perfile *pf = perfile_table; pf->name; pf++)
-	{
-	  size_t pflen = strlen (pf->name);
-	  const char *stem = get_name () + nlen - pflen;
-	  if (pflen > nlen || (stem != get_name () && !isdirsep (stem[-1])))
-	    continue;
-	  else if (ACCFLAGS (pf->flags) == accflags && strcasematch (stem, pf->name))
-	    return pf->flags & ~(O_RDONLY | O_WRONLY | O_RDWR);
-	}
+	if (!*pf->name && ACCFLAGS (pf->flags) == accflags)
+	  return pf->flags & ~(O_RDONLY | O_WRONLY | O_RDWR);
+	else
+	  {
+	    size_t pflen = strlen (pf->name);
+	    const char *stem = get_name () + nlen - pflen;
+	    if (pflen > nlen || (stem != get_name () && !isdirsep (stem[-1])))
+	      continue;
+	    else if (ACCFLAGS (pf->flags) == accflags && strcasematch (stem, pf->name))
+	      return pf->flags & ~(O_RDONLY | O_WRONLY | O_RDWR);
+	  }
     }
   return __fmode;
 }

@@ -1,3 +1,12 @@
+Thu Nov  2 23:01:20 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* pinfo.cc (pinfo::init): Reverse order of setting status and pid info
+	in an execed process to avoid a race.
+	* sigproc.cc (wait_subproc): Print more info when a WFSO error occurs.
+	* automode.c: New file.
+	* syscalls.cc (close_all_files): Streamline slightly.
+	* cygheap.cc (ccalloc): Clear *entire* allocated array.
+
 Thu Nov  2 01:58:03 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* ntdll.h: Remove IO_COUNTERS definition since it is now in winnt.h.

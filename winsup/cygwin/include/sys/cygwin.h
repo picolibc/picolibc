@@ -38,7 +38,7 @@ extern void cygwin_premain3 (int argc, char **argv);
 
 struct __cygwin_perfile
 {
-  char *name;
+  const char *name;
   unsigned flags;
 };
 

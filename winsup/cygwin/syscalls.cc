@@ -49,10 +49,11 @@ close_all_files (void)
 {
   SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," close");
 
+  fhandler_base *fh;
   for (int i = 0; i < (int) fdtab.size; i++)
-    if (!fdtab.not_open (i))
+    if ((fh = fdtab[i]) != NULL)
       {
-	fdtab[i]->close ();
+	fh->close ();
 	fdtab.release (i);
       }
 
