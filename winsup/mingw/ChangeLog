@@ -1,6 +1,6 @@
 2003-02-13  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* profile/Makefile.in (mcount,o): Use -O1 optimization
+	* profile/Makefile.in (mcount.o): Use -O1 optimization
 	switch to compile.
 
 2003-02-10  Danny Smith  <dannysmith@users.sourceforge.net>
