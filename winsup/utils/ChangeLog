@@ -1,3 +1,11 @@
+Tue Sep 12 22:45:28 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* kill.cc (main): Change behavior of -f so that it will force the
+	killing of a cygwin process after waiting 2 tenths of a second for it
+	to terminate.
+	(forcekill): Add an extra argument determining whether to wait for the
+	process to exit.
+
 Sun Sep 10 12:50:02 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: Refine dumper.exe message.
