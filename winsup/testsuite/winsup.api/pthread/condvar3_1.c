@@ -72,12 +72,10 @@ mythread(void * arg)
   result = pthread_cond_timedwait(&cv, &mutex, &abstime);
   if (result == ETIMEDOUT)
     {
-      printf ("thread N %d has timed out\n", (int)arg);
       timedout++;
     }
   else
     {
-      printf ("thread N %d has waken up\n", (int)arg);
       awoken++;
     }
 
@@ -123,7 +121,6 @@ main()
 
   for (i = NUMTHREADS/3; i <= 2*NUMTHREADS/3; i++)
     {
-      printf ("sending signal N %d\n", signaled + 1);
       assert(pthread_cond_signal(&cv) == 0);
       signaled++;
     }
@@ -134,9 +131,9 @@ main()
         assert(result == i);
     }
 
-  fprintf(stderr, "awk = %d\n", awoken);
-  fprintf(stderr, "sig = %d\n", signaled);
-  fprintf(stderr, "tot = %d\n", timedout);
+  printf("awk = %d\n", awoken);
+  printf("sig = %d\n", signaled);
+  printf("tot = %d\n", timedout);
 
   assert(signaled == awoken);
   assert(timedout == NUMTHREADS - signaled);
