@@ -174,7 +174,7 @@ case $basic_machine in
 		| mips64vr5000 | miprs64vr5000el | mcore \
 	        | m88110 | m680[012346]0 | m683?2 | m68360 | m5200 | z8k | v70 \
 		| sparc | sparclet | sparclite | sparc64 | sparc86x | sparcv9 \
-		| thumb | v850 | c4x | d10v | h8500 | w65 | fr30)
+		| thumb | v850 | c4x | d10v | h8500 | w65 | fr30 | pj | pjl)
 		basic_machine=$basic_machine-unknown
 		;;
 	# We use `pc' rather than `unknown'

@@ -1,3 +1,7 @@
+1999-09-04  Steve Chamberlain  <sac@pobox.com>
+
+	* config.sub: Add support for configuring for pj.
+
 1999-08-31  Nick Clifton  <nickc@cygnus.com>
 
 	* config.sub (maybe_os): Add support for configuring for fr30. 
