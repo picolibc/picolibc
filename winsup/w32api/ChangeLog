@@ -1,3 +1,9 @@
+Mon Oct  2 11:15:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * include/ras.h: New file.
+        * lib/rasapi32.def: Add symbols for RasEnumDevicesA and
+        RasEnumDevicesW.
+
 Mon Oct  2 10:56:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* include/ntdef.h: Add define for NTAPI.

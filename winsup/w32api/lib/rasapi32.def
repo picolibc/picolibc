@@ -10,6 +10,8 @@ RasEditPhonebookEntryW@12
 RasEnumConnectionsA@12
 RasEnumConnectionsW@12
 RasEnumConnectionsWow@12
+RasEnumDevicesA@12
+RasEnumDevicesW@12
 RasEnumEntriesA@20
 RasEnumEntriesW@20
 RasEnumEntriesWow@20
