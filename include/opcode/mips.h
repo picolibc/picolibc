@@ -257,6 +257,8 @@ struct mips_opcode
    "e" 5 bit vector register byte specifier (OP_*_VECBYTE)
    "%" 3 bit immediate vr5400 vector alignment operand (OP_*_VECALIGN)
    see also "k" above
+   "+D" Combined destination register ("G") and sel ("H") for CP0 ops,
+	for pretty-printing in disassembly only.
 
    Macro instructions:
    "A" General 32 bit expression
@@ -287,7 +289,7 @@ struct mips_opcode
 
    Extension character sequences used so far ("+" followed by the
    following), for quick reference when adding more:
-   "ABC"
+   "ABCD"
 */
 
 /* These are the bits which may be set in the pinfo field of an
