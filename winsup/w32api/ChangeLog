@@ -1,3 +1,8 @@
+2004-03-02  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/wtypes.h (DECIMAL_SETZERO): Add definition for
+	NONAMELESSUNION case.
+
 2004-03-03  Martin Fuchs  <martin-fuchs@gmx.net>
 
 	* include/oleauto.h (V_UNION, V_VT, V_DECIMAL): Use
