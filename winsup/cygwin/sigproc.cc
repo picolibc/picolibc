@@ -1162,7 +1162,9 @@ wait_sig (VOID *self)
 	default:
 	  if (pack.si.si_signo < 0)
 	    sig_clear (-pack.si.si_signo);
-	  else if (!sigq.sigs[pack.si.si_signo].si.si_signo)
+	  else if (sigq.sigs[pack.si.si_signo].si.si_signo)
+	    sigproc_printf ("sig %d already queued", pack.si.si_signo);
+	  else
 	    {
 	      int sig = pack.si.si_signo;
 	      int sigres = pack.process ();

@@ -1,3 +1,8 @@
+2004-03-26  Christopher Faylor  <cgf@redhat.com>
+
+	* sigproc.cc (wait_sig): Report if not trying to send signal due to
+	queued signal.
+
 2004-03-25  Christopher Faylor  <cgf@redhat.com>
 
 	* path.cc (normalize_posix_path): Reorganize to short circuit to DOS
