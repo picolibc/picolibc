@@ -1,3 +1,17 @@
+2002-05-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/socket.h: Protect some symbols against multiple
+	definition.
+	* include/netinet/ip.h: Ditto.
+	* include/netinet/tcp.h: Ditto.
+
+2002-05-29  Wu Yongwei <adah@netstd.com>
+
+	* include/netinet/ip.h: Replace by BSD derived version of the file.
+	* include/netinet/tcp.h: Ditto.
+	* include/netinet/udp.h: New file.
+	* include/cygwin/ip.h: Remove.
+
 2002-05-29  Christopher Faylor  <cgf@redhat.com>
 
 	* dtable.cc (dtable::init_std_file_from_handle): Attempt stronger
