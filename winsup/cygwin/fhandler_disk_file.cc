@@ -48,7 +48,7 @@ num_entries (const char *win32_name)
   handle = FindFirstFileA (buf1, &buf);
 
   if (handle == INVALID_HANDLE_VALUE)
-    return 0;
+    return 2; /* 2 is the minimum number of links to a dir, so... */
   count ++;
   while (FindNextFileA (handle, &buf))
     {

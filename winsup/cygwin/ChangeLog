@@ -1,5 +1,10 @@
 2003-01-09  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (num_entries): Return 2 as link count if
+	directory unreadable.
+
+2003-01-09  Corinna Vinschen  <corinna@vinschen.de>
+
 	* security.cc (get_nt_attribute): Always return -1 when read_sd()
 	fails.
 	(get_file_attribute): Set permissions to 0 and owner/group to -1
