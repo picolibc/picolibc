@@ -431,3 +431,12 @@ fhandler_socket::fcntl (int cmd, void *arg)
   return res;
 }
 
+void
+fhandler_socket::set_close_on_exec (int val)
+{
+  extern WSADATA wsadata;
+  if (wsadata.wVersion < 512) /* < Winsock 2.0 */
+    set_inheritance (get_handle (), val);
+  set_close_on_exec_flag (val);
+  debug_printf ("set close_on_exec for %s to %d", get_name (), val);
+}

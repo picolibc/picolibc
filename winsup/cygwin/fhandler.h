@@ -383,6 +383,7 @@ public:
   void hclose (HANDLE) {close ();}
   int dup (fhandler_base *child);
 
+  void set_close_on_exec (int val);
   virtual void fixup_before_fork_exec (DWORD);
   void fixup_after_fork (HANDLE);
   void fixup_after_exec (HANDLE parent) { fixup_after_fork (parent); }
