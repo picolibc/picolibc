@@ -1,3 +1,7 @@
+Wed Jan 17 23:20:56 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* libc/include/sys/unistd.h: Use correct declaration for setdtablesize.
+
 Fri Jan 12 00:34:31 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* libc/include/sys/signal.h: Add some SA_* defines for Cygwin.
