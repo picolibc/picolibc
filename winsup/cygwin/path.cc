@@ -98,7 +98,11 @@ struct symlink_info
   bool ext_tacked_on;
   int error;
   bool case_clash;
+  _major_t major;
+  _minor_t minor;
+  _devtype_t devtype;
   int check (char *path, const suffix_info *suffixes, unsigned opt);
+  bool parse_device (const char *);
   BOOL case_check (char *path);
 };
 
@@ -530,7 +534,7 @@ path_conv::check (const char *src, unsigned opt,
 	  if (error)
 	    return;
 
-	  if (dev.devn >= FH_CYGDRIVE && dev.devn <= FH_CYGDRIVE_Z)
+	  if (dev.major == DEV_CYGDRIVE_MAJOR)
 	    {
 	      if (!component)
 		fileattr = FILE_ATTRIBUTE_DIRECTORY;
@@ -602,6 +606,19 @@ path_conv::check (const char *src, unsigned opt,
 	    }
 
 	  int len = sym.check (full_path, suff, opt | fs.sym_opt);
+
+	  if (sym.minor || sym.major)
+	    {
+	      dev.parse (sym.major, sym.minor);
+	      if (!dev)
+		error = ENODEV;
+	      else
+		{
+		  dev.setfs (1);
+		  fileattr = sym.fileattr;
+		}
+	      goto out;
+	    }
 
 	  if (sym.case_clash)
 	    {
@@ -848,12 +865,7 @@ digits (const char *name)
   return p > name && !*p ? n : -1;
 }
 
-#define deveq(s) (strcasematch (name, (s)))
-#define deveqn(s, n) (strncasematch (name, (s), (n)))
-#define wdeveq(s) (strcasematch (w32_path, (s)))
-#define wdeveqn(s, n) (strncasematch (w32_path, (s), (n)))
-#define udeveq(s) (strcasematch (unix_path, (s)))
-#define udeveqn(s, n) (strncasematch (unix_path, (s), (n)))
+
 
 /* Return TRUE if src_path is a Win32 device name, filling out the device
    name in win32_path */
@@ -874,16 +886,6 @@ win32_device_name (const char *src_path, char *win32_path, device& dev)
       case FH_RAWDRIVE:
 	  __small_sprintf (win32_path, dev.fmt, dev.minor - 224 + 'A');
 	break;
-      case FH_TTY:
-	{
-	  if (!real_tty_attached (myself))
-	    dev = *console_dev;
-	  else
-	    {
-	      dev = *ttys_dev;
-	      dev.setunit (myself->ctty);
-	    }
-	}
       default:
 	__small_sprintf (win32_path, dev.fmt, dev.minor);
 	break;
@@ -2332,6 +2334,13 @@ int allow_winsymlinks = TRUE;
 extern "C" int
 symlink (const char *topath, const char *frompath)
 {
+  return symlink_worker (topath, frompath, allow_winsymlinks, false);
+}
+
+int
+symlink_worker (const char *topath, const char *frompath, bool use_winsym,
+		bool isdevice)
+{
   HANDLE h;
   int res = -1;
   path_conv win32_path, win32_topath;
@@ -2355,7 +2364,7 @@ symlink (const char *topath, const char *frompath)
     }
 
   win32_path.check (frompath, PC_SYM_NOFOLLOW);
-  if (allow_winsymlinks && !win32_path.exists ())
+  if (use_winsym && !win32_path.exists ())
     {
       strcpy (from, frompath);
       strcat (from, ".lnk");
@@ -2370,37 +2379,40 @@ symlink (const char *topath, const char *frompath)
 
   syscall_printf ("symlink (%s, %s)", topath, win32_path.get_win32 ());
 
-  if (win32_path.is_device () || win32_path.exists ())
+  if (win32_path.isdevice () || win32_path.exists ())
     {
       set_errno (EEXIST);
       goto done;
     }
 
-  if (allow_winsymlinks)
-    {
-      if (!isabspath (topath))
-	{
-	  getcwd (cwd, MAX_PATH + 1);
-	  if ((cp = strrchr (from, '/')) || (cp = strrchr (from, '\\')))
-	    {
-	      c = *cp;
-	      *cp = '\0';
-	      chdir (from);
-	    }
-	  backslashify (topath, w32topath, 0);
-	}
-      if (!cp || GetFileAttributes (w32topath) == INVALID_FILE_ATTRIBUTES)
-	{
-	  win32_topath.check (topath, PC_SYM_NOFOLLOW);
-	  if (!cp || win32_topath.error != ENOENT)
-	    strcpy (w32topath, win32_topath);
-	}
-      if (cp)
-	{
-	  *cp = c;
-	  chdir (cwd);
-	}
-    }
+  if (use_winsym)
+    if (isdevice)
+      strcpy (w32topath, topath);
+    else
+      {
+	if (!isabspath (topath))
+	  {
+	    getcwd (cwd, MAX_PATH + 1);
+	    if ((cp = strrchr (from, '/')) || (cp = strrchr (from, '\\')))
+	      {
+		c = *cp;
+		*cp = '\0';
+		chdir (from);
+	      }
+	    backslashify (topath, w32topath, 0);
+	  }
+	if (!cp || GetFileAttributes (w32topath) == INVALID_FILE_ATTRIBUTES)
+	  {
+	    win32_topath.check (topath, PC_SYM_NOFOLLOW);
+	    if (!cp || win32_topath.error != ENOENT)
+	      strcpy (w32topath, win32_topath);
+	  }
+	if (cp)
+	  {
+	    *cp = c;
+	    chdir (cwd);
+	  }
+      }
 
   if (allow_ntsec && win32_path.has_acls ())
     set_security_attribute (S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO,
@@ -2414,7 +2426,7 @@ symlink (const char *topath, const char *frompath)
     {
       BOOL success;
 
-      if (allow_winsymlinks)
+      if (use_winsym)
 	{
 	  create_shortcut_header ();
 	  /* Don't change the datatypes of `len' and `win_len' since
@@ -2454,8 +2466,8 @@ symlink (const char *topath, const char *frompath)
 				win32_path.get_win32 (),
 				S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO);
 
-	  DWORD attr = allow_winsymlinks ? FILE_ATTRIBUTE_READONLY
-					 : FILE_ATTRIBUTE_SYSTEM;
+	  DWORD attr = use_winsym ? FILE_ATTRIBUTE_READONLY
+	    			  : FILE_ATTRIBUTE_SYSTEM;
 #ifdef HIDDEN_DOT_FILES
 	  cp = strrchr (win32_path, '\\');
 	  if ((cp && cp[1] == '.') || *win32_path == '.')
@@ -2463,7 +2475,7 @@ symlink (const char *topath, const char *frompath)
 #endif
 	  SetFileAttributes (win32_path.get_win32 (), attr);
 
-	  if (win32_path.fs_fast_ea ())
+	  if (!isdevice && win32_path.fs_fast_ea ())
 	    set_symlink_ea (win32_path, topath);
 	  res = 0;
 	}
@@ -2476,7 +2488,8 @@ symlink (const char *topath, const char *frompath)
     }
 
 done:
-  syscall_printf ("%d = symlink (%s, %s)", res, topath, frompath);
+  syscall_printf ("%d = symlink_worker (%s, %s, %d, %d)", res, topath,
+		  frompath, use_winsym, isdevice);
   return res;
 }
 
@@ -2718,6 +2731,38 @@ suffix_scan::next ()
     }
 }
 
+bool
+symlink_info::parse_device (const char *contents)
+{
+  char *endptr;
+  int mymajor, myminor;
+
+  mymajor = strtol (++contents, &endptr, 16);
+  if (endptr == contents)
+    return false;
+
+  contents = endptr;
+  myminor = strtol (++endptr, &endptr, 16);
+  if (endptr == contents)
+    return false;
+
+  switch (*++endptr)
+    {
+    case 'b':
+    case 'c':
+    case 's':
+      if (mymajor || myminor)
+	break;
+    default:
+      return false;
+    }
+
+  major = mymajor;
+  minor = myminor;
+  devtype = *endptr;
+  return true;
+}
+
 /* Check if PATH is a symlink.  PATH must be a valid Win32 path name.
 
    If PATH is a symlink, put the value of the symlink--the file to
@@ -2746,6 +2791,8 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
   is_symlink = TRUE;
   ext_here = suffix.has (path, suffixes);
   extn = ext_here - path;
+  major = 0;
+  minor = 0;
 
   pflags &= ~PATH_SYMLINK;
 
@@ -2809,13 +2856,16 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 	goto file_not_symlink;
 
       /* FIXME: if symlink isn't present in EA, but EAs are supported,
-       * should we write it there?
-       */
+         should we write it there?  */
       switch (sym_check)
 	{
 	case 1:
 	  res = check_shortcut (suffix.path, fileattr, h, contents, &error, &pflags);
-	  if (res)
+	  if (!res)
+	    /* check more below */;
+	  else if (*contents == ':' && parse_device (contents))
+	    goto file_not_symlink;
+	  else
 	    break;
 	  /* If searching for `foo' and then finding a `foo.lnk' which is
 	     no shortcut, return the same as if file not found. */
@@ -2834,7 +2884,7 @@ symlink_info::check (char *path, const suffix_info *suffixes, unsigned opt)
 
     file_not_symlink:
       is_symlink = false;
-      syscall_printf ("not a symlink");
+      syscall_printf ("%s", (major || minor) ? "is a device" : "not a symlink");
       res = 0;
       break;
     }
