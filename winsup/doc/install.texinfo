@@ -134,3 +134,25 @@ another mirror, or try again tomorrow.
 Good question!  That very issue is sometimes debated on the
 @samp{cygwin-apps} mailing list.  Check the list archives if you want to
 know more.
+
+@subsection How do I uninstall Cygwin?
+
+Setup has no automatic uninstall facility.  Just delete everything
+manually:
+
+@itemize @bullet
+@item Cygwin shortcuts on the Desktop and Start Menu
+
+@item The registry tree @samp{Software\Cygnus Solutions} under
+@code{HKEY_LOCAL_MACHINE} and/or @code{HKEY_CURRENT_USER}.
+
+@item Anything under the Cygwin root folder, @samp{C:\cygwin} by
+default.
+
+@item Anything created by setup in its temporary working directory.
+
+@end itemize
+
+It's up to you to deal with other changes you made to your system, such
+as installing the inetd service, altering system paths, etc.  Setup
+would not have done any of these things for you.
