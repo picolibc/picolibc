@@ -465,7 +465,7 @@ cygheap_user::set_name (const char *new_name)
   cfree_and_set (homepath);
   cfree_and_set (plogsrv);
   cfree_and_set (pdomain);
-  cfree_and_set (winname);
+  cfree_and_set (pwinname);
 }
 
 BOOL

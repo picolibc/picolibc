@@ -93,6 +93,7 @@ enum homebodies
 };
 
 struct passwd;
+
 class cygheap_user
 {
   /* Extendend user information.
@@ -103,7 +104,7 @@ class cygheap_user
   char  *pdomain;       /* Logon domain of the user */
   char  *homedrive;	/* User's home drive */
   char  *homepath;	/* User's home path */
-  char  *winname;	/* User's name as far as Windows knows it */
+  char  *pwinname;	/* User's name as far as Windows knows it */
   char  *puserprof;	/* User profile */
   PSID   psid;          /* buffer for user's SID */
   PSID   orig_psid;     /* Remains intact even after impersonation */
@@ -134,13 +135,25 @@ public:
   void set_name (const char *new_name);
   const char *name () const { return pname; }
 
-  const char *env_logsrv ();
-  const char *env_homepath ();
-  const char *env_homedrive ();
-  const char *env_userprofile ();
-  const char *env_domain ();
-  const char *env_name ();
+  const char *env_logsrv (const char *, size_t);
+  const char *env_homepath (const char *, size_t);
+  const char *env_homedrive (const char *, size_t);
+  const char *env_userprofile (const char *, size_t);
+  const char *env_domain (const char *, size_t);
+  const char *env_name (const char *, size_t);
 
+  const char *logsrv ()
+  {
+    return env_logsrv ("LOGONSERVER=", sizeof ("LOGONSERVER=") - 1);
+  }
+  const char *winname ()
+  {
+    return env_name ("USERNAME=", sizeof ("USERNAME=") - 1);
+  }
+  const char *domain ()
+  {
+    return env_domain ("USERDOMAIN=", sizeof ("USERDOMAIN=") - 1);
+  }
   BOOL set_sid (PSID new_sid);
   BOOL set_orig_sid ();
   PSID sid () const { return psid; }
@@ -150,6 +163,8 @@ public:
   {
     return impersonated && token != INVALID_HANDLE_VALUE;
   }
+  const char *cygheap_user::test_uid (char *&, const char *, size_t)
+    __attribute__ ((regparm (3)));
 };
 
 /* cwd cache stuff.  */

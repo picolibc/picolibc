@@ -28,6 +28,7 @@ details. */
 #include "cygheap.h"
 #include "registry.h"
 #include "child_info.h"
+#include "environ.h"
 
 void
 internal_getlogin (cygheap_user &user)
@@ -199,6 +200,7 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
   char *newhomepath = NULL;
 
 
+  debug_printf ("what %d, pw %p", what, pw);
   if (what == CH_HOME)
     {
       char *p;
@@ -232,7 +234,7 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	}
     }
 
-  if (homepath == NULL && newhomepath == NULL)
+  if (what != CH_HOME && homepath == NULL && newhomepath == NULL)
     {
       if (!pw)
 	pw = getpwnam (name ());
@@ -241,12 +243,12 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
       else
 	{
 	  homepath_env_buf[0] = homepath_env_buf[1] = '\0';
-	  if (env_logsrv ())
+	  if (logsrv ())
 	    {
 	      WCHAR wlogsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];
-	      sys_mbstowcs (wlogsrv, env_logsrv (),
+	      sys_mbstowcs (wlogsrv, logsrv (),
 			    sizeof (wlogsrv) / sizeof(*wlogsrv));
-	     sys_mbstowcs (wuser, env_name (), sizeof (wuser) / sizeof (*wuser));
+	     sys_mbstowcs (wuser, winname (), sizeof (wuser) / sizeof (*wuser));
 	      if (!(ret = NetUserGetInfo (wlogsrv, wuser, 3,(LPBYTE *)&ui)))
 		{
 		  char *p;
@@ -302,25 +304,35 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 }
 
 const char *
-cygheap_user::env_logsrv ()
+cygheap_user::test_uid (char *&what, const char *name, size_t namelen)
 {
-  if (plogsrv)
+  if (what)
+    return what;
+  if (orig_uid == myself->uid)
+    what = getwinenveq (name, namelen, HEAP_STR);
+  return what;
+}
+
+const char *
+cygheap_user::env_logsrv (const char *name, size_t namelen)
+{
+  if (test_uid (plogsrv, name, namelen))
     return plogsrv;
 
-  if (!env_domain () || strcasematch (env_name (), "SYSTEM"))
-    return NULL;
+  if (!domain () || strcasematch (winname (), "SYSTEM"))
+    return almost_null;
 
   char logsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];
   cfree_and_set (plogsrv, almost_null);
-  if (get_logon_server (env_domain (), logsrv, NULL))
+  if (get_logon_server (domain (), logsrv, NULL))
     plogsrv = cstrdup (logsrv);
   return plogsrv;
 }
 
 const char *
-cygheap_user::env_domain ()
+cygheap_user::env_domain (const char *name, size_t namelen)
 {
-  if (pdomain)
+  if (pwinname && test_uid (pdomain, name, namelen))
     return pdomain;
 
   char username[UNLEN + 1];
@@ -329,26 +341,29 @@ cygheap_user::env_domain ()
   DWORD dlen = sizeof (userdomain);
   SID_NAME_USE use;
 
-  cfree_and_set (winname, almost_null);
+  cfree_and_set (pwinname, almost_null);
   cfree_and_set (pdomain, almost_null);
   if (!LookupAccountSid (NULL, sid (), username, &ulen,
 			 userdomain, &dlen, &use))
     __seterrno ();
   else
     {
-      winname = cstrdup (username);
+      pwinname = cstrdup (username);
       pdomain = cstrdup (userdomain);
     }
   return pdomain;
 }
 
 const char *
-cygheap_user::env_userprofile ()
+cygheap_user::env_userprofile (const char *name, size_t namelen)
 {
+  if (test_uid (puserprof, name, namelen))
+    return puserprof;
+
   char userprofile_env_buf[MAX_PATH + 1];
   cfree_and_set (puserprof, almost_null);
   /* FIXME: Should this just be setting a puserprofile like everything else? */
-  if (!strcasematch (env_name (), "SYSTEM")
+  if (!strcasematch (winname (), "SYSTEM")
       && get_registry_hive_path (sid (), userprofile_env_buf))
     puserprof = cstrdup (userprofile_env_buf);
 
@@ -356,20 +371,21 @@ cygheap_user::env_userprofile ()
 }
 
 const char *
-cygheap_user::env_homepath ()
+cygheap_user::env_homepath (const char *name, size_t namelen)
 {
   return ontherange (CH_HOMEPATH);
 }
 
 const char *
-cygheap_user::env_homedrive ()
+cygheap_user::env_homedrive (const char *name, size_t namelen)
 {
   return ontherange (CH_HOMEDRIVE);
 }
 
 const char *
-cygheap_user::env_name ()
+cygheap_user::env_name (const char *name, size_t namelen)
 {
-  (void) env_domain ();
-  return winname;
+  if (!test_uid (pwinname, name, namelen))
+    (void) domain ();
+  return pwinname;
 }

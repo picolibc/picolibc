@@ -1,3 +1,53 @@
+2002-06-29  Christopher Faylor  <cgf@redhat.com>
+
+	* environ.cc (spenv::retrieve): Detect return of env_dontadd from
+	cygheap_user methods.
+	(build_env): Avoid incrementing environment pointer if not actually
+	adding to the environment.  That could result in garbage in the
+	environment table.  Be more defensive when reallocing envblock.
+
+2002-06-29  Christopher Faylor  <cgf@redhat.com>
+
+	* uinfo.cc (cygheap_user::test_uid): Return NULL or further tests are
+	sorta useless.
+	(cygheap_user::env_domain): Recalculate if name is missing.
+
+2002-06-29  Christopher Faylor  <cgf@redhat.com>
+
+	* environ.cc (spenv::from_cygheap): Still need to take setuid into
+	consideration.
+
+2002-06-28  Christopher Faylor  <cgf@redhat.com>
+
+	* uinfo.cc (cygheap_user::env_logsrv): Return "almost_null" in case
+	where no domain or username is "SYSTEM".
+
+2002-06-28  Christopher Faylor  <cgf@redhat.com>
+
+	* cygheap.h (cygheap_user): Reorg to accommodate environment caching.
+	(cygheap_user::logsrv): New method.
+	(cygheap_user::winname): Ditto.
+	(cygheap_user::domain): Ditto.
+	(cygheap_user::test_uid): Ditto.
+	* cygheap.cc (cygheap_user::set_name): Reflect name "pwinname" name
+	change.
+	* environ.cc (getwinenveq): New function.
+	(penv::from_cygheap): penv::from_cygheap): Change arguments.
+	(spenv::retrieve): Ditto for call.  Use getwinenveq to retrieve info
+	from environment.  Always return value from cygwin environment, if it
+	exists.
+	* environ.h (getwinenveq): Declare.
+	* uinfo.cc (cygheap_user::ontherange): Use logsrv() rather than
+	env_logsrv().
+	(cygheap_user::test_uid): Define new method.
+	(cygheap_user::env_logsrv): Accept environment arguments.  Use test_uid
+	to find info.
+	(cygheap_user::env_domain): Ditto.
+	(cygheap_user::env_userprofile): Ditto.
+	(cygheap_user::env_homepath): Ditto.
+	(cygheap_user::env_homedrive): Ditto.
+	(cygheap_user::env_name): Ditto.
+
 2002-06-29  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* cygwin_ipc.h: Moved (back) to "include/sys/ipc.h".

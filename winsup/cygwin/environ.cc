@@ -750,11 +750,43 @@ env_sort (const void *a, const void *b)
   return strcmp (*p, *q);
 }
 
+char * __stdcall
+getwinenveq (const char *name, size_t namelen, int x)
+{
+  char dum[1];
+  char name0[namelen - 1];
+  memcpy (name0, name, namelen - 1);
+  name0[namelen - 1] = '\0';
+  int totlen = GetEnvironmentVariable (name0, dum, 0);
+  if (totlen > 0)
+    {
+      totlen++;
+      if (x == HEAP_1_STR)
+	totlen += namelen;
+      else
+	namelen = 0;
+      char *p = (char *) cmalloc ((cygheap_types) x, totlen);
+      if (namelen)
+	strcpy (p, name);
+      if (GetEnvironmentVariable (name0, p + namelen, totlen))
+	{
+	  debug_printf ("using value from GetEnvironmentVariable for '%s'",
+			name0);
+	  return p;
+	}
+      else
+	cfree (p);
+    }
+
+  debug_printf ("warning: %s not present in environment", name);
+  return NULL;
+}
+
 struct spenv
 {
   const char *name;
   size_t namelen;
-  const char * (cygheap_user::*from_cygheap) ();
+  const char * (cygheap_user::*from_cygheap) (const char *, size_t);
   char *retrieve (bool, const char * const = NULL)
     __attribute__ ((regparm (3)));
 };
@@ -785,29 +817,16 @@ spenv::retrieve (bool no_envblock, const char *const envname)
   if (from_cygheap)
     {
       const char *p;
-      if (cygheap->user.issetuid ())
-	debug_printf ("calculating for setuid");
-      else
+      if (envname && !cygheap->user.issetuid ())
 	{
-	  debug_printf ("calculating for non-setuid");
-	  if (!envname)
-	    {
-	      debug_printf ("not adding %s to windows environment", name);
-	      return NULL;		/* No need to force these into the
-					   environment */
-	    }
-
-	  if (no_envblock)
-	    {
-	      debug_printf ("duping existing value for '%s'", name);
-	      return cstrdup1 (envname);/* Don't really care what it's set to
+	  debug_printf ("duping existing value for '%s'", name);
+	  return cstrdup1 (envname);	/* Don't really care what it's set to
 					   if we're calling a cygwin program */
-	    }
 	}
 
       /* Calculate (potentially) value for given environment variable.  */
-      p = (cygheap->user.*from_cygheap) ();
-      if (!p || (no_envblock && !envname))
+      p = (cygheap->user.*from_cygheap) (name, namelen);
+      if (!p || (no_envblock && !envname) || (p == env_dontadd))
 	return env_dontadd;
       char *s = (char *) cmalloc (HEAP_1_STR, namelen + strlen (p) + 1);
       strcpy (s, name);
@@ -819,24 +838,7 @@ spenv::retrieve (bool no_envblock, const char *const envname)
   if (envname)
     return cstrdup1 (envname);
 
-  char dum[1];
-  int vallen = GetEnvironmentVariable (name, dum, 0);
-  if (vallen > 0)
-    {
-      char *p = (char *) cmalloc (HEAP_1_STR, namelen + ++vallen);
-      strcpy (p, name);
-      if (GetEnvironmentVariable (name, p + namelen, vallen))
-	{
-	  debug_printf ("using value from GetEnvironmentVariable for '%s'",
-			envname);
-	  return p;
-	}
-      else
-	cfree (p);
-    }
-
-  debug_printf ("warning: %s not present in environment", name);
-  return NULL;
+  return getwinenveq (name, namelen, HEAP_1_STR);
 }
 
 #define SPENVS_SIZE (sizeof (spenvs) / sizeof (spenvs[0]))
@@ -896,10 +898,9 @@ build_env (const char * const *envp, char *&envblock, int &envc,
     if (!saw_spenv[i])
       {
 	*dstp = spenvs[i].retrieve (no_envblock);
-	if (*dstp && *dstp != env_dontadd)
+	if (*dstp && *dstp != env_dontadd && !no_envblock)
 	  {
-	    if (!no_envblock)
-	      tl += strlen (*dstp) + 1;
+	    tl += strlen (*dstp) + 1;
 	    dstp++;
 	  }
       }
@@ -939,8 +940,9 @@ build_env (const char * const *envp, char *&envblock, int &envc,
 	  /* See if we need to increase the size of the block. */
 	  if (new_tl > tl)
 	    {
+	      tl = new_tl + 100;
 	      char *new_envblock =
-	      		(char *) realloc (envblock, 2 + (tl += len + 100));
+	      		(char *) realloc (envblock, 2 + tl);
 	      /* If realloc moves the block, move `s' with it. */
 	      if (new_envblock != envblock)
 	        {
