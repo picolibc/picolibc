@@ -70,6 +70,9 @@ AS:=@AS@
 #
 include $(srcdir)/../Makefile.common
 
+override CC:=$(CC) $(GCC_INCLUDE)
+export CC
+
 INSTALL_DATA:=$(SHELL) $(updir1)/install-sh -c
 
 # Setup the testing framework, if you have one
@@ -94,6 +97,7 @@ TESTSUP_OFILES:=${sort ${addsuffix .o,${basename ${notdir ${wildcard $(libltp_sr
 override ALL_CFLAGS:=${filter-out -O%,$(ALL_CFLAGS)}
 override COMPILE_CC:=${filter-out -O%,$(COMPILE_CC)}
 override CFLAGS:=${filter-out -O%,$(CFLAGS)}
+export CFLAGS
 
 .PHONY: all force dll_ofiles install all_target install_target all_host install_host
 
