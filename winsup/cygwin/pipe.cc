@@ -190,8 +190,8 @@ make_pipe (int fildes[2], unsigned int psize, int mode)
 	__seterrno ();
       else
 	{
-	  fhandler_pipe *fhr = (fhandler_pipe *) cygheap->fdtab.build_fhandler (fdr, FH_PIPER, "/dev/piper");
-	  fhandler_pipe *fhw = (fhandler_pipe *) cygheap->fdtab.build_fhandler (fdw, FH_PIPEW, "/dev/pipew");
+	  fhandler_pipe *fhr = (fhandler_pipe *) cygheap->fdtab.build_fhandler (fdr, *piper_dev, "/dev/piper");
+	  fhandler_pipe *fhw = (fhandler_pipe *) cygheap->fdtab.build_fhandler (fdw, *pipew_dev, "/dev/pipew");
 
 	  int binmode = mode & O_TEXT ?: O_BINARY;
 	  fhr->init (r, GENERIC_READ, binmode);
