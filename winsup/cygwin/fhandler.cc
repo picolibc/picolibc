@@ -1157,7 +1157,7 @@ fhandler_base::operator delete (void *p)
 }
 
 /* Normal I/O constructor */
-fhandler_base::fhandler_base (DWORD devtype, int unit):
+fhandler_base::fhandler_base (DWORD devtype):
   status (devtype),
   access (0),
   io_handle (NULL),
