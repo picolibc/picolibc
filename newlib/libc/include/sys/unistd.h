@@ -120,10 +120,14 @@ int     _EXFUN(unlink, (const char *__path ));
 int     _EXFUN(vhangup, (void ));
 _READ_WRITE_RETURN_TYPE _EXFUN(write, (int __fd, const void *__buf, size_t __nbyte ));
 
+#ifdef __CYGWIN__
+# include <getopt.h>
+#else
 extern char *optarg;			/* getopt(3) external variables */
 extern int optind, opterr, optopt;
 int	 getopt(int, char * const [], const char *);
 extern int optreset;			/* getopt(3) external variable */
+#endif
 
 #ifndef        _POSIX_SOURCE
 pid_t   _EXFUN(vfork, (void ));

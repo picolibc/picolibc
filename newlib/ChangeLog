@@ -1,3 +1,8 @@
+2002-12-28  Christopher Faylor  <cgf@redhat.com>
+
+	* libc/include/sys/unistd.h: Under cygwin, just include getopt.h rather
+	than defining getopt directly.
+
 2002-12-20  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* NEWS: Update with 1.11.0 info.
