@@ -1,3 +1,8 @@
+2002-06-09  Andrew Cagney  <cagney@redhat.com>
+
+	* remote-sim.h: Move to directory gdb/.
+	* callback.h: Move to directory gdb/.
+
 2002-06-07  Charles Wilson  <cwilson@ece.gatech.edu>
 
 	* bfdlink.h (struct bfd_link_info): Change type of

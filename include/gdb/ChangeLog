@@ -1,3 +1,8 @@
+2002-06-08  Andrew Cagney  <cagney@redhat.com>
+
+	* callback.h: Copy to here from directory above.
+	* remote-sim.h: Copy to here from directory above.
+
 2002-06-01  Andrew Cagney  <ac131313@redhat.com>
 
 	* sim-d10v.h (sim_d10v_regs): Expand to include all registers.
