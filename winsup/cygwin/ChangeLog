@@ -1,3 +1,14 @@
+Wed May 24 21:59:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* dir.cc (writable_directory): Comment out previous code,
+	return always 1 for now.
+	(mkdir): Call set_file_attribute explicitely with S_IFDIR mode bit.
+	* syscalls.cc (chown_worker): Ditto.
+	(chmod): Ditto.
+	* security.cc (get_nt_attribute): Fix error in debug output.
+	Never set FILE_DELETE_CHILD for files.
+	Construct appropriate inherit attribute according to file type.
+	
 2000-05-23  DJ Delorie  <dj@cygnus.com>
 
 	* syscalls.cc (_cygwin_istext_for_stdio): New, for newlib

@@ -605,7 +605,7 @@ get_nt_attribute (const char *file, int *attribute,
 
   if (! attribute)
     {
-      syscall_printf ("file: %s uid %d, gid %d", uid, gid);
+      syscall_printf ("file: %s uid %d, gid %d", file, uid, gid);
       return 0;
     }
 
@@ -834,6 +834,8 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
   // be (un)set in each ACE.
   if (! (attribute & S_IXOTH))
     attribute &= ~S_ISVTX;
+  if (! (attribute & S_IFDIR))
+    attribute |= S_ISVTX;
 
   // From here fill ACL
   size_t acl_len = sizeof (ACL);
@@ -887,23 +889,26 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
   DWORD group_deny = ~group_allow & other_allow;
   group_deny &= ~(STANDARD_RIGHTS_READ | FILE_READ_ATTRIBUTES | FILE_READ_EA);
 
+  // Construct appropriate inherit attribute
+  DWORD inherit = (attribute & S_IFDIR) ? INHERIT_ALL : DONT_INHERIT;
+
   // Set deny ACE for owner
   if (owner_deny
       && ! add_access_denied_ace (acl, ace_off++, owner_deny,
-                                  owner_sid, acl_len, INHERIT_ALL))
+                                  owner_sid, acl_len, inherit))
       return NULL;
   // Set allow ACE for owner
   if (! add_access_allowed_ace (acl, ace_off++, owner_allow,
-                                owner_sid, acl_len, INHERIT_ALL))
+                                owner_sid, acl_len, inherit))
     return NULL;
   // Set deny ACE for group
   if (group_deny
       && ! add_access_denied_ace (acl, ace_off++, group_deny,
-                                  group_sid, acl_len, INHERIT_ALL))
+                                  group_sid, acl_len, inherit))
       return NULL;
   // Set allow ACE for group
   if (! add_access_allowed_ace (acl, ace_off++, group_allow,
-                                group_sid, acl_len, INHERIT_ALL))
+                                group_sid, acl_len, inherit))
     return NULL;
 
   // Get owner and group from current security descriptor
@@ -948,7 +953,7 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
 
   // Set allow ACE for everyone
   if (! add_access_allowed_ace (acl, ace_off++, other_allow,
-                                get_world_sid (), acl_len, INHERIT_ALL))
+                                get_world_sid (), acl_len, inherit))
     return NULL;
 
   // Set AclSize to computed value

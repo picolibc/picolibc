@@ -23,6 +23,7 @@ details. */
 int __stdcall
 writable_directory (const char *file)
 {
+#if 0
   char dir[strlen (file) + 1];
 
   strcpy (dir, file);
@@ -44,6 +45,9 @@ writable_directory (const char *file)
   int acc = access (usedir, W_OK);
 
   return acc == 0;
+#else
+  return 1;
+#endif
 }
 
 /* opendir: POSIX 5.1.2.1 */
@@ -297,7 +301,7 @@ mkdir (const char *dir, mode_t mode)
   if (CreateDirectoryA (real_dir.get_win32 (), 0))
     {
       set_file_attribute (real_dir.has_acls (), real_dir.get_win32 (),
-                          (mode & 0777) & ~myself->umask);
+                          S_IFDIR | ((mode & 0777) & ~myself->umask));
       res = 0;
     }
   else

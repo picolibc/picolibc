@@ -701,6 +701,8 @@ chown_worker (const char *name, symlink_follow fmode, uid_t uid, gid_t gid)
             uid = old_uid;
           if (gid == (gid_t) -1)
             gid = old_gid;
+          if (win32_path.file_attributes () & FILE_ATTRIBUTE_DIRECTORY)
+            attrib |= S_IFDIR;
 	  res = set_file_attribute (win32_path.has_acls (),
                                     win32_path.get_win32 (),
 				    uid, gid, attrib,
@@ -805,9 +807,14 @@ chmod (const char *path, mode_t mode)
 
       uid_t uid;
       gid_t gid;
+
+      if (win32_path.file_attributes () & FILE_ATTRIBUTE_DIRECTORY)
+        mode |= S_IFDIR;
       get_file_attribute (win32_path.has_acls (),
                           win32_path.get_win32 (),
                           NULL, &uid, &gid);
+      if (win32_path.file_attributes () & FILE_ATTRIBUTE_DIRECTORY)
+        mode |= S_IFDIR;
       if (! set_file_attribute (win32_path.has_acls (),
                                 win32_path.get_win32 (),
 				uid, gid,
