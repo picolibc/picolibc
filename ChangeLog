@@ -1,3 +1,7 @@
+1999-08-09  Ian Lance Taylor  <ian@zembu.com>
+
+	* Makefile.in (LDFLAGS): Define.
+
 1999-08-08  Mumit Khan  <khan@xraylith.wisc.edu>
 
 	* configure.in (i[3456]-*-mingw32*): Don't put gprof in
