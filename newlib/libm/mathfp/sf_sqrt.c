@@ -94,7 +94,7 @@ _DEFUN (sqrtf, (float),
 
 double sqrt (double x)
 {
-  return (double) sqrt ((float) x);
+  return (double) sqrtf ((float) x);
 }
 
 #endif /* _DOUBLE_IS_32BITS */
