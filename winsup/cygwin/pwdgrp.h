@@ -67,7 +67,7 @@ public:
   int curr_lines;
 
   void load (const char *);
-  void refresh (bool check = true)
+  void refresh (bool check)
   {
     if (!check && initialized)
       return;

@@ -3,7 +3,7 @@ use strict;
 sub read_devices($%);
 my $infile = shift;
 my $incfile = shift;
-open(GPERF, "gperf  -c --key-positions='1-2,5-7,9-10' -r -t -C -E " .
+open(GPERF, "gperf  -c --key-positions='5-8,1-2,9-10' -r -t -C -E " .
             "-T -L 'ANSI-C' -Hdevhash -N'device::lookup' -Z devstring " .
 	    "-7 -G $infile |");
 my @lines = <GPERF>;

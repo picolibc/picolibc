@@ -111,7 +111,7 @@ internal_getgrsid (cygsid &sid)
 {
   char sid_string[128];
 
-  gr.refresh ();
+  gr.refresh (false);
 
   if (sid.string (sid_string))
     for (int i = 0; i < gr.curr_lines; i++)
@@ -197,8 +197,8 @@ endgrent ()
 extern "C" struct __group32 *
 getgrent32 ()
 {
-  gr.refresh ();
-
+  if (grp_pos == 0)
+    gr.refresh (true);
   if (grp_pos < gr.curr_lines)
     return group_buf + grp_pos++;
 
@@ -223,7 +223,7 @@ setgrent ()
 struct __group32 *
 internal_getgrent (int pos)
 {
-  gr.refresh ();
+  gr.refresh (false);
 
   if (pos < gr.curr_lines)
     return group_buf + pos;

@@ -82,7 +82,8 @@ pwdgrp::read_passwd ()
 	myself->uid != (__uid32_t) pw->pw_uid  &&
 	!internal_getpwuid (myself->uid))))
     {
-      static char NO_COPY linebuf[1024];	// must be static
+      static char linebuf[1024];	// must be static and
+      					// should not be NO_COPY
       (void) cygheap->user.ontherange (CH_HOME, NULL);
       snprintf (linebuf, sizeof (linebuf), "%s:*:%lu:%lu:,%s:%s:/bin/sh",
 		cygheap->user.name (),
@@ -102,7 +103,7 @@ internal_getpwsid (cygsid &sid)
   char *ptr1, *ptr2, *endptr;
   char sid_string[128] = {0,','};
 
-  pr.refresh ();
+  pr.refresh (false);
 
   if (sid.string (sid_string + 2))
     {
@@ -252,8 +253,8 @@ getpwnam_r (const char *nam, struct passwd *pwd, char *buffer, size_t bufsize, s
 extern "C" struct passwd *
 getpwent (void)
 {
-  pr.refresh ();
-
+  if (pw_pos == 0)
+    pr.refresh (true);
   if (pw_pos < pr.curr_lines)
     return passwd_buf + pw_pos++;
 
@@ -289,8 +290,6 @@ getpass (const char * prompt)
 {
   char *pass=_reent_winsup ()->_pass;
   struct termios ti, newti;
-
-  pr.refresh ();
 
   cygheap_fdget fhstdin (0);
 

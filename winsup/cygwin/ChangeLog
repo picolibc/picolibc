@@ -1,3 +1,14 @@
+2003-02-01  Christopher Faylor  <cgf@redhat.com>
+
+	* grp.cc (getgrent32): Only refresh group entries when at beginning.
+	(internal_getgrsid): Only refresh if uninitialized.
+	(internal_getgrent): Ditto.
+	* passwd.cc (getpwent): Only refresh passwd entries when at beginning.
+	(pwdgrp::read_passwd): linebuf *cannot* be NO_COPY.
+	(internal_getpwsid): Only refresh if uninitialized.
+	(getpass): No need to refresh passwd data here.
+	* pwdgrp.h (refresh): Eliminate default.
+
 2003-01-31  Christopher Faylor  <cgf@redhat.com>
 
 	* dlfcn.cc (dlerror): Only report load errors once per error.
