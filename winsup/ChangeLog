@@ -1,5 +1,10 @@
 2003-07-01  Christopher Faylor  <cgf@redhat.com>
 
+	* Makefile.common (CFLAGS_COMMON): Remove -Winline since it is too
+	noisy on newer versions of gcc.
+
+2003-07-01  Christopher Faylor  <cgf@redhat.com>
+
 	* configure.in: Add cygserver subdir.
 	* Makefile.in: Ditto.
 	* configure: Regenerate.
