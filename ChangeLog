@@ -1,5 +1,8 @@
 2002-12-03  Nathanael Nerode  <neroden@gcc.gnu.org>
 
+	* configure.in (host_tools): Order binutils, gas and ld for
+	convenience in running the testsuites.
+
 	* Makefile.tpl: Introduce rules to serialize subconfigure runs.
 	* Makefile.in: Regenerate.
 	* configure.in: Introduce rules to serialize subconfigure runs.

@@ -80,7 +80,9 @@ libstdcxx_version="target-libstdc++-v3"
 # these tools are built for the host environment
 # Note, the powerpc-eabi build depends on sim occurring before gdb in order to
 # know that we are building the simulator.
-host_tools="texinfo byacc flex bison binutils ld gas gcc sid sim gdb make patch prms send-pr gprof etc expect dejagnu ash bash bzip2 m4 autoconf automake libtool grep diff rcs fileutils shellutils time textutils wdiff find uudecode hello tar gzip indent recode release sed utils guile perl gawk findutils snavigator gettext zip fastjar"
+# binutils, gas and ld appear in that order because it makes sense to run
+# "make check" in that particular order.
+host_tools="texinfo byacc flex bison binutils gas ld gcc sid sim gdb make patch prms send-pr gprof etc expect dejagnu ash bash bzip2 m4 autoconf automake libtool grep diff rcs fileutils shellutils time textutils wdiff find uudecode hello tar gzip indent recode release sed utils guile perl gawk findutils snavigator gettext zip fastjar"
 
 # libgcj represents the runtime libraries only used by gcj.
 libgcj="target-libffi \
