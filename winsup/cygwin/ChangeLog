@@ -1,5 +1,10 @@
 2004-01-21  Christopher Faylor  <cgf@redhat.com>
 
+	* cygtls.cc (handle_threadlist_exception): Change logic, improve
+	debugging output.
+
+2004-01-21  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler_tty.cc (fhandler_tty::ioctl): Semi-revert 2003-09-26 change
 	for TIOCSWINSZ.  It is not an error for ioctl_request_event to be
 	missing.
