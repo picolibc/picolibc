@@ -391,7 +391,7 @@ class fhandler_socket: public fhandler_base
 class fhandler_pipe: public fhandler_base
 {
   HANDLE guard;
-  bool saweof;
+  bool broken_pipe;
   HANDLE writepipe_exists;
   DWORD orig_pid;
   unsigned id;
@@ -408,7 +408,7 @@ class fhandler_pipe: public fhandler_base
   int dup (fhandler_base *child);
   void fixup_after_fork (HANDLE);
   bool hit_eof ();
-  void set_eof () {saweof = true;}
+  void set_eof () {broken_pipe = true;}
   friend int make_pipe (int fildes[2], unsigned int psize, int mode);
   HANDLE get_guard () const {return guard;}
 };

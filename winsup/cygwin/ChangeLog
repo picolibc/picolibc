@@ -1,5 +1,13 @@
 2001-11-04  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler.h (fhandler_pipe::broken_pipe): Renamed from saweof.
+	(fhandler_pipe::set_eof): Reflect above change.
+	* pipe.cc (fhandler_pipe::fhandler_pipe): Ditto.
+	(fhandler_pipe::read): Ditto.
+	(fhandler_pipe::hiteof): Ditto.
+
+2001-11-04  Christopher Faylor  <cgf@redhat.com>
+
 	* pipe.cc (fhandler_pipe::read): Narrow eof return to just the "broken
 	pipe" test.
 
