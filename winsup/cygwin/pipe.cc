@@ -90,7 +90,7 @@ int fhandler_pipe::close ()
     CloseHandle (guard);
   if (writepipe_exists)
     CloseHandle (writepipe_exists);
-  if (read_state)
+  if (read_state && !cygheap->fdtab.in_vfork_cleanup ())
     CloseHandle (read_state);
   return res;
 }
