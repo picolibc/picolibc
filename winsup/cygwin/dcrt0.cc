@@ -533,6 +533,8 @@ sigthread::init (const char *s)
   id = GetCurrentThreadId ();
 }
 
+extern "C" void __sinit (_reent *);
+
 /* Take over from libc's crt0.o and start the application. Note the
    various special cases when Cygwin DLL is being runtime loaded (as
    opposed to being link-time loaded by Cygwin apps) from a non
@@ -633,7 +635,10 @@ dll_crt0_1 ()
   /* Initialize pthread mainthread when not forked and it is save to call new,
      otherwise it is reinitalized in fixup_after_fork */
   if (!user_data->forkee)
-    pthread::init_mainthread ();
+    {
+      __sinit (_impure_ptr);
+      pthread::init_mainthread ();
+    }
 
 #ifdef DEBUGGING
   strace.microseconds ();

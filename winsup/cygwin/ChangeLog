@@ -1,3 +1,8 @@
+2003-10-02  Christopher Faylor  <cgf@redhat.com>
+
+	* dcrt0.cc (dll_crt0_1): Call newlib __sinit routine to ensure that
+	stdio buffers are initialized to avoid thread initialization races.
+
 2003-10-01  Christopher Faylor  <cgf@redhat.com>
 
 	* path.cc (win32_device_name): Only fill out destination buffer when
