@@ -1,3 +1,7 @@
+2003-01-25  Jakub Jelinek  <jakub@redhat.com>
+
+	* elf/sparc.h: Add TLS relocs.  Move R_SPARC_REV32 to 252.
+
 2003-01-20  Svein E. Seldal  <Svein.Seldal@solidas.com>
 
 	* coff/tic4x.h (TICOFF_TARGET_MACHINE_GET): Fixed define bug
