@@ -21,7 +21,11 @@ union __dmath
   double d;
 };
 
+#if !defined(__CYGWIN__) || defined(__INSIDE_CYGWIN__) || defined(_COMPILING_NEWLIB)
 extern const union __dmath __infinity;
+#else
+extern __declspec(dllimport) const union __dmath __infinity;
+#endif
 
 #define HUGE_VAL (__infinity.d)
 
