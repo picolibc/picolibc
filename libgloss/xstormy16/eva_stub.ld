@@ -9,6 +9,15 @@ MEMORY
   ROM     (w)  : ORIGIN = 0x8000, LENGTH = 0x1000
 }
 
+/* Point interrupt vectors to user application. */
+PROVIDE (_int_basetimer = 0x10004);
+PROVIDE (_int_timer0 = 0x10008);
+PROVIDE (_int_timer1 = 0x1000C);
+PROVIDE (_int_sio0   = 0x10010);
+PROVIDE (_int_sio1   = 0x10014);
+PROVIDE (_int_port0  = 0x10018);
+PROVIDE (_int_port1  = 0x1001C);
+
 SECTIONS
 {
   /* CPU data for Sanyo debugger */
