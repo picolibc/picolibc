@@ -1,3 +1,8 @@
+2005-02-06  Yitzchak Scott-Thoennes <sthoenna@efn.org>
+
+	* net.cc (cygwin_gethostbyname): Be more picky about what's a numeric
+	address string, and use tls in that case too.
+
 2005-02-07  Christopher Faylor  <cgf@timesys.com>
 
 	* exceptions.cc: Make windows_system_directory non-static.

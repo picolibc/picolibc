@@ -936,17 +936,19 @@ cygwin_gethostname (char *name, size_t len)
 extern "C" struct hostent *
 cygwin_gethostbyname (const char *name)
 {
-  static unsigned char tmp_addr[4];
-  static struct hostent tmp;
-  static char *tmp_aliases[1];
-  static char *tmp_addr_list[2];
-  static int a, b, c, d;
+  unsigned char tmp_addr[4];
+  struct hostent tmp, *h;
+  char *tmp_aliases[1] = {0};
+  char *tmp_addr_list[2] = {0,0};
+  unsigned int a, b, c, d;
+  char dummy;
 
   sig_dispatch_pending ();
   if (check_null_str_errno (name))
     return NULL;
 
-  if (sscanf (name, "%d.%d.%d.%d", &a, &b, &c, &d) == 4)
+  if (sscanf (name, "%u.%u.%u.%u%c", &a, &b, &c, &d, &dummy) == 4
+      && a < 256 && b < 256 && c < 256 && d < 256)
     {
       /* In case you don't have DNS, at least x.x.x.x still works */
       memset (&tmp, 0, sizeof (tmp));
@@ -960,11 +962,13 @@ cygwin_gethostbyname (const char *name)
       tmp.h_addrtype = 2;
       tmp.h_length = 4;
       tmp.h_addr_list = tmp_addr_list;
-      return &tmp;
+      h = &tmp;
     }
+  else
+    h = gethostbyname (name);
 
-  _my_tls.locals.hostent_buf = (hostent *) dup_ent (_my_tls.locals.hostent_buf, gethostbyname (name),
-				     is_hostent);
+  _my_tls.locals.hostent_buf = (hostent *) dup_ent (_my_tls.locals.hostent_buf, h, is_hostent);
+
   if (!_my_tls.locals.hostent_buf)
     {
       debug_printf ("name %s", name);
