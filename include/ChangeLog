@@ -1,3 +1,7 @@
+2000-04-03  Alan Modra  <alan@linuxcare.com.au>
+
+	* bin-bugs.h: New file.
+
 2000-03-27  Denis Chertykov  <denisc@overta.ru>
 
 	* dis-asm.h (print_insn_avr): Declare.
