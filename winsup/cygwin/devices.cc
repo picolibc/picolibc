@@ -34,7 +34,7 @@ const device dev_tcp_storage =
   {"/dev/inet/tcp", FH_TCP, "", 0, 0, 0, 0};
 
 const device dev_udp_storage =
-  {"/dev/inet/udp", FH_UCP, "", 0, 0, 0, 0};
+  {"/dev/inet/udp", FH_UDP, "", 0, 0, 0, 0};
 
 const device dev_icmp_storage =
   {"/dev/inet/icmp", FH_ICMP, "", 0, 0, 0, 0};
@@ -132,83 +132,83 @@ const device dev_cdrom_storage =
 const device dev_sr_storage =
 {"/dev/sr", FH_CDROM, "\\Device\\CdRom%d", 0, 15};
 
-const device dev_hda_storage =
-{"/dev/hda", FH_SDA, "\\Device\\Harddisk%d\\Partition%d", 1, 16, -1};
+const device dev_sda_storage =
+{"/dev/sda", FH_SDA, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 0};
 
-const device dev_hdb_storage =
-{"/dev/hdb", FH_SDB, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 15};
+const device dev_sdb_storage =
+{"/dev/sdb", FH_SDB, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 16};
 
-const device dev_hdc_storage =
-{"/dev/hdc", FH_SDC, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 31};
+const device dev_sdc_storage =
+{"/dev/sdc", FH_SDC, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 32};
 
-const device dev_hdd_storage =
-{"/dev/hdd", FH_SDD, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 47};
+const device dev_sdd_storage =
+{"/dev/sdd", FH_SDD, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 48};
 
-const device dev_hde_storage =
-{"/dev/hde", FH_SDE, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 63};
+const device dev_sde_storage =
+{"/dev/sde", FH_SDE, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 64};
 
-const device dev_hdf_storage =
-{"/dev/hdf", FH_SDF, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 79};
+const device dev_sdf_storage =
+{"/dev/sdf", FH_SDF, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 80};
 
-const device dev_hdg_storage =
-{"/dev/hdg", FH_SDG, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 95};
+const device dev_sdg_storage =
+{"/dev/sdg", FH_SDG, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 96};
 
-const device dev_hdh_storage =
-{"/dev/hdh", FH_SDH, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 111};
+const device dev_sdh_storage =
+{"/dev/sdh", FH_SDH, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 112};
 
-const device dev_hdi_storage =
-{"/dev/hdi", FH_SDI, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 127};
+const device dev_sdi_storage =
+{"/dev/sdi", FH_SDI, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 128};
 
-const device dev_hdj_storage =
-{"/dev/hdj", FH_SDJ, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 143};
+const device dev_sdj_storage =
+{"/dev/sdj", FH_SDJ, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 144};
 
-const device dev_hdk_storage =
-{"/dev/hdk", FH_SDK, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 159};
+const device dev_sdk_storage =
+{"/dev/sdk", FH_SDK, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 160};
 
-const device dev_hdl_storage =
-{"/dev/hdl", FH_SDL, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 175};
+const device dev_sdl_storage =
+{"/dev/sdl", FH_SDL, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 176};
 
-const device dev_hdm_storage =
-{"/dev/hdm", FH_SDM, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 191};
+const device dev_sdm_storage =
+{"/dev/sdm", FH_SDM, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 192};
 
-const device dev_hdn_storage =
-{"/dev/hdn", FH_SDN, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 207};
+const device dev_sdn_storage =
+{"/dev/sdn", FH_SDN, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 208};
 
-const device dev_hdo_storage =
-{"/dev/hdo", FH_SDO, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 223};
+const device dev_sdo_storage =
+{"/dev/sdo", FH_SDO, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 224};
 
-const device dev_hdp_storage =
-{"/dev/hdp", FH_SDP, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 239};
+const device dev_sdp_storage =
+{"/dev/sdp", FH_SDP, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 240};
 
-const device dev_hdq_storage =
-{"/dev/hdq", FH_SDQ, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 255  /* FIXME 8 bit lunacy */};
+const device dev_sdq_storage =
+{"/dev/sdq", FH_SDQ, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 256};
 
-const device dev_hdr_storage =
-{"/dev/hdr", FH_SDR, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 271};
+const device dev_sdr_storage =
+{"/dev/sdr", FH_SDR, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 272};
 
-const device dev_hds_storage =
-{"/dev/hds", FH_SDS, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 287};
+const device dev_sds_storage =
+{"/dev/sds", FH_SDS, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 288};
 
-const device dev_hdt_storage =
-{"/dev/hdt", FH_SDT, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 303};
+const device dev_sdt_storage =
+{"/dev/sdt", FH_SDT, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 304};
 
-const device dev_hdu_storage =
-{"/dev/hdu", FH_SDU, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 319};
+const device dev_sdu_storage =
+{"/dev/sdu", FH_SDU, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 320};
 
-const device dev_hdv_storage =
-{"/dev/hdv", FH_SDV, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 335};
+const device dev_sdv_storage =
+{"/dev/sdv", FH_SDV, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 336};
 
-const device dev_hdw_storage =
-{"/dev/hdw", FH_SDW, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 351};
+const device dev_sdw_storage =
+{"/dev/sdw", FH_SDW, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 352};
 
-const device dev_hdx_storage =
-{"/dev/hdx", FH_SDX, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 367};
+const device dev_sdx_storage =
+{"/dev/sdx", FH_SDX, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 368};
 
-const device dev_hdy_storage =
-{"/dev/hdy", FH_SDY, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 383};
+const device dev_sdy_storage =
+{"/dev/sdy", FH_SDY, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 384};
 
-const device dev_hdz_storage =
-{"/dev/hdz", FH_SDZ, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 399};
+const device dev_sdz_storage =
+{"/dev/sdz", FH_SDZ, "\\Device\\Harddisk%d\\Partition%d", 1, 15, 400};
 
 const device dev_rawdrive_storage =
 {"/dev/rawdrive", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0};
@@ -319,13 +319,13 @@ return	NULL;
 }
         }
     case 8:
-      switch (KR_keyword [5])
+      switch (KR_keyword [7])
         {
-        case 't':
-          if (strncmp (KR_keyword, "/dev/tty", 8) == 0)
+        case 'z':
+          if (strncmp (KR_keyword, "/dev/sdz", 8) == 0)
             {
 {
-return &dev_tty_storage;
+return &dev_sdz_storage;
 
 }
             }
@@ -336,104 +336,14 @@ return	NULL;
 
 }
             }
-        case 's':
-          switch (KR_keyword [7])
+        case 'y':
+          switch (KR_keyword [5])
             {
-            case 'z':
-              if (strncmp (KR_keyword, "/dev/sdz", 8) == 0)
-                {
-{
-return &dev_hdz_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'y':
-              if (strncmp (KR_keyword, "/dev/sdy", 8) == 0)
-                {
-{
-return &dev_hdy_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'x':
-              if (strncmp (KR_keyword, "/dev/sdx", 8) == 0)
-                {
-{
-return &dev_hdx_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'w':
-              if (strncmp (KR_keyword, "/dev/sdw", 8) == 0)
-                {
-{
-return &dev_hdw_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'v':
-              if (strncmp (KR_keyword, "/dev/sdv", 8) == 0)
-                {
-{
-return &dev_hdv_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'u':
-              if (strncmp (KR_keyword, "/dev/sdu", 8) == 0)
-                {
-{
-return &dev_hdu_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
             case 't':
-              if (strncmp (KR_keyword, "/dev/sdt", 8) == 0)
+              if (strncmp (KR_keyword, "/dev/tty", 8) == 0)
                 {
 {
-return &dev_hdt_storage;
+return &dev_tty_storage;
 
 }
                 }
@@ -445,304 +355,10 @@ return	NULL;
 }
                 }
             case 's':
-              if (strncmp (KR_keyword, "/dev/sds", 8) == 0)
+              if (strncmp (KR_keyword, "/dev/sdy", 8) == 0)
                 {
 {
-return &dev_hds_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'r':
-              if (strncmp (KR_keyword, "/dev/sdr", 8) == 0)
-                {
-{
-return &dev_hdr_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'q':
-              if (strncmp (KR_keyword, "/dev/sdq", 8) == 0)
-                {
-{
-return &dev_hdq_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'p':
-              if (strncmp (KR_keyword, "/dev/sdp", 8) == 0)
-                {
-{
-return &dev_hdp_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'o':
-              if (strncmp (KR_keyword, "/dev/sdo", 8) == 0)
-                {
-{
-return &dev_hdo_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'n':
-              if (strncmp (KR_keyword, "/dev/sdn", 8) == 0)
-                {
-{
-return &dev_hdn_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'm':
-              if (strncmp (KR_keyword, "/dev/sdm", 8) == 0)
-                {
-{
-return &dev_hdm_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'l':
-              if (strncmp (KR_keyword, "/dev/sdl", 8) == 0)
-                {
-{
-return &dev_hdl_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'k':
-              if (strncmp (KR_keyword, "/dev/sdk", 8) == 0)
-                {
-{
-return &dev_hdk_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'j':
-              if (strncmp (KR_keyword, "/dev/sdj", 8) == 0)
-                {
-{
-return &dev_hdj_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'i':
-              if (strncmp (KR_keyword, "/dev/sdi", 8) == 0)
-                {
-{
-return &dev_hdi_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'h':
-              if (strncmp (KR_keyword, "/dev/sdh", 8) == 0)
-                {
-{
-return &dev_hdh_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'g':
-              if (strncmp (KR_keyword, "/dev/sdg", 8) == 0)
-                {
-{
-return &dev_hdg_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'f':
-              if (strncmp (KR_keyword, "/dev/sdf", 8) == 0)
-                {
-{
-return &dev_hdf_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'e':
-              if (strncmp (KR_keyword, "/dev/sde", 8) == 0)
-                {
-{
-return &dev_hde_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'd':
-              switch (KR_keyword [6])
-                {
-                case 'd':
-                  if (strncmp (KR_keyword, "/dev/sdd", 8) == 0)
-                    {
-{
-return &dev_hdd_storage;
-
-}
-                    }
-                  else
-                    {
-{
-return	NULL;
-
-}
-                    }
-                case 'c':
-                  if (strncmp (KR_keyword, "/dev/scd", 8) == 0)
-                    {
-{
-return &dev_cdrom_storage;
-
-}
-                    }
-                  else
-                    {
-{
-return	NULL;
-
-}
-                    }
-                default:
-{
-return	NULL;
-
-}
-                }
-            case 'c':
-              if (strncmp (KR_keyword, "/dev/sdc", 8) == 0)
-                {
-{
-return &dev_hdc_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'b':
-              if (strncmp (KR_keyword, "/dev/sdb", 8) == 0)
-                {
-{
-return &dev_hdb_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'a':
-              if (strncmp (KR_keyword, "/dev/sda", 8) == 0)
-                {
-{
-return &dev_hda_storage;
+return &dev_sdy_storage;
 
 }
                 }
@@ -759,11 +375,209 @@ return	NULL;
 
 }
             }
-        case 'n':
-          if (strncmp (KR_keyword, "/dev/nst", 8) == 0)
+        case 'x':
+          if (strncmp (KR_keyword, "/dev/sdx", 8) == 0)
             {
 {
+return &dev_sdx_storage;
+
+}
+            }
+          else
+            {
+{
+return	NULL;
+
+}
+            }
+        case 'w':
+          if (strncmp (KR_keyword, "/dev/sdw", 8) == 0)
+            {
+{
+return &dev_sdw_storage;
+
+}
+            }
+          else
+            {
+{
+return	NULL;
+
+}
+            }
+        case 'v':
+          if (strncmp (KR_keyword, "/dev/sdv", 8) == 0)
+            {
+{
+return &dev_sdv_storage;
+
+}
+            }
+          else
+            {
+{
+return	NULL;
+
+}
+            }
+        case 'u':
+          if (strncmp (KR_keyword, "/dev/sdu", 8) == 0)
+            {
+{
+return &dev_sdu_storage;
+
+}
+            }
+          else
+            {
+{
+return	NULL;
+
+}
+            }
+        case 't':
+          switch (KR_keyword [5])
+            {
+            case 's':
+              if (strncmp (KR_keyword, "/dev/sdt", 8) == 0)
+                {
+{
+return &dev_sdt_storage;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case 'n':
+              if (strncmp (KR_keyword, "/dev/nst", 8) == 0)
+                {
+{
 return &dev_nst_storage;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            default:
+{
+return	NULL;
+
+}
+            }
+        case 's':
+          if (strncmp (KR_keyword, "/dev/sds", 8) == 0)
+            {
+{
+return &dev_sds_storage;
+
+}
+            }
+          else
+            {
+{
+return	NULL;
+
+}
+            }
+        case 'r':
+          if (strncmp (KR_keyword, "/dev/sdr", 8) == 0)
+            {
+{
+return &dev_sdr_storage;
+
+}
+            }
+          else
+            {
+{
+return	NULL;
+
+}
+            }
+        case 'q':
+          if (strncmp (KR_keyword, "/dev/sdq", 8) == 0)
+            {
+{
+return &dev_sdq_storage;
+
+}
+            }
+          else
+            {
+{
+return	NULL;
+
+}
+            }
+        case 'p':
+          switch (KR_keyword [5])
+            {
+            case 's':
+              if (strncmp (KR_keyword, "/dev/sdp", 8) == 0)
+                {
+{
+return &dev_sdp_storage;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case 'd':
+              if (strncmp (KR_keyword, "/dev/dsp", 8) == 0)
+                {
+{
+return &dev_oss_dsp_storage;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            default:
+{
+return	NULL;
+
+}
+            }
+        case 'o':
+          if (strncmp (KR_keyword, "/dev/sdo", 8) == 0)
+            {
+{
+return &dev_sdo_storage;
+
+}
+            }
+          else
+            {
+{
+return	NULL;
+
+}
+            }
+        case 'n':
+          if (strncmp (KR_keyword, "/dev/sdn", 8) == 0)
+            {
+{
+return &dev_sdn_storage;
 
 }
             }
@@ -775,208 +589,13 @@ return	NULL;
 }
             }
         case 'm':
-          if (strncmp (KR_keyword, "/dev/mem", 8) == 0)
+          switch (KR_keyword [5])
             {
-{
-return &dev_mem_storage;
-
-}
-            }
-          else
-            {
-{
-return	NULL;
-
-}
-            }
-        case 'h':
-          switch (KR_keyword [7])
-            {
-            case 'z':
-              if (strncmp (KR_keyword, "/dev/hdz", 8) == 0)
-                {
-{
-return &dev_hdz_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'y':
-              if (strncmp (KR_keyword, "/dev/hdy", 8) == 0)
-                {
-{
-return &dev_hdy_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'x':
-              if (strncmp (KR_keyword, "/dev/hdx", 8) == 0)
-                {
-{
-return &dev_hdx_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'w':
-              if (strncmp (KR_keyword, "/dev/hdw", 8) == 0)
-                {
-{
-return &dev_hdw_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'v':
-              if (strncmp (KR_keyword, "/dev/hdv", 8) == 0)
-                {
-{
-return &dev_hdv_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'u':
-              if (strncmp (KR_keyword, "/dev/hdu", 8) == 0)
-                {
-{
-return &dev_hdu_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 't':
-              if (strncmp (KR_keyword, "/dev/hdt", 8) == 0)
-                {
-{
-return &dev_hdt_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
             case 's':
-              if (strncmp (KR_keyword, "/dev/hds", 8) == 0)
+              if (strncmp (KR_keyword, "/dev/sdm", 8) == 0)
                 {
 {
-return &dev_hds_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'r':
-              if (strncmp (KR_keyword, "/dev/hdr", 8) == 0)
-                {
-{
-return &dev_hdr_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'q':
-              if (strncmp (KR_keyword, "/dev/hdq", 8) == 0)
-                {
-{
-return &dev_hdq_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'p':
-              if (strncmp (KR_keyword, "/dev/hdp", 8) == 0)
-                {
-{
-return &dev_hdp_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'o':
-              if (strncmp (KR_keyword, "/dev/hdo", 8) == 0)
-                {
-{
-return &dev_hdo_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'n':
-              if (strncmp (KR_keyword, "/dev/hdn", 8) == 0)
-                {
-{
-return &dev_hdn_storage;
+return &dev_sdm_storage;
 
 }
                 }
@@ -988,145 +607,10 @@ return	NULL;
 }
                 }
             case 'm':
-              if (strncmp (KR_keyword, "/dev/hdm", 8) == 0)
+              if (strncmp (KR_keyword, "/dev/mem", 8) == 0)
                 {
 {
-return &dev_hdm_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'l':
-              if (strncmp (KR_keyword, "/dev/hdl", 8) == 0)
-                {
-{
-return &dev_hdl_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'k':
-              if (strncmp (KR_keyword, "/dev/hdk", 8) == 0)
-                {
-{
-return &dev_hdk_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'j':
-              if (strncmp (KR_keyword, "/dev/hdj", 8) == 0)
-                {
-{
-return &dev_hdj_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'i':
-              if (strncmp (KR_keyword, "/dev/hdi", 8) == 0)
-                {
-{
-return &dev_hdi_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'h':
-              if (strncmp (KR_keyword, "/dev/hdh", 8) == 0)
-                {
-{
-return &dev_hdh_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'g':
-              if (strncmp (KR_keyword, "/dev/hdg", 8) == 0)
-                {
-{
-return &dev_hdg_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'f':
-              if (strncmp (KR_keyword, "/dev/hdf", 8) == 0)
-                {
-{
-return &dev_hdf_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'e':
-              if (strncmp (KR_keyword, "/dev/hde", 8) == 0)
-                {
-{
-return &dev_hde_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'd':
-              if (strncmp (KR_keyword, "/dev/hdd", 8) == 0)
-                {
-{
-return &dev_hdd_storage;
+return &dev_mem_storage;
 
 }
                 }
@@ -1138,40 +622,10 @@ return	NULL;
 }
                 }
             case 'c':
-              if (strncmp (KR_keyword, "/dev/hdc", 8) == 0)
+              if (strncmp (KR_keyword, "/dev/com", 8) == 0)
                 {
 {
-return &dev_hdc_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'b':
-              if (strncmp (KR_keyword, "/dev/hdb", 8) == 0)
-                {
-{
-return &dev_hdb_storage;
-
-}
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case 'a':
-              if (strncmp (KR_keyword, "/dev/hda", 8) == 0)
-                {
-{
-return &dev_hda_storage;
+return &dev_serial_storage;
 
 }
                 }
@@ -1188,11 +642,11 @@ return	NULL;
 
 }
             }
-        case 'd':
-          if (strncmp (KR_keyword, "/dev/dsp", 8) == 0)
+        case 'l':
+          if (strncmp (KR_keyword, "/dev/sdl", 8) == 0)
             {
 {
-return &dev_oss_dsp_storage;
+return &dev_sdl_storage;
 
 }
             }
@@ -1203,11 +657,185 @@ return	NULL;
 
 }
             }
-        case 'c':
-          if (strncmp (KR_keyword, "/dev/com", 8) == 0)
+        case 'k':
+          if (strncmp (KR_keyword, "/dev/sdk", 8) == 0)
             {
 {
-return &dev_serial_storage;
+return &dev_sdk_storage;
+
+}
+            }
+          else
+            {
+{
+return	NULL;
+
+}
+            }
+        case 'j':
+          if (strncmp (KR_keyword, "/dev/sdj", 8) == 0)
+            {
+{
+return &dev_sdj_storage;
+
+}
+            }
+          else
+            {
+{
+return	NULL;
+
+}
+            }
+        case 'i':
+          if (strncmp (KR_keyword, "/dev/sdi", 8) == 0)
+            {
+{
+return &dev_sdi_storage;
+
+}
+            }
+          else
+            {
+{
+return	NULL;
+
+}
+            }
+        case 'h':
+          if (strncmp (KR_keyword, "/dev/sdh", 8) == 0)
+            {
+{
+return &dev_sdh_storage;
+
+}
+            }
+          else
+            {
+{
+return	NULL;
+
+}
+            }
+        case 'g':
+          if (strncmp (KR_keyword, "/dev/sdg", 8) == 0)
+            {
+{
+return &dev_sdg_storage;
+
+}
+            }
+          else
+            {
+{
+return	NULL;
+
+}
+            }
+        case 'f':
+          if (strncmp (KR_keyword, "/dev/sdf", 8) == 0)
+            {
+{
+return &dev_sdf_storage;
+
+}
+            }
+          else
+            {
+{
+return	NULL;
+
+}
+            }
+        case 'e':
+          if (strncmp (KR_keyword, "/dev/sde", 8) == 0)
+            {
+{
+return &dev_sde_storage;
+
+}
+            }
+          else
+            {
+{
+return	NULL;
+
+}
+            }
+        case 'd':
+          switch (KR_keyword [6])
+            {
+            case 'd':
+              if (strncmp (KR_keyword, "/dev/sdd", 8) == 0)
+                {
+{
+return &dev_sdd_storage;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            case 'c':
+              if (strncmp (KR_keyword, "/dev/scd", 8) == 0)
+                {
+{
+return &dev_cdrom_storage;
+
+}
+                }
+              else
+                {
+{
+return	NULL;
+
+}
+                }
+            default:
+{
+return	NULL;
+
+}
+            }
+        case 'c':
+          if (strncmp (KR_keyword, "/dev/sdc", 8) == 0)
+            {
+{
+return &dev_sdc_storage;
+
+}
+            }
+          else
+            {
+{
+return	NULL;
+
+}
+            }
+        case 'b':
+          if (strncmp (KR_keyword, "/dev/sdb", 8) == 0)
+            {
+{
+return &dev_sdb_storage;
+
+}
+            }
+          else
+            {
+{
+return	NULL;
+
+}
+            }
+        case 'a':
+          if (strncmp (KR_keyword, "/dev/sda", 8) == 0)
+            {
+{
+return &dev_sda_storage;
 
 }
             }
@@ -1576,6 +1204,8 @@ device::parse (const char *s)
 		dev = ttys_dev;         // SIGH
 	      if (n >= dev->lower && n <= dev->upper)
 		unit = n;
+	      else
+	        dev = NULL;
 	    }
 	}
     }

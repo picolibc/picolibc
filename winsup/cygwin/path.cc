@@ -903,17 +903,19 @@ win32_device_name (const char *src_path, char *win32_path, device& dev)
   if (dev.devn == FH_FS)
     return false;
 
-  switch (dev.devn)
+  switch (dev.major)
     {
-      case FH_TAPE:
+      case DEV_TAPE_MAJOR:
 	__small_sprintf (win32_path, dev.fmt, dev.minor % 128);
 	break;
-      case FH_RAWDRIVE:
-	  __small_sprintf (win32_path, dev.fmt, dev.minor - 224 + 'A');
+      case DEV_RAWDRIVE_MAJOR:
+	__small_sprintf (win32_path, dev.fmt, dev.minor + 'A');
+	break;
+      case DEV_SD_MAJOR:
+	__small_sprintf (win32_path, dev.fmt, dev.minor / 16, dev.minor % 16);
 	break;
       default:
 	__small_sprintf (win32_path, dev.fmt, dev.minor);
-	break;
     }
   return true;
 }

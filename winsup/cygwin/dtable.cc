@@ -382,7 +382,7 @@ build_fh_pc (path_conv& pc)
 	fh = cnew (fhandler_pipe) ();
 	break;
       case FH_TCP:
-      case FH_UCP:
+      case FH_UDP:
       case FH_ICMP:
       case FH_UNIX:
       case FH_STREAM:

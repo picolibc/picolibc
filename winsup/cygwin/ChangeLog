@@ -1,3 +1,13 @@
+2003-09-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* devices.h: Move a few device major numbers.  Fix typo of FH_UDP.
+	* device.shilka: Remove /dev/hd device entries, rename all device_hd*
+	to device_sd*.
+	(device::parse): Disallow units outside lower and upper bounds.
+	* dtable.cc (build_fh_pc): Fix typo of FH_UDP.
+	* path.cc (win32_device_name): Fix win32 name creation to match new
+	device handling.
+
 2003-09-27  Christopher Faylor  <cgf@redhat.com>
 
 	* device.shilka (device::parse): Allow units on other than tty.
