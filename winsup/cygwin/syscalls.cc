@@ -384,6 +384,9 @@ _write (int fd, const void *ptr, size_t len)
       myself->process_state |= PID_TTYOU;
       res = cfd->write (ptr, len);
       myself->process_state &= ~PID_TTYOU;
+      if (res && get_errno () == EACCES &&
+	  !(cfd->get_flags () & (O_WRONLY | O_RDWR)))
+	set_errno (EBADF);
     }
 
 done:
