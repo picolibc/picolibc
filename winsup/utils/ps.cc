@@ -165,6 +165,18 @@ to_time_t (FILETIME *ptr)
   return x;
 }
 
+static const char *
+ttynam (int ntty)
+{
+  static char buf[5];
+  if (ntty < 0)
+    return "   ?";
+  if (ntty == TTY_CONSOLE)
+    return " con";
+  sprintf (buf, "%4d", ntty);
+  return buf;
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -172,11 +184,11 @@ main (int argc, char *argv[])
   int aflag, lflag, fflag, sflag, uid;
   cygwin_getinfo_types query = CW_GETPINFO;
   const char *dtitle = "    PID TTY     STIME COMMAND\n";
-  const char *dfmt   = "%7d%4d%10s %s\n";
+  const char *dfmt   = "%7d%4s%10s %s\n";
   const char *ftitle = "     UID     PID    PPID TTY     STIME COMMAND\n";
-  const char *ffmt   = "%8.8s%8d%8d%4d%10s %s\n";
-  const char *ltitle = "      PID    PPID    PGID     WINPID TTY  UID    STIME COMMAND\n";
-  const char *lfmt   = "%c %7d %7d %7d %10u %3d %4d %8s %s\n";
+  const char *ffmt   = "%8.8s%8d%8d%4s%10s %s\n";
+  const char *ltitle = "      PID    PPID    PGID     WINPID  TTY  UID    STIME COMMAND\n";
+  const char *lfmt   = "%c %7d %7d %7d %10u %4s %4d %8s %s\n";
   char ch;
 
   aflag = lflag = fflag = sflag = 0;
@@ -298,12 +310,12 @@ main (int argc, char *argv[])
         }
 
       if (sflag)
-        printf (dfmt, p->pid, p->ctty, start_time (p), pname);
+        printf (dfmt, p->pid, ttynam (p->ctty), start_time (p), pname);
       else if (fflag)
-        printf (ffmt, uname, p->pid, p->ppid, p->ctty, start_time (p), pname);
+        printf (ffmt, uname, p->pid, p->ppid, ttynam (p->ctty), start_time (p), pname);
       else if (lflag)
         printf (lfmt, status, p->pid, p->ppid, p->pgid,
-                p->dwProcessId, p->ctty, p->uid, start_time (p), pname);
+                p->dwProcessId, ttynam (p->ctty), p->uid, start_time (p), pname);
 
     }
   (void) cygwin_internal (CW_UNLOCK_PINFO);

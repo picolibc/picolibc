@@ -1,3 +1,8 @@
+Sat Apr 28 22:32:01 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* passwd.cc (ttymnam): New function.
+	(main): Use ttynam() to report name of tty.
+
 2001-04-19  Egor Duda  <deo@logos-m.ru>
 
 	* dumper.cc (dumper::init_core_dump): Set architecture field in dump
