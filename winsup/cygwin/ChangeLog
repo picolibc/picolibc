@@ -1,3 +1,15 @@
+Tue Jun 26 16:59:16 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler.cc (fhandler_disk_file::fstat): Don't rely on exactly 3
+	characters being read for executable test since we could be checking
+	for less than that.
+	* syscalls.cc (stat_worker): Try opening the file the "correct" way
+	first so that #! processing can potentially happen.  If that fails,
+	then use "query open" method.
+
+	* spawn.cc (spawn_guts): Delay processing of signal until after we've
+	notified parent about reparenting.
+
 Tue Jun 26 10:47:24 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* mmap.cc: Clean up *ResourceLock calls throughout.

@@ -743,6 +743,7 @@ skip_arg_parsing:
 
   HANDLE waitbuf[3] = {pi.hProcess, signal_arrived, spr};
   int nwait = 3;
+  bool saw_signal = 0;
 
   res = 0;
   exited = FALSE;
@@ -761,8 +762,8 @@ skip_arg_parsing:
 	  break;
 	case WAIT_OBJECT_0 + 1:
 	  sigproc_printf ("signal arrived");
-	  // reset_signal_arrived ();
-	  thisframe.call_signal_handler ();
+	  reset_signal_arrived ();
+	  saw_signal = 1;
 	  continue;
 	case WAIT_OBJECT_0 + 2:
 	  if (mode == _P_OVERLAY)
@@ -819,6 +820,9 @@ skip_arg_parsing:
 	  system_printf ("old hProcess %p, hProcess %p", oldh, myself->hProcess);
 	}
     }
+
+  if (saw_signal && mode != _P_OVERLAY)
+    thisframe.call_signal_handler ();
 
   MALLOC_CHECK;
 

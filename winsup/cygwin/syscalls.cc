@@ -1069,9 +1069,16 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 	&& dtype != DRIVE_NO_ROOT_DIR
 	&& dtype != DRIVE_UNKNOWN)))
     {
-      fh.set_query_open (TRUE);
       oret = fh.open (real_path, O_RDONLY | O_BINARY | O_DIROPEN |
 				 (nofollow ? O_NOSYMLINK : 0), 0);
+      /* If we couldn't open the file, try a "query open" with no permissions.
+	 This will allow us to determine *some* things about the file, at least. */
+      if (!oret)
+	{
+	  fh.set_query_open (TRUE);
+	  oret = fh.open (real_path, O_RDONLY | O_BINARY | O_DIROPEN |
+				     (nofollow ? O_NOSYMLINK : 0), 0);
+	}
       /* Check a special case here. If ntsec is ON it happens
 	 that a process creates a file using mode 000 to disallow
 	 other processes access. In contrast to UNIX, this results

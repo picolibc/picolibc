@@ -993,8 +993,8 @@ fhandler_disk_file::fstat (struct stat *buf)
 		  {
 		    /* FIXME should we use /etc/magic ? */
 		    magic[0] = magic[1] = magic[2] = '\0';
-		    if (ReadFile (get_handle (), magic, 3, &done, 0) &&
-			done == 3 && has_exec_chars (magic, done))
+		    if (ReadFile (get_handle (), magic, 3, &done, NULL) &&
+			has_exec_chars (magic, done))
 			set_execable_p ();
 		    SetFilePointer (get_handle(), cur, NULL, FILE_BEGIN);
 		  }
