@@ -1,3 +1,11 @@
+Sat Sep  9 23:29:17 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (chdir): Use the full path for cwd_win32.  Consider attempts
+	to chdir to strings of dots > 2 to be an error.  Pass 'dir' argument to
+	cygcwd.set.
+	(cwdstuff::set): Need to treat arguments from chdir differently.
+	* path.h (cwdstuff): Add an argument to set.
+
 Fri Sep  8 11:50:09 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* lib/_cygwin_crt0_common.cc: Add missing header files.

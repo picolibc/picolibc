@@ -2488,12 +2488,29 @@ int
 chdir (const char *dir)
 {
   syscall_printf ("dir %s", dir);
-  path_conv path (dir);
+  path_conv path (dir, PC_FULL | PC_SYM_FOLLOW);
 
   if (path.error)
     {
       set_errno (path.error);
       syscall_printf ("-1 = chdir (%s)", dir);
+      return -1;
+    }
+
+  /* Look for trailing path component consisting entirely of dots.  This
+     is needed only in case of chdir since Windows simply ignores count
+     of dots > 2 here instead of returning an error code.  Counts of dots
+     <= 2 are already eliminated by normalize_posix_path. */
+  const char *p = strrchr (dir, '/');
+  if (!p)
+    p = dir;
+  else
+    p++;
+
+  int len = strlen (p);
+  if (len > 2 && strspn (p, ".") == len)
+    {
+      set_errno (ENOENT);
       return -1;
     }
 
@@ -2512,7 +2529,7 @@ chdir (const char *dir)
   if (res == -1)
     __seterrno ();
   else
-    cygcwd.set (path);
+    cygcwd.set (path, dir);
 
   /* Note that we're accessing cwd.posix without a lock here.  I didn't think
      it was worth locking just for strace. */
@@ -2920,8 +2937,10 @@ cwdstuff::get_initial ()
    It is assumed that the lock for the cwd is acquired if
    win32_cwd == NULL. */
 void
-cwdstuff::set (char *win32_cwd)
+cwdstuff::set (const char *win32_cwd, const char *posix_cwd)
 {
+  char pathbuf[MAX_PATH];
+
   if (win32_cwd)
     {
       lock->acquire ();
@@ -2929,14 +2948,15 @@ cwdstuff::set (char *win32_cwd)
       strcpy (win32, win32_cwd);
     }
 
+  if (!posix_cwd)
+    cygwin_shared->mount.conv_to_posix_path (win32, pathbuf, 0);
+  else
+    (void) normalize_posix_path (posix_cwd, pathbuf);
+
+  posix = (char *) crealloc (posix, strlen (pathbuf) + 1);
+  strcpy (posix, pathbuf);
+
   hash = hash_path_name (0, win32);
-
-  /* Turn from Win32 style to our style.  */
-  char temp[MAX_PATH];
-  cygwin_shared->mount.conv_to_posix_path (win32, temp, 0);
-
-  posix = (char *) crealloc (posix, strlen (temp) + 1);
-  strcpy (posix, temp);
 
   if (win32_cwd)
     lock->release ();

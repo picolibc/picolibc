@@ -139,7 +139,7 @@ struct cwdstuff
   void fixup_after_exec (char *win32, char *posix, DWORD hash);
   bool get_initial ();
   void copy (char * &posix_cwd, char * &win32_cwd, DWORD hash_cwd);
-  void set (char *win32_cwd);
+  void set (const char *win32_cwd, const char *posix_cwd = NULL);
 };
 
 extern cwdstuff cygcwd;
