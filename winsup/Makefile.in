@@ -40,7 +40,7 @@ SUBDIRS=@SUBDIRS@
 INSTALL_SUBDIRS=${patsubst %,install_%,$(SUBDIRS)}
 CLEAN_SUBDIRS=${patsubst %,clean_%,$(SUBDIRS)}
 
-.PHONY: all install clean all-info info install-info \
+.PHONY: all install clean all-info info install-info check \
 	$(SUBDIRS) $(INSTALL_SUBDIRS) $(CLEAN_SUBDIRS)
 
 .SUFFIXES:
@@ -73,6 +73,7 @@ $(INSTALL_SUBDIRS):
 
 $(CLEAN_SUBDIRS):
 	@$(MAKE) -C ${patsubst clean_%,%,$@} clean
+	@$(MAKE) -C testsuite clean
 
 .PRECIOUS: Makefile
 
@@ -81,3 +82,6 @@ Makefile: Makefile.in $(srcdir)/configure.in config.status
 
 config.status: configure
 	$(SHELL) config.status --recheck
+
+check:
+	@$(MAKE) -C testsuite check

@@ -1,3 +1,10 @@
+2000-09-02  Egor Duda  <deo@logos-m.ru>
+
+	* Makefile.in: Add new goal "check"
+	* configure.in: When doing native build do configure in
+	testsuite subdirectory
+	* configure: Regenerate.
+
 Fri Sep  1 10:15:37 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: More normalization.

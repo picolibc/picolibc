@@ -60,9 +60,8 @@ LIB_AC_PROG_CC
 SUBDIRS='w32api cygwin mingw'
 case "$with_cross_host" in
   ""|*cygwin*)
-    SUBDIRS="$SUBDIRS utils"
     test -d $srcdir/cinstall && SUBDIRS="$SUBDIRS cinstall"
-    SUBDIRS="$SUBDIRS doc"
+    SUBDIRS="$SUBDIRS utils doc testsuite"
     ;;
 esac
 
