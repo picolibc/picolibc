@@ -1,3 +1,7 @@
+2001-12-04  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/winuser.h (IDC_STATIC): Don't define.
+
 2001-12-04  Danny Smith  <dannysmith@users.sourceforge.net>
 
         Cleanup merge between SourceForge and winsup CVS.

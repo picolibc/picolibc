@@ -544,8 +544,13 @@ extern "C" {
 #define GCL_MENUNAME (-8)
 #define GCL_STYLE (-26)
 #define GCL_WNDPROC (-24)
+#if 0
+    /* This is supposed to be defined by the program using it not defined
+       in the win32api headers.  I've left it here for documentation purposes.
+    */
 #ifndef IDC_STATIC  /* May be predefined by resource compiler.  */
 #define IDC_STATIC (-1)
+#endif
 #endif
 #define IDC_ARROW MAKEINTRESOURCE(32512)
 #define IDC_IBEAM MAKEINTRESOURCE(32513)
