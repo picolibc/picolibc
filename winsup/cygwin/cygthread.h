@@ -15,9 +15,13 @@ class cygthread
   const char *__name;
   LPTHREAD_START_ROUTINE func;
   VOID *arg;
+  bool is_freerange;
   static DWORD main_thread_id;
+  static bool initialized;
   static DWORD WINAPI runner (VOID *);
+  static DWORD WINAPI free_runner (VOID *);
   static DWORD WINAPI stub (VOID *);
+  static DWORD WINAPI simplestub (VOID *);
  public:
   static const char * name (DWORD = 0);
   cygthread (LPTHREAD_START_ROUTINE, LPVOID, const char *);
@@ -27,6 +31,7 @@ class cygthread
   operator HANDLE ();
   static bool is ();
   void * operator new (size_t);
+  static void * freerange ();
   void exit_thread ();
 };
 

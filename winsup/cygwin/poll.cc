@@ -11,6 +11,7 @@
 #include "winsup.h"
 #include <sys/time.h>
 #include <sys/poll.h>
+#include <sys/socket.h>
 #include <errno.h>
 #include <stdlib.h>
 #include "security.h"
@@ -85,7 +86,27 @@ poll (struct pollfd *fds, unsigned int nfds, int timeout)
 	    else
 	      {
 		if (FD_ISSET(fds[i].fd, read_fds))
-		  fds[i].revents |= POLLIN;
+		  {
+		    char peek[1];
+		    fhandler_socket *sock =
+				      cygheap->fdtab[fds[i].fd]->is_socket ();
+		    if (!sock)
+		      fds[i].revents |= POLLIN;
+		    else
+		      switch (sock->recvfrom (peek, sizeof(peek), MSG_PEEK,
+					      NULL, NULL))
+			{
+			  case -1: /* Something weird happened */
+			    fds[i].revents |= POLLERR;
+			    break;
+			  case 0:  /* Closed on the read side. */
+			    fds[i].revents |= POLLHUP;
+			    break;
+			  default:
+			    fds[i].revents |= POLLIN;
+			    break;
+			}
+		  }
 		if (FD_ISSET(fds[i].fd, write_fds))
 		  fds[i].revents |= POLLOUT;
 		if (FD_ISSET(fds[i].fd, except_fds))

@@ -8,18 +8,36 @@ details. */
 
 #include "winsup.h"
 #include <windows.h>
+#include <stdlib.h>
 #include "exceptions.h"
 #include "security.h"
 #include "cygthread.h"
 
 #undef CloseHandle
 
-static cygthread NO_COPY threads[8];
+static cygthread NO_COPY threads[6];
 #define NTHREADS (sizeof (threads) / sizeof (threads[0]))
 
-static HANDLE NO_COPY hthreads[NTHREADS];
-
 DWORD NO_COPY cygthread::main_thread_id;
+bool cygthread::initialized;
+
+/* Initial stub called by cygthread constructor. Performs initial
+   per-thread initialization and loops waiting for new thread functions
+   to execute.  */
+DWORD WINAPI
+cygthread::simplestub (VOID *arg)
+{
+  DECLARE_TLS_STORAGE;
+  exception_list except_entry;
+
+  /* Initialize this thread's ability to respond to things like
+     SIGSEGV or SIGFPE. */
+  init_exceptions (&except_entry);
+
+  cygthread *info = (cygthread *) arg;
+  info->func (info->arg == cygself ? info : info->arg);
+  ExitThread (0);
+}
 
 /* Initial stub called by cygthread constructor. Performs initial
    per-thread initialization and loops waiting for new thread functions
@@ -60,9 +78,9 @@ DWORD WINAPI
 cygthread::runner (VOID *arg)
 {
   for (unsigned i = 0; i < NTHREADS; i++)
-    hthreads[i] = threads[i].h =
-      CreateThread (&sec_none_nih, 0, cygthread::stub, &threads[i],
-		    CREATE_SUSPENDED, &threads[i].avail);
+    threads[i].h = CreateThread (&sec_none_nih, 0, cygthread::stub, &threads[i],
+				 CREATE_SUSPENDED, &threads[i].avail);
+  cygthread::initialized = true;
   return 0;
 }
 
@@ -90,6 +108,17 @@ cygthread::is ()
   return 0;
 }
 
+void *
+cygthread::freerange ()
+{
+  cygthread *self = (cygthread *) calloc (1, sizeof (*self));
+  self->is_freerange = true;
+  self->h = CreateThread (&sec_none_nih, 0, cygthread::simplestub, self,
+			  CREATE_SUSPENDED, &self->id);
+  self->ev = self->h;
+  return self;
+}
+
 void * cygthread::operator
 new (size_t)
 {
@@ -110,8 +139,10 @@ new (size_t)
 	    return info;
 	  }
 
-      /* thread_runner may not be finished yet. */
-      Sleep (0);
+      if (!initialized)
+	Sleep (0); /* thread_runner is not be finished yet. */
+      else
+	return freerange ();
     }
 }
 
@@ -179,7 +210,8 @@ HANDLE ()
 void
 cygthread::exit_thread ()
 {
-  SetEvent (*this);
+  if (!is_freerange)
+    SetEvent (*this);
   ExitThread (0);
 }
 
@@ -204,10 +236,18 @@ cygthread::detach ()
 	  DWORD res = WaitForSingleObject (*this, INFINITE);
 	  thread_printf ("WFSO returns %d, id %p", res, id);
 	}
-      ResetEvent (*this);
-      id = 0;
-      __name = NULL;
-      /* Mark the thread as available by setting avail to non-zero */
-      (void) InterlockedExchange ((LPLONG) &this->avail, avail);
+      if (is_freerange)
+	{
+	  CloseHandle (h);
+	  free (this);
+	}
+      else
+	{
+	  ResetEvent (*this);
+	  id = 0;
+	  __name = NULL;
+	  /* Mark the thread as available by setting avail to non-zero */
+	  (void) InterlockedExchange ((LPLONG) &this->avail, avail);
+	}
     }
 }
