@@ -1,4 +1,10 @@
 
+Tue Jan 30 07:52:54  2001  Earnie Boyd  <earnie@users.sourceforge.net>
+
+	* Apply Danny Smith patch 102386
+	2000-11-15  Danny Smith  <danny_r_smith_2001@yahoo.co.nz>
+	* lib/rasapi32.def: add symbols available in NT4 and W2k
+
 Sun Jan 28 12:47:31  2001  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* Apply Danny Smith patch 102382
