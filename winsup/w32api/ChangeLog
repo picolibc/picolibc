@@ -1,3 +1,10 @@
+2001-11-08  Robert Collins  <rbtcollins@hotmail.com>
+
+	* include/winnt.h: Define *_SID_AUTHORITY appropriately. (nested
+	structures.)
+	GetCurrentFiber: Create a prototype before the implementation;
+	GetFiberData: Ditto.
+
 2001-11-04  Christopher Faylor  <cgf@redhat.com>
 
 	* lib/Makefile.in: Add .NOTPARALLEL target since dlltool cannot run in
