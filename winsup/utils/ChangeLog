@@ -1,5 +1,16 @@
 2002-06-03  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
+	* ssp.c (version): New global variable.
+	(longopts): Ditto.
+	(opts): Ditto.
+	(run_program): Correct cmd_line typos to cmdline.
+	(usage): New function.  Standardize usage output.  Add ssp.txt to
+	--help output.
+	(print_version): New function.
+	(main): Accommodate getopt.
+
+2002-06-03  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
+
 	* umount.cc (version): New global variable.
 	(longopts): Accommodate new --version option.
 	(opts): Ditto.

@@ -20,53 +20,26 @@
 #include <time.h>
 #include <ctype.h>
 #include <windows.h>
+#include <getopt.h>
 
-#ifdef __GNUC__
-const char *help_text = "\
-Usage: ssp [options] low_pc high_pc command...\n\
-\n\
-The SSP is a `single-step profiler' - it uses the debug API to\n\
-single-step your program, noting *everything* your program runs, not\n\
-just random places hit by random timer interrupts.  You must specify\n\
-the range of EIP values to profile.  For example, you could profile\n\
-just a function, or just a line of code, or the whole thing.\n\
-Use \"objdump -h\" to find the start of .text and the section following\n\
-it; this is what you want.\n\
-\n\
-There are many options to ssp.  Since step-profiling makes your\n\
-program run about 1,000 times slower than normal, it's best to\n\
-understand all the options so that you can narrow down the parts\n\
-of your program you need to single-step.\n\
-\n\
--v = verbose messages about debug events.\n\
-\n\
--d, -e = disable/enable single-stepping by default.  Use\n\
-OutputDebugString (\"ssp on\") to enable stepping, or \"ssp off\" to\n\
-disable it.  Thus, you can profile a single function call or block.\n\
-\n\
--t = trace every EIP value to a file TRACE.SSP.  This gets big *fast*.\n\
-Use \"addr2line -C -f -s -e foo.exe < trace.ssp > lines.ssp\" and then\n\
-\"perl cvttrace\" to convert to symbolic traces.\n\
-\n\
--tc = trace every EIP value to the console.  *Lots* slower.\n\
-\n\
--s = trace sub-threads too.  Dangerous if you have race conditions.\n\
-\n\
--dll = enable dll profiling.  A chart of relative DLL usage is\n\
-produced after the run.\n\
-\n\
-Examples:\n\
-  ssp 0x401000 0x403000 hello.exe\n\
-  ssp -v -d -dll 0x401000 0x440000 foo.exe\n\
-\n\
-The output is a file \"gmon.out\" that can be read with gprof:\n\
-  gprof -b foo.exe\n\
-\n\
-See ssp.txt in the cygwin sources for more information.\n\
-";
-#else
-char *help_text = "Usage: get cygwin!\n";
-#endif
+static const char version[] = "$Revision$";
+static char *prog_name;
+
+static struct option longopts[] =
+{
+  {"console-trace", no_argument, NULL, 'c' },
+  {"disable", no_argument, NULL, 'd' },
+  {"enable", no_argument, NULL, 'e' },
+  {"help", no_argument, NULL, 'h' },
+  {"dll", no_argument, NULL, 'l' },
+  {"sub-threads", no_argument, NULL, 's' },
+  {"trace-eip", no_argument, NULL, 't' },
+  {"verbose", no_argument, NULL, 'v' },
+  {"version", no_argument, NULL, 'V' },
+  {NULL, 0, NULL, 0}
+};
+
+static char opts[] = "cdehlstvV";
 
 #define KERNEL_ADDR 0x77000000
 
@@ -102,7 +75,6 @@ typedef struct {
 int low_pc=0, high_pc=0;
 unsigned int last_pc=0, pc, last_sp=0, sp;
 int total_cycles, count;
-char *cmd_line;
 HANDLE hProcess;
 PROCESS_INFORMATION procinfo;
 STARTUPINFO startup;
@@ -330,7 +302,7 @@ run_program (char *cmdline)
   memset (&startup, 0, sizeof (startup));
   startup.cb = sizeof (startup);
 
-  if (!CreateProcess (0, cmd_line, 0, 0, 0,
+  if (!CreateProcess (0, cmdline, 0, 0, 0,
 		     CREATE_NEW_PROCESS_GROUP
 		     | CREATE_SUSPENDED
 		     | DEBUG_PROCESS
@@ -355,7 +327,7 @@ run_program (char *cmdline)
   dll_info[0].base_address = 0;
   dll_info[0].pcount = 0;
   dll_info[0].scount = 0;
-  dll_info[0].name = cmd_line;
+  dll_info[0].name = cmdline;
   num_dlls = 1;
 
   SetThreadPriority (procinfo.hThread, THREAD_PRIORITY_IDLE);
@@ -671,76 +643,250 @@ run_program (char *cmdline)
 
 }
 
-#define WHITE(s) while (isspace (*s)) s++
+static void
+usage (FILE * stream)
+{
+  fprintf (stream , ""
+  "Usage: %s [options] low_pc high_pc command...\n"
+  " -c, --console-trace  trace every EIP value to the console. *Lots* slower.\n"
+  " -d, --disable        disable single-stepping by default; use\n"
+  "                      OutputDebugString (\"ssp on\") to enable stepping\n"
+  " -e, --enable         enable single-stepping by default; use\n"
+  "                      OutputDebugString (\"ssp off\") to disable stepping\n"
+  " -h, --help           output usage information and exit\n"
+  " -l, --dll            enable dll profiling.  A chart of relative DLL usage\n"
+  "                      is produced after the run.\n"
+  " -s, --sub-threads    trace sub-threads too.  Dangerous if you have\n" 
+  "                      race conditions.\n"
+  " -t, --trace-eip      trace every EIP value to a file TRACE.SSP.  This\n"
+  "                      gets big *fast*.\n"
+  " -v, --verbose        output verbose messages about debug events.\n"
+  " -V, --version        output version information and exit\n"
+  "\n"
+  "Example: %s 0x401000 0x403000 hello.exe\n"
+  "\n"
+  "", prog_name, prog_name);
+  if (stream == stdout)
+    fprintf (stream , ""
+    "SSP - The Single Step Profiler\n"
+    "\n"
+    "Original Author:  DJ Delorie <dj@redhat.com>\n"
+    "\n"
+    "The SSP is a program that uses the Win32 debug API to run a program\n"
+    "one ASM instruction at a time.  It records the location of each\n"
+    "instruction used, how many times that instruction is used, and all\n"
+    "function calls.  The results are saved in a format that is usable by\n"
+    "the profiling program \"gprof\", although gprof will claim the values\n"
+    "are seconds, they really are instruction counts.  More on that later.\n"
+    "\n"
+    "Because the SSP was originally designed to profile the cygwin DLL, it\n"
+    "does not automatically select a block of code to report statistics on.\n"
+    "You must specify the range of memory addresses to keep track of\n"
+    "manually, but it's not hard to figure out what to specify.  Use the\n"
+    "\"objdump\" program to determine the bounds of the target's \".text\"\n"
+    "section.  Let's say we're profiling cygwin1.dll.  Make sure you've\n"
+    "built it with debug symbols (else gprof won't run) and run objdump\n"
+    "like this:\n"
+    "\n"
+    "	objdump -h cygwin1.dll\n"
+    "\n"
+    "It will print a report like this:\n"
+    "\n"
+    "cygwin1.dll:     file format pei-i386\n"
+    "\n"
+    "Sections:\n"
+    "Idx Name          Size      VMA       LMA       File off  Algn\n"
+    "  0 .text         0007ea00  61001000  61001000  00000400  2**2\n"
+    "                  CONTENTS, ALLOC, LOAD, READONLY, CODE, DATA\n"
+    "  1 .data         00008000  61080000  61080000  0007ee00  2**2\n"
+    "                  CONTENTS, ALLOC, LOAD, DATA\n"
+    "  . . .\n"
+    "\n"
+    "The only information we're concerned with are the VMA of the .text\n"
+    "section and the VMA of the section after it (sections are usually\n"
+    "contiguous; you can also add the Size to the VMA to get the end\n"
+    "address).  In this case, the VMA is 0x61001000 and the ending address\n"
+    "is either 0x61080000 (start of .data method) or 0x0x6107fa00 (VMA+Size\n"
+    "method).\n"
+    "\n"
+    "There are two basic ways to use SSP - either profiling a whole\n"
+    "program, or selectively profiling parts of the program.\n"
+    "\n"
+    "To profile a whole program, just run ssp without options.  By default,\n"
+    "it will step the whole program.  Here's a simple example, using the\n"
+    "numbers above:\n"
+    "\n"
+    "	ssp 0x61001000 0x61080000 hello.exe\n"
+    "\n"
+    "This will step the whole program.  It will take at least 8 minutes on\n"
+    "a PII/300 (yes, really).  When it's done, it will create a file called\n"
+    "\"gmon.out\".  You can turn this data file into a readable report with\n"
+    "gprof:\n"
+    "\n"
+    "	gprof -b cygwin1.dll\n"
+    "\n"
+    "The \"-b\" means 'skip the help pages'.  You can omit this until you're\n"
+    "familiar with the report layout.  The gprof documentation explains\n"
+    "a lot about this report, but ssp changes a few things.  For example,\n"
+    "the first part of the report reports the amount of time spent in each\n"
+    "function, like this:\n"
+    "\n"
+    "Each sample counts as 0.01 seconds.\n"
+    "  %%   cumulative   self              self     total\n"
+    " time   seconds   seconds    calls  ms/call  ms/call  name\n"
+    " 10.02    231.22    72.43       46  1574.57  1574.57  strcspn\n"
+    "  7.95    288.70    57.48      130   442.15   442.15  strncasematch\n"
+    "\n"
+    "The \"seconds\" columns are really CPU opcodes, 1/100 second per opcode.\n"
+    "So, \"231.22\" above means 23,122 opcodes.  The ms/call values are 10x\n"
+    "too big; 1574.57 means 157.457 opcodes per call.  Similar adjustments\n"
+    "need to be made for the \"self\" and \"children\" columns in the second\n"
+    "part of the report.\n"
+    "\n"
+    "OK, so now we've got a huge report that took a long time to generate,\n"
+    "and we've identified a spot we want to work on optimizing.  Let's say\n"
+    "it's the time() function.  We can use SSP to selectively profile this\n"
+    "function by using OutputDebugString() to control SSP from within the\n"
+    "program.  Here's a sample program:\n"
+    "\n"
+    "	#include <windows.h>\n"
+    "	main()\n"
+    "	{\n"
+    "	  time_t t;\n"
+    "	  OutputDebugString(\"ssp on\");\n"
+    "	  time(&t);\n"
+    "	  OutputDebugString(\"ssp off\");\n"
+    "	}\n"
+    "\n"
+    "Then, add the \"-d\" option to ssp to default to *disabling* profiling.\n"
+    "The program will run at full speed until the first OutputDebugString,\n"
+    "then step until the second.\n"
+    "\n"
+    "	ssp -d 0x61001000 0x61080000 hello.exe\n"
+    "\n"
+    "You can then use gprof (as usual) to see the performance profile for\n"
+    "just that portion of the program's execution.\n"
+    "\n"
+    "There are many options to ssp.  Since step-profiling makes your\n"
+    "program run about 1,000 times slower than normal, it's best to\n"
+    "understand all the options so that you can narrow down the parts\n"
+    "of your program you need to single-step.\n"
+    "\n"
+    "\"-v\" - verbose.  This prints messages about threads starting and\n"
+    "stopping, OutputDebugString calls, DLLs loading, etc.\n"
+    "\n"
+    "\"-t\" and \"-c\" - tracing.  With -t, *every* step's address is written\n"
+    "to the file \"trace.ssp\".  This can be used to help debug functions,\n"
+    "since it can trace multiple threads.  Clever use of scripts can match\n"
+    "addresses with disassembled opcodes if needed.  Warning: creates\n"
+    "*huge* files, very quickly.  \"-c\" prints each address to the console,\n"
+    "useful for debugging key chunks of assembler.\n"
+    "Use \"addr2line -C -f -s -e foo.exe < trace.ssp > lines.ssp\" and then\n"
+    "\"perl cvttrace\" to convert to symbolic traces.\n"
+    "\n"
+    "\"-s\" - subthreads.  Usually, you only need to trace the main thread,\n"
+    "but sometimes you need to trace all threads, so this enables that.\n"
+    "It's also needed when you want to profile a function that only a\n"
+    "subthread calls.  However, using OutputDebugString automatically\n"
+    "enables profiling on the thread that called it, not the main thread.\n"
+    "\n"
+    "\"-l\" - dll profiling.  Generates a pretty table of how much time was\n"
+    "spent in each dll the program used.  No sense optimizing a function in\n"
+    "your program if most of the time is spent in the DLL.\n"
+    "\n"
+    "I usually use the -v, -s, and -l options:\n"
+    "\n"
+    "	ssp -v -s -l -d 0x61001000 0x61080000 hello.exe\n"
+    "\n");
+  if (stream == stderr)
+    fprintf (stream, "Try '%s --help' for more information.", prog_name);
+  exit (stream == stderr ? 1 : 0);
+}
+
+static void
+print_version ()
+{
+  const char *v = strchr (version, ':');
+  int len;
+  if (!v)
+    {
+      v = "?";
+      len = 1;
+    }
+  else
+    {
+      v += 2;
+      len = strchr (v, ' ') - v;
+    }
+  printf ("\
+%s (cygwin) %.*s\n\
+Single-Step Profiler\n\
+Copyright 2000, 2001, 2002 Red Hat, Inc.\n\
+Compiled on %s", prog_name, len, v, __DATE__);
+}
 
 int
 main (int argc, char **argv)
 {
-  int i, n;
+  int c, i;
   int total_pcount, total_scount;
   FILE *gmon;
 
   setbuf (stdout, 0);
 
-  cmd_line = GetCommandLine ();
+  prog_name = strrchr (argv[0], '/');
+  if (prog_name == NULL)
+    prog_name = strrchr (argv[0], '\\');
+  if (prog_name == NULL)
+    prog_name = argv[0];
+  else
+    prog_name++;
 
-  /* strip off the program part */
-  n = sscanf (cmd_line, "%*s%n", &i);
-  cmd_line += i;
-  WHITE (cmd_line);
-
-  /* parse arguments.  Ugly, but we need to preserve the tail of the line */
-  while (*cmd_line == '-')
+  while ((c = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
+    switch (c)
     {
-      char opt[100];
-      n = sscanf (cmd_line, " %s%n", opt, &i);
-      cmd_line += i;
-      WHITE (cmd_line);
-
-      if (strcmp (opt, "-d") == 0)
-	{
-	  printf ("stepping disabled; enable via OutputDebugString (\"ssp on\")\n");
-	  stepping_enabled = 0;
-	}
-      if (strcmp (opt, "-e") == 0)
-	{
-	  printf ("stepping enabled; disable via OutputDebugString (\"ssp off\")\n");
-	  stepping_enabled = 1;
-	}
-      if (strcmp (opt, "-t") == 0)
-	{
-	  printf ("tracing all $eip to trace.ssp\n");
-	  tracing_enabled = 1;
-	}
-      if (strcmp (opt, "-tc") == 0)
-	{
-	  printf ("tracing *all* $eip to the console\n");
-	  trace_console = 1;
-	}
-      if (strcmp (opt, "-s") == 0)
-	{
-	  printf ("tracing all sub-threads too, not just the main one\n");
-	  trace_all_threads = 1;
-	}
-      if (strcmp (opt, "-dll") == 0)
-	{
-	  printf ("profiling dll usage\n");
-	  dll_counts = 1;
-	}
-      if (strcmp (opt, "-v") == 0)
-	{
-	  printf ("verbose messages enabled\n");
-	  verbose = 1;
-	}
+      case 'c':
+        printf ("tracing *all* $eip to the console\n");
+        trace_console = 1;
+        break;
+      case 'd':
+        printf ("stepping disabled; enable via OutputDebugString (\"ssp on\")\n");
+        stepping_enabled = 0;
+        break;
+      case 'e':
+        printf ("stepping enabled; disable via OutputDebugString (\"ssp off\")\n");
+        stepping_enabled = 1;
+        break;
+      case 'h':
+        usage (stdout);
+        break;
+      case 'l':
+        printf ("profiling dll usage\n");
+        dll_counts = 1;
+        break;
+      case 's':
+        printf ("tracing all sub-threads too, not just the main one\n");
+        trace_all_threads = 1;
+        break;
+      case 't':
+        printf ("tracing all $eip to trace.ssp\n");
+        tracing_enabled = 1;
+        break;
+      case 'v':
+        printf ("verbose messages enabled\n");
+        verbose = 1;
+        break;
+      case 'V':
+        print_version ();
+        exit (0);
+      default:  
+        usage (stderr);
     }
 
-  n = sscanf (cmd_line, " %i %i %n", &low_pc, &high_pc, &i);
-  if (n < 2)
-    {
-      fputs (help_text, stderr);
-      exit (1);
-    }
-  cmd_line += i;
+  if ( (argc - optind) < 3 )
+    usage (stderr);
+  sscanf (argv[optind++], "%i", &low_pc); 
+  sscanf (argv[optind++], "%i", &high_pc); 
 
   if (low_pc > high_pc-8)
     {
@@ -752,9 +898,9 @@ main (int argc, char **argv)
   memset (hits, 0, high_pc-low_pc+4);
 
   fprintf (stderr, "prun: [%08x,%08x] Running `%s'\n",
-	  low_pc, high_pc, cmd_line);
+	  low_pc, high_pc, argv[optind]);
 
-  run_program (cmd_line);
+  run_program (argv[optind]);
 
   hdr.lpc = low_pc;
   hdr.hpc = high_pc;
