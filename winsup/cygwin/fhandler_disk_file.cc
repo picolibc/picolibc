@@ -656,37 +656,6 @@ fhandler_disk_file::readdir (DIR *dir)
 	}
     }
 
-  /* Compute d_ino by combining filename hash with the directory hash
-     (which was stored in dir->__d_dirhash when opendir was called). */
-  if (buf.cFileName[0] == '.')
-    {
-      if (buf.cFileName[1] == '\0')
-	dir->__d_dirent->d_ino = dir->__d_dirhash;
-      else if (buf.cFileName[1] != '.' || buf.cFileName[2] != '\0')
-	goto hashit;
-      else
-	{
-	  char *p, up[strlen (dir->__d_dirname) + 1];
-	  strcpy (up, dir->__d_dirname);
-	  if (!(p = strrchr (up, '\\')))
-	    goto hashit;
-	  *p = '\0';
-	  if (!(p = strrchr (up, '\\')))
-	    dir->__d_dirent->d_ino = hash_path_name (0, ".");
-	  else
-	    {
-	      *p = '\0';
-	      dir->__d_dirent->d_ino = hash_path_name (0, up);
-	    }
-	}
-    }
-  else
-    {
-  hashit:
-      ino_t dino = hash_path_name (dir->__d_dirhash, "\\");
-      dir->__d_dirent->d_ino = hash_path_name (dino, buf.cFileName);
-    }
-
   dir->__d_position++;
   res = dir->__d_dirent;
   syscall_printf ("%p = readdir (%p) (%s)",
@@ -784,13 +753,26 @@ fhandler_cygdrive::readdir (DIR *dir)
       set_errno (ENMFILE);
       return NULL;
     }
-  if (GetFileAttributes (pdrive) == INVALID_FILE_ATTRIBUTES)
+  if (dir->__d_position == 0)
+    {
+      *dir->__d_dirent->d_name = '.';
+      dir->__d_dirent->d_name[1] = '\0';
+    }
+  else if (dir->__d_position == 1)
+    {
+      dir->__d_dirent->d_name[0] = dir->__d_dirent->d_name[1] = '.';
+      dir->__d_dirent->d_name[2] = '\0';
+    }
+  else if (GetFileAttributes (pdrive) == INVALID_FILE_ATTRIBUTES)
     {
       pdrive += DRVSZ;
       return readdir (dir);
     }
-  *dir->__d_dirent->d_name = cyg_tolower (*pdrive);
-  dir->__d_dirent->d_name[1] = '\0';
+  else
+    {
+      *dir->__d_dirent->d_name = cyg_tolower (*pdrive);
+      dir->__d_dirent->d_name[1] = '\0';
+    }
   dir->__d_position++;
   pdrive += DRVSZ;
   syscall_printf ("%p = readdir (%p) (%s)", &dir->__d_dirent, dir,

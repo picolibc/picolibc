@@ -1,5 +1,12 @@
 2002-05-31  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler_disk_file.cc (readdir): Move inode calculation into caller.
+	(fhandler_cygdrive::readdir): Add "." and "..".
+	* dir.cc (readdir): Move inode calculation here so that fhandler
+	readdirs can benefit.
+
+2002-05-31  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler_console.cc (fhandler_console::open): Reinstate setting of
 	flags.
 

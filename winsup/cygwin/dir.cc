@@ -113,7 +113,42 @@ readdir (DIR *dir)
       return NULL;
     }
 
-  return ((fhandler_base *) dir->__d_u.__d_data.__fh)->readdir (dir);
+  dirent *res = ((fhandler_base *) dir->__d_u.__d_data.__fh)->readdir (dir);
+
+  if (res)
+    {
+      /* Compute d_ino by combining filename hash with the directory hash
+	 (which was stored in dir->__d_dirhash when opendir was called). */
+      if (res->d_name[0] == '.')
+	{
+	  if (res->d_name[1] == '\0')
+	    dir->__d_dirent->d_ino = dir->__d_dirhash;
+	  else if (res->d_name[1] != '.' || res->d_name[2] != '\0')
+	    goto hashit;
+	  else
+	    {
+	      char *p, up[strlen (dir->__d_dirname) + 1];
+	      strcpy (up, dir->__d_dirname);
+	      if (!(p = strrchr (up, '\\')))
+		goto hashit;
+	      *p = '\0';
+	      if (!(p = strrchr (up, '\\')))
+		dir->__d_dirent->d_ino = hash_path_name (0, ".");
+	      else
+		{
+		  *p = '\0';
+		  dir->__d_dirent->d_ino = hash_path_name (0, up);
+		}
+	    }
+	}
+      else
+	{
+      hashit:
+	  ino_t dino = hash_path_name (dir->__d_dirhash, "\\");
+	  dir->__d_dirent->d_ino = hash_path_name (dino, res->d_name);
+	}
+    }
+  return res;
 }
 
 extern "C" __off64_t
