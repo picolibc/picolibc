@@ -56,6 +56,7 @@ static char rcsid[] = "$OpenBSD: gmon.c,v 1.8 1997/07/23 21:11:27 kstailey Exp $
 //extern char *minbrk __asm ("minbrk");
 
 #ifdef __MINGW32__
+#include <string.h>
 #define bzero(ptr,size) memset (ptr, 0, size);
 #endif
 

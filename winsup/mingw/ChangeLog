@@ -1,3 +1,8 @@
+2004-08-15  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* profile/gmon.c [__MINGW32__]: Include  string.h for
+	memset prototype.
+
 2004-08-08  Christopher Faylor  <cgf@timesys.com>
 
 	* mingwex/stdio/vwscanf.c: Add stdio.h needed after 2004-08-07 change.
@@ -52,7 +57,7 @@
 	* include/_mingw.h: Use only two underscores to uglify
 	__MINGW_ATTRIB_* macros.
 	* include/stdlib.h: Adjust __MINGW_ATTRIB_* tokens.
-	* includ/setjmp.h: Likewise.
+	* include/setjmp.h: Likewise.
 
 	* include/sting.h: Add __MINGW_ATTRIB_PURE to locale-independent
 	string functions.
