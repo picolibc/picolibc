@@ -1,5 +1,10 @@
 2004-02-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/winioctl.h ( NTFS_VOLUME_DATA_BUFFER): Add structure.
+	(FSCTL_GET_NTFS_VOLUME_DATA): Add macro.
+
+2004-02-02  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/commctrl.h (ICC_STANDARD_CLASSES, ICC_LINK_CLASS): Add
 	defines.
 
