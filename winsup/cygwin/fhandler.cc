@@ -632,15 +632,6 @@ fhandler_base::open (int flags, mode_t mode)
 			 create_disposition, create_options, NULL, 0);
   if (!NT_SUCCESS (status))
     {
-      if (!wincap.can_open_directories () && pc.isdir ())
-	{
-	  if (flags & (O_CREAT | O_EXCL) == (O_CREAT | O_EXCL))
-	    set_errno (EEXIST);
-	  else if (flags & (O_WRONLY | O_RDWR))
-	    set_errno (EISDIR);
-	  else
-	    nohandle (true);
-	}
       __seterrno_from_win_error (RtlNtStatusToDosError (status));
       if (!nohandle ())
 	goto done;
