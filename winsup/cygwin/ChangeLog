@@ -1,3 +1,10 @@
+Fri Dec  8 22:21:01 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (normalize_win32_path): Reorganize logic to accomodate
+	chroot.  Always check for MAX_PATH overrun.  Avoid adding one too many
+	backslashes when src path begins with a slash.  From Corinna Vinschen.
+	* winsup.h: Force demangling for dll_crt0 for newer compilers.
+
 Thu Dec 7 12:10:00 2000  Edward M. Lee  <tailbert@yahoo.com>
 
 	* cygwin.din: Declare strtok_r for the import lib. Already in the DLL.

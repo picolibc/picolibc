@@ -712,32 +712,9 @@ normalize_win32_path (const char *src, char *dst)
   const char *src_start = src;
   char *dst_start = dst;
   char *dst_root_start = dst;
+  bool beg_src_slash;
 
-  if (strchr (src, ':') == NULL && !slash_unc_prefix_p (src))
-    {
-      if (!cygcwd.get (dst, 0))
-	return get_errno ();
-      if (SLASH_P (src[0]))
-	if (dst[1] == ':')
-	  dst[2] = '\0';
-	else if (slash_unc_prefix_p (dst))
-	  {
-	    char *p = strpbrk (dst + 2, "\\/");
-	    if (p && (p = strpbrk (p + 1, "\\/")))
-		*p = '\0';
-	  }
-	
-      else if (strlen (dst) + 1 + strlen (src) >= MAX_PATH)
-	{
-	  debug_printf ("ENAMETOOLONG = normalize_win32_path (%s)", src);
-	  return ENAMETOOLONG;
-	}
-      dst += strlen (dst);
-      if (!SLASH_P (dst[-1]))
-	*dst++ = '\\';
-    }
-  /* Two leading \'s?  If so, preserve them.  */
-  else if (SLASH_P (src[0]) && SLASH_P (src[1]))
+  if (slash_unc_prefix_p (src))
     {
       if (cygheap->root.length ())
 	{
@@ -748,7 +725,7 @@ normalize_win32_path (const char *src, char *dst)
       ++src;
     }
   /* If absolute path, care for chroot. */
-  else if (SLASH_P (src[0]) && !SLASH_P (src[1]) && cygheap->root.length ())
+  else if ((beg_src_slash = SLASH_P (src[0])) && cygheap->root.length ())
     {
       strcpy (dst, cygheap->root.path ());
       char *c;
@@ -757,6 +734,30 @@ normalize_win32_path (const char *src, char *dst)
       dst += cygheap->root.length ();
       dst_root_start = dst;
       *dst++ = '\\';
+    }
+  else if (strchr (src, ':') == NULL)
+    {
+      if (!cygcwd.get (dst, 0))
+	return get_errno ();
+      if (beg_src_slash)
+	{
+	  if (dst[1] == ':')
+	    dst[2] = '\0';
+	  else if (slash_unc_prefix_p (dst))
+	    {
+	      char *p = strpbrk (dst + 2, "\\/");
+	      if (p && (p = strpbrk (p + 1, "\\/")))
+		  *p = '\0';
+	    }
+	}
+      if (strlen (dst) + 1 + strlen (src) >= MAX_PATH)
+	{
+	  debug_printf ("ENAMETOOLONG = normalize_win32_path (%s)", src);
+	  return ENAMETOOLONG;
+	}
+      dst += strlen (dst);
+      if (!beg_src_slash)
+	*dst++ = '\\';
     }
 
   while (*src)
