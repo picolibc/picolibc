@@ -1,3 +1,7 @@
+2000-04-04  Alan Modra  <alan@linuxcare.com.au>
+
+	* bin-bugs.h (REPORT_BUGS_TO): Remove translated part.
+
 2000-04-03  Alan Modra  <alan@linuxcare.com.au>
 
 	* bin-bugs.h: New file.
