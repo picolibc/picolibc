@@ -1199,6 +1199,9 @@ extern "C" {
 #define WM_MDISETMENU 560
 #define WM_MDITILE 550
 #define WM_MEASUREITEM 44
+#if(WINVER >= 0x0500)
+#define WM_MENURBUTTONUP 290
+#endif
 #define WM_MENUCHAR 288
 #define WM_MENUSELECT 287
 #define WM_NEXTMENU 531

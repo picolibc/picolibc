@@ -1,3 +1,14 @@
+2002-07-20  Casper S. Hornstrup  <chorns@users.sourceforge.net>
+
+	* include/winbase.h (GetEnvironmentStringsA): Remove duplicate
+	definition.
+	(Interlocked*): Wrap in #ifndef __INTERLOCKED_DECLARED to
+	avoid compile error when already defined.
+
+2002-07-20  Steven Edwards  <Steven_Ed4153@yahoo.com>
+
+	* include/winuser.h (WM_MENURBUTTONUP): Add define.
+
 2002-07-17  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/commdlg.h: Define CDN_* notification message constants
@@ -25,7 +36,8 @@
 
 2002-07-17  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/wtypes.h: Remove duplicate #includes of rhc.h and
+	* include/wtypes.h: Remove duplicate #includes of rpc.h and
+	rpcndr.h.
 
 2002-07-05  Luke Dunstan  <infidel@users.sourceforge.net>
 

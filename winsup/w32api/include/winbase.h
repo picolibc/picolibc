@@ -1305,6 +1305,8 @@ DWORD WINAPI SetCriticalSectionSpinCount(LPCRITICAL_SECTION,DWORD);
 #endif
 BOOL WINAPI InitializeSecurityDescriptor(PSECURITY_DESCRIPTOR,DWORD);
 BOOL WINAPI InitializeSid (PSID,PSID_IDENTIFIER_AUTHORITY,BYTE);
+#ifndef __INTERLOCKED_DECLARED
+#define __INTERLOCKED_DECLARED
 LONG WINAPI InterlockedCompareExchange(LPLONG,LONG,LONG);
 /* PVOID WINAPI InterlockedCompareExchangePointer(PVOID*,PVOID,PVOID); */
 #define InterlockedCompareExchangePointer(d,e,c) \
@@ -1316,6 +1318,7 @@ LONG WINAPI InterlockedExchange(LPLONG,LONG);
     (PVOID)InterlockedExchange((LPLONG)(t),(LONG)(v))
 LONG WINAPI InterlockedExchangeAdd(LPLONG,LONG);
 LONG WINAPI InterlockedIncrement(LPLONG);
+#endif /* __INTERLOCKED_DECLARED */
 BOOL WINAPI IsBadCodePtr(FARPROC);
 BOOL WINAPI IsBadHugeReadPtr(PCVOID,UINT);
 BOOL WINAPI IsBadHugeWritePtr(PVOID,UINT);
@@ -1771,7 +1774,6 @@ typedef HW_PROFILE_INFOA HW_PROFILE_INFO,*LPHW_PROFILE_INFO;
 #define GetDiskFreeSpace GetDiskFreeSpaceA
 #define GetDiskFreeSpaceEx GetDiskFreeSpaceExA
 #define GetDriveType GetDriveTypeA
-#define GetEnvironmentStringsA GetEnvironmentStrings
 #define GetEnvironmentVariable GetEnvironmentVariableA
 #define GetFileAttributes GetFileAttributesA
 #define GetFileSecurity GetFileSecurityA
