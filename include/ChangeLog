@@ -1,3 +1,8 @@
+2002-09-19  Alexandre Oliva  <aoliva@redhat.com>
+
+	* libiberty.h (asprintf, vasprintf): Don't declare them if the
+	corresponding HAVE_DECL_ macro is 1.
+
 2002-09-19  Jakub Jelinek  <jakub@redhat.com>
 
 	* elf/i386.h (R_386_TLS_TPOFF, R_386_TLS_IE, R_386_TLS_GOTIE):
