@@ -1,3 +1,8 @@
+2003-11-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mkgroup.c (main): Print "root" group with local admins group sid
+	and gid 0.
+
 2003-11-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in: Add rules to build ipcrm and ipcs.

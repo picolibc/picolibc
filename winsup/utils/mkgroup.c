@@ -637,6 +637,14 @@ main (int argc, char **argv)
   if (print_local)
     {
       /*
+       * Very special feature for the oncoming future:
+       * Create a "root" group account, being actually the local
+       * Administrators group.  Since user name, sid and gid are
+       * fixed, there's no need to call print_special() for this.
+       */
+      printf ("root:S-1-5-32-544:0:\n");
+
+      /*
        * Get `system' group
        */
       print_special (print_sids, &sid_nt_auth, 1, SECURITY_LOCAL_SYSTEM_RID,
