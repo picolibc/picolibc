@@ -1,3 +1,9 @@
+Tue Dec  5 17:06:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* include/sys/uio.h: Include <sys/cdefs.h>. Use __BEGIN_DECL and
+	__END_DECL.
+	Add declarations for `readv' and `writev'.
+
 Mon Dec  4 20:49:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* Makefile.in: Change `-nostartfiles' to `-nostdlib' to avoid
