@@ -1,5 +1,13 @@
 2003-09-26  Pierre Humblet <pierre.humblet@ieee.org>
 
+	* pinfo.cc (pinfo::init): Do not give FILE_MAP_WRITE access to Everybody.
+	* exceptions.cc (sig_handle_tty_stop): Do not create pinfo parent with
+	PID_MAP_WRITE.
+	* fhandler_process.cc (fhandler_process::fill_filebuf): Ditto for pinfo p.
+	* signal.cc (kill_worker): Ditto for pinfo dest.
+
+2003-09-26  Pierre Humblet <pierre.humblet@ieee.org>
+
 	* pinfo.h (pinfo::set_acl): Declare.
 	* pinfo.cc (pinfo_fixup_after_fork): Duplicate with no rights.
 	(pinfo::set_acl): New.
