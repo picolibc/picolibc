@@ -70,6 +70,13 @@ details. */
   (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) <= \
   CYGWIN_VERSION_DLL_OLD_TERMIOS)
 
+     /* Old APIs had getc/putc macros that conflict with new CR/LF
+	handling in the stdio buffers */
+#define CYGWIN_VERSION_OLD_STDIO_CRLF_HANDLING \
+  (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) <= \
+  00020)
+
+
      /* We used to use the DLL major/minor to track
 	non-backward-compatible interface changes to the API.  Now we
 	use an API major/minor number for this purpose. */
@@ -96,10 +103,11 @@ details. */
        18: Stop exporting _strace_wm
        19: Export fchown, lchown, lacl
        20: regsub, inet_network
+       21: incompatible change to stdio cr/lf and buffering
      */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 20
+#define CYGWIN_VERSION_API_MINOR 21
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

@@ -1431,6 +1431,42 @@ ttyname (int fd)
   return (char *)(dtable[fd]->ttyname ());
 }
 
+/* Tells stdio if it should do the cr/lf conversion for this file */
+extern "C" int _cygwin_istext_for_stdio (int fd);
+int
+_cygwin_istext_for_stdio (int fd)
+{
+  syscall_printf("_cygwin_istext_for_stdio (%d)\n", fd);
+  if (CYGWIN_VERSION_OLD_STDIO_CRLF_HANDLING)
+    {
+      syscall_printf(" _cifs: old API\n");
+      return 0; /* we do it for old apps, due to getc/putc macros */
+    }
+
+  if (dtable.not_open (fd))
+    {
+      syscall_printf(" _cifs: fd not open\n");
+      return 0;
+    }
+
+  fhandler_base *p = dtable[fd];
+
+  if (p->get_device() != FH_DISK)
+    {
+      syscall_printf(" _cifs: fd not disk file\n");
+      return 0;
+    }
+
+  if (p->get_w_binary () || p->get_r_binary ())
+    {
+      syscall_printf(" _cifs: get_*_binary\n");
+      return 0;
+    }
+
+  syscall_printf("_cygwin_istext_for_stdio says yes\n");
+  return 1;
+}
+
 /* internal newlib function */
 extern "C" int _fwalk (struct _reent *ptr, int (*function)(FILE *));
 
@@ -1442,6 +1478,9 @@ setmode_helper (FILE *f)
 {
   if (fileno(f) != setmode_file)
     return 0;
+  syscall_printf("setmode: file was %s now %s\n",
+		 f->_flags & __SCLE ? "cle" : "raw",
+		 setmode_mode & O_TEXT ? "cle" : "raw");
   if (setmode_mode & O_TEXT)
     f->_flags |= __SCLE;
   else
@@ -1491,9 +1530,16 @@ setmode (int fd, int mode)
       p->set_r_binary (0);
     }
 
-  setmode_mode = mode;
+  if (_cygwin_istext_for_stdio (fd))
+    setmode_mode = O_TEXT;
+  else
+    setmode_mode = O_BINARY;
   setmode_file = fd;
   _fwalk(_REENT, setmode_helper);
+
+  syscall_printf ("setmode (%d, %s) returns %s\n", fd,
+		  mode&O_TEXT ? "text" : "binary",
+		  res&O_TEXT ? "text" : "binary");
 
   return res;
 }
