@@ -1,5 +1,9 @@
 2003-12-06  Christopher Faylor  <cgf@redhat.com>
 
+	* exceptions.cc (_threadinfo::remove): Avoid a linked list walk.
+
+2003-12-06  Christopher Faylor  <cgf@redhat.com>
+
 	* cygtls.h (_threadinfo::find_tls): New function.
 	* exceptions.cc (_threadinfo::find_tls): Rename from find_tls.  Use
 	critical section to protect access to linked list.

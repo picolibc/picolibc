@@ -188,17 +188,15 @@ _threadinfo::init_thread (void *)
 void
 _threadinfo::remove ()
 {
-  _threadinfo *t;
   EnterCriticalSection (&protect_linked_list);
-  for (t = _last_thread; t && t != this; t = t->prev)
-    continue;
-  if (t)
+  if (prev)
     {
-      t->prev->next = t->next;
-      if (t->next)
-	t->next->prev = t->prev;
-      if (t == _last_thread)
-	_last_thread = t->prev;
+      prev->next = next;
+      if (next)
+	next->prev = prev;
+      if (this == _last_thread)
+	_last_thread = prev;
+      prev = next = NULL;
     }
   LeaveCriticalSection (&protect_linked_list);
 }
