@@ -1,3 +1,11 @@
+2002-04-12  Eric Norum  <eric.norum@usask.com>
+
+	* libc/sys/rtems/crt0.c (rtems_gxx_mutex_init): Dummy
+	routine to allow autoconf to determine that building executables
+	for rtems works.
+	(rtems_gxx_mutex_lock, rtems_gxx_mutex_unlock): Ditto.
+	(rtems_gxx_mutex_once): Ditto.
+
 2002-04-09  Tom Rix  <trix@redhat.com>
 
 	* libc/include/sys/reent.h (_REENT_INIT_PTR): Fix typo.
