@@ -1,7 +1,7 @@
 2003-02-04  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/shlwapi.h (PathRelativePathTo[AW]): Correct
-	protototypes.
+	prototypes.
 	Thanks to: John Dallaway  <jld@ecoscentric.com>.
 
 2003-02-01  Danny Smith  <dannysmith@users.sourceforge.net>
