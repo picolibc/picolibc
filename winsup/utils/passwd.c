@@ -29,7 +29,24 @@ details. */
 
 #define UF_LOCKOUT            0x00010
 
-char *myname;
+static const char version[] = "$Revision$";
+static char *prog_name;
+
+static struct option longopts[] =
+{
+  {"help", no_argument, NULL, 'h' },
+  {"inactive", required_argument, NULL, 'i'},
+  {"lock", no_argument, NULL, 'l'},
+  {"minage", required_argument, NULL, 'n'},
+  {"unlock", no_argument, NULL, 'u'},
+  {"version", no_argument, NULL, 'v'},
+  {"maxage", required_argument, NULL, 'x'},
+  {"length", required_argument, NULL, 'L'},
+  {"status", no_argument, NULL, 'S'},
+  {NULL, 0, NULL, 0}
+};
+
+static char opts[] = "L:x:n:i:luShv";
 
 int
 eprint (int with_name, const char *fmt, ...)
@@ -37,7 +54,7 @@ eprint (int with_name, const char *fmt, ...)
   va_list ap;
 
   if (with_name)
-    fprintf(stderr, "%s: ", myname);
+    fprintf(stderr, "%s: ", prog_name);
   va_start (ap, fmt);
   vfprintf (stderr, fmt, ap);
   va_end (ap);
@@ -200,14 +217,52 @@ SetModals (int xarg, int narg, int iarg, int Larg)
   return EvalRet (ret, NULL);
 }
 
-int
-usage ()
+static void
+usage (FILE * stream, int status)
 {
-  fprintf (stderr, "usage: %s [name]\n", myname);
-  fprintf (stderr, "       %s [-L maxlen] [-x max] [-n min] [-i inact]\n",
-           myname);
-  fprintf (stderr, "       %s {-l|-u|-S} name\n", myname);
-  return 2;
+  fprintf (stream, ""
+  "Usage: %s (-l|-u|-S) [USER]\n"
+  "       %s [-i NUM] [-n MINDAYS] [-x MAXDAYS] [-L LEN]\n"
+  "\n"
+  "User operations:\n"
+  " -l, --lock      lock USER's account\n"
+  " -u, --unlock    unlock USER's account\n"
+  " -S, --status    display password status for USER (locked, expired, etc.)\n"
+  "\n"
+  "System operations:\n"
+  " -i, --inactive  set NUM of days before inactive accounts are disabled\n"
+  "                 (inactive accounts are those with expired passwords)\n"
+  " -n, --minage    set system minimum password age to MINDAYS\n"
+  " -x, --maxage    set system maximum password age to MAXDAYS\n"
+  " -L, --length    set system minimum password length to LEN\n"
+  "\n"
+  "Other options:\n"
+  " -h, --help      output usage information and exit\n"
+  " -v, --version   output version information and exit\n"
+  "", prog_name, prog_name);
+  exit (status);
+}
+
+static void
+print_version ()
+{
+  const char *v = strchr (version, ':');
+  int len;
+  if (!v)
+    {
+      v = "?";
+      len = 1;
+    }
+  else
+    {
+      v += 2;
+      len = strchr (v, ' ') - v;
+    }
+  printf ("\
+%s (cygwin) %.*s\n\
+Password Utility\n\
+Copyright 1999, 2000, 2001, 2002 Red Hat, Inc.\n\
+Compiled on %s", prog_name, len, v, __DATE__);
 }
 
 int
@@ -227,24 +282,33 @@ main (int argc, char **argv)
   int Sopt = 0;
   PUSER_INFO_3 ui, li;
 
- if ((myname = strrchr (argv[0], '/'))
-      || (myname = strrchr (argv[0], '\\')))
-    ++myname;
+  prog_name = strrchr (argv[0], '/');
+  if (prog_name == NULL)
+    prog_name = strrchr (argv[0], '\\');
+  if (prog_name == NULL)
+    prog_name = argv[0];
   else
-    myname = argv[0];
-  c = strrchr (myname, '.');
+    prog_name++;
+  c = strrchr (prog_name, '.');
   if (c)
     *c = '\0';
 
-  while ((opt = getopt (argc, argv, "L:x:n:i:luS")) != EOF)
+  while ((opt = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (opt)
       {
-      case 'x':
-	if ((xarg = atoi (optarg)) < 0 || xarg > 999)
-	  return eprint (1, "Maximum password age must be between 0 and 999.");
-	if (narg >= 0 && xarg < narg)
-	  return eprint (1, "Maximum password age must be greater than "
-	                    "minimum password age.");
+      case 'h':
+	usage (stdout, 0);
+        break;
+
+      case 'i':
+	if ((iarg = atoi (optarg)) < 0 || iarg > 999)
+	  return eprint (1, "Force logout time must be between 0 and 999.");
+        break;
+
+      case 'l':
+	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || uopt || Sopt)
+	  usage (stderr, 1);
+	lopt = 1;
         break;
 
       case 'n':
@@ -255,9 +319,23 @@ main (int argc, char **argv)
 	                    "maximum password age.");
         break;
 
-      case 'i':
-	if ((iarg = atoi (optarg)) < 0 || iarg > 999)
-	  return eprint (1, "Force logout time must be between 0 and 999.");
+      case 'u':
+	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || lopt || Sopt)
+	  usage (stderr, 1);
+	uopt = 1;
+        break;
+
+      case 'v':
+	print_version ();
+        exit (0);
+        break;
+
+      case 'x':
+	if ((xarg = atoi (optarg)) < 0 || xarg > 999)
+	  return eprint (1, "Maximum password age must be between 0 and 999.");
+	if (narg >= 0 && xarg < narg)
+	  return eprint (1, "Maximum password age must be greater than "
+	                    "minimum password age.");
         break;
 
       case 'L':
@@ -266,31 +344,19 @@ main (int argc, char **argv)
 	                    "0 and %d.", LM20_PWLEN);
         break;
 
-      case 'l':
-	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || uopt || Sopt)
-	  return usage ();
-	lopt = 1;
-        break;
-
-      case 'u':
-	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || lopt || Sopt)
-	  return usage ();
-	uopt = 1;
-        break;
-
       case 'S':
 	if (xarg >= 0 || narg >= 0 || iarg >= 0 || Larg >= 0 || lopt || uopt)
-	  return usage ();
+	  usage (stderr, 1);
 	Sopt = 1;
         break;
 
       default:
-        return usage ();
+        usage (stderr, 1);
       }
   if (Larg >= 0 || xarg >= 0 || narg >= 0 || iarg >= 0)
     {
       if (optind < argc)
-        return usage ();
+        usage (stderr, 1);
       return SetModals (xarg, narg, iarg, Larg);
     }
 

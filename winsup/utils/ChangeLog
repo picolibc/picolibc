@@ -1,5 +1,14 @@
 2002-05-28  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
+	* passwd.c (prog_name): New global variable.
+	(longopts): Ditto.
+	(opts): Ditto.
+	(usage): Standardize output. Accomodate new options.
+	(print_version): New function.
+	(main): Accomodate longopts and new --help, --version options.
+
+2002-05-28  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
+
 	* ps.cc (usage): Fix typo.
 
 2002-05-27  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
