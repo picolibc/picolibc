@@ -785,10 +785,9 @@ setup_handler (int sig, void *handler, struct sigaction& siga)
   CONTEXT cx;
   bool interrupted = false;
   sigthread *th = NULL;		// Initialization needed to shut up gcc
-  int prio = INFINITE;
 
   if (sigsave.sig)
-    goto set_pending;
+    goto out;
 
   for (int i = 0; i < CALL_HANDLER_RETRY; i++)
     {
@@ -823,7 +822,18 @@ setup_handler (int sig, void *handler, struct sigaction& siga)
 	     SuspendThread on itself then just queue the signal. */
 
 	  EnterCriticalSection (&mainthread.lock);
+#ifndef DEBUGGING
 	  sigproc_printf ("suspending mainthread");
+#else
+	  cx.ContextFlags = CONTEXT_CONTROL | CONTEXT_INTEGER;
+	  if (!GetThreadContext (hth, &cx))
+	    memset (&cx, 0, sizeof cx);
+#if 0
+	  if ((cx.Eip & 0xff000000) == 0x77000000)
+	    try_to_debug ();
+#endif
+	  sigproc_printf ("suspending mainthread PC %p", cx.Eip);
+#endif
 	  res = SuspendThread (hth);
 	  /* Just release the lock now since we hav suspended the main thread and it
 	     definitely can't be grabbing it now.  This will have to change, of course,
@@ -866,13 +876,6 @@ setup_handler (int sig, void *handler, struct sigaction& siga)
 	    }
 	}
 
-      if ((DWORD) prio != INFINITE)
-	{
-	  /* Reset the priority so we can finish this off quickly. */
-	  SetThreadPriority (GetCurrentThread (), WAIT_SIG_PRIORITY);
-	  prio = INFINITE;
-	}
-
       if (th)
 	{
 	  interrupted = interrupt_on_return (th, sig, handler, siga);
@@ -888,20 +891,11 @@ setup_handler (int sig, void *handler, struct sigaction& siga)
       if (interrupted)
 	break;
 
-      if ((DWORD) prio != INFINITE && !mainthread.frame)
-	prio = low_priority_sleep (SLEEP_0_STAY_LOW);
       sigproc_printf ("couldn't interrupt.  trying again.");
     }
 
- set_pending:
-  if (interrupted)
-    {
-      if ((DWORD) prio != INFINITE)
-	SetThreadPriority (GetCurrentThread (), WAIT_SIG_PRIORITY);
-      sigproc_printf ("signal successfully delivered");
-    }
-
-  sigproc_printf ("returning %d", interrupted);
+out:
+  sigproc_printf ("signal %d %sdelivered", sig, interrupted ? "" : "not ");
   return interrupted;
 }
 #endif /* i386 */

@@ -1218,7 +1218,6 @@ wait_sig (VOID *self)
 			  if (!sig_handle (sig))
 			    {
 			      saw_failed_interrupt = true;
-			      sigproc_printf ("couldn't send signal %d", sig);
 			      x = InterlockedIncrement (myself->getsigtodo (sig));
 			      pending_signals = true;
 			    }

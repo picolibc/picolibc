@@ -1,5 +1,10 @@
 2003-08-27  Christopher Faylor  <cgf@redhat.com>
 
+	* syscalls.cc (mount): Don't check win32_path when doing cygdrive
+	mount.
+
+2003-08-27  Christopher Faylor  <cgf@redhat.com>
+
 	* specdir: Correctly remove temporary directory prior to use.
 
 2003-08-27  Christopher Faylor  <cgf@redhat.com>

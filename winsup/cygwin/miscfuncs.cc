@@ -8,6 +8,7 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#define _WIN32_WINNT 0x400
 #include "winsup.h"
 #include "cygerrno.h"
 #include <sys/errno.h>
@@ -16,6 +17,7 @@ details. */
 #include <limits.h>
 #include <winbase.h>
 #include <winnls.h>
+#include "cygthread.h"
 
 long tls_ix = -1;
 
@@ -306,13 +308,27 @@ low_priority_sleep (DWORD secs)
       staylow = true;
     }
 
-  int main_prio = GetThreadPriority (hMainThread);
-  if (curr_prio != main_prio)
-    /* Force any threads in normal priority to be scheduled */
-    SetThreadPriority (thisthread, main_prio);
-  Sleep (secs);
+  if (!secs && wincap.has_switch_to_thread ())
+    {
+      for (int i = 0; i < 10; i++)
+	SwitchToThread ();
+    }
+  else
+    {
+      int new_prio;
+      if (GetCurrentThreadId () == cygthread::main_thread_id)
+	new_prio = THREAD_PRIORITY_LOWEST;
+      else
+	new_prio = GetThreadPriority (hMainThread);
 
-  if (!staylow || curr_prio == main_prio)
-    SetThreadPriority (thisthread, curr_prio);
+      if (curr_prio != new_prio)
+	/* Force any threads in normal priority to be scheduled */
+	SetThreadPriority (thisthread, new_prio);
+      Sleep (secs);
+
+      if (!staylow || curr_prio == new_prio)
+	SetThreadPriority (thisthread, curr_prio);
+    }
+
   return curr_prio;
 }
