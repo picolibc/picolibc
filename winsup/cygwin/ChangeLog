@@ -1,3 +1,8 @@
+2005-03-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygwin.din (__ctype_ptr): Export.
+	* include/cygwin/version.h: Bump API minor version.
+
 2005-03-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (class cygthread): Remove forward declaration.
