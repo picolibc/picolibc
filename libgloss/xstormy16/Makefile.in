@@ -58,7 +58,7 @@ EVA_APP_SCRIPTS = eva_app.ld
 
 # Stub stuff
 EVA_STUB_HEX    = eva_stub.hex
-EVA_STUB        = eva_stub
+EVA_STUB        = eva_stub.elf
 EVA_STUB_OBJS   = xstormy16_stub.o crt0_stub.o
 
 # Host specific makefile fragment comes in here.
@@ -110,7 +110,7 @@ distclean maintainer-clean realclean: clean
 
 .PHONY: install info install-info clean-info
 install: 
-	set -e; for x in ${SIM_BSP} ${CRT} ${EVA_APP_BSP} ${EVA_STUB_HEX}; do\
+	set -e; for x in ${SIM_BSP} ${CRT} ${EVA_APP_BSP} ${EVA_STUB_HEX} ${EVA_STUB} ; do\
 	  ${INSTALL_DATA} $$x ${tooldir}/lib${MULTISUBDIR}/$$x; \
 	done
 	@for script in ${SCRIPTS} ${SIM_SCRIPTS} ${EVA_APP_SCRIPTS}; do\
