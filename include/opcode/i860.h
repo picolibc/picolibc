@@ -40,7 +40,7 @@ struct i860_opcode
 
 enum expand_type
 {
-    E_MOV = 1, E_ADDR, E_U32, E_AND, E_S32, E_DELAY
+    E_MOV = 1, E_ADDR, E_U32, E_AND, E_S32, E_DELAY, XP_ONLY
 };
 
 
@@ -135,6 +135,10 @@ static const struct i860_opcode i860_opcodes[] =
 { "pfld.d",	0x64000000, 0x98000007, "L(2),g", E_ADDR },	/* pfld.d #const(isrc2),fdest */
 { "pfld.d",	0x60000001, 0x9c000006, "1(2)++,g", 0 },	/* pfld.d isrc1(isrc2)++,fdest */
 { "pfld.d",	0x64000001, 0x98000006, "L(2)++,g", E_ADDR },	/* pfld.d #const(isrc2)++,fdest */
+{ "pfld.q",	0x60000004, 0x9c000003, "1(2),g", XP_ONLY },	/* pfld.q isrc1(isrc2),fdest */
+{ "pfld.q",	0x64000004, 0x98000003, "L(2),g", XP_ONLY },	/* pfld.q #const(isrc2),fdest */
+{ "pfld.q",	0x60000005, 0x9c000002, "1(2)++,g", XP_ONLY },	/* pfld.q isrc1(isrc2)++,fdest */
+{ "pfld.q",	0x64000005, 0x98000002, "L(2)++,g", XP_ONLY },	/* pfld.q #const(isrc2)++,fdest */
 
 { "fst.l",	0x28000002, 0xd4000001, "g,1(2)", 0 },	/* fst.l fdest,isrc1(isrc2) */
 { "fst.l",	0x2c000002, 0xd0000001, "g,K(2)", E_ADDR },	/* fst.l fdest,#const(isrc2) */
@@ -204,6 +208,16 @@ static const struct i860_opcode i860_opcodes[] =
 { "calli",	0x4c000002, 0xb000001d, "1", E_DELAY },	/* calli isrc1ni */
 { "intovr",	0x4c000004, 0xb000001b, "", 0 },	/* intovr trap on integer overflow */
 { "unlock",	0x4c000007, 0xb0000018, "", 0 },	/* unlock clear BL in dirbase */
+{ "ldio.l",	0x4c000408, 0xb00003f7, "2,d", XP_ONLY },	/* ldio.l isrc2,idest */
+{ "ldio.s",	0x4c000208, 0xb00005f7, "2,d", XP_ONLY },	/* ldio.s isrc2,idest */
+{ "ldio.b",	0x4c000008, 0xb00007f7, "2,d", XP_ONLY },	/* ldio.b isrc2,idest */
+{ "stio.l",	0x4c000409, 0xb00003f6, "1,2", XP_ONLY },	/* stio.l isrc1ni,isrc2 */
+{ "stio.s",	0x4c000209, 0xb00005f6, "1,2", XP_ONLY },	/* stio.s isrc1ni,isrc2 */
+{ "stio.b",	0x4c000009, 0xb00007f6, "1,2", XP_ONLY },	/* stio.b isrc1ni,isrc2 */
+{ "ldint.l",	0x4c00040a, 0xb00003f5, "2,d", XP_ONLY },	/* ldint.l isrc2,idest */
+{ "ldint.s",	0x4c00020a, 0xb00005f5, "2,d", XP_ONLY },	/* ldint.s isrc2,idest */
+{ "ldint.b",	0x4c00000a, 0xb00007f5, "2,d", XP_ONLY },	/* ldint.b isrc2,idest */
+{ "scyc.b",	0x4c00000b, 0xb00007f4, "2", XP_ONLY },		/* scyc.b isrc2 */
 
 /* CTRL-Format Instructions */
 { "br",		0x68000000, 0x94000000, "l", E_DELAY },	/* br lbroff */
