@@ -1,5 +1,10 @@
 2004-03-26  Christopher Faylor  <cgf@redhat.com>
 
+	* sigproc.cc (wait_sig): Make sure that SIGCHLD is handled regardless
+	of whether a signal is queued.
+
+2004-03-26  Christopher Faylor  <cgf@redhat.com>
+
 	* sigproc.cc (wait_sig): Report if not trying to send signal due to
 	queued signal.
 

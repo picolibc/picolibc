@@ -1162,19 +1162,22 @@ wait_sig (VOID *self)
 	default:
 	  if (pack.si.si_signo < 0)
 	    sig_clear (-pack.si.si_signo);
-	  else if (sigq.sigs[pack.si.si_signo].si.si_signo)
-	    sigproc_printf ("sig %d already queued", pack.si.si_signo);
 	  else
 	    {
 	      int sig = pack.si.si_signo;
-	      int sigres = pack.process ();
-	      if (sigres <= 0)
+	      if (sigq.sigs[sig].si.si_signo)
+		sigproc_printf ("sig %d already queued", pack.si.si_signo);
+	      else
 		{
+		  int sigres = pack.process ();
+		  if (sigres <= 0)
+		    {
 #ifdef DEBUGGING2
-		  if (!sigres)
-		    system_printf ("Failed to arm signal %d from pid %d", pack.sig, pack.pid);
+		      if (!sigres)
+			system_printf ("Failed to arm signal %d from pid %d", pack.sig, pack.pid);
 #endif
-		  sigq.add (pack);	// FIXME: Shouldn't add this in !sh condition
+		      sigq.add (pack);	// FIXME: Shouldn't add this in !sh condition
+		    }
 		}
 	      if (sig == SIGCHLD)
 		proc_subproc (PROC_CLEARWAIT, 0);
