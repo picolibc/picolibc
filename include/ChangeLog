@@ -1,3 +1,8 @@
+2000-09-27  Hans-Peter Nilsson  <hp@axis.com>
+
+	* dis-asm.h: Declare cris_get_disassembler, not print_insn_cris.
+	Fix typo in comment.
+
 2000-09-28  John David Anglin <dave@hiauly1.hia.nrc.ca>
 
 	* alloca-conf.h: New file (copied from libiberty).

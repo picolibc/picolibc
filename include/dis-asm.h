@@ -191,7 +191,7 @@ extern int print_insn_big_powerpc	PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_little_powerpc	PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_rs6000		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_w65		PARAMS ((bfd_vma, disassemble_info*));
-extern int print_insn_cris		PARAMS ((bfd_vma, disassemble_info*));
+extern disassembler_ftype cris_get_disassembler PARAMS ((bfd *));
 extern int print_insn_d10v		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_d30v		PARAMS ((bfd_vma, disassemble_info*));
 extern int print_insn_v850		PARAMS ((bfd_vma, disassemble_info*));
@@ -251,7 +251,7 @@ extern int generic_symbol_at_address
 /* Call this macro to initialize only the internal variables for the
    disassembler.  Architecture dependent things such as byte order, or machine
    variant are not touched by this macro.  This makes things much easier for
-   GDB which must initialize these things seperatly.  */
+   GDB which must initialize these things separately.  */
 
 #define INIT_DISASSEMBLE_INFO_NO_ARCH(INFO, STREAM, FPRINTF_FUNC) \
   (INFO).fprintf_func = (fprintf_ftype)(FPRINTF_FUNC), \
