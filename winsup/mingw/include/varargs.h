@@ -52,9 +52,13 @@
 
 #ifndef RC_INVOKED
 
-#ifndef _VA_LIST
-#define	_VA_LIST
+#ifndef	_VA_LIST
+#define _VA_LIST
+#if defined __GNUC__ && __GNUC__ >= 3
+typedef __builtin_va_list va_list;
+#else
 typedef char* va_list;
+#endif
 #endif
 
 /*

@@ -1,3 +1,10 @@
+2001-08-29  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/stdarg.h (va_list): Typedef as __builtin_va_list if
+	__GNUC__ >= 3. 
+	* include/varargs.h (va_list): Ditto.
+	* include/stdio.h (va_list): Ditto.
+
 2001-08-01  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/stdlib.h (_wpgmptr): Don't declare ifndef __MSVCRT__.

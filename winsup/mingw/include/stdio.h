@@ -127,11 +127,14 @@
  * functions later on in the file which use va_list. That conflicts with
  * using stdio.h and varargs.h in the same file, so I do the typedef myself.
  */
-#ifndef _VA_LIST
+#ifndef	_VA_LIST
 #define _VA_LIST
-typedef	char* va_list;
+#if defined __GNUC__ && __GNUC__ >= 3
+typedef __builtin_va_list va_list;
+#else
+typedef char* va_list;
 #endif
-
+#endif
 /*
  * The structure underlying the FILE type.
  *
