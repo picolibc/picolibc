@@ -131,6 +131,7 @@ LIB_SOURCES = \
 	strncpy.c \
 	strpbrk.c \
 	strrchr.c \
+	strsep.c \
 	strspn.c \
 	strtok.c \
 	strtok_r.c \
@@ -181,9 +182,9 @@ lib_a_LIBADD =
 @USE_LIBTOOL_FALSE@rindex.o strcat.o strchr.o strcmp.o strcasecmp.o \
 @USE_LIBTOOL_FALSE@strcoll.o strcpy.o strcspn.o strerror.o strlcat.o \
 @USE_LIBTOOL_FALSE@strlcpy.o strlen.o strlwr.o strncat.o strncmp.o \
-@USE_LIBTOOL_FALSE@strncasecmp.o strncpy.o strpbrk.o strrchr.o strspn.o \
-@USE_LIBTOOL_FALSE@strtok.o strtok_r.o strupr.o strxfrm.o strstr.o \
-@USE_LIBTOOL_FALSE@swab.o u_strerr.o
+@USE_LIBTOOL_FALSE@strncasecmp.o strncpy.o strpbrk.o strrchr.o strsep.o \
+@USE_LIBTOOL_FALSE@strspn.o strtok.o strtok_r.o strupr.o strxfrm.o \
+@USE_LIBTOOL_FALSE@strstr.o swab.o u_strerr.o
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 libstring_la_LIBADD = 
@@ -193,8 +194,9 @@ libstring_la_LIBADD =
 @USE_LIBTOOL_TRUE@strcasecmp.lo strcoll.lo strcpy.lo strcspn.lo \
 @USE_LIBTOOL_TRUE@strerror.lo strlcat.lo strlcpy.lo strlen.lo strlwr.lo \
 @USE_LIBTOOL_TRUE@strncat.lo strncmp.lo strncasecmp.lo strncpy.lo \
-@USE_LIBTOOL_TRUE@strpbrk.lo strrchr.lo strspn.lo strtok.lo strtok_r.lo \
-@USE_LIBTOOL_TRUE@strupr.lo strxfrm.lo strstr.lo swab.lo u_strerr.lo
+@USE_LIBTOOL_TRUE@strpbrk.lo strrchr.lo strsep.lo strspn.lo strtok.lo \
+@USE_LIBTOOL_TRUE@strtok_r.lo strupr.lo strxfrm.lo strstr.lo swab.lo \
+@USE_LIBTOOL_TRUE@u_strerr.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

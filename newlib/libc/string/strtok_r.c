@@ -34,10 +34,11 @@
 #include <string.h>
 
 char *
-_DEFUN (strtok_r, (s, delim, lasts),
+_DEFUN (__strtok_r, (s, delim, lasts, skip_leading_delim),
 	register char *s _AND
 	register const char *delim _AND
-	char **lasts)
+	char **lasts _AND
+	int skip_leading_delim)
 {
 	register char *spanp;
 	register int c, sc;
@@ -53,8 +54,16 @@ _DEFUN (strtok_r, (s, delim, lasts),
 cont:
 	c = *s++;
 	for (spanp = (char *)delim; (sc = *spanp++) != 0;) {
-		if (c == sc)
-			goto cont;
+		if (c == sc) {
+			if (skip_leading_delim) {
+				goto cont;
+			}
+			else {
+				*lasts = s;
+				s[-1] = 0;
+				return (s - 1);
+			}
+		}
 	}
 
 	if (c == 0) {		/* no non-delimiter characters */
@@ -82,4 +91,13 @@ cont:
 		} while (sc != 0);
 	}
 	/* NOTREACHED */
+}
+
+char *
+_DEFUN (strtok_r, (s, delim, lasts),
+	register char *s _AND
+	register const char *delim _AND
+	char **lasts)
+{
+	return __strtok_r (s, delim, lasts, 1);
 }

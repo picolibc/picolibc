@@ -1,6 +1,6 @@
 /*
 FUNCTION
-	<<strtok>>---get next token from a string
+	<<strtok>>,<<strtok_r>>,<<strsep>>---get next token from a string
 
 INDEX
 	strtok
@@ -8,11 +8,15 @@ INDEX
 INDEX
 	strtok_r
 
+INDEX
+	strsep
+
 ANSI_SYNOPSIS
 	#include <string.h>
       	char *strtok(char *<[source]>, const char *<[delimiters]>)
       	char *strtok_r(char *<[source]>, const char *<[delimiters]>,
 			char **<[lasts]>)
+      	char *strsep(char **<[source_ptr]>, const char *<[delimiters]>)
 
 TRAD_SYNOPSIS
 	#include <string.h>
@@ -24,6 +28,10 @@ TRAD_SYNOPSIS
 	char *<[source]>;
 	char *<[delimiters]>;
 	char **<[lasts]>;
+
+	char *strsep(<[source_ptr]>, <[delimiters]>)
+	char **<[source_ptr]>;
+	char *<[delimiters]>;
 
 DESCRIPTION
 	The <<strtok>> function is used to isolate sequential tokens in a 
@@ -43,18 +51,30 @@ DESCRIPTION
 	The <<strtok_r>> function has the same behavior as <<strtok>>, except
 	a pointer to placeholder <<*[lasts]>> must be supplied by the caller.
 
+	The <<strsep>> function is similar in behavior to <<strtok>>, except
+	a pointer to the string pointer must be supplied <<[source_ptr]>> and
+	the function does not skip leading delimeters.  When the string starts
+	with a delimeter, the delimeter is changed to the NUL character and
+	the empty string is returned.  Like <<strtok_r>> and <<strtok>>, the
+	<<*[source_ptr]>> is updated to the next character following the
+	last delimeter found or NULL if the end of string is reached with
+	no more delimeters.
+
 RETURNS
-	<<strtok>> returns a pointer to the next token, or <<NULL>> if
-	no more tokens can be found.
+	<<strtok>>, <<strtok_r>>, and <<strsep>> all return a pointer to the 
+	next token, or <<NULL>> if no more tokens can be found.  For
+	<<strsep>>, a token may be the empty string.
 
 NOTES
 	<<strtok>> is unsafe for multi-thread applications.  <<strtok_r>>
-	is MT-Safe and should be used instead.
+	and <<strsep>> are MT-Safe and should be used instead.
 
 PORTABILITY
 <<strtok>> is ANSI C.
+<<strtok_r>> is POSIX.
+<<strsep>> is a BSD-extension.
 
-<<strtok>> requires no supporting OS subroutines.
+<<strtok>>, <<strtok_r>>, and <<strsep>> require no supporting OS subroutines.
 
 QUICKREF
 	strtok ansi impure
@@ -68,12 +88,14 @@ QUICKREF
 
 #ifndef _REENT_ONLY
 
+extern char *__strtok_r (char *, const char *, char **, int);
+
 char *
 _DEFUN (strtok, (s, delim),
 	register char *s _AND
 	register const char *delim)
 {
 	_REENT_CHECK_MISC(_REENT);
-	return strtok_r (s, delim, &(_REENT_STRTOK_LAST(_REENT)));
+	return __strtok_r (s, delim, &(_REENT_STRTOK_LAST(_REENT)), 1);
 }
 #endif

@@ -1,3 +1,13 @@
+2002-05-23  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/string/Makefile.am: Add support for strsep.c.
+        * libc/string/Makefile.in: Regenerated.
+        * libc/string/strsep.c: New file.
+        * libc/string/strtok.c: Change to call __strtok_r service routine.
+        * libc/string/strtok_r.c: Add __strtok_r routine which takes
+        additional flag parameter regarding whether to skip leading delimeters.
+        Change strtok_r to call __strtok_r.
+
 2002-05-23  Gareth Pearce  <tilps@hotmail.com>
 
         * libc/stdio/Makefile.am: Modify to add setbuffer.c and setlinebuf.c.

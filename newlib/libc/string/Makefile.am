@@ -33,6 +33,7 @@ LIB_SOURCES = \
 	strncpy.c \
 	strpbrk.c \
 	strrchr.c \
+	strsep.c \
 	strspn.c \
 	strtok.c \
 	strtok_r.c \
