@@ -234,6 +234,14 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  pinfo p (va_arg (arg, pid_t));
 	  return p ? p->dwProcessId : 0;
 	}
+      case CW_EXTRACT_DOMAIN_AND_USER:
+        {
+	  struct passwd *pw = va_arg (arg, struct passwd *);
+	  char *domain = va_arg (arg, char *);
+	  char *user = va_arg (arg, char *);
+	  extract_nt_dom_user (pw, domain, user);
+	  return 0;
+	}
       default:
 	return (DWORD) -1;
     }

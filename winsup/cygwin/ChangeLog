@@ -1,5 +1,12 @@
 2002-06-03  Corinna Vinschen  <corinna@vinschen.de>
 
+	* external.cc (cygwin_internal): Add CW_EXTRACT_DOMAIN_AND_USER
+	handling to call extract_nt_dom_user() from applications.
+	* include/sys/cygwin.h (cygwin_getinfo_types): Add
+	CW_EXTRACT_DOMAIN_AND_USER.
+
+2002-06-03  Corinna Vinschen  <corinna@vinschen.de>
+
 	* syscalls.cc (stat64_to_stat32): Transform st_dev correctly.
 	(fstat64): Add evaluating st_ino and st_dev.
 	(stat_worker): Evaluate st_dev as 32 bit value.
