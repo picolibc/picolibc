@@ -314,7 +314,12 @@ getacl (const char *file, DWORD attr, int nentries, __aclent16_t *aclbufp)
       int id;
       int type = 0;
 
-      if (ace_sid == owner_sid)
+      if (ace_sid == well_known_world_sid)
+	{
+	  type = OTHER_OBJ;
+	  id = 0;
+	}
+      else if (ace_sid == owner_sid)
 	{
 	  type = USER_OBJ;
 	  id = uid;
@@ -323,11 +328,6 @@ getacl (const char *file, DWORD attr, int nentries, __aclent16_t *aclbufp)
 	{
 	  type = GROUP_OBJ;
 	  id = gid;
-	}
-      else if (ace_sid == well_known_world_sid)
-	{
-	  type = OTHER_OBJ;
-	  id = 0;
 	}
       else
 	{
