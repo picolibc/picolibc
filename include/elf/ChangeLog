@@ -1,8 +1,14 @@
+2003-05-15  Roland McGrath  <roland@redhat.com>
+
+	* common.h (NT_AUXV, AT_*): New macros.
+	* external.h (Elf32_External_Auxv, Elf64_External_Auxv): New types.
+	* internal.h (Elf_Internal_Auxv): New type.
+
 2003-05-14  Michael Snyder  <msnyder@redhat.com>
 	From  Bernd Schmidt  <bernds@redhat.com>
 	* h8.h (E_H8_MACH_H8300SX): New.
 
-2003-04-24 Dhananjay Deshpande <dhananjayd@kpitcummins.com> 
+2003-04-24 Dhananjay Deshpande <dhananjayd@kpitcummins.com>
 
 	* elf/h8.h (E_H8_MACH_H8300HN, E_H8_MACH_H8300SN): New
 
@@ -30,7 +36,7 @@
 
 2003-03-25  Stan Cox   <scox@redhat.com>
 	    Nick Clifton  <nickc@redhat.com>
-	    
+
 	Contribute support for Intel's iWMMXt chip - an	ARM variant:
 
 	* arm.h (ARM_NOTE_SECTION): Define.
