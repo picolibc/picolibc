@@ -1,3 +1,8 @@
+2001-06-08  Jonathan Larmour  <jlarmour@redhat.com>
+
+	* libc/stdlib/mbtowc_r.c (_mbtowc_r): Avoid dereferencing
+	NULL pointer.
+
 2001-05-28  Nick Clifton  <nickc@cambridge.redhat.com>
 
 	* libc/stdio/vfprintf.c (_VFPRINTF_R): Handle printf ("%#.0o",0)

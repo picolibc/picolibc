@@ -68,9 +68,10 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
     { /* fall-through */ }
   else if (!strcmp (r->_current_locale, "C-SJIS"))
     {
-      int char1 = *t;
+      int char1;
       if (s == NULL)
         return 0;  /* not state-dependent */
+      char1 = *t;
       if (_issjis1 (char1))
         {
           int char2 = t[1];
@@ -87,9 +88,10 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
     }
   else if (!strcmp (r->_current_locale, "C-EUCJP"))
     {
-      int char1 = *t;
+      int char1;
       if (s == NULL)
         return 0;  /* not state-dependent */
+      char1 = *t;
       if (_iseucjp (char1))
         {
           int char2 = t[1];     
