@@ -102,6 +102,7 @@ SECTIONS
   } =0
   .rodata   : { *(.rodata) *(.rodata.*) *(.gnu.linkonce.r*) }
   .rodata1   : { *(.rodata1) }
+  .eh_frame_hdr : { *(.eh_frame_hdr) }
   /* Adjust the address for the data segment.  We want to adjust up to
      the same address within the page on the next page up.  */
   . = ALIGN(256) + (. & (256 - 1));
@@ -113,7 +114,7 @@ SECTIONS
     SORT(CONSTRUCTORS)
   }
   .data1   : { *(.data1) }
-  .eh_frame : { *(.eh_frame) }
+  .eh_frame : { KEEP (*(.eh_frame)) }
   .gcc_except_table : { *(.gcc_except_table) }
   .ctors   : 
   {
@@ -142,6 +143,7 @@ SECTIONS
     KEEP (*(SORT(.dtors.*)))
     KEEP (*(.dtors))
   }
+  .jcr            : { KEEP (*(.jcr)) }
   .got           : { *(.got.plt) *(.got) }
   .dynamic       : { *(.dynamic) }
   /* We want the small data sections together, so single-instruction offsets
