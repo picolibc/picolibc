@@ -53,7 +53,10 @@ cygthread::stub (VOID *arg)
   init_exceptions (&except_entry);
 
   cygthread *info = (cygthread *) arg;
-  info->ev = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
+  if (info->arg == cygself)
+    info->ev = NULL;
+  else
+    info->ev = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
   while (1)
     {
       if (!info->func)

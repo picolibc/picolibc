@@ -36,7 +36,7 @@ static DWORD WINAPI process_output (void *);		// Output queue thread
 static DWORD WINAPI process_ioctl (void *);		// Ioctl requests thread
 
 fhandler_tty_master::fhandler_tty_master (int unit)
-  : fhandler_pty_master (FH_TTYM, unit), console (NULL), output_thread (NULL)
+  : fhandler_pty_master (FH_TTYM, unit), console (NULL)
 {
 }
 
@@ -62,14 +62,17 @@ fhandler_tty_master::init (int ntty)
   inuse = get_ttyp ()->create_inuse (TTY_MASTER_ALIVE);
 
   cygthread *h;
-  h = new cygthread (process_input, NULL, "ttyin");
-  SetThreadPriority (*h, THREAD_PRIORITY_HIGHEST);
+  h = new cygthread (process_input, cygself, "ttyin");
+  h->SetThreadPriority (THREAD_PRIORITY_HIGHEST);
+  h->zap_h ();
 
-  h = new cygthread (process_ioctl, NULL, "ttyioctl");
-  SetThreadPriority (*h, THREAD_PRIORITY_HIGHEST);
+  h = new cygthread (process_ioctl, cygself, "ttyioctl");
+  h->SetThreadPriority (THREAD_PRIORITY_HIGHEST);
+  h->zap_h ();
 
-  output_thread = new cygthread (process_output, cygself, "ttyout");
-  SetThreadPriority (*output_thread, THREAD_PRIORITY_HIGHEST);
+  h = new cygthread (process_output, cygself, "ttyout");
+  h->SetThreadPriority (THREAD_PRIORITY_HIGHEST);
+  h->zap_h ();
 
   return 0;
 }
@@ -368,9 +371,9 @@ out:
 }
 
 static DWORD WINAPI
-process_output (void *self)
+process_output (void *)
 {
-  char buf[OUT_BUFFER_SIZE*2];
+  char buf[OUT_BUFFER_SIZE * 2];
 
   for (;;)
     {
@@ -379,9 +382,7 @@ process_output (void *self)
 	{
 	  if (n < 0)
 	    termios_printf ("ReadFile %E");
-	  cygthread *t = (cygthread *) self;
-	  tty_master->output_thread = NULL;
-	  t->exit_thread ();
+	  ExitThread (0);
 	}
       n = tty_master->console->write ((void *) buf, (size_t) n);
       tty_master->get_ttyp ()->write_error = n == -1 ? get_errno () : 0;
@@ -1167,7 +1168,6 @@ fhandler_tty_master::fixup_after_fork (HANDLE child)
 {
   this->fhandler_pty_master::fixup_after_fork (child);
   console->fixup_after_fork (child);
-  output_thread = NULL;		// It's unreachable now
 }
 
 void
@@ -1175,7 +1175,6 @@ fhandler_tty_master::fixup_after_exec (HANDLE)
 {
   console->close ();
   init_console ();
-  output_thread = NULL;		// It's unreachable now
 }
 
 int

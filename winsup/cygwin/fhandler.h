@@ -926,13 +926,11 @@ class fhandler_pty_master: public fhandler_tty_common
   bool hit_eof ();
 };
 
-class cygthread;
 class fhandler_tty_master: public fhandler_pty_master
 {
  public:
   /* Constructor */
   fhandler_console *console;	// device handler to perform real i/o.
-  cygthread *output_thread;		// process_output thread
 
   fhandler_tty_master (int unit);
   int init (int);

@@ -144,8 +144,6 @@ tty_list::terminate (void)
       ForceCloseHandle1 (t->to_slave, to_pty);
       ForceCloseHandle1 (t->from_slave, from_pty);
       CloseHandle (tty_master->inuse);
-      if (tty_master->output_thread)
-	tty_master->output_thread->detach ();
       t->init ();
 
       char buf[20];

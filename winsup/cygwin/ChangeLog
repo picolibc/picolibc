@@ -1,3 +1,28 @@
+2002-10-09  Christopher Faylor  <cgf@redhat.com>
+
+	* cygthread.cc (cygthread::stub): Don't create an event for "cygself"
+	threads.  Assume that they exit via an ExitThread call.
+	* cygthread.h (cygthread::SetThreadPriority): New function.
+	(cygthread::zap_h): New function.
+	* dcrt0.cc (do_exit): Move cygthread::terminate earlier and establish
+	exit_state guard.
+	* fhandler.h (fhandler_tty_master::output_thread): Delete.
+	* fhandler_tty.cc (fhandler_tty_master::init): Set priority for threads
+	via method.  Zap handles when done.  Don't treat process_output
+	specially.
+	(process_output): Call ExitThread directly.
+	(fhandler_tty_master::fixup_after_fork): Don't worry about
+	output_thread.
+	(fhandler_tty_master::fixup_after_exec): Ditto.
+	* sigproc.cc (proc_terminate): Don't detach from hwait_subproc.  Just
+	let it exit.
+	(sigproc_init): Close thread handle after initialization.
+	(wait_sig): Use GetCurrentThread() as SetThreadPriority call rather
+	than *event* handle.  Call ExitThread directly on termination.
+	(wait_subproc): Call ExitThread directly on termination.
+	* tty.cc (tty_list::terminate): Don't attempt t detach from
+	output_thread.
+
 2002-10-08  Christopher Faylor  <cgf@redhat.com>
 
 	* cygheap.cc (dup_now): Make fatal error a little more informative.

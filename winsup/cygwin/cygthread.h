@@ -34,6 +34,13 @@ class cygthread
   static void * freerange ();
   void exit_thread ();
   static void terminate ();
+  bool SetThreadPriority (int nPriority) {return ::SetThreadPriority (h, nPriority);}
+  void zap_h ()
+  {
+    (void) CloseHandle (h);
+    h = NULL;
+  }
+
 };
 
 #define cygself NULL

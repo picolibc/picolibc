@@ -458,7 +458,6 @@ proc_terminate (void)
     {
       proc_loop_wait = 0;	// Tell wait_subproc thread to exit
       wake_wait_subproc ();	// Wake wait_subproc loop
-      hwait_subproc->detach ();
       hwait_subproc = NULL;
 
       sync_proc_subproc->acquire (WPSP);
@@ -568,6 +567,7 @@ sigproc_init ()
   ProtectHandle (signal_arrived);
 
   hwait_sig = new cygthread (wait_sig, cygself, "sig");
+  hwait_sig->zap_h ();
 
   /* sync_proc_subproc is used by proc_subproc.  It serialises
    * access to the children and zombie arrays.
@@ -1030,7 +1030,7 @@ static DWORD WINAPI
 wait_sig (VOID *self)
 {
   /* Initialization */
-  (void) SetThreadPriority (*((cygthread *) self), WAIT_SIG_PRIORITY);
+  (void) SetThreadPriority (GetCurrentThread (), WAIT_SIG_PRIORITY);
 
   /* sigcatch_nosync       - semaphore incremented by sig_dispatch_pending and
    *			     by foreign processes to force an examination of
@@ -1193,7 +1193,7 @@ wait_sig (VOID *self)
     }
 
   sigproc_printf ("done");
-  return 0;
+  ExitThread (0);
 }
 
 /* Wait for subprocesses to terminate. Executes in a separate thread. */
@@ -1267,7 +1267,7 @@ wait_subproc (VOID *)
   ForceCloseHandle (events[0]);
   events[0] = NULL;
   sigproc_printf ("done");
-  return 0;
+  ExitThread (0);
 }
 
 extern "C" {

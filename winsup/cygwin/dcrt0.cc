@@ -947,9 +947,10 @@ __main (void)
 
 enum
   {
-    ES_SIGNAL = 1,
-    ES_CLOSEALL = 2,
-    ES_SIGPROCTERMINATE = 3
+    ES_THREADTERM = 1,
+    ES_SIGNAL = 2,
+    ES_CLOSEALL = 3,
+    ES_SIGPROCTERMINATE = 4
   };
 
 extern "C" void __stdcall
@@ -961,6 +962,12 @@ do_exit (int status)
   if (!DisableThreadLibraryCalls (cygwin_hmodule))
     system_printf ("DisableThreadLibraryCalls (%p) failed, %E",
 		   cygwin_hmodule);
+
+  if (exit_state < ES_THREADTERM)
+    {
+      exit_state = ES_THREADTERM;
+      cygthread::terminate ();
+    }
 
   syscall_printf ("do_exit (%d)", n);
 
@@ -1028,7 +1035,6 @@ do_exit (int status)
   window_terminate ();
   events_terminate ();
   shared_terminate ();
-  cygthread::terminate ();
 
   minimal_printf ("winpid %d, exit %d", GetCurrentProcessId (), n);
   myself->exit (n);
