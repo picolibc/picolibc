@@ -568,6 +568,14 @@ fhandler_base::open_fs (int flags, mode_t mode)
       return 0;
     }
 
+  /* Unfortunately NT allows to open directories for writing, but that's
+     disallowed according to SUSv3. */
+  if (pc.isdir () && (flags & (O_WRONLY | O_RDWR)))
+    {
+      set_errno (EISDIR);
+      return 0;
+    }
+
   int res = fhandler_base::open (flags | O_DIROPEN, mode);
   if (!res)
     goto out;
