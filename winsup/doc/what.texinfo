@@ -77,9 +77,8 @@ it all to make sure it worked together, and packaged it in a convenient
 form.  We considered such testing and packaging to be a valuable service
 and thus charged a fee for it.  Plus, it provided income for the Cygwin
 project so we could continue working on it.  However, Red Hat is no
-longer offering Cygwin 1.0 on CD.  There are tentative plans to offer a
-new Cygwin CD sometime in early 2001.  So far, however, there are no
-definite plans.  The latest news about this can be found at
+longer offering Cygwin 1.0 on CD, and there are no plans to
+do so again.  The latest news about this can be found at
 @file{http://cygwin.com/cygwin-cd.html}.
 
 
