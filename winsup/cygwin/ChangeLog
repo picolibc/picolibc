@@ -1,5 +1,10 @@
 2003-04-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* regex/regex.h: Define regoff_t as _off_t.
+	* regex/regex2.h: Ditto.
+
+2003-04-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwin.din: Export wcscoll, wcswidth and wcwidth.
 	* include/cygwin/version.h: Bump API minor number.
 

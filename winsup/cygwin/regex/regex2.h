@@ -1,6 +1,6 @@
 /*
  * First, the stuff that ends up in the outside-world include file
- = typedef off_t regoff_t;
+ = typedef _off_t regoff_t;
  = typedef struct {
  = 	int re_magic;
  = 	size_t re_nsub;		// number of parenthesized subexpressions
