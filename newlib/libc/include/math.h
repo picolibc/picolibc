@@ -88,12 +88,12 @@ extern int __signbitd (double x);
           (__extension__ ({__typeof__(x) __x = (x); \
                            (sizeof (__x) == sizeof (float))  ? __fpclassifyf(__x) : __fpclassifyd(__x);}))
 
-#define isfinite(x) \
-          (__extension__ ({__typeof__(x) __x = (x); \
-                           fpclassify(__x) != FP_INFINITE && fpclassify(__x) != FP_NAN;}))
-#define isnormal(x) \
-          (__extension__ ({__typeof__(x) __x = (x); \
-                           fpclassify(__x) == FP_NORMAL;}))
+#define isfinite(y) \
+          (__extension__ ({__typeof__(y) __y = (y); \
+                           fpclassify(__y) != FP_INFINITE && fpclassify(__y) != FP_NAN;}))
+#define isnormal(z) \
+          (__extension__ ({__typeof__(z) __z = (z); \
+                           fpclassify(__z) == FP_NORMAL;}))
 #define signbit(x) \
           (__extension__ ({__typeof__(x) __x = (x); \
                            (sizeof(__x) == sizeof(float)) ? __signbitf(__x) : __signbitd(__x);}))
@@ -114,9 +114,9 @@ extern int __signbitd (double x);
           (__extension__ ({__typeof__(x) __x = (x); __typeof__(y) __y = (y); \
                            !isunordered(__x,__y) && (__x < __y || __x > __y);}))
 
-#define isunordered(x,y) \
-          (__extension__ ({__typeof__(x) __x = (x); __typeof__(y) __y = (y); \
-                           fpclassify(__x) == FP_NAN || fpclassify(__y) == FP_NAN;}))
+#define isunordered(a,b) \
+          (__extension__ ({__typeof__(a) __a = (a); __typeof__(b) __b = (b); \
+                           fpclassify(__a) == FP_NAN || fpclassify(__b) == FP_NAN;}))
 
 /* Non ANSI double precision functions.  */
 

@@ -1,3 +1,8 @@
+2005-02-07  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/include/math.h (isfinite, isnormal, isunordered): Change
+	input variable names to avoid mixups with nesting macros.
+
 2005-01-27  Hans-Peter Nilsson  <hp@axis.com>
 
 	* configure.host: Add support for cris-*-* and crisv32-*-*.
