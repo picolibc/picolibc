@@ -1,5 +1,5 @@
 /* IA-64 ELF support for BFD.
-   Copyright (C) 1998, 1999 Free Software Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
    Contributed by David Mosberger-Tang <davidm@hpl.hp.com>
 
 This file is part of BFD, the Binary File Descriptor library.
@@ -113,6 +113,7 @@ START_RELOC_NUMBERS (elf_ia64_reloc_type)
   RELOC_NUMBER (R_IA64_FPTR64MSB, 0x46)	/* @fptr(sym + add), data8 MSB */
   RELOC_NUMBER (R_IA64_FPTR64LSB, 0x47)	/* @fptr(sym + add), data8 LSB */
 
+  RELOC_NUMBER (R_IA64_PCREL60B, 0x48)	/* @pcrel(sym + add), brl */
   RELOC_NUMBER (R_IA64_PCREL21B, 0x49)	/* @pcrel(sym + add), ptb, call */
   RELOC_NUMBER (R_IA64_PCREL21M, 0x4a)	/* @pcrel(sym + add), chk.s */
   RELOC_NUMBER (R_IA64_PCREL21F, 0x4b)	/* @pcrel(sym + add), fchkf */
@@ -146,6 +147,10 @@ START_RELOC_NUMBERS (elf_ia64_reloc_type)
   RELOC_NUMBER (R_IA64_LTV32LSB, 0x71)	/* symbol + addend, data4 LSB */
   RELOC_NUMBER (R_IA64_LTV64MSB, 0x72)	/* symbol + addend, data8 MSB */
   RELOC_NUMBER (R_IA64_LTV64LSB, 0x73)	/* symbol + addend, data8 LSB */
+
+  RELOC_NUMBER (R_IA64_PCREL21BI, 0x79)	/* @pcrel(sym + add), ptb, call */
+  RELOC_NUMBER (R_IA64_PCREL22, 0x7a)	/* @pcrel(sym + add), imm22 */
+  RELOC_NUMBER (R_IA64_PCREL64I, 0x7b)	/* @pcrel(sym + add), imm64 */
 
   RELOC_NUMBER (R_IA64_IPLTMSB, 0x80)	/* dynamic reloc, imported PLT, MSB */
   RELOC_NUMBER (R_IA64_IPLTLSB, 0x81)	/* dynamic reloc, imported PLT, LSB */

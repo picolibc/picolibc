@@ -1,3 +1,8 @@
+2000-05-22  Richard Henderson  <rth@cygnus.com>
+
+	* ia64.h (R_IA64_PCREL60B, R_IA64_PCREL21BI): New.
+	(R_IA64_PCREL22, R_IA64_PCREL64I): New.
+
 2000-05-02  H.J. Lu  <hjl@gnu.org>
 
 	* common.h (ELFOSABI_NONE): Renamed from ELFOSABI_SYSV.
