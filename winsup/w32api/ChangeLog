@@ -1,3 +1,24 @@
+2004-03-01  Martin Fuchs  <martin-fuchs@gmx.net>
+
+	* include/oaidl.h (FADF_*) Define missing constants.
+	(IDispatch_*): Define COBJ macros.
+	(VARIANT): Add missing union members llVal and ullVal.
+	(wireVARIANT): Likewise.
+	(ITypeinfo_*): Define COBJ macros.
+	* include/oleauto.h (Var*FromDisp): Correct parameter type from
+	LPDISPATCH* to LPDISPATCH.
+	(VARCMP_*, VAR_LOCALBOOL, LOCALE_USE_NLS, VARIANT_*,
+	VAR_CALENDAR_*): Add missing constants.
+	(SafeArray[Get/Set]*): Add prototypes.
+	(Var*From*):  Add missing prototypes.
+	(NUMPRS_*): Add defines.
+	(NUMPARSE): Define structure.
+	(VarParseNumFromStr,VarNumFromParseNum): Add prototypes.
+	* include/winerror.h (DISP_E_DIVBYZERO): Define constant.
+	* include/winuser.h (COLOR_*): Define missing constants.
+	* include/wtypes.h (enum VARENUM) Add VT_INT_PTR, VT_UINT_PTR.
+ 	(VT_INT_PTR, VT_UINT_PTR): Remove macro definitions.
+
 2004-02-23  Filip Navara  <xnavara@volny.cz>
 
 	* include/ddk/video.h: Corrected packing.
