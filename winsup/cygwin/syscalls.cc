@@ -1200,42 +1200,44 @@ _rename (const char *oldpath, const char *newpath)
       SetFileAttributesA (real_new.get_win32 (), newatts & ~ FILE_ATTRIBUTE_READONLY);
     }
 
-  /* First make sure we have the permissions */
-  if (!MoveFileEx (real_old.get_win32 (), real_new.get_win32 (), MOVEFILE_REPLACE_EXISTING))
-    {
-      res = -1;
+  if (!MoveFile (real_old.get_win32 (), real_new.get_win32 ()))
+    res = -1;
 
-      /* !!! fixme, check for windows version before trying this.. */
-      if (GetLastError () == ERROR_CALL_NOT_IMPLEMENTED)
+  if (res == 0 || GetLastError () != ERROR_ALREADY_EXISTS)
+    goto done;
+
+  if (os_being_run == winNT)
+    {
+      if (MoveFileEx (real_old.get_win32 (), real_new.get_win32 (),
+		      MOVEFILE_REPLACE_EXISTING))
+	res = 0;
+    }
+  else
+    {
+      syscall_printf ("try win95 hack");
+      for (;;)
 	{
-	  /* How sad, we must be on win95, try it the stupid way */
-	  syscall_printf ("try win95 hack");
-	  for (;;)
+	  if (!DeleteFileA (real_new.get_win32 ()) &&
+	      GetLastError () != ERROR_FILE_NOT_FOUND)
+	    {
+	      syscall_printf ("deleting %s to be paranoid",
+			      real_new.get_win32 ());
+	      break;
+	    }
+	  else
 	    {
 	      if (MoveFile (real_old.get_win32 (), real_new.get_win32 ()))
 		{
 		  res = 0;
 		  break;
 		}
-
-	      if (GetLastError () != ERROR_ALREADY_EXISTS)
-		{
-		  syscall_printf ("%s already_exists", real_new.get_win32 ());
-		  break;
-		}
-
-	      if (!DeleteFileA (real_new.get_win32 ()) &&
-		  GetLastError () != ERROR_FILE_NOT_FOUND)
-		{
-		  syscall_printf ("deleting %s to be paranoid",
-				  real_new.get_win32 ());
-		  break;
-		}
 	    }
 	}
-      if (res)
-	__seterrno ();
     }
+
+done:
+  if (res)
+    __seterrno ();
 
   if (res == 0)
     {
