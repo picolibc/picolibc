@@ -26,8 +26,6 @@
 /*
  * Constants for the stat st_mode member.
  */
-#ifndef __STRICT_ANSI__
-#endif
 #define	_S_IFIFO	0x1000	/* FIFO */
 #define	_S_IFCHR	0x2000	/* Character */
 #define	_S_IFBLK	0x3000	/* Block: Is this ever set under w32? */
@@ -101,6 +99,8 @@ struct _stat
 	time_t	st_ctime;	/* Creation time */
 };
 
+#ifndef	_NO_OLDNAMES
+/* NOTE: Must be the same as _stat above. */
 struct stat
 {
 	_dev_t	st_dev;		/* Equivalent to drive number 0=A 1=B ... */
@@ -116,6 +116,7 @@ struct stat
 	time_t	st_mtime;	/* Modified time */
 	time_t	st_ctime;	/* Creation time */
 };
+#endif /* _NO_OLDNAMES */
 
 #if defined (__MSVCRT__)
 struct _stati64 {
