@@ -1859,7 +1859,7 @@ if((yy[NE-1] & 0x7fff) == 0 && (yy[NE-2] & 0x8000) == 0)
 #ifdef INFINITY
 /* Point to the exponent field.  */
 p = &yy[NE-1];
-if( *p == 0x7fff )
+if( (*p & 0x7fff) == 0x7fff )
 	{
 #ifdef NANS
 #ifdef IBMPC

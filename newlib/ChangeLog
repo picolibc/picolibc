@@ -1,3 +1,8 @@
+2002-11-12  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/stdlib/ldtoa.c (e64toe): When checking the exponent
+        for inf/nan, make sure that the check ignores the sign bit.
+
 2002-11-07  Joel Sherrill <joel@OARcorp.com>
 
         * libc/sys/rtems/machine: New directory.
