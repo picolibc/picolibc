@@ -183,17 +183,15 @@ strace::write (unsigned category, const char *buf, int count)
    Warning: DO NOT SET ERRNO HERE! */
 
 void
-strace::prntf (unsigned category, const char *func, const char *fmt, ...)
+strace::vprntf (unsigned category, const char *func, const char *fmt, va_list ap)
 {
   DWORD err = GetLastError ();
   int count;
   char buf[10000];
-  va_list ap;
 
   PROTECT(buf);
   SetLastError (err);
 
-  va_start (ap, fmt);
   count = this->vsprntf (buf, func, fmt, ap);
   CHECK(buf);
   if (category & _STRACE_SYSTEM)
@@ -208,6 +206,27 @@ strace::prntf (unsigned category, const char *func, const char *fmt, ...)
     this->write (category, buf, count);
 #endif
   SetLastError (err);
+}
+
+void
+strace::prntf (unsigned category, const char *func, const char *fmt, ...)
+{
+  va_list ap;
+
+  va_start (ap, fmt);
+  this->vprntf (category, func, fmt, ap);
+}
+
+extern "C" void
+strace_printf (unsigned category, const char *func, const char *fmt, ...)
+{
+  va_list ap;
+
+  if ((category & _STRACE_SYSTEM) || strace.active)
+    {
+      va_start (ap, fmt);
+      strace.vprntf (category, func, fmt, ap);
+    }
 }
 
 static NO_COPY const struct tab

@@ -1,3 +1,13 @@
+Mon Feb 26 10:42:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* strace.cc (strace::vprntf): Move prntf functionality to this function
+	adding an va_list interface to strace.
+	(strace::printf): Calls strace::vprntf now.
+	(strace_printf): New function providing an extern "C" interface to
+	trace output.
+	* include/sys/strace.h: Make plain C clean.
+	(class strace): Add `vprntf' method.
+
 Mon Feb 26  0:10:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* shortcut.c: Remove #include <sys/strace.h>.

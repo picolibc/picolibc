@@ -21,6 +21,8 @@
 
 #include <stdarg.h>
 
+#ifdef __cplusplus
+
 class strace
 {
   int vsprntf (char *buf, const char *func, const char *infmt, va_list ap);
@@ -33,10 +35,13 @@ public:
   int execing;
   strace() : version(1) {}
   void prntf (unsigned, const char *func, const char *, ...);
+  void vprntf (unsigned, const char *func, const char *, va_list ap);
   void wm (int message, int word, int lon);
 };
 
 extern strace strace;
+
+#endif /* __cplusplus */
 
 #define _STRACE_INTERFACE_ACTIVATE_ADDR  -1
 #define _STRACE_INTERFACE_ACTIVATE_ADDR1 -2
@@ -63,7 +68,18 @@ extern strace strace;
 #define _STRACE_THREAD	 0x40000 // thread-locking calls
 #define _STRACE_NOTALL	 0x80000 // don't include if _STRACE_ALL
 
-extern "C" void small_printf (const char *, ...);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void small_printf (const char *, ...);
+void strace_printf (unsigned, const char *func, const char *, ...);
+
+#ifdef __cplusplus
+}
+#endif
+
+#ifdef __cplusplus
 
 #ifdef NOSTRACE
 #define define_strace(c, f)
@@ -120,4 +136,5 @@ extern "C" void small_printf (const char *, ...);
 #define thread_printf(fmt, args...) strace_printf_wrap1(THREAD, fmt , ## args)
 #endif /*NEW_MACRO_VARARGS*/
 #endif /*NOSTRACE*/
+#endif /* __cplusplus */
 #endif /* _SYS_STRACE_H */
