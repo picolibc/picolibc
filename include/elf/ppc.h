@@ -171,6 +171,9 @@ END_RELOC_NUMBERS (R_PPC_max)
 #define R_PPC64_GNU_VTINHERIT	  R_PPC_GNU_VTINHERIT
 #define R_PPC64_GNU_VTENTRY	  R_PPC_GNU_VTENTRY
 
+/* Specify the start of the .glink section.  */
+#define DT_PPC64_GLINK		DT_LOPROC
+
 /* Processor specific flags for the ELF header e_flags field.  */
 
 #define	EF_PPC_EMB		0x80000000	/* PowerPC embedded flag.  */

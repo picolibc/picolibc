@@ -1,3 +1,7 @@
+2002-01-16  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc.h (DT_PPC64_GLINK): Define.
+
 2002-01-09  Jason Thorpe  <thorpej@wasabisystems.com>
 
 	* common.h: Update copyright years.
