@@ -41,7 +41,7 @@ static int __dllMain (int a, char **b, char **c)			      \
 									      \
 static DWORD dll_index;							      \
 									      \
-int WINAPI _cygwin_dll_entry (HINSTANCE h, DWORD reason, void *ptr)	      \
+int WINAPI _cygwin_dll_entry (HANDLE h, DWORD reason, void *ptr)	      \
 {									      \
   int ret;								      \
   ret = 1;								      \
