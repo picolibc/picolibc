@@ -1,6 +1,6 @@
 /* ELF support for BFD.
    Copyright 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000,
-   2001
+   2001, 2002
    Free Software Foundation, Inc.
 
    Written by Fred Fish @ Cygnus Support, from information published
@@ -341,6 +341,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define NT_LWPSTATUS	16		/* Has a struct lwpstatus_t */
 #define NT_LWPSINFO	17		/* Has a struct lwpsinfo_t */
 #define NT_WIN32PSTATUS	18		/* Has a struct win32_pstatus */
+
+
+/* Note segments for core files on NetBSD systems.  Note name
+   must start with "NetBSD-CORE".  */
+
+#define NT_NETBSDCORE_PROCINFO	1	/* Has a struct procinfo */
+#define NT_NETBSDCORE_FIRSTMACH	32	/* start of machdep note types */
+
 
 /* Values of note segment descriptor types for object files.  */
 
