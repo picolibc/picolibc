@@ -609,6 +609,23 @@ enum cgen_operand_type { CGEN_OPERAND_MAX };
 /* "nil" indicator for the operand instance table */
 #define CGEN_OPERAND_NIL CGEN_OPERAND_MAX
 
+/* A tree of these structs represents the multi-ifield
+   structure of an operand's hw-index value, if it exists.  */
+
+struct cgen_ifld;
+
+typedef struct cgen_maybe_multi_ifield
+{
+  int count; /* 0: indexed by single cgen_ifld (possibly null: dead entry);
+		n: indexed by array of more cgen_maybe_multi_ifields.  */
+  union
+  {
+    struct cgen_maybe_multi_ifield * multi;
+    struct cgen_ifld * leaf;
+  } val;
+}
+CGEN_MAYBE_MULTI_IFLD;
+
 /* This struct defines each entry in the operand table.  */
 
 typedef struct
@@ -637,6 +654,11 @@ typedef struct
      May be unused for a modifier.  */
   unsigned char length;
 
+  /* The (possibly-multi) ifield used as an index for this operand, if it
+     is indexed by a field at all. This substitutes / extends the start and
+     length fields above, but unsure at this time whether they are used
+     anywhere.  */
+  CGEN_MAYBE_MULTI_IFLD index_fields;
 #if 0 /* ??? Interesting idea but relocs tend to get too complicated,
 	 and ABI dependent, for simple table lookups to work.  */
   /* Ideally this would be the internal (external?) reloc type.  */
