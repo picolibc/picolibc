@@ -1,3 +1,7 @@
+2004-04-14  Robert Wruck  <rwruck@users.sourceforge.net>
+
+	* include/ddk/winddk.h (RtlEqualLuid): Correct macro.
+
 2004-04-06  Luke Dunstan  <infidel@users.sourceforge.net>
 
 	* include/ocidl.h (QACONTAINERFLAGS): Correct typedef.
@@ -8,7 +12,7 @@
 	* lib/directx/dxerr.c: Remove dependence on mingw runtime. 
 	Don't include stdio.h or tchar.h.
 	Replace _T() macro with TEXT() macro, throughout.
-	Replace, _stprintf with wsprintf, throughout.
+	Replace _stprintf with wsprintf, throughout.
 
 2004-03-27  Hosaka Yuji  <hos@tamanegi.org>
 

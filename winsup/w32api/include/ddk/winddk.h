@@ -4398,12 +4398,12 @@ RtlDeleteRegistryValue(
 /*
  * BOOLEAN
  * RtlEqualLuid( 
- *   IN LUID  Luid1,
- *   IN LUID  Luid2)
+ *   IN LUID*  Luid1,
+ *   IN LUID*  Luid2)
  */
-#define RtlEqualLuid(_Luid1, \
-                     _Luid2) \
-  ((Luid1.LowPart == Luid2.LowPart) && (Luid1.HighPart == Luid2.HighPart))
+#define RtlEqualLuid(_Luid1,_Luid2) \
+  ((BOOLEAN) (((_Luid1)->LowPart == (_Luid2)->LowPart) \
+	      && ((_Luid1)->HighPart == (_Luid2)->HighPart)))
 
 /*
  * ULONG
