@@ -1,3 +1,22 @@
+2003-08-22  Mihai Preda <mihai_preda@users.sourceforge.net>
+
+	* include/shlobj.h (IPersistFolder::GetClassID):
+	Correct declaration.
+	(CMF_*) Add missing defines.
+
+2003-08-22   Danny Smith <dannysmith@users.sourceforge.net>
+
+        * include/winuser.h (DC_BUTTONS): Add define.
+
+2003-08-22  Andrew Greenwood  <lists@silverblade.co.uk>
+
+        * include/winuser.h (DC_GRADIENT): Add define.
+
+2003-08-22  Martin Fuchs  <Martin-Fuchs@gmx.net>
+
+	* include/commctrl.h (BTNS_*): Define BTNS_* as successors to the
+	older TBSTYLE_* constants.
+
 2003-08-18  Danny Smith <dannysmith@users.sourceforge.net>
 
 	* include/commctrl.h (TB_*) Group defines together. 

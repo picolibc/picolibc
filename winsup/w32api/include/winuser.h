@@ -1,6 +1,6 @@
 #ifndef _WINUSER_H
 #define _WINUSER_H
-#if __GNUC__ >=3
+#if __GNUC__ >= 3
 #pragma GCC system_header
 #endif
 
@@ -381,8 +381,16 @@ extern "C" {
 #define DC_ICON	4
 #define DC_TEXT	8
 #define DC_INBUTTON	16
+#if (_WIN32_WINDOWS >= 0x0410 || _WIN32_WINNT >= 0x0500)
+#define DC_GRADIENT	32
+#endif
+#if ( _WIN32_WINNT >= 0x0501)
+#define DC_BUTTONS	0x1000
+#endif
+/* Where are these documented?   */
 #define DC_CAPTION	(DC_ICON|DC_TEXT|DC_BUTTONS)
 #define DC_NC	(DC_CAPTION|DC_FRAME)
+
 #define BDR_RAISEDOUTER	1
 #define BDR_SUNKENOUTER	2
 #define BDR_RAISEDINNER	4
