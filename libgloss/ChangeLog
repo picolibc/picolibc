@@ -1,3 +1,9 @@
+2003-04-16  Nick Clifton  <nickc@redhat.com>
+
+	* xstormy16/sim_high.ld: Add .jcr section mapping.
+	* xstormy16/eva_stub.ld: Likewise.
+	* xstormy16/eva_app.ld: Likewise.
+
 2003-04-09  Chris Demetriou  <cgd@broadcom.com>
 
 	* mips/cfe.c (_flush_cache): New function.

@@ -52,6 +52,7 @@ SECTIONS
   } > RAM
   .eh_frame : { KEEP (*(.eh_frame)) } > RAM
   .gcc_except_table : { *(.gcc_except_table) } > RAM
+  .jcr : { *(.jcr) } > RAM
   .plt : { *(.plt) } > RAM
   _edata = .;
   PROVIDE (edata = .);

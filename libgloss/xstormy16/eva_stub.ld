@@ -54,6 +54,7 @@ SECTIONS
   } > ROM
   .eh_frame : { KEEP (*(.eh_frame)) } > ROM
   .gcc_except_table : { *(.gcc_except_table) } > ROM
+  .jcr : { *(.jcr) } > ROM
   .plt : { *(.plt) } > ROM
   .text      :
   {
