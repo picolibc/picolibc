@@ -80,6 +80,9 @@
 	* tty.cc (tty::common_init): Don't protect input/output mutex since it
 	confuses subsequent fork/execs when CYGWIN=tty.
 
+	* fhandler_process.cc (fhandler_process::fill_filebuf): Properly set
+	"file size" for "<defunct>" reporting when filebuf is zero length.
+
 2003-12-26  Christopher Faylor  <cgf@redhat.com>
 
 	* exceptions.cc (try_to_debug): Fix off-by-one problem when resetting
