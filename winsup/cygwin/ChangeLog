@@ -1,5 +1,15 @@
 2001-10-22  Christopher Faylor  <cgf@redhat.com>
 
+	* debug.cc (set_errno): Return value of errno that was set, just like
+	the macro.
+	(setclexec_pid): Replace old handle with new handle.
+	* debug.h: Reflect change in arguments for setclexec_pid.
+	* fhandler.cc (fhandler_base::set_inheritance): Ditto.
+	(fhandler_base::fork_fixup): Ditto.
+	* cygerrno.h: Reflect return value change for set_errno.
+
+2001-10-22  Christopher Faylor  <cgf@redhat.com>
+
 	Remove 'cb' parameter and modify fhandler_* constructors throughout.
 	* dtable.cc (dtable::build_fhandler): Remove debugging output which
 	uses 'cb'.

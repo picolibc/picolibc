@@ -214,11 +214,14 @@ out:
 }
 
 void
-setclexec_pid (HANDLE h, bool setit)
+setclexec_pid (HANDLE oh, HANDLE nh, bool setit)
 {
-  handle_list *hl = find_handle (h);
+  handle_list *hl = find_handle (oh);
   if (hl)
-    hl->clexec_pid = setit ? GetCurrentProcessId () : 0;
+    {
+      hl->clexec_pid = setit ? GetCurrentProcessId () : 0;
+      hl->h = nh;
+    }
 }
 
 /* Create a new handle record */
@@ -351,10 +354,10 @@ close_handle (const char *func, int ln, HANDLE h, const char *name, BOOL force)
 }
 
 /* Add a handle to the linked list of known handles. */
-void __stdcall
+int __stdcall
 __set_errno (const char *func, int ln, int val)
 {
   debug_printf ("%s:%d val %d", func, ln, val);
-  _impure_ptr->_errno = val;
+  return _impure_ptr->_errno = val;
 }
 #endif /*DEBUGGING*/

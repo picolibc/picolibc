@@ -1611,6 +1611,7 @@ fhandler_dev_null::dump (void)
 void
 fhandler_base::set_inheritance (HANDLE &h, int not_inheriting)
 {
+  HANDLE oh = h;
   /* Note that we could use SetHandleInformation here but it is not available
      on all platforms.  Test cases seem to indicate that using DuplicateHandle
      in this fashion does not actually close the original handle, which is
@@ -1620,7 +1621,7 @@ fhandler_base::set_inheritance (HANDLE &h, int not_inheriting)
 			     DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
     debug_printf ("DuplicateHandle failed, %E");
 #ifdef DEBUGGING
-  setclexec_pid (h, not_inheriting);
+  setclexec_pid (oh, h, not_inheriting);
 #endif
 }
 
@@ -1640,7 +1641,7 @@ fhandler_base::fork_fixup (HANDLE parent, HANDLE &h, const char *name)
     {
       debug_printf ("%s success - oldh %p, h %p", get_name (), oh, h);
       // someday, maybe ProtectHandle2 (h, name);
-      setclexec_pid (h, !get_close_on_exec ());
+      setclexec_pid (h, h, !get_close_on_exec ());
     }
 #endif
 }
