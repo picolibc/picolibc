@@ -99,12 +99,12 @@ typedef DWORD LCID;
 typedef PDWORD PLCID;
 typedef WORD LANGID;
 #ifdef __GNUC__
-#define HAVE_INT64
+#define _HAVE_INT64
 #define _INTEGRAL_MAX_BITS 64
 #undef __int64
 #define __int64 long long
 #endif
-#if defined(HAVE_INT64) || (defined(_INTEGRAL_MAX_BITS) && _INTEGRAL_MAX_BITS >= 64)
+#if defined(_HAVE_INT64) || (defined(_INTEGRAL_MAX_BITS) && _INTEGRAL_MAX_BITS >= 64)
 typedef __int64 LONGLONG;
 typedef unsigned __int64 DWORDLONG;
 #else
@@ -114,7 +114,7 @@ typedef LONGLONG *PLONGLONG;
 typedef DWORDLONG *PDWORDLONG;
 typedef DWORDLONG ULONGLONG,*PULONGLONG;
 typedef LONGLONG USN;
-#ifdef HAVE_INT64
+#ifdef _HAVE_INT64
 #define Int32x32To64(a,b) ((LONGLONG)(a)*(LONGLONG)(b))
 #define UInt32x32To64(a,b) ((DWORDLONG)(a)*(DWORDLONG)(b))
 #define Int64ShllMod32(a,b) ((DWORDLONG)(a)<<(b))

@@ -32,7 +32,7 @@ extern "C" {
 #define __MIDL_DECLSPEC_DLLIMPORT
 #define __MIDL_DECLSPEC_DLLEXPORT
 #endif
-#if defined(HAVE_INT64) || (defined(_INTEGRAL_MAX_BITS) && _INTEGRAL_MAX_BITS >= 64)
+#if defined(_HAVE_INT64) || (defined(_INTEGRAL_MAX_BITS) && _INTEGRAL_MAX_BITS >= 64)
 #define hyper __int64
 #define MIDL_uhyper unsigned __int64
 #else

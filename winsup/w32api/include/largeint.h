@@ -13,7 +13,7 @@
 extern "C" {
 #endif
 
-#ifdef HAVE_INT64
+#ifdef _HAVE_INT64
 #define _toi (__int64)
 #define _toui (unsigned __int64)
 #else
