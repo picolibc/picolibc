@@ -1,3 +1,11 @@
+2002-07-04  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/rpc.h: Conditionally include <windows.h> before
+	header guard.
+	* include/wtypes.h: Include <rpc.h> and <rpcndr.h> before
+	header guard.
+
+
 2002-07-02  Danny Smith <dannysmith@users.sourceforge.net>
 
 	* include/commctrl.h (WC_*): Remove some duplicate defines.

@@ -1,3 +1,6 @@
+#include <rpc.h>
+#include <rpcndr.h>
+
 #ifndef _WTYPES_H
 #define _WTYPES_H
 #if __GNUC__ >=3
