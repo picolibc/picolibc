@@ -292,6 +292,30 @@ when needed.
 </para>
 </sect2>
 
+<sect2><title>The /proc filesystem</title> 
+<para>
+Cygwin, like Linux and other similar operating systems, supports the
+<filename>/proc</filename> virtual filesystem. The files in this
+directory are representations of various aspects of your system,
+for example the command <userinput>cat /proc/cpuinfo</userinput> 
+displays information such as what model and speed processor you have.
+</para>
+<para>
+One unique aspect of the Cygwin <filename>/proc</filename> filesystem
+is <filename>/proc/registry</filename>, which displays the Windows
+registry with each <literal>KEY</literal> as a directory and each
+<literal>VALUE</literal> as a file. As anytime you deal with the
+Windows registry, use caution since changes may result in an unstable
+or broken system.
+</para>
+<para>
+The Cygwin <filename>/proc</filename> is not as complete as the
+one in Linux, but it provides significant capabilities. The
+<systemitem>procps</systemitem> package contains several utilities
+that use it.
+</para>
+</sect2>
+
 <sect2><title>The @pathnames</title> 
 <para>To circumvent the limitations on shell line length in the native
 Windows command shells, Cygwin programs expand their arguments

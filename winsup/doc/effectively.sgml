@@ -83,7 +83,7 @@ Windows programs, use a DOS prompt, running only the occasional Cygwin
 command or script. Next would be to run <command>bash</command> with 
 the default DOS box. To make Cygwin more Unix compatible in this case, 
 set <EnVar>CYGWIN=tty</EnVar> (see <Xref Linkend="using-cygwinenv">).
-Alternatively, the optional <command>rxvt</command> package provides 
+Alternatively, the optional <systemitem>rxvt</systemitem> package provides 
 a native-Windows version of the popular X11 terminal emulator (it is not 
 necessary to set <EnVar>CYGWIN=tty</EnVar> with <command>rxvt</command>). 
 Using <command>rxvt.exe</command> provides the most Unix-like environment, 
@@ -94,14 +94,15 @@ but expect some compatibility problems with Windows programs.
 
 <sect2> <title>Cygwin and Windows Networking</title>
 <para>
-Many popular Cygwin packages, such as <command>ncftp</command>, 
-<command>lynx</command>, and <command>wget</command>, require a 
+Many popular Cygwin packages, such as <systemitem>ncftp</systemitem>, 
+<systemitem>lynx</systemitem>, and <systemitem>wget</systemitem>, require a 
 network connection.  Since Cygwin relies on Windows for connectivity, 
 if one of these tools is not working as expected you may need to 
 troubleshoot using Windows tools. The first test is to see if you
 can reach the URL's host with <command>ping.exe</command>, one of the 
 few utilities included with every Windows version since Windows 95.
-If you chose to install the inetutils package, you may have both
+If you chose to install the <systemitem>inetutils</systemitem> package, 
+you may have both
 Windows and Cygwin versions of utilities such as <command>ftp</command>
 and <command>telnet</command>. If you are having problems using one
 of these programs, see if the alternate one works as expected. 
@@ -127,10 +128,10 @@ programs in your environment.
 <sect2><title>The cygutils package</title>
 
 <para>
-The optional cygutils package contains miscellaneous tools that are
+The optional <systemitem>cygutils</systemitem> package contains miscellaneous tools that are
 small enough to not require their own package. It is not included in a
 default Cygwin install; select it from the Utils category in 
-<command>setup.exe</command>. Several of the cygutils tools are useful
+<command>setup.exe</command>. Several of the <systemitem>cygutils</systemitem> tools are useful
 for interacting with Windows. 
 </para>
 
@@ -138,7 +139,7 @@ for interacting with Windows.
 One of the hassles of Unix-Windows interoperability is the different line 
 endings on text files.  As mentioned in <Xref Linkend="using-textbinary">, 
 Unix tools such as <command>tr</command> can convert between CRLF and LF 
-endings, but cygutils provides several dedicated programs: 
+endings, but <systemitem>cygutils</systemitem> provides several dedicated programs: 
 <command>conv</command>, <command>d2u</command>, <command>dos2unix</command>, 
 <command>u2d</command>, and <command>unix2dos</command>. Use the
 <literal>--help</literal> switch for usage information. 
@@ -153,7 +154,8 @@ different.  By default, Cygwin uses a mechanism that creates symbolic
 links that are compatible with standard Microsoft .lnk files. However,
 they do not include much of the information that is available in a 
 standard Microsoft shortcut, such as the working directory, an icon, 
-etc.  The cygutils package includes a <command>mkshortcut</command> 
+etc.  The <systemitem>cygutils</systemitem> package includes a 
+<command>mkshortcut</command> 
 utility for creating standard Microsoft .lnk files.
 </para>
 
@@ -172,8 +174,8 @@ Windows shortcuts.
 <sect2><title>Printing with cygutils</title>
 <para>
 There are several options for printing from Cygwin, including the 
-<command>lpr</command> found in cygutils (not to be confused with the 
-native Windows <command>lpr.exe</command>). The easiest way to use cygutils' 
+<command>lpr</command> found in <systemitem>cygutils</systemitem> (not to be confused with the 
+native Windows <command>lpr.exe</command>). The easiest way to use <systemitem>cygutils</systemitem>' 
 <command>lpr</command> is to specify a default device name in the 
 <EnVar>PRINTER</EnVar> environment variable.  You may also specify a device 
 on the command line with the <literal>-d</literal> or <literal>-P</literal> 
@@ -194,8 +196,9 @@ the backslash as an escape character.
 <command>lpr</command> sends raw data to the printer; no formatting is done.
 Many, but not all, printers accept plain text as input. If your printer 
 supports PostScript, packages such as 
-<command>a2ps</command> and <command>enscript</command> can prepare text
-files for printing. The ghostscript package also provides some translation
+<systemitem>a2ps</systemitem> and <systemitem>enscript</systemitem> can prepare 
+text files for printing. The <systemitem>ghostscript</systemitem> package also 
+provides some translation
 from PostScript to various native printer languages. Additionally, a native 
 Windows application for printing PostScript, <command>gsprint</command>, is 
 available from the <ulink URL="http://www.cs.wisc.edu/~ghost/">Ghostscript

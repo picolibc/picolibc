@@ -576,6 +576,18 @@ Unix emulation environment and defining _WIN32 confuses some programs
 which think that they have to make special concessions for a Windows
 environment which Cygwin handles automatically.
 
+Note that using -mno-cygwin replaces __CYGWIN__ with __MINGW32__ as to
+tell which compiler (or settings) you're running.
+Check this out in detail by running, for example
+
+@example
+       $ gcc  -dM -E -xc /dev/null >gcc.txt
+       $ gcc -mno-cygwin -dM -E -xc /dev/null >gcc-mno-cygwin.txt
+       $ gcc -mwin32 -dM -E -xc /dev/null >gcc-mwin32.txt
+@end example
+Then use the diff and grep utilities to check
+what the difference is.
+
 @subsection How should I port my Unix GUI to Windows?
 
 There are two basic strategies for porting Unix GUIs to Windows.

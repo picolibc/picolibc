@@ -3,7 +3,7 @@
 <sect1><title>Internet Setup</title>
 <para>To install the Cygwin net release, go to <ulink
 URL="http://cygwin.com/">http://cygwin.com/</ulink> and click on <ulink
-URL="http://cygwin.com/">"Install Cygwin Now!"</ulink>.  This will
+URL="http://cygwin.com/setup.exe">"Install Cygwin Now!"</ulink>.  This will
 download a GUI installer called <command>setup.exe</command> which can
 be run to download a complete cygwin installation via the internet.
 Follow the instructions on each screen to install Cygwin.
@@ -141,9 +141,9 @@ For each selected mirror site, <command>setup.exe</command> downloads a
 small text file called <literal>setup.bz2</literal> that contains a list
 of packages available from that site along with some basic information about
 each package which <command>setup.exe</command> parses and uses to create the 
-chooser window. For details about the format of this file, see
-<ulink URL="http://sources.redhat.com/cygwin-apps/setup.html#setup.ini">
-http://sources.redhat.com/cygwin-apps/setup.html</ulink>.
+chooser window. For details about the format of this file, see 
+the <ulink URL="http://sources.redhat.com/cygwin-apps/setup.html">
+setup.exe homepage</ulink>.
 </para>
 <para>
 The chooser is the most complex part of <command>setup.exe</command>. 
@@ -155,7 +155,10 @@ will install only the packages in the <literal>Base</literal> category
 and their dependencies, resulting in a minimal Cygwin installation.
 However, this will not include many commonly used tools such as 
 <command>gcc</command> (which you will find in the <literal>Devel</literal> 
-category). 
+category).  Since <command>setup.exe</command> automatically selects
+dependencies, be careful not to unselect any required packages. In 
+particular, everything in the <literal>Base</literal> category is
+required.
 </para>
 <para>
 You can change <command>setup.exe</command>'s view style, which is helpful
@@ -191,7 +194,8 @@ though mirrors have at least one previous version and occasionally there
 is a testing or beta version of a package available. To see these package,
 click on the <literal>Prev</literal> or <literal>Exp</literal> radio button.
 Be warned, however, that the next time you run <command>setup.exe</command> 
-it will try to replace old or experimental versions with the latest. 
+it will try to replace old or experimental versions with the current
+stable version. 
 </para>
 </sect2>
 

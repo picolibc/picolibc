@@ -91,13 +91,21 @@ you will probably want to use the complete syntax:</para>
     -Wl,--out-implib=lib${module}.dll.a \
     -Wl,--export-all-symbols \
     -Wl,--enable-auto-import \
-    -Wl,--whole-archive ${old_lib} \
+    -Wl,--whole-archive ${old_libs} \
     -Wl,--no-whole-archive ${dependency_libs}</screen>
 
-<para>Where ${module} is the name of your DLL, ${old_lib} are all
+<para>
+The name of your library is <literal>${module}</literal>, prefixed with
+<literal>cyg</literal> for the DLL and <literal>lib</literal> for the
+import library. Cygwin DLLs use the <literal>cyg</literal> prefix to 
+differentiate them from native-Windows MinGW DLLs, see 
+<ulink URL="http://mingw.org">the MinGW website</ulink> for more details.
+<literal>${old_libs}</literal> are all
 your object files, bundled together in static libs or single object
-files and the ${dependency_libs} are import libs you need to
-link against, e.g '-lpng -lz -L/usr/local/special -lmyspeciallib'.</para>
+files and the <literal>${dependency_libs}</literal> are import libs you 
+need to link against, e.g 
+<userinput>'-lpng -lz -L/usr/local/special -lmyspeciallib'</userinput>.
+</para>
 </sect2>
 
 <sect2 id="dll-link"><title>Linking Against DLLs</title>

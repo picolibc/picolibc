@@ -1,3 +1,19 @@
+2004-01-11  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
+
+	* Makefile.in: Add new target for single-file User's Guide, use new
+	cygwin.dsl for output.
+	* cygwin.dsl: New file, DSSSL stylesheet for custom Cygwin output.
+	* cygwin-api.in.sgml: Update to DocBook SGML 4.2 DTD.
+	* cygwin-ug-net.in.sgml: Update to DocBook SGML 4.2 DTD.
+	* cygwin-ug.in.sgml: Update to DocBook SGML 4.2 DTD.
+	* cygwinenv.sgml: Correct some tags. Add description of default values
+	to ntsec, export, and error_start items.
+	* dll.sgml: Add explanation of cyg prefix for DLLs.
+	* effectively.sgml: Use systemitem tag for names of Cygwin packages.
+	* how-programming.texinfo: Add example to FAQ entry.
+	* pathnames.sgml: Add discussion of /proc filesystem.
+	* setup-net.sgml: Correct some typos and grammar.
+
 2003-09-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* pathnames.sgml: Remove description how to mount raw devices and

@@ -29,45 +29,51 @@ TEXI2HTML:=texi2html
 
 include $(srcdir)/../Makefile.common
 
-TOCLEAN:=faq.txt ./*.html readme.txt doctool.o doctool \
-	 cygwin-ug.sgml cygwin-ug-net.sgml
+TOCLEAN:=faq.txt ./*.html readme.txt doctool.o doctool.exe *.junk \
+	 cygwin-ug.sgml cygwin-ug \
+	 cygwin-ug-net.sgml cygwin-ug-net cygwin-ug-net.html \
+	 cygwin-api.sgml cygwin-api cygwin-api-int.sgml cygwin-api-int
 
 .SUFFIXES:
 
-# You can add cygwin-api/cygwin-api.html if you want to.
 all : \
 	cygwin-ug/cygwin-ug.html \
 	cygwin-ug-net/cygwin-ug-net.html \
+	cygwin-ug-net.html \
 	cygwin-api-int/cygwin-api-int.html \
 	cygwin-api/cygwin-api.html \
 	$(DOC) \
 	$(HTMLDOC)
 
 clean:
-	rm -f $(TOCLEAN)
+	rm -Rf $(TOCLEAN)
 
 install:	all
 
+# jw -d $(srcdir)/cygwin.dsl#html cygwin-ug-net.sgml
 cygwin-ug/cygwin-ug.html : cygwin-ug.sgml doctool
-	-db2html $<
+	-db2html -d $(srcdir)/cygwin.dsl#html $<
 
 cygwin-ug.sgml : cygwin-ug.in.sgml ./doctool Makefile
 	-./doctool -m $(SGMLDIRS) -s $(srcdir) -o $@ $<
 
+cygwin-ug-net.html : cygwin-ug-net.sgml doctool
+	-jw -d $(srcdir)/cygwin.dsl#html -u $<
+
 cygwin-ug-net/cygwin-ug-net.html : cygwin-ug-net.sgml doctool
-	-db2html $<
+	-db2html -d $(srcdir)/cygwin.dsl#html $<
 
 cygwin-ug-net.sgml : cygwin-ug-net.in.sgml ./doctool Makefile
 	-./doctool -m $(SGMLDIRS) -s $(srcdir) -o $@ $<
 
 cygwin-api/cygwin-api.html : cygwin-api.sgml
-	-db2html $<
+	-db2html -d $(srcdir)/cygwin.dsl#html $<
 
 cygwin-api.sgml : cygwin-api.in.sgml ./doctool Makefile
 	-./doctool -m $(SGMLDIRS) -s $(srcdir) -o $@ $<
 
 cygwin-api-int/cygwin-api-int.html : cygwin-api-int.sgml
-	-db2html $<
+	-db2html -d $(srcdir)/cygwin.dsl#html $<
 
 cygwin-api-int.sgml : cygwin-api.in.sgml ./doctool Makefile
 	-./doctool -i -m $(SGMLDIRS) -s $(srcdir) -b cygwin-api-int -o $@ $<
