@@ -86,7 +86,7 @@ these shells the relevant value of <envar>CYGWIN</envar> is that at the time
 the shell was launched and not that at the time the program is executed.
 Non-Cygwin shells always pipe and redirect with binary mode. With
 non-Cygwin shells the commands <command> cat filename | program </command>
-and <command> program &lt filename </command> are not equivalent when
+and <command> program &lt; filename </command> are not equivalent when
 <filename>filename</filename> is on a text-mounted partition. </para>
 </listitem>
 </OrderedList>
@@ -98,22 +98,28 @@ from files by using the <command>tr</command> program, which can only write
 to standard output. 
 The script</para>
 <screen>
+<![CDATA[
 #!/bin/sh
 # Remove \r from the file given as argument
 tr -d '\r' < "$1" > "$1".nocr
+]]>
 </screen>
 <para> will not work on a text mounted systems because the \r will be 
 reintroduced on writing. However scripts such as </para>
 <screen>
+<![CDATA[
 #!/bin/sh
 # Remove \r from the file given as argument
 tr -d '\r' | gzip | gunzip > "$1".nocr
+]]>
 </screen>
 <para>and the .bat file</para>
 <screen>
+<![CDATA[
 REM Remove \r from the file given as argument
 @echo off
 tr -d \r < %1 > %1.nocr
+]]>
 </screen>
 <para> work fine. In the first case (assuming the pipes are binary)
 we rely on <command>gunzip</command> to set its output to binary mode,

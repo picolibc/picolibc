@@ -605,11 +605,11 @@ anymore. Porting a <command>setuid</command> application is illustrated by
 a short example:</para>
 
 <screen>
-
+<![CDATA[
 /* First include all needed cygwin stuff. */
 #ifdef __CYGWIN__
-#include &lt;windows.h&gt;
-#include &lt;sys/cygwin.h&gt;
+#include <windows.h>
+#include <sys/cygwin.h>
 /* Use the following define to determine the Windows version */
 #define is_winnt        (GetVersion() < 0x80000000)
 #endif
@@ -641,16 +641,17 @@ a short example:</para>
     /* Use standard method for W9X as well. */
     hashed_password = crypt (cleartext_password, salt);
     if (!user_pwd_entry ||
-        strcmp (hashed_password, user_pwd_entry-&gt;pw_password))
+        strcmp (hashed_password, user_pwd_entry->pw_password))
       error_exit;
 
 [...]
 
   /* Everything else remains the same! */
 
-  setegid (user_pwd_entry-&gt;pw_gid);
-  seteuid (user_pwd_entry-&gt;pw_uid);
+  setegid (user_pwd_entry->pw_gid);
+  seteuid (user_pwd_entry->pw_uid);
   execl ("/bin/sh", ...);
+]]>
 
 </screen>
 

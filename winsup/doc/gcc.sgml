@@ -44,11 +44,13 @@ and like any other Cygwin makefile.  The only difference is that you use
 application instead of a command-line application.  Here's an example:</para>
 
 <screen>
+<![CDATA[
 myapp.exe : myapp.o myapp.res
 	gcc -mwindows myapp.o myapp.res -o $@
 
 myapp.res : myapp.rc resource.h
 	windres $< -O coff -o $@
+]]>
 </screen>
 
 <para>Note the use of <filename>windres</filename> to compile the

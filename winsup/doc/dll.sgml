@@ -36,6 +36,7 @@ information needed to tell the OS how your program interacts with
 capabilities. To begin an exploration of the many additional options,
 see the gcc documentation and website, currently at 
 <ulink URL="http://gcc.gnu.org/">http://gcc.gnu.org/</ulink>
+</para>
 
 <para>Let's go through a simple example of how to build a dll.
 For this example, we'll use a single file

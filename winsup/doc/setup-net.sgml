@@ -109,6 +109,7 @@ the cache is no longer necessary, but you may want to retain the
 packages as backups, for installing Cygwin to another system,
 or in case you need to reinstall a package.
 </para>
+</sect2>
 
 <sect2><title>Connection Method</title>
 <para>

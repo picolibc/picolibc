@@ -10,11 +10,13 @@ the Windows resource format for details.  Also, the
 Binutils manual.  Here's an example of using it in a project:</para>
 
 <screen>
+<![CDATA[
 myapp.exe : myapp.o myapp.res
 	gcc -mwindows myapp.o myapp.res -o $@
 
 myapp.res : myapp.rc resource.h
 	windres $< -O coff -o $@
+]]>
 </screen>
 
 

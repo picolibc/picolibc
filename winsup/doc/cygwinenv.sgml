@@ -65,6 +65,7 @@ originally encoded in the firmware of IBM PCs by original
 equipment manufacturers (OEMs).  If you find that some characters 
 (especially non-US or 'graphical' ones) do not display correctly in 
 Cygwin, you can use this option to select an appropriate codepage.
+</para>
 </listitem>
 
 <listitem>
@@ -92,6 +93,7 @@ to copy memory some number of bytes at a time, in the above example
 32768 bytes (32Kb) at a time. The default is to copy as many bytes as 
 possible, which is preferable in most cases but may slow some older systems
 down.
+</para>
 </listitem>
 <listitem>
 <para><envar>(no)glob[:ignorecase]</envar> - if set, command line arguments

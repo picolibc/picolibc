@@ -154,7 +154,7 @@ default printer with the command <command>cat filename > PRN</command>
 
 </sect2>
 
-<sect2> <Title>POSIX devices</title>
+<sect2> <title>POSIX devices</title>
 <para>There is no need to create a POSIX <filename>/dev</filename> 
 directory as it is simulated within Cygwin automatically.
 It supports the following devices: <filename>/dev/null</filename>,

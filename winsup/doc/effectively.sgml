@@ -144,6 +144,7 @@ endings, but <systemitem>cygutils</systemitem> provides several dedicated progra
 <command>u2d</command>, and <command>unix2dos</command>. Use the
 <literal>--help</literal> switch for usage information. 
 </para>
+</sect2>
 
 <sect2><title>Creating shortcuts with cygutils</title>
 <para>

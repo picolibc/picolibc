@@ -1,3 +1,14 @@
+2004-01-24  Joshua Daniel Franklin  <joshuadfranklin@yahoo.com>
+	* cygwinenv.sgml: Cleanup minor markup problems.
+	* dll.sgml: Cleanup minor markup problems.
+	* effectively.sgml: Cleanup minor markup problems.
+	* gcc.sgml: Cleanup minor markup problems.
+	* ntsec.sgml: Cleanup minor markup problems.
+	* pathnames.sgml: Cleanup minor markup problems.
+	* setup-net.sgml: Cleanup minor markup problems.
+	* textbinary.sgml: Cleanup minor markup problems.
+	* windres.sgml: Cleanup minor markup problems.
+
 2004-01-20  Joshua Daniel Franklin <joshuadfranklin@yahoo.com>
 
 	* Makefile.in: Remove unused cygwin-ug and cygwin-api-int 
