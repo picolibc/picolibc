@@ -1,3 +1,8 @@
+2001-09-26  Andrew Cagney  <ac131313@redhat.com>
+
+	From 2001-08-22 D.J. Barrow <djbarrow@de.ibm.com>:
+	* config.sub: Added S/390 31 & 64 bit target.
+
 2001-07-26  DJ Delorie  <dj@redhat.com>
 
 	* MAINTAINERS: Clarify libiberty merge rules and procedures.
