@@ -1,3 +1,8 @@
+2002-11-07  Gilles Courcoux  <Gilles.Courcoux@col.bsf.alcatel.fr>
+
+	* fhandler_socket.cc (fhandler_socket::ioctl): Return correct flags
+	for loopback interface when name is given on input instead of address.
+
 2002-11-07  Jason Tishler  <jason@tishler.net>
 
 	* cygwin.din: Export fseeko() and ftello().
