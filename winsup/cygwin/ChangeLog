@@ -1,3 +1,7 @@
+Wed Feb 28 15:10:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* uinfo.cc: Eliminate `#include <wchar.h>'.
+
 2001-02-28  Egor Duda  <deo@logos-m.ru>
 
 	* fhandler_floppy.cc (fhandler_dev_floppy::lseek): Determine

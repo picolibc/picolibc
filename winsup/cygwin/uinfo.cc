@@ -15,7 +15,6 @@ details. */
 #include <utmp.h>
 #include <limits.h>
 #include <stdlib.h>
-#include <wchar.h>
 #include <lm.h>
 #include <sys/cygwin.h>
 #include "sync.h"
