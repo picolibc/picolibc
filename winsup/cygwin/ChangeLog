@@ -1,3 +1,11 @@
+2001-12-30  Christopher Faylor  <cgf@redhat.com>
+	    Ralf Habacker  <Ralf.Habacker@freenet.de>
+
+	* speclib: New file.
+	* Makefile.in: Create library versions of automode.o, textmode.o, and
+	binmode.o for easier use on command line.  Create libpthread.a, libm.a,
+	and libc.a with subsets of exports found in libcygwin.a.
+
 2001-12-30  Ralf Habacker  <Ralf.Habacker@freenet.de>
 
 	* cygmagic: Eliminate unneeded use of 'tr' and 'bc'.

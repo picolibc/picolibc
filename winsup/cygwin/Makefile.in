@@ -141,6 +141,11 @@ NEW_FUNCTIONS:=regcomp posix_regcomp \
 	       regexec posix_regexec \
 	       regfree posix_regfree
 
+PWD:=${shell pwd}
+SUBLIBS:=libpthread.a $(PWD)/libm.a libc.a
+EXTRALIBS:=libautomode.a libbinmode.a libtextmode.a
+INSTOBJS:=automode.o binmode.o textmode.o
+TARGET_LIBS:=$(LIB_NAME) $(SUBLIBS) $(GMON_START) $(LIBGMON_A) $(SUBLIBS) $(INSTOBJS) $(EXTRALIBS)
 .PHONY: all force dll_ofiles install all_target install_target all_host install_host \
 	install install_target install-libs install-headers
 
@@ -152,7 +157,7 @@ install_host=@install_host@
 
 all: all_target $(all_host)
 
-all_target: $(LIB_NAME) automode.o binmode.o textmode.o $(LIBGMON_A)
+all_target: $(TARGET_LIBS)
 
 all_host: new-$(LIB_NAME) cygrun.exe
 
@@ -160,9 +165,9 @@ force:
 
 install: install-libs install-headers install-man $(install_host) $(install_target)
 
-install-libs: $(LIB_NAME)
+install-libs: $(TARGET_LIBS)
 	$(INSTALL_DATA) new-$(DLL_NAME) $(bindir)/$(DLL_NAME); \
-	for i in $(LIB_NAME) $(GMON_START) $(LIBGMON_A) automode.o binmode.o textmode.o ; do \
+	for i in $^; do \
 	    $(INSTALL_DATA) $$i $(tooldir)/lib/$$i ; \
 	done
 
@@ -239,6 +244,18 @@ child_info_magic.h: cygmagic child_info.h
 dcrt0.o sigproc.o: child_info_magic.h
 
 shared.o: shared_info_magic.h
+
+libpthread.a: speclib cygwin.def pthread.o thread.o
+	/bin/sh ${word 1, $^} $@ "${NM}" "${DLLTOOL}" ${wordlist 2, 99, $^}
+
+$(PWD)/libm.a: speclib cygwin.def $(LIBM)
+	/bin/sh ${word 1, $^} $@ "${NM}" "${DLLTOOL}" ${wordlist 2, 99, $^}
+
+$(PWD)/libc.a: speclib cygwin.def $(PWD)/libm.a libpthread.a
+	/bin/sh ${word 1, $^} -v $@ "${NM}" "${DLLTOOL}" ${wordlist 2, 99, $^}
+
+lib%.a: %.o
+	$(AR) cru $@ $?
 
 winver_stamp: mkvers.sh include/cygwin/version.h winver.rc $(DLL_OFILES)
 	@echo "Making version.o and winver.o";\
