@@ -977,9 +977,7 @@ spawnve (int mode, const char *path, const char *const *argv,
       if (vf)
 	{
 	  debug_printf ("longjmping due to vfork");
-	  if (ret < 0)
-	    vf->restore_exit (ret);
-	  else
+	  if (ret > 0)
 	    vf->restore_pid (ret);
 	}
       break;

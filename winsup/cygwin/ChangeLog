@@ -1,3 +1,8 @@
+2003-09-25  Christopher Faylor  <cgf@redhat.com>
+
+	* spawn.cc (spawnve): Remove vfork short circuit and let caller deal
+	with error return.
+
 2003-09-25  Pierre Humblet <pierre.humblet@ieee.org>
 	    Christopher Faylor  <cgf@redhat.com>
 
