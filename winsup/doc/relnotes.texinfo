@@ -27,3 +27,14 @@ and related messages.
 
 This is a bug in the Cygwin pty code.  It should be fixed in the next
 release.
+
+@section dllwrap is broken
+
+Any invocation of dllwrap results in the error
+
+@code{/usr/bin/ld: warning: cannot find entry symbol __cygwin_dll_entry@@12}
+
+This should be fixed in the next release.  For details and a workaround,
+see
+
+@file{http://sources.redhat.com/ml/cygwin/2000-08/msg00256.html}
