@@ -1,3 +1,11 @@
+2003-04-19  Christopher Faylor  <cgf@redhat.com>
+
+	* wincap.h (wincaps:pty_needs_alloc_console): New element.
+	(wincapc:pty_needs_alloc_console): New function.
+	* wincap.cc: Add pty_needs_alloc_console throughout.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Open an "invisible"
+	console on first pty allocation.
+
 2003-04-18  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_tty.cc (fhandler_tty_slave::open): Allocate a console

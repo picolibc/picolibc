@@ -9,6 +9,8 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include <wingdi.h>
+#include <winuser.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -554,9 +556,19 @@ fhandler_tty_slave::open (path_conv *, int flags, mode_t)
   set_open_status ();
   if (!output_done_event)
     {
-      if (fhandler_console::open_fhs++ == 0)
+      if (fhandler_console::open_fhs++ == 0
+	  && wincap.pty_needs_alloc_console ())
 	{
-	  BOOL b = AllocConsole ();
+	  BOOL b;
+	  HWINSTA h = CreateWindowStation (NULL, 0, GENERIC_READ | GENERIC_WRITE, &sec_none_nih);
+	  termios_printf ("CreateWindowStation %p, %E", h);
+	  if (h)
+	    {
+	      b = SetProcessWindowStation (h);
+	      termios_printf ("SetProcessWindowStation %d, %E", b);
+	    }
+	  b = AllocConsole ();	// will cause flashing if workstation
+	  			// stuff fails
 	  termios_printf ("%d = AllocConsole ()", b);
 	}
       termios_printf ("incremented open_fhs %d", fhandler_console::open_fhs);
