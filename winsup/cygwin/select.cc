@@ -806,6 +806,7 @@ fhandler_dev_null::select_read (select_record *s)
     }
   s->h = get_handle ();
   s->read_selected = TRUE;
+  s->read_ready = TRUE;
   return s;
 }
 
@@ -821,6 +822,7 @@ fhandler_dev_null::select_write (select_record *s)
     }
   s->h = get_handle ();
   s->write_selected = TRUE;
+  s->write_ready = TRUE;
   return s;
 }
 

@@ -1,3 +1,8 @@
+Thu Aug 30 10:19:00 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* select.cc (select_read): Add setting read_ready flag.
+	(select_write): Add setting write_ready flag.
+
 Wed Aug 29 00:40:42 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* path.cc (path_conv::check): Avoid splitting off leading '/' in path
