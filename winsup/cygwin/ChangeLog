@@ -1,5 +1,10 @@
 2002-10-22  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat_helper): Nevermind.
+	Revert everything to previous state wrt ntsec and exec bits.
+
+2002-10-22  Christopher Faylor  <cgf@redhat.com>
+
 	* shared.cc (shared_info::initialize): Use correct value for version
 	comparison.
 	* include/cygwin/version.h (CYGWIN_VERSION_MAGIC): Use all of a DWORD
