@@ -1,3 +1,7 @@
+2003-09-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::fstat): Don't use PC_POSIX.
+
 2003-09-09  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* shared_info.h: Include security.h.

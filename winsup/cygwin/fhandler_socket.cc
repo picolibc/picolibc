@@ -366,8 +366,7 @@ fhandler_socket::fstat (struct __stat64 *buf, path_conv *pc)
   int res;
   if (get_addr_family () == AF_LOCAL && get_sun_path () && !get_socket_type ())
     {
-      path_conv spc (get_sun_path (),
-		     PC_SYM_NOFOLLOW | PC_NULLEMPTY | PC_FULL | PC_POSIX,
+      path_conv spc (get_sun_path (), PC_SYM_NOFOLLOW | PC_NULLEMPTY | PC_FULL,
 		     NULL);
       fhandler_base *fh = cygheap->fdtab.build_fhandler (-1, FH_DISK,
 							 get_sun_path (),
