@@ -78,6 +78,5 @@ _DEFUN (wcscmp, (s1, s2),
   while (*s1 == *s2++)
     if (*s1++ == 0)
       return (0);
-  /* XXX assumes wchar_t = short */
-  return (*(_CONST unsigned short *) s1 - *(_CONST unsigned short *) --s2);
+  return (*s1 - *--s2);
 }

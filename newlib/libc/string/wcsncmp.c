@@ -80,9 +80,7 @@ _DEFUN (wcsncmp, (s1, s2, n),
     {
       if (*s1 != *s2++)
 	{
-	  /* XXX assumes wchar_t = short */
-	  return (*(_CONST unsigned short *) s1 -
-		  *(_CONST unsigned short *) --s2);
+	  return (*s1 - *--s2);
 	}
       if (*s1++ == 0)
 	break;

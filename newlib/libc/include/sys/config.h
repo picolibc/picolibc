@@ -172,7 +172,7 @@
 
 #ifndef __WCHAR_MAX__ 
 #if __INT_MAX__ == 32767 || defined(__CYGWIN__) || \
-    defined (_WIN32) || defined(GO32)
+    defined (_WIN32)
 #define __WCHAR_MAX__ 0xffffu
 #endif
 #endif
