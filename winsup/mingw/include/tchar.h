@@ -187,7 +187,7 @@ typedef wchar_t _TCHAR;
 #define _tcreat     _wcreat
 #define _tfindfirst _wfindfirst
 #define _tfindnext  _wfindnext
-#define _tfopen     _wfdopen
+#define _tfdopen    _wfdopen
 #define _tfopen     _wfopen
 #define _tgetenv    _wgetenv
 #define _tputenv    _wputenv

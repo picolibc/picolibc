@@ -1,5 +1,9 @@
 2002-07-29  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/tchar.h (_tfdopen): Correct typo.
+
+2002-07-29  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* moldname.def.in (chgsign,scalb,finite,fpclass,logb,
 	nextafter): Add non-underscored stubs.
 	* moldname-msvcrt.def: Regenerate.
@@ -146,6 +150,8 @@
 	* mingwex/math/tanl.S: New file.
 	* mingwex/Makefile.in: Adjust VPATH for source files in
 	mingwex/math.
+	Adjust MATH_OBJS.
+	Add MATH_DISTFILES and use it to build source distro.
 	* include/ math.h: Add protypes for new functions and
 	reorganise to reflect ANSI,C99 status.
 
