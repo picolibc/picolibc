@@ -1,5 +1,10 @@
 2002-11-23  Christopher Faylor  <cgf@redhat.com>
 
+	* wait.cc (wait4): Force pending signal delivery before waiting for
+	process completion.
+
+2002-11-23  Christopher Faylor  <cgf@redhat.com>
+
 	* include/cygwin/version.h: Bump DLL minor number.
 
 2002-11-22  Christopher Faylor  <cgf@redhat.com>
