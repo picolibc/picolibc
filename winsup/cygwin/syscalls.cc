@@ -1074,7 +1074,7 @@ access (const char *fn, int flags)
 {
   sigframe thisframe (mainthread);
   // flags were incorrectly specified
-  if (flags & ~ (F_OK|R_OK|W_OK|X_OK))
+  if (flags & ~(F_OK|R_OK|W_OK|X_OK))
     {
       set_errno (EINVAL);
       return -1;
@@ -1084,7 +1084,7 @@ access (const char *fn, int flags)
     return acl_access (fn, flags);
 
   struct stat st;
-  int r = stat (fn, &st);
+  int r = stat_worker (fn, &st, 0);
   if (r)
     return -1;
   r = -1;

@@ -209,6 +209,12 @@ normalize_posix_path (const char *src, char *dst)
 	  *dst++ = '/';
 	  src = src_start + 1;
 	}
+      else if (src[0] == '.' && isslash (src[1]))
+	{
+	  *dst++ = '.';
+	  *dst++ = '/';
+	  src += 2;
+	}
     }
   else
     *dst = '\0';
@@ -934,7 +940,13 @@ normalize_win32_path (const char *src, char *dst)
   if (beg_src_slash && isdirsep (src[1]))
     {
       *dst++ = '\\';
-      ++src;
+      src++;
+      if (src[1] == '.' && isdirsep (src[2]))
+	{
+	  *dst++ = '\\';
+	  *dst++ = '.';
+	  src += 2;
+	}
     }
   else if (strchr (src, ':') == NULL && *src != '/')
     {
