@@ -1,3 +1,8 @@
+2004-01-23  Jeff Johnston  <jjohnstn@redhat.com>
+	
+	* COPYING.NEWLIB: Update to include copyrights for new
+	iconv code.
+
 2004-01-15  Andrew Cagney  <cagney@redhat.com>
 
 	* src-release: Update copyright year.
