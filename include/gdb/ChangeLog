@@ -1,3 +1,8 @@
+2004-09-08  Michael Snyder  <msnyder@redhat.com>
+
+	Commited by Corinna Vinschen <vinschen@redhat.com>
+	* sim-sh.h: Add new sh2a banked registers.
+
 2004-08-04  Andrew Cagney  <cagney@gnu.org>
 
 	* sim-ppc.h: Add extern "C" wrapper.
