@@ -127,15 +127,15 @@ _sigreturn:
 	addl	\$4,%esp			# Remove argument
 	call	_set_process_mask\@4
 
-	movl	%fs:4,%eax
+	movl	%fs:4,%ebx
 
-	cmpl	\$0,$tls::sig(%eax)	# Did a signal come in?
+	cmpl	\$0,$tls::sig(%ebx)	# Did a signal come in?
 	jnz	3f			# Yes, if non-zero
 
 1:	popl	%edx			# saved errno
 	testl	%edx,%edx		# Is it < 0
 	jl	2f			# yup.  ignore it
-	movl	$tls::errno_addr(%eax),%eax
+	movl	$tls::errno_addr(%ebx),%eax
 	movl	%edx,(%eax)
 2:	popl	%eax
 	popl	%ebx
