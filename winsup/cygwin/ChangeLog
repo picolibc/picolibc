@@ -1,3 +1,8 @@
+Mon Feb 28 00:08:09 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* configure.in: Remove --enable-strace-hhmmss option.
+	* configure: Regenerate.
+
 Sun Feb 27 23:11:57 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dcrt0.cc (set_os_type): Record OS name string.

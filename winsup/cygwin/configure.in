@@ -94,20 +94,6 @@ if test $use_builtin_memset = "yes"; then
 fi
 AC_LANG_RESTORE
 
-AC_ARG_ENABLE(strace-hhmmss,
-[ --enable-strace-hhmmss		strace log output has date/time stamp],
-[case "${enableval}" in
-yes)	
-  AC_DEFINE(STRACE_HHMMSS) 
-  ;;
-no)	
-  ;;
-*) 	
-  AC_MSG_ERROR(bad value ${enableval} given for enable-strace-hhmmss option) 
-  ;;
-esac
-])
-
 dnl set default mt safeness and then process the options.
 mt_safe_val=1
 MT_SAFE=yes
