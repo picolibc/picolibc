@@ -1,3 +1,8 @@
+2002-01-21  Robert Collins  <rbtcollins@hotmail.com>
+
+	* include/winnt.h: Add missing MEM_ defines, and convert existing to 
+	hex for readability.
+
 2002-01-14  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/winnt.h (FILE_ATTRIBUTE_ENCRYPTED): Correct constant.
