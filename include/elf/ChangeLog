@@ -1,3 +1,7 @@
+2004-06-19  Alan Modra  <amodra@bigpond.net.au>
+
+	* common.h (ELF64_R_INFO): Warning fix.
+
 2004-06-14  Chris Demetriou  <cgd@broadcom.com>
 
 	* mips.h (R_MIPS_PC32): Add back (undoing removal on 2004-04-24),
