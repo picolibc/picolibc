@@ -117,6 +117,13 @@ wint_t	fgetwc (FILE*);
 wint_t	fputwc (wchar_t, FILE*);
 wint_t	ungetwc (wchar_t, FILE*);
 
+#ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
+int snwprintf(wchar_t* s, size_t n, const wchar_t*  format, ...);
+extern __inline__ int vsnwprintf (wchar_t* s, size_t n, const wchar_t* format,
+			   va_list arg)
+  { return _vsnwprintf ( s, n, format, arg); }
+#endif
+
 #ifdef __MSVCRT__ 
 wchar_t* fgetws (wchar_t*, int, FILE*);
 int	fputws (const wchar_t*, FILE*);
@@ -236,6 +243,17 @@ wchar_t* _wsetlocale (int, const wchar_t*);
 #define _WLOCALE_DEFINED
 #endif
 
+#ifndef _WSTDLIB_DEFINED /* also declared in stdlib.h */
+long	wcstol	(const wchar_t*, wchar_t**, int);
+unsigned long	wcstoul (const wchar_t*, wchar_t**, int);
+double	wcstod	(const wchar_t*, wchar_t**);
+#if !defined __NO_ISOCEXT /* extern stub in static libmingwex.a */
+extern __inline__ float wcstof( const wchar_t *nptr, wchar_t **endptr)
+{  return (wcstod(nptr, endptr)); }
+#endif /* __NO_ISOCEXT */
+#define  _WSTDLIB_DEFINED
+#endif
+
 
 #ifndef	_NO_OLDNAMES
 
@@ -272,6 +290,23 @@ size_t  mbsrtowcs(wchar_t *, const char **, size_t, mbstate_t *);
 size_t  wcrtomb(char *, wchar_t, mbstate_t *);
 size_t  wcsrtombs(char *, const wchar_t **, size_t, mbstate_t *);
 int  	wctob(wint_t);
+
+#ifndef __NO_ISOCEXT /* these need static lib libmingwex.a */
+extern __inline__ int fwide(FILE* stream, int mode) {return -1;} /* limited to byte orientation */ 
+extern __inline__ int mbsinit(const mbstate_t* ps) {return 1;}
+wchar_t* wmemset(wchar_t* s, wchar_t c, size_t n);
+wchar_t* wmemchr(const wchar_t* s, wchar_t c, size_t n);
+int wmemcmp(const wchar_t* s1, const wchar_t * s2, size_t n);
+wchar_t* wmemcpy(wchar_t* __restrict__ s1, const wchar_t* __restrict__ s2,
+		 size_t n);
+wchar_t* wmemmove(wchar_t* s1, const wchar_t* s2, size_t n);
+long long wcstoll(const wchar_t* __restrict__ nptr,
+		  wchar_t** __restrict__ endptr, int base);
+unsigned long long wcstoull(const wchar_t* __restrict__ nptr,
+			    wchar_t ** __restrict__ endptr, int base);
+
+#endif /* __NO_ISOCEXT */
+
 
 #ifdef __cplusplus
 }	/* end of extern "C" */

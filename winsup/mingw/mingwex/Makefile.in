@@ -1,0 +1,236 @@
+#
+# mingw/mingwex/Makefile.in: This file is part of Mingw runtime.
+#
+# This makefile requires GNU make.
+
+VPATH = @srcdir@
+srcdir = @srcdir@
+objdir = .
+
+target_alias = @target_alias@
+prefix = @prefix@
+
+program_transform_name = @program_transform_name@
+exec_prefix = @exec_prefix@
+bindir = @bindir@
+libdir = @libdir@
+tooldir = $(exec_prefix)/$(target_alias)
+datadir = @datadir@
+infodir = @infodir@
+includedir = @includedir@
+
+SHELL = /bin/sh
+
+INSTALL = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+mkinstalldirs = $(SHELL) $(srcdir)/../mkinstalldirs
+DISTFILES = Makefile.in configure configure.in \
+	mingw-fseek.c \
+	_Exit.c \
+	atoll.c \
+	copysignl.S \
+	dirent.c \
+	fdim.c \
+	fdimf.c \
+	fdiml.c \
+	feclearexcept.c \
+	fegetenv.c \
+	fegetexceptflag.c \
+	fegetround.c \
+	feholdexcept.c \
+	feraiseexcept.c \
+	fesetenv.c \
+	fesetround.c \
+	fetestexcept.c \
+	fesetexceptflag.c \
+	feupdateenv.c \
+	fma.S \
+	fmaf.S \
+	fmal.c \
+	fmax.c \
+	fmaxf.c \
+	fmaxl.c \
+	fmin.c \
+	fminf.c \
+	fminl.c \
+	fp_consts.c \
+	fpclassify.c \
+	fpclassifyf.c \
+	fpclassifyl.c \
+	fucom.c \
+	fwide.c \
+	imaxabs.c \
+	imaxdiv.c \
+	isnan.c \
+	isnanf.c \
+	isnanl.c \
+	lltoa.c \
+	lltow.c \
+	log2.c \
+	log2f.c \
+	log2l.c \
+	math_stubs.c \
+	mbsinit.c \
+	rint.c \
+	rintf.c \
+	rintl.c \
+	round.c \
+	roundf.c \
+	roundl.c \
+	signbit.c \
+	signbitf.c \
+	signbitl.c \
+	sitest.c \
+	snprintf.c \
+	snwprintf.c \
+	strtof.c \
+	strtoimax.c \
+	strtoumax.c \
+	testwmem.c \
+	trunc.c \
+	truncf.c \
+	truncl.c \
+	ulltoa.c \
+	ulltow.c \
+	vsnprintf.c \
+	vsnwprintf.c \
+	wcstof.c \
+	wcstoimax.c \
+	wcstoumax.c \
+	wdirent.c \
+	wmemchr.c \
+	wmemcmp.c \
+	wmemcpy.c \
+	wmemmove.c \
+	wmemset.c \
+	wtoll.c
+
+CC = @CC@
+# FIXME: Which is it, CC or CC_FOR_TARGET?
+CC_FOR_TARGET = $(CC)
+AS_FOR_TARGET = $(AS)
+CFLAGS = @CFLAGS@ -Wall
+CXXFLAGS = @CXXFLAGS@ 
+OPTFLAGS= -fomit-frame-pointer
+
+# compiling with Cygwin?
+MNO_CYGWIN = @MNO_CYGWIN@
+
+
+INCLUDES = -I$(srcdir) -I$(srcdir)/../include \
+  -I$(srcdir)/../../w32api/include \
+  -nostdinc -nostdinc++ \
+  -iwithprefixbefore include
+ALL_CFLAGS = $(CFLAGS) $(OPTFLAGS) $(INCLUDES) $(MNO_CYGWIN)
+ALL_CXXFLAGS = $(CXXFLAGS) $(OPTFLAGS) $(INCLUDES) $(MNO_CYGWIN)
+
+AS = @AS@
+AR = @AR@
+LD = @LD@
+AR_FLAGS = rcv
+RANLIB = @RANLIB@
+DLLTOOL = @DLLTOOL@
+DLLTOOLFLAGS = 
+DLLTOOL_FOR_TARGET = $(DLLTOOL)
+DLLTOOL_FLAGS = --as $(AS_FOR_TARGET)
+
+LIBMINGWEX_A = libmingwex.a
+
+Q8_OBJS = \
+	fwide.o imaxabs.o imaxdiv.o mbsinit.o \
+	strtoimax.o strtoumax.o wcstoimax.o wcstoumax.o \
+	wmemchr.o wmemcmp.o wmemcpy.o wmemmove.o wmemset.o
+STDLIB_STUB_OBJS = \
+	lltoa.o ulltoa.o \
+	lltow.o ulltow.o \
+	atoll.o wtoll.o \
+	strtof.o wcstof.o \
+	_Exit.o
+STDIO_STUB_OBJS = \
+	snprintf.o  vsnprintf.o snwprintf.o vsnwprintf.o
+MATH_OBJS = \
+	fpclassify.o fpclassifyf.o fpclassifyl.o \
+	fucom.o \
+	round.o roundf.o roundl.o \
+	rint.o rintf.o rintl.o \
+	signbit.o signbitf.o signbitl.o \
+	trunc.o truncf.o truncl.o \
+	isnan.o  isnanf.o isnanl.o \
+	fp_consts.o \
+	fdim.o fdimf.o fdiml.o \
+	fmax.o  fmaxf.o fmaxl.o \
+	fmin.o fminf.o fminl.o \
+	fma.o  fmaf.o fmal.o \
+	log2.o log2f.o log2l.o  \
+	copysignl.o
+MATH_STUB_OBJS = \
+	math_stubs.o
+FENV_OBJS = fesetround.o  fegetround.o \
+	fegetenv.o fesetenv.o feupdateenv.o \
+	feclearexcept.o feholdexcept.o fegetexceptflag.o \
+	feraiseexcept.o fetestexcept.o fesetexceptflag.o
+POSIX_OBJS = \
+	dirent.o wdirent.o
+REPLACE_OBJS = \
+	mingw-fseek.o
+
+LIB_OBJS = $(Q8_OBJS) $(STDLIB_STUB_OBJS) $(STDIO_STUB_OBJS) \
+	$(MATH_OBJS) $(MATH_STUB_OBJS) $(FENV_OBJS) $(POSIX_OBJS) \
+	$(REPLACE_OBJS)
+
+LIBS = $(LIBMINGWEX_A)
+DLLS = 
+
+all: $(LIBMINGWEX_A)
+
+$(LIBMINGWEX_A): $(LIB_OBJS)
+	$(AR) $(ARFLAGS) $@ $(LIB_OBJS)
+	$(RANLIB) $@
+
+
+Makefile: Makefile.in config.status configure
+	$(SHELL) config.status
+
+config.status: configure
+	$(SHELL) config.status --recheck
+
+info:
+
+info-html:
+
+install-info: info
+
+install: all
+	$(mkinstalldirs) $(inst_libdir)
+	for i in $(LIBS); do \
+		$(INSTALL_DATA) $$i $(inst_libdir)/$$i ; \
+	done
+
+clean:
+	-rm -f $(LIB_OBJS)  $(LIBMINGWEX_A)
+
+distclean:
+	-rm -f *.o *.a *~ core a.out
+	-rm -f config.cache config.status config.log 
+	-rm -f Makefile
+.c.o:
+	$(CC) -c  $(ALL_CFLAGS) $< -o $@
+.S.o:
+	$(CC) -c  $< -o $@
+.s.o:
+	$(CC) -c  $< -o $@
+
+
+#
+# Dependancies
+#
+wdirent.o: $(srcdir)/dirent.c $(srcdir)/wdirent.c
+
+
+dist:
+	mkdir $(distdir)/mingwex
+	chmod 755 $(distdir)/mingwex
+	@for i in $(DISTFILES); do\
+		cp -p $(srcdir)/$$i $(distdir)/mingwex/$$i ; \
+	done

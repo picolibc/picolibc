@@ -1,3 +1,388 @@
+2002-06-13  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/_mingw.h: Increment version to 2.0.
+	* Makefile.in: Ditto.
+
+	Merge in mingwex branch.
+
+	2002-06-11  Danny Smith  <dannysmith@users.sourceforge.net>
+	* include/math.h (fdim, fdimf, fdiml): Add prototypes.
+	* mingwex/fdim.c: New file.
+	* mingwex/fdimf.c: New file.
+	* mingwex/fdiml.c: New file.
+	* mingwex/Makefile.in (DISTFILES): Add fdim.c, fdimf.c,
+	fdiml.c.
+	(MATHOBJS):Add fdim.o, fdimf.o. fdiml.o.
+
+	2002-05-23  Danny Smith  <dannysmith@users.sourceforge.net>
+	* mingwex/Makefile.in (DISTFILES): Add truncf.c, truncl.c.
+
+	2002-05-22  Danny Smith  <dannysmith@users.sourceforge.net>
+	* mingwex/isnanl.c: New file.
+
+	2002-05-21  Danny Smith  <dannysmith@users.sourceforge.net>
+	* include/stdint.h: Include stddef.h to get
+	wchar_t and wint_t.
+	(WINT_MAX): Define to ((wint_t)-1).
+
+	2002-05-21  Danny Smith  <dannysmith@users.sourceforge.net>
+	* include/wctype.h: Replace 'inline' with '__inline__'.
+	* include/inttypes.h: Likewise.
+
+	2002-05-16  Danny Smith  <dannysmith@users.sourceforge.net>
+	* include/_mingw.h (__MINGW_IMPORT): Put extern at start 
+	to avoid warnings.  Thanks to: Oscar Fuentes  <ofv@wanadoo.es>.
+
+	2002-05-16  Danny Smith  <dannysmith@users.sourceforge.net>
+	* mingwex/snprintf.c: Split out vsnprintf to....
+	* mingwex/vsnprintf.c: New file.
+	* mingwex/snwprintf.c: Split out vsnwprintf to...
+	* mingwex/vsnwprintf.c: New file.
+	* mingwex/Makefile.in: Adjust DISTFILES and STDIO_STUB_OBJS.
+
+	2002-05-15  Pascal Obry  <obry@gnat.com>
+	* include/dirent.h (DIR): Change dd_stat type to int.
+	(_WDIR): Likewise.
+
+	2002-05-07  Danny Smith  <dannysmith@users.sourceforge.net>
+	* include/stdio.h (vsnprintf): Change inline to __inline__;
+	(vsnwprintf): Likewise.
+ 	* include/wchar.h (vsnwprintf): Likewise.
+	(wcstof): Likewise.
+	(fwide): Likewise.
+	(mbsinit): Likewise.
+
+	2002-04-29  Danny Smith  <dannysmith@users.sourceforge.net>
+	Change FP default precison from 53 to 64-bit mantissa.
+	* Makefile.in (CRT0S): Add CRT_fp8.o.
+	(MINGW_OBJS): Replace CRT_fp8.o with CRT_fp10.o.
+	* include/float.h: Replace standard float.h defines with
+	#include_next<float.h> to use GCC's defines. Adjust comments
+	to reflect change.	
+
+	2002-04-26  Danny Smith  <dannysmith@users.sourceforge.net>
+	* include/dos.h: Change  prefix "__imp_"  to "_imp__" for
+	__GNUC__ without __DECLSPEC_SUPPORTED.
+	* include/fnctl.h: Likewise.
+	* include/math.h: Likewise.
+	* include/stdio.h: Likewise.
+	* include/stdlib.h: Likewise.
+	* include/time.h: Likewise.
+	* include/wctype.h: Likewise.
+	* include/ctype.h: Likewise.
+
+	2002-04-26  Danny Smith  <dannysmith@users.sourceforge.net>
+	Add atexit support for dlls.
+	* crt1.c (atexit): Force thunk to _imp__atexit.
+	(_onexit): Force thunk to _imp___onexit.
+	* dllcrt1.c (DllMainCRTStartup): Initialise private atexit
+	table on DLL_PROCESS_ATTACH, clean it up on DLL_PROCESS_DETACH.
+	(__dll_exit): New function to run atexit-registered functions
+	 and flush output buffers on DLL_PROCESS_DETACH or failed
+	DLL_PROCESS_ATTACH. 
+	(atexit): Force use of private atexit table via _dllonexit,
+	(_onexit): New function. Force use of private atexit table via
+	_dllonexit,
+	* mscvrt.def (atexit, _onexit): Add DATA keyword so that only 
+	_imp_<_symbol> is visible in import lib.
+	* mscvrt20.def: Likewise.
+	* mscvrt40.def: Likewise.
+	* crtdll.def: Likewise.
+
+	2002-04-26  Danny Smith  <dannysmith@users.sourceforge.net>
+	* include/fenv.h: Change header guard macro to _FENV_H_.
+	(fenv_t, fexcept_t): Move into block protected by
+	#ifndef RC_INVOKED.
+	Cleanup some whitespace.
+	* include/inttypes.h: Change header guard macro to
+	_INTTYPES_H_.
+
+	2002-04-26  Danny Smith  <dannysmith@users.sourceforge.net>
+	* include/math.h (copysignl): Declare.
+	* mingwex/Makefile.in (DISTFILES): Add copysignl.S.
+	(MATHOBJS):Add copysignl.o.
+
+	2002-04-24  Danny Smith  <dannysmith@users.sourceforge.net>
+	* include/math.h (__signbitl, __isnanl): Declare.
+
+	2002-04-24  Danny Smith  <dannysmith@users.sourceforge.net>
+	* include/math.h (nanl, __fpcassifyl, fminl, fmaxl, rintl,
+	roundl, truncl, fmal, log2l): Declare.
+	Protect C99 declarations with _STDC_VERSION__ >= 199901L)
+	|| !defined  __STRICT_ANSI__.
+ 	* mingwex/fmax.c (fmax): Call __isnan, not _isnan.
+	* mingwex/fmin.c (fmin): Likewise.
+	* mingwex/fmaxf.c (fmaxf): Call __isnanf, not _isnan.
+	* mingwex/fminf.c (fminf): Likewise.
+	* mingwex/fmaxl.c: New file.
+	* mingwex/fminl.c: New file.
+	* mingwex/fpclassify.c (__fpclassifyf): Split out to ...
+	* mingwex/fpclassifyf.c: New file. 
+	* mingwex/fpclassifyl.c: New file. 
+	* mingwex/rint.c (rintf): Split out to...
+	* mingwex/rintf.c: New file.
+	* mingwex/rintl.c: New file.
+	* mingwex/round.c (roundf): Split out to...
+	* mingwex/roundf.c: New file.
+	* mingwex/roundl.c: New file.
+	* mingwex/trunc.c (truncf): Split out to...
+	* mingwex/truncf.c: New file.
+	* mingwex/truncl.c: New file.
+	* mingwex/signbit.c (signbitf): Split out to...
+	* mingwex/signbitf.c: New file.
+	* mingwex/signbitl.c: New file.
+	* mingwex/fmal.c: New file.
+	* mingwex/copysignl.S: New file.
+	* mingwex/log2l.c: New file.
+	* mingwex/fp_consts.c: Add nanl definition.
+	Comment out unused constants.
+	* mingwex/Makefile.in (DISTFILES): Add fmaxl.c, fminl.c,
+	fpclassifyf.c, fpclassifyl.c, rintf.c, rintl.c, roundf.c,
+	roundl.c, truncf.c truncl.c, signbitf.c signbitl.c,
+	fmal.c, log2l.c
+	(MATHOBJS): Add fmaxl.o, fminl.o, fpclassifyf.o,
+	fpclassifyl.o, rintf.o, rintl.o, roundf.o, roundl.o,
+	truncf.o truncl.o, signbitf.o signbitl.o, fmal.o,
+	log2l.o.
+	* mingwex/snwprintf.c (snwprintf, vsnwprintf): Correct typo.
+	
+	2002-04-23  Danny Smith  <dannysmith@users.sourceforge.net>
+	Make wide char versions of opendir and friends.
+	* include/dirent.h (_wdirent, _WDIR): Define wide versions of
+	struct dirent, DIR.
+	(_wopendir,_wreaddir,_wclosedir,_wrewinddir,_wtelldir,
+	_wseekdir): Add prototypes for wide versions of corresponding
+	standard functions.
+	* include/tchar.h; Add _UNICODE mappings for dirent.h
+	structures and functions.
+	* mingwex/dirent.c: Make _UNICODE neutral.
+	* mingwex/wdirent.c: New file to define _UNICODE before
+	including dirent.c.  
+	* mingwex/Makefile.in (DISTFILES): Add wdirent.c.
+	(POSIX_OBJS): Add wdirent.o.
+	(wdirent.o): Specify dependency on dirent.c as well as
+	wdirent.c.
+	* samples/dirent/wtest.c: New file, wide version of test.c.
+
+	2002-04-17  Danny Smith  <dannysmith@users.sourceforge.net>
+	* Makefile.in (INCLUDES): Add "-iwithprefixbefore include" to
+	ensure gcc include dir is searched despite -nostdinc.
+	* profile/Makefile.in (INCLUDES): Likewise.
+	* mingwex/Makefile.in (INCLUDES): Likewise.
+	* include/stdarg.h: Replace with stub that just guards the
+	real gcc system header with #ifndef RC_INVOKED
+	* include/varargs.h: Likewise.
+	* include/stddef.h: Likewise.
+	* include/stdio.h: Include stdarg.h after defining
+	 __need___va_list.
+	(__VALIST): Define as __gnuc_va_list if __GNUC__, else char*.
+	Replace va_list with __VALIST throughout.
+
+	2002-04-17  Danny Smith  <dannysmith@users.sourceforge.net>
+	* crt1.c: Revert changes of 2002-04-16. Use _fpreset again.
+	* msvcrt.def (_fpreset): Mark as DATA so that only
+	_imp___fpreset is exported.
+	* msvcrt20.def (_fpreset): Likewise.
+	* msvcrt40.def (_fpreset): Likewise.
+	* crtdll.def (_fpreset): Likewise.
+	* CRT_fp10.c (_fpreset): Overide library _fpreset with one
+	that calls fninit.
+	(fpreset): Add alias.
+	(__CRT_PC): Delete definition. _fpreset does it now.
+	*  CRT_fp8.c (_fpreset): Force use of library _imp___fpreset.
+	(fpreset): Add alias.
+	(__CRT_PC): Delete definition.
+	* moldname.def.in: Comment out fpreset.
+	* moldname-msvcrt.def: Regenerate.
+	* moldname-crtdll.def: Regenerate.
+	* include/fenv.h (FE_DFL_ENV): Define as (fenv_t*)0.
+	* mingwex/fesetenv.c (FE_DFL_ENV): Use it to set environment
+	with the _fpreset determined by startup CRT_fp object.
+
+	2002-04-16  Danny Smith  <dannysmith@users.sourceforge.net>
+	* CRT_fp8.c: New file.
+	* CRT_fp10.c: New file.
+	* crt1.c (__CRT_PC) Declare.
+	(__CRT_fesetenv): New static function, using _CRT_PC.
+	(__mingw_CRTStartup):Use __CRT_fesetenv instead of _fpreset.
+	(_gnu_exception_handler): Likewise.
+	* Makefile.in (CRT0S): Add CRT_fp10.o.
+	(MINGW_OBJS): Add  CRT_fp8.o.
+	(SRCDIST_FILES): Add CRT_fp8.c, CRT_fp10.c.
+	Add CRT_fp8.o, CRT_fp10.o dependancies.
+	* include/float.h (_fpreset): Expand comment.
+	* include/fenv.h (FE_PC64_ENV): New define for Intel x87
+	(extended precison) environmemt.
+	(FE_PC53_ENV): New define for MSVCRT default environmemt.
+	(FE_DFL_ENV): Define as FE_PC53_ENV.
+	* mingwex/fesetenv.c: Use FE_PC53_ENV, FE_PC64_ENV to determine
+	precision control for default environment.
+
+	* include/math.h: Fix long comment line.
+	* profile/configure.in (CRT0S): Set to both gcrt1.o and gcrt2.o
+	for mingw.
+	* profile/configure: Regenerate.
+
+	2002-04-12  Danny Smith  <dannysmith@users.sourceforge.net>
+	* mingwex/Makefile.in (DISTFILES): Add suffix to wcstof.c.
+
+	2002-04-10  Danny Smith  <dannysmith@users.sourceforge.net>
+	* mingwex/mingw-fseek.c: New file, based on Mumit Khan
+	mingw-local patch to binutils.
+	Sun Nov  7 04:27:07 1999  Mumit Khan  <khan@xraylith.wisc.edu>
+	(__mingw_fseek): New function to work around Win9x f/lseek bug.
+	(__mingw_fwrite): Likewise.
+	(__mingw_is_win9x): New helper function.
+	* include/stdio.h (__USE_MINGW_FSEEK): New define,guarding...
+	(__mingw_fseek): New prototype and define to replace fseek.
+	(__mingw_fwrite): New prototype and define to replace fwrite.
+	* mingwex/Makefile.in: Add mingw-fseek.o to libmingwex.a.
+	* moldname-crtdll.def: Remove CR from end of line.
+	* moldname-msvcrt.def: Ditto.
+
+	2002-04-09  Danny Smith  <dannysmith@users.sourceforge.net>
+	* profile/configure.in (CRT0S): Configure name of gcrt?.o
+	based on target, building gcrt0.o for cygwin -mno-cygwin.
+	* profile/configure: Regenerate.
+	* profile/Makefile.in (CRT0S): Use name from configure.
+	(gcrt0.o): New rule.   
+	(ALL_CRT0S): New define, used to cleanup all gcrt?.o's.
+
+	2002-04-04  Danny Smith  <dannysmith@users.sourceforge.net>
+	* include/math.h (_controlfp, _control87, _clearfp, _statusfp, _fpreset,
+	_fpecode): Remove prototypes copied from float.h.
+	(nan, nanf): Move into block protected against RC_INVOKED
+	and __cplusplus.
+	* include/stdlib.h (_Exit): Change from static inline to
+	extern inline.
+	* mingwex/_Exit.c : New file.
+	* mingwex/Makefile.in: Add _Exit.o to libmingwex.a.
+
+	2002-04-04  Danny Smith  <dannysmith@users.sourceforge.net>
+	Add libgmon.a and libmingwex.a for cygwin -mno-cygwin.
+	* configure.in (SUBDIRS): Add  profile and mingwex to cygwin target.
+	(configdirs): Likewise.
+	(LIBGMON_A): Define for cygwin target as well.
+	* configure: Regenerate.
+	* profile/configure.in (THREAD_DLL): Remove define.
+	(LIBM_A): Remove define.
+	(LIBGMON_A): Define for cygwin target as well.
+	* profile/configure: Regenerate.
+	* profile/makefile.in (install): Install to inst_libdir and
+	inst_includedir.
+	* mingwex/makefile.in (CFLAGS): Move -fomit-frame-pointer to...
+	(OPTFLAGS): New define.
+	(ALL_CFLAGS): Add $(OPTFLAGS).
+	(ALL_CXXFLAGS): Same.
+	(.c.o:): Remove ALL_CXXFLAGS. 
+
+	2002-03-29  Danny Smith  <dannysmith@users.sourceforge.net>
+	* include/stdint.h: Add missing newline at eof. 
+	* include/stdio.h (snprintf): Add prototype.
+	(vsnprintf): Add prototype and inline definition.
+	(snwprintf): Add prototype.
+	(vsnwprintf): Add prototype and inline definition.
+	* include/wchar.h (snwprintf): Add prototype.
+	(vsnwprintf): Add prototype and inline definition.
+	* mingwex/Makefile.in: Add snprintf.o, snwprintf.o
+	to libmingwex.a.
+	* mingwex/snprintf.c: New file.
+	* mingwex/snwprintf.c: New file.
+
+	2002-03-22  Danny Smith   <dannysmith@users.sourceforge.net>
+	* configure.in: Add mingwex as SUBDIRS and configdirs.
+	* configure: Regenerate.
+	* Makefile.in (MINGW_OBJS): Remove dirent.o.
+	(SRC_DIST_FILES): Remove dirent.c.
+	* dirent.c: Remove.
+	* include/stdlib.h (_Exit): Add static inline
+	function.
+	(struct lldiv_t): Define.
+	(lldiv): Add prototype.
+	(llabs): Add extern inline function.
+	(strtoll,strtoull): Add prototypes.
+	(wcstol, wcstoul, wcstod): Group together.
+	(strtof, wcstof): Add extern inline definitions.
+	(atoll,lltoa,ulltoa, wtoll, lltow ulltow): Add prototypes
+	and extern inline definitions.
+	* include/wchar.h (fwide, wcstoll,wcstoull, wmemchr
+	wmemcmp, wmemcpy, wmemmove, wmemset. mbsinit): Add
+	prototypes.
+	(wcstol, wcstoul,wcstod): Copy prototypes from stdlib.h.
+	(wcstof): Add extern inline definition.
+	* include/math.h (nan, nanf): Add prototypes.
+	(NAN, INFINITE): Define constants.
+	(fpclassify, isnan ,signbit): Add macros and supporting float
+	and double functions.
+	(isfinite, isinf, isnormal): Add macros.
+	(isgreater, isless, isgreaterequal, islessequal,islessgreater):
+	Add macros.
+	(rint, rintf, round, roundf, trunc. truncf, fmax, fmaxf,
+	fmin, fminf, fma, fmaf, log2, log2f): Add prototypes.
+	(copysign, logb, nextafter, scalb): Add prototypes and
+	inline stubs for underscored versions in msvcrt.dll.  	
+	* include/inttypes.h: New file.
+	* include/fenv.h: New file
+
+	Add new mingwex subdir and files.
+	* mingwex: New directory.
+	* mingwex/Makefile.in: New file.
+	* mingwex/configure.in: New file.
+	* mingwex/configure: Generate.
+	* mingwex/dirent.c: Moved here from parent dir.
+	* mingwex/atoll.c: New file.
+	* mingwex/feclearexcept.c: New file.
+	* mingwex/fegetenv.c: New file.
+	* mingwex/fegetexceptflag.c: New file.
+	* mingwex/fegetround.c: New file.
+	* mingwex/feholdexcept.c: New file.
+	* mingwex/feraiseexcept.c: New file.
+	* mingwex/fesetenv.c: New file.
+	* mingwex/fesetexceptflag.c: New file.
+	* mingwex/fesetround.o: New file.
+	* mingwex/fetestexcept.c: New file.
+	* mingwex/feupdateenv.c: New file.
+	* mingwex/fma.S: New file.
+	* mingwex/fmaf.S: New file.
+	* mingwex/fmax.c: New file.
+	* mingwex/fmaxf.c: New file.
+	* mingwex/fmin.c: New file.
+	* mingwex/fminf.c: New file.
+	* mingwex/fp_consts.c: New file.
+	* mingwex/fpclassify.c: New file.
+	* mingwex/fucom.c: New file.
+	* mingwex/fwide.c: New file.
+	* mingwex/imaxabs.c: New file.
+	* mingwex/imaxdiv.c: New file.
+	* mingwex/isnan.c: New file.
+	* mingwex/isnanf.c: New file.
+	* mingwex/lltoa.c: New file.
+	* mingwex/lltow.c: New file.
+	* mingwex/log2.c: New file.
+	* mingwex/log2f.c: New file.
+	* mingwex/math_stubs.c: New file.
+	* mingwex/mbsinit.c: New file.
+	* mingwex/rint.c: New file.
+	* mingwex/round.c: New file.
+	* mingwex/signbit.c: New file.
+	* mingwex/sitest.c: New file.
+	* mingwex/strtof.c: New file.
+	* mingwex/strtoimax.c: New file.
+	* mingwex/strtoumax.c: New file.
+	* mingwex/testwmem.c: New file.
+	* mingwex/trunc.c: New file.
+	* mingwex/ulltoa.c: New file.
+	* mingwex/ulltow.c: New file.
+	* mingwex/wcstof.c: New file.
+	* mingwex/wcstoimax.c: New file.
+	* mingwex/wcstoumax.c: New file.
+	* mingwex/wmemchr.c: New file.
+	* mingwex/wmemcmp.c: New file.
+	* mingwex/wmemcpy.c: New file.
+	* mingwex/wmemmove.c: New file.
+	* mingwex/wmemset.c: New file.
+	* mingwex/wtoll.c: New file.
+
 2002-04-20  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/mbstring.h: New file.

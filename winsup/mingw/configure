@@ -1659,20 +1659,16 @@ test "$host_alias" != "$target_alias" &&
     NONENONEs,x,x, &&
   program_prefix=${target_alias}-
 
-
-configdirs=""
-SUBDIRS=""
+SUBDIRS="profile mingwex"
+configdirs="profile mingwex"
 HEADER_SUBDIR=""
+
+LIBGMON_A=libgmon.a
 
 case "$target_os" in
 *cygwin*)
   MNO_CYGWIN=-mno-cygwin
-  configdirs="$configdirs"
-  # FIXME MinGW versions of libm.a and libgmon.a needed for -mno-cygwin
-  # Do not build libm.a when building under Cygwin winsup. Otherwise, it'll
-  # overwrite Cygwin's one. Likewise for libgmon.a.
   LIBM_A=
-  LIBGMON_A=
   # Install mingw headers in mingw subdirectory.
   HEADER_SUBDIR="mingw"
   ;;
@@ -1680,9 +1676,6 @@ case "$target_os" in
   # Build it for MSVCRT by default.
   MNO_CYGWIN=
   LIBM_A=libm.a
-  LIBGMON_A=libgmon.a
-  SUBDIRS="profile"
-  configdirs="$configdirs profile"
   ;;
 esac
 
@@ -1719,7 +1712,7 @@ MKINSTALLDIRS=$ac_aux_dir/mkinstalldirs
 # SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
 # ./install, which can be erroneously created by make from ./install.sh.
 echo $ac_n "checking for a BSD compatible install""... $ac_c" 1>&6
-echo "configure:1723: checking for a BSD compatible install" >&5
+echo "configure:1716: checking for a BSD compatible install" >&5
 if test -z "$INSTALL"; then
 if eval "test \"`echo '$''{'ac_cv_path_install'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6

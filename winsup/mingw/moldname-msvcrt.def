@@ -54,7 +54,8 @@ fgetchar
 fgetwchar
 filelength
 fileno
-fpreset
+; Alias fpreset is set in CRT_fp10,c and CRT_fp8.c.
+; fpreset
 fputchar
 fputwchar
 fstat

@@ -88,20 +88,16 @@ AC_SUBST(WINDRES)
 AC_ALLOCA
 
 AC_CANONICAL_SYSTEM
-
-configdirs=""
-SUBDIRS=""
+SUBDIRS="profile mingwex"
+configdirs="profile mingwex"
 HEADER_SUBDIR=""
+
+LIBGMON_A=libgmon.a
 
 case "$target_os" in
 *cygwin*)
   MNO_CYGWIN=-mno-cygwin
-  configdirs="$configdirs"
-  # FIXME MinGW versions of libm.a and libgmon.a needed for -mno-cygwin
-  # Do not build libm.a when building under Cygwin winsup. Otherwise, it'll
-  # overwrite Cygwin's one. Likewise for libgmon.a.
   LIBM_A=
-  LIBGMON_A=
   # Install mingw headers in mingw subdirectory.
   HEADER_SUBDIR="mingw"
   ;;
@@ -109,9 +105,6 @@ case "$target_os" in
   # Build it for MSVCRT by default.
   MNO_CYGWIN=
   LIBM_A=libm.a
-  LIBGMON_A=libgmon.a
-  SUBDIRS="profile"
-  configdirs="$configdirs profile"
   ;;
 esac
 

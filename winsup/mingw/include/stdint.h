@@ -19,6 +19,9 @@
 
 #ifndef _STDINT_H
 #define _STDINT_H
+#define __need_wint_t
+#define __need_wchar_t
+#include <stddef.h>
 
 /* 7.18.1.1  Exact-width integer types */
 typedef signed char int8_t;
@@ -138,11 +141,10 @@ typedef unsigned long long   uintmax_t;
 #endif
 
 /*
- * wint_t is unsigned int in __MINGW32__,
- * but unsigned short in MS runtime
+ * wint_t is unsigned short for compatibility with MS runtime
  */
 #define WINT_MIN 0
-#define WINT_MAX UINT32_MAX
+#define WINT_MAX ((wint_t)-1) /* UINT16_MAX */
 
 #endif /* !defined ( __cplusplus) || defined __STDC_LIMIT_MACROS */
 

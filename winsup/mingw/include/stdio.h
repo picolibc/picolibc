@@ -34,12 +34,14 @@
 /* All the headers include this file. */
 #include <_mingw.h>
 
+#ifndef RC_INVOKED
 #define __need_size_t
 #define __need_NULL
 #define __need_wchar_t
 #define	__need_wint_t
-#ifndef RC_INVOKED
 #include <stddef.h>
+#define __need___va_list
+#include <stdarg.h>
 #endif	/* Not RC_INVOKED */
 
 
@@ -122,19 +124,12 @@
 
 #ifndef	RC_INVOKED
 
-/*
- * I used to include stdarg.h at this point, in order to allow for the
- * functions later on in the file which use va_list. That conflicts with
- * using stdio.h and varargs.h in the same file, so I do the typedef myself.
- */
-#ifndef	_VA_LIST
-#define _VA_LIST
-#if defined __GNUC__ && __GNUC__ >= 3
-typedef __builtin_va_list va_list;
+#ifdef __GNUC__
+#define __VALIST __gnuc_va_list
 #else
-typedef char* va_list;
+#define __VALIST char*
 #endif
-#endif
+
 /*
  * The structure underlying the FILE type.
  *
@@ -163,9 +158,9 @@ typedef struct _iobuf
  */
 #ifndef __DECLSPEC_SUPPORTED
 
-extern FILE (*__imp__iob)[];	/* A pointer to an array of FILE */
+extern FILE (*_imp___iob)[];	/* A pointer to an array of FILE */
 
-#define _iob	(*__imp__iob)	/* An array of FILE */
+#define _iob	(*_imp___iob)	/* An array of FILE */
 
 #else /* __DECLSPEC_SUPPORTED */
 
@@ -211,11 +206,17 @@ int	fprintf (FILE*, const char*, ...);
 int	printf (const char*, ...);
 int	sprintf (char*, const char*, ...);
 int	_snprintf (char*, size_t, const char*, ...);
-int	vfprintf (FILE*, const char*, va_list);
-int	vprintf (const char*, va_list);
-int	vsprintf (char*, const char*, va_list);
-int	_vsnprintf (char*, size_t, const char*, va_list);
+int	vfprintf (FILE*, const char*, __VALIST);
+int	vprintf (const char*, __VALIST);
+int	vsprintf (char*, const char*, __VALIST);
+int	_vsnprintf (char*, size_t, const char*, __VALIST);
 
+#ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
+int snprintf(char* s, size_t n, const char*  format, ...);
+extern __inline__ int vsnprintf (char* s, size_t n, const char* format,
+			   __VALIST arg)
+  { return _vsnprintf ( s, n, format, arg); }
+#endif
 
 /*
  * Formatted Input
@@ -254,6 +255,18 @@ size_t	fwrite (const void*, size_t, size_t, FILE*);
 int	fseek (FILE*, long, int);
 long	ftell (FILE*);
 void	rewind (FILE*);
+
+#ifdef __USE_MINGW_FSEEK  /* These are in libmingwex.a */
+/*
+ * Workaround for limitations on win9x where a file contents are
+ * not zero'd out if you seek past the end and then write.
+ */
+
+int __mingw_fseek (FILE *, long, int);
+int __mingw_fwrite (const void*, size_t, size_t, FILE*);
+#define fseek(fp, offset, whence)  __mingw_fseek(fp, offset, whence)
+#define fwrite(buffer, size, count, fp)  __mingw_fwrite(buffer, size, count, fp)
+#endif /* __USE_MINGW_FSEEK */
 
 /*
  * An opaque data type used for storing file positions... The contents of
@@ -321,10 +334,10 @@ int	fwprintf (FILE*, const wchar_t*, ...);
 int	wprintf (const wchar_t*, ...);
 int	swprintf (wchar_t*, const wchar_t*, ...);
 int	_snwprintf (wchar_t*, size_t, const wchar_t*, ...);
-int	vfwprintf (FILE*, const wchar_t*, va_list);
-int	vwprintf (const wchar_t*, va_list);
-int	vswprintf (wchar_t*, const wchar_t*, va_list);
-int	_vsnwprintf (wchar_t*, size_t, const wchar_t*, va_list);
+int	vfwprintf (FILE*, const wchar_t*, __VALIST);
+int	vwprintf (const wchar_t*, __VALIST);
+int	vswprintf (wchar_t*, const wchar_t*, __VALIST);
+int	_vsnwprintf (wchar_t*, size_t, const wchar_t*, __VALIST);
 int	fwscanf (FILE*, const wchar_t*, ...);
 int	wscanf (const wchar_t*, ...);
 int	swscanf (const wchar_t*, const wchar_t*, ...);
@@ -350,6 +363,14 @@ int	_wremove (const wchar_t*);
 void	_wperror (const wchar_t*);
 FILE*	_wpopen (const wchar_t*, const wchar_t*);
 #endif	/* __MSVCRT__ */
+
+#ifndef __NO_ISOCEXT  /* externs in libmingwex.a */
+int snwprintf(wchar_t* s, size_t n, const wchar_t*  format, ...);
+extern __inline__ int
+vsnwprintf (wchar_t* s, size_t n, const wchar_t* format, __VALIST arg)
+  { return _vsnwprintf ( s, n, format, arg);}
+#endif
+
 #define _WSTDIO_DEFINED
 #endif /* _WSTDIO_DEFINED */
 

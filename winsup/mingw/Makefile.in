@@ -18,7 +18,7 @@
 # This makefile requires GNU make.
 
 PACKAGE = mingw-runtime
-VERSION = 1.4
+VERSION = 2.0
 CYGRELEASE = 1
 
 VPATH = @srcdir@
@@ -96,7 +96,8 @@ LIBM_A=@LIBM_A@
 
 INCLUDES = -I$(srcdir)/include -I$(srcdir)/../w32api/include \
   -I$(srcdir)/../include \
-  -nostdinc -nostdinc++
+  -nostdinc -nostdinc++ \
+  -iwithprefixbefore include
 ALL_CFLAGS = $(CFLAGS) $(INCLUDES) $(MNO_CYGWIN)
 ALL_CXXFLAGS = $(CXXFLAGS) $(INCLUDES) $(MNO_CYGWIN)
 
@@ -145,9 +146,10 @@ FLAGS_TO_PASS:=\
 	TARFLAGS="$(TARFLAGS)" \
 	TARFILEEXT="$(TARFILEEXT)"
 
-CRT0S = crt1.o dllcrt1.o crt2.o dllcrt2.o CRT_noglob.o crtmt.o crtst.o
-MINGW_OBJS = CRTglob.o CRTfmode.o CRTinit.o dirent.o dllmain.o gccmain.o \
-	     main.o crtst.o mthr_stub.o
+CRT0S = crt1.o dllcrt1.o crt2.o dllcrt2.o CRT_noglob.o crtmt.o crtst.o \
+	CRT_fp8.o CRT_fp10.o
+MINGW_OBJS = CRTglob.o CRTfmode.o CRTinit.o  dllmain.o gccmain.o \
+	     main.o crtst.o mthr_stub.o CRT_fp10.o
 MOLD_OBJS = ctype_old.o string_old.o
 
 LIBS = libcrtdll.a libmsvcrt.a libmsvcrt20.a libmsvcrt40.a libmingw32.a \
@@ -157,10 +159,11 @@ DLLS = $(THREAD_DLL_NAME)
 
 SRCDIST_FILES = CRT_noglob.c CRTfmode.c CRTglob.c CRTinit.c ChangeLog \
 Makefile.in README TODO config.guess config.sub configure configure.in \
-crt1.c crtdll.def crtmt.c crtst.c ctype_old.c dirent.c dllcrt1.c dllmain.c \
+crt1.c crtdll.def crtmt.c crtst.c ctype_old.c  dllcrt1.c dllmain.c \
 gccmain.c init.c install-sh jamfile main.c mkinstalldirs moldname-crtdll.def \
 moldname-msvcrt.def moldname.def moldname.def.in msvcrt.def msvcrt20.def \
-msvcrt40.def mthr.c mthr_init.c mthr_stub.c readme.txt string_old.c
+msvcrt40.def mthr.c mthr_init.c mthr_stub.c readme.txt string_old.c \
+CRT_fp8.c CRT_fp10.c
 
 all_dlls_host = @all_dlls_host@
 install_dlls_host = @install_dlls_host@
@@ -379,11 +382,13 @@ crtst.o: $(srcdir)/crtst.c
 ctype_old.o: $(srcdir)/ctype_old.c
 dllcrt1.o: $(srcdir)/dllcrt1.c 
 dllcrt2.o: $(srcdir)/dllcrt1.c 
-dirent.o: $(srcdir)/dirent.c
 dllmain.o: $(srcdir)/dllmain.c
 main.o: $(srcdir)/main.c
 oldnames.o: $(srcdir)/oldnames.c
 string_old.o: $(srcdir)/string_old.c
+CRT_fp8.o: $(srcdir)/CRT_fp8.c
+CRT_fp10.o: $(srcdir)/CRT_fp10.c
+
 
 Makefile: Makefile.in config.status configure
 	$(SHELL) config.status

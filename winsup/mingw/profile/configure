@@ -645,36 +645,31 @@ test "$host_alias" != "$target_alias" &&
   program_prefix=${target_alias}-
 
 
+LIBGMON_A=libgmon.a
+
 case "$target_os" in
 *mingw32crt*)
   CRT_ID=1
   MNO_CYGWIN=
   RUNTIME=crtdll
-  THREAD_DLL=mingwc
-  LIBM_A=libm.a
-  LIBGMON_A=libgmon.a
+  CRT0S="gcrt1.o gcrt2.o"
   ;;
 *cygwin*)
   CRT_ID=2
   MNO_CYGWIN=-mno-cygwin
   RUNTIME=msvcrt
-  THREAD_DLL=mingwc
+  CRT0S=gcrt0.o
   # Do not build libm.a when building under Cygwin winsup. Otherwise, it'll
   # overwrite Cygwin's one. Likewise for libgmon.a.
-  LIBM_A=
-  LIBGMON_A=
   ;;
 *)
   # Build it for MSVCRT by default.
   CRT_ID=2
   MNO_CYGWIN=
   RUNTIME=msvcrt
-  THREAD_DLL=mingwm
-  LIBM_A=libm.a
-  LIBGMON_A=libgmon.a
+  CRT0S="gcrt1.o gcrt2.o"
   ;;
 esac
-
 
 
 
@@ -694,7 +689,7 @@ esac
 # SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
 # ./install, which can be erroneously created by make from ./install.sh.
 echo $ac_n "checking for a BSD compatible install""... $ac_c" 1>&6
-echo "configure:698: checking for a BSD compatible install" >&5
+echo "configure:693: checking for a BSD compatible install" >&5
 if test -z "$INSTALL"; then
 if eval "test \"`echo '$''{'ac_cv_path_install'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -916,9 +911,8 @@ s%@build_os@%$build_os%g
 s%@CRT_ID@%$CRT_ID%g
 s%@RUNTIME@%$RUNTIME%g
 s%@MNO_CYGWIN@%$MNO_CYGWIN%g
-s%@THREAD_DLL@%$THREAD_DLL%g
-s%@LIBM_A@%$LIBM_A%g
 s%@LIBGMON_A@%$LIBGMON_A%g
+s%@CRT0S@%$CRT0S%g
 s%@INSTALL_PROGRAM@%$INSTALL_PROGRAM%g
 s%@INSTALL_SCRIPT@%$INSTALL_SCRIPT%g
 s%@INSTALL_DATA@%$INSTALL_DATA%g

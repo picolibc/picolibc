@@ -151,13 +151,13 @@ __MINGW_IMPORT char 	*_tzname[2];
 
 #ifndef __DECLSPEC_SUPPORTED
 
-extern int*	__imp__daylight_dll;
-extern long*	__imp__timezone_dll;
-extern char**	__imp__tzname;
+extern int*	_imp___daylight_dll;
+extern long*	_imp___timezone_dll;
+extern char**	_imp___tzname;
 
-#define _daylight	(*__imp__daylight_dll)
-#define _timezone	(*__imp__timezone_dll)
-#define _tzname		(__imp__tzname)
+#define _daylight	(*_imp___daylight_dll)
+#define _timezone	(*_imp___timezone_dll)
+#define _tzname		(*_imp___tzname)
 
 #else /* __DECLSPEC_SUPPORTED */
 

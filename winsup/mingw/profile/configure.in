@@ -35,42 +35,37 @@ DLLWRAP=${DLLWRAP-dllwrap}
 AC_SUBST(DLLWRAP)
 AC_CANONICAL_SYSTEM
 
+LIBGMON_A=libgmon.a
+
 case "$target_os" in
 *mingw32crt*)
   CRT_ID=1
   MNO_CYGWIN=
   RUNTIME=crtdll
-  THREAD_DLL=mingwc
-  LIBM_A=libm.a
-  LIBGMON_A=libgmon.a
+  CRT0S="gcrt1.o gcrt2.o"
   ;;
 *cygwin*)
   CRT_ID=2
   MNO_CYGWIN=-mno-cygwin
   RUNTIME=msvcrt
-  THREAD_DLL=mingwc
+  CRT0S=gcrt0.o
   # Do not build libm.a when building under Cygwin winsup. Otherwise, it'll
   # overwrite Cygwin's one. Likewise for libgmon.a.
-  LIBM_A=
-  LIBGMON_A=
   ;;
 *)
   # Build it for MSVCRT by default.
   CRT_ID=2
   MNO_CYGWIN=
   RUNTIME=msvcrt
-  THREAD_DLL=mingwm
-  LIBM_A=libm.a
-  LIBGMON_A=libgmon.a
+  CRT0S="gcrt1.o gcrt2.o"
   ;;
 esac
 
 AC_SUBST(CRT_ID)
 AC_SUBST(RUNTIME)
 AC_SUBST(MNO_CYGWIN)
-AC_SUBST(THREAD_DLL)
-AC_SUBST(LIBM_A)
 AC_SUBST(LIBGMON_A)
+AC_SUBST(CRT0S)
 
 AC_PROG_INSTALL
 AC_OUTPUT(Makefile)

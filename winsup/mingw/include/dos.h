@@ -48,19 +48,19 @@ extern "C" {
 
 #ifndef __MSVCRT__ /* these are in CRTDLL, but not MSVCRT */
 #ifndef __DECLSPEC_SUPPORTED
-extern unsigned int *__imp__basemajor_dll;
-extern unsigned int *__imp__baseminor_dll;
-extern unsigned int *__imp__baseversion_dll;
-extern unsigned int *__imp__osmajor_dll;
-extern unsigned int *__imp__osminor_dll;
-extern unsigned int *__imp__osmode_dll;
+extern unsigned int *_imp___basemajor_dll;
+extern unsigned int *_imp___baseminor_dll;
+extern unsigned int *_imp___baseversion_dll;
+extern unsigned int *_imp___osmajor_dll;
+extern unsigned int *_imp___osminor_dll;
+extern unsigned int *_imp___osmode_dll;
 
-#define _basemajor (*__imp__basemajor_dll)
-#define _baseminor (*__imp__baseminor_dll)
-#define _baseversion (*__imp__baseversion_dll)
-#define _osmajor (*__imp__osmajor_dll)
-#define _osminor (*__imp__osminor_dll)
-#define _osmode (*__imp__osmode_dll)
+#define _basemajor (*_imp___basemajor_dll)
+#define _baseminor (*_imp___baseminor_dll)
+#define _baseversion (*_imp___baseversion_dll)
+#define _osmajor (*_imp___osmajor_dll)
+#define _osminor (*_imp___osminor_dll)
+#define _osmode (*_imp___osmode_dll)
 
 #else /* __DECLSPEC_SUPPORTED */
 

@@ -93,12 +93,12 @@
 #ifndef __DECLSPEC_SUPPORTED
 
 #ifdef __MSVCRT__
-extern unsigned int* __imp__fmode;
-#define	_fmode	(*__imp__fmode)
+extern unsigned int* _imp___fmode;
+#define	_fmode	(*_imp___fmode)
 #else
 /* CRTDLL */
-extern unsigned int* __imp__fmode_dll;
-#define	_fmode	(*__imp__fmode_dll)
+extern unsigned int* _imp___fmode_dll;
+#define	_fmode	(*_imp___fmode_dll)
 #endif
 
 #else /* __DECLSPEC_SUPPORTED */

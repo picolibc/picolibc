@@ -49,7 +49,8 @@ THREAD_DLL_NAME = $(THREAD_DLL)$(THREAD_DLL_VERSION).dll
 
 INCLUDES = -I$(srcdir) -I$(srcdir)/../include \
   -I$(srcdir)/../../w32api/include \
-  -nostdinc -nostdinc++
+  -nostdinc -nostdinc++ \
+  -iwithprefixbefore include
 ALL_CFLAGS = $(CFLAGS) $(INCLUDES) $(MNO_CYGWIN)
 ALL_CXXFLAGS = $(CXXFLAGS) $(INCLUDES) $(MNO_CYGWIN)
 
@@ -65,7 +66,8 @@ DLLTOOL_FLAGS = --as $(AS_FOR_TARGET)
 
 LIBGMON_A = @LIBGMON_A@
 LIBGMON_OBJS = gmon.o mcount.o profil.o
-CRT0S = gcrt1.o gcrt2.o
+CRT0S = @CRT0S@
+ALL_CRT0S = gcrt0.o gcrt1.o gcrt2.o
 
 LIBS = $(LIBGMON_A)
 DLLS = 
@@ -75,6 +77,11 @@ all: $(LIBGMON_A)
 $(LIBGMON_A): $(LIBGMON_OBJS) $(CRT0S)
 	$(AR) $(ARFLAGS) $@ $(LIBGMON_OBJS)
 	$(RANLIB) $@
+
+# FIXME: These are really the same, but gcc specs want different names.
+# The only CRT dependency is atexit.
+gcrt0.o: gcrt0.c
+	$(CC)  -c -o $@ $(CPPFLAGS) $(CFLAGS) $?
 
 gcrt1.o: gcrt0.c
 	$(CC) -U__MSVCRT__ -c -o $@ $(CPPFLAGS) $(CFLAGS) $?
@@ -95,22 +102,22 @@ info-html:
 install-info: info
 
 install: all
-	$(mkinstalldirs) $(tooldir)/lib 
+	$(mkinstalldirs) $(inst_libdir) 
 	for i in $(LIBS); do \
-		$(INSTALL_DATA) $$i $(tooldir)/lib/$$i ; \
+		$(INSTALL_DATA) $$i $(inst_libdir)/$$i ; \
 	done
 	for i in $(CRT0S); do \
-		$(INSTALL_DATA) $$i $(tooldir)/lib/$$i ; \
+		$(INSTALL_DATA) $$i $(inst_libdir)/$$i ; \
 	done
 	for sub in . ; do \
-	$(mkinstalldirs) $(tooldir)/include/$$sub ; \
+	$(mkinstalldirs) $(inst_includedir)/$$sub ; \
 		for i in $(srcdir)/$$sub/*.h ; do \
-		  $(INSTALL_DATA) $$i $(tooldir)/include/$$sub/`basename $$i` ; \
+		  $(INSTALL_DATA) $$i $(inst_includedir)/$$sub/`basename $$i` ; \
 		done ; \
 	done
 
 clean:
-	-rm -f $(LIBGMON_OBJS) $(CRT0S) $(LIBGMON_A)
+	-rm -f $(LIBGMON_OBJS) $(ALL_CRT0S) $(LIBGMON_A)
 
 distclean:
 	-rm -f *.o *.a *~ core a.out

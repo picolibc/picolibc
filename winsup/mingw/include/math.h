@@ -64,6 +64,7 @@
 #ifndef	__STRICT_ANSI__
 #ifndef __MINGW_FPCLASS_DEFINED
 #define __MINGW_FPCLASS_DEFINED 1
+/* IEEE 754 classication */
 #define	_FPCLASS_SNAN	0x0001	/* Signaling "Not a Number" */
 #define	_FPCLASS_QNAN	0x0002	/* Quiet "Not a Number" */
 #define	_FPCLASS_NINF	0x0004	/* Negative Infinity */
@@ -97,12 +98,12 @@ extern "C" {
 #ifndef __DECLSPEC_SUPPORTED
 
 #ifdef __MSVCRT__
-extern double*	__imp__HUGE;
-#define	HUGE_VAL	(*__imp__HUGE)
+extern double*	_imp___HUGE;
+#define	HUGE_VAL	(*_imp___HUGE)
 #else
 /* CRTDLL */
-extern double*	__imp__HUGE_dll;
-#define	HUGE_VAL	(*__imp__HUGE_dll)
+extern double*	_imp___HUGE_dll;
+#define	HUGE_VAL	(*_imp___HUGE_dll)
 #endif
 
 #else /* __DECLSPEC_SUPPORTED */
@@ -151,7 +152,6 @@ double	frexp (double, int*);
 double	modf (double, double*);
 double	fmod (double, double);
 
-
 #ifndef	__STRICT_ANSI__
 
 /* Complex number (for cabs) */
@@ -190,12 +190,15 @@ int	_isnan		(double);
 
 /* END FLOAT.H COPY */
 
-#ifndef	_NO_OLDNAMES
+#if !defined (_NO_OLDNAMES)  \
+   || (defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L )
 
 /*
  * Non-underscored versions of non-ANSI functions. These reside in
- * liboldnames.a. Provided for extra portability.
+ * liboldnames.a. They are now also ISO C99 standand names.
+ * Provided for extra portability.
  */
+
 double cabs (struct _complex);
 double hypot (double, double);
 double j0 (double);
@@ -212,8 +215,271 @@ double yn (int, double);
 #ifdef __cplusplus
 }
 #endif
-
 #endif	/* Not RC_INVOKED */
+
+
+#ifndef __NO_ISOCEXT
+#ifndef RC_INVOKED
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#if (defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) \
+	|| !defined  __STRICT_ANSI__
+
+#define INFINITY HUGE_VAL
+#define NAN (0.0F/0.0F)
+
+/*
+   Return values for fpclassify.
+   These are based on Intel x87 fpu condition codes
+   in the high byte of status word and differ from
+   the return values for MS IEEE 754 extension _fpclass()
+*/
+#define FP_NAN		0x0100
+#define FP_NORMAL	0x0400
+#define FP_INFINITE	(FP_NAN | FP_NORMAL)
+#define FP_ZERO		0x4000
+#define FP_SUBNORMAL	(FP_NORMAL | FP_ZERO)
+/* 0x0200 is signbit mask */
+
+
+/* Return a  NaN */
+double nan(const char *tagp);
+float nanf(const char *tagp);
+long double nanl(const char *tagp);
+
+#ifndef __STRICT_ANSI__
+#define nan() nan("")
+#define nanf() nanf("")
+#define nanl() nanl("")
+#endif
+
+/*
+  We can't inline float or double, because we want to ensure truncation
+  to semantic type before classification. 
+  (A normal long double value might become subnormal when 
+  converted to double, and zero when converted to float.)
+*/
+
+extern int __fpclassifyf (float);
+extern int __fpclassify (double);
+
+extern __inline__ int __fpclassifyl (long double x){
+  unsigned short sw;
+  __asm__ ("fxam; fstsw %%ax;" : "=a" (sw): "t" (x));
+  return sw & (FP_NAN | FP_NORMAL | FP_ZERO );
+}
+
+#define fpclassify(x) (sizeof (x) == sizeof (float) ? __fpclassifyf (x)	  \
+		       : sizeof (x) == sizeof (double) ? __fpclassify (x) \
+		       : __fpclassifyl (x))
+
+/* We don't need to worry about trucation here:
+   A NaN stays a NaN. */
+extern __inline__ int __isnan (double _x)
+{
+  unsigned short sw;
+  __asm__ ("fxam;"
+	   "fstsw %%ax": "=a" (sw) : "t" (_x));
+  return (sw & (FP_NAN | FP_NORMAL | FP_INFINITE | FP_ZERO | FP_SUBNORMAL))
+    == FP_NAN;
+}
+
+extern __inline__ int __isnanf (float _x)
+{
+  unsigned short sw;
+  __asm__ ("fxam;"
+	    "fstsw %%ax": "=a" (sw) : "t" (_x));
+  return (sw & (FP_NAN | FP_NORMAL | FP_INFINITE | FP_ZERO | FP_SUBNORMAL))
+    == FP_NAN;
+}
+
+extern __inline__ int __isnanl (long double _x)
+{
+  unsigned short sw;
+  __asm__ ("fxam;"
+	    "fstsw %%ax": "=a" (sw) : "t" (_x));
+  return (sw & (FP_NAN | FP_NORMAL | FP_INFINITE | FP_ZERO | FP_SUBNORMAL))
+    == FP_NAN;
+}
+
+#define isnan(x) (sizeof (x) == sizeof (float) ? __isnanf (x)	\
+		  : sizeof (x) == sizeof (double) ? __isnan (x)	\
+		  : __isnanl (x))
+
+#define isfinite(x) ((fpclassify(x) & FP_NAN) == 0)
+#define isinf(x) (fpclassify(x) == FP_INFINITE)
+#define isnormal(x) (fpclassify(x) == FP_NORMAL)
+
+
+extern __inline__ int __signbit (double x) {
+  unsigned short stw;
+  __asm__ ( "fxam; fstsw %%ax;": "=a" (stw) : "t" (x));
+  return stw & 0x0200;
+}
+
+extern  __inline__ int __signbitf (float x) {
+  unsigned short stw;
+  __asm__ ("fxam; fstsw %%ax;": "=a" (stw) : "t" (x));
+  return stw & 0x0200;
+}
+extern  __inline__ int __signbitl (long double x) {
+  unsigned short stw;
+  __asm__ ("fxam; fstsw %%ax;": "=a" (stw) : "t" (x));
+  return stw & 0x0200;
+}
+
+
+#define signbit(x) (sizeof (x) == sizeof (float) ? __signbitf (x)	\
+		    : sizeof (x) == sizeof (double) ? __signbit (x)	\
+		    : __signbitl (x))
+
+/* 
+ *  With these functions, comparisons involving quiet NaNs set the FP
+ *  condition code to "unordered".  The IEEE floating-point spec
+ *  dictates that the result of floating-point comparisons should be
+ *  false whenever a NaN is involved, with the exception of the !=, 
+ *  which always returns true: yes, (NaN != NaN) is true).
+ */
+
+#if __GNUC__ >= 3
+
+#define isgreater(x, y) __builtin_isgreater(x, y)
+#define isgreaterequal(x, y) __builtin_isgreaterequal(x, y)
+#define isless(x, y) __builtin_isless(x, y)
+#define islessequal(x, y) __builtin_islessequal(x, y)
+#define islessgreater(x, y) __builtin_islessgreater(x, y)
+#define isunordered(x, y) __builtin_isunordered(x, y)
+
+#else
+/*  helper  */
+extern  __inline__ int
+__fp_unordered_compare (long double x, long double y){
+  unsigned short retval;
+  __asm__ ("fucom %%st(1);"
+	   "fnstsw;": "=a" (retval) : "t" (x), "u" (y));
+  return retval;
+}
+
+#define isgreater(x, y) ((__fp_unordered_compare(x, y) \
+			   & 0x4500) == 0)
+#define isless(x, y) ((__fp_unordered_compare (y, x) \
+                       & 0x4500) == 0)
+#define isgreaterequal(x, y) ((__fp_unordered_compare (x, y) \
+                               & FP_INFINITE) == 0)
+#define islessequal(x, y) ((__fp_unordered_compare(y, x) \
+			    & FP_INFINITE) == 0)
+#define islessgreater(x, y) ((__fp_unordered_compare(x, y) \
+			      & FP_SUBNORMAL) == 0)
+#define isunordered(x, y) ((__fp_unordered_compare(x, y) \
+			    & 0x4500) == 0x4500)
+
+#endif
+
+/* round, using fpu control word settings */
+extern  __inline__ double rint (double x)
+{
+  double retval;
+  __asm__ ("frndint;": "=t" (retval) : "0" (x));
+  return retval;
+}
+
+extern  __inline__ float rintf (float x)
+{
+  float retval;
+  __asm__ ("frndint;" : "=t" (retval) : "0" (x) );
+  return retval;
+}
+
+extern  __inline__ long double rintl (long double x)
+{
+  long double retval;
+  __asm__ ("frndint;" : "=t" (retval) : "0" (x) );
+  return retval;
+}
+
+/* round away from zero, regardless of fpu control word settings */
+extern double round (double);
+extern float roundf (float);
+extern long double roundl (long double);
+
+
+/* round towards zero, regardless of fpu control word settings */
+extern double trunc (double);
+extern float truncf (float);
+extern long double truncl (long double);
+
+
+/* fmax and fmin.
+   NaN arguments are treated as missing data: if one argument is a NaN
+   and the other numeric, then these functions choose the numeric
+   value. */
+
+extern double fmax  (double, double);
+extern float fmaxf (float, float);
+extern long double fmaxl (long double, long double);
+
+extern double fmin (double, double);
+extern float fminf (float, float);
+extern long double fminl (long double, long double);
+
+/* return x * y + z as a ternary op */ 
+extern double fma (double, double, double);
+extern float fmaf (float, float, float);
+extern long double fmal (long double, long double, long double);
+
+/*  x > y ? (x - y) : 0.0  */
+extern double fdim (double, double);
+extern float fdimf (float, float);
+extern long double fdiml (long double, long double);
+
+/* one lonely transcendental */
+extern double log2 (double _x);
+extern float log2f (float _x);
+extern long double log2l (long double _x);
+#endif /* __STDC_VERSION__ >= 199901L */
+
+
+/* The underscored versions for double are in MSVCRT.dll.
+   The stubs for float and double versions are in libmingwex.a */
+
+double copysign (double, double);
+float copysignf (float, float);
+long double copysignl (long double, long double);
+
+double logb (double);
+float logbf (float);
+double nextafter (double, double);
+float nextafterf (float, float);
+double scalb (double, long);
+float scalbf (float, long);
+
+#if !defined (__STRICT_ANSI__)  /* inline using non-ANSI functions */
+extern  __inline__ double copysign (double x, double y)
+	{ return _copysign(x, y); }
+extern  __inline__ float copysignf (float x, float y)
+	{ return  _copysign(x, y); } 
+extern  __inline__ double logb (double x)
+	{ return _logb(x); }
+extern  __inline__ float logbf (float x)
+	{ return  _logb(x); }
+extern  __inline__ double nextafter(double x, double y)
+	{ return _nextafter(x, y); }
+extern  __inline__ float nextafterf(float x, float y)
+	{ return _nextafter(x, y); }
+extern  __inline__ double scalb (double x, long i)
+	{ return _scalb (x, i); }
+extern  __inline__ float scalbf (float x, long i)
+	{ return _scalb(x, i); }
+#endif /* (__STRICT_ANSI__)  */
+
+#ifdef __cplusplus
+}
+#endif
+#endif	/* Not RC_INVOKED */
+
+#endif /* __NO_ISOCEXT */
 
 #endif	/* Not _MATH_H_ */
 

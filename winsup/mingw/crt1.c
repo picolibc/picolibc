@@ -232,3 +232,20 @@ WinMainCRTStartup ()
   __mingw_CRTStartup ();
 }
 
+/*
+ *  We force use of library version of atexit, which is only
+ *  visible in import lib as _imp__atexit
+ */
+extern int (*_imp__atexit)(void (*)(void));
+int atexit (void (* pfn )(void) )
+{
+  return ( (*_imp__atexit)(pfn));
+}
+
+/* Likewise for non-ANSI _onexit */
+extern _onexit_t (*_imp___onexit)(_onexit_t);
+_onexit_t
+_onexit (_onexit_t pfn )
+{
+  return (*_imp___onexit)(pfn);
+}
