@@ -1,5 +1,10 @@
 2002-11-15  Christopher Faylor  <cgf@redhat.com>
 
+	* lib/uuid.c (IID_IRunnableObject): Remove duplicate definition.
+	(IID_IStdMarshalInfo): Ditto.
+
+2002-11-15  Christopher Faylor  <cgf@redhat.com>
+
 	* lib/uuid.c (IID_IOleInPlaceSite): Remove duplicate definition.
 	(IID_IPersistStorage): Ditto.
 
