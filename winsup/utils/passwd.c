@@ -330,6 +330,7 @@ main (int argc, char **argv)
   eprint (0, "Enter the new password (minimum of 5, maximum of 8 characters).");
   eprint (0, "Please use a combination of upper and lower case letters and numbers.");
 
+  oldpwd[0] = '\0';
   if (li->usri3_priv != USER_PRIV_ADMIN)
     {
       strcpy (oldpwd, getpass ("Old password: "));

@@ -1,3 +1,7 @@
+Mon Jul 31 15:12:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* passwd.c (main): Initialize oldpwd before beeing used.
+
 Sat Jul 29 00:44:46 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* kill.cc (main): Add '-f' option to force termination of a process.
