@@ -83,16 +83,21 @@ fhandler_pipe::read (void *in_ptr, size_t& in_len)
   return;
 }
 
-int fhandler_pipe::close ()
+int
+fhandler_pipe::close ()
 {
-  int res = this->fhandler_base::close ();
   if (guard)
     CloseHandle (guard);
   if (writepipe_exists)
     CloseHandle (writepipe_exists);
   if (read_state && !cygheap->fdtab.in_vfork_cleanup ())
     CloseHandle (read_state);
-  return res;
+  if (get_handle ())
+    {
+      CloseHandle (get_handle ());
+      set_io_handle (NULL);
+    }
+  return 0;
 }
 
 bool
@@ -174,55 +179,45 @@ fhandler_pipe::dup (fhandler_base *child)
 }
 
 int
-make_pipe (int fildes[2], unsigned int psize, int mode)
+fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode, bool fifo)
 {
   HANDLE r, w;
   SECURITY_ATTRIBUTES *sa = (mode & O_NOINHERIT) ?  &sec_none_nih : &sec_none;
   int res = -1;
 
-  cygheap_fdnew fdr;
-  if (fdr >= 0)
+  if (!CreatePipe (&r, &w, sa, psize))
+    __seterrno ();
+  else
     {
-      cygheap_fdnew fdw (fdr, false);
-      if (fdw < 0)
-	/* out of fds? */;
-      else if (!CreatePipe (&r, &w, sa, psize))
-	__seterrno ();
-      else
+      fhs[0] = (fhandler_pipe *) cygheap->fdtab.build_fhandler (-1, *piper_dev, "/dev/piper");
+      fhs[1] = (fhandler_pipe *) cygheap->fdtab.build_fhandler (-1, *pipew_dev, "/dev/pipew");
+
+      int binmode = mode & O_TEXT ?: O_BINARY;
+      fhs[0]->init (r, GENERIC_READ, binmode);
+      fhs[1]->init (w, GENERIC_WRITE, binmode);
+      if (mode & O_NOINHERIT)
+       {
+	 fhs[0]->set_close_on_exec_flag (1);
+	 fhs[1]->set_close_on_exec_flag (1);
+       }
+
+      fhs[0]->read_state = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
+      fhs[0]->set_need_fork_fixup ();
+
+      res = 0;
+      fhs[0]->create_guard (sa);
+      if (wincap.has_unreliable_pipes ())
 	{
-	  fhandler_pipe *fhr = (fhandler_pipe *) cygheap->fdtab.build_fhandler (fdr, *piper_dev, "/dev/piper");
-	  fhandler_pipe *fhw = (fhandler_pipe *) cygheap->fdtab.build_fhandler (fdw, *pipew_dev, "/dev/pipew");
-
-	  int binmode = mode & O_TEXT ?: O_BINARY;
-	  fhr->init (r, GENERIC_READ, binmode);
-	  fhw->init (w, GENERIC_WRITE, binmode);
-	  if (mode & O_NOINHERIT)
-	   {
-	     fhr->set_close_on_exec_flag (1);
-	     fhw->set_close_on_exec_flag (1);
-	   }
-
-	  fildes[0] = fdr;
-	  fildes[1] = fdw;
-	  fhr->read_state = CreateEvent (&sec_none_nih, FALSE, FALSE, NULL);
-	  fhr->set_need_fork_fixup ();
-
-	  res = 0;
-	  fhr->create_guard (sa);
-	  if (wincap.has_unreliable_pipes ())
-	    {
-	      char buf[80];
-	      int count = pipecount++;	/* FIXME: Should this be InterlockedIncrement? */
-	      __small_sprintf (buf, pipeid_fmt, myself->pid, count);
-	      fhw->writepipe_exists = CreateEvent (sa, TRUE, FALSE, buf);
-	      fhr->orig_pid = myself->pid;
-	      fhr->id = count;
-	    }
+	  char buf[80];
+	  int count = pipecount++;	/* FIXME: Should this be InterlockedIncrement? */
+	  __small_sprintf (buf, pipeid_fmt, myself->pid, count);
+	  fhs[1]->writepipe_exists = CreateEvent (sa, TRUE, FALSE, buf);
+	  fhs[0]->orig_pid = myself->pid;
+	  fhs[0]->id = count;
 	}
     }
 
-  syscall_printf ("%d = make_pipe ([%d, %d], %d, %p)", res, fildes[0],
-		  fildes[1], psize, mode);
+  syscall_printf ("%d = ([%p, %p], %d, %p)", res, fhs[0], fhs[1], psize, mode);
   return res;
 }
 
@@ -257,15 +252,38 @@ extern "C" int
 pipe (int filedes[2])
 {
   extern DWORD binmode;
-  return make_pipe (filedes, 16384, (!binmode || binmode == O_BINARY) ? O_BINARY : O_TEXT);
+  fhandler_pipe *fhs[2];
+  int res = fhandler_pipe::create (fhs, 16384, (!binmode || binmode == O_BINARY)
+					       ? O_BINARY : O_TEXT);
+  if (res == 0)
+    {
+      cygheap_fdnew fdin;
+      cygheap_fdnew fdout (fdin, false);
+      fdin = fhs[0];
+      fdout = fhs[1];
+      filedes[0] = fdin;
+      filedes[1] = fdout;
+    }
+
+  return res;
 }
 
 extern "C" int
 _pipe (int filedes[2], unsigned int psize, int mode)
 {
-  int res = make_pipe (filedes, psize, mode);
+  fhandler_pipe *fhs[2];
+  int res = fhandler_pipe::create (fhs, psize, mode);
   /* This type of pipe is not interruptible so set the appropriate flag. */
   if (!res)
-    cygheap->fdtab[filedes[0]]->set_r_no_interrupt (1);
+    {
+      cygheap_fdnew fdin;
+      cygheap_fdnew fdout (fdin, false);
+      fhs[0]->set_r_no_interrupt (1);
+      fdin = fhs[0];
+      fdout = fhs[1];
+      filedes[0] = fdin;
+      filedes[1] = fdout;
+    }
+
   return res;
 }
