@@ -1,3 +1,7 @@
+2002-12-21  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.common: Don't attempt to pretty-print c++ errors.
+
 2002-12-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.common: Define MINGW_LDFLAGS.
