@@ -39,7 +39,7 @@ _DEFUN (atanf, (float),
 #ifdef _DOUBLE_IS_32BITS
 double atan (double x)
 {
-  return (double) atangentf ((float) x, 0);
+  return (double) atangentf ((float) x, 0, 0, 0);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

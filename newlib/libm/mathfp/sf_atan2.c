@@ -26,7 +26,7 @@ _DEFUN (atan2f, (float, float),
 }
 
 #ifdef _DOUBLE_IS_32BITS
-double atan2f (double v, double u)
+double atan2 (double v, double u)
 {
   return (double) atangentf (0.0, (float) v, (float) u, 1);
 }

@@ -1,3 +1,12 @@
+Thu Feb 24 11:43:00 2000  Ran Cabell <rcabell@norfolk.infi.net>
+
+	* libm/mathfp/sf_atan2.c: Fix atan2 typo for _DOUBLE_IS_32_BITS.
+	* libm/mathfp/sf_atan.c: Ditto.
+
+Thu Feb 24 11:39:00 2000  Joel Sherrill <joel@OARcorp.com>
+
+	* libc/include/sys/stat.h: Add RTEMS prototype for lstat.
+
 Tue Feb 22 14:37:00 2000  Ran Cabell <rcabell@norfolk.infi.net>
 
 	* libm/mathfp/sf_exp.c: Corrected _DOUBLE_IS_32_BITS to be
@@ -118,7 +127,7 @@ Thu Jan  6 15:33:46 2000  Christopher Faylor <cgf@cygnus.com>
 	patch from Corinna Vinschen <corinna@vinschen.de>
 	* libc/sys/cygwin/sys/param.h: Define NGROUP_MAX as 16.
 
-Mon Jan 03 14:36:00 2000  Ranjith Kumaran <ranjith@cygnus.com>
+Mon Jan 03 14:36:00 2000  Sergei Organov <osv@javad.ru>
 
 	* libm/mathfp/s_atangent.c: Fix exponent calculation.
 	* libm/mathfp/s_ldexp.c: Ditto.
