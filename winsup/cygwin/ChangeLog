@@ -1,5 +1,9 @@
 2003-05-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	Replace ino_t by __ino64_t throughout.
+
+2003-05-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/types.h: Add key_t typedef.
 
 2003-05-10  Christopher Faylor  <cgf@redhat.com>

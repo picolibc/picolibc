@@ -3185,8 +3185,8 @@ readlink (const char *path, char *buf, int buflen)
    the directory.  FIXME: Not bullet-proof. */
 /* Cygwin internal */
 
-ino_t __stdcall
-hash_path_name (ino_t hash, const char *name)
+__ino64_t __stdcall
+hash_path_name (__ino64_t hash, const char *name)
 {
   if (!*name)
     return hash;

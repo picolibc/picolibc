@@ -442,7 +442,7 @@ fhandler_socket::fstat (struct __stat64 *buf, path_conv *pc)
       if (get_socket_type ()) /* fstat */
 	{
 	  buf->st_dev = 0;
-	  buf->st_ino = (ino_t) ((DWORD) get_handle ());
+	  buf->st_ino = (__ino64_t) ((DWORD) get_handle ());
 	  buf->st_mode = S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO;
 	}
       else

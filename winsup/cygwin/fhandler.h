@@ -151,7 +151,7 @@ class fhandler_base
   int access;
   HANDLE io_handle;
 
-  ino_t namehash;	/* hashed filename, used as inode num */
+  __ino64_t namehash;	/* hashed filename, used as inode num */
 
  protected:
   /* Full unix path name of this file */
@@ -292,7 +292,7 @@ class fhandler_base
 
   const char *get_name () { return unix_path_name; }
   const char *get_win32_name () { return win32_path_name; }
-  ino_t get_namehash () { return namehash; }
+  __ino64_t get_namehash () { return namehash; }
 
   virtual void hclose (HANDLE h) {CloseHandle (h);}
   virtual void set_inheritance (HANDLE &h, int not_inheriting);
