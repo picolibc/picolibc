@@ -180,13 +180,7 @@ uinfo_init ()
 extern "C" char *
 getlogin (void)
 {
-#ifdef _MT_SAFE
-  char *this_username=_reent_winsup ()->_username;
-#else
-  static char this_username[UNLEN + 1] NO_COPY;
-#endif
-
-  return strcpy (this_username, cygheap->user.name ());
+  return strcpy (_my_tls.locals.username, cygheap->user.name ());
 }
 
 extern "C" __uid32_t

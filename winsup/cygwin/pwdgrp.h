@@ -22,6 +22,7 @@ extern struct __group32 *internal_getgrent (int);
 int internal_getgroups (int, __gid32_t *, cygpsid * = NULL);
 
 #include "sync.h"
+#include "cygtls.h"
 class pwdgrp
 {
   unsigned pwdgrp_buf_elem_size;

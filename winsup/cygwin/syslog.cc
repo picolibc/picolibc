@@ -21,6 +21,7 @@ details. */
 #include "cygerrno.h"
 #include "cygheap.h"
 #include "thread.h"
+#include "cygtls.h"
 
 /* FIXME: These should probably be in the registry. */
 /* FIXME: The Win95 path should be whatever slash is */
@@ -38,50 +39,31 @@ get_win95_event_log_path ()
   return WIN95_EVENT_LOG_PATH;
 }
 
-/* FIXME: For MT safe code these will need to be replaced */
-
-#ifdef _MT_SAFE
-#define process_ident  _reent_winsup ()->_process_ident
-#define process_logopt  _reent_winsup ()->_process_logopt
-#define process_facility  _reent_winsup ()->_process_facility
-  /* Default priority logmask */
-#define process_logmask _reent_winsup ()->_process_logmask
-#else
-static char *process_ident = 0;
-static int process_logopt = 0;
-static int process_facility = 0;
-
-/* Default priority logmask */
-static int process_logmask = LOG_UPTO (LOG_DEBUG);
-#endif
-
-/*
- * openlog: save the passed args. Don't open the
- * system log (NT) or log file (95) yet.
- */
+/* openlog: save the passed args. Don't open the
+   system log (NT) or log file (95) yet.  */
 extern "C" void
 openlog (const char *ident, int logopt, int facility)
 {
     debug_printf ("openlog called with (%s, %d, %d)",
 		       ident ? ident : "<NULL>", logopt, facility);
 
-    if (process_ident != NULL)
+    if (_my_tls.locals.process_ident != NULL)
       {
-	free (process_ident);
-	process_ident = 0;
+	free (_my_tls.locals.process_ident);
+	_my_tls.locals.process_ident = 0;
       }
     if (ident)
       {
-	process_ident = (char *) malloc (strlen (ident) + 1);
-	if (process_ident == NULL)
+	_my_tls.locals.process_ident = (char *) malloc (strlen (ident) + 1);
+	if (_my_tls.locals.process_ident == NULL)
 	  {
-	    debug_printf ("failed to allocate memory for process_ident");
+	    debug_printf ("failed to allocate memory for _my_tls.locals.process_ident");
 	    return;
 	  }
-	strcpy (process_ident, ident);
+	strcpy (_my_tls.locals.process_ident, ident);
       }
-    process_logopt = logopt;
-    process_facility = facility;
+    _my_tls.locals.process_logopt = logopt;
+    _my_tls.locals.process_facility = facility;
 }
 
 /* setlogmask: set the log priority mask and return previous mask.
@@ -90,16 +72,16 @@ int
 setlogmask (int maskpri)
 {
   if (maskpri == 0)
-    return process_logmask;
+    return _my_tls.locals.process_logmask;
 
-  int old_mask = process_logmask;
-  process_logmask = maskpri & LOG_PRIMASK;
+  int old_mask = _my_tls.locals.process_logmask;
+  _my_tls.locals.process_logmask = maskpri & LOG_PRIMASK;
 
   return old_mask;
 }
 
-/* Private class used to handle formatting of syslog message */
-/* It is named pass_handler because it does a two-pass handling of log
+/* Private class used to handle formatting of syslog message
+   It is named pass_handler because it does a two-pass handling of log
    strings.  The first pass counts the length of the string, and the second
    one builds the string. */
 
@@ -211,10 +193,10 @@ vsyslog (int priority, const char *message, va_list ap)
 {
     debug_printf ("%x %s", priority, message);
     /* If the priority fails the current mask, reject */
-    if (((priority & LOG_PRIMASK) & process_logmask) == 0)
+    if (((priority & LOG_PRIMASK) & _my_tls.locals.process_logmask) == 0)
       {
 	debug_printf ("failing message %x due to priority mask %x",
-		      priority, process_logmask);
+		      priority, _my_tls.locals.process_logmask);
 	return;
       }
 
@@ -290,12 +272,12 @@ vsyslog (int priority, const char *message, va_list ap)
 	  pass.set_message ((char *) alloca (n));
 
 	/* Deal with ident_string */
-	if (process_ident != NULL)
+	if (_my_tls.locals.process_ident != NULL)
 	  {
-	    if (pass.print ("%s : ", process_ident) == -1)
+	    if (pass.print ("%s : ", _my_tls.locals.process_ident) == -1)
 	      return;
 	  }
-	if (process_logopt & LOG_PID)
+	if (_my_tls.locals.process_logopt & LOG_PID)
 	  {
 	    if (pass.print ("PID %u : ", getpid ()) == -1)
 	      return;
@@ -353,8 +335,8 @@ vsyslog (int priority, const char *message, va_list ap)
     if (wincap.has_eventlog ())
       {
 	/* For NT, open the event log and send the message */
-	HANDLE hEventSrc = RegisterEventSourceA (NULL, (process_ident != NULL) ?
-					 process_ident : CYGWIN_LOG_NAME);
+	HANDLE hEventSrc = RegisterEventSourceA (NULL, (_my_tls.locals.process_ident != NULL) ?
+					 _my_tls.locals.process_ident : CYGWIN_LOG_NAME);
 	if (hEventSrc == NULL)
 	  {
 	    debug_printf ("RegisterEventSourceA failed with %E");

@@ -22,106 +22,16 @@ details. */
 #define WRITE_LOCK 1
 #define READ_LOCK  2
 
-extern "C"
-{
-#if defined (_CYG_THREAD_FAILSAFE) && defined (_MT_SAFE)
-  void AssertResourceOwner (int, int);
-#else
-#define AssertResourceOwner(i,ii)
-#endif
-}
-
-#ifndef _MT_SAFE
-
-#define SetResourceLock(i,n,c)
-#define ReleaseResourceLock(i,n,c)
-
-#else
-
 #include <pthread.h>
 #include <limits.h>
-#include <errno.h>
-#include <signal.h>
-#include <pwd.h>
-#include <grp.h>
 #include <security.h>
-#define _NOMNTENT_FUNCS
-#include <mntent.h>
+#include <errno.h>
 
 extern "C"
 {
-
-struct _winsup_t
-{
-  /*
-     Needed for the group functions
-   */
-  struct __group16 _grp;
-  char *_namearray[2];
-  int _grp_pos;
-
-  /* console.cc */
-  unsigned _rarg;
-
-  /* dlfcn.cc */
-  int _dl_error;
-  char _dl_buffer[256];
-
-  /* passwd.cc */
-  struct passwd _res;
-  char _pass[_PASSWORD_LEN];
-  int _pw_pos;
-
-  /* path.cc */
-  struct mntent mntbuf;
-  int _iteration;
-  DWORD available_drives;
-  char mnt_type[80];
-  char mnt_opts[80];
-  char mnt_fsname[CYG_MAX_PATH];
-  char mnt_dir[CYG_MAX_PATH];
-
-  /* strerror */
-  char _strerror_buf[20];
-
-  /* sysloc.cc */
-  char *_process_ident;
-  int _process_logopt;
-  int _process_facility;
-  int _process_logmask;
-
-  /* times.cc */
-  char timezone_buf[20];
-  struct tm _localtime_buf;
-
-  /* uinfo.cc */
-  char _username[UNLEN + 1];
-
-  /* net.cc */
-  char *_ntoa_buf;
-  struct protoent *_protoent_buf;
-  struct servent *_servent_buf;
-  struct hostent *_hostent_buf;
-};
-
-
-struct __reent_t
-{
-  struct _reent *_clib;
-  struct _winsup_t *_winsup;
-  void init_clib (_reent&);
-};
-
-_winsup_t *_reent_winsup ();
 void SetResourceLock (int, int, const char *) __attribute__ ((regparm (3)));
 void ReleaseResourceLock (int, int, const char *)
   __attribute__ ((regparm (3)));
-
-#ifdef _CYG_THREAD_FAILSAFE
-void AssertResourceOwner (int, int);
-#else
-#define AssertResourceOwner(i,ii)
-#endif
 }
 
 class fast_mutex
@@ -173,16 +83,9 @@ class pinfo;
 class ResourceLocks
 {
 public:
-  ResourceLocks ()
-  {
-  }
   LPCRITICAL_SECTION Lock (int);
   void Init ();
   void Delete ();
-#ifdef _CYG_THREAD_FAILSAFE
-  DWORD owner;
-  DWORD count;
-#endif
 private:
   CRITICAL_SECTION lock;
   bool inited;
@@ -770,36 +673,22 @@ struct MTinterface
   int concurrency;
   long int threadcount;
 
-  // Used for main thread data, and sigproc thread
-  struct __reent_t reents;
-  struct _winsup_t winsup_reent;
-
   callback *pthread_prepare;
   callback *pthread_child;
   callback *pthread_parent;
-
-  pthread_key reent_key;
-  pthread_key thread_self_key;
 
   void Init ();
   void fixup_before_fork (void);
   void fixup_after_fork (void);
 
-#if 1 // avoid initialization since zero is implied and
-      // only use of this class is static
-  MTinterface () : reent_key (NULL), thread_self_key (NULL) {}
-#else
+#if 0 // avoid initialization since zero is implied and
   MTinterface () :
     concurrency (0), threadcount (0),
-    pthread_prepare (NULL), pthread_child (NULL), pthread_parent (NULL),
-    reent_key (NULL), thread_self_key (NULL)
+    pthread_prepare (NULL), pthread_child (NULL), pthread_parent (NULL)
   {
   }
 #endif
 };
 
 #define MT_INTERFACE user_data->threadinterface
-
-#endif // MT_SAFE
-
 #endif // _CYGNUS_THREADS_

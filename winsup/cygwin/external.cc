@@ -27,6 +27,7 @@ details. */
 #include "heap.h"
 #include "cygthread.h"
 #include "pwdgrp.h"
+#include "cygtls.h"
 
 static external_pinfo *
 fillout_pinfo (pid_t pid, int winpid)

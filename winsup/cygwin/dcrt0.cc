@@ -10,6 +10,7 @@ details. */
 
 #include "winsup.h"
 #include <unistd.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include "glob.h"
 #include "exceptions.h"
@@ -89,7 +90,6 @@ extern "C"
   char ***main_environ;
   /* __progname used in getopt error message */
   char *__progname;
-  struct _reent reent_data = _REENT_INIT(reent_data);
   struct per_process __cygwin_user_data =
   {/* initial_sp */ 0, /* magic_biscuit */ 0,
    /* dll_major */ CYGWIN_VERSION_DLL_MAJOR,
@@ -110,7 +110,7 @@ extern "C"
    /* api_minor */ CYGWIN_VERSION_API_MINOR,
    /* unused2 */ {0, 0, 0, 0, 0},
    /* resourcelocks */ &_reslock, /* threadinterface */ &_mtinterf,
-   /* impure_ptr */ &reent_data,
+   /* impure_ptr */ NULL,
   };
   bool ignore_case_with_glob;
   int __declspec (dllexport) _check_for_executable = true;
@@ -136,25 +136,18 @@ do_global_dtors (void)
 static void __stdcall
 do_global_ctors (void (**in_pfunc)(), int force)
 {
-  if (!force)
-    {
-      if (user_data->forkee || user_data->run_ctors_p)
-	return;		// inherit constructed stuff from parent pid
-      user_data->run_ctors_p = 1;
-    }
+  if (!force && user_data->forkee)
+    return;		// inherit constructed stuff from parent pid
 
   /* Run ctors backwards, so skip the first entry and find how many
      there are, then run them. */
 
-  void (**pfunc)() = in_pfunc;
+  void (**pfunc) () = in_pfunc;
 
   while (*++pfunc)
     ;
   while (--pfunc > in_pfunc)
     (*pfunc) ();
-
-  if (user_data->magic_biscuit == SIZEOF_PER_PROCESS)
-    atexit (do_global_dtors);
 }
 
 /*
@@ -530,12 +523,8 @@ alloc_stack (child_info_fork *ci)
    opposed to being link-time loaded by Cygwin apps) from a non
    cygwin app via LoadLibrary.  */
 static void
-dll_crt0_1 ()
+dll_crt0_1 (char *)
 {
-  char padding[CYGTLS_PADSIZE];
-  _main_tls = &_my_tls;
-  _main_tls->init_thread (padding);
-
   /* According to onno@stack.urc.tue.nl, the exception handler record must
      be on the stack.  */
   /* FIXME: Verify forked children get their exception handler set up ok. */
@@ -556,8 +545,6 @@ dll_crt0_1 ()
      Note: this MUST be done here (before the forkee code) as the
      fork copy code doesn't copy the data in libccrt0.cc (that's why we
      pass in the per_process struct into the .dll from libccrt0). */
-
-  _impure_ptr = &reent_data;
 
   user_data->resourcelocks->Init ();
   user_data->threadinterface->Init ();
@@ -771,15 +758,16 @@ dll_crt0_1 ()
   /* Disable case-insensitive globbing */
   ignore_case_with_glob = false;
 
-  /* Flush signals and ensure that signal thread is up and running. Can't
-     do this for noncygwin case since the signal thread is blocked due to
-     LoadLibrary serialization. */
-  wait_for_sigthread ();
 
   set_errno (0);
 
   MALLOC_CHECK;
   cygbench (__progname);
+
+  /* Flush signals and ensure that signal thread is up and running. Can't
+     do this for noncygwin case since the signal thread is blocked due to
+     LoadLibrary serialization. */
+  wait_for_sigthread ();
   if (user_data->main)
     exit (user_data->main (__argc, __argv, *user_data->envptr));
 }
@@ -830,6 +818,21 @@ initial_env ()
     _cygwin_testing = 1;
 }
 
+struct _reent *
+initialize_main_tls (char *padding)
+{
+  if (!_main_tls)
+    {
+      _threadinfo::init ();
+      _main_tls = &_my_tls;
+      _main_tls->init_thread (padding);
+      _main_tls->local_clib._stdin = &_main_tls->local_clib.__sf[0];
+      _main_tls->local_clib._stdout = &_main_tls->local_clib.__sf[1];
+      _main_tls->local_clib._stderr = &_main_tls->local_clib.__sf[2];
+    }
+  return &_main_tls->local_clib;
+}
+
 /* Wrap the real one, otherwise gdb gets confused about
    two symbols with the same name, but different addresses.
 
@@ -840,7 +843,7 @@ extern "C" void __stdcall
 _dll_crt0 ()
 {
   initial_env ();
-  char zeros[sizeof (fork_info->zero)] = {0};
+  char zeros[max (CYGTLS_PADSIZE, sizeof (child_proc_info->zero))] = {0};
   static NO_COPY STARTUPINFO si;
 
   main_environ = user_data->envptr;
@@ -859,7 +862,8 @@ _dll_crt0 ()
   GetStartupInfo (&si);
   child_proc_info = (child_info *) si.lpReserved2;
   if (si.cbReserved2 < EXEC_MAGIC_SIZE || !child_proc_info
-      || memcmp (child_proc_info->zero, zeros, sizeof (zeros)) != 0)
+      || memcmp (child_proc_info->zero, zeros,
+		 sizeof (child_proc_info->zero)) != 0)
     child_proc_info = NULL;
   else
     {
@@ -901,19 +905,20 @@ _dll_crt0 ()
 	    break;
 	}
     }
-
-  _threadinfo::init ();
-  dll_crt0_1 ();
+  
+  user_data->impure_ptr = _impure_ptr = initialize_main_tls (zeros);
+  dll_crt0_1 (zeros);
 }
 
 void
 dll_crt0 (per_process *uptr)
 {
+  char padding[CYGTLS_PADSIZE];
   /* Set the local copy of the pointer into the user space. */
   if (uptr && uptr != user_data)
     {
       memcpy (user_data, uptr, per_process_overwrite);
-      *(user_data->impure_ptr_ptr) = &reent_data;
+      *(user_data->impure_ptr_ptr) = initialize_main_tls (padding);
     }
   _dll_crt0 ();
 }
@@ -937,13 +942,14 @@ cygwin_dll_init ()
   user_data->envptr = &envp;
   user_data->fmode_ptr = &_fmode;
 
-  dll_crt0_1 ();
+  dll_crt0_1 (NULL);
 }
 
 extern "C" void
 __main (void)
 {
   do_global_ctors (user_data->ctors, false);
+  atexit (do_global_dtors);
 }
 
 exit_states NO_COPY exit_state;

@@ -36,6 +36,7 @@ details. */
 #include "pinfo.h"
 #include "registry.h"
 #include "wsock_event.h"
+#include "cygtls.h"
 
 extern "C"
 {
@@ -175,22 +176,16 @@ dump_protoent (struct protoent *p)
 extern "C" char *
 cygwin_inet_ntoa (struct in_addr in)
 {
-#ifdef _MT_SAFE
-#define ntoa_buf  _reent_winsup ()->_ntoa_buf
-#else
-  static char *ntoa_buf = NULL;
-#endif
-
   char *res = inet_ntoa (in);
 
-  if (ntoa_buf)
+  if (_my_tls.locals.ntoa_buf)
     {
-      free (ntoa_buf);
-      ntoa_buf = NULL;
+      free (_my_tls.locals.ntoa_buf);
+      _my_tls.locals.ntoa_buf = NULL;
     }
   if (res)
-    ntoa_buf = strdup (res);
-  return ntoa_buf;
+    _my_tls.locals.ntoa_buf = strdup (res);
+  return _my_tls.locals.ntoa_buf;
 }
 
 /* exported as inet_addr: BSD 4.3 */
@@ -587,38 +582,34 @@ dup_ent (void *old, void *src0, struct_type type)
   return dst;
 }
 
-#ifdef _MT_SAFE
-#define protoent_buf  _reent_winsup ()->_protoent_buf
-#else
-static struct protoent *protoent_buf = NULL;
-#endif
-
 /* exported as getprotobyname: standards? */
 extern "C" struct protoent *
 cygwin_getprotobyname (const char *p)
 {
   if (check_null_str_errno (p))
     return NULL;
-  protoent_buf = (protoent *) dup_ent (protoent_buf, getprotobyname (p),
-				       is_protoent);
-  if (!protoent_buf)
+  _my_tls.locals.protoent_buf =
+    (protoent *) dup_ent (_my_tls.locals.protoent_buf, getprotobyname (p),
+			  is_protoent);
+  if (!_my_tls.locals.protoent_buf)
     set_winsock_errno ();
 
-  dump_protoent (protoent_buf);
-  return protoent_buf;
+  dump_protoent (_my_tls.locals.protoent_buf);
+  return _my_tls.locals.protoent_buf;
 }
 
 /* exported as getprotobynumber: standards? */
 extern "C" struct protoent *
 cygwin_getprotobynumber (int number)
 {
-  protoent_buf = (protoent *) dup_ent (protoent_buf, getprotobynumber (number),
-				       is_protoent);
-  if (!protoent_buf)
+  _my_tls.locals.protoent_buf =
+    (protoent *) dup_ent (_my_tls.locals.protoent_buf,
+			  getprotobynumber (number), is_protoent);
+  if (!_my_tls.locals.protoent_buf)
     set_winsock_errno ();
 
-  dump_protoent (protoent_buf);
-  return protoent_buf;
+  dump_protoent (_my_tls.locals.protoent_buf);
+  return _my_tls.locals.protoent_buf;
 }
 
 bool
@@ -936,12 +927,6 @@ cygwin_connect (int fd, const struct sockaddr *name, int namelen)
   return res;
 }
 
-#ifdef _MT_SAFE
-#define servent_buf  _reent_winsup ()->_servent_buf
-#else
-static struct servent *servent_buf = NULL;
-#endif
-
 /* exported as getservbyname: standards? */
 extern "C" struct servent *
 cygwin_getservbyname (const char *name, const char *proto)
@@ -951,13 +936,13 @@ cygwin_getservbyname (const char *name, const char *proto)
       || (proto != NULL && check_null_str_errno (proto)))
     return NULL;
 
-  servent_buf = (servent *) dup_ent (servent_buf, getservbyname (name, proto),
+  _my_tls.locals.servent_buf = (servent *) dup_ent (_my_tls.locals.servent_buf, getservbyname (name, proto),
 				     is_servent);
-  if (!servent_buf)
+  if (!_my_tls.locals.servent_buf)
     set_winsock_errno ();
 
-  syscall_printf ("%x = getservbyname (%s, %s)", servent_buf, name, proto);
-  return servent_buf;
+  syscall_printf ("%x = getservbyname (%s, %s)", _my_tls.locals.servent_buf, name, proto);
+  return _my_tls.locals.servent_buf;
 }
 
 /* exported as getservbyport: standards? */
@@ -968,13 +953,13 @@ cygwin_getservbyport (int port, const char *proto)
   if (proto != NULL && check_null_str_errno (proto))
     return NULL;
 
-  servent_buf = (servent *) dup_ent (servent_buf, getservbyport (port, proto),
+  _my_tls.locals.servent_buf = (servent *) dup_ent (_my_tls.locals.servent_buf, getservbyport (port, proto),
 				     is_servent);
-  if (!servent_buf)
+  if (!_my_tls.locals.servent_buf)
     set_winsock_errno ();
 
-  syscall_printf ("%x = getservbyport (%d, %s)", servent_buf, port, proto);
-  return servent_buf;
+  syscall_printf ("%x = getservbyport (%d, %s)", _my_tls.locals.servent_buf, port, proto);
+  return _my_tls.locals.servent_buf;
 }
 
 extern "C" int
@@ -998,12 +983,6 @@ cygwin_gethostname (char *name, size_t len)
   h_errno = 0;
   return 0;
 }
-
-#ifdef _MT_SAFE
-#define hostent_buf  _reent_winsup ()->_hostent_buf
-#else
-static struct hostent *hostent_buf = NULL;
-#endif
 
 /* exported as gethostbyname: standards? */
 extern "C" struct hostent *
@@ -1036,19 +1015,19 @@ cygwin_gethostbyname (const char *name)
       return &tmp;
     }
 
-  hostent_buf = (hostent *) dup_ent (hostent_buf, gethostbyname (name),
+  _my_tls.locals.hostent_buf = (hostent *) dup_ent (_my_tls.locals.hostent_buf, gethostbyname (name),
 				     is_hostent);
-  if (!hostent_buf)
+  if (!_my_tls.locals.hostent_buf)
     {
       set_winsock_errno ();
       set_host_errno ();
     }
   else
     {
-      debug_printf ("h_name %s", hostent_buf->h_name);
+      debug_printf ("h_name %s", _my_tls.locals.hostent_buf->h_name);
       h_errno = 0;
     }
-  return hostent_buf;
+  return _my_tls.locals.hostent_buf;
 }
 
 /* exported as gethostbyaddr: standards? */
@@ -1059,20 +1038,20 @@ cygwin_gethostbyaddr (const char *addr, int len, int type)
   if (__check_invalid_read_ptr_errno (addr, len))
     return NULL;
 
-  hostent_buf = (hostent *) dup_ent (hostent_buf,
+  _my_tls.locals.hostent_buf = (hostent *) dup_ent (_my_tls.locals.hostent_buf,
 				     gethostbyaddr (addr, len, type),
 				     is_hostent);
-  if (!hostent_buf)
+  if (!_my_tls.locals.hostent_buf)
     {
       set_winsock_errno ();
       set_host_errno ();
     }
   else
     {
-      debug_printf ("h_name %s", hostent_buf->h_name);
+      debug_printf ("h_name %s", _my_tls.locals.hostent_buf->h_name);
       h_errno = 0;
     }
-  return hostent_buf;
+  return _my_tls.locals.hostent_buf;
 }
 
 /* exported as accept: standards? */

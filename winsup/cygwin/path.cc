@@ -72,15 +72,8 @@ details. */
 #include "cygheap.h"
 #include "shared_info.h"
 #include "registry.h"
+#include "cygtls.h"
 #include <assert.h>
-
-#ifdef _MT_SAFE
-#define iteration _reent_winsup ()->_iteration
-#define available_drives _reent_winsup ()->available_drives
-#else
-static int iteration;
-static DWORD available_drives;
-#endif
 
 static int normalize_win32_path (const char *src, char *dst);
 static void slashify (const char *src, char *dst, int trailing_slash_p);
@@ -1235,7 +1228,7 @@ void
 mount_item::fnmunge (char *dst, const char *src)
 {
   int name_type;
-  if (!(flags & MOUNT_ENC) || !(name_type = special_name (src)))
+  if (!(name_type = special_name (src)))
     strcpy (dst, src);
   else
     {
@@ -1286,7 +1279,25 @@ mount_item::build_win32 (char *dst, const char *src, unsigned *outflags, unsigne
     /* nothing */;
   else if ((!(flags & MOUNT_ENC) && isdrive (dst) && !dst[2]) || *p)
     dst[n++] = '\\';
-  fnmunge (dst + n, p);
+  if (!*p || !(flags & MOUNT_ENC))
+    strcpy (dst + n, p);
+  else
+    while (*p)
+      {
+	char slash = 0;
+	char *s = strchr (p + 1, '/');
+	if (s)
+	  {
+	    slash = *s;
+	    *s = '\0';
+	  }
+	fnmunge (dst += n, p);
+	if (!s)
+	  break;
+	n = strlen (dst);
+	*s = slash;
+	p = s;
+      }
 }
 
 /* conv_to_win32_path: Ensure src_path is a pure Win32 path and store
@@ -2234,18 +2245,14 @@ mount_info::del_item (const char *path, unsigned flags, int reg_p)
 static mntent *
 fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
 {
-#ifdef _MT_SAFE
-  struct mntent &ret=_reent_winsup ()->mntbuf;
-#else
-  static NO_COPY struct mntent ret;
-#endif
+  struct mntent& ret=_my_tls.locals.mntbuf;
 
   /* Remove drivenum from list if we see a x: style path */
   if (strlen (native_path) == 2 && native_path[1] == ':')
     {
       int drivenum = cyg_tolower (native_path[0]) - 'a';
       if (drivenum >= 0 && drivenum <= 31)
-	available_drives &= ~(1 << drivenum);
+	_my_tls.locals.available_drives &= ~(1 << drivenum);
     }
 
   /* Pass back pointers to mount_table strings reserved for use by
@@ -2253,40 +2260,39 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
      table because the mount table might change, causing weird effects
      from the getmntent user's point of view. */
 
-  strcpy (_reent_winsup ()->mnt_fsname, native_path);
-  ret.mnt_fsname = _reent_winsup ()->mnt_fsname;
-  strcpy (_reent_winsup ()->mnt_dir, posix_path);
-  ret.mnt_dir = _reent_winsup ()->mnt_dir;
+  strcpy (_my_tls.locals.mnt_fsname, native_path);
+  ret.mnt_fsname = _my_tls.locals.mnt_fsname;
+  strcpy (_my_tls.locals.mnt_dir, posix_path);
+  ret.mnt_dir = _my_tls.locals.mnt_dir;
 
   if (!(flags & MOUNT_SYSTEM))		/* user mount */
-    strcpy (_reent_winsup ()->mnt_type, (char *) "user");
+    strcpy (_my_tls.locals.mnt_type, (char *) "user");
   else					/* system mount */
-    strcpy (_reent_winsup ()->mnt_type, (char *) "system");
+    strcpy (_my_tls.locals.mnt_type, (char *) "system");
 
-  ret.mnt_type = _reent_winsup ()->mnt_type;
+  ret.mnt_type = _my_tls.locals.mnt_type;
 
   /* mnt_opts is a string that details mount params such as
      binary or textmode, or exec.  We don't print
      `silent' here; it's a magic internal thing. */
 
   if (!(flags & MOUNT_BINARY))
-    strcpy (_reent_winsup ()->mnt_opts, (char *) "textmode");
+    strcpy (_my_tls.locals.mnt_opts, (char *) "textmode");
   else
-    strcpy (_reent_winsup ()->mnt_opts, (char *) "binmode");
+    strcpy (_my_tls.locals.mnt_opts, (char *) "binmode");
 
   if (flags & MOUNT_CYGWIN_EXEC)
-    strcat (_reent_winsup ()->mnt_opts, (char *) ",cygexec");
+    strcat (_my_tls.locals.mnt_opts, (char *) ",cygexec");
   else if (flags & MOUNT_EXEC)
-    strcat (_reent_winsup ()->mnt_opts, (char *) ",exec");
+    strcat (_my_tls.locals.mnt_opts, (char *) ",exec");
   else if (flags & MOUNT_NOTEXEC)
-    strcat (_reent_winsup ()->mnt_opts, (char *) ",noexec");
+    strcat (_my_tls.locals.mnt_opts, (char *) ",noexec");
   if (flags & MOUNT_ENC)
-    strcat (_reent_winsup ()->mnt_opts, ",managed");
+    strcat (_my_tls.locals.mnt_opts, ",managed");
 
   if ((flags & MOUNT_CYGDRIVE))		/* cygdrive */
-    strcat (_reent_winsup ()->mnt_opts, (char *) ",noumount");
-
-  ret.mnt_opts = _reent_winsup ()->mnt_opts;
+    strcat (_my_tls.locals.mnt_opts, (char *) ",noumount");
+  ret.mnt_opts = _my_tls.locals.mnt_opts;
 
   ret.mnt_freq = 1;
   ret.mnt_passno = 1;
@@ -2307,16 +2313,16 @@ cygdrive_getmntent ()
   DWORD mask = 1, drive = 'a';
   struct mntent *ret = NULL;
 
-  while (available_drives)
+  while (_my_tls.locals.available_drives)
     {
       for (/* nothing */; drive <= 'z'; mask <<= 1, drive++)
-	if (available_drives & mask)
+	if (_my_tls.locals.available_drives & mask)
 	  break;
 
       __small_sprintf (native_path, "%c:\\", drive);
       if (GetFileAttributes (native_path) == INVALID_FILE_ATTRIBUTES)
 	{
-	  available_drives &= ~mask;
+	  _my_tls.locals.available_drives &= ~mask;
 	  continue;
 	}
       native_path[2] = '\0';
@@ -2425,15 +2431,15 @@ cygwin_umount (const char *path, unsigned flags)
 extern "C" FILE *
 setmntent (const char *filep, const char *)
 {
-  iteration = 0;
-  available_drives = GetLogicalDrives ();
+  _my_tls.locals.iteration = 0;
+  _my_tls.locals.available_drives = GetLogicalDrives ();
   return (FILE *) filep;
 }
 
 extern "C" struct mntent *
 getmntent (FILE *)
 {
-  return mount_table->getmntent (iteration++);
+  return mount_table->getmntent (_my_tls.locals.iteration++);
 }
 
 extern "C" int

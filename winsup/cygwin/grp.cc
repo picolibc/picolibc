@@ -24,9 +24,7 @@ details. */
 #include "cygerrno.h"
 #include "cygheap.h"
 #include "pwdgrp.h"
-
-/* Position in the group cache */
-#define grp_pos _reent_winsup ()->_grp_pos
+#include "cygtls.h"
 
 static __group32 *group_buf;
 static pwdgrp gr (group_buf);
@@ -208,16 +206,16 @@ getgrnam (const char *name)
 extern "C" void
 endgrent ()
 {
-  grp_pos = 0;
+  _my_tls.locals.grp_pos = 0;
 }
 
 extern "C" struct __group32 *
 getgrent32 ()
 {
-  if (grp_pos == 0)
+  if (_my_tls.locals.grp_pos == 0)
     gr.refresh (true);
-  if (grp_pos < gr.curr_lines)
-    return group_buf + grp_pos++;
+  if (_my_tls.locals.grp_pos < gr.curr_lines)
+    return group_buf + _my_tls.locals.grp_pos++;
 
   return NULL;
 }
@@ -233,7 +231,7 @@ getgrent ()
 extern "C" void
 setgrent ()
 {
-  grp_pos = 0;
+  _my_tls.locals.grp_pos = 0;
 }
 
 /* Internal function. ONLY USE THIS INTERNALLY, NEVER `getgrent'!!! */

@@ -263,7 +263,8 @@ fork_child (HANDLE& hParent, dll *&first_dll, bool& load_dlls)
   if (fork_info->stacksize)
     {
       _main_tls = &_my_tls;
-      _my_tls.init_thread (NULL);
+      _main_tls->init_thread (NULL);
+      // memcpy (&_main_tls->local_clib, _impure_ptr, sizeof (*_main_tls->local_lib));
     }
 
   set_file_api_mode (current_codepage);
@@ -553,13 +554,22 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
 
 
   MALLOC_CHECK;
+  void *impure_beg;
+  void *impure_end;
+  if (&_my_tls == _main_tls)
+    impure_beg = impure_end = NULL;
+  else
+    {
+      impure_beg = _impure_ptr;
+      impure_end = _impure_ptr + 1;
+    }
   rc = fork_copy (pi, "user/cygwin data",
 		  user_data->data_start, user_data->data_end,
 		  user_data->bss_start, user_data->bss_end,
 		  cygheap->user_heap.base, cygheap->user_heap.ptr,
 		  stack_here, ch.stackbottom,
 		  dll_data_start, dll_data_end,
-		  dll_bss_start, dll_bss_end, NULL);
+		  dll_bss_start, dll_bss_end, impure_beg, impure_end, NULL);
 
   __malloc_unlock ();
   MALLOC_CHECK;

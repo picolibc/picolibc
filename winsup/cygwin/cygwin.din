@@ -24,7 +24,6 @@ opterr DATA
 optind DATA
 optopt DATA
 optreset DATA
-reent_data DATA
 _alloca NOSIGFE
 dll_entry@12 NOSIGFE
 __assert SIGFE

@@ -1,4 +1,74 @@
-2003-12-17  Christopher Faylor  <cgf@redhat.com>
+2003-12-23  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (set_signal_mask): Redefine to not pass by address.
+	Report calculated mask in debugging output.
+	* sigproc.h (set_signal_mask): Reflect above change in declaration.
+
+2003-12-22  Christopher Faylor  <cgf@redhat.com>
+
+	* path.cc (mount_item::build_win32): Take path apart before feeding it
+	to fnmunge.
+
+2003-12-21  Christopher Faylor  <cgf@redhat.com>
+
+	Throughout, change use of _reent_winsup()-> to _my_tls.locals.
+	instead.
+	Throughout, remove obsolete MT_SAFE/_CYG_THREAD_FAILSAFE considerations.
+	Througout, add cygtls.h include.
+	* Makefile.in (DLL_OFILES): Add cygtls.o.  Add some more objects to the
+	-fomit-frame-pointer list.
+	* acconfig.h: Remove obsolete settings.
+	* config.h.in: Ditto.
+	* bsdlib.cc: Add cygtls.h include.
+	* configure.in: Remove --enable-extra-threadsafe-checking.
+	* configure: Regenerate.
+	* cygtls.h (_local_storage): New struct renamed from _winsup_t (sic).
+	(_threadinfo:local_clib): Add new field.
+	(_threadinfo::locals): Ditto.
+	(_threadinfo::init_thread): Accept second _reent * argument.
+	(_threadinfo::call): Define as regparm.
+	(CYGTLS_PADSIZE): Remove unnecessary slop.
+	(_getreent): Define as a macro.
+	* thread.h: Remove _CYG_THREAD_FAILSAFE and MT_SAFE stuff.
+	(_winsup_t): Move to cygtls.h.
+	(ResourceLocks::ResourceLocks): Eliminate empty constructor.
+	(MTinterface::reents): Eliminate.
+	(MTinterface::thread_self_key): Eliminate.
+	(MTinterface::MTinterface): Eliminate.
+	* dcrt0.cc: Include stdio.h for _impure_ptr initialization.
+	(do_global_ctors): Remove run_ctors_p (sic) considerations.  Don't call
+	atexit here.
+	(__main): Initialize destructors for user here.
+	(dll_crt0_1): Accept a dummy argument.  Don't call init_thread here.
+	Don't set _impure_ptr here.  Call do_global_ctors after more things
+	have been initialized.
+	(_dll_crt0): Define zeros buffer as max of needed size of
+	CYGTLS_PADSIZE so that it can be used for two purposes while minimizing
+	stack usage.  Initialize _impure_ptr specifically, for speed.  Call
+	dll_crt0_1 with buffer argument.
+	(cygwin_dll_init): Call dll_crt0_1 with dummy argument.
+	* dtable.cc (dtable::find_unused_handle): Remove call to
+	AssertResourceOwner.
+	* exceptions.cc: Move _threadinfo stuff to new file.
+	* cygtls.cc: New file.
+	* gentls_offsets: Accommodate increasing complexity of cygtls.h.
+	* hires.h (hires_base::~hires_base): Remove.
+	* init.cc (dll_entry): Remove setting of reents.
+	* thread.cc: Remove syslog.h include.
+	(__getreent): Simplify to use _my_tls.
+	(_reent_winsup): Delete.
+	(AssertResourceOwner): Delete.
+	(MTinterface::Init): Remove setting of _clib and _winsup, with all that
+	entails.
+	(MTinterface::fixup_after_fork): Ditto.
+	(pthread::thread_init_wrapper): Ditto.  Also remove call to
+	set_tls_self_pointer.
+	(pthread::set_tls_self_pointer): Eliminate.
+	(pthread::get_tls_self_pointer): Just return _my_tls.tid;
+	(__reent_t::init_clib): Eliminate.
+	* tlsoffsets.h: Regenerate.
+
+2003-12-17 Christopher Faylor <cgf@redhat.com>
 
 	* sigproc.cc (proc_subproc): Simplify code to just remove all zombies
 	if SIGCHLD == SIG_IGN.

@@ -15,6 +15,7 @@ details. */
 #include <stdio.h>
 #include "cygerrno.h"
 #include "thread.h"
+#include "cygtls.h"
 #undef _sys_nerr
 #undef sys_nerr
 #undef _sys_errlist
@@ -681,13 +682,8 @@ strerror (int errnum)
       error = "Value too large for defined data type";
       break;
     default:
-#ifdef _MT_SAFE
-      char *buf= _reent_winsup ()->_strerror_buf;
-#else
-      static NO_COPY char buf[20];
-#endif
-      __small_sprintf (buf, "error %d", errnum);
-      error = buf;
+      __small_sprintf (_my_tls.locals.strerror_buf, "error %d", errnum);
+      error = _my_tls.locals.strerror_buf;
       break;
     }
 

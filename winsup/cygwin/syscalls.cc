@@ -319,7 +319,9 @@ setsid (void)
       /* assuming that fork was successful */
     }
 
-  if (myself->pgid != myself->pid)
+  if (myself->pgid == myself->pid)
+    syscall_printf ("hmm.  pgid %d pid %d", myself->pgid, myself->pid);
+  else
     {
       if (myself->ctty >= 0 && fhandler_console::open_fhs <= 0)
 	{

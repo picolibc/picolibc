@@ -51,14 +51,13 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
   switch (reason)
     {
     case DLL_PROCESS_ATTACH:
-      _my_tls.stackptr = _my_tls.stack;
       dynamically_loaded = (static_load == NULL);
+      __cygwin_user_data.impure_ptr = &_my_tls.local_clib;
+      _my_tls.stackptr = _my_tls.stack;
       break;
     case DLL_PROCESS_DETACH:
       break;
     case DLL_THREAD_ATTACH:
-      if (MT_INTERFACE->reent_key.set (&MT_INTERFACE->reents))
-	    api_fatal ("thread initialization failed");
       munge_threadfunc (h);
       break;
     }

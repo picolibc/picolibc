@@ -40,6 +40,8 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include "cygerrno.h"
+#include "thread.h"
+#include "cygtls.h"
 
 extern "C" int
 daemon (int nochdir, int noclose)

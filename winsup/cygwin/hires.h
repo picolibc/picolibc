@@ -27,7 +27,6 @@ class hires_base
   int inited;
  public:
   virtual LONGLONG usecs (bool justdelta) {return 0LL;}
-  virtual ~hires_base () {}
 };
 
 class hires_us : hires_base

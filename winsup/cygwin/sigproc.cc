@@ -588,8 +588,17 @@ int __stdcall
 sig_dispatch_pending ()
 {
   if (exit_state || GetCurrentThreadId () == sigtid || !sigqueue.start.next)
-    return 0;
+    {
+#ifdef DEBUGGING
+      sigproc_printf ("exit_state %d, GetCurrentThreadId () %p, sigtid %p, sigqueue.start.next %p",
+		      exit_state, GetCurrentThreadId (), sigtid, sigqueue.start.next);
+#endif
+      return 0;
+    }
 
+#ifdef DEBUGGING
+  sigproc_printf ("flushing");
+#endif
   (void) sig_send (myself, __SIGFLUSH);
   return call_signal_handler_now ();
 }
@@ -1155,8 +1164,15 @@ wait_sig (VOID *self)
 	    sig_clear (-pack.sig);
 	  else
 	    {
-	      if (sig_handle (pack.sig, *pack.mask, pack.pid, pack.tls) <= 0)
-		sigqueue.add (pack.sig, pack.pid, pack.tls);// FIXME: Shouldn't add this in !sh condition
+	      int sigres = sig_handle (pack.sig, *pack.mask, pack.pid, pack.tls);
+	      if (sigres <= 0)
+		{
+#ifdef DEBUGGING
+		  if (!sigres)
+		    system_printf ("Failed to arm signal %d from pid %d");
+#endif
+		  sigqueue.add (pack.sig, pack.pid, pack.tls);// FIXME: Shouldn't add this in !sh condition
+		}
 	      if (pack.sig == SIGCHLD)
 		proc_subproc (PROC_CLEARWAIT, 0);
 	    }

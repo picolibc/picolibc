@@ -34,7 +34,6 @@ details. */
 #include "cygerrno.h"
 #include <assert.h>
 #include <stdlib.h>
-#include <syslog.h>
 #include "pinfo.h"
 #include "sigproc.h"
 #include "perprocess.h"
@@ -48,112 +47,36 @@ details. */
 
 extern int threadsafe;
 
+#undef __getreent
 extern "C" struct _reent *
 __getreent ()
 {
-  struct __reent_t *_r =
-    (struct __reent_t *) MT_INTERFACE->reent_key.get ();
-
-  if (_r == 0)
-    {
-#ifdef _CYG_THREAD_FAILSAFE
-      system_printf ("local thread storage not inited");
-#endif
-      /* Return _impure_ptr as long as MTinterface is not initialized */
-      return _impure_ptr;
-    }
-
-  return _r->_clib;
-}
-
-struct _winsup_t *
-_reent_winsup ()
-{
-  struct __reent_t *_r =
-    (struct __reent_t *) MT_INTERFACE->reent_key.get ();
-
-  if (_r == 0)
-    {
-#ifdef _CYG_THREAD_FAILSAFE
-      system_printf ("local thread storage not inited");
-#endif
-      return NULL;
-    }
-
-  return _r->_winsup;
+  return &_my_tls.local_clib;
 }
 
 inline LPCRITICAL_SECTION
 ResourceLocks::Lock (int _resid)
 {
-#ifdef _CYG_THREAD_FAILSAFE
-  if (!inited)
-    system_printf ("lock called before initialization");
-
-  thread_printf
-    ("Get Resource lock %d ==> %p for %p , real : %d , threadid %d ", _resid,
-     &lock, user_data, myself->pid, GetCurrentThreadId ());
-#endif
   return &lock;
 }
 
 void
 SetResourceLock (int _res_id, int _mode, const char *_function)
 {
-#ifdef _CYG_THREAD_FAILSAFE
-  thread_printf ("Set resource lock %d mode %d for %s start",
-		 _res_id, _mode, _function);
-#endif
   EnterCriticalSection (user_data->resourcelocks->Lock (_res_id));
-
-#ifdef _CYG_THREAD_FAILSAFE
-  user_data->resourcelocks->owner = GetCurrentThreadId ();
-  user_data->resourcelocks->count++;
-#endif
 }
 
 void
 ReleaseResourceLock (int _res_id, int _mode, const char *_function)
 {
-#ifdef _CYG_THREAD_FAILSAFE
-  thread_printf ("Release resource lock %d mode %d for %s done", _res_id,
-		 _mode, _function);
-
-  AssertResourceOwner (_res_id, _mode);
-  user_data->resourcelocks->count--;
-  if (user_data->resourcelocks->count == 0)
-    user_data->resourcelocks->owner = 0;
-#endif
-
   LeaveCriticalSection (user_data->resourcelocks->Lock (_res_id));
 }
-
-#ifdef _CYG_THREAD_FAILSAFE
-void
-AssertResourceOwner (int _res_id, int _mode)
-{
-
-  thread_printf
-    ("Assert Resource lock %d ==> for %p , real : %d , threadid %d count %d owner %d",
-     _res_id, user_data, myself->pid, GetCurrentThreadId (),
-     user_data->resourcelocks->count, user_data->resourcelocks->owner);
-  if (user_data && (user_data->resourcelocks->owner != GetCurrentThreadId ()))
-    system_printf ("assertion failed, not the resource owner");
-}
-
-#endif
 
 void
 ResourceLocks::Init ()
 {
   InitializeCriticalSection (&lock);
   inited = true;
-
-#ifdef _CYG_THREAD_FAILSAFE
-  owner = 0;
-  count = 0;
-#endif
-
   thread_printf ("lock %p inited by %p , %d", &lock, user_data, myself->pid);
 }
 
@@ -171,11 +94,6 @@ ResourceLocks::Delete ()
 void
 MTinterface::Init ()
 {
-  reents._clib = _impure_ptr;
-  reents._winsup = &winsup_reent;
-  winsup_reent._process_logmask = LOG_UPTO (LOG_DEBUG);
-  reent_key.set (&reents);
-
   pthread_mutex::init_mutex ();
   pthread_cond::init_mutex ();
   pthread_rwlock::init_mutex ();
@@ -192,14 +110,6 @@ void
 MTinterface::fixup_after_fork (void)
 {
   pthread_key::fixup_after_fork ();
-
-  /* As long as the signal handling not multithreaded
-     switch reents storage back to _impure_ptr for the mainthread
-     to support fork from threads other than the mainthread */
-  reents._clib = _impure_ptr;
-  reents._winsup = &winsup_reent;
-  winsup_reent._process_logmask = LOG_UPTO (LOG_DEBUG);
-  reent_key.set (&reents);
 
   threadcount = 0;
   pthread::init_mainthread ();
@@ -232,7 +142,6 @@ pthread::init_mainthread ()
 			GetCurrentProcess (), &thread->win32_obj_id,
 			0, FALSE, DUPLICATE_SAME_ACCESS))
     api_fatal ("failed to create mainthread handle");
-  thread->set_tls_self_pointer ();
   if (!thread->create_cancel_event ())
     api_fatal ("couldn't create cancel event for main thread");
   thread->postcreate ();
@@ -247,19 +156,11 @@ pthread::self ()
   return pthread_null::get_null_pthread ();
 }
 
-void
-pthread::set_tls_self_pointer ()
-{
-  MT_INTERFACE->thread_self_key.set (this);
-}
-
 pthread *
 pthread::get_tls_self_pointer ()
 {
-  return (pthread *) MT_INTERFACE->thread_self_key.get ();
+  return _my_tls.tid;
 }
-
-
 
 List<pthread> pthread::threads;
 
@@ -1876,18 +1777,6 @@ verifyable_object_isvalid (void const * objectptr, long magic)
   return verifyable_object_isvalid (objectptr, magic, NULL);
 }
 
-inline void
-__reent_t::init_clib (struct _reent& var)
-{
-  var = ((struct _reent) _REENT_INIT (var));
-  var._stdin = _GLOBAL_REENT->_stdin;
-  var._stdout = _GLOBAL_REENT->_stdout;
-  var._stderr = _GLOBAL_REENT->_stderr;
-  var.__sdidinit = _GLOBAL_REENT->__sdidinit;
-  var.__cleanup = _GLOBAL_REENT->__cleanup;
-  _clib = &var;
-};
-
 DWORD WINAPI
 pthread::thread_init_wrapper (void *arg)
 {
@@ -1897,32 +1786,14 @@ pthread::thread_init_wrapper (void *arg)
   exception_list cygwin_except_entry;
   init_exceptions (&cygwin_except_entry); /* Initialize SIGSEGV handling, etc. */
 
-  thread->set_tls_self_pointer ();
-  struct __reent_t local_reent;
-  struct _winsup_t local_winsup;
-  struct _reent local_clib;
-
-  memset (&local_winsup, 0, sizeof (struct _winsup_t));
-
-  local_reent.init_clib (local_clib);
-  local_reent._winsup = &local_winsup;
-
-  local_winsup._process_logmask = LOG_UPTO (LOG_DEBUG);
-
-  MT_INTERFACE->reent_key.set (&local_reent);
-
   thread->mutex.lock ();
+
   // if thread is detached force cleanup on exit
   if (thread->attr.joinable == PTHREAD_CREATE_DETACHED && thread->joiner == NULL)
     thread->joiner = thread;
   thread->mutex.unlock ();
 
-#ifdef _CYG_THREAD_FAILSAFE
-  if (_REENT == _impure_ptr)
-    system_printf ("local storage for thread isn't setup correctly");
-#endif
-
-  thread_printf ("started thread %p %p %p %p %p %p", arg, &local_clib,
+  thread_printf ("started thread %p %p %p %p %p %p", arg, &_my_tls.local_clib,
 		 _impure_ptr, thread, thread->function, thread->arg);
 
   // call the user's thread
@@ -2394,7 +2265,7 @@ pthread_getschedparam (pthread_t thread, int *policy,
   return 0;
 }
 
-/* Thread SpecificData */
+/* Thread Specific Data */
 extern "C" int
 pthread_key_create (pthread_key_t *key, void (*destructor) (void *))
 {

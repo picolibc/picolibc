@@ -118,9 +118,9 @@ DLL_IMPORTS:=$(w32api_lib)/libkernel32.a
 MT_SAFE_OBJECTS:=
 # Please maintain this list in sorted order, with maximum files per 80 col line
 #
-DLL_OFILES:=assert.o autoload.o bsdlib.o cxx.o cygheap.o cygthread.o dcrt0.o \
-	debug.o delqueue.o devices.o dir.o dlfcn.o dll_init.o dtable.o environ.o \
-	errno.o exceptions.o exec.o external.o fcntl.o fhandler.o \
+DLL_OFILES:=assert.o autoload.o bsdlib.o cxx.o cygheap.o cygthread.o cygtls.o \
+	dcrt0.o debug.o delqueue.o devices.o dir.o dlfcn.o dll_init.o dtable.o \
+	environ.o errno.o exceptions.o exec.o external.o fcntl.o fhandler.o \
 	fhandler_clipboard.o fhandler_console.o fhandler_disk_file.o \
 	fhandler_dsp.o fhandler_fifo.o fhandler_floppy.o fhandler_mem.o \
 	fhandler_nodevice.o fhandler_proc.o fhandler_process.o \
@@ -219,12 +219,11 @@ TARGET_LIBS:=$(LIB_NAME) $(CYGWIN_START) $(GMON_START) $(LIBGMON_A) $(SUBLIBS) $
 
 ifneq "${filter -O%,$(CFLAGS)}" ""
 cygheap_CFLAGS:=-fomit-frame-pointer
-devices_CFLAGS:=-fomit-frame-pointer -Os
-malloc_CFLAGS:=-fomit-frame-pointer
-malloc_wrapper_CFLAGS:=-fomit-frame-pointer
-shared_CFLAGS:=-fomit-frame-pointer
 cygthread_CFLAGS:=-fomit-frame-pointer
-miscfuncs_CFLAGS:=-fomit-frame-pointer
+cygtls_CFLAGS:=-fomit-frame-pointer
+devices_CFLAGS:=-fomit-frame-pointer -Os
+dir_CFLAGS:=-fomit-frame-pointer
+fcntl_CFLAGS:=-fomit-frame-pointer
 fhandler_CFLAGS:=-fomit-frame-pointer
 fhandler_clipboard_CFLAGS:=-fomit-frame-pointer
 fhandler_console_CFLAGS:=-fomit-frame-pointer
@@ -239,16 +238,22 @@ fhandler_raw_CFLAGS:=-fomit-frame-pointer
 fhandler_registry_CFLAGS:=-fomit-frame-pointer
 fhandler_serial_CFLAGS:=-fomit-frame-pointer
 fhandler_socket_CFLAGS:=-fomit-frame-pointer
+fhandler_syslog_CFLAGS:=-fomit-frame-pointer
 fhandler_tape_CFLAGS:=-fomit-frame-pointer
 fhandler_termios_CFLAGS:=-fomit-frame-pointer
 fhandler_tty_CFLAGS:=-fomit-frame-pointer
 fhandler_virtual_CFLAGS:=-fomit-frame-pointer
 fhandler_windows_CFLAGS:=-fomit-frame-pointer
 fhandler_zero_CFLAGS:=-fomit-frame-pointer
+malloc_CFLAGS:=-fomit-frame-pointer
+malloc_wrapper_CFLAGS:=-fomit-frame-pointer
+miscfuncs_CFLAGS:=-fomit-frame-pointer
 regcomp_CFLAGS=-fomit-frame-pointer
 regerror_CFLAGS=-fomit-frame-pointer
 regexec_CFLAGS=-fomit-frame-pointer
 regfree_CFLAGS=-fomit-frame-pointer
+shared_CFLAGS:=-fomit-frame-pointer
+smallprint_CFLAGS:=-fomit-frame-pointer
 endif
 
 .PHONY: all force dll_ofiles install all_target install_target all_host install_host \

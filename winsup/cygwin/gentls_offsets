@@ -6,7 +6,11 @@ my $struct = '';
 my @fields = ();
 my $def = '';
 my $tls = join('', <TLS>);
-$tls =~ s/\A.*?gentls_offsets[^\n]*\n//os;
+$tls =~ s/\n[^\n]*gentls_offsets[^\n]*\n(.+)\Z/$1/os;
+my $pre = $`;
+substr($tls, 0, length($pre)) = '';
+$pre =~ s/\n#ifndef _[^\n]+\n/\n/os;
+$pre .= "\n//*/";
 $tls =~ s%/\*\s*gentls_offsets.*?/\*\s*gentls_offsets\s*\*/%%ogs;
 foreach ($tls =~ /^.*\n/mg) {
     $def .= $_ if $struct;
@@ -32,11 +36,13 @@ foreach ($tls =~ /^.*\n/mg) {
 close TLS;
 open(TMP, '>', "/tmp/$$.cc") or die "$0: couldn't open temporary index file \"/tmp/$$.c\" - $!\n";
 print TMP <<EOF;
+#define __INSIDE_CYGWIN__
 #define __attribute__(X)
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
 typedef void *HANDLE;
+$pre
 $def
 int
 main(int argc, char **argv)

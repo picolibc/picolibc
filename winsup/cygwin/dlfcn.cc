@@ -21,15 +21,13 @@ details. */
 #include "dlfcn.h"
 #include "dll_init.h"
 #include "cygerrno.h"
-
-#define _dl_error _reent_winsup ()->_dl_error
-#define _dl_buffer _reent_winsup ()->_dl_buffer
+#include "cygtls.h"
 
 static void __stdcall
 set_dl_error (const char *str)
 {
-  __small_sprintf (_dl_buffer, "%s: %E", str);
-  _dl_error = 1;
+  __small_sprintf (_my_tls.locals.dl_buffer, "%s: %E", str);
+  _my_tls.locals.dl_error = 1;
 }
 
 /* Look for an executable file given the name and the environment
@@ -145,12 +143,12 @@ char *
 dlerror ()
 {
   char *res;
-  if (!_dl_error)
+  if (!_my_tls.locals.dl_error)
     res = NULL;
   else
     {
-      _dl_error = 0;
-      res = _dl_buffer;
+      _my_tls.locals.dl_error = 0;
+      res = _my_tls.locals.dl_buffer;
     }
   return res;
 }

@@ -21,6 +21,7 @@ details. */
 #include "fhandler.h"
 #include "pinfo.h"
 #include "hires.h"
+#include "cygtls.h"
 
 #define FACTOR (0x19db1ded53e8000LL)
 #define NSPERSEC 10000000LL
@@ -118,11 +119,7 @@ settimeofday (const struct timeval *tv, const struct timezone *tz)
 extern "C" char *
 timezone ()
 {
-#ifdef _MT_SAFE
-  char *b=_reent_winsup ()->timezone_buf;
-#else
-  static NO_COPY char b[20] = {0};
-#endif
+  char *b = _my_tls.locals.timezone_buf;
 
   tzset ();
   __small_sprintf (b,"GMT%+d:%02d", (int) (-_timezone / 3600), (int) (abs (_timezone / 60) % 60));
@@ -332,11 +329,7 @@ corelocaltime (const time_t * tim_p)
   int y;
   int yleap;
   _CONST int *ip;
-#ifdef _MT_SAFE
-  struct tm &localtime_buf=_reent_winsup ()->_localtime_buf;
-#else
-  static NO_COPY struct tm localtime_buf = {0};
-#endif
+  struct tm &localtime_buf=_my_tls.locals.localtime_buf;
 
   time_t tim = *tim_p;
   struct tm *res = &localtime_buf;

@@ -117,20 +117,6 @@ if test $use_builtin_memset = "yes"; then
 fi
 AC_LANG_RESTORE
 
-AC_ARG_ENABLE(extra-threadsafe-checking,
-[ --enable-extra-threadsafe-checking	Build a cygwin DLL which is thread safe with extra consistency checking],
-[case "${enableval}" in
-yes)
-  mt_safe_val=1
-  MT_SAFE=yes
-  AC_DEFINE(_CYG_THREAD_FAILSAFE)
-  ;;
-no)
-  dnl Don't do anything here to avoid overriding --enable-threadsafe.
-  ;;
-esac
-])
-
 AC_ARG_ENABLE(debugging,
 [ --enable-debugging		Build a cygwin DLL which has more consistency checking for debugging],
 [case "${enableval}" in

@@ -36,11 +36,6 @@ static int handle_exceptions (EXCEPTION_RECORD *, void *, CONTEXT *, void *);
 extern void sigdelayed ();
 };
 
-_threadinfo NO_COPY dummy_thread;
-_threadinfo NO_COPY *_last_thread = &dummy_thread;
-
-CRITICAL_SECTION NO_COPY _threadinfo::protect_linked_list;
-
 extern DWORD sigtid;
 
 extern HANDLE hExeced;
@@ -127,101 +122,6 @@ extern "C" void
 init_exceptions (exception_list *el)
 {
   init_exception_handler (el);
-}
-
-void
-_threadinfo::set_state (bool is_exception)
-{
-  initialized = CYGTLS_INITIALIZED + is_exception;
-}
-
-void
-_threadinfo::reset_exception ()
-{
-  if (initialized == CYGTLS_EXCEPTION)
-    {
-#ifdef DEBUGGING
-      debug_printf ("resetting stack after an exception stack %p, stackptr %p", stack, stackptr);
-#endif
-      set_state (false);
-      stackptr--;
-    }
-}
-
-void
-_threadinfo::call (DWORD (*func) (void *, void *), void *arg)
-{
-  char buf[CYGTLS_PADSIZE];
-  _my_tls.call2 (func, arg, buf);
-}
-
-void
-_threadinfo::call2 (DWORD (*func) (void *, void *), void *arg, void *buf)
-{
-  init_thread (buf);
-  ExitThread (func (arg, buf));
-}
-
-void
-_threadinfo::init ()
-{
-  InitializeCriticalSection (&protect_linked_list);
-}
-
-void
-_threadinfo::init_thread (void *x)
-{
-  if (x)
-    {
-      memset (this, 0, sizeof (*this));
-      stackptr = stack;
-    }
-
-  EnterCriticalSection (&protect_linked_list);
-  prev = _last_thread;
-  _last_thread->next = this;
-  _last_thread = this;
-  LeaveCriticalSection (&protect_linked_list);
-
-  set_state (false);
-  errno_addr = &errno;
-}
-
-void
-_threadinfo::remove ()
-{
-  EnterCriticalSection (&protect_linked_list);
-  if (prev)
-    {
-      prev->next = next;
-      if (next)
-	next->prev = prev;
-      if (this == _last_thread)
-	_last_thread = prev;
-      prev = next = NULL;
-    }
-  LeaveCriticalSection (&protect_linked_list);
-}
-
-void
-_threadinfo::push (__stack_t addr, bool exception)
-{
-  *stackptr++ = (__stack_t) addr;
-  set_state (exception);
-}
-
-__stack_t
-_threadinfo::pop ()
-{
-#ifdef DEBUGGING
-  assert (stackptr > stack);
-#endif
-  __stack_t res = *--stackptr;
-#ifdef DEBUGGING
-  *stackptr = 0;
-  debug_printf ("popped %p, stack %p, stackptr %p", res, stack, stackptr);
-#endif
-  return res;
 }
 
 extern "C" void
@@ -663,9 +563,9 @@ handle_sigsuspend (sigset_t tempmask)
   sig_dispatch_pending ();
   sigset_t oldmask = myself->getsigmask ();	// Remember for restoration
 
-  set_signal_mask (tempmask & ~SIG_NONMASKABLE);// Let signals we're
+  set_signal_mask (tempmask &= ~SIG_NONMASKABLE, oldmask);// Let signals we're
 				//  interested in through.
-  sigproc_printf ("old mask %x, new mask %x", oldmask, tempmask);
+  sigproc_printf ("oldmask %p, newmask %p", oldmask, tempmask);
 
   pthread_testcancel ();
   pthread::cancelable_wait (signal_arrived, INFINITE);
@@ -974,19 +874,23 @@ set_process_mask (sigset_t newmask)
 /* Set the signal mask for this process.
    Note that some signals are unmaskable, as in UNIX.  */
 extern "C" void __stdcall
-set_signal_mask (sigset_t newmask, sigset_t& oldmask)
+set_signal_mask (sigset_t newmask, sigset_t oldmask)
 {
   mask_sync->acquire (INFINITE);
   newmask &= ~SIG_NONMASKABLE;
-  sigproc_printf ("old mask %p, new mask %p", oldmask, newmask);
+  sigset_t mask_bits = oldmask & ~newmask;
+  sigproc_printf ("oldmask %p, newmask %p, mask_bits %p", oldmask, newmask,
+		  mask_bits);
   myself->setsigmask (newmask);	// Set a new mask
   mask_sync->release ();
-  if (oldmask & ~newmask)
+  if (mask_bits)
     sig_dispatch_pending ();
   else
     sigproc_printf ("not calling sig_dispatch_pending");
   return;
 }
+
+extern _threadinfo *_last_thread;
 
 _threadinfo *
 _threadinfo::find_tls (int sig)

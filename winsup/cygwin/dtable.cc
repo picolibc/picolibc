@@ -200,7 +200,6 @@ dtable::delete_archetype (fhandler_base *fh)
 int
 dtable::find_unused_handle (int start)
 {
-  AssertResourceOwner (LOCK_FD_LIST, READ_LOCK);
   do
     {
       for (size_t i = start; i < size; i++)

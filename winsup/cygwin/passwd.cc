@@ -26,11 +26,7 @@ details. */
    on the first call that needs information from it. */
 
 passwd *passwd_buf;
-/* FIXME: This really should use a constructor, but they are slow */
 static pwdgrp pr (passwd_buf);
-
-/* Position in the passwd cache */
-#define pw_pos  _reent_winsup ()->_pw_pos
 
 /* Parse /etc/passwd line into passwd structure. */
 bool
@@ -254,10 +250,10 @@ getpwnam_r (const char *nam, struct passwd *pwd, char *buffer, size_t bufsize, s
 extern "C" struct passwd *
 getpwent (void)
 {
-  if (pw_pos == 0)
+  if (_my_tls.locals.pw_pos == 0)
     pr.refresh (true);
-  if (pw_pos < pr.curr_lines)
-    return passwd_buf + pw_pos++;
+  if (_my_tls.locals.pw_pos < pr.curr_lines)
+    return passwd_buf + _my_tls.locals.pw_pos++;
 
   return NULL;
 }
@@ -271,13 +267,13 @@ getpwduid (__uid16_t)
 extern "C" void
 setpwent (void)
 {
-  pw_pos = 0;
+  _my_tls.locals.pw_pos = 0;
 }
 
 extern "C" void
 endpwent (void)
 {
-  pw_pos = 0;
+  _my_tls.locals.pw_pos = 0;
 }
 
 extern "C" int
@@ -289,7 +285,7 @@ setpassent ()
 extern "C" char *
 getpass (const char * prompt)
 {
-  char *pass=_reent_winsup ()->_pass;
+  char *pass = _my_tls.locals.pass;
   struct termios ti, newti;
 
   cygheap_fdget fhstdin (0);
