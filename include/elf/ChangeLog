@@ -1,3 +1,7 @@
+2003-07-28  Eric Christopher  <echristo@redhat.com>
+
+	* ppc.h (R_PPC_RELAX32): New. Fake relocation.
+
 2003-07-25  H.J. Lu  <hongjiu.lu@intel.com>
 
 	* v850.h (SHF_V850_GPREL): New.
