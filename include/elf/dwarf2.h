@@ -10,22 +10,22 @@
    Derived from the DWARF 1 implementation written by Ron Guilmette
    (rfg@netcom.com), November 1990.
 
-This file is part of GCC.
+   This file is part of GCC.
 
-GCC is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free
-Software Foundation; either version 2, or (at your option) any later
-version.
+   GCC is free software; you can redistribute it and/or modify it under
+   the terms of the GNU General Public License as published by the Free
+   Software Foundation; either version 2, or (at your option) any later
+   version.
 
-GCC is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+   GCC is distributed in the hope that it will be useful, but WITHOUT
+   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+   or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+   License for more details.
 
-You should have received a copy of the GNU General Public License
-along with GCC; see the file COPYING.  If not, write to the Free
-Software Foundation, 59 Temple Place - Suite 330, Boston, MA
-02111-1307, USA.  */
+   You should have received a copy of the GNU General Public License
+   along with GCC; see the file COPYING.  If not, write to the Free
+   Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+   02111-1307, USA.  */
 
 /* This file is derived from the DWARF specification (a public document)
    Revision 2.0.0 (July 27, 1993) developed by the UNIX International
@@ -488,10 +488,12 @@ enum dwarf_location_atom
     DW_OP_push_object_address = 0x97,
     DW_OP_call2 = 0x98,
     DW_OP_call4 = 0x99,
-    DW_OP_calli = 0x9a
+    DW_OP_call_ref = 0x9a,
+    /* GNU extensions.  */
+    DW_OP_GNU_push_tls_address = 0xe0
   };
 
-#define DW_OP_lo_user	0x80	/* Implementation-defined range start.  */
+#define DW_OP_lo_user	0xe0	/* Implementation-defined range start.  */
 #define DW_OP_hi_user	0xff	/* Implementation-defined range end.  */
 
 /* Type encodings.  */
@@ -678,7 +680,6 @@ enum dwarf_source_language
     /* MIPS.  */
     DW_LANG_Mips_Assembler = 0x8001
   };
-
 
 #define DW_LANG_lo_user 0x8000	/* Implementation-defined range start.  */
 #define DW_LANG_hi_user 0xffff	/* Implementation-defined range start.  */
