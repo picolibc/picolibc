@@ -1,3 +1,7 @@
+2002-10-02  Alan Modra  <amodra@bigpond.net.au>
+
+	* configure: Move stray line back to where it belongs.
+
 2002-10-01  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	* Makefile.tpl: Insert configure-target target, for src-release.

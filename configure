@@ -1410,7 +1410,6 @@ EOF
 		    -e "s|^SHELL[	 ]*=.*$|SHELL = ${config_shell}|" \
                     -e "s|^srcdir[ 	]*=.*$|srcdir = ${makesrcdir}|" \
                     -e "s///" \
-                    ${subdir}/Makefile.tem >> ${Makefile}
                     -e "s:^program_suffix[ 	]*=.*$:program_suffix = ${program_suffix}:" \
                     -e "s:^program_transform_name[ 	]*=.*$:program_transform_name = ${program_transform_name}:" \
                     -e "s|^tooldir[ 	]*=.*$|tooldir = ${tooldir}|" \
@@ -1418,6 +1417,7 @@ EOF
 		    -e "s:^DEFAULT_YACC[	 ]*=.*$:DEFAULT_YACC = ${DEFAULT_YACC}:" \
 		    -e "s:^DEFAULT_LEX[	 ]*=.*$:DEFAULT_LEX = ${DEFAULT_LEX}:" \
 		    -e "s:^DEFAULT_M4[  ]*=.*$:DEFAULT_M4 = ${DEFAULT_M4}:" \
+                    ${subdir}/Makefile.tem >> ${Makefile}
   
 	    mv -f ${Makefile}.tem ${Makefile}
 	    sed -e "s:^GDB_TK[	 ]*=.*$:GDB_TK = ${GDB_TK}:" ${Makefile} >${Makefile}.tem
