@@ -10,7 +10,7 @@
 	* winsup.h: Declare experimental tls storage.
 
 	* window.cc (alarm): Use old timer return from setitimer.
-	(ualarm): New function.
+	(ualarm): New function.  From Alexandr V. Shutko.
 
 2001-11-26  Christopher Faylor  <cgf@redhat.com>
 
