@@ -161,8 +161,13 @@ doit (char *filename)
       len = strlen (filename) + 100;
       if (len == 100)
         {
-          fprintf(stderr, "%s: can't convert empty path\n", prog_name);
-          exit (1);
+          if (!ignore_flag)
+            {
+              fprintf(stderr, "%s: can't convert empty path\n", prog_name);
+              exit (1);
+            }
+          else
+            exit (0);
         }
     }
   else

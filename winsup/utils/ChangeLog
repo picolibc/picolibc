@@ -1,3 +1,7 @@
+2002-01-15  Joerg Schaible <joerg.schaible@gmx.de>
+
+	* cygpath.cc (doit): Empty file ignored using option -i.
+
 2002-01-15  Mark Bradshaw  <bradshaw@crosswalk.com>
 
 	* mkpasswd.c (print_win_error): Add a new function.
