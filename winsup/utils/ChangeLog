@@ -1,3 +1,7 @@
+2004-01-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygpath.cc (dowin): Revert accidental checkin from November.
+
 2003-11-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mkgroup.c (main): Print "root" group with local admins group sid
