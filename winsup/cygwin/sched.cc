@@ -14,6 +14,7 @@
 # include "config.h"
 #endif
 
+#define _WIN32_WINNT 0x300
 #include "winsup.h"
 #include <limits.h>
 #include "cygerrno.h"
@@ -24,6 +25,9 @@
 #include "pinfo.h"
 /* for getpid */
 #include <unistd.h>
+#include "registry.h"
+
+extern "C" HWND WINAPI GetForegroundWindow();
 
 /* Win32 priority to UNIX priority Mapping.
    For now, I'm just following the spec: any range of priorities is ok.
@@ -249,21 +253,75 @@ sched_getscheduler (pid_t pid)
 
 /* get the time quantum for pid
 
-   We can't return -11, errno ENOSYS, because that implies that
-   sched_get_priority_max & min are also not supported (according to the spec)
-   so some spec-driven autoconf tests will likely assume they aren't present either
-
-   returning ESRCH might confuse some applications (if they assumed that when
-   rr_get_interval is called on pid 0 it always works).
-
-   If someone knows the time quanta for the various win32 platforms, then a
-   simple check for the os we're running on will finish this function
+   Implemented only for NT systems, it fails and sets errno to ESRCH
+   for non-NT systems.
 */
 int
 sched_rr_get_interval (pid_t pid, struct timespec *interval)
 {
-  set_errno (ESRCH);
-  return -1;
+  static const char quantable[2][2][3] =
+    {{{12, 24, 36}, { 6, 12, 18}},
+     {{36, 36, 36}, {18, 18, 18}}};
+  /* FIXME: Clocktickinterval can be 15 ms for multi-processor system. */
+  static const int clocktickinterval = 10;
+  static const int quantapertick = 3;
+
+  HWND forwin;
+  DWORD forprocid;
+  int vfindex, slindex, qindex, prisep;
+  long nsec;
+
+  if (!wincap.is_winnt ())
+    {
+      set_errno (ESRCH);
+      return -1;
+    }
+
+  forwin = GetForegroundWindow ();
+  if (!forwin)
+    GetWindowThreadProcessId (forwin, &forprocid);
+  else
+    forprocid = 0;
+
+  reg_key reg (HKEY_LOCAL_MACHINE, KEY_READ, "SYSTEM", "CurrentControlSet",
+               "Control", "PriorityControl", NULL);
+  if (reg.error ())
+    {
+      set_errno (ESRCH);
+      return -1;
+    }
+  prisep = reg.get_int ("Win32PrioritySeparation", 2);
+  pinfo pi (pid ? pid : myself->pid);
+  if (!pi)
+    {
+      set_errno (ESRCH);
+      return -1;
+    }
+
+  if (pi->dwProcessId == forprocid)
+    {
+      qindex = prisep & 3;
+      qindex = qindex == 3 ? 2 : qindex;
+    }
+  else
+    qindex = 0;
+  vfindex = ((prisep >> 2) & 3) % 3;
+  if (vfindex == 0)
+    vfindex = wincap.is_server () || prisep & 3 == 0 ? 1 : 0;
+  else
+    vfindex -= 1;
+  slindex = ((prisep >> 4) & 3) % 3;
+  if (slindex == 0)
+    slindex = wincap.is_server () ? 1 : 0;
+  else
+    slindex -= 1;
+
+  nsec = quantable[vfindex][slindex][qindex] / quantapertick
+    * clocktickinterval * 1000000;
+  interval->tv_sec = nsec / 1000000000;
+  interval->tv_nsec = nsec % 1000000000;
+
+  return 0;
 }
 
 /* set the scheduling parameters */

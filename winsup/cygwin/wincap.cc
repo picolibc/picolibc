@@ -16,6 +16,7 @@ static NO_COPY wincaps wincap_unknown = {
   chunksize:0x0,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE,
   is_winnt:false,
+  is_server:false,
   access_denied_on_delete:false,
   has_delete_on_close:false,
   has_page_guard:false,
@@ -58,6 +59,7 @@ static NO_COPY wincaps wincap_95 = {
   chunksize:32 * 1024 * 1024,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE,
   is_winnt:false,
+  is_server:false,
   access_denied_on_delete:true,
   has_delete_on_close:false,
   has_page_guard:false,
@@ -100,6 +102,7 @@ static NO_COPY wincaps wincap_95osr2 = {
   chunksize:32 * 1024 * 1024,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE,
   is_winnt:false,
+  is_server:false,
   access_denied_on_delete:true,
   has_delete_on_close:false,
   has_page_guard:false,
@@ -142,6 +145,7 @@ static NO_COPY wincaps wincap_98 = {
   chunksize:32 * 1024 * 1024,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE,
   is_winnt:false,
+  is_server:false,
   access_denied_on_delete:true,
   has_delete_on_close:false,
   has_page_guard:false,
@@ -184,6 +188,7 @@ static NO_COPY wincaps wincap_98se = {
   chunksize:32 * 1024 * 1024,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE,
   is_winnt:false,
+  is_server:false,
   access_denied_on_delete:true,
   has_delete_on_close:false,
   has_page_guard:false,
@@ -226,6 +231,7 @@ static NO_COPY wincaps wincap_me = {
   chunksize:32 * 1024 * 1024,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE,
   is_winnt:false,
+  is_server:false,
   access_denied_on_delete:true,
   has_delete_on_close:false,
   has_page_guard:false,
@@ -268,6 +274,7 @@ static NO_COPY wincaps wincap_nt3 = {
   chunksize:0,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
   is_winnt:true,
+  is_server:false,
   access_denied_on_delete:false,
   has_delete_on_close:true,
   has_page_guard:true,
@@ -310,6 +317,7 @@ static NO_COPY wincaps wincap_nt4 = {
   chunksize:0,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
   is_winnt:true,
+  is_server:false,
   access_denied_on_delete:false,
   has_delete_on_close:true,
   has_page_guard:true,
@@ -352,6 +360,7 @@ static NO_COPY wincaps wincap_nt4sp4 = {
   chunksize:0,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
   is_winnt:true,
+  is_server:false,
   access_denied_on_delete:false,
   has_delete_on_close:true,
   has_page_guard:true,
@@ -394,6 +403,7 @@ static NO_COPY wincaps wincap_2000 = {
   chunksize:0,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
   is_winnt:true,
+  is_server:false,
   access_denied_on_delete:false,
   has_delete_on_close:true,
   has_page_guard:true,
@@ -436,6 +446,7 @@ static NO_COPY wincaps wincap_xp = {
   chunksize:0,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
   is_winnt:true,
+  is_server:false,
   access_denied_on_delete:false,
   has_delete_on_close:true,
   has_page_guard:true,
@@ -478,6 +489,7 @@ static NO_COPY wincaps wincap_2003 = {
   chunksize:0,
   shared:FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
   is_winnt:true,
+  is_server:true,
   access_denied_on_delete:false,
   has_delete_on_close:true,
   has_page_guard:true,
@@ -526,8 +538,8 @@ wincapc::init ()
     return;		// already initialized
 
   memset (&version, 0, sizeof version);
-  version.dwOSVersionInfoSize = sizeof version;
-  GetVersionEx (&version);
+  version.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
+  GetVersionEx (reinterpret_cast<LPOSVERSIONINFO> (&version));
 
   switch (version.dwPlatformId)
     {
@@ -599,6 +611,15 @@ wincapc::init ()
 	caps = &wincap_unknown;
 	break;
     }
+
+  if (((wincaps *)this->caps)->is_winnt && version.dwMajorVersion > 4)
+    {
+      version.dwOSVersionInfoSize = sizeof version;
+      GetVersionEx (reinterpret_cast<LPOSVERSIONINFO>(&version));
+      if (version.wProductType != VER_NT_WORKSTATION)
+	((wincaps *)this->caps)->is_server = true;
+    }
+
   __small_sprintf (osnam, "%s-%d.%d", os, version.dwMajorVersion,
 		   version.dwMinorVersion);
 }

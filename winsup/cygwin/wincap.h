@@ -17,6 +17,7 @@ struct wincaps
   DWORD    chunksize;
   int      shared;
   unsigned is_winnt                                     : 1;
+  unsigned is_server                                    : 1;
   unsigned access_denied_on_delete                      : 1;
   unsigned has_delete_on_close                          : 1;
   unsigned has_page_guard                               : 1;
@@ -56,9 +57,9 @@ struct wincaps
 
 class wincapc
 {
-  OSVERSIONINFO version;
-  char          osnam[40];
-  void          *caps;
+  OSVERSIONINFOEX  version;
+  char             osnam[40];
+  void             *caps;
 
 public:
   void init ();
@@ -67,12 +68,13 @@ public:
 
   const char *osname () const { return osnam; }
 
-#define IMPLEMENT(cap) cap() const { return ((wincaps *)this->caps)->cap; }
+#define IMPLEMENT(cap) cap() const { return ((wincaps *) this->caps)->cap; }
 
   DWORD IMPLEMENT (lock_file_highword)
   DWORD IMPLEMENT (chunksize)
   int   IMPLEMENT (shared)
   bool  IMPLEMENT (is_winnt)
+  bool  IMPLEMENT (is_server)
   bool  IMPLEMENT (access_denied_on_delete)
   bool  IMPLEMENT (has_delete_on_close)
   bool  IMPLEMENT (has_page_guard)

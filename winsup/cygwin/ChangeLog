@@ -1,3 +1,24 @@
+2003-09-26  Vaclav Haisman  <V.Haisman@sh.cvut.cz>
+
+	* Makefile.in: Add libusr32.a to DLL_IMPORTS.
+	* wincap.h (wincaps::is_server): New flag.
+	(wincapc::version): Change type to OSVERSIONINFOEX.
+	(wincapc::is_server): New function.
+	* wincap.cc (wincap_unknown::is_server): New initializer.
+	(wincap_95): Ditto.
+	(wincap_95osr2): Ditto.
+	(wincap_98): Ditto.
+	(wincap_me): Ditto.
+	(wincap_nt3): Ditto.
+	(wincap_nt4): Ditto.
+	(wincap_nt4sp4): Ditto.
+	(wincap_2000): Ditto.
+	(wincap_xp): Ditto.
+	(wincapc::init): Adapt to OSVERSIONINFOEX.  Add detection of NT server
+	systems.
+	* sched.cc: Include windows.h and registry.h.
+	(sched_rr_get_interval): Re-implement for NT systems.
+
 2003-09-26  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_tty.cc (fhandler_tty_slave::ioctl): Properly set
