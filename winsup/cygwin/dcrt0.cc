@@ -671,9 +671,9 @@ dll_crt0_1 ()
 	    __argc = spawn_info->moreinfo->argc;
 	    __argv = spawn_info->moreinfo->argv;
 	    envp = spawn_info->moreinfo->environ;
-	    cwd_fixup_after_exec (spawn_info->moreinfo->cwd_win32,
-				  spawn_info->moreinfo->cwd_posix,
-				  spawn_info->moreinfo->cwd_hash);
+	    cygcwd.fixup_after_exec (spawn_info->moreinfo->cwd_win32,
+				     spawn_info->moreinfo->cwd_posix,
+				     spawn_info->moreinfo->cwd_hash);
 	    fdtab.fixup_after_exec (spawn_info->parent, spawn_info->moreinfo->nfds,
 				    spawn_info->moreinfo->fds);
 	    CloseHandle (spawn_info->parent);
@@ -733,7 +733,7 @@ dll_crt0_1 ()
     }
 
   cygheap_init ();	/* Initialize cygwin's heap */
-  cwd_init ();
+  cygcwd.init ();
 
   /* Initialize our process table entry. */
   pinfo_init (envp);

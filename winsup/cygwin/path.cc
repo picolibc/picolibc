@@ -1,6 +1,6 @@
 /* path.cc: path support.
 
-   Copyright 1996, 1997, 1998, 1999, 2000 Cygnus Solutions.
+   Copyright 1996, 1997, 1998, 1999, 2000 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -15,30 +15,13 @@ details. */
 
    Pathnames are handled as follows:
 
-   - / is equivalent to \
+   - A \ or : in a path denotes a pure windows spec.
    - Paths beginning with // (or \\) are not translated (i.e. looked
      up in the mount table) and are assumed to be UNC path names.
-   - Paths containing a : are not translated (paths like
-   /foo/bar/baz:qux: don't make much sense but having the rule written
-   this way allows one to use strchr).
 
    The goal in the above set of rules is to allow both POSIX and Win32
    flavors of pathnames without either interfering.  The rules are
    intended to be as close to a superset of both as possible.
-
-   A possible future enhancement would be to allow people to
-   disable/enable the mount table handling to support pure Win32
-   pathnames.  Hopefully this won't be needed.  The suggested way to
-   do this would be an environment variable because
-   a) we need something that is inherited from parent to child,
-   b) environment variables can be passed from the DOS shell to a
-   cygwin app,
-   c) it allows disabling the feature on an app by app basis within
-   the same session (whereas playing about with the registry wouldn't
-   -- without getting too complicated).  Example:
-   CYGWIN=pathrules[=@]{win32,posix}.  If CYGWIN=pathrules=win32,
-   mount table handling is disabled.  [The intent is to have CYGWIN be
-   a catchall for tweaking various cygwin.dll features].
 
    Note that you can have more than one path to a file.  The mount
    table is always prefered when translating Win32 paths to POSIX
@@ -46,15 +29,8 @@ details. */
    standard Win32 paths starting with <drive-letter>:
 
    Text vs Binary issues are not considered here in path style
-   decisions.
-
-   / and \ are treated as equivalent.  One or the other is prefered in
-   certain situations (e.g. / is preferred in result of getcwd, \ is
-   preferred in arguments to Win32 api calls), but this code will
-   translate as necessary.
-
-   Apps wishing to translate to/from pure Win32 and POSIX-like
-   pathnames can use cygwin_foo.
+   decisions, although the appropriate flags are retrieved and
+   stored in various structures.
 
    Removing mounted filesystem support would simplify things greatly,
    but having it gives us a mechanism of treating disk that lives on a
@@ -68,7 +44,7 @@ details. */
 
    Each DOS drive is defined to have a current directory.  Supporting
    this would complicate things so for now things are defined so that
-   c: means c:\.
+   c: means c:\.  FIXME: Is this still true?
 */
 
 #include "winsup.h"
@@ -90,14 +66,10 @@ details. */
 #include "pinfo.h"
 #include "cygheap.h"
 
-static int normalize_win32_path (const char *cwd, const char *src, char *dst);
-static char *getcwd_inner (char *buf, size_t ulen, int posix_p, int with_chroot);
+static int normalize_win32_path (const char *src, char *dst);
 static void slashify (const char *src, char *dst, int trailing_slash_p);
 static void backslashify (const char *src, char *dst, int trailing_slash_p);
 static int path_prefix_p_ (const char *path1, const char *path2, int len1);
-static int get_cwd_win32 ();
-
-static NO_COPY const char escape_char = '^';
 
 struct symlink_info
 {
@@ -113,7 +85,7 @@ struct symlink_info
   int check (const char *path, const suffix_info *suffixes);
 };
 
-/********************** Path Helper Functions *************************/
+cwdstuff cygcwd;	/* The current working directory. */
 
 #define path_prefix_p(p1, p2, l1) \
        ((tolower(*(p1))==tolower(*(p2))) && \
@@ -122,6 +94,20 @@ struct symlink_info
 #define SYMLINKATTR(x) \
   (((x) & (FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_DIRECTORY)) == \
    FILE_ATTRIBUTE_SYSTEM)
+
+/* Determine if path prefix matches current cygdrive */
+#define iscygdrive(path) \
+  (path_prefix_p (cygwin_shared->mount.cygdrive, (path), cygwin_shared->mount.cygdrive_len))
+
+#define iscygdrive_device(path) \
+  (iscygdrive(path) && isalpha(path[cygwin_shared->mount.cygdrive_len]) && \
+   (isdirsep(path[cygwin_shared->mount.cygdrive_len + 1]) || \
+    !path[cygwin_shared->mount.cygdrive_len + 1]))
+
+#define ischrootpath(path) \
+	(myself->rootlen && \
+	 strncasematch (myself->root, path, myself->rootlen) && \
+	 (path[myself->rootlen] == '/' || path[myself->rootlen] == '\0'))
 
 /* Return non-zero if PATH1 is a prefix of PATH2.
    Both are assumed to be of the same path style and / vs \ usage.
@@ -136,91 +122,6 @@ struct symlink_info
    foo/ is a prefix foo/bar
    /foo is not a prefix of /foobar
 */
-
-/* Determine if path prefix matches current cygdrive */
-#define iscygdrive(path) \
-  (path_prefix_p (cygwin_shared->mount.cygdrive, (path), cygwin_shared->mount.cygdrive_len))
-
-#define iscygdrive_device(path) \
-  (iscygdrive(path) && isalpha(path[cygwin_shared->mount.cygdrive_len]) && \
-   (isdirsep(path[cygwin_shared->mount.cygdrive_len + 1]) || \
-    !path[cygwin_shared->mount.cygdrive_len + 1]))
-
-/******************** Directory-related Support **************************/
-
-/* Cache getcwd value.  FIXME: We need a lock for these in order to
-   support multiple threads.  */
-
-#define TMPCWD	((char *) alloca (MAX_PATH + 1))
-
-struct cwdstuff
-{
-  char *posix;
-  char *win32;
-  DWORD hash;
-  muto *lock;
-};
-
-cwdstuff cwd;
-
-char * __stdcall
-cwd_win32 (char *buf)
-{
-  char *ret;
-  cwd.lock->acquire ();
-  if (cwd.win32 == NULL)
-    ret = NULL;
-  else if (buf == NULL)
-    ret = cwd.win32;
-  else
-    ret = strcpy (buf, cwd.win32);
-  cwd.lock->release ();
-  return ret;
-}
-
-char * __stdcall
-cwd_posix (char *buf)
-{
-  char *ret;
-  cwd.lock->acquire ();
-  if (cwd.posix == NULL)
-    ret = NULL;
-  else if (buf == NULL)
-    ret = cwd.posix;
-  else
-    ret = strcpy (buf, cwd.posix);
-  cwd.lock->release ();
-  return ret;
-}
-
-DWORD __stdcall
-cwd_hash ()
-{
-  DWORD hashnow;
-  cwd.lock->acquire ();
-  hashnow = cwd.hash;
-  cwd.lock->release ();
-  return hashnow;
-}
-
-void __stdcall
-cwd_init ()
-{
-  cwd.lock = new_muto (FALSE, "cwd");
-}
-
-void __stdcall
-cwd_fixup_after_exec (char *win32, char *posix, DWORD hash)
-{
-  cwd.win32 = win32;
-  cwd.posix = posix;
-  cwd.hash = hash;
-}
-
-#define ischrootpath(path) \
-	(myself->rootlen && \
-	 strncasematch (myself->root, path, myself->rootlen) && \
-	 (path[myself->rootlen] == '/' || path[myself->rootlen] == '\0'))
 
 static int
 path_prefix_p_ (const char *path1, const char *path2, int len1)
@@ -621,12 +522,12 @@ win32_device_name (const char *src_path, char *win32_path,
 #define isslash(c) ((c) == '/')
 
 static int
-normalize_posix_path (const char *cwd, const char *src, char *dst)
+normalize_posix_path (const char *src, char *dst)
 {
   const char *src_start = src;
   char *dst_start = dst;
 
-  syscall_printf ("cwd %s, src %s", cwd, src);
+  syscall_printf ("src %s", src);
   if (isdrive (src) || strpbrk (src, "\\:"))
     {
       cygwin_conv_to_full_posix_path (src, dst);
@@ -634,6 +535,8 @@ normalize_posix_path (const char *cwd, const char *src, char *dst)
     }
   if (!isslash (src[0]))
     {
+      char cwd[MAX_PATH];
+      cygcwd.get (cwd);	/* FIXME: check return value */
       if (strlen (cwd) + 1 + strlen (src) >= MAX_PATH)
 	{
 	  debug_printf ("ENAMETOOLONG = normalize_posix_path (%s)", src);
@@ -727,7 +630,7 @@ normalize_posix_path (const char *cwd, const char *src, char *dst)
    The result is 0 for success, or an errno error value.
    FIXME: A lot of this should be mergeable with the POSIX critter.  */
 static int
-normalize_win32_path (const char *cwd, const char *src, char *dst)
+normalize_win32_path (const char *src, char *dst)
 {
   const char *src_start = src;
   char *dst_start = dst;
@@ -735,6 +638,8 @@ normalize_win32_path (const char *cwd, const char *src, char *dst)
 
   if (!SLASH_P (src[0]) && strchr (src, ':') == NULL)
     {
+      char cwd[MAX_PATH];
+      cygcwd.get (cwd, 0);	/* FIXME: check return value */
       if (strlen (cwd) + 1 + strlen (src) >= MAX_PATH)
 	{
 	  debug_printf ("ENAMETOOLONG = normalize_win32_path (%s)", src);
@@ -1005,9 +910,6 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
   mount_item *mi = NULL;	/* initialized to avoid compiler warning */
   char pathbuf[MAX_PATH];
 
-  char cwd[MAX_PATH];
-  getcwd_inner (cwd, MAX_PATH, TRUE, 0); /* FIXME: check rc */
-
   /* Determine where the destination should be placed. */
   if (full_win32_path != NULL)
     dst = full_win32_path;
@@ -1022,7 +924,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
   if (strpbrk (src_path, ":\\") != NULL)
     {
       debug_printf ("%s already win32", src_path);
-      rc = normalize_win32_path (cwd_win32 (TMPCWD), src_path, dst);
+      rc = normalize_win32_path (src_path, dst);
       if (rc)
 	{
 	  debug_printf ("normalize_win32_path failed, rc %d", rc);
@@ -1065,10 +967,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
      converting it to a DOS-style path, looking up the appropriate drive
      in the mount table.  */
 
-  /* No need to fetch cwd if path is absolute.  */
-  isrelpath = !isslash (*src_path);
-
-  rc = normalize_posix_path (cwd, src_path, pathbuf);
+  rc = normalize_posix_path (src_path, pathbuf);
 
   if (rc)
     {
@@ -1076,6 +975,8 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
       *flags = 0;
       return rc;
     }
+
+  isrelpath = !isslash (*src_path);
 
   /* See if this is a cygwin "device" */
   if (win32_device_name (pathbuf, dst, devn, unit))
@@ -1137,31 +1038,32 @@ mount_info::conv_to_win32_path (const char *src_path, char *win32_path,
 
 fillin:
   /* Compute relative path if asked to and able to.  */
-  unsigned cwdlen;
-  cwdlen = 0;	/* avoid a (hopefully) bogus compiler warning */
-  char *cwd_win32_now;
-  cwd_win32_now = cwd_win32 (TMPCWD);
   if (win32_path == NULL)
     /* nothing to do */;
-  else if (isrelpath &&
-	   path_prefix_p (cwd_win32_now, dst, cwdlen = strlen (cwd_win32_now)))
+  else if (isrelpath)
     {
-      size_t n = strlen (dst);
-      if (n < cwdlen)
-	strcpy (win32_path, dst);
-      else
+      char cwd_win32[MAX_PATH];
+      cygcwd.get (cwd_win32, 0); /* FIXME: check return value someday */
+      unsigned cwdlen = strlen (cwd_win32);
+      if (path_prefix_p (cwd_win32, dst, cwdlen))
 	{
-	  if (n == cwdlen)
-	    dst += cwdlen;
+	  size_t n = strlen (dst);
+	  if (n < cwdlen)
+	    strcpy (win32_path, dst);
 	  else
-	    dst += isdirsep (cwd_win32_now[cwdlen - 1]) ? cwdlen : cwdlen + 1;
-
-	  memmove (win32_path, dst, strlen (dst) + 1);
-	  if (!*win32_path)
 	    {
-	      strcpy (win32_path, ".");
-	      if (trailing_slash_p)
-		strcat (win32_path, "\\");
+	      if (n == cwdlen)
+		dst += cwdlen;
+	      else
+		dst += isdirsep (cwd_win32[cwdlen - 1]) ? cwdlen : cwdlen + 1;
+
+	      memmove (win32_path, dst, strlen (dst) + 1);
+	      if (!*win32_path)
+		{
+		  strcpy (win32_path, ".");
+		  if (trailing_slash_p)
+		    strcat (win32_path, "\\");
+		}
 	    }
 	}
     }
@@ -1273,15 +1175,7 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
     }
 
   char pathbuf[MAX_PATH];
-  char cwd[MAX_PATH];
-
-  /* No need to fetch cwd if path is absolute. */
-  if (relative_path_p)
-    getcwd_inner (cwd, MAX_PATH, 0, 0); /* FIXME: check rc */
-  else
-    strcpy (cwd, "/"); /* some innocuous value */
-
-  int rc = normalize_win32_path (cwd, src_path, pathbuf);
+  int rc = normalize_win32_path (src_path, pathbuf);
   if (rc != 0)
     {
       debug_printf ("%d = conv_to_posix_path (%s)", rc, src_path);
@@ -2513,9 +2407,9 @@ hash_path_name (unsigned long hash, const char *name)
 	 Otherwise the inodes same will differ depending on whether a file is
 	 referenced with an absolute value or relatively. */
 
-      if (*name != '\\' && (cwd_win32 (TMPCWD) == NULL || get_cwd_win32 ()))
+      if (*name != '\\')
 	{
-	  hash = cwd_hash ();
+	  hash = cygcwd.get_hash ();
 	  if (name[0] == '.' && name[1] == '\0')
 	    return hash;
 	  hash = hash_path_name (hash, "\\");
@@ -2535,133 +2429,37 @@ hashit:
   return hash;
 }
 
-static int
-get_cwd_win32 ()
-{
-  DWORD dlen, len;
-
-  cwd.lock->acquire ();
-  for (dlen = 256; ; dlen *= 2)
-    {
-      cwd.win32 = (char *) crealloc (cwd.win32, dlen + 2);
-      if ((len = GetCurrentDirectoryA (dlen, cwd.win32)) < dlen)
-	break;
-    }
-
-  if (len == 0)
-    __seterrno ();
-  else
-    cwd.hash = hash_path_name (0, cwd.win32);
-
-  cwd.lock->release ();
-  return len;
-}
-
-/* getcwd */
-
-char *
-getcwd_inner (char *buf, size_t ulen, int posix_p, int with_chroot)
-{
-  char *resbuf = NULL;
-  size_t len = ulen;
-
-  if (cwd_win32 (TMPCWD) == NULL && !get_cwd_win32 ())
-    return NULL;
-
-  char *cwd_win32_now = cwd_win32 (TMPCWD);
-  char *cwd_posix_now = cwd_posix (TMPCWD);
-  if (!posix_p)
-    {
-      if (strlen (cwd_win32_now) >= len)
-	set_errno (ERANGE);
-      else
-	{
-	  strcpy (buf, cwd_win32_now);
-	  resbuf = buf;
-	}
-
-      syscall_printf ("%p (%s) = getcwd_inner (%p, %d, win32) (cached)",
-		      resbuf, resbuf ? resbuf : "", buf, len);
-      return resbuf;
-    }
-  else if (cwd_posix_now != NULL)
-    {
-      debug_printf("myself->root: %s, cwd_posix: %s", myself->root, cwd_posix_now);
-      if (strlen (cwd_posix_now) >= len)
-	set_errno (ERANGE);
-      else if (with_chroot && ischrootpath(cwd_posix_now))
-	{
-	  strcpy (buf, cwd_posix_now + myself->rootlen);
-	  if (!buf[0])
-	    strcpy (buf, "/");
-	  resbuf = buf;
-	}
-      else
-	{
-	  strcpy (buf, cwd_posix_now);
-	  resbuf = buf;
-	}
-
-      syscall_printf ("%p (%s) = getcwd_inner (%p, %d, posix) (cached)",
-		      resbuf, resbuf ? resbuf : "", buf, len);
-      return resbuf;
-    }
-
-  /* posix_p required and cwd_posix == NULL */
-
-  char temp[MAX_PATH];
-
-  /* Turn from Win32 style to our style.  */
-  cygwin_shared->mount.conv_to_posix_path (cwd_win32_now, temp, 0);
-
-  size_t tlen = strlen (temp);
-
-  if (with_chroot && ischrootpath (temp))
-    tlen -= myself->rootlen;
-
-  cwd.lock->acquire ();
-  cwd.posix = (char *) crealloc (cwd.posix, tlen + 1);
-  if (cwd.posix != NULL)
-    if (with_chroot && ischrootpath (temp))
-      {
-	strcpy (cwd.posix, temp + myself->rootlen);
-	if (!buf[0])
-	  strcpy (buf, "/");
-      }
-    else
-      strcpy (cwd.posix, temp);
-
-  cwd.lock->release ();
-
-  if (tlen >= ulen)
-    set_errno (ERANGE);	/* len was too small */
-  else
-    {
-      strcpy (buf, temp);
-      resbuf = buf;
-    }
-
-  syscall_printf ("%p (%s) = getcwd_inner (%p, %d, %s)",
-		  resbuf, resbuf ? resbuf : "",
-		  buf, len, posix_p ? "posix" : "win32");
-  return resbuf;
-}
-
 char *
 getcwd (char *buf, size_t ulen)
 {
   char *res;
+  char *usebuf, uselen;
 
-  if (buf == NULL || ulen == 0)
+  if (buf != NULL)
     {
-      buf = (char *) alloca (MAX_PATH);
-      res = getcwd_inner (buf, MAX_PATH, 1, 1);
-      res = strdup (buf);
+      usebuf = buf;
+      uselen = TRUE;
     }
   else
     {
-      res = getcwd_inner (buf, ulen, 1, 1);
+      if (ulen >= 0)
+	uselen = TRUE;
+      else
+	{
+	  uselen = FALSE;
+	  ulen = MAX_PATH + 1;
+	}
+
+      usebuf = (char *) malloc (ulen);
+      usebuf [ulen - 1] = '\0';
     }
+
+  res = cygcwd.get (usebuf, 1, 1, ulen);
+
+  if (res && !uselen)
+    usebuf = (char *) realloc (usebuf, strlen (usebuf) + 1);
+  else if (!res && buf == NULL)
+    free (usebuf);
 
   return res;
 }
@@ -2704,27 +2502,12 @@ chdir (const char *dir)
   if (res == -1)
     __seterrno ();
   else
-    {
-      cwd.lock->acquire ();
-      /* Store new cache information */
-      cfree (cwd.win32);
-      cwd.win32 = cstrdup (path);
+    cygcwd.set (path);
 
-      char pathbuf[MAX_PATH];
-      (void) normalize_posix_path (cwd.posix, dir, pathbuf);
-      /* Look for trailing path component consisting entirely of dots.  This
-	 is needed only in case of chdir since Windows simply ignores count
-	 of dots > 2 here instead of returning an error code.  Counts of dots
-	 <= 2 are already eliminated by normalize_posix_path. */
-      char *last_slash = strrchr (pathbuf, '/');
-      if (last_slash > pathbuf && strspn (last_slash + 1, ".") == strlen (last_slash + 1))
-	*last_slash = '\0';
-      cfree (cwd.posix);
-      cwd.posix = cstrdup (pathbuf);
-      cwd.lock->release ();
-    }
-
-  syscall_printf ("%d = chdir() cwd.posix '%s' native '%s'", res, cwd.posix, native_dir);
+  /* Note that we're accessing cwd.posix without a lock here.  I didn't think
+     it was worth locking just for strace. */
+  syscall_printf ("%d = chdir() cygcwd.posix '%s' native '%s'", res,
+		  cygcwd.posix, native_dir);
   return res;
 }
 
@@ -3064,4 +2847,131 @@ check_null_empty_path (const char *name)
     return ENOENT;
 
   return 0;
+}
+
+/* Return the hash value for the current win32 value.
+   This is used when constructing inodes. */
+DWORD
+cwdstuff::get_hash ()
+{
+  DWORD hashnow;
+  lock->acquire ();
+  hashnow = hash;
+  lock->release ();
+  return hashnow;
+}
+
+/* Initialize cygcwd 'muto' for serializing access to cwd info. */
+void
+cwdstuff::init ()
+{
+  lock = new_muto (FALSE, "cwd");
+}
+
+/* Called to fill in cwd values after an exec. */
+void
+cwdstuff::fixup_after_exec (char *win32_cwd, char *posix_cwd, DWORD hash_cwd)
+{
+  win32 = win32_cwd;
+  posix = posix_cwd;
+  hash = hash_cwd;
+}
+
+/* Get initial cwd.  Should only be called once in a
+   process tree. */
+bool
+cwdstuff::get_initial ()
+{
+  lock->acquire ();
+  DWORD len, dlen;
+
+  int i;
+  for (i = 0, dlen = MAX_PATH, len = 0; i < 3; dlen *= 2, i++)
+    {
+      win32 = (char *) crealloc (win32, dlen + 2);
+      if ((len = GetCurrentDirectoryA (dlen, win32)) < dlen)
+	break;
+    }
+
+  if (len == 0)
+    {
+      __seterrno ();
+      lock->release ();
+      debug_printf ("get_initial_cwd failed, %E");
+      return 0;
+    }
+  set (NULL);
+  return 1;	/* Leaves cwd lock unreleased */
+}
+
+/* Fill out the elements of a cwdstuff struct.
+   It is assumed that the lock for the cwd is acquired if
+   win32_cwd == NULL. */
+void
+cwdstuff::set (char *win32_cwd)
+{
+  if (win32_cwd)
+    {
+      lock->acquire ();
+      win32 = (char *) crealloc (win32, strlen (win32_cwd) + 1);
+      strcpy (win32, win32_cwd);
+    }
+
+  hash = hash_path_name (0, win32);
+
+  /* Turn from Win32 style to our style.  */
+  char temp[MAX_PATH];
+  cygwin_shared->mount.conv_to_posix_path (win32, temp, 0);
+
+  posix = (char *) crealloc (posix, strlen (temp) + 1);
+  strcpy (posix, temp);
+
+  if (win32_cwd)
+    lock->release ();
+
+  return;
+}
+
+/* Copy the value for either the posix or the win32 cwd into a buffer. */
+char *
+cwdstuff::get (char *buf, int need_posix, int with_chroot, unsigned ulen)
+{
+  size_t len = ulen;
+
+  if (!get_initial ())	/* Get initial cwd and set cwd lock */
+    return NULL;
+
+  char *tocopy;
+  if (!need_posix)
+    tocopy = win32;
+  else
+    tocopy = with_chroot && ischrootpath(posix) ?
+	     posix + myself->rootlen : posix;
+
+  debug_printf("myself->root: %s, posix: %s", myself->root, posix);
+  if (strlen (tocopy) >= ulen)
+    set_errno (ERANGE);
+  else
+    {
+      strcpy (buf, tocopy);
+      if (!buf[0])	/* Should only happen when chroot */
+	strcpy (buf, "/");
+    }
+
+  lock->release ();
+  syscall_printf ("(%s) = cwdstuff::get (%p, %d, %d, %d)",
+		  buf, buf, len, need_posix, with_chroot);
+  return buf;
+}
+
+/* Get copies of all cwdstuff elements.  Used by spawn_guts. */
+void
+cwdstuff::copy (char * &posix_cwd, char * &win32_cwd, DWORD hash_cwd)
+{
+  lock->acquire ();
+  get_initial (); /* FIXME: Check return someday */
+  posix_cwd = cstrdup (posix);
+  win32_cwd = cstrdup (win32);
+  hash_cwd = hash;
+  lock->release ();
 }

@@ -1,3 +1,31 @@
+Mon Sep  4 22:53:58 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* path.cc (cwd_win32): Eliminate.
+	(cwd_posix): Eliminate.
+	(cwd_hash): Eliminate.
+	(cwdstuff::init): Rename from cwd_init.
+	(cwdstuff::fixup_after_exec): Rename from cwd_fixup_after_exec.
+	(cwdstuff::get): Rename from get_cwd_inner.
+	(normalize_posix_path): Eliminate cwd argument.  Just calculate when
+	necessary.
+	(normalize_win32_path): Ditto.
+	(mount_info::conv_to_win32_path): Eliminate cwd retrieval here.
+	(mount_info::conv_to_posix_path): Ditto.
+	(hash_path_name): Accomodate additional methods in cwdstuff.
+	(get_cwd_win32): Eliminate.
+	(getcwd): Use cwdstuff methods.  Properly handle case where buf == NULL
+	and len < 0.
+	(cwdstuff::get_hash): New method.
+	(cwdstuff::get_initial): New method.
+	(cwdstuff::set): New method.
+	(cwdstuff::get): New method.
+	(cwdstuff::copy): New method.
+	* path.h: Move cwdstuff struct here.  Add a bunch of stuff to cwdstuff.
+	Make cygcwd an extern.
+	* spawn.cc (spawn_guts): Use copy method to get copies of cwd info to
+	pass to execed process.
+	* dcrt0.cc (dll_crt0_1): Use cygcwd methods for cwd initialization.
+
 2000-09-03  Egor Duda  <deo@logos-m.ru>
 
 	* path.cc (readlink): Check if buffer length is positive.

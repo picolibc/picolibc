@@ -111,13 +111,18 @@ _cfree (void *ptr)
 static void *__stdcall
 _crealloc (void *ptr, int size)
 {
-  char *newptr;
-  int oldsize = bucket2size[*(int *) ((char *) ptr - 4)];
-  if (size <= oldsize)
-    return ptr;
-  newptr = (char *) _cmalloc (size);
-  memcpy (newptr, ptr, oldsize);
-  _cfree (ptr);
+  void *newptr;
+  if (ptr == NULL)
+    newptr = _cmalloc (size);
+  else
+    {
+      int oldsize = bucket2size[*(int *) ((char *) ptr - 4)];
+      if (size <= oldsize)
+	return ptr;
+      newptr = _cmalloc (size);
+      memcpy (newptr, ptr, oldsize);
+      _cfree (ptr);
+    }
   return newptr;
 }
 

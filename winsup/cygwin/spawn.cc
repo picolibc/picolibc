@@ -505,10 +505,8 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
   ciresrv.moreinfo->argc = newargv.argc;
   ciresrv.moreinfo->argv = newargv;
 
-  /* FIXME: Should lock cwd access here. */
-  ciresrv.moreinfo->cwd_posix = cwd_posix (NULL);
-  ciresrv.moreinfo->cwd_win32 = cwd_win32 (NULL);
-  ciresrv.moreinfo->cwd_hash = cwd_hash ();
+  cygcwd.copy (ciresrv.moreinfo->cwd_posix, ciresrv.moreinfo->cwd_win32,
+	       ciresrv.moreinfo->cwd_hash);
 
   ciresrv.moreinfo->environ = (char **) cmalloc (HEAP_ARGV, envsize (envp, 1));
   char **c;

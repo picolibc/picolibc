@@ -110,11 +110,6 @@ int __stdcall check_null_empty_path (const char *name);
 
 const char * __stdcall find_exec (const char *name, path_conv& buf, const char *winenv = "PATH=",
 			int null_if_notfound = 0, const char **known_suffix = NULL);
-void __stdcall cwd_init ();
-char * __stdcall cwd_posix (char *);
-char * __stdcall cwd_win32 (char *);
-DWORD __stdcall cwd_hash ();
-void __stdcall cwd_fixup_after_exec (char *, char *, DWORD);
 
 /* Common macros for checking for invalid path names */
 
@@ -127,3 +122,24 @@ void __stdcall cwd_fixup_after_exec (char *, char *, DWORD);
 })
 
 #define isdrive(s) (isalpha (*(s)) && (s)[1] == ':')
+
+/* cwd cache stuff.  */
+
+class muto;
+
+struct cwdstuff
+{
+  char *posix;
+  char *win32;
+  DWORD hash;
+  muto *lock;
+  char *get (char *buf, int need_posix = 1, int with_chroot = 0, unsigned ulen = MAX_PATH);
+  DWORD get_hash ();
+  void init ();
+  void fixup_after_exec (char *win32, char *posix, DWORD hash);
+  bool get_initial ();
+  void copy (char * &posix_cwd, char * &win32_cwd, DWORD hash_cwd);
+  void set (char *win32_cwd);
+};
+
+extern cwdstuff cygcwd;
