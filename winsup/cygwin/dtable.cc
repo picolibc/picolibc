@@ -756,6 +756,7 @@ handle_to_fn (HANDLE h, char *posix_fn)
 
   char win32_fn[MAX_PATH + 100];
   sys_wcstombs (win32_fn, ntfn->Name.Buffer, ntfn->Name.Length);
+  debug_printf ("nt name '%s'", win32_fn);
   if (!strncasematch (win32_fn, DEVICE_PREFIX, DEVICE_PREFIX_LEN)
       || !QueryDosDevice (NULL, fnbuf, sizeof (fnbuf)))
     return strcpy (posix_fn, win32_fn);
@@ -765,7 +766,8 @@ handle_to_fn (HANDLE h, char *posix_fn)
     p = strchr (win32_fn + DEVICE_PREFIX_LEN, '\0');
 
   int n = p - win32_fn;
-  char *w32 = win32_fn;
+  int maxmatchlen = 0;
+  char *maxmatchdos = NULL;
   for (char *s = fnbuf; *s; s = strchr (s, '\0') + 1)
     {
       char device[MAX_PATH + 10];
@@ -774,16 +776,38 @@ handle_to_fn (HANDLE h, char *posix_fn)
 	continue;
       if (!QueryDosDevice (s, device, sizeof (device) - 1))
 	continue;
-      if (!strncasematch (device, win32_fn, n) ||
-	  (device[n] != '\0' && (device[n] != '\\' || device[n + 1] != ';')))
+      char *q = strrchr (device, ';');
+      if (q)
+	{
+	  char *r = strchr (q, '\\');
+	  if (r)
+	    strcpy (q, r + 1);
+	}
+      int devlen = strlen (device);
+      if (device[devlen - 1] == '\\')
+	device[--devlen] = '\0';
+      if (devlen < maxmatchlen)
 	continue;
-      n = strlen (s);
-      w32 = p - (n + 1);
-      memcpy (w32, s, n);
-      p[-1] = '\\';
-      break;
+      if (!strncasematch (device, win32_fn, devlen) ||
+	  (win32_fn[devlen] != '\0' && win32_fn[devlen] != '\\'))
+	continue;
+      maxmatchlen = devlen;
+      maxmatchdos = s;
+      debug_printf ("current match '%s'", device);
     }
 
+  char *w32 = win32_fn;
+  if (maxmatchlen)
+    {
+      n = strlen (maxmatchdos);
+      if (maxmatchdos[n - 1] == '\\')
+	n--;
+      w32 += maxmatchlen - n;
+      memcpy (w32, maxmatchdos, n);
+      w32[n] = '\\';
+    }
+
+  debug_printf ("derived path '%s'", w32);
   cygwin_conv_to_full_posix_path (w32, posix_fn);
   return posix_fn;
 }

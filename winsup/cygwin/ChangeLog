@@ -1,5 +1,10 @@
 2002-06-02  Christopher Faylor  <cgf@redhat.com>
 
+        * dtable.cc (handle_to_fn): Use largest match for device.  Correctly
+        (?) deal with remote drive weirdness.
+
+2002-06-02  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::fstat_by_name): Check
 	specifically for non-existent file, first.
 	(fhandler_disk_file::fstat): Perform fd open on files with funny
