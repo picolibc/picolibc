@@ -1,3 +1,10 @@
+2002-05-10  Mark Bradshaw  <bradshaw@staff.crosswalk.com>
+
+	* libc/include/string.h (!__STRICT_ANSI__): Add strlcat and strlcpy.
+	* libc/string/Makefile.am: Add strlcat.c and strlcpy.c.
+	* libc/string/strlcat.c: New file.
+	* libc/string/strlcpy.c: New file.
+
 2002-05-10  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/string/strchr.c: Fix comment typo.

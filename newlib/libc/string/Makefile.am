@@ -23,6 +23,8 @@ LIB_SOURCES = \
 	strcpy.c \
 	strcspn.c \
 	strerror.c \
+	strlcat.c \
+	strlcpy.c \
 	strlen.c  \
 	strlwr.c \
 	strncat.c \

@@ -61,6 +61,8 @@ char 	*_EXFUN(rindex,(const char *, int));
 int	 _EXFUN(strcasecmp,(const char *, const char *));
 char 	*_EXFUN(strdup,(const char *));
 char 	*_EXFUN(_strdup_r,(struct _reent *, const char *));
+size_t	 _EXFUN(strlcat,(char *, const char *, size_t));
+size_t	 _EXFUN(strlcpy,(char *, const char *, size_t));
 int	 _EXFUN(strncasecmp,(const char *, const char *, size_t));
 char 	*_EXFUN(strsep,(char **, const char *));
 char	*_EXFUN(strlwr,(char *));
