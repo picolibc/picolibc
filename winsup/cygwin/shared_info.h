@@ -176,6 +176,7 @@ enum shared_locations
   SH_USER_SHARED,
   SH_SHARED_CONSOLE,
   SH_MYSELF,
+  SH_MTINFO,
   SH_TOTAL_SIZE
 };
 void __stdcall memory_init ();

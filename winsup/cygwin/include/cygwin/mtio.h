@@ -35,7 +35,7 @@ struct	mtop {
 };
 
 /* Magnetic Tape operations [Not all operations supported by all drivers]: */
-#define MTRESET 0	/* +reset drive in case of problems */
+#define MTRESET 0	/* reset drive in case of problems */
 #define MTFSF	1	/* forward space over FileMark,
 			 * position at first record of next file
 			 */
@@ -80,15 +80,14 @@ struct	mtop {
 /* structure for MTIOCGET - mag tape get status command */
 
 struct	mtget {
-	long	mt_type;	/* type of magtape device
-				 * Cygwin: MT_ISUNKNOWN */
+	long	mt_type;	/* type of magtape device */
 	long	mt_resid;	/* residual count: (not sure)
 				 *	number of bytes ignored, or
 				 *	number of files not skipped, or
 				 *	number of records not skipped.
 				 *  Cygwin: remaining KB until 1.5.7.
-				 *          active partition since 1.5.8,
-				 *          same as on linux.
+				 *          active partition since 1.5.8
+				 *          (same as on GNU-Linux).
 				 */
 	/* the following registers are device dependent */
 	long	mt_dsreg;	/* status register, Contains blocksize and
@@ -133,17 +132,27 @@ struct	mtpos {
 #define GMT_SM(x)               ((x) & 0x10000000)  /* DDS setmark */
 #define GMT_EOD(x)              ((x) & 0x08000000)  /* DDS EOD */
 #define GMT_WR_PROT(x)          ((x) & 0x04000000)
-/* #define GMT_ ?		((x) & 0x02000000) */
+#define GMT_REP_SM(x)           ((x) & 0x02000000)  /* Cygwin: rep. setmarks */
 #define GMT_ONLINE(x)           ((x) & 0x01000000)
 #define GMT_D_6250(x)           ((x) & 0x00800000)
 #define GMT_D_1600(x)           ((x) & 0x00400000)
 #define GMT_D_800(x)            ((x) & 0x00200000)
-#define GMT_PADDING(x)		((x) & 0x00100000)  /* data padding */
-#define GMT_HW_ECC(x)		((x) & 0x00080000)  /* HW error correction */
+#define GMT_PADDING(x)          ((x) & 0x00100000)  /* Cygwin: data padding */
+#define GMT_HW_ECC(x)           ((x) & 0x00080000)  /* Cygwin: HW error corr. */
 #define GMT_DR_OPEN(x)          ((x) & 0x00040000)  /* door open (no tape) */
-#define GMT_HW_COMP(x)		((x) & 0x00020000)  /* HW compression */
+#define GMT_HW_COMP(x)          ((x) & 0x00020000)  /* Cygwin: HW compression */
 #define GMT_IM_REP_EN(x)        ((x) & 0x00010000)  /* immediate report mode */
-/* 16 generic status bits unused */
+#define GMT_CLN(x)              ((x) & 0x00008000)  /* cleaning requested */
+/* 15 generic status bits unused */
+/* Cygwin only: The below settings are also used by the GNU-Linux SCSI tape
+   driver but they aren't usually reported here.  Unfortunately, there's no
+   other official method to retrieve the values of these settings and
+   reporting them here apparently doesn't hurt. */
+#define GMT_TWO_FM(x)           ((x) & 0x00000080)  /* two fm after write */
+#define GMT_FAST_MTEOM(x)       ((x) & 0x00000040)  /* fast seek to eom */
+#define GMT_AUTO_LOCK(x)        ((x) & 0x00000020)  /* auto door lock on r/w */
+#define GMT_SYSV(x)		((x) & 0x00000010)  /* SYSV read semantics */
+#define GMT_NOWAIT(x)		((x) & 0x00000008)  /* don't wait for positioning commands */
 
 
 /* SCSI-tape specific definitions */
@@ -155,6 +164,33 @@ struct	mtpos {
 
 #define MT_ST_SOFTERR_SHIFT	0
 #define MT_ST_SOFTERR_MASK	0xffff
+
+/* Bitfields for the MTSETDRVBUFFER ioctl.  */
+#define MT_ST_OPTIONS           0xf0000000
+#define MT_ST_BOOLEANS          0x10000000
+#define MT_ST_SETBOOLEANS       0x30000000
+#define MT_ST_CLEARBOOLEANS     0x40000000
+#define MT_ST_WRITE_THRESHOLD   0x20000000	/* Not supported */
+#define MT_ST_DEF_OPTIONS       0x60000000	/* Not supported */
+#define MT_ST_EOT_WZ_SIZE	0xf0000000	/* Cygwin only */
+
+#define MT_ST_BUFFER_WRITES     0x00000001
+#define MT_ST_ASYNC_WRITES	0x00000002	/* Not supported */
+#define MT_ST_READ_AHEAD        0x00000004	/* Not supported */
+#define MT_ST_DEBUGGING         0x00000008	/* Not supported */
+#define MT_ST_TWO_FM		0x00000010
+#define MT_ST_FAST_MTEOM        0x00000020
+#define MT_ST_AUTO_LOCK		0x00000040
+#define MT_ST_DEF_WRITES        0x00000080	/* Not supported */
+#define MT_ST_CAN_BSR           0x00000100	/* Not supported */
+#define MT_ST_NO_BLKLIMS        0x00000200	/* Not supported */
+#define MT_ST_CAN_PARTITIONS    0x00000400	/* Not supported */
+#define MT_ST_SCSI2LOGICAL      0x00000800	/* Not supported */
+#define MT_ST_SYSV              0x00001000
+#define MT_ST_NOWAIT            0x00002000
+#define MT_ST_ECC		0x00010000	/* Cygwin only */
+#define MT_ST_PADDING		0x00020000	/* Cygwin only */
+#define MT_ST_REPORT_SM		0x00040000	/* Cygwin only */
 
 /*
  * Constants for mt_type. Not all of these are supported,

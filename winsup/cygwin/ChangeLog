@@ -1,3 +1,50 @@
+2004-03-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* errno.cc (errmap): Map ERROR_SHARING_VIOLATION to EBUSY,
+	ERROR_EOM_OVERFLOW and ERROR_NO_DATA_DETECTED to EIO.  Add mappings
+	for ERROR_NO_MEDIA_IN_DRIVE, ERROR_DEVICE_REQUIRES_CLEANING and
+	ERROR_DEVICE_DOOR_OPEN.
+	* fhandler.h (class fhandler_dev_raw): Drop varblkop member.
+	(fhandler_dev_raw::is_eom): De-virtualize.
+	(fhandler_dev_raw::is_eof): Ditto.
+	(class fhandler_dev_tape): Drop lasterr and dp member.  Add mt_mtx
+	member.  Drop all private methods formerly used by ioctl.
+	(fhandler_dev_tape::is_rewind_device): Use get_minor for clarity.
+	(fhandler_dev_tape::driveno): New method.
+	(fhandler_dev_tape::drive_init): New method.
+	(fhandler_dev_tape::clear): Remove method.
+	(fhandler_dev_tape::is_eom): Ditto.
+	(fhandler_dev_tape::is_eof): Ditto.
+	(fhandler_dev_tape::write_file): Ditto.
+	(fhandler_dev_tape::read_file): Ditto.
+	(fhandler_dev_tape::_lock): New method.
+	(fhandler_dev_tape::unlock): New method.
+	(fhandler_dev_tape::raw_read): New method.
+	(fhandler_dev_tape::raw_write): New method.
+	* fhandler_raw.cc (fhandler_dev_raw::is_eom): New method.
+	(fhandler_dev_raw::is_eof): New method.
+	(fhandler_dev_raw::open): Allow setting write through option by
+	using the O_TEXT flag as ... flag.
+	(fhandler_dev_raw::writebuf): Remove usage of varblkop and other
+	tape specific code.
+	(fhandler_dev_raw::raw_read): Ditto.
+	(fhandler_dev_raw::dup): Ditto.
+	* fhandler_tape.cc: Rewrite tape operations entirely.  Implement
+	new tape driver classes mtinfo, mtinfo_drive and mtinfo_part.
+	Reduce fhandler_dev_tape methods to mostly just calling appropriate
+	mtinfo_drive methods.
+	(mtinfo_init): New function adding the mtinfo shared memory area.
+	* mtinfo.h: New file, containing the definition of the new tape
+	driver classes.
+	* shared.cc: Include mtinfo.h.
+	(offsets): Add entry for mtinfo shared memory area.
+	(memory_init): Call mtinfo_init.
+	* shared_info.h (shared_locations): Add SH_MTINFO shared location.
+	* include/cygwin/mtio.h: Change and add various comments.  Add GMT_xxx
+	macros for new generic flags.  Add MT_ST_xxx bitfield definitions
+	for MTSETDRVBUFFER ioctl.
+	* include/cygwin/version.h: Bump API minor version number.
+
 2004-03-26  Christopher Faylor  <cgf@redhat.com>
 
 	* path.cc (path_conv::check): Use 'strchr' rather than 'strrchr' to

@@ -509,7 +509,6 @@ class fhandler_dev_raw: public fhandler_base
   int lastblk_to_read : 1;
   int is_writing      : 1;
   int has_written     : 1;
-  int varblkop	      : 1;
 
   virtual void clear (void);
   virtual BOOL write_file (const void *buf, DWORD to_write,
@@ -518,9 +517,9 @@ class fhandler_dev_raw: public fhandler_base
   virtual int writebuf (void);
 
   /* returns not null, if `win_error' determines an end of media condition */
-  virtual int is_eom(int win_error) = 0;
+  virtual int is_eom(int win_error);
   /* returns not null, if `win_error' determines an end of file condition */
-  virtual int is_eof(int win_error) = 0;
+  virtual int is_eof(int win_error);
 
   fhandler_dev_raw ();
 
@@ -569,18 +568,14 @@ class fhandler_dev_floppy: public fhandler_dev_raw
 
 class fhandler_dev_tape: public fhandler_dev_raw
 {
-  int lasterr;
-  TAPE_GET_DRIVE_PARAMETERS dp;
+  HANDLE mt_mtx;
 
-  bool is_rewind_device () { return get_unit () < 128; }
+  bool is_rewind_device () { return get_minor () < 128; }
+  unsigned int driveno () { return (unsigned int) get_minor () & 0x7f; }
+  void drive_init (void);
 
- protected:
-  virtual void clear (void);
-  virtual int is_eom (int win_error);
-  virtual int is_eof (int win_error);
-  virtual BOOL write_file (const void *buf, DWORD to_write,
-			   DWORD *written, int *err);
-  virtual BOOL read_file (void *buf, DWORD to_read, DWORD *read, int *err);
+  inline bool _lock ();
+  inline int unlock (int ret = 0);
 
  public:
   fhandler_dev_tape ();
@@ -588,33 +583,15 @@ class fhandler_dev_tape: public fhandler_dev_raw
   virtual int open (int flags, mode_t mode = 0);
   virtual int close (void);
 
+  void raw_read (void *ptr, size_t& ulen);
+  int raw_write (const void *ptr, size_t ulen);
+
   virtual _off64_t lseek (_off64_t offset, int whence);
 
   virtual int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
 
   virtual int dup (fhandler_base *child);
-
   virtual int ioctl (unsigned int cmd, void *buf);
-
- private:
-  inline bool tape_get_feature (DWORD parm)
-    {
-      return ((parm & TAPE_DRIVE_HIGH_FEATURES)
-	      ? ((dp.FeaturesHigh & parm) != 0)
-	      : ((dp.FeaturesLow & parm) != 0));
-    }
-  int tape_error (const char *txt);
-  int tape_write_marks (int marktype, DWORD len);
-  int tape_get_pos (unsigned long *block, unsigned long *partition = NULL);
-  int tape_set_pos (int mode, long count, bool sfm_func = false);
-  int _tape_set_pos (int mode, long count, int partition = 0);
-  int tape_erase (int mode);
-  int tape_prepare (int action);
-  int tape_set_blocksize (long count);
-  int tape_status (struct mtget *get);
-  int tape_compression (long count);
-  int tape_partition (long count);
-  int tape_set_partition (long count);
 };
 
 /* Standard disk file */

@@ -37,8 +37,20 @@ fhandler_dev_raw::clear (void)
   eom_detected = 0;
   eof_detected = 0;
   lastblk_to_read = 0;
-  varblkop = 0;
 }
+
+int
+fhandler_dev_raw::is_eom (int win_error)
+{
+  return 0;
+}
+
+int
+fhandler_dev_raw::is_eof (int)
+{
+  return 0;
+}
+
 
 /* Wrapper functions to allow fhandler_dev_tape to detect and care for
    media changes and bus resets. */
@@ -76,16 +88,13 @@ fhandler_dev_raw::writebuf (void)
   DWORD written;
   int ret = 0;
 
-  if (!varblkop && is_writing && devbuf && devbufend)
+  if (is_writing && devbuf && devbufend)
     {
       DWORD to_write;
       int ret = 0;
 
       memset (devbuf + devbufend, 0, devbufsiz - devbufend);
-      if (get_major () != DEV_TAPE_MAJOR)
-	to_write = ((devbufend - 1) / 512 + 1) * 512;
-      else
-	to_write = devbufsiz;
+      to_write = ((devbufend - 1) / 512 + 1) * 512;
       if (!write_file (devbuf, to_write, &written, &ret)
 	  && is_eom (ret))
 	eom_detected = 1;
@@ -141,7 +150,7 @@ fhandler_dev_raw::open (int flags, mode_t)
     }
 
   /* Check for illegal flags. */
-  if (flags & (O_APPEND | O_EXCL))
+  if (get_major () != DEV_TAPE_MAJOR && (flags & (O_APPEND | O_EXCL)))
     {
       set_errno (EINVAL);
       return 0;
@@ -162,11 +171,16 @@ fhandler_dev_raw::open (int flags, mode_t)
   WCHAR devname[CYG_MAX_PATH + 1];
   str2buf2uni (dev, devname, get_win32_name ());
   OBJECT_ATTRIBUTES attr;
+  ULONG options = FILE_SYNCHRONOUS_IO_NONALERT;
+  /* The O_TEXT flag is used to indicate write-through on tape devices */
+  if (get_major () == DEV_TAPE_MAJOR && (flags & O_TEXT))
+    options |= FILE_WRITE_THROUGH;
+  flags &= ~O_TEXT;
   InitializeObjectAttributes (&attr, &dev, OBJ_CASE_INSENSITIVE, NULL, NULL);
 
   HANDLE h;
   IO_STATUS_BLOCK io;
-  NTSTATUS status = NtOpenFile (&h, access, &attr, &io, wincap.shared (),
+  NTSTATUS status = NtOpenFile (&h, access, &attr, &io, 0 /* excl. access */,
 				FILE_SYNCHRONOUS_IO_NONALERT);
   if (!NT_SUCCESS (status))
     {
@@ -234,7 +248,8 @@ fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
 	    {
 	      bytes_to_read = min (len, devbufend - devbufstart);
 	      debug_printf ("read %d bytes from buffer (rest %d)",
-			    bytes_to_read, devbufend - devbufend);
+			    bytes_to_read,
+			    devbufend - devbufstart - bytes_to_read);
 	      memcpy (p, devbuf + devbufstart, bytes_to_read);
 	      len -= bytes_to_read;
 	      p += bytes_to_read;
@@ -251,10 +266,7 @@ fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
 	    {
 	      if (len >= devbufsiz)
 		{
-		  if (get_major () == DEV_TAPE_MAJOR)
-		    bytes_to_read = (len / devbufsiz) * devbufsiz;
-		  else
-		    bytes_to_read = (len / 512) * 512;
+		  bytes_to_read = (len / 512) * 512;
 		  tgt = p;
 		  debug_printf ("read %d bytes direct from file",bytes_to_read);
 		}
@@ -310,11 +322,6 @@ fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
     {
       if (!is_eof (ret) && !is_eom (ret))
 	{
-	  if (varblkop && ret == ERROR_MORE_DATA)
-	    /* *ulen < blocksize.  Linux returns ENOMEM here
-	       when reading with variable blocksize . */
-	    set_errno (ENOMEM);
-	  else
 	  __seterrno ();
 	  goto err;
 	}
@@ -470,7 +477,6 @@ fhandler_dev_raw::dup (fhandler_base *child)
       fhc->eom_detected = eom_detected;
       fhc->eof_detected = eof_detected;
       fhc->lastblk_to_read = 0;
-      fhc->varblkop = varblkop;
     }
   return ret;
 }

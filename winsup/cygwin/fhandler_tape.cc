@@ -14,6 +14,7 @@ details. */
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/mtio.h>
+#include <sys/param.h>
 #include <ddk/ntddstor.h>
 #include "cygerrno.h"
 #include "perprocess.h"
@@ -22,628 +23,684 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "shared_info.h"
+#include "sigproc.h"
+#include "mtinfo.h"
 
 /* Media changes and bus resets are sometimes reported and the function
    hasn't been executed.  We repeat all functions which return with one
    of these error codes. */
-/* FIXME: Note that this is wrong!  The correct behaviour after getting
-   an ERROR_BUS_RESET is to raise a flag and then to block any access,
-   except for MTREW, MTOFFL, MT_RETEN, MTERASE, MTSEEK and MTEOM, and
-   to set errno to EIO in all other cases. */
-#define TAPE_FUNC(func) do { \
-			  lasterr = (func); \
-			} while (lasterr == ERROR_MEDIA_CHANGED \
-				 || lasterr == ERROR_BUS_RESET)
+#define TAPE_FUNC(func) while ((lasterr = (func)) == ERROR_MEDIA_CHANGED) \
+			  { \
+			    initialize (drive, false); \
+			    part (partition)->initialize (0); \
+			  }
 
 /* Convert LARGE_INTEGER into long long */
 #define get_ll(pl)  (((long long) (pl).HighPart << 32) | (pl).LowPart)
 
-#define IS_EOM(err) ((err) == ERROR_END_OF_MEDIA \
-		     || (err) == ERROR_EOM_OVERFLOW \
-		     || (err) == ERROR_NO_DATA_DETECTED)
+#define IS_BOT(err) ((err) == ERROR_BEGINNING_OF_MEDIA)
 
 #define IS_EOF(err) ((err) == ERROR_FILEMARK_DETECTED \
 		     || (err) == ERROR_SETMARK_DETECTED)
 
+#define IS_SM(err)  ((err) == ERROR_SETMARK_DETECTED)
+
+#define IS_EOD(err) ((err) == ERROR_END_OF_MEDIA \
+		     || (err) == ERROR_EOM_OVERFLOW \
+		     || (err) == ERROR_NO_DATA_DETECTED)
+
+#define IS_EOM(err) ((err) == ERROR_END_OF_MEDIA \
+		     || (err) == ERROR_EOM_OVERFLOW)
+
 /**********************************************************************/
-/* fhandler_dev_tape */
+/* mtinfo_part */
 
 void
-fhandler_dev_tape::clear (void)
+mtinfo_part::initialize (long nblock)
+{
+  block = nblock;
+  if (block == 0)
+    file = fblock = 0;
+  else
+    file = fblock = -1;
+  smark = false;
+  emark = no_eof;
+}
+
+/**********************************************************************/
+/* mtinfo_drive */
+
+void
+mtinfo_drive::initialize (int num, bool first_time)
+{
+  drive = num;
+  partition = 0;
+  block = -1;
+  lock = unlocked;
+  if (first_time)
+    {
+      buffer_writes = true;
+      two_fm = false;
+      fast_eom = false;
+      auto_lock = false;
+      sysv = false;
+      nowait = false;
+    }
+  for (int i = 0; i < MAX_PARTITION_NUM; ++i)
+    part (i)->initialize ();
+}
+
+int
+mtinfo_drive::get_dp (HANDLE mt)
+{
+  DWORD len = sizeof _dp;
+  TAPE_FUNC (GetTapeParameters (mt, GET_TAPE_DRIVE_INFORMATION, &len, &_dp));
+  return error ("get_dp");
+}
+
+int
+mtinfo_drive::get_mp (HANDLE mt)
+{
+  DWORD len = sizeof _mp;
+  TAPE_FUNC (GetTapeParameters (mt, GET_TAPE_MEDIA_INFORMATION, &len, &_mp));
+  return error ("get_mp");
+}
+
+int
+mtinfo_drive::open (HANDLE mt)
+{
+  get_dp (mt);
+  get_mp (mt);
+  get_pos (mt);
+  if (partition < MAX_PARTITION_NUM && part (partition)->block != block)
+    part (partition)->initialize (block);
+  /* The following rewind in position 0 solves a problem which appears
+   * in case of multi volume archives (at least on NT4): The last ReadFile
+   * on the previous medium returns ERROR_NO_DATA_DETECTED.  After media
+   * change, all subsequent ReadFile calls return ERROR_NO_DATA_DETECTED,
+   * too.  The call to set_pos apparently reset some internal flags.
+   * FIXME:  Is that really true or based on a misinterpretation? */
+  if (!block)
+    {
+      debug_printf ("rewind in position 0");
+      set_pos (mt, TAPE_REWIND, 0, false);
+    }
+  return error ("open");
+}
+
+int
+mtinfo_drive::close (HANDLE mt, bool rewind)
 {
   lasterr = 0;
-  fhandler_dev_raw::clear ();
-}
-
-int
-fhandler_dev_tape::is_eom (int win_error)
-{
-  int ret = IS_EOM (win_error);
-  if (ret)
-    debug_printf ("end of medium");
-  return ret;
-}
-
-int
-fhandler_dev_tape::is_eof (int win_error)
-{
-  int ret = IS_EOF (win_error);
-  if (ret)
-    debug_printf ("end of file");
-  return ret;
-}
-
-BOOL
-fhandler_dev_tape::write_file (const void *buf, DWORD to_write,
-			       DWORD *written, int *err)
-{
-  BOOL ret;
-
-  do
+  if (GetTapeStatus (mt) == ERROR_NO_MEDIA_IN_DRIVE)
+    dirty = clean;
+  if (dirty == has_written)
     {
-      *err = 0;
-      if (!(ret = WriteFile (get_handle (), buf, to_write, written, 0)))
-	*err = GetLastError ();
-    }
-  while (*err == ERROR_MEDIA_CHANGED || *err == ERROR_BUS_RESET);
-  syscall_printf ("%d (err %d) = WriteFile (%d, %d, write %d, written %d, 0)",
-		  ret, *err, get_handle (), buf, to_write, *written);
-  return ret;
-}
-
-BOOL
-fhandler_dev_tape::read_file (void *buf, DWORD to_read, DWORD *read, int *err)
-{
-  BOOL ret;
-
-  do
-    {
-      *err = 0;
-      if (!(ret = ReadFile (get_handle (), buf, to_read, read, 0)))
-	*err = GetLastError ();
-    }
-  while (*err == ERROR_MEDIA_CHANGED || *err == ERROR_BUS_RESET);
-  syscall_printf ("%d (err %d) = ReadFile (%d, %d, to_read %d, read %d, 0)",
-		  ret, *err, get_handle (), buf, to_read, *read);
-  return ret;
-}
-
-fhandler_dev_tape::fhandler_dev_tape ()
-  : fhandler_dev_raw ()
-{
-  debug_printf ("unit: %d", dev ().minor);
-}
-
-int
-fhandler_dev_tape::open (int flags, mode_t)
-{
-  int ret;
-
-  devbufsiz = 1L;
-
-  ret = fhandler_dev_raw::open (flags);
-  if (ret)
-    {
-      DWORD varlen;
-      struct mtget get;
-      unsigned long block;
-
-      TAPE_FUNC (GetTapeParameters (get_handle (), GET_TAPE_DRIVE_INFORMATION,
-				    (varlen = sizeof dp, &varlen), &dp));
-
-      if (!tape_status (&get))
+      /* if last operation was writing, write a filemark */
+      debug_printf ("writing filemark");
+      write_marks (mt, TAPE_FILEMARKS, two_fm ? 2 : 1);
+      if (two_fm && !lasterr && !rewind) /* Backspace over the 2nd filemark. */
         {
-	  long blksize = (get.mt_dsreg & MT_ST_BLKSIZE_MASK)
-	  		 >> MT_ST_BLKSIZE_SHIFT;
-	  /* Tape drive supports and is set to variable block size. */
-	  if (blksize == 0)
-	    devbufsiz = get.mt_maxblksize;
-	  else
-	    devbufsiz = blksize;
-	  varblkop = blksize == 0;
-	}
-
-      if (devbufsiz > 1L)
-	devbuf = new char [devbufsiz];
-
-      /* The following rewind in position 0 solves a problem which appears
-       * in case of multi volume archives: The last ReadFile on first medium
-       * returns ERROR_NO_DATA_DETECTED. After media change, all subsequent
-       * ReadFile calls return ERROR_NO_DATA_DETECTED, too.
-       * The call to tape_set_pos seems to reset some internal flags. */
-      if (!tape_get_pos (&block) && !block)
-	{
-	  debug_printf ("rewinding");
-	  tape_set_pos (TAPE_REWIND, 0);
-	}
-
-      if (flags & O_APPEND)
-	{
-	  /* In append mode, seek to beginning of next filemark */
-	  tape_set_pos (TAPE_SPACE_FILEMARKS, 1, true);
+	  set_pos (mt, TAPE_SPACE_FILEMARKS, -1, false);
+	  if (!lasterr)
+	    part (partition)->fblock = 0; /* That's obvious, isn't it? */
 	}
     }
-
-  return ret;
-}
-
-int
-fhandler_dev_tape::close (void)
-{
-  struct mtop op;
-  int ret = 0;
-
-  if (is_writing)
+  else if (dirty == has_read && sysv && !rewind)
     {
-      ret = writebuf ();
-      if (has_written && !eom_detected)
-	{
-	  /* if last operation was writing, write a filemark */
-	  debug_printf ("writing filemark");
-	  op.mt_op = MTWEOF;
-	  op.mt_count = 1;
-	  ioctl (MTIOCTOP, &op);
+      if (sysv)
+        {
+	  /* Under SYSV semantics, the tape is moved past the next file mark
+	     after read. */
+	  if (part (partition)->emark == no_eof)
+	    set_pos (mt, TAPE_SPACE_FILEMARKS, 1, false);
+	  else if (part (partition)->emark == eof_hit)
+	    part (partition)->emark = eof;
+	}
+      else
+        {
+	  /* Under BSD semantics, we must check if the filemark has been
+	     inadvertendly crossed.  If so cross the filemark backwards
+	     and position the tape right before EOF. */
+	  if (part (partition)->emark == eof_hit)
+	    set_pos (mt, TAPE_SPACE_FILEMARKS, -1, false);
 	}
     }
-
-  // To protected reads on signaling (e.g. Ctrl-C)
-  eof_detected = 1;
-
-  if (is_rewind_device ())
+  if (rewind)
     {
       debug_printf ("rewinding");
-      tape_set_pos (TAPE_REWIND, 0);
+      set_pos (mt, TAPE_REWIND, 0, false);
     }
-
-  if (ret)
-    {
-      fhandler_dev_raw::close ();
-      return ret;
-    }
-
-  return fhandler_dev_raw::close ();
+  if (auto_lock && lock == auto_locked)
+    prepare (mt, TAPE_UNLOCK);
+  dirty = clean;
+  return error ("close");
 }
 
 int
-fhandler_dev_tape::fstat (struct __stat64 *buf)
+mtinfo_drive::read (HANDLE mt, void *ptr, size_t &ulen)
 {
-  int ret;
+  BOOL ret;
+  DWORD bytes_read = 0;
 
-  if (!(ret = fhandler_base::fstat (buf)))
+  if (GetTapeStatus (mt) == ERROR_NO_MEDIA_IN_DRIVE)
+    return lasterr = ERROR_NO_MEDIA_IN_DRIVE;
+  if (lasterr == ERROR_BUS_RESET)
     {
-      struct mtget get;
-
-      if (!ioctl (MTIOCGET, &get))
-	buf->st_blocks = get.mt_capacity / buf->st_blksize;
+      ulen = 0;
+      goto out;
     }
-
-  return ret;
-}
-
-_off64_t
-fhandler_dev_tape::lseek (_off64_t offset, int whence)
-{
-  struct mtop op;
-  struct mtpos pos;
-
-  debug_printf ("lseek (%s, %d, %d)", get_name (), offset, whence);
-
-  writebuf ();
-
-  if (ioctl (MTIOCPOS, &pos))
+  dirty = clean;
+  if (part (partition)->emark == eof_hit)
     {
-      return ILLEGAL_SEEK;
+      part (partition)->emark = eof;
+      lasterr = ulen = 0;
+      goto out;
     }
-
-  switch (whence)
+  else if (part (partition)->emark == eod_hit)
     {
-      case SEEK_END:
-	op.mt_op = MTFSF;
-	op.mt_count = 1;
-	if (ioctl (MTIOCTOP, &op))
-	  return -1;
-	break;
-      case SEEK_SET:
-	if (whence == SEEK_SET && offset < 0)
-	  {
-	    set_errno (EINVAL);
-	    return -1;
-	  }
-	break;
-      case SEEK_CUR:
-	break;
-      default:
-	set_errno (EINVAL);
-	return -1;
+      part (partition)->emark = eod;
+      lasterr = ulen = 0;
+      goto out;
     }
-
-  op.mt_op = MTFSR;
-  op.mt_count = offset / devbufsiz
-		- (whence == SEEK_SET ? pos.mt_blkno : 0);
-
-  if (op.mt_count < 0)
+  else if (part (partition)->emark == eod)
     {
-      op.mt_op = MTBSR;
-      op.mt_count = -op.mt_count;
+      lasterr = ERROR_NO_DATA_DETECTED;
+      ulen = (size_t) -1;
+      goto out;
     }
-
-  if (ioctl (MTIOCTOP, &op) || ioctl (MTIOCPOS, &pos))
-    return -1;
-
-  return (pos.mt_blkno * devbufsiz);
-}
-
-int
-fhandler_dev_tape::dup (fhandler_base *child)
-{
-  fhandler_dev_tape *fhc = (fhandler_dev_tape *) child;
-
-  fhc->lasterr = lasterr;
-  fhc->dp = dp;
-  return fhandler_dev_raw::dup (child);
-}
-
-int
-fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
-{
-  int ret = NO_ERROR;
-  unsigned long block;
-
-  if (cmd == MTIOCTOP)
+  else if (part (partition)->emark == eom_hit)
     {
-      struct mtop *op = (struct mtop *) buf;
-
-      if (!op)
-	ret = ERROR_INVALID_PARAMETER;
+      part (partition)->emark = eom;
+      lasterr = ulen = 0;
+      goto out;
+    }
+  else if (part (partition)->emark == eom)
+    {
+      lasterr = ERROR_END_OF_MEDIA;
+      ulen = (size_t) -1;
+      goto out;
+    }
+  part (partition)->smark = false;
+  if (auto_lock && lock < auto_locked)
+    prepare (mt, TAPE_LOCK, true);
+  ret = ReadFile (mt, ptr, ulen, &bytes_read, 0);
+  lasterr = ret ? 0 : GetLastError ();
+  ulen = (size_t) bytes_read;
+  if (bytes_read > 0)
+    {
+      long blocks_read = mp ()->BlockSize == 0
+			 ? 1 : howmany (bytes_read, mp ()->BlockSize);
+      block += blocks_read;
+      part (partition)->block += blocks_read;
+      if (part (partition)->fblock >= 0)
+	part (partition)->fblock += blocks_read;
+    }
+  if (IS_EOF (lasterr))
+    {
+      block++;
+      part (partition)->block++;
+      if (part (partition)->file >= 0)
+	part (partition)->file++;
+      part (partition)->fblock = 0;
+      part (partition)->smark = IS_SM (lasterr);
+      part (partition)->emark = bytes_read > 0 ? eof_hit : eof;
+      lasterr = 0;
+    }
+  else if (IS_EOD (lasterr))
+    {
+      if (part (partition)->emark == eof)
+        part (partition)->emark = IS_EOM (lasterr) ? eom : eod;
       else
-	switch (op->mt_op)
-	  {
-	  case MTRESET:
-	    break;
-	  case MTFSF:
-	    ret = tape_set_pos (TAPE_SPACE_FILEMARKS, op->mt_count);
-	    break;
-	  case MTBSF:
-	    ret = tape_set_pos (TAPE_SPACE_FILEMARKS, -op->mt_count);
-	    break;
-	  case MTFSR:
-	    ret = tape_set_pos (TAPE_SPACE_RELATIVE_BLOCKS, op->mt_count);
-	    break;
-	  case MTBSR:
-	    ret = tape_set_pos (TAPE_SPACE_RELATIVE_BLOCKS, -op->mt_count);
-	    break;
-	  case MTWEOF:
-	    if (tape_get_feature (TAPE_DRIVE_WRITE_FILEMARKS))
-	      ret = tape_write_marks (TAPE_FILEMARKS, op->mt_count);
-	    else if (tape_get_feature (TAPE_DRIVE_WRITE_LONG_FMKS))
-	      ret = tape_write_marks (TAPE_LONG_FILEMARKS, op->mt_count);
-	    else
-	      ret = tape_write_marks (TAPE_SHORT_FILEMARKS, op->mt_count);
-	    break;
-	  case MTREW:
-	    ret = tape_set_pos (TAPE_REWIND, 0);
-	    break;
-	  case MTOFFL:
-	  case MTUNLOAD:
-	    ret = tape_prepare (TAPE_UNLOAD);
-	    break;
-	  case MTNOP:
-	    reset_devbuf ();
-	    break;
-	  case MTRETEN:
-	    if (!tape_get_feature (TAPE_DRIVE_END_OF_DATA))
-	      ret = ERROR_INVALID_PARAMETER;
-	    else if (!(ret = tape_set_pos (TAPE_REWIND, 0, false)))
-	      ret = tape_prepare (TAPE_TENSION);
-	    break;
-	  case MTBSFM:
-	    ret = tape_set_pos (TAPE_SPACE_FILEMARKS, -op->mt_count, true);
-	    break;
-	  case MTFSFM:
-	    ret = tape_set_pos (TAPE_SPACE_FILEMARKS, op->mt_count, true);
-	    break;
-	  case MTEOM:
-	    if (tape_get_feature (TAPE_DRIVE_END_OF_DATA))
-	      ret = tape_set_pos (TAPE_SPACE_END_OF_DATA, 0);
-	    else
-	      ret = tape_set_pos (TAPE_SPACE_FILEMARKS, 32767);
-	    break;
-	  case MTERASE:
-	    ret = tape_erase (TAPE_ERASE_LONG);
-	    break;
-	  case MTRAS1:
-	  case MTRAS2:
-	  case MTRAS3:
-	    ret = ERROR_INVALID_PARAMETER;
-	    break;
-	  case MTSETBLK:
-	    if (!tape_get_feature (TAPE_DRIVE_SET_BLOCK_SIZE))
-	      {
-		ret = ERROR_INVALID_PARAMETER;
-		break;
-	      }
-	    if ((devbuf && (size_t) op->mt_count == devbufsiz)
-		|| (!devbuf && op->mt_count == 0))
-	      {
-		/* Nothing has changed. */
-		ret = 0;
-		break;
-	      }
-	    if ((op->mt_count == 0
-		 && !tape_get_feature (TAPE_DRIVE_VARIABLE_BLOCK))
-		|| (op->mt_count > 0
-		    && ((DWORD) op->mt_count < dp.MinimumBlockSize
-			|| (DWORD) op->mt_count > dp.MaximumBlockSize)))
-	      {
-		ret = ERROR_INVALID_PARAMETER;
-		break;
-	      }
-	    if (devbuf && devbufend - devbufstart > 0
-		&& (op->mt_count == 0
-		    || (op->mt_count > 0
-			&& (size_t) op->mt_count < devbufend - devbufstart)))
-	      {
-		/* Not allowed if still data in devbuf. */
-		ret = ERROR_INVALID_BLOCK_LENGTH; /* EIO */
-		break;
-	      }
-	    if (!(ret = tape_set_blocksize (op->mt_count)))
-	      {
-		char *buf = NULL;
-		if (op->mt_count > 1L && !(buf = new char [op->mt_count]))
-		  {
-		    ret = ERROR_OUTOFMEMORY;
-		    break;
-		  }
-		if (devbufsiz > 1L && op->mt_count > 1L)
-		  {
-		    memcpy (buf, devbuf + devbufstart,
-			    devbufend - devbufstart);
-		    devbufend -= devbufstart;
-		  }
-		else
-		  devbufend = 0;
-		devbufstart = 0;
-		delete [] devbuf;
-		devbuf = buf;
-		devbufsiz = op->mt_count;
-		varblkop = op->mt_count == 0;
-	      }
-	    reset_devbuf ();
-	    break;
-	  case MTSEEK:
-	    if (tape_get_feature (TAPE_DRIVE_LOGICAL_BLK))
-	      ret = tape_set_pos (TAPE_LOGICAL_BLOCK, op->mt_count);
-	    else if (!(ret = tape_get_pos (&block)))
-	      ret = tape_set_pos (TAPE_SPACE_RELATIVE_BLOCKS,
-				  op->mt_count - block);
-	    break;
-	  case MTTELL:
-	    if (!(ret = tape_get_pos (&block)))
-	      op->mt_count = block;
-	    break;
-	  case MTFSS:
-	    ret = tape_set_pos (TAPE_SPACE_SETMARKS, op->mt_count);
-	    break;
-	  case MTBSS:
-	    ret = tape_set_pos (TAPE_SPACE_SETMARKS, -op->mt_count);
-	    break;
-	  case MTWSM:
-	    ret = tape_write_marks (TAPE_SETMARKS, op->mt_count);
-	    reset_devbuf ();
-	    break;
-	  case MTLOCK:
-	    ret = tape_prepare (TAPE_LOCK);
-	    break;
-	  case MTUNLOCK:
-	    ret = tape_prepare (TAPE_UNLOCK);
-	    break;
-	  case MTLOAD:
-	    ret = tape_prepare (TAPE_LOAD);
-	    break;
-	  case MTCOMPRESSION:
-	    ret = tape_compression (op->mt_count);
-	    break;
-	  case MTSETPART:
-	    ret = tape_set_partition (op->mt_count);
-	    reset_devbuf ();
-	    break;
-	  case MTMKPART:
-	    ret = tape_partition (op->mt_count);
-	    reset_devbuf ();
-	    break;
-	  case MTSETDENSITY:
-	  case MTSETDRVBUFFER:
-	    reset_devbuf ();
-	  default:
-	    ret = ERROR_INVALID_PARAMETER;
-	    break;
-	  }
-    }
-  else if (cmd == MTIOCGET)
-    ret = tape_status ((struct mtget *) buf);
-  else if (cmd == MTIOCPOS)
-    {
-      ret = ERROR_INVALID_PARAMETER;
-      if (buf && (ret = tape_get_pos (&block)))
-	((struct mtpos *) buf)->mt_blkno = block;
+        {
+	  part (partition)->emark = IS_EOM (lasterr) ? eom_hit : eod_hit;
+	  lasterr = 0;
+	}
     }
   else
-    return fhandler_dev_raw::ioctl (cmd, buf);
-
-  if (ret != NO_ERROR)
     {
-      SetLastError (ret);
-      __seterrno ();
-      return -1;
+      part (partition)->emark = no_eof;
+      /* This happens if the buffer is too small when in variable block
+	 size mode.  Linux returns ENOMEM here.  We're doing the same. */
+      if (lasterr == ERROR_MORE_DATA)
+        lasterr = ERROR_NOT_ENOUGH_MEMORY;
     }
-
-  return 0;
-}
-
-/* ------------------------------------------------------------------ */
-/*                  Private functions used by `ioctl'                 */
-/* ------------------------------------------------------------------ */
-
-int
-fhandler_dev_tape::tape_error (const char *txt)
-{
-  if (lasterr)
-    debug_printf ("%s: error: %d", txt, lasterr);
-  return lasterr;
+  if (!lasterr)
+    dirty = has_read;
+out:
+  return error ("read");
 }
 
 int
-fhandler_dev_tape::tape_write_marks (int marktype, DWORD len)
+mtinfo_drive::write (HANDLE mt, const void *ptr, size_t &len)
 {
-  syscall_printf ("write_tapemark");
-  TAPE_FUNC (WriteTapemark (get_handle (), marktype, len, FALSE));
-  return tape_error ("tape_write_marks");
-}
+  BOOL ret;
+  DWORD bytes_written = 0;
 
-int
-fhandler_dev_tape::tape_get_pos (unsigned long *block,
-				 unsigned long *partition)
-{
-  DWORD part, low, high;
-
-  lasterr = ERROR_INVALID_PARAMETER;
-  if (tape_get_feature (TAPE_DRIVE_GET_LOGICAL_BLK))
-    TAPE_FUNC (GetTapePosition (get_handle (), TAPE_LOGICAL_POSITION,
-				&part, &low, &high));
-  else if (tape_get_feature (TAPE_DRIVE_GET_ABSOLUTE_BLK))
-    TAPE_FUNC (GetTapePosition (get_handle (), TAPE_ABSOLUTE_POSITION,
-				&part, &low, &high));
-
-  if (!tape_error ("tape_get_pos"))
+  if (GetTapeStatus (mt) == ERROR_NO_MEDIA_IN_DRIVE)
+    return lasterr = ERROR_NO_MEDIA_IN_DRIVE;
+  if (lasterr == ERROR_BUS_RESET)
     {
-      if (block)
-	*block = low;
-      if (partition)
-        *partition = part > 0 ? part - 1 : part;
+      len = 0;
+      return error ("write");
     }
-
-  return lasterr;
+  dirty = clean;
+  part (partition)->smark = false;
+  if (auto_lock && lock < auto_locked)
+    prepare (mt, TAPE_LOCK, true);
+  ret = WriteFile (mt, ptr, len, &bytes_written, 0);
+  lasterr = ret ? 0: GetLastError ();
+  len = (size_t) bytes_written;
+  if (bytes_written > 0)
+    {
+      long blocks_written = mp ()->BlockSize == 0
+			 ? 1 : howmany (bytes_written, mp ()->BlockSize);
+      block += blocks_written;
+      part (partition)->block += blocks_written;
+      if (part (partition)->fblock >= 0)
+	part (partition)->fblock += blocks_written;
+    }
+  if (lasterr == ERROR_EOM_OVERFLOW)
+    part (partition)->emark = eom;
+  else if (lasterr == ERROR_END_OF_MEDIA)
+    ; // FIXME?: part (partition)->emark = eom_hit;
+  else
+    {
+      part (partition)->emark = no_eof;
+      if (!lasterr)
+        dirty = has_written;
+    }
+  return error ("write");
 }
 
 int
-fhandler_dev_tape::_tape_set_pos (int mode, long count, int partition)
+mtinfo_drive::get_pos (HANDLE mt, long *ppartition, long *pblock)
 {
-  TAPE_FUNC (SetTapePosition (get_handle (), mode, partition, count,
+  DWORD p, low, high;
+
+  TAPE_FUNC (GetTapePosition (mt, TAPE_LOGICAL_POSITION, &p, &low, &high));
+  if (lasterr == ERROR_INVALID_FUNCTION)
+    TAPE_FUNC (GetTapePosition (mt, TAPE_ABSOLUTE_POSITION, &p, &low, &high));
+  if (!lasterr)
+    {
+      partition = (long) (p > 0 ? p - 1 : p);
+      block = (long) low;
+      if (ppartition)
+        *ppartition= partition;
+      if (pblock)
+        *pblock = block;
+    }
+  else
+    {
+      partition = 0;
+      block = -1;
+    }
+  return error ("get_pos");
+}
+
+int
+mtinfo_drive::_set_pos (HANDLE mt, int mode, long count,
+			int partition)
+{
+  TAPE_FUNC (SetTapePosition (mt, mode, partition, count,
 			      count < 0 ? -1 : 0, FALSE));
-  /* Reset buffer after successful repositioning. */
-  if (!lasterr || IS_EOF (lasterr) || IS_EOM (lasterr))
-    {
-      reset_devbuf ();
-      eof_detected = IS_EOF (lasterr);
-      eom_detected = IS_EOM (lasterr);
-    }
+  dirty = clean;
   return lasterr;
 }
 
 int
-fhandler_dev_tape::tape_set_pos (int mode, long count, bool sfm_func)
+mtinfo_drive::set_pos (HANDLE mt, int mode, long count,
+		       bool sfm_func)
 {
+  int err = 0;
+  long undone = count;
+  BOOL dont_wait = FALSE;
+
   switch (mode)
     {
       case TAPE_SPACE_RELATIVE_BLOCKS:
       case TAPE_SPACE_FILEMARKS:
+      case TAPE_SPACE_SETMARKS:
         if (!count)
 	  {
 	    lasterr = 0;
-	    return tape_error ("tape_set_pos");
+	    goto out;
 	  }
 	break;
-    }
-  _tape_set_pos (mode, count);
-  switch (mode)
-    {
-      case TAPE_SPACE_FILEMARKS:
-	if (!lasterr && sfm_func)
-	  return tape_set_pos (mode, count > 0 ? -1 : 1, false);
+      case TAPE_ABSOLUTE_BLOCK:
+      case TAPE_LOGICAL_BLOCK:
+      case TAPE_REWIND:
+        dont_wait = nowait ? TRUE : FALSE;
 	break;
     }
-  return tape_error ("tape_set_pos");
+  if (mode == TAPE_SPACE_FILEMARKS)
+    {
+      while (!err && undone > 0)
+	if (!(err = _set_pos (mt, mode, 1, 0)) || IS_SM (err))
+	  --undone;
+      while (!err && undone < 0)
+	if (!(err = _set_pos (mt, mode, -1, 0)) || IS_SM (err))
+	  ++undone;
+    }
+  else
+    err = _set_pos (mt, mode, count, dont_wait);
+  switch (mode)
+    {
+      case TAPE_ABSOLUTE_BLOCK:
+      case TAPE_LOGICAL_BLOCK:
+	get_pos (mt);
+	part (partition)->initialize (block);
+        break;
+      case TAPE_REWIND:
+        if (!err)
+	  {
+	    block = 0;
+	    part (partition)->initialize (0);
+	  }
+	else
+	  {
+	    get_pos (mt);
+	    part (partition)->initialize (block);
+	  }
+	break;
+      case TAPE_SPACE_END_OF_DATA:
+	get_pos (mt);
+	part (partition)->initialize (block);
+	part (partition)->emark = IS_EOM (err) ? eom : eod;
+        break;
+      case TAPE_SPACE_FILEMARKS:
+	if (!err || IS_SM (err))
+	  {
+	    get_pos (mt);
+	    part (partition)->block = block;
+	    if (count > 0)
+	      {
+		if (part (partition)->file >= 0)
+		  part (partition)->file += count - undone;
+		part (partition)->fblock = 0;
+		part (partition)->smark = IS_SM (err);
+	      }
+	    else
+	      {
+	        if (part (partition)->file >= 0)
+		  part (partition)->file += count - undone;
+		part (partition)->fblock = -1;
+		part (partition)->smark = false;
+	      }
+	    if (sfm_func)
+	      err = set_pos (mt, mode, count > 0 ? -1 : 1, false);
+	    else
+	      part (partition)->emark = count > 0 ? eof : no_eof;
+	  }
+	else if (IS_EOD (err))
+	  {
+	    get_pos (mt);
+	    part (partition)->block = block;
+	    if (part (partition)->file >= 0)
+	      part (partition)->file += count - undone;
+	    part (partition)->fblock = -1;
+	    part (partition)->smark = false;
+	    part (partition)->emark = IS_EOM (err) ? eom : eod;
+	  }
+	else if (IS_BOT (err))
+	  {
+	    block = 0;
+	    part (partition)->initialize (0);
+	  }
+	else
+	  {
+	    get_pos (mt);
+	    part (partition)->initialize (block);
+	  }
+	break;
+      case TAPE_SPACE_RELATIVE_BLOCKS:
+	if (!err)
+	  {
+	    block += count;
+	    part (partition)->block += count;
+	    if (part (partition)->fblock >= 0)
+	      part (partition)->fblock += count;
+	    part (partition)->smark = false;
+	    part (partition)->emark = no_eof;
+	  }
+	else if (IS_EOF (err))
+	  {
+	    get_pos (mt);
+	    part (partition)->block = block;
+	    if (part (partition)->file >= 0)
+	      part (partition)->file += count > 0 ? 1 : -1;
+	    part (partition)->fblock = count > 0 ? 0 : -1;
+	    part (partition)->smark = (count > 0 && IS_SM (err));
+	    part (partition)->emark = count > 0 ? eof : no_eof;
+	  }
+	else if (IS_EOD (err))
+	  {
+	    get_pos (mt);
+	    part (partition)->fblock = block - part (partition)->block;
+	    part (partition)->block = block;
+	    part (partition)->smark = false;
+	    part (partition)->emark = IS_EOM (err) ? eom : eod;
+	  }
+	else if (IS_BOT (err))
+	  {
+	    block = 0;
+	    part (partition)->initialize (0);
+	  }
+        break;
+      case TAPE_SPACE_SETMARKS:
+	get_pos (mt);
+	part (partition)->block = block;
+        if (!err)
+	  {
+	    part (partition)->file = -1;
+	    part (partition)->fblock = -1;
+	    part (partition)->smark = true;
+	  }
+        break;
+    }
+  lasterr = err;
+out:
+  return error ("set_pos");
 }
 
 int
-fhandler_dev_tape::tape_erase (int mode)
+mtinfo_drive::create_partitions (HANDLE mt, long count)
 {
-  if (tape_set_pos (TAPE_REWIND, 0))
-    return lasterr;
+  if (dp ()->MaximumPartitionCount <= 1)
+    return ERROR_INVALID_PARAMETER;
+  if (set_pos (mt, TAPE_REWIND, 0, false))
+    goto out;
+  debug_printf ("Format tape with %s partition(s)", count <= 0 ? "one" : "two");
+  TAPE_FUNC (CreateTapePartition (mt, TAPE_SELECT_PARTITIONS,
+				  count <= 0 ? 1 : 2, 0));
+out:
+  return error ("partition");
+}
+
+int
+mtinfo_drive::set_partition (HANDLE mt, long count)
+{
+  if (count < 0 || (unsigned long) count >= MAX_PARTITION_NUM)
+    lasterr = ERROR_INVALID_PARAMETER;
+  else if ((DWORD) count >= dp ()->MaximumPartitionCount)
+    lasterr = ERROR_IO_DEVICE;
+  else
+    {
+      int part_block = part (count)->block >= 0 ? part (count)->block : 0;
+      int err = _set_pos (mt, TAPE_LOGICAL_BLOCK, part_block, count + 1);
+      if (err)
+	{
+	  int sav_block = block;
+	  int sav_partition = partition;
+	  get_pos (mt);
+	  if (sav_partition != partition)
+	    {
+	      if (partition < MAX_PARTITION_NUM
+	          && part (partition)->block != block)
+		part (partition)->initialize (block);
+	    }
+	  else if (sav_block != block && partition < MAX_PARTITION_NUM)
+	    part (partition)->initialize (block);
+	  lasterr = err;
+	}
+      else
+	partition = count;
+    }
+  return error ("set_partition");
+}
+
+int
+mtinfo_drive::write_marks (HANDLE mt, int marktype, DWORD count)
+{
+  if (marktype != TAPE_SETMARKS)
+    dirty = clean;
+  if (marktype == TAPE_FILEMARKS
+      && !get_feature (TAPE_DRIVE_WRITE_FILEMARKS))
+    {
+      if (get_feature (TAPE_DRIVE_WRITE_LONG_FMKS))
+	marktype = TAPE_LONG_FILEMARKS;
+      else
+	marktype = TAPE_SHORT_FILEMARKS;
+    }
+  TAPE_FUNC (WriteTapemark (mt, marktype, count, FALSE));
+  int err = lasterr;
+  if (!err)
+    {
+      block += count;
+      part (partition)->block += count;
+      if (part (partition)->file >= 0)
+	part (partition)->file += count;
+      part (partition)->fblock = 0;
+      part (partition)->emark = eof;
+      part (partition)->smark = (marktype == TAPE_SETMARKS);
+    }
+  else
+    {
+      int sav_block = block;
+      int sav_partition = partition;
+      get_pos (mt);
+      if (sav_partition != partition)
+	{
+	  if (partition < MAX_PARTITION_NUM
+	      && part (partition)->block != block)
+	    part (partition)->initialize (block);
+	}
+      else if (sav_block != block && partition < MAX_PARTITION_NUM)
+	part (partition)->initialize (block);
+      lasterr = err;
+    }
+  return error ("write_marks");
+}
+
+int
+mtinfo_drive::erase (HANDLE mt, int mode)
+{
   switch (mode)
     {
       case TAPE_ERASE_SHORT:
-	if (!tape_get_feature (TAPE_DRIVE_ERASE_SHORT))
+	if (!get_feature (TAPE_DRIVE_ERASE_SHORT))
 	  mode = TAPE_ERASE_LONG;
 	break;
       case TAPE_ERASE_LONG:
-	if (!tape_get_feature (TAPE_DRIVE_ERASE_LONG))
+	if (!get_feature (TAPE_DRIVE_ERASE_LONG))
 	  mode = TAPE_ERASE_SHORT;
 	break;
     }
-  TAPE_FUNC (EraseTape (get_handle (), mode, false));
-  /* Reset buffer after successful tape erasing. */
-  if (!lasterr)
-    reset_devbuf ();
-  return tape_error ("tape_erase");
+  TAPE_FUNC (EraseTape (mt, mode, nowait ? TRUE : FALSE));
+  part (partition)->initialize (0);
+  return error ("erase");
 }
 
 int
-fhandler_dev_tape::tape_prepare (int action)
+mtinfo_drive::prepare (HANDLE mt, int action, bool is_auto)
 {
-  TAPE_FUNC (PrepareTape (get_handle (), action, FALSE));
+  BOOL dont_wait = FALSE;
+
+  dirty = clean;
+  if (action == TAPE_UNLOAD || action == TAPE_LOAD || action == TAPE_TENSION)
+    dont_wait = nowait ? TRUE : FALSE;
+  TAPE_FUNC (PrepareTape (mt, action, dont_wait));
   /* Reset buffer after all successful preparations but lock and unlock. */
-  if (!lasterr && action != TAPE_LOCK && action != TAPE_UNLOCK)
-    reset_devbuf ();
-  return tape_error ("tape_prepare");
+  switch (action)
+    {
+      case TAPE_FORMAT:
+      case TAPE_UNLOAD:
+      case TAPE_LOAD:
+	initialize (drive, false);
+	break;
+      case TAPE_TENSION:
+	part (partition)->initialize (0);
+	break;
+      case TAPE_LOCK:
+	lock = lasterr ? lock_error : is_auto ? auto_locked : locked;
+        break;
+      case TAPE_UNLOCK:
+        lock = lasterr ? lock_error : unlocked;
+	break;
+    }
+  return error ("prepare");
 }
 
 int
-fhandler_dev_tape::tape_set_blocksize (long count)
+mtinfo_drive::set_compression (HANDLE mt, long count)
 {
-  TAPE_SET_MEDIA_PARAMETERS mp;
-
-  mp.BlockSize = count;
-  TAPE_FUNC (SetTapeParameters (get_handle (), SET_TAPE_MEDIA_INFORMATION,
-  				&mp));
-  return tape_error ("tape_set_blocksize");
+  if (!get_feature (TAPE_DRIVE_SET_COMPRESSION))
+    return ERROR_INVALID_PARAMETER;
+  TAPE_SET_DRIVE_PARAMETERS sdp =
+    {
+      dp ()->ECC,
+      count ? TRUE : FALSE,
+      dp ()->DataPadding,
+      dp ()->ReportSetmarks,
+      dp ()->EOTWarningZoneSize
+    };
+  TAPE_FUNC (SetTapeParameters (mt, SET_TAPE_DRIVE_INFORMATION, &sdp));
+  int err = lasterr;
+  if (!err)
+    dp ()->Compression = sdp.Compression;
+  else
+    get_dp (mt);
+  lasterr = err;
+  return error ("set_compression");
 }
 
 int
-fhandler_dev_tape::tape_status (struct mtget *get)
+mtinfo_drive::set_blocksize (HANDLE mt, long count)
 {
-  DWORD varlen;
-  TAPE_GET_MEDIA_PARAMETERS mp;
+  TAPE_SET_MEDIA_PARAMETERS smp = {count};
+  TAPE_FUNC (SetTapeParameters (mt, SET_TAPE_MEDIA_INFORMATION, &smp));
+  return error ("set_blocksize");
+}
+
+int
+mtinfo_drive::status (HANDLE mt, struct mtget *get)
+{
   int notape = 0;
+  DWORD tstat;
 
   if (!get)
     return ERROR_INVALID_PARAMETER;
 
-  /* Setting varlen to sizeof DP is by intention, actually!  Never set
-     it to sizeof MP which seems to be more correct but results in a
-     ERROR_MORE_DATA error at least on W2K. */
-  TAPE_FUNC (GetTapeParameters (get_handle (), GET_TAPE_MEDIA_INFORMATION,
-				(varlen = sizeof dp, &varlen), &mp));
-  if (lasterr)
+  if ((tstat = GetTapeStatus (mt)) == ERROR_NO_MEDIA_IN_DRIVE)
     notape = 1;
 
   memset (get, 0, sizeof *get);
 
   get->mt_type = MT_ISUNKNOWN;
 
-  if (!notape && tape_get_feature (TAPE_DRIVE_SET_BLOCK_SIZE))
-    get->mt_dsreg = (mp.BlockSize << MT_ST_BLKSIZE_SHIFT)
+  if (!notape && get_feature (TAPE_DRIVE_SET_BLOCK_SIZE))
+    get->mt_dsreg = (mp ()->BlockSize << MT_ST_BLKSIZE_SHIFT)
 		    & MT_ST_BLKSIZE_MASK;
   else
-    get->mt_dsreg = (dp.DefaultBlockSize << MT_ST_BLKSIZE_SHIFT)
+    get->mt_dsreg = (dp ()->DefaultBlockSize << MT_ST_BLKSIZE_SHIFT)
 		    & MT_ST_BLKSIZE_MASK;
 
   if (wincap.has_ioctl_storage_get_media_types_ex ())
     {
       DWORD size = sizeof (GET_MEDIA_TYPES) + 10 * sizeof (DEVICE_MEDIA_INFO);
       void *buf = alloca (size);
-      if (DeviceIoControl (get_handle (), IOCTL_STORAGE_GET_MEDIA_TYPES_EX,
+      if (DeviceIoControl (mt, IOCTL_STORAGE_GET_MEDIA_TYPES_EX,
 			   NULL, 0, buf, size, &size, NULL)
 	  || GetLastError () == ERROR_MORE_DATA)
 	{
@@ -667,97 +724,657 @@ fhandler_dev_tape::tape_status (struct mtget *get)
 	    }
 	}
     }
-  if (notape)
-    get->mt_gstat |= GMT_DR_OPEN (-1);
 
   if (!notape)
     {
-      if (tape_get_feature (TAPE_DRIVE_GET_LOGICAL_BLK)
-          || tape_get_feature (TAPE_DRIVE_GET_ABSOLUTE_BLK))
-	tape_get_pos ((unsigned long *) &get->mt_blkno,
-		      (unsigned long *) &get->mt_resid);
+      get->mt_fileno = part (partition)->file;
+      get->mt_blkno = part (partition)->fblock;
 
-      if (!get->mt_blkno)
-	get->mt_gstat |= GMT_BOT (-1);
+      if (get->mt_blkno == 0)
+	if (get->mt_fileno == 0)
+	  get->mt_gstat |= GMT_BOT (-1);
+	else
+	  get->mt_gstat |= GMT_EOF (-1);
+      if (part (partition)->emark >= eod_hit)
+        get->mt_gstat |= GMT_EOD (-1);
+      if (part (partition)->emark >= eom_hit)
+        get->mt_gstat |= GMT_EOT (-1);
+
+      if (part (partition)->smark)
+        get->mt_gstat |= GMT_SM (-1);
 
       get->mt_gstat |= GMT_ONLINE (-1);
 
-      if (tape_get_feature (TAPE_DRIVE_WRITE_PROTECT) && mp.WriteProtected)
+      if (mp ()->WriteProtected)
 	get->mt_gstat |= GMT_WR_PROT (-1);
 
-      if (tape_get_feature (TAPE_DRIVE_TAPE_CAPACITY))
-	get->mt_capacity = get_ll (mp.Capacity);
+      get->mt_capacity = get_ll (mp ()->Capacity);
+      get->mt_remaining = get_ll (mp ()->Remaining);
+  }
 
-      if (tape_get_feature (TAPE_DRIVE_TAPE_REMAINING))
-	  get->mt_remaining = get_ll (mp.Remaining);
-    }
+  if (notape)
+    get->mt_gstat |= GMT_DR_OPEN (-1);
 
-  if (tape_get_feature (TAPE_DRIVE_COMPRESSION) && dp.Compression)
-    get->mt_gstat |= GMT_HW_COMP (-1);
+  if (buffer_writes)
+    get->mt_gstat |= GMT_IM_REP_EN (-1);	/* TODO: Async writes */
 
-  if (tape_get_feature (TAPE_DRIVE_ECC) && dp.ECC)
-    get->mt_gstat |= GMT_HW_ECC (-1);
+  else if (tstat == ERROR_DEVICE_REQUIRES_CLEANING)
+    get->mt_gstat |= GMT_CLN (-1);
 
-  if (tape_get_feature (TAPE_DRIVE_PADDING) && dp.DataPadding)
+  /* Cygwin specials: */
+  if (dp ()->ReportSetmarks)
+    get->mt_gstat |= GMT_REP_SM (-1);
+  if (dp ()->DataPadding)
     get->mt_gstat |= GMT_PADDING (-1);
+  if (dp ()->ECC)
+    get->mt_gstat |= GMT_HW_ECC (-1);
+  if (dp ()->Compression)
+    get->mt_gstat |= GMT_HW_COMP (-1);
+  if (two_fm)
+    get->mt_gstat |= GMT_TWO_FM (-1);
+  if (fast_eom)
+    get->mt_gstat |= GMT_FAST_MTEOM (-1);
+  if (auto_lock)
+    get->mt_gstat |= GMT_AUTO_LOCK (-1);
+  if (sysv)
+    get->mt_gstat |= GMT_SYSV (-1);
+  if (nowait)
+    get->mt_gstat |= GMT_NOWAIT (-1);
 
-  if (tape_get_feature (TAPE_DRIVE_REPORT_SMKS) && dp.ReportSetmarks)
-    get->mt_gstat |= GMT_IM_REP_EN (-1);
+  get->mt_erreg = 0;				/* FIXME: No softerr counting */
 
-  get->mt_erreg = lasterr;
-
-  get->mt_minblksize = dp.MinimumBlockSize;
-  get->mt_maxblksize = dp.MaximumBlockSize;
-  get->mt_defblksize = dp.DefaultBlockSize;
-  get->mt_featureslow = dp.FeaturesLow;
-  get->mt_featureshigh = dp.FeaturesHigh;
-  get->mt_eotwarningzonesize = dp.EOTWarningZoneSize;
+  get->mt_minblksize = dp ()->MinimumBlockSize;
+  get->mt_maxblksize = dp ()->MaximumBlockSize;
+  get->mt_defblksize = dp ()->DefaultBlockSize;
+  get->mt_featureslow = dp ()->FeaturesLow;
+  get->mt_featureshigh = dp ()->FeaturesHigh;
+  get->mt_eotwarningzonesize = dp ()->EOTWarningZoneSize;
 
   return 0;
 }
 
 int
-fhandler_dev_tape::tape_compression (long count)
+mtinfo_drive::set_options (HANDLE mt, long options)
 {
-  TAPE_SET_DRIVE_PARAMETERS dps;
+  long what = (options & MT_ST_OPTIONS);
+  bool call_setparams = false;
+  bool set;
+  TAPE_SET_DRIVE_PARAMETERS sdp =
+    {
+      dp ()->ECC,
+      dp ()->Compression,
+      dp ()->DataPadding,
+      dp ()->ReportSetmarks,
+      dp ()->EOTWarningZoneSize
+    };
 
-  if (!tape_get_feature (TAPE_DRIVE_COMPRESSION))
-    return ERROR_INVALID_PARAMETER;
-
-  dps.ECC = dp.ECC;
-  dps.Compression = count ? TRUE : FALSE;
-  dps.DataPadding = dp.DataPadding;
-  dps.ReportSetmarks = dp.ReportSetmarks;
-  dps.EOTWarningZoneSize = dp.EOTWarningZoneSize;
-  TAPE_FUNC (SetTapeParameters (get_handle (), SET_TAPE_DRIVE_INFORMATION,
-				&dps));
-  if (!lasterr)
-    dp.Compression = dps.Compression;
-  return tape_error ("tape_compression");
+  lasterr = 0;
+  switch (what)
+    {
+      case 0:
+	if (options == 0 || options == 1)
+	  {
+	    buffer_writes = (options == 1);
+	  }
+        break;
+      case MT_ST_BOOLEANS:
+	buffer_writes = !!(options & MT_ST_BUFFER_WRITES);
+	two_fm = !!(options & MT_ST_TWO_FM);
+	fast_eom = !!(options & MT_ST_FAST_MTEOM);
+	auto_lock = !!(options & MT_ST_AUTO_LOCK);
+	sysv = !!(options & MT_ST_SYSV);
+	nowait = !!(options & MT_ST_NOWAIT);
+	if (get_feature (TAPE_DRIVE_SET_ECC))
+	  sdp.ECC = !!(options & MT_ST_ECC);
+	if (get_feature (TAPE_DRIVE_SET_PADDING))
+	  sdp.DataPadding = !!(options & MT_ST_PADDING);
+	if (get_feature (TAPE_DRIVE_SET_REPORT_SMKS))
+	  sdp.ReportSetmarks = !!(options & MT_ST_REPORT_SM);
+	if (sdp.ECC != dp ()->ECC || sdp.DataPadding != dp ()->DataPadding
+	    || sdp.ReportSetmarks != dp ()->ReportSetmarks)
+	  call_setparams = true;
+        break;
+      case MT_ST_SETBOOLEANS:
+      case MT_ST_CLEARBOOLEANS:
+        set = (what == MT_ST_SETBOOLEANS);
+	if (options & MT_ST_BUFFER_WRITES)
+	  buffer_writes = set;
+	if (options & MT_ST_TWO_FM)
+	  two_fm = set;
+	if (options & MT_ST_FAST_MTEOM)
+	  fast_eom = set;
+	if (options & MT_ST_AUTO_LOCK)
+	  auto_lock = set;
+	if (options & MT_ST_SYSV)
+	  sysv = set;
+	if (options & MT_ST_NOWAIT)
+	  nowait = set;
+	if (options & MT_ST_ECC)
+	  sdp.ECC = set;
+	if (options & MT_ST_PADDING)
+	  sdp.DataPadding = set;
+	if (options & MT_ST_REPORT_SM)
+	  sdp.ReportSetmarks = set;
+	if (sdp.ECC != dp ()->ECC || sdp.DataPadding != dp ()->DataPadding
+	    || sdp.ReportSetmarks != dp ()->ReportSetmarks)
+	  call_setparams = true;
+        break;
+      case MT_ST_EOT_WZ_SIZE:
+	if (get_feature (TAPE_DRIVE_SET_EOT_WZ_SIZE))
+	  {
+	    sdp.EOTWarningZoneSize = (options & ~MT_ST_OPTIONS);
+	    if (sdp.EOTWarningZoneSize != dp ()->EOTWarningZoneSize)
+	      call_setparams = true;
+	  }
+        break;
+    }
+  if (call_setparams)
+    {
+      TAPE_FUNC (SetTapeParameters (mt, SET_TAPE_DRIVE_INFORMATION, &sdp));
+      int err = lasterr;
+      if (!err)
+        {
+	  dp ()->ECC = sdp.ECC;
+	  dp ()->DataPadding = sdp.DataPadding;
+	  dp ()->ReportSetmarks = sdp.ReportSetmarks;
+	}
+      else
+	get_dp (mt);
+      lasterr = err;
+    }
+  return error ("set_options");
 }
 
 int
-fhandler_dev_tape::tape_partition (long count)
+mtinfo_drive::ioctl (HANDLE mt, unsigned int cmd, void *buf)
 {
-  if (dp.MaximumPartitionCount <= 1)
-    return ERROR_INVALID_PARAMETER;
-  if (tape_set_pos (TAPE_REWIND, 0))
-    return lasterr;
-  if (count <= 0)
-    debug_printf ("Formatting tape with one partition");
+  if (cmd == MTIOCTOP)
+    {
+      if (__check_invalid_read_ptr (buf, sizeof (struct mtop)))
+        return ERROR_NOACCESS;
+      struct mtop *op = (struct mtop *) buf;
+      if (lasterr == ERROR_BUS_RESET)
+        {
+	  /* If a bus reset occurs, block further access to this device
+	     until the user rewinds, unloads or in any other way tries
+	     to maintain a well-known tape position. */
+	  if (op->mt_op != MTREW && op->mt_op != MTOFFL
+	      && op->mt_op != MTRETEN && op->mt_op != MTERASE
+	      && op->mt_op != MTSEEK && op->mt_op != MTEOM)
+	    return ERROR_BUS_RESET;
+	  /* Try to maintain last lock state after bus reset. */
+	  if (lock >= auto_locked && PrepareTape (mt, TAPE_LOCK, FALSE))
+	    {
+	      debug_printf ("Couldn't relock drive after bus reset.");
+	      lock = unlocked;
+	    }
+        }
+      switch (op->mt_op)
+	{
+	  case MTRESET:
+	    break;
+	  case MTFSF:
+	    set_pos (mt, TAPE_SPACE_FILEMARKS, op->mt_count, false);
+	    break;
+	  case MTBSF:
+	    set_pos (mt, TAPE_SPACE_FILEMARKS, -op->mt_count, false);
+	    break;
+	  case MTFSR:
+	    set_pos (mt, TAPE_SPACE_RELATIVE_BLOCKS, op->mt_count, false);
+	    break;
+	  case MTBSR:
+	    set_pos (mt, TAPE_SPACE_RELATIVE_BLOCKS, -op->mt_count, false);
+	    break;
+	  case MTWEOF:
+	    write_marks (mt, TAPE_FILEMARKS, op->mt_count);
+	    break;
+	  case MTREW:
+	    set_pos (mt, TAPE_REWIND, 0, false);
+	    break;
+	  case MTOFFL:
+	  case MTUNLOAD:
+	    prepare (mt, TAPE_UNLOAD);
+	    break;
+	  case MTNOP:
+	    lasterr = 0;
+	    break;
+	  case MTRETEN:
+	    if (!get_feature (TAPE_DRIVE_TENSION))
+	      lasterr = ERROR_INVALID_PARAMETER;
+	    else if (!set_pos (mt, TAPE_REWIND, 0, false))
+	      prepare (mt, TAPE_TENSION);
+	    break;
+	  case MTBSFM:
+	    set_pos (mt, TAPE_SPACE_FILEMARKS, -op->mt_count, true);
+	    break;
+	  case MTFSFM:
+	    set_pos (mt, TAPE_SPACE_FILEMARKS, op->mt_count, true);
+	    break;
+	  case MTEOM:
+	    if (fast_eom && get_feature (TAPE_DRIVE_END_OF_DATA))
+	      set_pos (mt, TAPE_SPACE_END_OF_DATA, 0, false);
+	    else
+	      set_pos (mt, TAPE_SPACE_FILEMARKS, 32767, false);
+	    break;
+	  case MTERASE:
+	    erase (mt, TAPE_ERASE_LONG);
+	    break;
+	  case MTRAS1:
+	  case MTRAS2:
+	  case MTRAS3:
+	    lasterr = ERROR_INVALID_PARAMETER;
+	    break;
+	  case MTSETBLK:
+	    if (!get_feature (TAPE_DRIVE_SET_BLOCK_SIZE))
+	      {
+		lasterr = ERROR_INVALID_PARAMETER;
+		break;
+	      }
+	    if ((DWORD) op->mt_count == mp ()->BlockSize)
+	      {
+		/* Nothing has changed. */
+		lasterr = 0;
+		break;
+	      }
+	    if ((op->mt_count == 0 && !get_feature (TAPE_DRIVE_VARIABLE_BLOCK))
+		|| (op->mt_count > 0
+		    && ((DWORD) op->mt_count < dp ()->MinimumBlockSize
+			|| (DWORD) op->mt_count > dp ()->MaximumBlockSize)))
+	      {
+		lasterr = ERROR_INVALID_PARAMETER;
+		break;
+	      }
+	    if (set_blocksize (mt, op->mt_count)
+		&& lasterr == ERROR_INVALID_FUNCTION)
+	      lasterr = ERROR_INVALID_BLOCK_LENGTH;
+	    break;
+	  case MTSEEK:
+	    if (get_feature (TAPE_DRIVE_LOGICAL_BLK))
+	      set_pos (mt, TAPE_LOGICAL_BLOCK, op->mt_count, false);
+	    else if (!get_pos (mt))
+	      set_pos (mt, TAPE_SPACE_RELATIVE_BLOCKS,
+		       op->mt_count - block, false);
+	    break;
+	  case MTTELL:
+	    if (!get_pos (mt))
+	      op->mt_count = block;
+	    break;
+	  case MTFSS:
+	    set_pos (mt, TAPE_SPACE_SETMARKS, op->mt_count, false);
+	    break;
+	  case MTBSS:
+	    set_pos (mt, TAPE_SPACE_SETMARKS, -op->mt_count, false);
+	    break;
+	  case MTWSM:
+	    write_marks (mt, TAPE_SETMARKS, op->mt_count);
+	    break;
+	  case MTLOCK:
+	    prepare (mt, TAPE_LOCK);
+	    break;
+	  case MTUNLOCK:
+	    prepare (mt, TAPE_UNLOCK);
+	    break;
+	  case MTLOAD:
+	    prepare (mt, TAPE_LOAD);
+	    break;
+	  case MTCOMPRESSION:
+	    set_compression (mt, op->mt_count);
+	    break;
+	  case MTSETPART:
+	    set_partition (mt, op->mt_count);
+	    break;
+	  case MTMKPART:
+	    create_partitions (mt, op->mt_count);
+	    break;
+	  case MTSETDRVBUFFER:
+	    set_options (mt, op->mt_count);
+	    break;
+	  case MTSETDENSITY:
+	  default:
+	    lasterr = ERROR_INVALID_PARAMETER;
+	    break;
+	}
+    }
+  else if (cmd == MTIOCGET)
+    {
+      if (__check_null_invalid_struct (buf, sizeof (struct mtget)))
+        return ERROR_NOACCESS;
+      status (mt, (struct mtget *) buf);
+    }
+  else if (cmd == MTIOCPOS)
+    {
+      if (__check_null_invalid_struct (buf, sizeof (struct mtpos)))
+        return ERROR_NOACCESS;
+      if (!get_pos (mt))
+	((struct mtpos *) buf)->mt_blkno = block;
+    }
+
+  return lasterr;
+}
+
+/**********************************************************************/
+/* mtinfo */
+
+void
+mtinfo::initialize (void)
+{
+  char name[CYG_MAX_PATH];
+  HANDLE mtx;
+
+  shared_name (name, "mtinfo_mutex", 0);
+  if (!(mtx = CreateMutex (&sec_all_nih, FALSE, name)))
+    api_fatal ("CreateMutex '%s'(%p), %E.  Terminating.", name);
+  WaitForSingleObject (mtx, INFINITE);
+  if (!magic)
+    {
+      magic = MTINFO_MAGIC;
+      version = MTINFO_VERSION;
+      for (unsigned i = 0; i < MAX_DRIVE_NUM; ++i)
+        drive (i)->initialize (i, true);
+      ReleaseMutex (mtx);
+      CloseHandle (mtx);
+    }
   else
-    debug_printf ("Formatting tape with two partitions");
-  TAPE_FUNC (CreateTapePartition (get_handle (), TAPE_SELECT_PARTITIONS,
-				   count <= 0 ? 1 : 2, 0));
-  return tape_error ("tape_partition");
+    {
+      ReleaseMutex (mtx);
+      CloseHandle (mtx);
+      if (magic != MTINFO_MAGIC)
+	api_fatal ("MT magic number screwed up: %lu, should be %lu",
+		   magic, MTINFO_MAGIC);
+      if (version != MTINFO_VERSION)
+        system_printf ("MT version number mismatch: %lu, should be %lu",
+		       version, MTINFO_VERSION);
+    }
+}
+
+HANDLE mt_h;
+mtinfo *mt;
+
+void __stdcall
+mtinfo_init ()
+{
+  mt = (mtinfo *) open_shared ("mtinfo", MTINFO_VERSION, mt_h, sizeof (mtinfo), SH_MTINFO);
+  mt->initialize ();
+}
+
+/**********************************************************************/
+/* fhandler_dev_tape */
+
+#define lock(err_ret_val) if (!_lock ()) return err_ret_val;
+
+inline bool
+fhandler_dev_tape::_lock ()
+{
+  HANDLE obj[2] = { mt_mtx, signal_arrived };
+  BOOL ret = WaitForMultipleObjects (2, obj, FALSE, INFINITE) == WAIT_OBJECT_0;
+  if (!ret)
+    {
+      debug_printf ("signal_arrived"); \
+      set_errno (EINTR);
+    }
+  return ret;
+}
+
+inline int
+fhandler_dev_tape::unlock (int ret)
+{
+  ReleaseMutex (mt_mtx);
+  return ret;
+}
+
+fhandler_dev_tape::fhandler_dev_tape ()
+  : fhandler_dev_raw ()
+{
+  debug_printf ("unit: %d", dev ().minor);
 }
 
 int
-fhandler_dev_tape::tape_set_partition (long count)
+fhandler_dev_tape::open (int flags, mode_t)
 {
-  if (count < 0 || (unsigned long) count >= dp.MaximumPartitionCount)
-    lasterr = ERROR_INVALID_PARAMETER;
+  int ret;
+
+  if (driveno () >= MAX_DRIVE_NUM)
+    {
+      set_errno (ENOENT);
+      return 0;
+    }
+  if (!(mt_mtx = CreateMutex (&sec_all, FALSE, NULL)))
+    {
+      __seterrno ();
+      return 0;
+    }
+  /* The O_TEXT flag is used to indicate write-through (non buffered writes)
+     to the underlying fhandler_dev_raw::open call. */
+  flags &= ~O_TEXT;
+  if (!mt->drive (driveno ())->buffered_writes ())
+    flags |= O_TEXT;
+  ret = fhandler_dev_raw::open (flags);
+  if (ret)
+    {
+      mt->drive (driveno ())->open (get_handle ());
+
+      /* In append mode, seek to beginning of next filemark */
+      if (flags & O_APPEND)
+	mt->drive (driveno ())->set_pos (get_handle (),
+					 TAPE_SPACE_FILEMARKS, 1, true);
+
+      devbufsiz = mt->drive (driveno ())->dp ()->MaximumBlockSize;
+      devbuf = new char (devbufsiz);
+      devbufstart = devbufend = 0;
+    }
   else
-    lasterr = _tape_set_pos (TAPE_LOGICAL_BLOCK, 0, count + 1);
-  return tape_error ("tape_set_partition");
+    ReleaseMutex (mt_mtx);
+  return ret;
+}
+
+int
+fhandler_dev_tape::close (void)
+{
+  int ret, cret;
+
+  lock (-1);
+  ret = mt->drive (driveno ())->close (get_handle (), is_rewind_device ());
+  if (ret)
+    __seterrno_from_win_error (ret);
+  cret = fhandler_dev_raw::close ();
+  return unlock (ret ? -1 : cret);
+}
+
+void
+fhandler_dev_tape::raw_read (void *ptr, size_t &ulen)
+{
+  char *buf = (char *) ptr;
+  size_t len = ulen;
+  size_t block_size;
+  size_t bytes_to_read;
+  size_t bytes_read = 0;
+  int ret = 0;
+
+  if (lastblk_to_read)
+    {
+      lastblk_to_read = 0;
+      ulen = 0;
+      return;
+    }
+  if (!_lock ())
+    {
+      ulen = (size_t) -1;
+      return;
+    }
+  block_size = mt->drive (driveno ())->mp ()->BlockSize;
+  if (devbufend > devbufstart)
+    {
+      bytes_to_read = min (len, devbufend - devbufstart);
+      debug_printf ("read %d bytes from buffer (rest %d)",
+		    bytes_to_read, devbufend - devbufstart - bytes_to_read);
+      memcpy (buf, devbuf + devbufstart, bytes_to_read);
+      len -= bytes_to_read;
+      bytes_read += bytes_to_read;
+      buf += bytes_to_read;
+      devbufstart += bytes_to_read;
+      if (devbufstart == devbufend)
+        devbufstart = devbufend = 0;
+      /* If a switch to variable block_size occured, just return the buffer
+         remains until the buffer is empty, then proceed with usual variable
+	 block size handling (one block per read call). */
+      if (!block_size)
+        len = 0;
+    }
+  if (len > 0)
+    {
+      size_t block_fit = !block_size ? len : rounddown(len,  block_size);
+      if (block_fit)
+        {
+	  debug_printf ("read %d bytes from tape (rest %d)",
+			block_fit, len - block_fit);
+	  ret = mt->drive (driveno ())->read (get_handle (), buf, block_fit);
+	  if (ret)
+	    __seterrno_from_win_error (ret);
+	  else if (block_fit)
+	    {
+	      len -= block_fit;
+	      bytes_read += block_fit;
+	      buf += block_fit;
+	      /* Only one block in each read call, please. */
+	      if (!block_size)
+	        len = 0;
+	    }
+	  else {
+	    len = 0;
+	    if (bytes_read)
+	      lastblk_to_read = 1;
+	  }
+	}
+      if (!ret && len > 0)
+        {
+	  debug_printf ("read %d bytes from tape (one block)", block_size);
+	  ret = mt->drive (driveno ())->read (get_handle (), devbuf,
+					      block_size);
+	  if (ret)
+	    __seterrno_from_win_error (ret);
+	  else if (block_size)
+	    {
+	      devbufstart = len;
+	      devbufend = block_size;
+	      bytes_read += len;
+	      memcpy (buf, devbuf, len);
+	    }
+	  else if (bytes_read)
+	    lastblk_to_read = 1;
+	}
+    }
+  if (ret)
+    ulen = (size_t) -1;
+  else
+    ulen = bytes_read;
+  unlock ();
+}
+
+int
+fhandler_dev_tape::raw_write (const void *ptr, size_t len)
+{
+  lock (-1);
+  int ret = mt->drive (driveno ())->write (get_handle (), ptr, len);
+    __seterrno_from_win_error (ret);
+  return unlock (len);
+}
+
+_off64_t
+fhandler_dev_tape::lseek (_off64_t offset, int whence)
+{
+  struct mtop op;
+  struct mtpos pos;
+  DWORD block_size;
+  _off64_t ret = ILLEGAL_SEEK;
+
+  lock (ILLEGAL_SEEK);
+
+  debug_printf ("lseek (%s, %d, %d)", get_name (), offset, whence);
+
+  block_size = mt->drive (driveno ())->mp ()->BlockSize;
+  if (block_size == 0)
+    {
+      set_errno (EIO);
+      goto out;
+    }
+
+  if (ioctl (MTIOCPOS, &pos))
+    goto out;
+
+  switch (whence)
+    {
+      case SEEK_END:
+	op.mt_op = MTFSF;
+	op.mt_count = 1;
+	if (ioctl (MTIOCTOP, &op))
+	  goto out;
+	break;
+      case SEEK_SET:
+	if (whence == SEEK_SET && offset < 0)
+	  {
+	    set_errno (EINVAL);
+	    goto out;
+	  }
+	break;
+      case SEEK_CUR:
+	break;
+      default:
+	set_errno (EINVAL);
+	goto out;
+    }
+
+  op.mt_op = MTFSR;
+  op.mt_count = offset / block_size
+		- (whence == SEEK_SET ? pos.mt_blkno : 0);
+
+  if (op.mt_count < 0)
+    {
+      op.mt_op = MTBSR;
+      op.mt_count = -op.mt_count;
+    }
+
+  if (ioctl (MTIOCTOP, &op) || ioctl (MTIOCPOS, &pos))
+    goto out;
+
+  ret = pos.mt_blkno * block_size;
+
+out:
+  return unlock (ret);
+}
+
+int
+fhandler_dev_tape::fstat (struct __stat64 *buf)
+{
+  int ret;
+
+  if (driveno () >= MAX_DRIVE_NUM)
+    {
+      set_errno (ENOENT);
+      return -1;
+    }
+  if (!(ret = fhandler_base::fstat (buf)))
+    buf->st_blocks = 0;
+  return ret;
+}
+
+int
+fhandler_dev_tape::dup (fhandler_base *child)
+{
+  lock (-1);
+  return unlock (fhandler_dev_raw::dup (child));
+}
+
+int
+fhandler_dev_tape::ioctl (unsigned int cmd, void *buf)
+{
+  int ret = 0;
+  lock (-1);
+  if (cmd == MTIOCTOP || cmd == MTIOCGET || cmd == MTIOCPOS)
+    {
+      ret = mt->drive (driveno ())->ioctl (get_handle (), cmd, buf);
+      if (ret)
+	__seterrno_from_win_error (ret);
+      return unlock (ret ? -1 : 0);
+    }
+  return unlock (fhandler_dev_raw::ioctl (cmd, buf));
 }

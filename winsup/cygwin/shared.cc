@@ -26,6 +26,7 @@ details. */
 #include "registry.h"
 #include "cygwin_version.h"
 #include "child_info.h"
+#include "mtinfo.h"
 
 shared_info NO_COPY *cygwin_shared;
 user_info NO_COPY *user_shared;
@@ -62,7 +63,13 @@ static char *offsets[] =
     + pround (sizeof (shared_info))
     + pround (sizeof (user_info))
     + pround (sizeof (console_state))
+    + pround (sizeof (_pinfo)),
+  (char *) cygwin_shared_address
+    + pround (sizeof (shared_info))
+    + pround (sizeof (user_info))
+    + pround (sizeof (console_state))
     + pround (sizeof (_pinfo))
+    + pround (sizeof (mtinfo))
 };
 
 void * __stdcall
@@ -243,6 +250,7 @@ memory_init ()
   ProtectHandleINH (cygheap->shared_h);
 
   user_shared_initialize (false);
+  mtinfo_init ();
 }
 
 unsigned
