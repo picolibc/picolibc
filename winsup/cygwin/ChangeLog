@@ -1,5 +1,12 @@
 2002-07-14  Christopher Faylor  <cgf@redhat.com>
 
+	* dcrt0.cc (initial_env): Force path and CYGWIN_DEBUG contents to lower
+	case.
+	* exceptions.cc (error_start_init): Use the name derived from
+	GetModuleName rather than myself->progname.
+
+2002-07-14  Christopher Faylor  <cgf@redhat.com>
+
 	* dcrt0.cc (dll_crt0_1): Move debug_init call back to here.  Avoid a
 	compiler warning.
 	* shared.cc (memory_init): Remove debug_init call.

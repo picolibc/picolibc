@@ -148,11 +148,13 @@ error_start_init (const char *buf)
       return;
     }
 
-  char myself_posix_name[MAX_PATH];
+  char pgm[MAX_PATH + 1];
+  if (!GetModuleFileName (NULL, pgm, MAX_PATH))
+    strcpy (pgm, "cygwin1.dll");
+  for (char *p = strchr (pgm, '\\'); p; p = strchr (p, '\\'))
+    *p = '/';
 
-  /* FIXME: gdb cannot use win32 paths, but what if debugger isn't gdb? */
-  cygwin_conv_to_posix_path (myself->progname, myself_posix_name);
-  __small_sprintf (debugger_command, "%s %s", buf, myself_posix_name);
+  __small_sprintf (debugger_command, "%s %s", buf, pgm);
 }
 
 static void
@@ -341,8 +343,6 @@ try_to_debug (bool waitloop)
 
   __small_sprintf (strchr (debugger_command, '\0'), " %u", GetCurrentProcessId ());
 
-  BOOL dbg;
-
   SetThreadPriority (hMainThread, THREAD_PRIORITY_HIGHEST);
   PROCESS_INFORMATION pi = {NULL, 0, 0, 0};
 
@@ -375,6 +375,7 @@ try_to_debug (bool waitloop)
 	}
     }
 
+  BOOL dbg;
   dbg = CreateProcess (NULL,
 		       debugger_command,
 		       NULL,
