@@ -143,7 +143,8 @@ protected:
   char *win32_path_name_;
 
 public:
-  void set_name (const char *unix, const char *win32 = NULL, int unit = 0);
+  void set_name (const char * unix_path, const char * win32_path = NULL,
+		 int unit = 0);
 
   virtual fhandler_base& operator =(fhandler_base &x)
   {

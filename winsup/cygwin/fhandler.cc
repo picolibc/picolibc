@@ -124,7 +124,7 @@ fhandler_base::get_readahead_into_buffer (char *buf, size_t buflen)
 */
 
 void
-fhandler_base::set_name (const char *unix, const char *win32, int unit)
+fhandler_base::set_name (const char *unix_path, const char *win32_path, int unit)
 {
   if (!no_free_names ())
     {
@@ -135,18 +135,18 @@ fhandler_base::set_name (const char *unix, const char *win32, int unit)
     }
 
   unix_path_name_ = win32_path_name_ = NULL;
-  if (unix == NULL || !*unix)
+  if (unix_path == NULL || !*unix_path)
     return;
 
-  unix_path_name_ = strdup (unix);
+  unix_path_name_ = strdup (unix_path);
   if (unix_path_name_ == NULL)
     {
       system_printf ("fatal error. strdup failed");
       exit (ENOMEM);
     }
 
-  if (win32)
-    win32_path_name_ = strdup (win32);
+  if (win32_path)
+    win32_path_name_ = strdup (win32_path);
   else
     {
       const char *fmt = get_native_name ();
