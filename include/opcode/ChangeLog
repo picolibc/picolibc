@@ -1,5 +1,12 @@
 2002-11-18  Klee Dienes  <kdienes@apple.com>
 
+	* h8300.h (h8_opcode): Remove 'length' field.
+	(h8_opcodes): Mark as 'const' (both the declaration and
+	definition).  Modify initializer and initializer macros to no
+	longer initialize the length field.
+
+2002-11-18  Klee Dienes  <kdienes@apple.com>
+
 	* arc.h (arc_ext_opcodes): Declare as extern.
 	(arc_ext_operands): Declare as extern.
 	* i860.h (i860_opcodes): Declare as const.
