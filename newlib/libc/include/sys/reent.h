@@ -325,7 +325,7 @@ struct _reent
     var->_r48 = _NULL; \
     var->_localtime_buf = _NULL; \
     var->_asctime_buf = _NULL; \
-    var->_sig_func = _NULL;
+    var->_sig_func = _NULL; \
     var->_atexit._ind = 0; \
     var->_atexit._fns = _NULL}; \
     var->__sglue._next = _NULL; \

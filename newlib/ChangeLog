@@ -1,3 +1,7 @@
+2002-04-09  Tom Rix  <trix@redhat.com>
+
+	* libc/include/sys/reent.h (_REENT_INIT_PTR): Fix typo.
+
 2002-04-09  Mark Bradshaw  <bradshaw@staff.crosswalk.com>
 
         * libc/include/time.h: Fix strptime declaration.
