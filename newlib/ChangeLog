@@ -1,5 +1,10 @@
 2003-11-27  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/include/stdlib.h (_atoi_r): New prototype.
+	* libc/stdlib/atoi.c (_atoi_r): New reentrant function.
+
+2003-11-27  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* libc/include/stdlib.h (_atoll_r, _atol_r): New prototypes.
 	* libc/stdlib/atol.c (_atol_r): New reentrant function.
 	* libc/stdlib/atoll.c (_atoll_r): Ditto.

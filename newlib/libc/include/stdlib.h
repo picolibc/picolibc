@@ -62,6 +62,7 @@ double	_EXFUN(atof,(const char *__nptr));
 float	_EXFUN(atoff,(const char *__nptr));
 #endif
 int	_EXFUN(atoi,(const char *__nptr));
+int	_EXFUN(_atoi_r,(struct _reent *, const char *__nptr));
 long	_EXFUN(atol,(const char *__nptr));
 long	_EXFUN(_atol_r,(struct _reent *, const char *__nptr));
 _PTR	_EXFUN(bsearch,(const _PTR __key,
