@@ -1,5 +1,9 @@
 2005-03-28  Mark Mitchell <mark@codesourcery.com>
 
+	* include/libiberty.h (ffs): Declare.
+	
+2005-03-28  Mark Mitchell <mark@codesourcery.com>
+
 	* gdb/ser-tcp.c (net_read_prim): Use recv unconditionally.
 	(net_write_prim): Use send unconditionally.
 	* gdb/configure.ac: Do not check for send and recv.

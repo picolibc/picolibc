@@ -140,6 +140,13 @@ extern char *libiberty_concat_ptr;
 
 extern int fdmatch PARAMS ((int fd1, int fd2));
 
+/* Return the position of the first bit set in the argument.  */
+/* Prototypes vary from system to system, so we only provide a
+   prototype on systems where we know that we need it.  */
+#ifdef __MINGW32__
+extern int ffs(int);
+#endif
+
 /* Get the working directory.  The result is cached, so don't call
    chdir() between calls to getpwd().  */
 
