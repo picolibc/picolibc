@@ -1,3 +1,16 @@
+Thu May 24 01:17:33 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (handle_exceptions): Bump repeat count for debugging
+	kick out.
+
+	* fhandler.h (fhandler_dev_dsp): Add a fixup_after_exec.
+	* fhandler_dsp.cc (class Audio): Add TOT_BLOCK_SIZE to enum.
+	(operator new): New.
+	(bigwavebuffer): Declare using TOT_BLOCK_SIZE to avoid buffer overruns.
+	(Audio::Audio): Optimize slightly.
+	(fhandler_dev_dsp::open): Allocate s_audio using static buffer.
+	(fhandler_dev_dsp::fixup_after_exec): New function.  Ditto.
+
 Wed May 23 17:45:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* syscalls.cc (seteuid): Restrict overriding external provided

@@ -28,7 +28,12 @@ static void CALLBACK wave_callback (HWAVE hWave, UINT msg, DWORD instance,
 class Audio
 {
 public:
-  enum { MAX_BLOCKS = 12, BLOCK_SIZE = 16384 };
+  enum
+  {
+    MAX_BLOCKS = 12,
+    BLOCK_SIZE = 16384,
+    TOT_BLOCK_SIZE = BLOCK_SIZE + sizeof (WAVEHDR)
+   };
 
     Audio ();
    ~Audio ();
@@ -42,6 +47,8 @@ public:
   void callback_sampledone (void *pData);
   void setformat (int format) {formattype_ = format;}
   int numbytesoutput ();
+
+  void *operator new (size_t, void *p) {return p;}
 
 private:
   char *initialisebuffer ();
@@ -57,21 +64,17 @@ private:
   char *freeblocks_[MAX_BLOCKS];
   int formattype_;
 
-  char bigwavebuffer_[MAX_BLOCKS * BLOCK_SIZE];
+  char bigwavebuffer_[MAX_BLOCKS * TOT_BLOCK_SIZE];
 };
+
+static char audio_buf[sizeof (class Audio)];
 
 Audio::Audio ()
 {
-  int size = BLOCK_SIZE + sizeof (WAVEHDR);
-
   InitializeCriticalSection (&lock_);
-  memset (freeblocks_, 0, sizeof (freeblocks_));
+  memset (bigwavebuffer_, 0, sizeof (bigwavebuffer_));
   for (int i = 0; i < MAX_BLOCKS; i++)
-    {
-      char *pBuffer = &bigwavebuffer_[i * size];
-      memset (pBuffer, 0, size);
-      freeblocks_[i] = pBuffer;
-    }
+    freeblocks_[i] =  &bigwavebuffer_[i * TOT_BLOCK_SIZE];
 }
 
 Audio::~Audio ()
@@ -436,7 +439,7 @@ fhandler_dev_dsp::open (const char *path, int flags, mode_t mode = 0)
   set_flags (flags);
 
   if (!s_audio)
-    s_audio = new Audio;
+    s_audio = new (audio_buf) Audio;
 
   // Work out initial sample format & frequency
   if (strcmp (path, "/dev/dsp") == 0L)
@@ -631,4 +634,11 @@ void
 fhandler_dev_dsp::dump ()
 {
   paranoid_printf ("here, fhandler_dev_dsp");
+}
+
+void
+fhandler_dev_dsp::fixup_after_exec (HANDLE)
+{
+  /* FIXME:  Is there a better way to do this? */
+  s_audio = new (audio_buf) Audio;
 }

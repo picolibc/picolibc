@@ -973,6 +973,7 @@ public:
   int close (void);
   int dup (fhandler_base * child);
   void dump (void);
+  void fixup_after_exec (HANDLE);
 };
 
 #if 0

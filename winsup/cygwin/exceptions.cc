@@ -405,7 +405,7 @@ handle_exceptions (EXCEPTION_RECORD *e, void *, CONTEXT *in, void *)
   static int NO_COPY debugging = 0;
   static int NO_COPY recursed = 0;
 
-  if (debugging && ++debugging < 50000)
+  if (debugging && ++debugging < 500000)
     {
       SetThreadPriority (hMainThread, THREAD_PRIORITY_NORMAL);
       return 0;
