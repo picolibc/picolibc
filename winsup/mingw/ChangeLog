@@ -1,5 +1,9 @@
 2003-10-21  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/math.h (cabs): Remove non-ISO prototype.
+
+2003-10-21  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* mingwex/math/cephes_mconf.h (NAN, NANF, NANL):
 	Use GCC __builtin's if available.
 	(INFINITY, INFINITYF, INFINITYL): Likewise.

@@ -175,7 +175,9 @@ _CRTIMP double __cdecl fmod (double, double);
 
 #ifndef __STRICT_ANSI__
 
-/* Complex number (for cabs). This really belongs in complex.h */
+/* Complex number (for _cabs). This is the MS version. The ISO
+   C99 counterpart _Complex is an intrinsic type in GCC and
+   'complex' is defined as a macro.  See complex.h  */
 struct _complex
 {
 	double	x;	/* Real part */
@@ -220,7 +222,6 @@ _CRTIMP int __cdecl _isnan (double);
 
 #if !defined (_NO_OLDNAMES)
 
-_CRTIMP double __cdecl cabs (struct _complex);
 _CRTIMP double __cdecl j0 (double);
 _CRTIMP double __cdecl j1 (double);
 _CRTIMP double __cdecl jn (int, double);
