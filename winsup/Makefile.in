@@ -1,3 +1,7 @@
+2003-07-25  Christopher Faylor  <cgf@redhat.com>
+
+	* 
+
 # Makefile.in for windows stuff
 # Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
 #
@@ -68,6 +72,7 @@ info:
 
 $(SUBDIRS):
 	@if cd $@ 2>/dev/null; then \
+	    test "$@" = "mingw" && export DISTCC_HOSTS=localhost;\
 	    $(MAKE) all || exit 1; \
 	fi || exit 0
 
