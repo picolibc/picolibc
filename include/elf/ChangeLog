@@ -1,3 +1,7 @@
+2001-08-27  Staffan Ulfberg  <staffanu@swox.se>
+
+	* ppc.h: Add relocs from the 64-bit PowerPC ELF ABI revision 1.2.
+
 2001-06-30  Daniel Berlin  <dan@cgsoftware.com>
 
 	* dwarf2.h: Remerge with gcc version, 
