@@ -1,3 +1,9 @@
+2002-12-10  James Cownie <jcownie@etnus.com>
+
+	* dwarf2.h (DW_TAG_upc_shared_type, DW_TAG_upc_strict_type,
+	DW_TAG_upc_relaxed_type, DW_AT_upc_threads_scaled, DW_LANG_Upc):
+	Define.
+
 2002-12-01  Stephane Carrez  <stcarrez@nerim.fr>
 
 	* m68hc11.h (EF_M68HC12_MACH, EF_M68HCS12_MACH): Define.
