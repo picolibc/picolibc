@@ -653,7 +653,6 @@ interrupt_setup (int sig, void *handler, DWORD retaddr, DWORD *retaddr_on_stack,
 {
   sigsave.retaddr = retaddr;
   sigsave.retaddr_on_stack = retaddr_on_stack;
-  sigsave.oldmask = myself->getsigmask ();	// Remember for restoration
   /* FIXME: Not multi-thread aware */
   sigsave.newmask = myself->getsigmask () | siga.sa_mask | SIGTOMASK (sig);
   sigsave.sa_flags = siga.sa_flags;
@@ -738,9 +737,9 @@ set_sig_errno (int e)
   // sigproc_printf ("errno %d", e);
 }
 
-static int call_handler (int, void *, struct sigaction&) __attribute__((regparm(3)));
+static int setup_handler (int, void *, struct sigaction&) __attribute__((regparm(3)));
 static int
-call_handler (int sig, void *handler, struct sigaction& siga)
+setup_handler (int sig, void *handler, struct sigaction& siga)
 {
   CONTEXT cx;
   bool interrupted = 0;
@@ -860,7 +859,7 @@ set_pending:
 #endif /* i386 */
 
 #ifndef HAVE_CALL_HANDLER
-#error "Need to supply machine dependent call_handler"
+#error "Need to supply machine dependent setup_handler"
 #endif
 
 /* Keyboard interrupt handler.  */
@@ -1000,7 +999,7 @@ stop:
 dosig:
   /* Dispatch to the appropriate function. */
   sigproc_printf ("signal %d, about to call %p", sig, handler);
-  rc = call_handler (sig, handler, thissig);
+  rc = setup_handler (sig, handler, thissig);
 
 done:
   sigproc_printf ("returning %d", rc);
@@ -1123,13 +1122,23 @@ _sigreturn:
 	addl	$4,%%esp	# Remove argument
 	movl	%%esp,%%ebp
 	addl	$36,%%ebp
-	call	_set_process_mask@4
+
+	cmpl	$0,%4		# Did a signal come in?
+	jz	1f		# No, if zero
+	call	_call_signal_handler@0 # yes handle the signal
+
+# FIXME: There is a race here.  The signal handler could set up
+# the sigsave structure between _call_signal_handler and the
+# end of _set_process_mask.  This would make cygwin detect an
+# incorrect signal mask.
+
+1:	call	_set_process_mask@4
 	popl	%%eax		# saved errno
 	testl	%%eax,%%eax	# Is it < 0
-	jl	1f		# yup.  ignore it
+	jl	2f		# yup.  ignore it
 	movl	%1,%%ebx
 	movl	%%eax,(%%ebx)
-1:	popl	%%eax
+2:	popl	%%eax
 	popl	%%ebx
 	popl	%%ecx
 	popl	%%edx
@@ -1158,11 +1167,13 @@ _sigdelayed0:
 	pushl	$_sigreturn
 
 	call	_reset_signal_arrived@0
+	pushl	%5
 	movl	$0,%0
 
 	pushl	%8
 	call	_set_process_mask@4
-	jmp	*%5
+	popl	%%eax
+	jmp	*%%eax
 __no_sig_end:
 
 " : "=m" (sigsave.sig) : "m" (&_impure_ptr->_errno),

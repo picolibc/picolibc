@@ -1,3 +1,10 @@
+Fri Jan 26 21:20:28 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* exceptions.cc (sigreturn): Call any pending signals prior to
+	resetting the signal mask so that stacked signals behave correctly.
+	(sigdelayed): Avoid a race where a signal could end up calling an
+	incorrect signal handler if two signals come in close together.
+
 Tue Jan 23 21:56:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* mmap.cc (fhandler_disk_file::mmap): Call CreateFileMapping with
