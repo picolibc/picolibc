@@ -10,6 +10,13 @@ main (int argc, char **argv)
   int fds[2];
   static char buf[4096];
 
+  close (0);
+  if ((fd = open ("/dev/null", O_WRONLY)) != 0)
+    {
+      fprintf (stderr, "couldn't redirect stdin to /dev/null, fd %d - %s\n", fd, strerror ());
+      exit (1);
+    }
+
   close (1);
   if ((fd = open ("/dev/null", O_WRONLY)) != 1)
     {

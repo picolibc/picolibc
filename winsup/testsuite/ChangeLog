@@ -1,3 +1,7 @@
+2002-02-27  Christopher Faylor  <cgf@redhat.com>
+
+	* winsup.api/systemcall.c (main): Ensure that stdin is redirected.
+
 2001-11-18  Egor Duda  <deo@logos-m.ru>
 
 	* winsup.api/pthread/condvar3_1.c: Fix debugging output.
