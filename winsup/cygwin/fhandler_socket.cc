@@ -34,6 +34,7 @@
 #include "select.h"
 #include "wininfo.h"
 #include <unistd.h>
+#include <sys/acl.h>
 
 extern bool fdsock (cygheap_fdmanip& fd, const device *, SOCKET soc);
 extern "C" {
@@ -386,14 +387,65 @@ fhandler_socket::dup (fhandler_base *child)
 int __stdcall
 fhandler_socket::fstat (struct __stat64 *buf)
 {
-  int res = fhandler_base::fstat (buf);
-  if (!res)
+  int res;
+  if (get_device () == FH_UNIX)
     {
-      buf->st_dev = 0;
-      buf->st_ino = (__ino64_t) ((DWORD) get_handle ());
-      buf->st_mode = S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO;
+      res = fhandler_base::fstat_fs (buf);
+      if (!res)
+        {
+	  buf->st_mode = (buf->st_mode & ~S_IFMT) | S_IFSOCK;
+	}
+    }
+  else
+    {
+      res = fhandler_base::fstat (buf);
+      if (!res)
+	{
+	  buf->st_dev = 0;
+	  buf->st_ino = (__ino64_t) ((DWORD) get_handle ());
+	  buf->st_mode = S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO;
+	}
     }
   return res;
+}
+
+int
+fhandler_socket::fchmod (mode_t mode)
+{
+  if (get_device () == FH_UNIX)
+    {
+      fhandler_disk_file fh;
+      fh.set_name (pc);
+      fh.get_device () = FH_FS;
+      int ret = fh.fchmod (mode);
+      SetFileAttributes	(pc, GetFileAttributes (pc) | FILE_ATTRIBUTE_SYSTEM);
+      return ret;
+    }
+  return 0;
+}
+
+int
+fhandler_socket::fchown (__uid32_t uid, __gid32_t gid)
+{
+  if (get_device () == FH_UNIX)
+    {
+      fhandler_disk_file fh;
+      fh.set_name (pc);
+      return fh.fchown (uid, gid);
+    }
+  return 0;
+}
+
+int
+fhandler_socket::facl (int cmd, int nentries, __aclent32_t *aclbufp)
+{
+  if (get_device () == FH_UNIX)
+    {
+      fhandler_disk_file fh;
+      fh.set_name (pc);
+      return fh.facl (cmd, nentries, aclbufp);
+    }
+  return fhandler_base::facl (cmd, nentries, aclbufp);
 }
 
 int

@@ -1,5 +1,15 @@
 2005-02-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (class fhandler_socket): Declare new methods fchown,
+	fchmod and facl.
+	* fhandler_socket.cc (fhandler_socket::fstat): Handle AF_LOCAL
+	sockets.
+	(fhandler_socket::fchmod): New method.
+	(fhandler_socket::fchown): New method.
+	(fhandler_socket::facl): New method.
+
+2005-02-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* localtime.cc: Temporary implementation of setting __tzrule's offset
 	member to be used by strftime.
 	(__tzrule): New global variable.

@@ -433,6 +433,9 @@ class fhandler_socket: public fhandler_base
   void signal_secret_event ();
   void close_secret_event ();
   int __stdcall fstat (struct __stat64 *buf) __attribute__ ((regparm (2)));
+  int __stdcall fchmod (mode_t mode) __attribute__ ((regparm (1)));
+  int __stdcall fchown (__uid32_t uid, __gid32_t gid) __attribute__ ((regparm (2)));
+  int __stdcall facl (int, int, __acl32 *) __attribute__ ((regparm (3)));
   bool is_slow () {return 1;}
 };
 
