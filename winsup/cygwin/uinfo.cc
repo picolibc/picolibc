@@ -106,7 +106,7 @@ internal_getlogin (struct pinfo *pi)
           else if (!GetTokenInformation (ptok, TokenUser, (LPVOID) &tu,
                                          sizeof tu, &siz))
             debug_printf ("GetTokenInformation(): %E");
-          else if (!(ret = CopySid (40, (PSID) pi->sidbuf,
+          else if (!(ret = CopySid (MAX_SID_LEN, (PSID) pi->sidbuf,
                                     ((TOKEN_USER *) &tu)->User.Sid)))
             debug_printf ("Couldn't retrieve SID from access token!");
           /* Close token only if it's a result from OpenProcessToken(). */
@@ -135,7 +135,7 @@ internal_getlogin (struct pinfo *pi)
           if (ret)
             {
               struct passwd *pw;
-              char psidbuf[40];
+              char psidbuf[MAX_SID_LEN];
               PSID psid = (PSID) psidbuf;
 
               pi->psid = (PSID) pi->sidbuf;
@@ -172,11 +172,9 @@ uinfo_init ()
   myself->token = INVALID_HANDLE_VALUE;
   myself->impersonated = TRUE;
 
-  /* If psid is non null, the process is forked or spawned from
-     another cygwin process without changing the user context.
-     So all user infos in myself as well as the environment are
-     (perhaps) valid. */
-  if (!myself->psid)
+  /* If uid is USHRT_MAX, the process is started from a non cygwin
+     process or the user context was changed in spawn.cc */
+  if (myself->uid == USHRT_MAX)
     if ((p = getpwnam (username = internal_getlogin (myself))) != NULL)
       {
         myself->uid = p->pw_uid;

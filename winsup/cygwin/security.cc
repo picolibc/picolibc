@@ -23,8 +23,6 @@ details. */
 #include "winsup.h"
 #include <ctype.h>
 
-#define MAX_SID_LEN     40
-
 extern BOOL allow_ntea;
 BOOL allow_ntsec = FALSE;
 

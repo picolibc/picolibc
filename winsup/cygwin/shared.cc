@@ -212,11 +212,11 @@ sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
                              ((char *) sa_buf + sizeof (*psa));
   PACL acl = (PACL) ((char *) sa_buf + sizeof (*psa) + sizeof (*psd));
 
-  char sid_buf[40];
+  char sid_buf[MAX_SID_LEN];
   PSID sid = (PSID) sid_buf;
 
   if (myself->psid)
-    CopySid (40, sid, myself->psid);
+    CopySid (MAX_SID_LEN, sid, myself->psid);
   else if (! lookup_name (getlogin (), myself->logsrv, sid))
     return inherit ? &sec_none_nih : &sec_none;
 

@@ -89,8 +89,8 @@ class pinfo
      The information is derived from the internal_getlogin call
      when on a NT system. */
   PSID psid;        /* user's SID */
-  char sidbuf[40];  /* buffer for user's SID */
-  char logsrv[256]; /* Logon server, may be fully qualified DNS name */
+  char sidbuf[MAX_SID_LEN];  /* buffer for user's SID */
+  char logsrv[MAX_HOST_NAME]; /* Logon server, may be FQDN */
   char domain[MAX_COMPUTERNAME_LENGTH+1]; /* Logon domain of the user */
 
   /* token is needed if sexec should be called. It can be set by a call

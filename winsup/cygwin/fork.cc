@@ -419,10 +419,10 @@ fork ()
       child->process_state |= PID_INITIALIZING |
 			      (myself->process_state & PID_USETTY);
       memcpy (child->username, myself->username, MAX_USER_NAME);
-      memcpy (child->sidbuf, myself->sidbuf, 40);
+      memcpy (child->sidbuf, myself->sidbuf, MAX_SID_LEN);
       if (myself->psid)
         child->psid = child->sidbuf;
-      memcpy (child->logsrv, myself->logsrv, 256);
+      memcpy (child->logsrv, myself->logsrv, MAX_HOST_NAME);
       memcpy (child->domain, myself->domain, MAX_COMPUTERNAME_LENGTH+1);
       child->token = myself->token;
       child->impersonated = myself->impersonated;
