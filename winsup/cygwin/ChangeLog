@@ -1,6 +1,23 @@
 2004-01-20  Christopher Faylor  <cgf@redhat.com>
 
+	* include/cygwin/version.h: Bump DLL minor number to 8.
+
+	* cygmalloc.h: Make more concessions to attempts to get debugging
+	malloc working.
+	* debug.h: Ditto.
+	* dlmalloc.cc: Ditto.
+	* dlmalloc.h: Ditto.
+	* malloc_wrapper.cc: Ditto.
+
+	* perthread.h (perthread::create): Use calloc to ensure zeroed memory.
+
+2004-01-20  Christopher Faylor  <cgf@redhat.com>
+
 	* sec_acl.cc (setacl): Make sure sd_ret is large enough.
+
+2004-01-19  Christopher Faylor  <cgf@redhat.com>
+
+	* sec_acl.cc (setacl): Make sure return sd is large enough.
 
 2004-01-19  Christopher Faylor  <cgf@redhat.com>
 

@@ -41,18 +41,18 @@ struct mallinfo {
 
 #ifdef MALLOC_DEBUG
 
-#define dmalloc(size)		malloc_dbg(size, __FILE__, __LINE__)
-#define dfree(p)			free_dbg(p, __FILE__, __LINE__)
-#define drealloc(p, size)	realloc_dbg(p, size, __FILE__, __LINE__)
-#define dcalloc(n, size)		calloc_dbg(n, size, __FILE__, __LINE__)
-#define dmemalign(align, size)	memalign_dbg(align, size, __FILE__, __LINE__)
-#define dvalloc(size)		valloc_dbg(size, __FILE__, __LINE__)
-#define dpvalloc(size)		pvalloc_dbg(size, __FILE__, __LINE__)
-#define dmalloc_trim(pad)	malloc_trim_dbg(pad, __FILE__, __LINE__)
-#define dmalloc_usable_size(p)	malloc_usable_size_dbg(p, __FILE__, __LINE__)
-#define dmalloc_stats()		malloc_stats_dbg(__FILE__, __LINE__)
-#define dmallopt(flag, val)	mallopt_dbg(flag, val, __FILE__, __LINE__)
-#define dmallinfo()		mallinfo_dbg(__FILE__, __LINE__)
+#define dlmalloc(size)		malloc_dbg(size, __FILE__, __LINE__)
+#define dlfree(p)			free_dbg(p, __FILE__, __LINE__)
+#define dlrealloc(p, size)	realloc_dbg(p, size, __FILE__, __LINE__)
+#define dlcalloc(n, size)		calloc_dbg(n, size, __FILE__, __LINE__)
+#define dlmemalign(align, size)	memalign_dbg(align, size, __FILE__, __LINE__)
+#define dlvalloc(size)		valloc_dbg(size, __FILE__, __LINE__)
+#define dlpvalloc(size)		pvalloc_dbg(size, __FILE__, __LINE__)
+#define dlmalloc_trim(pad)	malloc_trim_dbg(pad, __FILE__, __LINE__)
+#define dlmalloc_usable_size(p)	malloc_usable_size_dbg(p, __FILE__, __LINE__)
+#define dlmalloc_stats()		malloc_stats_dbg(__FILE__, __LINE__)
+#define dlmallopt(flag, val)	mallopt_dbg(flag, val, __FILE__, __LINE__)
+#define dlmallinfo()		mallinfo_dbg(__FILE__, __LINE__)
 
 
 #ifdef __cplusplus

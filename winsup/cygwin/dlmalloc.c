@@ -28,6 +28,16 @@
  *  malloc_usable_size(P) is equivalent to realloc(P, malloc_usable_size(P))
  *
  * $Log$
+ * Revision 1.8  2004/01/20 19:36:34  cgf
+ * * include/cygwin/version.h: Bump DLL minor number to 8.
+ * * cygmalloc.h: Make more concessions to attempts to get debugging malloc
+ * working.
+ * * debug.h: Ditto.
+ * * dlmalloc.cc: Ditto.
+ * * dlmalloc.h: Ditto.
+ * * malloc_wrapper.cc: Ditto.
+ * * perthread.h (perthread::create): Use calloc to ensure zeroed memory.
+ *
  * Revision 1.7  2003/09/25 00:37:16  cgf
  * * devices.cc: New file.
  * * devices.gperf: New file.
@@ -533,7 +543,6 @@
 
 /* Preliminaries */
 
-#include "winsup.h"
 
 #ifndef __STD_C
 #ifdef __STDC__
@@ -567,8 +576,11 @@
 extern "C" {
 #endif
 
+#include <sys/types.h>
+#include "cygmalloc.h"
+#define __INSIDE_CYGWIN__
 #include <stdio.h>    /* needed for malloc_stats */
-
+#include <string.h>
 
 /*
   Compile-time options
@@ -2098,9 +2110,7 @@ static void malloc_err(const char *err, mchunkptr p)
       /* avoid invalid pointers */
       debug_file_min &&
       p->file >= debug_file_min &&
-      p->file <= debug_file_max &&
-      /* try to avoid garbage file names */
-      isprint(*p->file))
+      p->file <= debug_file_max)
     errprint(p->file, p->line, "in block allocated here");
 # endif
 }

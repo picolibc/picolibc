@@ -28,8 +28,7 @@ public:
   virtual void set (int n) {TlsSetValue (get_tls (), (void *)n);}
   virtual void *create ()
   {
-    void *s = new char [size ()];
-    memset (s, 0, size ());
+    void *s = calloc (1, size ());
     set (s);
     return s;
   }

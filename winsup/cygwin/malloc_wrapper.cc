@@ -24,7 +24,9 @@ details. */
 #include "sync.h"
 #include "perprocess.h"
 #include "cygmalloc.h"
+#ifndef MALLOC_DEBUG
 #include <malloc.h>
+#endif
 extern "C" struct mallinfo dlmallinfo ();
 
 /* we provide these stubs to call into a user's
@@ -36,71 +38,6 @@ extern "C" struct mallinfo dlmallinfo ();
 static int export_malloc_called;
 static int use_internal_malloc = 1;
 
-#ifdef MALLOC_DEBUG
-extern "C" void * _sbrk (size_t incr_arg);
-
-#if 0
-extern "C" void *
-_sbrk_r (struct _reent *, size_t incr_arg)
-{
-  return _sbrk (incr_arg);
-}
-#endif
-
-extern "C" void *
-_malloc_r (struct _reent *, size_t size)
-{
-  export_malloc_called = 1;
-  return malloc (size);
-}
-#undef malloc
-
-extern "C" void *
-_calloc_r (struct _reent *, size_t nmemb, size_t size)
-{
-  export_malloc_called = 1;
-  return calloc (nmemb, size);
-}
-#undef calloc
-
-extern "C" void
-_free_r (struct _reent *, void *p)
-{
-  export_malloc_called = 1;
-  assert (!incygheap (p));
-  assert (inheap (p));
-  free (p);
-}
-#undef free
-
-extern "C" void *
-_realloc_r (struct _reent *, void *p, size_t size)
-{
-  export_malloc_called = 1;
-  assert (!incygheap (p));
-  assert (inheap (p));
-  return realloc (p, size);
-}
-#undef realloc
-
-extern "C" char *
-strdup_dbg (const char *s, const char *file, int line)
-{
-  char *p;
-  export_malloc_called = 1;
-  if ((p = (char *) malloc_dbg (strlen (s) + 1, file, line)) != NULL)
-      strcpy (p, s);
-  return p;
-}
-
-#undef strdup
-extern "C" char *
-strdup (const char *s)
-{
-  return strdup_dbg (s, __FILE__, __LINE__);
-}
-#else
-#endif
 /* These routines are used by the application if it
    doesn't provide its own malloc. */
 
@@ -317,18 +254,16 @@ malloc_init ()
 {
   new_muto (mallock);
 
+#ifndef MALLOC_DEBUG
   /* Check if mallock is provided by application. If so, redirect all
      calls to malloc/free/realloc to application provided. This may
      happen if some other dll calls cygwin's malloc, but main code provides
      its own malloc */
   if (!user_data->forkee)
     {
-#ifdef MALLOC_DEBUG
-      _free_r (NULL, _malloc_r (NULL, 16));
-#else
       user_data->free (user_data->malloc (16));
-#endif
       if (!export_malloc_called)
 	use_internal_malloc = 0;
     }
+#endif
 }
