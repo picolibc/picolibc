@@ -1,3 +1,7 @@
+2005-03-07  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/basetyps.h (__int16): Correct define.
+
 2005-02-10  Jiri Malak  <Jiri.Malak@iol.cz>
             Danny Smith  <dannysmith@users.sourceforge.net>
 

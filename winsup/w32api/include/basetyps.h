@@ -17,7 +17,7 @@
 #  define __int32 long
 # endif
 # ifndef __int16
-#  define __int16 int
+#  define __int16 short
 # endif
 # ifndef __int8
 #  define __int8 char
