@@ -1,5 +1,9 @@
 2003-08-31  Christopher Faylor  <cgf@redhat.com>
 
+	* net.cc (dup_ent): Make debugging output consistent.
+
+2003-08-31  Christopher Faylor  <cgf@redhat.com>
+
 	Use dup_ent rather than specific dup_*_ptr functions throughout.
 	* (gen_ent): Delete.
 	(dup_ent): Subsume gen_ent functionality.
