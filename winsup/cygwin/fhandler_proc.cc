@@ -87,7 +87,7 @@ fhandler_proc::get_proc_fhandler (const char *path)
    * it being normalised and therefore the path may have runs of slashes
    * in it.
    */
-  while (SLASH_P (*path))
+  while (isdirsep (*path))
     path++;
 
   /* Check if this is the root of the virtual filesystem (i.e. /proc).  */
@@ -105,7 +105,7 @@ fhandler_proc::get_proc_fhandler (const char *path)
 
   bool has_subdir = false;
   while (*path)
-    if (SLASH_P (*path++))
+    if (isdirsep (*path++))
       {
 	has_subdir = true;
 	break;
