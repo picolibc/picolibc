@@ -1,3 +1,8 @@
+2002-06-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* uinfo.cc (cygheap_user::ontherange): Call NetUserGetInfo() only with
+	non-NULL logserver parameter.
+
 2002-06-16  Christopher Faylor  <cgf@redhat.com>
 
 	* cygheap.h (cygheap_user::issetuid): New method.
