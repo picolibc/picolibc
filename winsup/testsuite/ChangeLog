@@ -1,3 +1,44 @@
+2001-11-15  Egor Duda  <deo@logos-m.ru>
+
+	* winsup.api/pthread/: New directory. Ports of pthread functionality
+	tests ported from pthreads-win32 project.
+	* winsup.api/pthread/test.h: Commmon declaraions for pthread tests.
+	* winsup.api/pthread/cleanup2.c: New test.
+	* winsup.api/pthread/cleanup3.c: Ditto.
+	* winsup.api/pthread/condvar1.c: Ditto.
+	* winsup.api/pthread/condvar2.c: Ditto.
+	* winsup.api/pthread/condvar2_1.c: Ditto.
+	* winsup.api/pthread/condvar3.c: Ditto.
+	* winsup.api/pthread/condvar3_1.c: Ditto.
+	* winsup.api/pthread/condvar3_2.c: Ditto.
+	* winsup.api/pthread/condvar3_3.c: Ditto.
+	* winsup.api/pthread/condvar4.c: Ditto.
+	* winsup.api/pthread/condvar5.c: Ditto.
+	* winsup.api/pthread/condvar6.c: Ditto.
+	* winsup.api/pthread/condvar8.c: Ditto.
+	* winsup.api/pthread/count1.c: Ditto.
+	* winsup.api/pthread/create1.c: Ditto.
+	* winsup.api/pthread/create2.c: Ditto.
+	* winsup.api/pthread/equal1.c: Ditto.
+	* winsup.api/pthread/exit1.c: Ditto.
+	* winsup.api/pthread/exit2.c: Ditto.
+	* winsup.api/pthread/exit3.c: Ditto.
+	* winsup.api/pthread/inherit1.c: Ditto.
+	* winsup.api/pthread/join0.c: Ditto.
+	* winsup.api/pthread/join1.c: Ditto.
+	* winsup.api/pthread/join2.c: Ditto.
+	* winsup.api/pthread/mutex1.c: Ditto.
+	* winsup.api/pthread/mutex1r.c: Ditto.
+	* winsup.api/pthread/mutex2.c: Ditto.
+	* winsup.api/pthread/mutex3.c: Ditto.
+	* winsup.api/pthread/mutex6r.c: Ditto.
+	* winsup.api/pthread/once1.c: Ditto.
+	* winsup.api/pthread/priority1.c: Ditto.
+	* winsup.api/pthread/priority2.c: Ditto.
+	* winsup.api/pthread/self1.c: Ditto.
+	* winsup.api/pthread/self2.c: Ditto.
+	* winsup.api/pthread/tsd1.c: Ditto.
+
 2001-11-08  Corinna Vinschen <corinna@vinschen.de>
 
 	* checksignal.c: New testcase.
