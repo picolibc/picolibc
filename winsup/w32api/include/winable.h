@@ -8,6 +8,10 @@
 extern "C" {
 #endif
 
+#define INPUT_MOUSE 0
+#define INPUT_KEYBOARD 1
+#define INPUT_HARDWARE 2
+#define CHILDID_SELF 0
 #define OBJID_WINDOW 0x00000000
 #define OBJID_SYSMENU 0xFFFFFFFF
 #define OBJID_TITLEBAR 0xFFFFFFFE
@@ -39,7 +43,6 @@ typedef struct tagGUITHREADINFO {
 	HWND hwndCaret;
 	RECT rcCaret;
 } GUITHREADINFO,*PGUITHREADINFO;
-BOOL WINAPI BlockInput(BOOL);
 
 #ifdef __cplusplus
 }
