@@ -1,5 +1,5 @@
 /* Opcode table for the H8/300
-   Copyright 1991, 1992, 1993, 1994, 1996, 1997, 1998, 2000, 2002, 2003
+   Copyright 1991, 1992, 1993, 1994, 1996, 1997, 1998, 2000, 2002, 2003, 2004
    Free Software Foundation, Inc.
    Written by Steve Chamberlain <sac@cygnus.com>.
    
@@ -26,7 +26,8 @@
 
 typedef int op_type;
 
-enum h8_flags {
+enum h8_flags
+{
   L_2  =	0x10,
   L_3  =	0x20,
   /* 3 bit constant, zero not accepted.  */
@@ -225,7 +226,8 @@ enum h8_flags {
 #endif
 };
 
-enum ctrlreg {
+enum ctrlreg
+{
   C_CCR  = 0, 
   C_EXR  = 1, 
   C_MACH = 2, 
@@ -247,7 +249,8 @@ struct arg
 };
 
 /* Availability of instructions on processor models.  */
-enum h8_model {
+enum h8_model
+{
   AV_H8,
   AV_H8H,
   AV_H8S,
@@ -304,7 +307,7 @@ struct h8_opcode
 #define A24LIST   L_24,  DATA5
 #define A32LIST   L_32,  DATA7
 
-/* Extended Operand Prefixes: */
+/* Extended Operand Prefixes:  */
 
 #define PREFIX_010	0x0, 0x1, 0x0
 #define PREFIX_015	0x0, 0x1, 0x5
@@ -383,7 +386,7 @@ struct h8_opcode
 #define PREFIX_7A7C	0x7, 0xa, 0x7, 0xc
 
 
-/* Source standard fragment: */
+/* Source standard fragment:  */
 #define FROM_IND	 0, RSIND
 #define FROM_POSTINC	 8, RSPOSTINC
 #define FROM_POSTDEC	10, RSPOSTDEC
@@ -401,7 +404,7 @@ struct h8_opcode
 #define FROM_ABS16	 4, B30 | IGNORE
 #define FROM_ABS32	 4, B31 | IGNORE
 
-/* Destination standard fragment: */
+/* Destination standard fragment:  */
 #define TO_IND		 0, RDIND
 #define TO_IND_MOV	 0, RDIND | B30
 #define TO_POSTINC	 8, RDPOSTINC
@@ -425,7 +428,7 @@ struct h8_opcode
 #define TO_ABS16	 4, B30 | IGNORE
 #define TO_ABS32	 4, B31 | IGNORE
 
-/* Source fragment for three-word instruction: */
+/* Source fragment for three-word instruction:  */
 #define TFROM_IND	6,  9, B30 | RSIND, 12
 #define TFROM_DISP2	6,  9, B30 | DISPREG, 12
 #define TFROM_ABS16	6, 11, B30 | B20 | B10 | IGNORE, 12, ABS16LIST
@@ -445,7 +448,7 @@ struct h8_opcode
 #define TFROM_ABS16W	6, 11, 1, 12, ABS16LIST
 #define TFROM_ABS32W	6, 11, 3, 12, ABS32LIST
 
-/* Source fragment for three-word instruction: */
+/* Source fragment for three-word instruction:  */
 #define TFROM_IND_B	6,  8, B30 | RSIND, 12
 #define TFROM_ABS16_B	6, 10, B30 | B20 | B10 | IGNORE, 12, ABS16LIST
 #define TFROM_ABS32_B	6, 10, B30 | B20 | B11 | IGNORE, 12, ABS32LIST
@@ -467,7 +470,7 @@ struct h8_opcode
 #define TFROM_ABS16W_B	6, 10, 1, 12, ABS16LIST
 #define TFROM_ABS32W_B	6, 10, 3, 12, ABS32LIST
 
-/* Extended Operand Class Expanders: */
+/* Extended Operand Class Expanders:  */
 
 #define MOVFROM_STD(CODE, PREFIX, NAME, SRC, SRC_INFIX) \
   {CODE, AV_H8SX, 0, NAME, {{SRC, RDIND,     E}},  {{PREFIX, SRC_INFIX, TO_IND_MOV,     E}}}, \
@@ -577,9 +580,7 @@ struct h8_opcode
   {CODE, AV_H8,   4, NAME, {{ABS16SRC,  DST, E}}, {{                              6, OP2, 0,               DST, RELAX16  | ABS16LIST, E}}}, \
   {CODE, AV_H8,   6, NAME, {{ABS32SRC,  DST, E}}, {{                              6, OP2, 2,               DST, MEMRELAX | ABS32LIST, E}}}
 
-/*
- * Expansion macros for two-word (plus data) instructions.
- */
+/* Expansion macros for two-word (plus data) instructions.  */
 
 /* Expansion from one source to "standard" destinations.  */
 #define EXPAND2_STD_SRC(CODE, WEIGHT, NAME, SRC, PREFIX, NIB1, NIB2) \
@@ -661,9 +662,7 @@ struct h8_opcode
   {CODE, AV_H8SX, 0, NAME, {{RSIND, INDEXW32D, E}}, {{0x7, 0xc, BIT | RSIND, 0x5, TO_DISP32W, OPCODE, IGNORE, DSTDISP32LIST, E}}}, \
   {CODE, AV_H8SX, 0, NAME, {{RSIND, INDEXL32D, E}}, {{0x7, 0xc, BIT | RSIND, 0x5, TO_DISP32L, OPCODE, IGNORE, DSTDISP32LIST, E}}}
 
-/*
- * Expansion macros for three word (plus data) instructions.
- */
+/* Expansion macros for three word (plus data) instructions.  */
 
 #define EXPAND3_STD_SRC(CODE, WEIGHT, NAME, SRC, PREFIX, INFIX, OPCODE)  \
   {CODE, AV_H8SX, 0, NAME, {{SRC, RDPOSTINC, E}}, {{PREFIX, INFIX,  8, RDPOSTINC, OPCODE, B30 | IGNORE, E}}}, \
@@ -749,9 +748,7 @@ struct h8_opcode
   EXPAND3_L_SRC (CODE, 4, NAME, INDEXL32,  PREFIX_78R7W,   TFROM_DISP32L_B, OPCODE)
 
 
-/*
- * Use the expansion macros to fill out the opcode table.
- */
+/* Use the expansion macros to fill out the opcode table.  */
 
 #define EXPAND_FROM_REG8(CODE, NAME, OP1, OP2, OP3) \
   {CODE, AV_H8SX, 0, NAME, {{RS8, RDIND,     E}}, {{0x7, 0xd, B30 | RDIND, IGNORE,             OP1, OP2, RS8, IGNORE, E}}}, \
@@ -892,16 +889,14 @@ struct h8_opcode
   EXPAND_STD_MATRIX_L   (CODE, NAME, OP1)
 
 
-/*
- * Old expanders: 
- */
+/* Old expanders:  */
 
 #define BITOP(code, imm, name, op00, op01, op10,  op11, op20, op21, op30, op4) \
   {code, AV_H8,  2, name, {{imm, RD8,      E}}, {{op00, op01, imm,  RD8,   E}}}, \
   {code, AV_H8,  6, name, {{imm, RDIND,    E}}, {{op10, op11, B30 | RDIND, 0,  op00, op01, imm, 0, E}}}, \
   {code, AV_H8,  6, name, {{imm, ABS8DST,  E}}, {{op20, op21, DSTABS8LIST,     op00, op01, imm, 0, E}}}, \
-  {code, AV_H8H, 6, name, {{imm, ABS16DST, E}}, {{0x6,  0xa,  0x1,  op30, DST | ABS16LIST, op00, op01, imm, op4, E}}}, \
-  {code, AV_H8H, 6, name, {{imm, ABS32DST, E}}, {{0x6,  0xa,  0x3,  op30, DST | ABS32LIST, op00, op01, imm, op4, E}}}
+  {code, AV_H8S, 6, name, {{imm, ABS16DST, E}}, {{0x6,  0xa,  0x1,  op30, DST | ABS16LIST, op00, op01, imm, op4, E}}}, \
+  {code, AV_H8S, 6, name, {{imm, ABS32DST, E}}, {{0x6,  0xa,  0x3,  op30, DST | ABS32LIST, op00, op01, imm, op4, E}}}
 
 #define BITOP_B(code, imm, name, op00, op01, op10, op11, op20, op21, op30, op4) \
   {code, AV_H8SX, 0, name, {{imm, RDIND,    E}}, {{op10, op11, B30 | RDIND, 0,  op00, op01, imm, op4, E}}}, \
@@ -1047,11 +1042,12 @@ struct h8_opcode
 #define PREFIXLDC 0x0, 0x1, 0x4, B30 | CCR_EXR | DST
 #define PREFIXSTC 0x0, 0x1, 0x4, B30 | CCR_EXR | SRC
 
-#define O(op, size)  (op*4+size)
+#define O(op, size)  (op * 4 + size)
 #define OP_SIZE(HOW) (HOW % 4)
 #define OP_KIND(HOW) (HOW / 4)
 
-enum h8_asm_codes {
+enum h8_asm_codes
+{
   O_RECOMPILE =	 0,
   O_ADD,
   O_ADDX,
@@ -1182,7 +1178,8 @@ enum h8_asm_codes {
   /* End of System Call specific Changes.  */
 };
 
-enum h8_size {
+enum h8_size
+{
   SB =	 0,
   SW =	 1,
   SL =	 2,
