@@ -1,5 +1,19 @@
 2003-08-31  Christopher Faylor  <cgf@redhat.com>
 
+	Use dup_ent rather than specific dup_*_ptr functions throughout.
+	* (gen_ent): Delete.
+	(dup_ent): Subsume gen_ent functionality.
+	(dup_host_ptr): Delete.
+	(dup_proto_ptr): Ditto.
+	(dup_servent_ptr): Ditto.
+
+2003-08-31  Christopher Faylor  <cgf@redhat.com>
+
+	* net.cc (gen_ent): Invert sense of null check so that debug output
+	makes sense.
+
+2003-08-31  Christopher Faylor  <cgf@redhat.com>
+
 	* net.cc (free_char_list): Delete.
 	(dup_addr_list): Delete.
 	(dup_char_list): Delete.

@@ -396,11 +396,6 @@ strlen_round (const char *s)
   return DWORD_round (strlen (s) + 1);
 }
 
-enum struct_type
-{
-  is_protoent, is_servent, is_hostent
-};
-
 #pragma pack(push,2)
 struct pservent
 {
@@ -424,6 +419,13 @@ struct unionent
   };
 };
 
+enum struct_type
+{
+  is_hostent, is_protoent, is_servent
+};
+
+static const char *entnames[] = {"host", "proto", "serv"};
+
 /* Generic "dup a {host,proto,serv}ent structure" function.
    This is complicated because we need to be able to free the
    structure at any point and we can't rely on the pointer contents
@@ -438,9 +440,18 @@ static void *
 #else
 static inline void *
 #endif
-dup_ent (void *src0, struct_type type)
+dup_ent (void *old, void *src0, struct_type type)
 {
+  if (old)
+    {
+      debug_printf ("freeing old %sent structure(%s) %p\n", entnames[type],
+		    ((unionent *) old)->name, old);
+      free (old);
+    }
+
   unionent *src = (unionent *) src0;
+  debug_printf ("duping %sent \"%s\", %p", entnames[type],
+		src ? src->name : "<null!>", src);
 
   /* Find the size of the raw structure minus any character strings, etc. */
   int sz, struct_sz;
@@ -565,28 +576,9 @@ dup_ent (void *src0, struct_type type)
       /* Sanity check that we did our bookkeeping correctly. */
       assert ((dp - (char *) dst) == sz);
     }
+  debug_printf ("duped %sent \"%s\", %p", entnames[type], dst ? dst->name : "<null!>", dst);
   return dst;
 }
-
-/* Generic macro to build a dup_{host,proto,serv}ent_ptr function.
-   The *ent buffers are allocated by dup_ent as contiguous storage.
-   Frees any previously exiting `old' storage, as well.  */
-#define gen_ent(x, p)								\
-static x *									\
-dup_##x##_ptr (x *old, x *src)							\
-{										\
-  if (old)									\
-    {										\
-      debug_printf ("freeing %s", old->p##_name);				\
-      free (old);								\
-    }										\
-  debug_printf ("%s", src ? "<null!>" : src->p##_name);				\
-  x *dst = (x *) dup_ent (src, is_##x);						\
-  debug_printf ("copied %s", dst ? "<null!>" : dst->p##_name);			\
-  return dst;									\
-}										\
-
-gen_ent (protoent, p)
 
 #ifdef _MT_SAFE
 #define protoent_buf  _reent_winsup ()->_protoent_buf
@@ -600,7 +592,8 @@ cygwin_getprotobyname (const char *p)
 {
   if (check_null_str_errno (p))
     return NULL;
-  protoent_buf = dup_protoent_ptr (protoent_buf, getprotobyname (p));
+  protoent_buf = (protoent *) dup_ent (protoent_buf, getprotobyname (p),
+				       is_protoent);
   if (!protoent_buf)
     set_winsock_errno ();
 
@@ -612,7 +605,8 @@ cygwin_getprotobyname (const char *p)
 extern "C" struct protoent *
 cygwin_getprotobynumber (int number)
 {
-  protoent_buf = dup_protoent_ptr (protoent_buf, getprotobynumber (number));
+  protoent_buf = (protoent *) dup_ent (protoent_buf, getprotobynumber (number),
+				       is_protoent);
   if (!protoent_buf)
     set_winsock_errno ();
 
@@ -942,8 +936,6 @@ cygwin_connect (int fd, const struct sockaddr *name, int namelen)
   return res;
 }
 
-gen_ent (servent, s)
-
 #ifdef _MT_SAFE
 #define servent_buf  _reent_winsup ()->_servent_buf
 #else
@@ -960,7 +952,8 @@ cygwin_getservbyname (const char *name, const char *proto)
       || (proto != NULL && check_null_str_errno (proto)))
     return NULL;
 
-  servent_buf = dup_servent_ptr (servent_buf, getservbyname (name, proto));
+  servent_buf = (servent *) dup_ent (servent_buf, getservbyname (name, proto),
+				     is_servent);
   if (!servent_buf)
     set_winsock_errno ();
 
@@ -977,7 +970,8 @@ cygwin_getservbyport (int port, const char *proto)
   if (proto != NULL && check_null_str_errno (proto))
     return NULL;
 
-  servent_buf = dup_servent_ptr (servent_buf, getservbyport (port, proto));
+  servent_buf = (servent *) dup_ent (servent_buf, getservbyport (port, proto),
+				     is_servent);
   if (!servent_buf)
     set_winsock_errno ();
 
@@ -1007,8 +1001,6 @@ cygwin_gethostname (char *name, size_t len)
   h_errno = 0;
   return 0;
 }
-
-gen_ent (hostent, h)
 
 #ifdef _MT_SAFE
 #define hostent_buf  _reent_winsup ()->_hostent_buf
@@ -1048,7 +1040,8 @@ cygwin_gethostbyname (const char *name)
       return &tmp;
     }
 
-  hostent_buf = dup_hostent_ptr (hostent_buf, gethostbyname (name));
+  hostent_buf = (hostent *) dup_ent (hostent_buf, gethostbyname (name),
+				     is_hostent);
   if (!hostent_buf)
     {
       set_winsock_errno ();
@@ -1071,7 +1064,9 @@ cygwin_gethostbyaddr (const char *addr, int len, int type)
   if (__check_invalid_read_ptr_errno (addr, len))
     return NULL;
 
-  hostent_buf = dup_hostent_ptr (hostent_buf, gethostbyaddr (addr, len, type));
+  hostent_buf = (hostent *) dup_ent (hostent_buf,
+				     gethostbyaddr (addr, len, type),
+				     is_hostent);
   if (!hostent_buf)
     {
       set_winsock_errno ();
