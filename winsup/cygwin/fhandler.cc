@@ -1522,8 +1522,12 @@ fhandler_base::set_inheritance (HANDLE &h, int not_inheriting, const char *namep
 {
   HANDLE newh;
 
-  if (!DuplicateHandle (hMainProc, h, hMainProc, &newh, 0, !not_inheriting,
-			DUPLICATE_SAME_ACCESS))
+  if (wincap.has_set_handle_information () && (!is_console () ||
+      wincap.has_set_handle_information_on_console_handles ()))
+    (void) SetHandleInformation (h, HANDLE_FLAG_INHERIT,
+    				 not_inheriting ? 0 : HANDLE_FLAG_INHERIT);
+  else if (!DuplicateHandle (hMainProc, h, hMainProc, &newh, 0, !not_inheriting,
+			     DUPLICATE_SAME_ACCESS))
     debug_printf ("DuplicateHandle %E");
 #ifndef DEBUGGING
   else

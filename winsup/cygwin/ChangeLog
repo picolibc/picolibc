@@ -1,3 +1,11 @@
+Thu Sep 20  9:55:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::set_inheritance): If available,
+	use SetHandleInformation() to set inheritance.
+	* wincap.cc: Set flag has_set_handle_information_on_console_handles
+	appropriately.
+	* wincap.h: Add flag has_set_handle_information_on_console_handles.
+
 Wed Sep 19 12:24:09 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* lib/getopt.c (__progname): Don't declare if not compiling for cygwin.
