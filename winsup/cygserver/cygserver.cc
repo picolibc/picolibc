@@ -18,6 +18,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <signal.h>
+#include <stdlib.h>
 #include "wincap.h"
 #include "cygwin_version.h"
 

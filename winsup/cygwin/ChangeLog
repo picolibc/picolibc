@@ -1,5 +1,10 @@
 2002-03-15  Christopher Faylor  <cgf@redhat.com>
 
+	* cygserver.cc: Include stdlib.h for exit declaration.
+	* threaded_queue.cc: Ditto.
+
+2002-03-15  Christopher Faylor  <cgf@redhat.com>
+
 	* pinfo.cc (pinfo::init): Use PID_ALLPIDS flag to control when a
 	redirected block should be marked as nonexistent.
 	(winpids::add): Use PID_ALLPIDS when looking for all pids.
