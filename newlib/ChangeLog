@@ -1,3 +1,11 @@
+2004-04-21  J"orn Rennecke <joern.rennecke@superh.com>
+
+	* libc/stdio/vfscanf.c (NNZDIGITS): New define.
+	(__svfscanf_r): In integer conversions, leave out leading zeroes
+	which are not part of a base prefix.
+	Keep track of width truncation to fit into buf, not counting left-out
+	zeroes against width till the truncation has been compensated for.
+
 2004-04-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/sys/unistd.h (ttyname_r): Add missing comma.
