@@ -1,3 +1,20 @@
+2003-02-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc (mmap_record::alloc_map): De-inline.  Add offset and length
+	parameter.  Only protect pages actually unused currently.  Do job
+	of map_map() when initializing a map.
+	(mmap_record::map_map): Reduce functionality for the reuse case
+	of private anonymous mapping.
+	(mmap_record::fixup_map): Format change.
+	(list::add_record): Add offset and length parameter to call
+	mmap_record::alloc_map() correctly.
+	(mmap64): Rename `l' variable to `map_list'.  Accomodate above changes.
+	(munmap): Rename `l' variable to `map_list'.
+	(msync): Ditto.
+	(fhandler_disk_file::mmap): Streamline code.
+	(mprotect): Ditto.
+	(fixup_mmaps_after_fork): Rename `l' variable to `map_list'.
+
 2003-02-07  Vaclav Haisman  <V.Haisman@sh.cvut.cz>
 	    Christopher Faylor  <cgf@redhat.com>
 
