@@ -252,8 +252,7 @@ __sbprintf(fp, fmt, ap)
 static char *cvt _PARAMS((struct _reent *, double, int, int, char *, int *, int, int *));
 #else
 static char *cvt _PARAMS((struct _reent *, _LONG_DOUBLE, int, int, char *, int *, int, int *));
-static int isinfl _PARAMS((_LONG_DOUBLE *));
-static int isnanl _PARAMS((_LONG_DOUBLE *));
+extern int  _ldcheck _PARAMS((_LONG_DOUBLE *));
 #endif
 
 static int exponent _PARAMS((char *, int, int));
@@ -322,6 +321,7 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 #else
 	union { int i; _LONG_DOUBLE ld; } _long_double_ = {0};
 	#define _fpvalue (_long_double_.ld)
+	int tmp;  
 #endif
 	int expt;		/* integer value of exponent */
 	int expsize = 0;	/* character count for expstr */
@@ -604,14 +604,15 @@ reswitch:	switch (ch) {
 			}
 
 			/* do this before tricky precision changes */
-			if (isinfl(&_fpvalue)) {
+			tmp = _ldcheck (&_fpvalue);
+			if (tmp == 2) {
 				if (_fpvalue < 0)
 					sign = '-';
 				cp = "Inf";
 				size = 3;
 				break;
 			}
-			if (isnanl(&_fpvalue)) {
+			if (tmp == 1) {
 				cp = "NaN";
 				size = 3;
 				break;
@@ -912,32 +913,6 @@ extern char *_ldtoa_r _PARAMS((struct _reent *, _LONG_DOUBLE, int,
 			      int, int *, int *, char **));
 #undef word0
 #define word0(x) ldword0(x)
-
-static int
-isinfl (value)
-     _LONG_DOUBLE *value;
-{
-  struct ldieee *ldptr;
-
-  ldptr = (struct ldieee *)value;
-
-  if (ldptr->exp == 0x7fff && !(ldptr->manh & 0x7fffffff) && !ldptr->manl)
-    return 1;
-  return 0;
-}
-
-static int
-isnanl (value)
-     _LONG_DOUBLE *value;
-{
-  struct ldieee *ldptr;
-
-  ldptr = (struct ldieee *)value;
-
-  if (ldptr->exp == 0x7fff && ((ldptr->manh & 0x7fffffff) || ldptr->manl))
-    return 1;
-  return 0;
-}
 #endif
 
 static char *

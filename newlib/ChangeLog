@@ -1,5 +1,14 @@
 2000-12-13  Jeff Johnston  <jjohnstn@redhat.com>
 
+	* libc/stdlib/ldtoa.c (_ldcheck): New routine
+	that categorizes a long double as NaN, Infinity, or other.
+	* libc/stdio/vfprintf.c [WANT_IO_LONG_DBL](_VFPRINTF_R): Removed 
+	isinfl and isnanl static routines which were i386-specific.  Changed 
+	calls to the two removed routines to a single _ldcheck call.
+	* libc/stdio/vfieeefp.h (ldieee): Fixed missing semi-colons.
+
+2000-12-13  Jeff Johnston  <jjohnstn@redhat.com>
+
 	* Makefile.am: Fixed install-data-local target to use
 	$(mkinstalldirs) for the installed header files to ensure
 	the directories exist before copying.

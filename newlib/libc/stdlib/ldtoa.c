@@ -13,6 +13,7 @@
 /* linux name:  long double _IO_strtold (char *, char **); */
 long double _strtold (char *, char **);
 char * _ldtoa_r (struct _reent *, long double, int, int, int *, int *, char **);
+int    _ldcheck (long double *);
 #if 0
 void _IO_ldtostr(long double *, char *, int, int, char);
 #endif
@@ -2825,6 +2826,46 @@ if( rve )
         *rve = s;
 return outstr;
 }
+
+/* Routine used to tell if long double is NaN or Infinity or regular number. 
+   Returns:  0 = regular number
+             1 = Nan
+             2 = Infinity
+*/
+int
+_ldcheck (long double *d)
+{
+unsigned short e[NI];
+char *s, *p;
+int k;
+LDPARMS rnd;
+LDPARMS *ldp = &rnd;
+char *outstr;
+
+rnd.rlast = -1;
+rnd.rndprc = NBITS;
+
+#if LDBL_MANT_DIG == 24
+e24toe( (unsigned short *)d, e, ldp );
+#elif LDBL_MANT_DIG == 53
+e53toe( (unsigned short *)d, e, ldp );
+#elif LDBL_MANT_DIG == 64
+e64toe( (unsigned short *)d, e, ldp );
+#else
+e113toe( (unsigned short *)d, e, ldp );
+#endif
+
+if( (e[NE-1] & 0x7fff) == 0x7fff )
+	{
+#ifdef NANS
+	if( eisnan(e) )
+		return( 1 );
+#endif
+	return( 2 );
+	}
+else
+	return( 0 );
+} /* _ldcheck */
 
 static void etoasc(short unsigned int *x, char *string, int ndigits, int outformat, LDPARMS *ldp)
 {

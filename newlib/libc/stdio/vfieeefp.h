@@ -70,7 +70,7 @@ struct ldieee
   unsigned manh:23;
   unsigned exp:8;
   unsigned sign:1;
-}
+};
 #elif LDBL_MANT_DIG == 53
 struct ldieee
 {
@@ -78,7 +78,7 @@ struct ldieee
   unsigned manh:32;
   unsigned exp:11;
   unsigned sign:1;
-}
+};
 #elif LDBL_MANT_DIG == 64
 struct ldieee
 {
@@ -105,7 +105,7 @@ struct ldieee
   unsigned sign:1;
   unsigned exp:8;
   unsigned manh:23;
-}
+};
 #elif LDBL_MANT_DIG == 53
 struct ldieee
 {
@@ -113,7 +113,7 @@ struct ldieee
   unsigned exp:11;
   unsigned manh:32;
   unsigned manl:20;
-}
+};
 #elif LDBL_MANT_DIG == 64
 struct ldieee
 {
@@ -121,7 +121,7 @@ struct ldieee
   unsigned exp:15;
   unsigned manh:32;
   unsigned manl:32;
-}
+};
 #elif LDBL_MANT_DIG > 64
 struct ldieee
 {
