@@ -13,6 +13,9 @@ details. */
 
 #include <sys/types.h>
 
+#define ST_RDONLY 0x80000	/* equals FILE_READ_ONLY_VOLUME */
+#define ST_NOSUID 0		/* Looking for that bit should always fail. */
+
 struct statvfs {
    unsigned long    f_bsize;    /* file system block size */
    unsigned long    f_frsize;   /* fragment size */

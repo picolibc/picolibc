@@ -1,5 +1,10 @@
 2005-02-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/sys/statvfs.h (ST_RDONLY): Define.
+	(ST_NOSUID): Define.
+
+2005-02-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygwin.din (fstatvfs): Export.
 	(statvfs): Export.
 	* syscalls.cc: Include sys/statvfs.h.
