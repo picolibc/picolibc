@@ -1,3 +1,10 @@
+Sun Jul  2 21:50:48 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dcrt0.cc (user32_init): Add primitive guard against concurrent
+	attempts to call this function.  Also add temporary debugging code to
+	display a message if the function is called multiple times.
+	(api32_init): Ditto.
+
 Sun Jul  2 10:39:00 2000  Corinna Vinschen  <corinna@vinschen.de>
 
 	* winsup.h: Define MAX_SID_LEN and new MAX_HOST_NAME.

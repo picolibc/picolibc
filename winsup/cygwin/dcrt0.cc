@@ -1108,25 +1108,47 @@ gotit:
 LoadDLLinitfunc (user32)
 {
   HANDLE h;
+  static NO_COPY LONG here = -1L;
 
-  if ((h = LoadLibrary ("user32.dll")) != NULL)
+  while (InterlockedIncrement (&here))
+    {
+      InterlockedDecrement (&here);
+small_printf ("Multiple tries to read user32.dll\n");
+      Sleep (0);
+    }
+
+  if (user32_handle)
+    /* nothing to do */;
+  else if ((h = LoadLibrary ("user32.dll")) != NULL)
     user32_handle = h;
   else if (!user32_handle)
     api_fatal ("could not load user32.dll, %E");
 
+  InterlockedDecrement (&here);
   return 0;		/* Already done by another thread? */
 }
 
 LoadDLLinitfunc (advapi32)
 {
   HANDLE h;
+  static NO_COPY LONG here = -1L;
 
-  if ((h = LoadLibrary ("advapi32.dll")) != NULL)
+  while (InterlockedIncrement (&here))
+    {
+      InterlockedDecrement (&here);
+small_printf ("Multiple tries to read advapi32.dll\n");
+      Sleep (0);
+    }
+
+  if (advapi32_handle)
+    /* nothing to do */;
+  else if ((h = LoadLibrary ("advapi32.dll")) != NULL)
     advapi32_handle = h;
   else if (!advapi32_handle)
     api_fatal ("could not load advapi32.dll, %E");
 
-  return 0;		/* Already done by another thread? */
+  InterlockedDecrement (&here);
+  return 0;
 }
 
 static void dummy_autoload (void) __attribute__ ((unused));
