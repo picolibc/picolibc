@@ -1,3 +1,11 @@
+2003-01-21  Jason Tishler  <jason@tishler.net>
+
+	* cygwin.din: Export nanosleep().
+	* signal.cc (nanosleep): New function.
+	(sleep): Move old functionality to nanosleep().  Call nanosleep().
+	(usleep): Remove old functionality.  Call nanosleep().
+	* include/cygwin/version.h: Bump API minor number.
+
 2003-01-21  Christopher Faylor  <cgf@redhat.com>
 
 	* grp.cc: Call gr.refresh() rather than doing isunitialized tests
@@ -26,7 +34,7 @@
 
 2003-01-21  Christopher Faylor  <cgf@redhat.com>
 
-        * include/cygwin/version.h: Bump DLL minor number.
+	* include/cygwin/version.h: Bump DLL minor number.
 
 2003-01-21  Pierre Humblet  <pierre.humblet@ieee.org>
 

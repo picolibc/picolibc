@@ -597,6 +597,8 @@ nan
 _nan = nan
 nanf
 _nanf = nanf
+nanosleep
+_nanosleep = nanosleep
 nextafter
 _nextafter = nextafter
 nextafterf

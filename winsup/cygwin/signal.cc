@@ -66,46 +66,63 @@ signal (int sig, _sig_func_ptr func)
   return prev;
 }
 
+extern "C" int
+nanosleep (const struct timespec *rqtp, struct timespec *rmtp)
+{
+  int res = 0;
+  sig_dispatch_pending (0);
+  sigframe thisframe (mainthread);
+  pthread_testcancel ();
+
+  if (rqtp->tv_sec < 0 || rqtp->tv_nsec < 0 || rqtp->tv_nsec > 999999999)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+
+  DWORD req = rqtp->tv_sec * 1000 + (rqtp->tv_nsec + 500000) / 1000000;
+  DWORD start_time = GetTickCount ();
+  DWORD end_time = start_time + req;
+  syscall_printf ("nanosleep (%ld)", req);
+
+  int rc = pthread::cancelable_wait (signal_arrived, req);
+  DWORD now = GetTickCount ();
+  DWORD rem = (rc == WAIT_TIMEOUT || now >= end_time) ? 0 : end_time - now;
+  if (WaitForSingleObject (signal_arrived, 0) == WAIT_OBJECT_0)
+    {
+      (void) thisframe.call_signal_handler ();
+      set_errno (EINTR);
+      res = -1;
+    }
+
+  if (rmtp)
+    {
+      rmtp->tv_sec = rem / 1000;
+      rmtp->tv_nsec = (rem % 1000) * 1000000;
+    }
+
+  syscall_printf ("%d = nanosleep (%ld, %ld)", res, req, rem);
+  return res;
+}
+
 extern "C" unsigned int
 sleep (unsigned int seconds)
 {
-  int rc;
-  sig_dispatch_pending (0);
-  sigframe thisframe (mainthread);
-  DWORD ms, start_time, end_time;
-
-  pthread_testcancel ();
-
-  ms = seconds * 1000;
-  start_time = GetTickCount ();
-  end_time = start_time + (seconds * 1000);
-  syscall_printf ("sleep (%d)", seconds);
-
-  rc = pthread::cancelable_wait (signal_arrived, ms);
-  DWORD now = GetTickCount ();
-  if (rc == WAIT_TIMEOUT || now >= end_time)
-    ms = 0;
-  else
-    ms = end_time - now;
-  if (WaitForSingleObject (signal_arrived, 0) == WAIT_OBJECT_0)
-    (void) thisframe.call_signal_handler ();
-
-  DWORD res = (ms + 500) / 1000;
-  syscall_printf ("%d = sleep (%d)", res, seconds);
-
-  return res;
+  struct timespec req, rem;
+  req.tv_sec = seconds;
+  req.tv_nsec = 0;
+  nanosleep (&req, &rem);
+  return rem.tv_sec + (rem.tv_nsec + 500000000) / 1000000000;
 }
 
 extern "C" unsigned int
 usleep (unsigned int useconds)
 {
-  pthread_testcancel ();
-
-  sig_dispatch_pending (0);
-  syscall_printf ("usleep (%d)", useconds);
-  pthread::cancelable_wait (signal_arrived, (useconds + 500) / 1000);
-  syscall_printf ("0 = usleep (%d)", useconds);
-  return 0;
+  struct timespec req;
+  req.tv_sec = useconds / 1000000;
+  req.tv_nsec = (useconds % 1000000) * 1000;
+  int res = nanosleep (&req, 0);
+  return res;
 }
 
 extern "C" int
