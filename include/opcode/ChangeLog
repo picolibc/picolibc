@@ -1,3 +1,70 @@
+2002-12-16  Alan Modra  <amodra@bigpond.net.au>
+
+	* hppa.h (completer_chars): #if 0 out.
+
+	* ns32k.h (struct ns32k_opcode): Constify "name", "operands" and
+	"default_args".
+	(struct not_wot): Constify "args".
+	(struct not): Constify "name".
+	(numopcodes): Delete.
+	(endop): Delete.
+
+2002-12-13  Alan Modra  <amodra@bigpond.net.au>
+
+	* pj.h (pj_opc_info_t): Add union.
+
+2002-12-04  David Mosberger  <davidm@hpl.hp.com>
+
+	* ia64.h: Fix copyright message.
+	(IA64_OPND_AR_CSD): New operand kind.
+
+2002-12-03  Richard Henderson  <rth@redhat.com>
+
+	* ia64.h (enum ia64_opnd): Add IA64_OPND_LDXMOV.
+
+2002-12-03  Alan Modra  <amodra@bigpond.net.au>
+
+	* cgen.h (struct cgen_maybe_multi_ifield): Add "const PTR p" to union.
+	Constify "leaf" and "multi".
+
+2002-11-19  Klee Dienes  <kdienes@apple.com>
+
+	* h8300.h (h8_opcode): Remove 'noperands', 'idx', and 'size'
+	fields.
+	(h8_opcodes). Modify initializer and initializer macros to no
+	longer initialize the removed fields.
+	
+2002-11-19  Svein E. Seldal  <Svein.Seldal@solidas.com>
+
+	* tic4x.h (c4x_insts): Fixed LDHI constraint
+
+2002-11-18  Klee Dienes  <kdienes@apple.com>
+
+	* h8300.h (h8_opcode): Remove 'length' field.
+	(h8_opcodes): Mark as 'const' (both the declaration and
+	definition).  Modify initializer and initializer macros to no
+	longer initialize the length field.
+
+2002-11-18  Klee Dienes  <kdienes@apple.com>
+
+	* arc.h (arc_ext_opcodes): Declare as extern.
+	(arc_ext_operands): Declare as extern.
+	* i860.h (i860_opcodes): Declare as const.
+
+2002-11-18  Svein E. Seldal  <Svein.Seldal@solidas.com>
+
+	* tic4x.h: File reordering. Added enhanced opcodes.
+
+2002-11-16  Svein E. Seldal  <Svein.Seldal@solidas.com>
+
+	* tic4x.h: Major rewrite of entire file. Define instruction
+	  classes, and put each instruction into a class.
+
+2002-11-11  Svein E. Seldal  <Svein.Seldal@solidas.com>
+
+	* tic4x.h: Added new opcodes and corrected some bugs.  Add support
+	for new DSP types.
+
 2002-10-14  Alan Modra  <amodra@bigpond.net.au>
 
 	* cgen.h: Test __BFD_H_SEEN__ rather than BFD_VERSION_DATE.

@@ -1,12 +1,34 @@
+2002-12-23  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h (struct bfd_link_info): Add "strip_discarded".
+
+2002-12-20  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h (struct bfd_link_info): Replace bfd_boolean fields with
+	bit-fields.  Rearrange to put all like types together.
+
+2002-11-30  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h: Replace boolean with bfd_boolean.  Formatting.
+
+2002-11-23  Simon Burge  <simonb@wasabisystems.com>
+
+	* libiberty.h (basename): Add NetBSD to the list.
+
+2002-11-22  Daniel Jacobowitz  <drow@mvista.com>
+
+	* libiberty.h (make_relative_prefix): Add prototype.
+
+2002-11-16  Klee Dienes  <kdienes@apple.com>
+
+	* opcode/m88k.h (INSTAB): Remove 'next' field.
+	(instruction): Remove definition; replace with extern declaration
+	and mark as const.
+
 2002-11-14  Egor Duda  <deo@logos-m.ru>
 
 	* bfdlink.h (struct bfd_link_info): Add new boolean
 	field pei386_runtime_pseudo_reloc.
-
-2002-11-11  Svein E. Seldal  <Svein.Seldal@solidas.com>
-
-	* opcode/tic4x.h: Added new opcodes and corrected some bugs.  Add
-	support for new DSP types.
 
 2002-10-26  Roger Sayle  <roger@eyesopen.com>
 

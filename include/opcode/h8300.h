@@ -151,20 +151,16 @@ struct h8_opcode
   char *name;
   struct arg args;
   struct code data;
-  int length;
-  int noperands;
-  int idx;
-  int size;
 };
 
 #ifdef DEFINE_TABLE
 
 #define BITOP(code, imm, name, op00, op01,op10,op11, op20,op21,op30)\
-{ code, 1, 2, name,	{{imm,RD8,E}},	{{op00, op01, imm, RD8, E, 0, 0, 0, 0}}, 0, 0, 0, 0},\
-{ code, 1, 6, name,	{{imm,RDIND,E}},{{op10, op11, B30|RDIND, 0, op00,op01, imm, 0, E}}, 0, 0, 0, 0},\
-{ code, 1, 6, name,	{{imm,ABS8DST,E}},{{op20, op21, ABS8DST, IGNORE, op00,op01, imm, 0,E}}, 0, 0, 0, 0}\
-,{ code, 0, 6, name,	{{imm,ABS16DST,E}},{{0x6,0xa,0x1,op30,ABS16DST,IGNORE,IGNORE,IGNORE, op00,op01, imm, 0,E}}, 0, 0, 0, 0},\
-{ code, 0, 6, name,	{{imm,ABS32DST,E}},{{0x6,0xa,0x3,op30,ABS32DST,IGNORE,IGNORE,IGNORE,IGNORE,IGNORE,IGNORE,IGNORE, op00,op01, imm, 0,E}}, 0, 0, 0, 0}
+{ code, 1, 2, name,	{{imm,RD8,E}},	{{op00, op01, imm, RD8, E, 0, 0, 0, 0}}},\
+{ code, 1, 6, name,	{{imm,RDIND,E}},{{op10, op11, B30|RDIND, 0, op00,op01, imm, 0, E}}},\
+{ code, 1, 6, name,	{{imm,ABS8DST,E}},{{op20, op21, ABS8DST, IGNORE, op00,op01, imm, 0,E}}}\
+,{ code, 0, 6, name,	{{imm,ABS16DST,E}},{{0x6,0xa,0x1,op30,ABS16DST,IGNORE,IGNORE,IGNORE, op00,op01, imm, 0,E}}},\
+{ code, 0, 6, name,	{{imm,ABS32DST,E}},{{0x6,0xa,0x3,op30,ABS32DST,IGNORE,IGNORE,IGNORE,IGNORE,IGNORE,IGNORE,IGNORE, op00,op01, imm, 0,E}}}
 
 
 #define EBITOP(code, imm, name, op00, op01,op10,op11, op20,op21,op30)\
@@ -172,33 +168,33 @@ struct h8_opcode
    BITOP(code,RS8,  name, op00, op01, op10,op11, op20,op21,op30)
 
 #define WTWOP(code,name, op1, op2) \
-{ code, 1, 2, name, {{RS16, RD16, E}}, {{ op1, op2, RS16, RD16, E, 0, 0, 0, 0}}, 0, 0, 0, 0}
+{ code, 1, 2, name, {{RS16, RD16, E}}, {{ op1, op2, RS16, RD16, E, 0, 0, 0, 0}}}
 
 #define BRANCH(code, name, op) \
-{ code, 1, 4,name,{{DISP8,E,0}}, {{ 0x4, op, DISP8, IGNORE, E, 0, 0, 0, 0}}, 0, 0, 0, 0}, \
-{ code, 0, 6,name,{{DISP16,E,0}}, {{ 0x5, 0x8, op, 0x0, DISP16, IGNORE, IGNORE, IGNORE, E,0}}, 0, 0, 0, 0} 
+{ code, 1, 4,name,{{DISP8,E,0}}, {{ 0x4, op, DISP8, IGNORE, E, 0, 0, 0, 0}}}, \
+{ code, 0, 6,name,{{DISP16,E,0}}, {{ 0x5, 0x8, op, 0x0, DISP16, IGNORE, IGNORE, IGNORE, E,0}}} 
 
 #define SOP(code, x,name) \
 {code, 1, x,  name 
 
 #define NEW_SOP(code, in,x,name) \
 {code, in, x,  name 
-#define EOP  ,0,0,0,0 }
+#define EOP  }
 
 #define TWOOP(code, name, op1, op2,op3) \
-{ code,1, 2,name, {{IMM8, RD8, E}},	{{ op1, RD8, IMM8, IGNORE, E, 0, 0, 0, 0}}, 0, 0, 0, 0},\
-{ code, 1, 2,name, {{RS8, RD8, E}},	{{ op2, op3, RS8, RD8, E, 0, 0, 0, 0}}, 0, 0, 0, 0} 
+{ code,1, 2,name, {{IMM8, RD8, E}},	{{ op1, RD8, IMM8, IGNORE, E, 0, 0, 0, 0}}},\
+{ code, 1, 2,name, {{RS8, RD8, E}},	{{ op2, op3, RS8, RD8, E, 0, 0, 0, 0}}} 
 
 #define UNOP(code,name, op1, op2) \
-{ code, 1, 2, name, {{OR8, E, 0}}, {{ op1, op2, 0, OR8, E, 0, 0, 0, 0}}, 0, 0, 0, 0}
+{ code, 1, 2, name, {{OR8, E, 0}}, {{ op1, op2, 0, OR8, E, 0, 0, 0, 0}}}
 
 #define UNOP3(code, name, op1, op2, op3) \
-{ O(code,SB), 1, 2, name, {{OR8,  E, 0}}, {{op1, op2, op3+0, OR8,  E, 0, 0, 0, 0}}, 0, 0, 0, 0}, \
-{ O(code,SW), 0, 2, name, {{OR16, E, 0}}, {{op1, op2, op3+1, OR16, E, 0, 0, 0, 0}}, 0, 0, 0, 0}, \
-{ O(code,SL), 0, 2, name, {{OR32, E, 0}}, {{op1, op2, op3+3, OR32|B30, E, 0, 0, 0, 0}}, 0, 0, 0, 0} \
-,{ O(code,SB), 1, 2, name, {{IMM, OR8 | SRC_IN_DST,  E}}, {{op1, op2, op3+4, OR8 | SRC_IN_DST,  E, 0, 0, 0, 0}}, 0, 0, 0, 0}, \
-{ O(code,SW), 0, 2, name, {{IMM, OR16 | SRC_IN_DST, E}}, {{op1, op2, op3+5, OR16 | SRC_IN_DST, E, 0, 0, 0, 0}}, 0, 0, 0, 0}, \
-{ O(code,SL), 0, 2, name, {{IMM, OR32 | SRC_IN_DST, E}}, {{op1, op2, op3+7, OR32 | SRC_IN_DST|B30 , E, 0, 0, 0, 0}}, 0, 0, 0, 0}
+{ O(code,SB), 1, 2, name, {{OR8,  E, 0}}, {{op1, op2, op3+0, OR8,  E, 0, 0, 0, 0}}}, \
+{ O(code,SW), 0, 2, name, {{OR16, E, 0}}, {{op1, op2, op3+1, OR16, E, 0, 0, 0, 0}}}, \
+{ O(code,SL), 0, 2, name, {{OR32, E, 0}}, {{op1, op2, op3+3, OR32|B30, E, 0, 0, 0, 0}}} \
+,{ O(code,SB), 1, 2, name, {{IMM, OR8 | SRC_IN_DST,  E}}, {{op1, op2, op3+4, OR8 | SRC_IN_DST,  E, 0, 0, 0, 0}}}, \
+{ O(code,SW), 0, 2, name, {{IMM, OR16 | SRC_IN_DST, E}}, {{op1, op2, op3+5, OR16 | SRC_IN_DST, E, 0, 0, 0, 0}}}, \
+{ O(code,SL), 0, 2, name, {{IMM, OR32 | SRC_IN_DST, E}}, {{op1, op2, op3+7, OR32 | SRC_IN_DST|B30 , E, 0, 0, 0, 0}}}
 
 
 #define IMM32LIST IMM32,IGNORE,IGNORE,IGNORE,IGNORE,IGNORE,IGNORE,IGNORE
@@ -314,7 +310,7 @@ struct h8_opcode
 /* FIXME: Lots of insns have "E, 0, 0, 0, 0" in the nibble code sequences.
    Methinks the zeroes aren't necessary.  Once confirmed, nuke 'em.  */
 
-struct h8_opcode h8_opcodes[] = 
+const struct h8_opcode h8_opcodes[] = 
 {
   TWOOP(O(O_ADD,SB),"add.b", 0x8, 0x0,0x8),
   
@@ -594,8 +590,8 @@ struct h8_opcode h8_opcodes[] =
   NEW_SOP(O(O_STMAC,SL),1,2,"stmac"),{{MACREG,RD32,E}},{{0x0,0x2,MACREG,RD32,E}} EOP,
   NEW_SOP(O(O_LDM,SL),0,6,"ldm.l"),{{RSINC, RS32, E}},{{ 0x0,0x1,IGNORE,0x0,0x6,0xD,0x7,IGNORE,E}}EOP,
   NEW_SOP(O(O_STM,SL),0,6,"stm.l"),{{RS32, RDDEC, E}},{{0x0,0x1,IGNORE,0x0,0x6,0xD,0xF,IGNORE,E}}EOP,
-  {0, 0, 0, NULL, {{0,0,0}}, {{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}}, 0, 0, 0, 0}
+  {0, 0, 0, NULL, {{0,0,0}}, {{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}}}
 };
 #else
-extern struct h8_opcode h8_opcodes[];
+extern const struct h8_opcode h8_opcodes[];
 #endif

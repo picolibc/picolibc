@@ -128,14 +128,14 @@ struct bfd_link_hash_entry
       struct
 	{
 	  /* The linker needs to know three things about common
-             symbols: the size, the alignment, and the section in
-             which the symbol should be placed.  We store the size
-             here, and we allocate a small structure to hold the
-             section and the alignment.  The alignment is stored as a
-             power of two.  We don't store all the information
-             directly because we don't want to increase the size of
-             the union; this structure is a major space user in the
-             linker.  */
+	     symbols: the size, the alignment, and the section in
+	     which the symbol should be placed.  We store the size
+	     here, and we allocate a small structure to hold the
+	     section and the alignment.  The alignment is stored as a
+	     power of two.  We don't store all the information
+	     directly because we don't want to increase the size of
+	     the union; this structure is a major space user in the
+	     linker.  */
 	  bfd_size_type size;	/* Common symbol size.  */
 	  struct bfd_link_hash_common_entry
 	    {
@@ -167,25 +167,25 @@ struct bfd_link_hash_table
   enum bfd_link_hash_table_type type;
 };
 
-/* Look up an entry in a link hash table.  If FOLLOW is true, this
+/* Look up an entry in a link hash table.  If FOLLOW is TRUE, this
    follows bfd_link_hash_indirect and bfd_link_hash_warning links to
    the real symbol.  */
 extern struct bfd_link_hash_entry *bfd_link_hash_lookup
-  PARAMS ((struct bfd_link_hash_table *, const char *, boolean create,
-	   boolean copy, boolean follow));
+  PARAMS ((struct bfd_link_hash_table *, const char *, bfd_boolean create,
+	   bfd_boolean copy, bfd_boolean follow));
 
 /* Look up an entry in the main linker hash table if the symbol might
    be wrapped.  This should only be used for references to an
    undefined symbol, not for definitions of a symbol.  */
 
 extern struct bfd_link_hash_entry *bfd_wrapped_link_hash_lookup
-  PARAMS ((bfd *, struct bfd_link_info *, const char *, boolean, boolean,
-	   boolean));
+  PARAMS ((bfd *, struct bfd_link_info *, const char *, bfd_boolean,
+	   bfd_boolean, bfd_boolean));
 
 /* Traverse a link hash table.  */
 extern void bfd_link_hash_traverse
   PARAMS ((struct bfd_link_hash_table *,
-	   boolean (*) (struct bfd_link_hash_entry *, PTR),
+	   bfd_boolean (*) (struct bfd_link_hash_entry *, PTR),
 	   PTR));
 
 /* Add an entry to the undefs list.  */
@@ -203,49 +203,46 @@ struct bfd_sym_chain
 
 struct bfd_link_info
 {
-  /* Function callbacks.  */
-  const struct bfd_link_callbacks *callbacks;
+  /* TRUE if BFD should generate a relocatable object file.  */
+  unsigned int relocateable: 1;
 
-  /* true if BFD should generate a relocateable object file.  */
-  boolean relocateable;
-
-  /* true if BFD should generate relocation information in the final
+  /* TRUE if BFD should generate relocation information in the final
      executable.  */
-  boolean emitrelocations;
+  unsigned int emitrelocations: 1;
 
-  /* true if BFD should generate a "task linked" object file,
+  /* TRUE if BFD should generate a "task linked" object file,
      similar to relocatable but also with globals converted to
      statics.  */
-  boolean task_link;
+  unsigned int task_link: 1;
 
-  /* true if BFD should generate a shared object.  */
-  boolean shared;
+  /* TRUE if BFD should generate a shared object.  */
+  unsigned int shared: 1;
 
-  /* true if BFD should pre-bind symbols in a shared object.  */
-  boolean symbolic;
+  /* TRUE if BFD should pre-bind symbols in a shared object.  */
+  unsigned int symbolic: 1;
 
-  /* true if BFD should export all symbols in the dynamic symbol table
+  /* TRUE if BFD should export all symbols in the dynamic symbol table
      of an executable, rather than only those used.  */
-  boolean export_dynamic;
+  unsigned int export_dynamic: 1;
 
-  /* true if shared objects should be linked directly, not shared.  */
-  boolean static_link;
+  /* TRUE if shared objects should be linked directly, not shared.  */
+  unsigned int static_link: 1;
 
-  /* true if the output file should be in a traditional format.  This
+  /* TRUE if the output file should be in a traditional format.  This
      is equivalent to the setting of the BFD_TRADITIONAL_FORMAT flag
      on the output file, but may be checked when reading the input
      files.  */
-  boolean traditional_format;
+  unsigned int traditional_format: 1;
 
-  /* true if we want to produced optimized output files.  This might
+  /* TRUE if we want to produced optimized output files.  This might
      need much more time and therefore must be explicitly selected.  */
-  boolean optimize;
+  unsigned int optimize: 1;
 
-  /* true if BFD should generate errors for undefined symbols
+  /* TRUE if BFD should generate errors for undefined symbols
      even if generating a shared object.  */
-  boolean no_undefined;
+  unsigned int no_undefined: 1;
 
-  /* true if BFD should allow undefined symbols in shared objects even
+  /* TRUE if BFD should allow undefined symbols in shared objects even
      when no_undefined is set to disallow undefined symbols.  The net
      result will be that undefined symbols in regular objects will
      still trigger an error, but undefined symbols in shared objects
@@ -257,13 +254,39 @@ struct bfd_link_info
      appropriate for the current architecture.  I.E. dynamically
      select an appropriate memset function.  Apparently it is also
      normal for HPPA shared libraries to have undefined symbols.  */
-  boolean allow_shlib_undefined;
+  unsigned int allow_shlib_undefined: 1;
 
-  /* true if ok to have multiple definition.  */
-  boolean allow_multiple_definition;
+  /* TRUE if ok to have multiple definition.  */
+  unsigned int allow_multiple_definition: 1;
 
-  /* true if ok to have version with no definition.  */
-  boolean allow_undefined_version;
+  /* TRUE if ok to have version with no definition.  */
+  unsigned int allow_undefined_version: 1;
+
+  /* TRUE if symbols should be retained in memory, FALSE if they
+     should be freed and reread.  */
+  unsigned int keep_memory: 1;
+
+  /* TRUE if every symbol should be reported back via the notice
+     callback.  */
+  unsigned int notice_all: 1;
+
+  /* TRUE if executable should not contain copy relocs.
+     Setting this true may result in a non-sharable text segment.  */
+  unsigned int nocopyreloc: 1;
+
+  /* TRUE if the new ELF dynamic tags are enabled. */
+  unsigned int new_dtags: 1;
+
+  /* TRUE if non-PLT relocs should be merged into one reloc section
+     and sorted so that relocs against the same symbol come together.  */
+  unsigned int combreloc: 1;
+
+  /* TRUE if .eh_frame_hdr section and PT_GNU_EH_FRAME ELF segment
+     should be created.  */
+  unsigned int eh_frame_hdr: 1;
+
+  /* TRUE if global symbols in discarded sections should be stripped.  */
+  unsigned int strip_discarded: 1;
 
   /* Which symbols to strip.  */
   enum bfd_link_strip strip;
@@ -271,9 +294,28 @@ struct bfd_link_info
   /* Which local symbols to discard.  */
   enum bfd_link_discard discard;
 
-  /* true if symbols should be retained in memory, false if they
-     should be freed and reread.  */
-  boolean keep_memory;
+  /* Criteria for skipping symbols when detemining
+     whether to include an object from an archive. */
+  enum bfd_link_common_skip_ar_aymbols common_skip_ar_aymbols;
+
+  /* Function callbacks.  */
+  const struct bfd_link_callbacks *callbacks;
+
+  /* Hash table handled by BFD.  */
+  struct bfd_link_hash_table *hash;
+
+  /* Hash table of symbols to keep.  This is NULL unless strip is
+     strip_some.  */
+  struct bfd_hash_table *keep_hash;
+
+  /* Hash table of symbols to report back via the notice callback.  If
+     this is NULL, and notice_all is FALSE, then no symbols are
+     reported back.  */
+  struct bfd_hash_table *notice_hash;
+
+  /* Hash table of symbols which are being wrapped (the --wrap linker
+     option).  If this is NULL, no symbols are being wrapped.  */
+  struct bfd_hash_table *wrap_hash;
 
   /* The list of input BFD's involved in the link.  These are chained
      together via the link_next field.  */
@@ -290,33 +332,8 @@ struct bfd_link_info
      sections against garbage collection.  */
   struct bfd_sym_chain *gc_sym_list;
 
-  /* Hash table handled by BFD.  */
-  struct bfd_link_hash_table *hash;
-
-  /* Hash table of symbols to keep.  This is NULL unless strip is
-     strip_some.  */
-  struct bfd_hash_table *keep_hash;
-
-  /* true if every symbol should be reported back via the notice
-     callback.  */
-  boolean notice_all;
-
-  /* Hash table of symbols to report back via the notice callback.  If
-     this is NULL, and notice_all is false, then no symbols are
-     reported back.  */
-  struct bfd_hash_table *notice_hash;
-
-  /* Hash table of symbols which are being wrapped (the --wrap linker
-     option).  If this is NULL, no symbols are being wrapped.  */
-  struct bfd_hash_table *wrap_hash;
-
   /* If a base output file is wanted, then this points to it */
   PTR base_file;
-
-  /* If non-zero, specifies that branches which are problematic for the
-  MPC860 C0 (or earlier) should be checked for and modified.  It gives the
-  number of bytes that should be checked at the end of each text page. */
-  int mpc860c0;
 
   /* The function to call when the executable or shared object is
      loaded.  */
@@ -326,16 +343,12 @@ struct bfd_link_info
      unloaded.  */
   const char *fini_function;
 
-  /* true if the new ELF dynamic tags are enabled. */ 
-  boolean new_dtags;
+  /* If non-zero, specifies that branches which are problematic for the
+     MPC860 C0 (or earlier) should be checked for and modified.  It gives the
+     number of bytes that should be checked at the end of each text page.  */
+  int mpc860c0;
 
-  /* May be used to set DT_FLAGS for ELF. */
-  bfd_vma flags;
-
-  /* May be used to set DT_FLAGS_1 for ELF. */
-  bfd_vma flags_1;
-
-  /* Non-zero if auto-import thunks for DATA items in pei386 DLLs 
+  /* Non-zero if auto-import thunks for DATA items in pei386 DLLs
      should be generated/linked against.  Set to 1 if this feature
      is explicitly requested by the user, -1 if enabled by default.  */
   int pei386_auto_import;
@@ -345,30 +358,20 @@ struct bfd_link_info
      is explicitly requested by the user, -1 if enabled by default.  */
   int pei386_runtime_pseudo_reloc;
 
-  /* True if non-PLT relocs should be merged into one reloc section
-     and sorted so that relocs against the same symbol come together.  */
-  boolean combreloc;
-
-  /* True if executable should not contain copy relocs.
-     Setting this true may result in a non-sharable text segment.  */
-  boolean nocopyreloc;
-
-  /* True if .eh_frame_hdr section and PT_GNU_EH_FRAME ELF segment
-     should be created.  */
-  boolean eh_frame_hdr;
-
   /* How many spare .dynamic DT_NULL entries should be added?  */
   unsigned int spare_dynamic_tags;
 
-  /* Criteria for skipping symbols when detemining
-     whether to include an object from an archive. */
-  enum bfd_link_common_skip_ar_aymbols common_skip_ar_aymbols;
+  /* May be used to set DT_FLAGS for ELF. */
+  bfd_vma flags;
+
+  /* May be used to set DT_FLAGS_1 for ELF. */
+  bfd_vma flags_1;
 };
 
 /* This structures holds a set of callback functions.  These are
    called by the BFD linker routines.  The first argument to each
    callback function is the bfd_link_info structure being used.  Each
-   function returns a boolean value.  If the function returns false,
+   function returns a boolean value.  If the function returns FALSE,
    then the BFD function which called it will return with a failure
    indication.  */
 
@@ -378,23 +381,18 @@ struct bfd_link_callbacks
      archive.  ABFD is the archive element being added.  NAME is the
      name of the symbol which caused the archive element to be pulled
      in.  */
-  boolean (*add_archive_element) PARAMS ((struct bfd_link_info *,
-					  bfd *abfd,
-					  const char *name));
+  bfd_boolean (*add_archive_element)
+    PARAMS ((struct bfd_link_info *, bfd *abfd, const char *name));
   /* A function which is called when a symbol is found with multiple
      definitions.  NAME is the symbol which is defined multiple times.
      OBFD is the old BFD, OSEC is the old section, OVAL is the old
      value, NBFD is the new BFD, NSEC is the new section, and NVAL is
      the new value.  OBFD may be NULL.  OSEC and NSEC may be
      bfd_com_section or bfd_ind_section.  */
-  boolean (*multiple_definition) PARAMS ((struct bfd_link_info *,
-					  const char *name,
-					  bfd *obfd,
-					  asection *osec,
-					  bfd_vma oval,
-					  bfd *nbfd,
-					  asection *nsec,
-					  bfd_vma nval));
+  bfd_boolean (*multiple_definition)
+    PARAMS ((struct bfd_link_info *, const char *name,
+	     bfd *obfd, asection *osec, bfd_vma oval,
+	     bfd *nbfd, asection *nsec, bfd_vma nval));
   /* A function which is called when a common symbol is defined
      multiple times.  NAME is the symbol appearing multiple times.
      OBFD is the BFD of the existing symbol; it may be NULL if this is
@@ -406,34 +404,29 @@ struct bfd_link_callbacks
      symbol, one of bfd_link_hash_defined, bfd_link_hash_common, or
      bfd_link_hash_indirect.  If NTYPE is bfd_link_hash_common, NSIZE
      is the size of the new symbol.  */
-  boolean (*multiple_common) PARAMS ((struct bfd_link_info *,
-				      const char *name,
-				      bfd *obfd,
-				      enum bfd_link_hash_type otype,
-				      bfd_vma osize,
-				      bfd *nbfd,
-				      enum bfd_link_hash_type ntype,
-				      bfd_vma nsize));
+  bfd_boolean (*multiple_common)
+    PARAMS ((struct bfd_link_info *, const char *name,
+	     bfd *obfd, enum bfd_link_hash_type otype, bfd_vma osize,
+	     bfd *nbfd, enum bfd_link_hash_type ntype, bfd_vma nsize));
   /* A function which is called to add a symbol to a set.  ENTRY is
      the link hash table entry for the set itself (e.g.,
      __CTOR_LIST__).  RELOC is the relocation to use for an entry in
      the set when generating a relocateable file, and is also used to
      get the size of the entry when generating an executable file.
      ABFD, SEC and VALUE identify the value to add to the set.  */
-  boolean (*add_to_set) PARAMS ((struct bfd_link_info *,
-				 struct bfd_link_hash_entry *entry,
-				 bfd_reloc_code_real_type reloc,
-				 bfd *abfd, asection *sec, bfd_vma value));
+  bfd_boolean (*add_to_set)
+    PARAMS ((struct bfd_link_info *, struct bfd_link_hash_entry *entry,
+	     bfd_reloc_code_real_type reloc, bfd *abfd, asection *sec,
+	     bfd_vma value));
   /* A function which is called when the name of a g++ constructor or
      destructor is found.  This is only called by some object file
-     formats.  CONSTRUCTOR is true for a constructor, false for a
+     formats.  CONSTRUCTOR is TRUE for a constructor, FALSE for a
      destructor.  This will use BFD_RELOC_CTOR when generating a
      relocateable file.  NAME is the name of the symbol found.  ABFD,
      SECTION and VALUE are the value of the symbol.  */
-  boolean (*constructor) PARAMS ((struct bfd_link_info *,
-				  boolean constructor,
-				  const char *name, bfd *abfd, asection *sec,
-				  bfd_vma value));
+  bfd_boolean (*constructor)
+    PARAMS ((struct bfd_link_info *, bfd_boolean constructor,
+	     const char *name, bfd *abfd, asection *sec, bfd_vma value));
   /* A function which is called to issue a linker warning.  For
      example, this is called when there is a reference to a warning
      symbol.  WARNING is the warning to be issued.  SYMBOL is the name
@@ -441,20 +434,17 @@ struct bfd_link_callbacks
      there is none.  ABFD, SECTION and ADDRESS identify the location
      which trigerred the warning; either ABFD or SECTION or both may
      be NULL if the location is not known.  */
-  boolean (*warning) PARAMS ((struct bfd_link_info *,
-			      const char *warning, const char *symbol,
-			      bfd *abfd, asection *section,
-			      bfd_vma address));
+  bfd_boolean (*warning)
+    PARAMS ((struct bfd_link_info *, const char *warning, const char *symbol,
+	     bfd *abfd, asection *section, bfd_vma address));
   /* A function which is called when a relocation is attempted against
      an undefined symbol.  NAME is the symbol which is undefined.
      ABFD, SECTION and ADDRESS identify the location from which the
      reference is made. FATAL indicates whether an undefined symbol is
      a fatal error or not. In some cases SECTION may be NULL.  */
-  boolean (*undefined_symbol) PARAMS ((struct bfd_link_info *,
-				       const char *name, bfd *abfd,
-				       asection *section,
-				       bfd_vma address,
-				       boolean fatal));
+  bfd_boolean (*undefined_symbol)
+    PARAMS ((struct bfd_link_info *, const char *name, bfd *abfd,
+	     asection *section, bfd_vma address, bfd_boolean fatal));
   /* A function which is called when a reloc overflow occurs.  NAME is
      the name of the symbol or section the reloc is against,
      RELOC_NAME is the name of the relocation, and ADDEND is any
@@ -462,11 +452,9 @@ struct bfd_link_callbacks
      location at which the overflow occurs; if this is the result of a
      bfd_section_reloc_link_order or bfd_symbol_reloc_link_order, then
      ABFD will be NULL.  */
-  boolean (*reloc_overflow) PARAMS ((struct bfd_link_info *,
-				     const char *name,
-				     const char *reloc_name, bfd_vma addend,
-				     bfd *abfd, asection *section,
-				     bfd_vma address));
+  bfd_boolean (*reloc_overflow)
+    PARAMS ((struct bfd_link_info *, const char *name, const char *reloc_name,
+	     bfd_vma addend, bfd *abfd, asection *section, bfd_vma address));
   /* A function which is called when a dangerous reloc is performed.
      The canonical example is an a29k IHCONST reloc which does not
      follow an IHIHALF reloc.  MESSAGE is an appropriate message.
@@ -474,26 +462,25 @@ struct bfd_link_callbacks
      problem occurred; if this is the result of a
      bfd_section_reloc_link_order or bfd_symbol_reloc_link_order, then
      ABFD will be NULL.  */
-  boolean (*reloc_dangerous) PARAMS ((struct bfd_link_info *,
-				      const char *message,
-				      bfd *abfd, asection *section,
-				      bfd_vma address));
+  bfd_boolean (*reloc_dangerous)
+    PARAMS ((struct bfd_link_info *, const char *message,
+	     bfd *abfd, asection *section, bfd_vma address));
   /* A function which is called when a reloc is found to be attached
      to a symbol which is not being written out.  NAME is the name of
      the symbol.  ABFD, SECTION and ADDRESS identify the location of
      the reloc; if this is the result of a
      bfd_section_reloc_link_order or bfd_symbol_reloc_link_order, then
      ABFD will be NULL.  */
-  boolean (*unattached_reloc) PARAMS ((struct bfd_link_info *,
-				       const char *name,
-				       bfd *abfd, asection *section,
-				       bfd_vma address));
+  bfd_boolean (*unattached_reloc)
+    PARAMS ((struct bfd_link_info *, const char *name,
+	     bfd *abfd, asection *section, bfd_vma address));
   /* A function which is called when a symbol in notice_hash is
      defined or referenced.  NAME is the symbol.  ABFD, SECTION and
      ADDRESS are the value of the symbol.  If SECTION is
      bfd_und_section, this is a reference.  */
-  boolean (*notice) PARAMS ((struct bfd_link_info *, const char *name,
-			     bfd *abfd, asection *section, bfd_vma address));
+  bfd_boolean (*notice)
+    PARAMS ((struct bfd_link_info *, const char *name,
+	     bfd *abfd, asection *section, bfd_vma address));
 };
 
 /* The linker builds link_order structures which tell the code how to
@@ -513,20 +500,20 @@ enum bfd_link_order_type
 /* This is the link_order structure itself.  These form a chain
    attached to the section whose contents they are describing.  */
 
-struct bfd_link_order 
+struct bfd_link_order
 {
   /* Next link_order in chain.  */
   struct bfd_link_order *next;
   /* Type of link_order.  */
   enum bfd_link_order_type type;
   /* Offset within output section.  */
-  bfd_vma offset;  
+  bfd_vma offset;
   /* Size within output section.  */
   bfd_size_type size;
   /* Type specific information.  */
-  union 
+  union
     {
-      struct 
+      struct
 	{
 	  /* Section to include.  If this is used, then
 	     section->output_section must be the section the
@@ -609,7 +596,7 @@ struct bfd_elf_version_expr
   /* Regular expression.  */
   const char *pattern;
   /* Matching function.  */
-  int (*match) PARAMS((struct bfd_elf_version_expr *, const char *));
+  int (*match) PARAMS ((struct bfd_elf_version_expr *, const char *));
   /* Defined by ".symver".  */
   unsigned int symver: 1;
   /* Defined by version script.  */
