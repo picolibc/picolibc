@@ -1,3 +1,8 @@
+2004-11-17  Christopher Faylor  <cgf@timesys.com>
+
+	* libc/stdio/refill.c (__srefill): Try again after EOF on Cygwin.  Clear
+	EOF flag if successful.
+
 2004-10-28  Christopher Faylor  <cgf@timesys.com>
 
 	* libc/include/sys/signal.h: Move <signal.h> include to bottom of file
