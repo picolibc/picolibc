@@ -675,7 +675,6 @@ dtable::vfork_parent_restore ()
 
   close_all_files ();
   fhandler_base **deleteme = fds;
-  assert (fds_on_hold != NULL);
   fds = fds_on_hold;
   fds_on_hold = NULL;
   cfree (deleteme);

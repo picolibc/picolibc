@@ -1130,7 +1130,7 @@ void
 events_init (void)
 {
   char *name;
-  /* title_mutex protects modification of console title. It's neccessary
+  /* title_mutex protects modification of console title. It's necessary
      while finding console window handle */
 
   if (!(title_mutex = CreateMutex (&sec_all_nih, FALSE,

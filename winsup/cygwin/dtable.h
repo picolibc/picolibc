@@ -79,6 +79,7 @@ public:
   void stdio_init ();
   void get_debugger_info ();
   void set_file_pointers_for_exec ();
+  bool in_vfork_cleanup () {return fds_on_hold == fds;}
 };
 
 void dtable_init (void);

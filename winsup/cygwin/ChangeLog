@@ -1,3 +1,11 @@
+2003-01-03  Christopher Faylor  <cgf@redhat.com>
+
+	* dtable.h (dtable::in_vfork_cleanup): New function.  True if vfork
+	cleanup needed.
+	* dtable.cc (dtable::vfork_parent_restore): Remove assertion.
+	* pipe.cc (fhandler_pipe::close): Don't close read_state during
+	fork_fixup since it wasn't inherited.
+
 2003-01-01  Christopher Faylor  <cgf@redhat.com>
 
 	* passwd.cc (getpwuid_r32): Revert previous change.
