@@ -1,3 +1,7 @@
+2002-01-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (getdomainname): Fix registry key for NT systems.
+
 2002-01-28  Christopher Faylor  <cgf@redhat.com>
 
 	* external.cc (cygwin_internal): Initialize various internal settings

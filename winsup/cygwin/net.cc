@@ -1629,6 +1629,7 @@ getdomainname (char *domain, int len)
 	     (!wincap.is_winnt ()) ? "System" : "SYSTEM",
 	     "CurrentControlSet", "Services",
 	     (!wincap.is_winnt ()) ? "MSTCP" : "Tcpip",
+	     (!wincap.is_winnt ()) ? NULL : "Parameters",
 	     NULL);
 
   /* FIXME: Are registry keys case sensitive? */
