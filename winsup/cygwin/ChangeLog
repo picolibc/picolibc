@@ -1,5 +1,9 @@
 2002-07-03  Christopher Faylor  <cgf@redhat.com>
 
+	* include/sys/statfs.h: New header file.
+
+2002-07-03  Christopher Faylor  <cgf@redhat.com>
+
 	* dtable.cc (cygwin_attach_handle_to_fd): Default to implicit bin mode
 	if none specified.
 	* fhandler.cc (fhandler_base::init): Make bin argument a guarantee
