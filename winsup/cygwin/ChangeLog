@@ -1,3 +1,9 @@
+2002-07-01  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* syscalls.c (seteuid32): Return immediately if the program is not
+	impersonated and both uid and gid are original.
+	(setegid32): Return immediately if the new gid is the current egid.
+
 2002-07-01  Christopher Faylor  <cgf@redhat.com>
 
 	* syscalls.cc (seteuid32): Fix incorrect placement of Pierre's patch

@@ -617,7 +617,7 @@ _link (const char *a, const char *b)
   sigframe thisframe (mainthread);
   path_conv real_b (b, PC_SYM_NOFOLLOW | PC_FULL);
   path_conv real_a (a, PC_SYM_NOFOLLOW | PC_FULL);
-  
+
   if (real_a.error)
     {
       set_errno (real_a.error);
@@ -1955,11 +1955,16 @@ mkfifo (const char *_path, mode_t mode)
 extern "C" int
 seteuid32 (__uid32_t uid)
 {
-  if (!wincap.has_security ()) return 0;
 
-  if (uid == ILLEGAL_UID)
+  debug_printf ("uid: %d myself->gid: %d", uid, myself->gid);
+
+  if (!wincap.has_security ()
+      || (!cygheap->user.issetuid ()
+	  && uid == myself->uid
+	  && myself->gid == cygheap->user.orig_gid)
+      || uid == ILLEGAL_UID)
     {
-      debug_printf ("new euid == illegal euid, nothing happens");
+      debug_printf ("Nothing happens");
       return 0;
     }
 
@@ -1970,8 +1975,6 @@ seteuid32 (__uid32_t uid)
   BOOL process_ok, explicitly_created_token = FALSE;
   struct passwd * pw_new;
   PSID origpsid, psid2 = NO_SID;
-
-  debug_printf ("uid: %d myself->gid: %d", uid, myself->gid);
 
   pw_new = getpwuid32 (uid);
   if (!usersid.getfrompw (pw_new) ||
@@ -2104,11 +2107,6 @@ seteuid32 (__uid32_t uid)
   if (cygheap->user.issetuid ()
        && !ImpersonateLoggedOnUser (cygheap->user.token))
     system_printf ("Impersonating in seteuid failed: %E");
-  if (uid == myself->uid)
-    {
-      syscall_printf ("special case, returning 0");
-      return 0;
-    }
   return -1;
 }
 
@@ -2140,6 +2138,7 @@ extern "C" int
 setegid32 (__gid32_t gid)
 {
   if ((!wincap.has_security ()) ||
+      (gid == myself->gid) ||
       (gid == ILLEGAL_GID))
     return 0;
 
