@@ -153,6 +153,8 @@ LIB_SOURCES = \
 	rget.c 				\
 	scanf.c 			\
 	setbuf.c 			\
+	setbuffer.c 			\
+	setlinebuf.c 			\
 	setvbuf.c 			\
 	siprintf.c 			\
 	snprintf.c			\
@@ -227,6 +229,8 @@ CHEWOUT_FILES = \
 	rename.def		\
 	rewind.def		\
 	setbuf.def		\
+	setbuffer.def		\
+	setlinebuf.def		\
 	setvbuf.def		\
 	siprintf.def		\
 	sprintf.def		\
@@ -263,10 +267,11 @@ LIBS = @LIBS@
 @USE_LIBTOOL_FALSE@iprintf.o makebuf.o mktemp.o perror.o printf.o \
 @USE_LIBTOOL_FALSE@putc.o putchar.o putc_u.o putchar_u.o puts.o putw.o \
 @USE_LIBTOOL_FALSE@refill.o remove.o rename.o rewind.o rget.o scanf.o \
-@USE_LIBTOOL_FALSE@setbuf.o setvbuf.o siprintf.o snprintf.o sprintf.o \
-@USE_LIBTOOL_FALSE@sscanf.o stdio.o tmpfile.o tmpnam.o ungetc.o \
-@USE_LIBTOOL_FALSE@vfscanf.o vprintf.o vscanf.o vsnprintf.o vsprintf.o \
-@USE_LIBTOOL_FALSE@vsscanf.o wbuf.o wsetup.o
+@USE_LIBTOOL_FALSE@setbuf.o setbuffer.o setlinebuf.o setvbuf.o \
+@USE_LIBTOOL_FALSE@siprintf.o snprintf.o sprintf.o sscanf.o stdio.o \
+@USE_LIBTOOL_FALSE@tmpfile.o tmpnam.o ungetc.o vfscanf.o vprintf.o \
+@USE_LIBTOOL_FALSE@vscanf.o vsnprintf.o vsprintf.o vsscanf.o wbuf.o \
+@USE_LIBTOOL_FALSE@wsetup.o
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
 @USE_LIBTOOL_TRUE@libstdio_la_DEPENDENCIES =  vfiprintf.$(oext) \
@@ -281,10 +286,11 @@ LTLIBRARIES =  $(noinst_LTLIBRARIES)
 @USE_LIBTOOL_TRUE@makebuf.lo mktemp.lo perror.lo printf.lo putc.lo \
 @USE_LIBTOOL_TRUE@putchar.lo putc_u.lo putchar_u.lo puts.lo putw.lo \
 @USE_LIBTOOL_TRUE@refill.lo remove.lo rename.lo rewind.lo rget.lo \
-@USE_LIBTOOL_TRUE@scanf.lo setbuf.lo setvbuf.lo siprintf.lo snprintf.lo \
-@USE_LIBTOOL_TRUE@sprintf.lo sscanf.lo stdio.lo tmpfile.lo tmpnam.lo \
-@USE_LIBTOOL_TRUE@ungetc.lo vfscanf.lo vprintf.lo vscanf.lo \
-@USE_LIBTOOL_TRUE@vsnprintf.lo vsprintf.lo vsscanf.lo wbuf.lo wsetup.lo
+@USE_LIBTOOL_TRUE@scanf.lo setbuf.lo setbuffer.lo setlinebuf.lo \
+@USE_LIBTOOL_TRUE@setvbuf.lo siprintf.lo snprintf.lo sprintf.lo \
+@USE_LIBTOOL_TRUE@sscanf.lo stdio.lo tmpfile.lo tmpnam.lo ungetc.lo \
+@USE_LIBTOOL_TRUE@vfscanf.lo vprintf.lo vscanf.lo vsnprintf.lo \
+@USE_LIBTOOL_TRUE@vsprintf.lo vsscanf.lo wbuf.lo wsetup.lo
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

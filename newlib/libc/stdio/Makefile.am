@@ -55,6 +55,8 @@ LIB_SOURCES = \
 	rget.c 				\
 	scanf.c 			\
 	setbuf.c 			\
+	setbuffer.c 			\
+	setlinebuf.c 			\
 	setvbuf.c 			\
 	siprintf.c 			\
 	snprintf.c			\
@@ -142,6 +144,8 @@ CHEWOUT_FILES = \
 	rename.def		\
 	rewind.def		\
 	setbuf.def		\
+	setbuffer.def		\
+	setlinebuf.def		\
 	setvbuf.def		\
 	siprintf.def		\
 	sprintf.def		\

@@ -1,3 +1,10 @@
+2002-05-23  Gareth Pearce  <tilps@hotmail.com>
+
+        * libc/stdio/Makefile.am: Modify to add setbuffer.c and setlinebuf.c.
+        * libc/stdio/Makefile.in: Regenerated.
+        * libc/stdio/setbuffer.c: New file.
+        * libc/stdio/setlinebuf.c: New file.
+
 2002-05-23  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/sys/linux/Makefile.am: Add resource.c.
