@@ -344,7 +344,7 @@ _read (int fd, void *ptr, size_t len)
 extern "C" ssize_t
 _write (int fd, const void *ptr, size_t len)
 {
-  if (__check_null_invalid_struct_errno (ptr, len))
+  if (__check_invalid_read_ptr_errno (ptr, len))
     return -1;
 
   int res = -1;

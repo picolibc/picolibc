@@ -153,3 +153,12 @@ __check_null_invalid_struct_errno (const void *s, unsigned sz)
     set_errno (__err);
   return __err;
 }
+
+int __stdcall
+__check_invalid_read_ptr_errno (const void *s, unsigned sz)
+{
+  if (!s || IsBadReadPtr ((void *) s, sz))
+    set_errno (EFAULT);
+
+  return 0;
+}
