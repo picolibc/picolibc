@@ -165,6 +165,11 @@
 	* ia64.h (EF_IA_64_REDUCEDFP, EF_IA_64_CONS_GP,
 	EF_IA_64_NOFUNCDESC_CONS_GP, EF_IA_64_ABSOLUTE): Define.
 
+2000-08-07  Nick Clifton  <nickc@cygnus.com>
+
+	* ppc.h: Remove spurious CYGNUS LOCAL comments.
+	* v850.h: Likewise.
+
 2000-07-22  Jason Eckhardt  <jle@cygnus.com>
 
 	* i860.h: New file.

@@ -1117,7 +1117,7 @@ Mon Feb  2 17:10:38 1998  Steve Haworth  <steve@pm.cse.rmit.EDU.AU>
 
 	* tic30.h: New file.
 
-Jan 22 17:54:56 1998  Nick Clifton  <nickc@cygnus.com>
+Thu Jan 22 17:54:56 1998  Nick Clifton  <nickc@cygnus.com>
 
 	* cgen.h: Add prototypes for cgen_save_fixups(),
 	cgen_restore_fixups(), and cgen_swap_fixups().  Change prototype
