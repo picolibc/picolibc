@@ -1,3 +1,8 @@
+2003-03-12  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/mswsock.h: Correct invalid filter for _WINSOCK2_H.
+	Thanks to Jim Barton <jmbarton@users.sf.net>.
+
 2003-03-12  Ranjit Mathew  <rmathew@hotmail.com>
 
         * include/winnt.h (_IMAGE_SEPARATE_DEBUG_HEADER): Expose

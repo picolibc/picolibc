@@ -54,7 +54,7 @@ BOOL PASCAL TransmitFile(SOCKET,HANDLE,DWORD,DWORD,LPOVERLAPPED,LPTRANSMIT_FILE_
 BOOL PASCAL AcceptEx(SOCKET,SOCKET,PVOID,DWORD,DWORD,DWORD,LPDWORD,LPOVERLAPPED);
 VOID PASCAL GetAcceptExSockaddrs(PVOID,DWORD,DWORD,DWORD,struct sockaddr**, LPINT, struct sockaddr**, LPINT);
 
-#ifdef WINSOCK2_H /* These require the winsock2 interface.  */
+#ifdef _WINSOCK2_H /* These require the winsock2 interface.  */
 
 #define TP_ELEMENT_FILE		1
 #define TP_ELEMENT_MEMORY	2
@@ -104,7 +104,7 @@ typedef struct wsacmsghdr {
 BOOL PASCAL DisconnectEx(SOCKET,LPOVERLAPPED,DWORD,DWORD);
 int PASCAL WSARecvMsg(SOCKET,LPWSAMSG,LPDWORD,LPWSAOVERLAPPED,LPWSAOVERLAPPED_COMPLETION_ROUTINE);
 
-#endif /* WINSOCK2_H */
+#endif /* _WINSOCK2_H */
 
 #ifdef __cplusplus
 }
