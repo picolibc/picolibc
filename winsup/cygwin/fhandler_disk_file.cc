@@ -26,6 +26,7 @@ details. */
 #include "pinfo.h"
 #include <assert.h>
 #include <ctype.h>
+#include <winioctl.h>
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>
@@ -384,6 +385,19 @@ fhandler_disk_file::open (path_conv *real_path, int flags, mode_t mode)
       close ();
       set_errno (ENOENT);
       return 0;
+    }
+
+  /* Set newly created and truncated files as sparse files. */
+  if ((real_path->fs_flags () & FILE_SUPPORTS_SPARSE_FILES)
+      && (get_access () & GENERIC_WRITE) == GENERIC_WRITE
+      && (get_flags () & (O_CREAT | O_TRUNC)))
+    {
+      DWORD dw;
+      HANDLE h = get_handle ();
+      BOOL r = DeviceIoControl (h , FSCTL_SET_SPARSE, NULL, 0, 	NULL, 0, &dw,
+				NULL);
+      syscall_printf ("%d = DeviceIoControl(0x%x, FSCTL_SET_SPARSE, NULL, 0, "
+		      "NULL, 0, &dw, NULL)", r, h);
     }
 
   set_symlink_p (real_path->issymlink ());

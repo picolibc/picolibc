@@ -1,3 +1,7 @@
+2003-02-17 Vaclav Haisman <V.Haisman@sh.cvut.cz>
+
+	* include/winioctl.h (FSCTL_SET_SPARSE): Define.
+
 2003-02-12  Roland Schwingel  <roland.schwingel@onevision.de>
 
 	* include/wingdi.h (AddFontResourceEx[AW]): Add.

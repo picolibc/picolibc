@@ -1,3 +1,23 @@
+2003-02-18  Vaclav Haisman  <V.Haisman@sh.cvut.cz>
+
+	* wincap.h (wincaps::supports_sparse_files): New flag.
+	(wincapc::supports_sparse_files): New method.
+	* wincap.cc (wincap_unknown): Define value for the new flag.
+	(wincap_95): Ditto.
+	(wincap_95osr2): Ditto.
+	(wincap_98): Ditto.
+	(wincap_98se): Ditto.
+	(wincap_me): Ditto.
+	(wincap_nt3): Ditto.
+	(wincap_nt4): Ditto.
+	(wincap_nt4sp4): Ditto.
+	(wincap_2000): Ditto.
+	(wincap_xp): Ditto.
+	* path.h (path_conv::fs_flags): New method.
+	* fhandler_disk_file.cc: Include winioctl.h for DeviceIoControl.   
+	(fhandler_disk_file::open): Set newly created and truncated files as    
+	sparse on platforms that support it.
+
 2003-02-17  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* grp.cc (internal_getgroups): Handle properly tokens with

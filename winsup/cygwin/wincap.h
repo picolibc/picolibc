@@ -49,6 +49,7 @@ struct wincaps
   unsigned has_process_io_counters                      : 1;
   unsigned supports_reading_modem_output_lines          : 1;
   unsigned needs_memory_protection			: 1;
+  unsigned supports_sparse_files                        : 1;
 };
 
 class wincapc
@@ -102,6 +103,7 @@ public:
   bool  IMPLEMENT (has_process_io_counters)
   bool  IMPLEMENT (supports_reading_modem_output_lines)
   bool  IMPLEMENT (needs_memory_protection)
+  bool  IMPLEMENT (supports_sparse_files)
 
 #undef IMPLEMENT
 };
