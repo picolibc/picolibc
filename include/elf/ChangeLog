@@ -1,3 +1,7 @@
+2004-12-09  Ian Lance Taylor  <ian@wasabisystems.com>
+
+	* mips.h (E_MIPS_MACH_9000): Define.
+
 2004-11-04  Hans-Peter Nilsson  <hp@axis.com>
 
 	* cris.h (EF_CRIS_VARIANT_MASK, EF_CRIS_VARIANT_ANY_V0_V10)
