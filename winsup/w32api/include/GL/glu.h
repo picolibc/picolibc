@@ -34,6 +34,7 @@
 #pragma GCC system_header
 #endif
 
+#include <stddef.h> /* for wchar_t */
 #include <GL/gl.h>
 
 #ifdef __cplusplus

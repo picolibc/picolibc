@@ -1,3 +1,8 @@
+2004-02-19  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/Gl/glu.h: Include <stddef.h>.
+	Thanks to Greg Couch <gregcouch@users.sourceforge.net>
+
 2004-02-13  Earnie Boyd  <earnie@users.sourceforge.net>
 
 	* include/ddk/winddk.h (DIRECTORY_QUERY): Add define.
