@@ -245,13 +245,14 @@ static struct tl errmap[] =
  {WSAEREMOTE, "WSAEREMOTE", EREMOTE},
  {WSAEINVAL, "WSAEINVAL", EINVAL},
  {WSAEFAULT, "WSAEFAULT", EFAULT},
+ {0, "NOERROR", 0},
  {0, NULL, 0}
 };
 
 static int
 find_winsock_errno (int why)
 {
-  for (int i = 0; errmap[i].w != 0; ++i)
+  for (int i = 0; errmap[i].s != NULL; ++i)
     if (why == errmap[i].w)
       return errmap[i].e;
 

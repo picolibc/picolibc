@@ -1,3 +1,8 @@
+Mon Apr 23 12:46:07 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* net.cc [errmap]: Add '0' condition.
+	(find_winsock_errno): Don't translate no error to EPERM.
+
 Sun Apr 22 20:48:24 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* include/cygwin/version.h: Bump Cygwin version and API version.

@@ -1630,7 +1630,7 @@ setmode (int fd, int mode)
       set_errno (EBADF);
       return -1;
     }
-  if (mode != O_BINARY  && mode != O_TEXT)
+  if (mode != O_BINARY  && mode != O_TEXT && mode != 0)
     {
       set_errno (EINVAL);
       return -1;
