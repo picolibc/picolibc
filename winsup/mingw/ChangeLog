@@ -1,3 +1,10 @@
+2004-07-28  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/math/powl.c (powl): Revert change of 2004-02-01.
+	(__convert_inf_to_maxnum): New.static inline.
+	(reducl): Use it to protect against Inf - Inf.
+	(__fast_ldexpl): New function.  Use in lieu of ldexpl.
+
 2004-07-27  Danny Smith  <dannysmith@users.sourceforge.net>
 	
 	* mingwex/math/expl.c (expl): Move body of code to new static

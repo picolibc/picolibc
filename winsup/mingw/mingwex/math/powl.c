@@ -411,7 +411,7 @@ long double floorl(), fabsl(), frexpl(), ldexpl();
 long double polevll(), p1evll(), __powil();
 static long double reducl();
 int isnanl(), isfinitel(), signbitl();
-#endif
+#endif  /* __MINGW32__ */
 
 #ifdef INFINITIES
 extern long double INFINITYL;
@@ -427,6 +427,24 @@ extern long double NEGZEROL;
 #endif
 
 #endif /* __MINGW32__ */
+
+#ifdef __MINGW32__
+
+/* No error checking. We handle Infs and zeros ourselves.  */
+static __inline__ long double
+__fast_ldexpl (long double x, int expn)
+{
+  long double res;
+  __asm__ ("fscale"
+  	    : "=t" (res)
+	    : "0" (x), "u" ((long double) expn));
+  return res;
+}
+
+#define ldexpl  __fast_ldexpl
+
+#endif
+
 
 long double powl( x, y )
 long double x, y;
@@ -690,25 +708,16 @@ Fa = reducl(F);
 Fb = F - Fa;
 
 G = Fa + w * ya;
-if (isinf (G))
-  {
-   /* Bail out: G - reducl(G) will result in NAN
-      that will propagate through rest of calculations */ 
-    _SET_ERRNO (ERANGE);
-    mtherr( fname, OVERFLOW );
-    return( MAXNUML );
-  }
 Ga = reducl(G);
 Gb = G - Ga;
 
 H = Fb + Gb;
 Ha = reducl(H);
-w = ldexpl( Ga+Ha, LNXT );
+w = ldexpl( Ga + Ha, LNXT );
 
 /* Test the power of 2 for overflow */
 if( w > MEXP )
 	{
-/*	printf( "w = %.4Le ", w ); */
 	_SET_ERRNO (ERANGE);
 	mtherr( fname, OVERFLOW );
 	return( MAXNUML );
@@ -716,7 +725,6 @@ if( w > MEXP )
 
 if( w < MNEXP )
 	{
-/*	printf( "w = %.4Le ", w ); */
 	_SET_ERRNO (ERANGE);
 	mtherr( fname, UNDERFLOW );
 	return( 0.0L );
@@ -768,6 +776,15 @@ if( nflg )
 return( z );
 }
 
+static __inline__ long double 
+__convert_inf_to_maxnum(long double x)
+{
+  if (isinf(x))
+    return (x > 0.0L ? MAXNUML : -MAXNUML);
+  else
+    return x;
+}
+
 
 /* Find a multiple of 1/NXT that is within 1/NXT of x. */
 static __inline__ long double reducl(x)
@@ -775,9 +792,13 @@ long double x;
 {
 long double t;
 
-t = ldexpl( x, LNXT );
+/* If the call to ldexpl overflows, set it to MAXNUML.
+   This avoids Inf - Inf = Nan result when calculating the 'small'
+   part of a reduction.  Instead, the small part becomes Inf,
+   causing under/overflow when adding it to the 'large' part.
+   There must be a cleaner way of doing this. */
+t =  __convert_inf_to_maxnum (ldexpl( x, LNXT ));
 t = floorl( t );
 t = ldexpl( t, -LNXT );
 return(t);
 }
-
