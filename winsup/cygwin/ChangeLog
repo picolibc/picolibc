@@ -1,5 +1,10 @@
 2003-07-01  Christopher Faylor  <cgf@redhat.com>
 
+	* configure.in: Fix --enable-server option.
+	* configure: Regenerate.
+
+2003-07-01  Christopher Faylor  <cgf@redhat.com>
+
 	* Makefile.in: Remove cygserver stuff.
 	* acconfig.h: Add USE_CYGSERVER define.
 	* config.h.in: Regenerate.

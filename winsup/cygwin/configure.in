@@ -84,19 +84,12 @@ AC_SUBST(all_host)
 AC_SUBST(install_host)
 
 AC_CHECK_TOOL(AR, ar, ar)
-dnl AC_SUBST(AR)
 AC_CHECK_TOOL(AS, as, as)
-dnl C_SUBST(AS)
 AC_CHECK_TOOL(RANLIB, ranlib, ranlib)
-dnl C_SUBST(RANLIB)
 AC_CHECK_TOOL(LD, ld, ld)
-dnl C_SUBST(LD)
 AC_CHECK_TOOL(NM, nm, nm)
-dnl C_SUBST(NM)
 AC_CHECK_TOOL(DLLTOOL, dlltool, dlltool)
-dnl C_SUBST(DLLTOOL)
 AC_CHECK_TOOL(WINDRES, windres, windres)
-dnl C_SUBST(WINDRES)
 
 AC_ALLOCA
 AC_PROG_MAKE_SET
@@ -140,7 +133,7 @@ no)	 ;;
 esac
 ])
 
-AC_ARG_ENABLE(cygserver,
+AC_ARG_ENABLE(server,
 [ --enable-server		Build a cygwin DLL which can communicate with cygserver],
 [case "${enableval}" in
 yes)	 AC_DEFINE(USE_CYGSERVE) ;;
