@@ -342,7 +342,7 @@ hinfo::dup2 (int oldfd, int newfd)
     }
 
   SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK,"dup");
-  if (newfd >= dtable.size || newfd < 0)
+  if ((size_t) newfd >= dtable.size || newfd < 0)
     {
       syscall_printf ("new fd out of bounds: %d", newfd);
       set_errno (EBADF);
