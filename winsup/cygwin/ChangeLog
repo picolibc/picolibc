@@ -1,3 +1,12 @@
+2004-03-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_raw.cc (fhandler_dev_raw::raw_read): When reading with
+	variable block size, read only one block, read directly into user
+	supplied buffer, return ENOMEM if user supplied buffer is smaller
+	than size of next block to read.  Use read2 instead of bytes_to_read
+	to count number of bytes read.
+	* fhandler_tape.cc (fhandler_dev_tape::open): Add debug output.
+
 2004-02-26  Brian Ford  <ford@vss.fsi.com>
 
 	* miscfuncs.cc (check_invalid_virtual_addr): Assure the last page

@@ -90,6 +90,7 @@ fhandler_dev_tape::open (int flags, mode_t)
        * The call to tape_set_pos seems to reset some internal flags. */
       if ((!ioctl (MTIOCPOS, &pos)) && (!pos.mt_blkno))
 	{
+	  debug_printf ("rewinding");
 	  op.mt_op = MTREW;
 	  ioctl (MTIOCTOP, &op);
 	}

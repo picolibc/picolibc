@@ -275,21 +275,29 @@ fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
 		  tgt = (char *) ptr;
 		  debug_printf ("read %d bytes direct from file",bytes_to_read);
 		}
+	      else if (varblkop)
+		{
+		  tgt = (char *) ptr;
+		  bytes_to_read = len;
+		  debug_printf ("read variable bytes direct from file");
+		}
 	      else
 		{
-		  bytes_to_read = devbufsiz;
 		  tgt = devbuf;
-		  if (varblkop)
-		    debug_printf ("read variable bytes from file into buffer");
-		  else
-		    debug_printf ("read %d bytes from file into buffer",
-				  bytes_to_read);
+		  bytes_to_read = devbufsiz;
+		  debug_printf ("read %d bytes from file into buffer",
+				bytes_to_read);
 		}
 	      if (!read_file (get_handle (), tgt, bytes_to_read, &read2, &ret))
 		{
 		  if (!is_eof (ret) && !is_eom (ret))
 		    {
-		      __seterrno ();
+		      if (varblkop && ret == ERROR_MORE_DATA)
+		        /* *ulen < blocksize.  Linux returns ENOMEM here
+			   when reading with variable blocksize . */
+		        set_errno (ENOMEM);
+		      else
+			__seterrno ();
 		      goto err;
 		    }
 
@@ -310,18 +318,25 @@ fhandler_dev_raw::raw_read (void *ptr, size_t& ulen)
 		    }
 		  lastblk_to_read = 1;
 		}
-	      if (! read2)
+	      if (!read2)
 	       break;
 	      if (tgt == devbuf)
 		{
 		  devbufstart = 0;
 		  devbufend = read2;
 		}
+	      else if (varblkop)
+		{
+		  /* When reading tapes with variable block size, we
+		     leave right after reading one block. */
+		  bytes_read = read2;
+		  break;
+		}
 	      else
 		{
-		  len -= bytes_to_read;
-		  ptr = (void *) ((char *) ptr + bytes_to_read);
-		  bytes_read += bytes_to_read;
+		  len -= read2;
+		  ptr = (void *) ((char *) ptr + read2);
+		  bytes_read += read2;
 		}
 	    }
 	}
