@@ -1,3 +1,7 @@
+2004-02-02  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* COPYING.NEWLIB: Update Red Hat license to 2004.
+	
 2004-01-23  DJ Delorie  <dj@redhat.com>
 
 	* Makefile.def (target_modules) [libiberty]: Don't stage.
