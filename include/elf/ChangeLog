@@ -1,6 +1,6 @@
 2003-01-17  Alan Modra  <amodra@bigpond.net.au>
 
-	* common.h: Formatting.
+	* common.h: Formatting, typo fixes.
 	(DT_ENCODING): Correct value.
 
 2003-01-17  Fabio Alemagna  <falemagn@aros.org>
