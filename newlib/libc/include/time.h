@@ -55,6 +55,7 @@ struct tm *_EXFUN(gmtime,   (const time_t *_timer));
 struct tm *_EXFUN(localtime,(const time_t *_timer));
 #endif
 size_t	   _EXFUN(strftime, (char *_s, size_t _maxsize, const char *_fmt, const struct tm *_t));
+char      *_EXFUN(strptime,     (const char *, const char *, struct tm *));
 
 char	  *_EXFUN(asctime_r,	(const struct tm *, char *));
 char	  *_EXFUN(ctime_r,	(const time_t *, char *));
@@ -62,7 +63,6 @@ struct tm *_EXFUN(gmtime_r,	(const time_t *, struct tm *));
 struct tm *_EXFUN(localtime_r,	(const time_t *, struct tm *));
 
 #ifdef __CYGWIN__
-char      *_EXFUN(strptime,     (const char *, const char *, struct tm *));
 #ifndef __STRICT_ANSI__
 extern __IMPORT time_t _timezone;
 extern __IMPORT int _daylight;

@@ -1,3 +1,10 @@
+2002-04-09  Mark Bradshaw  <bradshaw@staff.crosswalk.com>
+
+        * libc/include/time.h: Fix strptime declaration.
+        * libc/time/Makefile.am: Add strptime.c.
+	* libc/time/Makefile.in: Regenerated.
+        * libc/time/strptime.c: New file.
+
 2002-04-08  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/linux/include/setjmp.h: Add sigjmp_buf type,

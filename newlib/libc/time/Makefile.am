@@ -17,6 +17,7 @@ LIB_SOURCES = \
 	lcltime_r.c	\
 	mktime.c	\
 	strftime.c  	\
+	strptime.c  	\
 	time.c
 
 libtime_la_LDFLAGS = -Xcompiler -nostdlib
