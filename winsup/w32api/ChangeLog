@@ -1,3 +1,7 @@
+2004-11-13  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/shlobj.h (SHGFP_TYPE): Add enum.
+
 2004-11-12  Loïc Guilloux (glx@users.sourceforge.net> 
 
 	* include/winuser.h (WM_THEMECHANGED): Add define.
@@ -51,7 +55,7 @@
 
 2004-10-18  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	= include/wsahelp.h (WINSOCK_MAPPING, WSHGetWinsockMapping,
+	* include/wsahelp.h (WINSOCK_MAPPING, WSHGetWinsockMapping,
         PWSH_GET_WINSOCK_MAPPING): Don't define if __OBJC__.
 
 2004-10-15  Robert Wruck  <wruck@tweerlei.de>

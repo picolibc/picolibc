@@ -532,7 +532,13 @@ typedef struct
 	DWORD dwAttributes;
 	int csidl;
 } PERSIST_FOLDER_TARGET_INFO;
+
+typedef enum {
+	SHGFP_TYPE_CURRENT = 0,
+	SHGFP_TYPE_DEFAULT = 1,
+} SHGFP_TYPE;
 #endif
+
 
 DECLARE_ENUMERATOR_(IEnumIDList,LPITEMIDLIST);
 typedef IEnumIDList *LPENUMIDLIST;
