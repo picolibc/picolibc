@@ -54,6 +54,9 @@ fhandler_tty_master::init (int ntty)
   termios ti;
   memset (&ti, 0, sizeof (ti));
   console->tcsetattr (0, &ti);
+  winsize w;
+  console->ioctl (TIOCGWINSZ, &w);
+  this->ioctl (TIOCSWINSZ, &w);
 
   ttynum = ntty;
 
@@ -198,9 +201,8 @@ process_input (void *)
   while (1)
     {
       size_t nraw = INP_BUFFER_SIZE;
-      termios ti = tty_master->get_ttyp ()->ti;
       tty_master->console->read ((void *) rawbuf, nraw);
-      (void) tty_master->line_edit (rawbuf, nraw, ti);
+      (void) tty_master->line_edit (rawbuf, nraw, tty_master->get_ttyp ()->ti);
     }
 }
 

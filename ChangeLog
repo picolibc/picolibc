@@ -1,3 +1,11 @@
+2002-12-26  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_tty.cc (fhandler_tty_master::init): Set initial size of tty
+	to that of console in which tty is operating.
+	(process_input): Semi-revert previous change.  Need to just use current
+	terminfo settings since this function is running in a thread, blocked
+	when the terminfo changes.
+
 2002-12-24  Andreas Schwab  <schwab@suse.de>
 
 	* Makefile.tpl (multilib.out): Fix missing space.
