@@ -180,7 +180,7 @@ new-$(LIB_NAME): $(DEF_FILE) $(LIBCOS)
 # Rule to build cygwin.dll
 
 new-$(DLL_NAME): $(DLL_OFILES) $(DEF_FILE) $(DLL_IMPORTS) $(LIBC) $(LIBM) Makefile winver_stamp
-	$(LD) -shared -o $@ -e $(DLL_ENTRY) cygwin.def $(DLL_OFILES) version.o \
+	$(LD) -shared -o $@ -e $(DLL_ENTRY) $(DEF_FILE) $(DLL_OFILES) version.o \
 	winver.o $(DLL_IMPORTS) $(LIBM) $(LIBGCC) $(MALLOC_OBJ) $(LIBC) $(LIBGCC)
 
 dll_ofiles: $(DLL_OFILES)

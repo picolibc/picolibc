@@ -1,3 +1,8 @@
+Tue May  9 18:59:41 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Use appropriate VARIABLE to refer to cygwin.def in load
+	line.
+
 Thu May  9  23:53:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::puts_readahead): Change
@@ -7,7 +12,7 @@ Thu May  9  15:24:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	Patch suggested by <lha@stacken.kth.se>
 	* window.cc (setitimer): Check for overflow condition
-        in tv_sec.
+	in tv_sec.
 
 Thu May  9  0:47:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
