@@ -1,3 +1,8 @@
+2004-09-22  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* dump_setup.cc (dump_setup): Avoid trailing spaces on package-list.
+
 2004-09-15  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
 
 	* getfacl.c (main): Correct layout when nopt is set.

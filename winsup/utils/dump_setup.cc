@@ -392,12 +392,19 @@ dump_setup (int verbose, char **argv, bool check_files)
 	puts ("");
     }
 
-  printf ("%-*s %-*s     %s\n", package_len, "Package", version_len, "Version", check_files?"Status":"");
+  printf ("%-*s %-*s%s\n", package_len, "Package",
+			   check_files ? version_len : 7, "Version",
+			   check_files ? "     Status" : "");
   for (int i = 0; packages[i].name; i++)
     {
-      printf ("%-*s %-*s     %s\n", package_len, packages[i].name, version_len,
-	      packages[i].ver, check_files ?
-	      (check_package_files (verbose, packages[i].name) ? "OK" : "Incomplete") : "");
+      if (check_files)
+	printf ("%-*s %-*s%s\n", package_len, packages[i].name,
+		version_len, packages[i].ver,
+		check_package_files (verbose, packages[i].name)
+		  ? "     OK" : "     Incomplete");
+      else
+	printf ("%-*s %-*s\n", package_len, packages[i].name,
+	      strlen(packages[i].ver), packages[i].ver);
       fflush(stdout);
     }
 
