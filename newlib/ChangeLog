@@ -1,3 +1,8 @@
+Thu Apr 27 07:45:48 2000  Alexandre Oliva  <aoliva@cygnus.com>
+
+	* libc/machine/mn10300/setjmp.S (setjmp, longjmp): Use
+	post-increment when it is worth it, spacewise.
+
 Mon Apr 17 12:46:00 2000  Marek Michalkiewicz <marekm@linux.org.pl>
 
 	* libc/signal/signal.c (_signal_r) : Removed unused local variable temp.

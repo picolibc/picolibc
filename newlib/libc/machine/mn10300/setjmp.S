@@ -17,10 +17,11 @@ _setjmp:
 	mov sp,a1
 	mov a1,(20,a0)
 #ifdef __AM33__
-	mov r4,(24,a0)
-	mov r5,(28,a0)
-	mov r6,(32,a0)
-	mov r7,(36,a0)
+	add 24,a0
+	mov r4,(a0+)
+	mov r5,(a0+)
+	mov r6,(a0+)
+	mov r7,(a0+)
 #endif
         sub d0,d0
 	rets
@@ -37,10 +38,11 @@ _longjmp:
 	mov (20,a0),a1
 	mov a1,sp
 #ifdef __AM33__
-	mov (24,a0),r4
-	mov (28,a0),r5
-	mov (32,a0),r6
-	mov (36,a0),r7
+	add 24,a0
+	mov (a0+),r4
+	mov (a0+),r5
+	mov (a0+),r6
+	mov (a0+),r7
 #endif
 	cmp 0,d1
 	bne L1
