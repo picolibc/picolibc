@@ -595,6 +595,9 @@ no)
 esac
 
 case "${target}" in
+  *-*-freebsd[12] | *-*-freebsd[12].* | *-*-freebsd*aout*)
+    noconfigdirs="$noconfigdirs target-newlib target-libgloss ${libgcj}"
+    ;;
   *-*-netbsd*)
     # Skip some stuff on all NetBSD configurations.
     skipdirs="$skipdirs target-newlib target-libiberty target-libgloss"
@@ -623,6 +626,9 @@ case "${target}" in
     ;;
   alpha*-*-*vms*)
     noconfigdirs="$noconfigdirs gdb ld target-newlib target-libgloss target-libffi"
+    ;;
+  alpha*-*-freebsd*)
+    noconfigdirs="$noconfigdirs target-newlib target-libgloss"
     ;;
   alpha*-*-*)
     # newlib is not 64 bit ready
@@ -743,6 +749,9 @@ case "${target}" in
     if [ x${is_cross_compiler} != xno ] ; then
          target_configdirs="${target_configdirs} target-libstub target-cygmon"
     fi
+    ;;
+  i[34567]86-*-freebsd*)
+    noconfigdirs="$noconfigdirs target-newlib target-libgloss"
     ;;
   i[3456]86-*-go32* | i[3456]-*-msdosdjgpp*)
     # but don't build gdb

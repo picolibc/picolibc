@@ -1,3 +1,7 @@
+2002-04-09  Loren James Rittle  <rittle@labs.mot.com>
+	
+	* configure.in: Add *-*-freebsd* configurations.
+
 2002-04-07  Andrew Cagney  <ac131313@redhat.com>
 
 	* Makefile.in (do-tar-bz2): Delete rule.  Replace with ...
