@@ -125,9 +125,9 @@ static DWORD
 check_ntsec (const char *filename)
 {
   if (!filename)
-    return wincap.has_security () && allow_ntsec;
+    return allow_ntsec;
   path_conv pc (filename);
-  return wincap.has_security () && allow_ntsec && pc.has_acls ();
+  return allow_ntsec && pc.has_acls ();
 }
 
 extern "C" unsigned long

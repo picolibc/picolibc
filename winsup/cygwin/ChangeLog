@@ -1,3 +1,10 @@
+2004-10-05  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* external.cc (check_ntsec): Do not call wincap.has_security.
+	* path.cc (path_conv::check): Ditto.
+	* security.cc (get_object_attribute): Ditto.
+	(get_file_attribute): Ditto.
+
 2004-10-05  Bas van Gompel  <cygwin-patch.buzz@bavag.tmfweb.nl>
 
 	* pinfo.cc (_pinfo::commune_send): Correct debugging output.

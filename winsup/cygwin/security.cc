@@ -1382,7 +1382,7 @@ int
 get_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type,
 		      mode_t *attribute, __uid32_t *uidret, __gid32_t *gidret)
 {
-  if (allow_ntsec && wincap.has_security ())
+  if (allow_ntsec)
     {
       get_nt_object_attribute (handle, object_type, attribute, uidret, gidret);
       return 0;
@@ -1398,7 +1398,7 @@ get_file_attribute (int use_ntsec, HANDLE handle, const char *file,
   int res;
   syscall_printf ("file: %s", file);
 
-  if (use_ntsec && allow_ntsec && wincap.has_security ())
+  if (use_ntsec && allow_ntsec)
     {
       if (!handle || get_nt_object_attribute (handle, SE_FILE_OBJECT,
 					      attribute, uidret, gidret))
