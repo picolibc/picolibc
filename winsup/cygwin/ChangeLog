@@ -1,5 +1,14 @@
 2005-02-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwin.din (basename): Export.
+	(dirname): Export.
+	* path.cc (basename): New function.
+	(dirname): New function.
+	* include/libgen.h: New file.
+	* include/cygwin/version.h: Bump API minor version.
+
+2005-02-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* select.cc (peek_pipe): Disable new pipe code until there's
 	a working substitute.
 

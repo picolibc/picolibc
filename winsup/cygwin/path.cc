@@ -53,6 +53,7 @@ details. */
 #include <sys/mount.h>
 #include <mntent.h>
 #include <unistd.h>
+#include <libgen.h>
 #include <ctype.h>
 #include <winioctl.h>
 #include <wingdi.h>
@@ -3929,4 +3930,88 @@ etc::file_changed (int n)
   change_possible[n] = false;	/* Change is no longer possible */
   paranoid_printf ("fn[%d] %s res %d", n, fn[n], res);
   return res;
+}
+
+/* No need to be reentrant or thread-safe according to SUSv3.
+   / and \\ are treated equally.  Leading drive specifiers are
+   kept intact as far as it makes sense.  Everything else is
+   POSIX compatible. */
+extern "C" char *
+basename (char *path)
+{
+  static char buf[CYG_MAX_PATH + 1];
+  char *c, *d, *bs = buf;
+
+  if (!path || !*path)
+    return strcpy (buf, ".");
+  strncpy (buf, path, CYG_MAX_PATH);
+  if (isalpha (buf[0]) && buf[1] == ':')
+    bs += 2;
+  else if (strspn (buf, "/\\") > 1)
+    ++bs;
+  c = strrchr (bs, '/');
+  if ((d = strrchr (c ?: bs, '\\')) > c)
+    c = d;
+  if (c)
+    {
+      /* Trailing (back)slashes are eliminated. */
+      while (c && c > bs && c[1] == '\0')
+        {
+	  *c = '\0';
+	  c = strrchr (bs, '/');
+	  if ((d = strrchr (c ?: bs, '\\')) > c)
+	    c = d;
+	}
+      if (c && (c > bs || c[1]))
+	return c + 1;
+    }
+  else if (!bs[0])
+    strcpy (bs, ".");
+  return buf;
+}
+
+/* No need to be reentrant or thread-safe according to SUSv3.
+   / and \\ are treated equally.  Leading drive specifiers and
+   leading double (back)slashes are kept intact as far as it
+   makes sense.  Everything else is POSIX compatible. */
+extern "C" char *
+dirname (char *path)
+{
+  static char buf[CYG_MAX_PATH + 1];
+  char *c, *d, *bs = buf;
+
+  if (!path || !*path)
+    return strcpy (buf, ".");
+  strncpy (buf, path, CYG_MAX_PATH);
+  if (isalpha (buf[0]) && buf[1] == ':')
+    bs += 2;
+  else if (strspn (buf, "/\\") > 1)
+    ++bs;
+  c = strrchr (bs, '/');
+  if ((d = strrchr (c ?: bs, '\\')) > c)
+    c = d;
+  if (c)
+    {
+      /* Trailing (back)slashes are eliminated. */
+      while (c && c > bs && c[1] == '\0')
+        {
+	  *c = '\0';
+	  c = strrchr (bs, '/');
+	  if ((d = strrchr (c ?: bs, '\\')) > c)
+	    c = d;
+	}
+      if (!c)
+        strcpy (bs, ".");
+      else if (c > bs)
+	{
+	  /* More trailing (back)slashes are eliminated. */
+	  while (c > bs && (*c == '/' || *c == '\\'))
+	    *c-- = '\0';
+        }
+      else
+        c[1] = '\0';
+    }
+  else
+    strcpy (bs, ".");
+  return buf;
 }
