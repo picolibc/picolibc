@@ -1,3 +1,7 @@
+Wed May 23 10:11:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* syscalls.cc (chown_worker): Don't check for ENOSYS.
+
 Tue May 22 12:20:07 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* signal.cc (sleep): Protect with sigframe.

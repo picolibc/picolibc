@@ -724,12 +724,12 @@ chown_worker (const char *name, unsigned fmode, uid_t uid, gid_t gid)
 				    uid, gid, attrib,
 				    cygheap->user.logsrv ());
 	}
-      if (res != 0 && get_errno () == ENOSYS)
-      {
-	/* fake - if not supported, pretend we're like win95
-	   where it just works */
-	res = 0;
-      }
+      if (res != 0 && (!win32_path.has_acls () || !allow_ntsec))
+	{
+	  /* fake - if not supported, pretend we're like win95
+	     where it just works */
+	  res = 0;
+	}
     }
 
 done:
