@@ -1,3 +1,11 @@
+2005-01-16  Christopher Faylor  <cgf@timesys.com>
+
+	* ps.cc (main): Eliminate use of PID_ZOMBIE.
+	* strace.cc (main): Recognize new option for displaying hex value of
+	strace type.
+	(handle_output_debug_string): Prepend output with hex value of strace
+	message if -H is specified.
+
 2005-01-11  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* mkpasswd.c (print_win_error): Transform into macro.

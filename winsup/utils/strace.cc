@@ -41,6 +41,7 @@ static int hhmmss = 0;
 static int bufsize = 0;
 static int new_window = 0;
 static long flush_period = 0;
+static int include_hex = 0;
 
 static BOOL close_handle (HANDLE h, DWORD ok);
 
@@ -426,7 +427,7 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
     }
 
   char *buf;
-  buf = (char *) alloca (len + 65) + 10;
+  buf = (char *) alloca (len + 85) + 20;
 
   if (!ReadProcessMemory (hchild, ((char *) p) + INTROLEN, buf, len, &nbytes))
     error (0, "couldn't get message from subprocess, windows error %d",
@@ -558,6 +559,12 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
       memcpy ((s -= len), intbuf, len);
     }
 
+  if (include_hex)
+    {
+      s -= 8;
+      sprintf (s, "%p", n);
+      strchr (s, '\0')[0] = ' ';
+    }
   child->last_usecs = usecs;
   if (numerror || !output_winerror (ofile, s))
     fputs (s, ofile);
@@ -850,6 +857,7 @@ struct option longopts[] = {
   {"buffer-size", required_argument, NULL, 'b'},
   {"help", no_argument, NULL, 'h'},
   {"flush-period", required_argument, NULL, 'S'},
+  {"hex", no_argument, NULL, 'H'},
   {"mask", required_argument, NULL, 'm'},
   {"new-window", no_argument, NULL, 'w'},
   {"output", required_argument, NULL, 'o'},
@@ -864,7 +872,7 @@ struct option longopts[] = {
   {NULL, 0, NULL, 0}
 };
 
-static const char *const opts = "+b:dhfm:no:p:S:tTuvw";
+static const char *const opts = "+b:dhHfm:no:p:S:tTuvw";
 
 static void
 print_version ()
@@ -918,6 +926,9 @@ main (int argc, char **argv)
       case 'h':
 	// Print help and exit
 	usage (stdout);
+	break;
+      case 'H':
+	include_hex ^= 1;
 	break;
       case 'm':
 	{

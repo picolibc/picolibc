@@ -345,7 +345,7 @@ main (int argc, char *argv[])
 	status = 'O';
 
       char pname[MAX_PATH];
-      if (p->process_state & (PID_ZOMBIE | PID_EXITED))
+      if (p->process_state & PID_EXITED || (p->exitcode & ~0xffff))
 	strcpy (pname, "<defunct>");
       else if (p->ppid)
 	{
