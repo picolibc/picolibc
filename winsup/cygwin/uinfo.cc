@@ -188,11 +188,12 @@ cuserid (char *src)
   return src;
 }
 
+char cygheap_user::homepath_env_buf[MAX_PATH + 1];
+char cygheap_user::homedrive_env_buf[3];
+
 const char *
 cygheap_user::ontherange (homebodies what, struct passwd *pw)
 {
-  static char buf[MAX_PATH + 1];
-  static char homedrive_buf[3];
   LPUSER_INFO_3 ui = NULL;
   WCHAR wuser[UNLEN + 1];
   NET_API_STATUS ret;
@@ -202,13 +203,13 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
       char *p;
       if ((p = getenv ("HOMEDRIVE")))
 	{
-	  memcpy (homedrive_buf, p, 2);
-	  homedrive = homedrive_buf;
+	  memcpy (homedrive_env_buf, p, 2);
+	  homedrive = homedrive_env_buf;
 	}
       if ((p = getenv ("HOMEPATH")))
 	{
-	  strcpy (buf, p);
-	  homepath = buf;
+	  strcpy (homepath_env_buf, p);
+	  homepath = homepath_env_buf;
 	}
       if ((p = getenv ("HOME")))
 	debug_printf ("HOME is already in the environment %s", p);
@@ -224,6 +225,7 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	  else if (homedrive && homepath)
 	    {
 	      char home[MAX_PATH];
+	      char buf[MAX_PATH + 1];
 	      strcpy (buf, homedrive);
 	      strcat (buf, homepath);
 	      cygwin_conv_to_full_posix_path (buf, home);
@@ -238,7 +240,7 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
       if (!pw)
 	pw = getpwnam (name ());
       if (pw && pw->pw_dir && *pw->pw_dir)
-	cygwin_conv_to_full_win32_path (pw->pw_dir, buf);
+	cygwin_conv_to_full_win32_path (pw->pw_dir, homepath_env_buf);
       else
 	{
 	  sys_mbstowcs (wuser, name (), sizeof (wuser) / sizeof (*wuser));
@@ -247,23 +249,24 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	      if (env_logsrv ())
 		{
 		  WCHAR wlogsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];
-		  strcpy (buf, env_logsrv ());
-		  sys_mbstowcs (wlogsrv, buf, sizeof (wlogsrv) / sizeof(*wlogsrv));
+		  strcpy (homepath_env_buf, env_logsrv ());
+		  sys_mbstowcs (wlogsrv, homepath_env_buf,
+				sizeof (wlogsrv) / sizeof(*wlogsrv));
 		  ret = NetUserGetInfo (wlogsrv, wuser, 3,(LPBYTE *)&ui);
 		}
 	    }
 	  if (!ret)
 	    {
 	      char *p;
-	      sys_wcstombs (buf, ui->usri3_home_dir, MAX_PATH);
-	      if (!buf[0])
+	      sys_wcstombs (homepath_env_buf, ui->usri3_home_dir, MAX_PATH);
+	      if (!homepath_env_buf[0])
 		{
-		  sys_wcstombs (buf, ui->usri3_home_dir_drive, MAX_PATH);
-		  if (buf[0])
-		    strcat (buf, "\\");
-		  else if (!GetSystemDirectory (buf, MAX_PATH))
-		    strcpy (buf, "c:\\");
-		  else if ((p = strchr (buf, '\\')))
+		  sys_wcstombs (homepath_env_buf, ui->usri3_home_dir_drive, MAX_PATH);
+		  if (homepath_env_buf[0])
+		    strcat (homepath_env_buf, "\\");
+		  else if (!GetSystemDirectory (homepath_env_buf, MAX_PATH))
+		    strcpy (homepath_env_buf, "c:\\");
+		  else if ((p = strchr (homepath_env_buf, '\\')))
 		    p[1] = '\0';
 		}
 	    }
@@ -271,18 +274,18 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
 	    NetApiBufferFree (ui);
 	}
 
-      if (buf[1] != ':')
+      if (homepath_env_buf[1] != ':')
 	{
-	  homedrive_buf[0] = homedrive_buf[1] = '\0';
-	  homepath = buf;
+	  homedrive_env_buf[0] = homedrive_env_buf[1] = '\0';
+	  homepath = homepath_env_buf;
 	}
       else
 	{
-	  homedrive_buf[0] = buf[0];
-	  homedrive_buf[1] = buf[1];
-	  homepath = buf + 2;
+	  homedrive_env_buf[0] = homepath_env_buf[0];
+	  homedrive_env_buf[1] = homepath_env_buf[1];
+	  homepath = homepath_env_buf + 2;
 	}
-      homedrive = homedrive_buf;
+      homedrive = homedrive_env_buf;
     }
 
   switch (what)

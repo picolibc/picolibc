@@ -105,6 +105,10 @@ class cygheap_user
   char  *homepath;	/* User's home path */
   PSID   psid;          /* buffer for user's SID */
   PSID   orig_psid;     /* Remains intact even after impersonation */
+  static char homedrive_env_buf[3]; /* Where the HOMEDRIVE environment variable
+				       info may live. */
+  static char homepath_env_buf[MAX_PATH + 1]; /* Where the HOMEPATH environment
+						 variable info may live. */
 public:
   __uid32_t orig_uid;      /* Remains intact even after impersonation */
   __gid32_t orig_gid;      /* Ditto */

@@ -1,5 +1,12 @@
 2002-06-14  Christopher Faylor  <cgf@redhat.com>
 
+	* cygheap.h (cygheap_user): Add static members to hold home{drive,path}
+	info.
+	* uinfo.cc (cygheap_user::ontherange): Use static class members for
+	local HOME* storage.
+
+2002-06-14  Christopher Faylor  <cgf@redhat.com>
+
 	* cygheap.cc (cygheap_user::set_logsrv): Remove.
 	(cygheap_user::set_domain): Ditto.
 	* cygheap.h (cygheap_user::set_logsrv): Remove declaration.
