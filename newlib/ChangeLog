@@ -1,3 +1,10 @@
+2003-01-07  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configure.host: Support long double I/O for x86-linux.
+	* libc/stdlib/ldtoa.c (_ldtoa_r): Fix code to allocate a buffer
+	large enough to hold formatted result.
+	* libc/machine/powerpc/simdldtoa.c (_simdldtoa_r): Ditto.
+
 2003-01-06  Charles Wilson  <cwilson@ece.gatech.edu>
 
 	* Makefile.am: Add vasprintf.

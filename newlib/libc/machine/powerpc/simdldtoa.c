@@ -39,6 +39,9 @@ int    _simdldcheck (LONG_DOUBLE_UNION *);
  /* The exponent of 1.0 */
  #define EXONE (0x3fff)
 
+ /* Maximum exponent digits - base 10 */
+ #define MAX_EXP_DIGITS 5
+
 /* Control structure for long doublue conversion including rounding precision values.
  * rndprc can be set to 80 (if NE=6), 64, 56, 53, or 24 bits.
  */
@@ -2701,7 +2704,7 @@ _simdldtoa_r (struct _reent *ptr, LONG_DOUBLE_UNION *d, int mode, int ndigits, i
 {
 unsigned short e[NI];
 char *s, *p;
-int k;
+int i, j, k;
 LDPARMS rnd;
 LDPARMS *ldp = &rnd;
 char *outstr;
@@ -2742,15 +2745,20 @@ if( mode != 3 )
    For now, just ask for 20 digits which is enough but sometimes too many.  */
 if( mode == 0 )
         ndigits = 20;
+
+/* reentrancy addition to use mprec storage pool */
+/* we want to have enough space to hold the formatted result */
+i = ndigits + (mode == 3 ? (MAX_EXP_DIGITS + 1) : 1);
+j = sizeof (__ULong);
+for (_REENT_MP_RESULT_K(ptr) = 0; sizeof (_Bigint) - sizeof (__ULong) + j <= i; j <<= 1)
+  _REENT_MP_RESULT_K(ptr)++;
+_REENT_MP_RESULT(ptr) = Balloc (ptr, _REENT_MP_RESULT_K(ptr));
+outstr = (char *)_REENT_MP_RESULT(ptr);
+
 /* This sanity limit must agree with the corresponding one in etoasc, to
    keep straight the returned value of outexpon.  */
 if( ndigits > NDEC )
         ndigits = NDEC;
-
-/* reentrancy addition to use mprec storage pool */
-_REENT_MP_RESULT(ptr) = Balloc (ptr, 3);
-_REENT_MP_RESULT_K(ptr) = 3;
-outstr = (char *)_REENT_MP_RESULT(ptr);
 
 etoasc( e, outstr, ndigits, mode, ldp );
 s =  outstr;
