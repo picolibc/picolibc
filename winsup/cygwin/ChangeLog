@@ -1,3 +1,8 @@
+2003-02-17  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* grp.cc (internal_getgroups): Handle properly tokens with
+	no groups. Fix bug introduced on 2003-02-04.
+
 2003-02-16  Christopher Faylor  <cgf@redhat.com>
 
 	* cygwin.din: Export all appropriate newlibc libm functions.  Sort.
