@@ -10,8 +10,8 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include <sys/types.h>
-#include <sys/shm.h>
 
+#include "cygwin_shm.h"
 #include "threaded_queue.h"
 #include "cygwin/cygserver_process.h"
 #include "cygwin/cygserver_transport.h"

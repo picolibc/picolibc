@@ -1,3 +1,11 @@
+2002-06-24  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_shm.h: Replace <sys/shm.h> with "cygwin_shm.h" after
+	merge from HEAD.
+	* cygwin_ipc.h: Update with changes to include/sys/ipc.h lost in
+	merge from HEAD.
+	* cygwin_shm.h: Ditto.
+
 2002-06-23  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
 	* fhandler.cc (fhandler_base::fstat): Set S_IFIFO for pipes.
