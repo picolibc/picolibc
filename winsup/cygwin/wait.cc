@@ -70,9 +70,9 @@ beg:
   w->pid = intpid;
   w->options = options;
   w->rusage = r;
-  sigproc_printf("calling proc_subproc, pid %d, options %d",
+  sigproc_printf ("calling proc_subproc, pid %d, options %d",
 		 w->pid, w->options);
-  if (!proc_subproc(PROC_WAIT, (DWORD)w))
+  if (!proc_subproc (PROC_WAIT, (DWORD)w))
     {
       set_errno (ENOSYS);
       paranoid_printf ("proc_subproc returned 0");
@@ -119,6 +119,6 @@ done:
 		  intpid, status, w->status, options, res);
   w->status = -1;
   if (res < 0)
-    sigproc_printf("*** errno = %d", get_errno());
+    sigproc_printf ("*** errno = %d", get_errno ());
   return res;
 }

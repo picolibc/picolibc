@@ -146,7 +146,7 @@ internal_getlogin (cygheap_user &user)
 
 	  /* If that failes, too, as a last resort try to get the SID from
 	     the logon server. */
-	  if (!ret && !(ret = lookup_name(user.name (), user.logsrv (),
+	  if (!ret && !(ret = lookup_name (user.name (), user.logsrv (),
 					  user.sid ())))
 	    debug_printf ("Couldn't retrieve SID from '%s'!", user.logsrv ());
 
@@ -213,7 +213,7 @@ extern "C" char *
 getlogin (void)
 {
 #ifdef _MT_SAFE
-  char *this_username=_reent_winsup()->_username;
+  char *this_username=_reent_winsup ()->_username;
 #else
   static NO_COPY char this_username[MAX_USER_NAME];
 #endif

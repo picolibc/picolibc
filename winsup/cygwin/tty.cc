@@ -433,6 +433,6 @@ tty::common_init (fhandler_pty_master *ptym)
   winsize.ws_col = 80;
   winsize.ws_row = 25;
 
-  termios_printf("tty%d opened", ntty);
+  termios_printf ("tty%d opened", ntty);
   return TRUE;
 }

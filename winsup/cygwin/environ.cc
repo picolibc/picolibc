@@ -42,10 +42,9 @@ static char **lastenviron = NULL;
   (CYGWIN_VERSION_DLL_MAKE_COMBINED (user_data->api_major, user_data->api_minor) \
 	  <= CYGWIN_VERSION_DLL_MALLOC_ENV)
 
-
 /* List of names which are converted from dos to unix
    on the way in and back again on the way out.
-  
+
    PATH needs to be here because CreateProcess uses it and gdb uses
    CreateProcess.  HOME is here because most shells use it and would be
    confused by Windows style path names.  */
@@ -400,21 +399,21 @@ codepage_init (const char *buf)
   if (!buf || !*buf)
     return;
 
-  if (strcmp (buf, "oem")== 0 )
+  if (strcmp (buf, "oem")== 0)
     {
       current_codepage = oem_cp;
       SetFileApisToOEM ();
-      debug_printf ("File APIs set to OEM" );
+      debug_printf ("File APIs set to OEM");
     }
-  else if (strcmp (buf, "ansi")== 0 )
+  else if (strcmp (buf, "ansi")== 0)
     {
       current_codepage = ansi_cp;
       SetFileApisToANSI ();
-      debug_printf ("File APIs set to ANSI" );
+      debug_printf ("File APIs set to ANSI");
     }
   else
     {
-      debug_printf ("Wrong codepage name: %s", buf );
+      debug_printf ("Wrong codepage name: %s", buf);
     }
 }
 

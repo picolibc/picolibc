@@ -1,8 +1,8 @@
 /* pthread.cc: posix pthread interface for Cygwin
 
-   Copyright 1998 Cygnus Solutions.
+   Copyright 1998, 1999, 2000, 2001 Red Hat, Inc.
 
-   Written by Marco Fuykschot <marco@ddi.nl>
+   Originally written by Marco Fuykschot <marco@ddi.nl>
 
    This file is part of Cygwin.
 
@@ -59,27 +59,27 @@ pthread_exit (void * value_ptr)
 }
 
 int
-pthread_join(pthread_t thread, void **return_val)
+pthread_join (pthread_t thread, void **return_val)
 {
-  return __pthread_join(&thread, (void **)return_val);
+  return __pthread_join (&thread, (void **)return_val);
 }
 
 int
-pthread_detach(pthread_t thread)
+pthread_detach (pthread_t thread)
 {
-  return __pthread_detach(&thread);
+  return __pthread_detach (&thread);
 }
 
 int
-pthread_suspend(pthread_t thread)
+pthread_suspend (pthread_t thread)
 {
-   return __pthread_suspend(&thread);
+   return __pthread_suspend (&thread);
 }
 
 int
-pthread_continue(pthread_t thread)
+pthread_continue (pthread_t thread)
 {
-   return __pthread_continue(&thread);
+   return __pthread_continue (&thread);
 }
 
 unsigned long
@@ -174,49 +174,50 @@ pthread_mutex_destroy (pthread_mutex_t * mutex)
 /* Synchronisation */
 
 int
-pthread_cond_destroy(pthread_cond_t *cond)
+pthread_cond_destroy (pthread_cond_t *cond)
 {
   return  __pthread_cond_destroy (cond);
 }
 
 int
-pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr)
+pthread_cond_init (pthread_cond_t *cond, const pthread_condattr_t *attr)
 {
   return __pthread_cond_init (cond, attr);
 }
 
 int
-pthread_cond_signal(pthread_cond_t *cond)
+pthread_cond_signal (pthread_cond_t *cond)
 {
   return __pthread_cond_signal (cond);
 }
 
-int pthread_cond_broadcast(pthread_cond_t *cond)
+int
+pthread_cond_broadcast (pthread_cond_t *cond)
 {
   return __pthread_cond_broadcast (cond);
 }
 
 int
-pthread_cond_timedwait(pthread_cond_t *cond,
+pthread_cond_timedwait (pthread_cond_t *cond,
 	 pthread_mutex_t *mutex, const struct timespec *abstime)
 {
   return __pthread_cond_timedwait (cond, mutex, abstime);
 }
 
 int
-pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex)
+pthread_cond_wait (pthread_cond_t *cond, pthread_mutex_t *mutex)
 {
   return __pthread_cond_wait (cond, mutex);
 }
 
 int
-pthread_condattr_init(pthread_condattr_t *condattr)
+pthread_condattr_init (pthread_condattr_t *condattr)
 {
   return __pthread_condattr_init (condattr);
 }
 
 int
-pthread_condattr_destroy(pthread_condattr_t *condattr)
+pthread_condattr_destroy (pthread_condattr_t *condattr)
 {
   return __pthread_condattr_destroy (condattr);
 }
@@ -227,7 +228,8 @@ pthread_condattr_getpshared (const pthread_condattr_t *attr, int *pshared)
   return __pthread_condattr_getpshared (attr, pshared);
 }
 
-int pthread_condattr_setpshared (pthread_condattr_t *attr, int pshared)
+int
+pthread_condattr_setpshared (pthread_condattr_t *attr, int pshared)
 {
   return __pthread_condattr_setpshared (attr, pshared);
 }

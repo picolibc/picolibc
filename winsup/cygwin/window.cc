@@ -56,7 +56,7 @@ WndProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	      start_time = GetTickCount ();
 	      itv.it_value = itv.it_interval;
 	    }
-	  raise(SIGALRM);
+	  raise (SIGALRM);
 	}
       return 0;
     case WM_ASYNCIO:
@@ -169,7 +169,7 @@ setitimer (int which, const struct itimerval *value, struct itimerval *oldvalue)
     }
   if (timer_active)
     {
-      KillTimer (gethwnd(), timer_active);
+      KillTimer (gethwnd (), timer_active);
       timer_active = 0;
     }
   if (oldvalue)
@@ -186,7 +186,7 @@ setitimer (int which, const struct itimerval *value, struct itimerval *oldvalue)
       elapse = 1;
     else
       return 0;
-  if (!(timer_active = SetTimer (gethwnd(), 1, elapse, NULL)))
+  if (!(timer_active = SetTimer (gethwnd (), 1, elapse, NULL)))
     {
       __seterrno ();
       return -1;

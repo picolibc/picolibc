@@ -2,7 +2,7 @@
 
    Copyright 1998, 1999, 2000, 2001 Red Hat, Inc.
 
-   Written by Marco Fuykschot <marco@ddi.nl>
+   Originally written by Marco Fuykschot <marco@ddi.nl>
 
 This file is part of Cygwin.
 
@@ -186,7 +186,6 @@ ResourceLocks::Delete ()
     }
 }
 
-
 // Thread interface
 
 void
@@ -275,7 +274,6 @@ MTinterface::Init (int forked)
 #endif
 
   reent_index = TlsAlloc ();
-
   reents._clib = _impure_ptr;
   reents._winsup = &winsup_reent;
 
@@ -487,11 +485,10 @@ MTinterface::CreateCond (pthread_cond_t * cond, const pthread_condattr_t * attr)
   item->mutexitem=NULL;
   item->waiting=0;
 
-  item->win32_obj_id = ::CreateEvent (&sec_none_nih, 
+  item->win32_obj_id = ::CreateEvent (&sec_none_nih,
 	false, /* auto signal reset - which I think is pthreads like ? */
 	false, /* start non signaled */
-	NULL /* no name */ );
-
+	NULL /* no name */);
 
   CHECKHANDLE (NULL, 1);
 
@@ -504,7 +501,7 @@ MTinterface::CreateCond (pthread_cond_t * cond, const pthread_condattr_t * attr)
 int
 CondItem::Signal ()
 {
-  return !PulseEvent(win32_obj_id);
+  return !PulseEvent (win32_obj_id);
 }
 
 int
@@ -535,19 +532,19 @@ CondItem::BroadCast ()
 {
   if (!mutexitem)
     return 0;
-  PulseEvent(win32_obj_id);
-  while (InterlockedDecrement(&waiting)!=0)
-    PulseEvent(win32_obj_id);
+  PulseEvent (win32_obj_id);
+  while (InterlockedDecrement (&waiting)!=0)
+    PulseEvent (win32_obj_id);
   mutexitem=NULL;
   return 0;
 }
 
-//////////////////////////  Pthreads
+/*  Pthreads */
 
 void *
 thread_init_wrapper (void *_arg)
 {
-// Setup the local/global storage of this thread
+  // Setup the local/global storage of this thread
 
   ThreadItem *thread = (ThreadItem *) _arg;
   struct __reent_t local_reent;
@@ -558,7 +555,7 @@ thread_init_wrapper (void *_arg)
   sigset_t _sig_mask;		/* one set for everything to ignore. */
   LONG _sigtodo[NSIG + __SIGOFFSET];
 
-// setup signal structures
+  // setup signal structures
   thread->sigs = _sigs;
   thread->sigmask = &_sig_mask;
   thread->sigtodo = _sigtodo;
@@ -576,7 +573,6 @@ thread_init_wrapper (void *_arg)
 
   local_winsup._process_logmask = LOG_UPTO (LOG_DEBUG);
 
-
   if (!TlsSetValue (MT_INTERFACE->reent_index, &local_reent))
     system_printf ("local storage for thread couldn't be set");
 
@@ -585,16 +581,14 @@ thread_init_wrapper (void *_arg)
     system_printf ("local storage for thread isn't setup correctly");
 #endif
 
-
   thread_printf ("started thread %p %p %p %p %p %p", _arg, &local_clib, _impure_ptr, thread, thread->function, thread->arg);
 
-
-// call the user's thread
+  // call the user's thread
   void *ret = thread->function (thread->arg);
 
-// FIX ME : cleanup code
+  // FIXME : cleanup code
 
-//  thread->used = false;	// release thread entry
+  //  thread->used = false;	// release thread entry
     thread->return_ptr = ret;
   ExitThread (0);
 }
@@ -731,9 +725,6 @@ __pthread_continue (pthread_t * thread)
   return 0;
 }
 
-
-
-
 unsigned long
 __pthread_getsequence_np (pthread_t * thread)
 {
@@ -767,7 +758,7 @@ __pthread_getspecific (pthread_key_t */*key*/)
 /* Thread synchronisation */
 
 int
-__pthread_cond_destroy(pthread_cond_t *cond)
+__pthread_cond_destroy (pthread_cond_t *cond)
 {
   SetResourceLock (LOCK_COND_LIST, READ_LOCK | WRITE_LOCK, "__pthread_cond_destroy");
 
@@ -785,7 +776,7 @@ __pthread_cond_destroy(pthread_cond_t *cond)
 }
 
 int
-__pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr)
+__pthread_cond_init (pthread_cond_t *cond, const pthread_condattr_t *attr)
 {
   if (attr && (attr->valid != 0xf341))
     return EINVAL;
@@ -800,25 +791,28 @@ __pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr)
 
 }
 
-int __pthread_cond_broadcast(pthread_cond_t *cond)
+int
+__pthread_cond_broadcast (pthread_cond_t *cond)
 {
   GETCOND("_pthread_cond_lock");
-  
-  item->BroadCast();
+
+  item->BroadCast ();
 
   return 0;
 }
 
-int __pthread_cond_signal(pthread_cond_t *cond)
+int
+__pthread_cond_signal (pthread_cond_t *cond)
 {
   GETCOND("_pthread_cond_lock");
 
-  item->Signal();
+  item->Signal ();
 
   return 0;
 }
 
-int __pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex, const struct timespec *abstime)
+int
+__pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex, const struct timespec *abstime)
 {
   int rv;
   if (!abstime)
@@ -836,37 +830,38 @@ int __pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex, const
     return EINVAL;
 
   item->mutexitem=mutexitem;
-  InterlockedIncrement(&item->waiting);
-  rv = item->TimedWait(abstime->tv_sec*1000);
-  mutexitem->Lock();
-  if (InterlockedDecrement(&item->waiting)==0)
+  InterlockedIncrement (&item->waiting);
+  rv = item->TimedWait (abstime->tv_sec*1000);
+  mutexitem->Lock ();
+  if (InterlockedDecrement (&item->waiting)==0)
     item->mutexitem=NULL;
 
   return rv;
 }
 
-int __pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex)
-{ 
+int
+__pthread_cond_wait (pthread_cond_t *cond, pthread_mutex_t *mutex)
+{
   int rv;
-  SetResourceLock (LOCK_MUTEX_LIST, READ_LOCK, "_ptherad_mutex_lock"); 
-  MutexItem* mutexitem=user_data->threadinterface->GetMutex (mutex); 
-  ReleaseResourceLock (LOCK_MUTEX_LIST, READ_LOCK, "_ptherad_mutex_lock"); 
-  if (!mutexitem) return EINVAL;  
+  SetResourceLock (LOCK_MUTEX_LIST, READ_LOCK, "_ptherad_mutex_lock");
+  MutexItem* mutexitem=user_data->threadinterface->GetMutex (mutex);
+  ReleaseResourceLock (LOCK_MUTEX_LIST, READ_LOCK, "_ptherad_mutex_lock");
+  if (!mutexitem) return EINVAL;
   if (!mutexitem->HandleOke ())
-  { 
-    return EINVAL; 
+  {
+    return EINVAL;
   }
   GETCOND("_pthread_cond_lock");
   if (item->mutexitem && (item->mutexitem != mutexitem))
     return EINVAL;
-  
+
   item->mutexitem=mutexitem;
-  InterlockedIncrement(&item->waiting);
-  rv = item->Wait();  
-  mutexitem->Lock();
-  if (InterlockedDecrement(&item->waiting)==0)
+  InterlockedIncrement (&item->waiting);
+  rv = item->Wait ();
+  mutexitem->Lock ();
+  if (InterlockedDecrement (&item->waiting)==0)
     item->mutexitem=NULL;
- 
+
   return rv;
 }
 
@@ -890,7 +885,7 @@ __pthread_condattr_getpshared (const pthread_condattr_t * attr, int *pshared)
 int
 __pthread_condattr_setpshared (pthread_condattr_t * attr, int pshared)
 {
-  if (!attr || (attr->valid != 0xf341) || (pshared <0) || (pshared > 1 ))
+  if (!attr || (attr->valid != 0xf341) || (pshared <0) || (pshared > 1))
     return EINVAL;
   attr->shared = pshared;
   return 0;
@@ -909,8 +904,8 @@ __pthread_condattr_destroy (pthread_condattr_t * condattr)
 int
 __pthread_kill (pthread_t * thread, int sig)
 {
-// lock myself, for the use of thread2signal
-  // two differ kills might clash: FIX ME
+  // lock myself, for the use of thread2signal
+  // two differ kills might clash: FIXME
   GETTHREAD ("__pthread_kill");
 
   if (item->sigs)
@@ -918,7 +913,7 @@ __pthread_kill (pthread_t * thread, int sig)
 
   int rval = _kill (myself->pid, sig);
 
-// unlock myself
+  // unlock myself
   return rval;
 }
 
@@ -929,15 +924,15 @@ __pthread_sigmask (int operation, const sigset_t * set, sigset_t * old_set)
   ThreadItem *item = MT_INTERFACE->GetCallingThread ();
   ReleaseResourceLock (LOCK_THREAD_LIST, READ_LOCK, "__pthread_sigmask");
 
-// lock this myself, for the use of thread2signal
-  // two differt kills might clash: FIX ME
+  // lock this myself, for the use of thread2signal
+  // two differt kills might clash: FIXME
 
   if (item->sigs)
     myself->setthread2signal (item);
 
   int rval = sigprocmask (operation, set, old_set);
 
-// unlock this myself
+  // unlock this myself
 
   return rval;
 }
@@ -1182,27 +1177,27 @@ extern "C"
   {
     return -1;
   }
-  int __pthread_cond_destroy(pthread_cond_t *)
+  int __pthread_cond_destroy (pthread_cond_t *)
   {
     return -1;
   }
-  int __pthread_cond_init(pthread_cond_t *, const pthread_condattr_t *)
+  int __pthread_cond_init (pthread_cond_t *, const pthread_condattr_t *)
   {
     return -1;
   }
-  int __pthread_cond_signal(pthread_cond_t *)
+  int __pthread_cond_signal (pthread_cond_t *)
   {
     return -1;
   }
-  int __pthread_cond_broadcast(pthread_cond_t *)
+  int __pthread_cond_broadcast (pthread_cond_t *)
   {
     return -1;
   }
-  int __pthread_cond_timedwait(pthread_cond_t *, pthread_mutex_t *, const struct timespec *)
+  int __pthread_cond_timedwait (pthread_cond_t *, pthread_mutex_t *, const struct timespec *)
   {
     return -1;
   }
-  int __pthread_cond_wait(pthread_cond_t *, pthread_mutex_t *)
+  int __pthread_cond_wait (pthread_cond_t *, pthread_mutex_t *)
   {
     return -1;
   }

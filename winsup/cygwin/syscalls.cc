@@ -52,7 +52,7 @@ close_all_files (void)
 
   fhandler_base *fh;
   for (int i = 0; i < (int) fdtab.size; i++)
-    if ( (fh = fdtab[i]) != NULL)
+    if ((fh = fdtab[i]) != NULL)
       {
 	fh->close ();
 	fdtab.release (i);
@@ -434,14 +434,14 @@ _open (const char *unix_path, int flags, ...)
 
       if (fd < 0)
 	set_errno (ENMFILE);
-      else if ( (fh = fdtab.build_fhandler (fd, unix_path, NULL)) == NULL)
+      else if ((fh = fdtab.build_fhandler (fd, unix_path, NULL)) == NULL)
 	res = -1;		// errno already set
       else if (!fh->open (unix_path, flags, (mode & 0777) & ~cygheap->umask))
 	{
 	  fdtab.release (fd);
 	  res = -1;
 	}
-      else if ( (res = fd) <= 2)
+      else if ((res = fd) <= 2)
 	set_std_handle (res);
       ReleaseResourceLock (LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," open");
     }
@@ -940,7 +940,7 @@ num_entries (const char *win32_name)
   count ++;
   while (FindNextFileA (handle, &buf))
     {
-      if ( (buf.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+      if ((buf.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
 	count ++;
     }
   FindClose (handle);
@@ -1074,7 +1074,7 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
   strcpy (root, real_path.get_win32 ());
   dtype = GetDriveType (rootdir (root));
 
-  if ( (atts == -1 || ! (atts & FILE_ATTRIBUTE_DIRECTORY) ||
+  if ((atts == -1 || ! (atts & FILE_ATTRIBUTE_DIRECTORY) ||
        (os_being_run == winNT
 	&& dtype != DRIVE_NO_ROOT_DIR
 	&& dtype != DRIVE_UNKNOWN)))
@@ -1140,14 +1140,14 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 				 &buf->st_mode, &buf->st_uid, &buf->st_gid))
 	{
 	  buf->st_mode |= STD_RBITS | STD_XBITS;
-	  if ( (atts & FILE_ATTRIBUTE_READONLY) == 0)
+	  if ((atts & FILE_ATTRIBUTE_READONLY) == 0)
 	    buf->st_mode |= STD_WBITS;
 	  if (real_path.issymlink ())
 	    buf->st_mode |= S_IRWXU | S_IRWXG | S_IRWXO;
 	  get_file_attribute (FALSE, real_path.get_win32 (),
 			      NULL, &buf->st_uid, &buf->st_gid);
 	}
-      if ( (handle = FindFirstFile (real_path.get_win32 (), &wfd))
+      if ((handle = FindFirstFile (real_path.get_win32 (), &wfd))
 	  != INVALID_HANDLE_VALUE)
 	{
 	  buf->st_atime   = to_time_t (&wfd.ftLastAccessTime);
@@ -1155,7 +1155,7 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 	  buf->st_ctime   = to_time_t (&wfd.ftCreationTime);
 	  buf->st_size    = wfd.nFileSizeLow;
 	  buf->st_blksize = S_BLKSIZE;
-	  buf->st_blocks  = ( (unsigned long) buf->st_size +
+	  buf->st_blocks  = ((unsigned long) buf->st_size +
 			    S_BLKSIZE-1) / S_BLKSIZE;
 	  FindClose (handle);
 	}
@@ -1392,7 +1392,7 @@ system (const char *cmdstring)
   command[2] = cmdstring;
   command[3] = (const char *) NULL;
 
-  if ( (res = spawnvp (_P_WAIT, "sh", command)) == -1)
+  if ((res = spawnvp (_P_WAIT, "sh", command)) == -1)
     {
       // when exec fails, return value should be as if shell
       // executed exit (127)
@@ -2201,7 +2201,7 @@ login (struct utmp *ut)
       (void) write (fd, (char *) ut, sizeof (struct utmp));
       (void) close (fd);
     }
-  if ( (fd = open (_PATH_WTMP, O_WRONLY | O_APPEND | O_BINARY, 0)) >= 0)
+  if ((fd = open (_PATH_WTMP, O_WRONLY | O_APPEND | O_BINARY, 0)) >= 0)
     {
       (void) write (fd, (char *) ut, sizeof (struct utmp));
       (void) close (fd);
@@ -2241,7 +2241,7 @@ logout (char *line)
       while (!res && ReadFile (ut_fd, ut_buf, sizeof ut_buf, &rd, NULL)
 	     && rd != 0)
 	{
-	  struct utmp *ut_end = (struct utmp *) ( (char *) ut_buf + rd);
+	  struct utmp *ut_end = (struct utmp *) ((char *) ut_buf + rd);
 
 	  for (ut = ut_buf; ut < ut_end; ut++, pos += sizeof (*ut))
 	    if (ut->ut_name[0]
@@ -2255,7 +2255,7 @@ logout (char *line)
 
 		/* Now seek back to the position in utmp at which UT occured,
 		   and write the new version of UT there.  */
-		if ( (SetFilePointer (ut_fd, pos, 0, FILE_BEGIN) != 0xFFFFFFFF)
+		if ((SetFilePointer (ut_fd, pos, 0, FILE_BEGIN) != 0xFFFFFFFF)
 		    && (WriteFile (ut_fd, (char *) ut, sizeof (*ut),
 				   &rd, NULL)))
 		  {

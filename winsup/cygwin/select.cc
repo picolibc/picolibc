@@ -782,7 +782,7 @@ fhandler_tty_slave::ready_for_read (int fd, DWORD howlong, int ignra)
     case WAIT_OBJECT_0 + 1:
       return 1;
     case WAIT_FAILED:
-      select_printf ( "wait failed %E" );
+      select_printf ("wait failed %E");
     case WAIT_OBJECT_0:
     case WAIT_TIMEOUT:
     default:

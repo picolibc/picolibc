@@ -44,8 +44,8 @@ shared_name (const char *str, int num)
   char envbuf[6];
 
   __small_sprintf (buf, "%s.%s.%d", cygwin_version.shared_id, str, num);
-  if (GetEnvironmentVariable("CYGWIN_TESTING", envbuf, 5))
-    strcat(buf, cygwin_version.dll_build_date);
+  if (GetEnvironmentVariable ("CYGWIN_TESTING", envbuf, 5))
+    strcat (buf, cygwin_version.dll_build_date);
   return buf;
 }
 
@@ -260,37 +260,37 @@ sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
 	       + GetLengthSid (sid2);
 
   if (! InitializeAcl (acl, acl_len, ACL_REVISION))
-    debug_printf("InitializeAcl %E");
+    debug_printf ("InitializeAcl %E");
 
   if (! AddAccessAllowedAce (acl, ACL_REVISION,
 			     SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
 			     sid))
-    debug_printf("AddAccessAllowedAce(%s) %E", getlogin());
+    debug_printf ("AddAccessAllowedAce(%s) %E", getlogin ());
 
   if (! AddAccessAllowedAce (acl, ACL_REVISION,
 			     SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
 			     get_admin_sid ()))
-    debug_printf("AddAccessAllowedAce(admin) %E");
+    debug_printf ("AddAccessAllowedAce(admin) %E");
 
   if (! AddAccessAllowedAce (acl, ACL_REVISION,
 			     SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
 			     get_system_sid ()))
-    debug_printf("AddAccessAllowedAce(system) %E");
+    debug_printf ("AddAccessAllowedAce(system) %E");
 
   if (! AddAccessAllowedAce (acl, ACL_REVISION,
 			     SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
 			     get_creator_owner_sid ()))
-    debug_printf("AddAccessAllowedAce(creator_owner) %E");
+    debug_printf ("AddAccessAllowedAce(creator_owner) %E");
 
   if (sid2)
     if (! AddAccessAllowedAce (acl, ACL_REVISION,
 			       SPECIFIC_RIGHTS_ALL | STANDARD_RIGHTS_ALL,
 			       sid2))
-      debug_printf("AddAccessAllowedAce(sid2) %E");
+      debug_printf ("AddAccessAllowedAce(sid2) %E");
 
   if (! InitializeSecurityDescriptor (psd,
 				      SECURITY_DESCRIPTOR_REVISION))
-    debug_printf("InitializeSecurityDescriptor %E");
+    debug_printf ("InitializeSecurityDescriptor %E");
 
 /*
  * Setting the owner lets the created security attribute not work
@@ -299,11 +299,11 @@ sec_user (PVOID sa_buf, PSID sid2, BOOL inherit)
 */
 #if 0
   if (! SetSecurityDescriptorOwner (psd, sid, FALSE))
-    debug_printf("SetSecurityDescriptorOwner %E");
+    debug_printf ("SetSecurityDescriptorOwner %E");
 #endif
 
   if (! SetSecurityDescriptorDacl (psd, TRUE, acl, FALSE))
-    debug_printf("SetSecurityDescriptorDacl %E");
+    debug_printf ("SetSecurityDescriptorDacl %E");
 
   psa->nLength = sizeof (SECURITY_ATTRIBUTES);
   psa->lpSecurityDescriptor = psd;
