@@ -1,3 +1,7 @@
+2004-04-11  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* dtable.cc (dtable::extend): Change order of memcpy and cfree.
+
 2004-04-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* syscalls.cc (sync): Define void according to SUSv3.

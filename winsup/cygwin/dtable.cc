@@ -91,8 +91,8 @@ dtable::extend (int howmuch)
     }
   if (fds)
     {
-      cfree (fds);
       memcpy (newfds, fds, size * sizeof (fds[0]));
+      cfree (fds);
     }
 
   size = new_size;
