@@ -1,5 +1,10 @@
 2003-01-14  Thomas Pfaff  <tpfaff@gmx.net>
 
+	* syscalls.cc (system): Add pthread_testcancel call.
+	* thread.cc: Update list of cancellation points.
+
+2003-01-14  Thomas Pfaff  <tpfaff@gmx.net>
+
 	* wait.cc: Include thread.h
 	(wait4): Add pthread_testcancel call.
 	Wait for child process and cancellation event.

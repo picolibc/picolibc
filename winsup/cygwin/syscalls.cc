@@ -1374,6 +1374,8 @@ done:
 extern "C" int
 system (const char *cmdstring)
 {
+  pthread_testcancel ();
+
   if (check_null_empty_str_errno (cmdstring))
     return -1;
 
