@@ -1,3 +1,9 @@
+1999-08-08  Mumit Khan  <khan@xraylith.wisc.edu>
+
+	* configure.in (i[3456]-*-mingw32*): Don't put gprof in
+	noconfigdirs.
+	(*-*-cygwin*): Likewise.
+
 1999-08-08  Ian Lance Taylor  <ian@zembu.com>
 
 	* mkdep: New file.
