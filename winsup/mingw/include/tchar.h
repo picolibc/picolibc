@@ -70,7 +70,7 @@ typedef wchar_t _TCHAR;
 #define	__TEXT(q)	L##q
 
 /*  for porting from other Windows compilers */
-#if 0  // no  wide startup module
+#if 0  /* no  wide startup module */
 #define _tmain      wmain
 #define _tWinMain   wWinMain
 #define _tenviron   _wenviron

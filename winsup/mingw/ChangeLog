@@ -1,5 +1,9 @@
 2003-03-16  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/tchar.h: Ansi-fy a comment.
+
+2003-03-16  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* profile/profile.h (mcount): Use __builtin_return_address
 	rather than inline __asm statements.
 	* profile/Makefile.in: Remove special rule for mcount.o
