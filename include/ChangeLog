@@ -1,3 +1,9 @@
+2004-10-21  Tomer Levi  <Tomer.Levi@nsc.com>
+
+	* opcode/crx.h (operand_type): Remove redundant types i3, i4,
+	i5, i8, i12.
+	Add new unsigned immediate types us3, us4, us5, us16.
+
 2004-10-21  H.J. Lu  <hongjiu.lu@intel.com>
 
 	PR 463

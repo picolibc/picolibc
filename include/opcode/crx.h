@@ -136,12 +136,20 @@ argtype;
 typedef enum
   {
     dummy, cst4, disps9,
-    i3, i4, i5, i8, i12, i16, i32,
+    /* Immediate operands.  */
+    i16, i32,
+    /* Unsigned immediate operands.  */
+    us3, us4, us5, us16,
+    /* Signed displacement operands.  */
     d5, d9, d17, d25, d33,
+    /* Absolute operands.  */
     abs16, abs32,
+    /* Register relative operands.  */
     rbase, rbase_cst4,
     rbase_dispu8, rbase_dispu12, rbase_dispu16, rbase_dispu28, rbase_dispu32,
+    /* Index operands.  */
     rbase_ridx_scl2_dispu6, rbase_ridx_scl2_dispu22,
+    /* Register and processor register operands.  */
     regr, regr8, copregr,copregr8,copsregr,
     /* Not an operand.  */
     nulloperand,
@@ -390,7 +398,5 @@ extern const inst *instruction;
 /* Replace all appearances of 'long long int' with LONGLONG.  */
 typedef long long int LONGLONG;
 typedef unsigned long long ULONGLONG;
-/* A mask for the upper 31 bits of a 64 bits type.  */
-#define UPPER31_MASK	0xFFFFFFFE00000000LL
 
 #endif /* _CRX_H_ */
