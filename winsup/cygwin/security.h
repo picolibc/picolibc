@@ -20,8 +20,40 @@ details. */
 
 #define NO_SID ((PSID)NULL)
 
-class cygsid {
+class cygpsid {
+protected:
   PSID psid;
+public:
+  cygpsid () {}
+  cygpsid (PSID nsid) { psid = nsid; }
+  operator const PSID () { return psid; }
+  const PSID operator= (PSID nsid) { return psid = nsid;}
+  __uid32_t get_id (BOOL search_grp, int *type = NULL);
+  int get_uid () { return get_id (FALSE); }
+  int get_gid () { return get_id (TRUE); }
+
+  char *string (char *nsidstr) const;
+
+  bool operator== (const PSID nsid) const
+    {
+      if (!psid || !nsid)
+	return nsid == psid;
+      return EqualSid (psid, nsid);
+    }
+  bool operator!= (const PSID nsid) const
+    { return !(*this == nsid); }
+  bool operator== (const char *nsidstr) const;
+  bool operator!= (const char *nsidstr) const
+    { return !(*this == nsidstr); }
+
+  void debug_print (const char *prefix = NULL) const
+    {
+      char buf[256];
+      debug_printf ("%s %s", prefix ?: "", string (buf) ?: "NULL");
+    }
+};
+
+class cygsid : public cygpsid {
   char sbuf[MAX_SID_LEN];
 
   const PSID getfromstr (const char *nsidstr);
@@ -50,7 +82,7 @@ public:
   inline const PSID operator= (const char *nsidstr)
     { return getfromstr (nsidstr); }
 
-  inline cygsid () : psid ((PSID) sbuf) {}
+  inline cygsid () : cygpsid ((PSID) sbuf) {}
   inline cygsid (const PSID nsid) { *this = nsid; }
   inline cygsid (const char *nstrsid) { *this = nstrsid; }
 
@@ -58,34 +90,6 @@ public:
 
   BOOL getfrompw (const struct passwd *pw);
   BOOL getfromgr (const struct __group32 *gr);
-
-  __uid32_t get_id (BOOL search_grp, int *type = NULL);
-  inline int get_uid () { return get_id (FALSE); }
-  inline int get_gid () { return get_id (TRUE); }
-
-  char *string (char *nsidstr) const;
-
-  inline BOOL operator== (const PSID nsid) const
-    {
-      if (!psid || !nsid)
-	return nsid == psid;
-      return EqualSid (psid, nsid);
-    }
-  inline BOOL operator== (const char *nsidstr) const
-    {
-      cygsid nsid (nsidstr);
-      return *this == nsid;
-    }
-  inline BOOL operator!= (const PSID nsid) const
-    { return !(*this == nsid); }
-  inline BOOL operator!= (const char *nsidstr) const
-    { return !(*this == nsidstr); }
-
-  void debug_print (const char *prefix = NULL) const
-    {
-      char buf[256];
-      debug_printf ("%s %s", prefix ?: "", string (buf) ?: "NULL");
-    }
 };
 
 typedef enum { cygsidlist_empty, cygsidlist_alloc, cygsidlist_auto } cygsidlist_type;
@@ -171,8 +175,11 @@ public:
     }
   void clear_supp ()
     {
-      sgsids.free_sids ();
-      ischanged = TRUE;
+      if (issetgroups ())
+        {
+	  sgsids.free_sids ();
+	  ischanged = TRUE;
+	}
     }
   void update_pgrp (const PSID sid)
     {
@@ -222,6 +229,8 @@ BOOL __stdcall add_access_denied_ace (PACL acl, int offset, DWORD attributes, PS
 void set_security_attribute (int attribute, PSECURITY_ATTRIBUTES psa,
 			     void *sd_buf, DWORD sd_buf_size);
 
+bool get_sids_info (cygpsid, cygpsid, __uid32_t * , __gid32_t *);
+
 /* Try a subauthentication. */
 HANDLE subauth (struct passwd *pw);
 /* Try creating a token directly. */
@@ -236,7 +245,7 @@ BOOL get_logon_server (const char * domain, char * server, WCHAR *wserver = NULL
 
 /* sec_helper.cc: Security helper functions. */
 BOOL __stdcall is_grp_member (__uid32_t uid, __gid32_t gid);
-int set_process_privilege (const char *privilege, BOOL enable = TRUE);
+int set_process_privilege (const char *privilege, bool enable = true, bool use_thread = false);
 
 /* shared.cc: */
 /* Retrieve a security descriptor that allows all access */

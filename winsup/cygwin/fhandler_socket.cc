@@ -711,6 +711,11 @@ fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
 
   if (res == SOCKET_ERROR)
     {
+      /* According to SUSv3, errno isn't set in that case and no error
+         condition is returned. */
+      if (WSAGetLastError () == WSAEMSGSIZE)
+        return len;
+
       res = -1;
       set_winsock_errno ();
     }
@@ -789,6 +794,7 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
   else
     {
       WSABUF wsabuf[iovcnt];
+      unsigned long len = 0L;
 
       {
 	const struct iovec *iovptr = iov + iovcnt;
@@ -797,7 +803,7 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
 	  {
 	    iovptr -= 1;
 	    wsaptr -= 1;
-	    wsaptr->len = iovptr->iov_len;
+	    len += wsaptr->len = iovptr->iov_len;
 	    wsaptr->buf = (char *) iovptr->iov_base;
 	  }
 	while (wsaptr != wsabuf);
@@ -824,6 +830,11 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
 
       if (res == SOCKET_ERROR)
 	{
+	  /* According to SUSv3, errno isn't set in that case and no error
+	     condition is returned. */
+	  if (WSAGetLastError () == WSAEMSGSIZE)
+	    return len;
+
 	  res = -1;
 	  set_winsock_errno ();
 	}

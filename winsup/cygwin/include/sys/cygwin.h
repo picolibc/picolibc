@@ -74,31 +74,31 @@ typedef enum
     CW_CMDLINE
   } cygwin_getinfo_types;
 
-#define CW_NEXTPID	0x80000000	// or with pid to get next one
+#define CW_NEXTPID	0x80000000	/* or with pid to get next one */
 
 /* Flags associated with process_state */
 enum
 {
-  PID_IN_USE	       = 0x0001, // Entry in use.
-  PID_ZOMBIE	       = 0x0002, // Child exited: no parent wait.
-  PID_STOPPED	       = 0x0004, // Waiting for SIGCONT.
-  PID_TTYIN	       = 0x0008, // Waiting for terminal input.
-  PID_TTYOU	       = 0x0010, // Waiting for terminal output.
-  PID_ORPHANED	       = 0x0020, // Member of an orphaned process group.
-  PID_ACTIVE	       = 0x0040, // Pid accepts signals.
-  PID_CYGPARENT	       = 0x0080, // Set if parent was a cygwin app.
-  PID_SPLIT_HEAP       = 0x0100, // Set if the heap has been split,
-				 //  which means we can't fork again.
-  PID_MYSELF	       = 0x0200, // Flag that pid is me.
-  PID_UNUSED1	       = 0x0400, // Set if process uses Winsock.
-  PID_INITIALIZING     = 0x0800, // Set until ready to receive signals.
-  PID_USETTY	       = 0x1000, // Setting this enables or disables cygwin's
-				 //  tty support.  This is inherited by
-				 //  all execed or forked processes.
-  PID_ALLPIDS	       = 0x2000, // child has execed
-  PID_EXECED	       = 0x4000, // redirect to original pid info block
-  PID_NOREDIR	       = 0x8000, // don't redirect if execed
-  PID_EXITED	       = 0x80000000 // Free entry.
+  PID_IN_USE	       = 0x0001, /* Entry in use. */
+  PID_ZOMBIE	       = 0x0002, /* Child exited: no parent wait. */
+  PID_STOPPED	       = 0x0004, /* Waiting for SIGCONT. */
+  PID_TTYIN	       = 0x0008, /* Waiting for terminal input. */
+  PID_TTYOU	       = 0x0010, /* Waiting for terminal output. */
+  PID_ORPHANED	       = 0x0020, /* Member of an orphaned process group. */
+  PID_ACTIVE	       = 0x0040, /* Pid accepts signals. */
+  PID_CYGPARENT	       = 0x0080, /* Set if parent was a cygwin app. */
+  PID_SPLIT_HEAP       = 0x0100, /* Set if the heap has been split, */
+				 /*  which means we can't fork again. */
+  PID_MYSELF	       = 0x0200, /* Flag that pid is me. */
+  PID_UNUSED1	       = 0x0400, /* Set if process uses Winsock. */
+  PID_INITIALIZING     = 0x0800, /* Set until ready to receive signals. */
+  PID_USETTY	       = 0x1000, /* Setting this enables or disables cygwin's */
+				 /*  tty support.  This is inherited by */
+				 /*  all execed or forked processes. */
+  PID_ALLPIDS	       = 0x2000, /* child has execed */
+  PID_EXECED	       = 0x4000, /* redirect to original pid info block */
+  PID_NOREDIR	       = 0x8000, /* don't redirect if execed */
+  PID_EXITED	       = 0x80000000 /* Free entry. */
 };
 
 #ifdef WINVER

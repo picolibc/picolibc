@@ -128,9 +128,9 @@ void
 fhandler_windows::set_close_on_exec (int val)
 {
   if (get_handle ())
-    this->fhandler_base::set_close_on_exec (val);
+    fhandler_base::set_close_on_exec (val);
   else
-    this->fhandler_base::set_close_on_exec_flag (val);
+    fhandler_base::set_close_on_exec_flag (val);
   void *h = hWnd_;
   if (h)
     set_inheritance (h, val);
@@ -140,7 +140,7 @@ void
 fhandler_windows::fixup_after_fork (HANDLE parent)
 {
   if (get_handle ())
-    this->fhandler_base::fixup_after_fork (parent);
+    fhandler_base::fixup_after_fork (parent);
   void *h = hWnd_;
   if (h)
     fork_fixup (parent, h, "hWnd_");

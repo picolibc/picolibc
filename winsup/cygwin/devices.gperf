@@ -46,32 +46,32 @@ struct device;
 "/dev/fd", FH_FLOPPY, "\\Device\\Floppy%d", 0, 15
 "/dev/scd", FH_CDROM, "\\Device\\CdRom%d", 0, 15
 "/dev/sr", FH_CDROM, "\\Device\\CdRom%d", 0, 15
-"/dev/sda", FH_SDA, "\\Device\\Harddisk%d\\Partition%d", 1, 16, -1
-"/dev/sdb", FH_SDB, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 15
-"/dev/sdc", FH_SDC, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 31
-"/dev/sdd", FH_SDD, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 47
-"/dev/sde", FH_SDE, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 63
-"/dev/sdf", FH_SDF, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 79
-"/dev/sdg", FH_SDG, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 95
-"/dev/sdh", FH_SDH, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 111
-"/dev/sdi", FH_SDI, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 127
-"/dev/sdj", FH_SDJ, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 143
-"/dev/sdk", FH_SDK, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 159
-"/dev/sdl", FH_SDL, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 175
-"/dev/sdm", FH_SDM, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 191
-"/dev/sdn", FH_SDN, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 207
-"/dev/sdo", FH_SDO, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 223
-"/dev/sdp", FH_SDP, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 239
-"/dev/sdq", FH_SDQ, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 255  /* FIXME 8 bit lunacy */
-"/dev/sdr", FH_SDR, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 271
-"/dev/sds", FH_SDS, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 287
-"/dev/sdt", FH_SDT, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 303
-"/dev/sdu", FH_SDU, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 319
-"/dev/sdv", FH_SDV, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 335
-"/dev/sdw", FH_SDW, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 351
-"/dev/sdx", FH_SDX, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 367
-"/dev/sdy", FH_SDY, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 383
-"/dev/sdz", FH_SDZ, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 399
+"/dev/hda", FH_SDA, "\\Device\\Harddisk%d\\Partition%d", 1, 16, -1
+"/dev/hdb", FH_SDB, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 15
+"/dev/hdc", FH_SDC, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 31
+"/dev/hdd", FH_SDD, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 47
+"/dev/hde", FH_SDE, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 63
+"/dev/hdf", FH_SDF, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 79
+"/dev/hdg", FH_SDG, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 95
+"/dev/hdh", FH_SDH, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 111
+"/dev/hdi", FH_SDI, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 127
+"/dev/hdj", FH_SDJ, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 143
+"/dev/hdk", FH_SDK, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 159
+"/dev/hdl", FH_SDL, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 175
+"/dev/hdm", FH_SDM, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 191
+"/dev/hdn", FH_SDN, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 207
+"/dev/hdo", FH_SDO, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 223
+"/dev/hdp", FH_SDP, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 239
+"/dev/hdq", FH_SDQ, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 255  /* FIXME 8 bit lunacy */
+"/dev/hdr", FH_SDR, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 271
+"/dev/hds", FH_SDS, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 287
+"/dev/hdt", FH_SDT, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 303
+"/dev/hdu", FH_SDU, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 319
+"/dev/hdv", FH_SDV, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 335
+"/dev/hdw", FH_SDW, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 351
+"/dev/hdx", FH_SDX, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 367
+"/dev/hdy", FH_SDY, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 383
+"/dev/hdz", FH_SDZ, "\\Device\\Harddisk%d\\Partition%d", 1, 16, 399
 "/dev/rawdrive", FH_RAWDRIVE, "\\DosDevices\\%c:", 0, 0, 0, 0
 ":bad:", FH_BAD, ":bad:", 0, 0, 0, 0
 %%

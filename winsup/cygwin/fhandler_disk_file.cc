@@ -386,7 +386,7 @@ fhandler_base::open_fs (path_conv *real_path, int flags, mode_t mode)
   set_has_acls (real_path->has_acls ());
   set_isremote (real_path->isremote ());
 
-  int res = this->fhandler_base::open (real_path, flags | O_DIROPEN, mode);
+  int res = fhandler_base::open (real_path, flags | O_DIROPEN, mode);
   if (!res)
     goto out;
 
@@ -423,7 +423,7 @@ fhandler_disk_file::close ()
 int
 fhandler_base::close_fs ()
 {
-  int res = this->fhandler_base::close ();
+  int res = fhandler_base::close ();
   if (!res)
     cygwin_shared->delqueue.process_queue ();
   return res;

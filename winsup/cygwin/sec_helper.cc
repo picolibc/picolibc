@@ -39,7 +39,7 @@ SECURITY_ATTRIBUTES NO_COPY sec_none_nih;
 SECURITY_ATTRIBUTES NO_COPY sec_all;
 SECURITY_ATTRIBUTES NO_COPY sec_all_nih;
 
-SID_IDENTIFIER_AUTHORITY sid_auth[] = {
+SID_IDENTIFIER_AUTHORITY NO_COPY sid_auth[] = {
 	{SECURITY_NULL_SID_AUTHORITY},
 	{SECURITY_WORLD_SID_AUTHORITY},
 	{SECURITY_LOCAL_SID_AUTHORITY},
@@ -62,6 +62,63 @@ cygsid well_known_authenticated_users_sid;
 cygsid well_known_system_sid;
 cygsid well_known_admins_sid;
 
+bool
+cygpsid::operator== (const char *nsidstr) const
+{
+  cygsid nsid (nsidstr);
+  return psid == nsid;
+}
+
+__uid32_t
+cygpsid::get_id (BOOL search_grp, int *type)
+{
+    /* First try to get SID from group, then passwd */
+  __uid32_t id = ILLEGAL_UID;
+
+  if (search_grp)
+    {
+      struct __group32 *gr;
+      if (cygheap->user.groups.pgsid == psid)
+	id = myself->gid;
+      else if ((gr = internal_getgrsid (*this)))
+	id = gr->gr_gid;
+      if (id != ILLEGAL_UID)
+        {
+	  if (type)
+	    *type = GROUP;
+	  return id;
+	}
+    }
+  if (!search_grp || type)
+    {
+      struct passwd *pw;
+      if (*this == cygheap->user.sid ())
+	id = myself->uid;
+      else if ((pw = internal_getpwsid (*this)))
+	id = pw->pw_uid;
+      if (id != ILLEGAL_UID && type)
+        *type = USER;
+    }
+  return id;
+}
+
+
+char *
+cygpsid::string (char *nsidstr) const
+{
+  char *t;
+  DWORD i;
+
+  if (!psid || !nsidstr)
+    return NULL;
+  strcpy (nsidstr, "S-1-");
+  t = nsidstr + sizeof ("S-1-") - 1;
+  t += __small_sprintf (t, "%u", GetSidIdentifierAuthority (psid)->Value[5]);
+  for (i = 0; i < *GetSidSubAuthorityCount (psid); ++i)
+    t += __small_sprintf (t, "-%lu", *GetSidSubAuthority (psid, i));
+  return nsidstr;
+}
+
 void
 cygsid::init ()
 {
@@ -78,25 +135,6 @@ cygsid::init ()
   well_known_authenticated_users_sid = "S-1-5-11";
   well_known_system_sid = "S-1-5-18";
   well_known_admins_sid = "S-1-5-32-544";
-}
-
-char *
-cygsid::string (char *nsidstr) const
-{
-  char t[32];
-  DWORD i;
-
-  if (!psid || !nsidstr)
-    return NULL;
-  strcpy (nsidstr, "S-1-");
-  __small_sprintf (t, "%u", GetSidIdentifierAuthority (psid)->Value[5]);
-  strcat (nsidstr, t);
-  for (i = 0; i < *GetSidSubAuthorityCount (psid); ++i)
-    {
-      __small_sprintf (t, "-%lu", *GetSidSubAuthority (psid, i));
-      strcat (nsidstr, t);
-    }
-  return nsidstr;
 }
 
 PSID
@@ -148,37 +186,41 @@ cygsid::getfromgr (const struct __group32 *gr)
   return (*this = sp) != NULL;
 }
 
-__uid32_t
-cygsid::get_id (BOOL search_grp, int *type)
+bool
+get_sids_info (cygpsid owner_sid, cygpsid group_sid, __uid32_t * uidret, __gid32_t * gidret)
 {
-  /* First try to get SID from passwd or group entry */
-  __uid32_t id = ILLEGAL_UID;
+  struct passwd *pw;
+  struct __group32 *gr = NULL;
+  bool ret = false;
 
-  if (!search_grp)
+  if (group_sid == cygheap->user.groups.pgsid)
+    *gidret = myself->gid;
+  else if ((gr = internal_getgrsid (group_sid)))
+    *gidret = gr->gr_gid;
+  else
+    *gidret = ILLEGAL_GID;
+
+  if (owner_sid == cygheap->user.sid ())
     {
-      struct passwd *pw;
-      if (*this == cygheap->user.sid ())
-	id = myself->uid;
-      else if ((pw = internal_getpwsid (*this)))
-	id = pw->pw_uid;
-      if (id != ILLEGAL_UID)
-	{
-	  if (type)
-	    *type = USER;
-	   return id;
-	}
+      *uidret = myself->uid;
+      if (*gidret == myself->gid)
+	ret = true;
+      else
+	ret = (internal_getgroups (0, NULL, &group_sid) > 0);
     }
-  if (search_grp || type)
+  else if ((pw = internal_getpwsid (owner_sid)))
     {
-      struct __group32 *gr;
-      if (cygheap->user.groups.pgsid == psid)
-	id = myself->gid;
-      else if ((gr = internal_getgrsid (*this)))
-	id = gr->gr_gid;
-      if (id != ILLEGAL_UID && type)
-	*type = GROUP;
+      *uidret = pw->pw_uid;
+      if (gr || (*gidret != ILLEGAL_GID
+		 && (gr = internal_getgrgid (*gidret))))
+	for (int idx = 0; gr->gr_mem[idx]; ++idx)
+	  if ((ret = strcasematch (pw->pw_name, gr->gr_mem[idx])))
+	    break;
     }
-  return id;
+  else
+    *uidret = ILLEGAL_UID;
+
+  return ret;
 }
 
 BOOL
@@ -294,7 +336,7 @@ got_it:
 #endif //unused
 
 int
-set_process_privilege (const char *privilege, BOOL enable)
+set_process_privilege (const char *privilege, bool enable, bool use_thread)
 {
   HANDLE hToken = NULL;
   LUID restore_priv;
@@ -302,8 +344,12 @@ set_process_privilege (const char *privilege, BOOL enable)
   int ret = -1;
   DWORD size;
 
-  if (!OpenProcessToken (hMainProc, TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES,
-			 &hToken))
+  if ((use_thread
+       && !OpenThreadToken (GetCurrentThread (), TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES,
+			    0, &hToken))
+      ||(!use_thread
+	 && !OpenProcessToken (hMainProc, TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES,
+			     &hToken)))
     {
       __seterrno ();
       goto out;
@@ -329,7 +375,6 @@ set_process_privilege (const char *privilege, BOOL enable)
      be enabled. GetLastError () returns an correct error code, though. */
   if (enable && GetLastError () == ERROR_NOT_ALL_ASSIGNED)
     {
-      debug_printf ("Privilege %s couldn't be assigned", privilege);
       __seterrno ();
       goto out;
     }

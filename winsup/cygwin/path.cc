@@ -2423,7 +2423,7 @@ symlink_worker (const char *topath, const char *frompath, bool use_winsym,
     }
 
   if (allow_ntsec && win32_path.has_acls ())
-    set_security_attribute (S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO,
+    set_security_attribute (S_IFLNK | STD_RBITS | STD_WBITS,
 			    &sa, alloca (4096), 4096);
 
   h = CreateFile (win32_path, GENERIC_WRITE, 0, &sa, create_how,

@@ -352,7 +352,7 @@ fhandler_termios::line_edit (const char *rptr, int nread, termios& ti)
 void
 fhandler_termios::fixup_after_fork (HANDLE parent)
 {
-  this->fhandler_base::fixup_after_fork (parent);
+  fhandler_base::fixup_after_fork (parent);
   fork_fixup (parent, get_output_handle (), "output_handle");
 }
 

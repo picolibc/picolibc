@@ -1,3 +1,76 @@
+2003-02-05  Christopher Faylor  <cgf@redhat.com>
+
+	* include/sys/cygwin.h: Use C-style comments.
+
+2003-02-05  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* sec_helper.cc (get_sids_info): New function.
+	* security.cc (extract_nt_dom_user): Simplify with strechr.
+	(get_user_groups): Initialize glen to MAX_SID_LEN.
+	(get_user_local_groups): Ditto.
+	(get_attribute_from_acl): Define ace_sid as cygpsid.
+	(get_nt_attribute): Define owner_sid and group_sid as cygpsid.
+	Call get_sids_info instead of cygsid.get_{u,g}id and is_grp_member.
+	(get_nt_object_attribute): Ditto.
+	(alloc_sd): Define ace_sid as cygpsid.
+
+2003-02-04  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* syscalls.cc (struct system_cleanup_args): New struct.
+	(system_cleanup): New function.
+	(system): Use pthread_cleanup_push and _pop to save and restore
+	signal handlers and sigprocmask.
+
+2003-02-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink): Create security attributes so that only the
+	user can modify the symlink.
+	* security.cc (set_security_attribute): Remove symlink special
+	handling.
+
+2003-02-04  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* grp.cc (internal_getgroups): Do not return without closing
+	the process handle.
+
+2003-02-04  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* security.h (class cygpsid): New class.
+	(class cygsid): Use cygpsid as base. Remove members psid, get_id,
+	get_uid, get_gid, string, debug_printf and the == and != operators.
+	(cygsidlist::clear_supp): Only do work if setgroups has been called.
+	* sec_helper.cc: Define sid_auth NO_COPY.
+	(cygpsid::operator==): New operator.
+	(cygpsid::get_id): New function.
+	(cygpsid::string): New function.
+	(cygsid::string): Delete.
+	(cygsid::get_id): Delete.
+	* pwdgrp.h: Change arguments of internal_getpwsid,
+	internal_getgrsid and internal_getgroups to cygpsid.
+	* passwd.cc (internal_getpwsid): Change argument from cygsid to cygpsid.
+	* grp.cc (internal_getgrsid): Ditto. 
+	(internal_getgroups): Ditto.
+
+2003-02-03  Christopher Faylor  <cgf@redhat.com>
+
+	Eliminate most unneeded this-> pointers throughout.
+
+2003-02-03  Pierre Humblet  <pierre.humblet@ieee.org>
+
+	* security.h: Add third argument to set_process_privilege.
+	* autoload.cc: Add OpenThreadToken.
+	* sec_helper.cc (set_process_privilege): Add and use use_thread
+	argument.
+	* security.cc (alloc_sd): Modify call to set_process_privilege.
+	Remember the result in each process. If failed and file owner is not
+	the user, fail.
+
+2003-02-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc (fhandler_socket::recvfrom): Return buffer
+	length and don't set errno in case of WSAEMSGSIZE error.
+	(fhandler_socket::recvmsg): Ditto.
+
 2003-02-01  Christopher Faylor  <cgf@redhat.com>
 
 	* grp.cc (getgrent32): Only refresh group entries when at beginning.

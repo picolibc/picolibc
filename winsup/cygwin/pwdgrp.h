@@ -12,14 +12,14 @@ details. */
 
 /* These functions are needed to allow searching and walking through
    the passwd and group lists */
-extern struct passwd *internal_getpwsid (cygsid &);
+extern struct passwd *internal_getpwsid (cygpsid &);
 extern struct passwd *internal_getpwnam (const char *, bool = FALSE);
 extern struct passwd *internal_getpwuid (__uid32_t, bool = FALSE);
-extern struct __group32 *internal_getgrsid (cygsid &);
+extern struct __group32 *internal_getgrsid (cygpsid &);
 extern struct __group32 *internal_getgrgid (__gid32_t gid, bool = FALSE);
 extern struct __group32 *internal_getgrnam (const char *, bool = FALSE);
 extern struct __group32 *internal_getgrent (int);
-int internal_getgroups (int, __gid32_t *, cygsid * = NULL);
+int internal_getgroups (int, __gid32_t *, cygpsid * = NULL);
 
 #include "sync.h"
 class pwdgrp

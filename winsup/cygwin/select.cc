@@ -588,7 +588,7 @@ int
 fhandler_pipe::ready_for_read (int fd, DWORD howlong)
 {
   if (!howlong)
-    return this->fhandler_base::ready_for_read (fd, howlong);
+    return fhandler_base::ready_for_read (fd, howlong);
 
   get_guard ();
   return true;

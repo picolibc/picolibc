@@ -195,7 +195,7 @@ fhandler_proc ()
 int
 fhandler_registry::fstat (struct __stat64 *buf, path_conv *pc)
 {
-  this->fhandler_base::fstat (buf, pc);
+  fhandler_base::fstat (buf, pc);
   buf->st_mode &= ~_IFMT & NO_W;
   int file_type = exists ();
   switch (file_type)

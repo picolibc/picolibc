@@ -42,8 +42,8 @@ class per_thread_waitq : public per_thread
 {
 public:
   per_thread_waitq () : per_thread (0) {}
-  void *get () {return (waitq *) this->per_thread::get ();}
-  void *create () {return (waitq *) this->per_thread::create ();}
+  void *get () {return (waitq *) per_thread::get ();}
+  void *create () {return (waitq *) per_thread::create ();}
   size_t size () {return sizeof (waitq);}
 };
 
@@ -77,8 +77,8 @@ class vfork_save
 class per_thread_vfork : public per_thread
 {
 public:
-  vfork_save *val () { return (vfork_save *) this->per_thread::get (); }
-  vfork_save *create () {return (vfork_save *) this->per_thread::create ();}
+  vfork_save *val () { return (vfork_save *) per_thread::get (); }
+  vfork_save *create () {return (vfork_save *) per_thread::create ();}
   size_t size () {return sizeof (vfork_save);}
 };
 extern per_thread_vfork vfork_storage;
@@ -102,8 +102,8 @@ struct signal_dispatch
 
 struct per_thread_signal_dispatch : public per_thread
 {
-  signal_dispatch *get () { return (signal_dispatch *) this->per_thread::get (); }
-  signal_dispatch *create () {return (signal_dispatch *) this->per_thread::create ();}
+  signal_dispatch *get () { return (signal_dispatch *) per_thread::get (); }
+  signal_dispatch *create () {return (signal_dispatch *) per_thread::create ();}
   size_t size () {return sizeof (signal_dispatch);}
 };
 

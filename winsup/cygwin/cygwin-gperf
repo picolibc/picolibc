@@ -90,8 +90,10 @@ sub read_devices($%) {
     local $_;
     while (<F>) {
 	/^\s*DEV_([A-Z_0-9]+)_MAJOR\s*=\s*(\d+)/ and do {
+	    my $dev = lc($1) . '_dev';
+	    next unless $fh_declare{$dev};
 	    my $a = sprintf "%08d", $2;
-	    $dev{$2} = $fh_declare{lc($1) . '_dev'} . " /* \L$1 */";
+	    $dev{$2} = $fh_declare{$dev} . " /* \L$1 */";
 	    next;
 	};
 	/^\s*FH_([A-Z_0-9]+)\s*=\s*FHDEV\s*\((\d+),\s*(\d+)\)/ and do {
@@ -103,7 +105,7 @@ sub read_devices($%) {
     my $toprint = '';
     $toprint = "const device *unit_devices[] =\n{";
     for my $f (sort keys %dev) {
-	$toprint .= "\n  $dev{$f},";
+	$toprint .= "\n  $dev{$f}," if length($dev{$f});
     }
     chop $toprint;
     $toprint .= "\n};\n\nconst device *uniq_devices[] = \n{";
