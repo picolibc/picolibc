@@ -71,7 +71,7 @@ openlog (const char *ident, int logopt, int facility)
     if (ident)
       {
 	process_ident = (char *) malloc (strlen (ident) + 1);
-	if (process_ident == 0)
+	if (process_ident == NULL)
 	  {
 	    debug_printf ("failed to allocate memory for process_ident");
 	    return;
@@ -126,7 +126,7 @@ class pass_handler
     int print (const char *,...);
     int print_va (const char *, va_list);
     char *get_message () const { return message_; }
-    void set_message (char *s) { message_ = s; }
+    void set_message (char *s) { message_ = s; *message_ = '\0'; }
 };
 
 pass_handler::pass_handler () : fp_ (0), message_ (0), total_len_ (0)
@@ -179,7 +179,7 @@ pass_handler::print (const char *fmt, ...)
 int
 pass_handler::print_va (const char *fmt, va_list list)
 {
-    if (fp_ != 0)
+    if (fp_ != NULL)
       {
 	int len = vfprintf (fp_, fmt, list);
 	if (len < 0)
@@ -187,7 +187,7 @@ pass_handler::print_va (const char *fmt, va_list list)
 	total_len_ += len;
 	return 0;
       }
-    else if (message_ != 0)
+    else if (message_ != NULL)
       {
 	char *printpos = &message_[strlen (message_)];
 	vsprintf (printpos, fmt, list);
@@ -289,7 +289,7 @@ syslog (int priority, const char *message, ...)
 	  pass.set_message ((char *) alloca (n));
 
 	/* Deal with ident_string */
-	if (process_ident != 0)
+	if (process_ident != NULL)
 	  {
 	    if (pass.print ("%s : ", process_ident) == -1)
 	      return;
@@ -340,9 +340,9 @@ syslog (int priority, const char *message, ...)
     if (os_being_run == winNT)
       {
 	/* For NT, open the event log and send the message */
-	HANDLE hEventSrc = RegisterEventSourceA (NULL, (process_ident != 0) ?
+	HANDLE hEventSrc = RegisterEventSourceA (NULL, (process_ident != NULL) ?
 					 process_ident : CYGWIN_LOG_NAME);
-	if (hEventSrc == 0)
+	if (hEventSrc == NULL)
 	  {
 	    debug_printf ("RegisterEventSourceA failed with %E");
 	    return;
@@ -355,7 +355,7 @@ syslog (int priority, const char *message, ...)
       {
 	/* Under Windows 95, append the message to the log file */
 	FILE *fp = fopen (get_win95_event_log_path (), "a");
-	if (fp == 0)
+	if (fp == NULL)
 	  {
 	    debug_printf ("failed to open file %s",
 			  get_win95_event_log_path ());

@@ -1,3 +1,10 @@
+Thu Aug 24 17:16:14 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* select.cc (cygwin_select): Correct logic for "always_ready" fds or
+	when there is no wait specified.
+	* syslog.cc (pass_handler::set_message): Zero the buffer prior to
+	setting it.
+
 2000-08-24  Egor Duda  <deo@logos-m.ru>
 
 	* include/cygwin/core_dump.h: New file, contains structures used in

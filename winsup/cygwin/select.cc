@@ -173,8 +173,9 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   fd_set *w = allocfd_set (maxfds);
   fd_set *e = allocfd_set (maxfds);
 
-  /* Don't bother waiting if one of the selected fds is "always ready". */
-  if ((!sel.always_ready || ms != 0) && sel.wait (r, w, e, ms))
+  if (sel.always_ready || ms == 0)
+    /* Don't bother waiting. */;
+  else if (sel.wait (r, w, e, ms))
     return -1;	/* some kind of error */
 
   copyfd_set (readfds, r, maxfds);
