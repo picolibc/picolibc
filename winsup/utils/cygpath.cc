@@ -121,7 +121,7 @@ get_short_paths (char *path)
       if (ptr)
 	*ptr++ = 0;
       len = GetShortPathName (next, NULL, 0);
-      if (len == 0 && GetLastError () == ERROR_INVALID_PARAMETER)
+      if (!len)
 	{
 	  fprintf (stderr, "%s: cannot create short name of %s\n", prog_name,
 		   next);
@@ -139,7 +139,7 @@ get_short_paths (char *path)
   for (;;)
     {
       len = GetShortPathName (ptr, sptr, acc);
-      if (len == 0 && GetLastError () == ERROR_INVALID_PARAMETER)
+      if (!len)
 	{
 	  fprintf (stderr, "%s: cannot create short name of %s\n", prog_name,
 		   ptr);
@@ -162,7 +162,7 @@ get_short_name (const char *filename)
 {
   char *sbuf, buf[MAX_PATH];
   DWORD len = GetShortPathName (filename, buf, MAX_PATH);
-  if (len == 0 && GetLastError () == ERROR_INVALID_PARAMETER)
+  if (!len)
     {
       fprintf (stderr, "%s: cannot create short name of %s\n", prog_name,
 	       filename);

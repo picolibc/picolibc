@@ -1,3 +1,7 @@
+2003-06-12  Christopher Faylor  <cgf@redhat.com>
+
+	Throughout, always return error when GetShortPathName returns 0.
+
 2003-04-26  Joshua Daniel Franklin <joshuadfranklin at yahoo dot com>
 
 	* mkpasswd.c (usage) Remove extra newline from description output.
