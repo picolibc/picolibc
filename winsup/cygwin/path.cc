@@ -1,6 +1,6 @@
 /* path.cc: path support.
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Red Hat, Inc.
+   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -185,12 +185,12 @@ pathmatch (const char *path1, const char *path2)
 				      : strcasematch (path1, path2);
 }
 
+#define isslash(c) ((c) == '/')
+
 /* Normalize a POSIX path.
    \'s are converted to /'s in the process.
    All duplicate /'s, except for 2 leading /'s, are deleted.
    The result is 0 for success, or an errno error value.  */
-
-#define isslash(c) ((c) == '/')
 
 static int
 normalize_posix_path (const char *src, char *dst)
@@ -368,7 +368,9 @@ fs_info::update (const char *win32_path)
 
   strncpy (root_dir_storage, tmp_buf, CYG_MAX_PATH);
   drive_type_storage = GetDriveType (root_dir_storage);
-  if (drive_type_storage == DRIVE_REMOTE || (drive_type_storage == DRIVE_UNKNOWN && (root_dir_storage[0] == '\\' && root_dir_storage[1] == '\\')))
+  if (drive_type_storage == DRIVE_REMOTE
+      || (drive_type_storage == DRIVE_UNKNOWN
+	  && (root_dir_storage[0] == '\\' && root_dir_storage[1] == '\\')))
     is_remote_drive_storage = 1;
   else
     is_remote_drive_storage = 0;
