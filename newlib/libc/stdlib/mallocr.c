@@ -304,6 +304,11 @@ extern "C" {
 #define MALLOC_LOCK __malloc_lock(reent_ptr)
 #define MALLOC_UNLOCK __malloc_unlock(reent_ptr)
 
+#ifdef __CYGWIN__
+# undef _WIN32
+# undef WIN32
+#endif
+
 #ifndef _WIN32
 #ifdef SMALL_MEMORY
 #define malloc_getpagesize (128)

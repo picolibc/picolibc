@@ -1,3 +1,8 @@
+Mon Jan 29 23:03:06 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* libc/stdlib/mallocr.c: Undefine windows preprocessor variables when
+	compiling under Cygwin.
+
 2001-01-29  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/math.h (signgam): Change to errno-like solution
