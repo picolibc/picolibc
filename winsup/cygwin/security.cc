@@ -915,6 +915,21 @@ alloc_sd (uid_t uid, gid_t gid, const char *logsrv, int attribute,
       return NULL;
     }
 
+  /*
+   * We set the SE_DACL_PROTECTED flag here to prevent the DACL from being modified
+   * by inheritable ACEs.
+   * This flag as well as the SetSecurityDescriptorControl call are available only
+   * since Win2K.
+   */
+  static int win2KorHigher = -1;
+  if (win2KorHigher == -1)
+    {
+      DWORD version = GetVersion ();
+      win2KorHigher = (version & 0x80000000) || (version & 0xff) < 5 ? 0 : 1;
+    }
+  if (win2KorHigher > 0)
+    SetSecurityDescriptorControl (&sd, SE_DACL_PROTECTED, SE_DACL_PROTECTED);
+
   /* Create owner for local security descriptor. */
   if (! SetSecurityDescriptorOwner(&sd, owner_sid, FALSE))
     {

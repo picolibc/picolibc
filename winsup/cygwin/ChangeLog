@@ -1,3 +1,9 @@
+Wed Dec 20 13:37:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* autoload.cc: Add load statemant for SetSecurityDescriptorControl.
+	* security.cc (alloc_sd): Always set SE_DACL_PROTECTED flag on
+	Win2K and higher.
+
 Wed Dec 20 01:02:13 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (reset_signal_arrived): Make global to avoid inlining.
