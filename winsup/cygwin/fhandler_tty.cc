@@ -898,7 +898,6 @@ fhandler_tty_common::dup (fhandler_base *child)
   fhandler_tty_slave *fts = (fhandler_tty_slave *) child;
   int errind;
 
-debug_printf ("get_io_handle %p, cygheap->ctty.get_io_handle %p",get_io_handle (),cygheap->ctty.get_io_handle ());
   if (get_io_handle () == cygheap->ctty.get_io_handle ())
     {
       *fts = cygheap->ctty;
