@@ -1,3 +1,7 @@
+2001-03-20  Michael Chastain  <chastain@redhat.com>
+
+	* Makefile.in: all-m4 depends on all-texinfo.
+
 2001-03-08  Alexandre Oliva  <aoliva@redhat.com>
 
 	* Makefile.in (ALL_GCC, ALL_GCC_C, ALL_GCC_CXX): Set before use.
