@@ -1,5 +1,16 @@
 2002-07-13  Christopher Faylor  <cgf@redhat.com>
 
+	* dcrt0.cc (dll_crt0_1): Delay closing of some handles until cygheap
+	has been set up.
+	(break_here): New function, for debugging.
+	(initial_env): Add program name to "Sleeping" message.  Implement new
+	"CYGWIN_DEBUG" environment variable option.
+	* exceptions.cc (debugger_command): Add argument to dumper call.
+	* strace.cc (strace::hello): Use winpid if cygwin pid is unavailable.
+	(strace::vsprntf): Ditto.
+
+2002-07-13  Christopher Faylor  <cgf@redhat.com>
+
 	* debug.h (handle_list): Move here from debug.cc.  Add "inherit" flag
 	functionality.
 	* cygheap.cc (init_cheap): Move cygheap_max calculation to _csbrk.
