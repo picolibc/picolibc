@@ -1,3 +1,10 @@
+2001-03-21  Egor Duda  <deo@logos-m.ru>
+
+        Allow building internal stubs for non-reentrant syscalls
+        if target provides its own malloc
+        * libc/reent/reent.c (errno): Move definition here.
+        * libc/reent/sbrkr.c: From here.
+
 2001-03-20  Danny Smith <dannysmith@users.sourceforge.net>
 
 	* libc/include/sys/types.h (BSD int typedefs): Guard with

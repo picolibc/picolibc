@@ -7,11 +7,25 @@ INDEX
 
 DESCRIPTION
 	This module defines the impure data area used by the
-	non-rentrant functions, such as strtok.
+	non-reentrant functions, such as strtok.
 */
 
 #include <stdlib.h>
 #include <reent.h>
+
+#ifdef _REENT_ONLY
+#ifndef REENTRANT_SYSCALLS_PROVIDED
+#define REENTRANT_SYSCALLS_PROVIDED
+#endif
+#endif
+
+#ifndef REENTRANT_SYSCALLS_PROVIDED
+
+/* We use the errno variable used by the system dependent layer.  */
+#undef errno
+int errno;
+
+#endif
 
 /* Interim cleanup code */
 
