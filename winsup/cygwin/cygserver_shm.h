@@ -1,7 +1,9 @@
-/* cygserver_shm.h
+/* cygserver_shm.h: Single unix specification IPC interface for Cygwin.
 
-   Copyright 2001, 2002 Red Hat Inc.
-   Written by Robert Collins <rbtcollins@hotmail.com>
+   Copyright 2002 Red Hat, Inc.
+
+   Written by Conrad Scott <conrad.scott@dsl.pipex.com>.
+   Based on code by Robert Collins <robert.collins@hotmail.com>.
 
 This file is part of Cygwin.
 
@@ -9,84 +11,137 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#ifndef __CYGSERVER_SHM_H__
+#define __CYGSERVER_SHM_H__
+
 #include <sys/types.h>
-#include "cygwin/cygserver_transport.h"
+#include <cygwin/shm.h>
+
+#include <assert.h>
+#include <limits.h>
+
+#include "cygserver_ipc.h"
+
 #include "cygwin/cygserver.h"
 
-#define SHM_CREATE 0
-#define SHM_REATTACH 1
-#define SHM_ATTACH 2
-#define SHM_DETACH 3
-#define SHM_DEL    4
+/*---------------------------------------------------------------------------*
+ * Values for the shminfo entries.
+ *
+ * Nb. The values are segregated between two enums so that the `small'
+ * values aren't promoted to `unsigned long' equivalents.
+ *---------------------------------------------------------------------------*/
 
+enum
+  {
+    SHMMAX = ULONG_MAX,
+    SHMSEG = ULONG_MAX,
+    SHMALL = ULONG_MAX
+  };
+
+enum
+  {
+    SHMMIN = 1,
+    SHMMNI = IPCMNI		// Must be <= IPCMNI.
+  };
+
+/*---------------------------------------------------------------------------*
+ * class client_request_shm
+ *---------------------------------------------------------------------------*/
+
+#ifndef __INSIDE_CYGWIN__
+class transport_layer_base;
+class process_cache;
+#endif
 
 class client_request_shm : public client_request
 {
-  public:
-#ifndef __INSIDE_CYGWIN__
-  virtual void serve (transport_layer_base *conn, process_cache *cache);
+  friend class client_request;
+
+public:
+  enum shmop_t
+    {
+      SHMOP_shmat,
+      SHMOP_shmctl,
+      SHMOP_shmdt,
+      SHMOP_shmget
+    };
+
+#ifdef __INSIDE_CYGWIN__
+  client_request_shm (int shmid, int shmflg); // shmat
+  client_request_shm (int shmid, int cmd, const struct shmid_ds *); // shmctl
+  client_request_shm (int shmid); // shmdt
+  client_request_shm (key_t, size_t, int shmflg); // shmget
 #endif
-  client_request_shm (key_t, size_t, int, char psdbuf[4096], pid_t);
+
+  // Accessors for out parameters.
+
+  int shmid () const
+  {
+    assert (!error_code ());
+    return _parameters.out.shmid;
+  }
+
+  HANDLE hFileMap () const
+  {
+    assert (!error_code ());
+    return _parameters.out.hFileMap;
+  }
+
+  const struct shmid_ds & ds () const
+  {
+    assert (!error_code ());
+    return _parameters.out.ds;
+  }
+
+  const struct shminfo & shminfo () const
+  {
+    assert (!error_code ());
+    return _parameters.out.shminfo;
+  }
+
+  const struct shm_info & shm_info () const
+  {
+    assert (!error_code ());
+    return _parameters.out.shm_info;
+  }
+
+private:
+  union
+  {
+    struct
+    {
+      shmop_t shmop;
+      key_t key;
+      size_t size;
+      int shmflg;
+      int shmid;
+      int cmd;
+      pid_t cygpid;
+      DWORD winpid;
+      uid_t uid;
+      gid_t gid;
+      struct shmid_ds ds;
+    } in;
+
+    struct {
+      int shmid;
+      union
+      {
+	HANDLE hFileMap;
+	struct shmid_ds ds;
+	struct shminfo shminfo;
+	struct shm_info shm_info;
+      };
+    } out;
+  } _parameters;
+
+#ifndef __INSIDE_CYGWIN__
   client_request_shm ();
-  client_request_shm (int, int, pid_t);
-  client_request_shm (int, int);
-  union {
-   struct {int type; pid_t pid; int shm_id; key_t key; size_t size; int shmflg; char sd_buf[4096];} in;
-   struct {int shm_id; HANDLE filemap; HANDLE attachmap; key_t key;} out;
-  } parameters;
-};
+#endif
 
 #ifndef __INSIDE_CYGWIN__
-class shm_cleanup : cleanup_routine
-{
-public:
-  virtual void cleanup (long winpid);
-};
+  virtual void serve (transport_layer_base *, process_cache *);
 #endif
-#if 0
-class _shmattach {
-public:
-  void *data;
-  class _shmattach *next;
 };
 
-class shmid_ds {
-public:
-  struct   ipc_perm shm_perm;
-  size_t   shm_segsz;
-  pid_t    shm_lpid;
-  pid_t    shm_cpid;
-  shmatt_t shm_nattch;
-  time_t   shm_atime;
-  time_t   shm_dtime;
-  time_t   shm_ctime;
-  HANDLE filemap;
-  HANDLE attachmap;
-  void *mapptr;
-  class _shmattach *attachhead;
-};
-
-class shmnode {
-public:
-  class shmid_ds * shmid;
-  class shmnode *next;
-  key_t key;
-};
-//....
-struct shmid_ds {
-  struct   ipc_perm shm_perm;
-  size_t   shm_segsz;
-  pid_t    shm_lpid;
-  pid_t    shm_cpid;
-  shmatt_t shm_nattch;
-  time_t   shm_atime;
-  time_t   shm_dtime;
-  time_t   shm_ctime;
-};
-
-void *shmat(int, const void *, int);
-int   shmctl(int, int, struct shmid_ds *);
-int   shmdt(const void *);
-int   shmget(key_t, size_t, int);
-
-#endif
+#endif /* __CYGSERVER_SHM_H__ */

@@ -1,3 +1,1110 @@
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	GNUify non-GNU formatted functions calls throughout.
+
+2002-09-22  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_shm.cc (with_strerr): Remove macro.
+	(server_shmmgr::segment_t::~segment_t): Remove calls to with_strerr.
+	(server_shmmgr::segment_t::attach): Ditto.
+	(server_shmmgr::new_segment): Ditto.
+	* shm.cc (with_strerr): Remove macro.
+	(client_shmmgr::shmdt): Remove calls to with_strerr.
+	(client_shmmgr::attach): Ditto.
+
+2002-09-21  Conrad Scott  <conrad.scott@dsl.pipex.com>
+ 
+	* include/sys/ipc.h: Move to "include/cygwin/ipc.h".
+	* include/sys/msg.h: Move to "include/cygwin/msg.h".
+	* include/sys/sem.h: Move to "include/cygwin/sem.h".
+	* include/sys/shm.h: Move to "include/cygwin/shm.h".
+	* include/cygwin/ipc.h: New file.
+	* include/cygwin/msg.h: Ditto.
+	* include/cygwin/sem.h: Ditto.
+	* include/cygwin/shm.h: Ditto.
+	* cygserver_shm.h: Update includes.
+	* msg.cc: Ditto.
+	* sem.cc: Ditto.
+ 
+2002-09-21  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* safe_memory.h (safe_delete): Make a templated function.
+	* cygserver.cc (~server_request): Update use of safe_delete.
+	(main): Ditto.
+	* cygserver_client.cc (client_request::handle_request): Ditto.
+	(client_request::make_request): Ditto.
+	* cygserver_process.cc (~process_cleanup): Ditto.
+	(process::remove): Ditto.
+	(process::cleanup): Ditto.
+	(process_cache::process): Ditto.
+	* cygserver_shm.cc (server_shmmgr::segment_t::detach): Ditto.
+	(server_shmmgr::delete_segment): Ditto.
+	* shm.cc (client_shmmgr::shmdt): Ditto.
+	* threaded_queue.cc (~threaded_queue): Ditto.
+	(threaded_queue::worker_loop): Ditto.
+ 
+2002-08-29  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* safe_memory.h: Replace #include <new> with an explicit
+	definition of the placement new operator.
+	(safe_delete): Remove unnecessary ## operator.
+
+2002-07-28  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_shm.cc (class server_shmmgr): Remove `cleanup_t'
+	friend declaration.
+	(cleanup_t::cleanup_t): Use the segment's shmid as the key rather
+	than the segment pointer itself.
+	(cleanup_t::segptr): Remove method.
+	(cleanup_t::shmid): New method.
+	(cleanup_t::cleanup): Update for new key value.
+	(server_shmmgr::find (segment_t *)): Remove method.
+	* include/cygwin/cygserver_process.h (cleanup_routine::key): Make
+	method const.
+
+2002-07-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* include/cygwin/cygserver_process.h
+	(cleanup_routine::_key): New field.
+	(cleanup_routine::cleanup_routine): Initialise new field with new
+	argument.
+	(cleanup_routine::operator==): New method.
+	(cleanup_routine::key): New method.
+	(cleanup_routine::cleanup): Make argument non-const.
+	(process::is_active): New method.
+	(process::remove): Ditto.
+	(process::check_exit_code): Rename method.
+	* cygserver_process.cc (process::add): Reorganize code.
+	(process::remove): New method.
+	(process::check_exit_code): Rename method.
+	(process::cleanup): Use new `process::is_active' method.
+	(process_cache::process): Ditto.
+	(process_cache::sync_wait_array): Ditto.
+	(process_cache::check_and_remove_process): Ditto.
+	* cygserver_shm.cc (server_shmmgr): Make `cleanup_t' a friend.
+	(segment_t::detach): Make argument non-const.  Remove cleanup
+	object from client if appropriate.
+	(cleanup_t::_segptr): Remove field.
+	(cleanup_t::cleanup_t): Initialise parent explicitly.  Remove
+	field.
+	(cleanup_t::segptr): New method.
+	(cleanup_t::cleanup): Add error checking and reporting.
+	(server_shmmgr::shmdt): Make argument non-const.
+	(server_shmmgr::find (segment_t *)): New method.
+
+2002-07-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver.cc (client_request_shutdown::client_request_shutdown):
+	Comment out verbose tracing statement.
+	* cygserver_client.cc
+	(client_request_get_version::client_request_get_version): Ditto.
+	(client_request_attach_tty::client_request_attach_tty): Ditto.
+	* cygserver_shm.cc (client_request_shm::client_request_shm):
+	Ditto.
+
+2002-07-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_transport_pipes.cc (transport_layer_pipes::listen):
+	Set `_is_listening_endpoint' appropriately.
+
+2002-07-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* include/cygwin/cygserver_transport.h
+	(transport_layer_base::listen): Change return type.
+	(transport_layer_base::connect): Ditto.
+	* include/cygwin/cygserver_transport_pipes.h
+	(transport_layer_pipes::listen): Change return type.
+	(transport_layer_pipes::connect): Ditto.
+	(transport_layer_pipes::_sec_none_nih): Remove unused field.
+	(transport_layer_pipes::_is_listening_endpoint): New field.
+	* cygserver_transport_pipes.cc: Synchronize with sockets code.
+	(transport_layer_pipes::transport_layer_pipes): Initialise new
+	field.  Separate out asserts.
+	(transport_layer_pipes::listen): Change return type.  Add asserts.
+	(transport_layer_pipes::accept): Add asserts.
+	(transport_layer_pipes::read): Change conditional to an assert.
+	Add assert.
+	(transport_layer_pipes::write): Ditto.
+	(transport_layer_pipes::connect): Change return type.  Change
+	conditional to an assert.  Add asserts.  Rationalize error code
+	slightly.
+	(transport_layer_pipes::impersonate_client): Add asserts.
+	* include/cygwin/cygserver_transport_sockets.h
+	(transport_layer_sockets::listen): Change return type.
+	(transport_layer_sockets::connect): Ditto.
+	(transport_layer_sockets::_addr): Change type of field.
+	(transport_layer_sockets::_addr_len): Ditto.
+	(transport_layer_sockets::_is_accepted_endpoint): New field.
+	(transport_layer_sockets::_is_listening_endpoint): Ditto.
+	* cygserver_transport_sockets.cc
+	(MAX_CONNECT_RETRY): New constant.
+	(transport_layer_sockets::transport_layer_sockets): Initialise new
+	fields.  Only initialise the socket address where necessary.
+	(transport_layer_sockets::listen): Change return type.  Rewrite.
+	(transport_layer_sockets::accept): Add asserts.  Add tracing
+	statements.  Use a local variable to hold the accepted address.
+	(transport_layer_sockets::close): Add tracing statements.  Unlink
+	the UNIX domain socket file as appropriate.  Close the socket
+	cleanly.
+	(transport_layer_sockets::read): Rewrite method.
+	(transport_layer_sockets::write): Ditto.
+	(transport_layer_sockets::connect): Change return type.  Rewrite.
+	* cygserver.cc (server_submission_loop::request_loop): Run the
+	listening thread at high priority with special handling for
+	shutdown.
+	(main): Print the request error code rather than errno in shutdown
+	request code.  Install signal handlers with sigaction(2) to avoid
+	setting SA_RESTART.  Check value of the listen method call, now it
+	has one.
+	* cygserver_client.cc (client_request::make_request): Check new
+	return value on connect method call.
+
+2002-07-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* include/cygwin/cygserver_transport_pipes.h
+	(cygserver_transport_pipes::_sd): Rename field.
+	(cygserver_transport_pipes::_sec_none_nih): Ditto.
+	(cygserver_transport_pipes::_sec_all_nih): Ditto.
+	(cygserver_transport_pipes::_pipe_name): Ditto.
+	(cygserver_transport_pipes::_hPipe): Ditto.
+	(cygserver_transport_pipes::_is_accepted_endpoint): Ditto.
+	* cygserver_transport_pipes.cc
+	(transport_layer_pipes::transport_layer_pipes): Rename fields.
+	(transport_layer_pipes::init_security): Ditto.
+	(transport_layer_pipes::listen): Ditto.
+	(transport_layer_pipes::accept): Ditto.
+	(transport_layer_pipes::close): Ditto.
+	(transport_layer_pipes::read): Ditto.
+	(transport_layer_pipes::write): Ditto.
+	(transport_layer_pipes::connect): Ditto.
+	(transport_layer_pipes::impersonate_client): Ditto.
+	(transport_layer_pipes::revert_to_self): Ditto.
+	* include/cygwin/cygserver_transport_sockets.h
+	(cygserver_transport_sockets::_fd): Rename field.
+	(cygserver_transport_sockets::_addr): Ditto.
+	(cygserver_transport_sockets::_addr_len): Ditto.
+	* cygserver_transport_sockets.cc
+	(transport_layer_sockets::transport_layer_sockets): Rename fields.
+	(transport_layer_sockets::listen): Ditto.
+	(transport_layer_sockets::accept): Ditto.
+	(transport_layer_sockets::close): Ditto.
+	(transport_layer_sockets::read): Ditto.
+	(transport_layer_sockets::write): Ditto.
+	(transport_layer_sockets::connect): Ditto.
+
+2002-07-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_shm.cc (with_strerr): Fix use of %p format.
+	* shm.cc (client_shmmgr::shmat): Ditto.
+	(client_shmmgr::shmctl): Ditto.
+	(client_shmmgr::shmdt): Ditto.
+	(client_shmmgr::attach): Ditto.
+
+2002-07-14  Christopher Faylor  <cgf@redhat.com>
+
+	* woutsup.h (system_printf): Remove extraneous semicolon from macro
+	definition.
+
+2002-07-14  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_transport_pipes.cc
+	(transport_layer_pipes::connect): Use ProtectHandle in DLL code.
+	(transport_layer_pipes::close): Use ForceCloseHandle in DLL code.
+
+2002-07-13  Nicholas Wourms  <nwourms@netscape.com>
+
+	* threaded_queue.h (class queue_submission_loop): Correct friend
+	declaration for GCC 3.1.1.
+	* include/cygwin/cygserver_process.h (class process): Ditto.
+	(class process_cache): Ditto.
+
+2002-07-12  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_shm.cc (server_shmmgr::shmdt): Only call
+	delete_segment if the segment exists [sic].
+
+2002-07-12  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* safe_memory.h: Include <new> rather than <new.h> for gcc 3.
+
+2002-07-11  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* safe_memory.h: New file extracted from "woutsup.h".
+	* woutsup.h: Move the "safe" new/delete macros into the new
+	"safe_memory.h" header file and include that here.
+	* cygserver_client.cc: Explicitly include "safe_memory.h" for
+	client-side code.
+	(client_request::make_request): Use the "safe" new/delete macros
+	unconditionally, i.e. use them on the client side as well as on
+	the server side.
+	* cygserver_transport.cc: Explicitly include "safe_memory.h" for
+	client-side code.
+	(create_server_transport): Use the "safe" new/delete macros
+	unconditionally, i.e. use them on the client side as well as on
+	the server side.
+	* shm.cc: Include "safe_memory.h".
+	(client_shmmgr::instance): Use the "safe" new/delete macros.
+	(client_shmmgr::shmdt): Ditto.
+	(client_shmmgr::new_segment): Ditto.
+
+2002-07-11  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_process (process::process): Add the client's cygpid
+	and winpid to all tracing statements as appropriate.
+	(process::exit_code): Ditto.
+	(process_cache::check_and_remove_process): Ditto.
+	* cygserver_shm.cc (server_shmmgr::shmat): Ditto.
+	(server_shmmgr::shmdt): Ditto.
+	(server_shmmgr::shmctl): Add a process object argument and remove
+	the explicit cygpid argument.  Add the client's cygpid and winpid
+	to all tracing statements as appropriate.
+	(server_shmmgr::shmget): Ditto.
+	(client_request_shm::serve): Update for the new signature of the
+	shmctl and shmget methods.
+
+2002-07-11  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver.cc (client_request_shutdown::serve): Don't set the
+	shutdown flag directly, but send a SIGINT, as the signal handler
+	sets the flag and the signal breaks the pause(2) in the main loop.
+	(print_usage): Add new options.
+	(main): Add new --cleanup-threads and --request-threads options to
+	set the number of threads used by the daemon.  Use pause(2) rather
+	the win32 Sleep in the main loop.
+	* shm.cc (shmat): Add sigframe.
+	(shmctl): Ditto.
+	(shmdt): Ditto.
+	(shmget): Ditto.
+
+2002-07-11  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_shm.cc: Automatically detach processes from any
+	segments they are attached to at exit.
+	(class server_shmmgr::attach_t): New class.
+	(server_shmmgr::segment_t::IS_DELETED): Rename and make private.
+	(server_shmmgr::segment_t::_sequence): Make private.
+	(server_shmmgr::segment_t::_flg): Ditto.
+	(server_shmmgr::segment_t::_hFileMap): Ditto.
+	(server_shmmgr::segment_t::_attach_head): New private field.
+	(server_shmmgr::segment_t::segment_t): Initialise new fields.
+	Make non-inline.
+	(server_shmmgr::segment_t::~segment_t): New method.
+	(server_shmmgr::segment_t::is_deleted): Ditto.
+	(server_shmmgr::segment_t::is_pending_delete): Ditto.
+	(server_shmmgr::segment_t::mark_deleted): Ditto.
+	(server_shmmgr::segment_t::attach): Ditto.
+	(server_shmmgr::segment_t::detach): Ditto.
+	(server_shmmgr::segment_t::find): Ditto.
+	(class server_shmmgr::cleanup_t): New class.
+	(server_shmmgr::_shm_atts): New private field.
+	(server_shmmgr::shmat): Add a process object argument to replace
+	the removed process_cache, cygpid and winpid arguments.  Remove
+	the process_cache manipulations.  Move body of code to the
+	segment_t::attach method.  Increment _shm_atts when required.
+	Update tracing statements.
+	(server_shmmgr::shmdt): Add a process object argument to replace
+	the removed cygpid argument.  Move body of code to the
+	segment_t::detach method.  Decrement _shm_atts when required.
+	Update tracing statements.
+	(server_shmmgr::shmget): Use the new segment_t::is_deleted method.
+	(server_shmmgr::server_shmmgr): Initialise the new _shm_atts
+	field.
+	(server_shmmgr::delete_segment): Remove the CloseHandle code, as
+	this is now done in the segment_t destructor.
+	(client_request_shm::serve): Look up the client's process object
+	and pass to the server_shmmgr::shmat and server_shmmgr::shmdt
+	methods rather than passing the cache, winpid and cygpid.
+	* cygserver_process.h: Add a cygpid to the process object to make
+	it more useful and then pass process objects rather than winpids
+	where possible.
+	(cleanup_routine::cleanup): Change argument to be a pointer to a
+	process object.
+	(class process): Re-order fields for no discernible reason.
+	(process::_cygpid): New field.
+	(process::process): Add a cygpid argument.
+	(process::winpid): New method.
+	(process::cygpid): Ditto.
+	(process::add): Make public, as it always should have been.
+	(process_cache::process): Add a cygpid argument.
+	* cygserver_process.cc (process::process): Add a cygpid argument
+	and use it to initialise the `_cygpid' field.  Re-order
+	initialisers to match new field order.
+	(process::cleanup): Pass `this' rather than just the winpid to
+	cleanup_routine::cleanup.
+	(process_cache::process): Add a cygpid argument and pass it to the
+	process object constructor.
+	* include/sys/shm.h (shmatt_t): Make unsigned as per SUSv3.
+	(shm_info::shm_atts): New field.
+
+2002-07-11  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_shm.cc (class server_shmmgr::segment_t): Add `_'
+	prefix to the names of all fields.
+
+2002-07-10  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* msg.cc: New file of stub functions, no functionality.
+	* sem.cc: Ditto.
+	* shm.cc (client_shmmgr::shmctl): Add support for an out shm_info
+	buffer for the SHM_INFO command.
+	(client_shmmgr::shmget): Use %X to print keys.
+	* include/sys/ipc.h: Comment all fields and values.
+	(IPC_PRIVATE): Change to be non-negative.
+	* include/sys/msg.h: New file with SUSv3 and ipcs(8) interfaces.
+	* include/sys/sem.h: Ditto.
+	* include/sys/shm.h: Comment all fields and values.
+	(struct shm_info): New struct.
+	* cygserver_shm.h (client_request_shm::shminfo): Rename.
+	(client_request_shm::shm_info): New method.
+	(client_request_shm::_parameters.out.hFileMap): Move into union.
+	(client_request_shm::_parameters.out.shminfo): Rename.
+	(client_request_shm::_parameters.out.shm_info): New field.
+	* cygserver_shm.cc (server_shmmgr::_shm_ids): Rename.
+	(server_shmmgr::_shm_tot): New field.
+	(server_shmmgr::shmctl): Rename `out_shminfo' argument.  Add
+	`out_shm_info' argument.  Fill in the `out_shm_info' argument in
+	the SHM_INFO command.
+	(server_shmmgr::shmget): Check `shmflg' against the mode of
+	existing segments as per Stevens 1990, p. 123.
+	(server_shmmgr::server_shmmgr): Initialise the new `_shm_tot'
+	field.
+	(server_shmmgr::new_segment): Set ENOMEM if CreateFileMapping
+	fails.  Pass `size' to new_segment.
+	(server_shmmgr::new_segment): Add size argument and use it to
+	check against and update the new `_shm_tot' field.
+	(server_shmmgr::delete_segment): Update the new `_shm_tot' field.
+	* Makefile.in (DLL_OFILES): Add new DLL object files.
+
+2002-07-09  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_transport_pipes.cc: The main change is to make the
+	client try harder to connect to the server if it's previously
+	connected, and so has good grounds for believing that the server
+	is running.
+	(MAX_WAIT_NAMED_PIPE_RETRY): Change to be an enumerator.
+	(WAIT_NAMED_PIPE_TIMEOUT): Ditto.
+	(transport_layer_pipes::accept): Use interlocked operators on
+	`pipe_instance'.
+	(transport_layer_pipes::close): Rearrange so that FlushFileBuffers
+	and DisconnectNamedPipe are only called for accepted endpoints.
+	Use interlocked operators on `pipe_instance'.
+	(transport_layer_pipes::read): Use set_errno where required.
+	(transport_layer_pipes::write): Ditto.
+	(transport_layer_pipes::connect): Add local static variable
+	`assume_cygserver'.  Set it if a connection is made to cygserver,
+	clear it if a connection is not made even after retrying.  If set,
+	ignore all errors from CreateFile and retry the connection.  Catch
+	the situation where WaitNamedPipe fails to wait [sic] and add a
+	`Sleep (0)' so that the server gets a chance to run.
+
+2002-07-03  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* dcrt0.cc: Only check for cygserver if and when required.
+	(dll_crt0_1): Remove call to `cygserver_init ()'.
+	* fhandler_tty.cc (fhandler_tty_slave::open): Change the cygserver
+	logic to allow for the fact that `cygserver_init ()' may not yet
+	have been called.
+	(fhandler_tty_slave::cygserver_attach_tty): Tweak the cygserver
+	request logic to conform to the practice elsewhere in the code.
+	* tty.cc (tty::common_init): Add an explicit call to
+	`cygserver_init ()' if it hasn't already been called.
+	* include/cygwin/cygserver.h (CYGSERVER_UNAVAIL): Rename from
+	`CYGSERVER_DEAD'.
+	(client_request_get_version::check_version): Make available in
+	cygserver as well the DLL.
+	(check_cygserver_available): Ditto.  Remove `check_version_too'
+	argument.
+	(cygserver_init): Ditto.  And likewise.
+	* cygserver_client.cc (client_request_get_version::check_version):
+	Make available in cygserver as well the DLL.
+	(client_request::make_request): This may now be called without
+	`cygserver_init ()' having been called first.  Detect this and
+	call it as required.  Add tracing.
+	(check_cygserver_available): Make available in cygserver as well
+	the DLL.  Remove `check_version_too' argument and always check the
+	version information.  And since this is called from within
+	`cygserver_init ()', force `cygserver_running' before calling
+	`client_request::make_request ()'.
+	(cygserver_init): Make available in cygserver as well the DLL.
+	Remove `check_version_too' argument.
+
+2002-07-03  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_shm.cc: Implement the ipcs(8) interfaces, IPC_INFO,
+	SHM_STAT and SHM_INFO.
+	(server_shmmgr::segment_t::sequence): New static field.
+	(server_shmmgr::segment_t::key): Remove field, use the new
+	ds.shm_perm.key field instead.
+	(server_shmmgr::segment_t::shmid): Remove field.
+	(server_shmmgr::segment_t::intid): New field.
+	(server_shmmgr::segment_t::segment_t): Use the `key' argument to
+	initialise `ds.shm_perm.key'.  Change from using `shmid' to
+	`intid'.
+	(server_shmmgr::_shmseg_cnt): Renamed from `_shmid_cnt'.
+	(server_shmmgr::_intid_max): Renamed from `_shmid_max.
+	(server_shmmgr::shmat): Move the out arguments to the start of the
+	argument list.  Rename the `pid' argument as `cygpid'.  Add
+	tracing.  Pass an intid to `find ()', not a shmid.
+	(server_shmmgr::shmctl): Add separate out arguments.  Rename the
+	`pid' argument as `cygpid'.  Add support for the ipcs(8)
+	interfaces.  Add tracing.  Pass an intid to `find ()', not a
+	shmid.
+	(server_shmmgr::shmdt): Rename the `pid' argument as `cygpid'.
+	Add tracing.  Pass an intid to `find ()', not a shmid.
+	(server_shmmgr::shmget): Add a separate out arguments.  Rename the
+	`pid' argument as `cygpid'.  Add tracing.
+	(server_shmmgr::server_shmmgr): Update for new field names.
+	(server_shmmgr::find_by_key): Update for the new `ds.shm_perm.key'
+	field.
+	(server_shmmgr::find): Update to use the new `segment_t::intid'
+	field.
+	(server_shmmgr::new_segment): Rename the `pid' argument as
+	`cygpid'.  Check that the requested size is within bounds.  Handle
+	new error result from `new_segment (key, HANDLE)'.
+	(server_shmmgr::new_segment): Work with intids, not shmids.  Check
+	that the new intid is within bounds.  Update for new field names.
+	(server_shmmgr::delete_segment): Pass an intid to `find ()', not a
+	shmid.  Update for new field names.
+	(client_request_shm::serve): Check that the incoming message
+	length is the size of the `_parameters.in' struct, not of the
+	whole in/out parameter union.  Likewise, set the outgoing message
+	length to the size of the `_parameters.out' struct.  Update for
+	the new server_shmmgr interfaces.
+	* include/sys/ipc.h (ipc_perm::key): New field.
+	* include/sys/shm.h (SHM_INFO): New constant.
+	* cygserver_ipc.h (IPCMNI): New constant.
+	(ipc_int2ext): Add `sequence' argument and munge this into the
+	external ipc id.
+	(ipc_ext2int_subsys): Unmunge the sequence number from the
+	external ipc id.
+	(ipc_ext2int): Ditto.
+	(ipc_inc_id): Remove.
+	(ipc_dec_id): Remove.
+	* cygserver_shm.h (SHMMAX): New constant.
+	(SHMMIN): Ditto.
+	(SHMMNI): Ditto.
+	(SHMSEG): Ditto.
+	(SHMALL): Ditto.
+	(client_request_shm::_parameters): Re-arrange as a union of two
+	separate structs, one for in arguments, the other for out.
+	(client_request_shm::shmid): Update for the new parameter layout.
+	(client_request_shm::ds): Ditto.
+	(client_request_shm::info): New method.
+	* shm.cc (client_shmmgr::_shmat_cnt): New static field.
+	(client_shmmgr::shmat): Add locking.  Add tracing.
+	(client_shmmgr::shmctl): Update for ipcs(8) commands.  Add
+	tracing.  Add more argument checking.
+	(client_shmmgr::shmdt): Add locking.  Add tracing.  Update the new
+	`_shmat_cnt' field.
+	(client_shmmgr::shmget): Add tracing.
+	(client_shmmgr::fixup_shms_after_fork): Add tracing.  Add
+	consistency checking.
+	(client_shmmgr::attach): Add more tracing.
+	(client_shmmgr::new_segment): Update the new `_shmat_cnt' field.
+	(client_request_shm::client_request_shm): Update for the new
+	parameter layout.  Set the outgoing message length to the size of
+	the `_parameters.in' struct, not of the whole in/out parameter
+	union.
+
+2002-07-02  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* shm.cc: Remove the use of a static client_shmmgr object.
+	(client_shmmgr::_instance): New static variable.
+	(client_shmmgr::instance): Allocate a new shmmgr on the heap,
+	rather than using a local static object.
+
+2002-07-01  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_transport.cc (create_server_transport): Fix
+	cut-and-paste error.
+
+2002-06-30  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_client.cc (client_request::handle_request): Don't
+	bother with the client request activity marker when compiled with
+	debugging output.
+
+2002-06-30  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_transport_pipes.cc
+	(MAX_WAIT_NAMED_PIPE_RETRY): New constant.
+	(WAIT_NAMED_PIPE_TIMEOUT): Ditto.
+	(transport_layer_pipes::close): The `pipe' field is now either
+	NULL or a valid handle, and it should never have the value
+	`INVALID_HANDLE_VALUE'.
+	(transport_layer_pipes::read): Ditto.
+	(transport_layer_pipes::write): Ditto.
+	(transport_layer_pipes::connect): Ditto.
+	(transport_layer_pipes::impersonate_client): Ditto.
+	(transport_layer_pipes::connect): Ditto.  New, but still bogus,
+	retry logic.
+
+2002-06-30  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_shm.cc (server_shmmgr::server_shmmgr): All fields have
+	to be initialized now that the singleton is no longer static.
+
+2002-06-30  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_shm.cc (server_shmmgr::_instance): New static field.
+	(server_shmmgr::_instance_once): Ditto.
+	(server_shmmgr::initialise_instance): New static method.
+	(server_shmmgr::instance): Use a pthread_once_t rather than
+	relying on a local static variable.
+
+2002-06-30  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* woutsup.h: Remove all uses of the C++ new and delete operators
+	throughout cygserver until they are fully thread-safe.
+	(safe_new0): New macro to replace the C++ new operator.
+	(safe_new): Ditto.
+	(safe_delete): New macro to replace the C++ delete operator.
+	* cygserver_client.cc (client_request::handle_request): Replace
+	all uses of the C++ new and delete operators with the new macros
+	from "woutsup.h".
+	(client_request::make_request): Ditto.
+	* cygserver_process.cc (~process_cleanup): Ditto.
+	(process::cleanup): Ditto.
+	(process_cache::process): Ditto.
+	(process_cache::check_and_remove_process): Ditto.
+	* cygserver_shm.cc (server_shmmgr::new_segment): Ditto.
+	(server_shmmgr::delete_segment): Ditto.
+	* cygserver_transport.cc (create_server_transport): Ditto.
+	* cygserver_transport_pipes.cc
+	(transport_layer_pipes::accept): Ditto.
+	* cygserver_transport_sockets.cc
+	(transport_layer_sockets::accept): Ditto.
+	* threaded_queue.cc (~threaded_queue): Ditto.
+	(threaded_queue::worker_loop): Ditto.
+	(threaded_queue::stop): Replace sleep(3) with win32 Sleep.
+	* cygserver.cc (~server_request): Replace all uses of the C++ new
+	and delete operators with the new macros from "woutsup.h".
+	(server_submission_loop::request_loop): Ditto.
+	(main): Ditto.  Replace sleep(3) with win32 Sleep.  Replace
+	iostreams with FILEs.
+	(print_usage): Replace iostreams with FILEs.
+	(print_version): Ditto.
+
+2002-06-30  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_transport_sockets.cc
+	(transport_layer_sockets::accept): Rename local variable
+	`accept_fd' to avoid shadowing the `fd' field.
+
+2002-06-29  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygwin_ipc.h: Moved (back) to "include/sys/ipc.h".
+	* cygwin_shm.h: Moved (back) to "include/sys/shm.h".
+	* include/sys/ipc.h: New file.
+	* include/sys/shm.h: New file.
+	* cygserver_shm.h: Update for new header file locations.
+	* ipc.cc: Ditto.
+
+2002-06-28  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_client.cc (client_request::make_request): Comment out
+	a verbose tracing statement.
+	* cygserver_process.cc (process_cache::sync_wait_array): Fix
+	broken assert.
+	* include/cygwin/cygserver.h (class client_request): Remove excess
+	use of `class' qualifier in declarations.
+	(class client_request_get_version): Ditto.
+	(class client_request_shutdown): Ditto.
+	(class client_request_attach_tty): Ditto.
+
+2002-06-28  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_ipc.h: New file.
+	* cygserver_shm.h: Re-written from scratch.
+	* cygserver_shm.cc: Ditto.
+	* shm.cc: Ditto.
+
+2002-06-28  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* threaded_queue.h (class queue_request): Re-write.
+	(threaded_queue_thread_function): Remove.
+	(class queue_process_param): Remove.
+	(class threaded_queue): Re-write.
+	(class queue_submission_loop): New version of the old
+	`queue_process_param' class.
+	(TInterlockedExchangePointer): New templated function.
+	(TInterlockedCompareExchangePointer): Ditto.
+	* threaded_queue.cc (worker_function): Remove.
+	(class threaded_queue): Re-write.
+	(class queue_process_param): Remove.
+	(class queue_submission_loop): New version of the old
+	`queue_process_param' class.
+	* include/cygwin/cygserver_process.h (process_cleanup): Re-write.
+	(class process_process_param): Remove.
+	(class cleanup_routine): Re-write.
+	(class process): Re-write.
+	(class process_cache): Re-write.
+	* cygserver_process.cc (process_cleanup): Re-write.
+	(class process_process_param): Remove.
+	(class cleanup_routine): Re-write.
+	(class process): Re-write.
+	(class process_cache): Re-write.
+	* cygserver.cc (request_count): Remove unused variable.
+	(class server_request): Move methods inline.
+	(class server_process_param): Remove.
+	(class server_request_queue): Remove.
+	(request_queue): Move into `main ()' and change type to
+	`threaded_queue'.
+	(request_loop): Remove.
+	(class server_submission_loop): New version of the old
+	`server_process_param' class.
+	(shutdown_server): New variable.
+	(client_request_shutdown::serve): Set `shutdown_server' to trigger
+	shutdown.
+	(handle_signal): Ditto.
+	(main): Install signal handler for SIGINT rather than SIGQUIT.
+	Use new interfaces for the `request_queue' and the `cache'.
+	Create a `server_submission_loop' and add to the `request_queue'.
+	Add check for the `shutdown_server' variable to the main loop.
+	* cygserver_shm.cc (client_request_shm::serve): Release the
+	process object after use.
+
+2002-06-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_client.cc (client_request::handle_request): Correct
+	tracing statement.
+	* cygserver_transport_pipes.cc: Remove local definition of
+	FILE_FLAG_FIRST_PIPE_INSTANCE constant.
+	* cygwin_ipc.h: Update copyright notice.
+	* cygwin_shm.h: Ditto.
+	* woutsup.h: Add definition of _WIN32_WINNT.
+
+2002-06-24  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_client (client_request::make_request): Replace my
+	inappropriate use of set_errno () with error_code () throughout.
+
+2002-06-24  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* include/cygwin/cygserver.h: Add forward declarations of class
+	transport_layer_base and class process_cache to reduce
+	dependencies between header files.
+	* include/cygwin/cygserver_process.h: Add include of
+	"threaded_queue.h".
+	* cygserver.cc: Remove unnecessary cygserver header files.
+	* cygserver_client.cc: Ditto.
+	* cygserver_process.cc: Ditto.
+	* cygserver_shm.cc: Ditto.
+	* cygserver_shm.h: Ditto.
+	* cygserver_transport_pipes.cc: Ditto.
+	* dcrt0.cc: Ditto.
+	* fhandler_tty.cc: Ditto.
+	* tty.cc: Ditto.
+
+2002-06-24  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_shm.h: Replace <sys/shm.h> with "cygwin_shm.h" after
+	merge from HEAD.
+	* cygwin_ipc.h: Update with changes to include/sys/ipc.h lost in
+	merge from HEAD.
+	* cygwin_shm.h: Ditto.
+
+2002-06-21  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver.cc: The tests for a duplicate server instance are now
+	the responsibility of the transport layer.
+	(request_loop): Use new `recoverable' flag in call to
+	`cygserver_transport::accept ()' and shutdown on an unrecoverable
+	error.
+	(main): Never call `cygserver_init ()'.  Fake `cygserver_running'
+	just for sending a shutdown request.
+	* cygserver_client.cc (client_request::send): Comment out
+	message-size tracing statements as verbose.
+	(client_request::handle): Ditto.
+	(client_request_get_version::check_version): #ifdef as DLL-only.
+	(check_cygserver_available): Ditto.
+	(cygserver_init): Ditto.
+	* include/cygwin/cygserver.h
+	(client_request_get_version::check_version): #ifdef as DLL-only.
+	(check_cygserver_available): Ditto.
+	(cygserver_init): Ditto.
+	* include/cygwin/cygserver_transport.h
+	(transport_layer_base::impersonate_client): #ifdef as
+	cygserver-only.
+	(transport_layer_base::revert_to_self): Ditto.
+	(transport_layer_base::listen): Ditto.
+	(transport_layer_base::accept): Ditto.  Add a `recoverable' out
+	flag for error handling.
+	* include/cygwin/cygserver_transport_sockets.h: Ditto.
+	* include/cygwin/cygserver_transport_pipes.h: Ditto.
+	(transport_layer_pipes): Change type of the `pipe_name' field.
+	Remove the `inited' field, as unnecessary.  Add new
+	`is_accepted_endpoint' field.
+	* include/cygwin/cygserver_transport.cc
+	(transport_layer_base::impersonate_client): #ifdef as
+	cygserver-only.
+	(transport_layer_base::revert_to_self): Ditto.
+	* include/cygwin/cygserver_transport_sockets.cc
+	(transport_layer_sockets::listen): #ifdef as cygserver-only.
+	(transport_layer_sockets::accept): #ifdef as cygserver-only.
+	Analyse any errno from `accept ()' and set `recoverable' as
+	appropriate.
+	* cygserver_transport_pipes.cc: Add local #define of
+	`FILE_FLAG_FIRST_PIPE_INSTANCE'.
+	(pipe_instance_lock_once): New variable.
+	(pipe_instance_lock): Ditto.
+	(pipe_instance): Ditto.
+	(initialise_pipe_instance_lock): New function.
+	(transport_layer_pipes::transport_layer_pipes): Change
+	initialization of `pipe_name'.  Initialize `is_accepted_endpoint'
+	as appropriate.  Remove use of `inited'.
+	(transport_layer_pipes::impersonate_client): #ifdef as
+	cygserver-only.
+	(transport_layer_pipes::revert_to_self): Ditto.
+	(transport_layer_pipes::listen): Ditto.
+	(transport_layer_pipes::accept): Ditto.  Keep track of how often
+	many named pipes have been created, in the `pipe_instance'
+	variable, and pass the `FILE_FLAG_FIRST_PIPE_INSTANCE' flag on the
+	open of the first instance.  Analyse the error code from
+	`CreateNamedPipe ()' and set the `recoverable' flag as
+	appropriate.
+	(transport_layer_pipes::close): Update the `pipe_instance' count.
+
+2002-06-18  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* woutsup.h (cygserver_running): Add declaration.
+	(api_fatal): Eliminate.
+	* include/cygwin/cygserver.h
+	(client_request_get_version::check_version): Change return type to
+	bool.
+	(check_cygserver_available): New function.
+	(cygserver_init): Add check_version_too argument.
+	* cygserver_client.cc (allow_daemon): Make a bool.
+	(client_request_get_version::make_request): See errno on error.
+	Remove special case for CYGSERVER_REQUEST_GET_VERSION; this is now
+	handled in cygserver_init().
+	(client_request_get_version::check_version): Use syscall_printf()
+	instead of api_fatal(). Return true if cygserver version is
+	compatible.
+	(check_cygserver_available): New function; code moved here from
+	cygserver_init().
+	(cygserver_init): Move some code into check_cygserver_available().
+	* cygserver.cc (__set_errno): Copy from debug.cc so that
+	set_errno() can be used when __OUTSIDE_CYGWIN__.
+	(main): Call cygserver_init() to set up cygserver_running and add
+	checks against this to (try and) prevent multiple copies of
+	cygserver running simultaneously.  Remember to delete all
+	transport connections so that (one day) the transport classes can
+	tidy up on cygserver shutdown.
+
+2002-06-17  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver.cc (main): Adjust tracing output for a cleaner display
+	when compiled without --enable-debugging.
+	* threaded_queue.cc (threaded_queue::cleanup): Ditto.
+	(queue_process_param::stop): Ditto.
+	* include/cygwin/cygserver.h
+	(client_request::make_request): Make non-virtual.
+	(client_request::send): Make virtual and protected, not private.
+	(client_request_attach_tty::send): New virtual method.
+	* cygserver_client.cc: Use the `msglen()' accessor rather than
+	`_header.msglen' throughout.
+	(client_request_attach_tty::send): New method.
+	(client_request::make_request): Remove the explicit close of
+	`transport' as it is closed on deletion.
+
+2002-06-17  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* include/cygwin/cygserver.h: Change the client_request classes to
+	give greater encapsulation and to allow variable length requests
+	and replies.
+	(enum cygserver_request_code): Now client_request::request_code_t.
+	(class request_header): Now client_request::header_t.  Make a
+	union of the request_code and the error_code.  The `cb' field,
+	which was the buffer length, is now the `size_t msglen' field.
+	(struct request_get_version): Now
+	client_request_get_version::request_get_version.
+	(struct request_shutdown): Remove unused type.
+	(struct request_attach_tty): Now
+	client_request_attach_tty::request_attach_tty.
+	(client_request::_buf): Make field const.
+	(client_request::_buflen): New const private field.
+	(client_request::request_code): New accessor.
+	(client_request::error_code): Ditto.
+	(client_request::msglen): Ditto.
+	(client_request::handle_request): New static method.
+	(client_request::make_request): New virtual method.
+	(client_request::handle): New method.
+	(client_request::send): Make private.
+	(client_request_get_version::check_version): New method.
+	(client_request_get_version::serve): Make private.
+	(client_request_get_version::version): Ditto.
+	(client_request_shutdown::serve): Ditto.
+	(client_request_attach_tty::req): Ditto.
+	(client_request_attach_tty::serve): Ditto.
+	(client_request_attach_tty::from_master): Make method const.
+	(client_request_attach_tty::from_master): Ditto.
+	* cygserver_client.cc
+	(client_request_get_version::client_request_get_version): Track
+	changes to the client_request classes.
+	(client_request_attach_tty::client_request_attach_tty): Ditto.
+	(client_request_get_version::check_version): New method to
+	encapsulate code from cygserver_init().
+	(client_request_shutdown::client_request_shutdown): Move into
+	"cygserver.cc".
+	(client_request::send): Track changes to the client_request
+	classes.  Add more error checking.
+	(client_request::handle_request): New static method containing the
+	first half of the old server_request::process() code.
+	(client_request::make_request): New method to replace the old
+	cygserver_request() function.
+	(client_request::handle): New method containing the second half of
+	the old server_request::process() code.
+	(cygserver_init): Track changes to the client_request classes.  In
+	particular, some code moved into the
+	client_request_get_version::check_version() method.
+	* cygserver.cc (client_request_attach_tty::serve): Track changes
+	to the client_request classes.  In particular, only return a reply
+	body if some handles are successfully duplicated for the client.
+	And remove goto's.
+	(client_request_get_version::serve): Track changes to the
+	client_request classes.
+	(client_request_shutdown::serve): Ditto.
+	(class client_request_invalid): Dead, and so young too.
+	(server_request::request_buffer): Remove unnecessary field.
+	(client_request_shutdown::client_request_shutdown): Moved here
+	from "cygserver_client.cc".
+	(server_request::process): Implementation moved into the new
+	client_request::handle_request() and client_request::handle()
+	methods.
+	* cygserver_shm.h (class client_request_shm): Put client- and
+	server-specific interfaces inside #ifdef/#ifndef __INSIDE_CYGWIN__
+	guards.
+	(client_request_shm::serve): Make private.
+	* cygserver_shm.cc
+	(client_request_shm::client_request_shm): Track changes to the
+	client_request classes.
+	(client_request_shm::serve): Ditto
+	* shm.cc (client_request_shm::client_request_shm): Ditto.  Use
+	alloc_sd() rather than set_security_attribute() to get access to
+	the SECURITY_DESCRIPTOR length, so that we can use it to set the
+	request body length.
+	(shmat): Track changes to the client_request classes. In
+	particular, allocate client_request objects on the stack rather
+	than on the heap, and use the client_request::make_request()
+	method rather than the old cygserver_request() function.
+	(shmdt): Ditto.
+	(shmctl): Ditto.
+	(shmget): Ditto.
+	* fhandler_tty.cc (fhandler_tty_slave::cygserver_attach_tty): Ditto.
+
+2002-06-17  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* include/cygwin/cygserver_transport.h
+	(cygserver_transport::read): Change buffer type to void *.
+	(cygserver_transport::write): Ditto.
+	* include/cygwin/cygserver_transport_sockets.h
+	(cygserver_transport_sockets::read): Ditto.
+	(cygserver_transport_sockets::write): Ditto.
+	* include/cygwin/cygserver_transport_pipes.h
+	(cygserver_transport_pipes::read): Ditto.
+	(cygserver_transport_pipes::write): Ditto.
+	* cygserver_transport_sockets.cc
+	(cygserver_transport_sockets::read): Ditto.
+	(cygserver_transport_sockets::write): Ditto.
+	* cygserver_transport_pipes.cc
+	(cygserver_transport_pipes::read): Ditto. Set errno on error, to
+	match behaviour of cygserver_transport_sockets class.
+	(cygserver_transport_pipes::write): Ditto.
+
+2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver.cc (version): New static variable.
+	(server_request_queue::add_connection): Remove my gratuitous use
+	of studly caps.
+	(setup_privileges): Declare static.
+	(handle_signal): Ditto.
+	(longopts): Make a local variable of main().
+	(opts): Ditto.
+	(print_usage): New function.
+	(print_version): Ditto (tip of the hat to Joshua Daniel Franklin
+	for inspiration here).
+	(main): More argument checking.  Add --help and --version options.
+
+2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* include/cygwin/cygserver.h (client_request::serve): Make pure
+	virtual.
+	* cygserver.cc (client_request::serve): Remove definition of pure
+	virtual method.
+	(class client_request_invalid): New class.
+	(server_request::process): Use new client_request_invalid
+	class. And remove goto's.
+
+2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver.cc (class server_request): Add virtual destructor.
+	(server_request_queue::addConnection): New method to replace bad
+	virtual add() method.
+	(request_loop): Replace call to queue->add() with call to
+	queue->addConnection().
+	(server_request::server_request): Use field initialization.
+	(server_request::~server_request): New virtual destructor.
+	(server_request::process): Remove close and delete of
+	transport_layer_base object. It is deleted by the server_request's
+	own destructor and closed by its own destructor.
+	* include/cygwin/cygserver.h
+	(client_request::operator request_header): Remove unused method.
+	* cygserver_client.cc: Ditto.
+	* include/cygwin/cygserver_process.h
+	(class cleanup_routine): Add virtual destructor.
+	(cleanup_routine::cleanup): Make pure virtual.
+	(class process_cache): Make destructor non-virtual.
+	(process_cache::add): Ditto.
+	* cygserver_process.cc
+	(cleanup_routine::~cleanup_routine): New virtual destructor.
+	* include/cygwin/cygserver_transport.h
+	(class transport_layer_base): Add virtual destructor.
+	* cygserver_transport.cc
+	(transport_layer_base::~transport_layer_base): New virtual
+	destructor.
+	* include/cygwin/cygserver_transport_pipes.h
+	(class transport_layer_pipes): Add virtual destructor.
+	* cygserver_transport_pipes.cc
+	(transport_layer_pipes::~transport_layer_pipes): New virtual
+	destructor.
+	(transport_layer_pipes::close): Null out handle after closing.
+	* include/cygwin/cygserver_transport_sockets.h
+	(class transport_layer_sockets): Add virtual destructor.
+	* cygserver_transport_sockets.cc
+	(transport_layer_sockets::~transport_layer_sockets): New virtual
+	destructor.
+	(transport_layer_sockets::close): Null out fd after closing.
+	* threaded_queue.h (class queue_request): Add virtual destructor.
+	(queue_request::process): Make pure virtual.
+	* threaded_queue.cc (~queue_request): New virtual destructor.
+	(queue_request::process): Remove definition of pure virtual
+	method.
+
+2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* include/cygwin/cygserver.h (client_request::send): Make
+	non-virtual.
+	(class client_request_attach_tty): Put client- and server-specific
+	interfaces inside #ifdef/#ifndef __INSIDE_CYGWIN__ guards.
+	* cygserver_client.cc: Ditto.
+	(cygserver_init): Fix error handling.
+
+2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver.cc: Throughout the code, check and correct level of
+	the XXX_printf() functions used. Comment out several of the
+	debug_printf() calls with "// verbose:".  Reformat and correct
+	typos of some of the XXX_printf() formats.
+	* cygserver_process.cc: Ditto.
+	* cygserver_shm.cc: Ditto.
+	* cygserver_transport_pipes.cc: Ditto.
+	* cygserver_transport_sockets.cc: Ditto.
+	* shm.cc (hi_ulong): New function to allow printing of a 64-bit
+	key with current small_printf implementation.
+	(lo_ulong): Ditto.
+	(client_request_shm::client_request_shm): Use hi_ulong() and
+	lo_ulong() in call to debug_printf().
+
+2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_shm.cc: Remove #define __INSIDE_CYGWIN__ from around
+	<sys/shm.h> as it no longer contains any internal code.
+
+2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* include/sys/ipc.h (IPC_PRIVATE): Add cast to key_t.
+	(IPC_INFO): New flag for ipcs(8).
+	(IPC_RMID IPC_SET IPC_STAT): Renumber.
+	* include/sys/shm.h (SHM_RDONLY SHM_RND): Renumber with distinct
+	values [sic].
+	(class _shmattach): Internal type moved to "cygserver_shm.h".
+	(class shmnode): Ditto.
+	(class shmid_ds): Ditto.
+	(struct shmid_ds): Add spare fields.
+	(struct shminfo): New type for IPC_INFO interface.
+	* cygserver_shm.h: Remove obsolete #if 0 ... #endif block.
+	(class shm_cleanup): Remove unused class.
+	(struct _shmattach): Internal type moved from <sys/shm.h>.
+	(struct shmnode): Ditto.
+	(struct int_shmid_ds): Ditto. Renamed to avoid name clash with
+	public interface struct shmid_ds. Use the shmid_bs structure as a
+	field.
+	* cygserver_shm.cc: Remove obsolete #if 0 ... #endif block.
+	(client_request_shm::serve): Update for redefinition of
+	int_shmid_ds structure.
+	* shm.cc (build_inprocess_shmds): Ditto.
+	(fixup_shms_after_fork): Ditto.
+	(shmctl): Ditto.
+	(shmget): Ditto. Remove obsolete #if 0 ... #endif code.
+
+2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* include/cygwin/cygserver_transport.h
+	(transport_layer_base::transport_layer_base): Remove since it is
+	now redundant.
+	(transport_layer_base::listen): Make a pure virtual method.
+	(transport_layer_base::accept): Ditto.
+	(transport_layer_base::close): Ditto.
+	(transport_layer_base::read): Ditto.
+	(transport_layer_base::write): Ditto.
+	(transport_layer_base::connect): Ditto.
+	* cygserver_transport.cc
+	(transport_layer_base::transport_layer_base): Remove since it is
+	now redundant.
+	(transport_layer_base::listen): Remove since it is now a pure
+	virtual method.
+	(transport_layer_base::accept): Ditto.
+	(transport_layer_base::close): Ditto.
+	(transport_layer_base::read): Ditto.
+	(transport_layer_base::write): Ditto.
+	(transport_layer_base::connect): Ditto.
+
+2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver.cc (check_and_dup_handle): Only use security code if
+	running on NT, i.e. if wincap.has_security().
+	(client_request_attach_tty::serve): Add check for has_security().
+	* cygserver_process.cc (process_cache::process): Use DWORD winpid
+	throughout to avoid win32 vs. cygwin pid confusion.
+	(process::process): Ditto.
+	* cygserver_shm.cc (client_request_shm::serve): Only use security
+	code if running on NT, i.e. if wincap.has_security().
+	* cygserver_shm.h (client_request_shm::parameters.in): Replace the
+	ambiguous pid field with cygpid and winpid fields.
+	(client_request_shm::client_request_shm): Reduce to only two
+	client-side constructors: one for SHM_CREATE, another for all the
+	other requests.
+	* shm.cc (client_request_shm::client_request_shm):
+	Ditto. Initialize cygpid and winpid fields here. On NT initialize
+	sd_buf here using set_security_attribute() to make use of the euid
+	and egid.
+	(shmat): Use new client_request_shm constructor.
+	(shmdt): Ditto.
+	(shmctl): Ditto.
+	(shmget): Ditto. Remove security code, now performed in the
+	relevant client_request_shm constructor.
+	* include/cygwin/cygserver_process.h: (class cleanup_routine):
+	Change winpid type to DWORD.
+	(class process): Ditto.
+
+2002-06-15  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* woutsup.h: New file.
+	* cygserver.cc: Use "woutsup.h" and new XXX_printf macros.
+	(getfunc): New function, copied verbatim from "strace.cc".
+	(__cygserver__printf): New function.
+	* cygserver_client.cc: Use "woutsup.h" and new XXX_printf macros.
+	* cygserver_process.cc: Ditto.
+	* cygserver_shm.cc: Ditto.
+	* cygserver_transport.cc: Ditto.
+	* cygserver_transport_pipes.cc: Ditto.
+	* cygserver_transport_sockets.cc: Ditto.
+	* threaded_queue.cc: Ditto.
+	* shm.cc: Remove trailing \n from XXX_printf format strings.
+	* Makefile.in: Remove special __OUTSIDE_CYGWIN__ case for
+	cygserver_shm.cc.
+
 2002-09-21  Christopher Faylor  <cgf@redhat.com>
 
 	* init.cc (dll_entry): Temporarily disable thread detach code.

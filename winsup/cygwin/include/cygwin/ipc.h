@@ -1,6 +1,6 @@
 /* sys/ipc.h
 
-   Copyright 2001 Red Hat Inc. 
+   Copyright 2001, 2002 Red Hat Inc.
    Written by Robert Collins <rbtcollins@hotmail.com>
 
 This file is part of Cygwin.
@@ -9,45 +9,45 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#ifndef _SYS_IPC_H
+#define _SYS_IPC_H
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-#ifndef _SYS_IPC_H
-#define _SYS_IPC_H
+struct ipc_perm
+{
+  uid_t  uid;			/* Owner's user ID. */
+  gid_t  gid;			/* Owner's group ID. */
+  uid_t  cuid;			/* Creator's user ID. */
+  gid_t  cgid;			/* Creator's group ID. */
+  mode_t mode;			/* Read/write permission. */
+  key_t  key;
+};
 
-/* sys/types must be included before sys/ipc.h. We aren't meant to automatically 
- * include it however 
+/* Mode bits:
  */
+#define IPC_CREAT  0x0200	/* Create entry if key does not exist. */
+#define IPC_EXCL   0x0400	/* Fail if key exists. */
+#define IPC_NOWAIT 0x0800	/* Error if request must wait. */
 
-struct ipc_perm {
-  uid_t  uid;
-  gid_t  gid;
-  uid_t  cuid;
-  gid_t  cgid;
-  mode_t mode;
-}; 
-
-/* the mode flags used with the _get functions use the low order 9 bits for a mode 
- * request
+/* Keys:
  */
-#define IPC_CREAT  0x0200
-#define IPC_EXCL   0x0400
-#define IPC_NOWAIT 0x0800
+#define IPC_PRIVATE ((key_t) 0)	/* Private key. */
 
-/* this is a value that will _never_ be a valid key from ftok */
-#define IPC_PRIVATE -2
+/* Control commands:
+ */
+#define IPC_RMID 0x1000		/* Remove identifier. */
+#define IPC_SET  0x1001		/* Set options. */
+#define IPC_STAT 0x1002		/* Get options. */
+#define IPC_INFO 0x1003		/* For ipcs(8). */
 
-/* ctl commands 1000-1fff is ipc reserved */
-#define IPC_RMID 0x1003
-#define IPC_SET  0x1002
-#define IPC_STAT 0x1001
-
-key_t ftok(const char *, int);
-
-#endif /* _SYS_IPC_H */
+key_t ftok (const char *path, int id);
 
 #ifdef __cplusplus
 }
 #endif
+
+#endif /* _SYS_IPC_H */

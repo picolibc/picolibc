@@ -1,8 +1,9 @@
-/* shm.cc: Single unix specification IPC interface for Cygwin
+/* shm.cc: Single unix specification IPC interface for Cygwin.
 
-Copyright 2001, 2002 Red Hat, Inc.
+   Copyright 2002 Red Hat, Inc.
 
-Originally written by Robert Collins <robert.collins@hotmail.com>
+   Written by Conrad Scott <conrad.scott@dsl.pipex.com>.
+   Based on code by Robert Collins <robert.collins@hotmail.com>.
 
 This file is part of Cygwin.
 
@@ -11,548 +12,682 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <sys/stat.h>
+
+#include <sys/types.h>
+
+#include <assert.h>
 #include <errno.h>
-#include "cygerrno.h"
-#include <unistd.h>
-#include "security.h"
-#include "fhandler.h"
-#include "path.h"
-#include "dtable.h"
-#include "cygheap.h"
 #include <stdio.h>
-#include "thread.h"
-#include <cygwin/shm.h>
+#include <unistd.h>
+
+#include "cygerrno.h"
+#include "safe_memory.h"
+#include "sigproc.h"
+
+#include "cygserver_ipc.h"
 #include "cygserver_shm.h"
 
-// FIXME IS THIS CORRECT
-/* Implementation notes: We use two shared memory regions per key:
- * One for the control structure, and one for the shared memory.
- * While this has a higher overhead tham a single shared area,
- * It allows more flexability. As the entire code is transparent to the user
- * We can merge these in the future should it be needed.
+/*---------------------------------------------------------------------------*
+ * class client_shmmgr
+ *
+ * A singleton class.
+ *---------------------------------------------------------------------------*/
+
+#define shmmgr (client_shmmgr::instance ())
+
+class client_shmmgr
+{
+private:
+  class segment_t
+  {
+  public:
+    const int shmid;
+    const void *const shmaddr;
+    const int shmflg;
+    HANDLE hFileMap;		// Updated by fixup_shms_after_fork ().
+
+    segment_t *next;
+
+    segment_t (const int shmid, const void *const shmaddr, const int shmflg,
+	       const HANDLE hFileMap)
+      : shmid (shmid), shmaddr (shmaddr), shmflg (shmflg), hFileMap (hFileMap),
+	next (NULL)
+    {}
+  };
+
+public:
+  static client_shmmgr & instance ();
+
+  void *shmat (int shmid, const void *, int shmflg);
+  int shmctl (int shmid, int cmd, struct shmid_ds *);
+  int shmdt (const void *);
+  int shmget (key_t, size_t, int shmflg);
+
+  int fixup_shms_after_fork ();
+
+private:
+  static NO_COPY client_shmmgr *_instance;
+
+  CRITICAL_SECTION _segments_lock;
+  static segment_t *_segments_head; // List of attached segs by shmaddr.
+
+  static long _shmat_cnt;	// No. of attached segs; for info. only.
+
+  client_shmmgr ();
+  ~client_shmmgr ();
+
+  // Undefined (as this class is a singleton):
+  client_shmmgr (const client_shmmgr &);
+  client_shmmgr & operator= (const client_shmmgr &);
+
+  segment_t *find (const void *, segment_t **previous = NULL);
+
+  void *attach (int shmid, const void *, int shmflg, HANDLE & hFileMap);
+
+  segment_t *new_segment (int shmid, const void *, int shmflg, HANDLE);
+};
+
+/* static */ NO_COPY client_shmmgr *client_shmmgr::_instance;
+
+/* The following two variables must be inherited by child processes
+ * since they are used by fixup_shms_after_fork () to re-attach to the
+ * parent's shm segments.
  */
-extern "C" size_t
-getsystemallocgranularity ()
+/* static */ client_shmmgr::segment_t *client_shmmgr::_segments_head;
+/* static */ long client_shmmgr::_shmat_cnt;
+
+/*---------------------------------------------------------------------------*
+ * client_shmmgr::instance ()
+ *---------------------------------------------------------------------------*/
+
+client_shmmgr &
+client_shmmgr::instance ()
 {
-  SYSTEM_INFO sysinfo;
-  static size_t buffer_offset = 0;
-  if (buffer_offset)
-    return buffer_offset;
-  GetSystemInfo (&sysinfo);
-  buffer_offset = sysinfo.dwAllocationGranularity;
-  return buffer_offset;
+  if (!_instance)
+    _instance = safe_new0 (client_shmmgr);
+
+  assert (_instance);
+
+  return *_instance;
 }
 
-client_request_shm::client_request_shm (int ntype, int nshm_id):
-client_request (CYGSERVER_REQUEST_SHM_GET, sizeof (parameters))
+/*---------------------------------------------------------------------------*
+ * client_shmmgr::shmat ()
+ *---------------------------------------------------------------------------*/
+
+void *
+client_shmmgr::shmat (const int shmid,
+		      const void *const shmaddr,
+		      const int shmflg)
 {
-  buffer = (char *) &parameters;
-  parameters.in.shm_id = nshm_id;
-  parameters.in.type = SHM_REATTACH;
-  parameters.in.pid = GetCurrentProcessId ();
+  syscall_printf ("shmat (shmid = %d, shmaddr = %p, shmflg = 0%o)",
+		  shmid, shmaddr, shmflg);
+
+  EnterCriticalSection (&_segments_lock);
+
+  HANDLE hFileMap = NULL;
+
+  void *const ptr = attach (shmid, shmaddr, shmflg, hFileMap);
+
+  if (ptr)
+    new_segment (shmid, ptr, shmflg, hFileMap);
+
+  LeaveCriticalSection (&_segments_lock);
+
+  if (ptr)
+    syscall_printf ("%p = shmat (shmid = %d, shmaddr = %p, shmflg = 0%o)",
+		    ptr, shmid, shmaddr, shmflg);
+  // else
+    // See the syscall_printf in client_shmmgr::attach ().
+
+  return (ptr ? ptr : (void *) -1);
 }
 
-client_request_shm::client_request_shm (int ntype, int nshm_id, pid_t npid):
-client_request (CYGSERVER_REQUEST_SHM_GET, sizeof (parameters))
+/*---------------------------------------------------------------------------*
+ * client_shmmgr::shmctl ()
+ *---------------------------------------------------------------------------*/
+
+int
+client_shmmgr::shmctl (const int shmid,
+		       const int cmd,
+		       struct shmid_ds *const buf)
 {
-  buffer = (char *) &parameters;
-  parameters.in.shm_id = nshm_id;
-  parameters.in.type = ntype;
-  parameters.in.pid = npid;
-}
+  syscall_printf ("shmctl (shmid = %d, cmd = 0x%x, buf = %p)",
+		  shmid, cmd, buf);
 
-client_request_shm::client_request_shm (key_t nkey, size_t nsize,
-						int nshmflg,
-						char psdbuf[4096],
-						pid_t npid):
-client_request (CYGSERVER_REQUEST_SHM_GET, sizeof (parameters))
-{
-  buffer = (char *) &parameters;
-  parameters.in.key = nkey;
-  parameters.in.size = nsize;
-  parameters.in.shmflg = nshmflg;
-  parameters.in.type = SHM_CREATE;
-  parameters.in.pid = npid;
-  memcpy (parameters.in.sd_buf, psdbuf, 4096);
-}
+  // Check parameters and set up in parameters as required.
 
-static shmnode *shm_head = NULL;
+  const struct shmid_ds *in_buf = NULL;
 
-static shmnode *
-build_inprocess_shmds (HANDLE hfilemap, HANDLE hattachmap, key_t key,
-		       int shm_id)
-{
-  HANDLE filemap = hfilemap;
-  void *mapptr = MapViewOfFile (filemap, FILE_MAP_WRITE, 0, 0, 0);
-
-  if (!mapptr)
+  switch (cmd)
     {
-      CloseHandle (hfilemap);
-      CloseHandle (hattachmap);
-      //FIXME: close filemap and free the mutex
-      /* we couldn't access the mapped area with the requested permissions */
-      set_errno (EACCES);
-      return NULL;
-    }
-
-  /* Now get the user data */
-  HANDLE attachmap = hattachmap;
-  shmid_ds *shmtemp = new shmid_ds;
-  if (!shmtemp)
-    {
-      system_printf ("failed to malloc shm node\n");
-      set_errno (ENOMEM);
-      UnmapViewOfFile (mapptr);
-      CloseHandle (filemap);
-      CloseHandle (attachmap);
-      /* exit mutex */
-      return NULL;
-    }
-
-  /* get the system node data */
-  *shmtemp = *(shmid_ds *) mapptr;
-
-  /* process local data */
-  shmnode *tempnode = new shmnode;
-
-  tempnode->filemap = filemap;
-  tempnode->attachmap = attachmap;
-  shmtemp->mapptr = mapptr;
-
-  /* no need for InterlockedExchange here, we're serialised by the global mutex */
-  tempnode->shmds = shmtemp;
-  tempnode->shm_id = shm_id;
-  tempnode->key = key;
-  tempnode->next = shm_head;
-  tempnode->attachhead = NULL;
-  shm_head = tempnode;
-
-  /* FIXME: leave the system wide shm mutex */
-
-  return tempnode;
-}
-
-static void
-delete_inprocess_shmds (shmnode **nodeptr)
-{
-  shmnode *node = *nodeptr;
-
-  // remove from the list
-  if (node == shm_head)
-    shm_head = shm_head->next;
-  else
-    {
-      shmnode *tempnode = shm_head;
-      while (tempnode && tempnode->next != node)
-	tempnode = tempnode->next;
-      if (tempnode)
-	tempnode->next = node->next;
-      // else log the unexpected !
-    }
-
-  // release the shared data view
-  UnmapViewOfFile (node->shmds);
-  CloseHandle (node->filemap);
-  CloseHandle (node->attachmap);
-
-  // free the memory
-  delete node;
-  nodeptr = NULL;
-}
-
-int __stdcall
-fixup_shms_after_fork ()
-{
-  shmnode *tempnode = shm_head;
-  while (tempnode)
-    {
-      void *newshmds =
-	MapViewOfFile (tempnode->filemap, FILE_MAP_WRITE, 0, 0, 0);
-      if (!newshmds)
+    case IPC_SET:
+      if (__check_invalid_read_ptr_errno (buf, sizeof (struct shmid_ds)))
 	{
-	  /* don't worry about handle cleanup, we're dying! */
-	  system_printf ("failed to reattach to shm control file view %x\n",
-			 tempnode);
-	  return 1;
+	  syscall_printf (("-1 [EFAULT] = "
+			   "shmctl (shmid = %d, cmd = 0x%x, buf = %p)"),
+			  shmid, cmd, buf);
+	  set_errno (EFAULT);
+	  return -1;
 	}
-      tempnode->shmds = (class shmid_ds *) newshmds;
-      tempnode->shmds->mapptr = newshmds;
-      _shmattach *attachnode = tempnode->attachhead;
-      while (attachnode)
+      in_buf = buf;
+      break;
+
+    case IPC_STAT:
+    case SHM_STAT:
+      if (__check_null_invalid_struct_errno (buf, sizeof (struct shmid_ds)))
 	{
-	  void *newdata = MapViewOfFileEx (tempnode->attachmap,
-					   (attachnode->shmflg & SHM_RDONLY) ?
-					   FILE_MAP_READ : FILE_MAP_WRITE, 0,
-					   0, 0, attachnode->data);
-	  if (newdata != attachnode->data)
-	    {
-	      /* don't worry about handle cleanup, we're dying! */
-	      system_printf ("failed to reattach to mapped file view %x\n",
-			     attachnode->data);
-	      return 1;
-	    }
-	  attachnode = attachnode->next;
+	  syscall_printf (("-1 [EFAULT] = "
+			   "shmctl (shmid = %d, cmd = 0x%x, buf = %p)"),
+			  shmid, cmd, buf);
+	  set_errno (EFAULT);
+	  return -1;
 	}
-      tempnode = tempnode->next;
-    }
-  return 0;
-}
+      break;
 
-/* this is ugly. Yes, I know that.
- * FIXME: abstract the lookup functionality,
- * So that it can be an array, list, whatever without us being worried
- */
-
-/* FIXME: after fork, every memory area needs to have the attach count
- * incremented. This should be done in the server?
- */
-
-/* FIXME: tell the daemon when we attach, so at process close it can clean up
- * the attach count
- */
-extern "C" void *
-shmat (int shmid, const void *shmaddr, int shmflg)
-{
-  shmnode *tempnode = shm_head;
-  while (tempnode && tempnode->shm_id != shmid)
-    tempnode = tempnode->next;
-
-  if (!tempnode)
-    {
-      /* couldn't find a currently open shm control area for the key - probably because
-       * shmget hasn't been called.
-       * Allocate a new control block - this has to be handled by the daemon */
-      client_request_shm *req =
-	new client_request_shm (SHM_REATTACH, shmid, GetCurrentProcessId ());
-
-      int rc;
-      if ((rc = cygserver_request (req)))
+    case IPC_INFO:
+      if (__check_null_invalid_struct_errno (buf, sizeof (struct shminfo)))
 	{
-	  delete req;
-	  set_errno (ENOSYS);	/* daemon communication failed */
-	  return (void *) -1;
+	  syscall_printf (("-1 [EFAULT] = "
+			   "shmctl (shmid = %d, cmd = 0x%x, buf = %p)"),
+			  shmid, cmd, buf);
+	  set_errno (EFAULT);
+	  return -1;
 	}
+      break;
 
-      if (req->header.error_code)	/* shm_get failed in the daemon */
+    case SHM_INFO:
+      if (__check_null_invalid_struct_errno (buf, sizeof (struct shm_info)))
 	{
-	  set_errno (req->header.error_code);
-	  delete req;
-	  return (void *) -1;
+	  syscall_printf (("-1 [EFAULT] = "
+			   "shmctl (shmid = %d, cmd = 0x%x, buf = %p)"),
+			  shmid, cmd, buf);
+	  set_errno (EFAULT);
+	  return -1;
 	}
-
-      /* we've got the id, now we open the memory area ourselves.
-       * This tests security automagically
-       * FIXME: make this a method of shmnode ?
-       */
-      tempnode =
-	build_inprocess_shmds (req->parameters.out.filemap,
-			       req->parameters.out.attachmap,
-			       req->parameters.out.key,
-			       req->parameters.out.shm_id);
-      delete req;
-      if (!tempnode)
-	return (void *) -1;
-
+      break;
     }
 
-  // class shmid_ds *shm = tempnode->shmds;
+  // Create and issue the command.
 
-  if (shmaddr)
+  client_request_shm request (shmid, cmd, in_buf);
+
+  if (request.make_request () == -1 || request.error_code ())
     {
-      //FIXME: requested base address ?! (Don't forget to fix the fixup_after_fork too)
-      set_errno (EINVAL);
-      return (void *) -1;
-    }
-
-  void *rv = MapViewOfFile (tempnode->attachmap,
-			    (shmflg & SHM_RDONLY) ? FILE_MAP_READ :
-			    FILE_MAP_WRITE, 0, 0, 0);
-
-  if (!rv)
-    {
-      //FIXME: translate GetLastError()
-      set_errno (EACCES);
-      return (void *) -1;
-    }
-  /* tell the daemon we have attached */
-  client_request_shm *req =
-    new client_request_shm (SHM_ATTACH, shmid);
-  int rc;
-  if ((rc = cygserver_request (req)))
-    {
-      debug_printf ("failed to tell deaemon that we have attached\n");
-    }
-  delete req;
-
-  _shmattach *attachnode = new _shmattach;
-  attachnode->data = rv;
-  attachnode->shmflg = shmflg;
-  attachnode->next =
-    (_shmattach *) InterlockedExchangePointer (&tempnode->attachhead,
-					       attachnode);
-
-
-  return rv;
-}
-
-/* FIXME: tell the daemon when we detach so it doesn't cleanup incorrectly.
- */
-extern "C" int
-shmdt (const void *shmaddr)
-{
-  /* this should be "rare" so a hefty search is ok. If this is common, then we
-   * should alter the data structs to allow more optimisation
-   */
-  shmnode *tempnode = shm_head;
-  _shmattach *attachnode;
-  while (tempnode)
-    {
-      // FIXME: Race potential
-      attachnode = tempnode->attachhead;
-      while (attachnode && attachnode->data != shmaddr)
-	attachnode = attachnode->next;
-      if (attachnode)
-	break;
-      tempnode = tempnode->next;
-    }
-  if (!tempnode)
-    {
-      // dt cannot be called by an app that hasn't alreadu at'd
-      set_errno (EINVAL);
+      syscall_printf (("-1 [%d] = "
+		       "shmctl (shmid = %d, cmd = 0x%x, buf = %p)"),
+		      request.error_code (), shmid, cmd, buf);
+      set_errno (request.error_code ());
       return -1;
     }
 
-  UnmapViewOfFile (attachnode->data);
-  /* tell the daemon we have attached */
-  client_request_shm *req =
-      new client_request_shm (SHM_DETACH, tempnode->shm_id);
-  int rc;
-  if ((rc = cygserver_request (req)))
-    {
-      debug_printf ("failed to tell deaemon that we have detached\n");
-    }
-  delete req;
+  // Some commands require special processing for their out parameters.
 
-  return 0;
-}
-
-//FIXME: who is allowed to perform STAT?
-extern "C" int
-shmctl (int shmid, int cmd, struct shmid_ds *buf)
-{
-  shmnode *tempnode = shm_head;
-  while (tempnode && tempnode->shm_id != shmid)
-    tempnode = tempnode->next;
-  if (!tempnode)
-    {
-      /* couldn't find a currently open shm control area for the key - probably because
-       * shmget hasn't been called.
-       * Allocate a new control block - this has to be handled by the daemon */
-      client_request_shm *req =
-	new client_request_shm (SHM_REATTACH, shmid, GetCurrentProcessId ());
-
-      int rc;
-      if ((rc = cygserver_request (req)))
-	{
-	  delete req;
-	  set_errno (ENOSYS);	/* daemon communication failed */
-	  return -1;
-	}
-
-      if (req->header.error_code)	/* shm_get failed in the daemon */
-	{
-	  set_errno (req->header.error_code);
-	  delete req;
-	  return -1;
-	}
-
-      /* we've got the id, now we open the memory area ourselves.
-       * This tests security automagically
-       * FIXME: make this a method of shmnode ?
-       */
-      tempnode =
-	build_inprocess_shmds (req->parameters.out.filemap,
-			       req->parameters.out.attachmap,
-			       req->parameters.out.key,
-			       req->parameters.out.shm_id);
-      delete req;
-      if (!tempnode)
-	return -1;
-    }
+  int result = 0;
 
   switch (cmd)
     {
     case IPC_STAT:
-      buf->shm_perm = tempnode->shmds->shm_perm;
-      buf->shm_segsz = tempnode->shmds->shm_segsz;
-      buf->shm_lpid = tempnode->shmds->shm_lpid;
-      buf->shm_cpid = tempnode->shmds->shm_cpid;
-      buf->shm_nattch = tempnode->shmds->shm_nattch;
-      buf->shm_atime = tempnode->shmds->shm_atime;
-      buf->shm_dtime = tempnode->shmds->shm_dtime;
-      buf->shm_ctime = tempnode->shmds->shm_ctime;
+      *buf = request.ds ();
       break;
-    case IPC_RMID:
-      {
-	/* TODO: check permissions. Or possibly, the daemon gets to be the only
-	 * one with write access to the memory area?
-	 */
-	if (tempnode->shmds->shm_nattch)
-	  system_printf
-	    ("call to shmctl with cmd= IPC_RMID when memory area still has"
-	     " attachees\n");
-	/* how does this work?
-	   * we mark the ds area as "deleted", and the at and get calls all fail from now on
-	   * on, when nattch becomes 0, the mapped data area is destroyed.
-	   * and each process, as they touch this area detaches. eventually only the
-	   * daemon has an attach. The daemon gets asked to detach immediately.
-	 */
-	//waiting for the daemon to handle terminating process's
-	client_request_shm *req =
-	  new client_request_shm (SHM_DEL, shmid, GetCurrentProcessId ());
-	int rc;
-	if ((rc = cygserver_request (req)))
-	  {
-	    delete req;
-	    set_errno (ENOSYS);	/* daemon communication failed */
-	    return -1;
-	  }
 
-	if (req->header.error_code)	/* shm_del failed in the daemon */
-	  {
-	    set_errno (req->header.error_code);
-	    delete req;
-	    return -1;
-	  }
-
-	/* the daemon has deleted it's references */
-	/* now for us */
-
-	// FIXME: create a destructor
-	delete_inprocess_shmds (&tempnode);
-
-      }
+    case IPC_INFO:
+      *(struct shminfo *) buf = request.shminfo ();
       break;
-    case IPC_SET:
-    default:
+
+    case SHM_STAT:		// ipcs(8) i'face.
+      result = request.shmid ();
+      *buf = request.ds ();
+      break;
+
+    case SHM_INFO:		// ipcs(8) i'face.
+      result = request.shmid ();
+      *(struct shm_info *) buf = request.shm_info ();
+      break;
+    }
+
+  syscall_printf ("%d = shmctl (shmid = %d, cmd = 0x%x, buf = %p)",
+		  result, shmid, cmd, buf);
+
+  return result;
+}
+
+/*---------------------------------------------------------------------------*
+ * client_shmmgr::shmdt ()
+ *
+ * According to Posix, the only error condition for this system call
+ * is EINVAL if shmaddr is not the address of the start of an attached
+ * shared memory segment.  Given that, all other errors just generate
+ * tracing noise.
+ *---------------------------------------------------------------------------*/
+
+int
+client_shmmgr::shmdt (const void *const shmaddr)
+{
+  syscall_printf ("shmdt (shmaddr = %p)", shmaddr);
+
+  EnterCriticalSection (&_segments_lock);
+
+  segment_t *previous = NULL;
+
+  segment_t *const segptr = find (shmaddr, &previous);
+
+  if (!segptr)
+    {
+      LeaveCriticalSection (&_segments_lock);
+      syscall_printf ("-1 [EINVAL] = shmdt (shmaddr = %p)", shmaddr);
       set_errno (EINVAL);
       return -1;
     }
+
+  assert (previous ? previous->next == segptr : _segments_head == segptr);
+
+  if (previous)
+    previous->next = segptr->next;
+  else
+    _segments_head = segptr->next;
+
+  LeaveCriticalSection (&_segments_lock);
+
+  const long cnt = InterlockedDecrement (&_shmat_cnt);
+  assert (cnt >= 0);
+
+  if (!UnmapViewOfFile ((void *) shmaddr))
+    syscall_printf (("failed to unmap view "
+		     "[shmid = %d, handle = %p, shmaddr = %p]:"
+		     "%E"),
+		    segptr->shmid, segptr->hFileMap, shmaddr);
+
+  assert (segptr->hFileMap);
+
+  if (!CloseHandle (segptr->hFileMap))
+    syscall_printf (("failed to close file map handle "
+		     "[shmid = %d, handle = %p]: %E"),
+		    segptr->shmid, segptr->hFileMap);
+
+  client_request_shm request (segptr->shmid);
+
+  if (request.make_request () == -1 || request.error_code ())
+    syscall_printf ("shmdt request failed [shmid = %d, handle = %p]: %s",
+		    segptr->shmid, segptr->hFileMap,
+		    strerror (request.error_code ()));
+
+  safe_delete (segptr);
+
+  syscall_printf ("0 = shmdt (shmaddr = %p)", shmaddr);
+
   return 0;
 }
 
-/* FIXME: evaluate getuid32() and getgid32() against the requested mode. Then
- * choose PAGE_READWRITE | PAGE_READONLY and FILE_MAP_WRITE  |  FILE_MAP_READ
- * appropriately
- */
+/*---------------------------------------------------------------------------*
+ * client_shmmgr::shmget ()
+ *---------------------------------------------------------------------------*/
 
-/* FIXME: shmid should be a verifyable object
- */
-
-/* FIXME: on NT we should check everything against the SD. On 95 we just emulate.
- */
-extern "C" int
-shmget (key_t key, size_t size, int shmflg)
+int
+client_shmmgr::shmget (const key_t key, const size_t size, const int shmflg)
 {
-  DWORD sd_size = 4096;
-  char sd_buf[4096];
-  PSECURITY_DESCRIPTOR psd = (PSECURITY_DESCRIPTOR) sd_buf;
-  /* create a sd for our open requests based on shmflag & 0x01ff */
-  InitializeSecurityDescriptor (psd,
-				    SECURITY_DESCRIPTOR_REVISION);
-  psd = alloc_sd (getuid32 (), getgid32 (),
-		  shmflg & 0x01ff, psd, &sd_size);
+  syscall_printf ("shmget (key = 0x%016X, size = %u, shmflg = 0%o)",
+		  key, size, shmflg);
 
-  if (key == (key_t) - 1)
+  client_request_shm request (key, size, shmflg);
+
+  if (request.make_request () == -1 || request.error_code ())
     {
-      set_errno (ENOENT);
+      syscall_printf (("-1 [%d] = "
+		       "shmget (key = 0x%016X, size = %u, shmflg = 0%o)"),
+		      request.error_code (),
+		      key, size, shmflg);
+      set_errno (request.error_code ());
       return -1;
     }
 
-  /* FIXME: enter the checking for existing keys mutex. This mutex _must_ be system wide
-   * to prevent races on shmget.
-   */
+  syscall_printf (("%d = shmget (key = 0x%016X, size = %u, shmflg = 0%o)"),
+		  request.shmid (),
+		  key, size, shmflg);
 
-  /* walk the list of currently open keys and return the id if found
-   */
-  shmnode *tempnode = shm_head;
-  while (tempnode)
+  return request.shmid ();
+}
+
+/*---------------------------------------------------------------------------*
+ * client_shmmgr::fixup_shms_after_fork ()
+ *
+ * The hFileMap handles are non-inheritable: so they have to be
+ * re-acquired from cygserver.
+ *
+ * Nb. This routine need not be thread-safe as it is only called at startup.
+ *---------------------------------------------------------------------------*/
+
+int
+client_shmmgr::fixup_shms_after_fork ()
+{
+  debug_printf ("re-attaching to shm segments: %d attached", _shmat_cnt);
+
+  {
+    int length = 0;
+    for (segment_t *segptr = _segments_head; segptr; segptr = segptr->next)
+      length += 1;
+
+    if (_shmat_cnt != length)
+      {
+	system_printf (("state inconsistent: "
+			"_shmat_cnt = %d, length of segments list = %d"),
+		       _shmat_cnt, length);
+	return 1;
+      }
+  }
+
+  for (segment_t *segptr = _segments_head; segptr; segptr = segptr->next)
+    if (!attach (segptr->shmid,
+		 segptr->shmaddr,
+		 segptr->shmflg & ~SHM_RND,
+		 segptr->hFileMap))
+      {
+	system_printf ("fatal error re-attaching to shm segment %d",
+		       segptr->shmid);
+	return 1;
+      }
+
+  if (_shmat_cnt)
+    debug_printf ("re-attached all %d shm segments", _shmat_cnt);
+
+  return 0;
+}
+
+/*---------------------------------------------------------------------------*
+ * client_shmmgr::client_shmmgr ()
+ *---------------------------------------------------------------------------*/
+
+client_shmmgr::client_shmmgr ()
+{
+  InitializeCriticalSection (&_segments_lock);
+}
+
+/*---------------------------------------------------------------------------*
+ * client_shmmgr::~client_shmmgr ()
+ *---------------------------------------------------------------------------*/
+
+client_shmmgr::~client_shmmgr ()
+{
+  DeleteCriticalSection (&_segments_lock);
+}
+
+/*---------------------------------------------------------------------------*
+ * client_shmmgr::find ()
+ *---------------------------------------------------------------------------*/
+
+client_shmmgr::segment_t *
+client_shmmgr::find (const void *const shmaddr, segment_t **previous)
+{
+  if (previous)
+    *previous = NULL;
+
+  for (segment_t *segptr = _segments_head; segptr; segptr = segptr->next)
+    if (segptr->shmaddr == shmaddr)
+      return segptr;
+    else if (segptr->shmaddr > shmaddr) // The list is sorted by shmaddr.
+      return NULL;
+    else if (previous)
+      *previous = segptr;
+
+  return NULL;
+}
+
+/*---------------------------------------------------------------------------*
+ * client_shmmgr::attach ()
+ *
+ * The body of shmat (), also used by fixup_shms_after_fork ().
+ *---------------------------------------------------------------------------*/
+
+void *
+client_shmmgr::attach (const int shmid,
+		       const void *shmaddr,
+		       const int shmflg,
+		       HANDLE & hFileMap)
+{
+  client_request_shm request (shmid, shmflg);
+
+  if (request.make_request () == -1 || request.error_code ())
     {
-      if (tempnode->key == key && key != IPC_PRIVATE)
-	{
-	  // FIXME: free the mutex
-	  if (size && tempnode->shmds->shm_segsz < size)
-	    {
-	      set_errno (EINVAL);
-	      return -1;
-	    }
-	  if ((shmflg & IPC_CREAT) && (shmflg & IPC_EXCL))
-	    {
-	      set_errno (EEXIST);
-	      // FIXME: free the mutex
-	      return -1;
-	    }
-	  // FIXME: do we need to other tests of the requested mode with the
-	  // tempnode->shmid mode ? testcase on unix needed.
-	  // FIXME do we need a security test? We are only examining the keys we already have open.
-	  // FIXME: what are the sec implications for fork () if we don't check here?
-	  return tempnode->shm_id;
-	}
-      tempnode = tempnode->next;
+      syscall_printf (("-1 [%d] = "
+		       "shmat (shmid = %d, shmaddr = %p, shmflg = 0%o)"),
+		      request.error_code (), shmid, shmaddr, shmflg);
+      set_errno (request.error_code ());
+      return NULL;
     }
-  /* couldn't find a currently open shm control area for the key.
-   * Allocate a new control block - this has to be handled by the daemon */
-  client_request_shm *req =
-    new client_request_shm (key, size, shmflg, sd_buf,
-				GetCurrentProcessId ());
 
-  int rc;
-  if ((rc = cygserver_request (req)))
+  int result = 0;
+
+  const DWORD access = (shmflg & SHM_RDONLY) ? FILE_MAP_READ : FILE_MAP_WRITE;
+
+  if (shmaddr && (shmflg & SHM_RND))
+    shmaddr = (char *) shmaddr - ((ssize_t) shmaddr % SHMLBA);
+
+  void *const ptr =
+    MapViewOfFileEx (request.hFileMap (), access, 0, 0, 0, (void *) shmaddr);
+
+  if (!ptr)
     {
-      delete req;
-      set_errno (ENOSYS);	/* daemon communication failed */
-      return -1;
+      syscall_printf (("failed to map view "
+		       "[shmid = %d, handle = %p, shmaddr = %p]: %E"),
+		      shmid, request.hFileMap (), shmaddr);
+      result = EINVAL;		// FIXME
     }
-
-  if (req->header.error_code)	/* shm_get failed in the daemon */
+  else if (shmaddr && ptr != shmaddr)
     {
-      set_errno (req->header.error_code);
-      delete req;
-      return -1;
+      syscall_printf (("failed to map view at requested address "
+		       "[shmid = %d, handle = %p]: "
+		       "requested address = %p, mapped address = %p"),
+		      shmid, request.hFileMap (),
+		      shmaddr, ptr);
+      result = EINVAL;		// FIXME
     }
 
-  /* we've got the id, now we open the memory area ourselves.
-   * This tests security automagically
-   * FIXME: make this a method of shmnode ?
-   */
-  shmnode *shmtemp = build_inprocess_shmds (req->parameters.out.filemap,
-					    req->parameters.out.attachmap,
-					    key,
-					    req->parameters.out.shm_id);
-  delete req;
-  if (shmtemp)
-    return shmtemp->shm_id;
-  return -1;
+  if (result != 0)
+    {
+      if (!CloseHandle (request.hFileMap ()))
+	syscall_printf (("failed to close file map handle "
+			 "[shmid = %d, handle = %p]: %E"),
+			shmid, request.hFileMap ());
 
+      client_request_shm dt_req (shmid);
 
-#if 0
-  /* fill out the node data */
-  shmtemp->shm_perm.cuid = getuid32 ();
-  shmtemp->shm_perm.uid = shmtemp->shm_perm.cuid;
-  shmtemp->shm_perm.cgid = getgid32 ();
-  shmtemp->shm_perm.gid = shmtemp->shm_perm.cgid;
-  shmtemp->shm_perm.mode = shmflg & 0x01ff;
-  shmtemp->shm_lpid = 0;
-  shmtemp->shm_nattch = 0;
-  shmtemp->shm_atime = 0;
-  shmtemp->shm_dtime = 0;
-  shmtemp->shm_ctime = time (NULL);
-  shmtemp->shm_segsz = size;
-  *(shmid_ds *) mapptr = *shmtemp;
-  shmtemp->filemap = filemap;
-  shmtemp->attachmap = attachmap;
-  shmtemp->mapptr = mapptr;
+      if (dt_req.make_request () == -1 || dt_req.error_code ())
+	syscall_printf ("shmdt request failed [shmid = %d, handle = %p]: %s",
+			shmid, request.hFileMap (),
+			strerror (dt_req.error_code ()));
 
-#endif
+      set_errno (result);
+      return NULL;
+    }
+
+  hFileMap = request.hFileMap ();
+  return ptr;
+}
+
+/*---------------------------------------------------------------------------*
+ * client_shmmgr::new_segment ()
+ *
+ * Allocate a new segment for the given shmid, file map and address
+ * and insert into the segment map.
+ *---------------------------------------------------------------------------*/
+
+client_shmmgr::segment_t *
+client_shmmgr::new_segment (const int shmid,
+			    const void *const shmaddr,
+			    const int shmflg,
+			    const HANDLE hFileMap)
+{
+  assert (ipc_ext2int_subsys (shmid) == IPC_SHMOP);
+  assert (hFileMap);
+  assert (shmaddr);
+
+  segment_t *previous = NULL;	// Insert pointer.
+
+  const segment_t *const tmp = find (shmaddr, &previous);
+
+  assert (!tmp);
+  assert (previous							\
+	  ? (!previous->next || previous->next->shmaddr > shmaddr)	\
+	  : (!_segments_head || _segments_head->shmaddr > shmaddr));
+
+  segment_t *const segptr =
+    safe_new (segment_t, shmid, shmaddr, shmflg, hFileMap);
+
+  assert (segptr);
+
+  if (previous)
+    {
+      segptr->next = previous->next;
+      previous->next = segptr;
+    }
+  else
+    {
+      segptr->next = _segments_head;
+      _segments_head = segptr;
+    }
+
+  const long cnt = InterlockedIncrement (&_shmat_cnt);
+  assert (cnt > 0);
+
+  return segptr;
+}
+
+/*---------------------------------------------------------------------------*
+ * shmat ()
+ *---------------------------------------------------------------------------*/
+
+extern "C" void *
+shmat (const int shmid, const void *const shmaddr, const int shmflg)
+{
+  sigframe thisframe (mainthread);
+  return shmmgr.shmat (shmid, shmaddr, shmflg);
+}
+
+/*---------------------------------------------------------------------------*
+ * shmctl ()
+ *---------------------------------------------------------------------------*/
+
+extern "C" int
+shmctl (const int shmid, const int cmd, struct shmid_ds *const buf)
+{
+  sigframe thisframe (mainthread);
+  return shmmgr.shmctl (shmid, cmd, buf);
+}
+
+/*---------------------------------------------------------------------------*
+ * shmdt ()
+ *---------------------------------------------------------------------------*/
+
+extern "C" int
+shmdt (const void *const shmaddr)
+{
+  sigframe thisframe (mainthread);
+  return shmmgr.shmdt (shmaddr);
+}
+
+/*---------------------------------------------------------------------------*
+ * shmget ()
+ *---------------------------------------------------------------------------*/
+
+extern "C" int
+shmget (const key_t key, const size_t size, const int shmflg)
+{
+  sigframe thisframe (mainthread);
+  return shmmgr.shmget (key, size, shmflg);
+}
+
+/*---------------------------------------------------------------------------*
+ * fixup_shms_after_fork ()
+ *---------------------------------------------------------------------------*/
+
+int __stdcall
+fixup_shms_after_fork ()
+{
+  return shmmgr.fixup_shms_after_fork ();
+}
+
+/*---------------------------------------------------------------------------*
+ * client_request_shm::client_request_shm ()
+ *---------------------------------------------------------------------------*/
+
+client_request_shm::client_request_shm (const int shmid, const int shmflg)
+  : client_request (CYGSERVER_REQUEST_SHM, &_parameters, sizeof (_parameters))
+{
+  _parameters.in.shmop = SHMOP_shmat;
+
+  _parameters.in.shmid = shmid;
+  _parameters.in.shmflg = shmflg;
+
+  _parameters.in.cygpid = getpid ();
+  _parameters.in.winpid = GetCurrentProcessId ();
+  _parameters.in.uid = geteuid ();
+  _parameters.in.gid = getegid ();
+
+  msglen (sizeof (_parameters.in));
+}
+
+/*---------------------------------------------------------------------------*
+ * client_request_shm::client_request_shm ()
+ *---------------------------------------------------------------------------*/
+
+client_request_shm::client_request_shm (const int shmid,
+					const int cmd,
+					const struct shmid_ds *const buf)
+  : client_request (CYGSERVER_REQUEST_SHM, &_parameters, sizeof (_parameters))
+{
+  _parameters.in.shmop = SHMOP_shmctl;
+
+  _parameters.in.shmid = shmid;
+  _parameters.in.cmd = cmd;
+  if (buf)
+    _parameters.in.ds = *buf;
+
+  _parameters.in.cygpid = getpid ();
+  _parameters.in.winpid = GetCurrentProcessId ();
+  _parameters.in.uid = geteuid ();
+  _parameters.in.gid = getegid ();
+
+  msglen (sizeof (_parameters.in));
+}
+
+/*---------------------------------------------------------------------------*
+ * client_request_shm::client_request_shm ()
+ *---------------------------------------------------------------------------*/
+
+client_request_shm::client_request_shm (const int shmid)
+  : client_request (CYGSERVER_REQUEST_SHM, &_parameters, sizeof (_parameters))
+{
+  _parameters.in.shmop = SHMOP_shmdt;
+
+  _parameters.in.shmid = shmid;
+
+  _parameters.in.cygpid = getpid ();
+  _parameters.in.winpid = GetCurrentProcessId ();
+  _parameters.in.uid = geteuid ();
+  _parameters.in.gid = getegid ();
+
+  msglen (sizeof (_parameters.in));
+}
+
+/*---------------------------------------------------------------------------*
+ * client_request_shm::client_request_shm ()
+ *---------------------------------------------------------------------------*/
+
+client_request_shm::client_request_shm (const key_t key,
+					const size_t size,
+					const int shmflg)
+  : client_request (CYGSERVER_REQUEST_SHM, &_parameters, sizeof (_parameters))
+{
+  _parameters.in.shmop = SHMOP_shmget;
+
+  _parameters.in.key = key;
+  _parameters.in.size = size;
+  _parameters.in.shmflg = shmflg;
+
+  _parameters.in.cygpid = getpid ();
+  _parameters.in.winpid = GetCurrentProcessId ();
+  _parameters.in.uid = geteuid ();
+  _parameters.in.gid = getegid ();
+
+  msglen (sizeof (_parameters.in));
 }

@@ -13,123 +13,172 @@ details. */
 #ifndef _CYGSERVER_H_
 #define _CYGSERVER_H_
 
-#define MAX_REQUEST_SIZE 128
+#ifdef __GNUC__
+#define CYGSERVER_PACKED __attribute__ ((packed))
+#else
+#define CYGSERVER_PACKED
+#endif
 
 #define CYGWIN_SERVER_VERSION_MAJOR	1
 #define CYGWIN_SERVER_VERSION_API	1
 #define CYGWIN_SERVER_VERSION_MINOR	0
 #define CYGWIN_SERVER_VERSION_PATCH	0
 
-
 typedef enum {
-  CYGSERVER_UNKNOWN=0,
-  CYGSERVER_OK=1,
-  CYGSERVER_DEAD=2
+  CYGSERVER_UNKNOWN = 0,
+  CYGSERVER_OK,
+  CYGSERVER_UNAVAIL
 } cygserver_states;
 
-typedef enum {
-  CYGSERVER_REQUEST_INVALID = 0,
-  CYGSERVER_REQUEST_GET_VERSION,
-  CYGSERVER_REQUEST_ATTACH_TTY,
-  CYGSERVER_REQUEST_SHUTDOWN,
-  CYGSERVER_REQUEST_SHM_GET,
-  CYGSERVER_REQUEST_LAST
-} cygserver_request_code;
+/*---------------------------------------------------------------------------*
+ * class client_request
+ *---------------------------------------------------------------------------*/
 
-class request_header
-{
-  public:
-    ssize_t cb;
-    cygserver_request_code req_id;
-    ssize_t error_code;
-    request_header (cygserver_request_code id, ssize_t ncb) : cb (ncb), req_id (id), error_code (0) {} ;
-}
-#ifdef __GNUC__
-  __attribute__ ((packed))
+class transport_layer_base;
+
+#ifndef __INSIDE_CYGWIN__
+class process_cache;
 #endif
-;
-
-extern void cygserver_init ();
-
-#define INIT_REQUEST(req,id) \
-	(req).header.cb = sizeof (req); \
-	(req).header.req_id = id;
-
-struct request_get_version
-{
-  DWORD major, api, minor, patch;
-}
-#ifdef __GNUC__
-  __attribute__ ((packed))
-#endif
-;
-
-struct request_shutdown
-{
-  int foo;
-}
-#ifdef __GNUC__
-  __attribute__ ((packed))
-#endif
-;
-
-struct request_attach_tty
-{
-  DWORD pid, master_pid;
-  HANDLE from_master, to_master;
-}
-#ifdef __GNUC__
-  __attribute__ ((packed))
-#endif
-;
 
 class client_request
 {
-  public:
-  client_request (cygserver_request_code id, ssize_t data_size);
-  virtual void send (transport_layer_base *conn);
+protected:
+  typedef enum {
+    CYGSERVER_REQUEST_INVALID,
+    CYGSERVER_REQUEST_GET_VERSION,
+    CYGSERVER_REQUEST_SHUTDOWN,
+    CYGSERVER_REQUEST_ATTACH_TTY,
+    CYGSERVER_REQUEST_SHM,
+    CYGSERVER_REQUEST_LAST
+  } request_code_t;
+
+  struct header_t
+  {
+    size_t msglen;
+    union
+    {
+      request_code_t request_code;
+      ssize_t error_code;
+    };
+
+    header_t () {};
+    header_t (request_code_t, size_t);
+  } CYGSERVER_PACKED;
+
+public:
 #ifndef __INSIDE_CYGWIN__
-  virtual void serve (transport_layer_base *conn, class process_cache *cache);
+  static void handle_request (transport_layer_base *, process_cache *);
 #endif
-  virtual operator struct request_header ();
-  cygserver_request_code req_id () {return header.req_id;};
-  virtual ~client_request();
-  request_header header;
-  char *buffer;
+
+  client_request (request_code_t request_code,
+		  void *buf = NULL,
+		  size_t bufsiz = 0);
+  virtual ~client_request ();
+
+  request_code_t request_code () const { return _header.request_code; }
+
+  ssize_t error_code () const { return _header.error_code; };
+  void error_code (ssize_t error_code) { _header.error_code = error_code; };
+
+  size_t msglen () const { return _header.msglen; };
+  void msglen (size_t len) { _header.msglen = len; };
+
+  int make_request ();
+
+protected:
+  virtual void send (transport_layer_base *);
+
+private:
+  header_t _header;
+  void * const _buf;
+  const size_t _buflen;
+
+#ifndef __INSIDE_CYGWIN__
+  void handle (transport_layer_base *, process_cache *);
+  virtual void serve (transport_layer_base *, process_cache *) = 0;
+#endif
 };
+
+/*---------------------------------------------------------------------------*
+ * class client_request_get_version
+ *---------------------------------------------------------------------------*/
 
 class client_request_get_version : public client_request
 {
-  public:
-#ifndef __INSIDE_CYGWIN__
-  virtual void serve (transport_layer_base *conn, class process_cache *cache);
-#endif
-  client_request_get_version::client_request_get_version();
+private:
+  struct request_get_version
+  {
+    DWORD major, api, minor, patch;
+  } CYGSERVER_PACKED;
+
+public:
+  client_request_get_version ();
+  bool check_version () const;
+
+private:
   struct request_get_version version;
+
+#ifndef __INSIDE_CYGWIN__
+  virtual void serve (transport_layer_base *, process_cache *);
+#endif
 };
+
+/*---------------------------------------------------------------------------*
+ * class client_request_shutdown
+ *
+ * Nb. This whole class is only !__INSIDE_CYGWIN__ since it is used
+ * solely by cygserver itself.
+ *---------------------------------------------------------------------------*/
+
+#ifndef __INSIDE_CYGWIN__
 
 class client_request_shutdown : public client_request
 {
-  public:
-#ifndef __INSIDE_CYGWIN__
-  virtual void serve (transport_layer_base *conn, class process_cache *cache);
-#endif
+public:
   client_request_shutdown ();
+
+private:
+  virtual void serve (transport_layer_base *, process_cache *);
 };
+
+#endif /* !__INSIDE_CYGWIN__ */
+
+/*---------------------------------------------------------------------------*
+ * class client_request_attach_tty
+ *---------------------------------------------------------------------------*/
 
 class client_request_attach_tty : public client_request
 {
-  public:
-#ifndef __INSIDE_CYGWIN__
-  virtual void serve (transport_layer_base *conn, class process_cache *cache);
-#endif
+private:
+  struct request_attach_tty
+  {
+    DWORD pid, master_pid;
+    HANDLE from_master, to_master;
+  } CYGSERVER_PACKED;
+
+public:
+#ifdef __INSIDE_CYGWIN__
+  client_request_attach_tty (DWORD nmaster_pid,
+			     HANDLE nfrom_master, HANDLE nto_master);
+#else
   client_request_attach_tty ();
-  client_request_attach_tty (DWORD npid, DWORD nmaster_pid, HANDLE nfrom_master, HANDLE nto_master);
-  HANDLE from_master () {return req.from_master;};
-  HANDLE to_master () {return req.to_master;};
+#endif
+
+  HANDLE from_master () const { return req.from_master; };
+  HANDLE to_master () const { return req.to_master; };
+
+protected:
+  virtual void send (transport_layer_base *);
+
+private:
   struct request_attach_tty req;
+
+#ifndef __INSIDE_CYGWIN__
+  virtual void serve (transport_layer_base *, process_cache *);
+#endif
 };
 
-extern int cygserver_request (client_request *);
+extern bool check_cygserver_available ();
+extern void cygserver_init ();
 
-#endif /* _CYGSERVER+H+ */
+#endif /* _CYGSERVER_H_ */

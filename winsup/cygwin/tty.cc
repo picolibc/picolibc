@@ -22,7 +22,6 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "pinfo.h"
-#include "cygwin/cygserver_transport.h"
 #include "cygwin/cygserver.h"
 #include "shared_info.h"
 #include "cygthread.h"
@@ -405,10 +404,17 @@ tty::common_init (fhandler_pty_master *ptym)
   /* FIXME: we shold NOT set the security wide open when the
      daemon is running
    */
-  if (wincap.has_security () && cygserver_running != CYGSERVER_OK &&
-      (SetKernelObjectSecurity (hMainProc, DACL_SECURITY_INFORMATION,
-			       get_null_sd ()) == FALSE))
-    system_printf ("Can't set process security, %E");
+  if (wincap.has_security ())
+    {
+      if (cygserver_running == CYGSERVER_UNKNOWN)
+	cygserver_init ();
+
+      if (cygserver_running != CYGSERVER_OK
+	  && !SetKernelObjectSecurity (hMainProc,
+				       DACL_SECURITY_INFORMATION,
+				       get_null_sd ()))
+	system_printf ("Can't set process security, %E");
+    }
 
   /* Create synchronisation events */
 
