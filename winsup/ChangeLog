@@ -1,3 +1,7 @@
+2003-01-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.common (MINGW_LDFLAGS): Add mingw/mingwex builddir.
+
 2002-12-21  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.common: Don't attempt to pretty-print c++ errors.
