@@ -1,3 +1,11 @@
+Sat Mar 18 01:24:25 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* delqueue.cc (delqueue_list::queue_file): Add some debugging.
+	* path.h (class path_conv): Add a char * operator for the most common
+	case.
+	* syscalls.cc (_unlink): Rewrite to use FILE_FLAG_DELETE_ON_CLOSE when
+	possible (i.e., on NT).
+
 Fri Mar 17 18:16:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	Patch suggested by Eric Fifer <EFifer@sanwaint.com>

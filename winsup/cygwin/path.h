@@ -66,6 +66,7 @@ class path_conv
   path_conv (const char * const, symlink_follow follow_mode = SYMLINK_FOLLOW,
 	     int use_full_path = 0, const suffix_info *suffixes = NULL);
   inline char *get_win32 () { return path; }
+  operator char *() {return path; }
   BOOL is_device () {return devn != FH_BAD;}
   DWORD get_devn () {return devn == FH_BAD ? (DWORD) FH_DISK : devn;}
   short get_unitn () {return devn == FH_BAD ? 0 : unit;}

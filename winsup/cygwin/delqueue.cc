@@ -54,6 +54,7 @@ delqueue_list::queue_file (const char *dosname)
 	strcpy(name[i], temp);
 	inuse[i] = 1;
 	empty = 0;
+	debug_printf ("adding '%s' to queue %d", temp, i);
 	return;
       }
 

@@ -67,17 +67,39 @@ _unlink (const char *ourname)
     }
 
   /* Windows won't check the directory mode, so we do that ourselves.  */
-  if (! writable_directory (win32_name.get_win32 ()))
+  if (!writable_directory (win32_name))
     {
       syscall_printf ("non-writable directory");
       goto done;
     }
 
-  if (DeleteFileA (win32_name.get_win32 ()))
-    res = 0;
-  else
+  for (int i = 0; i < 2; i++)
     {
+      if (DeleteFile (win32_name))
+	{
+	  syscall_printf ("DeleteFile succeeded");
+	  res = 0;
+	  break;
+	}
+
+      /* FIXME: There's a race here. */
+      HANDLE h = CreateFile (win32_name, GENERIC_READ,
+			    FILE_SHARE_READ,
+			    &sec_none_nih, OPEN_EXISTING,
+			    FILE_FLAG_DELETE_ON_CLOSE, 0);
+      if (h != INVALID_HANDLE_VALUE)
+	{
+	  CloseHandle (h);
+	  syscall_printf ("CreateFile/CloseHandle succeeded");
+	  res = 0;
+	  break;
+	}
+
+      if (i > 0)
+	goto err;
+
       res = GetLastError ();
+      syscall_printf ("couldn't delete file, %E");
 
       /* if access denied, chmod to be writable in case it is not
 	 and try again */
@@ -85,29 +107,26 @@ _unlink (const char *ourname)
 	 and only try again if permissions are not sufficient */
       if (res == ERROR_ACCESS_DENIED)
 	{
-	  /* chmod ourname to be writable here */
-	  res = chmod (ourname, 0777);
-
-	  if (DeleteFileA (win32_name.get_win32 ()))
-	    {
-	      res = 0;
-	      goto done;
-	    }
-	  res = GetLastError ();
+	  /* chmod file to be writable here */
+	  if (chmod (win32_name, 0777) == 0)
+	    continue;
+	  else
+	    goto err;
 	}
 
       /* If we get ERROR_SHARING_VIOLATION, the file may still be open -
 	 Windows NT doesn't support deleting a file while it's open.  */
       if (res == ERROR_SHARING_VIOLATION)
 	{
-	  cygwin_shared->delqueue.queue_file (win32_name.get_win32 ());
+	  cygwin_shared->delqueue.queue_file (win32_name);
 	  res = 0;
+	  break;
 	}
-      else
-	{
-	  __seterrno ();
-	  res = -1;
-	}
+
+    err:
+      __seterrno ();
+      res = -1;
+      break;
     }
 
 done:
