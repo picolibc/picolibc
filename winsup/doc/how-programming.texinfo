@@ -16,6 +16,11 @@ would be difficult.
 
 @subsection Why is make behaving badly?
 
+First of all, if you are using @samp{make -j[N]}, then stop.  It doesn't
+work well.
+
+Otherwise, read on...
+
 Make has two operating modes, UNIX and WIN32.  You need to make sure
 that you are operating in the right mode.
 
