@@ -737,6 +737,7 @@ handle_to_fn (HANDLE h, char *posix_fn)
   if (res)
     {
       strcpy (posix_fn, "some disk file");
+      debug_printf ("NtQueryObject failed");
       return posix_fn;
     }
 
