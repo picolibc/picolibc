@@ -166,7 +166,7 @@
 #define _READ_WRITE_RETURN_TYPE int
 #endif
 
-#ifndef __WCHAR_MAX__ 
+#ifndef __WCHAR_MAX__
 #if __INT_MAX__ == 32767 || defined(__CYGWIN__) || \
     defined (_WIN32)
 #define __WCHAR_MAX__ 0xffffu

@@ -1,3 +1,10 @@
+2002-09-20  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* configure.host: Minor comment and formatting changes.
+	* libc/Makefile.am: Add libc_la_DEPENDENCIES.
+	* libc/Makefile.in: Regenerated.
+	* libc/include/sys/config.h: Minor format change.
+
 2002-09-19  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/syscalls/sysfcntl.c (fcntl): Fix typo in preprocessor

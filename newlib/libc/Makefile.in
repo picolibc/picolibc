@@ -172,6 +172,7 @@ libc_la_LDFLAGS = -Xcompiler -nostdlib
 
 @USE_LIBTOOL_TRUE@libc_la_SOURCES = 
 @USE_LIBTOOL_TRUE@libc_la_LIBADD = @USE_LIBTOOL_TRUE@$(SUBLIBS)
+@USE_LIBTOOL_TRUE@libc_la_DEPENDENCIES = @USE_LIBTOOL_TRUE@$(SUBLIBS)
 
 info_TEXINFOS = libc.texinfo
 
@@ -214,12 +215,6 @@ libc_a_SOURCES = libc.a.c
 libc_a_OBJECTS =  libc.a.$(OBJEXT)
 LTLIBRARIES =  $(noinst_LTLIBRARIES)
 
-@USE_LIBTOOL_TRUE@libc_la_DEPENDENCIES =  argz/libargz.$(aext) \
-@USE_LIBTOOL_TRUE@stdlib/libstdlib.$(aext) ctype/libctype.$(aext) \
-@USE_LIBTOOL_TRUE@search/libsearch.$(aext) stdio/libstdio.$(aext) \
-@USE_LIBTOOL_TRUE@string/libstring.$(aext) time/libtime.$(aext) \
-@USE_LIBTOOL_TRUE@locale/liblocale.$(aext) reent/libreent.$(aext) \
-@USE_LIBTOOL_TRUE@errno/liberrno.$(aext) misc/libmisc.$(aext)
 @USE_LIBTOOL_TRUE@libc_la_OBJECTS = 
 CFLAGS = @CFLAGS@
 COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)

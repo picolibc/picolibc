@@ -80,6 +80,7 @@ libc_la_LDFLAGS = -Xcompiler -nostdlib
 if USE_LIBTOOL
 libc_la_SOURCES =
 libc_la_LIBADD = $(SUBLIBS)
+libc_la_DEPENDENCIES = $(SUBLIBS)
 else
 libc.a: $(SUBLIBS)
 	rm -f $@

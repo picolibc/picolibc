@@ -22,6 +22,8 @@
 #   host_cpu		The configuration host CPU
 #   newlib_mb		--enable-newlib-mb ("yes", "no")
 #   target_optspace	--enable-target-optspace ("yes", "no", "")
+#   newlib_multithread	--enable-newlib-multithread ("yes", "no", "yes")
+#   newlib_elix_level	--enable-newlib-elix-level ("1","2","3","4") ("4")
 
 # It sets the following shell variables:
 #   newlib_cflags	Special CFLAGS to use when building
@@ -232,9 +234,9 @@ fi
 
 if [ "x${newlib_mb}" = "x" ]; then
 	case "${host}" in
-	  i[3456]86-pc-linux-*|*-*-cygwin*)
+  	  i[3456]86-pc-linux-*|*-*-cygwin*)
 		newlib_mb=yes
-		;;
+	  	;;
 	esac
 fi
 
