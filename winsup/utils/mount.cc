@@ -15,6 +15,7 @@ details. */
 #include <windows.h>
 #include <sys/cygwin.h>
 #include <stdlib.h>
+#include <getopt.h>
 
 #ifdef errno
 #undef errno
@@ -84,32 +85,57 @@ do_mount (const char *dev, const char *where, int flags)
   exit (0);
 }
 
+struct option longopts[] =
+{
+  {"binary", no_argument, NULL, 'b'},
+  {"force", no_argument, NULL, 'f'},
+  {"system", no_argument, NULL, 's'},
+  {"text", no_argument, NULL, 't'},
+  {"user", no_argument, NULL, 'u'},
+  {"executable", no_argument, NULL, 'x'},
+  {"change-cygdrive-prefix", no_argument, NULL, 'c'},
+  {"cygwin-executable", no_argument, NULL, 'X'},
+  {"show-cygdrive-prefix", no_argument, NULL, 'p'},
+  {"import-old-mounts", no_argument, NULL, 'i'},
+  {NULL, 0, NULL, 0}
+};
+
+char opts[] = "bfstuxXpic";
+
 static void
 usage (void)
 {
-  fprintf (stderr, "usage %s [-bfstux] <win32path> <posixpath>
--b  text files are equivalent to binary files (newline = \\n)
--f  force mount, don't warn about missing mount point directories
--s  add mount point to system-wide registry location
--t  text files get \\r\\n line endings (default)
--u  add mount point to user registry location (default)
--x  treat all files under mount point as executables
-
-[-bs] --change-cygdrive-prefix <posixpath>
-    change the cygdrive path prefix to <posixpath>
---show-cygdrive-prefixes
-    show user and/or system cygdrive path prefixes
---import-old-mounts
-    copy old registry mount table mounts into the current mount areas
+  fprintf (stderr, "Usage: %s [OPTION] [<win32path> <posixpath>]\n\
+  -b, --binary                  text files are equivalent to binary files\n\
+				(newline = \\n)\n\
+  -c, --change-cygdrive-prefix  change the cygdrive path prefix to <posixpath>\n\
+  -f, --force                   force mount, don't warn about missing mount\n\
+                                point directories\n\
+  -i, --import-old-mounts copy  old registry mount table mounts into the current\n\
+				mount areas\n\
+  -p, --show-cygdrive-prefix    show user and/or system cygdrive path prefix\n\
+  -s, --system                  add mount point to system-wide registry location\n\
+  -t, --text       (default)    text files get \\r\\n line endings\n\
+  -u, --user       (default)    add mount point to user registry location\n\
+  -x, --executable              treat all files under mount point as executables\n\
+  -X, --cygwin-executable       treat all files under mount point as cygwin\n\
+				executables\n\
 ", progname);
   exit (1);
 }
 
 int
-main (int argc, const char **argv)
+main (int argc, char **argv)
 {
   int i;
   int flags = 0;
+  enum do_what
+  {
+    nada,
+    saw_change_cygdrive_prefix,
+    saw_import_old_mounts,
+    saw_show_cygdrive_prefix
+  } do_what = nada;
 
   progname = argv[0];
 
@@ -119,65 +145,85 @@ main (int argc, const char **argv)
       exit (0);
     }
 
-  for (i = 1; i < argc; ++i)
-    {
-      if (argv[i][0] != '-')
-	 break;
-
-      if (strcmp (argv[i], "--change-cygdrive-prefix") == 0)
-	{
-	  if ((i + 2) != argc)
-	    usage ();
-
-	  change_cygdrive_prefix (argv[i+1], flags);
-	}
-      else if (strcmp (argv[i], "--import-old-mounts") == 0)
-	{
-	  if ((i + 1) != argc)
-	    usage ();
-
-	  cygwin_internal (CW_READ_V1_MOUNT_TABLES);
-	  exit (0);
-	}
-      else if (strcmp (argv[i], "--show-cygdrive-prefixes") == 0)
-	{
-	  if ((i + 1) != argc)
-	    usage ();
-
-	  show_cygdrive_info ();
-	}
-      else if (strcmp (argv[i], "-b") == 0)
+  while ((i = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
+    switch (i)
+      {
+      case 'b':
 	flags |= MOUNT_BINARY;
-      else if (strcmp (argv[i], "-t") == 0)
-	flags &= ~MOUNT_BINARY;
-      else if  (strcmp (argv[i], "-X") == 0)
-	flags |= MOUNT_CYGWIN_EXEC;
-#if 0
-      else if (strcmp (argv[i], "-x") == 0)
-	create_missing_dirs = TRUE;
-#endif
-      else if (strcmp (argv[i], "-s") == 0)
-	flags |= MOUNT_SYSTEM;
-      else if (strcmp (argv[i], "-u") == 0)
-	flags &= ~MOUNT_SYSTEM;
-      else if (strcmp (argv[i], "-x") == 0)
-	flags |= MOUNT_EXEC;
-      else if (strcmp (argv[i], "-f") == 0)
+	break;
+      case 'c': 
+	if (do_what == nada)
+	  do_what = saw_change_cygdrive_prefix;
+	else
+	  usage ();
+	break;
+      case 'f':
 	force = TRUE;
-      else
+	break;
+      case 'i':
+	if (do_what == nada)
+	  do_what = saw_import_old_mounts;
+	else
+	  usage ();
+	break;
+      case 'p':
+	if (do_what == nada)
+	  do_what = saw_show_cygdrive_prefix;
+	else
+	  usage ();
+	break;
+      case 's':
+	flags |= MOUNT_SYSTEM;
+	break;
+      case 't':
+	flags &= ~MOUNT_BINARY;
+	break;
+      case 'u':
+	flags &= ~MOUNT_SYSTEM;
+	break;
+      case 'X':
+	flags |= MOUNT_CYGWIN_EXEC;
+	break;
+      case 'x':
+	flags |= MOUNT_EXEC;
+	break;
+      default:
 	usage ();
-    }
+      }
 
-  if ((i + 2) != argc)
-    usage ();
-
-  if ((force == FALSE) && (mount_already_exists (argv[i + 1], flags)))
+  argc--;
+  switch (do_what)
     {
-      errno = EBUSY;
-      error (argv[i + 1]);
+    case saw_change_cygdrive_prefix:
+      if (optind != argc)
+	usage ();
+      change_cygdrive_prefix (argv[optind], flags);
+      break;
+    case saw_import_old_mounts:
+      if (optind <= argc)
+	usage ();
+      else
+	cygwin_internal (CW_READ_V1_MOUNT_TABLES);
+      break;
+    case saw_show_cygdrive_prefix:
+      if (optind <= argc)
+	usage ();
+      show_cygdrive_info ();
+      break;
+    default:
+      if (optind != (argc - 1))
+	{
+	  fprintf (stderr, "%s: too many arguments\n", progname);
+	  usage ();
+	}
+      if (force || !mount_already_exists (argv[optind + 1], flags))
+	do_mount (argv[optind], argv[optind + 1], flags);
+      else
+	{
+	  errno = EBUSY;
+	  error (argv[optind + 1]);
+	}
     }
-  else
-    do_mount (argv[i], argv[i + 1], flags);
 
   /* NOTREACHED */
   return 0;
@@ -257,7 +303,7 @@ change_cygdrive_prefix (const char *new_prefix, int flags)
   exit (0);
 }
 
-/* show_cygdrive_info: Show the user and/or cygdrive info, i.e., prefixes and
+/* show_cygdrive_info: Show the user and/or cygdrive info, i.e., prefix and
    flags.*/
 static void
 show_cygdrive_info ()
@@ -270,7 +316,7 @@ show_cygdrive_info ()
   cygwin_internal (CW_GET_CYGDRIVE_INFO, user, system, user_flags,
 		   system_flags);
 
-  /* Display the user and system cygdrive path prefixes, if necessary
+  /* Display the user and system cygdrive path prefix, if necessary
      (ie, not empty) */
   const char *format = "%-18s  %-11s  %s\n";
   printf (format, "Prefix", "Type", "Flags");
