@@ -165,15 +165,18 @@ itself a symbolic link, then find will not traverse it unless you
 specify the @samp{-follow} option.  This behavior is different than most
 other UNIX implementations, but is not likely to change.
 
-@subsection Where is the @samp{su} command?
+@subsection Why doesn't @samp{su} work?
 
-The @samp{su} command is not ported to Cygwin, so it is no longer
-provided in the distribution.  You may be able to use @samp{login}
-instead, but you should read
+The @samp{su} command has been in and out of Cygwin distributions, but
+it has not been ported to Cygwin and has never worked.  It is
+currently installed as part of the sh-utils, but again, it does not work.
+
+You may be able to use @samp{login} instead, but you should read
 @file{http://www.cygwin.com/ml/cygwin/2001-03/msg00337.html} first.
 
-If you have a copy of su, then it's from an old Cygwin distribution, and
-it probably doesn't work properly anyway.
+For some technical background into why @samp{su} doesn't work, read
+@file{http://www.cygwin.com/ml/cygwin/2003-06/msg00897.html} and
+related messages.
 
 @subsection Why doesn't man (or apropos) work?
 
