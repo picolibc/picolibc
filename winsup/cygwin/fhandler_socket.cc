@@ -61,15 +61,35 @@ get_inet_addr (const struct sockaddr *in, int inlen,
     }
   else if (in->sa_family == AF_LOCAL)
     {
-      int fd = open (in->sa_data, O_RDONLY);
-      if (fd == -1)
-	return 0;
-
+      path_conv pc (in->sa_data, PC_SYM_FOLLOW);
+      if (pc.error)
+        {
+	  set_errno (pc.error);
+	  return 0;
+	}
+      if (!pc.exists ())
+        {
+	  set_errno (ENOENT);
+	  return 0;
+	}
+      if (!pc.issocket ())
+        {
+	  set_errno (EBADF);
+	  return 0;
+	}
+      HANDLE fh = CreateFile (pc, GENERIC_READ, wincap.shared (), &sec_none,
+			      OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+      if (fh == INVALID_HANDLE_VALUE)
+        {
+	  __seterrno ();
+	  return 0;
+	}
       int ret = 0;
+      DWORD len = 0;
       char buf[128];
       memset (buf, 0, sizeof buf);
-      if (read (fd, buf, sizeof buf) != -1)
-	{
+      if (ReadFile (fh, buf, 128, &len, 0))
+        {
 	  sockaddr_in sin;
 	  sin.sin_family = AF_INET;
 	  sscanf (buf + strlen (SOCKET_COOKIE), "%hu %08x-%08x-%08x-%08x",
@@ -81,7 +101,7 @@ get_inet_addr (const struct sockaddr *in, int inlen,
 	  *outlen = sizeof sin;
 	  ret = 1;
 	}
-      close (fd);
+      CloseHandle (fh);
       return ret;
     }
   else
