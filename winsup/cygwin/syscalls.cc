@@ -2121,6 +2121,8 @@ seteuid32 (__uid32_t uid)
   HANDLE ptok, new_token = INVALID_HANDLE_VALUE;
   struct passwd * pw_new;
   BOOL token_is_internal, issamesid;
+  char dacl_buf[MAX_DACL_LEN (5)];
+  TOKEN_DEFAULT_DACL tdacl = {};
   
   pw_new = internal_getpwuid (uid);
   if (!wincap.has_security () && pw_new)
@@ -2161,18 +2163,13 @@ seteuid32 (__uid32_t uid)
   debug_printf ("Found token %d", new_token);
 
   /* Set process def dacl to allow access to impersonated token */
-  if (cygheap->user.current_token != new_token)
+  if (sec_acl ((PACL) dacl_buf, true, true, usersid))
     {
-      char dacl_buf[MAX_DACL_LEN (5)];
-      if (sec_acl ((PACL) dacl_buf, true, false, usersid))
-	{
-	  TOKEN_DEFAULT_DACL tdacl;
-	  tdacl.DefaultDacl = (PACL) dacl_buf;
-	  if (!SetTokenInformation (ptok, TokenDefaultDacl,
-				    &tdacl, sizeof dacl_buf))
-	    debug_printf ("SetTokenInformation"
-			  "(TokenDefaultDacl): %E");
-	}
+      tdacl.DefaultDacl = (PACL) dacl_buf;
+      if (!SetTokenInformation (ptok, TokenDefaultDacl,
+				&tdacl, sizeof dacl_buf))
+	debug_printf ("SetTokenInformation"
+		      "(TokenDefaultDacl): %E");
     }
 
   /* If no impersonation token is available, try to
@@ -2193,7 +2190,7 @@ seteuid32 (__uid32_t uid)
 	CloseHandle (cygheap->user.internal_token);
       cygheap->user.internal_token = new_token;
     }
-  else if (new_token != ptok)
+  if (new_token != ptok)
     {
       /* Avoid having HKCU use default user */
       load_registry_hive (usersid);
@@ -2204,11 +2201,15 @@ seteuid32 (__uid32_t uid)
 	debug_printf ("SetTokenInformation(user.token, "
 		      "TokenOwner): %E");
       /* Try setting primary group in token to current group */
-      if (!SetTokenInformation (new_token,
-				TokenPrimaryGroup,
+      if (!SetTokenInformation (new_token, TokenPrimaryGroup,
 				&groups.pgsid, sizeof (cygsid)))
 	debug_printf ("SetTokenInformation(user.token, "
 		      "TokenPrimaryGroup): %E");
+      /* Try setting default DACL */
+      if (tdacl.DefaultDacl
+	  && !SetTokenInformation (new_token, TokenDefaultDacl,
+				   &tdacl, sizeof (tdacl)))
+	debug_printf ("SetTokenInformation (TokenDefaultDacl): %E");
     }
 
   CloseHandle (ptok);

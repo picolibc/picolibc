@@ -815,8 +815,7 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   PTOKEN_PRIVILEGES privs = NULL;
   TOKEN_OWNER owner;
   TOKEN_PRIMARY_GROUP pgrp;
-  char acl_buf[MAX_DACL_LEN (5)];
-  TOKEN_DEFAULT_DACL dacl;
+  TOKEN_DEFAULT_DACL dacl = {};
   TOKEN_SOURCE source;
   TOKEN_STATISTICS stats;
   memcpy (source.SourceName, "Cygwin.1", 8);
@@ -904,13 +903,6 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   /* Retrieve list of privileges of that user. */
   if (!(privs = get_priv_list (lsa, usersid, tmp_gsids)))
     goto out;
-
-  /* Create default dacl. */
-  if (!sec_acl ((PACL) acl_buf, false, false,
-		tmp_gsids.contains (well_known_admins_sid) ?
-		well_known_admins_sid : usersid))
-    goto out;
-  dacl.DefaultDacl = (PACL) acl_buf;
 
   /* Let's be heroic... */
   ret = NtCreateToken (&token, TOKEN_ALL_ACCESS, &oa, TokenImpersonation,
