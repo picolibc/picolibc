@@ -358,7 +358,7 @@ proc_subproc (DWORD what, DWORD val)
 	      w->next->pid = 0;
 	      if (clearing)
 		w->next->status = -1;		/* flag that a signal was received */
-	      else if (!(w->next->options & WNOHANG))
+	      else if (!potential_match || !(w->next->options & WNOHANG))
 		w->next->ev = NULL;
 	      if (!SetEvent (oldw))
 		system_printf ("couldn't wake up wait event %p, %E", oldw);

@@ -1,3 +1,8 @@
+Mon Oct 23 16:43:33 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* sigproc.cc (proc_subproc): Don't send a false positive if WNOHANG and
+	no processes are available for waiting.
+
 Mon Oct 23 22:27:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::fcntl): Setting flags in F_SETFL
