@@ -1,3 +1,8 @@
+2003-11-04  Christopher Faylor  <cgf@redhat.com>
+
+	* net.cc (dup_ent): Use IsBadStringPtr for alignment checks.  Don't use
+	a known bad pointer.
+
 2003-11-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* net.cc (dup_ent): Move Win 95 misalignment recogition before
