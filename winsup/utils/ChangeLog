@@ -1,5 +1,9 @@
 2003-07-03  Christopher Faylor  <cgf@redhat.com>
 
+	* mount.cc (struct opt): Remove posix option.
+
+2003-07-03  Christopher Faylor  <cgf@redhat.com>
+
 	* mount.cc (longopts): Add long "options" keyword.
 	(opts): Add -o option.
 	(usage): Display -o option.

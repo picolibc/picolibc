@@ -174,8 +174,7 @@ struct opt
   {"exec", MOUNT_EXEC, 0},
   {"notexec", MOUNT_NOTEXEC, 0},
   {"cygexec", MOUNT_CYGWIN_EXEC, 0},
-  {"suid", 0, 0},
-  {"posix", MOUNT_ENC, 0},
+  {"nosuid", 0, 0},
   {"managed", MOUNT_ENC, 0}
 };
 

@@ -648,6 +648,23 @@ mount table. It also makes moving your settings to a different machine
 much easier.
 </para>
 
+<para>
+The <literal>-o</literal> option is the method via which various options about
+the mount point may be recorded.  The following options are available (note that
+most of the options are duplicates of other mount flags):</para>
+
+<screen>
+  user       - mount lives user-specific mount
+  system     - mount lives in system table (default)
+  binary     - files default to binary mode (default)
+  text       - files default to CRLF text mode line endings
+  exec       - files below mount point are all executable
+  notexec    - files below mount point are not executable
+  cygexec    - files below mount point are all cygwin executables
+  nosuid     - no suid files are allowed (currently unimplemented)
+  managed    - directory is managed by cygwin.  Mixed case and special
+               characters in filenames are allowed.
+</screen>
 </sect3>
 
 <sect3><title>Cygdrive mount points</title>
