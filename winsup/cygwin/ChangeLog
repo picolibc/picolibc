@@ -1,7 +1,11 @@
+2003-02-06  Christopher Faylor  <cgf@redhat.com>
+
+	* heap.cc (heap_init): Remove debugging code.
+
 2003-02-06  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* security.h: Introduce names UNKNOWN_UID and UNKNOWN_GID and delete
-	declaration of is_grp_member. 
+	declaration of is_grp_member.
 	* uinfo.cc (internal_getlogin): Use UNKNOWN_GID.
 	* passwd.cc (pwdgrp::read_passwd): Use UNKNOWN_UID.
 	* grp.cc (pwdgrp::read_group): Change group name to provide better

@@ -69,8 +69,6 @@ heap_init ()
 
       /* Loop until we've managed to reserve an adequate amount of memory. */
       char *p;
-MEMORY_BASIC_INFORMATION m;
-(void) VirtualQuery (cygheap->user_heap.base, &m, sizeof (m));
       for (;;)
 	{
 	  p = (char *) VirtualAlloc (cygheap->user_heap.base, reserve_size,
@@ -80,18 +78,6 @@ MEMORY_BASIC_INFORMATION m;
 	  if ((reserve_size -= page_const) <= allocsize)
 	    break;
 	}
-      if (p == NULL)
-{
-system_printf ("unable to allocate heap %p, chunk %u, reserve %u, alloc %u, %E",
-cygheap->user_heap.base, cygheap->user_heap.chunk,
-reserve_size, allocsize);
-system_printf ("base %p mem alloc base %p, state %p, size %d, %E",
-cygheap->user_heap.base, m.AllocationBase, m.State, m.RegionSize);
-error_start_init ("h:/gdbtest/gdb.exe < con > con"); try_to_debug ();
-	api_fatal ("unable to allocate heap %p, chunk %u, reserve %u, alloc %u, %E",
-		   cygheap->user_heap.base, cygheap->user_heap.chunk,
-		   reserve_size, allocsize);
-}
       if (p != cygheap->user_heap.base)
 	api_fatal ("heap allocated but not at %p", cygheap->user_heap.base);
       if (!VirtualAlloc (cygheap->user_heap.base, allocsize, MEM_COMMIT, PAGE_READWRITE))
