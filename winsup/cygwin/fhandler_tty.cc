@@ -1164,6 +1164,7 @@ fhandler_pty_master::open (int flags, mode_t)
   slave = *ttys_dev;
   slave.setunit (ntty);
   cygwin_shared->tty[ntty]->common_init (this);
+  ReleaseMutex (tty_mutex);	// lock was set in allocate_tty
   inuse = get_ttyp ()->create_inuse (TTY_MASTER_ALIVE);
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   set_open_status ();

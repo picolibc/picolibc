@@ -282,16 +282,22 @@ tty_list::allocate_tty (bool with_console)
 
 out:
   if (freetty < 0)
-    system_printf ("No tty allocated");
+    {
+      ReleaseMutex (tty_mutex);
+      system_printf ("No tty allocated");
+    }
   else if (!with_console)
-    termios_printf ("tty%d allocated", freetty);
+    {
+      termios_printf ("tty%d allocated", freetty);
+      /* exit with tty_mutex still held -- caller has more work to do */
+    }
   else
     {
       termios_printf ("console %p associated with tty%d", console, freetty);
       if (!hmaster)
 	create_tty_master (freetty);
+      ReleaseMutex (tty_mutex);
     }
-  ReleaseMutex (tty_mutex);
   return freetty;
 }
 

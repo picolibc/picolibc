@@ -1,3 +1,10 @@
+2004-05-20  Christopher Faylor  <cgf@alum.bu.edu>
+
+	* tty.cc (tty_list::allocate_tty): Leave tty_mutex armed on successful
+	return from !with_console
+	* fhandler_tty.cc (fhandler_pty_master::open): Release tty_mutex here
+	after all initialization is done.
+
 2004-05-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* grp.cc (getgrgid_r): Replace struct group by struct __group32 in
