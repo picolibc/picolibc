@@ -133,11 +133,12 @@ forcekill (int pid, int sig, int wait)
   HANDLE h = OpenProcess (PROCESS_TERMINATE, FALSE, (DWORD) dwpid);
   if (!h)
     {
-    fprintf (stderr, "couldn't open pid %u\n", (unsigned) dwpid);
-    return;
+      fprintf (stderr, "couldn't open pid %u\n", (unsigned) dwpid);
+      return;
     }
   if (!wait || WaitForSingleObject (h, 200) != WAIT_OBJECT_0)
-    if (!TerminateProcess (h, sig << 8))
+    if (!TerminateProcess (h, sig << 8)
+	&& WaitForSingleObject (h, 200) != WAIT_OBJECT_0)
       fprintf (stderr, "couldn't kill pid %u, %u\n", (unsigned) dwpid,
 	       (unsigned) GetLastError ());
   CloseHandle (h);

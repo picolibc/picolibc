@@ -1,3 +1,8 @@
+2003-09-13  Christopher Faylor  <cgf@redhat.com>
+
+	* kill.c (forcekill): Wait for process to terminate even if
+	TerminateProcess says it failed.
+
 2003-09-11  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in: Tweak mingw libz.a detection to make it more reliably
