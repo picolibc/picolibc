@@ -799,7 +799,7 @@ chown_worker (const char *name, unsigned fmode, __uid32_t uid, __gid32_t gid)
 
       /* FIXME: This makes chown on a device succeed always.  Someday we'll want
 	 to actually allow chown to work properly on devices. */
-      if (win32_path.is_device ())
+      if (win32_path.is_device () && !win32_path.issocket ())
 	{
 	  res = 0;
 	  goto done;
