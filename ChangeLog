@@ -1,3 +1,9 @@
+2001-06-17  H.J. Lu <hjl@gnu.org>
+
+	* Makefile.in (gas.tar.bz2): Pass TOOL=bfd PACKAGE=gas to make.
+	(gas+binutils.tar.bz2): Likewise.
+	(binutils.tar.bz2): Pass TOOL=bfd PACKAGE=binutils to make.
+
 Fri Jun  8 11:14:02 2001  Andrew Cagney  <cagney@b1.cygnus.com>
 
 	* Makefile.in (VER): When present, extract the version number from
