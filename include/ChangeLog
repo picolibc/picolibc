@@ -1,3 +1,8 @@
+2001-08-25  Nick Clifton  <nickc@cambridge.redhat.com>
+
+	* bfdlink.h (struct bfd_link_info): Change 'spare_dynamic_tags' to
+	unsigned to remove a compile time warning message.
+
 2001-08-24  H.J. Lu  <hjl@gnu.org>
 
 	* bfdlink.h (bfd_link_hash_table_type): New. The linker hash

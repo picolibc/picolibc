@@ -295,7 +295,7 @@ struct bfd_link_info
   boolean combreloc;
 
   /* How many spare .dynamic DT_NULL entries should be added?  */
-  int spare_dynamic_tags;
+  unsigned int spare_dynamic_tags;
 };
 
 /* This structures holds a set of callback functions.  These are
