@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <utmp.h>
@@ -29,8 +31,6 @@ endutent ()
 void
 utmpname (_CONST char *file)
 {
-  extern char *strdup (char *);
-
   utmp_file = strdup (file);
 }
 

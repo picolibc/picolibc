@@ -56,7 +56,9 @@ Supporting OS subroutines required: <<_exit>>, <<_execve>>, <<_fork_r>>,
 #include <errno.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <_syslist.h>
+#include <reent.h>
 
 #if defined (unix) || defined (__CYGWIN32__)
 static int do_system ();
@@ -112,7 +114,7 @@ do_system (ptr, s)
 {
   char *argv[4];
   int pid, status;
-  extern char *environ[];
+  extern char **environ;
 
   argv[0] = "sh";
   argv[1] = "-c";

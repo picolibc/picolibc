@@ -2,6 +2,8 @@
    These implementations just call the usual system calls.  */
 
 #include <reent.h>
+#include <signal.h>
+#include <unistd.h>
 #include <_syslist.h>
 
 /* Some targets provides their own versions of these functions.  Those

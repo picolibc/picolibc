@@ -45,6 +45,7 @@ Supporting OS subroutine required: <<unlink>>.
 */
 
 #include <stdio.h>
+#include <reent.h>
 
 int
 _remove_r (ptr, filename)

@@ -3,6 +3,7 @@
 
 #include <reent.h>
 #include <unistd.h>
+#include <sys/wait.h>
 #include <_syslist.h>
 
 /* Some targets provides their own versions of these functions.  Those

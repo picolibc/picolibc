@@ -1,3 +1,5 @@
+#include <string.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <utmp.h>
 #include <fcntl.h>

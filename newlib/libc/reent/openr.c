@@ -2,6 +2,7 @@
 
 #include <reent.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <_syslist.h>
 
 /* Some targets provides their own versions of this functions.  Those

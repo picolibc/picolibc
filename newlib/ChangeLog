@@ -1,5 +1,32 @@
 2000-08-23  Werner Almesberger  <Werner.Almesberger@epfl.ch>
 
+	* libc/stdlib/abort.c: changed description: uses "raise" instead of
+	"getpid" and "kill"; added: uses "write" and "_exit".
+	Also included unistd.h for "_exit" prototype.
+	* libc/stdlib/system.c: included unistd.h for "execve" prototype,
+	reent.h for "_fork_r" and "_wait_r" prototypes.
+	(do_system): changed  extern char *environ[] to POSIX-friendly 
+	extern char **environ.
+	* libc/stdlib/wctomb_r.c: included string.h for "strlen" and "strcmp"
+	prototypes.
+	* libc/stdlib/remove.c: included reent.h for "_unlink_r" prototype.
+	* libc/reent/execr.c: included sys/wait.h for "wait" prototype.
+	* libc/reent/fstatr.c: included sys/stat.h for "fstat" prototype.
+	* libc/reent/openr.c: included fcntl.h for "open" prototype.
+	* libc/reent/signalr.c: included signal.h for "kill" prototype,
+	unistd.h for "getpid" prototype.
+	* libc/reent/statr.c: included sys/stat.h for "stat" prototype.
+	* libc/reent/timer.c: included sys/time.h for "gettimeofday" prototype.
+	* libc/unix/getut.c (utmpname): removed local, incorrect "strdup"
+	prototype.  Also included stdlib.h for "abort", string.h for
+	"strdup" and "strncmp" prototypes.
+	* libc/unix/getlogin.c: included string.h for "strncmp", "memset", and
+	"strncpy", unistd.h for "read" and "close" prototypes.
+	* libc/posix/execvp.c: included string.h for "strchr", "strlen", and
+	"strcat" prototypes.
+
+2000-08-23  Werner Almesberger  <Wernen Almesberger@epfl.ch>
+
 	* libc/stdio/stdio.c (__swrite): declare "oldmode" only if it's
 	used later (ifdef __SCLE)
 	* libc/stdio/vfscanf.c (__svfscanf): declare "state" only if it's

@@ -43,10 +43,11 @@ RETURNS
 PORTABILITY
 ANSI C requires <<abort>>.
 
-Supporting OS subroutines required: <<getpid>>, <<kill>>.
+Supporting OS subroutines required: <<_exit>> and optionally, <<write>>.
 */
 
 #include <stdlib.h>
+#include <unistd.h>
 #include <signal.h>
 
 _VOID
