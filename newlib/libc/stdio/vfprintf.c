@@ -790,6 +790,18 @@ number:			if ((dprec = prec) >= 0)
 					goto skipsize;
 				}
 			}
+                       /*
+			* ...result is to be converted to an 'alternate form'.
+			* For o conversion, it increases the precision to force
+			* the first digit of the result to be a zero."
+			*     -- ANSI X3J11
+			*
+			* To demonstrate this case, compile and run:
+                        *    printf ("%#.0o",0);
+			*/
+                       else if (base == OCT && (flags & ALT))
+                         *--cp = '0';
+
 			size = buf + BUF - cp;
 		skipsize:
 			break;
