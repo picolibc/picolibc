@@ -721,6 +721,7 @@
 #define AT_ICACHEBSIZE	20		/* Instruction cache block size.  */
 #define AT_UCACHEBSIZE	21		/* Unified cache block size.  */
 #define AT_IGNOREPPC	22		/* Entry should be ignored */
+#define	AT_SECURE	23		/* Boolean, was exec setuid-like?  */
 /* Pointer to the global system page used for system calls and other
    nice things.  */
 #define AT_SYSINFO	32
