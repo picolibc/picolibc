@@ -96,23 +96,6 @@ hardware_init_hook(void)
   cfe_conshandle = cfe_getstdhandle(CFE_STDHANDLE_CONSOLE);
 }
 
-/* Avoid worst-case execution hazards.  This is targetted at the SB-1
-   pipe, and is much worse than it needs to be (not even counting
-   the subroutine call and return).  */
-void
-hardware_hazard_hook(void)
-{
-  __asm__ __volatile__ ("	.set push		\n"
-			"	.set mips32		\n"
-			"	.set noreorder		\n"
-			"	ssnop			\n"
-			"	ssnop			\n"
-			"	ssnop			\n"
-			"	bnel	$0, $0, .+4	\n"
-			"	ssnop			\n"
-			"	.set pop		\n");
-}
-
 /* Exit back to monitor, with the given status code.  */
 void
 hardware_exit_hook (int status)

@@ -64,3 +64,23 @@ _prestart:
 	jr	v0
 	nop
 	.end _prestart
+
+
+/* Avoid worst-case execution hazards.  This is targetted at the SB-1
+   pipe, and is much worse than it needs to be (not even counting
+   the subroutine call and return).  */
+	.globl	hardware_hazard_hook
+	.ent	hardware_hazard_hook
+hardware_hazard_hook:
+	.set push
+	.set mips32
+	.set noreorder
+	ssnop
+	ssnop
+	ssnop
+	bnel	$0, $0, .+4
+	ssnop
+	j	ra
+	nop
+	.set pop
+	.end	hardware_hazard_hook
