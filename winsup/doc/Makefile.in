@@ -92,7 +92,7 @@ cygwin-api-int.sgml : cygwin-api.in.sgml ./doctool Makefile
 %.html: %.texinfo
 	-$(TEXI2HTML) -I$(srcdir) $<
 
-readme.txt: readme.texinfo
+readme.txt: $(srcdir)/readme.texinfo $(srcdir)/*.texinfo
 	-$(MAKEINFO) -I$(srcdir) --no-split --no-headers $< -o - |\
 	sed '/^Concept Index/,$$d' > $@
 
