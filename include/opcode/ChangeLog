@@ -1,5 +1,10 @@
 2003-05-20  Jason Eckhardt  <jle@rice.edu>
 
+	opcode/i860.h (flush): Set lower 3 bits properly and use 'L'
+	for the immediate operand type instead of 'i'.
+
+2003-05-20  Jason Eckhardt  <jle@rice.edu>
+
 	opcode/i860.h (fzchks): Both S and R bits must be set.
 	(pfzchks): Likewise.
 	(faddp): Likewise.

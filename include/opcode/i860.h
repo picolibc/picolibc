@@ -1,5 +1,5 @@
 /* Table of opcodes for the i860.
-   Copyright 1989, 1991, 2000 Free Software Foundation, Inc.
+   Copyright 1989, 1991, 2000, 2003 Free Software Foundation, Inc.
 
 This file is part of GAS, the GNU Assembler, and GDB, the GNU disassembler.
 
@@ -176,8 +176,8 @@ static const struct i860_opcode i860_opcodes[] =
 
 { "trap",	0x44000000, 0xb8000000, "1,2,d", 0 },	/* trap isrc1ni,isrc2,idest */
 
-{ "flush",	0x34000000, 0xc81f0001, "i(2)", E_ADDR },	/* flush #const(isrc2) */
-{ "flush",	0x34000001, 0xc81f0000, "i(2)++", E_ADDR },	/* flush #const(isrc2)++ */
+{ "flush",	0x34000004, 0xc81f0003, "L(2)", E_ADDR },	/* flush #const(isrc2) */
+{ "flush",	0x34000005, 0xc81f0002, "L(2)++", E_ADDR },	/* flush #const(isrc2)++ */
 
 { "and",	0xc0000000, 0x3c000000, "1,2,d", 0 },	/* and isrc1,isrc2,idest */
 { "and",	0xc4000000, 0x38000000, "i,2,d", E_AND },	/* and #const,isrc2,idest */
