@@ -370,7 +370,7 @@ server_request::process ()
     case CYGSERVER_REQUEST_SHUTDOWN:
       req = new client_request_shutdown (); break;
     case CYGSERVER_REQUEST_SHM_GET:
-     req = new client_request_shm_get (); break;
+     req = new client_request_shm (); break;
     default:
       req = new client_request (CYGSERVER_REQUEST_INVALID, 0);
       req->header.error_code = ENOSYS;

@@ -15,23 +15,33 @@ details. */
 
 #define SHM_CREATE 0
 #define SHM_REATTACH 1
+#define SHM_ATTACH 2
+#define SHM_DETACH 3
 
 
-class client_request_shm_get : public client_request
+class client_request_shm : public client_request
 {
   public:
 #ifndef __INSIDE_CYGWIN__
   virtual void serve (transport_layer_base *conn, process_cache *cache);
 #endif
-  client_request_shm_get::client_request_shm_get(key_t, size_t, int, char psdbuf[4096], pid_t);
-  client_request_shm_get::client_request_shm_get();
-  client_request_shm_get::client_request_shm_get(int,pid_t);
+  client_request_shm (key_t, size_t, int, char psdbuf[4096], pid_t);
+  client_request_shm ();
+  client_request_shm (int, int, pid_t);
+  client_request_shm (int, int);
   union {
    struct {int type; pid_t pid; int shm_id; key_t key; size_t size; int shmflg; char sd_buf[4096];} in;
    struct {int shm_id; HANDLE filemap; HANDLE attachmap; key_t key;} out;
   } parameters;
 };
 
+#ifndef __INSIDE_CYGWIN__
+class shm_cleanup : cleanup_routine
+{
+public:
+  virtual void cleanup (long winpid);
+};
+#endif
 #if 0
 class _shmattach {
 public:

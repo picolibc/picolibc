@@ -45,16 +45,25 @@ getsystemallocgranularity ()
   return buffer_offset;
 }
 
-client_request_shm_get::client_request_shm_get (int nshm_id, pid_t npid):
+client_request_shm::client_request_shm (int ntype, int nshm_id):
 client_request (CYGSERVER_REQUEST_SHM_GET, sizeof (parameters))
 {
   buffer = (char *) &parameters;
   parameters.in.shm_id = nshm_id;
   parameters.in.type = SHM_REATTACH;
+  parameters.in.pid = GetCurrentProcessId ();
+}
+
+client_request_shm::client_request_shm (int ntype, int nshm_id, pid_t npid):
+client_request (CYGSERVER_REQUEST_SHM_GET, sizeof (parameters))
+{
+  buffer = (char *) &parameters;
+  parameters.in.shm_id = nshm_id;
+  parameters.in.type = ntype;
   parameters.in.pid = npid;
 }
 
-client_request_shm_get::client_request_shm_get (key_t nkey, size_t nsize,
+client_request_shm::client_request_shm (key_t nkey, size_t nsize,
                                                 int nshmflg,
                                                 char psdbuf[4096],
                                                 pid_t npid):
@@ -187,8 +196,8 @@ shmat (int shmid, const void *shmaddr, int shmflg)
       /* couldn't find a currently open shm control area for the key - probably because
        * shmget hasn't been called. 
        * Allocate a new control block - this has to be handled by the daemon */
-      client_request_shm_get *req =
-	new client_request_shm_get (shmid, GetCurrentProcessId ());
+      client_request_shm *req =
+	new client_request_shm (SHM_REATTACH, shmid, GetCurrentProcessId ());
 
       int rc;
       if ((rc = cygserver_request (req)))
@@ -239,10 +248,17 @@ shmat (int shmid, const void *shmaddr, int shmflg)
       set_errno (EACCES);
       return (void *) -1;
     }
+  /* tell the daemon we have attached */
+  client_request_shm *req =
+    new client_request_shm (SHM_ATTACH, shmid);
+  int rc;
+  if ((rc = cygserver_request (req)))
+    {
+      debug_printf ("failed to tell deaemon that we have attached\n");
+    }
+  delete req;
 
-  InterlockedIncrement (&shm->shm_nattch);
   _shmattach *attachnode = new _shmattach;
-
   attachnode->data = rv;
   attachnode->shmflg = shmflg;
   attachnode->next =
@@ -276,8 +292,8 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
       /* couldn't find a currently open shm control area for the key - probably because
        * shmget hasn't been called.
        * Allocate a new control block - this has to be handled by the daemon */
-      client_request_shm_get *req =
-	new client_request_shm_get (shmid, GetCurrentProcessId ());
+      client_request_shm *req =
+	new client_request_shm (SHM_REATTACH, shmid, GetCurrentProcessId ());
 
       int rc;
       if ((rc = cygserver_request (req)))
@@ -337,8 +353,8 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
 	 */
 #if 0
 //waiting for the daemon to handle terminating process's
-	client_request_shm_get *req =
-	  new client_request_shm_get (SHM_DEL, shmid, GetCurrentProcessId ());
+	client_request_shm *req =
+	  new client_request_shm (SHM_DEL, shmid, GetCurrentProcessId ());
 	int rc;
 	if ((rc = cygserver_request (req)))
 	  {
@@ -428,8 +444,8 @@ shmget (key_t key, size_t size, int shmflg)
     }
   /* couldn't find a currently open shm control area for the key.
    * Allocate a new control block - this has to be handled by the daemon */
-  client_request_shm_get *req =
-    new client_request_shm_get (key, size, shmflg, sd_buf,
+  client_request_shm *req =
+    new client_request_shm (key, size, shmflg, sd_buf,
 				GetCurrentProcessId ());
 
   int rc;

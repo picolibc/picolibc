@@ -95,18 +95,50 @@ process_cache::process_requests ()
 }
 
 void
-process_cache::add ()
+process_cache::add_task (class process * theprocess)
 {
   /* safe to not "Try" because workers don't hog this, they wait on the event
    */
   /* every derived ::add must enter the section! */
   EnterCriticalSection (&queuelock);
-  queue_request *listrequest = new process_request;
+  queue_request *listrequest = new process_cleanup (theprocess);
   threaded_queue::add (listrequest);
   LeaveCriticalSection (&queuelock);
 }
 
-
+/* NOT fully MT SAFE: must be called by only one thread in a program */
+void
+process_cache::remove_process (class process *theprocess)
+{
+  class process *entry = head;
+  /* unlink */
+  EnterCriticalSection (&cache_write_access);
+  if (entry == theprocess)
+    {
+      entry = (class process *) InterlockedExchangePointer (&head, theprocess->next);
+      if (entry != theprocess)
+        {
+          printf ("Bug encountered, process cache corrupted\n");
+	  exit (1);
+        }
+    }
+  else
+    {
+      while (entry->next && entry->next != theprocess)
+	entry = entry->next;
+      class process *temp = (class process *) InterlockedExchangePointer (&entry->next, theprocess->next);
+      if (temp != theprocess)
+	{
+	  printf ("Bug encountered, process cache corrupted\n");
+	  exit (1);
+	}
+    }
+  LeaveCriticalSection (&cache_write_access);
+  /* Process any cleanup tasks */
+  add_task (theprocess);
+}
+	
+      
 /* copy <= max_copy HANDLEs to dest[], starting at an offset into _our list_ of
  * begin_at. (Ie begin_at = 5, the first copied handle is still written to dest[0]
  * NOTE: Thread safe, but not thread guaranteed - a newly added process may be missed. 
@@ -148,6 +180,7 @@ process_cache::handle_snapshot (HANDLE * hdest, class process ** edest,
 }
 
 /* process's */
+/* global process crit section */
 static CRITICAL_SECTION process_access;
 static pthread_once_t process_init;
 
@@ -159,7 +192,7 @@ do_process_init (void)
 }
 
 process::process (long pid):
-winpid (pid), next (NULL), _exit_status (STILL_ACTIVE)
+winpid (pid), next (NULL), cleaning_up (0), head (NULL), _exit_status (STILL_ACTIVE)
 {
   pthread_once (&process_init, do_process_init);
   EnterCriticalSection (&process_access);
@@ -170,7 +203,13 @@ winpid (pid), next (NULL), _exit_status (STILL_ACTIVE)
       thehandle = INVALID_HANDLE_VALUE;
     }
   debug_printf ("Got handle %p for new cache process %ld\n", thehandle, pid);
+  InitializeCriticalSection (&access);
   LeaveCriticalSection (&process_access);
+}
+
+process::~process ()
+{
+  DeleteCriticalSection (&access);
 }
 
 HANDLE
@@ -216,11 +255,53 @@ DWORD process::exit_code ()
   return _exit_status;
 }
 
-/* process_request */
+/* this is single threaded. It's called after the process is removed from the cache,
+ * but inserts may be attemped by worker threads that have a pointer to it */
 void
-process_request::process ()
+process::cleanup ()
 {
-  printf ("processing...\n");
+  /* Serialize this */
+  EnterCriticalSection (&access);
+  InterlockedIncrement (&(long)cleaning_up);
+  class cleanup_routine *entry = head;
+  while (entry)
+    {
+      class cleanup_routine *temp;
+      entry->cleanup (winpid);
+      temp = entry->next;
+      delete entry;
+      entry = temp;
+    }
+  LeaveCriticalSection (&access);
+}
+
+bool
+process::add_cleanup_routine (class cleanup_routine *new_cleanup)
+{
+  if (cleaning_up)
+    return false;
+  EnterCriticalSection (&access);
+  /* check that we didn't block with ::cleanup () 
+   * This rigmarole is to get around win9x's glaring missing TryEnterCriticalSection call
+   * which would be a whole lot easier
+   */
+  if (cleaning_up)
+    {
+      LeaveCriticalSection (&access);
+      return false;
+    }
+  new_cleanup->next = head;
+  head = new_cleanup;
+  LeaveCriticalSection (&access);
+  return true;
+}
+
+/* process_cleanup */
+void
+process_cleanup::process ()
+{
+  theprocess->cleanup ();
+  delete theprocess;
 }
 
 /* process_process_param */
@@ -290,7 +371,7 @@ process_process_param::request_loop ()
 	  debug_printf ("Process %ld has left the building\n",
 			Entries[objindex]->winpid);
 	  /* fire off the termination routines */
-
+	  cache->remove_process (Entries[objindex]);
 	}
       else if (objindex >= 0 && objindex < 2)
 	{

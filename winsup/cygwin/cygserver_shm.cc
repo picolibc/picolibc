@@ -44,9 +44,9 @@
 #include <sys/shm.h>
 #endif
 //#include "perprocess.h"
-#include "cygserver_shm.h"
 #include <threaded_queue.h>
 #include <cygwin/cygserver_process.h>
+#include "cygserver_shm.h"
 
 // FIXME IS THIS CORRECT
 /* Implementation notes: We use two shared memory regions per key:
@@ -70,7 +70,7 @@ getsystemallocgranularity ()
 }
 
 
-client_request_shm_get::client_request_shm_get ():client_request (CYGSERVER_REQUEST_SHM_GET, sizeof (parameters))
+client_request_shm::client_request_shm ():client_request (CYGSERVER_REQUEST_SHM_GET, sizeof (parameters))
 {
   buffer = (char *) &parameters;
 }
@@ -152,7 +152,7 @@ static long new_id = 0;
 static long new_private_key = 0;
 
 void
-client_request_shm_get::serve (transport_layer_base * conn,
+client_request_shm::serve (transport_layer_base * conn,
 			       process_cache * cache)
 {
 //  DWORD sd_size = 4096;
@@ -208,6 +208,7 @@ client_request_shm_get::serve (transport_layer_base * conn,
   char *shmname = NULL, *shmaname = NULL;
   char stringbuf[29], stringbuf1[29];
 
+  /* TODO: make this code block a function! */
   if (parameters.in.type == SHM_REATTACH)
     {
       /* just find and fill out the existing shm_id */
@@ -245,6 +246,32 @@ client_request_shm_get::serve (transport_layer_base * conn,
       CloseHandle (token_handle);
       return;
     }
+
+  /* someone attached */
+  /* someone can send shm_id's they don't have and currently we will increment those
+   * attach counts. If someone wants to fix that, please go ahead.
+   * The problem is that shm_get has nothing to do with the ability to attach. Attach
+   * requires a permission check, which we get the OS to do in MapViewOfFile.
+   */
+  if (parameters.in.type == SHM_ATTACH)
+    {
+      shmnode *tempnode = shm_head;
+      while (tempnode)
+        {
+          if (tempnode->shm_id == parameters.in.shm_id)
+            {
+	      InterlockedIncrement (&tempnode->shmds->shm_nattch);
+	      header.error_code = 0;
+              CloseHandle (token_handle);
+              return;
+            }
+          tempnode = tempnode->next;
+        }
+      header.error_code = EINVAL;
+      CloseHandle (token_handle);
+      return;
+    }
+
   /* it's a original request from the users */
 
   /* FIXME: enter the checking for existing keys mutex. This mutex _must_ be system wide

@@ -1,3 +1,30 @@
+Mon Oct  8  7:41:00 2001  Robert Collins <rbtcollins@hotmail.com>
+
+	* cygserver.cc (server_request::process): Rename client_request_shm_get to
+	client_request_shm.
+	* cygserver_process.cc (process_cache::add): Rename to add_task.
+	Use process_cleanup instead of process_request.
+	(process_cache::remove_process): New method.
+	(process::process): Initialize new members.
+	(process::~process): New member.
+	(process::cleanup): New method.
+	(process::add_cleanup_routine): New method.
+	(process_request::process): Rename to process_cleanup.
+	Call the process object's cleanup method and then delete it.
+	(process_process_param::request_loop): Remove the signalling process.
+	* cygserver_shm.cc: Globally rename client_request_shm_get to client_request_shm.
+	(client_request_shm_get::serve): Handle attach request counting.
+	* cygserver_shm.h: Globally rename client_request_shm_get to client_request_shm.
+	(class shm_cleanup): New class.
+	* shm.cc: Globally rename client_request_shm_get to client_request_shm.
+	(client_request_shm::client_request_shm): New constructor for attach requests.
+	(shmat): Use it.
+	* include/cygwin/cygserver_process.h (class process_request): Rename to 
+	process_cleanup.
+	(class cleanup_routine): New class.
+	(class process): New members and methods to allow calling back when the process
+	terminates.
+
 Thu Oct  4 14:12:00 2001  Robert Collins <rbtcollins@hotmail.com>
 
 	* cygserver.cc (request_loop): Make static.
