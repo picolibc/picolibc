@@ -1,3 +1,14 @@
+2005-02-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* devices.h: Switch FH_ZERO and FH_PORT as on Linux.  Add FH_FULL.
+	* devices.in: Add /dev/full.
+	* devices.cc: Regenerate.
+	* dtable.cc (build_fh_pc): Add FH_FULL.
+	* fhandler.cc (fhandler_base::fstat): Set FH_FULL permission bits
+	correctly.
+	* fhandler_zero.cc (fhandler_dev_zero::write): Set errno to ENOSPC
+	and return -1 if device is FH_FULL.
+
 2005-02-22  Christopher Faylor  <cgf@timesys.com>
 
 	* fhandler_disk_file.cc (fhandler_cygdrive::closedir): Return 0 when

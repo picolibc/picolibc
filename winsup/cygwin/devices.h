@@ -94,8 +94,9 @@ enum fh_devices
   FH_MEM     = FHDEV (1, 1),
   FH_KMEM    = FHDEV (1, 2),	/* not implemented yet */
   FH_NULL    = FHDEV (1, 3),
-  FH_ZERO    = FHDEV (1, 4),
-  FH_PORT    = FHDEV (1, 5),
+  FH_PORT    = FHDEV (1, 4),
+  FH_ZERO    = FHDEV (1, 5),
+  FH_FULL    = FHDEV (1, 7),
   FH_RANDOM  = FHDEV (1, 8),
   FH_URANDOM = FHDEV (1, 9),
   FH_OSS_DSP = FHDEV (14, 3),

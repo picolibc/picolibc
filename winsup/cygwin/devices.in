@@ -59,6 +59,7 @@ const device dev_bad_storage =
 "/dev/conout", FH_CONOUT, "conout"
 "/dev/null", FH_NULL, "nul"
 "/dev/zero", FH_ZERO, "\\dev\\zero"
+"/dev/full", FH_FULL, "\\dev\\full"
 "/dev/random", FH_RANDOM, "\\dev\\random"
 "/dev/urandom", FH_URANDOM, "\\dev\\urandom", urandom_dev
 "/dev/mem", FH_MEM, "\\dev\\mem"

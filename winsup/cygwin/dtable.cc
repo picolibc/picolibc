@@ -428,6 +428,7 @@ build_fh_pc (path_conv& pc)
 	    fh = cnew (fhandler_dev_null) ();
 	    break;
 	  case FH_ZERO:
+	  case FH_FULL:
 	    fh = cnew (fhandler_dev_zero) ();
 	    break;
 	  case FH_RANDOM:

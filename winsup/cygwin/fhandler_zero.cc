@@ -34,6 +34,11 @@ fhandler_dev_zero::open (int flags, mode_t)
 int
 fhandler_dev_zero::write (const void *, size_t len)
 {
+  if (get_device () == FH_FULL)
+    {
+      set_errno (ENOSPC);
+      return -1;
+    }
   return len;
 }
 
