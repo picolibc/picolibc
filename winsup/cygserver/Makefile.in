@@ -46,6 +46,8 @@ LIBOBJS:=${patsubst %.o,lib%.o,$(OBJS)}
 CYGWIN_OBJS:=$(cygwin_build)/smallprint.o $(cygwin_build)/version.o \
 	$(cygwin_build)/wincap.o
 
+CYGWIN_LIB:=$(cygwin_build)/libcygwin.a
+
 all: cygserver.exe
 
 install: all $(updir1)/mkinstalldirs cygserver.conf cygserver-config README
@@ -66,7 +68,7 @@ libclean:
 
 fullclean: clean libclean
 
-cygserver.exe: $(OBJS) $(CYGWIN_OBJS)
+cygserver.exe: $(OBJS) $(CYGWIN_OBJS) $(CYGWIN_LIB)
 	$(CXX) -o $@ $^
 
 $(cygwin_build)/%.o: $(cygwin_source)/%.cc
