@@ -263,27 +263,28 @@ internal_getgroups (int gidsetsize, __gid32_t *grouplist, cygpsid * srchsid)
 	      if (srchsid)
 		{
 		  for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
-		    if (*srchsid == groups->Groups[pg].Sid)
-		      return 1;
-		  return 0;
+		    if ((cnt = (*srchsid == groups->Groups[pg].Sid)))
+		      break;
+		  cnt = -1;
 		}
-	      for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
-		if (sid.getfromgr (gr))
-		  for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
-		    if (sid == groups->Groups[pg].Sid &&
-			sid != well_known_world_sid)
-		      {
-			if (cnt < gidsetsize)
-			  grouplist[cnt] = gr->gr_gid;
-			++cnt;
-			if (gidsetsize && cnt > gidsetsize)
-			  {
-			    if (hToken != cygheap->user.token)
-			      CloseHandle (hToken);
-			    goto error;
-			  }
-			break;
-		      }
+	      else
+		for (int gidx = 0; (gr = internal_getgrent (gidx)); ++gidx)
+		  if (sid.getfromgr (gr))
+		    for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
+		      if (sid == groups->Groups[pg].Sid &&
+			  sid != well_known_world_sid)
+		        {
+			  if (cnt < gidsetsize)
+			    grouplist[cnt] = gr->gr_gid;
+			  ++cnt;
+			  if (gidsetsize && cnt > gidsetsize)
+			    {
+			      if (hToken != cygheap->user.token)
+				CloseHandle (hToken);
+			      goto error;
+			    }
+			  break;
+			}
 	    }
 	}
       else

@@ -1,5 +1,10 @@
 2003-02-04  Pierre Humblet  <pierre.humblet@ieee.org>
 
+	* grp.cc (internal_getgroups): Do not return without closing
+	the process handle.
+
+2003-02-04  Pierre Humblet  <pierre.humblet@ieee.org>
+
 	* security.h (class cygpsid): New class.
 	(class cygsid): Use cygpsid as base. Remove members psid, get_id,
 	get_uid, get_gid, string, debug_printf and the == and != operators.
