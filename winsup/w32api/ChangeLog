@@ -1,3 +1,8 @@
+2003-07-18  Danny Smith <dannysmith@users.sourceforge.net>
+
+	* include/winnt.h (FILE_*): Sync with ddk/winddk.h.
+	* include/winioctl.h (FILE_*): Sync with ddk/winddk.h.
+
 2003-07-17  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* include/mmsystem.h (TIME_KILL_SYNCHRONOUS): Add define.
