@@ -1,3 +1,9 @@
+2001-09-14  Nick Clifton  <nickc@cambridge.redhat.com>
+
+	* libc/sys/arm/crt0.S: Add calls to _init and _fini (via atexit)
+	for new style arm/elf ctor/dtor handling.
+	Minor formatting tidy up.
+
 2001-09-13  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/stdlib/Makefile.am: Add support to build strtoll_r.c
