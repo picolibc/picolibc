@@ -1,3 +1,8 @@
+Mon Sep 18 19:44:08 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler_tty.cc (fhandler_tty_slave::write): Correct typo which
+	caused resetting of windows error to ERROR_IO_DEVICE to be ignored.
+
 Mon Sep 18 17:15:37 2000  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
 	* path.cc (mount_info::read_mounts): Don't delete mount entries of

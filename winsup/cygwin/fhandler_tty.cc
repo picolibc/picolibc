@@ -571,7 +571,7 @@ fhandler_tty_slave::write (const void *ptr, size_t len)
 	    case ERROR_NO_DATA:
 	      err = ERROR_IO_DEVICE;
 	    default:
-	      __seterrno ();
+	      __seterrno_from_win_error (err);
 	    }
 	  _raise (SIGHUP);		/* FIXME: Should this be SIGTTOU? */
 	  towrite = (DWORD) -1;
