@@ -1,3 +1,8 @@
+2003-06-02  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.cc (fhandler_base::write): Correct minor printf formatting
+	style glitch.
+
 2003-06-01  Pierre Humblet  <pierre.humblet@ieee.org>
 
         * fhandler_disk_file.cc (fhandler_disk_file::fstat_by_name): Assume

@@ -638,7 +638,7 @@ fhandler_base::write (const void *ptr, size_t len)
 	      HANDLE h = get_handle ();
 	      BOOL r = DeviceIoControl (h, FSCTL_SET_SPARSE, NULL, 0, NULL,
 	      				0, &dw, NULL);
-	      syscall_printf ("%d = DeviceIoControl(0x%x, FSCTL_SET_SPARSE, "
+	      syscall_printf ("%d = DeviceIoControl(%p, FSCTL_SET_SPARSE, "
 			      "NULL, 0, NULL, 0, &dw, NULL)", r, h);
 	    }
 	  else if (wincap.has_lseek_bug ())
