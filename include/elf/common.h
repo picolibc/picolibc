@@ -92,7 +92,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define ET_HIPROC	0xFFFF	/* Processor-specific */
 
 /* Values for e_machine, which identifies the architecture.  These numbers
-   are officially assigned by registry@sco.com.  See below for a list of
+   are officially assigned by registry@caldera.com.  See below for a list of
    ad-hoc numbers used during initial development.  */
 
 #define EM_NONE		0	/* No machine */
@@ -145,6 +145,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define EM_TINYJ       61	/* Advanced Logic Corp. TinyJ embedded processor */
 #define EM_X86_64      62       /* Advanced Micro Devices X86-64 processor */
 
+#define EM_PDP10       64	/* Digital Equipment Corp. PDP-10 */
+#define EM_PDP11       65	/* Digital Equipment Corp. PDP-11 */
 #define EM_FX66	       66	/* Siemens FX66 microcontroller */
 #define EM_ST9PLUS     67	/* STMicroelectronics ST9+ 8/16 bit microcontroller */
 #define EM_ST7	       68	/* STMicroelectronics ST7 8-bit microcontroller */
@@ -184,7 +186,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    will have a collision.  Instead, pick a random number.
 
    Normally, each entity or maintainer responsible for a machine with an
-   unofficial e_machine number should eventually ask registry@sco.com for
+   unofficial e_machine number should eventually ask registry@caldera.com for
    an officially blessed number to be added to the list above.  */
 
 #define EM_PJ_OLD      99       /* picoJava */
@@ -242,6 +244,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 #define EM_XSTORMY16	        0xad45
 
+/* FRV magic number - no EABI available??.  */
+#define EM_CYGNUS_FRV		0x5441
 /* See the above comment before you add a new EM_* value here.  */
 
 /* Values for e_version.  */
@@ -298,6 +302,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 
 #define SHT_LOOS        0x60000000      /* First of OS specific semantics */
 #define SHT_HIOS        0x6fffffff      /* Last of OS specific semantics */
+
+#define SHT_GNU_LIBLIST	0x6ffffff7	/* List of prelink dependencies */
 
 /* The next three section types are defined by Solaris, and are named
    SHT_SUNW*.  We use them in GNU code, so we also define SHT_GNU*
@@ -516,6 +522,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    OS specific values.  This is a deliberate special case and we
    maintain it for backwards compatability.  */
 #define DT_VALRNGLO	0x6ffffd00
+#define DT_GNU_PRELINKED 0x6ffffdf5
+#define DT_GNU_CONFLICTSZ 0x6ffffdf6
+#define DT_GNU_LIBLISTSZ 0x6ffffdf7
 #define DT_CHECKSUM	0x6ffffdf8
 #define DT_PLTPADSZ	0x6ffffdf9
 #define DT_MOVEENT	0x6ffffdfa
@@ -527,6 +536,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
 #define DT_VALRNGHI	0x6ffffdff
 
 #define DT_ADDRRNGLO	0x6ffffe00
+#define DT_GNU_CONFLICT	0x6ffffef8
+#define DT_GNU_LIBLIST	0x6ffffef9
 #define DT_CONFIG	0x6ffffefa
 #define DT_DEPAUDIT	0x6ffffefb
 #define DT_AUDIT	0x6ffffefc

@@ -163,7 +163,7 @@ struct dlx_opcode
   char *args;
 };
 
-static CONST struct dlx_opcode dlx_opcodes[] =
+static const struct dlx_opcode dlx_opcodes[] =
   {
   /* Arithmetic and Logic R-TYPE instructions.  */
     { "nop",      (ALUOP|NOPF),   "N"     },  /* NOP                          */
