@@ -167,14 +167,6 @@ _CRTIMP double __cdecl sqrt (double);
 _CRTIMP double __cdecl ceil (double);
 _CRTIMP double __cdecl floor (double);
 _CRTIMP double __cdecl fabs (double);
-#if !defined (__NO_INLINES__)
-extern __inline__ __cdecl double fabs (double x)
-{
-  double res;
-  __asm__ ("fabs;" : "=t" (res) : "0" (x));
-  return res;
-}
-#endif
 _CRTIMP double __cdecl ldexp (double, int);
 _CRTIMP double __cdecl frexp (double, int*);
 _CRTIMP double __cdecl modf (double, double*);
@@ -494,19 +486,8 @@ extern float __cdecl cbrtf (float);
 extern long double __cdecl cbrtl (long double);
 
 /* 7.12.7.2 The fabs functions: Double in C89 */
-extern __inline__ float __cdecl fabsf (float x)
-{
-  float res;
-  __asm__ ("fabs;" : "=t" (res) : "0" (x));
-  return res;
-}
-
-extern __inline__ long double __cdecl fabsl (long double x)
-{
-  long double res;
-  __asm__ ("fabs;" : "=t" (res) : "0" (x));
-  return res;
-}
+extern  float __cdecl fabsf (float x);
+extern long double __cdecl fabsl (long double x);
 
 /* 7.12.7.3  */
 extern double __cdecl hypot (double, double); /* in libmoldname.a */
