@@ -3,6 +3,7 @@
 	* Makefile.in: Change distribution targets to use bzip2 instead of
 	gzip.
 	(TEXINFO_SUPPORT): Set to just texinfo/texinfo.tex.
+	(taz): Don't use texinfo/gpl.texinfo or texinfo/lgpl.texinfo.
 
 1999-06-04  Nick Clifton  <nickc@cygnus.com>
 

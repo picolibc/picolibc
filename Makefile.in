@@ -1690,8 +1690,7 @@ SUPPORT_FILES = list-of-support-files-for-tool-in-question
 
 .PHONY: taz
 
-taz: $(DEVO_SUPPORT) $(SUPPORT_FILES) \
-  texinfo/texinfo.tex texinfo/gpl.texinfo texinfo/lgpl.texinfo
+taz: $(DEVO_SUPPORT) $(SUPPORT_FILES) texinfo/texinfo.tex
 	# Take out texinfo from a few places.
 	sed -e '/^all\.normal: /s/\all-texinfo //' \
 	    -e '/^	install-texinfo /d' \
@@ -1736,8 +1735,6 @@ taz: $(DEVO_SUPPORT) $(SUPPORT_FILES) \
 	#
 	mkdir proto-toplev/texinfo
 	ln -s ../../texinfo/texinfo.tex		proto-toplev/texinfo/
-	ln -s ../../texinfo/gpl.texinfo		proto-toplev/texinfo/
-	ln -s ../../texinfo/lgpl.texinfo	proto-toplev/texinfo/
 	if test -r texinfo/util/tex3patch ; then \
 	  mkdir proto-toplev/texinfo/util && \
 	  ln -s ../../../texinfo/util/tex3patch	proto-toplev/texinfo/util ; \
