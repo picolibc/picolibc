@@ -44,6 +44,8 @@ usage (FILE *where = stderr)
 {
   fprintf (where, "\
 Usage: %s [OPTION] [<posixpath>]\n\
+Unmount filesystems\n\
+\n\
   -A, --remove-all-mounts       remove all mounts\n\
   -c, --remove-cygdrive-prefix  remove cygdrive prefix\n\
   -h, --help                    output usage information and exit\n\

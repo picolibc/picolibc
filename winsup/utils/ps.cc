@@ -201,6 +201,8 @@ usage (FILE * stream, int status)
 {
   fprintf (stream, "\
 Usage: %s [-aefls] [-u UID]\n\
+Report process status\n\
+\n\
  -a, --all       show processes of all users\n\
  -e, --everyone  show processes of all users\n\
  -f, --full      show process uids, ppids\n\

@@ -485,7 +485,7 @@ int
 usage (FILE * stream, int isNT)
 {
   fprintf (stream, "Usage: mkpasswd [OPTION]... [domain]...\n\n"
-	           "This program prints a /etc/passwd file to stdout\n\n"
+	           "Print /etc/passwd file to stdout\n\n"
 	           "Options:\n");
   if (isNT)
     fprintf (stream, "   -l,--local              print local user accounts\n"

@@ -284,7 +284,6 @@ usage (FILE * stream)
   fprintf (stream, ""
             "Usage: %s [-r] (-f ACL_FILE | -s acl_entries) FILE...\n"
             "       %s [-r] ([-d acl_entries] [-m acl_entries]) FILE...\n"
-            "\n"
             "Modify file and directory access control lists (ACLs)\n"
             "\n"
             "  -d, --delete     delete one or more specified ACL entries\n"

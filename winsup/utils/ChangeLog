@@ -1,3 +1,20 @@
+2003-04-26  Joshua Daniel Franklin <joshuadfranklin at yahoo dot com>
+
+	* cygcheck.cc (usage) Add description output.
+	* cygpath.cc (usage) Add description output.
+	* dumper.cc (usage) Add newline to description output.
+	* kill.cc (usage) Add description output.
+	* mkgroup.c (usage) Grammatical change to description output.
+	* mkpasswd.c (usage) Grammatical change to description output.
+	* mount.cc (usage) Add description output.
+	* passwd.c (usage) Add description output.
+	* ps.cc (usage) Add description output.
+	* regtool.cc (usage) Add description output.
+	* setfacl.c (usage) Remove extra newline from description output.
+	* ssp.c (usage) Add description output.
+	* strace.cc (usage) Add description output.
+	* umount.cc (usage) Add description output.
+
 2003-04-10  Pierre Humblet  <pierre.humblet@ieee.org>
 
 	* mkpasswd.c (current_user): print uid and gid as unsigned.

@@ -648,6 +648,8 @@ usage (FILE * stream)
 {
   fprintf (stream , ""
   "Usage: %s [options] low_pc high_pc command...\n"
+  "Single-step profile COMMAND\n"
+  "\n"
   " -c, --console-trace  trace every EIP value to the console. *Lots* slower.\n"
   " -d, --disable        disable single-stepping by default; use\n"
   "                      OutputDebugString (\"ssp on\") to enable stepping\n"

@@ -41,6 +41,8 @@ usage (FILE *where = stderr)
   fprintf (where , ""
 	"Usage: %s [-f] [-signal] [-s signal] pid1 [pid2 ...]\n"
 	"       %s -l [signal]\n"
+	"Send signals to processes\n"
+	"\n"
 	" -f, --force     force, using win32 interface if necessary\n"
 	" -l, --list      print a list of signal names\n"
 	" -s, --signal    send signal (use %s --list for a list)\n"

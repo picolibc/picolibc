@@ -243,6 +243,7 @@ usage (FILE * stream, int status)
   fprintf (stream, ""
   "Usage: %s (-l|-u|-S) [USER]\n"
   "       %s [-i NUM] [-n MINDAYS] [-x MAXDAYS] [-L LEN]\n"
+  "Change USER's password or password attributes\n"
   "\n"
   "User operations:\n"
   " -l, --lock      lock USER's account\n"

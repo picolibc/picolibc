@@ -481,8 +481,8 @@ current_group (int print_sids, int print_users, int id_offset)
 int
 usage (FILE * stream, int isNT)
 {
-  fprintf (stream, "Usage: mkgroup [OPTION]... [domain]...\n\n"
-	           "This program prints a /etc/group file to stdout\n\n"
+  fprintf (stream, "Usage: mkgroup [OPTION]... [domain]...\n"
+	           "Print /etc/group file to stdout\n\n"
 	           "Options:\n");
   if (isNT)
     fprintf (stream, "   -l,--local             print local group information\n"

@@ -134,6 +134,8 @@ static void
 usage (FILE *where = stderr)
 {
   fprintf (where, "Usage: %s [OPTION] [<win32path> <posixpath>]\n\
+Display information about mounted filesystems, or mount a filesystem\n\
+\n\
   -b, --binary     (default)    text files are equivalent to binary files\n\
 				(newline = \\n)\n\
   -c, --change-cygdrive-prefix  change the cygdrive path prefix to <posixpath>\n\

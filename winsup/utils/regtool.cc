@@ -63,6 +63,7 @@ usage (FILE *where = stderr)
 {
   fprintf (where, ""
   "Usage: %s [OPTION] (add | check | get | list | remove | unset) KEY\n"
+  "View or edit the Win32 registry\n"
   "\n"
   "", prog_name);
   if (where == stdout)

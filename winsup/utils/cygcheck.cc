@@ -1314,7 +1314,9 @@ static void
 usage (FILE * stream, int status)
 {
   fprintf (stream, "\
-Usage: cygcheck [OPTIONS] [program ...]\n\
+Usage: cygcheck [OPTIONS] [PROGRAM...]\n\
+Check system information or PROGRAM library dependencies\n\
+\n\
  -c, --check-setup  check packages installed via setup.exe\n\
  -s, --sysinfo      system information (not with -k)\n\
  -v, --verbose      verbose output (indented) (for -s or programs)\n\

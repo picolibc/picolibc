@@ -800,6 +800,8 @@ usage (FILE *where = stderr)
   fprintf (where, "\
 Usage: %s [OPTIONS] <command-line>\n\
 Usage: %s [OPTIONS] -p <pid>\n\
+Trace system calls and signals\n\
+\n\
   -b, --buffer-size=SIZE       set size of output file buffer\n\
   -d, --no-delta               don't display the delta-t microsecond timestamp\n\
   -f, --trace-children         trace child processes (toggle - default true)\n\
