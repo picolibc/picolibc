@@ -1,3 +1,9 @@
+2002-02-01  Michael Meissner  <meissner@redhat.com>
+
+	* mips/cma101.c (__sizemem_default): Allow user to specify the
+	memory size.
+	(__sizemem): Use it.
+
 2002-01-24  Mark Salter  <msalter@redhat.com>
 
 	* arm/redboot-crt0.S: Use __get_memtop to put stack in high memory.

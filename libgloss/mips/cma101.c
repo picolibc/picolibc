@@ -1,7 +1,7 @@
 /*
  * cma101.c -- lo-level support for Cogent CMA101 development board.
  *
- * Copyright (c) 1996, 2001 Cygnus Support
+ * Copyright (c) 1996, 2001, 2002 Cygnus Support
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -179,6 +179,9 @@ extern unsigned int __buserr_count(void);
 extern void __default_buserr_handler(void);
 extern void __restore_buserr_handler(void);
 
+/* Allow the user to provide his/her own defaults.  */
+unsigned int __sizemem_default;
+
 unsigned int
 __sizemem ()
 {
@@ -189,6 +192,11 @@ __sizemem ()
   extern void *end;
   char *endptr = (char *)&end;
   int extra;
+
+  /* If the linker script provided a value for the memory size (or the user
+     overrode it in a debugger), use that.  */
+  if (__sizemem_default)
+    return __sizemem_default;
 
   /* If we are running in kernel segment 0 (possibly cached), try sizing memory
      in kernel segment 1 (uncached) to avoid some problems with monitors.  */
