@@ -1,3 +1,8 @@
+2005-02-01  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* mingwex/strtold.c (__asctoe64): Set endptr to 'e' if exponent
+	string is not valid.
+
 2005-01-26  Oliver Stoeneberg  <oliverst@online.de>
 
 	* include/malloc.h: Add missing return code defines for

@@ -255,6 +255,8 @@ expnt:
 
 esign = 1;
 exp = 0;
+/* Save position in case we need to fall back.  */
+sp = s;
 ++s;
 /* check for + or - */
 if( *s == '-' )
@@ -264,6 +266,13 @@ if( *s == '-' )
 	}
 if( *s == '+' )
 	++s;
+
+/* Check for valid exponent.  */
+if (!(*s >= '0' && *s <= '9'))
+  {
+    s = sp;
+    goto daldone;
+  }
 
 while( (*s >= '0') && (*s <= '9') )
 {
