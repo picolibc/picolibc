@@ -1,3 +1,15 @@
+2004-03-18  Christopher Faylor  <cgf@redhat.com>
+
+	* child_info.h (CURR_CHILD_INFO_MAGIC): Reset to new value.
+	(child_info::cygheap_alloc_sz): New field.
+	* cygheap.cc (init_cheap): Reduce size of cygwin stack until minimal
+	hit when attempting initial allocation.
+	(cygheap_setup_for_child): Use alloc_sz to create secondary memory
+	mapped entry.  Store alloc_sz in cygheap_alloc_sz.
+	(cygheap_fixup_in_child): Use cygheap_alloc_sz to map parent's cygheap.
+	* cygheap.h (_CYGHEAPSIZE_SLOP): New define.
+	(CYGHEAPSIZE): Use _CYGHEAPSIZE_SLOP.
+
 2004-03-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_proc.cc (format_proc_meminfo): On NT, try to figure out
