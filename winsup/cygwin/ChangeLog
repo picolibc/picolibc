@@ -1,5 +1,13 @@
 2004-04-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::open): Remove special DEV_FLOPPY_MAJOR
+	treatment.
+	* fhandler_raw.cc (fhandler_dev_raw::open): Simplify write-only case.
+	* fhandler_tape.cc (fhandler_dev_tape::raw_write): Add accidentally
+	dropped condition.
+
+2004-04-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.cc (fhandler_base::open): Add FILE_READ_ATTRIBUTES when
 	only GENERIC_WRITE access is requested.
 

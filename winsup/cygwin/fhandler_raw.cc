@@ -144,10 +144,9 @@ fhandler_dev_raw::open (int flags, mode_t)
   flags &= ~(O_CREAT | O_TRUNC);
   flags |= O_BINARY;
 
-  if (get_major () == DEV_TAPE_MAJOR
-      || (flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_WRONLY
-      || (flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_RDWR)
-    flags = ((flags & ~(O_WRONLY | O_RDWR)) | O_RDWR);
+  /* Write-only doesn't work well with raw devices */
+  if ((flags & (O_RDONLY | O_WRONLY | O_RDWR)) == O_WRONLY)
+    flags = ((flags & ~O_WRONLY) | O_RDWR);
 
   int res = fhandler_base::open (flags, 0);
   if (res && devbufsiz > 1L)

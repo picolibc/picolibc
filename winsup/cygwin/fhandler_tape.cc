@@ -1364,6 +1364,7 @@ fhandler_dev_tape::raw_write (const void *ptr, size_t len)
   if (!mt_evt && !(mt_evt = CreateEvent (&sec_none, TRUE, FALSE, NULL)))
     debug_printf ("Creating event failed: %E");
   int ret = mt->drive (driveno ())->write (get_handle (), mt_evt, ptr, len);
+  if (ret)
     __seterrno_from_win_error (ret);
   return unlock (len);
 }
