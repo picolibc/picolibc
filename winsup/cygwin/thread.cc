@@ -301,14 +301,6 @@ MTinterface::Init (int forked)
   item->sigmask = NULL;
   item->sigtodo = NULL;
 #endif
-
-  struct _reent *r = _REENT;
-  memset (r, 0, sizeof (struct _reent));
-
-  r->_errno = 0;
-  r->_stdin = &r->__sf[0];
-  r->_stdout = &r->__sf[1];
-  r->_stderr = &r->__sf[2];
 }
 
 ThreadItem *

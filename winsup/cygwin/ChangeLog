@@ -1,3 +1,11 @@
+2001-02-15  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
+
+	* cygwin.din: Export rand48 functions.
+	* thread.cc (MTinterface::Init): Remove the initialization of
+	`reent_data'.
+	* dcrt0.cc: Add the initalizer to the declaration of `reent_data'.
+	* include/cygwin/version.h: Bump CYGWIN_VERSION_API_MINOR to 35.
+
 2001-02-16  Egor Duda  <deo@logos-m.ru>
 
 	* signal.cc (signal): Prohibit setting handlers for SIGKILL and

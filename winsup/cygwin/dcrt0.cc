@@ -85,7 +85,7 @@ extern "C"
   char ***main_environ;
   /* __progname used in getopt error message */
   char *__progname = NULL;
-  struct _reent reent_data;
+  struct _reent reent_data = _REENT_INIT(reent_data);
   struct per_process __cygwin_user_data =
   {/* initial_sp */ 0, /* magic_biscuit */ 0,
    /* dll_major */ CYGWIN_VERSION_DLL_MAJOR,
@@ -764,6 +764,9 @@ dll_crt0_1 ()
 
   if (!old_title && GetConsoleTitle (title_buf, TITLESIZE))
       old_title = title_buf;
+
+  /* Initialize locale */
+  locale_init ();
 
   /* Allocate fdtab */
   dtable_init ();

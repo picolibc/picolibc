@@ -866,6 +866,24 @@ y1
 y1f
 yn
 ynf
+drand48
+_drand48 = drand48
+erand48
+_erand48 = erand48
+jrand48
+_jrand48 = jrand48
+lcong48
+_lcong48 = lcong48
+lrand48
+_lrand48 = lrand48
+mrand48
+_lrand48 = lrand48
+nrand48
+_nrand48 = nrand48
+seed48
+_seed48 = seed48
+srand48
+_srand48 = srand48
 setmode
 _setmode = setmode
 __assertfail
