@@ -87,9 +87,7 @@ AUTOMAKE_OPTIONS = cygnus
 
 SUBDIRS = $(libm_machine_dir) .
 
-@USE_LIBTOOL_FALSE@noinst_LIBRARIES = @USE_LIBTOOL_FALSE@lib.a
-@USE_LIBTOOL_FALSE@lib_a_SOURCES = 
-@USE_LIBTOOL_FALSE@lib_a_LIBADD = @USE_LIBTOOL_FALSE@$(machlib)
+@USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
 
 ACLOCAL_AMFLAGS = -I ../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
@@ -102,8 +100,14 @@ LIBRARIES =  $(noinst_LIBRARIES)
 DEFS = @DEFS@ -I. -I$(srcdir) 
 CPPFLAGS = @CPPFLAGS@
 LIBS = @LIBS@
-@USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = 
-@USE_LIBTOOL_FALSE@lib_a_OBJECTS = 
+lib_a_LIBADD = 
+lib_a_SOURCES = lib.a.c
+lib_a_OBJECTS =  lib.a.o
+CFLAGS = @CFLAGS@
+COMPILE = $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
 DIST_COMMON =  Makefile.am Makefile.in aclocal.m4 configure configure.in
 
 
@@ -111,8 +115,8 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = gtar
 GZIP_ENV = --best
-SOURCES = $(lib_a_SOURCES)
-OBJECTS = $(lib_a_OBJECTS)
+SOURCES = lib.a.c
+OBJECTS = lib.a.o
 
 all: all-redirect
 .SUFFIXES:
@@ -179,11 +183,6 @@ clean-libtool:
 distclean-libtool:
 
 maintainer-clean-libtool:
-
-lib.a: $(lib_a_OBJECTS) $(lib_a_DEPENDENCIES)
-	-rm -f lib.a
-	$(AR) cru lib.a $(lib_a_OBJECTS) $(lib_a_LIBADD)
-	$(RANLIB) lib.a
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run `make' without going through this Makefile.
@@ -417,6 +416,13 @@ installdirs-am installdirs mostlyclean-generic distclean-generic \
 clean-generic maintainer-clean-generic clean mostlyclean distclean \
 maintainer-clean
 
+
+@USE_LIBTOOL_FALSE@lib.a: $(libm_machine_dir)/lib.a
+@USE_LIBTOOL_FALSE@	rm -f $@
+@USE_LIBTOOL_FALSE@	ln $(libm_machine_dir)/lib.a $@ >/dev/null 2>/dev/null || \
+@USE_LIBTOOL_FALSE@	 cp $(libm_machine_dir)/lib.a $@
+
+$(libm_machine_dir)/lib.a:
 
 doc:  
 

@@ -1,3 +1,8 @@
+2001-12-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libm/machine/Makefile.am: Change rules to create correct lib.a.
+	* libm/machine/Makefile.in: Regenerated through automake.
+
 2001-12-18  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* Makefile.am (DOCDIR): Force to empty string when doc
