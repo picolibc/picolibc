@@ -1,3 +1,7 @@
+2001-03-05  Jeff Johnston  <jjohnstn@redhat.com>
+
+        * libc/time/mktime.c: Add L suffix to _SEC_IN_xxxx constants.
+
 Sat Mar  3 00:34:14 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* libc/include/sys/stat.h: Use special defines for executable stat bits

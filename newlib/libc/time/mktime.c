@@ -48,9 +48,9 @@ ANSI C requires <<mktime>>.
 #include <stdlib.h>
 #include <time.h>
 
-#define _SEC_IN_MINUTE 60
-#define _SEC_IN_HOUR 3600
-#define _SEC_IN_DAY 86400
+#define _SEC_IN_MINUTE 60L
+#define _SEC_IN_HOUR 3600L
+#define _SEC_IN_DAY 86400L
 
 static _CONST int DAYS_IN_MONTH[12] =
 {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
