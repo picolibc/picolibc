@@ -26,10 +26,17 @@
  *
  */
 
+/* Hide the declaration of _fmode with dllimport attribute in stdlib.h.
+   This is not necessary with Mumit Khan's patches to gcc's winnt.c,
+   but those patches are still unofficial.  */
+
+#define __IN_MINGW_RUNTIME 
+#include <stdlib.h>
 #include <stdio.h>
 #include <io.h>
 #include <process.h>
 #include <float.h>
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <signal.h>
 
@@ -55,8 +62,9 @@ __MINGW_IMPORT void __set_app_type(int);
 
 /*  Global _fmode for this .exe, not the one in msvcrt.dll,
     The default is set in txtmode.o in libmingw32.a */
-#undef _fmode
-extern int _fmode;  
+/* Override the dllimport'd declarations in stdlib.h */
+#undef _fmode 
+extern int _fmode; 
 extern int* __p__fmode(void); /* To access the dll _fmode */
 
 /*
@@ -68,7 +76,7 @@ extern int _CRT_fmode;
 static void
 _mingw32_init_fmode ()
 {
-  /* Don't set the file mode if the user hasn't set any value for it. */
+  /* Don't set the std file mode if the user hasn't set any value for it. */
   if (_CRT_fmode)
     {
       _fmode = _CRT_fmode;
@@ -239,6 +247,7 @@ WinMainCRTStartup ()
   __set_app_type (__GUI_APP);
 #endif
   __mingw_CRTStartup ();
+return 0;
 }
 
 /*

@@ -284,7 +284,7 @@ wchar_t**  __p__wpgmptr(void);
  * This variable determines the default file mode.
  * TODO: Which flags work?
  */
-#ifndef __DECLSPEC_SUPPORTED
+#if !defined (__DECLSPEC_SUPPORTED) || defined (__IN_MINGW_RUNTIME)
 
 #ifdef __MSVCRT__
 extern int* _imp___fmode;
@@ -404,7 +404,7 @@ extern __inline__ void _Exit(int status)
 	{  _exit(status); }
 #endif
 /* _onexit is MS extension. Use atexit for portability.  */
-typedef  int (* _onexit_t)(void); 
+typedef  int (* _onexit_t)(void);
 _onexit_t _onexit( _onexit_t );
 
 int	_putenv	(const char*);

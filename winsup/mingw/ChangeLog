@@ -1,5 +1,17 @@
 2002-10-19  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* crt1.c: Define new macro __IN_MINGW_RUNTIME before including
+	stdlib.h.
+	Define WIN32_MEAN_AND_LEAN before including windows.h
+	* include/stdlib.h (_fmode): Protect declaration as dllimported
+	variable with __IN_MINGW_RUNTIME.
+
+2002-10-19  Igor Pechtchanski  <pechtcha@cs.nyu.edu>
+
+	* crt1.c: Include stdlib.h.
+
+2002-10-19  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* Makefile.in (CRT0S): Add txtmode.o binmode.o.
 	(MINGW_OBJS): Add txtmode.o.
 	(SRCDIST_FILES): Add txtmode.c binmode.c.
