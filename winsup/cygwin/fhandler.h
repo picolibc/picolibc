@@ -459,6 +459,7 @@ class fhandler_pipe: public fhandler_base
   int close ();
   void create_guard (SECURITY_ATTRIBUTES *sa) {guard = CreateMutex (sa, FALSE, NULL);}
   int dup (fhandler_base *child);
+  int ioctl (unsigned int cmd, void *);
   void fixup_after_fork (HANDLE);
   bool hit_eof ();
   void set_eof () {broken_pipe = true;}

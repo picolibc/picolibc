@@ -13,6 +13,7 @@ details. */
 #include "winsup.h"
 #include <unistd.h>
 #include <errno.h>
+#include <sys/socket.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "fhandler.h"
@@ -177,6 +178,33 @@ make_pipe (int fildes[2], unsigned int psize, int mode)
   syscall_printf ("%d = make_pipe ([%d, %d], %d, %p)", res, fildes[0],
 		  fildes[1], psize, mode);
   return res;
+}
+
+int
+fhandler_pipe::ioctl (unsigned int cmd, void *p)
+{
+  int n;
+
+  switch (cmd)
+    {
+    case FIONREAD:
+      if (get_device () == FH_PIPEW)
+	{
+	  set_errno (EINVAL);
+	  return -1;
+	}
+      if (!PeekNamedPipe (get_handle (), NULL, 0, NULL, (DWORD *) &n, NULL))
+	{
+	  __seterrno ();
+	  return -1;
+	}
+      break;
+    default:
+      return fhandler_base::ioctl (cmd, p);
+      break;
+    }
+  *(int *) p = n;
+  return 0;
 }
 
 extern "C" int
