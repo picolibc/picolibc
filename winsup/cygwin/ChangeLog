@@ -1,6 +1,6 @@
 2003-04-21  Christopher Faylor  <cgf@redhat.com>
 
-	* include/cygwin/version.h: Bump DLL major number to 5.  Change DLL
+	* include/cygwin/version.h: Bump DLL major number to 1005.  Change DLL
 	minor number to 0.  Bump API minor number.
 
 2003-04-20  Corinna Vinschen  <corinna@vinschen.de>
