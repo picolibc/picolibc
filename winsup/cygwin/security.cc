@@ -326,11 +326,8 @@ is_group_member (WCHAR *wlogonserver, WCHAR *wgroup,
   NET_API_STATUS ret;
   BOOL retval = FALSE;
 
-  ret = NetLocalGroupGetMembers (wlogonserver, wgroup, 0, (LPBYTE *) &buf,
+  ret = NetLocalGroupGetMembers (NULL, wgroup, 0, (LPBYTE *) &buf,
 				 MAX_PREFERRED_LENGTH, &cnt, &tot, NULL);
-  if (ret == ERROR_BAD_NETPATH || ret == RPC_S_SERVER_UNAVAILABLE)
-    ret = NetLocalGroupGetMembers (NULL, wgroup, 0, (LPBYTE *) &buf,
-				   MAX_PREFERRED_LENGTH, &cnt, &tot, NULL);
   if (ret)
     return FALSE;
 
@@ -354,11 +351,8 @@ get_user_local_groups (WCHAR *wlogonserver, const char *logonserver,
   DWORD cnt, tot;
   NET_API_STATUS ret;
 
-  ret = NetLocalGroupEnum (wlogonserver, 0, (LPBYTE *) &buf,
+  ret = NetLocalGroupEnum (NULL, 0, (LPBYTE *) &buf,
 			   MAX_PREFERRED_LENGTH, &cnt, &tot, NULL);
-  if (ret == ERROR_BAD_NETPATH || ret == RPC_S_SERVER_UNAVAILABLE)
-    ret = NetLocalGroupEnum (NULL, 0, (LPBYTE *) &buf,
-			     MAX_PREFERRED_LENGTH, &cnt, &tot, NULL);
   if (ret)
     {
       debug_printf ("%d = NetLocalGroupEnum ()", ret);

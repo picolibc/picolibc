@@ -1,3 +1,9 @@
+2001-10-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (is_group_member): Call NetLocalGroupGetMembers() for
+	local machine only.
+	(get_user_local_groups): Ditto for NetLocalGroupEnum().
+
 2001-10-29  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler.cc (fhandler_base::set_name): Set namehash here to catch
