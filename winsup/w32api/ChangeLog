@@ -5,6 +5,8 @@
 	* include/winbase.h (GetLongPathName[AW]): Add guard for OS >= NT5 or
 	>= Win98.
 	Change existing guards to use the above macro names as appropriate.
+	* include/basetyps.h (__int32, __int16, __int8, small, hyper): Define.
+	Note: Also added to mingw/include/_mingw.h.
 
 2003-06-28  Steven Edwards  <Steven_Ed4153@yahoo.com>
 

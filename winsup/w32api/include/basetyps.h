@@ -5,79 +5,97 @@
 #endif
 
 #ifndef __OBJC__
-#ifdef __cplusplus
-#define EXTERN_C extern "C"
-#else
-#define EXTERN_C extern
-#endif  /* __cplusplus */ 
-#define STDMETHODCALLTYPE	__stdcall
-#define STDMETHODVCALLTYPE	__cdecl
-#define STDAPICALLTYPE	__stdcall
-#define STDAPIVCALLTYPE	__cdecl
-#define STDAPI	EXTERN_C HRESULT STDAPICALLTYPE
-#define STDAPI_(t)	EXTERN_C t STDAPICALLTYPE
-#define STDMETHODIMP	HRESULT STDMETHODCALLTYPE
-#define STDMETHODIMP_(t)	t STDMETHODCALLTYPE
-#define STDAPIV	EXTERN_C HRESULT STDAPIVCALLTYPE
-#define STDAPIV_(t)	EXTERN_C t STDAPIVCALLTYPE
-#define STDMETHODIMPV	HRESULT STDMETHODVCALLTYPE
-#define STDMETHODIMPV_(t)	t STDMETHODVCALLTYPE
-#define interface	struct
-#if defined(__cplusplus) && !defined(CINTERFACE)
-#define STDMETHOD(m)	virtual HRESULT STDMETHODCALLTYPE m
-#define STDMETHOD_(t,m)	virtual t STDMETHODCALLTYPE m
-#define PURE	=0
-#define THIS_
-#define THIS	void
+# ifdef __cplusplus
+#  define EXTERN_C extern "C"
+# else
+#  define EXTERN_C extern
+# endif  /* __cplusplus */ 
+# ifndef __int64
+#  define __int64 long long
+# endif
+# ifndef __int32
+#  define __int32 long
+# endif
+# ifndef __int16
+#  define __int16 int
+# endif
+# ifndef __int8
+#  define __int8 char
+# endif
+# ifndef small
+#  define small char
+# endif
+# ifndef hyper
+#  define hyper long long
+# endif
+# define STDMETHODCALLTYPE	__stdcall
+# define STDMETHODVCALLTYPE	__cdecl
+# define STDAPICALLTYPE	__stdcall
+# define STDAPIVCALLTYPE	__cdecl
+# define STDAPI	EXTERN_C HRESULT STDAPICALLTYPE
+# define STDAPI_(t)	EXTERN_C t STDAPICALLTYPE
+# define STDMETHODIMP	HRESULT STDMETHODCALLTYPE
+# define STDMETHODIMP_(t)	t STDMETHODCALLTYPE
+# define STDAPIV	EXTERN_C HRESULT STDAPIVCALLTYPE
+# define STDAPIV_(t)	EXTERN_C t STDAPIVCALLTYPE
+# define STDMETHODIMPV	HRESULT STDMETHODVCALLTYPE
+# define STDMETHODIMPV_(t)	t STDMETHODVCALLTYPE
+# define interface	struct
+# if defined(__cplusplus) && !defined(CINTERFACE)
+#  define STDMETHOD(m)	virtual HRESULT STDMETHODCALLTYPE m
+#  define STDMETHOD_(t,m)	virtual t STDMETHODCALLTYPE m
+#  define PURE	=0
+#  define THIS_
+#  define THIS	void
 /*
- __attribute__((com_interface)) is obsolete in __GNUC__ >= 3
- g++ vtables are now COM-compatible by default
+  __attribute__((com_interface)) is obsolete in __GNUC__ >= 3
+  g++ vtables are now COM-compatible by default
 */
-#if defined(__GNUC__) &&  __GNUC__ < 3 && !defined(NOCOMATTRIBUTE)
-#define DECLARE_INTERFACE(i) interface __attribute__((com_interface)) i
-#define DECLARE_INTERFACE_(i,b) interface __attribute__((com_interface)) i : public b
-#else
-#define DECLARE_INTERFACE(i) interface i
-#define DECLARE_INTERFACE_(i,b) interface i : public b
-#endif
-#else
-#define STDMETHOD(m)	HRESULT(STDMETHODCALLTYPE *m)
-#define STDMETHOD_(t,m)	t(STDMETHODCALLTYPE *m)
-#define PURE
-#define THIS_	INTERFACE *,
-#define THIS	INTERFACE *
-#ifndef CONST_VTABLE
-#define CONST_VTABLE
-#endif
-#define DECLARE_INTERFACE(i) \
-typedef interface i { CONST_VTABLE struct i##Vtbl *lpVtbl; } i; \
-typedef CONST_VTABLE struct i##Vtbl i##Vtbl; \
-CONST_VTABLE struct i##Vtbl
-#define DECLARE_INTERFACE_(i,b) DECLARE_INTERFACE(i)
-#endif
-#define BEGIN_INTERFACE
-#define END_INTERFACE
+#  if defined(__GNUC__) &&  __GNUC__ < 3 && !defined(NOCOMATTRIBUTE)
+#   define DECLARE_INTERFACE(i) interface __attribute__((com_interface)) i
+#   define DECLARE_INTERFACE_(i,b) interface __attribute__((com_interface)) i : public b
+#  else
+#   define DECLARE_INTERFACE(i) interface i
+#   define DECLARE_INTERFACE_(i,b) interface i : public b
+#  endif
+# else
+#  define STDMETHOD(m)	HRESULT(STDMETHODCALLTYPE *m)
+#  define STDMETHOD_(t,m)	t(STDMETHODCALLTYPE *m)
+#  define PURE
+#  define THIS_	INTERFACE *,
+#  define THIS	INTERFACE *
+#  ifndef CONST_VTABLE
+#   define CONST_VTABLE
+#  endif
+#  define DECLARE_INTERFACE(i) \
+   typedef interface i { CONST_VTABLE struct i##Vtbl *lpVtbl; } i; \
+   typedef CONST_VTABLE struct i##Vtbl i##Vtbl; \
+   CONST_VTABLE struct i##Vtbl
+#  define DECLARE_INTERFACE_(i,b) DECLARE_INTERFACE(i)
+# endif
+# define BEGIN_INTERFACE
+# define END_INTERFACE
 
-#define FWD_DECL(i) typedef interface i i
-#if defined(__cplusplus) && !defined(CINTERFACE)
-#define IENUM_THIS(T)
-#define IENUM_THIS_(T)
-#else
-#define IENUM_THIS(T) T*
-#define IENUM_THIS_(T) T*,
-#endif
-#define DECLARE_ENUMERATOR_(I,T) \
-DECLARE_INTERFACE_(I,IUnknown) \
-{ \
-	STDMETHOD(QueryInterface)(IENUM_THIS_(I) REFIID,PVOID*) PURE; \
-	STDMETHOD_(ULONG,AddRef)(IENUM_THIS(I)) PURE; \
-	STDMETHOD_(ULONG,Release)(IENUM_THIS(I)) PURE; \
-	STDMETHOD(Next)(IENUM_THIS_(I) ULONG,T*,ULONG*) PURE; \
-	STDMETHOD(Skip)(IENUM_THIS_(I) ULONG) PURE; \
-	STDMETHOD(Reset)(IENUM_THIS(I)) PURE; \
-	STDMETHOD(Clone)(IENUM_THIS_(I) I**) PURE; \
-}
-#define DECLARE_ENUMERATOR(T) DECLARE_ENUMERATOR_(IEnum##T,T)
+# define FWD_DECL(i) typedef interface i i
+# if defined(__cplusplus) && !defined(CINTERFACE)
+#  define IENUM_THIS(T)
+#  define IENUM_THIS_(T)
+# else
+#  define IENUM_THIS(T) T*
+#  define IENUM_THIS_(T) T*,
+# endif
+# define DECLARE_ENUMERATOR_(I,T) \
+         DECLARE_INTERFACE_(I,IUnknown) \
+         { \
+	  STDMETHOD(QueryInterface)(IENUM_THIS_(I) REFIID,PVOID*) PURE; \
+	  STDMETHOD_(ULONG,AddRef)(IENUM_THIS(I)) PURE; \
+	  STDMETHOD_(ULONG,Release)(IENUM_THIS(I)) PURE; \
+	  STDMETHOD(Next)(IENUM_THIS_(I) ULONG,T*,ULONG*) PURE; \
+	  STDMETHOD(Skip)(IENUM_THIS_(I) ULONG) PURE; \
+	  STDMETHOD(Reset)(IENUM_THIS(I)) PURE; \
+	  STDMETHOD(Clone)(IENUM_THIS_(I) I**) PURE; \
+         }
+# define DECLARE_ENUMERATOR(T) DECLARE_ENUMERATOR_(IEnum##T,T)
 
 #endif /* __OBJC__ */
 
