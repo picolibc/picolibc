@@ -1,15 +1,15 @@
 #include <fenv.h>
 
-double
-round (double x) {
+float
+roundf (float x) {
   double retval;
   unsigned short saved_cw, _cw;
   __asm__ (
 	"fnstcw %0;"
-  	: "=m" (saved_cw)
+	: "=m" (saved_cw)
 	); /* save  control word  */
   _cw = ~(FE_TONEAREST | FE_DOWNWARD | FE_UPWARD | FE_TOWARDZERO)
-     	  | (x > 0.0 ? FE_UPWARD : FE_DOWNWARD); /* round away from zero */
+         | (x > 0.0 ? FE_UPWARD : FE_DOWNWARD); /* round away from zero */
   __asm__ (
 	"fldcw %0;"
 	:

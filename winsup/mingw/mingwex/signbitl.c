@@ -1,6 +1,6 @@
 #define __FP_SIGNBIT  0x0200
 
-int __signbit (double x) {
+int __signbitl (long double x) {
   unsigned short sw;
   __asm__ ("fxam; fstsw %%ax;"
 	   : "=a" (sw)
@@ -8,6 +8,4 @@ int __signbit (double x) {
   return sw & __FP_SIGNBIT;
 }
 
-#undef signbit
-int __attribute__ ((alias ("__signbit"))) signbit (double);
-
+int __attribute__ ((alias ("__signbitl"))) signbitl (long double);

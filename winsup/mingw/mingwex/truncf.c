@@ -1,9 +1,9 @@
 #include <fenv.h>
 #include <math.h>
 
-double
-trunc (double _x){
-  double retval;
+float
+truncf (float _x){
+  float retval;
   unsigned short saved_cw;
   __asm__ ("fnstcw %0;": "=m" (saved_cw)); /* save FPU control word */
   __asm__ ("fldcw %0;"

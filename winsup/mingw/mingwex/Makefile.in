@@ -41,27 +41,42 @@ DISTFILES = Makefile.in configure configure.in \
 	fetestexcept.c \
 	fesetexceptflag.c \
 	feupdateenv.c \
+	fma.S \
+	fmaf.S \
+	fmal.c \
 	fmax.c \
 	fmaxf.c \
+	fmaxl.c \
 	fmin.c \
 	fminf.c \
+	fminl.c \
 	fp_consts.c \
 	fpclassify.c \
+	fpclassifyf.c \
+	fpclassifyl.c \
 	fucom.c \
 	fwide.c \
 	imaxabs.c \
 	imaxdiv.c \
 	isnan.c \
 	isnanf.c \
+	isnanl.c \
 	lltoa.c \
 	lltow.c \
 	log2.c \
 	log2f.c \
+	log2l.c \
 	math_stubs.c \
 	mbsinit.c \
 	rint.c \
+	rintf.c \
+	rintl.c \
 	round.c \
+	roundf.c \
+	roundl.c \
 	signbit.c \
+	signbitf.c \
+	signbitl.c \
 	sitest.c \
 	snprintf.c \
 	snwprintf.c \
@@ -81,15 +96,13 @@ DISTFILES = Makefile.in configure configure.in \
 	wmemcpy.c \
 	wmemmove.c \
 	wmemset.c \
-	wtoll.c \
-	fma.S \
-	fmaf.S
+	wtoll.c
 
 CC = @CC@
 # FIXME: Which is it, CC or CC_FOR_TARGET?
 CC_FOR_TARGET = $(CC)
 AS_FOR_TARGET = $(AS)
-CFLAGS = @CFLAGS@
+CFLAGS = @CFLAGS@ -Wall
 CXXFLAGS = @CXXFLAGS@ 
 OPTFLAGS= -fomit-frame-pointer
 
@@ -129,11 +142,18 @@ STDLIB_STUB_OBJS = \
 STDIO_STUB_OBJS = \
 	snprintf.o snwprintf.o
 MATH_OBJS = \
-	fpclassify.o fucom.o round.o \
-	rint.o signbit.o trunc.o \
-	isnan.o  isnanf.o fp_consts.o \
-	fmax.o fmin.o fmaxf.o fminf.o \
-	fma.o  fmaf.o log2.o log2f.o 
+	fpclassify.o fpclassifyf.o fpclassifyl.o \
+	fucom.o \
+	round.o roundf.o roundl.o \
+	rint.o rintf.o rintl.o \
+	signbit.o signbitf.o signbitl.o \
+	trunc.o truncf.o truncl.o \
+	isnan.o  isnanf.o isnanl.o \
+	fp_consts.o \
+	fmax.o  fmaxf.o fmaxl.o \
+	fmin.o fminf.o fminl.o \
+	fma.o  fmaf.o fmal.o \
+	log2.o log2f.o log2l.o 
 MATH_STUB_OBJS = \
 	math_stubs.o
 FENV_OBJS = fesetround.o  fegetround.o \

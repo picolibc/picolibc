@@ -1,8 +1,8 @@
 #include <fenv.h>
 
-double
-round (double x) {
-  double retval;
+long double
+roundl (long double x) {
+  long double retval;
   unsigned short saved_cw, _cw;
   __asm__ (
 	"fnstcw %0;"
@@ -27,3 +27,4 @@ round (double x) {
 	); /* restore control word */
   return retval;
 }
+
