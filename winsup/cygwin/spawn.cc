@@ -407,16 +407,17 @@ spawn_guts (HANDLE hToken, const char * prog_arg, const char *const *argv,
 
       newargv0 = NULL;
       int len = strlen (a);
-      if (len != 0 && !(p = strpbrk (a, " \t\n\r\"")))
+      if (len != 0 && !strpbrk (a, " \t\n\r\""))
 	one_line.add (a, len);
       else
 	{
 	  one_line.add ("\"", 1);
-	  for (; p; a = p, p = strchr (p, '"'))
+	  for (0; p = strpbrk (a, "\"\\"); a = ++p)
 	    {
-	      one_line.add (a, ++p - a);
-	      if (p[-1] == '"')
-		one_line.add ("\"", 1);
+	      one_line.add (a, p - a);
+	      if (*p == '\\' || *p == '"')
+		one_line.add ("\\", 1);
+	      one_line.add (p, 1);
 	    }
 	  if (*a)
 	    one_line.add (a);

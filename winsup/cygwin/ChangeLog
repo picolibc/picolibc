@@ -1,3 +1,8 @@
+Sun Jul 16 02:30:09 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* spawn.cc (spawn_guts): Use \ for quoting '"'.
+	* dcrt0.cc (quoted): Understand \ quoting for '"'.
+
 Sun Jul 16 00:32:58 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* dcrt0.cc (build_argv): Strip quotes from argv[0] since it should

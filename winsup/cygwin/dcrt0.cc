@@ -277,7 +277,7 @@ isquote (char c)
 }
 
 /* Step over a run of characters delimited by quotes */
-static __inline char *
+static /*__inline*/ char *
 quoted (char *cmd, int winshell)
 {
   char *p;
@@ -293,10 +293,10 @@ quoted (char *cmd, int winshell)
 	    cmd = strchr (cmd, '\0');	// no closing quote
 	    break;
 	  }
-	else if (p[1] == quote)
+	else if (p[1] == quote && p[-1] != '\\')
 	  {
-	    *p++ = '\\';
-	    cmd = p;			// a quoted quote
+	    *p = '\\';
+	    cmd = ++p;			// a quoted quote
 	  }
 	else
 	  {
@@ -310,20 +310,26 @@ quoted (char *cmd, int winshell)
      characters should have been placed here by spawn_guts, so
      we'll just pinch them out of the command string unless
      they're quoted with a preceding \ */
-  strcpy (cmd, cmd + 1);
-  while (*cmd)
+  p = cmd + 1;
+  while (*p)
     {
-      if (*cmd != quote)
-	cmd++;
-      else if (cmd[1] == quote)
-	strcpy (cmd++, cmd + 1);
+      if (*p != quote)
+	p++;
+      else if (p[-1] == '\\')
+	strcpy (p - 1, p);
+      else if (p[1] == quote)
+	{
+	  strcpy (p, p + 1);
+	  p++;
+	}
       else
 	{
-	  strcpy (cmd, cmd + 1);
+	  strcpy (p, p + 1);
 	  break;
 	}
     }
-  return cmd;
+  strcpy (cmd, cmd + 1);
+  return p - 1;
 }
 
 /* Perform a glob on word if it contains wildcard characters.
