@@ -14,6 +14,7 @@
  */
 
 #include <math.h>
+#include <errno.h>
 
 #ifdef __STDC__
 	float tgammaf(float x)
@@ -24,7 +25,7 @@
 {
         float y;
 	int local_signgam;
-	y = __ieee754_gammaf_r(x,&local_signgam);
+	y = gammaf_r(x,&local_signgam);
 	if (local_signgam < 0) y = -y;
 #ifdef _IEEE_LIBM
 	return y;
@@ -33,11 +34,17 @@
 
 	if(!finitef(y)&&finitef(x)) {
 	  if(floorf(x)==x&&x<=(float)0.0)
-	    /* tgammaf pole */
-	    return (float)__kernel_standard((double)x,(double)x,141);
+            {
+              /* tgammaf pole */
+              errno = EDOM;
+              return HUGE_VAL;
+            }
 	  else
-	    /* tgammaf overflow */
-	    return (float)__kernel_standard((double)x,(double)x,140);
+            {
+              /* tgammaf overflow */
+              errno = ERANGE;
+              return HUGE_VAL;
+            }
 	}
 	return y;
 #endif

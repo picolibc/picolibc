@@ -16,6 +16,7 @@
  */
 
 #include <math.h>
+#include <errno.h>
 
 #ifdef __STDC__
 	double tgamma(double x)
@@ -26,7 +27,7 @@
 {
         double y;
 	int local_signgam;
-	y = __ieee754_gamma_r(x,&local_signgam);
+	y = gamma_r(x,&local_signgam);
 	if (local_signgam < 0) y = -y;
 #ifdef _IEEE_LIBM
 	return y;
@@ -35,9 +36,17 @@
 
 	if(!finite(y)&&finite(x)) {
 	  if(floor(x)==x&&x<=0.0)
-	    return __kernel_standard(x,x,41); /* tgamma pole */
+            {
+              /* tgamma pole */
+              errno = EDOM;
+              return HUGE_VAL;
+            }
 	  else
-	    return __kernel_standard(x,x,40); /* tgamma overflow */
+            {
+              /* tgamma overflow */
+              errno = ERANGE;
+              return HUGE_VAL;
+            }
 	}
 	return y;
 #endif

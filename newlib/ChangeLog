@@ -1,3 +1,10 @@
+2002-06-27  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* libm/mathfp/er_lgamma.c: Remove __kernel references.
+	* libm/mathfp/erf_lgamma.c: Likewise.
+	* libm/mathfp/s_tgamma.c: Likewise.
+	* libm/mathfp/sf_tgamma.c: Likewise.
+
 2002-06-27  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/sys/linux/Makefile.am: Add new clock routines.

@@ -285,7 +285,7 @@ static double zero=  0.00000000000000000000e+00;
 	GET_HIGH_WORD(ix,x);
 	ix &= 0x7fffffff;
 
-	if(ix<0x3fd00000) return __kernel_sin(pi*x,zero,0);
+	if(ix<0x3fd00000) return sin(pi*x);
 	y = -x;		/* x is assume negative */
 
     /*
@@ -309,14 +309,14 @@ static double zero=  0.00000000000000000000e+00;
             }
         }
 	switch (n) {
-	    case 0:   y =  __kernel_sin(pi*y,zero,0); break;
+	    case 0:   y =  sin(pi*y); break;
 	    case 1:   
-	    case 2:   y =  __kernel_cos(pi*(0.5-y),zero); break;
+	    case 2:   y =  cos(pi*(0.5-y)); break;
 	    case 3:  
-	    case 4:   y =  __kernel_sin(pi*(one-y),zero,0); break;
+	    case 4:   y =  sin(pi*(one-y)); break;
 	    case 5:
-	    case 6:   y = -__kernel_cos(pi*(y-1.5),zero); break;
-	    default:  y =  __kernel_sin(pi*(y-2.0),zero,0); break;
+	    case 6:   y = -cos(pi*(y-1.5)); break;
+	    default:  y =  sin(pi*(y-2.0)); break;
 	    }
 	return -y;
 }
@@ -331,6 +331,8 @@ static double zero=  0.00000000000000000000e+00;
 {
 	double t,y,z,nadj,p,p1,p2,p3,q,r,w;
 	__int32_t i,hx,lx,ix;
+
+        nadj = 0;
 
 	EXTRACT_WORDS(hx,lx,x);
 
