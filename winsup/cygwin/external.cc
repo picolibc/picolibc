@@ -259,6 +259,12 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  char *filename = va_arg (arg, char *);
 	  return check_ntsec (filename);
 	}
+      case CW_GET_ERRNO_FROM_WINERROR:
+        {
+	  int error = va_arg (arg, int);
+	  int deferrno = va_arg (arg, int);
+	  return geterrno_from_win_error (error, deferrno);
+	}
       default:
 	return (DWORD) -1;
     }

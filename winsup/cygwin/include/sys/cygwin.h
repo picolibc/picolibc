@@ -72,7 +72,8 @@ typedef enum
     CW_CYGWIN_PID_TO_WINPID,
     CW_EXTRACT_DOMAIN_AND_USER,
     CW_CMDLINE,
-    CW_CHECK_NTSEC
+    CW_CHECK_NTSEC,
+    CW_GET_ERRNO_FROM_WINERROR
   } cygwin_getinfo_types;
 
 #define CW_NEXTPID	0x80000000	/* or with pid to get next one */
