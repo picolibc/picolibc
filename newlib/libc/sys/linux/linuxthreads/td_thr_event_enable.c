@@ -28,7 +28,7 @@ td_thr_event_enable (th, onoff)
      const td_thrhandle_t *th;
      int onoff;
 {
-  LOG (__FUNCTION__);
+  LOG ("td_thr_event_enable");
 
   /* Write the new value into the thread data structure.  */
   if (ps_pdwrite (th->th_ta_p->ph,

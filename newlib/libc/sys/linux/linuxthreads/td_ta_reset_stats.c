@@ -25,7 +25,7 @@ td_err_e
 td_ta_reset_stats (const td_thragent_t *ta)
 {
   /* XXX We have to figure out what has to be done.  */
-  LOG (__FUNCTION__);
+  LOG ("td_ta_reset_stats");
 
   /* Test whether the TA parameter is ok.  */
   if (! ta_ok (ta))

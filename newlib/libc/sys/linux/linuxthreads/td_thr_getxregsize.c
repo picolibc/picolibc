@@ -25,6 +25,6 @@ td_err_e
 td_thr_getxregsize (const td_thrhandle_t *th, int *sizep)
 {
   /* XXX This might be platform specific.  */
-  LOG (__FUNCTION__);
+  LOG ("td_thr_getxregsize");
   return TD_NOXREGS;
 }

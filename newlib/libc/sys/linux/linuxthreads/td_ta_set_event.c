@@ -29,7 +29,7 @@ td_ta_set_event (ta, event)
   td_thr_events_t old_event;
   int i;
 
-  LOG (__FUNCTION__);
+  LOG ("td_ta_set_event");
 
   /* Test whether the TA parameter is ok.  */
   if (! ta_ok (ta))

@@ -33,7 +33,7 @@ td_thr_tsd (const td_thrhandle_t *th, const thread_key_t tk, void **data)
   unsigned int idx2nd;
   void *p;
 
-  LOG (__FUNCTION__);
+  LOG ("td_thr_tsd");
 
   /* Get the thread descriptor.  */
   if (ps_pdread (th->th_ta_p->ph, th->th_unique, &pds,

@@ -25,7 +25,7 @@ td_err_e
 td_ta_setconcurrency (const td_thragent_t *ta, int level)
 {
   /* This is something LinuxThreads does not support.  */
-  LOG (__FUNCTION__);
+  LOG ("td_ta_setconcurrency");
 
   /* Test whether the TA parameter is ok.  */
   if (! ta_ok (ta))

@@ -31,7 +31,7 @@ td_thr_set_event (th, event)
   td_thr_events_t old_event;
   int i;
 
-  LOG (__FUNCTION__);
+  LOG ("td_thr_set_event");
 
   /* Write the new value into the thread data structure.  */
   if (ps_pdread (th->th_ta_p->ph,

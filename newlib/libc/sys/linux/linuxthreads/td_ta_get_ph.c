@@ -24,7 +24,7 @@
 td_err_e
 td_ta_get_ph (const td_thragent_t *ta, struct ps_prochandle **ph)
 {
-  LOG (__FUNCTION__);
+  LOG ("td_ta_get_ph");
 
   /* Test whether the TA parameter is ok.  */
   if (! ta_ok (ta))

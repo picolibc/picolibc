@@ -25,6 +25,6 @@ td_err_e
 td_thr_sigsetmask (const td_thrhandle_t *th, const sigset_t *ss)
 {
   /* XXX We have to figure out what has to be done.  */
-  LOG (__FUNCTION__);
+  LOG ("td_thr_sigsetmask");
   return TD_OK;
 }

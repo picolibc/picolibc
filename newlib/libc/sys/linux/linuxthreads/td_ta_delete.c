@@ -26,7 +26,7 @@
 td_err_e
 td_ta_delete (td_thragent_t *ta)
 {
-  LOG (__FUNCTION__);
+  LOG ("td_ta_delete");
 
   /* Safety check.  */
   if (ta == NULL || __td_agent_list == NULL)

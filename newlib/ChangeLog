@@ -1,3 +1,44 @@
+2003-11-06  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/sys/linux/linuxthreads/td_init.c: Replace function name
+	in LOG() macro so this will compile on gcc 3.4 and up.
+	* libc/sys/linux/linuxthreads/td_log.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_ta_clear_event.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_ta_delete.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_ta_enable_stats.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_ta_event_addr.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_ta_event_getmsg.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_ta_get_nthreads.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_ta_get_ph.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_ta_get_stats.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_ta_map_id2thr.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_ta_map_lwp2thr.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_ta_new.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_ta_reset_stats.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_ta_set_event.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_ta_setconcurrency.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_ta_thr_iter.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_ta_tsd_iter.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_thr_clear_event.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_thr_dbresume.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_thr_dbsuspend.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_thr_event_enable.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_thr_event_getmsg.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_thr_get_info.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_thr_getfpregs.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_thr_getgregs.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_thr_getxregs.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_thr_getxregsize.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_thr_set_event.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_thr_setfpregs.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_thr_setgregs.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_thr_setprio.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_thr_setsigpending.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_thr_setxregs.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_thr_sigsetmask.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_thr_tsd.c: Ditto.
+	* libc/sys/linux/linuxthreads/td_thr_validate.c: Ditto.
+
 2003-11-05  Jeff Johnston  <jjohnstn@redhat.com>
             Artem B. Bityuckiy  <mail_lists@mail.ru>
 

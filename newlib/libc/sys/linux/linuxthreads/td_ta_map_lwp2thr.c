@@ -34,7 +34,7 @@ td_ta_map_lwp2thr (const td_thragent_t *ta, lwpid_t lwpid, td_thrhandle_t *th)
 # define num 1
 #endif
 
-  LOG (__FUNCTION__);
+  LOG ("td_ta_map_lwp2thr");
 
   /* Test whether the TA parameter is ok.  */
   if (! ta_ok (ta))

@@ -27,6 +27,6 @@ td_err_e
 td_init (void)
 {
   /* XXX We have to figure out what has to be done.  */
-  LOG (__FUNCTION__);
+  LOG ("td_init");
   return TD_OK;
 }

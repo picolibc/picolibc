@@ -26,6 +26,6 @@ td_thr_setsigpending (const td_thrhandle_t *th, unsigned char n,
 		      const sigset_t *ss)
 {
   /* XXX We have to figure out what has to be done.  */
-  LOG (__FUNCTION__);
+  LOG ("td_thr_setsigpending");
   return TD_OK;
 }
