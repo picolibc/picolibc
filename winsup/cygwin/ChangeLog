@@ -1,3 +1,7 @@
+2004-01-22  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler.cc (fhandler_base::open): Revert isfs change.
+
 2004-01-21  Christopher Faylor  <cgf@redhat.com>
 
 	* devices.in: Change raw com device to more correct form.
