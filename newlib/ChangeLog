@@ -1,3 +1,27 @@
+2001-11-12  Hans-Peter Nilsson  <hp@bitrange.com>
+
+        * libc/include/machine/ieeefp.h: Add support for mmix target.
+        * libc/include/machine/setjmp.h: Ditto.
+        * configure.host: Ditto.
+        * libc/sys/mmixware/Makefile.am, libc/sys/mmixware/_exit.c,
+        libc/sys/mmixware/access.c, libc/sys/mmixware/aclocal.m4,
+        libc/sys/mmixware/chmod.c, libc/sys/mmixware/chown.c,
+        libc/sys/mmixware/close.c, libc/sys/mmixware/configure.in,
+        libc/sys/mmixware/creat.c, libc/sys/mmixware/crt0.c,
+        libc/sys/mmixware/execv.c, libc/sys/mmixware/execve.c,
+        libc/sys/mmixware/fork.c, libc/sys/mmixware/fstat.c,
+        libc/sys/mmixware/getpid.c, libc/sys/mmixware/gettime.c,
+        libc/sys/mmixware/isatty.c, libc/sys/mmixware/kill.c,
+        libc/sys/mmixware/lseek.c, libc/sys/mmixware/open.c,
+        libc/sys/mmixware/pipe.c, libc/sys/mmixware/read.c,
+        libc/sys/mmixware/sbrk.c, libc/sys/mmixware/setjmp.S,
+        libc/sys/mmixware/stat.c, libc/sys/mmixware/sys/syscall.h,
+        libc/sys/mmixware/time.c, libc/sys/mmixware/times.c,
+        libc/sys/mmixware/unlink.c, libc/sys/mmixware/utime.c,
+        libc/sys/mmixware/wait.c, libc/sys/mmixware/write.c: New files.
+        * libc/sys/mmixware/configure, libc/sys/mmixware/Makefile.in,
+        libc/sys/mmixware/aclocal.m4: Generate.
+
 2001-11-05  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/sys/unistd.h: Add prototypes for endusershell(),

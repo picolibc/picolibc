@@ -73,6 +73,10 @@
 #define __IEEE_LITTLE_ENDIAN
 #endif
 
+#ifdef __MMIX__
+#define __IEEE_BIG_ENDIAN
+#endif
+
 #ifdef __AVR__
 #define _DOUBLE_IS_32BITS
 #define __SMALL_BITFIELDS

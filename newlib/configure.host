@@ -125,6 +125,8 @@ case "${host_cpu}" in
   mips*)
 	machine_dir=mips
 	;;
+  mmix)
+	;;
   mn10200)
 	machine_dir=mn10200
 	;;
@@ -276,6 +278,9 @@ case "${host}" in
   mips*-dec-*)
 	sys_dir=decstation
 	;;
+  mmix-knuth-mmixware)
+	sys_dir=mmixware
+	;;
   powerpcle-*-pe)
 	sys_dir=cygwin
 	posix_dir=posix
@@ -422,6 +427,12 @@ case "${host}" in
   mcore-*-*)
 	newlib_cflags="${newlib_cflags}"
 	syscall_dir=syscalls
+	;;
+  mmix-*)
+	syscall_dir=syscalls
+	# We need every symbol 32-bit aligned, so the invalid
+	# construct with attribute ((alias ("_ctype_b+127"))) breaks.
+	newlib_cflags="${newlib_cflags} -DCOMPACT_CTYPE"
 	;;
   mn10?00-*-*)
 	syscall_dir=syscalls

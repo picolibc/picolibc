@@ -145,6 +145,12 @@ typedef int jmp_buf[_JBLEN];
 #define _JBLEN 16
 #endif
 
+#ifdef __MMIX__
+/* Using a layout compatible with GCC's built-in.  */
+#define _JBLEN 5
+#define _JBTYPE unsigned long
+#endif
+
 #ifdef _JBLEN
 #ifdef _JBTYPE
 typedef	_JBTYPE jmp_buf[_JBLEN];
