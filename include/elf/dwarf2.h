@@ -588,7 +588,11 @@ enum dwarf_line_number_ops
     DW_LNS_negate_stmt = 6,
     DW_LNS_set_basic_block = 7,
     DW_LNS_const_add_pc = 8,
-    DW_LNS_fixed_advance_pc = 9
+    DW_LNS_fixed_advance_pc = 9,
+    /* DWARF 3 */
+    DW_LNS_set_prologue_end = 10,
+    DW_LNS_set_epilogue_begin = 11,
+    DW_LNS_set_isa = 12
   };
 
 /* Line number extended opcodes.  */

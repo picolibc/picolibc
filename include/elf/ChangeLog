@@ -1,3 +1,7 @@
+2001-11-11  Geoffrey Keating  <geoffk@redhat.com>
+
+	* dwarf2.h (dwarf_line_number_ops): Add DWARF 3 opcodes.
+
 2001-10-30  Hans-Peter Nilsson  <hp@bitrange.com>
 
 	* mmix.h: New file.
