@@ -972,6 +972,7 @@ closelog
 _closelog = closelog
 openlog
 _openlog = openlog
+setlogmask
 vhangup
 _vhangup = vhangup
 nice

@@ -1,3 +1,8 @@
+Sun Jan 21 22:40:25 2001  Jason Tishler <jt@dothill.com>
+
+	* cygwin.din: Add export for setlogmask().
+	* syslog.cc (setlogmask): New function.
+
 Thu Jan 18 10:27:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* resource.cc (setrlimit): Support RLIMIT_NOFILE.

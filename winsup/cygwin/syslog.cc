@@ -85,8 +85,6 @@ openlog (const char *ident, int logopt, int facility)
 
 /* setlogmask: set the log priority mask and return previous mask.
    If maskpri is zero, just return previous. */
-#if 0
-/* FIXME: nobody calls setlogmask? */
 int
 setlogmask (int maskpri)
 {
@@ -98,7 +96,6 @@ setlogmask (int maskpri)
 
   return old_mask;
 }
-#endif
 
 /* Private class used to handle formatting of syslog message */
 /* It is named pass_handler because it does a two-pass handling of log
