@@ -1,3 +1,16 @@
+Sat Oct  7 13:59:15 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler.h (fhandler_base): Remove obsolete _rpos and _rsize
+	elements.
+	* fhandler.cc (fhandler_base::open): Ditto.
+	* fhandler.cc (fhandler_base::fhandler_base): Ditto.
+	(fhandler_base::read): Ditto.  Add more debugging output.  Don't issue
+	a \r when \r\n detected.
+	* pipe.cc (make_pipe): Streamline slightly.  Make debug output more
+	interesting.
+	* strace.cc (strace::vsprintf): Use __progname where appropriate to
+	distinguish strace output when exec'ing.
+
 Sat Oct  7 19:25:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_dev_mem): Add methods mmap, munmap and msync.
@@ -102,12 +115,12 @@ Mon Oct  2 15:15:01 2000  Christopher Faylor <cgf@cygnus.com>
 
 Mon Oct  2 11:05:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * fhandler_mem.cc: Load ntdll functions via autoload method.
-        (load_ntdll_funcs): Eliminated.
+	* fhandler_mem.cc: Load ntdll functions via autoload method.
+	(load_ntdll_funcs): Eliminated.
 
 Sun Oct  1 16:36:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
-        * fhandler_mem.cc (load_ntdll_funcs): Add missing __stdcall qualifiers.
+	* fhandler_mem.cc (load_ntdll_funcs): Add missing __stdcall qualifiers.
 
 Sun Oct  1 22:20:39 2000  Christopher Faylor <cgf@cygnus.com>
 
@@ -125,7 +138,7 @@ Sun Oct  1  2:56:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* Makefile.in: Add fhandler_mem.o to the dependencies.
 	* dtable.cc (dtable::build_fhandler): Add case for FH_MEM.
-	* fhandler.h: Add FH_MEM device type.  Add class fhandler_dev_mem. 
+	* fhandler.h: Add FH_MEM device type.  Add class fhandler_dev_mem.
 	* fhandler_mem.cc: New file. Implementation of class fhandler_dev_mem.
 	* path.cc: Add /dev/mem to windows_device_names.
 	(get_device_number): Add FH_MEM type.

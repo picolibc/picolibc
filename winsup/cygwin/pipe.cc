@@ -24,8 +24,9 @@ make_pipe (int fildes[2], unsigned int psize, int mode)
   SetResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," make_pipe");
 
   HANDLE r, w;
-  int  fdr, fdw;
+  int  fdr = -1, fdw = -1;
   SECURITY_ATTRIBUTES *sa = (mode & O_NOINHERIT) ?  &sec_none_nih : &sec_none;
+  int res = -1;
 
   if ((fdr = fdtab.find_unused_handle ()) < 0)
     set_errno (ENMFILE);
@@ -50,16 +51,12 @@ make_pipe (int fildes[2], unsigned int psize, int mode)
       fildes[0] = fdr;
       fildes[1] = fdw;
 
-      debug_printf ("0 = pipe (%p) (%d:%p, %d:%p)", fildes,
-		    fdr, fhr->get_handle (), fdw, fhw->get_handle ());
-
-      ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," make_pipe");
-      return 0;
+      res = 0;
     }
 
-  syscall_printf ("-1 = pipe (%p)", fildes);
+  syscall_printf ("%d = make_pipe ([%d, %d], %d, %p)", res, fdr, fdw, psize, mode);
   ReleaseResourceLock(LOCK_FD_LIST,WRITE_LOCK|READ_LOCK," make_pipe");
-  return -1;
+  return res;
 }
 
 extern "C" int

@@ -129,9 +129,6 @@ private:
   int access_;
   HANDLE io_handle;
 
-  int rpos_; /* Used in text reading */
-  int rsize_;
-
   unsigned long namehash_;	/* hashed filename, used as inode num */
 
   /* Full unix path name of this file */

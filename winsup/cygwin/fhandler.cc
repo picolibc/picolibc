@@ -364,8 +364,6 @@ fhandler_base::open (int flags, mode_t mode)
 
   namehash_ = hash_path_name (0, get_win32_name ());
   set_io_handle (x);
-  rpos_ = 0;
-  rsize_ = -1;
   int bin;
   int fmode;
   if ((bin = flags & (O_BINARY | O_TEXT)))
@@ -441,8 +439,13 @@ fhandler_base::read (void *in_ptr, size_t in_len)
 	copied_chars += readlen;
     }
 
-  if (copied_chars <= 0 || get_r_binary ())
+  if (copied_chars <= 0)
     return copied_chars;
+  if (get_r_binary ())
+    {
+      debug_printf ("returning %d chars, binary mode", copied_chars);
+      return copied_chars;
+    }
 
   /* Scan buffer for a control-z and shorten the buffer to that length */
 
@@ -454,7 +457,10 @@ fhandler_base::read (void *in_ptr, size_t in_len)
     }
 
   if (copied_chars == 0)
-    return 0;
+    {
+      debug_printf ("returning 0 chars, text mode, CTRL-Z found");
+      return 0;
+    }
 
   /* Scan buffer and turn \r\n into \n */
   register char *src= (char *) ptr;
@@ -487,8 +493,6 @@ fhandler_base::read (void *in_ptr, size_t in_len)
   *dst++ = c;
   copied_chars = dst - (char *) ptr;
 
-  rpos_ += copied_chars;
-
 #ifndef NOSTRACE
   if (strace.active)
     {
@@ -507,6 +511,7 @@ fhandler_base::read (void *in_ptr, size_t in_len)
     }
 #endif
 
+  debug_printf ("returning %d chars, text mode", copied_chars);
   return copied_chars;
 }
 
@@ -564,118 +569,63 @@ fhandler_base::write (const void *ptr, size_t len)
 
   if (get_w_binary ())
     {
+      debug_printf ("binary write");
       res = raw_write (ptr, len);
     }
   else
     {
-#ifdef NOTDEF
-      /* Keep track of previous \rs, we don't want to turn existing
-	 \r\n's into \r\n\n's */
-      register int pr = 0;
-
-      /* Copy things in chunks */
-      char buf[CHUNK_SIZE];
-
-      for (unsigned int i = 0; i < len; i += sizeof (buf) / 2)
-	{
-	  register const char *src = (char *)ptr + i;
-	  int todo;
-	  if ((todo = len - i) > sizeof (buf) / 2)
-	    todo = sizeof (buf) / 2;
-	  register const char *end = src + todo;
-	  register char *dst = buf;
-	  while (src < end)
-	    {
-	      if (*src == '\n' && !pr)
-		{
-		  /* Emit a cr lf here */
-		  *dst ++ = '\r';
-		  *dst ++ = '\n';
-		}
-	      else if (*src == '\r')
-		{
-		  *dst ++ = '\r';
-		  pr = 1;
-		}
-	      else
-		{
-		  *dst ++ = *src;
-		  pr = 0;
-		}
-	      src++;
-	    }
-	  int want = dst - buf;
-	  if ((res = raw_write (buf, want)) != want)
-	    {
-	      if (res == -1)
-		return -1;
-	      /* FIXME: */
-	      /* Tricky... Didn't write everything we wanted.. How can
-		 we work out exactly which chars were sent?  We don't...
-		 This will only happen in pretty nasty circumstances. */
-	      rpos_ += i;
-	      return i;
-	    }
-	}
-#else
+      debug_printf ("text write");
       /* This is the Microsoft/DJGPP way.  Still not ideal, but it's
-	 compatible. */
+	 compatible.
+	 Modified slightly by CGF 2000-10-07 */
 
       int left_in_data = len;
       char *data = (char *)ptr;
+      res = 0;
 
       while (left_in_data > 0)
 	{
-	  char buf[CHUNK_SIZE], *buf_ptr = buf;
+	  char buf[CHUNK_SIZE + 1], *buf_ptr = buf;
 	  int left_in_buf = CHUNK_SIZE;
 
 	  while (left_in_buf > 0 && left_in_data > 0)
 	    {
-	      if (*data == '\n')
+	      char ch = *data++;
+	      if (ch == '\n')
 		{
-		  if (left_in_buf == 1)
-		    {
-		      /* Not enough room for \r and \n */
-		      break;
-		    }
 		  *buf_ptr++ = '\r';
 		  left_in_buf--;
 		}
-	      *buf_ptr++ = *data++;
+	      *buf_ptr++ = ch;
 	      left_in_buf--;
 	      left_in_data--;
+	      if (left_in_data > 0 && ch == '\r' && *data == '\n')
+		{
+		  *buf_ptr++ = *data++;
+		  left_in_buf--;
+		  left_in_data--;
+		}
 	    }
 
 	  /* We've got a buffer-full, or we're out of data.  Write it out */
+	  int nbytes;
 	  int want = buf_ptr - buf;
-	  if ((res = raw_write (buf, want)) != want)
+	  if ((nbytes = raw_write (buf, want)) == want)
 	    {
-	      if (res == -1)
-		return -1;
-	      /* FIXME: */
-	      /* Tricky... Didn't write everything we wanted.. How can
-		 we work out exactly which chars were sent?  We don't...
-		 This will only happen in pretty nasty circumstances. */
-	      int i = (len-left_in_data) - left_in_buf;
-	      rpos_ += i;
-	      /* just in case the math is off, guarantee it looks like
-		 a disk full error */
-	      if (i >= (int)len)
-		i = len-1;
-	      if (i < 0)
-		i = 0;
-	      return i;
+	      /* Keep track of how much written not counting additional \r's */
+	      res = data - (char *)ptr;
+	      continue;
 	    }
-	}
-#endif
 
-      /* Done everything, update by the chars that the user sent */
-      rpos_ += len;
-      /* Length of file has changed */
-      rsize_ = -1;
-      res = len;
-      debug_printf ("after write, name %s, rpos %d", unix_path_name_, rpos_);
+	  if (nbytes == -1)
+	    res = -1;		/* Error */
+	  else
+	    res += nbytes;	/* Partial write.  Return total bytes written. */
+	  break;		/* All done */
+	}
     }
+
+  debug_printf ("%d = write (%p, %d)", res, ptr, len);
   return res;
 }
 
@@ -1125,8 +1075,6 @@ fhandler_base::operator delete (void *p)
 fhandler_base::fhandler_base (DWORD devtype, const char *name, int unit):
   access_ (0),
   io_handle (NULL),
-  rpos_ (0),
-  rsize_ (0),
   namehash_ (0),
   openflags_ (0),
   rabuf (NULL),

@@ -96,6 +96,8 @@ getfunc (char *in_dst, const char *func)
   return dst - in_dst;
 }
 
+extern "C" char *__progname;
+
 /* sprintf analog for use by output routines. */
 int
 strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
@@ -105,6 +107,7 @@ strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
   static int nonewline = FALSE;
   DWORD err = GetLastError ();
   const char *tn = threadname (0);
+  char *pn = __progname ?: myself->progname;
 
   int microsec = microseconds ();
   lmicrosec = microsec;
@@ -117,11 +120,13 @@ strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
     count = 0;
   else
     {
-      char *p, progname[sizeof (myself->progname)];
-      if ((p = strrchr (myself->progname, '\\')) != NULL)
+      char *p, progname[MAX_PATH + 1];
+      if ((p = strrchr (pn, '\\')) != NULL)
+	p++;
+      else if ((p = strrchr (pn, '/')) != NULL)
 	p++;
       else
-	p = myself->progname;
+	p = pn;
       strcpy (progname, p);
       if ((p = strrchr (progname, '.')) != NULL)
 	*p = '\000';
