@@ -65,7 +65,7 @@ const device dev_bad_storage =
 "/dev/kmem", FH_KMEM, "\\dev\\mem"
 "/dev/clipboard", FH_CLIPBOARD, "\\dev\\clipboard"
 "/dev/port", FH_PORT, "\\dev\\port"
-"/dev/com%(0-16)d", FHDEV(DEV_SERIAL_MAJOR, {$1}), "\\\\.\\com{$1}"
+"/dev/com%(1-16)d", FHDEV(DEV_SERIAL_MAJOR, {$1}), "\\\\.\\com{$1}"
 "/dev/ttyS%(0-15)d", FHDEV(DEV_SERIAL_MAJOR, {$1 + 1}), "\\\\.\\com{$1 + 1}"
 "/dev/pipe", FH_PIPE, "\\dev\\pipe"
 "/dev/fifo", FH_FIFO, "\\dev\\fifo"

@@ -1,3 +1,7 @@
+2004-12-01  Christopher Faylor  <cgf@timesys.com>
+
+	* syscalls.cc (truncate64): Don't second-guess errno if open fails.
+
 2004-11-25  Christopher Faylor  <cgf@timesys.com>
 
 	* environ.cc (putenv): Accommodate recent newlib change in argument to

@@ -1734,9 +1734,7 @@ truncate64 (const char *pathname, _off64_t length)
 
   fd = open (pathname, O_RDWR);
 
-  if (fd == -1)
-    set_errno (EBADF);
-  else
+  if (fd != -1)
     {
       res = ftruncate64 (fd, length);
       close (fd);
