@@ -164,6 +164,10 @@ main (int argc, char **argv)
     usage ();
 
   opterr = 0;
+
+  char *p;
+  int pid = 0;
+
   for (;;)
     {
       int ch;
@@ -201,7 +205,12 @@ main (int argc, char **argv)
 	  break;
 	case '?':
 	  if (gotasig)
-	    usage ();
+	    {
+	      pid = strtol (argv[optind], &p, 10);
+	      if (pid < 0)
+		goto out;
+	      usage ();
+	    }
 	  optreset = 1;
 	  optind = 1 + av - argv;
 	  gotasig = *av + 1;
@@ -213,13 +222,14 @@ main (int argc, char **argv)
 	}
     }
 
+out:
   test_for_unknown_sig (sig, gotasig);
 
   argv += optind;
   while (*argv != NULL)
     {
-      char *p;
-      int pid = strtol (*argv, &p, 10);
+      if (!pid)
+	pid = strtol (*argv, &p, 10);
       if (*p != '\0')
 	{
 	  fprintf (stderr, "%s: illegal pid: %s\n", prog_name, *argv);
@@ -240,6 +250,7 @@ main (int argc, char **argv)
 	  ret = 1;
 	}
       argv++;
+      pid = 0;
     }
   return ret;
 }

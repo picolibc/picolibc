@@ -1,3 +1,7 @@
+2003-09-20  Christopher Faylor  <cgf@redhat.com>
+
+	* kill.cc (main): Allow negative pids (indicates process groups).
+
 2003-09-17  Christopher Faylor  <cgf@redhat.com>
 
 	* parse_pe.cc (exclusion::sort_and_check): Make error message a little
