@@ -61,7 +61,6 @@ endif # USE_LIBTOOL
 include $(srcdir)/../../../../Makefile.shared
 
 install-data-local:
-	$(start-sanitize-elix) \
 	$(mkinstalldirs) $(DESTDIR)$(tooldir)/include/arpa; \
 	for i in $(srcdir)/../include/arpa/*.h; do \
 	  $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/arpa/`basename $$i`; \
@@ -86,4 +85,3 @@ install-data-local:
 	for i in $(srcdir)/../include/rpc/*.h; do \
 	  $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/rpc/`basename $$i`; \
 	done; \
-	$(end-sanitize-elix)

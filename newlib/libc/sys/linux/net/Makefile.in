@@ -73,6 +73,8 @@ CXX = @CXX@
 CXXCPP = @CXXCPP@
 DLLTOOL = @DLLTOOL@
 EXEEXT = @EXEEXT@
+EXTRA_SUBDIRS = @EXTRA_SUBDIRS@
+EXTRA_SUBLIBS = @EXTRA_SUBLIBS@
 GCJ = @GCJ@
 GCJFLAGS = @GCJFLAGS@
 LDFLAGS = @LDFLAGS@
@@ -434,7 +436,6 @@ objectlist.awk.in: $(noinst_LTLIBRARIES)
 	done
 
 install-data-local:
-	$(start-sanitize-elix) \
 	$(mkinstalldirs) $(DESTDIR)$(tooldir)/include/arpa; \
 	for i in $(srcdir)/../include/arpa/*.h; do \
 	  $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/arpa/`basename $$i`; \
@@ -459,7 +460,6 @@ install-data-local:
 	for i in $(srcdir)/../include/rpc/*.h; do \
 	  $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/rpc/`basename $$i`; \
 	done; \
-	$(end-sanitize-elix)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
