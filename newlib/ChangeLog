@@ -1,3 +1,20 @@
+2003-02-20  Nick Clifton  <nickc@redhat.com>
+
+	* Add support for Cirrus Maverick ARM co-processor:
+	
+	2000-09-13  Aldy Hernandez  <aldyh@redhat.com>
+
+		* libc/include/machine/ieeefp.h: Set IEEE_BIG_ENDIAN or
+		IEEE_LITTLE_ENDIAN depending on endian mode (cirrus).
+
+	2000-08-11  Aldy Hernandez  <aldyh@redhat.com>
+
+		* configure.host: set sys_dir, syscall_dir, and
+		newlib_cflags for ep9312 host.
+
+        * configure.host: Restore alpha sorting of entries in case
+	statements.
+
 2003-02-19  Jeff Johnston  <jjohnstn@redhat.com>
 
         * libc/stdlib/mallocr.c (unlink): Revert 02/18 fix.

@@ -50,7 +50,7 @@
 	
 */
 
-#if (defined(__arm__) || defined(__thumb__))
+#if (defined(__arm__) || defined(__thumb__)) && !defined(__MAVERICK__)
 /* ARM always has big-endian words.  Within those words the byte ordering
    will be big or little endian depending upon the target.  */
 #define __IEEE_BIG_ENDIAN
@@ -233,6 +233,14 @@
 #define __SMALL_BITFIELDS
 #define _DOUBLE_IS_32BITS
 #endif
+
+#ifdef __MAVERICK__
+#ifdef __ARMEL__
+#  define __IEEE_LITTLE_ENDIAN
+#else  /* must be __ARMEB__ */
+#  define __IEEE_BIG_ENDIAN
+#endif /* __ARMEL__ */
+#endif /* __MAVERICK__ */
 
 #ifndef __IEEE_BIG_ENDIAN
 #ifndef __IEEE_LITTLE_ENDIAN

@@ -88,16 +88,21 @@ case "${host_cpu}" in
   avr*)
 	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -mcall-prologues"
 	;;
-
   d10v*)
 	machine_dir=d10v
 	;;
   d30v*)
 	machine_dir=d30v
 	;;
+  ep9312)
+	machine_dir=arm
+	;;
   fr30)
 	machine_dir=fr30
 	;;
+  frv)
+	machine_dir=frv
+        ;;
   h8300)
 	machine_dir=h8300
 	;;
@@ -204,9 +209,6 @@ case "${host_cpu}" in
 	machine_dir=v850
 	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -mv850 "
 	;;
-  frv)
-	machine_dir=frv
-        ;;
   w65*)
 	machine_dir=w65
 	;;
@@ -310,6 +312,9 @@ case "${host}" in
 	;;
   d30v*)
 	sys_dir=
+	;;
+  ep9312-*-*)
+	sys_dir=arm
 	;;
   h8300-*-hms*)
 	sys_dir=h8300hms
@@ -481,10 +486,19 @@ case "${host}" in
 	newlib_cflags="${newlib_cflags} -DABORT_MESSAGE -DSMALL_MEMORY -DMISSING_SYSCALL_NAMES"
 	syscall_dir=
 	;;
+  ep9312-*-*)
+	syscall_dir=syscalls
+	newlib_cflags="${newlib_cflags} -DABORT_PROVIDED -DHAVE_GETTIMEOFDAY"
+	newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
+	;;
   fr30-*-*)
 	newlib_cflags="${newlib_cflags}"
 	syscall_dir=syscalls
 	;;
+  frv-*-*)
+        syscall_dir=syscalls
+	newlib_cflags="${newlib_cflags} -DWANT_PRINTF_LONG_LONG"
+        ;;
   h8300*-*-*)
 	syscall_dir=syscalls	
 	newlib_cflags="${newlib_cflags} -DSMALL_DTOA -DSMALL_MEMORY"
@@ -602,10 +616,6 @@ case "${host}" in
   v850ea-*-*)
 	syscall_dir=syscalls
 	;;
-  frv-*-*)
-        syscall_dir=syscalls
-	newlib_cflags="${newlib_cflags} -DWANT_PRINTF_LONG_LONG"
-        ;;
   w65-*-*)
 	syscall_dir=syscalls	
 	newlib_cflags="${newlib_cflags} -DSMALL_DTOA -DSMALL_MEMORY"
