@@ -1,3 +1,7 @@
+2003-03-13  Christopher Faylor  <cgf@redhat.com>
+
+	* include/cygwin/version.h: Bump DLL minor number to 23.
+
 2003-03-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (IsProcessorFeaturePresent): Add.
