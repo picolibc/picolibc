@@ -1006,21 +1006,29 @@ fixup_mmaps_after_fork (HANDLE parent)
 			  }
 			else
 			  {
-			    BOOL ret, ret2;
+			    BOOL ret;
+			    DWORD dummy_prot;
+
 			    ret = ReadProcessMemory (parent, address, address,
 						     getpagesize (), NULL);
-			    ret2 = VirtualProtectEx(parent,
-			    			    address, getpagesize (),
-						    old_prot, &old_prot);
-			    if (!ret2)
-			      system_printf ("WARNING: VirtualProtectEx to"
+			    if (!VirtualProtectEx(parent,
+						  address, getpagesize (),
+						  old_prot, &dummy_prot))
+			      system_printf ("WARNING: VirtualProtectEx to "
 			      		     "return to previous state "
 					     "in parent failed for "
 					     "MAP_PRIVATE address %p, %E",
 					     rec->get_address ());
+			    if (!VirtualProtect (address, getpagesize (),
+						 old_prot, &dummy_prot))
+			      system_printf ("WARNING: VirtualProtect to copy "
+					     "protection to child failed for"
+					     "MAP_PRIVATE address %p, %E",
+					     rec->get_address ());
 			    if (!ret)
 			      {
-				system_printf ("ReadProcessMemory FAILED for "
+				system_printf ("ReadProcessMemory (2nd try) "
+					       "failed for "
 					       "MAP_PRIVATE address %p, %E",
 					       rec->get_address ());
 				return -1;

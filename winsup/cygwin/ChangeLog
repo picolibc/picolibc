@@ -1,5 +1,10 @@
 2003-01-14  Corinna Vinschen <corinna@vinschen.de>
 
+	* mmap.cc (fixup_mmaps_after_fork): Copy protection to child process.
+	Change ambiguous debug output.
+
+2003-01-14  Corinna Vinschen <corinna@vinschen.de>
+
 	* mmap.cc (mmap_record::access): Change argument type to caddr_t
 	for strictness.
 	(mprotect): Protect against calling VirtualProtect() for shared
