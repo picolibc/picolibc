@@ -171,7 +171,7 @@ typedef struct disassemble_info {
 
 
 /* Standard disassemblers.  Disassemble one instruction at the given
-   target address.  Return number of bytes processed.  */
+   target address.  Return number of octets processed.  */
 typedef int (*disassembler_ftype)
      PARAMS((bfd_vma, disassemble_info *));
 
