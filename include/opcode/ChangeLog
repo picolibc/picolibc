@@ -1,9 +1,13 @@
-Wed Jan  3 16:27:15 MET 2001  Jan hubicka  <jh@suse.cz>
+Fri Jan  5 13:22:23 MET 2001  Jan Hubicka  <jh@suse.cz>
+
+	* i386.h (i386_optab): Make [sml]fence template to use immext field.
+
+Wed Jan  3 16:27:15 MET 2001  Jan Hubicka  <jh@suse.cz>
 
 	* i386.h (i386_optab): Fix 64bit pushf template; Add instructions
 	introduced by Pentium4
 
-Sat Dec 30 19:03:15 MET 2000  Jan hubicka  <jh@suse.cz>
+Sat Dec 30 19:03:15 MET 2000  Jan Hubicka  <jh@suse.cz>
 
 	* i386.h (i386_optab): Add "rex*" instructions;
 	add swapgs; disable jmp/call far direct instructions for

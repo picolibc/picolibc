@@ -953,8 +953,8 @@ static const template i386_optab[] = {
 
 {"movnti",    2, 0x0fc3,    X, CpuP4, lq_Suf|Modrm,	{ WordReg|WordMem, WordReg, 0 } },
 {"clflush",   1, 0x0fae,    7, CpuP4, FP|Modrm, 	{ ByteMem, 0, 0 } },
-{"lfence",    0, 0x0faee8,  X, CpuP4, FP,		{ 0, 0, 0 } },
-{"mfence",    0, 0x0faef0,  X, CpuP4, FP,		{ 0, 0, 0 } },
+{"lfence",    0, 0x0fae, 0xe8, CpuP4, FP|ImmExt,	{ 0, 0, 0 } },
+{"mfence",    0, 0x0fae, 0xf0, CpuP4, FP|ImmExt,	{ 0, 0, 0 } },
 {"pause",     0, 0xf390,    X, CpuP4, FP,		{ 0, 0, 0 } },
 
 /* MMX/SSE2 instructions.  */
@@ -1172,7 +1172,7 @@ static const template i386_optab[] = {
 {"rcpss",     2, 0xf30f53,  X, CpuSSE, FP|Modrm,	{ RegXMM|WordMem, RegXMM, 0 } },
 {"rsqrtps",   2, 0x0f52,    X, CpuSSE, FP|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
 {"rsqrtss",   2, 0xf30f52,  X, CpuSSE, FP|Modrm,	{ RegXMM|WordMem, RegXMM, 0 } },
-{"sfence",    0, 0x0faef8,  X, CpuSSE, FP,		{ 0, 0, 0 } },
+{"sfence",    0, 0x0fae, 0xf8, CpuSSE, FP|ImmExt,	{ 0, 0, 0 } },
 {"shufps",    3, 0x0fc6,    X, CpuSSE, FP|Modrm,	{ Imm8, RegXMM|LLongMem, RegXMM } },
 {"sqrtps",    2, 0x0f51,    X, CpuSSE, FP|Modrm,	{ RegXMM|LLongMem, RegXMM, 0 } },
 {"sqrtss",    2, 0xf30f51,  X, CpuSSE, FP|Modrm,	{ RegXMM|WordMem, RegXMM, 0 } },
