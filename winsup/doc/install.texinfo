@@ -11,13 +11,14 @@ respective directories:
 @table @samp
 
 @item latest
-ash bash binutils bison byacc bzip2 clear common crypt cygwin dejagnu
-diff expect fileutils findutils flex gawk gcc gdb gperf grep groff gzip
-inetutils less login m4 make man mt opengl openssh openssl patch sed
-shellutils tar tcltk termcap texinfo textutils time vim
+ash autoconf bash binutils bison byacc bzip2 clear common crypt cygwin
+dejagnu diff expect fileutils findutils flex gawk gcc gdb gperf grep
+groff gzip inetutils less login m4 make man mt opengl openssh openssl
+patch regex sed shellutils tar tcltk termcap texinfo textutils time vim
+w32api
 
 @item contrib
-cvs gdbm jbigkit jpeg libpng tiff zlib
+cvs gdbm gettext jbigkit jpeg libpng ncurses readline tiff xpm zlib
 
 @end table
 
