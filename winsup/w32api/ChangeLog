@@ -1,3 +1,7 @@
+2002-09-17  Daniel Schlyder  <daniel@dascdev.net>
+
+	* include/winnt.h (VER_SUITE_BLADE): Define.
+
 2002-09-17  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/shlobj.h (SHGetSpecialFolderPath[AW]):
