@@ -67,10 +67,9 @@ ALL_LDFLAGS:=-B$(newlib_build)/libc/ -B$(newlib_build)/libm/ -B$(w32api_lib)/ \
 MINGW_LDFLAGS:=$(ALL_LDFLAGS) $(MINGW_LIB)
 DUMPER_LDFLAGS:=$(ALL_LDFLAGS) $(DUMPER_LIB)
 
-PROGS:=mount$(EXEEXT) umount$(EXEEXT) ps$(EXEEXT) kill$(EXEEXT) \
-       mkpasswd$(EXEEXT) mkgroup$(EXEEXT) cygpath$(EXEEXT) cygcheck$(EXEEXT) \
-       passwd$(EXEEXT) getfacl$(EXEEXT) setfacl$(EXEEXT) strace$(EXEEXT) \
-       regtool$(EXEEXT) ssp$(EXEEXT)
+PROGS:=	cygcheck.exe cygpath.exe cygme.exe getfacl.exe kill.exe mkgroup.exe \
+	mkpasswd.exe mount.exe passwd.exe ps.exe regtool.exe setfacl.exe \
+	ssp.exe strace.exe umount.exe
 
 CLEAN_PROGS:=$(PROGS)
 ifdef build_dumper

@@ -1,3 +1,9 @@
+2001-10-24  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Only build testsuite directory on first 'make check'.
+	* configure.in: Remove testsuite from SUBDIRS.
+	* configure: Regenerate.
+
 2001-10-12  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in: Add -nostdinc to CXXFLAGS.

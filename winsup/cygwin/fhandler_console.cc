@@ -104,7 +104,7 @@ get_tty_stuff (int flags = 0)
   if (shared_console_info)
     return shared_console_info;
 
-  shared_console_info = (tty_min *) open_shared (NULL, cygheap->console_h,
+  shared_console_info = (tty_min *) open_shared (NULL, 0, cygheap->console_h,
 						 sizeof (*shared_console_info),
 						 NULL);
   ProtectHandle (cygheap->console_h);

@@ -40,7 +40,7 @@ class mount_item
    scheme should be satisfactory for a long while yet.  */
 #define MAX_MOUNTS 30
 
-#define MOUNT_VERSION	0x01010103
+#define MOUNT_VERSION	27	// increment when mount table changes
 
 class reg_key;
 class mount_info
@@ -158,4 +158,4 @@ void __stdcall shared_terminate (void);
 #define cygheap_address		shared_align_past ((mount_info *) shared_align_past (cygwin_shared))
 
 char *__stdcall shared_name (const char *, int);
-void *__stdcall open_shared (const char *name, HANDLE &shared_h, DWORD size, void *addr);
+void *__stdcall open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, void *addr);

@@ -36,7 +36,7 @@ datadir:=@datadir@
 infodir:=@infodir@
 includedir:=@includedir@
 
-SUBDIRS=@SUBDIRS@
+SUBDIRS=@SUBDIRS@ testsuite
 INSTALL_SUBDIRS=${patsubst %,install_%,$(SUBDIRS)}
 CLEAN_SUBDIRS=${patsubst %,clean_%,$(SUBDIRS)}
 
@@ -66,13 +66,19 @@ install-info:
 info:
 
 $(SUBDIRS):
-	@$(MAKE) -C $@ all
+	@if cd $@ 2>/dev/null; then \
+	    $(MAKE) all; \
+	fi || exit 0
 
 $(INSTALL_SUBDIRS):
-	@$(MAKE) -C ${patsubst install_%,%,$@} install
+	@if cd ${patsubst install_%,%,$@} 2>/dev/null; then \
+	    make install; \
+	fi || exit 0
 
 $(CLEAN_SUBDIRS):
-	@$(MAKE) -C ${patsubst clean_%,%,$@} clean
+	@if cd ${patsubst clean_%,%,$@} 2>/dev/null; then \
+	    make install; \
+	fi || exit 0
 
 .PRECIOUS: Makefile
 
@@ -82,5 +88,15 @@ Makefile: Makefile.in $(srcdir)/configure.in config.status
 config.status: configure
 	$(SHELL) config.status --recheck
 
-check:
-	@$(MAKE) -C testsuite check
+check: cygwin
+	@if [ -d testsuite ]; then \
+	    cd testsuite; \
+	else \
+	    mkdir testsuite; \
+	    cd testsuite; \
+	    sed -n -e '1,/^done/{' -e 's%/cygwin%/testsuite%g; ' -e 'p; }'  ../cygwin/config.status > config.status; \
+	    chmod a+x config.status; \
+	    sh ./config.status --recheck; \
+	    sh ./config.status; \
+	fi; \
+	$(MAKE) check

@@ -55,7 +55,7 @@ shared_name (const char *str, int num)
 }
 
 void * __stdcall
-open_shared (const char *name, HANDLE &shared_h, DWORD size, void *addr)
+open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, void *addr)
 {
   void *shared;
 
@@ -66,7 +66,7 @@ open_shared (const char *name, HANDLE &shared_h, DWORD size, void *addr)
 	mapname = NULL;
       else
 	{
-	  mapname = shared_name (name, 0);
+	  mapname = shared_name (name, n);
 	  shared_h = OpenFileMappingA (FILE_MAP_READ | FILE_MAP_WRITE,
 				       TRUE, mapname);
 	}
@@ -127,6 +127,7 @@ memory_init ()
   /* Initialize general shared memory */
   HANDLE shared_h = cygheap ? cygheap->shared_h : NULL;
   cygwin_shared = (shared_info *) open_shared ("shared",
+					       CYGWIN_VERSION_SHARED_DATA,
 					       shared_h,
 					       sizeof (*cygwin_shared),
 					       cygwin_shared_address);
@@ -151,7 +152,8 @@ memory_init ()
   ProtectHandle (cygheap->shared_h);
 
   heap_init ();
-  mount_table = (mount_info *) open_shared (user_name, cygwin_mount_h,
+  mount_table = (mount_info *) open_shared (user_name, MOUNT_VERSION,
+      					    cygwin_mount_h,
 					    sizeof (mount_info), 0);
   debug_printf ("opening mount table for '%s' at %p", cygheap->user.name (),
 		mount_table_address);
@@ -165,6 +167,9 @@ memory_init ()
       debug_printf ("initializing mount table");
       mount_table->init ();	/* Initialize the mount table.  */
     }
+  else if (mount_table->version != MOUNT_VERSION)
+    multiple_cygwin_die ();
+
 }
 
 void __stdcall

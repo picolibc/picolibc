@@ -165,6 +165,7 @@ struct init_cygheap
   HANDLE shared_h;
   HANDLE console_h;
   HANDLE etc_changed_h;
+  char *cygwin_regname;
   cwdstuff cwd;
   dtable fdtab;
 
