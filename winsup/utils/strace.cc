@@ -870,7 +870,7 @@ struct option longopts[] = {
   {NULL, 0, NULL, 0}
 };
 
-static const char *const opts = "b:dhfm:no:p:S:tTuvw";
+static const char *const opts = "+b:dhfm:no:p:S:tTuvw";
 
 static void
 print_version ()
@@ -903,15 +903,12 @@ main (int argc, char **argv)
   pid_t pid = 0;
   int opt;
   int toggle = 0;
-  int posixly_correct_set = getenv ("POSIXLY_CORRECT") != NULL;
 
   if (!(pgm = strrchr (*argv, '\\')) && !(pgm = strrchr (*argv, '/')))
     pgm = *argv;
   else
     pgm++;
 
-  if (!posixly_correct_set)
-    (void) putenv("POSIXLY_CORRECT=1");
   while ((opt = getopt_long (argc, argv, opts, longopts, NULL)) != EOF)
     switch (opt)
       {
@@ -996,8 +993,6 @@ character #%d.\n", optarg, (int) (endptr - optarg), endptr);
   if (!ofile)
     ofile = stdout;
 
-  if (!posixly_correct_set)
-    putenv ("POSIXLY_CORRECT=");
   if (toggle)
     dotoggle (pid);
   else

@@ -1,3 +1,9 @@
+2004-02-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* strace.cc (opts): Add leading '+' to force posixly correct
+	behaviour.
+	(main): Revert POSIXLY_CORRECT manipulations.
+
 2004-02-10  Christopher Faylor  <cgf@redhat.com>
 
 	* strace.cc (main): Guard against previous setting of POSIXLY_CORRECT.
