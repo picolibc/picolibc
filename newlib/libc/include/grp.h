@@ -75,6 +75,7 @@ void		 setgrfile (const char *);
 #ifndef _XOPEN_SOURCE
 char		*group_from_gid (gid_t, int);
 int		 setgroupent (int);
+int		 initgroups (const char *, gid_t);
 #endif /* !_XOPEN_SOURCE */
 #endif /* !_POSIX_SOURCE */
 

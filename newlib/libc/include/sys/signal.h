@@ -147,6 +147,7 @@ int _EXFUN(pthread_sigmask, (int how, const sigset_t *set, sigset_t *oset));
    changes, then we will need to do something else, perhaps along the
    lines of <machine/types.h>.  */
 int _EXFUN(kill, (int, int));
+int _EXFUN(killpg, (pid_t, int));
 int _EXFUN(sigaction, (int, const struct sigaction *, struct sigaction *));
 int _EXFUN(sigaddset, (sigset_t *, const int));
 int _EXFUN(sigdelset, (sigset_t *, const int));

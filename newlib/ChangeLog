@@ -1,3 +1,12 @@
+2001-02-08  Edward M. Lee  <tailbert@yahoo.com>
+
+        * libc/include/grp.h: add prototype for initgroups.
+        * libc/include/stdio.h: fix prototype for putw.
+        * libc/include/sys/signal.h: add prototype for killpg.
+        * libc/include/sys/stat.h: enable mknod/lstat for CYGWIN.
+        * libc/include/sys/unistd.h: add prototypes for getpgid, setpgrp,
+	vhangup and remove duplicate sysconf prototype.
+
 2001-02-07  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/rtems/sys/types.h: Removed.

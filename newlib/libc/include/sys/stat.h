@@ -124,7 +124,7 @@ int	_EXFUN(mkfifo,( const char *__path, mode_t __mode ));
 int	_EXFUN(stat,( const char *__path, struct stat *__sbuf ));
 mode_t	_EXFUN(umask,( mode_t __mask ));
 
-#if defined(__rtems__)
+#if defined(__rtems__) || defined(__CYGWIN__)
 int	_EXFUN(mknod,( const char *_path, mode_t _mode, dev_t dev ));
 int	_EXFUN(lstat,( const char *__path, struct stat *__buf ));
 #endif
@@ -133,15 +133,6 @@ int	_EXFUN(lstat,( const char *__path, struct stat *__buf ));
    provided in newlib for some compilers.  */
 int	_EXFUN(_fstat,( int __fd, struct stat *__sbuf ));
 int	_EXFUN(_stat,( const char *__path, struct stat *__sbuf ));
-
-#ifdef __CYGWIN__
-int	_EXFUN(lstat,( const char *__path, struct stat *__buf ));
-#endif
-
-#if defined(__rtems__)
-int	_EXFUN(mknod,( const char *_path, mode_t _mode, dev_t dev ));
-int	_EXFUN(lstat,( const char *_path, struct stat *_sbuf ));
-#endif
 
 #endif /* !_STAT_H_ */
 #ifdef __cplusplus

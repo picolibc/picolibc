@@ -50,6 +50,7 @@ int _EXFUN(getlogin_r, (char *name, size_t namesize) );
 #endif
 char 	_EXFUN(*getpass, (__const char *__prompt));
 size_t  _EXFUN(getpagesize, (void));
+pid_t   _EXFUN(getpgid, (pid_t));
 pid_t   _EXFUN(getpgrp, (void ));
 pid_t   _EXFUN(getpid, (void ));
 pid_t   _EXFUN(getppid, (void ));
@@ -83,6 +84,7 @@ int     _EXFUN(seteuid, (uid_t __uid ));
 #endif
 int     _EXFUN(setgid, (gid_t __gid ));
 int     _EXFUN(setpgid, (pid_t __pid, pid_t __pgid ));
+int     _EXFUN(setpgrp, (void ));
 pid_t   _EXFUN(setsid, (void ));
 int     _EXFUN(setuid, (uid_t __uid ));
 unsigned _EXFUN(sleep, (unsigned int __seconds ));
@@ -92,6 +94,7 @@ pid_t   _EXFUN(tcgetpgrp, (int __fildes ));
 int     _EXFUN(tcsetpgrp, (int __fildes, pid_t __pgrp_id ));
 char    _EXFUN(*ttyname, (int __fildes ));
 int     _EXFUN(unlink, (const char *__path ));
+int     _EXFUN(vhangup, (void ));
 /* POSIX 1003.1b-1993 says write() returns ssize_t */
 #if defined(__rtems__)
 ssize_t     _EXFUN(write, (int __fildes, const void *__buf, size_t __nbyte ));
@@ -143,8 +146,6 @@ int     _EXFUN(symlink, (const char *__name1, const char *__name2));
 #define STDIN_FILENO    0       /* standard input file descriptor */
 #define STDOUT_FILENO   1       /* standard output file descriptor */
 #define STDERR_FILENO   2       /* standard error file descriptor */
-
-long _EXFUN(sysconf, (int __name));
 
 /*
  *  4.8.1 Get Configurable System Variables, P1003.1b-1993, p. 96
