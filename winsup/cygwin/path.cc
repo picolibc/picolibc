@@ -2197,14 +2197,14 @@ mount_info::add_item (const char *native, const char *posix, unsigned mountflags
     posixerr = normalize_posix_path (posix, posixtmp, &posixtail);
 
   debug_printf ("%s[%s], %s[%s], %p",
-                native, nativeerr?error:nativetmp,
-		posix, posixerr?error:posixtmp, mountflags);
+                native, nativeerr ? error : nativetmp,
+		posix, posixerr ? error : posixtmp, mountflags);
 
-  if (nativeerr || posixerr) 
+  if (nativeerr || posixerr)
     {
       set_errno (nativeerr?:posixerr);
-	  return -1;
-	}
+      return -1;
+    }
 
   /* Make sure both paths do not end in /. */
   if (nativetail > nativetmp + 1 && nativetail[-1] == '\\')

@@ -1,8 +1,13 @@
+2004-06-02  Christophe Jaillet  <christophe.jaillet@wanadoo.fr>
+
+	* spawn.cc (find_exec): Use has_slash to determine if path has a slash
+	rather than calculating this twice.
+
 2004-05-30  Pierre Humblet <pierre.humblet@ieee.org>
 
-	* path.cc (mount_info::add_item): Make sure native path has drive 
+	* path.cc (mount_info::add_item): Make sure native path has drive
 	or UNC form. Call normalize_xxx_path instead of [back]slashify.
-	Remove test for double slashes. Reorganize to always debug_print. 
+	Remove test for double slashes. Reorganize to always debug_print.
 
 2004-05-28  Pierre Humblet  <Pierre.Humblet@ieee.org>
 

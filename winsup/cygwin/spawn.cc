@@ -114,11 +114,9 @@ find_exec (const char *name, path_conv& buf, const char *mywinenv,
 
   /* Return the error condition if this is an absolute path or if there
      is no PATH to search. */
-  if (strchr (name, '/') || strchr (name, '\\') ||
-      isdrive (name) ||
-      !(winpath = getwinenv (mywinenv)) ||
-      !(path = winpath->get_native ()) ||
-      *path == '\0')
+  if (has_slash || strchr (name, '\\') || isdrive (name)
+      || !(winpath = getwinenv (mywinenv))
+      || !(path = winpath->get_native ()) || *path == '\0')
     goto errout;
 
   debug_printf ("%s%s", mywinenv, path);

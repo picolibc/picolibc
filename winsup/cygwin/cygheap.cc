@@ -369,7 +369,12 @@ cmalloc (cygheap_types x, DWORD n)
   MALLOC_CHECK;
   c = (cygheap_entry *) _cmalloc (sizeof_cygheap (n));
   if (!c)
-    system_printf ("cmalloc returned NULL");
+    {
+      system_printf ("cmalloc returned NULL");
+#ifdef DEBUGGING
+      try_to_debug ();
+#endif
+    }
   return creturn (x, c, n);
 }
 
