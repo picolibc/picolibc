@@ -1,5 +1,10 @@
 2004-02-13  Christopher Faylor  <cgf@redhat.com>
 
+	* sigproc.cc (proc_subproc): Change warning back to silent debug
+	output.
+
+2004-02-13  Christopher Faylor  <cgf@redhat.com>
+
 	* dcrt0.cc (alloc_stack_hard_way): Revert to previous implementation.
 	(alloc_stack): Ditto.
 	* exceptions.cc (ctrl_c_handler): Add debugging output.

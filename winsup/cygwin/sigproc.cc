@@ -374,7 +374,7 @@ proc_subproc (DWORD what, DWORD val)
 	 way to deal with this and could lead to process hangs.  */
       if (nzombies >= NZOMBIES)
 	{
-	  system_printf ("zombie table overflow %d", thiszombie);
+	  sigproc_printf ("zombie table overflow %d", thiszombie);
 	  remove_zombie (thiszombie);
 	}
 
