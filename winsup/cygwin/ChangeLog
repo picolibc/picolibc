@@ -1,3 +1,9 @@
+Wed Oct 25 20:49:59 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* signal.cc (kill_pgrp): Don't limit sending of signals to stopped
+	processes when sig < 0.
+	(kill_worker): Only send SIGCONT to stopped processes when sendSIGCONT.
+
 Wed Oct 25 13:56:39 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* exceptions.cc (sig_handle): Just make sure that wait_sig loops when
