@@ -1,9 +1,14 @@
-2003-03-30  Jeff Johnston  <jjohnstn@redhat.com>
+2004-04-01  Jeff Johnston  <jjohnstn@redhat.com>
+
+	* libc/stdio/vfscanf.c (__svfscanf_r): Add locking/unlocking
+	of file.
+
+2004-03-30  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/machine/h8300/Makefile.am: Reformat slightly.
 	* libc/machine/h8300/Makefile.in: Regenerate.
 
-2003-03-30  Thomas Pfaff  <tpfaff@gmx.net>
+2004-03-30  Thomas Pfaff  <tpfaff@gmx.net>
 
 	* libc/stdio/findfp.c (__fp_lock_all): Add call to
 	__sfp_lock_acquire.

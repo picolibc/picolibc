@@ -285,6 +285,8 @@ __svfscanf_r (rptr, fp, fmt0, ap)
   static _CONST short basefix[17] =
     {10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
 
+  _flockfile (fp);
+ 
   nassigned = 0;
   nread = 0;
   for (;;)
@@ -297,7 +299,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 #endif
       fmt += nbytes;
       if (wc == 0)
-	return nassigned;
+	goto all_done;
       if (nbytes == 1 && isspace (wc))
 	{
 	  for (;;)
@@ -499,6 +501,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	   * Disgusting backwards compatibility hacks.	XXX
 	   */
 	case '\0':		/* compat */
+	  _funlockfile (fp);
 	  return EOF;
 
 	default:		/* compat */
@@ -1130,8 +1133,11 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	}
     }
 input_failure:
+  _funlockfile (fp);
   return nassigned ? nassigned : -1;
 match_failure:
+all_done:
+  _funlockfile (fp);
   return nassigned;
 }
 
