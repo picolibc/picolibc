@@ -1935,6 +1935,11 @@ extern "C" {
 #define OBJID_CURSOR 0xFFFFFFF7
 #define OBJID_ALERT 0xFFFFFFF6
 #define OBJID_SOUND 0xFFFFFFF5
+#if(WINVER >= 0x0500)
+#define ASFW_ANY ((DWORD)-1)
+#define LSFW_LOCK 1
+#define LSFW_UNLOCK 2
+#endif
 
 #ifndef RC_INVOKED
 typedef BOOL(CALLBACK *DLGPROC)(HWND,UINT,WPARAM,LPARAM);
@@ -3271,6 +3276,10 @@ int WINAPIV wsprintfA(LPSTR,LPCSTR,...);
 int WINAPIV wsprintfW(LPWSTR,LPCWSTR,...);
 int WINAPI wvsprintfA(LPSTR,LPCSTR,va_list arglist);
 int WINAPI wvsprintfW(LPWSTR,LPCWSTR,va_list arglist);
+#if(WINVER >= 0x0500)
+BOOL WINAPI AllowSetForegroundWindow(DWORD);
+BOOL WINAPI LockSetForegroundWindow(UINT);
+#endif
 
 #ifdef UNICODE
 #define EDITWORDBREAKPROC EDITWORDBREAKPROCW

@@ -3,6 +3,7 @@ EXPORTS
 ActivateKeyboardLayout@8
 AdjustWindowRect@12
 AdjustWindowRectEx@16
+AllowSetForegroundWindow@4
 AnyPopup@0
 AppendMenuA@16
 AppendMenuW@16
@@ -384,6 +385,7 @@ LoadMenuIndirectW@4
 LoadMenuW@8
 LoadStringA@16
 LoadStringW@16
+LockSetForegroundWindow@4
 LockWindowUpdate@4
 LookupIconIdFromDirectory@8
 LookupIconIdFromDirectoryEx@20
