@@ -1,5 +1,5 @@
 /* Generic relocation support for BFD.
-   Copyright (C) 1998 Free Software Foundation, Inc.
+   Copyright (C) 1998, 2000 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -59,7 +59,7 @@
    	   }
    	}
    */
-   
+
 #ifndef _RELOC_MACROS_H
 #define _RELOC_MACROS_H
 
@@ -78,15 +78,15 @@ name (rtype)							\
   switch (rtype)						\
   {
 
-#ifdef __STDC__					  
+#if defined (__STDC__) || defined (ALMOST_STDC)
 #define RELOC_NUMBER(name, number)  case number : return #name ;
 #else
 #define RELOC_NUMBER(name, number)  case number : return "name" ;
 #endif
 
-#define FAKE_RELOC(name, number)    
+#define FAKE_RELOC(name, number)
 #define EMPTY_RELOC(name)
-					  
+
 #define END_RELOC_NUMBERS	\
     default: return NULL;	\
   }				\
@@ -100,15 +100,15 @@ name (rtype)							\
    to -1 so that the first real entry will still default to 0).  Further
    entries then prepend a comma to their definitions, creating a list
    of enumerator entries that will satisfy these compilers.  */
-#ifdef __STDC__
+#if defined (__STDC__) || defined (ALMOST_STDC)
 #define START_RELOC_NUMBERS(name)   enum name { _##name = -1
 #else
-#define START_RELOC_NUMBERS(name)   enum name { name = -1
+#define START_RELOC_NUMBERS(name)   enum name { _/**/name = -1
 #endif
-						
+
 #define RELOC_NUMBER(name, number)  , name = number
-#define FAKE_RELOC(name, number)    , name = number 
-#define EMPTY_RELOC(name)           , name 
+#define FAKE_RELOC(name, number)    , name = number
+#define EMPTY_RELOC(name)           , name
 #define END_RELOC_NUMBERS           };
 
 #endif

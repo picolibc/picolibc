@@ -1,3 +1,9 @@
+2000-06-03  Alan Modra  <alan@linuxcare.com.au>
+
+	* reloc-macros.h (START_RELOC_NUMBERS): Fix name clash for
+	!__STDC__ case.
+	(RELOC_NUMBER): Use ansi stringify if ALMOST_STDC defined.
+
 2000-05-22  Richard Henderson  <rth@cygnus.com>
 
 	* ia64.h (R_IA64_PCREL60B, R_IA64_PCREL21BI): New.
