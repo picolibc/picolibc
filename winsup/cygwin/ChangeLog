@@ -1,3 +1,9 @@
+2002-07-20  Christopher Faylor  <cgf@redhat.com>
+
+	* autoload.cc (LoadDLLprime): Add jmp call to allow streamlining of
+	later jmp rewrite.
+	(doit): Avoid use of cx register.  Just change one word to avoid races.
+
 2002-07-18  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* security.cc (get_unix_group_sidlist): Create.
