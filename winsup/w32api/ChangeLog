@@ -1,6 +1,12 @@
+2002-08-05  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/wingdi.h (AlphaBlend,GradientFill,TransparentBlt):
+	Add prototypes.
+	* lib/msimg32.def: New file, with stubs for above.
+
 2002-08-03  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* winbase.h (AddAccessAllowedAceEx,AddAccessDeniedAceEx,
+	* include/winbase.h (AddAccessAllowedAceEx,AddAccessDeniedAceEx,
 	GetFileSizeEx, SetFilePointerEx): Add prototypes.
 	(EncryptFile[AW], FileEncryptionStatus[AW]): Add prototypes
 	and UNICODE mappings.
@@ -20,7 +26,7 @@
 
 	* include/windef.h (PVOID): Move typedef to...
 	* include/winnt: ...here.
-	(PVOID64): New typeddef.
+	(PVOID64): New typedef.
 
 	* include/winnt,h (FILE_SEGMENT_ELEMENT): Define union.
 	* include/winbase.h (ReadFileScatter, WriteFileGather):
