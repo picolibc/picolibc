@@ -1,3 +1,15 @@
+2005-03-21  Zack Weinberg  <zack@codesourcery.com>
+
+	* Makefile.def: Remove libstdcxx_incdir, libsubdir, gxx_include_dir,
+	gcc_version, and gcc_version_trigger from set of flags to pass.
+	* Makefile.tpl: Remove definitions of above variables.
+	(config.status): Remove dependency on $(gcc_version_trigger).
+	* Makefile.in: Regenerate.
+	* configure.in: Do not reference config/gcc-version.m4 nor
+	config/gxx-include-dir.m4.  Do not invoke TL_AC_GCC_VERSION nor
+	TL_AC_GXX_INCLUDE_DIR.  Do not set gcc_version_trigger.
+	* configure: Regenerate.
+
 2005-03-16  Manfred Hollstein  <manfred.h@gmx.net>
 	    Andrew Pinski <pinskia@physics.uc.edu>
 
@@ -12,10 +24,10 @@
 
 2005-02-28  Andrew Pinski  <pinskia@physics.uc.edu>
 
-        PR bootstrap/20250
-        * Makefile.tpl (HOST target installs): Fix copy and pasto, use install
-        instead of check.
-        * Makefile.in: Regenerate.
+	PR bootstrap/20250
+	* Makefile.tpl (HOST target installs): Fix copy and pasto, use install
+	instead of check.
+	* Makefile.in: Regenerate.
 
 2005-02-28  Paolo Bonzini  <bonzini@gnu.org>
 
@@ -162,7 +174,7 @@
 	* Makefile.tpl (clean-target-libgcc): Add stmp-dirs to list
 	of things to remove.
 	* Makefile.in: Regenerate.
-	
+
 2004-12-02  Richard Sandiford  <rsandifo@redhat.com>
 
 	* configure.in: Clear gcc_version_trigger if the file doesn't exist.
@@ -253,7 +265,7 @@
 
 	* src-release (do-djunpack, do-md5sum): Install the generated file
 	directly into the proto-toplev/ directory.
-	
+
 2004-10-19  Andrew Cagney  <cagney@gnu.org>
 
 	* src-release (GDB_SUPPORT_DIRS): Remove utils and intl.
@@ -285,7 +297,7 @@
 2004-09-30  Tomer Levi  <Tomer.Levi@nsc.com>
 
 	* configure.in: Enable target-libgloss for crx-*-*.
-        * configure: Regenerate.
+	* configure: Regenerate.
 
 2004-09-24  Michael Roth  <mroth@nessie.de>
 
@@ -327,7 +339,7 @@
 	* configure: Regenerate.
 
 2004-09-09  Daniel Berlin  <dberlin@dberlin.org>
-	
+
 	* Makefile.def: Remove libbanshee.
 	* Makefile.tpl: Ditto.
 	* configure.in: Ditto.
@@ -343,7 +355,7 @@
 	* config.sub: Import latest version from master repository.
 	* config.guess: Likewise.
 	This includes these changes:
-	
+
 	2004-08-27  Hans-Peter Nilsson  <hp@axis.com>
 
 	* config.sub: Handle crisv32, alias etraxfs.
@@ -430,7 +442,7 @@
 	* config.sub: Add support for National Semiconductor CRX target.
 
 2004-09-03  Jan Beulich  <jbeulich@novell.com>
- 
+
 	* configure.in: Remove target-libstdc++-v3 from noconfigdirs for
 	*-*-netware, but add target-libmudflap.
 	Consolidate *-*-netware targets (of which really only i?86 exists)
@@ -456,8 +468,8 @@
 	* Makefile.in: Move BOOT_CFLAGS above host makefile fragment include.
 	* configure.in: add test for powerpc-*-darwin* to specify makefile frag
 	* configure: regenerate
-	* config/mh-ppc-darwin: create file, override BOOT_CFLAGS for 
-        -mdynamic-no-pic
+	* config/mh-ppc-darwin: create file, override BOOT_CFLAGS for
+	-mdynamic-no-pic
 
 2004-08-31  Paolo Bonzini  <bonzini@gnu.org>
 
