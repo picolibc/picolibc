@@ -1,5 +1,17 @@
 2003-08-27  Christopher Faylor  <cgf@redhat.com>
 
+	* autoload.cc (SwitchToThread): Declare as autoload function.
+	* cygthread.h (cygthread::main_thread_id): Make public.
+	* exceptions.cc (setup_handler): Remove unneeded priority stuff.
+	Rename label to reflect what it does.  Add debugging for idiotic
+	Windows NT problem.  Change debugging output to include signal number.
+	* miscfuncs.cc (low_priority_sleep): If available, use SwitchToThread
+	function to give time slice to other threads.
+	* wincap.cc: Properly define have_switch_to_thread throughout.
+	* wincap.h (wincap::switch_to_thread): New element.
+
+2003-08-27  Christopher Faylor  <cgf@redhat.com>
+
 	* syscalls.cc (mount): Don't check win32_path when doing cygdrive
 	mount.
 
