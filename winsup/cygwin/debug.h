@@ -81,7 +81,6 @@ extern int pinger;
 
 struct handle_list
   {
-    BOOL allocated;
     HANDLE h;
     const char *name;
     const char *func;
