@@ -1,5 +1,9 @@
 2004-09-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.cc (fhandler_base::dup): Use debug_printf.
+
+2004-09-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* Makefile.in: Create libutil.a from bsdlib.o exports.
 	* bsdlib.cc (logwtmp): Move from syscalls.cc to here.
 	(login): Ditto.

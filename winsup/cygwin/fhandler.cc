@@ -1245,8 +1245,8 @@ fhandler_base::dup (fhandler_base *child)
       if (!DuplicateHandle (hMainProc, get_handle (), hMainProc, &nh, 0, TRUE,
 			    DUPLICATE_SAME_ACCESS))
 	{
-	  system_printf ("dup(%s) failed, handle %x, %E",
-			 get_name (), get_handle ());
+	  debug_printf ("dup(%s) failed, handle %x, %E",
+			get_name (), get_handle ());
 	  __seterrno ();
 	  return -1;
 	}
