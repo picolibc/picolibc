@@ -1,3 +1,7 @@
+2003-08-23  Christopher Faylor  <cgf@redhat.com>
+
+	* syscalls.cc (_remove_r): Define.
+
 2003-08-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.h (enum cygheap_types): Add HEAP_MMAP.

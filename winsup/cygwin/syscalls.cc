@@ -232,6 +232,21 @@ unlink (const char *ourname)
 }
 
 extern "C" int
+_remove_r (struct _reent *, const char *ourname)
+{
+  path_conv win32_name (ourname, PC_SYM_NOFOLLOW | PC_FULL);
+
+  if (win32_name.error)
+    {
+      set_errno (win32_name.error);
+      syscall_printf ("-1 = remove (%s)", ourname);
+      return -1;
+    }
+
+  return win32_name.isdir () ? rmdir (ourname) : unlink (ourname);
+}
+
+extern "C" int
 remove (const char *ourname)
 {
   path_conv win32_name (ourname, PC_SYM_NOFOLLOW | PC_FULL);
