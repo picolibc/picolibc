@@ -23,15 +23,15 @@ extern "C" {
 #define SETRGBSTRINGW   L"commdlg_SetRGBColor"
 #define HELPMSGSTRINGW  L"commdlg_help"
 #define FINDMSGSTRINGW  L"commdlg_FindReplace"
-#define CDN_FIRST	(-601)
-#define CDN_LAST	(-699)
+#define CDN_FIRST	((UINT)-601) /* also in commctrl.h */
+#define CDN_LAST	((UINT)-699)
 #define CDN_INITDONE	CDN_FIRST
-#define CDN_SELCHANGE	(CDN_FIRST-1)
-#define CDN_FOLDERCHANGE	(CDN_FIRST-2)
-#define CDN_SHAREVIOLATION	(CDN_FIRST-3)
-#define CDN_HELP	(CDN_FIRST-4)
-#define CDN_FILEOK	(CDN_FIRST-5)
-#define CDN_TYPECHANGE	(CDN_FIRST-6)
+#define CDN_SELCHANGE	(CDN_FIRST-1U)
+#define CDN_FOLDERCHANGE	(CDN_FIRST-2U)
+#define CDN_SHAREVIOLATION	(CDN_FIRST-3U)
+#define CDN_HELP	(CDN_FIRST-4U)
+#define CDN_FILEOK	(CDN_FIRST-5U)
+#define CDN_TYPECHANGE	(CDN_FIRST-6U)
 #define CDM_FIRST	(WM_USER+100)
 #define CDM_LAST	(WM_USER+200)
 #define CDM_GETSPEC	CDM_FIRST
