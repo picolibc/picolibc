@@ -74,8 +74,9 @@ cat <<\EOF_SED > conftestsed
 s,\\,\\\\,g; s,\$,$$,g
 EOF_SED
 tmp="'$progname'"
-for ac_arg ; do
-  tmp="$tmp '"`echo "$ac_arg" | sed -fconftestsed`
+for ac_arg
+do
+  tmp="$tmp '"`echo "$ac_arg" | sed -f conftestsed`
 done
 rm -f conftestsed
 TOPLEVEL_CONFIGURE_ARGUMENTS="$tmp"
@@ -390,7 +391,7 @@ case "${target}" in
     # newlib is not 64 bit ready
     noconfigdirs="$noconfigdirs target-newlib target-libgloss"
     ;;
-  alpha*-*-freebsd*)
+  alpha*-*-freebsd* | alpha*-*-kfreebsd*-gnu)
     noconfigdirs="$noconfigdirs target-newlib target-libgloss"
     ;;
   alpha*-*-*)
@@ -511,7 +512,7 @@ case "${target}" in
   i[[3456789]]86-*-coff | i[[3456789]]86-*-elf)
     noconfigdirs="$noconfigdirs ${libgcj}"
     ;;
-  i[[3456789]]86-*-freebsd*)
+  i[[3456789]]86-*-freebsd* | i[[3456789]]86-*-kfreebsd*-gnu)
     noconfigdirs="$noconfigdirs target-newlib target-libgloss"
     ;;
   i[[3456789]]86-*-linux*)
@@ -1782,7 +1783,7 @@ s/ [[^' -][^ ]*] / /
 s/^ *//;s/ *$//
 s,\\,\\\\,g; s,\$,$$,g
 EOF_SED
-baseargs=`echo " ${ac_configure_args} " | sed -fconftestsed`
+baseargs=`echo " ${ac_configure_args} " | sed -f conftestsed`
 rm -f conftestsed
 
 # For the build-side libraries, we just need to pretend we're native,
@@ -1938,7 +1939,9 @@ libstdcxx_flags='`test ! -f $$r/$(TARGET_SUBDIR)/libstdc++-v3/scripts/testsuite_
 raw_libstdcxx_flags=' -L$$r/$(TARGET_SUBDIR)/libstdc++-v3/src -L$$r/$(TARGET_SUBDIR)/libstdc++-v3/src/.libs'
 
 if test "x${CXX_FOR_TARGET+set}" = xset; then
-  :
+  if test "x${RAW_CXX_FOR_TARGET+set}" != xset; then
+    RAW_CXX_FOR_TARGET=${CXX_FOR_TARGET}
+  fi
 elif test -d ${srcdir}/gcc; then
   # We add -shared-libgcc to CXX_FOR_TARGET whenever we use xgcc instead
   # of g++ for linking C++ or Java, because g++ has -shared-libgcc by

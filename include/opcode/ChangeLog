@@ -1,3 +1,7 @@
+2003-09-04  Nick Clifton  <nickc@redhat.com>
+
+	* v850.h (PROCESSOR_V850E1): Define.
+
 2003-08-19  Alan Modra  <amodra@bigpond.net.au>
 
 	* ppc.h (PPC_OPCODE_440): Define.  Formatting.  Use hex for other

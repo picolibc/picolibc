@@ -59,6 +59,7 @@ struct v850_opcode
 #define PROCESSOR_V850E		(1 << 1)		/* Just the V850E. */
 #define PROCESSOR_NOT_V850	(~ PROCESSOR_V850)	/* Any processor except the V850.  */
 #define PROCESSOR_V850EA	(1 << 2)		/* Just the V850EA. */
+#define PROCESSOR_V850E1	(1 << 3)		/* Just the V850E1. */
 
 /* The table itself is sorted by major opcode number, and is otherwise
    in the order in which the disassembler should consider
