@@ -1,3 +1,8 @@
+Wed Apr 25 10:57:36 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* include/cygwin/version.h: Bump minor version number.
+	* childinfo.h: Bump child structure magic number.
+
 2001-04-25  Kazuhiro Fujieda  <fujieda@jaist.ac.jp>
 
 	* uinfo.cc (internal_getlogin): Return pointer to struct passwd.
