@@ -564,6 +564,7 @@ _fsetpos64 = fsetpos64 SIGFE
 _fstat64 = fstat64 SIGFE
 fstatfs SIGFE
 _fstatfs = fstatfs SIGFE
+fstatvfs SIGFE
 fdatasync SIGFE
 fsync SIGFE
 _fsync = fsync SIGFE
@@ -1307,6 +1308,7 @@ _sscanf = sscanf SIGFE
 _stat64 = stat64 SIGFE
 statfs SIGFE
 _statfs = statfs SIGFE
+statvfs SIGFE
 strcasecmp NOSIGFE
 _strcasecmp = strcasecmp NOSIGFE
 strcat NOSIGFE

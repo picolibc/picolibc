@@ -1,5 +1,19 @@
 2005-02-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygwin.din (fstatvfs): Export.
+	(statvfs): Export.
+	* syscalls.cc: Include sys/statvfs.h.
+	(statvfs): New function.  Move statfs functionality here.
+	(fstatvfs): New function.
+	(statfs): Just call statvfs and copy structure.  Check validity of
+	incoming struct statfs pointer.
+	* include/cygwin/types.h (fsblkcnt_t): Define.
+	(fsfilcnt_t): Define.
+	* include/cygwin/version.h: Bump API minor version.
+	* include/sys/statvfs.h: New file.
+
+2005-02-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* devices.h: Switch FH_ZERO and FH_PORT as on Linux.  Add FH_FULL.
 	* devices.in: Add /dev/full.
 	* devices.cc: Regenerate.

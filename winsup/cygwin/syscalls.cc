@@ -24,6 +24,7 @@ details. */
 #include "winsup.h"
 #include <sys/stat.h>
 #include <sys/vfs.h> /* needed for statfs */
+#include <sys/statvfs.h> /* needed for statvfs */
 #include <pwd.h>
 #include <grp.h>
 #include <stdlib.h>
@@ -1684,9 +1685,13 @@ get_osfhandle (int fd)
 }
 
 extern "C" int
-statfs (const char *fname, struct statfs *sfs)
+statvfs (const char *fname, struct statvfs *sfs)
 {
   char root[CYG_MAX_PATH];
+
+  if (check_null_empty_str_errno (fname)
+      || check_null_invalid_struct_errno (sfs))
+    return -1;
 
   syscall_printf ("statfs %s", fname);
 
@@ -1729,16 +1734,49 @@ statfs (const char *fname, struct statfs *sfs)
       __seterrno ();
       return -1;
     }
-  sfs->f_type = flags;
   sfs->f_bsize = spc*bps;
+  sfs->f_frsize = spc*bps;
   sfs->f_blocks = totalc;
-  sfs->f_bavail = availc;
   sfs->f_bfree = freec;
-  sfs->f_files = -1;
-  sfs->f_ffree = -1;
+  sfs->f_bavail = availc;
+  sfs->f_files = ULONG_MAX;
+  sfs->f_ffree = ULONG_MAX;
+  sfs->f_favail = ULONG_MAX;
   sfs->f_fsid = vsn;
-  sfs->f_namelen = maxlen;
+  sfs->f_flag = flags;
+  sfs->f_namemax = maxlen;
   return 0;
+}
+
+extern "C" int
+fstatvfs (int fd, struct statvfs *sfs)
+{
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    return -1;
+  return statvfs (cfd->get_name (), sfs);
+}
+
+extern "C" int
+statfs (const char *fname, struct statfs *sfs)
+{
+  if (check_null_invalid_struct_errno (sfs))
+    return -1;
+  struct statvfs vfs;
+  int ret = statvfs (fname, &vfs);
+  if (!ret)
+    {
+      sfs->f_type = vfs.f_flag;
+      sfs->f_bsize = vfs.f_bsize;
+      sfs->f_blocks = vfs.f_blocks;
+      sfs->f_bavail = vfs.f_bavail;
+      sfs->f_bfree = vfs.f_bfree;
+      sfs->f_files = -1;
+      sfs->f_ffree = -1;
+      sfs->f_fsid = vfs.f_fsid;
+      sfs->f_namelen = vfs.f_namemax;
+    }
+  return ret;
 }
 
 extern "C" int

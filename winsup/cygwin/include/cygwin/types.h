@@ -66,6 +66,16 @@ typedef __blkcnt32_t  blkcnt_t;
 #endif
 #endif /*__blkcnt_t_defined*/
 
+#ifndef __fsblkcnt_t_defined
+#define __fsblkcnt_t_defined
+typedef unsigned long fsblkcnt_t;
+#endif /* __fsblkcnt_t_defined */
+
+#ifndef __fsfilcnt_t_defined
+#define __fsfilcnt_t_defined
+typedef unsigned long fsfilcnt_t;
+#endif /* __fsfilcnt_t_defined */
+
 #ifndef __uid_t_defined
 #define __uid_t_defined
 typedef unsigned short __uid16_t;
