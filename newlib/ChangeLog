@@ -1,3 +1,15 @@
+2004-07-30  Alexandre Oliva  <aoliva@redhat.com>
+
+	Introduce SH2a support.
+	2004-03-16  Corinna Vinschen  <vinschen@redhat.com>
+	* libc/include/machine/ieeefp.h: Define _DOUBLE_IS_32BITS for
+	__SH2A_SINGLE_ONLY__, too.
+	* libc/machine/sh/asm.h: Define DELAYED_BRANCHES for __SH2A__, too.
+	2004-02-24  Corinna Vinschen  <vinschen@redhat.com>
+	* libc/sys/sh/crt0.S (start_l): Support sh2a-nofpu.  Fix comments.
+	2004-02-10  DJ Delorie  <dj@redhat.com>
+	* libc/sys/sh/crt0.S (start_l): Support sh2a.
+
 2004-07-29  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/time/strptime.c: Correct full-name of "March" typo.
