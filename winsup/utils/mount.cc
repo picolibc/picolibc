@@ -134,7 +134,7 @@ static void
 usage (FILE *where = stderr)
 {
   fprintf (where, "Usage: %s [OPTION] [<win32path> <posixpath>]\n\
-  -b, --binary                  text files are equivalent to binary files\n\
+  -b, --binary     (default)    text files are equivalent to binary files\n\
 				(newline = \\n)\n\
   -c, --change-cygdrive-prefix  change the cygdrive path prefix to <posixpath>\n\
   -f, --force                   force mount, don't warn about missing mount\n\
@@ -144,7 +144,7 @@ usage (FILE *where = stderr)
 				system mount points and cygdrive prefixes\n\
   -p, --show-cygdrive-prefix    show user and/or system cygdrive path prefix\n\
   -s, --system     (default)    add system-wide mount point\n\
-  -t, --text       (default)    text files get \\r\\n line endings\n\
+  -t, --text                    text files get \\r\\n line endings\n\
   -u, --user                    add user-only mount point\n\
   -v, --version                 output version information and exit\n\
   -x, --executable              treat all files under mount point as executables\n\

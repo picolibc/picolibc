@@ -944,10 +944,10 @@ character #%d.\n", optarg, (int) (endptr - optarg), endptr);
 #endif
 	break;
       case 'p':
-	pid = strtol (optarg, NULL, 10);
+	pid = strtoul (optarg, NULL, 10);
 	break;
       case 'S':
-	flush_period = strtol (optarg, NULL, 10);
+	flush_period = strtoul (optarg, NULL, 10);
 	break;
       case 't':
 	hhmmss ^= 1;
