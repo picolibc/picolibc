@@ -27,7 +27,7 @@ details. */
 #include <ntdef.h>
 #include "ntdll.h"
 
-static char NO_COPY pinfo_dummy[sizeof(pinfo)] = {0};
+static char NO_COPY pinfo_dummy[sizeof (_pinfo)] = {0};
 
 pinfo NO_COPY myself ((_pinfo *)&pinfo_dummy);	// Avoid myself != NULL checks
 

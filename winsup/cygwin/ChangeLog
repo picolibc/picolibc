@@ -1,5 +1,9 @@
 2002-06-08  Christopher Faylor  <cgf@redhat.com>
 
+	* pinfo.cc (pinfo_dummy): Initialize to correct size.
+
+2002-06-08  Christopher Faylor  <cgf@redhat.com>
+
 	* path.cc: Change MOUNT_AUTO to MOUNT_CYGDRIVE throughout.
 	* shared_info.h (CURR_MOUNT_MAGIC): Update.
 
