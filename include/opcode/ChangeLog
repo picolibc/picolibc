@@ -1,3 +1,9 @@
+1999-08-21  Alan Modra  <alan@spri.levels.unisa.edu.au>
+
+	* i386.h: Add AMD athlon instructions, pfnacc, pfpnacc, pswapd.
+	Document pf2iw and pi2fw as athlon insns.  Remove pswapw.
+	Alphabetically sort PIII insns.
+
 Wed Aug 18 18:14:40 1999  Doug Evans  <devans@canuck.cygnus.com>
 
 	* cgen.h (CGEN_INSN_MACH_HAS_P): New macro.
