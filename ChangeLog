@@ -1,3 +1,8 @@
+2003-01-14  Maciej W. Rozycki  <macro@ds2.pg.gda.pl>
+
+	* gettext.m4: Quote names of macros to be defined by AC_DEFUN
+	throughout.
+
 2004-01-04  Nathanael Nerode  <neroden@gcc.gnu.org>
 
 	* configure.in: Use ./config.cache, not config.cache.
