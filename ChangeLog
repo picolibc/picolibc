@@ -1,3 +1,7 @@
+2004-10-19  Andrew Cagney  <cagney@gnu.org>
+
+	* src-release (GDB_SUPPORT_DIRS): Remove utils and intl.
+
 2004-10-12  Kelley Cook  <kcook@gcc.gnu.org>
 
 	* configure.in (*-*-cygwin*): Supress warning if newlib not present.
