@@ -1202,6 +1202,11 @@ wait_sig (VOID *)
       if (!SetEvent (child_proc_info->subproc_ready))
 	system_printf ("SetEvent (subproc_ready) failed, %E");
       ForceCloseHandle (child_proc_info->subproc_ready);
+      /* Initialize an "indirect" pid block so that if someone looks up this
+	 process via its Windows PID it will be redirected to the appropriate
+	 Cygwin PID shared memory block. */
+      static pinfo NO_COPY myself_identity;
+      myself_identity.init (cygwin_pid (myself->dwProcessId), PID_EXECED);
     }
 
   SetEvent (wait_sig_inited);

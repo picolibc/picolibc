@@ -655,14 +655,14 @@ skip_arg_parsing:
       proc_terminate ();
       hExeced = pi.hProcess;
 
-    /* Set up child's signal handlers */
-    /* CGF FIXME - consolidate with signal stuff below */
-    for (i = 0; i < NSIG; i++)
-      {
-	myself->getsig(i).sa_mask = 0;
-	if (myself->getsig(i).sa_handler != SIG_IGN || (mode != _P_OVERLAY))
-	  myself->getsig(i).sa_handler = SIG_DFL;
-      }
+      /* Set up child's signal handlers */
+      /* CGF FIXME - consolidate with signal stuff below */
+      for (i = 0; i < NSIG; i++)
+	{
+	  myself->getsig(i).sa_mask = 0;
+	  if (myself->getsig(i).sa_handler != SIG_IGN || (mode != _P_OVERLAY))
+	    myself->getsig(i).sa_handler = SIG_DFL;
+	}
     }
   else
     {
@@ -696,7 +696,6 @@ skip_arg_parsing:
       child->rootlen = myself->rootlen;
       child->dwProcessId = pi.dwProcessId;
       child->hProcess = pi.hProcess;
-      child->process_state |= PID_INITIALIZING;
       for (i = 0; i < NSIG; i++)
 	{
 	  child->getsig(i).sa_mask = 0;

@@ -81,14 +81,14 @@ enum
   PID_CYGPARENT	       = 0x0080, // Set if parent was a cygwin app.
   PID_SPLIT_HEAP       = 0x0100, // Set if the heap has been split,
 				 //  which means we can't fork again.
-  PID_CLEAR	       = 0x0200, // Flag that pid should be cleared from parent's
+  PID_UNUSED	       = 0x0200, // Flag that pid should be cleared from parent's
 				 //  wait list
-  PID_SOCKETS_USED     = 0x0400, // Set if process uses Winsock.
+  PID_UNUSED1	       = 0x0400, // Set if process uses Winsock.
   PID_INITIALIZING     = 0x0800, // Set until ready to receive signals.
   PID_USETTY	       = 0x1000, // Setting this enables or disables cygwin's
 				 //  tty support.  This is inherited by
 				 //  all execed or forked processes.
-  PID_REPARENT	       = 0x2000, // child has execed
+  PID_UNUSED2	       = 0x2000, // child has execed
   PID_EXECED	       = 0x4000, // redirect to original pid info block
   PID_NOREDIR	       = 0x8000  // don't redirect if execed
 };

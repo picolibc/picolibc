@@ -31,64 +31,54 @@ fillout_pinfo (pid_t pid, int winpid)
   if (!pids.npids)
     pids.init ();
 
+  static unsigned int i = 0;
+  if (!pid)
+    i = 0;
+
   memset (&ep, 0, sizeof ep);
-  for (unsigned i = 0; i < pids.npids; i++)
+  for (; i < pids.npids; )
     {
-      if (!pids[i])
+      DWORD thispid = pids[i++];
+      if (!thispid)
 	continue;
-      pinfo p (pids[i]);
-      pid_t thispid;
+      pinfo p (thispid);
 
-      if (p)
-	thispid = p->pid;
-      else if (winpid)
-	thispid = pids[i];
-      else
-	continue;
-
-      if (!pid || thispid == pid)
+      if (!p)
 	{
-	  if (nextpid && pid)
-	    {
-	      pid = 0;
-	      nextpid = 0;
-	      continue;
-	    }
-
-	  if (!p)
-	    {
-	      ep.pid = pids[i];
-	      ep.dwProcessId = cygwin_pid (pids[i]);
-	      ep.process_state = PID_IN_USE;
-	      ep.ctty = -1;
-	    }
-	  else if (p->pid && NOTSTATE(p, PID_CLEAR))
-	    {
-	      ep.ctty = tty_attached (p) ? p->ctty : -1;
-	      ep.pid = p->pid;
-	      ep.ppid = p->ppid;
-	      ep.hProcess = p->hProcess;
-	      ep.dwProcessId = p->dwProcessId;
-	      ep.uid = p->uid;
-	      ep.gid = p->gid;
-	      ep.pgid = p->pgid;
-	      ep.sid = p->sid;
-	      ep.umask = p->umask;
-	      ep.start_time = p->start_time;
-	      ep.rusage_self = p->rusage_self;
-	      ep.rusage_children = p->rusage_children;
-	      strcpy (ep.progname, p->progname);
-	      ep.strace_mask = 0;
-	      ep.strace_file = 0;
-
-	      ep.process_state = p->process_state;
-	    }
-	  break;
+	  if (!winpid)
+	    continue;
+	  ep.pid = thispid;
+	  ep.dwProcessId = cygwin_pid (thispid);
+	  ep.process_state = PID_IN_USE;
+	  ep.ctty = -1;
 	}
+      else if (p->pid)
+	{
+	  ep.ctty = tty_attached (p) ? p->ctty : -1;
+	  ep.pid = p->pid;
+	  ep.ppid = p->ppid;
+	  ep.hProcess = p->hProcess;
+	  ep.dwProcessId = p->dwProcessId;
+	  ep.uid = p->uid;
+	  ep.gid = p->gid;
+	  ep.pgid = p->pgid;
+	  ep.sid = p->sid;
+	  ep.umask = p->umask;
+	  ep.start_time = p->start_time;
+	  ep.rusage_self = p->rusage_self;
+	  ep.rusage_children = p->rusage_children;
+	  strcpy (ep.progname, p->progname);
+	  ep.strace_mask = 0;
+	  ep.strace_file = 0;
+
+	  ep.process_state = p->process_state;
+	}
+      break;
     }
 
   if (!ep.pid)
     {
+      i = 0;
       pids.reset ();
       return 0;
     }

@@ -646,9 +646,6 @@ dll_crt0_1 ()
   user_data->threadinterface->Init0();
 #endif
 
-  /* Set the os_being_run global. */
-  set_os_type ();
-
   /* Initialize the host dependent constants object. */
   host_dependent.init ();
 
@@ -811,6 +808,9 @@ _dll_crt0 ()
   init_exceptions (&cygwin_except_entry);
   do_global_ctors (&__CTOR_LIST__, 1);
 
+  /* Set the os_being_run global. */
+  set_os_type ();
+
 #ifdef DEBUGGING
   char buf[80];
   if (GetEnvironmentVariable ("CYGWIN_SLEEP", buf, sizeof (buf)))
@@ -921,6 +921,9 @@ cygwin_dll_init ()
      shared_init. */
   init_exceptions (&cygwin_except_entry);
   do_global_ctors (&__CTOR_LIST__, 1);
+
+  /* Set the os_being_run global. */
+  set_os_type ();
 
   user_data->heapbase = user_data->heapptr = user_data->heaptop = NULL;
 

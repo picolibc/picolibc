@@ -1,3 +1,16 @@
+Fri Aug 25 21:25:32 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* dcrt0.cc (dll_crt0_1): Move set_os_type.
+	(_dll_crt0): To here.
+	(cygwin_dll_init): And here.
+	* external.cc (fillout_pinfo): Use more foolproof method for scanning
+	for pids.
+	* pinfo.cc (set_myself): Eliminate myself_identity.init.
+	* sigproc.cc (wait_sig): Do it here instead to reduce the amount of
+	time where there could potentially be two processes with the same pid.
+	* spawn.cc (spawn_guts): Eliminate duplicate initialization.
+	* include/sys/cygwin.h: Mark unused PID_* elements.
+
 Fri Aug 25 21:49:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
 	* exec.cc (_execve): Change definition according to declaration in

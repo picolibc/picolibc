@@ -24,7 +24,6 @@ details. */
 static char NO_COPY pinfo_dummy[sizeof(pinfo)] = {0};
 
 pinfo NO_COPY myself ((_pinfo *)&pinfo_dummy);	// Avoid myself != NULL checks
-static pinfo NO_COPY myself_identity ((_pinfo *)&pinfo_dummy);
 
 /* Initialize the process table.
    This is done once when the dll is first loaded.  */
@@ -39,9 +38,6 @@ set_myself (pid_t pid, HANDLE h)
   myself->dwProcessId = winpid;
   myself->process_state |= PID_IN_USE;
   myself->start_time = time (NULL); /* Register our starting time. */
-  pid_t myself_cyg_pid = cygwin_pid (myself->dwProcessId);
-  if (pid != myself_cyg_pid && parent_alive)
-    myself_identity.init (myself_cyg_pid, PID_EXECED);
 
   char buf[30];
   __small_sprintf (buf, "cYg%8x %x", _STRACE_INTERFACE_ACTIVATE_ADDR,
@@ -95,7 +91,7 @@ pinfo_init (LPBYTE info)
     {
       /* Invent our own pid.  */
 
-      set_myself (1, NULL);
+      set_myself (1);
       myself->ppid = 1;
       myself->pgid = myself->sid = myself->pid;
       myself->ctty = -1;
