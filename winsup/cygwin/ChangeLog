@@ -1,3 +1,8 @@
+2003-10-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* miscfunc.cc (__check_invalid_read_ptr): New function.
+	* winsup.h: Declare.
+
 2003-10-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.h (cygpsid::debug_print): Avoid compiler warnings.
