@@ -8,20 +8,22 @@
  *
  */
 
-#ifndef _ASSERT_H_
-#define	_ASSERT_H_
+/* We should be able to include this file multiple times to allow the assert
+   macro to be enabled/disabled for different parts of code.  So don't add a
+   header guard.  */ 
+
+#ifndef RC_INVOKED
 
 /* All the headers include this file. */
 #include <_mingw.h>
 
-#ifndef RC_INVOKED
+#undef assert
 
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
 #ifdef NDEBUG
-
 /*
  * If not debugging, assert does nothing.
  */
@@ -33,16 +35,13 @@ extern "C" {
  * CRTDLL nicely supplies a function which does the actual output and
  * call to abort.
  */
-_CRTIMP void __cdecl _assert (const char*, const char*, int)
-#ifdef	__GNUC__
-	__attribute__ ((noreturn))
-#endif
-	;
+_CRTIMP void __cdecl _assert (const char*, const char*, int) __MINGW_ATTRIB_NORETURN;
 
 /*
  * Definition of the assert macro.
  */
 #define assert(e)       ((e) ? (void)0 : _assert(#e, __FILE__, __LINE__))
+
 #endif	/* NDEBUG */
 
 #ifdef	__cplusplus
@@ -50,6 +49,3 @@ _CRTIMP void __cdecl _assert (const char*, const char*, int)
 #endif
 
 #endif /* Not RC_INVOKED */
-
-#endif /* Not _ASSERT_H_ */
-
