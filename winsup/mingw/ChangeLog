@@ -1,3 +1,7 @@
+2004-10-14  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* include/sys/stat.h: Make S_ISLNK comment comply with ISO C90.
+
 2004-10-07  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/math/fastmath.h: New file.
