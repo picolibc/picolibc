@@ -1,3 +1,15 @@
+003-10-13  Filip Navara  <xnavara@volny.cz>
+
+	* include/commctrl.h: (DSA_*):Add prototypes, typedefs and
+	defines for Dynamic Storage Arrays.
+	(DPA_*): Likewise, for Dynamic Pointer Arrays.
+	(FlatSB_*, InitializeFlatSB, InitializeFlatSB): Add prototypes
+	and defines for Flat ScrollBars.
+	(SetWindowSubclass, GetWindowSubclass, RemoveWindowSubclass,
+	DefSubclassProc): Add prototypes for subclassing.
+	(DrawShadowText) Add prototype.
+`	(COMCTL32_VERSION): Define.
+
 2003-10-13  Martin Fuchs  <Martin-Fuchs@gmx.net>
 
 	* include/shlobj.h (CFSTR_FILENAME, CFSTR_FILEDESCRIPTOR,
