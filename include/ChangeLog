@@ -1,3 +1,31 @@
+2000-07-22  Jason Eckhardt  <jle@cygnus.com>
+
+	* opcode/i860.h (btne, bte, bla): Changed these opcodes
+	to use sbroff ('r') instead of split16 ('s').
+	(J, K, L, M): New operand types for 16-bit aligned fields.
+	(ld.x, {p}fld.x, fst.x, pst.d): Changed these opcodes to
+	use I, J, K, L, M instead of just I.
+	(T, U): New operand types for split 16-bit aligned fields.
+	(st.x): Changed these opcodes to use S, T, U instead of just S.
+	(andh, andnoth, orh, xorh): Deleted 3-register forms as they do not
+	exist on the i860.
+	(pfgt.sd, pfle.sd): Deleted these as they do not exist on the i860.
+	(pfeq.ss, pfeq.dd): New opcodes.
+	(st.s): Fixed incorrect mask bits.
+	(fmlow): Fixed incorrect mask bits.
+	(fzchkl, pfzchkl): Fixed incorrect mask bits.
+	(faddz, pfaddz): Fixed incorrect mask bits.
+	(form, pform): Fixed incorrect mask bits.
+	(pfld.l): Fixed incorrect mask bits.
+	(fst.q): Fixed incorrect mask bits.
+	(all floating point opcodes): Fixed incorrect mask bits for
+	handling of dual bit.
+
+	* elf/i860.h: New file.
+	(elf_i860_reloc_type): Defined ELF32 i860 relocations.
+
+	* dis-asm.h (print_insn_i860): Add prototype.
+
 2000-07-20  H.J. Lu  <hjl@gnu.org>
 
 	* bfdlink.h (bfd_link_info): Add new_dtags.
