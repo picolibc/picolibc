@@ -1,5 +1,5 @@
 /* ARM ELF support for BFD.
-   Copyright 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
+   Copyright 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
 
    This file is part of BFD, the Binary File Descriptor library.
 
@@ -33,6 +33,7 @@
 #define EF_ARM_NEW_ABI     0x80
 #define EF_ARM_OLD_ABI     0x100
 #define EF_ARM_SOFT_FLOAT  0x200
+#define EF_ARM_VFP_FLOAT   0x400
 
 /* Other constants defined in the ARM ELF spec. version B-01.  */
 #define EF_ARM_SYMSARESORTED 0x04	/* NB conflicts with EF_INTERWORK */
@@ -51,6 +52,7 @@
 #define F_APCS_FLOAT	   EF_ARM_APCS_FLOAT
 #define F_PIC              EF_ARM_PIC
 #define F_SOFT_FLOAT	   EF_ARM_SOFT_FLOAT
+#define F_VFP_FLOAT	   EF_ARM_VFP_FLOAT
 
 /* Additional symbol types for Thumb.  */
 #define STT_ARM_TFUNC      STT_LOPROC   /* A Thumb function.  */

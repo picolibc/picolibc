@@ -1,3 +1,8 @@
+2002-01-15  Richard Earnshaw  <rearnsha@arm.com>
+
+	* coff/arm.h (F_VFP_FLOAT): Define.
+	* elf/arm.h (F_VFP_FLOAT, EF_ARM_VFP_FLOAT): Define.
+
 2001-12-14  Nick Clifton  <nickc@cambridge.redhat.com>
 
 	* dis-asm.h (INIT_DISASSEMBLE_INFO_NO_ARCH): Initialise the
