@@ -1,3 +1,13 @@
+2003-09-08  Justin Forest <vhex@users.sourceforge.net>
+
+	* include/winuser.h (PM_QS_INPUT, PM_QS_POSTMESSAGE,
+	PM_QS_PAINT, PM_QS_SENDMESSAGE): Add defines.
+
+2003-09-08  Filip Navara  <xnavara@volny.cz>
+
+	* include/wingdi.h (GRADIENT_FILL_RECT_H, GRADIENT_FILL_RECT_V,
+	GRADIENT_FILL_TRIANGLE, GRADIENT_FILL_OP_FLAG): Add defines.
+
 2003-09-05  Earnie Boyd  <earnie@users.sf.net>
 
 	* include/w32api.h (_NT5, etc): Reverse the changes of 2003-07-01.

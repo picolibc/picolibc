@@ -1007,6 +1007,12 @@ extern "C" {
 #define PM_NOREMOVE 0
 #define PM_REMOVE 1
 #define PM_NOYIELD 2
+#if (WINVER >= 0x0500)
+# define PM_QS_INPUT (QS_INPUT << 16)
+# define PM_QS_POSTMESSAGE ((QS_POSTMESSAGE|QS_HOTKEY|QS_TIMER) << 16)
+# define PM_QS_PAINT (QS_PAINT << 16)
+# define PM_QS_SENDMESSAGE (QS_SENDMESSAGE << 16)
+#endif
 #define HWND_BROADCAST  ((HWND)0xffff)
 #define HWND_BOTTOM ((HWND)1)
 #define HWND_NOTOPMOST ((HWND)(-2))
