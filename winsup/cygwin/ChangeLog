@@ -1,5 +1,10 @@
 2002-06-28  Christopher Faylor  <cgf@redhat.com>
 
+	* uinfo.cc (cygheap_user::env_logsrv): Return "almost_null" in case
+	where no domain or username is "SYSTEM".
+
+2002-06-28  Christopher Faylor  <cgf@redhat.com>
+
 	* cygheap.h (cygheap_user): Reorg to accommodate environment caching.
 	(cygheap_user::logsrv): New method.
 	(cygheap_user::winname): Ditto.

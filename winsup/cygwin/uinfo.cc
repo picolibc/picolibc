@@ -320,7 +320,7 @@ cygheap_user::env_logsrv (const char *name, size_t namelen)
     return plogsrv;
 
   if (!domain () || strcasematch (winname (), "SYSTEM"))
-    return NULL;
+    return almost_null;
 
   char logsrv[INTERNET_MAX_HOST_NAME_LENGTH + 3];
   cfree_and_set (plogsrv, almost_null);
