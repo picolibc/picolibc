@@ -1,5 +1,11 @@
 2005-02-25  Danny Smith  <dannysmith@users.sourceforge.net>
 
+	* include/wctype.h (wctrans): Remove _CRTIMP.
+	(towctrans): Likewise.
+	(wctype): Likewise,
+
+2005-02-25  Danny Smith  <dannysmith@users.sourceforge.net>
+
 	* include/wctype.h:  Add comment on wctrans, towctrans, wctype.
 
 2005-02-25  Danny Smith  <dannysmith@users.sourceforge.net>
@@ -15,7 +21,7 @@
 
 2005-02-11  Danny Smith  <dannysmith@users.sourceforge.net>
 
-	* include/assert.h; Remove header guard.  #undef assert macro.
+	* include/assert.h: Remove header guard.  #undef assert macro.
 	(_assert): Use __MINGW_ATTRIB_NORETURN define.
 
 2005-02-11  Gregory W. Chicares  <chicares@cox.net>

@@ -136,9 +136,9 @@ typedef wchar_t wctrans_t;
    for a valid string descriptor.  If you want the MS behaviour (and you have
    msvcp60.dll in your path) add -lmsvcp60 to your command line.  */ 	
 
-_CRTIMP wint_t __cdecl		towctrans(wint_t, wctrans_t);
-_CRTIMP wctrans_t __cdecl	wctrans(const char*);
-_CRTIMP wctype_t __cdecl	wctype(const char*);
+wint_t __cdecl		towctrans(wint_t, wctrans_t);
+wctrans_t __cdecl	wctrans(const char*);
+wctype_t __cdecl	wctype(const char*);
 
 #ifdef __cplusplus
 }
