@@ -745,7 +745,7 @@ _threadinfo::interrupt_now (CONTEXT *ctx, int sig, void *handler,
   push (0);
   interrupt_setup (sig, handler, siga, (__stack_t) ctx->Eip);
   ctx->Eip = (DWORD) sigdelayed;
-  SetThreadContext (myself->getthread2signal (), ctx); /* Restart the thread in a new location */
+  SetThreadContext (*this, ctx); /* Restart the thread in a new location */
   return 1;
 }
 
@@ -801,7 +801,7 @@ setup_handler (int sig, void *handler, struct sigaction& siga, _threadinfo *tls)
 	}
 
       DWORD res;
-      HANDLE hth = myself->getthread2signal ();
+      HANDLE hth = (HANDLE) *tls;
 
       /* Suspend the thread which will receive the signal.  But first ensure that
 	 this thread doesn't have any mutos.  (FIXME: Someday we should just grab

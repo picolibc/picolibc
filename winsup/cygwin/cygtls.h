@@ -34,7 +34,7 @@ struct _threadinfo
   sigset_t sigwait_mask;
   siginfo_t *sigwait_info;
   siginfo_t infodata;
-  void *tid;
+  struct pthread *tid;
   struct _threadinfo *prev, *next;
   __stack_t stack[8];
   int sig;
@@ -51,6 +51,7 @@ struct _threadinfo
     __attribute__((regparm(3)));
   void __stdcall interrupt_setup (int sig, void *handler, struct sigaction& siga, __stack_t retaddr)
     __attribute__((regparm(3)));
+  operator HANDLE () const {return tid->win32_obj_id;}
 };
 #pragma pack(pop)
 

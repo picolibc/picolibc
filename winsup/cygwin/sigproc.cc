@@ -20,8 +20,6 @@ details. */
 #include <sys/signal.h>
 #include "cygerrno.h"
 #include "sync.h"
-#include "cygtls.h"
-#include "sigproc.h"
 #include "pinfo.h"
 #include "security.h"
 #include "path.h"
@@ -29,9 +27,11 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "child_info_magic.h"
-#include "perthread.h"
 #include "shared_info.h"
 #include "cygthread.h"
+#include "cygtls.h"
+#include "sigproc.h"
+#include "perthread.h"
 
 /*
  * Convenience defines

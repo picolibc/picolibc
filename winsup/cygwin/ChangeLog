@@ -1,5 +1,15 @@
 2003-11-28  Christopher Faylor  <cgf@redhat.com>
 
+	* pinfo.h (_pinfo::getthread2signal): Remove obsolete function.
+	* cygtls.h (_threadinfo): Define tid more precisely.
+	(_threadinfo::operator HANDLE): Define.
+	* exceptions.cc (_threadinfo::interupt_now): Use _threadinfo HANDLE
+	operator to derive thread handle.
+	(setup_handler): Ditto.
+	* sigproc.cc: Reorganize includes.
+
+2003-11-28  Christopher Faylor  <cgf@redhat.com>
+
 	* pinfo.h (_pinfo::getsig): Remove obsolete function, here and
 	throughout.
 	* exceptions.cc: Ditto.

@@ -114,11 +114,6 @@ public:
     sig_mask = mask;
   }
 
-  inline HANDLE getthread2signal ()
-  {
-    return hMainThread;
-  }
-
   void commune_recv ();
   commune_result commune_send (DWORD, ...);
   bool alive ();
