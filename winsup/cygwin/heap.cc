@@ -21,14 +21,6 @@ details. */
 
 static unsigned page_const = 0;
 
-static  __inline__ int
-getpagesize(void)
-{
-    SYSTEM_INFO si;
-    GetSystemInfo(&si);
-    return (int)si.dwPageSize;
-}
-
 /* Initialize the heap at process start up.  */
 
 void
@@ -37,7 +29,8 @@ heap_init ()
   /* If we're the forkee, we must allocate the heap at exactly the same place
      as our parent.  If not, we don't care where it ends up.  */
 
-  page_const = getpagesize();
+  extern size_t getpagesize ();
+  page_const = getpagesize ();
   if (brkbase)
     {
       DWORD chunk = brkchunk;	/* allocation chunk */
