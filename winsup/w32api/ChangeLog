@@ -1,3 +1,11 @@
+2003-10-06  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
+	* include/winnt.h (LANG_KYRGYZ, LANG_MONGOLIAN, LANG_GALICIAN,
+	LANG_SYRIAC, LANG_INVARIANT, SUBLANG_KASHMIRI_SASIA): Add constants.
+	* include/winnt.h (SUBLANG_AZERI_LATIN, SUBLANG_AZERI_CYRILLIC,
+	SUBLANG_ENGLISH_ZIMBABWE, SUBLANG_ENGLISH_PHILIPPINES): Fix wrong
+	value for constants.
+
 2003-10-03  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
 	* include/wincrypt.h (SCHANNEL_MAC_KEY, SCHANNEL_ENC_KEY,
