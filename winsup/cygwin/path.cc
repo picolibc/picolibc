@@ -2176,40 +2176,41 @@ mount_info::sort ()
 int
 mount_info::add_item (const char *native, const char *posix, unsigned mountflags, int reg_p)
 {
+  char nativetmp[CYG_MAX_PATH];
+  char posixtmp[CYG_MAX_PATH];
+  char *nativetail, *posixtail, error[] = "error";
+  int nativeerr, posixerr;
+
   /* Something's wrong if either path is NULL or empty, or if it's
      not a UNC or absolute path. */
 
-  if ((native == NULL) || (*native == 0) ||
-      (posix == NULL) || (*posix == 0) ||
-      !isabspath (native) || !isabspath (posix) ||
+  if (native == NULL || !isabspath (native) ||
+      !(is_unc_share (native) || isdrive (native)))
+    nativeerr = EINVAL;
+  else
+    nativeerr = normalize_win32_path (native, nativetmp, &nativetail);
+
+  if (posix == NULL || !isabspath (posix) ||
       is_unc_share (posix) || isdrive (posix))
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-
-  /* Make sure both paths do not end in /. */
-  char nativetmp[CYG_MAX_PATH];
-  char posixtmp[CYG_MAX_PATH];
-
-  backslashify (native, nativetmp, 0);
-  nofinalslash (nativetmp, nativetmp);
-
-  slashify (posix, posixtmp, 0);
-  nofinalslash (posixtmp, posixtmp);
+    posixerr = EINVAL;
+  else
+    posixerr = normalize_posix_path (posix, posixtmp, &posixtail);
 
   debug_printf ("%s[%s], %s[%s], %p",
-		native, nativetmp, posix, posixtmp, mountflags);
+                native, nativeerr?error:nativetmp,
+		posix, posixerr?error:posixtmp, mountflags);
 
-  /* Duplicate /'s in path are an error. */
-  for (char *p = posixtmp + 1; *p; ++p)
+  if (nativeerr || posixerr) 
     {
-      if (p[-1] == '/' && p[0] == '/')
-	{
-	  set_errno (EINVAL);
+      set_errno (nativeerr?:posixerr);
 	  return -1;
 	}
-    }
+
+  /* Make sure both paths do not end in /. */
+  if (nativetail > nativetmp + 1 && nativetail[-1] == '\\')
+    nativetail[-1] = '\0';
+  if (posixtail > posixtmp + 1 && posixtail[-1] == '/')
+    posixtail[-1] = '\0';
 
   /* Write over an existing mount item with the same POSIX path if
      it exists and is from the same registry area. */
