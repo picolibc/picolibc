@@ -1,3 +1,9 @@
+Fri Sep 28 03:23:04 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* passwd.cc (read_etc_passwd): Bother with unlocking when not
+	in cygwin initialization.
+	* grp.cc (read_etc_group): Ditto.
+
 Fri Sep 28 02:57:03 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* passwd.cc (read_etc_passwd): Don't bother with locking when

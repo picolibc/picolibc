@@ -115,6 +115,11 @@ class passwd_lock
  public:
   passwd_lock (): mutex ((pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER) {}
   void arm () {pthread_mutex_lock (&mutex); }
+  ~passwd_lock ()
+  {
+    if (mutex != (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER)
+      pthread_mutex_unlock (&mutex);
+  }
 };
 
 /* Read in /etc/passwd and save contents in the password cache.

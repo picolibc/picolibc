@@ -123,6 +123,11 @@ class group_lock
  public:
   group_lock (): mutex ((pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER) {}
   void arm () {pthread_mutex_lock (&mutex); }
+  ~group_lock ()
+  {
+    if (mutex != (pthread_mutex_t) PTHREAD_MUTEX_INITIALIZER)
+      pthread_mutex_unlock (&mutex);
+  }
 };
 
 /* Cygwin internal */
