@@ -1,3 +1,10 @@
+Fri Jul 13 13:13:09 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* syscalls.cc (_unlink): Correct (?) logic which determines when
+	to report an access violation and when to queue file for eventual
+	deletion.
+	(stat_worker): Check for invalid buf argument.
+
 Tue Jul 10 23:01:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* mmap.cc (fhandler_disk_file::mmap): Try to open file mappings
@@ -23,8 +30,8 @@ Wed Jun 27 22:19:07 2001  Christopher Faylor <cgf@cygnus.com>
 	retrieving info about remote shares can take some time.
 
 Wed Jun 27 23:30:00 2001  Robert Collins <rbtcollins@hotmail.com>
-                          Christopher Faylor <cgf@cygnus.com>
-   
+			  Christopher Faylor <cgf@cygnus.com>
+
 	Change check_null_empty_path* to check_null_empty_str* throughout.
 	* path.h (check_null_empty_str_errno): Convert to a function prototype.
 	* path.cc (check_null_empty_str): Move to miscfuncs.cc.

@@ -124,6 +124,13 @@ _unlink (const char *ourname)
       (void) chmod (win32_name, 0777);
     }
 
+  /* Windows 9x seems to report ERROR_ACCESS_DENIED rather than sharing
+     violation.  So, set lasterr to ERROR_SHARING_VIOLATION in this case
+     to simplify tests. */
+  if (os_being_run != winNT && lasterr == ERROR_ACCESS_DENIED
+      && !win32_name.isremote ())
+    lasterr = ERROR_SHARING_VIOLATION;
+
   /* Tried to delete file by normal DeleteFile and by resetting protection
      and then deleting.  That didn't work.
 
@@ -161,21 +168,11 @@ _unlink (const char *ourname)
 			   deleted by the OS. */
     }
 
-  /* FILE_FLAGS_DELETE_ON_CLOSE was a bust.  If delete_on_close_ok is
-     true then it should have worked.  If it didn't work, that was an
-     error.  Windows 9x seems to return ERROR_ACCESS_DENIED in "sharing
-     violation" type of situations. */
-  if (delete_on_close_ok
-      || (lasterr != ERROR_ACCESS_DENIED && lasterr != ERROR_SHARING_VIOLATION))
+  /* FILE_FLAGS_DELETE_ON_CLOSE was a bust.  If this is a sharing
+     violation, then queue the file for deletion when the process
+     exits.  Otherwise, punt. */
+  if (lasterr != ERROR_SHARING_VIOLATION)
     goto err;
-
-  /* Can't reliably detect sharing violations on remote shares, so if we
-     didn't specifically get that error, then punt. */
-  if (lasterr != ERROR_SHARING_VIOLATION && win32_name.isremote ())
-    {
-      syscall_printf ("access denied on remote drive");
-      goto err;  /* Can't detect this, unfortunately */
-    }
 
   syscall_printf ("couldn't delete file, err %d", lasterr);
 
@@ -1035,6 +1032,7 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
   int attribute = 0;
   uid_t uid;
   gid_t gid;
+  int err;
 
   UINT dtype;
   fhandler_disk_file fh (NULL);
@@ -1052,6 +1050,11 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
       goto done;
     }
 
+  if ((err = check_null_invalid_struct_errno (buf)))
+    {
+      set_errno (err);
+      goto done;
+    }
   memset (buf, 0, sizeof (struct stat));
 
   if (real_path.is_device ())
