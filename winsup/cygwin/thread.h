@@ -144,8 +144,8 @@ public:
     win32_obj_id = ::CreateSemaphore (&sec_none_nih, 0, LONG_MAX, NULL);
     if (!win32_obj_id)
       {
-        debug_printf ("CreateSemaphore failed. %E");
-        return false;
+	debug_printf ("CreateSemaphore failed. %E");
+	return false;
       }
     return true;
   }
@@ -242,14 +242,14 @@ List_remove (fast_mutex &mx, list_node *&head, list_node *node)
   if (head)
     {
       if (InterlockedCompareExchangePointer (&head, node->next, node) != node)
-        {
-          list_node *cur = head;
+	{
+	  list_node *cur = head;
 
-          while (cur->next && node != cur->next)
-            cur = cur->next;
-          if (node == cur->next)
-            cur->next = cur->next->next;
-        }
+	  while (cur->next && node != cur->next)
+	    cur = cur->next;
+	  if (node == cur->next)
+	    cur->next = cur->next->next;
+	}
     }
   mx.unlock ();
 }
@@ -288,8 +288,8 @@ template <class list_node> class List
     list_node *cur = head;
     while (cur)
       {
-        (cur->*callback) ();
-        cur = cur->next;
+	(cur->*callback) ();
+	cur = cur->next;
       }
     mx.unlock ();
   }
@@ -689,8 +689,8 @@ private:
   {
     if (waiting_writers)
       {
-        if (!readers)
-          cond_writers.unblock (false);
+	if (!readers)
+	  cond_writers.unblock (false);
       }
     else if (waiting_readers)
       cond_readers.unblock (true);
