@@ -73,7 +73,17 @@ mounted as / in Cygwin.
 
 @subsection How can I get bash filename completion to be case insensitive?
 
-"shopt -s nocaseglob" should do the trick.
+Add the following to your @code{~/.bashrc} file:
+
+@example
+	shopt -s nocaseglob
+@end example
+
+and add the following to your @code{~/.inputrc} file:
+
+@example
+	set completion-ignore-case on
+@end example
 
 @subsection Can I use paths/filenames containing spaces in them?
 
