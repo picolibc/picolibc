@@ -109,6 +109,8 @@ EnumDateFormatsA@12
 EnumDateFormatsW@12
 EnumDateFormatsExA@12
 EnumDateFormatsExW@12
+EnumLanguageGroupLocalesA@16
+EnumLanguageGroupLocalesW@16
 EnumResourceLanguagesA@20
 EnumResourceLanguagesW@20
 EnumResourceNamesA@16
@@ -117,10 +119,14 @@ EnumResourceTypesA@12
 EnumResourceTypesW@12
 EnumSystemCodePagesA@8
 EnumSystemCodePagesW@8
+EnumSystemLanguageGroupsA@12
+EnumSystemLanguageGroupsW@12
 EnumSystemLocalesA@8
 EnumSystemLocalesW@8
 EnumTimeFormatsA@12
 EnumTimeFormatsW@12
+EnumUILanguagesA@12
+EnumUILanguagesW@12
 EraseTape@12
 EscapeCommFunction@8
 ExitProcess@4
@@ -342,6 +348,7 @@ GetStringTypeExW@20
 GetStringTypeW@16
 GetSystemDefaultLCID@0
 GetSystemDefaultLangID@0
+GetSystemDefaultUILanguage@0
 GetSystemDirectoryA@8
 GetSystemDirectoryW@8
 GetSystemInfo@4
@@ -368,6 +375,7 @@ GetTimeFormatW@24
 GetTimeZoneInformation@4
 GetUserDefaultLCID@0
 GetUserDefaultLangID@0
+GetUserDefaultUILanguage@0
 GetVDMCurrentDirectories@8
 GetVersion@0
 GetVersionExA@4
@@ -443,6 +451,7 @@ IsDBCSLeadByteEx@8
 IsDebuggerPresent@0
 IsProcessorFeaturePresent@4
 IsValidCodePage@4
+IsValidLanguageGroup@8
 IsValidLocale@8
 LCMapStringA@24
 LCMapStringW@24
