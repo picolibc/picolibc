@@ -1,3 +1,7 @@
+2003-05-02  Francois Ferrand  <typz@sourceforge.users.net>
+
+	* include/commctrl.h (TBM_*): Add missing trackbar defines.
+
 2003-05-02  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/cplext.h (CPLPAGE_MOUSE_WHEEL,
