@@ -1,3 +1,10 @@
+2001-10-24  Christopher Faylor  <cgf@redhat.com>
+
+	* libc/stdio/fseek.c: Reset pointer to buffer base
+	when forced to seek outside of current buffer contents.
+	This prevents the code from erroneously thinking there is
+	anything in the current buffer.
+
 2001-10-22  Geoffrey Keating  <geoffk@redhat.com>
 
 	* libc/include/math.h: The C++ standard adds the single-precision
