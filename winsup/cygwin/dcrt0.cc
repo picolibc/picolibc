@@ -18,10 +18,8 @@ details. */
 #include <wingdi.h>
 #include <winuser.h>
 #include <errno.h>
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
-#include "heap.h"
 #include "cygerrno.h"
 #define NEED_VFORK
 #include "perprocess.h"

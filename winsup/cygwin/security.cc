@@ -29,12 +29,10 @@ details. */
 #include <ntsecapi.h>
 #include <subauth.h>
 #include "cygerrno.h"
-#include "perprocess.h"
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "cygheap.h"

@@ -39,7 +39,6 @@ details. */
 #include "path.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "sync.h"
 #include "sigproc.h"
 #include "perthread.h"
 #include "tty.h"

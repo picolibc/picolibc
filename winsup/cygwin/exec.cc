@@ -17,7 +17,6 @@ details. */
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "environ.h"

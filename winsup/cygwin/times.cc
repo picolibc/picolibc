@@ -17,11 +17,9 @@ details. */
 #include <stdlib.h>
 #include <errno.h>
 #include "cygerrno.h"
-#include "perprocess.h"
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "hires.h"

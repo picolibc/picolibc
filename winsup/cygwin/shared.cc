@@ -15,7 +15,6 @@ details. */
 #include <grp.h>
 #include <pwd.h>
 #include <errno.h>
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "security.h"

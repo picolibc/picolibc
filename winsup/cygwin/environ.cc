@@ -15,7 +15,6 @@ details. */
 #include <fcntl.h>
 #include <sys/cygwin.h>
 #include <cygwin/version.h>
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "perprocess.h"

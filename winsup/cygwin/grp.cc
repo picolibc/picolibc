@@ -17,7 +17,6 @@ details. */
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "security.h"

@@ -18,7 +18,6 @@ details. */
 #include "cygerrno.h"
 #include "security.h"
 #include "fhandler.h"
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "tty.h"

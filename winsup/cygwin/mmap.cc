@@ -20,7 +20,6 @@ details. */
 #include "dtable.h"
 #include "cygerrno.h"
 #include "cygheap.h"
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "sys/cygwin.h"

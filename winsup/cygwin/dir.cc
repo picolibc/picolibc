@@ -18,13 +18,11 @@ details. */
 #define _COMPILING_NEWLIB
 #include <dirent.h>
 
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "cygerrno.h"
 #include "security.h"
 #include "fhandler.h"
-#include "perprocess.h"
 #include "path.h"
 #include "dtable.h"
 #include "cygheap.h"

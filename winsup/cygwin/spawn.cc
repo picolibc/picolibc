@@ -21,12 +21,10 @@ details. */
 #include <ctype.h>
 #include "cygerrno.h"
 #include <sys/cygwin.h>
-#include "perprocess.h"
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"
 #include "dtable.h"
-#include "sync.h"
 #include "sigproc.h"
 #include "cygheap.h"
 #include "child_info.h"

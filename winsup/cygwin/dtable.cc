@@ -22,7 +22,6 @@ details. */
 
 #define USE_SYS_TYPES_FD_SET
 #include <winsock.h>
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "cygerrno.h"

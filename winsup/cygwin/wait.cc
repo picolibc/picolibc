@@ -13,7 +13,6 @@ details. */
 #include <stdlib.h>
 #include <errno.h>
 #include "cygerrno.h"
-#include "sync.h"
 #include "sigproc.h"
 #include "perthread.h"
 

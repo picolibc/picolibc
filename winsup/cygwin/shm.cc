@@ -23,7 +23,6 @@
 #include <stdio.h>
 #include "thread.h"
 #include <sys/shm.h>
-#include "perprocess.h"
 #include "cygserver_shm.h"
 
 // FIXME IS THIS CORRECT

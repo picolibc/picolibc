@@ -64,7 +64,6 @@ details. */
 #include <sys/cygwin.h>
 #include <cygwin/version.h>
 #include "cygerrno.h"
-#include "perprocess.h"
 #include "security.h"
 #include "fhandler.h"
 #include "path.h"

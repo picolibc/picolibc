@@ -16,7 +16,6 @@ details. */
 #include <stdlib.h>
 #include "cygerrno.h"
 #include <sys/cygwin.h>
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 

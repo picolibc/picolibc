@@ -14,7 +14,6 @@ details. */
 #include <wingdi.h>
 #include <winuser.h>
 #include <ctype.h>
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "perprocess.h"

@@ -1,3 +1,10 @@
+2002-05-24  Christopher Faylor  <cgf@redhat.com>
+
+	Remove unneeded sync.h, where appropriate, throughout.
+	Remove unneeded heap.h, where appropriate, throughout.
+	Remove unneeded exceptions.h, where appropriate, throughout.
+	Remove unneeded perprocess.h, where appropriate, throughout.
+
 2002-05-22  Pierre Humblet <pierre.humblet@ieee.org>
 
 	* security.cc (create_token): Call __sec_user() instead of

@@ -17,7 +17,6 @@ details. */
 #include <unistd.h>
 #include <limits.h>
 #include "cygerrno.h"
-#include "sync.h"
 #include "sigproc.h"
 #include "pinfo.h"
 #include "psapi.h"
