@@ -167,7 +167,7 @@ void translate(char *key)
 }
 
 void
-find_key(int howmanyparts)
+find_key(int howmanyparts, REGSAM access)
 {
   char *n = argv[0], *e, c;
   int i;
@@ -211,7 +211,7 @@ find_key(int howmanyparts)
       key = wkprefixes[i].key;
       return;
     }
-  int rv = RegOpenKeyEx(wkprefixes[i].key, n, 0, KEY_ALL_ACCESS, &key);
+  int rv = RegOpenKeyEx(wkprefixes[i].key, n, 0, access, &key);
   if (rv != ERROR_SUCCESS)
     Fail(rv);
   //printf("key `%s' value `%s'\n", n, value);
@@ -228,7 +228,7 @@ cmd_list()
   DWORD i, j, m, n, t;
   int v;
 
-  find_key(1);
+  find_key(1, KEY_READ);
   RegQueryInfoKey(key, 0, 0, 0, &num_subkeys, &maxsubkeylen, &maxclasslen,
 		  &num_values, &maxvalnamelen, &maxvaluelen, 0, 0);
 
@@ -302,7 +302,7 @@ cmd_list()
 int
 cmd_add()
 {
-  find_key(2);
+  find_key(2, KEY_ALL_ACCESS);
   HKEY newkey;
   DWORD newtype;
   int rv = RegCreateKeyEx(key, value, 0, (char *)"", REG_OPTION_NON_VOLATILE,
@@ -323,7 +323,7 @@ cmd_add()
 int
 cmd_remove()
 {
-  find_key(2);
+  find_key(2, KEY_ALL_ACCESS);
   DWORD rv = RegDeleteKey(key, value);
   if (rv != ERROR_SUCCESS)
     Fail(rv);
@@ -335,7 +335,7 @@ cmd_remove()
 int
 cmd_check()
 {
-  find_key(1);
+  find_key(1, KEY_READ);
   if (verbose)
     printf("key %s exists\n", argv[0]);
   return 0;
@@ -347,7 +347,7 @@ cmd_set()
   int i, n;
   DWORD v, rv;
   char *a = argv[1], *data;
-  find_key(2);
+  find_key(2, KEY_ALL_ACCESS);
 
   if (key_type == KT_AUTO)
     {
@@ -400,7 +400,7 @@ cmd_set()
 int
 cmd_unset()
 {
-  find_key(2);
+  find_key(2, KEY_ALL_ACCESS);
   DWORD rv = RegDeleteValue(key, value);
   if (rv != ERROR_SUCCESS)
     Fail(rv);
@@ -412,7 +412,7 @@ cmd_unset()
 int
 cmd_get()
 {
-  find_key(2);
+  find_key(2, KEY_READ);
   DWORD vtype, dsize, rv;
   char *data, *vd;
   rv = RegQueryValueEx(key, value, 0, &vtype, 0, &dsize);

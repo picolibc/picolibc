@@ -1,3 +1,12 @@
+Fri May 20  0:01:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* regtool.cc (find_key): Add parameter `access'.
+	Call `RegOpenKeyEx' with that desired access.
+	(cmd_add, cmd_remove, cmd_set, cmd_unset): Call
+	`find_key' with KEY_ALL_ACCESS access.
+	(cmd_list, cmd_check, cmd_get): Call `find_key'
+	with KEY_READ access.
+
 2000-05-19  DJ Delorie  <dj@cygnus.com>
 
 	* cygpath.cc: add --windir/--sysdir options
