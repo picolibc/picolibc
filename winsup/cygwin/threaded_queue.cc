@@ -73,7 +73,7 @@ threaded_queue::~threaded_queue ()
     {
       queue_request *const ptr = reqptr;
       reqptr = reqptr->_next;
-      safe_delete (queue_request, ptr);
+      safe_delete (ptr);
     }
 
   DeleteCriticalSection (&_queue_lock);
@@ -267,7 +267,7 @@ threaded_queue::worker_loop ()
 
       assert (reqptr);
       reqptr->process ();
-      safe_delete (queue_request, reqptr);
+      safe_delete (reqptr);
     }
 }
 

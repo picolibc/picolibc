@@ -347,7 +347,7 @@ server_shmmgr::segment_t::detach (class process *const client)
       else
 	_attach_head = attptr->_next;
 
-      safe_delete (attach_t, attptr);
+      safe_delete (attptr);
     }
 
   assert (_ds.shm_nattch > 0);
@@ -856,7 +856,7 @@ server_shmmgr::delete_segment (segment_t *const segptr)
   _shm_ids -= 1;
   _shm_tot -= segptr->_ds.shm_segsz;
 
-  safe_delete (segment_t, segptr);
+  safe_delete (segptr);
 }
 
 /*---------------------------------------------------------------------------*

@@ -40,10 +40,14 @@ inline void *operator new (size_t, void *__p) throw () { return __p; }
 
 #endif /* !NEW_MACRO_VARARGS */
 
-#define safe_delete(T, O)			\
-{						\
-  (O)->~T ();					\
-  free (O);					\
+template <typename T> void
+safe_delete (T *const object)
+{
+  if (object)
+    {
+      object->~T ();
+      free (object);
+    }
 }
 
 #endif /* __SAFE_MEMORY_H__ */

@@ -359,7 +359,7 @@ client_shmmgr::shmdt (const void *const shmaddr)
 		    segptr->shmid, segptr->hFileMap,
 		    strerror (request.error_code ()));
 
-  safe_delete (segment_t, segptr);
+  safe_delete (segptr);
 
   syscall_printf ("0 = shmdt (shmaddr = %p)", shmaddr);
 

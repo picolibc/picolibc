@@ -303,7 +303,7 @@ client_request::handle_request (transport_layer_base *const conn,
   req->msglen (header.msglen);
   req->handle (conn, cache);
 
-  safe_delete (client_request, req);
+  safe_delete (req);
 
 #ifndef DEBUGGING
   printf (".");			// A little noise when we're being quiet.
@@ -356,7 +356,7 @@ client_request::make_request ()
 	error_code (errno);
       else
 	error_code (ENOSYS);
-      safe_delete (transport_layer_base, transport);
+      safe_delete (transport);
       return -1;
     }
 
@@ -364,7 +364,7 @@ client_request::make_request ()
 
   send (transport);
 
-  safe_delete (transport_layer_base, transport);
+  safe_delete (transport);
 
   return 0;
 }

@@ -30,7 +30,7 @@ details. */
 
 process_cleanup::~process_cleanup ()
 {
-  safe_delete (process, _process);
+  safe_delete (_process);
 }
 
 void
@@ -140,7 +140,7 @@ process::remove (const cleanup_routine *const entry)
 	      else
 		_routines_head = ptr->_next;
 
-	      safe_delete (cleanup_routine, ptr);
+	      safe_delete (ptr);
 	      res = true;
 	      break;
 	    }
@@ -171,7 +171,7 @@ process::cleanup ()
       cleanup_routine *const ptr = entry;
       entry = entry->_next;
       ptr->cleanup (this);
-      safe_delete (cleanup_routine, ptr);
+      safe_delete (ptr);
     }
 }
 
@@ -255,7 +255,7 @@ process_cache::process (const pid_t cygpid, const DWORD winpid)
       if (!entry->is_active ())
 	{
 	  LeaveCriticalSection (&_cache_write_access);
-	  safe_delete (process, entry);
+	  safe_delete (entry);
 	  set_errno (ESRCH);
 	  return NULL;
 	}

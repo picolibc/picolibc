@@ -1,3 +1,20 @@
+2002-09-21  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* safe_memory.h (safe_delete): Make a templated function.
+	* cygserver.cc (~server_request): Update use of safe_delete.
+	(main): Ditto.
+	* cygserver_client.cc (client_request::handle_request): Ditto.
+	(client_request::make_request): Ditto.
+	* cygserver_process.cc (~process_cleanup): Ditto.
+	(process::remove): Ditto.
+	(process::cleanup): Ditto.
+	(process_cache::process): Ditto.
+	* cygserver_shm.cc (server_shmmgr::segment_t::detach): Ditto.
+	(server_shmmgr::delete_segment): Ditto.
+	* shm.cc (client_shmmgr::shmdt): Ditto.
+	* threaded_queue.cc (~threaded_queue): Ditto.
+	(threaded_queue::worker_loop): Ditto.
+
 2002-09-21  Robert Collins <rbtcollins@hotmail.com>
 
 	* pthread.cc: Use class::call for converted pthread and semaphore
