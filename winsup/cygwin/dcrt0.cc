@@ -831,20 +831,29 @@ _dll_crt0 ()
       else if (fork_info->intro == PROC_MAGIC_GENERIC
 	       && fork_info->magic != CHILD_INFO_MAGIC)
 	multiple_cygwin_problem ("proc", fork_info->magic, CHILD_INFO_MAGIC);
+      unsigned should_be_cb = 0;
       switch (fork_info->type)
 	{
 	  case _PROC_FORK:
 	    user_data->forkee = fork_info->cygpid;
+	    should_be_cb = sizeof (child_info_fork);
 	  case _PROC_SPAWN:
 	    if (fork_info->pppid_handle)
 	      CloseHandle (fork_info->pppid_handle);
 	  case _PROC_EXEC:
-	    {
-	      child_proc_info = fork_info;
-	      cygwin_mount_h = child_proc_info->mount_h;
-	      mypid = child_proc_info->cygpid;
-	      break;
-	    }
+	    if (!should_be_cb)
+	      should_be_cb = sizeof (child_info);
+	    if (should_be_cb != fork_info->cb)
+	      multiple_cygwin_problem ("proc size", fork_info->cb, should_be_cb);
+	    else if (sizeof (fhandler_union) != fork_info->fhandler_union_cb)
+	      multiple_cygwin_problem ("fhandler size", fork_info->fhandler_union_cb, sizeof (fhandler_union));
+	    else
+	      {
+		child_proc_info = fork_info;
+		cygwin_mount_h = child_proc_info->mount_h;
+		mypid = child_proc_info->cygpid;
+		break;
+	      }
 	  default:
 	    system_printf ("unknown exec type %d", fork_info->type);
 	    fork_info = NULL;
@@ -1025,6 +1034,11 @@ __api_fatal (const char *fmt, ...)
 void
 multiple_cygwin_problem (const char *what, unsigned magic_version, unsigned version)
 {
+  if (_cygwin_testing && strstr (what, "proc"))
+    {
+      fork_info = NULL;
+      return;
+    }
   if (CYGWIN_VERSION_MAGIC_VERSION (magic_version) != version)
     api_fatal ("%s version mismatch detected - %p/%p.\n\
 You have multiple copies of cygwin1.dll on your system.\n\

@@ -1,5 +1,23 @@
 2001-12-26  Christopher Faylor  <cgf@redhat.com>
 
+	* cygmagic: Add define name to warning.
+	* dcrt0.cc (_dll_crt0): Check for changes in child_info size.
+	(multiple_cygwin_problem): Avoid "proc" errors when testing.  Just
+	assume new cygwin proc.
+	* shared_info.h (mount_info): Add 'cb' element for sanity checks.
+	(shared_info): Ditto.
+	* child_info.h (child_info): Add fhandler_union_size element for sanity
+	checking.
+	* shared.cc (open_shared): Detect shared region size mismatch between
+	parent and child.
+	(shared_info::initialize): Detect shared region size mismatch with
+	expectation.
+	(memory_Init): Ditto.
+	* sigproc.cc (init_child_info): Correctly set cb in passed structure.
+	* shared.cc (open_shared):
+
+2001-12-26  Christopher Faylor  <cgf@redhat.com>
+
 	* include/getopt.h: Protect a declaratin.
 
 2001-12-26  Robert Collins  <rbtcollins@hotmail.com>

@@ -14,7 +14,7 @@ while [ -n "$1" ]; do
     echo "#define $define $sum"
     curr=`sed -n "s/^#[ 	]*define CURR_$define[ 	][ 	]*\([^ 	][^ 	]*\)/\1/p" $file`
     [ "$curr" == "$sum" ] || echo "*** WARNING WARNING WARNING WARNING WARNING ***
-*** $file: magic number changed old $curr != new $sum
+*** $file: magic number for $define changed old $curr != new $sum
 *** WARNING WARNING WARNING WARNING WARNING ***" 1>&2
 done >> $file_magic
 exit 0

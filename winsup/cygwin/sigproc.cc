@@ -857,13 +857,14 @@ void __stdcall
 init_child_info (DWORD chtype, child_info *ch, pid_t pid, HANDLE subproc_ready)
 {
   memset (ch, 0, sizeof *ch);
-  ch->cb = sizeof *ch;
+  ch->cb = chtype == PROC_FORK ? sizeof (child_info_fork) : sizeof (child_info);
   ch->intro = PROC_MAGIC_GENERIC;
   ch->magic = CHILD_INFO_MAGIC;
   ch->type = chtype;
   ch->cygpid = pid;
   ch->subproc_ready = subproc_ready;
   ch->pppid_handle = myself->ppid_handle;
+  ch->fhandler_union_cb = sizeof (fhandler_union);
 }
 
 /* Check the state of all of our children to see if any are stopped or

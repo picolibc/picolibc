@@ -103,10 +103,12 @@ open_shared (const char *name, int n, HANDLE &shared_h, DWORD size, void *addr)
 void
 shared_info::initialize ()
 {
-  if (inited)
+  if (version)
     {
-      if (inited != SHARED_VERSION_MAGIC)
-	multiple_cygwin_problem ("shared", inited, SHARED_VERSION);
+      if (version != SHARED_VERSION_MAGIC)
+	multiple_cygwin_problem ("shared", version, SHARED_VERSION);
+      else if (cb != SHARED_INFO_CB)
+	multiple_cygwin_problem ("shared size", cb, SHARED_INFO_CB);
       return;
     }
 
@@ -115,7 +117,11 @@ shared_info::initialize ()
 
   /* Initialize tty table.  */
   tty.init ();
-  inited = SHARED_VERSION_MAGIC;
+  version = SHARED_VERSION_MAGIC;
+  cb = sizeof (*this);
+  if (cb != SHARED_INFO_CB)
+    system_printf ("size of shared memory region changed from %u to %u",
+		   SHARED_INFO_CB, cb);
 }
 
 void __stdcall
@@ -162,10 +168,16 @@ memory_init ()
     {
       mount_table->version = MOUNT_VERSION_MAGIC;
       debug_printf ("initializing mount table");
+      mount_table->cb = sizeof (*mount_table);
+      if (mount_table->cb != MOUNT_INFO_CB)
+	system_printf ("size of mount table region changed from %u to %u",
+		       MOUNT_INFO_CB, mount_table->cb);
       mount_table->init ();	/* Initialize the mount table.  */
     }
   else if (mount_table->version != MOUNT_VERSION_MAGIC)
     multiple_cygwin_problem ("mount", mount_table->version, MOUNT_VERSION);
+  else if (mount_table->cb !=  MOUNT_INFO_CB)
+    multiple_cygwin_problem ("mount table size", mount_table->cb, MOUNT_INFO_CB);
 
 }
 
