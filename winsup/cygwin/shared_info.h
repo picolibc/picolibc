@@ -43,8 +43,8 @@ class mount_item
 #define MAX_MOUNTS 30
 
 #define USER_VERSION	1	// increment when mount table changes and
-#define USER_VERSION_MAGIC CYGWIN_VERSION_MAGIC (MOUNT_MAGIC, USER_VERSION)
-#define CURR_MOUNT_MAGIC 0x6dd73a3fU
+#define USER_VERSION_MAGIC CYGWIN_VERSION_MAGIC (USER_MAGIC, USER_VERSION)
+#define CURR_USER_MAGIC 0x8dc7b1d5U
 
 class reg_key;
 struct device;
@@ -55,8 +55,6 @@ struct device;
 class mount_info
 {
  public:
-  DWORD version;
- unsigned cb;
   DWORD sys_mount_table_counter;
   int nmounts;
   mount_item mount[MAX_MOUNTS];
@@ -147,9 +145,9 @@ public:
 				  cygwin_version.api_minor)
 #define SHARED_VERSION_MAGIC CYGWIN_VERSION_MAGIC (SHARED_MAGIC, SHARED_VERSION)
 
-#define SHARED_INFO_CB 47112
+#define SHARED_INFO_CB 21008
 
-#define CURR_SHARED_MAGIC 0x359218a2U
+#define CURR_SHARED_MAGIC 0x818f75beU
 
 /* NOTE: Do not make gratuitous changes to the names or organization of the
    below class.  The layout is checksummed to determine compatibility between
@@ -163,7 +161,6 @@ class shared_info
   DWORD sys_mount_table_counter;
 
   tty_list tty;
-  delqueue_list delqueue;
   void initialize ();
   unsigned heap_chunk_size ();
 };

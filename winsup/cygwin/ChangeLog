@@ -1,3 +1,13 @@
+2003-09-25  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* shared_info.h: Update CURR_USER_MAGIC, CURR_SHARED_MAGIC and
+	SHARED_INFO_CB.
+	(mount_info::cb): Delete.
+	(mount_info::version): Delete.
+	(shared_info::delqueue): Delete.
+	* Makefile.in: Do magic for USER_MAGIC, class user_info, instead
+	of for mount_info.
+
 2003-09-24  Christopher Faylor  <cgf@redhat.com>
 
 	* include/tzfile.h: Add some missing entries.
