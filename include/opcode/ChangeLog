@@ -1,3 +1,7 @@
+Thu Aug  5 16:56:07 1999  Jerry Quinn <jquinn@nortelnetworks.com>
+
+	* hppa.h (pa_opcodes): Change condition args to use '?' prefix.
+
 1999-08-04  Alan Modra  <alan@spri.levels.unisa.edu.au>
 
 	* i386.h (i386_optab): Add DefaultSize modifier to all insns

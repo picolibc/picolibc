@@ -57,8 +57,9 @@ struct pa_opcode
    particular opcode in order for an instruction to be an instance
    of that opcode.
 
-   The args component is a string containing one character
-   for each operand of the instruction.
+   The args component is a string containing one character for each operand of
+   the instruction.  Characters used as a prefix allow any second character to
+   be used without conflicting with the main operand characters.
 
    Bit positions in this description follow HP usage of lsb = 31,
    "at" is lsb of field.
@@ -69,9 +70,9 @@ struct pa_opcode
 
    In the args field, the following characters are unused:
 
-	'  "#$%    *+- ./          :;    '
-	'                          [\]  '
-	'                          { } '
+	' !"#$%&   *+- ./          :;< > @'
+	'            M       U     [\]  '
+	'a  d                      {|}~'
 
    Here are all the characters:
 
@@ -90,13 +91,6 @@ Kinds of operands:
    c    indexed load completer.
    C    short load and store completer.
    Y	Store Bytes Short completer
-   <    non-negated compare/subtract conditions.
-   a	compare/subtract conditions
-   d    non-negated add conditions
-   &    logical instruction conditions
-   U    unit instruction conditions
-   >    shift/extract/deposit conditions.
-   ~    bvb,bb conditions
    V    5 bit immediate value at 31
    i    11 bit immediate value at 31
    j    14 bit immediate value at 31
@@ -106,6 +100,27 @@ Kinds of operands:
    w    12 bit branch displacement
    W    17 bit branch displacement (PC relative)
    z    17 bit branch displacement (just a number, not an address)
+
+Condition operands all have '?' as the prefix:
+
+   ?f   Floating point compare conditions (encoded as 5 bits at 31)
+
+   ?a	add conditions
+   ?d	non-negated add branch conditions
+   ?@   add branch conditions followed by nullify
+
+   ?s   compare/subtract conditions
+   ?t   non-negated compare conditions
+   ?n   compare conditions followed by nullify
+
+   ?l   logical conditions
+   ?b   branch on bit conditions
+
+   ?x   shift/extract/deposit conditions
+   ?y   shift/extract/deposit conditions followed by nullify for conditional
+        branches
+
+   ?u   unit conditions
 
 Also these:
 
@@ -133,10 +148,6 @@ Also these:
    I    Source Floating Point Operand Format Completer encoded 1 bits at 20
 	(for 0xe format FP instructions)
    G    Destination Floating Point Operand Format Completer encoded 2 bits at 18
-   M    Floating-Point Compare Conditions (encoded as 5 bits at 31)
-   ?    non-negated/negated compare/subtract conditions.
-   @    non-negated/negated add conditions.
-   !    non-negated add conditions.
 
    s    2 bit space specifier at 17.
    b    register field at 10.
@@ -148,7 +159,6 @@ Also these:
    Q	5 bit immediate value at 10 (a bit position specified in
 	the bb instruction. It's the same as r above, except the
         value is in a different location)
-   |	shift/extract/deposit conditions when used in a conditional branch
 
 And these (PJH) for PA-89 F.P. registers and instructions:
 
@@ -163,8 +173,7 @@ And these (PJH) for PA-89 F.P. registers and instructions:
    8    5 bit register field at 20 (used in 'fmpyadd' and 'fmpysub')
    9    5 bit register field at 25 (used in 'fmpyadd' and 'fmpysub')
    H    Floating Point Operand Format at 26 for 'fmpyadd' and 'fmpysub'
-        (very similar to 'F')
-*/
+        (very similar to 'F') */
 
 
 /* List of characters not to put a space after.  Note that
@@ -187,22 +196,22 @@ static const struct pa_opcode pa_opcodes[] =
 
 { "b",		0xe8000000, 0xffe0e000, "nW", pa10}, /* bl foo,r0 */
 { "ldi",	0x34000000, 0xffe0c000, "j,x", pa10},	/* ldo val(r0),r */
-{ "comib", 	0x84000000, 0xfc000000, "?n5,b,w", pa10}, /* comib{tf}*/
+{ "comib", 	0x84000000, 0xfc000000, "?nn5,b,w", pa10}, /* comib{tf}*/
 /* This entry is for the disassembler only.  It will never be used by
    assembler.  */
-{ "comib", 	0x8c000000, 0xfc000000, "?n5,b,w", pa10}, /* comib{tf}*/
-{ "comb",	0x80000000, 0xfc000000, "?nx,b,w", pa10}, /* comb{tf} */
+{ "comib", 	0x8c000000, 0xfc000000, "?nn5,b,w", pa10}, /* comib{tf}*/
+{ "comb",	0x80000000, 0xfc000000, "?nnx,b,w", pa10}, /* comb{tf} */
 /* This entry is for the disassembler only.  It will never be used by
    assembler.  */
-{ "comb",	0x88000000, 0xfc000000, "?nx,b,w", pa10}, /* comb{tf} */
-{ "addb",	0xa0000000, 0xfc000000, "@nx,b,w", pa10}, /* addb{tf} */
+{ "comb",	0x88000000, 0xfc000000, "?nnx,b,w", pa10}, /* comb{tf} */
+{ "addb",	0xa0000000, 0xfc000000, "?@nx,b,w", pa10}, /* addb{tf} */
 /* This entry is for the disassembler only.  It will never be used by
    assembler.  */
-{ "addb",	0xa8000000, 0xfc000000, "@nx,b,w", pa10},
-{ "addib",	0xa4000000, 0xfc000000, "@n5,b,w", pa10}, /* addib{tf}*/
+{ "addb",	0xa8000000, 0xfc000000, "?@nx,b,w", pa10},
+{ "addib",	0xa4000000, 0xfc000000, "?@n5,b,w", pa10}, /* addib{tf}*/
 /* This entry is for the disassembler only.  It will never be used by
    assembler.  */
-{ "addib",	0xac000000, 0xfc000000, "@n5,b,w", pa10}, /* addib{tf}*/
+{ "addib",	0xac000000, 0xfc000000, "?@n5,b,w", pa10}, /* addib{tf}*/
 { "nop",        0x08000240, 0xffffffff, "", pa10},      /* or 0,0,0 */
 { "copy",       0x08000240, 0xffe0ffe0, "x,t", pa10},   /* or r,0,t */
 { "mtsar",      0x01601840, 0xffe0ffff, "x", pa10}, /* mtctl r,cr11 */
@@ -265,79 +274,79 @@ static const struct pa_opcode pa_opcodes[] =
 { "bv",		0xe800c000, 0xfc00fffd, "n(b)", pa10},
 { "be",		0xe0000000, 0xfc000000, "nz(S,b)", pa10},
 { "ble",	0xe4000000, 0xfc000000, "nz(S,b)", pa10},
-{ "movb",	0xc8000000, 0xfc000000, "|nx,b,w", pa10},
-{ "movib",	0xcc000000, 0xfc000000, "|n5,b,w", pa10},
-{ "combt",	0x80000000, 0xfc000000, "<nx,b,w", pa10},
-{ "combf",	0x88000000, 0xfc000000, "<nx,b,w", pa10},
-{ "comibt",	0x84000000, 0xfc000000, "<n5,b,w", pa10},
-{ "comibf",	0x8c000000, 0xfc000000, "<n5,b,w", pa10},
-{ "addbt",	0xa0000000, 0xfc000000, "!nx,b,w", pa10},
-{ "addbf",	0xa8000000, 0xfc000000, "!nx,b,w", pa10},
-{ "addibt",	0xa4000000, 0xfc000000, "!n5,b,w", pa10},
-{ "addibf",	0xac000000, 0xfc000000, "!n5,b,w", pa10},
-{ "bb",		0xc4004000, 0xfc004000, "~nx,Q,w", pa10}, 
-{ "bvb",	0xc0004000, 0xffe04000, "~nx,w", pa10},
+{ "movb",	0xc8000000, 0xfc000000, "?ynx,b,w", pa10},
+{ "movib",	0xcc000000, 0xfc000000, "?yn5,b,w", pa10},
+{ "combt",	0x80000000, 0xfc000000, "?tnx,b,w", pa10},
+{ "combf",	0x88000000, 0xfc000000, "?tnx,b,w", pa10},
+{ "comibt",	0x84000000, 0xfc000000, "?tn5,b,w", pa10},
+{ "comibf",	0x8c000000, 0xfc000000, "?tn5,b,w", pa10},
+{ "addbt",	0xa0000000, 0xfc000000, "?dnx,b,w", pa10},
+{ "addbf",	0xa8000000, 0xfc000000, "?dnx,b,w", pa10},
+{ "addibt",	0xa4000000, 0xfc000000, "?dn5,b,w", pa10},
+{ "addibf",	0xac000000, 0xfc000000, "?dn5,b,w", pa10},
+{ "bb",		0xc4004000, 0xfc004000, "?bnx,Q,w", pa10}, 
+{ "bvb",	0xc0004000, 0xffe04000, "?bnx,w", pa10},
 { "clrbts",	0xe8004005, 0xffffffff, "", pa20, FLAG_STRICT},
 { "pushnom",	0xe8004001, 0xffffffff, "", pa20, FLAG_STRICT},
 { "pushbts",	0xe8004001, 0xffe0ffff, "x", pa20, FLAG_STRICT},
 
 /* Computation Instructions */
 
-{ "comclr",     0x08000880, 0xfc000fe0, "ax,b,t", pa10},
-{ "or",         0x08000240, 0xfc000fe0, "&x,b,t", pa10},
-{ "xor",        0x08000280, 0xfc000fe0, "&x,b,t", pa10},
-{ "and",        0x08000200, 0xfc000fe0, "&x,b,t", pa10},
-{ "andcm",      0x08000000, 0xfc000fe0, "&x,b,t", pa10},
-{ "uxor",       0x08000380, 0xfc000fe0, "Ux,b,t", pa10},
-{ "uaddcm",     0x08000980, 0xfc000fe0, "Ux,b,t", pa10},
-{ "uaddcmt",    0x080009c0, 0xfc000fe0, "Ux,b,t", pa10},
-{ "dcor",       0x08000b80, 0xfc1f0fe0, "Ub,t",   pa10},
-{ "idcor",      0x08000bc0, 0xfc1f0fe0, "Ub,t",   pa10},
-{ "addi",       0xb4000000, 0xfc000800, "di,b,x", pa10},
-{ "addio",      0xb4000800, 0xfc000800, "di,b,x", pa10},
-{ "addit",      0xb0000000, 0xfc000800, "di,b,x", pa10},
-{ "addito",     0xb0000800, 0xfc000800, "di,b,x", pa10},
-{ "add",        0x08000600, 0xfc000fe0, "dx,b,t", pa10},
-{ "addl",       0x08000a00, 0xfc000fe0, "dx,b,t", pa10},
-{ "addo",       0x08000e00, 0xfc000fe0, "dx,b,t", pa10},
-{ "addc",       0x08000700, 0xfc000fe0, "dx,b,t", pa10},
-{ "addco",      0x08000f00, 0xfc000fe0, "dx,b,t", pa10},
-{ "sub",        0x08000400, 0xfc000fe0, "ax,b,t", pa10},
-{ "subo",       0x08000c00, 0xfc000fe0, "ax,b,t", pa10},
-{ "subb",       0x08000500, 0xfc000fe0, "ax,b,t", pa10},
-{ "subbo",      0x08000d00, 0xfc000fe0, "ax,b,t", pa10},
-{ "subt",       0x080004c0, 0xfc000fe0, "ax,b,t", pa10},
-{ "subto",      0x08000cc0, 0xfc000fe0, "ax,b,t", pa10},
-{ "ds",         0x08000440, 0xfc000fe0, "ax,b,t", pa10},
-{ "subi",       0x94000000, 0xfc000800, "ai,b,x", pa10},
-{ "subio",      0x94000800, 0xfc000800, "ai,b,x", pa10},
-{ "comiclr",    0x90000000, 0xfc000800, "ai,b,x", pa10},
-{ "sh1add",     0x08000640, 0xfc000fe0, "dx,b,t", pa10},
-{ "sh1addl",    0x08000a40, 0xfc000fe0, "dx,b,t", pa10},
-{ "sh1addo",    0x08000e40, 0xfc000fe0, "dx,b,t", pa10},
-{ "sh2add",     0x08000680, 0xfc000fe0, "dx,b,t", pa10},
-{ "sh2addl",    0x08000a80, 0xfc000fe0, "dx,b,t", pa10},
-{ "sh2addo",    0x08000e80, 0xfc000fe0, "dx,b,t", pa10},
-{ "sh3add",     0x080006c0, 0xfc000fe0, "dx,b,t", pa10},
-{ "sh3addl",    0x08000ac0, 0xfc000fe0, "dx,b,t", pa10},
-{ "sh3addo",    0x08000ec0, 0xfc000fe0, "dx,b,t", pa10},
+{ "comclr",     0x08000880, 0xfc000fe0, "?sx,b,t", pa10},
+{ "or",         0x08000240, 0xfc000fe0, "?lx,b,t", pa10},
+{ "xor",        0x08000280, 0xfc000fe0, "?lx,b,t", pa10},
+{ "and",        0x08000200, 0xfc000fe0, "?lx,b,t", pa10},
+{ "andcm",      0x08000000, 0xfc000fe0, "?lx,b,t", pa10},
+{ "uxor",       0x08000380, 0xfc000fe0, "?ux,b,t", pa10},
+{ "uaddcm",     0x08000980, 0xfc000fe0, "?ux,b,t", pa10},
+{ "uaddcmt",    0x080009c0, 0xfc000fe0, "?ux,b,t", pa10},
+{ "dcor",       0x08000b80, 0xfc1f0fe0, "?ub,t",   pa10},
+{ "idcor",      0x08000bc0, 0xfc1f0fe0, "?ub,t",   pa10},
+{ "addi",       0xb4000000, 0xfc000800, "?ai,b,x", pa10},
+{ "addio",      0xb4000800, 0xfc000800, "?ai,b,x", pa10},
+{ "addit",      0xb0000000, 0xfc000800, "?ai,b,x", pa10},
+{ "addito",     0xb0000800, 0xfc000800, "?ai,b,x", pa10},
+{ "add",        0x08000600, 0xfc000fe0, "?ax,b,t", pa10},
+{ "addl",       0x08000a00, 0xfc000fe0, "?ax,b,t", pa10},
+{ "addo",       0x08000e00, 0xfc000fe0, "?ax,b,t", pa10},
+{ "addc",       0x08000700, 0xfc000fe0, "?ax,b,t", pa10},
+{ "addco",      0x08000f00, 0xfc000fe0, "?ax,b,t", pa10},
+{ "sub",        0x08000400, 0xfc000fe0, "?sx,b,t", pa10},
+{ "subo",       0x08000c00, 0xfc000fe0, "?sx,b,t", pa10},
+{ "subb",       0x08000500, 0xfc000fe0, "?sx,b,t", pa10},
+{ "subbo",      0x08000d00, 0xfc000fe0, "?sx,b,t", pa10},
+{ "subt",       0x080004c0, 0xfc000fe0, "?sx,b,t", pa10},
+{ "subto",      0x08000cc0, 0xfc000fe0, "?sx,b,t", pa10},
+{ "ds",         0x08000440, 0xfc000fe0, "?sx,b,t", pa10},
+{ "subi",       0x94000000, 0xfc000800, "?si,b,x", pa10},
+{ "subio",      0x94000800, 0xfc000800, "?si,b,x", pa10},
+{ "comiclr",    0x90000000, 0xfc000800, "?si,b,x", pa10},
+{ "sh1add",     0x08000640, 0xfc000fe0, "?ax,b,t", pa10},
+{ "sh1addl",    0x08000a40, 0xfc000fe0, "?ax,b,t", pa10},
+{ "sh1addo",    0x08000e40, 0xfc000fe0, "?ax,b,t", pa10},
+{ "sh2add",     0x08000680, 0xfc000fe0, "?ax,b,t", pa10},
+{ "sh2addl",    0x08000a80, 0xfc000fe0, "?ax,b,t", pa10},
+{ "sh2addo",    0x08000e80, 0xfc000fe0, "?ax,b,t", pa10},
+{ "sh3add",     0x080006c0, 0xfc000fe0, "?ax,b,t", pa10},
+{ "sh3addl",    0x08000ac0, 0xfc000fe0, "?ax,b,t", pa10},
+{ "sh3addo",    0x08000ec0, 0xfc000fe0, "?ax,b,t", pa10},
 
 /* Extract and Deposit Instructions */
 
-{ "vshd",       0xd0000000, 0xfc001fe0, ">x,b,t", pa10},
-{ "shd",        0xd0000800, 0xfc001c00, ">x,b,p,t", pa10},
-{ "vextru",     0xd0001000, 0xfc001fe0, ">b,T,x", pa10},
-{ "vextrs",     0xd0001400, 0xfc001fe0, ">b,T,x", pa10},
-{ "extru",      0xd0001800, 0xfc001c00, ">b,P,T,x", pa10},
-{ "extrs",      0xd0001c00, 0xfc001c00, ">b,P,T,x", pa10},
-{ "zvdep",      0xd4000000, 0xfc001fe0, ">x,T,b", pa10},
-{ "vdep",       0xd4000400, 0xfc001fe0, ">x,T,b", pa10},
-{ "zdep",       0xd4000800, 0xfc001c00, ">x,p,T,b", pa10},
-{ "dep",        0xd4000c00, 0xfc001c00, ">x,p,T,b", pa10},
-{ "zvdepi",     0xd4001000, 0xfc001fe0, ">5,T,b", pa10},
-{ "vdepi",      0xd4001400, 0xfc001fe0, ">5,T,b", pa10},
-{ "zdepi",      0xd4001800, 0xfc001c00, ">5,p,T,b", pa10},
-{ "depi",       0xd4001c00, 0xfc001c00, ">5,p,T,b", pa10},
+{ "vshd",       0xd0000000, 0xfc001fe0, "?xx,b,t", pa10},
+{ "shd",        0xd0000800, 0xfc001c00, "?xx,b,p,t", pa10},
+{ "vextru",     0xd0001000, 0xfc001fe0, "?xb,T,x", pa10},
+{ "vextrs",     0xd0001400, 0xfc001fe0, "?xb,T,x", pa10},
+{ "extru",      0xd0001800, 0xfc001c00, "?xb,P,T,x", pa10},
+{ "extrs",      0xd0001c00, 0xfc001c00, "?xb,P,T,x", pa10},
+{ "zvdep",      0xd4000000, 0xfc001fe0, "?xx,T,b", pa10},
+{ "vdep",       0xd4000400, 0xfc001fe0, "?xx,T,b", pa10},
+{ "zdep",       0xd4000800, 0xfc001c00, "?xx,p,T,b", pa10},
+{ "dep",        0xd4000c00, 0xfc001c00, "?xx,p,T,b", pa10},
+{ "zvdepi",     0xd4001000, 0xfc001fe0, "?x5,T,b", pa10},
+{ "vdepi",      0xd4001400, 0xfc001fe0, "?x5,T,b", pa10},
+{ "zdepi",      0xd4001800, 0xfc001c00, "?x5,p,T,b", pa10},
+{ "depi",       0xd4001c00, 0xfc001c00, "?x5,p,T,b", pa10},
 
 /* System Control Instructions */
 
@@ -470,8 +479,8 @@ static const struct pa_opcode pa_opcodes[] =
 { "fneg",       0x3800c000, 0xfc1fe720, "FJ,v", pa20, FLAG_STRICT},
 { "fnegabs",    0x3000e000, 0xfc1fe7e0, "FE,v", pa20, FLAG_STRICT},
 { "fnegabs",    0x3800e000, 0xfc1fe720, "FJ,v", pa20, FLAG_STRICT},
-{ "fcmp",       0x30000400, 0xfc00e7e0, "FME,X", pa10},
-{ "fcmp",       0x38000400, 0xfc00e720, "IMJ,K", pa10},
+{ "fcmp",       0x30000400, 0xfc00e7e0, "F?fE,X", pa10},
+{ "fcmp",       0x38000400, 0xfc00e720, "I?fJ,K", pa10},
 { "xmpyu",	0x38004700, 0xfc00e720, "J,K,v", pa11},
 { "fmpyadd",	0x18000000, 0xfc000000, "H4,6,7,9,8", pa11},
 { "fmpysub",	0x98000000, 0xfc000000, "H4,6,7,9,8", pa11},
