@@ -1,5 +1,10 @@
 2001-11-24  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler_disk_file.cc (fhandler_cygdrive::readdir): Avoid reporting
+	inaccessible drives.
+
+2001-11-24  Christopher Faylor  <cgf@redhat.com>
+
 	* path.cc (path_conv::check): Tighten FH_CYGDRIVE check to avoid
 	matching trailing component, like other devices.
 

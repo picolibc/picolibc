@@ -545,7 +545,7 @@ fork_parent (HANDLE& hParent, dll *&first_dll,
   slow_pid_reuse (pi.hProcess);
 
   /* Wait for subproc to initialize itself. */
-  if (!sync_with_child(pi, subproc_ready, TRUE, "waiting for longjmp"))
+  if (!sync_with_child (pi, subproc_ready, TRUE, "waiting for longjmp"))
     goto cleanup;
 
   /* CHILD IS STOPPED */

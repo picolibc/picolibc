@@ -804,6 +804,11 @@ fhandler_cygdrive::readdir (DIR *dir)
       set_errno (ENMFILE);
       return NULL;
     }
+  if (GetFileAttributes (pdrive) == (DWORD) -1)
+    {
+      pdrive += DRVSZ;
+      return readdir (dir);
+    }
   *dir->__d_dirent->d_name = cyg_tolower (*pdrive);
   dir->__d_dirent->d_name[1] = '\0';
   dir->__d_position++;
