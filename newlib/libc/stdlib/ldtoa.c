@@ -2707,10 +2707,13 @@ _ldtoa_r (struct _reent *ptr, long double d, int mode, int ndigits, int *decpt,
 unsigned short e[NI];
 char *s, *p;
 int i, j, k;
+int orig_ndigits;
 LDPARMS rnd;
 LDPARMS *ldp = &rnd;
 char *outstr;
+char outbuf[NDEC + MAX_EXP_DIGITS + 10];
 
+orig_ndigits = ndigits;
 rnd.rlast = -1;
 rnd.rndprc = NBITS;
 
@@ -2748,22 +2751,13 @@ if( mode != 3 )
 if( mode == 0 )
         ndigits = 20;
 
-/* reentrancy addition to use mprec storage pool */
-/* we want to have enough space to hold the formatted result */
-i = ndigits + (mode == 3 ? (MAX_EXP_DIGITS + 1) : 1);
-j = sizeof (__ULong);
-for (_REENT_MP_RESULT_K(ptr) = 0; sizeof (_Bigint) - sizeof (__ULong) + j <= i; j <<= 1)
-  _REENT_MP_RESULT_K(ptr)++;
-_REENT_MP_RESULT(ptr) = Balloc (ptr, _REENT_MP_RESULT_K(ptr));
-outstr = (char *)_REENT_MP_RESULT(ptr);
-
 /* This sanity limit must agree with the corresponding one in etoasc, to
    keep straight the returned value of outexpon.  */
 if( ndigits > NDEC )
         ndigits = NDEC;
 
-etoasc( e, outstr, ndigits, mode, ldp );
-s =  outstr;
+etoasc( e, outbuf, ndigits, mode, ldp );
+s =  outbuf;
 if( eisinf(e) || eisnan(e) )
         {
         *decpt = 9999;
@@ -2774,7 +2768,7 @@ if( eisinf(e) || eisnan(e) )
 /* Transform the string returned by etoasc into what the caller wants.  */
 
 /* Look for decimal point and delete it from the string. */
-s = outstr;
+s = outbuf;
 while( *s != '\0' )
         {
         if( *s == '.' )
@@ -2795,19 +2789,19 @@ while( *s != '\0' )
 nodecpt:
 
 /* Back up over the exponent field. */
-while( *s != 'E' && s > outstr)
+while( *s != 'E' && s > outbuf)
         --s;
 *s = '\0';
 
 stripspaces:
 
 /* Strip leading spaces and sign. */
-p = outstr;
+p = outbuf;
 while( *p == ' ' || *p == '-')
         ++p;
 
 /* Find new end of string.  */
-s = outstr;
+s = outbuf;
 while( (*s++ = *p++) != '\0' )
         ;
 --s;
@@ -2820,20 +2814,38 @@ else if( ndigits > ldp->outexpon )
 else
         k = ldp->outexpon;
 
-while( *(s-1) == '0' && ((s - outstr) > k))
+while( *(s-1) == '0' && ((s - outbuf) > k))
         *(--s) = '\0';
 
 /* In f format, flush small off-scale values to zero.
    Rounding has been taken care of by etoasc. */
 if( mode == 3 && ((ndigits + ldp->outexpon) < 0))
         {
-        s = outstr;
+        s = outbuf;
         *s = '\0';
         *decpt = 0;
         }
 
+/* reentrancy addition to use mprec storage pool */
+/* we want to have enough space to hold the formatted result */
+
+if (mode == 3) /* f format, account for sign + dec digits + decpt + frac */
+  i = *decpt + orig_ndigits + 3;
+else /* account for sign + max precision digs + E + exp sign + exponent */
+  i = orig_ndigits + MAX_EXP_DIGITS + 4;
+
+j = sizeof (__ULong);
+for (_REENT_MP_RESULT_K(ptr) = 0; sizeof (_Bigint) - sizeof (__ULong) + j <= i; j <<= 1)
+  _REENT_MP_RESULT_K(ptr)++;
+_REENT_MP_RESULT(ptr) = Balloc (ptr, _REENT_MP_RESULT_K(ptr));
+
+/* Copy from internal temporary buffer to permanent buffer.  */
+outstr = (char *)_REENT_MP_RESULT(ptr);
+strcpy (outstr, outbuf);
+
 if( rve )
-        *rve = s;
+        *rve = outstr + (s - outbuf);
+
 return outstr;
 }
 
