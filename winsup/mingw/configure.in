@@ -94,35 +94,20 @@ SUBDIRS=""
 HEADER_SUBDIR=""
 
 case "$target_os" in
-*mingw32msvc*)
-  CRT_ID=2
-  MNO_CYGWIN=
-  RUNTIME=msvcrt
-  THREAD_DLL=mingwm
-  LIBM_A=libm.a
-  LIBGMON_A=libgmon.a
-  SUBDIRS="profile"
-  configdirs="$configdirs profile"
-  ;;
 *cygwin*)
-  CRT_ID=1
   MNO_CYGWIN=-mno-cygwin
-  RUNTIME=crtdll
-  THREAD_DLL=mingwc
   configdirs="$configdirs"
+  # FIXME MinGW versions of libm.a and libgmon.a needed for -mno-cygwin
   # Do not build libm.a when building under Cygwin winsup. Otherwise, it'll
   # overwrite Cygwin's one. Likewise for libgmon.a.
   LIBM_A=
   LIBGMON_A=
   # Install mingw headers in mingw subdirectory.
-  HEADER_SUBDIR="mingw32"
+  HEADER_SUBDIR="mingw"
   ;;
 *)
-  # Build it for CRTDLL by default.
-  CRT_ID=1
+  # Build it for MSVCRT by default.
   MNO_CYGWIN=
-  RUNTIME=crtdll
-  THREAD_DLL=mingwc
   LIBM_A=libm.a
   LIBGMON_A=libgmon.a
   SUBDIRS="profile"
@@ -130,14 +115,19 @@ case "$target_os" in
   ;;
 esac
 
+# THREAD_DLL used to be set within the above case and was mingwc for CRTDLL.
+# I can find no reason to do this.
+#
+# FIXME: In the future I would like to change the dll name to mingwthrd to
+# to match the libmingwthrd.a name.
+THREAD_DLL=mingwm
+
 if test -n "$configdirs"; then
   AC_CONFIG_SUBDIRS($configdirs)
 fi
 
 MKINSTALLDIRS=$ac_aux_dir/mkinstalldirs
 AC_SUBST(MKINSTALLDIRS)
-AC_SUBST(CRT_ID)
-AC_SUBST(RUNTIME)
 AC_SUBST(MNO_CYGWIN)
 AC_SUBST(THREAD_DLL)
 AC_SUBST(LIBM_A)

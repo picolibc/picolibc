@@ -116,13 +116,13 @@ FLAGS_TO_PASS:=\
 	prefix="$(prefix)" \
 	target_alias="$(target_alias)"
 
-CRT0S = crt$(CRT_ID).o dllcrt$(CRT_ID).o CRT_noglob.o crtmt.o crtst.o
+CRT0S = crt1.o dllcrt1.o crt2.o dllcrt2.o CRT_noglob.o crtmt.o crtst.o
 MINGW_OBJS = CRTglob.o CRTfmode.o CRTinit.o dirent.o dllmain.o gccmain.o \
 	     main.o crtst.o mthr_stub.o
 MOLD_OBJS = ctype_old.o string_old.o
 
 LIBS = libcrtdll.a libmsvcrt.a libmsvcrt20.a libmsvcrt40.a libmingw32.a \
-       libmoldname.a $(LIBM_A) libmingwthrd.a
+       libcoldname.a libmoldname.a $(LIBM_A) libmingwthrd.a
 
 DLLS = $(THREAD_DLL_NAME)
 
@@ -189,23 +189,40 @@ libmingw32.a: $(MINGW_OBJS)
 	$(AR) rc $@ $(MINGW_OBJS)
 	$(RANLIB) $@
 
-$(srcdir)/moldname-$(RUNTIME).def: moldname.def.in
-	$(CC) -DRUNTIME=$(RUNTIME) \
-		-D__FILENAME__=moldname-${RUNTIME}.def \
-		-D__`echo $(RUNTIME) | tr '[a-z]' '[A-Z]'`__  -c -E -P \
+$(srcdir)/moldname-crtdll.def: moldname.def.in
+	$(CC) -DRUNTIME=crtdll \
+		-D__FILENAME__=moldname-crtdll.def \
+		-D__CRTDLL__  -c -E -P \
 		-xc-header $? > $@
 
-libmoldname.a: $(srcdir)/moldname-$(RUNTIME).def $(MOLD_OBJS)
+$(srcdir)/moldname-msvcrt.def: moldname.def.in
+	$(CC) -DRUNTIME=msvcrt \
+		-D__FILENAME__=moldname-msvcrt.def \
+		-D__MSVCRT__  -c -E -P \
+		-xc-header $? > $@
+
+libcoldname.a: $(srcdir)/moldname-crtdll.def $(MOLD_OBJS)
 	$(DLLTOOL) --as $(AS) -k -U	\
-		--dllname $(RUNTIME).dll	\
-		--def $(srcdir)/moldname-$(RUNTIME).def	\
+		--dllname crtdll.dll	\
+		--def $(srcdir)/moldname-crtdll.def	\
 		--output-lib $@
 	$(AR) rc $@ $(MOLD_OBJS)
 	$(RANLIB) $@
 
-# The special rule is necessary.
+libmoldname.a: $(srcdir)/moldname-msvcrt.def $(MOLD_OBJS)
+	$(DLLTOOL) --as $(AS) -k -U	\
+		--dllname msvcrt.dll	\
+		--def $(srcdir)/moldname-msvcrt.def	\
+		--output-lib $@
+	$(AR) rc $@ $(MOLD_OBJS)
+	$(RANLIB) $@
+
+# The special rules are necessary.
+crt1.o dllcrt1.o:
+	$(CC) -c -D__CRTDLL__ -U__MSVCRT__ $(ALL_CFLAGS) $< -o $@
+
 crt2.o dllcrt2.o:
-	$(CC) -c -D__MSVCRT__ $(ALL_CFLAGS) $< -o $@
+	$(CC) -c -D__MSVCRT__ -U__CRTDLL__ $(ALL_CFLAGS) $< -o $@
 
 clean:
 	-rm -f *.o *.a *~ core a.out mingwthrd.def mingwthrd.base mingwthrd.exp

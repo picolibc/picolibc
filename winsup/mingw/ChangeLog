@@ -1,3 +1,15 @@
+2000-11-29  Earnie Boyd  <earnie_boyd@yahoo.com>
+
+	* Makefile.in: eliminate the need for RUNTIME and CRT_ID.
+	Always build crt1.o, dllcrt1.o, crt2.o and dllcrt2.o.
+	Create a libcoldname.a for the oldname library for CRTDLL.
+	Restrict libmoldname.a for the oldname library for MSVCRT.
+	* configure.in: eliminate setting RUNTIME and CRT_ID variables.
+	Restructure the $target_os case logic.
+	Always name the MinGW thread dll helper mingwm.
+	Change Cygwin's HEADER_SUBDIR value from mingw32 to mingw.
+	* configure: regenerate.
+
 2000-11-22  Earnie Boyd  <earnie_boyd@yahoo.com>
 
 	* Makefile.in: Fix bindist target to distribute the correct files.
