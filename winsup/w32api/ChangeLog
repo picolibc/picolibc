@@ -1,3 +1,9 @@
+2003-07-11  Earnie Boyd  <earnie@users.sf.net>
+
+	* include/winnt.h (HANDLE): Define based on STRICT filter.
+	(THREAD_BASE_PRIORITY_MIN): Use parens around negative value.
+	(THREAD_BASE_PRIOIRTY_IDLE): Ditto.
+
 2003-07-08  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/commctrl.h (NMTVDISPINFO[AW]): Replace obsolete struct
