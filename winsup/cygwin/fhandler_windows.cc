@@ -46,8 +46,8 @@ The following unix-style calls are supported:
 	select () call marks read fd when any message posted to queue.
 */
 
-fhandler_windows::fhandler_windows (const char *name) :
-	fhandler_base (FH_WINDOWS, name)
+fhandler_windows::fhandler_windows ()
+  : fhandler_base (FH_WINDOWS)
 {
   set_cb (sizeof *this);
   hWnd_ = NULL;

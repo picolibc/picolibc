@@ -23,10 +23,8 @@ details. */
 #define PSEUDO_MULTIPLIER       (6364136223846793005LL)
 #define PSEUDO_SHIFTVAL		(21)
 
-fhandler_dev_random::fhandler_dev_random (const char *name, int nunit)
-  : fhandler_base (FH_RANDOM, name),
-    unit(nunit),
-    crypt_prov((HCRYPTPROV)NULL)
+fhandler_dev_random::fhandler_dev_random (int nunit)
+  : fhandler_base (FH_RANDOM), unit(nunit), crypt_prov((HCRYPTPROV)NULL)
 {
   set_cb (sizeof *this);
 }

@@ -15,8 +15,8 @@ details. */
 #include "security.h"
 #include "fhandler.h"
 
-fhandler_dev_zero::fhandler_dev_zero (const char *name)
-  : fhandler_base (FH_ZERO, name)
+fhandler_dev_zero::fhandler_dev_zero ()
+  : fhandler_base (FH_ZERO)
 {
   set_cb (sizeof *this);
 }

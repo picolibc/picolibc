@@ -188,7 +188,7 @@ public:
 
   void reset_unix_path_name (const char *);
   virtual fhandler_base& operator =(fhandler_base &x);
-  fhandler_base (DWORD dev, const char *name = 0, int unit = 0);
+  fhandler_base (DWORD dev, int unit = 0);
   virtual ~fhandler_base ();
 
   /* Non-virtual simple accessor functions. */
@@ -385,7 +385,7 @@ private:
   struct _WSAPROTOCOL_INFOA *prot_info_ptr;
 
 public:
-  fhandler_socket (const char *name = 0);
+  fhandler_socket ();
   ~fhandler_socket ();
   int get_socket () { return (int) get_handle(); }
   fhandler_socket * is_socket () { return this; }
@@ -422,6 +422,7 @@ public:
   int check_peer_secret_event (struct sockaddr_in *peer, int *secret = NULL);
   void signal_secret_event ();
   void close_secret_event ();
+  int __stdcall fstat (struct stat *buf, path_conv *) __attribute__ ((regparm (2)));
 };
 
 class fhandler_pipe: public fhandler_base
@@ -431,7 +432,7 @@ class fhandler_pipe: public fhandler_base
   DWORD orig_pid;
   unsigned id;
 public:
-  fhandler_pipe (const char *name = 0, DWORD devtype = FH_PIPE);
+  fhandler_pipe (DWORD devtype = FH_PIPE);
   off_t lseek (off_t offset, int whence);
   select_record *select_read (select_record *s);
   select_record *select_write (select_record *s);
@@ -470,7 +471,7 @@ protected:
   /* returns not null, if `win_error' determines an end of file condition */
   virtual int is_eof(int win_error) = 0;
 
-  fhandler_dev_raw (DWORD dev, const char *name, int unit);
+  fhandler_dev_raw (DWORD dev, int unit);
 
 public:
   ~fhandler_dev_raw (void);
@@ -498,7 +499,7 @@ protected:
   virtual int is_eof (int win_error);
 
 public:
-  fhandler_dev_floppy (const char *name, int unit);
+  fhandler_dev_floppy (int unit);
 
   virtual int open (path_conv *, int flags, mode_t mode = 0);
   virtual int close (void);
@@ -520,7 +521,7 @@ protected:
   virtual int is_eof (int win_error);
 
 public:
-  fhandler_dev_tape (const char *name, int unit);
+  fhandler_dev_tape (int unit);
 
   int open (path_conv *, int flags, mode_t mode = 0);
   int close (void);
@@ -551,7 +552,7 @@ private:
 class fhandler_disk_file: public fhandler_base
 {
 public:
-  fhandler_disk_file (const char *name);
+  fhandler_disk_file ();
 
   int open (path_conv * real_path, int flags, mode_t mode);
   int close ();
@@ -579,7 +580,7 @@ public:
   OVERLAPPED io_status;
 
   /* Constructor */
-  fhandler_serial (const char *name, DWORD devtype = FH_SERIAL, int unit = 0);
+  fhandler_serial (DWORD devtype = FH_SERIAL, int unit = 0);
 
   int open (path_conv *, int flags, mode_t mode);
   int close ();
@@ -627,8 +628,8 @@ protected:
   virtual int accept_input () {return 1;};
 public:
   tty_min *tc;
-  fhandler_termios (DWORD dev, const char *name = 0, int unit = 0) :
-  fhandler_base (dev, name, unit)
+  fhandler_termios (DWORD dev, int unit = 0) :
+  fhandler_base (dev, unit)
   {
     set_need_fork_fixup ();
   }
@@ -740,7 +741,7 @@ private:
 
 public:
 
-  fhandler_console (const char *name);
+  fhandler_console ();
 
   fhandler_console* is_console () { return this; }
 
@@ -775,9 +776,8 @@ public:
 class fhandler_tty_common: public fhandler_termios
 {
 public:
-  fhandler_tty_common (DWORD dev, const char *name = 0, int unit = 0) :
-    fhandler_termios (dev, name, unit),
-    ttynum (unit)
+  fhandler_tty_common (DWORD dev, int unit = 0)
+    : fhandler_termios (dev, unit), ttynum (unit)
   {
     // nothing to do
   }
@@ -814,8 +814,8 @@ class fhandler_tty_slave: public fhandler_tty_common
 {
 public:
   /* Constructor */
-  fhandler_tty_slave (const char *name);
-  fhandler_tty_slave (int, const char *name);
+  fhandler_tty_slave ();
+  fhandler_tty_slave (int);
 
   int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
@@ -839,7 +839,7 @@ public:
   int need_nl;			// Next read should start with \n
 
   /* Constructor */
-  fhandler_pty_master (const char *name, DWORD devtype = FH_PTYM, int unit = -1);
+  fhandler_pty_master (DWORD devtype = FH_PTYM, int unit = -1);
 
   int process_slave_output (char *buf, size_t len, int pktmode_on);
   void doecho (const void *str, DWORD len);
@@ -865,7 +865,7 @@ class fhandler_tty_master: public fhandler_pty_master
 {
 public:
   /* Constructor */
-  fhandler_tty_master (const char *name, int unit);
+  fhandler_tty_master (int unit);
   fhandler_console *console;	// device handler to perform real i/o.
   HANDLE hThread;		// process_output thread handle.
 
@@ -878,7 +878,7 @@ public:
 class fhandler_dev_null: public fhandler_base
 {
 public:
-  fhandler_dev_null (const char *name);
+  fhandler_dev_null ();
 
   void dump ();
   select_record *select_read (select_record *s);
@@ -889,7 +889,7 @@ public:
 class fhandler_dev_zero: public fhandler_base
 {
 public:
-  fhandler_dev_zero (const char *name);
+  fhandler_dev_zero ();
   int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
   int __stdcall read (void *ptr, size_t len) __attribute__ ((regparm (2)));
@@ -911,7 +911,7 @@ protected:
   int pseudo_read (void *ptr, size_t len);
 
 public:
-  fhandler_dev_random (const char *name, int unit);
+  fhandler_dev_random (int unit);
   int get_unit () { return unit; }
   int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
@@ -931,7 +931,7 @@ protected:
   DWORD pos;
 
 public:
-  fhandler_dev_mem (const char *name, int unit);
+  fhandler_dev_mem (int unit);
   ~fhandler_dev_mem (void);
 
   int open (path_conv *, int flags, mode_t mode = 0);
@@ -954,7 +954,7 @@ public:
 class fhandler_dev_clipboard: public fhandler_base
 {
 public:
-  fhandler_dev_clipboard (const char *name);
+  fhandler_dev_clipboard ();
   int is_windows (void) { return 1; }
   int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
@@ -979,7 +979,7 @@ private:
   HWND hWnd_;	// the window whose messages are to be retrieved by read() call
   int method_;  // write method (Post or Send)
 public:
-  fhandler_windows (const char *name = 0);
+  fhandler_windows ();
   int is_windows (void) { return 1; }
   int open (path_conv *, int flags, mode_t mode = 0);
   int write (const void *ptr, size_t len);
@@ -1005,7 +1005,7 @@ private:
   int audiochannels_;
   bool setupwav(const char *pData, int nBytes);
 public:
-  fhandler_dev_dsp (const char *name = 0);
+  fhandler_dev_dsp ();
   ~fhandler_dev_dsp();
 
   int open (path_conv *, int flags, mode_t mode = 0);

@@ -23,9 +23,8 @@
 /**********************************************************************/
 /* fhandler_dev_mem */
 
-fhandler_dev_mem::fhandler_dev_mem (const char *name, int nunit)
-: fhandler_base (FH_MEM, name),
-  unit (nunit)
+fhandler_dev_mem::fhandler_dev_mem (int nunit)
+  : fhandler_base (FH_MEM), unit (nunit)
 {
   /* Reading physical memory only supported on NT/W2K. */
   if (!wincap.has_physical_mem_access ())

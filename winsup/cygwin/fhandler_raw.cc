@@ -116,7 +116,8 @@ fhandler_dev_raw::writebuf (void)
   return ret;
 }
 
-fhandler_dev_raw::fhandler_dev_raw (DWORD devtype, const char *name, int unit) : fhandler_base (devtype, name)
+fhandler_dev_raw::fhandler_dev_raw (DWORD devtype, int unit)
+  : fhandler_base (devtype)
 {
   clear ();
   this->unit = unit;

@@ -293,8 +293,8 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
   if (nelem >= npidlist)
     {
       npidlist += slop_pidlist;
-      pidlist = (DWORD *) realloc (pidlist, size_pidlist (npidlist));
-      pinfolist = (pinfo *) realloc (pinfolist, size_pinfolist (npidlist));
+      pidlist = (DWORD *) realloc (pidlist, size_pidlist (npidlist + 1));
+      pinfolist = (pinfo *) realloc (pinfolist, size_pinfolist (npidlist + 1));
     }
 
   pinfolist[nelem].init (cygpid, PID_NOREDIR);
@@ -324,7 +324,7 @@ winpids::enumNT (bool winpid)
 
   DWORD nelem = 0;
   if (!szprocs)
-    procs = (SYSTEM_PROCESSES *) malloc (szprocs = 200 * sizeof (*procs));
+    procs = (SYSTEM_PROCESSES *) malloc (sizeof (*procs) + (szprocs = 200 * sizeof (*procs)));
 
   NTSTATUS res;
   for (;;)
@@ -387,7 +387,8 @@ void
 winpids::init (bool winpid)
 {
   npids = (this->*enum_processes) (winpid);
-  pidlist[npids] = 0;
+  if (pidlist)
+    pidlist[npids] = 0;
 }
 
 DWORD

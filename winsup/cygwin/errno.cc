@@ -8,12 +8,16 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+#define _sys_nerr FOO_sys_nerr
+#define sys_nerr FOOsys_nerr
 #include "winsup.h"
 #define _REENT_ONLY
 #include <stdio.h>
 #include <errno.h>
 #include "cygerrno.h"
 #include "thread.h"
+#undef _sys_nerr
+#undef sys_nerr
 
 /* Table to map Windows error codes to Errno values.  */
 /* FIXME: Doing things this way is a little slow.  It's trivial to change
@@ -145,7 +149,8 @@ seterrno (const char *file, int line)
 
 extern char *_user_strerror _PARAMS ((int));
 
-extern const NO_COPY char __declspec(dllexport) * const _sys_errlist[]=
+extern "C" {
+const NO_COPY char __declspec(dllexport) * const _sys_errlist[]=
 {
 /*      NOERROR 0       */ "No error",
 /*	EPERM 1		*/ "Not super-user",
@@ -287,8 +292,8 @@ extern const NO_COPY char __declspec(dllexport) * const _sys_errlist[]=
 /* ECASECLASH 137 */ "Filename exists with different case"
 };
 
-int NO_COPY __declspec(dllexport) _sys_nerr =
-  sizeof (_sys_errlist) / sizeof (_sys_errlist[0]);
+extern int const NO_COPY __declspec(dllexport) _sys_nerr = sizeof (_sys_errlist) / sizeof (_sys_errlist[0]);
+};
 
 /* FIXME: Why is strerror() a long switch and not just:
 	return sys_errlist[errnum];

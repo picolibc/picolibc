@@ -420,8 +420,8 @@ fhandler_dev_dsp::setupwav (const char *pData, int nBytes)
 }
 
 //------------------------------------------------------------------------
-fhandler_dev_dsp::fhandler_dev_dsp (const char *name):
-  fhandler_base (FH_OSS_DSP, name)
+fhandler_dev_dsp::fhandler_dev_dsp ():
+  fhandler_base (FH_OSS_DSP)
 {
   set_cb (sizeof *this);
 }
@@ -526,6 +526,7 @@ fhandler_dev_dsp::ioctl (unsigned int cmd, void *ptr)
 
       CASE (SNDCTL_DSP_GETBLKSIZE)
 	*intptr = Audio::BLOCK_SIZE;
+        return 0;
 	break;
 
       CASE (SNDCTL_DSP_SETFMT)

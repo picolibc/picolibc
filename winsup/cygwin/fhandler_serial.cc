@@ -24,8 +24,8 @@ details. */
 /**********************************************************************/
 /* fhandler_serial */
 
-fhandler_serial::fhandler_serial (const char *name, DWORD devtype, int unit) :
-	fhandler_base (devtype, name, unit)
+fhandler_serial::fhandler_serial (DWORD devtype, int unit) :
+	fhandler_base (devtype, unit)
 {
   set_cb (sizeof *this);
   vmin_ = 0;

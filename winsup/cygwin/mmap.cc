@@ -217,7 +217,7 @@ mmap_record::fixup_map ()
 		    &old_prot);
 }
 
-static fhandler_disk_file fh_paging_file (NULL);
+static fhandler_disk_file fh_paging_file;
 
 fhandler_base *
 mmap_record::alloc_fh ()

@@ -862,8 +862,8 @@ fhandler_console::tcgetattr (struct termios *t)
  * Constructor.
  */
 
-fhandler_console::fhandler_console (const char *name) :
-  fhandler_termios (FH_CONSOLE, name, -1)
+fhandler_console::fhandler_console () :
+  fhandler_termios (FH_CONSOLE, -1)
 {
   set_cb (sizeof *this);
   default_color = dim_color = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;

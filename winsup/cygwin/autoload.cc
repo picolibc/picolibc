@@ -241,7 +241,6 @@ static long long
 wsock_init ()
 {
   static LONG NO_COPY here = -1L;
-  extern WSADATA wsadata;
   struct func_info *func = (struct func_info *) __builtin_return_address (0);
   struct dll_info *dll = func->dll;
 
@@ -261,7 +260,7 @@ wsock_init ()
       Sleep (0);
     }
 
-  if (!wsock_started && (wsock32_handle || ws2_32_handle))
+  if (!wsock_started && (winsock_active || winsock2_active))
     {
       /* Don't use autoload to load WSAStartup to eliminate recursion. */
       int (*wsastartup) (int, WSADATA *);
@@ -421,7 +420,7 @@ LoadDLLfunc (WSAAsyncSelect, 16, wsock32)
 LoadDLLfunc (WSACleanup, 0, wsock32)
 LoadDLLfunc (WSAGetLastError, 0, wsock32)
 LoadDLLfunc (WSASetLastError, 4, wsock32)
-LoadDLLfunc (WSAStartup, 8, wsock32)
+// LoadDLLfunc (WSAStartup, 8, wsock32)
 LoadDLLfunc (__WSAFDIsSet, 8, wsock32)
 LoadDLLfunc (accept, 12, wsock32)
 LoadDLLfunc (bind, 12, wsock32)

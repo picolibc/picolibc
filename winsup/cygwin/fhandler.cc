@@ -1329,7 +1329,7 @@ fhandler_base::operator delete (void *p)
 }
 
 /* Normal I/O constructor */
-fhandler_base::fhandler_base (DWORD devtype, const char *name, int unit):
+fhandler_base::fhandler_base (DWORD devtype, int unit):
   access (0),
   io_handle (NULL),
   namehash (0),
@@ -1369,8 +1369,8 @@ fhandler_base::~fhandler_base (void)
 /**********************************************************************/
 /* fhandler_disk_file */
 
-fhandler_disk_file::fhandler_disk_file (const char *name) :
-	fhandler_base (FH_DISK, name)
+fhandler_disk_file::fhandler_disk_file () :
+	fhandler_base (FH_DISK)
 {
   set_cb (sizeof *this);
 }
@@ -1598,8 +1598,8 @@ fhandler_disk_file::lock (int cmd, struct flock *fl)
 /**********************************************************************/
 /* /dev/null */
 
-fhandler_dev_null::fhandler_dev_null (const char *name) :
-	fhandler_base (FH_NULL, name)
+fhandler_dev_null::fhandler_dev_null () :
+	fhandler_base (FH_NULL)
 {
   set_cb (sizeof *this);
 }

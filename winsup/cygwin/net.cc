@@ -506,12 +506,15 @@ cygwin_getprotobynumber (int number)
 fhandler_socket *
 fdsock (int fd, const char *name, SOCKET soc)
 {
+  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "fdsock");
   if (wsadata.wVersion < 512) /* < Winsock 2.0 */
     soc = set_socket_inheritance (soc);
   fhandler_socket *fh = (fhandler_socket *) cygheap->fdtab.build_fhandler (fd, FH_SOCKET, name);
   fh->set_io_handle ((HANDLE) soc);
   fh->set_flags (O_RDWR);
   cygheap->fdtab.inc_need_fixup_before ();
+  fh->set_name (name, name);
+  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "fdsock");
   return fh;
 }
 

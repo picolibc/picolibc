@@ -41,8 +41,8 @@ fhandler_dev_random* entropy_source;
 /**********************************************************************/
 /* fhandler_socket */
 
-fhandler_socket::fhandler_socket (const char *name) :
-	fhandler_base (FH_SOCKET, name)
+fhandler_socket::fhandler_socket () :
+	fhandler_base (FH_SOCKET)
 {
   set_cb (sizeof *this);
   set_need_fork_fixup ();
@@ -62,8 +62,7 @@ fhandler_socket::set_connect_secret ()
   if (!entropy_source)
     {
       void *buf = malloc (sizeof (fhandler_dev_random));
-      entropy_source = new (buf) fhandler_dev_random (ENTROPY_SOURCE_NAME,
-						      ENTROPY_SOURCE_DEV_UNIT);
+      entropy_source = new (buf) fhandler_dev_random (ENTROPY_SOURCE_DEV_UNIT);
     }
   if (entropy_source &&
       !entropy_source->open (NULL, O_RDONLY))
@@ -115,8 +114,13 @@ fhandler_socket::create_secret_event (int* secret)
 void
 fhandler_socket::signal_secret_event ()
 {
-  if (secret_event)
-    SetEvent (secret_event);
+  if (!secret_event)
+    debug_printf ("no secret event?");
+  else
+    {
+      SetEvent (secret_event);
+      debug_printf ("signaled secret_event");
+    }
 }
 
 void
@@ -160,54 +164,48 @@ fhandler_socket::check_peer_secret_event (struct sockaddr_in* peer, int* secret)
 void
 fhandler_socket::fixup_before_fork_exec (DWORD win_proc_id)
 {
-  int ret = 1;
-
-  if (prot_info_ptr &&
-      (ret = WSADuplicateSocketA (get_socket (), win_proc_id, prot_info_ptr)))
-    {
-      debug_printf ("WSADuplicateSocket error");
-      set_winsock_errno ();
-    }
-  if (!ret && ws2_32_handle)
-    {
-      debug_printf ("WSADuplicateSocket went fine, dwServiceFlags1=%d",
-		    prot_info_ptr->dwServiceFlags1);
-    }
-  else
+  if (!winsock2_active)
     {
       fhandler_base::fixup_before_fork_exec (win_proc_id);
       debug_printf ("Without Winsock 2.0");
+    }
+  else if (!WSADuplicateSocketA (get_socket (), win_proc_id, prot_info_ptr))
+    debug_printf ("WSADuplicateSocket went fine, dwServiceFlags1=%d",
+		  prot_info_ptr->dwServiceFlags1);
+  else
+    {
+      debug_printf ("WSADuplicateSocket error");
+      set_winsock_errno ();
     }
 }
 
 void
 fhandler_socket::fixup_after_fork (HANDLE parent)
 {
-  SOCKET new_sock = INVALID_SOCKET;
+  SOCKET new_sock;
 
   debug_printf ("WSASocket begin, dwServiceFlags1=%d",
 		prot_info_ptr->dwServiceFlags1);
-  if (prot_info_ptr &&
-      (new_sock = WSASocketA (FROM_PROTOCOL_INFO,
-			      FROM_PROTOCOL_INFO,
-			      FROM_PROTOCOL_INFO,
-			      prot_info_ptr, 0, 0)) == INVALID_SOCKET)
+
+  if ((new_sock = WSASocketA (FROM_PROTOCOL_INFO,
+				   FROM_PROTOCOL_INFO,
+				   FROM_PROTOCOL_INFO,
+				   prot_info_ptr, 0, 0)) == INVALID_SOCKET)
     {
       debug_printf ("WSASocket error");
       set_winsock_errno ();
     }
-  if (new_sock != INVALID_SOCKET && ws2_32_handle)
+  else if (!new_sock && !winsock2_active)
+    {
+      fhandler_base::fixup_after_fork (parent);
+      debug_printf ("Without Winsock 2.0");
+    }
+  else
     {
       debug_printf ("WSASocket went fine %p", new_sock);
       set_io_handle ((HANDLE) new_sock);
     }
-  else
-    {
-#if 0
-      fhandler_base::fixup_after_fork (parent);
-#endif
-      debug_printf ("Without Winsock 2.0");
-    }
+
   if (secret_event)
     fork_fixup (parent, secret_event, "secret_event");
 }
@@ -215,26 +213,37 @@ fhandler_socket::fixup_after_fork (HANDLE parent)
 void
 fhandler_socket::fixup_after_exec (HANDLE parent)
 {
-  extern WSADATA wsadata;
+  debug_printf ("here");
   if (!get_close_on_exec ())
     fixup_after_fork (parent);
-  else if (wsadata.wVersion < 512) /* < Winsock 2.0 */
+#if 0
+  else if (!winsock2_active)
     closesocket (get_socket ());
+#endif
 }
 
 int
 fhandler_socket::dup (fhandler_base *child)
 {
+  debug_printf ("here");
   fhandler_socket *fhs = (fhandler_socket *) child;
   fhs->addr_family = addr_family;
   fhs->set_io_handle (get_io_handle ());
   fhs->fixup_before_fork_exec (GetCurrentProcessId ());
-  if (ws2_32_handle)
+  if (winsock2_active)
     {
       fhs->fixup_after_fork (hMainProc);
       return 0;
     }
   return fhandler_base::dup (child);
+}
+
+int __stdcall
+fhandler_socket::fstat (struct stat *buf, path_conv *pc)
+{
+  fhandler_disk_file fh;
+  fh.set_name (get_name (), get_win32_name ());
+  return fh.fstat (buf, pc);
 }
 
 int
@@ -243,9 +252,7 @@ fhandler_socket::read (void *ptr, size_t len)
   sigframe thisframe (mainthread);
   int res = recv (get_socket (), (char *) ptr, len, 0);
   if (res == SOCKET_ERROR)
-    {
-      set_winsock_errno ();
-    }
+    set_winsock_errno ();
   return res;
 }
 
@@ -414,7 +421,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
       if (cmd == FIONBIO)
 	{
 	  syscall_printf ("socket is now %sblocking",
-			    *(int *) p ? "un" : "");
+			    *(int *) p ? "non" : "");
 	  /* Start AsyncSelect if async socket unblocked */
 	  if (*(int *) p && get_async ())
 	    WSAAsyncSelect (get_socket (), gethwnd (), WM_ASYNCIO, ASYNC_MASK);
@@ -460,11 +467,8 @@ fhandler_socket::fcntl (int cmd, void *arg)
 void
 fhandler_socket::set_close_on_exec (int val)
 {
-#if 0
-  extern WSADATA wsadata;
-  if (wsadata.wVersion < 512) /* < Winsock 2.0 */
+  if (!winsock2_active) /* < Winsock 2.0 */
     set_inheritance (get_handle (), val);
-#endif
   set_close_on_exec_flag (val);
   debug_printf ("set close_on_exec for %s to %d", get_name (), val);
 }

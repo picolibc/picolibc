@@ -55,7 +55,8 @@ fhandler_dev_tape::is_eof (int win_error)
   return ret;
 }
 
-fhandler_dev_tape::fhandler_dev_tape (const char *name, int unit) : fhandler_dev_raw (FH_TAPE, name, unit)
+fhandler_dev_tape::fhandler_dev_tape (int unit)
+  : fhandler_dev_raw (FH_TAPE, unit)
 {
   set_cb (sizeof *this);
 }

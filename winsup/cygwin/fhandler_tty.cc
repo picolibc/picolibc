@@ -35,8 +35,8 @@ static DWORD WINAPI process_input (void *);		// Input queue thread
 static DWORD WINAPI process_output (void *);		// Output queue thread
 static DWORD WINAPI process_ioctl (void *);		// Ioctl requests thread
 
-fhandler_tty_master::fhandler_tty_master (const char *name, int unit) :
-	fhandler_pty_master (name, FH_TTYM, unit)
+fhandler_tty_master::fhandler_tty_master (int unit) :
+	fhandler_pty_master (FH_TTYM, unit)
 {
   set_cb (sizeof *this);
   console = NULL;
@@ -437,8 +437,8 @@ process_ioctl (void *)
 /**********************************************************************/
 /* Tty slave stuff */
 
-fhandler_tty_slave::fhandler_tty_slave (int num, const char *name) :
-	fhandler_tty_common (FH_TTYS, name, num)
+fhandler_tty_slave::fhandler_tty_slave (int num)
+  : fhandler_tty_common (FH_TTYS, num)
 {
   set_cb (sizeof *this);
   ttynum = num;
@@ -446,8 +446,8 @@ fhandler_tty_slave::fhandler_tty_slave (int num, const char *name) :
   inuse = NULL;
 }
 
-fhandler_tty_slave::fhandler_tty_slave (const char *name) :
-	fhandler_tty_common (FH_TTYS, name, 0)
+fhandler_tty_slave::fhandler_tty_slave ()
+  : fhandler_tty_common (FH_TTYS, 0)
 {
   set_cb (sizeof *this);
   inuse = NULL;
@@ -950,8 +950,8 @@ out:
 /*******************************************************
  fhandler_pty_master
 */
-fhandler_pty_master::fhandler_pty_master (const char *name, DWORD devtype, int unit) :
-	fhandler_tty_common (devtype, name, unit)
+fhandler_pty_master::fhandler_pty_master (DWORD devtype, int unit)
+  : fhandler_tty_common (devtype, unit)
 {
   set_cb (sizeof *this);
   ioctl_request_event = NULL;

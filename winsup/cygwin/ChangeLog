@@ -1,3 +1,37 @@
+2001-10-13  Ralf Habacker  <Ralf.Habacker@freenet.de>
+
+	* fhandler_dsp.cc (fhandler_dsp::ioctl): Return 0 for successful
+	SNDCTL_DSP_GETBLKSIZE operation.
+
+2001-10-13  Christopher Faylor  <cgf@redhat.com>
+
+	Remove obsolete 'name' arg from fhandler_* constructors throughout.
+	* winsup.h (winsock_active): New macro.
+	(winsock2_active): Ditto.
+	* autoload.cc (wsock_init): Use new macros to decide if winsock or
+	winsock2 is loaded.
+	(nonexist_wsock32): Dummy function to force winsock load.
+	(nonexist_ws2_32): Dummy function to force winsock2 load.
+	* fhandler.h (fhandler_socket::fstat): Declare new method.  Currently
+	unused.
+	* fhandler_socket.cc (fhandler_socket::fixup_before_fork_exec): Check
+	that winsock2 is active before trying WSADuplicateSocketA.
+	(fhandler_socket::fixup_after_fork): Add extra check for
+	winsock2_active.  Otherwise use iffy procedures for Windows 95.
+	(fhandler_socket::fixup_after_exec): Add debugging.
+	(fhandler_socket::dup): Add debugging.
+	(fhandler_socket::fstat): New method.
+	(fhandler_socket::set_close_on_exec): Attempt to perform iffy stuff on
+	Windows 95.
+
+	* errno.cc (_sys_nerr): Work around compiler strangeness.
+
+	* pinfo.cc (winpids::add): Add extra element at end of allocated array
+	for setting to NULL.
+	(winpids::enumNT): Ditto.
+	(winpids::init): Don't modify pidlist if it hasn't been allocated
+	(possibly due to malloc problem).
+
 2001-10-12  Christopher Faylor  <cgf@redhat.com>
 
 	* autoload.cc (wsock_init): Reorganize slightly to accomodate a new

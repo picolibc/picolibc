@@ -25,9 +25,8 @@ details. */
 static unsigned pipecount;
 static const NO_COPY char pipeid_fmt[] = "stupid_pipe.%u.%u";
 
-fhandler_pipe::fhandler_pipe (const char *name, DWORD devtype) :
-	fhandler_base (devtype, name),
-	guard (0), writepipe_exists(0), orig_pid (0), id (0)
+fhandler_pipe::fhandler_pipe (DWORD devtype)
+  : fhandler_base (devtype), guard (0), writepipe_exists(0), orig_pid (0), id (0)
 {
   set_cb (sizeof *this);
 }

@@ -701,6 +701,10 @@ out:
 	  set_has_buggy_open (strcmp (fs_name, "SUNWNFS") == 0);
 	}
     }
+#if 0
+  if (issocket ())
+    devn = FH_SOCKET;
+#endif
 
   if (!(opt & PC_FULL))
     {

@@ -265,63 +265,63 @@ dtable::build_fhandler (int fd, DWORD dev, const char *name, int unit)
   switch (dev)
     {
       case FH_TTYM:
-	fh = cnew (fhandler_tty_master) (name, unit);
+	fh = cnew (fhandler_tty_master) (unit);
 	break;
       case FH_CONSOLE:
       case FH_CONIN:
       case FH_CONOUT:
-	fh = cnew (fhandler_console) (name);
+	fh = cnew (fhandler_console) ();
 	inc_console_fds ();
 	break;
       case FH_PTYM:
-	fh = cnew (fhandler_pty_master) (name);
+	fh = cnew (fhandler_pty_master) ();
 	break;
       case FH_TTYS:
 	if (unit < 0)
-	  fh = cnew (fhandler_tty_slave) (name);
+	  fh = cnew (fhandler_tty_slave) ();
 	else
-	  fh = cnew (fhandler_tty_slave) (unit, name);
+	  fh = cnew (fhandler_tty_slave) (unit);
 	break;
       case FH_WINDOWS:
-	fh = cnew (fhandler_windows) (name);
+	fh = cnew (fhandler_windows) ();
 	break;
       case FH_SERIAL:
-	fh = cnew (fhandler_serial) (name, dev, unit);
+	fh = cnew (fhandler_serial) (unit);
 	break;
       case FH_PIPE:
       case FH_PIPER:
       case FH_PIPEW:
-	fh = cnew (fhandler_pipe) (name, dev);
+	fh = cnew (fhandler_pipe) ();
 	break;
       case FH_SOCKET:
-	fh = cnew (fhandler_socket) (name);
+	fh = cnew (fhandler_socket) ();
 	break;
       case FH_DISK:
-	fh = cnew (fhandler_disk_file) (NULL);
+	fh = cnew (fhandler_disk_file) ();
 	break;
       case FH_FLOPPY:
-	fh = cnew (fhandler_dev_floppy) (name, unit);
+	fh = cnew (fhandler_dev_floppy) (unit);
 	break;
       case FH_TAPE:
-	fh = cnew (fhandler_dev_tape) (name, unit);
+	fh = cnew (fhandler_dev_tape) (unit);
 	break;
       case FH_NULL:
-	fh = cnew (fhandler_dev_null) (name);
+	fh = cnew (fhandler_dev_null) ();
 	break;
       case FH_ZERO:
-	fh = cnew (fhandler_dev_zero) (name);
+	fh = cnew (fhandler_dev_zero) ();
 	break;
       case FH_RANDOM:
-	fh = cnew (fhandler_dev_random) (name, unit);
+	fh = cnew (fhandler_dev_random) (unit);
 	break;
       case FH_MEM:
-	fh = cnew (fhandler_dev_mem) (name, unit);
+	fh = cnew (fhandler_dev_mem) (unit);
 	break;
       case FH_CLIPBOARD:
-	fh = cnew (fhandler_dev_clipboard) (name);
+	fh = cnew (fhandler_dev_clipboard) ();
 	break;
       case FH_OSS_DSP:
-	fh = cnew (fhandler_dev_dsp) (name);
+	fh = cnew (fhandler_dev_dsp) ();
 	break;
       default:
 	{
