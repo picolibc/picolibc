@@ -18,13 +18,13 @@
 /*
 
 FUNCTION
-        <<printf>>, <<fprintf>>, <<saprintf>>, <<sprintf>>, <<snprintf>>---format output
+        <<printf>>, <<fprintf>>, <<asprintf>>, <<sprintf>>, <<snprintf>>---format output
 INDEX
 	fprintf
 INDEX
 	printf
 INDEX
-	saprintf
+	asprintf
 INDEX
 	sprintf
 INDEX
@@ -36,7 +36,7 @@ ANSI_SYNOPSIS
         int printf(const char *<[format]> [, <[arg]>, ...]);
         int fprintf(FILE *<[fd]>, const char *<[format]> [, <[arg]>, ...]);
         int sprintf(char *<[str]>, const char *<[format]> [, <[arg]>, ...]);
-        int saprintf(char **<[strp]>, const char *<[format]> [, <[arg]>, ...]);
+        int asprintf(char **<[strp]>, const char *<[format]> [, <[arg]>, ...]);
         int snprintf(char *<[str]>, size_t <[size]>, const char *<[format]> [, <[arg]>, ...]);
 
 TRAD_SYNOPSIS
@@ -49,7 +49,7 @@ TRAD_SYNOPSIS
 	FILE *<[fd]>;
 	char *<[format]>;
 
-	int saprintf(<[strp]>, <[format]> [, <[arg]>, ...]);
+	int asprintf(<[strp]>, <[format]> [, <[arg]>, ...]);
 	char **<[strp]>;
 	char *<[format]>;
 
@@ -72,16 +72,16 @@ DESCRIPTION
         If there are more arguments than the format requires, excess
         arguments are ignored.
 
-        <<fprintf>>, <<saprintf>>, <<sprintf>> and <<snprintf>> are identical 
+        <<fprintf>>, <<asprintf>>, <<sprintf>> and <<snprintf>> are identical 
 	to <<printf>>, other than the destination of the formatted output: 
 	<<fprintf>> sends the output to a specified file <[fd]>, while 
-	<<saprintf>> stores the output in a dynamically allocated buffer,
+	<<asprintf>> stores the output in a dynamically allocated buffer,
 	while <<sprintf>> stores the output in the specified char array 
 	<[str]> and <<snprintf>> limits number of characters written to 
 	<[str]> to at most <[size]> (including terminating <<0>>).  For 
 	<<sprintf>> and <<snprintf>>, the behavior is undefined if the 
 	output <<*<[str]>>> overlaps with one of the arguments. For
-	<<saprintf>>, <[strp]> points to a pointer to char which is filled
+	<<asprintf>>, <[strp]> points to a pointer to char which is filled
 	in with the dynamically allocated buffer.  <[format]> is a pointer 
 	to a charater string containing two types of objects: ordinary 
 	characters (other than <<%>>), which are copied unchanged to the 
@@ -282,11 +282,11 @@ O-
 
 
 RETURNS
-<<sprintf>> and <<saprintf>> return the number of bytes in the output string,
+<<sprintf>> and <<asprintf>> return the number of bytes in the output string,
 save that the concluding <<NULL>> is not counted.
 <<printf>> and <<fprintf>> return the number of characters transmitted.
 If an error occurs, <<printf>> and <<fprintf>> return <<EOF>> and
-<<saprintf>> returns -1.  No error returns occur for <<sprintf>>.
+<<asprintf>> returns -1.  No error returns occur for <<sprintf>>.
 
 PORTABILITY
         The  ANSI C standard specifies that implementations must

@@ -1,3 +1,8 @@
+2003-01-07  Charles Wilson  <cwilson@ece.gatech.edu>
+
+	* libc/stdio/sprintf.c: fix typo
+	* libc/stdio/vfprintf.c: fix typo
+
 2003-01-07  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* configure.host: Support long double I/O for x86-linux.

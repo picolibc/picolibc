@@ -91,7 +91,7 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
 <<vprintf>>, <<vfprintf>>, <<vasprintf>>, <<vsprintf>> and <<vsnprintf>> are 
-(respectively) variants of <<printf>>, <<fprintf>>, <<saprintf>>, <<sprintf>>,
+(respectively) variants of <<printf>>, <<fprintf>>, <<asprintf>>, <<sprintf>>,
 and <<snprintf>>.  They differ only in allowing their caller to pass the 
 variable argument list as a <<va_list>> object (initialized by <<va_start>>) 
 rather than directly accepting a variable number of arguments.
