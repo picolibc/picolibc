@@ -1,3 +1,23 @@
+2003-09-30  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Add YA method for generating devices.cc.
+	* child_info.h: YA update of another magic number.
+	* gendevices: New file.
+	* devices.in: New file.
+	* devices.cc: Regenerate.
+	* devices.shilka: Remove.
+	* devices.h: Correctly define device pointers.
+	(device): Remove now obsolete fields.
+	(device::native): Renamed from device::fmt.
+	* dtable.cc (build_fh_dev): Simplify in light of new unit parsing
+	scheme.
+	(build_fh_pc): Ditto.
+	* path.cc (win32_device_name): Ditto.
+	* fhandler.h (fhandler_base::get_native_name): Reflect renaming of fmt
+	to native.
+	* fhandler_tty.cc (fhandler_tty_mster::init): Initialize slave device
+	prior to reporting unit.
+
 2003-09-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::fstat): Drop FH_FLOPPY case.

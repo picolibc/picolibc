@@ -339,7 +339,7 @@ class fhandler_base
   virtual int ready_for_read (int fd, DWORD howlong);
   virtual const char *get_native_name ()
   {
-    return dev ().fmt;
+    return dev ().native;
   }
   virtual bg_check_types bg_check (int) {return bg_ok;}
   void clear_readahead ()

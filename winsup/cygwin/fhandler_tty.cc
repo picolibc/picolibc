@@ -60,9 +60,8 @@ fhandler_tty_master::set_winsize (bool sendSIGWINCH)
 int
 fhandler_tty_master::init ()
 {
-  termios_printf ("Creating master for tty%d", get_unit ());
-
   slave = dev ();
+  termios_printf ("Creating master for tty%d", get_unit ());
 
   if (init_console ())
     {

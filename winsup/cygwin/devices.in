@@ -1,0 +1,128 @@
+%import {
+#include "winsup.h"
+#include <sys/types.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
+#include "devices.h"
+#include "sys/cygwin.h"
+#include "tty.h"
+#include "pinfo.h"
+typedef const device *KR_device_t;
+}
+%type KR_device_t
+%local {
+const device dev_cygdrive_storage =
+  {"/cygdrive", FH_CYGDRIVE, "/cygdrive"};
+
+const device dev_fs_storage =
+  {"", FH_FS, ""};
+
+const device dev_proc_storage =
+  {"", FH_PROC, ""};
+
+const device dev_registry_storage =
+  {"", FH_REGISTRY, ""};
+
+const device dev_piper_storage =
+  {"", FH_PIPER, ""};
+
+const device dev_pipew_storage =
+  {"", FH_PIPEW, ""};
+
+const device dev_bad_storage =
+  {":bad:", FH_BAD, ""};
+
+%storage_here
+}
+%%
+"/dev/inet/tcp", FH_TCP, "", tcp_dev
+"/dev/inet/udp", FH_UDP, "", udp_dev
+"/dev/inet/icmp", FH_ICMP, "", icmp_dev
+"/dev/inet/unix", FH_UNIX, "", unix_dev
+"/dev/inet/stream", FH_STREAM, "", stream_dev
+"/dev/inet/dgram", FH_DGRAM, "", dgram_dev
+"/dev/tty", FH_TTY, "\\dev\\tty"
+"/dev/tty%(0-63)d", FHDEV(DEV_TTYS_MAJOR, {$1}), "\\dev\\tty{$1}", ttys_dev
+"/dev/console", FH_CONSOLE, "\\dev\\console", console_dev
+"/dev/ttym", FH_TTYM, "\\dev\\ttym", ttym_dev
+"/dev/ptmx", FH_PTYM, "\\dev\\ptmx"
+"/dev/windows", FH_WINDOWS, "\\dev\\windows"
+"/dev/dsp", FH_OSS_DSP, "\\dev\\dsp"
+"/dev/conin", FH_CONIN, "conin"
+"/dev/conout", FH_CONOUT, "conout"
+"/dev/null", FH_NULL, "nul"
+"/dev/zero", FH_ZERO, "\\dev\\zero"
+"/dev/random", FH_RANDOM, "\\dev\\random"
+"/dev/urandom", FH_URANDOM, "\\dev\\urandom", urandom_dev
+"/dev/mem", FH_MEM, "\\dev\\mem"
+"/dev/kmem", FH_KMEM, "\\dev\\mem"
+"/dev/clipboard", FH_CLIPBOARD, "\\dev\\clipboard"
+"/dev/port", FH_PORT, "\\dev\\port"
+"/dev/com%(0-16)d", FHDEV(DEV_SERIAL_MAJOR, {$1}), "\\.\\com{$1}"
+"/dev/ttyS%(0-15)d", FHDEV(DEV_SERIAL_MAJOR, {$1 + 1}), "\\.\\com{$1 + 1}"
+"/dev/pipe", FH_PIPE, "\\dev\\pipe"
+"/dev/fifo", FH_FIFO, "\\dev\\fifo"
+"/dev/st%(0-127)d", FHDEV(DEV_TAPE_MAJOR, {$1}), "\\Device\\Tape{$1}"
+"/dev/nst%(0-127)d", FHDEV(DEV_TAPE_MAJOR, {$1 + 128}), "\\Device\\Tape{$1}"
+"/dev/fd%(0-15)d", FHDEV(DEV_FLOPPY_MAJOR, {$1}), "\\Device\\Floppy{$1}"
+"/dev/scd%(0-15)d", FHDEV(DEV_CDROM_MAJOR, {$1}), "\\Device\\CdRom{$1}"
+"/dev/sr%(0-15)d", FHDEV(DEV_CDROM_MAJOR, {$1}), "\\Device\\CdRom{$1}"
+"/dev/sd%{a-z}s", FH_SD{uc $1}, "\\Device\\Harddisk{ord($1) - ord('a')}\\Partition0"
+"/dev/sd%{a-z}s%(1-15)d", FH_SD{uc $1} | {$2}, "\\Device\\Harddisk{ord($1) - ord('a')}\\Partition{$2 % 16}"
+%other	{return	NULL;}
+%%
+void
+device::parse (const char *s)
+{
+  size_t len = strlen (s);
+  const device *dev = KR_find_keyword (s, len);
+
+  if (!dev)
+    *this = *fs_dev;
+  else if (dev->devn == FH_TTY)
+    tty_to_real_device ();
+  else
+    *this = *dev;
+}
+
+void
+device::init ()
+{
+  /* nothing to do... yet */
+}
+
+void
+device::parse (_major_t major, _minor_t minor)
+{
+  _dev_t dev = FHDEV (major, minor);
+
+  devn = 0;
+
+  for (unsigned i = 0; i < (sizeof (dev_storage) / sizeof (dev_storage[0])); i++)
+    if (dev_storage[i].devn == dev)
+      {
+	*this = dev_storage[i];
+	break;
+      }
+
+  if (!*this)
+    devn = FHDEV (major, minor);
+  return;
+}
+
+void
+device::parse (_dev_t dev)
+{
+  parse (_major (dev), _minor (dev));
+}
+
+void
+device::tty_to_real_device ()
+{
+  if (!real_tty_attached (myself))
+    *this = myself->ctty < 0 ? dev_bad_storage : *console_dev;
+  else
+    parse (DEV_TTYS_MAJOR, myself->ctty);
+}
+

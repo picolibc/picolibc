@@ -899,22 +899,8 @@ static BOOL
 win32_device_name (const char *src_path, char *win32_path, device& dev)
 {
   dev.parse (src_path);
-
-  if (dev.devn == FH_FS)
-    return false;
-
-  switch (dev.major)
-    {
-      case DEV_TAPE_MAJOR:
-	__small_sprintf (win32_path, dev.fmt, dev.minor % 128);
-	break;
-      case DEV_SD_MAJOR:
-	__small_sprintf (win32_path, dev.fmt, dev.minor / 16, dev.minor % 16);
-	break;
-      default:
-	__small_sprintf (win32_path, dev.fmt, dev.minor);
-    }
-  return true;
+  strcpy (win32_path, dev.native);
+  return dev.devn != FH_FS;
 }
 
 /* Normalize a Win32 path.

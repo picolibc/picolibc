@@ -128,10 +128,7 @@ struct device
       _major_t major;
     };
   };
-  const char *fmt;
-  unsigned lower, upper;
-  int adjust;
-  unsigned mul;
+  const char *native;
   _mode_t mode;
   bool dev_on_fs;
   static const device *lookup (const char *, unsigned int = 0xffffffff);
@@ -140,9 +137,7 @@ struct device
   void parse (_dev_t dev);
   inline bool setunit (unsigned n)
   {
-    if (mul && n > mul)
-      return false;
-    minor += (n + adjust) * (mul ?: 1);
+    minor = n;
     return true;
   }
   static void init ();
@@ -152,32 +147,21 @@ struct device
   inline bool isfs () const {return dev_on_fs;}
 };
 
-extern const device dev_console_storage;
-#define console_dev (&dev_console_storage)
+extern const device *console_dev;
+extern const device *dgram_dev;
+extern const device *icmp_dev;
+extern const device *stream_dev;
+extern const device *tcp_dev;
+extern const device *ttym_dev;
+extern const device *ttys_dev;
+extern const device *udp_dev;
+extern const device *unix_dev;
+extern const device *urandom_dev;
+
 extern const device dev_piper_storage;
 #define piper_dev (&dev_piper_storage)
 extern const device dev_pipew_storage;
 #define pipew_dev (&dev_pipew_storage)
-extern const device dev_socket_storage;
-#define socket_dev (&dev_socket_storage)
-extern const device dev_ttym_storage;
-#define ttym_dev (&dev_ttym_storage)
-extern const device dev_ttys_storage;
-#define ttys_dev (&dev_ttys_storage)
-extern const device dev_urandom_storage;
-#define urandom_dev (&dev_urandom_storage)
-extern const device dev_tcp_storage;
-#define tcp_dev (&dev_tcp_storage)
-extern const device dev_udp_storage;
-#define udp_dev (&dev_udp_storage)
-extern const device dev_icmp_storage;
-#define icmp_dev (&dev_icmp_storage)
-extern const device dev_unix_storage;
-#define unix_dev (&dev_unix_storage)
-extern const device dev_stream_storage;
-#define stream_dev (&dev_stream_storage)
-extern const device dev_dgram_storage;
-#define dgram_dev (&dev_dgram_storage)
 extern const device dev_proc_storage;
 #define proc_dev (&dev_proc_storage)
 extern const device dev_cygdrive_storage;

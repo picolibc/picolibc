@@ -216,6 +216,7 @@ TARGET_LIBS:=$(LIB_NAME) $(CYGWIN_START) $(GMON_START) $(LIBGMON_A) $(SUBLIBS) $
 
 ifneq "${filter -O%,$(CFLAGS)}" ""
 cygheap_CFLAGS:=-fomit-frame-pointer
+devices_CFLAGS:=-fomit-frame-pointer -Os
 malloc_CFLAGS:=-fomit-frame-pointer
 malloc_wrapper_CFLAGS:=-fomit-frame-pointer
 shared_CFLAGS:=-fomit-frame-pointer
@@ -389,7 +390,7 @@ shared.o: shared_info_magic.h
 $(srcdir)/qevices.cc: cygwin-gperf devices.gperf devices.h
 	$^ > $@
 
-$(srcdir)/devices.cc: cygwin-shilka devices.shilka devices.h
+$(srcdir)/devices.cc: gendevices devices.in devices.h
 	${wordlist 1,2,$^} $@
 
 $(PWD)/libpthread.a: speclib $(LIB_NAME) pthread.o thread.o
