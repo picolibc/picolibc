@@ -1,3 +1,22 @@
+2004-01-05  Filip Navara  <xnavara@volny.cz>
+
+	* include/prsht.h (LPCPROPSHEETPAGEW): Fix definition.
+	* include/shlwapi.h (SHRegQueryInfoUSKey[AW]): Fix prototype.
+	* include/cpl.h (CPL_STARTWPARMS[AW]): Correct.
+	* include/shellapi.h (ABS_AUTOHIDE, ABS_ALWAYSONTOP,
+	SEE_MASK_NO_CONSOLE, SEE_MASK_ASYNCOK, SEE_MASK_HMONITOR,
+	FOF_NOCOPYSECURITYATTRIBS): Add defines.
+	* include/shlobj.h (BFFM_SETOKTEXT, BFFM_SETEXPANDED,
+	CSIDL_FLAG_DONT_VERIFY, CSIDL_FLAG_CREATE, CSIDL_FLAG_MASK,
+	CFSTR_INETURL[AW], SHGDN_FOREDITING, SHGDN_FORADDRESSBAR,
+	SSF_*): Add defines.
+	(SHCNF_PATH[AW], SHCNF_PRINTER[AW], CFSTR_FILENAME[AW],
+	CFSTR_FILENAMEMAP[AW], CFSTR_FILEDESCRIPTOR[AW], CFSTR_SHELLURL,
+	CMDSTR_NEWFOLDER[AW], CMDSTR_VIEWLIST[AW], CMDSTR_VIEWDETAILS[AW]):
+	Correct.
+	(IEnumIDList): Add COBJMACROS.
+	* include/winuser.h (MIM_*): Add define.
+
 2004-01-04  Filip Navara  <xnavara@volny.cz>
 
 	* include/shlguid.h (IID_IPersistFolder2, IID_IPersistFolder3,

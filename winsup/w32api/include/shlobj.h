@@ -36,6 +36,8 @@ extern "C" {
 #define BFFM_ENABLEOK (WM_USER + 101)
 #define BFFM_SETSELECTIONA (WM_USER + 102)
 #define BFFM_SETSELECTIONW (WM_USER + 103)
+#define BFFM_SETOKTEXT (WM_USER + 105)
+#define BFFM_SETEXPANDED (WM_USER + 106)
 #ifdef UNICODE
 #define BFFM_SETSTATUSTEXT  BFFM_SETSTATUSTEXTW
 #define BFFM_SETSELECTION   BFFM_SETSELECTIONW
@@ -73,12 +75,21 @@ extern "C" {
 #define SHCNE_ALLEVENTS	0x7FFFFFFF
 #define SHCNE_INTERRUPT	0x80000000
 #define SHCNF_IDLIST	0
-#define SHCNF_PATH	1
-#define SHCNF_PRINTER	2
+#define SHCNF_PATHA	1
+#define SHCNF_PRINTERA	2
 #define SHCNF_DWORD	3
+#define SHCNF_PATHW	5
+#define SHCNF_PRINTERW	6
 #define SHCNF_TYPE	0xFF
 #define SHCNF_FLUSH	0x1000
 #define SHCNF_FLUSHNOWAIT	0x2000
+#ifdef UNICODE
+#define SHCNF_PATH      SHCNF_PATHW
+#define SHCNF_PRINTER   SHCNF_PRINTERW
+#else
+#define SHCNF_PATH      SHCNF_PATHA
+#define SHCNF_PRINTER   SHCNF_PRINTERA
+#endif
 #define SFGAO_CANCOPY	DROPEFFECT_COPY
 #define SFGAO_CANMOVE	DROPEFFECT_MOVE
 #define SFGAO_CANLINK	DROPEFFECT_LINK
@@ -182,20 +193,32 @@ extern "C" {
 #define CSIDL_COMMON_OEM_LINKS	58
 #define CSIDL_CDBURN_AREA	59
 #define CSIDL_COMPUTERSNEARME	61
+#define CSIDL_FLAG_DONT_VERIFY	0x4000
+#define CSIDL_FLAG_CREATE	0x8000
+#define CSIDL_FLAG_MASK	0xFF00
 #define CFSTR_SHELLIDLIST	TEXT("Shell IDList Array")
 #define CFSTR_SHELLIDLISTOFFSET	TEXT("Shell Object Offsets")
 #define CFSTR_NETRESOURCES	TEXT("Net Resource")
 #define CFSTR_FILECONTENTS	TEXT("FileContents")
+#define CFSTR_FILENAMEA		TEXT("FileName")
+#define CFSTR_FILENAMEMAPA	TEXT("FileNameMap")
+#define CFSTR_FILEDESCRIPTORA	TEXT("FileGroupDescriptor")
+#define CFSTR_INETURLA		TEXT("UniformResourceLocator")
+#define CFSTR_SHELLURL		CFSTR_INETURLA
+#define CFSTR_FILENAMEW		TEXT("FileNameW")
+#define CFSTR_FILENAMEMAPW	TEXT("FileNameMapW")
+#define CFSTR_FILEDESCRIPTORW	TEXT("FileGroupDescriptorW")
+#define CFSTR_INETURLW		TEXT("UniformResourceLocatorW")
 #ifdef UNICODE
-#define CFSTR_FILENAME		L"FileNameW"
-#define CFSTR_FILENAMEMAP	L"FileNameMapW"
-#define CFSTR_FILEDESCRIPTOR	L"FileGroupDescriptorW"
-#define CFSTR_SHELLURL		L"UniformResourceLocatorW"
+#define CFSTR_FILENAME		CFSTR_FILENAMEW
+#define CFSTR_FILENAMEMAP	CFSTR_FILENAMEMAPW
+#define CFSTR_FILEDESCRIPTOR	CFSTR_FILEDESCRIPTORW
+#define CFSTR_INETURL		CFSTR_INETURLW
 #else
-#define CFSTR_FILENAME		"FileName"
-#define CFSTR_FILENAMEMAP	"FileNameMap"
-#define CFSTR_FILEDESCRIPTOR	"FileGroupDescriptor"
-#define CFSTR_SHELLURL		"UniformResourceLocator"
+#define CFSTR_FILENAME		CFSTR_FILENAMEA
+#define CFSTR_FILENAMEMAP	CFSTR_FILENAMEMAPA
+#define CFSTR_FILEDESCRIPTOR	CFSTR_FILEDESCRIPTORA
+#define CFSTR_INETURL		CFSTR_INETURLA
 #endif
 #define CFSTR_PRINTERGROUP	TEXT("PrinterFriendlyName")
 #define CFSTR_INDRAGLOOP	TEXT("InShellDragLoop")
@@ -227,9 +250,21 @@ extern "C" {
 #define GCS_HELPTEXT    GCS_HELPTEXTA
 #define GCS_VALIDATE    GCS_VALIDATEA
 #endif
-#define CMDSTR_NEWFOLDER	TEXT("NewFolder")
-#define CMDSTR_VIEWLIST		TEXT("ViewList")
-#define CMDSTR_VIEWDETAILS	TEXT("ViewDetails")
+#define CMDSTR_NEWFOLDERA	"NewFolder"
+#define CMDSTR_VIEWLISTA	"ViewList"
+#define CMDSTR_VIEWDETAILSA	"ViewDetails"
+#define CMDSTR_NEWFOLDERW	L"NewFolder"
+#define CMDSTR_VIEWLISTW	L"ViewList"
+#define CMDSTR_VIEWDETAILSW	L"ViewDetails"
+#ifdef UNICODE
+#define CMDSTR_NEWFOLDER	CMDSTR_NEWFOLDERW
+#define CMDSTR_VIEWLIST		CMDSTR_VIEWLISTW
+#define CMDSTR_VIEWDETAILS	CMDSTR_VIEWDETAILSW
+#else
+#define CMDSTR_NEWFOLDER	CMDSTR_NEWFOLDER
+#define CMDSTR_VIEWLIST		CMDSTR_VIEWLIST
+#define CMDSTR_VIEWDETAILS	CMDSTR_VIEWDETAILS
+#endif
 #define CMIC_MASK_HOTKEY	SEE_MASK_HOTKEY
 #define CMIC_MASK_ICON	SEE_MASK_ICON
 #define CMIC_MASK_FLAG_NO_UI	SEE_MASK_FLAG_NO_UI
@@ -355,6 +390,8 @@ typedef struct _DROPFILES {
 typedef enum tagSHGDN {
 	SHGDN_NORMAL=0,
 	SHGDN_INFOLDER,
+	SHGDN_FOREDITING=0x1000,
+	SHGDN_FORADDRESSBAR=0x4000,
 	SHGDN_FORPARSING=0x8000
 } SHGNO;
 typedef enum tagSHCONTF {
@@ -481,6 +518,16 @@ typedef struct
 
 DECLARE_ENUMERATOR_(IEnumIDList,LPITEMIDLIST);
 typedef IEnumIDList *LPENUMIDLIST;
+
+#ifdef COBJMACROS
+#define IEnumIDList_QueryInterface(T,a,b) (T)->lpVtbl->QueryInterface(T,a,b)
+#define IEnumIDList_Release(T) (T)->lpVtbl->AddRef(T)
+#define IEnumIDList_AddRef(T) (T)->lpVtbl->Release(T)
+#define IEnumIDList_Next(T,a,b,c) (T)->lpVtbl->Next(T,a,b,c)
+#define IEnumIDList_Skip(T,a) (T)->lpVtbl->Skip(T,a)
+#define IEnumIDList_Reset(T) (T)->lpVtbl->Reset(T)
+#define IEnumIDList_Clone(T,a) (T)->lpVtbl->Clone(T,a)
+#endif
 
 #undef INTERFACE
 #define INTERFACE IContextMenu
@@ -1192,8 +1239,22 @@ typedef struct {
 	UINT fRestFlags : 3;
 } SHELLFLAGSTATE, * LPSHELLFLAGSTATE;
 
+#define SSF_SHOWALLOBJECTS 0x1
+#define SSF_SHOWEXTENSIONS 0x2
+#define SSF_SHOWCOMPCOLOR 0x8
+#define SSF_SHOWSYSFILES 0x20
+#define SSF_DOUBLECLICKINWEBVIEW 0x80
+#define SSF_SHOWATTRIBCOL 0x100
+#define SSF_DESKTOPHTML 0x200
+#define SSF_WIN95CLASSIC 0x400
+#define SSF_DONTPRETTYPATH 0x800
+#define SSF_MAPNETDRVBUTTON 0x1000
+#define SSF_SHOWINFOTIP 0x2000
+#define SSF_HIDEICONS 0x4000
+#define SSF_NOCONFIRMRECYCLE 0x8000
+
 #undef  INTERFACE
-#define INTERFACE   IShellIconOverlayIdentifier
+#define INTERFACE IShellIconOverlayIdentifier
 DECLARE_INTERFACE_(IShellIconOverlayIdentifier,IUnknown)
 {
 	STDMETHOD(QueryInterface)(THIS_ REFIID,PVOID*) PURE;
@@ -1206,7 +1267,6 @@ DECLARE_INTERFACE_(IShellIconOverlayIdentifier,IUnknown)
 
 #define ISIOI_ICONFILE 0x00000001
 #define ISIOI_ICONINDEX 0x00000002
-
 
 #if (_WIN32_WINNT >= 0x0500) /* W2K */
 typedef struct {

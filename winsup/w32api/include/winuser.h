@@ -641,6 +641,14 @@ extern "C" {
 #define MIIM_STRING 64
 #define MIIM_BITMAP 128
 #define MIIM_FTYPE 256
+#if (WINVER >= 0x0500)
+#define MIM_MAXHEIGHT 1
+#define MIM_BACKGROUND 2
+#define MIM_HELPID 4
+#define MIM_MENUDATA 8
+#define MIM_STYLE 16
+#define MIM_APPLYTOSUBMENUS 0x80000000L
+#endif
 #define MFT_BITMAP 4
 #define MFT_MENUBARBREAK 32
 #define MFT_MENUBREAK 64
