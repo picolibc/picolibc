@@ -22,7 +22,7 @@ static char *
 rn (char *dst, int base, int dosign, long long val, int len, int pad)
 {
   /* longest number is ULLONG_MAX, 18446744073709551615, 20 digits */
-  unsigned uval;
+  unsigned long long uval;
   char res[20];
   static const char str[16] = "0123456789ABCDEF";
   int l = 0;

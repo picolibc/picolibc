@@ -468,7 +468,13 @@ format_process_maps (_pinfo *p, char *destbuf, size_t maxsize)
       {
 	char access[5];
 	strcpy (access, "r--p");
+	struct __stat64 st;
 	cygwin_conv_to_full_posix_path (modname, posix_modname);
+	if (stat64 (posix_modname, &st))
+	  {
+	    st.st_dev = 0;
+	    st.st_ino = 0;
+	  }
 	if (len + strlen (posix_modname) + 50 > maxsize - 1)
 	  break;
 	if (workingset)
@@ -485,14 +491,16 @@ format_process_maps (_pinfo *p, char *destbuf, size_t maxsize)
 		}
 	    }
 	int written = __small_sprintf (destbuf + len,
-				"%08lx-%08lx %s %08lx 00:00 %lu   ",
+				"%08lx-%08lx %s %08lx %04x:%04x %U   ",
 				info.lpBaseOfDll,
 				(unsigned long)info.lpBaseOfDll
 				+ info.SizeOfImage,
 				access,
 				info.EntryPoint,
-				info.SizeOfImage);
-	while (written++ < 49)
+				st.st_dev >> 16,
+				st.st_dev & 0xffff,
+				st.st_ino);
+	while (written++ < 61)
 	  destbuf[len + written] = ' ';
         len += written;
 	len += __small_sprintf (destbuf + len, "%s\n", posix_modname);
