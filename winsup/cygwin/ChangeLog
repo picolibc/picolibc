@@ -1,5 +1,9 @@
 2003-07-09  Christopher Faylor  <cgf@redhat.com>
 
+	* include/cygwin/version.h: Bump DLL minor number to 1.
+
+2003-07-09  Christopher Faylor  <cgf@redhat.com>
+
 	* fhandler_proc.cc (fhandler_proc::fill_filebuf): Allocate more space
 	for stat buffer.
 	(format_proc_stat): Reorganize to accumulate and report on all cpus.
