@@ -950,6 +950,10 @@ fhandler_disk_file::fstat (struct stat *buf)
     buf->st_mode |= S_IFDIR;
   if (! get_file_attribute (has_acls (), get_win32_name (), &buf->st_mode))
     {
+      /* If read-only attribute is set, modify ntsec return value */
+      if (local.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
+	buf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
+
       buf->st_mode &= ~S_IFMT;
       if (get_symlink_p ())
 	buf->st_mode |= S_IFLNK;

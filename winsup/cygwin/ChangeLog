@@ -1,3 +1,8 @@
+Sun Feb 18 21:31:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * fhandler.cc (fhandler_disk_file::fstat): Modify get_file_attribute
+        return value if FILE_ATTRIBUTE_READONLY is set.
+
 Mon Feb  7 16:50:44 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in: cygrun needs libshell32.a.
