@@ -1,3 +1,7 @@
+2003-04-07  Michael Snyder  <msnyder@redhat.com>
+
+	* h8300.h (ldc/stc): Fix up src/dst swaps.
+
 2003-04-09  J. Grant  <jg-binutils@jguk.org>
 
 	* mips.h: Correct comment typo.
