@@ -1,3 +1,9 @@
+2004-07-27  Danny Smith  <dannysmith@users.sourceforge.net>
+	
+	* mingwex/math/expl.c (expl): Move body of code to new static
+	function __expl, removing tests for +/-Inf. Extern function
+	expl calls __expl after testing for max, min log thresholds.
+
 2004-07-26  Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* mingwex/stdio/vsscanf.c: Add "edi" to registers-modified field

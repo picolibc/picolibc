@@ -23,26 +23,16 @@
  */
 
 #include <math.h>
+#include "cephes_mconf.h"  /* for max and min log thresholds */
 
 static long double c0 = 1.44268798828125L;
 static long double c1 = 7.05260771340735992468e-6L;
 
-long double
-expl (long double x)
+static long double
+__expl (long double x)
 {
   long double res;
-
-/* I added the following ugly construct because expl(+-Inf) resulted
-   in NaN.  The ugliness results from the bright minds at Intel.
-   For the i686 the code can be written better.
-   -- drepper@cygnus.com.  */
-  asm ("fxam\n\t"		/* Is NaN or +-Inf?  */
-       "fstsw	%%ax\n\t"
-       "movb	$0x45, %%dh\n\t"
-       "andb	%%ah, %%dh\n\t"
-       "cmpb	$0x05, %%dh\n\t"
-       "je	1f\n\t"		/* Is +-Inf, jump.    */
-       "fldl2e\n\t"             /* 1  log2(e)         */
+  asm ("fldl2e\n\t"             /* 1  log2(e)         */
        "fmul %%st(1),%%st\n\t"  /* 1  x log2(e)       */
        "frndint\n\t"            /* 1  i               */
        "fld %%st(1)\n\t"        /* 2  x               */
@@ -66,12 +56,16 @@ expl (long double x)
        "fscale\n\t"	        /* 2 scale factor is st(1); e^x */
        "fstp	%%st(1)\n\t"    /* 1  */
        "fstp	%%st(1)\n\t"    /* 0  */
-       "jmp 2f\n\t"
-       "1:\ttestl	$0x200, %%eax\n\t"	/* Test sign.  */
-       "jz	2f\n\t"		/* If positive, jump.  */
-       "fstp	%%st\n\t"
-       "fldz\n\t"		/* Set result to 0.  */
-       "2:\t\n"
        : "=t" (res) : "0" (x), "m" (c0), "m" (c1) : "ax", "dx");
   return res;
+}
+
+long double expl (long double x)
+{
+  if (x > MAXLOGL)
+    return INFINITY;
+  else if (x < MINLOGL)
+    return 0.0L;
+  else
+    return __expl (x);
 }
