@@ -23,13 +23,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
    gcc and possibly many other programs use this reversed syntax, so
    we're stuck with it.
 
-   eg. `fsub %st(3),%st' results in st <- st - st(3) as expected, but
-   `fsub %st,%st(3)' results in st(3) <- st - st(3), rather than
-   the expected st(3) <- st(3) - st !
+   eg. `fsub %st(3),%st' results in st = st - st(3) as expected, but
+   `fsub %st,%st(3)' results in st(3) = st - st(3), rather than
+   the expected st(3) = st(3) - st
 
    This happens with all the non-commutative arithmetic floating point
    operations with two register operands, where the source register is
-   %st, and destination register is %st(i).  Look for FloatDR below.  */
+   %st, and destination register is %st(i).  See FloatDR below.
+
+   The affected opcode map is dceX, dcfX, deeX, defX.  */
 
 #ifndef UNIXWARE_COMPAT
 /* Set non-zero for broken, compatible instructions.  Set to zero for
@@ -64,6 +66,9 @@ static const template i386_optab[] = {
 #define sld_FP (sld_Suf|IgnoreSize)
 #define sldx_FP (sldx_Suf|IgnoreSize)
 #if UNIXWARE_COMPAT
+/* Someone forgot that the FloatR bit reverses the operation when not
+   equal to the FloatD bit.  ie. Changing only FloatD results in the
+   destination being swapped *and* the direction being reversed.  */
 #define FloatDR FloatD
 #else
 #define FloatDR (FloatD|FloatR)
