@@ -1,3 +1,7 @@
+Thu Jun  1 01:40:20 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* autoload.h: Put each info block in its own dummy static function.
+
 2000-05-31  DJ Delorie  <dj@cygnus.com>
 
 	* include/cygwin/version.h: use decimal, NOT octal

@@ -65,6 +65,10 @@ static int dllname ## _init ()
 #define LoadDLLmangle(name, n) #name "@" #n
 #define LoadDLLfunc(name, n, dllname) LoadDLLfuncEx (name, n, dllname, 0)
 #define LoadDLLfuncEx(name, n, dllname, notimp) \
+extern "C" { \
+static void name##_dummy () __attribute__ ((noreturn)) __attribute__ ((unused)) __attribute__ ((stdcall)); \
+static void name##_dummy () \
+{ \
 __asm__ (".section .data_cygwin_nocopy,\"w\""); \
 __asm__ (".global _" LoadDLLmangle (name, n)); \
 __asm__ (".global _win32_" LoadDLLmangle (name, n)); \
@@ -77,6 +81,8 @@ __asm__ (#name "jump: .long " #dllname "_init_holder"); \
 __asm__ (" .long _" #dllname "_handle"); \
 __asm__ (" .long " #n "+" #notimp); \
 __asm__ (".asciz \"" #name "\""); \
-__asm__ (".text");
+__asm__ (".text"); \
+} \
+}
 
 extern "C" void cygwin_dll_func_load () __asm__ ("cygwin_dll_func_load");
