@@ -132,6 +132,7 @@ DefFrameProcA@20
 DefFrameProcW@20
 DefMDIChildProcA@16
 DefMDIChildProcW@16
+DefRawInputProc@12
 DefWindowProcA@16
 DefWindowProcW@16
 DeferWindowPos@32
@@ -216,10 +217,10 @@ FlashWindow@8
 FlashWindowEx@4
 FrameRect@12
 FreeDDElParam@8
+GetActiveWindow@0
 GetAltTabInfo@20
 GetAltTabInfoA@20	
 GetAltTabInfoW@20	
-GetActiveWindow@0
 GetAncestor@8
 GetAsyncKeyState@4
 GetCapture@0
@@ -308,6 +309,11 @@ GetProcessDefaultLayout@4
 GetProcessWindowStation@0
 GetPropA@8
 GetPropW@8
+GetRawInputBuffer@12
+GetRawInputData@20
+GetRawInputDeviceInfo@16
+GetRawInputDeviceList@12
+GetRegisteredRawInputDevices@12
 GetQueueStatus@4
 GetScrollBarInfo@12
 GetScrollInfo@12
@@ -473,6 +479,7 @@ RegisterClipboardFormatW@4
 RegisterDeviceNotificationA@12
 RegisterDeviceNotificationW@12
 RegisterHotKey@16
+RegisterRawInputDevices@12
 RegisterWindowMessageA@4
 RegisterWindowMessageW@4
 ReleaseCapture@0
