@@ -69,6 +69,12 @@ class path_conv
  public:
 
   unsigned path_flags;
+  char *known_suffix;
+  int error;
+  DWORD devn;
+  int unit;
+  DWORD fileattr;
+  BOOL case_clash;
 
   int isdisk () const { return path_flags & PATH_ISDISK;}
   int isremote () const {return is_remote_drive;}
@@ -80,6 +86,9 @@ class path_conv
   int issymlink () const {return path_flags & PATH_SYMLINK;}
   int issocket () const {return path_flags & PATH_SOCKET;}
   int iscygexec () const {return path_flags & PATH_CYGWIN_EXEC;}
+  bool exists () const {return fileattr != (DWORD) -1;}
+  bool has_attribute (DWORD x) const {return exists () && (fileattr & x);}
+  int isdir () const {return has_attribute (FILE_ATTRIBUTE_DIRECTORY);}
   executable_states exec_state ()
   {
     extern int _check_for_executable;
@@ -100,16 +109,6 @@ class path_conv
   void set_has_acls (int x = 1) {path_flags |= x ? PATH_HASACLS : PATH_NOTHING;}
   void set_has_buggy_open (int x = 1) {path_flags |= x ? PATH_HASBUGGYOPEN : PATH_NOTHING;}
 
-  char *known_suffix;
-
-  int error;
-  DWORD devn;
-  int unit;
-
-  DWORD fileattr;
-
-  BOOL case_clash;
-
   void check (const char *src, unsigned opt = PC_SYM_FOLLOW,
 	      const suffix_info *suffixes = NULL)  __attribute__ ((regparm(3)));
 
@@ -129,6 +128,8 @@ class path_conv
 
   inline char *get_win32 () { return path; }
   operator char *() {return path; }
+  operator DWORD &() {return fileattr; }
+  operator int &() {return (int) fileattr; }
   BOOL is_device () {return devn != FH_BAD;}
   DWORD get_devn () {return devn == FH_BAD ? (DWORD) FH_DISK : devn;}
   short get_unitn () {return devn == FH_BAD ? 0 : unit;}

@@ -2428,8 +2428,7 @@ symlink (const char *topath, const char *frompath)
 
   syscall_printf ("symlink (%s, %s)", topath, win32_path.get_win32 ());
 
-  if (win32_path.is_device () ||
-      win32_path.file_attributes () != (DWORD) -1)
+  if (win32_path.is_device () || win32_path.exists ())
     {
       set_errno (EEXIST);
       goto done;
@@ -2897,7 +2896,7 @@ readlink (const char *path, char *buf, int buflen)
       return -1;
     }
 
-  if (pathbuf.file_attributes () == (DWORD) -1)
+  if (!pathbuf.exists ())
     {
       set_errno (ENOENT);
       return -1;
@@ -3106,8 +3105,9 @@ fchdir (int fd)
       set_errno (EBADF);
       return -1;
     }
+  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "fchdir");
   int ret = chdir (cygheap->fdtab[fd]->get_name ());
-  if (!ret)
+  if (ret == 0)
     {
       /* The name in the fhandler is explicitely overwritten with the full path.
 	 Otherwise fchmod() to a path originally given as a relative path could
@@ -3119,13 +3119,11 @@ fchdir (int fd)
 
 	 The 2nd fchmod should chdir to the same dir as the first call, not
 	 to it's parent dir. */
-      char path[MAX_PATH];
       char posix_path[MAX_PATH];
-      mount_table->conv_to_posix_path (cygheap->cwd.get (path, 0, 1),
-				       posix_path, 0);
-      cygheap->fdtab[fd]->set_name (path, posix_path);
+      cygheap->fdtab.reset_unix_path_name (fd, cygheap->cwd.get (posix_path, 1, 1));
     }
 
+  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "fchdir");
   syscall_printf ("%d = fchdir (%d)", ret, fd);
   return ret;
 }

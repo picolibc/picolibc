@@ -13,6 +13,7 @@ details. */
 
 #include "thread.h"
 
+class suffix_info;
 class dtable
 {
   fhandler_base **fds;
@@ -50,7 +51,8 @@ public:
   fhandler_base *build_fhandler (int fd, DWORD dev, const char *name,
 				 int unit = -1);
   fhandler_base *build_fhandler (int fd, const char *name, HANDLE h = NULL,
-      				 path_conv *pc = NULL);
+      				 path_conv *pc = NULL,
+				 unsigned opts = PC_SYM_FOLLOW, suffix_info *si = NULL);
   inline int not_open (int fd)
   {
     SetResourceLock (LOCK_FD_LIST, READ_LOCK, "not_open");
@@ -60,6 +62,7 @@ public:
     ReleaseResourceLock (LOCK_FD_LIST, READ_LOCK, "not open");
     return res;
   }
+  void reset_unix_path_name (int fd, const char *name);
   int find_unused_handle (int start);
   int find_unused_handle () { return find_unused_handle (first_fd_for_open);}
   void release (int fd);

@@ -24,6 +24,7 @@ details. */
 #include "cygerrno.h"
 #include "security.h"
 #include "fhandler.h"
+#include "path.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "sync.h"

@@ -210,7 +210,8 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle,
 	}
     }
 
-  build_fhandler (fd, name, handle)->init (handle, myaccess, bin);
+  path_conv pc;
+  build_fhandler (fd, name, handle, &pc)->init (handle, myaccess, bin);
   set_std_handle (fd);
   paranoid_printf ("fd %d, handle %p", fd, handle);
 }
@@ -228,7 +229,8 @@ cygwin_attach_handle_to_fd (char *name, int fd, HANDLE handle, mode_t bin,
 }
 
 fhandler_base *
-dtable::build_fhandler (int fd, const char *name, HANDLE handle, path_conv *pc)
+dtable::build_fhandler (int fd, const char *name, HANDLE handle, path_conv *pc,
+    			unsigned opt, suffix_info *si)
 {
   int unit;
   DWORD devn;
@@ -238,7 +240,12 @@ dtable::build_fhandler (int fd, const char *name, HANDLE handle, path_conv *pc)
     devn = get_device_number (name, unit);
   else
     {
-      pc->check (name);
+      pc->check (name, opt | PC_NULLEMPTY, si);
+      if (pc->error)
+	{
+	  set_errno (pc->error);
+	  return NULL;
+	}
       devn = pc->get_devn ();
       unit = pc->get_unitn ();
     }
@@ -268,7 +275,7 @@ dtable::build_fhandler (int fd, const char *name, HANDLE handle, path_conv *pc)
 
   fh = build_fhandler (fd, devn, name, unit);
   if (pc)
-    fh->set_name (name, *pc);
+    fh->set_name (name, *pc, unit);
   return fh;
 }
 
@@ -432,6 +439,14 @@ done:
   syscall_printf ("%d = dup2 (%d, %d)", res, oldfd, newfd);
 
   return res;
+}
+
+void
+dtable::reset_unix_path_name (int fd, const char *name)
+{
+  SetResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "reset_unix_name");
+  fds[fd]->reset_unix_path_name (name);
+  ReleaseResourceLock (LOCK_FD_LIST, WRITE_LOCK | READ_LOCK, "reset_unix_name");
 }
 
 select_record *

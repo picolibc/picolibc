@@ -65,8 +65,7 @@ enum
   FH_W95LSBUG	= 0x00400000,	/* set when lseek is called as a flag that
 				 * _write should check if we've moved beyond
 				 * EOF, zero filling if so. */
-  FH_NOFRNAME	= 0x00800000,	/* Set if shouldn't free unix_path_name and
-				   windows_path_name_ on destruction. */
+  FH_UNUSED	= 0x00800000,	/* currently unused. */
   FH_NOEINTR	= 0x01000000,	/* Set if I/O should be uninterruptible. */
   FH_FFIXUP	= 0x02000000,	/* Set if need to fixup after fork. */
   FH_LOCAL	= 0x04000000,	/* File is unix domain socket */
@@ -187,6 +186,7 @@ public:
   void set_name (const char * unix_path, const char * win32_path = NULL,
 		 int unit = 0);
 
+  void reset_unix_path_name (const char *);
   virtual fhandler_base& operator =(fhandler_base &x);
   fhandler_base (DWORD dev, const char *name = 0, int unit = 0);
   virtual ~fhandler_base ();
@@ -300,10 +300,6 @@ public:
 
   int isremote () { return FHISSETF (ISREMOTE); }
   void set_isremote (int val) { FHCONDSETF (val, ISREMOTE); }
-
-  int no_free_names () { return FHISSETF (NOFRNAME); }
-  void set_no_free_names (int val) { FHCONDSETF (val, NOFRNAME); }
-  void set_no_free_names () { FHSETF (NOFRNAME); }
 
   const char *get_name () { return unix_path_name; }
   const char *get_win32_name () { return win32_path_name; }

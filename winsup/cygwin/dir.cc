@@ -367,79 +367,76 @@ rmdir (const char *dir)
   if (real_dir.error)
     {
       set_errno (real_dir.error);
-      goto done;
+      res = -1;
     }
-
-  /* Does the file exist? */
-  if (real_dir.file_attributes () == (DWORD) -1)
+  else if (!real_dir.exists ())
     {
       set_errno (ENOENT);
-      goto done;
+      res = -1;
     }
-
-  /* Is `dir' a directory? */
-  if  (!(real_dir.file_attributes () & FILE_ATTRIBUTE_DIRECTORY))
+  else if  (!real_dir.isdir ())
     {
       set_errno (ENOTDIR);
-      goto done;
-    }
-
-  /* Even own directories can't be removed if R/O attribute is set. */
-  if (real_dir.file_attributes () & FILE_ATTRIBUTE_READONLY)
-    SetFileAttributes (real_dir.get_win32 (), real_dir.file_attributes () &
-					      ~FILE_ATTRIBUTE_READONLY);
-
-  if (RemoveDirectoryA (real_dir.get_win32 ()))
-    {
-      /* RemoveDirectory on a samba drive doesn't return an error if the
-	 directory can't be removed because it's not empty. Checking for
-	 existence afterwards keeps us informed about success. */
-      if (GetFileAttributesA (real_dir.get_win32 ()) != (DWORD) -1)
-	set_errno (ENOTEMPTY);
-      else
-	res = 0;
+      res = -1;
     }
   else
     {
-      /* This kludge detects if we are attempting to remove the current working
-         directory.  If so, we will move elsewhere to potentially allow the
-	 rmdir to succeed.  This means that cygwin's concept of the current working
-	 directory != Windows concept but, hey, whaddaregonnado?
-	 Note that this will not cause something like the following to work:
-		 $ cd foo
-		 $ rmdir .
-         since the shell will have foo "open" in the above case and so Windows will
-	 not allow the deletion.
-	 FIXME: A potential workaround for this is for cygwin apps to *never* call
-	 SetCurrentDirectory. */
-      if (strcasematch (real_dir, cygheap->cwd.win32)
-	  && !strcasematch ("c:\\", cygheap->cwd.win32))
-	{
-	  DWORD err = GetLastError ();
-	  if (!SetCurrentDirectory ("c:\\"))
-	    SetLastError (err);
-	  else
-	    return rmdir (dir);
-	}
-      if (GetLastError() == ERROR_ACCESS_DENIED)
-	{
+      /* Even own directories can't be removed if R/O attribute is set. */
+      if (real_dir.has_attribute (FILE_ATTRIBUTE_READONLY))
+	SetFileAttributes (real_dir,
+	    		   (DWORD) real_dir & ~FILE_ATTRIBUTE_READONLY);
 
-	  /* On 9X ERROR_ACCESS_DENIED is returned if you try to remove
-	     a non-empty directory. */
-	  if (wincap.access_denied_on_delete ())
+      if (RemoveDirectory (real_dir))
+	{
+	  /* RemoveDirectory on a samba drive doesn't return an error if the
+	     directory can't be removed because it's not empty. Checking for
+	     existence afterwards keeps us informed about success. */
+	  if (GetFileAttributes (real_dir) != (DWORD) -1)
 	    set_errno (ENOTEMPTY);
 	  else
-	    __seterrno ();
+	    res = 0;
 	}
       else
-	__seterrno ();
+	{
+	  /* This kludge detects if we are attempting to remove the current working
+	     directory.  If so, we will move elsewhere to potentially allow the
+	     rmdir to succeed.  This means that cygwin's concept of the current working
+	     directory != Windows concept but, hey, whaddaregonnado?
+	     Note that this will not cause something like the following to work:
+		     $ cd foo
+		     $ rmdir .
+	     since the shell will have foo "open" in the above case and so Windows will
+	     not allow the deletion.
+	     FIXME: A potential workaround for this is for cygwin apps to *never* call
+	     SetCurrentDirectory. */
+	  if (strcasematch (real_dir, cygheap->cwd.win32)
+	      && !strcasematch ("c:\\", cygheap->cwd.win32))
+	    {
+	      DWORD err = GetLastError ();
+	      if (!SetCurrentDirectory ("c:\\"))
+		SetLastError (err);
+	      else if ((res = rmdir (dir)))
+		SetCurrentDirectory (cygheap->cwd.win32);
+	    }
+	  if (GetLastError () == ERROR_ACCESS_DENIED)
+	    {
 
-      /* If directory still exists, restore R/O attribute. */
-      if (real_dir.file_attributes () & FILE_ATTRIBUTE_READONLY)
-	SetFileAttributes (real_dir.get_win32 (), real_dir.file_attributes ());
+	      /* On 9X ERROR_ACCESS_DENIED is returned if you try to remove
+		 a non-empty directory. */
+	      if (wincap.access_denied_on_delete ())
+		set_errno (ENOTEMPTY);
+	      else
+		__seterrno ();
+	    }
+	  else
+	    __seterrno ();
+
+	  /* If directory still exists, restore R/O attribute. */
+	  if (real_dir.has_attribute (FILE_ATTRIBUTE_READONLY))
+	    SetFileAttributes (real_dir, real_dir);
+	}
     }
 
-done:
   syscall_printf ("%d = rmdir (%s)", res, dir);
   return res;
 }
