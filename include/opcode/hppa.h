@@ -70,9 +70,9 @@ struct pa_opcode
 
    In the args field, the following characters are unused:
 
-	' !"#$%&   *+- ./          :;< > @'
-	'            M       U     [\]  '
-	'a  d                      {|}~'
+	'  "# %&   *+-  /          :;< > @'
+	'  C        LM       U   YZ[\]  '
+	'a  d       l              {|} '
 
    Here are all the characters:
 
@@ -88,9 +88,6 @@ Kinds of operands:
    5    5 bit immediate at 15.
    s    2 bit space specifier at 17.
    S    3 bit space specifier at 18.
-   c    indexed load completer.
-   C    short load and store completer.
-   Y	Store Bytes Short completer
    V    5 bit immediate value at 31
    i    11 bit immediate value at 31
    j    14 bit immediate value at 31
@@ -138,14 +135,17 @@ Condition operands all have '?' as the prefix:
 
 Also these:
 
+   .    2 bit shift amount at 25
    p    5 bit shift count at 26 (to support the SHD instruction) encoded as
         31-p
+   ~    6 bit shift count at 20,22:26 encoded as 63-~.
    P    5 bit bit position at 26
    T    5 bit field length at 31 (encoded as 32-T)
    A    13 bit immediate at 18 (to support the BREAK instruction)
    ^	like b, but describes a control register
-   Z    System Control Completer (to support LPA, LHA, etc.)
+   !    sar (cr11) register
    D    26 bit immediate at 31 (to support the DIAG instruction)
+   $    9 bit immediate at 28 (to support POPBTS)
 
    f    3 bit Special Function Unit identifier at 25
    O    20 bit Special Function Unit operation split between 15 bits at 20
@@ -163,8 +163,6 @@ Also these:
 	(for 0xe format FP instructions)
    G    Destination Floating Point Operand Format Completer encoded 2 bits at 18
 
-   s    2 bit space specifier at 17.
-   b    register field at 10.
    r	5 bit immediate value at 31 (for the break instruction)
 	(very similar to V above, except the value is unsigned instead of
 	low_sign_ext)
@@ -299,9 +297,13 @@ static const struct pa_opcode pa_opcodes[] =
 { "addbf",	0xa8000000, 0xfc000000, "?dnx,b,w", pa10},
 { "addibt",	0xa4000000, 0xfc000000, "?dn5,b,w", pa10},
 { "addibf",	0xac000000, 0xfc000000, "?dn5,b,w", pa10},
+{ "bb",		0xc0006000, 0xffe06000, "?Bnx,!,w", pa20, FLAG_STRICT}, 
+{ "bb",		0xc0004000, 0xffe06000, "?bnx,!,w", pa10, FLAG_STRICT}, 
+{ "bb",		0xc4006000, 0xfc006000, "?Bnx,Q,w", pa20, FLAG_STRICT}, 
 { "bb",		0xc4004000, 0xfc004000, "?bnx,Q,w", pa10}, 
 { "bvb",	0xc0004000, 0xffe04000, "?bnx,w", pa10},
 { "clrbts",	0xe8004005, 0xffffffff, "", pa20, FLAG_STRICT},
+{ "popbts",	0xe8004005, 0xfffff007, "$", pa20, FLAG_STRICT},
 { "pushnom",	0xe8004001, 0xffffffff, "", pa20, FLAG_STRICT},
 { "pushbts",	0xe8004001, 0xffe0ffff, "x", pa20, FLAG_STRICT},
 
@@ -357,8 +359,19 @@ static const struct pa_opcode pa_opcodes[] =
 { "sh3addl",    0x08000ac0, 0xfc000fe0, "?ax,b,t", pa10},
 { "sh3addo",    0x08000ec0, 0xfc000fe0, "?ax,b,t", pa10},
 
+/* Subword Operation Instructions */
+
+{ "havg",       0x080002c0, 0xfc00ffe0, "x,b,t", pa20, FLAG_STRICT},
+{ "hshladd",    0x08000700, 0xfc00ff20, "x,.,b,t", pa20, FLAG_STRICT},
+{ "hshradd",    0x08000500, 0xfc00ff20, "x,.,b,t", pa20, FLAG_STRICT},
+
+
 /* Extract and Deposit Instructions */
 
+{ "shrpd",      0xd0000200, 0xfc001fe0, "?Xx,b,!,t", pa20, FLAG_STRICT},
+{ "shrpd",      0xd0000400, 0xfc001400, "?Xx,b,~,t", pa20, FLAG_STRICT},
+{ "shrpw",      0xd0000000, 0xfc001fe0, "?xx,b,!,t", pa10, FLAG_STRICT},
+{ "shrpw",      0xd0000800, 0xfc001c00, "?xx,b,p,t", pa10, FLAG_STRICT},
 { "vshd",       0xd0000000, 0xfc001fe0, "?xx,b,t", pa10},
 { "shd",        0xd0000800, 0xfc001c00, "?xx,b,p,t", pa10},
 { "vextru",     0xd0001000, 0xfc001fe0, "?xb,T,x", pa10},
