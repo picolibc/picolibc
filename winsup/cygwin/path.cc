@@ -705,7 +705,7 @@ path_conv::check (const char *src, unsigned opt,
 		  saw_symlinks = 1;
 		  if (component == 0 && !need_directory && !(opt & PC_SYM_FOLLOW))
 		    {
-		      set_symlink (); // last component of path is a symlink.
+		      set_symlink (symlen); // last component of path is a symlink.
 		      if (opt & PC_SYM_CONTENTS)
 			{
 			  strcpy (path, sym.contents);

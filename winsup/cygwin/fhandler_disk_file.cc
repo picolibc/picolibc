@@ -282,6 +282,7 @@ fhandler_base::fstat_helper (struct __stat64 *buf,
     buf->st_mode = S_IFDIR;
   else if (pc.issymlink ())
     {
+      buf->st_size = pc.get_symlink_length ();
       /* symlinks are everything for everyone! */
       buf->st_mode = S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO;
       get_file_attribute (pc.has_acls (), get_io_handle (), get_win32_name (),

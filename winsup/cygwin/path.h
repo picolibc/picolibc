@@ -162,7 +162,7 @@ class path_conv
   }
 
   void set_binary () {path_flags |= PATH_BINARY;}
-  void set_symlink () {path_flags |= PATH_SYMLINK;}
+  void set_symlink (DWORD n) {path_flags |= PATH_SYMLINK; symlink_length = n;}
   void set_has_symlinks () {path_flags |= PATH_HAS_SYMLINKS;}
   void set_isdisk () {path_flags |= PATH_ISDISK; dev.devn = FH_FS;}
   void set_exec (int x = 1) {path_flags |= x ? PATH_EXEC : PATH_NOTEXEC;}
@@ -215,7 +215,9 @@ class path_conv
   char *normalized_path;
   size_t normalized_path_size;
   void set_normalized_path (const char *) __attribute__ ((regparm (2)));
+  DWORD get_symlink_length () { return symlink_length; };
  private:
+  DWORD symlink_length;  
   char path[CYG_MAX_PATH];
 };
 
