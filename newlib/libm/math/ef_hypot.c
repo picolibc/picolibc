@@ -41,8 +41,8 @@
 	       if(FLT_UWORD_IS_INFINITE(hb)) w = b;
 	       return w;
 	   }
-	   /* scale a and b by 2**-60 */
-	   ha -= 0x5d800000L; hb -= 0x5d800000L;	k += 60;
+	   /* scale a and b by 2**-68 */
+	   ha -= 0x22000000L; hb -= 0x22000000L;	k += 68;
 	   SET_FLOAT_WORD(a,ha);
 	   SET_FLOAT_WORD(b,hb);
 	}
@@ -54,10 +54,10 @@
 		b *= t1;
 		a *= t1;
 		k -= 126;
-	    } else {		/* scale a and b by 2^60 */
-	        ha += 0x5d800000; 	/* a *= 2^60 */
-		hb += 0x5d800000;	/* b *= 2^60 */
-		k -= 60;
+	    } else {		/* scale a and b by 2^68 */
+	        ha += 0x22000000; 	/* a *= 2^68 */
+		hb += 0x22000000;	/* b *= 2^68 */
+		k -= 68;
 		SET_FLOAT_WORD(a,ha);
 		SET_FLOAT_WORD(b,hb);
 	    }
