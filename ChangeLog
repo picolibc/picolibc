@@ -1,5 +1,10 @@
 2004-10-19  Andrew Cagney  <cagney@gnu.org>
 
+	* src-release (do-djunpack, do-md5sum): Install the generated file
+	directly into the proto-toplev/ directory.
+	
+2004-10-19  Andrew Cagney  <cagney@gnu.org>
+
 	* src-release (GDB_SUPPORT_DIRS): Remove utils and intl.
 
 2004-10-12  Kelley Cook  <kcook@gcc.gnu.org>
