@@ -226,7 +226,7 @@ setsid (void)
   return -1;
 }
 
-extern "C" int
+extern "C" ssize_t
 _read (int fd, void *ptr, size_t len)
 {
   sigframe thisframe (mainthread);
@@ -280,7 +280,7 @@ out:
   return res;
 }
 
-extern "C" int
+extern "C" ssize_t
 _write (int fd, const void *ptr, size_t len)
 {
   int res = -1;

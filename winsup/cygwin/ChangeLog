@@ -1,3 +1,10 @@
+Wed Mar  7 15:49:47 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* syscalls.cc (_read): Change definition to return ssize_t to be
+	consistent with read.
+	(_write): Change definition to return ssize_t to be consistent with
+	write.
+
 Wed Mar  7 01:08:21 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* sigproc.h (sigthread): Declare new methods.  Create new winapi_lock
