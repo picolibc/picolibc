@@ -3281,13 +3281,10 @@ ULONGLONG WINAPI VerSetConditionMask(ULONGLONG,DWORD,BYTE);
 #if defined(__GNUC__)
 
 PVOID GetCurrentFiber(void);
-PVOID GetFiberData(void);
-
-PVOID GetCurrentFiber(void);
 extern __inline__ PVOID GetCurrentFiber(void)
 {
     void* ret;
-    __asm__ volatile (
+    __asm__ __volatile__ (
 	"movl	%%fs:0x10,%0"
 	: "=r" (ret) /* allow use of reg eax,ebx,ecx,edx,esi,edi */
 	);
@@ -3298,7 +3295,7 @@ PVOID GetFiberData(void);
 extern __inline__ PVOID GetFiberData(void)
 {
     void* ret;
-    __asm__ volatile (
+    __asm__ __volatile__ (
 	"movl	%%fs:0x10,%0\n"
 	"movl	(%0),%0"
 	: "=r" (ret) /* allow use of reg eax,ebx,ecx,edx,esi,edi */
