@@ -108,18 +108,7 @@ fhandler_disk_file::fstat_by_name (struct __stat64 *buf, path_conv *pc)
       set_errno (ENOENT);
       res = -1;
     }
-  else if (pc->isdir () && strlen (*pc) <= strlen (pc->root_dir ()))
-    {
-      FILETIME ft = {};
-      res = fstat_helper (buf, pc, ft, ft, ft, 0, 0);
-    }
-  else if ((handle = FindFirstFile (*pc, &local)) == INVALID_HANDLE_VALUE)
-    {
-      debug_printf ("FindFirstFile failed for '%s', %E", (char *) *pc);
-      __seterrno ();
-      res = -1;
-    }
-  else
+  else if ((handle = FindFirstFile (*pc, &local)) != INVALID_HANDLE_VALUE)
     {
       FindClose (handle);
       res = fstat_helper (buf, pc,
@@ -128,6 +117,17 @@ fhandler_disk_file::fstat_by_name (struct __stat64 *buf, path_conv *pc)
 			  local.ftLastWriteTime,
 			  local.nFileSizeHigh,
 			  local.nFileSizeLow);
+    }
+  else if (pc->isdir ())
+    {
+      FILETIME ft = {};
+      res = fstat_helper (buf, pc, ft, ft, ft, 0, 0);
+    }
+  else 
+    {
+      debug_printf ("FindFirstFile failed for '%s', %E", (char *) *pc);
+      __seterrno ();
+      res = -1;
     }
   return res;
 }

@@ -1,3 +1,8 @@
+2003-06-01  Pierre Humblet  <pierre.humblet@ieee.org>
+
+        * fhandler_disk_file.cc (fhandler_disk_file::fstat_by_name): Assume
+        an existing directory is a root if FindFirstFile fails.
+
 2003-05-30  Christopher Faylor  <cgf@redhat.com>
 
 	* path.cc (mount_info::conv_to_win32_path): gcc warning about chroot_ok
