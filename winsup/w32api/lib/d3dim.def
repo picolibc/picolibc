@@ -1,5 +1,5 @@
 ; from DirectX 6.1
-LIBRARY "d3dim.dll"
+LIBRARY d3dim.dll
 EXPORTS
 Direct3DCreate@12
 Direct3D_HALCleanUp@8

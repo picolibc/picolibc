@@ -1,5 +1,5 @@
 ; from DirectX 6.1
-LIBRARY "d3drm.dll"
+LIBRARY d3drm.dll
 EXPORTS
 D3DRMColorGetAlpha@4
 D3DRMColorGetBlue@4

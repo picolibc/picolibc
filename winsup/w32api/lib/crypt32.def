@@ -1,4 +1,4 @@
-LIBRARY "CRYPT32.DLL"
+LIBRARY CRYPT32.DLL
 EXPORTS
 CertFreeCertificateChain@4
 CertGetCertificateChain@32

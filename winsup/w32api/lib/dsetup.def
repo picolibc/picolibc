@@ -1,5 +1,5 @@
 ; from DirectX 6.1
-LIBRARY "DSETUP.dll"
+LIBRARY DSETUP.dll
 EXPORTS
 DirectXDeviceDriverSetupA@16
 DirectXDeviceDriverSetupW@16

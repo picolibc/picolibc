@@ -1,5 +1,5 @@
 ; from DirectX 6.1
-LIBRARY "DSOUND.dll"
+LIBRARY DSOUND.dll
 EXPORTS
 DirectSoundCaptureCreate@12
 DirectSoundCaptureEnumerateA@8

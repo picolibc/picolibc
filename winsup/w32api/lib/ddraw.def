@@ -1,5 +1,5 @@
 ; from DirectX 6.1
-LIBRARY "DDRAW.dll"
+LIBRARY DDRAW.dll
 EXPORTS
 D3DParseUnknownCommand@8
 DDHAL32_VidMemAlloc@16

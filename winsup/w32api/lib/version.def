@@ -1,4 +1,4 @@
-LIBRARY "VERSION.dll"
+LIBRARY VERSION.dll
 EXPORTS
 GetFileVersionInfoA@16
 GetFileVersionInfoSizeA@8

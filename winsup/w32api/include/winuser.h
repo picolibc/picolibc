@@ -460,7 +460,7 @@ extern "C" {
 #if (WINVER >= 0x0500)
 #define DFCS_TRANSPARENT	0x800
 #define DFCS_HOT	0x1000
-#endif /* WINVER >= 0x0500 */
+#endif /* (WINVER >= 0x0500) */
 #define DFCS_ADJUSTRECT	0x2000
 #define DFCS_FLAT	0x4000
 #define DFCS_MONO	0x8000
@@ -555,7 +555,7 @@ extern "C" {
 #define EWX_POWEROFF 8
 #define EWX_REBOOT 2
 #define EWX_SHUTDOWN 1
-#if(_WIN32_WINNT >= 0x0500)
+#if (_WIN32_WINNT >= 0x0500)
 #define EWX_FORCEIFHUNG 16
 #endif
 #define CS_BYTEALIGNCLIENT 4096
@@ -724,12 +724,12 @@ extern "C" {
 #define IDYES 6
 #define IDNO 7
 #if (WINVER >= 0x0400)
-#  define IDCLOSE 8
-#  define IDHELP 9
+#define IDCLOSE 8
+#define IDHELP 9
 #endif
 #if (WINVER >= 0x0500)
-#  define IDTRYAGAIN 10
-#  define IDCONTINUE 11
+#define IDTRYAGAIN 10
+#define IDCONTINUE 11
 #endif
 
 #define GWL_EXSTYLE (-20)
@@ -902,9 +902,9 @@ extern "C" {
 #define SM_CMONITORS 80
 #define SM_SAMEDISPLAYFORMAT 81
 #if (_WIN32_WINNT < 0x0400)
-#define SM_CMETRICS 76
+# define SM_CMETRICS 76
 #else
-#define SM_CMETRICS 83
+# define SM_CMETRICS 83
 #endif
 #define ARW_BOTTOMLEFT 0
 #define ARW_BOTTOMRIGHT 1
@@ -933,7 +933,7 @@ extern "C" {
 #define LR_SHARED 32768
 #define KEYEVENTF_EXTENDEDKEY 0x00000001
 #define KEYEVENTF_KEYUP 00000002
-#if(_WIN32_WINNT >= 0x0500)
+#if (_WIN32_WINNT >= 0x0500)
 #define KEYEVENTF_UNICODE 0x00000004
 #define KEYEVENTF_SCANCODE 0x00000008
 #endif
@@ -1263,7 +1263,7 @@ extern "C" {
 #define WM_MDISETMENU 560
 #define WM_MDITILE 550
 #define WM_MEASUREITEM 44
-#if(WINVER >= 0x0500)
+#if (WINVER >= 0x0500)
 #define WM_MENURBUTTONUP 290
 #endif
 #define WM_MENUCHAR 288
@@ -1365,7 +1365,7 @@ extern "C" {
 #define WM_MOUSELAST 522
 #define WM_MOUSEHOVER	0x2A1
 #define WM_MOUSELEAVE	0x2A3
-#if(_WIN32_WINNT >= 0x0400)
+#if (_WIN32_WINNT >= 0x0400)
 #define WHEEL_DELTA 120
 #define GET_WHEEL_DELTA_WPARAM(wparam) ((short)HIWORD (wparam))
 #define WHEEL_PAGESCROLL UINT_MAX
@@ -2038,8 +2038,8 @@ extern "C" {
 #define INPUT_HARDWARE 2
 #define CURSOR_SHOWING 0x00000001
 #if (WINVER >= 0x0400)
-#define ENDSESSION_LOGOFF    0x80000000
-#endif /* WINVER >= 0x0400 */
+#define ENDSESSION_LOGOFF 0x80000000
+#endif /* (WINVER >= 0x0400) */
 #if (WINVER >= 0x0500)
 #define CHILDID_SELF 0
 #define OBJID_WINDOW 0x00000000
@@ -2804,7 +2804,7 @@ typedef struct tagKBDLLHOOKSTRUCT {
 	DWORD time;
 	DWORD dwExtraInfo;
 } KBDLLHOOKSTRUCT, FAR *LPKBDLLHOOKSTRUCT, *PKBDLLHOOKSTRUCT;
-#if(WINVER >= 0x0500)
+#if (WINVER >= 0x0500)
 typedef struct {
   UINT  cbSize;
   HWND  hwnd;
@@ -2883,9 +2883,9 @@ typedef struct tagGUITHREADINFO {
 HKL WINAPI ActivateKeyboardLayout(HKL,UINT);
 BOOL WINAPI AdjustWindowRect(LPRECT,DWORD,BOOL);
 BOOL WINAPI AdjustWindowRectEx(LPRECT,DWORD,BOOL,DWORD);
-#if (WINVER >= 0x0500)
+#if (_WIN32_WINNT >= 0x0500)
 BOOL WINAPI AnimateWindow(HWND,DWORD,DWORD);
-#endif /* (WINVER >= 0x0500) */
+#endif /* (_WIN32_WINNT >= 0x0500) */
 BOOL WINAPI AnyPopup(void);
 BOOL WINAPI AppendMenuA(HMENU,UINT,UINT_PTR,LPCSTR);
 BOOL WINAPI AppendMenuW(HMENU,UINT,UINT_PTR,LPCWSTR);
@@ -2989,6 +2989,7 @@ LRESULT WINAPI DefMDIChildProcW(HWND,UINT,WPARAM,LPARAM);
 LRESULT WINAPI DefWindowProcA(HWND,UINT,WPARAM,LPARAM);
 LRESULT WINAPI DefWindowProcW(HWND,UINT,WPARAM,LPARAM);
 BOOL WINAPI DeleteMenu(HMENU,UINT,UINT);
+BOOL WINAPI DeregisterShellHookWindow(HWND);
 BOOL WINAPI DestroyAcceleratorTable(HACCEL);
 BOOL WINAPI DestroyCaret(void);
 BOOL WINAPI DestroyCursor(HCURSOR);
@@ -3037,6 +3038,9 @@ BOOL WINAPI EndDeferWindowPos(HDWP);
 BOOL WINAPI EndDialog(HWND,int);
 BOOL WINAPI EndMenu(VOID);
 BOOL WINAPI EndPaint(HWND,const PAINTSTRUCT*);
+#if (_WIN32_WINNT >= 0x0500)
+BOOL WINAPI EndTask(HWND,BOOL,BOOL);
+#endif
 BOOL WINAPI EnumChildWindows(HWND,ENUMWINDOWSPROC,LPARAM);
 UINT WINAPI EnumClipboardFormats(UINT);
 BOOL WINAPI EnumDesktopsA(HWINSTA,DESKTOPENUMPROCA,LPARAM);
@@ -3454,17 +3458,17 @@ int WINAPIV wsprintfA(LPSTR,LPCSTR,...);
 int WINAPIV wsprintfW(LPWSTR,LPCWSTR,...);
 int WINAPI wvsprintfA(LPSTR,LPCSTR,va_list arglist);
 int WINAPI wvsprintfW(LPWSTR,LPCWSTR,va_list arglist);
-#if(_WIN32_WINNT >= 0x0500  || _WIN32_WINDOWS >= 0x0490)
+#if (_WIN32_WINNT >= 0x0500  || _WIN32_WINDOWS >= 0x0490)
 BOOL WINAPI AllowSetForegroundWindow(DWORD);
 BOOL WINAPI LockSetForegroundWindow(UINT);
 #endif
-#if(_WIN32_WINNT >= 0x0500)
+#if (_WIN32_WINNT >= 0x0500)
 BOOL WINAPI SetLayeredWindowAttributes(HWND,COLORREF,BYTE,DWORD);
 #ifndef NOGDI
 BOOL WINAPI UpdateLayeredWindow(HWND,HDC,POINT*,SIZE*,HDC,POINT*,COLORREF,BLENDFUNCTION*,DWORD);
 #endif
 #endif
-#if(_WIN32_WINNT >= 0x0501)
+#if (_WIN32_WINNT >= 0x0501)
 BOOL WINAPI GetLayeredWindowAttributes(HWND,COLORREF*,BYTE*,DWORD*);
 #endif
 #ifdef UNICODE

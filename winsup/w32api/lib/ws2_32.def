@@ -1,4 +1,4 @@
-LIBRARY "WS2_32.DLL"
+LIBRARY WS2_32.DLL
 EXPORTS
 WEP@0
 WPUCompleteOverlappedRequest@20

@@ -1,5 +1,20 @@
 2003-09-25  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
 
+	* include/winuser.h (DeregisterShellHookWindow): Add function.
+
+	* include/winuser.h [_WIN32_WINNT >= 0x0500] (EndTask): Add function.
+
+	* lib/user32.def (EndTask): Add function.
+
+	* include/winuser.h (WINVER, _WIN32_WINNT): It's better (?) to
+	use _WIN32_WINNT instead of WINVER to test for Windows 2000.
+
+	* include/winable.h: Reorder target macros.
+
+	* lib/*.def: Cleanup.
+
+2003-09-25  Dimitri Papadopoulos  <papadopo@users.sourceforge.net>
+
 	* include/winuser.h [WINVER >= 0x0500] (AnimateWindow): Add
 	function.
 

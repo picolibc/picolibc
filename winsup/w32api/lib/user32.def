@@ -131,6 +131,7 @@ DefWindowProcA@16
 DefWindowProcW@16
 DeferWindowPos@32
 DeleteMenu@12
+DeregisterShellHookWindow@4
 DestroyAcceleratorTable@4
 DestroyCaret@0
 DestroyCursor@4
@@ -177,6 +178,7 @@ EndDeferWindowPos@4
 EndDialog@8
 EndMenu@0
 EndPaint@8
+EndTask@12
 EnumChildWindows@12
 EnumClipboardFormats@4
 EnumDesktopWindows@12

@@ -8,12 +8,12 @@
 extern "C" {
 #endif
 
+#if (WINVER < 0x0500)
 #if (_WIN32_WINNT < 0x0403)
 #define INPUT_MOUSE 0
 #define INPUT_KEYBOARD 1
 #define INPUT_HARDWARE 2
 #endif /* (_WIN32_WINNT < 0x04030) */
-#if (WINVER < 0x0500)
 #define CHILDID_SELF 0
 #define OBJID_WINDOW 0x00000000
 #define OBJID_SYSMENU 0xFFFFFFFF
