@@ -154,16 +154,16 @@ check_null_str_errno (const char *name)
 }
 
 int __stdcall
-__check_null_invalid_struct (const void *s, unsigned sz)
+__check_null_invalid_struct (void *s, unsigned sz)
 {
-  if (s && !IsBadWritePtr ((void *) s, sz))
+  if (s && !IsBadWritePtr (s, sz))
     return 0;
 
   return EFAULT;
 }
 
 int __stdcall
-__check_null_invalid_struct_errno (const void *s, unsigned sz)
+__check_null_invalid_struct_errno (void *s, unsigned sz)
 {
   int err;
   if ((err = __check_null_invalid_struct (s, sz)))
@@ -174,7 +174,7 @@ __check_null_invalid_struct_errno (const void *s, unsigned sz)
 int __stdcall
 __check_invalid_read_ptr_errno (const void *s, unsigned sz)
 {
-  if (s && !IsBadReadPtr ((void *) s, sz))
+  if (s && !IsBadReadPtr (s, sz))
     return 0;
   return set_errno (EFAULT);
 }

@@ -915,6 +915,8 @@ fhandler_socket::sendmsg (const struct msghdr *msg, int flags)
 int
 fhandler_socket::shutdown (int how)
 {
+  sigframe thisframe (mainthread);
+
   int res = ::shutdown (get_socket (), how);
 
   if (res)

@@ -157,7 +157,7 @@ getrlimit (int resource, struct rlimit *rlp)
 extern "C" int
 setrlimit (int resource, const struct rlimit *rlp)
 {
-  if (check_null_invalid_struct_errno (rlp))
+  if (__check_invalid_read_ptr_errno (rlp, sizeof (*rlp)))
     return -1;
 
   struct rlimit oldlimits;

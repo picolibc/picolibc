@@ -1,3 +1,29 @@
+2002-08-07  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* winsup.h (__check_null_invalid_struct): Make ptr argument non-const.
+	(__check_null_invalid_struct_errno): Ditto.
+	* miscfuncs.cc (__check_null_invalid_struct): Ditto.
+	(__check_null_invalid_struct_errno): Ditto.
+	(__check_invalid_read_ptr_errno): Remove superfluous cast.
+	* net.cc (get): Set appropriate errno if fd is not a socket.
+	(cygwin_sendto): Fix parameter checking.
+	(cygwin_recvfrom): Ditto.
+	(cygwin_setsockopt): Ditto.
+	(cygwin_getsockopt): Ditto.
+	(cygwin_connect): Ditto.
+	(cygwin_gethostbyaddr): Ditto.
+	(cygwin_accept): Ditto.
+	(cygwin_bind): Ditto.
+	(cygwin_getsockname): Ditto.
+	(cygwin_listen): Ditto.
+	(cygwin_getpeername): Ditto.
+	(cygwin_send): Ditto.
+	(cygwin_shutdown): Ditto.  Move sigframe to fhandler_socket.
+	(cygwin_recvmsg): Fix parameter checking.  Add tracing.
+	(cygwin_sendmsg): Ditto.
+	* fhandler_socket.cc (fhandler_socket::shutdown): Add sigframe.
+	* resource.cc (setrlimit): Fix parameter checking.
+
 2002-08-08  Joe Buehler  <jbuehler@hekimian.com
 
 	* sec_helper.cc (sec_acl): remove extraneous arg to debug_printf.
