@@ -843,8 +843,8 @@ fhandler_socket::recvfrom (void *ptr, size_t len, int flags,
 	    {
               do
                 {
-		  res = WSARecvFrom (get_socket (), &wsabuf, 1,
-				     &ret, (DWORD *) &flags,
+		  DWORD lflags = (DWORD) flags;
+		  res = WSARecvFrom (get_socket (), &wsabuf, 1, &ret, &lflags,
 				     from, fromlen, NULL, NULL);
                 }
               while (res == SOCKET_ERROR
@@ -895,8 +895,7 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
   if (!winsock2_active)
     {
       if (iovcnt == 1)
-	res = recvfrom (iov->iov_base, iov->iov_len, flags,
-			from, fromlen);
+	res = recvfrom (iov->iov_base, iov->iov_len, flags, from, fromlen);
       else
 	{
 	  if (tot == -1)	// i.e. if not pre-calculated by the caller.
@@ -920,8 +919,7 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
 	    }
 	  else
 	    {
-	      res = recvfrom (buf, tot, flags,
-			      from, fromlen);
+	      res = recvfrom (buf, tot, flags, from, fromlen);
 
 	      const struct iovec *iovptr = iov;
 	      int nbytes = res;
@@ -958,9 +956,8 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
       DWORD ret;
 
       if (is_nonblocking () || closed () || async_io ())
-	res = WSARecvFrom (get_socket (),
-			   wsabuf, iovcnt, (ret = 0, &ret), (DWORD *) &flags,
-			   from, fromlen, NULL, NULL);
+	res = WSARecvFrom (get_socket (), wsabuf, iovcnt, (ret = 0, &ret),
+			   (DWORD *) &flags, from, fromlen, NULL, NULL);
       else
 	{
 	  HANDLE evt;
@@ -968,9 +965,9 @@ fhandler_socket::recvmsg (struct msghdr *msg, int flags, ssize_t tot)
 	    {
               do
                 {
-		  res = WSARecvFrom (get_socket (), wsabuf, iovcnt,
-				     &ret, (DWORD *) &flags,
-				     from, fromlen, NULL, NULL);
+		  DWORD lflags = (DWORD) flags;
+		  res = WSARecvFrom (get_socket (), wsabuf, iovcnt, &ret,
+				     &lflags, from, fromlen, NULL, NULL);
                 }
               while (res == SOCKET_ERROR
 		     && WSAGetLastError () == WSAEWOULDBLOCK
