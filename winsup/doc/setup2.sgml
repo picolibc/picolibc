@@ -83,8 +83,7 @@ above.
 <para> Under Windows NT, if you want to create 
 <filename>/etc/passwd</filename> and <filename>/etc/group</filename> 
 (i.e. so that <command>whoami</command> works and 
-<command>ls -l</command> replaces the UID with a name) just
-do this:
+<command>ls -l</command> replaces the UID with a name) based on the accounts local to the machine, just do this:
 </para>
 
 <screen>
@@ -93,7 +92,30 @@ do this:
 <prompt>/etc$</prompt> <userinput>mkgroup -l > /etc/group</userinput>
 </screen>
 
-<para> Future changes to your NT registry will NOT be reflected in
+<para>If you are logging in based on an NT network domain, and want to
+also create entries in <filename>/etc/passwd</filename> and
+<filename>/etc/group</filename> based on all the accounts in the
+domain, then after creating local entries do this:
+</para>
+
+<screen>
+<prompt>/$</prompt> <userinput>cd /etc</userinput>
+<prompt>/etc$</prompt> <userinput>mkpasswd -d >> /etc/passwd</userinput>
+<prompt>/etc$</prompt> <userinput>mkgroup -d >> /etc/group</userinput>
+</screen>
+
+<para>Alternatively, to add only your account to the passwd file,
+assuming your NT name is "my_ntusername", instead of the above
+<command>mkpasswd</command> you should do:
+</para>
+ 
+<screen>
+<prompt>/$</prompt> <userinput>cd /etc</userinput>
+<prompt>/etc$</prompt> <userinput>mkpasswd -d | grep my_ntusername >> /etc/passwd</userinput>
+</screen>
+
+
+<para> Future changes to your NT registry or network domain will NOT be reflected in
 <filename>/etc/passwd</filename> or <filename>/etc/group </filename> after
 this so you may want to regenerate these files periodically.  Under Windows
 9x, you can create and edit these files with a text editor.  </para>

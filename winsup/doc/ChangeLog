@@ -1,3 +1,7 @@
+2001-02-07  Eric M. Monsler  <emonsler@beamreachnetworks.com>
+
+	* setup2.sgml: Add docs about domain accounts.
+
 Thu Dec 21 15:03:29 2000  Edward M. Lee <tailbert@yahoo.com>
 
 	* cygwinenv.sgml: Fix typo in <filename>. Add missing </para>.
