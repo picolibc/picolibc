@@ -1,3 +1,7 @@
+2003-03-06  Andrew Cagney  <cagney@redhat.com>
+
+	* texinfo/texinfo.tex: Import version 2003-02-03.16.
+
 2003-03-04  Daniel Jacobowitz  <drow@mvista.com>
 	
 	* configure.in: Include $(build_tooldir)/sys-include in
