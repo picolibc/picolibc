@@ -438,6 +438,11 @@ public:
 
   virtual unsigned long getsequence_np();
 
+  static int equal (pthread_t t1, pthread_t t2)
+  {
+    return t1 == t2;
+  }
+
 private:
   DWORD thread_id;
   __pthread_cleanup_handler *cleanup_stack;

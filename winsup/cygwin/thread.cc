@@ -373,7 +373,7 @@ pthread::exit (void *value_ptr)
 
   mutex.lock ();
   // cleanup if thread is in detached state and not joined
-  if (pthread_equal (joiner, thread))
+  if (equal (joiner, thread))
     delete this;
   else
     {
@@ -404,7 +404,7 @@ pthread::cancel (void)
       return 0;
     }
 
-  else if (pthread_equal (thread, self))
+  else if (equal (thread, self))
     {
       mutex.unlock ();
       cancel_self ();
@@ -1446,7 +1446,7 @@ pthread_mutex::can_be_unlocked (pthread_mutex_t const *mutex)
   /*
    * Check if the mutex is owned by the current thread and can be unlocked
    */
-  return ((*mutex)->recursion_counter == 1 && pthread_equal ((*mutex)->owner, self));
+  return ((*mutex)->recursion_counter == 1 && pthread::equal ((*mutex)->owner, self));
 }
 
 List<pthread_mutex> pthread_mutex::mutexes;
@@ -1508,7 +1508,7 @@ pthread_mutex::_lock (pthread_t self)
 
   if (InterlockedIncrement ((long *)&lock_counter) == 1)
     set_owner (self);
-  else if (type != PTHREAD_MUTEX_NORMAL && pthread_equal (owner, self))
+  else if (type != PTHREAD_MUTEX_NORMAL && pthread::equal (owner, self))
     {
       InterlockedDecrement ((long *) &lock_counter);
       if (type == PTHREAD_MUTEX_RECURSIVE)
@@ -1532,7 +1532,7 @@ pthread_mutex::_trylock (pthread_t self)
 
   if (InterlockedCompareExchange ((long *)&lock_counter, 1, 0 ) == 0)
     set_owner (self);
-  else if (type == PTHREAD_MUTEX_RECURSIVE && pthread_equal (owner, self))
+  else if (type == PTHREAD_MUTEX_RECURSIVE && pthread::equal (owner, self))
     result = lock_recursive ();
   else
     result = EBUSY;
@@ -1543,7 +1543,7 @@ pthread_mutex::_trylock (pthread_t self)
 int
 pthread_mutex::_unlock (pthread_t self)
 {
-  if (!pthread_equal (owner, self))
+  if (!pthread::equal (owner, self))
     return EPERM;
 
   if (--recursion_counter == 0)
@@ -2139,7 +2139,7 @@ pthread::join (pthread_t *thread, void **return_val)
   if (!is_good_object (thread))
     return ESRCH;
 
-  if (pthread_equal (*thread,joiner))
+  if (equal (*thread,joiner))
     return EDEADLK;
 
   (*thread)->mutex.lock ();
@@ -2765,7 +2765,7 @@ pthread_sigmask (int operation, const sigset_t *set, sigset_t *old_set)
 extern "C" int
 pthread_equal (pthread_t t1, pthread_t t2)
 {
-  return t1 == t2;
+  return pthread::equal (t1, t2);
 }
 
 /* Mutexes  */

@@ -1,3 +1,9 @@
+2003-04-17  Thomas Pfaff  <tpfaff@gmx.net>
+
+	* thread.h (pthread::equal): New static method.
+	* thread.cc: Rename pthread_equal to pthread::equal throughout.
+	(pthread_equal): Use pthread::equal to compare threads ids.
+
 2003-04-15  Christopher Faylor  <cgf@redhat.com>
 
 	* termios.cc (setspeed): New function.
