@@ -140,10 +140,7 @@ pinfo::exit (DWORD n)
   fill_rusage (&r, hMainProc);
   add_rusage (&self->rusage_self, &r);
 
-  /* The below call could be moved down two lines, but this provides consistent
-     output from strace and the overhead should be extremely negligible.  */
   maybe_set_exit_code_from_windows ();
-
 
   if (n != EXITCODE_NOSET)
     {
