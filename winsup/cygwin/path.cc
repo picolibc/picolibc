@@ -980,27 +980,15 @@ normalize_win32_path (const char *src, char *dst, char **tail)
     }
   else if (strchr (src, ':') == NULL && *src != '/')
     {
-      if (!cygheap->cwd.get (dst, 0))
-	return get_errno ();
       if (beg_src_slash)
-	{
-	  if (dst[1] == ':')
-	    dst[2] = '\0';
-	  else if (is_unc_share (dst))
-	    {
-	      char *p = strpbrk (dst + 2, "\\/");
-	      if (p && (p = strpbrk (p + 1, "\\/")))
-		  *p = '\0';
-	    }
-	}
-      if (strlen (dst) + 1 + strlen (src) >= CYG_MAX_PATH)
-	{
-	  debug_printf ("ENAMETOOLONG = normalize_win32_path (%s)", src);
-	  return ENAMETOOLONG;
-	}
-      dst += strlen (dst);
-      if (!beg_src_slash)
-	*dst++ = '\\';
+        dst += cygheap->cwd.get_drive (dst);
+      else if (!cygheap->cwd.get (dst, 0))
+	return get_errno ();
+      else
+        {
+          dst += strlen (dst);
+          *dst++ = '\\';
+        }
     }
 
   while (*src)
@@ -1520,9 +1508,13 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
 	return err;
       chroot_ok = true;
     }
-  else
-    backslashify (src_path, dst, 0);
-
+  else 
+    {
+      int offset = 0;
+      if (src_path[1] != '/' && src_path[1] != ':')
+        offset = cygheap->cwd.get_drive (dst);
+      backslashify (src_path, dst + offset, 0);
+    }
  out:
   MALLOC_CHECK;
   if (chroot_ok || cygheap->root.ischroot_native (dst))
@@ -3705,6 +3697,17 @@ cwdstuff::set (const char *win32_cwd, const char *posix_cwd, bool doit)
       win32 = (char *) crealloc (win32, strlen (win32_cwd) + 1);
       strcpy (win32, win32_cwd);
     }
+  if (win32[1] == ':')
+    drive_length = 2;
+  else if (win32[1] == '\\')
+    {
+      char * ptr = strechr (win32 + 2, '\\');
+      if (*ptr)
+	ptr = strechr (ptr + 1, '\\');
+      drive_length = ptr - win32;
+    }
+  else
+    drive_length = 0;
 
   if (!posix_cwd)
     {

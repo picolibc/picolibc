@@ -216,9 +216,16 @@ struct cwdstuff
   char *posix;
   char *win32;
   DWORD hash;
+  DWORD drive_length;
   muto *cwd_lock;
   char *get (char *, int = 1, int = 0, unsigned = CYG_MAX_PATH);
   DWORD get_hash ();
+  DWORD get_drive (char * dst) 
+  {
+    get_initial (); 
+    memcpy (dst, win32, drive_length); 
+    return drive_length;
+  }
   void init ();
   void fixup_after_exec (char *, char *, DWORD);
   bool get_initial ();

@@ -1,3 +1,11 @@
+2004-09-08  Pierre Humblet <pierre.humblet@ieee.org>
+
+	* cygheap.h (cwdstuff::drive_length): New member.
+	(cwdstuff::get_drive): New method.
+	* path.cc (normalize_win32_path): Simplify by using cwdstuff::get_drive.
+	(mount_info::conv_to_win32_path): Use cwdstuff::get_drive as default for /.
+	(cwdstuff::set): Initialize drive_length.
+
 2004-09-07  Christopher Faylor  <cgf@timesys.com>
 
 	* cygtls.cc (_cygtls::init_thread): Set __sdidinit to negative value to
