@@ -862,9 +862,9 @@ fhandler_socket::sendto (const void *ptr, size_t len, int flags,
   DWORD ret;
 
   if (!winsock2_active)
-    res = ::sendto (get_socket (), (const char *) ptr, len,
-		    flags & MSG_WINMASK,
-		    (to ? (const struct sockaddr *) &sin : NULL), tolen);
+    ret = res = ::sendto (get_socket (), (const char *) ptr, len,
+			  flags & MSG_WINMASK,
+			  (to ? (const struct sockaddr *) &sin : NULL), tolen);
   else
     {
       WSABUF wsabuf = { len, (char *) ptr };

@@ -1,3 +1,8 @@
+2002-11-27  Mikael Ylikoski  <my@post.utfors.se>
+
+	* fhandler_socket.cc (fhandler_socket::sendto): Fix potential
+	unitialized value return.
+
 2002-11-27  Christopher Faylor  <cgf@redhat.com>
 
 	* cygwin.din: Export pthread_getsequence_np.
