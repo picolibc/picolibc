@@ -631,7 +631,15 @@ format_proc_cpuinfo (char *destbuf, size_t maxsize)
 	    debug_printf ("processor does not support CPUID instruction");
 	}
 
-      if (!has_cpuid)
+      if (!wincap.is_winnt ())
+        {
+	  bufptr += __small_sprintf (bufptr, "processor       : %d\n", cpu_number);
+	  read_value ("VendorIdentifier", REG_SZ);
+	  bufptr += __small_sprintf (bufptr, "vendor id       : %s\n", szBuffer);
+	  read_value ("Identifier", REG_SZ);
+	  bufptr += __small_sprintf (bufptr, "identifier      : %s\n", szBuffer);
+	}
+      else if (!has_cpuid)
 	{
 	  bufptr += __small_sprintf (bufptr, "processor       : %d\n", cpu_number);
 	  read_value ("VendorIdentifier", REG_SZ);
