@@ -844,8 +844,9 @@ strstr
 _strstr = strstr
 strtod
 _strtod = strtod
-strtodf
-_strtodf = strtodf
+strtof
+strtodf = strtof
+_strtodf = strtof
 strtok
 _strtok = strtok
 strtok_r
