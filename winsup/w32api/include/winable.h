@@ -20,6 +20,26 @@ extern "C" {
 #define OBJID_CURSOR 0xFFFFFFF7
 #define OBJID_ALERT 0xFFFFFFF6
 #define OBJID_SOUND 0xFFFFFFF5
+#define GUI_CARETBLINKING 0x00000001
+#define GUI_INMOVESIZE 0x00000002
+#define GUI_INMENUMODE 0x00000004
+#define GUI_SYSTEMMENUMODE 0x00000008
+#define GUI_POPUPMENUMODE 0x00000010
+#if(_WIN32_WINNT >= 0x0501)
+#define GUI_16BITTASK 0x00000020
+#endif
+typedef struct tagGUITHREADINFO {
+	DWORD cbSize;
+	DWORD flags;
+	HWND hwndActive;
+	HWND hwndFocus;
+	HWND hwndCapture;
+	HWND hwndMenuOwner;
+	HWND hwndMoveSize;
+	HWND hwndCaret;
+	RECT rcCaret;
+} GUITHREADINFO,*PGUITHREADINFO;
+BOOL WINAPI BlockInput(BOOL);
 
 #ifdef __cplusplus
 }

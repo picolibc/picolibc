@@ -585,7 +585,7 @@ extern "C" {
 #define GCL_WNDPROC (-24)
 #if 0
     /* This is supposed to be defined by the program using it not defined
-       in the win32api headers.  I've left it here for documentation purposes.
+       in the w32api headers.  I've left it here for documentation purposes.
     */
 #ifndef IDC_STATIC  /* May be predefined by resource compiler.  */
 #define IDC_STATIC (-1)
@@ -931,8 +931,12 @@ extern "C" {
 #define LR_CREATEDIBSECTION 8192
 #define LR_COPYFROMRESOURCE 0x4000
 #define LR_SHARED 32768
-#define KEYEVENTF_EXTENDEDKEY 1
-#define KEYEVENTF_KEYUP 2
+#define KEYEVENTF_EXTENDEDKEY 0x00000001
+#define KEYEVENTF_KEYUP 00000002
+#if(_WIN32_WINNT >= 0x0500)
+#define KEYEVENTF_UNICODE 0x00000004
+#define KEYEVENTF_SCANCODE 0x00000008
+#endif
 #define OBM_BTNCORNERS 32758
 #define OBM_BTSIZE 32761
 #define OBM_CHECK 32760
@@ -2036,6 +2040,26 @@ extern "C" {
 #if(WINVER >= 0x0400)
 #define ENDSESSION_LOGOFF    0x80000000
 #endif /* WINVER >= 0x0400 */
+#define OBJID_WINDOW 0x00000000
+#define OBJID_SYSMENU 0xFFFFFFFF
+#define OBJID_TITLEBAR 0xFFFFFFFE
+#define OBJID_MENU 0xFFFFFFFD
+#define OBJID_CLIENT 0xFFFFFFFC
+#define OBJID_VSCROLL 0xFFFFFFFB
+#define OBJID_HSCROLL 0xFFFFFFFA
+#define OBJID_SIZEGRIP 0xFFFFFFF9
+#define OBJID_CARET 0xFFFFFFF8
+#define OBJID_CURSOR 0xFFFFFFF7
+#define OBJID_ALERT 0xFFFFFFF6
+#define OBJID_SOUND 0xFFFFFFF5
+#define GUI_CARETBLINKING 0x00000001
+#define GUI_INMOVESIZE 0x00000002
+#define GUI_INMENUMODE 0x00000004
+#define GUI_SYSTEMMENUMODE 0x00000008
+#define GUI_POPUPMENUMODE 0x00000010
+#if(_WIN32_WINNT >= 0x0501)
+#define GUI_16BITTASK 0x00000020
+#endif
 #if (_WIN32_WINNT >= 0x0500 || _WIN32_WINDOWS >= 0x0490)
 #define ASFW_ANY ((DWORD)-1)
 #define LSFW_LOCK 1
@@ -2821,7 +2845,7 @@ typedef struct tagGUITHREADINFO {
 	HWND hwndMoveSize;
 	HWND hwndCaret;
 	RECT rcCaret;
-} GUITHREADINFO, *PGUITHREADINFO;
+} GUITHREADINFO,*PGUITHREADINFO;
 
 #define AnsiToOem CharToOemA
 #define OemToAnsi OemToCharA
