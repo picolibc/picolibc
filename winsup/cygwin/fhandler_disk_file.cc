@@ -203,9 +203,14 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
   to_timestruc_t (&ftLastAccessTime, &buf->st_atim);
   to_timestruc_t (&ftLastWriteTime, &buf->st_mtim);
   to_timestruc_t (&ftCreationTime, &buf->st_ctim);
-  buf->st_nlink   = nNumberOfLinks;
-  buf->st_dev     = pc->volser ();
-  buf->st_size    = ((__off64_t)nFileSizeHigh << 32) + nFileSizeLow;
+  buf->st_dev = pc->volser ();
+  buf->st_size = ((__off64_t)nFileSizeHigh << 32) + nFileSizeLow;
+  /* Unfortunately the count of 2 confuses `find (1)' command. So
+     let's try it with `1' as link count. */
+  if (pc->isdir () && !pc->isremote () && nNumberOfLinks == 1)
+    buf->st_nlink = num_entries (pc->get_win32 ());
+  else
+    buf->st_nlink = nNumberOfLinks;
 
   /* Assume that if a drive has ACL support it MAY have valid "inodes".
      It definitely does not have valid inodes if it does not have ACL
@@ -307,10 +312,6 @@ fhandler_disk_file::fstat_helper (struct __stat64 *buf, path_conv *pc,
      those subdirectories point to it.
      This is too slow on remote drives, so we do without it and
      set the number of links to 2. */
-  /* Unfortunately the count of 2 confuses `find (1)' command. So
-     let's try it with `1' as link count. */
-  if (pc->isdir () && !buf->st_nlink)
-    buf->st_nlink = pc->isremote () ? 1 : num_entries (pc->get_win32 ());
 
   syscall_printf ("0 = fstat (, %p) st_atime=%x st_size=%D, st_mode=%p, st_ino=%d, sizeof=%d",
 		  buf, buf->st_atime, buf->st_size, buf->st_mode,

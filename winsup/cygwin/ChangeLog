@@ -1,3 +1,8 @@
+2002-06-09  Christopher Faylor  <cgf@redhat.com>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat_helper): Correctly
+	set number of links for directory, if appropriate.
+
 2002-06-10  Robert Collins  <rbtcollins@hotmail.com>
 
 	* cygwin.din: Add _pthread_cleanup_push and _pthread_cleanup_pop.
@@ -25,11 +30,11 @@
 
 2002-04-24  Thomas Pfaff  <tpfaff@gmx.net>
 
-	* include/pthread.h (__pthread_cleanup_handler): New structure
-	(pthread_cleanup_push): Rewritten .
+	* include/pthread.h (__pthread_cleanup_handler): New structure.
+	(pthread_cleanup_push): Rewritten.
 	(pthread_cleanup_pop): Ditto.
 	(_pthread_cleanup_push): New prototype.
-	(_pthread_cleanup_pop) Ditto.
+	(_pthread_cleanup_pop): Ditto.
 
 2002-04-24  Thomas Pfaff  <tpfaff@gmx.net>
 
@@ -809,7 +814,7 @@
 	descriptor, except if it already appears in my_grps.
 	Use sec_acl() in place of get_dacl().
 	(verify_token): Create from code in seteuid(), with tighter checks.
-	(get_dacl) Deleted.
+	(get_dacl): Deleted.
 	(get_group_sidlist): Add argument to indicate if pgrpsid is already
 	in the groups.
 	* security.h: Define verify_token().
