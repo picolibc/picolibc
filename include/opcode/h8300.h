@@ -895,8 +895,8 @@ struct h8_opcode
   {code, AV_H8,  2, name, {{imm, RD8,      E}}, {{op00, op01, imm,  RD8,   E}}}, \
   {code, AV_H8,  6, name, {{imm, RDIND,    E}}, {{op10, op11, B30 | RDIND, 0,  op00, op01, imm, 0, E}}}, \
   {code, AV_H8,  6, name, {{imm, ABS8DST,  E}}, {{op20, op21, DSTABS8LIST,     op00, op01, imm, 0, E}}}, \
-  {code, AV_H8S, 6, name, {{imm, ABS16DST, E}}, {{0x6,  0xa,  0x1,  op30, DST | ABS16LIST, op00, op01, imm, op4, E}}}, \
-  {code, AV_H8S, 6, name, {{imm, ABS32DST, E}}, {{0x6,  0xa,  0x3,  op30, DST | ABS32LIST, op00, op01, imm, op4, E}}}
+  {code, AV_H8S, 6, name, {{imm, ABS16DST, E}}, {{0x6,  0xa,  0x1,  op30, DST | MEMRELAX | ABS16LIST , op00, op01, imm, op4, E}}}, \
+  {code, AV_H8S, 6, name, {{imm, ABS32DST, E}}, {{0x6,  0xa,  0x3,  op30, DST | MEMRELAX | ABS32LIST , op00, op01, imm, op4, E}}}
 
 #define BITOP_B(code, imm, name, op00, op01, op10, op11, op20, op21, op30, op4) \
   {code, AV_H8SX, 0, name, {{imm, RDIND,    E}}, {{op10, op11, B30 | RDIND, 0,  op00, op01, imm, op4, E}}}, \
