@@ -61,14 +61,14 @@ typedef __gid16_t gid_t;
 
 #if !defined(__INSIDE_CYGWIN__) || !defined(__cplusplus)
 
-typedef void *pthread_t;
-typedef void *pthread_mutex_t;
+typedef struct __pthread_t {char __dummy;} *pthread_t;
+typedef struct __pthread_mutex_t {char __dummy;} *pthread_mutex_t;
 
-typedef void *pthread_key_t;
-typedef void *pthread_attr_t;
-typedef void *pthread_mutexattr_t;
-typedef void *pthread_condattr_t;
-typedef void *pthread_cond_t;
+typedef struct __pthread_key_t {char __dummy;} *pthread_key_t;
+typedef struct __pthread_attr_t {char __dummy;} *pthread_attr_t;
+typedef struct __pthread_mutexattr_t {char __dummy;} *pthread_mutexattr_t;
+typedef struct __pthread_condattr_t {char __dummy;} *pthread_condattr_t;
+typedef struct __pthread_cond_t {char __dummy;} *pthread_cond_t;
 
   /* These variables are not user alterable. This means you!. */
 typedef struct
@@ -77,8 +77,8 @@ typedef struct
   int state;
 }
 pthread_once_t;
-typedef void *pthread_rwlock_t;
-typedef void *pthread_rwlockattr_t;
+typedef struct __pthread_rwlock_t {char __dummy;} *pthread_rwlock_t;
+typedef struct __pthread_rwlockattr_t {char __dummy;} *pthread_rwlockattr_t;
 
 #else
 

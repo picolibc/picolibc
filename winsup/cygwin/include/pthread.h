@@ -44,7 +44,7 @@ extern "C"
 #define PTHREAD_CANCEL_DISABLE 1
 #define PTHREAD_CANCELED ((void *)-1)
 /* this should be a value that can never be a valid address */
-#define PTHREAD_COND_INITIALIZER (void *)21
+#define PTHREAD_COND_INITIALIZER (pthread_cond_t)21
 #define PTHREAD_CREATE_DETACHED 1
 /* the default : joinable */
 #define PTHREAD_CREATE_JOINABLE 0
@@ -54,7 +54,7 @@ extern "C"
 #define PTHREAD_MUTEX_RECURSIVE 1
 #define PTHREAD_MUTEX_DEFAULT PTHREAD_MUTEX_ERRORCHECK
 /* this should be too low to ever be a valid address */
-#define PTHREAD_MUTEX_INITIALIZER (void *)20
+#define PTHREAD_MUTEX_INITIALIZER (pthread_mutex_t)20
 #define PTHREAD_ONCE_INIT { PTHREAD_MUTEX_INITIALIZER, 0 }
 #define PTHREAD_PRIO_INHERIT
 #define PTHREAD_PRIO_NONE

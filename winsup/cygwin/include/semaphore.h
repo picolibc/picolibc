@@ -21,7 +21,7 @@ extern "C"
 #endif
 
 #ifndef __INSIDE_CYGWIN__
-  typedef void *sem_t;
+  typedef struct __sem_t {char __dummy;} *sem_t;
 #endif
 
 #define SEM_FAILED 0
