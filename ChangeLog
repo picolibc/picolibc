@@ -1,3 +1,9 @@
+2004-12-02  Richard Sandiford  <rsandifo@redhat.com>
+
+	* configure.in: Include config/gcc-version.m4.  Use TL_AC_GCC_VERSION
+	to set gcc_version_trigger.  Remove some now-redundant AC_SUBSTs.
+	* configure: Regenerate.
+
 2004-11-26  John David Anglin  <dave.anglin@nrc-cnrc.gc.ca>
 
 	* configure.in (hppa*-*-linux*): Don't add libgcj to noconfigdirs.
