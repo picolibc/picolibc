@@ -38,13 +38,6 @@
 
 #ifndef __INSIDE_CYGWIN__
 
-// This flag is currently missing from w32api so it's here 'til I get
-// a patch sorted out.
-
-#ifndef FILE_FLAG_FIRST_PIPE_INSTANCE
-#define FILE_FLAG_FIRST_PIPE_INSTANCE 0x00080000
-#endif
-
 static pthread_once_t pipe_instance_lock_once = PTHREAD_ONCE_INIT;
 static CRITICAL_SECTION pipe_instance_lock;
 static long pipe_instance = 0;

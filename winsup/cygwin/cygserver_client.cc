@@ -254,8 +254,8 @@ client_request::send (transport_layer_base * const conn)
  */
 
 /* static */ void
-client_request::handle_request (transport_layer_base *conn,
-				class process_cache *cache)
+client_request::handle_request (transport_layer_base *const conn,
+				process_cache *const cache)
 {
   // verbose: debug_printf ("about to read");
 
@@ -273,9 +273,9 @@ client_request::handle_request (transport_layer_base *conn,
 			errno, GetLastError ());
 	return;
       }
-  }
 
-  // verbose: debug_printf ("got header (%ld)", bytes_read);
+      // verbose: debug_printf ("got header (%ld)", count);
+  }
 
   client_request *req = NULL;
 
@@ -390,8 +390,8 @@ client_request::make_request ()
  */
 
 void
-client_request::handle (transport_layer_base * const conn,
-			class process_cache * const cache)
+client_request::handle (transport_layer_base *const conn,
+			process_cache *const cache)
 {
   if (msglen () && !_buf)
     {

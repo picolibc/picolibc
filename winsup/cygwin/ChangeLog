@@ -1,3 +1,13 @@
+2002-06-27  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
+	* cygserver_client.cc (client_request::handle_request): Correct
+	tracing statement.
+	* cygserver_transport_pipes.cc: Remove local definition of
+	FILE_FLAG_FIRST_PIPE_INSTANCE constant.
+	* cygwin_ipc.h: Update copyright notice.
+	* cygwin_shm.h: Ditto.
+	* woutsup.h: Add definition of _WIN32_WINNT.
+
 2002-06-26  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_disk_file.cc (fhandler_disk_file::fstat_by_name): Force

@@ -2,11 +2,11 @@
 
    Copyright 2002 Red Hat, Inc.
 
-   This file is part of Cygwin.
+This file is part of Cygwin.
 
-   This software is a copyrighted work licensed under the terms of the
-   Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
-   details. */
+This software is a copyrighted work licensed under the terms of the
+Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+details. */
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -14,6 +14,15 @@
 
 #ifdef __INSIDE_CYGWIN__
 #error "woutsup.h is not for code being compiled inside the dll"
+#endif
+
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0500
+#endif
+
+#if _WIN32_WINNT < 0x0500
+#undef _WIN32_WINNT
+#define _WIN32_WINNT 0x0500
 #endif
 
 #define WIN32_LEAN_AND_MEAN 1
