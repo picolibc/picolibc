@@ -1,3 +1,11 @@
+2002-06-03    Danny Smith  <dannysmith@users.sourceforge.net>
+
+	* lib/thunk32.def (LIBRARY): Change to KERNEL32.dll.
+
+2002-06-03    Steven Edwards  <Steven_Ed4153@yahoo.com>
+
+	* lib/kernel32.def (ConvertToGlobalHandle): Add stub.
+
 2002-06-01    Danny Smith  <dannysmith@users.sourceforge.net>
 
 	* include/windef.h: Fix typo in last change.

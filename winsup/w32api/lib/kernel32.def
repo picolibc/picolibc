@@ -40,6 +40,7 @@ ConsoleMenuControl@12
 ContinueDebugEvent@12
 ConvertDefaultLocale@4
 ConvertThreadToFiber@4
+ConvertToGlobalHandle@4
 CopyFileA@12
 CopyFileW@12
 CopyFileExA@24
