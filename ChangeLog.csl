@@ -1,3 +1,8 @@
+2005-03-28  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* gdb/remote-rdi.c (arm_rdi_insert_breakpoint): Don't call
+	arm_pc_is_thumb_dummy.
+
 2005-03-28  Mark Mitchell <mark@codesourcery.com>
 
 	* readline/Makefile.in (RLTTYOBJ): New variable.
