@@ -1,0 +1,347 @@
+Fri Dec 15 23:41:48 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* cygcheck.cc (cygwin_info): Add some more bounds checking.
+
+Fri Dec 15 23:41:34 2000  Christopher Faylor <cgf@cygnus.com>
+
+	From Matt Harget <matt@use.net>:
+	* utils/cygcheck.cc (keyeprint): Move declaration before other
+	functions so it could be used by all functions to report error
+	messages. Add comment.
+	(add_path): Check for NULL return from malloc.
+	(find_on_path): Check initial uses of pointers for NULL.
+	(rva_to_offset): Ditto.
+	(init_paths): Add checking for return values of Win32 calls.
+	(get_dword): Ditto.
+	(get_word): Ditto.
+	(dll_info): Ditto, also add NULL pointer checks.
+	(scan_registry): Ditto.
+	(check_keys): Ditto.
+	(dump_sysinfo): Ditto. Add default case to switch. Add error
+	reporting if GetVolumeInformation fails, except when it
+	returns ERROR_NOT_READY.
+	(track_down): Add checking for NULL pointers and
+	return values of Win32 calls.
+	(cygwin_info): Ditto.  Correct small memory leak.
+
+Sun Dec 10 19:08:58 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Compile/link dumper.exe with c++.
+
+Tue Dec  7 11:15:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* mkpasswd.c: Slight formatting changes to the below patch.
+	(longopts): Fix typo in `local-groups' option.
+	(main): Initialize `passed_home_path' before first usage.
+
+Tue Dec  7 11:15:00 2000  Chris Abbey <cabbey@bresnanlink.net>
+
+	* mkpasswd.c: make default home directory /home/$user if one
+	can't be found in user registry. Allow user to override
+	that with command line arg.
+
+Sun Dec  3 00:40:47 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Use CXX to build the DLL.
+	* configure.in: Find correct c++ compiler.
+	* configure: Regenerate.
+
+Sat Nov 18 23:53:59 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* utils.sgml: Document new options for ps and strace.
+
+Wed Nov  8 08:49:27 2000 Jason Tishler <jt@dothill.com>
+
+	* mount.cc (main): Call show_cygdrive_info instead of
+	show_cygdrive_prefixes.
+	* mount.cc (show_cygdrive_prefixes): Remove function.
+	* mount.cc (show_cygdrive_info): New function.  Actually,
+	show_cygdrive_info is really an enhanced version of
+	show_cygdrive_prefixes renamed to show_cygdrive_info that also displays
+	the user and system flags.
+
+Wed Nov  8 15:52:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* mkgroup.c (load_netapi): New function to load netapi32.dll functions
+	dynamically so that mkgroup works on 9x/ME as well.
+	Use corresponding function pointers throughout.
+	(usage): Change to `int'. Change text to be conformant to mkpasswd.
+	(main): Use `getlongopt' to process options.
+	Special handling to create a group entry on 9x/ME.
+	* mkpasswd.c (load_netapi): New function to load netapi32.dll functions
+	dynamically so that mkpasswd works on 9x/ME as well.
+	Use corresponding function pointers throughout.
+	(usage): Change to `int'. Change text to be conformant to mkgroup.
+	(main): Use `getlongopt' to process options.
+	Special handling to create a passwd entry on 9x/ME.
+	Change conditional to create an entry for the local administrators
+	group when appropriate.
+
+Thu Nov  2  2:01:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* kill.cc (main): Return 1 in case of errors.
+
+Sat Oct 28 01:37:55 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Accomodate newer gcc's which require linking of c++
+	programs with g++.  Fixup output for some compilations.
+	* cygcheck.cc: Respond to compiler warnings.
+	* dumper.cc (main): Ditto.
+	* parse_pe.cc (exclusion::sort_and_check): Ditto.
+	* setfacl.cc (getaclentry): Ditto.
+
+Fri Oct 27 20:20:29 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* strace.cc (main): Add a '-b' option.
+
+2000-10-18  DJ Delorie  <dj@redhat.com>
+
+	* ssp.c: new
+	* ssp.txt: new
+	* Makefile.in: build ssp.exe
+
+Wed Oct 18 18:57:46 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* ps.cc (main): Add some extra space to Windows pid output for
+	Windows 95.
+
+Tue Oct 17 23:49:04 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* ps.cc (main): Add some extra space to pid output for Windows 95.
+
+Tue Oct 17  1:09:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	Patch suggested by Brad Town <btown@ceddec.com>:
+	* cygcheck.cc (main): Fix argument counting.
+
+Sat Oct 14 23:42:58 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* ps.cc (main): Accomodate new PID_ constant.
+
+Thu Oct 12 02:19:12 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* strace.cc (proc_child): Handle exceptions correctly.
+
+Sun Oct  8 23:11:17 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* ps.cc (main): Change order of reporting slightly so that windows pids
+	are more obvious.
+	* strace.cc (add_child): Just add child's pid directly.
+	(remove_child): No need to close the child process pid since
+	ContinueDebugEvent does that automatically.
+	(proc_child): Ditto for child thread.
+
+Fri Sep 29 13:12:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* cygcheck.cc (keyeprint): New function.
+	(check_keys): New function. Perform checking keycodes.
+	(main): Add option `-k' for invoking check_keys.
+	Change option processing to use long options and getopt_long.
+	* cygkeycheck.cc: Removed. Functionality moved to `cygcheck.cc'.
+	* Makefile.in: Remove cygkeycheck from the dependencies.
+
+Wed Sep 27 16:24:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* cygkeycheck.cc: New file. Utility to retrieve keycodes.
+	* Makefile.in: Add cygkeycheck to the dependencies.
+
+2000-09-15  Joerg Schaible <joerg.schaible@gmx.de>
+
+	* cygpath.cc: Add new options: -s and -i.
+	* utils.sgml: Document the new options.
+
+Tue Sep 12 22:45:28 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* kill.cc (main): Change behavior of -f so that it will force the
+	killing of a cygwin process after waiting 2 tenths of a second for it
+	to terminate.
+	(forcekill): Add an extra argument determining whether to wait for the
+	process to exit.
+
+Sun Sep 10 12:50:02 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Refine dumper.exe message.
+
+Mon Aug 28 21:55:56 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* kill.c (main): Avoid skipping next argument when a signal number is
+	specified.
+	* Makefile.in: Always clean dumper.exe.
+
+Fri Aug 25 12:41:53 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Only build dumper.exe when all of its library and
+	include dependencies are available.
+
+Fri Aug 25 11:44:29 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Make failure to build dumper.exe a non-error.
+
+Thu Aug 24 18:02:35 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* ps.cc (main): Always print a cygwin process using cygwin paths.
+
+2000-08-24  Egor Duda  <deo@logos-m.ru>
+
+	* Makefile.in: Add dumper.exe target and associated mechanisms for building it.
+	* dumper.cc: New file.
+	* dumper.h: New file.
+	* module_info.cc: New file.
+	* parse_pe.cc: New file.
+
+Mon Jul 31 15:12:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* passwd.c (main): Initialize oldpwd before beeing used.
+
+Sat Jul 29 00:44:46 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* kill.cc (main): Add '-f' option to force termination of a process.
+	(forcekill): New function.
+	* ps.cc (main): Add '-W' option to list Windows pids as well as Cygwin
+	pids.
+	(dummyprocessmodules): New function.
+	(GetModuleFileNameEx95): New function.
+	(init_win): New function.
+	(to_time_t): New function.
+
+Thu Jul 27 22:54:28 2000  Jason Tishler <jt@dothill.com>
+
+	* utils/mount.cc (main): Add --show-cygdrive-prefixes option.
+	(show_cygdrive_prefixes): New function.
+	* utils/umount.cc (main): Add --remove-cygdrive-prefix option.
+	(error): Change signature from 'char *' to 'const char *'.
+	(remove_cygdrive_prefix): New function.
+
+Thu Jul 13 22:24:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* mount.cc (mount_already_exists): Slightly rearrange.
+	Change message texts.
+
+Thu Jul 13 13:02:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* mount.cc (mount_already_exists): Additional warning message
+	if mount point exists with another mount type.
+
+Sat Jul  1 00:19:27 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Find getopt.c in cygwin/lib subdirectory.
+
+Sat Jun 24 23:16:33 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* cygcheck.cc (cygwin_info): New function.  Scans DLL for Cygwin
+	version info.
+	(dll_info): Add path parameter for checking "cygwin1.dll".
+	(track_down): Accomodate additional parameter for dll_info.
+	(ls): Ditto.
+	(dump_sys_info): Always print cygwin1.dll last.
+
+2000-06-07  Kazuhiro Fujieda <fujieda@jaist.ac.jp>
+
+	* mount.cc (error): New function to report an error and exit.
+	* umount.cc (error): Ditto.
+	(remove_all_automounts): Check return status of cygwin_umount.
+	(remove_all_user_mounts): Ditto.
+	(remove_all_system_mounts): Ditto.
+
+2000-06-05  DJ Delorie  <dj@cygnus.com>
+
+	* mount.cc: add stdlib.h for exit
+	* umount.cc: ditto
+	* strace.cc: add #define for alloca
+
+Fri May 20  0:01:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* regtool.cc (find_key): Add parameter `access'.
+	Call `RegOpenKeyEx' with that desired access.
+	(cmd_add, cmd_remove, cmd_set, cmd_unset): Call
+	`find_key' with KEY_ALL_ACCESS access.
+	(cmd_list, cmd_check, cmd_get): Call `find_key'
+	with KEY_READ access.
+
+2000-05-19  DJ Delorie  <dj@cygnus.com>
+
+	* cygpath.cc: add --windir/--sysdir options
+	* utils.sgml: and document them
+
+Thu May 18 14:38:26 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Eliminate WINSUP_DEPS.
+	* cygpath.cc: Reorganize includes to accomodate sys/cygwin.h changes.
+	* mkgroup.c: Ditto.
+	* mkpasswd.c: Ditto.
+	* mount.cc: Ditto. Eliminate use of cygwin source specific includes.
+	* ps.cc: Ditto.
+	* cygwin.cc: Eliminate obsolete file.
+
+Wed Apr 26 23:43:25 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* mount.cc (main): Add "-X" option to specify a "Cygwin executable".
+
+Sat Apr 15 23:34:00 2000  Corinna Vinschen <corinna@vinschen.de>
+
+	* mkpasswd.c (main): Use GetDCName instead of GetAnyDCName.
+	Don't create extra passwd entry for administrators group
+	if local_groups is set.
+	(usage): Change usage text slightly.
+	(enum_users): Loop while ERROR_MORE_DATA is returned.
+	(enum_local_groups): Ditto.
+	* mkgroup.c (enum_local_groups): Ditto.
+	(enum_groups) Ditto.
+	(usage): Change usage text slightly.
+
+Thu Apr 13 01:22:35 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* cygpath.cc (main): Add -a -o and -c options.
+	(doit): Ditto.
+
+Mon Apr 10 22:56:07 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* cygpath.cc (main): Add -f option for processing a group of paths from
+	a file.
+	(doit): New function.
+
+Sat Mar 18 22:52:37 2000  Christopher Faylor <cgf@cygnus.com>
+
+	Patch suggested by Mumit Khan  <khan@xraylith.wisc.edu>:
+	* strace.cc (_impure_ptr): New global variable to make strace build
+	under Cygwin gcc.
+
+Sat Mar 18 12:45:10 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Make CXXFLAGS consistent with cygwin.
+
+Wed Mar 15 00:53:58 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* Makefile.in: Use MINGW_CXXFLAGS when compiling strace.
+
+Sun Mar 12 21:22:25 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* strace.cc: Throughout, track information like start_time, etc.  on a
+	per-process basis.
+
+Sun Feb 27 23:37:32 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* strace.cc (handle_output_debug_string): Parse strace output to allow
+	various types of time output.
+
+Fri Jan 21 02:10:26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* utils/regtool.cc (translate): Added unix like backslash
+	processing.
+
+2000-01-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* regtool.cc: allow forward slashes as key separators
+
+2000-01-19  DJ Delorie  <dj@redhat.com>
+
+	* regtool.cc: New file.
+	* Makefile.in: add regtool
+	* utils.sgml: add regtool
+
+Sat Jan  8 17:13:51 2000  Christopher Faylor <cgf@cygnus.com>
+
+	* getfacl.c: New file.
+	* setfacl.c: New file.
+	* Makefile.in: Add getfacl.exe and setfacl.exe to list of PROGS.
+	Fix link flags in MINGW case.
