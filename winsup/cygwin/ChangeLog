@@ -1,5 +1,14 @@
 2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
 
+	* include/cygwin/cygserver.h (client_request::send): Make
+	non-virtual.
+	(class client_request_attach_tty): Put client- and server-specific
+	interfaces inside #ifdef/#ifndef __INSIDE_CYGWIN__ guards.
+	* cygserver_client.cc: Ditto.
+	(cygserver_init): Fix error handling.
+
+2002-06-16  Conrad Scott  <conrad.scott@dsl.pipex.com>
+
 	* cygserver.cc: Throughout the code, check and correct level of
 	the XXX_printf() functions used. Comment out several of the
 	debug_printf() calls with "// verbose:".  Reformat and correct

@@ -36,6 +36,8 @@ client_request_get_version::client_request_get_version () : client_request (CYGS
   buffer = (char *)&version;
 }
 
+#ifndef __INSIDE_CYGWIN__
+
 client_request_attach_tty::client_request_attach_tty () : client_request (CYGSERVER_REQUEST_ATTACH_TTY, sizeof (req))
 {
   buffer = (char *)&req;
@@ -45,6 +47,8 @@ client_request_attach_tty::client_request_attach_tty () : client_request (CYGSER
   req.to_master = NULL;
 }
 
+#else /* __INSIDE_CYGWIN__ */
+
 client_request_attach_tty::client_request_attach_tty (DWORD npid, DWORD nmaster_pid, HANDLE nfrom_master, HANDLE nto_master) : client_request (CYGSERVER_REQUEST_ATTACH_TTY, sizeof (req))
 {
   buffer = (char *)&req;
@@ -53,6 +57,8 @@ client_request_attach_tty::client_request_attach_tty (DWORD npid, DWORD nmaster_
   req.from_master = nfrom_master;
   req.to_master = nto_master;
 }
+
+#endif /* __INSIDE_CYGWIN__ */
 
 client_request_shutdown::client_request_shutdown () : client_request (CYGSERVER_REQUEST_SHUTDOWN, 0)
 {
@@ -101,6 +107,8 @@ client_request::send (transport_layer_base *conn)
     }
   debug_printf ("completed ok");
 }
+
+#ifdef __INSIDE_CYGWIN__
 
 /* Oh, BTW: Fix the procedural basis and make this more intuitive. */
 
@@ -165,38 +173,51 @@ check_cygserver_available ()
 void
 cygserver_init ()
 {
-  int rc;
-  if (allow_daemon != TRUE)
+  if (!allow_daemon)
     {
       cygserver_running = CYGSERVER_DEAD;
       return;
     }
 
-  if (cygserver_running==CYGSERVER_OK)
+  if (cygserver_running == CYGSERVER_OK)
     return;
 
-  client_request_get_version *req =
-	new client_request_get_version ();
+  client_request_get_version req;
 
-  rc = cygserver_request (req);
-  delete req;
-  if (rc < 0)
-    cygserver_running = CYGSERVER_DEAD;
-  else if (rc > 0)
-    api_fatal ("error connecting to cygwin server. error: %d", rc);
-  else if (req->version.major != CYGWIN_SERVER_VERSION_MAJOR ||
-	   req->version.api != CYGWIN_SERVER_VERSION_API ||
-	   req->version.minor > CYGWIN_SERVER_VERSION_MINOR)
-    api_fatal ("incompatible version of cygwin server.\
- client version %d.%d.%d.%d, server version%ld.%ld.%ld.%ld",
-    CYGWIN_SERVER_VERSION_MAJOR,
-    CYGWIN_SERVER_VERSION_API,
-    CYGWIN_SERVER_VERSION_MINOR,
-    CYGWIN_SERVER_VERSION_PATCH,
-    req->version.major,
-    req->version.api,
-    req->version.minor,
-    req->version.patch);
-  else
-    cygserver_running = CYGSERVER_OK;
+  // This indicates that we failed to connect to cygserver at all but
+  // that's fine as cygwin doesn't need it to be running.
+  if (cygserver_request (&req) == -1)
+    {
+      cygserver_running = CYGSERVER_DEAD;
+      return;
+    }
+
+  // We connected to the server but something went wrong after that
+  // (sending the message, cygserver itself, or receiving the reply).
+  if (req.header.error_code != 0)
+    {
+      cygserver_running = CYGSERVER_DEAD;
+      debug_printf ("failure in cygserver version request: %d",
+		    req.header.error_code);
+      debug_printf ("process will continue without cygserver support");
+      return;
+    }
+
+  if (req.version.major != CYGWIN_SERVER_VERSION_MAJOR ||
+      req.version.api != CYGWIN_SERVER_VERSION_API ||
+      req.version.minor > CYGWIN_SERVER_VERSION_MINOR)
+    api_fatal ("incompatible version of cygwin server:\n"
+	       "client version %d.%d.%d.%d, server version %ld.%ld.%ld.%ld",
+	       CYGWIN_SERVER_VERSION_MAJOR,
+	       CYGWIN_SERVER_VERSION_API,
+	       CYGWIN_SERVER_VERSION_MINOR,
+	       CYGWIN_SERVER_VERSION_PATCH,
+	       req.version.major,
+	       req.version.api,
+	       req.version.minor,
+	       req.version.patch);
+
+  cygserver_running = CYGSERVER_OK;
 }
+
+#endif /* __INSIDE_CYGWIN__ */

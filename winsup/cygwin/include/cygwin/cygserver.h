@@ -38,11 +38,11 @@ typedef enum {
 
 class request_header
 {
-  public:
-    ssize_t cb;
-    cygserver_request_code req_id;
-    ssize_t error_code;
-    request_header (cygserver_request_code id, ssize_t ncb) : cb (ncb), req_id (id), error_code (0) {} ;
+public:
+  ssize_t cb;
+  cygserver_request_code req_id;
+  ssize_t error_code;
+  request_header (cygserver_request_code id, ssize_t ncb) : cb (ncb), req_id (id), error_code (0) {} ;
 }
 #ifdef __GNUC__
   __attribute__ ((packed))
@@ -85,9 +85,9 @@ struct request_attach_tty
 
 class client_request
 {
-  public:
+public:
   client_request (cygserver_request_code id, ssize_t data_size);
-  virtual void send (transport_layer_base *conn);
+  void send (transport_layer_base *conn);
 #ifndef __INSIDE_CYGWIN__
   virtual void serve (transport_layer_base *conn, class process_cache *cache);
 #endif
@@ -100,7 +100,7 @@ class client_request
 
 class client_request_get_version : public client_request
 {
-  public:
+public:
 #ifndef __INSIDE_CYGWIN__
   virtual void serve (transport_layer_base *conn, class process_cache *cache);
 #endif
@@ -110,7 +110,7 @@ class client_request_get_version : public client_request
 
 class client_request_shutdown : public client_request
 {
-  public:
+public:
 #ifndef __INSIDE_CYGWIN__
   virtual void serve (transport_layer_base *conn, class process_cache *cache);
 #endif
@@ -119,12 +119,13 @@ class client_request_shutdown : public client_request
 
 class client_request_attach_tty : public client_request
 {
-  public:
+public:
 #ifndef __INSIDE_CYGWIN__
   virtual void serve (transport_layer_base *conn, class process_cache *cache);
-#endif
   client_request_attach_tty ();
+#else
   client_request_attach_tty (DWORD npid, DWORD nmaster_pid, HANDLE nfrom_master, HANDLE nto_master);
+#endif
   HANDLE from_master () {return req.from_master;};
   HANDLE to_master () {return req.to_master;};
   struct request_attach_tty req;
@@ -132,4 +133,4 @@ class client_request_attach_tty : public client_request
 
 extern int cygserver_request (client_request *);
 
-#endif /* _CYGSERVER+H+ */
+#endif /* _CYGSERVER_H_ */
