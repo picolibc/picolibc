@@ -42,14 +42,14 @@ pi_lo   = 1.5099578832e-07; /* 0x34222168 */
 	ix = hx&0x7fffffff;
 	GET_FLOAT_WORD(hy,y);
 	iy = hy&0x7fffffff;
-	if((ix>0x7f800000)||
-	   (iy>0x7f800000))	/* x or y is NaN */
+	if(FLT_UWORD_IS_NAN(ix)||
+	   FLT_UWORD_IS_NAN(iy))	/* x or y is NaN */
 	   return x+y;
 	if(hx==0x3f800000) return atanf(y);   /* x=1.0 */
 	m = ((hy>>31)&1)|((hx>>30)&2);	/* 2*sign(x)+sign(y) */
 
     /* when y = 0 */
-	if(iy==0) {
+	if(FLT_UWORD_IS_ZERO(iy)) {
 	    switch(m) {
 		case 0: 
 		case 1: return y; 	/* atan(+-0,+anything)=+-0 */
@@ -58,11 +58,11 @@ pi_lo   = 1.5099578832e-07; /* 0x34222168 */
 	    }
 	}
     /* when x = 0 */
-	if(ix==0) return (hy<0)?  -pi_o_2-tiny: pi_o_2+tiny;
+	if(FLT_UWORD_IS_ZERO(ix)) return (hy<0)?  -pi_o_2-tiny: pi_o_2+tiny;
 	    
     /* when x is INF */
-	if(ix==0x7f800000) {
-	    if(iy==0x7f800000) {
+	if(FLT_UWORD_IS_INFINITE(ix)) {
+	    if(FLT_UWORD_IS_INFINITE(iy)) {
 		switch(m) {
 		    case 0: return  pi_o_4+tiny;/* atan(+INF,+INF) */
 		    case 1: return -pi_o_4-tiny;/* atan(-INF,+INF) */
@@ -79,7 +79,7 @@ pi_lo   = 1.5099578832e-07; /* 0x34222168 */
 	    }
 	}
     /* when y is INF */
-	if(iy==0x7f800000) return (hy<0)? -pi_o_2-tiny: pi_o_2+tiny;
+	if(FLT_UWORD_IS_INFINITE(iy)) return (hy<0)? -pi_o_2-tiny: pi_o_2+tiny;
 
     /* compute y/x */
 	k = (iy-ix)>>23;

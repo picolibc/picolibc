@@ -1,6 +1,24 @@
 #ifndef __IEEE_BIG_ENDIAN
 #ifndef __IEEE_LITTLE_ENDIAN
 
+/* This file can define macros to choose variations of the IEEE float
+   format:
+
+   _FLT_LARGEST_EXPONENT_IS_NORMAL
+
+	Defined if the float format uses the largest exponent for finite
+	numbers rather than NaN and infinity representations.  Such a
+	format cannot represent NaNs or infinities at all, but it's FLT_MAX
+	is twice the IEEE value.
+
+   _FLT_NO_DENORMALS
+
+	Defined if the float format does not support IEEE denormals.  Every
+	float with a zero exponent is taken to be a zero representation.
+
+   ??? At the moment, there are no equivalent macros for doubles and
+   the macros are not fully supported by --enable-newlib-hw-fp.  */
+
 #if defined(__arm__) || defined(__thumb__)
 /* ARM always has big-endian words.  Within those words the byte ordering
    appears to be big or little endian.  Newlib doesn't seem to care about

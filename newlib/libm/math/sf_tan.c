@@ -32,7 +32,7 @@
 	if(ix <= 0x3f490fda) return __kernel_tanf(x,z,1);
 
     /* tan(Inf or NaN) is NaN */
-	else if (ix>=0x7f800000) return x-x;		/* NaN */
+	else if (!FLT_UWORD_IS_FINITE(ix)) return x-x;		/* NaN */
 
     /* argument reduction needed */
 	else {

@@ -53,13 +53,14 @@ G =  3.5714286566e-01; /* 5/14      = 0x3eb6db6e */
 	GET_FLOAT_WORD(hx,x);
 	sign=hx&0x80000000; 		/* sign= sign(x) */
 	hx  ^=sign;
-	if(hx>=0x7f800000) return(x+x); /* cbrt(NaN,INF) is itself */
-	if(hx==0) 
-	    return(x);		/* cbrt(0) is itself */
+	if(!FLT_UWORD_IS_FINITE(hx))
+	    return(x+x);		/* cbrt(NaN,INF) is itself */
+	if(FLT_UWORD_IS_ZERO(hx))
+	    return(x);			/* cbrt(0) is itself */
 
 	SET_FLOAT_WORD(x,hx);	/* x <- |x| */
     /* rough cbrt to 5 bits */
-	if(hx<0x00800000) 		/* subnormal number */
+	if(FLT_UWORD_IS_SUBNORMAL(hx)) 		/* subnormal number */
 	  {SET_FLOAT_WORD(t,0x4b800000); /* set t= 2**24 */
 	   t*=x; GET_FLOAT_WORD(high,t); SET_FLOAT_WORD(t,high/3+B2);
 	  }

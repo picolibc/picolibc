@@ -15,7 +15,6 @@
 
 /*
  * isnanf(x) returns 1 is x is nan, else 0;
- * no branching!
  */
 
 #include "fdlibm.h"
@@ -30,8 +29,7 @@
 	__int32_t ix;
 	GET_FLOAT_WORD(ix,x);
 	ix &= 0x7fffffff;
-	ix = 0x7f800000 - ix;
-	return (int)(((__uint32_t)(ix))>>31);
+	return FLT_UWORD_IS_NAN(ix);
 }
 
 #ifdef _DOUBLE_IS_32BITS

@@ -58,14 +58,14 @@ static float zero = 0.0;
 
 	GET_FLOAT_WORD(hx,x);
 	ix = hx&0x7fffffff;
-	if(ix>=0x7f800000) return one/(x*x);
+	if(!FLT_UWORD_IS_FINITE(ix)) return one/(x*x);
 	x = fabsf(x);
 	if(ix >= 0x40000000) {	/* |x| >= 2.0 */
 		s = sinf(x);
 		c = cosf(x);
 		ss = s-c;
 		cc = s+c;
-		if(ix<0x7f000000) {  /* make sure x+x not overflow */
+		if(ix<=FLT_UWORD_HALF_MAX) {  /* make sure x+x not overflow */
 		    z = -cosf(x+x);
 		    if ((s*c)<zero) cc = z/ss;
 		    else 	    ss = z/cc;
@@ -128,8 +128,8 @@ v04  =  4.4111031494e-10; /* 0x2ff280c2 */
 	GET_FLOAT_WORD(hx,x);
         ix = 0x7fffffff&hx;
     /* Y0(NaN) is NaN, y0(-inf) is Nan, y0(inf) is 0  */
-	if(ix>=0x7f800000) return  one/(x+x*x); 
-        if(ix==0) return -one/zero;
+	if(!FLT_UWORD_IS_FINITE(ix)) return  one/(x+x*x); 
+        if(FLT_UWORD_IS_ZERO(ix)) return -one/zero;
         if(hx<0) return zero/zero;
         if(ix >= 0x40000000) {  /* |x| >= 2.0 */
         /* y0(x) = sqrt(2/(pi*x))*(p0(x)*sin(x0)+q0(x)*cos(x0))
@@ -151,7 +151,7 @@ v04  =  4.4111031494e-10; /* 0x2ff280c2 */
 	 * j0(x) = 1/sqrt(pi) * (P(0,x)*cc - Q(0,x)*ss) / sqrt(x)
 	 * y0(x) = 1/sqrt(pi) * (P(0,x)*ss + Q(0,x)*cc) / sqrt(x)
 	 */
-                if(ix<0x7f000000) {  /* make sure x+x not overflow */
+                if(ix<=FLT_UWORD_HALF_MAX) {  /* make sure x+x not overflow */
                     z = -cosf(x+x);
                     if ((s*c)<zero) cc = z/ss;
                     else            ss = z/cc;

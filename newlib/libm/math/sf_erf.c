@@ -109,7 +109,7 @@ sb7  = -2.2440952301e+01; /* 0xc1b38712 */
 	float R,S,P,Q,s,y,z,r;
 	GET_FLOAT_WORD(hx,x);
 	ix = hx&0x7fffffff;
-	if(ix>=0x7f800000) {		/* erf(nan)=nan */
+	if(!FLT_UWORD_IS_FINITE(ix)) {		/* erf(nan)=nan */
 	    i = ((__uint32_t)hx>>31)<<1;
 	    return (float)(1-i)+one/x;	/* erf(+-inf)=+-1 */
 	}
@@ -166,7 +166,7 @@ sb7  = -2.2440952301e+01; /* 0xc1b38712 */
 	float R,S,P,Q,s,y,z,r;
 	GET_FLOAT_WORD(hx,x);
 	ix = hx&0x7fffffff;
-	if(ix>=0x7f800000) {			/* erfc(nan)=nan */
+	if(!FLT_UWORD_IS_FINITE(ix)) {			/* erfc(nan)=nan */
 						/* erfc(+-inf)=0,2 */
 	    return (float)(((__uint32_t)hx>>31)<<1)+one/x;
 	}

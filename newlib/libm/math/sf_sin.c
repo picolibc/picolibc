@@ -32,7 +32,7 @@
 	if(ix <= 0x3f490fd8) return __kernel_sinf(x,z,0);
 
     /* sin(Inf or NaN) is NaN */
-	else if (ix>=0x7f800000) return x-x;
+	else if (!FLT_UWORD_IS_FINITE(ix)) return x-x;
 
     /* argument reduction needed */
 	else {

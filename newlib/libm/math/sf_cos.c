@@ -38,7 +38,7 @@ static float one=1.0;
 	if(ix <= 0x3f490fd8) return __kernel_cosf(x,z);
 
     /* cos(Inf or NaN) is NaN */
-	else if (ix>=0x7f800000) return x-x;
+	else if (!FLT_UWORD_IS_FINITE(ix)) return x-x;
 
     /* argument reduction needed */
 	else {

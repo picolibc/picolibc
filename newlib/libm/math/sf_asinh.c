@@ -35,7 +35,7 @@ huge=  1.0000000000e+30;
 	__int32_t hx,ix;
 	GET_FLOAT_WORD(hx,x);
 	ix = hx&0x7fffffff;
-	if(ix>=0x7f800000) return x+x;	/* x is inf or NaN */
+	if(!FLT_UWORD_IS_FINITE(ix)) return x+x;	/* x is inf or NaN */
 	if(ix< 0x31800000) {	/* |x|<2**-28 */
 	    if(huge+x>one) return x;	/* return x inexact except 0 */
 	} 

@@ -51,6 +51,7 @@ static float zero = 0.0;
 	ax = hx&0x7fffffff;
 
 	k = 1;
+	if (!FLT_UWORD_IS_FINITE(hx)) return x+x;
 	if (hx < 0x3ed413d7) {			/* x < 0.41422  */
 	    if(ax>=0x3f800000) {		/* x <= -1.0 */
 		if(x==(float)-1.0) return -two25/zero; /* log1p(-1)=+inf */
@@ -65,8 +66,7 @@ static float zero = 0.0;
 	    }
 	    if(hx>0||hx<=((__int32_t)0xbe95f61f)) {
 		k=0;f=x;hu=1;}	/* -0.2929<x<0.41422 */
-	} 
-	if (hx >= 0x7f800000) return x+x;
+	}
 	if(k!=0) {
 	    if(hx<0x5a000000) {
 		u  = (float)1.0+x; 

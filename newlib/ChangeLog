@@ -1,3 +1,12 @@
+2001-04-04  Richard Sandiford  <rsandifo@redhat.com>
+
+	* libc/include/machine/ieeefp.h: Comment about new configuration
+	macros _FLT_LARGEST_EXPONENT_IS_NORMAL and _FLT_NO_DENORMALS.
+	* libm/common/fdlib.h: Define new macros for testing floats.
+	* libm/common/sf_*: Use them.
+	* libm/math/ef_*: Likewise.
+	* libm/math/sf_*: Likewise.
+
 2001-03-29  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/sys/arm/setjmp.S: Added .code 16 specifier for thumb-mode

@@ -37,7 +37,7 @@ ln2	= 6.9314718246e-01;  /* 0x3f317218 */
 	if(hx<0x3f800000) {		/* x < 1 */
 	    return (x-x)/(x-x);
 	} else if(hx >=0x4d800000) {	/* x > 2**28 */
-	    if(hx >=0x7f800000) {	/* x is inf of NaN */
+	    if(!FLT_UWORD_IS_FINITE(hx)) {	/* x is inf of NaN */
 	        return x+x;
 	    } else 
 		return __ieee754_logf(x)+ln2;	/* acosh(huge)=log(2x) */

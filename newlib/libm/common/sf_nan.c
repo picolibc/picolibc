@@ -21,3 +21,4 @@
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
+

@@ -27,7 +27,6 @@ static float
 one		= 1.0,
 huge		= 1.0e+30,
 tiny		= 1.0e-30,
-o_threshold	= 8.8721679688e+01,/* 0x42b17180 */
 ln2_hi		= 6.9313812256e-01,/* 0x3f317180 */
 ln2_lo		= 9.0580006145e-06,/* 0x3717f7d1 */
 invln2		= 1.4426950216e+00,/* 0x3fb8aa3b */
@@ -56,13 +55,12 @@ Q5  =  -2.0109921195e-07; /* 0xb457edbb */
 
     /* filter out huge and non-finite argument */
 	if(hx >= 0x4195b844) {			/* if |x|>=27*ln2 */
-	    if(hx >= 0x42b17218) {		/* if |x|>=88.721... */
-                if(hx>0x7f800000)
-		    return x+x; 	 /* NaN */
-		if(hx==0x7f800000)
-		    return (xsb==0)? x:-1.0;/* exp(+-inf)={inf,-1} */
-	        if(x > o_threshold) return huge*huge; /* overflow */
-	    }
+	    if(FLT_UWORD_IS_NAN(hx))
+	        return x+x;
+	    if(FLT_UWORD_IS_INFINITE(hx))
+		return (xsb==0)? x:-1.0;/* exp(+-inf)={inf,-1} */
+	    if(xsb == 0 && hx > FLT_UWORD_LOG_MAX) /* if x>=o_threshold */
+		return huge*huge; /* overflow */
 	    if(xsb!=0) { /* x < -27*ln2, return -1.0 with inexact */
 		if(x+tiny<(float)0.0)	/* raise inexact */
 		return tiny-one;	/* return -1 */

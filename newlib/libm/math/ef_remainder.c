@@ -40,13 +40,13 @@ static float zero = 0.0;
 	hx &= 0x7fffffff;
 
     /* purge off exception values */
-	if(hp==0) return (x*p)/(x*p);	 	/* p = 0 */
-	if((hx>=0x7f800000)||			/* x not finite */
-	  ((hp>0x7f800000)))			/* p is NaN */
+	if(FLT_UWORD_IS_ZERO(hp)||
+	   !FLT_UWORD_IS_FINITE(hx)||
+	   FLT_UWORD_IS_NAN(hp))
 	    return (x*p)/(x*p);
 
 
-	if (hp<=0x7effffff) x = __ieee754_fmodf(x,p+p);	/* now x < 2p */
+	if (hp<=FLT_UWORD_HALF_MAX) x = __ieee754_fmodf(x,p+p); /* now x < 2p */
 	if ((hx-hp)==0) return zero*x;
 	x  = fabsf(x);
 	p  = fabsf(p);

@@ -28,8 +28,6 @@ one	= 1.0,
 halF[2]	= {0.5,-0.5,},
 huge	= 1.0e+30,
 twom100 = 7.8886090522e-31,      /* 2**-100=0x0d800000 */
-o_threshold=  8.8721679688e+01,  /* 0x42b17180 */
-u_threshold= -1.0397208405e+02,  /* 0xc2cff1b5 */
 ln2HI[2]   ={ 6.9313812256e-01,		/* 0x3f317180 */
 	     -6.9313812256e-01,},	/* 0xbf317180 */
 ln2LO[2]   ={ 9.0580006145e-06,  	/* 0x3717f7d1 */
@@ -49,23 +47,23 @@ P5   =  4.1381369442e-08; /* 0x3331bb4c */
 #endif
 {
 	float y,hi,lo,c,t;
-	__int32_t k,xsb;
+	__int32_t k,xsb,sx;
 	__uint32_t hx;
 
-	GET_FLOAT_WORD(hx,x);
-	xsb = (hx>>31)&1;		/* sign bit of x */
-	hx &= 0x7fffffff;		/* high word of |x| */
+	GET_FLOAT_WORD(sx,x);
+	xsb = (sx>>31)&1;		/* sign bit of x */
+	hx = sx & 0x7fffffff;		/* high word of |x| */
 
     /* filter out non-finite argument */
-	if(hx >= 0x42b17218) {			/* if |x|>=88.721... */
-	    if(hx>0x7f800000)
-		 return x+x;	 		/* NaN */
-            if(hx==0x7f800000)
-		return (xsb==0)? x:0.0;		/* exp(+-inf)={inf,0} */
-	    if(x > o_threshold) return huge*huge; /* overflow */
-	    if(x < u_threshold) return twom100*twom100; /* underflow */
-	}
-
+        if(FLT_UWORD_IS_NAN(hx))
+            return x+x;	 	/* NaN */
+        if(FLT_UWORD_IS_INFINITE(hx))
+	    return (xsb==0)? x:0.0;		/* exp(+-inf)={inf,0} */
+	if(sx > FLT_UWORD_LOG_MAX)
+	    return huge*huge; /* overflow */
+	if(sx < 0 && hx > FLT_UWORD_LOG_MIN)
+	    return twom100*twom100; /* underflow */
+	
     /* argument reduction */
 	if(hx > 0x3eb17218) {		/* if  |x| > 0.5 ln2 */ 
 	    if(hx < 0x3F851592) {	/* and |x| < 1.5 ln2 */

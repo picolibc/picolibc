@@ -33,8 +33,8 @@ two25 =  3.3554432000e+07; /* 0x4c000000 */
 	GET_FLOAT_WORD(hx,x);
 	ix = 0x7fffffff&hx;
 	*eptr = 0;
-	if(ix>=0x7f800000||(ix==0)) return x;	/* 0,inf,nan */
-	if (ix<0x00800000) {		/* subnormal */
+	if(!FLT_UWORD_IS_FINITE(ix)||FLT_UWORD_IS_ZERO(ix)) return x;	/* 0,inf,nan */
+	if (FLT_UWORD_IS_SUBNORMAL(ix)) {		/* subnormal */
 	    x *= two25;
 	    GET_FLOAT_WORD(hx,x);
 	    ix = hx&0x7fffffff;

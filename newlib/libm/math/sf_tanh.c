@@ -35,7 +35,7 @@ static float one=1.0, two=2.0, tiny = 1.0e-30;
 	ix = jx&0x7fffffff;
 
     /* x is INF or NaN */
-	if(ix>=0x7f800000) { 
+	if(!FLT_UWORD_IS_FINITE(ix)) {
 	    if (jx>=0) return one/x+one;    /* tanh(+-inf)=+-1 */
 	    else       return one/x-one;    /* tanh(NaN) = NaN */
 	}

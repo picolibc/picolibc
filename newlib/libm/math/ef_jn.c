@@ -47,7 +47,7 @@ static float zero  =  0.0000000000e+00;
 	GET_FLOAT_WORD(hx,x);
 	ix = 0x7fffffff&hx;
     /* if J(n,NaN) is NaN */
-	if(ix>0x7f800000) return x+x;
+	if(FLT_UWORD_IS_NAN(ix)) return x+x;
 	if(n<0){		
 		n = -n;
 		x = -x;
@@ -57,7 +57,7 @@ static float zero  =  0.0000000000e+00;
 	if(n==1) return(__ieee754_j1f(x));
 	sgn = (n&1)&(hx>>31);	/* even n -- 0, odd n -- sign(x) */
 	x = fabsf(x);
-	if(ix==0||ix>=0x7f800000) 	/* if x is 0 or inf */
+	if(FLT_UWORD_IS_ZERO(ix)||FLT_UWORD_IS_INFINITE(ix))
 	    b = zero;
 	else if((float)n<=x) {   
 		/* Safe to use J(n+1,x)=2n/x *J(n,x)-J(n-1,x) */
@@ -181,8 +181,8 @@ static float zero  =  0.0000000000e+00;
 	GET_FLOAT_WORD(hx,x);
 	ix = 0x7fffffff&hx;
     /* if Y(n,NaN) is NaN */
-	if(ix>0x7f800000) return x+x;
-	if(ix==0) return -one/zero;
+	if(FLT_UWORD_IS_NAN(ix)) return x+x;
+	if(FLT_UWORD_IS_ZERO(ix)) return -one/zero;
 	if(hx<0) return zero/zero;
 	sign = 1;
 	if(n<0){
@@ -191,7 +191,7 @@ static float zero  =  0.0000000000e+00;
 	}
 	if(n==0) return(__ieee754_y0f(x));
 	if(n==1) return(sign*__ieee754_y1f(x));
-	if(ix==0x7f800000) return zero;
+	if(FLT_UWORD_IS_INFINITE(ix)) return zero;
 
 	a = __ieee754_y0f(x);
 	b = __ieee754_y1f(x);

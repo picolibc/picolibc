@@ -44,14 +44,14 @@ static float zero   =  0.0;
 	GET_FLOAT_WORD(hx,x);
 
         k=0;
-        if (hx < 0x00800000) {                  /* x < 2**-126  */
-            if ((hx&0x7fffffff)==0)
-                return -two25/zero;             /* log(+-0)=-inf */
-            if (hx<0) return (x-x)/zero;        /* log(-#) = NaN */
+        if (FLT_UWORD_IS_ZERO(hx&0x7fffffff))
+            return -two25/zero;             /* log(+-0)=-inf */
+        if (hx<0) return (x-x)/zero;        /* log(-#) = NaN */
+	if (!FLT_UWORD_IS_FINITE(hx)) return x+x;
+        if (FLT_UWORD_IS_SUBNORMAL(hx)) {
             k -= 25; x *= two25; /* subnormal number, scale up x */
 	    GET_FLOAT_WORD(hx,x);
         }
-	if (hx >= 0x7f800000) return x+x;
 	k += (hx>>23)-127;
 	i  = ((__uint32_t)k&0x80000000)>>31;
         hx = (hx&0x007fffff)|((0x7f-i)<<23);

@@ -43,20 +43,23 @@ static float one = 1.0, Zero[] = {0.0, -0.0,};
 	hy &= 0x7fffffff;	/* |y| */
 
     /* purge off exception values */
-	if(hy==0||(hx>=0x7f800000)||		/* y=0,or x not finite */
-	   (hy>0x7f800000))			/* or y is NaN */
+	if(FLT_UWORD_IS_ZERO(hy)||
+	   !FLT_UWORD_IS_FINITE(hx)||
+	   FLT_UWORD_IS_NAN(hy))
 	    return (x*y)/(x*y);
 	if(hx<hy) return x;			/* |x|<|y| return x */
 	if(hx==hy)
 	    return Zero[(__uint32_t)sx>>31];	/* |x|=|y| return x*0*/
 
+    /* Note: y cannot be zero if we reach here. */
+
     /* determine ix = ilogb(x) */
-	if(hx<0x00800000) {	/* subnormal x */
+	if(FLT_UWORD_IS_SUBNORMAL(hx)) {	/* subnormal x */
 	    for (ix = -126,i=(hx<<8); i>0; i<<=1) ix -=1;
 	} else ix = (hx>>23)-127;
 
     /* determine iy = ilogb(y) */
-	if(hy<0x00800000) {	/* subnormal y */
+	if(FLT_UWORD_IS_SUBNORMAL(hy)) {	/* subnormal y */
 	    for (iy = -126,i=(hy<<8); i>=0; i<<=1) iy -=1;
 	} else iy = (hy>>23)-127;
 
@@ -99,6 +102,8 @@ static float one = 1.0, Zero[] = {0.0, -0.0,};
 	    hx = ((hx-0x00800000)|((iy+127)<<23));
 	    SET_FLOAT_WORD(x,hx|sx);
 	} else {		/* subnormal output */
+	    /* If denormals are not supported, this code will generate a
+	       zero representation.  */
 	    n = -126 - iy;
 	    hx >>= n;
 	    SET_FLOAT_WORD(x,hx|sx);

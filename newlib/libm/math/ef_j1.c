@@ -59,14 +59,14 @@ static float zero    = 0.0;
 
 	GET_FLOAT_WORD(hx,x);
 	ix = hx&0x7fffffff;
-	if(ix>=0x7f800000) return one/x;
+	if(!FLT_UWORD_IS_FINITE(ix)) return one/x;
 	y = fabsf(x);
 	if(ix >= 0x40000000) {	/* |x| >= 2.0 */
 		s = sinf(y);
 		c = cosf(y);
 		ss = -s-c;
 		cc = s-c;
-		if(ix<0x7f000000) {  /* make sure y+y not overflow */
+		if(ix<=FLT_UWORD_HALF_MAX) {  /* make sure y+y not overflow */
 		    z = cosf(y+y);
 		    if ((s*c)>zero) cc = z/ss;
 		    else 	    ss = z/cc;
@@ -129,15 +129,15 @@ static float V0[5] = {
 	GET_FLOAT_WORD(hx,x);
         ix = 0x7fffffff&hx;
     /* if Y1(NaN) is NaN, Y1(-inf) is NaN, Y1(inf) is 0 */
-	if(ix>=0x7f800000) return  one/(x+x*x); 
-        if(ix==0) return -one/zero;
+	if(!FLT_UWORD_IS_FINITE(ix)) return one/(x+x*x); 
+        if(FLT_UWORD_IS_ZERO(ix)) return -one/zero;
         if(hx<0) return zero/zero;
         if(ix >= 0x40000000) {  /* |x| >= 2.0 */
                 s = sinf(x);
                 c = cosf(x);
                 ss = -s-c;
                 cc = s-c;
-                if(ix<0x7f000000) {  /* make sure x+x not overflow */
+                if(ix<=FLT_UWORD_HALF_MAX) {  /* make sure x+x not overflow */
                     z = cosf(x+x);
                     if ((s*c)>zero) cc = z/ss;
                     else            ss = z/cc;

@@ -174,7 +174,7 @@ pio2_3t =  6.1232342629e-17; /* 0x248d3132 */
     /* 
      * all other (large) arguments
      */
-	if(ix>=0x7f800000) {		/* x is inf or NaN */
+	if(!FLT_UWORD_IS_FINITE(ix)) {
 	    y[0]=y[1]=x-x; return 0;
 	}
     /* set z = scalbn(|x|,ilogb(x)-7) */

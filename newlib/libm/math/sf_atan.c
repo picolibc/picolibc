@@ -77,7 +77,7 @@ huge   = 1.0e30;
 	GET_FLOAT_WORD(hx,x);
 	ix = hx&0x7fffffff;
 	if(ix>=0x50800000) {	/* if |x| >= 2^34 */
-	    if(ix>0x7f800000)
+	    if(FLT_UWORD_IS_NAN(ix))
 		return x+x;		/* NaN */
 	    if(hx>0) return  atanhi[3]+atanlo[3];
 	    else     return -atanhi[3]-atanlo[3];
