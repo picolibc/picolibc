@@ -1,3 +1,7 @@
+2003-08-30  Christopher Faylor  <cgf@redhat.com>
+
+	* threaded_queue.h: New file.
+
 2003-08-25  Christopher Faylor  <cgf@redhat.com>
 
 	* Makefile.in: Build libcygserver.a.
