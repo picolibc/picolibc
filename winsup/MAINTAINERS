@@ -19,7 +19,8 @@ mingw/*				Mumit Khan <xraylith.wisc.edu>
 w32api/*			Mumit Khan <xraylith.wisc.edu>
 cinstall/*			Ron Parker <rparker1@kc.rr.com>
 cygwin/{everything else}	Chris Faylor <cgf@cygnus.com>,
-				DJ Delorie <cgf@cygnus.com>
-doc/*				DJ Delorie <cgf@cygnus.com>
+				DJ Delorie <dj@cygnus.com>
+doc/*.texinfo {except readme}	David Starks-Browning <starksb@ebi.ac.uk>
+doc/{everything else}		DJ Delorie <dj@cygnus.com>
 utils/*				Chris Faylor <cgf@cygnus.com>,
 				DJ Delorie <dj@cygnus.com>
