@@ -1,6 +1,6 @@
 2004-12-05  Christopher Faylor  <cgf@timesys.com>
 
-	* cygthread.cc (cygthread::terminate_thread): Make public.
+	* cygthread.h (cygthread::terminate_thread): Make public.
 	* pinfo.h (pinfo::wait_thread): New element.
 	* pinfo.cc (pinfo::wait): Store "handle" to started thread in pinfo.
 	* sigproc.cc (proc_terminate): Kill any threads waiting for a process
