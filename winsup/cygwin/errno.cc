@@ -103,6 +103,7 @@ errmap[] =
   X (NEGATIVE_SEEK,             EINVAL),
   X (NOT_READY,                 ENOMEDIUM),
   X (DISK_FULL,		        ENOSPC),
+  X (NOACCESS,		        EFAULT),
   { 0, NULL, 0}
 };
 

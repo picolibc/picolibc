@@ -1,3 +1,7 @@
+Wed Mar 15 20:38:06 2000  Corinna Vinschen <corinna@vinschen.de>
+
+        * errno.cc: Map ERROR_NOACCESS to EFAULT.
+
 Wed Mar 15 14:25:38 2000  Christopher Faylor <cgf@cygnus.com>
 
 	* spawn.cc (spawn_guts): Restore dependency on signal_arrived.  It's
