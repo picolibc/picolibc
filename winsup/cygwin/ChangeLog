@@ -1,3 +1,8 @@
+2003-07-12  Christopher Faylor  <cgf@redhat.com>
+
+	* pinfo.cc (_pinfo::commune_send): Fix bounds test so that poll of
+	communicating pid actually stops eventually.
+
 2003-07-10  Christopher Faylor  <cgf@redhat.com>
 
 	* path.cc (get_device_number): Remove special com?  consideration.
