@@ -1,3 +1,7 @@
+Wed Jun 27 13:37:41 2001  Keith Starsmeare" <keith_starsmeare@yahoo.co.uk>
+
+	* regtool.cc (find_key): Allow '/' as a synonym for '\\'.
+
 Fri Jun 15 00:49:21 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* mkpasswd.c (main): Output passwd file in binary mode so that there

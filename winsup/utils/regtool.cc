@@ -194,10 +194,13 @@ find_key (int howmanyparts, REGSAM access)
   int i;
   if (*n == '/')
     translate (n);
-  while (*n == '\\')
+  while ((*n == '\\') || (*n == '/'))
     n++;
-  for (e = n; *e && *e != '\\'; e++);
-  c = *e;
+  for (e = n; *e && *e != '\\' && *e != '/'; e++);
+  if (*e == '/')
+    c = '\\';
+  else
+    c = *e;
   *e = 0;
   for (i = 0; wkprefixes[i].string; i++)
     if (strcmp (wkprefixes[i].string, n) == 0)
