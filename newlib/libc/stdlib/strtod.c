@@ -316,7 +316,7 @@ dig_done:
 
   if (e1 > 0)
     {
-      if (i = e1 & 15)
+      if ((i = e1 & 15) != 0)
 	rv.d *= tens[i];
       if (e1 &= ~15)
 	{
@@ -373,7 +373,7 @@ dig_done:
   else if (e1 < 0)
     {
       e1 = -e1;
-      if (i = e1 & 15)
+      if ((i = e1 & 15) != 0)
 	rv.d /= tens[i];
       if (e1 &= ~15)
 	{

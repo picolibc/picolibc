@@ -54,10 +54,11 @@ tiny   = 1.0e-30;
         if (k >  0xfe) return huge*copysignf(huge,x); /* overflow  */
         if (k > 0) 				/* normal result */
 	    {SET_FLOAT_WORD(x,(ix&0x807fffff)|(k<<23)); return x;}
-        if (k <= -25)
+        if (k <= -25) {
             if (n > OVERFLOW_INT) 	/* in case integer overflow in n+k */
 		return huge*copysignf(huge,x);	/*overflow*/
 	    else return tiny*copysignf(tiny,x);	/*underflow*/
+       }
         k += 25;				/* subnormal result */
 	SET_FLOAT_WORD(x,(ix&0x807fffff)|(k<<23));
         return x*twom25;

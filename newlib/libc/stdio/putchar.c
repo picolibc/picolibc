@@ -88,7 +88,7 @@ putchar (c)
 {
   /* CHECK_INIT is (eventually) called by __swbuf.  */
 
-  _putchar_r (_REENT, c);
+  return _putchar_r (_REENT, c);
 }
 
 #endif

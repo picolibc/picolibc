@@ -1,3 +1,28 @@
+Mon Apr 17 12:46:00 2000  Marek Michalkiewicz <marekm@linux.org.pl>
+
+	* libc/signal/signal.c (_signal_r) : Removed unused local variable temp.
+	* libc/stdio/findfp.c (std): Added declaration of flags and file.
+	* libc/stdio/mktemp.c (_gettemp, _mkstemp_r, mkstemp): Added int 
+	return type.
+	* libc/stdio/putchar.c (putchar): Added return statement.
+	* libc/stdio/refill.c (lflush): Added correct parentheses.
+	* libc/stdio/vfprintf.c (_VFPRINTF_R): Ditto.
+	* libc/stdio/vfscanf.c (__svfscanf): Changed sprintf call which 
+	prints long value to use l qualifier.
+	* libc/stdlib/dtoa.c (_dtoa_r): Added parentheses to remove warning
+	messages and initialized local values: ilim, ilim1, and spec_case.
+	* libc/stdlib/ecvtbuf.c (print_e): Removed unused variable dp.
+	* libc/stdlib/mbctype.h (_issjis1, _issjis2): Added parentheses.
+	* libc/stdlib/mprec.c: Ditto.
+	* libc/stdlib/setenv_r.c: Ditto.
+	* libc/stdlib/strtod.c: Ditto.
+	* libc/stdlib/strtol.c: Ditto.
+	* libc/stdlib/strtoul.c: Ditto.
+	* libm/common/sf_expm1.c: Added curly braces to if else clauses.
+	* libm/common/sf_log1p.c: Ditto.
+	* libm/common/sf_scalbn.c: Ditto.
+	* libm/math/ef_log.c: Ditto.
+
 Sun Apr 16 12:45:00 2000  Corinna Vinschen <corinna@vinschen.de>
 
         * libc/posix/execvp.c (execvp): Check path for

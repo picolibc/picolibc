@@ -64,7 +64,7 @@ _DEFUN (_setenv_r, (reent_ptr, name, value, rewrite),
         }
       if (strlen (C) >= l_value)
 	{			/* old larger; copy over */
-	  while (*C++ = *value++);
+         while ((*C++ = *value++) != 0);
           ENV_UNLOCK;
 	  return 0;
 	}
@@ -108,7 +108,7 @@ _DEFUN (_setenv_r, (reent_ptr, name, value, rewrite),
       return -1;
     }
   for (C = environ[offset]; (*C = *name++) && *C != '='; ++C);
-  for (*C++ = '='; *C++ = *value++;);
+  for (*C++ = '='; (*C++ = *value++) != 0;);
 
   ENV_UNLOCK;
 

@@ -144,7 +144,7 @@ _DEFUN (_signal_r, (ptr, sig, func),
 	int sig _AND
 	_sig_func_ptr func)
 {
-  _sig_func_ptr old_func, *temp;
+  _sig_func_ptr old_func;
 
   if (sig < 0 || sig >= NSIG)
     {

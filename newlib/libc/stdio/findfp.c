@@ -26,6 +26,8 @@
 static void
 std (ptr, flags, file, data)
      FILE *ptr;
+     int flags;
+     int file;
      struct _reent *data;
 {
   ptr->_p = 0;

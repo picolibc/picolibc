@@ -107,7 +107,7 @@ _DEFUN (Balloc, (ptr, k), struct _reent *ptr _AND int k)
 	}
     }
 
-  if (rv = ptr->_freelist[k])
+  if ((rv = ptr->_freelist[k]) != 0)
     {
       ptr->_freelist[k] = rv->_next;
     }
@@ -354,7 +354,7 @@ _DEFUN (mult, (ptr, a, b), struct _reent * ptr _AND _Bigint * a _AND _Bigint * b
 #ifdef Pack_32
   for (; xb < xbe; xb++, xc0++)
     {
-      if (y = *xb & 0xffff)
+      if ((y = *xb & 0xffff) != 0)
 	{
 	  x = xa;
 	  xc = xc0;
@@ -370,7 +370,7 @@ _DEFUN (mult, (ptr, a, b), struct _reent * ptr _AND _Bigint * a _AND _Bigint * b
 	  while (x < xae);
 	  *xc = carry;
 	}
-      if (y = *xb >> 16)
+      if ((y = *xb >> 16) != 0)
 	{
 	  x = xa;
 	  xc = xc0;
@@ -420,7 +420,7 @@ _DEFUN (pow5mult,
   int i;
   static _CONST int p05[3] = {5, 25, 125};
 
-  if (i = k & 3)
+  if ((i = k & 3) != 0)
     b = multadd (ptr, b, p05[i - 1], 0);
 
   if (!(k >>= 2))
@@ -484,7 +484,7 @@ _DEFUN (lshift, (ptr, b, k), struct _reent * ptr _AND _Bigint * b _AND int k)
 	  z = *x++ >> k1;
 	}
       while (x < xe);
-      if (*x1 = z)
+      if ((*x1 = z) != 0)
 	++n1;
     }
 #else
@@ -697,17 +697,17 @@ _DEFUN (b2d, (a, e),
 #ifdef Pack_32
   if (k < Ebits)
     {
-      d0 = Exp_1 | y >> Ebits - k;
+      d0 = Exp_1 | y >> (Ebits - k);
       w = xa > xa0 ? *--xa : 0;
 #ifndef _DOUBLE_IS_32BITS
-      d1 = y << (32 - Ebits) + k | w >> Ebits - k;
+      d1 = y << ((32 - Ebits) + k) | w >> (Ebits - k);
 #endif
       goto ret_d;
     }
   z = xa > xa0 ? *--xa : 0;
   if (k -= Ebits)
     {
-      d0 = Exp_1 | y << k | z >> 32 - k;
+      d0 = Exp_1 | y << k | z >> (32 - k);
       y = xa > xa0 ? *--xa : 0;
 #ifndef _DOUBLE_IS_32BITS
       d1 = z << k | y >> 32 - k;
@@ -789,7 +789,7 @@ _DEFUN (d2b,
   z |= Exp_msk11;
 #endif
 #else
-  if (de = (int) (d0 >> Exp_shift))
+  if ((de = (int) (d0 >> Exp_shift)) != 0)
     z |= Exp_msk1;
 #endif
 #ifdef Pack_32

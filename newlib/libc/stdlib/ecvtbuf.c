@@ -151,7 +151,6 @@ _DEFUN (print_e, (ptr, buf, invalue, width, type, dot),
 	char type _AND
 	int dot)
 {
-  int dp;
   int sign;
   char *end;
   char *p;

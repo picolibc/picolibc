@@ -25,7 +25,7 @@ static int
 lflush (fp)
      FILE *fp;
 {
-  if ((fp->_flags & (__SLBF | __SWR)) == __SLBF | __SWR)
+  if ((fp->_flags & (__SLBF | __SWR)) == (__SLBF | __SWR))
     return fflush (fp);
   return 0;
 }

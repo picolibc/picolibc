@@ -825,7 +825,7 @@ __svfscanf (fp, fmt0, ap)
 		     truncate some trailing digits to make room.  */
 		  if (exp_start >= buf + sizeof (buf) - MAX_LONG_LEN)
 		    exp_start = buf + sizeof (buf) - MAX_LONG_LEN - 1;
-		  sprintf (exp_start, "e%d", new_exp);
+                 sprintf (exp_start, "e%ld", new_exp);
 		}
 	      res = atof (buf);
 	      if (flags & LONG)
