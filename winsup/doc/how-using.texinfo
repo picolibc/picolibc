@@ -91,6 +91,20 @@ Make sure you are using the find that came with Cygwin and that you
 aren't picking up the Win32 find command instead.  You can verify that
 you are getting the right one by doing a "type find" in bash.
 
+@subsection Why doesn't man work?
+
+Even after installing the @samp{man} package, you get an error like this:
+
+@example
+	bash-2.03$ man man
+	Error executing formatting or display command.
+	System command (cd /usr/man ; (echo -e ".pl 1100i"; cat /usr/man/man1/man.1; echo ".pl \n(nlu+10") | /usr/bin/tbl | /usr/bin/groff -Tascii -mandoc | less -is) exited with status 32512.
+	No manual entry for man
+@end example
+
+You also need /bin/sh, which is found in the @samp{ash} package.
+Install this too.
+
 @subsection Why doesn't chmod work?
 
 @samp{ntsec} will allow UNIX permissions in Windows NT on NTFS file systems.
