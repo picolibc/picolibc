@@ -25,6 +25,9 @@
         (OPCODE_IS_MEMBER): Update for new ISA membership-related
         constant meanings.
 
+        * mips.h (INSN_ISA64, ISA_MIPS5, ISA_MIPS64): New
+        definitions. 
+
 2000-10-20  Jakub Jelinek  <jakub@redhat.com>
 
 	* sparc.h (enum sparc_opcode_arch_val): Add SPARC_OPCODE_ARCH_V9B.

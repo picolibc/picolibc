@@ -313,6 +313,7 @@ struct mips_opcode
 #define INSN_ISA4                 0x00000080
 #define INSN_ISA5                 0x00000100
 #define INSN_ISA32                0x00000200
+#define INSN_ISA64                0x00000400
 
 /* Chip specific instructions.  These are bitmasks.  */
 
@@ -334,7 +335,9 @@ struct mips_opcode
 #define       ISA_MIPS2       (ISA_MIPS1 | INSN_ISA2)
 #define       ISA_MIPS3       (ISA_MIPS2 | INSN_ISA3)
 #define       ISA_MIPS4       (ISA_MIPS3 | INSN_ISA4)
+#define       ISA_MIPS5       (ISA_MIPS4 | INSN_ISA5)
 #define       ISA_MIPS32      (ISA_MIPS2 | INSN_ISA32)
+#define       ISA_MIPS64      (ISA_MIPS5 | INSN_ISA32 | INSN_ISA64)
 
 /* CPU defines, use instead of hardcoding processor number. Keep this
    in sync with bfd/archures.c in order for machine selection to work.  */
@@ -357,6 +360,8 @@ struct mips_opcode
 #define CPU_MIPS16	16
 #define CPU_MIPS32	32
 #define CPU_MIPS32_4K	3204113         /* 32, 04, octal 'K' */
+#define CPU_MIPS5       5
+#define CPU_MIPS64      64
 
 /* Test for membership in an ISA including chip specific ISAs.
    INSN is pointer to an element of the opcode table; ISA is the
