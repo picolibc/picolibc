@@ -1,3 +1,11 @@
+2001-09-09  Egor Duda  <deo@logos-m.ru>
+
+	* dumper.cc (main): Change command-line arguments format to be
+	similar to gdb. Allow adding error_start=x:\path\to\dumper.exe to
+	CYGWIN environment variable to perform core dumping in case of
+	program crash.
+	(usage): Ditto.
+
 Wed Sep  5 22:37:21 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* Makefile.in (dumper): Change logic for libbfd and libintl so that

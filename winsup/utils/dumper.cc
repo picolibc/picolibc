@@ -36,9 +36,9 @@ __attribute__ ((packed))
 #endif
   note_header;
 
-     BOOL verbose = FALSE;
+BOOL verbose = FALSE;
 
-     int deb_printf (const char *format,...)
+int deb_printf (const char *format,...)
 {
   if (!verbose)
     return 0;
@@ -768,10 +768,12 @@ dumper::write_core_dump ()
 static void
 usage ()
 {
-  fprintf (stderr, "Usage: dumper [-d] [-c filename] pid\n");
-  fprintf (stderr, "-c filename -- dump core to filename.core\n");
-  fprintf (stderr, "-d          -- print some debugging info while dumping\n");
-  fprintf (stderr, "pid         -- win32-pid of process to dump\n");
+  fprintf (stderr, "Usage: dumper [options] filename pid\n");
+  fprintf (stderr, "filename -- dump core to filename.core\n");
+  fprintf (stderr, "pid      -- win32-pid of process to dump\n\n");
+  fprintf (stderr, "Possible options are:\n");
+  fprintf (stderr, "-d       -- be verbose while dumping\n");
+  fprintf (stderr, "-q       -- be quite while dumping (default)\n");
 }
 
 int
@@ -780,22 +782,37 @@ main (int argc, char **argv)
   int opt;
   const char *p = "";
   DWORD pid;
+  char win32_name [MAX_PATH];
 
-  while ((opt = getopt (argc, argv, "dc:")) != EOF)
+  while ((opt = getopt (argc, argv, "dq")) != EOF)
     switch (opt)
       {
       case 'd':
 	verbose = TRUE;
 	break;
-      case 'c':
-	char win32_name[MAX_PATH];
-	cygwin_conv_to_win32_path (optarg, win32_name);
-	if ((p = strrchr (win32_name, '\\')))
-	  p++;
-	else
-	  p = win32_name;
+      case 'q':
+	verbose = FALSE;
+	break;
+      default:
+	usage ();
 	break;
       }
+
+  if (argv && *(argv + optind) && *(argv + optind +1))
+    {
+      *win32_name = '\0';
+      cygwin_conv_to_win32_path (*(argv + optind), win32_name);
+      if ((p = strrchr (win32_name, '\\')))
+	p++;
+      else
+	p = win32_name;
+      pid = atoi (*(argv + optind + 1));
+    }
+  else
+    {
+      usage ();
+      return -1;
+    }
 
   char *core_file = (char *) malloc (strlen (p) + sizeof (".core"));
   if (!core_file)
@@ -804,14 +821,6 @@ main (int argc, char **argv)
       return -1;
     }
   sprintf (core_file, "%s.core", p);
-
-  if (argv && *(argv + optind))
-    pid = atoi (*(argv + optind));
-  else
-    {
-      usage ();
-      return -1;
-    }
 
   DWORD tid = 0;
 
