@@ -1187,7 +1187,7 @@ get_nt_attribute (const char *file, int *attribute,
     {
       if (!GetAce (acl, i, (PVOID *) &ace))
 	continue;
-      if (ace->Header.AceFlags & INHERIT_ONLY_ACE)
+      if (ace->Header.AceFlags & INHERIT_ONLY)
 	continue;
       switch (ace->Header.AceType)
 	{
@@ -1363,7 +1363,7 @@ get_nt_object_attribute (HANDLE handle, SE_OBJECT_TYPE object_type, int *attribu
     {
       if (!GetAce (acl, i, (PVOID *) &ace))
 	continue;
-      if (ace->Header.AceFlags & INHERIT_ONLY_ACE)
+      if (ace->Header.AceFlags & INHERIT_ONLY)
 	continue;
       switch (ace->Header.AceType)
 	{
@@ -1664,7 +1664,8 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
   group_deny &= ~(STANDARD_RIGHTS_READ | FILE_READ_ATTRIBUTES | FILE_READ_EA);
 
   /* Construct appropriate inherit attribute. */
-  DWORD inherit = (attribute & S_IFDIR) ? INHERIT_ALL : DONT_INHERIT;
+  DWORD inherit = (attribute & S_IFDIR) ? SUB_CONTAINERS_AND_OBJECTS_INHERIT
+  					: NO_INHERITANCE;
 
   /* Set deny ACE for owner. */
   if (owner_deny
@@ -1692,7 +1693,7 @@ alloc_sd (__uid32_t uid, __gid32_t gid, int attribute,
   /* Set null ACE for special bits. */
   if (null_allow
       && !add_access_allowed_ace (acl, ace_off++, null_allow,
-				  well_known_null_sid, acl_len, DONT_INHERIT))
+				  well_known_null_sid, acl_len, NO_INHERITANCE))
     return NULL;
 
   /* Get owner and group from current security descriptor. */
