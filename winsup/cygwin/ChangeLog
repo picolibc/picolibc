@@ -1,5 +1,10 @@
 2003-11-07  Christopher Faylor  <cgf@redhat.com>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::opendir): Reorganize to
+	handle freeing of memory on error condition.
+
+2003-11-07  Christopher Faylor  <cgf@redhat.com>
+
 	* cygthread.cc (cygthread::freerange): Set inuse count.  Avoid setting
 	ev from h as h would be NULL at this point.
 	(cygthread::operator new): Issue debugging info when overflowing the
