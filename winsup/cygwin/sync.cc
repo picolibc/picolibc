@@ -64,7 +64,8 @@ muto::~muto ()
 
    Note: The goal here is to minimize, as much as possible, calls to the
    OS.  Hence the use of InterlockedIncrement, etc., rather than (much) more
-   expensive OS mutexes.  */
+   expensive OS mutexes.  Also note that the only two valid "ms" times are
+   0 and INFINITE. */
 int
 muto::acquire (DWORD ms)
 {
@@ -78,35 +79,27 @@ muto::acquire (DWORD ms)
     {
       /* Increment the waiters part of the class.  Need to do this first to
 	 avoid potential races. */
-      LONG was_waiting = InterlockedIncrement (&waiters);
+      LONG was_waiting = ms ? InterlockedIncrement (&waiters) : 0;
 
-      /* This is deceptively simple.  Basically, it allows multiple attempts to
-	 lock the same muto to succeed without attempting to manipulate sync.
-	 If the muto is already locked then this thread will wait for ms until
-	 it is signalled by muto::release.  Then it will attempt to grab the
-	 sync field.  If it succeeds, then this thread owns the muto.
+      while (was_waiting || InterlockedExchange (&sync, 1) != 0)
+	  {
+	    switch (WaitForSingleObject (bruteforce, ms))
+		{
+		case WAIT_OBJECT_0:
+		  was_waiting = 0;
+		  break;
+		default:
+		  return 0;	/* failed. */
+		}
+	  }
 
-	 There is a pathological condition where a thread times out waiting for
-	 bruteforce but the release code triggers the bruteforce event.  In this
-	 case, it is possible for a thread which is going to wait for bruteforce
-	 to wake up immediately.  It will then attempt to grab sync but will fail
-	 and go back to waiting.  */
-      if (tid != this_tid && (was_waiting || InterlockedExchange (&sync, 1) != 0))
-	{
-	  switch (WaitForSingleObject (bruteforce, ms))
-	      {
-	      case WAIT_OBJECT_0:
-		goto gotit;
-		break;
-	      default:
-		InterlockedDecrement (&waiters);
-		return 0;	/* failed. */
-	      }
-	}
+      /* Have to do it this way to avoid a race */
+      if (!ms)
+	InterlockedIncrement (&waiters);
+
+      tid = this_tid;	/* register this thread. */
     }
 
-gotit:
-  tid = this_tid;	/* register this thread. */
   return ++visits;	/* Increment visit count. */
 }
 
@@ -129,7 +122,7 @@ muto::release ()
       (void) InterlockedExchange (&sync, 0); /* Reset trigger. */
       /* This thread had incremented waiters but had never decremented it.
 	 Decrement it now.  If it is >= 0 then there are possibly other
-	 threads waiting for the lock, so trigger bruteforce. */
+	 threads waiting for the lock, so trigger bruteforce.  */
       if (InterlockedDecrement (&waiters) >= 0)
 	(void) SetEvent (bruteforce); /* Wake up one of the waiting threads */
     }

@@ -1,3 +1,10 @@
+2004-03-15  Christopher Faylor  <cgf@redhat.com>
+
+	* exceptions.cc (try_to_debug): Report on tid of caller.
+
+	* sync.cc (muto::acquire): Fix some races.
+	* sync.h (muto): Expose some fields for easier debugging.
+
 2004-03-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.h (fhandler_dev_tape::tape_get_pos): Declare with extra

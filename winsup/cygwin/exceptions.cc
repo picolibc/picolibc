@@ -349,8 +349,8 @@ try_to_debug (bool waitloop)
 	}
     }
 
-  console_printf ("*** starting debugger for pid %u\n",
-		  cygwin_pid (GetCurrentProcessId ()));
+  console_printf ("*** starting debugger for pid %u, tid %u\n",
+		  cygwin_pid (GetCurrentProcessId ()), GetCurrentThreadId ());
   BOOL dbg;
   dbg = CreateProcess (NULL,
 		       debugger_command,

@@ -18,11 +18,11 @@ class muto
 {
   static DWORD exiting_thread;
   LONG sync;	/* Used to serialize access to this class. */
-  LONG visits;	/* Count of number of times a thread has called acquire. */
   LONG waiters;	/* Number of threads waiting for lock. */
   HANDLE bruteforce; /* event handle used to control waiting for lock. */
-  DWORD tid;	/* Thread Id of lock owner. */
 public:
+  LONG visits;	/* Count of number of times a thread has called acquire. */
+  DWORD tid;	/* Thread Id of lock owner. */
   // class muto *next;
   const char *name;
 
