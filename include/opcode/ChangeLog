@@ -1,3 +1,17 @@
+2003-08-07  Alan Modra  <amodra@bigpond.net.au>
+
+	* alpha.h: Remove PARAMS macro.
+	* arc.h: Likewise.
+	* d10v.h: Likewise.
+	* d30v.h: Likewise.
+	* i370.h: Likewise.
+	* or32.h: Likewise.
+	* pj.h: Likewise.
+	* ppc.h: Likewise.
+	* sparc.h: Likewise.
+	* tic80.h: Likewise.
+	* v850.h: Likewise.
+
 2003-07-18  Michael Snyder  <msnyder@redhat.com>
 
 	* include/opcode/h8sx.h (DO_MOVA1, DO_MOVA2): Reformatting.

@@ -1,3 +1,10 @@
+2003-08-07  Alan Modra  <amodra@bigpond.net.au>
+
+	* ti.h (GET_SCNHDR_NRELOC): Rename PTR param to LOC.
+	(PUT_SCNHDR_NRELOC, GET_SCNHDR_NLNNO, PUT_SCNHDR_NLNNO): Likewise.
+	(GET_SCNHDR_FLAGS, PUT_SCNHDR_FLAGS): Likewise.
+	(GET_SCNHDR_PAGE, PUT_SCNHDR_PAGE): Likewise.
+
 2003-07-17  Jeff Muizelaar  <muizelaar@rogers.com>
 
 	* pe.h: (IMAGE_FILE_NET_RUN_FROM_SWAP): Define.

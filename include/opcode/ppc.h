@@ -160,9 +160,8 @@ struct powerpc_operand
      string (the operand will be inserted in any case).  If the
      operand value is legal, *ERRMSG will be unchanged (most operands
      can accept any value).  */
-  unsigned long (*insert) PARAMS ((unsigned long instruction, long op,
-				   int dialect,
-				   const char **errmsg));
+  unsigned long (*insert)
+    (unsigned long instruction, long op, int dialect, const char **errmsg);
 
   /* Extraction function.  This is used by the disassembler.  To
      extract this operand type from an instruction, check this field.
@@ -181,8 +180,7 @@ struct powerpc_operand
      non-zero if this operand type can not actually be extracted from
      this operand (i.e., the instruction does not match).  If the
      operand is valid, *INVALID will not be changed.  */
-  long (*extract) PARAMS ((unsigned long instruction, int dialect,
-			   int *invalid));
+  long (*extract) (unsigned long instruction, int dialect, int *invalid);
 
   /* One bit syntax flags.  */
   unsigned long flags;

@@ -1,3 +1,9 @@
+2003-08-07  Alan Modra  <amodra@bigpond.net.au>
+
+	* reloc-macros.h (START_RELOC_NUMBERS) : Remove PARAMS macro.  Use
+	C90 function definition.  Formatting.
+	(RELOC_NUMBER): Remove !__STDC__ code.
+
 2003-07-28  Eric Christopher  <echristo@redhat.com>
 
 	* ppc.h (R_PPC_RELAX32): New. Fake relocation.
@@ -37,10 +43,6 @@
 
 	* mmix.h: Convert to ISO C90 prototypes.
 	* mips.h: Likewise.
-
-	* reloc-macros.h (START_RELOC_NUMBERS): Convert to ISO C90
-	prototype.
-	(RELOC_NUMBER): Remove !__STDC__ code.
 
 2003-06-13  Robert Millan <zeratul2@wanadoo.es>
 
