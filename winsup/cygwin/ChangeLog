@@ -3207,7 +3207,7 @@
 	mount entry is not found.
 	(mount_info::set_flags_from_win32_path): Ditto.
 
-2002-06-04  Christopher Faylor  <ccygserver_shm.ccgf@redhat.com>
+2002-06-04  Christopher Faylor  <cgf@redhat.com>
 
 	* dtable.cc (handle_to_fn): Correct placement and length of name
 	buffer.  (Suggested by Pavel Tsekov)
@@ -3343,7 +3343,7 @@
 
 2002-06-02  Christopher Faylor  <cgf@redhat.com>
 
-	* fhandler_disk_file.cc (fhacygserver_shm.ccndler_disk_file::fstat_by_name): Check
+	* fhandler_disk_file.cc (fhandler_disk_file::fstat_by_name): Check
 	specifically for non-existent file, first.
 	(fhandler_disk_file::fstat): Perform fd open on files with funny
 	characters.
