@@ -1,3 +1,8 @@
+Thu Apr  5 22:41:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* syscalls.cc (stat_worker): Fix conditional which still allowed
+	successful stat'ing of non-existant files.
+
 Wed Apr  4 10:37:44 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* child_info.h: Bump magic number for fork/exec/spawn.

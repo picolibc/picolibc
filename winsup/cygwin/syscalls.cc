@@ -1084,8 +1084,8 @@ stat_worker (const char *caller, const char *name, struct stat *buf,
 	  goto done;
 	}
     }
-  if (atts != -1 || (!oret && get_errno () != ENOENT
-			   && get_errno () != ENOSHARE))
+  if (atts != -1 && (oret || (!oret && get_errno () != ENOENT
+			            && get_errno () != ENOSHARE)))
     {
       /* Unfortunately, the above open may fail if the file exists, though.
 	 So we have to care for this case here, too. */
