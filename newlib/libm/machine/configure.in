@@ -33,6 +33,7 @@ fi
 AC_SUBST(libm_machine_dir)
 AC_SUBST(machlib)
 
+AM_CONDITIONAL(HAVE_LIBM_MACHINE_DIR, test x${libm_machine_dir} != x)
 AC_OUTPUT(Makefile)
 
 

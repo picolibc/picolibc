@@ -1,3 +1,8 @@
+2001-12-19  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* libm/machine/configure.in (HAVE_LIBM_MACHINE_DIR): New conditional.
+	* libm/machine/Makefile.am [HAVE_LIBM_MACHINE_DIR] (LIBM_MACHLIB): New variable.
+
 2001-12-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libm/machine/Makefile.am: Change rules to create correct lib.a.

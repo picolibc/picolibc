@@ -2284,6 +2284,15 @@ fi
 
 
 
+
+
+if test x${libm_machine_dir} != x; then
+  HAVE_LIBM_MACHINE_DIR_TRUE=
+  HAVE_LIBM_MACHINE_DIR_FALSE='#'
+else
+  HAVE_LIBM_MACHINE_DIR_TRUE='#'
+  HAVE_LIBM_MACHINE_DIR_FALSE=
+fi
 trap '' 1 2 15
 cat > confcache <<\EOF
 # This file is a shell script that caches the results of configure
@@ -2473,6 +2482,8 @@ s%@OBJDUMP@%$OBJDUMP%g
 s%@LIBTOOL@%$LIBTOOL%g
 s%@subdirs@%$subdirs%g
 s%@machlib@%$machlib%g
+s%@HAVE_LIBM_MACHINE_DIR_TRUE@%$HAVE_LIBM_MACHINE_DIR_TRUE%g
+s%@HAVE_LIBM_MACHINE_DIR_FALSE@%$HAVE_LIBM_MACHINE_DIR_FALSE%g
 
 CEOF
 EOF
