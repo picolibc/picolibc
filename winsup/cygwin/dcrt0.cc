@@ -688,7 +688,6 @@ dll_crt0_0 ()
 	    __argv = spawn_info->moreinfo->argv;
 	    envp = spawn_info->moreinfo->envp;
 	    envc = spawn_info->moreinfo->envc;
-	    envp = spawn_info->moreinfo->envp;
 	    cygheap->fdtab.fixup_after_exec ();
 	    signal_fixup_after_exec ();
 	    if (spawn_info->moreinfo->old_title)
