@@ -1,3 +1,7 @@
+2005-03-30  Paul Brook  <paul@codesourcery.com>
+
+	* arm/wrapper.c: Provide SIGTRAP and SIGBUS.
+
 2005-03-30  Daniel Jacobowitz  <dan@codesourcery.com>
 
 	* gdb/Makefile.in (arm-linux-nat.o): Update dependencies.
