@@ -1931,7 +1931,7 @@ cygwin_rcmd (char **ahost, unsigned short inport, char *locuser,
 
 	  fh = NULL;
 	  if (newfd >= 0)
-	    fh = fdsock (*fd2p, "/dev/tcp", fd2s);
+	    fh = fdsock (newfd, "/dev/tcp", fd2s);
 	  if (fh)
 	    *fd2p = newfd;
 	  else
@@ -2015,7 +2015,7 @@ cygwin_rexec (char **ahost, unsigned short inport, char *locuser,
 
 	  fh = NULL;
 	  if (newfd >= 0)
-	    fh = fdsock (*fd2p, "/dev/tcp", fd2s);
+	    fh = fdsock (newfd, "/dev/tcp", fd2s);
 	  if (fh)
 	    *fd2p = newfd;
 	  else

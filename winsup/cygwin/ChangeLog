@@ -1,3 +1,8 @@
+2003-03-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (cygwin_rcmd): Use correct file descriptor in call to fdsock.
+	(cygwin_rexec): Ditto.
+
 2003-03-13  Christopher Faylor  <cgf@redhat.com>
 
 	* fhandler_tty.cc (fhandler_tty_slave::close): Fix typo in debug
