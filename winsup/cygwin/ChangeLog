@@ -1,4 +1,4 @@
-2002-12-02  Egor Duda <deo@logos-m.ru>
+2002-12-09  2002-12-02  Egor Duda <deo@logos-m.ru>
 
 	* lib/pseudo-reloc.c: New file.
 	* lib/_cygwin_crt0_common.cc: Perform pseudo-relocs during
