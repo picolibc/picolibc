@@ -140,7 +140,7 @@ class fhandler_base
   void set_name (const char *unix_path, const char *win32_path = NULL);
 
   virtual fhandler_base& operator =(fhandler_base &x);
-  fhandler_base (DWORD dev);
+  fhandler_base ();
   virtual ~fhandler_base ();
 
   /* Non-virtual simple accessor functions. */
@@ -481,7 +481,7 @@ class fhandler_dev_raw: public fhandler_base
   /* returns not null, if `win_error' determines an end of file condition */
   virtual int is_eof(int win_error) = 0;
 
-  fhandler_dev_raw (DWORD dev);
+  fhandler_dev_raw ();
 
  public:
   ~fhandler_dev_raw (void);
@@ -562,7 +562,6 @@ class fhandler_disk_file: public fhandler_base
 {
  public:
   fhandler_disk_file ();
-  fhandler_disk_file (DWORD devtype);
 
   int open (path_conv *real_path, int flags, mode_t mode);
   int close ();
@@ -676,8 +675,8 @@ class fhandler_termios: public fhandler_base
   virtual int accept_input () {return 1;};
  public:
   tty_min *tc;
-  fhandler_termios (DWORD dev) :
-  fhandler_base (dev)
+  fhandler_termios () :
+  fhandler_base ()
   {
     set_need_fork_fixup ();
   }
@@ -832,8 +831,8 @@ class fhandler_console: public fhandler_termios
 class fhandler_tty_common: public fhandler_termios
 {
  public:
-  fhandler_tty_common (DWORD dev)
-    : fhandler_termios (dev), output_done_event (NULL),
+  fhandler_tty_common ()
+    : fhandler_termios (), output_done_event (NULL),
     ioctl_request_event (NULL), ioctl_done_event (NULL), output_mutex (NULL),
     input_mutex (NULL), input_available_event (NULL), inuse (NULL)
   {
@@ -893,7 +892,7 @@ class fhandler_pty_master: public fhandler_tty_common
   int need_nl;			// Next read should start with \n
 
   /* Constructor */
-  fhandler_pty_master (DWORD devtype = FH_PTYM);
+  fhandler_pty_master ();
 
   int process_slave_output (char *buf, size_t len, int pktmode_on);
   void doecho (const void *str, DWORD len);
@@ -1079,7 +1078,7 @@ class fhandler_virtual : public fhandler_base
   int fileid; // unique within each class
  public:
 
-  fhandler_virtual (DWORD devtype);
+  fhandler_virtual ();
   virtual ~fhandler_virtual();
 
   virtual int exists();
@@ -1103,7 +1102,6 @@ class fhandler_proc: public fhandler_virtual
 {
  public:
   fhandler_proc ();
-  fhandler_proc (DWORD devtype);
   int exists();
   struct dirent *readdir (DIR *);
   static DWORD get_proc_fhandler(const char *path);
