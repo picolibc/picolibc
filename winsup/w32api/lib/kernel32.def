@@ -357,6 +357,7 @@ GetSystemDirectoryW@8
 GetSystemInfo@4
 GetSystemPowerStatus@4
 GetSystemTime@4
+GetSystemTimes@12
 GetSystemTimeAdjustment@12
 GetSystemTimeAsFileTime@4
 GetTapeParameters@16

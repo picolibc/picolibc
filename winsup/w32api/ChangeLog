@@ -1,3 +1,15 @@
+2003-03-06  Christopher January  <chris@atomice.net>
+
+	* include/winbase.h (FindFirstVolume): Add declaration.
+	(FindNextVolume): Add declaration.
+	(FindVolumeClose): Add declaration.
+	(GetSystemTimes): Add declaration.
+	* include/winnt.h: Add define for PF_XMMI64_INSTRUCTIONS_AVAILABLE.
+
+2003-03-06  Danny Smith  <dannysmith@users.sourceforge.net>
+
+	*lib/kernel32.def (GetSystemTimes): Add stub.
+
 2003-03-04  Heiko Gerdau  <hg@technosis.de>
 
 	* oleidl.h (IOleObject): Correct GetUserType prototype.
