@@ -1,5 +1,15 @@
 2002-06-14  Earnie Boyd  <earnie@users.sf.net>
 
+	* include/w32api.h: Change to version 2.0 to reflect the change
+	in the license.
+	* README: Renamed.
+	* README.w32api: Renamed from README.  Modified license to remove
+	the restriction of notifying the author based on the fact that the
+	author is unreachable at the notified address.
+	* Makefile.in (VERSION): Change to 2.0.
+
+2002-06-14  Earnie Boyd  <earnie@users.sf.net>
+
 	* include/wingdi.h (GetEnhMetaFileBits): Correct typo.
 	* Makefile.in (bindist): Correct the MinGW distribution.
 

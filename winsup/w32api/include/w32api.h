@@ -4,8 +4,8 @@
 #pragma GCC system_header
 #endif
 
-#define __W32API_VERSION 1.5
-#define __W32API_MAJOR_VERSION 1
-#define __W32API_MINOR_VERSION 5
+#define __W32API_VERSION 2.0
+#define __W32API_MAJOR_VERSION 2
+#define __W32API_MINOR_VERSION 0
 
 #endif /* ndef _W32API_H_ */
