@@ -73,7 +73,7 @@ public:
   client_request (request_code_t request_code,
 		  void *buf = NULL,
 		  size_t bufsiz = 0);
-  virtual ~client_request();
+  virtual ~client_request ();
 
   request_code_t request_code () const { return _header.request_code; }
 

@@ -35,7 +35,7 @@ details. */
 static const char version[] = "$Revision$";
 
 /*
- * Support function for the XXX_printf() macros in "woutsup.h".
+ * Support function for the XXX_printf () macros in "woutsup.h".
  * Copied verbatim from "strace.cc".
  */
 static int
@@ -47,7 +47,7 @@ getfunc (char *in_dst, const char *func)
   for (p = func; (pe = strchr (p, '(')); p = pe + 1)
     if (isalnum ((int)pe[-1]) || pe[-1] == '_')
       break;
-    else if (isspace((int)pe[-1]))
+    else if (isspace ((int)pe[-1]))
       {
 	pe--;
 	break;
@@ -73,7 +73,7 @@ getfunc (char *in_dst, const char *func)
 }
 
 /*
- * Support function for the XXX_printf() macros in "woutsup.h".
+ * Support function for the XXX_printf () macros in "woutsup.h".
  */
 extern "C" void
 __cygserver__printf (const char *const function, const char *const fmt, ...)
@@ -83,14 +83,14 @@ __cygserver__printf (const char *const function, const char *const fmt, ...)
 
   va_list ap;
 
-  char *const buf = (char *) alloca(BUFSIZ);
+  char *const buf = (char *) alloca (BUFSIZ);
 
   assert (buf);
 
   int len = 0;
 
   if (function)
-    len += getfunc(buf, function);
+    len += getfunc (buf, function);
 
   va_start (ap, fmt);
   len += vsnprintf (buf + len, BUFSIZ - len, fmt, ap);
@@ -128,7 +128,7 @@ setup_privileges ()
   HANDLE hToken = NULL;
   TOKEN_PRIVILEGES sPrivileges;
 
-  rc = OpenProcessToken (GetCurrentProcess() , TOKEN_ALL_ACCESS , &hToken) ;
+  rc = OpenProcessToken (GetCurrentProcess () , TOKEN_ALL_ACCESS , &hToken) ;
   if (!rc)
     {
       system_printf ("error opening process token (%lu)", GetLastError ());
@@ -378,7 +378,7 @@ client_request_attach_tty::serve (transport_layer_base *const conn,
 }
 
 void
-client_request_get_version::serve(transport_layer_base *, process_cache *)
+client_request_get_version::serve (transport_layer_base *, process_cache *)
 {
   assert (!error_code ());
 
@@ -400,7 +400,7 @@ public:
     : _conn (conn), _cache (cache)
   {}
 
-  virtual ~server_request()
+  virtual ~server_request ()
   {
     safe_delete (_conn);
   }
@@ -525,7 +525,7 @@ handle_signal (const int signum)
 }
 
 /*
- * print_usage()
+ * print_usage ()
  */
 
 static void
@@ -540,7 +540,7 @@ print_usage (const char *const pgm)
 }
 
 /*
- * print_version()
+ * print_version ()
  */
 
 static void
@@ -588,7 +588,7 @@ print_version (const char *const pgm)
 }
 
 /*
- * main()
+ * main ()
  */
 
 int
@@ -616,7 +616,7 @@ main (const int argc, char *argv[])
   else
     pgm++;
 
-  wincap.init();
+  wincap.init ();
   if (wincap.has_security ())
     setup_privileges ();
 

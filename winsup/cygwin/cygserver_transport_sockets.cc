@@ -260,7 +260,7 @@ transport_layer_sockets::read (void *const buf, const size_t buf_len)
   // verbose: debug_printf ("read (buf = %p, len = %u) [this = %p, fd = %d]",
   //		buf, buf_len, this, _fd);
 
-  char *read_buf = static_cast<char *>(buf);
+  char *read_buf = static_cast<char *> (buf);
   size_t read_buf_len = buf_len;
   ssize_t res = 0;
 
@@ -281,7 +281,7 @@ transport_layer_sockets::read (void *const buf, const size_t buf_len)
       res = buf_len - read_buf_len;
     }
 
-  if (res != static_cast<ssize_t>(buf_len))
+  if (res != static_cast<ssize_t> (buf_len))
     debug_printf ("%d = read (buf = %p, len = %u) [this = %p, fd = %d]: %s",
 		  res, buf, buf_len, this, _fd,
 		  (res == -1 ? strerror (errno) : "EOF"));
@@ -306,7 +306,7 @@ transport_layer_sockets::write (void *const buf, const size_t buf_len)
   // verbose: debug_printf ("write (buf = %p, len = %u) [this = %p, fd = %d]",
   //		buf, buf_len, this, _fd);
 
-  char *write_buf = static_cast<char *>(buf);
+  char *write_buf = static_cast<char *> (buf);
   size_t write_buf_len = buf_len;
   ssize_t res = 0;
 
@@ -327,7 +327,7 @@ transport_layer_sockets::write (void *const buf, const size_t buf_len)
       res = buf_len - write_buf_len;
     }
 
-  if (res != static_cast<ssize_t>(buf_len))
+  if (res != static_cast<ssize_t> (buf_len))
     debug_printf ("%d = write (buf = %p, len = %u) [this = %p, fd = %d]: %s",
 		  res, buf, buf_len, this, _fd,
 		  (res == -1 ? strerror (errno) : "EOF"));

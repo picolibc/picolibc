@@ -78,7 +78,7 @@ process::~process ()
 }
 
 /* No need to be thread-safe as this is only ever called by
- * process_cache::remove_process().  If it has to be made thread-safe
+ * process_cache::remove_process ().  If it has to be made thread-safe
  * later on, it should not use the `access' critical section as that
  * is held by the client request handlers for an arbitrary length of
  * time, i.e. while they do whatever processing is required for a

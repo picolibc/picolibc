@@ -103,12 +103,12 @@ private:
   {
   public:
     cleanup_t (const segment_t *const segptr)
-      : cleanup_routine (reinterpret_cast<void *>(segptr->_shmid))
+      : cleanup_routine (reinterpret_cast<void *> (segptr->_shmid))
     {
       assert (key ());
     }
 
-    int shmid () const { return reinterpret_cast<int>(key ()); }
+    int shmid () const { return reinterpret_cast<int> (key ()); }
 
     virtual void cleanup (class process *const client)
     {

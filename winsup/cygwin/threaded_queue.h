@@ -22,8 +22,8 @@ class queue_request
 public:
   queue_request *_next;
 
-  queue_request() : _next (NULL) {}
-  virtual ~queue_request();
+  queue_request () : _next (NULL) {}
+  virtual ~queue_request ();
 
   virtual void process () = 0;
 };

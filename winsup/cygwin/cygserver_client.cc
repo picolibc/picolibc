@@ -45,7 +45,7 @@ client_request_get_version::client_request_get_version ()
 }
 
 /*
- * client_request_get_version::check_version()
+ * client_request_get_version::check_version ()
  *
  * The major version and API version numbers must match exactly.  An
  * older than expected minor version number is accepted (as long as
@@ -103,7 +103,7 @@ client_request_attach_tty::client_request_attach_tty ()
 #endif /* __INSIDE_CYGWIN__ */
 
 /*
- * client_request_attach_tty::send()
+ * client_request_attach_tty::send ()
  *
  * Wraps the base method to provide error handling support.  If the
  * reply contains a body but is flagged as an error, close any handles
@@ -506,10 +506,6 @@ check_cygserver_available ()
 
   return req.check_version ();
 }
-
-/*
- * check_cygserver_available()
- */
 
 void
 cygserver_init ()
