@@ -1,3 +1,8 @@
+Thu Sep  6 20:04:05 2001  Christopher Faylor <cgf@cygnus.com>
+
+	* fhandler_socket.cc (fhandler_socket::fhandler_socket): Ensure that
+	prot_info_ptr is zeroed for later use.
+
 Thu Sep  6 14:03:49 2001  Christopher Faylor <cgf@cygnus.com>
 
 	* cygheap.cc (cygheap_fixup_in_child): Don't consider a NULL bucket as
