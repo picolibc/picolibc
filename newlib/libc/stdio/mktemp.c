@@ -155,7 +155,7 @@ _DEFUN (_gettemp, (ptr, path, doopen),
 	  if ((*doopen = _open_r (ptr, path, O_CREAT | O_EXCL | O_RDWR, 0600))
 	      >= 0)
 	    return 1;
-#if defined(__CYGWIN32__) || defined(__CYGWIN__)
+#if defined(__CYGWIN__)
 	  if (ptr->_errno != EEXIST && ptr->_errno != EACCES)
 #else
 	  if (ptr->_errno != EEXIST)

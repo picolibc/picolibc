@@ -1,5 +1,12 @@
 2003-05-13  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/ctype/ctype_.c: Remove checks for deprecated __CYGWIN32__.
+	* libc/include/stdio.h: Ditto.
+	* libc/include/sys/config.h: Ditto.
+	* libc/stdio/mktemp.c: Ditto.
+
+2003-05-13  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/locale/ldpart.c (__part_load_locale): Substitute
 	__CYGWIN_USE_BIG_TYPES__ by __USE_INTERNAL_STAT64.
 	* libc/search/hash.c (__hash_open): Ditto.

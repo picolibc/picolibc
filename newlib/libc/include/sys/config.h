@@ -147,7 +147,7 @@
 #define __RAND_MAX 0x7fffffff
 #endif
 
-#if defined(__CYGWIN32__) || defined(__CYGWIN__)
+#if defined(__CYGWIN__)
 #include <cygwin/config.h>
 #endif
 

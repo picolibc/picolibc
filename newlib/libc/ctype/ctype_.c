@@ -84,7 +84,7 @@ static _CONST char _ctype_b[128 + 256] = {
 	_CTYPE_DATA_128_256
 };
 
-#if defined(__CYGWIN__) || defined(__CYGWIN32__)
+#if defined(__CYGWIN__)
 extern _CONST char __declspec(dllexport) _ctype_[1 + 256] __attribute__ ((alias ("_ctype_b+127")));
 _CONST char __declspec(dllexport) *__ctype_ptr = _ctype_b + 128;
 #else
@@ -94,7 +94,7 @@ _CONST char *__ctype_ptr = _ctype_b + 128;
 
 #else	/* !defined(ALLOW_NEGATIVE_CTYPE_INDEX) */
 
-#if defined(__CYGWIN__) || defined(__CYGWIN32__)
+#if defined(__CYGWIN__)
 _CONST char __declspec(dllexport) _ctype_[1 + 256] = {
 #else
 _CONST char _ctype_[1 + 256] = {
