@@ -6,8 +6,8 @@
 
 /* CYGNUS LOCAL */
 #include "winsup.h"
-#define lint
 #include <windows.h>
+#define lint
 
 #define USG_COMPAT
 
@@ -1429,7 +1429,7 @@ tzsetwall P((void))
 		}
 	}
 #endif /* defined ALL_STATE */
-#ifdef _WIN32
+#if defined (_WIN32) || defined (__CYGWIN__)
 #define is_upper(c) ((unsigned)(c) - 'A' <= 26)
 	{
 	    TIME_ZONE_INFORMATION tz;
