@@ -194,7 +194,7 @@ INT WSPAPI WSCWriteProviderOrder(LPDWORD,DWORD);
 #endif /* RC_INVOKED */
 
 #ifdef __cplusplus
-};
+}
 #endif /* __cplusplus */
 
 #endif /* _WS2SPI_H */
