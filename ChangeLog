@@ -1,3 +1,8 @@
+2003-05-02  Chris Demetriou  <cgd@broadcom.com>
+
+        * Makefile.tpl: Require "makeinfo" from texinfo 4.2 or later.
+        * Makefile.in: Regenerate.
+
 2003-04-27  Daniel Jacobowitz  <drow@mvista.com>
 
 	* src-release (DEVO_SUPPORT): Add src-release, Makefile.tpl,
