@@ -765,7 +765,7 @@ fhandler_tty_slave::read (void *ptr, size_t& len)
   w4[0] = signal_arrived;
   w4[1] = input_available_event;
 
-  DWORD waiter = !ptr ? 0 : INFINITE;
+  DWORD waiter = time_to_wait;
   while (len)
     {
       rc = WaitForMultipleObjects (2, w4, FALSE, waiter);
