@@ -1,3 +1,7 @@
+Wed Sep  5 12:12:00 2001  Corinna Vinschen <corinna@vinschen.de>
+
+	* fhandler_floppy.cc (fhandler_floppy::lseek): Remove iswinnt check.
+
 Wed Sep  5 11:34:00 2001  Corinna Vinschen <corinna@vinschen.de>
 
 	* fhandler_socket.cc (fhandler_socket::close): Change 2MSL value
